@@ -179,6 +179,7 @@ typedef struct CupidFindback0Data {
    int slice_lbnd[ 3 ];/* Lower bounds of each significant slice axis */
    int newalg;         /* Use experimental algorithm variations? */
    int slice_size;     /* Number of pixels in each slice */
+   float wlim;         /* Min. frac. of good pixels in a filter box */
 } CupidFindback0Data;
 
 

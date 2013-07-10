@@ -261,6 +261,16 @@ package cupid {
             helpkey *
           }
 
+         parameter wlim {
+            type _REAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default 0.3
+            prompt {Weight limit for good output pixels}
+            helpkey *
+         }
+
       }
 
       action findclumps {

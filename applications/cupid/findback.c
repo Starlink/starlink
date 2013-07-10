@@ -111,12 +111,35 @@ void findback( int *status ){
 *     OUT = NDF (Write)
 *        The output NDF containing either the estimated background, or the
 *        background-subtracted input data, as specified by parameter SUB.
+*     WLIM = _REAL (Read)
+*        If the input NDF contains bad pixels, then this parameter
+*        may be used to determine the number of good pixels which must
+*        be present within the filter box before a valid output
+*        pixel is generated.  It can be used, for example, to prevent
+*        output pixels from being generated in regions where there are
+*        relatively few good pixels to contribute to the filtered
+*        result.
+*
+*        If a null (!) value is used for WLIM, the pattern of bad pixels
+*        is propagated from the input NDF to the output NDF unchanged. In
+*        this case, filtered output values are only calculated for those
+*        pixels which are not bad in the input NDF.
+*
+*        If a numerical value is given for WLIM, then it specifies the
+*        minimum fraction of good pixels which must be present in the
+*        filter box in order to generate a good output pixel.  If
+*        this specified minimum fraction of good input pixels is not
+*        present, then a bad output pixel will result, otherwise a
+*        filtered output value will be calculated.  The value of this
+*        parameter should lie between 0.0 and 1.0 (the actual number
+*        used will be rounded up if necessary to correspond to at least
+*        1 pixel). [0.3]
 
 *  Notes:
 *     - Smoothing cubes in 3 dimensions can be very slow.
 
 *  Copyright:
-*     Copyright (C) 2009 Science and Technology Facilities Council.
+*     Copyright (C) 2009,2013 Science and Technology Facilities Council.
 *     Copyright (C) 2006, 2007 Particle Physics & Astronomy Research Council.
 *     All Rights Reserved.
 
@@ -162,6 +185,10 @@ void findback( int *status ){
 *        avoid accumulation of rsource usage associated with each new
 *        created workforce, which can be a problem when running from a
 *        monolith. And do not delete the singleton workforce.
+*     10-JUL-2013 (DSB):
+*        - Added parameter WLIM.
+*        - Fixed incorrect lower bounds when any insignificant axes are 
+*        present (this only affected debugging tools).
 *     {enter_further_changes_here}
 
 *-
@@ -181,6 +208,7 @@ void findback( int *status ){
    double sum;               /* Sum of variances */
    float *pf1;               /* Pointer to single precision input data */
    float *pf2;               /* Pointer to single precision output data */
+   float wlim;               /* Min. frac of good pixels required in a filter box */
    int *old_status;          /* Pointer to original status value */
    int box[ 3 ];             /* Dimensions of each cell in pixels */
    int dim[ NDF__MXDIM ];    /* Dimensions of each NDF pixel axis */
@@ -201,11 +229,13 @@ void findback( int *status ){
    int nystep;               /* Number of independent y slices */
    int nzstep;               /* Number of slices in z direction */
    int sdim[ 3 ];            /* Dimensions of each significant NDF axis */
+   int slbnd[ 3 ];           /* Lower bounds of each significant NDF axis */
    int slice_dim[ 3 ];       /* Dimensions of each significant slice axis */
    int slice_lbnd[ 3 ];      /* Lower bounds of each significant slice axis */
    int slice_size;           /* Number of pixels in each slice */
    int state;                /* Parameter state */
    int sub;                  /* Output the background-subtracted input data? */
+   int subnd[ 3 ];           /* Upper bounds of each significant NDF axis */
    int type;                 /* Integer identifier for data type */
    int ubnd[ NDF__MXDIM ];   /* Upper pixel bounds of slice */
    int var;                  /* Does i/p NDF have a Variance component? */
@@ -236,11 +266,15 @@ void findback( int *status ){
    ndfBound( indf1, NDF__MXDIM, lbnd, ubnd, &ndim, status );
 
 /* Identify and count the number of significant axes (i.e. axes spanning
-   more than 1 pixel). Also record their dimensions. */
+   more than 1 pixel). Also record their dimensions and bounds. */
    nsdim = 0;
    for( i = 0; i < ndim; i++ ) {
       dim[ i ] = ubnd[ i ] - lbnd[ i ] + 1;
-      if( dim[ i ] > 1 ) sdim[ nsdim++ ] = dim[ i ];
+      if( dim[ i ] > 1 ) {
+         slbnd[ nsdim ] = lbnd[ i ];
+         subnd[ nsdim ] = ubnd[ i ];
+         sdim[ nsdim++ ] = dim[ i ];
+      }
    }
 
 /* If there are too many significant axes, report an error. */
@@ -252,9 +286,18 @@ void findback( int *status ){
                "application requires 1, 2 or 3.", status );
    }
 
-/* Ensure we have 3 values in sdim (pad with trailings 1's if required). */
-   if( nsdim < 3 ) sdim[ 2 ] = 1;
-   if( nsdim < 2 ) sdim[ 1 ] = 1;
+/* Ensure we have 3 values in sdim, slbnd and subnd (pad with trailings 1's
+   if required). */
+   if( nsdim < 3 ) {
+      slbnd[ 2 ] = 1;
+      subnd[ 2 ] = 1;
+      sdim[ 2 ] = 1;
+   }
+   if( nsdim < 2 ) {
+      slbnd[ 1 ] = 1;
+      subnd[ 1 ] = 1;
+      sdim[ 1 ] = 1;
+   }
 
 /* See if the output is to contain the background-subtracted data, or the
    background estimate itself. */
@@ -298,9 +341,9 @@ void findback( int *status ){
    slice_dim[ 0 ] = sdim[ 0 ];
    slice_dim[ 1 ] = sdim[ 1 ];
    slice_dim[ 2 ] = sdim[ 2 ];
-   slice_lbnd[ 0 ] = lbnd[ 0 ];
-   slice_lbnd[ 1 ] = lbnd[ 1 ];
-   slice_lbnd[ 2 ] = lbnd[ 2 ];
+   slice_lbnd[ 0 ] = slbnd[ 0 ];
+   slice_lbnd[ 1 ] = slbnd[ 1 ];
+   slice_lbnd[ 2 ] = slbnd[ 2 ];
 
 /* If the 3rd pixel axis has a cell size of 1, arrange that each slice
    contains a single plane. */
@@ -391,6 +434,22 @@ void findback( int *status ){
 /* See if any experimental algorithm variations are to be used. */
    parGet0l( "NEWALG", &newalg, status );
 
+/* Get the minimum fraction of good pixels required in a filter box to
+   generate a good output value. */
+   if( *status == SAI__OK ) {
+      parGet0r( "WLIM", &wlim, status );
+      if( *status == PAR__NULL ) {
+         errAnnul( status );
+         wlim = -1.0;
+      } else {
+         if( wlim < 0.0 ) {
+            wlim = 0.0;
+         } else if( wlim > 1.0 ) {
+            wlim = 1.0;
+         }
+      }
+   }
+
 /* Create a pool of worker threads. */
    wf = thrGetWorkforce( thrGetNThread( "CUPID_THREADS", status ), status );
 
@@ -408,7 +467,7 @@ void findback( int *status ){
 
       for( izstep = 0; izstep < nzstep ; izstep++ ) {
 
-         slice_lbnd[ 1 ] = lbnd[ 1 ];
+         slice_lbnd[ 1 ] = slbnd[ 1 ];
 
          for( iystep = 0; iystep < nystep; iystep++, islice++,pdata++ ) {
 
@@ -431,6 +490,7 @@ void findback( int *status ){
             pdata->slice_dim[ 2 ] = slice_dim[ 2 ];
             pdata->slice_lbnd[ 2 ] = slice_lbnd[ 2 ];
             pdata->newalg = newalg;
+            pdata->wlim = wlim;
             pdata->slice_size = slice_size;
 
 /* Submit a job to the workforce to process the current slice. */

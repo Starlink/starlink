@@ -20,10 +20,11 @@ typedef struct CGEN_FUNCTION(MinFilterBox) {
    int ubndzl[ 3 ];    /* Upper grid index bounds of lower z slab */
    CGEN_TYPE minval;   /* Minimum data value in the box */
    int minpos[ 3 ];    /* Grid indices of the minimum value in the box */
+   int pop;            /* Number of good values in the filter box */
 } CGEN_FUNCTION(MinFilterBox);
 
 
-CGEN_TYPE *CGEN_FUNCTION(cupidFindback3)( int dim[3], int box[3],
+CGEN_TYPE *CGEN_FUNCTION(cupidFindback3)( float wlim, int dim[3], int box[3],
                                           CGEN_TYPE *din, CGEN_TYPE *dout,
                                           int *status ){
 /*
@@ -38,7 +39,7 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback3)( int dim[3], int box[3],
 *     Starlink C
 
 *  Synopsis:
-*     CGEN_TYPE *cupidFindback3<X>( int dim[3], int box[3],
+*     CGEN_TYPE *cupidFindback3<X>( float wlim, int dim[3], int box[3],
 *                                   CGEN_TYPE *din, CGEN_TYPE *dout,
 *                                   int *status )
 
@@ -48,6 +49,10 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback3)( int dim[3], int box[3],
 *     within a box of specified size centred on the pixel being replaced.
 
 *  Parameters:
+*     wlim
+*        The minimum fraction of good pixels in a filter box required for
+*        a good output value. If negative, then an output pixel is bad
+*        only if the input pixel is also bad.
 *     dim
 *        The length of each pixel axis in the supplied array.
 *     box
@@ -94,6 +99,8 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback3)( int dim[3], int box[3],
 *  History:
 *     13-SEP-2006 (DSB):
 *        Original version.
+*     10-JUL-2013 (DSB):
+*        Added argument wlim.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -107,6 +114,7 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback3)( int dim[3], int box[3],
    CGEN_FUNCTION(MinFilterBox) *zbox; /* Structure describing z axis filter box */
    CGEN_FUNCTION(MinFilterBox) *xbox; /* Structure describing x axis filter box */
    CGEN_TYPE *p;               /* Pointer to next returned pixel */
+   CGEN_TYPE *q;               /* Pointer to next input pixel */
    CGEN_TYPE *result;          /* Returned array */
    CGEN_TYPE val;              /* Input pixel value */
    CupidBoxIter *iter;         /* Structure for iterating round pixels */
@@ -120,6 +128,7 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback3)( int dim[3], int box[3],
    int iz;                     /* Z axis grid index for current output pixel */
    int lbnd[ 3 ];              /* Lower bounds of box centred on (0,0,0) */
    int nel;                    /* Number of pixel in supplied array */
+   int poplim;                 /* Min. no. of good pixels required in a box */
    int ubnd[ 3 ];              /* Upper bounds of box centred on (0,0,0) */
    int xx[ 3 ];                /* Grid indices of current pixel */
 
@@ -141,6 +150,12 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback3)( int dim[3], int box[3],
    } else {
       result = dout;
    }
+
+/* Form the minimum number of good values required in a filter box to create
+   a good output value. */
+   nel = box[ 0 ]*box[ 1 ]*box[ 2 ];
+   poplim = (int) ( nel*wlim + 0.5 );
+   if( poplim > nel ) poplim = nel;
 
 /* Create a MinFilterBox structure to describe a filter box that progress
    up the Z axis at (x=0,y=0). */
@@ -224,20 +239,27 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback3)( int dim[3], int box[3],
 /* Loop round all the pixels in this initial box, finding the minimum
    good pixel value in the filter box. */
       zbox->minval = CGEN_MAX;
+      zbox->pop = 0;
 
       iter = cupidBoxIterator( iter, dim, lbnd, ubnd, 1, status );
       while( cupidNextIt( iter, xx, &iv, status ) ) {
          val = din[ iv ];
-         if( val != CGEN_BAD && val < zbox->minval ) {
-            zbox->minval = val;
-            zbox->minpos[ 0 ] = xx[ 0 ];
-            zbox->minpos[ 1 ] = xx[ 1 ];
-            zbox->minpos[ 2 ] = xx[ 2 ];
+         if( val != CGEN_BAD ) {
+            (zbox->pop)++;
+            if( val < zbox->minval ) {
+               zbox->minval = val;
+               zbox->minpos[ 0 ] = xx[ 0 ];
+               zbox->minpos[ 1 ] = xx[ 1 ];
+               zbox->minpos[ 2 ] = xx[ 2 ];
+            }
          }
       }
 
 /* Store a pointer to the next output pixel to be assigned a value. */
       p = result;
+
+/* Store a pointer to the corresponding input pixel. */
+      q = din;
 
 /* Now loop through all the xy planes in the cube. */
       for( iz = 1; iz <= dim[ 2 ]; iz++ ) {
@@ -256,30 +278,34 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback3)( int dim[3], int box[3],
          zbox->lbndzu[ 2 ]++;
          zbox->ubndzu[ 2 ]++;
 
-/* Increment the Z axis bounds of the volume containing the old pixels to be
-   removed from the filter box. This volume is a slab of pixels in the xy plane,
-   one pixel thick in the z direction. It forms the slab of pixels that make up
-   the lower face of the current z box volume. */
-         zbox->lbndzl[ 2 ]++;
-         zbox->ubndzl[ 2 ]++;
-
 /* First deal with cases where the pixel with the minimum value in the box
    will pass out of the filter box as a consequence of updating the box to
    the new "iz" value. */
          if( full_check ){
 
+/* Increment the Z axis bounds of the volume containing the old pixels to be
+   removed from the filter box. This volume is a slab of pixels in the xy plane,
+   one pixel thick in the z direction. It forms the slab of pixels that make up
+   the lower face of the current z box volume. */
+            zbox->lbndzl[ 2 ]++;
+            zbox->ubndzl[ 2 ]++;
+
 /* Since the old minimum value has passed out of the box, we need to search
    all pixels within the new updated box for a minimum value. */
             zbox->minval = CGEN_MAX;
+            zbox->pop = 0;
             iter = cupidBoxIterator( iter, dim, zbox->lbndzl, zbox->ubndzu, 1,
                                  status );
             while( cupidNextIt( iter, xx, &iv, status ) ) {
                val = din[ iv ];
-               if( val != CGEN_BAD && val < zbox->minval ) {
-                  zbox->minval = val;
-                  zbox->minpos[ 0 ] = xx[ 0 ];
-                  zbox->minpos[ 1 ] = xx[ 1 ];
-                  zbox->minpos[ 2 ] = xx[ 2 ];
+               if( val != CGEN_BAD ) {
+                  (zbox->pop)++;
+                  if( val < zbox->minval ) {
+                     zbox->minval = val;
+                     zbox->minpos[ 0 ] = xx[ 0 ];
+                     zbox->minpos[ 1 ] = xx[ 1 ];
+                     zbox->minpos[ 2 ] = xx[ 2 ];
+                  }
                }
             }
 
@@ -294,13 +320,36 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback3)( int dim[3], int box[3],
                                  status );
             while( cupidNextIt( iter, xx, &iv, status ) ) {
                val = din[ iv ];
-               if( val != CGEN_BAD && val < zbox->minval ) {
-                  zbox->minval = val;
-                  zbox->minpos[ 0 ] = xx[ 0 ];
-                  zbox->minpos[ 1 ] = xx[ 1 ];
-                  zbox->minpos[ 2 ] = xx[ 2 ];
+               if( val != CGEN_BAD ) {
+                  (zbox->pop)++;
+                  if( val < zbox->minval ) {
+                     zbox->minval = val;
+                     zbox->minpos[ 0 ] = xx[ 0 ];
+                     zbox->minpos[ 1 ] = xx[ 1 ];
+                     zbox->minpos[ 2 ] = xx[ 2 ];
+                  }
                }
             }
+
+/* We might also need to decrease the population of the box to take account
+   of good values that are leaving the box. Note, we need to do this *before*
+   incrementing the Z axis bounds of the volume containing the old pixels
+   (below). */
+            if( wlim > 0.0 ) {
+               iter = cupidBoxIterator( iter, dim, zbox->lbndzl, zbox->ubndzl,
+                                        1, status );
+               while( cupidNextIt( iter, xx, &iv, status ) ) {
+                  if(  din[ iv ] != CGEN_BAD ) (zbox->pop)--;
+               }
+            }
+
+/* Increment the Z axis bounds of the volume containing the old pixels to be
+   removed from the filter box. This volume is a slab of pixels in the xy plane,
+   one pixel thick in the z direction. It forms the slab of pixels that make up
+   the lower face of the current z box volume. */
+            zbox->lbndzl[ 2 ]++;
+            zbox->ubndzl[ 2 ]++;
+
          }
 
 /* Modify the z value of the other bounds (not used above but used
@@ -336,30 +385,34 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback3)( int dim[3], int box[3],
             ybox->lbndyu[ 1 ]++;
             ybox->ubndyu[ 1 ]++;
 
-/* Increment the Y axis bounds of the volume containing the old pixels to be
-   removed from the filter box. This volume is a slab of pixels in the xz plane,
-   one pixel thick in the y direction. It forms the slab of pixels that make up
-   the lower face of the current y box volume. */
-            ybox->lbndyl[ 1 ]++;
-            ybox->ubndyl[ 1 ]++;
-
 /* First deal with cases where the pixel with the minimum value in the box
    will pass out of the filter box as a consequence of updating the box to
    the new "iy" value. */
             if( full_check ){
 
+/* Increment the Y axis bounds of the volume containing the old pixels to be
+   removed from the filter box. This volume is a slab of pixels in the xz plane,
+   one pixel thick in the y direction. It forms the slab of pixels that make up
+   the lower face of the current y box volume. */
+               ybox->lbndyl[ 1 ]++;
+               ybox->ubndyl[ 1 ]++;
+
 /* Since the old minimum value has passed out of the box, we need to search
    all pixels within the new updated box for a minimum value. */
                ybox->minval = CGEN_MAX;
-               iter = cupidBoxIterator( iter, dim, ybox->lbndyl, ybox->ubndyu, 1,
-                                    status );
+               ybox->pop = 0;
+               iter = cupidBoxIterator( iter, dim, ybox->lbndyl, ybox->ubndyu,
+                                        1, status );
                while( cupidNextIt( iter, xx, &iv, status ) ) {
                   val = din[ iv ];
-                  if( val != CGEN_BAD && val < ybox->minval ) {
-                     ybox->minval = val;
-                     ybox->minpos[ 0 ] = xx[ 0 ];
-                     ybox->minpos[ 1 ] = xx[ 1 ];
-                     ybox->minpos[ 2 ] = xx[ 2 ];
+                  if( val != CGEN_BAD ) {
+                     (ybox->pop)++;
+                     if( val < ybox->minval ) {
+                        ybox->minval = val;
+                        ybox->minpos[ 0 ] = xx[ 0 ];
+                        ybox->minpos[ 1 ] = xx[ 1 ];
+                        ybox->minpos[ 2 ] = xx[ 2 ];
+                     }
                   }
                }
 
@@ -374,13 +427,35 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback3)( int dim[3], int box[3],
                                     status );
                while( cupidNextIt( iter, xx, &iv, status ) ) {
                   val = din[ iv ];
-                  if( val != CGEN_BAD && val < ybox->minval ) {
-                     ybox->minval = val;
-                     ybox->minpos[ 0 ] = xx[ 0 ];
-                     ybox->minpos[ 1 ] = xx[ 1 ];
-                     ybox->minpos[ 2 ] = xx[ 2 ];
+                  if( val != CGEN_BAD ) {
+                     (ybox->pop)++;
+                     if( val < ybox->minval ) {
+                        ybox->minval = val;
+                        ybox->minpos[ 0 ] = xx[ 0 ];
+                        ybox->minpos[ 1 ] = xx[ 1 ];
+                        ybox->minpos[ 2 ] = xx[ 2 ];
+                     }
                   }
                }
+
+/* We might also need to decrease the population of the box to take account
+   of good values that are leaving the box. Note, we need to do this *before*
+   incrementing the Y axis bounds of the volume containing the old pixels
+   (below). */
+               if( wlim > 0.0 ) {
+                  iter = cupidBoxIterator( iter, dim, ybox->lbndyl, ybox->ubndyl,
+                                           1, status );
+                  while( cupidNextIt( iter, xx, &iv, status ) ) {
+                     if(  din[ iv ] != CGEN_BAD ) (ybox->pop)--;
+                  }
+               }
+
+/* Increment the Y axis bounds of the volume containing the old pixels to be
+   removed from the filter box. This volume is a slab of pixels in the xz plane,
+   one pixel thick in the y direction. It forms the slab of pixels that make up
+   the lower face of the current y box volume. */
+               ybox->lbndyl[ 1 ]++;
+               ybox->ubndyl[ 1 ]++;
             }
 
 /* Modify the y value of the other bounds (not used above but used
@@ -394,7 +469,7 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback3)( int dim[3], int box[3],
             memcpy( xbox, ybox, sizeof( CGEN_FUNCTION(MinFilterBox) ) );
 
 /* Now loop through the pixels in this new x row. */
-            for( ix = 1; ix <= dim[ 0 ]; ix++ ) {
+            for( ix = 1; ix <= dim[ 0 ]; ix++,p++,q++ ) {
 
 /* Set a flag indicating if the pixel with the minimum value in the box
    will pass out of the filter box as a consequence of updating the box to
@@ -410,30 +485,35 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback3)( int dim[3], int box[3],
                xbox->lbndxu[ 0 ]++;
                xbox->ubndxu[ 0 ]++;
 
-/* Increment the X axis bounds of the volume containing the old pixels to be
-   removed from the filter box. This volume is a slab of pixels in the yz plane,
-   one pixel thick in the x direction. It forms the slab of pixels that make up
-   the lower face of the current x box volume. */
-               xbox->lbndxl[ 0 ]++;
-               xbox->ubndxl[ 0 ]++;
-
 /* First deal with cases where the pixel with the minimum value in the box
    will pass out of the filter box as a consequence of updating the box to
    the new "ix" value. */
                if( full_check ){
 
+/* Increment the X axis bounds of the volume containing the old pixels to be
+   removed from the filter box. This volume is a slab of pixels in the yz plane,
+   one pixel thick in the x direction. It forms the slab of pixels that make up
+   the lower face of the current x box volume. */
+                  xbox->lbndxl[ 0 ]++;
+                  xbox->ubndxl[ 0 ]++;
+
 /* Since the old minimum value has passed out of the box, we need to search
    all pixels within the new updated box for a minimum value. */
                   xbox->minval = CGEN_MAX;
+                  xbox->pop = 0;
                   iter = cupidBoxIterator( iter, dim, xbox->lbndxl, xbox->ubndxu, 1,
                                        status );
                   while( cupidNextIt( iter, xx, &iv, status ) ) {
                      val = din[ iv ];
-                     if( val != CGEN_BAD && val < xbox->minval ) {
-                        xbox->minval = val;
-                        xbox->minpos[ 0 ] = xx[ 0 ];
-                        xbox->minpos[ 1 ] = xx[ 1 ];
-                        xbox->minpos[ 2 ] = xx[ 2 ];
+                     if( val != CGEN_BAD ) {
+                        (xbox->pop)++;
+                        if( val < xbox->minval ) {
+   printf("+> %g (%d)\n", val, iv );
+                           xbox->minval = val;
+                           xbox->minpos[ 0 ] = xx[ 0 ];
+                           xbox->minpos[ 1 ] = xx[ 1 ];
+                           xbox->minpos[ 2 ] = xx[ 2 ];
+                        }
                      }
                   }
 
@@ -448,20 +528,49 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback3)( int dim[3], int box[3],
                                        status );
                   while( cupidNextIt( iter, xx, &iv, status ) ) {
                      val = din[ iv ];
-                     if( val != CGEN_BAD && val < xbox->minval ) {
-                        xbox->minval = val;
-                        xbox->minpos[ 0 ] = xx[ 0 ];
-                        xbox->minpos[ 1 ] = xx[ 1 ];
-                        xbox->minpos[ 2 ] = xx[ 2 ];
+                     if( val != CGEN_BAD ) {
+                        (xbox->pop)++;
+                        if( val < xbox->minval ) {
+   printf("-> %g (%d)\n", val, iv );
+                           xbox->minval = val;
+                           xbox->minpos[ 0 ] = xx[ 0 ];
+                           xbox->minpos[ 1 ] = xx[ 1 ];
+                           xbox->minpos[ 2 ] = xx[ 2 ];
+                        }
                      }
                   }
+
+/* We might also need to decrease the population of the box to take account
+   of good values that are leaving the box. Note, we need to do this *before*
+   incrementing the X axis bounds of the volume containing the old pixels
+   (below). */
+                  if( wlim > 0.0 ) {
+                     iter = cupidBoxIterator( iter, dim, xbox->lbndxl, xbox->ubndxl,
+                                              1, status );
+                     while( cupidNextIt( iter, xx, &iv, status ) ) {
+                        if(  din[ iv ] != CGEN_BAD ) (xbox->pop)--;
+                     }
+                  }
+
+/* Increment the X axis bounds of the volume containing the old pixels to be
+   removed from the filter box. This volume is a slab of pixels in the yz plane,
+   one pixel thick in the x direction. It forms the slab of pixels that make up
+   the lower face of the current x box volume. */
+                  xbox->lbndxl[ 0 ]++;
+                  xbox->ubndxl[ 0 ]++;
                }
 
 /* Store the output value. */
                if( xbox->minval != CGEN_MAX ) {
-                  *(p++) = xbox->minval;
+                  if( wlim < 0.0 ) {
+                     *p = ( *q != CGEN_BAD ) ? xbox->minval : CGEN_BAD;
+                  } else if( wlim > 0.0 ) {
+                     *p = ( xbox->pop >= poplim ) ? xbox->minval : CGEN_BAD;
+                  } else {
+                     *p = xbox->minval;
+                  }
                } else {
-                  *(p++) = CGEN_BAD;
+                  *p = CGEN_BAD;
                }
             }
          }

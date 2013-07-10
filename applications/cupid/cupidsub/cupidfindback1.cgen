@@ -6,7 +6,7 @@
 #include "ndf.h"
 #include <math.h>
 
-void CGEN_FUNCTION(cupidFindback1)( int ndim, int dim[3], int lbnd[3],
+void CGEN_FUNCTION(cupidFindback1)( float wlim, int ndim, int dim[3], int lbnd[3],
                                     int box[3], double rms, CGEN_TYPE *din,
                                     CGEN_TYPE *dout, CGEN_TYPE *wa,
                                     CGEN_TYPE *wb, int alg, int *status ){
@@ -23,10 +23,10 @@ void CGEN_FUNCTION(cupidFindback1)( int ndim, int dim[3], int lbnd[3],
 *     Starlink C
 
 *  Synopsis:
-*     void cupidFindback1<X>( int ndim, int dim[3], int lbnd[3], int box[3],
-*                             double rms, CGEN_TYPE *din, CGEN_TYPE *dout,
-*                             CGEN_TYPE *wa, CGEN_TYPE *wb, int alg,
-*                             int *status )
+*     void cupidFindback1<X>( float wlim, int ndim, int dim[3], int lbnd[3],
+*                             int box[3], double rms, CGEN_TYPE *din,
+*                             CGEN_TYPE *dout, CGEN_TYPE *wa, CGEN_TYPE *wb,
+*                             int alg, int *status )
 
 *  Description:
 *     This function uses spatial filtering to remove features with a
@@ -62,6 +62,10 @@ void CGEN_FUNCTION(cupidFindback1)( int ndim, int dim[3], int lbnd[3],
 *     to obtain the output array.
 
 *  Parameters:
+*     wlim
+*        The minimum fraction of good pixels in a filter box required for
+*        a good output value. If negative, then an output pixel is bad
+*        only if the input pixel is also bad.
 *     ndim
 *        The number of dimensions in the input NDF.
 *     dim
@@ -125,6 +129,8 @@ void CGEN_FUNCTION(cupidFindback1)( int ndim, int dim[3], int lbnd[3],
 *     12-SEP-2011 (DSB):
 *        Allow RMS to be calculated independently for each slice of the
 *        base NDF.
+*     10-JUL-2013 (DSB):
+*        Added argument wlim.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -182,7 +188,7 @@ void CGEN_FUNCTION(cupidFindback1)( int ndim, int dim[3], int lbnd[3],
    value in a box centred on the input pixel. The filtered data goes in
    "wa". */
    msgOutif( MSG__VERB, "", "      Applying minimum filter", status );
-   CGEN_FUNCTION(cupidFindback3)( dim, box, din, wa, status );
+   CGEN_FUNCTION(cupidFindback3)( wlim, dim, box, din, wa, status );
 
    if( msgFlevok( MSG__DEBUG, status ) ) {
       CGEN_FUNCTION(cupidDump)( wa, ndim, dim, lbnd, "min. filtered data",

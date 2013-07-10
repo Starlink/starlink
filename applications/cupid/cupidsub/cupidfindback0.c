@@ -62,6 +62,7 @@ void cupidFindback0( void *data, int *status ){
 /* Local Variables: */
    CupidFindback0Data *pdata;/* Pointer to structure holding requied info */
    double rms;               /* Global rms error in data */
+   float wlim;              /* Min. fraction of good i/p values for a good o/p value */
    int box[ 3 ];             /* Dimensions of each cell in pixels */
    int islice;               /* Slice index */
    int ndim;                 /* Total number of pixel axes in NDF */
@@ -102,6 +103,7 @@ void cupidFindback0( void *data, int *status ){
    slice_size = pdata->slice_size;
    type = pdata->type;
    newalg = pdata->newalg;
+   wlim = pdata->wlim;
 
 /* Report the bounds of the slice if required. */
    msgBlankif( MSG__VERB, status );
@@ -113,12 +115,12 @@ void cupidFindback0( void *data, int *status ){
    if( type == CUPID__FLOAT ) {
       wa = astMalloc( sizeof( float )*slice_size );
       wb = astMalloc( sizeof( float )*slice_size );
-      cupidFindback1F( ndim, slice_dim, slice_lbnd, box, rms, ipd1, ipd2,
+      cupidFindback1F( wlim, ndim, slice_dim, slice_lbnd, box, rms, ipd1, ipd2,
                        wa, wb, newalg, status );
    } else {
       wa = astMalloc( sizeof( double )*slice_size );
       wb = astMalloc( sizeof( double )*slice_size );
-      cupidFindback1D( ndim, slice_dim, slice_lbnd, box, rms, ipd1, ipd2,
+      cupidFindback1D( wlim, ndim, slice_dim, slice_lbnd, box, rms, ipd1, ipd2,
                        wa, wb, newalg, status  );
    }
 
