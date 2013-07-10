@@ -239,9 +239,11 @@
 *     28-MAR-2013 (DSB):
 *        Added parameter RESTART.
 *     1-JUL-2013 (DSB):
-*        Do not export cleaned data on the first iteration if the supplied 
+*        Do not export cleaned data on the first iteration if the supplied
 *        data has already been cleaned. Instead, re-use the supplied data on
 *        subsequent iterations.
+*     10-JUL-2013 (DSB):
+*        Add support for ast.skip parameter.
 
 *-
 '''
@@ -406,6 +408,11 @@ try:
                                        "defaults=$SMURF_DIR/smurf_makemap.def "
                                        "select=\"\'450=0,850=1\'\"".format(model,config)))
 
+#  Get the number of iterations for which no AST model should be used.
+   ast_skip = int( invoke( "$KAPPA_DIR/configecho name=ast.skip config={0} "
+                           "defaults=$SMURF_DIR/smurf_makemap.def "
+                           "select=\"\'450=0,850=1\'\"".format(config)))
+
 #  The first invocation of makemap will create NDFs holding cleaned
 #  time-series data and EXT model values. The NDFs are created with
 #  hard-wired names and put in the current working directory. For
@@ -429,6 +436,12 @@ try:
    for path in glob.glob("s*_con_ext.sdf"):
       orig_ext_ndfs[path] = os.stat(path).st_atime
 
+#  Find the number of iterations to perform on the initial invocation of
+#  makemap.
+   niter0 = 1 + ast_skip
+   if niter0 > niter:
+      niter0 = niter
+
 #  On the first invocation of makemap, we use the raw data files specified
 #  by the IN parameter to create an initial estimate of the sky. We also
 #  save the cleaned time series data, and the EXT model (if we are doing
@@ -439,7 +452,8 @@ try:
    conf0 = os.path.join(NDG.tempdir,"conf0") # Full path to new config file
    fd = open(conf0,"w")       # Open the new config file.
    fd.write("{0}\n".format(config)) # Inherit the supplied config parameter values.
-   fd.write("numiter=1\n")    # MAKEMAP should do only one iteration.
+   fd.write("numiter={0}\n".format(niter0))    # MAKEMAP should do only one
+                              # iteration (plus any skipped iterations).
    fd.write("itermap=0\n")    # Itermaps don't make sense
    fd.write("bolomap=0\n")    # Bolomaps don't make sense
    fd.write("shortmap=0\n")   # Shortmaps don't make sense
@@ -549,6 +563,7 @@ try:
       add["smo.notfirst"] = 0  # Ensure we use SMO on 2nd and subsequent invocations
       add["diag.append"] = 1   # Ensure we append diagnostics to the file
                                # created on the first iteration.
+      add["ast.skip"] = 0      # Ensure we do not skip any more AST models
 
 #  Now create the config, inheriting the config from the first invocation.
       iconf = 1
@@ -566,8 +581,12 @@ try:
 #  after each iteration.
       mapchange = NDG(1)
 
-#  Now do the second and subsequent iterations.
-      iter = 2
+#  Now do the second (assuming none have been skipped) and subsequent
+#  iterations.
+      if ast_skip > 0:
+         msg_out( "Skipping {0} iterations since ast.skip is set to {0}".format(ast_skip))
+
+      iter = niter0 + 1
       while iter <= niter:
          msg_out( "Iteration {0}...".format(iter))
 
