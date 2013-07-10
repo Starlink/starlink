@@ -73,6 +73,8 @@
 *        Added maxsize argument.
 *     9-JUL-2013 (DSB):
 *        Correct algorithm for setting the block size to a multiple of pi/2.
+*     10-JUL-2013 (DSB):
+*        Take account of moving targets.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -104,27 +106,22 @@
 
 /* Starlink includes */
 #include "sofa.h"
+#include "star/pal.h"
 #include "sae_par.h"
 #include "mers.h"
 
 /* SMURF includes */
 #include "libsmf/smf.h"
 
-/* A macro to test if the focal plane has moved too far from its position
-   at the start of the block. Check the angular separation between the
-   centre of the focal plane at the start and at the current time slice
-   is not more than "arcerror", and check that he focal plane has not rotated
-   by more than "angle". */
-#define FPMOVED ( \
-     iauSeps( ac1_start, ac2_start, state->tcs_tr_ac1, state->tcs_tr_ac2 ) \
-     > arcerror || \
-       fabs( ang_start - state->tcs_tr_ang ) > angle )
-
 /* Old data has POL_ANG given in arbitrary integer units where
    SMF__MAXPOLANG is equivalent to 2*PI. Store the factor to convert such
    values into radians. */
 #define TORADS (2*AST__DPI/SMF__MAXPOLANG)
 
+static int smf1_hasmoved( double alpha_start, double beta_start, double ang_start,
+                          const JCMTState *state, int moving, double angerror,
+                          double arcerror, double *alpha, double *beta,
+                          double *angle, int *status );
 
 
 int smf_block_end( smfData *data, int block_start, int ipolcrd, float arcerror,
@@ -132,20 +129,25 @@ int smf_block_end( smfData *data, int block_start, int ipolcrd, float arcerror,
 
 /* Local Variables: */
    const JCMTState *state;    /* JCMTState info for current time slice */
+   const char *usesys;        /* Used system string */
    dim_t ntslice;             /* Number of time-slices in data */
+   double aalpha;
+   double aang;
+   double abeta;
    double ac1_start;          /* Tracking longitude at start of block (rads) */
    double ac2_start;          /* Tracking latitude at start of block (rads) */
    double ang_start;          /* Tracking orientaion at start of block (rads) */
    double angle;              /* Rotation that gives arcerror shift at corners */
    double end_wang;           /* Half-waveplate angle at end of block */
+   double oldwang;            /* Previous falf-waveplate angle */
    double start_wang;         /* Half-waveplate angle at start of block */
    double wang;               /* Half-waveplate angle */
-   double oldwang;            /* Previous falf-waveplate angle */
+   int hitime;                /* Highest time slice index to use */
    int ifail;                 /* Index of last time slice to fail the test */
    int inc;                   /* No. of time slices between tests */
    int ipass;                 /* Index of last time slice to pass the test */
    int itime;                 /* Time slice index at next test */
-   int hitime;                /* Highest time slice index to use */
+   int moving;                /* Is the object moving? */
    int ntime;                 /* Number of time slices to check */
    int old;                   /* Data has old-style POL_ANG values? */
    int result;                /* The returned time slice index at block end */
@@ -185,12 +187,16 @@ int smf_block_end( smfData *data, int block_start, int ipolcrd, float arcerror,
 /* Convert arcerror from arc-seconds to radians. */
       arcerror *= AST__DD2R/3600.0;
 
+/* Set a flag if the target is moving (assumed to be the case if the tracking
+   system is AZEL or GAPPT). */
+      state = (hdr->allState) + block_start;
+      usesys = sc2ast_convert_system( state->tcs_tr_sys, status );
+      moving = ( !strcmp( usesys, "AZEL" ) || !strcmp( usesys, "GAPPT" ) );
+
 /* Note the actual boresight position and focal plane orientation within
    the tracking system at the block start, all three in radians. */
-      state = (hdr->allState) + block_start;
-      ac1_start = state->tcs_tr_ac1;
-      ac2_start = state->tcs_tr_ac2;
-      ang_start = state->tcs_tr_ang;
+      smf1_hasmoved( 0.0, 0.0, 0.0, state, moving, angle, arcerror,
+                     &ac1_start, &ac2_start, &ang_start, status );
 
 /* For speed, we do not test every time slice. Instead we first check the
    time slice following the start, but then accelarate through subsequent
@@ -209,7 +215,8 @@ int smf_block_end( smfData *data, int block_start, int ipolcrd, float arcerror,
    has moved by more than arcerror arc-seconds since the block start, or
    if the focal plane has rotated on the sky (in the tracking system) by
    more than the critical angle. Leave the loop if the test fails. */
-         if( FPMOVED ) {
+         if( smf1_hasmoved( ac1_start, ac2_start, ang_start, state, moving,
+                            angle, arcerror, &aalpha, &abeta, &aang, status ) ) {
             ifail = itime;
             break;
          }
@@ -231,7 +238,8 @@ int smf_block_end( smfData *data, int block_start, int ipolcrd, float arcerror,
       if( ifail == -1 ) {
          itime = hitime - 1;
          state = (hdr->allState) + itime;
-         if( FPMOVED ) {
+         if( smf1_hasmoved( ac1_start, ac2_start, ang_start, state, moving,
+                            angle, arcerror, &aalpha, &abeta, &aang, status ) ) {
             ifail = itime;
          } else {
             result = itime;
@@ -250,7 +258,8 @@ int smf_block_end( smfData *data, int block_start, int ipolcrd, float arcerror,
    "ifail". otherwise use it to replace "ipass". */
             itime = ( ifail + ipass )/2;
             state = (hdr->allState) + itime;
-            if( FPMOVED ) {
+            if( smf1_hasmoved( ac1_start, ac2_start, ang_start, state, moving,
+                               angle, arcerror, &aalpha, &abeta, &aang, status ) ) {
                ifail = itime;
             } else {
                ipass = itime;
@@ -385,4 +394,46 @@ int smf_block_end( smfData *data, int block_start, int ipolcrd, float arcerror,
    return ( *status == SAI__OK && result >= block_start ) ? result : -1 ;
 }
 
+
+/* Returns a flag indicating if the focal plane has moved or rotated
+   significantly with respect to the target. */
+
+static int smf1_hasmoved( double alpha_start, double beta_start, double ang_start,
+                          const JCMTState *state, int moving, double angerror,
+                          double arcerror, double *alpha, double *beta,
+                          double *angle, int *status ) {
+
+/* Local Variables; */
+   double rmat[3][3];
+   double p[3];
+   double rp[3];
+   double r;
+
+/* Check inherited status */
+   if( *status != SAI__OK ) return 0;
+
+/* If the target is moving, find the offsets from the base telescope
+   position to the actual telescope position. These offsets are the
+   actual telescope position within a spherical coord system that has
+   its origin at the base telescope position, and in which north is
+   parallel to tracking north. */
+   if( moving ) {
+      palDeuler( "ZY", state->tcs_tr_bc1, -state->tcs_tr_bc2, 0.0, rmat );
+      iauS2p( state->tcs_tr_ac1, state->tcs_tr_ac2, 1.0, p );
+      iauRxp( rmat, p, rp );
+      iauP2s( rp, alpha, beta, &r );
+
+/* If the target is not moving, just use the actual telescope position in
+   the tracking system. */
+   } else {
+      *alpha = state->tcs_tr_ac1;
+      *beta = state->tcs_tr_ac2;
+   }
+
+/* Return the flag indicating if the focal plane has moved significantly
+   with respect to the target object. */
+   *angle = state->tcs_tr_ang;
+   return ( iauSeps( alpha_start, beta_start, *alpha, *beta ) > arcerror ||
+            fabs( ang_start - *angle ) > angerror );
+}
 

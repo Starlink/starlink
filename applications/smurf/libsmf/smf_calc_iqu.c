@@ -115,6 +115,8 @@
 *        Added calculation of variances.
 *     26-MAR-2013 (DSB):
 *        Added parameter "harmonic".
+*     10-JUL-2013 (DSB):
+*        Take account of moving sources.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -202,6 +204,7 @@ void smf_calc_iqu( ThrWorkForce *wf, smfData *data, int block_start,
 /* Local Variables: */
    AstFrameSet *wcs;          /* WCS FrameSet for output NDFs */
    AstWinMap *wm;             /* Mapping to reverse the X GRID axis */
+   const char *usesys;        /* Used system string */
    const JCMTState *state;    /* JCMTState info for current time slice */
    dim_t nbolo;               /* No. of bolometers */
    dim_t ncol;                /* No. of columns of bolometers */
@@ -294,9 +297,9 @@ void smf_calc_iqu( ThrWorkForce *wf, smfData *data, int block_start,
    central time slice in the block, and set its current Frame to the
    tracking frame. */
    smf_tslice_ast( data, ( block_start + block_end )/2, 1, NO_FTS, status);
-   astSetC( hdr->wcs, "System",
-            sc2ast_convert_system( (data->hdr->allState)[0].tcs_tr_sys,
-                                    status ) );
+   usesys = sc2ast_convert_system( (data->hdr->allState)[0].tcs_tr_sys,
+                                    status );
+   astSetC( hdr->wcs, "System", usesys );
 
 /* Take a copy and then reverse the X axis of the GRID Frame by remaping the
    base Frame using a WinMap. This produces a pixel grid such as you would
@@ -316,6 +319,13 @@ void smf_calc_iqu( ThrWorkForce *wf, smfData *data, int block_start,
    wm = astWinMap( 2, ina, inb, outa, outb, " " );
    astRemapFrame( wcs, AST__BASE, wm );
    wm = astAnnul( wm );
+
+/* If the target is moving (assumed to be the case if the tracking
+   system is AZEL or GAPPT), make the FrameSet current Frame represent
+   offsets from the reference position (i.e. the moving target). */
+   if( !strcmp( usesys, "AZEL" ) || !strcmp( usesys, "GAPPT" ) ){
+      astSet( wcs, "SkyRefIs=Origin" );
+   }
 
 /* Store the FrameSet in the output NDFs, then annull the copy. */
    ndfPtwcs( wcs, indfq, status );
