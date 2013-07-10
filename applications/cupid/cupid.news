@@ -13,6 +13,11 @@ Changes introduced at V1.6
    - Improvements to the initial guess at the Gaussian parameters of each
    clump has improved the ability of the GaussClumps algorithm to fit
    merged clumps.
+   - The FINDBACK command now has a WLIM parameter that specifies the
+   minimum fraction of good pixels in a filter box required to create a
+   good output value. The defualt is 0.4. This changes the behaviour of
+   findback in cases where the input data has any bad values. The degree
+   to which FINDBACK fills in such areas of bad data will be reduced.
 
 Changes introduced at V1.5
 
