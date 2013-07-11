@@ -508,7 +508,6 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback3)( float wlim, int dim[3], int box[3],
                      if( val != CGEN_BAD ) {
                         (xbox->pop)++;
                         if( val < xbox->minval ) {
-   printf("+> %g (%d)\n", val, iv );
                            xbox->minval = val;
                            xbox->minpos[ 0 ] = xx[ 0 ];
                            xbox->minpos[ 1 ] = xx[ 1 ];
@@ -531,7 +530,6 @@ CGEN_TYPE *CGEN_FUNCTION(cupidFindback3)( float wlim, int dim[3], int box[3],
                      if( val != CGEN_BAD ) {
                         (xbox->pop)++;
                         if( val < xbox->minval ) {
-   printf("-> %g (%d)\n", val, iv );
                            xbox->minval = val;
                            xbox->minpos[ 0 ] = xx[ 0 ];
                            xbox->minpos[ 1 ] = xx[ 1 ];
