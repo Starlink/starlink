@@ -322,9 +322,10 @@ void smf_calc_iqu( ThrWorkForce *wf, smfData *data, int block_start,
 
 /* If the target is moving (assumed to be the case if the tracking
    system is AZEL or GAPPT), make the FrameSet current Frame represent
-   offsets from the reference position (i.e. the moving target). */
+   offsets from the reference position (i.e. the moving target), and
+   indicate that the offset coord system should be used for alignment. */
    if( !strcmp( usesys, "AZEL" ) || !strcmp( usesys, "GAPPT" ) ){
-      astSet( wcs, "SkyRefIs=Origin" );
+      astSet( wcs, "SkyRefIs=Origin,AlignOffset=1" );
    }
 
 /* Store the FrameSet in the output NDFs, then annull the copy. */
