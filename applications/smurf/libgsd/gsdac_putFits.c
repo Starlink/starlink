@@ -348,6 +348,9 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   else if ( gsdVars->velocity > 120 )
      strcpy( recipe, "REDUCE_SCIENCE_BROADLINE" );
 
+  else if ( strncmp( mapVars->swMode, "freq", 4 ) == 0  )
+     strcpy( recipe, "REDUCE_SCIENCE_FSW" );
+
   /* FE Specific. */
 
   /* Truncate the name of the frontend. */
