@@ -182,6 +182,8 @@ void smurf_smurfcopy( int * );
 void smurf_smurfhelp( int * );
 void smurf_stackframes( int * );
 void smurf_starecalc( int * );
+void smurf_tilelist( int * );
+void smurf_tileinfo( int * );
 void smurf_timesort( int * );
 void smurf_unmakecube( int * );
 void smurf_unmakemap( int * );

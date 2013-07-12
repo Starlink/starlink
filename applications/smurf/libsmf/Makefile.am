@@ -374,6 +374,13 @@ smf_select_qualpntr.c \
 smf_set_clabels.c \
 smf_set_moving.c \
 smf_sigmaclip.c \
+smf_skytileheader.c \
+smf_skytile.c \
+smf_skytiling.c \
+smf_skytilei2xy.c \
+smf_skytilexy2i.c \
+smf_skytiles_data.c \
+smf_skytiles_region.c \
 smf_snrmask.c \
 smf_smfFile_msg.c \
 smf_smoothmask.c \

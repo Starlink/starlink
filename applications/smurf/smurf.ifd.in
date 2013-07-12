@@ -4916,6 +4916,178 @@ package @PACKAGE@ {
 
         }
 
+        action tileinfo {
+            helplib {$SMURF_HELP}
+
+            parameter allsky {
+                type NDF
+                access WRITE
+                vpath DEFAULT
+                prompt {Output NDF containing all-sky tile indices}
+                default !
+                helpkey *
+            }
+
+            parameter create {
+                position 3
+                type _LOGICAL
+                access READ
+                vpath DEFAULT
+                ppath DEFAULT
+                prompt {Create tile NDF if it does not already exist?}
+                default FALSE
+                helpkey *
+            }
+
+            parameter deccen {
+                type _DOUBLE
+                access WRITE
+                vpath DEFAULT
+                default 0
+                helpkey *
+            }
+
+            parameter exists {
+                type _LOGICAL
+                access WRITE
+                vpath DEFAULT
+                default FALSE
+                helpkey *
+            }
+
+            parameter header {
+                position 5
+                type LITERAL
+                access READ
+                ppath CURRENT
+                vpath DEFAULT
+                prompt {File to receive a FITS header for the tile}
+                default !
+                helpkey *
+            }
+
+            parameter instrument {
+                position 2
+                type LITERAL
+                access READ
+                ppath CURRENT DEFAULT
+                prompt {JCMT instrument}
+                default {SCUBA-2(450)}
+                helpkey *
+            }
+
+            parameter itile {
+                position 1
+                type _INTEGER
+                access READ
+                ppath CURRENT
+                prompt {One-based tile index}
+                helpkey *
+            }
+
+            parameter lbnd {
+                size *
+                type _INTEGER
+                access WRITE
+                vpath INTERNAL
+                helpkey *
+            }
+
+            parameter maxtile {
+                type _INTEGER
+                access WRITE
+                vpath DEFAULT
+                default 0
+                helpkey *
+            }
+
+            parameter racen {
+                type _DOUBLE
+                access WRITE
+                vpath DEFAULT
+                default 0
+                helpkey *
+            }
+
+            parameter region {
+                position 4
+                type LITERAL
+                access READ
+                ppath CURRENT
+                vpath DEFAULT
+                prompt {File to receive an AST Region for the tile}
+                default !
+                helpkey *
+            }
+
+            parameter size {
+                type _DOUBLE
+                access WRITE
+                vpath DEFAULT
+                default 0
+                helpkey *
+            }
+
+            parameter tilendf {
+                type LITERAL
+                access WRITE
+                vpath DEFAULT
+                default 0
+                helpkey *
+            }
+
+            parameter ubnd {
+                size *
+                type _INTEGER
+                access WRITE
+                vpath INTERNAL
+                helpkey *
+            }
+
+        }
+
+        action tilelist {
+            helplib {$SMURF_HELP}
+
+            parameter region {
+                type LITERAL
+                access READ
+                vpath DEFAULT
+                ppath CURRENT
+                prompt {File contining the AST Region}
+                default !
+                helpkey *
+            }
+
+            parameter in {
+                position 1
+                type NDF
+                access READ
+                vpath {PROMPT }
+                ppath GLOBAL CURRENT
+                association <-GLOBAL.DATA_ARRAY
+                prompt {Input NDF data structure}
+                helpkey *
+            }
+
+            parameter instrument {
+                type LITERAL
+                access READ
+                ppath CURRENT DEFAULT
+                prompt {JCMT instrument}
+                default {SCUBA-2(450)}
+                helpkey *
+            }
+
+            parameter tiles {
+                size *
+                type _INTEGER
+                access WRITE
+                vpath INTERNAL
+                helpkey *
+            }
+        }
+
         action timesort {
 
             helplib {$SMURF_HELP}

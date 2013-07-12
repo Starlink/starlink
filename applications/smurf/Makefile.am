@@ -74,6 +74,8 @@ smurfcopy \
 smurfhelp \
 stackframes \
 starecalc \
+tileinfo \
+tilelist \
 timesort \
 unmakecube \
 unmakemap
