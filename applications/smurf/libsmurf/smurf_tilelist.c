@@ -113,11 +113,13 @@ void smurf_tilelist( int *status ) {
    AstObject *obj;
    AstRegion *region;
    Grp *igrp = NULL;
+   Grp *sgrp = NULL;
    char text[ 200 ];
    int *tiles = NULL;
    int i;
    int ntile;
    size_t size;
+   size_t ssize;
    smf_inst_t instrument;
 
 /* Check inherited status */
@@ -171,11 +173,24 @@ void smurf_tilelist( int *status ) {
       errAnnul( status );
       kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
-/* Get the list of identifiers for tiles that receive any data. */
-      tiles = smf_skytiles_data( igrp, size, &ntile, status );
+/* Get a group containing just the files holding science data. */
+      smf_find_science( igrp, &sgrp, 0, NULL, NULL, 1, 1, SMF__NULL, NULL,
+                        NULL, NULL, NULL, status );
 
-/* Delete the group. */
+/* Check we have at least once science file. */
+      ssize = grpGrpsz( sgrp, status );
+      if( ssize == 0 ) {
+         msgOutif( MSG__NORM, " ", "None of the supplied input frames were SCIENCE.",
+                   status );
+
+/* Get the list of identifiers for tiles that receive any data. */
+      } else {
+         tiles = smf_skytiles_data( sgrp, ssize, &ntile, status );
+      }
+
+/* Delete the groups. */
       if( igrp ) grpDelet( &igrp, status);
+      if( sgrp ) grpDelet( &sgrp, status);
    }
 
 /* Sort the list of overlapping tiles into ascending order. */
