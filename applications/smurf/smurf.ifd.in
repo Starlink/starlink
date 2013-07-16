@@ -5038,11 +5038,37 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter target {
+                type LITERAL
+                access READ
+                vpath DEFAULT
+                ppath CURRENT
+                prompt {The target Region or NDF}
+                default !
+                helpkey *
+            }
+
             parameter tilendf {
                 type LITERAL
                 access WRITE
                 vpath DEFAULT
                 default 0
+                helpkey *
+            }
+
+            parameter tlbnd {
+                size *
+                type _INTEGER
+                access WRITE
+                vpath INTERNAL
+                helpkey *
+            }
+
+            parameter tubnd {
+                size *
+                type _INTEGER
+                access WRITE
+                vpath INTERNAL
                 helpkey *
             }
 

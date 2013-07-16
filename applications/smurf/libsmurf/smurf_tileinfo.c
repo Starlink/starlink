@@ -29,6 +29,9 @@
 *     NDF can be created containing the tile index at every point on the
 *     whole sky (see parameter ALLSKY).
 *
+*     Also, the bounds of the overlap in pixel indicies between the tile
+*     and a specified NDF or Region can be found (see parameter TARGET).
+*
 *     The environment variable JCMT_TILES should be defined prior to
 *     using this command, and should hold the path to the directory in
 *     which the NDFs containing the accumulated co-added data for each
@@ -95,11 +98,29 @@
 *     SIZE = _DOUBLE (Write)
 *        An output parameter to which is written the arc-length of each
 *        side of a square bounding box for the tile, in radians.
+*     TARGET = LITERAL (Read)
+*        Defines the region of interest. The pixel index bounds of the area
+*        of the specified tile that overlaps this region are found and
+*        reported (see parameter TLBND and TUBND). The value supplied for
+*        TARGET can be either the name of a text file containing an AST
+*        Region, or the path for an NDF, in which case a Region is created
+*        that covers the region of sky that maps onto the rectangular
+*        pixel grid of the NDF. [!]
 *     TILENDF = LITERAL (Write)
 *        An output parameter to which is written the full path to the
 *        NDF containing co-added data for the tile. Note, it is not
 *        guaranteed that this NDF exists on exit from this command (see
 *        parameters EXISTS and CREATE).
+*     TLBND( 2 ) = _INTEGER (Write)
+*        An output parameter to which are written the lower pixel bounds
+*        of the area of the tile NDF that overlaps the region specified
+*        by parameter TARGET. If there is no overlap, the TLBND values
+*        are returned greater than the TUBND values.
+*     TUBND( 2 ) = _INTEGER (Write)
+*        An output parameter to which are written the upper pixel bounds
+*        of the area of the tile NDF that overlaps the region specified
+*        by parameter TARGET. If there is no overlap, the TLBND values
+*        are returned greater than the TUBND values.
 *     UBND( 2 ) = _INTEGER (Write)
 *        An output parameter to which are written the upper pixel bounds
 *        of the NDF containing the co-added data for the tile.
@@ -114,6 +135,8 @@
 *  History:
 *     25-FEB-2011 (DSB):
 *        Original version.
+*     16-JUN-2013 (DSB):
+*        Added parameters LOCAL, TARGET, TLBND and TUBND.
 
 *  Copyright:
 *     Copyright (C) 2011 Science and Technology Facilities Council.
@@ -169,6 +192,9 @@
 #include "libsmf/tiles.h"   /* Move this to smf_typ.h and smf.h when done */
 
 
+F77_SUBROUTINE(ast_isaregion)( INTEGER(THIS), INTEGER(STATUS) );
+
+
 void smurf_tileinfo( int *status ) {
 
 /* Local Variables */
@@ -180,6 +206,7 @@ void smurf_tileinfo( int *status ) {
    char *jcmt_tiles;
    char *tilendf = NULL;
    char text[ 200 ];
+   int axes[ 2 ];
    double dec[ 9 ];
    double dist;
    double gx[ 9 ];
@@ -199,14 +226,22 @@ void smurf_tileinfo( int *status ) {
    int indf3;
    int itile;
    int lbnd[ 2 ];
+   int tlbnd[ 2 ];
+   int tubnd[ 2 ];
    int local_origin;
    int nc;
    int place;
    int ubnd[ 2 ];
+   double dlbnd[ 2 ];
+   double dubnd[ 2 ];
    smfSkyTiling skytiling;
    smf_inst_t instrument;
    void *pntr;
    int *ipntr;
+   AstCmpRegion *overlap;
+   AstRegion *target;
+   AstObject *obj;
+   int flag;
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -345,10 +380,15 @@ void smurf_tileinfo( int *status ) {
    msgSeti( "XU", ubnd[ 0 ] );
    msgSeti( "YL", lbnd[ 1 ] );
    msgSeti( "YU", ubnd[ 1 ] );
-   msgOutif( MSG__VERB, " ", "      Pixel bounds: (^XL:^XU,^YL:^YU)", status );
+   msgOut( " ", "      Pixel bounds: (^XL:^XU,^YL:^YU)", status );
 
 /* Transform the region centre and a collection of points on the edge
    of the region (corners and side mid-points) from GRID coords to RA,Dec. */
+   point1[ 0 ] = 0.5;
+   point1[ 1 ] = 0.5;
+   point2[ 0 ] = ubnd[ 0 ] - lbnd[ 0 ] + 1;
+   point2[ 1 ] = ubnd[ 1 ] - lbnd[ 1 ] + 1;
+
    gx[ 0 ] = 0.5*( point1[ 0 ] + point2[ 0 ] );   /* Centre */
    gy[ 0 ] = 0.5*( point1[ 1 ] + point2[ 1 ] );
 
@@ -512,8 +552,109 @@ void smurf_tileinfo( int *status ) {
    } else {
       msgSetc( "NDF",  tilendf );
       msgSetc( "E",  exists ? "exists" : "does not exist" );
-      msgOutif( MSG__VERB, " ", "      NDF: ^NDF (^E)", status );
+      msgOut( " ", "      NDF: ^NDF (^E)", status );
    }
+
+/* Initialise TBND and TLBND to indicate no overlap. */
+   tlbnd[ 0 ] = 1;
+   tlbnd[ 1 ] = 1;
+   tubnd[ 0 ] = 0;
+   tubnd[ 1 ] = 0;
+
+/* Attempt to to get an AST Region (assumed to be in some 2D sky coordinate
+   system) using parameter "TARGET". */
+   if( *status == SAI__OK ) {
+      kpg1Gtobj( "TARGET", "Region",
+                 (void (*)( void )) F77_EXTERNAL_NAME(ast_isaregion),
+                 &obj, status );
+
+/* Annul the error if none was obtained. */
+      if( *status == PAR__NULL ) {
+         errAnnul( status );
+
+/* Otherwise, use the supplied object. */
+      } else {
+         target = (AstRegion *) obj;
+
+/* If the target Region is 3-dimensional, remove the third axis, which
+   is assumed to be a spectral axis. */
+         if( astGetI( target, "Naxes" ) == 3 ) {
+            axes[ 0 ] = 1;
+            axes[ 1 ] = 2;
+            target = astPickAxes( target, 2, axes, NULL );
+         }
+
+/* See if there is any overlap between the target and the tile. */
+         overlap = NULL;
+         flag = astOverlap( region, target );
+
+         if( flag == 0 ) {
+            msgOut( "", "      Cannot convert between the coordinate system of the "
+                    "supplied target and the tile.", status );
+
+         } else if( flag == 1 || flag == 6 ) {
+            msgOut( "", "      There is no overlap between the target and the tile.",
+                    status );
+
+         } else if( flag == 2 ) {
+            msgOut( "", "      The tile is contained within the target.",
+                    status );
+            tlbnd[ 0 ] = lbnd[ 0 ];
+            tlbnd[ 1 ] = lbnd[ 1 ];
+            tubnd[ 0 ] = ubnd[ 0 ];
+            tubnd[ 1 ] = ubnd[ 1 ];
+
+         } else if( flag == 3 ) {
+            overlap = astCmpRegion( region, target, AST__AND, " " );
+
+         } else if( flag == 4 ) {
+            overlap = astCmpRegion( region, target, AST__AND, " " );
+
+         } else if( flag == 5 ) {
+            msgOut( "", "      The target and tile are identical.",
+                    status );
+            tlbnd[ 0 ] = lbnd[ 0 ];
+            tlbnd[ 1 ] = lbnd[ 1 ];
+            tubnd[ 0 ] = ubnd[ 0 ];
+            tubnd[ 1 ] = ubnd[ 1 ];
+
+         } else if( *status == SAI__OK ) {
+            *status = SAI__OK;
+            errRepf( "", "Unexpected value %d returned by astOverlap "
+                     "(programming error).", status, flag );
+         }
+
+/* If a region containing the intersection of the tile and target was
+   created above, map it into the grid coordinate system of the tile. */
+         if( overlap ) {
+            overlap = astMapRegion( overlap, astGetMapping( fs, AST__CURRENT,
+                                                            AST__BASE ),
+                                    astGetFrame( fs, AST__BASE ) );
+
+/* Get its GRID bounds. */
+            astGetRegionBounds( overlap, dlbnd, dubnd );
+
+/* Convert to integer. */
+            tlbnd[ 0 ] = ceil( dlbnd[ 0 ] - 0.5 );
+            tlbnd[ 1 ] = ceil( dlbnd[ 1 ] - 0.5 );
+            tubnd[ 0 ] = ceil( dubnd[ 0 ] - 0.5 );
+            tubnd[ 1 ] = ceil( dubnd[ 1 ] - 0.5 );
+
+/* Convert to PIXEL indicies within the tile. */
+            tlbnd[ 0 ] += lbnd[ 0 ] - 1;
+            tlbnd[ 1 ] += lbnd[ 1 ] - 1;
+            tubnd[ 0 ] += lbnd[ 0 ] - 1;
+            tubnd[ 1 ] += lbnd[ 1 ] - 1;
+
+            msgOutf( "", "      The target overlaps section (%d:%d,%d:%d).",
+                     status, tlbnd[ 0 ], tubnd[ 0 ], tlbnd[ 1 ], tubnd[ 1 ] );
+         }
+      }
+   }
+
+/* Store the pixel index bounds of the tiles overlap with the target. */
+   parPut1i( "TLBND", 2, tlbnd, status );
+   parPut1i( "TUBND", 2, tubnd, status );
 
 /* Arrive here if an error occurs. */
    L999:;

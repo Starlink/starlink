@@ -27,8 +27,11 @@
 
 *  ADAM Parameters:
 *     REGION = LITERAL (Read)
-*        The name of a text file containing the AST Region. If null (!)
-*        is supplied, the IN parameter is used instead. [!]
+*        The name of a text file containing the AST Region. Alternatively,
+*        the path for an NDF can be supplied, in which case a Region is
+*        created that covers the region of sky that maps onto the rectangular
+*        pixel grid of the NDF. If null (!) is supplied, the IN parameter is
+*        used instead. [!]
 *     IN = NDF (Read)
 *        Input raw data files that define the required list of tiles.
 *        ONly used if REGION is null (!).
@@ -128,7 +131,7 @@ void smurf_tilelist( int *status ) {
 /* Start a new AST context. */
    astBegin;
 
-/* Attempto to get an AST Region (assumed to be in some 2D sky coordinate
+/* Attempt to to get an AST Region (assumed to be in some 2D sky coordinate
    system). */
    kpg1Gtobj( "REGION", "Region",
               (void (*)( void )) F77_EXTERNAL_NAME(ast_isaregion),

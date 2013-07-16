@@ -93,6 +93,7 @@ int *smf_skytiles_region( AstRegion *region, smf_inst_t instrument,
    double *xmesh;
    double *ymesh;
    int *tiles = NULL;
+   int axes[ 2 ];
    int i;
    int ineb;
    int itile2;
@@ -131,6 +132,14 @@ int *smf_skytiles_region( AstRegion *region, smf_inst_t instrument,
    the base Frame is gird coords in which each grid pixel corresponds to
    a single tile. */
    smf_skytile( 0, &skytiling, 0, NULL, &fs, NULL, lbnd, ubnd, status );
+
+/* If the supplied Region is 3-dimensional, remove the third axis, which
+   is assumed to be a spectral axis. */
+   if( astGetI( region, "Naxes" ) == 3 ) {
+      axes[ 0 ] = 1;
+      axes[ 1 ] = 2;
+      region = astPickAxes( region, 2, axes, NULL );
+   }
 
 /* Map the Region using the FrameSet obtained above so that the new Region
    describes offsets in tiles from the lower left tile. */
