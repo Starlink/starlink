@@ -91,6 +91,10 @@ f     The Box class does not define any new routines beyond those
 *        Do not assume the first axis value is good in function BestBox.
 *     22-MAR-2011 (DSB):
 *        Improve uniformity of points within grid produced by astRegBaseGrid.
+*     16-JUL-2013 (DSB):
+*        Use a more robust algorithm for determining the order of the
+*        vertices whan a Box is simplified to a Polygon. The old method
+*        sometimes resulted in an unbounded "inside-out" polygon.
 *class--
 */
 
@@ -3705,10 +3709,6 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
    double corners[8];            /* Box corners in current Frame */
    double k;                     /* Axis constant value */
    double lb;                    /* Lower axis bound */
-   double rxx;                   /* Element of the Jacobian matrix */
-   double rxy;                   /* Element of the Jacobian matrix */
-   double ryx;                   /* Element of the Jacobian matrix */
-   double ryy;                   /* Element of the Jacobian matrix */
    double ub;                    /* Upper axis bound */
    int *inperm;                  /* Input axis permutation array */
    int *outperm;                 /* Output axis permutation array */
@@ -3721,8 +3721,6 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
    int neg;                      /* Was original Region negated? */
    int nin;                      /* No. of base Frame axes (Mapping inputs) */
    int nout;                     /* No. of current Frame axes (Mapping outputs) */
-   int olddir0;                  /* Original value of Direction(1) attribute */
-   int olddir1;                  /* Original value of Direction(2) attribute */
    int simpler;                  /* Has some simplication taken place? */
 
 /* Initialise. */
@@ -3962,89 +3960,61 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
             box = (AstBox *) new;
             Cache( box, 0, status );
 
-/* For a "normal" right handed coordinate system, rotation from the positive
-   first axis to the positive second axis is anti-clockwise. But for left
-   handed coordinate systems, it's the opposite. Determine if the required
-   system is left or right handed by looking at the default values for
-   the Direction attribute. If the default values are equal, then the
-   system is right handed - otherwise it is left handed. We need to clear
-   any set Direction value first in order to get the default value, but
-   take care to re-instate any set Direction values afterwards. */
-            if( astTestDirection( frm, 0 )  ) {
-               olddir0 = astGetDirection( frm, 0 ) ? 1 : 0;
-               astClearDirection( frm, 0 );
-            } else {
-               olddir0 = -1;
-            }
-
-            if( astTestDirection( frm, 1 )  ) {
-               olddir1 = astGetDirection( frm, 1 ) ? 1 : 0;
-               astClearDirection( frm, 1 );
-            } else {
-               olddir1 = -1;
-            }
-
-            right_handed = ( astGetDirection( frm, 0 ) == astGetDirection( frm, 1 ) );
-
-            if( olddir0 != - 1 ) astSetDirection( frm, 0, olddir0 );
-            if( olddir1 != - 1 ) astSetDirection( frm, 1, olddir1 );
-
-/* The Mapping may change the handedness of the axes. That is, the
-   Mapping may reverse one axis without reversing the other. This will be
-   the case if the determinant of the Jacobian matrix of the Mapping is
-   negative. Get the determinant. If it is negative, reverse the
-   handedness of the axes. */
-            rxx = astRate( map, box->centre, 0, 0 );
-            rxy = astRate( map, box->centre, 0, 1 );
-            ryx = astRate( map, box->centre, 1, 0 );
-            ryy = astRate( map, box->centre, 1, 1 );
-            if( rxx*ryy - rxy*ryx < 0 ) right_handed = ! right_handed;
-
 /* The order in which the polygon vertices are stored determines whether
    the interior or exterior of the polygon forms the inside of the
-   Region. We want the inside to be the interior so we must store the
-   vertices in anti-clockwise order within the new coordinate Frame. Do
-   right handed systems first. */
-            if( right_handed ) {
-               ptr1[ 0 ][ 0 ] = box->centre[ 0 ] - box->extent[ 0 ];
-               ptr1[ 1 ][ 0 ] = box->centre[ 1 ] + box->extent[ 1 ];
+   Region. We want the inside to be the interior. First create a Polygon
+   in which the vertices are stored in clockwise order within the
+   new coordinate Frame. If the new Polygon is not bounded, use
+   anti-clockwise order. */
+            for( right_handed = 0; right_handed < 2; right_handed++ ) {
 
-               ptr1[ 0 ][ 1 ] = box->centre[ 0 ] - box->extent[ 0 ];
-               ptr1[ 1 ][ 1 ] = box->centre[ 1 ] - box->extent[ 1 ];
+               if( right_handed ) {
+                  ptr1[ 0 ][ 0 ] = box->centre[ 0 ] - box->extent[ 0 ];
+                  ptr1[ 1 ][ 0 ] = box->centre[ 1 ] + box->extent[ 1 ];
 
-               ptr1[ 0 ][ 2 ] = box->centre[ 0 ] + box->extent[ 0 ];
-               ptr1[ 1 ][ 2 ] = box->centre[ 1 ] - box->extent[ 1 ];
+                  ptr1[ 0 ][ 1 ] = box->centre[ 0 ] - box->extent[ 0 ];
+                  ptr1[ 1 ][ 1 ] = box->centre[ 1 ] - box->extent[ 1 ];
 
-               ptr1[ 0 ][ 3 ] = box->centre[ 0 ] + box->extent[ 0 ];
-               ptr1[ 1 ][ 3 ] = box->centre[ 1 ] + box->extent[ 1 ];
+                  ptr1[ 0 ][ 2 ] = box->centre[ 0 ] + box->extent[ 0 ];
+                  ptr1[ 1 ][ 2 ] = box->centre[ 1 ] - box->extent[ 1 ];
 
-/* For left handed systems, "anti-clockwise" implies the opposite order */
-            } else {
-               ptr1[ 0 ][ 3 ] = box->centre[ 0 ] - box->extent[ 0 ];
-               ptr1[ 1 ][ 3 ] = box->centre[ 1 ] + box->extent[ 1 ];
+                  ptr1[ 0 ][ 3 ] = box->centre[ 0 ] + box->extent[ 0 ];
+                  ptr1[ 1 ][ 3 ] = box->centre[ 1 ] + box->extent[ 1 ];
 
-               ptr1[ 0 ][ 2 ] = box->centre[ 0 ] - box->extent[ 0 ];
-               ptr1[ 1 ][ 2 ] = box->centre[ 1 ] - box->extent[ 1 ];
+               } else {
+                  ptr1[ 0 ][ 3 ] = box->centre[ 0 ] - box->extent[ 0 ];
+                  ptr1[ 1 ][ 3 ] = box->centre[ 1 ] + box->extent[ 1 ];
 
-               ptr1[ 0 ][ 1 ] = box->centre[ 0 ] + box->extent[ 0 ];
-               ptr1[ 1 ][ 1 ] = box->centre[ 1 ] - box->extent[ 1 ];
+                  ptr1[ 0 ][ 2 ] = box->centre[ 0 ] - box->extent[ 0 ];
+                  ptr1[ 1 ][ 2 ] = box->centre[ 1 ] - box->extent[ 1 ];
 
-               ptr1[ 0 ][ 0 ] = box->centre[ 0 ] + box->extent[ 0 ];
-               ptr1[ 1 ][ 0 ] = box->centre[ 1 ] + box->extent[ 1 ];
-            }
-         }
+                  ptr1[ 0 ][ 1 ] = box->centre[ 0 ] + box->extent[ 0 ];
+                  ptr1[ 1 ][ 1 ] = box->centre[ 1 ] - box->extent[ 1 ];
+
+                  ptr1[ 0 ][ 0 ] = box->centre[ 0 ] + box->extent[ 0 ];
+                  ptr1[ 1 ][ 0 ] = box->centre[ 1 ] + box->extent[ 1 ];
+               }
 
 /* Transform the Box corners into the current Frame. */
-         ps2 = astTransform( map, ps1, 1, NULL );
-         ptr2 = astGetPoints( ps2 );
-         if( astOK ) {
+               ps2 = astTransform( map, ps1, 1, NULL );
+               ptr2 = astGetPoints( ps2 );
+               if( astOK ) {
 
 /* Create a Polygon from these points. */
-            for( ic = 0; ic < 4; ic++ ) {
-               corners[ ic ] = ptr2[ 0 ][ ic ];
-               corners[ 4 + ic ] = ptr2[ 1 ][ ic ];
+                  for( ic = 0; ic < 4; ic++ ) {
+                     corners[ ic ] = ptr2[ 0 ][ ic ];
+                     corners[ 4 + ic ] = ptr2[ 1 ][ ic ];
+                  }
+                  newpoly = astPolygon( frm, 4, 4, corners, unc, "", status );
+
+/* If the Polygon is bounded, break out of the loop. */
+                  if( astGetBounded( newpoly ) ) break;
+               }
+
+/* Free resources. */
+               newpoly = astAnnul( newpoly );
+               ps2 = astAnnul( ps2 );
             }
-            newpoly = astPolygon( frm, 4, 4, corners, unc, "", status );
 
 /* See if all points within the Box mesh fall on the boundary of this
    Polygon, to within the uncertainty of the Region. */
