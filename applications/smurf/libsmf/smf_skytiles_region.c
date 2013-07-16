@@ -129,7 +129,7 @@ int *smf_skytiles_region( AstRegion *region, smf_inst_t instrument,
 
 /* Create a FrameSet describing the whole sky in which each pixel
    corresponds to a single tile. The current Frame is ICRS (RA,Dec) and
-   the base Frame is gird coords in which each grid pixel corresponds to
+   the base Frame is grid coords in which each grid pixel corresponds to
    a single tile. */
    smf_skytile( 0, &skytiling, 0, NULL, &fs, NULL, lbnd, ubnd, status );
 
@@ -171,8 +171,8 @@ int *smf_skytiles_region( AstRegion *region, smf_inst_t instrument,
    xmesh = mesh;
    ymesh = mesh + npoint;
    for( i = 0; i < npoint && *status == SAI__OK; i++ ) {
-      ix = (int)( *(xmesh++) + 0.5 );
-      iy = (int)( *(ymesh++) + 0.5 );
+      ix = (int)( *(xmesh++) + 0.5 ) - 1;
+      iy = (int)( *(ymesh++) + 0.5 ) - 1;
       itile = smf_skytilexy2i( ix, iy, &skytiling, status );
       sprintf( text, "%d", itile );
       astMapPut0I( km, text, 1, NULL );
