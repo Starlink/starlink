@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     AstFitsChan *smf_skytileheader( int itile, smfSkyTiling *skytiling,
-*                                     int *status )
+*                                     int local_origin, int *status )
 
 *  Arguments:
 *     itile = int (Given)
@@ -23,6 +23,11 @@
 *        Pointer to a structure holding parameters describing the tiling
 *        scheme used for the required JCMT instrument, as returned by
 *        function smf_skytiling.
+*     local_origin = int (Given)
+*        If non-zero, then the returned header will include values for
+*        projection parameters PVi_1 and PVi_2 that causes the origin of
+*        grid coordinates to be moved to the centre of the tile. If zero,
+*        the origin of pixel coordinates will be at RA=0, Dec=0.
 *     status = int * (Given)
 *        Pointer to the inherited status variable.
 
@@ -47,13 +52,13 @@
 *     this means that for most tiles the reference point is not actually
 *     contained within the tile, and also results in tiles having huge
 *     values for CRPIX1/2. To avoid this, the feature described in
-*     FITS-WCS paper II section 2.5 ("User specified phi_0,theta_0") is
-*     used. This means that the CRVAL and CRPIX values in the returned
-*     header do not give the celestial and pixel coords of the projection
-*     reference point, but instead give the celestial and pixel coords of
-*     an arbitrary point (specified by projection parameters PVi_1 and PVi_2
-*     for longitude axis "i"). The point actually used is the centre
-*     centre of the requested tile.
+*     FITS-WCS paper II section 2.5 ("User specified phi_0,theta_0") may
+*     be used (see the "local_origin" argument). This causes the CRVAL and
+*     CRPIX values in the returned header do not give the celestial and
+*     pixel coords of the projection reference point, but instead give
+*     the celestial and pixel coords of an arbitrary point (specified by
+*     projection parameters PVi_1 and PVi_2 for longitude axis "i"). The
+*     point actually used is the centre centre of the requested tile.
 *
 *     HEALPix facets are numbered from 0 to 11 raster-fashion from bottom
 *     left of the projection plane to top right (note, facet zero
@@ -71,10 +76,12 @@
 *  History:
 *     28-FEB-2011 (DSB):
 *        Initial version.
+*     16-JUL-2013 (DSB):
+*        Added argument "local_origin".
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2011 Science & Technology Facilities Council.
+*     Copyright (C) 2011,2013 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -116,7 +123,7 @@ static AstFitsChan *smfMakeFC( int nx, int ny, int n, int p, double crpix1,
                                int *status );
 
 AstFitsChan *smf_skytileheader( int itile, smfSkyTiling *skytiling,
-                                int *status ){
+                                int local_origin, int *status ){
 
 /* Local Variables: */
    AstFitsChan *fc = NULL;
@@ -217,42 +224,46 @@ AstFitsChan *smf_skytileheader( int itile, smfSkyTiling *skytiling,
       fc = smfMakeFC( 1, 1, skytiling->ntpf, skytiling->ppt, gx_ref, gy_ref, ra_ref,
                       dec_ref, status );
 
+/* If we want a local pixel origin... */
+      if( local_origin ) {
+
 /* Read a FrameSet from the FitsChan, then annul the FitsChan. */
-      astClear( fc, "Card" );
-      fs = astRead( fc );
-      fc = astAnnul( fc );
+         astClear( fc, "Card" );
+         fs = astRead( fc );
+         fc = astAnnul( fc );
 
 /* Store the grid coords at the tile centre. */
-      gx_cen = gy_cen = 0.5*( skytiling->ppt + 1.0 );
+         gx_cen = gy_cen = 0.5*( skytiling->ppt + 1.0 );
 
 /* Transform these into WCS coords to get the ra,dec (in radians) at
    the centre of the tile. Then annull the FrameSet. */
-      astTran2( fs, 1, &gx_cen, &gy_cen, 1, &ra_cen, &dec_cen );
-      fs = astAnnul( fs );
+         astTran2( fs, 1, &gx_cen, &gy_cen, 1, &ra_cen, &dec_cen );
+         fs = astAnnul( fs );
 
 /* To avoid the header including huge CRPIX values and CRVAL values that
    are (in general) way off the tile (i.e. the origin of (RA,Dec)), we
    use the option described in FITS-WCS paper II section 2.5 to specify
    CRVAL as the (RA,Dec) at the centre of the tile. Create a FitsCHan
    holding the header. */
-      fc = smfMakeFC( 1, 1, skytiling->ntpf, skytiling->ppt, gx_cen, gy_cen,
-                      ra_cen, dec_cen, status );
+         fc = smfMakeFC( 1, 1, skytiling->ntpf, skytiling->ppt, gx_cen, gy_cen,
+                         ra_cen, dec_cen, status );
 
 /* Set PVi_0 to a non-zero value in the header to indicate that the CRPIX
    grid coords correspond to the CRVAL sky coords, and not to the projection
    reference point (i.e. (ra,dec)=(0,0) or (ra,dec)=(180,0)). */
-      astPutFits( fc, "PV1_0   = 1.0", 1 );
+         astPutFits( fc, "PV1_0   = 1.0", 1 );
 
 /* We now need to store the native coords corresponding to CRVAL in the
    PVi_1/PVi_2 keywords. For all but the first tile, native coords and
    (RA,Dec) are equivalent so these are just the same as the values stored
    for CRVAL. For the first tile (which uses ra=180 as the projection
    reference point), we need to shift the RA value by 180 degrees. */
-      if( fi == 0 ) ra_cen -= AST__DPI;
-      sprintf( card,  "PV1_1   = %.15g", ra_cen*AST__DR2D );
-      astPutFits( fc, card, 1 );
-      sprintf( card,  "PV1_2   = %.15g", dec_cen*AST__DR2D );
-      astPutFits( fc, card, 1 );
+         if( fi == 0 ) ra_cen -= AST__DPI;
+         sprintf( card,  "PV1_1   = %.15g", ra_cen*AST__DR2D );
+         astPutFits( fc, card, 1 );
+         sprintf( card,  "PV1_2   = %.15g", dec_cen*AST__DR2D );
+         astPutFits( fc, card, 1 );
+      }
 
 /* Add the one based tile index into the header. */
       sprintf( card, "JCMTTILE= %d", itile );

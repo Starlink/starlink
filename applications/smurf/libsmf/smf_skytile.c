@@ -13,9 +13,9 @@
 *     C function
 
 *  Invocation:
-*     void smf_skytile( int itile, smfSkyTiling *skytiling, AstFitsChan **fc,
-*                       AstFrameSet **fs, AstRegion **region, int dim[2],
-*                       int *status )
+*     void smf_skytile( int itile, smfSkyTiling *skytiling, int local_origin,
+*                       AstFitsChan **fc, AstFrameSet **fs, AstRegion **region,
+*                       int lbnd[2], int ubnd[2], int *status )
 
 *  Arguments:
 *     itile = int (Given)
@@ -26,6 +26,11 @@
 *        Pointer to a structure holding parameters describing the tiling
 *        scheme used for the required JCMT instrument, as returned by
 *        function smf_skytiling.
+*     local_origin = int (Given)
+*        If non-zero, then the returned header will include values for
+*        projection parameters PVi_1 and PVi_2 that causes the origin of
+*        grid coordinates to be moved to the centre of the tile. If zero,
+*        the origin of pixel coordinates will be at RA=0, Dec=0.
 *     fc = AstFitsChan ** (Returned)
 *        Address at which to return a pointer to a FitsChan containing
 *        the FITS headers for the tile. May be NULL.
@@ -37,8 +42,10 @@
 *        Address at which to return a pointer to a Region defining the
 *        extent of the tile. May be NULL. The Region will be defined
 *        defined within ICRS (RA,DEc).
-*     dim[ 2 ] = integer (Returned)
-*        The dimensions of the tile in grid pixels.
+*     lbnd[ 2 ] = integer (Returned)
+*        The lower bounds of the tile in PIXEL indicies.
+*     ubnd[ 2 ] = integer (Returned)
+*        The upper bounds of the tile in PIXEL indicies.
 *     status = int * (Given)
 *        Pointer to the inherited status variable.
 
@@ -48,7 +55,8 @@
 *  Description:
 *     This function returns an AST Region describing the outline of the
 *     requested sky tile in (RA,Dec), together with the the dimensions of
-*     the tile in grid pixels.
+*     the tile in grid pixels. Th NDF pixel origin is assumed to be at
+*     the FITS reference point, as selected by argument "local_origin".
 
 *  Authors:
 *     DSB: David S Berry (JAC, UCLan)
@@ -57,6 +65,8 @@
 *  History:
 *     14-APR-2011 (DSB):
 *        Initial version.
+*     16-JUL-2013 (DSB):
+*        Added argument "local_origin". Replaced "dim" by "lbnd" and "ubnd".
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -101,9 +111,9 @@
 /* Local constants */
 #define DELTA 0.01          /* Pixel offset to avoid edges */
 
-void smf_skytile( int itile, smfSkyTiling *skytiling, AstFitsChan **fc,
-                  AstFrameSet **fs, AstRegion **region, int dim[2],
-                  int *status ){
+void smf_skytile( int itile, smfSkyTiling *skytiling, int local_origin,
+                  AstFitsChan **fc, AstFrameSet **fs, AstRegion **region,
+                  int lbnd[2], int ubnd[2], int *status ) {
 
 /* Local Variables: */
    AstFitsChan *lfc = NULL;
@@ -111,6 +121,8 @@ void smf_skytile( int itile, smfSkyTiling *skytiling, AstFitsChan **fc,
    AstRegion *lregion = NULL;
    double point1[ 2 ];
    double point2[ 2 ];
+   int crpix1;
+   int crpix2;
 
 /* Initialise the returned pointers. */
    if( fc ) *fc = NULL;
@@ -125,16 +137,21 @@ void smf_skytile( int itile, smfSkyTiling *skytiling, AstFitsChan **fc,
 
 /* Get a FitsChan holding the FITS headers defining the tile WCS and
    extent. */
-   lfc = smf_skytileheader( itile, skytiling, status );
+   lfc = smf_skytileheader( itile, skytiling, local_origin, status );
 
-/* Store the upper pixel bounds of the tile. */
-   if( ( !astGetFitsI( lfc, "NAXIS1", dim )  ||
-         !astGetFitsI( lfc, "NAXIS2", dim + 1 ) ) &&
+/* Store the upper bounds of the tile in GRID coords (later changed to
+   PIXEL coords). */
+   if( ( !astGetFitsI( lfc, "NAXIS1", ubnd )  ||
+         !astGetFitsI( lfc, "NAXIS2", ubnd + 1 ) ) &&
          *status == SAI__OK ) {
       *status = SAI__ERROR;
       errRep( " ", "Failed to get a tile dimensions (programming error).",
                  status );
    }
+
+/* Get the GRID coords of the FITS reference point. */
+   astGetFitsI( lfc, "CRPIX1", &crpix1 );
+   astGetFitsI( lfc, "CRPIX2", &crpix2 );
 
 /* If required, return a deep copy of the FitsChan, before the
    WCS-related cards are removed by the following astRead call. */
@@ -159,8 +176,8 @@ void smf_skytile( int itile, smfSkyTiling *skytiling, AstFitsChan **fc,
       if( region ) {
          point1[ 0 ] = 0.5 + DELTA;
          point1[ 1 ] = 0.5 + DELTA;
-         point2[ 0 ] = dim[ 0 ] + 0.5 - DELTA;
-         point2[ 1 ] = dim[ 1 ] + 0.5 - DELTA;
+         point2[ 0 ] = ubnd[ 0 ] + 0.5 - DELTA;
+         point2[ 1 ] = ubnd[ 1 ] + 0.5 - DELTA;
          lregion = (AstRegion *) astBox(  astGetFrame( lfs, AST__BASE ), 1,
                                           point1, point2, NULL, " " );
 
@@ -168,6 +185,13 @@ void smf_skytile( int itile, smfSkyTiling *skytiling, AstFitsChan **fc,
          lregion = astMapRegion( lregion, lfs, lfs );
       }
    }
+
+/* Find the lower and upper bounds of the tile in NDF PIXEL indicies. The
+   origin is placed at teh FITS reference pixel. */
+   lbnd[ 0 ] = 1 - crpix1;
+   lbnd[ 1 ] = 1 - crpix2;
+   ubnd[ 0 ] += lbnd[ 0 ] - 1;
+   ubnd[ 1 ] += lbnd[ 1 ] - 1;
 
 /* Return and export the required pointers. */
    if( fc ) astExport( *fc );

@@ -104,9 +104,11 @@ int *smf_skytiles_data( Grp *igrp, size_t size, int *ntile, int *status ){
    double point2[ 2 ];
    double search;
    int *tiles = NULL;
+   int dim[ 2 ];
    int i;
    int ix;
    int iy;
+   int lbnd[ 2 ];
    int ubnd[ 2 ];
    size_t ifile;
    smfData *data = NULL;
@@ -168,11 +170,13 @@ int *smf_skytiles_data( Grp *igrp, size_t size, int *ntile, int *status ){
    corresponds to a single tile. The current Frame is ICRS (RA,Dec) and
    the base Frame is grid coords in which each grid pixel corresponds to
    a single tile. */
-         smf_skytile( 0, &skytiling, NULL, &fs, NULL, ubnd, status );
+         smf_skytile( 0, &skytiling, 0, NULL, &fs, NULL, lbnd, ubnd, status );
 
 /* Allocate an image with one pixel for each tile, and fill it with
    zeros. */
-         hits = astCalloc( ubnd[0]*ubnd[1], sizeof( *hits ) );
+         dim[ 0 ] = ubnd[ 0 ] - lbnd[ 0 ] + 1;
+         dim[ 1 ] = ubnd[ 1 ] - lbnd[ 1 ] + 1;
+         hits = astCalloc( dim[0]*dim[1], sizeof( *hits ) );
 
 /* Get the radius of the field of view in radians. */
          fov = 0.5*(skytiling.fov*AST__DD2R)/3600.0;
@@ -233,7 +237,7 @@ int *smf_skytiles_data( Grp *igrp, size_t size, int *ntile, int *status ){
          for( iframe = 0; iframe < 4*hdr->nframes; iframe++,px++,py++ ) {
             ix = (int)( *px + 0.5 ) - 1;
             iy = (int)( *py + 0.5 ) - 1;
-            hits[ ix + iy*ubnd[ 0 ] ]++;
+            hits[ ix + iy*dim[ 0 ] ]++;
          }
       }
 
@@ -244,8 +248,8 @@ int *smf_skytiles_data( Grp *igrp, size_t size, int *ntile, int *status ){
 
 /* Form a list of all the tiles that receive any data. */
    ph = hits;
-   for( iy = 0; iy < ubnd[ 1 ]; iy++ ) {
-      for( ix = 0; ix < ubnd[ 0 ]; ix++,ph++ ) {
+   for( iy = 0; iy < dim[ 1 ]; iy++ ) {
+      for( ix = 0; ix < dim[ 0 ]; ix++,ph++ ) {
          if( *ph > 0 ) {
             tiles = astGrow( tiles, ++(*ntile), sizeof( *tiles ) );
             if( *status == SAI__OK ) {

@@ -80,6 +80,9 @@
 *     LBND( 2 ) = _INTEGER (Write)
 *        An output parameter to which are written the lower pixel bounds
 *        of the NDF containing the co-added data for the tile.
+*     LOCAL = _LOGICAL (Read)
+*        If TRUE, the FITS reference point is put at the centre of the
+*        tile. Otherwise, it is put at RA=0 Dec=0. [FALSE]
 *     MAXTILE = _INTEGER (Write)
 *        An output parameter to which is written the largest tile index
 *        associated with the instrument specified by parameter INSTRUMENT.
@@ -196,6 +199,7 @@ void smurf_tileinfo( int *status ) {
    int indf3;
    int itile;
    int lbnd[ 2 ];
+   int local_origin;
    int nc;
    int place;
    int ubnd[ 2 ];
@@ -260,7 +264,7 @@ void smurf_tileinfo( int *status ) {
 /* Otherwise, create a FrameSet describing the whole sky in which each
    pixel corresponds to a single tile. */
    } else {
-      smf_skytile( 0, &skytiling, NULL, &fs, NULL, ubnd, status );
+      smf_skytile( 0, &skytiling, 0, NULL, &fs, NULL, lbnd, ubnd, status );
 
 /* Change the bounds of the output NDF. */
       ndfSbnd( 2, lbnd, ubnd, indf3, status );
@@ -273,8 +277,8 @@ void smurf_tileinfo( int *status ) {
               status );
 
 /* Loop round every row and column */
-      for( j = 0; j < ubnd[ 1 ]; j++ ) {
-         for( i = 0; i < ubnd[ 0 ]; i++ ) {
+      for( j = 0; j < ubnd[ 1 ] - lbnd[ 1 ] + 1; j++ ) {
+         for( i = 0; i < ubnd[ 0 ] - lbnd[ 0 ] + 1; i++ ) {
 
 /* Store the tile index at this pixel. */
             *(ipntr++) = smf_skytilexy2i( i, j, &skytiling, status );
@@ -305,6 +309,9 @@ void smurf_tileinfo( int *status ) {
        goto L999;
    }
 
+/* See if the pixel origin is to be at the centre of the tile. */
+   parGet0l( "LOCAL", &local_origin, status );
+
 /* Display the tile number. */
    msgBlank( status );
    msgSeti( "ITILE", itile );
@@ -312,8 +319,9 @@ void smurf_tileinfo( int *status ) {
    msgOut( " ", "   Tile ^ITILE (of ^MAXTILE):", status );
 
 /* Get the FITS header, FrameSet and Region defining the tile, and the tile
-   dimensions. */
-   smf_skytile( itile, &skytiling, &fc, &fs, &region, ubnd, status );
+   bounds in pixel indices. */
+   smf_skytile( itile, &skytiling, local_origin, &fc, &fs, &region, lbnd,
+                ubnd, status );
 
 /* Write the FITS headers out to a file, annulling the error if the
    header is not required. */
@@ -329,8 +337,6 @@ void smurf_tileinfo( int *status ) {
    }
 
 /* Store the lower and upper pixel bounds of the tile. */
-   lbnd[ 0 ] = 1;
-   lbnd[ 1 ] = 1;
    parPut1i( "LBND", 2, lbnd, status );
    parPut1i( "UBND", 2, ubnd, status );
 

@@ -100,6 +100,7 @@ int *smf_skytiles_region( AstRegion *region, smf_inst_t instrument,
    int ix;
    int iy;
    int key_index;
+   int lbnd[ 2 ];
    int mapsize;
    int npoint;
    int overlap;
@@ -129,7 +130,7 @@ int *smf_skytiles_region( AstRegion *region, smf_inst_t instrument,
    corresponds to a single tile. The current Frame is ICRS (RA,Dec) and
    the base Frame is gird coords in which each grid pixel corresponds to
    a single tile. */
-   smf_skytile( 0, &skytiling, NULL, &fs, NULL, ubnd, status );
+   smf_skytile( 0, &skytiling, 0, NULL, &fs, NULL, lbnd, ubnd, status );
 
 /* Map the Region using the FrameSet obtained above so that the new Region
    describes offsets in tiles from the lower left tile. */
@@ -189,7 +190,8 @@ int *smf_skytiles_region( AstRegion *region, smf_inst_t instrument,
       if( value == -1 ) {
 
 /* Get a Region covering the tile. */
-         smf_skytile( itile, &skytiling, NULL, NULL, &tregion, ubnd, status );
+         smf_skytile( itile, &skytiling, 0, NULL, NULL, &tregion, lbnd, ubnd,
+                      status );
 
 /* See if this Region overlaps the user supplied region. Set the value of
    the KeyMap entry to +1 or -1 accordingly. */

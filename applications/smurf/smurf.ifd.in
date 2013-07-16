@@ -4993,6 +4993,16 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter local {
+                type _LOGICAL
+                access READ
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                prompt {Put the reference point at the centre of the tile?}
+                default FALSE
+                helpkey *
+            }
+
             parameter maxtile {
                 type _INTEGER
                 access WRITE

@@ -31,9 +31,10 @@ typedef struct smfSkyTiling {
 
 /* Prototypes */
 void smf_skytiling( smf_inst_t instrument, smfSkyTiling *skytiling, int *status );
-AstFitsChan *smf_skytileheader( int itile, smfSkyTiling *skytiling, int *status );
+AstFitsChan *smf_skytileheader( int itile, smfSkyTiling *skytiling, int local_origin, int *status );
 int smf_skytilexy2i( int xt, int yt, smfSkyTiling *skytiling, int *status );
-void smf_skytile( int itile, smfSkyTiling *skytiling, AstFitsChan **fc, AstFrameSet **fs, AstRegion **region, int dim[2], int *status );
+void smf_skytile( int itile, smfSkyTiling *skytiling, int local_origin,
+AstFitsChan **fc, AstFrameSet **fs, AstRegion **region, int lbnd[2], int ubnd[2], int *status );
 void smf_skytilei2xy( int itile, smfSkyTiling *skytiling, int *xt, int *yt, int *status );
 int *smf_skytiles_region( AstRegion *region, smf_inst_t instrument, int *ntile, int *status );
 int *smf_skytiles_data( Grp *igrp, size_t size, int *ntile, int *status );
