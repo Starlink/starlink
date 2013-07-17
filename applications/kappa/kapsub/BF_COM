@@ -55,6 +55,8 @@
 *        Added SEPARC and PIXOFF.
 *     2010 July 5 (MJC):
 *        Added SHAPEC.
+*     2013 July 15 (MJC):
+*        Added CIRC.
 *     {enter_further_changes_here}
 
 *-
@@ -97,6 +99,11 @@
 *           Background level fixed by the user?
 *        FWHMC = LOGICAL
 *           FWHM of the Gaussian fixed by the user?
+*        CIRC = LOGICAL
+*           Circular Gaussian demanded by the user?
+*        ORIC = LOGICAL
+*           Orientation of Gaussian fixed by the user?
+*           This should be set TRUE when CIRC is TRUE.
 *        POSC = LOGICAL
 *           Position co-ordinates fixed?
 *        RATIOC = LOGICAL
@@ -118,8 +125,9 @@
                                  ! variance arrays
       LOGICAL AMPC               ! Amplitude fixed by user?
       LOGICAL BACKC              ! Background level fixed by user?
+      LOGICAL CIRC               ! Circular Gaussian fixed by user?
       LOGICAL FWHMC              ! FWHM of the Gaussian fixed by user?
-      LOGICAL ORIC               ! Position co-ordinates fixed?
+      LOGICAL ORIC               ! Orientation fixed?
       LOGICAL POSC               ! Position co-ordinates fixed?
       LOGICAL RATIOC             ! Amplitude ratios fixed by user?
       LOGICAL SEPARC             ! Separations fixed by user?
@@ -128,4 +136,4 @@
 
       COMMON /BF1_COM/ PC, PIXOFF, ARATIO, USEVAR, NBEAMS
       COMMON /BF2_COM/ IPWD, IPWV, LBND, UBND, AMPC, BACKC, FWHMC,
-     :                 ORIC, POSC, RATIOC, SEPARC, SHAPEC, ISTAT
+     :                 CIRC, ORIC, POSC, RATIOC, SEPARC, SHAPEC, ISTAT

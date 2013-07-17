@@ -32,7 +32,7 @@
 
 *  Copyright:
 *     Copyright (C) 2007 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     Copyright (C) 2010, 2013 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Authors:
@@ -46,6 +46,11 @@
 *        Add number of constraints.
 *     2010 July 5 (MJC):
 *        Increment the number of constraints and fit coefficients.
+*     2013 July 15 (MJC):
+*        Increment the number of constraints for circularity and
+*        orientation.  The latter is not currently set by BEAMFIT
+*        except for circularity but might be needed later, so add
+*        it while the code structure is fresh in the mind.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -61,7 +66,7 @@
 
 *  Maximum number of constraints
       INTEGER BF__NCON
-      PARAMETER ( BF__NCON = 7 )
+      PARAMETER ( BF__NCON = 9 )
 
 *  Number of fit coefficients per beam
       INTEGER BF__NCOEF
