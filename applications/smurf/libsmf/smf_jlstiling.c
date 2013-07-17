@@ -1,7 +1,7 @@
 /*
 *+
 *  Name:
-*     smf_skytiling
+*     smf_jlstiling
 
 *  Purpose:
 *     Return information about the sky tiling scheme for a JCMT instrument.
@@ -13,13 +13,13 @@
 *     C function
 
 *  Invocation:
-*     smf_skytiling( smf_inst_t instrument, smfSkyTiling *skytiling,
+*     smf_jlstiling( smf_inst_t instrument, smfJLSTiling *skytiling,
 *                    int *status )
 
 *  Arguments:
 *     instrument = smf_inst_t (Given)
 *        The instrument for which information is required.
-*     skytiling = smfSkyTiling * (Given)
+*     skytiling = smfJLSTiling * (Given)
 *        Pointer to a structure in which to return the required
 *        information.
 *     status = int * (Given)
@@ -84,12 +84,12 @@
 #include "libsmf/smf.h"
 
 
-#include "libsmf/tiles.h"   /* Move this to smf_typ.h and smf.h when done */
+#include "libsmf/jlstiles.h"   /* Move this to smf_typ.h and smf.h when done */
 
 
 
 
-void smf_skytiling( smf_inst_t instrument, smfSkyTiling *skytiling,
+void smf_jlstiling( smf_inst_t instrument, smfJLSTiling *skytiling,
                     int *status ){
 
 /* Initialise the returned structure before checking the inherited status. */
@@ -157,7 +157,7 @@ void smf_skytiling( smf_inst_t instrument, smfSkyTiling *skytiling,
    } else {
       *status = SAI__ERROR;
       msgSeti( "I", instrument );
-      errRep( " ", "smf_skytiling: Unknown instrument identifier (^I) "
+      errRep( " ", "smf_jlstiling: Unknown instrument identifier (^I) "
               "supplied (programming error).", status );
    }
 

@@ -1,7 +1,7 @@
 /*
 *+
 *  Name:
-*     smf_skytiles_region.
+*     smf_jlstiles_region.
 
 *  Purpose:
 *     Find the sky tiles that overlap a given AST Region.
@@ -13,7 +13,7 @@
 *     C function
 
 *  Invocation:
-*     int *smf_skytiles_region( AstRegion *region, smf_inst_t instrument,
+*     int *smf_jlstiles_region( AstRegion *region, smf_inst_t instrument,
 *                               int *ntile, int *status );
 
 *  Arguments:
@@ -76,10 +76,10 @@
 
 /* SMURF includes */
 #include "libsmf/smf.h"
-#include "libsmf/tiles.h"
+#include "libsmf/jlstiles.h"
 
 
-int *smf_skytiles_region( AstRegion *region, smf_inst_t instrument,
+int *smf_jlstiles_region( AstRegion *region, smf_inst_t instrument,
                           int *ntile, int *status ){
 
 /* Local Variables */
@@ -111,7 +111,7 @@ int *smf_skytiles_region( AstRegion *region, smf_inst_t instrument,
    int xt;
    int yoff[ 4 ] = { 0, 1, 0, -1 };
    int yt;
-   smfSkyTiling skytiling;
+   smfJLSTiling skytiling;
 
 /* Initialise */
    *ntile = 0;
@@ -125,13 +125,13 @@ int *smf_skytiles_region( AstRegion *region, smf_inst_t instrument,
 
 /* Get the parameters that define the layout of sky tiles for this
    instrument. */
-   smf_skytiling( instrument, &skytiling, status );
+   smf_jlstiling( instrument, &skytiling, status );
 
 /* Create a FrameSet describing the whole sky in which each pixel
    corresponds to a single tile. The current Frame is ICRS (RA,Dec) and
    the base Frame is grid coords in which each grid pixel corresponds to
    a single tile. */
-   smf_skytile( 0, &skytiling, 0, NULL, &fs, NULL, lbnd, ubnd, status );
+   smf_jlstile( 0, &skytiling, 0, NULL, &fs, NULL, lbnd, ubnd, status );
 
 /* If the supplied Region is 3-dimensional, remove the third axis, which
    is assumed to be a spectral axis. */
@@ -173,7 +173,7 @@ int *smf_skytiles_region( AstRegion *region, smf_inst_t instrument,
    for( i = 0; i < npoint && *status == SAI__OK; i++ ) {
       ix = (int)( *(xmesh++) + 0.5 ) - 1;
       iy = (int)( *(ymesh++) + 0.5 ) - 1;
-      itile = smf_skytilexy2i( ix, iy, &skytiling, status );
+      itile = smf_jlstilexy2i( ix, iy, &skytiling, status );
       sprintf( text, "%d", itile );
       astMapPut0I( km, text, 1, NULL );
    }
@@ -199,7 +199,7 @@ int *smf_skytiles_region( AstRegion *region, smf_inst_t instrument,
       if( value == -1 ) {
 
 /* Get a Region covering the tile. */
-         smf_skytile( itile, &skytiling, 0, NULL, NULL, &tregion, lbnd, ubnd,
+         smf_jlstile( itile, &skytiling, 0, NULL, NULL, &tregion, lbnd, ubnd,
                       status );
 
 /* See if this Region overlaps the user supplied region. Set the value of
@@ -234,9 +234,9 @@ int *smf_skytiles_region( AstRegion *region, smf_inst_t instrument,
    tested in their turn, giving them a value of -1 to indicate that they
    have not yet been tested to see if they overlap the supplied Region.
    Ignore adjoining tiles that are already in the keyMap. */
-            smf_skytilei2xy( itile, &skytiling, &xt, &yt, status );
+            smf_jlstilei2xy( itile, &skytiling, &xt, &yt, status );
             for( ineb = 0; ineb < 4; ineb++ ) {
-               itile2 = smf_skytilexy2i( xt + xoff[ ineb ], yt + yoff[ ineb ],
+               itile2 = smf_jlstilexy2i( xt + xoff[ ineb ], yt + yoff[ ineb ],
                                          &skytiling, status );
                if( itile2 != VAL__BADI ) {
                   sprintf( text, "%d", itile2 );

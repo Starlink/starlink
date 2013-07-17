@@ -32,12 +32,12 @@
 *     Also, the bounds of the overlap in pixel indicies between the tile
 *     and a specified NDF or Region can be found (see parameter TARGET).
 *
-*     The environment variable JCMT_TILES should be defined prior to
+*     The environment variable JLS_TILE_DIR should be defined prior to
 *     using this command, and should hold the path to the directory in
 *     which the NDFs containing the accumulated co-added data for each
 *     tile are stored. Tiles for a specified instrument will be stored
 *     within a sub-directory of this directory (see parameter INSTRUMENT).
-*     If JCMT_TILES is undefined, the current directory is used.
+*     If JLS_TILE_DIR is undefined, the current directory is used.
 
 *  ADAM Parameters:
 *     ALLSKY = NDF (Write)
@@ -51,7 +51,7 @@
 *        be created if it does not already exist. If TRUE, and if the
 *        tile's NDF does not exist on entry to this command, a new NDF will
 *        be created for the tile and filled with zeros. The instrument
-*        subdirectory within the JCMT_TILES directory will be created if it
+*        subdirectory within the JLS_TILE_DIR directory will be created if it
 *        does not already exist. [FALSE]
 *     DECCEN = _DOUBLE (Write)
 *        An output parameter to which is written the ICRS Declination
@@ -70,7 +70,7 @@
 *        supplied): "SCUBA-2(450)", "SCUBA-2(850)", "HARP", "RxA",
 *        "RxWD", "RxWB". NDFs containing co-added data for the selected
 *        instrument reside within a corresponding sub-directory of the
-*        directory specified by environment variable JCMT_TILES. These
+*        directory specified by environment variable JLS_TILE_DIR. These
 *        sub-directories are called "scuba2-450", "scuba2-850", "harp",
 *        "rxa", "rxwd" and "rxwb".
 *     ITILE = _INTEGER (Read)
@@ -189,7 +189,7 @@
 #include "smurflib.h"
 
 
-#include "libsmf/tiles.h"   /* Move this to smf_typ.h and smf.h when done */
+#include "libsmf/jlstiles.h"   /* Move this to smf_typ.h and smf.h when done */
 
 
 F77_SUBROUTINE(ast_isaregion)( INTEGER(THIS), INTEGER(STATUS) );
@@ -234,7 +234,7 @@ void smurf_tileinfo( int *status ) {
    int ubnd[ 2 ];
    double dlbnd[ 2 ];
    double dubnd[ 2 ];
-   smfSkyTiling skytiling;
+   smfJLSTiling skytiling;
    smf_inst_t instrument;
    void *pntr;
    int *ipntr;
@@ -277,7 +277,7 @@ void smurf_tileinfo( int *status ) {
 
 /* Get the parameters that define the layout of sky tiles for this
    instrument. */
-   smf_skytiling( instrument, &skytiling, status );
+   smf_jlstiling( instrument, &skytiling, status );
 
 /* Return the maximum tile index. */
    parPut0i( "MAXTILE", skytiling.ntiles, status );
@@ -299,7 +299,7 @@ void smurf_tileinfo( int *status ) {
 /* Otherwise, create a FrameSet describing the whole sky in which each
    pixel corresponds to a single tile. */
    } else {
-      smf_skytile( 0, &skytiling, 0, NULL, &fs, NULL, lbnd, ubnd, status );
+      smf_jlstile( 0, &skytiling, 0, NULL, &fs, NULL, lbnd, ubnd, status );
 
 /* Change the bounds of the output NDF. */
       ndfSbnd( 2, lbnd, ubnd, indf3, status );
@@ -316,7 +316,7 @@ void smurf_tileinfo( int *status ) {
          for( i = 0; i < ubnd[ 0 ] - lbnd[ 0 ] + 1; i++ ) {
 
 /* Store the tile index at this pixel. */
-            *(ipntr++) = smf_skytilexy2i( i, j, &skytiling, status );
+            *(ipntr++) = smf_jlstilexy2i( i, j, &skytiling, status );
          }
       }
 
@@ -355,7 +355,7 @@ void smurf_tileinfo( int *status ) {
 
 /* Get the FITS header, FrameSet and Region defining the tile, and the tile
    bounds in pixel indices. */
-   smf_skytile( itile, &skytiling, local_origin, &fc, &fs, &region, lbnd,
+   smf_jlstile( itile, &skytiling, local_origin, &fc, &fs, &region, lbnd,
                 ubnd, status );
 
 /* Write the FITS headers out to a file, annulling the error if the
@@ -447,11 +447,11 @@ void smurf_tileinfo( int *status ) {
 /* Write the size to the output parameter as radians. */
    parPut0d( "SIZE", maxdist, status );
 
-/* Get the translation of the environment variable JCMT_TILES. */
-   jcmt_tiles = getenv( "JCMT_TILES" );
+/* Get the translation of the environment variable JLS_TILE_DIR. */
+   jcmt_tiles = getenv( "JLS_TILE_DIR" );
 
 /* Initialise the path to the tile's NDF to hold the root directory.
-   Use the current working directory if JCMT_TILES is undefined. */
+   Use the current working directory if JLS_TILE_DIR is undefined. */
    if( jcmt_tiles ) {
       nc = 0;
       tilendf = astAppendString( tilendf, &nc, jcmt_tiles );
@@ -515,7 +515,7 @@ void smurf_tileinfo( int *status ) {
 /* Store the WCS FrameSet. */
       ndfPtwcs( fs, indf1, status );
 
-/* If the instrument tiles have variance, fill the variance array with zeros. */
+/* If the instrument jlstiles.have variance, fill the variance array with zeros. */
       if( skytiling.var ) {
          ndfMap( indf1, "Variance", skytiling.type, "WRITE/ZERO", &pntr,
                  &el, status );

@@ -1,7 +1,7 @@
 /*
 *+
 *  Name:
-*     smf_skytile
+*     smf_jlstile
 
 *  Purpose:
 *     Get the definition of a single sky tile.
@@ -13,7 +13,7 @@
 *     C function
 
 *  Invocation:
-*     void smf_skytile( int itile, smfSkyTiling *skytiling, int local_origin,
+*     void smf_jlstile( int itile, smfJLSTiling *skytiling, int local_origin,
 *                       AstFitsChan **fc, AstFrameSet **fs, AstRegion **region,
 *                       int lbnd[2], int ubnd[2], int *status )
 
@@ -22,10 +22,10 @@
 *        The one-based index of the tile. Supplying a tile index of zero
 *        causes the returned values to cover the whole sky, with a single
 *        grid pixel corresponding to a single tile.
-*     skytiling = smfSkyTiling * (Given)
+*     skytiling = smfJLSTiling * (Given)
 *        Pointer to a structure holding parameters describing the tiling
 *        scheme used for the required JCMT instrument, as returned by
-*        function smf_skytiling.
+*        function smf_jlstiling.
 *     local_origin = int (Given)
 *        If non-zero, then the returned header will include values for
 *        projection parameters PVi_1 and PVi_2 that causes the origin of
@@ -105,13 +105,13 @@
 
 
 
-#include "libsmf/tiles.h"   /* Move this to smf_typ.h and smf.h when done */
+#include "libsmf/jlstiles.h"   /* Move this to smf_typ.h and smf.h when done */
 
 
 /* Local constants */
 #define DELTA 0.01          /* Pixel offset to avoid edges */
 
-void smf_skytile( int itile, smfSkyTiling *skytiling, int local_origin,
+void smf_jlstile( int itile, smfJLSTiling *skytiling, int local_origin,
                   AstFitsChan **fc, AstFrameSet **fs, AstRegion **region,
                   int lbnd[2], int ubnd[2], int *status ) {
 
@@ -137,7 +137,7 @@ void smf_skytile( int itile, smfSkyTiling *skytiling, int local_origin,
 
 /* Get a FitsChan holding the FITS headers defining the tile WCS and
    extent. */
-   lfc = smf_skytileheader( itile, skytiling, local_origin, status );
+   lfc = smf_jlstileheader( itile, skytiling, local_origin, status );
 
 /* Store the upper bounds of the tile in GRID coords (later changed to
    PIXEL coords). */

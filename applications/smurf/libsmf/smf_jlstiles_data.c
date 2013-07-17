@@ -1,7 +1,7 @@
 /*
 *+
 *  Name:
-*     smf_skytiles_data.
+*     smf_jlstiles_data.
 
 *  Purpose:
 *     Find the sky tiles that overlap a given set of JCMT data files.
@@ -13,7 +13,7 @@
 *     C function
 
 *  Invocation:
-*     int *smf_skytiles_data( Grp *igrp, size_t size, int *ntile, int *status )
+*     int *smf_jlstiles_data( Grp *igrp, size_t size, int *ntile, int *status )
 
 *  Arguments:
 *     igrp = Grp * (Given)
@@ -77,10 +77,10 @@
 /* SMURF includes */
 #include "jcmt/state.h"
 #include "libsmf/smf.h"
-#include "libsmf/tiles.h"
+#include "libsmf/jlstiles.h"
 
 
-int *smf_skytiles_data( Grp *igrp, size_t size, int *ntile, int *status ){
+int *smf_jlstiles_data( Grp *igrp, size_t size, int *ntile, int *status ){
 
 /* Local Variables */
    AstFrame *frm = NULL;
@@ -113,7 +113,7 @@ int *smf_skytiles_data( Grp *igrp, size_t size, int *ntile, int *status ){
    size_t ifile;
    smfData *data = NULL;
    smfHead *hdr = NULL;
-   smfSkyTiling skytiling;
+   smfJLSTiling skytiling;
    smf_inst_t inst = SMF__INST_NONE;
    smf_inst_t instrument;
    smf_subinst_t subinst;
@@ -164,13 +164,13 @@ int *smf_skytiles_data( Grp *igrp, size_t size, int *ntile, int *status ){
 
 /* Get the parameters that define the layout of sky tiles for the
    instrument. */
-         smf_skytiling( instrument, &skytiling, status );
+         smf_jlstiling( instrument, &skytiling, status );
 
 /* Create a FrameSet describing the whole sky in which each pixel
    corresponds to a single tile. The current Frame is ICRS (RA,Dec) and
    the base Frame is grid coords in which each grid pixel corresponds to
    a single tile. */
-         smf_skytile( 0, &skytiling, 0, NULL, &fs, NULL, lbnd, ubnd, status );
+         smf_jlstile( 0, &skytiling, 0, NULL, &fs, NULL, lbnd, ubnd, status );
 
 /* Allocate an image with one pixel for each tile, and fill it with
    zeros. */
@@ -253,7 +253,7 @@ int *smf_skytiles_data( Grp *igrp, size_t size, int *ntile, int *status ){
          if( *ph > 0 ) {
             tiles = astGrow( tiles, ++(*ntile), sizeof( *tiles ) );
             if( *status == SAI__OK ) {
-               tiles[ *ntile - 1 ] = smf_skytilexy2i( ix, iy, &skytiling,
+               tiles[ *ntile - 1 ] = smf_jlstilexy2i( ix, iy, &skytiling,
                                                       status );
             }
          }

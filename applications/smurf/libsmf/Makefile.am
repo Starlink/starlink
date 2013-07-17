@@ -267,6 +267,13 @@ smf_is_wvm_usable.c \
 smf_isdark.c \
 smf_isfft.c \
 smf_iteratemap.c \
+smf_jlstileheader.c \
+smf_jlstile.c \
+smf_jlstiling.c \
+smf_jlstilei2xy.c \
+smf_jlstilexy2i.c \
+smf_jlstiles_data.c \
+smf_jlstiles_region.c \
 smf_keyname.c \
 smf_km2ext.c \
 smf_kmmerge.c \
@@ -374,13 +381,6 @@ smf_select_qualpntr.c \
 smf_set_clabels.c \
 smf_set_moving.c \
 smf_sigmaclip.c \
-smf_skytileheader.c \
-smf_skytile.c \
-smf_skytiling.c \
-smf_skytilei2xy.c \
-smf_skytilexy2i.c \
-smf_skytiles_data.c \
-smf_skytiles_region.c \
 smf_snrmask.c \
 smf_smfFile_msg.c \
 smf_smoothmask.c \
