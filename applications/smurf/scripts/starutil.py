@@ -418,12 +418,18 @@ def get_task_par( parname, taskname, **kwargs ):
    if 'default' in kwargs:
       try:
          text = invoke( cmd, False )
-         result = eval( text.replace('\n', '' ) )
+         text = text.replace('\n', '' )
+         text = text.replace('TRUE', 'True' )
+         text = text.replace('FALSE', 'False' )
+         result = eval( text )
       except AtaskError:
          result = kwargs['default']
    else:
       text = invoke( cmd, False )
-      result = eval( text.replace('\n', '' ) )
+      text = text.replace('\n', '' )
+      text = text.replace('TRUE', 'True' )
+      text = text.replace('FALSE', 'False' )
+      result = eval( text )
 
    return result
 
