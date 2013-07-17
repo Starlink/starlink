@@ -278,14 +278,15 @@
 *          stored in the JCMTSTATE extension of the input NDFs. DLON and DLAT
 *          values for non-tabulated times are determined by interpolation. [!]
 *     REF = NDF (Read)
-*          An existing NDF that is to be used to define the output grid.
-*          If supplied, the output grid will be aligned with the supplied
-*          reference NDF. The reference can be either 2D or 3D and the spatial
-*          frame will be extracted. If a null (!) value is supplied then the
-*          output grid is determined by parameters REFLON, REFLAT, etc.
-*          In addition, this NDF can be used to mask the AST, FLT or COM
-*          model. See configuration parameters AST.ZERO_MASK, FLT.ZERO_MASK
-*          and COM.ZERO_MASK. [!]
+*          An existing NDF that is to be used to define the output grid,
+*          or the string "JLS". If an NDF is supplied, the output grid will
+*          be aligned with the supplied reference NDF. The reference can be
+*          either 2D or 3D and the spatial frame will be extracted. If "JLS"
+*          is supplied, the JLS all-sky pixel grid will be used. If a null
+*          (!) value is supplied then the output grid is determined by
+*          parameters REFLON, REFLAT, etc. In addition, this NDF can be
+*          used to mask the AST, FLT or COM model. See configuration
+*          parameters AST.ZERO_MASK, FLT.ZERO_MASK and COM.ZERO_MASK. [!]
 *     REFLAT = LITERAL (Read)
 *          The formatted celestial latitude value at the tangent point of
 *          the spatial projection in the output cube. This should be provided
@@ -1045,7 +1046,7 @@ void smurf_makemap( int *status ) {
 
   /* Calculate the map bounds */
 
-  smf_getrefwcs( "REF", &specrefwcs, &spacerefwcs, status );
+  smf_getrefwcs( "REF", igrp, &specrefwcs, &spacerefwcs, status );
   if( specrefwcs ) specrefwcs = astAnnul( specrefwcs );
 
   /* See if the input data is to be aligned in the output coordinate system

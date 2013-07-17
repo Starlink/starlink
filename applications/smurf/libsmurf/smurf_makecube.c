@@ -397,14 +397,16 @@
 *          corresponds to north in the celestial co-ordinate system specified
 *          by parameter SYSTEM. [0]
 *     REF = NDF (Read)
-*          An existing NDF that is to be used to define the output grid.
-*          If supplied, the output grid will be aligned with the supplied
-*          reference NDF. The supplied NDF need not be three-dimensional. For
-*          instance, a two-dimensional image can be supplied in which case the
-*          spatial axes of the output cube will be aligned with the reference
-*          image and the spectral axis will be inherited form the first input
-*          NDF. If a null (!) value is supplied then the output grid is
-*          determined by parameters AUTOGRID, REFLON, REFLAT, etc. [!]
+*          An existing NDF that is to be used to define the output grid,
+*          or the string "JLS". If an NDF is supplied, the output grid will
+*          be aligned with the supplied reference NDF. The NDF need not be
+*          three-dimensional. For instance, a two-dimensional image can be
+*          supplied in which case the spatial axes of the output cube will be
+*          aligned with the reference image and the spectral axis will be
+*          inherited form the first input NDF. If "JLS" is supplied, the
+*          JLS all-sky pixel grid will be used. If a null (!) value is
+*          supplied then the output grid is determined by parameters
+*          AUTOGRID, REFLON, REFLAT, etc. [!]
 *     REFLAT = LITERAL (Read)
 *          Only accessed if a null value is supplied for parameter REF.
 *          The formatted celestial-latitude value at the tangent point of
@@ -1112,7 +1114,7 @@ void smurf_makecube( int *status ) {
    parGet0l( "TRIM", &trim, status );
 
 /* Attempt to get WCS information from a reference NDF. */
-   smf_getrefwcs( "REF", &specrefwcs, &spacerefwcs, status );
+   smf_getrefwcs( "REF", igrp, &specrefwcs, &spacerefwcs, status );
 
 /* If no spatial reference WCS was obtained, see if any unspecified
    projection parameters are to be determined using an optimal fitting

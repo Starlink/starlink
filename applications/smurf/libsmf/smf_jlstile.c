@@ -37,7 +37,8 @@
 *     fs = AstFitsChan ** (Returned)
 *        Address at which to return a pointer to a FrameSet defining the
 *        WCS for the tile. May be NULL. The base Frame will be GRID
-*        coords and the current Frame will be ICRS (RA,DEc).
+*        coords and the current Frame will be ICRS (RA,DEc). There will
+*        also be a PIXEL Frame.
 *     region = AstRegion ** (Returned)
 *        Address at which to return a pointer to a Region defining the
 *        extent of the tile. May be NULL. The Region will be defined
@@ -121,8 +122,10 @@ void smf_jlstile( int itile, smfJLSTiling *skytiling, int local_origin,
    AstRegion *lregion = NULL;
    double point1[ 2 ];
    double point2[ 2 ];
+   double shift[ 2 ];
    int crpix1;
    int crpix2;
+   int icur;
 
 /* Initialise the returned pointers. */
    if( fc ) *fc = NULL;
@@ -187,11 +190,20 @@ void smf_jlstile( int itile, smfJLSTiling *skytiling, int local_origin,
    }
 
 /* Find the lower and upper bounds of the tile in NDF PIXEL indicies. The
-   origin is placed at teh FITS reference pixel. */
+   origin is placed at the FITS reference pixel. */
    lbnd[ 0 ] = 1 - crpix1;
    lbnd[ 1 ] = 1 - crpix2;
    ubnd[ 0 ] += lbnd[ 0 ] - 1;
    ubnd[ 1 ] += lbnd[ 1 ] - 1;
+
+/* Add a PIXEL Frame to the returned FrameSet, making sure to leave the
+   current Frame unchanged. */
+   shift[ 0 ] = lbnd[ 0 ] - 1.0;
+   shift[ 1 ] = lbnd[ 1 ] - 1.0;
+   icur = astGetI( lfs, "Current" );
+   astAddFrame( lfs, AST__BASE, astShiftMap( 2, shift, " " ),
+                astFrame( 2, "Domain=PIXEL" ) );
+   astSetI( lfs, "Current", icur );
 
 /* Return and export the required pointers. */
    if( fc ) astExport( *fc );

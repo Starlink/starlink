@@ -1357,7 +1357,7 @@ void smf_getfitss( const smfHead *hdr, const char * name, char * result,
 char *smf_getobsidss( AstFitsChan *hdr, char * obsid, size_t szobs,
                       char * obsidss, size_t szss, int *status );
 
-void smf_getrefwcs( const char *param, AstFrameSet **specwcs,
+void smf_getrefwcs( const char *param, Grp *igrp, AstFrameSet **specwcs,
                     AstFrameSet **spacewcs, int *status );
 
 void smf_getspectralwcs( AstFrameSet *fset, int type, AstFrameSet **specwcs,

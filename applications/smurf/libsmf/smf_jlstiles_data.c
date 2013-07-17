@@ -230,7 +230,7 @@ int *smf_jlstiles_data( Grp *igrp, size_t size, int *ntile, int *status ){
 /* Convert them to grid coords in the hits map. */
          astTran2( fs, 4*hdr->nframes, trac1, trac2, 0, gx, gy );
 
-/* Loop round them all again. Update the hits map to indiucate how many
+/* Loop round them all again. Update the hits map to indicate how many
    points fall in each tile. */
          px = gx;
          py = gy;
