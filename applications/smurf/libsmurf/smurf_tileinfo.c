@@ -321,7 +321,7 @@ void smurf_tileinfo( int *status ) {
       }
 
 /* Store NDF title. */
-      sprintf( text, "JCMT sky tile indices for %s data", skytiling.name );
+      sprintf( text, "JLS tile indices for %s data", skytiling.name );
       ndfCput( text, indf3, "TITLE", status );
 
 /* Store the instrument as a component in the SMURF extension. */
