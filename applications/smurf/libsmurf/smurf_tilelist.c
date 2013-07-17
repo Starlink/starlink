@@ -103,7 +103,7 @@
 #include "libsmf/smf.h"
 #include "smurflib.h"
 
-#include "libsmf/jlstiles.h"   /* Move this to smf_typ.h and smf.h when done */
+#include "libsmf/jsatiles.h"   /* Move this to smf_typ.h and smf.h when done */
 
 
 F77_SUBROUTINE(ast_isaregion)( INTEGER(THIS), INTEGER(STATUS) );
@@ -168,7 +168,7 @@ void smurf_tilelist( int *status ) {
       }
 
 /* Get the list of identifiers for tiles that overlap the region. */
-      tiles = smf_jlstiles_region( region, instrument, &ntile, status );
+      tiles = smf_jsatiles_region( region, instrument, &ntile, status );
 
 /* If no Region was supplied, annull the error and get a group of input
    data files. */
@@ -188,7 +188,7 @@ void smurf_tilelist( int *status ) {
 
 /* Get the list of identifiers for tiles that receive any data. */
       } else {
-         tiles = smf_jlstiles_data( sgrp, ssize, &ntile, status );
+         tiles = smf_jsatiles_data( sgrp, ssize, &ntile, status );
       }
 
 /* Delete the groups. */

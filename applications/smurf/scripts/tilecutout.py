@@ -6,22 +6,22 @@
 *     tilecutout
 
 *  Purpose:
-*     Create a single NDF holding a region from the JLS tile collection.
+*     Create a single NDF holding a region from the JSA tile collection.
 
 *  Language:
 *     python (2.7 or 3.*)
 
 *  Description:
-*     This script identifies the JLS tiles that overlap the specified
+*     This script identifies the JSA tiles that overlap the specified
 *     region, extract the overlaps from these tiles, and join them
 *     together into a single NDF covering the specified region.
 *
-*     The environment variable JLS_TILE_DIR should be defined prior to
+*     The environment variable JSA_TILE_DIR should be defined prior to
 *     using this command, and should hold the path to the directory in
 *     which the NDFs containing the accumulated co-added data for each
 *     tile are stored. Tiles for a specified instrument will be stored
 *     within a sub-directory of this directory (see parameter INSTRUMENT).
-*     If JLS_TILE_DIR is undefined, the current directory is used.
+*     If JSA_TILE_DIR is undefined, the current directory is used.
 
 *  Usage:
 *     tilecutout region out instrument [retain] [msg_filter] [ilevel] [glevel] [logfile]
@@ -63,7 +63,7 @@
 *        starutil.PROGRESS, starutil.ATASK or starutil.DEBUG) to the module
 *        variable starutil.glevel. ["PROGRESS"]
 *     REGION = LITERAL (Read)
-*        Defines the region to be extracted from the JLS tile collection.
+*        Defines the region to be extracted from the JSA tile collection.
 *        It can be either the path to an NDF, or a text file holding an AST
 *        Region.
 *     INSTRUMENT = LITERAL (Read)
@@ -72,7 +72,7 @@
 *        may be supplied): "SCUBA-2(450)", "SCUBA-2(850)", "HARP", "RxA",
 *        "RxWD", "RxWB". NDFs containing co-added data for the selected
 *        instrument reside within a corresponding sub-directory of the
-*        directory specified by environment variable JLS_TILE_DIR. These
+*        directory specified by environment variable JSA_TILE_DIR. These
 *        sub-directories are called "scuba2-450", "scuba2-850", "harp",
 *        "rxa", "rxwd" and "rxwb".
 *     LOGFILE = LITERAL (Read)
@@ -197,11 +197,11 @@ try:
 #  Report what we will be doing...
    msg_out( "Creating a cut-out for {0} data".format(instrument) )
 
-   tiledir = os.getenv( 'JLS_TILE_DIR' )
+   tiledir = os.getenv( 'JSA_TILE_DIR' )
    if tiledir:
       msg_out( "Tiles will be read from {0}".format(tiledir) )
    else:
-      msg_out( "Environment variable JLS_TILE_DIR is not set!" )
+      msg_out( "Environment variable JSA_TILE_DIR is not set!" )
       msg_out( "Tiles will be read from the current directory ({0})".format(os.getcwd()) )
 
 #  Create an empty list to hold the NDFs for the tiles holding the
@@ -244,7 +244,7 @@ try:
 #  Raise an exception if no data is available for the tiles overlap
    msg_out( " " )
    if len( tilendf ) == 0:
-      raise starutil.StarUtilError( "No JLS {0} data is available "
+      raise starutil.StarUtilError( "No JSA {0} data is available "
                           "for the requested region.".format(instrument) )
 
 #  Otherwise, paste the sections together to form the output NDF.

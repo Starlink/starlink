@@ -1,7 +1,7 @@
 /*
 *+
 *  Name:
-*     smf_jlstilei2xy
+*     smf_jsatilei2xy
 
 *  Purpose:
 *     Convert a scalar sky tile index into the (x,y) indices of the tile.
@@ -13,16 +13,16 @@
 *     C function
 
 *  Invocation:
-*     void smf_jlstilei2xy( int itile, smfJLSTiling *skytiling, int *xt,
+*     void smf_jsatilei2xy( int itile, smfJSATiling *skytiling, int *xt,
 *                           int *yt, int *status )
 
 *  Arguments:
 *     itile = int (Given)
 *        The one-based index of the tile.
-*     skytiling = smfJLSTiling * (Given)
+*     skytiling = smfJSATiling * (Given)
 *        Pointer to a structure holding parameters describing the tiling
 *        scheme used for the required JCMT instrument, as returned by
-*        function smf_jlstiling.
+*        function smf_jsatiling.
 *     xt = int * (Returned)
 *        Address of the integer in which to store the zero-based index of
 *        the tile in the X (RA) direction.
@@ -81,12 +81,12 @@
 
 
 
-#include "libsmf/jlstiles.h"   /* Move this to smf_typ.h and smf.h when done */
+#include "libsmf/jsatiles.h"   /* Move this to smf_typ.h and smf.h when done */
 
 
 
 
-void smf_jlstilei2xy( int itile, smfJLSTiling *skytiling, int *xt, int *yt,
+void smf_jsatilei2xy( int itile, smfJSATiling *skytiling, int *xt, int *yt,
                       int *status ){
 
 /* Local Variables: */
@@ -145,7 +145,7 @@ void smf_jlstilei2xy( int itile, smfJLSTiling *skytiling, int *xt, int *yt,
    } else if( *status == SAI__OK ) {
       *status = SAI__ERROR;
       msgSeti( "I", itile );
-      errRep( "", "smf_jlstilei2xy: Illegal tile index (^I) supplied "
+      errRep( "", "smf_jsatilei2xy: Illegal tile index (^I) supplied "
               "(programming error).", status );
    }
 

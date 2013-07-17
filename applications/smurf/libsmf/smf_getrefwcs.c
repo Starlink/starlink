@@ -19,14 +19,14 @@
 *  Arguments:
 *     param = const char * (Given)
 *        The name of the ADAM parameter used to get the reference NDF. A
-*        value of "JLS" may also be provided for the parameter, in which
-*        case the WCS defined by the JLS all-sky pixel grid is returned.
+*        value of "JSA" may also be provided for the parameter, in which
+*        case the WCS defined by the JSA all-sky pixel grid is returned.
 *     igrp = Grp * (Given)
 *        A group holding the paths to the input science files. The first
 *        of these is used to determine the instrument in use in the case
-*        that WCS defined by the JLS all-sky pixel grid is requested. A
+*        that WCS defined by the JSA all-sky pixel grid is requested. A
 *        NULL value may be supplied, but an error will then be reported
-*        if the user requests JLS all-sky WCS.
+*        if the user requests JSA all-sky WCS.
 *     specwcs = AstFrameSet ** (Returned)
 *        A pointer to a location at which to return a pointer to an AST
 *        FrameSet describing the spectral axis of the reference NDF. The
@@ -47,8 +47,8 @@
 *  Description:
 *     This function determines the spatial and spectral WCS to be used by
 *     the output map/cube on the basis of the value obtained for a
-*     specified ADAM parameter. If the string "JLS" is obtained for the
-*     parameter, the returned spatial WCS describes the JLS all-sky pixel
+*     specified ADAM parameter. If the string "JSA" is obtained for the
+*     parameter, the returned spatial WCS describes the JSA all-sky pixel
 *     grid (no spectral WCS is returned in this case). Otherwise, a reference
 *     NDF should be supplied for the parameter. The WCS from this NDF is
 *     split into 2 parallel parts; one describing the spatial axes and one
@@ -68,7 +68,7 @@
 *        (smf_getspectralwcs). The same could be done with the code for
 *        the spatial axes if required.
 *     17-JUL-2013 (DSB):
-*        Allow JLS all-sky WCS to be requested, instead of supplying an
+*        Allow JSA all-sky WCS to be requested, instead of supplying an
 *        NDF.
 *     {enter_further_changes_here}
 
@@ -108,7 +108,7 @@
 /* SMURF includes */
 #include "smurf_par.h"
 #include "libsmf/smf.h"
-#include "libsmf/jlstiles.h"
+#include "libsmf/jsatiles.h"
 
 void smf_getrefwcs( const char *param, Grp *igrp, AstFrameSet **specwcs,
                     AstFrameSet **spacewcs, int *status ){
@@ -131,7 +131,7 @@ void smf_getrefwcs( const char *param, Grp *igrp, AstFrameSet **specwcs,
    int refndf;                  /* NDF identifier for the refence NDF */
    int ubnd[2];                 /* Upper pixel index bounds of mid tile */
    smfData *data = NULL;        /* Structure describing 1st input file */
-   smfJLSTiling skytiling;
+   smfJSATiling skytiling;
    smf_inst_t inst = SMF__INST_NONE;
    smf_subinst_t subinst;
    size_t code;
@@ -155,14 +155,14 @@ void smf_getrefwcs( const char *param, Grp *igrp, AstFrameSet **specwcs,
    if( *status == PAR__NULL ) {
       errAnnul( status );
 
-/* If it is "JLS", we return WCS that describes the JLS all-sky pixel grid. */
+/* If it is "JSA", we return WCS that describes the JSA all-sky pixel grid. */
    } else if( *status == SAI__OK ) {
-      if( astChrMatch( text, "JLS" ) ) {
+      if( astChrMatch( text, "JSA" ) ) {
 
 /* Report an error if the instrument cannot be determined. */
          if( !igrp ) {
             *status = SAI__ERROR;
-            errRep( "", "smf_getrefwcs: Cannot use the JLS all-sky pixel "
+            errRep( "", "smf_getrefwcs: Cannot use the JSA all-sky pixel "
                     "grid since no input group has been supplied (possibly "
                     "programming error).", status );
          } else {
@@ -198,13 +198,13 @@ void smf_getrefwcs( const char *param, Grp *igrp, AstFrameSet **specwcs,
 
 /* Get the parameters that define the layout of sky tiles for the
    instrument. */
-               smf_jlstiling( inst, &skytiling, status );
+               smf_jsatiling( inst, &skytiling, status );
 
 /* Get the WCS FrameSet for the central tile - since we do not use the
    "local-origin" option, the WCS for every tile is identical.The base
    Frame will be GRID coords within the tile, and the current Frame will
    be ICRS (RA,Dec). */
-               smf_jlstile( skytiling.ntiles/2, &skytiling, 0,
+               smf_jsatile( skytiling.ntiles/2, &skytiling, 0,
                             NULL, spacewcs, NULL, lbnd, ubnd, status );
 
 /* Change the base Frame to be PIXEL. */
@@ -221,7 +221,7 @@ void smf_getrefwcs( const char *param, Grp *igrp, AstFrameSet **specwcs,
             smf_close_file( &data, status);
          }
 
-/* If it is not "JLS", get the parameter value as an NDF. */
+/* If it is not "JSA", get the parameter value as an NDF. */
       } else {
          ndfAssoc( param, "READ", &refndf, status );
 

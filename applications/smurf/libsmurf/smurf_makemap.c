@@ -279,10 +279,10 @@
 *          values for non-tabulated times are determined by interpolation. [!]
 *     REF = NDF (Read)
 *          An existing NDF that is to be used to define the output grid,
-*          or the string "JLS". If an NDF is supplied, the output grid will
+*          or the string "JSA". If an NDF is supplied, the output grid will
 *          be aligned with the supplied reference NDF. The reference can be
-*          either 2D or 3D and the spatial frame will be extracted. If "JLS"
-*          is supplied, the JLS all-sky pixel grid will be used. If a null
+*          either 2D or 3D and the spatial frame will be extracted. If "JSA"
+*          is supplied, the JSA all-sky pixel grid will be used. If a null
 *          (!) value is supplied then the output grid is determined by
 *          parameters REFLON, REFLAT, etc. In addition, this NDF can be
 *          used to mask the AST, FLT or COM model. See configuration

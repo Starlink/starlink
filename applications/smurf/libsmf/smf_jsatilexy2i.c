@@ -1,7 +1,7 @@
 /*
 *+
 *  Name:
-*     smf_jlstilexy2i
+*     smf_jsatilexy2i
 
 *  Purpose:
 *     Convert the (x,y) indices of a sky tile into a scalar tile index.
@@ -13,17 +13,17 @@
 *     C function
 
 *  Invocation:
-*     int smf_jlstilexy2i( int xt, int yt, smfJLSTiling *skytiling, int *status )
+*     int smf_jsatilexy2i( int xt, int yt, smfJSATiling *skytiling, int *status )
 
 *  Arguments:
 *     xt = int (Given)
 *        The zero-based index of the tile in the X (RA) direction.
 *     yt = int (Given)
 *        The zero-based index of the tile in the Y (Dec) direction.
-*     skytiling = smfJLSTiling * (Given)
+*     skytiling = smfJSATiling * (Given)
 *        Pointer to a structure holding parameters describing the tiling
 *        scheme used for the required JCMT instrument, as returned by
-*        function smf_jlstiling.
+*        function smf_jsatiling.
 *     status = int * (Given)
 *        Pointer to the inherited status variable.
 
@@ -79,12 +79,12 @@
 
 
 
-#include "libsmf/jlstiles.h"   /* Move this to smf_typ.h and smf.h when done */
+#include "libsmf/jsatiles.h"   /* Move this to smf_typ.h and smf.h when done */
 
 
 
 
-int smf_jlstilexy2i( int xt, int yt, smfJLSTiling *skytiling, int *status ){
+int smf_jsatilexy2i( int xt, int yt, smfJSATiling *skytiling, int *status ){
 
 /* Local Variables: */
    int itile;

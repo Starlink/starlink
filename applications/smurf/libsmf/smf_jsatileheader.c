@@ -1,7 +1,7 @@
 /*
 *+
 *  Name:
-*     smf_jlstileheader
+*     smf_jsatileheader
 
 *  Purpose:
 *     Return a FITS header describing a sky tile for a JCMT instrument.
@@ -13,16 +13,16 @@
 *     C function
 
 *  Invocation:
-*     AstFitsChan *smf_jlstileheader( int itile, smfJLSTiling *skytiling,
+*     AstFitsChan *smf_jsatileheader( int itile, smfJSATiling *skytiling,
 *                                     int local_origin, int *status )
 
 *  Arguments:
 *     itile = int (Given)
 *        The one-based tile index, or zero for the whole sky.
-*     skytiling = smfJLSTiling * (Given)
+*     skytiling = smfJSATiling * (Given)
 *        Pointer to a structure holding parameters describing the tiling
 *        scheme used for the required JCMT instrument, as returned by
-*        function smf_jlstiling.
+*        function smf_jsatiling.
 *     local_origin = int (Given)
 *        If non-zero, then the returned header will include values for
 *        projection parameters PVi_1 and PVi_2 that causes the origin of
@@ -50,7 +50,7 @@
 *     The projection reference point is at the origin of native longitude
 *     and latitude, which corresponds to the origin of (RA,Dec). However,
 *     this means that for most tiles the reference point is not actually
-*     contained within the tile, and also results in jlstiles.having huge
+*     contained within the tile, and also results in jsatiles.having huge
 *     values for CRPIX1/2. To avoid this, the feature described in
 *     FITS-WCS paper II section 2.5 ("User specified phi_0,theta_0") may
 *     be used (see the "local_origin" argument). This causes the CRVAL and
@@ -115,14 +115,14 @@
 #include "libsmf/smf.h"
 
 
-#include "libsmf/jlstiles.h"   /* Move this to smf_typ.h and smf.h when done */
+#include "libsmf/jsatiles.h"   /* Move this to smf_typ.h and smf.h when done */
 
 /* Prototypes for private functions. */
 static AstFitsChan *smfMakeFC( int nx, int ny, int n, int p, double crpix1,
                                double crpix2, double crval1, double crval2,
                                int *status );
 
-AstFitsChan *smf_jlstileheader( int itile, smfJLSTiling *skytiling,
+AstFitsChan *smf_jsatileheader( int itile, smfJSATiling *skytiling,
                                 int local_origin, int *status ){
 
 /* Local Variables: */
@@ -166,7 +166,7 @@ AstFitsChan *smf_jlstileheader( int itile, smfJLSTiling *skytiling,
       *status = SAI__ERROR;
       msgSeti( "I", itile );
       msgSeti( "M", skytiling->ntiles );
-      errRep( " ", "smf_jlstileheader: Supplied tile index (^I) is "
+      errRep( " ", "smf_jsatileheader: Supplied tile index (^I) is "
               "illegal. Should be in the range 1 to ^M.", status );
 
 /* If the tile index is good, proceed. */

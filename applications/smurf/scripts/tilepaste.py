@@ -6,14 +6,14 @@
 *     tilepaste
 
 *  Purpose:
-*     Update the JLS tile collection to include data from one or more
+*     Update the JSA tile collection to include data from one or more
 *     NDFs.
 
 *  Language:
 *     python (2.7 or 3.*)
 
 *  Description:
-*     This script identifies the JLS tiles that overlap each of the
+*     This script identifies the JSA tiles that overlap each of the
 *     supplied NDFs, cuts each NDF up into corresponding sections and
 *     coadds the NDF data into the existing tile (or creates the tile if
 *     it does not already exist). The data in each final tile is the
@@ -21,21 +21,21 @@
 *     from the supplied NDFs. The reciprocal of the varianes are used as
 *     weights.
 *
-*     For best results, the supplied NDFs should be gridded on the JLS
-*     all-sky pixel grid (see parameter JLS). This avoids the need for
+*     For best results, the supplied NDFs should be gridded on the JSA
+*     all-sky pixel grid (see parameter JSA). This avoids the need for
 *     any resampling of the data. But data that is not so gridded can be
-*     supplied, in which case it will be resamples onto the JLS pixel
+*     supplied, in which case it will be resamples onto the JSA pixel
 *     grid before being coadded into the existing tiles.
 *
-*     The environment variable JLS_TILE_DIR should be defined prior to
+*     The environment variable JSA_TILE_DIR should be defined prior to
 *     using this command, and should hold the path to the directory in
 *     which the NDFs containing the accumulated co-added data for each
 *     tile are stored. Tiles for a specified instrument will be stored
 *     within a sub-directory of this directory (see parameter INSTRUMENT).
-*     If JLS_TILE_DIR is undefined, the current directory is used.
+*     If JSA_TILE_DIR is undefined, the current directory is used.
 
 *  Usage:
-*     tilepaste in instrument jls [retain] [msg_filter] [ilevel] [glevel] [logfile]
+*     tilepaste in instrument jsa [retain] [msg_filter] [ilevel] [glevel] [logfile]
 
 *  Parameters:
 *     GLEVEL = LITERAL (Read)
@@ -74,7 +74,7 @@
 *        starutil.PROGRESS, starutil.ATASK or starutil.DEBUG) to the module
 *        variable starutil.glevel. ["PROGRESS"]
 *     IN = NDF (Read)
-*        A group of NDFs to be pasted into the JLS tile collection. They
+*        A group of NDFs to be pasted into the JSA tile collection. They
 *        must all have defined Variance components. Any that do not will
 *        be reported and then ignored. They must all be form the same
 *        JCMT instrument.
@@ -87,11 +87,11 @@
 *        abbreviations may be supplied): "SCUBA-2(450)", "SCUBA-2(850)",
 *        "HARP", "RxA", "RxWD", "RxWB". NDFs containing co-added data for
 *        the selected instrument reside within a corresponding sub-directory
-*        of the directory specified by environment variable JLS_TILE_DIR.
+*        of the directory specified by environment variable JSA_TILE_DIR.
 *        These sub-directories are called "scuba2-450", "scuba2-850", "harp",
 *        "rxa", "rxwd" and "rxwb". []
-*     JLS = _LOGICAL (Read)
-*        TRUE if the supplied input NDFs are gridded on the JLS all-sky
+*     JSA = _LOGICAL (Read)
+*        TRUE if the supplied input NDFs are gridded on the JSA all-sky
 *        pixel grid associated with the specified JCMT instrument. If
 *        this is not the case, the NDFs are first resampled to this grid.
 *        The dynamic default is True if the WCS for the first NDF uses an
@@ -196,7 +196,7 @@ try:
                                     "RxA", "RxWD", "RxWB"],
                                     "The JCMT instrument", "SCUBA-2(850)"))
 
-   params.append(starutil.Par0L("JLS", "Are the input NDFs on the JLS "
+   params.append(starutil.Par0L("JSA", "Are the input NDFs on the JSA "
                                 "all-sky pixel grid?", True, noprompt=True ) )
 
    params.append(starutil.Par0L("RETAIN", "Retain temporary files?", False,
@@ -244,24 +244,24 @@ try:
 #  See if temp files are to be retained.
    retain = parsys["RETAIN"].value
 
-#  Set up the dynamic default for parameter "JLS". This is True if the
+#  Set up the dynamic default for parameter "JSA". This is True if the
 #  dump of the WCS FrameSet in the first supplied NDF contains the string
 #  "HPX".
    prj = invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=get name=projection".format(indata[0]) )
-   parsys["JLS"].default = True if prj.strip() == "HEALPix" else False
+   parsys["JSA"].default = True if prj.strip() == "HEALPix" else False
 
-#  See if input NDFs are on the JLS all-sky pixel grid.
-   jls = parsys["JLS"].value
-   if not jls:
-      msg_out( "The supplied NDFs will first be resampled onto the JLS "
+#  See if input NDFs are on the JSA all-sky pixel grid.
+   jsa = parsys["JSA"].value
+   if not jsa:
+      msg_out( "The supplied NDFs will first be resampled onto the JSA "
                "all-sky pixel grid" )
 
 #  Report the tile directory.
-   tiledir = os.getenv( 'JLS_TILE_DIR' )
+   tiledir = os.getenv( 'JSA_TILE_DIR' )
    if tiledir:
       msg_out( "Tiles will be written to {0}".format(tiledir) )
    else:
-      msg_out( "Environment variable JLS_TILE_DIR is not set!" )
+      msg_out( "Environment variable JSA_TILE_DIR is not set!" )
       msg_out( "Tiles will be written to the current directory ({0})".format(os.getcwd()) )
 
 #  Loop round each supplied NDF. "indata" is an instance of the starutil.NDG
@@ -276,7 +276,7 @@ try:
           msg_out( "No Variance component found in {0} - it will be ignored".format(ndf) )
           continue
 
-#  Indicate we have not yet selected the NDF that is aligned with the JLS
+#  Indicate we have not yet selected the NDF that is aligned with the JSA
 #  all-sky pixel grid.
       aligned = None
 
@@ -300,13 +300,13 @@ try:
          tlbnd = starutil.get_task_par( "lbnd", "tileinfo" )
          tubnd = starutil.get_task_par( "ubnd", "tileinfo" )
 
-#  If the NDFs are not gridded using the JLS all-sky grid appropriate to
+#  If the NDFs are not gridded using the JSA all-sky grid appropriate to
 #  the specified instrument, then we need to resample them onto that grid
 #  before coadding the new and old data. We only need do this for the
 #  first tile for each input NDF, since all tiles are aligned on the same
 #  pixel grid.
          if aligned == None:
-            if not jls:
+            if not jsa:
                aligned = NDG( 1 )[ 0 ]
                invoke("$KAPPA_DIR/wcsalign in={0} ref={1} out={2} lbnd=! "
                       "method=bilin".format(ndf,tilendf,aligned) )

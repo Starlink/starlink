@@ -398,13 +398,13 @@
 *          by parameter SYSTEM. [0]
 *     REF = NDF (Read)
 *          An existing NDF that is to be used to define the output grid,
-*          or the string "JLS". If an NDF is supplied, the output grid will
+*          or the string "JSA". If an NDF is supplied, the output grid will
 *          be aligned with the supplied reference NDF. The NDF need not be
 *          three-dimensional. For instance, a two-dimensional image can be
 *          supplied in which case the spatial axes of the output cube will be
 *          aligned with the reference image and the spectral axis will be
-*          inherited form the first input NDF. If "JLS" is supplied, the
-*          JLS all-sky pixel grid will be used. If a null (!) value is
+*          inherited form the first input NDF. If "JSA" is supplied, the
+*          JSA all-sky pixel grid will be used. If a null (!) value is
 *          supplied then the output grid is determined by parameters
 *          AUTOGRID, REFLON, REFLAT, etc. [!]
 *     REFLAT = LITERAL (Read)
