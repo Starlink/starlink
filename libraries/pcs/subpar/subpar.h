@@ -35,6 +35,7 @@
 
  *  Authors:
  *     TIMJ: Tim Jenness (JAC, Hawaii)
+ *     DSB: David S Berry (JAC, Hawaii)
  *     {enter_new_authors_here}
 
  *  History:
@@ -42,6 +43,8 @@
  *        Initial version.
  *     31-JUL-2009 (TIMJ):
  *        Add subParGet0l
+ *     17-JUL-2013 (DSB):
+ *        Add subParGetname
 
  *  Bugs:
  *     {note_any_bugs_here}
@@ -63,7 +66,8 @@ void subParState( size_t namecode, int * state, int * status );
 void subParSync( int * status );
 void subParWrerr( const char * string, int * status );
 void subParWrmsg( const char * string, int * status );
-
+void subParGetname( size_t namecode, char *structname, size_t structname_length,
+                    int * status );
 
 
 #endif

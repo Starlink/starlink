@@ -306,3 +306,39 @@ void subParWrmsg( const char * string, int * status ) {
 
   return;
 }
+
+F77_SUBROUTINE(subpar_getname)( INTEGER(NAMECODE), CHARACTER(STRUCTNAME),
+                                INTEGER(STATUS) TRAIL(STRUCTNAME) );
+
+
+void subParGetname( size_t namecode, char *structname, size_t structname_length,
+                    int * status ) {
+  DECLARE_INTEGER(NAMECODE);
+  DECLARE_CHARACTER_DYN(STRUCTNAME);
+  DECLARE_INTEGER(STATUS);
+
+  if (*status != SAI__OK) {
+    if (structname) structname[0] = '\0';
+    return;
+  }
+
+  F77_EXPORT_INTEGER( namecode, NAMECODE );
+  F77_CREATE_CHARACTER( STRUCTNAME, structname_length - 1 );
+  F77_EXPORT_INTEGER( *status, STATUS );
+
+  if (!STRUCTNAME) {
+    *status = SAI__ERROR;
+    emsRep("", "Error allocating Fortran string", status );
+    return;
+  }
+
+  F77_LOCK( F77_CALL(subpar_getname)( INTEGER_ARG(&NAMECODE), CHARACTER_ARG(STRUCTNAME),
+                                      INTEGER_ARG(&STATUS) TRAIL_ARG(STRUCTNAME) ); )
+
+  F77_IMPORT_CHARACTER( STRUCTNAME, STRUCTNAME_length, structname );
+  F77_FREE_CHARACTER( STRUCTNAME );
+  F77_IMPORT_INTEGER( STATUS, *status );
+
+  return;
+}
+
