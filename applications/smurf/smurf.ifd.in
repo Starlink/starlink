@@ -5486,6 +5486,10 @@ package @PACKAGE@ {
         obey {python $SMURF_DIR/fts2gaia.py}
     }
 
+    command tilepaste {
+        obey {python $SMURF_DIR/tilepaste.py}
+    }
+
     icl {defhelp @PACKAGE@ $@PACKAGE_UPCASE@_HELP 0}
 
     display {
