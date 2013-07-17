@@ -5490,6 +5490,10 @@ package @PACKAGE@ {
         obey {python $SMURF_DIR/tilepaste.py}
     }
 
+    command tilecutout {
+        obey {python $SMURF_DIR/tilecutout.py}
+    }
+
     icl {defhelp @PACKAGE@ $@PACKAGE_UPCASE@_HELP 0}
 
     display {

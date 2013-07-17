@@ -88,6 +88,7 @@ int *smf_jlstiles_region( AstRegion *region, smf_inst_t instrument,
    AstRegion *region2;
    AstRegion *tregion;
    char text[ 200 ];
+   const char *class;
    const char *key;
    double *mesh = NULL;
    double *xmesh;
@@ -103,6 +104,7 @@ int *smf_jlstiles_region( AstRegion *region, smf_inst_t instrument,
    int key_index;
    int lbnd[ 2 ];
    int mapsize;
+   int nax;
    int npoint;
    int overlap;
    int ubnd[ 2 ];
@@ -135,10 +137,19 @@ int *smf_jlstiles_region( AstRegion *region, smf_inst_t instrument,
 
 /* If the supplied Region is 3-dimensional, remove the third axis, which
    is assumed to be a spectral axis. */
-   if( astGetI( region, "Naxes" ) == 3 ) {
+   nax = astGetI( region, "Naxes" );
+   if( nax > 2 ) {
       axes[ 0 ] = 1;
       axes[ 1 ] = 2;
-      region = astPickAxes( region, 2, axes, NULL );
+      region2 = astPickAxes( region, 2, axes, NULL );
+      if( ! astIsARegion( region2 ) && *status == SAI__OK ) {
+         class = astGetC( region, "Class" );
+         *status = SAI__ERROR;
+         errRepf( "", "Cannot extract a 2-D Region from the supplied "
+                  "%d-D %s.", status,  nax, class );
+      } else {
+         region = region2;
+      }
    }
 
 /* Map the Region using the FrameSet obtained above so that the new Region
