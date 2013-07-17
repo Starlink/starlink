@@ -76,21 +76,26 @@
 *     IN = NDF (Read)
 *        A group of NDFs to be pasted into the JLS tile collection. They
 *        must all have defined Variance components. Any that do not will
-*        be reported and then ignored.
+*        be reported and then ignored. They must all be form the same
+*        JCMT instrument.
 *     INSTRUMENT = LITERAL (Read)
-*        The JCMT instrument (different instruments have different
-*        tiling schemes and pixel sizes). The following instrument
-*        names are recognised (unambiguous abbreviations may be
-*        supplied): "SCUBA-2(450)", "SCUBA-2(850)", "HARP", "RxA",
-*        "RxWD", "RxWB". NDFs containing co-added data for the selected
-*        instrument reside within a corresponding sub-directory of the
-*        directory specified by environment variable JLS_TILE_DIR. These
-*        sub-directories are called "scuba2-450", "scuba2-850", "harp",
-*        "rxa", "rxwd" and "rxwb".
+*        Indicates the tiling scheme to be used (different instruments have
+*        different tiling schemes). The default value is determined from
+*        the FITS headers in the first supplied NDF. The user is prompted
+*        only if a supported instrument cannot be determined from the FITS
+*        headers. The following instrument names are recognised (unambiguous
+*        abbreviations may be supplied): "SCUBA-2(450)", "SCUBA-2(850)",
+*        "HARP", "RxA", "RxWD", "RxWB". NDFs containing co-added data for
+*        the selected instrument reside within a corresponding sub-directory
+*        of the directory specified by environment variable JLS_TILE_DIR.
+*        These sub-directories are called "scuba2-450", "scuba2-850", "harp",
+*        "rxa", "rxwd" and "rxwb". []
 *     JLS = _LOGICAL (Read)
 *        TRUE if the supplied input NDFs are gridded on the JLS all-sky
 *        pixel grid associated with the specified JCMT instrument. If
 *        this is not the case, the NDFs are first resampled to this grid.
+*        The dynamic default is True if the WCS for the first NDF uses an
+*        HPX (HEALPix) projection, and False otherwise. []
 *     LOGFILE = LITERAL (Read)
 *        The name of the log file to create if GLEVEL is not NONE. The
 *        default is "<command>.log", where <command> is the name of the
@@ -192,7 +197,7 @@ try:
                                     "The JCMT instrument", "SCUBA-2(850)"))
 
    params.append(starutil.Par0L("JLS", "Are the input NDFs on the JLS "
-                                "all-sky pixel grid?", True) )
+                                "all-sky pixel grid?", True, noprompt=True ) )
 
    params.append(starutil.Par0L("RETAIN", "Retain temporary files?", False,
                                  noprompt=True))
@@ -212,15 +217,44 @@ try:
 #  running an atask from the shell.
    indata = parsys["IN"].value
 
+#  See if we can determine a good default for INSTRUMENT by looking at
+#  the FITS headers of the first input NDF.
+   instrume = starutil.get_fits_header( indata[0], "INSTRUME" ).strip();
+   if instrume == "HARP":
+      deflt = "HARP"
+
+   elif instrume == "SCUBA-2":
+      filter = starutil.get_fits_header( indata[0], "FILTER" ).strip();
+      if filter == "850":
+         deflt = "SCUBA-2(850)";
+      else:
+         deflt = "SCUBA-2(450)";
+   else:
+      deflt = None
+
+   if deflt != None:
+      parsys["INSTRUMENT"].default = deflt
+      parsys["INSTRUMENT"].noprompt = True
+
 #  Get the JCMT instrument. Quote the string so that it can be used as
 #  a command line argument when running an atask from the shell.
    instrument = starutil.shell_quote( parsys["INSTRUMENT"].value )
+   msg_out( "Updating tiles for {0} data".format(instrument) )
 
 #  See if temp files are to be retained.
    retain = parsys["RETAIN"].value
 
+#  Set up the dynamic default for parameter "JLS". This is True if the
+#  dump of the WCS FrameSet in the first supplied NDF contains the string
+#  "HPX".
+   prj = invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=get name=projection".format(indata[0]) )
+   parsys["JLS"].default = True if prj.strip() == "HEALPix" else False
+
 #  See if input NDFs are on the JLS all-sky pixel grid.
    jls = parsys["JLS"].value
+   if not jls:
+      msg_out( "The supplied NDFs will first be resampled onto the JLS "
+               "all-sky pixel grid" )
 
 #  Report the tile directory.
    tiledir = os.getenv( 'JLS_TILE_DIR' )
@@ -230,7 +264,8 @@ try:
       msg_out( "Environment variable JLS_TILE_DIR is not set!" )
       msg_out( "Tiles will be written to the current directory ({0})".format(os.getcwd()) )
 
-#  Loop round each supplied NDF.
+#  Loop round each supplied NDF. "indata" is an instance of the starutil.NDG
+#  class, but "ndf" is a simple Python string.
    for ndf in indata:
       msg_out( " " )
       msg_out( "Copying data from {0}".format(ndf) )
@@ -250,12 +285,9 @@ try:
       invoke("$SMURF_DIR/tilelist region={0} instrument={1}".format(ndf,instrument) )
       for itile in starutil.get_task_par( "tiles", "tilelist" ):
 
-#  Get the information about the tile. If we need to resample the current
-#  NDF, ensure that a master tile exists so that we have something with
-#  which to align the resampled data.
-         create = "no" if jls else "yes"
+#  Get the information about the tile. Ensure the directory and tile exist.
          invoke("$SMURF_DIR/tileinfo itile={0} instrument={1} "
-                "create={2}".format(itile,instrument,create) )
+                "create=yes".format(itile,instrument) )
 
 #  Get the path to the tile's master NDF.
          tilendf = starutil.get_task_par( "tilendf", "tileinfo" )
@@ -275,7 +307,7 @@ try:
 #  pixel grid.
          if aligned == None:
             if not jls:
-               aligned = NDG( 1 )
+               aligned = NDG( 1 )[ 0 ]
                invoke("$KAPPA_DIR/wcsalign in={0} ref={1} out={2} lbnd=! "
                       "method=bilin".format(ndf,tilendf,aligned) )
             else:
@@ -309,7 +341,7 @@ try:
 #  If the master tile exists, form the weighted mean of the existing master
 #  tile and the overlap area of the aligned NDF.
          if existed:
-            sec = "{0}({1}:{2},{3}:{4})".format(aligned[0],olbnd[0],oubnd[0],olbnd[1],oubnd[1])
+            sec = "{0}({1}:{2},{3}:{4})".format(aligned,olbnd[0],oubnd[0],olbnd[1],oubnd[1])
             inndf = NDG( [ tilendf, sec ] )
             outndf = NDG( 1 )
             invoke("$CCDPACK_DIR/makemos in={0} out={1} method=mean".format(inndf,outndf) )
@@ -322,7 +354,7 @@ try:
 #  If the master tile does not yet exist, just copy a section of the aligned
 #  NDF that has pixel bounds the same as the tile.
          else:
-            sec = starutil.shell_quote("{0}({1}:{2},{3}:{4})".format(aligned[0],tlbnd[0],tubnd[0],tlbnd[1],tubnd[1]))
+            sec = starutil.shell_quote("{0}({1}:{2},{3}:{4})".format(aligned,tlbnd[0],tubnd[0],tlbnd[1],tubnd[1]))
             invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(sec,tilendf) )
             msg_out("   Creating {0}".format(tilendf) )
 
