@@ -214,15 +214,15 @@ try:
    invoke("$SMURF_DIR/tilelist region={0} instrument={1}".format(region,instrument) )
    for itile in starutil.get_task_par( "tiles", "tilelist" ):
 
-#  Get information about the tile, including the pixel index bounds of
-#  its overlap with the required Region.
+#  Get information about the tile, including the 2D spatial pixel index
+#  bounds of its overlap with the required Region.
       invoke("$SMURF_DIR/tileinfo itile={0} instrument={1} "
              "target={2}".format(itile,instrument,region) )
 
 #  Skip this tile if it does not exist (i.e. is empty).
       if starutil.get_task_par( "exists", "tileinfo" ):
 
-#  Get the pixel index bounds of the part of the master tile that
+#  Get the 2D spatial pixel index bounds of the part of the master tile that
 #  overlaps the required region.
          tlbnd = starutil.get_task_par( "tlbnd", "tileinfo" )
          tubnd = starutil.get_task_par( "tubnd", "tileinfo" )
@@ -231,7 +231,7 @@ try:
          tndf = starutil.get_task_par( "tilendf", "tileinfo" )
 
 #  Add on the section specifier for the overlap region.
-         sec = "{0}({1}:{2},{3}:{4})".format(tndf,tlbnd[0],tubnd[0],tlbnd[1],tubnd[1])
+         sec = "{0}({1}:{2},{3}:{4},)".format(tndf,tlbnd[0],tubnd[0],tlbnd[1],tubnd[1])
 
 #  Check the overlap contains some good values. */
          invoke( "$KAPPA_DIR/stats ndf={0}".format(starutil.shell_quote(sec)) )

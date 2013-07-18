@@ -300,7 +300,7 @@ try:
 #  above invocation of "tileinfo".
          existed = starutil.get_task_par( "exists", "tileinfo" )
 
-#  Get the pixel index bounds of the master tile.
+#  Get the 2D spatial pixel index bounds of the master tile.
          tlbnd = starutil.get_task_par( "lbnd", "tileinfo" )
          tubnd = starutil.get_task_par( "ubnd", "tileinfo" )
 
@@ -322,8 +322,8 @@ try:
             nlbnd = starutil.get_task_par( "lbound", "ndftrace" )
             nubnd = starutil.get_task_par( "ubound", "ndftrace" )
 
-#  Get the pixel index bounds of the overlap of the current tile and the
-#  aligned NDF.
+#  Get the 2D spatial pixel index bounds of the overlap of the current tile
+#  and the aligned NDF.
          olbnd = [ 1, 1 ]
          oubnd = [ 0, 0 ]
          for i in (0,1):
@@ -345,7 +345,7 @@ try:
 #  If the master tile exists, form the weighted mean of the existing master
 #  tile and the overlap area of the aligned NDF.
          if existed:
-            sec = "{0}({1}:{2},{3}:{4})".format(aligned,olbnd[0],oubnd[0],olbnd[1],oubnd[1])
+            sec = "{0}({1}:{2},{3}:{4},)".format(aligned,olbnd[0],oubnd[0],olbnd[1],oubnd[1])
             inndf = NDG( [ tilendf, sec ] )
             outndf = NDG( 1 )
             invoke("$CCDPACK_DIR/makemos in={0} out={1} method=mean".format(inndf,outndf) )
@@ -358,7 +358,7 @@ try:
 #  If the master tile does not yet exist, just copy a section of the aligned
 #  NDF that has pixel bounds the same as the tile.
          else:
-            sec = starutil.shell_quote("{0}({1}:{2},{3}:{4})".format(aligned,tlbnd[0],tubnd[0],tlbnd[1],tubnd[1]))
+            sec = starutil.shell_quote("{0}({1}:{2},{3}:{4},)".format(aligned,tlbnd[0],tubnd[0],tlbnd[1],tubnd[1]))
             invoke("$KAPPA_DIR/ndfcopy in={0} out={1}".format(sec,tilendf) )
             msg_out("   Creating {0}".format(tilendf) )
 
