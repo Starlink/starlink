@@ -77,7 +77,8 @@
 *        transformation results in a maximum positional error greater
 *        than the value supplied for ACC (in pixels), then a smaller
 *        region is used. High accuracy is paid for by larger run times.
-*        [0.05]
+*        A value of zero prevents any linear approximations being used -
+*        each pixel position is transformed explicitly. [0.05]
 *     CONSERVE = _LOGICAL (Read)
 *        If set TRUE, then the output pixel values will be scaled in
 *        such a way as to preserve the total data value in a feature on
@@ -452,6 +453,8 @@
 *     20-SEP-2012 (DSB):
 *        Record ancestor NDFs explicitly in each output NDF to avoid
 *        all input NDFs being used as ancestors of all output NDFs.
+*     18-JUL-2013 (DSB):
+*        Allow an ACC value of zero to be supplied.
 *     {enter_further_changes_here}
 
 *-
@@ -715,7 +718,6 @@
 
 *  Get the positional accuracy required.
       CALL PAR_GET0R( 'ACC', ERRLIM, STATUS )
-      ERRLIM = MAX( 0.0001, ERRLIM )
 
 *  Get the minimum acceptable output weight
       IF( STATUS .EQ. SAI__OK .AND. REBIN ) THEN
