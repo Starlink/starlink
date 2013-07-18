@@ -82,6 +82,9 @@ def which(program):
    return None
 
 
+#  Removes non-printable chars from ASCII String
+def remove_junk(str):
+   return ''.join([ch for ch in str if ord(ch) > 31 and ord(ch) < 126 or ord(ch) == 9])
 
 
 #  -------------------  Logging ---------------------------
@@ -670,6 +673,14 @@ class ParSys(object):
       byName = {}
       byPosition = []
       for item in sys.argv[1:]:
+
+         #  Remove any non-printing characters, and trailing or leading
+         # white space.
+         item = remove_junk( item ).strip()
+
+         #  Skip this item if it is now empty.
+         if item == "":
+            continue
 
          #  If "-h" or "--help" is encountered at any point, display the
          #  docstring from the top-level script, if available. Otherwise,
