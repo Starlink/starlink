@@ -164,21 +164,23 @@ int *smf_jsatiles_region( AstRegion *region, smf_inst_t instrument,
    region2 = astMapRegion( region, fs, fs );
 
 /* Get a mesh of all-sky "grid" positions (actually tile X and Y indices)
-   covering the region */
+   covering the region. Since the mesh positions are limited in number
+   and placed arbitrarily within the Region, the mesh will identify some,
+   but potentially not all, of the tiles that overlap the Region. */
    astGetRegionMesh( region2, 0, 0, 2, &npoint, NULL );
    mesh = astMalloc( 2*npoint*sizeof( *mesh ) );
    astGetRegionMesh( region2, 0, npoint, 2, &npoint, mesh );
 
-/* Find the index of the tile containing each position, and store them
-   in a KeyMap using the tile index as the key and "1" (indicating the
-   tile overlaps the region) as the value. The KeyMap is sorted by age
-   of entry. Each entry has a key which is an integer tile index, and
-   an integer value. If the value is zero, it means the tile does not
-   overlap the supplied Region. If the value is positive, it means the
-   tile does overlap the supplied Region. If the value is negative, it
-   means the tile has not yet been tested to see if it overlaps the
-   supplied Region. */
-   km = astKeyMap( "SortBy=AgeDown" );
+/* Find the index of the tile containing each mesh position, and store
+   them in a KeyMap using the tile index as the key and "1" (indicating
+   the tile overlaps the region) as the value. The KeyMap is sorted by
+   age of entry. Neighbouring tiles will be added to this KeyMap later.
+   If an entry has a value of zero, it means the tile does not overlap
+   the supplied Region. If the value is positive, it means the tile
+   does overlap the supplied Region. If the value is negative, it means
+   the tile has not yet been tested to see if it overlaps the supplied
+   Region. */
+   km = astKeyMap( "SortBy=KeyAgeDown" );
    xmesh = mesh;
    ymesh = mesh + npoint;
    for( i = 0; i < npoint && *status == SAI__OK; i++ ) {
