@@ -219,17 +219,21 @@ try:
 
 #  See if we can determine a good default for INSTRUMENT by looking at
 #  the FITS headers of the first input NDF.
-   instrume = starutil.get_fits_header( indata[0], "INSTRUME" ).strip();
-   if instrume == "HARP":
-      deflt = "HARP"
+   try:
+      instrume = starutil.get_fits_header( indata[0], "INSTRUME" ).strip();
+      if instrume == "HARP":
+         deflt = "HARP"
 
-   elif instrume == "SCUBA-2":
-      filter = starutil.get_fits_header( indata[0], "FILTER" ).strip();
-      if filter == "850":
-         deflt = "SCUBA-2(850)";
+      elif instrume == "SCUBA-2":
+         filter = starutil.get_fits_header( indata[0], "FILTER" ).strip();
+         if filter == "850":
+            deflt = "SCUBA-2(850)";
+         else:
+            deflt = "SCUBA-2(450)";
       else:
-         deflt = "SCUBA-2(450)";
-   else:
+         deflt = None
+
+   except:
       deflt = None
 
    if deflt != None:
