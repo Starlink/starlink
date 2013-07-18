@@ -358,6 +358,9 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *     20-MAY-2013 (DSB):
 *        Always perform a linear fit in RebinAdaptively if flux
 *        conservation is requested.
+*     18-JUL-2013 (DSB):
+*        Correct logic for determining whether to divide or not in
+*        RebinAdaptively. The old logic could lead to infinite recursion.
 *class--
 */
 
@@ -10321,11 +10324,13 @@ static int RebinAdaptively( AstMapping *this, int ndim_in,
    } else if ( toobig ) {
       divide = 1;
 
-/* If neither of the above apply, we need to do a fiot regardless of
+/* If neither of the above apply, we need to do a fit regardless of
    whether flux conservation was requested or not. Whether we divide or
-   not will depend on whether the Mapping is linear or not. */
+   not will depend on whether the Mapping is linear or not. Assume for
+   the moment that the Mapping is not linear and so we will divide. */
    } else {
       need_fit = 1;
+      divide = 1;
    }
 
 /* If required, attempt to fit a linear approximation to the Mapping's
@@ -10365,9 +10370,10 @@ static int RebinAdaptively( AstMapping *this, int ndim_in,
       fubnd = astFree( fubnd );
 
 /* If a linear fit was obtained, we will use it and therefore do not
-   wish to sub-divide further. Otherwise, we sub-divide in the hope
+   wish to sub-divide further. Otherwise, we sub-divide (unless the
+   section is too small or too big as determined earlier) in the hope
    that this may result in a linear fit next time. */
-      divide = !linear_fit;
+      if( linear_fit ) divide = 0;
    }
 
 /* If no sub-division is required, perform rebinning (in a
