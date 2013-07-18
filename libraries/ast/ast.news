@@ -17,6 +17,9 @@ Main Changes in this Version
 ----------------------------
 
 - Fix support for reading GLS projections from FITS headers.
+- The KeyMap class has new sorting options "KeyAgeUp" and "KeyAgeDown" that
+retain the position of an existing entry if its value is changed. See the
+SortBy attribute.
 
 Main Changes in V7.3.1
 ----------------------

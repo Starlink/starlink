@@ -184,6 +184,8 @@ f     - AST_MAPTYPE: Return the data type of a named entry in a map
 *         from a dump of a KeyMap.
 *     18-MAR-2013 (DSB):
 *         Added astMapDefined.
+*     18-JUL-2013 (DSB):
+*         Added SortBy options "KeyAgeUp" and "KeyAgeDown".
 *class--
 */
 
@@ -210,6 +212,8 @@ f     - AST_MAPTYPE: Return the data type of a named entry in a map
 #define SORTBY_AGEDOWN 2
 #define SORTBY_KEYUP 3
 #define SORTBY_KEYDOWN 4
+#define SORTBY_KEYAGEUP 5
+#define SORTBY_KEYAGEDOWN 6
 
 
 /* Include files. */
@@ -437,7 +441,7 @@ AstKeyMap *astKeyMapId_( const char *, ... );
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
-static AstMapEntry *AddTableEntry( AstKeyMap *, int, AstMapEntry *, int * );
+static AstMapEntry *AddTableEntry( AstKeyMap *, int, AstMapEntry *, int, int * );
 static AstMapEntry *CopyMapEntry( AstMapEntry *, int * );
 static AstMapEntry *FreeMapEntry( AstMapEntry *, int * );
 static AstMapEntry *RemoveTableEntry( AstKeyMap *, int, const char *, int * );
@@ -564,7 +568,9 @@ static int ManageLock( AstObject *, int, int, AstObject **, int * );
 
 /* Member functions. */
 /* ================= */
-static AstMapEntry *AddTableEntry( AstKeyMap *this, int itab, AstMapEntry *entry, int *status ){
+static AstMapEntry *AddTableEntry( AstKeyMap *this, int itab,
+                                   AstMapEntry *entry, int keymember,
+                                   int *status ){
 /*
 *  Name:
 *     AddTableEntry
@@ -577,7 +583,9 @@ static AstMapEntry *AddTableEntry( AstKeyMap *this, int itab, AstMapEntry *entry
 
 *  Synopsis:
 *     #include "keymap.h"
-*     AstMapEntry *AddTableEntry( AstKeyMap *this, int itab, AstMapEntry *entry, int *status )
+*     AstMapEntry *AddTableEntry( AstKeyMap *this, int itab,
+*                                 AstMapEntry *entry, int keymember,
+*                                 int *status ){
 
 *  Class Membership:
 *     KeyMap member function.
@@ -596,6 +604,10 @@ static AstMapEntry *AddTableEntry( AstKeyMap *this, int itab, AstMapEntry *entry
 *        Index of the hash table element to be searched.
 *     entry
 *        Pointer to the MapEntry to be added.
+*     keymember
+*        A unique integer identifier for the key that increases
+*        monotonically with age of the key. If this is negative,
+*        the next available identifier will be used automatically.
 *     status
 *        Pointer to the inherited status variable.
 
@@ -618,9 +630,19 @@ static AstMapEntry *AddTableEntry( AstKeyMap *this, int itab, AstMapEntry *entry
 /* Increment the length of linked list. */
    this->nentry[ itab ]++;
 
-/* Each entry added to the KeyMap has a unique member index that is
+/* Each new entry added to the KeyMap has a unique member index that is
    never re-used. */
    entry->member = (this->member_count)++;
+
+/* Each key added to the  KeyMap also has a separate unique member index,
+   but this index is re-used each time the same key is added into the
+   KeyMap. So changing the value associated with a key does not cause the
+   keymember value to change. */
+   if( keymember >= 0 ) {
+      entry->keymember = keymember;
+   } else {
+      entry->keymember = (this->member_count)++;
+   }
 
 /* Insert the supplied MapEntry into a list sorted by key. */
    AddToSortedList( this, entry, status );
@@ -1442,7 +1464,7 @@ static int CompareEntries( const void *first_void, const void *second_void ) {
    second = *( (AstMapEntry **) second_void );
    sortby = first->sortby;
 
-/* First handle sorting by increasing age */
+/* First handle sorting by increasing age of the value */
    if( sortby == SORTBY_AGEUP ) {
       if( first->member < second->member ) {
          result = 1;
@@ -1452,11 +1474,31 @@ static int CompareEntries( const void *first_void, const void *second_void ) {
          result = 0;
       }
 
-/* Next handle sorting by decreasing age */
+/* Next handle sorting by decreasing age of the value */
    } else if( sortby == SORTBY_AGEDOWN ) {
       if( first->member < second->member ) {
          result = -1;
       } else if( first->member > second->member ) {
+         result = 1;
+      } else {
+         result = 0;
+      }
+
+/* Next handle sorting by increasing age of the key */
+   } else if( sortby == SORTBY_KEYAGEUP ) {
+      if( first->keymember < second->keymember ) {
+         result = 1;
+      } else if( first->keymember > second->keymember ) {
+         result = -1;
+      } else {
+         result = 0;
+      }
+
+/* Next handle sorting by decreasing age of the key */
+   } else if( sortby == SORTBY_KEYAGEDOWN ) {
+      if( first->keymember < second->keymember ) {
+         result = -1;
+      } else if( first->keymember > second->keymember ) {
          result = 1;
       } else {
          result = 0;
@@ -3646,6 +3688,7 @@ static void InitMapEntry( AstMapEntry *entry, int type, int nel, int *status ){
    entry->snext = NULL;
    entry->sprev = NULL;
    entry->member = 0;
+   entry->keymember = 0;
    entry->sortby = SORTBY_NONE;
 
    if( type == AST__OBJECTTYPE ) {
@@ -3911,6 +3954,7 @@ f        The global status.
    const char *key;       /* Key for current entry */
    int i;                 /* Index into source hash table */
    int itab;              /* Index of destination hash table element */
+   int keymember;         /* Identifier for key */
    int merged;            /* Were source and destination KeyMaps merged? */
    unsigned long hash;    /* Full width hash value */
 
@@ -3943,7 +3987,7 @@ f        The global status.
                          astGetClass( this ), key, key );
             } else {
                out_entry = CopyMapEntry( in_entry, status );
-               out_entry = AddTableEntry( this, itab, out_entry, status );
+               out_entry = AddTableEntry( this, itab, out_entry, -1, status );
             }
 
 /* If the destination KeyMap contains an entry with the current key... */
@@ -3984,12 +4028,15 @@ f        The global status.
             }
 
 /* If the source and desination entries are not KeyMaps, then just remove
-   the entry in the desination KeyMap and add a copy of the source entry. */
+   the entry in the desination KeyMap and add a copy of the source entry.
+   But retain the original keymember value since we are just changing the
+   value of an existing key. */
             if( ! merged ) {
-               (void) FreeMapEntry( RemoveTableEntry( this, itab, key, status ),
-                                    status );
+               out_entry = RemoveTableEntry( this, itab, key, status );
+               keymember = out_entry->keymember;
+               (void) FreeMapEntry( out_entry, status );
                out_entry = CopyMapEntry( in_entry, status );
-               out_entry = AddTableEntry( this, itab, out_entry, status );
+               out_entry = AddTableEntry( this, itab, out_entry, keymember, status );
             }
          }
 
@@ -4243,6 +4290,7 @@ static void MapPut0##X( AstKeyMap *this, const char *skey, Xtype value, \
    char keybuf[ AST__MXKEYLEN + 1 ]; /* Buffer for upper cas key */ \
    int itab;               /* Index of hash table element to use */ \
    int keylen;             /* Length of supplied key string */ \
+   int keymember;          /* Identifier for existing key */ \
    int there;              /* Did the entry already exist in the KeyMap? */ \
 \
 /* Check the global error status. */ \
@@ -4286,12 +4334,15 @@ static void MapPut0##X( AstKeyMap *this, const char *skey, Xtype value, \
    which to store the new entry. */ \
       itab = HashFun( mapentry->key, this->mapsize - 1, &(mapentry->hash), status ); \
 \
-/* Remove any existing entry with the given key from the table element. */ \
+/* Remove any existing entry with the given key from the table element. \
+   First save the key identifier. */ \
       oldent = RemoveTableEntry( this, itab, mapentry->key, status ); \
       if( oldent ) { \
+         keymember = oldent->keymember; \
          oldent = FreeMapEntry( oldent, status ); \
          there = 1; \
       } else { \
+         keymember = -1; \
          there = 0; \
       } \
 \
@@ -4305,7 +4356,7 @@ static void MapPut0##X( AstKeyMap *this, const char *skey, Xtype value, \
 /* If all has gone OK, store the new entry at the head of the linked list \
    associated with the selected table entry. */ \
       if( astOK ) { \
-         mapentry = AddTableEntry( this, itab, mapentry, status ); \
+         mapentry = AddTableEntry( this, itab, mapentry, keymember, status ); \
 \
 /* If anything went wrong, try to delete the new entry. */ \
       } else { \
@@ -4465,6 +4516,7 @@ static void MapPut1##X( AstKeyMap *this, const char *skey, int size, \
    int itab;               /* Index of hash table element to use */ \
    int i;                  /* Loop count */ \
    int keylen;             /* Length of supplied key string */ \
+   int keymember;          /* Identifier for existing key */ \
    int there;              /* Did the entry already exist in the KeyMap? */ \
 \
 /* Check the global error status. */ \
@@ -4512,12 +4564,15 @@ static void MapPut1##X( AstKeyMap *this, const char *skey, int size, \
    which to store the new entry. */ \
       itab = HashFun( mapentry->key, this->mapsize - 1, &(mapentry->hash), status ); \
 \
-/* Remove any existing entry with the given key from the table element. */ \
+/* Remove any existing entry with the given key from the table element. \
+   First save the key identifier. */ \
       oldent = RemoveTableEntry( this, itab, mapentry->key, status ); \
       if( oldent ) { \
+         keymember = oldent->keymember; \
          oldent = FreeMapEntry( oldent, status ); \
          there = 1; \
       } else { \
+         keymember = -1; \
          there = 0; \
       } \
 \
@@ -4531,7 +4586,7 @@ static void MapPut1##X( AstKeyMap *this, const char *skey, int size, \
 /* If all has gone OK, store the new entry at the head of the linked list \
    associated with the selected table entry. */ \
       if( astOK ) { \
-         mapentry = AddTableEntry( this, itab, mapentry, status ); \
+         mapentry = AddTableEntry( this, itab, mapentry, keymember, status ); \
 \
 /* If anything went wrong, try to delete the new entry. */ \
       } else { \
@@ -4620,6 +4675,7 @@ void astMapPut1AId_( AstKeyMap *this, const char *skey, int size,
    int i;                  /* Loop count */
    int itab;               /* Index of hash table element to use */
    int keylen;             /* Length of supplied key string */
+   int keymember;          /* Identifier for existing key */
    int there;              /* Did the entry already exist in the KeyMap? */
 
 /* Check the global error status. */
@@ -4668,10 +4724,12 @@ void astMapPut1AId_( AstKeyMap *this, const char *skey, int size,
 /* Remove any existing entry with the given key from the table element. */
       oldent = RemoveTableEntry( this, itab, mapentry->key, status );
       if( oldent ) {
+         keymember = oldent->keymember;
          oldent = FreeMapEntry( oldent, status );
          there = 1;
       } else {
          there = 0;
+         keymember = -1;
       }
 
 /* If the KeyMap is locked we report an error if an attempt is made to add a value for
@@ -4684,7 +4742,7 @@ void astMapPut1AId_( AstKeyMap *this, const char *skey, int size,
 /* If all has gone OK, store the new entry at the head of the linked list
    associated with the selected table entry. */
       if( astOK ) {
-         mapentry = AddTableEntry( this, itab, mapentry, status );
+         mapentry = AddTableEntry( this, itab, mapentry, keymember, status );
 
 /* If anything went wrong, try to delete the new entry. */
       } else {
@@ -4761,6 +4819,7 @@ f        The global status.
    char *p;                /* Pointer to next key character */
    int itab;               /* Index of hash table element to use */
    int keylen;             /* Length of supplied key string */
+   int keymember;          /* Identifier for existing key */
    int there;              /* Did the entry already exist in the KeyMap? */
 
 /* Check the global error status. */
@@ -4802,9 +4861,11 @@ f        The global status.
 /* Remove any existing entry with the given key from the table element. */
       oldent = RemoveTableEntry( this, itab, mapentry->key, status );
       if( oldent ) {
+         keymember = oldent->keymember;
          oldent = FreeMapEntry( oldent, status );
          there = 1;
       } else {
+         keymember = -1;
          there = 0;
       }
 
@@ -4818,7 +4879,7 @@ f        The global status.
 /* If all has gone OK, store the new entry at the head of the linked list
    associated with the selected table entry. */
       if( astOK ) {
-         mapentry = AddTableEntry( this, itab, mapentry, status );
+         mapentry = AddTableEntry( this, itab, mapentry, keymember, status );
 
 /* If anything went wrong, try to delete the new entry. */
       } else {
@@ -6962,6 +7023,7 @@ f        The global status.
    char *p;                /* Pointer to next key character */
    int itab;               /* Index of hash table element to use */
    int keylen;             /* Length of supplied key string */
+   int keymember;          /* Identifier for new key */
    int there;              /* Did the entry already exist in the KeyMap? */
    unsigned long hash;     /* Full width hash value */
 
@@ -7011,9 +7073,11 @@ f        The global status.
    element. */
          oldent = RemoveTableEntry( this, itab, entry->key, status );
          if( oldent ) {
+            keymember = oldent->keymember;
             oldent = FreeMapEntry( oldent, status );
             there = 1;
          } else {
+            keymember = -1;
             there = 0;
          }
 
@@ -7029,7 +7093,7 @@ f        The global status.
 /* If all has gone OK, store the renamed entry at the head of the linked list
    associated with the selected table entry. */
          if( astOK ) {
-            entry = AddTableEntry( this, itab, entry, status );
+            entry = AddTableEntry( this, itab, entry, keymember, status );
 
 /* If anything went wrong, try to delete the renamed entry. */
          } else {
@@ -8972,6 +9036,12 @@ static int SortByInt( const char *sortby, const char *method, int *status ){
    } else if( astChrMatch( sortby, "AgeDown" ) ) {
       result = SORTBY_AGEDOWN;
 
+   } else if( astChrMatch( sortby, "KeyAgeUp" ) ) {
+      result = SORTBY_KEYAGEUP;
+
+   } else if( astChrMatch( sortby, "KeyAgeDown" ) ) {
+      result = SORTBY_KEYAGEDOWN;
+
    } else if( astChrMatch( sortby, "KeyUp" ) ) {
       result = SORTBY_KEYUP;
 
@@ -9041,6 +9111,12 @@ static const char *SortByString( int sortby, const char *method, int *status ){
 
    } else if( sortby == SORTBY_AGEDOWN ) {
       result = "AgeDown";
+
+   } else if( sortby == SORTBY_KEYAGEUP ) {
+      result = "KeyAgeUp";
+
+   } else if( sortby == SORTBY_KEYAGEDOWN ) {
+      result = "KeyAgeDown";
 
    } else if( sortby == SORTBY_KEYUP ) {
       result = "KeyUp";
@@ -9507,11 +9583,25 @@ f     AST_MAPKEY
 *     fastest method as it avoids the need for a sorted list of keys to
 *     be maintained and used.
 *
-*     - "AgeDown": The keys are returned in the order in which they were
-*     stored in the KeyMap, with the most recent key being returned last.
+*     - "AgeDown": The keys are returned in the order in which values were
+*     stored in the KeyMap, with the key for the most recent value being
+*     returned last. If the value of an existing entry is changed, it goes
+*     to the end of the list.
 *
-*     - "AgeUp": The keys are returned in the order in which they were
-*     stored in the KeyMap, with the most recent key being returned first.
+*     - "AgeUp": The keys are returned in the order in which values were
+*     stored in the KeyMap, with the key for the most recent value being
+*     returned first. If the value of an existing entry is changed, it goes
+*     to the top of the list.
+*
+*     - "KeyAgeDown": The keys are returned in the order in which they
+*     were originally stored in the KeyMap, with the most recent key being
+*     returned last. If the value of an existing entry is changed, its
+*     position in the list does not change.
+*
+*     - "KeyAgeUp": The keys are returned in the order in which they
+*     were originally stored in the KeyMap, with the most recent key being
+*     returned first. If the value of an existing entry is changed, its
+*     position in the list does not change.
 *
 *     - "KeyDown": The keys are returned in alphabetical order, with "A..."
 *     being returned last.

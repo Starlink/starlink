@@ -1136,7 +1136,7 @@ C  Test AST_MAPPUTU and undefined values
 
       if( status .ne. sai__ok ) return
 
-C  Age sorting...
+C  Value Age sorting...
 
 C  First test adding entries into an already sorted KeyMap
 
@@ -1167,7 +1167,80 @@ C  Now test sorting existing entries in a KeyMap.
          end if
       end do
 
+
+C  Changing the value of an existing entry should change its position in
+C  the list.
+      call ast_mapput0i( km, keys(1), 10, ' ', status )
+      call ast_set( km, 'Sortby=AgeDown', status )
+
+      do i = 1, 5
+         key = ast_mapkey( km, i, status )
+         if( i .eq. 5 ) then
+            if( key .ne. keys(1) .and. status .eq. SAI__OK ) then
+               write(*,*) 'Key ',1,' is ',key,' (should be ',keys(1),')'
+               call stopit( status, 'Error Sort 2b' )
+               return
+            end if
+         else if( key .ne. keys(i+1) .and. status .eq. SAI__OK ) then
+            write(*,*) 'Key ',i+1,' is ',key,' (should be ',keys(i+1),
+     :                 ')'
+            call stopit( status, 'Error Sort 2c' )
+            return
+         end if
+      end do
+
       call ast_annul( km, status )
+
+
+C  Key Age sorting...
+
+C  First test adding entries into an already sorted KeyMap
+
+      km = ast_keymap( 'Sortby=KeyAgeDown', status )
+
+      do i = 1, 5
+         call ast_mapput0i( km, keys(i), i, ' ', status )
+      end do
+
+      do i = 1, 5
+         key = ast_mapkey( km, i, status )
+         if( key .ne. keys(i) .and. status .eq. SAI__OK ) then
+            write(*,*) 'Key ',i,' is ',key,' (should be ',keys(i),')'
+            call stopit( status, 'Error Sort 0' )
+            return
+         end if
+      end do
+
+C  Now test sorting existing entries in a KeyMap.
+      call ast_set( km, 'Sortby=KeyAgeUp', status )
+
+      do i = 1, 5
+         key = ast_mapkey( km, i, status )
+         if( key .ne. keys(6-i) .and. status .eq. SAI__OK ) then
+            write(*,*) 'Key ',i,' is ',key,' (should be ',keys(6-i),')'
+            call stopit( status, 'Error Sort -1' )
+            return
+         end if
+      end do
+
+
+C  Changing the value of an existing entry should not change its position
+C  in the list.
+      call ast_mapput0i( km, keys(1), 10, ' ', status )
+      call ast_set( km, 'Sortby=KeyAgeDown', status )
+
+      do i = 1, 5
+         key = ast_mapkey( km, i, status )
+         if( key .ne. keys(i) .and. status .eq. SAI__OK ) then
+            write(*,*) 'Key ',i,' is ',key,' (should be ',keys(i),')'
+            call stopit( status, 'Error Sort -2' )
+            return
+         end if
+      end do
+
+      call ast_annul( km, status )
+
+
 
 C  Key sorting...
 
