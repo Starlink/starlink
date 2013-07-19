@@ -315,7 +315,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
   int canwrite = 0;          /* We can write to the file if true */
   char datatype[NDF__SZTYP+1];  /* String for DATA type */
   char dtype[NDF__SZTYP+1];  /* String for DATA/VARIANCE type */
-  int indf;                  /* NDF identified for input file */
+  int indf = NDF__NOID;      /* NDF identified for input file */
   int isFFT;                 /* FFT data? */
   int lbnd[NDF__MXDIM];      /* Lower pixel bounds of NDF */
   int ubnd[NDF__MXDIM];      /* Upper pixel bounds of NDF */

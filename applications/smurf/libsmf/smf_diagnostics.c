@@ -215,7 +215,7 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
    int repbolo;
    int res_after;
    int res_before;
-   int rowoffset;
+   int rowoffset = 0;
    int there;
    int time;
    smfArray *res;

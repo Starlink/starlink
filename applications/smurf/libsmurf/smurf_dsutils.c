@@ -2218,7 +2218,7 @@ static int SaveTimeSlice( const char *param1, const char *param2,
    int *ipi = NULL;
    int el;
    int i;
-   int indf;
+   int indf = NDF__NOID;
    int ival;
    int lbnd[ 3 ];
    int result;

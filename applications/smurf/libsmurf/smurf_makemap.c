@@ -800,7 +800,7 @@ void smurf_makemap( int *status ) {
   smfFile *file=NULL;        /* Pointer to SCUBA2 data file struct */
   int first;                 /* Is this the first input file? */
   smfArray *flatramps = NULL;/* Flatfield ramps */
-  fts2Port fts_port;         /* FTS-2 port */
+  fts2Port fts_port = NO_FTS;/* FTS-2 port */
   char fts_port_name[10];    /* FTS-2 port name */
   int gotbadflat = 0;        /* Was one of the required flats bad? */
   AstKeyMap *heateffmap = NULL;    /* Heater efficiency data */
