@@ -71,6 +71,8 @@
 *        more uniform).
 *     2012-10-22 (DSB):
 *        Add mapqua argument.
+*     2013-7-19 (DSB):
+*        Correct imapdata->pntr[2] to imapdata->qual.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -175,7 +177,7 @@ void smf_write_itermap( ThrWorkForce *wf, const double *map, const double *mapva
   if( *status == SAI__OK ) {
     memcpy( imapdata->pntr[0], map, msize*sizeof(*map) );
     memcpy( imapdata->pntr[1], mapvar, msize*sizeof(*mapvar) );
-    if( mapqua ) memcpy( imapdata->pntr[2], mapqua, msize*sizeof(*mapqua) );
+    if( mapqua ) memcpy( imapdata->qual, mapqua, msize*sizeof(*mapqua) );
   }
 
   /* Write out a FITS header */
