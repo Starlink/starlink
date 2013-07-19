@@ -692,7 +692,7 @@ typedef struct smfData {
   smfDream *dream;           /* DREAM parameters */
   smfFts* fts;               /* FTS2 specific information */
   smf_dtype dtype;           /* Data type of DATA and VARIANCE arrays */
-  void * pntr[2];            /* Array of pointers to DATA/VARIANCE/QUALITY */
+  void * pntr[2];            /* Array of pointers to DATA and VARIANCE */
   smf_qual_t * qual;         /* Pointer for quality information */
   struct smfData * sidequal; /* Override external quality not owned by this smfData */
   smf_qfam_t qfamily;        /* Quality family used in "qual" */
