@@ -3321,6 +3321,14 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter tausrc {
+                type _CHAR
+                access WRITE
+                vpath DEFAULT
+                default UNKNOWN
+                helpkey *
+            }
+
             parameter tileborder {
                 type _INTEGER
                 prompt {Width of tile overlap in pixels}

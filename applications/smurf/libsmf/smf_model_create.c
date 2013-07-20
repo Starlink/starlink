@@ -261,6 +261,7 @@
 #include "prm_par.h"
 #include "par_par.h"
 #include "star/one.h"
+#include "par.h"
 
 /* SMURF includes */
 #include "libsmf/smf.h"
@@ -1050,6 +1051,13 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
                  thetausrc = tausrc; /* So we modify a different variable */
                  int allquick = smf_correct_extinction( wf, idata, &thetausrc, extmeth, kmap, tau,
                                                   (double *) dataptr, &wvmtaucache, status );
+
+                 /* Store the tau source that was used in an ADAM parameter. Note that we update the
+                    parameter each time the model is created so only the most recent value is
+                    ultimately stored. Storing the information in the output map is complicated
+                    by getting the value up from this routine and then working out what to do if each
+                    chunk in the output map has a different answer. */
+                 parPut0c( "TAUSRC", smf_tausrc_str( thetausrc, status), status );
 
                  /* Store a flag saying if all bolometers have the same
                     extinction corrections. */
