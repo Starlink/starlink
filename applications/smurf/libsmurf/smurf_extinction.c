@@ -202,6 +202,9 @@
 *        Extract correct part of EXT keymap
 *     2013-04-04 (TIMJ):
 *        Ask for CSOFIT.
+*     2013-07-20 (TIMJ):
+*        Add an output message indicating which tau source was actually used.
+*        This is important for AUTO mode.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -396,10 +399,8 @@ void smurf_extinction( int * status ) {
           deftau = smf_cso2filt_tau( ohdr, deftau, extpars, status );
         }
         parGdr0d( param, deftau, 0.0,1.0, 1, &tau, status );
-      } else if ( tausrc == SMF__TAUSRC_WVMRAW ) {
-        msgOutif(MSG__VERB," ", "Using Raw WVM data", status);
-      } else if ( tausrc == SMF__TAUSRC_CSOFIT ) {
-        msgOutif(MSG__VERB," ", "Using fit to CSO data", status);
+      } else if ( tausrc == SMF__TAUSRC_CSOFIT || tausrc == SMF__TAUSRC_WVMRAW ) {
+        /* Defer a message until after extinction correction */
       } else {
         *status = SAI__ERROR;
         errRep("", "Unsupported opacity source. Possible programming error.",
@@ -411,6 +412,23 @@ void smurf_extinction( int * status ) {
        determine whether the data have already been extinction
        corrected */
     smf_correct_extinction( wf, odata, &tausrc, extmeth, extpars, tau, NULL, NULL, status );
+
+    if ( tausrc == SMF__TAUSRC_WVMRAW ) {
+      msgOutif(MSG__VERB," ", "Used Raw WVM data for extinction correction", status);
+    } else if ( tausrc == SMF__TAUSRC_CSOFIT ) {
+      msgOutif(MSG__VERB," ", "Used fit to CSO data for extinction correction", status);
+    } else if ( tausrc == SMF__TAUSRC_CSOTAU ) {
+      msgOutif(MSG__VERB," ", "Used an explicit CSO tau value for extinction correction", status);
+    } else if ( tausrc == SMF__TAUSRC_TAU ) {
+      msgOutif(MSG__VERB," ", "Used an explicit filter tau value for extinction correction", status);
+    } else {
+      if (*status == SAI__OK) {
+        const char * taustr = smf_tausrc_str( tausrc, status );
+        *status = SAI__ERROR;
+        errRepf( "", "Unexpected opacity source used for extinction correction of %s."
+                 " Possible programming error.", status, taustr );
+      }
+    }
 
     /* Set character labels */
     smf_set_clabels( "Extinction corrected",NULL, NULL, odata->hdr, status);
