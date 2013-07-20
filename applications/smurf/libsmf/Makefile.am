@@ -401,6 +401,7 @@ smf_subtract_poly.c \
 smf_summarize_obs.c \
 smf_swmode_str.c \
 smf_tai2unix.c \
+smf_tausrc_str.c \
 smf_telpos_get.c \
 smf_terr.c \
 smf_timerinit.c \

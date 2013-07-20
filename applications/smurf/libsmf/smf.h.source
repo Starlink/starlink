@@ -1895,6 +1895,8 @@ const char * smf_swmode_str( smf_swmode mode, int * status );
 double
 smf_tai2unix( double tai, int * status );
 
+const char * smf_tausrc_str( smf_tausrc mode, int * status );
+
 void smf_telpos_get( smfHead * hdr, int * status );
 
 void smf_terr( double phi, double h, double lambda, double pos[3] );
