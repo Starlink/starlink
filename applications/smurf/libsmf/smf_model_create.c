@@ -1021,6 +1021,7 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
 
               /* If calculating new EXT values here... */
               } else {
+                 smf_tausrc thetausrc = SMF__TAUSRC_NULL;
 
                  if( tausrc == SMF__TAUSRC_CSOTAU ||
                      tausrc == SMF__TAUSRC_AUTO ) {
@@ -1046,7 +1047,8 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
                             status );
                  }
 
-                 int allquick = smf_correct_extinction( wf, idata, tausrc, extmeth, kmap, tau,
+                 thetausrc = tausrc; /* So we modify a different variable */
+                 int allquick = smf_correct_extinction( wf, idata, &thetausrc, extmeth, kmap, tau,
                                                   (double *) dataptr, &wvmtaucache, status );
 
                  /* Store a flag saying if all bolometers have the same

@@ -410,7 +410,7 @@ void smurf_extinction( int * status ) {
     /* Apply extinction correction - note that a check is made to
        determine whether the data have already been extinction
        corrected */
-    smf_correct_extinction( wf, odata, tausrc, extmeth, extpars, tau, NULL, NULL, status );
+    smf_correct_extinction( wf, odata, &tausrc, extmeth, extpars, tau, NULL, NULL, status );
 
     /* Set character labels */
     smf_set_clabels( "Extinction corrected",NULL, NULL, odata->hdr, status);

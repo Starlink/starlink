@@ -850,7 +850,7 @@ void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
 void smf_copytime( struct timeval *target, struct timeval *source,
                    int *status);
 
-int smf_correct_extinction( ThrWorkForce * wf, smfData *data, smf_tausrc tausrc,
+int smf_correct_extinction( ThrWorkForce * wf, smfData *data, smf_tausrc *thetausrc,
                              smf_extmeth method, AstKeyMap * extpars, double tau,
                              double *allextcorr, double **wvmtaucache, int *status);
 

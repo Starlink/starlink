@@ -13,7 +13,7 @@
 *     Subroutine
 
 *  Invocation:
-*     int smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc tausrc,
+*     int smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc *thetausrc,
 *                             smf_extmeth method, AstKeyMap * extpars, double tau,
 *                             double *allextcorr, double ** wvmtaucache, int *status);
 
@@ -22,8 +22,9 @@
 *        Pointer to a pool of worker threads (can be NULL)
 *     data = smfData* (Given)
 *        smfData struct
-*     tausrc = smf_tausrc (Given)
-*        Source of opacity value. Options are:
+*     thetausrc = smf_tausrc (Given)
+*        Source of opacity value. On exit reflects the value that was used if a dynamic
+*        option was given. Options are:
 *          SMF__TAUSRC_AUTO: Use WVM if available and reliable, else use CSO fit.
 *          SMF__TAUSRC_CSOTAU: Use the supplied "tau" argument as if it is CSO tau.
 *          SMF__TAUSRC_CSOFIT: Use an external fit to the CSO data.
@@ -41,7 +42,7 @@
 *        containing the parameters for the specific filter. Currently
 *        only used if we are scaling from CSO or WVM.
 *     tau = double (Given)
-*        Optical depth at 225 GHz or filter wavelength. Only used if tausrc is
+*        Optical depth at 225 GHz or filter wavelength. Only used if thetausrc is
 *        AUTO, TAU or CSOTAU. If the bad value is used a default value will be
 *        used from the header.
 *     allextcorr = double* (Given and Returned)
@@ -193,6 +194,8 @@
 *        problem when running skyloop).
 *     2013-06-21 (TIMJ):
 *        Change AUTO mode so that it looks at WVM then CSO fit and then gives up.
+*     2013-07-20 (TIMJ):
+*        Update the tausrc argument so the caller knows which scheme was used.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -275,7 +278,7 @@ static pthread_mutex_t data_mutex = PTHREAD_MUTEX_INITIALIZER;
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_correct_extinction"
 
-int smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc tausrc, smf_extmeth method,
+int smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc *thetausrc, smf_extmeth method,
                             AstKeyMap * extpars, double tau, double *allextcorr,
                             double **wvmtaucache, int *status) {
 
@@ -294,6 +297,7 @@ int smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc tausrc, s
   dim_t npts = 0;          /* Number of data points */
   dim_t nx = 0;            /* # pixels in x-direction */
   dim_t ny = 0;            /* # pixels in y-direction */
+  smf_tausrc tausrc;       /* Local copy of tausrc value */
   int ubnd[2];             /* Upper bound */
   double *vardata = NULL;  /* Pointer to variance array */
   double * wvmtau = NULL;  /* WVM tau (smoothed or not) for these data */
@@ -312,6 +316,17 @@ int smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc tausrc, s
              status );
     return allquick;
   }
+
+  if ( ! thetausrc ) {
+    *status = SAI__ERROR;
+    errRep( "", FUNC_NAME ": Must supply a thetausrc argument. Possible programming error.",
+            status );
+    return allquick;
+  }
+
+  /* Use a local value for tausrc as we update it in this routine. In particular,
+     CSOFIT becomes WVMRAW and this would be confusing to the caller */
+  tausrc = *thetausrc;
 
   /* If no opacity monitor specified generate bad status */
   if( tausrc==SMF__TAUSRC_NULL ) {
@@ -402,6 +417,9 @@ int smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc tausrc, s
     msgOutiff( MSG__VERB, "", "Using cached high resolution data for extinction correction of ^FILE",
                status);
     tausrc = SMF__TAUSRC_WVMRAW; /* We are now WVMRAW as we have the data */
+
+    /* Assume that we only do not know the provenance if in AUTO mode */
+    if (tausrc == SMF__TAUSRC_AUTO) *thetausrc = SMF__TAUSRC_CACHED;
   }
 
   if (!wvmtau && tausrc == SMF__TAUSRC_WVMRAW) {
@@ -454,6 +472,7 @@ int smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc tausrc, s
     if (ndims == 2) {
       /* have to use CSO mode */
       tausrc = SMF__TAUSRC_CSOTAU;
+      *thetausrc = tausrc;
     } else if (ndims == 3) {
       /* We have already done the cache test so not needed here */
 
@@ -472,6 +491,7 @@ int smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc tausrc, s
           tausrc = SMF__TAUSRC_WVMRAW;
           msgOutiff( MSG__VERB, "", "Selecting WVM mode for extinction correction of ^FILE."
                      " %.0f %% of WVM data are present", status, percentgood );
+          *thetausrc = tausrc;
         } else {
           tausrc = SMF__TAUSRC_AUTO; /* keep it AUTO (a no-op but make it clear) */
           if (wvmtau) wvmtau = astFree( wvmtau );
@@ -489,6 +509,7 @@ int smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc tausrc, s
                      status );
           /* Rebrand as WVM data from this point on */
           tausrc = SMF__TAUSRC_WVMRAW;
+          *thetausrc = SMF__TAUSRC_CSOFIT;
         } else if (*status == SMF__BADFIT) {
           /* No fit, carry on. */
           errAnnul( status );
