@@ -3316,6 +3316,13 @@ iraf! {
 
          helplib {$ATOOLS_HELP}
 
+         parameter badval {
+            type LITERAL
+            prompt {Output value to use for bad input values}
+            ppath CURRENT
+            helpkey *
+          }
+
          parameter fmt {
             type LITERAL
             prompt {Format for output text file}
