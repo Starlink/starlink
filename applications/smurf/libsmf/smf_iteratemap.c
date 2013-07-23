@@ -412,6 +412,9 @@
 *        - If an initial sky is supplied that was created by a previous
 *        interupted run of makemap, start counting iterations from where
 *        the previous run of makemap left off.
+*     2013-7-23 (DSB):
+*        Do not converge until any initial iterations that skip the AST
+*        model have been done.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -2262,6 +2265,10 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                     converged=0;
                   }
                 }
+
+                /* If the AST model was skipped, we have not converged yet. */
+                if( untilconverge && dat.ast_skipped ) converged=0;
+
               } else {
                 /* Can't converge until at least 2 consecutive chi^2... */
                 converged=0;
@@ -2310,9 +2317,12 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
           /* Check for the map change stopping criterion. Do not modify
              the converged flag on the extra iteration that is done after
-             convergence has been reached (i.e. when quit=0).  */
-          if( untilconverge && (maptol!=VAL__BADD) &&
-              (mapchange_mean > maptol) && quit == -1 ) {
+             convergence has been reached (i.e. when quit=0).  We do not
+             allow convergence to be reached until we have finished any
+             initial iterations that skip the AST model. */
+          if( untilconverge &&
+              ( ( (maptol!=VAL__BADD) && (mapchange_mean > maptol) ) ||
+                dat.ast_skipped ) && quit == -1 ) {
             /* Map hasn't converged yet */
             converged=0;
           }
