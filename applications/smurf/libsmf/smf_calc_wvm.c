@@ -42,6 +42,10 @@
 *     - If the TCS_AIRMASS value is missing "approxam" is used instead.
 *       If this is a bad value then AMSTART or AMEND will be examined.
 *     - Returns VAL__BADD if any of the temperature values are the bad value.
+*     - A cache is implemented to allow previously calculated values to be
+*       returned. Calling the function with NULL hdr and a negative airmass
+*       will free the cache. The cache should be cleared between calls to the
+*       monolith.
 
 *  Authors:
 *     Andy Gibb (UBC)
@@ -76,6 +80,9 @@
 *        Include date in WVM conversion.
 *     2013-03-18 (DSB):
 *        Ensure VAL__BADD is returned if airmass cannot be determined.
+*     2013-07-22 (TIMJ):
+*        Add a cache so that previously calculate values can be returned
+*        immediately.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -111,6 +118,7 @@
 /* Starlink includes */
 #include "sae_par.h"
 #include "ast.h"
+#include "ast_err.h"
 #include "mers.h"
 #include "msg_par.h"
 #include "prm_par.h"
@@ -124,6 +132,8 @@
 /* WVM includes */
 #include "wvm/wvmCal.h"
 #include "wvm/wvmTau.h"
+
+static AstKeyMap * CACHE = NULL;
 
 double smf_calc_wvm( const smfHead *hdr, double approxam, AstKeyMap * extpars, int *status ) {
 
@@ -144,6 +154,32 @@ double smf_calc_wvm( const smfHead *hdr, double approxam, AstKeyMap * extpars, i
 
   /* Routine */
   if ( *status != SAI__OK) return VAL__BADD;
+
+  /* See if we are required to clear any cache */
+  if (!hdr && approxam != VAL__BADD && approxam < 0.0) {
+    if (CACHE) {
+      CACHE = astAnnul( CACHE );
+      return VAL__BADD;
+    }
+  }
+
+  /* do not allow null pointer */
+  if (!hdr) {
+    *status = SAI__ERROR;
+    errRep( "", "hdr is NULL for calc_wvm. Possible programming error.", status );
+    return VAL__BADD;
+  }
+
+  /* Sane airmass */
+  if (approxam < 1.000 && approxam != VAL__BADD) {
+    *status = SAI__ERROR;
+    errRep( "", "approxam has an invalid value. Must be >= 1.00 or BAD."
+            " Possible programming error.", status );
+    return VAL__BADD;
+  }
+
+  /* Initialise the cache */
+  if (!CACHE) CACHE = astKeyMap( "" );
 
   /* Store TCS info */
   state = hdr->state;
@@ -195,16 +231,39 @@ double smf_calc_wvm( const smfHead *hdr, double approxam, AstKeyMap * extpars, i
               status);
     } else {
       float rms;
+      struct timeval tv1, tv2;
+      char cachekey[100];
 
-      /* Get the pwv for this airmass */
-      wvmOpt( (float)airmass, (float)tamb, wvm, &pwv, &tau0, &twater, &rms);
+      /* This is quite a costly operation but is predictable given the inputs.
+         Therefore use a cache */
+      sprintf( cachekey, "%.4f-%.4f-%.4f-%.4f-%.4f",
+               airmass, tamb, wvm[0], wvm[1], wvm[2] );
 
-      /* Convert to zenith pwv */
-      pwv /= airmass;
+      if (astMapHasKey( CACHE, cachekey )) {
+        /* Get the value */
+        astMapGet0D( CACHE, cachekey, &tau225 );
 
-      /* convert zenith pwv to zenith tau */
-      tau225 = pwv2tau_bydate( wvmtime, pwv );
+      } else {
+        int usecache = 1;
 
+        if (*status == AST__OBJIN) {
+          usecache = 0;
+          errAnnul( status );
+        }
+
+        /* Get the pwv for this airmass */
+        wvmOpt( (float)airmass, (float)tamb, wvm, &pwv, &tau0, &twater, &rms);
+
+        /* Convert to zenith pwv */
+        pwv /= airmass;
+
+        /* convert zenith pwv to zenith tau */
+        tau225 = pwv2tau_bydate( wvmtime, pwv );
+
+        /* Store the result in the cache */
+        if (usecache) astMapPut0D( CACHE, cachekey, tau225, "" );
+
+      }
     }
   }
 
