@@ -255,10 +255,6 @@ typedef struct AstSkyFrameVtab {
    void (* ClearAlignOffset)( AstSkyFrame *, int * );
    void (* SetAlignOffset)( AstSkyFrame *, int, int * );
 
-/* Local Apparent Sidereal Time look-up tables. */
-   int nlast_tables;
-   AstSkyLastTable **last_tables;
-
 } AstSkyFrameVtab;
 
 #if defined(THREAD_SAFE)

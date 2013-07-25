@@ -317,6 +317,14 @@ f     - AST_SKYOFFSETMAP: Obtain a Mapping from absolute to offset coordinates
 *        - Correct astLoadSkyFrame function so that any axis permutation is
 *        taken into account when loading SkyFrame attributes that have a
 *        separate value for each axis.
+*     25-JUL-2013 (DSB):
+*        Use a single table of cached LAST values for all threads, rather
+*        than a separate table for each thread. The problem with a table per
+*        thread  is that if you have N threads, each table contains only
+*        one N'th of the total number of cached values, resulting in
+*        poorer accuracy, and small variations in interpolated LAST value
+*        depending on the way the cached values are distributed amongst the
+*        N threads.
 *class--
 */
 
@@ -826,6 +834,12 @@ static double deg2rad;
 static double pi;
 static double piby2;
 
+/* Table of cached Local Apparent Sidereal Time values and corresponding
+   epochs. */
+static int nlast_tables = 0;
+static AstSkyLastTable **last_tables = NULL;
+
+
 /* Define macros for accessing each item of thread specific global data. */
 #ifdef THREAD_SAFE
 
@@ -862,6 +876,14 @@ static pthread_mutex_t mutex2 = PTHREAD_MUTEX_INITIALIZER;
 #define LOCK_MUTEX2 pthread_mutex_lock( &mutex2 );
 #define UNLOCK_MUTEX2 pthread_mutex_unlock( &mutex2 );
 
+/* A read-write lock used to protect the table of cached LAST values so
+   that multiple threads can read simultaneously so long as no threads are
+   writing to the table. */
+static pthread_rwlock_t rwlock1=PTHREAD_RWLOCK_INITIALIZER;
+#define LOCK_WLOCK1 pthread_rwlock_wrlock( &rwlock1 );
+#define LOCK_RLOCK1 pthread_rwlock_rdlock( &rwlock1 );
+#define UNLOCK_RWLOCK1 pthread_rwlock_unlock( &rwlock1 );
+
 /* If thread safety is not needed, declare and initialise globals at static
    variables. */
 #else
@@ -895,8 +917,9 @@ static int class_init = 0;       /* Virtual function table initialised? */
 #define LOCK_MUTEX2
 #define UNLOCK_MUTEX2
 
-#define LOCK_MUTEX2
-#define UNLOCK_MUTEX2
+#define LOCK_WLOCK1
+#define LOCK_RLOCK1
+#define UNLOCK_RWLOCK1
 
 #endif
 
@@ -2887,7 +2910,6 @@ static double GetCachedLAST( AstSkyFrame *this, double epoch, double obslon,
 
 /* Local Variables: */
    astDECLARE_GLOBALS
-   AstSkyFrameVtab *vtab;
    AstSkyLastTable *table;
    double *ep;
    double *lp;
@@ -2907,13 +2929,14 @@ static double GetCachedLAST( AstSkyFrame *this, double epoch, double obslon,
 /* Check the global error status. */
    if ( !astOK ) return result;
 
-/* Get a pointer to the SkyFrame virtual function table. */
-   vtab = (AstSkyFrameVtab *) ((AstObject *) this)->vtab;
+/* Wait until the table is not being written to by any thread. This also
+   prevents a thread from writing to the table whilst we are reading it. */
+   LOCK_RLOCK1
 
 /* Loop round every LAST table held in the vtab. Each table refers to a
    different observatory position and/or DUT1 value. */
-   for( itable = 0; itable < vtab->nlast_tables; itable++ ) {
-      table = (vtab->last_tables)[ itable ];
+   for( itable = 0; itable < nlast_tables; itable++ ) {
+      table = last_tables[ itable ];
 
 /* See if the table refers to the given position and dut1 value, allowing
    some small tolerance. */
@@ -2981,6 +3004,9 @@ static double GetCachedLAST( AstSkyFrame *this, double epoch, double obslon,
          break;
       }
    }
+
+/* Indicate that threads may now write to the table. */
+   UNLOCK_RWLOCK1
 
 /* Ensure the returned value is within the range 0 - 2.PI. */
    if( result != AST__BAD ) {
@@ -4818,11 +4844,6 @@ void astInitSkyFrameVtab_(  AstSkyFrameVtab *vtab, const char *name, int *status
    astSetDelete( vtab, Delete );
    astSetDump( vtab, Dump, "SkyFrame",
                "Description of celestial coordinate system" );
-
-/* Initialise information about the tables of cached Local Apparent
-   Sidereal Time values stored in the vtab. */
-   vtab->nlast_tables = 0;
-   vtab->last_tables = NULL;
 
 /* Initialize constants for converting between hours, degrees and
    radians, etc.. */
@@ -8643,7 +8664,6 @@ static void SetCachedLAST( AstSkyFrame *this, double last, double epoch,
 
 /* Local Variables: */
    astDECLARE_GLOBALS
-   AstSkyFrameVtab *vtab;
    AstSkyLastTable *table;
    double *ep;
    double *lp;
@@ -8660,13 +8680,10 @@ static void SetCachedLAST( AstSkyFrame *this, double last, double epoch,
 /* Check the global error status. */
    if ( !astOK ) return;
 
-/* Get a pointer to the SkyFrame virtual function table. */
-   vtab = (AstSkyFrameVtab *) ((AstObject *) this)->vtab;
-
 /* Loop round every LAST table held in the vtab. Each table refers to a
    different observatory position and/or DUT1 value. */
-   for( itable = 0; itable < vtab->nlast_tables; itable++ ) {
-      table = (vtab->last_tables)[ itable ];
+   for( itable = 0; itable < nlast_tables; itable++ ) {
+      table = last_tables[ itable ];
 
 /* See if the table refers to the given position and dut1 value, allowing
    some small tolerance. If it does, leave the loop. */
@@ -8679,18 +8696,22 @@ static void SetCachedLAST( AstSkyFrame *this, double last, double epoch,
       table = NULL;
    }
 
+/* Ensure no threads are allowed to read the table whilst we are writing
+   to it. */
+   LOCK_RLOCK1
+
 /* If no table was found, create one now, and add it into the vtab cache. */
    if( !table ) {
 
       astBeginPM;
       table = astMalloc( sizeof( AstSkyLastTable ) );
-      itable = (vtab->nlast_tables)++;
-      vtab->last_tables = astGrow( vtab->last_tables, vtab->nlast_tables,
+      itable = nlast_tables++;
+      last_tables = astGrow( last_tables, nlast_tables,
                                    sizeof( AstSkyLastTable * ) );
       astEndPM;
 
       if( astOK ) {
-         (vtab->last_tables)[ itable ] = table;
+         last_tables[ itable ] = table;
          table->obslat = obslat;
          table->obslon = obslon;
          table->obsalt = obsalt;
@@ -8761,6 +8782,10 @@ static void SetCachedLAST( AstSkyFrame *this, double last, double epoch,
          }
       }
    }
+
+/* Indicate other threads are now allowed to read the table. */
+   UNLOCK_RWLOCK1
+
 }
 
 static void SetDut1( AstFrame *this_frame, double val, int *status ) {
