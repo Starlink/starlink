@@ -53,7 +53,7 @@
     mappings.
 
     Errors in the default intensity and colormaps have been fixed to remove a
-    discontinous change that could show up as a false contour (this has been
+    discontinuous change that could show up as a false contour (this has been
     present for many years).
 
     When connecting the coordinate system of a catalogue to that of the
@@ -221,7 +221,7 @@
 
     Short integer data types (FITS BITPIX 16 & -16, HDS _WORD & _UWORD) may
     now have data display limits outside those of the data type. Previously
-    these data types unexpectably wrapped or refused to extend the contrast
+    these data types unexpectedly wrapped or refused to extend the contrast
     when given limits outside the data range.
 
     The patch toolbox now says when you have not defined any background
@@ -422,7 +422,7 @@
     enhanced to offer a new "Browse" facility. This allows you to view
     any FITS extensions (HDUs) or NDFs also present at the same level
     in the container. Local catalogues can now also have the HDU number given
-    as part of their name (previously this effect could only be acheieved by
+    as part of their name (previously this effect could only be achieved by
     opening the FITS MEF as an image, selecting the catalogue using the HDU
     chooser and then loading the actual image).
 
