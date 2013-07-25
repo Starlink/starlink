@@ -157,10 +157,8 @@ double smf_calc_wvm( const smfHead *hdr, double approxam, AstKeyMap * extpars, i
 
   /* See if we are required to clear any cache */
   if (!hdr && approxam != VAL__BADD && approxam < 0.0) {
-    if (CACHE) {
-      CACHE = astAnnul( CACHE );
-      return VAL__BADD;
-    }
+    if (CACHE) CACHE = astAnnul( CACHE );
+    return VAL__BADD;
   }
 
   /* do not allow null pointer */
