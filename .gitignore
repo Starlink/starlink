@@ -705,6 +705,7 @@ applications/sgmlkit/misc/libdocs.sgml
 applications/sgmlkit/misc/misc.stamp
 
 applications/smurf/defaults/params.tex
+applications/smurf/defaults/make_pardocs
 applications/smurf/docs/sun258/sun258.pdf
 applications/smurf/libsmf/make_h
 applications/smurf/libsmf/smf.h
