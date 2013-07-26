@@ -38,7 +38,7 @@
     the item name. If you are using the hypertext version of this
     document, the most up-to-date document references can be found by
     following the link from the software item name.
-  </p></abstract>  
+  </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>

@@ -11,7 +11,7 @@
      describe how to gain access or obtain copies of selected data,
      and to guide potential users to Starlink software and
      documentation which can help in the analysis of the data.
-  </p></abstract>  
+  </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>

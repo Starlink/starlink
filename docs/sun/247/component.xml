@@ -5,7 +5,7 @@
 <component id="sun247">
   <version>1</version>
   <path>docs/sun/247</path>
-  <description>Starlink Standard Data Structures</description>
+  <description>XRT: ROSAT XRT Data Reduction</description>
   <abstract><p>
     XRT is a package for reducing data acquired with the ROSAT XRT
     instruments.  The XRT (X-Ray Telescope) was the principal
@@ -15,10 +15,10 @@
     operates on data produced by these instruments and can be used to
     transform them into calibrated images, spectra, time-series etc.
 
-   XRT was created by taking the ROSAT XRT-specific functions in the 
-   ASTERIX general X-ray astronomy data reduction system and 
+   XRT was created by taking the ROSAT XRT-specific functions in the
+   ASTERIX general X-ray astronomy data reduction system and
    re-packaging them as stand-alone applications.
-  </p></abstract>  
+  </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>

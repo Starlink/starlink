@@ -10,7 +10,7 @@
     This document describes the GNU EMACS editor as distributed by
     Starlink for UNIX systems. It is intended to provide an
     introduction for the new user.
-  </p></abstract>  
+  </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>

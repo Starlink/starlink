@@ -17,7 +17,7 @@
      and a variety of spectral atlases. It is not a general purpose
      computer, and users will not have permanent file space or private
      usernames allocated on it.
-  </p></abstract>  
+  </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>

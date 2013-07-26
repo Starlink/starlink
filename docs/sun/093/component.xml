@@ -17,7 +17,7 @@
 
     This manual is an introduction to the use of TeX on Starlink
     machines.
-  </p></abstract>  
+  </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>

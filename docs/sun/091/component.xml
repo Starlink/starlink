@@ -10,7 +10,7 @@
      This guide describes the IRAS Calibrated Raw Detector Data, how
      to access the data, and the programs available to process it and
      examine the results.
-  </p></abstract>  
+  </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>

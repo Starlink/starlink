@@ -25,7 +25,7 @@
      on object class, image number, camera, aperture, homogeneous ID,
      sky position or any combination of these attributes. Users in the
      UK will use the USSP on the Starlink database Microvax (STADAT).
-  </p></abstract>  
+  </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>

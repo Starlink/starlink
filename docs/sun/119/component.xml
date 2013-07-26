@@ -12,7 +12,7 @@
      systems. Applications written using the CHI and CHP routines will
      run on the current STARLINK database (ADC) and any future
      STARLINK database systems.
-  </p></abstract>  
+  </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>

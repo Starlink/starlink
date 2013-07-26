@@ -21,7 +21,7 @@
      databases. Some of these databases have data products associated
      with them, these may be plotted and analysed using software
      within the EXOSAT database system.
-  </p></abstract>  
+  </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>
