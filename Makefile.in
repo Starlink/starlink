@@ -121,8 +121,87 @@ ALL_TARGETS = \
 	$(MANIFESTS)/sc15 \
 	$(MANIFESTS)/sc17 \
 	$(MANIFESTS)/sc21 \
+	$(MANIFESTS)/sg4 \
+	$(MANIFESTS)/sg6 \
 	$(MANIFESTS)/sg8 \
-	$(MANIFESTS)/sg9
+	$(MANIFESTS)/sg9 \
+	$(MANIFESTS)/sg10 \
+	$(MANIFESTS)/sg12 \
+	$(MANIFESTS)/sgp1 \
+	$(MANIFESTS)/sgp2 \
+	$(MANIFESTS)/sgp4 \
+	$(MANIFESTS)/sgp7 \
+	$(MANIFESTS)/sgp12 \
+	$(MANIFESTS)/sgp16 \
+	$(MANIFESTS)/sgp21 \
+	$(MANIFESTS)/sgp25 \
+	$(MANIFESTS)/sgp28 \
+	$(MANIFESTS)/sgp31 \
+	$(MANIFESTS)/sgp38 \
+	$(MANIFESTS)/sgp41 \
+	$(MANIFESTS)/sgp42 \
+	$(MANIFESTS)/sgp44 \
+	$(MANIFESTS)/sgp45 \
+	$(MANIFESTS)/sgp47 \
+	$(MANIFESTS)/sgp49 \
+	$(MANIFESTS)/sgp50 \
+	$(MANIFESTS)/sgp51 \
+	$(MANIFESTS)/sgp52 \
+	$(MANIFESTS)/ssn3 \
+	$(MANIFESTS)/ssn6 \
+	$(MANIFESTS)/ssn7 \
+	$(MANIFESTS)/ssn8 \
+	$(MANIFESTS)/ssn18 \
+	$(MANIFESTS)/ssn22 \
+	$(MANIFESTS)/ssn23 \
+	$(MANIFESTS)/ssn24 \
+	$(MANIFESTS)/ssn26 \
+	$(MANIFESTS)/ssn27 \
+	$(MANIFESTS)/ssn30 \
+	$(MANIFESTS)/ssn31 \
+	$(MANIFESTS)/ssn32 \
+	$(MANIFESTS)/ssn33 \
+	$(MANIFESTS)/ssn36 \
+	$(MANIFESTS)/ssn37 \
+	$(MANIFESTS)/ssn39 \
+	$(MANIFESTS)/ssn64 \
+	$(MANIFESTS)/ssn67 \
+	$(MANIFESTS)/ssn75 \
+	$(MANIFESTS)/sun1 \
+	$(MANIFESTS)/sun9 \
+	$(MANIFESTS)/sun20 \
+	$(MANIFESTS)/sun30 \
+	$(MANIFESTS)/sun34 \
+	$(MANIFESTS)/sun58 \
+	$(MANIFESTS)/sun63 \
+	$(MANIFESTS)/sun73 \
+	$(MANIFESTS)/sun82 \
+	$(MANIFESTS)/sun91 \
+	$(MANIFESTS)/sun93 \
+	$(MANIFESTS)/sun101 \
+	$(MANIFESTS)/sun107 \
+	$(MANIFESTS)/sun119 \
+	$(MANIFESTS)/sun127 \
+	$(MANIFESTS)/sun145 \
+	$(MANIFESTS)/sun161 \
+	$(MANIFESTS)/sun162 \
+	$(MANIFESTS)/sun163 \
+	$(MANIFESTS)/sun165 \
+	$(MANIFESTS)/sun168 \
+	$(MANIFESTS)/sun169 \
+	$(MANIFESTS)/sun170 \
+	$(MANIFESTS)/sun172 \
+	$(MANIFESTS)/sun174 \
+	$(MANIFESTS)/sun189 \
+	$(MANIFESTS)/sun192 \
+	$(MANIFESTS)/sun197 \
+	$(MANIFESTS)/sun201 \
+	$(MANIFESTS)/sun202 \
+	$(MANIFESTS)/sun205 \
+	$(MANIFESTS)/sun207 \
+	$(MANIFESTS)/sun247 \
+	$(MANIFESTS)/sun249
+
 
 # The other important target is `buildsupport', the dependencies of
 # which are defined in the Makefile.dependencies which is included below.

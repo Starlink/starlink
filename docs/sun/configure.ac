@@ -15,7 +15,7 @@ AC_PROG_MAKE_SET
 dnl    The following list must be kept up-to-date by hand.
 dnl    The list is available as the substitution variable @subdirs@.
 dnl    (must be kept on one line)
-AC_CONFIG_SUBDIRS([009 058 063 073 101 107 145 161 162 163 165 168 169 170 172 174 189 192 197 201 202 205 207 248 249])
+AC_CONFIG_SUBDIRS([001 009 020 030 034 058 063 073 082 091 093 101 107 119 127 145 161 162 163 165 168 169 170 172 174 189 192 197 201 202 205 207 247 248 249])
 
 AC_CONFIG_FILES(Makefile)
 
