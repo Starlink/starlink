@@ -381,6 +381,9 @@ static AstFitsChan *smfMakeFC( int nx, int ny, int n, int p, double crpix1,
    sprintf( card, "RADESYS = 'ICRS'" );
    astPutFits( fc, card, 1 );
 
+   sprintf( card, "EPOCH   = 2013" );
+   astPutFits( fc, card, 1 );
+
 /* Return the result. */
    return fc;
 }
