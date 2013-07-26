@@ -4,7 +4,7 @@
 
 <component id="@PACKAGE@">
   <version>@PACKAGE_VERSION@</version>
-  <path>docs/sun/093</path>
+  <path>docs/obsolete/sun/093</path>
   <description>TeX --- A superior document preparation system</description>
   <abstract><p>
     TeX is an extremely flexible computer type-setting system designed

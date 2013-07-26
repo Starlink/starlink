@@ -2961,7 +2961,7 @@ $(MANIFESTS)/sun91: \
 
 $(MANIFESTS)/sun93: \
 		$(MANIFESTS)/star2html
-	cd docs/sun/093 \
+	cd docs/obsolete/sun/093 \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/surf: \

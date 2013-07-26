@@ -1945,6 +1945,39 @@ to handle data from a variety of different instruments.
 </component>
 
 
+<component id="sun93">
+  <version>3</version>
+  <path>docs/obsolete/sun/093</path>
+  <description>TeX --- A superior document preparation system</description>
+  <abstract><p>
+    TeX is an extremely flexible computer type-setting system designed
+    by Donald Knuth. The full capabilities of TeX are described by
+    its creator in `The TeX book' with the help of which the
+    enthusiastic TeX user can produce elaborate documents of almost
+    limitless complexity. However, unadventurous users can produce
+    ordinary documents with a minimum of effort; simple Runoff
+    files for example can be edited into TeX format very easily.
+
+    This manual is an introduction to the use of TeX on Starlink
+    machines.
+  </p></abstract>
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Jo Murray</name>
+      <name>Ann Charles</name>
+    </person>
+  </developers>
+  <documentation> sun93</documentation>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
+  <copyright>
+    <year>1989,1990,1995</year>
+    <name>SERC</name>
+  </copyright>
+</component>
+
 <component id="sc2">
   <version>3</version>
   <path>docs/sc/002</path>
@@ -4051,39 +4084,6 @@ to handle data from a variety of different instruments.
   <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year>1987,1989</year>
-    <name>SERC</name>
-  </copyright>
-</component>
-
-<component id="sun93">
-  <version>3</version>
-  <path>docs/sun/093</path>
-  <description>TeX --- A superior document preparation system</description>
-  <abstract><p>
-    TeX is an extremely flexible computer type-setting system designed
-    by Donald Knuth. The full capabilities of TeX are described by
-    its creator in `The TeX book' with the help of which the
-    enthusiastic TeX user can produce elaborate documents of almost
-    limitless complexity. However, unadventurous users can produce
-    ordinary documents with a minimum of effort; simple Runoff
-    files for example can be edited into TeX format very easily.
-
-    This manual is an introduction to the use of TeX on Starlink
-    machines.
-  </p></abstract>  
-  <dependencies >
-    <sourceset>star2html</sourceset>
-  </dependencies>
-  <developers>
-    <person>
-      <name>Jo Murray</name>
-      <name>Ann Charles</name>
-    </person>
-  </developers>
-  <documentation> sun93</documentation>
-  <bugreports>starlink@jiscmail.ac.uk</bugreports>
-  <copyright>
-    <year>1989,1990,1995</year>
     <name>SERC</name>
   </copyright>
 </component>
