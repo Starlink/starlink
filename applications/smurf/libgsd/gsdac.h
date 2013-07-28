@@ -61,6 +61,8 @@
 *        Add gsdac_printHdr.
 *     2008-04-22 (JB):
 *        Add gsdac_flagBad.
+*     2013-07-28 (TIMJ):
+*        Add gsdac_getRealInstrumentName
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -278,6 +280,14 @@ const gsdVars *gsdVars, /* GSD headers and arrays (given) */
 const char *samMode, /* sampling mode (given) */
 mapVars *mapVars,    /* map/chop/scan variables (given and returned) */
 int *status          /* global status (given and returned) */
+);
+
+void gsdac_getRealInstrumentName
+(
+const gsdVars *gsdVars, /* GSD headers and arrays (given) */
+char * instrume,        /* Buffer to receive instrument name (given and returned) */
+size_t instrumelen,     /* Size of instrume (given) */
+int *status             /* global status (given and returned) */
 );
 
 void gsdac_getRecepNames

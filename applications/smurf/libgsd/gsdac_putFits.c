@@ -143,6 +143,9 @@
 *        Add additional continuum-recipe objects.
 *     2013 June 7 (MJC):
 *        Add focus recipe.
+*     2013-07-28 (TIMJ):
+*        Use frontend translation routine to get real instrument name.
+*        Do not assume that "RXB" always has 2 receptors.
 
 *  Copyright:
 *     Copyright (C) 2008-2013 Science and Technology Facilities Council.
@@ -353,12 +356,17 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
 
   /* FE Specific. */
 
-  /* Truncate the name of the frontend. */
-  cnfImprt ( gsdVars->frontend, 16, instrume );
+  /* We need to take the opportunity to correct the frontend name.
+     In many cases, especially in B-band, the instrument names are
+     incorrect. */
+  gsdac_getRealInstrumentName( gsdVars, instrume, sizeof(instrume), status );
 
-  /* Get the number of mixers, 2 for RXB & RXW, 1 for others. */
-  if ( strncmp ( "RXB", gsdVars->frontend, 3 ) == 0 ||
-       strncmp ( "RXW", gsdVars->frontend, 3 ) == 0 ) {
+  /* Get the number of mixers, 2 for RXB3 & RXW, 1 for others.
+     but note that RXB3I has 1. We know that instrume is nul-terminated.
+     Both RXWC and RXWD have two mixers so just check first 3 characters.
+  */
+  if ( strcmp ( "RXB3", instrume ) == 0 ||
+       strncmp ( "RXW", instrume, 3 ) == 0 ) {
     nMix = 2;
   } else {
     nMix = 1;

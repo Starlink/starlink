@@ -12,6 +12,7 @@ gsdac_getDASFlag.c \
 gsdac_getDateVars.c \
 gsdac_getGSDVars.c \
 gsdac_getMapVars.c \
+gsdac_getRealInstrumentName.c \
 gsdac_getRecepNames.c \
 gsdac_getSampleMode.c \
 gsdac_getStartIdx.c \
