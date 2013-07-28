@@ -157,7 +157,13 @@ double smf_calc_wvm( const smfHead *hdr, double approxam, AstKeyMap * extpars, i
 
   /* See if we are required to clear any cache */
   if (!hdr && approxam != VAL__BADD && approxam < 0.0) {
-    if (CACHE) CACHE = astAnnul( CACHE );
+    if (CACHE) {
+      CACHE = astAnnul( CACHE );
+      /* if we got an error ignore it. An error would indicate that we
+         somehow instantiated the cache in a different thread to the one we
+         are using to free it. */
+      if (*status == AST__OBJIN) errAnnul( status );
+    }
     return VAL__BADD;
   }
 
@@ -249,8 +255,13 @@ double smf_calc_wvm( const smfHead *hdr, double approxam, AstKeyMap * extpars, i
           errAnnul( status );
         }
 
+        smf_timerinit(&tv1,&tv2,status);
+
         /* Get the pwv for this airmass */
         wvmOpt( (float)airmass, (float)tamb, wvm, &pwv, &tau0, &twater, &rms);
+
+        printf("Called wvmOpt with %g %g %g %g : %.5f s\n", airmass, wvm[0], wvm[1], wvm[2],
+               smf_timerupdate(&tv1,&tv2,status));
 
         /* Convert to zenith pwv */
         pwv /= airmass;
