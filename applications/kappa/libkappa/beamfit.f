@@ -73,8 +73,8 @@
 *                        mode
 
 *  ADAM Parameters:
-*     AMP( 2 ) = _DOUBLE (Write)
-*        The primary beam position's amplitude and its error.
+*     AMP( 2 * BEAMS ) = _DOUBLE (Write)
+*        The amplitude and its error for each beam.
 *     AMPRATIO( ) = _REAL (Read)
 *        If number of beam positions given by BEAMS is more than one,
 *        this specifies the ratio of the amplitude of the secondary
@@ -83,8 +83,8 @@
 *        ratio  is copied to the missing values.  The ratios would
 *        normally be negative, usually -1 or -0.5.  AMPRATIO is ignored
 *        when there is only one beam feature to fit.  [!]
-*     BACK( 2 ) = _DOUBLE (Write)
-*        The primary beam position's background level and its error.
+*     BACK( 2 * BEAMS ) = _DOUBLE (Write)
+*        The background level and its error at each beam position.
 *     BEAMS = _INTEGER (Read)
 *        The number of beam positions to fit.  This will normally be 1,
 *        unless a chopped observation is supplied, when there may be two
@@ -95,9 +95,9 @@
 *        on the command line without BEAMS.  In all modes there is a
 *        maximum of five positions, which for "File" or "Catalogue"
 *        modes will be the first five.  [1]
-*     CENTRE( 2 ) = LITERAL (Write)
-*        The formatted co-ordinates and their errors of the primary
-*        beam in the current co-ordinate Frame of the NDF.
+*     CENTRE( 2 * BEAMS ) = LITERAL (Write)
+*        The formatted co-ordinates and their errors of each beam in
+*        the current co-ordinate Frame of the NDF.
 *     CIRCULAR = _LOGICAL (Read)
 *        If set TRUE only circular beams will be fit.   [FALSE]
 *     COIN = FILENAME (Read)
@@ -181,7 +181,7 @@
 *        Null requests that BEAMFIT itself estimates the initial FWHM
 *        values.  [!]
 *     GAMMA( 2 ) = _DOUBLE (Write)
-*        The primary beam position's shape exponent and its error.
+*        The shape exponent and its error for each beam.
 *     GAUSS = _LOGICAL (Read)
 *        If TRUE, the shape exponent is fixed to be 2; in other words
 *        the beams are modelled as two-dimensional normal distributions.
@@ -197,8 +197,8 @@
 *        will be no logging.  Note this is intended for the human reader
 *        and is not intended for passing to other applications.  [!]
 *     MAJFWHM( 2 ) = _DOUBLE (Write)
-*         The primary beam position's major-axis FWHM and its error,
-*         measured in the current co-ordinate Frame of the NDF.
+*         The major-axis FWHM and its error, measured in the current
+*         co-ordinate Frame of the NDF, for each beam.
 *     MARK = LITERAL (Read)
 *        Only accessed if Parameter MODE is given the value "Cursor".
 *        It indicates which positions are to be marked on the screen
@@ -224,8 +224,8 @@
 *        dot, 2 gives a cross, 3 gives an asterisk, 7 gives a triangle.
 *        The value must be larger than or equal to -31.  [current value]
 *     MINFWHM( 2 ) = _DOUBLE (Write)
-*        The primary beam position's minor-axis FWHM and its error,
-*        measured in the current co-ordinate Frame of the NDF.
+*        The minor-axis FWHM and its error, measured in the current
+*        co-ordinate Frame of the NDF, for each beam.
 *     MODE = LITERAL (Read)
 *        The mode in which the initial co-ordinates are to be obtained.
 *        The supplied string can be one of the following values.
@@ -256,9 +256,9 @@
 *        number of values stored is twice the number of beams.  The
 *        array alternates an offset, then its corresponding error,
 *        appearing in beam order starting with the first secondary beam.
-*     ORIENT( 2 ) = _DOUBLE (Write)
-*        The primary beam position's orientation and its error, measured
-*        in degrees.  If the current WCS frame is a SKY Frame, the angle
+*     ORIENT( 2 * BEAMS ) = _DOUBLE (Write)
+*        The orientation and its error, measured in degrees for each
+*        beam.  If the current WCS frame is a SKY Frame, the angle
 *        is measured from North through East.  For other Frames the
 *        angle is from the X-axis through Y.
 *     PA() = _REAL (Write)
@@ -362,7 +362,7 @@
 *     REFOFF( 2 ) = LITERAL (Write)
 *        The formatted offset followed by its error of the primary
 *        beam's location with respect to the reference position (see
-*        Parameter REFPOS).  The offset  might be used to assess the
+*        Parameter REFPOS).  The offset might be used to assess the
 *        optical alignment of an instrument.  The ofset and its error
 *        are measured in the current Frame of the NDF along a latitude
 *        axis if that Frame is in the SKY Domain, or the first axis
@@ -603,6 +603,9 @@
 *        Add CIRCULAR parameter and set new COMMON constraint flag.
 *        Extended FIXFWHM to FWHM to encompass initial guesses.  Made new
 *        _LOGICAL FIXFWHM parameter solely to set fixed FWHM values.
+*     2013 July 29 (MJC):
+*        Seven output parameters now record the fit statistics for all
+*        beams, not just for the primary.
 *     {enter_further_changes_here}
 
 *-

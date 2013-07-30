@@ -15,10 +15,10 @@
 *                     POLAR, POLSIG, RMS, STATUS )
 
 *  Description:
-*     The supplied generalised Gaussian parameters from BEAMFIT are 
-*     written to the environment.  Each output parameter is a two-element
-*     vector containing the fit coefficient in the first element, and its
-*     error in the second, applicable to the primary beam.
+*     The supplied generalised Gaussian parameters from BEAMFIT are
+*     written to the environment.  Each output parameter is a vector
+*     containing pairs of elements for each beam.  The first of each
+*     pair is the fit coefficient, and its error is in the second.
 *
 *     The parameters written are as follows.
 *
@@ -65,12 +65,10 @@
 *     P( NP ) = DOUBLE PRECISION (Given)
 *        The fit parameters.  Spatial co-ordinates should be measured
 *        in the reporting Frame.  See KPS1_BFCRF to convert from
-*        PIXEL co-ordinates.  Only the first BF_MXCOEF elements are
-*        used.
+*        PIXEL co-ordinates.
 *     SIGMA( NP ) = DOUBLE PRECISION (Given)
 *        The errors in the fit parameters.   Spatial co-ordinates should
-*        be measured in the reporting Frame.  Only the first BF_MXCOEF
-*        elements are used.
+*        be measured in the reporting Frame.
 *     NBEAM = INTEGER (Given)
 *        The number of beam positions.
 *     REFOFF( 2 ) = DOUBLE PRECISION (Given)
@@ -147,6 +145,8 @@
 *        Removed no-longer-used argument MAP.
 *     2013 July 16 (MJC):
 *        Use circular constraint.
+*     2013 July 29 (MJC):
+*        Output parameters for every beam.
 *     {enter_further_changes_here}
 
 *-
@@ -185,7 +185,7 @@
 
 *  Local Constants:
       INTEGER BUFSIZ             ! Buffers' dimension
-      PARAMETER ( BUFSIZ = 2 * ( BF__MXPOS - 1 ) )
+      PARAMETER ( BUFSIZ = 2 * BF__MXPOS )
 
       DOUBLE PRECISION PI
       PARAMETER ( PI = 3.1415926535898 )
@@ -196,6 +196,7 @@
 *  Local Variables:
       CHARACTER*9 ATTR           ! Buffer for attribute name
       CHARACTER*50 AXVAL         ! A formatted axis value
+      INTEGER BOFF               ! Buffer offset for each beam
       CHARACTER*12 FMAT( 2 )     ! SkyFrame format
       INTEGER IAT                ! No. of characters currently in buffer
       INTEGER IB                 ! Beam loop counter
@@ -204,10 +205,12 @@
       INTEGER K                  ! Loop count
       INTEGER LAT                ! Index to latitude axis in SkyFrame
       CHARACTER*128 LINE( BUFSIZ ) ! Buffer for output text
-      DOUBLE PRECISION S2FWHM    ! Sigma-to-FWHM conversion
+      INTEGER NEL                ! Number of output-parameter elements
+      INTEGER POFF               ! Offset for each beam's fit parameters
       INTEGER PREC( 2 )          ! Number of digits of precision
+      DOUBLE PRECISION S2FWHM    ! Sigma-to-FWHM conversion
       LOGICAL TIME( 2 )          ! Coordinates formatted as times?
-      DOUBLE PRECISION WORK( 2 ) ! Work array for storing values
+      DOUBLE PRECISION WORK( BUFSIZ ) ! Work array for storing values
                                  ! and errors
       REAL WORKER( BUFSIZ )      ! Work array for storing values
                                  ! and errors
@@ -257,68 +260,93 @@
 *  Now write the primary-beam position out to the output parameters.
 *  The complete set of axis values (separated by spaces) is written to
 *  a buffer.
-      IAT = 0
-      LINE( 1 ) = ' '
+      DO IB = 1, NBEAM
+         BOFF = ( IB - 1 ) * 2
+         POFF = ( IB - 1 ) * BF__NCOEF
+         IAT = 0
+         LINE( 1 + BOFF ) = ' '
 
-      DO J = 1, NAXR
-         AXVAL = AST_FORMAT( RFRM, J, P( J ), STATUS )
-         CALL CHR_APPND( AXVAL, LINE( 1 ), IAT )
-         IAT = IAT + 1
-      END DO
+         DO J = 1, NAXR
+            AXVAL = AST_FORMAT( RFRM, J, P( J + POFF ), STATUS )
+            CALL CHR_APPND( AXVAL, LINE( 1 + BOFF ), IAT )
+            IAT = IAT + 1
+         END DO
 
 *  Record the errors in the second element of the buffer.
-      IAT = 0
-      LINE( 2 ) = ' '
-      DO J = 1, NAXR
-         IF ( SIGMA( J ) .NE. VAL__BADD ) THEN
-            AXVAL = AST_FORMAT( RFRM, J, SIGMA( J ), STATUS )
-         ELSE
-            AXVAL = 'bad'
-         END IF
-         CALL CHR_APPND( AXVAL, LINE( 2 ), IAT )
-         IAT = IAT + 1
+         IAT = 0
+         LINE( 2 + BOFF ) = ' '
+         DO J = 1, NAXR
+            IF ( SIGMA( J ) .NE. VAL__BADD ) THEN
+               AXVAL = AST_FORMAT( RFRM, J, SIGMA( J + POFF ), STATUS )
+            ELSE
+               AXVAL = 'bad'
+            END IF
+            CALL CHR_APPND( AXVAL, LINE( 2 + BOFF ), IAT )
+            IAT = IAT + 1
+         END DO
       END DO
 
 *  Record the formattd co-ordinates and correspending errors in the
 *  output parameter.
-      CALL PAR_PUT1C( 'CENTRE', 2, LINE, STATUS )
+      CALL PAR_PUT1C( 'CENTRE', 2 * NBEAM, LINE, STATUS )
 
 *  FWHMs
 *  =====
       S2FWHM = SQRT( 8.D0 * LOG( 2.D0 ) )
 
-      WORK( 1 ) = P( 3 ) * S2FWHM
-      WORK( 2 ) = SIGMA( 3 ) * S2FWHM
-      CALL PAR_PUT1D( 'MAJFWHM', 2, WORK, STATUS )
+      DO IB = 1, NBEAM
+         BOFF = ( IB - 1 ) * 2
+         POFF = ( IB - 1 ) * BF__NCOEF
+         WORK( 1 + BOFF ) = P( 3 + POFF ) * S2FWHM
+         WORK( 2 + BOFF ) = SIGMA( 3 + POFF ) * S2FWHM
+      END DO
+      CALL PAR_PUT1D( 'MAJFWHM', 2 * NBEAM, WORK, STATUS )
 
-      WORK( 1 ) = P( 4 ) * S2FWHM
-      WORK( 2 ) = SIGMA( 4 ) * S2FWHM
-      CALL PAR_PUT1D( 'MINFWHM', 2, WORK, STATUS )
+      DO IB = 1, NBEAM
+         BOFF = ( IB - 1 ) * 2
+         POFF = ( IB - 1 ) * BF__NCOEF
+         WORK( 1 + BOFF ) = P( 4 + POFF ) * S2FWHM
+         WORK( 2 + BOFF ) = SIGMA( 4 + POFF ) * S2FWHM
+      END DO
+      NEL = 2 * NBEAM
+      CALL PAR_PUT1D( 'MINFWHM', NEL, WORK, STATUS )
 
 *  ORIENT
 *  ======
 
 * Convert to degrees.  May need a +/- 90 later...
-      IF ( CIRC ) THEN
-         WORK( 1 ) = 0.0D0
-         WORK( 2 ) = 0.0D0
-      ELSE
-         WORK( 1 ) = P( 5 ) * R2D
-         WORK( 2 ) = SIGMA( 5 ) * R2D
-      END IF
-      CALL PAR_PUT1D( 'ORIENT', 2, WORK, STATUS )
+      DO IB = 1, NBEAM
+         BOFF = ( IB - 1 ) * 2
+         POFF = ( IB - 1 ) * BF__NCOEF
+         IF ( CIRC ) THEN
+            WORK( 1 + BOFF ) = 0.0D0
+            WORK( 2 + BOFF ) = 0.0D0
+         ELSE
+            WORK( 1 + BOFF ) = P( 5 + POFF ) * R2D
+            WORK( 2 + BOFF ) = SIGMA( 5 + POFF ) * R2D
+         END IF
+      END DO
+      CALL PAR_PUT1D( 'ORIENT', NEL, WORK, STATUS )
 
 *  AMP
 *  ===
-      WORK( 1 ) = P( 6 )
-      WORK( 2 ) = SIGMA( 6 )
-      CALL PAR_PUT1D( 'AMP', 2, WORK, STATUS )
+      DO IB = 1, NBEAM
+         BOFF = ( IB - 1 ) * 2
+         POFF = ( IB - 1 ) * BF__NCOEF
+         WORK( 1 + BOFF ) = P( 6 + POFF )
+         WORK( 2 + BOFF ) = SIGMA( 6 + POFF )
+      END DO
+      CALL PAR_PUT1D( 'AMP', NEL, WORK, STATUS )
 
 *  BACK
 *  ====
-      WORK( 1 ) = P( 7 )
-      WORK( 2 ) = SIGMA( 7 )
-      CALL PAR_PUT1D( 'BACK', 2, WORK, STATUS )
+      DO IB = 1, NBEAM
+         BOFF = ( IB - 1 ) * 2
+         POFF = ( IB - 1 ) * BF__NCOEF
+         WORK( 1 + BOFF ) = P( 7 + POFF )
+         WORK( 2 + BOFF ) = SIGMA( 7 + POFF )
+      END DO
+      CALL PAR_PUT1D( 'BACK', NEL, WORK, STATUS )
 
 *  RMS
 *  ===
@@ -326,9 +354,13 @@
 
 *  GAMMA
 *  =====
-      WORK( 1 ) = P( 8 )
-      WORK( 2 ) = SIGMA( 8 )
-      CALL PAR_PUT1D( 'GAMMA', 2, WORK, STATUS )
+      DO IB = 1, NBEAM
+         BOFF = ( IB - 1 ) * 2
+         POFF = ( IB - 1 ) * BF__NCOEF
+         WORK( 1 + BOFF ) = P( 8 + POFF )
+         WORK( 2 + BOFF ) = SIGMA( 8 + POFF )
+      END DO
+      CALL PAR_PUT1D( 'GAMMA', NEL, WORK, STATUS )
 
 *  OFFSET of primary beam
 *  ======================

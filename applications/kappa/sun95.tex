@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.40}
 \newcommand{\stardocnumber}    {95.40}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2013 July 16}
+\newcommand{\stardocdate}      {2013 July 29}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {2.1}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -15569,37 +15569,37 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
    }
    \sstresparameters{
       \sstsubsection{
-         AMP( 2 ) = \_DOUBLE (Write)
+         AMP( 2 * BEAMS ) = \_DOUBLE (Write)
       }{
-         The primary beam position's amplitude and its error.
+         The amplitude and its error for each beam.
       }
       \sstsubsection{
-         BACK( 2 ) = \_DOUBLE (Write)
+         BACK( 2 * BEAMS ) = \_DOUBLE (Write)
       }{
-         The primary beam position's background level and its error.
+         The background level and its error at each beam position.
       }
       \sstsubsection{
-         CENTRE( 2 ) = LITERAL (Write)
+         CENTRE( 2 * BEAMS ) = LITERAL (Write)
       }{
-         The formatted co-ordinates and their errors of the primary
-         beam in the current co-ordinate Frame of the NDF.
+         The formatted co-ordinates and their errors of each beam in
+         the current co-ordinate Frame of the NDF.
       }
       \sstsubsection{
-         GAMMA( 2 ) = \_DOUBLE (Write)
+         GAMMA( 2 * BEAMS ) = \_DOUBLE (Write)
       }{
-         The primary beam position's shape exponent and its error.
+         The shape exponent and its error for each beam.
       }
       \sstsubsection{
-         MAJFWHM( 2 ) = \_DOUBLE (Write)
+         MAJFWHM( 2 * BEAMS ) = \_DOUBLE (Write)
       }{
-         The primary beam position's major-axis FWHM and its error,
-         measured in the current co-ordinate Frame of the NDF.
+         The major-axis FWHM and its error, measured in the current
+         co-ordinate Frame of the NDF, for each beam.
       }
       \sstsubsection{
-         MINFWHM( 2 ) = \_DOUBLE (Write)
+         MINFWHM( 2 * BEAMS ) = \_DOUBLE (Write)
       }{
-         The primary beam position's minor-axis FWHM and its error,
-         measured in the current co-ordinate Frame of the NDF.
+         The minor-axis FWHM and its error, measured in the current
+         co-ordinate Frame of the NDF, for each beam.
       }
       \sstsubsection{
          OFFSET( ) = LITERAL (Write)
@@ -15613,10 +15613,10 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          appearing in beam order starting with the first secondary beam.
       }
       \sstsubsection{
-         ORIENT( 2 ) = \_DOUBLE (Write)
+         ORIENT( 2 * BEAMS ) = \_DOUBLE (Write)
       }{
-         The primary beam position's orientation and its error, measured
-         in degrees.  If the \htmlref{current WCS Frame}{se:curframe}~ is a SKY Frame,
+         The orientation and its error, measured in degrees for each
+         beam.  If the \htmlref{current WCS Frame}{se:curframe}~ is a SKY Frame,
          the angle is measured from North through East.  For other Frames the
          angle is from the \textit{x}-axis through \textit{y}.
       }
@@ -59192,6 +59192,8 @@ The following applications have been modified:
 	thus there is no minor axis and orientation derived.  In
 	combination it is possible to give a list of circular or
 	elliptical FWHMs.
+        \item The output parameters now store the statistics of every
+        fitted beam, not just those of the primary beam.
       \end{itemize}
    \item [\htmlref{DISPLAY}{DISPLAY}]\mbox{}
       \begin{itemize}

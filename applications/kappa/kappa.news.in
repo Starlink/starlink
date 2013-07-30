@@ -18,6 +18,9 @@
       values should be fixed.  FWHM allows you to set actual sizes or
       initial guesses.
 
+      -  The output parameters now store the statistics of every
+      fitted beam, not just those of the primary beam.
+
    o  DISPLAY
 
       -  The MODE parameter can now be set to "Current" to force the
