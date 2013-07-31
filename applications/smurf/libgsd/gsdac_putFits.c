@@ -146,6 +146,9 @@
 *     2013-07-28 (TIMJ):
 *        Use frontend translation routine to get real instrument name.
 *        Do not assume that "RXB" always has 2 receptors.
+*     2013-07-30 (TIMJ):
+*        Trap bad seeing and tau values so that they can be correctly
+*        stored as undef FITS headers.
 
 *  Copyright:
 *     Copyright (C) 2008-2013 Science and Technology Facilities Council.
@@ -231,6 +234,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   char recipe[25];            /* ORAC-DR recipe name */
   char recptors[SZFITSTR];    /* active FE receptor IDs for this obs */
   double refChan;             /* reference IF channel no. */
+  int seeingok;               /* True if the seeing measurement is okay */
   char seeDatSt[SZFITSTR];    /* time of seeingSt in format
                                  YYYY-MM-DDTHH:MM:SS */
   char sSysObs[SZFITSTR];     /* spectral ref. frame during observation */
@@ -240,6 +244,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   int stBetRef_defined;       /* Use the stBetRef value? */
   double stepTime;            /* RTS step time */
   char subBands[SZFITSTR];    /* ACSIS sub-band set-up */
+  int tauok;                  /* True if the tau measurement is okay */
   char tauDatSt[SZFITSTR];    /* time of tau225St observation in
                                  format YYYY-MM-DDTHH:MM:SS */
   const char *transiti;       /* target transition for molecule */
@@ -400,48 +405,68 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
 
   /* Environmental data. */
 
-  /* Convert dates from YYMMDDHHMMSS to
-     YYYY-MM-DDTHH:MM:SS. */
-  parse = sscanf ( gsdVars->tauTime, "%02d%02d%02d%02d%02d", &year,
-                   &month, &day, &hour, &min );
+  /* The GSD magic value for bad seeing and tau seems to be VAL__BADR */
 
-  if ( parse == 0 || parse == EOF ) {
+  tauDatSt[0] = '\0'; /* make sure it is initialised */
 
-    msgOutf ( FUNC_NAME, "Couldn't convert CSO tau time of '%s', continuing anyway.",
-              status, gsdVars->tauTime );
-    strcpy ( tauDatSt, "" );
+  if (gsdVars->tau225 == VAL__BADR) {
+    tauok = 0;
 
   } else {
+    tauok = 1;
 
-    /* Inelegant method to get YYYY from YY. */
-    if ( year > 70 ) year = year + 1900;
-    else year = year + 2000;
+    /* Convert dates from YYMMDDHHMMSS to
+       YYYY-MM-DDTHH:MM:SS. */
+    parse = sscanf ( gsdVars->tauTime, "%02d%02d%02d%02d%02d", &year,
+                     &month, &day, &hour, &min );
 
-    sprintf ( tauDatSt, "%04d-%02d-%02dT%02d:%02d:00",
-              year, month, day, hour, min );
+    if ( parse == 0 || parse == EOF ) {
 
+      msgOutf ( FUNC_NAME, "Couldn't convert CSO tau time of '%s', continuing anyway.",
+                status, gsdVars->tauTime );
+
+    } else {
+
+      /* Inelegant method to get YYYY from YY. */
+      if ( year > 70 ) year = year + 1900;
+      else year = year + 2000;
+
+      sprintf ( tauDatSt, "%04d-%02d-%02dT%02d:%02d:00",
+                year, month, day, hour, min );
+
+    }
   }
 
+  /* The GSD magic value for bad seeing and tau seems to be VAL__BADR */
 
-  /* Convert dates from YYMMDDHHMMSS to
-     YYYY-MM-DDTHH:MM:SS. */
-  parse = sscanf ( gsdVars->seeTime, "%02d%02d%02d%02d%02d", &year,
-                   &month, &day, &hour, &min );
+  seeDatSt[0] = '\0'; /* Make sure it is initialised */
 
-  if ( parse == 0 || parse == EOF ) {
-    msgOutiff(MSG__VERB," ",
-	     "Couldn't convert seeing time of '%s', continuing anyway.", status,
-             gsdVars->seeTime );
-    strcpy ( seeDatSt, "" );
+  if (gsdVars->seeing == VAL__BADR) {
+    seeingok = 0;
+
   } else {
+    seeingok = 1;
 
-    /* Kludge to get YYYY from YY. */
-    if ( year > 70 ) year = year + 1900;
-    else year = year + 2000;
+    /* Convert dates from YYMMDDHHMMSS to
+       YYYY-MM-DDTHH:MM:SS. */
+    parse = sscanf ( gsdVars->seeTime, "%02d%02d%02d%02d%02d", &year,
+                     &month, &day, &hour, &min );
 
-    sprintf ( seeDatSt, "%04d-%02d-%02dT%02d:%02d:00",
-           year, month, day, hour, min );
+    if ( parse == 0 || parse == EOF ) {
+      msgOutiff(MSG__VERB," ",
+                "Couldn't convert seeing time of '%s', continuing anyway.", status,
+                gsdVars->seeTime );
 
+    } else {
+
+      /* Kludge to get YYYY from YY. */
+      if ( year > 70 ) year = year + 1900;
+      else year = year + 2000;
+
+      sprintf ( seeDatSt, "%04d-%02d-%02dT%02d:%02d:00",
+                year, month, day, hour, min );
+
+    }
   }
 
   /* JOS parameters */
@@ -788,17 +813,34 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
 
   astSetFitsU ( fitschan, "WNDDIREN", "[deg] Wind direction, azimuth at obs end", 0 );
 
-  astSetFitsF ( fitschan, "TAU225ST", gsdVars->tau225,
-		"Tau at 225 GHz from CSO at start", 0 );
+  if (tauok) {
+    astSetFitsF ( fitschan, "TAU225ST", gsdVars->tau225,
+                  "Tau at 225 GHz from CSO at start", 0 );
 
-  astSetFitsF ( fitschan, "TAU225EN", gsdVars->tau225,
-		"Tau at 225 GHz from CSO at end", 0 );
+    astSetFitsF ( fitschan, "TAU225EN", gsdVars->tau225,
+                  "Tau at 225 GHz from CSO at end", 0 );
+  } else {
+    astSetFitsU ( fitschan, "TAU225ST",
+                  "Tau at 225 GHz from CSO at start", 0 );
 
-  astSetFitsS ( fitschan, "TAUDATST", tauDatSt,
-		"Time of TAU225ST observation", 0 );
+    astSetFitsU ( fitschan, "TAU225EN",
+                  "Tau at 225 GHz from CSO at end", 0 );
+  }
 
-  astSetFitsS ( fitschan, "TAUDATEN", tauDatSt,
-		"Time of TAU225EN observation", 0 );
+  if (tauok && tauDatSt[0]) {
+    astSetFitsS ( fitschan, "TAUDATST", tauDatSt,
+                  "Time of TAU225ST observation", 0 );
+
+    astSetFitsS ( fitschan, "TAUDATEN", tauDatSt,
+                  "Time of TAU225EN observation", 0 );
+  } else {
+    astSetFitsU ( fitschan, "TAUDATST",
+                  "Time of TAU225ST observation", 0 );
+
+    astSetFitsU ( fitschan, "TAUDATEN",
+                  "Time of TAU225EN observation", 0 );
+  }
+
 
   astSetFitsS ( fitschan, "TAUSRC", "CSO225GHZ",
 		"Source of the TAU225 value", 0 );
@@ -811,17 +853,35 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
 
   astSetFitsU ( fitschan, "WVMDATEN", "Time of WVMTAUEN", 0 );
 
-  astSetFitsF ( fitschan, "SEEINGST", gsdVars->seeing,
-		"[arcsec] SAO atmospheric seeing (start)", 0 );
+  if ( seeingok ) {
+    astSetFitsF ( fitschan, "SEEINGST", gsdVars->seeing,
+                  "[arcsec] SAO atmospheric seeing (start)", 0 );
 
-  astSetFitsF ( fitschan, "SEEINGSEN", gsdVars->seeing,
-		"[arcsec] SAO atmospheric seeing (end)", 0 );
+    astSetFitsF ( fitschan, "SEEINGSEN", gsdVars->seeing,
+                  "[arcsec] SAO atmospheric seeing (end)", 0 );
 
-  astSetFitsS ( fitschan, "SEEDATST", seeDatSt,
-		"Date/Time of SEEINGST", 0 );
+  } else {
+    /* Use undefined header value if there was no measurement */
+    astSetFitsU ( fitschan, "SEEINGST",
+                  "[arcsec] SAO atmospheric seeing (start)", 0 );
 
-  astSetFitsS ( fitschan, "SEEDATEN", seeDatSt,
-		"Date/Time of SEEINGEN", 0 );
+    astSetFitsU ( fitschan, "SEEINGSEN",
+                  "[arcsec] SAO atmospheric seeing (end)", 0 );
+  }
+
+  if (seeingok && seeDatSt[0] ) {
+    astSetFitsS ( fitschan, "SEEDATST", seeDatSt,
+                  "Date/Time of SEEINGST", 0 );
+
+    astSetFitsS ( fitschan, "SEEDATEN", seeDatSt,
+                  "Date/Time of SEEINGEN", 0 );
+  } else {
+    astSetFitsU ( fitschan, "SEEDATST",
+                  "Date/Time of SEEINGST", 0 );
+
+    astSetFitsU ( fitschan, "SEEDATEN",
+                  "Date/Time of SEEINGEN", 0 );
+  }
 
   astSetFitsU ( fitschan, "FRLEGTST", "[degC] Mean Front leg temperature - Start", 0 );
 
