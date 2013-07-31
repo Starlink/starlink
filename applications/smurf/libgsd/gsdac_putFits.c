@@ -857,7 +857,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
     astSetFitsF ( fitschan, "SEEINGST", gsdVars->seeing,
                   "[arcsec] SAO atmospheric seeing (start)", 0 );
 
-    astSetFitsF ( fitschan, "SEEINGSEN", gsdVars->seeing,
+    astSetFitsF ( fitschan, "SEEINGEN", gsdVars->seeing,
                   "[arcsec] SAO atmospheric seeing (end)", 0 );
 
   } else {
@@ -865,7 +865,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
     astSetFitsU ( fitschan, "SEEINGST",
                   "[arcsec] SAO atmospheric seeing (start)", 0 );
 
-    astSetFitsU ( fitschan, "SEEINGSEN",
+    astSetFitsU ( fitschan, "SEEINGEN",
                   "[arcsec] SAO atmospheric seeing (end)", 0 );
   }
 
