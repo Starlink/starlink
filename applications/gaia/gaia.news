@@ -1,3 +1,10 @@
+    Development version
+    ===================
+
+    A serious bug that stopped images with modified astrometries from
+    being saved to disk has been fixed. Users experiencing this issue 
+    should downgrade or get the development release.
+
 
     A bug in the printing of the colour ramp (which caused GAIA to exit)
     has been fixed. This was introduced when support for handling -TAB
