@@ -25,6 +25,7 @@
  *     Malcolm J. Currie (Starlink)
  *     Coskun Oba (COBA, UoL)
  *     Remo Tilanus (JAC, Hawaii)
+ *     Matt Sherwood (MS, UoL)
  *     {enter_new_authors_here}
 
  *  History:
@@ -415,6 +416,8 @@
  *     2012-07-19 (RPT)
  *        Extract smf_math_cmplxerrfunc from smf_math_functions as separate
  *              routine
+ *     2013-07-31 (MS)
+ *        Add smf_fit_poly1d_chisq
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -706,7 +709,7 @@ void smf_check_units( int count, char current[], smfHead* hdr, int *status );
 void smf_checkdets( Grp *detgrp, smfData *data, int *status );
 
 void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
-			smf_modeltype *modeltyps, dim_t nmodels, dim_t msize,
+            smf_modeltype *modeltyps, dim_t nmodels, dim_t msize,
                         AstKeyMap *keymap, size_t available, dim_t maxfilelen,
                         size_t *necessary, int *status );
 
@@ -919,8 +922,8 @@ void * smf_dataOrder_array( void * oldbuf, smf_dtype oldtype, smf_dtype newtype,
                             int freeOld, int * status );
 
 void * smf_dataOrder_ndims( void * oldbuf, smf_dtype dtype, size_t ndata,
-			    size_t ndims, const dim_t dims[], const size_t perm[],
-			    int inPlace, int freeOld, int * status );
+                size_t ndims, const dim_t dims[], const size_t perm[],
+                int inPlace, int freeOld, int * status );
 
 smfDA * smf_deepcopy_smfDA ( const smfData *old, int cpdks, int * status);
 
@@ -1113,12 +1116,18 @@ void smf_fit_poly1d ( size_t order, size_t nelem, double clip, const double x[],
                       double varcoeffs[], double polydata[], int64_t *nused,
                       int *status );
 
+void smf_fit_poly1d_chisq ( size_t order, size_t nelem, const double x[],
+                       const double y[], const double vary[],
+                       const smf_qual_t qual[], double coeffs[],
+                       double varcoeffs[], double polydata[], int64_t *nused,
+                       double * rchisq, int *status );
+
 void smf_fit_pspec( const double *pspec, dim_t nf, size_t box, double df,
                     double minfreq, double whitefreq, double maxfreq,
                     double *a, double *b, double *w, int *status );
 
 void smf_fit_profile(  smfData *data, smfArray *pardata, void *pfcntrl,
-		       int *status );
+               int *status );
 
 void smf_fits_crchan( size_t nfits, const char * headrec, AstFitsChan ** fits,
                       int *status);
@@ -1485,14 +1494,14 @@ smf_mathfunc_fromstring( const char * mathfunc, int * status );
 const char * smf_mathfunc_str( smf_math_function type, int * status );
 
 void smf_math_functions( smf_math_function fid, double xdat, const double fpar[], int ncomp,
-			 double *value, double *pderv, int *npar,
-			 const int iopt[], const double dopt[] __attribute__((unused)) );
+             double *value, double *pderv, int *npar,
+             const int iopt[], const double dopt[] __attribute__((unused)) );
 
 double smf_math_fvalue( smf_math_function fid, double xdat, const double fpar[], int ncomp,
-			const int iopt[], const double dopt[] );
+            const int iopt[], const double dopt[] );
 
 void smf_math_fpderv( smf_math_function fid, double xdat, const double fpar[], int ncomp,
-		      double *epar, const int iopt[], const double dopt[] );
+              double *epar, const int iopt[], const double dopt[] );
 
 int smf_math_fnpar( smf_math_function fid );
 
