@@ -66,7 +66,6 @@
 *  Authors:
 *     TIMJ: Tim Jenness (JAC, Hawaii)
 *     EC: Ed Chapin (UBC)
-*     MS: Matt Sherwood (ULeth)
 *     {enter_new_authors_here}
 
 *  History:
@@ -81,8 +80,6 @@
 *     2010-09-15 (EC):
 *        -Added special-case code for 0th order polynomial
 *        -Added quality to interface
-*     2013-07-31 (MS):
-*        Expose alternate function that returns chi^2 value, but without clipping
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -131,17 +128,7 @@ void smf__fit_poly1d ( size_t order, size_t nelem, const double x[],
                        double varcoeffs[], double polydata[], int64_t *nused,
                        double * rchisq, int *status );
 
-/* Expose alternate function that returns chi^2 value, but without clipping */
-void smf_fit_poly1d_chisq ( size_t order, size_t nelem, const double x[],
-                            const double y[], const double vary[],
-                            const smf_qual_t qual[], double coeffs[],
-                            double varcoeffs[], double polydata[], int64_t *nused,
-                            double * rchisq, int *status ) {
 
-    smf__fit_poly1d ( order, nelem, x, y, vary, qual, coeffs, varcoeffs,
-                      polydata, nused, rchisq, status);
-
-}
 
 void smf_fit_poly1d ( size_t order, size_t nelem, double clip, const double x[],
                       const double y[], const double vary[],
