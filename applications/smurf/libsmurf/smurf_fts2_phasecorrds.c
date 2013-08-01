@@ -98,6 +98,8 @@
 *       Add fit coefficients output
 *       The fit coefficients are the DC Offset, slope and CHI^2 (goodness of fit) values of the polynomial phase fit.
 *       This is intended to help filter out bad interferograms.
+*     2013-08-01 (MS)
+*       Replace one_snprintf SMF_PATH_MAX parameter to sizeof(fileName) for safety sake
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -853,7 +855,7 @@ void smurf_fts2_phasecorrds(int* status)
 #if DEBUG
         /* Write output Interferogram Input Real DEBUG */
         /* Append unique suffix to fileName */
-        n = one_snprintf(outDataIFGINR->file->name, SMF_PATH_MAX, "%sphs_%s", status, fileName, "IFGINR");
+        n = one_snprintf(outDataIFGINR->file->name, sizeof(fileName), "%sphs_%s", status, fileName, "IFGINR");
         if(n < 0 || n >= SMF_PATH_MAX) {
             errRepf(TASK_NAME, "Error creating outDataIFGINR->file->name", status);
             goto CLEANUP;
@@ -871,7 +873,7 @@ void smurf_fts2_phasecorrds(int* status)
 
         /* Write output Interferogram Digitally Filtered Real DEBUG */
         /* Append unique suffix to fileName */
-        n = one_snprintf(outDataIFGDFR->file->name, SMF_PATH_MAX, "%sphs_%s", status, fileName, "IFGDFR");
+        n = one_snprintf(outDataIFGDFR->file->name, sizeof(fileName), "%sphs_%s", status, fileName, "IFGDFR");
         if(n < 0 || n >= SMF_PATH_MAX) {
             errRepf(TASK_NAME, "Error creating outDataIFGDFR->file->name", status);
             goto CLEANUP;
@@ -889,7 +891,7 @@ void smurf_fts2_phasecorrds(int* status)
 
         /* Write output Interferogram Digitally Filtered Imaginary DEBUG */
         /* Append unique suffix to fileName */
-        n = one_snprintf(outDataIFGDFI->file->name, SMF_PATH_MAX, "%sphs_%s", status, fileName, "IFGDFI");
+        n = one_snprintf(outDataIFGDFI->file->name, sizeof(fileName), "%sphs_%s", status, fileName, "IFGDFI");
         if(n < 0 || n >= SMF_PATH_MAX) {
             errRepf(TASK_NAME, "Error creating outDataIFGDFI->file->name", status);
             goto CLEANUP;
@@ -907,7 +909,7 @@ void smurf_fts2_phasecorrds(int* status)
 
         /* Write output Spectrum Real DEBUG */
         /* Append unique suffix to fileName */
-        n = one_snprintf(outDataSR->file->name, SMF_PATH_MAX, "%sphs_%s", status, fileName, "SR");
+        n = one_snprintf(outDataSR->file->name, sizeof(fileName), "%sphs_%s", status, fileName, "SR");
         if(n < 0 || n >= SMF_PATH_MAX) {
             errRepf(TASK_NAME, "Error creating outDataSR->file->name", status);
             goto CLEANUP;
@@ -925,7 +927,7 @@ void smurf_fts2_phasecorrds(int* status)
 
         /* Write output Spectrum Imaginary DEBUG */
         /* Append unique suffix to fileName */
-        n = one_snprintf(outDataSI->file->name, SMF_PATH_MAX, "%sphs_%s", status, fileName, "SI");
+        n = one_snprintf(outDataSI->file->name, sizeof(fileName), "%sphs_%s", status, fileName, "SI");
         if(n < 0 || n >= SMF_PATH_MAX) {
             errRepf(TASK_NAME, "Error creating outDataSI->file->name", status);
             goto CLEANUP;
@@ -943,7 +945,7 @@ void smurf_fts2_phasecorrds(int* status)
 
         /* Write output Spectrum Real Phase Corrected DEBUG */
         /* Append unique suffix to fileName */
-        n = one_snprintf(outDataSRC->file->name, SMF_PATH_MAX, "%sphs_%s", status, fileName, "SRC");
+        n = one_snprintf(outDataSRC->file->name, sizeof(fileName), "%sphs_%s", status, fileName, "SRC");
         if(n < 0 || n >= SMF_PATH_MAX) {
             errRepf(TASK_NAME, "Error creating outDataSRC->file->name", status);
             goto CLEANUP;
@@ -962,7 +964,7 @@ void smurf_fts2_phasecorrds(int* status)
 
         /* Write output Spectrum Imaginary Phase Corrected DEBUG */
         /* Append unique suffix to fileName */
-        n = one_snprintf(outDataSIC->file->name, SMF_PATH_MAX, "%sphs_%s", status, fileName, "SIC");
+        n = one_snprintf(outDataSIC->file->name, sizeof(fileName), "%sphs_%s", status, fileName, "SIC");
         if(n < 0 || n >= SMF_PATH_MAX) {
             errRepf(TASK_NAME, "Error creating outDataSIC->file->name", status);
             goto CLEANUP;
@@ -980,7 +982,7 @@ void smurf_fts2_phasecorrds(int* status)
 
         /* Write output Spectrum Phase DEBUG */
         /* Append unique suffix to fileName */
-        n = one_snprintf(outDataSP->file->name, SMF_PATH_MAX, "%sphs_%s", status, fileName, "SP");
+        n = one_snprintf(outDataSP->file->name, sizeof(fileName), "%sphs_%s", status, fileName, "SP");
         if(n < 0 || n >= SMF_PATH_MAX) {
             errRepf(TASK_NAME, "Error creating outDataSP->file->name", status);
             goto CLEANUP;
@@ -998,7 +1000,7 @@ void smurf_fts2_phasecorrds(int* status)
 
         /* Write output Phase Correction Function Real DEBUG */
         /* Append unique suffix to fileName */
-        n = one_snprintf(outDataPCFR->file->name, SMF_PATH_MAX, "%sphs_%s", status, fileName, "PCFR");
+        n = one_snprintf(outDataPCFR->file->name, sizeof(fileName), "%sphs_%s", status, fileName, "PCFR");
         if(n < 0 || n >= SMF_PATH_MAX) {
             errRepf(TASK_NAME, "Error creating outDataPCFR->file->name", status);
             goto CLEANUP;
@@ -1016,7 +1018,7 @@ void smurf_fts2_phasecorrds(int* status)
 
         /* Write output Phase Correction Function Imaginary DEBUG */
         /* Append unique suffix to fileName */
-        n = one_snprintf(outDataPCFI->file->name, SMF_PATH_MAX, "%sphs_%s", status, fileName, "PCFI");
+        n = one_snprintf(outDataPCFI->file->name, sizeof(fileName), "%sphs_%s", status, fileName, "PCFI");
         if(n < 0 || n >= SMF_PATH_MAX) {
             errRepf(TASK_NAME, "Error creating outDataPCFI->file->name", status);
             goto CLEANUP;
@@ -1034,7 +1036,7 @@ void smurf_fts2_phasecorrds(int* status)
 
         /* Write output Fitted Phase DEBUG */
         /* Append unique suffix to fileName */
-        n = one_snprintf(outDataSPF->file->name, SMF_PATH_MAX, "%sphs_%s", status, fileName, "SPF");
+        n = one_snprintf(outDataSPF->file->name, sizeof(fileName), "%sphs_%s", status, fileName, "SPF");
         if(n < 0 || n >= SMF_PATH_MAX) {
             errRepf(TASK_NAME, "Error creating outDataSPF->file->name", status);
             goto CLEANUP;
@@ -1052,7 +1054,7 @@ void smurf_fts2_phasecorrds(int* status)
 
         /* Write output Wave Numbers DEBUG */
         /* Append unique suffix to fileName */
-        n = one_snprintf(outDataWN->file->name, SMF_PATH_MAX, "%sphs_%s", status, fileName, "WN");
+        n = one_snprintf(outDataWN->file->name, sizeof(fileName), "%sphs_%s", status, fileName, "WN");
         if(n < 0 || n >= SMF_PATH_MAX) {
             errRepf(TASK_NAME, "Error creating outDataWN->file->name", status);
             goto CLEANUP;
@@ -1070,7 +1072,7 @@ void smurf_fts2_phasecorrds(int* status)
 
         /* Write output Weights DEBUG */
         /* Append unique suffix to fileName */
-        n = one_snprintf(outDataWT->file->name, SMF_PATH_MAX, "%sphs_%s", status, fileName, "WT");
+        n = one_snprintf(outDataWT->file->name, sizeof(fileName), "%sphs_%s", status, fileName, "WT");
         if(n < 0 || n >= SMF_PATH_MAX) {
             errRepf(TASK_NAME, "Error creating outDataWT->file->name", status);
             goto CLEANUP;
@@ -1089,7 +1091,7 @@ void smurf_fts2_phasecorrds(int* status)
 #endif
         /* Write output chi^2 goodness of fit */
         /* Append unique suffix to fileName */
-        n = one_snprintf(outDataFPM->file->name, SMF_PATH_MAX, "%sphs_%s", status, fileName, "FPM");
+        n = one_snprintf(outDataFPM->file->name, sizeof(fileName), "%sphs_%s", status, fileName, "FPM");
         if(n < 0 || n >= SMF_PATH_MAX) {
             errRepf(TASK_NAME, "Error creating outDataFPM->file->name", status);
             goto CLEANUP;
@@ -1107,7 +1109,7 @@ void smurf_fts2_phasecorrds(int* status)
 
         /* Write output */
         outData->fts = smf_construct_smfFts(NULL, zpd, fpm, sigma, status);
-        n = one_snprintf(outData->file->name, SMF_PATH_MAX, "%sphs", status, fileName);
+        n = one_snprintf(outData->file->name, sizeof(fileName), "%sphs", status, fileName);
         if(n < 0 || n >= SMF_PATH_MAX) {
             errRepf(TASK_NAME, "Error creating outData->file->name", status);
             goto CLEANUP;
