@@ -504,7 +504,6 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, i
      the telescope data for subscans 30, 31 and 32 */
   if (fitsvals.utdate == 20110530) {
     char obsid[81];
-    const char fitskey[] = "FIXPCORR";
     smf_getobsidss( hdr->fitshdr, obsid, sizeof(obsid), NULL, 0, status);
 
     if (strcmp(obsid, "scuba2_00056_20110530T135530") == 0 ) {
