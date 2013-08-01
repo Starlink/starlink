@@ -91,6 +91,8 @@
 *        - Update the ISO times for the starting and ending WVM values.
 *        - Ensure WVM headers are left unchanged without error if
 *        airmass cannot be determined.
+*     2013-07-31 (TIMJ):
+*        Disable WVM recalc for FOCUS
 
 *  Copyright:
 *     Copyright (C) 2009-2013 Science & Technology Facilities Council.
@@ -393,58 +395,81 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, i
      Note that smf_calc_smoothedwvm can do a better job because it has multiple
      subarrays to get all the values from. We just have to try with what we
      have from a single subarray. We do step into the time series until we
-     find something good. */
+     find something good.
+
+     The header values should mostly agree with the recalculated values if the
+     WVM code at the time matches the code in SMURF for that date. This has not
+     been true in cases where we have retrospectively realised that there has been
+     a calibration error in the WVM. So that we do not have to keep track of those
+     times explicitly we currently recalculate every time. If this recalculation
+     becomes a problem (smf_calc_wvm has a cache now to minimize this) it should
+     be possible to disable this recalculation if the file is less than, say,
+     30 minutes old to indicate we are running in near realtime.
+
+     As a special case we do not recalculate the headers for FOCUS observations
+     as the WVM reading is somewhat irrelevant and simply slows things down.
+
+  */
+
   if( *status == SAI__OK ){
-    size_t i;
-    size_t nframes = hdr->nframes;
-    double starttau = VAL__BADD;
-    double starttime = VAL__BADD;
-    double endtau = VAL__BADD;
-    double endtime = VAL__BADD;
 
-    /* Create a TimeFrame that can be used to format MJD values into ISO
-       date-time strings, including a "T" separator between time and date. */
-    AstTimeFrame *tf = astTimeFrame( "Format=iso.0T" );
+    /* Have not parsed header yet to extract type so do it explicitly here */
+    char obstype[100];
+    smf_getfitss( hdr, "OBS_TYPE", obstype, sizeof(obstype), status );
 
-    for (i=0; i < nframes; i++) {
-      smf__calc_wvm_index( hdr, "AMSTART", i, &starttau, &starttime, status );
-      if (starttau != VAL__BADD) break;
-      if (*status != SAI__OK) errAnnul( status );
-    }
+    if (strcasecmp( obstype, "focus") != 0) {
 
-    /* if we did not get a start tau we are not going to get an end tau */
-    if (starttau != VAL__BADD) {
+      size_t i;
+      size_t nframes = hdr->nframes;
+      double starttau = VAL__BADD;
+      double starttime = VAL__BADD;
+      double endtau = VAL__BADD;
+      double endtime = VAL__BADD;
+
+      /* Create a TimeFrame that can be used to format MJD values into ISO
+         date-time strings, including a "T" separator between time and date. */
+      AstTimeFrame *tf = astTimeFrame( "Format=iso.0T" );
+
       for (i=0; i < nframes; i++) {
-        smf__calc_wvm_index( hdr, "AMEND", nframes - 1 - i, &endtau, &endtime, status );
-        if (endtau != VAL__BADD) break;
+        smf__calc_wvm_index( hdr, "AMSTART", i, &starttau, &starttime, status );
+        if (starttau != VAL__BADD) break;
         if (*status != SAI__OK) errAnnul( status );
       }
+
+      /* if we did not get a start tau we are not going to get an end tau */
+      if (starttau != VAL__BADD) {
+        for (i=0; i < nframes; i++) {
+          smf__calc_wvm_index( hdr, "AMEND", nframes - 1 - i, &endtau, &endtime, status );
+          if (endtau != VAL__BADD) break;
+          if (*status != SAI__OK) errAnnul( status );
+        }
+      }
+
+      /* If we could not find any WVM readings then we have a bit of a problem.
+         Do we clear the FITS headers or do we leave them untouched? Leave them
+         alone for now. */
+      if (starttau != VAL__BADD && starttime != VAL__BADD) {
+        smf_fits_updateD( hdr, "WVMTAUST", starttau, "186GHz Tau from JCMT WVM at start", status );
+
+        /* Convert starttime MJD to ISO format and update the value in the
+           FITS header. */
+        smf_fits_updateS( hdr, "WVMDATST", astFormat( tf, 1, starttime ),
+                          "Time of WVMTAUST", status );
+      }
+
+      if (endtau != VAL__BADD && endtime != VAL__BADD) {
+        smf_fits_updateD( hdr, "WVMTAUEN", endtau, "186GHz Tau from JCMT WVM at end", status );
+
+        /* Convert endtime MJD to ISO format and update the value in the
+           FITS header. */
+        smf_fits_updateS( hdr, "WVMDATEN", astFormat( tf, 1, endtime ),
+                          "Time of WVMTAUEN", status );
+      }
+
+      /* Free the TimeFrame. */
+      tf = astAnnul( tf );
+
     }
-
-    /* If we could not find any WVM readings then we have a bit of a problem.
-       Do we clear the FITS headers or do we leave them untouched? Leave them
-       alone for now. */
-    if (starttau != VAL__BADD && starttime != VAL__BADD) {
-      smf_fits_updateD( hdr, "WVMTAUST", starttau, "186GHz Tau from JCMT WVM at start", status );
-
-      /* Convert starttime MJD to ISO format and update the value in the
-         FITS header. */
-      smf_fits_updateS( hdr, "WVMDATST", astFormat( tf, 1, starttime ),
-                        "Time of WVMTAUST", status );
-    }
-
-    if (endtau != VAL__BADD && endtime != VAL__BADD) {
-      smf_fits_updateD( hdr, "WVMTAUEN", endtau, "186GHz Tau from JCMT WVM at end", status );
-
-      /* Convert endtime MJD to ISO format and update the value in the
-         FITS header. */
-      smf_fits_updateS( hdr, "WVMDATEN", astFormat( tf, 1, endtime ),
-                        "Time of WVMTAUEN", status );
-    }
-
-    /* Free the TimeFrame. */
-    tf = astAnnul( tf );
-
   }
 
 
