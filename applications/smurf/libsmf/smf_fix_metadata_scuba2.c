@@ -455,6 +455,7 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, i
            FITS header. */
         smf_fits_updateS( hdr, "WVMDATST", astFormat( tf, 1, starttime ),
                           "Time of WVMTAUST", status );
+        have_fixed |= SMF__FIXED_FITSHDR;
       }
 
       if (endtau != VAL__BADD && endtime != VAL__BADD) {
@@ -464,6 +465,7 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, i
            FITS header. */
         smf_fits_updateS( hdr, "WVMDATEN", astFormat( tf, 1, endtime ),
                           "Time of WVMTAUEN", status );
+        have_fixed |= SMF__FIXED_FITSHDR;
       }
 
       /* Free the TimeFrame. */
