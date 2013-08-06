@@ -20,7 +20,7 @@ noinst_LIBRARIES = libextractor.a libfits.a
 # Files for the docs, directory. Some of these may present in the .htx
 # subdirectory as they are needed by the hypertext document, this just
 # copies the files out of there and into "star/docs" when necessary.
-stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ sun226.htx/mud165.pdf sun226fig.ps
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ sun226.htx/mud165.pdf sun226fig.eps
 
 
 ##  There are no local sources for these libraries and programs.
