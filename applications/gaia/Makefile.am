@@ -10,7 +10,7 @@
 SUBDIRS = teagaia gaia gaia3d tasks gaiavo scripts
 
 ##  Documentation.
-stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ sun214fig.ps
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ sun214fig.eps
 
 ##  On-line help.
 starhelp_DATA = gaia.htx/*.html gaia.htx/*.gif
