@@ -116,6 +116,8 @@ world-stamp
 
 *.texml/
 *.texml_tar
+*-eps-converted-to.pdf
+*.idx
 
 # These are non-standard ignores. They could go in subdirs but for now
 put them in global.
