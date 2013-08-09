@@ -143,12 +143,12 @@
          CALL NDF_CPUT( TITLE( :NC ), NDF, 'Title', STATUS )
       END IF
 
-*  Obtain the units from the BUNIT keyword in the header.
+*  Obtain the label from the LABEL keyword in the header.
       CALL COF_GKEYC( FUNIT, 'LABEL', THERE, LABEL, COMENT, STATUS )
 
-*  If it is present, set the NDF units, truncating unnecessary blanks.
+*  If it is present, set the NDF label, truncating unnecessary blanks.
       IF ( THERE .AND. LABEL .NE. ' ' ) THEN
-         NC = CHR_LEN( UNITS )
+         NC = CHR_LEN( LABEL )
          CALL NDF_CPUT( LABEL( :NC ), NDF, 'Label', STATUS )
       END IF
 
