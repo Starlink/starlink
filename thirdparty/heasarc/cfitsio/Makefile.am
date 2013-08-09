@@ -10,7 +10,10 @@ bin_SCRIPTS = cfitsio/imcopy cfitsio/fitscopy
 ## as automake doesn't like the unknown extension.
 lib_LIBRARIES = cfitsio/libcfitsio.a
 liblibdir = $(libdir)
-liblib_SCRIPTS = cfitsio/libcfitsio@SHLIB_SUFFIX@ cfitsio/cfitsio.pc
+liblib_SCRIPTS = cfitsio/libcfitsio@SHLIB_SUFFIX@ \
+	cfitsio/libcfitsio.1@SHLIB_SUFFIX@ \
+	cfitsio/libcfitsio.1.@PACKAGE_VERSION@@SHLIB_SUFFIX@ \
+	cfitsio/cfitsio.pc
 
 # There are no sources for libcfits in this directory.
 cfitsio_libcfitsio_a_SOURCES =
