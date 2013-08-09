@@ -32,6 +32,11 @@
 *     ZPD = NDF (Read)
 *          ZPD calibration file.
 
+* Notes:
+*    - The CENTRE parameter should be the same value as was used when
+*    producing the supplied ZPD file in order to prevent the introduction
+*    of an unwanted offset.
+
 *  Authors:
 *     COBA: Coskun Oba (UoL)
 *     MSHERWOOD: Matt Sherwood (UofL)
