@@ -22,15 +22,15 @@ smurf_flatfield.c \
 smurf_fts2_deglitch.c \
 smurf_fts2_flatfield.c \
 smurf_fts2_freqcorr.c \
-smurf_fts2_split.c \
 smurf_fts2_init.c \
 smurf_fts2_maskmap.c \
+smurf_fts2_spatialwcs.c \
 smurf_fts2_phasecorr.c \
 smurf_fts2_phasecorrds.c \
 smurf_fts2_portimbal.c \
 smurf_fts2_removebse.c \
-smurf_fts2_spatialwcs.c \
 smurf_fts2_spectrum.c \
+smurf_fts2_split.c \
 smurf_fts2_transcorr.c \
 smurf_gsd2acsis.c \
 smurf_gsdshow.c \
