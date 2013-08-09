@@ -1,73 +1,73 @@
 /*
- * +
- *  Name:
- *     FTS2SPLIT
- *
- *  Purpose:
- *     Convert multi scan NDFs for use in FTS-2 data reduction pipeline
- *
- *  Language:
- *     Starlink ANSI C
- *
- *  Type of Module:
- *     ADAM TASK
- *
- *  Invocation:
- *     smurf_fts2_split(status);
- *
- *  Arguments:
- *     status = int* (Given and Returned)
- *        Pointer to global status.
- *
- *  Description:
- *     Split out multiple unidirectional scans from a single NDF file into separate single scan NDF files
- *     The filename scan numbers are temporarily derived from the concatenation file's scan number
- *     This is intended to be changed to just append a uniqe sub-scan number.
- *
- *  ADAM Parameters:
- *     IN = NDF (Read)
- *          Input files to be transformed.
- *     OUT = NDF (Write)
- *          Output files.
- *     OUTFILES = LITERAL (Write)
- *          The name of text file to create, in which to put the names of
- *          all the output NDFs created by this application (one per
- *          line). If a NULL (!) value is supplied no file is created. [!]
- *
- *  Authors:
- *     MSHERWOOD: Matt Sherwood (UofL)
- *
- *  History :
- *     2013-05-16 (MSHERWOOD)
- *        Initial version
- *     2013-05-21 (MS)
- *        Skip scans that are too short
- *     2013-06-20 (MS)
- *        Fixed bug that prevented scans any smaller than the previous one from being kept
- *
- *  Copyright:
- *     Copyright (C) 2013 University of Lethbridge. All Rights Reserved.
- *
- *  Licence:
- *     This program is free software; you can redistribute it and/or
- *     modify it under the terms of the GNU General Public License as
- *     published by the Free Software Foundation; either version 3 of
- *     the License, or (at your option) any later version.
- *
- *     This program is distributed in the hope that it will be
- *     useful, but WITHOUT ANY WARRANTY; without even the implied
- *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
- *     PURPOSE. See the GNU General Public License for more details.
- *
- *     You should have received a copy of the GNU General Public
- *     License along with this program; if not, write to the Free
- *     Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- *     MA 02110-1301, USA
- *
- *  Bugs:
- *     {note_any_bugs_here}
- *-
- */
+*+
+*  Name:
+*     FTS2SPLIT
+
+*  Purpose:
+*     Convert multi scan NDFs for use in FTS-2 data reduction pipeline
+
+*  Language:
+*     Starlink ANSI C
+
+*  Type of Module:
+*     ADAM TASK
+
+*  Invocation:
+*     smurf_fts2_split(status);
+
+*  Arguments:
+*     status = int* (Given and Returned)
+*        Pointer to global status.
+
+*  Description:
+*     Split out multiple unidirectional scans from a single NDF file into separate single scan NDF files
+*     The filename scan numbers are temporarily derived from the concatenation file's scan number
+*     This is intended to be changed to just append a uniqe sub-scan number.
+
+*  ADAM Parameters:
+*     IN = NDF (Read)
+*          Input files to be transformed.
+*     OUT = NDF (Write)
+*          Output files.
+*     OUTFILES = LITERAL (Write)
+*          The name of text file to create, in which to put the names of
+*          all the output NDFs created by this application (one per
+*          line). If a NULL (!) value is supplied no file is created. [!]
+
+*  Authors:
+*     MSHERWOOD: Matt Sherwood (UofL)
+
+*  History :
+*     2013-05-16 (MSHERWOOD)
+*        Initial version
+*     2013-05-21 (MS)
+*        Skip scans that are too short
+*     2013-06-20 (MS)
+*        Fixed bug that prevented scans any smaller than the previous one from being kept
+
+*  Copyright:
+*     Copyright (C) 2013 University of Lethbridge. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 3 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public
+*     License along with this program; if not, write to the Free
+*     Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+*     MA 02110-1301, USA
+
+*  Bugs:
+*     {note_any_bugs_here}
+*-
+*/
 
 #if HAVE_CONFIG_H
 #include <config.h>
