@@ -23,6 +23,8 @@
 *     Prepares the input to be processed by the FTS2 Data Reduction tasks
 
 *  ADAM Parameters:
+*     CENTRE = REAL (Read)
+*          Moving mirror position at centre of travel (mm).
 *     IN = NDF (Read)
 *          Input files to be transformed.
 *     OUT = NDF (Write)
@@ -115,7 +117,7 @@ void smurf_fts2_init(int* status)
 {
   if( *status != SAI__OK ) { return; }
 
-  const double STAGE_CENTER = 225.0;    /* mm */
+  double STAGE_CENTER       = 0.0;      /* mm */
   Grp* gIn                  = NULL;     /* Input group */
   Grp* gOut                 = NULL;     /* Output group */
   Grp* gZpd                 = NULL;     /* ZPD group */
@@ -190,6 +192,13 @@ void smurf_fts2_init(int* status)
   /* BEGIN NDF */
   ndfBegin();
 
+  /* Get moving mirror centre position. */
+  parGet0d("CENTRE", &STAGE_CENTER, status);
+  if (*status != SAI__OK) {
+    errRep(FUNC_NAME, "Could not read parameters", status);
+    goto CLEANUP;
+  }
+
   /* Open the ZPD calibration file */
   smf_open_file(gZpd, 1, "READ", SMF__NOCREATE_QUALITY, &zpdData, status);
   if(*status != SAI__OK) {
@@ -230,8 +239,7 @@ void smurf_fts2_init(int* status)
       goto CLEANUP;
     }
 
-    /* THIS WILL NO LONGER NECESSARY WHEN THE FTS2 MIRROR POSITIONS ARE READ IN [-225, 225]
-       Transform mirror positions from [0, 450] to [-225, 225] */
+    /* Transform mirror positions from measured coordinates to [-225, 225] */
        for(k = 0; k < nFrames; k++) { MIRPOS[k] -= STAGE_CENTER; }
 
     /* The number of mirror positions with unique values */

@@ -2068,6 +2068,16 @@ package @PACKAGE@ {
 
             helplib {$SMURF_HELP}
 
+            parameter centre {
+                type _REAL
+                access READ
+                vpath DEFAULT
+                ppath DEFAULT
+                default 225.0
+                prompt {Moving mirror position at centre of travel (mm)}
+                helpkey *
+            }
+
             parameter in {
                 position 1
                 type NDF
