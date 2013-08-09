@@ -524,6 +524,7 @@
 
 *  Convert the text into paragraphs of up to WIDTH characters.
                         TEXCOL = 1
+                        PARAGR = ' '
   160                   CONTINUE     ! Start of DO WHILE loop
 
 *  TEXCOL = 0 indicates that there are no more lines in the paragraph.
