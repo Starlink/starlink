@@ -1,84 +1,84 @@
 /*
- * +
- *  Name:
- *     FTS2INIT
- *
- *  Purpose:
- *     Prepares the input to be processed by the FTS2 Data Reduction tasks
- *
- *  Language:
- *     Starlink ANSI C
- *
- *  Type of Module:
- *     ADAM TASK
- *
- *  Invocation:
- *     smurf_fts2_init(status);
- *
- *  Arguments:
- *     status = int* (Given and Returned)
- *        Pointer to global status.
- *
- *  Description:
- *     Prepares the input to be processed by the FTS2 Data Reduction tasks
- *
- *  ADAM Parameters:
- *     IN = NDF (Read)
- *          Input files to be transformed.
- *     OUT = NDF (Write)
- *          Output files.
- *     ZPD = NDF (Read)
- *          ZPD calibration file.
- *
- *  Authors:
- *     COBA: Coskun Oba (UoL)
- *     MSHERWOOD: Matt Sherwood (UofL)
- *
- *  History :
- *     23-NOV-2010 (COBA):
- *        Original version.
- *     2011-05-05 (COBA):
- *        - Get mirror positions via fts2_getmirrorpositions
- *        - Fixed possible memory leaks
- *        - Removed redundancies
- *     2012-12-12 (MSHERWOOD):
- *        Put back adjustment for non-centered mirror starting position.
- *     2012-12-21 (MSHERWOOD)
- *        Removed unneccessary sort (fts2_validatemirrorpositions now reverses list when needed)
- *     2013-04-04 (MSHERWOOD)
- *        - Document the previous conversion of ZPD values from mechanical to optical units
- *     2013-04-12 (MSHERWOOD)
- *        Adjust OPD for each bolometer's measured ZPD position
- *        Ensure that interpolation onto evenly spaced OPD grid stays within bounds
- *     2013-06-05 (MS)
- *        Adjust debug output
- *     2013-05-19 (MS)
- *        Set the step time to a nominal value to produce uniformly sized zero-padded spectra
- *
- *  Copyright:
- *     Copyright (C) 2008 Science and Technology Facilities Council.
- *     Copyright (C) 2008 University of Lethbridge. All Rights Reserved.
- *
- *  Licence:
- *     This program is free software; you can redistribute it and/or
- *     modify it under the terms of the GNU General Public License as
- *     published by the Free Software Foundation; either version 3 of
- *     the License, or (at your option) any later version.
- *
- *     This program is distributed in the hope that it will be
- *     useful, but WITHOUT ANY WARRANTY; without even the implied
- *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
- *     PURPOSE. See the GNU General Public License for more details.
- *
- *     You should have received a copy of the GNU General Public
- *     License along with this program; if not, write to the Free
- *     Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- *     MA 02110-1301, USA
- *
- *  Bugs:
- *     {note_any_bugs_here}
- *-
- */
+*+
+*  Name:
+*     FTS2INIT
+
+*  Purpose:
+*     Prepares the input to be processed by the FTS2 Data Reduction tasks
+
+*  Language:
+*     Starlink ANSI C
+
+*  Type of Module:
+*     ADAM TASK
+
+*  Invocation:
+*     smurf_fts2_init(status);
+
+*  Arguments:
+*     status = int* (Given and Returned)
+*        Pointer to global status.
+
+*  Description:
+*     Prepares the input to be processed by the FTS2 Data Reduction tasks
+
+*  ADAM Parameters:
+*     IN = NDF (Read)
+*          Input files to be transformed.
+*     OUT = NDF (Write)
+*          Output files.
+*     ZPD = NDF (Read)
+*          ZPD calibration file.
+
+*  Authors:
+*     COBA: Coskun Oba (UoL)
+*     MSHERWOOD: Matt Sherwood (UofL)
+
+*  History :
+*     23-NOV-2010 (COBA):
+*        Original version.
+*     2011-05-05 (COBA):
+*        - Get mirror positions via fts2_getmirrorpositions
+*        - Fixed possible memory leaks
+*        - Removed redundancies
+*     2012-12-12 (MSHERWOOD):
+*        Put back adjustment for non-centered mirror starting position.
+*     2012-12-21 (MSHERWOOD)
+*        Removed unneccessary sort (fts2_validatemirrorpositions now reverses list when needed)
+*     2013-04-04 (MSHERWOOD)
+*        - Document the previous conversion of ZPD values from mechanical to optical units
+*     2013-04-12 (MSHERWOOD)
+*        Adjust OPD for each bolometer's measured ZPD position
+*        Ensure that interpolation onto evenly spaced OPD grid stays within bounds
+*     2013-06-05 (MS)
+*        Adjust debug output
+*     2013-05-19 (MS)
+*        Set the step time to a nominal value to produce uniformly sized zero-padded spectra
+
+*  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008 University of Lethbridge. All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 3 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public
+*     License along with this program; if not, write to the Free
+*     Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+*     MA 02110-1301, USA
+
+*  Bugs:
+*     {note_any_bugs_here}
+*-
+*/
 
 #if HAVE_CONFIG_H
 #include <config.h>
