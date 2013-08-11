@@ -1,5 +1,7 @@
-\documentstyle[11pt,epsf]{article}
+\documentclass[11pt]{article}
 \pagestyle{myheadings}
+
+\usepackage{graphicx}
 
 % The document header has a title picture and its caption
 % added explicitly in the LaTeX and HTML title pages.
@@ -166,7 +168,7 @@
 
 % ? Title figure
    \begin{center}
-   \leavevmode\epsfysize=130mm\epsfbox{sc1_cover.eps}
+   \leavevmode\includegraphics[height=130mm]{sc1_cover}
 
    Grey: JCMT double-beam map in azimuth/elevation\\
    Contours: The same map restored to single beam\\
@@ -194,7 +196,7 @@
 
 % ? Add picture here if required.
    \begin{figure}[h]
-   \epsfysize=130mm\epsfbox{sc1_cover.eps}
+   \includegraphics[height=130mm]{sc1_cover}
    \end{figure}
 
    Grey: JCMT double-beam map in azimuth/elevation\\
@@ -284,7 +286,7 @@ Section~\ref{gloss}.
 
 \begin{latexonly}
 \begin{center}
-\leavevmode\epsfysize=150mm\epsfbox{sc1_cont.eps}
+\leavevmode\includegraphics[height=150mm]{sc1_cont}
 \end{center}
 \end{latexonly}
 \begin{htmlonly}
@@ -744,7 +746,7 @@ Section~\ref{display2}
 
 \begin{latexonly}
 \begin{center}
-\leavevmode\epsfysize=80mm\epsfbox{sc1_display1.eps}
+\leavevmode\includegraphics[height=80mm]{sc1_display1}
 \end{center}
 \end{latexonly}
 \htmladdimg{addon/display1.gif}
@@ -1006,7 +1008,7 @@ Section~\ref{obtain}.
 
 \begin{latexonly}
 \begin{center}
-\leavevmode\epsfysize=80mm\epsfbox{sc1_fitgauss.eps}
+\leavevmode\includegraphics[height=80mm]{sc1_fitgauss}
 \end{center}
 \end{latexonly}
 \htmladdimg{addon/fitgauss.gif}
@@ -1095,7 +1097,7 @@ Section~\ref{obtain}.
 
 \begin{latexonly}
 \begin{center}
-\leavevmode\epsfysize=80mm\epsfbox{sc1_display4.eps}
+\leavevmode\includegraphics[height=80mm]{sc1_display4}
 \end{center}
 \end{latexonly}
 \htmladdimg{addon/display4.gif}
@@ -1309,7 +1311,7 @@ Section~\ref{obtain}.
 
 \begin{latexonly}
 \begin{center}
-\leavevmode\epsfysize=80mm\epsfbox{sc1_display5.eps}
+\leavevmode\includegraphics[height=80mm]{sc1_display5}
 \end{center}
 \end{latexonly}
 \htmladdimg{addon/display5.gif}
@@ -1350,7 +1352,7 @@ Section~\ref{obtain}.
 
 \begin{latexonly}
 \begin{center}
-\leavevmode\epsfysize=80mm\epsfbox{sc1_spindex1.eps}
+\leavevmode\includegraphics[height=80mm]{sc1_spindex1}
 \end{center}
 \end{latexonly}
 \htmladdimg{addon/spindex1.gif}
@@ -1440,7 +1442,7 @@ Section~\ref{obtain}.
 
 \begin{latexonly}
 \begin{center}
-\leavevmode\epsfysize=80mm\epsfbox{sc1_spindex2.eps}
+\leavevmode\includegraphics[height=80mm]{sc1_spindex2}
 \end{center}
 \end{latexonly}
 \htmladdimg{addon/spindex2.gif}
@@ -1748,7 +1750,7 @@ Section~\ref{iras90}.
 
 \begin{latexonly}
 \begin{center}
-\leavevmode\epsfysize=100mm\epsfbox{sc1_figure.eps}
+\leavevmode\includegraphics[height=100mm]{sc1_figure}
 \end{center}
 \end{latexonly}
 \begin{htmlonly}
@@ -1860,7 +1862,7 @@ Section~\ref{iras90}.
 
 \begin{latexonly}
 \begin{center}
-\leavevmode\epsfysize=80mm\epsfbox{sc1_skyphot.eps}
+\leavevmode\includegraphics[height=80mm]{sc1_skyphot}
 \end{center}
 \end{latexonly}
 \htmladdimg{addon/skyphot.gif}
@@ -2420,7 +2422,7 @@ Section~\ref{iras90}.
 
 \begin{latexonly}
 \begin{center}
-\leavevmode\epsfysize=80mm\epsfbox{sc1_display2.eps}
+\leavevmode\includegraphics[height=80mm]{sc1_display2}
 \end{center}
 \end{latexonly}
 \htmladdimg{addon/display2.gif}
@@ -2445,7 +2447,7 @@ Section~\ref{iras90}.
 
 \begin{latexonly}
 \begin{center}
-\leavevmode\epsfysize=80mm\epsfbox{sc1_display3.eps}
+\leavevmode\includegraphics[height=80mm]{sc1_display3}
 \end{center}
 \end{latexonly}
 \htmladdimg{addon/display3.gif}
@@ -2573,7 +2575,7 @@ Section~\ref{iras90}.
 
 \begin{latexonly}
 \begin{center}
-\leavevmode\epsfysize=80mm\epsfbox{sc1_fitcheby.eps}
+\leavevmode\includegraphics[height=80mm]{sc1_fitcheby}
 \end{center}
 \end{latexonly}
 \htmladdimg{addon/fitcheby.gif}

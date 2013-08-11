@@ -2,7 +2,6 @@
 
 % ? Specify used packages
 \usepackage{graphicx}        %  Use this one for final production.
-\usepackage{epsfig}          %  Use this one for final production.
 % \usepackage[draft]{graphicx} %  Use this one for drafting.
 % ? End of specify used packages
 
@@ -335,7 +334,8 @@ included, as is a glossary of commonly used terms.  }
 
 % ? Add picture here if required.
    \begin{center}
-   \leavevmode\epsfysize=100mm\epsffile{sc7_cover.eps}
+   \leavevmode
+   \includegraphics[height=100mm]{sc7_cover}
 
    An extracted spectrum and its corresponding arc.\\
    Graphic created using DIPSO\cite{dipso}\@.
@@ -362,7 +362,7 @@ included, as is a glossary of commonly used terms.  }
 
 % ? Add picture here if required.
    \begin{figure}[h]
-   \epsfysize=100mm\epsfbox{sc7_cover.eps}
+   \includegraphics[height=100mm]{sc7_cover}
    \end{figure}
 
    An extracted spectrum and its corresponding arc.\\
@@ -565,8 +565,8 @@ reductions with \xref{{\sc echomop}}{sun152}{}\cite{echomop}\@.
 
 \begin{figure}
 \begin{center}
-  \scspec{\leavevmode\epsfysize=105mm\epsfbox{sc7_01.eps}}
-         {\leavevmode\epsfysize=136mm\epsfbox{sc7_01.eps}}
+  \scspec{\leavevmode\includegraphics[height=105mm]{sc7_01}}
+         {\leavevmode\includegraphics[height=136mm]{sc7_01}}
 
   \parbox{140mm}{
     \caption{Basic characteristics of a simple 1-D spectrum.}
@@ -593,8 +593,8 @@ the light coming from the sky) running vertically across the spectrum.
 
 \begin{figure}
 \begin{center}
-  \scspec{\leavevmode\epsfysize=105mm\epsfbox{sc7_01b.eps}}
-         {\leavevmode\epsfysize=136mm\epsfbox{sc7_01b.eps}}
+  \scspec{\leavevmode\includegraphics[height=105mm]{sc7_01b}}
+         {\leavevmode\includegraphics[height=136mm]{sc7_01b}}
 
   \parbox{140mm}{
     \caption{A longslit 2-D spectrum produces a number of spectra for
@@ -871,8 +871,8 @@ data preparation.
 
 \begin{figure}
 \begin{center}
-  \scspec{\leavevmode\epsfysize=105mm\epsfbox{sc7_02.eps}}
-          {\leavevmode\epsfysize=136mm\epsfbox{sc7_02.eps}}
+  \scspec{\leavevmode\includegraphics[height=105mm]{sc7_02}}
+          {\leavevmode\includegraphics[height=136mm]{sc7_02}}
 
   \parbox{140mm}{
     \caption{A cross-section through a simple spectrum.}
@@ -920,8 +920,8 @@ to the right of the profile.
 
 \begin{figure}
 \begin{center}
-  \scspec{\leavevmode\epsfysize=55mm\epsfbox{sc7_03.eps}}
-         {\leavevmode\epsfysize=66mm\epsfbox{sc7_03.eps}}
+  \scspec{\leavevmode\includegraphics[height=55mm]{sc7_03}}
+         {\leavevmode\includegraphics[height=66mm]{sc7_03}}
 
   \parbox{140mm}{
     \caption{Selecting object and background channels (left), and a
@@ -965,8 +965,8 @@ curve fitted to a trace overlaid on the image of the spectrum.
 
 \begin{figure}
 \begin{center}
-  \scspec{\leavevmode\epsfysize=105mm\epsfbox{sc7_05.eps}}
-         {\leavevmode\epsfysize=136mm\epsfbox{sc7_05.eps}}
+  \scspec{\leavevmode\includegraphics[height=105mm]{sc7_05}}
+         {\leavevmode\includegraphics[height=136mm]{sc7_05}}
 
   \parbox{140mm}{
     \caption{Trace of a spectrum overlaid on the image.}
@@ -1022,8 +1022,8 @@ the small-scale sensitivity variations only.
 
 \begin{figure}
 \begin{center}
-  \scspec{\leavevmode\epsfysize=55mm\epsfbox{sc7_06.eps}}
-         {\leavevmode\epsfysize=66mm\epsfbox{sc7_06.eps}}
+  \scspec{\leavevmode\includegraphics[height=55mm]{sc7_06}}
+         {\leavevmode\includegraphics[height=66mm]{sc7_06}}
 
   \parbox{140mm}{
     \caption{A section through a typical flat field for spectroscopy
@@ -1090,8 +1090,8 @@ Marsh\cite{marsh} for more details of the theory of optimal extraction.
 
 \begin{figure}
 \begin{center}
-  \scspec{\leavevmode\epsfysize=105mm\epsfbox{sc7_07.eps}}
-         {\leavevmode\epsfysize=136mm\epsfbox{sc7_07.eps}}
+  \scspec{\leavevmode\includegraphics[height=105mm]{sc7_07}}
+         {\leavevmode\includegraphics[height=136mm]{sc7_07}}
 
   \parbox{140mm}{
     \caption{An extracted spectrum.}
@@ -1149,8 +1149,8 @@ The basic steps here are:
 
 \begin{figure}
 \begin{center}
-  \scspec{\leavevmode\epsfysize=105mm\epsfbox{sc7_08.eps}}
-         {\leavevmode\epsfysize=136mm\epsfbox{sc7_08.eps}}
+  \scspec{\leavevmode\includegraphics[height=105mm]{sc7_08}}
+         {\leavevmode\includegraphics[height=136mm]{sc7_08}}
 
   \parbox{140mm}{
     \caption{Line Identification: a typical plot during interactive
@@ -1278,8 +1278,8 @@ data\scspec{---}{ - }otherwise you will have to calculate it.
 
 \begin{figure}
 \begin{center}
-  \scspec{\leavevmode\epsfysize=105mm\epsfbox{sc7_09.eps}}
-         {\leavevmode\epsfysize=136mm\epsfbox{sc7_09.eps}}
+  \scspec{\leavevmode\includegraphics[height=105mm]{sc7_09}}
+         {\leavevmode\includegraphics[height=136mm]{sc7_09}}
 
   \parbox{140mm}{
     \caption{Normalisation: the top spectrum is the normalised version
@@ -1617,8 +1617,8 @@ image, which is called \verb+arc+ in the example data.
 
 \begin{figure}
 \begin{center}
-  \scspec{\leavevmode\epsfysize=100mm\epsfbox{sc7_10.eps}}
-         {\leavevmode\epsfysize=136mm\epsfbox{sc7_10.eps}}
+  \scspec{\leavevmode\includegraphics[height=100mm]{sc7_10}}
+         {\leavevmode\includegraphics[height=136mm]{sc7_10}}
 
    \parbox{140mm}{
    \caption{Order location: a cross-dispersion section produced using
@@ -1687,7 +1687,7 @@ number-of-knots, times two).
 \begin{htmlonly}
 \begin{figure}
 \begin{center}
-  \leavevmode\epsfysize=136mm\epsfbox{sc7_05.eps}
+  \leavevmode\includegraphics[height=136mm]{sc7_05}
   \parbox{140mm}{
     \caption{Trace of a spectrum overlaid on the image.}
     \label{fi_order_trace_again}
@@ -1714,8 +1714,8 @@ The only parameter you will be prompted for here is
 
 \begin{figure}
 \begin{center}
-  \scspec{\leavevmode\epsfysize=100mm\epsfbox{sc7_11.eps}}
-         {\leavevmode\epsfysize=136mm\epsfbox{sc7_11.eps}}
+  \scspec{\leavevmode\includegraphics[height=100mm]{sc7_11}}
+         {\leavevmode\includegraphics[height=136mm]{sc7_11}}
 
   \parbox{140mm}{
   \caption{Trace fitting: a display of traced points versus fitted trace,
@@ -1804,8 +1804,8 @@ strong absorption feature.
 
 \begin{figure}
 \begin{center}
-  \scspec{\leavevmode\epsfysize=100mm\epsfbox{sc7_12.eps}}
-         {\leavevmode\epsfysize=136mm\epsfbox{sc7_12.eps}}
+  \scspec{\leavevmode\includegraphics[height=100mm]{sc7_12}}
+         {\leavevmode\includegraphics[height=136mm]{sc7_12}}
 
   \parbox{140mm}{
     \caption{Finding the dekker-limits of the slit: a plot of a section
@@ -1836,7 +1836,7 @@ the dekker hit the \verb+E+ key.
 \begin{htmlonly}
 \begin{figure}
 \begin{center}
-  \leavevmode\epsfysize=136mm\epsfbox{sc7_04.eps}
+  \leavevmode\includegraphics[height=136mm]{sc7_04}
 
   \parbox{140mm}{
     \caption{Selecting object and background channels: a plot of a section
@@ -1989,7 +1989,7 @@ Once in the plotter, a menu appears and new prompt:
 \begin{htmlonly}
 \begin{figure}
 \begin{center}
-  \leavevmode\epsfysize=136mm\epsfbox{sc7_07.eps}
+  \leavevmode\includegraphics[height=136mm]{sc7_07}
   \parbox{140mm}{
     \caption{An extracted spectrum.}
     \label{fi_extracted_spectrum_again}
@@ -2122,7 +2122,7 @@ made if the value is unusable.
 \begin{htmlonly}
 \begin{figure}
 \begin{center}
-  \leavevmode\epsfysize=136mm\epsfbox{sc7_08.eps}
+  \leavevmode\includegraphics[height=136mm]{sc7_08}
 
   \parbox{140mm}{
     \caption{Line Identification: a typical plot during interactive fitting
@@ -2357,8 +2357,8 @@ calibration.
 
 \begin{figure}
 \begin{center}
-  \scspec{\leavevmode\epsfysize=105mm\epsfbox{sc7_13.eps}}
-         {\leavevmode\epsfysize=136mm\epsfbox{sc7_13.eps}}
+  \scspec{\leavevmode\includegraphics[height=105mm]{sc7_13}}
+         {\leavevmode\includegraphics[height=136mm]{sc7_13}}
 
   \parbox{140mm}{
     \caption{A 2-D arc line image showing curvature along the spatial axis.}
@@ -2723,8 +2723,8 @@ below.})
 
 \begin{figure}
 \begin{center}
-\scspec{\leavevmode\epsfysize=105mm\epsfbox{sc7_14.eps}}
-       {\leavevmode\epsfysize=136mm\epsfbox{sc7_14.eps}}
+\scspec{\leavevmode\includegraphics[height=105mm]{sc7_14}}
+       {\leavevmode\includegraphics[height=136mm]{sc7_14}}
 
   \parbox{140mm}{
     \caption{An arc line spectrum with lines selected between the
@@ -2862,8 +2862,8 @@ figure below}.
 
 \begin{figure}
 \begin{center}
-  \scspec{\leavevmode\epsfysize=105mm\epsfbox{sc7_15.eps}}
-         {\leavevmode\epsfysize=136mm\epsfbox{sc7_15.eps}}
+  \scspec{\leavevmode\includegraphics[height=105mm]{sc7_15}}
+         {\leavevmode\includegraphics[height=136mm]{sc7_15}}
 
   \parbox{140mm}{
     \caption{An example Gaussian fit to an arc line spectrum.}
@@ -2891,8 +2891,8 @@ looks to be a good one.
 
 \begin{figure}
 \begin{center}
-  \scspec{\leavevmode\epsfysize=105mm\epsfbox{sc7_16.eps}}
-         {\leavevmode\epsfysize=136mm\epsfbox{sc7_16.eps}}
+  \scspec{\leavevmode\includegraphics[height=105mm]{sc7_16}}
+         {\leavevmode\includegraphics[height=136mm]{sc7_16}}
 
   \parbox{140mm}{
     \caption{The residuals with increasing order for a polynomial fit to
@@ -2955,8 +2955,8 @@ of that line in the calculations.
 
 \begin{figure}
 \begin{center}
-  \scspec{\leavevmode\epsfysize=105mm\epsfbox{sc7_17.eps}}
-          {\leavevmode\epsfysize=136mm\epsfbox{sc7_17.eps}}
+  \scspec{\leavevmode\includegraphics[height=105mm]{sc7_17}}
+          {\leavevmode\includegraphics[height=136mm]{sc7_17}}
 
   \parbox{140mm}{
     \caption{The dispersion calibration control screen.}
@@ -2986,8 +2986,8 @@ page~\pageref{dispfit},}{the figure below} for an example fit.
 
 \begin{figure}
 \begin{center}
-  \scspec{\leavevmode\epsfysize=105mm\epsfbox{sc7_18.eps}}
-         {\leavevmode\epsfysize=136mm\epsfbox{sc7_18.eps}}
+  \scspec{\leavevmode\includegraphics[height=105mm]{sc7_18}}
+         {\leavevmode\includegraphics[height=136mm]{sc7_18}}
 
   \parbox{140mm}{
     \caption{An example dispersion fit, displaying the polynomial used
@@ -3114,8 +3114,8 @@ page~\pageref{scrunched}.}{the figure below.}
 
 \begin{figure}
 \begin{center}
-  \scspec{\leavevmode\epsfysize=105mm\epsfbox{sc7_19.eps}}
-         {\leavevmode\epsfysize=136mm\epsfbox{sc7_19.eps}}
+  \scspec{\leavevmode\includegraphics[height=105mm]{sc7_19}}
+         {\leavevmode\includegraphics[height=136mm]{sc7_19}}
 
   \parbox{140mm}{
     \caption{The data frame, now calibrated and curvature corrected.}
@@ -3164,8 +3164,8 @@ This generates a spectrum quartzspec.sdf which we can view with
 
 \begin{figure}
 \begin{center}
-  \scspec{\leavevmode\epsfysize=105mm\epsfbox{sc7_20.eps}}
-          {\leavevmode\epsfysize=136mm\epsfbox{sc7_20.eps}}
+  \scspec{\leavevmode\includegraphics[height=105mm]{sc7_20}}
+          {\leavevmode\includegraphics[height=136mm]{sc7_20}}
 
   \parbox{140mm}{
     \caption{The extracted quartz spectrum.}
@@ -3262,8 +3262,8 @@ page~\pageref{finalcal}.}{the figure below.}
 
 \begin{figure}
 \begin{center}
-  \scspec{\leavevmode\epsfysize=105mm\epsfbox{sc7_21.eps}}
-          {\leavevmode\epsfysize=136mm\epsfbox{sc7_21.eps}}
+  \scspec{\leavevmode\includegraphics[height=105mm]{sc7_21}}
+          {\leavevmode\includegraphics[height=136mm]{sc7_21}}
 
   \parbox{140mm}{
     \caption{The calibrated data frame, corrected for the instrumental
@@ -3491,7 +3491,7 @@ image is correctly oriented with the spectrum dispersed from left-to-right.
 \begin{htmlonly}
 \begin{figure}
 \begin{center}
-  \leavevmode\epsfysize=136mm\epsfbox{sc7_10.eps}
+  \leavevmode\includegraphics[height=136mm]{sc7_10}
 
   \parbox{140mm}{
     \caption{Order location: a cross-dispersion section produced using

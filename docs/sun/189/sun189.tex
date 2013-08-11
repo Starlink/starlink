@@ -2,7 +2,6 @@
 
 % ? Specify used packages
 \usepackage{graphicx}        %  Use this one for final production.
-\usepackage{epsfig}
 % \usepackage[draft]{graphicx} %  Use this one for drafting.
 % ? End of specify used packages
 
@@ -174,7 +173,7 @@
 
 % ? Add picture here if required.
    \begin{center}
-   \leavevmode\epsfysize=100mm\epsffile{sun189_cover.eps}
+   \leavevmode\includegraphics[height=100mm]{sun189_cover}
    \end{center}
 % ? End of picture
 
@@ -196,7 +195,7 @@
 
 % ? Add picture here if required.
    \begin{figure}[h]
-   \epsfysize=100mm\epsfbox{sun189_cover.eps}
+   \includegraphics[height=100mm]{sun189_cover}
    \end{figure}
 % ? End of picture
 

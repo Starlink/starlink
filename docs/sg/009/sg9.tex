@@ -2,7 +2,6 @@
 
 % ? Specify used packages
 \usepackage{graphicx}        %  Use this one for final production.
-\usepackage{epsfig}          %  Use this one for final production.
 % \usepackage[draft]{graphicx} %  Use this one for drafting.
 % ? End of specify used packages
 
@@ -202,7 +201,7 @@
 
 % ? Add picture here if required.
    \begin{center}
-   \leavevmode\epsfysize=120mm\epsffile{sg9_cover.eps}
+   \leavevmode\includegraphics[height=120mm]{sg9_cover}
 
    An Echelle spectrum
    \end{center}
@@ -228,7 +227,7 @@
 
 % ? Add picture here if required.
    \begin{figure}[h]
-   \epsfysize=120mm\epsfbox{sg9_cover.eps}
+   \includegraphics[height=120mm]{sg9_cover}
    \end{figure}
 
    \begin{center}
@@ -442,8 +441,8 @@ absorption features.  Several \htmlref{{\bf cosmic-ray events}}{gl_cosmic_ray}
 
 \begin{figure}
 \begin{center}
-\sgspec{\leavevmode\epsfysize=105mm\epsfbox{sg9_04.eps}}
-{\leavevmode\epsfysize=136mm\epsfbox{sg9_04.eps}}
+\sgspec{\leavevmode\includegraphics[height=105mm]{sg9_04}}
+{\leavevmode\includegraphics[height=136mm]{sg9_04}}
 
 \parbox{140mm}{
 \caption{Echelle Image: Part of an \'{e}chelle image produced with UCLES
@@ -991,8 +990,8 @@ a single column.
 
 \begin{figure}
 \begin{center}
-\sgspec{\leavevmode\epsfysize=105mm\epsfbox{sg9_01.eps}}
-{\leavevmode\epsfysize=136mm\epsfbox{sg9_01.eps}}
+\sgspec{\leavevmode\includegraphics[height=105mm]{sg9_01}}
+{\leavevmode\includegraphics[height=136mm]{sg9_01}}
 
 \parbox{140mm}{
 \caption{Order Location: cross-dispersion section through an IUE
@@ -1027,8 +1026,8 @@ well be possible to use a single trace frame for all the extractions.
 
 \begin{figure}
 \begin{center}
-\sgspec{\leavevmode\epsfysize=105mm\epsfbox{sg9_02.eps}}
-{\leavevmode\epsfysize=136mm\epsfbox{sg9_02.eps}}
+\sgspec{\leavevmode\includegraphics[height=105mm]{sg9_02}}
+{\leavevmode\includegraphics[height=136mm]{sg9_02}}
 
 \parbox{140mm}{
 \caption{Order Tracing: Fitting a polynomial to an order trace in ECHMENU.}
@@ -1041,8 +1040,8 @@ well be possible to use a single trace frame for all the extractions.
 
 \begin{figure}
 \begin{center}
-\sgspec{\leavevmode\epsfysize=105mm\epsfbox{sg9_06.eps}}
-{\leavevmode\epsfysize=136mm\epsfbox{sg9_06.eps}}
+\sgspec{\leavevmode\includegraphics[height=105mm]{sg9_06}}
+{\leavevmode\includegraphics[height=136mm]{sg9_06}}
 
 \parbox{140mm}{
 \caption{Slit Definition: Selecting the object and background channels in
@@ -1276,8 +1275,8 @@ The basic steps here are:
 
 \begin{figure}
 \begin{center}
-\sgspec{\leavevmode\epsfysize=105mm\epsfbox{sg9_03.eps}}
-{\leavevmode\epsfysize=136mm\epsfbox{sg9_03.eps}}
+\sgspec{\leavevmode\includegraphics[height=105mm]{sg9_03}}
+{\leavevmode\includegraphics[height=136mm]{sg9_03}}
 
 \parbox{140mm}{
 \caption{Line Identification: typical plot during interactive fitting
@@ -1371,8 +1370,8 @@ single-order spectrum and a blaze-corrected version of the same order.
 
 \begin{figure}
 \begin{center}
-\sgspec{\leavevmode\epsfysize=105mm\epsfbox{sg9_05.eps}}
-{\leavevmode\epsfysize=136mm\epsfbox{sg9_05.eps}}
+\sgspec{\leavevmode\includegraphics[height=105mm]{sg9_05}}
+{\leavevmode\includegraphics[height=136mm]{sg9_05}}
 
 \parbox{140mm}{
 \caption{Blaze correction: the top spectrum is the blaze-corrected version of
