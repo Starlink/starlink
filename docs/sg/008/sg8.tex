@@ -14,7 +14,6 @@
 
 % ? Specify used packages
 \usepackage{graphicx}        %  Use this one for final production.
-\usepackage{epsfig}          %  Use this one for final production.
 % \usepackage[draft]{graphicx} %  Use this one for drafting.
 % ? End of specify used packages
 
@@ -188,7 +187,7 @@ problem. It is not a manual for any particular package.}
    \vspace{5mm}
 
 % ? Add picture here if required for the LaTeX version.
-%   e.g. \includegraphics[scale=0.3]{filename.ps}
+%   e.g. \includegraphics[scale=0.3]{filename}
 % ? End of picture
 
 % ? Heading for abstract if used.
@@ -210,7 +209,7 @@ problem. It is not a manual for any particular package.}
    \begin{rawhtml} </H1> \end{rawhtml}
 
 % ? Add picture here if required.
-%   e.g. \includegraphics[scale=0.7]{filename.ps}
+%   e.g. \includegraphics[scale=0.7]{filename}
 % ? End of picture
 
    \begin{rawhtml} <P> <I> \end{rawhtml}
@@ -351,8 +350,7 @@ stellar structure and evolution.
 \begin{figure}[htbp]
 \begin{center}
 \leavevmode
-\epsfxsize=461pt
-\epsfbox{sg8_cholera.ps}
+\includegraphics[width=461pt]{sg8_cholera}
 \end{center}
 
 \caption[Cholera deaths in central London.]{The distribution of cholera
@@ -369,8 +367,7 @@ Broad Street. Reproduced from Gilbert\cite{GILBERT}. \label{CHOLERA} }
 
 \begin{center}
 \leavevmode
-\epsfxsize=449pt
-\epsfbox{sg8_butterfly.ps}
+\includegraphics[width=449pt]{sg8_butterfly}
 \end{center}
 
 \caption[Butterfly diagram for solar flares.]{Butterfly diagram for
@@ -699,8 +696,7 @@ a point defined by three components: Hue ($H$), Saturation ($S$) and value
 
 \begin{center}
 \leavevmode
-\epsfxsize=434pt
-\epsfbox{sg8_hsv.ps}
+\includegraphics[width=434pt]{sg8_hsv}
 \end{center}
 
 \caption[The Hue-Saturation-Value ({\it HSV}) system.]{The
@@ -772,8 +768,7 @@ draped over an assemblage of bulky objects.
 
 \begin{center}
 \leavevmode
-\epsfxsize=470pt
-\epsfbox{sg8_carpet_grey.ps}
+\includegraphics[width=470pt]{sg8_carpet_grey}
 \end{center}
 
 \caption[A carpet plot.]{A carpet plot. The plot shows a small region
@@ -791,8 +786,7 @@ Section~\ref{IDL}). \label{CARPET} }
 
 \begin{center}
 \leavevmode
-\epsfxsize=585pt
-\epsfbox{sg8_carpet_colour.ps}
+\includegraphics[width=585pt]{sg8_carpet_colour}
 \end{center}
 
 \caption[A carpet plot.]{A carpet plot. The plot shows a small region
@@ -822,8 +816,7 @@ Additional variations on the technique are possible (see Figure~\ref{NSCAT}).
 
 \begin{center}
 \leavevmode
-\epsfxsize=379pt
-\epsfbox{sg8_nscat_grey.ps}
+\includegraphics[width=379pt]{sg8_nscat_grey}
 \end{center}
 
 \caption[Two-dimensional vector data.]{Two-dimensional vector data.
@@ -842,8 +835,7 @@ Observing Satellite (ADEOS). \label{NSCAT} }
 
 \begin{center}
 \leavevmode
-\epsfxsize=379pt
-\epsfbox{sg8_nscat_colour.ps}
+\includegraphics[width=379pt]{sg8_nscat_colour}
 \end{center}
 
 \caption[Two-dimensional vector data.]{Two-dimensional vector data.
@@ -896,8 +888,7 @@ an entire data cube, but nonetheless can give surprisingly good results.
 
 \begin{center}
 \leavevmode
-\epsfxsize=342pt
-\epsfbox{sg8_slice_grey.ps}
+\includegraphics[width=342pt]{sg8_slice_grey}
 \end{center}
 
 \caption[Perspective view of a slice in a three-dimensional data
@@ -918,8 +909,7 @@ with Data Explorer (see Section~\ref{IBMDX}). \label{SLICE} }
 
 \begin{center}
 \leavevmode
-\epsfxsize=332pt
-\epsfbox{sg8_slice_colour.ps}
+\includegraphics[width=332pt]{sg8_slice_colour}
 \end{center}
 
 \caption[Perspective view of a slice in a three-dimensional data
@@ -950,8 +940,7 @@ of it will be visible (see Figure~\ref{ISOSURFACE}).
 
 \begin{center}
 \leavevmode
-\epsfxsize=315pt
-\epsfbox{sg8_iso_grey.ps}
+\includegraphics[width=315pt]{sg8_iso_grey}
 \end{center}
 
 \caption[Perspective view of an iso-surface in a three-dimensional data
@@ -967,8 +956,7 @@ It was generated with Data Explorer (see Section~\ref{IBMDX}).
 
 \begin{center}
 \leavevmode
-\epsfxsize=327pt
-\epsfbox{sg8_iso_colour.ps}
+\includegraphics[width=327pt]{sg8_iso_colour}
 \end{center}
 
 \caption[Perspective view of an iso-surface in a three-dimensional data
@@ -1022,8 +1010,7 @@ is quicker but produces less accurate results.
 
 \begin{center}
 \leavevmode
-\epsfxsize=396pt
-\epsfbox{sg8_vol_grey.ps}
+\includegraphics[width=396pt]{sg8_vol_grey}
 \end{center}
 
 \caption[Perspective view of a volume rendering of a three-dimensional data
@@ -1040,8 +1027,7 @@ It was generated with Data Explorer (see Section~\ref{IBMDX}).
 
 \begin{center}
 \leavevmode
-\epsfxsize=417pt
-\epsfbox{sg8_vol_colour.ps}
+\includegraphics[width=417pt]{sg8_vol_colour}
 \end{center}
 
 \caption[Perspective view of a volume rendering of a three-dimensional data
@@ -1308,8 +1294,7 @@ laboratory analogues of many of these techniques.
 
   \begin{center}
   \leavevmode
-  \epsfxsize=129pt
-  \epsfbox{sg8_arrow.ps}
+  \includegraphics[width=129pt]{sg8_arrow}
   \end{center}
 
   \caption[An arrow drawn as a three-dimensional object.]{An arrow drawn
@@ -1329,8 +1314,7 @@ laboratory analogues of many of these techniques.
 
   \begin{center}
   \leavevmode
-  \epsfxsize=385pt
-  \epsfbox{sg8_halley_grey.ps}
+  \includegraphics[width=385pt]{sg8_halley_grey}
   \end{center}
 
   \caption[Comet Halley.]{Comet Halley photographed on 12th March 1986
