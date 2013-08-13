@@ -33,6 +33,7 @@
 
 *  Copyright:
 *     Copyright (C) 1997 Central Laboratory of the Research Councils.
+*     Copyright (C) 2013 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -60,6 +61,8 @@
 *        Original version.
 *     18-DEC-1997 (DSB):
 *        Added statement to initialise FSTAT to FITSOK.
+*     2013 August 12 (MJC):
+*        Allow for blank headers immediately before the END card.
 *     {enter_further_changes_here}
 
 *-
@@ -89,9 +92,11 @@
       PARAMETER( FITSOK = 0 )
 
 *  Local Variables:
-      CHARACTER * ( 200 ) BUFFER ! Buffer for error messages
+      CHARACTER*200 BUFFER       ! Buffer for error messages
+      CHARACTER*80 CARD          ! Header card
       INTEGER FSTAT              ! FITSIO error status
       INTEGER KEYADD             ! Number of headers which can be added
+      LOGICAL MORE               ! Reached the END card?
       INTEGER NCF                ! Number of characters in the file name
 
 *.
@@ -114,5 +119,25 @@
          CALL COF_FIOER( FSTAT, 'COF_NHEAD_NCARD',
      :                  'FTGHSP', BUFFER, STATUS )
       END IF
+
+*  FTGHSP returns the number of headers excluding the END card and
+*  blank headers before the END card.  Allow for any trailing blank
+*  headers.
+      MORE = .TRUE.
+      DO WHILE ( MORE )
+         NCARD = NCARD + 1
+         CALL FTGREC( FUNIT, NCARD, CARD, FSTAT )
+
+*  Assume that an error here is due to a lack of an END header and the
+#  the headers are exhausted.
+         IF ( FSTAT .NE. FITSOK ) THEN
+            MORE = .FALSE.
+            NCARD = NCARD - 1
+            FSTAT = FITSOK
+         ELSE IF ( CARD( 1:8 ) .EQ. 'END     ' ) THEN
+            MORE = .FALSE.
+            NCARD = NCARD - 1
+         END IF
+      END DO
 
       END
