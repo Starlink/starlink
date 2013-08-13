@@ -129,7 +129,7 @@
          CALL FTGREC( FUNIT, NCARD, CARD, FSTAT )
 
 *  Assume that an error here is due to a lack of an END header and the
-#  the headers are exhausted.
+*  the headers are exhausted.
          IF ( FSTAT .NE. FITSOK ) THEN
             MORE = .FALSE.
             NCARD = NCARD - 1
