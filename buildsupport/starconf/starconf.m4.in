@@ -1066,10 +1066,10 @@ AC_DEFUN([STAR_LATEX_DOCUMENTATION],
         if $_star_build_docs; then
             AC_FOREACH([DocCode], [$1],
                [m4_if(m4_bregexp(DocCode,[/]), -1,
-                      [STAR@&t@_LATEX_DOCUMENTATION="$STAR@&t@_LATEX_DOCUMENTATION DocCode.tex DocCode.pdf DocCode.htx_tar"
+                      [STAR@&t@_LATEX_DOCUMENTATION="$STAR@&t@_LATEX_DOCUMENTATION DocCode.tex DocCode.ps DocCode.htx_tar"
 ],
                       [m4_define([_T], m4_bpatsubst(DocCode,[/]))dnl
-                       STAR_LATEX_DOCUMENTATION_[]_STAR_UPCASE(_T)="_T.tex _T.pdf _T.htx_tar"
+                       STAR_LATEX_DOCUMENTATION_[]_STAR_UPCASE(_T)="_T.tex _T.ps _T.htx_tar"
                        AC_SUBST(STAR_LATEX_DOCUMENTATION_[]_STAR_UPCASE(_T))])])
         fi
         STAR_DECLARE_DEPENDENCIES([sourceset], [star2html])
