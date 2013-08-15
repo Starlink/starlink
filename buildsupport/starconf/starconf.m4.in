@@ -586,7 +586,7 @@ float fred_() {
            $FC $FCFLAGS $opt -o conftest conftest.f c-conftest.$ac_objext 2>&5
            if test -r conftest
            then
-              star_cv_cnf_f2c_compatible=`eval conftest | sed 's/\ //g'` > /dev/null
+              star_cv_cnf_f2c_compatible=`eval ./conftest | sed 's/\ //g'` > /dev/null
            else
               AC_MSG_ERROR([failed to link program]) 
            fi
@@ -795,7 +795,7 @@ C  checks passing 4 byte character string lengths on 64bit compiler.
               $FC $FCFLAGS $opt -o conftest conftest.f 2>&5
               if test -r conftest
               then
-                 star_cv_cnf_trail_type=`eval conftest | sed 's/\ //g'` > /dev/null
+                 star_cv_cnf_trail_type=`eval ./conftest | sed 's/\ //g'` > /dev/null
               else
                  AC_MSG_ERROR([failed to link program]) 
               fi
