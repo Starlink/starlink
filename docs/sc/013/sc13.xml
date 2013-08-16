@@ -7,15 +7,15 @@
   <!ENTITY gausssine-gnuplot.eps
 			SYSTEM "sc13-gausssine-gnuplot.eps"
 			NDATA eps>
-  <!ENTITY gausssine-gnuplot.gif
-			SYSTEM "sc13-gausssine-gnuplot.gif"
-			NDATA gif89a>
+  <!ENTITY gausssine-gnuplot.png
+			SYSTEM "sc13-gausssine-gnuplot.png"
+			NDATA png>
   <!ENTITY gausssine-idl.eps
 			SYSTEM "sc13-gausssine-idl.eps"
 			NDATA eps>
-  <!ENTITY gausssine-idl.gif
-			SYSTEM "sc13-gausssine-idl.gif"
-			NDATA gif89a>
+  <!ENTITY gausssine-idl.png
+			SYSTEM "sc13-gausssine-idl.png"
+			NDATA png>
 
   <!-- Local text files included -->
   <!ENTITY version SYSTEM "VERSION">
@@ -3053,7 +3053,7 @@ gnuplot&gt; set output          # close the output file
             <caption><px>File gausssine.dat, displayed with
                 gnuplot</px></caption>
             <figurecontent image="gausssine-gnuplot.eps"/>
-            <figurecontent image="gausssine-gnuplot.gif"/>
+            <figurecontent image="gausssine-gnuplot.png"/>
           </figure>
 
           <p>There is good help within gnuplot, available by typing
@@ -3147,7 +3147,7 @@ m=s2*a3</verbatim>
             <caption><px>File gausssine.dat, displayed with
                 IDL</px></caption>
             <figurecontent image="gausssine-idl.eps"/>
-            <figurecontent image="gausssine-idl.gif"/>
+            <figurecontent image="gausssine-idl.png"/>
           </figure>
 
           <p>IDL comes with rather good manuals, the reference parts
