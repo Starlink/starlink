@@ -50,6 +50,7 @@
 *     BDK: Dennis Kelly (UKATC)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
 *     COBA: Coskun Oba (UoL)
+*     DSB: David Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -67,11 +68,14 @@
 *        fit by a straight line with a reasonable signal-to-noise.
 *     2010-09-17 (COBA):
 *        Updated smf_construct_smfData which now contains smfFts
+*     2013-08-16 (DSB):
+*        Use a nearby good value as the reference value if the central value
+*        is bad, rather than rejecting the whole bolometer.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
-*     Copyright (C) 2010 Science and Technology Facilities Council.
+*     Copyright (C) 2010,2013 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -120,12 +124,14 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
   double * corrs = NULL;    /* correlation coefficients for each bolometer */
   double corr_thresh = 0.0; /* threshold for correlation coefficient thresholding */
   double * goodht = NULL;   /* Heater values for good measurements */
-  size_t * goodidx = NULL;     /* Indices of good measurements */
+  size_t * goodidx = NULL;  /* Indices of good measurements */
   double * ht = NULL;       /* Heater values corrected for reference */
+  size_t iref;              /* Index of reference measurement */
+  size_t ireflo;            /* Lowest allowed index for reference measurement */
   size_t j;
   const size_t NCOEFF = 6;  /* Max number of coefficients per bolometer */
   size_t nbol = 0;          /* Number of bolometers */
-  size_t ncorr = 0;          /* Number of bolometers flagged due to bad correlation coefficient */
+  size_t ncorr = 0;         /* Number of bolometers flagged due to bad correlation coefficient */
   size_t nheat = 0;         /* Number of measurements */
   size_t nsnr = 0;          /* Number of bolometers flagged by SNR limit */
   double *poly = NULL;      /* polynomial expansion of each fit */
@@ -210,7 +216,22 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
 
   /* Now loop over each bolometer and extract the measurements */
   for (bol=0; bol<nbol; bol++) {
-    const double refval = bolval[nbol*(nheat/2)+bol];
+
+    /* Find a reference value. Use the central value if good, otherwise
+       use the previous good value so long as it is not too far away from
+       the centre. */
+    iref = nheat/2;
+
+    ireflo = iref - 5;
+    if( ireflo < nheat/4 ) ireflo = nheat/4;
+
+    double refval = bolval[nbol*iref+bol];
+
+    while( refval == VAL__BADD && iref > ireflo ) {
+       iref--;
+       refval = bolval[nbol*iref+bol];
+    }
+
     double refvar = 0.0;
     size_t i;
     size_t nrgood = 0;
@@ -219,15 +240,12 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
     if (corrs) corrs[bol] = VAL__BADD;
 
     if (bolvar) {
-      refvar = bolvar[nbol*(nheat/2)+bol];
+      refvar = bolvar[nbol*iref+bol];
     }
 
-    /* if refval is bad then this really means that there was a flagged measurement
-       right at the middle heater value. This is a bit of a problem since it might
-       be a reasonable ramp otherwise. Chances are it's a dodgy ramp so we leave
-       it for now. One solution is to store the reference value when calculating the
-       average ramp and pass it through to this routine independently. Alternatively
-       at least store the value prior to the precondition step. */
+    /* If refval is bad then this means that there were no good measurements
+       close to the centre of the array. Chances are it's a dodgy ramp so
+       we ignore it. */
     if (refval != VAL__BADD) {
       for (i=0; i<nheat; i++) {
         if (bolval[nbol*i+bol] != VAL__BADD && bolvar[nbol*i+bol] != VAL__BADD) {
