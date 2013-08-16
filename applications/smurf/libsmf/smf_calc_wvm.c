@@ -83,6 +83,9 @@
 *     2013-07-22 (TIMJ):
 *        Add a cache so that previously calculate values can be returned
 *        immediately.
+*     2013-08-16 (DSB):
+*        Exempt the cache from AST context handling so that it is not
+*        annulled when the current AST context ends.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -157,13 +160,7 @@ double smf_calc_wvm( const smfHead *hdr, double approxam, AstKeyMap * extpars, i
 
   /* See if we are required to clear any cache */
   if (!hdr && approxam != VAL__BADD && approxam < 0.0) {
-    if (CACHE) {
-      CACHE = astAnnul( CACHE );
-      /* if we got an error ignore it. An error would indicate that we
-         somehow instantiated the cache in a different thread to the one we
-         are using to free it. */
-      if (*status == AST__OBJIN) errAnnul( status );
-    }
+    if (CACHE) CACHE = astAnnul( CACHE );
     return VAL__BADD;
   }
 
@@ -182,8 +179,12 @@ double smf_calc_wvm( const smfHead *hdr, double approxam, AstKeyMap * extpars, i
     return VAL__BADD;
   }
 
-  /* Initialise the cache */
-  if (!CACHE) CACHE = astKeyMap( "" );
+  /* Initialise the cache and exempt it from AST context handling so it
+     is not annulled when the current AST context ends. */
+  if (!CACHE) {
+     CACHE = astKeyMap( "" );
+     astExempt( CACHE );
+  }
 
   /* Store TCS info */
   state = hdr->state;
