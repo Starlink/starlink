@@ -16,6 +16,6 @@ STAR_DEFAULTS(docs-only)
 
 STAR_LATEX_DOCUMENTATION(sg8)
 
-AC_CONFIG_FILES(Makefile component.xml examples/Makefile)
+AC_CONFIG_FILES(Makefile component.xml)
 
 AC_OUTPUT
