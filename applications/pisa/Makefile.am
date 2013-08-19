@@ -7,7 +7,7 @@ dist_noinst_SCRIPTS = pisa_link_adam
 
 bin_MONOLITHS = pisa_mon pisa_mon4 pisahelp
 
-stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ sun109fig.ps
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ sun109_cover.eps
 
 DYNSCRIPTS = pisa.sh pisa.csh pisa.icl
 
@@ -81,7 +81,7 @@ pisasupport_DATA = frame.sdf frame_stars.acc clustan.dat findinfo.dat \
 dist_starnews_DATA = pisa.news
 
 ##  Things for distribution that are not picked up otherwise.
-EXTRA_DIST = $(pisasupport_DATA) $(HELP_SOURCES) sun109fig.ps
+EXTRA_DIST = $(pisasupport_DATA) $(HELP_SOURCES) sun109_cover.eps
 
 CLEANFILES = addnoise.ifc pisa2ard.ifc pisa2cat.ifc pisacut.ifc \
              pisafind4.ifc pisafind.ifc pisafit4.ifc pisafit.ifc \
