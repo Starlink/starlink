@@ -238,6 +238,9 @@
 *        Write effective noise to output image. This allows the pipeline
 *        to easily look at the results when multiple files have been
 *        created.
+*     2011-08-23 (DSB):
+*        Do not call grpList if no output files are generated. This
+*        avoids a GRP__INVID error in such cases.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -907,8 +910,9 @@ void smurf_calcnoise( int *status ) {
 
  CLEANUP:
   /* Write out the list of output NDF names, annulling the error if a null
-     parameter value is supplied. */
-  if( *status == SAI__OK ) {
+     parameter value is supplied. Do not attempt do this if no output files 
+     were created. */
+  if( *status == SAI__OK && ogrp ) {
     grpList( "OUTFILES", 0, 0, NULL, ogrp, status );
     if( *status == PAR__NULL ) errAnnul( status );
   }
