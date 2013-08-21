@@ -109,11 +109,14 @@
 *        Add FLAT parameter.
 *     2010-03-11 (TIMJ):
 *        Support flatfield ramps.
+*     2013-08-21 (AGG):
+*        Do not call grpList if no output files are generated. This
+*        avoids a GRP__INVID error in such cases.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
-*     Copyright (C) 2005-2009 University of British Columbia.
+*     Copyright (C) 2005-2009,2013 University of British Columbia.
 *     Copyright (C) 2008-2010 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
@@ -290,7 +293,7 @@ void smurf_sc2concat( int *status ) {
 
   /* Write out the list of output NDF names, annulling the error if a null
      parameter value is supplied. */
-  if( *status == SAI__OK ) {
+  if( *status == SAI__OK && ogrp ) {
     grpList( "OUTFILES", 0, 0, NULL, ogrp, status );
     if( *status == PAR__NULL ) errAnnul( status );
   }

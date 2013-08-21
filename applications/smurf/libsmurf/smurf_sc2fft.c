@@ -155,11 +155,14 @@
 *        Use AVPSPECTHRESH rather than simply ignoring it.
 *     2011-06-13 (EC):
 *        Add WEIGHTAVPSPEC option.
+*     2013-08-21 (AGG):
+*        Do not call grpList if no output files are generated. This
+*        avoids a GRP__INVID error in such cases.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2008-2011 Science and Technology Facilities Council.
-*     Copyright (C) 2008-2011 University of British Columbia.
+*     Copyright (C) 2008-2011,2013 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -505,7 +508,7 @@ void smurf_sc2fft( int *status ) {
 
   /* Write out the list of output NDF names, annulling the error if a null
      parameter value is supplied. */
-  if( *status == SAI__OK ) {
+  if( *status == SAI__OK && ogrp ) {
     grpList( "OUTFILES", 0, 0, NULL, ogrp, status );
     if( *status == PAR__NULL ) errAnnul( status );
   }

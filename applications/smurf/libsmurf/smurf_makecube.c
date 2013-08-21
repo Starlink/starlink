@@ -857,11 +857,14 @@
 *        specified by the OUTFILES parameter.
 *     7-MAY-2013 (DSB):
 *        Report an error if no NDFs are created.
+*     21-AUG-2013 (AGG):
+*        Do not call grpList if no output files are generated. This
+*        avoids a GRP__INVID error in such cases.
 
 *  Copyright:
 *     Copyright (C) 2007-2011 Science and Technology Facilities Council.
 *     Copyright (C) 2006-2007 Particle Physics and Astronomy Research
-*     Council. Copyright (C) 2006-2008 University of British Columbia.
+*     Council. Copyright (C) 2006-2008,2013 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -2097,7 +2100,7 @@ void smurf_makecube( int *status ) {
 
 /* Write out the list of output NDF names, annulling the error if a null
    parameter value is supplied. */
-   if( *status == SAI__OK ) {
+   if( *status == SAI__OK && igrp4 ) {
       grpList( "OUTFILES", 0, 0, NULL, igrp4, status );
       if( *status == PAR__NULL ) errAnnul( status );
    }

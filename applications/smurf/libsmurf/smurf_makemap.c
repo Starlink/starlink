@@ -708,11 +708,14 @@
 *        how many iterations were completed.
 *     2013-07-04 (DSB):
 *        Added parameter ITERMAPS.
+*     2013-08-21 (AGG):
+*        Do not call grpList if no output files are generated. This
+*        avoids a GRP__INVID error in such cases.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
-*     Copyright (C) 2005-2010 University of British Columbia.
+*     Copyright (C) 2005-2010,2013 University of British Columbia.
 *     Copyright (C) 2007-2012 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
@@ -1509,7 +1512,7 @@ void smurf_makemap( int *status ) {
 
     /* Write out the list of output NDF names, annulling the error if a null
        parameter value is supplied. */
-    if( *status == SAI__OK ) {
+    if( *status == SAI__OK && igrp4 ) {
       grpList( "OUTFILES", 0, 0, NULL, igrp4, status );
       if( *status == PAR__NULL ) errAnnul( status );
     }

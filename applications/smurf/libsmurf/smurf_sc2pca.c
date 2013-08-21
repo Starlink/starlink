@@ -105,15 +105,19 @@
 
 *  Authors:
 *     Ed Chapin (UBC)
+*     Andy Gibb (UBC)
 *     {enter_new_authors_here}
 
 *  History:
 *     2011-03-18 (EC):
 *        Initial version based on smurf_extinction
+*     2013-08-21 (AGG):
+*        Do not call grpList if no output files are generated. This
+*        avoids a GRP__INVID error in such cases.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006-2011 University of British Columbia.
+*     Copyright (C) 2006-2011,2013 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -253,10 +257,11 @@ void smurf_sc2pca( int *status ) {
 
   /* Write out the list of output NDF names, annulling the error if a null
      parameter value is supplied. */
-  if( *status == SAI__OK ) {
+  if( *status == SAI__OK && outampgrp ) {
     grpList( "OUTAMPFILES", 0, 0, NULL, outampgrp, status );
     if( *status == PAR__NULL ) errAnnul( status );
-
+  }
+  if( *status == SAI__OK && outcompgrp ) {
     grpList( "OUTCOMPFILES", 0, 0, NULL, outcompgrp, status );
     if( *status == PAR__NULL ) errAnnul( status );
   }

@@ -73,12 +73,15 @@
 *        Add BPM parameter.
 *     2009-03-30 (TIMJ):
 *        Add OUTFILES parameter.
+*     2013-08-21 (AGG):
+*        Do not call grpList if no output files are generated. This
+*        avoids a GRP__INVID error in such cases.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2008-2009 Science and Technology Facilities Council.
-*     Copyright (C) 2006-2008 University of British Columbia. All Rights
-*     Reserved.
+*     Copyright (C) 2006-2008,2013 University of British Columbia.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -219,7 +222,7 @@ void smurf_starecalc ( int *status ) {
 
   /* Write out the list of output NDF names, annulling the error if a null
      parameter value is supplied. */
-  if( *status == SAI__OK ) {
+  if( *status == SAI__OK && ogrp ) {
     grpList( "OUTFILES", 0, 0, NULL, ogrp, status );
     if( *status == PAR__NULL ) errAnnul( status );
   }

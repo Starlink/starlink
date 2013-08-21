@@ -121,6 +121,9 @@
 *        Change BPM to BBM.
 *     2010-03-11 (TIMJ):
 *        Support flatfield ramps.
+*     2013-08-21 (AGG):
+*        Do not call grpList if no output files are generated. This
+*        avoids a GRP__INVID error in such cases.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -128,7 +131,7 @@
 *     correction has already been applied.
 
 *  Copyright:
-*     Copyright (C) 2006-2010 University of British Columbia.
+*     Copyright (C) 2006-2010,2013 University of British Columbia.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2008-2009 Science and Technology Facilities Council.
 *     All Rights Reserved.
@@ -314,7 +317,7 @@ void smurf_remsky( int * status ) {
 
   /* Write out the list of output NDF names, annulling the error if a null
      parameter value is supplied. */
-  if( *status == SAI__OK ) {
+  if( *status == SAI__OK && ogrp ) {
     grpList( "OUTFILES", 0, 0, NULL, ogrp, status );
     if( *status == PAR__NULL ) errAnnul( status );
   }

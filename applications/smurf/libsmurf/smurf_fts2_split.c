@@ -35,6 +35,7 @@
 *          line). If a NULL (!) value is supplied no file is created. [!]
 
 *  Authors:
+*     AGG: Andy Gibb (UBC)
 *     MSHERWOOD: Matt Sherwood (UofL)
 
 *  History :
@@ -43,10 +44,16 @@
 *     2013-05-21 (MS)
 *        Skip scans that are too short
 *     2013-06-20 (MS)
-*        Fixed bug that prevented scans any smaller than the previous one from being kept
+*        Fixed bug that prevented scans any smaller than the previous one
+*        from being kept
+*     2013-08-21 (AGG):
+*        Do not call grpList if no output files are generated. This
+*        avoids a GRP__INVID error in such cases.
+*     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2013 University of Lethbridge. All Rights Reserved.
+*     Copyright (C) 2013 University of British Columbia.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -409,7 +416,7 @@ void smurf_fts2_split(int* status)
 
   /* Write out the list of output NDF names, annulling the error if a null
      parameter value is supplied. */
-  if( *status == SAI__OK ) {
+  if( *status == SAI__OK && gOut ) {
       grpList( "OUTFILES", 0, 0, NULL, gOut, status );
           if( *status == PAR__NULL ) {
               errRep(FUNC_NAME, "Error writing OUTFILES!", status);
