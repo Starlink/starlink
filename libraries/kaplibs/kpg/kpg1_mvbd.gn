@@ -2,21 +2,21 @@
 *+
 *  Name:
 *     KPG1_MVBDx
- 
+
 *  Purpose:
 *     Moves bad data values to the end of an index of array values.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL KPG1_MVBDx( ELA, ARRAY, ELI, INDX, NGOOD, STATUS )
- 
+
 *  Description:
 *     This routine modifies the supplied index array by removing indicies
 *     of all bad data values and shuffling indicies for good data values 
 *     down to fill the gaps.
- 
+
 *  Arguments:
 *     ELA = INTEGER (Given)
 *        The size of the data array.
@@ -38,11 +38,11 @@
 *        values of INDX will retain their original values.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
- 
+
 *  Notes:
 *     -  There is a routine for each numeric data type: replace "x" in
-*     the routine name by D, R, I, W, UW, B or UB as appropriate. 
- 
+*     the routine name by D, R, I, W, UW, B or UB as appropriate.
+
 *  Copyright:
 *     Copyright (C) 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
@@ -52,12 +52,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 51, Franklin Street, Fifth Floor, Boston, MA
@@ -66,38 +66,38 @@
 *  Authors:
 *     DSB: David S Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     20-AUG-2009 (DSB):
 *        Original version.
 *     {enter_changes_here}
- 
+
 *  Bugs:
 *     {note_any_bugs_here}
- 
+
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT constants
- 
+
 *  Arguments Given:
       INTEGER ELA
       <TYPE> ARRAY( ELA )
       INTEGER ELI
- 
+
 *  Arguments Given and Returned:
       INTEGER INDX( ELI )
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  Local Variables:
-       INTEGER I                 ! Index of next INDX value to check 
-       INTEGER K                 ! Index of next data value to check 
+       INTEGER I                 ! Index of next INDX value to check
+       INTEGER K                 ! Index of next data value to check
        INTEGER NGOOD             ! Number of good values found so far
 *.
 
@@ -111,13 +111,13 @@
       DO I = 1, ELI
 
 *  Get the index of the data value, and check it is within the bounds of
-*  the data array. 
+*  the data array.
          K = INDX( I )
          IF( K .GE. 1 .AND. K .LE. ELA ) THEN
 
-*  If the data value is good, increment the number of good values found, 
-*  and store its index in the corresponding element of INDX (NGOOD will 
-*  always be fewer than or equal to I and so the value of INDX( NGOOD ) 
+*  If the data value is good, increment the number of good values found,
+*  and store its index in the corresponding element of INDX (NGOOD will
+*  always be fewer than or equal to I and so the value of INDX( NGOOD )
 *  will already have been used and so can be over-written safely).
             IF( ARRAY( K ) .NE. VAL__BAD<T> ) THEN
                NGOOD = NGOOD + 1
@@ -127,5 +127,5 @@
          END IF
 
       END DO
- 
+
       END
