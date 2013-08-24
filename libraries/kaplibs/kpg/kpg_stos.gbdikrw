@@ -48,10 +48,10 @@
 *        The global status.
  
 *  Notes:
-*     -  There is a routine for double-precision, integer, and real data
-*     types: replace "x" in the routine name by D, I, or R as 
-*     appropriate.  The data type of the ARRAY argument must match the 
-*     particular routine used.
+*     -  There is a routine for byte, double-precision, integer, 64-bit
+*     integer, real, and word data types: replace "x" in the routine name
+*     by B, D, I, K, R, or W as  appropriate.  The data type of the
+*     ARRAY argument must match the particular routine used.
 *     -  If the value of NGOOD is not at least two, then this routine 
 *     will abort.  The median and percentiles will have the bad value.
 *     -  The sorting is recorded in an index leaving the order of the 
