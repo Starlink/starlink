@@ -137,7 +137,7 @@
 *         array.  This parameter is only written when one or more
 *         percentiles have been requested.
 *     SIGMA = _DOUBLE (Write)
-*        The population standard deviation of the pixel values in the 
+*        The population standard deviation of the pixel values in the
 *        NDF array.
 *     SKEWNESS = _DOUBLE (Write)
 *        The population skewness of all the valid pixels in the NDF
@@ -188,8 +188,8 @@
 *  Copyright:
 *     Copyright (C) 1991-1992 Science & Engineering Research Council.
 *     Copyright (C) 2004 Central Laboratory of the Research Councils.
-*     Copyright (C) 2007, 2009, 2010 Science & Technology Facilities 
-*     Council.
+*     Copyright (C) 2007, 2009, 2010. 2013 Science & Technology
+*     Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -246,7 +246,9 @@
 *        skewness and kurtosis.  The standard deviation is now a
 *        population statistic, rather than the sample statistic
 *        formerly.  In practice this will only make a significant
-*        difference for small NDF arrays. 
+*        difference for small NDF arrays.
+*     2013 August 23 (MJC):
+*        Ordered statistics now respect sigma clipping.
 *     {enter_further_changes_here}
 
 *-
@@ -284,6 +286,7 @@
       CHARACTER * ( SZBUF ) BUF  ! Text buffer
       CHARACTER * ( 255 ) MAXWCS ! Formatted max WCS position
       CHARACTER * ( 255 ) MINWCS ! Formatted max WCS position
+      DOUBLE PRECISION CRANGE( 2 ) ! Clipping range
       DOUBLE PRECISION DMAX      ! Max. value of pixels in array
       DOUBLE PRECISION DMAXC     ! Max. pixel value after clipping
       DOUBLE PRECISION DMIN      ! Min. value of pixels in array
@@ -296,11 +299,11 @@
       DOUBLE PRECISION MAXCC( NDF__MXDIM ) ! Max. pixel coords (clipped)
       DOUBLE PRECISION MEAN      ! Mean of pixels in array
       DOUBLE PRECISION MEANC     ! Mean of pixels after clipping
-      DOUBLE PRECISION MEDIAN    ! Median of pixels in array
+      DOUBLE PRECISION MEDIAN( 2 ) ! Medians of pixels in array
       DOUBLE PRECISION MINC( NDF__MXDIM ) ! Co-ordinates of min. pixel
       DOUBLE PRECISION MINCC( NDF__MXDIM ) ! Min. pixel coords (clipped)
       DOUBLE PRECISION MODE      ! Mode of pixels in array (dummy)
-      DOUBLE PRECISION PERVAL( NPRCTL ) ! Values at the percentiles
+      DOUBLE PRECISION PERVAL( NPRCTL * 2 ) ! Values at the percentiles
       DOUBLE PRECISION SKEW      ! Skewness
       DOUBLE PRECISION SKEWC     ! Skewness (after clipping)
       DOUBLE PRECISION STDEV     ! Standard devn. of pixels in array
@@ -318,6 +321,7 @@
       INTEGER ISTAT( 3 )         ! Array of integer statistics
       INTEGER ISTATC( 3 )        ! Array of clipped integer statistics
       INTEGER IWCS               ! Pointer to WCS FrameSet
+      INTEGER J                  ! Loop counter for clipped order stats
       INTEGER LBND( NDF__MXDIM ) ! NDF lower bounds
       INTEGER MAXP( NDF__MXDIM ) ! Indices of maximum-valued pixel
       INTEGER MAXPC( NDF__MXDIM ) ! Maximum pixel indices after clipping
@@ -589,10 +593,12 @@
 
 *  Assign undefined values to the ordered statistics so by default
 *  they are not reported.
-      MEDIAN = VAL__BADD
+      MEDIAN( 1 ) = VAL__BADD
+      MEDIAN( 2 ) = VAL__BADD
       IF ( .NOT. DOPRCT ) THEN
          PERCNT( 1 ) = VAL__BADR
          PERVAL( 1 ) = VAL__BADD
+         PERVAL( 1 + NUMPER ) = VAL__BADD
       END IF
       MODE = VAL__BADD
 
@@ -604,29 +610,37 @@
 
 *  Call the appropriate routine to quicksort the array and then find the
 *  order statistics.
+         CRANGE( 1 ) = DMINC
+         CRANGE( 2 ) = DMAXC
          IF ( TYPE .EQ. '_BYTE' ) THEN
-            CALL KPG_STOSB( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), NGOOD,
-     :                      NUMPER, PERCNT, MEDIAN, PERVAL, STATUS )
+            CALL KPG_STOCB( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), NGOOD,
+     :                      NUMPER, PERCNT, CRANGE, MEDIAN, PERVAL,
+     :                      STATUS )
 
          ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPG_STOSD( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), NGOOD,
-     :                      NUMPER, PERCNT, MEDIAN, PERVAL, STATUS )
+            CALL KPG_STOCD( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), NGOOD,
+     :                      NUMPER, PERCNT, CRANGE, MEDIAN, PERVAL,
+     :                      STATUS )
 
          ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-            CALL KPG_STOSI( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), NGOOD,
-     :                      NUMPER, PERCNT, MEDIAN, PERVAL, STATUS )
+            CALL KPG_STOCI( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), NGOOD,
+     :                      NUMPER, PERCNT, CRANGE, MEDIAN, PERVAL,
+     :                      STATUS )
 
          ELSE IF ( TYPE .EQ. '_INT64' ) THEN
-            CALL KPG_STOSK( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), NGOOD,
-     :                      NUMPER, PERCNT, MEDIAN, PERVAL, STATUS )
+            CALL KPG_STOCK( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), NGOOD,
+     :                      NUMPER, PERCNT, CRANGE, MEDIAN, PERVAL,
+     :                      STATUS )
 
          ELSE IF ( TYPE .EQ. '_REAL' ) THEN
-            CALL KPG_STOSR( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), NGOOD,
-     :                      NUMPER, PERCNT, MEDIAN, PERVAL, STATUS )
+            CALL KPG_STOCR( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), NGOOD,
+     :                      NUMPER, PERCNT, CRANGE, MEDIAN, PERVAL,
+     :                      STATUS )
 
          ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-            CALL KPG_STOSW( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), NGOOD,
-     :                      NUMPER, PERCNT, MEDIAN, PERVAL, STATUS )
+            CALL KPG_STOCW( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), NGOOD,
+     :                      NUMPER, PERCNT, CRANGE, MEDIAN, PERVAL,
+     :                      STATUS )
 
          END IF
       END IF
@@ -636,13 +650,13 @@
       IF ( TYPE .EQ. '_DOUBLE' .OR. TYPE .EQ. '_INT64' ) THEN
          CALL KPG1_STDSD( IWCS, NDIM, EL, NGOOD, DMIN, MINP, MINC,
      :                    DMAX, MAXP, MAXC, SUM, MEAN, STDEV, SKEW,
-     :                    KURT, MEDIAN, MODE, MAX( 1, NUMPER ), PERCNT,
-     :                    PERVAL, MAXWCS, MINWCS, STATUS )
+     :                    KURT, MEDIAN( 1 ), MODE, MAX( 1, NUMPER ),
+     :                    PERCNT, PERVAL, MAXWCS, MINWCS, STATUS )
       ELSE
          CALL KPG1_STDSR( IWCS, NDIM, EL, NGOOD, DMIN, MINP, MINC,
      :                    DMAX, MAXP, MAXC, SUM, MEAN, STDEV, SKEW,
-     :                    KURT, MEDIAN, MODE, MAX( 1, NUMPER ), PERCNT,
-     :                    PERVAL, MAXWCS, MINWCS, STATUS )
+     :                    KURT, MEDIAN( 1 ), MODE, MAX( 1, NUMPER ),
+     :                    PERCNT, PERVAL, MAXWCS, MINWCS, STATUS )
       END IF
 
 *  Also write the statistics to the logfile, if used.
@@ -650,12 +664,12 @@
          IF ( TYPE .EQ. '_DOUBLE' .OR. TYPE .EQ. '_INT64' ) THEN
             CALL KPG1_STFLD( IWCS, NDIM, EL, NGOOD, DMIN, MINP, MINC,
      :                       DMAX, MAXP, MAXC, SUM, MEAN, STDEV, SKEW,
-     :                       KURT, MEDIAN, MODE, MAX( 1, NUMPER ), 
+     :                       KURT, MEDIAN(  1 ), MODE, MAX( 1, NUMPER ),
      :                       PERCNT, PERVAL, IFIL, STATUS )
          ELSE
             CALL KPG1_STFLR( IWCS, NDIM, EL, NGOOD, DMIN, MINP, MINC,
      :                       DMAX, MAXP, MAXC, SUM, MEAN, STDEV, SKEW,
-     :                       KURT, MEDIAN, MODE, MAX( 1, NUMPER ), 
+     :                       KURT, MEDIAN( 1 ), MODE, MAX( 1, NUMPER ),
      :                       PERCNT, PERVAL, IFIL, STATUS )
          END IF
       END IF
@@ -691,15 +705,17 @@
          IF ( TYPE .EQ. '_DOUBLE' .OR. TYPE .EQ. '_INT64' ) THEN
             CALL KPG1_STDSD( IWCS, NDIM, EL, NGOODC, DMINC, MINPC,
      :                       MINCC, DMAXC, MAXPC, MAXCC, SUMC, MEANC,
-     :                       STDEVC, SKEWC, KURTC, MEDIAN, MODE, 
-     :                       MAX( 1, NUMPER ), PERCNT, PERVAL, MAXWCS, 
-     :                       MINWCS, STATUS )
+     :                       STDEVC, SKEWC, KURTC, MEDIAN( 2 ), MODE,
+     :                       MAX( 1, NUMPER ), PERCNT,
+     :                       PERVAL( 1 + NUMPER ), MAXWCS, MINWCS,
+     :                       STATUS )
          ELSE
             CALL KPG1_STDSR( IWCS, NDIM, EL, NGOODC, DMINC, MINPC,
      :                       MINCC, DMAXC, MAXPC, MAXCC, SUMC, MEANC,
-     :                       STDEVC, SKEWC, KURTC, MEDIAN, MODE, 
-     *                       MAX( 1, NUMPER ), PERCNT, PERVAL, MAXWCS, 
-     :                       MINWCS, STATUS )
+     :                       STDEVC, SKEWC, KURTC, MEDIAN( 2 ), MODE,
+     :                       MAX( 1, NUMPER ), PERCNT,
+     :                       PERVAL( 1 + NUMPER ), MAXWCS, MINWCS,
+     :                       STATUS )
          END IF
 
 *  Also write the statistics to the log file, if used.
@@ -708,15 +724,16 @@
             IF ( TYPE .EQ. '_DOUBLE' .OR. TYPE .EQ. '_INT64' ) THEN
                CALL KPG1_STFLD( IWCS, NDIM, EL, NGOODC, DMINC, MINPC,
      :                          MINCC, DMAXC, MAXPC, MAXCC, SUMC, MEANC,
-     :                          STDEVC, SKEWC, KURTC, MEDIAN, MODE, 
+     :                          STDEVC, SKEWC, KURTC, MEDIAN( 2 ), MODE,
      :                          MAX( 1, NUMPER ), PERCNT, PERVAL, IFIL,
-     :                          STATUS )
+     :                          MAX( 1, NUMPER ), PERCNT,
+     :                          PERVAL( 1 + NUMPER ), IFIL, STATUS )
             ELSE
                CALL KPG1_STFLR( IWCS, NDIM, EL, NGOODC, DMINC, MINPC,
      :                          MINCC, DMAXC, MAXPC, MAXCC, SUMC, MEANC,
-     :                          STDEVC, SKEWC, KURTC, MEDIAN, MODE,
-     :                          MAX( 1, NUMPER ), PERCNT, PERVAL, IFIL,
-     :                          STATUS )
+     :                          STDEVC, SKEWC, KURTC, MEDIAN( 2 ), MODE,
+     :                          MAX( 1, NUMPER ), PERCNT,
+     :                          PERVAL( 1 + NUMPER ), IFIL, STATUS )
             END IF
          END IF
       END IF
@@ -738,11 +755,23 @@
       CALL PAR_PUT1D( 'MINCOORD', NWCS, MINCC, STATUS )
       CALL PAR_PUT1I( 'MAXPOS', NDIM, MAXPC, STATUS )
       CALL PAR_PUT1I( 'MINPOS', NDIM, MINPC, STATUS )
-      IF ( ORDER ) CALL PAR_PUT0D( 'MEDIAN', MEDIAN, STATUS )
+      IF ( ORDER ) THEN
+         IF ( NCLIP .NE. 0 ) THEN
+            CALL PAR_PUT0D( 'MEDIAN', MEDIAN( 2 ), STATUS )
+         ELSE
+            CALL PAR_PUT0D( 'MEDIAN', MEDIAN( 2 ), STATUS )
+         END IF
+      END IF
 
 *  Only write percentiles values if any percentiles were given.
-      IF ( DOPRCT ) CALL PAR_PUT1D( 'PERVAL', NUMPER, PERVAL, STATUS )
-
+      IF ( DOPRCT ) THEN
+         IF ( NCLIP .NE. 0 ) THEN
+            CALL PAR_PUT1D( 'PERVAL', NUMPER, PERVAL( 1 + NUMPER ),
+     :                      STATUS )
+         ELSE
+            CALL PAR_PUT1D( 'PERVAL', NUMPER, PERVAL, STATUS )
+         END IF
+      END IF
 
 *  Arrive here if an error occurs.
  99   CONTINUE
