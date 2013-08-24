@@ -13,8 +13,8 @@
 *     CALL KPG1_MVBDx( ELA, ARRAY, ELI, INDX, NGOOD, STATUS )
 
 *  Description:
-*     This routine modifies the supplied index array by removing indicies
-*     of all bad data values and shuffling indicies for good data values 
+*     This routine modifies the supplied index array by removing indices
+*     of all bad data values and shuffling indices for good data values
 *     down to fill the gaps.
 
 *  Arguments:
@@ -27,8 +27,8 @@
 *     INDX( ELI ) = INTEGER (Given and Returned)
 *        Each element of this array is an index into the ARRAY array. On
 *        exit, the contents of INDX are re-arranged so that indices that
-*        refer to bad data values are removed and indices that refer to 
-*        good data values are shuffled down to fill the gaps. Any indicies
+*        refer to bad data values are removed and indices that refer to
+*        good data values are shuffled down to fill the gaps. Any indices
 *        which are outside the bounds of the data array are treated as if
 *        they referred to bad data values (i.e. they are removed).
 *     NGOOD = INTEGER (Returned)
@@ -101,13 +101,13 @@
        INTEGER NGOOD             ! Number of good values found so far
 *.
 
-*  Initialise 
+*  Initialise returned value.
       NGOOD = 0
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Loop round testing every value in the supplied index array
+*  Loop round testing every value in the supplied index array.
       DO I = 1, ELI
 
 *  Get the index of the data value, and check it is within the bounds of
