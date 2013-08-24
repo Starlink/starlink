@@ -6,6 +6,10 @@ which provide general-purpose algorithms required by the KAPPA package,
 and which may be of use to anyone developing their own KAPPA-like
 applications (see SUN/238).
 
+Version 3.5
+   - New generic KPG_STOCx calculates clipped ordered statistics,
+     enabling the API of KPG_STOSx to remain unchanged.
+
 Version 3.4
    - New KPG1_KY2HD and kpg1Ky2hd have been moved to the ATL library.
    - Added KPG1_QUOTE to put single quotes round a string and escape

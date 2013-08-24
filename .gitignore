@@ -1181,6 +1181,7 @@ libraries/kaplibs/kpg/kpg1_ssaz.f
 libraries/kaplibs/kpg/kpg1_stat.f
 libraries/kaplibs/kpg/kpg1_stds.f
 libraries/kaplibs/kpg/kpg1_stfl.f
+libraries/kaplibs/kpg/kpg_stoc.f
 libraries/kaplibs/kpg/kpg1_stor.f
 libraries/kaplibs/kpg/kpg_stos.f
 libraries/kaplibs/kpg/kpg1_tdli.f

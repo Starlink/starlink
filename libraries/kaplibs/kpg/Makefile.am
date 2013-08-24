@@ -100,7 +100,7 @@ KPG_XC_GEN = kpg1_retv.gxc
 
 # All except unsigned types
 KPG_BDIKRW_GEN = kpg1_iscl.gbdikrw kpg1_flas.gbdikrw \
-                 kpg_stos.gbdikrw
+                 kpg_stoc.gbdikrw kpg_stos.gbdikrw
 
 # All except unsigned types and double
 KPG_BIRW_GEN =
