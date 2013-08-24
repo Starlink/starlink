@@ -10,6 +10,7 @@ Version 3.4
    - New KPG1_KY2HD and kpg1Ky2hd have been moved to the ATL library.
    - Added KPG1_QUOTE to put single quotes round a string and escape
      any embedded single quotes.
+   - Handles 64-bit integers.
 
 Version 3.3
    - New generic KPG1_CORRx routine to calculate the Pearson
