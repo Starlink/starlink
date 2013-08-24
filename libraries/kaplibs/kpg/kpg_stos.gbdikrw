@@ -3,19 +3,19 @@
 *+
 *  Name:
 *     KPG_STOSx
- 
+
 *  Purpose:
 *     Calculates accurate order statistics by sorting an array
- 
+
 *  Language:
 *     Starlink Fortran 77.
- 
+
 *  Invocation:
 *     CALL KPG_STOSx( EL, ARRAY, NGOOD, NUMPER, PERCNT,
 *                     MEDIAN, PERVAL, STATUS )
- 
+
 *  Description:
-*     This routine calculates the median and optionally up to 
+*     This routine calculates the median and optionally up to
 *     one-hundred percentiles.  It achieves this by using Quicksort
 *     to order the good array values, and hence provide correct values
 *     (unlike the faster histogram approximation used by KPG1_HSTAx).
@@ -33,8 +33,8 @@
 *        the range 1 to 100.  Set this to 1 and PERCNT(1) to VAL__BADR
 *        if percentiles are not required.
 *     PERCNT( NUMPER ) = REAL (Given)
-*        The percentiles to derive.  Valid percentiles must be in the 
-*        range 0.0 to 100.0, and preferably in ascending order.  If the 
+*        The percentiles to derive.  Valid percentiles must be in the
+*        range 0.0 to 100.0, and preferably in ascending order.  If the
 *        first element is set to the bad value, then no percentiles are
 *        calculated.
 *     MEDIAN = DOUBLE PRECISION (Returned)
@@ -46,17 +46,17 @@
 *        in PERCNT.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
- 
+
 *  Notes:
 *     -  There is a routine for byte, double-precision, integer, 64-bit
 *     integer, real, and word data types: replace "x" in the routine name
 *     by B, D, I, K, R, or W as  appropriate.  The data type of the
 *     ARRAY argument must match the particular routine used.
-*     -  If the value of NGOOD is not at least two, then this routine 
+*     -  If the value of NGOOD is not at least two, then this routine
 *     will abort.  The median and percentiles will have the bad value.
-*     -  The sorting is recorded in an index leaving the order of the 
+*     -  The sorting is recorded in an index leaving the order of the
 *     supplied array values intact.
- 
+
 *  Copyright:
 *     Copyright (C) 2009, 2013 Science & Technology Facilities Council.
 *     All Rights Reserved.
@@ -66,12 +66,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This programme is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE.  See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this programme; if not, write to the Free Software
 *     Foundation, Inc., 51, Franklin Street, Fifth Floor, Boston, MA
@@ -80,7 +80,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     2009 August 20 (MJC):
 *        Original version adapted from KAPPA STATS.
@@ -92,17 +92,17 @@
 *     2013 January 4 (MJC):
 *        Protect against an index of zero for low percentiles.
 *     {enter_further_changes_here}
- 
+
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing allowed
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! PRIMSDAT public constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
- 
+
 *  Arguments Given:
       INTEGER EL
       <TYPE> ARRAY
@@ -116,7 +116,7 @@
 
 *  Status:
       INTEGER  STATUS
- 
+
 *  External References:
       INTEGER KPG1_FLOOR         ! Most positive integer .LE. a given
                                  ! real
@@ -139,7 +139,7 @@
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! Declarations of conversion routines
       INCLUDE 'NUM_DEF_CVT'      ! Definitions of conversion routines
- 
+
 *.
 
 *  Initialise returned values.
@@ -147,7 +147,7 @@
       DO I = 1, MIN( NPRCTL, MAX( 1, NUMPER ) )
          PERVAL( I ) = VAL__BADD
       END DO
-      
+
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
@@ -231,7 +231,7 @@
 *  for an integer data array.
          IF ( INTYPE ) THEN
             DO I = 1, NPERC
-               PERVAL( I ) = DBLE( 
+               PERVAL( I ) = DBLE(
      :                       KPG1_FLOOR( NUM_<T>TOR( QUANT( I ) ) ) )
             END DO
          ELSE
