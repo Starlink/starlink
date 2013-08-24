@@ -2,30 +2,30 @@
                                              Expires: ???
 
 KAPLIBS is a package containing several Fortran subroutine libraries
-which provide general purpose algorithms required by the KAPPA package,
+which provide general-purpose algorithms required by the KAPPA package,
 and which may be of use to anyone developing their own KAPPA-like
 applications (see SUN/238).
 
 Version 3.4
    - New KPG1_KY2HD and kpg1Ky2hd have been moved to the ATL library.
-   - Added KPG1_QUOTE to put single quotes round a string and escape any
-     embedded single quotes.
+   - Added KPG1_QUOTE to put single quotes round a string and escape
+     any embedded single quotes.
 
 Version 3.3
-   - New KPG1_CORR<x> routine to calculate the Pearson correlation
-     coefficient of two arrays.
-   - New methods in CCG_COMNB1/2 to combine lines to give the number (or
-     fraction) of good (or bad) pixels.
+   - New generic KPG1_CORRx routine to calculate the Pearson
+     correlation coefficient of two arrays.
+   - New methods in CCG_COMNB1/2 to combine lines to give the number
+     or fraction) of good (or bad) pixels.
 
 Version 3.2
    - New KPG_TYPSZ routine (adapted from CONVERT equivalent) that
      returns the number of bytes for a given numeric HDS data type.
-   - Routine KPG1_BADBX now has an extra argument that indicates how the
-     calculated bounding box should be used.
-   - Routine KPG1_ASSET now allows the new pseudo-attribute "TEXTMARGIN"
-     to be used to specify a margin to clear around a text string. The
-     value of the attribute gives the width of the margin in units of the
-     text height.
+   - Routine KPG1_BADBX now has an extra argument that indicates how
+     the calculated bounding box should be used.
+   - Routine KPG1_ASSET now allows the new pseudo-attribute
+     "TEXTMARGIN" to be used to specify a margin to clear around a
+     text string. The value of the attribute gives the width of the
+     margin in units of the text height.
    - C wrappers added for KPG1_BADBX, KPG1_GTOBJ, and KPG1_PXSCL.
    - Fixed bug handling default-configuration settings by kpg1Config.
 
