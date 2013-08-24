@@ -8,10 +8,10 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 \newcommand{\stardocnumber}    {238.8}
 \newcommand{\stardocauthors}   {D.S. Berry \\Malcolm J. Currie}
-\newcommand{\stardocdate}      {2011 April 12}
+\newcommand{\stardocdate}      {2013 August 23}
 \newcommand{\stardoctitle}     {KAPLIBS -- Internal subroutines used within
                                 the KAPPA package.}
-\newcommand{\stardocversion}   {Version 3.2}
+\newcommand{\stardocversion}   {Version 3.4}
 \newcommand{\stardocmanual}    {Programmer's Reference}
 \newcommand{\stardocabstract}  {KAPLIBS is a package of Fortran subroutine
 libraries which were originally written as part of the KAPPA package (a
@@ -798,6 +798,24 @@ related items to be removed.
 
 \newpage
 \appendix
+
+\section{Changes in Version 3.4}
+\begin{itemize}
+\item Handles 64-bit integers.
+\item New KPG1\_KY2HD and kpg1Ky2hd have been moved to the ATL library.
+\item Added KPG1\_QUOTE to put single quotes round a string and escape any
+      embedded single quotes.
+\end{itemize}
+
+
+\section{Changes in Version 3.3}
+\begin{itemize}
+\item New generic KPG1\_CORRx routine to calculate the Pearson correlation
+      coefficient of two arrays.
+\item New methods in CCG\_COMNB1/2 to combine lines to give the number (or
+      fraction) of good (or bad) pixels.
+\end{itemize}
+
 
 \section{Changes in Version 3.2}
 \begin{itemize}
