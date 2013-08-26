@@ -598,7 +598,6 @@
       IF ( .NOT. DOPRCT ) THEN
          PERCNT( 1 ) = VAL__BADR
          PERVAL( 1 ) = VAL__BADD
-         PERVAL( 1 + NUMPER ) = VAL__BADD
       END IF
       MODE = VAL__BADD
 
