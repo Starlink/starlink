@@ -49,9 +49,9 @@
 *     Optionally, an output NDF can be created containing a normalised
 *     version of the data array from the first input NDF.
 *
-*     For the special case of two-dimensional images, if IN2 spans only
-*     a single row or column, it can be used to normalize each row or
-*     column of IN1 in turn.  See Parameter LOOP.
+*     For the special case of two-dimensional images, if IN2 (or IN1) spans
+*     only a single row or column, it can be used to normalize each row or
+*     column of IN1 (or IN2) in turn.  See Parameter LOOP.
 
 *  Usage:
 *     normalize in1 in2 out
@@ -90,12 +90,17 @@
 *     IN2 = NDF (Read)
 *        The NDF to which IN1 will be normalised.
 *     LOOP = _LOGICAL (Read)
-*        If both IN1 and IN2 are two-dimensional, and if IN2 spans only
-*        a single row or column, then setting LOOP to TRUE will cause
-*        every row or column in IN1 to be normalised, in turn, to the
-*        values in the single row or column of IN2.  The details of the
-*        fit for each row or column will be displayed separately.
-*        [FALSE]
+*        If both IN1 and IN2 are two-dimensional, but one of them spans
+*        only a single row or column, then setting LOOP to TRUE will cause
+*        every row or column in to be normalised independently of each other.
+*        Specifically, if IN2 spans only a single row or column, then it
+*        will be used to normalise each row or column of IN1 in turn. Any
+*        output NDF (see parameter OUT) will have the shape and size of
+*        IN1. If IN1 spans only a single row or column, then it will be
+*        normalised in turn by each row or column of IN2. Any output NDF
+*        (see parameter OUT) will then have the shape and size of IN2. In
+*        either case, the details of the fit for each row or column will
+*        be displayed separately. [FALSE]
 *     MARGIN( 4 ) = _REAL (Read)
 *        The widths of the margins to leave for axis annotation, given
 *        as fractions of the corresponding dimension of the current
@@ -131,7 +136,7 @@
 *     OUT = NDF (Write)
 *        An optional output NDF to hold a version of IN1 which is
 *        normalised to IN2.  A null (!) value indicates that an output
-*        NDF is not required.
+*        NDF is not required. See also parameter LOOP.
 *     PCRANGE( 2 ) = _REAL (Read)
 *        This parameter takes two real values in the range 0 to 100 and
 *        is used to modify the action of the auto-scaling algorithm
@@ -366,6 +371,8 @@
 *        Added ZEROFF parameter.
 *     17-JAN-2013 (DSB):
 *        Added LOOP parameter.
+*     27-AUG-2013 (DSB):
+*        Allow looping over IN2 as well as over IN1.
 *     {enter_further_changes_here}
 
 *-
@@ -440,6 +447,7 @@
       LOGICAL  BAD               ! Any bad pixels found?
       LOGICAL  DEFIND            ! NDF component is in a defined state?
       LOGICAL  LOOP              ! Loop over rows or columns?
+      LOGICAL  LPOVR1            ! Loop over rows or columns in IN1?
       LOGICAL  OUTRQD            ! Is an output NDF is to be generated?
       LOGICAL  VAR1              ! IN1 has a defined variance component?
       LOGICAL  ZEROFF            ! Fix fit offset at zero?
@@ -504,12 +512,22 @@
 *  probably be removed if needed).
       IF( NDIM1 .EQ. 2 .AND. NDIM2 .EQ. 2 ) THEN
 
-*  We only loop if IN2 spans a single pixel on one of the two pixel
-*  axes.
-         IF( LBND2( 1 ) .EQ. UBND2( 1 ) ) THEN
+*  We only loop if IN1 or IN2 spans a single pixel on one of the two pixel
+*  axes. The LPOVR1 flag is .TRUE. if we will be looping over the rows or
+*  columns in IN1 and is .FALSE if we will be looping over the rows or
+*  columns in IN2.
+         IF( LBND1( 1 ) .EQ. UBND1( 1 ) ) THEN
             AXIS = 1
+            LPOVR1 = .FALSE.
+         ELSE IF( LBND1( 2 ) .EQ. UBND1( 2 ) ) THEN
+            AXIS = 2
+            LPOVR1 = .FALSE.
+         ELSE IF( LBND2( 1 ) .EQ. UBND2( 1 ) ) THEN
+            AXIS = 1
+            LPOVR1 = .TRUE.
          ELSE IF( LBND2( 2 ) .EQ. UBND2( 2 ) ) THEN
             AXIS = 2
+            LPOVR1 = .TRUE.
          ELSE
             AXIS = 0
          END IF
@@ -525,15 +543,28 @@
          IF( .NOT. LOOP ) AXIS = 0
       END IF
 
+*  If we are looping over the rows or columns of IN2, we need to reshape
+*  the output to match IN2.
+      IF( OUTRQD .AND. LOOP .AND. .NOT. LPOVR1 ) THEN
+         CALL NDF_SBND( 2, LBND2, UBND2, NDFO, STATUS )
+      END IF
+
 *  If so, set the bounds on the looping axis, and store the initial
-*  pixel shifts that move IN2 NDF so that it is in the correct position
-*  to normalize the first row or column of IN1.
+*  pixel shifts that move IN2 (or IN1)  NDF so that it is in the correct
+*  position to normalize (or be normalized by) the first row or column of
+*  IN1 (or IN2).
       IF( AXIS .GT. 0 ) THEN
-         ILO = LBND1( AXIS )
-         IHI = UBND1( AXIS )
+         IF( LPOVR1 ) THEN
+            ILO = LBND1( AXIS )
+            IHI = UBND1( AXIS )
+            SHIFT( AXIS ) = ILO - LBND2( AXIS )
+         ELSE
+            ILO = LBND2( AXIS )
+            IHI = UBND2( AXIS )
+            SHIFT( AXIS ) = ILO - LBND1( AXIS )
+         END IF
          SHIFT( 1 ) = 0
          SHIFT( 2 ) = 0
-         SHIFT( AXIS ) = ILO - LBND2( AXIS )
 
 *  If we are not looping, we only pass through the loop once, using the
 *  supplied NDF identifiers without change.
@@ -547,27 +578,54 @@
 
 *  Do all required values on the looping axis (if any)
       DO I = ILO, IHI
+         CALL NDF_BEGIN
 
 *  Prepare for the next value on the looping axis.
          IF( AXIS .GT. 0 ) THEN
 
+*  First deal with cases where we are looping over rows or columns in IN1.
+            IF( LPOVR1 ) THEN
+
 *  Get a section of IN1 that is restricted to the current value on the
 *  looping axis.
-            LBND1( AXIS ) = I
-            UBND1( AXIS ) = I
-            CALL NDF_SECT( NDF1T, NDIM1, LBND1, UBND1, NDF1S, STATUS )
+               LBND1( AXIS ) = I
+               UBND1( AXIS ) = I
+               CALL NDF_SECT( NDF1T, 2, LBND1, UBND1, NDF1S, STATUS )
 
 *  If we are producing an output NDF, get a section of it that is
 *  restricted to the current value on the looping axis.
-            IF( OUTRQD ) CALL NDF_SECT( NDFO, NDIM2, LBND1, UBND1,
-     :                                  NDFOUT, STATUS )
+               IF( OUTRQD ) CALL NDF_SECT( NDFO, 2, LBND1, UBND1,
+     :                                     NDFOUT, STATUS )
 
 *  Shift the supplied IN2 NDF so that it is aligned with the above IN1
 *  section. We take a section covering the whole supplied IN1 NDF first
 *  because NDF_SHIFT requires write access to the underlying input NDF
 *  otherwise.
-            CALL NDF_SECT( NDF2T, NDIM2, LBND2, UBND2, NDF2S, STATUS )
-            CALL NDF_SHIFT( 2, SHIFT, NDF2S, STATUS )
+               CALL NDF_SECT( NDF2T, 2, LBND2, UBND2, NDF2S, STATUS )
+               CALL NDF_SHIFT( 2, SHIFT, NDF2S, STATUS )
+
+*  Now deal with cases where we are looping over rows or columns in IN2.
+            ELSE
+
+*  Get a section of IN2 that is restricted to the current value on the
+*  looping axis.
+               LBND2( AXIS ) = I
+               UBND2( AXIS ) = I
+               CALL NDF_SECT( NDF2T, 2, LBND2, UBND2, NDF2S, STATUS )
+
+*  If we are producing an output NDF, get a section of it that is
+*  restricted to the current value on the looping axis.
+               IF( OUTRQD ) CALL NDF_SECT( NDFO, 2, LBND2, UBND2,
+     :                                     NDFOUT, STATUS )
+
+*  Shift the supplied IN1 NDF so that it is aligned with the above IN2
+*  section. We take a section covering the whole supplied IN2 NDF first
+*  because NDF_SHIFT requires write access to the underlying input NDF
+*  otherwise.
+               CALL NDF_SECT( NDF1T, 2, LBND1, UBND1, NDF1S, STATUS )
+               CALL NDF_SHIFT( 2, SHIFT, NDF1S, STATUS )
+
+            END IF
 
 *  Update the required shift ready for the next pass.
             SHIFT( AXIS ) = SHIFT( AXIS ) + 1
@@ -575,13 +633,18 @@
 *  Tell the user what we are doing.
             CALL MSG_SETI( 'I', I )
             IF( AXIS .EQ. 1 ) THEN
-               CALL MSG_SETC( 'W', 'column' )
+               CALL MSG_SETC( 'W1', 'column' )
             ELSE
-               CALL MSG_SETC( 'W', 'row' )
+               CALL MSG_SETC( 'W1', 'row' )
+            END IF
+            IF( LPOVR1 ) THEN
+               CALL MSG_SETC( 'W2', 'IN1' )
+            ELSE
+               CALL MSG_SETC( 'W2', 'IN2' )
             END IF
             CALL MSG_BLANK( STATUS )
             CALL MSG_BLANK( STATUS )
-            CALL MSG_OUT( ' ', ' Doing ^w ^I ...',
+            CALL MSG_OUT( ' ', ' Doing ^W1 ^I of ^W2...',
      :                    STATUS  )
             CALL MSG_BLANK( STATUS )
          END IF
@@ -617,11 +680,26 @@
 *  Find if there are any bad values in the section of the 2nd input NDF.
          CALL NDF_BAD( NDF2S, 'Data', .FALSE., BAD, STATUS )
 
+*  Abort if an error has occurred.
+         IF ( STATUS .NE. SAI__OK ) GO TO 999
+
 *  Get maximum and minimum values in the data array of the IN2 NDF
 *  section.
          CALL KPG1_MXMNR( BAD, NELS, %VAL( CNF_PVAL( PNT2S( 1 ) ) ),
      :                    NBAD2, MAX2, MIN2, MAXPOS, MINPOS, STATUS )
          BAD = NBAD2 .NE. 0
+
+*  If we are looping and the current scetion is all bad, annull the error
+*  and pass on to the next row/column leaving bad values in the output
+*  NDF.
+         IF( AXIS .GT. 0 .AND. STATUS .EQ. SAI__ERROR ) THEN
+            CALL ERR_ANNUL( STATUS )
+            CALL MSG_OUT( ' ', '   No good data.', STATUS )
+            IF( OUTRQD ) CALL KPG1_MAP( NDFOUT, 'DATA', '_REAL',
+     :                                  'WRITE/BAD', PNTOD, NEL1B,
+     :                                  STATUS )
+            GO TO 998
+         END IF
 
 *  Get temporary workspace to hold the histogram, and map it.
          CALL PSX_CALLOC( HISIZE, '_INTEGER', PNTW0, STATUS )
@@ -690,6 +768,9 @@
 *  See if the offset should be fixed at zero.
          CALL PAR_GET0L( 'ZEROFF', ZEROFF, STATUS )
 
+*  Abort if an error has occurred.
+         IF( STATUS .NE. SAI__OK ) GO TO 999
+
 *  Call KPS1_NMPLT to calculate the linear function which normalises
 *  IN1 to IN2.
          CALL KPS1_NMPLT( %VAL( CNF_PVAL( PNT2S( 1 ) ) ),
@@ -702,6 +783,19 @@
      :                %VAL( CNF_PVAL( PNTW4 ) ),
      :                %VAL( CNF_PVAL( PNTW5 ) ), SLOPE, OFFSET,
      :                STATUS )
+
+*  If we are looping and the normalisation failed, annull the error
+*  and pass on to the next row/column leaving bad values in the output
+*  NDF.
+         IF( AXIS .GT. 0 .AND. STATUS .EQ. SAI__ERROR ) THEN
+            CALL ERR_ANNUL( STATUS )
+            CALL MSG_OUT( ' ', '   Unable to calculate normalization '//
+     :                    'constants.', STATUS )
+            IF( OUTRQD ) CALL KPG1_MAP( NDFOUT, 'DATA', '_REAL',
+     :                                  'WRITE/BAD', PNTOD, NEL1B,
+     :                                  STATUS )
+            GO TO 998
+         END IF
 
 *  Unmap and release the temporary work space.
          CALL PSX_FREE( PNTW1, STATUS )
@@ -784,12 +878,8 @@
 
          END IF
 
-*  If we are looping, annul the sections created within this loop.
-         IF( AXIS .GT. 0 ) THEN
-            CALL NDF_ANNUL( NDF1S, STATUS )
-            CALL NDF_ANNUL( NDF2S, STATUS )
-            IF( OUTRQD ) CALL NDF_ANNUL( NDFOUT, STATUS )
-         END IF
+*  Annul any NDF sections etc created within this loop.
+ 998     CALL NDF_END( STATUS )
 
       END DO
 

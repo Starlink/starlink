@@ -38231,9 +38231,9 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
       Optionally, an output NDF can be created containing a normalised
       version of the data array from the first input NDF.
 
-      For the special case of two-dimensional images, if IN2 spans only
-      a single row or column, it can be used to normalize each row or
-      column of IN1 in turn.  See Parameter LOOP.
+      For the special case of two-dimensional images, if IN2 (or IN1)
+      spans only a single row or column, it can be used to normalize each
+      row or column of IN1 (or IN2) in turn.  See Parameter LOOP.
 
    }
    \sstusage{
@@ -38293,12 +38293,17 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
       \sstsubsection{
           LOOP = \_LOGICAL (Read)
       }{
-         If both IN1 and IN2 are two-dimensional, and if IN2 spans only
-         a single row or column, then setting LOOP to {\tt TRUE} will cause
-         every row or column in IN1 to be normalised, in turn, to the
-         values in the single row or column of IN2.  The details of the
-         fit for each row or column will be displayed separately.
-         {\tt [FALSE]}
+         If both IN1 and IN2 are two-dimensional, but one of them spans
+	 only a single row or column, then setting LOOP to {\tt TRUE} will
+	 cause every row or column in to be normalised independently of
+	 each other. Specifically, if IN2 spans only a single row or
+	 column, then it will be used to normalise each row or column of
+	 IN1 in turn. Any output NDF (see parameter OUT) will have the
+	 shape and size of IN1. If IN1 spans only a single row or column,
+	 then it will be normalised in turn by each row or column of IN2.
+	 Any output NDF (see parameter OUT) will then have the shape and
+	 size of IN2. In either case, the details of the fit for each row
+	 or column will be displayed separately. {\tt [FALSE]}
       }
       \sstsubsection{
          MARGIN( 4 ) = \_REAL (Read)
@@ -38351,7 +38356,7 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
       }{
          An optional output NDF to hold a version of IN1 which is
          normalised to IN2.  A null ({\tt{!}}) value indicates that an output
-         NDF is not required.
+         NDF is not required. See also parameter LOOP.
       }
       \sstsubsection{
          PCRANGE( 2 ) = \_REAL (Read)
