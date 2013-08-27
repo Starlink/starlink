@@ -233,13 +233,14 @@
 *        The minimum ratio of the polarised intensity to the error on
 *        polarised intensity for vectors to be plotted. [3.0]
 *     STAREDIR = LITERAL (Read)
-*        A directory in which to store separate angle and polarised
+*        A directory in which to store separate Q, U, angle and polarised
 *        intensity images for each stare position, for each sub-array.
-*        The 2D NDFs created have names of the form "ANG_<A>_<I>.sdf"
-*        and "PI_<A>_<I>.sdf", where <A> is the subarray name ("S8A", etc.)
+*        The 2D NDFs created have names of the form "ANG_<A>_<I>.sdf",
+*        "PI_<A>_<I>.sdf", etc, where <A> is the subarray name ("S8A", etc.)
 *        and <I> is an index that counts from zero to one less than the number
-*        of stare positions. The angles are in degrees, relative to the focal
-*        plane Y axis. The directory is created if it does not exist. [!]
+*        of stare positions. The Q and U values use focal plane Y as the
+*        reference direction, and the angles are in degrees, relative to the
+*        focal plane Y axis. The directory is created if it does not exist. [!]
 
 *  Copyright:
 *     Copyright (C) 2012-2013 Science & Technology Facilities Council.
@@ -290,6 +291,8 @@
 *        Added parameter EXTCOR.
 *     4-JUL-2013 (DSB):
 *        Added parameter HARMONIC.
+*     27-AUG-2013 (DSB):
+*        Store Q and U images in STAREDIR.
 
 *-
 '''
@@ -826,6 +829,10 @@ try:
                out = "{0}/PI_{1}_{2}".format(staredir,a,mm)
                invoke( "$KAPPA_DIR/maths exp='sqrt(iu**2+iq**2)' iu={0} "
                        "iq={1} out={2}".format(uin,qin,out))
+               out = "{0}/Q_{1}_{2}".format(staredir,a,mm)
+               invoke( "$KAPPA_DIR/ndfcopy in={0} out={1}".format(qin,out))
+               out = "{0}/U_{1}_{2}".format(staredir,a,mm)
+               invoke( "$KAPPA_DIR/ndfcopy in={0} out={1}".format(uin,out))
 
 #  The reference map defines the output pixel grid - the origin, pixel size,
 #  sky projection, etc (but not the pixel bounds) - of the final Q, U and I
