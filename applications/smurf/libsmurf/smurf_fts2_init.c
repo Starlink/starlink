@@ -61,6 +61,8 @@
 *        Adjust debug output
 *     2013-05-19 (MS)
 *        Set the step time to a nominal value to produce uniformly sized zero-padded spectra
+*     2013-08-27 (MS)
+*        Temporary fix for segfault due to incorrect array sizes
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -376,7 +378,8 @@ void smurf_fts2_init(int* status)
     smf_fits_updateD(inData->hdr, "OPDSTEP", dz, "OPD step size", status);
 
     /* Copy input data into output data */
-    outData = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
+    outData = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA
+            | SMF__NOCREATE_FTS | SMF__NOCREATE_QUALITY, 0, 0, status);
     outData->dtype   = SMF__DOUBLE;
     outData->ndims   = 3;
     outData->dims[0] = nWidth;

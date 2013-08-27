@@ -72,6 +72,8 @@
 *        Error check file writing and closures
 *     2013-06-05 (MS)
 *        Correct off-by-one ZPD index error causing attenuation at half nyquist
+*     2013-08-27 (MS)
+*        Temporary fix for segfault due to incorrect array sizes
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -201,7 +203,7 @@ void smurf_fts2_spectrum(int* status)
     /* Loop through each input file */
     for(fIndex = 1; fIndex <= nFiles; fIndex++) {
         /* Open Observation file */
-        smf_open_file(gIn, fIndex, "READ", 0, &inData, status);
+    smf_open_file(gIn, fIndex, "READ", SMF__NOFIX_METADATA, &inData, status);
         if(*status != SAI__OK) {
             *status = SAI__ERROR;
             errRep(FUNC_NAME, "Unable to open the source file!", status);

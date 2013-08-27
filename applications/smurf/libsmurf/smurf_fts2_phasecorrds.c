@@ -100,6 +100,10 @@
 *       This is intended to help filter out bad interferograms.
 *     2013-08-01 (MS)
 *       Replace one_snprintf SMF_PATH_MAX parameter to sizeof(fileName) for safety sake
+*     2013-08-27 (MS)
+*        Temporary fix for segfault due to incorrect array sizes
+*     2013-08-27 (MS)
+*        Temporary fix for segfault due to incorrect array sizes
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -301,7 +305,7 @@ void smurf_fts2_phasecorrds(int* status)
     /* Loop through each input file */
     for(fIndex = 1; fIndex <= nFiles; fIndex++) {
         /* Open Observation file */
-        smf_open_file(gIn, fIndex, "READ", 0, &inData, status);
+    smf_open_file(gIn, fIndex, "READ", SMF__NOFIX_METADATA, &inData, status);
         if(*status != SAI__OK) {
             *status = SAI__ERROR;
             errRep(FUNC_NAME, "Unable to open the source file!", status);
