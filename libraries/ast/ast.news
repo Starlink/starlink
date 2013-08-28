@@ -17,9 +17,15 @@ Main Changes in this Version
 ----------------------------
 
 - Fix support for reading GLS projections from FITS headers.
+
 - The KeyMap class has new sorting options "KeyAgeUp" and "KeyAgeDown" that
 retain the position of an existing entry if its value is changed. See the
 SortBy attribute.
+
+- A bug has been fixed in FitsChan that caused CDELT keywords for sky
+axes to be treated as radians rather than degrees when reading a FITS
+header, if the corresponding CTYPE values included no projection code.
+
 
 Main Changes in V7.3.1
 ----------------------

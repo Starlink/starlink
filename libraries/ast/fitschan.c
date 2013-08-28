@@ -1066,6 +1066,11 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 *     11-JUN-2013 (DSB):
 *        Fix support for reading GLS projections, and add support for
 *        rotated GLS projections.
+*     28-AUG-2013 (DSB):
+*        In WcsCelestial, if celestial axes are found with no projection
+*        code in CTYPE, assume an old-fashioned CAR projection (i.e. no
+*        rotation from native to WCS coords). Before this change,
+*        CTYPE = "RA" | "DEC" axes got treated as radians, not degrees.
 *class--
 */
 
@@ -32639,7 +32644,6 @@ static AstMapping *WcsCelestial( AstFitsChan *this, FitsStore *store, char s,
                                  AstSkyFrame **reffrm, AstMapping **tabmap,
                                  int *tabaxis, const char *method,
                                  const char *class, int *status ){
-
 /*
 *  Name:
 *     WcsCelestial
@@ -32652,7 +32656,6 @@ static AstMapping *WcsCelestial( AstFitsChan *this, FitsStore *store, char s,
 *     Private function.
 
 *  Synopsis:
-
 *     AstMapping *WcsCelestial( AstFitsChan *this, FitsStore *store, char s,
 *                               AstFrame **frm, AstFrame *iwcfrm, double *reflon, double *reflat,
 *                               AstSkyFrame **reffrm, , AstMapping **tabmap,
@@ -32758,6 +32761,7 @@ static AstMapping *WcsCelestial( AstFitsChan *this, FitsStore *store, char s,
    int *axes;                /* Point to a list of axis indices */
    int axlat;                /* Index of latitude physical axis */
    int axlon;                /* Index of longitude physical axis */
+   int carlin;               /* Assume native and WCS axes are the same? */
    int ctlen;                /* Length of CTYPE string */
    int gotax;                /* Celestial axis found? */
    int i;                    /* Loop count */
@@ -32789,6 +32793,11 @@ static AstMapping *WcsCelestial( AstFitsChan *this, FitsStore *store, char s,
 /* Get the number of physical axes. */
    naxes = astGetNaxes( *frm );
 
+/* See if CAR projections should be interpreted in the old fashioned way
+   (i.e native coords are always the same as WCS coords, so no need for
+   any rotation). */
+   carlin = astGetCarLin( this );
+
 /* The first major section sees if the physical axes include a pair of
    longitude/latitude celestial axes.
    ================================================================= */
@@ -32819,12 +32828,16 @@ static AstMapping *WcsCelestial( AstFitsChan *this, FitsStore *store, char s,
 /* Find the projection type as specified by the last 4 characters
    in the CTYPE keyword value. AST__WCSBAD is stored in "prj" if the
    last 4 characters do not specify a known WCS projection, but no error
-   is reported. */
+   is reported. Assume simple linear axes if no projection code is
+   supplied. Note, AST__WCSBAD is used to indicate a TAB header. */
          ctlen = strlen( ctype );
          if( ctlen > 4 ) {
             prj = astWcsPrjType( ctype + ctlen - 4 );
-         } else {
+         } else if( tabmap && *tabmap ) {
             prj = AST__WCSBAD;
+         } else {
+            prj = AST__CAR;
+            carlin = 1;
          }
 
 /* See if this is a longitude axis (e.g. if the first 4 characters of CTYPE
@@ -32995,8 +33008,7 @@ static AstMapping *WcsCelestial( AstFitsChan *this, FitsStore *store, char s,
    case when using -TAB for instance) then do the same but use a UnitMap
    instead of a WcsMap. */
       map3 = NULL;
-      if( ( latprj == AST__CAR && astGetCarLin( this ) ) ||
-            latprj == AST__WCSBAD ) {
+      if( ( latprj == AST__CAR && carlin ) || latprj == AST__WCSBAD ) {
          if( latprj == AST__CAR ) {
             map2 = (AstMapping *) astWcsMap( naxes, AST__WCSBAD, axlon + 1,
                                              axlat + 1, "", status );
