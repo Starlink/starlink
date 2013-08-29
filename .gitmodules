@@ -154,3 +154,6 @@
 [submodule "libext/pal"]
 	path = libext/pal
 	url = ../pal
+[submodule "thirdparty/perlsys/perlmods/perl-Astro-ITC-SCUBA2"]
+	path = thirdparty/perlsys/perlmods/perl-Astro-ITC-SCUBA2
+	url = git://github.com/jac-h/perl-Astro-ITC-SCUBA2.git
