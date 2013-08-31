@@ -419,6 +419,77 @@ if ( ( -T $TEXFILE ) && ( -r $TEXFILE ) ) {
        }
    }
 
+#  To support PNG and PDF embedded graphics we need to do two things
+#  1. Copy the PNG file to the temporary directory so that latex2html
+#     will discover it
+#  2. Convert any PDF graphics to EPS. The reason we do this is that it saves
+#     us having to patch latex2html (which is a bit of a rats nest).
+#  We have to work out which .pdf and .png files are relevant. We could copy them
+#  all or we could scan through the tex file for includegraphics directives.
+#  For EPS files latex2html rebuilds a postscript document and picks up the images
+#  via TEXINPUTS. These paths are not searched when latx2html is looking for PNG files.
+#  Try the scanning approach
+   {
+     my %tocopy;
+     open my $TFH, "<", $TEXFILE
+       or &clear_up("Could not open file $TEXFILE");
+     while (defined (my $texline = <$TFH>) ) {
+       # remove comments
+       $texline =~ s/\%.*$//;
+       if ($texline =~ /includegraphics(?:\[.*\])\{(.*)\}/ ) {
+         my $found = $1;
+
+         # Complain if this is explicitly a pdf
+         if ( $found =~ /\.pdf/ ) {
+           &clear_up( "Please remove explicit PDF suffix from TEX file for $found includegraphics entry" );
+         }
+
+         if (-e File::Spec->catfile( $TEXDIR, $found) ) {
+           # full name already
+           $tocopy{File::Spec->catfile( $TEXDIR, $found )}++;
+         } else {
+           # We do not have to worry about EPS files
+           # and if we find a PNG version we can stop
+           for my $s (qw/ png pdf / ) {
+             my $check = File::Spec->catfile( $TEXDIR, $found . "." . $s);
+             if (-e $check) {
+               $tocopy{$check}++;
+               last;
+             }
+           }
+         }
+       }
+     }
+     for my $file (keys %tocopy) {
+       use File::Basename qw/ fileparse /;
+       next if $file =~ /\.(eps|ps)$/;
+       my ($name, $path, $suffix) = fileparse($file, qr/.pdf|.png/ );
+
+       if ($suffix eq ".png") {
+         # do not copy if there is a version already there and this one is not newer
+         my $outfile = File::Spec->catfile($DESTDIR, $name.".png");
+         if (!-e $outfile || (-M $outfile > -M $file ) ) {
+           print "Copying $file to $DESTDIR\n";
+           system("cp", $file, $DESTDIR ) and
+             &clear_up( "Star2HTML fatal: cannot copy $file into $DESTDIR\n" );
+         }
+       } elsif ($suffix eq ".pdf") {
+         # Must convert this to postscript unless there is an .eps version
+         # in TEXDIR already
+         if ( ! -e File::Spec->catfile($TEXDIR, $name . ".eps" ) ) {
+           my $outfile = File::Spec->catfile($DESTDIR, $name.".ps");
+           if (!-e $outfile || (-M $outfile > -M $file) ) {
+             print "Using pdf2ps to convert $file to $outfile\n";
+             system("pdf2ps", $file, $outfile) and
+               &clear_up( "Could not convert $file to PS using pdf2ps\n");
+           }
+         }
+       } else {
+         warn "Did not know what to do with file $file\n";
+       }
+     }
+   }
+
 #  Append tex file directory to TEXINPUTS to get /specials etc.
 #  Note that an empty string should be defaulted for $ENV{TEXINPUTS} if it does
 #  not exist in the environment.  ":$dir" is a valid form of the variable.
