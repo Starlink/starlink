@@ -431,6 +431,7 @@ if ( ( -T $TEXFILE ) && ( -r $TEXFILE ) ) {
 #  Try the scanning approach
    {
      my %tocopy;
+     my %outpath;
      open my $TFH, "<", $TEXFILE
        or &clear_up("Could not open file $TEXFILE");
      while (defined (my $texline = <$TFH>) ) {
@@ -448,9 +449,18 @@ if ( ( -T $TEXFILE ) && ( -r $TEXFILE ) ) {
            &clear_up( "Please remove explicit PDF suffix from TEX file for $found includegraphics entry" );
          }
 
+         # if there is a directory path we have to remember it for the output
+         my $dirname;
+         if ( $found =~ /\// ) {
+           use File::Basename qw/ dirname /;
+           $dirname = dirname($found);
+         }
+
          if (-e File::Spec->catfile( $TEXDIR, $found) ) {
            # full name already
-           $tocopy{File::Spec->catfile( $TEXDIR, $found )}++;
+           my $path = File::Spec->catfile( $TEXDIR, $found );
+           $tocopy{$path}++;
+           $outpath{$path} = $dirname if defined $dirname;
          } else {
            # We do not have to worry about EPS files
            # and if we find a PNG version we can stop
@@ -458,6 +468,7 @@ if ( ( -T $TEXFILE ) && ( -r $TEXFILE ) ) {
              my $check = File::Spec->catfile( $TEXDIR, $found . "." . $s);
              if (-e $check) {
                $tocopy{$check}++;
+               $outpath{$check} = $dirname if defined $dirname;
                last;
              }
            }
@@ -469,19 +480,30 @@ if ( ( -T $TEXFILE ) && ( -r $TEXFILE ) ) {
        next if $file =~ /\.(eps|ps)$/;
        my ($name, $path, $suffix) = fileparse($file, qr/.pdf|.png/ );
 
+       # Output directory may have an extra path in it if we found that in latex
+       my $destdir = $DESTDIR;
+
+       # if we need the extra path, make sure it is there and create if it isn't
+       if (exists $outpath{$file}) {
+         $destdir = File::Spec->catdir( $destdir, $outpath{$file} );
+         if (!-d $destdir) {
+           mkdir($destdir) or &clear_up("Could not create temp dir $destdir: $!");
+         }
+       }
+
        if ($suffix eq ".png") {
          # do not copy if there is a version already there and this one is not newer
-         my $outfile = File::Spec->catfile($DESTDIR, $name.".png");
+         my $outfile = File::Spec->catfile($destdir, $name.".png");
          if (!-e $outfile || (-M $outfile > -M $file ) ) {
-           print "Copying $file to $DESTDIR\n";
-           system("cp", $file, $DESTDIR ) and
-             &clear_up( "Star2HTML fatal: cannot copy $file into $DESTDIR\n" );
+           print "Copying $file to $destdir\n";
+           system("cp", $file, $destdir ) and
+             &clear_up( "Star2HTML fatal: cannot copy $file into $destdir\n" );
          }
        } elsif ($suffix eq ".pdf") {
          # Must convert this to postscript unless there is an .eps version
          # in TEXDIR already
          if ( ! -e File::Spec->catfile($TEXDIR, $name . ".eps" ) ) {
-           my $outfile = File::Spec->catfile($DESTDIR, $name.".ps");
+           my $outfile = File::Spec->catfile($destdir, $name.".ps");
            if (!-e $outfile || (-M $outfile > -M $file) ) {
              print "Using pdf2ps to convert $file to $outfile\n";
              system("pdf2ps", $file, $outfile) and
