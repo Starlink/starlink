@@ -13,10 +13,10 @@ dist_noinst_HEADERS = include/DSA_TYPES include/SPD_EPAR  include/arc_dims  incl
 	include/opt_cmn  include/status_inc
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ \
-    sun86a.tex sun86_2df.eps sun86_ech1.eps sun86_ech2.eps sun86_ech3.eps \
-    sun86_ech4.eps sun86_ech5.eps sun86_hard.eps sun86_icont.eps \
-    sun86_igrey.eps sun86_imag2.eps sun86_imag3.eps sun86_imag.eps \
-    sun86_spec2.eps sun86_spec.eps
+    sun86a.tex sun86_2df.pdf sun86_ech1.pdf sun86_ech2.pdf sun86_ech3.pdf \
+    sun86_ech4.pdf sun86_ech5.pdf sun86_hard.pdf sun86_icont.pdf \
+    sun86_igrey.pdf sun86_imag2.pdf sun86_imag3.pdf sun86_imag.pdf \
+    sun86_spec2.pdf sun86_spec.pdf
 
 # Define the help source file.
 HELP_SOURCES = figaro.hlp
