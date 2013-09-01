@@ -436,7 +436,11 @@ if ( ( -T $TEXFILE ) && ( -r $TEXFILE ) ) {
      while (defined (my $texline = <$TFH>) ) {
        # remove comments
        $texline =~ s/\%.*$//;
-       if ($texline =~ /includegraphics(?:\[.*\])\{(.*)\}/ ) {
+       if ($texline =~ /includegraphics
+                        (?:\[.*\])    # Non-capturing parens for the options
+                        \{(.*?)\}     # File name is inside curly braces but non-greedy on final brace
+                                      # So that \myfunc{\includegraphics{file}} matches "file" not "file}"
+                       /x ) {
          my $found = $1;
 
          # Complain if this is explicitly a pdf
