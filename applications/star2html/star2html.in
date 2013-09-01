@@ -438,7 +438,7 @@ if ( ( -T $TEXFILE ) && ( -r $TEXFILE ) ) {
        # remove comments
        $texline =~ s/\%.*$//;
        if ($texline =~ /includegraphics
-                        (?:\[.*\])    # Non-capturing parens for the options
+                        (?:\[.*\])?   # Non-capturing parens for the optional options
                         \{(.*?)\}     # File name is inside curly braces but non-greedy on final brace
                                       # So that \myfunc{\includegraphics{file}} matches "file" not "file}"
                        /x ) {
