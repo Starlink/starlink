@@ -136,8 +136,6 @@ rm -f .sst.tmp
    rm -f f_attribs.tex f_classes.tex f_routines.tex f_commands.tex
    rm -f memory_routines.tex
 
-   latex sun210; latex sun210
-   latex sun211; latex sun211
+   pdflatex sun210; pdflatex sun210
+   pdflatex sun211; pdflatex sun211
 
-   dvips -f sun210 >sun210.ps
-   dvips -f sun211 >sun211.ps
