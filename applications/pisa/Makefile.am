@@ -7,7 +7,7 @@ dist_noinst_SCRIPTS = pisa_link_adam
 
 bin_MONOLITHS = pisa_mon pisa_mon4 pisahelp
 
-stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ sun109_cover.eps
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ sun109_cover.pdf
 
 DYNSCRIPTS = pisa.sh pisa.csh pisa.icl
 
