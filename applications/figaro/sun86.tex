@@ -535,10 +535,10 @@ Anthony Holloway (Manchester).
 %    --------------------------------------------------------------------------
 
 %
-% This section in the HTML version includes a number of GIF images that
+% This section in the HTML version includes a number of PNG images that
 % were captured with xv from the screen. These files are
 %
-%    /star/docs/sun86.htx/addon/*.gif
+%    /star/docs/sun86.htx/addon/*.png
 %
 % For the benefit of the LaTeX version these could be saved with xv as
 % EPS as well:
@@ -560,9 +560,15 @@ Anthony Holloway (Manchester).
 % \end{figure}
 % \end{latexonly}
 %
-% The original GIF images are included in the HTML version via:
+% Note that for pdflatex the PNG images can be included natively
+% and this is done for screen grabs. Vector graphics should remain
+% as PDF files.
 %
-% \htmladdimg{addon/*.gif}
+% The original PNG images are included in the HTML version via:
+% Note that the addon/ path is not needed as the files are copied in
+% using the htx_tar.extras file
+%
+% \htmladdimg{*.png}
 
 
 \subsection{\xlabel{unix_setup}\label{unixstart}Unix setup}
@@ -1095,14 +1101,11 @@ Classified
    ICL> splot a_file accept
 \end{verbatim}
 
-\begin{latexonly}
 \begin{figure}[htb]
 \begin{center}
 \includegraphics{sun86_spec}
 \end{center}
 \end{figure}
-\end{latexonly}
-\htmladdimg{lookspec.gif}
 
    The first command is necessary if your X display `server' is not
    the same as the `client' machine running Figaro for you. It
@@ -1149,14 +1152,11 @@ Classified
    HARDCOPY - (HArdcopy) Produce plot as a hard copy? /NO/ >
 \end{verbatim}
 
-\begin{latexonly}
 \begin{figure}[htb]
 \begin{center}
 \includegraphics{sun86_spec2}
 \end{center}
 \end{figure}
-\end{latexonly}
-\htmladdimg{lookspec2.gif}
 
    The `xdisplay' command now tells the remote client explicitly what
    the Internet host name of the local server is. This is necessary when
@@ -1239,14 +1239,11 @@ Classified
    commands know about this, and must not be given this file name
    extension.
 
-\begin{latexonly}
 \begin{figure}[htb]
 \begin{center}
 \includegraphics{sun86_imag}
 \end{center}
 \end{figure}
-\end{latexonly}
-\htmladdimg{lookimag.gif}
 
    The keyword `accept' prevents the command from prompting you for
    information that it can guess itself. Unfortunately, you don't know
@@ -1297,14 +1294,11 @@ Classified
    ASPECT - Maintain correct aspect ratio for image? /TRUE/ >
 \end{verbatim}
 
-\begin{latexonly}
 \begin{figure}[htb]
 \begin{center}
 \includegraphics{sun86_imag2}
 \end{center}
 \end{figure}
-\end{latexonly}
-\htmladdimg{lookimag2.gif}
 
    If you are not familiar with the necessities of using X windows over
    the computer network, see
@@ -1356,14 +1350,11 @@ Classified
    ICL> colour contour_lut
 \end{verbatim}
 
-\begin{latexonly}
 \begin{figure}[htb]
 \begin{center}
 \includegraphics{sun86_imag3}
 \end{center}
 \end{figure}
-\end{latexonly}
-\htmladdimg{lookimag3.gif}
 
    There are a number of prepared colour lookup tables. They are
    `.sdf' files, similar to other data files. By convention their
@@ -1410,27 +1401,21 @@ Classified
    ICL> icont a_file min max min max low=0 high=250 contours=6 accept
 \end{verbatim}
 
-\begin{latexonly}
 \begin{figure}[htb]
 \begin{center}
 \includegraphics{sun86_icont}
 \end{center}
 \end{figure}
-\end{latexonly}
-\htmladdimg{lookicont.gif}
 
 \begin{verbatim}
    ICL> igrey a_file min max min max low=0 high=250 accept
 \end{verbatim}
 
-\begin{latexonly}
 \begin{figure}[htb]
 \begin{center}
 \includegraphics{sun86_igrey}
 \end{center}
 \end{figure}
-\end{latexonly}
-\htmladdimg{lookigrey.gif}
 
    If the display window has more than 16 colours, `igrey' will use
    those resources and display with true grey levels. It will also reset
@@ -3763,7 +3748,7 @@ FIGARO\_PROG\_U, then FIGARO\_PROG\_L and finally FIGARO\_PROG\_S.
 \end{center}
 \end{figure}
 \end{latexonly}
-\htmladdimg{2df.gif}
+\htmladdimg{2df.png}
 
    The main problem with spectral flat-fields is that the flat-field
    data will usually vary in x, not because of the instrumental
@@ -7423,7 +7408,7 @@ The mean fractional deviation is defined as:
 \end{center}
 \end{figure}
 \end{latexonly}
-\htmladdimg{echelle5.gif}
+\htmladdimg{echelle5.png}
 
    The first thing to do is to ensure that your data is in the
    conventional orientation with wavelength increasing from left to
@@ -7453,7 +7438,7 @@ The mean fractional deviation is defined as:
 \end{center}
 \end{figure}
 \end{latexonly}
-\htmladdimg{echelle1.gif}
+\htmladdimg{echelle1.png}
 
 %       -----------------------------------------------------------------------
 
@@ -7466,7 +7451,7 @@ The mean fractional deviation is defined as:
 \end{center}
 \end{figure}
 \end{latexonly}
-\htmladdimg{echelle2.gif}
+\htmladdimg{echelle2.png}
 
    At present locating the orders is rather an interactive process
    (there is a program `echfind' that does it automatically but it does
@@ -7543,7 +7528,7 @@ The mean fractional deviation is defined as:
 \end{center}
 \end{figure}
 \end{latexonly}
-\htmladdimg{echelle3.gif}
+\htmladdimg{echelle3.png}
 
    You now have a choice. For quick-look extraction, you can create a
    mask image whose data values indicate which order (if any) each pixel
@@ -7725,7 +7710,7 @@ The mean fractional deviation is defined as:
 \end{center}
 \end{figure}
 \end{latexonly}
-\htmladdimg{echelle4.gif}
+\htmladdimg{echelle4.png}
 
    We are now at the stage where arc and object have both had their
    orders extracted into collapsed \'echellograms. These are
