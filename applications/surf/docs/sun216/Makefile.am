@@ -2,11 +2,11 @@
 
 
 
-stardocs_DATA = @STAR_LATEX_DOCUMENTATION_SUN216@ sun216_3c279.eps \
-sun216_fitsdip.eps sun216_m82_remdbm.eps sun216_remsky.eps	   \
-sun216_4chops.eps sun216_flow_jig.eps sun216_omc1vec.eps	   \
-sun216_scansky.eps sun216_arrays.eps sun216_flow_photom.eps	   \
-sun216_qdraw.eps sun216_shift_diag.eps sun216_despike_eg.eps	   \
-sun216_flow_scan.eps sun216_rawsdip.eps sun216_skydip.eps	   \
-sun216_despikemodes.eps sun216_logo.eps sun216_rawsdip2.eps
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION_SUN216@ sun216_3c279.pdf \
+sun216_fitsdip.pdf sun216_m82_remdbm.pdf sun216_remsky.pdf	   \
+sun216_4chops.pdf sun216_flow_jig.pdf sun216_omc1vec.pdf	   \
+sun216_scansky.pdf sun216_arrays.pdf sun216_flow_photom.pdf	   \
+sun216_qdraw.pdf sun216_shift_diag.pdf sun216_despike_eg.pdf	   \
+sun216_flow_scan.pdf sun216_rawsdip.pdf sun216_skydip.pdf	   \
+sun216_despikemodes.pdf sun216_logo.pdf sun216_rawsdip2.pdf
 
