@@ -2,6 +2,9 @@
 \usepackage{graphicx}
 \pagestyle{myheadings}
 
+%% Need PDF to take preference over PNG
+\DeclareGraphicsExtensions{.pdf,.png}
+
 % -----------------------------------------------------------------------------
 % ? Document identification
 \newcommand{\stardoccategory}  {Starlink User Note}
@@ -462,7 +465,7 @@ local time.
 
 \begin{figure}
 \begin{center}
-\includegraphics[angle=-180,width=\textwidth]{sun146_fig}
+\includegraphics[width=\textwidth]{sun146_fig}
 \vspace{5mm}
 \caption{Graphic output from {\bf{observe}}.}
 \label{fig_output}
