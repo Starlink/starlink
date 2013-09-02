@@ -11,7 +11,7 @@ libsgs_la_LIBADD = `gns_link`
 
 include_MESSAGES = SGS_ERR
 
-stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ sun85_diag1.eps
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ sun85_diag1.pdf
 
 #  There are no other public include files.
 

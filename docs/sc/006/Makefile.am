@@ -2,11 +2,11 @@
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
-sc6.htx_tar: sc6.htx_tar.extras sc6_airmass.eps sc6_ap1.eps sc6_ap2.eps \
-sc6_gaia1.eps sc6_gaia2.eps sc6_gaia3.eps sc6_gaia4.eps sc6_intensity.eps \
-sc6_irwindows.eps sc6_sensitivity.eps sc6_ubv.eps sc6_xcatview1.eps \
-sc6_xcatview2.eps
+sc6.htx_tar: sc6.htx_tar.extras sc6_airmass.pdf sc6_ap1.pdf sc6_ap2.pdf \
+sc6_gaia1.pdf sc6_gaia2.pdf sc6_gaia3.pdf sc6_gaia4.pdf sc6_intensity.pdf \
+sc6_irwindows.pdf sc6_sensitivity.pdf sc6_ubv.pdf sc6_xcatview1.pdf \
+sc6_xcatview2.pdf
 
 SUBDIRS = examples
 
-CLEANFILES = sc6.htx_tar sc6.ps sc6.lof sc6.lot sc6.toc
+CLEANFILES = sc6.htx_tar sc6.pdf sc6.ps sc6.lof sc6.lot sc6.toc

@@ -16,11 +16,11 @@ HYPERTEXT_DOCS=sun152.htx_tar
 # This dependency on sun152.ind generates and incorporates the index,
 # but we don't actually distribute that file.
 $(LATEX_DOCS): sun152.tex sun152.ind
-	tar cf $@ sun152.tex sun152*eps
+	tar cf $@ sun152.tex sun152_*.pdf
 
 # Generate the index and paste it in place, replacing the previous version.
 sun152.ind: sun152.tex
-	latex '\def\generateindex{1}\input sun152'
+	pdflatex '\def\generateindex{1}\input sun152'
 	makeindex sun152
 	sed -e '/\\begin{theindex}/r sun152.ind' -e '/\\begin{theindex}/,/\\end{theindex}/d' sun152.tex >t
 	mv t sun152.tex

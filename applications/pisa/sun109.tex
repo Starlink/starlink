@@ -1,4 +1,10 @@
-\documentstyle[twoside,11pt]{article}
+\documentclass[twoside,11pt]{article}
+
+% ? Specify used packages
+\usepackage{graphicx}        %  Use this one for final production.
+% \usepackage[draft]{graphicx} %  Use this one for drafting.
+% ? End of specify used packages
+
 \pagestyle{myheadings}
 
 % -----------------------------------------------------------------------------
@@ -14,12 +20,43 @@
 \newcommand{\stardocversion}   {2.4-5}
 \newcommand{\stardocmanual}    {[manual-type]}
 \newcommand{\stardocabstract}  {[Text of abstract]}
-% ? End of document identification
+\newcommand{\stardoccopyright}
+{Copyright \copyright\ 2002 Particle Physics and Astronomy Research
+  Council}
 
+% ? End of document identification
 % -----------------------------------------------------------------------------
 
+% +
+%  Name:
+%     sun.tex
+%
+%  Purpose:
+%     Template for Starlink User Note (SUN) documents.
+%     Refer to SUN/199
+%
+%  Authors:
+%     AJC: A.J.Chipperfield (Starlink, RAL)
+%     BLY: M.J.Bly (Starlink, RAL)
+%     PWD: Peter W. Draper (Starlink, Durham University)
+%
+%  History:
+%     17-JAN-1996 (AJC):
+%        Original with hypertext macros, based on MDL plain originals.
+%     16-JUN-1997 (BLY):
+%        Adapted for LaTeX2e.
+%        Added picture commands.
+%     13-AUG-1998 (PWD):
+%        Converted for use with LaTeX2HTML version 98.2 and
+%        Star2HTML version 1.3.
+%      1-FEB-2000 (AJC):
+%        Add Copyright statement in LaTeX
+%     {Add further history here}
+%
+% -
+
 \newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markright{\stardocname}
+\markboth{\stardocname}{\stardocname}
 \setlength{\textwidth}{160mm}
 \setlength{\textheight}{230mm}
 \setlength{\topmargin}{-2mm}
@@ -46,7 +83,7 @@
 %    USA
 
 %  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
-%  star2html to signify raw TeX that latex2html cannot process).
+%  LaTeX2HTML to signify text it shouldn't process).
 %begin{latexonly}
 \makeatletter
 \def\makeinnocent#1{\catcode`#1=12 }
@@ -92,32 +129,28 @@
 \newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
 \newcommand{\htmladdnormallink}[2]{#1}
 \newcommand{\htmladdimg}[1]{}
-\newenvironment{latexonly}{}{}
 \newcommand{\hyperref}[4]{#2\ref{#4}#3}
 \newcommand{\htmlref}[2]{#1}
 \newcommand{\htmlimage}[1]{}
 \newcommand{\htmladdtonavigation}[1]{}
-\newcommand{\latexhtml}[2]{#1}
+
+\newenvironment{latexonly}{}{}
+\newcommand{\latex}[1]{#1}
 \newcommand{\html}[1]{}
+\newcommand{\latexhtml}[2]{#1}
+\newcommand{\HTMLcode}[2][]{}
 
 %  Starlink cross-references and labels.
 \newcommand{\xref}[3]{#1}
 \newcommand{\xlabel}[1]{}
 
 %  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
+\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
 
 %  Define command to re-centre underscore for Latex and leave as normal
 %  for HTML (severe problems with \_ in tabbing environments and \_\_
 %  generally otherwise).
-\newcommand{\latex}[1]{#1}
-\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-\latex{\setunderscore}
-
-%  Redefine the \tableofcontents command. This procrastination is necessary
-%  to stop the automatic creation of a second table of contents page
-%  by latex2html.
-\newcommand{\latexonlytoc}[0]{\tableofcontents}
+\renewcommand{\_}{\texttt{\symbol{95}}}
 
 % -----------------------------------------------------------------------------
 %  Debugging.
@@ -158,12 +191,18 @@
 %     source prior to any statements that make of the sst commnds.
 
 %  Notes:
-%     The style file html.sty provided with LaTeX2html needs to be used.
-%     This must be before this file.
+%     The commands defined in the style file html.sty provided with LaTeX2html
+%     are used. These should either be made available by using the appropriate
+%     sun.tex (with hypertext extensions) or by putting the file html.sty
+%     on your TEXINPUTS path (and including the name as part of the
+%     documentstyle declaration).
 
 %  Authors:
 %     RFWS: R.F. Warren-Smith (STARLINK)
 %     PDRAPER: P.W. Draper (Starlink - Durham University)
+%     MJC: Malcolm J. Currie (STARLINK)
+%     DSB: David Berry (STARLINK)
+%     TIMJ: Tim Jenness (JAC)
 
 %  History:
 %     10-SEP-1990 (RFWS):
@@ -174,6 +213,19 @@
 %        Added support for the usage section and adjusted various spacings.
 %     8-DEC-1994 (PDRAPER):
 %        Added support for simplified formatting using LaTeX2html.
+%     1995 October 4 (MJC):
+%        Added goodbreaks and pagebreak[3] in various places to improve
+%        pages breaking before headings, not immediately after.
+%        Corrected banner width.
+%     1996 March 7 (MJC):
+%        Mark document name on both sides of an sstroutine.
+%     2-DEC-1998 (DSB):
+%        Added sstattributetype (copied from sun210.tex).
+%     2004 August 6 (MJC):
+%        Added sstattribute.
+%     21-JUL-2009 (TIMJ):
+%        Added \sstdiylist{}{} as used when a Parameters section is located that
+%        is not "ADAM Parameters".
 %     {enter_further_changes_here}
 
 %  Bugs:
@@ -195,6 +247,7 @@
 %  a purpose description and the rest of the routine's documentation.
 \newcommand{\sstroutine}[3]{
    \goodbreak
+   \markboth{{\stardocname}~ --- #1}{{\stardocname}~ --- #1}
    \rule{\textwidth}{0.5mm}
    \vspace{-7ex}
    \newline
@@ -214,15 +267,56 @@
    \end{description}
 }
 
+% Frame attributes fount.  Need to find a way for these to stand out.
+% San serif doesn't work by default.  Also without the \rm the
+% san serif continues after \sstatt hyperlinks.  Extra braces
+% failed to prevent \sstattribute from using roman fount for its
+% headings.  The current lash up appears to work, but needs further
+% investigation or a TeX wizard.
+\newcommand{\sstatt}[1]{\sf #1}
+\begin{htmlonly}
+  \newcommand{\sstatt}[1]{\large{\tt #1}}
+\end{htmlonly}
+
+%  Define a command to produce an attribute header, including its name,
+%  a purpose description and the rest of the routine's documentation.
+\newcommand{\sstattribute}[3]{
+   \goodbreak
+   \markboth{{\stardocname}~ --- #1}{{\stardocname}~ --- #1}
+   \rule{\textwidth}{0.5mm}
+   \vspace{-7ex}
+   \newline
+   \settowidth{\sstbannerlength}{{\Large {\sstatt #1}}}
+   \setlength{\sstcaptionlength}{\textwidth}
+   \setlength{\sstexampleslength}{\textwidth}
+   \addtolength{\sstbannerlength}{0.5em}
+   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
+   \addtolength{\sstcaptionlength}{-4.9pt}
+   \settowidth{\sstexampleswidth}{{\bf Examples:}}
+   \addtolength{\sstexampleslength}{-\sstexampleswidth}
+   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\sstatt #1}}}
+   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
+   \parbox[t]{\sstbannerlength}{\flushright{\Large {\sstatt #1}}}
+   \begin{description}
+      #3
+   \end{description}
+}
+
 %  Format the description section.
 \newcommand{\sstdescription}[1]{\item[Description:] #1}
 
 %  Format the usage section.
-\newcommand{\sstusage}[1]{\item[Usage:] \mbox{}
+\newcommand{\sstusage}[1]{\goodbreak \item[Usage:] \mbox{}
 \\[1.3ex]{\raggedright \ssttt #1}}
 
 %  Format the invocation section.
 \newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
+
+%  Format the attribute data type section.
+\newcommand{\sstattributetype}[1]{
+   \item[Type:] \mbox{} \\
+      #1
+}
 
 %  Format the arguments section.
 \newcommand{\sstarguments}[1]{
@@ -244,7 +338,17 @@
 
 %  Format the parameters section (for an application).
 \newcommand{\sstparameters}[1]{
+   \goodbreak
    \item[Parameters:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the applicability section.
+\newcommand{\sstapplicability}[1]{
+   \item[Class Applicability:] \mbox{} \\
    \vspace{-3.5ex}
    \begin{description}
       #1
@@ -253,6 +357,7 @@
 
 %  Format the examples section.
 \newcommand{\sstexamples}[1]{
+   \goodbreak
    \item[Examples:] \mbox{} \\
    \vspace{-3.5ex}
    \begin{description}
@@ -269,11 +374,20 @@
 \\ #2 }
 
 %  Format the notes section.
-\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
+\newcommand{\sstnotes}[1]{\goodbreak \item[Notes:] \mbox{} \\[1.3ex] #1}
 
 %  Provide a general-purpose format for additional (DIY) sections.
 \newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}]
 \mbox{} \\[1.3ex] #2}
+
+%  Format the a generic section as a list
+\newcommand{\sstdiylist}[2]{
+   \item[#1:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #2
+   \end{description}
+}
 
 %  Format the implementation status section.
 \newcommand{\sstimplementationstatus}[1]{
@@ -294,7 +408,7 @@
 %  Define the format of an item.
 \newcommand{\sstitem}{\item}
 
-%% Now define html equivalents of those already set. These are used by
+%  Now define html equivalents of those already set. These are used by
 %  latex2html and are defined in the html.sty files.
 \begin{htmlonly}
 
@@ -306,11 +420,21 @@
       \end{description}
    }
 
+%  sstattribute. Note the further level of subsectioning.
+   \newcommand{\sstattribute}[3]{
+      \subsubsection{#1\xlabel{#1}-\label{#1}#2}
+      \begin{description}
+         #3
+      \end{description}
+      \\
+   }
+
 %  sstdescription
    \newcommand{\sstdescription}[1]{\item[Description:]
       \begin{description}
          #1
       \end{description}
+      \\
    }
 
 %  sstusage
@@ -318,6 +442,7 @@
       \begin{description}
          {\ssttt #1}
       \end{description}
+      \\
    }
 
 %  sstinvocation
@@ -325,65 +450,69 @@
       \begin{description}
          {\ssttt #1}
       \end{description}
+      \\
    }
 
 %  sstarguments
    \newcommand{\sstarguments}[1]{
-      \item[Arguments:]
+      \item[Arguments:] \\
       \begin{description}
          #1
       \end{description}
+      \\
    }
 
 %  sstreturnedvalue
    \newcommand{\sstreturnedvalue}[1]{
-      \item[Returned Value:]
+      \item[Returned Value:] \\
       \begin{description}
          #1
       \end{description}
+      \\
    }
 
 %  sstparameters
    \newcommand{\sstparameters}[1]{
-      \item[Parameters:]
+      \item[Parameters:] \\
       \begin{description}
          #1
       \end{description}
+      \\
+   }
+
+%  sstapplicability
+   \newcommand{\sstapplicability}[1]{%
+      \item[Class Applicability:]
+       \begin{description}
+         #1
+      \end{description}
+      \\
    }
 
 %  sstexamples
    \newcommand{\sstexamples}[1]{
-      \item[Examples:]
+      \item[Examples:] \\
       \begin{description}
          #1
       \end{description}
+      \\
    }
 
 %  sstsubsection
    \newcommand{\sstsubsection}[1]{\item[{#1}]}
 
 %  sstexamplesubsection
-   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] \\ #2}
+   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] #2\\}
 
 %  sstnotes
-   \newcommand{\sstnotes}[1]{\item[Notes:]
-      \begin{description}
-         #1
-      \end{description}
-   }
+   \newcommand{\sstnotes}[1]{\item[Notes:] #1 }
 
 %  sstdiytopic
-   \newcommand{\sstdiytopic}[2]{\item[{#1}]
-      \begin{description}
-         #2
-      \end{description}
-   }
+   \newcommand{\sstdiytopic}[2]{\item[{#1}] #2 }
 
 %  sstimplementationstatus
-   \newcommand{\sstimplementationstatus}[1]{\item[Implementation Status:]
-      \begin{description}
-         #1
-      \end{description}
+   \newcommand{\sstimplementationstatus}[1]{
+      \item[Implementation Status:] #1
    }
 
 %  sstitemlist
@@ -391,11 +520,17 @@
       \begin{itemize}
          #1
       \end{itemize}
+      \\
    }
+%  sstitem
+   \newcommand{\sstitem}{\item}
+
 \end{htmlonly}
 
-%  End of "sst.tex" layout definitions.
+%  End of sst.tex layout definitions.
 %.
+
+
 
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
@@ -408,8 +543,8 @@
 %  Latex document header.
 %  ======================
 \begin{latexonly}
-   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
-   {\large Particle Physics \& Astronomy Research Council}\\
+   \textsc{Rutherford Appleton Laboratory} \hfill \textbf{\stardocname}\\
+   {\large Science \& Technology Facilities Council}\\
    {\large Starlink Project\\}
    {\large \stardoccategory\ \stardocnumber}
    \begin{flushright}
@@ -420,19 +555,16 @@
    \rule{\textwidth}{0.5mm}
    \vspace{5mm}
    \begin{center}
-   {\Large\bf  \stardoctitle \\ [2.5ex]}
+   {\Huge\textbf{\stardoctitle \\ [2.5ex]}}
+%   {\LARGE\textbf{\stardocversion \\ [4ex]}}
+%   {\Huge\textbf{\stardocmanual}}
    \end{center}
    \vspace{5mm}
 
-% ? Heading for abstract if used.
-%   \vspace{10mm}
-%   \begin{center}
-%      {\Large\bf Abstract}
-%   \end{center}
-% ? End of heading for abstract.
+% ? Add picture here if required for the LaTeX version.
 
 % Include a PISAPLOT picture to show what the packages is about.
-% The postscript file sun109fig.ps is an encapsulated output from
+% The postscript file sun109_cover.eps is an encapsulated output from
 % PISAPLOT which is produced with the following commands
 %
 % PISAFIND $PISA_DIR/frame(80:210,115:260) reset accept
@@ -443,27 +575,35 @@
 %
 % it will be necessary to scale the output in some fashion to a
 % width of around 5 inches. This may be performed using an AGI picture.
-%
-   \setlength{\unitlength}{1in}
-   \begin{center}
-      \begin {picture}(5,5)
-         \put(0,0){\special{psfile=sun109fig.ps}}
-      \end {picture}
-   \end{center}
+
+
+%   e.g. \includegraphics[scale=0.3]{filename}
+\centering\leavevmode\includegraphics[width=4in]{sun109_cover}
+% ? End of picture
+
+% ? Heading for abstract if used.
+%   \vspace{10mm}
+%   \begin{center}
+%      {\Large\textbf{Abstract}}
+%   \end{center}
+% ? End of heading for abstract.
 \end{latexonly}
 
 %  HTML documentation header.
 %  ==========================
 \begin{htmlonly}
    \xlabel{}
-   \begin{rawhtml} <H1 ALIGN=CENTER> \end{rawhtml}
-      \stardoctitle
-   \begin{rawhtml} </H1> \end{rawhtml}
+   \begin{rawhtml} <H1> \end{rawhtml}
+      \stardoctitle\\
+%%      \stardocversion\\
+%%      \stardocmanual
+   \begin{rawhtml} </H1> <HR> \end{rawhtml}
 
-% ? Add picture here if required.
-   \begin{center}
-   \htmladdimg{main.gif}
-   \end{center}
+% ? Add picture here if required for the hypertext version.
+%   e.g. \includegraphics[scale=0.7]{filename}
+\begin{center}
+\htmladdimg{sun109_main.png}
+\end{center}
 % ? End of picture
 
    \begin{rawhtml} <P> <I> \end{rawhtml}
@@ -471,11 +611,10 @@
    \stardocauthors \\
    \stardocdate
    \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
       \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
-                        {http://www.pparc.ac.uk} \\
+                        {http://www.scitech.ac.uk} \\
+      \htmladdnormallink{Science \& Technology Facilities Council}
+                        {http://www.scitech.ac.uk} \\
    \begin{rawhtml} </H3> <H2> \end{rawhtml}
       \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
    \begin{rawhtml} </H2> \end{rawhtml}
@@ -491,7 +630,6 @@
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
-  \newcommand{\latexonlytoc}[0]{}
   \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
         {stardoccontents}}
 
@@ -503,21 +641,33 @@
 % -----------------------------------------------------------------------------
 % ? Document Abstract. (if used)
 %  ==================
-%\stardocabstract
+% \stardocabstract
 % ? End of document abstract
+
+% -----------------------------------------------------------------------------
+% ? Latex Copyright Statement
+%  =========================
+\begin{latexonly}
+\newpage
+\vspace*{\fill}
+\stardoccopyright
+\end{latexonly}
+% ? End of Latex copyright statement
+
 % -----------------------------------------------------------------------------
 % ? Latex document Table of Contents (if used).
 %  ===========================================
- \newpage
- \begin{latexonly}
-   \setlength{\parskip}{0mm}
-   \latexonlytoc
-   \setlength{\parskip}{\medskipamount}
-   \markright{\stardocname}
- \end{latexonly}
+  \newpage
+  \begin{latexonly}
+    \setlength{\parskip}{0mm}
+    \tableofcontents
+    \setlength{\parskip}{\medskipamount}
+    \markboth{\stardocname}{\stardocname}
+  \end{latexonly}
 % ? End of Latex document table of contents
 % -----------------------------------------------------------------------------
-\newpage
+
+\cleardoublepage
 \renewcommand{\thepage}{\arabic{page}}
 \setcounter{page}{1}
 

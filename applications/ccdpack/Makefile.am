@@ -10,8 +10,8 @@ dist_bin_SCRIPTS = $(PUBLIC_SCR)
 bin_PROGRAMS = ccdwish
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ \
-    sun139geo.eps sun139reg.eps sun139red.eps sun139mos.eps sun139driz.eps \
-    sun139outsky.eps sun139outclear.eps sun139outim.eps
+    sun139_geo.pdf sun139_reg.pdf sun139_red.pdf sun139_mos.pdf sun139_driz.pdf \
+    sun139_outsky.pdf sun139_outclear.pdf sun139_outim.pdf
 
 noinst_LTLIBRARIES = libgrf_ccdpack.la
 libgrf_ccdpack_la_SOURCES = grf_ccdpack.c grf.h

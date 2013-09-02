@@ -6,7 +6,7 @@ dist_bin_SCRIPTS = pda_link pda_link_adam
 
 lib_LTLIBRARIES = libpda.la
 
-stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ sun194_1.eps
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ sun194_1.pdf
 
 libpda_la_SOURCES = \
         $(PUBLIC_INCLUDES) \

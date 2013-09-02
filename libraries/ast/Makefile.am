@@ -246,33 +246,33 @@ GRP_F_INCLUDE_FILES = \
 ##     sun211.tex
 
 DOCUMENTATION_PRODUCTS = $(PAPER_DOCUMENTATION) $(HYPER_DOCUMENTATION)
-PAPER_DOCUMENTATION = sun210.tex sun211.tex sun210.ps sun211.ps
+PAPER_DOCUMENTATION = sun210.tex sun211.tex sun210.pdf sun211.pdf
 HYPER_DOCUMENTATION = sun210.htx_tar sun211.htx_tar
 
-POSTSCRIPT_FIGURES = \
-    cmpframe.eps \
-    complex.eps \
-    frames.eps \
-    frameset.eps \
-    fronta.eps \
-    fronta_bw.eps \
-    frontb.eps \
-    frontb_bw.eps \
-    frontc.eps \
-    frontc_bw.eps \
-    fsalign.eps \
-    fsconvert.eps \
-    fsexample.eps \
-    fsmerge.eps \
-    fsremap.eps \
-    gridplot.eps \
-    gridplot_bw.eps \
-    mapping.eps \
-    overgrid.eps \
-    overgrid_bw.eps \
-    parallel.eps \
-    series.eps \
-    simpexamp.eps
+PDF_FIGURES = \
+    cmpframe.pdf \
+    complex.pdf \
+    frames.pdf \
+    frameset.pdf \
+    fronta.pdf \
+    fronta_bw.pdf \
+    frontb.pdf \
+    frontb_bw.pdf \
+    frontc.pdf \
+    frontc_bw.pdf \
+    fsalign.pdf \
+    fsconvert.pdf \
+    fsexample.pdf \
+    fsmerge.pdf \
+    fsremap.pdf \
+    gridplot.pdf \
+    gridplot_bw.pdf \
+    mapping.pdf \
+    overgrid.pdf \
+    overgrid_bw.pdf \
+    parallel.pdf \
+    series.pdf \
+    simpexamp.pdf
 
 WCSLIB_FILES = \
     proj.c \

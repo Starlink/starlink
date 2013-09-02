@@ -12,7 +12,8 @@ fluxes_LDADD = `$(srcdir)/fluxes_link_adam`
 dist_starnews_DATA = fluxes.news
 dist_pkgdata_DATA = FLUXES_CONDITIONS
 
-stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ sun213_fig1.eps
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ sun213_fig1.pdf \
+sun213_fig2.pdf
 
 # The path here is ignored for the install location
 filterdir = $(bindir)

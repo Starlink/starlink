@@ -18,7 +18,7 @@ libgks_la_LIBADD = base/libgks_base.la call/libgks_call.la \
 	@DRIVER_LIBLIST@
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ \
-    sun83-c1.eps sun83-c2.eps sun83-c3.eps sun83-c4.eps sun83-c5.eps
+    sun83_c1.pdf sun83_c2.pdf sun83_c3.pdf sun83_c4.pdf sun83_c5.pdf
 
 include_MESSAGES = GKS_ERR
 

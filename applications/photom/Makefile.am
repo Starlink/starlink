@@ -24,7 +24,7 @@ IFC_FILES = $(IFL_FILES:.ifl=.ifc)
 $(IFL_FILES) $(DYNSCRIPTS): photom.ifd
 	$(IFD2STAR) photom
 
-stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ sun45fig.eps
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ sun45_cover.pdf
 
 # testing
 edit = sed \
