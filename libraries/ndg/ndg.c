@@ -176,6 +176,30 @@ void ndgNdfpr( int indf1, const char clist[], const Grp *igrp, size_t index, int
 
 }
 
+F77_SUBROUTINE(ndg_ndfco)( INTEGER(INDF1), INTEGER(IGRP), INTEGER(INDEX), INTEGER(INDF2), INTEGER(STATUS));
+
+void ndgNdfco( int indf1, const Grp *igrp, size_t index, int * indf2, int * status) {
+
+  DECLARE_INTEGER(INDF1);
+  DECLARE_INTEGER(IGRP);
+  DECLARE_INTEGER(INDEX);
+  DECLARE_INTEGER(INDF2);
+  DECLARE_INTEGER(STATUS);
+
+  F77_EXPORT_INTEGER(indf1, INDF1);
+  IGRP = grpC2F( igrp, status );
+  F77_EXPORT_INTEGER(index, INDEX);
+  F77_EXPORT_INTEGER(*status, STATUS);
+
+  F77_LOCK( F77_CALL(ndg_ndfco)( INTEGER_ARG(&INDF1),
+		       INTEGER_ARG(&IGRP), INTEGER_ARG(&INDEX),
+		       INTEGER_ARG(&INDF2), INTEGER_ARG(&STATUS) ); )
+
+  F77_IMPORT_INTEGER( STATUS, *status);
+  F77_IMPORT_INTEGER( INDF2, *indf2);
+
+}
+
 F77_SUBROUTINE(ndg_asexp)( CHARACTER(GRPEXP), LOGICAL(VERB), INTEGER(IGRP1), INTEGER(IGRP2),
 			   INTEGER(SIZE), LOGICAL(FLAG), INTEGER(STATUS) TRAIL(GRPEXP) );
 
