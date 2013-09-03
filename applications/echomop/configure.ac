@@ -40,7 +40,7 @@ STAR_DECLARE_DEPENDENCIES(sourceset, htx)
 # Makefile.am, before the whole lot are installed as the default action of
 # this macro.
 STAR_LATEX_DOCUMENTATION(sun152,
-                         [sun152.htx_tar sun152.latex_tar echomop_hyper.tar])
+                         [sun152.htx_tar sun152.latex_tar echomop_hyper.tar sun152.pdf])
 
 AC_CONFIG_FILES([Makefile component.xml doc/Makefile])
 AC_OUTPUT

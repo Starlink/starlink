@@ -2,6 +2,7 @@
 
 STAR2HTML = @STAR2HTML@
 HLINK = @HLINK@
+LN_S = @LN_S@
 
 # Following might be overridden on the command line (by the parent makefile)
 LATEX_DOCS=sun152.latex_tar
@@ -11,6 +12,9 @@ HYPERTEXT_DOCS=sun152.htx_tar
 # the makefile in the parent directory.
 $(LATEX_DOCS): sun152/sun152.tex
 	cd sun152; tar cf ../$@ sun152.tex sun152_*.pdf
+
+sun152.pdf: sun152/sun152.tex
+	cd sun152; pdflatex sun152; pdflatex sun152; cd -; $(LN_S) sun152/sun152.pdf sun152.pdf
 
 $(HYPERTEXT_DOCS): sun152/sun152.htx/sun152.html
 	cd sun152; tar cf ../$@ sun152.htx

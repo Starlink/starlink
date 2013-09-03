@@ -198,7 +198,7 @@ stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
 
 # Documentation lives in the doc directory, which has its own Makefile
-sun152.htx_tar sun152.latex_tar echomop_hyper.tar:
+sun152.htx_tar sun152.latex_tar echomop_hyper.tar sun152.pdf:
 	rm -f $@
 	cd doc; test -f $@ || $(MAKE) $@
 	$(LN_S) doc/$@ $@
