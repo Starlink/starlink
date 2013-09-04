@@ -28,7 +28,7 @@ STAR_CHECK_PROGS([env])
 dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.
 STAR_LATEX_DOCUMENTATION(sun199,
-                         [sun199.tex sun199.pdf sun199.htx_tar mud152.ps.gz])
+                         [sun199.tex sun199.pdf sun199.htx_tar mud152.pdf])
 dnl    We override the standard .tex.htx_tar rule inside Makefile.am, and so
 dnl    don't need the @STAR2HTML@ substitution.
 
