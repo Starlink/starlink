@@ -52,7 +52,7 @@
 *  Usage:
 *     pol2cat in cat iref pi [plot] [snr] [maxlen] [domain] [pixsize]
 *             [config] [device] [nsigma] [extcor] [retain] [qui] [hits]
-*             [harmonic] [msg_filter] [ilevel] [glevel] [logfile]
+*             [harmonic] [forcefile] [msg_filter] [ilevel] [glevel] [logfile]
 
 *  Parameters:
 *     CAT = LITERAL (Read)
@@ -82,6 +82,14 @@
 *        SMURF:REMSKY). If FALSE, no extinction correction is applied. The
 *        value of this parameter is ignored if pre-calculated Q and U values
 *        are supplied via the INQU parameter. [TRUE]
+*     FORCEFLAT = _LOGICAL (Read)
+*        Should any remaining low frequency structure be removed from the
+*        final background-removed Q and U images? This option is only
+*        available if a mask has been suppplied using parameter MASK. If
+*        TRUE, each masked Q and U image is smoothed using a 3 pixel
+*        Gaussian. The masked areas in the resulting smoothed image are
+*        filled in with artifical data using KAPPA:FILLBAD, and the filled
+*        image is subtracted form the original (unmasked) image. [FALSE]
 *     GLEVEL = LITERAL (Read)
 *        Controls the level of information to write to a text log file.
 *        Allowed values are as for "ILEVEL". The log file to create is
@@ -166,10 +174,18 @@
 *        with the vector orientations rotating through 90 degrees in the
 *        halo.
 *
+*        If a mask is supplied, a further stage of cleaning is performed
+*        in which correlations between the unmasked regions within the
+*        residual Q and U images are found and removed. In addition,
+*        supplying a mask also enables the FORCEFLAT parameter to be used
+*        to remove any final low frequency structure in the background
+*        regions.
+*
 *        A suitable mask can often be formed by running pol2cat first
 *        without a mask, and then thresholding the resulting polarised
 *        intensity image. The thresholded image can then be used as the
-*        mask in a second run of pol2cat. [!]
+*        mask in a second run of pol2cat. ALternatively, a mask can be
+*        formed form a scanm map of the region. [!]
 *     MAXLEN = _REAL (Read)
 *        The maximum length for the plotted vectors, in terms of the
 *        quantity specified by parameter PLOT. Only vectors below this
@@ -224,6 +240,10 @@
 *        single container file, with path given by QUI. So for instance if
 *        QUI is set to "stokes.sdf", the Q, U and I images can be accessed
 *        as "stokes.q", "stokes.u" and "stokes.i". [!]
+*     REFINE = _LOGICAL (Read)
+*        Add extra background removal stages? Only available if a mask is
+*        supplied (See parameter MASK). This increases the time taken to
+*        run pol2cat hugely.
 *     RETAIN = _LOGICAL (Read)
 *        Should the temporary directory containing the intermediate files
 *        created by this script be retained? If not, it will be deleted
@@ -293,12 +313,16 @@
 *        Added parameter HARMONIC.
 *     27-AUG-2013 (DSB):
 *        Store Q and U images in STAREDIR.
+*     4-SEP-2013 (DSB):
+*        - Added REFINE and FORCEFLAT parameters.
+*        - Added removal of correlated residual Q and U components.
 
 *-
 '''
 
 import os
 import starutil
+import smurfutil
 from starutil import invoke
 from starutil import NDG
 from starutil import Parameter
@@ -394,8 +418,14 @@ try:
    params.append(starutil.Par0I("HARMONIC", "The harmonic for calculating "
                                 "Q and U", 4, minval=1, noprompt=True))
 
+   params.append(starutil.Par0L("FORCEFLAT", "Force Q and U images to be flat?",
+                                False, noprompt=True))
+
    params.append(starutil.Par0L("DEBIAS", "Remove statistical bias from P"
                                 "and IP?", False, noprompt=True))
+
+   params.append(starutil.Par0L("REFINE", "Do extra refinements (takes "
+                                "lots of time)?", False, noprompt=False))
 
    params.append(starutil.ParNDG("INQU", "NDFs containing previously calculated Q and U values",
                                  None,noprompt=True))
@@ -512,6 +542,19 @@ try:
 
 #  See if temp files are to be retained.
    retain = parsys["RETAIN"].value
+
+#  See if backgrounds refinements are to be performed.
+   refine = parsys["REFINE"].value
+   if refine and mask == None:
+      raise starutil.InvalidParameterError("REFINE is True but no mask "
+                                           "was supplied.")
+
+#  See if the Q and U backgrounds are to be force flat by smoothing, and
+#  then removing the low frequency structure.
+   forceflat = parsys["FORCEFLAT"].value
+   if forceflat and not refine:
+      raise starutil.InvalidParameterError("FORCEFLAT is True but REFINE "
+                                           "is False.".format(inqu))
 
 #  See statistical debiasing is to be performed.
    debias = parsys["DEBIAS"].value
@@ -720,6 +763,20 @@ try:
             invoke( "$KAPPA_DIR/wcscopy ndf={0} like={1} ok".
                     format(qq,qffb[islice-1]) )
 
+
+#  If required, look for correlated components in the residuals and remove
+#  them.
+         if refine:
+            msg_out( "Removing correlated background components from {0} "
+                     "bolometer Q values...".format(a) )
+            qsm = smurfutil.remove_corr( qsm, qmasked )
+
+#  If required, force the background to be flat my removing any remaining
+#  low frequency structure in the unmasked regions.
+            if forceflat:
+               msg_out( "Forcing flat backgrounds in {0} bolometer Q values...".format(a) )
+               qsm = smurfutil.force_flat( qsm, qmasked )
+
 #  Remove smaller spikes from the Q images and estimate variances.
          msg_out( "Removing smaller spikes from {0} bolometer Q values...".format(a))
          qff2 = NDG(qsm)
@@ -808,6 +865,16 @@ try:
                     format(ures,islice,uu) )
             invoke( "$KAPPA_DIR/wcscopy ndf={0} like={1} ok".
                     format(uu,uffb[islice-1]) )
+
+         if refine:
+            msg_out( "Removing correlated background components from {0} "
+                     "bolometer U values...".format(a) )
+            usm = smurfutil.remove_corr( usm, umasked )
+
+            if forceflat:
+               msg_out( "Forcing flat backgrounds in {0} bolometer U values...".format(a) )
+               usm = smurfutil.force_flat( usm, umasked )
+
          uff2 = NDG(usm)
          invoke( "$KAPPA_DIR/ffclean in={0} out={1} genvar=yes box=3 clip=\[{2}\]"
                  .format(usm,uff2,clip) )
