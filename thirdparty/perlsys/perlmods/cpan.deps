@@ -5,6 +5,8 @@ Text::Balanced
 Config::IniFiles
 Digest::MD5
 IO::Tee
+List::MoreUtils
+Params::Util
 DateTime
 DateTime::Format::Strptime
 DateTime::Format::ISO8601
