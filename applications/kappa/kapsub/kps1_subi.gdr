@@ -123,7 +123,7 @@
 *     Copyright (C) 1990, 1993 Science & Engineering Research Council.
 *     Copyright (C) 1996 Central Laboratory of the Research Councils.
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     Copyright (C) 2010, 2013 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -163,6 +163,9 @@
 *        KPG1_STATR.
 *     2010 August 28 (MJC):
 *        Replace ICMMM with KPG_IMMMx.
+*     2013 September 4 (MJC):
+*        Fix logic for bad bin.  A condition should have been
+*        changed after moving from the STATV to KPG1_STATx APIs.
 *     {enter_further_changes_here}
 
 *-
@@ -418,10 +421,8 @@
 
 *  Only store the results when there were sufficient points.  Unused
 *  bins are not put in the list.
-               NOSTAT = ( ( NPIXCL .LT. NGMIN ) .AND.
-     :                    ( ESTIM .EQ. 'KSIG' ) ) .OR.
-     :                  ( ( BINTOT - NINVAL .LT. NGMIN ) .AND.
-     :                    ( ESTIM .EQ. 'MEAN' ) )
+               NOSTAT = NPIXCL .LT. NGMIN .AND.
+     :                  ( ESTIM .EQ. 'KSIG' .OR. ESTIM .EQ. 'MEAN' )
                IF ( STATUS .EQ. SAI__OK .AND. ( .NOT. NOSTAT ) ) THEN
                   NBIN = NBIN + 1
                   IF ( ESTIM .EQ. 'MEAN' ) THEN
