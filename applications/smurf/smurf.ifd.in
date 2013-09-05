@@ -2058,11 +2058,12 @@ package @PACKAGE@ {
 
             parameter bandpass {
                 position 3
-                type NDF
-                access WRITE
-                vpath {PROMPT}
-                ppath GLOBAL CURRENT
-                prompt {Output data files}
+                type _REAL
+                access READ
+                vpath DEFAULT
+                ppath DEFAULT
+                default 0.0
+                prompt {Distance to extract on either side of centre (mm)}
                 helpkey *
             }
 
