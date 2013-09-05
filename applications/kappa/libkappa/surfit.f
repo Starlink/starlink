@@ -700,8 +700,8 @@
 
 *  Kappa-sigma clipping requires an additional parameter: the clipping
 *  limits.  A null value indicates no clipping is to be performed.
+      NCLIP = 0
       IF ( ESTIMA .EQ. 'KSIGMA' ) THEN
-         NCLIP = 0
          CALL PAR_GDRVR( 'CLIP', MXCLIP, 0.1, VAL__MAXR,
      :                   CLIP, NCLIP, STATUS )
          IF ( STATUS .EQ. PAR__NULL ) THEN
