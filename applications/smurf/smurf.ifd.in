@@ -71,7 +71,7 @@
 #     JB: Jennifer Balfour (UBC)
 #     COBA: Coskun Oba (UoL)
 #     MJC: Malcolm J. Currie (JAC, Hawaii)
-#     MSHERWOOD: Matt Sherwood (UoL)
+#     MS: Matt Sherwood (UoL)
 #     {enter_new_authors_here}
 
 #  History:
@@ -270,6 +270,8 @@
 #        Add FTS2SPLIT
 #     2013-07-03 (MSHERWOOD):
 #        Add fts2gaia
+#     2013-09-04 (MS):
+#        Add low resolution bandpass parameter (in +/- mm from centre) to fts2split
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -2046,6 +2048,16 @@ package @PACKAGE@ {
 
             parameter out {
                 position 2
+                type NDF
+                access WRITE
+                vpath {PROMPT}
+                ppath GLOBAL CURRENT
+                prompt {Output data files}
+                helpkey *
+            }
+
+            parameter bandpass {
+                position 3
                 type NDF
                 access WRITE
                 vpath {PROMPT}
