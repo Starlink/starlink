@@ -10064,12 +10064,19 @@ package kappa {
             helpkey *
          }
 
-         parameter ref {
-            position 2
-            type NDF
-            access READ
-            vpath PROMPT
-            prompt {Reference NDF}
+         parameter nbad {
+            type _INTEGER
+            access WRITE
+            vpath DEFAULT
+            default 0
+            helpkey *
+         }
+
+         parameter ngood {
+            type _INTEGER
+            access WRITE
+            vpath DEFAULT
+            default 0
             helpkey *
          }
 
@@ -10080,6 +10087,15 @@ package kappa {
             vpath PROMPT
             association ->GLOBAL.DATA_ARRAY
             prompt {Output NDF}
+            helpkey *
+         }
+
+         parameter ref {
+            position 2
+            type NDF
+            access READ
+            vpath PROMPT
+            prompt {Reference NDF}
             helpkey *
          }
 

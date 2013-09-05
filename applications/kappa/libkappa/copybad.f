@@ -41,10 +41,14 @@
 *        specified by parameter REF are inverted before being used (that
 *        is, good pixels are treated as bad and bad pixels are treated as
 *        good). [FALSE]
-*     REF = NDF (Read)
-*        NDF containing the bad pixels to be copied to OUT.
+*     NBAD = _INTEGER (Write)
+*        The number of bad pixels in the output NDF.
+*     NGOOD = _INTEGER (Write)
+*        The number of good pixels in the output NDF.
 *     OUT = NDF (Write)
 *        The output NDF.
+*     REF = NDF (Read)
+*        NDF containing the bad pixels to be copied to OUT.
 *     TITLE = LITERAL (Read)
 *        Value for the title of the output NDF.  A null value will cause
 *        the title of the NDF supplied for parameter IN to be used
@@ -144,6 +148,8 @@
 *        Initialise TY_IN.
 *     2012 May 8 (MJC):
 *        Add _INT64 support.
+*     5-SEP-2013 (DSB):
+*        Added output parameter NBAD and NGOOD.
 *     {enter_further_changes_here}
 
 *-
@@ -273,6 +279,10 @@
 
 *  Display a blank line to highlight the previous message.
       CALL MSG_BLANK( STATUS )
+
+*  Write output parameters.
+      CALL PAR_PUT0I( 'NBAD', NBAD, STATUS )
+      CALL PAR_PUT0I( 'NGOOD', NEL - NBAD, STATUS )
 
 *  Obtain the output title and insert it into the output NDF.
       CALL NDF_CINP( 'TITLE', OUT, 'Title', STATUS )

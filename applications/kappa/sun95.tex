@@ -20734,6 +20734,16 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
          good).  {\tt [FALSE]}
       }
       \sstsubsection{
+         NBAD = \_INTEGER (Write)
+      }{
+         The number of bad pixels in the output NDF.
+      }
+      \sstsubsection{
+         NGOOD = \_INTEGER (Write)
+      }{
+         The number of good pixels in the output NDF.
+      }
+      \sstsubsection{
          OUT = NDF (Write)
       }{
          The output NDF.
@@ -59058,6 +59068,11 @@ The following applications have been modified:
 	elliptical FWHMs.
         \item The output parameters now store the statistics of every
         fitted beam, not just those of the primary beam.
+      \end{itemize}
+   \item [\htmlref{COPYBAD}{COPYBAD}]\mbox{}
+      \begin{itemize}
+        \item  Now writes the number of good and bad pixels in the output
+        NDF to output parameters NGOOD and NBAD.
       \end{itemize}
    \item [\htmlref{DISPLAY}{DISPLAY}]\mbox{}
       \begin{itemize}
