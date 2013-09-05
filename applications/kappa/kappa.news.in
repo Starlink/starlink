@@ -47,6 +47,11 @@
       -  The USEAXIS parameter now works, needed when the supplied NDF
       has more than two axes.
 
+   o  SCATTER
+
+      -  Now writes the number of pixels used to form the correlation
+      coefficient to output parameter NPIX.
+
 1 KAPPA_Version_2.0
 
    A new release of KAPPA (@PACKAGE_VERSION@) is available.  The main

@@ -19613,7 +19613,7 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
       between the two supplied arrays.
    }
    \sstinvocation{
-      CALL KPG1\_CORR$<$T$>$( EL, X, Y, R, STATUS )
+      CALL KPG1\_CORR$<$T$>$( EL, X, Y, R, N, STATUS )
    }
    \sstarguments{
       \sstsubsection{
@@ -19635,6 +19635,12 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
          R = DOUBLE PRECISION (Returned)
       }{
          The correlation coefficient.
+      }
+      \sstsubsection{
+         N = INTEGER (Returned)
+      }{
+         The number of points used to form the returned
+         correlation coefficient.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)

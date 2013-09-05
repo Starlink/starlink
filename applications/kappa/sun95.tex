@@ -44747,6 +44747,11 @@ KAPPA: \htmlref{FLIP}{FLIP},
          must be larger than or equal to $-$31.  {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
+         NPIX = \_INTEGER (Write)
+      }{
+         The number of pixels used to form the correlation coefficient.
+      }
+      \sstsubsection{
          PERC1( 2 ) = \_REAL (Read)
       }{
          The percentiles that define the default values for XLEFT and
@@ -59094,6 +59099,11 @@ The following applications have been modified:
       \begin{itemize}
         \item The USEAXIS parameter now works, needed when the supplied NDF
         has more than two axes.
+      \end{itemize}
+   \item [\htmlref{SCATTER}{SCATTER}]\mbox{}
+      \begin{itemize}
+        \item Now writes the number of pixels used to form the correlation
+        coefficient to output parameter NPIX.
       \end{itemize}
 \end{description}
 

@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_CORR<T>( EL, X, Y, R, STATUS )
+      SUBROUTINE KPG1_CORR<T>( EL, X, Y, R, N, STATUS )
 *+
 *  Name:
 *     KPG1_CORRx
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_CORR<T>( EL, X, Y, R, STATUS )
+*     CALL KPG1_CORR<T>( EL, X, Y, R, N, STATUS )
 
 *  Description:
 *     The routine calculates the sample Pearson correlation coefficient
@@ -25,6 +25,9 @@
 *        First input array.
 *     R = DOUBLE PRECISION (Returned)
 *        The correlation coefficient.
+*     N = INTEGER (Returned)
+*        The number of points used to form the returned correlation
+*        coefficient.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -60,6 +63,8 @@
 *  History:
 *     15-SEP-2011 (DSB):
 *        Original version.
+*     5-SEP-2013 (DSB):
+*        Added argument N.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -83,6 +88,7 @@
 
 *  Arguments Returned:
       DOUBLE PRECISION R
+      INTEGER N
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -98,12 +104,13 @@
       DOUBLE PRECISION VX        ! X value
       DOUBLE PRECISION VY        ! Y value
       INTEGER I                  ! Loop counter for array elements
-      INTEGER N                  ! Number of summed values
 
 *.
 
-*  Initialise the returned correlation coefficient.
+*  Initialise the returned correlation coefficient and number of
+*  points used.
       R = VAL__BADD
+      N = 0
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
@@ -118,7 +125,6 @@
       SY = 0.0D0
       SXX = 0.0D0
       SYY = 0.0D0
-      N = 0
 
 *  Loop round every pair of values
       DO I = 1, EL

@@ -9,6 +9,8 @@ applications (see SUN/238).
 Version 3.5
    - New generic KPG_STOCx calculates clipped ordered statistics,
      enabling the API of KPG_STOSx to remain unchanged.
+   - KPG1_CORRx has an new argument, N, in which the number of used
+    points is returned.
 
 Version 3.4
    - New KPG1_KY2HD and kpg1Ky2hd have been moved to the ATL library.

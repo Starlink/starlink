@@ -107,6 +107,8 @@
 *        instance, 0 gives a box, 1 gives a dot, 2 gives a cross, 3 gives
 *        an asterisk, 7 gives a triangle. The value must be larger than or
 *        equal to -31.  [current value]
+*     NPIX = _INTEGER (Write)
+*        The number of points used to form the correlation coefficient.
 *     PERC1( 2 ) = _REAL (Read)
 *        The percentiles that define the default values for XLEFT and
 *        XRIGHT. For example, [5,95] would result in the lowest and
@@ -262,6 +264,8 @@
 *        Add new WGTS and WEIGHT arguments to KPG1_GHSTx calls.
 *     15-SEP-2011 (DSB):
 *        Added calculation of correlation coefficient.
+*     5-SEP-2013 (DSB):
+*        Added output parameter NPIX.
 *     {enter_further_changes_here}
 
 *-
@@ -325,6 +329,7 @@
       INTEGER NERR               ! Number of numerical errors
       INTEGER NINVAL             ! Number of invalid values
       INTEGER NMLEN              ! Used length of NDFNAM
+      INTEGER NPIX               ! Number of values used in corr. coeff.
       INTEGER NVAL               ! Number of supplied values
       LOGICAL BLAV               ! Do block averaging?
       REAL PERC1( 2 )            ! Percentiles defining default IN1 data range
@@ -549,15 +554,17 @@
 
 *  Calculate the correlation coefficient.
       CALL KPG1_CORRR( NEL, %VAL( CNF_PVAL( IPW3 ) ),
-     :                 %VAL( CNF_PVAL( IPW4 ) ), R, STATUS )
+     :                 %VAL( CNF_PVAL( IPW4 ) ), R, NPIX, STATUS )
       IF( R .NE. VAL__BADD ) THEN
          CALL MSG_SETD( 'R', R )
          CALL MSG_OUT( ' ', '   Correlation coefficient: ^R', STATUS )
          CALL PAR_PUT0D( 'CORR', R, STATUS )
+         CALL PAR_PUT0I( 'NPIX', NPIX, STATUS )
       ELSE
          CALL MSG_OUT( ' ', '   Correlation coefficient: <bad>',
      :                 STATUS )
          CALL PAR_PUT0D( 'CORR', 0.0D0, STATUS )
+         CALL PAR_PUT0I( 'NPIX', 0, STATUS )
       ENDIF
 
 *  Construct the default label for the X and Y axes. These include

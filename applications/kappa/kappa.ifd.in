@@ -7117,6 +7117,14 @@ package kappa {
             helpkey *
          }
 
+         parameter npix {
+            type _INTEGER
+            access WRITE
+            vpath DEFAULT
+            default 0
+            helpkey *
+         }
+
          parameter perc1 {
             type _REAL
             vpath CURRENT DEFAULT
