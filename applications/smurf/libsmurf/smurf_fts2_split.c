@@ -49,6 +49,11 @@
 *     2013-08-21 (AGG):
 *        Do not call grpList if no output files are generated. This
 *        avoids a GRP__INVID error in such cases.
+*     2013-09-04 (MS)
+*        Added optional low resolution treatment of high resolution scans
+*        Usage:
+*          bandpass=20 means extract a +/- 20 mm region from the centre of the scan
+*          bandpass=0 means retain the entire scan
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -112,7 +117,8 @@ void smurf_fts2_split(int* status)
 {
   if( *status != SAI__OK ) { return; }
 
-  const double STAGE_CENTER = 225.0;    /* mm */
+  const double STAGE_LENGTH = 450.0;    /* mm */
+  int LR                    = 0;        /* Treat as Low Resolution scan */
   Grp* gIn                  = NULL;     /* Input group */
   Grp* gOut                 = NULL;     /* Output group */
   Grp* gTmp                 = NULL;     /* Temporary group */
@@ -123,6 +129,11 @@ void smurf_fts2_split(int* status)
   int nStart                = 0;        /* Frame index where the mirror starts moving */
   int nStartNext            = 0;        /* Frame index where the mirror starts moving in the next scan */
   int nStop                 = 0;        /* Frame index where the mirror stops */
+  int lrStart               = 0;        /* Frame index where low resolution mirror limit starts */
+  int hrStop                = 0;        /* Frame index where high resolution mirror limit stops */
+  int hrStart               = 0;        /* Frame index where high resolution mirror limit starts */
+  int lrStop                = 0;        /* Frame index where low resolution mirror limit stops */
+  int lrCentre              = 0;        /* Frame index at centre of low resolution mirror positions */
   int i                     = 0;        /* Counter */
   int j                     = 0;        /* Counter */
   int k                     = 0;        /* Counter */
@@ -139,6 +150,10 @@ void smurf_fts2_split(int* status)
   size_t nFrames            = 0;        /* Data cube depth in input file */
   size_t nFramesOut         = 0;        /* Data cube depth in output file */
   size_t nFramesOutPrev     = 0;        /* Data cube depth in previous output file */
+  size_t hrFramesOut        = 0;        /* Data cube depth in high res output file */
+  size_t hrFramesOutPrev    = 0;        /* Data cube depth in previous high res output file */
+  size_t lrFramesOut        = 0;        /* Data cube depth in low res output file */
+  size_t lrFramesOutPrev    = 0;        /* Data cube depth in previous low res output file */
   size_t nPixels            = 0;        /* Number of bolometers in the subarray */
 
   char object[SZFITSTR];
@@ -151,6 +166,8 @@ void smurf_fts2_split(int* status)
   double minOPD             = 0;        /* OPD minimum */
   double maxOPD             = 0;        /* OPD maximum */
   double ZPD                = 0;
+  double lrmmBandPass       = 0.0;      /* low res mm +/- offset from centre */
+  int lrBandPassFrames      = 0;        /* Number of low res band pass frames from centre +/- length of lrmmBandPass */
   int nTmp                  = 0;
   int nMax                  = 0;
   int nOPD                  = 0;
@@ -186,6 +203,14 @@ void smurf_fts2_split(int* status)
   /* Get Input, Output groups */
   kpg1Rgndf("IN", 0, 1, "", &gIn, &nFiles, status);
   kpg1Wgndf("OUT", gOut, nFiles, nFiles, "More output files expected!", &gOut, &nOutFiles, status);
+
+  /* Read in ADAM parameters */
+  parGet0d("BANDPASS", &lrmmBandPass, status);          /* Low res mm band +/- offset from centre */
+
+  /* Treat as Low Resolution scan? */
+  if(lrmmBandPass > 0) {
+      LR = 1;
+  }
 
   /* Eliminate the first record in the output group, since it will be replaced later */
   gTmp = grpCopy(gOut, 1, 1, 1, status);
@@ -225,7 +250,7 @@ void smurf_fts2_split(int* status)
         errAnnul(status);
     }
 
-    /* Create a temporary base file name from input file name - DEBUG */
+    /* Create a temporary base file name from input file name */
     one_strlcpy(fileName, inData->file->name,
                 astMIN(SMF_PATH_MAX + 1, strlen(inData->file->name) - 7), status);
     if (*status == ONE__TRUNC) {
@@ -267,44 +292,78 @@ void smurf_fts2_split(int* status)
     nStart = -1;
     nStop = -1;
     nStartNext = 0;
+    hrStart = -1;
+    hrStop = -1;
+    lrStart = -1;
+    lrStop = -1;
     outDataCount = 0;
     done = 0;
     do {
         /* Find the next range of single scan mirror positions for which to extract corresponding NDF data */
         for(n=nStartNext; n<nFrames-1; n++){
-            if(nStart < 0 && fabs(MIRPOS[n+1] - MIRPOS[n]) >= EPSILON) {
+            if(hrStart < 0 && fabs(MIRPOS[n+1] - MIRPOS[n]) >= EPSILON) {
                 nStart = n;
+                hrStart = n;
             }
-            if(nStart >= 0 && nStop < 0 && (fabs(MIRPOS[n+1] - MIRPOS[n]) < EPSILON || n+1 == nFrames-1) ) {
-                nStop = n+1;
-                nFramesOutPrev = nFramesOut;
-                nFramesOut = nStop - nStart + 1;
+            if(hrStart >= 0 && hrStop < 0 && (fabs(MIRPOS[n+1] - MIRPOS[n]) < EPSILON || n+1 == nFrames-1)) {
+                hrStop = n+1;
+                hrFramesOutPrev = hrFramesOut;
+                hrFramesOut = hrStop - hrStart + 1;
                 outDataCount++;
-              /*printf("%s: Split: %d of %d frames found at nStart=%d, nStop=%d\n",
-                       TASK_NAME, outDataCount, nFramesOut, nStart, nStop);*/
+
+                nStop = hrStop;
+                nFramesOutPrev = nFramesOut;
+                nFramesOut = hrFramesOut;
+
+                /*printf("%s: Split: %d of %d frames found at hrStart=%d, hrStop=%d\n",
+                       TASK_NAME, outDataCount, hrFramesOut, hrStart, hrStop);*/
                 break;
             }
         }
 
         /* Determine scan direction */
-        if(MIRPOS[nStart] < MIRPOS[nStop]) {
+        if(MIRPOS[hrStart] < MIRPOS[hrStop]) {
             scanDir = 1;    /* Positive */
         } else {
             scanDir = -1;   /* Negative */
         }
 
+        /* Limit to specified mirror position range */
+        if(LR) {
+            /* Calculate how many frames correspond to the given +/- mm of LR bandpass */
+            lrBandPassFrames = lrmmBandPass / dz;
+
+            /* Find the centre of the current scan */
+            lrCentre = floor((abs(hrStop-hrStart)+1)/2);
+
+            /* Set low res start and stop values at corresponding frame offsets from centre */
+            lrStart = lrCentre - lrBandPassFrames;
+            lrStop = lrCentre + lrBandPassFrames;
+            lrFramesOutPrev = lrFramesOut;
+            lrFramesOut = abs(lrStop - lrStart) + 1;
+
+            nStart = lrStart;
+            nStop = lrStop;
+            nFramesOutPrev = lrFramesOutPrev;
+            nFramesOut = lrFramesOut;
+
+            /*printf("%s: LR Split: %d of %d frames found at lrStart=%d, lrStop=%d\n",
+                   TASK_NAME, outDataCount, lrFramesOut, lrStart, lrStop);*/
+        }
+
         /* Check for end of data condition */
-        if(nStop < nStart  || nStop >= nFrames-1) {
-            nStop = nFrames-1;
+        if(hrStop < hrStart  || hrStop >= nFrames-1) {
+            hrStop = nFrames-1;
             done = 1;
         }
 
         /* Output scan if there is a start and stop position found,
            and for the last scan if it's the only one
            and if it's not too short (compared to the previous one) */
+        /*printf("%s: nStart=%d, nStop=%d, nFramesOutPrev=%d, nFramesOut=%d\n", TASK_NAME, nStart, nStop, nFramesOutPrev, nFramesOut);*/
         if(nStart >=0 && nStop > 0 &&
             (nFramesOutPrev == 0 ||
-              (nFramesOutPrev > 0 && nFramesOut > 0 && (double)nFramesOut/(double)nFramesOutPrev >= 0.5))) {
+              (nFramesOutPrev > 0 && nFramesOut > 0 && (double)hrFramesOut/(double)hrFramesOutPrev >= 0.5))) {
             /* Copy single scan NDF data from input to output */
             outData = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
             outData->dtype   = SMF__DOUBLE;
@@ -339,7 +398,7 @@ void smurf_fts2_split(int* status)
 
             /* Update the JCMTSTATE header */
             /* Reallocate outData header array memory to reduced size */
-            allState = (JCMTState*) astRealloc(outData->hdr->allState, nFramesOut * sizeof(*(outData->hdr->allState)));
+            allState = (JCMTState*) astRealloc(outData->hdr->allState, lrFramesOut * sizeof(*(outData->hdr->allState)));
             if(*status == SAI__OK && allState) {
                 outData->hdr->allState = allState;
             } else {
@@ -392,9 +451,9 @@ void smurf_fts2_split(int* status)
         }*/
 
         /* Prepare for next iteration */
-        nStartNext = nStop + 1;
-        nStart = -1;
-        nStop = -1;
+        nStartNext = hrStop + 1;
+        hrStart = -1;
+        hrStop = -1;
 
     } while (!done);
 
