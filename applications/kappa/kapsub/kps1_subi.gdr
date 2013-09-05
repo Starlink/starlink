@@ -166,6 +166,8 @@
 *     2013 September 4 (MJC):
 *        Fix logic for bad bin.  A condition should have been
 *        changed after moving from the STATV to KPG1_STATx APIs.
+*        Weight by the inverse variance for mean or Ksigma, allowing
+*        for zero variance.
 *     {enter_further_changes_here}
 
 *-
@@ -257,6 +259,7 @@
       DOUBLE PRECISION TOTCL     ! Clipped total value (not used)
       INTEGER UBNDI( 2 )         ! Upper bounds of current bin
       INTEGER UBNDO( 2 )         ! Upper bounds of extracted bin
+      DOUBLE PRECISION WMAX      ! Maximum weight where variance is zero
       INTEGER XMIN, YMIN         ! Pixel numbers of the lower-bound
                                  ! pixel in the current bin
       INTEGER XMAX, YMAX         ! Pixel numbers of the upper-bound
@@ -285,10 +288,11 @@
  
 *  Initialise counter for number of bins containing valid pixels.
       NBIN = 0
- 
+      WMAX = -1D0
+
 *  Scan through bins, calculating the minimum and maximum x and y
 *  co-ordinates.
-       DO YMIN = 1, DIM2, BINY
+      DO YMIN = 1, DIM2, BINY
          YMAX = MIN( YMIN + BINY - 1, DIM2 )
  
          DO XMIN = 1, DIM1, BINX
@@ -406,6 +410,7 @@
                      Z( NBIN ) = NUM_RTO<T>( MEDIAN )
                   END IF
                   W( NBIN ) = SQRT( NUM_ITO<T>( NSAM ) )
+                  WMAX = MAX( WMAX, W( NBIN ) )
                END IF
  
             ELSE
@@ -427,11 +432,20 @@
                   NBIN = NBIN + 1
                   IF ( ESTIM .EQ. 'MEAN' ) THEN
                      Z( NBIN ) = NUM_DTO<T>( DMEAN )
-                     W( NBIN ) = NUM_DTO<T>( DSTDEV )
+                     IF ( DSTDEV .NE. 0.0D0 ) THEN
+                        W( NBIN ) = NUM_DTO<T>( 1.0D0 / DSTDEV / DSTDEV )
+                     ELSE
+                        W( NBIN ) = -1D0
+                     END IF
                   ELSE
                      Z( NBIN ) = NUM_DTO<T>( MEANCL )
-                     W( NBIN ) = NUM_DTO<T>( STDVCL )
+                     IF ( DSTDEV .NE. 0D0 ) THEN
+                        W( NBIN ) = NUM_DTO<T>( 1.0D0 / STDVCL / STDVCL )
+                     ELSE
+                        W( NBIN ) = -1D0
+                     END IF
                   END IF
+                  WMAX = MAX( WMAX, W( NBIN ) )
                END IF
  
             END IF
@@ -481,7 +495,15 @@
             END IF
          END DO
       END DO
- 
+
+*  Handle infinite weights when all the values are the same in a bin.
+*  These were flagged with -1, leaving VAL__BADx for genuine bad
+*  weights.
+      DO I = 1, NBIN
+         IF ( W( I ) .LT. 0D0 .AND. W( I ) .NE. VAL__BAD<T> ) W( I ) = WMAX
+      END DO
+
+
   999 CONTINUE
  
       END
