@@ -102,8 +102,6 @@
 *       Replace one_snprintf SMF_PATH_MAX parameter to sizeof(fileName) for safety sake
 *     2013-08-27 (MS)
 *        Temporary fix for segfault due to incorrect array sizes
-*     2013-08-27 (MS)
-*        Temporary fix for segfault due to incorrect array sizes
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
