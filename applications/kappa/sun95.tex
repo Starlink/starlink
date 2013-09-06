@@ -20734,16 +20734,6 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
          good).  {\tt [FALSE]}
       }
       \sstsubsection{
-         NBAD = \_INTEGER (Write)
-      }{
-         The number of bad pixels in the output NDF.
-      }
-      \sstsubsection{
-         NGOOD = \_INTEGER (Write)
-      }{
-         The number of good pixels in the output NDF.
-      }
-      \sstsubsection{
          OUT = NDF (Write)
       }{
          The output NDF.
@@ -20759,6 +20749,18 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
          The title for the output NDF.  A null value will cause
          the title of the NDF supplied for Parameter IN to be used
          instead.  {\tt [!]}
+      }
+   }
+   \sstresparameters{
+      \sstsubsection{
+         NBAD = \_INTEGER (Write)
+      }{
+         The number of bad pixels in the output NDF.
+      }
+      \sstsubsection{
+         NGOOD = \_INTEGER (Write)
+      }{
+         The number of good pixels in the output NDF.
       }
    }
    \sstexamples{
@@ -44747,11 +44749,6 @@ KAPPA: \htmlref{FLIP}{FLIP},
          must be larger than or equal to $-$31.  {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
-         NPIX = \_INTEGER (Write)
-      }{
-         The number of pixels used to form the correlation coefficient.
-      }
-      \sstsubsection{
          PERC1( 2 ) = \_REAL (Read)
       }{
          The percentiles that define the default values for XLEFT and
@@ -44847,6 +44844,11 @@ KAPPA: \htmlref{FLIP}{FLIP},
          The Pearson correlation coefficient of the points in the scatter
          plot.  A value of zero is stored if the correlation coefficient
          cannot be calculated.
+      }
+      \sstsubsection{
+         NPIX = \_INTEGER (Write)
+      }{
+         The number of pixels used to form the correlation coefficient.
       }
    }
    \sstexamples{
