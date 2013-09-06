@@ -758,7 +758,7 @@
          IF ( NCLIP .NE. 0 ) THEN
             CALL PAR_PUT0D( 'MEDIAN', MEDIAN( 2 ), STATUS )
          ELSE
-            CALL PAR_PUT0D( 'MEDIAN', MEDIAN( 2 ), STATUS )
+            CALL PAR_PUT0D( 'MEDIAN', MEDIAN( 1 ), STATUS )
          END IF
       END IF
 
