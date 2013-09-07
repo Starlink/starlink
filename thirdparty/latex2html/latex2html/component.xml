@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="latex2html" support="U">
-  <version>2002.2</version>
+  <version>2012.1</version>
   <path>thirdparty/latex2html/latex2html</path>
   <description>LaTeX2HTML - convert LaTeX to HTML</description>
   <abstract><p>
