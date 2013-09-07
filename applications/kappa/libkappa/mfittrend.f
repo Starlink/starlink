@@ -1666,9 +1666,6 @@
      :                            IERR, NERR, STATUS )
                END IF
 
-*  Done with the input data array.
-               CALL NDF_UNMAP( INNDF, 'DATA', STATUS )
-
 *  Use the existing residuals map.
             ELSE
                IPRES = IPDAT( 1 )
