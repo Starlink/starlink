@@ -244,6 +244,8 @@
 *        subsequent iterations.
 *     10-JUL-2013 (DSB):
 *        Add support for ast.skip parameter.
+*     9-SEP-2013 (DSB):
+*        Add support for "..._last" parameters.
 
 *-
 '''
@@ -407,6 +409,32 @@ try:
       zero_freeze[model] = int( invoke( "$KAPPA_DIR/configecho name={0}.zero_freeze config={1} "
                                        "defaults=$SMURF_DIR/smurf_makemap.def "
                                        "select=\"\'450=0,850=1\'\"".format(model,config)))
+
+#  Save parameter values to be used on the last iteration (-1.0 if unset)
+   filt_edge_largescale_last = float( invoke( "$KAPPA_DIR/configecho "
+                                      "name=flt.filt_edge_largescale_last config={0} "
+                                      "defaults=$SMURF_DIR/smurf_makemap.def "
+                                      "select=\"\'450=0,850=1\'\" defval=-1.0".format(config)))
+   filt_edge_smallscale_last = float( invoke( "$KAPPA_DIR/configecho "
+                                      "name=flt.filt_edge_smallscale_last config={0} "
+                                      "defaults=$SMURF_DIR/smurf_makemap.def "
+                                      "select=\"\'450=0,850=1\'\" defval=-1.0".format(config)))
+   filt_edgehigh_last = float( invoke( "$KAPPA_DIR/configecho "
+                               "name=flt.filt_edgehigh_last config={0} "
+                               "defaults=$SMURF_DIR/smurf_makemap.def "
+                               "select=\"\'450=0,850=1\'\" defval=-1.0".format(config)))
+   filt_edgelow_last = float( invoke( "$KAPPA_DIR/configecho "
+                               "name=flt.filt_edgelow_last config={0} "
+                               "defaults=$SMURF_DIR/smurf_makemap.def "
+                               "select=\"\'450=0,850=1\'\" defval=-1.0".format(config)))
+   filt_whiten_last = int( invoke( "$KAPPA_DIR/configecho "
+                               "name=flt.filt_whiten_last config={0} "
+                               "defaults=$SMURF_DIR/smurf_makemap.def "
+                               "select=\"\'450=0,850=1\'\" defval=-1".format(config)))
+   com_perarray_last = int( invoke( "$KAPPA_DIR/configecho "
+                               "name=com.perarray_last config={0} "
+                               "defaults=$SMURF_DIR/smurf_makemap.def "
+                               "select=\"\'450=0,850=1\'\" defval=-1".format(config)))
 
 #  Get the number of iterations for which no AST model should be used.
    ast_skip = int( invoke( "$KAPPA_DIR/configecho name=ast.skip config={0} "
@@ -624,6 +652,32 @@ try:
                if zero_notlast[model] != 0:
                   add["ast.zero_notlast"] = 1
                   newcon = 1
+
+#  Also override the normal values for parameters that have a
+#  corresponding "_last" value.
+            if filt_edge_largescale_last != -1.0:
+               add["flt.filt_edge_largescale_last"] = filt_edge_largescale_last
+               newcon = 1
+
+            if filt_edge_smallscale_last != -1.0:
+               add["flt.filt_edge_smallscale_last"] = filt_edge_smallscale_last
+               newcon = 1
+
+            if filt_edgehigh_last != -1.0:
+               add["flt.filt_edgehigh_last"] = filt_edgehigh_last
+               newcon = 1
+
+            if filt_edgelow_last != -1.0:
+               add["flt.filt_edgelow_last"] = filt_edgelow_last
+               newcon = 1
+
+            if filt_whiten_last != -1:
+               add["flt.filt_whiten_last"] = filt_whiten_last
+               newcon = 1
+
+            if com_perarray_last != -1:
+               add["com.perarray_last"] = com_perarray_last
+               newcon = 1
 
 #  If this is not the last iteration, get the name of a temporary NDF that
 #  can be used to store the current iteration's map. This NDF is put in
