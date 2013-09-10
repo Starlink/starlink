@@ -1527,6 +1527,7 @@ applications/surf/docs/sc11/sc11.pdf
 applications/surf/docs/ssn72/ssn72.pdf
 applications/surf/docs/sun216/sun216.pdf
 applications/xdisplay/sun129.pdf
+
 docs/sc/002/sc2.pdf
 docs/sc/003/sc3.pdf
 docs/sc/004/sc4.pdf
@@ -1617,6 +1618,7 @@ docs/sun/207/sun207.pdf
 docs/sun/247/sun247.pdf
 docs/sun/248/sun248.pdf
 docs/sun/249/sun249.pdf
+
 libraries/agi/sun48.pdf
 libraries/ard/sun183.pdf
 libraries/ary/sun11.pdf
@@ -1667,4 +1669,5 @@ libraries/sla/sun67.pdf
 libraries/snx/sun90.pdf
 libraries/thr/sun266.pdf
 libraries/trn/sun61.pdf
+
 thirdparty/heasarc/cfitsio/sun227.pdf
