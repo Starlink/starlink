@@ -54,6 +54,8 @@
 *        Usage:
 *          bandpass=20 means extract a +/- 20 mm region from the centre of the scan
 *          bandpass=0 means retain the entire scan
+*     2013-09-10 (MS)
+*        Fixed bug introduced in base case by previous addition of low resolution extraction
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -304,15 +306,16 @@ void smurf_fts2_split(int* status)
             if(hrStart < 0 && fabs(MIRPOS[n+1] - MIRPOS[n]) >= EPSILON) {
                 nStart = n;
                 hrStart = n;
+                /*printf("%s: Split nStart=%d\n", TASK_NAME, nStart);*/
             }
             if(hrStart >= 0 && hrStop < 0 && (fabs(MIRPOS[n+1] - MIRPOS[n]) < EPSILON || n+1 == nFrames-1)) {
                 hrStop = n+1;
                 hrFramesOutPrev = hrFramesOut;
-                hrFramesOut = hrStop - hrStart + 1;
+                hrFramesOut = abs(hrStop - hrStart) + 1;
                 outDataCount++;
 
                 nStop = hrStop;
-                nFramesOutPrev = nFramesOut;
+                nFramesOutPrev = hrFramesOutPrev;
                 nFramesOut = hrFramesOut;
 
                 /*printf("%s: Split: %d of %d frames found at hrStart=%d, hrStop=%d\n",
@@ -398,7 +401,7 @@ void smurf_fts2_split(int* status)
 
             /* Update the JCMTSTATE header */
             /* Reallocate outData header array memory to reduced size */
-            allState = (JCMTState*) astRealloc(outData->hdr->allState, lrFramesOut * sizeof(*(outData->hdr->allState)));
+            allState = (JCMTState*) astRealloc(outData->hdr->allState, nFramesOut * sizeof(*(outData->hdr->allState)));
             if(*status == SAI__OK && allState) {
                 outData->hdr->allState = allState;
             } else {
