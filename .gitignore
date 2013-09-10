@@ -708,7 +708,6 @@ applications/sgmlkit/misc/misc.stamp
 
 applications/smurf/defaults/params.tex
 applications/smurf/defaults/make_pardocs
-applications/smurf/docs/sun258/sun258.pdf
 applications/smurf/libsmf/make_h
 applications/smurf/libsmf/smf.h
 applications/smurf/libsmf/smf_average_data.c
@@ -818,8 +817,6 @@ docs/ssn/078/ssn78-5.pdf
 docs/ssn/078/ssn78.pdf
 
 docs/sun/001/sun1.idx
-
-docs/sun/248/sun248.pdf
 
 etc/init/cshrc
 etc/init/login
@@ -1512,6 +1509,7 @@ applications/pongo/sun137/sun137.pdf
 applications/psmerge/sun164.pdf
 applications/rv/sun78.pdf
 applications/smurf/docs/sc19/sc19.pdf
+applications/smurf/docs/sun258/sun258.pdf
 applications/smurf/docs/sun259/sun259.pdf
 applications/specx/docs/sc8/sc8.pdf
 applications/specx/docs/sun17/sun17.pdf
@@ -1613,6 +1611,7 @@ docs/sun/202/sun202.pdf
 docs/sun/205/sun205.pdf
 docs/sun/207/sun207.pdf
 docs/sun/247/sun247.pdf
+docs/sun/248/sun248.pdf
 docs/sun/249/sun249.pdf
 libraries/agi/sun48.pdf
 libraries/ard/sun183.pdf
