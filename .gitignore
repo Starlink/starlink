@@ -1480,6 +1480,9 @@ applications/datacube/sc16/sc16.pdf
 applications/datacube/sun237/sun237.pdf
 applications/dipso/sun50.pdf
 applications/docfind/sun38.pdf
+applications/echomop/sun152.pdf
+applications/echomop/doc/sun152.pdf
+applications/echomop/doc/sun152/sun152.pdf
 applications/echwind/sun53.pdf
 applications/esp/sun180.pdf
 applications/extractor/sun226.pdf
@@ -1516,6 +1519,7 @@ applications/specx/docs/sun17/sun17.pdf
 applications/spt/sun111.pdf
 applications/sst/sun110.pdf
 applications/startcl/sun186.pdf
+applications/star2html/sun199.pdf
 applications/startcl/sun219.pdf
 applications/starx/ssn21.pdf
 applications/surf/docs/sc10/sc10.pdf
@@ -1616,6 +1620,7 @@ docs/sun/249/sun249.pdf
 libraries/agi/sun48.pdf
 libraries/ard/sun183.pdf
 libraries/ary/sun11.pdf
+libraries/ast/sun210.pdf
 libraries/ast/sun211.pdf
 libraries/atl/sun257.pdf
 libraries/cat/sun181.pdf
