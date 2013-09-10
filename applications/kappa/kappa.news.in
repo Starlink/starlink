@@ -36,6 +36,11 @@
       -  Will now remove any unused space from the graphics-database
       file, thus keeping its size to a minimum.
 
+   o  MFITTREND
+
+      -  now has a parameter called PROPBAD that controls whether to
+      propagate bad input values to the returned fit.
+
    o  NDFECHO
 
       -  A new parameter called EXISTS has been added that allows the

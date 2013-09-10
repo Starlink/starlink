@@ -232,6 +232,10 @@
 *        system of the input NDF that corresponds to the trend axis.
 *        Supplying a colon ":" will display details of the current
 *        co-ordinate Frame.  [!]
+*     PROPBAD = _LOGICAL (Read)
+*        Only used if SUBTRACT is FALSE. If PROPBAD is TRUE, the returned
+*        fitted values are set bad if the corresponding input value is
+*        bad. If PROPBAD is FALSE, the fitted value are retained. [TRUE]
 *     RANGES() = LITERAL (Read)
 *        These are the pairs of co-ordinates that define ranges
 *        along the trend axis.  When given these ranges are used to
@@ -265,7 +269,7 @@
 *     SUBTRACT = _LOGICAL (Read)
 *        Whether not to subtract the trends from the input NDF or not.
 *        If not, then the trends will be evaluated and written to a new
-*        NDF.  [FALSE]
+*        NDF (see also parameter PROPBAD). [FALSE]
 *     TITLE = LITERAL (Read)
 *        Value for the title of the output NDF.  A null value will cause
 *        the title of the NDF supplied for parameter IN to be used
@@ -434,6 +438,8 @@
 *        sections.
 *     2012 May 8 (MJC):
 *        Add _INT64 support.
+*     10-SEP-2013 (DSB):
+*        Added parameter PROPBAD.
 *     {enter_further_changes_here}
 
 *-
@@ -581,6 +587,7 @@
       DOUBLE PRECISION PRANGE( MAXRNG ) ! Fit ranges pixel co-ordinates
       DOUBLE PRECISION PXHIGH    ! High pixel bound of fitted axis
       DOUBLE PRECISION PXLOW     ! Low pixel bound of fitted axis
+      LOGICAL PRPBAD             ! Propagate bad input values to fit?
       LOGICAL QUICK              ! Use quicker code?
       INTEGER RANGES( MAXRNG )   ! The fit ranges pixels
       LOGICAL REGION             ! Representative region auto method?
@@ -647,6 +654,11 @@
       MODIN = .FALSE.
       IF ( SUBTRA ) THEN
          CALL PAR_GET0L( 'MODIFYIN', MODIN, STATUS )
+
+*  See if bad pixels should be propagated to the output fit. Only matters
+*  if we're not subtracting the fit.
+      ELSE
+         CALL PAR_GET0L( 'PROPBAD', PRPBAD, STATUS )
       END IF
 
 *  Obtain the rms clipping threshold.
@@ -1729,10 +1741,10 @@
             CALL PSX_FREE( IPCOL, STATUS )
             CALL PSX_FREE( IPWRK3, STATUS )
 
-*  Propagate the bad values to the output.  Recall that if the data
-*  were already de-trended then the array supplied to and amended in
+*  If required, propagate the bad values to the output.  Recall that if the
+*  data were already de-trended then the array supplied to and amended in
 *  KPS1_MFRM is the output array.
-            IF ( .NOT. SUBTRA ) THEN
+            IF ( PRPBAD .AND. .NOT. SUBTRA ) THEN
 
                IF ( ITYPE .EQ. '_BYTE' ) THEN
                   CALL KPG1_CPBDB( EL, %VAL( CNF_PVAL( IPDAT( 1 ) ) ),

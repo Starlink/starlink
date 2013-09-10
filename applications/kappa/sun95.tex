@@ -35344,6 +35344,14 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
          co-ordinate Frame.  {\tt [!]}
       }
       \sstsubsection{
+         PROPBAD = _LOGICAL (Read)
+      }{
+         Only used if SUBTRACT is {\tt FALSE}. If PROPBAD is {\tt TRUE},
+         the returned fitted values are set bad if the corresponding
+         input value is bad. If PROPBAD is FALSE, the fitted value are
+         retained. {\tt [TRUE]}
+      }
+      \sstsubsection{
          RANGES() = LITERAL (Read)
       }{
          Pairs of co-ordinates that define ranges along the trend
@@ -35389,7 +35397,7 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
       }{
          Whether not to subtract the trends from the input NDF or not.
          If not, then the trends will be evaluated and written to a new
-         NDF.  {\tt [FALSE]}
+         NDF (see also parameter PROPBAD).  {\tt [FALSE]}
       }
       \sstsubsection{
          TITLE = LITERAL (Read)
@@ -59090,6 +59098,11 @@ The following applications have been modified:
       \begin{itemize}
         \item Will now remove any unused space from the graphics-database file,
         thus keeping its size to a minimum.
+      \end{itemize}
+   \item [\htmlref{MFITTREND}{MFITTREND}]\mbox{}
+      \begin{itemize}
+        \item Now has a parameter called PROPBAD that controls whether to
+        propagate bad input values to the returned fit.
       \end{itemize}
    \item [\htmlref{NDFECHO}{NDFECHO}]\mbox{}
       \begin{itemize}

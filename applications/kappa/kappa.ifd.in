@@ -13867,6 +13867,15 @@ iraf! {
             size *
          }
 
+         parameter propbad {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Propagate bad input values to the returned fit?}
+            default TRUE
+            helpkey *
+         }
+
          parameter ranges {
             position 3
             type LITERAL
