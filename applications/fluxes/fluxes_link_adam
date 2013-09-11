@@ -43,6 +43,8 @@
 #        Version for FLUXES.
 #     17-SEP-1998 (TIMJ):
 #        Add err_link_adam for MSG_IFSET
+#     2013-09-11 (TIMJ):
+#        Remove jpl_link
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -51,7 +53,7 @@
 #-
 
 
-      echo `fio_link_adam` `jpl_link` `sla_link_adam` `err_link_adam`\
+      echo `fio_link_adam` `sla_link_adam` `err_link_adam`\
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
