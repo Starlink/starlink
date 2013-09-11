@@ -42,12 +42,16 @@
 '''
 
 import starutil
+import mdp
+import numpy
+import starlink.ndf as ndf
 from starutil import invoke
 from starutil import get_task_par
 from starutil import NDG
 from starutil import Parameter
 from starutil import ParSys
 from starutil import msg_out
+from starlink.ndfpack import Ndf
 
 
 # -----------------------------------------------------------------------
@@ -409,4 +413,91 @@ def force_flat( ins, masks ):
    invoke( "$KAPPA_DIR/sub in1={0} in2={1} out={2}".format(ins,qf,result) )
 
    return result
+
+
+
+
+
+
+# -----------------------------------------------------------------------
+
+def pca( indata, ncomp ):
+   """
+
+   Identifies and returns the strongest PCA components in a 3D NDF.
+
+   Invocation:
+      result = pca( indata, ncomp )
+
+   Arguments:
+      indata = NDG
+         An NDG object specifying a single 3D NDF. Each plane in the cube
+         is a separate image, and the images are compared using PCA.
+      ncomp = int
+         The number of PCA components to include in the returned NDF.
+
+   Returned Value:
+      A new NDG object containing a single 3D NDF containing just the
+      strongest "ncomp" PCA components found in the input NDF.
+
+   """
+
+   msg_out( "   finding strongest {0} components using Principal Component Analysis...".format(ncomp) )
+
+#  Get the shape of the input NDF.
+   invoke( "$KAPPA_DIR/ndftrace {0} quiet".format(indata) )
+   nx = get_task_par( "dims(1)", "ndftrace" )
+   ny = get_task_par( "dims(2)", "ndftrace" )
+   nz = get_task_par( "dims(3)", "ndftrace" )
+
+#  Read the planes from the supplied NDF. Note, numpy axis ordering is the
+#  reverse of starlink axis ordering. We want a numpy array consisting of
+#  "nz" elements, each being a vectorised form of a plane from the 3D NDF.
+   pcadata = numpy.transpose( numpy.reshape( Ndf( indata[0] ).data, (nz,nx*ny) ) )
+
+#  Find the required number of PCA components (these are the strongest
+#  components).
+   pca = mdp.nodes.PCANode( output_dim=ncomp )
+   comp = pca.execute( pcadata )
+
+#  Re-project the components back into the space of the input 3D NDF.
+   ip = numpy.dot( comp, pca.get_recmatrix() )
+
+#  Transpose the array so that each row is an image.
+   ipt = numpy.transpose(ip)
+
+#  Dump the re-projected images out to a 3D NDF.
+   result = NDG(1)
+   indf = ndf.open( result[0], 'WRITE', 'NEW' )
+   indf.new('_DOUBLE', 3, numpy.array([1,1,1]),numpy.array([nx,ny,nz]))
+   ndfmap = indf.map( 'DATA', '_DOUBLE', 'WRITE' )
+   ndfmap.numpytondf( ipt )
+   indf.annul()
+
+
+
+#  Uncomment to dump the components.
+#
+#   msg_out( "Dumping PCA comps to {0}-comps".format(result[0]) )
+#   compt = numpy.transpose(comp)
+#   indf = ndf.open( "{0}-comps".format(result[0]), 'WRITE', 'NEW' )
+#   indf.new('_DOUBLE', 3, numpy.array([1,1,1]),numpy.array([nx,ny,ncomp]))
+#   ndfmap = indf.map( 'DATA', '_DOUBLE', 'WRITE' )
+#   ndfmap.numpytondf( compt )
+#   indf.annul()
+
+
+
+
+   return result
+
+
+
+
+
+
+
+
+
+
 
