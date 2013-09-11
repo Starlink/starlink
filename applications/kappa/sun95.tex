@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.40}
 \newcommand{\stardocnumber}    {95.40}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2013 July 29}
+\newcommand{\stardocdate}      {2013 September 10}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {2.1}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -35346,10 +35346,10 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
       \sstsubsection{
          PROPBAD = \_LOGICAL (Read)
       }{
-         Only used if SUBTRACT is {\tt FALSE}. If PROPBAD is {\tt TRUE},
+         Only used if SUBTRACT is {\tt FALSE}.  If PROPBAD is {\tt TRUE},
          the returned fitted values are set bad if the corresponding
-         input value is bad. If PROPBAD is FALSE, the fitted value are
-         retained. {\tt [TRUE]}
+         input value is bad.  If PROPBAD is {\tt FALSE}, the fitted
+         values are retained.  {\tt [TRUE]}
       }
       \sstsubsection{
          RANGES() = LITERAL (Read)
@@ -35397,7 +35397,7 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
       }{
          Whether not to subtract the trends from the input NDF or not.
          If not, then the trends will be evaluated and written to a new
-         NDF (see also parameter PROPBAD).  {\tt [FALSE]}
+         NDF (see also Parameter PROPBAD).  {\tt [FALSE]}
       }
       \sstsubsection{
          TITLE = LITERAL (Read)
@@ -59101,7 +59101,7 @@ The following applications have been modified:
       \end{itemize}
    \item [\htmlref{MFITTREND}{MFITTREND}]\mbox{}
       \begin{itemize}
-        \item Now has a parameter called PROPBAD that controls whether to
+        \item Now has a parameter called PROPBAD, which controls whether to
         propagate bad input values to the returned fit.
       \end{itemize}
    \item [\htmlref{NDFECHO}{NDFECHO}]\mbox{}

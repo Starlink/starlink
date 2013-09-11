@@ -233,9 +233,10 @@
 *        Supplying a colon ":" will display details of the current
 *        co-ordinate Frame.  [!]
 *     PROPBAD = _LOGICAL (Read)
-*        Only used if SUBTRACT is FALSE. If PROPBAD is TRUE, the returned
-*        fitted values are set bad if the corresponding input value is
-*        bad. If PROPBAD is FALSE, the fitted value are retained. [TRUE]
+*        Only used if SUBTRACT is FALSE.  If PROPBAD is TRUE, the
+*        returned fitted values are set bad if the corresponding input
+*        value is bad.  If PROPBAD is FALSE, the fitted values are
+*        retained.  [TRUE]
 *     RANGES() = LITERAL (Read)
 *        These are the pairs of co-ordinates that define ranges
 *        along the trend axis.  When given these ranges are used to
@@ -269,7 +270,7 @@
 *     SUBTRACT = _LOGICAL (Read)
 *        Whether not to subtract the trends from the input NDF or not.
 *        If not, then the trends will be evaluated and written to a new
-*        NDF (see also parameter PROPBAD). [FALSE]
+*        NDF (see also Parameter PROPBAD). [FALSE]
 *     TITLE = LITERAL (Read)
 *        Value for the title of the output NDF.  A null value will cause
 *        the title of the NDF supplied for parameter IN to be used
