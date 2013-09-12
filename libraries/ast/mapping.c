@@ -12299,10 +12299,11 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
             neff = wgt/mwpip; \
 \
          } else if( astOK ) { \
-            astError( AST__BADIN, "astRebinSeq"#X"(%s): The input " \
-                      "%d-dimensional array has no overlap with the output " \
-                      "%d-dimensional array.", status, astGetClass( this ), \
-                      nin, nout ); \
+            astError( AST__BADIN, "astRebinSeq"#X"(%s): The overlap " \
+                      "between the %d-d input array and the %d-d output " \
+                      "array contains no pixels with good data %svalues.", \
+                      status, astGetClass( this ), nin, nout,  \
+                      in_var ? "and variance " : "" ); \
          } \
 \
 /* Assign bad values to unused output pixels. */ \
