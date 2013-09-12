@@ -24,6 +24,11 @@
 *     images for varying bolometer gain and phase lag. The resulting flat
 *     background are then removed from the corrected Q and U images.
 *
+*     Instrumental polarisation is then removed, based on the total
+*     intensity values specified by the IMAP parameter. The parameters
+*     of the instrumental polarisation model can be specified via the
+*     "IP_..." parameters.
+*
 *     All the Q images are then mosaiced together into a single Q image,
 *     using the total intensity map specified by parameter IREF to define
 *     the pixel grid. All the U images are mosaiced together in the same
@@ -140,17 +145,32 @@
 *        A group of NDFs containing Q and U images calculated by a previous run
 *        of SMURF:CALCQU. If not supplied, the IN parameter is used to get input
 *        NDFs holding POL-2 time series data. [!]
+*     IP = _LOGICAL (Read)
+*        Should a correction for instrumental polarisation be applied? The
+*        default is True if a total intensity map has been supplied (see
+*        parameter IREF) and False otherwise. []
+*     IP_P0 = _REAL (Read)
+*        The "p0" term in the instrumental polarisation model. [0.0025]
+*     IP_P1 = _REAL (Read)
+*        The "p1" term in the instrumental polarisation model. [0.01]
+*     IP_ANGLE_C = _REAL (Read)
+*        The "angle_c" term in the instrumental polarisation model, in
+*        degrees. [-53.0]
+*     IP_C_0 = _REAL (Read)
+*        The "C_0" term in the instrumental polarisation model, in
+*        degrees. [90.0]
 *     IREF = NDF (Read)
 *        An optional total intensity map covering the same area. If
-*        supplied, this will be used to determine percentage polarisation,
-*        to determine the pixel size and projection for the Q and U images,
-*        and will also be used a background for the plotted vectors. It
-*        will also determine the extent of the resulting catalogue and
-*        vector plot. If a null value (!) is supplied, then an image of
-*        polarised intensity calculated from the supplied POL-2 data
-*        will be used instead. This will result in percentage polarisation
-*        values being 100%. The extent and WCS of the vector plot and
-*        catalogue will then be determined by the supplied POL-2 data files.
+*        supplied, this will be used to determine the expected
+*        instrumental polarisation, the percentage polarisation, the pixel
+*        size and projection for the Q and U images, and will also be used
+*        as a background for the plotted vectors. It will also determine
+*        the extent of the resulting catalogue and vector plot. If a null
+*        value (!) is supplied, then an image of polarised intensity
+*        calculated from the supplied POL-2 data will be used instead.
+*        This will result in percentage polarisation values being 100%.
+*        The extent and WCS of the vector plot and catalogue will then be
+*        determined by the supplied POL-2 data files.
 *     LOGFILE = LITERAL (Read)
 *        The name of the log file to create if GLEVEL is not NONE. The
 *        default is "<command>.log", where <command> is the name of the
@@ -278,35 +298,10 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     15-OCT-2012 (DSB):
-*        Original version
-*     16-NOV-2012 (DSB):
-*        Use a temporary ADAM directory for each invocation.
-*     27-NOV-2012 (DSB):
-*        - Ensure the script runs even if no ~/adam/GLOBAL.sdf file exists.
-*        - Ensure reference image has units of pW.
-*     14-JAN-2013 (DSB):
-*        Added parameter INQU.
-*     11-MAR-2013 (DSB):
-*        - Remove low frequency drift between stare positions in Q and U
-*        values for each bolometer.
-*        - Relax rejection criteria.
-*     19-MAR-2013 (DSB):
-*        Combine all Q (and U) images together in a single invocation of
-*        makemos (not wcsalign).
-*     6-JUN-2013 (DSB):
-*        Added parameter STAREDIR.
-*     12-JUN-2013 (DSB):
-*        Added parameter NSIGMA.
-*     28-JUN-2013 (DSB):
-*        Added parameter EXTCOR.
-*     4-JUL-2013 (DSB):
-*        Added parameter HARMONIC.
-*     27-AUG-2013 (DSB):
-*        Store Q and U images in STAREDIR.
-*     4-SEP-2013 (DSB):
-*        - Added REFINE and FORCEFLAT parameters.
-*        - Added removal of correlated residual Q and U components.
+*     11-SEP-2013 (DSB):
+*        Original version based on pol2cat.
+*     12-SEP-2013 (DSB):
+*        Added instrumental polarisation correction.
 
 *-
 '''
@@ -428,6 +423,21 @@ try:
    params.append(starutil.Par0I("NPCA", "The number of PCA components to use "
                  "when modelling the background", 6, minval=0, noprompt=True))
 
+   params.append(starutil.Par0L("IP", "Do instrumental polarisation correction?",
+                                True, noprompt=True))
+
+   params.append(starutil.Par0F("IP_P0", "The p0 constant for the IP correction",
+                                0.0025, minval=0, noprompt=True))
+
+   params.append(starutil.Par0F("IP_P1", "The p1 constant for the IP correction",
+                                0.01, minval=0, noprompt=True))
+
+   params.append(starutil.Par0F("IP_ANGLE_C", "The Angle_C constant for the IP correction",
+                                -53.0, noprompt=True))
+
+   params.append(starutil.Par0F("IP_C_0", "The C_0 constant for the IP correction",
+                                90.0, noprompt=True))
+
 #  Initialise the parameters to hold any values supplied on the command
 #  line.
    parsys = ParSys( params )
@@ -472,6 +482,9 @@ try:
       if iunits != "pW":
          raise starutil.InvalidParameterError("Reference image ({0}) has "
                     "incorrect units '{1} - must be 'pW'.".format(iref,iunits))
+
+#  We do not yet have any cut-outs of the IREF image.
+   icuts = None
 
 #  Now get the PI value to use.
    pimap = parsys["PI"].value
@@ -540,6 +553,25 @@ try:
 
 #  See statistical debiasing is to be performed.
    debias = parsys["DEBIAS"].value
+
+#  See if instrumental polarisation correction is to be done, and get the
+#  associated constants to use.
+   if iref:
+      parsys["IP"].default = True
+   else:
+      parsys["IP"].default = False
+
+   doip = parsys["IP"].value
+
+   if doip:
+      if iref:
+         ip_p0 = parsys["IP_P0"].value
+         ip_p1 = parsys["IP_P1"].value
+         ip_angle_c = parsys["IP_ANGLE_C"].value
+         ip_c_0 = parsys["IP_C_0"].value
+      else:
+         raise starutil.InvalidParameterError("Cannot correct for instrumental"
+             " polarisation since no total intensity map was supplied (IREF)")
 
 #  Open a new file to receive diagnostic info
    diagfile = parsys["DIAGFILE"].value
@@ -1040,12 +1072,68 @@ try:
                        format(ref,tmp,pixscale) )
                ref = tmp
 
+#  Correct the background-subtracted Q and U for the instrumental
+#  polarisation, whilst they are still referred to the focal plane Y axis.
+#  We can only do this if we have a total intenbsity map.
+         if doip:
+            msg_out( "Correcting all {0} Q and U values for instrumental "
+                     "polarisation...".format(a) )
+
+#  If not yet done, create a set of cut-outs from the supplied total
+#  intensity map that are aligned in pixel coords with each of the 25
+#  Q and U images. Also, if a mask was supplied, mask these cut-out by
+#  setting background regions to zero.
+            if icuts == None:
+
+#  If a mask was supplied, align it with the iref image, and then use it
+#  to create a copy of iref in which all non-source pixels are bad, then
+#  convert bad values to zero.
+               if mask:
+                  maska = NDG( 1 )
+                  invoke( "$KAPPA_DIR/wcsalign in={0} out={1} ref={2} "
+                          "method=near accept".format(mask,maska,iref) )
+                  iref_tmp = NDG( 1 )
+                  invoke( "$KAPPA_DIR/copybad in={0} out={1} ref={2} "
+                          "invert=yes".format(iref,iref_tmp,maska) )
+                  invoke( "$KAPPA_DIR/erase {0}.variance ok=yes".format(iref_tmp) )
+                  iref_masked = NDG( 1 )
+                  invoke( "$KAPPA_DIR/nomagic in={0} out={1} repval=0".
+                          format(iref_tmp,iref_masked) )
+               else:
+                  iref_masked = iref
+
+#  Create the required aligned cut-outs of this masked iref image.
+            icuts = NDG( npos )
+            for (ipref,icut) in zip( qoff, icuts ):
+               invoke( "$KAPPA_DIR/wcsalign in={0} out={1} ref={2} "
+                       "method=bilin accept". format(iref_masked,icut,ipref) )
+
+#  Get the elevation (in degs) at the centre of the observation.
+            elev = float( invoke("$KAPPA_DIR/fitsmod {0} edit=print keyword=ELSTART".
+                                 format( qoff[ npos/2 ] )))
+
+#  Calculate the factors by which to multiply the total intensity image
+#  to get the Q and U corrections.
+            qfac = ip_p0*math.cos(math.radians(2*ip_angle_c)) + ip_p1*math.cos(math.radians(2*(ip_angle_c+elev+ip_c_0)))
+            ufac = ip_p0*math.sin(math.radians(2*ip_angle_c)) + ip_p1*math.sin(math.radians(2*(ip_angle_c+elev+ip_c_0)))
+
+#  Correct the Q and U images.
+            qip = NDG( npos )
+            uip = NDG( npos )
+            invoke( "$KAPPA_DIR/maths exp='ia-ib*pa' ia={0} ib={1} pa={2} out={3}".
+                    format(qoff,icuts,qfac,qip))
+            invoke( "$KAPPA_DIR/maths exp='ia-ib*pa' ia={0} ib={1} pa={2} out={3}".
+                    format(uoff,icuts,ufac,uip))
+         else:
+            qip = qoff
+            uip = uoff
+
 #  Modify the values in each pair of Q and U images so that they refer to
 #  the common reference direction (i.e. the ref image pixel Y axis).
          msg_out( "Rotating all {0} Q and U reference directions to be parallel...".format(a) )
-         qrot = NDG(qoff)
-         urot = NDG(uoff)
-         for (qin,uin,qout,uout) in zip( qoff, uoff, qrot, urot ):
+         qrot = NDG(qip)
+         urot = NDG(uip)
+         for (qin,uin,qout,uout) in zip( qip, uip, qrot, urot ):
             invoke( "$POLPACK_DIR/polrotref qin={0} uin={1} like={2} qout={3} uout={4} ".
                     format(qin,uin,ref,qout,uout) )
 
