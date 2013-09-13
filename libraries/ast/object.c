@@ -214,7 +214,13 @@ f     - AST_VERSION: Return the verson of the AST library being used.
 *     22-JUL-2011 (DSB):
 *        Add methods astSetProxy and astGetProxy.
 *     2-SEP-2011 (DSB):
-*        Add functions astToString and astFromString
+*        Add functions astToString and astFromString.
+*     13-SEP-2013 (DSB):
+*        Report an error in astAnnul if the supplied object handle is owned by 
+*        a different thread. Note, the Object itself does not need to be owned
+*        by the current thread, since it should be possible for a thread to 
+*        relinquish a pointer to an object (i.e. a handle) without actually 
+*        owning the object itself. 
 *class--
 */
 
@@ -6065,9 +6071,13 @@ AstObject *astAnnulId_( AstObject *this_id, int *status ) {
    if ( !astIsAObject( astMakePointer_NoLockCheck( this_id ) ) ) return NULL;
 
 /* Obtain the Handle offset for this Object and annul the Handle and
-   its associated Object pointer. */
+   its associated Object pointer. Report an error if the handle is
+   currently owned by a different thread. That is, the *Object* need
+   not be locked by the current thread (as indicated by the use of
+   astMakePointer above), but the *handle* must be owned by the current
+   thread. */
    LOCK_MUTEX2;
-   AnnulHandle( CheckId( this_id, 0, status ), status );
+   AnnulHandle( CheckId( this_id, 1, status ), status );
    UNLOCK_MUTEX2;
 
 /* Always return a NULL pointer value. */
@@ -6381,8 +6391,8 @@ MYSTATIC int CheckId( AstObject *this_id, int lock_check, int *status ) {
          if ( astOK ) {
             astError( AST__OBJIN, "Invalid Object pointer given (value is "
                       "%d).", status, id  );
-            astError( AST__OBJIN, "This pointer is currently locked by "
-                      "another thread." , status);
+            astError( AST__OBJIN, "This pointer is currently owned by "
+                      "another thread (possible programming error)." , status);
          }
 #endif
 
