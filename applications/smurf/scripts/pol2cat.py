@@ -336,6 +336,11 @@
 *        - Added removal of correlated residual Q and U components.
 *     12-SEP-2013 (DSB):
 *        Added instrumental polarisation correction.
+*     13-SEP-2013 (DSB):
+*        Do not conserve flux when aligning the Q and U images with thre
+*        reference image. The Q and U images represent the average Q and
+*        U in each pixel, not the sum, and so flux should not be conserved
+*        when changing the pixel scale of the Q and U images.
 *-
 '''
 
@@ -714,8 +719,8 @@ try:
             qmasked = NDG(qff)
             tmask = NDG(1)
             for (qin,qout) in zip( qff, qmasked ):
-               invoke( "$KAPPA_DIR/wcsalign in={0} out={1} ref={2} lbnd=! method=near".
-                       format(mask,tmask,qin) )
+               invoke( "$KAPPA_DIR/wcsalign in={0} out={1} ref={2} lbnd=! "
+                       "method=near rebin=no".format(mask,tmask,qin) )
                invoke( "$KAPPA_DIR/copybad in={0} out={1} ref={2}".
                        format(qin,qout,tmask) )
          else:
@@ -851,8 +856,8 @@ try:
             method = "mean"
             umasked = NDG(uff)
             for (uin,uout) in zip( uff, umasked ):
-               invoke( "$KAPPA_DIR/wcsalign in={0} out={1} ref={2} lbnd=! method=near".
-                       format(mask,tmask,uin) )
+               invoke( "$KAPPA_DIR/wcsalign in={0} out={1} ref={2} lbnd=! "
+                       "method=near rebin=no".format(mask,tmask,uin) )
                invoke( "$KAPPA_DIR/copybad in={0} out={1} ref={2}".
                        format(uin,uout,tmask) )
          else:
@@ -1012,7 +1017,7 @@ try:
                if mask:
                   maska = NDG( 1 )
                   invoke( "$KAPPA_DIR/wcsalign in={0} out={1} ref={2} "
-                          "method=near accept".format(mask,maska,iref) )
+                          "method=near rebin=no accept".format(mask,maska,iref) )
                   iref_tmp = NDG( 1 )
                   invoke( "$KAPPA_DIR/copybad in={0} out={1} ref={2} "
                           "invert=yes".format(iref,iref_tmp,maska) )
@@ -1027,7 +1032,7 @@ try:
             icuts = NDG( nstare )
             for (ipref,icut) in zip( qff2, icuts ):
                invoke( "$KAPPA_DIR/wcsalign in={0} out={1} ref={2} "
-                       "method=bilin accept". format(iref_masked,icut,ipref) )
+                       "method=bilin rebin=no accept". format(iref_masked,icut,ipref) )
 
 #  Get the elevation (in degs) at the centre of the observation.
             elev = float( invoke("$KAPPA_DIR/fitsmod {0} edit=print keyword=ELSTART".
@@ -1070,15 +1075,15 @@ try:
    msg_out( "Combining all Q and U images for all sub-arrays...")
    qmaps_all = NDG( qmaps )
    qaligned = NDG( qmaps_all )
-   invoke( "$KAPPA_DIR/wcsalign method=bilin rebin=yes in={0} ref={1} "
-           "out={2} lbnd=!".format(qmaps_all,ref,qaligned) )
+   invoke( "$KAPPA_DIR/wcsalign method=bilin rebin=yes conserve=no in={0} "
+           "ref={1} out={2} lbnd=!".format(qmaps_all,ref,qaligned) )
    qtotal = NDG( 1 )
    invoke( "$CCDPACK_DIR/makemos method=broad  in={0} out={1}".format(qaligned,qtotal) )
 
 #  Do the same for U.
    umaps_all = NDG( umaps )
    ualigned = NDG( umaps_all )
-   invoke( "$KAPPA_DIR/wcsalign method=bilin rebin=yes in={0} ref={1} "
+   invoke( "$KAPPA_DIR/wcsalign method=bilin rebin=yes conserve=no in={0} ref={1} "
            "out={2} lbnd=!".format(umaps_all,ref,ualigned) )
    utotal = NDG( 1 )
    invoke( "$CCDPACK_DIR/makemos method=broad in={0} out={1}".format(ualigned,utotal) )
@@ -1111,7 +1116,8 @@ try:
 #  aligned the total intensity map with the reference image.
    elif pixsize:
       tmp = NDG( 1 )
-      invoke( "$KAPPA_DIR/wcsalign in={0} out={1} ref={2} method=bilin lbnd=!".format(iref,tmp,ref) )
+      invoke( "$KAPPA_DIR/wcsalign in={0} out={1} ref={2} method=bilin "
+              "rebin=no lbnd=!".format(iref,tmp,ref) )
       iref = tmp
 
 #  Ensure the Q U and I images all have the same bounds, equal to the

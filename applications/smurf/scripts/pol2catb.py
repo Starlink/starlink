@@ -302,6 +302,11 @@
 *        Original version based on pol2cat.
 *     12-SEP-2013 (DSB):
 *        Added instrumental polarisation correction.
+*     13-SEP-2013 (DSB):
+*        Do not conserve flux when aligning the Q and U images with thre
+*        reference image. The Q and U images represent the average Q and
+*        U in each pixel, not the sum, and so flux should not be conserved
+*        when changing the pixel scale of the Q and U images.
 
 *-
 '''
@@ -672,8 +677,8 @@ try:
             msg_out( "Forming a 3D mask for {0} values...".format(a))
             mplanes = NDG(qarray)
             for (din,mplane) in zip( qarray, mplanes ):
-               invoke( "$KAPPA_DIR/wcsalign in={0} out={1} ref={2} method=near accept".
-                       format(mask,mplane,din) )
+               invoke( "$KAPPA_DIR/wcsalign in={0} out={1} ref={2} method=near "
+                       "rebin=no accept".format(mask,mplane,din) )
 
             mcube = NDG(1)
             invoke( "$KAPPA_DIR/paste in={0} out={1} shift=\[0,0,1\]".
@@ -1091,7 +1096,7 @@ try:
                if mask:
                   maska = NDG( 1 )
                   invoke( "$KAPPA_DIR/wcsalign in={0} out={1} ref={2} "
-                          "method=near accept".format(mask,maska,iref) )
+                          "method=near rebin=no accept".format(mask,maska,iref) )
                   iref_tmp = NDG( 1 )
                   invoke( "$KAPPA_DIR/copybad in={0} out={1} ref={2} "
                           "invert=yes".format(iref,iref_tmp,maska) )
@@ -1105,7 +1110,7 @@ try:
 #  Create the required aligned cut-outs of this masked iref image.
             icuts = NDG( npos )
             for (ipref,icut) in zip( qoff, icuts ):
-               invoke( "$KAPPA_DIR/wcsalign in={0} out={1} ref={2} "
+               invoke( "$KAPPA_DIR/wcsalign in={0} out={1} ref={2} rebin=no "
                        "method=bilin accept". format(iref_masked,icut,ipref) )
 
 #  Get the elevation (in degs) at the centre of the observation.
@@ -1151,7 +1156,7 @@ try:
    qmaps_all = NDG( qmaps )
    qaligned = NDG( qmaps_all )
    invoke( "$KAPPA_DIR/wcsalign method=gauss params=\[0,1.2\] rebin=yes in={0} ref={1} "
-           "out={2} lbnd=!".format(qmaps_all,ref,qaligned) )
+           "out={2} lbnd=! conserve=no".format(qmaps_all,ref,qaligned) )
    qtotal = NDG( 1 )
    invoke( "$CCDPACK_DIR/makemos method=broad genvar=yes in={0} out={1}".format(qaligned,qtotal) )
 
@@ -1159,7 +1164,7 @@ try:
    umaps_all = NDG( umaps )
    ualigned = NDG( umaps_all )
    invoke( "$KAPPA_DIR/wcsalign method=gauss params=\[0,1.2\] rebin=yes in={0} ref={1} "
-           "out={2} lbnd=!".format(umaps_all,ref,ualigned) )
+           "out={2} lbnd=! conserve=no".format(umaps_all,ref,ualigned) )
    utotal = NDG( 1 )
    invoke( "$CCDPACK_DIR/makemos method=broad genvar=yes in={0} out={1}".format(ualigned,utotal) )
 
@@ -1197,7 +1202,7 @@ try:
    elif pixsize:
       tmp = NDG( 1 )
       invoke( "$KAPPA_DIR/wcsalign in={0} out={1} ref={2} method=gauss "
-              "params=\[0,1\] rebin=yes lbnd=!".format(iref,tmp,ref) )
+              "params=\[0,1\] rebin=yes conserve=no lbnd=!".format(iref,tmp,ref) )
       iref = tmp
 
 #  Ensure the Q U and I images all have the same bounds, equal to the
