@@ -636,7 +636,7 @@ void smf_calc_telpos( const double obsgeo[3], const char telName[],
 
 float smf_calc_telres( AstFitsChan *hdr, int *status );
 
-double smf_calc_wvm( const smfHead *hdr, double approxam, AstKeyMap * extpars, int *status );
+double smf_calc_wvm( const smfHead *hdr, double approxam, AstKeyMap * extpars, int usecache, int *status );
 
 
 void smf_calcmodel_ast( ThrWorkForce *wf, smfDIMMData *dat, int chunk,

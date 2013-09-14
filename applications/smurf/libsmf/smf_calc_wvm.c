@@ -13,7 +13,7 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_calc_wvm( const smfHead *hdr, double approxam, AstKeyMap * extpars, int *status) {
+*     smf_calc_wvm( const smfHead *hdr, double approxam, AstKeyMap * extpars, int usecache, int *status);
 
 *  Arguments:
 *     hdr = const smfHead* (Given)
@@ -29,6 +29,10 @@
 *        contain the "taurelation" key which itself will be a keymap
 *        containing the parameters for the specific filter. If NULL
 *        the 225GHz tau will be returned.
+*     usecache = int (Given)
+*        If true then a cache will be used. The cache is not thread-safe
+*        so the cache should be disabled if you are running the WVM calculations
+*        in multiple threads. Must be true if an existing cache is to be freed.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -86,6 +90,11 @@
 *     2013-08-16 (DSB):
 *        Exempt the cache from AST context handling so that it is not
 *        annulled when the current AST context ends.
+*     2013-09-13 (TIMJ):
+*        Add ability to disable cache explicitly. The cache doesn't work
+*        in threads and causes problems when we let it simply trigger
+*        AST__OBJIN and annul it. So now when you know you are in threads
+*        you can explicitly disable it.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -138,7 +147,8 @@
 
 static AstKeyMap * CACHE = NULL;
 
-double smf_calc_wvm( const smfHead *hdr, double approxam, AstKeyMap * extpars, int *status ) {
+double smf_calc_wvm( const smfHead *hdr, double approxam, AstKeyMap * extpars, int usecache,
+                     int *status ) {
 
   /* Local variables */
   double airmass;           /* Airmass of current observation */
@@ -159,7 +169,7 @@ double smf_calc_wvm( const smfHead *hdr, double approxam, AstKeyMap * extpars, i
   if ( *status != SAI__OK) return VAL__BADD;
 
   /* See if we are required to clear any cache */
-  if (!hdr && approxam != VAL__BADD && approxam < 0.0) {
+  if (!hdr && approxam != VAL__BADD && approxam < 0.0 && usecache) {
     if (CACHE) CACHE = astAnnul( CACHE );
     return VAL__BADD;
   }
@@ -181,7 +191,7 @@ double smf_calc_wvm( const smfHead *hdr, double approxam, AstKeyMap * extpars, i
 
   /* Initialise the cache and exempt it from AST context handling so it
      is not annulled when the current AST context ends. */
-  if (!CACHE) {
+  if (!CACHE && usecache) {
      CACHE = astKeyMap( "" );
      astExempt( CACHE );
   }
@@ -244,17 +254,11 @@ double smf_calc_wvm( const smfHead *hdr, double approxam, AstKeyMap * extpars, i
       sprintf( cachekey, "%.4f-%.4f-%.4f-%.4f-%.4f",
                airmass, tamb, wvm[0], wvm[1], wvm[2] );
 
-      if (astMapHasKey( CACHE, cachekey )) {
+      if (usecache && astMapHasKey( CACHE, cachekey )) {
         /* Get the value */
         astMapGet0D( CACHE, cachekey, &tau225 );
 
       } else {
-        int usecache = 1;
-
-        if (*status == AST__OBJIN) {
-          usecache = 0;
-          errAnnul( status );
-        }
 
         /* Get the pwv for this airmass */
         wvmOpt( (float)airmass, (float)tamb, wvm, &pwv, &tau0, &twater, &rms);

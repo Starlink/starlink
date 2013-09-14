@@ -595,7 +595,7 @@ static void smf__calc_wvm_index( smfHead * hdr, const char * amhdr, size_t index
   /* This saves us calling smf_tslice_ast as it is the only thing that needs to be set for smf_calc_wvm to run */
   hdr->state = &((hdr->allState)[index]);
   if (hdr->state->wvm_time != VAL__BADD) {
-    double thistau = smf_calc_wvm( hdr, approxam, NULL, status );
+    double thistau = smf_calc_wvm( hdr, approxam, NULL, 1, status );
     if (thistau != VAL__BADD) {
       *tau = thistau;
       *time = hdr->state->wvm_time;

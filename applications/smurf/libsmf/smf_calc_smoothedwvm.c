@@ -605,7 +605,7 @@ void smf__calc_wvm_job( void *job_data, int *status ) {
             amprev = airmass;
           }
 
-          thistau = smf_calc_wvm( curdata->hdr, airmass, extpars, status );
+          thistau = smf_calc_wvm( curdata->hdr, airmass, extpars, 0, status );
 
           /* Check status and/or value of tau */
           if ( thistau == VAL__BADD ) {
