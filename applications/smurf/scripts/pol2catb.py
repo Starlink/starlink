@@ -914,36 +914,13 @@ try:
                   rmasked = res2
                   pars = "fittype=poly order=1"
 
-#  The PCA module cannot handle bad (i.e. missing) values. So we need
-#  to fill the holes in the above residuals.
-               filled = NDG(1)
-               invoke( "$KAPPA_DIR/fillbad in={0} out={1} variance=no niter=10 size=10".format(rmasked,filled) )
-
-#  PCA also requires each plane to have a mean value of zero. So we
-#  subtract off the mean value now, and later add it back on to the results found
-#  by FastICA.
-               tmp1 = NDG(1)
-               invoke( "$KAPPA_DIR/reshape in={0} out={1} shape=\[1280,{2}\]".
-                       format(filled,tmp1,npos) )
-               tmp2 = NDG(1)
-               invoke( "$KAPPA_DIR/collapse in={0} out={1} axis=1 estimator=mean".format(tmp1,tmp2) )
-               mean3d = NDG(1)
-               invoke( "$KAPPA_DIR/manic in={0} out={1} axes=\[0,0,1\] lbound=\[1,1\] "
-                       "ubound=\[32,40\]".format(tmp2,mean3d) )
-               ica_in = NDG(1)
-               invoke( "$KAPPA_DIR/sub in1={0} in2={1} out={2}".format(filled,mean3d,ica_in) )
-
 #  Use PCA to identify the correlated features that appear in multiple
 #  planes, and return them in tmp3.
-               tmp3 = smurfutil.pca( ica_in, npca )
-
-#  Add the mean values back onto the model returned by PCA
-               tmp4 = NDG(1)
-               invoke( "$KAPPA_DIR/add in1={0} in2={1} out={2}".format(tmp3,mean3d,tmp4) )
+               tmp3 = smurfutil.pca( rmasked, npca )
 
 #  Add the new model component onto the previous model.
                model5 = NDG(1)
-               invoke( "$KAPPA_DIR/add in1={0} in2={1} out={2}".format(model4,tmp4,model5) )
+               invoke( "$KAPPA_DIR/add in1={0} in2={1} out={2}".format(model4,tmp3,model5) )
             else:
                model5 = model4
 

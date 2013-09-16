@@ -41,6 +41,7 @@
 *-
 '''
 
+import math
 import starutil
 import mdp
 import numpy
@@ -450,10 +451,33 @@ def pca( indata, ncomp ):
    ny = get_task_par( "dims(2)", "ndftrace" )
    nz = get_task_par( "dims(3)", "ndftrace" )
 
+#  Fill any bad pixels.
+   tmp = NDG(1)
+   invoke( "$KAPPA_DIR/fillbad in={0} out={1} variance=no niter=10 size=10".format(indata,tmp) )
+
 #  Read the planes from the supplied NDF. Note, numpy axis ordering is the
 #  reverse of starlink axis ordering. We want a numpy array consisting of
 #  "nz" elements, each being a vectorised form of a plane from the 3D NDF.
-   pcadata = numpy.transpose( numpy.reshape( Ndf( indata[0] ).data, (nz,nx*ny) ) )
+   ndfdata = numpy.reshape( Ndf( tmp[0] ).data, (nz,nx*ny) )
+
+#  Normalize each plane to a mean of zero and standard deviation of 1.0
+   means = []
+   sigmas = []
+   newdata = []
+   for iplane in range(0,nz):
+      plane = ndfdata[ iplane ]
+      mn = plane.mean()
+      sg = math.sqrt( plane.var() )
+      means.append( mn )
+      sigmas.append( sg )
+
+      if sg > 0.0:
+         newdata.append( (plane-mn)/sg )
+
+   newdata= numpy.array( newdata )
+
+#  Transpose as required by MDP.
+   pcadata = numpy.transpose( newdata )
 
 #  Find the required number of PCA components (these are the strongest
 #  components).
@@ -466,18 +490,27 @@ def pca( indata, ncomp ):
 #  Transpose the array so that each row is an image.
    ipt = numpy.transpose(ip)
 
+#  Normalise them back to the original scales.
+   jplane = 0
+   newdata = []
+   for iplane in range(0,nz):
+      if sigmas[ iplane ] > 0.0:
+         newplane = sigmas[ iplane ] * ipt[ jplane ] + means[ iplane ]
+         jplane += 1
+      else:
+         newplane = ndfdata[ iplane ]
+      newdata.append( newplane )
+   newdata= numpy.array( newdata )
+
 #  Dump the re-projected images out to a 3D NDF.
    result = NDG(1)
    indf = ndf.open( result[0], 'WRITE', 'NEW' )
    indf.new('_DOUBLE', 3, numpy.array([1,1,1]),numpy.array([nx,ny,nz]))
    ndfmap = indf.map( 'DATA', '_DOUBLE', 'WRITE' )
-   ndfmap.numpytondf( ipt )
+   ndfmap.numpytondf( newdata )
    indf.annul()
 
-
-
 #  Uncomment to dump the components.
-#
 #   msg_out( "Dumping PCA comps to {0}-comps".format(result[0]) )
 #   compt = numpy.transpose(comp)
 #   indf = ndf.open( "{0}-comps".format(result[0]), 'WRITE', 'NEW' )
@@ -486,18 +519,7 @@ def pca( indata, ncomp ):
 #   ndfmap.numpytondf( compt )
 #   indf.annul()
 
-
-
-
    return result
-
-
-
-
-
-
-
-
 
 
 
