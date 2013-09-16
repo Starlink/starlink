@@ -87,11 +87,12 @@
 *        ["SKY"]
 *     EXTCOR = LOGICAL (Given)
 *        If TRUE, the time series data is corrected for extinction using
-*        the SMURF:EXTINCTION task before being used to calculate Q and U
-*        values (the data first have a constant sky background removed using
-*        SMURF:REMSKY). If FALSE, no extinction correction is applied. The
-*        value of this parameter is ignored if pre-calculated Q and U values
-*        are supplied via the INQU parameter. [TRUE]
+*        the SMURF:EXTINCTION task before being used to calculate Q and
+*        U values (the data are first cleaned using SMURF:SC2CLEAN to
+*        remove a linear background from each bolometer time stream). If
+*        FALSE, no extinction correction is applied. The value of this
+*        parameter is ignored if pre-calculated Q and U values are
+*        supplied via the INQU parameter. [TRUE]
 *     GLEVEL = LITERAL (Read)
 *        Controls the level of information to write to a text log file.
 *        Allowed values are as for "ILEVEL". The log file to create is
@@ -303,11 +304,13 @@
 *     12-SEP-2013 (DSB):
 *        Added instrumental polarisation correction.
 *     13-SEP-2013 (DSB):
-*        Do not conserve flux when aligning the Q and U images with thre
+*        Do not conserve flux when aligning the Q and U images with the
 *        reference image. The Q and U images represent the average Q and
 *        U in each pixel, not the sum, and so flux should not be conserved
 *        when changing the pixel scale of the Q and U images.
-
+*     16-SEP-2013 (DSB):
+*        Remove the background using SC2CLEAN rather than REMSKY before
+*        doing th eextinction correction.
 *-
 '''
 
@@ -527,9 +530,8 @@ try:
    pixsize = parsys["PIXSIZE"].value
    ref = None
 
-#  Get the cleaning config, and quote it so that any shell metacharacters are
-#  passed unchanged to the SMURF:CALCQU task.
-   config = starutil.shell_quote( parsys["CONFIG"].value )
+#  Get the cleaning config.
+   config = parsys["CONFIG"].value
 
 #  Get the graphics device for graphical output. Normalisation plots will
 #  only be produced if at least one of ILEVEL and GLEVEL is DEBUG.
@@ -616,21 +618,25 @@ try:
    else:
 
 #  First remove a sky background and perform extinction correction if
-#  requested. REMSKY only creates output files for science files, not
-#  flats, etc, so we need to filter out any NDF paths that do not exist
-#  after REMSKY.
+#  requested. We use SC2CLEAN to remove the sky rather than REMSKY. This
+#  is because REMSKY removes a background from eahc time slice in turn,
+#  which removes most of the polarised signal. On the other hand, SC2CLEAN
+#  removes a linear baseline from each bolometer time stream, which leaves
+#  the time-variation unchanges in each bolometer. SC2CLEAN only creates
+#  output files for science files, not flats, etc, so we need to filter
+#  out any NDF paths that do not exist after SC2CLEAN.
       if parsys["EXTCOR"].value:
          nosky = NDG(indata)
          msg_out( "Removing a background from the time series data...")
-         invoke("$SMURF_DIR/remsky in={0} out={1} method=plane group=no "
-                "fit=slope".format(indata,nosky) )
-
+         invoke("$SMURF_DIR/sc2clean in={0} out={1} config={2}".
+                 format(indata,nosky,starutil.shell_quote( config ) ) )
          nosky = nosky.filter()
 
          noext = NDG( nosky )
          msg_out( "Performing extinction correction on the time series data...")
          invoke("$SMURF_DIR/extinction in={0} out={1} tausrc=auto "
-                "method=adaptive csotau=! ".format(nosky,noext) )
+                "method=adaptive csotau=! hasskyrem=yes".format(nosky,noext) )
+         config += ",doclean=0"
 
 #  Use the supplied input data from now on if no extinction correction is
 #  required.
@@ -646,8 +652,9 @@ try:
       ucont.comment = "ucont"
 
       msg_out( "Calculating Q and U values for each bolometer...")
-      invoke("$SMURF_DIR/calcqu in={0} config={1} outq={2} outu={3} "
-             "harmonic={4} fix".format(noext,config,qcont,ucont,harmonic) )
+      invoke("$SMURF_DIR/calcqu in={0} config=\"{1}\" outq={2} outu={3} "
+             "harmonic={4} fix".format(noext,starutil.shell_quote(config),
+                                       qcont,ucont,harmonic) )
 
 #  The next stuff we do independently for each subarray.
    qmaps = []

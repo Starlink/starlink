@@ -177,6 +177,9 @@
 *        Added ADAM parameter HARMONIC.
 *     7-MAY-2013 (DSB):
 *        Do not issue warnings about missing darks.
+*     16-SEP-2013 (DSB):
+*        Do not clean the data if config parameter "doclean" indicates it has
+*        already been cleaned.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -257,6 +260,7 @@ void smurf_calcqu( int *status ) {
    int block_end;             /* Index of last time slice in block */
    int block_start;           /* Index of first time slice in block */
    int dkclean;               /* Clean dark squids? */
+   int doclean;               /* Clean science data? */
    int fix;                   /* Fix the POL-2 triggering issue? */
    int harmonic;              /* The requested harmonic */
    int iblock;                /* Index of current block */
@@ -388,6 +392,8 @@ void smurf_calcqu( int *status ) {
          msgOutiff( MSG__VERB, "", "ANGROT=%g", status, angrot );
          if( !astMapGet0I( config, "SUBMEAN", &submean ) ) submean = 0;
          msgOutiff( MSG__VERB, "", "SUBMEAN=%d", status, submean );
+         if( !astMapGet0I( config, "DOCLEAN", &doclean ) ) doclean = 0;
+         msgOutiff( MSG__VERB, "", "DOCLEAN=%d", status, doclean );
 
 /* See if the dark squids should be cleaned. */
          if( !astMapGet0I( config, "DKCLEAN", &dkclean ) ) dkclean = 0;
@@ -430,7 +436,7 @@ void smurf_calcqu( int *status ) {
          }
 
 /* Now clean the bolometer data */
-         smf_clean_smfArray( wf, concat, NULL, NULL, NULL, config, status );
+         if( doclean ) smf_clean_smfArray( wf, concat, NULL, NULL, NULL, config, status );
 
 /* If required correct for the POL2 triggering issue. */
          if( fix ) smf_fix_pol2( wf, concat, status );
