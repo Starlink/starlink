@@ -1071,6 +1071,10 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 *        code in CTYPE, assume an old-fashioned CAR projection (i.e. no
 *        rotation from native to WCS coords). Before this change,
 *        CTYPE = "RA" | "DEC" axes got treated as radians, not degrees.
+*     16-SEP-2013 (DSB):
+*        When exporting alternate offset SkyFrames to FITS-WCS headers,
+*        correctly test the alternate Frame in the supplied FrameSet, rather
+*        than the current Frame.
 *class--
 */
 
@@ -11129,7 +11133,7 @@ static FitsStore *FsetToStore( AstFitsChan *this, AstFrameSet *fset, int naxis,
             if( s0 != 0 && s0 != 1 ) {
 
 /* Does it contain an offset sky frame? */
-               isoff = IsSkyOff( fset, icurr, status );
+               isoff = IsSkyOff( fset, ifrm, status );
 
 /* Write out the Frame - offset if it is offset, absolute otherwise. */
                (void) AddVersion( this, fset, ibase, ifrm, ret, dim,
