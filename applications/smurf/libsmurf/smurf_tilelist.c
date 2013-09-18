@@ -47,6 +47,34 @@
 *        An output parameter to which is written the list of integer tile
 *        indices.
 
+*  Tile Definitions:
+*     It should rarely, if ever, be necessary to know the specific details
+*     of the tiling scheme used by SMURF. But for reference, it works as
+*     follows:
+*
+*     The whole sky is covered by an HPX (HEALPix) projection containing
+*     12 basic square facets, the reference point of the projection is put
+*     at (RA,Dec)=(0,0) (except for the first facet that has a reference
+*     point of (12h,0)). The projection plane is rotated by 45 degrees so
+*     that the edges of each facet are parallel to X and Y (as in Fig.3 of
+*     the A&A paper "Mapping on the HEALPix grid" by Calabretta and Roukema).
+*     Each facet is then divided up into NxN tiles, where N is 64 for
+*     SCUBA-2 and 128 for HARP. Each tile is then divided into PxP pixels,
+*     where P is 412 for HARP, 825 for SCUBA-2 850 um, 1650 for SCUBA-2
+*     450 um. Facets are counted raster-fashion from the bottom left to
+*     the top right of the projection plane (except that the first facet is
+*     split equally into two triangles, one at the bottom left and one at
+*     the top right of the projection plane). Within a facet, tiles are
+*     also counted raster-fashion from bottom left to top right. All the
+*     tiles in the first facet come first, followed by all the tiles in
+*     the second facet, etc.
+*
+*     This is a fairly complex scheme. To help understanding, the
+*     SMURF:TILEINFO command can create an all-sky map in which each
+*     pixel corresponds to a single tile, and has a pixel value equal to
+*     the corresponding tile index. Displaying this map should help you
+*     to visualise the indexing scheme described above.
+
 *  Related Applications:
 *     SMURF: MAKECUBE, MAKEMAP, TILEINFO.
 
