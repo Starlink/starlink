@@ -23295,6 +23295,13 @@ KAPPA: \htmlref{HISTOGRAM}{HISTOGRAM},
          be erased.  If a {\tt FALSE} value is given, then the object will not
          be erased and a message will be issued to this effect.
       }
+      \sstsubsection{
+         REPORT = \_LOGICAL (Read)
+      }{
+         This parameter controls what happens if the named OBJECT does
+         not exist.  If {\tt TRUE}, an error is reported. Otherwise no error
+         is reported. {\tt [TRUE]}
+      }
    }
    \sstexamples{
       \sstexamplesubsection{
@@ -59093,6 +59100,11 @@ The following applications have been modified:
       \begin{itemize}
         \item The MODE parameter can now be set to {\tt "Current"} to force the
         current upper and lower limits to be re-used.
+      \end{itemize}
+   \item [\htmlref{ERASE}{ERASE}]\mbox{}
+      \begin{itemize}
+        \item Now has aparameter called REPORT that indicates if an error
+        should be reported if the specified object does not exist.
       \end{itemize}
    \item [\htmlref{GDCLEAR}{GDCLEAR}]\mbox{}
       \begin{itemize}

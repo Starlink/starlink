@@ -329,6 +329,16 @@ package kappa {
             helpkey *
          }
 
+         parameter report {
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Report an error if the object does not exist?}
+            helpkey *
+         }
+
       }
 
       action fitsdin {

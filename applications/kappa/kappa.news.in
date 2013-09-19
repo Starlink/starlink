@@ -31,6 +31,11 @@
       -  The MODE parameter can now be set to "Current" to force the
       current upper and lower limits to be re-used.
 
+   o  ERASE
+
+      -  Now has aparameter called REPORT that indicates if an error
+      should be reported if the specified object does not exist.
+
    o  GDCLEAR
 
       -  Will now remove any unused space from the graphics-database

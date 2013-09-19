@@ -36,6 +36,10 @@
 *        is erased.  If a TRUE value is given, then the HDS object will
 *        be erased.  If a FALSE value is given, then the object will not
 *        be erased and a message will be issued to this effect.
+*     REPORT = _LOGICAL (Read)
+*        This parameter controls what happens if the named OBJECT does
+*        not exist. If TRUE, an error is reported. Otherwise no error is
+*        reported. [TRUE]
 
 *  Examples:
 *     erase horse
@@ -98,6 +102,8 @@
 *        incrementing.  Test for DAT__OBJNF as DAT_EXIST returns this
 *        instead of the documented PAR__ERROR should the object not
 *        exist.  Added HDSTOOLS to Related Applications.
+*     19-SEP-2013 (DSB):
+*        Added parameter REPORT.
 *     {enter_further_changes_here}
 
 *-
@@ -131,7 +137,7 @@
       INTEGER NLEV               ! Number of HDS levels
       LOGICAL OK                 ! Confirmation flag
       CHARACTER * ( SZPATH ) PATH ! HDS path name
-
+      LOGICAL REPORT             ! Report an error if no object?
 *.
 
 *  Check the inherited global status.
@@ -145,14 +151,17 @@
       CALL DAT_EXIST( 'OBJECT', 'WRITE', LOC, STATUS )
 
 *  If the object does not exist, then annul the error and make a new
-*  error report.
+*  error report (if required).
       IF ( STATUS .EQ. PAR__ERROR . OR. STATUS .EQ. DAT__OBJNF ) THEN
          LOC = ' '
          CALL ERR_ANNUL( STATUS )
-         STATUS = SAI__ERROR
-         CALL ERR_REP( 'ERASE_NOOBJ',
-     :   'The object ''$OBJECT'' does not exist or is inaccessible.',
-     :                 STATUS )
+         CALL PAR_GET0L( 'REPORT', REPORT, STATUS )
+         IF( REPORT ) THEN
+            STATUS = SAI__ERROR
+            CALL ERR_REP( 'ERASE_NOOBJ',
+     :      'The object ''$OBJECT'' does not exist or is inaccessible.',
+     :                    STATUS )
+         END IF
 
 *  If the object exists, obtain its path name and define a prompt to
 *  confirm if it should be erased.
