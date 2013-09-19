@@ -61,7 +61,7 @@
 
 *  Usage:
 *     pol2catb in cat iref pi [plot] [snr] [maxlen] [domain] [pixsize]
-*              [config] [device] [nsigma] [extcor] [retain] [qui] [hits]
+*              [config] [device] [extcor] [retain] [qui] [hits]
 *              [harmonic] [forcefile] [msg_filter] [ilevel] [glevel] [logfile]
 
 *  Parameters:
@@ -214,17 +214,14 @@
 
 *        The default is 6 if a mask has been supplied (see parameter
 *        MASK), and zero otherwise. []
-*     NSIGMA = _REAL (Read)
-*        Specifies the strength of the spike removal. Features with a
-*        scale size smaller than 3 bolometers are removed by comparison
-*        of each pixel value with the local mean. If a pixel value deviates
-*        by more than NSIGMA standard deviations from the local mean, then
-*        it is set bad. Since the removal of such pixel values will
-*        change the local mean, this process is repeated 3 times. This
-*        cleaning algorithm is performed by the KAPPA FFCLEAN command with
-*        parameter BOX set to 3 and CLIP set to an array of three values
-*        each equal to NSIGMA. Using a larger value for NSIGMA will result
-*        in fewer pixels being removed. [3.0]
+*     NKEEP = _INTEGER (Read)
+*        This controls the algorithm that chooses which bolometers to
+*        retain and which to reject as too noisey. It specifies the
+*        target number of bolometers that should be retained in each
+*        subarray. The least noisey "NKEEP" bolometers are retained and
+*        the rest are set bad. In some cases it may be necessary to reject
+*        more than the specified number. The supplied number should be
+*        less than 1280. [700]
 *     PI = NDF (Read)
 *        The output NDF in which to return the polarised intensity map.
 *        No polarised intensity map will be created if null (!) is supplied.
@@ -312,7 +309,9 @@
 *        Remove the background using SC2CLEAN rather than REMSKY before
 *        doing th eextinction correction.
 *     20-SEP-2013 (DSB):
-*        Provide some support for masks that are larger than a single subarray.
+*        - Provide some support for masks that are larger than a single subarray.
+*        - Replace the (unused) NSIGMA parameter with NKEEP. This
+*        controls how many bolometers are rejected.
 *-
 '''
 
@@ -395,8 +394,8 @@ try:
                                                        "GLOBAL",default=None),
                                  noprompt=True))
 
-   params.append(starutil.Par0F("NSIGMA", "No. of standard deviations at "
-                                "which to clip spikes", 3.0, noprompt=True))
+   params.append(starutil.Par0I("NKEEP", "No. of bolometers to retain in "
+                                 "each subarray", 700, noprompt=True))
 
    params.append(starutil.Par0L("EXTCOR", "Perform extinction correction?",
                                 True, noprompt=True))
@@ -521,10 +520,8 @@ try:
 #  Get the alignment domain.
    domain = parsys["DOMAIN"].value
 
-#  Get the clipping limit and create a string to use for the FFCLEAN CLIP
-#  parameter.
-   nsigma = parsys["NSIGMA"].value
-   clip = "{0},{0},{0}".format(nsigma)
+#  Get the target number of bolometers to use per subarray.
+   nkeep = parsys["NKEEP"].value
 
 #  Get the pixel size to use. If no pixel size is supplied we use the pixel
 #  size of the total intensity map if supplied, or of the Q and U maps
@@ -730,19 +727,41 @@ try:
          urange = NDG(1)
          invoke( "$KAPPA_DIR/sub in1={0} in2={1} out={2}".format(umax,umin,urange) )
 
-#  Use kappa:ffclean to identify unusually strong small features in these maps
-#  (i.e. bolometers that have unually large range of Q or U), and set them bad.
-#  Note, in this case ffclean seems to work much better if it ignores the
-#  input variances. So we first erase the variance component from the
-#  input NDFs
-         qrancln = NDG(1)
-         invoke( "$KAPPA_DIR/erase {0}.variance report=no ok=yes".format(qrange) )
-         invoke( "$KAPPA_DIR/ffclean in={0} out={1} box=\[3,3\] clip=\[3,3,3\]".
-                 format(qrange,qrancln) )
-         urancln = NDG(1)
-         invoke( "$KAPPA_DIR/erase {0}.variance report=no ok=yes".format(urange) )
-         invoke( "$KAPPA_DIR/ffclean in={0} out={1} box=\[3,3\] clip=\[3,3,3\]".
-                 format(urange,urancln) )
+#  We keep the best "nkeep" bolometers (i.e. the ones with the smallest
+#  ranges). We first need to convert "nkeep" to a percentage of the remaining
+#  valid bolometers.
+         invoke( "$KAPPA_DIR/stats {0} quiet".format(qrange) )
+         ngood = starutil.get_task_par( "numgood", "stats" )
+         if ngood > nkeep:
+            perc = float( nkeep )/float( ngood )
+
+#  Get the corresponding percentile value.
+            invoke( "$KAPPA_DIR/stats {0} order=yes percentiles={1} quiet".format(qrange,perc) )
+            thresh = starutil.get_task_par( "perval(1)", "stats" )
+
+#  Set bad all bolometers above this percentile value.
+            qrancln = NDG(1)
+            invoke( "$KAPPA_DIR/thresh in={0} out={1} thrlo=-1 newlo=bad "
+                    "thrhi={2} newhi=bad".format(qrange,qrancln,thresh) )
+         else:
+            qrancln = qrange
+
+#  Do the same for U.
+         invoke( "$KAPPA_DIR/stats {0} quiet".format(urange) )
+         ngood = starutil.get_task_par( "numgood", "stats" )
+         if ngood > nkeep:
+            perc = float( nkeep )/float( ngood )
+
+#  Get the corresponding percentile value.
+            invoke( "$KAPPA_DIR/stats {0} order=yes percentiles={1} quiet".format(urange,perc) )
+            thresh = starutil.get_task_par( "perval(1)", "stats" )
+
+#  Set bad all bolometers above this percentile value.
+            urancln = NDG(1)
+            invoke( "$KAPPA_DIR/thresh in={0} out={1} thrlo=-1 newlo=bad "
+                    "thrhi={2} newhi=bad".format(urange,urancln,thresh) )
+         else:
+            urancln = urange
 
 #  We can only use bolometers that are good in both Q *and* U. So
 #  multiply the cleaned maps together to get a 2d mask of bad bolometers.
