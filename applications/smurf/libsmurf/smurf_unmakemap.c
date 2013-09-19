@@ -38,6 +38,15 @@
 *          The angle from the focal plane X axis to the fixed analyser, in
 *          degrees. Measured positive in the same sense as rotation from focal
 *          plane X to focal plane Y. [90.0]
+*     HARMONIC = _INTEGER (Read)
+*          The Q and U values are derived from the fourth harmonic of the
+*          half-wave plate rotation. However, to allow investigation of
+*          other instrumental effects, it is possible instead to derive
+*          equivalent quantities from any specified harmonic. These quantities
+*          are calculated in exactly the same way as Q and U, but use the
+*          harmonic specified by this parameter. They are stored in the
+*          output NDFs given by OUT, in place of the normal fourth
+*          harmonic signal. [4]
 *     IN = NDF (Read)
 *          The input 2D image of the sky. If NDFs are supplied for the
 *          QIN and UIN parameters, then IN should hold I values.
@@ -159,6 +168,8 @@
 *        Original version.
 *     8-JAN-2013 (DSB):
 *        Added parameters PASIGN, PAOFF and ANGROT.
+*     20-SEP-2013 (DSB):
+*        Added ADAM parameter HARMONIC.
 
 *  Copyright:
 *     Copyright (C) 2011 Science and Technology Facilities Council.
@@ -248,6 +259,7 @@ void smurf_unmakemap( int *status ) {
    double params[ 4 ];        /* astResample parameters */
    double sigma;              /* Standard deviation of noise to add to output */
    int flag;                  /* Was the group expression flagged? */
+   int harmonic;              /* The requested harmonic */
    int ifile;                 /* Input file index */
    int indf;                  /* Input sky map NDF identifier */
    int indfin;                /* Input template cube NDF identifier */
@@ -507,7 +519,7 @@ void smurf_unmakemap( int *status ) {
    main output is analysed intensity. */
          smf_uncalc_iqu( wf, odata, odata->pntr[ 0 ], outq_data, outu_data,
                          ang_data, pasign, AST__DD2R*paoff, AST__DD2R*angrot,
-                         status );
+                         harmonic, status );
 
 /* Release work space. */
          outq_data = astFree( outq_data );

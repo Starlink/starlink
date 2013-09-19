@@ -1919,7 +1919,8 @@ void smf_tslice_ast (smfData * data, dim_t index, int needwcs, fts2Port fts_port
 
 void smf_uncalc_iqu( ThrWorkForce *wf, smfData *data, double *idata,
                      double *qdata, double *udata, double *angdata,
-                     int pasign, double paoff, double angrot, int *status );
+                     int pasign, double paoff, double angrot, int harmonic,
+                     int *status );
 
 void smf_update_quality( smfData *data, int syncbad,
                          const int *badmask, smf_qual_t addqual, double badfrac,

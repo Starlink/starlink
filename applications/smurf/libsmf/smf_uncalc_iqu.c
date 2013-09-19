@@ -16,7 +16,7 @@
 *     void smf_uncalc_iqu( ThrWorkForce *wf, smfData *data, int nel,
 *                          double *idata, double *qdata, double *udata,
 *                          double *angdata, int pasign, double paoff,
-*                          double angrot, int *status );
+*                          double angrot, int harmonic, int *status );
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -49,6 +49,11 @@
 *        The angle from the focal plane X axis to the fixed analyser, in
 *        radians. Measured positive in the same sense as rotation from focal
 *        plane X to focal plane Y.
+*     harmonic = int  (Given)
+*        The harmonic of the half-wave plate rotation from which the Q
+*        and U values should be derived. This should normally be 4, but
+*        other values can be used to investigate the effects of asymetry in
+*        the half-wave plate, etc.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -67,6 +72,8 @@
 *        Use focal plane Y axis as the reference direction.
 *     8-JAN-2013 (DSB):
 *        Added arguments pasign, paoff and angrot.
+*     20-SEP-2013 (DSB):
+*        Added parameter "harmonic".
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -113,6 +120,7 @@ typedef struct smfUncalcIQUJobData {
    double *ipi;
    double *ipq;
    double *ipu;
+   double angfac;
    double angrot;
    double paoff;
    int ipolcrd;
@@ -135,7 +143,8 @@ static void smf1_uncalc_iqu_job( void *job_data, int *status );
 
 void smf_uncalc_iqu( ThrWorkForce *wf, smfData *data, double *idata,
                      double *qdata, double *udata, double *angdata,
-                     int pasign, double paoff, double angrot, int *status ){
+                     int pasign, double paoff, double angrot, int harmonic,
+                     int *status ){
 
 /* Local Variables: */
    const JCMTState *state;    /* JCMTState info for current time slice */
@@ -264,6 +273,7 @@ void smf_uncalc_iqu( ThrWorkForce *wf, smfData *data, double *idata,
          pdata->pasign = pasign ? +1: -1;
          pdata->paoff = paoff;
          pdata->angrot = angrot;
+         pdata->angfac = harmonic/4.0;
 
 /* Pass the job to the workforce for execution. */
          thrAddJob( wf, THR__REPORT_JOB, pdata, smf1_uncalc_iqu_job, 0, NULL,
@@ -321,6 +331,7 @@ static void smf1_uncalc_iqu_job( void *job_data, int *status ) {
    double *ipu;               /* Pointer to supplied U array */
    double *qin;               /* Pointer to Q array for each bolometer*/
    double *uin;               /* Pointer to U array for each bolometer*/
+   double angfac;
    double angle;              /* Phase angle for FFT */
    double angrot;             /* Angle from focal plane X axis to fixed analyser */
    double cosval;             /* Cos of twice reference rotation angle */
@@ -361,6 +372,7 @@ static void smf1_uncalc_iqu_job( void *job_data, int *status ) {
    pasign = pdata->pasign;
    paoff = pdata->paoff;
    angrot = pdata->angrot;
+   angfac = pdata->angfac;
 
 /* Check we have something to do. */
    if( b1 < nbolo ) {
@@ -438,9 +450,10 @@ static void smf1_uncalc_iqu_job( void *job_data, int *status ) {
 
 /* Calculate the analysed intensity and store it in place of the I value.
    A phi value of zero corresponds to the fixed analyser (i.e. the new Q/U
-   reference direction). */
-               angle *= 2.0;
-               *iin = 0.5*( (*iin) + qval*cos( 2*phi ) + uval*sin( 2*phi ) );
+   reference direction). Allow the angle to be scaled by some user-specified
+   factor. This is to allow the investigation of other harmonics. */
+               *iin = 0.5*( (*iin) + qval*cos( 2*phi*angfac ) +
+                                     uval*sin( 2*phi*angfac ) );
             } else {
                *iin = VAL__BADD;
             }
