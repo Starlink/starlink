@@ -311,6 +311,8 @@
 *     16-SEP-2013 (DSB):
 *        Remove the background using SC2CLEAN rather than REMSKY before
 *        doing th eextinction correction.
+*     20-SEP-2013 (DSB):
+*        Provide some support for masks that are larger than a single subarray.
 *-
 '''
 
@@ -734,11 +736,11 @@ try:
 #  input variances. So we first erase the variance component from the
 #  input NDFs
          qrancln = NDG(1)
-         invoke( "$KAPPA_DIR/erase {0}.variance ok=yes".format(qrange) )
+         invoke( "$KAPPA_DIR/erase {0}.variance report=no ok=yes".format(qrange) )
          invoke( "$KAPPA_DIR/ffclean in={0} out={1} box=\[3,3\] clip=\[3,3,3\]".
                  format(qrange,qrancln) )
          urancln = NDG(1)
-         invoke( "$KAPPA_DIR/erase {0}.variance ok=yes".format(urange) )
+         invoke( "$KAPPA_DIR/erase {0}.variance report=no ok=yes".format(urange) )
          invoke( "$KAPPA_DIR/ffclean in={0} out={1} box=\[3,3\] clip=\[3,3,3\]".
                  format(urange,urancln) )
 
@@ -817,9 +819,27 @@ try:
             else:
                masked = incube
 
+#  If the mask is very large, it may blank out a whole plane or the vast
+#  majority of a plane, leaving very few if any samples to fit. To avoid
+#  this we create another copy of the Q/U cube in which masked pixels
+#  have a very much higher variance than the non-masked pixels. This high
+#  variance will give low weight to the masked pixels, but will allow a
+#  result to be calculated even if all pixels are masked. So find the assign a
+#  variance of 1.0 to all non-masked pixels, and a variance of 100.0 to all
+#  masked pixels.
+            if mask != None:
+               tmp1 = NDG(1)
+               invoke( "$KAPPA_DIR/maths exp=\"'qif((ia==<bad>),100,1)'\" ia={0} out={1}".
+                       format(masked,tmp1) )
+               wmasked = NDG(1)
+               invoke( "$KAPPA_DIR/ndfcopy in={0} out={1}".format(incube,wmasked) )
+               invoke( "$KAPPA_DIR/setvar ndf={0} comp=data from={1}".format(wmasked,tmp1) )
+            else:
+               wmasked = incube
+
 #  All stare positions (i.e. planes in the cube) tend to have very
 #  similar structure. So our first guess at the model is given by the mean
-#  of all planes, and is time-invariant.
+#  of all planes (excluding source regions), and is time-invariant.
             model1 = NDG(1)
             invoke( "$KAPPA_DIR/collapse in={0} out={1} estimator=mean wlim=0 axis=3".
                      format(masked,model1) )
@@ -831,19 +851,19 @@ try:
 #  image in which each row is a vectorised form of one plane in the cube,
 #  each containing 1280 values (i.e. 32x40 bolometers). We also reshape
 #  the current model to be a 2D image with only a single row.
-            flatmasked = NDG(1)
+            flatwmasked = NDG(1)
             invoke( "$KAPPA_DIR/reshape in={0} out={1} shape=\[1280,{2}\]".
-                    format(masked,flatmasked,npos) )
+                    format(wmasked,flatwmasked,npos) )
             flatmodel = NDG(1)
             invoke( "$KAPPA_DIR/reshape in={0} out={1} shape=\[1280,1\]".
                     format(model1,flatmodel) )
 
-#  Now use normalize. For each row in flatmasked (i.e. each stare
+#  Now use normalize. For each row in flatwmasked (i.e. each stare
 #  position), it fits the model to the masked data, and stores the scaled
 #  and shifted model in the output.
             flatnew = NDG(1)
             invoke( "$KAPPA_DIR/normalize in1={0} in2={1} out={2} loop=yes device={3}".
-                    format(flatmodel,flatmasked,flatnew,ndevice), buffer=True )
+                    format(flatmodel,flatwmasked,flatnew,ndevice), buffer=True )
 
 #  Reshape the 2D new model back into a 3D cube. Each plane in this cube
 #  will now contain a scaled and shifted form of the original model that
@@ -935,11 +955,17 @@ try:
 #  value of 1.0 and the delay model to a mean of zero.
             invoke( "$KAPPA_DIR/stats {0}".format(model5) )
             mean = starutil.get_task_par( "mean", "stats" )
+            tmp = NDG( 1 )
             if incube == gcube:
-               invoke( "$KAPPA_DIR/cdiv in={0} scalar={1} out={2}".format(model5,mean,model) )
+               invoke( "$KAPPA_DIR/cdiv in={0} scalar={1} out={2}".format(model5,mean,tmp) )
             else:
-               invoke( "$KAPPA_DIR/csub in={0} scalar={1} out={2}".format(model5,mean,model) )
+               invoke( "$KAPPA_DIR/csub in={0} scalar={1} out={2}".format(model5,mean,tmp) )
 
+# Also need to fill any bad values. This is important if the mask is so
+# large that an entire plane is masked out, in which case it will have no
+# gain/delay values. Bad values in the final map will be inherited form the
+# Q and U values, not the gain and delay values.
+            invoke( "$KAPPA_DIR/fillbad in={1} variance=no out={0} size=10 niter=10".format(model,tmp) )
 
 #  Having determined models for the gain and time delay for each bolometer
 #  at each time slice, use these models to correct the raw Q and U cubes.
@@ -957,12 +983,12 @@ try:
 #  First erase variance, as they are not reliable, upset ffclean, and will
 #  be replace later by more reliable variances.
          msg_out( "Removing small blemishes from {0} Q and U images".format(a) )
-         invoke( "$KAPPA_DIR/erase {0}.variance ok=yes".format(qcor) )
+         invoke( "$KAPPA_DIR/erase {0}.variance report=no ok=yes".format(qcor) )
          qff = NDG( 1 )
          invoke( "$KAPPA_DIR/ffclean in={0} out={1} axes=\[1,2\] box=3 "
                  "clip=\[5,5,5\]".format(qcor,qff) )
 
-         invoke( "$KAPPA_DIR/erase {0}.variance ok=yes".format(ucor) )
+         invoke( "$KAPPA_DIR/erase {0}.variance report=no ok=yes".format(ucor) )
          uff = NDG( 1 )
          invoke( "$KAPPA_DIR/ffclean in={0} out={1} axes=\[1,2\] box=3 "
                  "clip=\[5,5,5\]".format(ucor,uff) )
@@ -1084,7 +1110,7 @@ try:
                   iref_tmp = NDG( 1 )
                   invoke( "$KAPPA_DIR/copybad in={0} out={1} ref={2} "
                           "invert=yes".format(iref,iref_tmp,maska) )
-                  invoke( "$KAPPA_DIR/erase {0}.variance ok=yes".format(iref_tmp) )
+                  invoke( "$KAPPA_DIR/erase {0}.variance report=no ok=yes".format(iref_tmp) )
                   iref_masked = NDG( 1 )
                   invoke( "$KAPPA_DIR/nomagic in={0} out={1} repval=0".
                           format(iref_tmp,iref_masked) )
@@ -1141,6 +1167,7 @@ try:
    qaligned = NDG( qmaps_all )
    invoke( "$KAPPA_DIR/wcsalign method=gauss params=\[0,1.2\] rebin=yes in={0} ref={1} "
            "out={2} lbnd=! conserve=no".format(qmaps_all,ref,qaligned) )
+   qaligned = qaligned.filter() #  Remove any NDFs that could not be created by wcsalign
    qtotal = NDG( 1 )
    invoke( "$CCDPACK_DIR/makemos method=broad genvar=yes in={0} out={1}".format(qaligned,qtotal) )
 
@@ -1149,6 +1176,7 @@ try:
    ualigned = NDG( umaps_all )
    invoke( "$KAPPA_DIR/wcsalign method=gauss params=\[0,1.2\] rebin=yes in={0} ref={1} "
            "out={2} lbnd=! conserve=no".format(umaps_all,ref,ualigned) )
+   ualigned = ualigned.filter() #  Remove any NDFs that could not be created by wcsalign
    utotal = NDG( 1 )
    invoke( "$CCDPACK_DIR/makemos method=broad genvar=yes in={0} out={1}".format(ualigned,utotal) )
 

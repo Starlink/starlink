@@ -343,8 +343,10 @@
 *        U in each pixel, not the sum, and so flux should not be conserved
 *        when changing the pixel scale of the Q and U images.
 *     16-SEP-2013 (DSB):
-*        Remove the background using SC2CLEAN rather than REMSKY before 
-*        doing th eextinction correction. 
+*        Remove the background using SC2CLEAN rather than REMSKY before
+*        doing th extinction correction.
+*     20-SEP-2013 (DSB):
+*        Provide some support for masks that are larger than a single subarray.
 *-
 '''
 
@@ -1085,6 +1087,7 @@ try:
    qaligned = NDG( qmaps_all )
    invoke( "$KAPPA_DIR/wcsalign method=bilin rebin=yes conserve=no in={0} "
            "ref={1} out={2} lbnd=!".format(qmaps_all,ref,qaligned) )
+   qaligned = qaligned.filter() #  Remove any NDFs that could not be created by wcsalign
    qtotal = NDG( 1 )
    invoke( "$CCDPACK_DIR/makemos method=broad  in={0} out={1}".format(qaligned,qtotal) )
 
@@ -1093,6 +1096,7 @@ try:
    ualigned = NDG( umaps_all )
    invoke( "$KAPPA_DIR/wcsalign method=bilin rebin=yes conserve=no in={0} ref={1} "
            "out={2} lbnd=!".format(umaps_all,ref,ualigned) )
+   ualigned = ualigned.filter() #  Remove any NDFs that could not be created by wcsalign
    utotal = NDG( 1 )
    invoke( "$CCDPACK_DIR/makemos method=broad in={0} out={1}".format(ualigned,utotal) )
 
