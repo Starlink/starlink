@@ -733,7 +733,7 @@ try:
          invoke( "$KAPPA_DIR/stats {0} quiet".format(qrange) )
          ngood = starutil.get_task_par( "numgood", "stats" )
          if ngood > nkeep:
-            perc = float( nkeep )/float( ngood )
+            perc = float( 100*nkeep )/float( ngood )
 
 #  Get the corresponding percentile value.
             invoke( "$KAPPA_DIR/stats {0} order=yes percentiles={1} quiet".format(qrange,perc) )
@@ -750,7 +750,7 @@ try:
          invoke( "$KAPPA_DIR/stats {0} quiet".format(urange) )
          ngood = starutil.get_task_par( "numgood", "stats" )
          if ngood > nkeep:
-            perc = float( nkeep )/float( ngood )
+            perc = float( 100*nkeep )/float( ngood )
 
 #  Get the corresponding percentile value.
             invoke( "$KAPPA_DIR/stats {0} order=yes percentiles={1} quiet".format(urange,perc) )
