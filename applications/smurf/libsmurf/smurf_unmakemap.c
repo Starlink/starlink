@@ -502,6 +502,9 @@ void smurf_unmakemap( int *status ) {
             }
          }
 
+/* Determine the harmonic to use. */
+         parGet0i( "HARMONIC", &harmonic, status );
+
 /* Allocate room for an array to hold the anti-clockwise angle from the
    focal plane Y axis to the Y pixel axis in the reference map, at each
    time slice. */
