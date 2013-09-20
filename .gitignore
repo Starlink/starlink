@@ -27,6 +27,8 @@
 *.lot
 *.loT
 *.log
+*.bbl
+*.blg
 *.m4
 *.now
 *.pro

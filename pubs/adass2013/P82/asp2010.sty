@@ -1,0 +1,1293 @@
+% This is the asp2010.sty LaTeX style file -- DO NOT CHANGE THIS FILE
+% Copyright 2010, Astronomical Society of the Pacific Conference Series
+% Revision:  10 February 2010
+
+% This style file is a revised version of newpasp.sty and contains
+% new features added by Terry Mahoney, Lisa Roper, Jared Bellows, 
+% and Jonathan Barnes. 
+
+% If you have any queries concerning this style file, please contact 
+% Terry Mahoney at tjm@ll.iac.esf
+
+%%% COMMENTS -- Comment style:
+% File Header information includes file name and ASPCS Copyright.
+
+% '%%%' HEADING -- Represents a major heading in a file (all caps)
+%   followed by information about the section.
+
+% '%' SUBHEADING -- Represents a minor heading in a file (all caps)
+%   followed by information about the section.
+
+% '%' Comment -- Represents instructions for commands or general 
+%   information about the subsequent commands.
+
+
+\usepackage{array}
+\usepackage{txfonts}
+\usepackage{ifthen}
+\usepackage{lscape}
+\usepackage{index}
+\usepackage{graphicx,amssymb}
+\usepackage{wrapfig}
+\usepackage{chapterbib}
+\usepackage{url}
+\usepackage{ncccropmark}   % For Proofing:  Use this line to show margin guides
+\usepackage{watermark}   % For Proofing:  Use this line to show margin guides
+
+\ProvidesPackage{asp2010}[2010/05/11 \space  v 1.1]
+
+%%% VOLUME AND SLUG INFORMATION -- Do not change this file.
+
+% Volume Number
+\def\@aspvolume{**Volume Number**}
+\newcommand{\aspvolume}[1]{\gdef\@aspvolume{#1}}
+\newcommand{\volume}{\@aspvolume}
+% Usage in main file:  \aspvolume{0} % Insert volume number from ASPCS
+
+% Volume Copyright Year
+\def\@aspcpryear{**Copyright Year**}
+\newcommand{\aspcpryear}[1]{\gdef\@aspcpryear{#1}}
+\newcommand{\cpryear}{\@aspcpryear}
+% Usage in main file:  \aspcpryear{2009} % Insert year received from ASPCS
+
+% Volume Title for Slug
+\def\@aspvoltitle{**Volume Title**}
+\newcommand{\aspvoltitle}[1]{\gdef\@aspvoltitle{#1}}
+\newcommand{\voltitle}{\@aspvoltitle}
+% Usage in main file:  \aspvoltitle{ASPCS Instructions for Authors and Editors} % Insert Full Title in Initial Caps
+
+% Volume Author for Slug
+\def\@aspvolauthor{**Author**}
+\newcommand{\aspvolauthor}[1]{\gdef\@aspvolauthor{#1}}
+\newcommand{\volauthor}{\@aspvolauthor}
+% Usage in main file:  \aspvolauthor{T. J. Mahoney and Lisa B. Roper, eds.} % Insert Editors
+% Use a serial comma with 3 or more editors with "and" not "&" between last two names.
+% Follow editors' names with comma and "ed." or "eds."
+
+%%% COPYRIGHT INFORMATION -- Do not change this file.
+
+% Volume LCCN
+\def\@aspLCCN{**LCCN**}
+\newcommand{\aspLCCN}[1]{\gdef\@aspLCCN{#1}}
+\newcommand{\LCCN}{\@aspLCCN}
+% Usage in main file:  \aspLCCN{Not Applicable}
+
+% Volume ISBN
+\def\@aspISBN{**ISBN**} % As of 2007, should be 978-1-58381-XXX-X
+\newcommand{\aspISBN}[1]{\gdef\@aspISBN{#1}}
+\newcommand{\ISBN}{\@aspISBN}
+% Usage in main file:  \aspISBN{Not Applicable}
+
+% Volume eISBN
+\def\@aspeISBN{**eISBN**}
+\newcommand{\aspeISBN}[1]{\gdef\@aspeISBN{#1}}
+\newcommand{\eISBN}{\@aspeISBN}
+% Usage in main file:  \aspeISBN}{978-1-58381-681-3}
+
+% Volume Contract Number
+\def\@aspContract{**CN**}
+\newcommand{\aspContract}[1]{\gdef\@aspContract{#1}}
+\newcommand{\Contract}{\@aspContract}
+% Usage in main file:  \aspContract}{91}
+
+%%% HALFTITLE PAGE
+
+% Volume Title for Halftitle Page
+\def\@asphalftitle{**BOOK TITLE**}
+\newcommand{\asphalftitle}[1]{\gdef\@asphalftitle{#1}}
+\newcommand{\halftitle}{\@asphalftitle}
+% Usage in main file:  \asphalftitle{ASP CONFERENCE SERIES\\ INSTRUCTIONS FOR AUTHORS AND EDITORS} % IN ALL CAPS
+
+% Book Cover Illustration Information
+\def\@aspcoverinfo{\relax}
+\global\let\@aspcoverinfo\@empty
+\newcommand{\aspcoverinfo}[1]{\gdef\@aspcoverinfo{#1}}
+\newcommand{\blurb}{\@aspcoverinfo}
+% Usage in main file:
+%\aspcoverinfo{\emph{Celestial Tryst:}  The moon, Venus, and Jupiter 
+%   in the evening sky from the coastline south of Pacifica, California 
+%   on November 30, 2008.\\\mbox{}\\Photographed by James Manning, the 
+%   Executive Director of the Astronomical Society of the Pacific.} % In 
+%   Mixed Case (Initial Caps)
+
+% Editors:  Please be sure to obtain permission from the author and from the publisher if previously published.
+% Suggested acknowledgement wording might include the following, depending upon the circumstance:
+%   Image/drawing/photo courtesy of individual or organization who created the image.
+%   Referenced in this volume, author name, p. xxx.
+%   By the kind permission of publisher, volume number, author and page number.
+%   Copyright held by name and place.
+
+%%% TITLE PAGE
+
+% Volume Title for Title Page
+\def\@aspmaintitle{**MAIN TITLE**}
+\newcommand{\aspmaintitle}[1]{\gdef\@aspmaintitle{#1}}
+\newcommand{\maintitle}{\@aspmaintitle}
+% Usage in main file: \aspmaintitle{ASP CONFERENCE SERIES\\ INSTRUCTIONS FOR AUTHORS AND EDITORS} % IN ALL CAPS
+
+% Volume Meeting Type
+\def\@aspmtgtype{\relax}
+\global\let\@aspmtgtype\@empty
+\newcommand{\aspmtgtype}[1]{\gdef\@aspmtgtype{#1}}
+\newcommand{\mtgtype}{\@aspmtgtype}
+% Usage in main file: \aspmtgtype{Proceedings of a conference held in}
+
+% Meeting Venue
+\def\@aspmtgvenue{\relax}
+\newcommand{\aspmtgvenue}[1]{\gdef\@aspmtgvenue{#1}}
+\newcommand{\venue}{\@aspmtgvenue}
+% Usage in main file: \aspmtgvenue{St. Louis, Missouri, USA}
+% Spell out fully (Institute, City, State, Country).
+
+% Meeting Time
+\def\@aspmtgwhen{\relax}
+\newcommand{\aspmtgwhen}[1]{\gdef\@aspmtgwhen{#1}}
+\newcommand{\when}{\@aspmtgwhen}
+% Usage in main file: \aspmtgwhen{1--5 June 2008}
+% In 7--11 May 2001 format with no commas
+
+%%% EDITOR INFORMATION -- Please include Department, Institute, City, State, Country in the affiliation
+
+% First Editor Name
+\def\@aspeditorone{\relax}
+\global\let\@aspeditorone\@empty
+\newcommand{\aspfirsteditor}[1]{\gdef\@aspeditorone{#1}}
+\newcommand{\firsteditor}{\@aspeditorone}
+% Usage in main file: \aspfirsteditor{T. J. Mahoney}
+
+% First Editor Affiliation
+\def\@aspaffilone{\relax}
+\newcommand{\aspfirstaffil}[1]{\gdef\@aspaffilone{#1}}
+\newcommand{\firstaffil}{\@aspaffilone}
+% Usage in main file: \aspfirstaffil{Instituto de Astrof\'\i sica de Canarias, La Laguna, Tenerife, Spain}
+
+% Second Editor
+\def\@aspeditortwo{\relax}
+\global\let\@aspeditortwo\@empty
+\newcommand{\aspsecondeditor}[1]{\gdef\@aspeditortwo{#1}}
+\newcommand{\secondeditor}{\@aspeditortwo}
+% Usage in main file: \aspsecondeditor{**Name**}
+
+% Second Editor Affiliation
+\def\@aspaffiltwo{\relax}
+\newcommand{\aspsecondaffil}[1]{\gdef\@aspaffiltwo{#1}}
+\newcommand{\secondaffil}{\@aspaffiltwo}
+% Usage in main file: \aspfirstaffil{**Affiliation**}
+
+% Third Editor
+\def\@aspeditorthree{\relax}
+\global\let\@aspeditorthree\@empty
+\newcommand{\aspthirdeditor}[1]{\gdef\@aspeditorthree{#1}}
+\newcommand{\thirdeditor}{\@aspeditorthree}
+
+% Third Editor Affiliation
+\def\@aspaffilthree{\relax}
+\newcommand{\aspthirdaffil}[1]{\gdef\@aspaffilthree{#1}}
+\newcommand{\thirdaffil}{\@aspaffilthree}
+
+% Fourth Editor
+\def\@aspeditorfour{\relax}
+\global\let\@aspeditorfour\@empty
+\newcommand{\aspfourtheditor}[1]{\gdef\@aspeditorfour{#1}}
+\newcommand{\fourtheditor}{\@aspeditorfour}
+
+% Fourth Editor Affiliation
+\def\@aspaffilfour{\relax}
+\newcommand{\aspfourthaffil}[1]{\gdef\@aspaffilfour{#1}}
+\newcommand{\fourthaffil}{\@aspaffilfour}
+
+% Fifth Editor
+\def\@aspeditorfive{\relax}
+\global\let\@aspeditorfive\@empty
+\newcommand{\aspfiftheditor}[1]{\gdef\@aspeditorfive{#1}}
+\newcommand{\fiftheditor}{\@aspeditorfive}
+
+% Fifth Editor Affiliation
+\def\@aspaffilfive{\relax}
+\newcommand{\aspfifthaffil}[1]{\gdef\@aspaffilfive{#1}}
+\newcommand{\fifthaffil}{\@aspaffilfive}
+
+% Part Name (Usually either Part of Session)
+\def\@asppartname{Part}
+\newcommand{\asppartname}[1]{\gdef\@asppartname{#1}}
+\renewcommand{\partname}{\@asppartname}
+% Usage in main file: \asppartname{Part} % Name of the Major Sections: Part
+
+% Define the organization (ASP), genre (conference proceedings),
+% version number (version 1.0) and date of version (1 January 2004) - all of
+% which will appear in the .log file:
+\def\revtex@ver{2.0}		
+\def\revtex@date{1 March 2009}	
+\def\revtex@org{ASP}
+\def\revtex@jnl{}
+\def\revtex@genre{conference proceedings}
+
+% The following command types all the above information into the .log file:
+\typeout{\revtex@org\space
+\ifx\revtex@jnl\@empty\else\revtex@jnl\space\fi
+\revtex@genre\space substyle, version \revtex@ver\space <\revtex@date>.}
+
+\def\revtex@pageid{\xdef\@thefnmark{\null}
+\@footnotetext{This \revtex@genre\space was prepared with the
+\revtex@org\space \revtex@jnl\space Rev\TeX\ macros v\revtex@ver.}}
+% The following routine issues a warning for documentclass font sizes smaller
+% than 11 pt ("\@ptsize takes values 0, 1 or 2 (representing 10, 11 and 12 pt):
+\ifnum\@ptsize<1
+\typeout{Warning: Undersize manuscript font (1\@ptsize\space pts).
+	Use 11pt documentclass option.}
+\fi
+% The value of 1\@ptsize might need to be 0 for some IAU publications. Check with the IAU.
+
+% This routine defines where the slug and page number go on the
+% first page of any article, regardless of whether page is even or odd:
+\def\ps@paspcstitle{\let\@mkboth\@gobbletwo
+\def\@oddhead{\null{\footnotesize\it\@slug}\hfil}
+\def\@oddfoot{\rm\hfil\thepage\hfil}
+\let\@evenhead\@oddhead\let\@evenfoot\@oddfoot
+}
+% Now set odd page head to contain running title & page number:
+\def\ps@myheadings{\let\@mkboth\@gobbletwo
+\def\@oddhead{\hbox{}\hfil\sl\rightmark\hskip 1in\rm\thepage}%
+% The odd foot is empty:
+\def\@oddfoot{}%
+% ... and the even page head and foot to contain the author names & page no.:
+\def\@evenhead{\rm\thepage\hskip 1in\sl\leftmark\hfil\hbox{}}%
+% The even foot is also empty:
+\def\@evenfoot{}
+%
+\def\sectionmark##1{}
+\def\subsectionmark##1{}}
+\def\@leftmark#1#2{\sec@upcase{#1}}
+\def\@rightmark#1#2{\sec@upcase{#2}}
+
+\providecommand{\mainmatter}{%
+  \cleardoublepage
+  \@mainmattertrue
+  %\label{aspendfrontmatter} 
+  \typeout{(ASP) Front Matter End: \arabic{page}}
+  \pagenumbering{arabic}
+  \parindent=2em
+  \typeout{(ASP) Main Matter Begin: \arabic{page}}
+}%
+
+\providecommand\backmatter{%
+  \pagestyle{myheadings}   % Required for formatting
+  \if@openright
+    \cleardoublepage
+  \else
+    \clearpage
+  \fi
+  \@mainmatterfalse
+}%
+
+
+% Define page and text layout:
+\textwidth=5.25in
+\textheight=8.3in
+\headheight=18pt
+\headsep=18pt
+\topmargin=0in
+\footskip=.25in
+\oddsidemargin=0.49in
+\evensidemargin=0.49in
+\parindent=2em
+\parskip=.1ex
+\def\@singleleading{0.9}
+\def\@doubleleading{1.6}
+\def\baselinestretch{\@singleleading}
+\def\tightenlines{\def\baselinestretch{\@singleleading}}
+\def\loosenlines{\def\baselinestretch{\@doubleleading}}
+\clubpenalty\@M
+\widowpenalty\@M
+
+% Input for slug:
+\def\@journalname{ASP Conference Series}
+\def\cpr@holder{Astronomical Society of the Pacific}
+\let\journalid=\@gobbletwo
+\let\articleid=\@gobbletwo
+\let\received=\@gobble
+\let\accepted=\@gobble
+
+% Order of information in slug:
+\def\@slug{{\tabcolsep\z@\begin{tabular}[t]{l}\voltitle\\
+%\@journalname, Vol.\ \@jourvol, \cpr@year\\ 
+%LR: 4/13/07 changed to insert copyright symbol
+%\@journalname, Vol.\ \@jourvol\\ \vol@author , eds.\\ {\raisebox{1.5pt}{\tiny\copyright}}\hspace{-1pt}\ \cpr@year\ Astronomical Society of the Pacific 
+\@journalname, Vol.\ \volume\\ \volauthor\\ {\raisebox{1.5pt}{\tiny\copyright}}\hspace{-1pt}\ \cpryear\ Astronomical Society of the Pacific 
+\end{tabular}}
+}
+
+% Title, author names & affiliations to be indented by 0.45 inches:
+\def\paspconf@frontindent{.45in}
+
+% Title format, font, etc.:
+\def\title#1{%
+  \vspace*{2.5\baselineskip}
+  \@tempdima\textwidth \advance\@tempdima by-\paspconf@frontindent
+  \hfill
+  \parbox{\@tempdima}
+	{\pretolerance=10000\raggedright\large\bf\sec@upcase{#1}}\par
+  \vspace*{1\baselineskip}
+  \thispagestyle{title}
+}%
+
+%Author format, font, etc.:
+\def\author#1{\vspace*{1\baselineskip}
+\@tempdima\textwidth \advance\@tempdima by-\paspconf@frontindent
+\hfill
+\parbox{\@tempdima}
+{\pretolerance=10000\raggedright{#1}}\par}
+\def\affil#1{\vspace*{.5\baselineskip}
+\@tempdima\textwidth \advance\@tempdima by-\paspconf@frontindent
+\hfill
+\parbox{\@tempdima}
+{\pretolerance=10000\raggedright{\it #1}}\par}
+
+% Affiliation format, font, etc.:
+\def\altaffilmark#1{$^{#1}$}
+\def\altaffiltext#1#2{\footnotetext[#1]{#2}}
+
+% Abstract format
+\def\abstract{\vspace*{1.3\baselineskip}\bgroup\leftskip\paspconf@frontindent
+\noindent{\bf\sec@upcase{\small Abstract.}}\hskip 1em\small}
+\def\endabstract{\par\egroup\vspace*{1.4\baselineskip}}
+
+% Distance of first footnote from bottom of text.
+\skip\footins 4ex plus 1ex minus .5ex
+
+% Separation between footnotes:
+\footnotesep 3ex
+
+% Format the footnotes:
+\long\def\@makefntext#1{\noindent\hbox {\hss$^{\@thefnmark}$}\hspace{0ex}#1} % No space between footnote mark and following text.
+
+\def\tablenotemark#1{\rlap{$^{#1}$}}
+\def\tablenotetext#1#2{
+\@temptokena={\vspace{.5ex}{\noindent\llap{$^{#1}$}#2}\par}
+\@temptokenb=\expandafter{\tblnote@list}
+\xdef\tblnote@list{\the\@temptokenb\the\@temptokena}}
+\def\spewtablenotes{
+\ifx\tblnote@list\@empty
+\else
+\let\@temptokena=\tblnote@list
+\xdef\tblnote@list{\@empty}
+\vspace{4.5ex}
+\footnoterule
+\vspace{.5ex}
+{\footnotesize\@temptokena}
+\fi}
+\newtoks\@temptokenb
+\def\tblnote@list{}
+\def\endtable{\spewtablenotes\end@float}
+\@namedef{endtable*}{\spewtablenotes\end@dblfloat}
+\let\tableline=\hline
+\def\thefigure{\@arabic\c@figure}
+\def\fnum@figure{\small Figure \thefigure.}
+\def\thetable{\@arabic\c@table}
+\def\fnum@table{\small Table \thetable.}
+\long\def\@makecaption#1#2{
+\vskip 10pt
+\setbox\@tempboxa\hbox{#1\hskip 1.5em #2}
+\let\@tempdima=\hsize \advance\@tempdima by -2em
+\ifdim \wd\@tempboxa >\@tempdima
+	{\leftskip 2em
+	#1\hskip 1.5em #2\par}
+\else
+	\hbox to\hsize{\hskip 2em\box\@tempboxa\hfil}
+\fi}
+\def\fps@figure{tbp}
+\def\fps@table{htbp}
+\let\keywords=\@gobble
+\let\subjectheadings=\@gobble
+\setcounter{secnumdepth}{3}
+
+\def\upper{\def\sec@upcase##1{\uppercase{##1}}}
+\def\sec@upcase#1{\relax#1}
+\def\section{\@startsection {section}{1}{\z@}{-4.2ex plus -1ex minus -.2ex}{2.2ex plus .2ex}{\normalsize\bf}}
+\def\subsection{\@startsection{subsection}{2}{\z@}{-2.2ex plus -1ex minus -.2ex}{1.1ex plus .2ex}{\normalsize\bf}}
+\def\subsubsection{\@startsection{subsubsection}{3}{\z@}{-2.2ex plus -1ex minus -.2ex}{1.1ex plus .2ex}{\normalsize\bf}}
+\def\altsubsubsection{\@startsection{subsubsection}{3}{\z@}{-2.2ex plus -1ex minus -.2ex}{-1.2em}{\normalsize\it}}
+
+\def\inlinesubsubsection#1{
+	\def\thesubsubsection{\hskip -1em}
+	\altsubsubsection{#1}
+	\def\thesubsubsection{\thesubsection.\@arabic\c@subsubsection}
+}
+
+\def\thesection{\@arabic\c@section}
+\def\thesubsection{\thesection.\@arabic\c@subsection}
+\def\thesubsubsection{\thesubsection.\@arabic\c@subsubsection}
+\def\@sect#1#2#3#4#5#6[#7]#8{%
+	\ifnum #2>\c@secnumdepth
+		\def\@svsec{}
+	\else
+		\refstepcounter{#1}\edef\@svsec{\csname the#1\endcsname.\hskip 1em }
+	\fi
+	\@tempskipa #5\relax
+	\ifdim \@tempskipa>\z@
+		\begingroup #6\relax
+		\@hangfrom{\hskip #3\relax\@svsec}{\interlinepenalty \@M \sec@upcase{#8}\par}%
+		\endgroup
+		\csname #1mark\endcsname{#7}
+	\else
+		\def\@svsechd{#6\hskip #3\@svsec #8\csname #1mark\endcsname
+		{#7}.
+		}
+	\fi
+	\@xsect{#5}
+}%
+
+\def\@ssect#1#2#3#4#5{%
+  \@tempskipa #3\relax
+  \ifdim \@tempskipa>\z@
+    \begingroup #4\@hangfrom{\hskip #1}{\interlinepenalty \@M \sec@upcase{#5}\par}\endgroup
+  \else 
+    \def\@svsechd{#4\hskip #1\relax #5.}
+  \fi
+  \@xsect{#3}
+}%
+  
+\def\acknowledgments{%
+  \@startsection{paragraph}{4}{1em}{1ex plus .5ex minus .5ex}{-1em}{\bf}{\sec@upcase{Acknowledgments}}
+}%
+
+\usepackage{natbib}
+\bibpunct[, ]{(}{)}{;}{u}{}{,}
+
+\let\acknowledgements=\acknowledgments			
+\def\qanda@heading{Discussion}
+\newif\if@firstquestion \@firstquestiontrue
+\newenvironment{question}[1]{\if@firstquestion
+\section*{\qanda@heading}\global\@firstquestionfalse\fi
+\par\vskip 1ex
+\noindent{\it#1\/}:}{\par}
+\newenvironment{answer}[1]{\par\vskip 1ex
+\noindent{\it#1\/}:}{\par}
+\def\last{\newif\if@firstquestion \@firstquestiontrue}
+
+\def\mathwithsecnums{
+\@newctr{equation}[section]
+\def\theequation{\hbox{\normalsize\arabic{section}-\arabic{equation}}}}
+\def\references{\small\section*{References}
+\small\bgroup\parindent=0pt\parskip=.5ex
+\def\refpar{\par\hangindent=3em\hangafter=1}}
+\def\endreferences{\refpar\egroup}
+\def\thebibliography{\small\section*{\small References}
+\list{\null}{\leftmargin 3em\labelwidth 0pt\labelsep 0pt\itemindent -3em
+\itemsep 0pt \parsep 0pt\usecounter{enumi}}
+\def\refpar{\relax}
+\def\newblock{\hskip .11em plus .33em minus .07em}
+\sloppy\clubpenalty4000\widowpenalty4000
+\sfcode`\.=1000\relax}
+\def\endthebibliography{\endlist}
+\def\@biblabel#1{\relax}
+\def\@cite#1#2{#1\if@tempswa , #2\fi}
+\def\reference{\relax\refpar}
+\def\@citex[#1]#2{\if@filesw\immediate\write\@auxout{\string\citation{#2}}\fi
+\def\@citea{}\@cite{\@for\@citeb:=#2\do
+{\@citea\def\@citea{,\penalty\@m\ }\@ifundefined
+{b@\@citeb}{\@warning
+{Citation `\@citeb' on page \thepage \space undefined}}%
+{\csname b@\@citeb\endcsname}}}{#1}}
+\let\jnl@style=\rm
+\def\ref@jnl#1{{\jnl@style#1\/}}
+\def\aj{\ref@jnl{AJ}}			
+\def\araa{\ref@jnl{ARA\&A}}		
+\def\apj{\ref@jnl{ApJ}}			
+\def\apjl{\ref@jnl{ApJ}}		
+\def\apjs{\ref@jnl{ApJS}}		
+\def\ao{\ref@jnl{Appl.Optics}}		
+\def\apss{\ref@jnl{Ap\&SS}}		
+\def\aap{\ref@jnl{A\&A}}		
+\def\aapr{\ref@jnl{A\&A~Rev.}}		
+\def\aaps{\ref@jnl{A\&AS}}		
+%LR: 4/13/07 added defintion for ASP Conf. Ser. citation
+\def\aspcs{\ref@jnl{ASP Conf.~Ser.)}}
+\def\azh{\ref@jnl{AZh}}			
+\def\baas{\ref@jnl{BAAS}}		
+\def\ion#1#2{{\rm #1}~{\sc #2}}
+\def\jrasc{\ref@jnl{JRASC}}		
+\def\memras{\ref@jnl{MmRAS}}		
+\def\mnras{\ref@jnl{MNRAS}}
+\def\nat{\ref@jnl{Nat}}		
+\def\pra{\ref@jnl{Phys.Rev.A}}		
+\def\prb{\ref@jnl{Phys.Rev.B}}		
+\def\prc{\ref@jnl{Phys.Rev.C}}		
+\def\prd{\ref@jnl{Phys.Rev.D}}		
+\def\prl{\ref@jnl{Phys.Rev.Lett}}	
+\def\pasp{\ref@jnl{PASP}}		
+\def\pasj{\ref@jnl{PASJ}}		
+\def\qjras{\ref@jnl{QJRAS}}
+\def\science{\ref@jnl{Sci}}		
+\def\skytel{\ref@jnl{S\&T}}		
+\def\solphys{\ref@jnl{Solar~Phys.}}	
+\def\sovast{\ref@jnl{Soviet~Ast.}}	
+\def\ssr{\ref@jnl{Space~Sci.Rev.}}	
+\def\zap{\ref@jnl{ZAp}}			
+\let\astap=\aap
+\let\apjlett=\apjl
+\let\apjsupp=\apjs
+\def\deg{\hbox{$^\circ$}}
+\def\sun{\hbox{$\odot$}}
+\def\earth{\hbox{$\oplus$}}
+\def\la{\mathrel{\hbox{\rlap{\hbox{\lower4pt\hbox{$\sim$}}}\hbox{$<$}}}}
+\def\ga{\mathrel{\hbox{\rlap{\hbox{\lower4pt\hbox{$\sim$}}}\hbox{$>$}}}}
+\def\sq{\hbox{\rlap{$\sqcap$}$\sqcup$}}
+\def\arcmin{\hbox{$^\prime$}}
+\def\arcsec{\hbox{$^{\prime\prime}$}}
+\def\fd{\hbox{$.\!\!^{\rm d}$}}
+\def\fh{\hbox{$.\!\!^{\rm h}$}}
+\def\fm{\hbox{$.\!\!^{\rm m}$}}
+\def\fs{\hbox{$.\!\!^{\rm s}$}}
+\def\fdg{\hbox{$.\!\!^\circ$}}
+\def\farcm{\hbox{$.\mkern-4mu^\prime$}}
+\def\farcs{\hbox{$.\!\!^{\prime\prime}$}}
+\def\fp{\hbox{$.\!\!^{\scriptscriptstyle\rm p}$}}
+\def\micron{\hbox{$\mu$m}}
+\def\onehalf{\hbox{$\,^1\!/_2$}}	
+\def\onethird{\hbox{$\,^1\!/_3$}}
+\def\twothirds{\hbox{$\,^2\!/_3$}}
+\def\onequarter{\hbox{$\,^1\!/_4$}}
+\def\threequarters{\hbox{$\,^3\!/_4$}}
+\def\ubv{\hbox{$U\!BV$}}		
+\def\ubvr{\hbox{$U\!BV\!R$}}		
+\def\ubvri{\hbox{$U\!BV\!RI$}}		
+\def\ubvrij{\hbox{$U\!BV\!RI\!J$}}		
+\def\ubvrijh{\hbox{$U\!BV\!RI\!J\!H$}}		
+\def\ubvrijhk{\hbox{$U\!BV\!RI\!J\!H\!K$}}		
+\def\ub{\hbox{$U\!-\!B$}}		
+\def\bv{\hbox{$B\!-\!V$}}		
+\def\vr{\hbox{$V\!-\!R$}}		
+\def\ur{\hbox{$U\!-\!R$}}		
+\newcount\lecurrentfam
+\def\LaTeX{\lecurrentfam=\the\fam \leavevmode L\raise.42ex
+\hbox{$\fam\lecurrentfam\scriptstyle\kern-.3em A$}\kern-.15em\TeX}
+%\def\plotone#1{\centering \leavevmode
+%\epsfxsize=.95\textwidth \epsfbox{#1}}
+%%NEXT 6 LINES ADDED BY LISA ROPER 1/1/08, TAKEN FROM ADASS V ADAPTATION BY J. BARNES, 7/30/95 
+%%found at iraf.noao.edu/iraf/ftp/iraf/conf/adass-95/proc/aspconf.doc,
+%%modified in adassconf2006.sty in ASPCS Vol. 376 
+\@ifundefined{epsfbox}{\@input{epsf.sty}}{\relax}
+\def\eps@scaling{.95}
+
+\newcommand{\epsscale}[1]{%
+  \def\eps@scaling{#1}
+}%
+
+\newcommand{\plotone}[2][width=.95\textwidth]{%
+  \centering 
+  \leavevmode  
+  \includegraphics[#1]{#2}
+}%
+
+\newcommand{\plottwo}[2]{%
+  \centering 
+  \leavevmode
+  \includegraphics[width=.45\textwidth]{#1}%
+  \hfil
+  \includegraphics[width=.45\textwidth]{#2}%
+}%
+
+\newcommand{\plotthree}[3]{%3
+  \centering 
+  \leavevmode  
+  \includegraphics[width=0.3\textwidth]{#1}% 
+  \hfil
+  \includegraphics[width=0.3\textwidth]{#2}%
+  \hfil 
+  \includegraphics[width=0.3\textwidth]{#3}% 
+}%
+
+\newcommand{\plotfour}[4]{%
+  \centering 
+  \leavevmode
+  \includegraphics[width=.45\textwidth]{#1}%
+  \hfil
+  \includegraphics[width=.45\textwidth]{#2}%
+  \vspace{1ex}
+  \includegraphics[width=.45\textwidth]{#3}%
+  \hfil
+  \includegraphics[width=.45\textwidth]{#4}%
+}%
+
+\newcommand{\plotfiddle}[7]{%
+  \centering
+  \leavevmode
+  \vbox to#2{\rule{0pt}{#2}}
+  \special{psfile=#1 voffset=#7 hoffset=#6 vscale=#5 hscale=#4 angle=#3}
+}%
+
+\newif\if@finalstyle \@finalstyletrue
+\if@finalstyle
+  \ps@myheadings		
+  \let\ps@title=\ps@paspcstitle	
+\else
+  \ps@plain			
+  \let\ps@title=\ps@plain	
+\fi%
+\ds@twoside
+
+%\renewcommand{\cleardoublepage}{%
+%  \clearpage
+%  \if@twoside 
+%  \ifodd \c@page
+%  \else% 
+%    \hbox{}% 
+%    \thispagestyle{empty} 
+%    \newpage% 
+%    \if@twocolumn
+%      \hbox{}
+%      \newpage
+%    \fi
+%  \fi
+%\fi}
+
+% Added 7/11/06 by Jared
+% Modified 2/18/09 by Jonathan
+\renewcommand\part{%
+  \typeout{(ASP) Part Begin: \arabic{page}}%
+  \thispagestyle{empty}
+	\markboth{}{}
+  \if@openright
+    \cleardoublepage
+  \else
+    \clearpage
+  \fi
+  \thispagestyle{empty}
+  \if@twocolumn
+    \onecolumn
+    \@tempswatrue
+  \else
+    \@tempswafalse
+  \fi
+  \null\vfil
+  \typeout{(ASP) Part End: \arabic{page}}%
+  \secdef\@asppart\@spart}%
+
+\def\@asppart[#1]#2{%
+    \ifnum \c@secnumdepth >-2\relax
+      \refstepcounter{part}%
+      \addtocontents{toc}{\protect\partline{#2}}%
+    \else
+      \addtocontents{toc}{\protect\unpartline{#2}}%
+    \fi
+    \markboth{}{}%
+    {\centering
+     \interlinepenalty \@M
+     \normalfont
+     \ifnum \c@secnumdepth >-2\relax
+       \huge\bfseries \partname\nobreakspace\thepart
+       \par
+       \vskip 20\p@
+     \fi
+     \Huge \bfseries #2\par
+    }%
+    \@endpart}%
+
+\newcommand\tocentry[2]{%
+	\addtocontents{toc}{\protect\tocline{#1}{#2}{\thepage}}
+}
+
+% For adjusting the number width in the table of contents
+\newcommand\tocnumwidth[1]{%
+  \ifx&#1&%
+	  \relax
+	\else
+    \renewcommand\@pnumwidth{#1}
+  \fi%
+}%
+
+\renewcommand\tableofcontents{%
+    \pagestyle{myheadings}%
+    %\title{}
+    \thispagestyle{plain}%
+    \parindent 0pt%
+    \markboth{Contents}{Contents}%
+    \Large{\bf Contents}\normalsize\vspace{0.5in}\linebreak%
+    \@starttoc{toc}%
+    }
+
+\def\tocline#1#2#3{\medskip\vbox{
+	\@dottedtocline{1}{\z@}{.4in}{#1}{#3}
+	\smallskip
+	\protect\@authortocline{1}{.4in}{#2}
+	}
+}
+
+\def\@authortocline#1#2#3{\vskip \z@ plus .2pt
+  {\leftskip #2\relax \rightskip \@tocrmarg
+   \parindent\z@\relax\@afterindenttrue
+   \interlinepenalty\@M
+   \leavevmode 
+   \@tempdimb\textwidth \advance\@tempdimb by-#2
+   \advance\@tempdimb by-\@tocrmarg
+   \parbox{\@tempdimb}{\pretolerance=10000\raggedright\small\sl#3}\par}}
+   
+\newcounter{tocpart}
+\newcounter{tocsect}[tocpart]
+\def\sectline#1{\stepcounter{tocsect}\vskip 3.5ex
+    {{\bf Section \Alph{tocsect}. #1}}\par\smallskip}
+%\def\unpartline#1{\stepcounter{tocpart}\vskip 5.5ex
+\def\unpartline#1{\vskip 5.5ex
+    {\bf #1}\par\bigskip}
+\def\sectline#1{\stepcounter{tocsect}\vskip 3.5ex
+    {{\bf Section \Alph{tocsect}. #1}}\par\smallskip}
+\def\partline#1{\stepcounter{tocpart}\vskip 5.5ex
+    {\bf \partname\ \Roman{tocpart}. #1}\par\bigskip}
+
+%\def\@sect#1#2#3#4#5#6[#7]#8{%
+%  \ifnum #3>\c@secnumdepth
+%    \let\@svsec\@empty
+%  \else
+%    \refstepcounter{#1}%
+%    \protected@edef\@svsec{\@seccntformat{#1}\relax}%
+%  \fi
+%  \@tempskipa #5\relax
+%  \ifdim \@tempskipa>\z@
+%    \begingroup
+%      #6{%
+%        \@hangfrom{\hskip #3\relax\@svsec}%
+%          \interlinepenalty \@M #8\@@par}%
+%    \endgroup
+%    \csname #1mark\endcsname{#7}%
+%  \else
+%    \def\@svsechd{%
+%      #6{\hskip #3\relax
+%      \@svsec #8}%
+%      \csname #1mark\endcsname{#7}%
+%    }%
+%  \fi
+%  \@xsect{#5}}
+
+\newcommand{\marginguide}{%
+  \watermark{\cropmark{0mm}{0mm}{9mm}{0mm}{115mm}}   % For Proofing:  Use this line to show margin guides
+}%
+
+\newcommand{\aspeditorialstaff}[0]{%
+  \begin{center}
+    {EDITORIAL STAFF\\}
+  \end{center}
+  \begin{center}
+    {\small
+    {\itshape Managing Editor:} Joseph Jensen\\
+    {\itshape Associate Managing Editor:} Jonathan Barnes\\
+    {\itshape Publication Manager:} Pepita Ridgeway\\
+    {\itshape Editorial Assistant:} Cindy Moody\\
+    {\itshape e-Book Specialist:} Bret Little\\
+    {\itshape Web Developer/Technical Consultant:} Jared M.\ Bellows\\
+    {\itshape \LaTeX\ Consultant:} T.\ J.\ Mahoney\\
+    }%
+  \end{center}
+}%
+
+\newcommand{\aspaddress}[0]{%
+  \begin{center}
+  {\small
+  MS 179, Utah Valley University, 800 W. University Parkway, Orem, Utah 84058-5999\\
+  Phone: 801-863-8804 \hspace{2em} E-mail: \url{aspcs@aspbooks.org}\\
+  E-book site: \url{http://www.aspbooks.org}\\
+  }%
+  \end{center}
+}%
+
+\newcolumntype{x}[1]{>{\centering\hspace{0pt}}p{#1}}%
+
+\newcommand{\asppubcommittee}[0]{%
+  \begin{center}
+    {PUBLICATION COMMITTEE\\}
+    \medskip
+  \end{center}
+  \begin{center}
+    {\small
+    \begin{tabular*}{1\textwidth}{x{6cm} p{0.1cm} x{6cm}} %x{5cm} x{5cm}}
+      {\centering Lynne Hillenbrand, Chair} & & Marsha J. Bishop\tabularnewline
+      {\scriptsize California Institute of Technology} & & {\scriptsize National Radio Astronomy Observatory}\tabularnewline
+      \tabularnewline
+      Daniela Calzetti & & Gary J.\ Ferland\tabularnewline
+      {\scriptsize University of Massachusetts} & & {\scriptsize University of Kentucky}\tabularnewline
+      \tabularnewline
+      Ed Guinan & & Luis Ho\tabularnewline
+      {\scriptsize Villanova University} & & {\scriptsize The Observatories of the Carnegie}\tabularnewline
+      {\scriptsize \ } & & {\scriptsize Institution of Washington}\tabularnewline
+      \tabularnewline
+      Scott J.\ Kenyon & & Doug Leonard\tabularnewline
+      {\scriptsize Smithsonian Astrophysical Observatory} & & {\scriptsize San Diego State University}\tabularnewline
+      \tabularnewline
+      Don McCarthy & & Ren\'e  Racine\tabularnewline
+      {\scriptsize The University of Arizona} & & {\scriptsize Universit\'e  de Montr\'eal}
+    \end{tabular*}
+    }%
+    Ata Sarajedini\\{\scriptsize University of Florida}
+  \end{center}
+}%
+
+% Keyword LaTeX Marks
+\newcommand{\keyword}[1]{%
+  \@empty%
+}%
+
+% Title Footnote Macros
+\newcommand{\allowtitlefootnote}{%
+  \renewcommand{\thefootnote}{\fnsymbol{footnote}}
+}%
+
+\newcommand{\titlefootnote}[1]{%
+  \footnotetext{#1}
+  \renewcommand{\thefootnote}{\arabic{footnote}}
+  \setcounter{footnote}{0}
+}%
+
+% Format and deliver cover illustration info if it exists
+\newcommand{\providecoverinfo}{%
+  \ifx \@aspcoverinfo \@empty
+    \relax
+  \else
+    {\small \noindent {\itshape COVER ILLUSTRATION\/:}\\\hfill\\\blurb{}}
+  \fi%
+}%
+
+% Format and deliver meeting info if it exists
+\newcommand{\providemeetinginfo}{%
+  \ifx \@aspmtgtype \@empty
+    \relax
+  \else
+    \medskip
+    \begin{center}
+    {Proceedings of a \mtgtype{} held at\\
+    \venue{}\\
+    \when{}
+    }
+    \end{center}
+  \fi%
+}%
+
+% Format and deliver first editor info if it exists
+\newcommand{\provideeditorone}{%
+  \ifx \@aspeditorone \@empty
+    \relax
+  \else
+    \begin{center}
+    {\bfseries \firsteditor{}}\\
+    {\itshape \firstaffil{}}\\
+    \end{center}
+  \fi%
+}%
+
+% Format and deliver second editor info if it exists
+\newcommand{\provideeditortwo}{%
+  \ifx \@aspeditortwo \@empty
+    \relax
+  \else
+    \begin{center}
+    {\bfseries \secondeditor{}}\\
+    {\itshape \secondaffil{}}\\
+    \end{center}
+  \fi%
+}%
+
+% Format and deliver third editor info if it exists
+\newcommand{\provideeditorthree}{%
+  \ifx \@aspeditorthree \@empty
+    \relax
+  \else
+    \begin{center}
+    {\bfseries \thirdeditor{}}\\
+    {\itshape \thirdaffil{}}\\
+    \end{center}
+  \fi%
+}%
+
+% Format and deliver fourth editor info if it exists
+\newcommand{\provideeditorfour}{%
+  \ifx \@aspeditorfour \@empty
+    \relax
+  \else
+    \begin{center}
+    {\bfseries \fourtheditor{}}\\
+    {\itshape \fourthaffil{}}\\
+    \end{center}
+  \fi%
+}%
+
+% Format and deliver fifth editor info if it exists
+\newcommand{\provideeditorfive}{%
+  \ifx \@aspeditorfive \@empty
+    \relax
+  \else
+    \begin{center}
+    {\bfseries \fiftheditor{}}\\
+    {\itshape \fifthaffil{}}\\
+    \end{center}
+  \fi%
+}%
+
+% Convenient macros for preparing indexes
+\newcommand{\prepareindexes}{%
+  \makeindex
+  \newindex{not}{ndx}{nnd}{\Large List of Notation}
+  \newindex{aut}{adx}{and}{\Large Author Index}
+  \newindex{sub}{sdx}{snd}{\Large Subject Index}
+  \newindex{obj}{odx}{ond}{\Large Object Index}
+  \newindex{mol}{mdx}{mnd}{\Large Spectral Feature Index}
+}%
+
+\newcommand{\nindex}[1]{\index*[not]{#1}}
+\newcommand{\aindex}[1]{\index[aut]{#1}}
+\newcommand{\sindex}[1]{\index*[sub]{#1}}
+\newcommand{\ssindex}[1]{\index[sub]{#1}}
+\newcommand{\oindex}[1]{\index*[obj]{#1}}
+\newcommand{\ooindex}[1]{\index[obj]{#1}}
+\newcommand{\mindex}[1]{\index*[mol]{#1}}
+\newcommand{\nn}[1]{#1n}
+
+\newcommand{\printnotationlist}{%
+  \markboth{List of Notation}{List of Notation}
+  \tocentry{\itshape List of Notation}{}
+  \printindex[not]
+}%
+
+\newcommand{\printauthorindex}{%
+  \markboth{Author Index}{Author Index}
+  \tocentry{\itshape Author Index}{}
+  \printindex[aut]
+}%
+
+\newcommand{\printsubjectindex}{%
+  \markboth{Subject Index}{Subject Index}
+  \tocentry{\itshape Subject Index}{}
+  \printindex[sub]
+}%
+
+\newcommand{\printobjectindex}{%
+  \markboth{Object Index}{Object Index}
+  \tocentry{\itshape Object Index}{}
+  \printindex[obj]
+}%
+
+\newcommand{\printspectralindex}{%
+  \markboth{Spectral Feature Index}{Spectral Feature Index}
+  \tocentry{\itshape Spectral Feature Index}{}
+  \printindex[mol]
+}%
+
+% Convenient macro for preparing main matter
+\newcommand{\preparemainmatter}{%
+  \textwidth=5.25in 
+  \textheight=8.3in 
+  \headheight=18pt 
+  \headsep=18pt 
+  \topmargin=0in 
+  \footskip=.25in
+}%
+
+\renewcommand{\contentsname}{\Large Contents}
+
+% Convenient macro for resetting counters
+\newcommand{\resetcounters}{%
+  \setcounter{section}{0}
+  \setcounter{footnote}{0}
+  \setcounter{figure}{0}
+  \setcounter{table}{0}
+  \setcounter{equation}{0}
+  \pagestyle{myheadings}
+}%
+
+% Convenient macro for making a blank page
+\newcommand{\bookblankpage}{%
+  \newpage
+  \thispagestyle{empty}
+  \mbox{}
+  \vfill
+  \clearpage
+}%
+
+\newcommand{\removerunninghead}{%
+  \clearpage
+  \thispagestyle{empty}
+  \mbox{}
+  \pagebreak
+}%
+
+% Convenient file for participant list
+\def\attendee#1#2#3#4{\par{\samepage\hangindent 1.5em\def\@tempa{#2}
+  #1, #3, #4\ifx\@tempa\@empty\relax\else\space$\langle\,$#2$\,\rangle$\fi\par}}
+
+% Convenient image inclusion macros for adding images easier
+
+% For including a figure in an article
+% \articlefigure{filename}{labelname}{caption}
+\newcommand{\articlefigure}[4][width=.95\textwidth]{%
+  \begin{figure}[!ht]
+    \plotone[#1]{#2}%
+	  \ifx&#4&%
+	  	\typeout{(ASP) Missing Caption: \jobname, #2}
+	    \relax
+	  \else
+      \caption{#4}%
+    \fi%
+	  \ifx&#3&%
+	  	\typeout{(ASP) Missing Label: \jobname, #2}
+	  	\relax
+	  \else
+      \label{#3}%
+    \fi%
+  \end{figure}
+}%
+
+% For including a two figures side by side in an article
+% \articlefiguretwo{filename1}{filename2}{labelname}{caption}
+\newcommand{\articlefiguretwo}[4]{%
+  \begin{figure}[!ht]
+  \plottwo{#1}{#2}%
+	\ifx&#4&%
+		\typeout{(ASP) Missing Caption: \jobname, #1}
+	  \relax
+	\else
+    \caption{#4}%
+  \fi%
+	\ifx&#3&%
+	  \typeout{(ASP) Missing Label: \jobname, #1}
+	 	\relax
+	\else
+    \label{#3}%
+  \fi%
+  \end{figure}
+}
+
+% For including a three figures in an article
+% \articlefigurethree{filename1}{filename2}{filename3}{labelname}{caption}
+\newcommand{\articlefigurethree}[5]{%
+  \begin{figure}[!ht]
+  \plotthree{#1}{#2}{#3}%
+	\ifx&#5&%
+		\typeout{(ASP) Missing Caption: \jobname, #1}
+	  \relax
+	\else
+    \caption{#5}%
+  \fi%
+	\ifx&#4&%
+	  \typeout{(ASP) Missing Label: \jobname, #1}
+	 	\relax
+	\else
+    \label{#4}%
+  \fi%
+  \end{figure}
+}%
+
+% For including a four figures in a four by four square in an article
+% \articlefigurefour{filename1}{filename2}{filename3}{filename4}{labelname}{caption}
+\newcommand{\articlefigurefour}[6]{%
+  \begin{figure}[!ht]
+    \plotfour{#1}{#2}{#3}{#4}%
+	  \ifx&#6&%
+		  \typeout{(ASP) Missing Caption: \jobname, #1}
+	    \relax
+	  \else
+      \caption{#6}%
+    \fi%
+	  \ifx&#5&%
+	    \typeout{(ASP) Missing Label: \jobname, #1}
+	 	  \relax
+	  \else
+      \label{#5}%
+    \fi%
+  \end{figure}
+}%
+
+% For including a landscape figure in an article
+% Syntax:  \articlelandscapefigure{filename}{labelname}{caption}
+\newcommand{\articlelandscapefigure}[3]{%
+  \pagestyle{empty}
+  \mbox{}
+  \vfill
+  \begin{center}
+    \begin{landscape}
+      \begin{figure}[ht]
+        \includegraphics[height=0.92\textheight]{#1}%
+  	    \ifx&#3&%
+		      \typeout{(ASP) Missing Caption: \jobname, #1}
+	        \relax
+	      \else
+          \caption{#3}%
+        \fi%
+	      \ifx&#2&%
+	        \typeout{(ASP) Missing Label: \jobname, #1}
+	 	      \relax
+	      \else
+          \label{#2}%
+        \fi%
+      \end{figure}
+    \end{landscape}
+  \end{center} 
+  \vfill 
+  \pagebreak
+}%
+
+% For including two figures in a landscape figure side by side in an article
+% Syntax:  \articlelandscapefiguretwo{filename1}{filename2}{labelname}{caption}
+\newcommand{\articlelandscapefiguretwo}[4]{%
+  \pagestyle{empty}
+  \mbox{}
+  \vfill
+  \leavevmode
+  \begin{center}
+    \begin{landscape}
+    \begin{figure}
+      \begin{minipage}[b]{0.5\linewidth}
+        \centering
+        \includegraphics[width=0.9\linewidth]{#1}%
+      \end{minipage}
+      \hspace{0.5cm}
+      \begin{minipage}[b]{0.5\linewidth}
+        \centering
+        \includegraphics[width=0.9\linewidth]{#2}%
+      \end{minipage}
+  	  \ifx&#4&%
+		    \typeout{(ASP) Missing Caption: \jobname, #1}
+	      \relax
+	    \else
+        \caption{#4}%
+      \fi%
+	    \ifx&#3&%
+	      \typeout{(ASP) Missing Label: \jobname, #1}
+	 	    \relax
+	    \else
+        \label{#3}%
+      \fi%
+    \end{figure}
+    \end{landscape}
+  \end{center} 
+  \vfill 
+  \pagebreak
+}%
+
+% For including a figure
+% Syntax:  \bookfigure{filename}{caption}
+\newcommand{\bookfigure}[2]{%
+  \begin{figure}[!ht]
+    \plotone{#1}%
+  \end{figure}
+  \begin{center}
+    \small{#2}%
+  \end{center} 
+}%
+
+% For including a full page image
+% This command removes slug and page number
+% Syntax:  \bookfullphoto{filename}{caption}
+\newcommand{\bookfullphoto}[3][width=.95\linewidth]{%
+  \clearpage
+  \pagestyle{empty}
+  \mbox{}
+  \vfill
+  \begin{figure}[!ht]
+    \plotone[#1]{#2}%
+  \end{figure}
+  \begin{center}
+    \small{#3}% 
+  \end{center} 
+  \vfill 
+  \pagebreak
+}%
+
+% For including a full page landscape image
+% This command removes slug and page number
+% Syntax:  \booklandscapephoto[options]{filename}{caption}
+\newcommand{\booklandscapephoto}[3][height=0.85\textheight]{%
+  \pagestyle{empty}
+  \mbox{}
+  \vfill
+  \begin{center}
+    \begin{landscape}
+      \includegraphics[#1]{#2}\\
+      %~\\
+      \noindent
+      \small{#3}%
+    \end{landscape}
+  \end{center} 
+  \vfill 
+  \pagebreak
+}%
+
+% For including an image for part of a page
+% This command fills empty space with an editor's image
+% Syntax:  \bookpartphoto{filename}{caption}
+\newcommand{\bookpartphoto}[3][width=.95\linewidth]{%
+  \mbox{}
+  \vfill
+  \begin{figure}[!ht]
+    \plotone[#1]{#2}
+  \begin{center}
+    \small{#3}%
+  \end{center} 
+  \end{figure}
+  \vfill 
+}%
+
+% For simplifying table of contents and file include
+% Syntax:  \tocinsertentry[n or r]{Title}{Author}{Latex File}
+\newcommand{\tocinsertentry}[4][n]{%
+  \ifthenelse{\equal{#1}{r}}{%  Option for right side of the page specified
+    \clearpage
+    \ifodd\c@page
+    	\relax
+    \else
+      \null
+      \thispagestyle{empty}%
+      \newpage
+    \fi%
+  }{}%
+	\typeout{(ASP) Entry Begin: #1|#2|\arabic{page}|\jobname}
+	\tocentry{#2}{#3}
+	\ifx&#4&%
+		\typeout{(ASP) Missing file: #1}
+	\else
+		\include{#4}\last
+		\typeout{(ASP) Entry End: #1|#2|\arabic{page}|\jobname}		
+	\fi%
+}%
+
+% For simplifying table of contents and directly including files
+% Syntax:  \tocinclude{Latex File}
+\newcommand{\tocinclude}[2][n]{%
+  \ifthenelse{\equal{#1}{r}}{%  Option for right side of the page specified
+    \clearpage
+    \ifodd\c@page
+    	\relax
+    \else
+      \null
+      \thispagestyle{empty}%
+      \newpage
+    \fi%
+  }{}%
+  \include{#2}\last
+}%
+
+% For simplifying table of contents and including unnumbered labels
+% Syntax:  \tocinsertlabel{vspace}{Label}
+\newcommand{\tocinsertlabel}[2][0in]{%
+	  \addtocontents{toc}{\vspace{#1}}	
+		\addtocontents{toc}{\protect\unpartline{#2}}
+}%
+
+\newcommand{\tocinsertvspace}[1]{%
+	  \addtocontents{toc}{\vspace{#1}}	
+}%
+
+% For simplifying table of contents and including page breaks
+% Syntax:  \tocinsertnewpage
+\newcommand{\tocinsertnewpage}{%
+	\addtocontents{toc}{\newpage}
+}%
+
+% For making the bullet and dash marks into boxes
+% This command MUST be run between the \begin{itemize} and \end{itemize} commands.
+\newcommand{\checklistitemize}{%
+  \renewcommand{\labelitemi}{$\Box$}
+  \renewcommand{\labelitemii}{\scriptsize $\Box$}
+}%
+
+% For changing the line spacing value
+\newcommand{\changelinespacing}[1]{%
+  \renewcommand{\baselinestretch}{#1}
+}%
