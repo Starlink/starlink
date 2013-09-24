@@ -28,20 +28,23 @@
 *     the jobs within a task (using thrAddJob), the calling thread waits
 *     until all the jobs have been completed.
 *
-*     - thrGetWorkforce: Get a pointer to an existing workforce, or
-*       create a new one if no workforce currently exists.
+*     - thrAddJob: Tell the workforce about a specific job that forms
+*       part of the overall task.
 *     - thrCreateWorkforce: Create a new workforce with a given number
 *       of workers
 *     - thrDestroyWorkforce: Free all resources used by a workforce.
-*     - thrAddJob: Tell the workforce about a specific job that forms
-*       part of the overall task.
-*     - thrWait: Block the calling thread until all jobs that the
-*       workforce currently knows about have been completed.
+*     - thrGetWorkforce: Get a pointer to an existing workforce, or
+*       create a new one if no workforce currently exists.
 *     - thrJobWait: Block the calling thread until the next job has
 *       been completed.
+*     - thrThreadData: Returns an AST KeyMap associated with the running
+*       thread that can be used to store thread-speicific global data.
+*       workforce currently knows about have been completed.
+*     - thrWait: Block the calling thread until all jobs that the
+*       workforce currently knows about have been completed.
 
 *  Copyright:
-*     Copyright (C) 2008-2011 Science & Technology Facilities Council.
+*     Copyright (C) 2008-2013 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -119,6 +122,8 @@
 *     1-JUL-2013 (DSB):
 *        Allow the app to be run in a single thread (no workers) by
 *        specifying zero for the number of threads.
+*     23-SEP-2013 (DSB):
+*        Added thrThreadData.
 */
 
 
@@ -163,6 +168,9 @@ static FILE *fd = NULL;
 static int njob = 0;
 pthread_mutex_t fd_mutex = PTHREAD_MUTEX_INITIALIZER;
 static ThrWorkForce *singleton = NULL;
+pthread_once_t starlink_thr_globals_initialised = PTHREAD_ONCE_INIT;
+pthread_key_t starlink_thr_globals_key;
+
 
 /* Module Prototypes */
 /* ----------------- */
@@ -185,7 +193,8 @@ static void thr1PushListFoot( ThrJob *job, ThrJob **head, int *status );
 static void thr1PushListHead( ThrJob *job, ThrJob **head, int *status );
 static void thr1RemoveFromList( ThrJob *job, ThrJob **head, int *status );
 static void thr1ThreadLog_( const char *text, const char *colour, int ijob );
-
+static void thr1GlobalsCreateKey( void );
+static void thr1GlobalsDestroyKey( void *kmap );
 
 /* Public workforce-related functions */
 /* ---------------------------------- */
@@ -955,10 +964,13 @@ ThrWorkForce *thrGetWorkforce( int nworker, int *status ) {
 
 *  Arguments:
 *     nworker
-*        The number of threads to use if a new workforce is created. If
-*        this is zero, a NULL pointer is returned without error, in
-*        which case the app should be run in a single thread without any
-*        workers.
+*        If this value is negative, a NULL pointer is returned if no workforce
+*        exists on entry, and a pointer to the existing workforce is
+*        returned otherwise. If "nworker" is zero, a NULL pointer is
+*        always returned (in which case the app should be run in a single
+*        thread without any workers). If "nworker" is positive, it will
+*        be ignored if a workforce already exists, and will be used to
+*        specify the number of worker threads in the new workforce otherwise.
 *     status
 *        Pointer to the inherited status value.
 
@@ -976,7 +988,7 @@ ThrWorkForce *thrGetWorkforce( int nworker, int *status ) {
    creation in an AST "permanent memory" context, so that the memory
    allocated during the creation is not included in the list of active
    memory pointers reported by astCheckMemory/astFlushMemory. */
-   if( !singleton ) {
+   if( !singleton && nworker > 0 ) {
       astBeginPM;
       singleton = thrCreateWorkforce( nworker, status );
       astEndPM;
@@ -1104,6 +1116,74 @@ int thrJobWait( ThrWorkForce *workforce, int *status ) {
 /* Return the job identifier. */
    return result;
 }
+
+AstKeyMap *thrThreadData( int *status ) {
+/*
+*+
+*  Name:
+*     thrThreadData
+
+*  Purpose:
+*     Returns a KeyMap that can be used to hold thread-specific global data.
+
+*  Language:
+*     Starlink ANSI C
+
+*  Type of Module:
+*     C function
+
+*  Invocation:
+*     AstKeyMap *thrThreadData( int *status );
+
+*  Description:
+*     This function returns a pointer to an AST KeyMap that is associated
+*     with the running thread (each thread has a separate KeyMap). The
+*     KeyMap can be used to store values that need to be passed between
+*     functions within a thread, or that need to be retained between
+*     invocations.
+
+*  Arguments:
+*     status
+*        Pointer to the inherited status value.
+
+*  Notes:
+*     - The returned Keymap, plus any data still in it, is released when
+*     the thread terminates.
+*     - This function attempts to execute even if an error has already
+*     occurred.
+
+*-
+*/
+
+/* Local Variables: */
+   AstKeyMap *result = NULL;
+
+/* Ensure that the thread specific data key has been created. */
+   if( pthread_once( &starlink_thr_globals_initialised,
+                     thr1GlobalsCreateKey ) ) {
+      result = NULL;
+      fprintf( stderr, "Starlink THR package initialisation failed." );
+
+/* If the current thread does not yet have a thread-specific KeyMap to
+   hold thread data, create one now. */
+   } else if( ( result = pthread_getspecific( starlink_thr_globals_key ) )
+              == NULL ) {
+      result = astKeyMap( " ");
+      astExempt( result );
+
+/* Associate it with the thread specific data key. */
+      if( result && pthread_setspecific( starlink_thr_globals_key, result ) ) {
+         fprintf( stderr, "Starlink THR library failed to store Thread-Specific "
+                  "Data pointer." );
+         result = astAnnul( result );
+      }
+   }
+
+/* Return the KeyMap pointer. */
+   return result;
+
+}
+
 
 void thrWait( ThrWorkForce *workforce, int *status ) {
 /*
@@ -2793,6 +2873,59 @@ static void thr1ThreadLog_( const char *text, const char *colour, int ijob ) {
    }
    pthread_mutex_unlock( &fd_mutex );
 }
+
+
+
+
+
+
+
+
+static void thr1GlobalsCreateKey( void ) {
+/*
+*  Name:
+*     thr1GlobalsCreateKey
+
+*  Purpose:
+*     Create the thread specific data key used for accessing global data.
+
+*  Description:
+*     This function creates the thread-specific data key. It is called
+*     once only by the pthread_once function, which is invoked from the
+*     thrThreadData function.
+
+*  Returned Value:
+*     Zero for success.
+
+*/
+
+/* Create the key used to access thread-specific global data values.
+   Report an error if it fails. */
+   if( pthread_key_create( &starlink_thr_globals_key, thr1GlobalsDestroyKey ) ) {
+      fprintf( stderr, "thr: Failed to create Thread-Specific Data key" );
+   }
+
+}
+
+
+static void thr1GlobalsDestroyKey( void *kmap ) {
+/*
+*  Name:
+*     thr1GlobalsDestroyKey
+
+*  Purpose:
+*     Destroy the thread specific data (see thrThreadData).
+
+*  Description:
+*     This function is called when a thread dies. It frees the KeyMap
+*     returned by thrThreadData.
+
+*/
+
+   (void) astAnnul( (AstKeyMap *) kmap );
+}
+
+
 
 
 

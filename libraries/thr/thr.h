@@ -38,6 +38,7 @@
  */
 
 #include <pthread.h>
+#include "ast.h"
 
 /* Macros */
 #define THR__REPORT_JOB 1
@@ -118,5 +119,6 @@ void thrEndJobContext( ThrWorkForce *workforce, int *status );
 
 /* Prototypes for other public functions */
 int thrGetNThread( const char *env, int *status );
+AstKeyMap *thrThreadData( int *status );
 
 #endif
