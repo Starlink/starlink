@@ -1,0 +1,513 @@
+
+
+
+SCIENCE AND ENGINEERING RESEARCH COUNCIL                      SUN/60.5
+RUTHERFORD APPLETON LABORATORY
+SPACE & ASTROPHYSICS DIVISION
+
+Starlink Project                                             Issued by
+Starlink User Note 60.5
+
+                                                          P J Richards
+                                                         4 August 1987
+
+----------------------------------------------------------------------
+
+                    IRAS - Image analysis software
+                    ------------------------------
+
+
+
+1  INTRODUCTION
+
+This note describes software and data files provided to  analyse  IRAS
+image data.  It is not a complete self-contained package, but is meant
+to be used in conjuction with the other software packages available on
+Starlink.   To  make  these facilities available, the command IRASTART
+must be executed.  This can be done by inserting:
+
+        $ IRASTART
+
+into your LOGIN.COM file, or typing the same at  your  terminal.   The
+procedure  creates  symbols for the routines so they may be invoked by
+typing the command I_progname, eg I_CONTOUR.   Although  the  routines
+will  run outside DSCL, it is often easier to run them in DSCL so that
+ASPIC programs may also be used.
+
+Information on individual routines may be  found  using  the  IRASHELP
+command, eg
+
+        $ IRASHELP I_CONTOUR
+
+will give instructions on how to use I_CONTOUR.  A complete listing of
+help    information   can   be   obtained   by   printing   the   file
+IRASDIR:IRAS.HLP.  A summary of the programs available is given in the
+next section and in file IRASDIR:SUMMARY.LIS.
+
+
+
+2  SOFWARE SUMMARY
+
+The following programs are available:
+
+I_COMBINE      Combine several images into one.
+
+I_CONTOUR      Produce contour map in RA and DEC of an image.
+
+                                - 1 -
+SUN/60.5                                                        Page 2
+
+
+I_DESCR        Display descriptor items of an image on the terminal.
+
+I_PDESCR       Print descriptor items of an image on the lineprinter.
+
+I_FITSOUT      Write BDF files to FITS Format Tape.
+
+I_SQOREX       Squash or expand image by bilinear interpolation.
+
+
+They  fall  into  2  categories:   new  programs  and  modified  ASPIC
+programs.
+
+
+
+2.1  New Programs:  I_COMBINE And I_CONTOUR
+
+These two programs were written by Dr C J Hirst (UCL).   They  perform
+some  basic  operations on IRAS images:  namely those of combining the
+data from several observations to form a single image, displaying  the
+images  in  the form of contour maps on an RA and Dec grid, and making
+simple measurements such as the  position  and  flux  of  the  sources
+present.   Information  about  the  images  is  obtained from the FITS
+descriptors accompanying the images.  A detailed description of  these
+programs is given in section 5.
+
+
+
+2.2  Modified ASPIC Programs
+
+Some ASPIC programs have been found to be lacking in some respect when
+used   with   IRAS   images,   particularly  when  dealing  with  FITS
+descriptors.  The improvements, carried out by Dr Ken King  (RAL/UCL),
+are summarised below:
+
+I_DESCR         Allows all the descriptors of an image to be listed in
+                the correct order.
+
+I_PDESCR        Prints  all  the  descriptors  of  an  image  on   the
+                lineprinter.
+
+I_FITSOUT       Writes an image to tape in FITS format  which  can  be
+                read back using the ASPIC program FITSIN.
+
+I_SQOREX        A version of the ASPIC SIZE program SQORST which keeps
+                the  absolute  position  of  the edge of the image (as
+                defined by the centres of the edge pixels) constant.
+
+
+
+3  GALACTIC PLANE MAPS
+
+The programs I_COMBINE and I_CONTOUR can process Galactic  plane  maps
+
+                                - 2 -
+SUN/60.5                                                        Page 3
+
+
+(see  IRAS  Explanatory  Supplement  ,  pX-36).   All  the  facilities
+described in section 5 are available when processing these maps except
+that  the  coordinates are Galactic longitude and latitude rather than
+RA and Dec.
+
+
+
+4  DATA-SETS AVAILABLE
+
+There is a sub-directory of IRASDIR  with  logical  name  IRASDATADIR.
+This  contains  a  single  test  observation  of  the  PRPR (The PRime
+Photometric Reference source) obtained with the DPS60D macro processed
+to  give both FLUX and INTENSITY images.  A data file BGR.BDF can also
+be found in this directory.  This contains a pleasing  colour  look-up
+table  for  use  with  an  ARGS  display  device and the ASPIC program
+LUTREAD.  When possible, additional data sets will  be  included  here
+such  as  detector  beam  profiles  (point  spread  functions) and the
+transmission curves for the IRAS wavelength bands.
+
+
+
+5  DETAILED DESCRIPTION OF NEW SOFTWARE
+
+Some of the programs available are sufficiently complicated to warrant
+a detailed description.  Others are easy to use in conjuction with the
+IRASHELP facility and will not be mentioned here.
+
+
+
+5.1  I_COMBINE
+
+Combines 1 or more IRAS CPC,  Deep-Sky,  Skyflux,  Galactic  plane  or
+survey  co-add  maps  into  a  single  output  image.   It pays to use
+I_COMBINE on a single image, as subsequent uses of it will  be  faster
+on  the  'combined'  image  than on the original, especially for large
+images.  The current version of the program does  not  use  the  noise
+images that accompany the signal images; data from different images in
+overlapping regions are given equal weighting.  You are  prompted  for
+various  parameters  and can choose the default values when offered by
+typing <CR>.  The required responses to prompts are described below:
+
+IMAGE - The name of the .BDF  file  containing  the  IRAS  map  to  be
+     processed.   You  will  be  asked repeatedly for images until you
+     signify by a null response that they have all been  entered.   If
+     an image does not contain the required information in the form of
+     descriptors, you are given the option of specifying another image
+     that  does,  or  of  entering  the descriptors from the terminal.
+     (See Appendix A for the  meaning  and  format  of  the  necessary
+     descriptors).
+
+
+
+
+                                - 3 -
+SUN/60.5                                                        Page 4
+
+
+WHOLE - A value of TRUE produces a combined image just big  enough  to
+     include all the input images.  Alternatively, you can specify the
+     size and position of the combined image.  The  size  is  normally
+     expressed in arc minutes, but if negative values are entered they
+     will be  considered  to  be  a  number  of  pixels.   Using  this
+     facility,  together  with  a particular pixel size, allows you to
+     ensure  that,  for  example,  different  bands  of   a   deep-sky
+     observation  are  processed to cover exactly the same area of sky
+     with the same number of pixels to permit their division etc.
+
+SIZE - Here you select the pixel size  of  the  combined  image.   The
+     defaults  are based on the input pixel sizes and rotation angles,
+     but you may well want to use round numbers or force pixels to  be
+     square or some particular size.
+
+OUTPUT - The name of the .BDF file to hold the  combined  image.   Any
+     previous file of the same name will be overwritten.
+
+Since I_COMBINE does not create a noise image to accompany the  signal
+image  it  produces,  if  a  previously combined image is subsequently
+combined again with other images, the program assumes a weight for the
+previously  combined  image, based on the number of original images it
+contains.  Under some circumstances, such an assumption is perhaps not
+the  best.   This only occurs if an image previously combined from two
+or more others that do not completely overlap (ie are not repeats)  is
+subsequently  combined with other images that overlap it.  If there is
+a chance that such an image is being used, a warning message  will  be
+given.   The  error will probably not be significant, but if a warning
+message is issued it is advisable to combine all the  images  together
+in a single run of the program.
+
+
+
+5.2  I_CONTOUR
+
+Draws contour maps of IRAS images  and  allows  source  positions  and
+fluxes  to  be measured.  The map is provided with an RA and Dec grid,
+and the contours are calibrated in absolute  units.   There  are  many
+optional facilities which are described in detail below:
+
+IMAGE - The name of the .BDF  file  containing  an  IRAS  image.   The
+     process  will  be  quicker  if  the  image was written by program
+     I_COMBINE; if it wasn't, you will be  additionally  prompted  for
+     parameter  SIZE  as described for I_COMBINE.  This does not apply
+     to Sky Flux maps which can only  be  contoured  directly  with  a
+     fixed  pixel  size  to  provide  a  quick  look with a minimum of
+     processing time.  Source coordinates are only approximate in this
+     quick  look  mode, so it is essential to use program I_COMBINE to
+     extract  areas  of   interest   before   making   any   important
+     measurements  or  producing a hard copy; coordinates will then be
+     correct.
+
+
+                                - 4 -
+SUN/60.5                                                        Page 5
+
+
+SPECIAL - A response of TRUE here allows you to specify the values  of
+     several  parameters that would normally just take defaults.  They
+     are:
+
+     WHOLE - FALSE here just plots the area covered by the map.   TRUE
+          allows  any  other area of specified position and size to be
+          plotted.  For Sky Flux maps, it is important only to plot  a
+          reasonably  sized  area.  The whole map is 16 degrees square
+          and will take an extremely long time to plot; but  a  region
+          of,  say, 8 degrees square is quite practicable.  Of course,
+          if a larger pixel size (say 5')  was  specified,  the  whole
+          image  will  contain  fewer  pixels  and  plotting it all is
+          feasible.
+
+     LABELS - TRUE here results in labelled contours, FALSE does not.
+
+     EDGE - TRUE will mark on the contour map the  edge  of  the  area
+          actually containing data.
+
+     LINES - TRUE here means  the  RA  and  Dec  will  be  plotted  as
+          continuous lines across the map.  FALSE just puts tick marks
+          at the edges (except when the pole is included in the map).
+
+     SPACINGS - The spacings of the RA and Dec lines or ticks  can  be
+          changed.
+
+     OBJECTS - The positions of particular objects can  be  marked  on
+          the  map.   If you respond TRUE here, you will also be asked
+          for the name of a file containing the list of positions  (in
+          free format, 6 numbers to a line representing the RA and Dec
+          in Hours, Minutes, Seconds, Degrees, Minutes, Seconds).  The
+          first  line of the file can, optionally, consist of a single
+          number representing the epoch.  The actual value is ignored,
+          but this makes the file compatible with that accepted by the
+          CHART program.  A file name of TT represents your terminal.
+
+LEVELS - Here you specify the contour levels to be  plotted.   A  null
+     response  uses  all  default  levels,  a single value is taken to
+     represent the lowest contour level and subsequent  ones  will  be
+     chosen  automatically.   If  you  enter  two values, the first is
+     taken as the lowest contour level and the second  represents  the
+     multiplication factor for subsequent levels.  If you enter two or
+     three values and the second one is negative, the second value  is
+     then  taken  as  the difference between subsequent levels and the
+     third value, if present, is the total number of contour levels to
+     draw (up to a maximum of 40).
+
+TITLE - An optional character string to be written on  the  map.   The
+     title  is  also written to files FLUXES.LIS and OBJECTS.LIS which
+     keep a record of any fluxes measured and any  particular  objects
+     plotted  on  the  contour  map  (if  the  relevant  options  were
+     selected).
+
+                                - 5 -
+SUN/60.5                                                        Page 6
+
+
+DEVICE - The name of the graphics device on which to display the map.
+     With certain devices that are not specifically supported (such as
+     a  PERICOM  which  emulates  a  Tektronix  4010) you will have to
+     select the  graphics  screen  manually  before  any  plotting  is
+     attempted.   This  is  best  done  at  the  DEVICE  prompt before
+     pressing <CR>.
+     If a hard copy device is selected, you  will  also  be  asked  to
+     specify  a  particular  scale  for  the  map.  The default is the
+     largest that will fit on the page, so any value given should  not
+     be   greater   than   this.   Certain  devices  require  that  an
+     intermediate file be spooled to produce  the  map.   If  this  is
+     necessary,  the  program  will  inform  you.  If you have plotted
+     several maps to a hard copy device during one run of the program,
+     there  will  be  a separate version of the file to spool for each
+     map.
+
+FLUXES - You can choose to measure the fluxes and positions of sources
+     on  the  map just plotted.  Integrated fluxes are only meaningful
+     for INTENSITY maps, but peak fluxes can  be  measured  from  FLUX
+     maps.
+     In MANUAL mode, a cursor is displayed and you mark points  around
+     the  chosen  area  by  positioning the cursor and pressing a key.
+     You MUST START AT THE BOTTOM, move up one side of the area  until
+     you get to the top, then JUMP BACK DOWN TO THE BOTTOM and move up
+     the other side until you just pass the  top  position  previously
+     marked.   The  flux  in the enclosed area will then be calculated
+     and the position of peak flux marked.  You can  then  save  in  a
+     file the area just defined.
+     If  a  key  is  pressed  twice  at  the  same   cursor   position
+     (occasionally  three  presses  are necessary), the values printed
+     will be the RA and Dec of the cursor position  and  the  flux  at
+     that  point.   This  is very useful for measuring fluxes of point
+     sources on FLUX maps.  It can also be used  for  aborting  manual
+     mode before fully defining an area.
+     FILE mode uses an area previously defined  and  saved.   This  is
+     useful for repeating a measurement over exactly the same area for
+     different bands.
+     Some attempt is made to  remove  the  local  background  flux  by
+     subtracting  the  values in the strip around the edge of the area
+     (for integrated fluxes only, not peak fluxes).  If this strip  is
+     at  all  contaminated  by  a  neighbouring  source,  clearly  the
+     calculation will be grossly inaccurate.  It is  then  up  you  to
+     measure  a small piece of the map containing just background flux
+     and subtract it from the total flux after allowing for the number
+     of pixels used in the integration.
+     The size (FWHM) of the source is a  rough  measurement  only  and
+     should  be  disregarded unless the area contains only one, fairly
+     circular, source with just background flux around the edge of the
+     area.
+
+
+
+
+                                - 6 -
+SUN/60.5                                                        Page 7
+
+
+AGAIN - It is possible to plot the map again  without  re-running  the
+     program.  This is useful for getting the various parameters right
+     on a graphics terminal before changing  to  a  hard-copy  device.
+     NB:  Plotting can be interrupted at any time and control returned
+     to the AGAIN prompt by  pressing  CTRL/C.   This  is  useful  for
+     aborting  a  plot  when  the  wrong parameters have been selected
+     accidentally, but it also provides a way of returning control  to
+     the  terminal when a cursor has been requested on the ARGS and no
+     tracker-ball is present.
+
+If you have problems or comments concerning  I_CONTOUR  or  I_COMBINE,
+MAIL  RLVAD::PJR  on  Starlink, giving the date of your version of the
+program.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 7 -
+
+
+
+
+
+
+
+
+
+
+
+
+                              APPENDIX A
+
+                        FITS IMAGE DESCRIPTORS
+
+
+
+Each image has associated with it a set of  descriptors  that  provide
+information  about  the  size, position, orientation, units etc of the
+image.  They are of most importance to I_COMBINE and  I_CONTOUR  which
+must have access to certain information.  If an image does not contain
+the required descriptors,  you  will  be  prompted  for  them  at  the
+terminal.   Below  is  a list of the relevant ones with typical values
+and their meanings:
+
+Descriptor     Value          Meaning
+
+INSTRUME       CPC or SURVEY  The instrument used.
+
+CRVAL1         123.5221       The  RA  in  degrees  of  the  reference
+                              pixel.
+
+CRPIX1         17             The  reference  pixel  number   in   the
+                              X-direction.
+
+CRVAL2         -23.4505       The Dec  in  degrees  of  the  reference
+                              pixel.
+
+CRPIX2         18             The  reference  pixel  number   in   the
+                              Y-direction.
+
+CDELT1         0.008          The size of a pixel in  degrees  in  the
+                              X-direction.
+
+CROTA1         14.8543        The angle of rotation of  the  image  in
+                              degrees from the meridian.
+
+CDELT2         0.008          The size of a pixel in  degrees  in  the
+                              Y-direction.
+
+BZERO          0.0            The zero level  of  the  values  in  the
+                              image.   (True  value  =  value*BSCALE +
+                              BZERO)
+
+
+                                - 8 -
+FITS IMAGE DESCRIPTORS                                        Page A-2
+
+
+BSCALE         1.0E-4         The scale factor to be  applied  to  the
+                              values in the image.
+
+BLANK          -999999        The value  used  to  represent  a  blank
+                              (undefined) pixel.
+
+BUNIT          JY/SR          The units  of  the  image  values  after
+                              scaling.
+               JY/STER
+               MJY/SR
+               W/M**2/STER
+
+NB:  If you use any of the standard ASPIC programs to manipulate  IRAS
+images, you will find that the descriptors are not retained in any new
+images created.  As long as the new image is  the  same  size  as  the
+original,  you  can  use  program  CYDSCR  to  copy  the  whole set of
+descriptors to it.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 9 -

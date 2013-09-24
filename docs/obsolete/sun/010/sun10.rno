@@ -1,0 +1,611 @@
+.title SUN/10.3
+.set date 01,08,1986
+.autoparagraph
+.set paragraph 0,1,2
+.layout 3,2
+.page size 57,70
+.flags substitute
+.nofill
+.keep
+.justify
+SCIENCE#AND#ENGINEERING#RESEARCH#COUNCIL SUN/10.3
+RUTHERFORD#APPLETON#LABORATORY
+SPACE#_&#ASTROPHYSICS#DIVISION
+
+Starlink#Project Issued#by
+Starlink#User#Note#10.3
+
+.right;J R Gallop _& M D Lawden
+.right;$$date
+
+.fill
+.repeat 70,"-"
+.blank
+.centre;ARGSLIB - ARGS Subroutine Library
+.centre;---------------------------------
+.hl1 Introduction
+The ARGS FORTRAN-callable subroutine library "ARGSLIB" provides access to the
+following facilities in the ARGS:
+.ls "o"
+.le;allocate and optionally reset the ARGS - (SRINIT)
+.le;draw image - (SRPXP, SRPXI2)
+.le;draw filled rectangle - (SRBLOC)
+.le;alter colour table - (SRCOLS, SRCOL1)
+.le;buffer control - (SRSEND)
+.le;trackerball/cursor control - (ARGS__*)
+.els
+Some ARGS facilities are also available through the device-independent
+graphics system GKS (see ref [1]).
+
+In this note, the ARGS coordinate system used is 0 to 511 in each of x and y.
+(0,0) is bottom left and (511,511) is top right.
+A pixel value can be written at each point.
+
+The least  significant 8 bits of each value are used as an index to a colour
+table.
+The colour table can be altered at any time and any change has an effect on an
+image already present.
+Each entry in the table is a triad of intensity values in the range 0-255.
+These values represent the red, green and blue intensities which combine to
+create a particular colour.
+
+The image is contained in the ARGS pixel store and this is scanned in
+conjunction with the colour table by a video processor, which refreshes a
+colour monitor on which the image is visible.
+
+An ARGS is SELECTED by routine SRINIT using the logical name ARGS__DEVICE.
+A default value for this exists when the user logs in, but can be overridden:
+.lt
+
+	$ ASSIGN IDB0: ARGS_DEVICE
+
+.el
+The device names are set up by each Site Manager, but are normally IDA0:, IDB0:
+etc.
+
+An ARGS is ALLOCATED by routine SRINIT.
+The ARGS is released when the program stops, unless the program is broken into.
+If required, the ARGS can be allocated to your process indefinitely before
+running a program which calls SRINIT:
+.lt
+
+	$ ALLOC IDA0:
+
+.el
+Be sure to deallocate the ARGS you are using when you have finished with it:
+.lt
+
+	$ DEALLOC IDA0:
+
+.el
+Routine SRINIT must be called before any other routine in this package,
+otherwise all sorts of error messages will go to an obscure stream (probably
+zero).
+.hl1 Linking
+The library is available in shared and unshared forms.
+The shared library leads to smaller executable programs and is linked with as
+follows:
+.lt
+
+	$ LINK <prog>,ARGSOPT/OPT
+
+.el
+The unshared library is linked with as follows:
+.lt
+
+	$ LINK <prog>,@ARGSLIB
+
+.el
+.hl1 Errors
+Error messages from the package go to stream 6 if SRINIT is properly called.
+Error messages are of 3 sorts:
+.ls "o"
+.le;Those resulting from mistakes in the application program begin:
+
+*	ARGSLIB error
+
+and are followed by an error code, a text message and a list of
+auxiliary values.
+.le;Those resulting from some hardware or operating system event.
+These do not begin with a predefined text pattern, but each makes it obvious
+that it concerns the ARGS.
+.le;Those resulting from internal errors in ARGSLIB. These begin:
+
+*	ARGSLIB INTERNAL ERROR
+
+and continue with an error code and a list of auxiliary values.
+Such errors should be reported to Starlink User Support (RLVAD::STAR).
+.els
+Error messages in the first two classes are listed in Appendix B.
+.hl1 References
+[1] SUN/83 - GKS - Version 7.2
+.hl1 Subroutine specifications
+The routines are described in alphabetical order.
+The arguments are described in the order in which they must be supplied by the
+caller.
+An argument marked as 'entry' is one whose value(s) is/are significant on entry
+to the routine.
+An argument marked as 'exit' might be altered at some time during the execution
+of the routine.
+The ARGS__* routines have not yet been documented.
+However, the example program in Appendix C illustrates their use and should give
+enough information for them to be used properly.
+.page
+.c;SRBLOC - Draw filled rectangle
+.c;------------------------------
+.b 4
+DESCRIPTION
+.lm 8
+
+Fills a rectangle, whose sides are parallel to the axes, with one pixel value.
+.lm 0
+.b 4
+ARGUMENTS
+.spr -20
+.lm 28
+
+INTEGER X1,Y1 (entry)  - One corner of the rectangle to be drawn.
+
+INTEGER X2,Y2 (entry)  - Diagonally opposite corner of the rectangle.
+
+INTEGER Z     (entry)  - Pixel value to be used (range 0 to 255 inclusive).
+
+X1, Y1, X2 and Y2 should all be in the range 0 to 511 inclusive.
+.spr 0
+.lm 0
+.b 4
+EXAMPLE
+.lm 8
+
+Draw a red rectangle.
+.lt
+
+	CALL SRCOL1(15, 255,0,0)
+	CALL SRBLOC(200,200, 300,300, 15)
+	CALL SRSEND
+.el
+.lm 0
+.page
+.c;SRCOL1 - Change one entry in the colour table
+.c;---------------------------------------------
+.b 4
+DESCRIPTION
+.lm 8
+
+Puts red,green and blue intensities into one entry of the ARGS colour table.
+.b 4
+.lm 0
+ARGUMENTS
+.spr -20
+.lm 28
+
+INTEGER N (entry)  - Index of entry in colour table to be updated.
+Must be in range 0 to 255.
+
+INTEGER RED,GREEN,BLUE (entry) - Intensities of the 3 primary colours to be put
+into the table entry.
+Range of each intensity is 0 to 255.
+.spr 0
+.lm 0
+.b 4
+EXAMPLE
+.lm 8
+
+The example for SRBLOC includes a example of SRCOL1 being used.
+.lm 0
+.page
+.c;SRCOLS - Change all or part of the colour table
+.c;-----------------------------------------------
+.b4
+DESCRIPTION
+.lm 8
+
+Changes all or part of the ARGS colour table.
+.lm 0
+.b 4
+ARGUMENTS
+.spr -20
+.lm 28
+
+INTEGER FIRST (entry)  - Index of first entry in ARGS colour table to be
+altered.
+Range is 0 to 255.
+
+INTEGER N (entry)  - Number of entries in colour table to be altered.
+Range is 1 to 256.
+
+INTEGER COLOUR(3,N) (entry) - Colour array to be used to update the selected
+part of the ARGS colour table.
+COLOUR(1,x), COLOUR(2,x) and COLOUR(3,x) are the red, green and blue values
+respectively for colour table entry (FIRST-x+1).
+.spr 0
+.lm 0
+.b4
+EXAMPLE
+.lm 8
+.lt
+
+Define a grey scale.
+
+          INTEGER COLOUR(3,256)
+          DO J=1,256
+            K=J-1
+            COLOUR(1,J)=K
+            COLOUR(2,J)=K
+            COLOUR(3,J)=K
+          ENDDO
+          CALL SRCOLS(0,256,COLOUR)
+.el
+.lm 0
+.page
+.c;SRINIT - Allocate and optionally reset the ARGS
+.c;-----------------------------------------------
+.b 4
+DESCRIPTION
+.lm 8
+
+Allocates the ARGS identified by ARGS__DEVICE to your process.
+If required, the ARGS is reset: the pixel store is cleared and the colour table
+is reset.
+If a failure occurs (FAIL.NE.0), the remainder of the ARGS package can still be
+obeyed, but will not produce any more ARGS output.
+.b 4
+.lm 0
+ARGUMENTS
+.spr -20
+.lm 28
+
+INTEGER ARGSID (entry)  - Currently unused so any integer value can be put here.
+An ARGS is selected by the logical name ARGS__DEVICE.
+
+LOGICAL RESET (entry) -  If and only if RESET is .TRUE., reset the ARGS after
+allocating.
+
+INTEGER FAIL (exit)  - Failure code; 0 is OK.
+.spr 0
+.lm 0
+.b 4
+EXAMPLE
+.lm 8
+.lt
+
+Allocate the ARGS, but do not reset.
+
+       INTEGER FAIL
+       CALL SRINIT(0,.FALSE.,FAIL)
+       IF (FAIL.NE.0) THEN
+         WRITE (6,*) 'FAIL CODE FROM ALLOCATING ARGS IS',FAIL
+       ENDIF
+.el
+.lm 0
+.page
+.c;SRPXI2 - Draw image using unpacked values
+.c;-----------------------------------------
+.b 4
+DESCRIPTION
+.lm 8
+
+The pixel values in array PIXELS are transferred to the ARGS.
+The colour table is not altered.
+.b 4
+.lm 0
+ARGUMENTS
+.spr -20
+.lm 28
+
+INTEGER*2 PIXELS(D1,NY) (entry)  - Array containing the unpacked pixel values
+(each pixel is contained in one array element at the least significant end).
+The first subscript increases as the x-coordinate increases (going toward the
+right).
+The second subscript increases with the y-coordinate (going upwards).
+
+INTEGER D1 (entry)  - 1st dimension of PIXELS array.
+
+INTEGER NX,NY (entry)  - Number of pixels in NX and NY directions.
+
+INTEGER X,Y (entry)  - Position at which PIXELS(1,1) is placed.
+
+INTEGER BITS (entry)  - Number of bits in pixel value to be sent to the ARGS
+(must be power of 2 and between 1 and 16 inclusive).
+Anything other than 16, causes packing to take place internally.
+In the current version of the package, 16 can always be used even if the spread
+of pixel values would suggest a much smaller bit value.
+The high I/O rate to the ARGS ensures that the time taken to send a 16-bit image
+is smaller than the time the VAX takes to pack.
+
+LOGICAL OGICAL (entry)  - For the time being this should be .FALSE.
+
+INTEGER*2 WORK(DWORK) (exit)  - Array for workspace.
+This is used for the pixel packing.
+
+INTEGER DWORK (entry)  - Dimension of WORK.
+If no packing takes place (BITS=16), this can be 1.
+Otherwise it must be big enough to contain at least one row of pixels (ie at
+least NX/(16/BITS)+1).
+.spr 0
+.lm 0
+.b 4
+EXAMPLE
+.lm 8
+.lt
+
+Calculate pixel values, position image and transfer it to the ARGS.
+
+      INTEGER*2 PIXELS(512,512),DUMMY(1)
+      INTEGER OX,OY,FUNC
+        :
+        :
+      NX=400
+      NY=450
+
+*   Calculate pixel values using external function 'FUNC'
+      DO JY=1,NY
+        DO JX=1,NX
+          PIXELS(JX,JY)=MOD(FUNC(JX,JY),32768)
+        ENDDO
+      ENDDO
+
+*   Set the origin so the picture is centred
+      OX=(SIZE-NX)/2
+      OY=(SIZE-NY)/2
+
+*   Send to the ARGS
+      CALL SRPXI2(PIXELS,SIZE,NX,NY,OX,OY,16,.FALSE.,DUMMY,1)
+.el
+.page
+.lm 0
+.c;SRPXP - Draw image using packed values
+.c;--------------------------------------
+.b 4
+DESCRIPTION
+.lm 8
+
+The pixel values in array BUFF are transferred to the ARGS.
+The colour table is not altered.
+.b4
+.lm 0
+ARGUMENTS
+.spr -20
+.lm 28
+
+INTEGER*2 BUFF(DIM) (entry)  - Array containing the closely packed pixel values.
+The values are written to the ARGS pixel store from the least significant end of
+each INTEGER*2 element first.
+
+INTEGER NX,NY (entry)  - Number of pixels in X and Y directions respectively.
+This gives the size of the image.
+
+INTEGER X,Y (entry)  - X and Y coordinates of the bottom left corner of the
+rectangular array.
+This positions the image on the screen.
+
+INTEGER BITS (entry)  - Number of bits in pixel value (1,2,4,8 or 16).
+
+INTEGER DIM (entry)  - Size of array BUFF.
+.spr 0
+.lm 0
+.b 4
+EXAMPLE
+.lm 0
+.page
+.c;SRSEND - Output and clear buffer
+.c;--------------------------------
+.b 4
+DESCRIPTION
+.lm 8
+
+The contents of the ARGS buffer is built up by calls to the other routines.
+Some of these routines do not output this to the ARGS.
+SRSEND guarantees that this is done.
+The routines that output the buffer automatically are: SRCOLS, SRPXI2, and
+SRPXP.
+.lm 0
+.b 4
+ARGUMENTS
+.lm 8
+
+None.
+.lm 0
+.b 4
+EXAMPLE
+.lm 8
+
+Prepare a colour table and transfer it to the ARGS.
+.lt
+
+          N=127
+          DO J=1,N
+            CALL SRCOL1(J, J*2,J,0)
+          ENDDO
+          CALL SRSEND
+.el
+.lm 0
+.page
+.ax Names
+The global names used in this package are as follows:
+.ls "o"
+.le;public routines beginning with SR (described in this document)
+.le;internal subprograms beginning with ARGS__
+.le;internal subprograms beginning with GRP__
+.le;COMMON blocks of the form CARGSn (where n is an integer)
+.els
+.ax Error Messages
+.hl1 Errors in calling sequence
+These begin 'ARGSLIB error' and also contain an error code, a text message and
+a list of auxiliary values.
+.lt
+
+CODE ROUTINE            ERROR                        ARGUMENTS
+
+  1. SRBLOC   Rectangle corners are out of range.    X1,Y1,X2,Y2
+
+  2. SRBLOC   Z value is out of range.               Z
+
+  3. SRCOL1   Index of entry in colour table is      <-
+     SRCOLS   out of range. For SRCOLS, the
+              auxiliary values are the arguments
+              FIRST and N. For SRCOL1, only the
+              first auxiliary value is significant
+              and this is the faulty index.
+
+  4. SRCOL1   One or more of the R,G or B            R,G and B
+     SRCOLS   intensities for a particular table
+              entry is out of range.
+
+  5. SRPXI2   The number of bits is wrong.           Number of bits
+     SRPXP
+
+  6. SRPXP    The length of the pixel array is       NX,NY,BITS,DIM
+              insufficient to accommodate the
+              information specified.
+
+  7. SRPXI2   The length of the array provided       DWORK
+              by the caller to accommodate the     (NX-1)/(16/BITS)+1
+              workspace is not enough.
+.el
+.hl1 Hardware and Operating System events
+If an error is detected by the hardware or the operating system, a flag is set
+which prevents further system service calls to the ARGS until SRINIT is called
+again.
+This allows ARGSLIB routines to be executed without causing an encyclopaedia of
+error messages.
+
+(a) ASSIGNING ARGS ARGS__DEVICE
+.lm 8
+This is mainly for information.
+ARGS__DEVICE is the logical name used for the ARGS and SRINIT causes this
+message to be output before the VMS routine SYS_$ASSIGN is called.
+.lm 0
+
+(b) ARGS ALREADY ALLOCATED TO ANOTHER USER
+.lm 8
+ARGS device driver prevents use by 2 users simultaneously.
+SRINIT causes this message to be output after SYS_$ASSIGN has failed from this
+cause.
+.lm 0
+
+(c) ARGS OF THIS ID DOES NOT EXIST
+.lm 8
+Expansion of the logical name ARGS__DEVICE results in an unrecognised device
+name.
+Could be due to user error or due to device not being connected by the site
+manager.
+Device names normally used are __IDA0: or __IDB0:.
+This error could also be due to ARGS__DEVICE not having been set up as a logical
+name.
+.lm 0
+
+(d) FAILED TO ALLOCATE ARGS -- REPLY FROM SYS_$ASSIGN IS <code>
+.lm 8
+The SYS_$QIO(W) used to reset the ARGS has returned a failure code not
+recognised as corresponding to situations (b) or (c).
+.lm 0
+
+(e) FAILED TO RESET ARGS <code>
+.lm 8
+The SYS_$QIO(W) used to reset the ARGS has returned a failure code.
+.lm 0
+
+(f) FAILED TO SEND BUFFER TO ARGS <code>
+.lm 8
+Failure code from SYS_$QIO(W).
+.lm 0
+
+(g) RESULT OF ARGS SYSTEM SERVICE CALL IS .... <code>
+.lm 8
+This is output after some of the above messages. The code is the
+result of the system service call when considered as a function.
+.lm 0
+.ax Example program
+This program illustrates the use of some trackerball/cursor routines.
+The source code is stored in file LIBDIR:TBC.FOR and is reproduced below:
+.lm 8
+.lt
+
+
+      PROGRAM TBC
+
+*+
+*
+*  - - - - - -
+*  :  T B C  :
+*  - - - - - -
+*
+*
+*  TEST ARGS TRACKERBALL/CURSOR PACKAGE
+*
+*
+*  PTW/JUN-81
+*  ALTERED BY JRG AUGUST 1981
+*    REFERS ONLY TO SYSTEM CURSOR
+*
+*-
+
+
+*  ALLOCATE ARGS
+      CALL SRINIT(0,.FALSE.,JSTAT)
+      IF (JSTAT.NE.0) GO TO 9000
+
+*  ENABLE ONLY SYSTEM CURSOR
+      CALL ARGS_CURS('+')
+
+*  CENTRE CURSOR
+      CALL ARGS_CURP(0,255,255)
+
+*  SET CURSOR COLOUR
+      CALL ARGS_CURC('W')
+
+*  LOAD TRACKERBALL/CURSOR PROGRAM INTO ARGS
+      CALL ARGS_TBCL(0)
+
+*  SWITCH ON LAMPS
+      CALL ARGS_LAMPS(0,0,1,1)
+
+*  LOOP UNTIL BUTTON 4 PRESSED
+      IB4=0
+      NPOINT=0
+      DO WHILE (IB4.EQ.0)
+
+*     GET A CURSOR X,Y
+         CALL ARGS_TBCX(IX,IY,IB1,IB2,IB3,IB4)
+
+*     IF BUTTON 3 PRESSED DISPLAY X,Y
+         IF (IB3.NE.0) THEN
+            NPOINT=NPOINT+1
+            PRINT *,NPOINT,IX,IY
+         END IF
+      END DO
+
+*  SWITCH OFF LAMPS
+      CALL ARGS_LAMPS(0,0,0,0)
+
+*  DISABLE CURSOR
+      CALL ARGS_CURS('0')
+      CALL SRSEND
+
+*  EXIT
+      GO TO 9999
+
+*  ERRORS
+ 9000 CONTINUE
+      PRINT *,'ARGS ERROR'
+ 9999 CONTINUE
+      END
+
+.el
+.lm 0
+This program can be compiled, linked and run from your default directory as
+follows:
+.lm 8
+.lt
+
+$ FOR LIBDIR:TBC
+$ LINK TBC,ARGSOPT/OPT
+$ RUN TBC
+
+.el
+.lm 0
+When run, the cursor will appear and two buttons will light.
+The red button causes termination.
+The other button causes the position of the cursor to be output on the terminal.
+The cursor can be moved using the trackerball.

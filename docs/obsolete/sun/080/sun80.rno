@@ -1,0 +1,1544 @@
+.title SUN/80.2
+.set date 31,07,1986
+.autoparagraph
+.set paragraph 0,1,2
+.layout 3,2
+.page size 57,70
+.flags substitute
+.nofill
+.keep
+.justify
+SCIENCE#AND#ENGINEERING#RESEARCH#COUNCIL SUN/80.2
+RUTHERFORD#APPLETON#LABORATORY
+SPACE#_&#ASTROPHYSICS#DIVISION
+
+Starlink#Project Issued#by
+Starlink#User#Note#80.2
+
+.right;B C Stewart
+.right;$$date
+
+.fill
+.repeat 70,"-"
+.blank
+.centre;IRAS - Extended Emission and Pointed observation data: User Guide
+.centre;-----------------------------------------------------------------
+.hl1 Introduction
+Since the release of version .1 of this note, the IRAS Pointed
+Observations(AO's) and sky plate data from all 3 hours confirmations(HCON's)
+have become available, and various programs produced by the IRAS Post Mission
+Analysis Facility (IPMAF) have been updated.
+These changes to the IRAS image archive and IPMAF software are reflected in
+this document.
+In particular, systems for the retrieval of all AO's are now described.
+Further, some modifications to I__PICV are given is 5.2.
+The program now handles AO's, the galactic plane maps and the sky plates, and
+allows the display of the positions of IRAS sources and AO's on the images.
+
+The published IRAS data are
+.ls "o"
+.le;The catalogues of point and small sources.
+.le;The sets of surface brightness images of the whole sky (the Extended
+Emission data set).
+.le;The Chopped Photometric Channel (CPC) and survey array pointed observations.
+.els
+The IPMAF has been set up at the RAL STARLINK node to make these data readily
+available to the UK astronomical community via STARLINK.
+Jock Gourlay (X6478, RLVAD::JAG), Phil Richards (X6723, RLVAD::PJR) and Brian
+Stewart (X5548, RLVAD:BCS) are responsible for making the IRAS image data
+available and should be contacted if you wish to use these data.
+.hl1 The Extended Emission Data Set
+This data set has four components:
+.ls "o"
+.le;A set of 212 high resolution 'SKY Plates' covering the whole sky.
+.le;A set of 24 'Galactic Plane Maps' obtained by rebinning a subset of the SKY
+Plates.
+.le;A set of 2 'Low Resolution All Sky Maps' each covering the whole sky.
+One map is centred on the galactic centre and the other the anti-centre.
+.le;A Zodiacal Observation History File giving a time ordered history of the
+Zodiacal emission as seen by IRAS during the survey.
+.els
+For each of the Plates and Maps there are 4 sets of data (images) corresponding
+to the 4 IRAS wavebands of 12, 25, 60 and 100 microns.
+Further, the Sky Plate images each have an associated statistical weight image.
+These have not been generated for the Galactic Maps but could, in principle, be
+generated from those for the Sky Plates.
+
+The Extended Emission images are available both as photographic negatives and as
+digital data on tape.
+The negatives exist in two formats.
+The first has all four bands reproduced side by side in a rectangular format
+approximately 5 inches square which is intended for enlargement to prints 16
+inches by 20 inches.
+In order to display the whole dynamic range of the data the grey scale employed
+corresponds to the fifth root of the surface brightness.
+The second format is a colour composite representing the 100micron map in red,
+the 60micron map in green and the 12micron map in blue.
+Photographic negatives have been distributed to about 30 astronomical institutes
+in the UK (also see section 6.0).
+The digital data is available via RAL and section 4.0 describes the means of
+access.
+
+The IRAS survey covered most parts of the sky three times during the 10 months
+of data collection.
+Each of these coverages (HCON's) is distinct and is processed separately, this
+results in three sets of the image like products.
+The first two HCON's were of about 95% of the sky, the third of about 71%.
+All the Extended Emission products will be available at RAL.
+As of the date of this note, we have the complete sets of SKY Plates from
+HCON1, HCON2 and HCON3, the Galactic Plane maps from HCON1, and the Low
+Resolution Maps from all three HCONS.
+The remaining Galactic Plane data we expect in the next few months.
+
+Finally, the IRAS Explanatory Supplement describes in detail how the extended
+source products were derived from the IRAS raw data.
+.hl2 SKY Plates
+These are about 16.7 degrees square and have plate centres separated by 15
+degrees in Right Ascension and Declination.
+The plates nominally have 499 by 499, 2 arcmin.*2 arcmin., pixels.
+The quoted effective resolution is 6 arcmin.
+The data are presented in the Gnomonic projection which is described in the FITS
+header of each image (see 4.3.2 PREPRO).
+
+It should be remembered the images from a single survey will include moving
+objects and confirmation should be sought from 2 coverages before believing
+objects/structures etc are real (see also the Explanatory Supplement).
+
+The digital data at RAL are stored on 6250 bpi tapes.
+Each plate requires flux and statistical weight images to be stored for all 4
+of the IRAS bands.
+The images are stored in separate files, each tape holding the 64 images
+required by 8 plates.
+The plates from the 3 HCON's are stored on a total of 78 tapes.
+.hl2 Galactic Plane Maps
+These cover the band of sky within +/-10 degrees of the galactic plane.
+The maps are 16.7 by 20 degrees and have map centres separated by 15 degrees in
+galactic longitude.
+The maps nominally have 499 by 599, 2 arcmin.*2 arcmin., pixels.
+The rebinning gives some degradation of the 6 arcmin sky plate resolution.
+The maps are presented in the Lambert normal equivalent cylindrical projection
+which is described in the FITS header of each image (see 4.3.2 PREPRO).
+
+Again, 6250 bpi tapes are used for storage , each holding the 48 image files
+corresponding to 12 maps.
+This gives a total of 2 tapes for the 1st HCON data set.
+The associated statistical weight maps are not available directly but may, if
+needed, be derived from those for the SKY plates.
+.hl2 Zodiacal Observation History File
+For convenience in the analysis and treatment of background emission from
+interplanetary dust (zodiacal emission) and other extremely large scale
+emission features of the sky, the IRAS survey data was averaged to half degree
+square beam size and along with pointing information was preserved as a time
+ordered data set.
+These data are available as the Zodiacal Observation History Tape at RAL.
+However, the inclusion of the point sources in the averaging process makes these
+data very difficult to interpret and no software is currently planned to use
+them.
+.hl2 Low Resolution All Sky Maps
+These are derived from the Zodiacal Observation History File.
+They cover the whole sky and are centred on the galactic centre and anti-centre.
+The maps have 325 by 649 half degree pixels, the effective resolution being
+about a degree.
+The maps are in the Aitoff projection which is described in the FITS header of
+each image (see 4.3.2 PREPRO).
+Again the plates are available as digital data on tape at RAL.
+.hl1 The Pointed Observations data set
+During the ten month lifetime of IRAS, roughly 40% of the observing time was
+devoted to pointed observations of selected objects.
+Nearly 10,000 of these observations, also commonly called Additional
+Observations (AO's) were made of virtually every kind of astronomical object
+using either the survey array or the CPC.
+The survey array observations are described and listed in the 'Users's Guide to
+IRAS Pointed Observation Products' and those for the CPC in the 'IRAS-DAX
+Chopped Photometric Channel Explanatory Supplement'.
+The survey array observations are on a number of magnetic tapes, the 'User's
+Guide' lists the tape and file for each observation.
+The corresponding list for the CPC observations is in file CPCAOS.LIS on
+STARLINK.
+The 'Guide' and 'CPC Explanatory Supplement' have been circulated to
+Astronomical Institutions in the UK, however, if you do not have ready access to
+copies please contact B.Stewart at RAL.
+The lists of observations are also available on STARLINK as SCAR catalogues
+IAOD, CPCD and PIRO.
+.hl1 Access to IRAS Image data at RAL
+Astronomers requiring IRAS image data should come, at least in the first
+instance, to RAL and obtain these data using the facilities of the RAL STARLINK
+node.
+Arrangements for this should be made in advance with either Jock Gourlay (X6478,
+RLVAD::JAG), Phil Richards (X6723, RLVAD::PJR) or Brian Stewart (RLVAD::BCS) who
+will also be available to help visitors with any problems.
+
+It is assumed the typical user of these data products will require the small
+number of sky plates, galactic maps, or AO's covering his/her objects of
+interest.
+Overall, this is seen as being a four stage process:
+.ls
+.le;Logging in to the IRAS visitors directory.
+.le;Identifying the images containing the objects of interest and finding the
+tapes on which these are stored.
+.le;Copying the required images from tape to the STARLINK VAX and carrying out
+processing needed to make the images Starlink compatible.
+.le;Copying the required images from the VAX to the users own tape which he/she
+will take back to his/her own node.
+.els
+The steps in this process will produce listings which will be of value when
+displaying and analysing these data (see section 5).
+.hl2 Logging in
+The following procedure is required:
+.lt
+
+ VAX          USER                      Comments
+prompt        reply
+
+            return                Press return key to
+                                  wake the system up
+username:   IRASVIS
+password:   IRASVIS               This is subject to change and
+   :                              the current one can be obtained
+   :                              from B.Stewart, J.Gourlay or
+   :                              P.Richards
+   :
+   :
+directory   VIS1 or VIS2 or VIS3  These subdirectories are
+                                  available to visitors to RAL
+                                  for using the IRAS processing
+                                  facilities. Note, users wishing
+                                  to keep data should copy it to
+                                  tape as a subsequent user is
+                                  at liberty to erase any data he
+                                  finds left in these directories.
+$           DSCL                  All processing is carried
+                                  out using the facilities of the
+                                  STARLINK interim environment.
+DSCL>       prog. or              Programs and procedures may
+         procedure name           be executed until the user
+                                  has carried out all his
+                                  required processing.
+DSCL>       STOP                  Terminates DSCL if required
+$           LO                    Logout
+DSCL>       LO                    Will also logout
+.el
+.hl2 Image Identification
+The required AO images are best identified using the lists in the guide and
+supplement mentioned in 3.0 above.
+For SCAR users, there are catalogues (IAOD and PIRO) which contain both the
+lists and some additional information pertaining to each observation (eg noise
+estimates).
+
+Extended Emission plates/maps are most simply identified using the charts (fig
+4.2) and table (table 4.2) at the end of this document.
+These show the sky plate/galactic map boundaries and give the tape and file
+numbers on which each plate/map is stored.
+There is also a DSCL program I__SKYPOSN available which once entered prompts the
+user for object names and positions and returns a list of required plates.
+Table 4.2 gives the corresponding tape and file numbers.
+.hl2 Image extraction
+This requires the following steps for Extended Emission and survey array AO
+images
+.ls "o"
+.le;Using FITSIN to copy the required images to disc on the VAX.
+.le;Using PREPRO to convert the images to a form more suitable for processing
+using the STARLINK image analysis software.
+.le;Only for AO's, using I__COMBINE to convert the non square pixels to square
+pixels.
+.els
+CPC AO images require a modified extraction procedure because the images on tape
+are three dimensional, the third dimension being wavelength (the CPC operated at
+50 and 100 microns).
+.ls "o"
+.le;Using FITSIN to copy the required images to disc on the VAX.
+.le;Using CPREPRO to split the 3-D image into two 2-D images.
+.els
+The above extraction procedure is time consuming because it requires images to
+be written to and from disc.
+If the PREPROcessing is left to be done at the visitors home institution it is
+very much quicker to copy the required files directly from one tape to another
+using the STARLINK TPU utility (section 4.5).
+.hl3 FITSIN
+Having identified the required tape and files, the following procedure is run on
+the STARLINK VAX.
+.lt
+
+ VAX          USER                      Comments
+prompt        reply
+                                  Login and enter DSCL
+
+DSCL>       ALLOCATE MTB0: tape   Allocate the 6250 bpi
+DSCL>       MOUNT/FOREIGN    "    mag tape unit. Required
+                                  tape must then be mounted.
+DSCL>       FITSIN
+MTDECK:=    MTB0
+FILES:=     11,13,24-26           Files numbered 11,13,24,25,26
+                                  are to be copied. Mag .tape
+                                  unit skips down to beginning
+                                  of file 11 then prompts for
+OUTPUT:=    PLiBjHk(W)            the OUTPUT filename for the
+          or (GFiBjHk)            first file. Any name can be
+          or AOXNAME              used but the convention shown
+                                  is recommended for extended
+                                  emission images
+                                   PLi  SKY Plate i
+                                  (GFi) Galactic Map i
+                                   Bj   Band j where
+                                        1=12,2=25,3=60
+                                        and 4=100 microns
+                                   Hk   Hours confirmation
+                                        (survey) k
+                                   W    Set if weight image.
+                                  The program prompts for a
+                                  filename for each of the
+                                  output files.
+MORE:=      YES or NO             More files can be specified
+                                  if required. Otherwise NO
+                                  terminates the program run.
+DSCL>       DISMOUNT MTB0:        Frees tape unit for other
+DSCL>       DEALLOCATE MTB0:      users.
+
+.el
+The input magnetic tape should now be taken off drive MTB0.
+.hl3 I__PREPRO
+This requires the following procedure for each image file to be processed.
+.lt
+
+ VAX        USER                     Comments
+prompt      reply
+                                  Login and enter DSCL
+DSCL>       I_PREPRO
+IN:=        PLiBjHk(W)            Input and
+OUT:=       PiBjHk(W)             Output(processed) images.
+                                  (N.B. All Extended Emission and
+                                  AO Survey array images require
+                                  this processing)
+DSCL>
+
+.el
+This program has the following function:-
+.ls "o"
+.le;It flips Extended Emission images such that by default they are displayed
+with North up and East to the left.
+In addition, it modifies all the appropriate image descriptors.
+.els
+A listing of the image descriptors may be produced using I__PDESCR:
+.lt
+
+ VAX        USER                     Comments
+prompt      reply
+
+DSCL>       I_PDESCR
+IMAGE:=     PiBjHk(W)             Output(processed) image. A
+                                  lineprinter listing of the
+                                  descriptors is automatically
+                                  printed.
+DSCL>
+
+.el
+The descriptors give the image centre coordinates, its dimensions in pixels and
+degrees, its band and the surface brightness scale.
+Further, a comments section describes the image projection and gives some
+history of the image's production (table 4.3 gives the format of a SKY Plate
+FITS header).
+.hl3 I__COMBINE
+If survey array AO's are to be displayed on the STARLINK image display, they
+should first be processed with I__COMBINE to convert them to images with square
+pixels.
+.lt
+
+ VAX        USER                     Comments
+prompt      reply
+
+DSCL>      I_COMBINE
+IMAGE:=    AO name                AO image filename
+IMAGE:=    return                 For this use of I_COMBINE
+                                  no second image needs to be
+                                  specified
+
+  "Create the whole image or some other area?"
+
+WHOLE/T    return                 Default T(rue) means the whole
+                                  of the input image is contained
+                                  in the output image.
+
+  "Select output pixel size in arcmin,(X,Y)
+   (not less than 0.1')
+
+SIZE/x,y/:= z,z                   use the smaller of x,y as the
+                                  dimension for the square pixels
+
+  "Processing image 1.....                                  :"
+
+OUTPUT:=   AO out-name            Filename to be given to COMBINEd
+                                  image.
+DSCL>
+.el
+.hl3 I__CPREPRO
+This requires the following procedure for each CPC file to be processed.
+.lt
+
+ VAX        USER                     Comments
+prompt      reply
+                                  Login and enter DSCL
+DSCL>       I_CPREPRO
+IN:=        CPCAO                 Input and
+OUT50:=     CPCAO50               Output 50 & 100 micron
+OUT100:=    CPCAO100              images.
+
+'Writing descriptors...'
+
+'Starting image transformation..'
+
+'Image transformation completed.'
+
+DSCL>
+.el
+.hl2 Image storage
+Having produced the required images and background data, these are stored on
+tape using I__FITSOUT.
+.lt
+
+ VAX          USER                      Comments
+prompt        reply
+                                  Login and enter DSCL
+DSCL>       ALLOCATE MTAn: tape   Allocate a 1600 bpi mag tape
+DSCL>       MOUNT/FOREIGN   "     unit.(n = 0 or 1) Required
+                                  tape must then be mounted.
+DSCL>       I__FITSOUT
+MTDECK:=    MTA0(1)
+FILES:=     1-n                   n is the number of images
+                                  to be written to tape.
+            (or m-m+n)            where n images are appended
+                                  to a tape already holding
+                                  m-1 images.
+SIMPLE/T/:= return
+BITPIX/16/:=32                    Images are 32 bit
+INPUT:=     PiBjHk(W)             Image to be stored.
+                                  Program lists descriptors,
+                                  when image has been copied
+                                  to tape it prompts for
+                                  next image etc. until all
+                                  images have been copied.
+DSCL>       DISMOUNT MTA0(1):     Frees tape unit for other
+DSCL>       DEALLOCATE MTA0(1):   users.
+
+.el
+The output magnetic tape should now be taken off the drive.
+.hl2 The TPU Utility
+SUN/68 describes the tape processing facility TPU.
+This may be used to copy or append files from one tape to another.
+The following is a simple example of its use:
+.lt
+
+ VAX          USER                      Comments
+prompt        reply
+                                  Login
+$RUN UTILITYDIR:TPU
+
+     " *****  TPU - VAX/VMS Tape Processing Utility V3.2 ***** "
+
+Enter input tape drive>  MTB0     6250bpi tape deck for IRAS tapes
+
+     " The current tape density is 6250 "
+
+Enter Output tape drive> MTA0 or MTA1
+
+     " The current tape density is 1600 "
+
+** Enter TPU function>   DENS     Use this function to change output
+                                  tape density if different from 1600
+** Enter TPU function>   SKIP     Function used to skip down input
+                                  and/or output tapes
+     " Input, Output or Both "
+Enter number of records or files to skip > 3
+Enter type of skip > FF           An answer of ? will list options
+                                  FF is forward file skip.
+                                  The input tape will now be
+                                  positioned at the start of the
+                                  first file.
+** Enter TPU function> C2T2
+      No. of files/records ? default files
+          Files or records ? default files
+   Stop input parity error ? default no
+ Do you want to check data ? default no
+
+** Enter TPU function> WLEOT
+  " Input, Output, or Both " ?  O writes end of tape marker on
+                                Output Tape.
+** Enter TPU function> REWIND
+  " Input, Output, or Both " ?  B rewinds both tapes
+** Enter TPU function> EXIT
+  Exits from TPU if you no longer need the tape decks
+  Dismount and Deallocate them.
+
+.el
+.hl1 Image Analysis on STARLINK
+This section describes a small subset of the three hundred or so image analysis
+(ASPIC) programs available which have been found to be particularly useful for
+the display and analysis of IRAS image data.
+In addition, it describes IRAS specific utilities which have been developed.
+Obviously, this section is not exhaustive and will be of little interest to
+ASPIC experts, however it is hoped it will save a lot of time for those who are
+relative newcomers to STARLINK/ASPIC.
+
+ASPIC is more fully described in SUN/23, available at RAL from Mike Lawden
+(X5114).
+Further, the file IRASDIR:ASPSUM.LIS contains a summary of the available ASPIC
+software.
+
+The use of the current ASPIC package is seen only as an interim measure.
+Ken Hartley has revamped it making use of the Graphical Kernel System (GKS).
+The package is now being developed and tested by STARLINK at RAL.
+The new package collects together the more useful features of the old system and
+removes its many-fold duplication.
+Where necessary, the IRAS specific software will be modified by IPMAF for
+incorporation in this system when it becomes available.
+In the meantime it would be useful to have reports of individuals experience
+with the current system or any other software they may have access to; these
+should be sent to B.Stewart at RAL.
+
+The ASPIC programs described are considered under five headings:
+.ls "o"
+.le;Image display
+.le;Pixel coordinates and values
+.le;Image subsets and contours
+.le;Image cross-sections
+.le;Image annotation
+.els
+Finally the HELP facilities are outlined.
+.b1
+.hl2 Image Display
+The following describes how a number of the ASPIC basic programs are used to
+display an image.
+
+Initially ASPIC program ADISP is used to display an IRAS image on the ARGS
+colour graphics terminal.
+The following is the suggested procedure for running this program:
+.lt
+
+ VAX          USER                      Comments
+prompt        reply
+                                  Login and enter DSCL
+
+DSCL>       ARESET                Resets the ARGS which may have
+                                  been left in a peculiar state
+                                  by a previous user.
+DSCL>       ADISP
+IMAGE:=     PiBjHk(or GL or AO)   Name of image to be displayed
+XC/n/:=     return                Location of image on ARGS default
+YC/m/:=     return                (n,m) centres image on the screen.
+PVLO/x/:=   xx                    Pixel value corresponding to
+                                  0 in the ARGS colour table.
+                                  Convenient choices are 0 for
+                                  Extended Emission or CPC images
+                                  and
+                                      xx = DATAMIN/BSCALE
+                                  for survey array AO's
+PVHI/y/:=   return                Pixel value corresponding to
+                                  255 in the ARGS colour table. A
+                                  convenient choice is the default
+                                  (maximum) data value. In the case
+                                  of Extended Emission images I
+                                  have found 1e8 a useful value
+                                  for the images I have looked at.
+
+.el
+ADISP converts pixel values in the range PVLO to PVHI to ARGS values in the
+range 0 to 255 and stores them in the ARGS memory.
+Values below PVLO are set to 0, values above PVHI are set to 255.
+In addition to the pixel values, the ARGS holds a colour table which defines a
+colour for each of the 256 possible pixel values.
+The ARGS will always contain a colour table so that ADISP will invariably
+produce an image on the ARGS screen.
+However, the default colour table is unlikely to be entirely satisfactory so the
+following programs provide some means to display and modify it.
+The programs considered are ABLOCK, LUTGREY, LUTREAD, and LUTLIN.
+.lt
+
+ VAX        USER                     Comments
+prompt      reply
+
+DSCL>       ABLOCK
+XC/n/:=     return                Defaults display the colour
+YC/m/:=     return                table as a strip across the
+L/l/:=      return                top of the display.
+
+DSCL>       LUTGREY               Changes the colour table to
+                                  a grey scale. ARESET sets
+                                  this up as the default table.
+
+DSCL>       LUTREAD               This program allows any colour
+                                  table which may be available
+                                  to be used.
+LUT:=       filename              Name of file containing the
+                                  required colour table.
+                                  BGR gives a blue-green-red table,
+                                  BRYW a Blue-Red-Yellow-White one and
+                                  BGYRW  Blue-Green-Yellow-Red-White.
+DSCL>       LUTLIN  colour-table  This program uses the tracker
+                    (e.g BGR)     ball and buttons to alter the
+                                  colour table. If no colour
+                                  table is specified a greyscale
+                                  is used.
+
+OUTPUT:=    filename              The modified colour table
+            (or return)           may be stored in a file if
+                                  required then used subsequently
+                                  with LUTREAD.
+
+.el
+LUTLIN is a particularly powerful tool for emphasising a small part of the
+dynamic range of a displayed image.
+Using ADISP as described above, divides the flux range of the image up into 256
+equal ranges.
+Whatever the colour table, only a small number of these levels will be
+distinguishable so that features of interest in the image may be entirely
+unresolvable.
+As an example, we can consider the default grey scale where a pixel value 0
+corresponds to black and 255 to white with a 'linear' interpolation in between.
+The features of interest in an image may well be in a limited part of the pixel
+value range and appear as a nearly uniform shade of grey.
+It would be of great value to use the whole grey scale over this range and
+display values below it as black and those above as white.
+LUTLIN makes this possible under cursor control.
+The cursor is most conveniently used in conjunction with the ABLOCK display.
+The vertical cursor line is used to define the limits over which the grey scale
+is to be used.
+The tracker ball buttons have the following functions:
+.lt
+
+  Tracker Ball Button             Function
+
+       1-left           Log of colour table
+       2                Cursor position on ABLOCK scale
+                        sets lower pixel limit
+       3                Cursor position on ABLOCK scale
+                        sets upper pixel limit
+
+.el
+When any of the buttons are depressed, the colour table modification is nearly
+instantaneous.
+Of course the same effect could be achieved using ADISP and suitable values of
+PVLO and PVHI, but this is a much slower process.
+However, redisplaying will show up much more detail if using LUTLIN suggests
+only a very small part of the total dynamic range is of interest.
+.hl3 'ZOOM and PAN'
+A part of the image may be examined on a larger scale using the program APAN:
+.lt
+
+ VAX        USER                     Comments
+prompt      reply
+
+DSCL>       APAN                  This program allows the
+                                  image to be moved using the
+                                  tracker ball and enlarged
+                                  or reduced using the buttons.
+
+.el
+The tracker ball buttons have the following functions:
+.lt
+
+  Tracker Ball Button             Function
+
+       1-left           Resets the image centre and scale.
+       2                Reduces image scale by a factor of 2
+       3                Increases image scale by a factor of 2
+       4-right          Exit
+  Allowed magnification range is 1 to 16.
+.el
+.hl2 Pixel coordinates and values
+This section describes an IRAS specific program which has been written to allow
+RA, DEC positions to be identified on IRAS image data.
+Version 1.4 of the program may be used with sky plates, galactic plane maps, CPC
+AO's and any COMBINE'd images.
+The program also allows pixel values to be printed and provides an interface
+with the IRAS Point Source, Small Structure  and AO index Catalogues.
+The program writes some explanation of its DSCL prompts, these are enclosed in
+quotes.
+(NB this program will only work if an image has already been displayed.)
+.lt
+
+ VAX        USER                     Comments
+prompt      reply
+
+DSCL>     START_CAR               The program requires part
+                                  of the catalogue system
+                                  to be available namely the
+                                  ADCSHR shared image. (There
+                                  is a version of the program
+                                  I_PICVEX which does not have
+                                  the catalogues interface and
+                                  may be used if the SCAR
+                                  system is not available)
+DSCL>     I_PICV
+
+IN_IMAGE:=  PiBjHk(or GL or AO)   Name of image file
+
+'Single key         Function
+  Command
+     G          Generate RA,DEC Grid
+     P          Input/output Pixel RA,DEC
+     L          Positions from a List
+     C          Clear some/all overlays
+     S          Plot SCAR generated subset
+                catalogue
+     A          Access SCAR subset catalogue
+     E          Exit                         '
+
+OPT:=       G                     One of the possible options
+      (or P,L,C,S,A,E)            must be selected. These are
+                                  now considered in turn
+
+
+                                  The G(rid) option requires the
+DEC_INT:=   y                     RA and DEC grid intervals
+RA_INT:=    x                     (x,y) to be chosen. The
+                                  default for each is 2deg.
+                                  If a Galactic Plane map is
+                                  displayed the prompt is for L2
+                                  and B2 intervals.
+---------------------------------------------------------------------
+        or (P)                    The P(ixel) option allows small
+                                  areas of a sky flux image to be
+                                  listed. The program can write
+                                  the positions examined to a file.
+                                  This file may be used with the
+                                  L(ist) option in a subsequent
+                                  run of I_PICV to simplify access
+                                  to the data for the other bands.
+                                  This option works in L2,B2 if
+                                  a Galactic Plane map is being
+                                  displayed.
+
+' If you wish to store a list of the pixel positions
+  you access type a filename, otherwise type return'
+
+OUT_SRC:=   filename2             Name of file to which source
+                                  positions are to be written.
+                                  This may be used as an input
+                                  file for a subsequent run of
+                                  the  program  (see  L option
+                                  below).
+
+ '     Tracker Ball Buttons
+   Button           Function
+     1 left     Print pixel values
+     2          Input RA,DEC from keyboard
+     3          RA,DEC of cursor and centering
+                if depressed twice
+     4 right    EXIT     '
+                                  Button 1 depressed
+                                  ------------------
+'Give box size in pixels'
+NBOX:=      n                     Size of the required region.
+                                  n*n pixels are printed about
+                                  the  cursor  position.   The
+                                  maximum value of n is 11.The
+                                  cursor RA,DEC is also output.
+'Is this a background position?(y/n)'
+ANS:=       y/n                   If the answer is y(es) the
+                                  mean pixel value of this region
+                                  is subtracted from subsequent
+                                  regions
+
+                                  Button 2 depressed
+                                  ------------------
+'Input source RA in hrsmin (eg 1212.3)'
+RA:=        x
+'Input source DEC in degmin (eg 1212.3)'
+DEC:=       y                     Cursor moves to the position
+                                  with coordinates RA=x,DEC=y
+
+                                  Button 3 depressed
+                                  ------------------
+                                  Coordinates of cursor are output
+                                  to the terminal screen. If the
+                                  button is depressed a second
+                                  time and the cursor is within a few
+                                  pixels of a bright point source
+                                  the cursor will move to the
+                                  centre of that source
+
+
+---------------------------------------------------------------------
+        or (L)                    The L(ist) option requires
+                                  a source list file to be specified.
+                                  This will have been generated
+                                  in a previous run of the program.
+                                  This option offers a means of
+                                  looking at a number of positions
+                                  in all 4 bands without having to
+                                  type in the source coordinates
+                                  more than once.
+' Type input list filename '
+IN_SRC:=    filename              Name of previously generated source
+                                  file.
+' Do you wish to revise this position?(y/n)'
+ANS:=       y/n                   Option of looking at data from a
+                                  revised position.
+' Set cursor to revised position and press any tracker ball button'
+
+
+---------------------------------------------------------------------
+        or (C)                    The C(lear) overlay planes option
+                                  removes any/all of the image
+                                  annotation produced by the other
+                                  options
+
+' RA-DEC grid to be cleared(y/n)?
+ANS:=       y/n                   y(es) clears output of grid(G)
+                                  option.
+' Little boxes to be cleared(y/n)?'
+ANS:=       y/n                   y(es) clears output of pixel(P)
+                                  option.
+' Catalogue subset to be cleared(y/n)
+ANS:=       y/n                   y(es) clears output of subset(S)
+                                  option.
+
+
+---------------------------------------------------------------------
+        or (S)                    Plot SCAR generated subset
+                                  catalogue
+'Type in catalogue subset filename'
+SUBSET:=    SETn                  Name of catalogue subset. It is also
+                                  possible to answer IRPS (IRAS Point
+                                  Source Catalogue), ISSC (IRAS Small
+                                  Structure Catalogue) or IAOD (IRAS
+                                  AO Index Catalogue) to this prompt.
+                                  If IRPS or ISSC is input the
+                                  following prompt is obtained:-
+'Type in associations catalogue filename
+ AIPS for IRPS or ASSC for ISSC '
+SUBSET1:=   AIPS (or ASSC)        AIPS = Associations of IRPS
+                                  ASSC = Associations of ASSC
+                                  If the IRAS point source catalogue is
+                                  being plotted the source 'IDTYPEs'
+                                  are distinguished.
+
+                                     Symbol       IDTYPE  Association
+                                  Diagonal cross     1   Stellar
+                                  Vertical cross(+)  2   Extragalactic
+                                  Triangle apex up   3   Other
+                                  Triangle apex down 4   Multiple types
+                                  Box                0   none
+
+                                  If catalogue contains more than
+                                  100 records eg the IRPS, ISSC or IAOD
+                                  the following message is typed:-
+
+' Catalogue contains NNNNNNN records, do you want them all plotted(y/n)?'
+
+ANS:=       y/n                   If the answer is n(o) then the
+                                  cursor is enabled and a field centre
+                                  and size may be defined. Objects are
+                                  only plotted inside this subfield.
+'       Tracker Ball Buttons
+   Button           Function
+     1 left     Set  cursor  on centre
+     2          of field to be plotted
+     3          and  press  any of the
+     4 right    buttons                 '
+                                  Once a button has been pressed the
+                                  field size is prompted for
+' Give field size in arcmin
+  Minimum is 10, maximum is 900 '
+
+SIZE:=      nnn                   Size of subfield in arcmins. The
+                                  outline of the box is plotted if
+                                  this does not include the area of
+                                  interest it can be modified by
+                                  answering y(es) to the next prompt.
+
+' Do you wish to modify the plot area(y/n)?'
+
+ANS:=       y/n                   When you are satisfied with the
+                                  subfield and answer n(o) the
+                                  IRAS sources are plotted.
+
+---------------------------------------------------------------------
+        or (A)                    If the catalogue plotted is the
+                                  IRPS, ISSC or IAOD entries can
+                                  be written to the VDU screen.
+                                  The particular source is identified
+                                  using the cursor.
+ '     Tracker Ball Buttons
+   Button           Function
+     1 left     Set cursor on source to
+     2          be printed and press
+     3          any of these buttons
+     4 right    EXIT '
+                                  If more than 1 source is near the
+                                  cursor the following message is
+                                  printed.
+' Do you wish to print next source?(y/n)'
+ANS:=       y/n                   y(es) lists the next source.
+
+
+---------------------------------------------------------------------
+        or (E)                    Exit. A record of the output to
+                                  the screen is available in EXEM.LIS
+                                  and may be printed.
+.el
+.hl2 Image subsets and contours
+Chris Hurst at UCL has written two programs I__COMBINE and I__CONTOUR for
+analysing IRAS Additional Observations data, and to process SKY plate data.
+The programs have many facilities which are described in detail in SUN/60.
+The procedure below is only a simple example of how they may be used to generate
+a subset of a SKY plate and then display it as a contour plot.
+
+In order to identify the required subset, it is suggested the plate be displayed
+on the ARGS using SKYDISP or ADISP etc, then a coordinate grid be superposed
+using PICV.
+I__COMBINE and I__CONTOUR may then be used as follows (these programs write an
+explanation of their DSCL prompts which, in the following, are enclosed in
+quotes):
+.lt
+
+ VAX        USER                     Comments
+prompt      reply
+
+DSCL>      I_COMBINE
+IMAGE:=    filename1              Name of image from which
+                                  subset is to be selected
+IMAGE:=    return                 For this use of I_COMBINE
+                                  no second image needs to be
+                                  specified
+
+  "Create the whole image or some other area?"
+
+WHOLE/T/:= F                      Answer T(rue) or F(alse)
+                                  False means only a part of
+                                  the image is selected.
+
+  "Current centre is HR,MIN,SEC DEG,MIN,SEC
+   and size is X * Y arcmins
+   Enter centre RA and DEC and size of the area you want to use as:=
+   raH,raM,raS, decD,decM,decS, Xsize,Ysize"
+
+AREA:=    H,M,S,D,M,S,X,Y         Input position and size
+
+  "Select output pixel size in arcmin,(X,Y)
+   (not less than 2.5')
+
+SIZE/2.5,2.5/:=  return           Use default
+
+  "Processing image 1.....                                  :"
+
+OUTPUT:=   filename2              Filename of subset
+DSCL>
+
+.el
+This procedure produces a subset of SKY plate filename1 in filename2.
+The following step produces a contour plot of this subset on the Versatec.
+.lt
+
+ VAX        USER                     Comments
+prompt      reply
+
+DSCL>     I_CONTOUR
+
+  "version n.m (day-month-year) "
+
+IMAGE:=     filename2             Name of image from which
+                                  contour plot is to be generated
+
+  "Processing image 1....                                 :
+   Special plot or use defaults?"
+
+SPECIAL/F/:=    T                 Answer T(rue) or F(alse)
+                                  True causes the rest of the
+                                  prompts to be issued
+
+  "Plot the whole image or some other area?"
+
+WHOLE/T/:=    return              Answer T or F. As the subset
+                                  has already been chosen the
+                                  default T(rue) is required
+
+  "Label the contours?"
+
+LABELS/T/:=   return              Default used
+
+  "Mark the edge of the area covered?"
+
+EDGE/T/:=       F
+
+  "RA and DEC in lines or ticks?"
+
+LINES/T/:=    return              Default used
+
+  "Enter RA and DEC line spacings in secs,arcmins"
+
+SPACINGS/,/:= return              Default used
+
+  "Plot particular objects on the map?"
+
+OBJECTS/F/:=  return              Default, no objects to
+                                  be plotted
+
+  "Min and Max values are:-         XMIN   XMAX
+   Enter up to 20 contour levels,
+   OR just the base level,
+   OR the base level and further qualifiers,
+   OR just press return for default levels"
+
+LEVELS:=      return              Default used
+         (  or a powerful option is  )
+LEVELS:=      XMIN,-XSTEP,N       Where :
+                                    XMIN  - minimum contour
+                                    XSTEP - contour spacing
+                                    N     - number of levels
+
+  "Base contour is XXX and subsequent ones *1.50
+   Enter a title:-"
+
+TITLE//:=   Title of plot
+
+  "Available graphics devices are:-
+   ARGS,Tektronix 4010,Sigma T5671,Tektronix 4014,Versatec
+   HP 7221 plotter,Printronix,Sigma T5674,Calcomp 81 plotter
+   Cifer 2634,HP 2648A,ARGS overlay,Zeta 8 plotter
+   Which do you want to use?"
+
+DEVICE/Tektronix/:= Versatec
+
+  "Enter plot scale in mm/arcmin"
+
+SCALE/  /:=                       Palomar Plate Scale is
+                                   0.89366 mm/arcmin
+
+  "When the program finishes, to get your plot spool
+   the FOR099.DAT file(s) to the appropriate queue.
+   Do you want the image again?
+   Enter  F - No
+          T - yes,change all parameters,
+          D - yes,change Device only,
+          L - yes,change contour Levels,"
+
+AGAIN/F/:=    return              Default used
+
+.el
+In order to output the plot the Versatec, the following command is required:
+.lt
+
+DSCL> PRINT/QUEUE=GKS_RASTER/PARAMETER=VERSATEC FOR099.DAT
+.el
+.hl2 Image Cross-Sections
+ASPIC program MSLICE  provides a mean of generating a cross-section through an
+image.
+LINPLOT may be used to produce a lineprinter hard copy of this cross-section.
+The commands are as follows:
+.lt
+
+ VAX        USER                     Comments
+prompt      reply
+
+DSCL>     MSLICE
+INPUT:=   filename1                Name of image to be displayed.
+                                  The tracker ball and buttons
+                                  are used to define the line
+                                  on the image through which the
+                                  cross-section is to be taken.
+                                  The cross-section is written to
+                                  the ARGS screen.
+
+.el
+The tracker ball buttons should be used in the following order:
+.lt
+
+  Tracker Ball Button             Function
+
+       1-left           Used with the tracker ball to set one
+                        end of the cross section.
+       2                Used after button 1 to set the other
+                        end of the cross section.
+       3                Can be used instead of button 2.
+       1                Used again when both ends have been set
+                        and cross section is required. MSLICE
+                        exits when this has been done.
+
+OUTPUT:=  filename2               Name of file to which cross
+                                  -section is to be written if a
+                                  hard copy is needed.
+
+.el
+NB: The MSLICE output Y values have to be multiplied by BSCALE (see Table 4.3)
+to convert them to JY/SR.
+.lt
+
+DSCL>           LINPLOT
+INPUT:=         filename2          Name of MSLICE output file.
+DEVICE/def/:=   1,ARGS             Plot produced on the ARGS screen.
+LIMITS/def/:=   return             X and Y limits of plot may be
+RANGE/def/:=      "                defaulted or explicit values set
+AXES/LIN,LIN/:=   "                if required.
+DSCL>           AHARDCOPY          This program is used to copy
+LABEL:=         Name of plot       the plot on the ARGS screen to
+                                   the line printer.
+DSCL>
+.el
+.hl2 Image Annotation
+The ASPIC program ANNOTASP allows text to be written on an image.
+An example of its use is:
+.lt
+
+ VAX        USER                     Comments
+prompt      reply
+
+DSCL>     ANNOTASP                The program gives a list of
+                                  its options including
+                                  'WRITE (W)    Enter,position
+                                           and display string'
+
+COMMAND/ /:=W                     Enter character(s) defining
+                                  the required option. W
+                                  chooses the WRITE option
+
+STRING/ /:=text string            Text to be written to the
+                                  ARGS screen.
+
+ 'Place cursor over bottom L.H. Corner of string position'
+
+                                  Once cursor has been set
+                                  depressing the illuminated
+                                  tracker ball button causes
+                                  the text to be written to
+                                  the ARGS.
+
+.el
+The options available can be printed by typing H in reply to the COMMAND prompt.
+Other options allow:
+.lt
+
+    - the size and colour of the text to be changed
+    - arrows or scale intervals to be displayed
+    - the removal of the last entered or all of the text
+.el
+.hl2 Help
+The STARLINK VAX supports a comprehensive HELP system.
+HELP information may be obtained for:
+.ls "o"
+.le;the VAX system
+.le;ASPIC
+.le;IRAS
+.els
+The following gives an example for ASPIC:
+.lt
+
+ VAX        USER                     Comments
+prompt      reply
+
+DSCL>           HELP              The system responds with a list
+                                  of the topics for which HELP is
+                                  available, one of which is ARGS.
+@ASP Topic?     ARGS              This produces a list of ARGS display
+                                  programs, one of which is ADISP.
+@ARGS Subtopic? ADISP             This gives instructions for using
+                                  ADISP. Typing the return key a
+                                  number of times gets the DSCL
+                                  prompt back.
+   Other useful DSCL topics are
+
+     LUT       which describes LUTLIN and other colour table
+               manipulation programs.
+     DETAILS   which describes MSLICE   and other programs
+     DISPLAY     "       "     ANNOTASP "    "      "
+     DSCL        "       "     the facilities of the DSCL
+               command language.
+
+.el
+System HELP can be obtained by typing HELP after the * prompt on logging in.
+
+IRAS HELP can be obtained by typing IRASHELP after the * prompt on logging in.
+.hl1 Extended Emission photographic products
+Film copies of the greyscale photographic data have been distributed to about 30
+astronomical departments in the UK.
+Those wishing to produce prints may do so from these data.
+Prints can also be obtained from the National Space Data Center at 11.70 dollars
+each.
+The address for the NSSDC is:
+.lt
+
+                   World Data Center A
+                   Rockets and Satellites
+                   Code 630.2
+                   Goddard Space Flight Center
+                   Greenbelt, Maryland 20771
+                   USA
+.el
+.hl1 Comments
+To reiterate, the above is meant to be only a brief introductory guide.
+However, we would be pleased to hear from users regarding any very useful
+utilities which may have been omitted.
+Further, if users have any ideas for IRAS specific programs we would like to
+hear of them.
+The forum for discussion of new ideas is the IRAS Starlink Special Interest
+Group chaired by J.P.Emerson (QMC or RLVAD::JPE).
+The comments and/or ideas should be sent to B.Stewart at RAL and J.P.Emerson at
+QMC.
+A current list of the SIG members and their MAIL addresses is available in
+RLVAD::LADMINDIR:SIG.LIS.
+.pg
+.lt
+  Table 4.2  Sky Plates
+
+Sky   Plate Centre HCON 1              HCON 2              HCON 3
+Plate DEC    RA    Tape    File Nos.   Tape    File Nos.   Tape    File Nos.
+No.   Deg. Hr Min        12 24 60 100        12 24 60 100        12 24 60 100
+
+  1    90   0  0  SH1201  1  3  5  7  SH2201  1  3  5  7  SH3301  1  3  5  7
+
+  2    75   0  0     "    9 11 13 15     "    9 11 13 15     "    9 11 13 15
+  3     "   2 24     "   17 19 21 23     "   17 19 21 23     "   17 19 21 23
+  4     "   4 48     "   25 27 29 31     "   25 27 29 31     "   25 27 29 31
+  5     "   7 12     "   33 35 37 39     "   33 35 37 39     "   33 35 37 39
+  6     "   9 36     "   41 43 45 47     "   41 43 45 47     "   41 43 45 47
+  7     "  12  0     "   49 51 53 55     "   49 51 53 55     "   49 51 53 55
+  8     "  14 24     "   57 59 61 63     "   57 59 61 63     "   57 59 61 63
+  9     "  16 48  SH1202  1  3  5  7  SH2202  1  3  5  7  SH3302  1  3  5  7
+ 10     "  19 12     "    9 11 13 15     "    9 11 13 15     "    9 11 13 15
+ 11     "  21 36     "   17 19 21 23     "   17 19 21 23     "   17 19 21 23
+
+ 12    60   0  0     "   25 27 29 31  SH2202 25 27 29 31  SH3302 25 27 29 31
+ 13     "   1 36     "   33 35 37 39     "   33 35 37 39     "   33 35 37 39
+ 14     "   3 12     "   41 43 45 47     "   41 43 45 47     "   41 43 45 47
+ 15     "   4 48     "   49 51 53 55     "   49 51 53 55     "   49 51 53 55
+ 16     "   6 24     "   57 59 61 63     "   57 59 61 63     "   57 59 61 63
+ 17     "   8  0  SH1203  1  3  5  7  SH2203  1  3  5  7  SH3303  1  3  5  7
+ 18     "   9 36     "    9 11 13 15     "    9 11 13 15     "    9 11 13 15
+ 19     "  11 12     "   17 19 21 23     "   17 19 21 23     "   17 19 21 23
+ 20     "  12 48     "   25 27 29 31     "   25 27 29 31     "   25 27 29 31
+ 21     "  14 24     "   33 35 37 39     "   33 35 37 39     "   33 35 37 39
+ 22     "  16  0     "   41 43 45 47     "   41 43 45 47     "   41 43 45 47
+ 23     "  17 36     "   49 51 53 55     "   49 51 53 55     "   49 51 53 55
+ 24     "  19 12     "   57 59 61 63     "   57 59 61 63     "   57 59 61 63
+ 25     "  20 48  SH1204  1  3  5  7  SH2204  1  3  5  7  SH3304  1  3  5  7
+ 26     "  22 24     "    9 11 13 15     "    9 11 13 15     "    9 11 13 15
+
+ 27    45   0  0  SH1204 17 19 21 23  SH2204 17 19 21 23  SH3304 17 19 21 23
+ 28     "   1 12     "   25 27 29 31     "   25 27 29 31     "   25 27 29 31
+ 29     "   2 24     "   33 35 37 39     "   33 35 37 39     "   33 35 37 39
+ 30     "   3 36     "   41 43 45 47     "   41 43 45 47     "   41 43 45 47
+ 31     "   4 48     "   49 51 53 55     "   49 51 53 55     "   49 51 53 55
+ 32     "   6  0     "   57 59 61 63     "   57 59 61 63     "   57 59 61 63
+ 33     "   7 12  SH1205  1  3  5  7  SH2205  1  3  5  7  SH3305  1  3  5  7
+ 34     "   8 24     "    9 11 13 15     "    9 11 13 15     "    9 11 13 15
+ 35     "   9 36     "   17 19 21 23     "   17 19 21 23     "   17 19 21 23
+ 36     "  10 48     "   25 27 29 31     "   25 27 29 31     "   25 27 29 31
+ 37     "  12  0     "   33 35 37 39     "   33 35 37 39     "   33 35 37 39
+ 38     "  13 12     "   41 43 45 47     "   41 43 45 47     "   41 43 45 47
+ 39     "  14 24     "   49 51 53 55     "   49 51 53 55     "   49 51 53 55
+ 40     "  15 36     "   57 59 61 63     "   57 59 61 63     "   57 59 61 63
+ 41     "  16 48  SH1206  1  3  5  7  SH2206  1  3  5  7  SH3306  1  3  5  7
+ 42     "  18  0     "    9 11 13 15     "    9 11 13 15     "    9 11 13 15
+ 43     "  19 12     "   17 19 21 23     "   17 19 21 23     "   17 19 21 23
+.el
+.pg
+.lt
+Sky   Plate Centre HCON 1              HCON 2              HCON 3
+Plate DEC    RA    Tape    File Nos.   Tape    File Nos.   Tape    File Nos.
+No.   Deg. Hr Min        12 24 60 100        12 24 60 100        12 24 60 100
+
+ 44    45  20 24  SH1206 25 27 29 31  SH2206 25 27 29 31  SH3306 25 27 29 31
+ 45     "  21 36     "   33 35 37 39     "   33 35 37 39    "    33 35 37 39
+ 46     "  22 48     "   41 43 45 47     "   41 43 45 47    "    41 43 45 47
+ 47    30   0  0     "   49 51 53 55     "   49 51 53 55  absent
+ 48     "   1  0     "   57 59 61 63     "   57 59 61 63  SH3306 49 51 53 55
+ 49     "   2  0  SH1207  1  3  5  7  SH2207  1  3  5  7     "   57 59 61 63
+ 50     "   3  0     "    9 11 13 15     "    9 11 13 15  SH3307  1  3  5  7
+ 51     "   4  0     "   17 19 21 23     "   17 19 21 23     "    9 11 13 15
+ 52     "   5  0     "   25 27 29 31     "   25 27 29 31     "   17 19 21 23
+ 53     "   6  0     "   33 35 37 39     "   33 35 37 39     "   25 27 29 31
+ 54     "   7  0     "   41 43 45 47     "   41 43 45 47     "   33 35 37 39
+ 55     "   8  0     "   49 51 53 55     "   49 51 53 55     "   41 43 45 47
+ 56     "   9  0     "   57 59 61 63     "   57 59 61 63     "   49 51 53 55
+ 57     "  10  0  SH1208  1  3  5  7  SH2208  1  3  5  7     "   57 59 61 63
+ 58     "  11  0     "    9 11 13 15     "    9 11 13 15  SH3308  1  3  5  7
+ 59     "  12  0     "   17 19 21 23     "   17 19 21 23     "    9 11 13 15
+ 60     "  13  0     "   25 27 29 31     "   25 27 29 31  absent
+ 61     "  14  0     "   33 35 37 39     "   33 35 37 39  SH3308 17 19 21 23
+ 62     "  15  0     "   41 43 45 47     "   41 43 45 47     "   25 27 29 31
+ 63     "  16  0     "   49 51 53 55     "   49 51 53 55     "   33 35 37 39
+ 64     "  17  0     "   57 59 61 63     "   57 59 61 63     "   41 43 45 47
+ 65     "  18  0  SH1209  1  3  5  7  SH2209  1  3  5  7     "   49 51 53 55
+ 66     "  19  0     "    9 11 13 15     "    9 11 13 15     "   57 59 61 63
+ 67     "  20  0     "   17 19 21 23     "   17 19 21 23  SH3309  1  3  5  7
+ 68     "  21  0     "   25 27 29 31     "   25 27 29 31     "    9 11 13 15
+ 69     "  22  0     "   33 35 37 39     "   33 35 37 39     "   17 19 21 23
+ 70     "  23  0     "   41 43 45 47     "   41 43 45 47  absent
+
+ 71    15   0  0  SH1209 49 51 53 55  SH2209 49 51 53 55  absent
+ 72     "   1  0     "   57 59 61 63     "   57 59 61 63     "
+ 73     "   2  0  SH1210  1  3  5  7  SH2210  1  3  5  7  SH3309 25 27 29 31
+ 74     "   3  0     "    9 11 13 15     "    9 11 13 15     "   33 35 37 39
+ 75     "   4  0     "   17 19 21 23     "   17 19 21 23     "   41 43 45 47
+ 76     "   5  0     "   25 27 29 31     "   25 27 29 31     "   49 51 53 55
+ 77     "   6  0     "   33 35 37 39     "   33 35 37 39     "   57 59 61 63
+ 78     "   7  0     "   41 43 45 47     "   41 43 45 47  SH3310  1  3  5  7
+ 79     "   8  0     "   49 51 53 55     "   49 51 53 55     "    9 11 13 15
+ 80     "   9  0     "   57 59 61 63     "   57 59 61 63     "   17 19 21 23
+ 81     "  10  0  SH1211  1  3  5  7  SH2211  1  3  5  7     "   25 27 29 31
+ 82     "  11  0     "    9 11 13 15     "    9 11 13 15     "   33 35 37 39
+ 83     "  12  0     "   17 19 21 23     "   17 19 21 23  absent
+ 84     "  13  0     "   25 27 29 31     "   25 27 29 31     "
+ 85     "  14  0     "   33 35 37 39     "   33 35 37 39  SH3310 41 43 45 47
+ 86     "  15  0     "   41 43 45 47     "   41 43 45 47     "   49 51 53 55
+ 87     "  16  0     "   49 51 53 55     "   49 51 53 55     "   57 59 61 63
+ 88     "  17  0     "   57 59 61 63     "   57 59 61 63  SH3311  1  3  5  7
+ 89     "  18  0  SH1212  1  3  5  7  SH2212  1  3  5  7     "    9 11 13 15
+.el
+.pg
+.lt
+Sky   Plate Centre HCON 1              HCON 2              HCON 3
+Plate DEC    RA    Tape    File Nos.   Tape    File Nos.   Tape    File Nos.
+No.   Deg. Hr Min        12 24 60 100        12 24 60 100        12 24 60 100
+
+ 90    15  19  0  SH1212  9 11 13 15  SH2212  9 11 13 15  SH3311 17 19 21 23
+ 91     "  20  0     "   17 19 21 23     "   17 19 21 23     "   25 27 29 31
+ 92     "  21  0     "   25 27 29 31     "   25 27 29 31     "   33 35 37 39
+ 93     "  22  0     "   33 35 37 39     "   33 35 37 39     "   41 43 45 47
+ 94     "  23  0     "   41 43 45 47     "   41 43 45 47  absent
+
+ 95     0   0  0  SH1212 49 51 53 55  SH2212 49 51 53 55  absent
+ 96     "   1  0     "   57 59 61 63     "   57 59 61 63     "
+ 97     "   2  0  SH1213  1  3  5  7  SH2213  1  3  5  7     "
+ 98     "   3  0     "    9 11 13 15     "    9 11 13 15  SH3311 49 51 53 55
+ 99     "   4  0     "   17 19 21 23     "   17 19 21 23     "   57 59 61 63
+100     "   5  0     "   25 27 29 31     "   25 27 29 31  SH3312  1  3  5  7
+101     "   6  0     "   33 35 37 39     "   33 35 37 39     "    9 11 13 15
+102     "   7  0     "   41 43 45 47     "   41 43 45 47     "   17 19 21 23
+103     "   8  0     "   49 51 53 55     "   49 51 53 55     "   25 27 29 31
+104     "   9  0     "   57 59 61 63     "   57 59 61 63     "   33 35 37 39
+105     "  10  0  SH1214  1  3  5  7  SH2214  1  3  5  7     "   41 43 45 47
+106     "  11  0     "    9 11 13 15     "    9 11 13 15     "   49 51 53 55
+107     "  12  0     "   17 19 21 23     "   17 19 21 23  absent
+108     "  13  0     "   25 27 29 31     "   25 27 29 31     "
+109     "  14  0     "   33 35 37 39     "   33 35 37 39  SH3312 57 59 61 63
+110     "  15  0     "   41 43 45 47     "   41 43 45 47  SH3313  1  3  5  7
+111     "  16  0     "   49 51 53 55     "   49 51 53 55     "    9 11 13 15
+112     "  17  0     "   57 59 61 63     "   57 59 61 63     "   17 19 21 23
+113     "  18  0  SH1215  1  3  5  7  SH2215  1  3  5  7     "   25 27 29 31
+114     "  19  0     "    9 11 13 15     "    9 11 13 15     "   33 35 37 39
+115     "  20  0     "   17 19 21 23     "   17 19 21 23     "   41 43 45 47
+116     "  21  0     "   25 27 29 31     "   25 27 29 31     "   49 51 53 55
+117     "  22  0     "   33 35 37 39     "   33 35 37 39     "   57 59 61 63
+118     "  23  0     "   41 43 45 47     "   41 43 45 47  absent
+
+119   -15   0  0  SH1215 49 51 53 55  SH2215 49 51 53 55  absent
+120     "   1  0     "   57 59 61 63     "   57 59 61 63     "
+121     "   2  0  SH1216  1  3  5  7  SH2216  1  3  5  7  SH3314  1  3  5  7
+122     "   3  0     "    9 11 13 15     "    9 11 13 15     "    9 11 13 15
+123     "   4  0     "   17 19 21 23     "   17 19 21 23     "   17 19 21 23
+124     "   5  0     "   25 27 29 31     "   25 27 29 31     "   25 27 29 31
+125     "   6  0     "   33 35 37 39     "   33 35 37 39     "   33 35 37 39
+126     "   7  0     "   41 43 45 47     "   41 43 45 47     "   41 43 45 47
+127     "   8  0     "   49 51 53 55     "   49 51 53 55     "   49 51 53 55
+128     "   9  0     "   57 59 61 63     "   57 59 61 63     "   57 59 61 63
+129     "  10  0  SH1217  1  3  5  7  SH2217  1  3  5  7  SH3315  1  3  5  7
+130     "  11  0     "    9 11 13 15     "    9 11 13 15  absent
+131     "  12  0     "   17 19 21 23     "   17 19 21 23     "
+132     "  13  0     "   25 27 29 31     "   25 27 29 31     "
+133     "  14  0     "   33 35 37 39     "   33 35 37 39  SH3315  9 11 13 15
+134     "  15  0     "   41 43 45 47     "   41 43 45 47     "   17 19 21 23
+135     "  16  0     "   49 51 53 55     "   49 51 53 55     "   25 27 29 31
+.el
+.pg
+.lt
+Sky   Plate Centre HCON 1              HCON 2              HCON 3
+Plate DEC    RA    Tape    File Nos.   Tape    File Nos.   Tape    File Nos.
+No.   Deg. Hr Min        12 24 60 100        12 24 60 100        12 24 60 100
+
+136   -15  17  0  SH1217 57 59 61 63  SH2217 57 59 61 63  SH3315 33 35 37 39
+137     "  18  0  SH1218  1  3  5  7  SH2218  1  3  5  7     "   41 43 45 47
+138     "  19  0     "    9 11 13 15     "    9 11 13 15     "   49 51 53 55
+139     "  20  0     "   17 19 21 23     "   17 19 21 23     "   57 59 61 63
+140     "  21  0     "   25 27 29 31     "   25 27 29 31  SH3316  1  3  5  7
+141     "  22  0     "   33 35 37 39     "   33 35 37 39     "    9 11 13 15
+142     "  23  0     "   41 43 45 47     "   41 43 45 47     "   17 19 21 23
+
+143   -30   0  0  SH1218 49 51 53 55  SH2218 49 51 53 55  absent
+144     "   1  0     "   57 59 61 63     "   57 59 61 63     "
+145     "   2  0  SH1219  1  3  5  7  SH2219  1  3  5  7  SH3316 25 27 29 31
+146     "   3  0     "    9 11 13 15     "    9 11 13 15     "   33 35 37 39
+147     "   4  0     "   17 19 21 23     "   17 19 21 23     "   41 43 45 47
+148     "   5  0     "   25 27 29 31     "   25 27 29 31     "   49 51 53 55
+149     "   6  0     "   33 35 37 39     "   33 35 37 39     "   57 59 61 63
+150     "   7  0     "   41 43 45 47     "   41 43 45 47  SH3317  1  3  5  7
+151     "   8  0     "   49 51 53 55     "   49 51 53 55     "    9 11 13 15
+152     "   9  0     "   57 59 61 63     "   57 59 61 63     "   17 19 21 23
+153     "  10  0  SH1220  1  3  5  7  SH2220  1  3  5  7     "   25 27 29 31
+154     "  11  0     "    9 11 13 15     "    9 11 13 15  absent
+155     "  12  0     "   17 19 21 23     "   17 19 21 23     "
+156     "  13  0     "   25 27 29 31     "   25 27 29 31  SH3317 33 35 37 39
+157     "  14  0     "   33 35 37 39     "   33 35 37 39     "   41 43 45 47
+158     "  15  0     "   41 43 45 47     "   41 43 45 47     "   49 51 53 55
+159     "  16  0     "   49 51 53 55     "   49 51 53 55     "   57 59 61 63
+160     "  17  0     "   57 59 61 63     "   57 59 61 63  SH3318  1  3  5  7
+161     "  18  0  SH1221  1  3  5  7  SH2221  1  3  5  7     "    9 11 13 15
+162     "  19  0     "    9 11 13 15     "    9 11 13 15     "   17 19 21 23
+163     "  20  0     "   17 19 21 23     "   17 19 21 23     "   25 27 29 31
+164     "  21  0     "   25 27 29 31     "   25 27 29 31     "   33 35 37 39
+165     "  22  0     "   33 35 37 39     "   33 35 37 39     "   41 43 45 47
+166     "  23  0     "   41 43 45 47     "   41 43 45 47     "   49 51 53 55
+
+167   -45   0  0  SH1221 49 51 53 55  SH2221 49 51 53 55  SH3318 57 59 61 63
+168     "   1 12     "   57 59 61 63     "   57 59 61 63  absent
+169     "   2 24  SH1222  1  3  5  7  SH2222  1  3  5  7  SH3319  1  3  5  7
+170     "   3 36     "    9 11 13 15     "    9 11 13 15     "    9 11 13 15
+171     "   4 48     "   17 19 21 23     "   17 19 21 23     "   17 19 21 23
+172     "   6  0     "   25 27 29 31     "   25 27 29 31     "   25 27 29 31
+173     "   7 12     "   33 35 37 39     "   33 35 37 39     "   33 35 37 39
+174     "   8 24     "   41 43 45 47     "   41 43 45 47     "   41 43 45 47
+175     "   9 36     "   49 51 53 55     "   49 51 53 55     "   49 51 53 55
+176     "  10 48     "   57 59 61 63     "   57 59 61 63     "   57 59 61 63
+177     "  12  0  SH1223  1  3  5  7  SH2223  1  3  5  7  SH3320  1  3  5  7
+178     "  13 12     "    9 11 13 15     "    9 11 13 15     "    9 11 13 15
+.el
+.pg
+.lt
+Sky   Plate Centre HCON 1              HCON 2              HCON 3
+Plate DEC    RA    Tape    File Nos.   Tape    File Nos.   Tape    File Nos.
+No.   Deg. Hr Min        12 24 60 100        12 24 60 100        12 24 60 100
+
+179   -45  14 24  SH1223 17 19 21 23  SH2223 17 19 21 23  SH3320 17 19 21 23
+180     "  15 36     "   25 27 29 31     "   25 27 29 31     "   25 27 29 31
+181     "  16 48     "   33 35 37 39     "   33 35 37 39     "   33 35 37 39
+182     "  18  0     "   41 43 45 47     "   41 43 45 47     "   41 43 45 47
+183     "  19 12     "   49 51 53 55     "   49 51 53 55     "   49 51 53 55
+184     "  20 24     "   57 59 61 63     "   57 59 61 63     "   57 59 61 63
+185     "  21 36  SH1224  1  3  5  7  SH2224  1  3  5  7  SH3321  1  3  5  7
+186     "  22 48     "    9 11 13 15     "    9 11 13 15     "    9 11 13 15
+
+187   -60   0  0  SH1224 17 19 21 23  SH2224 17 19 21 23  SH3321 17 19 21 23
+188     "   1 36     "   25 27 29 31     "   25 27 29 31     "   25 27 29 31
+189     "   3 12     "   33 35 37 39     "   33 35 37 39     "   33 35 37 39
+190     "   4 48     "   41 43 45 47     "   41 43 45 47     "   41 43 45 47
+191     "   6 24     "   49 51 53 55     "   49 51 53 55     "   49 51 53 55
+192     "   8  0     "   57 59 61 63     "   57 59 61 63     "   57 59 61 63
+193     "   9 36  SH1225  1  3  5  7  SH2225  1  3  5  7  SH3322  1  3  5  7
+194     "  11 12     "    9 11 13 15     "    9 11 13 15     "    9 11 13 15
+195     "  12 48     "   17 19 21 23     "   17 19 21 23     "   17 19 21 23
+196     "  14 24     "   25 27 29 31     "   25 27 29 31     "   25 27 29 31
+197     "  16  0     "   33 35 37 39     "   33 35 37 39     "   33 35 37 39
+198     "  17 36     "   41 43 45 47     "   41 43 45 47     "   41 43 45 47
+199     "  19 12     "   49 51 53 55     "   49 51 53 55     "   49 51 53 55
+200     "  20 48     "   57 59 61 63     "   57 59 61 63     "   57 59 61 63
+201     "  22 24  SH1226  1  3  5  7  SH2226  1  3  5  7  SH3323  1  3  5  7
+
+202   -75   0  0  SH1226  9 11 13 15  SH2226  9 11 13 15  SH3323  9 11 13 15
+203     "   2 24     "   17 19 21 23     "   17 19 21 23     "   17 19 21 23
+204     "   4 48     "   25 27 29 31     "   25 27 29 31     "   25 27 29 31
+205     "   7 12     "   33 35 37 39     "   33 35 37 39     "   33 35 37 39
+206     "   9 36     "   41 43 45 47     "   41 43 45 47     "   41 43 45 47
+207     "  12  0     "   49 51 53 55     "   49 51 53 55     "   49 51 53 55
+208     "  14 24     "   57 59 61 63     "   57 59 61 63     "   57 59 61 63
+209     "  16 48  SH1227  1  3  5  7  SH2227  1  3  5  7  SH3324  1  3  5  7
+210     "  19 12     "    9 11 13 15     "    9 11 13 15     "    9 11 13 15
+211     "  21 36     "   17 19 21 23     "   17 19 21 23     "   17 19 21 23
+
+212   -90   0  0  SH1227 25 27 29 31  SH2227 25 27 29 31  SH3324 25 27 29 31
+.el
+.pg
+.lt
+  Table 4.2 (continued) Galactic Plane Maps
+
+ Gal.  Plate Centre  HCON 1             HCON 2   HCON 3
+ Plane L2     B2     Tape    File Nos.
+ Map   Deg.   Deg.         12 24 60 100
+
+   1     0      0   GP1001  1  2  3  4  absent   absent
+   2    15      0      "    5  6  7  8    "        "
+   3    30      0      "    9 10 11 12    "        "
+   4    45      0      "   13 14 15 16    "        "
+   5    60      0      "   17 18 19 20    "        "
+   6    75      0      "   21 22 23 24    "        "
+   7    90      0      "   25 26 27 28    "        "
+   8   105      0      "   29 30 31 32    "        "
+   9   120      0      "   33 34 35 36    "        "
+  10   135      0      "   37 38 39 40    "        "
+  11   150      0      "   41 42 43 44    "        "
+  12   165      0      "   45 46 47 48    "        "
+
+  13   180      0   GP1002  1  2  3  4  absent   absent
+  14   195      0      "    5  6  7  8    "        "
+  15   210      0      "    9 10 11 12    "        "
+  16   225      0      "   13 14 15 16    "        "
+  17   240      0      "   17 18 19 20    "        "
+  18   255      0      "   21 22 23 24    "        "
+  19   270      0      "   25 26 27 28    "        "
+  20   285      0      "   29 30 31 32    "        "
+  21   300      0      "   33 34 35 36    "        "
+  22   315      0      "   37 38 39 40    "        "
+  23   330      0      "   41 42 43 44    "        "
+  24   345      0      "   45 46 47 48    "        "
+
+.el
+.pg
+.lt
+  Table 4.3  FITS Header for Sky Plates
+
+SIMPLE=                              T   /STANDARD FITS FORMAT
+BITPIX=                             32   /4 BYTE TWOS COMPL INTEGERS
+NAXIS=                               3   /NUMBER OF AXES
+NAXIS1=                             nn   /#SAMPLES PER LINE(FASTEST VARY INDEX)
+NAXIS2=                             mm   /#LINES OF DATA IN IMAGE FILE
+NAXIS3=                              1   /#WAVELENGTHS
+BSCALE=                   S.ssssssE-ee   /TRUE=TAPE*SCALE+BZERO
+BZERO=                             0.0   /
+BUNIT=       'JY/SR'                     /INTENSITY
+BLANK=                     -2000000000   /TAPE VALUE FOR EMPTY PIXEL
+CRVAL1=                          DD.dd   /RA AT ORIGIN(DEGREES)
+CRPIX1=                           xxx.   /SAMPLE AXIS ORIGIN(PIXEL)
+CTYPE1=      'RA-TAN'                    /DECREASES IN VALUE AS SAMPLE INDEX
+COMMENT                                   INCREASES (GNOMONIC PROJECTION)
+CDELT1=                  -3.333333E-02   /COORD VALUE INCREMENT DEG/PIXEL
+COMMENT                                   AT ORIGIN ON SAMPLE AXIS
+CRVAL2=                          DD.dd   /DEC AT ORIGIN(DEGREES)
+CRPIX2=                           yyy.   /LINE AXIS ORIGIN(PIXEL)
+CTYPE2=      'DEC-TAN'                   /DECREASES IN VALUE AS LINE INDEX
+COMMENT                                   INCREASES (GNOMONIC PROJECTION)
+CDELT2=                  -3.333333E-02   /COORD VALUE INCREMENT DEG/PIXEL
+COMMENT                                   AT ORIGIN ON LINE AXIS
+CRVAL3=                         zzzE-6   /WAVELENGTH IN METERS
+CRPIX3=                             1.
+CTYPE3=      'LAMBDA '
+CDELT3=                             0.
+DATAMAX=                   D.ddddddEee   /JY/SR (TRUE VALUE)
+DATAMIN=                   D.ddddddEee   /JY/SR (TRUE VALUE)
+EPOCH=                           1950.   /EME50
+DATE-MAP=    '01/11/84'                  /MAP RELEASE DATE
+DATE=        'DD/MM/YY'                  /DATE THIS TAPE WRITTEN
+ORIGIN=      'JPL-IRAS'                  /INSTITUTION
+TELESCOP=    'IRAS    '
+INSTRUME=    'SKYPLATE'                  /IRAS SKY PLATE
+OBJECT=      'PLnnnHm'                   /PLATE NUMBER/HCON
+PROJTYPE=    'GNOMONIC'                  /PROJECTION TYPE
+COMMENT                                   MINSOP=MMM; MAXSOP=NNN
+COMMENT                                   LOGTAG = VSFLOG(7.6)
+COMMENT                                   GEOMTAG = GEOM(7.5)
+COMMENT
+COMMENT      PROJECTION FORMULAE:
+COMMENT         FORWARD FORMULA;RA0 AND DEC0 ARE THE PLATE CENTER
+COMMENT      R2D = 45./ATAN(1.)
+COMMENT      PIX = 30.
+COMMENT      A = COS(DEC)*COS(RA0-RA)
+COMMENT      F = PIX*R2D/(SIN(DEC0)*SIN(DEC)+A*COS(DEC0))
+COMMENT      SAMPLE = -F*COS(DEC)*SIN(RA-RA0)
+COMMENT      XLINE=-F*(COS(DEC0)*SIN(DEC)-A*SIN(DEC0))
+COMMENT
+COMMENT         INVERSE FORMULA;REQUIRES ARCSINE
+COMMENT      X = SAMPLE/(PIX*R2D)
+COMMENT      Y = LINE/(PIX*R2D)
+COMMENT      DELTA = ATAN(SQRT(X*X+Y*Y))
+COMMENT      BETA = ATAN2(-X,Y)
+COMMENT      DEC = ASIN(SIN(DEC0)*COS(DELTA)-COS(DEC0)*SIN(DELTA)*COS(BETA))
+COMMENT      XX = SIN(DEC0)*SIN(DELTA)*COS(BETA)+COS(DEC0)*COS(DELTA)
+COMMENT      YY = SIN(DELTA)*SIN(BETA)
+COMMENT      RA = RA0+ATAN2(YY,XX)
+COMMENT      REFERENCES:
+COMMENT      IRAS SDAS SOFTWARE INTERFACE SPECIFICATION(SIS) #623-94/NO.SF05
+COMMENT      ASTRON.ASTROPHYS.SUPPL.SER.44,(1981)363-370(RE:FITS)
+COMMENT      RECONCILIATION OF FITS PARMS W/SIS SF05 PARMS:
+COMMENT      NAXIS1 = (ES-SS+1);NAXIS2 = (EL-SL+1);
+COMMENT      CRPIX1 = (1-SS);   CRPIX2 = (1-SL)
+END
+
+.el
+NB: OBJECT and CRVAL3 are used to generate the STARLINK plate file-name.

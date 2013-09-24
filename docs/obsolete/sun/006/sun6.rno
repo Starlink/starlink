@@ -1,0 +1,57 @@
+.title SUN/6.2
+.set date 01,08,1986
+.autoparagraph
+.set paragraph 0,1,2
+.layout 3,2
+.page size 57,70
+.flags substitute
+.nofill
+.keep
+.justify
+SCIENCE#AND#ENGINEERING#RESEARCH#COUNCIL SUN/6.2
+RUTHERFORD#APPLETON#LABORATORY
+SPACE#_&#ASTROPHYSICS#DIVISION
+
+Starlink#Project Issued#by
+Starlink#User#Note#6.2
+
+.right;P T Wallace
+.right;$$date
+
+.fill
+.repeat 70,"-"
+.blank
+.centre;AATGS - Guide Probe Predictions for AAT
+.centre;---------------------------------------
+.hl1 Introduction
+AATGS is a version of the AAO program GS.
+This note is a preface to the AAO document, a copy of which is attached.
+AATGS predicts guide probe settings, given the celestial coordinates of the
+field centre and of a guide star, for the guiding systems at the prime and
+Cassegrain foci of the AAT.
+.hl1 Operating Instructions
+AATGS is intended to be run interactively via a terminal, but can be run with
+specified input and output files if this is required.
+The command is:
+.lt
+
+	$ AATGS  [input]  [report]
+
+.el
+where both file identifiers would normally be omitted, to default to terminal
+operation.
+The parameters may be defaulted either by omission or by using the special code
+'.'.
+.hl1 CHANGES TO AAO VERSION
+These notes refer to the attached AAO document, most of which no longer applies
+and may be ignored.
+The sections that still apply are:
+.lt
+
+	2.1.1 & 2.1.2  Dialogue & example.
+	2.2.1  &  2.2.2  Details of batch operation (read 'input
+		file' etc for 'card deck' etc.).
+	3.  Limitations.
+	4.  Internal description.  Only the architectural and
+	    trigonometric remarks apply to this version of the program.
+.el

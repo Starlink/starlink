@@ -1,0 +1,798 @@
+
+
+
+SCIENCE AND ENGINEERING RESEARCH COUNCIL                      SUN/79.3
+RUTHERFORD APPLETON LABORATORY
+SPACE & ASTROPHYSICS DIVISION
+
+Starlink Project                                             Issued by
+Starlink User Note 79.3
+
+                                                        J H Fairclough
+                                                     15 September 1986
+
+----------------------------------------------------------------------
+
+             CDS - Centre de Donnees Stellaire Catalogues
+             --------------------------------------------
+
+
+(This is a reformatting of SUN/79.2 with minor corrections - MDL)
+
+
+
+1  INTRODUCTION
+
+This note should be read by any astronomer who uses catalogue data, or
+any person in the UK who intends to use CDS Astronomical catalogues.
+
+The Centre De Donnees Stellaires - (Stellar Data  Centre,  Strasbourg,
+France)  -  is the major distributor of Astronomical Catalogue Data in
+Europe.  Its products are astronomical catalogues on magnetic tape and
+microfiche.   It  is  also  responsible  for  the  SIMBAD Astronomical
+Catalogue Database System.  It publishes a regular bulletin describing
+its products.
+
+Three years ago, ROE made  an  order  for  the  entire  magnetic  tape
+database  of  Astronomical  Catalogues  from  CDS.   Owing  to lack of
+resources to organise a database at ROE, the library of 32  1600bpi  9
+track ASCII tapes received from CDS was moved to the RAL Starlink site
+in June 1984.  At RAL, the tapes were  analysed  and  security  copies
+made.  An indexing system was set up to allow users to locate the tape
+containing the catalogue they wanted.  Starlink has placed a  standing
+order  for  catalogues  from  CDS.   A  support  person  at  RAL  will
+assimilate each CDS tape into the offline database  according  to  the
+guidelines  in SSN/34.  He will update the index to the CDS catalogues
+and distribute the index as part of a SCAR software release.  It  will
+only  be  distributed  on  demand.  Printed summaries of the index are
+appended to this note.  Starlink  users  who  produce  catalogues  are
+encouraged to send them to CDS for distribution throughout Europe.
+
+The Starlink Catalogue Access and Reporting System, SCAR (see SUN/70),
+is  a  general  catalogue handling system and can be used for directly
+processing a CDS tape.
+
+
+
+                                - 1 -
+SUN/79.3                                                        Page 2
+
+
+2  ASTRONOMICAL CATALOGUES ON TAPE
+
+2.1  CDS Tapes
+
+The tapes are 9-track, 1600 bpi unlabelled tapes each containing 1  to
+100  or  so  files written in ASCII code.  In July 1985 there were 855
+files of which 424 were documented.  Most of the catalogue data are in
+the  form  of  tables,  so  they can be directly processed by the SCAR
+system.  "Documentation" is used here to mean  that  there  is  enough
+information  for  the  columns  of  the  table  to be understood.  The
+contents of these tapes have been indexed.
+
+Many catalogues are contained in more than  one  file.   Most  of  the
+files  have  a  unique  identifier placed at the start of each record.
+This  file  identifier  is  the  "dataset  id".   It  consists  of   7
+characters:
+
+      o  Characters  1  to  4  are  the  number  of   the   catalogue.
+         Catalogues are numbered:
+
+          o  1000 - 1999 = Astrometric Data
+
+          o  2000 - 2999 = Photometric Data
+
+          o  3000 - 3999 = Spectroscopic Data
+
+          o  4000 - 4999 = Cross-Identifications
+
+          o  5000 - 5999 = Combined Data
+
+          o  6000 - 6999 = Miscellaneous Data
+
+          o  7000 - 7999 = Extended and Non Stellar Objects
+
+
+      o  Character 5 is the  subcatalogue  letter.   The  files  in  a
+         catalogue would be denoted A, B, C etc.
+
+      o  Character 6 and 7 contain the year of release by CDS.
+
+Where a catalogue is contained in more than one file, it is often  the
+case  that  the  first  file  describes the other files, which usually
+would contain the data catalogue (a table  of  numbers)  and  possibly
+references.   All the catalogues from CDS are summarised in an "index"
+file which contains the names of the catalogues, their location in the
+tape  library,  the  authors  and references, documentation flag, etc.
+The main index CDST is ordered by tape number and then file number  on
+the  tape.   The entries for documented files have been extracted from
+the main index and sorted on various useful fields:
+
+        CDSA  : Author and dataset number
+        CDSW  : Wavelength and dataset number
+
+                                - 2 -
+SUN/79.3                                                        Page 3
+
+
+        CDSC  : CDS type (class) and dataset number
+        CDSO  : Object type and dataset number
+        CDSN  : Title of catalogue and dataset number
+
+These indexes are FACTs catalogues and can be processed using the  CAR
+programs  (see  SUN/70).   Listings of the indexes in tabular form are
+available in the CDS_DOC directory at your site.  For example to print
+the NAME index:
+
+        $ PRINT CDS_DOC:CDSN.CAR
+
+The Author index is appended to this note.  The files run to about  10
+printer pages.
+
+
+
+2.2  Getting Tapes
+
+On request, the Starlink Support team at RAL will send  a  copy  of  a
+tape  containing  a  CDS  catalogue  to  any  Starlink user.  Mail to:
+RLVAD::STAR "CDS catalogue request from XNODE::USER".   Give  the  CDS
+tape name that you want (eg:  SD405), your name and postal address.  A
+jiffy bag will be sent containing a copy of the tape.  You must obtain
+your  own  documentation  (see GETTING DOCUMENTATION).  Users who want
+more than one tape in a monthly period must come to RAL to make  their
+own  copies.  This distribution system is on a best efforts basis.  If
+RAL gets deluged with requests (more than 1 per  week)  then  we  will
+have to review the distribution system.
+
+
+
+2.3  Getting Documentation
+
+The CDS catalogue documentation has been photocopied and  a  3  volume
+set  has  been  sent  to  the  site  manager at Birmingham, Cambridge,
+Durham, Leicester, Birmingham, RGO, ROE and UCL.  It is ordered by the
+catalogue  number  of  the  dataset  id.   Users  should refer to this
+documentation to get information on the fields in a  catalogue.   Note
+that  the  CDST  contains  a field to indicate whether a file has been
+documented.  RAL Starlink Support will retain the master copy  of  the
+documentation.
+
+
+
+2.4  FACTS Description Files
+
+When a CDS tape is assimilated into the offline  database,  a  partial
+FACTS  description file is produced which contains all the information
+SCAR requires to get the catalogue off  the  tape.   Each  description
+file  is named DSCF, followed by the first 5 characters of the dataset
+id "rolled" to put the last character  at  the  front  to  generate  a
+unique  filename.   For  example, the GCIO has dataset number 6020A83.
+
+                                - 3 -
+SUN/79.3                                                        Page 4
+
+
+Drop the last two characters and "roll" the remainder to  give  A6020.
+The description file is then DSCFA6020.
+
+The description files are kept in a text library in the CDS directory:
+CDS_DSCF:CDSDSCF.TLB.   The  entire  record of the description file is
+described in a single field called "TEXT".  To analyse the contents of
+each  record,  users must employ the catalogue documentation to define
+each field.  Each description file contains the first  1400  bytes  of
+the  file  to  assist  in describing the data.  If you generate a full
+FACTS description file (see SUN/70), please mail it  to  RAL  Starlink
+Support at RAL who will put it in the SCAR description file directory.
+
+
+
+2.5  Tape To Disk
+
+You can use any TAPE utility to get a CDS catalogue off a tape, or you
+can  use  SCAR.  If you use SCAR, you must issue the START_CAR command
+before any other SCAR commands.  SCAR gives  you  two  ways  of  doing
+this:   CAR_CONVERT  and CAR_EXTAPE.  Use CONVERT if you only want one
+file.
+
+
+
+2.5.1  CONVERT A CDS Catalogue From Tape To Disk - This example  shows
+how to get 6020A83 onto disk:
+
+        $ CAR_MOUNT  ! Allocate and mount on TAPE0
+        $ LIB/LOG/EXTRACT=(DSCFA6020)/OUTPUT=DSCFTAPE0.DAT/TEXT -
+                CDS_DSCF:DSCFTAPE.TLB
+        $ ED/READ DSCFTAPE0.DAT
+
+    <In the edit, change the value of MEDIUM from TAPE to DISK
+     and then EXIT DSCFA6020.DAT>
+
+        $ CAR_CONVERT/FROM=TAPE0/TO=A6020
+        $ CAR_DISMOUNT TAPE0
+
+This is the easiest method if you only want one file.   You  can  then
+decompose   the   TEXT   field   into  the  fields  specified  by  the
+documentation.  For greater detail see example in section 4.
+
+
+
+2.5.2  EXTAPE - Extract A CDS Catalogue From Tape - This example shows
+how to get 6020A83 onto disk:
+
+        $ CAR_MOUNT  ! Allocate and mount on TAPE0
+        $ LIB/LOG/EXTRACT=(DSCFA6020)/OUTPUT=DSCFTAPE0.DAT/TEXT -
+            CDS_DSCF:CDSDSCF.TLB
+
+    <Get the filenumbers and logical record lengths by
+
+                                - 4 -
+SUN/79.3                                                        Page 5
+
+
+     looking in DSCFA6020>
+
+        $ CAR_EXTAPE
+
+CAR_EXTAPE prompts for TAPE deck name (TAPE0) and asks the  number  of
+tapemarks to skip (= Filenumber - 1).  You can examine the file to see
+whether it is what you wanted.  You can  measure  the  logical  record
+length.   You  can  give  any integer value for MARKS, so you can skip
+back and forth along the tape.  This is the most efficient  method  if
+you want more than one file.  The tape does not have to be rewound for
+each file.  For more detail, see section 4.
+
+
+
+2.6  Miscellaneous IPMAF Tapes
+
+The IRAS Post Mission Analysis Facility inherited 32  catalogues  from
+the  IRAS Preliminary Analysis Facility.  The 32 catalogues are stored
+on six 9-track 1600 bpi ASCII tapes at the  RAL  Starlink  site.   The
+catalogues  are listed in Appendix C.  These catalogues were processed
+from original tapes into G-EXEC files for the PAF ICL  2960  and  then
+converted  to  ASCII format for use on Starlink at the end of the IRAS
+mission.  Many of the catalogues are in the  CDS  library.   As  blank
+fields  were converted to zeroes by G-EXEC, the CDS version is usually
+to be preferred as the CAR system specially processes null data.
+
+Each catalogue on the tape is preceded by a pseudo ADC version 1 (1980
+vintage)  description  file.   There  is  enough  data in this file to
+identify the fields in the succeeding catalogues.   The  documentation
+on each catalogue is kept by the STARLINK support group.  Files can be
+extracted from the tapes using the EXTAPE program.   Copies  of  these
+tapes are available, as are the CDS tapes.
+
+The original catalogue tapes are kept at RAL  in  the  R3  tape  store
+(IRAS  area).   Many  of  them  are  in EBCDIC code.  Some have parity
+errors which were only circumvented by skipping the offending  blocks.
+There  is  no  intention of distributing these original tapes.  Anyone
+can make their own copy if they so desire.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 5 -
+SUN/79.3                                                        Page 6
+
+
+3  SIMBAD
+
+3.1  What Is SIMBAD?
+
+SIMBAD  stands  for  "Set   of   Identifications,   Measurements   and
+Bibliography  for  Astronomical  Data".   It  is a database system for
+accessing the Astronomical Catalogue Data accumulated by CDS.  In  the
+UK,  SIMBAD  can  be  accessed by making a PSS call to the main SIMBAD
+computer in France.  What  makes  it  unique  is  the  combination  of
+astronomical  catalogue  data and bibliographic data.  This means that
+if you are interested in Object X, you can get all  the  bibliographic
+and  catalogue  entries  on  Object  X  from  the database.  SIMBAD is
+already employed by many astronomical institutions in Europe.  It is a
+cheap  facility;  the  annual  standing  charge for the Vilspa, Madrid
+station is about four hundred pounds  per  year.   Computing  time  is
+charged  at  15  French  Francs  per  minute (minimum charge 50 French
+Francs).  SCAR and SIMBAD complement  one  another  very  well.   SCAR
+enables  you to handle catalogues globally and isolate your objects of
+interest.  SIMBAD then enables you to follow up those objects  in  the
+literature.
+
+STARLINK has  come  to  the  following  agreement  with  CDS  for  the
+extension of SIMBAD to more UK users:
+
+      o  The maximum number of user accounts will be  1  per  STARLINK
+         node.  This is to reduce administration at the CDS.
+
+      o  A SIMBAD account, and any associated PSS charges, are  to  be
+         paid  for  by  the  owner  of  the  account, not by STARLINK.
+         Potential users of SIMBAD should include its expected cost in
+         their funding applications.
+
+
+
+
+3.2  Getting A Username From CDS
+
+If you are interested in using SIMBAD then you should write to:
+
+        Dr C JASCHEK,
+        CENTRE DE DONNEES STELLAIRES,
+        11, RUE DE L'UNIVERSITE,
+        67000,
+        STRASBOURG,
+        FRANCE
+
+You will be supplied with  a  username  and  manual.   Once  you  have
+obtained  the  username  you should arrange with your site manager for
+authorisation to call "SDC".  The SDC  number  can  be  obtained  from
+Starlink Support at RAL.
+
+
+
+                                - 6 -
+SUN/79.3                                                        Page 7
+
+
+3.3  Using SIMBAD Over The PAD
+
+You must first acquire network authorisation from your site manager to
+call  CDS via the PSS.  The PSS number for CDS is 20809104057310*DPSI.
+Your site manager should give you authorisation for  calling  CDS  via
+the call address mnemonic "SDC".
+
+The following is the procedure for accessing the SIMBAD data  base  at
+SDC.   The  dots  refer to informational responses which have not been
+recorded.
+
+        $ PAD
+        PAD> SET P13 0
+              ......
+        PAD> JOU filename
+        PAD> CALL SDC
+           ......
+           ......
+           ......
+        ENTER USERID/PASSWORD CLEARANCE LEVEL
+        > userid/password
+          ......
+          ......
+          ......
+        > @CDS*SIMBAD.P,E
+           ......
+           ......
+           ......
+        > enter your name   Simbad username
+
+  (You are now in SIMBAD and should use the SIMBAD reference
+   manual to proceed correctly. To terminate the session the
+   following is required)
+
+        > END         terminates the SIMBAD session
+        > @FIN        terminates the UNIVAC session
+        > @@TERM      terminates the connection
+
+        PAD> CLEAR     (if the above terminations are OK,
+                         this is superfluous)
+        PAD> EXIT
+        $
+
+Dr P.  Hill of St Andrews recommends that  you  use  the  PAD  JOURNAL
+facility  which  enables a record to be kept of all I/O when connected
+to the remote host.  The journal file can be printed at the end of the
+session.    One   warning:    it  contains  lots  of  strange  control
+characters; Dr Hill (REVAD::PWH) has an editing routine  to  clean  it
+up.
+
+
+
+
+                                - 7 -
+SUN/79.3                                                        Page 8
+
+
+4  EXAMPLE CATALOGUE CREATION
+
+4.1  Finding Data
+
+Appendix A indicates that the Fourth Uhuru Catalogue was on tape  415A
+file 36 and dataset 7018A78.
+
+
+
+4.2  Creating Basic Description File
+
+Log in and initiate SCAR
+
+        $ LIB/LOG/EXTRACT=(DSCFA7018)/OUTPUT=DSCFA7018.DAT/TEXT
+        
+        LIB:- CDS_DSCF:CDSDSCF.TLB
+
+Print out DSCFA7018.  This allows you to obtain information on  record
+length and file size.
+
+
+
+4.3  Obtaining Data File From Tape
+
+
+        $ CAR_MOUNT and mount tape 415A
+        $ CAR_EXTAPE
+        $ CAR_DISMOUNT when job complete.
+
+Skip 35 files and examine file 36.  This was confirmed as Fourth Uhuru
+Catalogue.   It  also  confirmed record length, in this case 88 bytes.
+The data was then dumped to file A7018.DAT.  Since the file only  held
+339  records  printed  out  complete  file,  (if  file is much larger,
+suggest printing out  sub-set).   From  the  printout  identified  the
+fields and record structure.  In this case RA, DEC, FLUX,and COMMENTS.
+
+
+
+4.4  Expansion Of Description File
+
+Edited the following into the basic description file.
+
+        P KEYFIELD ----- etc
+        P EPOCH ------ etc
+        F NAME -----  etc
+        F RA  -----   etc
+        F DEC ----    etc
+        F FLUX ----- etc
+        F COMMENTS ----- etc
+
+Also change TAPE to DISC in P MEDIUM, (this is essential in  order  to
+open data file).
+
+                                - 8 -
+SUN/79.3                                                        Page 9
+
+
+4.5  First Test
+
+Used CAR_REPORT on A7018F.  This identified two problems.
+
+     1.  NAME - was one byte too short.
+
+     2.  FLUX - a number of entries did not have a decimal  point  and
+         wrong values were output.
+
+Edited the description file to correct the first  error.   Edited  the
+data  file to correct the second error; care had to be taken with this
+edit to ensure that each record did not contain more than 88 bytes (ie
+the length of the record in this case).
+
+
+
+4.6  Creation Of Unformatted Description File
+
+Used CARBINARY with DSCFA7018 as input and DSCFTES1 as  output.   This
+created DSCFTES1.DAT
+
+
+
+4.7  Creation Of Unformatted Data File
+
+Used CARCONVERT with A7018 as input and TES1 as output.  This  created
+TES1.DAT and saves space in large files.
+
+
+
+4.8  Testing Unformatted Files
+
+Carried  out  CARREPORT  on  TES1.   This  showed  an  error  in   the
+unformatted description file.
+
+        1. F RA------  DEGREES.
+        2. F DEC______ DEGREES could not be translated.
+        3. F RA  ------ 1.570796 gave 6 Hrs RA instead of 0 Hrs RA.
+
+Edited DSCFTES1.DAT to change
+
+        1.   RA DEGREES to HHMMSS.S!
+        2.   DEC DEGREES to SDDMMSS!
+        3.   RA  1.570796 to 0.000000
+
+
+
+
+4.9  Next Test
+
+CARCONVERT repeated with A7018 as input and TES1 as output.
+
+
+                                - 9 -
+SUN/79.3                                                       Page 10
+
+
+4.10  Sorting Data In Descending Declination
+
+Having tested yet again  with  CAR_REP,  we  now  wanted  to  sort  in
+descending   declination  to  allow  us  to  use  CARJOIN  with  other
+catalogues.  Used CAR_SORT with TES1 as  input  and  TES2  as  output.
+Note   that  this  program  produces  the  required  description  file
+DSCFTES2.DAT.
+
+
+
+4.11  Final Testing
+
+
+        $ CAR_REP       ok!
+        $ CAR_SEARCH    ok!
+        $ CAR_JOIN      ok!
+
+Could now be considered for implementation as SCAR Catalogue.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 10 -
+
+
+
+
+
+
+
+
+
+
+
+
+                              APPENDIX A
+
+                 CDS CATALOGUES INDEXED BY AUTHORNAME
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 11 -
+
+
+
+
+
+
+
+
+
+
+
+
+                              APPENDIX B
+
+                   CDS CATALOGUES INDEXED BY TITLE
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 12 -
+
+
+
+
+
+
+
+
+
+
+
+
+                              APPENDIX C
+
+                       MISCELLANEOUS CATALOGUES
+
+
+
+The Master Lists  of  Non  Stellar  objects  and  Radio  Sources  were
+subdivided  into subsets marked *, hence there are more than 32 files.
+Catalogues not in the RAL CDS set are marked "!"
+
+
+CATS
+Tape  File Mnem Author       Title
+____  ____ ____ ___________  _____
+
+* 1    2   ABCL DIXON,R.S.   Abell Clusters (from NSO)
+  1    4   AGCC ARP,H.       Arp Catalogue of Globular Clusters
+! 1    6   BONN ALTENOFF     Bonn Catalogue of HII regions
+* 1    8   CM5C DIXON,R.S.   Fifth Cambridge catalogue (from NSO)
+! 1   10   DOLA DOLAN,J.     Dolan X-Ray Positions (many errors)
+! 1   12   FCPL TAYLOR,J.H.  Five Colleges Pulsar List
+  1   14   SNRC ILOVAISKY,S. Super Nova Remnant Catalogue
+  1   16   GLIE GLIESE,W.    Catalogue of Nearby Stars
+  1   18   LCBN LYNDS        Lynds Catalogue of Bright Nebulae
+! 1   20   LCDN LYNDS        Lynds Catalogue of Dark Nebulae
+* 1   22   MARH DIXON,R.S.   MRSL objects (from NSO)
+* 1   24   MCGA DIXON,R.S.   MCG subset A (from NSO)
+* 1   26   MCGB DIXON,R.S.   MCG subset B (from NSO)
+* 1   28   MCGC DIXON,R.S.   MCG subset C (from NSO)
+* 1   30   MCGD DIXON,R.S.   MCG subset D (from NSO)
+* 1   32   MIRA KUKARNIN,S.  MIRA variable subset of GCVS
+* 1   34   MOLG DIXON,R.S.   Molonglo radio catalogue (from NSO)
+* 1   36   NBNP DIXON,R.S.   NB objects (from MLRS)
+  1   38   ORG2 BURBIDGE     Optical catalogue of radio galaxies
+  1   40   PULS SEIRADAKIS,J.Pulsar catalogue
+! 1   42   PARK BOLTON,W.    Parkes radio source catalogue
+  1   44   PNEB ACKER,A.     Strasbourg Planetary Nebulae
+  1   46   QSOC HEWITT,A.    Quasar catalogue
+! 1   48   RSAC SANDAGE,A.   Revised Shapley Ames Catalogue
+  1   50   SHAR SHARPLESS    Sharpless Catalogue
+  1   52   UH4C FORMAN,W.    Uhuru Catalogue
+* 1   54   VVIG DIXON,R.S    VV Galaxies (from NSO)
+! 1   56   WEED WEEDMAN,D.W. Weedman Seyfert Galaxy List
+
+                                - 13 -
+MISCELLANEOUS CATALOGUES                                      Page C-2
+
+
+! 1   58   WEGL WESSELIUS,P. Wesselius Globule list
+! 1   60   WRSC VAN DER HUCHTWolf-Rayet Star Catalogue
+* 1   62   ZWCL DIXON,R.S.   Zwicky Clusters subset  (from NSO)
+* 1   64   ZWGA DIXON,R.S.   Zwicky Galaxies subset A (from NSO)
+* 1   66   ZWGB DIXON,R.S.   Zwicky Galaxies subset B (from NSO)
+* 1   68   ZWGC DIXON,R.S.   Zwicky Galaxies subset C (from NSO)
+* 1   70   ZWGD DIXON,R.S.   Zwicky Galaxies subset D (from NSO)
+* 1   72   ZWGE DIXON,R.S.   Zwicky Galaxies subset E (from NSO)
+  2    2   DEAR LEE,O.J.     Dearborn Catalogue of Faint Red Stars
+  2    4   GCIO GEZARI,D.Y.  General Catalogue of infrared observations
+  2    6   GCVS KUKARNIN,B.V.General Catalogue of Variable Stars
+! 2    8   KIST JPL          Predicted Infrared Source Catalogue (1983.0)
+! 2   10   KSUB RAL          PAF Predicted Objects subset
+  2   12   MIRC GSFC         Merged Infrared Source Catalogue
+! 3    2   MKOC RAL          PAF Predicted Objects Catalogue
+! 3    4   MLRS DIXON,R.S.   Master List of Radio Sources V43
+! 3    6   RBGC DE_VAUCOUL'  Second Ref. Catalogue of Bright Galaxies
+  3    8   ESOB LAUBERTS,A.  ESO/B Uppsalla Catalogue
+  3   10   UPSA NEILSON,     Uppsalla Catalogue of Galaxies
+! 3   12   WACK WACKERLING,  Wackerling Catalogue of emission line stars
+  3   14   YALE HOFFLIET,D.  Yale Catalogue of bright stars (4th ed)
+  4    2   MLNS DIXON,R.S.   Master List of Non Stellar Objects
+  5    2   CSI1 STRASBOURG   CSI (1979) Part 1 sorted by DEC band and RA
+  6    2   CSI2 STRASBOURG   CSI (1979) Part 2 sorted by DEC band and RA
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 14 -

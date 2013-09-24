@@ -1,0 +1,760 @@
+\documentstyle {article} 
+\markright{SUN/74.3}
+\setlength{\textwidth}{153mm}
+\setlength{\textheight}{220mm}
+\setlength{\oddsidemargin}{3mm}
+\setlength{\evensidemargin}{3mm}
+\pagestyle{myheadings}
+
+\begin{document}
+\thispagestyle{plain}
+\noindent
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill SUN/74.3\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf Starlink User Note 74.3}
+\begin{flushright}
+W F Lupton\\
+27th April 1987
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{9mm}
+\begin{center}
+{\Large\bf DSCL --- Starlink Command Language}
+\end{center}
+\vspace{9mm}
+\tableofcontents
+\markright{SUN/74.3}
+\newpage
+This paper contains the internal documentation on DSCL stored in file
+ASPDIR:FULLDSCL.LIS.
+It is issued as a SUN so that it is visible in the Starlink documentation
+indexing system.
+The layout has been revised by M D Lawden but the text mostly derives from 1981
+and so may no longer be fully up-to-date.
+\section {INTRODUCTION}
+At the moment (1981), we have the Starlink Subroutine  Interface  (SUN/4) but no
+command language.
+This means each application program must run in isolation from all others and
+the unfortunate user is saddled with the endless specification of parameters and
+answering of prompts.
+Clearly, some sort of interim command language is needed which will allow one
+program to communicate its results to another one.
+DSCL is a response to this need.
+
+Prime considerations in the design of this system have been both that existing
+Starlink programs should not need any modification at all to run within the
+system and that DSCL should not need any re-configuration in order to allow new
+applications to be `plugged-in'.
+
+The first version of DSCL was implemented in DCL.
+However, it ran too slowly to be useful in real circumstances.
+In this version, as much as possible has been converted to FORTRAN and several
+new features have been implemented.
+
+Although DSCL can be used by anyone for specific applications, it has been
+produced primarily to aid in the creation of ASPIC, an interim set of image
+processing applications (ASPIC stands for AStronomical PICtures).
+A basic introduction to ASPIC and DSCL is given in SUN/23 which should be
+read in conjunction with this paper.
+\section {SPECIFICATIONS}
+In section 3 of SUN/23 on DSCL no rules were given, merely examples of usage.
+This section should be used as a reference to determine command formats.
+\subsection {Command Line}
+The syntax of the command line is (square brackets indicate optional fields):
+\begin{verbatim}
+        [<commchar>][<commname>][ <parval1>[ <parval2>[..]]]
+\end{verbatim}
+where:
+\begin{description}
+\begin{description}
+\item [$<$commchar$>$] is an optional `*', `@' or `\$' which indicates that the
+command is an applications program, DSCL procedure, or DSCL or DCL command
+respectively.
+It is not normally needed.
+\item [$<$commname$>$] is the program, procedure, DSCL or DCL command name.
+If omitted (this is tested for by checking whether $<$parval1$>$ contains an equals
+sign) then LET is assumed: see section 2.3.
+\item [$<$parvaln$>$] is of the form [$<$param$>$][=][$<$value$>$].
+For the interpretation of this field see the separate section on command line
+parameters (2.2.1).
+\end{description}
+\end{description}
+The spaces separating parameters may in fact be multiple spaces or tabs, just as
+in DCL.
+The same is true in DSCL procedures.
+
+Command qualifiers can appear anywhere after the command name, preceded by a
+slash (/).
+At present, the only places where a qualifier is used are on compiling and
+executing DSCL procedures (sections 2.4.2 and 2.4.3).
+\subsubsection {Searching procedures}
+Whether the command is interpreted as a request to run an applications program,
+execute a procedure or perform a DCL or DSCL command depends on whether
+$<$commname$>$ is the name of a program, a procedure or not.
+
+Unless a $<$commchar$>$ is given, it is first assumed that it is a program, so a
+search is made first for $<$commname$>$.EXE, then, failing that, for
+DSCL\_EXEDIR:$<$commname$>$.EXE.
+(DSCL\_EXEDIR is a logical name which points to the directory where generally
+available applications programs live.)
+If both searches fail, an attempt is made to translate $<$commname$>$ as a logical
+name.
+If this is successful, $<$commname$>$ is replaced with the name of the file in the
+translation.
+Thus, if logical name G2 has translation DISK\$USER2:[WFL.ENV]GEN2D.EXE, a
+command of G2 is very nearly (see below) the same as a command of GEN2D issued
+from DISK\$USER2:[WFL.ENV].
+
+If the search for an applications program fails a procedure is searched for,
+firstly a compiled version, then a source version.
+The search order is the same as for applications programs, except that the
+`system' directories are pointed to by logical names DSCL\_SCCDIR and
+DSCL\_SCLDIR.
+
+If a procedure is not found, it is assumed that the command is a DCL or DSCL
+command and the command line (minus the $<$commchar$>$ if it was given) is passed to
+DCL.
+
+As can be seen from the above, there is a certain overhead in executing DCL and
+DSCL commands.
+If commonly used sets of such commands are put into DSCL procedures this
+overhead is overcome since the above searches are carried out at compile time.
+
+If logical name G2 had translation DISK\$USER2:[WFL.ENV]GEN2D.SCC, typing G2
+would be taken as a request to execute the DSCL procedure whose compiled version
+is held in DISK\$USER2:\-[WFL.\-ENV]\-GEN2D.\-SCC.
+{\em No actual check is made to ensure that this file exists}, it is your
+responsibility to set up sensible logical names.
+(See SUN/23 for a discussion of the effect of packages on the search path ---
+MDL.)
+\subsection {Application Programs}
+Every application program will have a connection file which details the
+program parameters.
+Once DSCL has located the program, it searches separately for the connection
+file and, if it is present, determines which of the parameters are already
+defined.
+
+Because the program and connection file are searched for separately, a logical
+name can be used to allow the same program to be used with several different
+connection files, eg.\ if logical name QDISP has translation
+DSCL\_EXEDIR:ADISP.EXE, but there is a file DSCL\_CONDIR:QDISP.CON, then there
+need be only one copy of the executable image, but QDISP might allow more
+connection file defaults (say).
+\subsubsection {Definition of program parameters}
+Program parameters are initially undefined.
+They may become defined by being:
+\begin{itemize}
+\item Set equal to a literal value or the value of another parameter using the
+LET command
+\item Set by explicit call to WRKEYx in an application program
+\end{itemize}
+The value of a defined parameter can be retrieved and manipulated using DCL
+facilities.
+Parameter $<$param$>$ of program $<$prog$>$ is stored in a DCL logical name called:
+\begin{verbatim}
+        <prog>_<param>  ,eg:
+
+        STATS_IMAGE
+        GLOBAL_INPUT
+        FFT_RINPUT
+\end{verbatim}
+Logical names may be manipulated within DSCL procedures by using the DCL
+F\$LOGICAL lexical function.
+Also, whenever a parameter becomes defined through use of the DSCL LET command,
+a DCL global symbol is set up in {\em addition} to the logical name.
+This is for the convenience of users as symbols are more convenient to use in
+procedures than are logical names.
+These logical names and global symbols remain in force until either cancelled
+using the CLEAR command or until you log out.
+
+Every DSCL command line is in fact read by DCL and consequently any DCL symbol
+substitution will automatically be performed.
+This is really a free bonus --- the only real benefits from symbol substitution
+come in procedures which are dealt with in Section 2.4.
+
+There is a special sort of program parameter called a GLOBAL PARAMETER which
+may be thought of as a parameter to an application program called GLOBAL.
+Such a parameter is referred to as  \_$<$param$>$ (or GLOBAL\_$<$param$>$) and is used
+to provide a `last ditch' value for program parameters of the same name.
+If a parameter is undefined but there is a global parameter of the same name,
+DSCL will use the global value, but this will {\em not} cause the undefined
+parameter to become defined.
+\paragraph {Command line parameters}
+A parameter value specified on the command line will always override any
+previous value.
+This will be a commonly used method and it is important to allow a flexible
+syntax.
+For this reason, command line parameters may be specified by KEYWORD or by
+POSITION.
+The order assigned to parameters is the same as that in the connection file.
+DSCL {\em never} reads past the first ERROR type parameter in the connection
+file.
+Thus, the $<$parval$>$ of section 2.1 can have the following forms:
+\begin{verbatim}
+    <param>=<value>    normal form; parameter specified by keyword
+
+    [=]<value>         positional parameter
+\end{verbatim}
+There must be {\em no} extraneous spaces.
+This is a necessary restriction, since to permit spaces would be to permit
+ambiguity.
+An equals sign surrounded by spaces is a positionally-specified null parameter
+value so `$<$param$>$ = $<$value$>$' is three positional parameters, {\em not}
+one keyword parameter!
+\paragraph {Accessing the stack}
+If a frame parameter has value `\$', this indicates that the frame is
+to be read from or written to the image stack (depending on whether it is an
+input or output frame).
+In some circumstances the user may ask for an input frame from an empty stack.
+If this happens, DSCL will ask which file to put on the stack.
+
+NB: because it is DSCL, not the application program, which handles the stack,
+it is {\em not} permissible to reply `\$' to a prompt which has come from a
+program since it will be taken literally!
+\paragraph {Further details}
+As stated above, DSCL reads the program connection file and determines which of
+the program parameters are defined.
+If a parameter is defined, the value is passed to the program just as
+though it had been specified on the command line (although a command line value
+takes precedence over a previously defined value).
+
+If a value is defined then, just as described in SUN/4, DSCL attempts a
+recursive logical name translation on it.
+Thus, the parameter mechanism can be used to create an EQUIVALENCE between
+parameters.
+For example, suppose that we do the following:
+\begin{verbatim}
+        STATS_IMAGE=_ADD_OUT
+\end{verbatim}
+The underscore before ADD is to prevent a possible translation of ADD\_OUT
+(ie.\ exactly as in DCL).
+The actual value of STATS\_IMAGE is `ADD\_OUT' (ie.\ the underscore is removed).
+
+Whenever we run STATS, DSCL will determine that STATS\_IMAGE has value
+`ADD\_OUT'.
+It will then translate ADD\_OUT recursively until translation fails, so if, for
+example, the value of ADD\_OUT is `\$', STATS will read its input from the
+stack.
+
+It is advisable to include the underscore before ADD in the definition of
+STATS\_IMAGE, since otherwise ADD\_OUT might be translated at the first stage
+and we wish to defer translation to as late as possible.
+It would be possible to prevent the LET command (section 2.3.1) from
+translating, but the more normal interpretation of:
+\begin{verbatim}
+        STATS_IMAGE=ADD_OUT
+\end{verbatim}
+would be to set STATS\_IMAGE to the CURRENT value of ADD\_OUT.
+\subsection {DSCL Commands}
+DSCL commands are implemented as foreign DCL commands and are thus used in
+exactly the same way as DCL commands.
+They handle definition, manipulation, clearing and display of both parameters
+and stack and provide a sophisticated HELP facility.
+The internal workings are documented elsewhere.
+Here we are concerned only with the user interface.
+\subsubsection {Parameter commands}
+You can use LET, LOOK and CLEAR to handle parameters.
+Each is discussed separately.
+\paragraph {Setting parameters}
+The syntax of the LET command is:
+\begin{verbatim}
+        [LE[T] ]<progparam>{ }<value>
+                           {=}
+\end{verbatim}
+There are several rules to be stated here so we will give a list of examples
+demonstrating each rule at least once and then we will list the rules:
+\begin{tabbing}
+XXXX\=PLOTxTITLE=POWERxSPECTRUMXXX\=\kill
+\>Command\>Effect\\
+\\
+\>LE CADD\_SCALAR=2\>CADD\_SCALAR = 2\\
+\>LET CADD\_SCALAR 2\>as above\\
+\>CADD\_SCALAR=2\>as above\\
+\>CADD\_OUT=STATS\_IMAGE\>CADD\_OUT = value of STATS\_IMAGE. (Note\\
+\>\>the underscore implies a parameter name.\\
+\>\>If STATS\_IMAGE is undefined, the rhs is\\
+\>\>taken literally)\\
+\>PLOT\_TITLE=POWER SPECTRUM\>PLOT\_TITLE = POWER (the space delimits\\
+\>\>--- see rules below)\\
+\>PLOT\_TITLE=POWER\_SPECTRUM\>PLOT\_TITLE = value of parameter\\
+\>\>SPECTRUM of program POWER. If this is\\
+\>\>undefined, the literal value is used\\
+\>PLOT\_TITLE=\_POWER\_SPECTRUM\>PLOT\_TITLE = text `POWER\_SPECTRUM'.\\
+\>\>This is safer\\
+\>GLOBAL\_OUT=\$\>GLOBAL\_OUT = \$\\
+\>\_OUT=\$\>as above\\
+\>OUT=\$\>as above
+\end{tabbing}
+and the rules are:
+\begin{enumerate}
+\item If the `LET' is omitted, the equals sign must be included and no spaces
+can surround it.
+\item If the $<$value$>$ contains an underscore, it will be assumed to be a
+parameter name, unless it is preceded by an underscore, in which case the
+leading underscore is removed.
+If the parameter is undefined, the literal value is taken.
+\item The $<$value$>$ may not contain any spaces.
+This implies that to set a parameter to the value of a global parameter, the
+`GLOBAL' {\em must} be included in the parameter name.
+\end{enumerate}
+\paragraph {Looking at parameters}
+The syntax of the LOOK command (for parameters) is:
+\begin{verbatim}
+        LOO[K] [P[ARAM] ]<progparam>
+\end{verbatim}
+Again, we give a list of examples, followed by rules:
+\begin{tabbing}
+XXXX\=PLOTxTITLE=POWERxSPECTRUMXXX\=\kill
+\>Command\>Effect\\
+\\
+\>LOO PARAM CADD\_SCALAR\>displays value of CADD\_SCALAR\\
+\>LOOK P CADD\_SCALAR\>as above\\
+\>LOO CADD\_SCALAR\>as above\\
+\>LOOK CADD\>displays all of CADD's parameters\\
+\>LOOK \_IN\>displays global parameter IN\\
+\>LOOK GLOBAL\>displays values of all global parameters\\
+\>\>accessed since login\\
+\>LOOK STATS\>displays all of STATS's parameters\\
+\end{tabbing}
+and the rules are:
+\begin{enumerate}
+\item `PARAM' is only needed when $<$progparam$>$ could be confused with
+`PARAM' or `STACK', ie.\ very seldom.
+\item Writing the $<$progparam$>$ as $<$a$>$\_$<$b$>$, there are three cases:
+\begin{itemize}
+\item $<$a$>$ and $<$b$>$ both non-null - look at param b of program a.
+\item $<$b$>$ null $<$a$>$ non-null - look at all params of program a.
+\item $<$a$>$ null or `GLOBAL' $<$b$>$ not - look at global symbol b.
+\end{itemize}
+If there is no underscore, behaviour is as for the second case above (bearing
+rule 1 in mind)
+\item `PARAM' may be abbreviated to one character.
+\end{enumerate}
+\paragraph {Clearing parameters}
+The syntax and operation of the CLEAR command are exactly like that of the LOOK
+command; see above.
+\subsubsection {Stack commands}
+You can use CLEAR, DUPE, LASTX, POP, PUSH, RCL, LOOK, STORE and SWAP to handle
+the stack.
+They are tabulated below, followed by notes on points of interest:
+\begin{tabbing}
+XXXX\=PLOTxTITLE=POWERxSPECTRUMXXX\=\kill
+\>Syntax\>Effect\\
+\\
+\>CL[EAR] S[TACK]\>Clears the entire stack by  performing an\\
+\>\>appropriate number of POP operations.\\
+\>\>LASTX will become undefined.\\
+\>DU[PE]\>Duplicates the top entry on the stack\\
+\>LA[STX]\>RCL's the most recently POPped frame\\
+\>PO[P]\>Removes the top stack entry\\
+\>PU[SH] $<$filename$>$\>Puts $<$filename> on top of the stack\\
+\>RC[L] $<$filename$>$\>Exactly like PUSH\\
+\>LOO[K] S[TACK]\>Displays the contents of the stack\\
+\>STOR[E] $<$filename$>$\>Stores the top entry on the stack in\\
+\>\>$<$filename$>$ (really just renames it)\\
+\>SW[AP]\>Swaps the two top stack entries
+\end{tabbing}
+and the notes are:
+\begin{enumerate}
+\item Any attempt to do something illegal results in an error message  (eg.\
+POPping an empty stack).
+If the error is one which might affect the safe execution of a procedure, an
+error status is communicated to the environment (which will cause immediate
+exit from a procedure).
+For example, an error in CLEAR STACK is {\em not} deemed fatal (the only
+possible error is that the stack is already empty), whereas one in LET {\em is}.
+\item POP does not normally cause files to be deleted.
+Files are {\em never} deleted unless their names begin `WORK' (as is the case
+for all files which are created automatically by DSCL).
+\end{enumerate}
+\subsubsection {Procedure commands}
+The CALL command has been withdrawn since procedures can, in all cases, be
+initiated implicitly:
+\begin{verbatim}
+        <procname>[ <param1>[ <param2>[...]]]
+\end{verbatim}
+$<$procname$>$ must have no filetype specified.
+The searching procedure outlined in section SUN/23 is used to locate the
+procedure and then it is compiled if necessary and executed.
+Parameters are exactly as for DCL command procedures.
+
+When DSCL is first entered, it searches for a procedure called STARTUP.
+If such a file is found then it is executed.
+This therefore allows the user the equivalent of a LOGIN.COM file in which
+common definitions etc.\ can be effected.
+Procedures are dealt with in more detail in Section 2.4.
+\subsubsection {Help command}
+The syntax of the HELP command is:
+\begin{verbatim}
+        H[ELP][ <item>[ <subitem1>[ <subitem2>[...]]]]
+\end{verbatim}
+To obtain a list of available items, HELP with no parameters.
+To obtain a list of $<$subitem$>$s, refer to the output from HELP $<$item$>$.
+A list of all available help on a particular subject can be obtained by typing
+`HELP $<$subject$>$\ldots'.
+If you abbreviate an item you will get help on all items matching the
+abbreviation.
+For example:
+\begin{verbatim}
+        H ASPIC
+        HE FFT PARAMETERS
+        HELP ARGS...
+        HEL LET
+\end{verbatim}
+Help is available on all ASPIC programs, all DSCL commands, and various `general
+topics' such as `ASPIC', `DSCL' and `AUTHORS'.
+If you type HELP, you get a list of all available information (it's just like
+DCL HELP in operation).
+
+The help available on ASPIC programs is compiled automatically by stripping
+certain of the comments from the program source.
+In addition the connection file is listed, as is information on the author,
+keywords (eg.\ PLOT, ARGS, 3D,\ldots) and the date that the HELP entry was made.
+
+You can also use the HELP command to obtain help on DCL commands, but you
+{\em cannot} abbreviate the names of DCL commands on which you want help.
+This is unfortunate, but unavoidable.
+\subsection {Procedures}
+A DSCL procedure is similar in concept to a DCL command procedure.
+In fact, after a little compilation, DSCL procedures are executed using the DCL
+`@' command (although users do not see this) and this is why their parameters
+work exactly as do those for DCL command procedures.
+\subsubsection {Creating procedures}
+Procedure sources reside in files of type `SCL'.
+You can use an editor (eg.\ EDT) from within DSCL to create and modify procedure
+files.
+
+A procedure can contain any DSCL command and any DCL command with one very
+slight restriction.
+The `LET' of the DSCL parameter assignation command cannot be omitted in a
+procedure.
+This is because there is a potential ambiguity over the meaning of a command
+such as:
+\begin{verbatim}
+        SCALAR=2000
+\end{verbatim}
+Does this mean `Set the DCL local symbol SCALAR equal to 2000' or `Set the DSCL
+GLOBAL parameter SCALAR equal to 2000'?
+
+The leading `\$' required in DCL command procedures should not be included in
+DSCL procedures.
+The first character of a procedure command has the same interpretation as in an
+ordinary DSCL command line.
+\subsubsection {Compiling procedures}
+If you create a procedure and then immediately execute it, it will be compiled
+before it is run and the compiled version will be put into a file of type `SCC'.
+If you subsequently alter the procedure source, you must either delete the
+compiled version (which is in the same directory as the source) or else compile
+it `manually' using the COMPILE command:
+\begin{verbatim}
+        COM[PILE] <procname>
+\end{verbatim}
+$<$procname$>$ must not have a filetype specified.
+
+Normally it is possible to decide, at run-time, whether a procedure is to echo
+DSCL commands at the terminal as they are executed.
+This means that there is a certain (small) overhead in running a procedure where
+the commands are not being echoed.
+If a `/NOECHO' qualifier is appended to $<$procname$>$, the echoing instructions
+will not be compiled into the procedure and echoing will thus be disabled, eg.
+\begin{verbatim}
+        COM STARTUP /NOECHO
+\end{verbatim}
+`NOECHO' can be abbreviated to `NOEC'.
+\subsubsection {Executing procedures}
+Procedures are executed merely by typing the procedure name as a DSCL command.
+As for application programs, first of all the current directory is searched,
+then the ASPIC directories, then the logical name tables.
+It is perfectly legal to include a disk/directory specification if you want to
+execute somebody else's procedure.
+For example, if the current directory is [RGOWFL] and the logical name GO has
+translation STARTUP, the following are all equivalent:
+\begin{verbatim}
+        [RGOWFL]STARTUP
+        STARTUP
+        GO      (but not [RGOWFL]GO!)
+\end{verbatim}
+If an `/ECHO' qualifier is given (anywhere following the procedure name), DSCL
+commands will be echoed as they are executed (unless the procedure was compiled
+with the `/NOECHO' qualifier).
+For nested procedures, each procedure preserves its own level of echoing.
+`ECHO' can be abbreviated to `EC'.
+
+Up to eight parameters may be passed to a procedure, separated, just as in DCL,
+by spaces.
+Within the procedure they are known as P1, P2,\ldots,P8 and are handled as DCL
+local symbols.
+The following simple example demonstrates how to clear the ARGS and display an
+image, centred and zoomed as required:
+\begin{verbatim}
+        ACLEAR
+        ADISP 'P1' = = = =
+        AZOOM 256 256 'P2' 'P3'
+\end{verbatim}
+The parameters are optional.
+If specified, the first is the input image and the other two are the factors for
+zooming.
+If omitted and undefined, the programs prompt for them.
+If the procedure is called ARGS, the call might look like:
+\begin{verbatim}
+        ARGS GAUSS 8 8
+\end{verbatim}
+If we knew the size of the image --- perhaps program STATS writes parameters
+NAXIS1 and NAXIS2 --- we could dispense with the last two parameters and use DCL
+integer arithmetic to determine the appropriate zoom factors:
+\begin{verbatim}
+        ACLEAR
+        ADISP 'P1' = = = =
+        STATS ADISP_INPUT
+        MAX=STATS_NAXIS1
+        IF STATS_NAXIS2.GT.MAX THEN MAX=STATS_NAXIS2
+        Z=2*(256/MAX)
+        IF Z.GT.14 THEN Z = 14
+        IF Z.LT.1  THEN Z = 1
+        AZOOM 256 256 'Z' 'Z'
+\end{verbatim}
+The argument to the procedure is passed through to the program ADISP.
+Strictly, since it is a parameter to the procedure, it should be thought of as
+ARGS\_P1 (or whatever) not as ADISP\_INPUT, but that will have to come later, if
+ever!
+
+This will, of course, be slower than a program dedicated to the task, but it is
+quicker to write and requires no knowledge of the ARGS library routines.
+Provided the right primitive facilities are  available (such as clearing the
+ARGS, displaying an image, adding two arrays or calculating a Fourier
+Transform), a  DSCL  procedure will often be a far better solution than yet
+another application program.
+
+The DCL global symbol DSCL\_NSTACK holds the number of entries currently on the
+stack.
+It is possible to retrieve the names of the frames on the stack but is probably
+not a good idea.
+\subsubsection {Control structures in procedures}
+Because all DCL commands can be used in DSCL procedures, DCL control statements
+can be used to evaluate logical expressions and take conditional branches to
+labels.
+Admittedly DCL is not conducive to structured programming, but the basic
+facilities are available.
+An example of symbol usage was given in Section 2.4.2.
+
+The following trivial example pushes ten files, named FILE1, FILE2,\ldots,FILE10
+onto the stack.
+It is, of course, mostly DCL:
+\begin{verbatim}
+        COUNT=0 NEXT_COUNT:
+        COUNT=COUNT+1
+        PUSH FILE'COUNT'
+        IF COUNT.LT.10 THEN GOTO NEXT_COUNT
+\end{verbatim}
+\subsection {DCL Commands}
+It has been stated that `most DCL commands' can be used in DSCL and that `all
+DCL commands' can be used in DSCL procedures.
+What exactly does this mean and what are the restrictions?
+\begin{itemize}
+\item You cannot take advantage of DCL's habit of prompting for missing
+parameters.
+Outside DSCL you can type `COPY' and be prompted `From:' and `To:'.
+Within DSCL you cannot.
+\item It is only possible to use DCL symbol assignments, IF, GOTO and labels in
+procedures.
+\end{itemize}
+\subsection {Other Observations}
+Several important points should be noted:
+\subsubsection {Leaving DSCL}
+The recommended way to leave DSCL is to execute the DCL STOP command:
+\begin{verbatim}
+        STOP
+\end{verbatim}
+Use of cntrl/Y will only return you to DSCL, not to DCL.
+EXIT will have the same effect as STOP (but not, luckily, in a procedure!).
+In an emergency, typing cntrl/Y {\em six} or more times without intervening
+commands will always get you back to DCL.
+\subsubsection {Precise action of the stack}
+A stack is a simple concept: what goes in last comes out first.
+However, in order to make the stack operate in a natural fashion, some
+complication must be introduced into its operation and users should be aware of
+this.
+Although frames are referred to as being `on the stack', the stack is merely a
+list of frame filenames and does not itself hold any frame data.
+
+For each application program, DSCL makes a note of how many input frames come
+from the stack and how many output frames are to go on to it.
+When the program has run, DSCL makes the assumption that if there are no output
+frames on the stack, then any input frames there should be left untouched, and
+conversely that if there are any output frames on the stack, then all input
+frames on it should be removed.
+This is obviously `sensible' in that if an output frame has been produced, it is
+likely to be derived from the input frames and so they should no longer be
+needed.
+In SUN/23 we saw that this allows DSCL to be used like an HP calculator.
+
+Note that removal from the stack does not in general cause deletion of the frame
+file.
+It is deleted only if the filename begins `WORK', which is the case if DSCL put
+it there in the first place.
+Users should therefore avoid having frames in files whose names begin `WORK'
+unless they want them to be deleted when POPped.
+\section {EXAMPLES}
+The following is a fairly genuine example of a DSCL procedure.
+It is only fairly genuine because the absolute minimum is done in the
+`specific application program' part of it (and even this could just about have
+been done using existing ASPIC programs).
+For this reason it is slow to execute, but it does work.
+In practice, although convolution and display would be kept separate, a lot more
+of the algorithm would be packaged into the central application program.
+
+The problem is to deconvolve a spectrum using a known point spread function
+using a method of successive convolution converging (in theory!) to the inverse
+filter solution.
+The method employed is due to Jansson (Huang) and the example comes from Dave
+Pike.
+
+The following is the procedure.
+It requires three arguments which are spectrum, PSF, and relaxation parameter
+--- 0.5 is a good guess! --- respectively.
+After each iteration the restored spectrum is displayed and the user can
+change the relaxation parameter.
+The final iteration is left on the stack.
+\begin{verbatim}
+        IF P3.EQS."" THEN GOTO ERROR
+        PUSH 'P2'
+        STATS $
+        CDIV STATS_TOTAL $ $
+        DUPE
+        POP
+        PUSH 'P1'
+        STATS $
+        SPECMAX := 'STATS_MAX'
+        JUMP_HERE:
+        DUPE
+        DUPE
+        LASTX
+        CONVOLVE
+        POP
+        STATS $
+        CDIV STATS_MAX $ $
+        CMULT 'SPECMAX' $ $
+        PUSH 'P1'
+        SWAP
+        SUB $ $ $
+        SWAP
+        STATS $
+        CDIV STATS_MAX $ $
+        [CDP]MBRP 'P3' $ $
+        MULT $ $ $
+        ADD $ $ $
+        LINPLOT $ =
+        INQUIRE P3 "NEW RELAXATION PARAMETER (NULL TO STOP)"
+        IF P3.EQS."" THEN GOTO END
+        SWAP
+        DUPE
+        POP
+        SWAP
+        GOTO JUMP_HERE
+        END:
+        SWAP
+        POP
+        EXIT
+        ERROR:
+        WRITE SYS$OUTPUT "EX - USAGE: EX <SPECT> <PSF> <RELAX PARM>"
+        EXIT
+\end{verbatim}
+It calls one procedure, CONVOLVE, which takes two images from the stack and puts
+their convolution back on it (both the real and imaginary inverse FT images are
+left, but we hope that the imaginary one is essentially zero!).
+This involves three Fourier Transforms and would easily qualify for an ASPIC
+program of its own!
+\begin{verbatim}
+        IF DSCL_NSTACK.LT.2 THEN GOTO ERROR
+        FFT $ = $ $ = = F
+        STORE KEEPCONBI
+        POP
+        STORE KEEPCONBR
+        SWAP
+        LASTX
+        SWAP
+        FFT $ = $ $ = = F
+        STORE KEEPCONAI
+        POP
+        STORE KEEPCONAR
+        MULT $ $ $
+        SWAP
+        LASTX
+        MULT $ $ $
+        ADD $ $ $
+        RCL KEEPCONAR
+        STORE WORKCONAR
+        RCL KEEPCONBR
+        STORE WORKCONBR
+        MULT $ $ $
+        RCL KEEPCONAI
+        STORE WORKCONAI
+        RCL KEEPCONBI
+        STORE WORKCONBI
+        MULT $ $ $
+        SUB $ $ $
+        SWAP
+        FFT $ $ $ $ = = T
+        EXIT
+        ERROR:
+        WRITE SYS$OUTPUT "CONVOLVE - STACK HAS FEWER THAN TWO ELEMENTS"
+\end{verbatim}
+Note the use of temporary names not beginning `WORK' to prevent popped images
+from being deleted.
+Perhaps it is possible to do it {\em all} on the stack, but if so, the solution
+probably resembles that of the Tower of Hanoi!
+\section {FUTURE DEVELOPMENTS}
+Several additional features could be added at little expense of effort:
+\subsection {Further Procedure Commands}
+It would be useful to be able to submit a DSCL procedure on a batch queue.
+This would be very easy to implement.
+Another possibility, only slightly less easy to implement, is the creation of a
+subprocess (or even a detached one) to perform some computationally intensive
+task, such as the calculation of a Fourier Transform.
+The only difficulty is if the subprocess is to be allowed to request input from
+its parent (this could, I think, be a real difficulty).
+\subsection {Multiple Commands on the line}
+This, again, would be easy to implement but is probably not worth it.
+\subsection {Stacking of Program Parameters}
+If it were possible to stack the values of program parameters on entry to a
+procedure this would be very useful.
+\section {REFERENCES}
+\begin{itemize}
+\item SUN/4 `INTERIM --- Starlink software environment'.
+\item SUN/23 `ASPIC --- Image processing programs (1)'.
+\item Digital Command Language User's Guide.
+\item 	Picture Processing and Digital Filtering [1975], Springer-Verlag.
+\end{itemize}
+\appendix
+\section {COMMAND FORMATS}
+\begin{quote}
+\begin{verbatim}
+Command       Format
+
+Program       [<commchar>]<progname>[ <parval1>[ <parval2>[...]]]
+                (<parvaln> is of the form [<param>][=][<value>])
+Procedure     <procname>[/EC[HO]][ <param1>[ <param2>[...]]]
+DSCL command  Behave as DCL commands
+DCL command   As normal
+CLEAR         CL[EAR] [P[ARAM] ]<progparam>
+              CL[EAR] S[TACK]
+                (<progparam> is of the form <program>[_<param>])
+COMPILE       COM[PILE] <procname>[/NOEC[HO]]
+DUPE          DU[PE]
+HELP          H[ELP][ <item>[ <subitem1>[ <subitem2>[...]]]]
+LASTX         LA[STX]
+LET           [LE[T] ]<progparam1>=<progparam2>
+                (In most circumstances `LET' can be omitted.)
+LOOK          LOO[K] [P[ARAM] ]<progparam>
+              LOO[K] S[TACK]
+                (<progparam> is of the form <program>[_<param>])
+POP           PO[P]
+PUSH          PUS[H] <filename>
+RCL           RC[L] <filename>
+STORE         STOR[E] <filename>
+SWAP          SW[AP]
+\end{verbatim}
+\end{quote}
+\end{document}

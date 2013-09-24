@@ -1,0 +1,200 @@
+.title SUN/89.2
+.set date 08,08,1986
+.autoparagraph
+.set paragraph 0,1,2
+.layout 3,2
+.page size 57,70
+.flags substitute
+.nofill
+.keep
+.justify
+SCIENCE#AND#ENGINEERING#RESEARCH#COUNCIL SUN/89.2
+RUTHERFORD#APPLETON#LABORATORY
+SPACE#_&#ASTROPHYSICS#DIVISION
+
+Starlink#Project Issued#by
+Starlink#User#Note#89.2
+
+.right;J Straede
+.right;$$date
+
+.fill
+.repeat 70,"-"
+.blank
+.centre;APLATE - Aperture Plate Preparation Program
+.centre;-------------------------------------------
+.hl1 Introduction
+Program APLATE is an SGS version of a program developed at the AAT to compute
+required hole positions for a fibre optics aperture plate for the AAT.
+It will produce:
+.ls
+.le;A Report file of the input positions, their hole coordinates and warning
+and error messages.
+.le;A Plot file to be copied to the GKS rasterizer (by default) or other device
+as specified, which will then draw a scale diagram of the plate showing
+orientation, hole positions and TV mirror vignetting.
+.els
+A 40 arcminute diameter field round plates and 12 arcminute square field
+rectangular plates are catered for.
+.hl1 Running the Program
+To run the program type:
+.lt
+
+	$ APLATE <parameterlist>
+
+.el
+for example:
+.lt
+
+	$ APLATE NGC5128,DEVICE=ARGS
+
+.el
+will produce a plot from the input file NGC5128.DAT on the ARGS and a report
+file NGC5128.LOG for subsequent printing.
+
+<parameterlist> is made up of the following optional parameters separated by
+spaces, commas or forward slashes:
+.lt
+
+   [INPUT=]inputfile[.DAT]          NOTE: You may omit the INPUT= from
+   PLOT=plotfile[.PLT]                    the input file specification
+   LOG=logfile[.LOG]                      provided only that it comes 
+   DEVICE=plottertype			  first in the parameter list.
+   PLATE=platetype
+   DATE=observation_date
+   EPOCH=epoch_of_position_data
+   CAMERA=camera_identification
+
+.el
+The above parameters default in various ways.
+INPUT defaults to the keyboard.
+LOG defaults to the screen for keyboard input, otherwise it takes its name from
+the input file name unless given as a parameter.
+DEVICE may be any logical name which translates to a GKS workstation identifier
+and defaults to a GKS_RASTER metafile for the Printronix.
+If DEVICE is specified, the plot file will be forced to FOR000.DAT as it must be
+opened by GKS.
+Keywords and their values may be in either case.
+Keywords may be abbreviated, but be careful about ambiguities (eg IN for INPUT
+is OK but PL can mean PLOT or PLATE).
+File types default to that shown in brackets if not specified.
+
+<platetype> can be either 12ARCMIN or 40ARCMIN, but need not be given in the
+parameter list; it defaults to 12ARCMIN and can be overridden by a command in
+the input file.
+<observation__date> defaults to 0.1 year hence.
+<epoch__of__position__data> defaults to 1950.0. 
+<camera__identification> may be either 82 (the default) or 25 and controls the
+limits of the allowed rotator angles.
+At the time of writing, the limits for the 25cm camera are 0 and 275 degrees
+and those for the 82cm camera are 88 and 92 degrees.
+
+<inputfile> consists of commands commencing in column 1 as detailed below:
+.lt
+
+Command              Specifies                        Default 
+
+L  label             Plot label                       no default
+12ARCMIN             Rectangular plate
+40ARCMIN             Round plate                      12ARCMIN
+D  date              Observation date                 1.2 month hence
+E  epoch             Epoch                            1950.0
+O  orientation       Rotator position                 90deg
+S  scale             Plate scale                      6.6839 arcsec/mm
+T  [Tobs][,Tdrill]   Temperatures                     f(month) & 25 C
+C  position          Plate centre position            no default
+F  position          Fiducial object position         no default
+P  position          Programme object position        no default
+X  arcsec            Extra fiducial positions         no default
+                        (+ve North, -ve South)
+?                    Help
+.                    End of input
+
+   position          = right_ascension declination [epoch]
+   right_ascension   = hours minutes seconds
+   declination       = [sign]degrees minutes seconds
+   epoch             = years (A.D., floating point)
+   date              = years (A.D., floating point)
+   orientation       = degrees (floating point)
+   scale             = arcseconds/mm (floating point)
+   label             = character string
+   Tobs              = degrees Celsius (floating point)
+   Tdrill            = degrees Celsius (floating point)
+   arcsec            = arc seconds north of centre (floating point)
+
+.el
+Positions can have epochs appended to them which override the current default
+for that position only.
+Right ascension and declination components are integer except for seconds
+which are floating point.
+
+Commands may in be upper or lower case.
+
+It is recommended that the plate scale and default temperatures are not
+overridden.
+
+A more detailed description of these commands may be found in "AAO Fibre
+System Manual" by Peter Gray and Ray Sharples (UM18) which should be read by
+intending fibre observers.
+This is available from the AAO.
+
+NB: Using the 40 arcminute field requires that the RGO Spectrograph be mounted
+on an extender box and then fouls equipment racks in the Cassegrain cage at any
+orientation other than 90 degrees.
+Until further notice, only the default orientation should be used.
+.hl1 Plotting the Plate Diagram
+To plot on the Printronix:
+.lt
+
+	$ PRINT/QUEUE=GKS_RASTER/PARAM=PRINTRONIX <filename>
+
+.el
+Don't forget to include the file type in the <filename>.
+
+To plot on the Zeta (if available) you could use the following sequence:
+.lt
+
+	$ ALLO TXA5:
+	$ COPY FOR000.DAT TXA5:
+	$ DEALL TXA5:
+	$ EXIT
+
+.el
+This assumes that the Zeta plotter is _TXA5: and that DEVICE=ZETA has been
+specified.
+This may be different away from the AAO.
+.hl1 Installation Notes
+The software supplied consists of the executable program APLATE.EXE and
+everything required to produce it.
+Source code is provided for the main program APLATE and the subroutine packages
+APSUB and FMTUTIL.
+Two additional object libraries OC6 and REENT are provided without source code.
+APLATE.EXE can be recreated by executing the command procedure APLINK.COM.
+This assumes that the SGS6 library (LIBDIR:SGS.OLB) and the GKS6 software item
+(GKSDIR:) are available.
+
+Define the logical name APLATEDIR: to point to the directory holding the
+software; e.g.
+.lt
+
+	$ DEFINE/SYSTEM APLATEDIR STARDISK:[STARLINK.UTILITY.APLATE]
+
+.el
+Define the symbol APLATE as a foreign command; e.g.
+.lt
+
+	$ APLATE :== $APLATEDIR:APLATE
+
+
+.el
+All source code written by me in this package is in FORTRAN 77 but does not
+fully comply with all Starlink standards.
+I apologise for this and can offer various excuses. 
+In particular, points 1, 7, 16, 22 and 39 of SGP/16 are violated to such an
+extent that rectification is impractical, although some considerable effort has
+gone into reducing this.
+The Starlink environment is not required for running this program.
+
+If you have any problems with this software please send details to the Starlink
+Software Librarian (RLVAD::STAR).
+These will be forwarded to John Straede at the Anglo-Australian Observatory.

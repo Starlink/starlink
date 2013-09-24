@@ -1,0 +1,775 @@
+\documentstyle {article} 
+\markright{SUN/97.2}
+\setlength{\textwidth}{153mm}
+\setlength{\textheight}{220mm}
+\setlength{\oddsidemargin}{3mm}
+\setlength{\evensidemargin}{3mm}
+\pagestyle{myheadings}
+
+\begin{document}
+\thispagestyle{plain}
+\noindent
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill SUN/97.2\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf Starlink User Note 97.2}
+\begin{flushright}
+M D Lawden\\
+2 June 1987
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{10mm}
+\begin{center}
+{\Large\bf REXEC --- Introduction \& Comparison with SCAR}
+\end{center}
+\vspace{10mm}
+\section {INTRODUCTION}
+REXEC is a relational database management system (DBMS) developed by the
+Scientific Databases Section within the Central Computing Division at Rutherford
+Appleton Laboratory.
+The principal user document is the `R-EXEC Guide and Reference' written by
+Brian J Read.
+The reference part of this document is accessible via an on-line HELP system.
+Some background material is contained in two RAL reports: RAL-86-053 and
+RAL-86-084.
+
+SCAR is a DBMS designed principally to facilitate access to existing large
+astronomical databases.
+It is documented in SUN/70.
+
+This note demonstrates how to set up and use a private database using REXEC
+and SCAR.
+Its main purpose is to help you start to use REXEC effectively and to compare
+its features with those of SCAR.
+It is not intended to replace the R-EXEC guide or SUN/70.
+Many people will simply want to use existing databases and this problem is
+simpler than having to set up your own.
+However, as a DBMS is a useful tool for private use, this note deals with
+the problem of setting up databases as well as using them.
+
+A good way for a novice to overcome his initial lack of knowledge of and
+insight into new software is for him to run through a simple demonstration
+example which starts from scratch and can be typed in as shown.
+This clarifies what the software does, the concepts behind it, and how to use it
+effectively.
+The next two sections present such an example for REXEC and SCAR.
+The examples do the same job and enable REXEC and SCAR to be compared step by
+step.
+They are followed by a section which compares the two systems.
+
+Bug reports should be sent to RLVAD::STAR.
+Queries should be made direct to Brian Read on 0235-21900 X6492; mail address
+BJR@UK.AC.RL.IB.
+\section {REXEC Example}
+To run this example, copy files REXECDIR:TEST*.* into your own directory
+and proceed as described below, typing in the commands as shown.
+The files are:
+\begin{tabbing}
+XXXXXXXX\=TEST2DD.DATXXXX\=X\kill
+\>\+TEST1.DAT\>Ship data - set 1\\
+TEST2.DAT\>Ship data - set 2\\
+TEST1DD.DAT\>Description file for TEST1.DAT\\
+TEST2DD.DAT\>Description file for TEST2.DAT\\
+TEST.COM\>Command procedure to run example
+\end{tabbing}
+If you don't want to type in the commands you can execute TEST.COM instead.
+The raw data to be manipulated happens to be details of ships; the important
+thing is that they are a collection of data in integer, real and character
+format.
+REXEC assumes a type default of .DAT for raw data files and data description
+files.
+It stores data it wishes to manipulate in `R-files' which have a type default
+of .REX.
+These should only be accessed via REXEC commands.
+
+The data flow for the example is shown below:
+\setlength{\unitlength}{1mm}
+\begin{center}
+\begin{picture}(150,90)
+\thicklines
+\put (0,85){\framebox(30,5){TEST1.DAT}}
+\put (40,85){\framebox(30,5){TEST1DD.DAT}}
+\put (80,85){\framebox(30,5){TEST2DD.DAT}}
+\put (120,85){\framebox(30,5){TEST2.DAT}}
+\put (40,75){\framebox(30,5){TEST1}}
+\put (80,75){\framebox(30,5){TEST2}}
+\put (40,60){\framebox(30,5){TEST1}}
+\put (80,60){\framebox(30,5){TEST2}}
+\put (40,50){\framebox(30,5){JUNK}}
+\put (80,50){\framebox(30,5){=}}
+\put (60,35){\framebox(30,5){TEST}}
+\put (40,20){\framebox(30,5){=}}
+\put (80,20){\framebox(30,5){=}}
+\put (40,10){\framebox(30,5){=}}
+\put (80,10){\framebox(30,5){TESTCB}}
+\put (80,0){\framebox(30,5){RESULT}}
+\put (55,85){\vector(0,-1){5}}
+\put (95,85){\vector(0,-1){5}}
+\put (55,60){\vector(0,-1){5}}
+\put (95,60){\vector(0,-1){5}}
+\put (75,45){\vector(0,-1){5}}
+\put (55,30){\vector(0,-1){5}}
+\put (95,30){\vector(0,-1){5}}
+\put (55,20){\vector(0,-1){5}}
+\put (95,20){\vector(0,-1){5}}
+\put (95,10){\vector(0,-1){5}}
+\put (55,75){\vector(0,-1){10}}
+\put (95,75){\vector(0,-1){10}}
+\put (15,85){\line(0,-1){15}}
+\put (135,85){\line(0,-1){15}}
+\put (15,70){\line(1,0){40}}
+\put (95,70){\line(1,0){40}}
+\put (55,50){\line(0,-1){5}}
+\put (95,50){\line(0,-1){5}}
+\put (55,45){\line(1,0){40}}
+\put (75,35){\line(0,-1){5}}
+\put (55,30){\line(1,0){40}}
+\put (140,80){{\bf DEFINE}}
+\put (120,66.5){{\bf LOAD}}
+\put (120,56.5){{\bf SORT}}
+\put (120,43.5){{\bf JOIN}}
+\put (120,28.5){{\bf PROJECT}}
+\put (120,16.5){{\bf SORT}}
+\put (120,6.5){{\bf REPORT}}
+\put (10,28.5){{\bf SELECT}}
+\put (10,16.5){{\bf SORT}}
+\end{picture}
+\end{center}
+The names in boxes are file names and the branch names in bold-face are command
+names.
+File type is .REX unless shown otherwise.
+
+To get the raw data into an R-file you must first create the file using the
+{\bf DEFINE} command and the appropriate data definition file:
+\begin{verbatim}
+        $ REXEC DEFINE TEST1DD TEST1
+\end{verbatim}
+This command will create the R-file TEST1.REX.
+The first field `REXEC' is a predefined symbol which causes a command procedure
+to be executed which implements the command interface of REXEC.
+In the guide the commands are shown starting with the symbol `R'.
+This was considered too short for Starlink purposes and so has been changed
+to `REXEC'.
+{\em You must use `REXEC' instead of `R' to invoke REXEC commands.}
+
+You can examine the field definitions in the created file by:
+\begin{verbatim}
+        $ REXEC SHOW TEST1
+\end{verbatim}
+At this stage, file TEST1.REX does not contain any data; only field definitions.
+Data is loaded into the file by:
+\begin{verbatim}
+        $ REXEC LOAD TEST1 TEST1
+\end{verbatim}
+This adds the data stored in TEST1.DAT to the R-file TEST1.REX.
+You can now examine this data on your terminal by:
+\begin{verbatim}
+        $ REXEC LIST TEST1
+\end{verbatim}
+File TEST2.DAT contains some further information about the ships specified in
+TEST1.DAT.
+We want to join these two sets of data together.
+Before we can do this, we must store the new data in an R-file.
+We use the same method that we used for TEST1:
+\begin{verbatim}
+        $ REXEC DEFINE TEST2DD TEST2
+        $ REXEC LOAD   TEST2   TEST2
+        $ REXEC LIST   TEST2
+\end{verbatim}
+Both sets of data are now in the appropriate format.
+However, before we can join them we must make sure they are both sorted on
+the same key field.
+We will sort them on the NAME field (the ship name):
+\begin{verbatim}
+        $ REXEC SORT TEST1 JUNK (NAME)
+        $ REXEC SORT TEST2 =    (NAME)
+\end{verbatim}
+We store the output in two temporary files.
+The first one is JUNK.REX.
+The second one is the {\em current temporary file} specified by the symbol `='.
+As there is only one current temporary file, we had to call the first temporary
+file by a specific name (JUNK).
+Now we can join the data together:
+\begin{verbatim}
+        $ REXEC JOIN JUNK = TEST
+\end{verbatim}
+The output is stored in the R-file TEST.REX.
+You can examine the field definitions in the new file by:
+\begin{verbatim}
+        $ REXEC SHOW TEST
+\end{verbatim}
+and you can examine the actual data by:
+\begin{verbatim}
+        $ REXEC LIST TEST
+\end{verbatim}
+Now we have a complete set of raw data in one R-file we can perform some
+relational operations on it.
+A typical useful operation is to select records which satisfy some criterion.
+Thus, let us select those ships with a displacement $>$50000 tons
+and display them in order of displacement:
+This can be done as follows:
+\begin{verbatim}
+        $ REXEC SELECT TEST = (DISP>50000)
+        $ REXEC SORT   =    = (DISP)
+        $ REXEC LIST   =
+\end{verbatim}
+DISP is the name of the field holding the displacement.
+Notice how we have used the current temporary file feature to avoid having to
+think up names for the temporary files involved.
+
+Selecting records on fields with character values is more tricky than doing it
+on numeric fields.
+This is because REXEC delimits character strings with apostrophes and the DCL
+interpreter deals with the apostrophe character in a special way.
+The safest thing is to let the program prompt you for character strings with
+the prompt `R$>$'.
+Thus, to list all the passenger ships in the database, do this:
+\begin{verbatim}
+        REXEC SELECT TEST (
+        R>TYPE='P')
+\end{verbatim}
+(the reply to TYPE is case sensitive, you must use upper case in this instance)
+and to list the details of the ship {\em Des Moines,} do this:
+\begin{verbatim}
+        REXEC SELECT TEST (
+        R>NAME='Des Moines')
+\end{verbatim}
+Another common requirement is to calculate for every record the value of some
+parameter which is a function of the record's field values.
+Let us calculate values for the following two functions:
+\begin{verbatim}
+        Cb = 0.9912*DISP/(L*B*D)
+        LB = L/B
+\end{verbatim}
+Cb is the Block Coefficient of the hull calculated from the given values of
+Displacement, Length, Beam, and Draught and LB is the Length to Beam ratio.
+The appropriate command is {\bf PROJECT:}
+\begin{verbatim}
+        $ REXEC PROJECT TEST = (NAME (0.9912*DISP/(L*B*D)):CB (L/B):LB)
+\end{verbatim}
+The parameters enclosed in parentheses are interpreted as follows.
+The two blanks separate the specification of the three fields that we want to
+create in the output file.
+The first is simply a copy of the NAME field.
+The second is a new field called CB which is defined in terms of the original
+fields by the expression (0.9912*DISP/(L*B*D)).
+The third is a new field called LB which is defined in terms of the original
+fields by the expression (L/B).
+DISP, L, B and D are existing field names.
+
+Finally, let us sort the new file in order of Block Coefficient and display
+a report containing the extracted data:
+\begin{verbatim}
+        $ REXEC SORT    =      TESTCB (CB)
+        $ REXEC REPORT  TESTCB        (Average CB LB Error Recordnumbers)
+\end{verbatim}
+The codes enclosed in parentheses have the following meaning.
+`Average CB LB' means display the average value for fields CB and LB; `Error'
+means include the standard deviation; `Recordnumbers' means number the records.
+You can abbreviate these options to `(A CB LB E R)'.
+If you want to store the output permanently in a file, specify a file name
+following `TESTCB' in the last command.
+This leads to a problem because REXEC will not accept more than eight fields
+in a command line.
+This is due to a restriction in the number of parameters allowed in a DCL
+command procedure.
+Once again, the way to overcome it is to enter `(' as the option field and
+allow the program to prompt you for the rest of the option list.
+Thus, to get a report written to file RESULT.LIS, enter the command:
+\begin{verbatim}
+        $ REXEC REPORT TESTCB RESULT (
+        R>A CB LB E R)
+\end{verbatim}
+\section {SCAR Example}
+This example illustrates how to set up and use a simple database using SCAR.
+It does the same processing as the REXEC example so you can compare how REXEC
+and SCAR do the same job.
+The following SCAR commands are used (the `CAR\_' prefix is omitted):
+\begin{tabbing}
+XXXXXXXX\=Database functions:XXX\=\kill
+\>\+Database functions:\>{\bf CONVERT}, {\bf JOIN}, {\bf SEARCH}, {\bf SORT}\\
+Display data:\>{\bf ANALYSE}, {\bf CALC}, {\bf REPORT}
+\end{tabbing}
+There are many other ways of performing the processing done in this example.
+The method used here is not claimed to be the best.
+
+To run the example, copy the following files from REXECDIR into your own
+directory and proceed as described below:
+\begin{tabbing}
+XXXXXXXX\=Database functions:XXX\=\kill
+\>\+T1F.DAT\>Ship data - set 1\\
+T2F.DAT\>Ship data - set 2\\
+DSCFT1F.DAT\>Description file for T1F.DAT\\
+DSCFT2F.DAT\>Description file for T2F.DAT\\
+SCARDEMO.COM\>Command procedure to run example
+\end{tabbing}
+Files T1F.DAT and T2F.DAT were prepared using an editor (EDT).
+The DSCF files are best prepared using the {\bf FORM} command.
+The data flow for the example is show below:
+\begin{center}
+\begin{picture}(120,100)
+\thicklines
+\put (20,95){\framebox(30,5){T1F}}
+\put (70,95){\framebox(30,5){T2F}}
+\put (20,85){\framebox(30,5){T1}}
+\put (70,85){\framebox(30,5){T2}}
+\put (20,75){\framebox(30,5){T1SS}}
+\put (70,75){\framebox(30,5){T2SS}}
+\put (45,60){\framebox(30,5){TEST}}
+\put (45,50){\framebox(30,5){TESTC}}
+\put (20,35){\framebox(30,5){TDP0}}
+\put (70,35){\framebox(30,5){TCB0}}
+\put (20,25){\framebox(30,5){TDP1}}
+\put (70,25){\framebox(30,5){TCB1}}
+\put (20,15){\framebox(30,5){TDP2}}
+\put (70,15){\framebox(30,5){TCB2}}
+\put (70,5){\framebox(30,5){TCB3}}
+\put (35,95){\vector(0,-1){5}}
+\put (85,95){\vector(0,-1){5}}
+\put (35,85){\vector(0,-1){5}}
+\put (85,85){\vector(0,-1){5}}
+\put (60,70){\vector(0,-1){5}}
+\put (60,60){\vector(0,-1){5}}
+\put (35,45){\vector(0,-1){5}}
+\put (85,45){\vector(0,-1){5}}
+\put (35,35){\vector(0,-1){5}}
+\put (85,35){\vector(0,-1){5}}
+\put (35,25){\vector(0,-1){5}}
+\put (85,25){\vector(0,-1){5}}
+\put (85,15){\vector(0,-1){5}}
+\put (85,5){\vector(0,-1){5}}
+\put (35,75){\line(0,-1){5}}
+\put (85,75){\line(0,-1){5}}
+\put (35,70){\line(1,0){50}}
+\put (35,45){\line(1,0){50}}
+\put (60,50){\line(0,-1){5}}
+\put (110,91.5){{\bf CONVERT}}
+\put (110,81.5){{\bf SORT}}
+\put (110,68.5){{\bf JOIN}}
+\put (85,56.5){{\bf CONVERT}}
+\put (110,41.5){{\bf CALC} (BLOCK)}
+\put (110,31.5){{\bf CALC} (CB)}
+\put (110,21.5){{\bf SORT}}
+\put (110,11.5){{\bf CONVERT}}
+\put (110,1.5){{\bf ANALYSE}}
+\put (0,41.5){{\bf SEARCH}}
+\put (0,31.5){{\bf CONVERT}}
+\put (0,21.5){{\bf SORT}}
+\end{picture}
+\end{center}
+The names in boxes are file names and the branch names in bold-face are command
+names.
+
+First, prepare SCAR for use:
+\begin{verbatim}
+        $ START_CAR
+\end{verbatim}
+and get the `\$' prompt back again:
+\begin{verbatim}
+        SCAR 3.1> SET PROMPT
+\end{verbatim}
+You can look at the contents of a file at any time by using {\bf REPORT},
+thus to look at the contents of T1F:
+\begin{verbatim}
+        $ CAR_REPORT
+        INPUT:=T1F
+        MODE:=2
+        SELECT?:=N
+        HEADER?:=N
+\end{verbatim}
+Reply `+' to the prompt `Scroll:=' to get more output; `E' to quit.
+Use Mode 1 to get printed output (stored in file T1F.CAR).
+You can specify the parameter values on the command line:
+\begin{verbatim}
+        $ CAR_REPORT/INPUT=T1F/MODE=2/SELECT?=N/HEADER?=N
+\end{verbatim}
+However, it is easier and clearer to wait for the prompts and this is how the
+example is shown.
+
+T1F and T2F contain different data for the same ships.
+The first job is to join these files and store the data in a single file.
+However, we must first convert the data from formatted to unformatted form
+since {\bf JOIN} only works on unformatted files:
+\begin{verbatim}
+        $ CAR_CONVERT
+        INPUT:=T1F
+        OUTPUT:=T1
+        SIMPLE?:=Y
+        ASCII?:=N
+        INDEX?:=N
+        SELECT?:=N
+                <4 I lines output>
+\end{verbatim}
+The $<$4 I lines output$>$ means that four information lines will be output by
+the program.
+These are self explanatory and will not be displayed in detail in this paper.
+The $<>$ syntax is used freely below to indicate where information lines are
+output.
+
+SCAR will always write a descriptor file for a specified output file if a such
+a descriptor file does not exist.
+Thus, in this case the descriptor file DSCFT1.DAT is automatically written.
+
+Files to be joined should be sorted on the same key field.
+T1F and T2F are arranged in different order, so T1 and T2 must be sorted on key
+field NAME:
+\begin{verbatim}
+        $ CAR_SORT
+        INPUT:=T1
+        SIMPLE?:=Y
+        OUTPUT?:=T1SS
+        KEYS:=NAME
+        ASCEND:=Y
+        TAG?:=N
+                <3 I lines>
+\end{verbatim}
+A four character output file name is chosen because later on we will identify
+fields in such a way that the first four characters of this name are used in the
+field name.
+
+Now do the same thing to T2F as was done to T1F:
+\begin{verbatim}
+        $ CAR_CONVERT        (T2F -> T2)
+        $ CAR_SORT           (T2 -> T2SS)
+\end{verbatim}
+The replies to the prompts are obvious modifications of those shown above.
+
+We are now able to join files T1SS and T2SS to form file TEST containing
+all the data in T1F and T2F.
+\begin{verbatim}
+        $ CAR_JOIN
+        INPUT:=T1SS,T2SS
+        OUTPUT:=TEST
+        SIMPLE?:=Y
+        MATCH:=T1SS__NAME.EQ.T2SS__NAME.END.
+        OK?:=Y
+              <8 I lines>
+\end{verbatim}
+File TEST is in indexed form and in order to be able to use {\bf SEARCH}
+and {\bf CALC} on it we must convert it into a form which contains all the
+required fields.
+The fields obtained from T1SS will have names formed by prefixing the
+original names by `T1SS\_\_' and similarly for T2SS.
+Thus the displacement from T1SS will have field name T1SS\_\_DISP and the length
+from T2SS will have field name T2SS\_\_L.
+We only want one of the NAME fields since they will have the same value in any
+one record.
+\begin{verbatim}
+        $ CAR_CONVERT
+        INPUT:=TEST
+        OUTPUT:=TESTC
+        SIMPLE?:=Y
+        ASCII?:=N
+        INDEX?:=N
+        TITLE:=Full Ship Data
+        SELECT?:=Y
+                <answer Y to each prompt except on second occasion that
+                NAME field is prompted for (8th prompt)>
+\end{verbatim}
+The next section extracts records for ships with a displacement $>$50000 tons and
+prepares a file containing a list of such ships in displacement order.
+Select records for ships with displacement $>$50000 tons:
+\begin{verbatim}
+        $ CAR_SEARCH
+        INPUT:=TESTC
+        OUTPUT:=TDP0
+        SIMPLE?:=Y
+        I : KEYFIELD          :NAME
+        I : Do you have a RANGE         ?
+        ANSWER?:=N
+        I : Do you have a QUERY         ?
+        ANSWER?:=Y
+        QUERY:=T1SS__DISP.GT.50000.END.
+        OK?:=Y
+                <5 I lines output>
+\end{verbatim}
+We cannot sort the TDP0 file as it stands since it is an index and {\bf SORT}
+cannot find field T1SS\_\_DISP.
+We must first convert it to a form which explicitly contains all the fields.
+\begin{verbatim}
+        $ CAR_CONVERT
+        INPUT:=TDP0
+        OUTPUT:=TDP1
+        SIMPLE?:=Y
+        ASCII?:=N
+        INDEX?:=N
+        TITLE:=Ships with displacement > 50000 tons
+        SELECT?:=N
+                <4 I lines>
+\end{verbatim}
+Now sort in order of displacement:
+\begin{verbatim}
+        $ CAR_SORT
+        INPUT:=TDP1
+        SIMPLE?:=Y
+        OUTPUT:=TDP2
+        KEYS:=T1SS__DISP
+        ASCEND:=Y
+        TAG?:=N
+                <3 I lines>
+\end{verbatim}
+We can now get a list of ships with displacement $>$50000 tons in displacement
+order.
+\begin{verbatim}
+        $ CAR_REPORT
+        INPUT:=TDP2
+        MODE:=1
+                <2 I lines>
+        SELECT?:=Y
+        HEADER?:=N
+                <Select NAME and T1SS__DISP fields>
+\end{verbatim}
+The output is stored in file TDP2.CAR which may be printed.
+
+We can use {\bf SEARCH} to extract all the passenger ship records by
+specifying the query:
+\begin{verbatim}
+        QUERY:=T1SS__TYPE.EQ."P".END.
+\end{verbatim}
+However, {\bf SEARCH} is completely defeated by any request for the record
+of a ship specified by name, unless that name contains no lower case characters.
+Thus, the query:
+\begin{verbatim}
+        QUERY:=NAME.EQ."Des Moines".END.
+\end{verbatim}
+fails because SCAR converts the input string `Des Moines' to the string
+`DES MOINES' and the comparison with the name string `Des Moines' in the
+database fails.
+However, a query for ship `QE2' will succeed.
+I can't see a way of getting around it.
+This problem makes the current version of SCAR unusable for serious
+administrative applications.
+
+Now calculate the Block Coefficient (Cb) and Length/Beam (LB) ratio defined
+above.
+SCAR immediately gives us another problem because it will not accept parentheses
+in formulas!
+We must therefore make the calculation of Cb in 2 stages:
+\begin{verbatim}
+        BLOCK = L * B * D
+        Cb    = 0.9912 * DISP / BLOCK
+\end{verbatim}
+First calculate the value of BLOCK for every record in TESTC.
+\begin{verbatim}
+        $ CAR_CALC
+        INPUT:=TESTC
+        OUTPUT=TCB0
+        KEYWORD:=F
+        NAME:=BLOCK
+        DEFINE:=T2SS__L*T2SS__B*T2SS__D
+        UNIT:=M**3
+        KEYWORD=E
+                <A report is displayed on the screen>
+        Scroll:=+
+\end{verbatim}
+Now calculate CB.
+\begin{verbatim}
+        $ CAR_CALC
+        INPUT:=TCB0
+        OUTPUT:=TCB1
+        KEYWORD:=F
+        NAME:=CB
+        DEFINE:=0.9912*T1SS__DISP/BLOCK
+        KEYWORD:=F
+        NAME:=LB
+        DEFINE:=T2SS__L/T2SS__B
+        KEYWORD:=E
+                <A report is displayed on the screen>
+        Scroll:=+
+\end{verbatim}
+Now sort the records into CB order.
+This works with TCB1 because it contains the CB field although other fields are
+held in TESTC.
+\begin{verbatim}
+        $ CAR_SORT
+        INPUT:=TCB1
+        SIMPLE?:=Y
+        OUTPUT:=TCB2
+        KEYS:=CB
+        ASCEND:=Y
+        TAG?:=N
+                <3 I lines>
+\end{verbatim}
+TCB2 still only contains a small number of fields and points to TESTC for the
+rest.
+It is convenient to produce a file (TCB3) containing all the fields explicitly.
+The fields POINTER, NUMBER and BLOCK are of no interest and should be discarded.
+\begin{verbatim}
+        $ CAR_CONVERT
+        INPUT:=TCB2
+        OUTPUT:=TCB3
+        SIMPLE?:=Y
+        ASCII?:=N
+        INDEX?:=N
+        TITLE:=Augmented Ship Data
+        SELECT?:=Y
+                <omit POINTER, NUMBER and BLOCK>
+\end{verbatim}
+A full report of the joined, augmented and sorted ship data can now be
+produced and printed.
+\begin{verbatim}
+        $ CAR_REPORT
+        INPUT:=TCB3
+        MODE:=1
+                <2 I lines>
+        SELECT?:=N
+        HEADER?:=N
+                <the report appears a record at a time. Answer "+"
+                 to the Scroll:= prompt until all data have been
+                 processed, then answer "e">
+\end{verbatim}
+The full report is available for printing in file TCB3.CAR.
+The required statistical analysis can be obtained using command {\bf ANALYSE}
+and this can be displayed graphically.
+The input below shows a typical process:
+\begin{verbatim}
+        $ CAR_ANALYSE
+                <3 I lines>
+        STYLE:=1                        (Histogram)
+        INPUT:=TCB3
+                <3 I lines>
+        PTYPE:=1                        (Bar chart)
+                <1 I line>
+        XAXIS:=CB
+        TITLE:=Block Coefficient
+                <5 I lines>
+                <report on statistical analysis of CB appears on terminal>
+        Scroll:=E
+        I : Enter bin size
+        BIN_SZ:=0.05
+        I : Xaxis lower limit
+        X_LOW:=0.45
+        I : No. of bins required
+        NBINS:=10
+        I : largest bin pop: 5
+        I : Yaxis lower limit
+        Y_LOW:=0
+        I : Yaxis upper limit
+        Y_UPP:=6
+        I : Okay to continue?
+        OKAY?:=Y
+        I : Enter device
+                <possible devices displayed>
+        DEVICE:=<choose your own>
+                <7 I lines>
+        PLOTTER:=PRINTRONIX
+                <6 I lines>
+        SIZE:=4                                        (A4 size)
+                <a graph should appear on your terminal>
+        STORE?:=Y
+        MORE?=N
+                <1 I line>
+        $ PRINT/PASSALL PRINTRONIX.BIT
+\end{verbatim}
+The process described above shows what happens when you start from just the
+original five files supplied.
+If you tried to carry out the process again you would find that SCAR reacted
+differently.
+This is because of the existence of the DSCF files created during the initial
+process.
+When an output file is specified, SCAR looks for an associated descriptor file
+and if found gets information from it.
+This modifies the prompts.
+In particular, {\bf CONVERT}, {\bf JOIN} and {\bf SEARCH} only prompt for
+INPUT and OUTPUT.
+
+The commands for this demo are stored in file REXECDIR:SCARDEMO.COM.
+When executed, this requires that some parameter values be supplied from the
+keyboard.
+In particular, I can't see how to specify the formula
+`0.9912*T1SS\_\_DISP/BLOCK' as a parameter because the `/' is interpreted as a
+parameter separator.
+\section {A comparison of REXEC and SCAR}
+REXEC and SCAR have a lot of similarities in design and functionality.
+However, SCAR was designed principally for processing existing astronomical
+catalogues while REXEC was designed as a general purpose system.
+SCAR is four times larger than REXEC (7100 blocks to 1800 blocks) and in general
+SCAR is more powerful and has more facilities.
+I personally found SCAR more difficult than REXEC to start using successfully
+as it is more complex, more unforgiving and has a tougher user manual to crack.
+You will see from the examples that SCAR makes heavier weather of the job than
+REXEC and the output is less concise, but you do get a graph.
+
+In REXEC both the text files and the R-files are sequential but the text files
+have variable length records while the R-files have fixed length (1024 byte)
+records.
+I/O for R-files is via Fortran binary direct access statements.
+In SCAR the formatted files are sequential with variable length records while
+the unformatted files are relative with fixed length records.
+SCAR also has index files while REXEC does not.
+REXEC only processes R-files while SCAR can do some operations on both
+formatted and unformatted files.
+
+REXEC takes the text data description from a separate file to the text data
+and stores both sets of information in a single R-file.
+SCAR stores the data description in a separate file for both formatted and
+unformatted versions and it has naming rules for them.
+Only SCAR can edit data in the form in which it is usually processed.
+With REXEC you have to edit the text form and them convert this to an R-file.
+Only SCAR has a plotting package --- this is a major advantage over REXEC ---
+however, an REXEC plotting package is expected.
+Both have a HELP system.
+
+SCAR is unable to select records based on keys which are character values
+containing lower case letters.
+This is a serious defect for administrative type databases.
+SCAR doesn't have the temporary file feature of REXEC which makes SCAR more
+painful to use.
+
+The command formats differ.
+The REXEC command is of the form:
+\begin{verbatim}
+        $ REXEC command infile(s) outfile (options)
+\end{verbatim}
+while SCAR has a symbol defined for each command and its parameters use the
+INTERIM environment form of specification:
+\begin{verbatim}
+        $ command/par1=value/par2=value...
+\end{verbatim}
+The table below shows which commands perform similar functions in REXEC and
+SCAR (the `CAR\_' prefix has been omitted).
+Specific details can be found in the associated documentation.
+\begin{tabbing}
+XXXXX\=Database functions:XXX\=JOIN/DIFFERXXXXXXXXXXXXX\=\kill
+\>\+{\bf Functional area}\>{\bf SCAR}\>{\bf REXEC}\\
+\\
+Database functions:\\
+\>SEARCH\>SELECT/RANGE\\
+\>CONVERT\>PROJECT\\
+\>SORT\>SORT\\
+\>MERGE\>MERGE\\
+\>JOIN/DIFFER\>JOIN\\
+\\
+Display data:\\
+\>REPORT\>REPORT/LIST\\
+\>CALCULATE\>PROJECT\\
+\>ANALYSE\>PLOT\\
+\>PLOT\>-\\
+\>-\>GROUP\\
+\\
+Data definitions:\\
+\>FORM\>-\\
+\>BINARY/ASCII\>-
+\end{tabbing}
+The SCAR {\bf PLOT} command is really a version of the CHART program and is not
+comparable to the REXEC {\bf PLOT} command (not yet implemented in the VAX/VMS
+version).
+Both items have a number of commands which are really tools to help the user
+perform utility functions and these are not comparable.
+They are:
+\begin{tabbing}
+XXXXXDatabase functions:XXX\=JOIN/DIFFERXXXXXXXXXXXXX\=\kill
+\>\+START\_CAR\>DEFINE/LOAD\\
+HARDCOPY/WRAP\>COPY/RENAME\\
+UPDATE/HELP\>SHOW\\
+EXTAPE/MOUNT/DISMOUNT\>UNDO
+\end{tabbing}
+\section {REFERENCES}
+B J Read, `R-EXEC Guide and Reference'; RAL/CCD Division.\\
+B J Read, `A Relational Data Handling System for Scientists'; RAL Report
+RAL-86-053.\\
+B J Read, `Scientific Data Manipulation in a Relational Database System';
+RAL Report RAL-86-084.\\
+J H Fairclough, `SCAR - Starlink Catalogue Access and Reporting'; SUN/70.
+\end{document}

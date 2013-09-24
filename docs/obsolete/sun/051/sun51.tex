@@ -1,0 +1,100 @@
+\documentstyle{article} 
+\pagestyle{myheadings}
+\markright{SUN/51.1}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill SUN/51.1\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf Starlink User Note 51.1}
+\begin{flushright}
+C A Clayton\\
+1 November 1988
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf Submission of NEWS items}
+\end{center}
+\vspace{5mm}
+
+The purpose of this note is to inform users how to correctly format
+and submit NEWS items for distribution around Starlink. An incorrectly
+formatted item can appear garbled when inserted into the
+NEWS library. At the very least, system managers around Starlink 
+will have to waste time reformatting these items before
+they can be used. 
+
+\section {Formatting your NEWS item}
+
+NEWS items should be produced according to the following guidelines:
+
+\begin{itemize}
+
+\item Please keep the title of the news item as short as possible 
+without losing important detail. The title line should start with a 
+`1' in column 1 (see example). The title itself must be a single string of
+characters starting in column 3 or greater. If the title contains
+more than one word, each word should be separated by a `\_' and
+not a space (see example).
+
+\item Every news item {\bf MUST} contain an expiration date. This is the date
+after which the NEWS item can be deleted from the NEWS system. In the past,
+NEWS items without expiration dates have been left filling up the NEWS system
+well beyond their useful lifetime because system managers have been unsure 
+whether it is time to delete them. This date should be clearly visible at the
+top right-hand corner of the item, above the main text but below the 
+title line (see example). 
+
+\item Each line of the main text should be no more than 78 characters long
+since the LIBRARIAN utility used to store NEWS items 
+indents the main text by two spaces. Longer
+lines wrap around and give the NEWS item a chaotic, unprofessional look.
+
+\item The main text of your NEWS item should contain no digits in
+the first column. The LIBRARIAN utility will interpret these as key
+numbers with potentially catastrophic consequences for your text.
+
+\item If you wish to have a tree structured NEWS item, then this
+should be formatted as described in the Librarian Reference manual
+(VMS Version 4 -- Vol 7b, LIB-7; VMS Version 5 -- Vol 2b, LIB-5).
+
+\end{itemize}
+
+\section {Submitting your NEWS item}
+
+Once your NEWS item is complete, you should send it to your local
+system manager, clearly stating whether the item is just to go
+into the local NEWS system or if it is to be displayed around the 
+whole of Starlink. Your manager will take care of both local 
+installation of the item and, if applicable, distribution to other system 
+managers around Starlink. 
+
+\section {Example}
+
+\begin{verbatim}
+
+1 Black_hole_Seminar
+                                                Expires 13-12-1988
+
+An extra seminar has been scheduled for next week. On Tuesday 13th
+December, Dr. John Blout will describe his controversial work in a
+talk entitled ``Star Formation in Black Holes''. Everyone is urged 
+to attend this seminar and the lively discussion afterwards at the 
+Rose & Crown. 
+
+S.D. Stoddard
+
+\end{verbatim}
+
+\end{document} 

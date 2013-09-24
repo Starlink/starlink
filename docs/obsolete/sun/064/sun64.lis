@@ -1,0 +1,57 @@
+
+
+
+SCIENCE AND ENGINEERING RESEARCH COUNCIL                      SUN/64.4
+RUTHERFORD APPLETON LABORATORY
+
+Starlink Project                                             Issued by
+Starlink User Note 64.4
+
+                                                          D L Terrrett
+                                                         12 March 1987
+
+----------------------------------------------------------------------
+
+                 MONGO - Interactive Plotting Program
+                 ------------------------------------
+
+
+
+1  INTRODUCTION
+
+MONGO is a set of commands which  make  it  possible  to  build  up  a
+complicated  diagram, including graphics, text, axes and so on, and to
+create publishable quality output.  It was written by John L Tonry and
+modified  to run over SGS and GKS 7.2 by D J King (RGO).  It therefore
+works on ALL devices supported by GKS.  MONGO is also available  as  a
+collection  of  subroutines  which enthusiasts may use to create their
+own programs.
+
+MONGO can be activated by typing the command "MONGO" in response to  a
+VMS  "$"  prompt.   When  MONGO  is running, you will get a "MONGO72>"
+prompt.  Online help, similar to VMS help, is available by typing  the
+command "HELP".  To exit from MONGO, type "END".
+
+A comprehensive manual is available; if you require  a  copy,  contact
+your  site  manager.   This  contains  four examples of MONGO plotting
+which you can produce interactively yourself by typing  the  following
+MONGO commands:
+
+        TERMINAL 'workstation'
+        INPUT MONGO72DIR:EX001.PL
+        ERASE
+        INPUT MONGO72DIR:EX002.PL
+        ERASE
+        INPUT MONGO72DIR:EX003.PL
+        ERASE
+        INPUT MONGO72DIR:EX004.PL
+        ERASE
+
+Where 'workstation' is the GKS workstation number or  SGS  workstation
+name on which the plots are to be produced.
+
+MONGO is only really suitable for production  of  publishable  quality
+output.   It is too slow and too expensive in computer resources to be
+put into a user's data reduction system.
+
+                                - 1 -
