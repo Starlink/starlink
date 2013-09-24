@@ -419,8 +419,8 @@ void smurf_mon( int * status ) {
   /* Clear cached info from sc2ast_createwcs. */
   sc2ast_createwcs(SC2AST__NULLSUB, NULL, NULL, NULL, NO_FTS, NULL, status);
 
-  /* Clear WVM cache */
-  smf_calc_wvm( NULL, -1.0, NULL, 1, status );
+  /* Clear WVM caches (one for each thread). */
+  smf_calc_wvm_clear( status );
 
   /* Free AST resources */
   astTune( "MemoryCaching", memory_caching );

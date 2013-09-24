@@ -13,7 +13,8 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_calc_wvm( const smfHead *hdr, double approxam, AstKeyMap * extpars, int usecache, int *status);
+*     smf_calc_wvm( const smfHead *hdr, double approxam, AstKeyMap * extpars,
+*                   int *status);
 
 *  Arguments:
 *     hdr = const smfHead* (Given)
@@ -29,10 +30,6 @@
 *        contain the "taurelation" key which itself will be a keymap
 *        containing the parameters for the specific filter. If NULL
 *        the 225GHz tau will be returned.
-*     usecache = int (Given)
-*        If true then a cache will be used. The cache is not thread-safe
-*        so the cache should be disabled if you are running the WVM calculations
-*        in multiple threads. Must be true if an existing cache is to be freed.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -49,7 +46,8 @@
 *     - A cache is implemented to allow previously calculated values to be
 *       returned. Calling the function with NULL hdr and a negative airmass
 *       will free the cache. The cache should be cleared between calls to the
-*       monolith.
+*       monolith. Each thread has its own cache, stored in thread-specific
+*       data .
 
 *  Authors:
 *     Andy Gibb (UBC)
@@ -95,6 +93,8 @@
 *        in threads and causes problems when we let it simply trigger
 *        AST__OBJIN and annul it. So now when you know you are in threads
 *        you can explicitly disable it.
+*     2013-09-24 (DSB):
+*        Changed so that each thread has its own cache.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -145,13 +145,14 @@
 #include "wvm/wvmCal.h"
 #include "wvm/wvmTau.h"
 
-static AstKeyMap * CACHE = NULL;
+#define CACHE_NAME "SMF_CALC_WVM_CACHE"
 
-double smf_calc_wvm( const smfHead *hdr, double approxam, AstKeyMap * extpars, int usecache,
+double smf_calc_wvm( const smfHead *hdr, double approxam, AstKeyMap * extpars,
                      int *status ) {
 
   /* Local variables */
   double airmass;           /* Airmass of current observation */
+  AstKeyMap *cache = NULL;  /* The caceh for the running thread */
   float pwv;                /* Precipitable water vapour in mm */
   const JCMTState *state = NULL; /* STATE struct containing TCS info */
   double tau;               /* Zenith tau at current wavelength */
@@ -168,9 +169,17 @@ double smf_calc_wvm( const smfHead *hdr, double approxam, AstKeyMap * extpars, i
   /* Routine */
   if ( *status != SAI__OK) return VAL__BADD;
 
-  /* See if we are required to clear any cache */
-  if (!hdr && approxam != VAL__BADD && approxam < 0.0 && usecache) {
-    if (CACHE) CACHE = astAnnul( CACHE );
+  /* Get a pointer to the cache used by the running thread. This will be
+     NULL if no cache has yet been created. */
+  if( !astMapGet0A( thrThreadData( status ), CACHE_NAME, &cache ) ) cache = NULL;
+
+  /* See if we are required to clear any cache. If so, remove the cache from
+     the thread specific data KeyMap, and then annul the cache object. */
+  if (!hdr && approxam != VAL__BADD && approxam < 0.0 ) {
+    if (cache) {
+      astMapRemove( thrThreadData( status ), CACHE_NAME );
+      cache = astAnnul( cache );
+    }
     return VAL__BADD;
   }
 
@@ -189,11 +198,11 @@ double smf_calc_wvm( const smfHead *hdr, double approxam, AstKeyMap * extpars, i
     return VAL__BADD;
   }
 
-  /* Initialise the cache and exempt it from AST context handling so it
-     is not annulled when the current AST context ends. */
-  if (!CACHE && usecache) {
-     CACHE = astKeyMap( "" );
-     astExempt( CACHE );
+  /* Initialise the cache and store it in the thread specific data
+     KeyMap. */
+  if (!cache) {
+     cache = astKeyMap( "" );
+     astMapPut0A( thrThreadData( status ), CACHE_NAME, cache, "" );
   }
 
   /* Store TCS info */
@@ -207,6 +216,7 @@ double smf_calc_wvm( const smfHead *hdr, double approxam, AstKeyMap * extpars, i
   wvmtime = state->wvm_time;
 
   if (wvm[0] == VAL__BADR || wvm[1] == VAL__BADR || wvm[2] == VAL__BADR ) {
+    cache = astAnnul( cache );
     return VAL__BADD;
   }
 
@@ -254,9 +264,9 @@ double smf_calc_wvm( const smfHead *hdr, double approxam, AstKeyMap * extpars, i
       sprintf( cachekey, "%.4f-%.4f-%.4f-%.4f-%.4f",
                airmass, tamb, wvm[0], wvm[1], wvm[2] );
 
-      if (usecache && astMapHasKey( CACHE, cachekey )) {
+      if (astMapHasKey( cache, cachekey )) {
         /* Get the value */
-        astMapGet0D( CACHE, cachekey, &tau225 );
+        astMapGet0D( cache, cachekey, &tau225 );
 
       } else {
 
@@ -270,7 +280,7 @@ double smf_calc_wvm( const smfHead *hdr, double approxam, AstKeyMap * extpars, i
         tau225 = pwv2tau_bydate( wvmtime, pwv );
 
         /* Store the result in the cache */
-        if (usecache) astMapPut0D( CACHE, cachekey, tau225, "" );
+        astMapPut0D( cache, cachekey, tau225, "" );
 
       }
     }
@@ -286,6 +296,8 @@ double smf_calc_wvm( const smfHead *hdr, double approxam, AstKeyMap * extpars, i
   }
 
   /*  printf("A = %g tau225 = %g tau = %g\n",airmass,tau225,tau);*/
+
+  cache = astAnnul( cache );
 
   return tau;
 }

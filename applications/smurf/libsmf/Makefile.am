@@ -41,6 +41,7 @@ smf_calc_subinst.c \
 smf_calc_telpos.c \
 smf_calc_telres.c \
 smf_calc_wvm.c \
+smf_calc_wvm_clear.c \
 smf_calcmodel_ast.c \
 smf_calcmodel_com.c \
 smf_calcmodel_com_old.c \
