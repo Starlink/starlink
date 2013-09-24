@@ -93,6 +93,10 @@
 *        airmass cannot be determined.
 *     2013-07-31 (TIMJ):
 *        Disable WVM recalc for FOCUS
+*     2013-03-18 (DSB):
+*        If airmass cannot be determined, only annull the error if it
+*        is SAI__ERROR (i.e. do not hide errors from instra-structure
+*        libraries that might indicate a programming problem).
 
 *  Copyright:
 *     Copyright (C) 2009-2013 Science & Technology Facilities Council.
@@ -430,18 +434,18 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, i
          date-time strings, including a "T" separator between time and date. */
       AstTimeFrame *tf = astTimeFrame( "Format=iso.0T" );
 
-      for (i=0; i < nframes; i++) {
+      for (i=0; i < nframes && *status == SAI__OK; i++) {
         smf__calc_wvm_index( hdr, "AMSTART", i, &starttau, &starttime, status );
         if (starttau != VAL__BADD) break;
-        if (*status != SAI__OK) errAnnul( status );
+        if (*status == SAI__ERROR) errAnnul( status );
       }
 
       /* if we did not get a start tau we are not going to get an end tau */
       if (starttau != VAL__BADD) {
-        for (i=0; i < nframes; i++) {
+        for (i=0; i < nframes && *status == SAI__OK; i++) {
           smf__calc_wvm_index( hdr, "AMEND", nframes - 1 - i, &endtau, &endtime, status );
           if (endtau != VAL__BADD) break;
-          if (*status != SAI__OK) errAnnul( status );
+          if (*status == SAI__ERROR) errAnnul( status );
         }
       }
 
