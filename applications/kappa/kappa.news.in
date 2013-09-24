@@ -33,7 +33,7 @@
 
    o  ERASE
 
-      -  Now has aparameter called REPORT that indicates if an error
+      -  Now has a parameter called REPORT that indicates if an error
       should be reported if the specified object does not exist.
 
    o  GDCLEAR
