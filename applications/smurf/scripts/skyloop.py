@@ -427,8 +427,8 @@ try:
                                "name=flt.filt_edgelow_last config={0} "
                                "defaults=$SMURF_DIR/smurf_makemap.def "
                                "select=\"\'450=0,850=1\'\" defval=-1.0".format(config)))
-   filt_whiten_last = int( invoke( "$KAPPA_DIR/configecho "
-                               "name=flt.filt_whiten_last config={0} "
+   flt_whiten_last = int( invoke( "$KAPPA_DIR/configecho "
+                               "name=flt.whiten_last config={0} "
                                "defaults=$SMURF_DIR/smurf_makemap.def "
                                "select=\"\'450=0,850=1\'\" defval=-1".format(config)))
    com_perarray_last = int( invoke( "$KAPPA_DIR/configecho "
@@ -504,6 +504,14 @@ try:
                               # in our case, so force any enabled
                               # masking to be performed on the last iteration.
    fd.write("diag.append = 0\n") # Ensure a new diagnostics file is started
+
+   fd.write("flt.filt_edge_largescale_last=<undef>\n") # Ensure these parameter
+   fd.write("flt.filt_edge_smallscale_last=<undef>\n") # are only used on the
+   fd.write("flt.filt_edgehigh_last=<undef>\n")        # final iteration. We
+   fd.write("flt.filt_edgelow_last=<undef>\n")         # reset them here in
+   fd.write("flt.whiten_last=<undef>\n")               # case they are set in
+   fd.write("com.perarray_last=<undef>\n")             # the supplied config.
+
    fd.close()                 # Close the config file.
 
 #  Get the name of a temporary NDF that can be used to store the first
@@ -671,8 +679,8 @@ try:
                add["flt.filt_edgelow_last"] = filt_edgelow_last
                newcon = 1
 
-            if filt_whiten_last != -1:
-               add["flt.filt_whiten_last"] = filt_whiten_last
+            if flt_whiten_last != -1:
+               add["flt.whiten_last"] = flt_whiten_last
                newcon = 1
 
             if com_perarray_last != -1:
