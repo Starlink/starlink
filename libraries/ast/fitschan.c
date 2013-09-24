@@ -1075,6 +1075,8 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 *        When exporting alternate offset SkyFrames to FITS-WCS headers,
 *        correctly test the alternate Frame in the supplied FrameSet, rather
 *        than the current Frame.
+*     24-SEP-2013 (DSB):
+*        Fix bug in choosing default value for PolyTan attribute.
 *class--
 */
 
@@ -12809,7 +12811,8 @@ static int GetUsedPolyTan( AstFitsChan *this, AstFitsChan *out, int latax,
    int lbnd_lat;
    int lbnd_lon;
    int m;
-   int nfound;
+   int nfound1;
+   int nfound2;
    int ok;
    int ret;
    int ubnd_lat;
@@ -12824,6 +12827,7 @@ static int GetUsedPolyTan( AstFitsChan *this, AstFitsChan *out, int latax,
 /* If it is negative, we examine the FitsChan to see which convention to
    use. */
    if( ret < 0 ) {
+      ret = 0;
 
 /* Search the FitsChan for latitude PV cards. */
       if( s != ' ' ) {
@@ -12831,27 +12835,20 @@ static int GetUsedPolyTan( AstFitsChan *this, AstFitsChan *out, int latax,
       } else {
          sprintf( template, "PV%d_%%d", latax );
       }
-      nfound = astKeyFields( this, template, 1, &ubnd_lat, &lbnd_lat );
+      nfound1 = astKeyFields( this, template, 1, &ubnd_lat, &lbnd_lat );
 
-/* If any were found, assume the distorted TAN convention is in use. */
-      if( nfound ) {
-         ret = 1;
-
-/* If no PVi_m keywords were found for the latitude axis, see if there
-   are any on the longitude axis. */
+/* Search the FitsChan for longitude PV cards. */
+      if( s != ' ' ) {
+         sprintf( template, "PV%d_%%d%c", lonax, s );
       } else {
-         if( s != ' ' ) {
-            sprintf( template, "PV%d_%%d%c", lonax, s );
-         } else {
-            sprintf( template, "PV%d_%%d", lonax );
-         }
-         nfound = astKeyFields( this, template, 1, &ubnd_lon, &lbnd_lon );
+         sprintf( template, "PV%d_%%d", lonax );
+      }
+      nfound2 = astKeyFields( this, template, 1, &ubnd_lon, &lbnd_lon );
 
 /* If any were found with "m" value greater than 4, assume the distorted
    TAN convention is in use. Otherwise assume the stdanrd TAN convention is
    in use. */
-         ret = ( nfound && ubnd_lon > 4 ) ? 1 : 0;
-      }
+      if( nfound1 || ( nfound2 && ubnd_lon > 4 ) ) ret = 1;
 
 /* If the distorted TAN convention is to be used, check that at least one
    of the PVi_m values is non-zero on each axis. We ignore the PVi_0
