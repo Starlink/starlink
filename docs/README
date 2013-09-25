@@ -1,6 +1,6 @@
 The documents in this tree are not associated with a particular
-library or application but are standalone. They are (currently) 
-distributed on Starlink systems in the "docs" package and 
+library or application but are standalone. They are (currently)
+distributed on Starlink systems in the "docs" package and
 installed into $STARLINK/docs along with other latex/html
 Starlink documentation.
 
@@ -21,12 +21,16 @@ document categories are in use by Starlink:
  ssn: Starlink System Notes
    Covers technical issues
 
+ mud: Miscellaneous User Documents
+   Documents from thirdparties and other project documents
+   that do not fall into the other categories.
+
 The document labelled "sug" is a special case; it's the Starlink
 User Guide and is a one off.
 
-Each of these directories contains a directory named after the specific 
-number of each document. Within that directory are all the files 
-associated with that document (usually at least a latex file, possibly 
+Each of these directories contains a directory named after the specific
+number of each document. Within that directory are all the files
+associated with that document (usually at least a latex file, possibly
 with some associated images).
 
 The "obsolete" directory contains documents that have been
