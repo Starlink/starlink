@@ -135,7 +135,7 @@ void smf_mask_noisy( ThrWorkForce *wf, smfData *data, smfData **noise,
   if (noisemap) noisedata = (noisemap->pntr)[0];
 
   /* Calculate the noise on each bolometer */
-  smf_bolonoise( wf, data, 0, 0.5, SMF__F_WHITELO,
+  smf_bolonoise( wf, data, -1.0, 0, 0.5, SMF__F_WHITELO,
                  SMF__F_WHITEHI, 0, zeropad ? SMF__MAXAPLEN : SMF__BADSZT,
                  (noisemap->pntr)[0], NULL, NULL, status );
 

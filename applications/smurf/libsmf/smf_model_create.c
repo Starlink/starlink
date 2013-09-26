@@ -973,7 +973,7 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
                           ndata*smf_dtype_size(noisemaps->sdata[j], status) );
                 } else {
                   if( idata && idata->pntr[0] ) {
-                    smf_bolonoise( wf, idata, 0, 0.5, SMF__F_WHITELO,
+                    smf_bolonoise( wf, idata, -1.0, 0, 0.5, SMF__F_WHITELO,
                                    SMF__F_WHITEHI, 0, zeropad ? SMF__MAXAPLEN : SMF__BADSZT,
                                    dataptr, NULL, NULL, status );
                   } else {

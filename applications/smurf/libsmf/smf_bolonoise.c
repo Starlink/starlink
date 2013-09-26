@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_bolonoise( ThrWorkForce *wf, smfData *data,
-*                    size_t window, double f_low,
+*                    double gfrac, size_t window, double f_low,
 *                    double f_white1, double f_white2,
 *                    int nep, size_t len, double *whitenoise, double *fratio,
 *                    smfData **fftpow, int *status )
@@ -24,6 +24,12 @@
 *        Pointer to a pool of worker threads (can be NULL)
 *     data = smfData * (Given)
 *        Pointer to the input smfData.
+*     gfrac = double (Given)
+*        The fraction of supplied bolometer samples that must be good for
+*        a power to be determined. Any bolometer which has fewer than
+*        this fraction of good values is left with a VAL__BADD value in
+*        "whitemoise". Supply a negative value if you do not want this
+*        check to be performed.
 *     window = size_t (Given)
 *        Width of boxcar smooth to apply to power spectrum before measurement
 *     f_low = double (Given)
@@ -156,7 +162,7 @@
 
 #define FUNC_NAME "smf_bolonoise"
 
-void smf_bolonoise( ThrWorkForce *wf, smfData *data,
+void smf_bolonoise( ThrWorkForce *wf, smfData *data, double gfrac,
                     size_t window, double f_low,
                     double f_white1, double f_white2,
                     int nep, size_t len, double *whitenoise, double *fratio,
@@ -170,6 +176,7 @@ void smf_bolonoise( ThrWorkForce *wf, smfData *data,
   size_t i_w1;             /* Index in power spectrum to f_white1 */
   size_t i_w2;             /* Index in power spectrum to f_white2 */
   size_t j;                /* Loop counter */
+  size_t mingood;          /* Min. required no. of good values in bolometer */
   dim_t nbolo;             /* Number of bolometers */
   dim_t ndata;             /* Number of data points */
   dim_t nf=0;              /* Number of frequencies */
@@ -233,6 +240,9 @@ void smf_bolonoise( ThrWorkForce *wf, smfData *data,
      bad bolometer. */
   qua = smf_select_qualpntr( data, NULL, status );
 
+  /* The minimum required number of good values in a bolometer. */
+  mingood = ( gfrac > 0.0 ) ? ntslice*gfrac : 0;
+
   /* Loop over detectors */
   for( i=0; (*status==SAI__OK)&&(i<nbolo); i++ )
     if( !qua || !(qua[i*bstride]&SMF__Q_BADB) ) {
@@ -258,11 +268,21 @@ void smf_bolonoise( ThrWorkForce *wf, smfData *data,
         if (ngood == 0) continue;
       }
 
-      /* Set bolometer to bad if no power detected */
-      if( (*status==SAI__OK) && qua && ( (p_low<=0) || (p_white<=0) ) ) {
-        for( j=0; j<ntslice; j++ ) {
-          qua[i*bstride + j*tstride] |= SMF__Q_BADB;
-        }
+      /* Count the number of initially good values for the current
+         bolometer. */
+      if( (*status==SAI__OK) && qua ){
+         ngood = 0;
+         for( j=0; j<ntslice; j++ ) {
+           if( qua[i*bstride + j*tstride] == 0 ) ngood++;
+         }
+
+         /* Set bolometer to bad if no power detected, or the number of good
+            values is too low.  */
+         if( (p_low <= 0) || (p_white <= 0) || (ngood < mingood) ) {
+           for( j=0; j<ntslice; j++ ) {
+             qua[i*bstride + j*tstride] |= SMF__Q_BADB;
+           }
+         }
       }
     }
 

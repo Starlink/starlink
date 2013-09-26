@@ -321,7 +321,7 @@ void smf_calcmodel_noi( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
           if (var) {
 
             /* Measure the noise from power spectra */
-            smf_bolonoise( wf, res->sdata[idx], 0, 0.5, SMF__F_WHITELO,
+            smf_bolonoise( wf, res->sdata[idx], -1.0, 0, 0.5, SMF__F_WHITELO,
                            SMF__F_WHITEHI, 0, zeropad ? SMF__MAXAPLEN : SMF__BADSZT,
                            var, NULL, NULL, status );
 
@@ -440,7 +440,7 @@ void smf_calcmodel_noi( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
                }
 
                /* Measure the noise from power spectra in the box. */
-               smf_bolonoise( wf, box, 0, 0.5, SMF__F_WHITELO, SMF__F_WHITEHI,
+               smf_bolonoise( wf, box, 0.1, 0, 0.5, SMF__F_WHITELO, SMF__F_WHITEHI,
                               0, zeropad ? SMF__MAXAPLEN : SMF__BADSZT, var,
                               NULL, NULL, status );
 
@@ -456,8 +456,13 @@ void smf_calcmodel_noi( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
                for( ibolo = 0; ibolo < nbolo; ibolo++ ) {
                   if( !( qua_data[ ibolo*bstride ] & SMF__Q_BADB ) ) {
                      dout =  model_data + ibolo*bstride + tstart;
-                     for( itime = tstart; itime <= tend; itime++ ) {
-                        *(dout++) = var[ ibolo ];
+                     qout =  qua_data + ibolo*bstride + tstart;
+                     for( itime = tstart; itime <= tend; itime++,dout++,qout++ ) {
+                        if( var[ ibolo ] != VAL__BADD ) {
+                           *dout = var[ ibolo ];
+                        } else {
+                           *qout |= SMF__Q_NOISE;
+                        }
                      }
                   }
                }

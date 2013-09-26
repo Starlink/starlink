@@ -393,7 +393,7 @@ void smurf_sc2fft( int *status ) {
 
 	    freqlo = 1. / (idata->hdr->steptime * idata->hdr->nframes);
 
-            smf_bolonoise( wf, idata, 1, freqlo, SMF__F_WHITELO,
+            smf_bolonoise( wf, idata, -1.0, 1, freqlo, SMF__F_WHITELO,
                            SMF__F_WHITEHI, 1, 0, whitenoise, NULL, &odata,
                            status );
 
