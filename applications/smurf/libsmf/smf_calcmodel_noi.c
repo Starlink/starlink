@@ -304,9 +304,12 @@ void smf_calcmodel_noi( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
          easier. We either do it prior to the start of iterations (in which
          case the relative weights will be influeced by low-frequency noise,
          this is initialized in smf_model_create), or else we calculate
-         the noise after the first iteration. */
+         the noise after the first iteration. We also skip this
+         calculation if we have already imported external noise values into
+         the NOI model. */
 
-      if( (flags & SMF__DIMM_FIRSTITER) && (!calcfirst) ) {
+      if( (flags & SMF__DIMM_FIRSTITER) && (!calcfirst) &&
+          (!astMapDefined( kmap, "IMPORT" )) ) {
 
         /* There are two forms for the NOI model: one constant noise value
            for each bolometer, or "ntslice" noise values for each bolometer.

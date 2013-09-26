@@ -1400,6 +1400,9 @@ void smf_history_write( const smfData* data, int *status);
 void smf_import_array( smfData *refdata, const char *name, int bad,
                        int expand, double *dataptr, int *status );
 
+int smf_import_noi( const char *name, smfDIMMHead *head,
+                    AstKeyMap *keymap, double *dataptr, int *status );
+
 void smf_inbeam_str ( smf_inbeam_t inbeam, char *inbeamstr, size_t lenstr, int * status );
 
 int smf_initial_sky( ThrWorkForce *wf, AstKeyMap *config, smfDIMMData *dat,

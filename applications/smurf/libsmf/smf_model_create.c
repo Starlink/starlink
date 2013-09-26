@@ -956,13 +956,18 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
               smf_get_dims( &(head.data), NULL, NULL, NULL, NULL, &ndata,
                             NULL, NULL, status);
 
-              if( calcfirst ) {
-                /* If calcfirst flag is set, we know that there is one
-                   variance for each bolometer. initialize NOI using noise
-                   measured in the bolometer now (i.e. before the first
-                   iteration). Use externally-supplied noise values
-                   if provided. */
+              /* Initialise the NOI model from any external NOI model
+                 supplied by the user (such as may be dumped on a previous
+                 run by setting exportndf=noi). */
+              if( smf_import_noi( name, &head, keymap, dataptr, status ) ) {
+                 msgOutif( MSG__VERB, "", FUNC_NAME ": using external NOI "
+                           "model.", status );
 
+              /* If calcfirst flag is set, we know that there is one
+                 variance for each bolometer. initialize NOI using noise
+                 measured in the bolometer now (i.e. before the first
+                 iteration). Use pre-calculated noise values if provided. */
+              } else if( calcfirst ) {
                 if( noisemaps ) {
                   memcpy( dataptr, noisemaps->sdata[j]->pntr[0],
                           ndata*smf_dtype_size(noisemaps->sdata[j], status) );
