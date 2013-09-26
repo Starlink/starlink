@@ -255,6 +255,8 @@
 #        - Handle multiple \copyrights in copyright section
 #        - Fix logic in edit_main so that filehandles close automatically
 #          on exit
+#     31-AUG-2013 (TIMJ):
+#        - Convert PDF images to EPS
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -268,6 +270,7 @@ use Cwd;
 use File::Spec;
 use Pod::Usage;
 use Getopt::Long;
+use File::SearchPath qw/ searchpath /;
 
 #  Print introductory message.
 my $announce = "Star2HTML V@PACKAGE_VERSION@";
@@ -430,6 +433,18 @@ if ( ( -T $TEXFILE ) && ( -r $TEXFILE ) ) {
 #  via TEXINPUTS. These paths are not searched when latx2html is looking for PNG files.
 #  Try the scanning approach
    {
+
+     # First work out which converter to use
+     my @pdftops;
+     for my $tool (qw/ pdftops pdf2ps /) {
+       my $path = searchpath( $tool, $ENV{PATH} );
+       if (defined $path) {
+         push(@pdftops, $tool);
+         push(@pdftops, "-eps") if $tool eq 'pdftops';
+         last;
+       }
+     }
+
      my %tocopy;
      my %outpath;
      open my $TFH, "<", $TEXFILE
@@ -505,9 +520,9 @@ if ( ( -T $TEXFILE ) && ( -r $TEXFILE ) ) {
          if ( ! -e File::Spec->catfile($TEXDIR, $name . ".eps" ) ) {
            my $outfile = File::Spec->catfile($destdir, $name.".ps");
            if (!-e $outfile || (-M $outfile > -M $file) ) {
-             print "Using pdf2ps to convert $file to $outfile\n";
-             system("pdf2ps", $file, $outfile) and
-               &clear_up( "Could not convert $file to PS using pdf2ps\n");
+             print "Using $pdftops[0] to convert $file to $outfile\n";
+               system(@pdftops, $file, $outfile) and
+                 &clear_up( "Could not convert $file to PS using $pdftops[0]\n");
            }
          }
        } else {
