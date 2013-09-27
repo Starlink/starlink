@@ -37,8 +37,8 @@
 *     temporary directory (e.g. "/tmp").
 *
 *     In addition, files holding the extinction correction factor for each
-*     data sample are written to the current working directory. These are
-*     deleted when the script ends.
+*     data sample, and files holding the noise model, are written to the
+*     current working directory. These are deleted when the script ends.
 
 *  Usage:
 *     skyloop in out niter pixsize config [itermap] [ref] [mask2] [mask3]
@@ -52,7 +52,7 @@
 *
 *        - First iteration:
 *           numiter=1
-*           noi.calcfirst=1
+*           noi.export=1
 *           exportNDF=ext
 *           noexportsetbad=1
 *           exportclean=1
@@ -68,7 +68,7 @@
 *
 *        - Subsequent iterations:
 *           numiter=1
-*           noi.calcfirst=1
+*           noi.import=1
 *           doclean=0
 *           importsky=ref
 *           ext.import=1
@@ -87,7 +87,7 @@
 *
 *        - Last iteration:
 *           numiter=1
-*           noi.calcfirst=1
+*           noi.import=1
 *           doclean=0
 *           importsky=ref
 *           ext.import=1
@@ -246,6 +246,18 @@
 *        Add support for ast.skip parameter.
 *     9-SEP-2013 (DSB):
 *        Add support for "..._last" parameters.
+*     27-SEP-2013 (DSB):
+*        Changed from using noi.calcfirst=1 to noi.calcfirst=0. The NOI
+*        model is now calculated after the first iteration is completed,
+*        and is exported for use on subsequent iterations. Previously, it
+*        was calculated afresh on every iteration, before the iteration
+*        commenced. This means that it is now possible for skyloop to
+*        recognise and use the noi.box_size parameter. But first results
+*        suggest that the noise values are less stable without calcfirst
+*        set, causing some bolometers to be given inappropriately small
+*        variances, and thus be over-emphasised in the final map,
+*        resulting in visible bolometer tracks. If this is a problem, add
+*        "noi.calcfirst=1" to your config., and remove "noi.box_size".
 
 *-
 '''
@@ -268,19 +280,26 @@ retain = 0
 #  when the script exist.
 new_ext_ndfs = []
 
+#  A list of the NOI model NDFs created by this script. These are created
+#  and used in the current working directory, and are deleted when the
+#  script exist.
+new_noi_ndfs = []
+
 #  A function to clean up before exiting. Delete all temporary NDFs etc,
 #  unless the script's RETAIN parameter indicates that they are to be
 #  retained. Also delete the script's temporary ADAM directory.
 def cleanup():
-   global retain, new_ext_ndfs
+   global retain, new_ext_ndfs, new_noi_ndfs
    try:
       starutil.ParSys.cleanup()
       if retain:
-         msg_out( "Retaining EXT models in {0} and temporary files in {1}".format(os.getcwd(),NDG.tempdir))
+         msg_out( "Retaining EXT and NOI models in {0} and temporary files in {1}".format(os.getcwd(),NDG.tempdir))
       else:
          NDG.cleanup()
          for ext in new_ext_ndfs:
             os.remove( ext )
+         for noi in new_noi_ndfs:
+            os.remove( noi )
    except:
       pass
 
@@ -442,7 +461,7 @@ try:
                            "select=\"\'450=0,850=1\'\"".format(config)))
 
 #  The first invocation of makemap will create NDFs holding cleaned
-#  time-series data and EXT model values. The NDFs are created with
+#  time-series data, EXT and NOI model values. The NDFs are created with
 #  hard-wired names and put in the current working directory. For
 #  tidyness, we will move the cleaned data files into the NDG temp
 #  directory, where all the other temp files are stored. In order to
@@ -451,10 +470,11 @@ try:
 #  last-accessed times of any relevant pre-existing NDFs. Note, if the
 #  "ext.import" config parameter is set, makemap expects EXT model
 #  values to be in the current working directory, so we do not move
-#  those NDFs to the NDG temp directory. Use last-accessed times rather
-#  than inode numbers since something very strange seems to be happening
-#  with inode numbers for NDFs created by the starutil module (two
-#  succesive NDFs with the same path can have the same inode number).
+#  those NDFs to the NDG temp directory. Likewise for NOI model files.
+#  Use last-accessed times rather than inode numbers since something
+#  very strange seems to be happening with inode numbers for NDFs
+#  created by the starutil module (two succesive NDFs with the same
+#  path can have the same inode number).
    orig_cln_ndfs = {}
    for path in glob.glob("s*_con_res_cln.sdf"):
       orig_cln_ndfs[path] = os.stat(path).st_atime
@@ -464,6 +484,11 @@ try:
    for path in glob.glob("s*_con_ext.sdf"):
       orig_ext_ndfs[path] = os.stat(path).st_atime
 
+#  Note any pre-existing NDFs holding NOI values.
+   orig_noi_ndfs = {}
+   for path in glob.glob("s*_con_noi.sdf"):
+      orig_noi_ndfs[path] = os.stat(path).st_atime
+
 #  Find the number of iterations to perform on the initial invocation of
 #  makemap.
    niter0 = 1 + ast_skip
@@ -472,9 +497,9 @@ try:
 
 #  On the first invocation of makemap, we use the raw data files specified
 #  by the IN parameter to create an initial estimate of the sky. We also
-#  save the cleaned time series data, and the EXT model (if we are doing
-#  more than one iteration), for use on subsequent iterations (this speeds
-#  them up a bit). First create a text file holding a suitably modified
+#  save the cleaned time series data, and the EXT and NOI models (if we are
+#  doing more than one iteration), for use on subsequent iterations (this
+#  speeds them up a bit). First create a text file holding a suitably modified
 #  set of configuration parameters. This file is put in the NDG temp
 #  directory (which is where we store all temp files).
    conf0 = os.path.join(NDG.tempdir,"conf0") # Full path to new config file
@@ -487,11 +512,11 @@ try:
    fd.write("shortmap=0\n")   # Shortmaps don't make sense
    fd.write("flagmap=<undef>\n")# Flagmaps don't make sense
    fd.write("sampcube=0\n")   # Sampcubes don't make sense
-   fd.write("noi.calcfirst=1\n")# The NOI model is usually calculated after the
-                              # first ieration, which is no use to use as
-                              # we are only doing one iteration. So instead
-                              # pre-calculate NOI before the iteration starts.
+
    if niter > 1:
+      fd.write("noi.export=1\n") # Export the NOI model. This forces the
+                                 # NOI model to be created and exported after
+                                 # the first iteration has completed.
       fd.write("exportNDF=ext\n")# Save the EXT model values to avoid
                                  # re-calculation on each invocation of makemap.
       fd.write("noexportsetbad=1\n")# Export good EXT values for bad bolometers
@@ -576,6 +601,14 @@ try:
             elif os.stat(ndf).st_atime > orig_ext_ndfs[ndf]:
                new_ext_ndfs.append(ndf)
 
+#  Get a list of the NOI model files created by the first invocation of
+#  makemap.
+         for ndf in glob.glob("s*_con_noi.sdf"):
+            if not ndf in orig_noi_ndfs:
+               new_noi_ndfs.append(ndf)
+            elif os.stat(ndf).st_atime > orig_noi_ndfs[ndf]:
+               new_noi_ndfs.append(ndf)
+
 #  Get the paths to the the moved cleaned files.
    if niter > 1:
       if not precleaned:
@@ -600,6 +633,9 @@ try:
       add["diag.append"] = 1   # Ensure we append diagnostics to the file
                                # created on the first iteration.
       add["ast.skip"] = 0      # Ensure we do not skip any more AST models
+      add["noi.import"] = 0    # Use the NOI model created by iteration 1
+      add["noi.export"] = 0    # No need to export the NOI model again
+
 
 #  Now create the config, inheriting the config from the first invocation.
       iconf = 1
