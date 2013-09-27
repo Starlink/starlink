@@ -96,7 +96,15 @@ reduction of data from SCUBA-2
 \citep{2013MNRAS.430.2545C,2013MNRAS.430.2513H}. In particular a new
 approach to map-making was developed whereby all data are involved in
 each iteration rather than iteratively processing small chunks and
-coadding them all at the end.
+coadding them all at the end.  An example of this so-called
+\textit{Skyloop} is presented in Figure~\ref{P82_F1}.
+
+\articlefiguretwo{P82_WithoutSkyloopExample.jpeg}{P82_SkyloopExample.jpeg}{P82_F1}{The
+left panel shows an example reduction of a SCUBA-2 continuum image
+without the Skyloop technique.  The right panel shows the same data
+after application of Skyloop.  Notice many diffuse false-emission blooms
+now disappear.}
+
 
 \altsubsubsection*{POLPACK}
 
@@ -143,9 +151,18 @@ user-defined regions to excise emission from non-linear baseline
 detections, a filter to identify spectra with ringing (the same
 oscillation pattern appears in varying strength over tens of
 contiguous time series).  Different options are now available to
-determine the receptor-to-receptor flat field.  The ACSIS/HARP
-pipeline can now process most data from the earlier DAS backend,
-arising in part from better merging of hybrid data,
+determine the receptor-to-receptor flat field.  See
+Figure~\ref{P82_F2} for an example.
+
+\articlefiguretwo{P82_L1448_before.png}{P82_L1448_after.png}{P82_F2}{Reduced
+HARP cubes integrated along the spectral axis over the source emission
+in L1448.  The left panel shows the effect of ringing, which although
+weaker extends over many more spectra than the common noise
+interference, and relative receptor sensitivities.  The right
+panel has the affected spectra excised and a flat field applied.}
+
+The ACSIS/HARP pipeline can now process most data from the earlier DAS
+backend, arising in part from better merging of hybrid data,
 instrument-specific quality assurance criteria, and baseline
 correction in line forests.
 
