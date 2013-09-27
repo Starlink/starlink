@@ -123,7 +123,7 @@ protocol introduction]{2004SPIE.5493..262D}.
 The AST library \citep[see][and references
 therein]{2012ASPC..461..825B} can now read FITS headers that use the
 SAO convention for representing a distorted TAN projection, and can
-now handle missing \textsc{cnpix1} and \textsc{cnpix2} keywords in DSS
+now handle missing \texttt{CNPIX1} and \texttt{CNPIX2} keywords in DSS
 headers. There were also modifications to flux conservation and
 normalisation in the rebinning routines.
 
@@ -174,18 +174,18 @@ A number of data-quality analysis recipes have been added that allow
 an assessment the properties of SCUBA-2 data.
 \begin{itemize}
 \item Instrumental noise---this helps identify excessively noisy data that
-can be excluded from map-maker (ASSESS\_DATA\_NOISE).
+can be excluded from map-maker (\texttt{ASSESS\_DATA\_NOISE}).
 \item Calibration consistency---calculate flux-conversion factors and beam
 sizes of standard sources to check calibration quality
-(SCUBA2\_CHECK\_CAL).  This includes fitting of the source peak for FCF
+(\texttt{SCUBA2\_CHECK\_CAL}).  This includes fitting of the source peak for FCF
 calculations now attempts to fit two Gaussian components for high
 (100) signal-to-noise ratio images of calibrators.
 \item Output map noise (1/2)---calculate the noise and NEFD from map,
 compare with those derived from noise calculations and the SCUBA-2
-integration-time calculator (SCUBA2\_CHECK\_RMS).
+integration-time calculator (\texttt{SCUBA2\_CHECK\_RMS}).
 \item Output map noise (2/2) - calculate the spatial power spectrum and
 determine noise power on scales up to a high-pass filtering scale
-(SCUBA2\_MAP\_PSPEC).
+(\texttt{SCUBA2\_MAP\_PSPEC}).
 \end{itemize}
 
 
