@@ -127,6 +127,54 @@ The NDF library will now limit the maximum size of an NDF
 section. There have also been efficiency improvements in the way that
 provenance information is stored.
 
+\section{Since Kapuahi}
+
+\subsection*{ORAC-DR}
+
+ORAC-DR \citep{Cavanagh2008} is the object-oriented perl pipeline used
+and developed at the Joint Astronomy Centre, but also used at other
+observatories such as Las Cumbres and AAO for optical, infrared, and
+sub-millimetre data reduction.
+
+\subsection*{Heterodyne}
+
+Further improvements to the detection of bad spectra
+\citep{P61_adassxxii} include automatic emission detection or
+user-defined regions to excise emission from non-linear baseline
+detections, a filter to identify spectra with ringing (the same
+oscillation pattern appears in varying strength over tens of
+contiguous time series).  Different options are now available to
+determine the receptor-to-receptor flat field.  The ACSIS/HARP
+pipeline can now process most data from the earlier DAS backend,
+arising in part from better merging of hybrid data,
+instrument-specific quality assurance criteria, and baseline
+correction in line forests.
+
+Although the goal is to provide high-quality results automatically for
+JCMT Science Archive, many new tailoring recipe parameters, such as to
+control memory requirements and the creation of a longitude-velocity
+image, have been added.
+
+\subsection*{SCUBA-2 \& PICARD}
+
+A number of data-quality analysis recipes have been added that allow
+an assessment the properties of SCUBA-2 data.
+\begin{itemize}
+\item Instrumental noise---this helps identify excessively noisy data that
+can be excluded from map-maker (ASSESS\_DATA\_NOISE).
+\item Calibration consistency---calculate flux-conversion factors and beam
+sizes of standard sources to check calibration quality
+(SCUBA2\_CHECK\_CAL).  This includes fitting of the source peak for FCF
+calculations now attempts to fit two Gaussian components for high
+(100) signal-to-noise ratio images of calibrators.
+\item Output map noise (1/2)---calculate the noise and NEFD from map,
+compare with those derived from noise calculations and the SCUBA-2
+integration-time calculator (SCUBA2\_CHECK\_RMS).
+\item Output map noise (2/2) - calculate the spatial power spectrum and
+determine noise power on scales up to a high-pass filtering scale
+(SCUBA2\_MAP\_PSPEC).
+\end{itemize}
+
 \bibliography{P82}
 
 \end{document}
