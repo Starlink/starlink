@@ -1165,10 +1165,14 @@ AstKeyMap *thrThreadData( int *status ) {
       fprintf( stderr, "Starlink THR package initialisation failed." );
 
 /* If the current thread does not yet have a thread-specific KeyMap to
-   hold thread data, create one now. */
+   hold thread data, create one now. Mark the KeyMap as AST "Permanent
+   Memory" to avoid it appearing in lists of currently active AST memory
+   blocks. This is because it may never be deleted until the thread dies.  */
    } else if( ( result = pthread_getspecific( starlink_thr_globals_key ) )
               == NULL ) {
+      astBeginPM;
       result = astKeyMap( " ");
+      astEndPM;
       astExempt( result );
 
 /* Associate it with the thread specific data key. */
