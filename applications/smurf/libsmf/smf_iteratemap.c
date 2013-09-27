@@ -612,6 +612,8 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   int nm=0;                     /* Signed int version of nmodels */
   dim_t nmodels=0;              /* Number of model components / iteration */
   int noidone;                  /* Has the NOI model been calculated yet? */
+  dim_t noi_boxsize;            /* No. of time slices in each NOI box */
+  int noi_export;               /* Export the compressed NOI model? */
   size_t nsamples_tot = 0;      /* Number of valid samples in all chunks */
   dim_t nthetabin;              /* Number of scan angle bins */
   size_t ntgood_tot = 0;        /* Number of good time slices in all chunks */
@@ -736,6 +738,13 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
   if( *status == SAI__OK ) {
     if( *status == SAI__OK ) {
+
+      /* See if the NOI model is to be exported in compressed form in its
+         own NDF (i.e. NOT as the Variance component of the "_res" ndf). */
+      if( astMapGet0A( keymap, "NOI", &kmap ) ) {
+         astMapGet0I( kmap, "EXPORT", &noi_export );
+         kmap = astAnnul( kmap );
+      }
 
       /* See if the FLT model is to be undone at the start of the
          iteration or when the FLT model is updated. */
@@ -1408,8 +1417,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
       smf_model_create( wf, NULL, res, darks, bbms, flatramps, heateffmap,
                         NULL, 1, SMF__QUA, 0, NULL, 0, NULL, NULL, NO_FTS,
-                        NULL, qua,
-                        keymap, status );
+                        NULL, qua, keymap, &noi_boxsize, status );
 
       /* Associate quality with the res model, and do cleaning before we
          start using more memory for other things. Note that we are
@@ -1431,8 +1439,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
       smf_model_create( wf, NULL, res, darks, bbms, flatramps, heateffmap,
                         NULL, 1, SMF__LUT, 0, NULL, 0, NULL, NULL, NO_FTS,
-                        NULL, lut,
-                        keymap, status );
+                        NULL, lut, keymap, &noi_boxsize, status );
 
       if( *status == SAI__OK ) {
          for( idat = 0; idat < res[0]->ndat; idat++ ) {
@@ -1450,7 +1457,8 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       if( haveext ) {
         smf_model_create( wf, NULL, res, darks, bbms, flatramps, heateffmap,
                           noisemaps, 1, modeltyps[whichext], 0, NULL, 0, NULL,
-                          NULL, NO_FTS, NULL, model[whichext], keymap, status);
+                          NULL, NO_FTS, NULL, model[whichext], keymap,
+                          &noi_boxsize, status);
       }
 
       /*** TIMER ***/
@@ -1649,7 +1657,8 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         if( (modeltyps[imodel] != SMF__LUT) && (modeltyps[imodel] != SMF__EXT) ) {
           smf_model_create( wf, NULL, res, darks, bbms, flatramps, heateffmap,
                             noisemaps, 1, modeltyps[imodel], 0, NULL, 0, NULL, NULL,
-                            NO_FTS, NULL, model[imodel], keymap, status );
+                            NO_FTS, NULL, model[imodel], keymap,
+                            &noi_boxsize, status );
         }
 
         /* Associate quality with some models */
@@ -1724,6 +1733,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       dat.mdims[0] = mdims[0];
       dat.mdims[1] = mdims[1];
       dat.msize = msize;
+      dat.noi_boxsize = noi_boxsize;
       dat.outfset = outfset;
       dat.lbnd_out = lbnd_out;
       dat.ubnd_out = ubnd_out;
@@ -2575,6 +2585,33 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                    status, smf_timerupdate(&tv1,&tv2,status) );
       }
 
+
+      /* If required export NOI in compressed form to its own NDF. This
+         is different to how NOI is exported via the "exportNDF" config
+         parameter.  */
+      if( noi_export && havenoi ) {
+
+         /* If NOI is being exported but has not yet been calculated
+            (e.g. if numiter=1), calculate it now. This is useful for
+            SKYLOOP, which runs makemap with numiter=1. */
+         if( !noidone ) smf_calcmodel_noi( wf, &dat, 0, keymap,
+                                           model[whichnoi],
+                                           SMF__DIMM_FIRSTITER, status );
+
+         for( idx=0; idx<res[0]->ndat; idx++ ) {
+
+            /* Get the NDF name for the exported NOI model. */
+            smf_stripsuffix( res[0]->sdata[idx]->file->name, SMF__DIMM_SUFFIX,
+                             name, status );
+            one_strlcat( name, "_noi", SMF_PATH_MAX+1, status );
+
+            /* Export it. */
+            smf_export_noi( dat.noi[0]->sdata[idx], name, dat.noi_boxsize,
+                            status );
+         }
+      }
+
+
       /* Export DIMM model components to NDF files.
          Note that we don't do LUT since it is originally an extension in the
          input flatfielded data.
@@ -2628,18 +2665,6 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
             if( exportNDF_which[nmodels] ) {
               if( (res[0]->sdata[idx]->file->name)[0] ) {
-
-                /* If NOI is being exported but has not yet been
-                   calculated (e.g. if numiter=1), calculate it now.
-                   This is useful for SKYLOOP, which runs makemap with
-                   numiter=1. Re-establish time-ordering afterwards since 
-                   smf_calcmodel_noi echanges the data to bolo-ordering. */
-                if( havenoi && exportNDF_which[whichnoi] && !noidone ) {
-                   smf_calcmodel_noi( wf, &dat, 0, keymap, model[whichnoi],
-                                      SMF__DIMM_FIRSTITER, status );
-                   smf_model_dataOrder( &dat, model[whichnoi], 0,
-                                        SMF__RES|SMF__QUA, 1, status );
-                }
 
                 smf_model_createHdr( res[0]->sdata[idx], SMF__RES, refdata,
                                      status );

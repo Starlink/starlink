@@ -21,7 +21,7 @@
 *                       AstFrameSet *outfset, int moving, int *lbnd_out,
 *                       int *ubnd_out, fts2Port fts_port, smfGroup **mgroup,
 *                       smfArray **mdata,
-*                       AstKeyMap *keymap, int *status )
+*                       AstKeyMap *keymap, dim_t *noi_boxsize, int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -73,6 +73,9 @@
 *        in igroup), but the individual smfArrays get allocated here.
 *     keymap = AstKeyMap* (Given)
 *        keymap containing parameters to control map-maker
+*     noi_boxsize = dim_t * (Given and Returned)
+*        The boxsize, in samples, for the NOI model. Returned unchanged
+*        if mtype is not SMF__NOI.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -277,7 +280,8 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
                        AstFrameSet *outfset, int moving,
                        int *lbnd_out, int *ubnd_out, fts2Port fts_port,
                        smfGroup **mgroup,
-                       smfArray **mdata, AstKeyMap *keymap, int *status ) {
+                       smfArray **mdata, AstKeyMap *keymap, dim_t *noi_boxsize,
+                       int *status ) {
 
   /* Local Variables */
   size_t bstride;               /* Bolometer stride in data array */
@@ -606,11 +610,10 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
                one, unless NOI.BOX_SIZE is set non-zero in which case it
                is "ntslice". */
             astMapGet0A( keymap, "NOI", &kmap );
-            dim_t boxsize = 0;
-            smf_get_nsamp( kmap, "BOX_SIZE", idata, &boxsize, status );
+            smf_get_nsamp( kmap, "BOX_SIZE", idata, noi_boxsize, status );
             astMapGet0I( kmap, "CALCFIRST", &calcfirst );
             kmap = astAnnul( kmap );
-            if( boxsize ) {
+            if( *noi_boxsize ) {
                if( calcfirst && *status == SAI__OK ) {
                   *status = SAI__ERROR;
                   errRep( " ", FUNC_NAME ": Configuration parameters "
@@ -618,7 +621,7 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
                           "non-zero - this is not allowed.", status );
                }
             }
-            dim_t nointslice = boxsize ? idata->dims[isTordered?2:0] : 1;
+            dim_t nointslice = *noi_boxsize ? idata->dims[isTordered?2:0] : 1;
 
             head.data.dtype = SMF__DOUBLE;
             head.data.ndims = 3;
@@ -958,8 +961,9 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
 
               /* Initialise the NOI model from any external NOI model
                  supplied by the user (such as may be dumped on a previous
-                 run by setting exportndf=noi). */
-              if( smf_import_noi( name, &head, keymap, dataptr, status ) ) {
+                 run by setting "exportndf=noi,noi.export=1"). */
+              if( smf_import_noi( name, &head, keymap, dataptr,
+                                  noi_boxsize, status ) ) {
                  msgOutif( MSG__VERB, "", FUNC_NAME ": using external NOI "
                            "model.", status );
 
@@ -968,6 +972,7 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
                  measured in the bolometer now (i.e. before the first
                  iteration). Use pre-calculated noise values if provided. */
               } else if( calcfirst ) {
+                *noi_boxsize = ntslice;
                 if( noisemaps ) {
                   memcpy( dataptr, noisemaps->sdata[j]->pntr[0],
                           ndata*smf_dtype_size(noisemaps->sdata[j], status) );

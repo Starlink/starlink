@@ -764,6 +764,7 @@ typedef struct smfDIMMData {
   int iter;                  /* Iteration number */
   int ast_skipped;           /* True if the subtraction of AST was skipped
                                 on the previous iteration */
+  dim_t noi_boxsize;         /* The number of samples in a NOI box. */
 } smfDIMMData;
 
 

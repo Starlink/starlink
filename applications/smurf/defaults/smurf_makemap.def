@@ -1551,6 +1551,23 @@ noi.dcsmooth = 50
 noi.dcthresh = 25.0
 
 #-----------------------------------------------------------------
+#  Name: 	noi.export
+#  Type: 	integer
+#  Default: 	0
+#  Purpose: 	Controls the exporting of the NOI model.
+#  Description: If set to a non-zero value, export the values in the NOI
+#               model to an NDF. The name of the NDF is similar to that
+#               used by parameter "exportndf", but with a trailing
+#               suffix of "_noi" instead of "_res". Unlike "exportndf",
+#               the NOI values are stored in the "Data" array of the NDF,
+#               and only one value is stored for each box in the NOI model
+#               (see parameter "noi.box_size"). This makes the NDF much
+#               smaller than that produced by "exportndf". The box size
+#               (in samples) is stored in the NOI_BOXSIZE item in the
+#               SMURF extension of the NDF.
+noi.export = 0
+
+#-----------------------------------------------------------------
 #  Name: 	noi.fillgaps
 #  Type: 	integer
 #  Default: 	1
@@ -1561,18 +1578,18 @@ noi.fillgaps = 1
 
 #-----------------------------------------------------------------
 #  Name: 	noi.import
-#  Type: 	string
-#  Default: 	<undef>
+#  Type: 	integer
+#  Default: 	0
 #  Purpose: 	Controls the noise values used in the NOI model.
-#  Description: If set to "Data" or "Variance", import the the noise values
-#               to use in the NOI model from an NDF created by a previous
-#               run of makemap. The NDF is expected to have the same name as
-#               would be created by setting parameter "exportNDF" to "(noi)"
-#               in the makemap configuration. This means the file should end
-#               in "_res.sdf". The specific value supplied ("Data" or
-#               "Variance") indicates which NDF component contains the
-#               noise variances. Normally "Data" should be used.
-noi.import = <undef>
+#  Description: If set to a non-zero value, import the noise values to use
+#               in the NOI model from an NDF created by a previous run of
+#               makemap, rather than calculating them from scratch. The
+#               NDF should have been created by setting parameter "noi.export"
+#               to 1 in the configuration for a previous run of makemap. 
+#               (the file should end in "_noi.sdf"). Note, the parameter 
+#               "noi.box_size" must be set to the same value it had in the 
+#               previous run of makemap.
+noi.import = 0
 
 #-----------------------------------------------------------------
 #  Name: 	noi.spikebox

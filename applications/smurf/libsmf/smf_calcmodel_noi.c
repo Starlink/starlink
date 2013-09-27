@@ -211,6 +211,7 @@ void smf_calcmodel_noi( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   dim_t i;                      /* Loop counter */
   dim_t ibolo;                  /* Bolometer index */
   int ibox;                     /* Index of current noise box */
+  int import;                   /* Has an external NOI model been imported? */
   dim_t itime;                  /* Time slice index */
   dim_t idx=0;                  /* Index within subgroup */
   JCMTState *instate=NULL;      /* Pointer to input JCMTState */
@@ -274,6 +275,9 @@ void smf_calcmodel_noi( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   /* Did we already calculate the noise on each detector? */
   astMapGet0I( kmap, "CALCFIRST", &calcfirst );
 
+  /* Did we import an external BOI model? */
+  astMapGet0I( kmap, "IMPORT", &import );
+
   /* Initialize chisquared */
   dat->chisquared[chunk] = 0;
   nchisq = 0;
@@ -307,9 +311,7 @@ void smf_calcmodel_noi( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
          the noise after the first iteration. We also skip this
          calculation if we have already imported external noise values into
          the NOI model. */
-
-      if( (flags & SMF__DIMM_FIRSTITER) && (!calcfirst) &&
-          (!astMapDefined( kmap, "IMPORT" )) ) {
+      if( (flags & SMF__DIMM_FIRSTITER) && (!calcfirst) && (!import) ) {
 
         /* There are two forms for the NOI model: one constant noise value
            for each bolometer, or "ntslice" noise values for each bolometer.
@@ -333,6 +335,7 @@ void smf_calcmodel_noi( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
               }
 
             var = astFree( var );
+            dat->noi_boxsize = ntslice;
           }
 
 
@@ -473,6 +476,7 @@ void smf_calcmodel_noi( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
             }
 
             var = astFree( var );
+            dat->noi_boxsize = boxsize;
           }
 
         /* Report an error if the number of samples for each bolometer in

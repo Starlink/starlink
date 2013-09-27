@@ -146,6 +146,7 @@ smf_expand_tilegroup.c \
 smf_expmodel_dks.c \
 smf_expmodel_two.c \
 smf_expmodel_init.c \
+smf_export_noi.c \
 smf_ext2km.c \
 smf_extracols.c \
 smf_fft_2dazav.c \

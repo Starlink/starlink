@@ -1014,6 +1014,8 @@ void smf_expmodel_two( const smfData *indata, smfData **outdata, int *status);
 
 void smf_expmodel_init( const smfData *indata, smfData **outdata, int *status);
 
+void smf_export_noi( smfData *noi, const char *name, int boxsize, int *status );
+
 void smf_ext2km( int indf, const char *xname, AstKeyMap *keymap, int mode,
                  int *status );
 
@@ -1401,7 +1403,8 @@ void smf_import_array( smfData *refdata, const char *name, int bad,
                        int expand, double *dataptr, int *status );
 
 int smf_import_noi( const char *name, smfDIMMHead *head,
-                    AstKeyMap *keymap, double *dataptr, int *status );
+                    AstKeyMap *keymap, double *dataptr, dim_t *noi_boxsize,
+                    int *status );
 
 void smf_inbeam_str ( smf_inbeam_t inbeam, char *inbeamstr, size_t lenstr, int * status );
 
@@ -1525,8 +1528,8 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
                        dim_t nchunks, smf_modeltype mtype, int isTordered,
                        AstFrameSet *outfset, int moving,
                        int *lbnd_out, int *ubnd_out, fts2Port fts_port,
-                       smfGroup **mgroup,
-                       smfArray **mdata, AstKeyMap *keymap, int *status );
+                       smfGroup **mgroup, smfArray **mdata,
+                       AstKeyMap *keymap, dim_t *noi_boxsize, int *status );
 
 void smf_model_createHdr( smfData *model, smf_modeltype type,
                           smfData *refdata, int *status );
