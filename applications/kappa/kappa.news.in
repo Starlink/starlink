@@ -52,6 +52,12 @@
       list of displayed NDF paths to be filtered by removing the paths
       for NDFs that do not exist.
 
+   o  NORMALIZE
+
+      -  This will loop if the first NDF is one-dimensional and the
+      second is two-dimensional, provided LOOP=TRUE.  It previously
+      only worked if the dimensionalities were in the reverse sense.
+
    o  OUTSET
 
       -  The USEAXIS parameter now works, needed when the supplied NDF
