@@ -1,7 +1,7 @@
 all: P82.pdf
 
 # Add figure requirements here:
-P01.dvi: P82.tex
+P82.dvi: P82.tex
 
 %.dvi: %.tex %.bib
 	latex $<
