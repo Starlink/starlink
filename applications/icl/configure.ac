@@ -64,6 +64,7 @@ AC_CHECK_HEADERS([term.h ncurses/term.h])
 
 dnl Check for library, either -lncurses or -lcurses. Prefer ncurses.
 AC_CHECK_LIB([ncurses], [initscr],,AC_CHECK_LIB([curses], [initscr]))
+AC_CHECK_LIB([tinfo], [putp],,)
 
 # unix.c should be tweaked to not use environ
 AC_CHECK_FUNCS([setenv putenv])
