@@ -1,4 +1,4 @@
-
+AM_FCFLAGS=-I.
 #  Things to build.
 
 ccdsupportdir = $(bindir)
