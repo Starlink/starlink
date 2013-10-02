@@ -257,6 +257,8 @@
 #          on exit
 #     31-AUG-2013 (TIMJ):
 #        - Convert PDF images to EPS
+#     2013-10-02 (TIMJ):
+#        - Use autoconf to find pdftops
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -270,7 +272,6 @@ use Cwd;
 use File::Spec;
 use Pod::Usage;
 use Getopt::Long;
-use File::SearchPath qw/ searchpath /;
 
 #  Print introductory message.
 my $announce = "Star2HTML V@PACKAGE_VERSION@";
@@ -435,12 +436,15 @@ if ( ( -T $TEXFILE ) && ( -r $TEXFILE ) ) {
    {
 
      # First work out which converter to use
+     my %TOOLS = ( pdftops => '@PDFTOPS@',
+                   pdf2ps => '@PDF2PS@',
+                 );
+
      my @pdftops;
      for my $tool (qw/ pdftops pdf2ps /) {
-       my $path = searchpath( $tool, $ENV{PATH} );
-       if (defined $path) {
-         push(@pdftops, $tool);
-         push(@pdftops, "-eps") if $tool eq 'pdftops';
+       my $exe = $TOOLS{$tool};
+       if ($exe) {
+         push(@pdftops, split(/\s+/,$exe));
          last;
        }
      }

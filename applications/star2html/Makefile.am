@@ -26,6 +26,8 @@ l2hdir=$(DESTDIR)$(datadir)/latex2html/bin/
 
 edit=sed \
     -e 's,@ENV\@,$(ENV),g' \
+    -e 's,@PDFTOPS\@,$(PDFTOPS),g' \
+    -e 's,@PDF2PS\@,$(PDF2PS),g' \
     -e 's,@PACKAGE_VERSION\@,$(PACKAGE_VERSION),g' \
     -e 's,@PACKAGE_BUGREPORT\@,$(PACKAGE_BUGREPORT),g' \
     -e 's,@l2hdir\@,$(l2hdir),g'

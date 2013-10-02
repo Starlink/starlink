@@ -24,6 +24,8 @@ dnl    And requires that Perl is already built, from which we use the
 dnl    starperl command.
 STAR_DECLARE_DEPENDENCIES([configure], [perl])
 STAR_CHECK_PROGS([env])
+AC_CHECK_PROGS(PDF2PS, 'pdf2ps')
+AC_CHECK_PROGS(PDFTOPS, 'pdftops -eps')
 
 dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.
