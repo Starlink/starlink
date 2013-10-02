@@ -5,10 +5,13 @@
     being saved to disk has been fixed. Users experiencing this issue 
     should downgrade or get the development release.
 
-
     A bug in the printing of the colour ramp (which caused GAIA to exit)
     has been fixed. This was introduced when support for handling -TAB
     world coordinate systems (4.4-2).
+
+    A long standing bug when printing the main image to postscript has
+    been fixed. Previously when logged into a machine remotely printing
+    did not work correctly depending on the image zoom and scroll position.
 
     Version 4.4-4
     =============
