@@ -89,6 +89,9 @@ void kpg1Fit1d( int lbnd, int ubnd, const double y[], const double x[],
 *        - Handle perfect straight lines.
 *     5-JUL-2013 (DSB):
 *        Account for rounding errors when checking for zero values.
+*     5-OCT-2013 (DSB):
+*        Do not use the gradent before it is calculated !! This would
+*        have completely fouled up the calculation of the returned RMS.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -167,12 +170,6 @@ void kpg1Fit1d( int lbnd, int ubnd, const double y[], const double x[],
    if( fabs( d1 ) <= 10*VAL__EPSD*(n*sxy + sx*sy) ) d1 = 0.0;
    d2 = sxx*sy - sx*sxy;
    if( fabs( d2 ) <= 10*VAL__EPSD*( sxx*sy + sx*sxy ) ) d2 = 0.0;
-   d3 = syy - sy*sy/n;
-   if( fabs( d3 ) <= 10*VAL__EPSD*( syy + sy*sy/n ) ) d3 = 0.0;
-   d4 = sxy - sx*sy/n;
-   if( fabs( d4 ) <= 10*VAL__EPSD*( sxy + sx*sy/n ) ) d4 = 0.0;
-   d5 =  d3 - (*m)*d4;
-   if( fabs( d5 ) <= 10*VAL__EPSD*( d3 + (*m)*d4 ) ) d5 = 0.0;
 
 /* Report an error if the denominator is zero. */
    if( denom == 0 ) {
@@ -191,6 +188,12 @@ void kpg1Fit1d( int lbnd, int ubnd, const double y[], const double x[],
       *c =  d2/denom;
 
 /* Form the RMS residual. */
+      d3 = syy - sy*sy/n;
+      if( fabs( d3 ) <= 10*VAL__EPSD*( syy + sy*sy/n ) ) d3 = 0.0;
+      d4 = sxy - sx*sy/n;
+      if( fabs( d4 ) <= 10*VAL__EPSD*( sxy + sx*sy/n ) ) d4 = 0.0;
+      d5 =  d3 - (*m)*d4;
+      if( fabs( d5 ) <= 10*VAL__EPSD*( d3 + (*m)*d4 ) ) d5 = 0.0;
       *rms = d5/n;
 
 /* Do not reject any points if the RMS is zero (e.g. if the supplied data
