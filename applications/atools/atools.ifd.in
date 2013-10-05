@@ -4491,7 +4491,54 @@ iraf! {
 
       }
 
+      action astprism {
 
+         helplib {$ATOOLS_HELP}
+
+         parameter fmt {
+            type LITERAL
+            prompt {Format for output text file}
+            ppath DEFAULT
+            vpath DEFAULT
+            default AST
+            helpkey *
+          }
+
+         parameter region1 {
+            position 1
+            type LITERAL
+            prompt {The Region to be extruded}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter region2 {
+            position 2
+            type LITERAL
+            prompt {The Region defining the extent of the extrusion}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter options {
+            position 3
+            type LITERAL
+            prompt {Options for the Prism}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter result {
+            position 4
+            type LITERAL
+            prompt {Name of file in which to store the Prism}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+      }
    }
 
    command astshow {

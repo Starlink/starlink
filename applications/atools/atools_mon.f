@@ -325,6 +325,9 @@
       ELSE IF ( NAME .EQ. 'ASTMIRRORVARS' ) THEN
          CALL ASTMIRRORVARS( STATUS )
 
+      ELSE IF ( NAME .EQ. 'ASTPRISM' ) THEN
+         CALL ASTPRISM( STATUS )
+
 *  If the action name is not recognised, then report an error.
       ELSE
          STATUS = SAI__ERROR
