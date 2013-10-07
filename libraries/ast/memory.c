@@ -4157,7 +4157,9 @@ void astActiveMemory_( const char *label ) {
    next = Active_List;
    if( next ) {
       while( next ) {
-         if( !next->perm ) printf( "%d ", next->id );
+         if( !next->perm ) {
+            printf( "%d(%s:%d) ", next->id, next->file, next->line );
+         }
          next = next->next;
       }
    } else {
@@ -4793,6 +4795,16 @@ static void Issue( Memory *mem, int *status ) {
    non-zero, a new identifier is used each time the pointer becomes active
    (i.e. each time it is remove from the cache or malloced). */
    if( !Keep_ID || mem->id < 0 ) mem->id = ++Next_ID;
+
+/* Record the file name and line number where it was issued. */
+   if( AST__GLOBALS && AST__GLOBALS->Error.Current_File ) {
+      strncpy( mem->file, AST__GLOBALS->Error.Current_File, sizeof(mem->file) );
+      mem->file[ sizeof(mem->file) - 1 ] = 0;
+      mem->line = AST__GLOBALS->Error.Current_Line;
+   } else {
+      mem->file[ 0 ] = 0;
+      mem->line = 0;
+   }
 
 /* Indicate if this is a permanent memory block (i.e. it will usually not
    be freed by AST). */

@@ -160,6 +160,8 @@ typedef struct Memory {
    struct Memory *prev; /* Pointer to the previous linked Memory structure */
    int id;      /* A unique identifier for every allocated memory chunk */
    int perm;    /* Is this chunk part of an acceptable once-off "memory leak"? */
+   int line;    /* Line number in "file" (below). */
+   char file[50];/* The source file that made the top-level call to AST */
 #endif
 
 } Memory;
