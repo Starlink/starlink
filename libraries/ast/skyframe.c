@@ -325,6 +325,11 @@ f     - AST_SKYOFFSETMAP: Obtain a Mapping from absolute to offset coordinates
 *        poorer accuracy, and small variations in interpolated LAST value
 *        depending on the way the cached values are distributed amongst the
 *        N threads.
+*     6-AST-2013 (DSB):
+*        Fix the use of the read-write lock that is used to serialise
+*        access to the table of cached LAST values. This bug could
+*        cause occasional problems where an AST pointer would became
+*        invalid for no apparent reason.
 *class--
 */
 
@@ -8680,6 +8685,10 @@ static void SetCachedLAST( AstSkyFrame *this, double last, double epoch,
 /* Check the global error status. */
    if ( !astOK ) return;
 
+/* Ensure no threads are allowed to read the table whilst we are writing
+   to it. */
+   LOCK_WLOCK1
+
 /* Loop round every LAST table held in the vtab. Each table refers to a
    different observatory position and/or DUT1 value. */
    for( itable = 0; itable < nlast_tables; itable++ ) {
@@ -8695,10 +8704,6 @@ static void SetCachedLAST( AstSkyFrame *this, double last, double epoch,
 /* Ensure "table" ends up NULL if no suitable table is found. */
       table = NULL;
    }
-
-/* Ensure no threads are allowed to read the table whilst we are writing
-   to it. */
-   LOCK_RLOCK1
 
 /* If no table was found, create one now, and add it into the vtab cache. */
    if( !table ) {
