@@ -13,7 +13,6 @@
 *     C function
 
 *  Invocation:
-
 *     smf_iteratemap(ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 *                    const Grp *bolrootgrp, const Grp *shortrootgrp,
 *                    const Grp *flagrootgrp, const Grp *samprootgrp,
@@ -532,6 +531,9 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   size_t bstride;               /* Bolometer stride */
   double *chisquared=NULL;      /* chisquared for each chunk each iter */
   double chitol=VAL__BADD;      /* chisquared change tolerance for stopping */
+  double chunkweight;           /* The relative weight to give to the
+                                   current chunk when adding into the running
+                                   sum map. */
   size_t contchunk;             /* Continuous chunk in outer loop counter */
   int converged=0;              /* Has stopping criteria been met? */
   smfDIMMData dat;              /* Struct passed around to model components */
@@ -593,7 +595,8 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   double mapchange_mean=0;      /* Mean change in map */
   double mapchange_max=0;       /* Maximum change in the map */
   double maptol=VAL__BADD;      /* map change tolerance for stopping */
-  double *mapweightsq=NULL;     /* map weight squared */
+  double *mapweights=NULL;      /* Weight for each pixel including chunk weight */
+  double *mapweightsq=NULL;     /* Sum of bolometer weights squared */
   dim_t maxconcat;              /* Longest continuous chunk that fits in mem.*/
   dim_t maxfile;                /* Longest file length in time samples*/
   int maxiter=0;                /* Maximum number of iterations */
@@ -636,6 +639,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   int shortmap=0;               /* If set, produce maps every shortmap tslices*/
   double srate_maxlen=0;        /* Sample rate used to calc maxlen in samples */
   double steptime;              /* Length of a sample in seconds */
+  double sumchunkweights;       /* Sum of all chunk weights */
   const char *tempstr=NULL;     /* Temporary pointer to static char buffer */
   double *thetabincen=NULL;     /* Bin centres of scan angle */
   double *thetabins=NULL;       /* Bins of scan angle */
@@ -1277,6 +1281,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
      and iterate each one of those to completion without any file i/o.
      These are called "contchunk".
    *************************************************************************** */
+  sumchunkweights = 0.0;
 
   for( contchunk=0; contchunk<ncontchunks  && !smf_interupt; contchunk++ ) {
 
@@ -1310,6 +1315,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         thisqual = mapqual;
         thisvar = mapvar;
         thisweight = weights;
+        mapweights = astCalloc( msize, sizeof(*mapweights) );
         mapweightsq = astMalloc( msize*sizeof(*mapweightsq) );
         thisweightsq = mapweightsq;
       } else if( contchunk == 1 ) {
@@ -2889,13 +2895,18 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       /* Remember how many chunks failed due to lack of samples */
       count_minsmp++;
     } else {
+
       /* In the multiple contchunk case, add this map to the total if
-         we got here with clean status */
-      if( contchunk >= 1 ) {
+         we got here with clean status. First get the weight for this
+         chunk. */
+      chunkweight = smf_chunkweight( res[0]->sdata[0], keymap,
+                                     contchunk, status );
+      if( ncontchunks > 1 ) {
         msgOut( " ", FUNC_NAME ": Adding map estimated from this continuous"
                 " chunk to total", status);
-        smf_addmap1( map, weights, hitsmap, mapvar, mapqual, thismap,
-                     thisweight, thishits, thisvar, thisqual, msize, status );
+        smf_addmap1( map, mapweights, weights, hitsmap, mapvar, mapqual,
+                     thismap, thisweight, thishits, thisvar, thisqual,
+                     msize, chunkweight, status );
       }
 
       /* Add this chunk of exposure time to the total. We assume the array was
@@ -2904,10 +2915,12 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         steptime = res[0]->sdata[0]->hdr->steptime;
         for (ipix = 0; ipix < msize; ipix++ ) {
           if ( thishits[ipix] != VAL__BADI) {
-            exp_time[ipix] += steptime * (double)thishits[ipix];
+            exp_time[ipix] += chunkweight*steptime * (double)thishits[ipix];
           }
         }
       }
+      /* Update the sum of all chunk weights. */
+      sumchunkweights += chunkweight;
     }
 
     /* *************************************************************************
@@ -2965,7 +2978,13 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
     whichthetabin = astFree( whichthetabin );
   }
 
-
+/* Normalise the returned exposure times to a mean chunk weight of unity. */
+  if( *status == SAI__OK ) {
+    double meanw = sumchunkweights/ncontchunks;
+    for (ipix = 0; ipix < msize; ipix++ ) {
+       exp_time[ipix] /= meanw;
+    }
+  }
 
 
 
@@ -3008,6 +3027,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   if( thisweight != weights ) thisweight = astFree( thisweight );
   if( thisweightsq != mapweightsq ) thisweightsq = astFree( thisweightsq );
   mapweightsq = astFree( mapweightsq );
+  mapweights = astFree( mapweights );
 
   modeltyps = astFree( modeltyps );
   exportNDF_which = astFree( exportNDF_which );

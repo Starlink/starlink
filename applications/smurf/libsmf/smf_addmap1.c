@@ -13,17 +13,25 @@
 *     C function
 
 *  Invocation:
-*     smf_addmap1( double *map1, double *mapweight1,
+*     smf_addmap1( double *map1, double *mapweight1, double *boloweight1,
 *                  int *hitsmap1, double *mapvar1, smf_qual_t *mapqual1,
-*                  double *map2, double *mapweight2,
+*                  double *map2, double *boloweight2,
 *                  int *hitsmap2, double *mapvar2, smf_qual_t *mapqual2,
-*                  dim_t msize, int *status ) {
+*                  dim_t msize, double chunkweight2, int *status ) {
 
 *  Arguments:
 *     map1 = double* (Given and Returned)
 *        The first map
 *     mapweight1 = double* (Given and Returned)
-*        Relative weighting for each pixel in map1
+*        The sum of the weights for each pixel in the map. Each of these
+*        weights is the reciprocal of a single map variance times the
+*        associated chunk weight.
+*     boloweight1 = double* (Given and Returned)
+*        The sum of the weights of the bolometer values that fall in the
+*        pixel. Each of these weights is the reciprocal of the
+*        corresponding bolometer variance. The variance of the bolometer
+*        values need to be distinguished from the variance of the map pixel
+*        values.
 *     hitsmap1 = int* (Given and Returned)
 *        Number of samples that land in map1 pixels
 *     mapvar1 = double* (Given and Returned)
@@ -32,8 +40,8 @@
 *        Quality map1
 *     map2 = double* (Given)
 *        The second map
-*     mapweight2 = double* (Given)
-*        Relative weighting for each pixel in map2
+*     boloweight2 = double* (Given)
+*        Sum of bolometer weights for each pixel in map2
 *     hitsmap2 = int* (Given)
 *        Number of samples that land in map2 pixels
 *     mapvar2 = double* (Given)
@@ -42,6 +50,8 @@
 *        Quality map2
 *     msize = dim_t (Given)
 *        Number of pixels in the maps
+*     chunkweight2 = double (Given)
+*        The weight for the new map (map2).
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -62,6 +72,11 @@
 *        Handle map quality arrays.
 *     2011-09-01 (EC):
 *        The weightsmap does not necessarily need to be 1/varmap!
+*     2013-10-08 (DSB):
+*        Renamed arguments "mapweight1/2" to "boloweight1/2", and added
+*        new arguments "mapweight1" and "chunkweight2". These changes
+*        allow different chunks to be weighted differently in the final
+*        coadded map.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -104,10 +119,11 @@
 
 #define FUNC_NAME "smf_addmap1"
 
-void smf_addmap1( double *map1, double *mapweight1, int *hitsmap1,
-                  double *mapvar1, smf_qual_t *mapqual1, double *map2,
-                  double *mapweight2, int *hitsmap2, double *mapvar2,
-                  smf_qual_t *mapqual2, dim_t msize, int *status ) {
+void smf_addmap1( double *map1, double *mapweight1, double *boloweight1,
+                  int *hitsmap1, double *mapvar1, smf_qual_t *mapqual1,
+                  double *map2, double *boloweight2, int *hitsmap2,
+                  double *mapvar2, smf_qual_t *mapqual2, dim_t msize,
+                  double chunkweight2, int *status ) {
 
   /* Local Variables */
   dim_t i;                   /* Loop counter */
@@ -116,42 +132,60 @@ void smf_addmap1( double *map1, double *mapweight1, int *hitsmap1,
   if (*status != SAI__OK) return;
 
   /* Check for NULL inputs */
-  if( (map1==NULL) || (mapweight1==NULL) || (hitsmap1==NULL) ||
-      (mapvar1==NULL) || (map2==NULL) || (mapweight2==NULL) ||
+  if( (map1==NULL) || (boloweight1==NULL) || (hitsmap1==NULL) ||
+      (mapvar1==NULL) || (map2==NULL) || (boloweight2==NULL) ||
       (hitsmap2==NULL) || (mapvar2==NULL) ) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Addmap failed due to NULL inputs.", status);
       return;
   }
 
-  /* Loop over every pixel and store the weighted values in arrays associated
-     with map1 */
+  /* If the two maps refer to the same array (i.e. the first iteration),
+     just update the mapweight array. */
+  if( map1 == map2 ) {
+    for( i=0; i<msize; i++ ) {
+       if( mapvar1[ i ] != VAL__BADD ) {
+          mapweight1[ i ] = chunkweight2/mapvar1[ i ];
+          boloweight1[ i ] *= chunkweight2;
+          hitsmap1[ i ] *= chunkweight2;
+       }
+    }
 
-  for( i=0; i<msize; i++ ) {
-    if( (map1[i] == VAL__BADD) || (mapvar1[i] == VAL__BADD) ) {
-      /* If bad pixel in map1 just copy map2 regardless */
-      map1[i] = map2[i];
-      mapweight1[i] = mapweight2[i];
-      hitsmap1[i] = hitsmap2[i];
-      mapvar1[i] = mapvar2[i];
-      mapqual1[i] = mapqual2[i];
-    } else if( (map2[i] != VAL__BADD) && (mapvar2[i] != VAL__BADD) ) {
-      /* Add together if both maps have good pixels */
-      if( (mapvar1[i]<=0) || (mapvar2[i]<=0) ) {
-	*status = SAI__ERROR;
-	errRepf("", FUNC_NAME ": invalid variance(s) <=0 detected (%g and %g)", status,
-                mapvar1[i], mapvar2[i]);
-	return;
-      } else {
-        double w = 1./mapvar1[i] + 1./mapvar2[i];
+  /* Otherwise, loop over every pixel and store the weighted values in
+     arrays associated with map1 */
+  } else {
+    for( i=0; i<msize; i++ ) {
+      if( (map1[i] == VAL__BADD) || (mapvar1[i] == VAL__BADD) ) {
 
-        map1[i] = (map1[i]/mapvar1[i] + map2[i]/mapvar2[i])/w;
-        mapweight1[i] += mapweight2[i];
-        hitsmap1[i] += hitsmap2[i];
-        mapqual1[i] &= mapqual2[i];
-	mapvar1[i] = 1. / w;
+        /* If bad pixel in map1 just copy map2 regardless */
+        map1[i] = map2[i];
+        mapweight1[i] = chunkweight2/mapvar2[ i ];
+        boloweight1[i] = boloweight2[i];
+        hitsmap1[i] = hitsmap2[i];
+        mapvar1[i] = mapvar2[i];
+        mapqual1[i] = mapqual2[i];
+
+      } else if( (map2[i] != VAL__BADD) && (mapvar2[i] != VAL__BADD) ) {
+
+        /* Add together if both maps have good pixels */
+        if( (mapvar1[i]<=0) || (mapvar2[i]<=0) ) {
+          *status = SAI__ERROR;
+          errRepf("", FUNC_NAME ": invalid variance(s) <=0 detected (%g and %g)", status,
+                  mapvar1[i], mapvar2[i]);
+          return;
+
+        } else {
+          double w1 = mapweight1[ i ];
+          double w2 = chunkweight2/mapvar2[ i ];
+          double wnew = w1 + w2;
+          map1[ i ] = ( map1[i]*w1 + map2[i]*w2 )/wnew;
+          mapvar1[ i ] = ( mapvar1[ i ]*w1*w1 + chunkweight2*w2 )/( wnew*wnew );
+          boloweight1[ i ] += boloweight2[i]*chunkweight2;
+          hitsmap1[ i ] += hitsmap2[i]*chunkweight2;
+          mapqual1[ i ] &= mapqual2[i];
+          mapweight1[ i ] = wnew;
+        }
       }
     }
   }
-
 }

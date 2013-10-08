@@ -297,6 +297,27 @@ bolomap = 0
 chitol = <undef>
 
 #-----------------------------------------------------------------
+#  Name: 	chunkweight
+#  Type: 	real or string
+#  Default: 	1.0
+#  Purpose: 	Specifies a relative weight for each continuous chunk
+#  Description: This parameter specifies the weight to use for each
+#               chunk of time series data. These weights are used when
+#               the maps made from the individual chunks are combined
+#               together to form the total map. They can be specified in
+#               two ways: 1) The "chunkweight" parameter can be set to
+#               the name of a FITS header that has a numerical value. The
+#               value of the FITS header for each chunk will then be used
+#               as the weight for that chunk. 2) A comma-separated list
+#               of explicit numerical values can be supplied. The list
+#               must be enclosed in parentheses. The last value in the
+#               list will be replicated if the number of values in the
+#               list is smaller than the number of chunks. Thus, the
+#               default value of 1.0 will cause a weight of 1.0 to be
+#               used for every chunk.
+chunkweight = 1.0
+
+#-----------------------------------------------------------------
 #  Name: 	com.zero_circle
 #  Type: 	real
 #  Default: 	<undef>
@@ -1585,9 +1606,9 @@ noi.fillgaps = 1
 #               in the NOI model from an NDF created by a previous run of
 #               makemap, rather than calculating them from scratch. The
 #               NDF should have been created by setting parameter "noi.export"
-#               to 1 in the configuration for a previous run of makemap. 
-#               (the file should end in "_noi.sdf"). Note, the parameter 
-#               "noi.box_size" must be set to the same value it had in the 
+#               to 1 in the configuration for a previous run of makemap.
+#               (the file should end in "_noi.sdf"). Note, the parameter
+#               "noi.box_size" must be set to the same value it had in the
 #               previous run of makemap.
 noi.import = 0
 
