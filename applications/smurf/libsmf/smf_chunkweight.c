@@ -93,10 +93,10 @@ double smf_chunkweight( smfData *data, AstKeyMap *keymap, int contchunk,
 
 /* Local Variables: */
    const char *cval = NULL;
-   const char *text = "";
    double result = 0.0;
    double values[ MAXCHUNKS ];
    int nval;
+   AstKeyMap *maths = NULL;
 
 /* Initialise the returned weight to a safe value. */
    result = 1.0;
@@ -115,26 +115,59 @@ double smf_chunkweight( smfData *data, AstKeyMap *keymap, int contchunk,
       } else {
          result = values[ nval - 1 ];
       }
-      msgOutiff( MSG__DEBUG, "", "smf_chunkweight: Using a weight of %g "
+      msgOutiff( MSG__VERB, "", "smf_chunkweight: Using a weight of %g "
                  "for chunk %d specified by config parameter CHUNKWEIGHT",
                  status, result, contchunk );
 
 /* If the CHUNKWEIGHT parameter is not a vector of numerical values,
-   annull the error and access it as a text string. */
+   annull the error and try to access it first as a text string. */
    } else if( *status == AST__MPGER ) {
       errAnnul( status );
-      if( astMapGet0C( keymap, "CHUNKWEIGHT", &cval ) ){
-         if( data->hdr ) {
-            smf_getfitsd( data->hdr, cval, &result, status );
-            msgOutiff( MSG__DEBUG, "", "smf_chunkweight: Using a weight of %g "
-                       "for chunk %d read from FITS header '%s'", status, result,
-                       contchunk, cval );
-         } else {
-            *status = SAI__ERROR;
-            errRepf( "", "SMF_CHUNKWEIGHT: Supplied smfData "
-                     "has no FITS header (programming error).", status );
+
+/* We need a FITS header. */
+      if( !data->hdr ) {
+         *status = SAI__ERROR;
+         errRepf( "", "SMF_CHUNKWEIGHT: Supplied smfData has no FITS "
+                  "header (programming error).", status );
+
+/* Attempt to get the value as a text string. */
+      } else if( astMapGet0C( keymap, "CHUNKWEIGHT", &cval ) ){
+
+/* If successful, try to create a MathMap that treats the text string as an
+   algebraic function of a selection of FITS keywords, and evaluate this
+   function using the FITS keyword values in the suppleid header. */
+         maths = smf_fits_maths( NULL, cval, data->hdr, &result, status );
+
+/* Store the "maths" object in the KeyMap. Since it is itself an AST
+   object, it will be annulled when the KeyMap is annulled. */
+         int oldval = astGetI( keymap, "MapLocked" );
+         astSetI( keymap, "MapLocked", 0 );
+         astMapPut0A( keymap, "CHUNKWEIGHT", maths, NULL );
+         astSetI( keymap, "MapLocked", oldval );
+
+/* Now that we have saved a pointer to the "maths" object in the KeyMap,
+   we can annul our local copy of the pointer without the object being
+   destroyed. */
+         maths = astAnnul( maths );
+
+/* If the CHUNKWEIGHT value could not be read as a text string, annull
+   the error and attempt to get it as an AST Object. */
+      } else if( *status == AST__MPGER ) {
+         errAnnul( status );
+         if( astMapGet0A( keymap, "CHUNKWEIGHT", &maths ) ){
+
+/* If successful, use the "maths" object to evaluate the FITS expression. */
+            (void) smf_fits_maths( maths, NULL, data->hdr, &result, status );
+
+/* Annul the local pointer. */
+            maths = astAnnul( maths );
          }
       }
+
+/* Tell the user what value we are using. */
+      msgOutiff( MSG__VERB, "", "smf_chunkweight: Using a weight of %g "
+                 "for chunk %d read from FITS header expression '%s'",
+                 status, result, contchunk, cval );
    }
 
 /* Give a context message if anything went wrong. */

@@ -189,6 +189,7 @@ smf_fits_getD.c \
 smf_fits_getI.c \
 smf_fits_getL.c \
 smf_fits_getS.c \
+smf_fits_maths.c \
 smf_fits_outhdr.c \
 smf_fits_updateD.c \
 smf_fits_updateI.c \

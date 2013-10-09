@@ -929,6 +929,14 @@ typedef struct smfStepFix {
   int corr;       /* Was step fixed as a "correlated step"? */
 } smfStepFix;
 
+/* Struct to store a description of a fixed step. */
+
+typedef struct smfFITSMaths {
+  int nname;      /* The number of names in "names" */
+  char **names;   /* Array of FITS keyword names used in the expression */
+  AstMathMap *map;/* The MathMap that defines the expression. */
+} smfFITSMaths;
+
 
 /* These are the bits defined in the DA for use in the SCUBA-2 DRCONTROL
    structure to indicate whether we are missing information from a particular
