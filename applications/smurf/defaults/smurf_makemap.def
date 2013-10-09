@@ -302,19 +302,23 @@ chitol = <undef>
 #  Default: 	1.0
 #  Purpose: 	Specifies a relative weight for each continuous chunk
 #  Description: This parameter specifies the weight to use for each
-#               chunk of time series data. These weights are used when
-#               the maps made from the individual chunks are combined
-#               together to form the total map. They can be specified in
-#               two ways: 1) The "chunkweight" parameter can be set to
-#               the name of a FITS header that has a numerical value. The
-#               value of the FITS header for each chunk will then be used
-#               as the weight for that chunk. 2) A comma-separated list
-#               of explicit numerical values can be supplied. The list
-#               must be enclosed in parentheses. The last value in the
-#               list will be replicated if the number of values in the
-#               list is smaller than the number of chunks. Thus, the
-#               default value of 1.0 will cause a weight of 1.0 to be
-#               used for every chunk.
+#               chunk of continuous time series data that goes into the
+#               final map. These weights are used when the maps made
+#               from the individual chunks are combined together to form
+#               the total map. They can be specified in two ways: 1) The
+#               "chunkweight" parameter can be set to an arbitrary
+#               algebraic expression in which the variable names are the
+#               names of FITS keyword. The keyword must be present in the
+#               FITS extension of the input data and must have numerical
+#               values. The expression should be enclosed in double quotes.
+#               The value of the expression using the FITS keywords values
+#               for a chunk will then be used as the weight for that
+#               chunk. 2) A comma-separated list of explicit numerical values
+#               can be supplied. The list must be enclosed in parentheses.
+#               The last value in the list will be replicated if the number
+#               of values in the list is smaller than the number of chunks.
+#               Thus, the default value of 1.0 will cause a weight of 1.0 to
+#               be used for every chunk.
 chunkweight = 1.0
 
 #-----------------------------------------------------------------
