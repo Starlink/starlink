@@ -69,7 +69,7 @@ order = 1
 
 # clip really noisy bolos prior to common-mode removal
 noiseclipprecom=1
-noisecliphigh=10
+noisecliphigh=4
 noisecliplow = 0
 
 # use common-mode removal
