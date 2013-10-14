@@ -33,6 +33,7 @@ dreamsolve \
 dreamweights \
 dsutils \
 extinction \
+findslices\
 fit1d\
 fixsteps \
 flatfield \

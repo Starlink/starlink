@@ -1520,6 +1520,71 @@ package @PACKAGE@ {
 
         }
 
+        action findslices {
+
+            helplib {$SMURF_HELP}
+
+            parameter closest {
+                type _LOGICAL
+                access READ
+                vpath default
+                ppath current default
+                prompt {Display only closest time slices?}
+                default TRUE
+                helpkey *
+            }
+
+            parameter frame {
+                position 5
+                type NDF
+                access READ
+                vpath default
+                ppath current default
+                prompt {NDF defining coordinate frame}
+                default !
+                helpkey *
+            }
+
+            parameter in {
+                position 1
+                type NDF
+                access READ
+                association <-GLOBAL.DATA_ARRAY
+                prompt {NDFs containing time-series data}
+                helpkey *
+            }
+
+            parameter radius {
+                position 4
+                type _DOUBLE
+                access READ
+                vpath default
+                ppath current default
+                prompt {Radius of search circle in arc-sec}
+                default 300
+                helpkey *
+            }
+
+            parameter xpos {
+                position 2
+                type LITERAL
+                access READ
+                ppath CURRENT
+                prompt {X position at search centre}
+                helpkey *
+            }
+
+            parameter ypos {
+                position 3
+                type LITERAL
+                access READ
+                ppath CURRENT
+                prompt {Y position at search centre}
+                helpkey *
+            }
+
+        }
+
         action fit1d {
 
             helplib {$SMURF_HELP}
