@@ -24,7 +24,7 @@
 	url = ../libtool.git
 [submodule "thirdparty/perlsys/perl/perl"]
 	path = thirdparty/perlsys/perl/perl
-	url = git://github.com/mirrors/perl.git
+	url = git://github.com/Perl/perl5.git
 [submodule "applications/smurf/libacsis/specwrite"]
 	path = applications/smurf/libacsis/specwrite
 	url = git://github.com/jac-h/acsis-libspecwrite.git
