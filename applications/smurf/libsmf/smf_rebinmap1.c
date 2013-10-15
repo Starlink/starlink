@@ -635,7 +635,7 @@ static void smf1_rebinmap1( void *job_data_ptr, int *status ) {
 
 /* Map variance from spread of input values - VAL__BADD checking version.
    ==================================================================== */
-   } else if( pdata->operation == 1 ) {
+   } else if( pdata->operation == 2 ) {
 
       for( ibolo = 0; ibolo < pdata->nbolo; ibolo++ ) {
          for( itime = pdata->t1; itime <= pdata->t2; itime++ ) {
