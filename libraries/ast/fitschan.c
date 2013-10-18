@@ -1077,6 +1077,16 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 *        than the current Frame.
 *     24-SEP-2013 (DSB):
 *        Fix bug in choosing default value for PolyTan attribute.
+*     19-OCT-2013 (DSB):
+*        - In SIPMapping, always ignore any inverse polynomial supplied in
+*        a SIP header as they seem often to be inaccurate. A new inverse is
+*        created to replace it.
+*        - In SIPMapping, only use a fit to the inverted SIP transformation
+*        if an accuracy of 0.01 pixel can be achieved over an area three
+*        times the dimensions of the image. Otherwise use an iterative
+*        inverse for each point. People were seeing bad round-trip errors
+*        when transforming points outside the image because the fit was
+*        being used when it was not very accurate.
 *class--
 */
 
@@ -26684,24 +26694,25 @@ static AstMapping *SIPMapping( double *dim, FitsStore *store, char s,
    } else {
       pmap = astPolyMap( 2, 2, ncoeff_f, coeff_f, ncoeff_i, coeff_i, "", status );
 
-/* If only one transformation was supplied, attempt create the other by sampling
-   the supplied transformation, and fitting a polynomial to the sampled
-   positions. If the fit fails to reach 0.1 pixel accuracy, forget it and
-   rely on the iterative inverse provided by the PolyMap class. */
-      if( ncoeff_f == 0 || ncoeff_i == 0 ){
-         lbnd[ 0 ] = 1.0;
-         lbnd[ 1 ] = 1.0;
-         ubnd[ 0 ] = dim[ 0 ] != AST__BAD ? dim[ 0 ] : 1000.0;
-         ubnd[ 1 ] = dim[ 1 ] != AST__BAD ? dim[ 1 ] : 1000.0;
-         pmap2 = astPolyTran( pmap, (ncoeff_f == 0), 0.001, 0.1, 6, lbnd,
-                              ubnd );
-         if( pmap2 ) {
-            (void) astAnnul( pmap );
-            pmap = pmap2;
-         } else {
-            astSet( pmap, "IterInverse=1,NiterInverse=6,TolInverse=1.0E-8",
-                    status );
-         }
+/* The inverse transformations supplied within SIP headers are often
+   inaccurate. So replace any existing inverse by sampling the supplied
+   transformation, and fitting a polynomial to the sampled positions. If
+   the fit fails to reach 0.01 pixel accuracy, forget it and rely on the
+   (slower) iterative inverse provided by the PolyMap class. Do the fit
+   over an area three times the size of the image to provide accurate
+   values outside the image.*/
+      lbnd[ 0 ] = ( dim[ 0 ] != AST__BAD ) ? -dim[ 0 ] : -1000.0;
+      lbnd[ 1 ] = ( dim[ 1 ] != AST__BAD ) ? -dim[ 1 ] : -1000.0;
+      ubnd[ 0 ] = ( dim[ 0 ] != AST__BAD ) ? 2*dim[ 0 ] : 2000.0;
+      ubnd[ 1 ] = ( dim[ 1 ] != AST__BAD ) ? 2*dim[ 1 ] : 2000.0;
+      pmap2 = astPolyTran( pmap, (ncoeff_f == 0), 0.0001, 0.01, 7, lbnd,
+                           ubnd );
+      if( pmap2 ) {
+         (void) astAnnul( pmap );
+         pmap = pmap2;
+      } else {
+         astSet( pmap, "IterInverse=1,NiterInverse=6,TolInverse=1.0E-8",
+                 status );
       }
 
 /* Add the above Mapping in parallel with a UnitMap which passes any

@@ -22873,12 +22873,10 @@ certain FITS headers that use a TNX projection.
 
 \end{enumerate}
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V7.3.2}
+\subsection{Changes Introduced in V7.3.2}
 
-The following describes the most significant changes which have
-occurred in the AST library between versions V7.3.1 and V7.3.2 (the
-current version):
+The following describes the most significant changes which
+occurred in the AST library between versions V7.3.1 and V7.3.2:
 
 \begin{enumerate}
 
@@ -22893,6 +22891,25 @@ is changed. See the SortBy attribute.
 \item A bug has been fixed in the FitsChan class that caused CDELT keywords
 for sky axes to be treated as radians rather than degrees when reading a
 FITS header, if the corresponding CTYPE values included no projection code.
+
+\end{enumerate}
+
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V7.3.3}
+
+The following describes the most significant changes which have
+occurred in the AST library between versions V7.3.2 and V7.3.3 (the
+current version):
+
+\begin{enumerate}
+
+\item When using the FitsChan class to read FITS-WCS headers that include
+polynomial distortion in the SIP format, any inverse transformation specified
+in the header is now ignored and a new inverse is created to replace it based
+on the supplied forward transformation. Previously, an inverse was created
+only if the header did not include an inverse. The accuracy of the inverse
+transformation has also been improved, although it may now be slower to
+evaluate in some circumstances.
 
 \end{enumerate}
 

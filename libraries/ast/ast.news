@@ -1,6 +1,6 @@
 AST Library
 -----------
-   A new release (V7.3.2) of the Starlink AST (astrometry) library is
+   A new release (V7.3.3) of the Starlink AST (astrometry) library is
 now available.
 
    AST provides a comprehensive range of facilities for attaching
@@ -15,6 +15,18 @@ environment-independent.
 
 Main Changes in this Version
 ----------------------------
+
+- When reading FITS-WCS headers that include polynomial distortion in the
+SIP format, any inverse transformation specified in the header is now
+ignored and a new inverse is created to replace it based on the supplied
+forward transformation. Previously, an inverse was created only if the
+header did not include an inverse. The accuracy of the inverse
+transformation has also been improved, although it may now be slower to
+evaluate in some circumstances.
+
+
+Main Changes in V7.3.2
+----------------------
 
 - Fix support for reading GLS projections from FITS headers.
 
