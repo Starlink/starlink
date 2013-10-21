@@ -14,7 +14,7 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_filter_edge( smfFilter *filt, double f, double w, int lowpass,
+*     smf_filter_edge( smfFilter *filt, double f, int order, int lowpass,
 *                      int *status );
 
 *  Arguments:
@@ -22,8 +22,10 @@
 *        Pointer to smfFilter to be modified
 *     f = double (Given)
 *        Frequency of the edge in Hz
-*     w = double (Given)
-*        Width of transition zone in Hz. Zero for hard edged filter.
+*     order = int (Given)
+*        If zero or negative, a hard-edged filter is used. Otherwise,
+*        a Butterworth filter is used with the specified order. Higher
+*        order produce sharper cut-offs with more ringing.
 *     highpass = int (Given)
 *        Set flag if edge is low-pass. Otherwise high-pass is assumed.
 *     status = int* (Given and Returned)
@@ -33,15 +35,14 @@
 *     This function applies a hard or soft, low- or high-pass cut at the
 *     specified edge frequency. For a hard-edged filter, the power at all
 *     frequencies below (or above) the edge are set to zero if highpass is
-*     0 (or non-zero). For a soft-edge filter, the transition from zero to
-*     one occurs over a width of "w" Hz, centred on the specified edge
-*     frequecy, and is sinusoidal in shape. The conversion of the frequency
-*     to a discrete bin in the filter is accomplished by rounding. For
-*     a hard-edge, the range of frequencies set to 0 include the bin
-*     corresponding to the edge frequency. This function will operate on
-*     either real or complex-valued filters, and will not alter the data
-*     type. Bad status is set if filt is NULL, or the filter is 0 length.
-*     If filt->buf is NULL it is first initialized by calling smf_filter_ident
+*     0 (or non-zero). For a soft-edge filter, a Butterworth filter is used.
+*     The conversion of the frequency to a discrete bin in the filter is
+*     accomplished by rounding. For a hard-edge, the range of frequencies set
+*     to 0 include the bin corresponding to the edge frequency. This function
+*     will operate on either real or complex-valued filters, and will not
+*     alter the data type. Bad status is set if filt is NULL, or the filter
+*     is 0 length. If filt->buf is NULL it is first initialized by calling
+*     smf_filter_ident
 *     (type=real).
 
 *  Authors:
@@ -56,6 +57,9 @@
 *        -Switch to split real/imaginary arrays for smfFilter
 *     2013-02-18 (DSB):
 *        Allow soft-edged filters to be used.
+*     2013-10-21 (DSB):
+*        Changed soft-edged filters to use a standard zero-order
+*        Butterworth filter.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -103,12 +107,12 @@
 
 #define FUNC_NAME "smf_filter_edge"
 
-void smf_filter_edge( smfFilter *filt, double f, double w, int lowpass,
+void smf_filter_edge( smfFilter *filt, double f, int order, int lowpass,
                       int *status ) {
+  double rat;           /* Ratio of channel freq to edge freq */
   size_t base;          /* Index to start of memory to be zero'd */
   size_t i;             /* Channel index */
   size_t iedge;         /* Index corresponding to the edge frequency */
-  size_t hw;            /* The half-width of transition zone in channels */
   size_t len;           /* Length of memory to be zero'd */
 
   if( *status != SAI__OK ) return;
@@ -135,11 +139,8 @@ void smf_filter_edge( smfFilter *filt, double f, double w, int lowpass,
   /* Calculate offset of edge frequency in filter */
   iedge = smf_get_findex( f, filt->df[0], filt->fdims[0], status );
 
-  /* Get half the width of the transition zone in channels. */
-  hw = 0.5*w/filt->df[0];
-
   /* Hard-edged... */
-  if( hw <= 0 ) {
+  if( order <= 0 ) {
 
     /* Since we're zero'ing a continuous piece of memory, just use memset */
 
@@ -161,31 +162,21 @@ void smf_filter_edge( smfFilter *filt, double f, double w, int lowpass,
   /* Soft-edged */
   } else {
 
-    size_t ilo = ( iedge > hw ) ? iedge - hw : 0;
-    size_t ihi = ( iedge + hw < filt->fdims[0] ) ? iedge + hw : filt->fdims[0];
-
-    /* For low pass, we can skip the channels below the transisition
-       zone, which will already hold 1.0 */
     if( lowpass ) {
+      for( i = 0; i < filt->fdims[0]; i++ ) {
+        rat = (double) i / (double) iedge;
+        rat *= rat;
+        if( order > 1 ) rat = pow( rat, order );
+        (filt->real)[ i ] = 1.0/( 1.0 + rat );
+      }
 
-       for( i = ilo; i < filt->fdims[0]; i++ ) {
-          if( i > ihi ) {
-             (filt->real)[ i ] = 0.0;
-          } else {
-             (filt->real)[ i ] = 0.5*( 1.0 - sin(AST__DPIBY2*( (float) i - (float) iedge )/hw));
-          }
-       }
-
-    /* For high pass, we can skip the channels above the transisition
-       zone, which will already hold 1.0 */
     } else {
-       for( i = 0; i < ihi; i++ ) {
-          if( i < ilo ) {
-             (filt->real)[ i ] = 0.0;
-          } else {
-             (filt->real)[ i ] = 0.5*( 1.0 + sin(AST__DPIBY2*( (float) i - (float) iedge )/hw));
-          }
-       }
+      for( i = 0; i < filt->fdims[0]; i++ ) {
+        rat = (double) i / (double) iedge;
+        rat *= rat;
+        if( order > 1 ) rat = pow( rat, order );
+        (filt->real)[ i ] = rat/( 1.0 + rat );
+      }
     }
 
     /* For complex filters, copy the real part into the imaginary part. */

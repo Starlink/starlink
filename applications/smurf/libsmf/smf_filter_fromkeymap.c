@@ -129,11 +129,10 @@ void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap, const char *qual
   double f_edgehigh;        /* Freq. cutoff for high-pass edge filter */
   double f_edgesmall;       /* Select low-pass based on spatial scale */
   double f_edgelarge;       /* Select high-pass based on spatial scale */
-  double f_edgewidth;       /* Spatial edge width */
   double f_low;             /* Lowest edge frequency */
   double f_notchlow[SMF__MXNOTCH]; /* Array low-freq. edges of notch filters */
   double f_notchhigh[SMF__MXNOTCH];/* Array high-freq. edges of notch filters */
-  double f_width;           /* Frequency edge width */
+  int f_order;              /* Order of Butterworth filter (0=hard-edged) */
   int f_nnotch=0;           /* Number of notch filters in array */
   int i;                    /* Loop count */
   int ival = 0;             /* Dummy integer argument */
@@ -162,12 +161,11 @@ void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap, const char *qual
                     NULL, NULL, NULL, &f_edgelow, &f_edgehigh, &f_edgesmall,
                     &f_edgelarge, f_notchlow, f_notchhigh, &f_nnotch, &dofft,
                     NULL, NULL, NULL, NULL, NULL, NULL, NULL, &whitening, NULL,
-                    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &f_edgewidth,
+                    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &f_order,
                     status );
 
   /* Modify edge filters if spacial scales were requested */
-  smf_scale2freq( f_edgesmall, f_edgelarge, f_edgewidth, hdr, &f_edgelow,
-                  &f_edgehigh, &f_width, status );
+  smf_scale2freq( f_edgesmall, f_edgelarge, hdr, &f_edgelow, &f_edgehigh, status );
 
   /* Return dofilt if requested */
   if( dofilt ) {
@@ -178,9 +176,9 @@ void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap, const char *qual
 
   }
 
-  if( f_width != 0.0 && filt && filt->df[0] != 0.0 ) {
-     msgOutiff( MSG__DEBUG, "", FUNC_NAME ": Filter is soft edged with width %d channels",
-               status, (int)(0.5*f_width/filt->df[0])*2 );
+  if( f_order > 0.0 && filt && filt->df[0] != 0.0 ) {
+     msgOutiff( MSG__DEBUG, "", FUNC_NAME ": Filter is a soft edged Butterworth "
+                "filter of order %d", status, f_order );
   } else {
      msgOutif( MSG__DEBUG, "", FUNC_NAME ": Filter is hard edged", status );
   }
@@ -188,11 +186,11 @@ void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap, const char *qual
   /* If filtering parameters given, create filter  */
   if( dofft ) {
     if( f_edgelow ) {
-      smf_filter_edge( filt, f_edgelow, f_width, 1, status );
+      smf_filter_edge( filt, f_edgelow, f_order, 1, status );
     }
 
     if( f_edgehigh ) {
-      smf_filter_edge( filt, f_edgehigh, f_width, 0, status );
+      smf_filter_edge( filt, f_edgehigh, f_order, 0, status );
     }
 
     if( f_nnotch ) {

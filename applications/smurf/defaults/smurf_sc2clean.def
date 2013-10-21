@@ -79,7 +79,7 @@ cleandk.filt_edge_smallscale = 0
 cleandk.filt_edgelow = 0
 cleandk.filt_edge_largescale = 0
 cleandk.filt_edgehigh = 0
-cleandk.filt_edgewidth = 0
+cleandk.filt_order = 0
 cleandk.filt_notchlow = <undef>
 cleandk.filt_notchhigh = <undef>
 cleandk.filt_wlim = <undef>
@@ -533,21 +533,21 @@ filt_edgehigh = 0
 filt_edgelow = 0
 
 #-----------------------------------------------------------------
-#  Name: 	filt_edgewidth
-#  Type: 	real
+#  Name: 	filt_order
+#  Type: 	integer
 #  Default: 	0
-#  Purpose: 	Indicates if the edge filter is hard or soft edged.
-#  Description: If filt_edgewidth is zero, then the edge filters defined
-#		by the other "filt_..." parameters are hard-edged. That
-#		is, they change from zero to one without any intermediate
-#		values. If filt_edgewidth is larger than zero, the edge
-#		filters are soft-edged, and the transition between zero
-#		and one occurs over a range of spatial scales given
-#		by the value of filt_edgewidth. It is converted to a
-#		frequency range using the avergae slew speed. The
-#		transition curve is a single 180 degree peak-to-peak
-#		section of a sinusoid.
-filt_edgewidth = 0
+#  Purpose: 	Indicates the shape of the filter.
+#  Description: If filt_order is zero or negative, a the edge filters
+#               defined by the other "filt_..." parameters are hard-edged.
+#		That is, they change from zero to one without any intermediate
+#		values. If filt_order is larger than zero, the edge
+#		filters are soft-edged Butterworth filters with order
+#               given by the value of this parameter. An order of 1 is
+#               the softest, and will thus produce least ringing, at the
+#               expense of poorer frequency response. Higher orders
+#               produce sharper filters that have better frequency response
+#               but at the expense of greater ringing.
+filt_order = 0
 
 #-----------------------------------------------------------------
 #  Name: 	filt_notchhigh

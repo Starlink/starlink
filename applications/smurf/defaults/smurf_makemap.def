@@ -1026,32 +1026,31 @@ flt.filt_edgelow = 0
 flt.filt_edgelow_last = 0
 
 #-----------------------------------------------------------------
-#  Name: 	flt.filt_edgewidth
-#  Type: 	real
+#  Name: 	flt.filt_order
+#  Type: 	integer
 #  Default: 	0
-#  Purpose: 	Indicates if the edge filter is hard or soft edged.
-#  Description: If flt.filt_edgewidth is zero, then the edge filters defined
-#		by the other "flt.filt_..." parameters are hard-edged. That
-#		is, they change from zero to one without any intermediate
-#		values. If flt.filt_edgewidth is larger than zero, the edge
-#		filters are soft-edged, and the transition between zero
-#		and one occurs over a range of spatial scales given
-#		by the value of flt.filt_edgewidth. It is converted to a
-#		frequency range using the avergae slew speed. The
-#		transition curve is a single 180 degree peak-to-peak
-#		section of a sinusoid.
-flt.filt_edgewidth = 0
+#  Purpose: 	Indicates the shape of the filter.
+#  Description: If flt.filt_order is zero or negative, a the edge filters
+#               defined by the other "flt.filt_..." parameters are hard-edged.
+#		That is, they change from zero to one without any intermediate
+#		values. If flt.filt_order is larger than zero, the edge
+#		filters are soft-edged Butterworth filters with order
+#               given by the value of this parameter. An order of 1 is
+#               the softest, and will thus produce least ringing, at the
+#               expense of poorer frequency response. Higher orders
+#               produce sharper filters that have better frequency response
+#               but at the expense of greater ringing.
+flt.filt_order = 0
 
 #-----------------------------------------------------------------
-#  Name: 	flt.filt_edgewidth_last
-#  Type: 	real
+#  Name: 	flt.filt_order_last
+#  Type: 	integer
 #  Default: 	<undef>
-#  Purpose: 	Indicates if the edge filter is hard or soft edged on the
-#               last iteration.
-#  Description: This is the value to be used for parameter "flt.filt_edgewidth"
+#  Purpose: 	Indicates the shape of the filter on the last iteration.
+#  Description: This is the value to be used for parameter "flt.filt_order"
 #               on the last iteration. If it is "<undef>", then the same value
 #               will be used as for earlier iterations.
-flt.filt_edgewidth_last = 0
+flt.filt_order_last = 0
 
 #-----------------------------------------------------------------
 #  Name: 	flt.filt_notchhigh

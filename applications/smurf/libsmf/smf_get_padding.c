@@ -185,8 +185,8 @@ dim_t smf_get_padding( AstKeyMap *keymap, int report, const smfHead *hdr,
       if( *status == SAI__OK ) {
 
 /* Modify edge filters if spatial scales were requested */
-         smf_scale2freq( filt_edgesmall, filt_edgelarge, 0.0, hdr, &filt_edgelow,
-                         &filt_edgehigh, NULL, status );
+         smf_scale2freq( filt_edgesmall, filt_edgelarge, hdr, &filt_edgelow,
+                         &filt_edgehigh, status );
          if( *status == SMF__TELSTAT ) {
            errAnnul( status );
          }

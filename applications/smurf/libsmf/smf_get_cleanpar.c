@@ -28,7 +28,7 @@
 *                       dim_t *pcalen, double *pcathresh, int groupsubarray,
 *                       double *downsampscale, double *downsampfreq,
 *                       int *noiseclipprecom, int *deconvmce, double delay,
-*                       double *filt_edgewidth, int *status )
+*                       int *filt_order, int *status )
 
 *  Arguments:
 *     keymap = AstKeyMap* (Given)
@@ -140,9 +140,8 @@
 *     delay = double * (Returned)
 *        A time, in seconds, by which to delay each time stream, causing
 *        each sample to be associated with a different position on the sky.
-*     filt_edgewidth = double * (Returned)
-*        Width of the 0->1 transition zone for a high pass or low pass filter edge
-*        (arcsec) (NULL:0)
+*     filt_order = int * (Returned)
+*        Order of Butterworth filter to use (0=hard-edged).
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -218,6 +217,8 @@
 *        Add argument "filt_edgewidth".
 *     2013-03-18 (DSB):
 *        Added argument "qualifier".
+*     2013-10-21 (DSB):
+*        Changed argument "filt_edgewidth" to "filt_order".
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -280,7 +281,7 @@ void smf_get_cleanpar( AstKeyMap *keymap, const char *qualifier,
                        int *compreprocess, dim_t *pcalen, double *pcathresh,
                        int *groupsubarray, double *downsampscale,
                        double *downsampfreq, int *noiseclipprecom,
-                       int *deconvmce, double *delay, double *filt_edgewidth,
+                       int *deconvmce, double *delay, int *filt_order,
                        int *status ) {
 
   char buf[255];                /* Buffer for qualified parameter names */
@@ -459,12 +460,12 @@ void smf_get_cleanpar( AstKeyMap *keymap, const char *qualifier,
                *filt_edge_smallscale );
   }
 
-  if( filt_edgewidth ) {
-    *filt_edgewidth = 0;
-    key = smf_keyname( keymap, "FILT_EDGEWIDTH", qualifier, buf, sizeof( buf ), status );
-    astMapGet0D( keymap, key, filt_edgewidth );
+  if( filt_order ) {
+    *filt_order = 0;
+    key = smf_keyname( keymap, "FILT_ORDER", qualifier, buf, sizeof( buf ), status );
+    astMapGet0I( keymap, key, filt_order );
     msgOutiff( MSG__DEBUG, "", FUNC_NAME ": %s=%f", status, key,
-               *filt_edgewidth );
+               *filt_order );
   }
 
   if( filt_notchlow ) {
