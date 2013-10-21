@@ -14,14 +14,17 @@
 
 *  Invocation:
 *     void smf_boxcar1<X>( CGEN_TYPE *series, const size_t ninpts,
-*                          size_t window, smf_qual_t *qual,
-*                          smf_qual_t mask, int *status )
+*                          size_t stride, size_t window, smf_qual_t *qual,
+*                          smf_qual_t mask, int update, double *var,
+*                          int *status )
 
 *  Arguments:
-*     series = CGEN_TYPE* (Given)
+*     series = CGEN_TYPE* (Given and Returned)
 *        Pointer to array that will be smoothed
 *     ninpts = const size_t (Given)
 *        Number of points in input series
+*     stride = const size_t (Given)
+*        Stride between elements in the "series", "qual" and "var" arrays.
 *     window = size_t (Given)
 *        Size of boxcar filter window (in array elements)
 *     qual = smf_qual_t* (Given)
@@ -31,6 +34,14 @@
 *     mask = smf_qual_t (Given)
 *        Use with qual to define which bits in quality are relevant to
 *        ignore data in the calculation.
+*     update = int (Given)
+*        If non-zero, the supplied "series" array will be updated on exit
+*        to hold the smoothed values. Otherwise the smoothed values will
+*        be thrown away.
+*     var = doible * (Returned)
+*        Pointer to an array to recieve the variance of the data within
+*        each filter box. May be NULL. If supplied, it should have
+*        "ninpts" elements.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -70,10 +81,12 @@
 *     2010-05-28 (TIMJ):
 *        size_t can't go negative so "off" must be a long and when copying
 *        from i and window we need to cast to long before negating.
+*     2013-10-21 (DSB):
+*        Added arguments stride, update and var.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2010 Science & Technology Facilities Council.
+*     Copyright (C) 2010,2013 Science & Technology Facilities Council.
 *     Copyright (C) 2006-2008 University of British Columbia. All Rights
 *     Reserved.
 
@@ -118,8 +131,9 @@
 #define FUNC_NAME "smf_boxcar1"
 
 void CGEN_FUNCTION(smf_boxcar1)( CGEN_TYPE *series, const size_t ninpts,
-                                 size_t window, smf_qual_t *qual,
-                                 smf_qual_t mask, int *status) {
+                                 size_t stride, size_t window, smf_qual_t *qual,
+                                 smf_qual_t mask, int update, double *var,
+                                 int *status) {
 
   /* Local variables */
   long off;                   /* offset from loop counter to modified sample */
@@ -127,6 +141,8 @@ void CGEN_FUNCTION(smf_boxcar1)( CGEN_TYPE *series, const size_t ninpts,
   size_t i;                   /* Loop counter */
   CGEN_TYPE *seriescopy;      /* Copy of the time series */
   double sum;                 /* Sum of values in the window */
+  double sum2;                /* Sum of squared values in the window */
+  double tmp;                 /* Temporary storage */
 
   /* Check status */
   if (*status != SAI__OK) return;
@@ -145,21 +161,30 @@ void CGEN_FUNCTION(smf_boxcar1)( CGEN_TYPE *series, const size_t ninpts,
     return;
   }
 
-  /* Make a copy of the time series that won't get altered as we go */
-  seriescopy = astMalloc( ninpts*sizeof(*series) );
+  /* If the input data is to be updated, make a copy of the time series
+     that won't get altered as we go */
+  if( update ) {
+     seriescopy = astMalloc( ninpts*stride*sizeof(*series) );
+  } else {
+     seriescopy = series;
+     series = NULL;
+  }
 
   if( *status == SAI__OK ) {
-    memcpy( seriescopy, series, ninpts*sizeof(*series) );
+    if( series ) memcpy( seriescopy, series, ninpts*stride*sizeof(*series) );
 
     sum = 0;
+    sum2 = 0;
     count = 0;
 
     if( qual ) {    /* QUALITY checking version */
 
       for( i=0; i<ninpts; i++ ) {
 	/* sum another point from the unaltered array */
-	if( !(qual[i]&mask) ) {
-	  sum += seriescopy[i];
+	if( !(qual[i*stride]&mask) ) {
+	  tmp = seriescopy[i*stride];
+	  sum += tmp;
+	  sum2 += tmp*tmp;
 	  count++;
 	}
 
@@ -167,15 +192,19 @@ void CGEN_FUNCTION(smf_boxcar1)( CGEN_TYPE *series, const size_t ninpts,
         else off = -1 * (long)window/2;
 
 	/* As soon as we have at least 2 samples start applying smooth val */
-	if( (count > 1) && !(qual[i+off]&mask) ) {
-	  series[i+off] = sum / (double) count;
+	if( (count > 1) && !(qual[stride*(i+off)]&mask) ) {
+	  tmp = sum / (double) count;
+	  if( series ) series[stride*(i+off)] = tmp;
+	  if( var ) var[stride*(i+off)] = sum2 / (double) count - tmp*tmp;
 	}
 
 	/* Subtract off the first sample in the window if we are at
 	   least window samples from the start here before adding in a
 	   new point next time around the loop */
-	if( (i >= (window-1)) && !(qual[i-(window-1)]&mask) ) {
-	  sum -= seriescopy[i-(window-1)];
+	if( (i >= (window-1)) && !(qual[stride*(i-(window-1))]&mask) ) {
+	  tmp = seriescopy[stride*(i-(window-1))];
+	  sum -= tmp;
+	  sum2 -= tmp*tmp;
 	  count--;
 	}
 
@@ -185,13 +214,17 @@ void CGEN_FUNCTION(smf_boxcar1)( CGEN_TYPE *series, const size_t ninpts,
       for( i=ninpts-window; i<ninpts; i++ ) {
 	off = (ninpts-i-1)/2;
 
-	if( (count > 1) && !(qual[i+off]&mask) ) {
-	  series[i+off] = sum / (double) count;
+	if( (count > 1) && !(qual[stride*(i+off)]&mask) ) {
+	  tmp = sum / (double) count;
+	  if( series ) series[stride*(i+off)] = tmp;
+	  if( var ) var[stride*(i+off)] = sum2 / (double) count - tmp*tmp;
 	}
 
 	/* Remove the sample at i from the window */
-	if( seriescopy[i] != CGEN_BAD ) {
-	  sum -= seriescopy[i];
+	if( seriescopy[stride*i] != CGEN_BAD ) {
+	  tmp = seriescopy[stride*i];
+	  sum -= tmp;
+	  sum2 -= tmp*tmp;
 	  count--;
 	}
       }
@@ -200,8 +233,10 @@ void CGEN_FUNCTION(smf_boxcar1)( CGEN_TYPE *series, const size_t ninpts,
 
       for( i=0; i<ninpts; i++ ) {
 	/* sum another point from the unaltered array */
-	if( seriescopy[i] != CGEN_BAD ) {
-	  sum += seriescopy[i];
+        tmp = seriescopy[stride*i];
+	if( tmp != CGEN_BAD ) {
+          sum += tmp;
+          sum2 += tmp*tmp;
 	  count++;
 	}
 
@@ -209,15 +244,19 @@ void CGEN_FUNCTION(smf_boxcar1)( CGEN_TYPE *series, const size_t ninpts,
         else off = -1 * (long)window/2;
 
 	/* As soon as we have at least 2 samples start applying smooth val */
-	if( (count > 1) && (series[i+off] != CGEN_BAD) ) {
-	  series[i+off] = sum / (double) count;
+	if( (count > 1) && (series[stride*(i+off)] != CGEN_BAD) ) {
+	  tmp = sum / (double) count;
+	  if( series ) series[stride*(i+off)] = tmp;
+	  if( var ) var[stride*(i+off)] = sum2 / (double) count - tmp*tmp;
 	}
 
 	/* Subtract off the first sample in the window if we are at
 	   least window samples from the start here before adding in a
 	   new point next time around the loop */
-	if( (i >= (window-1)) && (seriescopy[i-(window-1)] != CGEN_BAD) ) {
-	  sum -= seriescopy[i-(window-1)];
+        tmp = seriescopy[stride*(i-(window-1))];
+	if( (i >= (window-1)) && (tmp != CGEN_BAD) ) {
+	  sum -= tmp;
+	  sum2 -= tmp*tmp;
 	  count--;
 	}
 
@@ -227,13 +266,17 @@ void CGEN_FUNCTION(smf_boxcar1)( CGEN_TYPE *series, const size_t ninpts,
       for( i=ninpts-window; i<ninpts; i++ ) {
 	off = (ninpts-i-1)/2;
 
-	if( (count > 1) && (series[i+off] != CGEN_BAD) ) {
-	  series[i+off] = sum / (double) count;
+	if( (count > 1) && (series[stride*(i+off)] != CGEN_BAD) ) {
+	  tmp = sum / (double) count;
+	  if( series ) series[stride*(i+off)] = tmp;
+	  if( var ) var[stride*(i+off)] = sum2 / (double) count - tmp*tmp;
 	}
 
 	/* Remove the sample at i from the window */
-	if( seriescopy[i] != CGEN_BAD ) {
-	  sum -= seriescopy[i];
+        tmp = seriescopy[stride*i];
+	if( tmp != CGEN_BAD ) {
+	  sum -= tmp;
+	  sum2 -= tmp*tmp;
 	  count--;
 	}
       }
@@ -241,6 +284,6 @@ void CGEN_FUNCTION(smf_boxcar1)( CGEN_TYPE *series, const size_t ninpts,
   }
 
   /* Clean Up */
-  if ( seriescopy ) seriescopy = astFree( seriescopy );
+  if ( series ) seriescopy = astFree( seriescopy );
 
 }

@@ -209,7 +209,7 @@ void smfParallelTime( void *job_data_ptr, int *status ) {
           val += k*ntslice;
 
           /* Boxcar smooth each bolometer by 500 samples */
-          smf_boxcar1D( val, ntslice, 500, NULL, 0, status );
+          smf_boxcar1D( val, ntslice, 1, 500, NULL, 0, 1, NULL, status );
         }
       }
 

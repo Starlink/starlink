@@ -252,7 +252,7 @@ void smf_bolonoise( ThrWorkForce *wf, smfData *data, double gfrac,
     base += nf*i;
 
     /* Smooth the power spectrum */
-    smf_boxcar1D( base, nf, window, NULL, 0, status );
+    smf_boxcar1D( base, nf, 1, window, NULL, 0, 1, NULL, status );
 
     /* Measure the power */
     if( *status == SAI__OK ) {

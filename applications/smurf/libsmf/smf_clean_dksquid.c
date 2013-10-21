@@ -309,7 +309,7 @@ void smf_clean_dksquid( smfData *indata, smf_qual_t mask, size_t window, smfData
         /* Do some dksquid initialization if requested  */
         if( (*status==SAI__OK) && needDA && calcdk && model && dkgood[i] ) {
           /* Smooth the dark squid template */
-          smf_boxcar1D( &dksquid[jt1], ntot, window, NULL, 0, status );
+          smf_boxcar1D( &dksquid[jt1], ntot, 1, window, NULL, 0, 1, NULL, status );
         }
 
         /* Initialize fit coeffs to VAL__BADD */
