@@ -17,7 +17,8 @@ dnl    Include defaults for Starlink configurations
 STAR_DEFAULTS
 
 dnl    Find required versions of the programs we need for configuration
-AC_PROG_FC([],77)
+AC_PROG_CC
+AC_PROG_FC
 AC_PROG_FPP
 AC_PROG_LIBTOOL
 
