@@ -1,11 +1,11 @@
 ## Process this file with automake to produce Makefile.in
 
 bin_SCRIPTS = bin/sgml2docs bin/sgml2hlp
-nobase_dist_pkglib_SCRIPTS = lib/img-eqlist.pl
+nobase_dist_pkgdata_SCRIPTS = lib/img-eqlist.pl
 # The contents of the dsssl/sl/latex/ directory are not installed, as they
 # are no longer used (and may no longer work); the contents of dsssl/sl/xml
 # are not installed as they are an experiment which was never completed.
-nobase_dist_pkglib_DATA = \
+nobase_dist_pkgdata_DATA = \
 	lib/plainhtml.bst lib/plaintexml.bst \
 	lib/postprocess-bbl.sed \
 	lib/icons.tar \
