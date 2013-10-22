@@ -31,7 +31,7 @@ dnl    suseconds_t...)
 AC_CHECK_HEADERS(sys/time.h)
 AC_CACHE_CHECK([gettimeofday compiles],
    [ac_cv_gettimeofday],
-   [AC_COMPILE_IFELSE(AC_LANG_SOURCE([
+   [AC_COMPILE_IFELSE([AC_LANG_SOURCE([
 #define _POSIX_SOURCE 1
 #include <stdio.h>
 #include <sys/time.h>
@@ -40,7 +40,7 @@ void check() {
    suseconds_t usec = 0;
    int result;
    result = gettimeofday( &tv, NULL );
-}]),
+}])],
         ac_cv_gettimeofday=yes,
         ac_cv_gettimeofday=no)])
 if test $ac_cv_gettimeofday = yes; then
