@@ -74,9 +74,9 @@ dnl    PWD: note in passing, this test always fails as it does not use
 dnl    Fortran, might be just as well.
 AC_CACHE_CHECK([whether ${FC} supports type-kind notation],
    [ac_cv_fc_type_kind],
-   [AC_COMPILE_IFELSE(AC_LANG_PROGRAM([], [
+   [AC_COMPILE_IFELSE([AC_LANG_PROGRAM([], [
       I=1_8
-]),
+])],
         ac_cv_fc_type_kind=yes,
         ac_cv_fc_type_kind=no)])
 if test $ac_cv_fc_type_kind = yes; then
