@@ -251,7 +251,7 @@ install-libraries: libraries
 	@test -d $(DESTDIR)$(pkgincludedir) || mkdir -p $(DESTDIR)$(pkgincludedir)
 	@echo "Installing header files in $(DESTDIR)$(pkgincludedir)"
 	@list='$(PKG_HEADERS)'; for i in $$list; do \
-	    echo "MANIFEST:$(srcdir)/$$i" ; \
+	    echo "MANIFEST:$(DESTDIR)$(pkgincludedir)/`basename $$i`" ; \
 	    $(INSTALL_DATA) $(srcdir)/$$i $(DESTDIR)$(pkgincludedir) ; \
 	done;
 

@@ -6727,12 +6727,12 @@ target: dependency
         </subsect>
 
         <subsect id="macro-star-initialise-fortran" export="export"
-          indexkey="starconf!macros!STAR_INITIALISE_FORTRAN">
+          indexkey="starconf!macros!STAR_INITIALISE_FORTRAN_RTL">
           <subhead>
-            <title>STAR_INITIALISE_FORTRAN</title>
+            <title>STAR_INITIALISE_FORTRAN_RTL</title>
           </subhead>
 
-          <p><strong><code>STAR_INITIALISE_FORTRAN</code></strong></p>
+          <p><strong><code>STAR_INITIALISE_FORTRAN_RTL</code></strong></p>
 
           <p>Define a macro which can be used in a C or C++
             main<index>C and Fortran, mixing</index>
