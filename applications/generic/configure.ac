@@ -15,6 +15,7 @@ AC_CONFIG_SRCDIR([generic])
 
 dnl    Include defaults for Starlink configurations
 STAR_DEFAULTS
+AC_PROG_CC
 
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_LN_S
