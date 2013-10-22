@@ -54,7 +54,8 @@ PRIVATE_INCLUDES = SST_PAR SST_SCB
 # We (oddly) want these data files to go into the same directory as the 
 # binaries.  Since we have STAR_DEFAULTS(per-package-dirs) in configure.ac, 
 # however, we are allowed to use bin_DATA (don't ask).
-dist_bin_DATA = sst_preamble.tex forstats.dat html.sty
+dist_bindata_DATA = sst_preamble.tex forstats.dat html.sty
+bindatadir = $bindir
 
 
 EXTRA_DIST = sst.ifd.in $(bin_DATA) sst_master.hlp
