@@ -82,7 +82,9 @@
 *        size_t can't go negative so "off" must be a long and when copying
 *        from i and window we need to cast to long before negating.
 *     2013-10-21 (DSB):
-*        Added arguments stride, update and var.
+*        - Added arguments stride, update and var.
+*        - Fix nasty bug that could cause spurious values to be returned 
+*        at the end of the array, when using QUALITY masking.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -221,7 +223,7 @@ void CGEN_FUNCTION(smf_boxcar1)( CGEN_TYPE *series, const size_t ninpts,
 	}
 
 	/* Remove the sample at i from the window */
-	if( seriescopy[stride*i] != CGEN_BAD ) {
+        if( !(qual[stride*i]&mask) ) {
 	  tmp = seriescopy[stride*i];
 	  sum -= tmp;
 	  sum2 -= tmp*tmp;

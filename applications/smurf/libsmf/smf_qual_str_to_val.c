@@ -157,6 +157,9 @@ smf_qual_t smf_qual_str_to_val( const char *qname, smf_qfam_t * family, int * st
   } else if ( strcmp(qname, "BADEF") == 0 ) {
     retval = SMF__Q_BADEF;
     lfamily = SMF__QFAM_TSERIES;
+  } else if ( strcmp(qname, "RING") == 0 ) {
+    retval = SMF__Q_RING;
+    lfamily = SMF__QFAM_TSERIES;
   } else {
     *status = SMF__BADQNM;
     errRepf( "", "Unrecognized quality name (%s)",

@@ -87,11 +87,14 @@
 *        - The FLT mask was mis-placed by a number of samples equal to
 *        twice the padding plus the apodisation.
 *        - Reorder the LUT model if any masking is being one.
+*     2013-10-21 (DSB):
+*        - Provide an option to flag samples that appear to suffer from 
+*        ringing  after the FLT model has been removed.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2009-2010 University of British Columbia.
-*     Copyright (C) 2010-2012 Science & Technology Facilities Council.
+*     Copyright (C) 2010-2013 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -142,9 +145,14 @@ typedef struct smfCalcModelFltData {
    double *res_data;
    double chisquared;
    double dchisq;
+   double ring_nsigma;
    int *lut_data;
    int chisq;
    int oper;
+   int ring_box1;
+   int ring_box2;
+   int ring_minsize;
+   int ring_wing;
    size_t bstride;
    size_t nclose;
    size_t ndchisq;
@@ -197,9 +205,16 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   smf_qual_t *qua_data=NULL; /* Pointer to quality data */
   smfArray *res=NULL;           /* Pointer to RES at chunk */
   double *res_data=NULL;        /* Pointer to DATA component of res */
+  double ring_box1;             /* Small scale box size for ringing filter */
+  double ring_box2;             /* Small scale box size for ringing filter */
+  int ring_minsize;             /* Smallest section of ringing samples to flag */
+  double ring_nsigma;           /* Clipping limit for ringing filter */
+  double ring_wing;             /* Size of wings for ringing filter */
+  int skip;                     /* Number of AST models being skipped */
   size_t tstride;               /* Time slice stride in data array */
   int undofirst = 1;            /* Undo FLT model at start of iteration? */
   int whiten;                   /* Applying whitening filter? */
+  double period;                /* Period of lowest passed frequency */
   int zeropad;                  /* Pad with zeros? */
 
   /* Main routine */
@@ -251,6 +266,13 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
 
   /* Are we padding with zeros or artifical data? */
   astMapGet0I( kmap, "ZEROPAD", &zeropad );
+
+  /* Get parameters used by the ringing filter. */
+  astMapGet0D( kmap, "RING_BOX1", &ring_box1 );
+  astMapGet0D( kmap, "RING_BOX2", &ring_box2 );
+  astMapGet0D( kmap, "RING_NSIGMA", &ring_nsigma );
+  astMapGet0D( kmap, "RING_WING", &ring_wing );
+  astMapGet0I( kmap, "RING_MINSIZE", &ring_minsize );
 
   /* Assert bolo-ordered data */
   order_list = SMF__RES|SMF__QUA|SMF__NOI;
@@ -331,7 +353,9 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
       }
 
       /* If we are just inverting the model, place last iteration of filtered
-         signal back into residual */
+         signal back into residual. This also clears any SMF__Q_RING flags (this 
+         should be done at the start of each iteration before re-estimating COM 
+         to avoid problems with convergence). */
       if( flags & SMF__DIMM_INVERT ) {
         for( iw = 0; iw < nw; iw++ ) {
           pdata = job_data + iw;
@@ -343,7 +367,8 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
       /* Otherwise, estimate and remove the FLT model. */
       } else {
 
-        /* If not already done, add the old FLT model back on again. */
+        /* If not already done, add the old FLT model back on again, and clear 
+           SMF__Q_RING flags. */
         if( ! undofirst ) {
           for( iw = 0; iw < nw; iw++ ) {
             pdata = job_data + iw;
@@ -425,7 +450,7 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
            we can then subtract it from the residual).
         */
         if( dofft ) {
-          smf_filter_execute( wf, model->sdata[idx], filt, 1, whiten, status );
+          smf_filter_execute( wf, model->sdata[idx], filt, -1, whiten, status );
         }
 
         /* Now remove the filtered signals from the residual by subtracting
@@ -447,6 +472,27 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
             pdata = job_data + iw;
             ndchisq += pdata->ndchisq;
             dchisq += pdata->dchisq;
+          }
+
+          /* If required, locate and flag any residuals that seem to suffer
+             from ringing now that the low frequency FLT model has been
+             removed. */
+          if( ring_box1 > 0.0 ){
+             msgOutif( MSG__DEBUG, "", "Flagging residuals that appear "
+                       "to suffer from ringing.", status );
+
+             smf_filter_getlowf( filt, res->sdata[idx]->hdr, &period, status );
+             for( iw = 0; iw < nw; iw++ ) {
+               pdata = job_data + iw;
+               pdata->ring_box1 = (int)( ring_box1*period + 0.5 );
+               pdata->ring_box2 = (int)( ring_box2*period + 0.5 );
+               pdata->ring_nsigma = ring_nsigma;
+               pdata->ring_wing = (int)( ring_wing*period + 0.5 );
+               pdata->ring_minsize = (int)( ring_minsize*period + 0.5 );
+               pdata->oper = 4;
+               thrAddJob( wf, 0, pdata, smf1_calcmodel_flt, 0, NULL, status );
+             }
+             thrWait( wf, status );
           }
         }
 
@@ -520,7 +566,8 @@ static void smf1_calcmodel_flt( void *job_data_ptr, int *status ) {
       for( ibolo = pdata->b1; ibolo <= pdata->b2; ibolo++ ) {
 
 /* Check that the whole bolometer has not been flagged as bad. */
-         if( !( (pdata->qua_data)[ ibase ] & SMF__Q_BADB ) ) {
+         pq = pdata->qua_data + ibase;
+         if( !( *pq & SMF__Q_BADB ) ) {
 
 /* Get a pointer to the first residual and model value for the current bolo,
    and then loop round all time slices. */
@@ -531,9 +578,13 @@ static void smf1_calcmodel_flt( void *job_data_ptr, int *status ) {
 /*  Add the model value on to the residual. */
                *pr += *pm;
 
+/* Clear any SMF__Q_RING flags. */
+               *pq &= ~SMF__Q_RING;
+
 /* Move residual and model pointers on to the next time slice. */
                pr += pdata->tstride;
                pm += pdata->tstride;
+               pq += pdata->tstride;
             }
          }
 
@@ -593,6 +644,20 @@ static void smf1_calcmodel_flt( void *job_data_ptr, int *status ) {
             }
          }
          ibase += pdata->bstride;
+      }
+
+/* Locate and flag samples that suffer from ringing. */
+   } else if( pdata->oper == 4 ) {
+      for( ibolo = pdata->b1; ibolo <= pdata->b2; ibolo++ ) {
+         pq = pdata->qua_data + ibolo*pdata->bstride;
+         if( !( *pq & SMF__Q_BADB ) ) {
+            pr = pdata->res_data + ibolo*pdata->bstride;
+            smf_flag_rings( pr, pdata->tstride, pdata->ntslice,
+                            pdata->ring_box1, pdata->ring_box2,
+                            pdata->ring_nsigma, pdata->ring_wing,
+                            pdata->ring_minsize, pq, SMF__Q_FIT,
+                            status );
+         }
       }
 
    } else if( *status == SAI__OK ) {

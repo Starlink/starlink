@@ -200,6 +200,11 @@ const char *smf_qual_str( smf_qfam_t family, int usebit, int bit_or_val,
       ldescr = "Set iff optical efficiency value is bad";
       break;
 
+    case SMF__Q_RING:
+      retval = "RING";
+      ldescr = "Set iff samples suffer from filter ringing";
+      break;
+
     default:
       retval = NULL;
     }

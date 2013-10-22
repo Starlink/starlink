@@ -160,6 +160,7 @@ smf_filter_delay.c \
 smf_filter_edge.c \
 smf_filter_execute.c \
 smf_filter_fromkeymap.c \
+smf_filter_getlowf.c \
 smf_filter_ident.c \
 smf_filter_mce.c \
 smf_filter_notch.c \
@@ -202,6 +203,7 @@ smf_fix_metadata_acsis.c \
 smf_fix_metadata_scuba2.c \
 smf_fix_pol2.c \
 smf_fix_steps.c \
+smf_flag_rings.c \
 smf_flag_slewspeed.c \
 smf_flag_spikes.c \
 smf_flat_assign.c \

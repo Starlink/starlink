@@ -81,17 +81,20 @@ ast.mapspike = 10
 #  Default: 	0
 #  Purpose: 	Skip subtraction of astronomical signal.
 #  Description: If ast.skip is non-zero, it gives the number of initial
-#       iterations for which no AST model (astronomical signal) should
-#       be subtracted. A map is still formed at the end of these iterations
-#       but the astronomical signal implied by this map is not removed from
-#       the residuals (neither is it added back prior to forming the next
-#       map). This means that the residuals at the start of each of these
-#       iterations are unchanging and essentially equal to the cleaned raw
-#       data.
+#               iterations for which no AST model (astronomical signal)
+#               should be subtracted. A map is still formed at the end of
+#               these iterations but the astronomical signal implied by this
+#               map is not removed from the residuals (neither is it added
+#               back prior to forming the next map). This means that the
+#               residuals at the start of each of these iterations are
+#               unchanging and essentially equal to the cleaned raw data.
+#               The value supplied for parameter "numiter" should therefore
+#               be greater than the value of "ast.skip".
 #
-#       This option is useful when using SNR-based masking for the FLT and/or
-#       COM models, since it allows a reasonable mask to be formed before
-#       subtracting off the first estimate of the astronommical signal.
+#               This option is useful, for instance, when using SNR-based
+#               masking for the FLT and/or COM models, since it allows a
+#               reasonable mask to be formed before subtracting off the
+#               first estimate of the astronommical signal.
 ast.skip = 0
 
 #-----------------------------------------------------------------
@@ -1023,7 +1026,7 @@ flt.filt_edgelow = 0
 #  Description: This is the value to be used for parameter "flt.filt_edgelow"
 #               on the last iteration. If it is "<undef>", then the same value
 #               will be used as for earlier iterations.
-flt.filt_edgelow_last = 0
+flt.filt_edgelow_last = <undef>
 
 #-----------------------------------------------------------------
 #  Name: 	flt.filt_order
@@ -1050,7 +1053,7 @@ flt.filt_order = 0
 #  Description: This is the value to be used for parameter "flt.filt_order"
 #               on the last iteration. If it is "<undef>", then the same value
 #               will be used as for earlier iterations.
-flt.filt_order_last = 0
+flt.filt_order_last = <undef>
 
 #-----------------------------------------------------------------
 #  Name: 	flt.filt_notchhigh
@@ -1151,6 +1154,65 @@ flt.filt_wlim_last = <undef>
 flt.notfirst = 0
 
 #-----------------------------------------------------------------
+#  Name: 	flt.ring_box1
+#  Type: 	float
+#  Default: 	0
+#  Purpose: 	Controls the flagging of samples that suffer from ringing.
+#  Description: If this is non-zero, then a ringing filter is applied to
+#               the residuals once the FLT model has been removed. This
+#               filter attempts to locate and flag residuals that suffer
+#               from ringing. It gives the size of the box used to smooth
+#               the residuals in order to determine the background. It
+#               is specified as a multiple of the filter size. A value of
+#               0.5 could be a good starting point.
+flt.ring_box1 = 0
+
+#-----------------------------------------------------------------
+#  Name: 	flt.ring_box2
+#  Type: 	float
+#  Default: 	1.5
+#  Purpose: 	Controls the flagging of samples that suffer from ringing.
+#  Description: Specifies the size of the box used to determine the
+#               mean squared residual after FLT removal. It is specified
+#               as a multiple of the filter size, and should be greater
+#               than parameter "flt.ring_box1".
+flt.ring_box2 = 1.5
+
+#-----------------------------------------------------------------
+#  Name: 	flt.ring_minsize
+#  Type: 	float
+#  Default: 	0.1
+#  Purpose: 	Controls the flagging of samples that suffer from ringing.
+#  Description: A contiguous section of residuals that are considered
+#               to suffer from ringing will only be flagged if it is
+#               longer than the size specified by this parameter. It is
+#               given as a multiple of the filter size. See parameter
+#               "flt.ring_box1".
+flt.ring_minsize = 0.1
+
+#-----------------------------------------------------------------
+#  Name: 	flt.ring_nsigma
+#  Type: 	float
+#  Default: 	2.0
+#  Purpose: 	Controls the flagging of samples that suffer from ringing.
+#  Description: Specifies the number of standard deviations at which to
+#               flag samples that suffer from ringing. See parameter
+#               "flt.ring_box1".
+flt.ring_nsigma = 2.0
+
+#-----------------------------------------------------------------
+#  Name: 	flt.ring_wing
+#  Type: 	float
+#  Default: 	0.3
+#  Purpose: 	Controls the flagging of samples that suffer from ringing.
+#  Description: For each contiguous section of residuals that are considered
+#               to suffer from ringing, this parameter gives the number
+#               of extra samples to flag at the beginning and end of the
+#               section. It is given as a multiple of the filter size.
+#               See parameter "flt.ring_box1".
+flt.ring_wing = 0.3
+
+#-----------------------------------------------------------------
 #  Name: 	flt.undofirst
 #  Type: 	integer
 #  Default: 	1
@@ -1177,7 +1239,7 @@ flt.whiten = 0
 #  Description: This is the value to be used for parameter "flt.whiten"
 #               on the last iteration. If it is "<undef>", then the same value
 #               will be used as for earlier iterations.
-flt.whiten_last = 0
+flt.whiten_last = <undef>
 
 #-----------------------------------------------------------------
 #  Name: 	flt.zero_circle
@@ -1353,7 +1415,7 @@ flt.zeropad = 0
 #  Description: This is the value to be used for parameter "flt.zeropad"
 #               on the last iteration. If it is "<undef>", then the same value
 #               will be used as for earlier iterations.
-flt.zeropad_last = 0
+flt.zeropad_last = <undef>
 
 #-----------------------------------------------------------------
 #  Name: 	importsky

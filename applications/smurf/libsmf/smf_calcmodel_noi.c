@@ -392,11 +392,12 @@ void smf_calcmodel_noi( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
             boxsize = 0;
             smf_get_nsamp( kmap, "BOX_SIZE", res->sdata[0], &boxsize, status );
 
-            msgOutf( "", FUNC_NAME ": Calculating a NOI variance for each "
-                     "box of %d samples.", status, (int) boxsize );
-
             /* More initialisation needed for the 2 to 10 Hz power method. */
             if( box_type == 0 ) {
+               msgOutf( "", FUNC_NAME ": Calculating a NOI variance for each "
+                        "box of %d samples using 2-10 Hz noise.", status,
+                        (int) boxsize );
+
 
               /* Find the indices of the first and last non-PAD sample. */
               smf_get_goodrange( qua_data, ntslice, tstride, SMF__Q_PAD,
@@ -456,6 +457,11 @@ void smf_calcmodel_noi( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
                     }
                  }
               }
+
+            } else {
+               msgOutf( "", FUNC_NAME ": Calculating a NOI variance for each "
+                        "box of %d samples using variance of neighbouring residuals.",
+                        status, (int) boxsize );
             }
           }
 

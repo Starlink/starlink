@@ -1054,6 +1054,9 @@ void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap,
                             const char *qualifier, const smfHead *hdr,
                             int *dofft, int *whiten, int *status );
 
+void smf_filter_getlowf( smfFilter *filt, smfHead *hdr, double *period,
+                         int *status );
+
 void smf_filter_ident( smfFilter *filt, int complex, int *status );
 
 void smf_filter_mce( smfFilter *filt, int noinverse, int *status );
@@ -1190,6 +1193,10 @@ int smf_fix_metadata_scuba2( msglev_t msglev, smfData * data, int have_fixed,
                              int *ncards, int * status );
 
 void smf_fix_pol2( ThrWorkForce *wf,  smfArray *array, int *status );
+
+int smf_flag_rings( double *data, size_t stride, int nel, int box1, int box2,
+                    double nsigma, int wing, int minsize, smf_qual_t *qual,
+                    smf_qual_t mask, int *status );
 
 void smf_flag_slewspeed( smfData *data, double smin, double smax,
                          size_t *nflagged, double *average_speed,
