@@ -481,8 +481,8 @@ AC_DEFUN([STAR_CNF_COMPATIBLE_SYMBOLS],
         AC_MSG_ERROR([STAR[]_CNF_COMPATIBLE_SYMBOLS in docs-only dir])
     AC_CACHE_CHECK([how to make Fortran and C play nicely],
        [star_cv_cnf_compatible_symbols],
-       [AC_REQUIRE([AC_PROG_FC])dnl
-        AC_REQUIRE([AC_PROG_CC])dnl
+       [dnl AC_REQUIRE([AC_PROG_FC])dnl
+        dnl AC_REQUIRE([AC_PROG_CC])dnl
         AC_LANG_PUSH([C])
         AC_LANG_CONFTEST([AC_LANG_SOURCE([
 void funcone_() { return; }
@@ -1616,8 +1616,8 @@ fi
 ])# STAR_PLATFORM_SOURCES
 
 
-# STAR_INITIALISE_FORTRAN
-# -----------------------
+# STAR_INITIALISE_FORTRAN_RTL
+# ---------------------------
 #
 # Define a macro which can be used in a C main program to initialise the
 # Fortran RTL, including, for example, doing whatever work is required so that
@@ -1666,7 +1666,7 @@ fi
 # variable __xargc and __xargv, this may need fixing from time to time.
 # Doesn't seem to be a function for doing this job.
 #
-AC_DEFUN([STAR_INITIALISE_FORTRAN],
+AC_DEFUN([STAR_INITIALISE_FORTRAN_RTL],
    [AC_CACHE_CHECK([how to initialise the Fortran RTL],
        [star_cv_initialise_fortran],
        [AC_REQUIRE([AC_PROG_FC])
@@ -1687,34 +1687,34 @@ AC_DEFUN([STAR_INITIALISE_FORTRAN],
                 star_cv_initialise_fortran=
             fi
         fi])
-    AH_TEMPLATE([STAR_INITIALISE@&t@_FORTRAN],
+    AH_TEMPLATE([STAR_INITIALISE_FORTRAN],
        [Define to a function call which will initialise the Fortran RTL])
     case "$star_cv_initialise_fortran" in
       g77-setarg)
-        AC_DEFINE([STAR_INITIALISE@&t@_FORTRAN(argc,argv)],
+        AC_DEFINE([STAR_INITIALISE_FORTRAN(argc,argv)],
                   [{extern void f_setarg(int,char**); f_setarg(argc, argv);}])
         ;;
       g95-start)
-        AC_DEFINE([STAR_INITIALISE@&t@_FORTRAN(argc,argv)],
+        AC_DEFINE([STAR_INITIALISE_FORTRAN(argc,argv)],
                   [{extern void g95_runtime_start(int,char**); g95_runtime_start(argc, argv);}])
         ;;
       gfortran-setarg)
-        AC_DEFINE([STAR_INITIALISE@&t@_FORTRAN(argc,argv)],
+        AC_DEFINE([STAR_INITIALISE_FORTRAN(argc,argv)],
                   [{extern void _gfortran_set_args(int,char**); if (argv == NULL) {static char *sc_dummy[[]]={NULL};_gfortran_set_args(0,sc_dummy);} else {_gfortran_set_args(argc,argv);}}])
         ;;
       ifort-setarg)
-        AC_DEFINE([STAR_INITIALISE@&t@_FORTRAN(argc,argv)],
+        AC_DEFINE([STAR_INITIALISE_FORTRAN(argc,argv)],
                   [{extern void for_rtl_init_(int*,char**); for_rtl_init_(&argc, argv);}])
         ;;
       sunstudio-setarg)
-        AC_DEFINE([STAR_INITIALISE@&t@_FORTRAN(argc,argv)],
+        AC_DEFINE([STAR_INITIALISE_FORTRAN(argc,argv)],
                   [{extern int __xargc; extern char **__xargv;__xargc = argc;__xargv = argv;}])
         ;;
       *) 
-        AC_DEFINE([STAR_INITIALISE@&t@_FORTRAN(argc,argv)],[])
+        AC_DEFINE([STAR_INITIALISE_FORTRAN(argc,argv)],[])
         ;;
     esac
-dnl    AC_DEFINE_UNQUOTED([STAR_INITIALISE@&t@_FORTRAN(argc,argv)],
+dnl    AC_DEFINE_UNQUOTED([STAR_INITIALISE_FORTRAN(argc,argv)],
 dnl                       $star_cv_initialise_fortran)
 ])# STAR_INITIALISE_FORTRAN
 
@@ -1798,8 +1798,8 @@ AC_DEFUN([_STAR_RESTFP_FIX],
    [AC_CACHE_CHECK([whether we need any library fixups],
        [star_cv_restfp_fixup],
        [AC_REQUIRE([AC_CANONICAL_BUILD])
-        AC_REQUIRE([AC_PROG_CC])
-        AC_REQUIRE([AC_PROG_FC])
+        dnl AC_REQUIRE([AC_PROG_CC])
+        dnl AC_REQUIRE([AC_PROG_FC])
         if expr $build_os : 'darwin7' >/dev/null; then
 dnl Only affects OSX/Darwin
             # Following uses undocumented (but probably fairly stable)
@@ -1809,7 +1809,7 @@ dnl The problem only affects g77/gcc, so we know we're dealing with these below
                 AC_LANG_PUSH(C)
                 rm -f conftest*
                 star_cv_restfp_fixup=unknown
-                AC_LANG_CONFTEST(AC_LANG_PROGRAM([], restFP()))
+                AC_LANG_CONFTEST([AC_LANG_PROGRAM([], restFP())])
                 { AC_TRY_COMMAND($CC -o conftest.x -S conftest.c)
                   test $ac_status = 0
                 } &&

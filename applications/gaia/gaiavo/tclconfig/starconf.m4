@@ -3,6 +3,25 @@
 # original starconf.m4, installed by starconf 1.3, rnum=1003000
 # DO NOT EDIT: it may be overwritten when starconf is next run
 
+#  Copyright:
+#     Copyright (C) 2003-2005 Council for the Central Laboratory of the
+#     Research Councils
+#
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public Licence as
+#     published by the Free Software Foundation; either version 2 of
+#     the Licence, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful,but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public Licence for more details.
+#
+#     You should have received a copy of the GNU General Public Licence
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
+#     02110-1301, USA
 
 # STAR_DEFAULTS(options='')
 # -------------------------
@@ -50,17 +69,17 @@ m4_ifdef([_poss_STAR_RESTFP_FIX],
 ## acinclude.m4 file just before running ./bootstrap or autoreconf.
 m4_define([per_dir_PREFIX],   [m4_ifdef([OVERRIDE_PREFIX],
                                         [OVERRIDE_PREFIX],
-                                        [/home/pdraper/starlink_git/build])])
+                                        [/loc/pwdb/pdraper/starlink_git/build])])
 m4_define([per_dir_STARLINK], [m4_ifdef([OVERRIDE_STARLINK],
                                         [OVERRIDE_STARLINK],
-                                        [/home/pdraper/starlink_git/build])])
+                                        [/loc/pwdb/pdraper/starlink_git/build])])
 
 test -n "$_star_per_package_dirs" || _star_per_package_dirs=false
 test -n "$_star_docs_only"        || _star_docs_only=false
 
 
 # Ensure that STARLINK has a value, defaulting to
-# /home/pdraper/starlink_git/build.  Note that this directory may be
+# /loc/pwdb/pdraper/starlink_git/build.  Note that this directory may be
 # different from /star, and reflects the value of
 # STARCONF_DEFAULT_STARLINK that the `starconf' package was configured
 # with before its installation. 
@@ -74,7 +93,7 @@ test -n "$_star_docs_only"        || _star_docs_only=false
 # is possible to make a test version of a new package, using tools
 # from an old installation, but installing in a new place.
 #
-# However, we install software in /home/pdraper/starlink_git/build by
+# However, we install software in /loc/pwdb/pdraper/starlink_git/build by
 # default.  This is so even if $STARLINK and STARCONF_DEFAULT_STARLINK
 # are different, because in this case we are planning to use a
 # previous installation in $STARLINK or $STARCONF_DEFAULT_STARLINK,
@@ -462,8 +481,8 @@ AC_DEFUN([STAR_CNF_COMPATIBLE_SYMBOLS],
         AC_MSG_ERROR([STAR[]_CNF_COMPATIBLE_SYMBOLS in docs-only dir])
     AC_CACHE_CHECK([how to make Fortran and C play nicely],
        [star_cv_cnf_compatible_symbols],
-       [AC_REQUIRE([AC_PROG_FC])dnl
-        AC_REQUIRE([AC_PROG_CC])dnl
+       [dnl AC_REQUIRE([AC_PROG_FC])dnl
+        dnl AC_REQUIRE([AC_PROG_CC])dnl
         AC_LANG_PUSH([C])
         AC_LANG_CONFTEST([AC_LANG_SOURCE([
 void funcone_() { return; }
@@ -567,7 +586,7 @@ float fred_() {
            $FC $FCFLAGS $opt -o conftest conftest.f c-conftest.$ac_objext 2>&5
            if test -r conftest
            then
-              star_cv_cnf_f2c_compatible=`eval conftest | sed 's/\ //g'` > /dev/null
+              star_cv_cnf_f2c_compatible=`eval ./conftest | sed 's/\ //g'` > /dev/null
            else
               AC_MSG_ERROR([failed to link program]) 
            fi
@@ -776,7 +795,7 @@ C  checks passing 4 byte character string lengths on 64bit compiler.
               $FC $FCFLAGS $opt -o conftest conftest.f 2>&5
               if test -r conftest
               then
-                 star_cv_cnf_trail_type=`eval conftest | sed 's/\ //g'` > /dev/null
+                 star_cv_cnf_trail_type=`eval ./conftest | sed 's/\ //g'` > /dev/null
               else
                  AC_MSG_ERROR([failed to link program]) 
               fi
@@ -1047,10 +1066,10 @@ AC_DEFUN([STAR_LATEX_DOCUMENTATION],
         if $_star_build_docs; then
             AC_FOREACH([DocCode], [$1],
                [m4_if(m4_bregexp(DocCode,[/]), -1,
-                      [STAR@&t@_LATEX_DOCUMENTATION="$STAR@&t@_LATEX_DOCUMENTATION DocCode.tex DocCode.ps DocCode.htx_tar"
+                      [STAR@&t@_LATEX_DOCUMENTATION="$STAR@&t@_LATEX_DOCUMENTATION DocCode.tex DocCode.pdf DocCode.htx_tar"
 ],
                       [m4_define([_T], m4_bpatsubst(DocCode,[/]))dnl
-                       STAR_LATEX_DOCUMENTATION_[]_STAR_UPCASE(_T)="_T.tex _T.ps _T.htx_tar"
+                       STAR_LATEX_DOCUMENTATION_[]_STAR_UPCASE(_T)="_T.tex _T.pdf _T.htx_tar"
                        AC_SUBST(STAR_LATEX_DOCUMENTATION_[]_STAR_UPCASE(_T))])])
         fi
         STAR_DECLARE_DEPENDENCIES([sourceset], [star2html])
@@ -1597,8 +1616,8 @@ fi
 ])# STAR_PLATFORM_SOURCES
 
 
-# STAR_INITIALISE_FORTRAN
-# -----------------------
+# STAR_INITIALISE_FORTRAN_RTL
+# ---------------------------
 #
 # Define a macro which can be used in a C main program to initialise the
 # Fortran RTL, including, for example, doing whatever work is required so that
@@ -1647,7 +1666,7 @@ fi
 # variable __xargc and __xargv, this may need fixing from time to time.
 # Doesn't seem to be a function for doing this job.
 #
-AC_DEFUN([STAR_INITIALISE_FORTRAN],
+AC_DEFUN([STAR_INITIALISE_FORTRAN_RTL],
    [AC_CACHE_CHECK([how to initialise the Fortran RTL],
        [star_cv_initialise_fortran],
        [AC_REQUIRE([AC_PROG_FC])
@@ -1668,34 +1687,34 @@ AC_DEFUN([STAR_INITIALISE_FORTRAN],
                 star_cv_initialise_fortran=
             fi
         fi])
-    AH_TEMPLATE([STAR_INITIALISE@&t@_FORTRAN],
+    AH_TEMPLATE([STAR_INITIALISE_FORTRAN],
        [Define to a function call which will initialise the Fortran RTL])
     case "$star_cv_initialise_fortran" in
       g77-setarg)
-        AC_DEFINE([STAR_INITIALISE@&t@_FORTRAN(argc,argv)],
+        AC_DEFINE([STAR_INITIALISE_FORTRAN(argc,argv)],
                   [{extern void f_setarg(int,char**); f_setarg(argc, argv);}])
         ;;
       g95-start)
-        AC_DEFINE([STAR_INITIALISE@&t@_FORTRAN(argc,argv)],
+        AC_DEFINE([STAR_INITIALISE_FORTRAN(argc,argv)],
                   [{extern void g95_runtime_start(int,char**); g95_runtime_start(argc, argv);}])
         ;;
       gfortran-setarg)
-        AC_DEFINE([STAR_INITIALISE@&t@_FORTRAN(argc,argv)],
+        AC_DEFINE([STAR_INITIALISE_FORTRAN(argc,argv)],
                   [{extern void _gfortran_set_args(int,char**); if (argv == NULL) {static char *sc_dummy[[]]={NULL};_gfortran_set_args(0,sc_dummy);} else {_gfortran_set_args(argc,argv);}}])
         ;;
       ifort-setarg)
-        AC_DEFINE([STAR_INITIALISE@&t@_FORTRAN(argc,argv)],
+        AC_DEFINE([STAR_INITIALISE_FORTRAN(argc,argv)],
                   [{extern void for_rtl_init_(int*,char**); for_rtl_init_(&argc, argv);}])
         ;;
       sunstudio-setarg)
-        AC_DEFINE([STAR_INITIALISE@&t@_FORTRAN(argc,argv)],
+        AC_DEFINE([STAR_INITIALISE_FORTRAN(argc,argv)],
                   [{extern int __xargc; extern char **__xargv;__xargc = argc;__xargv = argv;}])
         ;;
       *) 
-        AC_DEFINE([STAR_INITIALISE@&t@_FORTRAN(argc,argv)],[])
+        AC_DEFINE([STAR_INITIALISE_FORTRAN(argc,argv)],[])
         ;;
     esac
-dnl    AC_DEFINE_UNQUOTED([STAR_INITIALISE@&t@_FORTRAN(argc,argv)],
+dnl    AC_DEFINE_UNQUOTED([STAR_INITIALISE_FORTRAN(argc,argv)],
 dnl                       $star_cv_initialise_fortran)
 ])# STAR_INITIALISE_FORTRAN
 
@@ -1779,8 +1798,8 @@ AC_DEFUN([_STAR_RESTFP_FIX],
    [AC_CACHE_CHECK([whether we need any library fixups],
        [star_cv_restfp_fixup],
        [AC_REQUIRE([AC_CANONICAL_BUILD])
-        AC_REQUIRE([AC_PROG_CC])
-        AC_REQUIRE([AC_PROG_FC])
+        dnl AC_REQUIRE([AC_PROG_CC])
+        dnl AC_REQUIRE([AC_PROG_FC])
         if expr $build_os : 'darwin7' >/dev/null; then
 dnl Only affects OSX/Darwin
             # Following uses undocumented (but probably fairly stable)
@@ -1790,7 +1809,7 @@ dnl The problem only affects g77/gcc, so we know we're dealing with these below
                 AC_LANG_PUSH(C)
                 rm -f conftest*
                 star_cv_restfp_fixup=unknown
-                AC_LANG_CONFTEST(AC_LANG_PROGRAM([], restFP()))
+                AC_LANG_CONFTEST([AC_LANG_PROGRAM([], restFP())])
                 { AC_TRY_COMMAND($CC -o conftest.x -S conftest.c)
                   test $ac_status = 0
                 } &&
