@@ -198,6 +198,7 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
    const char *modname;
    const char *out;
    double mingood;
+   int addqual;
    int append;
    int cube;
    int history;
@@ -249,6 +250,9 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
 /* See if a full cube containing data for all bolometers is required at
    each iteration. */
       astMapGet0I( kmap, "CUBE", &cube );
+
+/* See if NDFs are to include Quality arrays. */
+      astMapGet0I( kmap, "QUAL", &addqual );
 
 /* If we are appending to previously created NDFs, attempt to open the
    pre-existing container file. */
@@ -416,8 +420,9 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
                   msgOutf( "", "Diagnostics: Dumping residuals before subtraction of %s",
                            status, modname );
                   sprintf( root, "bef_%d", chunk );
-                  smf_diag( wf, mloc, &ibolo, irow, power, time, isub, dat,
-                            type, NULL, 1, root, 0, mingood, cube, status );
+                  smf_diag( wf, mloc, &ibolo, irow, power, time, isub,
+                            dat, type, NULL, 1, root, 0, mingood, cube,
+                            addqual, status );
                }
 
 /* If this function has been called immediately after estimating the new
@@ -427,13 +432,14 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
                sprintf( root, "mod_%d", chunk );
                smf_diag( wf, mloc, &ibolo, irow, power, time, isub,
                          dat, type, allmodel ? allmodel[ 0 ] : NULL,
-                         0, root, mask, mingood, cube, status );
+                         0, root, mask, mingood, cube, addqual, status );
                if( res_after && type != SMF__RES ) {
                   msgOutf( "", "Diagnostics: Dumping residuals after subtraction of %s",
                            status, modname );
                   sprintf( root, "aft_%d", chunk );
-                  smf_diag( wf, mloc, &ibolo, irow, power, time, isub, dat,
-                            type, NULL, 1, root, 0, mingood, cube, status );
+                  smf_diag( wf, mloc, &ibolo, irow, power, time, isub,
+                            dat, type, NULL, 1, root, 0, mingood, cube,
+                            addqual, status );
                }
 
 /* Any other "where" value is currently an error. */

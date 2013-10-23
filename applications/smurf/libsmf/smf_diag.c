@@ -17,7 +17,7 @@
 *               int power, int time, int isub, smfDIMMData *dat,
 *               smf_modeltype type, smfArray *model, int res,
 *               const char *root, int mask, double mingood, int cube,
-*               int *status )
+*               int addqual, int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -67,6 +67,8 @@
 *        Is a full cube containing time ordered data for all bolometers
 *        required? If so, it will be stored in an NDF with name
 *        "<root>_cube_<irow>".
+*     addqual = int (Given)
+*        If non-zero, the output NDFs will include a quality array.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -81,6 +83,8 @@
 *  History:
 *     25-JAN-2013 (DSB):
 *        Original version.
+*     21-OCT-2013 (DSB):
+*        Added argument "addqual".
 
 *  Copyright:
 *     Copyright (C) 2013 Science and Technology Facilities Council.
@@ -141,13 +145,14 @@ typedef struct smfDiagData {
    size_t tstride;
    smf_qual_t *mapqual;
    smf_qual_t *qua;
+   smf_qual_t *qua_out;
 } SmfDiagData;
 
 void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
                int power, int time, int isub, smfDIMMData *dat,
                smf_modeltype type, smfArray *model, int res,
                const char *root, int mask, double mingood, int cube,
-               int *status ){
+               int addqual, int *status ){
 
 /* Local Variables: */
    AstCmpFrame *totfrm;
@@ -198,6 +203,7 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
    size_t tstride;
    size_t bstrider;
    size_t tstrider;
+   size_t nmap;
    smfArray *array;
    smfData *data = NULL;
    smfData *data_tmp;
@@ -205,7 +211,9 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
    smf_qual_t *oldcomq;
    smf_qual_t *pqr;
    smf_qual_t *pq;
+   smf_qual_t *qua = NULL;
    smf_qual_t *qual;
+   smf_qual_t *qbuffer = NULL;
    smf_qual_t qval;
    smfData *sidequal;
 
@@ -344,11 +352,15 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
 /* If a specified single bolometer was requested, copy it into
    the buffer, replacing flagged samples with VAL__BADD. */
    if( usebolo >= 0 && *status == SAI__OK ) {
+
       pd = ((double *) data->pntr[0]) + usebolo*bstride;
       pq = qual ? qual + usebolo*bstride : NULL;
+      if( pq && addqual ) qbuffer = astMalloc( ntslice*sizeof( *qbuffer ) );
+
       ngood = 0;
       for( itime = 0; itime < ntslice; itime++ ){
-         if( ( !pq || *pq == 0 ) && *pd != VAL__BADD ) {
+         if( qbuffer ) qbuffer[ itime ] = *pq;
+         if( ( qbuffer || ( !pq || *pq == 0 ) ) && *pd != VAL__BADD ) {
             buffer[ itime ] = *pd;
             ngood++;
          } else {
@@ -411,9 +423,13 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
 /* Copy the data from the selected bolometer into the buffer. */
             pd = ((double *) data->pntr[0]) + usebolo*bstride;
             pq = qual ? qual + usebolo*bstride : NULL;
+
+            if( pq && addqual ) qbuffer = astMalloc( ntslice*sizeof( *qbuffer ) );
+
             ngood = 0;
             for( itime = 0; itime < ntslice; itime++ ){
-               if( ( !pq || *pq == 0 ) && *pd != VAL__BADD ) {
+               if( qbuffer ) qbuffer[ itime ] = *pq;
+               if( ( qbuffer || ( !pq || *pq == 0 ) ) && *pd != VAL__BADD ) {
                   buffer[ itime ] = *pd;
                   ngood++;
                } else {
@@ -647,13 +663,23 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
          mode = "Update";
       }
 
-/* Map it. */
+/* Map the data array and copy the values. */
       ndfMap( indf, "DATA", "_DOUBLE", mode, (void **) &ip, &el,
               status );
-
-/* Copy the data. */
       if( *status == SAI__OK ) memcpy( ip + ( irow + 1 - lbnd[1] )*ndata,
                                        buffer, sizeof(double)*ndata );
+
+/* If required, map the Quality array and copy the values, then unmap it. */
+      if( qbuffer ) {
+         qua = smf_qual_map( indf, mode, NULL, &nmap, status );
+         if( *status == SAI__OK ) memcpy( qua + ( irow + 1 - lbnd[1] )*ndata,
+                                          qbuffer, sizeof(*qua)*ndata );
+         smf_qual_unmap( indf, SMF__QFAM_TSERIES, qua, status );
+
+/* Set the bad bits mask so that the data array will not be masked when
+   it is mapped when dumping diagnostics for the next iteration. */
+         ndfSbb( 0, indf, status );
+      }
 
 /* Free resources. */
       ndfAnnul( &indf, status );
@@ -686,8 +712,11 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
       ndfMap( indf, "DATA", "_DOUBLE", "WRITE", (void **) &ip, &el,
               status );
 
+/* If required, map the quality array. */
+      if( addqual ) qua = smf_qual_map( indf, "wRITE", NULL, &nmap, status );
+
 /* Copy the data values from the smfData to the NDF Data component,
-   setting flagged values to VAL__BADD. */
+   setting flagged values to VAL__BADD if required. */
       for( iw = 0; iw < nw; iw++ ) {
          pdata = job_data + iw;
          if( pdata->b1 < nbolo ) {
@@ -695,10 +724,14 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
             pdata->out = ip;
             pdata->in = (data->pntr)[0];
             pdata->qua = qual;
+            pdata->qua_out = qua;
             thrAddJob( wf, 0, pdata, smf1_diag, 0, NULL, status );
          }
       }
       thrWait( wf, status );
+
+/* If required, unmap the quality array. */
+      if( addqual ) smf_qual_unmap( indf, SMF__QFAM_TSERIES, qua, status );
 
 /* Annul the NDF identifier. */
       ndfAnnul( &indf, status );
@@ -714,6 +747,7 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
 
 /* Free remaining resources. */
    buffer = astFree( buffer );
+   qbuffer = astFree( qbuffer );
    job_data = astFree( job_data );
 
 /* End the AST context. */
@@ -756,6 +790,7 @@ static void smf1_diag( void *job_data_ptr, int *status ) {
    size_t bstride;
    size_t tstride;
    smf_qual_t *qua;
+   smf_qual_t *qua_out;
    const double *in;
    double sum;
    double wsum;
@@ -763,6 +798,7 @@ static void smf1_diag( void *job_data_ptr, int *status ) {
    int n;
    const double *pd;
    smf_qual_t *pq;
+   smf_qual_t *pq2;
    double *po;
    int *pl;
 
@@ -778,6 +814,7 @@ static void smf1_diag( void *job_data_ptr, int *status ) {
    in = pdata->in;
    out = pdata->out;
    qua = pdata->qua;
+   qua_out = pdata->qua_out;
    var = pdata->var;
    bstride = pdata->bstride;
    tstride = pdata->tstride;
@@ -790,7 +827,7 @@ static void smf1_diag( void *job_data_ptr, int *status ) {
       po = pdata->out +  pdata->s1;
       pq = pdata->qua +  pdata->s1;
       pl = pdata->lut +  pdata->s1;
-      for( idata = pdata->s1; idata <= pdata->s2; idata++,pq++,pl++,po++ ) {
+      for( idata = pdata->s1; idata <= pdata->s2; idata++,pq++,pq2++,pl++,po++ ) {
          if( !( *pq & SMF__Q_MOD ) && *pl != VAL__BADI ) {
             double ast_data = pdata->map[ *pl ];
             if( ast_data != VAL__BADD &&
@@ -822,15 +859,20 @@ static void smf1_diag( void *job_data_ptr, int *status ) {
          out = pdata->out + ibolo*bstride;
          in = pdata->in + ibolo*bstride;
          pq = qua ? qua + ibolo*bstride : NULL;
+         pq2 = qua_out ? qua_out + ibolo*bstride : NULL;
          for( itime = 0; itime < pdata->ntslice; itime++) {
-            if( !pq || *pq == 0  ) {
+            if( !pq || *pq == 0 || pq2 ) {
                *out = *in;
             } else {
                *out = VAL__BADD;
             }
+
+            if( pq && pq2 ) *pq2 = *pq;
+
             in += tstride;
             out += tstride;
             if( pq ) pq += tstride;
+            if( pq2 ) pq2 += tstride;
          }
       }
 

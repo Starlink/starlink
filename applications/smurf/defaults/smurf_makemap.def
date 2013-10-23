@@ -618,6 +618,20 @@ diag.out = <undef>
 diag.power = 0
 
 #-----------------------------------------------------------------
+#  Name: 	diag.qual
+#  Type: 	integer
+#  Default: 	0
+#  Purpose: 	Qualifies the required dignostic information.
+#  Description: If zero, no Quality arrays will be stored in the diagnostic
+#               NDFs. Instead, flagged Data values will be set to the
+#               starlink bad value. If non-zero, each NDF holding diagnostic
+#               information will include a Quality array, and flagged Data
+#               values will retain their internal values (i.e. they will
+#               not be set to the starlink bad value). This makes the NDF
+#               seriously bigger.
+diag.qual = 0
+
+#-----------------------------------------------------------------
 #  Name: 	diag.res_after
 #  Type: 	integer
 #  Default: 	0
