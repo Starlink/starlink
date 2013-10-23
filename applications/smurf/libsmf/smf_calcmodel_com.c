@@ -217,7 +217,7 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    iteration. Some samples (e.g. source samples) may have looked unusual
    on early iterations but may become "normal" on later iterations once
    the source signal has been moved into the AST model. */
-   qmask = ( SMF__Q_GOOD & ~SMF__Q_COM );
+   qmask = ( SMF__Q_GOOD & ~SMF__Q_COM & ~SMF__Q_RING );
 
 /* Ensure the data is bolo-ordered (i.e. adjacent values in memory are
    adjacent time slices from the same bolometer). */
@@ -683,8 +683,8 @@ static void smf1_calcmodel_com( void *job_data_ptr, int *status ) {
    } else if( pdata->operation == 3 ) {
 
 /* Quality mask that includes samples previously flagged by the COM
-   model. */
-      qmask = ( SMF__Q_FIT & ~SMF__Q_COM );
+   model or ringing filter. */
+      qmask = ( SMF__Q_FIT & ~SMF__Q_COM & ~SMF__Q_RING );
 
 /* Store the index of the block containing the first time slice to be
    processed by this thread. Also store the index of the time slice at which

@@ -1193,16 +1193,26 @@ flt.ring_box1 = 0
 flt.ring_box2 = 1.5
 
 #-----------------------------------------------------------------
+#  Name: 	flt.ring_freeze
+#  Type: 	integer
+#  Default: 	10
+#  Purpose: 	Controls the flagging of samples that suffer from ringing.
+#  Description: The flags will be frozen after the number of iterations
+#               specified by thsi parameter. This helps convergence. Set
+#               it to zero to allow the flags to change on every iteration.
+flt.ring_freeze = 10
+
+#-----------------------------------------------------------------
 #  Name: 	flt.ring_minsize
 #  Type: 	float
-#  Default: 	0.1
+#  Default: 	0.0
 #  Purpose: 	Controls the flagging of samples that suffer from ringing.
 #  Description: A contiguous section of residuals that are considered
 #               to suffer from ringing will only be flagged if it is
 #               longer than the size specified by this parameter. It is
 #               given as a multiple of the filter size. See parameter
 #               "flt.ring_box1".
-flt.ring_minsize = 0.1
+flt.ring_minsize = 0.0
 
 #-----------------------------------------------------------------
 #  Name: 	flt.ring_nsigma

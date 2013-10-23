@@ -88,7 +88,7 @@
 *        twice the padding plus the apodisation.
 *        - Reorder the LUT model if any masking is being one.
 *     2013-10-21 (DSB):
-*        - Provide an option to flag samples that appear to suffer from 
+*        - Provide an option to flag samples that appear to suffer from
 *        ringing  after the FLT model has been removed.
 *     {enter_further_changes_here}
 
@@ -148,6 +148,7 @@ typedef struct smfCalcModelFltData {
    double ring_nsigma;
    int *lut_data;
    int chisq;
+   int clear_ring;
    int oper;
    int ring_box1;
    int ring_box2;
@@ -207,7 +208,8 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   double *res_data=NULL;        /* Pointer to DATA component of res */
   double ring_box1;             /* Small scale box size for ringing filter */
   double ring_box2;             /* Small scale box size for ringing filter */
-  int ring_minsize;             /* Smallest section of ringing samples to flag */
+  int ring_freeze;              /* When to freeze the ringing filter */
+  double ring_minsize;          /* Smallest section of ringing samples to flag */
   double ring_nsigma;           /* Clipping limit for ringing filter */
   double ring_wing;             /* Size of wings for ringing filter */
   int skip;                     /* Number of AST models being skipped */
@@ -272,7 +274,8 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   astMapGet0D( kmap, "RING_BOX2", &ring_box2 );
   astMapGet0D( kmap, "RING_NSIGMA", &ring_nsigma );
   astMapGet0D( kmap, "RING_WING", &ring_wing );
-  astMapGet0I( kmap, "RING_MINSIZE", &ring_minsize );
+  astMapGet0D( kmap, "RING_MINSIZE", &ring_minsize );
+  astMapGet0I( kmap, "RING_FREEZE", &ring_freeze );
 
   /* Assert bolo-ordered data */
   order_list = SMF__RES|SMF__QUA|SMF__NOI;
@@ -353,13 +356,15 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
       }
 
       /* If we are just inverting the model, place last iteration of filtered
-         signal back into residual. This also clears any SMF__Q_RING flags (this 
-         should be done at the start of each iteration before re-estimating COM 
+         signal back into residual. This also clears any SMF__Q_RING flags (this
+         should be done at the start of each iteration before re-estimating COM
          to avoid problems with convergence). */
       if( flags & SMF__DIMM_INVERT ) {
         for( iw = 0; iw < nw; iw++ ) {
           pdata = job_data + iw;
           pdata->oper = 1;
+          pdata->clear_ring = ( ring_box1 > 0.0 && ( ring_freeze <= 0 ||
+                                dat->iter <= ring_freeze ) ); 
           thrAddJob( wf, 0, pdata, smf1_calcmodel_flt, 0, NULL, status );
         }
         thrWait( wf, status );
@@ -367,11 +372,13 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
       /* Otherwise, estimate and remove the FLT model. */
       } else {
 
-        /* If not already done, add the old FLT model back on again, and clear 
+        /* If not already done, add the old FLT model back on again, and clear
            SMF__Q_RING flags. */
         if( ! undofirst ) {
           for( iw = 0; iw < nw; iw++ ) {
             pdata = job_data + iw;
+            pdata->clear_ring = ( ring_box1 > 0.0 && ( ring_freeze <= 0 ||
+                                  dat->iter <= ring_freeze ) );
             pdata->oper = 1;
             thrAddJob( wf, 0, pdata, smf1_calcmodel_flt, 0, NULL, status );
           }
@@ -477,7 +484,8 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
           /* If required, locate and flag any residuals that seem to suffer
              from ringing now that the low frequency FLT model has been
              removed. */
-          if( ring_box1 > 0.0 ){
+          if( ring_box1 > 0.0 && ( ring_freeze <= 0 ||
+                                   dat->iter <= ring_freeze ) ){
              msgOutif( MSG__DEBUG, "", "Flagging residuals that appear "
                        "to suffer from ringing.", status );
 
@@ -579,7 +587,7 @@ static void smf1_calcmodel_flt( void *job_data_ptr, int *status ) {
                *pr += *pm;
 
 /* Clear any SMF__Q_RING flags. */
-               *pq &= ~SMF__Q_RING;
+               if( pdata->clear_ring) *pq &= ~SMF__Q_RING;
 
 /* Move residual and model pointers on to the next time slice. */
                pr += pdata->tstride;
