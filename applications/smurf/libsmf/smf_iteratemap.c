@@ -127,6 +127,7 @@
 *     TIMJ: Tim Jenness (JAC, Hawaii)
 *     DSB: David Berry (JAC, Hawaii)
 *     COBA: Coskun Oba (UoL)
+*     AGM: Gaelen Marsden (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -414,6 +415,8 @@
 *     2013-7-23 (DSB):
 *        Do not converge until any initial iterations that skip the AST
 *        model have been done.
+*     2013-10-25 (AGM):
+*        Allocate extra memory for maps for alternate rebinning scheme
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -1310,23 +1313,17 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       if( contchunk == 0 ) {
         /* For the first continuous chunk, calculate the map
            in-place */
-        thismap = map;
-        thishits = hitsmap;
-        thisqual = mapqual;
-        thisvar = mapvar;
-        thisweight = weights;
         mapweights = astCalloc( msize, sizeof(*mapweights) );
         mapweightsq = astMalloc( msize*sizeof(*mapweightsq) );
-        thisweightsq = mapweightsq;
-      } else if( contchunk == 1 ) {
-        /* Subsequent continuous chunks are done in new map arrays and
-           then added to the first */
-        thismap = astCalloc( msize, sizeof(*thismap) );
-        thishits = astCalloc( msize, sizeof(*thishits) );
-        thisqual = astCalloc( msize, sizeof(*thisqual) );
-        thisvar = astCalloc( msize, sizeof(*thisvar) );
-        thisweight = astCalloc( msize, sizeof(*thisweight) );
-        thisweightsq = astCalloc( msize, sizeof(*thisweightsq) );
+
+        /* submaps for multithread rebinning -- each thread needs its own map.
+           Requires copying onto input maps on first contchunk */
+        thismap = astCalloc( nw*msize, sizeof(*thismap) );
+        thisweight = astCalloc( nw*msize, sizeof(*thisweight) );
+        thisweightsq = astCalloc( nw*msize, sizeof(*thisweightsq) );
+        thisvar = astCalloc( nw*msize, sizeof(*thisvar) );
+        thishits = astCalloc( nw*msize, sizeof(*thishits) );
+        thisqual = astCalloc( nw*msize, sizeof(*thisqual) );
       }
 
       /* Concat everything in this contchunk into a single smfArray. Note
@@ -2901,6 +2898,18 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
          chunk. */
       chunkweight = smf_chunkweight( res[0]->sdata[0], keymap,
                                      contchunk, status );
+
+      /* on first chunk, copy thismap onto map
+         subsquent chunks get added below */
+      if( contchunk == 0 ) {
+        memcpy( map, thismap, msize*sizeof(*map) );
+        memcpy( weights, thisweight, msize*sizeof(*weights) );
+        memcpy( mapweightsq, thisweightsq, msize*sizeof(*mapweightsq) );
+        memcpy( mapvar, thisvar, msize*sizeof(*mapvar) );
+        memcpy( hitsmap, thishits, msize*sizeof(*hitsmap) );
+        memcpy( mapqual, thisqual, msize*sizeof(*mapqual) );
+      }
+
       if( ncontchunks > 1 ) {
         msgOut( " ", FUNC_NAME ": Adding map estimated from this continuous"
                 " chunk to total", status);
