@@ -1,4 +1,4 @@
-\documentstyle{article}
+\documentclass{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -83,11 +83,9 @@ The `INTERIM environment' is the result of the initial efforts to create a
 Starlink software environment.
 It is described under the following headings:
 \begin{description}
-\begin{description}
 \item [Programmer Interface]
 \item [Program Development]
 \item [User Interface]
-\end{description}
 \end{description}
 The programmer interface is provided by the routines in the INTERIM library.
 These are described in section 3 and appendices A, B and C.
@@ -103,10 +101,8 @@ appendix D.
 
 Two different user interfaces are available:
 \begin{description}
-\begin{description}
 \item [RUNSTAR]
 \item [DSCL]
-\end{description}
 \end{description}
 RUNSTAR is the simplest of the two and is described in section 5.
 Examples of its use are shown in appendix E.
@@ -120,10 +116,8 @@ library INTERIM\_DIR:\-INTERIM.\-OLB.
 There are 36 user callable routines available in this library.
 Their functions can be classified under 2 headings:
 \begin{description}
-\begin{description}
 \item [Parameter access and control] (22)
 \item [Utilities] (14)
-\end{description}
 \end{description}
 This section describes these routines in general terms.
 Section 3.1 describes routines for accessing program parameters.
@@ -143,11 +137,9 @@ Parameters identify the data on which a program operates.
 
 Each parameter has the following three characteristics:
 \begin{description}
-\begin{description}
 \item [Name]
 \item [Class]
 \item [Value]
-\end{description}
 \end{description}
 These are considered in more detail in the next 3 sub-sections.
 \subsubsection {Name}
@@ -158,11 +150,9 @@ Letters should be in upper case.
 \subsubsection {Class}
 There are 3 classes of parameter:
 \begin{description}
-\begin{description}
 \item [VALUE]
 \item [FRAME]
 \item [ERROR]
-\end{description}
 \end{description}
 Parameters of different classes are accessed by different sets of routines
 and serve different purposes.
@@ -385,12 +375,10 @@ program's address space.
 \subsection {Utility routines}
 The utility routines fall into 4 groups:
 \begin{description}
-\begin{description}
 \item [Data conversion] (9)
 \item [Mapping control] (2)
 \item [Direct terminal I/O] (2)
 \item [Error handling] (1)
-\end{description}
 \end{description}
 There are 9 utility routines which handle {\em data conversion}:
 \begin{tabbing}
@@ -526,13 +514,11 @@ a different way.
 We will call programs which use INTERIM routines {\em INTERIM programs}.
 The development of an INTERIM  program has five stages:
 \begin{description}
-\begin{description}
 \item [Coding the program]
 \item [Specifying the connection file]
 \item [Compiling the program]
 \item [Linking the program]
 \item [Running the program]
-\end{description}
 \end{description}
 These stages may need iteration if bugs are found.
 The first four stages are discussed in this section.
@@ -638,10 +624,8 @@ For {\bf FRAME} class parameters, a code must be specified within parentheses
 indicating the operation to be performed on the frame.
 The codes and their meanings are:
 \begin{description}
-\begin{description}
 \item [R] - Read
 \item [W] - Write
-\end{description}
 \end{description}
 \item [Value] is the default value for the parameter and is optional.
 The correct syntax for specifying a value is described in section 5.2.2.
@@ -733,11 +717,9 @@ A search path is an ordered set of possible sources for a value.
 When a program wants a value for a parameter for the first time, the search
 path followed is:
 \begin{description}
-\begin{description}
 \item [RUNSTAR command]
 \item [Connection file]
 \item [Prompt]
-\end{description}
 \end{description}
 The program takes the first value found during the search.
 Thus, a value specified in the RUNSTAR command takes precedence over a value
@@ -869,11 +851,9 @@ ambiguity.
 {\bf PARAMETER VALUES}\\
 Parameter values can be expressed in three ways:
 \begin{description}
-\begin{description}
 \item [Explicit]
 \item [DCL symbol]
 \item [DCL logical name]
-\end{description}
 \end{description}
 Each way will be considered separately.
 \begin{description}
@@ -1085,10 +1065,8 @@ The processing performed on commands submitted to DCL is described in VAX/VMS
 manuals [9], [10].
 The following two features will be highlighted in this section:
 \begin{description}
-\begin{description}
 \item [Lower to upper case conversion]
 \item [Logical name translation]
-\end{description}
 \end{description}
 \begin{description}
 \item [Lower to upper case conversion]:
