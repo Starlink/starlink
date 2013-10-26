@@ -14,7 +14,8 @@
 
 *  Invocation:
 *     smf_checkmem_map( const int lbnd[2], const int ubnd[2], int rebin,
-*                       size_t available, size_t *necessary, int *status );
+*                       int nw, size_t available, size_t *necessary,
+*                       int *status );
 
 *  Arguments:
 *     lbnd = const int[2] (Given)
@@ -23,6 +24,8 @@
 *        2-element array indices for upper bounds of the output map
 *     rebin = int (Given)
 *        If set calculate memory for method=rebin. Otherwise method=iterate.
+*     nw = int (Given)
+*        Number of worker threads, since iteratemap uses nw temp maps
 *     available = size_t (Given)
 *        Maximum memory in bytes that the mapped arrays may occupy
 *     necessary = size_t * (Returned)
@@ -38,6 +41,7 @@
 
 *  Authors:
 *     Edward Chapin (UBC)
+*     Gaelen Marsden (AGM, UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -49,6 +53,8 @@
 *        Extra space required for mapweight^2 array in iteratemap
 *     2010-09-20 (TIMJ):
 *        We are using MiB not Mb
+*     2013-10-24 (AGM):
+*        smf_iteratemap uses nw maps for temporary calculations
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -94,7 +100,7 @@
 
 #define FUNC_NAME "smf_checkmem_map"
 
-void smf_checkmem_map( const int lbnd[], const int ubnd[], int rebin,
+void smf_checkmem_map( const int lbnd[], const int ubnd[], int rebin, int nw,
 		       size_t available, size_t *necessary, int *status ) {
 
  /* Local Variables */
@@ -152,6 +158,10 @@ void smf_checkmem_map( const int lbnd[], const int ubnd[], int rebin,
 
       /* smf_iteratemap also uses a local buffer to accumulate weights^2 */
       total += sizeof(double)*mapsize;
+
+      /* add (nw - 1) maps for threaded calculations
+         uses 4 doubles (map, mapvar, weight, weightsq) and 1 int (hitsmap) */
+      total += 4*(nw-1)*sizeof(double)*mapsize + (nw-1)*sizeof(int)*mapsize;
     }
 
     /* Set bad status if too big */

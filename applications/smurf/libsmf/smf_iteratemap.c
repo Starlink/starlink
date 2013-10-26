@@ -1159,7 +1159,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
     /* First check memory for the map and subtract off total memory to
        see what is available for model components. */
-    smf_checkmem_map( lbnd_out, ubnd_out, 0, maxmem, &mapmem, status );
+    smf_checkmem_map( lbnd_out, ubnd_out, 0, nw, maxmem, &mapmem, status );
     maxdimm = maxmem-mapmem;
 
     /* Then the iterative components that are proportional to time */
