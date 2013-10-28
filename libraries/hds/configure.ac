@@ -7,7 +7,7 @@ AC_INIT(hds, 5.1-1, starlink@jiscmail.ac.uk)
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
 dnl    Require Starlink automake at least
-AM_INIT_AUTOMAKE(1.8.2-starlink)
+AM_INIT_AUTOMAKE([1.8.2-starlink subdir-objects])
 
 dnl    Sanity-check: name a file in the source directory -- if this
 dnl    isn't found then configure will complain
