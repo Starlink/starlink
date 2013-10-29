@@ -171,7 +171,7 @@ void smf_jsatiling( smf_inst_t instrument, smfJSATiling *skytiling,
       }
 
 /* Otherwise, store the instrument identifier and the total number of tiles
-   on the sky (this assumes that we are using 12 HPX facets to cover the
+   on the sky (this assumes that we are using 12 HEALPix facets to cover the
    whole sky). */
    } else {
       skytiling->instrument = instrument;

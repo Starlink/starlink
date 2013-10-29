@@ -21,7 +21,7 @@ typedef struct smfJSATiling {
   const char *subdir;     /* Sub-directory for instrument tiles */
   const char *type;       /* Data type for tile values */
   int var;                /* Should tiles have variance arrays? */
-  int ntpf;               /* No. of tiles along one edge of an HPX facet */
+  int ntpf;               /* No. of tiles along one edge of an HEALPix facet */
   int ppt;                /* No. of pixels along one edge of a tile */
   int ntiles;             /* Number of tiles over whole sky */
   float fov;              /* Diameter of field of view (arcsec) */

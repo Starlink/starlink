@@ -36,7 +36,7 @@
 *     holding data from a specified JCMT instrument (or, if "itile" is
 *     -1, a FITS header describing the whole collection of tiles).
 *
-*     The whole sky is covered by an HPX (healpix) projection containing
+*     The whole sky is covered by an HPX (HEALPix) projection containing
 *     12 basic facets,the reference point (native lon.=0, native lat.=0)
 *     of the projection is put at (RA,Dec)=(0,0) [except for the first
 *     facet which has a reference point of (12h,0)], so that native coords
@@ -301,7 +301,7 @@ static AstFitsChan *smfMakeFC( int nx, int ny, int n, int p, double crpix1,
 *     ny = int (Given)
 *        Number of Y tiles within the FITS grid.
 *     n = int (Given)
-*        Number of tiles along each edge of an HPX facet.
+*        Number of tiles along each edge of an HEALPix facet.
 *     p = int (Given)
 *        Number of pixels along each edge of a tile.
 *     crpix1 = double (Given)

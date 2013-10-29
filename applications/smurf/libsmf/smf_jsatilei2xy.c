@@ -105,7 +105,7 @@ void smf_jsatilei2xy( int itile, smfJSATiling *skytiling, int *xt, int *yt,
 /* Check inherited status */
    if( *status != SAI__OK ) return;
 
-/* Get the number of tiles per HPX facet */
+/* Get the number of tiles per HEALPix facet */
    nsq = skytiling->ntpf*skytiling->ntpf;
 
 /* Check the tile index is legal. */
