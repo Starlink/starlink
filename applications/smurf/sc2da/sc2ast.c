@@ -22,10 +22,10 @@
 #define COLROW 1
 
 /* Prototypes for private functions defined in this file. */
-static void sc2ast_fts_second_port( AstFrameSet *fs, int subnum,
+static void sc2ast_fts_image_port( AstFrameSet *fs, int subnum,
                                     const fts2Port fts_port, int *status );
 static AstMapping *sc2ast_make_fts2_portmap( const fts2Port fts_port,
-                                             int invert, int subnum,
+                                             int subnum,
                                              int *status );
 
 /* The one-based index for each Frame within the cached FrameSet. Note,
@@ -1515,12 +1515,12 @@ int *status             /* global status (given and returned) */
                                                           polymap, 1, " " );
       }
 
-/* If required, create a Mapping appropriate for the selected port and add it
-   into the cached Mapping. The variant Mapping for the other port, will be
+/* If required, create a Mapping appropriate for the FTS tracking port and add
+   it into the cached Mapping. The variant Mapping for the image port will be
    added once the FrameSet has been completed. */
       if( fts_port ) {
          cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ],
-                                    sc2ast_make_fts2_portmap( fts_port, 0,
+                                    sc2ast_make_fts2_portmap( FTS_TRACKING,
                                                               subnum, status ),
                                                           1, " " );
       }
@@ -1601,14 +1601,16 @@ int *status             /* global status (given and returned) */
                                  astZoomMap( 2, AST__DR2D*3600.0, " " ), 1,
                                  " " ) );
 
-/* The GRID->FPLANE Mapping in the FrameSet will currently describe the selected
+/* The GRID->FPLANE Mapping in the FrameSet will currently describe the tracking
    FTS-2 port (if any). Create an alternative GRID->FPLANE Mapping that describes
-   the other port and store it as a variant Mapping in the FPLANE Frame of the
+   the image port and store it as a variant Mapping in the FPLANE Frame of the
    FrameSet. The FrameSet can then be switched between these two Mappings by
-   setting the "Variant" attribute of the FrameSet to "PORT1" or "PORT2" (when
+   setting the "Variant" attribute of the FrameSet to "IMAGE" or "TRACKING" (when
    the FPLANE Frame is the current Frame). */
-      sc2ast_fts_second_port( cache->frameset[ subnum ], subnum, fts_port,
-                              status );
+      if (fts_port) {
+         sc2ast_fts_image_port( cache->frameset[ subnum ], subnum, fts_port,
+                                status );
+      }
 
 /* Exempt the cached AST objects from AST context handling. This means
    that the pointers will not be annulled as a result of calling
@@ -2339,16 +2341,16 @@ void sc2ast_make_bolo_frame
 }
 
 
-static void sc2ast_fts_second_port( AstFrameSet *fs, int subnum,
+static void sc2ast_fts_image_port( AstFrameSet *fs, int subnum,
                                     const fts2Port fts_port, int *status ){
 /*
 *  Purpose:
-*    Add a description of the non-selected FTS port to the supplied FrameSet.
+*    Add a description of the image FTS port to the supplied FrameSet.
 
 *  Description:
 *    It is assumed that the supplied FrameSet already contains a
-*    Mapping that describes the Mapping from GRID to FPLANE using the
-*    port indicated by argument "fts_port".
+*    Mapping that describes the Mapping from GRID to FPLANE and the
+*    port indicated by argument "fts_port" is the one desired.
 */
 
 /* Local Variables: */
@@ -2358,16 +2360,12 @@ static void sc2ast_fts_second_port( AstFrameSet *fs, int subnum,
    AstMapping *map2;
    AstMapping *map5;
    AstMapping *map;
-   AstMapping *oportmap;
-   AstMapping *sportmap;
-   const char *ovarname;
-   const char *port;
-   const char *sident;
-   const char *svarname;
+   AstMapping *im_portmap; /* IMAGE */
+   AstMapping *tr_portmap; /* TRACKING */
    int icur;
 
 /* Check inherited status */
-   if( *status != SAI__OK || !fts_port ) return;
+   if( *status != SAI__OK ) return;
 
 /* Start an AST context so that we do not need to annul AST objects
    explicitly. */
@@ -2377,48 +2375,33 @@ static void sc2ast_fts_second_port( AstFrameSet *fs, int subnum,
    FrameSet. */
    map = astGetMapping( fs, AST__BASE, FPLANE_IFRAME );
 
-/* Construct the CmpMap for the other (unselected) port. */
-   oportmap = sc2ast_make_fts2_portmap( fts_port, 1, subnum, status );
-
-/* Get the identifier for the unselected port. */
-   port = astGetC( oportmap, "Ident" );
+/* Construct the CmpMap for the image port. */
+   im_portmap = sc2ast_make_fts2_portmap( FTS_IMAGE, subnum, status );
 
 /* We can now clear its Ident since we do not need to be able to locate
    it later, and leaving Ident set would prevent the Mapping from
    simplifying. */
-   astClear( oportmap, "Ident" );
+   astClear( im_portmap, "Ident" );
    if( *status == SAI__OK ) {
 
-/* Select the identifier and variant name for the selected port and the
-   unselected port. */
-      if( !strcmp( port, "port1map" ) ) {
-         sident = "port2map";
-         svarname = "PORT2";
-         ovarname = "PORT1";
-      } else {
-         sident = "port1map";
-         svarname = "PORT1";
-         ovarname = "PORT2";
-      }
-
-/* Locate the CmpMap for the selected port within the total Mapping, and
+/* Locate the CmpMap for the tracking port within the total Mapping, and
    get the Mappings before and after the port's CmpMap. */
-      sportmap = atlFindMap( map, sident, &map1, &map2, status );
-      if( !sportmap && astOK ) {
+      tr_portmap = atlFindMap( map, "ftsportmap", &map1, &map2, status );
+      if( !tr_portmap && astOK ) {
          *status = SAI__ERROR;
-         errRepf( " ", "sc2ast: Cannot find '%s' Mapping.", status, sident );
+         errRepf( " ", "sc2ast: Cannot find FTS-2 tracking Mapping.", status );
       }
 
 /* The Ident attribute in the portmap is no longer needed so clear it. This
    allows the Mapping to be simplified. */
-      astClear( sportmap, "Ident" );
-      sportmap = astAnnul( sportmap );
+      astClear( tr_portmap, "Ident" );
+      tr_portmap = astAnnul( tr_portmap );
 
-/* Construct the total GRID->FPLANE (using the unselected port) Mapping. */
-      map3 = astCmpMap( map1, oportmap, 1, " " );
+/* Construct the total GRID->FPLANE (using the image port) Mapping. */
+      map3 = astCmpMap( map1, im_portmap, 1, " " );
       map4 = astCmpMap( map3, map2, 1, " " );
 
-/* Get the Mapping from FPLANE (selected port) to FPLANE (unselected port)
+/* Get the Mapping from FPLANE (tracking port) to FPLANE (image port)
    and simplify it. */
       astInvert( map );
       map5 = astSimplify( astCmpMap( map, map4, 1, " " ) );
@@ -2430,18 +2413,20 @@ static void sc2ast_fts_second_port( AstFrameSet *fs, int subnum,
       astSetI( fs, "Current", FPLANE_IFRAME );
 
 /* Assign a name to the Mapping that generates FPLANE values using the
-   selected port in the original FrameSet. */
-      astAddVariant( fs, NULL, svarname );
+   tracking port in the original FrameSet. */
+      astAddVariant( fs, NULL, "TRACKING" );
 
-/* Store the unselected port  Mapping in the FrameSet as a variant Mapping
+/* Store the image port  Mapping in the FrameSet as a variant Mapping
    for the FPLANE Frame. */
-      astAddVariant( fs, map5, ovarname );
+      astAddVariant( fs, map5, "IMAGE" );
 
-/* This will leave unselected port as the current variant Mapping. Swap to
-   back to use the selected port Mapping instead. */
-      astSetC( fs, "Variant", svarname );
-      msgOutiff( MSG__DEBUG1, " ", "sc2ast: Using FTS-2 '%s' Mapping\n",
-                 status, astGetC( fs, "Variant" ) );
+/* This will leave the image port as the current variant Mapping. Swap
+   back to use the tracking port Mapping instead if desired. */
+      if (fts_port == FTS_TRACKING) {
+         astSetC( fs, "Variant", "TRACKING" );
+         msgOutiff( MSG__DEBUG1, " ", "sc2ast: Using FTS-2 '%s' Mapping\n",
+                    status, astGetC( fs, "Variant" ) );
+      }
 
 /* Re-instate the original current Frame in the FrameSet. */
       astSetI( fs, "Current", icur );
@@ -2454,7 +2439,7 @@ static void sc2ast_fts_second_port( AstFrameSet *fs, int subnum,
 }
 
 static AstMapping *sc2ast_make_fts2_portmap( const fts2Port fts_port,
-                                             int invert, int subnum,
+                                             int subnum,
                                              int *status ){
 /*
 *  Purpose:
@@ -2471,8 +2456,6 @@ static AstMapping *sc2ast_make_fts2_portmap( const fts2Port fts_port,
    AstMatrixMap *fts_flipmap;
    AstShiftMap *fts_shiftmap;
    AstShiftMap *fts_mirrorshiftmap;
-   const char *ident;
-   int port;
 
 /* Coordinates of the FTS-2 ports.  These coordinates should be subtracted
    before flipping / scaling the coordinates and added back on afterwards. */
@@ -2497,24 +2480,21 @@ static AstMapping *sc2ast_make_fts2_portmap( const fts2Port fts_port,
    references explicitly. */
    astBegin;
 
-/* Get the port to use. */
+/* Get the port to use.  The FTS-2 port "in front of" the
+   S4A/S8D subarrays is called Port 1, and the port in front
+   of the S4B/S8C subarrays is called Port 2.  (FTS-2 does
+   not have ports in front of the S4C, S4D, S8A or S8B subarrays.)
+   When the telescope is tracking the source with one of these
+   subarrays/ports, the other subarray will "see" a mirrored image
+   of the source through that same port.  So we need to use the
+   coordinates of Port 1 if the subarray is in Port 1 x-or we
+   are creating the Mapping for the image. */
    if( (subnum == S4A || subnum == S8D) != (fts_port == FTS_IMAGE) ){
-      port = 1;
-   } else {
-      port = 2;
-   }
-
-/* Invert the choice if required. */
-   if( invert ) port = 3 - port;
-
-/* Get the required ShiftMap for the selected port. */
-   if( port == 1 ){
       fts_shiftmap = astShiftMap( 2, fts_port_1, " " );
-      ident = "port1map";
    } else {
       fts_shiftmap = astShiftMap( 2, fts_port_2, " " );
-      ident = "port2map";
    }
+
    astInvert( fts_shiftmap );
 
    fts_flipmap = astMatrixMap( 2, 2, 0, fts_flip, " " );
@@ -2533,7 +2513,7 @@ static AstMapping *sc2ast_make_fts2_portmap( const fts2Port fts_port,
 
 /* Set the Ident attribute for the returned Mapping so that the
    sc2ast_ftsport2 function can identify it within the total Mapping. */
-   astSetC( result, "Ident", ident );
+   astSetC( result, "Ident", "ftsportmap" );
 
 /* Export the returned pointer from the current AST context, and then end
    the context so that all other AST objects references created within this
