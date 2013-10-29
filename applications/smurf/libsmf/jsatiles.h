@@ -34,7 +34,8 @@ void smf_jsatiling( smf_inst_t instrument, smfJSATiling *jsatiling, int *status 
 AstFitsChan *smf_jsatileheader( int itile, smfJSATiling *jsatiling, int local_origin, int *status );
 int smf_jsatilexy2i( int xt, int yt, smfJSATiling *jsatiling, int *status );
 void smf_jsatile( int itile, smfJSATiling *jsatiling, int local_origin,
-AstFitsChan **fc, AstFrameSet **fs, AstRegion **region, int lbnd[2], int ubnd[2], int *status );
+                  AstFitsChan **fc, AstFrameSet **fs, AstRegion **region,
+                  int lbnd[2], int ubnd[2], int *status );
 void smf_jsatilei2xy( int itile, smfJSATiling *jsatiling, int *xt, int *yt, int *status );
 int *smf_jsatiles_region( AstRegion *region, smf_inst_t instrument, int *ntile, int *status );
 int *smf_jsatiles_data( Grp *igrp, size_t size, int *ntile, int *status );
