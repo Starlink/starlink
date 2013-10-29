@@ -170,7 +170,7 @@ int *smf_jsatiles_data( Grp *igrp, size_t size, int *ntile, int *status ){
    corresponds to a single tile. The current Frame is ICRS (RA,Dec) and
    the base Frame is grid coords in which each grid pixel corresponds to
    a single tile. */
-         smf_jsatile( 0, &skytiling, 0, NULL, &fs, NULL, lbnd, ubnd, status );
+         smf_jsatile( -1, &skytiling, 0, NULL, &fs, NULL, lbnd, ubnd, status );
 
 /* Allocate an image with one pixel for each tile, and fill it with
    zeros. */

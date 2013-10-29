@@ -133,7 +133,7 @@ int *smf_jsatiles_region( AstRegion *region, smf_inst_t instrument,
    corresponds to a single tile. The current Frame is ICRS (RA,Dec) and
    the base Frame is grid coords in which each grid pixel corresponds to
    a single tile. */
-   smf_jsatile( 0, &skytiling, 0, NULL, &fs, NULL, lbnd, ubnd, status );
+   smf_jsatile( -1, &skytiling, 0, NULL, &fs, NULL, lbnd, ubnd, status );
 
 /* If the supplied Region is 3-dimensional, remove the third axis, which
    is assumed to be a spectral axis. */

@@ -5077,7 +5077,7 @@ package @PACKAGE@ {
                 type _INTEGER
                 access READ
                 ppath CURRENT
-                prompt {One-based tile index}
+                prompt {Zero-based tile index}
                 helpkey *
             }
 

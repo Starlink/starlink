@@ -75,7 +75,7 @@
 *        "rxa", "rxwd" and "rxwb".
 *     ITILE = _INTEGER (Read)
 *        The index of the tile about which information is required. The
-*        first tile has index 1. The  largest allowed tile index is
+*        first tile has index 0. The  largest allowed tile index is
 *        always returned in output parameter MAXTILE. If a null (!)
 *        value is supplied for ITILE, the MAXTILE parameter is still
 *        written, but the command will then exit immediately without
@@ -280,7 +280,7 @@ void smurf_tileinfo( int *status ) {
    smf_jsatiling( instrument, &skytiling, status );
 
 /* Return the maximum tile index. */
-   parPut0i( "MAXTILE", skytiling.ntiles, status );
+   parPut0i( "MAXTILE", skytiling.ntiles - 1, status );
 
 /* Abort if an error has occurred. */
    if( *status != SAI__OK ) goto L999;
@@ -299,7 +299,7 @@ void smurf_tileinfo( int *status ) {
 /* Otherwise, create a FrameSet describing the whole sky in which each
    pixel corresponds to a single tile. */
    } else {
-      smf_jsatile( 0, &skytiling, 0, NULL, &fs, NULL, lbnd, ubnd, status );
+      smf_jsatile( -1, &skytiling, 0, NULL, &fs, NULL, lbnd, ubnd, status );
 
 /* Change the bounds of the output NDF. */
       ndfSbnd( 2, lbnd, ubnd, indf3, status );
@@ -336,9 +336,9 @@ void smurf_tileinfo( int *status ) {
 /* Abort if an error has occurred. */
    if( *status != SAI__OK ) goto L999;
 
-/* Get the one-based index of the required tile. If a null value is
+/* Get the zero-based index of the required tile. If a null value is
    supplied, annull the error and skip to the end. */
-   parGdr0i( "ITILE", 0, 1, skytiling.ntiles, 0, &itile, status );
+   parGdr0i( "ITILE", 0, 0, skytiling.ntiles - 1, 0, &itile, status );
    if( *status == PAR__NULL ) {
        errAnnul( status );
        goto L999;
@@ -350,8 +350,8 @@ void smurf_tileinfo( int *status ) {
 /* Display the tile number. */
    msgBlank( status );
    msgSeti( "ITILE", itile );
-   msgSeti( "MAXTILE", skytiling.ntiles );
-   msgOut( " ", "   Tile ^ITILE (of ^MAXTILE):", status );
+   msgSeti( "NTILES", skytiling.ntiles );
+   msgOut( " ", "   Tile ^ITILE (of ^NTILES):", status );
 
 /* Get the FITS header, FrameSet and Region defining the tile, and the tile
    bounds in pixel indices. */

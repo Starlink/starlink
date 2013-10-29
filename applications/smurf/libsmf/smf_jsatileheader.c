@@ -18,7 +18,7 @@
 
 *  Arguments:
 *     itile = int (Given)
-*        The one-based tile index, or zero for the whole sky.
+*        The zero-based tile index, or -1 for the whole sky.
 *     skytiling = smfJSATiling * (Given)
 *        Pointer to a structure holding parameters describing the tiling
 *        scheme used for the required JCMT instrument, as returned by
@@ -34,7 +34,7 @@
 *  Description:
 *     This function returns a FITS header describing a specified sky tile
 *     holding data from a specified JCMT instrument (or, if "itile" is
-*     0, a FITS header describing the whole collection of tiles).
+*     -1, a FITS header describing the whole collection of tiles).
 *
 *     The whole sky is covered by an HPX (healpix) projection containing
 *     12 basic facets,the reference point (native lon.=0, native lat.=0)
@@ -152,9 +152,9 @@ AstFitsChan *smf_jsatileheader( int itile, smfJSATiling *skytiling,
 /* Check inherited status */
    if( *status != SAI__OK ) return fc;
 
-/* If the tile index is zero, produce a header for the whole sky (one
+/* If the tile index is -1, produce a header for the whole sky (one
    pixel per tile). */
-   if( itile == 0 ) {
+   if( itile == -1 ) {
       ng = 5*skytiling->ntpf;
       gx_ref = gy_ref = 0.5*( ng + 1);
       ra_ref = dec_ref = 0.0;
@@ -162,12 +162,12 @@ AstFitsChan *smf_jsatileheader( int itile, smfJSATiling *skytiling,
                       dec_ref, status );
 
 /* Otherwise, check the supplied tile index. */
-   } else if( itile < 1 || itile > skytiling->ntiles ) {
+   } else if( itile < 0 || itile >= skytiling->ntiles ) {
       *status = SAI__ERROR;
       msgSeti( "I", itile );
-      msgSeti( "M", skytiling->ntiles );
+      msgSeti( "M", skytiling->ntiles - 1 );
       errRep( " ", "smf_jsatileheader: Supplied tile index (^I) is "
-              "illegal. Should be in the range 1 to ^M.", status );
+              "illegal. Should be in the range 0 to ^M.", status );
 
 /* If the tile index is good, proceed. */
    } else {
@@ -181,8 +181,8 @@ AstFitsChan *smf_jsatileheader( int itile, smfJSATiling *skytiling,
 /* Convert the supplied tile index into a pair of X and Y offsets that
    give the gaps along the X and Y axes, in tiles, between the bottom left
    tile in the projection plane and the required tile. */
-      fi = ( itile - 1 )/n2;
-      tj = itile - 1 - fi*n2;
+      fi = itile / n2;
+      tj = itile - fi*n2;
       ty = tj/skytiling->ntpf;
       tx = tj - ty*skytiling->ntpf;
       fy = skytiling->ntpf*( ( fi + 1 )/3 );
@@ -265,7 +265,7 @@ AstFitsChan *smf_jsatileheader( int itile, smfJSATiling *skytiling,
          astPutFits( fc, card, 1 );
       }
 
-/* Add the one based tile index into the header. */
+/* Add the zero based tile index into the header. */
       sprintf( card, "JCMTTILE= %d", itile );
       astPutFits( fc, card, 1 );
    }

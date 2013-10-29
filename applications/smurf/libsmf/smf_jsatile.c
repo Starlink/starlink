@@ -19,7 +19,7 @@
 
 *  Arguments:
 *     itile = int (Given)
-*        The one-based index of the tile. Supplying a tile index of zero
+*        The zero-based index of the tile. Supplying a tile index of -1
 *        causes the returned values to cover the whole sky, with a single
 *        grid pixel corresponding to a single tile.
 *     skytiling = smfJSATiling * (Given)

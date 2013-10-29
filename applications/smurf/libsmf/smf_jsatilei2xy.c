@@ -18,7 +18,7 @@
 
 *  Arguments:
 *     itile = int (Given)
-*        The one-based index of the tile.
+*        The zero-based index of the tile.
 *     skytiling = smfJSATiling * (Given)
 *        Pointer to a structure holding parameters describing the tiling
 *        scheme used for the required JCMT instrument, as returned by
@@ -35,7 +35,7 @@
 *  Description:
 *     This function returns offsets along the X (RA) and Y (Dec) axes
 *     (measured as a number of tiles) from the bottom left tile to the
-*     tile with the specified one-based tile index.
+*     tile with the specified zero-based tile index.
 
 *  Authors:
 *     DSB: David S Berry (JAC, UCLan)
@@ -109,13 +109,13 @@ void smf_jsatilei2xy( int itile, smfJSATiling *skytiling, int *xt, int *yt,
    nsq = skytiling->ntpf*skytiling->ntpf;
 
 /* Check the tile index is legal. */
-   if( itile >= 1 && itile <= 12*nsq ){
+   if( itile >= 0 && itile < 12*nsq ){
 
 /* Get the zero-based index of the facet contained the tile. */
-      fi = ( itile - 1 )/nsq;
+      fi = itile / nsq;
 
 /* Get the offset in tiles into this facet of the required tile. */
-      tj = ( itile - 1 ) - fi*nsq;
+      tj = itile - fi*nsq;
 
 /* Within a facet, tiles are stored raster-fashion from bottom left to
    top right. Get the row and column indices (zero-based) of the tile within

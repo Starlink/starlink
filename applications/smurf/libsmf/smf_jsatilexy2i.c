@@ -28,7 +28,7 @@
 *        Pointer to the inherited status variable.
 
 *  Returned Value:
-*     The one-based scalar tile index of the requested tile. VAL__BADI is
+*     The zero-based scalar tile index of the requested tile. VAL__BADI is
 *     returned if no tile has the requested X adn Y offsets.
 
 *  Description:
@@ -143,8 +143,8 @@ int smf_jsatilexy2i( int xt, int yt, smfJSATiling *skytiling, int *status ){
 
 /* Get the scalar index of the tile within the facet. Add this index onto
    the index of the first tile in the facet, to get the index of the
-   required tile. Add an extra one to oncert to one-based. */
-         itile += ty*skytiling->ntpf + tx + 1;
+   required tile. */
+         itile += ty*skytiling->ntpf + tx;
       }
    }
 
