@@ -66,8 +66,11 @@
 *     an RA range of 9h to 15h - the top right corner of the projection
 *     covers the same area on the sky but has no corresponding tile). Facet
 *     zero contains tiles zero to N*N-1, facet one contains tiles N*N to
-*     2*N*N-1, etc. Within a facet tiles are ordered raster fashion from
-*     bottom left to top right.
+*     2*N*N-1, etc. Within a facet tiles are indexed using the "nested"
+*     scheme described in the HEALPix paper. This starts with pixel
+*     zero in the southern corner of the facet.  The even bits number
+*     the position in the north-east direction and the odd bits number
+*     the position in the north-west direction.
 
 *  Authors:
 *     DSB: David S Berry (JAC, UCLan)

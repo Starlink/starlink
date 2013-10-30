@@ -65,8 +65,11 @@
 *     paper (Gorsky et. al. 2005 ApJ 622, 759) (note that the facet six is
 *     split equally into two triangles, one at the bottom left and one at
 *     the top right of the projection plane). Within a facet, tiles are
-*     also counted raster-fashion from bottom left to top right. All the
-*     tiles in the first facet come first, followed by all the tiles in
+*     indexed using the "nested" scheme described in the HEALPix paper.
+*     This starts with pixel zero in the southern corner of the facet.
+*     The even bits number the position in the north-east direction and
+*     the odd bits number the position in the north-west direction. All
+*     the tiles in the first facet come first, followed by all the tiles in
 *     the second facet, etc.
 *
 *     This is a fairly complex scheme. To help understanding, the

@@ -95,7 +95,12 @@
 
 #include "libsmf/jsatiles.h"   /* Move this to smf_typ.h and smf.h when done */
 
-
+/* "Binary Magic Numbers" for selecting alternate bits. */
+#define SELECT_MAGIC_0 0x55555555;
+#define SELECT_MAGIC_1 0x33333333;
+#define SELECT_MAGIC_2 0x0F0F0F0F;
+#define SELECT_MAGIC_3 0x00FF00FF;
+#define SELECT_MAGIC_4 0x0000FFFF;
 
 
 void smf_jsatilei2xy( int itile, smfJSATiling *skytiling, int *xt, int *yt,
@@ -130,11 +135,23 @@ void smf_jsatilei2xy( int itile, smfJSATiling *skytiling, int *xt, int *yt,
 /* Get the offset in tiles into this facet of the required tile. */
       tj = itile - fi*nsq;
 
-/* Within a facet, tiles are stored raster-fashion from bottom left to
-   top right. Get the row and column indices (zero-based) of the tile within
-   the facet. */
-      yj = tj/skytiling->ntpf;
-      xj = tj - yj*skytiling->ntpf;
+/* Within a facet, tiles are stored in nested order from the southern
+   corner. Get the row and column indices (zero-based) of the tile within
+   the facet.  xj and yj come from the even and odd bits respectively.
+   The bit selection method is the reverse of the "Binary Magic Numbers"
+   method mentioned in smf_jsatilexy2i. */
+      xj = tj & SELECT_MAGIC_0;
+      yj = (tj >> 1) & SELECT_MAGIC_0;
+
+      xj = (xj | (xj >> 1)) & SELECT_MAGIC_1;
+      xj = (xj | (xj >> 2)) & SELECT_MAGIC_2;
+      xj = (xj | (xj >> 4)) & SELECT_MAGIC_3;
+      xj = (xj | (xj >> 8)) & SELECT_MAGIC_4;
+
+      yj = (yj | (yj >> 1)) & SELECT_MAGIC_1;
+      yj = (yj | (yj >> 2)) & SELECT_MAGIC_2;
+      yj = (yj | (yj >> 4)) & SELECT_MAGIC_3;
+      yj = (yj | (yj >> 8)) & SELECT_MAGIC_4;
 
 /* Get the offsets, in facets, along X and Y, from the bottom left tile of
    the first facet to the bottom left tile of the requested facet. Note that
@@ -147,8 +164,9 @@ void smf_jsatilei2xy( int itile, smfJSATiling *skytiling, int *xt, int *yt,
       fy = fc + ((11 - fi) / 8);
 
 /* Add the offsets to the facet onto the offsets within the facet to get
-   the total offsets. */
-      *xt = fx * skytiling->ntpf + xj;
+   the total offsets. xj is measured north-east (left) and yj is measured
+   north-west (up). */
+      *xt = (fx + 1) * skytiling->ntpf - xj - 1;
       *yt = fy * skytiling->ntpf + yj;
 
       if (fi_) {

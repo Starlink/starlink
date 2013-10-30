@@ -81,7 +81,11 @@
 
 #include "libsmf/jsatiles.h"   /* Move this to smf_typ.h and smf.h when done */
 
-
+/* "Binary Magic Numbers" for interleaving bits. */
+#define INTERLEAVE_MAGIC_1 0x00FF00FF
+#define INTERLEAVE_MAGIC_2 0x0F0F0F0F
+#define INTERLEAVE_MAGIC_3 0x33333333
+#define INTERLEAVE_MAGIC_4 0x55555555
 
 
 int smf_jsatilexy2i( int xt, int yt, smfJSATiling *skytiling, int *status ){
@@ -142,14 +146,29 @@ int smf_jsatilexy2i( int xt, int yt, smfJSATiling *skytiling, int *status ){
 /* Get the scalar zero-based index of the first tile within the facet. */
          itile = fi*skytiling->ntpf*skytiling->ntpf;
 
-/* Get the (x,y) offsets of the tile into the facet. */
-         tx = xt - fx*skytiling->ntpf;
+/* Get the (x,y) offsets of the tile into the facet. tx is measured
+   north-east (left) and ty is measured north-west (up). */
+         tx = (fx + 1)*skytiling->ntpf - xt - 1;
          ty = yt - fy*skytiling->ntpf;
 
-/* Get the scalar index of the tile within the facet. Add this index onto
+/* Get the scalar index of the tile within the facet. Interleave the bits
+   of tx and ty (tx gives the even bits) and add this index onto
    the index of the first tile in the facet, to get the index of the
-   required tile. */
-         itile += ty*skytiling->ntpf + tx;
+   required tile. Interleaving is performed using the "Binary
+   Magic Numbers" method with code based on the public domain
+   example (collection (C) 1997-2005 Sean Eron Anderson) available at:
+   http://graphics.stanford.edu/~seander/bithacks.html#InterleaveBMN */
+         tx = (tx | (tx << 8)) & INTERLEAVE_MAGIC_1;
+         tx = (tx | (tx << 4)) & INTERLEAVE_MAGIC_2;
+         tx = (tx | (tx << 2)) & INTERLEAVE_MAGIC_3;
+         tx = (tx | (tx << 1)) & INTERLEAVE_MAGIC_4;
+
+         ty = (ty | (ty << 8)) & INTERLEAVE_MAGIC_1;
+         ty = (ty | (ty << 4)) & INTERLEAVE_MAGIC_2;
+         ty = (ty | (ty << 2)) & INTERLEAVE_MAGIC_3;
+         ty = (ty | (ty << 1)) & INTERLEAVE_MAGIC_4;
+
+         itile += tx | (ty << 1);
       }
    }
 
