@@ -37,6 +37,7 @@ STAR_CNF_COMPATIBLE_SYMBOLS
 dnl Link against fortran libraries. Don't want the Fortran main
 dnl in this, so remove the known libraries that contain it 
 dnl (g77/frtbegin and gfortran/gfortranbegin).
+AC_PROG_FC
 AC_FC_LIBRARY_LDFLAGS
 FCLIBS=`echo $FCLIBS | sed 's:\ \-l.*begin\ : :g'`
 
