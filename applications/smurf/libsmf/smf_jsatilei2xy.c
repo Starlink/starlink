@@ -125,7 +125,7 @@ void smf_jsatilei2xy( int itile, smfJSATiling *skytiling, int *xt, int *yt,
 
 /* Get the offsets, in tiles, along X and Y, from the bottom left tile of
    the first facet to the bottom left tile of the requested facet. */
-      fy = ( ( fi + 1 )/3 )*skytiling->ntpf + 1;
+      fy = ( ( fi + 1 )/3 )*skytiling->ntpf;
       fx = fy + ( ( fi + 1 )%3 - 1 )*skytiling->ntpf;
 
 /* Add the offsets to the facet onto the offsets within the facet to get
