@@ -64,8 +64,6 @@ extractorsupport_DATA = \
 #  EXTRACTOR needs the libextractor.a and libfits.a libraries.
 
 libextractor.a: extract/src/libextractor.a
-
-extract/src/libextractor.a:
 	(cd extract ;\
 	export INSTALL; unset INSTALL;\
 	export SHELL; unset SHELL;\
@@ -78,8 +76,6 @@ extract/src/libextractor.a:
 #  SExtractor runs to completion.
 
 sex$(EXEEXT): sextractor/src/sex$(EXEEXT)
-
-sextractor/src/sex$(EXEEXT):
 	(cd sextractor ;\
         export INSTALL; unset INSTALL;\
         export SHELL; unset SHELL;\
