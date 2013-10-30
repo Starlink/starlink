@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     void smf_jsatilei2xy( int itile, smfJSATiling *skytiling, int *xt,
-*                           int *yt, int *status )
+*                           int *yt, int *fi, int *status )
 
 *  Arguments:
 *     itile = int (Given)
@@ -29,6 +29,10 @@
 *     yt = int * (Returned)
 *        Address of the integer in which to store the zero-based index of
 *        the tile in the Y (Dec) direction.
+*     fi = int * (Returned)
+*        Address in which to store the zero-based facet (base resolution
+*        HEALPix element), or NULL if not required.  Also controls
+*        handling of the lower left tile (see Description).
 *     status = int * (Given)
 *        Pointer to the inherited status variable.
 
@@ -36,6 +40,14 @@
 *     This function returns offsets along the X (RA) and Y (Dec) axes
 *     (measured as a number of tiles) from the bottom left tile to the
 *     tile with the specified zero-based tile index.
+*
+*     If a non-NULL pointer fi is supplied then the facet number
+*     will be stored in the integer to which it refers.  If this
+*     pointer is NULL then the lower left tile is split so that
+*     half of it appears at the upper right corner.  This makes the
+*     assumption that code which is interested in the facet number
+*     will deal with the lower left tile itself.  If necessary
+*     this behaviour could be controlled by a separate parameter.
 
 *  Authors:
 *     DSB: David S Berry (JAC, UCLan)
@@ -87,7 +99,7 @@
 
 
 void smf_jsatilei2xy( int itile, smfJSATiling *skytiling, int *xt, int *yt,
-                      int *status ){
+                      int *fi_, int *status ){
 
 /* Local Variables: */
    int fi;
@@ -133,10 +145,13 @@ void smf_jsatilei2xy( int itile, smfJSATiling *skytiling, int *xt, int *yt,
       *xt = fx + xj;
       *yt = fy + yj;
 
+      if (fi_) {
+        *fi_ = fi;
+      }
 /* The facet with the lowest tile indices is split between the bottom
    left and top right corners of the grid. Move tiles from bottom left
-   to top right. */
-      if( *yt < skytiling->ntpf - 1 && *xt < skytiling->ntpf - 1 - *yt ) {
+   to top right, but only in non fi-returning mode. */
+      else if( *yt < skytiling->ntpf - 1 && *xt < skytiling->ntpf - 1 - *yt ) {
          *xt += 4*skytiling->ntpf;
          *yt += 4*skytiling->ntpf;
       }
@@ -145,8 +160,10 @@ void smf_jsatilei2xy( int itile, smfJSATiling *skytiling, int *xt, int *yt,
    } else if( *status == SAI__OK ) {
       *status = SAI__ERROR;
       msgSeti( "I", itile );
+      msgSeti( "M", skytiling->ntiles - 1 );
       errRep( "", "smf_jsatilei2xy: Illegal tile index (^I) supplied "
-              "(programming error).", status );
+              "(programming error) should be in the range 0 to ^M.",
+              status );
    }
 
 }

@@ -138,14 +138,8 @@ AstFitsChan *smf_jsatileheader( int itile, smfJSATiling *skytiling,
    double gy_cen;     /* Y grid coord at tile centre */
    double ra_cen;     /* RA at tile centre */
    int fi;            /* Zero-based facet index in range [0,11] */
-   int fx;            /* X offset to the first tile in the facet */
-   int fy;            /* Y offset to the first tile in the facet */
    int m;             /* The number of pixels along one edge of a facet */
    int ng;            /* The number of tile along one edge of the FITS grid */
-   int n2;            /* Number of tiles in a facet */
-   int tj;            /* Zero-based index of tile within facet [0,N^2-1] */
-   int tx;            /* X offset from facet's first tile to requested tile */
-   int ty;            /* Y offset from facet's first tile to requested tile */
    int xt;            /* X offset to the requested tile */
    int yt;            /* Y offset to the requested tile */
 
@@ -161,34 +155,16 @@ AstFitsChan *smf_jsatileheader( int itile, smfJSATiling *skytiling,
       fc = smfMakeFC( ng, ng, skytiling->ntpf, 1, gx_ref, gy_ref, ra_ref,
                       dec_ref, status );
 
-/* Otherwise, check the supplied tile index. */
-   } else if( itile < 0 || itile >= skytiling->ntiles ) {
-      *status = SAI__ERROR;
-      msgSeti( "I", itile );
-      msgSeti( "M", skytiling->ntiles - 1 );
-      errRep( " ", "smf_jsatileheader: Supplied tile index (^I) is "
-              "illegal. Should be in the range 0 to ^M.", status );
-
-/* If the tile index is good, proceed. */
    } else {
-
-/* Get the total number of tiles per HEALPix facet. */
-      n2 = skytiling->ntpf*skytiling->ntpf;
-
 /* Get the number of pixels along one edge of a facet. */
       m = skytiling->ntpf*skytiling->ppt;
 
 /* Convert the supplied tile index into a pair of X and Y offsets that
    give the gaps along the X and Y axes, in tiles, between the bottom left
-   tile in the projection plane and the required tile. */
-      fi = itile / n2;
-      tj = itile - fi*n2;
-      ty = tj/skytiling->ntpf;
-      tx = tj - ty*skytiling->ntpf;
-      fy = skytiling->ntpf*( ( fi + 1 )/3 );
-      fx = fy + skytiling->ntpf*( ( ( fi + 1 ) % 3 ) - 1  );
-      xt = fx + tx;
-      yt = fy + ty;
+   tile in the projection plane and the required tile. This function
+   includes a check that the tile number is valid. */
+      smf_jsatilei2xy(itile, skytiling, &xt, &yt, &fi, status);
+      if( *status != SAI__OK ) return fc;
 
 /* Note the RA at the reference point. This is 0 hours except for tiles
    within the first facet. */

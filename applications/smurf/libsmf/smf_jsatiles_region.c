@@ -247,7 +247,7 @@ int *smf_jsatiles_region( AstRegion *region, smf_inst_t instrument,
    tested in their turn, giving them a value of -1 to indicate that they
    have not yet been tested to see if they overlap the supplied Region.
    Ignore adjoining tiles that are already in the keyMap. */
-            smf_jsatilei2xy( itile, &skytiling, &xt, &yt, status );
+            smf_jsatilei2xy( itile, &skytiling, &xt, &yt, NULL, status );
             for( ineb = 0; ineb < 4; ineb++ ) {
                itile2 = smf_jsatilexy2i( xt + xoff[ ineb ], yt + yoff[ ineb ],
                                          &skytiling, status );
