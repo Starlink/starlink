@@ -464,7 +464,7 @@ void smf_get_cleanpar( AstKeyMap *keymap, const char *qualifier,
     *filt_order = 0;
     key = smf_keyname( keymap, "FILT_ORDER", qualifier, buf, sizeof( buf ), status );
     astMapGet0I( keymap, key, filt_order );
-    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": %s=%f", status, key,
+    msgOutiff( MSG__DEBUG, "", FUNC_NAME ": %s=%d", status, key,
                *filt_order );
   }
 
