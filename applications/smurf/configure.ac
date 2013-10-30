@@ -2,14 +2,14 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT(smurf, 1.5.0, scuba2dr@phas.ubc.ca)
+AC_INIT([smurf],[1.5.0],[scuba2dr@phas.ubc.ca])
 PACKAGE_UPCASE='SMURF'
 AC_DEFINE( [PACKAGE_UPCASE], "SMURF", [Upper cased package name] )
 AC_SUBST(PACKAGE_UPCASE)
 
 dnl    Require autoconf-2.50 at least
-AC_PREREQ(2.50)
-AM_INIT_AUTOMAKE(1.8.2-starlink)
+AC_PREREQ([2.69])
+AM_INIT_AUTOMAKE([1.8.2-starlink subdir-objects])
 
 dnl    Sanity-check: name a file in the source directory -- if this
 dnl    isn't found then configure will complain
@@ -24,7 +24,7 @@ AC_DEFINE_UNQUOTED([PACKAGE_VERSION_INTEGER], $PACKAGE_VERSION_INTEGER,
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_CC
 AC_PROG_FC
-AC_PROG_LIBTOOL
+LT_INIT
 
 STAR_MONOLITHS
 STAR_CHECK_PROGS( ifd2star )
@@ -60,7 +60,7 @@ if test "$GCC" = "yes"; then
     AC_MSG_CHECKING([whether ${CC} accepts -fstack-protector])
     fsp_old_cflags="$CFLAGS"
     CFLAGS="$CFLAGS -fstack-protector -pedantic-errors"
-    AC_TRY_COMPILE(,,,[have_fsp=no])
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[]])],[],[have_fsp=no])
     echo $have_fsp
     if test "$have_fsp" = "no"; then
         CFLAGS="$fsp_old_cflags $SMURF_CFLAGS"
