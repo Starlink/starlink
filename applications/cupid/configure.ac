@@ -24,6 +24,7 @@ STAR_DEFAULTS(per-package-dirs)
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_CC
 AC_PROG_CPP
+AC_PROG_FC
 AC_PROG_LIBTOOL
 
 dnl    Setup for creating a monolith.
