@@ -7,10 +7,10 @@ dnl   1.5.  It should work with autoconf versions 2.50 or better, and
 dnl   automake 1.6 or better.
 
 dnl   Initialisation: package name and version number
-AC_INIT(ast, 7.3.3, starlink@jiscmail.ac.uk)
+AC_INIT([ast],[7.3.3],[starlink@jiscmail.ac.uk])
 
 dnl   Require autoconf-2.50 at least
-AC_PREREQ(2.50)
+AC_PREREQ([2.69])
 dnl   Require Starlink automake
 AM_INIT_AUTOMAKE(1.8.2-starlink)
 
@@ -24,8 +24,7 @@ STAR_DEFAULTS
 #   preprocesor macro HAVE_STAR_MEM_H.
 AC_ARG_WITH(
       [starmem],
-      AC_HELP_STRING([--with-starmem],
-                     [use starmem library for memory management]),
+      AS_HELP_STRING([--with-starmem],[use starmem library for memory management]),
       AC_DEFINE([HAVE_STAR_MEM_H],[1],[Use the starmem library for memory management]),
 )
 
@@ -34,8 +33,7 @@ AC_ARG_WITH(
 #   down memory leaks, etc.
 AC_ARG_WITH(
       [memdebug],
-      AC_HELP_STRING([--with-memdebug],
-                     [enable AST memory leak debugging functions]),
+      AS_HELP_STRING([--with-memdebug],[enable AST memory leak debugging functions]),
       AC_DEFINE([MEM_DEBUG],[1],[enable AST memory leak debugging functions in memory.c]),
 )
 
@@ -64,7 +62,7 @@ AM_CONDITIONAL(EXTERNAL_PAL, test x$external_pal = x1)
 #   Checks for programs
 AC_PROG_CC
 AC_PROG_CPP
-AC_PROG_LIBTOOL
+LT_INIT
 AC_PROG_LN_S
 
 #   If --with-pic=no is set we should honour that.
@@ -107,6 +105,7 @@ AC_CHECK_SIZEOF(long long)
 
 #   ast_link needs to be able to link against the Fortran runtime if
 #   necessary
+AC_PROG_FC
 AC_FC_LIBRARY_LDFLAGS
 
 #   Find an absolute path to the Perl binary, augmenting the path with the
