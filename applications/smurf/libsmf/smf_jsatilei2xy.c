@@ -103,6 +103,7 @@ void smf_jsatilei2xy( int itile, smfJSATiling *skytiling, int *xt, int *yt,
 
 /* Local Variables: */
    int fi;
+   int fc;
    int fx;
    int fy;
    int nsq;
@@ -135,15 +136,20 @@ void smf_jsatilei2xy( int itile, smfJSATiling *skytiling, int *xt, int *yt,
       yj = tj/skytiling->ntpf;
       xj = tj - yj*skytiling->ntpf;
 
-/* Get the offsets, in tiles, along X and Y, from the bottom left tile of
-   the first facet to the bottom left tile of the requested facet. */
-      fy = ( ( fi + 1 )/3 )*skytiling->ntpf;
-      fx = fy + ( ( fi + 1 )%3 - 1 )*skytiling->ntpf;
+/* Get the offsets, in facets, along X and Y, from the bottom left tile of
+   the first facet to the bottom left tile of the requested facet. Note that
+   the divisions here are integer divisions.  This tile numbering is
+   illustrated in Figure 4 of the paper "Mapping on the HEALPix grid"
+   (Calabretta and Roukema 2007 MNRAS 381 865).
+   */
+      fc = (13 - fi + ((fi / 4) % 2)) % 4;
+      fx = fc + fi / 8;
+      fy = fc + ((11 - fi) / 8);
 
 /* Add the offsets to the facet onto the offsets within the facet to get
    the total offsets. */
-      *xt = fx + xj;
-      *yt = fy + yj;
+      *xt = fx * skytiling->ntpf + xj;
+      *yt = fy * skytiling->ntpf + yj;
 
       if (fi_) {
         *fi_ = fi;

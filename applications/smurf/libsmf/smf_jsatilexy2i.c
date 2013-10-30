@@ -93,6 +93,7 @@ int smf_jsatilexy2i( int xt, int yt, smfJSATiling *skytiling, int *status ){
    int tx;
    int fy;
    int fx;
+   int fxy;
 
 /* Initialise the returned tile index. */
    itile = VAL__BADI;
@@ -131,8 +132,12 @@ int smf_jsatilexy2i( int xt, int yt, smfJSATiling *skytiling, int *status ){
           fx >= fy - 1 && fx <= fy + 1 ) {
 
 /* Get the scalar zero-based index of the facet within the collection of
-   12 facets. */
-         fi = 2*fy + fx;
+   12 facets.  In terms of the equations in the HEALPix paper, (fx - fy)
+   is (f_row - 1) [equation 10] and the values of (fx + fy) are a
+   permutation of the values of F_2 [equation 12].  Note that the division
+   here is an integer division. */
+         fxy = fx + fy;
+         fi = (5 - (fxy / 2) + ((fxy + 1) % 2)) % 4 + 4 * (1 + fx - fy);
 
 /* Get the scalar zero-based index of the first tile within the facet. */
          itile = fi*skytiling->ntpf*skytiling->ntpf;

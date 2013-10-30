@@ -38,8 +38,8 @@
 *
 *     The whole sky is covered by an HPX (HEALPix) projection containing
 *     12 basic facets,the reference point (native lon.=0, native lat.=0)
-*     of the projection is put at (RA,Dec)=(0,0) [except for the first
-*     facet which has a reference point of (12h,0)], so that native coords
+*     of the projection is put at (RA,Dec)=(0,0) [except for facet six
+*     which has a reference point of (12h,0)], so that native coords
 *     are equivalent to celestial coords. The projection plane is rotated
 *     by 45 degrees so that the edges of each facet are parallel to X and
 *     Y (as in Fig.3 of the A&A paper "Mapping on the HEALPix grid" by
@@ -60,8 +60,8 @@
 *     projection parameters PVi_1 and PVi_2 for longitude axis "i"). The
 *     point actually used is the centre centre of the requested tile.
 *
-*     HEALPix facets are numbered from 0 to 11 raster-fashion from bottom
-*     left of the projection plane to top right (note, facet zero
+*     HEALPix facets are numbered from 0 to 11 as defined in the HEALPix
+*     paper (Gorsky et. al. 2005 ApJ 622, 759) (note, facet six
 *     occupies the bottom left corner of the projection plane and covers
 *     an RA range of 9h to 15h - the top right corner of the projection
 *     covers the same area on the sky but has no corresponding tile). Facet
@@ -167,8 +167,8 @@ AstFitsChan *smf_jsatileheader( int itile, smfJSATiling *skytiling,
       if( *status != SAI__OK ) return fc;
 
 /* Note the RA at the reference point. This is 0 hours except for tiles
-   within the first facet. */
-      if( fi > 0 ) {
+   within facet six. */
+      if( fi != 6 ) {
          ra_ref = 0.0;
 
 /* Get the grid coordinates (within the grid frame of the current tile),
@@ -177,11 +177,11 @@ AstFitsChan *smf_jsatileheader( int itile, smfJSATiling *skytiling,
          gx_ref = 0.5*( 5.0*m + 1.0) - xt*skytiling->ppt;
          gy_ref = 0.5*( 5.0*m + 1.0) - yt*skytiling->ppt;
 
-/* The first facet (i.e bottom right, fi==0) in the projection plane is a
+/* The seventh facet (i.e bottom right, fi==6) in the projection plane is a
    problem because it is split by the ra = 12hours line into two halfs.
    When a WcsMap is used transform (x,y) points in the lower left half of
    this facet, the resulting RA an Dec values will be AST__BAD. To avoid
-   this, we use (ra,dec)=(12h,0) as the reference point for the first
+   this, we use (ra,dec)=(12h,0) as the reference point for the seventh
    facet. Note the RA at the reference point. */
       } else {
          ra_ref = AST__DPI;

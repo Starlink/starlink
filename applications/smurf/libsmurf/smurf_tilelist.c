@@ -54,15 +54,15 @@
 *
 *     The whole sky is covered by an HPX (HEALPix) projection containing
 *     12 basic square facets, the reference point of the projection is put
-*     at (RA,Dec)=(0,0) (except for the first facet that has a reference
+*     at (RA,Dec)=(0,0) (except for facet six that has a reference
 *     point of (12h,0)). The projection plane is rotated by 45 degrees so
 *     that the edges of each facet are parallel to X and Y (as in Fig.3 of
 *     the A&A paper "Mapping on the HEALPix grid" by Calabretta and Roukema).
 *     Each facet is then divided up into NxN tiles, where N is 64 for
 *     SCUBA-2 and 128 for HARP. Each tile is then divided into PxP pixels,
 *     where P is 412 for HARP, 825 for SCUBA-2 850 um, 1650 for SCUBA-2
-*     450 um. Facets are counted raster-fashion from the bottom left to
-*     the top right of the projection plane (except that the first facet is
+*     450 um. Facets are numbered from 0 to 11 as defined in the HEALPix
+*     paper (Gorsky et. al. 2005 ApJ 622, 759) (note that the facet six is
 *     split equally into two triangles, one at the bottom left and one at
 *     the top right of the projection plane). Within a facet, tiles are
 *     also counted raster-fashion from bottom left to top right. All the
