@@ -57,6 +57,8 @@ daocurs () { $DAOPHOT_DIR/daocurs ${1+"$@"}; }
       echo " "
       echo "   DAOPHOT applications are now available -- (Version @PACKAGE_VERSION@)"
       echo " "
+      echo "   Type 'showme sun42' to browse the hypertext documentation."
+      echo " "
 #
 # end
 #

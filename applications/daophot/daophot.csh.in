@@ -51,6 +51,8 @@ alias daocurs $DAOPHOT_DIR/daocurs
       echo " "
       echo "   DAOPHOT applications are now available -- (Version @PACKAGE_VERSION@)"
       echo " "
+      echo "   Type 'showme sun42' to browse the hypertext documentation."
+      echo " "
 #
 # end
 #
