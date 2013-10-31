@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT(daophot, 1.3-5, starlink@jiscmail.ac.uk)
+AC_INIT(daophot, 1.3-6, starlink@jiscmail.ac.uk)
 
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -45,6 +45,6 @@ fi
 STAR_DECLARE_DEPENDENCIES([build], [sae mers pcs ndf psx chr agi gks cnf], [link])
 STAR_LATEX_DOCUMENTATION(sun42)
 
-AC_CONFIG_FILES([Makefile component.xml daophot.csh])
+AC_CONFIG_FILES([Makefile component.xml daophot.csh daophot.sh])
 
 AC_OUTPUT

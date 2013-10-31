@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="daophot" support="U">
-  <version>1.3-5</version>
+  <version>1.3-6</version>
   <path>applications/daophot</path>
   <description>Stellar Photometry Package</description>
   <abstract>

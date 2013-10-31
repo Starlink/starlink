@@ -387,6 +387,7 @@ applications/daophot/daogrey
 applications/daophot/daophot
 applications/daophot/daoplot
 applications/daophot/daophot.csh
+applications/daophot/daophot.sh
 
 applications/datacube/datacube.csh
 applications/datacube/datacube.icl

@@ -32,7 +32,7 @@ DATA_FILES = allstar.opt daophot.opt photo.opt
 ##  and environment variables.  It is listed separately from the public 
 ##  scripts as it is edited by the installation procedure.
 
-STARTUP_SCRIPT = daophot.csh 
+STARTUP_SCRIPT = daophot.csh daophot.sh
 
 ##  List of object library files to be built.
 

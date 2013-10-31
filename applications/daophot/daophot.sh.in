@@ -1,0 +1,63 @@
+#!/bin/bash -f
+#+
+#  Name:
+#     daophot.sh
+#
+#  Purpose:
+#     Start the DAOPHOT system from Unix shell.
+#
+#  Type of Module:
+#     C shell script.
+#
+#  Invocation:
+#     source daophot.sh
+#
+#  Description:
+#     This procedure defines the aliases needed to run
+#     each application monolith or executable.
+#
+#  Notes:
+#     The installation target INSTALL_BIN is set outside of this script,
+#     and edited at install time to reflect the installation location.
+#
+#  Authors:
+#     BLY: M.J.Bly (Starlink, RAL)
+#     TIMJ: Tim Jenness (Cornell)
+#     {enter_new_authors_here}
+#
+#  History:
+#     13-OCT-1994 (BLY);
+#       Original for DAOPHOT
+#     2013-10-30 (TIMJ):
+#       Ported to bash
+#     {enter_changes_here}
+#
+#-
+#
+
+# Make ${1+"$@"} portability feature work on zsh, too.
+test "${ZSH_VERSION+set}" = set && alias -g '${1+"$@"}'='"$@"'
+
+#
+#  Define aliases for the applications.
+
+daophot () { $DAOPHOT_DIR/daophot ${1+"$@"}; }
+
+allstar () { $DAOPHOT_DIR/allstar ${1+"$@"}; }
+
+daogrey () { $DAOPHOT_DIR/daogrey ${1+"$@"}; }
+
+daoplot () { $DAOPHOT_DIR/daaplot ${1+"$@"}; }
+
+daocurs () { $DAOPHOT_DIR/daocurs ${1+"$@"}; }
+
+#
+#  Announce the availability of the DAOPHOT commands.
+#
+      echo " "
+      echo "   DAOPHOT applications are now available -- (Version @PACKAGE_VERSION@)"
+      echo " "
+#
+# end
+#
+

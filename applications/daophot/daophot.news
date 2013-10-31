@@ -1,7 +1,11 @@
 1 DAOPHOT - DAO photometry package
                                                             Expires: **.**.**
 
- This is DAOPHOT v1.3-5.
+ This is DAOPHOT v1.3-6.
+
+ Change at v1.3-6
+
+   o Enable bash versions of commands
 
  Changes at v1.3-5:
 
