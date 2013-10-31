@@ -233,13 +233,13 @@ fi
 
 #
 #  CURSA
-if test -f ${bindir}/cursa/cursa.csh; then
+if test -f ${bindir}/cursa/cursa.sh; then
    export CURSA_DIR=${bindir}/cursa
 fi
 
 #  DATACUBE
 
-if test -f ${bindir}/datacube/datacube.csh; then
+if test -f ${bindir}/datacube/datacube.sh; then
    export DATACUBE_DIR=${bindir}/datacube
    export DATACUBE_HELP=${starhelpdir}/datacube/datacube
 fi
@@ -267,7 +267,7 @@ fi
 
 #  FIGARO
 
-if test -f ${bindir}/figaro/figaro.csh; then
+if test -f ${bindir}/figaro/figaro.sh; then
    export FIG_DIR=${bindir}/figaro
    export FIG_HELP=${starhelpdir}/figaro/figaro
    export FIG_HTML=${exec_prefix}/docs/sun86.htx
@@ -519,7 +519,7 @@ fi
 #   Cursa
 #
 
-if test -f ${bindir}/cursa/cursa.csh; then
+if test -f ${bindir}/cursa/cursa.sh; then
   cursa () { . $CURSA_DIR/cursa.sh; }
   cursasetup () { . $CURSA_DIR/cursa.sh; }
 else
