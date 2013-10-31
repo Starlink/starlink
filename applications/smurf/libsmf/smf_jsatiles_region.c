@@ -218,7 +218,7 @@ int *smf_jsatiles_region( AstRegion *region, smf_inst_t instrument,
                       status );
 
 /* See if this Region overlaps the user supplied region. Set the value of
-   the KeyMap entry to +1 or -1 accordingly. */
+   the KeyMap entry to +1 or 0 accordingly. */
          overlap = astOverlap( tregion, region );
          if( overlap == 0 ) {
             if( *status == SAI__OK ) {
