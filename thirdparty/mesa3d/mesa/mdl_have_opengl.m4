@@ -159,9 +159,8 @@ dnl bugfix: dont forget to cache this variables, too
 
 dnl Do this outside of the cache check. That cannot have side-effects in case
 dnl the cache check succeeds and the code is not ran.
-  if test "$mdl_cv_have_OpenGL" = "yes"; then
-      AC_SUBST(GL_CFLAGS)
-      AC_SUBST(GL_LIBS)
-  fi
+  AC_SUBST([GL_CFLAGS])
+  AC_SUBST([GL_LIBS])
+
 ])
 dnl endof bugfix -ainan
