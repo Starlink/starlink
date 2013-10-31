@@ -212,6 +212,7 @@ void smurf_tileinfo( int *status ) {
    double gx[ 9 ];
    double gy[ 9 ];
    double maxdist;
+   double norm_radec[2]; /* array to pass to astNorm */
    double point1[ 2 ];
    double point2[ 2 ];
    double ra[ 9 ];
@@ -418,9 +419,17 @@ void smurf_tileinfo( int *status ) {
 
    astTran2( fs, 9, gx, gy, 1, ra, dec );
 
-/* Format the central RA and Dec. and display. */
-   msgSetc( "RACEN",  astFormat( fs, 1, ra[ 0 ] ));
-   msgSetc( "DECCEN",  astFormat( fs, 2, dec[ 0 ] ));
+/* Format the central RA and Dec. and display.
+   Call astNorm on the coordinates provided that the frame set has the
+   correct number of axes.  (Which it should as it comes from
+   smf_jsatile.) */
+   norm_radec[0] = ra[0];
+   norm_radec[1] = dec[0];
+   if (astGetI(fs, "Naxes") == 2) {
+      astNorm(fs, norm_radec);
+   }
+   msgSetc( "RACEN",  astFormat( fs, 1, norm_radec[ 0 ] ));
+   msgSetc( "DECCEN",  astFormat( fs, 2, norm_radec[ 1 ] ));
    msgOut( " ", "      Centre (ICRS): RA=^RACEN DEC=^DECCEN", status );
 
 /* Write the tile centre ra and dec in radians to the output parameters. */
