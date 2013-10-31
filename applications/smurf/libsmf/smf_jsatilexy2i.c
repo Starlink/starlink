@@ -130,9 +130,11 @@ int smf_jsatilexy2i( int xt, int yt, smfJSATiling *skytiling, int *status ){
          yt -= 4*skytiling->ntpf;
       }
 
-/* Check they are within bounds. */
-      if( fx >= 0 && fx < 5 &&
-          fy >= 0 && fy < 5 &&
+/* Check they are within bounds, but check that xt >= 0 and yt >=0
+   since testing fx >= and fy >= 0 will miss fx or fy betwen -1 and 0
+   since they are integers. */
+      if( xt >= 0 && fx < 5 &&
+          yt >= 0 && fy < 5 &&
           fx >= fy - 1 && fx <= fy + 1 ) {
 
 /* Get the scalar zero-based index of the facet within the collection of
