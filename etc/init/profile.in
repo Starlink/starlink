@@ -237,6 +237,12 @@ if test -f ${bindir}/cursa/cursa.sh; then
    export CURSA_DIR=${bindir}/cursa
 fi
 
+#
+#  DAOPHOT
+if test -f ${bindir}/daophot/daophot; then
+   export DAOPHOT_DIR=${bindir}/daophot
+fi
+
 #  DATACUBE
 
 if test -f ${bindir}/datacube/datacube.sh; then
@@ -527,6 +533,19 @@ else
   cursasetup () { ${STARLINK_DIR}/etc/notinst cursa; }
 fi
 
+#
+#  DAOPHOT
+#
+
+if test -f ${bindir}/daophot/daophot.sh; then
+  daostart () { . $DAOPHOT_DIR/daophot.sh; }
+  daophot () { . $DAOPHOT_DIR/daophot.sh; }
+  daophotsetup () { . $DAOPHOT_DIR/daophot.sh; }
+else
+  daostart () { ${STARLINK_DIR}/etc/notinst daophot; }
+  daophot () { ${STARLINK_DIR}/etc/notinst daophot; }
+  daophotsetup () { ${STARLINK_DIR}/etc/notinst daophot; }
+fi
 
 #  DATACUBE
 
