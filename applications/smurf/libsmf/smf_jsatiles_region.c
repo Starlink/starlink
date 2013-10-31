@@ -187,8 +187,10 @@ int *smf_jsatiles_region( AstRegion *region, smf_inst_t instrument,
       ix = (int)( *(xmesh++) + 0.5 ) - 1;
       iy = (int)( *(ymesh++) + 0.5 ) - 1;
       itile = smf_jsatilexy2i( ix, iy, &skytiling, status );
-      sprintf( text, "%d", itile );
-      astMapPut0I( km, text, 1, NULL );
+      if (itile != VAL__BADI) {
+         sprintf( text, "%d", itile );
+         astMapPut0I( km, text, 1, NULL );
+      }
    }
 
 /* Starting with the oldest entry in the KeyMap, loop round checking all
