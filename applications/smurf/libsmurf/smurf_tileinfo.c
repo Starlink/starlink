@@ -351,8 +351,8 @@ void smurf_tileinfo( int *status ) {
 /* Display the tile number. */
    msgBlank( status );
    msgSeti( "ITILE", itile );
-   msgSeti( "NTILES", skytiling.ntiles );
-   msgOut( " ", "   Tile ^ITILE (of ^NTILES):", status );
+   msgSeti( "MAXTILE", skytiling.ntiles - 1);
+   msgOut( " ", "   Tile ^ITILE (from 0 to ^MAXTILE):", status );
 
 /* Get the FITS header, FrameSet and Region defining the tile, and the tile
    bounds in pixel indices. */
