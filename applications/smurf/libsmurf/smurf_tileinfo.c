@@ -433,8 +433,8 @@ void smurf_tileinfo( int *status ) {
    msgOut( " ", "      Centre (ICRS): RA=^RACEN DEC=^DECCEN", status );
 
 /* Write the tile centre ra and dec in radians to the output parameters. */
-   parPut0d( "RACEN", ra[ 0 ], status );
-   parPut0d( "DECCEN", dec[ 0 ], status );
+   parPut0d( "RACEN", norm_radec[ 0 ], status );
+   parPut0d( "DECCEN", norm_radec[ 1 ], status );
 
 /* Find the arc-distance from the centre to the furthest point from the
    centre. */
