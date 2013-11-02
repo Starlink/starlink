@@ -130,6 +130,7 @@
 
 *  Authors:
 *     DSB: David Berry (JAC, UCLan)
+*     GB: Graham Bell (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -137,9 +138,16 @@
 *        Original version.
 *     16-JUN-2013 (DSB):
 *        Added parameters LOCAL, TARGET, TLBND and TUBND.
+*     1-NOV-2013 (GB):
+*        - Change displayed tile index to new nested scheme.
+*        - Wite normalised (ra,dec) to output parameter
+*     2-NOV-2013 (GB):
+*        Revert to writing unnormalised (ra,dec) to output parameter.
+*        Starlink standard behaviour is to normalise (ra,dec) prior
+*        to display, not for passing on to future calculations.
 
 *  Copyright:
-*     Copyright (C) 2011 Science and Technology Facilities Council.
+*     Copyright (C) 2011-2013 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -433,8 +441,8 @@ void smurf_tileinfo( int *status ) {
    msgOut( " ", "      Centre (ICRS): RA=^RACEN DEC=^DECCEN", status );
 
 /* Write the tile centre ra and dec in radians to the output parameters. */
-   parPut0d( "RACEN", norm_radec[ 0 ], status );
-   parPut0d( "DECCEN", norm_radec[ 1 ], status );
+   parPut0d( "RACEN", ra[ 0 ], status );
+   parPut0d( "DECCEN", dec[ 0 ], status );
 
 /* Find the arc-distance from the centre to the furthest point from the
    centre. */
