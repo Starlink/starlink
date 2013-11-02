@@ -57,7 +57,8 @@
 *     with a apatial image or a 1D spectrum).
 
 *  Authors:
-*     David S Berry (JAC, UCLan)
+*     DSB: David S Berry (JAC, UCLan)
+*     GB: Graham Bell (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -70,6 +71,9 @@
 *     17-JUL-2013 (DSB):
 *        Allow JSA all-sky WCS to be requested, instead of supplying an
 *        NDF.
+*     2-NOV-2013 (GB):
+*        Change the index of the central tile to take account of the
+*        changing in tile indexing scheme from raster to nested.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -200,15 +204,15 @@ void smf_getrefwcs( const char *param, Grp *igrp, AstFrameSet **specwcs,
    instrument. */
                smf_jsatiling( inst, &skytiling, status );
 
-/* Get the WCS FrameSet for the "central" tile - since we do not use the
-   "local-origin" option, the WCS for every tile is identical.The base
-   Frame will be GRID coords within the tile, and the current Frame will
-   be ICRS (RA,Dec).  Note that this isn't really the tile in the centre.
-   It used to be the tile numbered ntiles/2 in the raster scheme,
-   i.e. the lower of the two middle tiles in numerical order.  This
-   specific tile is in the north west corner of facet 0, so in the nested
-   scheme, it has number 0 * ntpf^2 + all the odd bits of the index
-   within the tile. */
+/* Get the WCS FrameSet for what was the central tile in the old
+   raster-based indexing scheme - since we do not use the "local-origin"
+   option, the WCS for every tile is identical.The base Frame will be
+   GRID coords within the tile, and the current Frame will be ICRS
+   (RA,Dec).  This used to be the central tile in numerical order, not
+   in spatial position. In other words, it was the lower of the two middle
+   tiles in numerical order. This tile is in the north west corner of
+   facet 0, so in the new nested scheme, it has number 0 * ntpf^2 + all
+   the odd bits of the index within the tile. */
                smf_jsatile( ((skytiling.ntpf * skytiling.ntpf - 1) * 2) / 3,
                             &skytiling, 0,
                             NULL, spacewcs, NULL, lbnd, ubnd, status );
