@@ -4539,6 +4539,50 @@ iraf! {
           }
 
       }
+
+      action astgetunc {
+
+         helplib {$ATOOLS_HELP}
+
+         parameter fmt {
+            type LITERAL
+            prompt {Format for output text file}
+            ppath DEFAULT
+            vpath DEFAULT
+            default AST
+            helpkey *
+          }
+
+         parameter def {
+            position 2
+            type _LOGICAL
+            prompt {Return default uncertainty if non defined?}
+            ppath DEFAULT
+            vpath DEFAULT
+            default TRUE
+            helpkey *
+          }
+
+         parameter result {
+            position 3
+            type LITERAL
+            prompt {The uncertainty Region}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+         parameter this {
+            position 1
+            type LITERAL
+            prompt {The input Region}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+      }
+
    }
 
    command astshow {
