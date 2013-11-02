@@ -200,11 +200,17 @@ void smf_getrefwcs( const char *param, Grp *igrp, AstFrameSet **specwcs,
    instrument. */
                smf_jsatiling( inst, &skytiling, status );
 
-/* Get the WCS FrameSet for the central tile - since we do not use the
+/* Get the WCS FrameSet for the "central" tile - since we do not use the
    "local-origin" option, the WCS for every tile is identical.The base
    Frame will be GRID coords within the tile, and the current Frame will
-   be ICRS (RA,Dec). */
-               smf_jsatile( skytiling.ntiles/2, &skytiling, 0,
+   be ICRS (RA,Dec).  Note that this isn't really the tile in the centre.
+   It used to be the tile numbered ntiles/2 in the raster scheme,
+   i.e. the lower of the two middle tiles in numerical order.  This
+   specific tile is in the north west corner of facet 0, so in the nested
+   scheme, it has number 0 * ntpf^2 + all the odd bits of the index
+   within the tile. */
+               smf_jsatile( ((skytiling.ntpf * skytiling.ntpf - 1) * 2) / 3,
+                            &skytiling, 0,
                             NULL, spacewcs, NULL, lbnd, ubnd, status );
 
 /* Change the base Frame to be PIXEL. */
