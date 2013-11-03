@@ -140,7 +140,7 @@
       LOGICAL FTS1_WCSDF
 
 *  Local Variables:
-      CHARACTER ASTCOD( DEFNCD )*8 ! The non-native AST encoding names
+      CHARACTER ASTCOD( DEFNCD )*9 ! The non-native AST encoding names
       CHARACTER CARD*80          ! FITS header card
       INTEGER DIM( NDF__MXDIM )  ! NDF dimensions
       INTEGER FC2                ! AST identifier for temporary FitsChan
