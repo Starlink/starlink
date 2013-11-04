@@ -227,6 +227,7 @@ int *status             /* global status (given and returned) */
      D.S. Berry (dsb@ast.man.ac.uk)
      E.Chapin (echapin@phas.ubc.ca)
      P.Friberg (friberg@jach.hawaii.edu)
+     Graham Bell (g.bell@jach.hawaii.edu)
 
    History :
      01Apr2005 : original (bdk)
@@ -336,7 +337,12 @@ int *status             /* global status (given and returned) */
                  old and new orders are mathematically equivalent, but produce
                  different numerical rounding errors. Consequently some samples that
                  are close to the edge of map pixels will move into adjacent pixels,
-                 resulting in some small changes to the resulting map.
+                 resulting in some small changes to the resulting map. (DSB)
+     28Oct2013 : Tidy up FTS-2 related code.  The variant mappings should be called
+                 "TRACKING" and "IMAGE" because the physical port used is not
+                 likely to be how users will want to refer to them.  Also simplified
+                 the code on the basis that there are only two possible situations
+                 (TRACKING and IMAGE) rather than four. (GSB)
 */
 {
 
