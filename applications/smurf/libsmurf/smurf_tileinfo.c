@@ -130,7 +130,7 @@
 
 *  Authors:
 *     DSB: David Berry (JAC, UCLan)
-*     GB: Graham Bell (JAC, Hawaii)
+*     GSB: Graham Bell (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -138,10 +138,12 @@
 *        Original version.
 *     16-JUN-2013 (DSB):
 *        Added parameters LOCAL, TARGET, TLBND and TUBND.
-*     1-NOV-2013 (GB):
-*        - Change displayed tile index to new nested scheme.
-*        - Wite normalised (ra,dec) to output parameter
-*     2-NOV-2013 (GB):
+*     31-OCT-2013 (GSB):
+*        - Change displayed comment after tile index to clarify
+*          the range of indices.
+*        - Normalize ra,dec for display to screen.
+*        - Write normalised (ra,dec) to output parameter.
+*     2-NOV-2013 (DSB):
 *        Revert to writing unnormalised (ra,dec) to output parameter.
 *        Starlink standard behaviour is to normalise (ra,dec) prior
 *        to display, not for passing on to future calculations.

@@ -74,6 +74,7 @@
 
 *  Authors:
 *     DSB: David S Berry (JAC, UCLan)
+*     GSB: Graham Bell (JAC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -81,6 +82,12 @@
 *        Initial version.
 *     16-JUL-2013 (DSB):
 *        Added argument "local_origin".
+*     29-OCT-2013 (GSB):
+*        Use zero-based numbering for JSA tiles and number facets
+*        as defined by HEALPix.  Removed code duplicating that in
+*        smf_jsatilei2xy.
+*     30-OCT-2013 (GSB):
+*        Use nested numbering scheme for JSA tiles.
 *     {enter_further_changes_here}
 
 *  Copyright:

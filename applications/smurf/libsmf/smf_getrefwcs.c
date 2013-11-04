@@ -58,7 +58,7 @@
 
 *  Authors:
 *     DSB: David S Berry (JAC, UCLan)
-*     GB: Graham Bell (JAC, Hawaii)
+*     GSB: Graham Bell (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -71,9 +71,9 @@
 *     17-JUL-2013 (DSB):
 *        Allow JSA all-sky WCS to be requested, instead of supplying an
 *        NDF.
-*     2-NOV-2013 (GB):
+*     1-NOV-2013 (GSB):
 *        Change the index of the central tile to take account of the
-*        changing in tile indexing scheme from raster to nested.
+*        change in tile numbering scheme from raster to nested.
 *     {enter_further_changes_here}
 
 *  Copyright:

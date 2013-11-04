@@ -51,11 +51,17 @@
 
 *  Authors:
 *     DSB: David S Berry (JAC, UCLan)
+*     GSB: Graham Bell (JAC)
 *     {enter_new_authors_here}
 
 *  History:
 *     12-APR-2011 (DSB):
 *        Initial version.
+*     29-OCT-2013 (GSB):
+*        Use zero-based numbering for JSA tiles, add facet index
+*        return parameter and number facets as defined by HEALPix.
+*     30-OCT-2013 (GSB):
+*        Use nested numbering scheme for JSA tiles.
 *     {enter_further_changes_here}
 
 *  Copyright:
