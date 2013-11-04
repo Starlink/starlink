@@ -58,6 +58,10 @@ c     - AST_CIRCLEPARS: Get the geometric parameters of the Circle
 *  History:
 *     31-AUG-2004 (DSB):
 *        Original version.
+*     4-NOV-2013 (DSB):
+*        Modify RegPins so that it can handle uncertainty regions that straddle
+*        a discontinuity. Previously, such uncertainty Regions could have a huge
+*        bounding box resulting in matching region being far too big.
 *class--
 */
 
@@ -1359,6 +1363,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    double *lbnd_tunc;           /* Lower bounds of "this" uncertainty Region */
    double *lbnd_unc;            /* Lower bounds of supplied uncertainty Region */
    double *p;                   /* Pointer to next axis value */
+   double *safe;                /* An interior point in "this" */
    double *ubnd_tunc;           /* Upper bounds of "this" uncertainty Region */
    double *ubnd_unc;            /* Upper bounds of supplied uncertainty Region */
    double drad;                 /* Radius increment corresponding to border width */
@@ -1401,23 +1406,32 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
                 astGetNaxes( unc ), nc );
    }
 
+/* Get the centre of the region in the base Frame. We use this as a "safe"
+   interior point within the region. */
+   safe = astRegCentre( this, NULL, NULL, 0, AST__BASE );
+
 /* We now find the maximum distance on each axis that a point can be from the
    boundary of the Circle for it still to be considered to be on the boundary.
    First get the Region which defines the uncertainty within the Circle being
-   checked (in its base Frame), and get its bounding box. */
+   checked (in its base Frame), re-centre it on the interior point found
+   above (to avoid problems if the uncertainty region straddles a
+   discontinuity), and get its bounding box. */
    tunc = astGetUncFrm( this, AST__BASE );
-
+   if( safe ) astRegCentre( tunc, safe, NULL, 0, AST__CURRENT );
    lbnd_tunc = astMalloc( sizeof( double )*(size_t) nc );
    ubnd_tunc = astMalloc( sizeof( double )*(size_t) nc );
    astGetRegionBounds( tunc, lbnd_tunc, ubnd_tunc );
 
-/* Find the geodesic length withi the base Frame of "this" of the diagonal of
+/* Find the geodesic length within the base Frame of "this" of the diagonal of
    the bounding box. */
    l1 = astDistance( frm, lbnd_tunc, ubnd_tunc );
 
-/* Also get the Region which defines the uncertainty of the supplied points
-   and get its bounding box. */
+/* Also get the Region which defines the uncertainty of the supplied
+   points and get its bounding box. First re-centre the uncertainty at the
+   interior position to avoid problems from uncertainties that straddle a
+   discontinuity. */
    if( unc ) {
+      if( safe ) astRegCentre( unc, safe, NULL, 0, AST__CURRENT );
       lbnd_unc = astMalloc( sizeof( double )*(size_t) nc );
       ubnd_unc = astMalloc( sizeof( double )*(size_t) nc );
       astGetRegionBounds( unc, lbnd_unc, ubnd_unc );
@@ -1522,6 +1536,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    ubnd_tunc = astFree( ubnd_tunc );
    if( unc ) lbnd_unc = astFree( lbnd_unc );
    if( unc ) ubnd_unc = astFree( ubnd_unc );
+   safe = astFree( safe );
 
 /* If an error has occurred, return zero. */
    if( !astOK ) {

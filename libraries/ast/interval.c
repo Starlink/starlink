@@ -72,6 +72,13 @@ f     The Interval class does not define any new routines beyond those
 *        Over-ride astRegBasePick.
 *     26-JAN-2009 (DSB):
 *        Over-ride astMapMerge.
+*     4-NOV42-2013 (DSB):
+*        - Change RegCentre so that it does not report an error for an unbounded 
+*        Interval if the centre is merely being inquired rather than set. This is 
+*        the documented behaviour of the astRegCentre method.
+*        - Modify RegPins so that it can handle uncertainty regions that straddle
+*        a discontinuity. Previously, such uncertainty Regions could have a huge
+*        bounding box resulting in matching region being far too big.
 *class--
 */
 
@@ -2569,7 +2576,7 @@ static double *RegCentre( AstRegion *this_region, double *cen, double **ptr,
       }
 
 /* If the Interval is not equivalent to a Box, report an error */
-   } else {
+   } else if( cen || ptr ) {
       astError( AST__REGCN, "astRegCentre(%s): The supplied %s is not a "
                 "closed Interval and so cannot be re-centred.", status,
                 astGetClass( this ), astGetClass( this ) );
@@ -2652,6 +2659,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    double *lbnd_tunc;        /* Lower bounds of "this" uncertainty Region */
    double *lbnd_unc;         /* Lower bounds of supplied uncertainty Region */
    double *p;                /* Pointer to next axis value */
+   double *safe;             /* An interior point in "this" */
    double *small_lbnd;       /* Lower bounds of smaller interval */
    double *small_ubnd;       /* Upper bounds of smaller interval */
    double *ubnd_tunc;        /* Upper bounds of "this" uncertainty Region */
@@ -2705,18 +2713,28 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
                 astGetNaxes( unc ), nc );
    }
 
+/* Get the centre of the region in the base Frame. We use this as a "safe"
+   interior point within the region. */
+   safe = astRegCentre( this, NULL, NULL, 0, AST__BASE );
+
 /* We now find the maximum distance on each axis that a point can be from
    the boundary of the Interval for it still to be considered to be on the
    boundary. First get the Region which defines the uncertainty within the
-   Interval being checked (in its base Frame), and get its bounding box. */
+   Interval being checked (in its base Frame), re-centre it on the interior
+   point found above (to avoid problems if the uncertainty region straddles
+   a discontinuity), and get its bounding box. */
    tunc = astGetUncFrm( this, AST__BASE );
+   if( safe ) astRegCentre( tunc, safe, NULL, 0, AST__CURRENT );
    lbnd_tunc = astMalloc( sizeof( double )*(size_t) nc );
    ubnd_tunc = astMalloc( sizeof( double )*(size_t) nc );
    astGetRegionBounds( tunc, lbnd_tunc, ubnd_tunc );
 
-/* Also get the Region which defines the uncertainty of the supplied points
-   and get its bounding box. */
+/* Also get the Region which defines the uncertainty of the supplied
+   points and get its bounding box. First re-centre the uncertainty at the
+   interior position to avoid problems from uncertainties that straddle a
+   discontinuity. */
    if( unc ) {
+      if( safe ) astRegCentre( unc, safe, NULL, 0, AST__CURRENT );
       lbnd_unc = astMalloc( sizeof( double )*(size_t) nc );
       ubnd_unc = astMalloc( sizeof( double )*(size_t) nc );
       astGetRegionBounds( unc, lbnd_unc, ubnd_unc );
@@ -2863,6 +2881,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    large_ubnd = astFree( large_ubnd );
    small_lbnd = astFree( small_lbnd );
    small_ubnd = astFree( small_ubnd );
+   safe = astFree( safe );
 
 /* If an error has occurred, return zero. */
    if( !astOK ) {

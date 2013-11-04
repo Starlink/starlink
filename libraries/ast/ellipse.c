@@ -58,6 +58,10 @@ c     - AST_ELLIPSEPARS: Get the geometric parameters of the Ellipse
 *  History:
 *     7-SEP-2004 (DSB):
 *        Original version.
+*     4-NOV-2013 (DSB):
+*        Modify RegPins so that it can handle uncertainty regions that straddle
+*        a discontinuity. Previously, such uncertainty Regions could have a huge
+*        bounding box resulting in matching region being far too big.
 *class--
 */
 
@@ -1436,6 +1440,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    AstRegion *tunc;             /* Uncertainity Region from "this" */
    double **ptr;                /* Pointer to axis values in "ps2" */
    double *p;                   /* Pointer to next axis value */
+   double *safe;                /* An interior point in "this" */
    double drad;                 /* Radius increment corresponding to border width */
    double l1;                   /* Length of bounding box diagonal */
    double l2;                   /* Length of bounding box diagonal */
@@ -1476,11 +1481,18 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
                 astGetNaxes( unc ) );
    }
 
+/* Get the centre of the region in the base Frame. We use this as a "safe"
+   interior point within the region. */
+   safe = astRegCentre( this, NULL, NULL, 0, AST__BASE );
+
 /* We now find the maximum distance on each axis that a point can be from the
    boundary of the Ellipse for it still to be considered to be on the boundary.
    First get the Region which defines the uncertainty within the Ellipse being
-   checked (in its base Frame), and get its bounding box. */
+   checked (in its base Frame), re-centre it on the interior point found
+   above (to avoid problems if the uncertainty region straddles a
+   discontinuity), and get its bounding box. */
    tunc = astGetUncFrm( this, AST__BASE );
+   if( safe ) astRegCentre( tunc, safe, NULL, 0, AST__CURRENT );
    astGetRegionBounds( tunc, lbnd_tunc, ubnd_tunc );
 
 /* Find the geodesic length within the base Frame of "this" of the diagonal of
@@ -1488,9 +1500,12 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    frm = astGetFrame( this_region->frameset, AST__BASE );
    l1 = astDistance( frm, lbnd_tunc, ubnd_tunc );
 
-/* Also get the Region which defines the uncertainty of the supplied points
-   and get its bounding box in the same Frame. */
+/* Also get the Region which defines the uncertainty of the supplied
+   points and get its bounding box. First re-centre the uncertainty at the
+   interior position to avoid problems from uncertainties that straddle a
+   discontinuity. */
    if( unc ) {
+      if( safe ) astRegCentre( unc, safe, NULL, 0, AST__CURRENT );
       astGetRegionBounds( unc, lbnd_unc, ubnd_unc );
 
 /* Find the geodesic length of the diagonal of this bounding box. */
@@ -1595,6 +1610,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
 
    tunc = astAnnul( tunc );
    frm = astAnnul( frm );
+   safe = astFree( safe );
 
 /* If an error has occurred, return zero. */
    if( !astOK ) {

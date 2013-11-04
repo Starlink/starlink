@@ -95,6 +95,10 @@ f     The Box class does not define any new routines beyond those
 *        Use a more robust algorithm for determining the order of the
 *        vertices whan a Box is simplified to a Polygon. The old method
 *        sometimes resulted in an unbounded "inside-out" polygon.
+*     4-NOV-2013 (DSB):
+*        Modify RegPins so that it can handle uncertainty regions that straddle
+*        a discontinuity. Previously, such uncertainty Regions could have a huge
+*        bounding box resulting in matching region being far too big.
 *class--
 */
 
@@ -3012,6 +3016,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    AstRegion *tunc;             /* Uncertainity Region from "this" */
    double **ptr;                /* Pointer to axis values in "ps2" */
    double *large;               /* A corner position in the larger Box */
+   double *safe;                /* An interior point in "this" */
    double *lbnd_tunc;           /* Lower bounds of "this" uncertainty Region */
    double *lbnd_unc;            /* Lower bounds of supplied uncertainty Region */
    double *p;                   /* Pointer to next axis value */
@@ -3058,18 +3063,28 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
                 astGetNaxes( unc ), nc );
    }
 
+/* Get the centre of the region in the base Frame. We use this as a "safe"
+   interior point within the region. */
+   safe = astRegCentre( this, NULL, NULL, 0, AST__BASE );
+
 /* We now find the maximum distance on each axis that a point can be from the
    boundary of the Box for it still to be considered to be on the boundary.
    First get the Region which defines the uncertainty within the Box being
-   checked (in its base Frame), and get its bounding box. */
+   checked (in its base Frame), re-centre it on the interior point found
+   above (to avoid problems if the uncertainty region straddles a
+   discontinuity), and get its bounding box. */
    tunc = astGetUncFrm( this, AST__BASE );
+   if( safe ) astRegCentre( tunc, safe, NULL, 0, AST__CURRENT );
    lbnd_tunc = astMalloc( sizeof( double )*(size_t) nc );
    ubnd_tunc = astMalloc( sizeof( double )*(size_t) nc );
    astGetRegionBounds( tunc, lbnd_tunc, ubnd_tunc );
 
-/* Also get the Region which defines the uncertainty of the supplied points
-   and get its bounding box. */
+/* Also get the Region which defines the uncertainty of the supplied
+   points and get its bounding box. First re-centre the uncertainty at the
+   interior position to avoid problems from uncertainties that straddle a
+   discontinuity. */
    if( unc ) {
+      if( safe ) astRegCentre( unc, safe, NULL, 0, AST__CURRENT );
       lbnd_unc = astMalloc( sizeof( double )*(size_t) nc );
       ubnd_unc = astMalloc( sizeof( double )*(size_t) nc );
       astGetRegionBounds( unc, lbnd_unc, ubnd_unc );
@@ -3078,8 +3093,9 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
       ubnd_unc = NULL;
    }
 
-/* The required border width for each axis is half of the total width of
-   the two bounding boxes. Use a zero sized box "unc" if no box was supplied. */
+/* The required border width for each axis is half of the total width
+   of the two bounding boxes. Use a zero sized box "unc" if no box was
+   supplied. */
    wid = astMalloc( sizeof( double )*(size_t) nc );
    large = astMalloc( sizeof( double )*(size_t) nc );
    small = astMalloc( sizeof( double )*(size_t) nc );
@@ -3184,6 +3200,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    wid = astFree( wid );
    large = astFree( large );
    small = astFree( small );
+   safe = astFree( safe );
 
 /* If an error has occurred, return zero. */
    if( !astOK ) {
