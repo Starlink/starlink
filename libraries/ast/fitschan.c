@@ -28194,7 +28194,7 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
 *        to a CDj_is array.
 *
 *     7) EQUINOX keywords with string values equal to a date preceded
-*        by the leter B or J (eg "B1995.0"). These are converted to the
+*        by the letter B or J (eg "B1995.0"). These are converted to the
 *        corresponding Julian floating point value without any epoch
 *        specifier.
 *
@@ -39005,15 +39005,15 @@ f     data will be written to the FitsChan and AST_WRITE will return
 *     until such time as an agreed method for describing projection
 *     distortions within FITS-WCS has been published.
 *
-*     AST extends the range of celestial coordinate sytstems which may be
-*     described using this encoding by inclusion of the allowing the use of
+*     AST extends the range of celestial coordinate systems which may be
+*     described using this encoding by allowing the inclusion of
 *     "AZ--" and "EL--" as the coordinate specification within CTYPE
 *     values. These form a longitude/latitude pair of axes which describe
 *     azimuth and elevation. The geographic position of the observer
 *     should be supplied using the OBSGEO-X/Y/Z keywords described in FITS-WCS
 *     paper III. Currently, a simple model is used which includes diurnal
 *     aberration, but ignores atmospheric refraction, polar motion, etc.
-*     These may be added in a leter release.
+*     These may be added in a later release.
 *
 *     If an AST SkyFrame that represents offset rather than absolute
 *     coordinates (see attribute SkyRefIs) is written to a FitsChan using
@@ -39022,7 +39022,7 @@ f     data will be written to the FitsChan and AST_WRITE will return
 *     "OFLT" as the axis codes in the CTYPE keywords. The other will
 *     describe absolute coordinates as specified by the System attribute
 *     of the SkyFrame, using the usual CTYPE codes ("RA--"/"DEC-", etc).
-*     Inaddition, the absolute coordinates description will contain
+*     In addition, the absolute coordinates description will contain
 *     AST-specific keywords (SREF1/2, SREFP1/2 and SREFIS) that allow the
 *     header to be read back into AST in order to reconstruct the original
 *     SkyFrame.
