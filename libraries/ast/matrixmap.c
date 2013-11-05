@@ -147,6 +147,9 @@ f     The MatrixMap class does not define any new routines beyond those
 *          matrix would contain only bad elements.
 *        - Report an error if an attempt is made to create a MatrixMap
 *          containing only bad elements.
+*     4-NOV-2013 (DSB):
+*        Allow a full form MatrixMap to be simplified to a diagonal form 
+*        MatrixMap if all the off-diagonal values are zero.
 *class--
 */
 
@@ -1618,6 +1621,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    const char *class2;   /* Pointer to second Mapping class string */
    const char *nclass;   /* Pointer to neighbouring Mapping class */
    double *b;            /* Pointer to scale terms */
+   double *new_mat;      /* Pointer to elements of new MatrixMap */
    int *invlt;           /* New invert flags list pointer */
    int do1;              /* Would a backward swap make a simplification? */
    int do2;              /* Would a forward swap make a simplification? */
@@ -1626,6 +1630,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    int i;                /* Loop counter */
    int ic[2];            /* Copies of supplied invert flags to swap */
    int invert;           /* Should the inverted Mapping be used? */
+   int j;                /* Loop counter */
    int neighbour;        /* Index of Mapping with which to swap */
    int nin;              /* Number of input coordinates for MatrixMap */
    int nmapt;            /* No. of Mappings in list */
@@ -1697,6 +1702,28 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
          } else {
             map2 = (AstMapping *) astZoomMap( nin, (mm->f_matrix)[ 0 ], "", status );
          }
+      }
+
+/* If the MatrixMap is a full matrix but all off-diagnal elements are
+   zero, it can be replaced by a diagonal MatrixMap. */
+   } else if( mm->form == FULL && nin == nout && mm->f_matrix ){
+      new_mat = astMalloc( sizeof( double )*nin );
+      b = mm->f_matrix;
+      for( i = 0; i < nin && new_mat; i++ ){
+         for( j = 0; j < nout; j++,b++ ){
+            if( i == j ) {
+               new_mat[ i ] = *b;
+            } else if( *b != 0.0 ) {
+               new_mat = astFree( new_mat );
+               break;
+            }
+         }
+      }
+
+      if( new_mat ) {
+         map2 = (AstMapping *) astMatrixMap( nin, nout, 1, new_mat, "",
+                                             status );
+         new_mat = astFree( new_mat );
       }
    }
 
@@ -2541,7 +2568,7 @@ static void MatPermSwap( AstMapping **maps, int *inverts, int imm, int *status )
 *     void MatPermSwap( AstMapping **maps, int *inverts, int imm )
 
 *  Class Membership:
-*     WinMap member function
+*     MatrixMap member function
 
 *  Description:
 *     A list of two Mappings is supplied containing a PermMap and a
