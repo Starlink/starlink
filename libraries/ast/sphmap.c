@@ -75,6 +75,10 @@ f     The SphMap class does not define any new routines beyond those
 *        Added PolarLong attribute.
 *     10-MAY-2006 (DSB):
 *        Override astEqual.
+*     5-NOV-2013 (DSB):
+*        Modify MapMerge so that it can spot and simplify an
+*        (inverted SphMap,MatrixMap,SphMap) sequence in which the
+*        MatrixMap just magnifies or reflects the radius vector.
 *class--
 */
 
@@ -330,7 +334,7 @@ static int Equal( AstObject *this_object, AstObject *that_object, int *status ) 
          if( astGetInvert( this ) == astGetInvert( that ) ) {
 
             if( astEQUAL( this->polarlong, that->polarlong ) &&
-                this->unitradius == that->unitradius ){
+                          this->unitradius == that->unitradius ){
                result = 1;
             }
 
@@ -695,7 +699,12 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
 /* Local Variables: */
    AstMapping *new;              /* Pointer to replacement Mapping */
+   AstMatrixMap *mm;             /* Pointer to MatrixMap */
+   AstWinMap *wm;                /* The new WinMap */
    const char *class;            /* Pointer to Mapping class string */
+   double absval;                /* Absolute value fo each diagonal element */
+   double diag[ 3 ];             /* The diagonal matrix elements */
+   double polarlong;             /* Value of PolarLong attribute */
    int imap1;                    /* Index of first SphMap */
    int imap2;                    /* Index of second SphMap */
    int imap;                     /* Loop counter for Mappings */
@@ -730,8 +739,8 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    the second in the forward direction. This combination can be
    simplified if the PolarLongitude attributes are equal.. */
          if( ( *invert_list )[ imap1 ] && !( *invert_list )[ imap2 ] ) {
-            simpler = ( astGetPolarLong( ( *map_list )[ imap1 ] ) ==
-                        astGetPolarLong( ( *map_list )[ imap2 ] ) );
+            simpler = astEQUAL( astGetPolarLong( ( *map_list )[ imap1 ] ),
+                                astGetPolarLong( ( *map_list )[ imap2 ] ) );
 
 /* If the first SphMap is applied in the forward direction and the second in
    the inverse direction, the combination can only be simplified if the
@@ -773,6 +782,156 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
             ( *nmap )--;
             result = imap1;
          }
+      }
+   }
+
+/* Another possible simplification is if the nominated Mapping is an inverted
+   SphMap followed in series by a ZoomMap or diagonal MatrixMap that has
+   diagonal elements of equal magnitude, which is then followed by a
+   non-inverted SphMap. This is equivalent to a 3D rotation of a pair of
+   (longitude,latitude) angles. The MatrixMap/ZoomMap may magnify the
+   radius vector, but this will not alter the angles. Any difference in
+   signs amongst the diagonal elements will cause a reflection or reversal
+   of the corresponbding angles, which can be represented by a WinMap. We
+   do not need to consider the other possibility (that the nominated
+   SphMap is the *last* Mapping in such a sequence of three), since we
+   will already have discovered such a sequence on an earlier invocation
+   of this function. */
+   if( series && !simpler && ( *invert_list )[ where ] &&
+       where + 2 < *nmap  ) {
+
+/* Check the third Mapping is a non-inverted SphMap. */
+      class = astGetClass( ( *map_list )[ where + 2 ] );
+      if( astOK && !strcmp( class, "SphMap" ) &&
+          !( *invert_list )[ where + 2 ] ) {
+
+/* Check the second Mapping is a ZoomMap, or a diagonal MatrixMap that
+   has diagonal elements of equal magnitude. Since the Mapping is
+   sandwiched between the two SphMaps, we know it must have 3 inputs and
+   3 outputs. Record the corresponding diagonal values. The state of the
+   Invert flag does not matter since it will only affect the degree to
+   which the radius vector is magnified - it will not change the signs of
+   any diagonal elements. */
+         class = astGetClass( ( *map_list )[ where + 1 ] );
+         if( astOK && !strcmp( class, "ZoomMap" ) ) {
+            diag[ 0 ] = astGetZoom( ( *map_list )[ where + 1 ] );
+            if( diag[ 0 ] != 0.0 ) {
+               diag[ 1 ] = diag[ 0 ];
+               diag[ 2 ] = diag[ 0 ];
+            } else {
+               class = NULL;
+            }
+
+         } else if( astOK && !strcmp( class, "MatrixMap" ) ) {
+            mm = (AstMatrixMap *)  ( *map_list )[ where + 1 ];
+            if( mm->form == 1 && mm->f_matrix ) {
+               diag[ 0 ] = mm->f_matrix[ 0 ];
+               if( diag[ 0 ] != 0.0 ) {
+                  diag[ 1 ] = mm->f_matrix[ 1 ];
+                  diag[ 2 ] = mm->f_matrix[ 2 ];
+
+                  absval = fabs( diag[ 0 ] );
+                  if( !astEQUAL( fabs( diag[ 1 ] ), absval ) ||
+                      !astEQUAL( fabs( diag[ 2 ] ), absval ) ) {
+                     class = NULL;
+                  }
+
+               } else {
+                  class = NULL;
+               }
+
+            } else {
+               class = NULL;
+            }
+
+         } else {
+            class = NULL;
+         }
+
+      } else {
+         class = NULL;
+      }
+
+/* We can only make changes if above conditions were met. */
+      if( class ) {
+
+/* Create a WinMap that modifies the (longitude,latitude) values, initially
+   with undefined corners. */
+         wm = astWinMap( 2, NULL, NULL, NULL, NULL, "", status );
+
+/* Store appropriate scales and offsets in the WinMap. These just depend on
+   the signs of the matrix diagonal elements since we know the magnitudes of
+   these elements are all equal. */
+         if( diag[ 0 ] < 0.0 ) {
+            if( diag[ 1 ] < 0.0 ) {
+               wm->a[ 0 ] = AST__DPI;
+               wm->b[ 0 ] = -1.0;
+            } else {
+               wm->a[ 0 ] = AST__DPI;
+               wm->b[ 0 ] = 1.0;
+            }
+
+         } else {
+            if( diag[ 1 ] < 0.0 ) {
+               wm->a[ 0 ] = 0.0;
+               wm->b[ 0 ] = -1.0;
+            } else {
+               wm->a[ 0 ] = 0.0;
+               wm->b[ 0 ] = 1.0;
+            }
+         }
+
+         if( diag[ 2 ] < 0.0 ) {
+            wm->a[ 1 ] = 0.0;
+            wm->b[ 1 ] = -1.0;
+         } else {
+            wm->a[ 1 ] = 0.0;
+            wm->b[ 1 ] = 1.0;
+         }
+
+/* We are aiming to replace the supplied (SphMap,MatrixMap,SphMap)
+   combination with (WinMap,SphMap,SphMap), leaving us with an inverted
+   and non-inverted SphMap side by side. This is on the understanding
+   that a subsequent call to this function will combine these two
+   adjacent SphMaps into a UnitMap. But this will only happen if the
+   adjacent SphMaps have equal values for their PolarLong attributes. The
+   change of (SphMap,MatrixMap) to (WinMap,SphMap) will change the value
+   of the PolarLong attribute in the first SphMap, so we need to work out
+   this changed value and check that it is the same as the PolarLong
+   value of the second SphMap. If they are different, there is no point
+   making any changes since the two SphMaps cannot be merged into a
+   UnitMap. So get the PolarLong value from the supplied first SphMap. */
+         polarlong = astGetPolarLong( ( *map_list )[ where ] );
+
+/* Modified the PolarLong value to take account of the change from
+   (SphMap,MatrixMap) to (WinMap,SphMap). */
+         polarlong =  wm->a[ 0 ] + wm->b[ 0 ]*polarlong;
+
+/* Check this is the same as the PolarLong value in the second SphMap. */
+         if( astEQUAL( polarlong, astGetPolarLong( ( *map_list )[ where + 2 ] ) ) ) {
+
+/* All is good, so we can now change the supplied Mappings list. First
+   change the PolarLong value in the first SphMap. */
+            astSetPolarLong( ( *map_list )[ where ], polarlong );
+
+/* Annul The MatrixMap or ZoomMap. */
+            (void) astAnnul( ( *map_list )[ where + 1 ] );
+
+/* Move the first SphMap to the slot left vacant by the annulled
+   MatrixMap or ZoomMap. */
+            ( *map_list )[ where + 1 ] = ( *map_list )[ where ];
+            ( *invert_list )[ where + 1 ] = ( *invert_list )[ where ];
+
+/* Store the new WinMap in the place of the SphMap. */
+            ( *map_list )[ where ] = astClone( wm );
+            ( *invert_list )[ where ] = 0;
+
+/* Return the index of the first modified element. */
+            result = where;
+         }
+
+/* Free resources. */
+         wm = astAnnul( wm );
       }
    }
 
