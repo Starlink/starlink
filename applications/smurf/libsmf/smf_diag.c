@@ -827,7 +827,7 @@ static void smf1_diag( void *job_data_ptr, int *status ) {
       po = pdata->out +  pdata->s1;
       pq = pdata->qua +  pdata->s1;
       pl = pdata->lut +  pdata->s1;
-      for( idata = pdata->s1; idata <= pdata->s2; idata++,pq++,pq2++,pl++,po++ ) {
+      for( idata = pdata->s1; idata <= pdata->s2; idata++,pq++,pl++,po++ ) {
          if( !( *pq & SMF__Q_MOD ) && *pl != VAL__BADI ) {
             double ast_data = pdata->map[ *pl ];
             if( ast_data != VAL__BADD &&
