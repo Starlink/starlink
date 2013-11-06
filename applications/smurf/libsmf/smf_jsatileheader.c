@@ -50,7 +50,7 @@
 *     The projection reference point is at the origin of native longitude
 *     and latitude, which corresponds to the origin of (RA,Dec). However,
 *     this means that for most tiles the reference point is not actually
-*     contained within the tile, and also results in jsatiles.having huge
+*     contained within the tile, and also results in jsatiles having huge
 *     values for CRPIX1/2. To avoid this, the feature described in
 *     FITS-WCS paper II section 2.5 ("User specified phi_0,theta_0") may
 *     be used (see the "local_origin" argument). This causes the CRVAL and
@@ -165,15 +165,15 @@ AstFitsChan *smf_jsatileheader( int itile, smfJSATiling *skytiling,
       fc = smfMakeFC( ng, ng, skytiling->ntpf, 1, gx_ref, gy_ref, ra_ref,
                       dec_ref, status );
 
+/* Otherwise, get the number of pixels along one edge of a facet. */
    } else {
-/* Get the number of pixels along one edge of a facet. */
       m = skytiling->ntpf*skytiling->ppt;
 
 /* Convert the supplied tile index into a pair of X and Y offsets that
    give the gaps along the X and Y axes, in tiles, between the bottom left
    tile in the projection plane and the required tile. This function
    includes a check that the tile number is valid. */
-      smf_jsatilei2xy(itile, skytiling, &xt, &yt, &fi, status);
+      smf_jsatilei2xy( itile, skytiling, &xt, &yt, &fi, status );
       if( *status != SAI__OK ) return fc;
 
 /* Note the RA at the reference point. This is 0 hours except for tiles

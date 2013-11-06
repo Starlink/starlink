@@ -36,9 +36,9 @@
 *        the FITS headers for the tile. May be NULL.
 *     fs = AstFitsChan ** (Returned)
 *        Address at which to return a pointer to a FrameSet defining the
-*        WCS for the tile. May be NULL. The base Frame will be GRID
-*        coords and the current Frame will be ICRS (RA,DEc). There will
-*        also be a PIXEL Frame.
+*        WCS for the tile. May be NULL. The base Frame (frame 1) will be
+*        GRID coords and the current Frame (frame 2) will be ICRS (RA,DEc).
+*        There will also be a PIXEL Frame (frame 3).
 *     region = AstRegion ** (Returned)
 *        Address at which to return a pointer to a Region defining the
 *        extent of the tile. May be NULL. The Region will be defined
@@ -68,10 +68,15 @@
 *        Initial version.
 *     16-JUL-2013 (DSB):
 *        Added argument "local_origin". Replaced "dim" by "lbnd" and "ubnd".
+*     6-NOV-2013 (DSB):
+*        - Document the indices of the GRID, SKY and PIXEL Frames in the
+*        returned FrameSet.
+*        - Correct definition of PIXEL Frame in returned FrameSet.
+*        - Ensure FITS ref. point is placed somewhere in pixel zero.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2011 Science & Technology Facilities Council.
+*     Copyright (C) 2011,2013 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -102,12 +107,7 @@
 
 /* SMURF includes */
 #include "libsmf/smf.h"
-
-
-
-
-#include "libsmf/jsatiles.h"   /* Move this to smf_typ.h and smf.h when done */
-
+#include "libsmf/jsatiles.h"
 
 /* Local constants */
 #define DELTA 0.01          /* Pixel offset to avoid edges */
@@ -120,11 +120,14 @@ void smf_jsatile( int itile, smfJSATiling *skytiling, int local_origin,
    AstFitsChan *lfc = NULL;
    AstFrameSet *lfs = NULL;
    AstRegion *lregion = NULL;
+   double crpix1;
+   double crpix2;
    double point1[ 2 ];
    double point2[ 2 ];
    double shift[ 2 ];
-   int crpix1;
-   int crpix2;
+   double tmp;
+   int icrpix1;
+   int icrpix2;
    int icur;
 
 /* Initialise the returned pointers. */
@@ -153,8 +156,8 @@ void smf_jsatile( int itile, smfJSATiling *skytiling, int local_origin,
    }
 
 /* Get the GRID coords of the FITS reference point. */
-   astGetFitsI( lfc, "CRPIX1", &crpix1 );
-   astGetFitsI( lfc, "CRPIX2", &crpix2 );
+   astGetFitsF( lfc, "CRPIX1", &crpix1 );
+   astGetFitsF( lfc, "CRPIX2", &crpix2 );
 
 /* If required, return a deep copy of the FitsChan, before the
    WCS-related cards are removed by the following astRead call. */
@@ -189,17 +192,38 @@ void smf_jsatile( int itile, smfJSATiling *skytiling, int local_origin,
       }
    }
 
-/* Find the lower and upper bounds of the tile in NDF PIXEL indicies. The
-   origin is placed at the FITS reference pixel. */
-   lbnd[ 0 ] = 1 - crpix1;
-   lbnd[ 1 ] = 1 - crpix2;
+/* Get the integer GRID index that contains the FITS reference point.
+   This is basically just the nearest integer to CRPIX, except that
+   midway values (i.e. xxx.5) are always rounded in the positive
+   direction, reradgless of whether CRPIX is positive or negative. */
+   if( crpix1 >= 0.0 ) {
+      icrpix1 = (int)( crpix1 + 0.5 );
+   } else {
+      tmp = crpix1 - 0.5;
+      icrpix1 = (int) tmp;
+      if( icrpix1 == tmp ) icrpix1++;
+   }
+
+   if( crpix2 >= 0.0 ) {
+      icrpix2 = (int)( crpix2 + 0.5 );
+   } else {
+      tmp = crpix2 - 0.5;
+      icrpix2 = (int) tmp;
+      if( icrpix2 == tmp ) icrpix2++;
+   }
+
+/* Find the lower and upper bounds of the tile in NDF PIXEL indicies. This
+   is chosen so that the FITS reference point (CRPIX) is always somewhere
+   inside pixel zero. */
+   lbnd[ 0 ] = 1 - icrpix1;
+   lbnd[ 1 ] = 1 - icrpix2;
    ubnd[ 0 ] += lbnd[ 0 ] - 1;
    ubnd[ 1 ] += lbnd[ 1 ] - 1;
 
 /* Add a PIXEL Frame to the returned FrameSet, making sure to leave the
    current Frame unchanged. */
-   shift[ 0 ] = lbnd[ 0 ] - 1.0;
-   shift[ 1 ] = lbnd[ 1 ] - 1.0;
+   shift[ 0 ] = lbnd[ 0 ] - 1.5;
+   shift[ 1 ] = lbnd[ 1 ] - 1.5;
    icur = astGetI( lfs, "Current" );
    astAddFrame( lfs, AST__BASE, astShiftMap( 2, shift, " " ),
                 astFrame( 2, "Domain=PIXEL" ) );
