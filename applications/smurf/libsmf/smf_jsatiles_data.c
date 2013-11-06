@@ -41,6 +41,10 @@
 *  History:
 *     12-JUL-2013 (DSB):
 *        Original version.
+*     6-NOV-2013 (DSB):
+*        In order to take account of changing Epoch, etc., base the
+*        hits positions on the AZEL telescope position, not the tracking
+*        system position.
 
 *  Copyright:
 *     Copyright (C) 2013 Science and Technology Facilities Council.
@@ -85,26 +89,20 @@ int *smf_jsatiles_data( Grp *igrp, size_t size, int *ntile, int *status ){
 /* Local Variables */
    AstFrame *frm = NULL;
    AstFrameSet *fs;
-   JCMTState *state;
-   const char *trsys;
-   const char *trsys_last;
+   AstFrameSet *azeltogrid;
    dim_t *hits = NULL;
    dim_t *ph;
    dim_t iframe;
-   double *gx = NULL;
-   double *gy = NULL;
-   double *p1;
-   double *p2;
-   double *px;
-   double *py;
-   double *trac1 = NULL;
-   double *trac2 = NULL;
+   double gx[ 4 ];
+   double gy[ 4 ];
+   double azel1[ 4 ];
+   double azel2[ 4 ];
    double fov;
    double point1[ 2 ];
    double point2[ 2 ];
    double search;
    int *tiles = NULL;
-   int dim[ 2 ];
+   int dim[ 2 ] = { 0, 0 };
    int i;
    int ix;
    int iy;
@@ -129,7 +127,6 @@ int *smf_jsatiles_data( Grp *igrp, size_t size, int *ntile, int *status ){
    astBegin;
 
 /* Loop round all the input NDFs. */
-   trsys_last = "";
    for( ifile = 1; ifile <= size && *status == SAI__OK; ifile++ ) {
 
 /* Obtain information about the current input NDF. */
@@ -169,8 +166,9 @@ int *smf_jsatiles_data( Grp *igrp, size_t size, int *ntile, int *status ){
 /* Create a FrameSet describing the whole sky in which each pixel
    corresponds to a single tile. The current Frame is ICRS (RA,Dec) and
    the base Frame is grid coords in which each grid pixel corresponds to
-   a single tile. */
+   a single tile. Then invert it so that the current Frame is GRID. */
          smf_jsatile( -1, &skytiling, 0, NULL, &fs, NULL, lbnd, ubnd, status );
+         astInvert( fs );
 
 /* Allocate an image with one pixel for each tile, and fill it with
    zeros. */
@@ -189,56 +187,48 @@ int *smf_jsatiles_data( Grp *igrp, size_t size, int *ntile, int *status ){
                  "to the previous files.", status );
       }
 
-/* Re-map the current Frame of the hits map WCS FrameSet to be the tracking
-   system used by the current file (if it has changed). */
-      trsys = sc2ast_convert_system( (hdr->allState)[0].tcs_tr_sys,
-                                      status );
-      if( *status == SAI__OK && strcmp( trsys, trsys_last ) ) {
-         astSetC( fs, "System", trsys );
-         trsys_last = trsys;
-         frm = astGetFrame( fs, AST__CURRENT );
-      }
-
 /* Get the radius of the search circle. */
       search = fov + sqrt( hdr->instap[ 0 ]*hdr->instap[ 0 ] +
                            hdr->instap[ 1 ]*hdr->instap[ 1 ] );
 
-/* Ensure our work arrays are big enough to hold the current file. */
-      trac1 = astGrow( trac1, 4*hdr->nframes, sizeof( *trac1 ) );
-      trac2 = astGrow( trac2, 4*hdr->nframes, sizeof( *trac2 ) );
-      gx = astGrow( gx, 4*hdr->nframes, sizeof( *gx ) );
-      gy = astGrow( gy, 4*hdr->nframes, sizeof( *gy ) );
+/* Ensure ACSIS positions are returned by smf_tslice_ast in AZEL rather
+   than tracking. */
+      hdr->detpos = astFree( hdr->detpos );
 
-/* Check pointers can be used safely. */
-      if( *status == SAI__OK ) {
+/* Loop round each time slice. */
+      for( iframe = 0; iframe < hdr->nframes; iframe++ ) {
 
-/* Loop round all time slices, getting the tracking coords at the corners
-   of a box that enclose the field of view. */
-         p1 = trac1;
-         p2 = trac2;
-         state = hdr->allState;
-         for( iframe = 0; iframe < hdr->nframes; iframe++,state++ ) {
-            point1[ 0 ] = state->tcs_tr_ac1;
-            point1[ 1 ] = state->tcs_tr_ac2;
-            for( i = 0; i < 4; i++ ) {
-               astOffset2( frm, point1, i*AST__DPIBY2, search, point2 );
-               *(p1++) = point2[ 0 ];
-               *(p2++) = point2[ 1 ];
-            }
+/* Get the WCS FrameSet for this slice, and get a pointer to the current
+   Frame (should be an AZEL SkyFrame). */
+         smf_tslice_ast( data, iframe, 1, NO_FTS, status );
+         frm = astGetFrame( hdr->wcs, AST__CURRENT );
+
+/* Get a Mapping from AZEL to GRID coords in the hits map. */
+         azeltogrid = astConvert( frm, fs, "SKY" );
+
+/* Get the AZEL positions of four points on the circumference of a search
+   circle centred on the boresight position. */
+         point1[ 0 ] = hdr->state->tcs_az_ac1;
+         point1[ 1 ] = hdr->state->tcs_az_ac2;
+         for( i = 0; i < 4; i++ ) {
+            astOffset2( frm, point1, i*AST__DPIBY2, search, point2 );
+            azel1[ i ] = point2[ 0 ];
+            azel2[ i ] = point2[ 1 ];
          }
 
-/* Convert them to grid coords in the hits map. */
-         astTran2( fs, 4*hdr->nframes, trac1, trac2, 0, gx, gy );
+/* COnvert them from AZEL to GRID coords in the hits map. */
+         astTran2( azeltogrid, 4, azel1, azel2, 1, gx, gy );
 
-/* Loop round them all again. Update the hits map to indicate how many
-   points fall in each tile. */
-         px = gx;
-         py = gy;
-         for( iframe = 0; iframe < 4*hdr->nframes; iframe++,px++,py++ ) {
-            ix = (int)( *px + 0.5 ) - 1;
-            iy = (int)( *py + 0.5 ) - 1;
+/* Update the counts at the corresponding pixels in the hits map. */
+         for( i = 0; i < 4; i++ ) {
+            ix = (int)( gx[ i ] + 0.5 ) - 1;
+            iy = (int)( gy[ i ] + 0.5 ) - 1;
             hits[ ix + iy*dim[ 0 ] ]++;
          }
+
+/* Free resources. */
+         frm = astAnnul( frm );
+         azeltogrid = astAnnul( azeltogrid );
       }
 
 /* Close the current input data file. */
@@ -262,10 +252,6 @@ int *smf_jsatiles_data( Grp *igrp, size_t size, int *ntile, int *status ){
 
 /* Free resources. */
    hits = astFree( hits );
-   trac1 = astFree( trac1 );
-   trac2 = astFree( trac2 );
-   gx = astFree( gx );
-   gy = astFree( gy );
 
    if( *status != SAI__OK ) {
       tiles = astFree( tiles );
