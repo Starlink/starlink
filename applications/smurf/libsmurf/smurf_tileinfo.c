@@ -147,6 +147,8 @@
 *        Revert to writing unnormalised (ra,dec) to output parameter.
 *        Starlink standard behaviour is to normalise (ra,dec) prior
 *        to display, not for passing on to future calculations.
+*     7-NOV-2013 (DSB):
+*        Use smf_jsainstrument to get the instrument and tiling parameters.
 
 *  Copyright:
 *     Copyright (C) 2011-2013 Science and Technology Facilities Council.
@@ -197,9 +199,7 @@
 /* SMURF includes */
 #include "libsmf/smf.h"
 #include "smurflib.h"
-
-
-#include "libsmf/jsatiles.h"   /* Move this to smf_typ.h and smf.h when done */
+#include "libsmf/jsatiles.h"
 
 
 F77_SUBROUTINE(ast_isaregion)( INTEGER(THIS), INTEGER(STATUS) );
@@ -246,7 +246,6 @@ void smurf_tileinfo( int *status ) {
    double dlbnd[ 2 ];
    double dubnd[ 2 ];
    smfJSATiling skytiling;
-   smf_inst_t instrument;
    void *pntr;
    int *ipntr;
    AstCmpRegion *overlap;
@@ -260,35 +259,10 @@ void smurf_tileinfo( int *status ) {
 /* Start a new AST context. */
    astBegin;
 
-/* Get the instrument name, and convert to an integer identifier. */
-   parChoic( "INSTRUMENT", "SCUBA-2(450)", "SCUBA-2(450),SCUBA-2(850),"
-             "HARP,RxA,RxWD,RxWB", 0, text, sizeof(text), status );
-
-   if( !strcmp( text, "SCUBA-2(450)" ) ) {
-      instrument = SMF__INST_SCUBA_2_450;
-
-   } else if( !strcmp( text, "SCUBA-2(850)" ) ) {
-      instrument = SMF__INST_SCUBA_2_850;
-
-   } else if( !strcmp( text, "HARP" ) ) {
-      instrument = SMF__INST_HARP;
-
-   } else if( !strcmp( text, "RXA" ) ) {
-      instrument = SMF__INST_RXA;
-
-   } else if( !strcmp( text, "RxWD" ) ) {
-      instrument = SMF__INST_RXWD;
-
-   } else if( !strcmp( text, "RxWB" ) ) {
-      instrument = SMF__INST_RXWB;
-
-   } else {
-      instrument = SMF__INST_NONE;
-   }
-
-/* Get the parameters that define the layout of sky tiles for this
-   instrument. */
-   smf_jsatiling( instrument, &skytiling, status );
+/* Get the instrument to use abnd get the parameters describing the
+   layout of its JSA tiles. */
+   smf_jsainstrument( "INSTRUMENT", NULL, SMF__INST_NONE, &skytiling,
+                      status );
 
 /* Return the maximum tile index. */
    parPut0i( "MAXTILE", skytiling.ntiles - 1, status );

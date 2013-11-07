@@ -5066,7 +5066,8 @@ package @PACKAGE@ {
                 position 2
                 type LITERAL
                 access READ
-                ppath CURRENT DEFAULT
+                ppath DYNAMIC CURRENT DEFAULT
+                vpath DYNAMIC PROMPT
                 prompt {JCMT instrument}
                 default {SCUBA-2(450)}
                 helpkey *
@@ -5205,9 +5206,10 @@ package @PACKAGE@ {
             parameter instrument {
                 type LITERAL
                 access READ
-                ppath CURRENT DEFAULT
+                ppath DYNAMIC CURRENT DEFAULT
+                vpath DYNAMIC PROMPT
                 prompt {JCMT instrument}
-                default {SCUBA-2(450)}
+                default {SCUBA-2(850)}
                 helpkey *
             }
 

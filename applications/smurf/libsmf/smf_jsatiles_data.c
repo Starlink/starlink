@@ -45,6 +45,8 @@
 *        In order to take account of changing Epoch, etc., base the
 *        hits positions on the AZEL telescope position, not the tracking
 *        system position.
+*     7-NOV-2013 (DSB):
+*        Use smf_jsainstrument to select the instrument.
 
 *  Copyright:
 *     Copyright (C) 2013 Science and Technology Facilities Council.
@@ -97,7 +99,7 @@ int *smf_jsatiles_data( Grp *igrp, size_t size, int *ntile, int *status ){
    double gy[ 4 ];
    double azel1[ 4 ];
    double azel2[ 4 ];
-   double fov;
+   double fov = 0;
    double point1[ 2 ];
    double point2[ 2 ];
    double search;
@@ -112,9 +114,6 @@ int *smf_jsatiles_data( Grp *igrp, size_t size, int *ntile, int *status ){
    smfData *data = NULL;
    smfHead *hdr = NULL;
    smfJSATiling skytiling;
-   smf_inst_t inst = SMF__INST_NONE;
-   smf_inst_t instrument;
-   smf_subinst_t subinst;
 
 /* Initialise */
    *ntile = 0;
@@ -136,32 +135,14 @@ int *smf_jsatiles_data( Grp *igrp, size_t size, int *ntile, int *status ){
 /* Get a pointer to the header. */
       hdr = data->hdr;
 
-/* Get the instrument. */
-      if( hdr->instrument == INST__SCUBA2 ) {
-         subinst = smf_calc_subinst( hdr, status );
-         if( subinst == SMF__SUBINST_850 ) {
-            inst = SMF__INST_SCUBA_2_850;
-         } else {
-            inst = SMF__INST_SCUBA_2_450;
-         }
-
-      } else if( hdr->instrument == INST__ACSIS ) {
-         inst = SMF__INST_HARP;
-
-      } else if( *status == SAI__OK ) {
-         *status = SAI__ERROR;
-         smf_smfFile_msg( data->file, "FILE", 1, "<unknown>" );
-         errRep( "", "No tiles are yet defined for the instrument that "
-                 "created ^FILE.", status );
-      }
-
 /* If this is the first file, it defines the instrument in use. */
       if( ifile == 1 ) {
-         instrument = inst;
 
-/* Get the parameters that define the layout of sky tiles for the
-   instrument. */
-         smf_jsatiling( instrument, &skytiling, status );
+/* Select a JSA instrument using the instrument that created the data as
+   the default, and get the parameters defining the layout of tiles for
+   the selected instrument. */
+         smf_jsainstrument( "INSTRUMENT", hdr->fitshdr, SMF__INST_NONE,
+                            &skytiling, status );
 
 /* Create a FrameSet describing the whole sky in which each pixel
    corresponds to a single tile. The current Frame is ICRS (RA,Dec) and
@@ -178,13 +159,6 @@ int *smf_jsatiles_data( Grp *igrp, size_t size, int *ntile, int *status ){
 
 /* Get the radius of the field of view in radians. */
          fov = 0.5*(skytiling.fov*AST__DD2R)/3600.0;
-
-/* If this is not the first file, report an error if the instrument has
-   changed... */
-      } else if( instrument != inst && *status == SAI__OK ) {
-         smf_smfFile_msg( data->file, "FILE", 1, "<unknown>" );
-         errRep( "", "The file ^FILE was created by a different instrument "
-                 "to the previous files.", status );
       }
 
 /* Get the radius of the search circle. */
@@ -262,6 +236,4 @@ int *smf_jsatiles_data( Grp *igrp, size_t size, int *ntile, int *status ){
 
    return tiles;
 }
-
-
 

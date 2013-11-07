@@ -90,6 +90,8 @@
 *        Original version.
 *     12-JUL-2013 (DSB):
 *        Added parameter IN.
+*     7-NOV-2013 (DSB):
+*        Call smf_jsainstrument to get the instrument and tiling scheme.
 
 *  Copyright:
 *     Copyright (C) 2011,2013 Science and Technology Facilities Council.
@@ -148,13 +150,12 @@ void smurf_tilelist( int *status ) {
    AstRegion *region;
    Grp *igrp = NULL;
    Grp *sgrp = NULL;
-   char text[ 200 ];
    int *tiles = NULL;
    int i;
    int ntile;
    size_t size;
    size_t ssize;
-   smf_inst_t instrument;
+   smfJSATiling tiling;
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -169,37 +170,14 @@ void smurf_tilelist( int *status ) {
               &obj, status );
    region = (AstRegion *) obj;
 
-/* If successful, get the instrument name, and convert to an integer
-   identifier. */
+/* If successful, select a JSA instrument and get the parameters defining
+   the layout of tiles for the selected instrument. */
    if( *status == SAI__OK && region ) {
-
-      parChoic( "INSTRUMENT", "SCUBA-2(450)", "SCUBA-2(450),SCUBA-2(850),"
-                "HARP,RxA,RxWD,RxWB", 0, text, sizeof(text), status );
-
-      if( !strcmp( text, "SCUBA-2(450)" ) ) {
-         instrument = SMF__INST_SCUBA_2_450;
-
-      } else if( !strcmp( text, "SCUBA-2(850)" ) ) {
-         instrument = SMF__INST_SCUBA_2_850;
-
-      } else if( !strcmp( text, "HARP" ) ) {
-         instrument = SMF__INST_HARP;
-
-      } else if( !strcmp( text, "RXA" ) ) {
-         instrument = SMF__INST_RXA;
-
-      } else if( !strcmp( text, "RxWD" ) ) {
-         instrument = SMF__INST_RXWD;
-
-      } else if( !strcmp( text, "RxWB" ) ) {
-         instrument = SMF__INST_RXWB;
-
-      } else {
-         instrument = SMF__INST_NONE;
-      }
+      smf_jsainstrument( "INSTRUMENT", NULL, SMF__INST_NONE,
+                         &tiling, status );
 
 /* Get the list of identifiers for tiles that overlap the region. */
-      tiles = smf_jsatiles_region( region, instrument, &ntile, status );
+      tiles = smf_jsatiles_region( region, &tiling, &ntile, status );
 
 /* If no Region was supplied, annull the error and get a group of input
    data files. */
