@@ -13,13 +13,17 @@
 *     C function
 
 *  Invocation:
-*     int *smf_jsatiles_data( Grp *igrp, size_t size, int *ntile, int *status )
+*     int *smf_jsatiles_data( Grp *igrp, size_t size, smfJSATiling *tiling,
+*                             int *ntile, int *status )
 
 *  Arguments:
 *     igrp = Grp * (Given)
 *        A group holding the paths to the data files.
 *     size = size_t (Given)
 *        The number of data files in "igrp".
+*     tiling = smfJSATiling * (Returned)
+*        Structure in which to return the parameters of the used tiling
+*        scheme.
 *     ntile = int * (Returned)
 *        The number of tiles in the returned list.
 *     status = int* (Given and Returned)
@@ -86,7 +90,8 @@
 #include "libsmf/jsatiles.h"
 
 
-int *smf_jsatiles_data( Grp *igrp, size_t size, int *ntile, int *status ){
+int *smf_jsatiles_data( Grp *igrp, size_t size, smfJSATiling *tiling,
+                        int *ntile, int *status ){
 
 /* Local Variables */
    AstFrame *frm = NULL;
@@ -113,7 +118,6 @@ int *smf_jsatiles_data( Grp *igrp, size_t size, int *ntile, int *status ){
    size_t ifile;
    smfData *data = NULL;
    smfHead *hdr = NULL;
-   smfJSATiling skytiling;
 
 /* Initialise */
    *ntile = 0;
@@ -142,13 +146,13 @@ int *smf_jsatiles_data( Grp *igrp, size_t size, int *ntile, int *status ){
    the default, and get the parameters defining the layout of tiles for
    the selected instrument. */
          smf_jsainstrument( "INSTRUMENT", hdr->fitshdr, SMF__INST_NONE,
-                            &skytiling, status );
+                            tiling, status );
 
 /* Create a FrameSet describing the whole sky in which each pixel
    corresponds to a single tile. The current Frame is ICRS (RA,Dec) and
    the base Frame is grid coords in which each grid pixel corresponds to
    a single tile. Then invert it so that the current Frame is GRID. */
-         smf_jsatile( -1, &skytiling, 0, NULL, &fs, NULL, lbnd, ubnd, status );
+         smf_jsatile( -1, tiling, 0, NULL, &fs, NULL, lbnd, ubnd, status );
          astInvert( fs );
 
 /* Allocate an image with one pixel for each tile, and fill it with
@@ -158,7 +162,7 @@ int *smf_jsatiles_data( Grp *igrp, size_t size, int *ntile, int *status ){
          hits = astCalloc( dim[0]*dim[1], sizeof( *hits ) );
 
 /* Get the radius of the field of view in radians. */
-         fov = 0.5*(skytiling.fov*AST__DD2R)/3600.0;
+         fov = 0.5*(tiling->fov*AST__DD2R)/3600.0;
       }
 
 /* Get the radius of the search circle. */
@@ -217,7 +221,7 @@ int *smf_jsatiles_data( Grp *igrp, size_t size, int *ntile, int *status ){
          if( *ph > 0 ) {
             tiles = astGrow( tiles, ++(*ntile), sizeof( *tiles ) );
             if( *status == SAI__OK ) {
-               tiles[ *ntile - 1 ] = smf_jsatilexy2i( ix, iy, &skytiling,
+               tiles[ *ntile - 1 ] = smf_jsatilexy2i( ix, iy, tiling,
                                                       status );
             }
          }

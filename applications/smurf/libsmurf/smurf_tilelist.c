@@ -4,7 +4,7 @@
 *     TILELIST
 
 *  Purpose:
-*     List the sky tiles that overlap a given set of raw data files or an
+*     List the sky tiles that overlap a given set of data files or an
 *     AST Region.
 
 *  Language:
@@ -22,35 +22,41 @@
 
 *  Description:
 *     This routine returns a list containing the indices of the sky tiles
-*     (for a named JCMT instrument) that receive data from a given set of
-*     raw data files, or that overlap a supplied AST Region.
+*     (for a named JCMT instrument) that overlap a supplied AST Region,
+*     map, cube or group of raw data files.
 
 *  ADAM Parameters:
-*     REGION = LITERAL (Read)
-*        The name of a text file containing the AST Region. Alternatively,
-*        the path for an NDF can be supplied, in which case a Region is
-*        created that covers the region of sky that maps onto the rectangular
-*        pixel grid of the NDF. If null (!) is supplied, the IN parameter is
-*        used instead. [!]
-*     IN = NDF (Read)
-*        Input raw data files that define the required list of tiles.
-*        ONly used if REGION is null (!).
+*     IN = LITERAL (Read)
+*        Specifies the region of sky for which tiles should be listed. It
+*        may be:
+*
+*        - The name of a text file containing an AST Region. The Region 
+*        can be either 2D or 3D but must include celestial axes.
+*
+*        - The path to a 2- or 3-D NDF holding a reduced map or cube. This
+*        need not necessarily hold JCMT data, but must have celestial axes 
+*        in its current WCS Frame.
+*
+*        - A group of raw JCMT data files.
+*
 *     INSTRUMENT = LITERAL (Read)
 *        The JCMT instrument (different instruments have different
 *        tiling schemes and pixel sizes). The following instrument
 *        names are recognised (unambiguous abbreviations may be
 *        supplied): "SCUBA-2(450)", "SCUBA-2(850)", "HARP", "RxA",
-*        "RxWD", "RxWB". Only used if a value is supplied for REGION
-*        (the instrument is determined from the data supplied for IN
-*        otherwise).
+*        "RxWD", "RxWB". If one or more NDFs are supplied for parameter
+*        IN, then a dynamic default is determined if possible from the
+*        first NDF. If this cannot be done, or if a Region is supplied
+*        for parameter IN, then no dynamic default is provided, and the 
+*        user is prompted for a value if none was supplied on the command 
+*        line. []
 *     TILES(*) = _INTEGER (Write)
 *        An output parameter to which is written the list of integer tile
 *        indices.
 
 *  Tile Definitions:
-*     It should rarely, if ever, be necessary to know the specific details
-*     of the tiling scheme used by SMURF. But for reference, it works as
-*     follows:
+*     It should never be necessary to know the specific details of the tiling 
+*     scheme used by SMURF. But for reference, it works as follows:
 *
 *     The whole sky is covered by an HPX (HEALPix) projection containing
 *     12 basic square facets, the reference point of the projection is put
@@ -74,8 +80,8 @@
 *
 *     This is a fairly complex scheme. To help understanding, the
 *     SMURF:TILEINFO command can create an all-sky map in which each
-*     pixel corresponds to a single tile, and has a pixel value equal to
-*     the corresponding tile index. Displaying this map should help you
+*     pixel corresponds to a single tile, and has a pixel value equal
+*     to the corresponding tile index. Displaying this map can help
 *     to visualise the indexing scheme described above.
 
 *  Related Applications:
@@ -91,7 +97,9 @@
 *     12-JUL-2013 (DSB):
 *        Added parameter IN.
 *     7-NOV-2013 (DSB):
-*        Call smf_jsainstrument to get the instrument and tiling scheme.
+*        - Call smf_jsainstrument to get the instrument and tiling scheme.
+*        - Allow this command to be used on a reduced map or cube, or
+*        other NDF.
 
 *  Copyright:
 *     Copyright (C) 2011,2013 Science and Technology Facilities Council.
@@ -131,12 +139,12 @@
 #include "mers.h"
 #include "par.h"
 #include "sae_par.h"
+#include "kpg_err.h"
 
 /* SMURF includes */
 #include "libsmf/smf.h"
 #include "smurflib.h"
-
-#include "libsmf/jsatiles.h"   /* Move this to smf_typ.h and smf.h when done */
+#include "libsmf/jsatiles.h"
 
 
 F77_SUBROUTINE(ast_isaregion)( INTEGER(THIS), INTEGER(STATUS) );
@@ -146,12 +154,14 @@ static int tilelist_icomp(const void *a, const void *b);
 void smurf_tilelist( int *status ) {
 
 /* Local Variables */
+   AstFitsChan *fc = NULL;
    AstObject *obj;
    AstRegion *region;
    Grp *igrp = NULL;
    Grp *sgrp = NULL;
    int *tiles = NULL;
    int i;
+   int indf;
    int ntile;
    size_t size;
    size_t ssize;
@@ -163,26 +173,42 @@ void smurf_tilelist( int *status ) {
 /* Start a new AST context. */
    astBegin;
 
-/* Attempt to to get an AST Region (assumed to be in some 2D sky coordinate
-   system). */
-   kpg1Gtobj( "REGION", "Region",
+/* Attempt to to get an AST Region. */
+   kpg1Gtobj( "IN", "Region",
               (void (*)( void )) F77_EXTERNAL_NAME(ast_isaregion),
               &obj, status );
    region = (AstRegion *) obj;
 
-/* If successful, select a JSA instrument and get the parameters defining
-   the layout of tiles for the selected instrument. */
+/* If successful, attempt to access the IN parameter as an NDF. If this
+   works, we may be able to determine the instrument by looking at its
+   FITS extension. */
    if( *status == SAI__OK && region ) {
-      smf_jsainstrument( "INSTRUMENT", NULL, SMF__INST_NONE,
-                         &tiling, status );
+      ndfExist( "IN", "Read", &indf, status );
+
+/* If we got an NDF, get a FitsChan holding the contents of its FITS
+   extension. Annul the error if the NDF has no FITS extension. */
+      if( indf != NDF__NOID ) {
+         kpgGtfts( indf, &fc, status );
+         if( *status == KPG__NOFTS ) {
+            errAnnul( status );
+            fc = NULL;
+         }
+         ndfAnnul( &indf, status );
+      }
+
+/* Select a JSA instrument and get the parameters defining the layout of
+   tiles for the selected instrument. */
+      smf_jsainstrument( "INSTRUMENT", fc, SMF__INST_NONE, &tiling,
+                         status );
 
 /* Get the list of identifiers for tiles that overlap the region. */
       tiles = smf_jsatiles_region( region, &tiling, &ntile, status );
+   }
 
-/* If no Region was supplied, annull the error and get a group of input
-   data files. */
-   } else if( *status == PAR__NULL ) {
-      errAnnul( status );
+/* If the IN parameter could not be accessed as a Region, annull any error
+   and get a group of input data files. */
+   if( !region || *status == SAI__ERROR ) {
+      if( *status != SAI__OK ) errAnnul( status );
       kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
 /* Get a group containing just the files holding science data. */
@@ -197,7 +223,7 @@ void smurf_tilelist( int *status ) {
 
 /* Get the list of identifiers for tiles that receive any data. */
       } else {
-         tiles = smf_jsatiles_data( sgrp, ssize, &ntile, status );
+         tiles = smf_jsatiles_data( sgrp, ssize, &tiling, &ntile, status );
       }
 
 /* Delete the groups. */
@@ -210,6 +236,9 @@ void smurf_tilelist( int *status ) {
       qsort( tiles, ntile, sizeof( *tiles ), tilelist_icomp );
 
 /* Display the list of overlapping tiles. */
+      msgBlank( status );
+      msgOutf( "", "   %s tiles touched by supplied data:", status,
+               tiling.name );
       msgBlank( status );
       for( i = 0; i < ntile; i++ ) {
          msgSeti( "I", tiles[ i ] );

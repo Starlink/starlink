@@ -5182,16 +5182,6 @@ package @PACKAGE@ {
         action tilelist {
             helplib {$SMURF_HELP}
 
-            parameter region {
-                type LITERAL
-                access READ
-                vpath DEFAULT
-                ppath CURRENT
-                prompt {File contining the AST Region}
-                default !
-                helpkey *
-            }
-
             parameter in {
                 position 1
                 type NDF
@@ -5199,11 +5189,12 @@ package @PACKAGE@ {
                 vpath {PROMPT }
                 ppath GLOBAL CURRENT
                 association <-GLOBAL.DATA_ARRAY
-                prompt {Input NDF data structure}
+                prompt {Input Region or NDF}
                 helpkey *
             }
 
             parameter instrument {
+                position 2
                 type LITERAL
                 access READ
                 ppath DYNAMIC CURRENT DEFAULT

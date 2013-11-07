@@ -34,7 +34,8 @@
 
 *  Description:
 *     This routine returns a list containing the indices of the sky tiles
-*     (for a named JCMT instrument) that receive data from a given AST Region.
+*     (for a named JCMT instrument) that receive data from a given AST
+*     Region.
 
 *  Authors:
 *     DSB: David Berry (JAC, Hawaii)
@@ -76,6 +77,7 @@
 #include "ast.h"
 #include "mers.h"
 #include "sae_par.h"
+#include "star/atl.h"
 
 /* SMURF includes */
 #include "libsmf/smf.h"
@@ -89,9 +91,10 @@ int *smf_jsatiles_region( AstRegion *region, smfJSATiling *skytiling,
    AstFrameSet *fs;
    AstKeyMap *km;
    AstRegion *region2;
+   AstRegion *space_region;
    AstRegion *tregion;
+   AstSkyFrame *skyframe;
    char text[ 200 ];
-   const char *class;
    const char *key;
    double *mesh = NULL;
    double *xmesh;
@@ -107,7 +110,6 @@ int *smf_jsatiles_region( AstRegion *region, smfJSATiling *skytiling,
    int key_index;
    int lbnd[ 2 ];
    int mapsize;
-   int nax;
    int npoint;
    int overlap;
    int ubnd[ 2 ];
@@ -127,39 +129,51 @@ int *smf_jsatiles_region( AstRegion *region, smfJSATiling *skytiling,
    are annulled automatically. */
    astBegin;
 
+/* Identify the celestial axes in the Region. */
+   atlFindSky( (AstFrame *) region, &skyframe, axes + 1, axes, status );
+
+/* Report an error if no celestial axes were found. */
+   if( !skyframe && *status == SAI__OK ) {
+      space_region = NULL;
+      *status = SAI__ERROR;
+      errRep( "", "The current WCS Frame in the supplied Region or "
+              "NDF does not include celestial longitude and latitude axes.",
+              status );
+
+/* Otherwise, if the Region itself is 2-dimensional, it does not contain
+   any other axes, so just use it as is. */
+   } else if( astGetI( region, "Naxes" ) == 2 ) {
+      space_region = astClone( region );
+
+/* Otherwise, create a new Region by picking the celestial axes from the
+   supplied Region. Report an error if a Region cannot be created in this
+   way. */
+   } else {
+      space_region = astPickAxes( region, 2, axes, NULL );
+      if( !astIsARegion( space_region ) && *status == SAI__OK ) {
+         *status = SAI__ERROR;
+         errRep( "", "The  celestial longitude and latitude axes in the "
+                 "supplied Region or NDF are not independent of the other "
+                 "axes.", status );
+      }
+   }
+
 /* Create a FrameSet describing the whole sky in which each pixel
    corresponds to a single tile. The current Frame is ICRS (RA,Dec) and
    the base Frame is grid coords in which each grid pixel corresponds to
    a single tile. */
    smf_jsatile( -1, skytiling, 0, NULL, &fs, NULL, lbnd, ubnd, status );
 
-/* If the supplied Region is 3-dimensional, remove the third axis, which
-   is assumed to be a spectral axis. */
-   nax = astGetI( region, "Naxes" );
-   if( nax > 2 ) {
-      axes[ 0 ] = 1;
-      axes[ 1 ] = 2;
-      region2 = astPickAxes( region, 2, axes, NULL );
-      if( ! astIsARegion( region2 ) && *status == SAI__OK ) {
-         class = astGetC( region, "Class" );
-         *status = SAI__ERROR;
-         errRepf( "", "Cannot extract a 2-D Region from the supplied "
-                  "%d-D %s.", status,  nax, class );
-      } else {
-         region = region2;
-      }
-   }
-
 /* Map the Region using the FrameSet obtained above so that the new Region
    describes offsets in tiles from the lower left tile. */
    astInvert( fs );
-   fs = astConvert( region, fs, "SKY" );
+   fs = astConvert( space_region, fs, "SKY" );
    if( !fs && *status == SAI__OK ) {
       *status = SAI__ERROR;
-      errRep( "", "Supplied Region is not a SkyFrame.", status );
+      errRep( "", "Cannot convert the supplied Region to ICRS.", status );
       goto L999;
    }
-   region2 = astMapRegion( region, fs, fs );
+   region2 = astMapRegion( space_region, fs, fs );
 
 /* Get a mesh of all-sky "grid" positions (actually tile X and Y indices)
    covering the region. Since the mesh positions are limited in number
@@ -217,7 +231,7 @@ int *smf_jsatiles_region( AstRegion *region, smfJSATiling *skytiling,
 
 /* See if this Region overlaps the user supplied region. Set the value of
    the KeyMap entry to +1 or 0 accordingly. */
-         overlap = astOverlap( tregion, region );
+         overlap = astOverlap( tregion, space_region );
          if( overlap == 0 ) {
             if( *status == SAI__OK ) {
                *status = SAI__ERROR;

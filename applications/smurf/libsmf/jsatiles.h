@@ -43,8 +43,8 @@ void         smf_jsatilei2xy( int itile, smfJSATiling *jsatiling, int *xt,
                               int *yt, int *fi, int *status );
 int *        smf_jsatiles_region( AstRegion *region, smfJSATiling *tiling,
                                   int *ntile, int *status );
-int *        smf_jsatiles_data( Grp *igrp, size_t size, int *ntile,
-                                int *status );
+int *        smf_jsatiles_data( Grp *igrp, size_t size, smfJSATiling *tiling,
+                                int *ntile, int *status );
 int          smf_jsatilexy2i( int xt, int yt, smfJSATiling *jsatiling,
                               int *status );
 void         smf_jsatiling( smf_inst_t instrument, smfJSATiling *jsatiling,
