@@ -76,6 +76,7 @@
 *     file is closed.
 
 *  Notes:
+*     - All HARP/ACSIS files are considered to be science files.
 *     - use smf_close_related to free the smfArray.
 *     - if "outgrp" is NULL then only dark information will be returned.
 *     - if both "darkgrp" and "darks" are NULL on entry, this routine
@@ -94,8 +95,9 @@
 *       There is no facility for creating an output responsivity image.
 
 *  Authors:
-*     Tim Jenness (JAC, Hawaii)
-*     Ed Chapin (UBC)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
+*     EC: Ed Chapin (UBC)
+*     DSB: David Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -167,9 +169,13 @@
 *        and rely on downstream to complain.
 *     2012-08-29 (TIMJ):
 *        Allow the user to control whether the following flat should be used.
+*     2013-11-07 (DSB):
+*        All HARP/ACSIS files are now accepted as science files. Previously,
+*        a "no SEQCOUNT header found" error was reported if any HARP/ACSIS
+*        files were supplied.
 
 *  Copyright:
-*     Copyright (C) 2008-2011 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2013 Science and Technology Facilities Council.
 *     Copyright (C) 2010 University of British Columbia.
 *     All Rights Reserved.
 
@@ -326,80 +332,93 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
     /* Fill in the keymap with observation details */
     smf_obsmap_fill( infile, obsmap, objmap, status );
 
-    /* Find the heater efficiency map if required */
-    if (*status == SAI__OK && heateffmap) {
-      char arrayidstr[32];
-      smf_fits_getS( infile->hdr, "ARRAYID", arrayidstr, sizeof(arrayidstr),
-                     status );
-      if (!astMapHasKey( heatermap, arrayidstr ) ) {
-        smfData * heateff = NULL;
-        dim_t nbolos = 0;
-        smf_flat_params( infile, "RESIST", NULL, NULL, NULL, NULL, NULL,
-                         NULL, NULL, NULL, NULL, NULL, &heateff, status );
-        smf_get_dims( heateff, NULL, NULL, &nbolos, NULL, NULL, NULL, NULL,
-                      status );
-        if (heateff) astMapPut0P( heatermap, arrayidstr, heateff, NULL );
-      }
-    }
+    /* If this is a HARP/ACSIS file it must be a science file, so store it
+       in the output group. */
+    if( infile->hdr->instrument == INST__ACSIS) {
+      smf_smfFile_msg( infile->file, "F", 1, "<unknown file>");
+      ndgCpsup( ingrp, i, ogrp, status );
+      msgOutif( MSG__DEBUG, " ", "Found ACSIS file ^F",status);
+      smf__addto_durations( infile, &duration_sci, &nsteps_sci, status );
+      sccount++;
 
-    /* Get the sequence counter for the file. We do not worry about
-       duplicate sequence counters (at the moment) */
-    smf_find_seqcount( infile->hdr, &seqcount, status );
-
-    /* The key identifying this subarray/obsidss/heater/shutter combo */
-    smf__calc_flatobskey( infile->hdr, keystr, sizeof(keystr), status );
-
-    if (smf_isdark( infile, status )) {
-      /* Store the sorting information */
-      dkcount = smf__addto_sortinfo( infile, alldarks, i, dkcount, "Dark", status );
-      smf__addto_durations( infile, &duration_darks, &nsteps_dark, status );
-      astMapPutElemI( scimap, keystr, -1, seqcount );
+    /* Now handle non-HARP/ACSIS files. */
     } else {
-      /* compare sequence type with observation type and drop it (for now)
-         if they differ */
-      if ( infile->hdr->obstype == infile->hdr->seqtype ) {
-        /* Sanity check the header for corruption. Compare RTS_NUM with SEQSTART
-           and SEQEND. The first RTS_NUM must either be SEQSTART or else between
-           SEQSTART and SEQEND (if someone has giving us a section) */
-        int seqstart = 0;
-        int seqend = 0;
-        int firstnum = 0;
-        JCMTState *tmpState = NULL;
-        smf_getfitsi( infile->hdr, "SEQSTART", &seqstart, status );
-        smf_getfitsi( infile->hdr, "SEQEND", &seqend, status );
-        tmpState = infile->hdr->allState;
 
-        if( tmpState ) {
-          firstnum = (tmpState[0]).rts_num;
-          smf_smfFile_msg( infile->file, "F", 1, "<unknown file>");
-          if ( firstnum >= seqstart && firstnum <= seqend ) {
+      /* Find the heater efficiency map if required */
+      if (*status == SAI__OK && heateffmap) {
+        char arrayidstr[32];
+        smf_fits_getS( infile->hdr, "ARRAYID", arrayidstr, sizeof(arrayidstr),
+                       status );
+        if (!astMapHasKey( heatermap, arrayidstr ) ) {
+          smfData * heateff = NULL;
+          dim_t nbolos = 0;
+          smf_flat_params( infile, "RESIST", NULL, NULL, NULL, NULL, NULL,
+                           NULL, NULL, NULL, NULL, NULL, &heateff, status );
+          smf_get_dims( heateff, NULL, NULL, &nbolos, NULL, NULL, NULL, NULL,
+                        status );
+          if (heateff) astMapPut0P( heatermap, arrayidstr, heateff, NULL );
+        }
+      }
+
+      /* Get the sequence counter for the file. We do not worry about
+         duplicate sequence counters (at the moment) */
+      smf_find_seqcount( infile->hdr, &seqcount, status );
+
+      /* The key identifying this subarray/obsidss/heater/shutter combo */
+      smf__calc_flatobskey( infile->hdr, keystr, sizeof(keystr), status );
+
+      if (smf_isdark( infile, status )) {
+        /* Store the sorting information */
+        dkcount = smf__addto_sortinfo( infile, alldarks, i, dkcount, "Dark", status );
+        smf__addto_durations( infile, &duration_darks, &nsteps_dark, status );
+        astMapPutElemI( scimap, keystr, -1, seqcount );
+      } else {
+        /* compare sequence type with observation type and drop it (for now)
+           if they differ */
+        if ( infile->hdr->obstype == infile->hdr->seqtype ) {
+          /* Sanity check the header for corruption. Compare RTS_NUM with SEQSTART
+             and SEQEND. The first RTS_NUM must either be SEQSTART or else between
+             SEQSTART and SEQEND (if someone has giving us a section) */
+          int seqstart = 0;
+          int seqend = 0;
+          int firstnum = 0;
+          JCMTState *tmpState = NULL;
+          smf_getfitsi( infile->hdr, "SEQSTART", &seqstart, status );
+          smf_getfitsi( infile->hdr, "SEQEND", &seqend, status );
+          tmpState = infile->hdr->allState;
+
+          if( tmpState ) {
+            firstnum = (tmpState[0]).rts_num;
+            smf_smfFile_msg( infile->file, "F", 1, "<unknown file>");
+            if ( firstnum >= seqstart && firstnum <= seqend ) {
+              /* store the file in the output group */
+              ndgCpsup( ingrp, i, ogrp, status );
+              msgOutif(MSG__DEBUG, " ", "Non-dark file: ^F",status);
+              smf__addto_durations( infile, &duration_sci, &nsteps_sci, status );
+              astMapPutElemI( scimap, keystr, -1, seqcount );
+              sccount++;
+            } else {
+              msgOutif( MSG__QUIET, "",
+                        "File ^F has a corrupt FITS header. Ignoring it.",
+                        status );
+            }
+          } else {
+            smf_smfFile_msg( infile->file, "F", 1, "<unknown file>");
             /* store the file in the output group */
             ndgCpsup( ingrp, i, ogrp, status );
-            msgOutif(MSG__DEBUG, " ", "Non-dark file: ^F",status);
+            msgOutif( MSG__DEBUG, " ",
+                      "File ^F lacks JCMTState: assuming it is non-dark",status);
             smf__addto_durations( infile, &duration_sci, &nsteps_sci, status );
             astMapPutElemI( scimap, keystr, -1, seqcount );
             sccount++;
-          } else {
-            msgOutif( MSG__QUIET, "",
-                      "File ^F has a corrupt FITS header. Ignoring it.",
-                      status );
           }
+
+        } else if (infile->hdr->seqtype == SMF__TYP_FASTFLAT ) {
+          ffcount = smf__addto_sortinfo( infile, allfflats, i, ffcount, "Fast flat", status );
         } else {
           smf_smfFile_msg( infile->file, "F", 1, "<unknown file>");
-          /* store the file in the output group */
-          ndgCpsup( ingrp, i, ogrp, status );
-          msgOutif( MSG__DEBUG, " ",
-                    "File ^F lacks JCMTState: assuming it is non-dark",status);
-          smf__addto_durations( infile, &duration_sci, &nsteps_sci, status );
-          astMapPutElemI( scimap, keystr, -1, seqcount );
-          sccount++;
+          msgOutif(MSG__DEBUG, " ", "Sequence type mismatch with observation type: ^F",status);
         }
-
-      } else if (infile->hdr->seqtype == SMF__TYP_FASTFLAT ) {
-        ffcount = smf__addto_sortinfo( infile, allfflats, i, ffcount, "Fast flat", status );
-      } else {
-        smf_smfFile_msg( infile->file, "F", 1, "<unknown file>");
-        msgOutif(MSG__DEBUG, " ", "Sequence type mismatch with observation type: ^F",status);
       }
     }
 
