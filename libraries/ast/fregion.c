@@ -19,6 +19,7 @@
 *     AST_MAPREGION
 *     AST_GETREGIONBOUNDS
 *     AST_GETREGIONFRAME
+*     AST_GETREGIONFRAMESET
 *     AST_OVERLAP
 *     AST_SETUNC
 *     AST_GETUNC
@@ -112,6 +113,18 @@ F77_INTEGER_FUNCTION(ast_getregionframe)( INTEGER(THIS),
    astAt( "AST_GETREGIONFRAME", NULL, 0 );
    astWatchSTATUS(
       RESULT = astP2I( astGetRegionFrame( astI2P( *THIS ) ) );
+   )
+   return RESULT;
+}
+
+F77_INTEGER_FUNCTION(ast_getregionframeset)( INTEGER(THIS),
+                                             INTEGER(STATUS) ) {
+   GENPTR_INTEGER(THIS)
+   F77_INTEGER_TYPE(RESULT);
+
+   astAt( "AST_GETREGIONFRAMESET", NULL, 0 );
+   astWatchSTATUS(
+      RESULT = astP2I( astGetRegionFrameSet( astI2P( *THIS ) ) );
    )
    return RESULT;
 }

@@ -111,6 +111,8 @@ c     - astGetRegionBounds: Get the bounds of a Region
 f     - AST_GETREGIONBOUNDS: Get the bounds of a Region
 c     - astGetRegionFrame: Get a copy of the Frame represent by a Region
 f     - AST_GETREGIONFRAME: Get a copy of the Frame represent by a Region
+f     - astGetRegionFrameSet: Get a copy of the Frameset encapsulated by a Region
+f     - AST_GETREGIONFRAMESET: Get a copy of the Frameset encapsulated by a Region
 c     - astGetRegionMesh: Get a mesh of points covering a Region
 f     - AST_GETREGIONMESH: Get a mesh of points covering a Region
 c     - astGetRegionPoints: Get the positions that define a Region
@@ -213,6 +215,8 @@ f     - AST_SHOWMESH: Display a mesh of points on the surface of a Region
 *        component regions.
 *     15-JUN-2012 (DSB):
 *        Guard against division by zero in RegBase Grid if "ipr" is zero.
+*     7-NOV-2013 (DSB):
+*        Added method astGetRegionFrameSet.
 *class--
 
 *  Implementation Notes:
@@ -879,6 +883,7 @@ static int MaskUS( AstRegion *, AstMapping *, int, int, const int[], const int[]
 
 static AstAxis *GetAxis( AstFrame *, int, int * );
 static AstFrame *GetRegionFrame( AstRegion *, int * );
+static AstFrameSet *GetRegionFrameSet( AstRegion *, int * );
 static AstFrame *PickAxes( AstFrame *, int, const int[], AstMapping **, int * );
 static AstFrame *RegFrame( AstRegion *, int * );
 static AstFrameSet *Conv( AstFrameSet *, AstFrameSet *, int * );
@@ -4228,6 +4233,64 @@ f     function is invoked with STATUS set to an error value, or if it
    return result;
 }
 
+static AstFrameSet *GetRegionFrameSet( AstRegion *this, int *status ) {
+/*
+*++
+*  Name:
+c     astGetRegionFrameSet
+f     AST_GETREGIONFRAMESET
+
+*  Purpose:
+*     Obtain a pointer to the encapsulated FrameSet within a Region.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "region.h"
+c     AstFrame *astGetRegionFrameSet( AstRegion *this )
+f     RESULT = AST_GETREGIONFRAMESET( THIS, STATUS )
+
+*  Class Membership:
+*     Region method.
+
+*  Description:
+*     This function returns a pointer to the FrameSet encapsulated by a
+*     Region. The base Frame is the Frame in which the box was originally
+*     defined, and the current Frame is the Frame into which the Region
+*     is currently mapped (i.e. it will be the same as the Frame returned
+c     by astGetRegionFrame).
+f     by AST_GETREGIONFRAME).
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the Region.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Returned Value:
+c     astGetRegionFrameSet()
+f     AST_GETREGIONFRAMESET = INTEGER
+*        A pointer to a deep copy of the FrameSet represented by the Region.
+*        Using this pointer to modify the FrameSet will have no effect on
+*        the Region.
+
+*  Notes:
+*     - A null Object pointer (AST__NULL) will be returned if this
+c     function is invoked with the AST error status set, or if it
+f     function is invoked with STATUS set to an error value, or if it
+*     should fail for any reason.
+*--
+*/
+
+/* Check the global error status. */
+   if ( !astOK ) return NULL;
+
+/* Return a deep copy of the encapsulated FrameSet. */
+   return astCopy( this->frameset );
+}
+
 void astInitRegionVtab_(  AstRegionVtab *vtab, const char *name, int *status ) {
 /*
 *+
@@ -4328,6 +4391,7 @@ void astInitRegionVtab_(  AstRegionVtab *vtab, const char *name, int *status ) {
    vtab->TestUnc = TestUnc;
    vtab->ClearUnc = ClearUnc;
    vtab->GetRegionFrame = GetRegionFrame;
+   vtab->GetRegionFrameSet = GetRegionFrameSet;
    vtab->MapRegion = MapRegion;
    vtab->Overlap = Overlap;
    vtab->OverlapX = OverlapX;
@@ -12752,6 +12816,10 @@ void astNegate_( AstRegion *this, int *status ){
 AstFrame *astGetRegionFrame_( AstRegion *this, int *status ){
    if ( !astOK ) return NULL;
    return (**astMEMBER(this,Region,GetRegionFrame))( this, status );
+}
+AstFrameSet *astGetRegionFrameSet_( AstRegion *this, int *status ){
+   if ( !astOK ) return NULL;
+   return (**astMEMBER(this,Region,GetRegionFrameSet))( this, status );
 }
 AstRegion *astMapRegion_( AstRegion *this, AstMapping *map, AstFrame *frame, int *status ){
    if ( !astOK ) return NULL;

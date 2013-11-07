@@ -122,6 +122,7 @@ typedef struct AstRegionVtab {
    int (* OverlapX)( AstRegion *, AstRegion *, int * );
    AstRegion *(* MapRegion)( AstRegion *, AstMapping *, AstFrame *, int * );
    AstFrame *(* GetRegionFrame)( AstRegion *, int * );
+   AstFrameSet *(* GetRegionFrameSet)( AstRegion *, int * );
    AstFrame *(* RegFrame)( AstRegion *, int * );
    AstFrameSet *(* GetRegFS)( AstRegion *, int * );
    AstPointSet *(* RegTransform)( AstRegion *, AstPointSet *, int, AstPointSet *, AstFrame **, int * );
@@ -250,6 +251,7 @@ void astInitRegionGlobals_( AstRegionGlobals * );
 /* -------------------------------- */
 
 AstFrame *astGetRegionFrame_( AstRegion *, int * );
+AstFrameSet *astGetRegionFrameSet_( AstRegion *, int * );
 int astOverlap_( AstRegion *, AstRegion *, int * );
 void astNegate_( AstRegion *, int * );
 
@@ -383,6 +385,8 @@ astINVOKE(O,astLoadRegion_(mem,size,vtab,name,astCheckChannel(channel),STATUS_PT
    of object is supplied. */
 #define astGetRegionFrame(this) \
 astINVOKE(O,astGetRegionFrame_(astCheckRegion(this),STATUS_PTR))
+#define astGetRegionFrameSet(this) \
+astINVOKE(O,astGetRegionFrameSet_(astCheckRegion(this),STATUS_PTR))
 #define astNegate(this) \
 astINVOKE(V,astNegate_(astCheckRegion(this),STATUS_PTR))
 #define astOverlap(this,that) \
