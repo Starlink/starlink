@@ -81,6 +81,7 @@ void atlAddWcsAxis( AstFrameSet *, AstMapping *, AstFrame *, int *, int *, int *
 void atlAxtrm( AstFrameSet *, int *, int *, int *, double *, int * );
 void atlCreat( const char *, AstObject *, int * );
 void atlDumpFits( const char *, AstFitsChan *, int * );
+void atlFindSky( AstFrame *, AstSkyFrame **, int *, int *, int * );
 void atlGetParam( const char *, AstKeyMap *, int * );
 void atlHd2ky( HDSLoc *, AstKeyMap *, int * );
 void atlKy2hd( AstKeyMap *, HDSLoc *, int * );

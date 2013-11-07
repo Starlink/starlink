@@ -608,5 +608,38 @@ void atlKychk( AstKeyMap *keymap, const char *key, const char *errmsg,
 }
 
 
+F77_SUBROUTINE(atl_findsky)( INTEGER(FRAME),
+                             INTEGER(SKYFRAME),
+                             INTEGER(LATAX),
+                             INTEGER(LONAX),
+                             INTEGER(STATUS) );
+
+void atlFindSky( AstFrame *frame, AstSkyFrame **skyframe,
+                 int *latax, int *lonax, int *status ){
+   DECLARE_INTEGER(FRAME);
+   DECLARE_INTEGER(SKYFRAME);
+   DECLARE_INTEGER(LATAX);
+   DECLARE_INTEGER(LONAX);
+   DECLARE_INTEGER(STATUS);
+   int iskyframe;
+
+   if( !astOK ) return;
+
+   F77_EXPORT_INTEGER( astP2I( frame ), FRAME );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_LOCK( F77_CALL(atl_findsky)( INTEGER_ARG(&FRAME),
+                                    INTEGER_ARG(&SKYFRAME),
+                                    INTEGER_ARG(&LATAX),
+                                    INTEGER_ARG(&LONAX),
+                                    INTEGER_ARG(&STATUS) ); )
+
+   F77_IMPORT_INTEGER( STATUS, *status );
+   F77_IMPORT_INTEGER( SKYFRAME, iskyframe );
+   *skyframe = astI2P( iskyframe );
+   F77_IMPORT_INTEGER( LATAX, *latax );
+   F77_IMPORT_INTEGER( LONAX, *lonax );
+}
+
 
 
