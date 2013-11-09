@@ -1,0 +1,1 @@
+../../mk exec ../../${SYSTEM}/etc/replace RCS hedlib ROOT=../.. $*

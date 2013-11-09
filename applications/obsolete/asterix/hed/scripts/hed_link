@@ -1,0 +1,63 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     hed_link
+
+#  Purpose:
+#     Generate linker (ld) arguments for linking against HED package.
+
+#  Type of Module:
+#     Shell script.
+
+#  Description:
+#     This script should be invoked by those building standalone applications 
+#     which use the ASTERIX HED package in order to generate the correct
+#     arguments for the compiler (or ld) command. The arguments
+#     generated are written to the standard output.
+
+#  Invocation:
+#     The script is normally invoked as part of a compiler command line,
+#     such as:
+#
+#        f77 -o program program.f -L/star/lib/asterix `ast_link` 
+
+#  Copyright:
+#     Copyright (C) University of Birmingham, 1995
+
+#  Authors:
+#     DJA: D.J. Allan (JET-X,University of Birmingham)
+#     {enter_new_authors_here}
+
+#  History:
+#     7-JUL-1993 (RFWS):
+#        Original version.
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#.
+
+#  Initialise the special options string.
+      special=''
+
+#  Test to see if we are on a system which requires additional
+#  "special" ld options for correct linking.
+
+#  DEC Alpha systems running OSF1:
+#  ------------------------------
+#  Ensure that allocated memory addresses will fit into 32 bits to
+#  prevent problems with storing them in Fortran integers.
+      if test "`uname -m`" = "alpha" -a "`uname -s`" = "OSF1"; then
+         special='-Wl,-D -Wl,40800000 -Wl,-T -Wl,30000000'
+      fi
+
+#  Echo any special options, followed by the ASTERIX library reference,
+#  followed by the list of options for packages on which ASTERIX depends.
+      ldef=${AST_TOP}/${SYSTEM}/lib
+      echo "${special}" -L${1-$ldef} -lhedlib
+
+#  End of script.
