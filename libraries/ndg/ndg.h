@@ -127,5 +127,6 @@ const char *ndgGetAttrib( AstXmlElement *elem, const char *name, const char *met
 void ndgHwrgh( int indf, int *status );
 void ndgHltgh( int new, int *old, int *status );
 void ndgHltpv( int new, int *old, int *status );
+void ndgMoreg( int indf, Grp **igrp, size_t *size, int *status );
 
 #endif

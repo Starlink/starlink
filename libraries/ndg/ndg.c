@@ -447,3 +447,28 @@ void ndgHltpv( int new, int *old, int *status ){
    F77_IMPORT_INTEGER( STATUS, *status );
 }
 
+F77_SUBROUTINE(ndg_moreg)( INTEGER(INDF), INTEGER(IGRP), INTEGER(SIZE),
+                           INTEGER(STATUS) );
+
+void ndgMoreg( int indf, Grp **igrp, size_t *size, int *status ){
+   DECLARE_INTEGER(INDF);
+   DECLARE_INTEGER(IGRP);
+   DECLARE_INTEGER(SIZE);
+   DECLARE_INTEGER(STATUS);
+
+   IGRP = grpC2F( *igrp, status );
+   if ( *status != SAI__OK ) return;
+
+   F77_EXPORT_INTEGER( indf, INDF );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_LOCK( F77_CALL(ndg_moreg)( INTEGER_ARG(&INDF), INTEGER_ARG(&IGRP),
+                                  INTEGER_ARG(&SIZE), INTEGER_ARG(&STATUS) ); )
+
+   F77_IMPORT_INTEGER( SIZE, *size );
+   F77_IMPORT_INTEGER( STATUS, *status );
+   *igrp = (Grp *) grpF2C( IGRP, status );
+
+   return;
+}
+
