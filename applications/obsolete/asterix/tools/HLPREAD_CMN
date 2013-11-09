@@ -1,0 +1,69 @@
+*    Constants
+      INTEGER 			MAXFILES		! Max diff files
+        PARAMETER		( MAXFILES = 10 )
+      INTEGER 			MAXSTACK		! Max nesting level
+        PARAMETER		( MAXSTACK = 20 )
+      INTEGER 			MAXLINKS		! Max links per level
+        PARAMETER		( MAXLINKS = 100 )
+
+*    List forms
+      INTEGER			HTML__UL		! Unordered list
+        PARAMETER		( HTML__UL = 1 )
+      INTEGER			HTML__OL		! Ordered list
+        PARAMETER		( HTML__OL = 2 )
+      INTEGER			HTML__DL		! Definition list
+        PARAMETER		( HTML__DL = 3 )
+
+*    Help file info
+      CHARACTER*40              HFI_ROOT(MAXFILES)	! Library root name
+      INTEGER			HFI_LROOT(MAXFILES)	! Length of root name
+      INTEGER			HFI_HLN(MAXFILES)	! Index for .shl access
+      CHARACTER*132		HFI_IDX(MAXFILES)	! .index full name
+      INTEGER			HFI_IFD(MAXFILES)	! FIO id for .index
+      CHARACTER*132		HFI_TAG(MAXFILES)	! .tags full name
+      INTEGER			HFI_TFD(MAXFILES)	! FIO id for .tags
+      INTEGER			HFI_CTL(MAXFILES)	! Current .tags line
+      INTEGER                   NFILE                   ! Number files opened
+
+*    Help links
+      INTEGER			HLI_ITAG(MAXLINKS)	! Tag number of link
+      CHARACTER*80		HLI_PATH(MAXLINKS)	! Help link path
+      CHARACTER*40		HLI_TXT(MAXLINKS)	! Displayed text
+
+*    The help stack
+      INTEGER                   HST_IFILE(MAXSTACK)	! Help library no.
+      CHARACTER*132		HST_PATH(MAXSTACK)	! Path here
+      INTEGER 			HST_FLINK(MAXSTACK)	! First link no.
+      INTEGER 			HST_NLINK(MAXSTACK)	! Number of links
+      INTEGER			HSP			! Stack pointer
+
+*    Screen info
+      INTEGER			SC_WID, SC_DEP		! Screen dimensions
+      INTEGER			SC_NLINE		! Number of lines o/p
+
+*    The input buffer
+      CHARACTER*400             IBUF			! Input help text buf
+      INTEGER			IBUFP			! Input buffer position
+
+*    State variables
+      CHARACTER*80 A_TEXT
+      INTEGER A_LEN,A_FD
+      LOGICAL A_EXIT,A_HYPER,A_TOP,A_FILE,A_PREV,A_SCREEN,A_IGNORE
+
+*    Global variables :
+      COMMON /HLPREAD_CMN/ 	A_LEN,A_EXIT,A_HYPER,A_TOP,
+     :                     	A_FILE, A_PREV,A_SCREEN,A_FD,A_IGNORE,
+     :                     	SC_DEP, SC_WID,		! Screen data
+     :                          SC_NLINE,
+     :                          IBUFP,			! Input buffer
+     :                          NFILE, HFI_IFD, HFI_HLN,! Help files
+     :                          HFI_LROOT, HFI_TFD, HFI_CTL,
+     :                          HST_IFILE, HST_FLINK,	! Help stack
+     :                          HST_NLINK, 
+     :                          HSP, HLI_ITAG
+      
+      COMMON /HLPREAD_CMNC/	HFI_ROOT, HFI_IDX, 	! Help files
+     :				HFI_TAG,
+     :				HLI_PATH, HLI_TXT,	! Help links
+     :                          HST_PATH,          	! Help stack
+     :                          IBUF, A_TEXT		! Other stuff
