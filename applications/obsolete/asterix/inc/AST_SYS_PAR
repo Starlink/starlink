@@ -1,0 +1,31 @@
+*+  ALPHA_OSF1_PAR - ASTERIX operating system specific definitions
+*
+*    Description :
+*
+*     This include file contains ULTRIX operating system specific definitions
+*     used by the ASTERIX system. The values defined are,
+*
+*      USRTERMOUT   - The name of a 'device' which can be OPENed to send
+*                     text to the user console.
+*
+*      FIL_SEP_CH   - Character separating filename from directory.
+*
+*      PATH_SEP_CH  - Path separation character
+*
+*    Author :
+*
+*     David J. Allan (BHVAD::DJA)
+*
+*    History :
+*
+*      8 May 92 : Original (BHVAD::DJA)
+*-
+ 
+      CHARACTER*8     USRTERMOUT
+        PARAMETER     ( USRTERMOUT = '/dev/tty' )
+
+      CHARACTER*1     FIL_SEP_CH
+        PARAMETER     ( FIL_SEP_CH = '/' )
+
+      CHARACTER*1     PATH_SEP_CH
+        PARAMETER     ( PATH_SEP_CH = ':' )

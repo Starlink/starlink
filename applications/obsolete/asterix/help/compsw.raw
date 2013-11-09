@@ -1,0 +1,1381 @@
+0 Complimentary_Software
+ Welcome to the Complementary Software online help facility.  This Help
+ system is aimed at ASTERIX users and is your guide to useful application
+ inside other packages available "out there". To select an item from  the
+ following menu just type the first letter.
+
+  If you are browsing for a certain functionality, select the
+ "command summary", and then select the package mentioned in parentheses
+ that supports that functionality.  If you find something that you are
+ interested in using, find out more by using the package help recommended
+ for each software suite included below.
+
+1 KAPPA
+
+<dl>
+<dt>Features:
+<dd>    Fourier transforms, Laplace transforms, colour table manipulation.
+        Maximum Entropy deconvolution.
+<dt>Scope:
+<dd>  Kappa (Kernel APplication PAckage) provides many
+  general-purpose applications and is mainly oriented at IMAGE
+  manipulation and analysis in the optical waveband.
+
+<dt>Invocation and help system:
+<dd>  Kappa is invoked by typing "kappa" at the prompt and will run
+  under unix, ICL, and VAX/VMS DCL. You can access Kappa's help
+  system by typing "kaphelp" after you have invoked kappa.
+  Or by following this link to <a href="/kappa/">kaphelp</a>.
+
+<dt>Limitations:
+<dd>  kappa doesn't support spaced arrays. See Spaced_arrays below.
+
+<dt>Documentation:   SUN 95.8
+
+<dt>Advice:
+<dd>  Quality. If you have a quality mask then you will need to
+             take steps to preserve the data with poor quality. <p>
+
+      Display. Taking the default scalings can result in problems.
+</dl>
+
+2 Spaced_arrays
+
+  kappa does not support spaced arrays. Some applications (which
+  don't need to map the axes) will still work. For those kappa
+  applications that fail (eg DISPLAY) you will need to invoke
+  <a href="/asthelp/axconv">AXCONV</a> to convert the axes to the long format.
+
+  Invoke <a href="/asthelp/validate">VALIDATE</a> if you wish to
+  get back to the spaced array format.
+
+2 Image_Display
+
+  DISPLAY is the kappa application for displaying 2-d SDFs.
+  Display will NOT work on SDFs that have spaced arrays. The
+  image may be the data array, but also variance or quality can
+  be shown.
+
+  Various scaling schemes are offered, max and min by user input,
+  percentiles, significances etc etc. (curiously the `sigma' mode
+  "works" in the absence of variance).
+
+  If you are keen to use DISPLAY then you must run the ASTERIX
+  application AXCONV to convert to the old style axes. Convert
+  back to short form by invoking VALIDATE.
+
+  Detailed <a href="/kappa/display notes">notes</a> are available.
+
+3 Display_surfaces
+
+  The documentation in kappa is still geared towards Ikons and
+  other prehistoric image display devices, though Xwindows is also
+  supported. <p>
+
+  KAPPA commands to set your displays
+  <ol>
+ <li> IDSET XWINDOWS (current image display device)
+ <li> GDSET X2WINDOWS (another display)
+ <li> OVSET XWINDOWS3 (for overlays). NB The default given in kaphelp doesn't work.
+ </ol>
+
+ Overlays and line graphs in a separate window is a <em>very</em> useful
+ feature that  ASTERIX will pinch directly in the near future.
+
+3 Irregular_axes
+
+  DISPLAY will not draw  images with irregularly spaced axes,
+  nor will it crash. The failure mode is to chew up cpu but not
+  deliver an image on the display surface.
+
+3 Image_B&ampW_only?
+
+  Beware of the colour scaling! If you get a B&ampW image on the
+  display, then you need to change the minimum and maximum values
+  displayed, so that the colour table applied becomes less extreme.
+  A useful first try is `Sigma mode' with the scaling from -1 sigma
+  to +1 sigma.
+
+3 Preserving_data_and_quality
+
+  kappa uses magic values in the data array as a means of identifying
+  poor quality data. So when you have a quality mask in your data, you
+  will need to run MAGIC to convert the affected data to the magic value.
+
+  After the kappa application has run, you can revert to the asterix
+  style quality mask by running QUALITY in SET mode (SETQUAL) with the
+  selection keyword MAGIC.
+
+
+2 Useful_Applications
+
+3 FOURIER
+
+  Fourier performs forward and inverse Fourier transforms of 2-d
+  NDFs. This application is possibly the most useful KAPPA
+  application for ASTERIX users.
+
+  If performing space to domain you may select the output
+  to be one of:-
+
+    <ol>
+    <li> Hermitian form in a single NDF
+    <li> two NDFs giving the real and imaginary parts of the complex transform
+    <li> two NDFs giving the power and phase of the complex transform
+    </ol>
+
+  If performing the reverse transform, the input can be any of the
+  above outputs.
+
+  Obvious applications are for high and low pass filtering,
+  convolving images and periodic feature work.
+
+  FOURIER not yet available under unix as it uses single precision
+  NAG routines, which are not available under unix. Conversion to
+  double precision is under way..
+
+  For more information on Fourier, try  "kaphelp fourier" (after
+  invoking kappa) or follow this link  ~
+  <a href="/kappa/fourier">fourier</a>.
+
+3 MEM2D
+
+  <a href="/kappa/mem2d">MEM2D</a> ~
+  is a maximum entropy  deconvolution program.
+  It is based on the Gull and Skilling MEMSYS3 documented in SUN117.
+
+  It takes a 2-d image and a psf as input and produces an output
+  with higher resolution. Facilities are provided to help interpret
+  the deconvolved image and to extract useful information about the
+  statistical significance of any structures in the deconvolved
+  image. The PSF file may be created with CREPSF from ASTERIX.
+
+  A typical invocation would be
+
+  MEM2D M82 M82_HIRES def=0.33 psf=psf_file xcentre=31 ycentre=31
+  noise="poisson" niter=100
+
+  runs mem2d on file M82 storing the output in M82_HIRES. The data
+  is not background subtracted and the mean background level is 0.33
+  counts/pixel.
+
+  The psf is stored in file psf_file and the x,y centre of the psf is
+  at pixel 31,31 in the psf file. The statistics are to be poisson not
+  guassian (guassian is the default) and up to 100 iterations are
+  permitted. If the deconvolution has not succeeded in "niter"
+  iterations then rerun mem2d with the old output file the new input
+  file.
+
+  Mem2d is a very <em>resource-greedy</em> program both in memory and CPU.
+
+  Mem2d is not yet available under unix as it uses single precision
+  NAG routines, which are not available under unix. Conversion to
+  double precision is under way.
+
+3 LUTROT
+  Rotates the colour table of an image-display device. Moving
+  the mouse rotates the colour table of the image while-you-watch.
+
+  LUTROT is pretty, this is not an entirely trivial statement as
+  different colour tables can bring out subtleties in the image.
+
+  Left mouse button resets the colour table to the original.
+  Right mouse button terminates colour table rotation.
+
+  Lutrot can save colour table to NDF format, which cannot be
+  read by ASTERIX, though this functionality will be implemented
+  if there is sufficient demand.
+
+  kappa has <em> 19 </em> separate lookup table (LUT) manipulation
+  routines.
+
+  Some goodies are to be found
+    <a href="/kappa/lutable">lutable</a> ~
+    <a href="/kappa/lutheat">lutheat</a> ~
+    <a href="/kappa/lutsave">lutsave</a> ~
+    <a href="/kappa/lutweak">lutweak</a>. <p>
+
+and a link to the original entry ~
+<a href="/kappa/lutrot">lutrot</a>. <p>
+
+
+3 SURFIT
+
+ Surfit will fit a spline or polynomial surface to an image.  There are
+several options to make the fit more accurate, such as :-
+
+    <ol>
+    <li> Values above/below user-defined thresholds excluded
+    <li> Sigma clipping to exclude anomolous bins
+    <li> user-defined min fraction of good pixels per bin used in the fit
+    </ol>
+
+All the paramters desired must be entered on the command line,
+there are a lot of them!
+Consulting the kaphelp on ~
+ <a href="/kappa/surfit">surfit</a> ~
+is strongly recommended.
+
+If you require diagnostic help, then the following can be output
+to a log file (ascii only),
+    <ol>
+    <li> The input data array
+    <li> The weights array
+    <li> The fitted binned data
+    <li> The residuals to the fit.
+    <li> The input parameters and the rms error.
+    </ol>
+
+
+The magic value method is used for processing bad data, and surfit
+works on spaced arrays.
+
+3 ROTATE
+
+  Rotate will rotate a 2-d image through an arbritary angle.
+
+  Input image not limited to being a square. Output pixels can be
+  generated by two different techniques, nearest-neighbour
+  substitution, or bilinear interpolation (the latter is slower)
+
+3 MEDIAN
+
+  Median smooths a 2-d data array using a 2-d weighted median filter.
+  several pre-defined filtering masks are avaiable eg
+
+      0:  1 1 1   1:  0 1 0   2:  1 0 1   3:  1 1 1   4:  0 1 0
+          1 1 1       1 1 1       0 1 0       1 3 1       1 3 1
+          1 1 1       0 1 0       1 0 1       1 1 1       0 1 0
+
+      5:  1 0 1   6:  1 2 1   7:  1 3 1
+          0 3 0       2 3 2       3 3 3
+          1 0 1       1 2 1       1 3 1
+
+  but more can be user defined. This application works on spaced array
+  images.
+
+3 LAPLACE
+
+  Laplace is a useful edge detection algorithm for 2-d data. This
+  application is a uni-directional edge detector.  Areas where
+  the input data are flat become zero in the output image.
+  Extra details contained <a href="/kappa/laplace">here</a>.
+
+3 Extra_Math_Ops
+  Kappa provides a few more options than the ASTERIX applications
+  OPERATE or ARITHMETIC do. Logs to arbritrary bases can be done
+  using LOGAR or by remembering that
+
+      Log_a (x) = Log10(x)/Log10(a)
+
+  and using OPERATE twice. The functionalty of Kappa's TRIG is
+  not available under ASTERIX.
+
+  LOGAR will take the logarithm (arbritrary base) of your data
+  array, this application can work with spaced array images and
+  also with cubes.
+
+  TRIG performs trignometric operations on your data, The
+  operations supported are sin, cos and tan (plus their inverses)
+  with the data being in degrees or radians. The selection made
+  between degrees and radians is enabled in a fortran-like way,
+  ie sin (sine in radians) atand (arc-tan in degrees) etc.
+
+  This application will work on spaced arrays and cubes.
+
+3 HISTEQ
+
+  Histeq provides histogram equalisation. Histogram equalisation
+  is an image-processing technique which the distribution
+  (between limits) of grey levels in the input picture is
+  adjusted so that in the output picture there are approximately
+  equal numbers of pixels at each grey level.
+
+  This application works on spaced array data.
+
+3 SHADOW
+
+  Shadow will enhance edges in 2-d data using a shadow effect. A
+  side illumination (imaginary source) is used. Useful for
+  finding fine detail in your image.
+
+  This application works on spaced array data.
+
+3 NOMAGIC
+
+  Replaces all occurrences of magic-value pixels in a data array
+  by a user-defined value.
+
+  This is a very useful application as virtually all of Kappa's
+  image   processing applications use the magic-value method for
+  processing bad   data, and deposit +/- few x 1e35 etc into the
+  data array, which can create problems, especially when displaying
+  the image with kappa.
+
+1 FIGARO
+
+<dl>
+<dt>Features:
+<dd>
+    Manipulation of complex number  data types, Fourier Transforms,
+    (optical) spectral fitting and image differentiation.
+    Applications are run in the same way as ASTERIX, i.e. command
+    line invocation with position or keyword.
+
+<dt>Scope:
+<dd> Figaro is a set of general astronomical data reduction programs with
+   a bias towards spectrocopy. The NDF format is now preferred over the
+   old DST format.
+
+<dt>Invocation and help system:
+<dd>  Figaro is invoked by typing "figaro". The help system
+   is available as "fighelp" after invoking figaro, or by following
+   this link to  <a href="/figaro/">fighelp</a>.
+
+
+<dt>Limitations:
+<dd> Figaro doesn't support spaced arrays. See Spaced_arrays below.
+     Figaro's treatment of files with a quality array present (even if all
+     values set "good") is different to that of ASTERIX.
+     See Data Quality below.   <DJA please modify>
+
+
+     <dt>Documentation: SUN 86.9, SSN40
+
+<dt>Advice:
+<dd>
+</dl>
+
+2 Spaced_arrays
+
+  Figaro does not support spaced arrays, though some routines will work.
+  You will need to invoke <a href="/asthelp/axconv">AXCONV</a> to  ~
+convert the axes to the long format.
+
+  Invoke <a href="/asthelp/validate">VALIDATE</a> if you wish to ~
+get back to the spaced array format.
+
+2 Data_Quality
+
+  Figaro applications will fail if files have a quality array present
+
+
+  After running the ASTERIX application ~
+<a href="/asthelp/axconv">AXCONV</a> ~
+to expand the axes,
+  run the Figaro application Q2BAD to replace poor data with
+  flagged (ie magic) data values.   <DJA please modify>
+
+2 Image_Display
+
+  The image display surface can be chosen with the SOFT command,
+  type SOFT OPTIONS for a list of available devices. Similarly, the
+  HARD command can be used to select for hardcopy.
+
+  The command to draw a file to either surface selected with SOFT or
+  HARD is IMAGE. The user is prompted for xstart, xend, etc, after
+  the first invocation all this can be abbreviated by using the
+  double slash on the command line, forcing the defaults to be taken
+  which is the same behaviour as ASTERIX.
+
+2 Useful_Applications
+
+3 Fourier_Transforms
+
+  Figaro has a host of routines to create and manipulate complex data.
+  Routines are provided to convert back and forth between real data
+  arrays and complex number format. The Fourier transform application
+  is <a href="/fighelp/FFT">FFT</a>. ~
+  Real data is put into the correct format for FFT
+  by <a href="/fighelp/r2cmplx">R2CMPLX</a>
+
+  The data array format is of the type COMPLEX_ARRAY, and has separate
+  real and imaginary arrays. Though parts of the help system indicate
+  that the input data for FFT can be multi-dimensional, this is not the
+  case, the data must be 1 or 2-D. The array sizes must factorise in a
+  way acceptable to the NAG FFT routine.
+
+  Here is a table containing all of the FFT/complex number applications
+  with a one line description, available under figaro.
+
+  BFFT       Takes the reverse FFT of a complex data structure
+  CMPLX2I    Extracts the imaginary part of a complex data structure
+  CMPLX2M    Extracts the modulus of a complex data structure
+  CMPLX2R    Extracts the real part of a complex data structure
+  CMPLXADD   Add two complex structures
+  CMPLXCONJ  Produce the complex conjugate of a complex structure
+  CMPLXDIV   Divide two complex structures
+  CMPLXFILT  Create a mid-pass filter for complex data
+  CMPLXMULT  Multiply two complex structures
+  CMPLXSUB   Subtract two complex structures
+  COSBELL    Create data that goes to zero at the edges in a cosine bell
+  FFT        Takes the forward FFT of a complex data structure
+  I2CMPLX    Copies an array into the imaginary part of a complex structure
+  PEAK       Determines position of highest peak in a spectrum
+  R2CMPLX    Creates a complex data structure from a real data array
+  ROTX       Rotate data along the X-axis
+
+3 DVDPLOT
+
+  Plots two data arrays against each other, which has it's uses
+  in linearity tests. The two files must have the same dimensions
+  (and dimensionality!), but do not have to have regularly spaced axes.
+
+  Corresponding elements in the two arrays are plotted against
+  one another. The output can be to a display or to a file.
+
+3 Q2BAD
+  All figaro applications will fail if a file has a quality component
+  even if all of the quality bits are set "good". The ASTERIX magic
+  application will set magic values, but the quality component is
+  propagated, and so figaro will fail on the output from magic.
+
+  One can get around this my using magic and then deleting the quality,
+  or by using the figaro application Q2BAD. Poor quality data has the
+  data replaced my the magic value and the quality component is erased
+  in the output.
+
+3 HOPT
+
+  A contrast enhancing application that works by performing
+  histogram equalisation. The user defines the minimum and maximum
+  values to be used in calculating the histogram. The input and
+  output histograms are displayed on the SOFT surface.
+
+  Although the Figaro help mentions "images", HOPT works on cubes too.
+  Here is a link to <a href="/fighelp/hopt">HOPT</a>.
+
+
+3 IDIFF
+  IDIFF is useful for highlighting regions where the data values are
+  changing rapidly. NB the variance component is not propagated, as it
+  is no longer meaningful.
+
+  The technique used is to differentiate the input image (or vector)
+  in the sense that an output pixel will be the average absolute
+  difference with it's immdeiate neighbours, excludes corner pixels.
+
+3 ICONV3
+
+  ICONV3 convolves an image with a  symmetric 3x3 kernal, with the
+  user able to define the centre and edge pixels. Some examples are
+  given below. NB the parameter for the central value is CENTER (sic).
+
+  CENTER    EDGE     Usage
+
+   -9        -1      High pass filter
+   0.1      0.1      Low  pass filter
+   8         -1      Laplacian edge enhancement filter
+
+ NB the variance component is not propagated, as it is no longer
+ meaningful.
+
+3 ISMOOTH
+  ISMOOTH is a smoothing application that replaces the existing pixel
+  value with a user defined fraction of itself plus neighbouring pixels.
+  Corner pixels contribute less than side-on pixels by a factor of 1.414.
+  The redistribution fraction must lie in the range 0.0 to 1.0, the
+  smoothing is increased by repeating the smoothing N times (N<1000).
+
+3 ISTRETCH
+
+  ISTRETCH is an application that will both shift and stretch an image
+  in the X and Y directions. The original image size is retained, with
+  the consequence that data shifted outside the boundary is lost, and in
+  the case of shifts, rows and columns of zeroes will be introduced.
+  A user defined oversampling of the input pixels is permitted.
+
+  If the X, Y shifts are greater than one, then new pixel values are
+  calculated by fitting to a 2-d parabola. This application does
+  not emit error messages when given a cube, though the results of
+  this are non-obvious. This application is sufficiently complicated
+  to merit a link <a href="/fighelp/istretch">ISTRETCH</a> ~ to the figaro help
+
+  NB the variance component is not propagated, as it is no longer
+  meaningful.
+
+3 MEDFILT
+  MEDFILT is a median-filtering application. The result of a median
+  filter is that each pixel in the output file is the median of the
+  pixels that form a box around the corresponding original pixel. The
+  box size is user defined (must be odd. If even BOX-1 is used). Input
+  data must be one or two dimensional.
+
+  NB the variance component is not propagated, as it is no longer
+  meaningful.
+
+3 GOODVAR
+  GOODVAR will replace bad, negative and zero variances with user defined
+  values. Beware that if one sets negative variances, then VALIDATE will
+  mark the quality array with the temporary badbit (msb) set.
+
+3 ICSET
+
+  ICSET sets a rectangular region in an image to a constant value.
+  The region to be altered is specified by a xstart, xend and
+  ystart,yend
+
+  NB the variance component is not propagated, which seems a little
+  heavy handed as it is still meaningful in the areas which have not
+  been set.
+
+1 NDPROGS
+<dl>
+<dt>Features:
+<dd> NDPROGS is a set of general binned data manipulation programs with
+     several useful applications unique to this package.
+
+<dt>Scope:
+<dd> Binned datasets up to 6-D, but some applications are limited to
+     three (or fewer) dimensions.
+
+<dt>Invocation and help system:
+<dd>  NDPRPOGS is invoked by typing "ndprogssetup". The help system
+   is available as "ndp_help" after invoking ndprogssetup, or by following
+   this link to  <a href="/ndprogssetup/">ndp_help</a>.
+
+<dt>Limitations:
+<dd> NDPROGS doesn't support spaced arrays. See Spaced_arrays below.
+     The  treatment of files with a quality array present (even if all
+     values set "good") is different to that of ASTERIX.
+     See Data Quality below.
+<dd>
+
+<dt>Documentation: SUN 19.3
+
+<dt>Advice:
+<dd>
+</dl>
+
+2 Spaced_arrays
+
+  NDPROGS does not support spaced arrays. ~
+  You will need to invoke <a href="/asthelp/axconv">AXCONV</a> to
+  convert the axes to the long format.
+
+  Invoke <a href="/asthelp/validate">VALIDATE</a> if you wish to ~
+get back to the spaced array format.
+
+
+2 Data_Quality
+
+  NDPROGS applications will fail if files have a quality array present
+
+  After running the ASTERIX application ~
+<a href="/asthelp/axconv">AXCONV</a> ~
+to expand the axes,
+  run the Figaro application Q2BAD to replace poor data with
+  flagged (ie magic) data values.    <DJA please modify>
+
+2 Useful_Applications
+
+3 HILITE
+
+  Hilite uses a narrow colour table on an image, moving through the
+  data range so that all pixels with a particular value are illuminated
+  at the same time. Pixels not in the narrow range are diaplayed as black.
+
+  It is necessary to have the image already displayed on your graphics
+  device (use of GDRAW permitted also the NDPROGS application DEPICT).
+  Once loaded, HILITE can be run again and again without reloading the
+  image.
+
+  The data LOW and HIGH defaults are not determined by the data values
+  but by previous usgage (first time 0 and 100)
+
+
+3 MOVIE
+ Movie is a fast way of sequentially looking at the successive planes in
+a cube. The images to be shown are of axis one and two only. You may
+subset the region to be shown and planes can be skipped. The option to
+halt/restart the process with control-S and control-Q does NOT WORK.
+
+3 TRANSFORM
+
+ Transform is a geometric transformation program which can perform
+rebinning operations on an image or cube, via shift, rotation, and
+resampling. These may be done separately or in combination. There are
+several techniques available for interpolating new pixel values viz
+nearest neighbour, linear interpolation (and in the future) higher order
+interpolations. The output axis ranges can be used defined, or left
+uncalibrated.
+
+3 SMOOTH
+
+Smooth offers the normal smoothing options of top-hat and Gaussian
+functions as well as the more unusual sinc function smoothing and
+moffat smoothing for 1-D data. The routine supports data dimensionality
+up to six, but the smoothing function must be 1, 2 or 3 dimensional.
+
+1 Q
+
+<dl>
+<dt>Features:
+<dd> Q is the Leicester interactive programming language which is
+     useful for astronomical image analysis. The variables handled by Q
+     can be data objects or HDS files. There is an underlying parameter
+     system analagous to that of ICL.
+
+<dt>Scope:
+<dd> Q is fully HDS compatible. Writing Q procedures is simpler than
+     writing ICL procedures.
+
+<dt>Invocation and help system:
+<dd>  Q is invoked by typing "q". NB LOWERCASE.
+      The help system is available from within Q, type "help <command>"
+      at the Q prompt, Q>.
+
+<dt>Limitations:
+<dd>  Q is not presently available under OSF at Birmingham
+
+<dt>Documentation: q/doc/manual.dvi-ps (in principle)
+                   /lstar/asterix/q/sun4_Solaris/manual.dvi-ps
+                   in practice.
+<dt>Advice:
+<dd>  You absolutely MUST create the following directory!
+      /base/your_userid/.parlog./lstar/asterix/q where a file
+      called sun4_Solaris will be created.
+</dl>
+
+2 More_about_Features
+
+3 Help
+  The help system is invoked by typing `help' at the Q prompt.
+  It is also very useful to type `menu' or `amenu' <applications
+  menu> from the Q prompt, which allows you to explore Q with it's
+  functionality explained in a classified way. Note that on typing
+  menu or amenu, one is offered a list of numbers with a closing square
+  bracket `]'. The help is accessed by typing the numeral with the `]'
+  appended.
+
+  Example:
+  Q>menu
+ HELP            Q help facility (keyword-->)
+ 1]              Arithmetic
+ 2]              Arithmetic functions
+ 3]              Comparison
+ 4]              Logical
+ 5]              String manipulation
+ 6]              Vector to scalar operations
+ 7]              Structured programming
+ 8]              Formatting numbers
+ 9]              Parameter system
+ 10]             Dictionary manipulation
+ 11]             Data system
+ 12]             I/O with formatted/FITS files
+ 13]             Utilities and control
+ 14]             Error handling
+ 15]             UNIX/VMS interface
+ 16]             Debugging
+ 17]             Angular coordinate conversions
+ AMENU           List applications menu
+ Q>17]
+ DTOR            convert from degrees to radians (V-->V)
+ RTOD            convert from radians to degrees (V-->V)
+ DEGTORAD        convert pair from degrees to radians (V1 V2-->V1 V2)
+ RADTODEG        convert pair from radians to degrees (V1 V2-->V1 V2)
+ DEGTOFORM       format pair of degrees (V1 V2-->str)
+ DEGTODMS        convert decimal degrees to deg. min. sec. (V-->sign d m s)
+ DMSTODEG        convert deg. min. sec. to decimal degrees (sign d m s-->V)
+ DMSTOFORM       format deg. min. sec. (sign d m s-->str)
+ HMSTOFORM       format hour. min. sec. (h m s-->str)
+
+3 Parameter_System
+  burble on about the parameter system
+
+3 Global_variables
+
+  A global variable is created (or re-assigned) straightforwardly viz:
+
+  Q> global_name = value
+
+  where the value can be of any type (character included) or a HDS file
+  or part thereof.
+
+  examples
+
+  Q> A = 3.142                                    numerical scalar
+  Q> B = 'A short string'                         a character string
+  Q> C = n3923.sdf%more.asterix.header.field_ra   a structure node
+  Q> D = n1553.sdf%                               a container file
+  Q> E = A*10                                     an expression
+  Q> F = @/datan5/doug/sun/N1553/n1553.sdf%more
+
+  Use of `@' allows Q to interpret a unix path to the container file.
+
+  NB the percent sign `%' is important. It denotes the end of the string
+     describing the container file.
+
+3 Listing_data
+
+  Any data (variable or expression) or evaluation can be listed by
+  use of the `=' sign on the LHS of the expression
+
+  Examples
+
+  Q> C = n1553.sdf%more.asterix.header.field_ra
+  Q> =C
+    63.869998931885
+
+   Global variable C is assigned to be a double_precision primitive
+   deep inside container file n1553.sdf. The path to the primitive is
+   defined in the same way as ASTERIX accesses of HDS files.
+
+  Q> = asin(1.0) * 10.0
+    15.707963267949
+
+    NB radians are assumed for all trig functions.
+
+  Q> = doug.sdf%
+    < a hdir-like dump of the HDS file doug.sdf is dumped >
+
+  Q> = loge(exp(1.0))
+    1
+
+  Q> = 10 < 9
+    0                          logical FALSE
+
+  See "2]" for the other arithmetic functions that are available.
+
+3 Initialising_data
+
+  If you have created a scratch array or variable how do you assign
+  values?  The creation is trivial
+
+ Q> RAT = RANDAT([_REAL](3,3)
+
+ a real 2-d array called rat has been created and filled with random
+ numbers between 0.0 and 1.0
+
+ Q> =RAT
+ (3,3)
+   0.909534      0.351692      0.932534      0.654436      2.107025E-02
+   0.512205      0.202019      0.939977      0.204082
+
+written out in the following order (1,1) (2,1) (3,1) etc
+
+ Examples
+
+ Q>A(1) = -2.2                assign a single element
+ Q>A(1:3) = 2.0               assign a slice with a scalar
+ Q>A(1:3) = [1,9,3]           assign a slice with a vector
+ Q>A() = 99                   assign all elements with a scalar
+
+
+3 Shell_interface
+  You can issue shell commands by using the `$' (dollar) command, you
+  must leave a space between the dollar and the command. You can also
+  feed variables into the dollar command.
+
+  Examples:
+  Q> $ ls *.dump       (and also the sequence)
+  Q>A='*.dump'
+  Q> $ ls (A)          (both produce the same output
+   dump.dump        la_palma.dump    mid224_f1.dump   un_sources.dump
+   filter1.dump     lap.dump         mid228_f1.dump
+
+2 Devices_available
+  One can get a list of the graphics display devices available by typing
+  (at the Q prompt)
+
+  Q> opendev *
+
+   the result of doing this (28/3/95, xun4) was
+  Legal PGPLOT device types are:
+ /NULL  (Null device, no output)
+ /PS    (PostScript file, landscape orientation)
+ /VPS   (PostScript file, portrait orientation)
+ /CPS   (Colour PostScript file, landscape orientation)
+ /VCPS  (Colour PostScript file, portrait orientation)
+ /TEK4010 (Tektronix 4010 terminal)
+ /GF    (GraphOn Tek terminal emulator)
+ /XTERM (XTERM Tek terminal emulator)
+ /XWINDOW (Window on Xwindow server)
+ /XDISP (pgdisp or figdisp server)
+ /GIF   (GIF87 image file)
+
+2 Reading_from_files
+
+  Data can be read in from formatted files using user-defined
+  format statements. Examples follow.
+
+ Q> OLD 1 data.dat              where the 1 is the logical unit number
+ Q> READ 1 * XDATA[_REAL](3,3)  and * is free format read, which can be
+                                replaced with any legal fortran format
+                                specification. eg 1X,F7.2,I4 etc etc
+ Q> ClOSE 1                     close the file
+
+ Also, lines in the  file can be skipped
+
+ Q> OLD  1 doug.data
+ Q> SKIP 1 120                  skip first 120 lines in doug.dat
+ Q> READ 1 * MYDATA[_REAL](100) read 100 numbers (free format)
+ Q> CLOSE 1                     close the file
+
+ and there is a specialist read function that reads tabulated data into
+ variables C1, C2, C3 etc called READCOLS
+
+ Q> OLD 20 input.data         open input.data (LUN 20 this time)
+ Q> READCOLS 20 * 3 100       read 3 columns, 100 lines (into c1 c2 c3)
+ Q> CLOSE 20
+
+  All of the columns must be read and each field in the table must
+  contain a valid number.
+
+  For manipulating large ASCII tabulations, then you can use the Q
+  applications HDSTOTAB and TABTOHDS which are the direct equivalents
+  of the ASTERIX applications HDS2TEXT and TEXT2HDS. See Formats_required
+  below for getting data in/out for TABTOHDS/HDSTOTAB
+
+3 Formats_required
+
+  TABTOHDS/HDSTOTAB are the ASCII <-> HDS interface for Q. The first line
+  of the ASCII file must contain a tabulation format for each column viz:
+
+  name1(spec1) name2(spec2) name3(spec3)   etc etc
+
+  where name1, name2 and name3 are objects in the structure (all must
+  have the same number of elements) and the spec1, spec2 etc are (in
+  effect) format & datatype specifiers.
+
+  Spec   Type   Format
+  Cn     _CHAR    An
+  Rn.m   _REAL    Fn.m
+  Dn.m   _DOUBLE  Fn.m
+  En.m   _REAL    En.m
+  Gn.m   _DOUBLE  Gn.m
+  In.m   _INTEGER In.m
+  Ln     _LOGICAL uses 0 or 1, rest of field blank
+  Kn     _DOUBLE  degrees to/from dms (n > 11)
+  Hn     _DOUBLE  degrees to/from hms (n > 11)
+  Mn     _DOUBLE  radians to/from dms (n > 11)
+  Nn     _DOUBLE  radians to/from hms (n > 11)
+
+  In all cases the digit `n' specifies the full width of the column
+  including intervening spaces between the columns.
+
+2 Displaying_data
+
+  The easiest way to display data is via OPENDEV and DISPLAY viz:
+
+  Q> OPENDEV xw                          ! create a x-window
+  Q> DISPLAY file.data_array             ! you are then prompted
+ ZLO minimum z level = 0 =               ! min and max display
+ ZHI maximum z level = 0 =20             ! levels.
+
+2 Useful_Applications
+  There are a lot of applications in Q that directly mirror what is
+  available under Asterix (especially the interactive graphics), if you
+  find Q useful for other things and you want to do polar distributions,
+  centroiding, coordinate grids etc etc, then you can. Other useful
+  applications are listed below.
+
+3 OPENDEV
+
+  Q uses PGPLOT subroutines for graphical output, only one device can be
+  active at any given time and is opened with the command OPENDEV (and as
+  you can probably guess is closed with the command CLOSEDEV)
+
+  Q> opendev xwin
+
+  opens an xwindow, with the entire plotting surface available for one
+  plot, to open with (say) four plot zones arranged 2x2 then use
+
+  Q> opendev xwin 2 2
+
+  and if you wish to specify absolute height and width (in centimetres)
+  of the plotting surface (say to 15.0 x 9.0 cm) then
+
+  Q> opendev xwin 1 1 15.0 9.0
+
+  to see all of the devices that are available by entering `*' as the
+  device name.
+
+3 HDSTOTAB
+
+  HDSTOTAB (as you can probably guess) tabulates values from HDS
+  structures and is the equivalent of HDS2TEXT in ASTERIX.
+
+  example follows
+
+ Q> NEW 1 COLUMNS.OUT
+ Q> OUTFORM='energy(R10.3) channel(I6) intensity(D10.4)'
+ Q> HDSTOTAB struc% [0] OUTFORM 1
+
+  Energy, channel and intensity must exist as 1-d arrays on the structure
+  struck%. The [0] specifies that the index to be used is the natural
+  ordering in the arrays. The columns are written to new file COLUMNS.OUT.
+
+3 TABTOHDS
+
+  Will read in columns of data from an ASCII file and create a HDS
+  structure from the columns. The first line of the ASCII file must
+  contain a tabulation format (see "format_required" under the section on
+  reading_from_files)
+
+3 FFT2D
+
+  FFT2D is a two-dimensional FFT routine. The output can be held
+  internally or paged out explicitly to a file. An example of the latter
+  is appended below.  The output file has RPART, IPART and POWER as 2-d
+  primitves in the output file.
+
+   Q> opendev xw
+   Q>display cpraw_841.data_array
+   ZLO minimum z level = 0 =
+   ZHI maximum z level = 4 = 6
+   Q>fft2d           ! Note well the `%' in the output name
+   OBJECT data object = cpraw_841.data_array =
+   FTOUT data structure for result = fourier.sdf%[data_array]
+
+   <spurious error messages deleted>
+
+   Q>display cpraw_841.data_array
+   ZLO minimum z level = 0 =
+   ZHI maximum z level = 6 =
+   Q>! the above command then draws the REAL PART of the FFT to xw
+
+3 LOOKAT
+
+  LOOKAT will display an image about a given celestial position. You have
+  to supply a filename, the coordinates of the point you wish to
+  display about and the number of pixels (one axis) you want to see in
+  the zoomed field. After the usual prompt for ZLO and ZHI (min and max
+  data display values) the zoomed image is output to the current graphics
+  device and information about the selected point is output to the VDU.
+
+3 TELGRID
+
+  TELGRID plots the local spherical grid. The other usual grids are
+  available too (celestial, ecliptic etc)
+
+3 SHOWG
+
+  SHOWG shows the user the current status of the graphics display system.
+  example follows
+
+  Q>opendev xw
+  Q>display cpraw_841.data_array
+  ZLO minimum z level = 0 =
+  ZHI maximum z level = 0 =20
+  Q>showg
+   device  cursor available
+   colour index range   0 to   144
+   zone   0    7.58011E-02   0.924199    1.00000E-01   0.900000
+   current zone   0
+   mapping SCALE
+   window   0.    512.000  0.    512.000
+   x-axis BCNST                 0.  0
+   y-axis BCNST                 0.  0
+   z range   0. to     20.0000
+   font   1
+   character height     1.00000
+   colour index   1
+   line style   1
+   line width   1
+   area style   1
+
+2 Procedures
+
+  Procedures are useful for complex or repetitive tasks and are
+  relatively simple to write.
+
+  An example procedure (used in the WFC eyeballing campaign) is
+  appended below, NB a semicolon (;) indicates a line has been
+  'commented out'.
+
+  It is a long example, to get a hard copy from the unix prompt type
+
+  unix>  hlpread compsw compsw q proced exam -f file.file -q
+
+  and then print file.file on your favourite printer
+
+3 Example_procedure_(LONG!)
+
+ PARAMETER NEXT 'next image pair number (out of range to stop)'
+ PARAMETER WHAT 'N(ext) B(lur) G(rid) C(ursor) Z(scale) I(mage) P(oint) S(top)'
+ PARAMETER PSSLOG 'PSS daily log name, eg MID063'
+ PROC PSS_LOOK 'visual inspection of images'
+ ; Get PSS sources
+   SFILE=UPCASE(_PSSLOG)
+ ; Get plotting device
+   IF(NOT(?PLOTTING))
+    OPENDEV xwin 2 1
+ ;   SETABLE Q_DATA:LUT%TABLE0
+   ENDIF
+ ; Get image file names
+   FILES IM%%%%%%_F1.SDF
+ ; Initialize variables needed in loop
+   NLOOK=1
+   NFILT=1
+   _NEXT=NLOOK
+   NLOOK=_NEXT
+   FF=SUBSTR(FINDSTR(FILE(NLOOK),'.SDF;') DROP 1 -, 1 SWAP)
+   SNAME=@(FF//'%[READ]')
+   DATA=SNAME.DATA_ARRAY
+   ZLL=0.0
+   ZHH=0.0
+ ; Loop until asked to quit
+   WHILE(NLOOK<>0)
+ ; Display current image array
+    ='displaying'&NLOOK&FF
+    FRAME
+    GETFIELD SNAME
+    DISPLAY DATA (ZLL,ZHH)
+ ;Border area searched by PSS.
+    POSITION 80 80
+     RECTANGLE 67 67 0
+    BORDER
+    LABELS ' ' ' ' (FF)
+    CBAR
+ ; Get option
+    =' '
+    ='N(ext) display next image'
+    ='B(lur) display blurred version of current raw image'
+    ='G(rid) draw Celestial grid'
+    ='C(ursor) use cursor to list a position'
+    ='P(oint) display PSS point source detections'
+    ='Z(scale) redisplay current image with new z scaling'
+    ='I(mage) select next image pair by number'
+    ='M display significance map'
+    ='K display background map'
+    ='S(top) to return to Q prompt'
+    =' '
+    OPT=' '
+    WHILE(NOT(?SAME(OPT,'N')))
+     OPT=UPCASE(SUBSTR(_WHAT,1,1))
+ ;    OPT='N'
+     IF(?SAME(OPT,'N'))
+      IF(NFILT=1)
+        NFILT=2
+      ELSE
+        NFILT=1
+        NLOOK=NLOOK+1
+      ENDIF
+      IF((NLOOK>0)AND(NLOOK<=NFILES))
+    FF=SUBSTR(FINDSTR(FILE(NLOOK),'.SDF;') DROP 1 -, 1 SWAP)
+        IF(NFILT=2)
+        FF=REPSTR(FINDSTR(FF,'F1'),'F2')
+        ENDIF
+ ;       RELEASE SNAME
+        SNAME=@(FF//'%[READ]')
+        DATA=SNAME.DATA_ARRAY
+        ZLL=0.0
+        ZHH=0.0
+      ELSE
+        NLOOK=0
+      ENDIF
+     ENDIF
+     IF(?SAME(OPT,'B'))
+      TT=TOPHAT(5)
+      BLUR DATA TT BLURDATA[BLUR]
+      DATA=BLURDATA.DATA_ARRAY
+      OPT='N'
+      FRAME
+     ENDIF
+     IF(?SAME(OPT,'G'))
+      CELGRID
+     ENDIF
+     IF(?SAME(OPT,'C'))
+      CURSOR
+     ENDIF
+     IF(?SAME(OPT,'M'))
+      T=FINDSTR(FILE(NLOOK),']')
+      TM=SUBSTR(FILE(NLOOK),T+3,T+8)
+        IF (NFILT=1)
+      TEMP='IMS'//TM//'_F1'
+      ELSE
+      TEMP='IMS'//TM//'_F2'
+      ENDIF
+      MAP=@(TEMP//'%[READ]')
+      SM=MAP.DATA_ARRAY
+        ='displaying'&TEMP
+      DISPLAY SM (ZLL,ZHH)
+      GETFIELD MAP
+     ENDIF
+     IF(?SAME(OPT,'K'))
+      TB=FINDSTR(FILE(NLOOK),']')
+      TMB=SUBSTR(FILE(NLOOK),TB+3,TB+8)
+        IF (NFILT=1)
+      TEMPB='BG'//TMB//'_F1'
+      ELSE
+      TEMPB='BG'//TMB//'_F2'
+      ENDIF
+      BGM=@(TEMPB//'%[READ]')
+      BM=BGM.DATA_ARRAY
+        ='displaying'&TEMPB
+      DISPLAY BM (ZLL,ZHH)
+     ENDIF
+     IF(?SAME(OPT,'P'))
+      IF(?SAME(SFILE,'NONE'))
+        ='No PSS log available'
+      ELSE
+        IF (NFILT=1)
+       TEMP=SFILE//'_F1'
+      ELSE
+       TEMP=SFILE//'_F2'
+      ENDIF
+      RES=@(TEMP//'%[READ]')
+        RAP=RES.POSIT.CEL_COORDS.RA.DATA_ARRAY
+        DECP=RES.POSIT.CEL_COORDS.DEC.DATA_ARRAY
+        NSRCE=NTOTAL(RAP)
+; Plot only sources that belong to image
+       DO(1,NSRCE,1)
+    PIM=UPCASE(RES.BOOK(RES.POSIT.ID.DATA_ARRAY(I)).SEARCHED)
+       IF (?WITHIN(SNAME,PIM))
+        POSEQU(RAP(I),DECP(I))
+       CIRCLE 5
+       ENDIF
+      LOOP
+     ENDIF
+    ENDIF
+    IF(?SAME(OPT,'Z'))
+     ZLL=_ZLO
+     ZHH=_ZHI
+     FRAME
+     OPT='N'
+    ENDIF
+    IF(?SAME(OPT,'I'))
+     =NFILES&'image pairs to be inspected'
+     _NEXT=NLOOK+1
+     NLOOK=_NEXT
+     IF((NLOOK>0)AND(NLOOK<=NFILES))
+       IF(NFILT=1)
+        FRAME
+       ENDIF
+       NFILT=1
+  FF=SUBSTR(FINDSTR(FILE(NLOOK),'.SDF;') DROP 1 -, 1 SWAP)
+;       RELEASE SNAME
+       SNAME=@(FF//'%[READ]')
+       DATA=SNAME.DATA_ARRAY
+       ZLL=0.0
+       ZHH=0.0
+       OPT='N'
+     ELSE
+       NLOOK=0
+       OPT='N'
+     ENDIF
+    ENDIF
+    IF(?SAME(OPT,'S'))
+     NLOOK=0
+     OPT='N'
+    ENDIF
+   LOOP
+  LOOP
+ END
+;USES 'NIPSLOG'
+
+1 Xronos
+
+<dl>
+<dt>Features:
+<dd>
+
+<dt>Scope:
+<dd>
+
+<dt>Invocation and help system:
+<dd>
+
+<dt>Limitations:
+<dd>
+
+<dt>Documentation:
+
+<dt>Advice:
+<dd>
+</dl>
+
+
+  Time series analysis TBD
+
+1 PERIOD
+
+  Documentation: SUN 167.1
+<dl>
+<dt>Features:
+<dd>
+
+<dt>Scope:
+<dd> Figaro is a set of general astronomical data reduction programs with
+   a bias towards spectrocopy. Figaro is made available by typing "figaro"
+   you can access figaro's help system by typing "fighelp" after invoking
+   figaro.
+
+
+<dt>Invocation and help system:
+<dd>
+
+<dt>Limitations:
+<dd>
+
+<dt>Documentation: SUN 86.9, SSN40
+
+<dt>Advice:
+<dd>
+</dl>
+
+
+  Time series analysis TBD
+
+1 XSPEC
+
+<dl>
+<dt>Features:
+<dd>
+
+<dt>Scope:
+<dd>
+
+<dt>Invocation and help system:
+<dd>
+
+<dt>Limitations:
+<dd>
+
+<dt>Documentation:
+
+<dt>Advice:
+<dd>
+</dl>
+
+  Comprehensive data reduction package, spectral fitting, data simulation
+  etc etc TBD
+
+1 QDP
+
+<dl>
+<dt>Features:
+<dd>
+
+<dt>Scope:
+<dd>
+
+<dt>Invocation and help system:
+<dd>
+
+<dt>Limitations:
+<dd>
+
+<dt>Documentation: SUN 128.2
+
+<dt>Advice:
+<dd>
+</dl>
+
+
+  The "Quick and Dandy Plotter"  TBD  (To Be Done)
+
+1 PROS
+
+<dl>
+<dt>Features:
+<dd>
+
+<dt>Scope:
+<dd>
+
+
+<dt>Invocation and help system:
+<dd>
+
+<dt>Limitations:
+<dd>
+
+<dt>Documentation:
+
+<dt>Advice:
+<dd>
+</dl>
+
+  TBD
+
+1 RGASP
+
+<dl>
+<dt>Features:
+<dd>
+
+<dt>Scope:
+<dd>
+
+<dt>Invocation and help system:
+<dd>
+
+<dt>Limitations:
+<dd>
+
+<dt>Documentation:
+
+<dt>Advice:
+<dd>
+</dl>
+
+
+  Galaxy surface brightness profiles, profiling and fitting. TBD
+
+1 Command_Summary
+
+ This Facility is not yet fully enabled. What will be here is a one line
+ description of all the complementary packages thought to be useful
+ or of potential to ASTERIX users. (some examples given).
+
+ FOURIER  Forward and backward FFTs on 2-D data. <kappa>
+
+ MEM2D    A Maximum Entropy deconvolution application <Kappa>
+
+ LUTROT   A mouse-driven colour table manipulation application <kappa>
+
+ SURFIT   Spline or Polynomial surface fitting for images <kappa>
+
+ ROTATE   Rotates images through arbritary angles <kappa>
+
+ MEDIAN   Two-dimensional user-selectable median filter smoothing <kappa>
+
+ LAPLACE  Laplacian edge-detection algorithm <kappa>
+
+ Extra_maths operations (eg hyperbolics) are avaliable under <kappa>
+
+ HISTEQ   Histogram equalisation application <kappa>
+
+ SHADOW   Edge enhancement using a shadow effect <kappa>
+
+ NOMAGIC  Magic-value replacement by user-defined value <kappa>
+
+ fourier_transforms Lots of Fourier applications under Figaro. <figaro>
+
+ DVDPLOT  Plots two data arrays against each other <figaro>
+
+ Q2BAD    quality array -> magic values <figaro>
+
+ HOPT     Edge-enhancement via histogram equalisation <figaro>
+
+ IDIFF    An application to differentiate an image <figaro>
+
+ ICONV3   Image convlution with a symmetric 3x3 user-defined kernal <figaro>
+
+ ISMOOTH  Replaces current pixel dependent on nearest neighbours <figaro>
+
+ ISTRETCH Shifts and stretches an image in X and Y  <figaro>
+
+ MEDFILT  Median filtering, similar in nature to ISMOOTH <figaro>
+
+ GOODVAR  Replaces bad/negative/zero variances with user-defined value <figaro>
+
+ ICSET    Sets a rectangular regin in an image to a constant value <figaro>
+
+ HILITE   Scan a an image with a very narrow colour table <ndprogs>
+
+ MOVIE    Look quickly through successive planes of a cube <ndprogs>
+
+ TRANSFORM Rebin ops via shift/rotation/resampling (images/cubes) <ndprogs>
+
+ SMOOTH   Smoothing ops via tophat/gaussian/sinc functions <ndprogs>
+
+ HDSTOTAB Tabulates values from HDS to ASCII --- multiple formats <q>
+
+ TABTOHDS Reads columns from ASCII to HDS --- multiple formats <q>
+
+ FFT2D    Two-dimensional FFT <q>
+
+ LOOKAT   Diplays HDS image 'about' given coordinates <q>

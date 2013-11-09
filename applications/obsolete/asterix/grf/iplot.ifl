@@ -1,0 +1,9 @@
+interface IPLOT
+  parameter NEXT
+    type '_LOGICAL'
+    vpath 'DEFAULT'
+    default Y
+    prompt 'Next window'
+    help 'Y = advance to next display window  N = stay in current one'
+  endparameter
+endinterface

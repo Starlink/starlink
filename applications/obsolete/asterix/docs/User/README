@@ -1,0 +1,68 @@
+CREATING USER_005 - brief notes.
+
+09 Mar 00
+
+  See pg 43 Sun/145.6 UNIX - AN Introduction.
+
+  The  document user_005   and  associated  files  is  presently  in   -
+/soft/asterix/asterix/docs/user.
+
+  These documents are accessible  from the web  DO NOT WORK ON THEM LIVE
+make a copy.
+
+  Once changes are complete  move the currently versions to user_005_old
+and then copy over.
+
+  Four file types are create .html .ps. .pdf .dvi.
+
+  Although in  the AST_TOP/docs directory they  are "linked" directly to
+the web pages - in /www/web/asterix/user
+
+      *
+
+  Creating USER5 involves a number of steps.
+
+1) TEX.  User5 is written (in a   text editor) in  the LATEX  FORMAT -
+ending with file extension .tex
+
+2) LATEX turns .TEX files to .DVI (DEVICE INDEPENDENT) files
+
+   For example eg. -> LATEX user_005.tex
+
+   XDVI can be used to display .DVI files
+
+3) DVIPS CONVERTS TO .DVI to .PS (POSTSCRIPT) eg ->dvips user_005.dvi
+ 
+   GV (GHOSTVIEWER) can be used to view .PS files
+
+4) PDF  (ADOBE ACROBAT PORTABLE  DOCUMENT FORM)  files can  be created
+from PS files using ACROBAT DISTILLER.
+
+   We presently only have one  ACROBAT license -  for PC32. The reader
+   is widely available. To display use ACROREAD .
+  
+   The conversion is simple. The file created was readable in UNIX but
+   NOT on the NT machine.
+
+   To  print PDF save  as   PS in acroread   ~ check  A4 size OR   see
+   /base2/bwf/bin/ - one of the scripts in here
+
+5) LATEX files can be converted to HTML using LATEX2HTML
+
+  eg.  latex2html user_005.tex.
+
+  This sets  up  a directory structure containing   a number of  .html
+  files.
+
+     *
+
+  The link to "user" on the asterix webpage contains  links to each of
+  these   document types  -   html,  ps, dvi,   pdf.   If   the helper
+  application   is  specified under  preferences  in  the browser then
+  clicking on these links will  initiate the application otherwise the
+  user is prompted to download the corresponding file.
+
+  The user_005 .pdf .ps and .pdf file are renamed rosat-user-guide and
+  copied to /soft/asterix/asterix/docs
+
+

@@ -1,0 +1,40 @@
+*+  USI_CMN - Internal common for USI routines
+
+*  Constants constraining system
+      INTEGER			USI__MXCTX		! Max no. contexts
+        PARAMETER		( USI__MXCTX = 5 )
+      INTEGER			USI__MXPSYS		! Max no. par systems
+        PARAMETER		( USI__MXPSYS = 3 )
+      INTEGER			USI__MXPRTN		! Max no. par methods
+        PARAMETER		( USI__MXPRTN = 100 )
+
+*  Parameter systems
+      INTEGER			USI_NPS			! # systems defined
+      CHARACTER*80		PS_NAME(USI__MXPSYS)
+      INTEGER			PS_NLEN(USI__MXPSYS)
+      INTEGER			PS_RTN(USI__MXPRTN,USI__MXPSYS)
+
+*  Command logging control
+      CHARACTER*4		USI_LOGMODE		! Logging mode
+      CHARACTER*132      	USI_LOGFILE		! Logging file
+      INTEGER			USI_LOGIMODE		! Logging mode id
+      INTEGER			USI_LOGFID		! Logging FIO id
+      LOGICAL			USI_LOGGING		! Logging enabled?
+
+*  Context storage
+      INTEGER			USI_ICTX		! Current context
+      INTEGER			CTX_TYPE(USI__MXCTX)	! Context types
+      INTEGER			CTX_PST(USI__MXCTX)	!
+      CHARACTER*512		CTX_CSTR(USI__MXCTX)	! Command strings
+      INTEGER			CTX_CLEN(USI__MXCTX)
+
+*  System initialised?
+      LOGICAL			USI_SYINIT
+
+*    Common block definitions
+      COMMON /USI_CMN_I/        USI_ICTX, USI_NPS, PS_NLEN, PS_RTN,
+     :                           USI_LOGGING, USI_LOGIMODE, USI_LOGFID,
+     :                           CTX_PST, CTX_TYPE, CTX_CLEN,USI_SYINIT
+
+      COMMON /USI_CMN_C/        USI_LOGFILE, USI_LOGMODE, PS_NAME,
+     :                           CTX_CSTR

@@ -1,0 +1,2110 @@
+\documentclass[11pt,fleqn]{article}    %10% larger letters, equns to left
+\usepackage{graphics}
+\pagestyle{myheadings}
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {User Note}
+\newcommand{\stardocinitials}  {USER}
+\newcommand{\stardocnumber}    {005}
+\newcommand{\stardocauthors}   {Richard D Saxton, Jeremy Ashley \& Robert Vallance}
+\newcommand{\stardocdate}      {Revised February 2000\\David Geddes}
+\newcommand{\stardoctitle}     {The ROSAT XRT interface in ASTERIX}
+\newcommand{\stardocname}      {\stardocinitials /\stardocnumber}
+%------------------------------------------------------------------------------
+
+\setlength{\textwidth}{160mm}           % Text width 16 cm
+\setlength{\textheight}{240mm}          % Text height 24 cm
+\setlength{\oddsidemargin}{0pt}         % LH margin width, -1 inch
+\setlength{\evensidemargin}{0pt}        % LH margin width, -1 inch
+\setlength{\topmargin}{-5mm}            %
+\setlength{\headsep}{8mm}               % 
+\setlength{\parindent}{0mm}
+
+%    Starlink definitions for \LaTeX\ macros used in MAN output
+%
+%  Description:
+%    As much as possible of the output from the MAN automatic manual generator
+%    uses calls to user-alterable macros rather than direct calls to built-in
+%    \LaTeX\ macros. This file is a version of the MAN default definitions for
+%    these macros modified for Starlink preferences.
+%
+%  Language:
+%    \LaTeX
+%
+%  Support:
+%    William Lupton, {AAO}
+%    Alan Chipperfield (RAL)
+%-
+%  History:
+%    16-Nov-88 - WFL - Add definitions to permit hyphenation to work on
+%                words containing special characters and in teletype fonts.
+%    27-Feb-89 - AJC - Redefine \manroutine
+%                      Added \manheadstyle
+%                      Switch order of argument descriptors
+%    07-Mar-89 - AJC - Narrower box for parameter description
+%                      Remove Intro section and other unused bits
+%
+% permit hyphenation when in teletype font (support 9,10,11,12 point only -
+% could extend), define lccodes for special characters so that the hyphen-
+% ation algorithm is not switched off. Define underscore character to be
+% explicit underscore rather than lots of kerns etc.
+
+\typeout{Starlink MAN macros. Released 27th February 1989}
+
+%\hyphenchar\nintt=`-\hyphenchar\tentt=`-\hyphenchar\elvtt=`-\hyphenchar\twltt=`-\lccode`_=`_\lccode`$=`$
+
+%    Macros used in the .TEX_SUMMARY file
+%
+%  Description:
+%    There is a command to introduce a new section (mansection) and a list-like
+%    environment (mansectionroutines) that handles the list of routines in the
+%    current section. In addition a mansectionitem command can be used instead
+%    of the item command to introduce a new routine in the current section.
+%-
+
+\newcommand {\mansection}[2]{\subsection{#1 --- #2}}
+
+\newenvironment {mansectionroutines}{\begin{description}\begin{description}}%
+{\end{description}\end{description}}
+
+\newcommand {\mansectionitem}[1]{\item [#1:] \mbox{}}
+
+%    Macros used in the .TEX_DESCR file
+%
+%  Description:
+%    There is a command to introduce a new routine (manroutine) and a list-like
+%    environment (manroutinedescription) that handles the list of paragraphs
+%    describing the current routine. In addition a manroutineitem command can
+%    be used instead of the item command to introduce a new paragraph for the
+%    current routine.
+%
+%    Two-column tables (the ones that can occur anywhere and which are
+%    triggered by "=>" as the second token on a line) are bracketed by a
+%    new environment (mantwocolumntable). Other sorts of table are introduced
+%    by relevant  environments (manparametertable, manfunctiontable and
+%    manvaluetable). The definitions of these environments call various other
+%    user-alterable commands, thus allowing considerable user control over such
+%    tables... (to be filled in when the commands have been written)
+%-
+
+\newcommand {\manrule}{\rule{\textwidth}{0.5mm}}
+
+%\newcommand {\manroutine}[2]{\subsection{#1 --- #2}}
+\newlength{\speccaption}
+\newlength{\specname}
+\newcommand{\manroutine}[2]{\goodbreak
+                          \rule{\textwidth}{0.5mm}  % draw thick line
+                          \settowidth{\specname}{{\Large {\bf #1}}}
+                        % left and right box width is text width plus gap
+                          \addtolength{\specname}{4ex} 
+                        % caption width is width of page less the two names
+                        % less than empirical fudge factor
+                          \setlength{\speccaption}{\textwidth}
+                          \addtolength{\speccaption}{-2.0\specname}
+                          \addtolength{\speccaption}{-4.45pt}
+                        % move text up the page because \flushleft environ-
+                        % ment creates a paragraph
+                          \vspace{-7mm}
+                          \newline
+                          \parbox[t]{\specname}{\flushleft{\Large {\bf #1}}}
+                          \parbox[t]{\speccaption}{\flushleft{\Large #2}}
+                          \parbox[t]{\specname}{\flushright{\Large {\bf #1}}}
+                          }
+
+\newenvironment {manroutinedescription}{\begin{description}}{\end{description}}
+
+\newcommand {\manroutineitem}[2]{\item [#1:] #2\mbox{}}
+
+
+% parameter tables
+
+\newcommand {\manparametercols}{lllp{90mm}}
+
+\newcommand {\manparameterorder}[3]{#2 & #3 & #1 &}
+
+\newcommand {\manparametertop}{}
+
+\newcommand {\manparameterblank}{\gdef\manparameterzhl{}\gdef\manparameterzss{}}
+
+\newcommand {\manparameterbottom}{}
+
+\newenvironment {manparametertable}{\gdef\manparameterzss{}%
+\gdef\manparameterzhl{}\hspace*{\fill}\vspace*{-\partopsep}\begin{trivlist}%
+\item[]\begin{tabular}{\manparametercols}\manparametertop}{\manparameterbottom%
+\end{tabular}\end{trivlist}}
+
+\newcommand {\manparameterentry}[3]{\manparameterzss\gdef\manparameterzss{\\}%
+\gdef\manparameterzhl{\hline}\manparameterorder{#1}{#2}{#3}}
+
+
+% list environments
+
+\newenvironment {manenumerate}{\begin{enumerate}}{\end{enumerate}}
+
+\newcommand {\manenumerateitem}[1]{\item [#1]}
+
+\newenvironment {manitemize}{\begin{itemize}}{\end{itemize}}
+
+\newcommand {\manitemizeitem}{\item}
+
+\newenvironment {mandescription}{\begin{description}\begin{description}}%
+{\end{description}\end{description}}
+
+\newcommand {\mandescriptionitem}[1]{\item [#1]}
+
+\newcommand {\mantt}{\tt}
+
+% manheadstyle for Starlink
+\newcommand {\manheadstyle}{}
+
+\catcode`\_=12
+\def\cha{{$\langle c1 \rangle$}}
+\def\chb{{$\langle c2 \rangle$}}
+\def\rornum{{$\langle nnnnnn \rangle$}}
+\def\RPF{{$R \langle P/F \rangle$}}
+\def\RH{{\it RH}}
+\def\RP{{\it RP}}
+
+\newcommand{\docpicture} {\includegraphics{user_005_rosat.ps_tex}}
+% End of MAN add-in
+
+
+\begin{document}                                % Start document
+\thispagestyle{empty}
+SCHOOL OF PHYSICS AND ASTRONOMY \hfill \stardocname\\
+BIRMINGHAM UNIVERSITY\\
+{\large\bf ASTERIX Data Analysis\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+\begin{center}
+\docpicture                             % picture of ROSAT
+\end{center}
+\parskip=4.0truemm plus 0.5truemm       % Paragraph spacing
+\markright{\stardocname}
+
+\newpage
+\tableofcontents
+
+\newpage
+
+\section{Introduction}
+This guide is for people who want to reduce and analyse data from the ROSAT
+X-ray satellite using the Starlink multi-mission data analysis package
+ASTERIX. It describes how to get from observation datasets to high level
+data products such as spectra, point source lists, etc.
+
+\subsection{Software Version}
+This version of  the user guide is  associated with ASTERIX version 2.3, a
+beta version of which can be downloaded via the net.  
+
+\begin{verbatim}
+       http://sr.bham.ac.uk/asterix
+\end{verbatim}
+
+No other formal release plans have yet been made.   This version of ASTERIX
+is supported on Solaris, Digital Unix, and Linux.
+
+\subsection{ASTERIX Version 2.3}
+ASTERIX version 2.3   includes changes which   allow the XRT   interface to
+directly   access  FITS files.  The development   of full FITs compatibility
+throughout ASTERIX is also well underway.
+
+\subsection{Getting Started}
+All commands described in this document are available automatically as part 
+of ASTERIX. If you have ASTERIX installed at your site, it can be started
+by typing
+
+\begin{verbatim}
+       > aststart
+\end{verbatim}
+
+Most ASTERIX commands can be run from the shell.  The exception to this is
+the command driven version of image processing.  This requires the
+user to start ICL (command: {\tt icl}), although most of the same
+functions are available within Isys, the image processing GUI, which
+is invoked from the shell.  All other ASTERIX commands will also run
+from ICL.
+
+\subsection{Getting Help}
+This document provides recipes for specific data analysis tasks, as well
+as descriptions of the data formats. It does not provide detailed help on
+individual ASTERIX ROSAT commands. 
+
+Such help is provided by the on-line help system, invoked by the command
+
+\begin{verbatim}
+       > asthelp
+\end{verbatim}
+
+{\tt asthelp} attempts to provide complete information on all ASTERIX commands,
+as well as more general guidance on how to get started with ASTERIX,
+where to find documentation, information specific to the current ASTERIX
+release, etc..
+
+With this release of ASTERIX, a hypertext version of {\tt asthelp} is also
+available. This can be invoked with the command 
+
+\begin{verbatim}
+       > xasthelp
+\end{verbatim}
+
+Or referenced on the WWW at 
+
+\begin{verbatim}
+        http://www.sr.bham.ac.uk/asterix
+\end{verbatim}
+
+\subsection{Related Documents}
+
+The international ROSAT project has also produced a number of useful
+documents, including individual calibration memos and the ROSAT Users
+Handbook. These are available from the US anonymous ftp site {\it
+legacy.gsfc.nasa.gov}.  More specific references are provided in later
+section where appropriate.
+
+News items, including the national ROSAT newsletters can be accessed
+via the Leicester ROSAT home page and the HEASARC ROSAT guest observer
+facility on the World Wide Web.  Information about ASTERIX is
+available on Birmingham University's ASTERIX home page.
+
+\begin{verbatim}
+       http://ledas-www.star.le.ac.uk/Forum/rosat-news  
+       http://heasarc.gsfc.nasa.gov/docs/rosat/rosgof.html
+       http://www.sr.bham.ac.uk/asterix
+\end{verbatim}
+
+\subsection{Layout of this Guide}
+The following sections give information about the ROSAT satellite (section 2),
+the data that you get from ROSAT (section 3), how to read a data tape and
+how to get a quick idea of what your data contains (section 4), detailed
+descriptions of how to analyse ROSAT PSPC and HRI data (section 5), how to
+communicate with the ROSAT project and how to stay informed (section 6).
+Finally, there is a number of appendices describing the dataset formats,
+giving a full list of ASTERIX XRT commands.
+
+\newpage
+\section{ROSAT}
+The ROSAT X-ray astronomy satellite (R\"ontgen Satellite) was launched on
+June 1, 1990, and was switched off on Friday 12th February 1999. ROSAT 
+is a German satellite,which also has scientific instrumentation supplied by the 
+USA and the UK. There are scientific data centres at the Max Planck Institut 
+f\"ur Extraterrestische Astrophysik (MPE) near Munich in Germany, the 
+Goddard Space Flight Center (GSFC) near Washington DC in the US, and 
+RAL/University of Leicester in the UK. 
+
+\subsection{Project}
+Following a performance verification and calibration phase, the ROSAT
+satellite spent 6 months continuously scanning the sky to make an all-sky
+survey. This ended on Jan 25 1991, since then observations have consisted
+of pointings at individual targets. These targets are selected by
+peer-review committees from proposals made in response to annual announcements
+of opportunity in the three countries.
+
+\subsection{Satellite}
+The ROSAT satellite is in a 96 minute period, low earth orbit having an
+inclination of 53$^o$. It is a 3-axis stabilised spacecraft with two
+co-aligned telescope systems. The main telescope is the X-Ray Telescope
+(XRT), having at its focus a carousel which can place one of two Position
+Sensitive Proportional Counters (PSPC) or a micro channel plate High
+Resolution Imager (HRI) in the beam. There is also a Wide Field Camera
+(WFC) for EUV astronomy co-mounted with the XRT. This document deals
+only with the analysis of data from the XRT. SUN 62 describes the analysis
+of data from the WFC.
+
+\subsection{Attitude Measurement and Control System}
+The ROSAT XRT has two CCD star trackers (one of which failed early in the
+mission). The WFC has an independent star tracker. The data from this
+star tracker are being incorporated into XRT attitude solutions in the Rev
+2 data re-processing.
+
+During PSPC observations the ROSAT spacecraft is wobbled with an
+amplitude of typically $\pm$ 3 arcminutes at a period of around 400
+seconds. This avoids having the sharply focussed X-ray image of a point
+source hitting a detector wire throughout the observation. HRI images are
+also wobbled, but with a lower amplitude of typically $\pm$ 1.5 arcminutes.
+Although the wobble is strictly periodic, the path of an image across the
+detector varies from cycle to cycle.
+
+Attitude reconstruction has not met specification. This can manifest
+itself in distortion of the on-axis PSF seen with the HRI, and as offsets
+of up to 30 arcseconds between the positions of objects observed after an
+interval of months. 
+
+\subsection{XRT Mirrors}
+The ROSAT XRT consists of four nested co-focal Wolter type 1 gold-coated
+Zerodur (glass) grazing incidence mirrors manufactured by Zeiss in
+Germany. The system has a field of view larger than the 2$^o$ diameter of
+the PSPC (the HRI is smaller), although vignetting is significant at large
+off-axis angles, especially at high energies. The mirror system has a focal
+length of 240cm, a focal plane scale of 11.64 $\mu$ per arcsecond, and a
+geometric area of 1141 cm$^2$. The point spread function and effective area
+is described in the sections on the PSPC and HRI detectors.
+
+\subsection{PSPC}
+There are two (nominally identical) position sensitive proportional
+counters on ROSAT. PSPC C was in use up to Jan 25, 1991, after which PSPC
+B only was used.
+
+The PSPC is a multiwire proportional counter which provides both spectral
+and spatial resolution. The counter gas is argon/methane/xenon, enclosed
+by a 1 $\mu$ polypropylene/carbon/lexan window supported by a 
+grid  with 72\% transmission. A window support structure consists of 8 
+radial ribs meeting at a 20 arcminute diameter ring. The PSPC has a 2$^o$
+diameter. It has effective area between 0.1 and 2.2 keV, peaking at 330
+cm$^2$ just below the carbon edge at 0.28 keV.
+
+In general, both spectral and spatial resolution improve with increasing
+energy, but although the PSPC has 256 pha channels, it can make only
+$\sim$ 5 independent spectral measures. The spectral resolution varies as
+$$ FWHM/E = 0.43 (E/0.93)^{-0.5}$$
+
+The PSPC detector used for observations was swapped (from detector `C' to
+detector `B') on 25th January 1991, and the detector gain changed on
+11th October 1991, so different combinations of response matrix and
+effective area file must be used for observations taken between these dates.
+
+The recommended combinations are: 
+
+before 25th January 1991 - pspcc\_eff.sdf and drm\_06.sdf \\
+25th January 1991 to 11th October 1991 - pspcb\_eff.sdf and drm\_06.sdf \\
+after 11th October 1991 - pspcb\_eff.sdf and drm\_36.sdf \\
+
+For further information on using these files, see the Leicester Database
+and Archive Services (LEDAS) User Guide or the ASTERIX documentation. 
+
+\begin{verbatim}
+http://ledas-www.star.le.ac.uk/info/user_guide/node24.html
+\end{verbatim}
+
+
+The PSPC PSF encloses 50\% of counts at 1 keV in a radius of 0.22
+arcminutes. A model describing the the PSF as a function of energy and
+off-axis angle (within the 20 arcminute ring) is a good fit to the data.
+However, at large off-axis angles the PSF can no longer be treated as
+circularly symmetric, and at the lowest energies electronic 'ghosting'
+occurs, significantly broadening the PSF below 0.19 keV. Neither of these
+extreme cases is covered by the PSF model.
+
+The PSPC was occasionally used with a boron filter in the X-ray beam.
+This filter has little transmission between the boron edge (0.188 keV)
+and the carbon edge (0.28 keV), and thus can provide extra spectral
+information in the energy range where the intrinsic spectral resolution
+is poorest. The boron filter only covered the central part of the PSPC
+field of view.
+
+Since the end of 1994, the gas supply to the PSPC has been exhausted.
+The HRI is now permanently at the focus.  A typical PSPC image can be seen
+in Figure 1.
+  
+\subsection{HRI}
+The ROSAT HRI is an enhanced version of the HRI flown on the Einstein
+satellite. It consists of two cascaded microchannel plates with a crossed
+grid readout system. The quantum efficiency of the HRI is maximised by
+use of a CsI coating on the front plate.
+ 
+The HRI field of view is the intersection of a circle and a square,
+having an effective radius of $\sim$ 18 arcminutes. Unlike the PSPC, it
+is able to make full use of the very small mirror PSF, and has an on-axis 
+50\% power radius of 3 arcseconds. However, point images also show a large
+diameter, low surface brightness halo
+
+The effective area of the HRI is less than that of the PSPC at all
+energies, particularly so at the lowest energies. Like the PSPC, it has a
+strong carbon edge at 0.28 keV.
+
+The HRI has 16 pha channels, and is easily able to distinguish UV photons from
+X-rays. Some X-ray spectral resolution may also be possible, however
+this would be very limited. Spatial gain variations 
+have not been corrected in the HRI datasets.  A typical HRI image can be
+seen in Figure 2.
+
+\newpage
+\section{The ROSAT Data}
+
+\subsection{Overview and Origins}
+Data from the ROSAT XRT is processed by the SASS (Scientific Analysis
+Software System) before being converted to a FITS format and then
+distributed to the PI. This processing occurs at MPE for data belonging
+to German and UK PIs, and at GSFC for US PIs. Both the SASS and the FITS
+conversion software have evolved throughout the mission, but more
+fundamentally, the FITS conversion up until May 1994 was different at MPE
+from that at GSFC. (This corresponds to SASS versions earlier than 7\_1.) 
+Data distributed after that date was FITS converted
+using yet another form of the FITS standard, `Rationalized Data Format'
+(RDF). This FITS conversion is now common between MPE and GSFC.
+
+Starting at    around the  same  time  as   the FITS    software change,  a
+re-processing  of all data using  the evolved SASS   was started.  This has
+become   known as the    `Rev   2 re-processing'.  The   output   from  this
+re-processing are   RDF files.   Data in   the Leicester   public  archives
+currently consist of  a mix of RDF  and pre-RDF FITS files.  As of Feb 2000
+around 3 percent of  the old datasets   remain. It is, however,  anticipated
+that the database will be completely RDF within a matter of months.
+
+ASTERIX  2.3-0  reads RDF FITS  files directly.   Earlier  ASTERIX versions
+converted  all FITS format   files  to HDS files    using the program  {\tt
+  xrtconv}.  {\tt xrtconv} has been withdraw in version 2.3-0.
+
+\subsection{The SASS}
+The Standard Analysis Software System converts the ROSAT telemetry into
+scientifically useful files. It performs standard scientific operations on
+these files, and generates postscript output summarising the observation.
+The data in the files that make up a ROSAT XRT observation dataset have all
+been through the SASS, however, the SASS does not make the FITS files that PIs
+and archive users receive, this is done by later software.
+
+The SASS was written by MPE and SAO. Identical copies run at MPE and
+GSFC, although it has been continuously updated throughout the mission.  
+A brief description of the SASS follows, however, the details of what
+specific versions of the SASS have done have proved difficult to uncover.
+What is clear is that later versions of the SASS produce significantly more
+reliable results than earlier versions. Confidence has risen to the point
+that with SASS version 7\_1 the entire set of observations to date are being
+re-processed (the so-called `Rev 2 re-processing').
+
+The following modules make up the SASS.
+
+SAV -- copies telemetry tape to disk, deleting duplicate records, and
+separates PSPC from HRI data.
+
+TEL -- splits data into continuous observing intervals and identifies
+these with the timeline, assigns quality flags to detector and aspect data.
+
+OBI -- applies the aspect solution and screens out bad data. Determines
+components of background map.
+
+SEQ (PSPC) -- merges observation, makes images, performs source detection
+and identification, makes spectra and light curves and applies
+statistical tests to these.
+
+SEQ (HRI) -- as above, but no spectra or scientific light curves made.
+
+\subsection{FITS Conversions}
+
+The User's Guide to  ROSAT Data in the   Rationalized Data Format  (RDF) is
+available to download from :
+
+\begin{verbatim}
+      http://ledas-www.star.le.ac.uk/rosat-goc/doc.html
+\end{verbatim} 
+
+As the conversion of archive datasets into the RDF file format is soon to be 
+completed the following section is now only useful as background.
+
+\subsubsection{The Background to FITS File Conversions}
+The ROSAT datasets have always been distributed as collections of FITS
+files, however there have been three different sets of file formats
+within the  FITS convention. The MPE and GSFC FITS files represent the first
+generation data format. They were developed independently, and were read by
+the respective national analysis packages.  Datasets from the two sites
+contained essentially the same information, although the GSFC datasets
+included files that had no equivalent in the MPE datasets. UK and German
+PIs had data in the MPE format, US PIs had data in the GSFC format.
+
+The fact that there were two data formats, together with the
+deficiencies of the individual FITS styles, led to the definition of the
+a format common to both MPE and GSFC. This is the `Rationalised Data
+Format' (RDF), which is described below. The switch between first
+generation FITS files and RDF FITS files took place in April 1994. In
+addition to current PI data, all prior data is being re-processed by the
+SASS and converted to RDF files.   
+
+Detailed descriptions of the files making up the datasets in the three
+formats are given for both the PSPC and HRI in appendix 1. This appendix
+also shows the correspondence between FITS files and HDS files. 
+
+\newpage
+\section{Getting a Quick Look at your Data}
+In this section you will find a description of how to get from the your
+data tape or archive dataset useful images, spectra and light curves of
+point sources.
+
+\subsection{How to get your Data onto Disk}
+
+\subsubsection{Reading a Data Tape}
+The UK ROSAT Data Centre sends out data tapes to PIs. Until May 1994,
+these tapes were always in VMS backup format. After that date, the
+default format became unix tar.
+
+You can read the unix data tapes to disk with the command
+
+\begin{verbatim}
+       > tar -xvf /dev/rmt0l
+\end{verbatim} 
+
+where /dev/rmt0l is the device filename for the tape drive.  Extracted
+files will be placed in the current directory.
+
+\subsubsection{Accessing the On-line Public Archive}
+ROSAT data enters the public archive 1 year and 2 weeks after it was first sent
+to the PI. Rev 2 data enters the archive 6 months after distribution.
+
+UK investigators can easily get archive datasets from the on-line service
+maintained by the Leicester Database and Archive Service (LEDAS). Access
+is described in detail in The LEDAS User Guide but will be describe very
+briefly here.
+
+\begin{verbatim}
+        http://ledas-www.star.le.ac.uk/info/user_guide
+\end{verbatim}
+
+The archive service is currently run from a DEC Alpha and is accessible via
+ssh (or telnet) and the WWW.
+
+Connect to the LEDAS machine:
+
+\begin{verbatim}
+        > ssh ledas.star.le.ac.uk
+\end{verbatim}
+
+Use the username {\tt xray}, no password is required. After giving your
+name, you will see a prompt. Type
+
+\begin{verbatim}
+        ledas>  browse rospublic
+\end{verbatim}
+
+You will then be using the Browse Database Management System, which has
+been described in a Users Guide (ESA TM-11, distributed to all Starlink
+sites as a MUD). The system is not described here, however, if you know
+the position or name of your target, or the original PI name, you can
+issue one of the following commands: 
+
+\begin{verbatim}
+        rospublic_total_dec> sc 10 20 30 +20 30 40
+        rospublic_total_dec> sn crab
+        rospublic_total_dec> sif pi smith
+\end{verbatim}
+
+These perform searches, the results from which can be seen with the
+display sample command {\tt ds}. Once the dataset required is identified,
+the command {\tt request} will cause the dataset to be read from the CD
+jukebox to a staging area from which you can copy the data over the net
+to your home site. The system will mail you when the data is ready for
+copying, usually within 5 minutes of the {\tt request} command being
+issued.
+
+An alternative method using the WWW at Leicester and the {\it ARNIE}
+interface can be found at:
+
+\begin{verbatim}
+        http://ledas-www.star.le.ac.uk/arnieV4
+\end{verbatim}
+
+\subsection{A Quick Look at the Data}
+With your data on a local disk  you are now ready to run ASTERIX on it.
+Start ASTERIX with the command:
+
+\begin{verbatim}
+        > aststart
+\end{verbatim}
+
+If you are using a version of ASTERIX earlier than 2.3-0 you will need to 
+convert your FITS data into HDS files using the command:
+
+\begin{verbatim}
+        > xrtconv
+\end{verbatim}
+
+Begin by getting a summary of the observation with the command {\tt showxrt}.
+
+ROSAT data is in the form of event tables, that is a logical record
+containing detection attributes such as position, time, etc. Most
+analysis cannot make use of the data in this form, but requires uniformly
+binned data. The ASTERIX command to bin data is {\tt xrtsort}. With this
+you can make images, spectra, light curves, etc. It's probably
+best to make an image first. From this you  can select regions for
+further study using {\tt Isys}.
+
+{\tt Isys} or the  command driven image  processing can be used to  inspect
+the image.  Specific regions can then be resorted either by entering simple
+parameters  into {\tt xrtsort}, such  as positions and  radii of circles or
+annuli, or a  regional description can be exported  from {\tt Isys}  in ARD
+format (Askii Region Description) then  entered into xrtsort.  Subsequently
+the  background   can be  extracted  with  {\tt  xrtsub},  calibrations and
+corrections applied with {\tt xtrcorr}, and an energy response applied with
+{\tt xrtresp}.  ASTERIX spectral fitting can then  be used directly, if you
+have it installed, or the  command {\tt ast2xsp}  can be used to format the
+data to a form suitable for {\tt xspec}.
+
+More detailed guidance on data analysis techniques appears in subsequent
+sections of this guide.
+
+\newpage
+\section{Detailed Analysis}
+
+\subsection{PSPC}
+
+The following is a brief overview of the basic reduction sequence, the
+details are shown in the later subsections.
+
+{\bf ROSAT} data may be obtained from a datatape or from the Leicester
+data archive (LEDAS).  In either case the raw data should be copied
+into a single directory.  It is important that this directory does not
+contain any raw datafiles from another observation as this can cause
+problems with the pre-processing.
+
+\begin{itemize}
+
+\item{Users of ASTERIX earlier than version 2-3-0 will need to apply 
+{\tt xrtconv} to the raw dataset to convert it into ASTERIX format.}
+
+\item{{\tt showxrt} will produce a summary of the observation, listing
+information such as target name, pointing direction and exposure time.}
+
+\item{The program {\tt xrthk} may be used to "clean" the data by
+producing a file of times when the background was low.}
+
+\item{{\tt xrtsort} can now be used to sort the data directly into an
+ASTERIX data file.  If a file of time slots has been created with {\tt
+xrthk}  this can be used in  {\tt xrtsort} when  sorting the data (see
+Example 2).  A background source  file for input into {\tt xrtsub}  can
+also be selected from a source free area of sky  with {\tt xrtsort} by
+selecting  the BACK parameter.    Example 1 shows {\tt  xrtsort} being
+used to create an image} .
+
+\item{The data can be background subtracted with the program {\tt
+xrtsub.} {\tt  xrtsub}  uses a  background file containing  a  selected
+source free area to create a model background 
+for the  whole dataset. The model  background can then be
+subtracted from the source to create a background subtracted source.}
+
+\item{{\tt xrtcorr} is used to exposure correct a dataset.  This
+includes corrections for instrumental effects, such as vignetting,
+dead time as well as normalisation to on-axis counts/sec.}
+
+\item{A detector matrix needs to be produced with {\tt xrtresp} before
+spectral fitting can be performed.  To use {\tt xspec} convert the
+files using {\tt ast2xsp}.}
+\end{itemize}
+
+\subsection{Background Subtraction}
+This is a complex problem and needs to be thought about carefully before
+proceeding. The PSPC background consists of a cosmic X-ray background,
+a particle induced detector background, solar scattered X-rays,
+afterpulses, long and short term enhancements and auroral X-rays. 
+A full description is given in Snowden et al, 1993.
+
+The particles contribute $\sim2-3\%$ of the background on average 
+($\sim 5\%$ for an observation with the boron filter), with their major
+effect being above 1 keV. The needs of background subtraction are as
+follows:
+
+{\bf 1.} A representative region of background has to be selected 
+from the observation using the {\tt Isys} GUI or the command driven image
+processing commands.
+The background region should satisfy the following criteria:
+
+\begin{itemize}
+       \item{Large enough to give good statistics}
+       \item{Free from sources}
+       \item{Should not include the ribs or central ring}
+       \item{As near to source as possible, to avoid ramps in the background}
+\end{itemize}
+
+{\bf 2.} The background data need to be corrected for vignetting effects
+before subtraction. This is energy dependent and is complicated by the fact
+that the particles in the background have a different radial dependency 
+to the photons (i.e. they are not vignetted).
+
+{\bf 3.} The background has to be normalised for the area of the source
+and background boxes before subtraction.
+
+{\tt xrtsub} calculates: 
+\begin{math}
+SUB = SRC - BCK \times \frac {A_{s}} {A_{b}} \left[
+B_{phot} \frac {V_{s}} {V_{b}} + B_{part} \frac {P_{s}} {P_{b}} \right]
+\end{math}
+
+where A is the area, $B_{phot}$ the photon fraction of the background, 
+$B_{part}$ the particle fraction, V is the vignetting function and P is the
+position dependence of the particles. The subscripts 's' and 'b' refer to
+source and background respectively.
+
+
+The program {\tt xrtsub} caters for points 2 and 3, so the user only has to
+worry about point 1. The program ignores source or background pixels with
+bad quality and this feature may be used to create background regions with
+complicated shapes, which satisfy the requirements of point 1. e.g. an
+annulus at a large radius with sources and the ribs removed. See the 
+section on subtracting extended sources for a recipe for creating such a
+background file.
+
+The particles in  the background are calculated using  a model developed in
+Snowden et al. 1992  and updated by Plucinsky  et al. 1993, which gives the
+particle flux as a function  of energy, time  and detector position. Over a
+single  observation this model  is entirely  dependent  on the housekeeping
+parameter   master\_veto\_rate,  which is  contained  in an    array in the
+eventrate file. The model is well constrained for values between 0 and 170,
+and this constraint should be applied to the data  using {\tt xrthk} before
+attempting  a   difficult subtraction.   The model   parameters  vary  on a
+timescales of months.   This effect is   taken into account  by providing a
+different set of model parameters depending on the date of the observation.
+
+\subsubsection{Point Source Subtraction}
+The background subtraction of point sources tends to be relatively easy
+because of the low intrinsic background of the PSPC.  Use {\tt Isys}
+to determine a suitable background area and then sort with {\tt xrtsort}.
+This should be either an annulus around the source, with an inner radius of
+at least 3 arcminutes, or if source confusion makes this impossible, a
+circular box as near as possible to the source. The background box should
+be as large as possible without including any sources or intersecting the
+window support structure.  If a spectrum or time series is being
+subtracted, the background datafile must have exactly the same range of
+spectral bins and time bins as the source file.
+
+\subsubsection{Extended Source Subtraction}
+This is a much trickier problem. The {\tt asthelp} section 
+"{\tt xrtsub} advice extended\_sources" gives up to date advice on the best 
+subtraction method. The subtraction of an image provides a good illustration 
+of the current best technique. Let's say a background subtracted image of 
+the whole field between corrected pulse height channels 11 and 250 is
+required. First, {\tt xrtsort} should be used to make a {\em spectral\_image}
+over this channel range with about 6 spectral bins. A few spectral bins
+need to be used to adequately sample the vignetting function which is energy
+dependent.
+(It is unnecessary to use more than about 10 spectral bins because of the
+moderate energy resolution of the instrument. Indeed using a large number
+of energy bins can cause problems due to irregularities in the vignetting
+function). 
+
+The background area needs to be large but constrained within a narrow range of 
+off-axis angles (so that a single vignetting correction may be applied to
+the data). The best shape to satisfy these criteria is an annulus at a
+reasonably large off-axis angle (e.g. $r=0.6^o - 0.7^o$). To produce such
+an annulus with sources and window support structure removed, use the
+following procedure:
+
+\begin{itemize}
+       \item{Mask support structures using {\tt xspokes} and {\tt ardqual}.}
+       \item{Select your background region using {\tt iregion annulus}.}
+       \item{Export the remaining areas using {\tt iregion invert} and
+{\tt iregion export}.}
+       \item{Mask the un-selected regions using {\tt ardqual}.}
+\end{itemize}
+
+{\tt xrtsub} may then be run on the source and background spectral images.
+The output spectral image can be compressed into an image using
+{\tt project}. Alternatively it may be {\tt project}ed into a spectrum for spectral work.
+{\em NB:} DO NOT compress the background spectral image into a
+spectrum before background subtraction as this will result in the 
+spatial information being lost and the program will be unable to normalise for 
+the box areas.
+
+The above procedure is fairly robust against spatial variations in the
+background.  One problem is that beyond the central ring, it becomes harder
+to resolve point sources from the background. This means that faint
+sources may be included in the background region when they would have been
+ignored in the middle. This can cause a slight over-subtraction and be a
+problem for very accurate work. No data should be used beyond a radius of
+50 arcminutes due to inaccuracies in the vignetting function at these large
+radii. 
+
+\subsubsection{Multiple Point Source Subtraction}
+The situation where there are a large number of point sources within the 
+central ring, such as a 'deep survey' field, has many similarities to the
+case of the extended source. Choosing a nearby background region for each 
+source is often impossible because of source confusion and anyway
+is time consuming. One method of subtracting these sources is to use an
+annulus at a large radius as described above. However, this method may
+cause over-subtraction and since many of the sources are likely to be
+faint, this can be a serious problem.
+
+An alternative method is to use background from within the central ring.
+Although much of the area may be contaminated by sources, there is usually
+a reasonable amount of blank sky available. The method for producing such
+a background file is very similar to the annular background described in the
+'Extended source' section. 
+
+\begin{itemize}
+   \item{Produce a square spectral\_image with sides just larger than
+the circle required$^{\star}$} 
+   \item{Select the regions to be excluded using {\tt iregion}.}
+   \item{Export the regions into an ARDFILE using {\tt iregion export}.}
+   \item{Use {\tt ardqual} to remove the sources.}
+\end{itemize}
+
+$^{\star}$ Never {\tt xrtsort} directly to a circular or annular
+spectral\_image.  The pixels at the edge of the circle will be only half
+filled and there is no way of subsequently correcting for this in the software.
+
+An example of this method is shown in Figure 3.
+
+A restriction of this method is that a single vignetting correction has
+to be applied to the whole background file. This means that the range of 
+off-axis angles that can be used with this method is limited. A circular 
+background region with off-axis angles 0--12 arcminutes or an annular box with 
+angles 10--17 are acceptable. 
+
+When removing   sources from the   background region, careful consideration
+must be given to the point spread function of the instrument. Very high and
+very  low energies are the  most affected  by photon  scattering  and so if
+sources  are  inadequately  removed the   spectral  characteristics  of the
+background will be strongly biased. A description  of the PSPC PSF is given
+in Hasinger et al.  1992. Faint sources ($<  100$ counts) can be adequately
+excluded with a circle  of 1--2 arcminutes radius, centered  on the source. 
+Brighter sources should be treated individually. {\tt  Isys} can be used to
+obtain a radial profile to ascertain the distance from  the source at which
+the source counts  fall below the  level of the background.  Photons should
+be excluded from a circle of this radius  centred on the source.  Its often
+a good idea to smooth the image, before extracting the profile.
+
+\subsection{Instrument Corrections}
+\subsubsection{Spatial/Temporal Gain Correction}
+The PSPC suffers from both spatial and temporal gain variations.  An
+account of this can be found in {\it OGIP Calibration Memo CAL/ROS/95-003}.
+ASTERIX doesn't currently take these into account, however, there is an
+ftool, {\it pcpicor} which can be applied to the raw FITS data.
+This will only work for data in RDF format.
+\subsubsection{Exposure Correction} 
+The program {\tt xrtcorr} performs exposure correction on binned datasets. The 
+effects listed in the following table are corrected for:
+
+\begin {table}
+\caption{Correction factor dependencies}
+\label{t:corr}
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+  Correction    &  Energy   & Time  &  Position \\ \hline
+Vignetting      &   YES     &  NO   &    YES    \\
+PSF scattering  &   YES     &  NO   &    YES    \\
+Filter absorption &   YES     &  NO   &    NO   \\
+Dead time       &   NO      &  YES  &    NO     \\
+Wires           &   NO      &  NO   &    NO    \\
+\hline
+\end{tabular}
+\end{center}
+
+\end{table}
+
+All these effects are applied directly to the {\em data} when exposure
+correcting a time series or an image, however, only the dead time correction
+is applied to a spectrum; in this case the energy dependent corrections 
+and the effect of the wires are applied to the detector matrix. 
+For a time series or an image, the energy dependent 
+corrections, vignetting,
+PSF scattering and filter absorption, are applied assuming a mean energy.
+The default energy for this correction is 0.2 keV but it may be overridden
+on the command line, by :
+
+\begin{verbatim}
+        > xrtcorr energy=1.0
+\end{verbatim}
+
+The vignetting and filter corrections are read from the effective
+area and detector matrix files held in the \$XRTCAL directory. The PSF
+correction is calculated from an analytical function and is a strong
+function of off-axis angle as well as energy. The wire correction is a
+single value (1.27) and dead time is calculated from count rate values
+stored in the eventrate file and is usually $\sim 2\%$.
+
+The vignetting, PSF and filter corrections are {\em ENERGY} dependent
+and {\em NOT} pulse height dependent. This means that they cannot be
+directly applied to the data in a {\em spectrum} but rather must be applied
+to the detector matrix used in spectral fitting.
+The data in a spectrum are simply multiplied by the dead time factor
+and divided by the exposure time during exposure correction. The wire
+factor is not applied because this is also contained within the detector 
+matrix.
+
+Images and spectral\_images are corrected for dead time and vignetting.
+The vignetting correction applied to an image assumes a mean energy
+and so is not accurate. The correction applied to a spectral\_image,
+uses the approximate energy to pulse height bin mapping of 
+$E=(Ch.No.) / 100$ keV. This again is not accurate and under no circumstances
+should a spectral image be corrected with {\tt xrtcorr} and then used for
+{\em spectral} work by {\tt project}ing the file into a spectrum.
+
+\subsection{Spectral Analysis}
+PSPC spectra may be produced over the channel range 1-256.  However the first
+7 channels should be ignored in the spectral analysis of sources observed
+before 11th October 1991. On this date, the operating voltage of the
+detector was reduced in an attempt to lower the detector background. This
+led to the first 10 channels becoming useless and so analysis of
+observations post 11th October 1991 should ignore the first 10 channels. 
+
+\subsubsection{Single Point Source}
+This is the simplest case, a circular box should be used in {\tt xrtsort} to
+extract the source counts into a spectrum (BIN\_AXIS=7). There is one 
+subtlety which must be 
+considered. The PSF of the PSPC is very energy dependent (Hasinger et al 1992),
+e,g, on-axis the 95\% radius of a point source is 0.65 arcminutes at 
+0.5 keV, but 8.8 arcminutes at 1.7 keV. Below $\sim 0.3 keV$ (channel 30),
+PSPC images suffer from an effect known as 'electronic ghost imaging'.
+This causes events to be recorded at the intersection of anode wires rather
+than at their true position and results in the image appearing like a
+rectangular grid rather than a point source. This effect varies
+from source to source and so is impossible to correct for in the software.
+It has been found that a source radius of 3 arcminutes usually includes
+most of the counts at all energies and produces good results as a rule.
+If low energies are not important and/or the source is very faint, this
+can be reduced to $\sim 1$ arcminute to improve the signal to noise.
+If very low energy counts are important for a particular source, e.g.
+if it is a very soft source, then the radius which includes most of the soft
+counts needs to be found. This may be done by displaying the {\em low energy}
+image with {\tt idisplay}, centroiding on the source and producing a radial
+profile with {\tt iradial}. The extraction radius should be set to the point
+where the source profile merges into the background.
+
+Having produced the source spectrum, it should be background subtracted
+and exposure corrected as discussed earlier. After this a detector matrix
+needs to be created using the program {\tt xrtresp}. The detector matrix is
+unique for each source, being a function of off-axis angle and source
+box radius. It is written directly into the spectral datafile. This file
+may be used directly in the ASTERIX spectral fitting package, {\tt sfit}, or
+within {\tt xspec} after format conversion by {\tt ast2xsp}.
+
+For weak or very soft sources, modelling the particle component of the
+background correctly is important. In this case the data should be
+"cleaned" before sorting by only using times when the Master Veto Rate
+parameter is between 0 and 170. 
+
+\subsubsection{Extended Source Single Spectrum}
+Extended sources have higher background and so care needs to be taken
+when performing the background subtraction. To help reduce the background
+present in the data it is possible to "clean" the data using the Master
+Veto Rate parameter, contained in the eventrate file. 
+The program {\tt xrthk} may be used to generate a text file of time slots,
+for when the MVR value is between 0 and 170. This typically 
+results in a reduction in exposure time of about 10 \% but can significantly
+reduce the background. The particle model of Snowden et al 1991, used
+in the background subtraction assumes that the MVR is no greater than 
+170. The text file generated by {\tt xrthk} can be used directly in
+{\tt xrtsort}
+to specify the time ranges wanted (see Example 2). The same time ranges
+{\em must} be used when sorting the background file for the observation.
+
+When analysing part or all of an extended source, e.g. the inner 0.1
+degrees of a cluster of galaxies, there are no PSF considerations
+when choosing the source box. 
+However, the source box must be small enough that a single
+vignetting correction (at a single off-axis angle) is appropriate for
+the file. A reasonable size source box would be a circle of radius 
+0.2 degrees within the inner ring, or an annulus of width 0.1 degrees 
+outside the central ring. If a larger box is required, see the 
+section on "radial\_spectra".
+
+It is not always obvious which off-axis angle to use for the vignetting
+correction of a large source box, centred on the optical axis. 
+By default, the off-axis angle is set
+as the half radius of a circle or the mid-radius of an annulus. For a point
+source with a small source box this is not important, however, with a
+large source box this may not be appropriate. For instance, if a circular 
+source box was used with a uniform distribution of photons, then the
+photon weighted mean off-axis angle would be $R / \sqrt{2}$, where R is
+the radius of the box. On the other hand if the photon distribution is
+strongly centrally peaked, then an off-axis angle less than the half
+radius would be appropriate. In general with a smooth decrease in the
+source radial profile, the half radius is the best value to use for the
+mean off-axis value, however this default can be overridden on the 
+command line if necessary with:
+
+\begin{verbatim}
+      > xrtcorr offax1=8.2
+\end{verbatim}
+
+Where the off-axis value is in arcminutes.
+
+\subsubsection{Radial Spectra}
+To save time analysing different sections of an extended object, it is
+possible to produce a single file containing spectra at a number of
+different radii. For instance a circular cluster, centred on the optical
+axis, of extent 0.5 degrees, could be divided into 5 radial rings 
+of width 0.1 degrees. To produce such a source file select a circular source
+box in {\tt xrtsort} of radius 0.5 degrees, and select axes 7 and 8 at the
+BIN\_AXIS prompt. As with extended sources, it is best to subset the
+data by restricting the Master Veto Rate range to 170.
+
+The subtraction should be performed as for an extended source, e.g. an
+annular background region of radius 0.7--0.8 degrees might be appropriate.
+{\tt xrtsub} and {\tt xrtcorr} will then background subtract and exposure
+correct all the spectra in one go. 
+
+If {\tt xspec} is used for spectral fitting, each spectrum may be converted
+individually with {\tt ast2xsp}. The ASTERIX spectral fitting software will
+work directly on a radial set of spectra, the desired spectra may be
+selected with {\tt sdata} before using {\tt sfit}.
+
+\subsubsection{Spectral Analysis of the Background}
+To find the spectra of the cosmic background in a PSPC image,
+the following procedure may be adopted. It is probably best to just
+use data from within the central ring for this purpose to ensure
+uniform point source rejection to a well defined threshold.
+
+{\bf 1.} Use {\tt xrthk} to restrict the master veto rate to 170. 
+
+{\bf 2.} Use {\tt xrtsort} to produce a square spectral\_image which includes 
+    the inner ring. The spatial binsize should be about 15 arcseconds;
+    any number of spectral channels may be used, but 32 or 64 is
+    possibly best. A 256 by 256 by 32 spectral channel file should
+    produce good results.
+
+{\bf 3.} Use the {\tt quality} setting programs to set pixels outside a 
+    radius of upto 17 arcminutes BAD and blank out the sources 
+    and window support structure from the spectral image (this
+    procedure is described in the section on background subtracting
+    multiple point sources). 
+
+{\bf 4.} The spectral\_image can now be compressed into a spectrum
+    using {\tt project}.
+
+{\bf 5.} Remove the particles (and detector noise) from the spectrum.
+    This is accomplished by using {\tt xrtsub} to produce a spectrum 
+    of the particle background by :
+
+\begin{verbatim}
+        a) xrtsub spectrum spec_image part_file=parts
+
+           This just uses xrtsub to generate the particle file, throw
+           away the subtracted file that it produces. This assumes that the
+           spectral file is called spectrum.sdf and the spectral image,
+           spec_image.sdf
+
+        b) subtract spectrum parts
+
+           Use to subtract the particles from the background spectrum
+\end{verbatim}
+
+{\bf 5.} Exposure correct the spectrum with:
+
+\begin{verbatim}
+        > xrtcorr offax1=n.n
+\end{verbatim}
+
+{\tt xrtcorr} will use an inappropriate default for the off-axis angle of this
+spectrum. It must be supplied with the area weighted mean off-axis
+angle of the photons, this is $R/\sqrt{2}$, where R is
+the radius of the circular region specified with the quality setting
+programs. OFFAX1 is in arcminutes.
+
+{\bf 6.} {\tt xrtresp} will attach a detector response structure using
+instrument information calculated by {\tt xrtcorr}.  The default matrix should
+be used with observations after mid 1991.  
+
+\subsubsection{Spectra of many Sources}
+A common requirement in ROSAT analysis is to improve the signal to 
+noise ratio by combining spectra from many similar sources in the same
+field, e.g. AGN in a deep exposure field. Strictly speaking this is 
+incorrect because a separate detector matrix is required for
+each source, depending 
+on the off-axis angle and the source extraction radius. However, if this
+point is born in mind and the analysis is restricted to sources within
+the central ring it is possible to use the technique.
+
+Each source required should be extracted using a circular box with a
+fixed radius. If all the sources are faint then {\tt xrtmspec} may be used
+to extract each spectrum. This procedure uses an extraction radius of
+0.01 degrees which is too small for bright sources ($>100$ counts). If
+one or more bright sources are present, then {\tt xrtmspec} should be modified
+to use a larger radius or each source should be extracted separately with
+{\tt xrtsort}. Each source {\em must} be extracted with the same radius.
+
+The spectra may be added together using:
+
+\begin{verbatim}
+        > meandat average=no
+\end{verbatim}
+
+This program adds the counts from each input spectrum. 
+Subsequent programs will use the
+off-axis angle from the first file used in {\tt meandat} to calculate the 
+energy dependent corrections for the combined spectrum, so it is 
+important that the first datafile is at an average 
+off-axis angle for all the sources.
+The resultant datafile may be subtracted and corrected as described earlier.
+
+\subsection{Time Series Analysis}
+
+While we would  fully expect the Time Series  Analysis component of ASTERIX
+to function as described in this guide, the User should  be aware that 
+the use this software has now been superseded, and that there are
+no further plans for the development of Time Series software within ASTERIX.
+
+ROSAT flies a near circular low earth orbit. The drawback of
+such an orbit is that periodically the satellite must stop observing while
+it passes through regions of high particle background such as the South 
+Atlantic Anomaly. A {\em ROSAT} time series of greater than 30 minutes duration 
+may have gaps in it due to this effect; this causes     difficulties for
+traditional time series analysis routines. The ASTERIX document, USER\_006, 
+provides a summary of the routines within ASTERIX which have
+been designed to overcome this problem.
+
+Analysis of PSPC data is further complicated by the window support
+structure. The detector is continually wobbled while observing 
+to ensure that sources are not continuously hidden behind the 
+fine wire mesh of the 
+support structure. This means that a source will continually pass under 
+wires and its flux will be modulated at the wobble period, (about 
+six minutes). Sources outside the central ring are less prone to this effect
+because of the wide PSF at high off-axis angles. 
+
+A time series may be background subtracted if required in a similar
+manner to the spectral datasets mentioned earlier. It is likely that 
+several of the time bins in the file will be only partly exposed and so 
+it is important that the data is exposure corrected with {\tt xrtcorr} before
+being analysed. 
+
+Due to the nature of ROSAT observations there can be very long
+gaps between data in a time series. To save disk space and processing time,
+the gaps in the time series may be removed with the program {\tt streamline}.
+
+The program {\tt lombscar} provides a good technique for searching for peaks
+in the power spectrum of 'gappy' data.
+
+\subsubsection{Barycentric Correction}
+There is currently no way to correct for the motions of the satellite and
+the Earth from within ASTERIX.  However there are two FTOOLS available
+{\tt abc} and {\tt bct}, wrapped up in a script {\tt rosbary} which may be
+of some use.  These programs will not work on old MPE style datasets.
+
+\subsection{Image Analysis}
+Images may be sorted over any energy range with {\tt xrtsort}. Occasionally,
+observations are incorrectly processed by the SASS pre-processing
+software and aspect errors are introduced. This is often the result of
+a poor attitude solution from the star-trackers onboard ROSAT
+and results in photons appearing in a different part of the image
+from where they were recorded. A sign that this may have happened
+is if sources appear to be elongated along the wobble direction.
+If it is suspected that an observation contains aspect problems or if
+very accurate work, e.g. a search for source extension, is being undertaken,
+the problem can be reduced by subsetting the data on the aspect error
+(ASP\_ERR) housekeeping parameter, contained in the attitude
+file. {\tt xrthk} should be used to
+produce a file of times when the aspect error parameter was between 0 and 1.
+An image should then be produced with {\tt xrtsort}
+between these times. At the same time, the Master Veto Rate parameter
+may be used to reduce the background in the image.
+
+The image may be background subtracted using the methods outlined in 
+the "Background subtraction" section. 
+
+{\tt xrtcorr} may be used to exposure correct an image. This includes a vignetting
+correction, but it should be remembered that this correction
+when applied to an image is only approximate because 
+vignetting is calibrated in terms of energy and not pulse height channel.
+
+The image may be manipulated in a wide variety of ways using {\tt
+Isys} and the command driven image processing, within ASTERIX. 
+See "{\tt asthelp} image" for details.
+
+\subsubsection{Energy Mapping}
+PSPC data contains energy as well as spatial information. It is possible
+to indicate this on an image by producing an {\em energy map}. This may
+be done in two ways :
+
+{\bf 1.} Produce a spectral image, with 4-8 spectral channels. \\
+{\bf 2.} Run {\tt enmap} with a suitable threshold (See the help entry). \\
+{\bf 3.} Plot the result with {\tt idisplay}. \\
+
+or by producing a 3-colour image, \\
+
+{\bf 1.} Produce a low energy (chns: 8-40), medium energy (41-100) 
+and high energy (101-200) image of the same region. \\
+{\bf 2.} Combine these with {\tt mkcolim}. \\
+{\bf 3.} Display after using {\tt icolour rgb}. \\
+
+The first method is suitable for low signal to noise data whereas the 
+3-colour image method works well on bright objects.
+
+\subsubsection{Radial Profiling}
+A radial profile of a source may be produced with the {\tt iradial}
+command. If the region of interest is contaminated by another source
+or intersects the window support structure, the image may be cleaned 
+before starting the analysis. A typical procedure may be :
+
+\begin{verbatim}
+        icl> idisplay im1           ! Display the image 
+        icl> iregion                ! Choose the areas to set bad 
+        icl> iexclude curr          ! Set these areas bad 
+        icl> iradial                ! Produce the radial profile
+        icl> isave1d im1_radp       ! Save the radial profile 
+        icl> exit
+\end{verbatim}
+
+The saved radial profile may be analysed in detail with {\tt qdp}
+if required after using the {\tt astqdp} command.
+
+The above example uses the command driven image processing commands.
+The same sequence, including the export to {\tt qdp}, can be performed
+purely within {\tt Isys}.
+
+\subsubsection{Test for Extension}
+A source may be tested for extension using the following procedure:
+
+\begin{verbatim}
+        icl> idisplay
+        icl> icentroid            ! Find the centre of the source 
+        icl> imode key            ! Switch to keyboard mode 
+        icl> iradial              ! Produce a radial profile 
+        icl> ipsf                 ! Compare with the expected PSF 
+\end{verbatim}
+
+{\tt ipsf} allows several PSF functions to be compared against the 
+radial profile. The PSPC options may be accessed by selecting XRT\_PSPC.
+The best options at present are, ONAXIS\_3 if the source is on
+axis or VARPROFILE if it is off axis. The routine gives a $\chi^{2}$
+value for the quality of the fit.
+
+NB: if a source appears to be extended, the image should be
+sorted over times when the aspect error value was low, to minimise 
+possible aspect errors, and the above procedure repeated.
+
+\subsection{Count Rates and Source Searching}
+
+\subsubsection{Quick source counts}
+Quick source counts and count rates may be extracted from a PSPC
+observation with the image processing system. e.g. 
+
+\begin{verbatim}
+        icl> xrtsort              ! Sort an image
+        icl> iload image xwin     ! Start the image processing system
+        icl> idisplay             ! Display the image 
+        icl> icircstats           ! Find the counts in a source
+\end{verbatim}
+
+\subsubsection{Accurate source counts}
+
+To determine accurate source counts, the source searching routine, 
+{\tt pss} should be used. This routine provides a sensitive means of 
+finding the sources in an XRT observation. 
+Full details are given in the help and in the document,
+USER\_004. It has a large number of operational modes but the
+following method works well for finding sources and obtaining count rates
+from a PSPC image.
+
+{\bf 1.}  Begin by creating a  spectrum of a  blank  region using {\tt
+xrtsort}. The source free area  (ie. a portion of background) selected
+will  be used by {\tt  xrtsub}  to create  a model  background for the
+whole dataset.
+
+The lower  and upper bounds  in channels {\em must} be {\em
+exactly} the same as used  to create the  image to be searched by {\tt
+pss}, and  the  spectrum should contain   between 4 and 10   bins. For
+instance if  the image was sorted over  the corrected PH  range 8-247,
+then the spectrum must be produced over  the same 240 channels and may
+consist of 4,6,8, or 10 bins.
+
+Now produce a background model image using {\tt xrtsub}.
+
+Invoke {\tt  xrtsub}  inputting the  image you want  to  search at the
+SOURCE   prompt,  and your      background  spectrum at  the    BCKGND
+prompt. Supply the program with a file name for the background  model which you wish
+to create using the BGMODEL parameter.  {\tt  xrtsub} will also output
+a  background subtracted copy  of   the SOURCE  image  using the   OUT
+parameter.
+
+{\tt xrtsub}  creates a model of  background by scaling the vignetting
+function as a function of energy using  a {\em source free} portion of
+the  input  data and  adding an estimate   of  the particle background
+(which is not vignetted).
+
+{\tt pss} can accept either the raw image or the background subtracted
+image.
+
+{\bf 2.}  Run  {\tt  pss}.  At the  PSF  interface, select POLAR  mode
+option, and use  the XRT\_PSPC VARPROFILE option as  the PSF. Give the
+background    image generated  by  {\tt  xrtsub}   above  as the model
+background at  the BGND parameter.  See Example 3.  {\tt pss} produces
+two  outputs, a significance map and  source list.  The first of these
+is optional  but useful in diagnosing problems.   It is a map over the
+image region searched  of the likelihood ratio  of the two models {\em
+background  only} and {\em   background  + point source}.   {\tt  pss}
+searches  for  points  in this map  above   a user supplied threshold,
+identifies  these as sources   and finds confidence  intervals on  the
+parameters describing the source, ie.  flux, X and Y.  The flux output
+is in raw counts and takes  into account the fact  that not all of the
+psf may be included in the search box.
+
+{\bf 3.} The source   list from {\tt   pss} may  be displayed  to  the
+screen, file or printer using the {\tt ssdump} command.
+
+{\bf 4.} The source  counts in the list  produced by {\tt pss} may  be
+exposure corrected using {\tt xpsscorr}.
+
+{\tt xpsscorr} can be used to convert  the source counts calculated by
+{\tt pss} into a count rate. This  is the count  rate which would have
+been observed had the source been on axis. It does this by dividing by
+the exposure   time and by using  calibration  files to  determine the
+vignetting.  By default it also   multiplies  by a factor 1.0/0.79  to
+correct for the absorption by the fine wires in the support structure.
+
+Alternatively the  merged  exposure map which   is provided with  each
+observation  may be used to calculate  the exposure  time. This latter
+approach has the advantage of coping  with sources which are partially
+obscured by  the window support structure,  however, it  is only valid
+for images produced  over the full time  range and over the full pulse
+height channel  range. Any subset of  these quantities will invalidate
+the use of the exposure map.
+
+With    either method,  the wire    correction may be   turned  off by
+specifying "wires=no" on  the command  line.  If the count rates   are
+going to be  subsequently converted  into  a flux using the  effective
+area files or used within spectral fitting, the wire correction should
+NOT be applied as it is already included in the detector matrix.
+
+{\bf  5.} Source positions can be  marked on the displayed image using
+{\tt  imark}, or added  as  permanent annotations in  the presentation
+graphics using {\tt ssanot}.
+
+{\bf 6.} Time series or spectra can be extracted for every source in a
+{\tt pss} list using the {\tt  xrtmtime} and {\tt xrtmspec} procedures
+respectively.
+
+{\bf 7.}   The whole process  can be  performed iteratively. To refine
+your  background estimate those regions  of   the image input to  {\tt
+xrtsub} containing  sources can be  masked out using {\tt iregion} and
+{\tt iexclude} or {\tt Isys}.   This produces a background unbiased by
+the  presence of  point  sources which can then   be used in {\tt pss}
+again.
+
+\subsection{HRI}
+Before starting to  analyse HRI data you should  obtain a  copy of the
+calibration report :
+
+\begin{verbatim}
+      ftp://legacy.gsfc.nasa.gov/pub/rosat/doc/hri/HRI_report
+\end{verbatim}
+
+HRI data are sorted in an identical manner to PSPC data. The HRI has 
+16 pulse height channels, which give very limited energy resolution. It is not
+yet possible within ASTERIX to make use of this aspect of the data
+except to subset the data on PH channel within {\tt xrtsort}.
+
+Source spectra are significantly more peaked than background spectra
+and an improvement in signal to noise may result from restricting the
+channel range to 3--8, although the exact channel range will vary
+from one source to the next.
+
+\subsubsection {HRI\_Aspect\_Errors}
+
+An error in the SASS processing of aspect time has been recognised in Rosat
+HRI observations prior to 17 Jan 1997. The error in calculating aspect time
+causes the position of  events to be offset  by upto 3.5 pixels This causes
+the PSF to be blurred by the order of ~ 3".
+
+An approximate solution,  using an FTOOLS script, has  been developed 
+which is accurate provided that the  roll  angle is not changing too rapidly. A  
+detailed description of this problem is provided at :
+
+\begin{verbatim}
+       http://ledas-www.star.le.ac.uk/rosat-goc/rosstatus178
+       http://hea-www.harvard.edu/rosat/rsdc_www/aspfix.html   
+\end{verbatim}
+
+\subsection{Background Subtraction}
+Basic background subtraction may be performed with {\tt xrtsub}. This will
+subtract the background after normalising for area. At present
+the software does not perform any correction for the different detector
+efficiencies at the source and background box positions.
+
+Alternatively, since most of the background is due to particles, it would
+also be possible simply to subtract a flat background. Software to help
+determine the level of this may be obtained from:
+
+\begin{verbatim}
+ ftp://legacy.gsfc.nasa.gov/ in directory /rosat/publications/diff_bkgrd/temp
+\end{verbatim}
+
+\subsection{Exposure Correction} 
+The exposure correction program, {\tt xrtcorr} performs dead-time corrections,
+correction for the mirror vignetting, and correction for the quantum
+efficiency of the detector.  All corrections are carried out according
+to formulae given in the Calibration Report.  The one slight exception to
+this is the quantum efficiency correction. The QE of the detector is 
+provided as a 2-D map in detector coordinates.  To apply this to data
+binned in world coordinates it is radially binned, and the averaged
+correction applied only as a function of radial offset from the centre of
+the FOV.
+\subsection{Source Searching}
+The source search program uses the point spread function as specified
+in the calibration report.
+
+\newpage
+\section{A Description of the PSF}
+ 
+The ROSAT PSF describes the  spatial response of  the instrument to a point
+source resulting from the scattering of photons due  to mirror figuring and
+irregularities, and physical limitations of the detector. This response also
+varies with energy.
+
+The PSF  has  to  be considered   to  perform an  optimal   analysis of  an
+observation. 
+
+The PSF results from a number of factors;
+
+ON AXIS effects - see OGIP calibration memo. CAL/ROS/92-001.
+\begin{itemize}
+\item A scattering effect  - caused by irregularities in the surface of the mirror.
+\item A penetration effect - due to the varying depth penetration of X-rays in the counter gas.
+\item A resolution effect  - because of the  manner in which electrons are generated.
+\item Image ghosting    - in PHA channels less than channel 15. 
+\item An ellipsoidal blur    - due to the uncorrected attitude motion.
+\end{itemize}
+
+OFF AXIS effect - see OGIP calibration memo. CAL/ROS/93-015.
+\begin{itemize}
+\item A blur effect - the blur of the XMA.
+\end{itemize}
+
+\subsection{ASTERIX PSF}
+\subsubsection{ASTERIX Programs using the PSF System}
+\begin{itemize}
+\item {\tt pss} - in the point source searching program {\tt pss} the PSF is used in conjunction with a background model to make comparisons with an input dataset. (See user_004.)
+\item {\tt imsim} - uses the PSF to help create simulated images.
+\item {\tt spresp} - attaches a spatial response to an input dataset. (See the Respfile option below).
+\item {\tt crepsf} - creates a tabular PSF dataset. (See the Tabular  option below.)
+\item {\tt spconvol} - is used in extended source searching to convolve the spatial response with a user supplied source model.
+\item {\tt ipsf} - fits the PSF to a radial distribution produced by Iradial and displays the result.
+\item {\tt xrad} - is a ROSAT PSPC only program which calculates the radius of a circle which encloses a certain fraction of counts. 
+\end{itemize}
+
+\subsubsection {PSF User Interface}
+
+Because ASTERIX  is designed  as a multi-mission program it  facilitates the
+inclusion  of instrument dependent code  for the PSF by  the use  of a PSF data
+routines  library which  it  accesses   using  PSF system  routines.   (See
+{\tt Prog/011})
+
+The PSF system controls access to the numerous PSF options which are
+presented to the user in the ASTERIX PSF user interface as follows;
+
+\begin{verbatim}
+        PSF system options :
+ 
+        ANALYTIC       ASCA           EXOLE          PWFC           RADIAL
+        RESPFILE       TABULAR        WFC            XRT_HRI        XRT_PSPC
+ 
+        CSPEC(PSF/model,spec[,nbin])
+        POLAR(PSF,rbin[,abin])        RECT(PSF,xbin[,ybin])
+
+        PSF - Choose PSF to use for source model /'XRT_PSPC'/ >   
+        MASK - PSPC PSF option (LIST for descriptions) /'VARPROFILE'/ > 
+        Loaded XRT PSF cube with 10 energy channels
+        AUX - Mean photon energy in KeV > 
+\end{verbatim}
+
+The reason for  the  large number of  PSF  options  list above include:
+multiple  missions and  instruments,   recalibrations,  analytical options,  
+searching   for extended source, and techniques for improving the speed 
+of PSF processing.
+
+\subsubsection{General Considerations}
+Although the options all provide a PSF to  the ASTERIX programs in standard
+form  it is  important for the   user  to familiarise himself with  the operation  of the
+individual PSF which he is using, because there are variations in
+the behaviour of each  option.  Fortunately there  are a number of  general
+considerations which will hasten understanding of a particular PSF ;
+
+\begin{itemize}
+\item Does the PSF option derived from calibration data or an analytical form?
+\item Has the PSF been  calculated  from a generally applicable  analytical
+  function or is it instrument dependent?
+\item Which other PSF options are available?
+\item Is the PSF onaxis or offaxis?  
+\item Does the PSF simply calculate and apply a single PSF array to a dataset?
+\item Is  the  PSF a  variable option  which  attempts to  account for  the
+  variation of the PSF  with energy and variation of  the PSF with off-axis
+  angle? (see the Respfile Option below.)
+\item Is the option intended to be used when working with extended sources?
+\item Does the option include techniques to improve the speed of processing PSFs?
+\end{itemize}
+
+\subsubsection{Improving PSF Processing Speeds}
+
+ASTERIX stores  PSFs as 2D arrays of  integrated probability. These arrays
+are  pixel  based.   When  applying  the PSF  the  size of  the  PSF  array
+determines the number of adjacent pixels which have to be visited.  Because
+calculating a PSF  for individual pixels,  and then applying  that PSF to each
+pixel  in a dataset is  computationally expensive, the PSF system includes
+strategies to speed up the process;
+
+\begin{itemize}
+\item {{\tt Reduce  the PSF size.} The included energy   fraction of the PSF,
+    and hence pixel array size, can be reduced (as in {\tt pss}).}
+\item {{\tt Precalculate the PSF.} The spatial response can be pre-calculated
+    and included in the dataset (see the Respfile Option below.)}
+\item {{\tt Calculate the PSF on a grid.}The number of PSF calculations can
+    be reduced by calculating PSFs,  not at each pixel  in the image, but over
+    some coarser  grid of positions. This  method can be used either before
+    applying the PSF (as in {\tt  spresp}) or on  an `as needed' basis (see
+    the Model Option below.)}
+\end{itemize}
+
+\subsubsection{PSF and Extended Sources} 
+
+The PSF  system can  also  be used to  search  for or model  extended point
+sources.  The pss program has a variable EXTEN which measures the fit to an
+extended source using the PSF convolved with a Gaussian. Greater control of
+the   process of modifying the  PSF  shape can be   achieved using the {\tt
+  crepsf} and {\tt spconvol} programs.
+
+\subsection{PSF Options and Masks}
+\subsubsection{Other Satellites and ROSAT Instruments}
+
+The ASCA and EXOLE options refer to other satellite missions, while the WFC,
+XRT\_HRI  and  XRT\_PSPC  are  different ROSAT   instruments which each
+require their own PSF.
+
+\begin{verbatim}
+        PWFC*
+        - The WFC in pointed mode 
+        WFC 
+        - The WFC in survey mode 
+        XRT_HRI 
+        - The ROSAT XRT, HRI detector 
+        XRT_PSPC*!
+        - The ROSAT XRT, PSPC 1 and 2 detectors 
+
+        * These psf routines vary with position across the field of view
+        ! These psf routines support energy modelling using the CSPEC model  
+\end{verbatim}
+
+\subsubsection{Analytic Options}
+The ANALYTIC option provides single   analytical descriptions which can  be
+used as initial approximations to the PSF. These  are useful pre-flight. 
+They  can also be used  to help  create  models when  dealing with extended
+sources
+
+A  number of  analytical functions  can  be combined  together   and fit to
+calibration data to create a PSF model for a particular instrument (see
+the HRI Option below.)
+
+\subsubsection{Tabular and Respfile Options}
+
+The TABULAR and RESPFILE  options do  not  create PSFs  but are methods 
+which allow access to PSFs which have been previously created.  
+
+The  TABULAR option reads in  a {\it single} PSF from  a datafile which has
+been created by  the {\tt crepsf} application. This  option is useful  when
+working with extended sources.
+
+The RESPFILE option is an attempt to increase the processing speed in a PSF
+program by allowing access  to a SPATIAL  RESPONSE which is attached to the
+datafile.  The spatial response  is an ``array  of PSF arrays.''  A spatial
+response  is included in  a datafile as  a precomputed grid of point spread
+functions tailored to {\it both} the spatial  and energy sub-space occupied
+by a dataset.
+
+If a dataset repeatedly uses a PSF the program {\tt spresp}  can be used to
+create a PSF SPatial RESPonse and attach it to the dataset  where it can be
+recalled as required.  Because a SPATIAL  RESPONSE is precalculated it also
+speeds  processing time. This option  is most  useful in applications which
+make very intensive use of the PSF. Attaching a spatial response increase the size of a dataset.
+
+\subsubsection{PSF Models}
+
+The PSF   MODELS are  used  to increase processing  speed.   The MODEL
+option places a  grid over the dataset  and subsequently  computes a single
+PSF for each grid cell which is to be used for all the enclosed points.
+For each cell of the grid the PSF is calculated only once, and only if required.
+
+There   are   three    MODEL      forms  -    POLAR(PSF,rbin[,abin])    and
+RECT(PSF,xbin[,ybin])        have      spatial         variations while
+CSPEC(PSF/model,spec[,nbin])  includes  energy  dependency.     
+
+MODEL selection {\it must} include a reference to a variable PSF option.
+
+eg.  PSF  -    Choose PSF   to use   for    source  model /'XRT_PSPC'/    >
+polar(xrt_pspc,0.02)  
+
+In this example 'polar' is the model,  'xrt_pspc' the variable PSF option and
+'0.02' the grid cell size.
+
+\subsubsection{XRT\_PSPC - the Recommended Rosat Option and its Masks}
+ 
+The XRT\_PSPC is  the recommended option for the  ROSAT PSPC and four MASKS
+are provided: VARPROFILE, VARGAUSSIAN, ONAXIS\_2, ONAXIS\_3
+
+MASK is probably a slightly misleading term which is used by the PSF system
+for a sub-menu or sub-option.
+
+ONAXIS\_3 is a recommended MASK if the source  is on  axis.  
+
+The  ONAXIS\_3  mask returns a   single  on-axis PSF.  It  combines three
+functions which account    for three of the  factors   which  make up   the
+composite on-axis PSF;
+\begin{verbatim}
+        - primary electron generation is represented by a Gaussian function
+        - penetration of the counter gases which is an exponential function
+        - mirror scattering which is a Lorentzian function
+\end{verbatim}      
+        
+At greater  than 20 arc   minutes off axis the  off-axis  blur becomes  the
+dominant  factor  in the  PSF   and causes  a  noticeable asymmetry  in the
+distribution   of source counts.  Because  of the  blur  effect a PSF which
+varies with off-angle is a widely preferred option.
+
+VARPROFILE is the recommended MASK if the source is off axis.
+
+The VARPROFILE mask creates  a variable PSF  which contains {\it both }
+off-axis angle and energy dependence.
+
+The VARPROFILE mask uses a `data cube'  - a file  in which calibration data
+has been pre-processed and stored.   The values of  radius contained in  US
+Rod  Calibration  Tables have been  transformed  into the `data  cube' with
+ENERGY, OFF AXIS and RADIAL BIN components.  The `data cube' applies to the
+whole ROSAT field of  view and can be used  to calculate an  individual PSF
+for each data set.   The   comment `Loaded  XRT  PSF  cube with 10   energy
+channels' indicates that the data cube has been loaded. 
+
+\begin{verbatim}
+        THE CUBE'S DIMENSIONS
+
+        DATA CUBE   BINS    BIN SIZE
+
+        ENERGY      1-10    0.24keV
+        OFF AXIS    1-30    2 arcmin
+        RADIAL BIN  1-40    Variable @0.018 arcmin       
+\end{verbatim}
+
+With  the VARPROFILE mask  the user will also be prompted for a value of AUX.
+
+The AUX value  provides the program with a  value of mean photon energy  in
+keV. For typical source spectra 0.5keV is  a recommended value for AUX. For
+very hard or soft sources other values may be required - look at a spectrum
+of the source to decide.
+
+If  the  VARPROFILE option   is  being  used with   a MODEL   the  smallest
+recommended grid size is 0.02 (where axis values are in degrees).
+
+\subsection{HRI Option}
+
+The HRI model  is an analytic fit  to the in-flight response, performed  by
+MPE/GSFC/SAO. The functional form of the on-axis HRI PSF is :
+\begin{displaymath}
+ PSF(R) = A_{1} e^{-0.5({\frac{R}{S1}})^2} + A_{2} e^{-0.5({\frac{R}{S2}})^2} + e^{(\frac{-R}{S3})}
+\end{displaymath}
+
+ where the radial distance R from the psf centre is in arc seconds.
+ The constants A and S have values :
+
+    A1 = 0.9638 S1 = 2.1858"
+    A2 = 0.1798 S2 = 4.0419"
+    A3 = 0.001168 S3 = 31.69"
+
+ The on-axis model provides a reasonable description of the PSF out to
+ radii of 100 arcsec, but does not model the azimuthal asymmetry
+ present within the PSF core [at a radii less than 12 arcsec] of the PSF.
+
+ The on-axis model does not vary  with position in the field  of view and
+consequently " ... the
+ PSF starts to degrade beyond 5 arc minutes off axis. Beyond 12 arc minutes
+ off     axis,     the      images      become    very      asymmetrical."
+
+"A parametric representation of the azimuthally averaged off-axis HRI PSF
+has also been derived which is a simple extension of the on axis expression
+... The best fit values of s2 are well parameterised by a cubic polynomial
+in the off-axis angle, and are given by 
+
+\begin{displaymath}
+\rm   S2 = 3.3 + 0.019\theta - 0.016\theta^2 + 0.0044\theta^3
+\end{displaymath}
+
+where T is the angle off-axis in arc minutes. Substituting this into the
+HRI PSF gives the general off-axis representation."
+
+The ASTERIX XRT_HRI option uses the off-axis HRI PSF parameterisation. 
+
+Documentation on HRI can be found at :  
+\begin{verbatim}
+http://hea-www.harvard.edu/rosat/rsdc_www/HRI_CAL_REPORT/node12.html. Feb-97
+http://heasarc.gsfc.nasa.gov/docs/rosat/newsletters/hripsf10.html. Mar-96.
+\end{verbatim}
+
+\newpage
+\section{Communicating with the ROSAT Project}
+
+\subsection{Staying Informed}
+
+News items, including the national ROSAT newsletters can be accessed
+via the Leicester ROSAT home page and the HEASARC ROSAT guest observer
+facility on the World Wide Web.
+
+\begin{verbatim}
+        http://www.star.le.ac.uk/Forum/rosat-news  and
+        http://heasarc.gsfc.nasa.gov/docs/rosat/rosgof.html
+\end{verbatim}
+
+Documentation on ASTERIX can be found at:
+
+\begin{verbatim}
+        http://www.sr.bham.ac.uk/asterix-docs/
+\end{verbatim}
+
+
+\subsection{Reporting Bugs}
+An interactive form can be found via the WWW which also lists known bugs,
+and the action being taken with regards to them, within ASTERIX project.
+This can be found from the main ASTERIX web page.
+
+\newpage
+\section{A Quick Guide}
+
+\subsection{PSPC}
+
+This section gives brief details of the programs needed to process an
+XRT observation.
+
+ROSAT data may be obtained from a data tape or from the Leicester data
+archive. In either case all the raw data files should be copied into
+a single directory. It is important that this directory does not
+contain any raw datafiles from another observation as this can cause
+problems with the pre-processing.
+
+\begin{itemize}
+\item{Run {\tt xrtconv } on the raw dataset to convert into ASTERIX format.}
+\item{Running program{\tt showxrt} will produce a summary of the observation, listing
+information such as target name, pointing direction and exposure time.}
+\item{The program {\tt xrthk} may be used to "clean" the data by
+producing a file of times when the background was low.}
+\item{{\tt xrtsort} can now be used to sort the data directly into an
+ASTERIX data file.  Example 1 shows {\tt xrtsort} being used to create an
+image.  If a file of time slots has been created with {\tt xrthk} this
+can be used in {\tt xrtsort} when sorting the data (see Example 2 below).}
+\item{The data can be background subtracted with the program {\tt
+xrtsub}.  A background file should first be sorted from a blank area
+of sky with {\tt xrtsort}.}
+\item{{\tt xrtcorr} is used to exposure correct a dataset.  This
+includes corrections for instrumental effects, such as vignetting,
+dead time as well as normalisation to on-axis counts/sec.}
+\item{A detector matrix needs to be produced with {\tt xrtresp} before
+spectral fitting can be performed.  To use {\tt xspec} convert the
+files using {\tt ast2xsp}.}
+\end{itemize}
+
+\subsection{HRI}
+Processing of HRI data proceeds on an identical path to PSPC data,
+with the obvious omission of the spectral fitting.
+
+\newpage
+\section{Housekeeping and calibration data}
+\subsection{Housekeeping Data}
+By thresholding on the values of different housekeeping parameters  using the 
+XRTHK program
+the User  is able exclude  unwanted times in  the  original dataset.  XRTHK
+outputs a list of on/off MJD times which can then be passed into XRTSORT.
+
+A  list of  the  all housekeeping  parameters  are  included later in  this
+document  (Appendix  4).  The  most   commonly used parameters   (and  some
+suggested values) are :
+
+\begin{itemize}
+\item MV\_ACO - the master veto rate (1-170). 
+\item XACC      - the accepted X-ray rate (1-30).
+\item ASP\_QUAL - aspect quality (0-2).
+\end{itemize}
+
+The  FTOOL program  {\tt  fv} can be used   to  inspect the housekeeping
+parameters in the {\tt evrate} and {\tt aspect} extensions of the ancillary
+fits file. {\tt fv} may subsequently be  used to plot one
+array in a file against another.
+
+For example - the {\tt xspokes} program  uses the satellite  roll angle to 
+determine
+the position of the window support structure on the  image. This system can
+be flawed if  an observation has been  performed in two  sections, with the
+satellite at different roll angles.
+
+To check the  roll angle, start FTOOL  program fv and open  your \_anc.fits
+file. Select a  plot on the aspect extension  and use the time and roan\_cas
+parameters as your axis.
+
+\subsection{Calibration Data}
+The  effective area and  detector response  matrix information is currently
+read  from SDF calibration files. {\tt plotxy} can be used to plot SDF information.
+
+eg. The approximate relationship between pulse height channel and energy
+for the PSPC is $E=(Ch.No.) / 100$ keV, e.g. channel 100 is approximately 
+1.0 keV.
+
+To plot the relative vignetting on-axis against that at 15 arcminutes:
+
+\begin{verbatim}
+    plotxy $AST_ETC/pspcb_eff.effar_1 $AST_ETC/pspcb_eff.effar_4
+\end{verbatim}
+
+Plots  of the   vignetting function  are  given in  Figures 5   \&  6.  The
+vignetting  function is defined  at fourteen different off-axis angles from
+0--60 arcminutes.
+
+\newpage
+\section{Examples}
+\input{user_005_examples.tex}
+
+\newpage
+\section{Appendix 1: Dataset Filenames and Contents}
+
+The following is a list of files and contents, from dataset of different
+origins.
+
+\begin{tabbing}
+c1 \= = P if PSPC observation without the Boron filter \\
+\> = FP if PSPC observation with the Boron filter \\
+\> = H if HRI observation \\
+\> = nnnnnn \= six digit ROSAT Observation Request (ROR) number.
+\end{tabbing}
+
+%File info.
+\input{user_005_files.tex}
+\newpage
+\subsection{A Typical ASTERIX File}
+\input{user_005_trace.tex}
+
+\newpage
+\section{Appendix 2: ASTERIX XRT Command List}
+
+\subsection{Preprocessing}
+{\large \bf{fits2hds}} - Convert US, MPE and RDF FITS files into ASTERIX
+format.\\
+
+\subsection{Data Analysis}
+{\large \bf {showxrt}} - Display details of an XRT observation. \\
+{\large \bf {xpsscorr}} - Exposure correct a PSS source file. \\
+{\large \bf {xrad}} - Calculate the PSF of a PSPC source. \\
+{\large \bf {xrtcorr}} - Perform instrument corrections. \\
+{\large \bf {xrthk}} - Produce a file of times when the housekeeping
+parameters are within a certain range. \\
+{\large \bf {xrtresp}} - Calculate the detector matrix for a source. \\
+{\large \bf {xrtsub}} - Perform background subtraction. \\
+{\large \bf {xrtsort}} - Sort raw data into a binned dataset,
+e.g. image, spectrum. \\
+{\large \bf {xspokes}} - Produce an ARD file to describe the position
+of the PSPC support structure on the image. \\
+
+\subsection{ICL Procedures}
+
+{\large \bf {xpsf}} - Draw the PSF circle on an image. \\
+{\large \bf {xrtbox}} - Interactively define a source region 
+for data sorting. \\
+{\large \bf {xrtbckbox}} - Define a source and background region 
+for data sorting. \\
+{\large \bf {xrtmspec}} - Produce a spectrum for each source found
+with {\tt pss}. \\
+{\large \bf {xrtmtime}} - Produce a time series for each source found
+with {\tt pss}. \\
+
+\subsection{Associated Commands}
+
+{\large \bf {ardqual}} - Set pixels GOOD/BAD using an ARD file. \\
+{\large \bf {arithmetic}} - Basic arithmetic on 2 files. \\
+{\large \bf {ast2xsp}} - Convert an ASTERIX spectral file into {\tt xspec} format. \\
+{\large \bf {enmap}}   - Creates an energy map. \\
+{\large \bf {evbin}}   - Bin up an EVENT dataset. \\
+{\large \bf {meandat}} - Average several datafiles. \\
+{\large \bf {mkcolim}} - Produce a 3-colour image. \\
+{\large \bf {project}} - Reduce file dimensions. \\
+{\large \bf {Isys}}    - Image processing GUI.\\
+
+\newpage
+\section{Appendix 3: Photon Characteristics}
+\begin {table}[h]
+\caption{PSPC and HRI Photon characteristics}
+\label{t:phot}
+\begin{center}
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+Property        &\multicolumn{2}{|c}{PSPC} & \multicolumn{2}{c|}{HRI}  \\ \hline
+                &  MPE      &  US          &  MPE   &  US  \\ \hline
+XDET$^{a}$      &  0--8192  &  1--8192  &  0--4096 & 1--4096 \\
+YDET$^{a}$      &  0--8192  &  1--8192 & 0--4096   & 1--4096 \\
+XPIX$^{b}$      & $-7680\rightarrow+7680$ &  1--15360 & $-4095\rightarrow+4097$ & 1--8192 \\
+YPIX$^{b}$      & $-7680\rightarrow+7680$ &  1--15360 & $-4095\rightarrow+4097$ & 1--8192 \\
+Time            &   S/C time &  S/C time  &  S/C time  & S/C time \\
+Raw PHA         & 1--256     &  1--256 & 0--15 & 0--15 \\
+Corr. PHA$^{c}$ & 1--256     &  0--255 & 1--1  & 1--1 \\
+\hline
+\end{tabular}
+\end{center}
+$^{a}$ Pixel position on the detector. \\
+$^{b}$ Pixel position on the sky. i.e. directly related to RA/DEC. \\
+$^{c}$ The raw pulse height from the PSPC is corrected for
+gain effects during the SASS pre-processing. This corrected PHA is 
+related to the energy of the incident photon. \\
+
+The sky pixels are defined and numbered differently in the US and MPE datafiles.
+US data increases from bottom to top, so for the PSPC, the 
+bottom left hand corner 
+pixel is 1,1. MPE pixel numbers decrease with increasing Y value, so
+the bottom left hand pixel is -7680,7680 and the top left hand corner
+pixel is -7680,-7680. Corrected PH channels have the same meaning in
+the two datasets, but the US supply channels 0--255 for PSPC data 
+whereas the MPE
+data ranges from 1--256. The channel 0 PSPC data in the US files 
+may not be used within ASTERIX.
+
+\end{table}
+
+\newpage
+\section{Appendix 4: Important Housekeeping Parameters}
+
+By setting the values of  different housekeeping parameters using the XRTHK program
+the User  is  able exclude unwanted times  in  the original dataset.  XRTHK
+produces a list of on/off MJD's times which are passed in to XRTSORT. 
+
+The following list of parameters upon which the user is able to search in XRTHK
+has been compiled from the ASPECT and EVRATE  extension of the ANCILLARY RDF
+data file
+ 
+\begin{verbatim}
+
+EVRATE FITS EXTENSION
+
+PARAMETER           DESCRIPTION
+TIME                / Spacecraft time of event
+MV_ACO              / MV anticoincidence rate       
+XTRANSM             / Transmitted X-ray rate  
+A1_AL               / Events in anode A1 above low level threshold       
+A2_AL               / Events in veto anode A2 above low level thresho        
+A1AL_MV             / Events in A1 above low level thresh in antico.
+XACC                / Accepted X-ray rate         
+SA_RATE             / SA-RATE    
+SAADA_RT            / SAA detector A rate   
+SAADB_RT            / SAA detector B rate   
+A1_AH               / Events in anode A1 above high level threshold      
+A2_AH               / Events in veto anode A2 above high level thresh 
+|K1_EDGE            / Rate of events in edge strips of front cathode     
+K2_EDGE             / Rate of events in edge strips of back cathode K   
+K1_PASS             / Rate of events in K1 passing event selection  
+K2_PASS             / Rate of events in K2 passing event selection   
+MV_CNT              / MV anticoincidence counter
+XTR_CNT             / Transmitted X-ray events counter
+A1AL_CNT            / Counter of events in A1 above low level threshold
+A2AL_CNT            / Counter of events in A2 above low level threshold
+XACC_CNT            / Accepted X-ray events
+PING_CNT            / Ping counter
+A1AH_CNT            / Events in A1 above high level
+A2AH_CNT            / Events in A2 above high level
+K1ED_CNT            / Events in edge strips of K1
+K2ED_CNT            / Events in edge strips of K2
+K1PA_CNT            / Events in K1 passing event selection logic
+K2PA_CNT            / Events in K2 passing event selection logic  
+
+ASPECT FITS EXTENSION
+
+PARAMETER           DESCRIPTION
+TIME                / Spacecraft time of corrected aspect (sec)      
+MJD_INT             / Integer portion of UT in MJD     
+MJD_FRAC            / Fractional portion of UT in MJD    
+RA_CAS              / Corrected right ascension (offset from RA_NOM)   
+DEC_CAS             / Corrected declination (offset from DEC_NOM) 
+ROAN_CAS            / Corrected roll angle (offset from ROLL_NOM) 
+ASP_QUAL            / Aspect quality      
+STT_QUAL            / Star tracker flag  
+RA_SC               / Right ascension of spacecraft pointing       
+DEC_SC              / Declination of spacecraft pointing      
+ROAN_SC             / Roll angle of spacecraft pointing     
+RA_ERR              / 1-sigma error of RA_SC  
+DEC_ERR             / 1-sigma error of DEC_SC   
+ROAN_ERR            / 1-sigma error of ROAN_SC    
+STATUS              / Aspect status     
+\end{verbatim}
+
+\newpage
+\section{Glossary}
+{\large\bf ARD} - Ascii Region Description. A method of describing
+a spatial region in a text file. \\
+{\large\bf GUI} - Graphical User Interface.\\
+{\large\bf HRI} - High Resolution Imager. \\
+{\large\bf LEDAS} - Leicester Database and Archive Service. \\
+{\large\bf MPE} - Max-Planck institute at Garching bei Munchen. \\
+{\large\bf PSF} - Point spread function. The scattering of photons
+from a source due to mirror irregularities and detector response. \\
+{\large\bf PSPC} - Position Sensitive Proportional Counter. \\
+{\large\bf RDAC} - {\em ROSAT} Data Archive Centre. \\
+{\large\bf ROD} - {\em ROSAT} Observation Dataset. \\
+{\large\bf US} - United States of America. \\
+{\large\bf Vignetting} - The decline in detection efficiency with 
+increasing off-axis angle. Primarily due to XRT mirror reflectivity. \\
+
+\subsection{Useful WWW References}
+
+Hypertex version of asthelp:\\
+  http://www.sr.bham.ac.uk/asterix\\
+  
+ROSAT news items:\\
+  http://ledas-www.star.le.ac.uk/rosat-goc.html\\
+  http://heasarc.gsfc.nasa.gov/\\
+  http://www.sr/bham.ac.uk/asterix\\
+  
+LEDAS user guide:\\
+  http://ledas-www.star.le.ac.uk/rosat-goc/doc.html\\
+
+Calibration report:\\
+  ftp://legacy.gsfc.nasa.gov/rosat/doc/hri/hri\_report\\
+
+
+\subsection{Caption List}
+
+The following figures can be found in \$AST\_DOCS as postscript files.
+
+figure 1. "PSPC image" user\_005\_impspc.ps\_tex
+
+figure 2. "HRI image" user\_005\_imhri.ps\_tex
+
+figure 3. "Background extraction technique" user\_005\_srcblk.ps\_tex
+
+figure 4. "HRI detector efficiency" user\_005\_hriqeff.ps\_tex
+
+figure 5. "Vignetting curves at 0,15,30,45 arcminutes of-axis" user\_005\_angvig.ps\_tex
+
+figure 6. "Vignetting at diff. energies" user\_005\_envig.ps\_tex
+
+\newpage
+\section{References \& Bibliography}
+
+\subsection{User Guides}
+"The UK ROSAT Data Archive Centre User Guide", Sembay, S., Watson, M.G.,
+Osborne, J.P.
+
+"The EXSAS users guide", EXSAS development group, ROSAT Scientific Data 
+Center, MPE, 8046 Garching, Giessenstrasse, Germany.
+
+"ROSAT Data Products Guide", Downes, R., White, R., Reichert, G., 
+Dennerl, K., Englehauser, J., Rosso, C., Voges, W.
+
+\subsection{Instrumentation}
+
+David, L.P., Harnden Jr., F.R., Kearns, K.E., Zombeck, M.V., 
+"The ROSAT High Resolution Imager (HRI)", {\em U.S. ROSAT Science Data Center
+/SAO}
+
+Plucinsky, P.P., Snowden, S.L., Briel, U.G., Hasinger, B. \& Pfefferman, E.,
+1993, {\em Astrophys.J., submitted.}
+
+Snowden, S.L., Plucinsky, P.P, Briel, U., Hasinger, G. \& Pfeffermann, E.
+1992, {\em Astrophys.J., {\bf 393}, 819}
+
+Snowden, S.L., McCammon, D., Burrows, D.N. \& Mendenhall, J.A, 1993, 
+{\em Astrophys.J., submitted.}
+
+Hasinger, G., Turner, J.T., George, I.M., Boese, G.,
+1992, OGIP calibration memo. CAL/ROS/92-001, published in 'Legacy II'.
+
+Hasinger, G., Turner, J.T., George, I.M., Boese, G.,
+1992, OGIP calibration memo. CAL/ROS/92-001a.
+
+Hasinger, G., Boese, G., Predehl, P.,
+1993, OGIP calibration memo. CAL/ROS/93-015.
+
+\subsection{ASTERIX documents}
+
+APP\_001, "PSS manual", Allan, D.J, Ponman, T.J.
+
+PROG\_002, "Data structures: specification and conventions: ", Ponman, T.J. 
+
+USER\_006, "A guide to time series analysis within ASTERIX", Saxton, R.D. 
+
+SUN98, "ASTERIX - X-ray Data Processing System", Saxton, R.D. 
+
+
+\end{document}                                  % End

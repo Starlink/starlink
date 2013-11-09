@@ -1,0 +1,73 @@
+interface IBGND
+  parameter MODE
+    position 1
+    type '_CHAR'
+    prompt 'Mode'
+    help 'Type HELP for a full list'
+  endparameter
+
+  parameter SUBMODE
+    position 2
+    type '_CHAR'
+    prompt 'Command sub-mode'
+  endparameter
+
+  parameter X
+    type '_REAL'
+    ppath 'DYNAMIC,DEFAULT'
+    default 0.0
+    prompt 'X centre'
+    help 'X-coord of centre in axis units'
+  endparameter
+  parameter Y
+    type '_REAL'
+    ppath 'DYNAMIC,DEFAULT'
+    default 0.0
+    prompt 'Y centre'
+    help 'Y-coord of centre in axis units'
+  endparameter
+  parameter RAD
+    type '_REAL'
+    prompt 'Radius'
+    help 'Radius of circle in axis units'
+  endparameter
+  parameter RBIN
+    type '_REAL'
+    prompt 'Radial bin size'
+    help 'The width in axis units of the annular bins'
+  endparameter
+  parameter ISRC
+    type '_INTEGER'
+    prompt 'Source number'
+    help 'Source number to which operation will be applied'
+  endparameter
+  parameter SAMPLING
+    type '_CHAR'
+    default 'WHOLE'
+    prompt 'Sampling mode'
+    help 'WHOLE, ANNULAR or BOXES'
+  endparameter
+
+  parameter SAMPFIT
+    type '_CHAR'
+    default 'MEAN'
+    prompt 'Method of fitting sample distribution'
+    help 'MEAN, POLY, SPLINE, NONE'
+  endparameter
+
+  parameter XCENT
+    type '_REAL'
+    vpath 'INTERNAL,NOPROMPT'
+  endparameter
+  parameter YCENT
+    type '_REAL'
+    vpath 'INTERNAL,NOPROMPT'
+  endparameter
+
+  parameter OUT
+    type 'LITERAL'
+    prompt 'Output filename'
+    help 'The file in which the background model will be saved'
+  endparameter
+
+endinterface

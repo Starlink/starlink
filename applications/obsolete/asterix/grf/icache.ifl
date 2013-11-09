@@ -1,0 +1,7 @@
+interface ICACHE
+  parameter MODE
+    position 1
+    type '_CHAR'
+    help 'Operates on cache image - modes are PUSH, POP, TOGGLE'
+  endparameter
+endinterface

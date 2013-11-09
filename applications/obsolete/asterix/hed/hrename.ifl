@@ -1,0 +1,14 @@
+interface HRENAME
+  parameter INP
+    type 'UNIV'
+    position 1
+    prompt 'Old name'
+    help 'Full path name of object to be renamed e.g. TOP.NEXT.BOTTOM'
+  endparameter
+  parameter TO
+    type '_CHAR'
+    position 2
+    prompt 'New name'
+    help 'New name of object - not whole path name'
+  endparameter
+endinterface

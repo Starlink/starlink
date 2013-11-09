@@ -1,0 +1,53 @@
+*+  PSS_STAT_BIT0 - Constant and variable declarations for all statistics
+*
+*    Authors :
+*
+*     David J. Allan (BHVAD::DJA)
+*
+*    History :
+*
+*     30 Jul 91 : Original
+*     10 Jul 93 : No longer uses inline functions (DJA)
+*-
+*
+*    Functions :
+*
+      REAL                     DAT                     ! Pixel -> radians
+      INTEGER                  PSS_PPIX                ! Psf radius to use
+      INTEGER                  PIX                     ! Radians -> pixels
+      LOGICAL                  PSS_CONVERGED           ! Two numbers converged?
+*
+*    Import :
+*
+      INTEGER            	BOX			! Box to search
+      INTEGER                  NX, NY
+      INTEGER                  PNX, PNY                ! PSF work space
+      REAL                     PSFV(-PNX/2:PNX/2,
+     :                             -PNY/2:PNY/2 )
+      INTEGER                  CACHE_CTRL              ! Cache control
+*
+*    Export :
+*
+      INTEGER                  SNX, SNY                ! Signif map
+      REAL                     SMAP(SNX,SNY)
+*
+*    Local constants :
+*
+      INTEGER                  MAXITER                 ! Max iterations
+         PARAMETER             ( MAXITER = 20 )
+*
+*    Local variables :
+*
+      REAL                     CC(2)                   ! Current image position
+      REAL                     FV(2)                   ! Psf shift vector
+      REAL                     PSUM                    ! Sum of psf values
+      REAL                     PVAL                    ! A single psf value
+      REAL                     TPSUM                   ! Largest value of PSUM
+      INTEGER                  CP                      ! Cache pointer
+      INTEGER                  I,J                     ! Loop over SMAP data
+      INTEGER                  NITER                   ! Iterations to converge
+      INTEGER                  PII, PJJ                ! PSF equiv of (II,JJ)
+      INTEGER                  PC(2)                   ! Current image pixel
+      LOGICAL                  ALL_X, ALL_Y            ! PSF coverage of box
+      LOGICAL                  DONE_PIX_YET            ! Good pixel yet?
+      LOGICAL                  LASTALLXY               !

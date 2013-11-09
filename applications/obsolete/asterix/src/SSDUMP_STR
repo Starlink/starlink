@@ -1,0 +1,45 @@
+*+  SSDUMP_STR - SSDUMP field structure definition
+*
+*    History :
+*
+*     20 Aug 91 : Original (BHVAD::DJA)
+*      8 May 98 : Remove structures for Linux (RB)
+*
+*-
+
+      INTEGER                SZHEAD                        ! Length of header string
+        PARAMETER            ( SZHEAD = 20 )
+
+      INTEGER                MXCOL                         ! Max columns of data
+        PARAMETER            ( MXCOL = 20 )
+
+
+      CHARACTER*(DAT__SZNAM) FIELD_FLD(MXCOL)              ! The name of the field
+      CHARACTER*(SZHEAD)     FIELD_HEAD(MXCOL)             ! Heading
+      CHARACTER*(DAT__SZTYP) FIELD_TYPE(MXCOL)             ! Field data type
+      INTEGER                FIELD_COL(MXCOL)              ! First column for display
+      INTEGER                FIELD_PTR(MXCOL)              ! Pointer to data
+      INTEGER                FIELD_WID(MXCOL)              ! Width of field in char
+      INTEGER                FIELD_SIZE(MXCOL)             ! Bytes to transfer
+      CHARACTER*10           FIELD_DFMT(MXCOL)             ! Data format
+      INTEGER                FIELD_NDIM(MXCOL)             ! Dimensionality
+      INTEGER                FIELD_DIMS(MXCOL,DAT__MXDIM)  ! Dimensions
+      INTEGER                FIELD_NELM(MXCOL)             ! Elements per source
+      LOGICAL                FIELD_HMS(MXCOL)              ! Sexigessimal output?
+      LOGICAL                FIELD_ETHERE(MXCOL)           ! Errors present
+      INTEGER                FIELD_EWID(MXCOL)             ! Width of error in char
+      INTEGER                FIELD_EPTR(MXCOL)             ! Pointer to error data
+      INTEGER                FIELD_ECOL(MXCOL)             ! Column for errors
+      INTEGER                FIELD_ENDIM(MXCOL)            ! Dimensionality
+      INTEGER                FIELD_EDIMS(MXCOL,DAT__MXDIM) ! Dimensions
+      INTEGER                FIELD_ENELM(MXCOL)            ! Elements per source
+      CHARACTER*10           FIELD_EFMT(MXCOL)             ! Error format
+      CHARACTER*40           FIELD_UNITS(MXCOL)            ! Field units
+
+      COMMON /FIELD/ FIELD_FLD, FIELD_HEAD, FIELD_TYPE, FIELD_COL,
+     :               FIELD_PTR, FIELD_WID, FIELD_SIZE, FIELD_DFMT,
+     :               FIELD_NDIM, FIELD_DIMS, FIELD_NELM, FIELD_HMS,
+     :               FIELD_ETHERE, FIELD_EWID, FIELD_EPTR, FIELD_ECOL,
+     :               FIELD_ENDIM, FIELD_EDIMS, FIELD_ENELM, FIELD_EFMT,
+     :               FIELD_UNITS
+

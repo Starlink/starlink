@@ -1,0 +1,20 @@
+interface AST2QDP
+
+  parameter INP
+    type 'LITERAL'
+    position 1
+    ppath 'GLOBAL'
+    association '<->GLOBAL.BINDS'
+    prompt 'Dataset'
+    help 'Name of 1D binned dataset'
+  endparameter
+
+  parameter OUT
+    type 'LITERAL'
+    position 2
+    association '<->GLOBAL.OUT'
+    prompt 'Output QDP data file'
+    help 'QDP file containing data and commands'
+  endparameter
+
+endinterface

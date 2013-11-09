@@ -1,0 +1,9 @@
+interface TSELECT
+  parameter ALL
+    type '_LOGICAL'
+    vpath 'DEFAULT'
+    default N
+    prompt 'All segments'
+    help 'Select all segments of time series'
+  endparameter
+endinterface

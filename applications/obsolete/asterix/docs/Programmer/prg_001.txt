@@ -1,0 +1,71 @@
+               Brief guide to use of the UFIT_ routines
+              ******************************************
+
+The UFIT_ routines in this directory are intended for incorporation into
+a user's program to perform a chi-squared fitting task. They have been 
+stripped out from the FIT_ package to make them more self-contained and easy 
+to use.
+
+The control for the minimisation is contained in UFIT_MIN and this calls
+only two futher routines: UFIT_CHISQ and UFIT_DERIVS, the latter simply calls
+UFIT_CHISQ several times to establish chi-squared gradients. The user need
+only provide the routine UFIT_CHISQ which, given the model parameters in an
+array, returns the chi-squared fit to the data. All other information required
+to do this can be passed into UFIT_CHISQ via common blocks. 
+
+Hence to use this package you must do the following:-
+
+1. Write a routine UFIT_CHISQ to replace the dummy version in the UFIT 
+directory. This has a simple interface
+		UFIT_CHISQ(PARAM,CHISQ,STATUS)
+where	PARAM is an imported array of (REAL) model parameter values
+	CHISQ (REAL) returns the chisquared value
+	STATUS (INTEGER) is a status value, returned as zero if all is well
+All additional information required by UFIT_CHISQ must be passed to it from 
+the top level program via common blocks.
+
+2. Write a calling program which sets up the arrays and variables necessary 
+for UFIT_MIN, and puts all the information which UFIT_CHISQ will require 
+into COMMON. This program calls UFIT_MIN to perform the fitting. The 
+interface is
+		UFIT_CHIMIN(OPCHAN,NITMAX,NPAR,LB,UB,FROZEN,NDOF,
+		            INITIALISE,MINSLO,PARAM,DPAR,PEGGED,CHISQ,NIT,
+		            FINISHED,FITERR,STATUS)
+
+The arguments are described in the program header. Provided INITIALISE is set 
+TRUE on entry, DPAR, NIT, FINISHED and FITERR will be set up by the routine.
+The other arguments might be set as follows:-
+
+OPCHAN	Set to 6 for terminal output reporting progress (0 for no output).
+NITMAX	Maximum no. of iterations before return. 30 is sensible.
+NPAR	Number of model parameters.
+LB,UB	Lower and upper bounds for each parameter. These will not be crossed
+	in the fitting process. The parameter step for gradient calculation is
+	set to (UB-LB)/2000.
+FROZEN	Array of logicals enabling parameter freezing. Set FALSE to free all
+	parameters.
+NDOF	Number of degrees of freedom for chi-squared (used to calculate 
+	reduced chi-squared) = no. of data minus no. of unfrozen parameters.
+MINSLO	Termination slope criterion. Defaults to 20. if entered as zero. 
+	Smaller values will make it more choosy about terminating.
+PARAM	On entry this should contain the start values for the parameters. 
+	Choice of sensible start values can be very important, the routine 
+	will settle for the first local minimum it finds. 
+	On successful return PARAM will contain the best fit parameter values.
+
+The following are returned in addition to PARAM:-
+
+PEGGED	A logical array flagging those parameters whose values is set on one
+	of its bounds. Where one of these is TRUE the minimum found is a
+	constrained minimum.
+CHISQ	The minimum chi-squared value attained.
+NIT	The number of iterations performed before termination.
+FINISHED Whether a satisfactory termination was achieved (as opposed to 
+	 termination because NITMAX iterations have been executed).
+FITERR	A non-zero value indicates a fitting error (see the header of
+	UFIT_MIN for explanation of the various codes). This should 
+	therefore be checked on return.
+STATUS	A non-zero value indicates an HDS error, which is very unlikely here.
+
+3. Compile calling program and user-supplied UFIT_CHISQ and link using
+	$ ALINK CALLING_PROG,UFIT_CHISQ,ASTOPT/OPT

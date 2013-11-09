@@ -1,0 +1,20 @@
+INTERFACE DIFDAT
+
+  PARAMETER INP
+       POSITION  1
+       TYPE      'LITERAL'
+       PPATH     'GLOBAL'
+       ASSOCIATION '<-global.BINDS'
+       prompt    'Input object '
+       help      'This must either be a primitive object, or a binned dataset.'
+  ENDPARAMETER
+
+  PARAMETER OUT
+       POSITION  2
+       TYPE      'LITERAL'
+       ASSOCIATION '->GLOBAL.BINDS'
+       VPATH     'DEFAULT'
+       PROMPT    'Output object '
+  ENDPARAMETER
+
+ENDINTERFACE

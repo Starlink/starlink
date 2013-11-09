@@ -1,0 +1,150 @@
+#!/bin/sh
+
+# Description:
+#	ftalink - link an ASTERIX program as an ftool
+#
+# Invocation:
+#       % ftalink [-xdbx] prog_module [other_arguments]
+#
+# Arguments:
+#       -xdbx Must be the first argument if it is used.
+#         Its effect is to add a -g option to the compile/link command,
+#         create a dummy source file for dtask_main, the top-level routine 
+#         of an ADAM task and to prevent the deletion of the otherwise 
+#         temporary dtask_applic files. This overcomes some problems using
+#         xdbx and ups on Suns and may be helpful in other cases where
+#         debuggers are used.
+#
+#       prog_module specifies a file containing the task's main subroutine.
+#         It may take the form prog.f, prog.o or prog. If neither .f or .o is
+#         specified, .o will be assumed. prog must be the name of the task's 
+#         main subroutine, and will be the name of the executable produced.
+#       
+#       other_arguments is a space-separated list list of modules, and 
+#         compiler or linker options to be presented to the fortran compiler.
+#
+# Authors:
+#	CAAG: C A A Goswell (RLVAD::CAAG)
+#       AJC:  A J Chipperfield (Starlink)
+#
+# History:
+#	24.07.1991 (CAAG):
+#	   Original version (RLVAD::CAAG)
+#       01.08.1991 (AJC):
+#          Add ADAM bits (RLVAD::AJC)
+#       23.06.1992 (AJC):
+#          Add HLP and PSX and terminal size libraries
+#        6.11.1992 (AJC):
+#          Add REQUEST to PUT and GET_CURRINFO in DTASK_APPLIC
+#          Set REQUEST to ACT__END
+#          Private libs
+#          Add MESSYS and MSC
+#          Add ADAM and MSP
+#       27.04.1993 (AJC):
+#          Improve comments
+#          Remove FFLAGS
+#          Add -B for static and dynamic link options
+#          Add directory of libraries (to be edited during installation)
+#          Use library link scripts
+#          Don't pre-compile .f files
+#       29.06.1993 (AJC):
+#          Put -L's before $(ARGS)
+#          Include both new and Starlink libraries
+#       08.11.1993 (AJC):
+#          Don't assume .o for arguments other than the first.
+#          Simplify link files for efficiency.
+#          Fortran compiler name to be edited
+#          Allow pathname on first argument
+#       10.12.1993 (AJC):
+#          Switch -Ls to after $ARGS
+#       10.02.1994 (AJC):
+#          Add -xdbx option to aid debugging
+#-
+
+LD_LIBRARY_PATH=`echo $LD_LIBRARY_PATH|sed "s%/usr/ucblib:%%;s%/usr/ucblib%%"`
+export LD_LIBRARY_PATH
+
+set -e
+
+# produce help message if requested
+
+if [ "$1" = "-?" ]
+then
+	cat >&2 <<FOO
+	usage: `basename $0` [-xdbx] <name of program> [ other files, libraries and options ]
+	
+	e.g.
+	\$ f77 -c fred-aux.f
+	\$ $0 fred.f fred-aux.o -lgks
+FOO
+	exit 1
+fi
+
+# check FTOOLS stuff defined
+if [ "$SYSPFILES" = "" ] 
+then
+echo "`basename $0`: FTOOLS directories not defined..."
+exit 1
+fi
+
+# get name of program by inquiry if necessary
+
+if [ -z "$1" ]
+then
+	echo >&2 -n `basename $0`: 'name of execution module: '
+	read PROGNAME
+else
+# Check is the first argument is a -xdbx option
+        XDBX=" "
+        if [ "$1" = "-xdbx" ]
+        then
+           XDBX="-g"
+           shift
+        fi
+        PROGNAME=$1
+        # shift all the arguments left by one to remove the first argument
+        shift
+fi
+
+# next determine name of program allowing a certain amount of flexibility
+# first get any path component
+
+DIR=`dirname $PROGNAME`
+
+case $PROGNAME in
+*.o)
+	PROGNAME=`basename $PROGNAME .o`
+	ARGS=${DIR}/${PROGNAME}.o
+	;;
+*.f)
+	PROGNAME=`basename $PROGNAME .f`
+	ARGS=${DIR}/${PROGNAME}.f
+	;;
+*)
+	PROGNAME=`basename $PROGNAME`
+	ARGS=${DIR}/${PROGNAME}.o
+	;;
+esac
+
+# Add remaining arguments to ARGS
+
+while [ $# != 0 ]
+do
+	ARGS="$ARGS $1"
+	shift
+done
+
+$AST_ROOT/dev/GEN_ftool_applic $PROGNAME
+f77 -o $PROGNAME ${PROGNAME}_applic.f \
+$XDBX \
+$ARGS \
+$AST_LIB/libastlib_ftool.a \
+-L$SYSPFILES/../host -lftools -lhost -lxanlib -lfitsio \
+-Bstatic -L/star/lib `hds_link` `err_link` \
+`ast_link_ftool` -Bdynamic \
+-lcurses -ltermcap
+
+if [ "$XDBX" != "-g" ]
+then
+   rm ${PROGNAME}_applic.[fo]
+fi

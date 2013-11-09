@@ -1,0 +1,145 @@
+This is TeX, C Version 3.141 (format=lplain 92.11.26)  19 APR 1994 09:19
+**user_004
+(user_004.tex
+LaTeX Version 2.09 <25 March 1992>
+(/star/TeX-3.141/tex/latex/styles/article.sty
+Standard Document Style `article' <14 Jan 92>.
+(/star/TeX-3.141/tex/latex/styles/art11.sty)
+\c@part=\count79
+\c@section=\count80
+\c@subsection=\count81
+\c@subsubsection=\count82
+\c@paragraph=\count83
+\c@subparagraph=\count84
+\c@figure=\count85
+\c@table=\count86
+)
+(/star/TeX-3.141/tex/latex/styles/fleqn.sty
+Document style option `fleqn' - Released 04 Nov 91
+\mathindent=\dimen99
+) (user_004.aux) (user_004.toc [1
+
+] [2])
+\tf@toc=\write3
+ [3] [4] [5] [6] [7] [8] [9] [10]
+[11] [12] [13] [14] [15] [16] [17] [18] [19] [20] [21] [22] [23] [24] [25]
+[26]
+LaTeX Warning: Reference `pss:alg:uplims' on page 27 undefined on input line 12
+99.
+[27] [28]
+Underfull \hbox (badness 10000) in paragraph at lines 1436--1437
+
+
+\hbox(0.0+0.0)x427.86902
+.\glue(\rightskip) 0.0
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1437--1443
+
+
+\hbox(0.0+0.0)x427.86902
+.\glue(\rightskip) 0.0
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1443--1448
+
+
+\hbox(0.0+0.0)x427.86902
+.\glue(\rightskip) 0.0
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1448--1452
+
+
+\hbox(0.0+0.0)x427.86902
+.\glue(\rightskip) 0.0
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1452--1463
+
+
+\hbox(0.0+0.0)x427.86902
+.\glue(\rightskip) 0.0
+
+[29] [30] [31] [32] [33] [34] [35]
+Underfull \hbox (badness 10000) in paragraph at lines 1839--1840
+
+
+\hbox(0.0+0.0)x427.86902
+.\penalty -10000
+.\glue(\rightskip) 0.0
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1839--1840
+
+
+\hbox(0.0+0.0)x427.86902
+.\penalty -10000
+.\glue(\rightskip) 0.0
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1839--1840
+
+
+\hbox(0.0+0.0)x427.86902
+.\glue(\rightskip) 0.0
+
+[36]
+Underfull \hbox (badness 10000) in paragraph at lines 1840--1843
+
+
+\hbox(0.0+0.0)x427.86902
+.\penalty -10000
+.\glue(\rightskip) 0.0
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1840--1843
+
+
+\hbox(0.0+0.0)x427.86902
+.\penalty -10000
+.\glue(\rightskip) 0.0
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1840--1843
+
+
+\hbox(0.0+0.0)x427.86902
+.\glue(\rightskip) 0.0
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1843--1847
+
+
+\hbox(0.0+0.0)x427.86902
+.\penalty -10000
+.\glue(\rightskip) 0.0
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1843--1847
+
+
+\hbox(0.0+0.0)x427.86902
+.\penalty -10000
+.\glue(\rightskip) 0.0
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1843--1847
+
+
+\hbox(0.0+0.0)x427.86902
+.\glue(\rightskip) 0.0
+
+[37] (user_004.aux)
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+ ) 
+Here is how much of TeX's memory you used:
+ 223 strings out of 11979
+ 2289 string characters out of 87049
+ 35886 words of memory out of 262141
+ 2170 multiletter control sequences out of 9500
+ 19304 words of font info for 73 fonts, out of 100000 for 255
+ 14 hyphenation exceptions out of 607
+ 14i,10n,15p,201b,221s stack positions out of 300i,40n,60p,3000b,4000s
+
+Output written on user_004.dvi (37 pages, 119236 bytes).

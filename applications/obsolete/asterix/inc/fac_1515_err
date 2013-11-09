@@ -1,0 +1,33 @@
+FACILITY AST
+1,CONER,Data conversion error
+2,TRUNC,Text truncated
+3,INVARG,Invalid argument
+4,SYMDEF,Symbol already defined
+5,FATAL,Fatal internal ADI error
+6,IDINV,Invalid ADI identifier
+7,ILLKOP,Illegal operation on kernel object
+8,NOTSET,Object data is not set
+9,EXISTS,Object already exists
+10,NOMTH,No applicable methods
+11,MTHERR,Error in method
+12,NOMEMB,No such class member
+13,ISPRIM,Object is primitive
+14,ILLOP,Illegal operation
+15,OUTMEM,Unable to allocate dynamic memory
+16,NOTACT,ADI is not active
+17,NOPROP,No such property
+18,NOCOMP,No such structure component
+19,EXCEED,Storage space in buffer exceeded
+20,NOTDEL,Object not deleted
+21,NONAME,Object is not a named object
+22,PRGERR,Programming error
+23,MAPPED,Object is already mapped
+24,NOTMAP,Object is not mapped at this address
+25,RDONLY,Object is readonly
+26,SYNTAX,Syntax error
+27,ITREND,No more items
+28,NOFUN,No applicable functions
+29,INTGTY,Integrity check failure
+30,RETRY,Retry operation
+50,CALNXTMTH,
+51,UNWIND,

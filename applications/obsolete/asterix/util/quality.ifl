@@ -1,0 +1,252 @@
+Interface QUALITY
+
+  Parameter INP
+    Type      'LITERAL'
+    ppath     'global'
+    Association '<->GLOBAL.BINDS'
+    Position  1
+    Prompt    'Input dataset'
+    Help      'This must be a binned dataset'
+  EndParameter
+
+  Parameter AUXIN
+    Type      'LITERAL'
+    ppath     'DEFAULT'
+    default   !
+    vpath     'DEFAULT,PROMPT'
+    Prompt    'Auxilliary input dataset'
+    Help      'If defined, QUALITY will use this data array in preference to that in the INP dataset'
+  EndParameter
+
+  Parameter OUT
+    Type      'LITERAL'
+    Association '->GLOBAL.BINDS'
+    Position  2
+    Prompt    'Output dataset'
+    Help      'No file extension allowed'
+  Endparameter
+
+  Parameter IGNORE
+    Type      '_logical'
+    Vpath     'default'
+    Default   F
+    Prompt    'Run in IGNORE mode?'
+    Help      'i.e. set temporary bad quality values'
+  EndParameter
+
+  Parameter RESTORE
+    Type      '_logical'
+    Vpath     'default'
+    Default   F
+    Prompt    'Run in RESTORE mode?'
+    Help      'i.e. clear temporary bad quality values'
+  EndParameter
+
+  Parameter SET
+    Type      '_logical'
+    Vpath     'default'
+    Default   F
+    Prompt    'Run in SET mode?'
+    Help      'i.e. set quality to a specified value'
+  EndParameter
+
+  Parameter AND
+    Type      '_logical'
+    Vpath     'default'
+    Default   F
+    Prompt    'Run in AND mode?'
+    Help      'i.e. AND existing quality with a specified value'
+  EndParameter
+
+
+  Parameter OR
+    Type      '_logical'
+    Vpath     'default'
+    Default   F
+    Prompt    'Run in OR mode?'
+    Help      'i.e. OR existing quality with a specified value'
+  EndParameter
+
+  Parameter EOR
+    Type      '_logical'
+    Vpath     'default'
+    Default   F
+    Prompt    'Run in EOR mode?'
+    Help      'i.e. EOR existing quality with a specified value'
+  EndParameter
+
+  Parameter NOT
+    Type      '_logical'
+    Vpath     'default'
+    Default   F
+    Prompt    'Run in NOT mode?'
+    Help      'i.e. Complement existing quality values'
+  EndParameter
+
+  Parameter MAGIC
+    Type      '_logical'
+    Vpath     'default'
+    Default   F
+    Prompt    'Run in MAGIC mode?'
+    Help      'Convert magic values to QUALITY'
+  EndParameter
+
+  Parameter OVER
+    Type      '_logical'
+    Vpath     'default'
+    Default   F
+    Prompt    'Overwrite existing dataset?'
+    Help      'If no, a new dataset will be created'
+  EndParameter
+
+  Parameter AXSEL
+    Type      '_logical'
+    Vpath     'default'
+    Default   T
+    Prompt    'Enable selection of axis ranges?'
+    Help      'Only points within specified range(s) will have quality altered.'
+  EndParameter
+
+  Parameter DATSEL
+    Type      '_logical'
+    Vpath     'default'
+    Default   T
+    Prompt    'Enable selection of data ranges?'
+    Help      'Only points within specified range(s) will have quality altered.'
+  EndParameter
+
+  Parameter QSEL
+    Type      '_logical'
+    Vpath     'default'
+    Default   F
+    Prompt    'Enable selection of quality value?'
+    Help      'Only quality with specified existing value will be altered.'
+  EndParameter
+
+  Parameter AXES
+    Type      '_Char'
+    Prompt    'Enter indices of axes to have ranges applied'
+    Help      'e.g. 1 2 3'
+  EndParameter
+
+  Parameter AXIS1
+    Type      '_CHAR'
+    Prompt    'Enter range(s) for this axis'
+    Help      'Lower bounds will be inclusive, and upper exclusive (unless max)'
+  EndParameter
+
+  Parameter AXIS2
+    Type      '_CHAR'
+    Prompt    'Enter ranges for this axis'
+    Help      'Lower bounds will be inclusive, and upper exclusive (unless max)'
+  EndParameter
+
+  Parameter AXIS3
+    Type      '_CHAR'
+    Prompt    'Enter ranges for this axis'
+    Help      'Lower bounds will be inclusive, and upper exclusive (unless max)'
+  EndParameter
+
+  Parameter AXIS4
+    Type      '_CHAR'
+    Prompt    'Enter ranges for this axis'
+    Help      'Lower bounds will be inclusive, and upper exclusive (unless max)'
+  EndParameter
+
+  Parameter AXIS5
+    Type      '_CHAR'
+    Prompt    'Enter ranges for this axis'
+    Help      'Lower bounds will be inclusive, and upper exclusive (unless max)'
+  EndParameter
+
+  Parameter AXIS6
+    Type      '_CHAR'
+    Prompt    'Enter ranges for this axis'
+    Help      'Lower bounds will be inclusive, and upper exclusive (unless max)'
+  EndParameter
+
+  Parameter AXIS7
+    Type      '_CHAR'
+    Prompt    'Enter ranges for this axis'
+    Help      'Lower bounds will be inclusive, and upper exclusive (unless max)'
+  EndParameter
+
+  Parameter DATA
+    Type      '_CHAR'
+    Prompt    'Enter ranges for the data values'
+    Help      'Lower bounds inclusive, upper exclusive (unless max)'
+  EndParameter
+
+  Parameter MODQUAL
+    Type      '_CHAR'
+    Prompt    'Enter value of quality to modify'
+    Help      'Only quality values matching this value will be altered'
+  EndParameter
+
+  Parameter QVAL
+    Type      '_Char'
+    ppath     'DYNAMIC'
+    Prompt    'Specify quality value'
+    Help      'In binary, or GOOD,BAD,ARITH,MISSING,IGNORE or PATCHED'
+  EndParameter
+
+  Parameter FSEL
+    Type      '_logical'
+    Vpath     'default'
+    Default   F
+    Prompt    'use a spatial file?'
+    Help      'Define a spatial region using an ARD, spatial description file ?'
+  EndParameter
+
+  Parameter ARDFILE
+    Type      '_char'
+    Vpath     'prompt'
+    Ppath     'global,current'
+    Prompt    'spatial filename'
+    Association '<->GLOBAL.ARDFILE'
+    Help      'Name of the ARD, spatial description file'
+  EndParameter
+
+  Parameter TSEL
+    Type      '_logical'
+    Vpath     'default'
+    Default   F
+    Prompt    'use a file of on-off times?'
+    Help      'Match time axis to a list of on-off times in MJD'
+  EndParameter
+
+  Parameter MJDFILE
+    Type      '_char'
+    Vpath     'prompt'
+    Ppath     'global,current'
+    Prompt    'On-off time filename'
+    Association '<->GLOBAL.MJDFILE'
+    Help      'Name of the file containing list of on-off times'
+  EndParameter
+
+  Parameter XDIM
+    Type      '_integer'
+    Vpath     'prompt'
+    Ppath     'default'
+    Prompt    'Which axis is the X axis ?'
+    default    1
+    Help      'Specify the number of the axis e.g. 1'
+  EndParameter
+
+  Parameter YDIM
+    Type      '_integer'
+    Vpath     'prompt'
+    Ppath     'default'
+    Prompt    'Which axis is the Y axis ?'
+    default    2
+    Help      'Specify the number of the axis e.g. 1'
+  EndParameter
+
+  Parameter TDIM
+    Type      '_integer'
+    Vpath     'prompt'
+    Prompt    'Which axis is the time axis ?'
+    Help      'Specify the number of the axis e.g. 1'
+  EndParameter
+
+EndInterface

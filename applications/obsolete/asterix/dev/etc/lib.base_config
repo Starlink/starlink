@@ -1,0 +1,11 @@
+files F_INCLUDES
+files C_INCLUDES
+
+files LIB_ROOTS
+
+files LIB_LISTS %presuf . LIB_ROOTS _list
+files LIB_UROOTS %upper LIB_ROOTS
+
+files OBJ_LIBS %presuf {$(LIB)/lib} LIB_ROOTS .a
+
+files SRC_CODE %presuf {$(} LIB_UROOTS _CODE)

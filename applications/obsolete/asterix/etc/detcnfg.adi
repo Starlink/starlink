@@ -1,0 +1,10 @@
+defclass MissionStrings {
+                Mission,			;; The name of the satellite
+                Instrument,			;; The instrument on it
+                Detector,                       ;; Detector on the telescope
+                Filter,				;; Filter id
+                Target,				;; Name of the target
+                Observer,			;; Name of the observer
+                DataMode,			;; Instrument mode
+  STRUC         InstrPars                       ;; Instrument specific data
+  }

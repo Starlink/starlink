@@ -1,0 +1,24 @@
+;;
+;; Extension structures
+;;
+
+defclass HDSobj {
+ CHAR		Locator,		;; Locator of component
+ CHAR		Parent,			;; Locator of parent component
+;;
+ CHAR		Name,			;; Name of extension
+ CHAR		Type,			;; Type of data stored
+ INTEGER	NDim,			;; Number of dimensions
+ 		Dims			;; Size of dimensions
+}
+
+defclass FITSobj {
+ INTEGER	HDUid,			;; ID of component HDU
+ INTEGER	Parent,			;; ID of parent HDU
+ INTEGER	FileId,			;; ID of FITS file
+;;
+ CHAR		Name,			;; Name of extension
+ CHAR		Type,			;; Type of data stored
+ INTEGER	NDim,			;; Number of dimensions
+ 		Dims			;; Size of dimensions
+}

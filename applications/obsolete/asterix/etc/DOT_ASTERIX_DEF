@@ -1,0 +1,7 @@
+#
+#
+#
+ResourceClass Directory	CHAR
+ResourceClass DirectoryPath listof Directory :
+ResourceClass Executable CHAR
+ResourceClass URL CHAR

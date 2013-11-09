@@ -1,0 +1,79 @@
+#!/bin/csh
+set opt="GENERAL"
+if ( $1 =~ pri* || $1 =~ spo* ) then
+  set opt="PRINT"
+else
+  if ( $1 == all ) then
+    set opt="ALL"
+  else if ( $1 == WWW || $1 == www ) then
+    set opt="WWW"
+  endif
+endif
+echo " "
+echo "ASTERIX defaults for user : `whoami`"
+echo " "
+if ( $opt == "GENERAL" || $opt == "ALL" ) then
+ echo "Installation"
+ echo " "
+ echo "  ASTERIX Version           : $AST_VERSION"
+ echo "  Installed root directory  : $AST_ROOT"
+ echo " "
+ echo "Optional Data"
+ echo " "
+ if ( ${?AST_FTOOLS_CALDB} ) then
+   set proc=$AST_FTOOLS_CALDB
+ else
+   set proc="UNDEFINED"
+ endif
+ echo "  FTOOLS calibration files  : $proc"
+ echo " "
+ echo "Local and user start up procedures"
+ echo " "
+ if ( ${?AST_LOCAL} ) then
+   set proc=$AST_LOCAL
+ else
+   set proc="UNDEFINED"
+ endif
+ echo "  Site shell start up       : $proc"
+ if ( ${?AST_LOCAL_ICL} ) then
+   set proc=$AST_LOCAL_ICL
+ else
+   set proc="UNDEFINED"
+ endif
+ echo "  Site ICL start up         : $proc"
+ if ( ${?AST_USER} ) then
+   set proc=$AST_USER
+ else
+   set proc="UNDEFINED"
+ endif
+ echo "  User shell start up       : $proc"
+ if ( ${?AST_USER_ICL} ) then
+   set proc=$AST_USER_ICL
+ else
+   set proc="UNDEFINED"
+ endif
+ echo "  User ICL start up         : $proc"
+ echo " "
+ echo "Logging Info"
+ echo " "
+ echo "  Current logging state     : $AST_LOG_STATE"
+ echo " "
+endif
+if ( $opt == "ALL" || $opt == "WWW" ) then
+ echo "World Wide Web "
+ echo " "
+ echo "  WWW viewer command        : $AST_WWW_VIEWER"
+ echo "  Asterix WWW home page     : $AST_WWW_HOMPAG"
+ echo " "
+endif
+#
+# Spool set up
+#
+if ( $opt == "PRINT" || $opt == "ALL" ) then
+ echo "Spooling to printer"
+ echo " "
+ echo "  LIST spool command        : $AST_LIST_SPOOL"
+ echo "  FORTRAN spool command     : $AST_FORTRAN_SPOOL"
+ echo "  Postscript spool command  : $AST_PS_SPOOL"
+ echo " "
+endif

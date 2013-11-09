@@ -1,0 +1,16 @@
+interface HFILL
+  parameter INP
+     type 'UNIV'
+     position 1
+     ppath 'GLOBAL'
+     prompt 'Object name'
+     help 'Full path name of object to be filled with specified value'
+     association '<->GLOBAL.HDSOBJ'
+  endparameter
+  parameter VALUE
+    type 'UNIV'
+    position 2
+    prompt 'Value'
+    help 'Value with which object is to be filled'
+  endparameter
+endinterface

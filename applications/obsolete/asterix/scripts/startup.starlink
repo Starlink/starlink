@@ -1,0 +1,125 @@
+#+  Startup file for Starlink installed version of Asterix
+
+#  Authors:
+
+#  History:
+
+#-
+
+#
+# See if Asterix variables are already defined and if so remove
+# references from PATH in case versions are different
+#
+if ( ${?AST_BIN} ) then
+  setenv PATH `echo $PATH | sed s%:"${AST_BIN}"%%g`
+endif
+#
+# The version number
+#
+setenv AST_VERSION "2.2-0"
+#
+# Check presence of ADAM sub-directory in $HOME
+#
+if (-d $HOME/adam) then
+   echo -n
+else
+   if (-f $HOME/adam) then
+      echo "You have a file called adam in your home directory.  Please rename it"
+      echo "since adam must be a directory for ADAM files."
+      exit
+   else
+      mkdir $HOME/adam
+   endif
+endif
+#
+#
+# Define environment variables needed by Asterix
+#
+#
+  setenv AST_BIN /star/bin/asterix
+  setenv AST_ETC /star/etc/asterix
+#  setenv AST_LIB $AST_ROOT/lib
+  setenv AST_DOCS /star/etc/asterix/docs
+#
+#
+# Define pointers to Startcl
+  setenv AST_TCL_BIN /star/bin/awish
+  setenv AST_TCL_LIB /star/lib/startcl
+#
+# Data paths
+
+  set dpath = $AST_ROOT
+  set hpath = /star/help/asterix
+#
+#
+#
+# Define various things relative to AST_ROOT
+#
+setenv AST_SCRATCH
+#
+# Spectral fitting files
+#
+setenv SPEC_DIR  $AST_ETC
+setenv SPEC_MENU spec.mnu
+setenv RZ_CUBE  $AST_ETC/rz_cube.sdf
+setenv MK_CUBE  $AST_ETC/mkl_cube.sdf
+#
+#
+#
+# Add ASTERIX executable directory to path
+#
+setenv PATH ${PATH}:$AST_BIN
+#
+# Add ASTERIX class definitions to ADI load path
+#
+setenv ADI_LOAD_PATH ${AST_ETC}:.
+#
+#
+# Define logging state variable, and alias for changing it
+#
+setenv AST_LOG_STATE OFF
+alias astlog 'setenv AST_LOG_STATE `$AST_BIN/astlogsetup "\!\!"`;$AST_BIN/astlogprint'
+#
+# Define spoolers
+#
+setenv AST_LIST_SPOOL      lpr
+setenv AST_FORTRAN_SPOOL   $AST_BIN/ast_fortran_spooler
+setenv AST_PS_SPOOL        "lpr -Pps"
+#
+# Create ASTERIX fitting menu search path
+#
+if ( ! ${?AST_MENU_PATH} ) then
+  setenv AST_MENU_PATH    .:$AST_ETC
+endif
+#
+# Create ASTERIX help path
+#
+if ( ! ${?AST_HELP_PATH} ) then
+  setenv AST_HELP_PATH    /star/help/asterix/
+endif
+#
+#
+# Point remote catalogue access at LEDAS
+setenv SKYCAT_CONFIG "http://ledas-www.star.le.ac.uk/arnieV4/SkyCatConfig.pl"
+#
+alias astdev source $AST_ETC/astdev
+#
+# Put up the banner
+#
+cat $AST_ETC/banner.txt|sed s%VERSN%$AST_VERSION%
+#
+# Site specific login
+#
+if ${?AST_LOCAL} then
+  if ( -e ${AST_LOCAL}/startup ) then
+    source $AST_LOCAL/startup
+  endif
+endif
+#
+# Personal login
+#
+if ${?AST_USER} then
+  if ( -e ${AST_USER}/startup ) then
+    source $AST_USER/startup
+  endif
+endif

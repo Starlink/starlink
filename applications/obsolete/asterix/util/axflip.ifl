@@ -1,0 +1,28 @@
+ INTERFACE AXFLIP
+
+    PARAMETER INP
+       POSITION 1
+       TYPE 'LITERAL'
+       PPATH 'GLOBAL'
+       ASSOCIATION '<-GLOBAL.BINDS'
+       PROMPT 'Input object'
+       HELP 'Must be structured, not primitive'
+    ENDPARAMETER
+
+    PARAMETER SELAX
+       POSITION 2
+       TYPE 'LITERAL'
+       VPATH 'PROMPT'
+       PROMPT 'Axis numbers to flip'
+       HELP 'Use ASTERIX list notation, eg. 1,2 or 1:3, 2:*'
+    ENDPARAMETER
+
+    PARAMETER OUT
+       POSITION 3
+       TYPE 'LITERAL'
+       ASSOCIATION '->GLOBAL.BINDS'
+       PROMPT 'Output for flipped data'
+       HELP 'This will be a binned dataset, same shape as input'
+    ENDPARAMETER
+
+ ENDINTERFACE

@@ -1,0 +1,13 @@
+*+  SEDIT_CMN - Common block for SEDIT application
+*
+*    Author :
+*
+*     David J. Allan (ROSAT,BHVAD::DJA)
+*
+*    History :
+*
+*      4 Aug 93 : Original (DJA)
+*-
+
+      INTEGER         NPAR(MAXCOMP), NCOMP
+      COMMON          /SEDIT_CMN/ NPAR, NCOMP

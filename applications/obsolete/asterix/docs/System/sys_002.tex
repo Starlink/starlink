@@ -1,0 +1,251 @@
+\documentstyle[11pt]{article}     % 10% larger letters, equns to left
+\pagestyle{myheadings}
+%------------------------------------------------------------------------------
+\newcommand{\astdoccategory}  {ASTERIX System Note}
+\newcommand{\astdocinitials}  {SYS}
+\newcommand{\astdocnumber}    {002}
+\newcommand{\astdocauthors}   {David J Allan}
+\newcommand{\astdocdate}      {7 Jan 1995}
+\newcommand{\astdoctitle}     {The GEN\_make Procedure}
+\newcommand{\astdocname}      {\astdocinitials /\astdocnumber}
+\renewcommand{\_}             {{\tt\char'137}}
+
+%------------------------------------------------------------------------------
+
+\setlength{\textwidth}{160mm}           % Text width 16 cm
+\setlength{\textheight}{240mm}          % Text height 24 cm
+\setlength{\oddsidemargin}{0pt}         % LH margin width, -1 inch
+\setlength{\evensidemargin}{0pt}        % LH margin width, -1 inch
+\setlength{\topmargin}{-5mm}            %
+\setlength{\headsep}{8mm}               % 
+\setlength{\parindent}{0mm}
+
+\begin{document}                                % Start document
+\thispagestyle{empty}
+ASTROPHYSICS and SPACE RESEARCH GROUP \hfill \astdocname \\
+DEPARTMENT OF PHYSICS AND SPACE RESEARCH\\
+UNIVERSITY OF BIRMINGHAM\\
+{\large\bf Asterix System Note} \hfill \astdocauthors\\
+{\large\bf \astdoccategory\ \astdocnumber} \hfill \astdocdate\\
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\huge\bf \astdoctitle}
+\end{center}
+\vspace{5mm}
+
+\parskip=4.0truemm plus 0.5truemm       % Paragraph spacing
+
+\markright{\astdocname}
+
+\section{Introduction}
+
+This document describes the \verb+GEN_make+ Makefile processor -- the Tcl
+script which generates ASTERIX \verb+Makefiles+. This script exists because
+editing the ASTERIX make files is too error prone to be done by hand. It is
+better to reduce the varying information to control files and put the
+invariant rules on how to build the various components of the system in 
+proto-make files. The reduction in volume thus achieved is about a factor
+of 40.
+ 
+In addition to the script itself there are only 3 files involved when 
+\verb+GEN_make+ is run. They are named according the the {\em class} of
+directory for which the \verb+Makefile+ is being constructed. They are,
+\begin{description}
+\item[class.config] Contains the configurations of the \verb+Makefile+
+  which are peculiar to the directory to which it refers. It might, for
+  example, contain the names of the programs to be built.
+
+\item[class.make] The proto-type make file. This is the file which 
+  contains the skeleton of the \verb+Makefile+. Things which vary from
+  one instance of a directory class to another are parameterised using
+  GEN\_make tokens, which have the form $colon$\_$identifier$\_$colon$
+  (eg. \verb+:FILES:+). Proto-type include files may also contain
+  \verb+#include+ directives which cause file inclusion. This enables
+  entire sections common to different classes of make files to be shared,
+  further reducing the number of potential errors.
+
+\item[class.base\_config]
+  This file, in the same format as the {\bf class.config} file, contains
+  default definitions for all the tokens used in the proto-make file.
+  This serves two purposes. It enables developers to realise the tokens
+  which can be used, and it serves to provide default behaviour which
+  may or may not need to be overriden.
+\end{description}
+
+
+\section{How It Works}
+
+Consider a directory in which a file called \verb+etc.config+ exists in
+the directory \verb+$AST_ROOT/dev/etc+. How
+does GEN\_make go about creating a \verb+Makefile+? To get it started
+the user types,
+\begin{verbatim}
+   % GEN_make etc.config
+\end{verbatim}
+The file extension may be omitted. GEN\_make then follows the following
+algorithm,
+\begin{enumerate}
+\item The class is derived from the name of the configuration file. In this
+  case it is \verb+etc+.
+  
+\item GEN\_make clears its token substitution array. It defines a number
+  of standard tokens which are available for use by all proto-make files.
+  They are listed below (without their delimiting colons), with their
+  values in parentheses where relevant,
+  \begin{description}
+  \item[CLASS] The name of the class ({\em etc})
+  \item[ROOT] The relative file specification to get to \verb+$AST_ROOT+ ({\em ../..})
+  \item[HERE] The location of the \verb+Makefile+ relative to \verb+$AST_ROOT+. ({\em dev/etc})
+  \item[SUBSYS] The is full name of
+    the subsystem. Same as the HERE token, but with slashes converted to
+    underscores. ({\em dev\_etc})
+  \item[MODULE] The leftmost directory name in the HERE list ({\em dev})
+  \item[MODSUB] The rightmost directory name in the HERE list ({\em etc})
+  \item[DATE] The date in \verb+14 Jul 1789+ format
+  \item[CREATOR] The version of GEN\_make used to create the \verb+Makefile+
+  \item[HOST] The machine on which the \verb+Makefile+ was made ({\em xun9})
+  \item[PKG] The package name. Hardwired at the moment ({\em ASTERIX})
+  \item[INDENT] A joker this one. Essentially a string of spaces whose
+    length is $min(1,2 * depth)$. Useful for formatting recursive
+    \verb+Makefile+ text.
+  \end{description}
+
+\item GEN\_make loads the value of the \verb+AST_MAKE_PATH+ variable. This
+  is a colon separated list of the directories which will be searched for
+  proto-make files.
+
+\item The script checks that the {\bf $class$.make} and 
+  {\bf $class$.base\_config} files
+  exist somewhere in \verb+$AST_MAKE_PATH+.
+  
+\item The token translations in the files {\bf global.base\_config}, 
+  {\bf $class$.base\_config} and
+  {\bf $class$.config} files are loaded in that order. See the next
+  section for a discussion of the format.
+  
+\item The proto-make file is processed to remove all \verb+#include+
+  directives -- the file name argument following the \verb+#include+
+  specifies a file which {\em must} lie somewhere in the \verb+$AST_MAKE_PATH+
+  directory list. This file flattening process is performed for speed's
+  sake for a C tool which lives in the kernel called \verb+at_strm+.
+
+\item GEN\_make now reads this flattened file looking for occurrances of
+  its tokens. When it finds one it substitutes the token value defined
+  by the configuration files and/or its built in tokens. This process
+  continues until each line is free of tokens. The only further
+  complication is the \verb+#foreach+ directive. This is a control
+  structure within the proto-make file for generating multiple copies
+  of the same bit of make text. An example is,
+  
+  \begin{verbatim}
+  #foreach &X& :TASKS:
+  $(BIN)/&x&: &x&.f
+      alink $? `ast_link_adam`
+      mv &x& $@
+	
+  #end
+  \end{verbatim}
+  This directive  expands {\em zero or more} times, depending on the 
+  number of space separated values in the translation of the token
+  specified as the second argument. The first argument is the loop
+  variable name -- it must be enclosed in ampersands. This apparently
+  silly choice of ampersands and colons was done deliberately to make
+  GEN\_make stuff stand out from normal \verb+Makefile+ text, and
+  ensure \verb+make+ will break if you leave any such tokens untranslated. 
+  Upper
+  case instances of the loop variable expand to upper case copies of
+  the elements of the second and subsequent arguments, and lower to 
+  lower case copies.
+  
+  The utility of this directive can only be appreciated after a thorough
+  understanding of the differences of OSF, Solaris and Linux `make'
+  syntax. The above text of a good example of why it useful. The final
+  target is in another directory and we only want to rebuild it if it
+  is out of date with respect to its source code.
+
+  The (entirely) blank line before the \verb+#end+ marker is required
+  to generate correct \verb+Makefile+ source if there is more than one
+  repetition of the directive.
+  
+  The \verb+#foreach+ directives cannot be nested.
+  
+\item The output file is renamed to be \verb+Makefile+. Any pre-existing
+  file of that name is deleted.
+\end{enumerate}
+
+\section{Configuration File Syntax}
+
+To recap the behaviour of GEN\_make is quite simple. It translates named
+tokens in an input file to token values in an output file. The job of
+the configuration files is to manipulate the GEN\_make token translation
+table. GEN\_make is written in {\bf Tcl} and the token translation table
+is just an associative array called \verb+Subs+.
+
+GEN\_make loads configuration information by \verb+source+ing them, ie. a
+configuration file is itself a Tcl script! This cunning trick is a 
+generally useful technique and I commend it to you. There are currently
+two configuration file commands, called \verb+files+ and \verb+const+.
+These are there for historical reasons, in the current implemention
+there effect is similar except for the fact that \verb+const+ can have only
+one argument, whereas \verb+files+ can have many. The syntax is,
+\begin{verbatim}
+   files TOKEN values
+   
+   const TOKEN [value]
+\end{verbatim}
+In the \verb+const+ case the value defaults to the null string. In 
+addition to simply listing file names there are some `specials'. 
+These have the following forms,
+\begin{verbatim}
+   files NEW_TOKEN %remext OLD_TOKEN
+
+   files NEW_TOKEN %reverse OLD_TOKEN
+   
+   files NEW_TOKEN %upper OLD_TOKEN
+   
+   files NEW_TOKE %lower OLD_TOKEN
+   
+   files NEW_TOKEN %prefix <prefix> OLD_TOKEN
+   
+   files NEW_TOKEN %suffix OLD_TOKEN <suffix>
+   
+   files NEW_TOKEN %presuf <prefix> OLD_TOKEN <suffix>
+\end{verbatim}
+The use of these is hopefully clear! They add or subtract bits from
+file name to create new tokens, or reorder the elements of a token. 
+If the bit you are adding contains
+characters special to Tcl (eg dollars) then you should enclose the
+bit in braces, eg.
+
+\begin{verbatim}
+   # The task names
+   
+   files TASKS  hdir hcreate hretype
+
+   # The Fortran files
+   
+   files FORTRAN %suffix .f TASKS
+   
+   # The executables
+   
+   files EXECS %prefix {$(BIN)/} TASKS
+\end{verbatim}
+
+It is important to realise that all token translation is delayed until
+the proto-make file is processed, ie. it is quite valid to use one of
+the specials above before \verb+TOKEN2+ is defined.
+
+The ability to do this is extremely useful. We only have to name the tasks
+{\em once} -- all the rest is rule based. In Starlink make files task names
+often appear in 4 or 5 places. 
+
+\section{Adding a Directory Class}
+
+To add a directory class you must create a \verb+.base_config+ and a
+\verb+.make+ file in the \verb+dev/etc+ directory. Then edit the 
+\verb+etc.config+ file in that directory, build it, and then you are
+ready. 
+
+\end{document}

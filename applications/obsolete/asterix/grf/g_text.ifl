@@ -1,0 +1,38 @@
+interface G_PTEXT
+  parameter KEY
+    type '_LOGICAL'
+    default N
+    vpath 'DEFAULT'
+    prompt 'Input from keyboard'
+    help 'Otherwise input is via cursor where appropriate'
+  endparameter
+  parameter X
+    type '_REAL'
+    prompt 'X-position'
+    help 'in world coords'
+  endparameter
+  parameter Y
+    type '_REAL'
+    prompt 'Y-position'
+    help 'in world coords'
+  endparameter
+  parameter ANGLE
+    position 3
+    type '_REAL'
+    default 0.0
+    prompt 'Angle'
+    help 'degrees anti-clockwise from horizontal'
+  endparameter
+  parameter JUST
+    position 2
+    type '_CHAR'
+    default 'L'
+    prompt 'Justification'
+    help 'L)eft  C)entre  R)ight'
+  endparameter
+  parameter TEXT
+    position 1
+    type '_CHAR'
+    prompt 'Text'
+  endparameter
+endinterface

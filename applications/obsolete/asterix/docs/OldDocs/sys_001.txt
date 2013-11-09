@@ -1,0 +1,27 @@
+ASTERIX Release V1.8
+~~~~~~~~~~~~~~~~~~~~
+
+ 1) Set up SYSTEM 
+
+    Tested on SunOS 4.1.3, Solaris 2.4, OSF 3.2
+
+ 2) Starlink package requirements
+
+    a) NBS V2.4 or later
+    b) NAG V15 or later
+ 
+ 3) O/S specific requirements
+
+    a) Solaris
+
+       i)  Directory (or link) X11 must exist in /usr/include
+       ii) Compatability mode directory /usr/ucblib must be included in 
+           LD_LIBRARY_PATH
+
+ 4) Files copied into /star
+
+       bin/asterix/*
+       dates/asterix_datestamp
+       help/asterix/*
+
+David J. Allan, 7th July 1995

@@ -1,0 +1,69 @@
+#+
+#  Name:
+#     Makefile
+
+#  Purpose:
+#     Build an :PKG: :CLASS: directory
+
+#  Type of Module:
+#     Description file for the "make" command.
+
+#  Description:
+#     This description file is used by the "make" command to build an :PKG:
+#     module :CLASS: directory. 
+
+#  Notes:
+#     Command rm must not be aliased.
+
+#  Invocation:
+#     make [build]
+#        Causes make to build the target "build".  This results in the
+#        creation of the banner executable
+#     make clean
+#        Causes make to clean up after building the package, deleting all
+#        intermediate files created during the building process.
+#     make executable
+#        Causes make to remove those files not required for an executable
+#        version of :PKG:
+#     make rebuild
+#        Causes make to clean up after building the package, deleting all
+#        intermediate and target files created during the building process.
+#     make install
+#        Causes make to install components of the built package into the
+#        appropriate directories on Starlink machines.
+#     make deinstall
+#        Causes make to de-install components of the built package from the
+#        appropriate directories on Starlink systems.
+#     make unbuild
+#        Remove those files not in the distributed :PKG: system. Assumed
+#        to work from an installed system
+#
+#  External Dependencies:
+#     The :PKG: help system depends on the following external files and 
+#     systems, which must previously have been installed in the appropriate 
+#     Starlink directories:
+#        chr
+#           Character-handling Routines.
+#        ems
+#           Error and message routines.
+#        fio
+#           Fortran I/O routines.
+#        posix
+#           POSIX routines.
+#        sae_par
+#           Global include file in /star/include.
+
+#  Authors:
+#     DJA: David J. Allan (BHVAD)
+#     {enter_new_authors_here}
+
+#  History:
+#     20 Nov 1992 (DJA):
+#        Original version.
+#     12 Jan 1996 (DJA):
+#        New version for :PKG: V2
+#     :DATE: (:CREATOR:):
+#        Created by GEN_make script running on :HOST:
+#     {note_changes_here}
+
+#-

@@ -1,0 +1,75 @@
+#!/bin/csh
+#
+# Get name of device
+#
+if ( "$1" == "" ) then
+  echo -n "Device: "
+  set dev = "$<"
+else
+  set dev = "$1"
+endif
+#
+# Delete after spooling?
+#
+if ( "$2" =~ DEL* || "$2" =~ del* ) then
+  set del = "Y"
+else
+  set del = "N"
+endif
+#
+# Convert to upper case
+#
+set dev = `echo $dev|tr '[a-z]' '[A-Z]'`
+#
+# Switch on device
+#
+set spvar = "AST_$dev:r_SPOOL"
+set status = 0
+printenv $spvar >/dev/null
+set spcmdok = $status
+#
+# Postscript
+#
+if ( ("$dev" =~ POST*) || ("$dev" =~ PS*) ) then
+  echo "Postscript"
+  set dev = "PS"
+  set file = "gks74.ps"
+else if ( "$dev" =~ CANON* ) then
+  echo "Canon"
+  set dev = "CANON"
+  set file = "canon.dat"
+else if ( "$dev" =~ INK* ) then
+  echo "Inkjet"
+  set dev = "INKJET"
+  set file = "inkjet.dat"
+else if ( $spcmdok != 1 ) then
+  echo "The $dev device isn't recognised by dspool, but a valid spool command exists"
+  echo -n "File to be spooled > "
+  set file = "$<"
+else
+  echo "Unknown device /$dev:r/"
+endif
+#
+# Check file exists
+#
+if ( ! -e $file ) then
+  echo "File $file does not exist..."
+  exit
+endif
+#
+# Invoke standard spooler
+#
+set printed = 1
+if ( $spcmdok != 1 ) then
+  set spool = `printenv $spvar`
+  $spool $file
+  set printed = $status
+endif
+#
+# Delete file?
+#
+if ( ($printed == 0) && ($del == "Y") ) then
+  rm $file
+else if ( $del == "Y" ) then
+  echo "File not deleted as it was not spooled"
+endif

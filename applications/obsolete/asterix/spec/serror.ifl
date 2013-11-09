@@ -1,0 +1,102 @@
+INTERFACE SERROR
+
+   PARAMETER LIK
+      TYPE '_LOGICAL'
+      VPATH 'DEFAULT'
+      DEFAULT FALSE
+      HELP 'Likelihood (Y) or chis-squared (N) fit?'
+   ENDPARAMETER
+
+   PARAMETER INP
+      POSITION 1
+      TYPE 'LITERAL'
+      VPATH 'GLOBAL,PROMPT'
+      PPATH 'GLOBAL'
+      ASSOCIATION '<->GLOBAL.FIT_DATA'
+      PROMPT 'Data'
+      HELP 'Either a single spectrum, or an object containing refs to spectra'
+   ENDPARAMETER
+
+   PARAMETER Z
+      TYPE '_REAL'
+      VPATH 'GLOBAL,DEFAULT'
+      PPATH 'GLOBAL'
+      ASSOCIATION '<->GLOBAL.REDSHIFT'
+      DEFAULT 0.0
+      HELP 'Redshift to be applied to source spectrum'
+   ENDPARAMETER
+
+   PARAMETER MODEL
+      POSITION 2
+      TYPE 'LITERAL'
+      VPATH 'GLOBAL,PROMPT'
+      PPATH 'GLOBAL'
+      ASSOCIATION '<->GLOBAL.FIT_MODEL'
+      PROMPT 'Model'
+      HELP 'Name of data object containing spectral model specification'
+   ENDPARAMETER
+
+   PARAMETER DS
+      POSITION 3
+      TYPE '_REAL'
+      VPATH 'CURRENT,PROMPT'
+      DEFAULT 1.0
+      PROMPT 'Chi-squared increase'
+      HELP 'Under linear approx. a value of 1 gives one sigma, 2.71 gives 90%'
+   ENDPARAMETER
+
+   PARAMETER MAX
+      POSITION 4
+      TYPE '_INTEGER'
+      VPATH 'CURRENT,PROMPT'
+      PROMPT 'Max. no. of iterations'
+      HELP 'Program will terminate after N iterations, but can be reinvoked'
+   ENDPARAMETER
+
+   PARAMETER PARS
+      TYPE 'LITERAL'
+      DEFAULT '*'
+      POSITION 5
+      PPATH 'DEFAULT'
+      VPATH 'DEFAULT,PROMPT'
+      PROMPT 'Parameters to have errors evaluated'
+      HELP 'Only these parameters will have errors evaluated'
+   ENDPARAMETER
+
+   PARAMETER MCTRL
+      TYPE '_LOGICAL'
+      DEFAULT FALSE
+      VPATH 'CURRENT,DEFAULT'
+      PPATH 'CURRENT,DEFAULT'
+      PROMPT 'Genetic fitting?'
+      HELP 'Minimisation control files no longer exist'
+   ENDPARAMETER
+
+   PARAMETER MINS
+      TYPE '_REAL'
+      VPATH 'CURRENT,DEFAULT'
+      DEFAULT 20
+   ENDPARAMETER
+
+   PARAMETER OP
+      TYPE '_LOGICAL'
+      PROMPT 'Output results?'
+      HELP 'If Y, then final fit results will be spooled or sent to a file'
+   ENDPARAMETER
+
+   PARAMETER FITOUT
+      TYPE 'LITERAL'
+      DEFAULT !
+      PPATH 'DYNAMIC,DEFAULT'
+      VPATH 'DYNAMIC,DEFAULT,PROMPT'
+      PROMPT 'File name'
+      HELP 'Named of output text file'
+   ENDPARAMETER
+
+   PARAMETER APPEND
+      TYPE '_LOGICAL'
+      VPATH 'DEFAULT'
+      DEFAULT FALSE
+   ENDPARAMETER
+
+ENDINTERFACE

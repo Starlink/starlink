@@ -1,0 +1,38 @@
+interface TLOAD
+  parameter INP
+    position 1
+    type '_CHAR'
+    prompt 'Time series'
+    help 'Name of time series file'
+  endparameter
+  parameter DEV
+    position 2
+    type '_CHAR'
+    prompt 'Device'
+    help 'Name of graphics device to display image'
+  endparameter
+  parameter NX
+    position 3
+    type '_INTEGER'
+    vpath 'DEFAULT'
+    default 1
+    prompt 'X-zones'
+    help 'Number of plotting zones in x-direction'
+  endparameter
+  parameter NY
+    position 4
+    type '_INTEGER'
+    vpath 'DEFAULT'
+    default 1
+    prompt 'Y-zones'
+    help 'Number of plotting zones in y-direction'
+  endparameter
+  parameter MODE
+    position 5
+    type '_INTEGER'
+    vpath 'DEFAULT'
+    default 1
+    prompt 'Input mode'
+    help '1=cursor 2=keyboard'
+  endparameter
+endinterface

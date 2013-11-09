@@ -1,0 +1,53 @@
+ interface GDEVICES
+   parameter OPEN
+     type '_LOGICAL'
+     default N
+     vpath 'DEFAULT'
+     prompt 'Is a device to be opened'
+   endparameter
+   parameter CLOSE
+     type '_LOGICAL'
+     default N
+     vpath 'DEFAULT'
+     prompt 'Is device to be closed'
+   endparameter
+   parameter ERASE
+     type '_LOGICAL'
+     default N
+     vpath 'DEFAULT'
+     prompt 'Is device to be erased'
+   endparameter
+   parameter SHOW
+     type '_LOGICAL'
+     default N
+     vpath 'DEFAULT'
+     prompt 'Show info. on current device'
+   endparameter
+   parameter LIST
+     type '_LOGICAL'
+     default N
+     vpath 'DEFAULT'
+     prompt 'List available devices'
+   endparameter
+   parameter DEV
+     type '_CHAR'
+     position 1
+     prompt 'Device name'
+     help 'Use LIST option to get a list of valid devices'
+   endparameter
+   parameter XZONE
+     type '_INTEGER'
+     position 2
+     default 1
+     vpath 'DEFAULT'
+     prompt 'Horizontal zones'
+     help 'Each zone behaves like a separate device'
+   endparameter
+   parameter YZONE
+     type '_INTEGER'
+     position 3
+     default 1
+     vpath 'DEFAULT'
+     prompt 'Vertical zones'
+   endparameter
+ endinterface

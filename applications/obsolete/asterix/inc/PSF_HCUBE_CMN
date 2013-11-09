@@ -1,0 +1,85 @@
+*+  PSF_HCUBE_CMN - Constant parameter and common block definition for HYPER CUBE PSF
+*-
+*    Constant parameters for the AXAF mission
+
+      INTEGER                 CHIP_GAP                         ! Gap between chips
+        PARAMETER                (CHIP_GAP = 22)
+      INTEGER                 NOMINAL_X                        ! Aim point
+        PARAMETER                (NOMINAL_X = 1109)             ! Equvalent to 1024-61
+      INTEGER                 NOMINAL_Y                        ! Aim point
+        PARAMETER                (NOMINAL_Y = 963)
+      INTEGER                 ACIS_I_MAX_X
+        PARAMETER                (ACIS_I_MAX_X = 2070)
+      INTEGER                 ACIS_I_MAX_Y
+        PARAMETER                (ACIS_I_MAX_Y = 2070)
+      INTEGER                 ACIS_S_MAX_X
+        PARAMETER                (ACIS_S_MAX_X = 1024)
+      INTEGER                 ACIS_S_MAX_Y
+        PARAMETER                (ACIS_S_MAX_Y = 1024)        
+      INTEGER                 TOTAL_PIX_NUMBER
+        PARAMETER                (TOTAL_PIX_NUMBER = 2070*2070)
+
+      REAL                    AXAF_CPIX_SIZE
+	PARAMETER                (AXAF_CPIX_SIZE = 0.495)
+      REAL                    AXAF_CPIX_AMIN
+	PARAMETER 	         (AXAF_CPIX_AMIN= 0.495/60.0)
+      REAL                    AXAF_ENERGY_MAX
+        PARAMETER 	         ( AXAF_ENERGY_MAX = 10.0)
+      REAL                    AXAF_ENERGY_MIN
+        PARAMETER 	         ( AXAF_ENERGY_MIN = 0.1)
+
+*    Common block definition for HYPER CUBE PSF
+
+      LOGICAL                 HX_CB_OPEN
+      INTEGER		      HX_CB_ID	        	! Cube identifier
+      INTEGER                 HX_CB_CPTR, HX_CB_RPTR    ! Ptr to cube fields
+      INTEGER                 HX_CB_RPTRX, HX_CB_RPTRY
+      INTEGER                 HX_CB_NRBINX, HX_CB_NEBIN,! Cube dimensions
+     :                        HX_CB_NRBINY, HX_CB_NOBIN      
+      INTEGER                 HX_CB_EAPTR, HX_CB_EWPTR  ! Energy axis data
+
+      REAL                    HX_CB_OBASE, HX_CB_OSCALE ! Off-axis axis pars
+      REAL                    HX_CB_RPMIN               ! Minimum radius > 0
+      INTEGER                 HX_PSF_CUTOFF
+      INTEGER                 HX_CB_LPTR		       
+
+      INTEGER                 HX_PSF_ARRAY_X
+      INTEGER                 HX_PSF_ARRAY_Y	
+      INTEGER                 HX_ARRAY_NUMBER
+      INTEGER                 HX_SCALE_X
+      INTEGER                 HX_SCALE_Y		
+      INTEGER                 HX_LOCATOR_POSX, HX_LOCATOR_POSY,
+     :                        HX_LOCATOR_POSE 		
+      INTEGER                 HX_ENERGY_RANGE
+      INTEGER                 HX_CB_GAP_X,HX_CB_GAP_Y		
+      INTEGER                 HX_PSF_PTR
+      INTEGER                 HX_PSF_SIZE
+
+      CHARACTER*80            HX_PSF_NAME
+
+      LOGICAL                 DB
+
+
+      CHARACTER*80            TEMP_STRING 
+      CHARACTER*80            DETECTORTYPE	
+      CHARACTER*80            ENERGY_UNITS
+
+      REAL                    HX_KEEP_ARRAY(300,300)
+      INTEGER                 HX_KEEP_NX
+
+      COMMON /PSF_HCUBE_CMN/  HX_CB_OPEN, 
+     :                        HX_CB_CPTR, HX_CB_RPTR,
+     :                        HX_CB_RPTRX, HX_CB_RPTRY,
+     :                        HX_CB_NRBINX, HX_CB_NRBINY,
+     :                        HX_CB_NEBIN, HX_CB_NOBIN, HX_CB_EAPTR,
+     :                        HX_CB_EWPTR, HX_CB_OBASE, HX_CB_OSCALE,
+     :                        HX_CB_RPMIN, HX_CB_ID,
+     :                        HX_PSF_ARRAY_X, HX_PSF_ARRAY_Y,
+     :                        HX_ARRAY_NUMBER, HX_SCALE_X, HX_SCALE_Y,
+     :                        HX_LOCATOR_POSX, HX_LOCATOR_POSY,
+     :                        HX_LOCATOR_POSE, HX_ENERGY_RANGE,
+     :                        HX_CB_LPTR, HX_CB_GAP_X, HX_CB_GAP_Y,	 
+     :                        HX_PSF_NAME, HX_PSF_CUTOFF, HX_PSF_PTR,
+     :                        HX_PSF_SIZE,DB,TEMP_STRING,
+     :                        HX_KEEP_ARRAY,DETECTORTYPE,
+     :                        HX_KEEP_NX,ENERGY_UNITS

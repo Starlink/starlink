@@ -1,0 +1,228 @@
+ASTERIX/88/001.3                                                Page 1
+
+
+SCIENCE AND ENGINEERING RESEARCH COUNCIL
+
+ASTERIX Programmer Note                                      Issued by
+
+                                                        Richard Saxton
+                                                       17 January 1990
+
+---------------------------------------------------------------------
+
+                     ASTERIX directory Structure
+
+
+
+                                   CONTENTS
+
+
+        1       Introduction
+        2       Directory structure diagram
+        3       Subdirectory contents
+        4       DCL logical and symbol nomenclature
+
+
+
+1  INTRODUCTION
+
+ASTERIX applications are organised into ADAM shared  image  monoliths.
+Each  monolith  contains a group of related applications, for instance
+spectral  analysis  programs.   Fortran  source   files   are   stored
+separately  for each monolith in subdirectories below [.SOURCE].  They
+are held in text libraries and there is a corresponding object library
+for  each monolith.  The only other source files are held in a library
+called ASTLIB which is held in [.LIB].   This  is  a  general  library
+which applications from all monoliths link into.  All the files needed
+to run ASTERIX monoliths are contained in [.EXE].  These  include  the
+executable  code for the monoliths as well as compiled interface files
+and ICL command definition files.  Individual Atask  versions  of  the
+applications  reside in a subdirectory of this called [.TASKS] and ICL
+procedures are held in the [.PROCS] subdirectory.
+
+The whole directory structure is set  up  as  a  substructure  of  the
+pseudo-device  AST_ROOT:   which  points  to  an  [ASTERIX.] directory
+level, whose location is system dependent.
+
+
+
+
+
+
+
+
+
+
+
+                                - 1 -
+ASTERIX/88/001.3                                                Page 2
+
+
+2  DIRECTORY STRUCTURE
+
+  [ASTERIX]*--|--[.DATA]----------[.EXOSAT]
+              |                |--[.ROSAT]---------[.WFC]
+              |                |--[.SPECTRUM]
+              |                |--[.DEMO]
+              |                |--[.SRC]
+              |                |--[.PSF]
+              |                +--[.CTABLE]
+              |
+              |--[.DEV]-----------[.INCLUDE]
+              |                +--[.TOOLS]
+              |--[.DOCS]
+              |
+              |--[.EXE]-----------[.TASKS]
+              |                +--[.PROCS]
+              |--[.HELP]
+              |
+              |--[.LIB]
+              |
+              |--[.SOURCE]--------[.EXOSAT]
+              |                |--[.GRAFIX]
+              |                |--[.HED]
+              |                |--[.IMAGE]
+              |                |--[.ROSAT]
+              |                |--[.SPECTRUM]
+              |                |--[.TIME]
+              |                |--[.SRC]
+              |                +--[.UTIL]
+              |--[.SYSTEM]
+
+
+
+
+3  SUBDIRECTORY CONTENTS
+
+3.1  [.DATA]
+
+Contains instrument specific data, such  as  calibration  and  orbital
+element  files.   The  data for each satellite is stored in a separate
+subdirectory e.g.  [.EXOSAT].  These are  the  default  locations  for
+these  data  files and individual sites may choose to redefine logical
+names to point elsewhere.
+
+
+
+3.2  [.DEV]
+
+Routines  to  help  in  the  development  of  ASTERIX,  divided   into
+subdirectories as follows.
+
+
+
+                                - 2 -
+ASTERIX/88/001.3                                                Page 3
+
+
+3.2.1  [.INCLUDE] -
+
+Header  templates  for  different  types  of  file  e.g.   subroutine,
+function, block data ...
+
+
+
+3.2.2  [.TOOLS] -
+
+Development tools.
+
+
+
+3.3  [.EXE]
+
+Contains all the executable  images  for  monoliths  as  well  as  the
+compiled    interface    files.     Also    contains   the   following
+sub-directories:
+
+
+
+3.3.1  [.TASKS] -
+
+Contains executable code for individual Atasks.
+
+
+
+3.3.2  [.PROCS] -
+
+Contains ICL procedures.
+
+
+
+3.4  [.HELP]
+
+Contains the help libraries for ASTHELP.
+
+
+
+3.5  [.LIB]
+
+Contains the source and object code for the main library ASTLIB
+
+
+
+3.6  [.SOURCE]
+
+Contains all source and object files not in ASTLIB.  It is split  into
+several  subdirectories, one for each monolith.  Each of these contain
+a text library of Fortran source code, an object library, an IFL  file
+for the monolith and command files to link individual applications and
+the whole monolith.
+
+                                - 3 -
+ASTERIX/88/001.3                                                Page 4
+
+
+3.7  [.SYSTEM]
+
+Command files to define logicals and symbols (see 4).
+     STARTUP.COM     -    Starts the ASTERIX system
+     LOGNAM.COM      -    Defines logicals for users
+     DATLOGNAM.COM   -    Defines logicals for data files
+     COMMANDS.COM    -    Sets up ASTERIX commands as DCL symbols
+     DEVLOGNAM.COM   -    Defines logicals and symbols for ASTERIX
+                          development
+
+
+
+
+4  DCL LOGICAL AND SYMBOL NOMENCLATURE
+
+All ASTERIX logicals are prefixed by "AST_".  The logical pointing  to
+a  particular  directory is of the form 'AST_(directory abbreviation)'
+e.g.  the directory  [ASTERIX.EXE]  is  pointed  to  by  AST_EXE,  the
+directory  [ASTERIX.SOURCE.EXOSAT]  has  the logical AST_EXO.  Some of
+these logicals are set up when ASTERIX is entered, and more are  added
+by  ASTDEV.   For  a  list  of  those currently defined, type "SHO LOG
+AST_*".
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 4 -

@@ -1,0 +1,46 @@
+*+
+*  Name:
+*     AST_PKG_CMN
+
+*  Purpose:
+*     Define logical array holding loaded status of ASTERIX sub-packages
+
+*  Language:
+*     Starlink Fortran
+
+*  Type of Module:
+*     Global variables include file.
+
+*  Description:
+*     This files defines a logical variable for each allowed ASTERIX sub
+*     package number.
+
+*  Prior Requirements:
+*     None.
+
+*  References:
+*     FCI Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/fci.html
+
+*  Keywords:
+*     package:fci, usage:public
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     7 Mar 1996 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*-
+
+*  Global Variables:
+      LOGICAL			AST__LPACK(AST__MXPKG)
+
+*  Integer aligned values      
+      COMMON /AST_PKG_CMN/   	AST__LPACK
+
+*  Save common block contents
+      SAVE /AST_PKG_CMN/
+*.

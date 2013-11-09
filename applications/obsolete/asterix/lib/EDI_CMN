@@ -1,0 +1,52 @@
+*+
+*  Name:
+*     EDI_CMN
+
+*  Purpose:
+*     Define EDI_ subroutine package initialisation flag
+
+*  Language:
+*     Starlink Fortran
+
+*  Type of Module:
+*     Global variables include file.
+
+*  Description:
+*     This file defines one global variable which defines the initialisation
+*     state of the EDI subroutine group. This variable should be
+*     defined to be .FALSE. on image startup by using an associated BLOCK
+*     DATA module.
+
+*  Prior Requirements:
+*     None.
+
+*  References:
+*     EDI Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/edi.html
+
+*  Keywords:
+*     package:edi, usage:public
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     15 Aug 1995 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*-
+
+*  Global Constants:
+      CHARACTER*4		EDI_PROP
+        PARAMETER		( EDI_PROP = '.EDI' )
+
+*  Global Variables:
+      LOGICAL			EDI_INIT		! Initialised?
+
+*  Word aligned values
+      COMMON /EDI_CMN/          EDI_INIT
+
+*  Save common block contents
+      SAVE /EDI_CMN/
+*.

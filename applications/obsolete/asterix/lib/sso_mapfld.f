@@ -1,0 +1,101 @@
+*+  SSO_MAPFLD - Map an SSO field
+      SUBROUTINE SSO_MAPFLD( LOC, FLD, TYPE, MODE, PTR, STATUS )
+*    Description :
+*
+*     Map an old format SSDS field. A wrap up for all the old routines.
+*
+*    Method :
+*    Deficiencies :
+*    Bugs :
+*    Authors :
+*
+*     David J. Allan (BHVAD::DJA)
+*
+*    History :
+*
+*     17 Jun 91 : Original (DJA)
+*
+*    Type definitions :
+*
+      IMPLICIT NONE
+*
+*    Global constants :
+*
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+*
+*    Global variables :
+*
+      INCLUDE 'SSO_CMN'
+*
+*    Import :
+*
+      CHARACTER*(DAT__SZLOC)       LOC           ! SSDS locator
+      CHARACTER*(*)                FLD           ! Field to map
+      CHARACTER*(*)                TYPE          ! Mapping type
+      CHARACTER*(*)                MODE          ! Access mode
+*
+*    Export :
+*
+      INTEGER                      PTR           ! Ptr to mapped field
+*
+*    Status :
+*
+      INTEGER STATUS
+*
+*    Local variables :
+*
+      CHARACTER*(DAT__SZLOC)       FLOC          ! Field structure
+      CHARACTER*(DAT__SZLOC)       PLOC          ! POSIT structure
+
+      INTEGER                      DIMS(DAT__MXDIM) ! Field dimensions
+      INTEGER                      NDIM          ! Field dimensionality
+      INTEGER                      NMI           ! Mapped item index
+      INTEGER                      NSRC          ! Number of sources
+      INTEGER                      TLEN          ! Useful length of TYPE
+*-
+
+*    Status ok?
+      IF ( STATUS .EQ. SAI__OK ) THEN
+
+*      Number of sources
+        CALL DAT_FIND( LOC, 'POSIT', PLOC, STATUS )
+        CALL CMP_GET0I( PLOC, 'NSRC', NSRC, STATUS )
+
+*      Locate the item
+        CALL SSO_LOCFLD( LOC, FLD, FLOC, STATUS )
+
+*      Add object to map list
+        CALL SSO_ADDMAP( LOC, FLD, SSO__MI_DATA, NMI, STATUS )
+
+*      Already mapped?
+        IF ( SSO_MI_MAPPED(NMI) ) THEN
+
+*        Return stored pointer
+          PTR = SSO_MI_PTR(NMI)
+
+        ELSE IF ( STATUS .EQ. SAI__OK ) THEN
+
+*        Map its data array
+          TLEN = INDEX( TYPE, '[' )
+          IF ( TLEN .EQ. 0 ) TLEN = LEN(TYPE)+1
+          CALL CMP_SHAPE( FLOC, 'DATA_ARRAY', DAT__MXDIM, DIMS, NDIM,
+     :                                                       STATUS )
+          CALL CMP_MAPN( FLOC, 'DATA_ARRAY', TYPE(:TLEN-1), MODE, NDIM,
+     :                                              PTR, DIMS, STATUS )
+          IF ( STATUS .EQ. SAI__OK ) THEN
+            SSO_MI_PTR(NMI) = PTR
+            SSO_MI_MAPPED(NMI) = .TRUE.
+            SSO_MI_FLOC(NMI) = FLOC
+          END IF
+
+        END IF
+
+*      Tidy up
+        IF ( STATUS .NE. SAI__OK ) THEN
+          CALL AST_REXIT( 'SSO_MAPFLD', STATUS )
+        END IF
+
+      END IF
+
+      END

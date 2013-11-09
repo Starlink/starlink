@@ -1,0 +1,17 @@
+      INTEGER			ADA__NULLID
+        PARAMETER	        ( ADA__NULLID = -1 )
+
+      INTEGER                   ADA__MXDIM
+        PARAMETER               ( ADA__MXDIM = 7 )
+
+      INTEGER                   ADA__SZTYP
+        PARAMETER               ( ADA__SZTYP = 15 )
+
+      REAL                      ADA__NULLR
+        PARAMETER               (ADA__NULLR = -3.0E+38)
+
+      DOUBLE PRECISION          ADA__NULLD
+        PARAMETER               (ADA__NULLD = -1.7D+308)
+
+      INTEGER                   ADA__WCSMAX
+        PARAMETER               (ADA__WCSMAX = 10)

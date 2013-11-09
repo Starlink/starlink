@@ -1,0 +1,68 @@
+*    Constants
+      INTEGER			MAXLIST			! Max list nesting
+        PARAMETER		( MAXLIST = 5 )
+
+      INTEGER			MAXLEV			! Max source nesting
+        PARAMETER		( MAXLEV = 9 )
+
+      INTEGER			MAXTAGS			! Max list nesting
+        PARAMETER		( MAXTAGS = 2000 )
+
+*    Convertor modes
+      INTEGER			HCO__HLP
+        PARAMETER		( HCO__HLP = 1 )
+      INTEGER			HCO__TEX
+        PARAMETER		( HCO__TEX = 2 )
+      INTEGER			HCO__HTML
+        PARAMETER		( HCO__HTML = 3 )
+
+*    List forms
+      INTEGER			HTML__UL		! Unordered list
+        PARAMETER		( HTML__UL = 1 )
+      INTEGER			HTML__OL		! Ordered list
+        PARAMETER		( HTML__OL = 2 )
+      INTEGER			HTML__DL		! Definition list
+        PARAMETER		( HTML__DL = 3 )
+
+*    List indentations
+      INTEGER			INDENT__UL		! Unordered list
+        PARAMETER		( INDENT__UL = 3 )
+      INTEGER			INDENT__OL		! Ordered list
+        PARAMETER		( INDENT__OL = 3 )
+      INTEGER			INDENT__DL		! Definition list
+        PARAMETER		( INDENT__DL = 4 )
+
+*    The help stack
+      INTEGER			HST_L_LEV		! List level
+      INTEGER			HST_L_CNT(MAXLIST)	! List counters
+      INTEGER			HST_L_FORM(MAXLIST)	! List form
+      INTEGER			CURIND
+      INTEGER			MAXWID			! Maximum line length
+      LOGICAL			IN_PREFORMAT
+      LOGICAL			IN_PARSECT
+      INTEGER			OBP(0:MAXLEV)
+      CHARACTER*5000		OBUF(0:MAXLEV)
+      INTEGER                   HTXTP(5000)		! Help text posn
+      INTEGER			IMODE
+      INTEGER			OFD(0:MAXLEV)		! Output file descrips
+      INTEGER			CURLEV			! Current help nesting
+      INTEGER			CUROLEV			! Current o/p file
+      LOGICAL			FIRSTSUB(0:MAXLEV)	
+      INTEGER			SECTID(0:MAXLEV)	! Sections numbers
+
+      CHARACTER*500		FROOT
+      INTEGER			FRLEN
+
+      CHARACTER*80		HT_ADDR(MAXTAGS)
+      INTEGER			HT_ALEN(MAXTAGS)
+      CHARACTER*80		HT_TEXT(MAXTAGS)
+      INTEGER			HT_TLEN(MAXTAGS)
+      INTEGER			NTAGS
+
+*    Global variables :
+      COMMON /HLPCONV_CMN/ 	HST_L_LEV, HST_L_CNT, MAXWID,
+     :                          HST_L_FORM, CURIND, IN_PREFORMAT, 
+     :                          HTXTP, OBP, NTAGS, HT_ALEN, HT_TLEN,
+     :                          IMODE, IN_PARSECT, OFD, CURLEV, 
+     :                          CUROLEV, FRLEN, FIRSTSUB, SECTID
+      COMMON /HLPCONV_CMN_C/    OBUF, HT_ADDR, HT_TEXT, FROOT

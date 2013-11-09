@@ -1,0 +1,9 @@
+#
+# Declaration for tools Makefile class
+#
+files C_TOOLS
+files C_EXE %remext C_TOOLS
+
+const C_LINK_OPTS
+
+files BIN_C_TOOLS %prefix {$(BIN)/} C_EXE

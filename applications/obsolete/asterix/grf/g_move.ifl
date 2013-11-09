@@ -1,0 +1,21 @@
+interface G_MOVE
+  parameter KEY
+    type '_LOGICAL'
+    default N
+    vpath 'DEFAULT'
+    prompt 'Input from keyboard'
+    help 'Otherwise input is via cursor where appropriate'
+  endparameter
+  parameter X
+    position 1
+    type '_REAL'
+    prompt 'X position'
+    help 'new x position to move to'
+  endparameter
+  parameter Y
+    position 2
+    type '_REAL'
+    prompt 'Y position'
+    help 'new y position to move to'
+  endparameter
+endinterface

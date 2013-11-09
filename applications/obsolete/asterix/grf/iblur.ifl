@@ -1,0 +1,20 @@
+interface IBLUR
+  parameter GAUSS
+    type '_LOGICAL'
+    prompt 'Gaussian filter'
+    default Y
+    help 'Alternative is a box filter'
+  endparameter
+  parameter XWID
+    position 1
+    type '_REAL'
+    help 'FWHM for Gaussian, or Box width - both in pixels'
+    default 1.0
+  endparameter
+  parameter YWID
+    position 2
+    type '_REAL'
+    help 'FWHM for Gaussian, or Box width - both in pixels'
+    default 1.0
+  endparameter
+endinterface

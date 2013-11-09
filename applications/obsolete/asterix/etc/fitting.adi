@@ -1,0 +1,34 @@
+;;
+;; Define classes for fitting structures
+;;
+
+;;
+;; Abstract base class for minimisation control
+;;
+defclass MinControl {
+  CHAR          Style,                  ;; Style of minimisation
+  LOGICAL       VaryDataset = False   	;; Dataset being varied in call?
+  }
+
+;;
+;; Class controlling CURFIT minimisation 
+;;
+defclass CurfitControl MinControl {
+  CHAR          Style = "CURFIT",       ;; CURFIT algorithm
+  INTEGER       MaxIt = 30,		;; Maximum number of iterations
+  INTEGER       UpdateInterval = 3,	;; Emit model this often
+  INTEGER       Niter = 0,		;; Number of iterations completed
+  REAL		MinSlope = 1.0,		;; Stop criterion
+  REAL          Lambda = 0.001,         ;; Marquardt's parameter
+  LOGICAL       Finished = False        ;; Found minimum?
+  }
+
+;;
+;; Class controlling simulated annealing minimisation
+;;
+defclass SimAnnControl MinControl {
+  CHAR          Style = "SIMANN",       ;; SIMANN algorithm
+  INTEGER       MaxIt = 30,		;; Maximum number of iterations
+  REAL		Temperature = 1.0,	;; Current temperature
+  REAL          TempDecrement = 0.1     ;; Temperature decrement
+  }

@@ -1,0 +1,112 @@
+    
+    GRAFIX Control Block                           R J Vallance
+                                                   Revision 0.0
+                                                   13 Jan 1989
+
+    Introduction
+
+    The GRAFIX Control Block (GCB) is a structure which can be appended
+    to any ASTERIX binned dataset and which contains attributes
+    which control the way the GRAFIX system plots the contents of
+    that dataset.  Applications are provided within ASTERIX to edit
+    the attributes but they may also want to be set directly by user
+    applications.  For example an application that produces a
+    frequency distribution may wish to set the appropriate attribute
+    such that the dataset produced gets plotted by default in a
+    histogram style.  All manipulation of the attributes is done
+    through subroutines and the following is a description of those
+    subroutines.  A description of the objects within the GCB is also
+    provided but applications should not make direct reference to these
+    as they may change in the future.
+
+
+
+    Subroutines
+
+      Three groups of subroutines are provided.  The GCB_GETx routines
+      obtain the current state and value of the attribute if set.  The
+      GCB_PUTx routines write values into the attributes , creating
+      them first if necessary.  The GCB_CANx routines cancel the attribute
+      such that plotting applications pick their own default values.
+      A list of all the routines followed by a more detailed description
+      of their function is now given.
+
+          --------- routines still under development ----------
+          --------- details will be added later      ----------
+
+
+
+    Control Block contents
+
+      The attributes for individual graphs reside within the structure
+
+          dataset.MORE.ASTERIX.GRAFIX
+
+      and fall into the three groups that follow.  Not all attributes or
+      sub-attributes have to be present - absence is the equivalent of
+      being in an unset or cancelled state.
+
+
+      Axis control:
+        
+        XRANGE_LO              low edge of x-axis
+        XRANGE_HI              high edge of y-axis
+        YRANGE_LO              low edge of y-axis
+        YRANGE_HI              high edge of y-axis
+        XLOG                   flag x-axis to be logarithmic
+        YLOG                   flag y-axis to be logarithmic
+
+      Plotting style:
+
+        POLYLINE               flag polyline to be drawn through points
+        POLYLINE_STYLE         linestyle
+        POLYLINE_WIDTH         linewidth
+        POLYLINE_COLOUR        colour index
+        STEPLINE               flag stepped line to be drawn through points
+        STEPLINE_STYLE         linestyle
+        STEPLINE_WIDTH         linewidth
+        STEPLINE_COLOUR        colour index
+        MARKER                 PGPLOT marker number (0=none)
+        MARKER_SIZE            marker size
+        MARKER_BOLD            boldness
+        MARKER_COLOUR          colour index
+        ERRSYM                 error symbol (0=none)
+        ERRSYM_WIDTH           linewidth
+        ERRSYM_COLOUR          colour index
+
+        PIXEL                  flag pixel plot to be drawn
+        PIXEL_MIN              low cut-off
+        PIXEL_MAX              high cut-off
+        CONTOUR                contour plot to be drawn
+        CONTOUR_LEVELS(n)      levels
+        CONTOUR_STYLE(n)       linestyle for each level
+        CONTOUR_WIDTH(n)       linewidth for each level
+        CONTOUR_COLOUR(n)      colour index for each level
+        THREED                 pseudo 3D plot to be drawn
+        THREED_BIAS            vertical bias of each row
+        THREED_OFFSET          horizontal offset of each row
+
+      Text:
+
+        XLABEL                 text for x-axis label
+        XLABEL_SIZE            character size
+        XLABEL_FONT            character font
+        YLABEL                 text for y-axis label
+        YLABEL_SIZE            character size
+        YLABEL_FONT            character font
+        LEGEND(n)              array containing details of each line of legend
+          .TEXT                text
+          .SIZE                character size
+          .FONT                character font
+          .JUST                text justification
+        ANNOTATION(n)          array containing details of each line of text
+          .TEXT                text
+          .SIZE                character size
+          .FONT                character font
+          .POSITION(2)         x-y position
+          .ANGLE               orientation
+          .JUST                text justification
+
+
+    NOTE:  this list is incomplete and liable to change
+

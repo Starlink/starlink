@@ -1,0 +1,15 @@
+interface TONOFF
+  parameter INP
+    position 1
+    type 'LITERAL'
+    prompt 'Time series'
+    help 'Name of time series file'
+  endparameter
+  parameter FILE
+    position 2
+    type '_CHAR'
+    Association '<->GLOBAL.MJDFILE'
+    prompt 'Filename'
+    help 'File to write on/off times to'
+  endparameter
+endinterface

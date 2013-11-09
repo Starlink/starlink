@@ -1,0 +1,15 @@
+#!/bin/csh
+if ( -e ADI_ERR ) rm -f ADI_ERR
+if ( -e tmp.c ) rm -f tmp.c
+cat <<EOF >tmp.c
+#include <stdio.h>
+#include "adi_err.h"
+void doit( char *n, int e ) {
+printf( "      INTEGER %s\n        PARAMETER ( %s = %d)\n\n", n, n, e);}
+main() {
+EOF
+grep ADI__ adi_err.h | awk '{print "doit(\""$2"\","$2");"}' >>tmp.c
+echo "}" >>tmp.c
+cc -o tmp -I/star/include tmp.c
+tmp > ADI_ERR
+rm tmp tmp.c

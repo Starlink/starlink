@@ -1,0 +1,7 @@
+#
+# Declaration for etc Makefile class
+#
+files MAKE_TEMPLATES
+files ETC_FILES
+
+files BIN_ETC_FILES %prefix $(ETC)/ ETC_FILES

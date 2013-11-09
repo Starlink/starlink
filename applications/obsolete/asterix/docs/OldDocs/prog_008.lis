@@ -1,0 +1,42 @@
+
+                           ASTHELP V 1.5
+                           =============
+
+ASTHELP has been implemented on top of the Starlink portable
+help system (SUN124).  It is invoked via a FORTRAN programme
+which calls the Starlink HELP subroutines.  As well as the
+normal hierarchical structure, facilities have been added
+which allow a hypertext-like feel to be included.  This is
+achieved by having a separate index file which associates
+keywords with the path to a help topic.  These keywords are
+invoked from within the ASTHELP session using the syntax
+described in the Using_ASTHELP section of help.  At present
+this index file (AST_ROOT:[HELP]ASTHELP.INDEX) is a simple
+text file and keywords are located by a linear search.  If
+it grows to the point where this becomes too slow, then we
+can implement it using direct access files and binary searching.
+With this in mind new entries should be placed in alphabetic
+order.  Use upper case for command names and lower case for
+other things.  To indicate to users of ASTHELP what keywords
+are available, they can be highlighted where they occur in
+the text by enclosing them as follows: -<keyword>- .  The 
+ASTHELP programme replaces the -< >- by ANSI escape sequences.
+
+The full help text is to be found in ASTHELP.HLP (we may want to
+break this down into smaller files some time) and the command file,
+REPHELP in the same directory will compile this into the help
+library, ASTHELP.SHL (this takes some time!).
+
+The full list of files associated with ASTHELP are:
+
+    AST_ROOT:[HELP] ASTHELP.HLP      help text
+                    ASTHELP.SHL      help library
+                    ASTHELP.INDEX    index file
+                    REPHELP.COM      builds library
+                    ASTHELP.EXE      ASTHELP programme
+                    ASTHELP.FOR      source for above
+                    ASTHELP.COM      build programme
+
+
+RJV
+12th Nov 91

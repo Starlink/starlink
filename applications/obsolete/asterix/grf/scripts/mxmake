@@ -1,0 +1,36 @@
+#!/bin/csh
+set one="0$1"
+#
+# Choose device name
+#
+switch ( $one )
+ case "0":
+ case "01":
+   set dev="xwindows"
+   breaksw
+ case "02":
+   set dev="x2windows"
+   breaksw
+ case "03":
+   set dev="x3windows"
+   breaksw
+ case "04":
+   set dev="x4windows"
+   breaksw
+ default:
+   echo "Illegal argument to mxmake, should be 2,3 or 4"
+   exit
+   breaksw
+endsw
+#
+# Remove existing log file if present
+#
+if ( -e xmake.elog ) then
+  rm -f xmake.log
+endif
+#
+/star/bin/xmake -bg black -fg white $dev >& xmake.elog
+if ( ! -z xmake.elog ) then
+  cat xmake.elog | grep -v 'older revision'
+endif
+rm -f xmake.elog

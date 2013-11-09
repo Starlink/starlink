@@ -1,0 +1,230 @@
+interface IMOSAIC
+
+   parameter      NUMBER
+      position    1
+      type        '_INTEGER'
+      vpath       'PROMPT'
+      ppath       'CURRENT,DYNAMIC'
+      prompt      'Number of images to be put in a mosaic'
+      help        'Give the total number of data arrays be to made into a mosaic data array (max. 20)'
+#     range       1, 20
+   endparameter
+
+   parameter      INP1
+      position    2
+      type        'LITERAL'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'Image to be added'
+      help        'Name of the IMAGE structure containing the next 2-d data array to be added'
+   endparameter
+
+   parameter      INP2
+      position    3
+      type        'LITERAL'
+      ppath       'CURRENT'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of the IMAGE structure containing the next 2-d data array to be added'
+   endparameter
+
+   parameter      INP3
+      type        'LITERAL'
+      ppath       'CURRENT'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of the IMAGE structure containing the next 2-d data array to be added'
+   endparameter
+
+   parameter      INP4
+      type        'LITERAL'
+      ppath       'CURRENT'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of the IMAGE structure containing the next 2-d data array to be added'
+   endparameter
+
+   parameter      INP5
+      type        'LITERAL'
+      ppath       'CURRENT'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of the IMAGE structure containing the next 2-d data array to be added'
+   endparameter
+
+   parameter      INP6
+      type        'LITERAL'
+      access      'READ'
+      ppath       'CURRENT'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of the IMAGE structure containing the next 2-d data array to be added'
+   endparameter
+
+   parameter      INP7
+      type        'LITERAL'
+      access      'READ'
+      ppath       'CURRENT'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of the IMAGE structure containing the next 2-d data array to be added'
+   endparameter
+
+   parameter      INP8
+      type        'LITERAL'
+      access      'READ'
+      ppath       'CURRENT'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of the IMAGE structure containing the next 2-d data array to be added'
+   endparameter
+
+   parameter      INP9
+      type        'LITERAL'
+      access      'READ'
+      ppath       'CURRENT'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of the IMAGE structure containing the next 2-d data array to be added'
+   endparameter
+
+   parameter      INP10
+      type        'LITERAL'
+      access      'READ'
+      ppath       'CURRENT'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of the IMAGE structure containing the next 2-d data array to be added'
+   endparameter
+
+   parameter      INP11
+      type        'LITERAL'
+      access      'READ'
+      ppath       'CURRENT'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of the IMAGE structure containing the next 2-d data array to be added'
+   endparameter
+
+   parameter      INP12
+      type        'LITERAL'
+      access      'READ'
+      ppath       'CURRENT'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of the IMAGE structure containing the next 2-d data array to be added'
+   endparameter
+
+   parameter      INP13
+      type        'LITERAL'
+      access      'READ'
+      ppath       'CURRENT'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of the IMAGE structure containing the next 2-d data array to be added'
+   endparameter
+
+   parameter      INP14
+      type        'LITERAL'
+      access      'READ'
+      ppath       'CURRENT'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of the IMAGE structure containing the next 2-d data array to be added'
+   endparameter
+
+   parameter      INP15
+      type        'LITERAL'
+      access      'READ'
+      ppath       'CURRENT'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of the IMAGE structure containing the next 2-d data array to be added'
+   endparameter
+
+   parameter      INP16
+      type        'LITERAL'
+      access      'READ'
+      ppath       'CURRENT'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of the IMAGE structure containing the next 2-d data array to be added'
+   endparameter
+
+   parameter      INP17
+      type        'LITERAL'
+      access      'READ'
+      ppath       'CURRENT'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of the IMAGE structure containing the next 2-d data array to be added'
+   endparameter
+
+   parameter      INP18
+      type        'LITERAL'
+      access      'READ'
+      ppath       'CURRENT'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of the IMAGE structure containing the next 2-d data array to be added'
+   endparameter
+
+   parameter      INP19
+      type        'LITERAL'
+      access      'READ'
+      ppath       'CURRENT'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of the IMAGE structure containing the next 2-d data array to be added'
+   endparameter
+
+   parameter      INP20
+      type        'LITERAL'
+      access      'READ'
+      ppath       'CURRENT'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of the IMAGE structure containing the next 2-d data array to be added'
+   endparameter
+
+   parameter      XOFFSET
+      type        '_INTEGER'
+      vpath       'PROMPT'
+      ppath       'CURRENT,DYNAMIC'
+      prompt      'x offset of the array from the first'
+      help        'Give the x offset in pixels of the current data array from the first data array input'
+   endparameter
+
+   parameter      YOFFSET
+      type        '_INTEGER'
+      vpath       'PROMPT'
+      ppath       'CURRENT,DYNAMIC'
+      prompt      'y offset of the array from the first'
+      help        'Give the y offset in pixels of the current data array from the first data array input'
+   endparameter
+
+   parameter      OUT
+      type        'LITERAL'
+      vpath       'PROMPT'
+      prompt      'Mosaic image'
+      help        'Name given to the IMAGE structure to hold the mosaic data array'
+   endparameter
+
+   parameter      OTITLE
+      type        '_CHAR'
+      vpath       'DEFAULT'
+      prompt      'Title for output image'
+      default     'Mosaic'
+      help        'Character string used as a title for the output IMAGE structure.'
+   endparameter
+
+   parameter      AVERAGE
+      type        '_LOGICAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Are overlapped input pixels to be averaged in the output array?'
+      help        'Input pixels may be occupy the same position in the output array. So output pixels can be averaged or summed'
+      default     YES
+   endparameter
+
+endinterface

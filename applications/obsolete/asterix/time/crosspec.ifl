@@ -1,0 +1,52 @@
+Interface CROSSPEC
+   Parameter    INP1
+      position    1
+      type        'LITERAL'
+      prompt      'Enter name of first input object'
+      help        '1 dimensional dataset or primitive object'
+   EndParameter
+
+   Parameter    INP2
+      position    2
+      type        'LITERAL'
+      prompt      'Enter name of second input object'
+      help        '1 dimensional dataset or primitive object'
+   EndParameter
+
+   Parameter    OUT
+      position    3
+      type        'LITERAL'
+      association '->GLOBAL.GRAFDS'
+      prompt      'Output dataset'
+   EndParameter
+
+   Parameter    SIGMA
+      position    4
+      type        '_INTEGER'
+      prompt      'Enter sigma for smoothing Gaussian (in output bins)'
+      help        'Smoothing reduces the variance, but introduces bias. 0 = no smoothing'
+   EndParameter
+
+   Parameter    SHIFT
+      position    5
+      type        '_INTEGER'
+      prompt      'Alignment shift (in output bins)'
+      help        'Moves first input to the right relative to the second if +ve'
+   EndParameter
+
+   Parameter    TAPER
+      type        '_LOGICAL'
+      vpath       'DEFAULT'
+      default     Y
+      prompt      'Do you require the end of the data to be tapered? (Y/N)'
+      help        'Tapering reduces "leakage" in the power spectrum'
+   EndParameter
+
+   Parameter    FRAC
+      type        '_REAL'
+      vpath       'DEFAULT'
+      default     0.2
+      prompt      'What fraction of the data do you want tapered?'
+      help        'This fraction is tapered at EACH end of the data'
+   EndParameter
+EndInterface

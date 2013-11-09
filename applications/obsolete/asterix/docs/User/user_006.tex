@@ -1,0 +1,930 @@
+\documentstyle[11pt,fleqn]{article}     % 10% larger letters, equns to left
+\pagestyle{myheadings}
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {User Note}
+\newcommand{\stardocinitials}  {USER}
+\newcommand{\stardocnumber}    {006}
+\newcommand{\stardocauthors}   {Richard D Saxton}
+\newcommand{\stardocdate}      {17-June-1991}
+\newcommand{\stardoctitle}     {Time series analysis}
+\newcommand{\stardocname}      {\stardocinitials /\stardocnumber}
+%------------------------------------------------------------------------------
+
+\setlength{\textwidth}{160mm}           % Text width 16 cm
+\setlength{\textheight}{240mm}          % Text height 24 cm
+\setlength{\oddsidemargin}{0pt}         % LH margin width, -1 inch
+\setlength{\evensidemargin}{0pt}        % LH margin width, -1 inch
+\setlength{\topmargin}{-5mm}            %
+\setlength{\headsep}{8mm}               % 
+\setlength{\parindent}{0mm}
+
+%    Starlink definitions for \LaTeX\ macros used in MAN output
+%
+%  Description:
+%    As much as possible of the output from the MAN automatic manual generator
+%    uses calls to user-alterable macros rather than direct calls to built-in
+%    \LaTeX\ macros. This file is a version of the MAN default definitions for
+%    these macros modified for Starlink preferences.
+%
+%  Language:
+%    \LaTeX
+%
+%  Support:
+%    William Lupton, {AAO}
+%    Alan Chipperfield (RAL)
+%-
+%  History:
+%    16-Nov-88 - WFL - Add definitions to permit hyphenation to work on
+%		 words containing special characters and in teletype fonts.
+%    27-Feb-89 - AJC - Redefine \manroutine
+%                      Added \manheadstyle
+%                      Switch order of argument descriptors
+%    07-Mar-89 - AJC - Narrower box for parameter description
+%                      Remove Intro section and other unused bits
+%
+% permit hyphenation when in teletype font (support 9,10,11,12 point only -
+% could extend), define lccodes for special characters so that the hyphen-
+% ation algorithm is not switched off. Define underscore character to be
+% explicit underscore rather than lots of kerns etc.
+
+\typeout{Starlink MAN macros. Released 27th February 1989}
+
+\hyphenchar\nintt=`-\hyphenchar\tentt=`-\hyphenchar\elvtt=`-\hyphenchar\twltt=`-
+
+\lccode`_=`_\lccode`$=`$
+
+%    Macros used in the .TEX_SUMMARY file
+%
+%  Description:
+%    There is a command to introduce a new section (mansection) and a list-like
+%    environment (mansectionroutines) that handles the list of routines in the
+%    current section. In addition a mansectionitem command can be used instead
+%    of the item command to introduce a new routine in the current section.
+%-
+
+\newcommand {\mansection}[2]{\subsection{#1 --- #2}}
+
+\newenvironment {mansectionroutines}{\begin{description}\begin{description}}%
+{\end{description}\end{description}}
+
+\newcommand {\mansectionitem}[1]{\item [#1:] \mbox{}}
+
+%    Macros used in the .TEX_DESCR file
+%
+%  Description:
+%    There is a command to introduce a new routine (manroutine) and a list-like
+%    environment (manroutinedescription) that handles the list of paragraphs
+%    describing the current routine. In addition a manroutineitem command can
+%    be used instead of the item command to introduce a new paragraph for the
+%    current routine.
+%
+%    Two-column tables (the ones that can occur anywhere and which are
+%    triggered by "=>" as the second token on a line) are bracketed by a
+%    new environment (mantwocolumntable). Other sorts of table are introduced
+%    by relevant  environments (manparametertable, manfunctiontable and
+%    manvaluetable). The definitions of these environments call various other
+%    user-alterable commands, thus allowing considerable user control over such
+%    tables... (to be filled in when the commands have been written)
+%-
+
+\newcommand {\manrule}{\rule{\textwidth}{0.5mm}}
+
+%\newcommand {\manroutine}[2]{\subsection{#1 --- #2}}
+\newlength{\speccaption}
+\newlength{\specname}
+\newcommand{\manroutine}[2]{\goodbreak
+                          \rule{\textwidth}{0.5mm}  % draw thick line
+                          \settowidth{\specname}{{\Large {\bf #1}}}
+                        % left and right box width is text width plus gap
+                          \addtolength{\specname}{4ex} 
+                        % caption width is width of page less the two names
+                        % less than empirical fudge factor
+                          \setlength{\speccaption}{\textwidth}
+                          \addtolength{\speccaption}{-2.0\specname}
+                          \addtolength{\speccaption}{-4.45pt}
+                        % move text up the page because \flushleft environ-
+                        % ment creates a paragraph
+                          \vspace{-7mm}
+                          \newline
+                          \parbox[t]{\specname}{\flushleft{\Large {\bf #1}}}
+                          \parbox[t]{\speccaption}{\flushleft{\Large #2}}
+                          \parbox[t]{\specname}{\flushright{\Large {\bf #1}}}
+                          }
+
+\newenvironment {manroutinedescription}{\begin{description}}{\end{description}}
+
+\newcommand {\manroutineitem}[2]{\item [#1:] #2\mbox{}}
+
+
+% parameter tables
+
+\newcommand {\manparametercols}{lllp{90mm}}
+
+\newcommand {\manparameterorder}[3]{#2 & #3 & #1 &}
+
+\newcommand {\manparametertop}{}
+
+\newcommand {\manparameterblank}{\gdef\manparameterzhl{}\gdef\manparameterzss{}}
+
+\newcommand {\manparameterbottom}{}
+
+\newenvironment {manparametertable}{\gdef\manparameterzss{}%
+\gdef\manparameterzhl{}\hspace*{\fill}\vspace*{-\partopsep}\begin{trivlist}%
+\item[]\begin{tabular}{\manparametercols}\manparametertop}{\manparameterbottom%
+\end{tabular}\end{trivlist}}
+
+\newcommand {\manparameterentry}[3]{\manparameterzss\gdef\manparameterzss{\\}%
+\gdef\manparameterzhl{\hline}\manparameterorder{#1}{#2}{#3}}
+
+
+% list environments
+
+\newenvironment {manenumerate}{\begin{enumerate}}{\end{enumerate}}
+
+\newcommand {\manenumerateitem}[1]{\item [#1]}
+
+\newenvironment {manitemize}{\begin{itemize}}{\end{itemize}}
+
+\newcommand {\manitemizeitem}{\item}
+
+\newenvironment {mandescription}{\begin{description}\begin{description}}%
+{\end{description}\end{description}}
+
+\newcommand {\mandescriptionitem}[1]{\item [#1]}
+
+\newcommand {\mantt}{\tt}
+
+% manheadstyle for Starlink
+\newcommand {\manheadstyle}{}
+
+\catcode`\_=12
+
+% End of MAN add-in
+
+\begin{document}                        	% Start document
+\thispagestyle{empty}
+DEPARTMENT OF PHYSICS AND ASTRONOMY \hfill \stardocname\\
+LEICESTER UNIVERSITY\\
+{\large\bf Asterix Data Analysis\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+\parskip=4.0truemm plus 0.5truemm       % Paragraph spacing
+\markright{\stardocname}
+
+\tableofcontents
+
+\newpage
+
+\section{Introduction}
+
+This document describes how to analyse a time series
+within the Asterix data processing system. Asterix has been primarily
+designed to cope with X-ray data, however, the time series analysis
+routines within it are not wavelength dependent and so are equally 
+capable of processing any time series in the correct format.
+
+A full description of each application in the time series package is
+given in the Asterix help file. Type :
+
+\begin{verbatim}
+
+          $ ASTHELP app_name
+
+\end{verbatim}
+
+for further information. This guide is intended to give a brief
+description of the available routines and give an indication of
+their strengths and weaknesses in various situations.
+
+\section{Input data}
+
+All the applications described in this document work on binned
+data with the exception of the barycentric correction program,
+BARYCORR, which works on the raw event data.
+
+The input datafile should be a standard Starlink NDF (see the Starlink
+document SGP/38). This must contain a component DATA\_ARRAY and a time
+axis . In addition the components VARIANCE and QUALITY will be 
+used if present. 
+
+Most of the applications support irregularly spaced data and so the
+time axis may be either a simple array of times or a regularly spaced
+array. An exception is the standard FFT program, POWER, which can
+only work on regularly spaced data; it will therefore fail if the time
+axis is represented by a simple data array.
+
+Gaps and dropouts in the data should be represented by a QUALITY array.
+Most applications support QUALITY and will ignore all bad pixels, 
+although as before, POWER can not handle data gaps and will fail if
+any pixel is bad.
+
+Datafiles containing magic values are not supported by the software,
+however, they may be converted to QUALITY using the command :
+
+\begin{verbatim}
+
+          $ SETQUAL MAGIC=YES
+
+\end{verbatim}
+
+Data currently stored in a textfile may be converted to a standard
+NDF, using the command :
+
+\begin{verbatim}
+
+          $ IMPORT
+
+\end{verbatim}
+
+\newpage
+
+\section{The applications}
+Time series applications are described briefly below. For more information
+on an individual routine see the help entry. 
+
+\subsection{Power spectrum analysis}
+
+\manroutine {{\manheadstyle{POWER}}}{ Standard FFT application.}
+
+\begin{manroutinedescription}
+\manroutineitem {Description }{}
+
+Computes the power spectrum of a 1-d dataset using a standard FFT.
+This technique works on regularly spaced data with NO gaps.
+
+\manroutineitem {Parameters }{}
+\begin{manparametertable}
+\manparameterentry {{\mantt{READ}} }{{\mantt{INP}} }{{\mantt{_CHAR}}}
+   Name of the input NDF.
+\manparameterentry {{\mantt{READ}} }{{\mantt{OUT}} }{{\mantt{UNIV}}}
+   Name of the output NDF containing the power spectrum
+\manparameterentry {{\mantt{READ}} }{{\mantt{TRUNCATE}} }{{\mantt{\_LOGICAL}}}
+   Truncate the data to the nearest power of 2, to increase speed ?
+\manparameterentry {{\mantt{READ}} }{{\mantt{TAPER}} }{{\mantt{\_LOGICAL}}}
+   Taper the data to minimise the effects of the window fn. ?
+\manparameterentry {{\mantt{READ}} }{{\mantt{REMOVE_MEAN}} }{{\mantt{\_LOGICAL}}}
+   Subtract the mean before processing ?
+\end{manparametertable}
+
+\end{manroutinedescription}
+
+\manroutine {{\manheadstyle{DYNAMICAL}}}{Running FFT algorithm.}
+
+\begin{manroutinedescription}
+\manroutineitem {Description }{}
+
+Computes the power spectrum of successive segments of a time
+series and stacks the results to form a dynamical power spectrum.
+
+\manroutineitem {Parameters }{}
+\begin{manparametertable}
+\manparameterentry {{\mantt{READ}} }{{\mantt{INP}} }{{\mantt{UNIV}}}
+   Name of the input NDF.
+\manparameterentry {{\mantt{READ}} }{{\mantt{OUT}} }{{\mantt{UNIV}}}
+   Name of the output NDF containing the power spectrum
+\manparameterentry {{\mantt{READ}} }{{\mantt{SECTOR}} }{{\mantt{\_INTEGER}}}
+   Number of points in each time series segment
+\end{manparametertable}
+
+\end{manroutinedescription}
+
+
+\manroutine {{\manheadstyle{LOMBSCAR}}}{Power spectrum application using
+the Lomb-Scargle algorithm.}
+
+\begin{manroutinedescription}
+\manroutineitem {Description }{}
+
+Calculates the power spectrum of a 1-d dataset, using the
+Press and Rybicki invocation of the LOMB-SCARGLE algorithm. 
+This is a particularly useful technique for a time series containing 
+data gaps. 
+
+\manroutineitem {Parameters }{}
+\begin{manparametertable}
+\manparameterentry {{\mantt{READ}} }{{\mantt{INP}} }{{\mantt{UNIV}}}
+   Name of the input NDF.
+\manparameterentry {{\mantt{READ}} }{{\mantt{OFAC}} }{{\mantt{\_REAL}}}
+   Oversampling factor (to increase the low frequency range)
+\manparameterentry {{\mantt{READ}} }{{\mantt{HIFAC}} }{{\mantt{\_REAL}}}
+   High frequency factor (to increase the high frequency range)
+\manparameterentry {{\mantt{READ}} }{{\mantt{WFREQ}} }{{\mantt{\_REAL}}}
+   Frequency of window function 
+\manparameterentry {{\mantt{READ}} }{{\mantt{OUT}} }{{\mantt{UNIV}}}
+   Name of output NDF to contain the power spectrum
+\end{manparametertable}
+
+\end{manroutinedescription}
+
+\manroutine {{\manheadstyle{SINFIT}}}{Least-squares fit of Sine-waves.}
+
+\begin{manroutinedescription}
+\manroutineitem {Description }{}
+
+Computes a periodogram of a 1-d dataset by a weighted least squares fit
+of Sine waves. It is slow compared with the FFT method in POWER. The
+advantage of this technique is that genuine variations in the datapoint
+errors are accounted for.
+
+\manroutineitem {Parameters }{}
+\begin{manparametertable}
+\manparameterentry {{\mantt{READ}} }{{\mantt{INP}} }{{\mantt{UNIV}}}
+   Name of the input NDF.
+\manparameterentry {{\mantt{READ}} }{{\mantt{OUT}} }{{\mantt{UNIV}}}
+   Name of output NDF to contain the power spectrum
+\manparameterentry {{\mantt{READ}} }{{\mantt{BASE}} }{{\mantt{\_REAL}}}
+   Base frequency 
+\manparameterentry {{\mantt{READ}} }{{\mantt{INC}} }{{\mantt{\_REAL}}}
+   Frequency increment 
+\manparameterentry {{\mantt{READ}} }{{\mantt{PHASE}} }{{\mantt{\_LOGICAL}}}
+   Store phase information ?
+\end{manparametertable}
+
+\end{manroutinedescription}
+
+\manroutine {{\manheadstyle{CROSSPEC}}}{Calculates a cross-spectrum.}
+
+\begin{manroutinedescription}
+\manroutineitem {Description }{}
+
+Computes the cross-spectrum of two 1-d arrays. 
+
+\manroutineitem {Parameters }{}
+\begin{manparametertable}
+\manparameterentry {{\mantt{READ}} }{{\mantt{INP1}} }{{\mantt{UNIV}}}
+   Name of the first input array.
+\manparameterentry {{\mantt{READ}} }{{\mantt{INP2}} }{{\mantt{UNIV}}}
+   Name of the second input array.
+\manparameterentry {{\mantt{READ}} }{{\mantt{OUT}} }{{\mantt{UNIV}}}
+   Name of the output NDF.
+\manparameterentry {{\mantt{READ}} }{{\mantt{SIGMA}} }{{\mantt{\_INTEGER}}}
+   Sigma of the smoothing gaussian
+\manparameterentry {{\mantt{READ}} }{{\mantt{TAPER}} }{{\mantt{\_LOGICAL}}}
+   Taper data ?
+\manparameterentry {{\mantt{READ}} }{{\mantt{FRAC}} }{{\mantt{\_REAL}}}
+   Fraction of data tapered at each end
+\end{manparametertable}
+
+\end{manroutinedescription}
+
+\newpage
+
+\subsection{Folding}
+
+\manroutine {{\manheadstyle{FOLDLOTS}}}{Performs period search by a
+standard folding technique.}
+
+\begin{manroutinedescription}
+\manroutineitem {Description }{}
+
+Determines the best folding period of a 1-d dataset by performing
+a chi-squared fit to the dataset folded at a number of periods.
+
+\manroutineitem {Parameters }{}
+\begin{manparametertable}
+\manparameterentry {{\mantt{READ}} }{{\mantt{INP}} }{{\mantt{UNIV}}}
+   Name of the input NDF.
+\manparameterentry {{\mantt{READ}} }{{\mantt{FOLD\_OBJ}} }{{\mantt{UNIV}}}
+   Name of the output file containing data folded at the best period
+\manparameterentry {{\mantt{READ}} }{{\mantt{CHI\_OBJ}} }{{\mantt{UNIV}}}
+   Name of the output file containing the chi-squared v period data
+\manparameterentry {{\mantt{READ}} }{{\mantt{PERIOD}} }{{\mantt{\_REAL}}}
+   Base period for folding
+\manparameterentry {{\mantt{READ}} }{{\mantt{PINC}} }{{\mantt{\_REAL}}}
+   Period increment
+\manparameterentry {{\mantt{READ}} }{{\mantt{NPER}} }{{\mantt{\_INTEGER}}}
+   Number of periods to fold at
+\manparameterentry {{\mantt{READ}} }{{\mantt{PHASE_0_EPOCH}} }{{\mantt{\_DOUBLE}}}
+   Epoch of phase zero, in atomic time.
+\manparameterentry {{\mantt{READ}} }{{\mantt{N_PHASE_BINS}} }{{\mantt{\_INTEGER}}}
+   Number of phase bins to use
+\manparameterentry {{\mantt{READ}} }{{\mantt{WEIGHT}} }{{\mantt{\_LOGICAL}}}
+   Are weighted means required ?
+\end{manparametertable}
+
+\end{manroutinedescription}
+
+\manroutine {{\manheadstyle{FOLDBIN}}}{Folds an n-dimensional dataset
+at a given period}
+
+\begin{manroutinedescription}
+\manroutineitem {Description }{}
+
+Folds an n-d datafile at a chosen period.
+
+\manroutineitem {Parameters }{}
+\begin{manparametertable}
+\manparameterentry {{\mantt{READ}} }{{\mantt{INP}} }{{\mantt{UNIV}}}
+   Name of the input NDF.
+\manparameterentry {{\mantt{READ}} }{{\mantt{OUT}} }{{\mantt{UNIV}}}
+   Name of the output file containing folded data
+\manparameterentry {{\mantt{READ}} }{{\mantt{PERIOD}} }{{\mantt{\_REAL}}}
+   Period for folding
+\manparameterentry {{\mantt{READ}} }{{\mantt{EPOCH}} }{{\mantt{\_DOUBLE}}}
+   Epoch of phase zero, in atomic time.
+\manparameterentry {{\mantt{READ}} }{{\mantt{BINS}} }{{\mantt{\_INTEGER}}}
+   Number of phase bins to use
+\manparameterentry {{\mantt{READ}} }{{\mantt{WEIGHTED}} }{{\mantt{\_LOGICAL}}}
+   Are weighted means required ?
+\end{manparametertable}
+
+\end{manroutinedescription}
+
+\manroutine {{\manheadstyle{FOLDAOV}}}{Performs a period search on a
+dataset using the 'Analysis of variances' folding technique.}
+
+\begin{manroutinedescription}
+\manroutineitem {Description }{}
+
+Determines the best folding period of a 1-d dataset by performing
+an analysis of variances chi-squared fit to the dataset folded at a 
+number of frequencies.
+
+\manroutineitem {Parameters }{}
+\begin{manparametertable}
+\manparameterentry {{\mantt{READ}} }{{\mantt{INP}} }{{\mantt{UNIV}}}
+   Name of the input NDF.
+\manparameterentry {{\mantt{READ}} }{{\mantt{PERIOD}} }{{\mantt{\_REAL}}}
+   Base period for folding
+\manparameterentry {{\mantt{READ}} }{{\mantt{PINC}} }{{\mantt{\_REAL}}}
+   Period increment
+\manparameterentry {{\mantt{READ}} }{{\mantt{NPER}} }{{\mantt{\_INTEGER}}}
+   Number of periods to fold at
+\manparameterentry {{\mantt{READ}} }{{\mantt{NPBIN}} }{{\mantt{\_INTEGER}}}
+   Number of phase bins to use
+\manparameterentry {{\mantt{READ}} }{{\mantt{PER}} }{{\mantt{UNIV}}}
+   Name of output chi-squared file
+\manparameterentry {{\mantt{READ}} }{{\mantt{FOLD}} }{{\mantt{UNIV}}}
+   Name of output folded file at best frequency
+\end{manparametertable}
+
+\end{manroutinedescription}
+
+\manroutine {{\manheadstyle{PHASE}}}{Converts a time series into a
+phase series.}
+
+\begin{manroutinedescription}
+\manroutineitem {Description }{}
+
+Converts a time series into a `phase series', given the ephemeris of
+the periodicity
+
+\manroutineitem {Parameters }{}
+\begin{manparametertable}
+\manparameterentry {{\mantt{READ}} }{{\mantt{INP}} }{{\mantt{UNIV}}}
+   Name of the input NDF.
+\manparameterentry {{\mantt{READ}} }{{\mantt{OUT}} }{{\mantt{UNIV}}}
+   Name of the output NDF.
+\manparameterentry {{\mantt{READ}} }{{\mantt{COEFF1}} }{{\mantt{\_DOUBLE}}}
+   Julian date of an occurence of phase zero (days)
+\manparameterentry {{\mantt{READ}} }{{\mantt{COEFF2}} }{{\mantt{\_DOUBLE}}}
+   Periodicity at the time of coeff1 (days)
+\manparameterentry {{\mantt{READ}} }{{\mantt{COEFF3}} }{{\mantt{\_DOUBLE}}}
+   dP/dt, first derivative of period wrt time.
+\end{manparametertable}
+
+\end{manroutinedescription}
+
+\manroutine {{\manheadstyle{EVPHASE}}}{Produces a phase list for an
+event dataset.}
+
+\begin{manroutinedescription}
+\manroutineitem {Description }{}
+
+Adds a phase list to an event dataset, gven the ephemeris of
+the periodicity.
+
+\manroutineitem {Parameters }{}
+\begin{manparametertable}
+\manparameterentry {{\mantt{READ}} }{{\mantt{INP}} }{{\mantt{UNIV}}}
+   Name of the input event dataset
+\manparameterentry {{\mantt{READ}} }{{\mantt{OUT}} }{{\mantt{UNIV}}}
+   Name of the output event dataset
+\manparameterentry {{\mantt{READ}} }{{\mantt{COEFF1}} }{{\mantt{\_DOUBLE}}}
+   Julian date of an occurence of phase zero (days)
+\manparameterentry {{\mantt{READ}} }{{\mantt{COEFF2}} }{{\mantt{\_DOUBLE}}}
+   Periodicity at the time of coeff1 (days)
+\manparameterentry {{\mantt{READ}} }{{\mantt{COEFF3}} }{{\mantt{\_DOUBLE}}}
+   dP/dt, first derivative of period wrt time.
+\end{manparametertable}
+
+\end{manroutinedescription}
+
+\newpage
+
+\subsection{Correlation routines}
+
+The correlation routines are limited to working on regularly spaced
+data.
+
+\manroutine {{\manheadstyle{ACF}}}{Auto-correlation function.}
+
+\begin{manroutinedescription}
+\manroutineitem {Description }{}
+
+Calculates a 1-d auto-correlation function.
+
+\manroutineitem {Parameters }{}
+\begin{manparametertable}
+\manparameterentry {{\mantt{READ}} }{{\mantt{INP}} }{{\mantt{UNIV}}}
+   Name of the input NDF.
+\manparameterentry {{\mantt{READ}} }{{\mantt{OUT}} }{{\mantt{UNIV}}}
+   Name of the output NDF.
+\manparameterentry {{\mantt{READ}} }{{\mantt{AXIS}} }{{\mantt{\_INTEGER}}}
+   Index number of axis to perform autocorrelation along
+\manparameterentry {{\mantt{READ}} }{{\mantt{MXLAG}} }{{\mantt{\_INTEGER}}}
+   Maximum lag to calculate ACF at.
+\manparameterentry {{\mantt{READ}} }{{\mantt{BIAS}} }{{\mantt{\_LOGICAL}}}
+   Bias the ACF ?
+\manparameterentry {{\mantt{READ}} }{{\mantt{WEIGHT}} }{{\mantt{\_LOGICAL}}}
+   Weight the dataset ?
+\end{manparametertable}
+
+\end{manroutinedescription}
+
+\manroutine {{\manheadstyle{CROSSCOR}}}{Cross-correlates two 1-d arrays.}
+
+\begin{manroutinedescription}
+\manroutineitem {Description }{}
+
+Computes the cross-correlation of two 1-d arrays. 
+
+\manroutineitem {Parameters }{}
+\begin{manparametertable}
+\manparameterentry {{\mantt{READ}} }{{\mantt{INP1}} }{{\mantt{UNIV}}}
+   Name of the first input array.
+\manparameterentry {{\mantt{READ}} }{{\mantt{INP2}} }{{\mantt{UNIV}}}
+   Name of the second input array.
+\manparameterentry {{\mantt{READ}} }{{\mantt{OUT}} }{{\mantt{UNIV}}}
+   Name of the output NDF.
+\manparameterentry {{\mantt{READ}} }{{\mantt{LAG}} }{{\mantt{\_INTEGER}}}
+   Maximum lag to be computed
+\manparameterentry {{\mantt{READ}} }{{\mantt{WEIGHT}} }{{\mantt{\_LOGICAL}}}
+   Use variances to weight calculation ?
+\manparameterentry {{\mantt{READ}} }{{\mantt{NOISE}} }{{\mantt{\_LOGICAL}}}
+   Remove noise variance from calculation ?
+\end{manparametertable}
+
+\end{manroutinedescription}
+
+\newpage
+
+\subsection{General}
+
+\manroutine {{\manheadstyle{BARYCORR}}}{Barycentric correction.}
+
+\begin{manroutinedescription}
+\manroutineitem {Description }{}
+
+Barycentrically corrects an event dataset. This application corrects
+for the motion of the earth and of the particular satellite. A file
+giving the position of the satellite with respect to the earth as a 
+function of time is required if a spacecraft correction is to be applied.
+
+\manroutineitem {Parameters }{}
+\begin{manparametertable}
+\manparameterentry {{\mantt{READ}} }{{\mantt{INP}} }{{\mantt{UNIV}}}
+   Name of the input event dataset
+\manparameterentry {{\mantt{READ}} }{{\mantt{SATCORR}} }{{\mantt{\_LOGICAL}}}
+   Correct for the satellite motion ?
+\manparameterentry {{\mantt{READ}} }{{\mantt{POS_FILE}} }{{\mantt{CHARACTER}}}
+   Name of the satellite orbit file 
+\manparameterentry {{\mantt{READ}} }{{\mantt{GO_ON}} }{{\mantt{\_LOGICAL}}}
+   Ignore invalid orbit file and perform earth-centred correction ?
+\manparameterentry {{\mantt{READ}} }{{\mantt{UPDATE_PRD}} }{{\mantt{\_REAL}}}
+   Period after which correction is re-calculated
+\manparameterentry {{\mantt{READ}} }{{\mantt{UPDATE_INT}} }{{\mantt{\_REAL}}}
+   If no orbit file, the period after which correction is updated
+\end{manparametertable}
+
+\end{manroutinedescription}
+
+\manroutine {{\manheadstyle{DIFDAT}}}{Calculates the difference between
+adjacent data points in an array.}
+
+\begin{manroutinedescription}
+\manroutineitem {Description }{}
+
+Calculates the difference between adjacent data points in a data array.
+The object is to reduce low-frequency power, making it effectively a
+high pass filter.
+
+\manroutineitem {Parameters }{}
+\begin{manparametertable}
+\manparameterentry {{\mantt{READ}} }{{\mantt{INP}} }{{\mantt{UNIV}}}
+   Name of the input NDF
+\manparameterentry {{\mantt{READ}} }{{\mantt{OUT}} }{{\mantt{UNIV}}}
+   Name of the output dataset
+\end{manparametertable}
+
+\end{manroutinedescription}
+
+\manroutine {{\manheadstyle{TIMSIM}}}{Simulates a time series.}
+
+\begin{manroutinedescription}
+\manroutineitem {Description }{}
+
+Simulates an Asterix binned time series. This may consist of
+any number of sine waves, square waves, ramps or saw tooths with 
+added noise and poisson statistics.
+
+\manroutineitem {Parameters }{}
+\begin{manparametertable}
+\manparameterentry {{\mantt{READ}} }{{\mantt{OUT}} }{{\mantt{UNIV}}}
+   Name of the output NDF.
+\manparameterentry {{\mantt{READ}} }{{\mantt{AXIS}} }{{\mantt{\_LOGICAL}}}
+   Is the time axis to be taken from another file ?
+\manparameterentry {{\mantt{READ}} }{{\mantt{INP}} }{{\mantt{UNIV}}}
+   Input file name (if AXIS is true)
+\manparameterentry {{\mantt{READ}} }{{\mantt{DUR}} }{{\mantt{\_REAL}}}
+   Length of dataset (seconds)
+\manparameterentry {{\mantt{READ}} }{{\mantt{WID}} }{{\mantt{\_REAL}}}
+   Width of each time bin
+\manparameterentry {{\mantt{READ}} }{{\mantt{INIT}} }{{\mantt{\_REAL}}}
+   Initial time value
+\manparameterentry {{\mantt{READ}} }{{\mantt{OPT}} }{{\mantt{\_CHAR}}}
+   Options required in time series, e.g. Sin wave ....
+\manparameterentry {{\mantt{READ}} }{{\mantt{LEV1}} }{{\mantt{\_REAL}}}
+   Background level
+\manparameterentry {{\mantt{READ}} }{{\mantt{RAM1}} }{{\mantt{\_REAL}}}
+   Initial level for ramp
+\manparameterentry {{\mantt{READ}} }{{\mantt{RAM2}} }{{\mantt{\_REAL}}}
+   Final level for ramp
+\manparameterentry {{\mantt{READ}} }{{\mantt{NUMSIN}} }{{\mantt{\_INTEGER}}}
+   Number of sine waves
+\manparameterentry {{\mantt{etc...}} }{{\mantt{etc...}} }{{\mantt{etc...}}}
+\end{manparametertable}
+
+\end{manroutinedescription}
+
+\manroutine {{\manheadstyle{STREAMLINE}}}{Removes BAD quality data from a
+time series.}
+
+\begin{manroutinedescription}
+\manroutineitem {Description }{}
+
+Reduces the size of a time series by removing the bad quality data.
+This can be useful for very long, relatively blank datasets which 
+take ages to process because of all the paging required.
+
+\manroutineitem {Parameters }{}
+\begin{manparametertable}
+\manparameterentry {{\mantt{READ}} }{{\mantt{INP}} }{{\mantt{UNIV}}}
+   Name of the input NDF.
+\manparameterentry {{\mantt{READ}} }{{\mantt{OUT}} }{{\mantt{\_LOGICAL}}}
+   Name of the output NDF.
+
+\end{manparametertable}
+
+\end{manroutinedescription}
+
+\manroutine {{\manheadstyle{VARTEST}}}{Tests for variability.}
+
+\begin{manroutinedescription}
+\manroutineitem {Description }{}
+
+Tests a 1-d dataset for variability. It first finds the source count 
+rate from an input source and background time series and then finds 
+the probability that the least likely background point originated from 
+a constant source. Both the source and background data need to have
+a poissonian distribution for this technique to be valid.
+
+\manroutineitem {Parameters }{}
+\begin{manparametertable}
+\manparameterentry {{\mantt{READ}} }{{\mantt{INP}} }{{\mantt{UNIV}}}
+   Name of the input source file
+\manparameterentry {{\mantt{READ}} }{{\mantt{BACK}} }{{\mantt{UNIV}}}
+   Name of the input bckground file
+\manparameterentry {{\mantt{READ}} }{{\mantt{AREA}} }{{\mantt{\_REAL}}}
+   Ratio of the source box to background box areas
+\manparameterentry {{\mantt{WRITE}} }{{\mantt{PFUNC}} }{{\mantt{\_REAL}}}
+   Probability statistic.
+\end{manparametertable}
+
+\end{manroutinedescription}
+
+\newpage
+
+\section{Which application to use}
+
+Table 1 illustrates the response of the main applications
+to certain types of input data. This table shows the relative 
+performance of the power spectral applications, POWER, LOMBSCAR
+and CLEAN and the folding routines, FOLDLOTS and FOLDAOV. CLEAN
+is an algorithm which works by identifying the main peak in a
+power spectrum and then subtracting the effects of the window function
+on the resultant spectrum. It was written by Harry Lehto at Southampton
+(SOTON::HL) and is NOT currently available in the Asterix package, but
+is incuded here for reference. It is hoped that it will be available 
+in Asterix before too long, however, in the meantime users may contact 
+Harry directly to use the program.
+
+Each scenario in the table was simulated by adding one or more signals 
+to a certain amount of background noise, introducing poissonian 
+statistics and then removing a percentage of the data samples.
+A noise rate of 95 \% (e.g. scenario 3) means that the mean background 
+count rate was 95 per time bin and the amplitude of the signal was
+5 per time bin. Data gaps were set to be either periodic or random,
+e.g. '50 R' means that 50 percent of the datapoints were removed
+randomly from the dataset, '50 P' means that half the datapoints
+were removed in a periodic fashion, usually 5 points present, 5 missing,
+5 points present etc... Points refers to the number of datapoints
+present after the datagaps have been introduced. In the scenario
+column, '1 freq' means a single sine wave, '10,12 s' means two sine
+waves of period 10 and 12 s, square wave, saw tooth and delta
+function refer to the type of input signal.
+
+The key to the performance of each application is as follows:
+
+\begin{itemize}
+
+    \item[{\bf M}] - means that the signal was not detected by the program
+    \item[{\bf O}] - means that the signal was obviously detected but not quite
+             at the correct frequency.
+    \item[{\bf F}] - means that the signal WAS detected by the program
+    \item[{\bf G}] - means the signal was well detected by the program
+
+    \item[{\bf S}] - means that spurious peaks were present at a high level
+             in the periodogram
+
+    \item[{\bf *}] - means that this was demonstrably the best application
+             for this scenario 
+
+    \item[{\bf +}] - means that the performance of this application was
+             worse than that of the others in this scenario.
+
+\end{itemize}
+
+From table 1, it can be seen that the basic FFT routine, POWER,
+works well on periodic signals contained in evenly sampled datasets
+with NO gaps. LOMBSCAR and the CLEAN algorithm both perform well
+on broken datasets. CLEAN in general produces less spurious peaks
+than the other applications but in one or two cases, 
+LOMBSCAR is superior at resolving two 
+close frequencies. The folding programs behave acceptably but are
+only superior to the power spectrum applications for very sharp
+signals.
+
+\subsection{Execution times}
+
+Table 2 shows the execution times of the various programs on an
+unloaded Vaxstation 3100. It can be seen that POWER is much the 
+quickest program for more than a few thousand samples. LOMBSCAR
+is reasonably quick for upto 10000 samples as are the folding routines. 
+The version of CLEAN tested here is very slow for more than a few hundred
+samples and would ordinarily need to be run in batch for large
+datasets.
+
+\section{How to display the data}
+ Bob's bit
+
+
+\section{Example session}
+
+Example 1
+
+This example shows a period analysis of a ROSAT XRT source.
+
+1) Prepare the orbit file for the barycentric correction program.
+
+\begin{verbatim}
+$ XRTORB                         
+XRTORB  Version 1.4-2
+ORBFIL - Name of file containing XRT orbit data /@ORB/ > GX349_ORB
+\end{verbatim}
+
+2) Perform barycentric corrections on the raw event data
+
+\begin{verbatim}
+$ BARYCORR GX349_EVRAW
+ Input data file :
+  DISK$<SCRATCH>:[ASTERIX88]GX349_EVRAW.SDF;2
+There are 48944 events in this file
+SATCORR - Correct for satellite orbit /TRUE/ > 
+POS_FILE - Name of orbit file /'ATT_FILE.DAT'/ > 
+\end{verbatim}
+
+3) Bin up the event data
+
+\begin{verbatim}
+$ EVBIN
+ EVBIN Version 1.3-1
+INP - Enter name of input dataset /@GX349_EVRAW/ > 
+The available lists are:
+ 1  X_CORR         
+ 2  Y_CORR         
+ 3  X_DET          
+ 4  Y_DET          
+ 5  RAW_TIMETAG    
+ 6  PULSE_HEIGHT_CH
+ 7  CORR_PH_CH     
+
+Select the lists to be binned, by entering the index numbers.
+E.g. 1 2 3
+LISTS - Index numbers > 5
+
+ RAW_TIMETAG axis:
+
+BASE1 - Enter axis base value /326/ > 
+The RAW_TIMETAG data range is 326 to 128435
+The intrinsic width is 0.
+BINSIZE1 - Enter binsize /250.2129/ > 250.
+This will give 512 RAW_TIMETAG bins
+OUT - Enter name of the output dataset > GX349_TIM
+A total of 48722 events were binned out of 48944 input
+\end{verbatim}
+
+4) Exposure correct the binned dataset and set quality of bins
+   with zero exposure to bad.
+
+\begin{verbatim}
+$ XRTCORR
+XRTCORR version 1.4-6
+INP - Input dataset name /@GX349_TIMC/ > GX349_TIM
+OUT - Output dataset name /@GX349_TIMC/ > GX349_TIMC
+RTNAME - Rootname for calibration files /'[HIS.2142]X2142'/ > 
+Warning: insufficient eventrate data to calculate dead time correction for 464 t
+imebins
+Correction for these bins has been set to 1.0
+Warning: bad eventrate data for 18 timebins
+Correction for these bins has been set to 1.0
+Mean dead time correction : 1.001657
+Mean vignetting correction : 1.001776
+Mean scattering correction : 1.000025
+Mean wire correction : 1.388889
+\end{verbatim}
+
+5) Do a period search on this file from 1300 to 1800 seconds.
+
+\begin{verbatim}
+$ FOLDLOTS
+FOLDLOTS - V1.5-1
+INP - Enter name of input file /@GX349_TIMC/ > 
+Using 63 of the 512 input data values
+FOLD_OBJ - Enter name of output fold file /@GX349_FOLD/ > GX349_F
+CHI_OBJ - Enter name of output chi-sq vs. period file /@GX349_PER/ > GX349_P
+TIME UNITS are seconds
+Mean time increment : 250
+PERIOD - Enter start period for folding /1400/ > 1300.
+PINC - Enter increment period for folding /1/ > 
+NPER - Enter number of periods to fold at /400/ > 500
+EPOCH - Enter epoch of phase zero /6775.0817013889/ > 
+BINS - Enter number of phase bins /5/ > 
+WEIGHTED - Are weighted means required? /FALSE/ > 
+Best fit period = 1748 seconds
+Chi-sq value of best fit to mean = 14631.43
+\end{verbatim}
+
+6) Plot the periodogram produced
+
+\begin{verbatim}
+$ DRAW GX349_P VWS
+DRAW Version 1.0-14
+
+Dataset: DISK$<SCRATCH>:[ASTERIX88]GX349_P
+\end{verbatim}
+
+7) Perform a Fourier analysis on the data
+
+\begin{verbatim}
+$ LOMBSCAR
+LOMBSCAR Version 1.5-1
+INP - Input datafile /@GX349_TIMC/ > 
+Using 63 of the 512 input data values
+OFAC - Oversampling factor /4/ > 
+HIFAC - High frequency factor /1/ > 
+Peak found at 1.9569472E-06 of amplitude 2.629137 and significance 0.9910592
+Graphics device/type (? to see list): CANL
+OUT - Output datafile /@GX349_LS/ > 
+
+\end{verbatim}
+
+\section{Conclusions}
+I hope that the material in this document will soon become dated
+as better techniques are found. Please mail LTVAD::RDS if you 
+know of a time series application which is superior or faster than 
+those listed here in a given situation. Contributions involving
+working software of any standard are especially welcome.
+
+\section{Acknowledgements}
+Many thanks to those people who contributed software to this
+project, especially, David Holmgren, Koji Mukai, Harry Lehto,
+Andy Norton and Simon Duck.
+
+
+
+\include{tb_res}
+\include{tb_tim}
+
+\end{document}                                  % End

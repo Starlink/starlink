@@ -1,0 +1,78 @@
+*+  INC_XRTHEAD Include file defines header structure for an XRT observation
+*-
+        INTEGER MAXMAPS                           ! Maximum no of small maps
+          PARAMETER (MAXMAPS=1000)
+        INTEGER MAXRAN                            ! Maximum no of time ranges
+          PARAMETER (MAXRAN=2000)
+        INTEGER MAXSPOT                           ! Maximum number of hotspots
+          PARAMETER (MAXSPOT=100)
+*
+	STRUCTURE /XRT_HEAD/
+          DOUBLE PRECISION   AXIS_RA              ! Pointing direction RA
+          DOUBLE PRECISION   AXIS_DEC             !                    DEC
+          DOUBLE PRECISION   ROLLCI               ! Position angle of obs.
+          REAL               PIXEL                ! Pixel size (arcsecs)
+*
+          INTEGER            NTRANGE              ! Number of time ranges
+*
+          DOUBLE PRECISION   BASE_SCTIME          ! The spacecraft clock time
+*                                                 ! of time 0.0
+          DOUBLE PRECISION   TSTART(MAXRAN)       ! Start time of observation
+*                                                 ! offset from start time
+          DOUBLE PRECISION   TEND(MAXRAN)         ! End time of observation
+          INTEGER            ASTART               ! Range of amplitudes
+          INTEGER            AEND                 !  in the file
+          INTEGER            CSTART               ! Range of corrected amps
+          INTEGER            CEND                 !  in the file
+          INTEGER            XSTART               ! Range of X pixels
+          INTEGER            XEND                 !  in the file
+          INTEGER            YSTART               ! Range of Y pixels
+          INTEGER            YEND                 !  in the file
+          INTEGER            XDSTART              ! Range of X detector corrds
+          INTEGER            XDEND                !  in the file
+          INTEGER            YDSTART              ! Range of Y detector corrds
+          INTEGER            YDEND                !  in the file
+          INTEGER            NEVENTS(MAXMAPS)     ! Number of events in each map
+          INTEGER            EVSTART(MAXMAPS)     ! Start byte of each map.
+          INTEGER            IEVLEN               ! Length of event string
+          INTEGER            IRECLN               ! Number of bytes per record.
+          INTEGER            IFDSZX               ! Field width for X (pixels)
+          INTEGER            IFDSZY               ! Field width for Y (pixels)
+          INTEGER            XSMAP(MAXMAPS)       ! X pixel of top left hand
+                                                  ! corner of small map.
+          INTEGER            YSMAP(MAXMAPS)       ! Y pixel of left hand corner
+          INTEGER            ISMNUX               ! No of smaps in X direction
+          INTEGER            ISMNUY               ! No of smaps in Y direction
+          INTEGER            ISMTNU               ! Total no of smaps in file
+          INTEGER            IEVTNU               ! Total number of events
+          INTEGER            NHEAD                ! Total number - header recs.
+
+          CHARACTER*10       OBS_MODE             !
+          CHARACTER*10       OBC_MODE             !
+          CHARACTER*20       TARGET               ! Object being studied
+          CHARACTER*20       OBSERVER             ! Proposor of observation
+          CHARACTER*20       OBSERVATORY          ! ROSAT
+          CHARACTER*20       INSTRUMENT           ! XRT
+          CHARACTER*20       DETECTOR             ! HRI,PSPC...
+          CHARACTER*20       FILTER               ! Filter status
+          CHARACTER*80       TITLE                ! Title of observation
+          CHARACTER*11       XPUNITS              ! Units of X pixel
+          CHARACTER*11       YPUNITS              ! Units of Y pixel
+
+          DOUBLE PRECISION   BASE_MJD             ! Reference time of obs.
+          DOUBLE PRECISION   END_MJD              ! End time of obs. (MJD)
+          DOUBLE PRECISION   SCCONV               ! Conversion factor between
+*                                                 ! s/c time and U.T.
+          REAL               SKYCX, SKYCY         ! SKY pixel value of centre
+*
+* Hotspot information - currently HRI only
+          INTEGER            NSPOT                ! No. of hotspots
+          INTEGER            XSPOT(MAXSPOT)       ! X centre of hotspot
+          INTEGER            YSPOT(MAXSPOT)       ! Y centre of hotspot
+          INTEGER            SPOTRAD(MAXSPOT)     ! Radius of spot
+*                                                 !   in detector pixels
+* Additional information for Rationalised fits and general purposes
+          CHARACTER*25       SASS_DATE            ! SASS processing date
+          CHARACTER*5        ORIGIN               ! original file format
+        ENDSTRUCTURE
+

@@ -1,0 +1,17 @@
+#
+# Target to build the Fortran include file index
+#
+$(F_INCLUDE_IDX):	$(F_INCS) Makefile
+	@ if test -f $@; then \
+          rm -f $@;\
+        else :; fi
+	@ echo $(F_INCS) | awk '{for(i=1;i<=NF;i++) print $$i" $:PKG_ROOT:/$(HERE)/"$$i;}' > $@ 
+	@ chmod 644 $@
+
+$(INST_F_INCLUDE_IDX):
+	@ if test -f $@; then \
+          rm -f $@;\
+        else :; fi
+	@ echo $(F_INCS) | awk '{for(i=1;i<=NF;i++) print $$i" $(INSTALL_INC)/"$$i;}' > $@ 
+	@ chmod 644 $@
+

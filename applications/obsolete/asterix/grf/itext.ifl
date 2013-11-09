@@ -1,0 +1,26 @@
+interface ITEXT
+  parameter TEXT
+    position 1
+    type '_CHAR'
+    prompt 'Text'
+  endparameter
+  parameter XPOS
+    position 2
+    type '_REAL'
+    prompt 'X-position'
+    help 'X-position of start of text'
+  endparameter
+  parameter YPOS
+    position 3
+    type '_REAL'
+    prompt 'Y-position'
+    help 'Y-position of start of text'
+  endparameter
+  parameter ANGLE
+    position 4
+    type '_REAL'
+    default 0.0
+    prompt 'Angle'
+    help 'Angle of text anti-clockwise from horizontal'
+  endparameter
+endinterface

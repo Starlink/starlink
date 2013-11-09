@@ -1,0 +1,14 @@
+#! /bin/sh
+
+cmd="gcc -c -g -O hlpread.c -I/star/include"
+echo $cmd
+$cmd
+
+cmd="g77 -c -g -O -fno-second-underscore hlpread_top.f"
+echo $cmd
+$cmd
+
+cmd="g77 -o hlpread -g -O -static hlpread.o hlpread_top.o `hlp_link` `asterix_standalone`"
+echo $cmd
+$cmd
+

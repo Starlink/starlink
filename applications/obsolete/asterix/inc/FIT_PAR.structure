@@ -1,0 +1,65 @@
+*+  FIT_PAR - Global constants for fitting software
+*
+*    Description :
+*
+*     Global constants for FIT_ routines.
+*
+*    WARNING :
+*
+*     If you update this file please make equivalent changes to fit_par.h
+*
+*    Authors :
+*
+*     Trevor Ponman  (BHVAD::TJP)
+*
+*    History :
+*
+*      7 Jun 89 : NDSCMAX and NDETMAX added (TJP)
+*      1 Jun 92 : MAXGRIDVAL added (DJA)
+*     15 Jun 92 : FIT__CHISQ and FIT__LOGL added (DJA)
+*     11 Jan 94 : Increased MAKKEYLEN from 2 to 5 (DJA)
+*     24 Jan 94 : Added C version. Please ensure that if you update this
+*                 file you do the same to fit_par.h (DJA)
+*     18 May 94 : Added MAXTIE parameter (DJA)
+*     22 Nov 94 : Increased MAXIMP to 64 (DJA)
+*     24 Jul 95 : Added minimisation control names (DJA)
+*      9 Nov 95 : Added FIT__MXDIM
+*-
+
+      INTEGER 		NDSMAX			! Max # datasets
+	PARAMETER  	( NDSMAX = 32 )
+      INTEGER 		NDSCMAX			! Max # container files
+	PARAMETER  	( NDSCMAX = 32 )
+      INTEGER 		NDETMAX			! Max # detector spectra in
+	PARAMETER  	( NDETMAX = 8 )		! a single spectral set
+      INTEGER 		MAXCOMP			! Max # model components
+	PARAMETER  	( MAXCOMP = 30 )
+      INTEGER 		NPAMAX			! Max # model parameters
+	PARAMETER  	( NPAMAX = 60 )
+      INTEGER 		MAXIMP			! Max # implemented pmodels
+	PARAMETER  	( MAXIMP = 128 )
+      INTEGER 		MAXSTACK		! Max # pmodels which can be
+	PARAMETER  	( MAXSTACK = 8 )	! stacked during computation of  cmodel
+      INTEGER 		MAXTIE			! Max # parameter ties
+	PARAMETER  	( MAXTIE = 16 )		! 
+
+      REAL 		PARRANGE		! Range for scaled parameters
+	PARAMETER  	( PARRANGE = 20.0 )
+      INTEGER 		MAXKEYLEN               ! Maximum length of a model key
+        PARAMETER  	( MAXKEYLEN = 5 )
+
+*  Various maxima
+      INTEGER		FIT__MXDIM		! Max dataset dimensionality
+        PARAMETER	( FIT__MXDIM = 7 )
+
+*  Fit statistic selectors
+      INTEGER 		FIT__CHISQ              ! Chi-squared statistic 
+        PARAMETER  	( FIT__CHISQ = 1 )	! identifier
+      INTEGER 		FIT__LOGL               ! log(likelihood) statistic 
+        PARAMETER  	( FIT__LOGL = 2 )	! identifier
+
+*  Minimisation method selectors	
+      INTEGER		FIT__CURFIT		! Bevington curfit algorithm
+        PARAMETER	( FIT__CURFIT = 1 )
+      INTEGER		FIT__SIMANN		! Simulated annealing
+        PARAMETER	( FIT__SIMANN = 2)

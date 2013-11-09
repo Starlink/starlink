@@ -1,0 +1,11 @@
+*+  GTR_CMN  common block for storing transformation details
+
+
+      REAL VPORT(4,GMD__MXPLOT)		! viewport on display surface
+      LOGICAL ABS(GMD__MXPLOT)		! viewport specified in abs units (cm)
+      REAL WIND(4,GMD__MXPLOT)		! world coord window to map on viewport
+      LOGICAL SCALED(GMD__MXPLOT)	! axes scaled equally
+      INTEGER NPLOT			! current plot number
+
+      COMMON /GTR_CMN/ VPORT,ABS,WIND,SCALED,NPLOT
+

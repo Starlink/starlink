@@ -1,0 +1,16 @@
+interface HRESHAPE
+  parameter INP
+    type 'UNIV'
+    position 1
+    ppath 'GLOBAL'
+    association '<->GLOBAL.HDSOBJ'
+    prompt 'Object name'
+    help 'Name of object to be reshaped e.g. TOP.DATA_ARRAY'
+  endparameter
+  parameter DIMS
+    type '_INTEGER'
+    position 2
+    prompt 'New dimensions'
+    help 'eg [256 256 5] - number of dimensions must be the same'
+  endparameter
+endinterface

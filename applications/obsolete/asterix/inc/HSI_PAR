@@ -1,0 +1,13 @@
+*+  HSI_PAR - ASTERIX history constants
+*-
+
+
+*     Verbosity levels
+       INTEGER                   HSI__DISABLED
+         PARAMETER               ( HSI__DISABLED = 1 )
+       INTEGER                   HSI__QUIET
+         PARAMETER               ( HSI__QUIET = 2 )
+       INTEGER                   HSI__NORMAL
+         PARAMETER               ( HSI__NORMAL = 3 )
+       INTEGER                   HSI__VERBOSE
+         PARAMETER               ( HSI__VERBOSE = 4 )

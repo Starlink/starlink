@@ -1,0 +1,7 @@
+if test $AST_REV_CONTROL = "RCS"; then
+  co -l $1
+else
+  sccs edit $1
+fi
+jed $1
+replace $1

@@ -1,0 +1,101 @@
+#+ B U I L D
+#
+#  Build files needed for executable system given source
+#-
+#  build: Build the system.
+#  -----------------------
+#
+#  Compile the source and build the required files in the source
+#  directory.
+
+#  The build target first checks that the subsystem is not installed. If
+#  not, it then causes the .BUILT_$(SYSTEM) target to be made which ensures 
+#  that the subsystem has been built.
+
+build:
+	@ if test -f .INSTALLED_$(SYSTEM); then \
+           echo;\
+           echo \
+   "*** The $(SUBSYSTEM) subsystem is currently installed -- please use the";\
+           echo "    \"deinstall\" target before re-building it";\
+           echo;\
+        else \
+  	  for f in $(REV_SUBDIRS) " "; do \
+            if test -d "$$f"; then \
+              cd $$f; $(MAKE) build; cd .. ;\
+            fi ;\
+	  done; \
+          if $(MAKE) .BUILT_$(SYSTEM); then \
+           echo;\
+           echo ":INDENT:*** The $(SUBSYSTEM) subsystem has been built";\
+           echo;\
+          fi; \
+        fi
+
+#  The .BUILT_$(SYSTEM) target records the time of the most recent build which
+#  modified any of the built files. It depends on all the built files
+#  being up to date (which causes them to be built) and also on any
+#  software which generates information for the date stamp file.
+
+.BUILT_$(SYSTEM): $(BUILD_DIRS) $(BUILT_FILES)
+#
+#  Note the subsystem will need to be tested again.
+	@- if test -f .TESTED_$(SYSTEM); then rm .TESTED_$(SYSTEM); else :; fi
+#
+#  Enter information about the current machine and build environment
+#  into the date stamp file.
+	@ echo "Subsystem : $(SUBSYSTEM)"         >$(DATE_STAMP)
+	@ echo ""                             >>$(DATE_STAMP)
+	@ echo "Built by  : $(USER) on node `uname -n`" \
+                                              >>$(DATE_STAMP)
+	@ echo "On        : `date`"             >>$(DATE_STAMP)
+	@ echo ""                             >>$(DATE_STAMP)
+	@ echo \
+  "Machine   : `uname -m` running `uname -s` `uname -v` (release `uname -r`)" \
+                                              >>$(DATE_STAMP)
+	@ echo ""                             >>$(DATE_STAMP)
+	@ echo "make macros  :"                 >>$(DATE_STAMP)
+	@ echo ""                             >>$(DATE_STAMP)
+	@ echo "   SYSTEM    : $(SYSTEM)"       >>$(DATE_STAMP)
+	@ echo ""                             >>$(DATE_STAMP)
+	@ echo "   EXPORT    : $(EXPORT)"       >>$(DATE_STAMP)
+	@ echo "   INSTALL   : $(INSTALL)"      >>$(DATE_STAMP)
+	@ echo "   STARLINK  : $(STARLINK)"     >>$(DATE_STAMP)
+	@ echo ""                             >>$(DATE_STAMP)
+	@ echo "   AR_IN     : $(AR_IN)"        >>$(DATE_STAMP)
+	@ echo "   CC        : $(CC)"           >>$(DATE_STAMP)
+	@ echo "   CFLAGS    : $(CFLAGS)"       >>$(DATE_STAMP)
+	@ echo "   FC        : $(FC)"           >>$(DATE_STAMP)
+	@ echo "   FFLAGS    : $(FFLAGS)"       >>$(DATE_STAMP)
+	@ echo "   LINK      : $(LINK)"         >>$(DATE_STAMP)
+	@ echo "   RANLIB    : $(RANLIB)"       >>$(DATE_STAMP)
+	@ echo "   TAR_IN    : $(TAR_IN)"       >>$(DATE_STAMP)
+	@ echo "   TAR_OUT   : $(TAR_OUT)"      >>$(DATE_STAMP)
+	@ echo ""                             >>$(DATE_STAMP)
+#
+#  Record completion of the build.
+	@ touch .BUILT_$(SYSTEM)
+
+
+$(BUILD_DIRS):
+	@ mkdir -p $@
+
+#+ U N B U I L D
+#
+#  Remove everything not in the source release, ie. work and built files
+#-
+unbuild: clean
+	@- rm -f $(BUILT_FILES) $(DATE_STAMP) 1>/dev/null 2>/dev/null
+	@- rm -f .BUILT_$(SYSTEM) .TESTED_$(SYSTEM) 1>/dev/null 2>/dev/null
+	@- for f in $(REV_SUBDIRS) " "; do \
+          if test -d "$$f"; then \
+            cd $$f; $(MAKE) unbuild; cd .. ;\
+          fi ;\
+	done
+	@ echo "$(INDENT)*** Built files removed from $(SUBSYSTEM)"
+	@ echo
+
+#
+# Rebuild all built files from scratch
+#
+rebuild:	unbuild build clean

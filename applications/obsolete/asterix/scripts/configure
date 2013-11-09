@@ -1,0 +1,80 @@
+#!/bin/sh
+#
+echo " ";echo " "
+echo "   This is the Asterix configuration script.  It will"
+echo "   define the Asterix root directory and look for"
+echo "   various things on your system.  The result will be"
+echo "   a file called 'startup' in your current directory."
+echo "   You should define an alias which sources this file"
+echo "   in order to make Asterix commands available."
+echo " "
+#
+#
+# remove existing file
+rm -f startup 
+# find system type
+SYS=`uname`
+#
+#
+# set options according to type
+#if [ $SYS = "Linux" ]
+#  then
+#
+#elif [ $SYS = "OSF1" ]
+#  then
+#
+#elif [ $SYS = "SunOS" ]
+#  then
+#
+#else
+#
+#fi
+#
+ROOT=`pwd`
+#
+echo "Asterix root directory has been set to: "
+echo "   $ROOT";echo " "
+#
+#
+#
+#  Look for awish
+echo "Looking for Startcl..."
+TCLBIN=`which awish` 
+if [ -f "$TCLBIN" ] 
+  then
+  echo "...found it!"
+  STARROOT=`echo $TCLBIN|sed -e s%/bin/awish%""%g`
+  TCLLIB=$STARROOT/lib/startcl
+else
+  echo "Can't find Startcl in your current PATH - give me a clue..."
+  echo "Enter the root directory for your Starlink software........"
+  echo "eg /star "
+  read STARROOT
+  TCLBIN=$STARROOT/bin/awish
+  if [ -f "$TCLBIN" ]
+    then
+    echo "OK - got it now!"
+    TCLLIB=$STARROOT/lib/startcl
+  else
+    echo "Still can't find it!  I give up - you'll have to"
+    echo "do without it - you just won't be able to run any"
+    echo "GUIs.  If you subsequently install it, just come"
+    echo "back and re-run this script"
+    TCLBIN=
+    TCLLIB=
+  fi
+fi
+
+
+# make substitutions
+echo " "
+echo "Creating startup file"
+cat startup.local | sed -e s%@ROOT@%"${ROOT}"%g \
+                  | sed -e s%@TCLBIN@%"${TCLBIN}"%g \
+                  | sed -e s%@TCLLIB@%"${TCLLIB}"%g \
+                       > startup 
+echo "Done!"
+#
+#
+#
+exit

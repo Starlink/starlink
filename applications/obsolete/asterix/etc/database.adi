@@ -1,0 +1,80 @@
+defclass Database ADIbase {
+  NRECORD,                              ;; Number of records in database
+  STRUC         Params,                 ;; Database parameters
+  STRUC         Groups,                 ;; Field grouping info
+  STRUC         Fields,                 ;; Database fields
+  Records                               ;; Database records
+  }
+
+
+;;
+;; Class describing a database selection
+;;
+defclass DatabaseSelection Database {
+  OBJREF        Parent,                 ;; Parent database object
+		Index                   ;; Selected rows from parent
+  }
+
+
+defclass AsciiDatabase Database {
+		ParList,
+		FldList,
+		GrpList
+  }
+
+defclass DBiterator [ClusterSize=8] {
+  OBJREF        Database,               ;; The database being iterated over
+  INTEGER       Counter = 0             ;; Iterator position
+  }
+
+
+;;
+;; Class defining the attributes of a database column or field. Only
+;; the first 3 values are mandatory.
+;;
+defclass DBfieldData {
+		Name,                   ;; The name of the column
+		Shape,                  ;; Dimensions of the data values
+		Type,                   ;; The ADI type of the data
+		Genus,
+		Expression,
+		Null,
+		Exceptions,
+		ScaleFactor,
+		ZeroPoint,
+		Order,
+		Units,
+		ExternalFormat,
+		PrefDisplay,
+		Comment,
+		ModificationDate
+  }
+
+;;
+;; Class defining the attributes of a database parameter. Only
+;; the first 3 values are mandatory.
+;;
+defclass DBparamData {
+		Name,                   ;; The name of the parameter
+		Shape,                  ;; The dimensions of the value 
+		Type,                   ;; /
+		Units,
+		ExternalFormat,
+		PrefDisplay,
+		Comment,
+		Value,
+		ModificationDate
+  }
+
+defclass DBfdIt DBiterator, DBfieldData {
+		CurFld
+  }
+
+defclass DBpdIt DBiterator, DBparamData {
+		CurPar
+  }
+
+defclass DBrdIt DBiterator {
+  STRUC         CurRec
+  }
+

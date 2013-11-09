@@ -1,0 +1,49 @@
+#
+#  Package name
+#
+PKG_NAME       = asterix
+
+#
+#  Names of the parts of components in the directory hierarchy 
+#
+#  HERE is the full dir spec from root down to this Makefile
+#
+HERE	       = :HERE:
+#
+#  SUBSYSTEM is HERE with slashes converted to underscores
+#
+SUBSYSTEM      = :SUBSYS:
+#
+#  Module is SUBSYSTEM without the directory in which this Makefile resides
+#
+MODULE         = :MODULE:
+
+#
+#  Directories relative to this make file
+#
+ROOT           = :ROOT:
+MK             = $(ROOT)/mk
+BIN            = $(ROOT)/$(SYSTEM)/bin
+ETC	       = $(ROOT)/$(SYSTEM)/etc
+LIB            = $(ROOT)/$(SYSTEM)/lib
+DOC            = $(ROOT)/$(SYSTEM)/etc/docs
+SYS            = $(ROOT)/$(SYSTEM)/etc/sys
+DATES          = $(ROOT)/$(SYSTEM)/dates
+DEV_SCR        = :DEV_SCR:
+KER_SCR        = :KER_SCR:
+BUILD_DIRS     = $(LIB) $(ETC) $(BIN) $(SYS) $(DOC) $(DATES)
+
+SUBDIRS        = :SUBDIRS:
+REV_SUBDIRS    = :REV_SUBDIRS:
+
+#  Name of the date stamp file. This is used to record the time of the
+#  most recent build for use in subsequent operations that require it.
+#  There must be no rule for generating this file; it is only updated
+#  as a side effect of building the package.
+
+DATE_STAMP      = $(DATES)/$(SUBSYSTEM)_datestamp
+
+#
+#  A string to help with message indentation
+#
+INDENT         = ":INDENT:"

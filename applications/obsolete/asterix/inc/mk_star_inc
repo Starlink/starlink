@@ -1,0 +1,15 @@
+#! /bin/sh
+#
+# mk_star_link: make Starlink INCLUDE links
+#
+# 15/06/98: Richard Beard - Original version.
+
+LIST="chr_err dat_err dat_par fio_err fio_par grp_par nbs_par par_err par_par prm_par sae_par subpar_err"
+
+for STAR in $LIST
+do
+	AST=`echo $STAR | tr a-z A-Z`
+	echo $STAR $AST
+	rm -f $AST
+	ln -s /star/include/$STAR $AST
+done

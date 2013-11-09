@@ -1,0 +1,73 @@
+*+  XRT_CORR_SUB_CMN  common block for XRTCORR and XRTSUB
+*
+        INTEGER MAXTRNG,MAXERNG                   ! Max number of ranges
+          PARAMETER (MAXTRNG=2000,MAXERNG=256)
+*
+*
+        COMMON /XRT_C_CMN/
+     :    CHEAD_RTNAME,CHEAD_SHAPE,CHEAD_DET,
+     :    CHEAD_ORIGIN,CHEAD_FILTER
+
+          CHARACTER*80       CHEAD_RTNAME         ! Rotname of cal. files
+          CHARACTER*8        CHEAD_SHAPE(2)       ! Shape of box Circ. or Rect.
+          CHARACTER*8        CHEAD_DET            ! Detector PSPC or HRI
+          CHARACTER*3        CHEAD_ORIGIN         ! Data origin/type
+*                                                 ! US,MPE,RAT,OMD
+          CHARACTER*10       CHEAD_FILTER         ! Filter "OFF" or "BORON"
+
+        COMMON /XRT_D_CMN/
+     :    CHEAD_TMIN,CHEAD_TMAX,CHEAD_TSCALE,
+     :    CHEAD_SCBASE,CHEAD_EXPOS,
+     :    CHEAD_RA,CHEAD_DEC,CHEAD_ROLL
+
+          DOUBLE PRECISION   CHEAD_TMIN(MAXTRNG,2)    ! Start times of sort
+          DOUBLE PRECISION   CHEAD_TMAX(MAXTRNG,2)    ! Stop times of sort
+          DOUBLE PRECISION   CHEAD_TSCALE(MAXTRNG,2)  ! Width of time bins
+          DOUBLE PRECISION   CHEAD_SCBASE(2)          ! Base s/c start time.
+          DOUBLE PRECISION   CHEAD_EXPOS(2)           ! Total exposure time
+          DOUBLE PRECISION   CHEAD_RA(2),CHEAD_DEC(2) ! Pointing direction
+          DOUBLE PRECISION   CHEAD_ROLL(2)            ! Spacecraft roll angle
+*
+  
+      COMMON /XRT_R_CMN/
+     :    CHEAD_PHI,CHEAD_XCENT,CHEAD_YCENT,
+     :    CHEAD_XINNER,CHEAD_YINNER,CHEAD_XOUTER,CHEAD_YOUTER,
+     :    CHEAD_XSCALE,CHEAD_YSCALE,CHEAD_OFFAX,
+     :    CHEAD_PMIN,CHEAD_PMAX,CHEAD_PSCALE,
+     :    CHEAD_UPMIN,CHEAD_UPMAX,CHEAD_UPSCALE
+
+          REAL               CHEAD_PHI(2)            ! Box orientation (degs)
+          REAL               CHEAD_XCENT(2)          ! X centre of box
+          REAL               CHEAD_YCENT(2)          ! Y centre of box
+          REAL               CHEAD_XINNER(2)         ! Inner X radius
+          REAL               CHEAD_YINNER(2)         ! Inner Y radius
+          REAL               CHEAD_XOUTER(2)         ! Outer X radius
+          REAL               CHEAD_YOUTER(2)         ! Outer Y radius
+          REAL               CHEAD_XSCALE(2)         ! X pixel width (degs)
+          REAL               CHEAD_YSCALE(2)         ! Y pixel width (degs)
+          REAL               CHEAD_OFFAX(2)          ! Off axis angle (arcmin)
+          REAL               CHEAD_PMIN(MAXERNG,2)   ! Min and Max CORR PH used
+          REAL               CHEAD_PMAX(MAXERNG,2)
+          REAL               CHEAD_PSCALE(2)         ! PH width (if any)
+          REAL               CHEAD_UPMIN(MAXERNG,2)  ! Min, Max uncorr PH used
+          REAL               CHEAD_UPMAX(MAXERNG,2)
+          REAL               CHEAD_UPSCALE(2)        ! Uncorrected PH wid 
+*
+        COMMON /XRT_I_CMN/
+     :    CHEAD_NPRANGE,CHEAD_NTRANGE,CHEAD_NUPRANGE,CHEAD_ARDID
+
+          INTEGER            CHEAD_NPRANGE(2)
+          INTEGER            CHEAD_NTRANGE(2)      ! No of time ranges
+          INTEGER            CHEAD_NUPRANGE(2)
+          INTEGER            CHEAD_ARDID(2)	   ! ID of ARD sort description
+*
+        COMMON /XRT_L_CMN/
+     :    CHEAD_VIGNET,CHEAD_DTCORR,CHEAD_BACK
+
+          LOGICAL            CHEAD_VIGNET(2)  ! Have vignetting corrections
+*                                             ! already been performed ?
+          LOGICAL            CHEAD_DTCORR(2)  ! Have dead time corrections
+*                                             ! already been performed ?
+          LOGICAL            CHEAD_BACK(2)    ! Has background been
+*                                             ! subtracted ?
+

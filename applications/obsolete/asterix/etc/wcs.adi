@@ -1,0 +1,24 @@
+defclass Pixellation {		
+  DIMS,					;; Number of pixels per axis
+  BASE,					;; Base axis value in 1st pixel
+  SCALE,				;; Pixel width at reference position
+  AXPTR,				;; Ptrs to axis values
+  UCONV,				;; Converts from axis units -> radians
+  ROTATION				;; Position angle 
+  }
+
+defclass Projection {
+  NAME,					;; Name of the projection
+  PARAM,				;; Projection data
+  SPOINT, 				;; Position of special point
+  NPOINT,				;; Nominal pointing direction
+  LPOLE,				;; Longitude of NCP in native system
+  RMATRIX				;; 3x3 rotation matrix
+  }
+
+defclass CoordSystem {
+  NAME,					;; Name of the coord system
+  EQUINOX,				;; Equinox of mean equator
+  EPOCH,				;; Epoch
+  EFORM 				;; Besselian or Julian epoch
+  }

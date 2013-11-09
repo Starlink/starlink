@@ -1,0 +1,8 @@
+interface HRESET
+  parameter INP
+    type 'UNIV'
+    position 1
+    prompt 'Object to be reset'
+    help 'Object will be given a null value but not deleted'
+  endparameter
+endinterface

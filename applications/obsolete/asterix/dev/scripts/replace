@@ -1,0 +1,385 @@
+#!/bin/csh -f
+#
+#+ replace - replace Fortran module in text and object libraries
+#
+#   Description :
+#
+#    Replaces one or more Fortran or C modules in the specified library.
+#    This script is generally not called directly, but via the ASTERIX
+#    top-level "mk" script, which sets up the appropriate machine
+#    dependent variable translations. 
+#
+#    The first argument is the library root, eg. if equal to X then the text
+#    library is called X.t and the object library libX.a. The optional -o
+#    turns off replacement of the text module in the text library. The
+#    optional ROOT= enables the ASTERIX source tree to be specified externally.
+#
+#   Invokation :
+#
+#    replace sarchive library [ROOT=dir] [-o] [-c] modules...
+#
+#   History :
+#
+#    17 Aug 93 : Original (DJA)
+#     6 Apr 95 : Perform include file gathering only once
+#     4 Jun 98 : Cope with C++ and .F files (RB)
+#-
+
+#
+#
+#
+set starbin="/star/bin/"
+#
+# Get the library name
+#
+set sarchive=$1
+shift argv
+set lib=$1
+shift argv
+#
+# User supplied a ROOT?
+#
+if ( $1 =~ ROOT=* ) then
+  set ROOT=`echo $1 |sed s%ROOT=%%`
+  shift argv
+else
+  set ROOT="$AST_ROOT"
+endif
+#
+# Seeking object library
+#
+if ( "$lib" != "seek" ) then
+  set objlib="${ROOT}/${SYSTEM}/lib/lib${lib}.a"
+  set lastobjlib="$objlib"
+else
+  set firstlast=1
+endif
+#
+# Extract the source listing command
+#
+set scmd = "$SOURCE_LIST"
+if ( "$scmd" == '$(TAR_LIST)' ) then
+  set scmd = "$TAR_LIST"
+endif
+#
+# User wants text replacement turned off?
+#
+if ( "$1" == '-o' ) then
+  set trep="NO"
+  shift argv
+else
+  set trep="YES"
+endif
+#
+#  We only update the WWW documentation if we are running on the server machine
+#
+set wrep="NO"
+if ( ${?AST_WWW_SERVER} ) then
+  set wrep="YES"
+endif
+set wrep="NO"
+#
+#  Temporary directory defined?
+#
+set ftemp=" "
+set ctemp=" "
+if ( ${?TMPDIR} ) then
+  if ( ${?FTEMP} ) set ftemp=`echo $FTEMP|sed 's%$TMPDIR'%$TMPDIR%`
+  if ( ${?CTEMP} ) set ctemp=`echo $CTEMP|sed 's%$TMPDIR'%$TMPDIR%`
+endif
+#
+# Look for comment?
+#
+if ( "$1" == '-c' ) then
+  echo -n "Enter comment > "
+  set comment="$<"
+  set comment="-y$comment"
+  shift argv
+else
+  set comment='-yAuto-comment by replace'
+endif
+#
+# Processed source files
+#
+set sources=" "
+set objects=" "
+set nmods=0
+set gotincs=0
+#
+# For each command line argument
+#
+while ( $#argv > 0 )
+  echo Only $#argv files to go...
+#
+# Decide on Fortran or C or C++
+#
+  set rtn=$argv[1]
+  if ( $rtn == $rtn:r.f ) then
+    set lang="f"
+    set rtn=$rtn:r
+  else if ( $rtn == $rtn:r.F ) then
+    set lang="F"
+    set rtn=$rtn:r
+  else if ( $rtn == $rtn:r.c ) then
+    set lang="c"
+    set rtn=$rtn:r
+  else if ( $rtn == $rtn:r.C ) then
+    set lang="C"
+    set rtn=$rtn:r
+  else if ( $rtn == $rtn:r.g ) then
+    set lang="g"
+    set rtn=$rtn:r
+  else if ( -e $rtn:r.f ) then
+    set lang="f"
+  else if ( -e $rtn:r.f ) then
+    set lang="F"
+  else if ( -e $rtn:r.c ) then
+    set lang="c"
+  else if ( -e $rtn:r.C ) then
+    set lang="C"
+  else if ( -e $rtn:r.g ) then
+    set lang="g"
+  else
+    echo "No such module $rtn, aborting..."
+    exit
+  endif
+#
+# Construct the proper filename
+#
+  set rtn=${rtn}.${lang}
+#                                                                                 
+# Check less than 16 characters
+#
+  set rlen=`echo $rtn|awk '{print length($1)}'`
+  if ( $rlen > 15 ) then
+    echo "Module $rtn exceeds maximum length (15) and will be ignored"
+    goto nocando
+  endif
+#
+# Must exist in seek list if in that mode
+#
+  if ( "$lib" == "seek" ) then
+    if ( -e rsearch ) rm -f rsearch
+    grep -c "^${rtn}"\$ .*_list >rsearch
+    set nf=`fgrep -c ':1' rsearch`
+    if ( $nf == 0 ) then
+      echo "Module $rtn is not defined in the Makefile"
+      rm -f rsearch
+      goto nocando
+    else if ( $nf == 1 ) then
+      set lfile=`fgrep ':1' rsearch|awk -F':' '{print $1}'`
+      rm -f rsearch
+      set objlib=`head -1 $lfile`
+      set objlib="${ROOT}/${SYSTEM}/lib/lib${objlib}.a"
+      if ( $firstlast ) then
+        set firstlast=0
+        set lastobjlib="$objlib"
+      endif
+    else
+      echo "Ambiguous routine name $rtn"
+      rm -f rsearch
+      goto nocando
+    endif
+  endif
+#
+# If the module is not already in the source archive, then it must be present
+# in the sub-system Makefile or we have an error. Only need to do this when
+# we are updating the source archive.
+#
+#  if ( $trep == "YES" ) then
+#  if ( `$scmd ${sarchive} $rtn` != $rtn ) then
+# retry:
+#    set gline=`fgrep $rtn Makefile`
+#    if ( "$gline" == "" ) then
+#      echo "Module $rtn is not defined in the Makefile and is not present in the library"
+# loop:
+#      echo -n "[E]dit the Makefile or [Q]uit > " 
+#      set choice=$<
+#      if ( $choice == E || $choice == e ) then
+#        $EDITOR *.config
+#        GEN_make *.config
+#        goto retry
+#      else if ( $choice == Q || $choice == q ) then
+#        exit
+#      else
+#        goto loop
+#      endif
+#    endif 
+#  endif
+#  endif
+#
+# Replace source in text library
+#
+  if ( $trep == "YES" ) then
+#
+#  Test whether module has been removed for edit
+    if ( "$locked" == "" ) then
+        echo "Module $rtn has not been retrieved for edit access"
+        goto nocando
+    endif
+    if ( ${?AST_ARCHIVE} ) then
+      if ( -e $AST_ARCHIVE/$rtn ) then
+        chmod +w $AST_ARCHIVE/$rtn
+      endif
+      cp $rtn $AST_ARCHIVE/
+    endif
+
+#  Check in but keep copy
+    ci -u -q -m"$comment" $rtn
+
+    if ( $status ) then
+      echo "Some kind of failure happened inserting the text module. Perhaps the password"
+      echo "server is down. Aborting without updating module $rtn in archive."
+      goto abort
+    endif
+    chmod +w $rtn
+    if ( -e ${rtn}~ ) then
+      rm -f ${rtn}~
+    endif
+  endif
+#
+#  Level of optimisation
+#
+  set OPT=" "
+  if ( $rtn =~ prs_* ) then
+    set OPT="$FNOOP"
+  else if ( $rtn =~ adi*c ) then
+    set OPT="$FNOOP"
+  endif
+#
+#  GENERIC file?
+#
+  if ( $lang == "g" ) then
+    set types = `grep ${rtn:r} generic.settings | awk '{print $3}' | tr -d ','`
+    ln -s ${rtn} ${rtn:r}.gen
+    ${starbin}/generic -t $types ${rtn:r}.gen
+    rm -f ${rtn:r}.gen
+  endif
+#
+#  Update the WWW page?
+#
+  if ( $wrep == "YES" ) then
+    if ( $lang == "f" ) then
+      $AST_ROOT/dev/scripts/prolext ${rtn:r}.f
+    else if ( $lang == "F" ) then
+      $AST_ROOT/dev/scripts/prolext ${rtn:r}.F
+    else if ( $lang == "c" ) then
+      $AST_ROOT/dev/scripts/prolext ${rtn:r}.c
+    else if ( $lang == "C" ) then
+      $AST_ROOT/dev/scripts/prolext ${rtn:r}.C
+    else if ( $lang == "g" ) then
+      mv ${rtn:r}.f ${rtn:r}.F
+      fsplit ${rtn:r}.F >&/dev/null
+      set wspec=`echo ${rtn:r}|sed s%'x$'%'['$types']'%`.f
+      foreach gfile ($wspec)
+        $AST_ROOT/dev/scripts/prolext $gfile
+        rm -f $gfile
+      end
+      mv ${rtn:r}.F ${rtn:r}.f
+    endif
+  endif
+#
+#  Process includes for Fortran or generic Fortran modules
+#  if ( ($lang == "f") || ($lang == "g") ) then
+#    if ( ! $gotincs ) then
+#      $ROOT/dev/scripts/v2u_include -cf ROOT=$ROOT >&/dev/null
+#      set gotincs=1
+#    endif
+#    $ROOT/dev/scripts/v2u_include -f $rtn:r >&/dev/null
+#  endif
+#
+#  Compile it
+  if ( ($lang == "f") || ($lang == "g") ) then
+    $FC -c $FFLAGS $OPT $ftemp -I$ROOT/src/inc ${rtn:r}.f
+  else if ( $lang == "F" ) then
+    $FC -c $FFLAGS $OPT $ftemp -I$ROOT/src/inc ${rtn:r}.F
+  else if ( $lang == "c" ) then
+    $CC $CFLAGS $ctemp -D$SYSTEM -I$ROOT/src/inc -I/star/include $OPT -c $rtn
+  else if ( $lang == "C" ) then
+    $CPP $CPPFLAGS $ctemp -D$SYSTEM -I$ROOT/src/inc -I/star/include $OPT -c $rtn
+  endif
+#
+#  Compiled ok?
+#
+  if ( ! $status ) then
+#
+#    Remove processed generic source
+#
+    if ( $lang == "g" ) then
+      rm -f ${rtn:r}.f
+    endif
+#
+#  Add to processed module list if not in seek mode, or if seek mode library
+#  is same as last time
+    if ( ($lib != "seek") || ("$lastobjlib" == "$objlib") ) then
+      set sources="$sources $rtn"
+      set objects="$objects $rtn:r.o"
+      @ nmods++
+      if ( $nmods > 20 ) then
+        $AR_IN ${objlib} $objects
+        rm -f $objects $sources
+        set sources=" "
+        set objects=" "
+        set nmods=0
+      endif
+    else
+#
+# Randomise old library
+      if ${?RANLIB} then
+        $RANLIB ${lastobjlib}
+      endif
+#
+# Insert modules into old library
+      $AR_IN ${lastobjlib} $objects
+      rm -f $objects $sources
+#
+# One new module
+      set sources="$rtn"
+      set objects="$rtn:r.o"
+      set nmods=1
+
+    endif
+#
+  endif
+#
+#  Store the library we just used
+#
+  set lastobjlib="$objlib"
+#
+#  Next file
+#
+  nocando:
+  shift argv
+#
+end
+abort:
+#
+# Remove include file translation
+#
+if ( $gotincs && -e include.sub ) then
+  rm -f include.sub
+endif
+#
+# Put objects into library
+#
+if ( $nmods > 0 ) then
+  $AR_IN ${objlib} $objects
+  if ( $status ) then
+    echo "Error inserting object modules into library..."
+  endif
+  rm -f $objects $sources
+endif
+#
+# Randomise library (if RANLIB is defined)
+#
+if ${?RANLIB} then
+  $RANLIB ${objlib}
+endif
+
+
+
+
+
+
+
+

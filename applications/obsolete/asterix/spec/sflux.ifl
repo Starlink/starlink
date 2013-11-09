@@ -1,0 +1,64 @@
+INTERFACE SFLUX
+
+   PARAMETER MODEL
+      POSITION 1
+      TYPE 'LITERAL'
+      VPATH 'GLOBAL,DEFAULT'
+      PPATH 'GLOBAL'
+      ASSOCIATION '<->GLOBAL.FIT_MODEL'
+      PROMPT 'Model'
+      HELP 'Dataset containing spectrum model specification'
+   ENDPARAMETER
+
+   PARAMETER Z
+      TYPE '_REAL'
+      VPATH 'GLOBAL,DEFAULT'
+      PPATH 'GLOBAL'
+      ASSOCIATION '<->GLOBAL.REDSHIFT'
+      DEFAULT 0.0
+      PROMPT 'Redshift'
+      HELP 'Redshift to be applied to source spectrum'
+   ENDPARAMETER
+
+   PARAMETER NCH
+      TYPE '_INTEGER'
+      VPATH 'DEFAULT'
+      DEFAULT 1000
+      PROMPT 'Number of energy channels'
+      HELP 'Channels are used for discrete evaluation of integral (max.5000)'
+   ENDPARAMETER
+
+   PARAMETER LEN
+      POSITION 2
+      TYPE 'REAL'
+      PROMPT 'Lower energy limit'
+      HELP 'Flux integral starts at this energy (in keV)'
+   ENDPARAMETER
+
+   PARAMETER UEN
+      POSITION 3
+      TYPE 'REAL'
+      PROMPT 'Upper energy limit'
+      HELP 'Flux integral ends at this energy (in keV)'
+   ENDPARAMETER
+
+   PARAMETER SPLIT
+      TYPE '_LOGICAL'
+      PROMPT 'Print fluxes for subcomponents'
+      VPATH 'DEFAULT,PROMPT'
+      PPATH 'DEFAULT'
+      DEFAULT N
+      HELP 'If specified, each additive component will have fluxes printed'
+   ENDPARAMETER
+
+   PARAMETER EFLUX
+     TYPE '_REAL'
+     VPATH 'INTERNAL,NOPROMPT'
+   ENDPARAMETER
+
+   PARAMETER PFLUX
+     TYPE '_REAL'
+     VPATH 'INTERNAL,NOPROMPT'
+   ENDPARAMETER
+
+ENDINTERFACE

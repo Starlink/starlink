@@ -1,0 +1,37 @@
+ interface G_CURS
+   parameter PLOT
+     type '_INTEGER'
+     prompt 'Plot number'
+     help 'Plot number to read coordinates from'
+   endparameter
+   parameter MARK
+     type '_LOGICAL'
+     vpath 'DEFAULT'
+     default Y
+   endparameter
+   parameter BOX
+     type '_LOGICAL'
+     vpath 'DEFAULT'
+     default N
+   endparameter
+   parameter X1
+     type '_REAL'
+     position 1
+     vpath 'INTERNAL,NOPROMPT'
+   endparameter
+   parameter Y1
+     type '_REAL'
+     position 2
+     vpath 'INTERNAL,NOPROMPT'
+   endparameter
+   parameter X2
+     type '_REAL'
+     position 3
+     vpath 'INTERNAL,NOPROMPT'
+   endparameter
+   parameter Y2
+     type '_REAL'
+     position 4
+     vpath 'INTERNAL,NOPROMPT'
+   endparameter
+ endinterface

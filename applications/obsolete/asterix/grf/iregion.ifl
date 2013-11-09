@@ -1,0 +1,141 @@
+interface IREGION
+  parameter MODE
+    position 1
+    type '_CHAR'
+    prompt 'Mode'
+    help 'Type HELP for a full list'
+  endparameter
+  parameter SUBMODE
+    position 2
+    type '_CHAR'
+    default 'NEW'
+    prompt 'Sub-mode'
+    help 'Type HELP for a full list'
+  endparameter
+  parameter XC
+    position 3
+    type '_REAL'
+    ppath 'DYNAMIC'
+    prompt 'X centre'
+    help 'X-coord of centre in axis units'
+  endparameter
+  parameter YC
+    position 4
+    type '_REAL'
+    ppath 'DYNAMIC'
+    prompt 'Y centre'
+    help 'Y-coord of centre in axis units'
+  endparameter
+  parameter RAD
+    type '_REAL'
+    ppath 'DYNAMIC'
+    prompt 'Radius'
+    help 'Radius of circle in axis units'
+  endparameter
+  parameter IRAD
+    type '_REAL'
+    ppath 'DYNAMIC'
+    prompt 'Inner radius'
+    help 'Inner radius of annulus in axis units'
+  endparameter
+  parameter ORAD
+    type '_REAL'
+    ppath 'DYNAMIC'
+    prompt 'Outer radius'
+    help 'Outer radius of annulus in axis units'
+  endparameter
+  parameter XWID
+    type '_REAL'
+    ppath 'DYNAMIC'
+    prompt 'X width'
+    help 'Horizontal width of box in axis units'
+  endparameter
+  parameter YWID
+    type '_REAL'
+    ppath 'DYNAMIC'
+    prompt 'Y width'
+    help 'Vertical width of box in axis units'
+  endparameter
+  parameter ANGLE
+    type '_REAL'
+    prompt 'Angle to x-axis'
+    help 'Anticlockwise'
+  endparameter
+  parameter MAJOR
+    type '_REAL'
+    prompt 'Length of major axis'
+    help 'In world (axis) units'
+  endparameter
+  parameter MINOR
+    type '_REAL'
+    prompt 'Length of minor axis'
+    help 'In world (axis) units'
+  endparameter
+  parameter LEV
+    type '_REAL'
+    prompt 'Reference level'
+  endparameter
+  parameter TEXT
+    type '_CHAR'
+    prompt 'ARD input'
+    help '^filename or direct text input'
+  endparameter
+  parameter OUT
+    type 'LITERAL'
+    prompt 'Output filename'
+    help 'Name of object to hold region mask'
+  endparameter
+  parameter INP
+    type 'LITERAL'
+    prompt 'Input filename'
+    help 'Name of object containing region mask to be loaded'
+  endparameter
+  parameter MASK
+    type '_LOGICAL'
+    default Y
+    prompt 'Save copy of mask'
+  endparameter
+  parameter ARDFILE
+    type '_LOGICAL'
+    default Y
+    prompt 'Save copy of ARD text'
+  endparameter
+  parameter FILE
+    type '_CHAR'
+    prompt 'ARD file name'
+  endparameter
+  PARAMETER ROOTNAME
+    TYPE    '_CHAR'
+    PROMPT  'Rootname of calibration files'
+    PPATH   'CURRENT'
+    VPATH   'PROMPT'
+  ENDPARAMETER
+  PARAMETER ATTFIL
+    TYPE    '_CHAR'
+    PROMPT  'Name of attitude file'
+    PPATH   'DEFAULT'
+    VPATH   'PROMPT'
+  ENDPARAMETER
+  PARAMETER AUTO
+    TYPE    '_LOGICAL'
+    PROMPT  'Run in automatic mode'
+    DEFAULT  T
+    HELP 'AUTO uses the the attitude file  -  non-AUTO uses cursor'
+  ENDPARAMETER
+  PARAMETER EXTRA
+    TYPE    '_REAL'
+    PROMPT  'Extra width to give ring and spokes'
+    PPATH   'DEFAULT'
+    VPATH   'DEFAULT'
+    DEFAULT  0.0
+    HELP 'To widen ring a bit -  enter in degrees, roughly ~0.01'
+  ENDPARAMETER
+  PARAMETER TIMRANGE
+    TYPE    '_CHAR'
+    PROMPT  'Time ranges'
+    PPATH   'DYNAMIC,CURRENT,DEFAULT'
+    HELP    'e.g. 130.6:140.7 or M47890.4:M47891.0 or TIMES.DAT'
+    VPATH   'PROMPT'
+  ENDPARAMETER
+endinterface
+

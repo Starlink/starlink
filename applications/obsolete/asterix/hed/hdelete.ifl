@@ -1,0 +1,8 @@
+INTERFACE HDELETE
+  PARAMETER INP
+    TYPE 	'UNIV'
+    POSITION 	1
+    PROMPT	'Object to be deleted'
+    HELP	'Name of object to be deleted e.g. top.next.bottom'
+  ENDPARAMETER
+ENDINTERFACE

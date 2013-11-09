@@ -1,0 +1,37 @@
+INTERFACE SYSERR
+
+   PARAMETER INP
+      POSITION    1
+      TYPE        'LITERAL'
+      PPATH       'GLOBAL'
+      ASSOCIATION '<-GLOBAL.BINDS'
+      PROMPT      'Input dataset'
+      HELP        'Must be a binned dataset'
+   ENDPARAMETER
+
+   PARAMETER ERROR
+      POSITION    2
+      TYPE        '_REAL'
+      PPATH       'GLOBAL'
+      PROMPT      'Percentage error to be added'
+      HELP        'The % error to be added in quadrature to the existing errors of dataset'
+   ENDPARAMETER
+
+   PARAMETER OUT
+      POSITION    3
+      TYPE        'LITERAL'
+      ASSOCIATION '->GLOBAL.BINDS'
+      PPATH       'GLOBAL'
+      PROMPT      'Output dataset'
+      HELP        'The name of the output file with errors changed'
+   ENDPARAMETER
+
+   PARAMETER OVER
+      TYPE        '_LOGICAL'
+      DEFAULT     N
+      VPATH       'DEFAULT'
+      PROMPT      'Overwrite the input dataset? '
+      HELP        'If NO then a new dataset will be created for the output.'
+   ENDPARAMETER
+
+ENDINTERFACE

@@ -1,0 +1,16 @@
+interface ILABELS
+  parameter XLBL
+    type '_CHAR'
+    position 1
+    ppath 'DYNAMIC'
+    prompt 'X-label'
+    help 'New label for x-axis'
+  endparameter
+  parameter YLBL
+    type '_CHAR'
+    position 2
+    ppath 'DYNAMIC'
+    prompt 'Y-label'
+    help 'New label for y-axis'
+  endparameter
+endinterface

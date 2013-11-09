@@ -1,0 +1,1128 @@
+      
+     BINNED DATASET ACCESS ROUTINES                     R J Vallance
+     ------------------------------                     Revision 1.5
+                                                        1 MAR 1990
+
+
+      1.0 Introduction
+
+      The set of subroutines described here are designed to allow
+      access to binned data stored in NDF's, without the need to
+      know the intimate details of the structure of the NDF.  The
+      need to hard-code the names of data structure components into
+      application code is completely removed.  In order to make
+      applications written using these routines more generally
+      applicable, the routines will also handle the case where the
+      main input is a simple, primitive array.  In this case they
+      will behave as if given a structure containing only a
+      DATA_ARRAY component.  At present the routines will not handle
+      any of the exotic ARRAY types specified in SGP/38.1 with the
+      exception of the 'SPACED-ARRAY' used for storing regular axis
+      values.  They have been designed, however, to make the inclusion
+      of other types fairly straightforward should anyone ever find
+      the need to use them.  The only other restriction at present is that 
+      all quantities other than QUALITY are assumed to be REAL and 
+      are mapped as such.  This is done for ease of use in the most
+      common case, although it is possible for the programmer to use
+      the system to obtain a locator and then go their own way.
+
+
+      2.0 Functional subsets
+
+      The routines are divided by function into the following subsets:
+
+        i)    INIT/CLOSE   - initialise and tidy-up internal system
+        ii)   FIND/RELEASE - find in, add to, release from internal system
+        iii)  CHKxxx       - check existence and state of data component
+        iv)   LOCxxx       - obtain a locator to data component
+        v)    MAPxxx       - obtain a pointer to non-scalar component
+        vi)   UNMAPxxx     - release pointers and annul locators
+        vii)  GETxxx       - get value of scalar component
+        viii) PUTxxx       - write value of scalar component
+        ix)   CRExxx       - create data component
+        x)    COPxxx       - copy component between datasets
+
+
+      3.0 How they work
+
+      The heart of the system is a common block (/BDA_CMN/) which stores
+      what is currently known to the system about the datasets it is
+      currently dealing with.  At present it can deal with up to 20
+      concurrently, but this could easily be increased.  Heavy and 'illegal'
+      use is made of VAX Fortran structures and if at all squeamish
+      about such things you should avoid looking at the source code.
+      Such use is completely invisible to the applications programmer
+      using the routines.  When a call is made to a  routine  the
+      locator is checked against a list stored in the common block and
+      traded for an integer index; a new entry will be made in the list
+      if necessary.  That index is then passed to the INTernal version
+      of the subroutine which has the name BDA_xxxxx_INT, so that it
+      can access the relevant part of the common block.  All internal
+      communication between routines is done directly with the _INT
+      form.  Because things such as locators and pointers are stored
+      internally in the common block there is no need to pass them
+      between subroutines within an application.  Once a locator or
+      pointer has been obtained once, a further call to the BDA_
+      routine will simply pick the value straight from the common
+      block and pass it out to the application.  Quantities which are
+      liable to change during the execution of an application are
+      not stored but are obtained each time a routine is called;
+      this includes quantities such as object dimensions and state.
+
+
+      4.0 How to use them
+
+      The start of each application using the routines should include
+      a call to BDA_INIT() to initialise the internal common block.
+      This is essential if the application is part of a monolith.
+      Several of the routines may create temporary arrays using the 
+      ASTERIX dynamic memory system, so DYN_INIT() should also be called.
+      Alternatively use AST_INIT() to cover both of these.
+      Next a locator to the top level of the NDF (or primitive array)
+      needs to be obtained.  From this point there are two paths the
+      application programmer can take: the blind,default path, or the
+      safe, detailed path.  The first would look like -
+
+       CALL AST_INIT()					! initialise
+       CALL USI_ASSOCI('INP','READ',LOC,PRIM,STATUS)	! get input locator
+       CALL BDA_CHKDATA(LOC,OK,NDIM,DIMS,STATUS)	! check data
+        IF (OK) THEN					! if data present
+          CALL BDA_MAPDATA(LOC,'R',DPTR,STATUS)		! map data
+          CALL BDA_MAPVAR(LOC,'R',VPTR,STATUS)		! map variance
+          CALL BDA_MAPQUAL(LOC,'R',QPTR,STATUS)		! map quality
+          CALL BDA_MAPAXVAL(LOC,1,'R',APTR,STATUS)	! map axis values
+          CALL BDA_MAPAXWID(LOC,1,'R',WPTR,STATUS)	! map axis widths
+           .			
+           .						! do whatever
+           .
+        ENDIF
+        CALL AST_CLOSE()				! unmap and annul
+        END						! everything
+      
+
+      The only mandatory component is the data-array, so after checking
+      this and obtaining its dimensions all other quantities are mapped
+      blindly, taking invented defaults where the components are not
+      present.  After processing the input data, a call is made to the
+      global close-down/tidy-up routine  (AST_CLOSE includes a call to
+      BDA_CLOSE) which unmaps and annuls everything the system knows
+      about.  Clearly this represents the extreme of default behaviour.
+      Although economical in code it may behave inefficiently by creating
+      dynamic arrays and filling them with default values.  At the other
+      extreme is the robust path along which each quantity would be 
+      checked before mapping and a set of flags propagated through the 
+      application, such that VARIANCE, QUALITY etc are only processed 
+      if present.  The application may go even further and capitalise on 
+      cases where the axis values are regular and widths uniform by just 
+      GETing the appropriate scalar quantities and not expanding these 
+      into a dynamic array.  The application programmer must decide upon 
+      the appropriate balance between ease of coding (and therefore 
+      readability) and application robustness and efficiency.  The global 
+      CLOSE should be called at the end of each application as a 
+      catch-all; it's possible that explicit UNMAPs may have been 
+      by-passed because of bad STATUS.  However, it is recommended that 
+      quantities should be UNMAPped as soon as they are finished with to 
+      spread out the shutdown  overhead.  This is particularly important 
+      where dynamic arrays may have been created so that the virtual 
+      memory involved can be released for other use. When writing to
+      output objects by CREating or COPying the routines will overwrite
+      any existing components, so it is up to the programmer to check
+      that this is allowable.  The LOCate routines are provided to give 
+      the programmer the freedom to do things such as mapping with
+      different types, reshaping, slicing etc.  Any further locators
+      or pointers obtained must be tidied up explicitly by the application
+      because obviously the BDA_ system will know nothing about them.
+      Conversely, locators and pointers obtained with the BDA_ routines
+      must ONLY be tidied up by that system.  Explicitly annuling
+      locators obtained by the BDA system will upset the internal
+      record keeping and will almost certainly lead to unpredictable
+      behaviour.
+
+
+
+
+      5.0 Short list
+      
+      BDA_INIT       ()
+      BDA_CLOSE      ()
+
+      BDA_FIND       (LOC;ID,STATUS)
+      BDA_RELEASE    (LOC;STATUS)
+      
+      BDA_CHKDATA    (LOC;OK,NDIM,DIMS,STATUS)
+      BDA_CHKAXIS    (LOC,AXN;OK,STATUS)
+      BDA_CHKAXVAL   (LOC,AXN;OK,REG,NVAL,STATUS)
+      BDA_CHKAXWID   (LOC,AXN;OK,UNIF,NVAL,STATUS)
+      BDA_CHKVAR     (LOC;OK,NDIM,DIMS,STATUS)
+      BDA_CHKQUAL    (LOC;OK,NDIM,DIMS,STATUS)
+      BDA_CHKAST     (LOC;OK,STATUS)
+      BDA_CHKHEAD    (LOC;OK,STATUS)
+      BDA_CHKINSTR   (LOC;OK,STATUS)
+      BDA_CHKLIVE    (LOC;OK,STATUS)
+      BDA_CHKPSF     (LOC;OK,STATUS)
+      BDA_CHKERESP   (LOC;OK,STATUS)
+      BDA_CHKGRAF    (LOC;OK,STATUS)
+      
+      BDA_LOCDATA    (LOC;DLOC,STATUS)
+      BDA_LOCAXVAL   (LOC,AXN;ALOC,STATUS)
+      BDA_LOCAXWID   (LOC,AXN;WLOC,STATUS)
+      BDA_LOCVAR     (LOC;VLOC,STATUS)
+      BDA_LOCQUAL    (LOC;QLOC,STATUS)
+      BDA_LOCAST     (LOC;ALOC,STATUS)
+      BDA_LOCHEAD    (LOC;HLOC,STATUS)
+      BDA_LOCINSTR   (LOC;ILOC,STATUS)
+      BDA_LOCLIVE    (LOC;LLOC,STATUS)
+      BDA_LOCPSF     (LOC;PLOC,STATUS)
+      BDA_LOCERESP   (LOC;ELOC,STATUS)
+      BDA_LOCGRAF    (LOC;GLOC,STATUS)
+      
+      BDA_MAPDATA    (LOC,MODE;DPTR,STATUS)
+      BDA_MAPTDATA   (LOC,TYPE,MODE;DPTR,STATUS)
+      BDA_MAPAXVAL   (LOC,MODE,AXN;APTR,STATUS)
+      BDA_MAPAXWID   (LOC,MODE,AXN;WPTR,STATUS)
+      BDA_MAPVAR     (LOC,MODE,VPTR,STATUS)
+      BDA_MAPTVAR
+      BDA_MAPERR     (LOC,MODE,EPTR,STATUS)
+      BDA_MAPQUAL    (LOC,MODE;QPTR,STATUS)
+      BDA_MAPLQUAL   (LOC,MODE;BAD,QPTR,STATUS)
+      
+      BDA_UNMAPDATA  (LOC,STATUS)
+      BDA_UNMAPAXVAL (LOC,AXN,STATUS)
+      BDA_UNMAPAXWID (LOC,AXN,STATUS)
+      BDA_UNMAPAXIS  (LOC,AXN,STATUS)
+      BDA_UNMAPAXES  (LOC,AXN,STATUS)
+      BDA_UNMAPVAR   (LOC,STATUS)
+      BDA_UNMAPERR   (LOC,STATUS)
+      BDA_UNMAPAXES  (LOC,STATUS)
+      BDA_UNMAPQUAL  (LOC,STATUS)
+      BDA_UNMAPLQUAL (LOC,STATUS)
+      BDA_UNMAP      (LOC,STATUS)
+
+      
+      BDA_GETTITLE   (LOC;TITLE,STATUS)
+      BDA_PUTTITLE   (LOC,TITLE;STATUS)
+      BDA_GETLABEL   (LOC;LABEL,STATUS)
+      BDA_PUTLABEL   (LOC,LABEL;STATUS)
+      BDA_GETUNITS   (LOC;UNITS,STATUS)
+      BDA_PUTUNITS   (LOC,UNITS;STATUS)
+      BDA_GETMASK    (LOC;MASK,STATUS)
+      BDA_PUTMASK    (LOC,MASK;STATUS)
+      BDA_GETAXVAL   (LOC,AXN;BASE,SCALE,DIM,STATUS)
+      BDA_PUTAXVAL   (LOC,AXN,BASE,SCALE,DIM;STATUS)
+      BDA_GETAXWID   (LOC,AXN;WIDTH,STATUS)
+      BDA_PUTAXWID   (LOC,AXN,WIDTH;STATUS)
+      BDA_GETAXLABEL (LOC,AXN;LABEL,STATUS)
+      BDA_PUTAXLABEL (LOC,AXN,LABEL;STATUS)
+      BDA_GETAXUNITS (LOC,AXN;UNITS,STATUS)
+      BDA_PUTAXUNITS (LOC,AXN,UNITS;STATUS)
+      BDA_GETAXNORM  (LOC,AXN;NORM,STATUS)
+      BDA_PUTAXNORM  (LOC,AXN,NORM;STATUS)
+      
+      BDA_CREDATA    (LOC,NDIM,DIMS,STATUS)
+      BDA_CREAXES    (LOC,NAX,STATUS)
+      BDA_CREAXVAL   (LOC,AXN,REG,DIM,STATUS)
+      BDA_CREAXWID   (LOC,AXN,UNIF,DIM,STATUS)
+      BDA_CREVAR     (LOC,NDIM,DIMS,STATUS)
+      BDA_CREQUAL    (LOC,NDIM,DIMS,STATUS)
+      BDA_CREAST     (LOC,STATUS)
+      BDA_CREHEAD    (LOC,STATUS)
+      BDA_CREINSTR   (LOC,STATUS)
+      BDA_CRELIVE    (LOC,STATUS)
+      BDA_CREPSF     (LOC,STATUS)
+      BDA_CREERESP   (LOC,STATUS)
+      BDA_CREGRAF    (LOC,STATUS)
+      BDA_CREBDS     (LOC,NDIM,DIMS,REG,VFLAG,QFLAG,STATUS)
+
+      
+      BDA_COPDATA    (LOC1,LOC2,STATUS)
+      BDA_COPTEXT    (LOC1,LOC2,STATUS)
+      BDA_COPAXVAL   (LOC1,LOC2,AXN1,AXN2,STATUS)
+      BDA_COPAXWID   (LOC1,LOC2,AXN1,AXN2,STATUS)
+      BDA_COPAXTEXT  (LOC1,LOC2,AXN1,AXN2,STATUS)
+      BDA_COPAXIS    (LOC1,LOC2,AXN1,AXN2,STATUS)
+      BDA_COPAXES    (LOC1,LOC2,STATUS)
+      BDA_COPVAR     (LOC1,LOC2,STATUS)
+      BDA_COPQUAL    (LOC1,LOC2,STATUS)
+      BDA_COPMORE    (LOC1,LOC2,STATUS)
+      BDA_COPBDS     (LOC1,LOC2,STATUS)
+      
+      
+      6.0 Detailed list
+      
+      NOTE: In the descriptions below ';' has been used to 
+      separate the input & output arguments.
+      ------------------------------------------------------------
+      
+       BDA_INIT ()
+      
+      Initialises BDA_ internal common blocks - should be run
+      at beginning of application.
+      ------------------------------------------------------------
+      
+       BDA_CLOSE ()
+      
+       Unmaps, annuls and resets everything leaving common blocks
+       in a respectable state for following applications (in a
+       monolith).
+      ------------------------------------------------------------
+
+       BDA_FIND (LOC; ID, STATUS)
+        
+        LOC	<char>	locator to container structure or primitive array
+        ID	<int>	internal IDentifier
+
+       Looks to see if system already knows about dataset, otherwise adds
+       it to internal list.  Returns the internal IDentifier.  This is
+       mainly for internal use, but can be used in applications to allow
+       the programmer to call _INT versions of other routines directly.
+
+      -------------------------------------------------------------------
+
+       BDA_RELEASE (LOC; STATUS)
+      
+      	LOC	<char>	locator to container structure or primitive array
+
+       Unmaps and annuls all quantities associated with the dataset and
+       removes all memory of it from the system.  NOTE: it does not
+       annul the top level locator.
+
+      --------------------------------------------------------------------
+
+       BDA_CHKDATA (LOC; OK, NDIM, DIMS, STATUS)
+      
+      	LOC	<char>	locator to container structure or primitive array
+      	OK	<log>	true if data there and set
+      	NDIMS	<int>	dimensionality of data
+      	DIMS	<int>	dimensions of data
+      
+       If LOC points to a structure it looks for DATA_ARRAY within it
+       and checks if it contains values.  If it is there but doesn't
+       contain values then the dimensions are still returned, but OK
+       will be false.  At present DATA_ARRAY must be a primitive array.
+       Alternatively LOC may itself point directly to a primitive array,
+       in which case it behaves in the same way as described above.
+      ------------------------------------------------------------
+      
+       BDA_CHKAXIS (LOC, AXN; OK, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      	AXN	<int>	axis number
+      	OK	<log>	true if axis structure present
+      
+       Checks if specified axis structure exists. Doesn't check
+       if it contains anything. 
+      ------------------------------------------------------------
+      
+       BDA_CHKAXVAL (LOC, AXN; OK, REG, NVAL, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      	AXN	<int>	axis number
+      	OK	<log>	true if axis values present
+      	REG	<log>	true if axis values reg spaced
+      	NVAL	<int>	number of axis values
+      
+      Locates relevant part of AXIS structure and checks for
+      values.  If values are stored in a spaced array then they
+      are flagged as regular. 
+      ------------------------------------------------------------
+      
+       BDA_CHKAXWID (LOC, AXN; OK, UNIF, NVAL, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      	AXN	<int>	axis number
+      	OK	<log>	true if axis width values present
+      	UNIF	<log>	true if axis widths are uniform
+      	NVAL	<int>	number of WIDTH values (length of
+                        array, 1 for scalar, 0 if not present)
+      
+      Locates relevant part of AXIS structure and checks for
+      values. If WIDTH is a scalar it is flagged as uniform. 
+      ------------------------------------------------------------
+      
+       BDA_CHKVAR (LOC; OK, NDIM, DIMS, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      	OK	<log>	true if variance there and set
+      	NDIMS	<int>	dimensionality of variance array
+      	DIMS	<int>	dimensions of variance array
+      
+      Locates VARIANCE and checks if it contains values.
+      ------------------------------------------------------------
+      
+       BDA_CHKQUAL (LOC; OK, NDIM, DIMS, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      	OK	<log>	true if quality there and set
+      	NDIMS	<int>	dimensionality of quality
+      	DIMS	<int>	dimensions of quality
+      
+      Locates QUALITY structure and QUALITY array and checks
+      for values. 
+      ------------------------------------------------------------
+      
+       BDA_CHKAST (LOC; OK, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      	OK	<log>	true if ASTERIX structure present
+      
+      Checks if ASTERIX  structure exists.
+      ------------------------------------------------------------
+      
+       BDA_CHKHEAD (LOC; OK, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      	OK	<log>	true if HEADER structure present
+      
+      Checks if HEADER structure exists.
+      ------------------------------------------------------------
+      
+       BDA_CHKINSTR (LOC; OK, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      	OK	<log>	true if INSTRUMENT structure present
+      
+      Checks if INSTRUMENT structure exists. 
+      ------------------------------------------------------------
+      
+       BDA_CHKLIVE (LOC; OK, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      	OK	<log>	true if LIVE_TIME structure present
+      
+      Checks if LIVE_TIME structure exists. 
+      ------------------------------------------------------------
+      
+       BDA_CHKPSF (LOC; OK, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      	OK	<log>	true if PSF structure present
+      
+      Checks if PSF structure exists. 
+      ------------------------------------------------------------
+      
+       BDA_CHKERESP (LOC; OK, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      	OK	<log>	true if ENERGY_RESP structure present
+      
+      Checks if ENERGY_RESP structure exists. 
+      ------------------------------------------------------------
+      
+       BDA_CHKGRAF (LOC; OK, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      	OK	<log>	true if GRAFIX structure present
+      
+      Checks if GRAFIX structure exists. 
+      ------------------------------------------------------------
+      
+       BDA_LOCDATA (LOC; DLOC, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      	DLOC	<char>	locator to DATA_ARRAY
+      
+      Returns locator to DATA_ARRAY within structure pointed to by
+      LOC or passes back a cloned locator if LOC is primitive. Bad
+      STATUS is returned if neither are present.
+      ------------------------------------------------------------
+      
+       BDA_LOCAXVAL (LOC, AXN; ALOC, STATUS)
+      
+      	LOC	<char>	locator to container structure
+        AXN	<int>	axis number
+      	ALOC	<char>	locator to AXIS values
+      
+      Returns locator to DATA_ARRAY for relevant axis or bad
+      status if not there. 
+      ------------------------------------------------------------
+      
+       BDA_LOCAXWID (LOC, AXN; WLOC, STATUS)
+      
+      	LOC	<char>	locator to container structure
+        AXN	<int>	axis number
+      	WLOC	<char>	locator to axis WIDTH
+      
+      Returns locator to WIDTH for relevant axis or bad status
+      if not there. 
+      ------------------------------------------------------------
+      
+       BDA_LOCVAR (LOC; VLOC, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      	VLOC	<char>	locator to VARIANCE
+      
+      Returns locator to VARIANCE or bad status if not there. 
+      ------------------------------------------------------------
+      
+      BDA_LOCQUAL (LOC; QLOC, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      	QLOC	<char>	locator to QUALITY
+      
+      Returns locator to QUALITY (values) or bad status if not
+      there. 
+      ------------------------------------------------------------
+      
+      BDA_LOCAST (LOC; aLOC, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      	ALOC	<char>	locator to ASTERIX
+      
+      Returns locator to ASTERIX or bad status if not there. 
+      ------------------------------------------------------------
+      
+      BDA_LOCHEAD (LOC; HLOC, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      	HLOC	<char>	locator to HEADER
+      
+      Returns locator to HEADER or bad status if not there. 
+      ------------------------------------------------------------
+      
+       BDA_LOCINSTR (LOC; ILOC, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      	ILOC	<char>	locator to INSTRUMENT
+      
+      Returns locator to INSTRUMENT or bad status if not there.
+      ------------------------------------------------------------
+      
+       BDA_LOCLIVE (LOC; LLOC, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      	LLOC	<char>	locator to LIVE_TIME
+      
+      Returns locator to LIVE_TIME or bad status if not there. 
+      ------------------------------------------------------------
+      
+       BDA_LOCPSF (LOC; PLOC, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      	PLOC	<char>	locator to PSF
+      
+      Returns locator to PSF or bad status if not there. 
+      ------------------------------------------------------------
+      
+       BDA_LOCERESP (LOC; ELOC, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      	ELOC	<char>	locator to ENERGY_RESP
+      
+      Returns locator to ENERGY_RESP or bad status if not
+      there. 
+      ------------------------------------------------------------
+      
+      BDA_LOCGRAF (LOC; GLOC, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      	GLOC	<char>	locator to GRAFIX
+      
+      Returns locator to GRAFIX or bad status if not there. 
+      ------------------------------------------------------------
+      
+       BDA_MAPDATA (LOC, MODE; DPTR, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      	MODE	<char>	'READ', 'WRITE' or 'UPDATE'
+      	DPTR	<int>	pointer to DATA_ARRAY
+      
+      The DATA_ARRAY or primitive array is mapped for _REAL and the
+      pointer returned.  Bad STATUS is returned if there is no array
+      present. 
+      ------------------------------------------------------------
+      
+       BDA_MAPTDATA (LOC, TYPE, MODE; DPTR, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      	TYPE	<char>	type for mapping
+      	MODE	<char>	'READ', 'WRITE' or 'UPDATE'
+      	DPTR	<int>	pointer to DATA_ARRAY
+      
+      The DATA_ARRAY or primitive array is mapped with specified type
+      and the pointer returned.  Bad STATUS is returned if there is no 
+      array present. 
+      ------------------------------------------------------------
+      
+       BDA_MAPAXVAL (LOC, MODE, AXN; APTR, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      	MODE	<char>	'READ', 'WRITE' or 'UPDATE'
+        AXN	<int>	axis number
+      	APTR	<int>	pointer to DATA_ARRAY
+      
+      Returns pointer to values for specified axis.  If values
+      are in a spaced array they are unpacked into dynamic memory
+      first.  If no values are there then a dynamic array filled
+      the the values 1..n is created, but only for READ mode.
+      ------------------------------------------------------------
+      
+       BDA_MAPAXWID (LOC, MODE, AXN; WPTR, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      	MODE	<char>	'READ', 'WRITE' or 'UPDATE'
+        AXN	<int>	axis number
+      	WPTR	<int>	pointer to WIDTH
+      
+      Returns pointer to WIDTH for specified axis. If value is
+      scalar then it is expanded into a dynamic array.  If no value(s)
+      are present then widths are generated from the axis values with
+      the assumption that bin-boundaries fall half-way between axis
+      points - this will be valid for most cases, but should be used
+      with some caution.
+      ------------------------------------------------------------
+      
+       BDA_MAPVAR (LOC, MODE, VPTR, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      	MODE	<char>	'READ', 'WRITE' or 'UPDATE'
+      	VPTR	<int>	pointer to VARIANCE
+      
+      Returns pointer to VARIANCE.  If no VARIANCE is present then
+      a dynamic array is created and filled with a dummy VARIANCE
+      assuming Poisson statistics (=abs(data_value)).  The latter
+      only applies to READ mode.
+      ------------------------------------------------------------
+      
+       BDA_MAPTVAR (LOC, TYPE, MODE, VPTR, STATUS)
+      
+      	LOC	<char>	locator to container structure
+	TYPE	<char>  type for mapping
+      	MODE	<char>	'READ', 'WRITE' or 'UPDATE'
+      	VPTR	<int>	pointer to VARIANCE
+      
+      Maps VARIANCE with specified type and returns pointer.  If no
+      VARIANCE is present then bad status is returned.
+      ------------------------------------------------------------
+      
+       BDA_MAPERR (LOC, MODE, EPTR, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      	MODE	<char>	'READ', 'WRITE' or 'UPDATE'
+      	EPTR	<int>	pointer to ERRORs
+      
+      Creates dynamic array containing ERROR values generated
+      from VARIANCE. 
+      ------------------------------------------------------------
+      
+       BDA_MAPQUAL (LOC, MODE; QPTR, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      	MODE	<char>	'READ', 'WRITE' or 'UPDATE'
+      	QPTR	<int>	pointer to QUALITY values
+      
+      Returns pointer to QUALITY values mapped as _UBYTE.  If no
+      QUALITY values are present then a dynamic array filled with
+      good (00000000) values is created, but only for READ-mode.
+      ------------------------------------------------------------
+      
+       BDA_MAPLQUAL (LOC, MODE; BAD, QPTR, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      	MODE	<char>	'READ', 'WRITE' or 'UPDATE'
+        BAD	<log>	whether any bad QUALITY present
+      	QPTR	<int>	pointer to logical QUALITY flags
+      
+      Creates a dynamic logical array containing flags to good (.TRUE.)
+      or bad (.FALSE.) QUALITY.  A single logical argument (BAD) also
+      flags whether any bad QUALITY is present.      
+      ------------------------------------------------------------
+      
+       BDA_UNMAPDATA (LOC, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      
+      Unmaps and annuls DATA_ARRAY and associated ancilliary objects
+      such as TITLE etc.
+      ------------------------------------------------------------
+      
+       BDA_UNMAPAXVAL (LOC, AXN, STATUS)
+      
+      	LOC	<char>	locator to container structure
+        AXN	<int>	axis number
+      
+      Unmaps and annuls specified axis values and associated objects
+      such as LABEL etc.  If the original axis values were regular
+      and were mapped for mode other than READ, then it checks to
+      see if that is still valid and makes the appropriate changes
+      if not.
+      ------------------------------------------------------------
+      
+       BDA_UNMAPAXWID (LOC, AXN, STATUS)
+      
+      	LOC	<char>	locator to container structure
+        AXN	<int>	axis number
+      
+      Unmaps and annuls specified axis WIDTH.  If the original
+      width values were uniform (scalar) and were mapped for mode
+      other than READ then it checks to see if that is still true,
+      making any appropriate changes.
+
+      ------------------------------------------------------------
+      
+       BDA_UNMAPAXIS (LOC, AXN, STATUS)
+      
+      	LOC	<char>	locator to container structure
+        AXN	<int>	axis number
+      
+      Unmaps and annuls all components for specified axis.
+      ------------------------------------------------------------
+      
+       BDA_UNMAPAXES (LOC, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      
+      Unmaps and annuls everything to do with axes.
+      ------------------------------------------------------------
+      
+       BDA_UNMAPVAR (LOC, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      
+      Unmaps and annuls VARIANCE.
+      ------------------------------------------------------------
+      
+       BDA_UNMAPERR (LOC, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      
+      Deletes dynamic array containing ERROR and unmaps and
+      annuls VARIANCE. If ERROR was originally mapped with 'WRITE'
+      or 'UPDATE' mode then VARIANCE is first updated from values
+      contained in ERROR. 
+      ------------------------------------------------------------
+      
+       BDA_UNMAPQUAL (LOC, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      
+      Unmaps and annuls QUALITY values and structure.
+      ------------------------------------------------------------
+      
+       BDA_UNMAPLQUAL (LOC, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      
+      Deletes dynamic array containing QUALITY flags.
+      ------------------------------------------------------------
+      
+       BDA_UNMAP (LOC, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      
+      Unmaps and annuls all quantities within this structure and 
+      removes reference to it from internal list.
+      ------------------------------------------------------------
+      
+       BDA_GETTITLE (LOC; TITLE, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      	TITLE	<char>	contents of TITLE component
+      
+      Returns contents of TITLE component or blank if not there. 
+      ------------------------------------------------------------
+      
+       BDA_PUTTITLE (LOC, TITLE; STATUS)
+      
+      	LOC	<char>	locator to container structure
+      	TITLE	<char>	contents of TITLE component
+      
+      Writes value into TITLE component after creating it if
+      necessary. 
+      ------------------------------------------------------------
+      
+       BDA_GETLABEL (LOC; LABEL, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      	LABEL	<char>	data LABEL
+      
+      Returns contents of LABEL component or blank if not there. 
+      ------------------------------------------------------------
+      
+       BDA_PUTLABEL (LOC, LABEL; STATUS)
+      
+      	LOC	<char>	locator to container structure
+      	LABEL	<char>	data LABEL
+      
+      Writes a value into LABEL component after creating it if
+      necessary. 
+      ------------------------------------------------------------
+      
+       BDA_GETUNITS (LOC; UNITS, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      	UNITS	<char>	data UNITS
+      
+      Returns contents of UNITS component or blank if not there. 
+      ------------------------------------------------------------
+      
+       BDA_PUTUNITS (LOC, UNITS; STATUS)
+      
+      	LOC	<char>	locator to container structure
+      	UNITS	<char>	data UNITS
+      
+      Writes a value into UNITS component after creating it if
+      necessary. 
+      ------------------------------------------------------------
+      
+       BDA_GETAXVAL (LOC, AXN; BASE, SCALE, DIM, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      	AXN	<int>	axis number
+      	BASE	<real>	base value
+      	SCALE	<real>	increment
+      	DIM	<int>	dimension of axis
+      
+      Gets axis values stored as a spaced array otherwise
+      returns bad STATUS. 
+      ------------------------------------------------------------
+      
+       BDA_PUTAXVAL (LOC, AXN, BASE, SCALE, DIM; STATUS)
+      
+      	LOC	<char>	locator to container structure
+      	AXN	<int>	axis number
+      	BASE	<real>	base value
+      	SCALE	<real>	increment
+      	DIM	<int>	dimension of axis
+      
+      Writes axis values as a spaced array creating things if
+      necessary. 
+      ------------------------------------------------------------
+      
+       BDA_GETAXWID (LOC, AXN; WIDTH, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      	AXN	<int>	axis number
+      
+      Gets axis WIDTH if scalar otherwise returns bad status. 
+      ------------------------------------------------------------
+      
+       BDA_PUTAXWID (LOC, AXN, WIDTH; STATUS)
+      
+      	LOC	<char>	locator to container structure
+      	AXN	<int>	axis number
+        WIDTH	<real>	width
+      
+      Writes axis WIDTH  as a scalar value.
+      ------------------------------------------------------------
+      
+       BDA_GETAXLABEL (LOC, AXN; LABEL, STATUS)
+      
+      	LOC	<char>	locator to container structure
+        AXN	<int>	axis number
+      	LABEL	<char>	axis LABEL
+      
+      Returns contents of axis LABEL component or blank if not there. 
+      ------------------------------------------------------------
+      
+       BDA_PUTAXLABEL (LOC, AXN, LABEL; STATUS)
+      
+      	LOC	<char>	locator to container structure
+        AXN	<int>	axis number
+      	LABEL	<char>	axis LABEL
+      
+      Writes a value into axis LABEL component after creating
+      it if necessary. 
+      ------------------------------------------------------------
+      
+       BDA_GETAXUNITS (LOC, AXN; UNITS, STATUS)
+      
+      	LOC	<char>	locator to container structure
+        AXN	<int>	axis number
+      	UNITS	<char>	axis UNITS
+      
+      Returns contents of axis UNITS component or blank if not there. 
+      ------------------------------------------------------------
+       
+       BDA_PUTAXUNITS (LOC, AXN, UNITS; STATUS)
+      
+      	LOC	<char>	locator to container structure
+      	UNITS	<char>	axis UNITS
+        AXN	<int>	axis number
+      
+      Writes a value into axis UNITS component after creating
+      it if necessary. 
+      ------------------------------------------------------------
+      
+       BDA_GETAXNORM (LOC, AXN; NORM, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      	NORM	<char>	normalisation
+        AXN	<int>	axis number
+      
+      Reads a value from axis NORMALISED component or returns
+      default of .FALSE. if not present. 
+      ------------------------------------------------------------
+      
+       BDA_PUTAXNORM (LOC, AXN, NORM; STATUS)
+      
+      	LOC	<char>	locator to container structure
+      	NORM	<char>	normalisation
+        AXN	<int>	axis number
+      
+      Writes a value into axis NORMALISED component after
+      creating it if necessary. 
+      ------------------------------------------------------------
+      
+       BDA_GETMASK (LOC; MASK, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      	MASK	<byte>	QUALITY mask
+      
+      Reads value of BADBITS from QUALITY structure or returns
+      default of 11111111 (-1) if not there. 
+      ------------------------------------------------------------
+      
+       BDA_PUTMASK (LOC, MASK; STATUS)
+      
+      	LOC	<char>	locator to container structure
+      	MASK	<byte>	QUALITY mask
+      
+      Writes value into BADBITS component of QUALITY structure
+      after creating it if necessary. 
+      ------------------------------------------------------------
+      
+       BDA_CREDATA (LOC, NDIM, DIMS, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      	NDIMS	<int>	dimensionality of data
+      	DIMS	<int>	dimensions of data
+      
+      Creates a DATA_ARRAY component of the given dimensions.  Any
+      existing DATA_ARRAY will first be deleted.
+      ------------------------------------------------------------
+      
+       BDA_CREAXES (LOC, NAX, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      	NAX	<int>	number of axes
+      
+      Creates AXIS structure of specified dimension.  If an axis
+      structure already exists then the dimension will be altered
+      as necessary.
+      ------------------------------------------------------------
+      
+       BDA_CREAXVAL (LOC, AXN, REG, DIM, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      	AXN	<int>	axis number
+      	REG	<log>	true if axis values reg spaced
+      	DIM	<int>	dimension of axis values
+      
+      Creates DATA_ARRAY component of specified axis with type
+      according to value of REG.  Axis structure is also created
+      if necessary.   Any existing DATA_ARRAY will be deleted. 
+      ------------------------------------------------------------
+      
+       BDA_CREAXWID (LOC, AXN, UNIF, DIM, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      	AXN	<int>	axis number
+      	UNIF	<log>	true if widths uniform
+      	DIM	<int>	dimension of axis values
+       
+      Creates WIDTH component of specified axis with
+      dimensionality according to value of UNIF.  Axis structure
+      is also created if necessary.  Any existing WIDTH will be
+      deleted.
+      ------------------------------------------------------------
+      
+       BDA_CREVAR (LOC, NDIM, DIMS, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      	NDIMS	<int>	dimensionality of variance array
+      	DIMS	<int>	dimensions of variance array
+      
+      Creates VARIANCE component of given dimensions.  Any existing
+      VARIANCE will be deleted.
+      ------------------------------------------------------------
+      
+       BDA_CREQUAL (LOC, NDIM, DIMS, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      	NDIMS	<int>	dimensionality of quality
+      	DIMS	<int>	dimensions of quality
+      
+      Creates QUALITY structure and QUALITY array of specified
+      dimensions. Also writes default BADBITS component. Any
+      existing QUALITY will be deleted.
+      ------------------------------------------------------------
+      
+       BDA_CREAST (LOC, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      
+      Creates ASTERIX (and MORE) structure.  An existing component
+      will be deleted.
+      ------------------------------------------------------------
+      
+       BDA_CREHEAD (LOC, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      
+      Creates HEADER structure. (MORE and ASTERIX are also created
+      if necessary).  An existing component will be deleted.
+      ------------------------------------------------------------
+      
+       BDA_CREINSTR (LOC, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      
+      Creates INSTRUMENT structure. (MORE and ASTERIX are also created
+      if necessary).  An existing component will be deleted.
+      ------------------------------------------------------------
+      
+       BDA_CRELIVE (LOC, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      
+      Creates LIVE_TIME structure. (MORE and ASTERIX are also created
+      if necessary). An existing component will be deleted.
+      ------------------------------------------------------------
+      
+       BDA_CREPSF (LOC, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      
+      Creates PSF structure. (MORE and ASTERIX are also created
+      if necessary). An existing component will be deleted.
+      ------------------------------------------------------------
+      
+       BDA_CREERESP (LOC, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      
+      Creates ENERGY_RESP structure. (MORE and ASTERIX are also created
+      if necessary).  An existing component will be deleted.
+      ------------------------------------------------------------
+      
+       BDA_CREGRAF (LOC, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      
+      Creates GRAFIX structure. (MORE and ASTERIX are also created
+      if necessary).  An existing component will be deleted.
+      ------------------------------------------------------------
+      
+       BDA_CREBDS (LOC, NDIM, DIMS, REG, VFLAG, QFLAG, STATUS)
+      
+      	LOC	<char>	locator to container structure
+      	NDIMS	<int>	dimensionality of data
+      	DIMS	<int>	dimensions of data
+      	REG	<log>	whether axes reg spaced
+      	VFLAG	<log>	whether VARIANCE to be created
+      	QFLAG	<log>	whether QUALITY to be created
+      
+      Creates standard components of a Binned DataSet. Axes are
+      mandatory, VARIANCE and QUALITY optional. 
+      ------------------------------------------------------------
+      
+       BDA_COPDATA (LOC1, LOC2, STATUS)
+      
+      	LOC1	<char>	locator to input container structure
+      	LOC2	<char>	locator to output container structure
+      
+      Copies DATA_ARRAY from one dataset to another.  Ancilliary
+      stuff such as TITLE, LABEL etc are also copied.  Existing
+      components will be deleted.
+      ------------------------------------------------------------
+      
+       BDA_COPTEXT (LOC1, LOC2, STATUS)
+      
+      	LOC1	<char>	locator to input container structure
+      	LOC2	<char>	locator to output container structure
+      
+      Copies textual labels associated with the data. Existing
+      components will be deleted.
+      ------------------------------------------------------------
+      
+       BDA_COPAXVAL (LOC1, LOC2, AXN1, AXN2, STATUS)
+      
+      	LOC1	<char>	locator to input container structure
+      	LOC2	<char>	locator to output container structure
+      	AXN1	<int>	axis number in input
+        AXN2	<int>	axis number in output
+      
+      Copies values for specified axis in one dataset to a
+      specified axis in another. Existing components will be
+      deleted.
+      ------------------------------------------------------------
+      
+       BDA_COPAXWID (LOC1, LOC2, AXN1, AXN2, STATUS)
+      
+      	LOC1	<char>	locator to input container structure
+      	LOC2	<char>	locator to output container structure
+      	AXN1	<int>	axis number in input
+        AXN2	<int>	axis number in output
+      
+      Copies WIDTH for specified axis in one dataset to a
+      specified axis in another.  Existing components will 
+      be deleted.
+      ------------------------------------------------------------
+      
+       BDA_COPAXTEXT (LOC1, LOC2, AXN1, AXN2, STATUS)
+      
+      	LOC1	<char>	locator to input container structure
+      	LOC2	<char>	locator to output container structure
+      	AXN1	<int>	axis number in input
+        AXN2	<int>	axis number in output
+      
+      Copies textual labels for specified axis in one dataset to a
+      specified axis in another.  Existing components will be deleted.
+      ------------------------------------------------------------
+      
+       BDA_COPAXIS (LOC1, LOC2, AXN1, AXN2, STATUS)
+      
+      	LOC1	<char>	locator to input container structure
+      	LOC2	<char>	locator to output container structure
+      	AXN1	<int>	axis number in input
+        AXN2	<int>	axis number in output
+      
+      Copies all axis values, width, labels etc for specified axis 
+      in one dataset to a specified axis in another. Existing
+      components will be deleted.
+      ------------------------------------------------------------
+      
+       BDA_COPAXES (LOC1, LOC2, STATUS)
+      
+      	LOC1	<char>	locator to input container structure
+      	LOC2	<char>	locator to output container structure
+      
+      Copies all axis information from one dataset to another.
+      Existing axes will be deleted.
+      ------------------------------------------------------------
+      
+       BDA_COPVAR (LOC1, LOC2, STATUS)
+      
+      	LOC1	<char>	locator to input container structure
+      	LOC2	<char>	locator to output container structure
+      
+      Copies VARIANCE from one dataset to another.  Existing 
+      VARIANCE will be deleted.
+      ------------------------------------------------------------
+      
+       BDA_COPQUAL (LOC1, LOC2, STATUS)
+      
+      	LOC1	<char>	locator to input container structure
+      	LOC2	<char>	locator to output container structure
+      
+      Copies QUALITY from one dataset to another.  Existing QUALITY
+      will be deleted.
+      ------------------------------------------------------------
+      
+       BDA_COPMORE (LOC1, LOC2, STATUS)
+      
+      	LOC1	<char>	locator to input container structure
+      	LOC2	<char>	locator to output container structure
+      
+      Copies entire contents of MORE box from one dataset to another
+      with the exception of the GRAFIX component within ASTERIX.
+      ------------------------------------------------------------
+      
+       BDA_COPBDS (LOC1, LOC2, STATUS)
+      
+      	LOC1	<char>	locator to input container structure
+      	LOC2	<char>	locator to output container structure
+      
+      Copies all components of a binned dataset from one
+      container structure to another. 
+      ------------------------------------------------------------

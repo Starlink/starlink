@@ -1,0 +1,18 @@
+#! /bin/sh
+
+PROGS="hcopy.f hcreate.f hdelete.f hdir.f hdisplay.f hfill.f hget.f hmodify.f hread.f hrename.f hreset.f hreshape.f hretype.f htab.f htrace.f hwrite.f"
+
+for PROG in $PROGS
+do
+	echo $PROG
+	co -l $PROG
+
+	mv $PROG ${PROG}.tmp
+	cat ${PROG}.tmp | sed "s/ Version 2\..*\'/ Version 2.2-0\'/" > $PROG
+	grep " Version 2\." $PROG
+	rm -f ${PROG}.tmp
+
+	cp -f $PROG /lsoft1/asterix/work/allsrc
+	ci -m"Version 2.2-0 for PDA + ASTPDA (RB)" $PROG
+done
+

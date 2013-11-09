@@ -1,0 +1,17 @@
+Interface KSTAT
+   Parameter INP
+      Position    1
+      Type        'LITERAL'
+      ppath       'GLOBAL'
+      Association '<->GLOBAL.BINDS'
+      Prompt      'Enter input dataset'
+      Help        'This must be 1 dimensional.'
+   EndParameter
+
+   Parameter INP2
+      Position    2
+      Type        'LITERAL'
+      Prompt      'Enter another primitive array of the same size'
+      Help        'This will be correlated with the first'
+   EndParameter
+EndInterface

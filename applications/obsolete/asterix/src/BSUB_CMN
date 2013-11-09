@@ -1,0 +1,28 @@
+*+  BSUB_CMN - Common block definition for BSUB
+*-
+	INTEGER PSF_X, PSF_Y		!PSF dimensions
+
+	INTEGER NPIX_R_PSF		!no of pixels with R_PSF
+
+	REAL R_PSF, R_80  		!radii containing 68 and 95% of PSF
+
+	REAL R_90
+
+	REAL DETECTION_THRESH		!detection significance threshold
+
+	REAL PSF_MAX, PSF_INTEGRAL
+
+	REAL CONST(2),SLOPE(2)	!line for diagonal edge
+
+	INTEGER NHISTORY
+	INTEGER MAX_HIST
+	INTEGER NHISTMAX
+
+	CHARACTER*80 HISTORY(100)
+
+	LOGICAL LOUD
+
+	COMMON /BSUB_CMN/R_PSF,R_80,DETECTION_THRESH,
+     &  PSF_X,PSF_Y,PSF_INTEGRAL,PSF_MAX,NPIX_R_PSF,
+     &  NHISTORY,NHISTMAX,MAX_HIST,HISTORY,CONST,SLOPE,
+     &  R_90,LOUD

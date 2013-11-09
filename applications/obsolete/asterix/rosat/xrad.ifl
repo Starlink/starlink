@@ -1,0 +1,46 @@
+INTERFACE XRAD
+
+  PARAMETER OFFAX
+        POSITION 1
+               TYPE    '_REAL'
+               PROMPT  'OFF-axis angle (arcminutes)'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP 'Distance from the optical axis in arcminutes'
+            ENDPARAMETER
+
+     PARAMETER ENERGY
+               POSITION 2
+               TYPE    '_REAL'
+               PROMPT  'Mean photon energy (keV)'
+               PPATH   'CURRENT,DEFAULT'
+               VPATH   'PROMPT'
+               DEFAULT  0.5
+               HELP 'e.g. 1.0'
+            ENDPARAMETER
+
+     PARAMETER PFRAC
+               POSITION 3
+               TYPE    '_REAL'
+               PROMPT  'Fraction of counts'
+               PPATH   'CURRENT,DEFAULT'
+               VPATH   'PROMPT'
+               DEFAULT  0.9
+               HELP 'Fraction of counts to take the PSF out to, e.g. 0.95'
+            ENDPARAMETER
+
+     PARAMETER DISP
+               TYPE    '_LOGICAL'
+               PROMPT  'Display result ?'
+               PPATH   'CURRENT'
+               VPATH   'DEFAULT'
+               DEFAULT YES
+               HELP 'Write result to the screen ?'
+            ENDPARAMETER
+
+     PARAMETER PSFRAD
+               TYPE    '_REAL'
+               VPATH   'INTERNAL,NOPROMPT'
+            ENDPARAMETER
+
+ ENDINTERFACE

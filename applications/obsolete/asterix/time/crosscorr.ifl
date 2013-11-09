@@ -1,0 +1,41 @@
+Interface CROSSCORR
+   Parameter      INP1
+      position    1
+      type        'LITERAL'
+      ppath 'GLOBAL'
+      association '<-GLOBAL.BINDS'
+      prompt      'Input object 1'
+   EndParameter
+
+   Parameter      INP2
+      position    2
+      type        'LITERAL'
+      prompt      'Input object 2'
+   EndParameter
+
+   Parameter    OUT
+      position    3
+      type        'LITERAL'
+      association '->GLOBAL.BINDS'
+      prompt      'Output object'
+   EndParameter
+
+   Parameter    LAG
+      position    4
+      type        '_INTEGER'
+      prompt      'Maximum lag to be computed (in bins)'
+      help        'This must be less than the number of data points!'
+   EndParameter
+
+   Parameter    WEIGHTED
+      type        '_LOGICAL'
+      prompt      'Weighted cross-correlation?'
+      help        'Data variances will be used as weights in the usual way'
+   EndParameter
+
+   Parameter    NOISE
+      type        '_LOGICAL'
+      prompt      'Remove expected noise bias?'
+      help        'This will give an estimate of the source (not the data) XCF'
+   EndParameter
+EndInterface

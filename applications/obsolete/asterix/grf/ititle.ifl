@@ -1,0 +1,8 @@
+interface ITITLE
+  parameter TITLE
+    type '_CHAR'
+    position 1
+    prompt 'Title'
+    help 'New title to put at top of current display'
+  endparameter
+endinterface

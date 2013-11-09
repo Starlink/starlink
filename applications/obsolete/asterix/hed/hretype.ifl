@@ -1,0 +1,16 @@
+interface HRETYPE
+  parameter INP
+    type 'UNIV'
+    position 1
+    ppath 'GLOBAL'
+    association '<->GLOBAL.HDSOBJ'
+    prompt 'Object name'
+    help 'Name of object to be retyped e.g. TOP.NEXT.BOTTOM'
+  endparameter
+  parameter TO
+    type '_CHAR'
+    position 2
+    prompt 'New type'
+    help 'New type of object eg _INTEGER'
+  endparameter
+endinterface

@@ -1,0 +1,30 @@
+#
+#  Package name
+#
+PKG_NAME       = asterix
+
+#
+#  Sub-system id
+#
+SUBSYSTEM      = :MODULE:
+
+#  Name of the date stamp file. This is used to record the time of the
+#  most recent build for use in subsequent operations that require it.
+#  There must be no rule for generating this file; it is only updated
+#  as a side effect of building the package.
+
+DATE_STAMP      = $(DATES)/$(SUBSYSTEM)_datestamp
+
+#
+#  Directories relative to this make file
+#
+ROOT           = :ROOT:
+VERSION        = :VERSION:
+DESCRIPTION    = :DESCRIPTION:
+MODULE         = :MODULE:
+MK             = $(ROOT)/mk
+ITOOLS         = $(ROOT)/src/scripts
+BIN            = $(ROOT)/$(SYSTEM)/bin
+DATES          = $(ROOT)/$(SYSTEM)/dates
+ETC	       = $(ROOT)/$(SYSTEM)/etc
+SYS            = $(ROOT)/$(SYSTEM)/sys

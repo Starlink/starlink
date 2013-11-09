@@ -1,0 +1,47 @@
+INTERFACE GROW
+
+  PARAMETER INP
+    TYPE 'LITERAL'
+    POSITION 1
+    ASSOCIATION '<->GLOBAL.BINDS'
+    PPATH 'GLOBAL'
+    PROMPT 'Dataset to be grown into'
+  ENDPARAMETER
+
+  PARAMETER GROW
+    TYPE 'LITERAL'
+    POSITION 2
+    PROMPT 'Dataset to be copied'
+  ENDPARAMETER
+
+  PARAMETER AXIS
+    TYPE '_INTEGER'
+    POSITION 3
+    PROMPT 'Axis of input to grow into'
+  ENDPARAMETER
+
+  PARAMETER DATA
+    TYPE '_LOGICAL'
+    DEFAULT Y
+    VPATH 'DEFAULT'
+    PPATH 'DEFAULT'
+    PROMPT 'Copy data if present'
+  ENDPARAMETER
+
+  PARAMETER QUAL
+    TYPE '_LOGICAL'
+    DEFAULT Y
+    VPATH 'DEFAULT'
+    PPATH 'DEFAULT'
+    PROMPT 'Copy quality if present'
+  ENDPARAMETER
+
+  PARAMETER VAR
+    TYPE '_LOGICAL'
+    DEFAULT Y
+    VPATH 'DEFAULT'
+    PPATH 'DEFAULT'
+    PROMPT 'Copy variance if present'
+  ENDPARAMETER
+
+ENDINTERFACE

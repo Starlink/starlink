@@ -1,0 +1,9 @@
+interface TSLICE
+  parameter KEEP
+    type '_LOGICAL'
+    vpath 'DEFAULT'
+    default N
+    prompt 'Keep selected range'
+    help 'default is to discard it'
+  endparameter
+endinterface

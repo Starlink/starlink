@@ -1,0 +1,70 @@
+interface ICURRENT
+  parameter X
+    type '_REAL'
+    position 1
+    vpath 'INTERNAL,NOPROMPT'
+  endparameter
+  parameter Y
+    type '_REAL'
+    position 2
+    vpath 'INTERNAL,NOPROMPT'
+  endparameter
+  parameter NAME
+    type '_CHAR'
+    vpath 'INTERNAL,NOPROMPT'
+  endparameter
+  parameter RA
+    type '_DOUBLE'
+    vpath 'INTERNAL,NOPROMPT'
+  endparameter
+  parameter DEC
+    type '_DOUBLE'
+    vpath 'INTERNAL,NOPROMPT'
+  endparameter
+  parameter ELON
+    type '_DOUBLE'
+    vpath 'INTERNAL,NOPROMPT'
+  endparameter
+  parameter ELAT
+    type '_DOUBLE'
+    vpath 'INTERNAL,NOPROMPT'
+  endparameter
+  parameter L
+    type '_DOUBLE'
+    vpath 'INTERNAL,NOPROMPT'
+  endparameter
+  parameter B
+    type '_DOUBLE'
+    vpath 'INTERNAL,NOPROMPT'
+  endparameter
+  parameter X1
+    type '_REAL'
+    vpath 'INTERNAL,NOPROMPT'
+  endparameter
+  parameter X2
+    type '_REAL'
+    vpath 'INTERNAL,NOPROMPT'
+  endparameter
+  parameter Y1
+    type '_REAL'
+    vpath 'INTERNAL,NOPROMPT'
+  endparameter
+  parameter Y2
+    type '_REAL'
+    vpath 'INTERNAL,NOPROMPT'
+  endparameter
+  parameter RAD
+    type '_REAL'
+    vpath 'INTERNAL,NOPROMPT'
+  endparameter
+  parameter MODE
+    type '_CHAR'
+    vpath 'INTERNAL,NOPROMPT'
+  endparameter
+  parameter SUPPRESS
+    type '_LOGICAL'
+    vpath 'DEFAULT'
+    default N
+    prompt 'Suppress screen output'
+  endparameter
+endinterface

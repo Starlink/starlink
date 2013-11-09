@@ -1,0 +1,13 @@
+if test "$1" = ""; then
+  sdir="RCS"
+else
+  sdir="$1"
+  shift
+fi
+if test "$1" = ""; then
+  ls $sdir/ | fgrep ',v' | cut -f1 -d, 
+else
+  for i in "$*"; do
+    ls $sdir/ | fgrep $i',v' | cut -f1 -d,
+  done
+fi

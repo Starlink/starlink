@@ -1,0 +1,21 @@
+*+  HTRACE_CMN - HTRACE common block include file
+*
+*    Authors :
+*
+*     David J. Allan (ROSAT,BHVAD::DJA)
+*
+*    History :
+*
+*     15 Nov 93 : Original (DJA)
+*      4 May 94 : LUN changed to OCH (DJA)
+*-
+      INTEGER                   TYPIND		! Type field indentation
+      INTEGER                   VALIND		! Value field indentation
+      INTEGER                   OCH             ! AIO output channel id
+      INTEGER                   OUTWIDTH        ! Output page width
+      INTEGER                   NLINES          ! No. of lines for values
+      LOGICAL                   NEWLINE         ! Values on a new line?
+      LOGICAL                   EACHLINE        ! Each of value of char[] on NL
+
+      COMMON /HTRACE_CMN/       TYPIND, VALIND, OCH, OUTWIDTH,
+     :                          NLINES, NEWLINE, EACHLINE

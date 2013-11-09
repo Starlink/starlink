@@ -1,0 +1,28 @@
+INTERFACE THAW
+
+   PARAMETER MODEL
+      TYPE 'LITERAL'
+      VPATH 'GLOBAL,PROMPT'
+      PPATH 'GLOBAL'
+      ASSOCIATION '<->GLOBAL.FIT_MODEL'
+      PROMPT 'Model'
+      HELP 'Data object containing fit model specification'
+   ENDPARAMETER
+
+   PARAMETER PAR
+      POSITION 1
+      TYPE 'LITERAL'
+      PROMPT 'Parameter numbers'
+      HELP 'Numbers of parameters to be thawed (in square brackets if >1)'
+   ENDPARAMETER
+
+   PARAMETER VALS
+      POSITION 2
+      TYPE '_REAL'
+      PROMPT 'Parameter values'
+      VPATH 'DEFAULT'
+      DEFAULT !
+      HELP 'New values for parameters to be thawed (in square brackets if >1)'
+   ENDPARAMETER
+
+ENDINTERFACE

@@ -1,0 +1,106 @@
+INTERFACE SFIT
+
+   PARAMETER LIK
+      TYPE '_LOGICAL'
+      VPATH 'DEFAULT'
+      DEFAULT FALSE
+      HELP 'Likelihood (Y) or chis-squared (N) fit?'
+   ENDPARAMETER
+
+   PARAMETER INP
+      POSITION 1
+      TYPE 'LITERAL'
+      VPATH 'GLOBAL,PROMPT'
+      PPATH 'GLOBAL'
+      ASSOCIATION '<->GLOBAL.FIT_DATA'
+      PROMPT 'Data'
+      HELP 'Either a single spectrum, or an object containing refs to spectra'
+   ENDPARAMETER
+
+   PARAMETER Z
+      TYPE '_REAL'
+      VPATH 'GLOBAL,DEFAULT'
+      PPATH 'GLOBAL'
+      ASSOCIATION '<->GLOBAL.REDSHIFT'
+      DEFAULT 0.0
+      HELP 'Redshift to be applied to source spectrum'
+   ENDPARAMETER
+
+   PARAMETER MODEL
+      POSITION 2
+      TYPE 'LITERAL'
+      VPATH 'GLOBAL,PROMPT'
+      PPATH 'GLOBAL'
+      ASSOCIATION '<->GLOBAL.FIT_MODEL'
+      PROMPT 'Model'
+      HELP 'Name of data object containing spectral model specification'
+   ENDPARAMETER
+
+   PARAMETER MAX
+      POSITION 3
+      TYPE '_INTEGER'
+      DEFAULT 30
+      VPATH 'CURRENT,PROMPT'
+      PPATH 'CURRENT,DEFAULT'
+      PROMPT 'Max. no. of iterations'
+      HELP 'Program will terminate after N iterations, but can be reinvoked'
+   ENDPARAMETER
+
+   PARAMETER MINS
+      TYPE '_REAL'
+      VPATH 'CURRENT,DEFAULT'
+      PPATH 'CURRENT,DEFAULT'
+      DEFAULT 20.0
+      HELP 'Terminating chi-squared slope. Default 20. Smaller => more fussy.'
+   ENDPARAMETER
+
+   PARAMETER NUP
+      POSITION 4
+      TYPE '_INTEGER'
+      DEFAULT 3
+      VPATH 'CURRENT,PROMPT'
+      PPATH 'CURRENT,DEFAULT'
+      PROMPT 'Update interval'
+      HELP 'Number of its. between update of model file (and diagnostic o/p)'
+   ENDPARAMETER
+
+   PARAMETER MCTRL
+      TYPE '_LOGICAL'
+      DEFAULT FALSE
+      VPATH 'CURRENT,DEFAULT'
+      PPATH 'CURRENT,DEFAULT'
+      PROMPT 'Genetic fitting?'
+      HELP 'Minimisation control files no longer exist'
+   ENDPARAMETER
+
+   PARAMETER ERR
+      TYPE '_LOGICAL'
+      VPATH 'DEFAULT'
+      DEFAULT TRUE
+      HELP 'Approximate parameter errors to be calculated?'
+   ENDPARAMETER
+
+   PARAMETER OP
+      TYPE '_LOGICAL'
+      DEFAULT FALSE
+      PROMPT 'Output results?'
+      HELP 'If Y, then final fit results will be spooled or sent to a file'
+   ENDPARAMETER
+
+   PARAMETER FITOUT
+      TYPE 'LITERAL'
+      DEFAULT !
+      PPATH 'DYNAMIC,DEFAULT'
+      VPATH 'DYNAMIC,DEFAULT,PROMPT'
+      PROMPT 'File name'
+      HELP 'Named of output text file'
+   ENDPARAMETER
+
+   PARAMETER APPEND
+      TYPE '_LOGICAL'
+      VPATH 'DEFAULT'
+      DEFAULT FALSE
+      HELP 'Append output to existing file (FIT.OP by default)?'
+   ENDPARAMETER
+
+ENDINTERFACE

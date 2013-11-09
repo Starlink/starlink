@@ -1,0 +1,47 @@
+#!/bin/csh
+if ( "$1" == "obelix" ) then
+  set WDIR="/lsoft1/asterix/obelix/WWW/Programmer/Source"
+  shift argv
+else
+  set WDIR="/lsoft1/asterix/WWW/Programmer/Source"
+endif
+#
+set fil="$1"
+if ( ! -e $1 ) then
+  if ( $AST_REV_CONTROL == "RCS" ) then
+    co -q $1
+  else
+    sccs get -s $1
+  endif
+  set extracted="Y"
+endif
+set sdot="`fgrep -c '*.' $1`"
+if ( "${fil:r}.c" == "$fil" ) then
+  set sdot="`fgrep -c 'Keywords:' $1`"
+  set lang="c"
+else
+  set lang="f"
+endif
+set froot="$1"
+set froot="$froot:r"
+if ( "$sdot" != "0" ) then
+  set rtn="$1"
+  set rrtn="$rtn:r"
+  set rurtn=`echo $rtn:r|tr '[a-z]' '[A-Z]'`
+  set HTML="$WDIR/${rrtn}.html"
+  set INDX="$WDIR/Index/${rrtn}"
+  set CODE="$WDIR/Code/${rrtn}.html"
+  set ALGM="$WDIR/Algorithms/${rrtn}.html"
+  foreach i ($HTML $CODE $INDX $ALGM)
+    if ( -e $i ) rm -f $i
+  end
+  awk -f $AST_ROOT/dev/scripts/rtnhead2html.awk fname=$froot $1 >$HTML
+  awk -f $AST_ROOT/dev/scripts/rtnkeys.awk $1 >$INDX
+  awk -f $AST_ROOT/dev/scripts/rtnalgm.awk $1 >$ALGM
+  awk -f $AST_ROOT/dev/scripts/rtncode.awk fname=$froot $1 >$CODE
+else
+  echo "Routine $1 has old style comments"
+endif
+if ( ${?extracted} ) then
+  rm -f $1
+endif

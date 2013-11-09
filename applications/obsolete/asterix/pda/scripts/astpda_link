@@ -1,0 +1,45 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     astpda_link
+
+#  Purpose:
+#     Generate linker (ld) arguments for linking standalone version
+#     of Asterix PDA library.
+
+#  Type of Module:
+#     Shell script.
+
+#  Description:
+#     This script should be invoked by those building standalone
+#     applications which use PDA in order to generate the correct
+#     arguments for the compiler (or ld) command. The arguments
+#     generated are written to the standard output.
+
+#  Invocation:
+#     The script is normally invoked as part of a compiler command line,
+#     such as:
+#
+#        f77 -o program -L/star/lib `astpda_link` program.f
+
+#  Copyright:
+#     Copyright (C) 1997 University of Birmingham
+
+#  Authors:
+#     RB: Richard Beard (Birmingham)
+#     {enter_new_authors_here}
+
+#  History:
+#     23 Jun 1997 (RB):
+#        Original version.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+      echo -lastpda
+
+#  End of script.

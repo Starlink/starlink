@@ -1,0 +1,47 @@
+INTERFACE EVPHASE
+
+  PARAMETER     INP
+    POSITION    1
+    TYPE        'LITERAL'
+    PPATH       'GLOBAL'
+    ASSOCIATION '<-GLOBAL.EVDS'
+    PROMPT      'Enter name of input file'
+    HELP        'This must be an event dataset'
+  ENDPARAMETER
+
+  PARAMETER     OUT
+    POSITION    2
+    TYPE        'LITERAL'
+    ASSOCIATION '->GLOBAL.EVDS'
+    PROMPT      'Enter name of output file'
+  ENDPARAMETER
+
+  PARAMETER     COEFF1
+    POSITION    3
+    TYPE        '_DOUBLE'
+    PROMPT      'First Ephemeris coeff, date of phase zero'
+    HELP        'This must be the Julian Date, in days, of an occurrence of phase zero.'
+  ENDPARAMETER
+
+  PARAMETER     COEFF2
+    POSITION    4
+    TYPE        '_DOUBLE'
+    PROMPT      'Second Ephemeris coeff, period'
+    HELP        'Units are days.'
+  ENDPARAMETER
+
+  PARAMETER     COEFF3
+    POSITION    5
+    TYPE        '_DOUBLE'
+    PROMPT      'Third Ephemeris coeff, first derivative of period wrt time'
+    HELP        'Rate of change of period, unitless'
+  ENDPARAMETER
+
+  PARAMETER TLIST
+    TYPE '_CHAR'
+    DEFAULT 'RAW_TIMETAG'
+    PPATH 'DEFAULT'
+    PROMPT 'Name of list whic htime tags events'
+  ENDPARAMETER
+
+ENDINTERFACE

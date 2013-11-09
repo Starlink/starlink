@@ -1,0 +1,6 @@
+*+  GFX_PIX_CMN - global variables for pixel plotting routines
+
+      REAL G_BOUNDS(2,256)		! bounds for histogram
+					! equalisation
+      INTEGER G_NBOUNDS
+      COMMON /GFX_PIX_CMN/ G_BOUNDS,G_NBOUNDS

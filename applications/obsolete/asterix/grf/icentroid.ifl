@@ -1,0 +1,37 @@
+interface ICENTROID
+  parameter X
+    position 1
+    type '_REAL'
+    ppath 'DYNAMIC'
+    prompt 'X centre'
+    help 'X-coord of centre in axis units'
+  endparameter
+  parameter Y
+    position 2
+    type '_REAL'
+    ppath 'DYNAMIC'
+    prompt 'Y centre'
+    help 'Y-coord of centre in axis units'
+  endparameter
+  parameter RAD
+    position 3
+    type '_REAL'
+    prompt 'Radius'
+    help 'Radius of circle in axis units'
+  endparameter
+  parameter ITER
+    position 4
+    type '_INTEGER'
+    default 1
+    prompt 'Iterations'
+    help 'Number of iterations to find centroid'
+  endparameter
+  parameter XCENT
+    type '_REAL'
+    vpath 'INTERNAL,NOPROMPT'
+  endparameter
+  parameter YCENT
+    type '_REAL'
+    vpath 'INTERNAL,NOPROMPT'
+  endparameter
+endinterface

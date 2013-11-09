@@ -1,0 +1,76 @@
+INTERFACE STATISTIX
+
+   PARAMETER INP
+      POSITION  1
+      TYPE      'LITERAL'
+      VPATH     'PROMPT'
+      PPATH     'GLOBAL'
+      ASSOCIATION '<-GLOBAL.BINDS'
+      PROMPT    'Enter the name of the input object/file: '
+      HELP      'This must either be a primitive object, or a binned dataset.'
+   ENDPARAMETER
+
+   PARAMETER DEV
+      POSITION  2
+      TYPE      'LITERAL'
+      VPATH     'DEFAULT'
+      DEFAULT   'C'
+      PROMPT    'Enter name of output device: '
+      HELP      'P = Printer; N = New file; O = Old file; Anything else = terminal'
+   ENDPARAMETER
+
+   PARAMETER WEIGHT
+      TYPE      '_LOGICAL'
+      VPATH     'DEFAULT'
+      DEFAULT   YES
+      PROMPT    'Do you want the VARIANCE information used (y/n)?'
+      HELP      'If yes, then will weight the calculations accordingly.'
+   ENDPARAMETER
+
+   PARAMETER USEGRP
+      TYPE      '_LOGICAL'
+      VPATH     'DEFAULT'
+      DEFAULT   YES
+      PROMPT    'Use grouping information'
+      HELP      'Responding N will ignore the grouping data in the file'
+   ENDPARAMETER
+
+   PARAMETER QUALITY
+      TYPE      '_LOGICAL'
+      VPATH     'DEFAULT'
+      DEFAULT   YES
+      PROMPT    'Do you want the DATA_QUALITY information used (y/n)?'
+      HELP      'If yes, then all points with non-zero quality will be ignored.'
+   ENDPARAMETER
+
+   PARAMETER SIGMA
+      TYPE      '_DOUBLE'
+      PROMPT    'Enter cutoff sigma N (or ! to exit program) '
+      HELP      'Points greater than N sigma from current mean will be ignored'
+   ENDPARAMETER
+
+   PARAMETER DISPLAY
+      TYPE      '_LOGICAL'
+      PPATH     'CURRENT,DEFAULT'
+      DEFAULT   Y
+      PROMPT    'Display ignored data points '
+      HELP      'Answer Y to display them at the terminal'
+   EndPARAMETER
+
+   PARAMETER LOOP
+      TYPE      '_LOGICAL'
+      VPATH     'DEFAULT'
+      DEFAULT   NO
+      PROMPT    'Do you want to loop over the data ?'
+      HELP      'If yes, then points greater than N sigma from the current mean may be ignored.'
+   ENDPARAMETER
+
+   PARAMETER ONCE
+      TYPE	'_LOGICAL'
+      VPATH	'DEFAULT'
+      DEFAULT	NO
+      PROMPT	'Do SIGMA looping only once?'
+      HELP	'If yes, then the program will not prompt further.'
+   ENDPARAMETER
+
+ENDINTERFACE

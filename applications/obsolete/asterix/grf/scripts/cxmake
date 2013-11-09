@@ -1,0 +1,50 @@
+#!/bin/csh
+set mcol=128
+set ncol=128
+set one="0$1"
+#
+# Remove existing log file if present
+#
+if ( -e xmake.elog ) then
+  rm -f xmake.log
+endif
+#
+# Choose device name
+#
+switch ( $one )
+ case "0":
+ case "01":
+   set dev="xwindows"
+   breaksw
+ case "02":
+   set dev="x2windows"
+   breaksw
+ case "03":
+   set dev="x3windows"
+   breaksw
+ case "04":
+   set dev="x4windows"
+   breaksw
+ default: 
+   echo "Illegal argument to cxmake, should be 2,3 or 4"
+   exit
+   breaksw
+endsw
+
+loop:
+/star/bin/xmake -bg black -fg white -col $ncol $dev >&xmake.elog
+set colsfailed=" `cat xmake.elog|grep 'colour cells'`"
+if ( "$colsfailed" =~ *Unable* ) then
+  @ ncol /= 2
+  set jump=1
+else
+  set jump=0
+  if ( ! -z xmake.elog ) then
+    cat xmake.elog | grep -v 'older revision'
+  endif
+endif
+rm -f xmake.elog
+if ( $jump ) goto loop
+if ( $ncol != $mcol ) then
+  echo "Failed to create window with $mcol colours, but managed $ncol"
+endif

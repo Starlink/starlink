@@ -1,0 +1,115 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     Isys
+
+#  Purpose:
+#     Starts the image processing GUI
+
+#  Type of Module:
+#     Shell script
+
+#  Usage:
+#     isys [filename]
+
+#  Description:
+#     This command starts the ASTERIX image processing GUI.
+
+#  Authors:
+#     DJA: D.J.Allan (Jet-X, University of Birmingham)
+#     {enter_new_authors_here}
+
+#  History:
+#     22 Jan 1996 (DJA):
+#        Original version.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+#  Check for Startcl
+if test "$AST_TCL_BIN" = ""; then
+  echo "!! Cannot start Isys; Startcl not found on system."
+  exit 1
+fi
+ 
+#  Check that AST_BIN is around.
+if test "$AST_BIN" = ""; then
+  echo "!! Cannot start Isys; AST_BIN environment variable not set."
+  exit 1
+fi
+
+#
+# Export these environment variables to the GUI
+#
+export AST_MACHINE
+export AST_HELP
+export AST_BIN
+export AST_ETC
+export XANBIN
+export XANADU
+
+#  Notes:
+#     The ${1+"$@"} passes on any command line arguments? Perhaps $0
+#     is also required?
+
+#  Check all the necessary elements are available and start up the GUI.
+
+if test -r $AST_ETC/IsysMain.tcl ; then
+
+#  Try to stop problems with the AMS rendevous files by creating a
+#  new directory as ADAM_USER.
+  OLD_ADAM_USER=${ADAM_USER:-"${HOME}/adam"}
+  ADAM_USER=${OLD_ADAM_USER}/isys_$$
+  export ADAM_USER    
+
+#  Make sure directory exists.
+  if test -f $ADAM_USER; then
+    rm -r -f $ADAM_USER
+  fi
+  mkdir -p $ADAM_USER
+
+#  Copy the existing applications files that we're interested in
+#  grfmono and GLOBAL.sdf. Since the interface runs as an 
+#  I task these are almost unnecessary and will not be updated... 
+#  (so perhaps could be dispensed with?).
+  (cp $OLD_ADAM_USER/grf_mono.sdf $OLD_ADAM_USER/GLOBAL.sdf $ADAM_USER) 2>/dev/null
+
+#  Make sure we clean this up on exit.
+  trap 'rm -r -f $ADAM_USER 2>/dev/null' 0 1 2 3 9 15
+
+#  Trap pids of all existing ASTERIX graphics processes
+  oldmonos=`ps | grep grf_m | grep -v grep | awk '{print $1}'`
+
+#  And run up the interface.
+  $AST_TCL_BIN $AST_ETC/IsysMain.tcl $*
+
+#  Trap pids of any new ASTERIX graphics processes.
+  newmonos=`ps | grep grf_m | grep -v grep | awk '{print $1}'`
+
+#  Kill any new processes.
+  for newpid in "$newmonos"; do
+    dokill=1
+    for oldpid in "$oldmonos"; do
+      if test "$newpid" = "$oldpid"; then
+        dokill=0
+      fi
+    done
+    if test "$dokill" = "1"; then 
+      kill -KILL $newpid
+    fi
+  done
+
+#  The directory might still exist because it is NFS mounted and write
+#  locks were not released until the rogue process was deleted
+  if test -f $ADAM_USER; then
+    rm -r -f $ADAM_USER
+  fi
+
+  exit
+else
+  echo "!! Cannot start Isys; failed to locate $AST_ETC/IsysMain.tcl."
+  exit 1
+fi

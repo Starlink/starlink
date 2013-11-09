@@ -1,0 +1,27 @@
+help:	help_public help_:CLASS: help_develop
+
+help_public:	
+	@ echo "Targets supported by this Makefile are:"
+	@ echo
+	@ echo "Public targets:"
+	@ echo
+	@ echo "  help          - Displays this list"
+	@ echo "  build		- Build files in this directory, and all"
+	@ echo "                  its sub-directories"
+	@ echo "  unbuild       - Reverse the build target"
+	@ echo "  check         - Write build status of module component"
+	@ echo "  clean         - Clean any temporary files created during the build"
+	@ echo "  install       - Install files into Starlink tree"
+	@ echo "  deinstall     - Reverse the install target, returning"
+	@ echo "                  to the built state"
+	@ echo " "
+
+help_develop:	
+	@ echo "Developer targets (not invoked by build system):"
+	@ echo
+	@ echo "  makes         - Rebuild all Makefiles in sub-directories"
+	@ echo "  developer     - Turn an unbuilt system into a developer system"
+	@ echo "  get_s_files   - List source files"
+	@ echo "  get_b_files   - List built files in built state"
+	@ echo "  showtree      - List directory structure"
+	@ echo

@@ -1,0 +1,51 @@
+ INTERFACE XRTRESP
+
+     PARAMETER INP
+               POSITION 1
+               TYPE    'LITERAL'
+               PROMPT  'Name of source file'
+               PPATH   'GLOBAL,CURRENT'
+               ASSOCIATION '<->GLOBAL.BINDS'
+               HELP 'Enter dataset name without an extension'
+            ENDPARAMETER
+
+     PARAMETER RESPFILE
+               POSITION 2
+               TYPE    '_CHAR'
+               PROMPT  'Response matrix file'
+               PPATH   'DYNAMIC'
+               HELP 'Enter dataset name without the .SDF extension'
+            ENDPARAMETER
+
+     parameter HRI
+       type '_LOGICAL'
+       vpath 'DEFAULT'
+       default F
+       prompt 'Attach HRI response matrix'
+       help 'Default is PSPC response'
+     endparameter
+
+
+
+
+     PARAMETER ERASE
+               TYPE    '_LOGICAL'
+               PROMPT  'Erase existing response structure ?'
+               PPATH   'DEFAULT'
+               DEFAULT N
+               HELP ' "YES" will cause the old response matrix to be replaced'
+            ENDPARAMETER
+
+     PARAMETER PH_DIM
+               TYPE    '_INTEGER'
+               PROMPT  'Enter code for the PH axis'
+               HELP 'Enter one of the above integers'
+            ENDPARAMETER
+
+     PARAMETER CONTINUE
+               TYPE    '_LOGICAL'
+               PROMPT  'Continue execution'
+               HELP 'Please enter "YES", if you have enough disk space'
+     ENDPARAMETER
+
+ ENDINTERFACE

@@ -1,0 +1,28 @@
+INTERFACE SSHOW
+
+   PARAMETER MODEL
+      POSITION 1
+      TYPE 'LITERAL'
+      VPATH 'GLOBAL,PROMPT'
+      ASSOCIATION '<-GLOBAL.FIT_MODEL'
+      PROMPT 'Model'
+      HELP 'Data object to contain spectral model specification'
+   ENDPARAMETER
+
+   PARAMETER DEV
+     POSITION 2
+     TYPE '_CHAR'
+     VPATH 'PROMPT'
+     PPATH 'DEFAULT'
+     DEFAULT 'TERMINAL'
+     PROMPT 'Output to'
+     HELP 'Valid responses :TERMINAL,PRINTER,OLDFILE,NEWFILE,filename'
+   ENDPARAMETER
+
+   PARAMETER GEN
+      TYPE 'LITERAL'
+      DEFAULT 'SPEC'
+      VPATH 'DEFAULT,NOPROMPT'
+   ENDPARAMETER
+
+ENDINTERFACE

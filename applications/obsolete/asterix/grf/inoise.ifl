@@ -1,0 +1,10 @@
+	INTERFACE INOISE
+	    PARAMETER SDEV
+               POSITION 1
+               TYPE    '_REAL'
+               PROMPT  'Enter the standard deviation of the gaussian noise'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               HELP 'The routine produces noise of this stand. dev with a mean of zero'
+            ENDPARAMETER
+	ENDINTERFACE

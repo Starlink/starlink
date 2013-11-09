@@ -1,0 +1,6 @@
+*+ SPEC_CMN - general common block for spectral fitting
+
+      LOGICAL S_CACHE			! do GCB caches exist
+
+      COMMON /SPEC_CMN/ S_CACHE
+*-

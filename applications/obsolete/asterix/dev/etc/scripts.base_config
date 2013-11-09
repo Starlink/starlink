@@ -1,0 +1,22 @@
+#
+# Declaration for scripts Makefile class
+#
+files PRIVATE_CSH_SRC
+files PRIVATE_ICL_SRC
+files PRIVATE_SH_SRC
+files PRIVATE_TCL_SRC
+
+files PUBLIC_CSH_SRC
+files PUBLIC_ICL_SRC
+files PUBLIC_SH_SRC
+files PUBLIC_TCL_SRC
+
+files PUBLIC_CSH_BIN %prefix {$(BIN)/} PUBLIC_CSH_SRC
+files PUBLIC_ICL_BIN %prefix {$(BIN)/} PUBLIC_ICL_SRC
+files PUBLIC_SH_BIN  %prefix {$(BIN)/} PUBLIC_SH_SRC
+files PUBLIC_TCL_BIN %prefix {$(BIN)/} PUBLIC_TCL_SRC
+
+files PRIVATE_CSH_BIN %prefix {$(ETC)/} PRIVATE_CSH_SRC
+files PRIVATE_ICL_BIN %prefix {$(ETC)/} PRIVATE_ICL_SRC
+files PRIVATE_SH_BIN  %prefix {$(ETC)/} PRIVATE_SH_SRC
+files PRIVATE_TCL_BIN %prefix {$(ETC)/} PRIVATE_TCL_SRC

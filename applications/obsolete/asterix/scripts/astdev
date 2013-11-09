@@ -1,0 +1,56 @@
+#!/bin/csh
+#+
+#-
+
+#
+# Set the environment type - this can be either BUILT or INSTALLED. In the
+# former case the directory structure is the hierarchical form as
+# maintained in the ASTERIX development system. In the latter case the
+# files all reside in one directory supplied externally.
+#
+set envtype="BUILT"
+#
+# Point to the tools directory
+#
+#
+# Make builder search path
+#
+setenv AST_MAKE_PATH $AST_ETC
+setenv AST_NAG NAG=0
+#
+#
+set sys=`uname`
+if ($sys == "Linux") then
+  set fopt = ' -ff2c -fno-second-underscore -fno-globals -Wno-globals -finit-local-zero -fno_automatic -O '
+  set finc = ' -I/star/include -I/soft/asterix/asterix/src/inc '
+  set fcom = 'g77'
+  set copt = ' -O0 -Df2cFortran -fno-default-inline '
+  set cinc = ' -I./ -I/star/include -I/soft/asterix/asterix/src/inc '
+  set ccom = 'g++'
+set sysname = 'Linux'
+else if ($sys == "SunOS") then
+  set fopt = ' -PIC  -O '
+  set finc = ' -I/star/include -I/soft/asterix/asterix/src/inc '
+  set fcom = 'f77'
+  set copt = ' -O '
+  set cinc = ' -I./ -I/star/include -I/soft/asterix/asterix/src/inc '
+  set ccom = 'CC'
+set sysname = 'Solaris'
+else if ($sys == "OSF1") then
+  set fopt = ' -O3 '
+  set finc = ' -I/star/include -I/soft/asterix/asterix/src/inc '
+  set fcom = 'f77'
+  set copt = ' -O '
+  set cinc = ' -I./ -I/star/include -I/soft/asterix/asterix/src/inc '
+  set ccom = 'cxx'
+set sysname = 'Digital Unix'
+endif
+alias a77 ${fcom} ${fopt} ${finc}
+alias a++ ${ccom} ${copt} ${cinc}
+#
+#
+# Report to user
+#
+if ( ! ${?QUIET} ) then
+  echo "ASTERIX program development enabled for "$sysname
+endif

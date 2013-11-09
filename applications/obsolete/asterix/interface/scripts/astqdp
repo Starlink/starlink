@@ -1,0 +1,145 @@
+
+#+
+#  Name:
+#     astqdp
+#
+#  Purpose:
+#     Runs QDP using an HDS file
+#
+#  Language:
+#     sh
+#
+#  Invocation:
+#     astqdp [-h] [-k] [filename [device]]
+#
+#  Description:
+#     Convert an HDS file to QDP format, and run qdp on that file
+#
+#  Arguments:
+#     -h 
+#        Print description of procedure
+#     -k 
+#        Retain temporary file if specified
+#     $1 = string (given)
+#        Name of HDS file to convert to QDP format
+#     $2 = string (given)
+#        Name of PGPLOT device to run with QDP
+
+#  Examples:
+#     {routine_example_text}
+#        {routine_example_description}
+
+#  Notes:
+#     {routine_notes}...
+
+#  Prior Requirements:
+#     {routine_prior_requirements}...
+
+#  Side Effects:
+#     None
+
+#  References:
+#     {routine_references}...
+
+#  Keywords:
+#     {routine_keywords}...
+
+#  Copyright:
+#     Copyright (C) University of Birmingham, 1995
+
+#  Authors:
+#     DJA: D.J.Allan (JET-X,University of Birmingham)
+#     {enter_new_authors_here}
+
+#  History:
+#     21 Feb 1995 (DJA):
+#        Original version.
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+#.
+
+#
+# Test for qualififiers
+#
+if [ "$1" = "-h" ] 
+  then
+  echo "Usage: astqdp [-h] [-k] [filename [device]]   (asthelp astqdp for more)"
+  exit 0
+fi
+#
+# Version id
+#
+echo "ASTQDP Version 1.8-0"
+#
+# Test for switches
+#
+if [ "$1" = "-k" ] 
+  then
+  keep=1
+  shift
+else
+  keep=0
+fi
+#
+# Import arguments
+#
+sdf="$1"
+dev="$2"
+#
+# Check input file exists - prompt if it does not
+#
+if [ ! -f ${sdf}.sdf ]
+  then
+  echo "Enter name of file to plot > "
+  read sdf
+fi
+#
+# Choose temporary file name
+#
+if [ $keep = 1 ] 
+  then
+  tfile="${sdf}.qdp"
+else
+  tfile="/tmp/temp.qdp"
+fi
+#
+# Check XANADU up and running
+#
+#if ( ! ${?XANBIN} ) then
+#  echo "XANADU has not been initialised yet...enter the command to do so, or ! to quit"
+#  echo -n "XANADU initialisation command > "
+#  set xcmd = "$<"
+#  if ( "$xcmd" == "\!" || "$xcmd" == "\!\!" ) then
+#    goto exit
+#  else
+#    eval $xcmd
+#  endif
+#  goto retry
+#endif
+#
+# Convert the HDS file to QDP format
+#
+$AST_BIN/ast2qdp $sdf $tfile
+#
+# User has supplied a device?
+#
+if [ "$dev" != "" ] 
+  then
+  PGPLOT_TYPE="$dev"
+  export PGPLOT_TYPE
+fi
+#
+# Run QDP
+#
+$XANBIN/bin/qdp $tfile 
+#
+# Remove temporary file unless user wants it
+#
+if [ $keep = 0 ] 
+  then
+  rm -f $tfile
+fi

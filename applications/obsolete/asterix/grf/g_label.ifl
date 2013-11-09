@@ -1,0 +1,27 @@
+interface G_LABEL
+  parameter KEY
+    type '_LOGICAL'
+    default N
+    vpath 'DEFAULT'
+    prompt 'Input from keyboard'
+    help 'Otherwise input is via cursor where appropriate'
+  endparameter
+  parameter XLBL
+    position 1
+    type '_CHAR'
+    prompt 'X-label'
+    default ' '
+  endparameter
+  parameter YLBL
+    position 2
+    type '_CHAR'
+    prompt 'X-label'
+    default ' '
+  endparameter
+  parameter TOPLBL
+    position 3
+    type '_CHAR'
+    prompt 'X-label'
+    default ' '
+  endparameter
+endinterface

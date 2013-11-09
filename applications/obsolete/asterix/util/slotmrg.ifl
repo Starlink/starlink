@@ -1,0 +1,30 @@
+INTERFACE SLOTMRG
+
+PARAMETER SFILE1
+  POSITION 1
+  TYPE    'FILENAME'
+  PROMPT  'Name of first time slot file'
+  PPATH   'CURRENT'
+  VPATH   'PROMPT'
+  HELP    'Name of a textfile containing time slots'
+ENDPARAMETER
+
+PARAMETER SFILE2
+  POSITION 2
+  TYPE    'FILENAME'
+  PROMPT  'Name of second time slot file'
+  PPATH   'CURRENT'
+  VPATH   'PROMPT'
+  HELP    'Name of a textfile containing time slots'
+ENDPARAMETER
+
+PARAMETER SOFILE
+  POSITION 3
+  TYPE    'FILENAME'
+  PROMPT  'Name of output merged time slot file'
+  PPATH   'CURRENT'
+  VPATH   'PROMPT'
+  HELP    'Name of a textfile to contain the merged times'
+ENDPARAMETER
+
+ENDINTERFACE

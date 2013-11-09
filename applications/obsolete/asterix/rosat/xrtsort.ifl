@@ -1,0 +1,511 @@
+ INTERFACE XRTSORT
+
+     PARAMETER CURR
+               TYPE '_LOGICAL'
+               VPATH 'DEFAULT'
+               DEFAULT Y
+               PROMPT 'Use current directory'
+     ENDPARAMETER
+
+     PARAMETER RAWDIR
+               TYPE    '_CHAR'
+               PROMPT  'Raw data directory'
+               PPATH   'DYNAMIC'
+               VPATH   'PROMPT'
+               HELP    'Directory containing raw data files'
+     ENDPARAMETER
+
+     PARAMETER ROOTNAME
+               POSITION 1
+               TYPE    '_CHAR'
+               PROMPT  'Rootname of files to sort'
+               PPATH   'DYNAMIC,CURRENT'
+               HELP    'Enter name of files without the extension'
+               VPATH   'PROMPT'
+     ENDPARAMETER
+
+     PARAMETER TYPE
+               TYPE    '_CHAR'
+               PROMPT  'Output data type - Event(E) Binned(B)'
+               PPATH   'CURRENT,DEFAULT'
+               VPATH   'PROMPT'
+               DEFAULT 'B'
+               HELP    'See user manual'
+     ENDPARAMETER
+
+     PARAMETER OUT
+               POSITION 2
+               TYPE    'LITERAL'
+               PROMPT  'Output source filename'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               ASSOCIATION '->GLOBAL.BINDS'
+               HELP    'Enter name without extension'
+     ENDPARAMETER
+
+     PARAMETER BOUT
+               POSITION 3
+               TYPE    'LITERAL'
+               PROMPT  'Output background filename'
+               PPATH   'CURRENT'
+               VPATH   'PROMPT'
+               ASSOCIATION '->GLOBAL.BCKFILE'
+               HELP    'Enter name without extension'
+     ENDPARAMETER
+
+     PARAMETER DOUT
+               TYPE    '_CHAR'
+               PROMPT  'Name of the difevents file'
+               PPATH   'CURRENT'
+               HELP    'e.g. SA_DIF'
+               VPATH   'PROMPT'
+            ENDPARAMETER
+
+     PARAMETER ARD
+               TYPE '_CHAR'
+               PROMPT 'ARD file'
+     ENDPARAMETER
+
+
+     PARAMETER BARD
+               TYPE '_CHAR'
+               PROMPT 'ARD file'
+     ENDPARAMETER
+
+     PARAMETER CENTRE
+               TYPE '_CHAR'
+               PROMPT 'Nominal source centre'
+     ENDPARAMETER
+
+     PARAMETER RES
+               TYPE '_INTEGER'
+               PROMPT 'Resolution factor'
+               HELP '1=high 2=medium 3=low'
+               DEFAULT 2
+     ENDPARAMETER
+
+     PARAMETER PROPERTY
+               TYPE    '_CHAR'
+               PROMPT  'Property limits to change (enter numbers)'
+               PPATH   'DEFAULT'
+               HELP    'Enter 1 for Temp, 2 for Gain... Enter "!" to use default values'
+               DEFAULT !
+            ENDPARAMETER
+
+     PARAMETER TEMPMIN
+               TYPE    '_INTEGER'
+               PROMPT  'Minimum temperature quality accepted (integer)'
+               PPATH   'DYNAMIC,CURRENT'
+               HELP    'Enter 1 to 5'
+               VPATH   'PROMPT'
+               DEFAULT  3
+            ENDPARAMETER
+
+     PARAMETER TEMPMAX
+               TYPE    '_INTEGER'
+               PROMPT  'Maximum temperature quality accepted (integer)'
+               PPATH   'DYNAMIC,CURRENT'
+               HELP    'Enter 1 to 5'
+               VPATH   'PROMPT'
+               DEFAULT  3
+            ENDPARAMETER
+
+     PARAMETER GAINMIN
+               TYPE    '_INTEGER'
+               PROMPT  'Minimum gain quality accepted (integer)'
+               PPATH   'DYNAMIC,CURRENT'
+               HELP    'Enter 1 to 5'
+               VPATH   'PROMPT'
+               DEFAULT  3
+            ENDPARAMETER
+
+     PARAMETER GAINMAX
+               TYPE    '_INTEGER'
+               PROMPT  'Maximum gain quality accepted (integer)'
+               PPATH   'DYNAMIC,CURRENT'
+               HELP    'Enter 1 to 5'
+               VPATH   'PROMPT'
+               DEFAULT  3
+            ENDPARAMETER
+
+     PARAMETER RANGES
+               TYPE    '_CHAR'
+               PROMPT  'Property ranges to change (enter numbers)'
+               PPATH   'DEFAULT'
+               DEFAULT !
+               HELP    'Enter 1 for x, 2 for y... Enter "!" to use ranges shown'
+            ENDPARAMETER
+
+     PARAMETER XSTART
+               TYPE    '_REAL'
+               PROMPT  'Minimum value of X in pixels'
+               PPATH   'CURRENT,DEFAULT'
+               VPATH   'PROMPT'
+               HELP    'Lowest raw X pixel value to get data from'
+            ENDPARAMETER
+
+     PARAMETER XSTOP
+               TYPE    '_REAL'
+               PROMPT  'Maximum value of X in pixels'
+               PPATH   'CURRENT,DEFAULT'
+               VPATH   'PROMPT'
+               HELP    'Highest raw X pixel value to get data from'
+            ENDPARAMETER
+
+     PARAMETER YSTART
+               TYPE    '_REAL'
+               PROMPT  'Minimum value of Y in pixels'
+               PPATH   'CURRENT,DEFAULT'
+               VPATH   'PROMPT'
+               HELP    'Lowest raw Y pixel value to get data from'
+            ENDPARAMETER
+
+     PARAMETER YSTOP
+               TYPE    '_REAL'
+               PROMPT  'Maximum value of X in pixels'
+               PPATH   'CURRENT,DEFAULT'
+               VPATH   'PROMPT'
+               HELP    'Highest raw Y pixel value to get data from'
+            ENDPARAMETER
+
+     PARAMETER XDSTART
+               TYPE    '_INTEGER'
+               PROMPT  'Minimum X detector pixel'
+               PPATH   'CURRENT,DEFAULT'
+               VPATH   'PROMPT'
+               HELP    'Lowest raw X detector pixel value to get data from'
+            ENDPARAMETER
+
+     PARAMETER XDEND
+               TYPE    '_INTEGER'
+               PROMPT  'Maximum X detector pixel to use'
+               PPATH   'CURRENT,DEFAULT'
+               VPATH   'PROMPT'
+               HELP    'Highest raw X detector pixel value to get data from'
+            ENDPARAMETER
+
+     PARAMETER YDSTART
+               TYPE    '_INTEGER'
+               PROMPT  'Minimum Y detector pixel'
+               PPATH   'CURRENT,DEFAULT'
+               VPATH   'PROMPT'
+               HELP    'Lowest raw Y detector pixel value to get data from'
+            ENDPARAMETER
+
+     PARAMETER YDEND
+               TYPE    '_INTEGER'
+               PROMPT  'Maximum Y detector pixel to use'
+               PPATH   'CURRENT,DEFAULT'
+               VPATH   'PROMPT'
+               HELP    'Highest raw Y detector pixel value to get data from'
+            ENDPARAMETER
+
+     PARAMETER TIMRANGE
+               TYPE    '_CHAR'
+               PROMPT  'Time ranges'
+               PPATH   'DYNAMIC,CURRENT,DEFAULT'
+               HELP    'e.g. 130.6:140.7 or M47890.4:M47891.0 or TIMES.DAT'
+               VPATH   'PROMPT'
+            ENDPARAMETER
+
+     PARAMETER MINPH
+               TYPE    '_INTEGER'
+               PROMPT  'Minimum value of pulse height'
+               PPATH   'CURRENT,DEFAULT'
+               HELP    'Lowest pulse height value to use'
+               VPATH   'PROMPT'
+            ENDPARAMETER
+
+     PARAMETER MAXPH
+               TYPE    '_INTEGER'
+               PROMPT  'Maximum value of pulse height'
+               PPATH   'CURRENT,DEFAULT'
+               HELP    'Highest pulse height value to use'
+               VPATH   'PROMPT'
+            ENDPARAMETER
+
+     PARAMETER MINEN
+               TYPE    '_INTEGER'
+               PROMPT  'Minimum value of energy'
+               PPATH   'CURRENT,DEFAULT'
+               HELP    'Lowest energy value to use'
+               VPATH   'PROMPT'
+            ENDPARAMETER
+
+     PARAMETER MAXEN
+               TYPE    '_INTEGER'
+               PROMPT  'Maximum value of energy'
+               PPATH   'CURRENT,DEFAULT'
+               HELP    'Highest energy value to use'
+               VPATH   'PROMPT'
+            ENDPARAMETER
+
+     PARAMETER AXES
+               TYPE    '_CHAR'
+               PROMPT  'Enter integer codes of axes required in data array'
+               PPATH   'CURRENT,DEFAULT'
+               VPATH   'PROMPT'
+               HELP    'e.g. for an image enter >1,2'
+            ENDPARAMETER
+
+     PARAMETER SHAPE
+               TYPE    '_CHAR'
+               PROMPT  'Shape of source area [D,C,A,E,R]'
+               PPATH   'CURRENT,DEFAULT'
+               VPATH   'PROMPT'
+               HELP    'ard-Description, Circle, Annulus, Ellipse or Rectangle'
+               DEFAULT 'R'
+            ENDPARAMETER
+
+     PARAMETER RA
+               TYPE    '_CHAR'
+               PROMPT  'RA of the centre of the source region'
+               PPATH   'DYNAMIC'
+               VPATH   'PROMPT'
+               HELP    'Enter in any format'
+            ENDPARAMETER
+
+     PARAMETER DEC
+               TYPE    '_CHAR'
+               PROMPT  'DEC of the centre of the source region'
+               PPATH   'DYNAMIC'
+               VPATH   'PROMPT'
+               HELP    'Enter in any format'
+            ENDPARAMETER
+
+     PARAMETER SWIDTH
+               TYPE    '_REAL'
+               PROMPT  'Width of source box '
+               PPATH   'DYNAMIC,CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Enter in decimal degrees'
+            ENDPARAMETER
+
+     PARAMETER SHEIGHT
+               TYPE    '_REAL'
+               PROMPT  'Height of source box '
+               PPATH   'DYNAMIC,CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Enter in decimal degrees'
+            ENDPARAMETER
+
+     PARAMETER RAD
+               TYPE    '_REAL'
+               PROMPT  'Radius of source box (degrees)'
+               PPATH   'DYNAMIC,CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Enter in decimal degrees'
+            ENDPARAMETER
+
+     PARAMETER IRAD
+               TYPE    '_REAL'
+               PROMPT  'Inner radius of source box (degrees)'
+               PPATH   'DEFAULT'
+               VPATH   'PROMPT'
+               HELP    'Enter in decimal degrees'
+               DEFAULT  0.0
+            ENDPARAMETER
+
+     PARAMETER ORAD
+               TYPE    '_REAL'
+               PROMPT  'Outer radius of source box (degrees)'
+               PPATH   'DYNAMIC,CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Enter in decimal degrees'
+            ENDPARAMETER
+
+     PARAMETER ANGLE
+               TYPE    '_REAL'
+               PROMPT  'Orientation angle of ellipse (degrees)'
+               PPATH   'CURRENT,DEFAULT'
+               VPATH   'PROMPT'
+   HELP    'Enter in degrees, clockwise from the X axis (eg. South is +90)'
+               DEFAULT  0.0
+            ENDPARAMETER
+
+     PARAMETER EXINN
+               TYPE    '_REAL'
+               PROMPT  'Inner radius of the X or semi-major axis (degs)'
+               PPATH   'DEFAULT'
+               VPATH   'PROMPT'
+               HELP    'Enter in decimal degrees'
+               DEFAULT  0.0
+            ENDPARAMETER
+
+     PARAMETER EXOUT
+               TYPE    '_REAL'
+               PROMPT  'Outer radius of the X or semi-major axis (degs)'
+               PPATH   'DYNAMIC,CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Enter in decimal degrees'
+            ENDPARAMETER
+
+     PARAMETER EYOUT
+               TYPE    '_REAL'
+               PROMPT  'Outer radius of the Y or semi-minor axis (degs)'
+               PPATH   'CURRENT,DEFAULT'
+               VPATH   'PROMPT'
+               HELP    'Enter in decimal degrees'
+               DEFAULT  0.0
+            ENDPARAMETER
+
+     PARAMETER NXBIN
+               TYPE    '_INTEGER'
+               PROMPT  'Number of output bins in the X axis'
+               PPATH   'CURRENT,DEFAULT'
+               VPATH   'PROMPT'
+               HELP    'An integer number of raw pixels will be put in each bin'
+               DEFAULT  512
+            ENDPARAMETER
+
+     PARAMETER NYBIN
+               TYPE    '_INTEGER'
+               PROMPT  'Number of output bins in the Y axis'
+               PPATH   'CURRENT,DEFAULT'
+               VPATH   'PROMPT'
+               HELP    'An integer number of raw pixels will be put in each bin'
+               DEFAULT  512
+            ENDPARAMETER
+
+     PARAMETER NXDBIN
+               TYPE    '_INTEGER'
+               PROMPT  'Number of output bins in the detector X axis'
+               PPATH   'CURRENT,DEFAULT'
+               VPATH   'PROMPT'
+               HELP    'An integer number of raw pixels will be put in each bin'
+               DEFAULT  512
+            ENDPARAMETER
+
+     PARAMETER NYDBIN
+               TYPE    '_INTEGER'
+               PROMPT  'Number of output bins in the detector Y axis'
+               PPATH   'CURRENT,DEFAULT'
+               VPATH   'PROMPT'
+               HELP    'An integer number of raw pixels will be put in each bin'
+               DEFAULT  512
+            ENDPARAMETER
+
+     PARAMETER TIMBIN
+               TYPE    '_REAL'
+               PROMPT  'Width of bins in the time axis '
+               PPATH   'CURRENT,DEFAULT'
+               VPATH   'PROMPT'
+               HELP    ' Enter binwidth in seconds'
+            ENDPARAMETER
+
+     PARAMETER PHBIN
+               TYPE    '_INTEGER'
+               PROMPT  'Bin width of pulse height axis '
+               PPATH   'CURRENT,DEFAULT'
+               VPATH   'PROMPT'
+               HELP    ' Enter binwidth in channels'
+            ENDPARAMETER
+
+     PARAMETER ENBIN
+               TYPE    '_INTEGER'
+               PROMPT  'Bin width of corrected pulse height axis '
+               PPATH   'CURRENT,DEFAULT'
+               VPATH   'PROMPT'
+               HELP    ' Enter binwidth in channels'
+            ENDPARAMETER
+
+     PARAMETER NRBIN
+               TYPE    '_INTEGER'
+               PROMPT  'Number of radial bins'
+               PPATH   'CURRENT,DEFAULT'
+               VPATH   'PROMPT'
+               HELP    ' Enter number of radial bins wanted in output file'
+            ENDPARAMETER
+
+     PARAMETER BACK
+               TYPE    '_LOGICAL'
+               PROMPT  'Is a background file wanted (Y/N)'
+               PPATH   'CURRENT,DEFAULT'
+               VPATH   'PROMPT'
+               HELP    'A blank area of sky may be used later to background subtract'
+               DEFAULT  N
+            ENDPARAMETER
+
+     PARAMETER RAB
+               TYPE    '_CHAR'
+               PROMPT  'RA of centre of bckgnd box'
+               PPATH   'DYNAMIC'
+               VPATH   'PROMPT'
+               HELP    'Can be away from source box or an annulus around it.'
+            ENDPARAMETER
+
+     PARAMETER DECB
+               TYPE    '_CHAR'
+               PROMPT  'DEC of the centre of the bckgnd box'
+               PPATH   'DYNAMIC'
+               VPATH   'PROMPT'
+               HELP    ' Enter in any format'
+            ENDPARAMETER
+
+     PARAMETER BWIDTH
+               TYPE    '_REAL'
+               PROMPT  'Width of bckgnd box '
+               PPATH   'CURRENT,DEFAULT'
+               VPATH   'PROMPT'
+               HELP    ' Enter in decimal degrees'
+            ENDPARAMETER
+
+     PARAMETER BHEIGHT
+               TYPE    '_REAL'
+               PROMPT  'Height of bckgnd box'
+               PPATH   'CURRENT,DEFAULT'
+               VPATH   'PROMPT'
+               HELP    ' Enter in decimal degrees'
+            ENDPARAMETER
+
+     PARAMETER BIRAD
+               TYPE    '_REAL'
+               PROMPT  'Inner radius of bckgnd box (degrees)'
+               PPATH   'DYNAMIC'
+               VPATH   'PROMPT'
+               HELP    'Enter 0.0 if a circular box is wanted >0 for an annulus'
+            ENDPARAMETER
+
+     PARAMETER BORAD
+               TYPE    '_REAL'
+               PROMPT  'Outer radius of bckgnd box (degrees)'
+               PPATH   'DYNAMIC,CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Enter in decimal degrees'
+     ENDPARAMETER
+
+     PARAMETER  BANGLE
+               TYPE    '_REAL'
+               PROMPT  'Orientation of background ellipse (degrees)'
+               PPATH   'CURRENT,DEFAULT'
+               VPATH   'PROMPT'
+   HELP    'Enter in degrees, clockwise from the X axis (eg. South is +90)'
+               DEFAULT  0.0
+     ENDPARAMETER
+
+     PARAMETER BEXINN
+               TYPE    '_REAL'
+               PROMPT  'Inner radius of the bckgnd X or semi-major axis (degs)'
+               PPATH   'DYNAMIC,CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Enter in decimal degrees'
+     ENDPARAMETER
+
+     PARAMETER BEXOUT
+               TYPE    '_REAL'
+               PROMPT  'Outer radius of the bckgnd X or semi-major axis (degs)'
+               PPATH   'DYNAMIC,CURRENT'
+               VPATH   'PROMPT'
+               HELP    'Enter in decimal degrees'
+     ENDPARAMETER
+
+     PARAMETER BEYOUT
+               TYPE    '_REAL'
+               PROMPT  'Outer radius of the bckgnd Y or semi-minor axis (degs)'
+               PPATH   'DYNAMIC,CURRENT,DEFAULT'
+               VPATH   'PROMPT'
+               HELP    'Enter in decimal degrees'
+               DEFAULT  0.0
+     ENDPARAMETER
+
+ENDINTERFACE

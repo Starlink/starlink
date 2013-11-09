@@ -1,0 +1,26 @@
+*+  PSF_CMN - PSF system common block definition
+*
+*     History :
+*
+*      24 Oct 89 : Original (BHVAD::DJA)
+*      23 Feb 90 : Added module name list for PSF_DISPLAY (DJA)
+*       8 Mar 90 : Removed TE block from psf data record (DJA)
+*      25 Oct 92 : Added energy options (DJA)
+*      21 Apr 93 : Added EVDS and EOK logicals and some spare slots (DJA)
+*      14 Dec 93 : Added fields for spatial response handling (DJA)
+*      29 Jan 94 : Added PSFINIT flag (DJA)
+*      10 Mar 94 : Last structures removed (DJA)
+*      23 Mar 95 : Split initialisation in two (DJA)
+*      27 Jul 95 : Added AUTO flag (DJA)
+*       1 May 1996 (DJA):
+*         Removed library stuff
+*-
+
+*  Psf system initialised
+      LOGICAL                   PSFAUTO                 ! Automatic mode
+
+*  Psf list
+      INTEGER			P_PLIST			! ADI structure
+
+*  Non-character common block
+      COMMON /PSF_CMN/ P_PLIST, PSFAUTO

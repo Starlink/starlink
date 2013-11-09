@@ -1,0 +1,16 @@
+#
+#  Install sub-directories
+#
+	- for f in $(SUBDIRS) " "; do \
+           if test -d "$$f"; then \
+  	     cd $$f; $(MAKE) install; cd ..; \
+           fi ;\
+        done
+
+#
+#  Deinstall the subdirectories
+	- for f in $(SUBDIRS) " "; do \
+           if test -d "$$f"; then \
+  	     cd $$f; $(MAKE) deinstall; cd ..; \
+           fi ;\
+        done

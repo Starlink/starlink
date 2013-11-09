@@ -1,0 +1,25 @@
+INTERFACE FOLDGRID
+
+   PARAMETER INP
+      POSITION 1
+      TYPE 'LITERAL'
+      PROMPT 'Input spectral grid'
+      HELP 'Name of object grid of spectra'
+   ENDPARAMETER
+
+   PARAMETER RESP
+      POSITION 2
+      TYPE 'LITERAL'
+      VPATH 'PROMPT'
+      PPATH 'GLOBAL'
+      ASSOCIATION '<-GLOBAL.FIT_DATA'
+      PROMPT 'Name of object containing response'
+   ENDPARAMETER
+
+   PARAMETER OUT
+      POSITION 3
+      TYPE 'LITERAL'
+      PROMPT 'Output spectral grid'
+   ENDPARAMETER
+
+ENDINTERFACE

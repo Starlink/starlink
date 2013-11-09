@@ -1,0 +1,100 @@
+*+  XRTHEAD_CMN - defines header common block for an XRT observation
+*-
+*  constants
+        INTEGER MAXMAPS                           ! Maximum no of small maps
+          PARAMETER (MAXMAPS=1000)
+        INTEGER MAXRAN                            ! Maximum no of time ranges
+          PARAMETER (MAXRAN=2000)
+        INTEGER MAXSPOT                           ! Maximum number of hotspots
+          PARAMETER (MAXSPOT=100)
+*
+*  common blocks
+        COMMON /XRTHEAD_CMN_D/
+     :      HEAD_AXIS_RA, HEAD_AXIS_DEC, HEAD_ROLLCI,
+     :      HEAD_BASE_SCTIME, HEAD_TSTART, HEAD_TEND,
+     :      HEAD_BASE_MJD, HEAD_END_MJD, HEAD_SCCONV
+
+          DOUBLE PRECISION   HEAD_AXIS_RA         ! Pointing direction RA
+          DOUBLE PRECISION   HEAD_AXIS_DEC        !                    DEC
+          DOUBLE PRECISION   HEAD_ROLLCI          ! Position angle of obs.
+          DOUBLE PRECISION   HEAD_BASE_SCTIME     ! The spacecraft clock time
+*                                                 ! of time 0.0
+          DOUBLE PRECISION   HEAD_TSTART(MAXRAN)  ! Start time of observation
+*                                                 ! offset from start time
+          DOUBLE PRECISION   HEAD_TEND(MAXRAN)    ! End time of observation
+          DOUBLE PRECISION   HEAD_BASE_MJD        ! Reference time of obs.
+          DOUBLE PRECISION   HEAD_END_MJD         ! End time of obs. (MJD)
+          DOUBLE PRECISION   HEAD_SCCONV          ! Conversion factor between
+*                                                 ! s/c time and U.T.
+
+        COMMON /XRTHEAD_CMN_R/
+     :      HEAD_PIXEL, HEAD_SKYCX, HEAD_SKYCY
+
+          REAL               HEAD_PIXEL           ! Pixel size (arcsecs)
+          REAL               HEAD_SKYCX, HEAD_SKYCY ! SKY pixel value of centre
+
+        COMMON /XRTHEAD_CMN_I/
+     :      HEAD_NTRANGE, HEAD_ASTART, HEAD_AEND, HEAD_CSTART,
+     :      HEAD_CEND, HEAD_XSTART, HEAD_XEND, HEAD_YSTART, HEAD_YEND,
+     :      HEAD_XDSTART, HEAD_XDEND, HEAD_YDSTART, HEAD_YDEND,
+     :      HEAD_NEVENTS, HEAD_EVSTART, HEAD_IEVLEN, HEAD_IRECLN,
+     :      HEAD_IFDSZX, HEAD_IFDSZY, HEAD_XSMAP, HEAD_YSMAP,
+     :      HEAD_ISMNUX, HEAD_ISMNUY, HEAD_ISMTNU, HEAD_IEVTNU,
+     :      HEAD_NHEAD, HEAD_NSPOT, HEAD_XSPOT, HEAD_YSPOT,
+     :      HEAD_SPOTRAD
+
+          INTEGER            HEAD_NTRANGE         ! Number of time ranges
+          INTEGER            HEAD_ASTART          ! Range of amplitudes
+          INTEGER            HEAD_AEND            !  in the file
+          INTEGER            HEAD_CSTART          ! Range of corrected amps
+          INTEGER            HEAD_CEND            !  in the file
+          INTEGER            HEAD_XSTART          ! Range of X pixels
+          INTEGER            HEAD_XEND            !  in the file
+          INTEGER            HEAD_YSTART          ! Range of Y pixels
+          INTEGER            HEAD_YEND            !  in the file
+          INTEGER            HEAD_XDSTART         ! Range of X detector corrds
+          INTEGER            HEAD_XDEND           !  in the file
+          INTEGER            HEAD_YDSTART         ! Range of Y detector corrds
+          INTEGER            HEAD_YDEND           !  in the file
+          INTEGER            HEAD_NEVENTS(MAXMAPS) ! events in each map
+          INTEGER            HEAD_EVSTART(MAXMAPS) ! Start byte of each map.
+          INTEGER            HEAD_IEVLEN          ! Length of event string
+          INTEGER            HEAD_IRECLN          ! Number of bytes per record.
+          INTEGER            HEAD_IFDSZX          ! Field width for X (pixels)
+          INTEGER            HEAD_IFDSZY          ! Field width for Y (pixels)
+          INTEGER            HEAD_XSMAP(MAXMAPS)  ! X pixel of top left hand
+                                                  ! corner of small map.
+          INTEGER            HEAD_YSMAP(MAXMAPS)  ! Y pixel of left hand corner
+          INTEGER            HEAD_ISMNUX          ! No of smaps in X direction
+          INTEGER            HEAD_ISMNUY          ! No of smaps in Y direction
+          INTEGER            HEAD_ISMTNU          ! Total no of smaps in file
+          INTEGER            HEAD_IEVTNU          ! Total number of events
+          INTEGER            HEAD_NHEAD           ! Total number - header recs.
+* Hotspot information - currently HRI only
+          INTEGER            HEAD_NSPOT           ! No. of hotspots
+          INTEGER            HEAD_XSPOT(MAXSPOT)  ! X centre of hotspot
+          INTEGER            HEAD_YSPOT(MAXSPOT)  ! Y centre of hotspot
+          INTEGER            HEAD_SPOTRAD(MAXSPOT)  ! Radius of spot
+
+        COMMON /XRTHEAD_CMN_C/
+     :      HEAD_OBS_MODE, HEAD_OBC_MODE, HEAD_TARGET,
+     :      HEAD_OBSERVER, HEAD_OBSERVATORY, HEAD_INSTRUMENT,
+     :      HEAD_DETECTOR, HEAD_FILTER, HEAD_TITLE,
+     :      HEAD_XPUNITS, HEAD_YPUNITS, HEAD_SASS_DATE,
+     :      HEAD_ORIGIN
+
+          CHARACTER*10       HEAD_OBS_MODE        !
+          CHARACTER*10       HEAD_OBC_MODE        !
+          CHARACTER*20       HEAD_TARGET          ! Object being studied
+          CHARACTER*20       HEAD_OBSERVER        ! Proposor of observation
+          CHARACTER*20       HEAD_OBSERVATORY     ! ROSAT
+          CHARACTER*20       HEAD_INSTRUMENT      ! XRT
+          CHARACTER*20       HEAD_DETECTOR        ! HRI,PSPC...
+          CHARACTER*20       HEAD_FILTER          ! Filter status
+          CHARACTER*80       HEAD_TITLE           ! Title of observation
+          CHARACTER*11       HEAD_XPUNITS         ! Units of X pixel
+          CHARACTER*11       HEAD_YPUNITS         ! Units of Y pixel
+                                                  !   in detector pixels
+* Additional information for Rationalised fits and general purposes
+          CHARACTER*25       HEAD_SASS_DATE       ! SASS processing date
+          CHARACTER*5        HEAD_ORIGIN          ! original file format

@@ -1,0 +1,33 @@
+ INTERFACE SETRANGES
+
+    PARAMETER INPUT_VALUE
+       POSITION 1
+       TYPE 'UNIV'
+       PROMPT 'Value object'
+       VPATH  'PROMPT'
+       HELP 'Primitive 1D array for which value limits will be specified'
+    ENDPARAMETER
+
+    PARAMETER INPUT_RANGE
+       POSITION 2
+       TYPE 'UNIV'
+       PROMPT 'Range object'
+       VPATH  'PROMPT'
+       HELP 'Primitive 1D array from which ranges will be derived'
+    ENDPARAMETER
+
+    PARAMETER LIMITS
+       POSITION 3
+       TYPE '_REAL'
+       PROMPT 'Limits'
+       VPATH 'PROMPT'
+       HELP 'Lower and upper limit  e.g. Min,Max or 1D(2) HDS obj'
+    ENDPARAMETER
+
+    PARAMETER RANGES
+       POSITION 4
+       TYPE '_CHAR'
+       PPATH 'CURRENT'
+    ENDPARAMETER
+
+ ENDINTERFACE

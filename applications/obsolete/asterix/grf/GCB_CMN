@@ -1,0 +1,94 @@
+*+  GCB_CMN - internal common block for Grafix Control Block system
+
+      CHARACTER*15 G_SCNAME(GCB__MXSCAL)		! names of scalar
+							! attributes
+      CHARACTER*15 G_STNAME(GCB__MXSTRUC)		! root name of
+							! structured attributes
+      CHARACTER*15 G_CNAME(GCB__MXSTRUC,GCB__MXCOMP)	! individual component
+							! names in structure
+      CHARACTER*8 G_SCFMT(GCB__MXSCAL)			! storage format of
+							! scalars
+      CHARACTER*8 G_CFMT(GCB__MXSTRUC,GCB__MXCOMP)	! staorage format of
+							! components
+      REAL G_VERSION					! current version no
+      INTEGER G_SIZE					! default size
+      INTEGER G_END					! pointer to pointer
+							! to end of block
+      INTEGER G_ID					! noticeboard id
+      INTEGER G_NSCAL					! number of scalars
+      INTEGER G_NSTRUC					! number of structures
+      INTEGER G_NCOMP(GCB__MXSTRUC)			! number of components
+      INTEGER G_SCSIZ(GCB__MXSCAL)			! size of scalars
+      INTEGER G_STSIZ(GCB__MXSTRUC)			! size of structure
+      INTEGER G_CSIZ(GCB__MXSTRUC,GCB__MXCOMP)		! size of each comp.
+      INTEGER G_SCDISP(GCB__MXSCAL)			! displacement of
+							! scalar from start
+							! of block
+      INTEGER G_CDISP(GCB__MXSTRUC,GCB__MXCOMP)		! displacement of comp
+							! within structure
+      INTEGER G_PTR_START(GCB__MXSTRUC)			! location of pointer
+							! to first group of
+							! components in list
+							! of structures -
+							! relative to top of 
+							! block
+      INTEGER G_PTR_CURR(GCB__MXSTRUC)			! location of pointer
+							! to last accessed
+							! group in list 
+      INTEGER G_CURR(GCB__MXSTRUC)			! index of last
+							! accessed group
+      INTEGER G_TOPSCAL					! displacement from
+							! start of block of
+							! end of scalars
+      INTEGER G_ENDSTRUC				! displacement from
+							! top of block of
+							! pointer to current
+							! end of structures
+      INTEGER G_STARTLISTS				! start of lists
+							! of structures
+      INTEGER G_MEMPTR					! pointer to current
+							! of GCB
+      INTEGER G_GMEMPTR					! ptr to global mem
+      INTEGER G_DMEMPTR					! ptr to dyn mem
+
+      LOGICAL G_READONLY
+      LOGICAL G_INITIALISED				! this common block
+							! initialised ie.
+							! description file
+							! has been read
+
+      LOGICAL			G_MTHINIT		! Loaded file methods?
+
+      COMMON /GCB_CMN/ G_INITIALISED, G_MTHINIT,
+     :                 G_MEMPTR,G_GMEMPTR,G_DMEMPTR,
+     :                 G_READONLY,G_SIZE,G_ID,
+     :                 G_SCSIZ,G_STSIZ,G_CSIZ,G_SCDISP,G_CDISP,
+     :                 G_NSCAL,G_NSTRUC,G_NCOMP,
+     :                 G_PTR_START,G_PTR_CURR,G_CURR,
+     :                 G_TOPSCAL,G_ENDSTRUC,G_STARTLISTS,G_END,
+     :                 G_VERSION
+      COMMON /GCB_CMN_C/ G_SCNAME,G_STNAME,G_CNAME,
+     :                   G_SCFMT,G_CFMT
+
+      CHARACTER*40 G_CONTEXT				! current context
+      INTEGER G_NCONTEXT				! no. of active contexts
+      INTEGER G_GRAFIX_PTR				! ptr. to cache
+      INTEGER G_IMAGE_PTR				!       "
+      INTEGER G_SPECTRUM_PTR				!       "
+      INTEGER G_TIME_PTR				!       "
+      LOGICAL G_GRAFIX					! GRAFIX active
+      LOGICAL G_IMAGE					! IMAGE active
+      LOGICAL G_SPECTRUM				! SPECTRUM active
+      LOGICAL G_TIME					! TIME active
+      LOGICAL G_LOCAL					! GCB is in local
+							! dynamic memory
+
+      COMMON /GCB_CNTX_CMN_C/ G_CONTEXT
+      COMMON /GCB_CNTX_CMN/ G_NCONTEXT,
+     :                      G_GRAFIX_PTR,G_IMAGE_PTR,
+     :                      G_SPECTRUM_PTR,G_TIME_PTR,
+     :                      G_GRAFIX,G_IMAGE,
+     :                      G_SPECTRUM,G_TIME,
+     :                      G_LOCAL
+
+*-

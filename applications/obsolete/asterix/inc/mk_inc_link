@@ -1,0 +1,96 @@
+#! /bin/sh
+#
+# mk_inc_link: make includes links
+#		removes to need for utility "v2u_include" if 
+#		"-I$AST_INC" is put in the compile line
+#
+#  4/11/97: Richard Beard - Original version.
+
+STAR="chr_err dat_err dat_par fio_err fio_par grp_par nbs_par par_err par_par \
+	prm_par sae_par subpar_err"
+LIB="ADP_CMN AIO_CMN AST_PKG_CMN DYN_CMN EDI_CMN PSF_ASCA_CMN PSF_CMN \
+	PSF_XRT_PSPC_CMN SSO_CMN USI0_PAR USI_CMN"
+GRF="GCB_CMN GCB_PAR GDV_CMN GFX_CMN GFX_PIX_CMN GFX_SKY_CMN GMD_CMN GMD_PAR \
+	GTR_CMN IMG_CMN"
+HED="HTRACE_CMN"
+SRC="BSUB_CMN IMSIM_CMN PSS_ASTROM_CMN PSS_CMN PSS_DIAG_CMN PSS_FIT_CMN \
+	PSS_IO_CMN PSS_PAR PSS_STAT_BIT0 PSS_STAT_BIT1 PSS_STAT_BIT2 SSDUMP_STR"
+UTIL="IMPORT_CMN"
+ROSXRT="INC_BAR INC_CORR INC_FITSVAR INC_GETPSF_DATA INC_XRTEVE INC XRTHEAD INC_XRTSRT"
+SPEC="SEDIT_CMN SPEC_CMN SPEC_CMN_RZ SPLOT_CMN"
+TIME="TIM_CMN"
+TOOLS="HLPCONV_CMN HLPREAD_CMN"
+
+echo Removing old links
+find . -type l -print -exec rm -f {} \; > /dev/null
+
+echo Linking with /star/include
+for FILE in $STAR
+do
+	TARGET=`echo $FILE | tr [a-z] [A-Z]`
+	ln -s /star/include/$FILE $TARGET
+done
+
+echo Linking with $AST_ROOT/src/lib
+for FILE in $LIB
+do
+	echo $FILE
+	ln -s ../../../src/lib/$FILE
+done
+
+echo Linking with $AST_ROOT/src/grf/inc
+for FILE in $GRF
+do
+	echo $FILE
+	ln -s ../../../src/grf/inc/$FILE
+done
+
+echo Linking with $AST_ROOT/src/hed
+for FILE in $HED
+do
+	echo $FILE
+	ln -s ../../../src/hed/$FILE
+done
+
+echo Linking with $AST_ROOT/src/src
+for FILE in $SRC
+do
+	echo $FILE
+	ln -s ../../../src/src/$FILE
+done
+
+echo Linking with $AST_ROOT/src/util
+for FILE in $UTIL
+do
+	echo $FILE
+	ln -s ../../../src/util/$FILE
+done
+
+echo Linking with $AST_ROOT/src/rosxrt
+for FILE in $ROSXRT
+do
+	echo $FILE
+	ln -s ../../../src/rosxrt/$FILE
+done
+
+echo Linking with $AST_ROOT/src/spec
+for FILE in $SPEC
+do
+	echo $FILE
+	ln -s ../../../src/spec/$FILE
+done
+
+echo Linking with $AST_ROOT/src/time
+for FILE in $TIME
+do
+	echo $FILE
+	ln -s ../../../src/time/$FILE
+done
+
+echo Linking with $AST_ROOT/tools
+for FILE in $TOOLS
+do
+	echo $FILE
+	ln -s ../../../tools/$FILE
+done
+

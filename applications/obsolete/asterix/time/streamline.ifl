@@ -1,0 +1,23 @@
+     INTERFACE STREAMLINE
+
+       PARAMETER INP
+         POSITION 1
+         TYPE     'LITERAL'
+         PROMPT 'Name of input file'
+         VPATH 'PROMPT'
+         PPATH 'GLOBAL,CURRENT'
+         ASSOCIATION '<-GLOBAL.BINDS'
+         HELP 'Enter without the file extension'
+       ENDPARAMETER
+
+       PARAMETER OUT
+         POSITION 2
+         TYPE     'LITERAL'
+         PROMPT 'Name of output file'
+         VPATH 'PROMPT'
+         PPATH 'CURRENT'
+         ASSOCIATION '->GLOBAL.BINDS'
+         HELP 'Enter without the file extension'
+       ENDPARAMETER
+
+    ENDINTERFACE

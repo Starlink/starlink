@@ -1,0 +1,26 @@
+Interface DYNAMICAL
+
+   Parameter    INP
+      position    1
+      type        'LITERAL'
+      ppath       'GLOBAL'
+      association '<-GLOBAL.BINDS'
+      prompt      'Enter name of input file'
+      help        'Give name of a structure containing a 1D DATA_ARRAY primitive'
+   EndParameter
+
+   Parameter    SECTOR
+      position    3
+      type        '_INTEGER'
+      prompt      'Enter sector size for FFT'
+      help        'Successive sectors are stacked to form a dynamical power spectrum'
+   EndParameter
+
+   Parameter    OUT
+      position    2
+      type        'LITERAL'
+      association '->GLOBAL.BINDS'
+      prompt      'Enter name of output file'
+      help        'Give name of output object for power spectrum'
+   EndParameter
+EndInterface

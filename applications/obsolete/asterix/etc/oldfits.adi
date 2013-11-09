@@ -1,0 +1,47 @@
+;;
+;; Define the file representation form. Allows %fits to be appended to file
+;; names
+;;
+defrep "fits"
+
+;;
+;; The class representing a FITS HDU
+;;
+defclass FITShdu {
+		Extension = "Undefined",;; Extension type, IMAGE, BINTABLE etc
+  LOGICAL       Created = False,        ;; Created on disk yet?
+  LOGICAL       DefStart = False,       ;; Definition started?
+  LOGICAL       DefEnd = False,         ;; Definition ended?
+  LOGICAL       Scanned = False,	;; Keywords scanned yet?
+  LOGICAL       Changed = False,	;; HDU updated in any way?
+  LOGICAL       DataChanged = False,	;; HDU data updated in any way?
+  LOGICAL       AnyNewCols = False,     ;; Any new columns created?
+  INTEGER       HduType,                ;; FITSIO HDU type
+  INTEGER       Ihdu,
+		Name,                   ;; Name of the HDU = EXTNAME keyword
+  INTEGER       Ncard = 0,		;; Number of HDU cards present
+  INTEGER       Nkey = 0,		;; Number of existing keys
+  INTEGER       Ncol = 0,               ;; Number of defined bintable columns
+  INTEGER       MinDiffCard = 0,        ;; First card updated in HDU
+  STRUC         CardIndex,              ;; Indexes keys,comments and history
+  STRUC         Columns,                ;; New columns container
+  STRUC         ColumnIndex,            ;; Columns container index
+  STRUC         Comments,               ;; Structure containing the comments
+  STRUC         History,                ;; Structure containing the history
+  STRUC         Keys                    ;; Structure containing the keywords
+  }
+
+;;
+;; The class representing a FITS file
+;;
+defclass FITSfile FileObject {
+  INTEGER       BlockSize,              ;; FITS block size
+  INTEGER       Lun,                    ;; Logical unit number
+  INTEGER       UserHDU,		;; User selected HDU number
+                Fpath,                  ;; Path to sub-file items
+                SubItem,                ;; Named sub-item altered
+  INTEGER       HiComit = 0,            ;; HDUs committed to disk
+  STRUC         Hdus,                   ;; Structure containing all the HDUs
+  STRUC         HduIndex,               ;; HDU number->name mapping
+  INTEGER       Nhdu = 0                ;; Number of HDUs
+  }

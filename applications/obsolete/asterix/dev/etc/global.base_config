@@ -1,0 +1,18 @@
+#
+# Global Makefile configurations
+#
+
+#
+# Package name
+#
+const PKG       ASTERIX
+
+const DEV_SCR   "$(ROOT)/src/dev/scripts"
+const KER_SCR   "$(ROOT)/src/scripts"
+const PKG_ROOT  {$AST_ROOT}
+#
+# No subdirectories by default
+#
+const SUBDIRS
+
+files REV_SUBDIRS %reverse SUBDIRS

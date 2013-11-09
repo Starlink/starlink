@@ -1,0 +1,90 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     ast_link_adam
+
+#  Purpose:
+#     Generate linker (ld) arguments for linking against ADAM ASTERIX.
+
+#  Type of Module:
+#     Shell script.
+
+#  Description:
+#     This script should be invoked by those building ADAM applications
+#     which use ASTERIX in order to generate the correct arguments for the
+#     compiler (or ld) command. The arguments generated are written to
+#     the standard output.
+
+#  Invocation:
+#     The script may be invoked as part of a command such as:
+#
+#        alink program.f `ast_link_adam`
+
+#  Copyright:
+#     Copyright (C) University of Birmingham, 1995
+
+
+#  History:
+#     16-FEB-1995 (DJA):
+#        Original version.
+#      6 Mar 97 : nag removed (RJV)
+#      7 Nov 97 : tcl removed (rjv)
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#.
+
+#  Initialise the special options string.
+      special=''
+      special2=''
+      tclvers='-ltcl7.6'
+      catbeta='-lcat'
+      
+#  Test to see if we are on a system which requires additional
+#  "special" ld options for correct linking.
+
+#  DEC Alpha systems running OSF1:
+#  ------------------------------
+#  Ensure that allocated memory addresses will fit into 32 bits to
+#  prevent problems with storing them in Fortran integers.
+      if test "`uname -m`" = "alpha" -a "`uname -s`" = "OSF1"; then
+         special='-Wl,-D -Wl,40800000 -Wl,-T -Wl,30000000'
+
+#  SUN Sparc systems running SunOS
+#  -------------------------------
+#  The gcc compiler is is required explicitly if variable length argument
+#  lists are used (as they are in ASTERIX).
+      elif test "`uname -m`" = "sun4m" -a "`uname -r`" = "4.1.3"; then
+         special2='-L/usr/local/lib/gcc-lib/sparc-sun-sunos4.1/2.2.2 -lgcc'
+
+#  SUN running Solaris
+#  -------------------
+#  Using local beta version of CAT library for time being
+      elif test "`uname -m`" = "sun4m" -a "`uname -r`" = "5.5"; then
+         catbeta='-lcat'
+
+#  PC running Linux
+#  ----------------
+      elif test "`uname`" = "Linux"; then
+        tclvers='-L/usr/lib -ltcl'
+
+      fi
+
+#  Echo any special options, followed by the ASTERIX library reference,
+#  followed by the list of options for packages on which ASTERIX depends.
+#  Pass the result through an awk script to remove duplicate library
+#  references. We miss out some of the libraries ADAM includes itself
+#  to speed this script up a little
+      ldef="$AST_LIB"
+      echo "${special}" -L${1-$ldef} -lastlib_adam -lastlib -lwfclib "${catbeta}" \
+        -L/star/lib `fitsio_link` `ref_link_adam` `grp_link_adam` \
+	   `prm_link_adam` `sla_link_adam` `ard_link_adam` \
+	`fio_link_adam` "${special2}" `astpda_link` `pda_link` \
+           | awk '{for(f=NF;f;f--)if(!w[$f]++)l=$f" "l;print l}'
+
+#  End of script.

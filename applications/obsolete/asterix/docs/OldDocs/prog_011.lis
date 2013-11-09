@@ -1,0 +1,527 @@
+   THE ASTERIX PSF SYSTEM ROUTINES                       D.J.Allan
+   -------------------------------                       Revision 2.0
+                                                         20 Feb 1992
+
+   Contents
+   ~~~~~~~~
+   1    Introduction
+
+   2    Overview
+
+   3    Application Level
+
+        3.1   Initialisation and Linking
+        3.2   Associating a Dataset with a Psf
+        3.3   Accessing psf data
+
+   4    Creating a PSF Library or Data Routine
+
+        4.1   PSF system architecture
+        4.2   The PSF Library Structure
+        4.3   PSF_SHARE_INIT and PSF_SHARE_CLOSE
+        4.4   Data Routine
+        4.5   Data _INIT routine
+        4.6   Data _CLOSE routine
+        4.7   Data _DEF routine
+        4.8   Data _PFL routine
+
+   5    PSF System Routine List
+
+   6    PSF Library Routine Specifications
+
+
+
+   1 Introduction
+
+     This document describes the ASTERIX psf system in order that users
+     can write applications to use the psf routines or write their own
+     psf data routines.
+
+     A description of the user interface can be found in the ASTERIX on
+     line help system ASTHELP.
+
+   2 Overview
+
+     The PSF system is designed to allow application software to access
+     information which is instrument dependent without incorporating any
+     instrument dependent code. The architecture of the system is split
+     into 2 distinct sections, the 'system' routines and the 'data'
+     routines,
+
+              application   <->  psf system  <->  psf libraries
+
+     The former are the application's sole contact with the psf system.
+     A psf library is a collection of subroutines which is constructed
+     in such a way that its components can be recompiled and the whole
+     library relinked without any rebuilding at the application level.
+     On VAX systems this functionality is achieved using shareable
+     images. The psf system supports mutliple psf libraries to enable
+     additional instruments to be interfaced without distrurbing other
+     libraries. 
+
+   3 The Application Level
+
+     3.1  Initialisation and Linking
+     
+     Any application using the PSF system must perform all access
+     between calls to the two system routines PSF_INIT and PSF_CLOSE.
+     The former ensures that the common block is explicitly initialised
+     (vital for monoliths) and the latter that all memory/file resources
+     are released by the system before the application returns control 
+     to the calling environment. To link with the PSF routines, just
+     include the standard ASTERIX options file on the link line, eg.
+
+       ALINK application,...,ASTOPT/OPT
+
+     Note that the INIT and CLOSE routines, unlike most such pairs
+     in ASTERIX subpackages, require a STATUS argument. This is for
+     the simple reason that they can generate errors when executing.
+
+     3.2  Associating a Dataset with a Psf
+
+     The PSF system associates a dataset with a psf using one of the
+     two routines PSF_ASSOCI, PSF_ASSOCO, depending on whether read
+     or write access is being performed. Both routines return a psf
+     reference number to the application, which should be declared as
+     type INTEGER. All subsequent access to PSF system routines should
+     pass this reference number as the first argument. More than one
+     psf can be associated with the same dataset, and more than one
+     dataset can be associated simultaneously. The total number of
+     active references is defined by the symbolic constant PSF_NMAX
+     in the ASTERIX include file PSF_PAR.
+
+     Before discussion of the routines which return useful data, the
+     routine PSF_RELEASE should be mentioned. This simply frees all
+     internal storage used by the PSF system for a specified reference.     
+
+     3.3  Accessing psf data
+
+     Discussion of the arguments to psf routines is not complete 
+     without a definition of the coordinate system used. 
+
+         +---------------------------------------------------+
+         |                                                   |     
+         |                                                   |     
+         |                            ^ +-----------------+  |     
+         |                            | |                 |  |     
+         |                            | |   +             |  |     
+         |                            NY|(X0,Y0) +        |  |     
+         |                            | |        (X0+QX,  |  |     
+         |                         +  | |         Y0+QY)  |  |     
+         |                      (0,0) v +------ARRAY------+  |     
+         |                              <--------NX------->  |     
+         |                                                   |     
+         |                                                   |     
+         |                                                   |     
+         |                                                   |     
+         |                                                   |     
+         +---------------- dataset X,Y space ----------------+
+
+     The dataset associated with a psf must have enough axis information
+     to define the X,Y space in angular units. The ASTERIX standards 
+     document PROG_002 defines the pointing direction as (0,0) in this
+     space.
+
+     The most primitive psf access routine is PSF_2D_DATA which directly
+     drives the psf library routines. Other system routines such as the
+     profilers RADIAL_PFL and ENERGY_PFL are built on top of PSF_2D_DATA.
+     The argument list of PSF_2D_DATA is,
+
+       PSF_2D_DATA( SLOT, X0, Y0, QX, QY, DX, DY, INTEG, NX, NY,
+                                                 ARRAY, STATUS )
+
+         SLOT		<int>   The psf reference
+         X0,Y0		<real>  The image position at which the psf is to
+                        	be evaluated, in radians
+         QX,QY		<real>  Radian offsets from the position (X0,Y0)
+                        	to the centre of the array ARRAY
+         DX,DY		<real>  The widths of the bins in ARRAY
+         INTEG		<log>   Return integrated probability per pixel?
+         NX,NY  	<int>   The dimensions of ARRAY
+         ARRAY(NX,NY)	<real>  The 2d probability array
+
+     The units of the values in ARRAY when INTEG is true are integrated 
+     probability per unit pixel area DX*DY. Thus, if the image area ARRAY
+     is sufficiently large, the sum of the values returned should approach
+     or even equal unity. The units of if INTEG is false are currently
+     undefined.
+
+     The discussion above has mentioned nothing of potential time or
+     energy dependence of the psf. Most application software is optimised
+     to handle spatial variation efficiently, with time and energy being
+     treated as extensions. The PSF system is organised to reflect this
+     method of programming - the data routines only provide control over
+     the spatial variables. To change the energy or time separate calls
+     to PSF_DEF must be made. This allows time and energy bands, as well
+     as user definable data to be passed to the psf data routine. A 
+     typical structure for processing such data where the psf also varies
+     with image position might look like,
+
+       CALL PSF_ASSOCI( LOC, SLOT, STATUS )
+       DO E = 1, NCHANNEL
+         CALL PSF_DEF( SLOT, ..., STATUS )
+         DO X = 1, NX
+           DO Y = 1, NY
+             CALL PSF_2D_DATA( SLOT, ... STATUS )
+           END DO
+         END DO 
+       END DO
+
+     Note that the PSF system routines know nothing about time or 
+     energy. The sole means by which the PSF_DEF call has any effect
+     is by altering the internal state of the psf library routine
+     generating the 2D psf data.
+
+
+   4 Creating a Psf Library or Library Routine
+
+     4.1  PSF system architecture
+
+     ASTERIX maintains a list of psf libraries it can access in the
+     environment variable AST_PSF_LIB_PATH. This text string contains
+     the names of the library or libraries or separated by commas. The
+     psf library containing the psf's supplied with ASTERIX release is
+     called PSFLIB. On VMS systems the psf library name must be a
+     logical name consisting of the filename of the executable image
+     (see next section), "EXE" is taken as the default file extension.
+     For example,
+
+       $ ASSIGN DISK$WORK1:[ASTERIX]TESTPSFLIB TESTPSFLIB
+       $ AST_PSF_LIB_PATH = "TESTPSFLIB"
+     
+     would set up TESTPSFLIB.EXE in the directory indicated as the only
+     active library in the psf system. Alternatively, the following
+
+       $ AST_PSF_LIB_PATH = "TESTPSFLIB,PSFLIB"
+ 
+     adds the library to the ASTERIX library search list. Note that  
+     the logical assignment MUST NOT contain any process or job logical 
+     names, only SYSTEM names are translated by VMS when translated 
+     shareable image names. Details of how to construct a psf library 
+     are dealt with in system specific sections at the end of this note.
+
+
+     4.2  The PSF Library Structure
+
+     A PSF library is a shareable image constructed from a series of 
+     subroutines, some of which have names and arguments defined by 
+     the interface to the PSF system routines. The recommended means
+     to maintain a psf library is to put all the object modules in a
+     object library. Consider the hypothetical example of a library 
+     called MYLIB which contains two psf data routines, DET1 and DET2.
+     To link this object library into a shareable psf library, run 
+     the ASTERIX development procedure PSFLIBLINK,
+
+       PSFLIBLINK MYLIB
+
+     This procedure expects to find,
+
+       1) An object library called MYLIB.OLB
+       2) A link options file called MYLIB.OPT
+
+     and creates a file called MYLIB.EXE. The link options file is 
+     very important, and the source of most difficulties creating a 
+     psf library. It must contain,
+
+       1) A UNIVERSAL statement for each externally visible
+          subroutine
+       2) A PSECT statement for each named common block (Fortran)
+          or global variable (C) used in the psf library.
+
+
+     4.3  PSF_SHARE_INIT and PSF_SHARE_CLOSE
+
+     To continue the example above, here is the beginning of a 
+     possible MYLIB.OPT options file
+
+       UNIVERSAL=PSF_SHARE_INIT,PSF_SHARE_CLOSE
+       PSECT=DET1_CMN,NOSHR
+       PSECT=DET2_CMN,NOSHR
+       ...
+
+     The first line introduces the first 2 special routines. These
+     routines are recognised by the PSF system by NAME. The second
+     and third lines name common blocks used by the psf routines,
+     and specify them NOSHR. Failure to name a common block will
+     not prevent a psf library linking, but will result in a PSF
+     system error "failed to load library NAME".
+
+     The mandatory PSF_SHARE_INIT routine is called the library 
+     when PSF_INIT is invoked by the application. Its purpose is
+     two-fold; it returns the number and name of the psfs supplied
+     by the library, and performs initialisation tasks for ALL the
+     routines in the library, such as zeroing common blocks.
+
+     PSF_SHARE_CLOSE, if present, is executed by PSF_CLOSE for each
+     library that has been accessed at least once by the PSF system.
+
+
+     4.4  A Data routine
+
+     For a psf of name <name>, the data routine is called PSF_<name>,
+     eg. PSF_DET1 or PSF_DET2 in our example. The arguments to this
+     routine are specified in Section 6. These routines have to be
+     externally visible so we require the following additional lines
+     in our example options file,
+
+       UNIVERSAL=PSF_DET1,PSF_DET2
+
+     The data routine will usually require some ancillary information
+     to generate psf data. Such data usually only needs accessed once
+     when the psf is selected by the user. The means to do this is 
+     through the PSF_<name>_INIT routine.
+
+
+     4.5  Data _INIT routine
+
+     When a psf is selected using one of the PSF_ASSOC routines, the
+     routine PSF_<name>_INIT is invoked if present. This routine is
+     supplied the slot number and locator to the associated dataset.
+     The former can be used to index a common block inside the library
+     if required - the locator is available for any access the library
+     routine might need, eg. getting a filter id.
+
+     Note that the _INIT routine should never annul the locator it
+     is given, and should either free any resources it uses or store
+     them in COMMON so that the PSF_<name>_CLOSE routine can do so.
+
+     Again, if an _INIT routine is required, it must be specified in
+     the options file, eg.
+
+       UNIVERSAL=PSF_DET1_INIT
+
+     The PSF system defines two ADAM parameters called MASK and AUX
+     for the use of _INIT routines. These can be used to get auxilliary
+     information from the user (see PSF_ANAL_INIT in AST_PSF:PSFLIB.TLB
+     for a good example). The interface file parameter type for both
+     is "LITERAL" which means that scalar values and filesnames can
+     be read using these parameters; vectors, however, must be parsed
+     after reading PAR_GET0C. The prompts require defining using the
+     PAR_PROMT subroutine. _INIT routines should always PAR_CANCL any
+     environment parameter accessed. This permits multiple calls to an
+     _INIT routine for different psfs.
+
+
+     4.6  Data _CLOSE routine
+  
+     This routine, if present, is called by PSF_RELEASE or PSF_CLOSE
+     when a psf is being released from the psf system. Its usual
+     function is to free any resources allocated by the <name> or
+     <name>_INIT routines.
+
+     Again, if an _INIT routine is required, it must be specified in
+     the options file, eg.
+
+       UNIVERSAL=PSF_DET1_CLOSE
+
+
+     4.7  Data _DEF routine
+
+     The PSF_<name>_DEF routine is invoked, if present, by a call to 
+     the psf system routine PSF_DEF. This link is provided in order 
+     that any internal settings stored in COMMON by a psf data routine
+     and associated routines can be changed. The seetings can then
+     be access by the data routine.
+
+
+     4.8  Data _PFL routine
+
+     The PSF_<name>_PFL routine provides an mechanism to generate
+     energy profile values directly. The PSF system routine 
+     PSF_ENERGY_PFL has an algorithm to perform energy profiling
+     by repeated calls to the routine. However, this routine is
+     susceptible to psfs with discontinuities and is very slow.
+     If energy radii can be calculated analytically for your psf
+     it is best to write this routine.
+
+     4.10  Examples
+
+     A good simple example of a collection of psf routines is
+     provided by the XRT_PSPC routines in AST_PSF:PSFLIB.TLB. A
+     not so simple one is the ANAL psf in the same library.
+
+
+   5 The PSF system routines
+
+     The following subset of the PSF system routines are for use by
+     application software. Note that ";" in argument lists shows
+     the break between the input arguments to the left, and output
+     arguments to the right.
+
+       ------------------------------------------------------------
+       PSF_INIT( STATUS ) 
+
+         Initialise the PSF common block and load the available psf
+         libraries.
+       ------------------------------------------------------------
+       PSF_CLOSE( STATUS )
+
+         Free all psf system sources
+       ------------------------------------------------------------
+       PSF_ASSOCI( LOC; SLOT, STATUS )
+       
+      	 LOC	<char>	  Locator to dataset
+         SLOT   <int>     The psf reference
+
+         Associate a dataset with a psf using READ access
+       ------------------------------------------------------------
+       PSF_ASSOCO( LOC; SLOT, STATUS )
+       
+      	 LOC	<char>	  Locator to dataset
+         SLOT   <int>     The psf reference
+
+         Associate a dataset with a psf using WRITE access.The name
+         of the psf selected is written to the dataset.
+       ------------------------------------------------------------
+       PSF_RELEASE( SLOT, STATUS )
+
+         SLOT   <int>     The psf reference
+
+         Free any resources used by the PSF system for the psf SLOT
+       ------------------------------------------------------------
+       PSF_2D_DATA( SLOT, X0, Y0, QX, QY, DX, DY, INTEG, NX, NY,
+                                                 ARRAY, STATUS )
+
+         SLOT   <int>     The psf reference
+         X0,Y0  <real>    The image position at which the psf is to
+                          be evaluated, in radians
+         QX,QY  <real>    Radian offsets from the position (X0,Y0) to
+                          the centre of the array ARRAY
+         DX,DY  <real>    The widths of the bins in ARRAY
+         INTEG  <log>     Return integrated probability per pixel?
+         NX,NY  <int>     The dimensions of ARRAY
+         ARRAY  <real>[]  The 2d probability array
+
+         Return a 2D array of probability per unit pixel for the
+         psf specified by SLOT.
+       ------------------------------------------------------------
+       PSF_DEF( SLOT, LOWT, HIGHT, LOWE, HIGHE, USERIN, USEROUT,
+                                                        STATUS )
+         SLOT   <int>     The psf reference
+         LOWT   <dble>    The lower time bound in offset from OBS_TAI
+         HIGHT  <dble>    The upper time bound in offset from OBS_TAI
+         LOWE   <int>     The lower energy channel bound
+         HIGHE  <int>     The upper energy channel bound
+         USERIN   *       User input to library DEF routine
+         USEROUT  *       User output from library DEF routine
+
+         Define the current energy and time bands for subsequent
+         psf evaluation. The time units are offsets from OBS_TAI,
+         ie. the TAI equivalent of the time origin of the dataset,
+         and the energy units are channel numbers. Additional 
+         USERIN and USEROUT arguments are provided for other
+         possible information which could affect the psf.
+       ------------------------------------------------------------
+       PSF_ENERGY_PFL( SLOT, NFRAC, FRAC, X0, Y0, RADII, STATUS )
+
+         SLOT   <int>     The psf reference
+         NFRAC  <int>     Number of energy fractions to be evaluated
+         FRAC   <real>    Array of fractions for radii to be found
+         X0,Y0  <real>    The image position at which the psf is to
+                          be evaluated, in radians
+         RADII  <real>[]  The radii in radians
+
+         Returns the radius in radians at which the specified psf
+         SLOT encloses each of the NFRAC energy fractions in FRAC.
+         The psf is evaluated at the image position (X0,Y0).
+       ------------------------------------------------------------
+       PSF_QMODEL( SLOT, MODEL, STATUS )
+
+         SLOT   <int>     The psf reference
+         MODEL  <logical> Psf is a model
+
+         Returns a logical flag depending on whether the psf SLOT
+         was defined using a psf model specification.
+       ------------------------------------------------------------
+       PSF_RADIAL_PFL( SLOT, X0, Y0, DIM, PROF, STATUS )
+
+         SLOT   <int>     The psf reference
+         X0,Y0  <real>    The image position at which the psf is to
+                          be evaluated, in radians
+         DIM    <int>     Number of profile values
+         PROF   <real>[]  Profile values
+
+         Returns an normalised surface brightness profile of the
+         specified psf SLOT, evaluating the psf at (X0,Y0).
+       ------------------------------------------------------------
+       PSF_RESAMPLE( NX, NY, IN, BORDER, OX, OY, OUT, STATUS )
+         NX,NY  <int>     Dimensions of IN and OUT arrays
+         IN     <REAL>[]  The input 2d psf
+         BORDER <int>     Border in pixels 
+         OUT    <REAL>[]  The input 2d psf
+
+         Used to shift a 2D array of values by an amount less than
+         or equal to one pixel in each dimension. The value of
+         BORDER which should be at least 1 prevents edge effects
+         affecting the values in OUT within this BORDER. The units
+         of OX and OY are fraction pixels.
+       ------------------------------------------------------------
+
+
+  6 PSF Library Routine Specifications
+
+    6.1  Library Routines
+
+    The special psf library routines are listed below, with a
+    description of the purpose of each.
+
+       ------------------------------------------------------------
+       PSF_SHARE_INIT( NNAME, NAMES, STATUS )
+
+         NNAME  <INT>     Number of psf routines in library
+         NAMES  <REAL>[]  Names of the psfs
+
+       Called only on the first occasion a library is accessed. 
+       Should be used to initialise any common blocks used by
+       the library.
+       ------------------------------------------------------------
+       PSF_SHARE_CLOSE( STATUS )
+
+       Called once during PSF_CLOSE() for each psf library which
+       has been accessed.
+       ------------------------------------------------------------
+
+    6.2  Data Routines
+
+    The routines below are defined for a psf of name <name>. Only
+    the PSF_<name> routine is mandatory.
+
+       ------------------------------------------------------------
+       PSF_<name>( SLOT, X0, Y0, QX, QY, DX, DY, INTEG, NX, NY,
+                                                ARRAY, STATUS )
+
+         SLOT   <int>     The psf reference
+         X0,Y0  <real>    The image position at which the psf is to
+                          be evaluated, in radians
+         QX,QY  <real>    Radian offsets from the position (X0,Y0) to
+                          the centre of the array ARRAY
+         DX,DY  <real>    The widths of the bins in ARRAY
+         INTEG  <log>     Return integrated probability per pixel?
+         NX,NY  <int>     The dimensions of ARRAY
+         ARRAY  <real>[]  The 2d probability array
+
+         Return a 2D array of probability per unit pixel for the
+         psf specified by SLOT.
+       ------------------------------------------------------------
+       PSF_<name>_INIT( SLOT, LOC, STATUS )
+         SLOT   <int>     The psf reference
+         LOC    <char>    Locator to associated dataset
+       ------------------------------------------------------------
+       PSF_<name>_DEF( SLOT, SLOT, LOWT, HIGHT, LOWE, HIGHE, USERIN,
+                                                   USEROUT, STATUS )
+         SLOT   <int>     The psf reference
+         LOWT   <dble>    The lower time bound in offset from OBS_TAI
+         HIGHT  <dble>    The upper time bound in offset from OBS_TAI
+         LOWE   <int>     The lower energy channel bound
+         HIGHE  <int>     The upper energy channel bound
+         USERIN   *       User input to library DEF routine
+         USEROUT  *       User output from library DEF routine
+       ------------------------------------------------------------
+       PSF_<name>_CLOSE( SLOT, STATUS )
+         SLOT   <int>     The psf reference
+       ------------------------------------------------------------
+       PSF_<name>_PFL( SLOT, NFRAC, FRAC, RADII, STATUS )
+         SLOT   <int>     The psf reference
+         NFRAC  <int>     The number of radii to evaluate
+         FRAC   <real>[]  The energy radii required
+         RADII  <real>[]  The radii in radians for each energy fraction

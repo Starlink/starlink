@@ -1,0 +1,23 @@
+ INTERFACE HCREATE                  
+    parameter INP                   
+       type 'UNIV'                  
+       position 1    
+       prompt 'Object name'
+       help 'Full path name of new object to be created'
+       association '->GLOBAL.HDSOBJ'  
+    endparameter                            
+   parameter TYPE                           
+     type '_CHAR'                           
+     position 2                             
+     prompt 'Object type'                   
+     help 'Type of data object to be created eg _REAL, SPECTRUM etc'             
+   endparameter                             
+   parameter DIMS
+     position 3
+     type '_INTEGER'                        
+     vpath 'DEFAULT'
+     default 0
+     prompt 'Dimensions'                    
+     help 'Dimensions of object - 0 for scalar -  128,128 for 2-D etc'           
+   endparameter                             
+ endinterface                               

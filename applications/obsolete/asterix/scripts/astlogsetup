@@ -1,0 +1,83 @@
+#!/bin/csh
+set a1=`echo $argv DUMMY|awk '{print $2}'`
+set a2=`echo $argv DUMMY DUMMY|awk '{print $3}'`
+#
+# Do nothing when no arguments supplied
+#
+if ( $a1 != "DUMMY" ) then
+#
+# Is logging on?
+#
+  set state=0
+  if ( ${?AST_LOG_STATE} ) then
+    if ( "${AST_LOG_STATE}" != "OFF" ) then
+      if ( `echo ${AST_LOG_STATE}|sed 's% %%'` != "" ) then
+        set state=1
+      endif
+    endif
+  endif    
+#
+# If logging is on, and the first argument is OFF or off, then switch it off
+#
+  set a1=`echo $a1 | tr '[a-z]' '[A-Z]'`
+  if ( $a2 == "DUMMY" ) then
+    set a2="astscript"
+  endif
+  set ext=""
+  if ( $state && ($a1 == "OFF") ) then
+#
+#  Write any trailing data to the log file
+#
+    set mode=`echo $AST_LOG_STATE|awk '{print $1}'`
+    set file=`echo $AST_LOG_STATE|awk '{print $2}'`
+    if ( -e $file ) then
+      if ( $mode == "CALL" ) then 
+        echo "      END" >> $file
+      endif
+    endif
+#
+#  Declare logging to be off
+#
+    echo "OFF"
+  else
+#
+#  Switch on allowed values
+    switch ( $a1 )
+     case "OFF":
+      echo "OFF"
+      breaksw
+     case "ICL":
+      if ( $a2 == ${a2:r} ) then
+        set ext=".icl"
+      endif
+      echo "ICL ${a2}${ext}"
+      touch ${a2}${ext}
+      breaksw
+     case "CSH":
+      if ( $a2 == ${a2:r} ) then
+        set ext=".csh"
+      endif
+      echo "CSH ${a2}${ext}"
+      touch ${a2}${ext}
+      chmod +x ${a2}${ext}
+      breaksw
+     case "CALL":
+      if ( $a2 == ${a2:r} ) then
+        set ext=".f"
+      endif
+      echo "CALL ${a2}${ext}"
+      touch ${a2}${ext}
+      echo "      PROGRAM ${a2:r}" >> ${a2}${ext}
+      echo "      INTEGER STATUS" >> ${a2}${ext}
+      echo "      STATUS = 0" >> ${a2}${ext}
+      breaksw
+     default:
+      echo $AST_LOG_STATE
+      breaksw
+    endsw
+#
+  endif
+#
+else
+  echo $AST_LOG_STATE
+endif

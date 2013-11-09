@@ -1,0 +1,2 @@
+
+$AST_BIN/cquality ignore=y set=n restore=n over=y $*

@@ -1,0 +1,46 @@
+*+  PSF_PAR - Constant parameters for the PSF system
+*-
+
+
+      INTEGER                   PSF_E_NONE              ! Energy modes
+        PARAMETER               ( PSF_E_NONE = 0 )
+      INTEGER                   PSF_E_CHANNEL
+        PARAMETER               ( PSF_E_CHANNEL = 1 )
+      INTEGER                   PSF_E_MODEL
+        PARAMETER               ( PSF_E_MODEL = 2 )
+
+      INTEGER                   PGRID_MAXR              ! Max bins in polar model
+        PARAMETER               ( PGRID_MAXR = 30 )
+
+      INTEGER                 PSF_NMAX             ! No. of psfs per system
+         PARAMETER            ( PSF_NMAX = 10 )
+
+      INTEGER                 PSF_LMAX             ! No. of libs in system
+         PARAMETER            ( PSF_LMAX = 4 )
+
+      INTEGER                 PSF_PGRID, PSF_RGRID ! Model identifiers
+         PARAMETER            ( PSF_PGRID = 1, PSF_RGRID = 2 )
+
+      CHARACTER*15            PSF_H_RADSYM
+         PARAMETER            ( PSF_H_RADSYM = 'RADIAL_SYMMETRY' )
+
+      CHARACTER*16            PSF_H_ENDEP
+         PARAMETER            ( PSF_H_ENDEP = 'ENERGY_DEPENDENT' )
+ 
+      CHARACTER*18            PSF_H_POSDEP
+         PARAMETER            ( PSF_H_POSDEP = 'POSITION_DEPENDENT' )
+ 
+      CHARACTER*14            PSF_H_MAXRAD
+         PARAMETER            ( PSF_H_MAXRAD = 'MAXIMUM_RADIUS' )
+
+      CHARACTER*19            PSF_H_SPATGRAN
+         PARAMETER            ( PSF_H_SPATGRAN = 'SPATIAL_GRANULARITY' )
+
+      CHARACTER*18            PSF_H_EGRAN
+         PARAMETER            ( PSF_H_EGRAN = 'ENERGY_GRANULARITY' )
+
+      CHARACTER*10            PSF_H_FLDSIZ
+         PARAMETER            ( PSF_H_FLDSIZ = 'FIELD_SIZE' )
+
+      CHARACTER*6		PSF__PROP
+         PARAMETER		( PSF__PROP = '.PSFID' )

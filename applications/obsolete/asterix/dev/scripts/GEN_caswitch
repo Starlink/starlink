@@ -1,0 +1,186 @@
+#!/bin/csh
+
+#+
+# Generate callable Asterix switcher for sub-system $1 given ifl modules $2 ...
+#
+#
+#-
+
+#
+# Get sub-system name
+#
+set subsys="$1"
+shift argv
+shift argv
+#
+# Extract the source listing command
+#
+set scmd = "$SOURCE_LIST"
+if ( "$scmd" == '$(TAR_LIST)' ) then
+  set scmd = "$TAR_LIST"
+endif
+#
+# The monolith header. Substitute in the sub-system id
+#
+sed "s%SUBSYS%$subsys%" <<FOO
+      SUBROUTINE CASW_SUBSYS( TASK, CSTRING, DONE, STATUS )
+*+
+*  Name:
+*     CASW_SUBSYS
+
+*  Purpose:
+*     Top-level SUBSYS subroutine for A-task pseudo-monolith 
+*     on Unix.
+
+*  Language:
+*     UNIX Fortran 77
+
+*  Type of Module:
+*     Callable Asterix task switcher
+
+*  Invocation:
+*     CALL CASW_SUBSYS( TASK, CSTRING, DONE, STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
+*     This is the top-level pseudo-monolith subroutine for the HED
+*     suite of A-tasks.  It is a pseudo-monolith as the command does
+*     not come from the ADAM interface, but is taken from the UNIX
+*     command line.  Each HED command is an alias to a softlink that
+*     points to this monolith.  The chosen commands is obtained from
+*     the UNIX Fortran run-time library routine GETARG.  Given the
+*     command,the requested A-task is called after a successful matching
+*     of the input string with a valid task name.
+*
+
+*  Notes:
+
+*  Algorithm:
+*     Check for error on entry - return if not o.k.
+*     The input string NAME is tested against all the valid A-task
+*     names after having been forced to upper-case. If a valid test
+*     is made, the relevant A-task is called. If not, an error message
+*     is output to the environment.
+
+*  Implementation Deficiencies:
+*     The input string has to be forced to upper-case.
+
+*  Authors:
+*     DJA: David J. Allan (BHVAD)
+*     {enter_new_authors_here}
+
+*  History:
+*     1993 March 30 (DJA):
+*        Original.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_new_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT  NONE              ! no implicit typing allowed
+
+*  Global Constants:
+      INCLUDE '/star/include/sae_par'
+
+*  Status:
+      INTEGER  STATUS
+
+*  Import:
+      CHARACTER*(*) TASK,CSTRING
+
+*  Export:
+      LOGICAL	DONE
+
+*  External references:
+FOO
+#
+# Loop over interface file library names
+#
+set nifl=1
+while ( $#argv > 0)
+#
+# Get the name of the next library
+#
+  set iflib="$argv[1]"
+#
+# Identify the interesting of the library. If the library name contains braces 
+# then they contain a list of the names of the modules to use, separated by
+# commas.
+#
+  set plib=`echo "${iflib}"| sed "s%(% %;s%)%%;s%,% %g"`
+  if ( "$plib" == "$iflib" ) then
+    set modules=" "
+    set thelib="$iflib"
+  else
+    set modules=`echo ${plib} | awk '{for(x=2;x<=NF;x++)print $x}'`
+    set thelib=`echo ${plib} | awk '{print $1}'`
+  endif
+#
+# Declare tasks as external
+#
+  set smods=`$scmd ${thelib} ${modules}|fgrep .ifl|sort -r|tr '[a-z]' '[A-Z]'`
+  foreach prog ($smods)
+    set eprog="$prog:r"
+    echo "      EXTERNAL $eprog"
+  end
+#
+sed "s%SUBSYS%$subsys%" <<FOO
+*.
+
+*    Check the inherited status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*    Quit if already executed
+      IF ( DONE ) RETURN
+
+*    Default is now done
+      DONE = .TRUE.
+
+*    Switch on task name
+FOO
+#
+# Loop over all the required modules in the interface file library. We sort 
+# them into descending order to put the test for commands like ISAVE1D before 
+# those for ISAVE which would otherwise be executed for both cases.
+#
+  foreach iprog ($smods)
+#
+# Get interface file name in upper case, and the length of that name
+#
+    set prog="$iprog:r"
+#
+# First one?
+#
+    if ( $nifl == 1 ) then
+      echo "      IF ( TASK .EQ. '"$prog"' ) THEN"
+    else
+      echo "      ELSE IF ( TASK .EQ. '"$prog"' ) THEN"
+    endif
+    echo "        CALL AST_UEXEC( $prog, CSTRING, STATUS )"
+    @ nifl++
+#
+#  next module
+#
+  end
+#
+# next library
+#
+  shift argv
+
+end
+#
+# Add the tail bit
+#
+cat <<FOO
+      ELSE
+        DONE = .FALSE.
+      END IF
+
+      END
+FOO

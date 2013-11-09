@@ -1,0 +1,6 @@
+#
+# Declaration for etc Makefile class
+#
+files DOC_FILES
+
+files BIN_DOC_FILES %prefix $(DOC)/ DOC_FILES

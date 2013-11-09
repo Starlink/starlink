@@ -1,0 +1,44 @@
+;; Class for storing a psf
+
+defclass PsfDescription {
+  INTEGER       Slot,			;; Temporary slot number
+  CHAR          Tag,			;; Psf tag name
+  INTEGER       Xax = 0,		;; Axis identifiers
+  INTEGER       Yax = 0,
+  INTEGER	Eax = 0,
+  INTEGER	Tax = 0,     
+  INTEGER	FileID,			;; Associated file identifier
+  LOGICAL       GotAx = False,          ;; Loaded axis stuff yet?
+  LOGICAL       IsModel = False,	;; Spatial model psf?
+  INTEGER       ModelType,		;; Model type
+  INTEGER	ModelNr,		;; # radial model bins
+  INTEGER	ModelNaz,		;; # azimuthal model bins
+  LOGICAL	ModelReg= False,	;; Model regular?
+  REAL		ModelDr,		;; Radial bin size
+                ModelRup,		;; Radial model bin upper bounds
+  INTEGER	ModelNx,		;; # rectangular X-axis model bins
+  INTEGER	ModelNy,		;; # rectangular Y-axis model bins
+  INTEGER	ModelNtot,		;; Total # model bins
+  INTEGER	ModelNelm = 0,		;; Total # model bins so far
+  INTEGER       ModelData,
+  LOGICAL	ModelDataOk = False,	
+  INTEGER       ModelFlag,
+  LOGICAL       IsEnergyModel = False,	;; Energy model psf?
+  INTEGER	NemBin,			;; # energy model bins
+  INTEGER	NemBnds,		;; Energy model bounds pointer
+  INTEGER	NemMode,		;; Energy modelling mode
+  LOGICAL       IsEventDS = False,	;; Attached to event dataset?
+  INTEGER       Instance = 0,		;; Other instance data
+  LOGICAL       PhaDef = False,		;; PHA bounds defined?
+  INTEGER       PhaLo = 0,		;; Lower PHA bound
+  INTEGER       PhaHi = 0,		;; Upper PHA bound
+  LOGICAL       TimeDef = False,	;; Time bounds defined?
+  DOUBLE        TimeLo = 0.0,	        ;; Lower time bound
+  DOUBLE        TimeHi = 0.0,		;; Upper time bound
+  INTEGER       EprofileRtn = 0,        ;; Energy profiler address
+  INTEGER       DataRtn = 0,            ;; 2-D data address
+  INTEGER       HintRtn = 0,            ;; Hint routine
+  INTEGER       CloseRtn = 0,           ;; Closure routine
+                Axes, 			;; Axis storage
+  STRUC         InstanceData		;; Data peculiar to this psf
+  }

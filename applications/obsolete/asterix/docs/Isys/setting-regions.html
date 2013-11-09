@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<HTML>
+<HEAD>
+	<TITLE>Isys</TITLE>
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+parent.prevURL = "main-toolbar.html"
+parent.nextURL = "formatting-plots.html"
+parent.frames[1].location = "buttons.html"
+//-->
+</SCRIPT>	
+</HEAD>
+
+<BODY BGCOLOR="White" TEXT="Navy">
+
+<H2><CENTER>Setting Spatial Regions</CENTER></H2><HR ALIGN="CENTER" SIZE="3"  COLOR="NAVY"><BR>
+<CENTER><TABLE BORDER=1 WIDTH=600>
+<TR>
+	<TD>Isys has the concept of a <I>current region</I>.  This will be an area of the image, which can vary in shape from, say, a simple box to a complex combination of shapes. Regions can also be imported and exported in text (currently ARD) format via the File menu item.</TD>
+</TR>
+</TABLE></CENTER><BR>
+<CENTER><TABLE BORDER=1 WIDTH=600>
+<TR>
+	<TD><IMG SRC="graphics/region-toolbar-shapes.gif" BORDER=0></TD>
+	<TD VALIGN="TOP">This group of buttons selects the basic shapes.</TD>
+</TR>
+<TR>
+	<TD VALIGN="TOP"><IMG SRC="graphics/region-toolbar-complex.gif" BORDER=0></TD>
+	<TD>These buttons control how regions are combined.  By default a new region is created, and previous regions discarded. Selecting the left button in the group will cause shapes to be accumulated (OR).  The middle button creates a region from the overlap (AND).  The right button takes the region outside the specified shape (NOT).  Note that the latter button does not cause existing regions to be inverted, but applies to shapes defined after it is selected.</TD>
+</TR>
+<TR>
+	<TD><IMG SRC="graphics/region-toolbar-actions.gif" BORDER=0></TD>
+	<TD VALIGN="TOP">From left to right these buttons perform the following actions: remove the current region from the image by setting quality to <I>IGNORE</I>, show the outline of the current region, reselect the whole image as the current region.</TD>
+</TR>
+</TABLE></CENTER><BR>
+
+<CENTER><TABLE WIDTH=600 BORDER=1>
+<TR>
+	<TD><IMG SRC="graphics/animated-tip.gif" BORDER=0> </TD>
+	<TD>By default positions are specified by left mouse clicks.  Positions and distances may also be entered via the
+keyboard in a variety of units. 
+ 
+Whenever Isys is awaiting positional input, clicking the right mouse button on the image will bring up a 
+dialogue for entering data via the keyboard.  Current positions will be offered as defaults. 
+ 
+Alternatively the toolbar buttons may be invoked with the right mouse button to go straight to keyboard 
+entry mode 
+ </TD>
+</TR>
+</TABLE></CENTER>
+</BODY>
+</HTML>

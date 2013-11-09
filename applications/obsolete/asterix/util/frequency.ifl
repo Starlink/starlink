@@ -1,0 +1,57 @@
+ INTERFACE FREQUENCY
+
+    PARAMETER INP
+       POSITION 1
+       TYPE 'LITERAL'
+       PPATH 'GLOBAL'
+       ASSOCIATION '<-GLOBAL.BINDS'
+       PROMPT 'Input object'
+       HELP 'Can be primitive, e.g 1,2,3,4,5 or structured, e.g. an image'
+    ENDPARAMETER
+
+    PARAMETER OUT
+       POSITION 2
+       TYPE 'LITERAL'
+       ASSOCIATION '->GLOBAL.BINDS'
+       PROMPT 'Dataset to receive distribution'
+       HELP 'This will be a 1D binned dataset'
+    ENDPARAMETER
+
+    PARAMETER    REG
+       TYPE        '_LOGICAL'
+       DEFAULT     Y
+       PPATH       'DEFAULT'
+       PROMPT      'Are the output bins to be regularly spaced'
+       HELP 'Answer Y if you want the output bins to be all the same size'
+    ENDPARAMETER
+
+    PARAMETER    SPACING
+       POSITION    3
+       TYPE        '_REAL'
+       PROMPT      'Enter the bin spacing'
+       HELP 'The spacing between the (regularly spaced) output bins'
+    ENDPARAMETER
+
+    PARAMETER    BOUNDARIES
+       POSITION    4
+       TYPE        'LITERAL'
+       PROMPT      'Enter the bin boundaries'
+       HELP 'A sequence of bounds is required, eg. 1:10:20:40:55:60:65'
+    ENDPARAMETER
+
+    PARAMETER NORM
+       TYPE '_LOGICAL'
+       PROMPT 'Normalise (Y/N)'
+       DEFAULT Y
+       HELP 'Answer Y if you want the "area" under the curve to be 1'
+    ENDPARAMETER
+
+   PARAMETER USEGRP
+      TYPE      '_LOGICAL'
+      VPATH     'DEFAULT'
+      DEFAULT   YES
+      PROMPT    'Use grouping information'
+      HELP      'Responding N will ignore the grouping data in the file'
+   ENDPARAMETER
+
+ENDINTERFACE

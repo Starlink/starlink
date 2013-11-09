@@ -1,0 +1,36 @@
+interface FITS2HDS
+  parameter INPUT
+    position 1
+    type     '_CHAR'
+    prompt   'Name of FITS file'
+    ppath    'CURRENT'
+    vpath   'PROMPT'
+  endparameter
+  parameter ASTERIX
+    type     '_LOGICAL'
+    prompt   'Include ASTERIX axis information'
+    vpath    'DEFAULT'
+    default  'TRUE'
+  endparameter
+  parameter ORIGIN
+    type     '_CHAR'
+    prompt   'Origin of datafiles (MPE,US,RDF)'
+    vpath    'DEFAULT'
+    default  'AUTO'
+    in       'MPE','US','RDF','AUTO'
+  endparameter
+  parameter OUTPUT
+    position 2
+    type     '_CHAR'
+    prompt   'Generic name of HDS output files'
+    ppath    'CURRENT'
+    vpath    'PROMPT'
+    help     'without an extension'
+  endparameter
+  parameter JOIN
+    type     '_LOGICAL'
+    prompt   'Join adjacent tables with identical columns'
+    vpath    'DEFAULT'
+    default  'TRUE'
+  endparameter
+endinterface

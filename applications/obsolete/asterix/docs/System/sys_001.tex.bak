@@ -1,0 +1,495 @@
+\documentstyle[11pt]{article}     % 10% larger letters, equns to left
+\pagestyle{myheadings}
+%------------------------------------------------------------------------------
+\newcommand{\astdoccategory}  {ASTERIX System Note}
+\newcommand{\astdocinitials}  {SYS}
+\newcommand{\astdocnumber}    {001}
+\newcommand{\astdocauthors}   {David J Allan}
+\newcommand{\astdocdate}      {27 May 1996}
+\newcommand{\astdoctitle}     {ASTERIX System Architecture}
+\newcommand{\astdocname}      {\astdocinitials /\astdocnumber}
+\renewcommand{\_}             {{\tt\char'137}}
+
+%------------------------------------------------------------------------------
+
+\setlength{\textwidth}{160mm}           % Text width 16 cm
+\setlength{\textheight}{240mm}          % Text height 24 cm
+\setlength{\oddsidemargin}{0pt}         % LH margin width, -1 inch
+\setlength{\evensidemargin}{0pt}        % LH margin width, -1 inch
+\setlength{\topmargin}{-5mm}            %
+\setlength{\headsep}{8mm}               % 
+\setlength{\parindent}{0mm}
+
+\begin{document}                                % Start document
+\thispagestyle{empty}
+ASTROPHYSICS and SPACE RESEARCH GROUP \hfill \astdocname \\
+DEPARTMENT OF PHYSICS AND SPACE RESEARCH\\
+UNIVERSITY OF BIRMINGHAM\\
+{\large\bf Asterix System Note} \hfill \astdocauthors\\
+{\large\bf \astdoccategory\ \astdocnumber} \hfill \astdocdate\\
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\huge\bf \astdoctitle}
+\end{center}
+\vspace{5mm}
+
+\parskip=4.0truemm plus 0.5truemm       % Paragraph spacing
+
+\markright{\astdocname}
+\tableofcontents
+\newpage
+
+\section{Introduction}
+
+This document explains the system architecture of the ASTERIX package
+and in particular the way in which make files are used. It also 
+highlights some of the reasons why things are done the way they are.
+Sometimes things me seem more complicated than they need be, but before
+changing anything fundemental be sure to test that it will work on all
+the machines supported (be especially wary of vendor specific make file
+features), and that it will work in both the development and publicly 
+released systems.
+
+\subsection{The Basics}
+
+All Starlink software uses the \verb+SYSTEM+ environment variable
+to control machine dependent aspects of software construction. It
+is normal for accounts doing software development to set this up
+in their \verb+.cshrc+ file. The values {\em currently} in use
+are,
+\begin{description}
+\item[sun4\_Solaris] SUN SPARCs running Solaris
+\item[alpha\_OSF1] DEC Alphas running OSF1
+\item[ix86\_Linux] Generic PC architecture running Linux
+\end{description}
+In addition we have supported {\bf sun4} (SUNs running SunOS) and
+{\bf mips} (DECstations running Ultrix) in the past, although we
+don't any longer.
+
+All Starlink software uses the UNIX system utility \verb+make+ to build
+its software. The associated make files are written in a generic fashion
+with the aim of containing no system dependent statements. Operations
+which are potentially non-portable (eg. the command to replace an object
+module in an archive) are tokenised. Each Starlink package then has a
+Bourne shell script called \verb+mk+ which sets up the values of these
+tokens depending on the value of \verb+$SYSTEM+. All make files are 
+therefore invoked using this \verb+mk+ script rather than running
+\verb+make+ directly.
+
+Make files define a number of targets. The ones used by Starlink
+are usually high level operations such as `build the system from the
+source code', or `install this package into the Starlink tree'. These
+high level targets are called {\em primary targets}. The {\em secondary}
+targets are the actual files which are built or modified by the system.
+Generally it is good practise not to access the secondary targets directly.
+A \verb+make+ target is activated if the file which the target specifies 
+is to be built is out of date with respect to its dependencies. A target
+with no dependencies is always activated.
+
+For primary targets it is not unusual to have dummy or zero length
+files which due to their date stamp in the file system can be used
+as date carrying flags. Starlink software usually maintains 3 such files
+in each directory called \verb+.BUILT+, \verb+.INSTALLED+ and \verb+.TESTED+.
+These flag files tell the system in which of 4 potential states the package
+exists. In ASTERIX, because we build our volatile files from one copy of
+the source code, these files are suffixed with the value of \verb+$SYSTEM+.
+Starlink aren't too keen on this, but who cares, and they get flack for
+having multiple copies of software.
+
+\subsection{Revision Control}
+The ASTERIX development system uses {\bf sccs}, the UNIX {\em s}ource 
+{\em c}ode {\em c}ontrol {\em s}ystem. This is done for two very different
+reasons,
+\begin{itemize}
+\item Almost unbelievably the text archive format is not portable between
+  SunOS and Solaris, and not updatable between Solaris and OSF. A container
+  is required for text modules, and updates to \verb+tar+ archives are not
+  universally supported.
+
+\item We need some way of preserving old versions of code which accessible
+  with resorting to system backups.
+\end{itemize}
+The result is that each library or application group subdirectory in ASTERIX
+contains an SCCS archive. Some useful SCCS commands are,
+\begin{center}
+\begin{tabular}{|l|l|} \hline
+Command & Purpose \\ \hline
+\verb+mkdir SCCS+            & Start a new SCCS archive \\
+\verb+sccs create <module>+  & Create a new module \\
+\verb+sccs get <module>+     & Extract a read only copy of a module \\
+\verb+sccs edit <module>+    & Extract a writable copy of a module \\
+\verb+sccs prs <module>+     & Display revision history of a module \\
+\verb+sccs get -r<rev> <module>+ & Extract a particular revision \\
+\verb+sccs -r<rev> SCCS+     & Increment version counter in archive \\ \hline
+\end{tabular}
+\end{center}
+
+Typical mistakes using SCCS include,
+\begin{itemize}
+\item Making a read only copy of a file, editing it (because \verb+jed+ allows
+  this), and \verb+replace+ing it. Effect is to change object module correctly
+  but {\em does not} update the source archive. Result is that next time
+  you rebuild the library the change goes away!
+  
+\item Deleting the writable copy of a module. Simply re-extract the
+  module using the \verb+sccs get -r+ mode (a simple \verb+sccs get+
+  fails because SCCS believes the module is write locked), change the
+  protection using \verb+chmod +w+ and then replace it.
+\end{itemize}
+
+If you make a change which subsequently turns out to have been ill-advised
+then you can recover old versions by discarding subsequent revisions. See
+the manual for details. You can also recover the whole archive to a
+particular date.
+
+It is important to realise that only the development system uses SCCS --
+Starlink just get \verb+tar+ files containing the source modules and
+build it from those. This duality is controlled by the \verb+AST_SYS_DEV+
+environment variable which causes the \verb+mk+ script to make alternate
+token substitutions. Starlink build ASTERIX without setting this variable,
+we define a value for it (which is itself irrelevant)  in the \verb+sysdev+
+procedure.
+
+\subsection{The Primary Targets}
+
+Lets go back to the state files \verb+BUILT_$SYSTEM+ etc. A Starlink
+package (and for us, any ASTERIX directory) can exist in 4 states, unbuilt
+(or source), built, installed and tested. The system is in the first state
+if you unpack the source code distribution. The primary targets can now
+be understood in terms of transitions between these states. 
+\begin{description}
+\item[build] Changes the state from unbuilt to built by constructing 
+  all the volatile, usually system dependent, files (eg executables)
+  Success is marked by the presence of the \verb+.BUILT_$SYSTEM+ file.
+  
+\item[unbuild] Goes from built back to unbuilt by deleting the volatile
+  files and the built flag file.
+  
+\item[check] Check that all the files that will be needed for a `build'
+  are in fact present. Generally a test that the `tar' file was not
+  corrupted
+  
+\item[clean] Deletes any temporary files created by the `build' target. 
+  Generally a null task in ASTERIX
+
+\item[install] Change the state from built to installed. Involves moving
+  and sometimes editing the volatile files into different directories.
+  Create the \verb+.INSTALLED_$SYSTEM+ flag file. Generally the built
+  volatiles are replaced with soft links to their installed counterparts
+  to save disk space.
+  
+\item[deinstall] Recover the built system from the installed state. It
+  is quite important that this pair of targets are well written such 
+  that if the install partially fails then the built system can be
+  correctly recovered.
+
+\item[export] Builds a \verb+tar+ file containing all the built files for
+  the architecture specified by the \verb+SYSTEM+ environment variable.
+  The tar file is created compressed in the top-level directory with 
+  name \verb+asterix_$SYSTEM.tar.Z+.
+  
+\item[export\_source] Builds a \verb+tar+ file containing all the source
+  and make files required to generate the binary built system and the
+  developer system. The file is created compressed in the top-level 
+  directory with name \verb+asterix.tar.Z+.
+  
+\item[test] Run a test procedure and create the test flag file. Not used
+  by ASTERIX.
+
+\end{description}
+In addition ASTERIX make files support a few more primary targets,
+\begin{description}
+\item[help] List the primary targets available to this directory
+\item[developer] Create the development system from the normal source
+  distribution. This involves setting up the SCCS directories.
+\item[makes] Recreate the \verb+Makefile+ for each of the dependent 
+  sub-directories of the current directory. Invoked at the top level
+  of the ASTERIX distribution this will rebuild all the make files except the
+  top level one (which is a special case anyhow).
+\item[showtree] Display the directory structure from the current directory
+  downwards. Invoked from the top-level shows the ASTERIX directory tree
+\item[rebuild] Just performs a {\bf unbuild}, then a {\bf build} and
+  finally a {\bf clean}.
+\item[get\_s\_files] Lists source files in the directory and all
+  sub-directories. This target is used by the \verb+build_export+ target
+  to construct the releasable files.
+\item[get\_b\_files] Lists built files in the directory and all sub-directories.
+  Used for building the binary release.
+\end{description}
+
+
+
+
+\section{The ASTERIX File Structure}
+
+The ASTERIX top level development directory contains a number of {\em modules}
+each of which has its own directory, plus one directory for each architecture
+on which the system is built. The latter directories have the same name as
+their corresponding \verb+$SYSTEM+ value. Source files for modules are broken
+up into different directories depending on their type. The system has been
+designed so that a directory contains only one class of file (eg.
+applications, script or data) which enables the make-files required to build
+those files be parameterised using the GEN\_make facility. 
+
+\subsection{The {\tt build} system}
+
+Each module sub-directory constructs built files from the source files (even
+if they are only copies), and moves them into the appropriate sub-directory
+of the system dependent directory for that architecture. There are only 5 
+such sub-directories.
+\begin{description}
+\item[dates] Text date stamp files. These are using to store details
+  of build times and macro definitions extant at the time of build. One
+  for every directory in ASTERIX.
+\item[bin] Executables and scripts. This is the directory which is
+  added to the user's \verb+PATH+ string.
+\item[etc] Everything else needed by the run-time system, apart from
+  help text and documentation. Contains data files, non-executable
+  scripts (eg. Tcl routines) and anything else you care to mention.
+\item[etc/sys] This contains a small subset of files needed by the ASTERIX
+  system. They are those which control the modular aspect of the system,
+  and include the module start up scripts and include file tables. Their
+  presence in this directory greatly speeds up the ASTERIX startup because
+  many fewer directory entries need to be scanned compared with keeping
+  them in {\tt etc}.
+\item[etc/docs] Contains all ASTERIX internal documentation, apart from 
+  SUN 98, the guide to the whole package.
+\item[lib] Object archives and object modules
+\item[help] Online help info
+\end{description}
+The entire ASTERIX system runs from within these directories, and relies
+on nothing outside. This results in duplication of the contents of the 
+\verb+etc+ directory which is unnecessary as the files are portable, but
+greatly simplifies the overall architecture of the system, and satisifies
+Starlink requirements for architecture separation.
+
+\subsection{The {\tt install} system}
+
+The ASTERIX development system runs in the built state, but for 
+external consumption Starlink insist we distribute our files into
+the Starlink directory structure. This is done by moving the built
+files from the build system directory \verb+xxx+ to \verb+/star/xxx/asterix+.
+Most files can simply be copied, but some scripts have to be edited.
+When the {\bf install} target moves the files is replaces the copies
+in the build directories with soft links to the installed files. The
+{\bf deinstall} target destroys these links and moves the files back
+to the build directories.
+
+\subsection{Modules}
+
+The module is the smallest optional unit in ASTERIX, ie. it is the unit
+in which sub-packages of ASTERIX are distributed. 
+
+\subsection{The Directory Classes}
+
+The various classes of ASTERIX directories are discussed below. There
+is nothing to stop new classes being defined, but you should ensure
+that they behave according to the general principles.
+
+\subsubsection{The General Principles}
+
+All ASTERIX directories can contain sub-directories. The list of such 
+directories is defined by the token {\bf SUBDIRS}. The order specified
+in this token is the order in which the sub-directories are built and
+installed -- these operations take place {\em before} the build and
+install phases of the directory which is the container. The {\bf SUBDIRS}
+token defines another token called {\bf REV\_SUBDIRS}, which is the
+order in which sub-directories are unbuilt and deinstalled.
+
+A useful target supported by {\em all} ASTERIX directory classes is the
+\verb+showtree+ target. THis recursively displays the names of all the
+directories in the {\bf SUBDIRS} list, and all their sub-directories,
+and so on until a directory is reached which has no sub-directories. The
+output looks something like,
+
+\begin{verbatim}
+   % cd $AST_ROOT
+   % mk showtree
+
+     dev/
+       etc
+       scripts
+     kernel/
+       hed/
+         scripts
+       lib/
+         etc
+         inc
+         scripts
+       util/
+         scripts
+     ....
+     rosat/
+       scripts
+\end{verbatim}
+
+\subsubsection{The {\tt etc} Class}
+
+The {\tt etc} class is the simplest directory class. Source files are
+simply copied to the {\tt etc} sub-directory of \verb+$AST_ROOT/$SYSTEM+
+in the build phase, and \verb+$INSTALL/etc/asterix+ in the install phase.
+
+Often the files which are specified by the {\tt etc} directory are
+calibration files, which are perhaps computed by some application or
+supplied by an external agency. Each such file should have a subdirectory
+containing either the code required to make the file or relevant
+documentation. This directory
+is not part of the system as far as building and installing is
+concerned, and is ignored by the \verb+mk+ system. An example of this
+is the ASCA SIS psf calibration, which lives in \verb+kernel/etc+. 
+A subdirectory called \verb+SISpsfGenerator+ exists which contains
+the code which makes this file.
+
+The only mandatory token required by the \verb+etc+ class make file
+is one called {\bf ETC\_FILES}. You can list all the files under this token
+or you can split them, which is neater. For example,
+\begin{verbatim}
+   files BITMAPS marilyn.xbm pamella.xbm claudia.xbm
+  
+   files COLTABS mary.sdf mungo.sdf midge.sdf
+  
+   #
+   # The mandatory token
+   #
+   files ETC_FILES :BITMAPS: :COLTABS:
+\end{verbatim}
+  
+\subsubsection{The {\tt docs} Class}
+
+A simple variant of the \verb+etc+ class which simply copies its files
+into the directory \verb+$AST_ROOT/$SYSTEM/etc/docs+. The only token used
+is {\bf DOC\_FILES} which is a list of the documents to be copied. Current
+practice in ASTERIX is to have all user documents available in an installation
+regardless of the modules actually installed. System maintainance and
+programmer documentation may however be module specific.
+
+\subsubsection{The {\tt scripts} Class}
+
+Contains {\em public} and {\em private} scripts. Public scripts are
+executable files which are built to the directory
+\verb+$AST_ROOT/$SYSTEM/bin+,
+and installed to \verb+$INSTALL/bin/asterix+. Private scripts are
+auxilliary files (``subroutines''), which are not intended to be
+directly referenced by the user. These are built to 
+\verb+$AST_ROOT/$SYSTEM/etc+ and installed to \verb+$INSTALL/etc/asterix+.
+
+There are 4 types of supported scripts -- C shell scripts, Bourne shell
+scripts, ICL procedures and Tcl procedures. The first three require no
+special treatment by the \verb+mk+ system, but the Tcl files require
+the location of the \verb+tclsh+ interpreter and the ADAM Tk 
+library edited in. These locations are specified by token substitutions
+in the \verb+mk+ script.
+
+Only those tokens denoting source for the class of scripts in a particular
+directory are mandatory, eg.
+\begin{verbatim}
+   files PRIVATE_TCL_SRC sub1.tcl doit.tcl
+   
+   files PUBLIC_ICL_SRC  mickey.icl mouse.icl language.icl
+\end{verbatim}
+We have no Bourne shell scripst so we don't have to specify the
+{\bf PUBLIC\_SH\_SRC} or the {\bf PRIVATE~\_SH\_SRC} tokens.
+
+\subsubsection{The {\tt tools} Class}
+
+The {\tt tools} class supports C and Fortran standalone programs. These
+tools are used to support ASTERIX operations. Examples include the file
+streamer \verb+at_strm+ (used by GEN\_make) and the help reader. The
+requirement on the linking of these tools is that they must {\em not}
+depend on any other part of ASTERIX. They may require linking against
+Starlink libraries. Executables are built to the \verb+$AST_ROOT/$SYSTEM/bin+
+directory and installed in \verb+$INSTALL/bin/asterix+.
+
+\subsubsection{The {\tt inc} Class}
+
+The purpose of this class is to support C and Fortran include files.
+The C ones are no problem, it's the Fortran ones that cause the hassle.
+All ASTERIX Fortran uses the old VMS style logical names for include
+files. These are translated by the \verb+v2u_include+ script into
+absolute UNIX file names. This process is performed by the Starlink
+\verb+forconv+ program which reads in a file called \verb+include.sub+
+which is a two column text file containing the mappings from VMS style
+include file names to UNIX ones. The file of these mappings is constructed
+on the fly by \verb+v2u_include+, and destroyed after translation (although 
+their is a persistent mode to support bulk compilation). The mapping
+file is made by concatenating all the mapping files generated for each
+of the ASTERIX \verb+inc+ directories. These mapping files are stored
+in \verb+$AST_ROOT/$SYSTEM/etc/sys+ in the built system.
+
+It is worth mentioning that C modules in ASTERIX have to have their
+include file paths specified somehow. This is done in two ways. Include
+paths which are system dependent are included in the {\bf mk} script 
+using the \verb+CFLAGS+ environment variable. The \verb+replace+ script
+in \verb+dev/scripts+ then adds the current directory, the ASTERIX library
+include directory and the Starlink include directory to the include 
+path list, ie.the equivalent of 
+\begin{verbatim}
+   -I. -I$AST_ROOT/kernel/lib/inc -I/star/include
+\end{verbatim}
+on the command line. The strategy of C use in ASTERIX has been to restrict
+it to the kernel routines -- there are only two exceptions, 
+\verb+fit__misc_c.c+ in the spectral fitting and \verb+htrace_int.c+
+in the HSD editor packages. If it became necessary to start adding more
+C routines then there might then be a case for a local \verb+GEN_make+ token
+containing local C include directives to give the same flexibility as 
+is already implemented in the Fortran case.
+
+In summary there are only two tokens in this directory class, namely
+{\bf F\_INCS} and {\bf C\_INCS}. The only built file is the Fortran
+mapping file which ends up in \verb+$AST_ETC/sys/<subsystem>.includes+
+where $subsystem$ is the full subsystem name of the include file diretory.
+
+\subsubsection{The {\tt lib} Class}
+
+The {\tt lib} class handles the construction of one or more object libraries
+
+\subsubsection{The {\tt appgrp} Class}
+
+\subsubsection{The {\tt module} Class}
+
+\subsubsection{The {\tt master} Class}
+
+The master class is the template for the top level package. The only
+build function performed by such a directory is the creation of the
+system Tcl index file in \verb+$AST_ETC/tclIndex+. This is done after
+building all the sub-directories which are all modules at this level.
+
+\subsection{The {\tt cmk} script}
+
+Now that the directory class structure has been introduced we can mention
+the \verb+cmk+ script without hopelessly confusing the reader. \verb+cmk+
+takes two or more arguments. The first argument is the name of a directory 
+class (eg. \verb+script+, \verb+appgrp+ etc). Subsequent arguments are
+concatenated to form a command. \verb+cmk+ then effectively runs \verb+mk+
+with that command {\em only} on directories whose class is the same as
+the first argument from the current directory downwards. For example,
+\begin{verbatim}
+   % cd $AST_ROOT
+   
+   % cmk scripts unbuild
+\end{verbatim}
+Unbuilds every scripts directory in ASTERIX. This is an extremely useful
+thing to be able to do. If you have to make a change to the way the
+script directory class is handled, you can unbuild all the script directories,
+change the \verb+.base_config+ and/or \verb+.make+ files, reconstruct
+the \verb+Makefiles+ using \verb+mk makes+ then rebuild.
+Thus although the whole system is rather more fragmented then it used to
+be, giving a finer degree of control of parts of the system, there is
+also more opportunity for labour saving tricks.
+
+\section{Open Issues}
+
+This is a list of those things which haven't been finished in ASTERIX V2.
+\begin{itemize}
+\item The documentation directory. I have implemented this as a simple
+variant of the \verb+etc+ directory class, with the documents being copied
+into \verb+$AST_ETC/docs+. Starlink doesn't really have a system for recognising
+internal package documents, so I propose we simply don't tell them about
+this.
+
+\item The help system.
+\end{itemize}
+
+\end{document}

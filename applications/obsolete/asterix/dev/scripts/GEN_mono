@@ -1,0 +1,191 @@
+#!/bin/csh -f
+
+#+
+# Generate monolith code for a sub-system $1 given ifl modules $2 ...
+#
+#
+#-
+
+#
+# Get sub-system name
+#
+set subsys="$1"
+shift argv
+#
+# Extract the source listing command
+#
+set scmd = "$SOURCE_LIST"
+if ( "$scmd" == '$(TAR_LIST)' ) then
+  set scmd = "$TAR_LIST"
+endif
+#
+# The monolith header. Substitute in the sub-system id
+#
+sed "s%SUBSYS%$subsys%" <<FOO
+      SUBROUTINE SUBSYS_MONO( STATUS )
+*+
+*  Name:
+*     SUBSYS_MONO
+
+*  Purpose:
+*     Top-level SUBSYS subroutine for A-task pseudo-monolith 
+*     on Unix.
+
+*  Language:
+*     UNIX Fortran 77
+
+*  Type of Module:
+*     ADAM A-task
+
+*  Invocation:
+*     CALL SUBSYS_MONO( STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
+*     This is the top-level pseudo-monolith subroutine for the HED
+*     suite of A-tasks.  It is a pseudo-monolith as the command does
+*     not come from the ADAM interface, but is taken from the UNIX
+*     command line.  Each HED command is an alias to a softlink that
+*     points to this monolith.  The chosen commands is obtained from
+*     the UNIX Fortran run-time library routine GETARG.  Given the
+*     command,the requested A-task is called after a successful matching
+*     of the input string with a valid task name.
+*
+
+*  Notes:
+
+*  Algorithm:
+*     Check for error on entry - return if not o.k.
+*     The input string NAME is tested against all the valid A-task
+*     names after having been forced to upper-case. If a valid test
+*     is made, the relevant A-task is called. If not, an error message
+*     is output to the environment.
+
+*  Implementation Deficiencies:
+*     The input string has to be forced to upper-case.
+
+*  Authors:
+*     DJA: David J. Allan (BHVAD)
+*     {enter_new_authors_here}
+
+*  History:
+*     1993 March 30 (DJA):
+*        Original.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_new_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT  NONE              ! no implicit typing allowed
+
+*  Global Constants:
+      INCLUDE '/star/include/sae_par'
+      INCLUDE '/star/include/par_par'
+
+*  Status:
+      INTEGER  STATUS
+
+*  External References:
+      EXTERNAL			CHR_LEN
+        INTEGER			CHR_LEN
+
+*  Local Variables:
+      CHARACTER  NAME * (PAR__SZNAM)             ! Task name from the command
+      CHARACTER  LNAME * (PAR__SZNAM)             ! Task name from the command
+
+      INTEGER			L			! Length of name
+*.
+
+*    Check the inherited status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*    Get task name from environment
+      CALL TASK_GET_NAME( NAME, STATUS )
+      LNAME = NAME
+
+*    Force the input string to upper-case before testing
+      CALL CHR_UCASE( LNAME )
+      L = CHR_LEN( LNAME )
+
+*    Identify and execute the task.
+*    ==============================
+*  
+*    Check the string against valid A-task names---if matched then call
+*    the relevant A-task
+FOO
+#
+# Loop over interface file library names
+#
+set nifl=1
+set preif=""
+while ( $#argv > 0)
+#
+# Get the name of the next library
+#
+  set iflib="$argv[1]"
+#
+# Identify the interesting of the library. If the library name contains braces 
+# then they contain a list of the names of the modules to use, separated by
+# commas.
+#
+  set plib=`echo "${iflib}"| sed "s%(% %;s%)%%;s%,% %g"`
+  if ( "$plib" == "$iflib" ) then
+    set modules=" "
+    set thelib="$iflib"
+  else
+    set modules=`echo ${plib} | awk '{for(x=2;x<=NF;x++)print $x}'`
+    set thelib=`echo ${plib} | awk '{print $1}'`
+  endif
+#
+# Loop over all the required modules in the interface file library. We sort 
+# them into descending order to put the test for commands like ISAVE1D before 
+# those for ISAVE which would otherwise be executed for both cases.
+#
+  set ifls=`$scmd ${thelib} ${modules}|grep ifl|sort -r`
+  set ifls=`echo $ifls|tr '[a-z]' '[A-Z]'`
+#
+  foreach iprog ($ifls)
+#
+# Get interface file name in upper case, and the length of that name
+#
+    set prog="$iprog:r"
+#    set plen=`echo $prog|awk '{print length($1)}'`
+#
+# First one?
+#
+    echo "      ${preif}IF ( LNAME(1:L) .EQ. '"$prog"' ) THEN"
+    echo "        CALL $prog( STATUS )"
+    @ nifl++
+#
+#  next module
+#
+    set preif="ELSE "
+  end
+#
+# next library
+#
+  shift argv
+
+end
+#
+# Add the tail bit
+#
+cat <<FOO
+
+*    No such option
+      ELSE
+
+         STATUS = SAI__ERROR
+         CALL MSG_SETC( 'CMD', LNAME )
+         CALL ERR_REP( ' ', 'No such option ^CMD.', STATUS )
+
+      END IF
+
+      END
+FOO

@@ -1,0 +1,35 @@
+*+  SSO_CMN - SSO system
+*-
+
+*  Max active datasets
+      INTEGER      SSO__MXDS
+        PARAMETER  ( SSO__MXDS = 12 )
+
+*  Max mapped items
+      INTEGER      SSO__MXMI
+        PARAMETER  ( SSO__MXMI = SSO__MXDS*4 )
+
+*  The two types of mapped item
+      INTEGER      SSO__MI_DATA, SSO__MI_ERROR
+        PARAMETER  ( SSO__MI_DATA=1, SSO__MI_ERROR=2 )
+
+*  Dataset store
+      CHARACTER*(DAT__SZLOC)	SSO_DS_LOC(SSO__MXDS)
+      LOGICAL			SSO_DS_USED(SSO__MXDS)
+
+*  Mapped item store
+      INTEGER			SSO_MI_DS(SSO__MXMI)
+      CHARACTER*(DAT__SZNAM)	SSO_MI_FNAM(SSO__MXMI)
+      CHARACTER*(DAT__SZLOC)	SSO_MI_FLOC(SSO__MXMI)
+      INTEGER			SSO_MI_TYPE(SSO__MXMI)
+      INTEGER			SSO_MI_PTR(SSO__MXMI)
+      LOGICAL			SSO_MI_MAPPED(SSO__MXMI)
+      LOGICAL			SSO_MI_USED(SSO__MXMI)
+
+*  Non-character stuff
+      COMMON /SSO_CMN/ SSO_DS_USED, SSO_MI_DS,
+     :                 SSO_MI_TYPE, SSO_MI_PTR, SSO_MI_MAPPED,
+     :                 SSO_MI_USED
+
+*  Character stuff
+      COMMON /SSO_CMN_C/ SSO_DS_LOC, SSO_MI_FNAM, SSO_MI_FLOC

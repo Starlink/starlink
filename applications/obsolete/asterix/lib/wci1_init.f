@@ -1,0 +1,148 @@
+      SUBROUTINE WCI1_INIT( STATUS )
+*+
+*  Name:
+*     WCI1_INIT
+
+*  Purpose:
+*     Load ADI definitions required for WCI operation
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL WCI1_INIT( STATUS )
+
+*  Description:
+*     Loads those class definitions required by the WCI subroutine group.
+*     Results in the following classes being defined,
+*
+*       Pixellation    - Describes pixel grid w.r.t. some fiducial point
+*       Projection     - Describes a map projection
+*       CoordSystem    - Describes an astronomical coordinate system
+*
+*     Methods are defined to read and write WCS information from HDS and
+*     FITS files.
+
+*  Arguments:
+*     STATUS = INTEGER (given and returned)
+*        The global status.
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  External Routines Used:
+*     ADI:
+*        ADI_REQPKG - Load a package from the load path
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     WCI Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/wci.html
+
+*  Keywords:
+*     package:wci, usage:private
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     9 Jan 1995 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'AST_PKG'
+
+*  Status:
+      INTEGER 			STATUS             	! Global status
+
+*  External References:
+      EXTERNAL			AST_QPKGI
+        LOGICAL			AST_QPKGI
+      EXTERNAL			ADI_REQPKG
+      EXTERNAL                  WCI1_READ
+      EXTERNAL                  WCI2_READ
+      EXTERNAL                  WCI1_WRITE
+      EXTERNAL			WCI2_WRITFIT
+      EXTERNAL			WCI2_SPWRITE
+
+*  Local variables:
+      INTEGER			DID			! Ignored identifier
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Check not already initialised?
+      IF ( .NOT. AST_QPKGI( WCI__PKG ) ) THEN
+
+*    Load the ADI classes
+        CALL ADI_REQPKG( 'wcs', STATUS )
+
+*    Define the methods
+        CALL ADI_DEFMTH( 'ReadWCS(_,_HDSfile)', WCI1_READ, DID,
+     :                   STATUS )
+
+        CALL ADI_DEFMTH( 'ReadWCS(_,_FITSfile)', WCI2_READ, DID,
+     :                   STATUS )
+
+        CALL ADI_DEFMTH( 'WriteWCS(_BinDS,_HDSfile,_,_Projection,'/
+     :                   /'_CoordSystem)', WCI1_WRITE, DID, STATUS )
+
+        CALL ADI_DEFMTH( 'WriteWCS(_EventDS,_HDSfile,_,_Projection,'/
+     :                   /'_CoordSystem)', WCI1_WRITE, DID, STATUS )
+
+        CALL ADI_DEFMTH( 'WriteWCS(_BinDS,_FITSfile,_,_Projection,'/
+     :                   /'_CoordSystem)', WCI2_WRITFIT, DID, STATUS )
+
+        CALL ADI_DEFMTH( 'WriteWCS(_Spectrum,_FITSfile,_,_Projection,'/
+     :                   /'_CoordSystem)', WCI2_SPWRITE, DID, STATUS )
+
+        CALL ADI_DEFMTH( 'WriteWCS(_FITSfile,_FITSfile,_,_,'/
+     :                   /'_)', WCI2_SPWRITE, DID, STATUS )
+
+*    Now initialised
+        CALL AST_SPKGI( WCI__PKG )
+
+      END IF
+
+*  Report any errors
+      IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'WCI1_INIT', STATUS )
+
+      END

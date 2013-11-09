@@ -1,0 +1,54 @@
+interface IBROWSE
+  parameter XPOS
+    position 1
+    type '_REAL'
+    ppath 'DYNAMIC'
+    prompt 'X-position'
+    help 'In axis coordinates'
+  endparameter
+  parameter YPOS
+    position 2
+    type '_REAL'
+    ppath 'DYNAMIC'
+    prompt 'Y-position'
+    help 'In axis coordinates'
+  endparameter
+  parameter VAR
+    type '_LOGICAL'
+    default N
+    vpath 'DEFAULT'
+    prompt 'Display variance'
+    help 'Display variance instead of data values'
+  endparameter
+  parameter ERR
+    type '_LOGICAL'
+    default N
+    vpath 'DEFAULT'
+    prompt 'Display errors'
+    help 'Display errors instead of data values'
+  endparameter
+  parameter SIGNIF
+    type '_LOGICAL'
+    default N
+    vpath 'DEFAULT'
+    prompt 'Display significance'
+    help 'Display significances instead of data values'
+  endparameter
+  parameter QUAL
+    type '_LOGICAL'
+    default N
+    vpath 'DEFAULT'
+    prompt 'Display quality'
+    help 'Display quality instead of data values'
+  endparameter
+  parameter SCALE
+    type '_INTEGER'
+    vpath 'DEFAULT'
+    default 0
+    prompt 'Power of 10 to scale displayed data by'
+  endparameter
+  parameter VAL
+    type '_REAL'
+    vpath 'INTERNAL,NOPROMPT'
+  endparameter
+endinterface

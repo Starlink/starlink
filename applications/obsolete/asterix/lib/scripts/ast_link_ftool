@@ -1,0 +1,68 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     ast_link_ftool
+
+#  Purpose:
+#     Generate linker (ld) arguments for linking against ADAM ASTERIX.
+
+#  Type of Module:
+#     Shell script.
+
+#  Description:
+#     This script should be invoked by those building ADAM applications
+#     which use ASTERIX in order to generate the correct arguments for the
+#     compiler (or ld) command. The arguments generated are written to
+#     the standard output.
+
+#  Invocation:
+#     The script may be invoked as part of a command such as:
+#
+#         f77 -o program program.f `ast_link_ftool`
+
+#  Copyright:
+#     Copyright (C) University of Birmingham, 1995
+
+#  Authors:
+#     DJA: D.J. Allan (JET-X, University of Birmingham)
+#     {enter_new_authors_here}
+
+#  History:
+#     16-FEB-1995 (DJA):
+#        Original version.
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#.
+
+#  Initialise the special options string.
+      special=''
+
+#  Test to see if we are on a system which requires additional
+#  "special" ld options for correct linking.
+
+#  DEC Alpha systems running OSF1:
+#  ------------------------------
+#  Ensure that allocated memory addresses will fit into 32 bits to
+#  prevent problems with storing them in Fortran integers.
+      if test "`uname -m`" = "alpha" -a "`uname -s`" = "OSF1"; then
+         special='-Wl,-D -Wl,40800000 -Wl,-T -Wl,30000000'
+      fi
+
+#  Echo any special options, followed by the HDS library reference,
+#  followed by the list of options for packages on which HDS depends.
+#  Pass the result through an awk script to remove duplicate library
+#  references.
+      ldef="$AST_LIB"
+      echo "${special}" -L${1-$ldef} -lastlib_ftool -lastlib `fitsio_link` \
+	`grp_link` `hds_link` `sla_link` `ard_link` \
+	`fio_link` `chr_link` `psx_link` `err_link` \
+	`cnf_link` -ltcl7.4 \
+           | awk '{for(f=NF;f;f--)if(!w[$f]++)l=$f" "l;print l}'
+
+#  End of script.

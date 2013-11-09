@@ -1,0 +1,22 @@
+*+  GCB_PAR - constants for Grafix Control Block
+
+      REAL GCB__OK
+      PARAMETER (GCB__OK=0)
+      INTEGER GCB__MXSTRUC		! max no of structured attributes
+      PARAMETER (GCB__MXSTRUC=10)
+      INTEGER GCB__MXCOMP		! max no of components within
+      PARAMETER (GCB__MXCOMP=15)	! each structure
+      INTEGER GCB__MXSCAL		! max no of scalar attributes
+      PARAMETER (GCB__MXSCAL=120)
+      INTEGER GCB__SZPTR		! no bytes to store displacement
+      PARAMETER (GCB__SZPTR=6)		! pointers
+      CHARACTER*8 GCB__PTRFMT		! format to store pointers
+      PARAMETER (GCB__PTRFMT='(I6.6)')
+      CHARACTER*8 GCB__VERFMT		! format to store version no
+      PARAMETER (GCB__VERFMT='(F6.2)')
+      INTEGER GCB__NHDBLK		! no of blocks of size SZPTR
+      PARAMETER (GCB__NHDBLK=6)		! at start of GCB written
+					! to file or cache
+      INTEGER GCB__MXCONTLEV,GCB__DEFCONTLEV
+      PARAMETER (GCB__MXCONTLEV=64,GCB__DEFCONTLEV=16)
+*-

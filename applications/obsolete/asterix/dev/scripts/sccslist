@@ -1,0 +1,10 @@
+
+sdir="$1"
+shift 
+if test "$1" = ""; then
+  ls $sdir/ | fgrep 's.' | cut -c3- 
+else
+  for i in "$*"; do
+    ls $sdir/ | fgrep 's.'$i | cut -c3-
+  done
+fi
