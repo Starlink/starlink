@@ -1,0 +1,64 @@
+\contentsline {section}{\numberline {1}Introduction}{4}
+\contentsline {section}{\numberline {2}Overview}{5}
+\contentsline {subsection}{\numberline {2.1}The PSF System}{5}
+\contentsline {subsection}{\numberline {2.2}Background Modelling}{5}
+\contentsline {subsection}{\numberline {2.3}Source Searching}{5}
+\contentsline {subsection}{\numberline {2.4}Post Search Processing}{6}
+\contentsline {section}{\numberline {3}PSS Tutorial}{7}
+\contentsline {subsection}{\numberline {3.1}Definitions}{7}
+\contentsline {subsection}{\numberline {3.2}Modes}{7}
+\contentsline {subsection}{\numberline {3.3}{SEARCH} mode}{7}
+\contentsline {subsection}{\numberline {3.4}{PARAM} mode}{11}
+\contentsline {subsection}{\numberline {3.5}{UPLIM} mode}{12}
+\contentsline {subsection}{\numberline {3.6}{UPMAP} mode}{12}
+\contentsline {section}{\numberline {4}PSS Reference}{13}
+\contentsline {subsection}{\numberline {4.1}Global Properties}{14}
+\contentsline {subsection}{\numberline {4.2}Input data}{14}
+\contentsline {subsection}{\numberline {4.3}Background Model}{15}
+\contentsline {subsection}{\numberline {4.4}Point Spread Function}{15}
+\contentsline {subsection}{\numberline {4.5}Fitting Statistics}{16}
+\contentsline {subsection}{\numberline {4.6}Background Rescaling}{16}
+\contentsline {subsection}{\numberline {4.7}Oversampling}{16}
+\contentsline {subsection}{\numberline {4.8}Source Confusion}{17}
+\contentsline {subsection}{\numberline {4.9}Source Extension}{18}
+\contentsline {subsection}{\numberline {4.10}Specifying Confidence Levels}{18}
+\contentsline {subsection}{\numberline {4.11}Source Parameter Errors}{19}
+\contentsline {subsection}{\numberline {4.12}Restarting PSS}{19}
+\contentsline {subsection}{\numberline {4.13}Source Subtraction}{19}
+\contentsline {subsection}{\numberline {4.14}Diagnostic Mode}{20}
+\contentsline {subsection}{\numberline {4.15}Limitations}{20}
+\contentsline {section}{\numberline {5}EVPSS Reference}{20}
+\contentsline {section}{\numberline {6}Support Programs}{21}
+\contentsline {subsection}{\numberline {6.1}SSDUMP}{21}
+\contentsline {subsection}{\numberline {6.2}SSCARIN}{21}
+\contentsline {subsection}{\numberline {6.3}SSANOT}{22}
+\contentsline {subsection}{\numberline {6.4}IMARK}{22}
+\contentsline {subsection}{\numberline {6.5}SSMERGE}{23}
+\contentsline {subsection}{\numberline {6.6}SSZAP}{23}
+\contentsline {subsection}{\numberline {6.7}EVSIM}{24}
+\contentsline {subsection}{\numberline {6.8}CREPSF}{25}
+\contentsline {subsection}{\numberline {6.9}WFCSPEC}{26}
+\contentsline {subsection}{\numberline {6.10}XPSSCORR}{26}
+\contentsline {section}{\numberline {7}Techniques}{27}
+\contentsline {subsection}{\numberline {7.1}Bad data}{27}
+\contentsline {subsection}{\numberline {7.2}Simulation}{27}
+\contentsline {subsection}{\numberline {7.3}Upper limits}{27}
+\contentsline {subsection}{\numberline {7.4}Using data QUALITY}{28}
+\contentsline {subsection}{\numberline {7.5}Interpreting Changes in Significance}{28}
+\contentsline {subsection}{\numberline {7.6}Iterative Methods}{28}
+\contentsline {section}{\numberline {8}References}{28}
+\contentsline {section}{\numberline {A}The PSF System}{29}
+\contentsline {subsection}{\numberline {A.1}Instrument Psfs}{29}
+\contentsline {subsection}{\numberline {A.2}ANALytic Psfs}{30}
+\contentsline {subsection}{\numberline {A.3}Tabular Psfs}{31}
+\contentsline {subsection}{\numberline {A.4}PSF models}{31}
+\contentsline {section}{\numberline {B}PSS Algorithms}{32}
+\contentsline {subsection}{\numberline {B.1}CASH}{33}
+\contentsline {subsubsection}{\numberline {B.1.1}Detection Significance}{34}
+\contentsline {subsubsection}{\numberline {B.1.2}Background Rescaling}{34}
+\contentsline {subsection}{\numberline {B.2}GAUSSIAN}{35}
+\contentsline {subsubsection}{\numberline {B.2.1}Selection of psf box}{35}
+\contentsline {subsubsection}{\numberline {B.2.2}Source flux estimates}{36}
+\contentsline {subsubsection}{\numberline {B.2.3}Flux and Positional Errors}{37}
+\contentsline {section}{\numberline {C}EVPSS Algorithms}{37}
+\contentsline {section}{\numberline {D}Figures}{37}

@@ -1,0 +1,93 @@
+The ASTERIX X-ray Analysis Package
+
+ ASTERIX provides a comprehensive set of tools for the reduction and
+ analysis of X-ray data, ie. the conversion of raw instrument data
+ into the images, spectra and other data products from which useful science
+ can be derived. Although developed primarily for the analysis of data 
+ from the German/UK/US ROSAT satellite, ASTERIX can now use data 
+ supplied by other projects which use the internationally defined 
+ standard data format.
+
+ ASTERIX Version 2 consists of a number of related but stand alone 
+ sub-packages including the kernel (utilities, graphics and image 
+ processing), timing analysis, spectral analysis and the ROSAT interface.
+ These are linked together by an online help system and a WWW help
+ page for reporting bugs and making requests for enhancements.
+
+ Two of the recent ASTERIX developments are highlighted below...
+
+
+
+Image Processing
+
+ The first Asterix GUI, {\bf Isys}, provides an easy to use alternative
+ to the old command line image processing system. The aim is to combine
+ the ease of use of the GUI with the ability to do quantitative analysis.
+
+ Some of the features of Isys are,
+
+  - Handles images in a variety of formats, and knows about astronomical
+    coordinate systems if present
+
+  - The user can define arbitrarily complex regions on which to operate.
+    These regions can be cut and pasted, smoothed or manipulated in other
+    ways.
+
+  - An interactive colour table editor. A number of different scaling 
+    algorithms are available to enhance different parts of the image 
+    data range
+    
+  - An interactive background modeller and ability to run the ASTERIX source
+    searching tool PSS from within the GUI
+
+  - Access to online source databases and image data archives. Enables
+    the user to overlay his image with a large number of source catalogues
+    stored at Goddard Space Flight Centre, USA (see fig_1a), or to extract 
+    images at other wavebands which lie at the same place on the sky
+
+  - Plots can be exported to non-ASTERIX software, such as the XANADU QDP
+    program 
+
+ Caption to fig_1:
+
+  The Isys main screen showing a ROSAT image of M82. The right hand panel
+  shows the characteristics of the current region, in this case the whole
+  image. Access to Isys functions can be through either the menus or using
+  the tool bars present above the image display area.
+
+
+ Caption to optional fig_1a
+
+  The Isys HEASARC (Goddard archive) catalogue access dialogue. Isys offers
+  the GUI's current celestial position and image size as the default for 
+  the search, but these may be overridden.
+
+
+
+Spectral Analysis
+
+ The spectral analysis of much X-ray data is complicated by the poor 
+ energy resolution of most X-ray detectors. When comparing observed 
+ spectra with theoretical models the software must perform a quite complex
+ transformation on the latter before the comparison can take 
+ place. Sophisticated software tools are required to find the best
+ model spectrum, estimate the uncertainties in that model and perform
+ other associated tasks.
+
+ The ASTERIX spectral fitting system supports multi-instrument fitting to 
+ a wide variety of models. Included is an advanced $n$-dimensional gridding 
+ tool, an example of whose output is shown in Figure 2.
+
+ Caption to fig_2 if required:
+
+  The figure shows the goodness of fit of a two temperature plasma model
+  to a ROSAT spectrum, as a function of the temperatures in the model and
+  overlaid with contours of the metallicity of the first component.
+
+ The ASTERIX spectral fitting is evolving to tackle the needs of the newer
+ X-ray CCD detectors, where the gains of higher resolution are balanced by 
+ uncertainties in the theoretical plasma spectra and the difficulties of
+ calibrating fine structure in the telescope response due to the CCD materials
+ used. An imminent development is a spectral image fitting GUI which will
+ allow interactive definition of spatial regions using {\bf Isys} and allow
+ the energy dependent spatial blurring to be taken into account.

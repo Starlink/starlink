@@ -1,0 +1,34 @@
+defclass RedistributionMatrix {
+  INTEGER       NCHAN, 			;; Number of channel bins
+  INTEGER       NENERGY, 		;; Number of energy bins
+                Channels,		;; Boundaries of channel bins
+                Energy,                 ;; Boundaries of energy bins
+  LOGICAL       Normalised,		;; Normalised response, ie. no area
+                CompressMethod,		;; Compression method. NONE, ASTERIX
+                                        ;; or XANADU
+                Threshold,		;; Lower probability threshold
+                RMF,			;; The response matrix
+  CHAR          Version,		;; Version id
+  REAL		GeometricalArea		;; The geometrical area
+  }
+
+defclass AsterixRMF RedistributionMatrix {
+		Normalised = False,	;; ASTERIX responses are never norm'd
+                CompressMethod = "ASTERIX",
+                ChannelIndices,		;; Channel index of non-zero RMF items
+                EnergyIndices,		;; Energy index of non-zero RMF items
+                ChannelSpec		;; Centres of rebinned response
+  }
+
+defclass OGIPcmpRMF RedistributionMatrix {
+                CompressMethod = "OGIP_CMP",
+                Ngrp,			;; Channel subsets per energy channel
+                Fchan,			;; Subset start positions
+                Nchan			;; Subset lengths
+  }
+
+defclass AncillaryResponse {
+  INTEGER       NENERGY,		;; Size of these two arrays
+                Energy,			;; Energies at which values tabulated
+                Response		;; Response (cm**2)
+  }

@@ -1,0 +1,98 @@
+                        NEW HISTORY ROUTINES
+                        ~~~~~~~~~~~~~~~~~~~~
+
+ ast_docs:prog_006.lis                                          Phil Andrews
+ Version 2 (8/12/88)
+
+
+   The HISTORY routines have been rewritten to:
+
+     a) Accept any locator as input, & to look for the HISTORY
+        structure.
+
+     b) Use an internal common block to preserve locators.
+
+   The HIST_ routines available are:
+
+1)  HIST_ADD - Add standard record to existing HISTORY structure
+     SUBROUTINE HIST_ADD (LOC, NAME, STATUS)
+
+     Name = name of calling application
+     A new HISTORY structure will be created if necessary.
+
+2)  HIST_COPY - Copies HISTORY structure from ILOC to OLOC
+     SUBROUTINE HIST_COPY (ILOC, OLOC, STATUS)
+
+     ILOC obeys point a) above.
+     OLOC does NOT; the HISTORY is copied into the structure
+     located by OLOC.
+
+3)  HIST_FIND - Find current HISTORY record
+     SUBROUTINE HIST_FIND (LOC, RECORD, STATUS)
+
+     RECORD is a locator to the current HISTORY record.
+     VERY few (if any) applications will need to use this.
+
+4)  HIST_INIT - Initialize HISTORY common block
+     SUBROUTINE HIST_INIT
+
+     Applications MUST call this or AST_INIT 
+
+5)  HIST_NEW - Create a new HISTORY structure (will delete any existing one)
+     SUBROUTINE HIST_NEW (LOC, STATUS)
+
+6)  HIST_NREC - Enquire current number of HISTORY records
+     SUBROUTINE HIST_NREC (LOC, COUNT, STATUS)
+
+     VERY few applications will need to use this.
+
+7)  HIST_OK - Is there a HISTORY structure present?
+     SUBROUTINE HIST_OK (LOC, OK, STATUS)
+
+     Called by many of the other HIST_ routines.
+     Few applications will need to use this.
+
+8)  HIST_PTXT - Puts text component into current HISTORY record
+     SUBROUTINE HIST_PTXT (LOC, NLINE, TEXT, STATUS)
+
+     LOC obeys point a) above.
+     NLINE is the number of text lines in the character array TEXT
+
+
+
+
+
+
+
+
+   USAGE:
+   ~~~~~~
+
+      Most applications will use either HIST_COPY or HDX_RCOPY to
+   copy the HISTORY from input to output file. They will then use
+   HIST_ADD & then HIST_PTXT. Note that USI_INPNAME & USI_OUTNAME
+   should be used to obtain the input & output file names as required.
+
+      At present HISTORY, the application, will display ANY component
+   written to a HISTORY record. However, it is preferable to write all
+   HISTORY comments & values into a CHARACTER*80 array, and to add this
+   to the HISTORY record using HIST_PTXT.
+
+
+
+
+   CONVERTING FROM THE OLD HISTORY ROUTINES:
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   a) No longer need to check before calling HIST_COPY; it will work
+     OK if ILOC is to a primitive object; it will simply do nothing if 
+     the input file contains no HISTORY, and STATUS is not altered.
+
+   b) HIST_ADD will work if LOC is to a primitive object; a new HISTORY
+     structure will be created if necessary.
+
+   c) Applications need no longer call HIST_FIND
+
+   d) The locator given to HIST_PTXT should be the output locator.
+
+   e) Don't forget to add a HIST_INIT call, unless  you are using AST_INIT.

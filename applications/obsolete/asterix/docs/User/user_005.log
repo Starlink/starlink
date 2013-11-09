@@ -1,0 +1,168 @@
+This is TeX, Version 3.14159 (C version 6.1) (format=latex 97.5.19)  7 MAR 2000 09:36
+**user_005.tex
+(user_005.tex
+LaTeX2e <1996/12/01> patch level 1
+Babel <v3.6h> and hyphenation patterns for american, german, loaded.
+(/usr/local/teTeX/texmf/tex/latex/base/article.cls
+Document Class: article 1996/10/31 v1.3u Standard LaTeX document class
+(/usr/local/teTeX/texmf/tex/latex/base/fleqn.clo
+File: fleqn.clo 1996/07/26 v1.1b Standard LaTeX option (flush left equations)
+\mathindent=\dimen102
+)
+(/usr/local/teTeX/texmf/tex/latex/base/size11.clo
+File: size11.clo 1996/10/31 v1.3u Standard LaTeX file (size option)
+)
+\c@part=\count79
+\c@section=\count80
+\c@subsection=\count81
+\c@subsubsection=\count82
+\c@paragraph=\count83
+\c@subparagraph=\count84
+\c@figure=\count85
+\c@table=\count86
+\abovecaptionskip=\skip41
+\belowcaptionskip=\skip42
+\bibindent=\dimen103
+)
+(/usr/local/teTeX/texmf/tex/latex/graphics/graphics.sty
+Package: graphics 1996/10/31 v1.0c Standard LaTeX Graphics (DPC,SPQR)
+
+(/usr/local/teTeX/texmf/tex/latex/graphics/trig.sty
+Package: trig 1994/10/16 v1.08 sin cos tan (DPC)
+)
+(/usr/local/teTeX/texmf/tex/latex/config/graphics.cfg)
+Package graphics Info: Driver file: dvips.def on input line 82.
+
+(/usr/local/teTeX/texmf/tex/latex/graphics/dvips.def
+File: dvips.def 1996/12/12 v3.0d Driver-dependant file (DPC,SPQR)
+))
+Starlink MAN macros. Released 27th February 1989
+\speccaption=\skip43
+\specname=\skip44
+(user_005.aux)
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 171.
+LaTeX Font Info:    ... okay on input line 171.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 171.
+LaTeX Font Info:    ... okay on input line 171.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 171.
+LaTeX Font Info:    ... okay on input line 171.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 171.
+LaTeX Font Info:    ... okay on input line 171.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 171.
+LaTeX Font Info:    ... okay on input line 171.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 171.
+LaTeX Font Info:    ... okay on input line 171.
+File: user_005_rosat.ps_tex Graphic file (type eps)
+ <user_005_rosat.ps_tex> [1
+
+] (user_005.toc
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <10.95> on input line 2.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <8> on input line 2.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <6> on input line 2.
+ [2] [3] [4])
+\tf@toc=\write3
+ [5]
+[6] [7] [8]
+Underfull \hbox (badness 10000) in paragraph at lines 377--380
+
+ []
+
+[9] [10] [11] [12] [13] [14] [15]
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 657.
+
+
+(/usr/local/teTeX/texmf/tex/latex/base/omscmr.fd
+File: omscmr.fd 1997/01/14 v2.5a Standard LaTeX font definitions
+)
+LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10.95> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 657.
+ [16] [17] [18] [19] [20]
+[21] [22] [23] [24]
+Underfull \hbox (badness 10000) in paragraph at lines 1193--1196
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1197--1198
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1199--1203
+
+ []
+
+[25] [26] [27] [28] [29] [30] [31] [32] [33] [34] [35] [36] [37] [38]
+(user_005_examples.tex [39] [40] [41] [42]) [43] (user_005_files.tex [44]
+[45
+
+] [46
+
+] [47
+
+]) (user_005_trace.tex [48
+
+]) [49]
+Underfull \hbox (badness 10000) in paragraph at lines 1840--1842
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1844--1856
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1859--1868
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1871--1880
+
+ []
+
+[50]
+Underfull \hbox (badness 10000) in paragraph at lines 1901--1906
+
+ []
+
+[51] [52] [53]
+Underfull \hbox (badness 10000) in paragraph at lines 1987--2001
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2004--2006
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2007--2011
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2012--2014
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2015--2017
+
+ []
+
+[54] [55] (user_005.aux) ) 
+Here is how much of TeX's memory you used:
+ 560 strings out of 10906
+ 5946 string characters out of 71872
+ 56470 words of memory out of 262141
+ 3446 multiletter control sequences out of 9500
+ 9586 words of font info for 34 fonts, out of 150000 for 255
+ 14 hyphenation exceptions out of 607
+ 22i,9n,25p,213b,329s stack positions out of 300i,40n,60p,3000b,4000s
+
+Output written on user_005.dvi (55 pages, 160036 bytes).

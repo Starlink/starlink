@@ -1,0 +1,74 @@
+AST_DOCS:PROG_010        
+
+                       The AXIS_ routines
+                       ==================
+Version 1.0
+David Allan (4/7/90)
+
+  The AXIS_ routines perform manipulations specific to Asterix axis
+  structures and data.
+
+  The first five of these routines use the AXIS LABELs in a binned dataset
+  to obtain the index number (for use in BDA_ routines) of an axis with a
+  particular label. 
+
+  If the specified axis is found, then AXDIM (or X_AXIS, Y_AXIS, T_AXIS) is
+  set to the index number of that axis. If no matches are found, then a
+  value of 0 is returned. If N matches are made (N > 1), then a value of -N
+  is returned. 
+
+  The new routines are:-
+    N.B. arguments to the left of the ; are imports & to the right are
+         exports. 
+
+---------------------------------------------------------------------------
+
+*+ AXIS_GET - Finds axis; asks user if can't do it automatically.
+      SUBROUTINE AXIS_GET (LOC, SUB_STRING, PARNAME, NDIM; AXDIM,
+     :                                                           STATUS) 
+
+      This routine calls AXIS_FIND. If the axis is NOT found, or more than
+      one match is made, then the relevant axis labels are displayed
+      together with their index numbers, and the user is asked to choose
+      which axis to use. 
+
+---------------------------------------------------------------------------
+
+*+ AXIS_FIND - Returns index number of axis with label containing SUB_STRING.
+      SUBROUTINE AXIS_FIND (LOC, SUB_STRING, NDIM; AXDIM, STATUS)
+
+      This routine looks for the axis label containing the sub string
+      SUB_STRING. SUB_STRING must therefore be chosen carefully! 
+
+---------------------------------------------------------------------------
+
+*+ AXIS_FINDXYT - Find the X, Y, and T axes, if possible.
+      SUBROUTINE AXIS_FINDXYT (LOC, NDIM; X_AXIS, Y_AXIS, T_AXIS,
+     :                                                           STATUS) 
+
+      This routine looks for X_CORR, Y_CORR, & TIMETAG labels. If it fails
+      it will look for the X_RAW, Y_RAW, & RAW_TIMETAG labels as
+      appropriate. 
+
+---------------------------------------------------------------------------
+
+*+ AXIS_LIST - Lists the axes of the data array with their labels.
+      SUBROUTINE AXIS_LIST (LOC, NDIM; STATUS)
+
+      This routine displays to the user the axis labels, together with
+      their index numbers. 
+
+---------------------------------------------------------------------------
+
+*+ AXIS_LISTMATCH - Lists axes with labels containing SUB_STRING.
+      SUBROUTINE AXIS_LISTMATCH (LOC, SUB_STRING, NDIM; STATUS)
+
+      This routine displays to the user the axis labels containing the sub
+      string SUB_STRING, together with their index numbers. 
+---------------------------------------------------------------------------
+*+ AXIS_VAL2PIX - Translates range spec to pixel values 
+      SUBROUTINE AXIS_VAL2PIX( DIM, AXVAL, RLO, RHI ; PLO, PHI, STATUS )
+
+      Locates a range specified in axis values in pixels. The bound
+      specified by RLO is inclusive, that by RHI is exclusive.
+---------------------------------------------------------------------------

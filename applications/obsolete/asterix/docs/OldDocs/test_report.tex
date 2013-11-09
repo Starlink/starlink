@@ -1,0 +1,106 @@
+\documentstyle[12pt]{article}
+\setlength{\textwidth}{154mm}
+\setlength{\headsep}{0mm}
+\setlength{\headheight}{0mm}
+\setlength{\textheight}{250mm}
+\setlength{\oddsidemargin}{2.6mm}
+\setlength{\evensidemargin}{2.6mm}
+\setlength{\topmargin}{2.0mm}
+\samepage
+\begin{document}
+\begin{center}
+\begin{bf}
+\begin{Large}
+
+Software Item Test Report                                          
+
+\end{Large}
+\end{bf}
+\end{center}
+\begin{scriptsize}
+\begin{it}
+This page should contain the result of one group of tests on one item of software.
+\end{it}
+\end{scriptsize}
+\begin{tiny}
+\begin{verbatim}
+Program Name:                                           Program Author / Responsible Authority:  
+
+Version:                                                Tested by:                   
+
+Date:                                                   Code Review:
+
+
+
+A) USER INTERFACE                                                                               COMMENTS
+------------------------------------------------------------------------------------------------------------------------------------
+  i)   Is the version number displayed?
+
+------------------------------------------------------------------------------------------------------------------------------------
+  ii)   Does the program display name of input container file? 
+
+------------------------------------------------------------------------------------------------------------------------------------
+  iii)  Are the prompts helpful/self explanatory?       
+
+------------------------------------------------------------------------------------------------------------------------------------
+  iv)   Does the on-line help explain the prompt in more detail?                              
+
+------------------------------------------------------------------------------------------------------------------------------------
+  v)    How does the program respond to funny inputs?   
+         a) invalid data type                         
+         b) (cr)   - should re-prompt                  
+         c) !      - should abort or react meaningfully      
+         d) !!     - should abort                   
+
+------------------------------------------------------------------------------------------------------------------------------------
+  vi)   Is the information displayed on the terminal useful?
+         a) Is the meaning of it obvious,             
+                    if not is it explained in the HELP file?
+         b) Are there any spurious messages?              
+
+------------------------------------------------------------------------------------------------------------------------------------
+  vii)  Does the HELP file describe the user interfaces?
+             (inputs, keywords, globals)            
+
+------------------------------------------------------------------------------------------------------------------------------------
+  vii)  Are the keywords in the Help file correct?      
+                                             
+------------------------------------------------------------------------------------------------------------------------------------
+  ix)   Does the command line keyword entry of parameters work? 
+                                                   
+------------------------------------------------------------------------------------------------------------------------------------
+
+B) PROGRAM EXECUTION 
+------------------------------------------------------------------------------------------------------------------------------------
+  i)    Will the program work on the minimum HDS data object required?                                    
+                                                   
+------------------------------------------------------------------------------------------------------------------------------------
+  ii)   Do all the options work, without crashing?             
+                                                   
+------------------------------------------------------------------------------------------------------------------------------------
+
+C) PROGRAM OUTPUT 
+------------------------------------------------------------------------------------------------------------------------------------
+  i)    Is the header information copied into the output file?      
+                                                   
+------------------------------------------------------------------------------------------------------------------------------------
+  ii)   Are unused structures/objects in the output file?       
+         (Do all components in the output file contain values?)      
+
+------------------------------------------------------------------------------------------------------------------------------------
+  iii)  Is a HISTORY component created?                        
+                                                   
+------------------------------------------------------------------------------------------------------------------------------------
+  iv)   Does the HISTORY component include parameters used?      
+                                                
+------------------------------------------------------------------------------------------------------------------------------------
+  v)    Is the output data correct?                        
+                                                
+------------------------------------------------------------------------------------------------------------------------------------
+  vi)   Can the output be displayed ( if appropiate ) ?            
+                                                
+------------------------------------------------------------------------------------------------------------------------------------
+
+D) OTHER COMMENTS:
+\end{verbatim}
+\end{document}

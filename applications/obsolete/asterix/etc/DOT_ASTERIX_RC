@@ -1,0 +1,27 @@
+#+
+#
+#
+#
+#
+#
+#.
+
+#include "DOT_ASTERIX_DEF"
+
+#
+CHAR loadModules: *
+
+
+# The directory in which ASTERIX expects to find XANADU executables
+
+Directory xanbin: ${XANBIN}
+
+# FTOOLS calibration database
+
+Directory ftoolsCaldb: 
+
+#
+# WWW interface
+#
+Executable wwwBrowser: netscape
+URL        wwwHomePage: http://www.sr.bham.ac.uk/asterix-docs/Asthelp/base/

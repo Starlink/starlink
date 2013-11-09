@@ -1,0 +1,91 @@
+\contentsline {section}{\numberline {1}Introduction}{6}
+\contentsline {subsection}{\numberline {1.1}Software Version}{6}
+\contentsline {subsection}{\numberline {1.2}ASTERIX Version 2.3}{6}
+\contentsline {subsection}{\numberline {1.3}Getting Started}{6}
+\contentsline {subsection}{\numberline {1.4}Getting Help}{6}
+\contentsline {subsection}{\numberline {1.5}Related Documents}{7}
+\contentsline {subsection}{\numberline {1.6}Layout of this Guide}{7}
+\contentsline {section}{\numberline {2}ROSAT}{8}
+\contentsline {subsection}{\numberline {2.1}Project}{8}
+\contentsline {subsection}{\numberline {2.2}Satellite}{8}
+\contentsline {subsection}{\numberline {2.3}Attitude Measurement and Control System}{8}
+\contentsline {subsection}{\numberline {2.4}XRT Mirrors}{9}
+\contentsline {subsection}{\numberline {2.5}PSPC}{9}
+\contentsline {subsection}{\numberline {2.6}HRI}{10}
+\contentsline {section}{\numberline {3}The ROSAT Data}{11}
+\contentsline {subsection}{\numberline {3.1}Overview and Origins}{11}
+\contentsline {subsection}{\numberline {3.2}The SASS}{11}
+\contentsline {subsection}{\numberline {3.3}FITS Conversions}{12}
+\contentsline {subsubsection}{\numberline {3.3.1}The Background to FITS File Conversions}{12}
+\contentsline {section}{\numberline {4}Getting a Quick Look at your Data}{13}
+\contentsline {subsection}{\numberline {4.1}How to get your Data onto Disk}{13}
+\contentsline {subsubsection}{\numberline {4.1.1}Reading a Data Tape}{13}
+\contentsline {subsubsection}{\numberline {4.1.2}Accessing the On-line Public Archive}{13}
+\contentsline {subsection}{\numberline {4.2}A Quick Look at the Data}{14}
+\contentsline {section}{\numberline {5}Detailed Analysis}{16}
+\contentsline {subsection}{\numberline {5.1}PSPC}{16}
+\contentsline {subsection}{\numberline {5.2}Background Subtraction}{16}
+\contentsline {subsubsection}{\numberline {5.2.1}Point Source Subtraction}{17}
+\contentsline {subsubsection}{\numberline {5.2.2}Extended Source Subtraction}{17}
+\contentsline {subsubsection}{\numberline {5.2.3}Multiple Point Source Subtraction}{18}
+\contentsline {subsection}{\numberline {5.3}Instrument Corrections}{19}
+\contentsline {subsubsection}{\numberline {5.3.1}Spatial/Temporal Gain Correction}{19}
+\contentsline {subsubsection}{\numberline {5.3.2}Exposure Correction}{19}
+\contentsline {subsection}{\numberline {5.4}Spectral Analysis}{20}
+\contentsline {subsubsection}{\numberline {5.4.1}Single Point Source}{20}
+\contentsline {subsubsection}{\numberline {5.4.2}Extended Source Single Spectrum}{21}
+\contentsline {subsubsection}{\numberline {5.4.3}Radial Spectra}{22}
+\contentsline {subsubsection}{\numberline {5.4.4}Spectral Analysis of the Background}{22}
+\contentsline {subsubsection}{\numberline {5.4.5}Spectra of many Sources}{23}
+\contentsline {subsection}{\numberline {5.5}Time Series Analysis}{24}
+\contentsline {subsubsection}{\numberline {5.5.1}Barycentric Correction}{24}
+\contentsline {subsection}{\numberline {5.6}Image Analysis}{24}
+\contentsline {subsubsection}{\numberline {5.6.1}Energy Mapping}{25}
+\contentsline {subsubsection}{\numberline {5.6.2}Radial Profiling}{25}
+\contentsline {subsubsection}{\numberline {5.6.3}Test for Extension}{26}
+\contentsline {subsection}{\numberline {5.7}Count Rates and Source Searching}{26}
+\contentsline {subsection}{\numberline {5.8}HRI}{28}
+\contentsline {subsubsection}{\numberline {5.8.1}HRI\_Aspect\_Errors}{28}
+\contentsline {subsection}{\numberline {5.9}Background Subtraction}{28}
+\contentsline {subsection}{\numberline {5.10}Exposure Correction}{29}
+\contentsline {subsection}{\numberline {5.11}Source Searching}{29}
+\contentsline {section}{\numberline {6}A Description of the PSF}{30}
+\contentsline {subsection}{\numberline {6.1}ASTERIX PSF}{30}
+\contentsline {subsubsection}{\numberline {6.1.1}ASTERIX Programs using the PSF System}{30}
+\contentsline {subsubsection}{\numberline {6.1.2}PSF User Interface}{31}
+\contentsline {subsubsection}{\numberline {6.1.3}General Considerations}{31}
+\contentsline {subsubsection}{\numberline {6.1.4}Improving PSF Processing Speeds}{32}
+\contentsline {subsubsection}{\numberline {6.1.5}PSF and Extended Sources}{32}
+\contentsline {subsection}{\numberline {6.2}PSF Options and Masks}{32}
+\contentsline {subsubsection}{\numberline {6.2.1}Other Satellites and ROSAT Instruments}{32}
+\contentsline {subsubsection}{\numberline {6.2.2}Analytic Options}{33}
+\contentsline {subsubsection}{\numberline {6.2.3}Tabular and Respfile Options}{33}
+\contentsline {subsubsection}{\numberline {6.2.4}PSF Models}{33}
+\contentsline {subsubsection}{\numberline {6.2.5}XRT\_PSPC - the Recommended Rosat Option and its Masks}{34}
+\contentsline {subsection}{\numberline {6.3}HRI Option}{35}
+\contentsline {section}{\numberline {7}Communicating with the ROSAT Project}{36}
+\contentsline {subsection}{\numberline {7.1}Staying Informed}{36}
+\contentsline {subsection}{\numberline {7.2}Reporting Bugs}{36}
+\contentsline {section}{\numberline {8}A Quick Guide}{37}
+\contentsline {subsection}{\numberline {8.1}PSPC}{37}
+\contentsline {subsection}{\numberline {8.2}HRI}{37}
+\contentsline {section}{\numberline {9}Housekeeping and calibration data}{38}
+\contentsline {subsection}{\numberline {9.1}Housekeeping Data}{38}
+\contentsline {subsection}{\numberline {9.2}Calibration Data}{38}
+\contentsline {section}{\numberline {10}Examples}{39}
+\contentsline {section}{\numberline {11}Appendix 1: Dataset Filenames and Contents}{44}
+\contentsline {subsection}{\numberline {11.1}A Typical ASTERIX File}{48}
+\contentsline {section}{\numberline {12}Appendix 2: ASTERIX XRT Command List}{50}
+\contentsline {subsection}{\numberline {12.1}Preprocessing}{50}
+\contentsline {subsection}{\numberline {12.2}Data Analysis}{50}
+\contentsline {subsection}{\numberline {12.3}ICL Procedures}{50}
+\contentsline {subsection}{\numberline {12.4}Associated Commands}{50}
+\contentsline {section}{\numberline {13}Appendix 3: Photon Characteristics}{51}
+\contentsline {section}{\numberline {14}Appendix 4: Important Housekeeping Parameters}{52}
+\contentsline {section}{\numberline {15}Glossary}{54}
+\contentsline {subsection}{\numberline {15.1}Useful WWW References}{54}
+\contentsline {subsection}{\numberline {15.2}Caption List}{54}
+\contentsline {section}{\numberline {16}References \& Bibliography}{55}
+\contentsline {subsection}{\numberline {16.1}User Guides}{55}
+\contentsline {subsection}{\numberline {16.2}Instrumentation}{55}
+\contentsline {subsection}{\numberline {16.3}ASTERIX documents}{55}

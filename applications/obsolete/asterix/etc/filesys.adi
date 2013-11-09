@@ -1,0 +1,11 @@
+defclass FileRepresentation [ClusterSize=8] {
+  CHAR          NAME,
+		OpenRtn,
+		CreatRtn,
+		NatrlRtn
+  }
+
+defclass FileObject ADIbase {
+		REP,
+		MODE
+  }

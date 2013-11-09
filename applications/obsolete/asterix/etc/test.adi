@@ -1,0 +1,5 @@
+TimeIt(2+3,22222)
+TimeIt(x=4,22222)
+TimeIt(Sqrt(9.0),22222)
+TimeIt(y={1,2},22222)
+TimeIt("a"//"b",22222)

@@ -1,0 +1,26 @@
+This is TeX, Version 3.14159 (C version 6.1) (format=latex 97.5.19)  9 FEB 2000 14:40
+**user_005_files.tex
+(user_005_files.tex
+LaTeX2e <1996/12/01> patch level 1
+Babel <v3.6h> and hyphenation patterns for american, german, loaded.
+! Undefined control sequence.
+l.1 \small
+          
+? h
+The control sequence at the end of the top line
+of your error message was never \def'ed. If you have
+misspelled it (e.g., `\hobx'), type `I' and the correct
+spelling (e.g., `I\hbox'). Otherwise just continue,
+and I'll forget about whatever was undefined.
+
+? x
+ 
+Here is how much of TeX's memory you used:
+ 4 strings out of 10906
+ 54 string characters out of 71872
+ 43261 words of memory out of 262141
+ 2979 multiletter control sequences out of 9500
+ 3640 words of font info for 14 fonts, out of 150000 for 255
+ 14 hyphenation exceptions out of 607
+ 5i,0n,1p,29b,7s stack positions out of 300i,40n,60p,3000b,4000s
+No pages of output.

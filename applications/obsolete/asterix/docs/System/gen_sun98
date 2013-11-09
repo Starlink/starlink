@@ -1,0 +1,8 @@
+#!/bin/csh
+cp sun98_top.tex sun98.tex
+hlpconv ../help/asthelp.raw tex mid.tex
+cat mid.tex | sed 1d >>sun98.tex
+rm mid.tex
+cat <<FOO >>sun98.tex
+\end{document}
+FOO

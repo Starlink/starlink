@@ -1,0 +1,10 @@
+;;
+;; Define file representation type
+;;
+defrep "hds"
+
+defclass HDSlocator {
+	Locator
+  }
+
+defclass HDSfile  FileObject,HDSlocator

@@ -1,0 +1,5 @@
+defrep "ascii"
+
+defclass ASCIIfile FileObject {
+  Handle
+  }

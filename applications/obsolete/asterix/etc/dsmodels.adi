@@ -1,0 +1,136 @@
+defclass Scalar ADIbase {
+  CHAR          TYPE,
+		Value*,
+                DatasetType = "PRIMITIVE"
+  }
+
+defclass Array ADIbase {
+  CHAR          TYPE,
+		SHAPE,
+		Origin,
+		Values*,
+		SpacedValues,
+                DatasetType = "ARRAY"
+  }
+
+defclass BinDSAxis {
+		Data,
+		Width,
+		LoWidth, HiWidth,
+  CHAR          Label,
+  CHAR          Units,
+  LOGICAL       Normalised = False
+  }
+
+defclass BinDS ADIbase {
+  CHAR          TYPE = "REAL",
+		SHAPE,
+  CHAR          DatasetType,
+  CHAR          Label,
+  CHAR          Units,
+                Title,
+		Data,
+		Variance,
+		Error,
+		LoError, HiError,
+		SystematicError,
+		Quality,
+                LogicalQuality,
+                MaskedQuality,
+  UBYTE         QualityMask = 255,
+  LOGICAL       MagicFlag = False,
+		Axes
+  }
+
+defclass Spectrum BinDS {
+  CHAR          AxisOrder = "E",
+                DatasetType = "SPECTRUM"
+  }
+
+defclass SpectralGrid BinDS {
+  CHAR          AxisOrder = "E",
+                DatasetType = "SPECTRA"
+  }
+
+defclass TimeSeries BinDS {
+  CHAR          AxisOrder = "T",
+                DatasetType = "TIME_SERIES"
+  }
+
+defclass PowerSpectrum BinDS {
+  CHAR          AxisOrder = "F",
+                DatasetType = "POWER_SPECTRUM"
+  }
+
+defclass PhaseSpectrum BinDS {
+  CHAR          AxisOrder = "F",
+                DatasetType = "PHASE_SPECTRUM"
+  }
+
+defclass Periodogram BinDS {
+                DatasetType = "PERIODOGRAM"
+  }
+
+defclass PhaseFold BinDS {
+                DatasetType = "PHASE_FOLD"
+  }
+
+defclass XYimage BinDS {
+  CHAR          AxisOrder = "XY",
+                DatasetType = "IMAGE"
+  }
+
+defclass EXYcube BinDS {
+  CHAR          AxisOrder = "EXY",
+                DatasetType = "SPECTRAL_IMAGE"
+  }
+
+defclass EventList {
+		SHAPE,                  ;; Dimensions of a list element
+  CHAR          TYPE,                   ;; Basic data type of list
+  CHAR          Name,                   ;; Name of the list
+		Min, Max,               ;; List extrema
+  LOGICAL       VectorQuantum = False,	;; Quantum is a per event vector
+		Quantum,                ;; Smallest distinguishable increment
+  LOGICAL       Decreasing = False,     ;; Sense is -ve
+  CHAR          Label,                  ;; If different from name
+  CHAR          Units                   ;; Units of list values
+  }
+
+defclass EventDS ADIbase {
+  INTEGER       NEVENT = 0,     	;; Number of events in dataset
+  INTEGER	NLIST = 0,      	;; Number of lists in dataset
+  CHAR          Title,			;; Dataset title
+  STRUC         Lists,           	;; Container of lists
+                DatasetType = "EVDS"
+  }
+
+
+defclass MultiGraph ADIbase {
+  INTEGER	NPLOT
+  }
+
+
+defclass SSDS ADIbase {
+  INTEGER       NFILE = 0,
+  INTEGER       NSRC,
+                DatasetType = "SSDS"
+  }
+
+defclass SSDSset SSDS {
+                DatasetType = "SSDS_SET"
+
+  }
+
+defclass PsfGrid BinDS {
+                DatasetType = "PSF_GRID"
+  }
+
+defclass Group ADIbase {
+  INTEGER               GRPID = 0,	;; GRP identifier holding names
+  STRUC                 Ids
+  }
+
+defclass FileSet ADIbase {
+  INTEGER               NFILE = 0
+  }

@@ -1,0 +1,113 @@
+
+      DYNAMIC MEMORY ACCESS ROUTINES                     R J Vallance
+      ------------------------------                     Revision 1.1
+                                                         19 Jul 89
+
+      
+      The DYN_ routines are a set of routines for obtaining
+      chunks of virtual memory dynamically. They are intended as a
+      more tidy alternative to the DAT_TEMP - DAT_MAP method.  For 
+      small amounts of memory they make calls to the relevant
+      VMS system services to obtain virtual memory, whereas for
+      larger amounts they create temporary mapped files on
+      SYS$SCRATCH.  No debris is left when the memory is released.
+      The routines reside in ASTLIB. 
+      
+      -------------------------------------------------------------
+      
+       DYN_INIT ()
+      
+      Initialises internal common blocks.  Only necessary if to
+      be used within a monolith ie. discrete programs need not
+      call it. 
+      
+      -------------------------------------------------------------
+      
+       DYN_MAPR (NDIM, DIMS; PTR, STATUS)
+      
+      	NDIM	<int>	number of dimensions
+      	DIMS	<int>	dimensions
+      	PTR	<int>	pointer to start of array
+      
+      Gets pointer to REAL array of specified size.
+      
+      -------------------------------------------------------------
+      
+       DYN_MAPD (NDIM, DIMS; PTR, STATUS)
+      
+      	NDIM	<int>	number of dimensions
+      	DIMS	<int>	dimensions
+      	PTR	<int>	pointer to start of array
+      
+      Gets pointer to DOUBLE PRECISION array of specified size.
+      
+      -------------------------------------------------------------
+      
+       DYN_MAPI (NDIM, DIMS; PTR, STATUS)
+      
+      	NDIM	<int>	number of dimensions
+      	DIMS	<int>	dimensions
+      	PTR	<int>	pointer to start of array
+      
+      Gets pointer to INTEGER array of specified size.
+      
+      -------------------------------------------------------------
+      
+       DYN_MAPW (NDIM, DIMS; PTR, STATUS)
+      
+      	NDIM	<int>	number of dimensions
+      	DIMS	<int>	dimensions
+      	PTR	<int>	pointer to start of array
+      
+      Gets pointer to WORD array of specified size.
+      
+      -------------------------------------------------------------
+      
+       DYN_MAPB (NDIM, DIMS; PTR, STATUS)
+      
+      	NDIM	<int>	number of dimensions
+      	DIMS	<int>	dimensions
+      	PTR	<int>	pointer to start of array
+      
+      Gets pointer to BYTE array of specified size.
+      
+      -------------------------------------------------------------
+      
+       DYN_MAPL (NDIM, DIMS; PTR, STATUS)
+      
+      	NDIM	<int>	number of dimensions
+      	DIMS	<int>	dimensions
+      	PTR	<int>	pointer to start of array
+      
+      Gets pointer to LOGICAL array of specified size.
+      
+      -------------------------------------------------------------
+      
+       DYN_SIZE (PTR;NVAL,STATUS)
+      
+      	PTR	<int>	pointer to dynamic array
+        NVAL    <int>   total number of values (elements) in array
+      
+      Returns the total size of a dynamic array currently known to
+      the DYN_ system.  Zero is returned if the pointer is not known.
+      For multi-dimensional arrays the product of the dimensions is 
+      returned.
+      
+      -------------------------------------------------------------
+      
+       DYN_UNMAP (PTR)
+      
+      	PTR	<int>	pointer to dynamic array
+      
+      Frees virtual memory obtained with DYN_MAPx routines. 
+      
+      -------------------------------------------------------------
+      
+       DYN_CLOSE ()
+      
+      Frees all virtual memory obtained with DYN_MAPx routines.
+      
+      -------------------------------------------------------------
+
+
+      RJV

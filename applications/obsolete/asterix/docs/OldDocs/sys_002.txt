@@ -1,0 +1,94 @@
+The rules below govern the contents of the ASTERIX .raw documentation
+source. These files contain raw text which is processed by the tool
+'hlpconv' into 3 different forms.
+
+ 1) HLP source. The input source to the Starlink help system
+ 
+ 2) HTML files. Files name for the WWW online version of the ASTERIX gelp
+    system
+
+ 3) LaTex documentation.
+
+
+
+
+
+0) Indentation in .raw files. All text should be indented by one space. TABS
+   should never be used. The only non-blank characters in the first column
+   should be the level numbers.
+
+1) Examples
+
+   Prompts should reflect when a command can be run
+
+   csh>	shell only
+   ICL>  ICL only
+      >  both
+
+2) Carriage returns are no longer significant. HLPCONV works out how much
+   text fits on a line depending on the indentation level in the HLP case.
+   Neither LaTeX nor Mosaic care about line breaks.
+
+3) The formatting HTML tags supported in .raw. Not all are directly supported
+   by HTML browsers - these are <exam> and <key>. These are are translated by
+   hlpconv 
+
+   Tag                      HLP             TEX                   HTML
+     (usage)
+
+   <exam> txt </exam>       txt, indented   txt is verbatim,      <bq><pre>...
+                            2 chars         and indented          </pre></bq>
+     example text
+
+   <pre> txt </pre>         txt             txt is verbatim,      -
+                                            not indented          
+     preformatted text
+
+   <key> txt </key>         <txt>           \verb+<txt>+          &lt txt &gt
+     key name, eg. <RETURN>
+
+   <cite> txt </cite>       txt             {\em txt}             -
+
+   <em> txt </em>           bold txt        {\em txt}             -
+ 
+   <code> txt </code>       'txt'           {\tt txt}             - 
+     computer text, eg. command names
+
+   <var> txt </var>	    <txt>           {\em txt}             -
+     meta-variables
+ 
+   <math> txt </math>       NONE            $ txt $               NONE
+     math formulae
+
+   <ul> <li>.. </ul>        formatted       itemize environment   -
+     unordered list
+
+   <ol> <li>.. </ol>        formatted       enumerate environment -
+     ordered list
+
+   <dl> <dt><dd>.. </dl>    formatted       description environ't -
+     descriptive list
+   
+   NB : NONE means tags are stripped out and enclosed text is present in output
+        <bq> means <blockquote>
+         -   means no change from .raw to product file
+
+3) Special symbols. The special symbols start with an ampersand and (mostly)
+   trap special TEX, special HTML, or non-ascii characters.
+
+   Code     Description    HLP          HTML             TEX
+
+   &amp     ampersand      &            &amp             \&
+   &gt      greater than   >            &gt              $>$
+   &lt      less than      <            &lt              $<$
+   &inf     infinity       infinity     infinity         $\infty$
+   &lar     left arrow     <-           &lt-             $\leftarrow$
+   &rar     right arrow    ->           -&gt             $\rightarrow$
+   &sim     approx eq to   ~            ~                $\sim$
+   &quot    quote          '            &quot            '
+
+4) Topic names should never contain a slash. This is because topic names
+   map directly on to filenames in the WWW page. The server must be able
+   to distiguish between topic name text and directories.
+
+David

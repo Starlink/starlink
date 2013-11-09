@@ -1,0 +1,36 @@
+
+The following documentation is available:
+
+In this directory
+
+  rosat-user-guide (.ps, ,.dvi, ,.pdf)     - Guide to reducing Rosat data
+  source-searching-guide (.ps, .dvi, .pdf) - Guide to using PSS 
+
+In the following sub-directories
+
+  User       - source files for above documents
+  System     - various Asterix system documents
+  Programmer - documentation for developers 
+  OldDocs    - various old, and mostly obsolete documents
+  Glossy     - files for Starlink 'glossy'
+  Isys       - source files for Isys documentation (see below)
+
+On the web
+
+  http://www.sr.bham.ac.uk/asterix   - Asterix homepage including links
+                                       to some of above documents and
+                                       to HTML version of online help
+
+  http://www.sr.bham.ac.uk/Isys      - Documentation for Isys, the 
+                                       Image Processing System. This
+                                       can also be accessed from Isys
+                                       itself
+
+
+  
+
+
+
+
+
+

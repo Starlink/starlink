@@ -1,0 +1,7 @@
+#+  Selections - ADI package defining data selections
+#
+#-
+defclass SelectionRecord {
+  CHAR			Version,		;; Program which wrote record
+  STRUC                 Selectors		;; Quantity selectors
+  }

@@ -1,0 +1,125 @@
+This is TeX, Version 3.1415 (C version 6.1) (format=latex 95.2.14)  21 JUN 1996 08:43
+**sys_001
+(sys_001.tex
+LaTeX2e <1994/12/01> patch level 1
+(/usr/local/texmf/tex/latex/base/latex209.def
+File: latex209.def 1994/11/28 v0.39 Standard LaTeX file
+
+Entering LaTeX 2.09 compatibility mode.
+\footheight=\dimen102
+\@maxsep=\dimen103
+\@dblmaxsep=\dimen104
+(/usr/local/texmf/tex/latex/base/tracefnt.sty
+Package: tracefnt 1994/11/18 v2.3m Standard LaTeX package (font tracing)
+\tracingfonts=\count82
+LaTeX Info: Redefining \selectfont on input line 101.
+)
+\symbold=\mathgroup4
+\symsans=\mathgroup5
+\symtypewriter=\mathgroup6
+\symitalic=\mathgroup7
+\symsmallcaps=\mathgroup8
+\symslanted=\mathgroup9
+LaTeX Font Info:    Redeclaring math alphabet \mathbf on input line 200.
+LaTeX Font Info:    Redeclaring math alphabet \mathsf on input line 201.
+LaTeX Font Info:    Redeclaring math alphabet \mathtt on input line 202.
+LaTeX Font Info:    Redeclaring math alphabet \mathit on input line 208.
+LaTeX Info: Redefining \em on input line 218.
+
+(/usr/local/texmf/tex/latex/base/latexsym.sty
+Package: latexsym 1994/09/25 v2.1f Standard LaTeX package (lasy symbols)
+\symlasy=\mathgroup10
+LaTeX Font Info:    Overwriting symbol font `lasy' in version `bold'
+(Font)                  U/lasy/m/n --> U/lasy/b/n on input line 47.
+)
+LaTeX Font Info:    Redeclaring math delimiter \lgroup on input line 283.
+LaTeX Font Info:    Redeclaring math delimiter \rgroup on input line 285.
+LaTeX Font Info:    Redeclaring math delimiter \bracevert on input line 287.
+)
+(/usr/local/texmf/tex/latex/base/article.cls
+Document Class: article 1994/12/09 v1.2x Standard LaTeX document class
+(/usr/local/texmf/tex/latex/base/size11.clo
+File: size11.clo 1994/12/09 v1.2x Standard LaTeX file (size option)
+)
+\c@part=\count83
+\c@section=\count84
+\c@subsection=\count85
+\c@subsubsection=\count86
+\c@paragraph=\count87
+\c@subparagraph=\count88
+\c@figure=\count89
+\c@table=\count90
+\abovecaptionskip=\skip41
+\belowcaptionskip=\skip42
+Compatibility mode: definition of \rm ignored.
+Compatibility mode: definition of \sf ignored.
+Compatibility mode: definition of \tt ignored.
+Compatibility mode: definition of \bf ignored.
+Compatibility mode: definition of \it ignored.
+Compatibility mode: definition of \sl ignored.
+Compatibility mode: definition of \sc ignored.
+LaTeX Info: Redefining \cal on input line 455.
+LaTeX Info: Redefining \mit on input line 456.
+\bibindent=\dimen105
+) (sys_001.aux)
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 23.
+LaTeX Font Info:    ... okay on input line 23.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 23.
+LaTeX Font Info:    ... okay on input line 23.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 23.
+LaTeX Font Info:    ... okay on input line 23.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 23.
+LaTeX Font Info:    ... okay on input line 23.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 23.
+LaTeX Font Info:    ... okay on input line 23.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 23.
+LaTeX Font Info:    ... okay on input line 23.
+
+Overfull \hbox (2.43333pt too wide) in paragraph at lines 25--33
+ []
+ []
+
+(sys_001.toc
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <10.95> on input line 2.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <8> on input line 2.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <6> on input line 2.
+LaTeX Font Info:    Try loading font information for U+lasy on input line 2.
+ (/usr/local/texmf/tex/latex/base/Ulasy.fd
+File: Ulasy.fd 1994/09/25 v2.1fLaTeX symbol font definitions
+) [1
+
+])
+\tf@toc=\write3
+ [2] [3]
+Overfull \hbox (7.56567pt too wide) in paragraph at lines 136--140
+[][]\OT1/cmr/m/n/10.95 Deleting the writable copy of a mod-ule. Sim-ply re-extr
+act the mod-ule us-ing the []\OT1/cmtt/m/n/10.95 sccs get -r
+ []
+
+[4] [5] [6] [7]
+Overfull \hbox (63.60085pt too wide) in paragraph at lines 363--369
+\OT1/cmr/m/n/10.95 A sim-ple vari-ant of the []\OT1/cmtt/m/n/10.95 etc \OT1/cmr
+/m/n/10.95 class which sim-ply copies its files into the di-rec-tory []\OT1/cmt
+t/m/n/10.95 $AST_ROOT/$SYSTEM/etc/docs\OT1/cmr/m/n/10.95 .
+ []
+
+[8]
+Overfull \hbox (26.18924pt too wide) in paragraph at lines 441--445
+\OT1/cmr/m/n/10.95 The only built file is the For-tran map-ping file which ends
+ up in []\OT1/cmtt/m/n/10.95 $AST_ETC/sys/<subsystem>.includes
+ []
+
+[9] [10] [11] [12] [13] (sys_001.aux) ) 
+Here is how much of TeX's memory you used:
+ 394 strings out of 10950
+ 4026 string characters out of 73448
+ 49724 words of memory out of 262141
+ 3251 multiletter control sequences out of 9500
+ 14027 words of font info for 51 fonts, out of 100000 for 255
+ 14 hyphenation exceptions out of 607
+ 22i,7n,21p,223b,226s stack positions out of 300i,40n,60p,3000b,4000s
+
+Output written on sys_001.dvi (13 pages, 38828 bytes).

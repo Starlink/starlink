@@ -1,0 +1,5 @@
+ResourceClass GUI CHAR
+
+GUI isys:
+
+isys.fileFilter: *.sdf

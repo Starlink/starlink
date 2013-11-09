@@ -1,0 +1,102 @@
+;;
+;; Define the file representation form. Allows %fits to be appended to file
+;; names
+;;
+defrep "fits"
+
+;;
+;; Base class for FITS cache objects
+;;
+defclass FITScacheObj {
+                Name,			;; Name of object
+  INTEGER       Number,                 ;; Sequential number in parent object
+  INTEGER       Parent,                 ;; Parent of this object
+  LOGICAL	Written = False,	;; Written to file?
+  LOGICAL       MarkedForDelete = False ;; Object is marked for deletion
+  }
+
+
+;;
+;; Comment cache object
+;;
+defclass FITScommCache FITScacheObj {
+                Value			;; Comment string
+  }
+
+
+
+;;
+;; Crap cache object. Use this to store cards which are not keywords,
+;; comments or history. Some FITS writers just use FITS files as
+;; replacements for ascii files and write all sorts of guff.
+;;
+defclass FITScrapCache FITScacheObj {
+                Value			;; Crap string
+  }
+
+
+;;
+;; History cache object
+;;
+defclass FITShistCache FITScacheObj {
+                Value			;; History string
+  }
+
+
+;;
+;; Keyword cache object
+;;
+defclass FITSkeyCache FITScacheObj {
+  LOGICAL	Modified = False,	;; Modified image data?
+                Value, Comment          ;; Value and comment
+  }
+
+;;
+;; Image data cache object
+;;
+defclass FITSimgCache FITScacheObj {
+                TYPE,                   ;; The basic data type
+                SHAPE,			;; The dimensions
+  INTEGER       Lun = 0,                ;; Logical unit copy
+  INTEGER       Hdu = 0,                ;; Self HDU number
+  LOGICAL	Modified = False,	;; Modified image data?
+                Value                   ;; The image data
+  }
+
+;;
+;; HDU cache object
+;;
+defclass FITShduCache FITScacheObj {
+                Name,                   ;; Name of HDU = EXTNAM keyword value
+  LOGICAL       IsTable = False,        ;; This is a table extension?
+  INTEGER       Ncard = 0,		;; Number of HDU cards present on i/p
+  LOGICAL       Scanned = False,	;; Cards scanned yet?
+  LOGICAL	Modified = False,	;; Modified data or cards?
+  INTEGER       CrapCount = 0,          ;; Crap count
+  INTEGER       CommentCount = 0,       ;; Comment count
+  INTEGER       HistoryCount = 0,       ;; History count
+  		Image,                  ;; Image data
+  INTEGER       CrdCount = 0,           ;; Count of cards in HDU
+  STRUC         CrdTable                ;; Card table
+  }
+
+
+defclass FITSfileCache FITScacheObj {
+  INTEGER       HduCount = 0,           ;; Count of HDUs in file
+  STRUC         HduTable,               ;; HDU table
+  INTEGER       MaxScan = 0,            ;; Number of HDUs scanned so far
+  LOGICAL       ScannedAll = False      ;; Scanned all the HDUs?
+  }
+
+
+;;
+;; The class representing a FITS file
+;;
+defclass FITSfile FileObject {
+  INTEGER       BlockSize,              ;; FITS block size
+  INTEGER       Lun,                    ;; Logical unit number
+  INTEGER       UserHDU,		;; User selected HDU number
+                Fpath,                  ;; Path to sub-file items
+                SubItem,                ;; Named sub-item altered
+  FITSfileCache Hdus                    ;; The data cache
+  }

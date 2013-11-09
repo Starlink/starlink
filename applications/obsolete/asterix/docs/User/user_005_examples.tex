@@ -1,0 +1,201 @@
+{\bf EXAMPLE 1: Sorting an image from PSPC data}
+
+\begin{verbatim}
+XRTSORT
+xunb> xrtsort
+XSORT Version 2.0-0
+The following header files are present:
+ mrk33_hdr.sdf
+ROOTNAME - Rootname of files to sort /'mrk33'/ > 
+TYPE - Output data type - Event(E) Binned(B) /'B'/ > B
+Binned dataset selection
+--------------------------
+1 - XPIX
+2 - YPIX
+3 - XDET
+4 - YDET
+5 - Time
+6 - PHA channel
+7 - Corrected PHA channel
+8 - Radial
+AXES - Enter integer codes of axes required in data array /'12'/ > 1 2
+SHAPE - Shape of source area [D,C,A,E,R] /'R'/ > R
+RA - RA of the centre of the source region /'     158.13000488281'/ > 
+DEC - DEC of the centre of the source region /'     54.400001525879'/ > 
+SWIDTH - Width of source box /2.133333/ > 
+SHEIGHT - Height of source box /2.133333/ > 
+    Data array axes
+  *******************
+     3) XDET:      0 to    8192 (pixels)
+     4) YDET:      0 to    8192 (pixels)
+     5) Time:     147.000 to    87964.000 (seconds)
+     6) PHA channel:      1 to     256 (chn.)
+     7) Corr. PHA chan.      1 to     256 (chn.)
+RANGES - Property ranges to change (enter numbers) /!/ > 
+ There are 15358 raw sky pixels within the X range selected
+NXBIN - Number of output bins in the X axis /512/ > 
+There will be 512 X bins, each of 30 raw pixels, starting from -7680
+ There are 15358 raw sky pixels within the Y range selected
+NYBIN - Number of output bins in the Y axis /512/ > 
+There will be 512 Y bins, each of 30 raw pixels, starting from -7680
+BACK - Is a background file wanted (Y/N) /FALSE/ > FALSE
+OUT - Output source filename /'image1'/ > broad_image1
+> 
+\end{verbatim}
+
+\newpage
+{\bf EXAMPLE 2: Sorting a spectrum from PSPC data with master veto rate
+between 0 and 170.}
+
+\begin{verbatim}
+> xrthk
+XRTHK - Version 1.7-0
+RAWDIR - Raw data directory /'/data'/ > 
+Index/header file found on  /data
+ Found 15 data files on  /data
+ /data/mrk33.sdf
+ /data/mrk33_att.sdf
+ /data/mrk33_dif.sdf
+ /data/mrk33_diffuse.sdf
+ /data/mrk33_evr.sdf
+ /data/mrk33_hdr.sdf
+ /data/mrk33_imec.sdf
+ /data/mrk33_mex.sdf
+ /data/mrk33_orb.sdf
+ /data/mrk33_overlay.sdf
+ /data/mrk33_pl.sdf
+ /data/mrk33_qua.sdf
+ /data/mrk33_rz.sdf
+ /data/broad_image1.sdf
+ /data/aspec_10.sdf
+ROOTNAME - Rootname of the calibration files /'mrk33'/ > 
+Typical parameters to sort on :
+   Master veto rate : ee_mv
+   Aspect error : asp_err
+   Accepted event rate : ee_axe
+HKPAR1 - Name of HK parameter (! to finish) /'ee_mv'/ > 
+ee_mv : ranges from 0 : 210
+PMIN1 - Minimum value for this parameter /0/ > 
+PMAX1 - Maximum value for this parameter /210/ > 170
+18 BAD windows - excluding 25.3 % of the data
+HKPAR2 - Name of HK parameter (! to finish) /!/ > 
+Total exposure time now: 3063 seconds - excluded 25.35 % of the data
+FNAME - Name of output time window file /'xrt_times.lis'/ > 
+xunb> xrtsort
+XSORT Version 2.0-0
+The following header files are present:
+ mrk33_hdr.sdf
+ROOTNAME - Rootname of files to sort /'mrk33'/ > 
+TYPE - Output data type - Event(E) Binned(B) /'B'/ > 
+Binned dataset selection
+--------------------------
+1 - XPIX
+2 - YPIX
+3 - XDET
+4 - YDET
+5 - Time
+6 - PHA channel
+7 - Corrected PHA channel
+8 - Radial
+AXES - Enter integer codes of axes required in data array /'7'/ > 7
+SHAPE - Shape of source area [D,C,A,E,R] /'C'/ > C
+RA - RA of the centre of the source region /'     158.13000488281'/ > 
+DEC - DEC of the centre of the source region /'     54.400001525879'/ > 
+RAD - Radius of source box (degrees) /1.066667/ > 0.16
+    Data array axes
+  *******************
+     3) XDET:      0 to    8192 (pixels)
+     4) YDET:      0 to    8192 (pixels)
+     5) Time:     147.000 to    87964.000 (seconds)
+     6) PHA channel:      1 to     256 (chn.)
+     7) Corr. PHA chan.      1 to     256 (chn.)
+RANGES - Property ranges to change (enter numbers) /!/ > 5
+TIMRANGE - Time ranges /'147:87964'/ > xrt_times.lis
+ENBIN - Bin width of corrected pulse height axis /1/ > 
+There will be 256 energy bins, each of 1 raw channels, starting from 1
+BACK - Is a background file wanted (Y/N) /FALSE/ > 
+OUT - Output source filename /'aspec_10'/ > aspec_10
+> 
+\end{verbatim}
+
+\newpage
+{\bf EXAMPLE 3: Source searching a PSPC image}
+
+\begin{verbatim}
+> pss
+PSS Version 2.0-1
+INP - Dataset to be searched/tested for sources /'broad_srcsub'/ > broad_image1
+EXPERT - Expert mode /TRUE/ > 
+PSF system options :
+  ANALYTIC       ASCA           EXOLE          PWFC           RADIAL
+  RESPFILE       TABULAR        WFC            XRT_HRI        XRT_PSPC
+  CSPEC(psf/model,spec[,nbin])
+  POLAR(psf,rbin[,abin])        RECT(psf,xbin[,ybin])
+PSF - Choose PSF to use for source model /'XRT_PSPC'/ > polar(xrt_pspc,0.02)
+MASK - PSPC psf option (LIST for descriptions) /'VARPROFILE'/ > 
+Loaded XRT psf cube with 10 energy channels
+AUX - Mean photon energy in KeV > 0.9
+PSFCON - Assume constant PSF across field /NO/ > 
+Energy fraction    Off-axis angle
+                    0    32    64   arcmin
+      50%         0.9   5.0  13.4   pixels
+      68%         1.2   6.4  16.4   pixels
+      90%         1.6   8.6  25.7   pixels
+      95%         1.8   9.3  28.7   pixels
+PSFPIX - Radius of PSF box in pixels /'68%'/ > 
+X position axis range is from 1.064584 to -1.064445 degrees
+Y position axis range is from -1.064445 to 1.064583 degrees
+SLICE - Section of dataset to search /'0.3:-0.3,-0.3:0.3'/ > 
+SOPT - Statistic option (CASH,GAUSSIAN) /'CASH'/ > 
+BGND - Background model /'broad_bgmodel'/ > 
+RESCALE - Re-scale background estimate /NO/ > 
+EXTEN - Fit for extension measure /NO/ > 
+SAMPLE - Oversampling factor for first pass /1/ > 
+First pass - grid spacing 1 pixels
+MAP - Significance map /!/ > broad_sigmap
+Significance varies from 0 to 12.07309
+SIGMIN - Significance threshold /5/ > 4.5
+ Src    X        Y     Signif
+   1   0.19    -0.14    6.998
+   2  -0.22    -0.01    4.528
+   3   0.13     0.14    4.072
+   4  -0.20     0.16    8.338
+   5   0.00     0.00    4.507
+   6  -0.07     0.22    8.857
+   7  -0.14     0.23    4.872
+   8   0.04    -0.19    5.617
+   9   0.12     0.02    8.161
+  10   0.06     0.06    3.657
+  11  -0.14    -0.09   12.073
+  12   0.04     0.16    5.764
+  13   0.03     0.20    8.549
+  14  -0.09    -0.11    4.844
+  15  -0.09    -0.09    4.147
+  16   0.05    -0.12    4.608
+  17   0.04    -0.10    4.981
+  18   0.22     0.10    5.942
+  19   0.22     0.11    5.974
+Second pass
+ASYMMETRIC - Asymmetric source parameter errors /NO/ > 
+FERL - Flux error confidence level /'1 sigma'/ > 
+PERL - Positional error confidence levels /'90%'/ > 
+ Src      RA         DEC         X        Y     Signif    Flux
+   1  10 31 01.5  +54 23 37    -0.22    -0.01    4.581    17.232
+   2  10 31 09.0  +54 33 51    -0.20     0.16    8.362    40.788
+   3  10 31 35.1  +54 37 30    -0.14     0.23    4.940    23.224
+   4  10 31 35.7  +54 18 30    -0.13    -0.09   12.572    59.422
+   5  10 31 54.0  +54 17 06    -0.09    -0.11    4.910    15.302
+   6  10 32 03.8  +54 37 04    -0.07     0.22    9.039    48.550
+   7  10 32 42.8  +54 35 46     0.03     0.20    8.767    39.222
+   8  10 32 47.4  +54 17 50     0.04    -0.10    5.029    15.633
+   9  10 32 47.6  +54 12 38     0.04    -0.19    5.624    20.476
+  10  10 32 48.7  +54 33 57     0.04     0.17    6.040    23.733
+  11  10 32 52.0  +54 16 38     0.05    -0.12    4.739    14.189
+  12  10 33 21.5  +54 25 12     0.12     0.02    8.486    34.084
+  13  10 33 47.6  +54 15 29     0.19    -0.14    7.144    34.381
+  14  10 34 04.0  +54 30 52     0.22     0.11    6.077    30.701
+  15  10 34 04.1  +54 30 57     0.22     0.12    6.172    31.177
+OUT - Source search results file (! for none) /'srclist'/ > broad_srclist
+SSUB - Source subtracted dataset /!/ > broad_srcsub
+Creating source subtracted image...
+\end{verbatim}

@@ -1,0 +1,20 @@
+;;
+;; Response structures
+;;
+
+defclass RSPobj {
+ CHAR		Locator,		;; Locator if type is HDS
+ INTEGER	HDU,			;; HDU if type is FITS
+ INTEGER	FileObj,		;; Pointed file object ID
+ INTEGER	PSFid			;; Pointer to PSF system
+;;
+ LOGICAL	Radial,			;; Is PSF radially symmetric?
+ LOGICAL	PixCent,		;; Is PSF maximum at a pixel centre?
+ REAL		CutOff,			;; Minimum PSF stored
+ INTEGER	Rlimit,			;; Limiting PSF radius
+ INTEGER	Ndim,			;; Number of dimensions
+ INTEGER	Dims,			;; Pointer to dimensions
+ INTEGER	Npsf,			;; Number of PSFs in response
+ INTEGER	SpatResp,		;; Pointer to full response
+ INTEGER	Nelements		;; Size of full response
+ } 

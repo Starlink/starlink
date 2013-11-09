@@ -1,0 +1,107 @@
+\begin{verbatim}
+HARD_SPEC3  <UNKNOWN>
+
+   TITLE          <_CHAR*80>      'GB2 1217+348'
+   UNITS          <_CHAR*80>      'Counts'
+   DATA_ARRAY(128,128,256)  <_REAL>   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                                      ... 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+   QUALITY        <QUALITY>       {structure}
+      QUALITY(128,128,256)  <_UBYTE>   128,128,128,128,128,128,128,128,
+                                       ... 128,128,128,128,128,128,128,128,128
+      BADBITS        <_UBYTE>        *
+
+   AXIS(3)        <AXIS>          {array of structures}
+
+   Contents of AXIS(1)
+      LABEL          <_CHAR*80>      'X position'
+      UNITS          <_CHAR*80>      'degrees'
+      NORMALISED     <_LOGICAL>      FALSE
+      DATA_ARRAY     <ARRAY>         {structure}
+         VARIANT        <_CHAR*6>       'SPACED'
+         BASE           <_REAL>         1.058334
+         SCALE          <_REAL>         -0.016666
+         DIMENSION      <_INTEGER>      128
+
+   MORE           <EXT>           {structure}
+      ASTERIX        <EXT>           {structure}
+         HEADER         <EXTENSION>     {structure}
+            TARGET         <_CHAR*20>      'GB2 1298+348'
+            OBSERVER       <_CHAR*20>      'WG700001P'
+            OBSERVATORY    <_CHAR*5>       'ROSAT'
+            INSTRUMENT     <_CHAR*3>       'XRT'
+            AXIS_RA        <_DOUBLE>       185.029586791992
+            AXIS_DEC       <_DOUBLE>       34.5200004577637
+            FIELD_RA       <_DOUBLE>       185.02958679199
+            FIELD_DEC      <_DOUBLE>       34.520000457764
+            EQUINOX        <_INTEGER>      2000
+            POSITION_ANGLE  <_DOUBLE>      0
+            BASE_MJD       <_INTEGER>      49129
+            BASE_DATE      <_CHAR*11>      '1993-May-22'
+            BASE_UTC       <_DOUBLE>       26568.0000002263
+            BASE_TAI       <_DOUBLE>       7812.30769675926
+            OBS_LENGTH     <_REAL>         7970
+            EXPOSURE_TIME  <_REAL>         4281
+
+         INSTRUMENT     <EXTENSION>     {structure}
+            PIXEL_SIZE     <_REAL>         0.5
+            FILTER         <_CHAR*20>      'OFF'
+            DETECTOR       <_CHAR*20>      'PSPCB'
+            SC_BASE        <_DOUBLE>       93780976
+            SC_CONV        <_DOUBLE>       0.99990789351471
+            RAWDATA        <_CHAR*5>       'MPE'
+            SASS_VERSION   <_CHAR*25>      '                         '
+            SORT           <EXTN>          {structure}
+               SPACE(1)       <SPACE>         {structure}
+                  SHAPE          <_CHAR*1>       'R'
+                  PHI            <_REAL>         0
+                  XCENT          <_REAL>         0.000069
+                  YCENT          <_REAL>         0.000069
+                  XINNER         <_REAL>         0
+                  XOUTER         <_REAL>         1.066597
+                  YINNER         <_REAL>         0
+                  YOUTER         <_REAL>         1.066597
+
+               XDET(1)        <XDET>          {structure}
+                  START          <_INTEGER>      0
+                  STOP           <_INTEGER>      8192
+
+               YDET(1)        <YDET>          {structure}
+                  START          <_INTEGER>      0
+                  STOP           <_INTEGER>      8192
+
+               TIME(1)        <TIME>          {structure}
+                  START          <_REAL>         2877
+                  STOP           <_REAL>         10847
+
+               PH_CHANNEL(1)  <PH_CHANNEL>    {structure}
+                  START          <_INTEGER>      1
+                  STOP           <_INTEGER>      256
+
+               ENERGY(1)      <ENERGY>        {structure}
+                  START          <_INTEGER>      1
+                  STOP           <_INTEGER>      256
+
+         PSF            <EXTENSION>     {structure}
+            LIBRARY_NAME   <_CHAR*6>       'PSFLIB'
+            ROUTINE_NAME   <_CHAR*8>       'XRT_PSPC'
+
+         PROCESSING     <EXTENSION>     {structure}
+            BGND_SUBTRACTED  <_LOGICAL>    FALSE
+            CORRECTED      <EXTENSION>     {structure}
+               DEAD_TIME      <_LOGICAL>      FALSE
+               VIGNETTING     <_LOGICAL>      FALSE
+
+   HISTORY        <HISTORY>       {structure}
+      CREATED        <_CHAR*18>      ' 9-Jul-96 14:35:25'
+      UPDATE_MODE    <_CHAR*10>      'NORMAL'
+      EXTEND_SIZE    <_INTEGER>      10
+      CURRENT_RECORD  <_INTEGER>     2
+      RECORDS(10)    <HIST_REC>      {array of structures}
+
+      Contents of RECORDS(1)
+         DATE           <_CHAR*30>      '    9-Jul-1996 14:35:25'
+         COMMAND        <_CHAR*30>      'XSORT Version 1.7-1'
+         HOST           <_CHAR*30>      'xra1'
+
+End of Trace.
+\end{verbatim}

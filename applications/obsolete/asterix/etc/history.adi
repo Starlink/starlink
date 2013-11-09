@@ -1,0 +1,13 @@
+defclass HistoryControl {
+                NRECORD,		;; Number of records
+                Date,			;; Base creation date
+                Verbosity		;; Verbosity control
+  }
+
+defclass HistoryRecord {
+                Creator,		;; Creator of new record
+                Date,			;; Date of history creation
+                User,			;; Username of modifier
+                Host,			;; Machine on which it was done
+                Text			;; The history text
+  }

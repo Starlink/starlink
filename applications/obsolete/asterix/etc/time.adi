@@ -1,0 +1,17 @@
+defclass GoodTimeInterval {
+                On,			;; Start times
+                Off 			;; Stop times
+  }
+
+defclass TimingInfo {
+                Exposure,		;; Effective exposure time
+                EffExposure,		;; Exposure time
+                System,			;; Time system type
+                Assign,			;; Place where time assigned
+                MJDRef,			;; MJD at s/c clock start
+                DateObs,
+                MJDObs,
+                TAIObs,			;; Atomic seconds since 0:0 UTC 1/1/72
+  		ObsLength,		;; Length of observation
+                LiveOn,LiveOff,LiveDur  ;; ASTERIX style live times
+  }
