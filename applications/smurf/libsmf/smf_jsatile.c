@@ -44,9 +44,9 @@
 *        extent of the tile. May be NULL. The Region will be defined
 *        defined within ICRS (RA,DEc).
 *     lbnd[ 2 ] = integer (Returned)
-*        The lower bounds of the tile in PIXEL indicies.
+*        The lower bounds of the spatial axes of the tile in PIXEL indicies.
 *     ubnd[ 2 ] = integer (Returned)
-*        The upper bounds of the tile in PIXEL indicies.
+*        The upper bounds of the spatial axes of the tile in PIXEL indicies.
 *     status = int * (Given)
 *        Pointer to the inherited status variable.
 

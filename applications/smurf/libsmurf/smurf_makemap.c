@@ -158,6 +158,13 @@
 *          supplied, they are placed in the MORE.SMURF.ITERMAPS component of
 *          the main output NDF (see parameter OUT).  See configuration
 *          parameter "Itermap". [!]
+*     JSATILES = _LOGICAL (Read)
+*          If TRUE, the output map is created on the JSA all-sky pixel
+*          grid, and is split up into individual JSA tiles. Thus multiple
+*          output NDFs may be created, one for each JSA tile that touches
+*          the map. Each of these output NDF will have the tile index number
+*          appended to the end of the path specified by parameter "OUT". If
+*          "JSATILES" is TRUE, the "REF" parameter is ignored. [FALSE]
 *     LBND( 2 ) = _INTEGER (Read)
 *          An array of values giving the lower pixel index bound on each
 *          spatial axis of the output NDF. The suggested default values
@@ -218,9 +225,10 @@
 *          when METHOD=iterate that failed due to insufficient samples. [!]
 *     NTILE = _INTEGER (Write)
 *          The number of output tiles used to hold the entire output
-*          array (see parameter TILEDIMS). If no input data fall within
-*          a specified tile, then no output NDF will be created for the
-*          tile, but the tile will still be included in the tile numbering.
+*          array (see parameters JSATILES and TILEDIMS). If no input data
+*          fall within a specified tile, then no output NDF will be created
+*          for the tile, but (if JSATILES is FALSE) the tile will still be
+*          included in the tile numbering.
 *     OUT = NDF (Write)
 *          Output file.
 *     OUTFILES = LITERAL (Write)
@@ -282,10 +290,13 @@
 *          or the string "JSA". If an NDF is supplied, the output grid will
 *          be aligned with the supplied reference NDF. The reference can be
 *          either 2D or 3D and the spatial frame will be extracted. If "JSA"
-*          is supplied, the JSA all-sky pixel grid will be used. If a null
-*          (!) value is supplied then the output grid is determined by
-*          parameters REFLON, REFLAT, etc. In addition, this NDF can be
-*          used to mask the AST, FLT or COM model. See configuration
+*          is supplied, the JSA all-sky pixel grid will be used (note,
+*          the map will be still created as a single NDF - if multiple NDFs,
+*          one for each JSA tile, are required, the "JSATILES" parameter
+*          should beset TRUE instead of using the "REF" parameter). If a
+*          null (!) value is supplied then the output grid is determined
+*          by parameters REFLON, REFLAT, etc. In addition, this NDF can
+*          be used to mask the AST, FLT or COM model. See configuration
 *          parameters AST.ZERO_MASK, FLT.ZERO_MASK and COM.ZERO_MASK. [!]
 *     REFLAT = LITERAL (Read)
 *          The formatted celestial latitude value at the tangent point of
@@ -382,6 +393,8 @@
 *          given number of pixels. Pixels within the overlap border will
 *          be given a quality name of "BORDER" (see KAPPA:SHOWQUAL). [0]
 *     TILEDIMS( 2 ) = _INTEGER (Read)
+*          This parameter is ignored if parameter "JSATILES" is set TRUE.
+*
 *          For large data sets, it may sometimes be beneficial to break
 *          the output array up into a number of smaller rectangular tiles,
 *          each created separately and stored in a separate output NDF. This
@@ -417,9 +430,9 @@
 *          of bad pixels. [FALSE]
 *     TRIMTILES = _LOGICAL (Read)
 *          Only accessed if the output is being split up into more than
-*          one spatial tile (see parameter TILEDIMS). If TRUE, then the
-*          tiles around the border will be trimmed to exclude areas that
-*          fall outside the bounds of the full sized output array. This
+*          one spatial tile (see parameter TILEDIMS and JSATILES). If TRUE,
+*          then the tiles around the border will be trimmed to exclude areas
+*          that fall outside the bounds of the full sized output array. This
 *          will result in the border tiles being smaller than the central
 *          tiles. [FALSE]
 *     UBND( 2 ) = _INTEGER (Read)
@@ -465,10 +478,13 @@
 *     array (stored in the SMURF extension of the output NDF).If this
 *     value cannot be calculated for any reason, the corresponding
 *     FITS keyword is assigned a blank value.
-*     - FITS keywords NUMTILES and TILENUM are added to the output FITS
-*     header. These are the number of tiles used to hold the output data,
-*     and the index of the NDF containing the header, in the range 1 to
-*     NUMTILES. See parameter TILEDIMS.
+*     - If parameter TILEDIMS is assigned a value, FITS keywords NUMTILES
+*     and TILENUM are added to the output FITS header. These are the number
+*     of tiles used to hold the output data, and the index of the NDF
+*     containing the header, in the range 1 to NUMTILES.
+*     - If parameter JSATILE is assigned a value, FITS keywords JSATILE
+*     is added to the output FITS header, holding the index of the JSA
+*     tile.
 *     - The model configuration parameters can be sub-instrument dependent.
 *     For example, 850.flt.edgelow will copy the edgelow value into the flt
 *     section only for 850 micron data. Similarly for 450.flt.edgelow.
@@ -711,6 +727,9 @@
 *     2013-08-21 (AGG):
 *        Do not call grpList if no output files are generated. This
 *        avoids a GRP__INVID error in such cases.
+*     2013-11-08 (DSB):
+*        Added the "JSATILES" parameter, and made other changes to allow
+*        the output map to be split up into JSA tiles.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -772,6 +791,7 @@
 #include "smurf_par.h"
 #include "smurflib.h"
 #include "libsmf/smf.h"
+#include "libsmf/jsatiles.h"
 #include "libsmf/smf_err.h"
 #include "smurf_typ.h"
 
@@ -820,6 +840,7 @@ void smurf_makemap( int *status ) {
   int iters;                 /* If interupted, the no. of completed iterations */
   size_t itile;              /* Output tile index */
   int jin;                   /* Input NDF index within igrp */
+  int jsatiles;              /* Create JSA tiles? */
   int junk;                  /* Unused integer */
   AstKeyMap *keymap=NULL;    /* Pointer to keymap of config settings */
   int lbnd_out[2];           /* Lower pixel bounds for output map */
@@ -835,12 +856,14 @@ void smurf_makemap( int *status ) {
   char method[LEN__METHOD];  /* String for map-making method */
   int moving = 0;            /* Is the telescope base position changing? */
   int nparam = 0;            /* Number of extra parameters for pixel spreading*/
+  size_t njsatile;           /* Number of output JSA tiles */
   size_t ntile;              /* Number of output tiles */
   int64_t nused;             /* No. of used input samples */
   int nval;                  /* Number of parameter values supplied */
   size_t nxy;                /* Number of pixels in output image */
   smfData *odata=NULL;       /* Pointer to output SCUBA2 data struct */
   Grp *ogrp = NULL;          /* Group containing output file */
+  char oname[SMF_PATH_MAX+1];/* Name of output NDF */
   int ondf = NDF__NOID;      /* output NDF identifier */
   size_t outsize;            /* Number of files in output group */
   AstFrameSet *outfset=NULL; /* Frameset containing sky->output mapping */
@@ -1077,9 +1100,11 @@ void smurf_makemap( int *status ) {
      each one being stored in a separate output NDF. If a null value is
      supplied for TILEDIMS, annul the error and retain the original NULL
      pointer for the array of tile structures (this is used as a flag that
-     the entire output grid should be stored in a single output NDF). */
-
-  if( *status == SAI__OK ) {
+     the entire output grid should be stored in a single output NDF). If
+     we are producing JSA tiles, do not access the parameters for
+     user-defined tiles. */
+  parGet0l( "JSATILES", &jsatiles, status );
+  if( !jsatiles && *status == SAI__OK ) {
     parGet1i( "TILEDIMS", 2, tiledims, &nval, status );
     if( *status == PAR__NULL ) {
       errAnnul( status );
@@ -1103,9 +1128,6 @@ void smurf_makemap( int *status ) {
                              spread, params, outfset, tiledims,
                              0, 0, &ntile, status );
   }
-
-  /* Write the number of tiles being created to an output parameter. */
-  parPut0i( "NTILE", ntile, status );
 
   /* Output the pixel bounds of the full size output array (not of an
      individual tile). */
@@ -1471,10 +1493,12 @@ void smurf_makemap( int *status ) {
 
       /* Store the keywords holding the number of tiles generated and the index
          of the current tile. */
-      atlPtfti( fchan, "NUMTILES", ntile,
-                "No. of tiles covering the field", status );
-      atlPtfti( fchan, "TILENUM", itile,
-                "Index of this tile (1->NUMTILES)", status );
+      if( !jsatiles ) {
+         atlPtfti( fchan, "NUMTILES", ntile,
+                   "No. of tiles covering the field", status );
+         atlPtfti( fchan, "TILENUM", itile,
+                   "Index of this tile (1->NUMTILES)", status );
+      }
 
       /* If the FitsChan is not empty, store it in the FITS extension of the
          output NDF (any existing FITS extension is deleted). Do not annul
@@ -1510,12 +1534,6 @@ void smurf_makemap( int *status ) {
       astEnd;
     }
 
-    /* Write out the list of output NDF names, annulling the error if a null
-       parameter value is supplied. */
-    if( *status == SAI__OK && igrp4 ) {
-      grpList( "OUTFILES", 0, 0, NULL, igrp4, status );
-      if( *status == PAR__NULL ) errAnnul( status );
-    }
 
 
 
@@ -1556,6 +1574,7 @@ void smurf_makemap( int *status ) {
     if ( *status == SAI__OK ) {
       file = odata->file;
       ondf = file->ndfid;
+      strcpy( oname, file->name );
       odata->qfamily = SMF__QFAM_MAP;
       /* Map the data and variance arrays */
       map = (odata->pntr)[0];
@@ -1826,11 +1845,13 @@ void smurf_makemap( int *status ) {
 
     /* Store the keywords holding the number of tiles generated and the index
        of the current tile. For the iterative mapmaker these are currently
-       alwatys 1. */
-    atlPtfti( fchan, "NUMTILES", 1,
-              "No. of tiles covering the field", status );
-    atlPtfti( fchan, "TILENUM", 1,
-              "Index of this tile (1->NUMTILES)", status );
+       always 1 (unless JSATILES is set). */
+    if( !jsatiles ) {
+       atlPtfti( fchan, "NUMTILES", 1,
+                 "No. of tiles covering the field", status );
+       atlPtfti( fchan, "TILENUM", 1,
+                 "Index of this tile (1->NUMTILES)", status );
+    }
 
     /* Store the effective bolometer count */
     atlPtftd( fchan, "NBOLOEFF", nboloeff,
@@ -1863,7 +1884,18 @@ void smurf_makemap( int *status ) {
     /* Convert the output NDF form 2D to 3D by adding a spectral axis
        spanning a single pixel. Then the output NDF identifier. */
     smf_add_spectral_axis( tndf, fchan, status );
-    ndfAnnul( &tndf, status );
+
+    /* If required, split the output map up into JSA tiles. Delete the
+       original output NDF afterwards. */
+    if( jsatiles ) {
+       parGet0l( "TRIMTILES", &trimtiles, status );
+       grpSetsz( igrp4, 0, status );
+       smf_jsasplit( tndf, oname, trimtiles, SMF__INST_NONE, &njsatile,
+                     igrp4, status );
+       ndfDelet( &tndf, status );
+    } else {
+       ndfAnnul( &tndf, status );
+    }
 
   } else {
     /* no idea what mode */
@@ -1873,6 +1905,16 @@ void smurf_makemap( int *status ) {
               status );
     }
   }
+
+  /* Write out the list of output NDF names, annulling the error if a null
+     parameter value is supplied. */
+  if( *status == SAI__OK && igrp4 ) {
+    grpList( "OUTFILES", 0, 0, NULL, igrp4, status );
+    if( *status == PAR__NULL ) errAnnul( status );
+  }
+
+  /* Write the number of tiles being created to an output parameter. */
+  parPut0i( "NTILE", jsatiles ? njsatile : ntile, status );
 
   /* Arrive here if no output NDF is being created. */
  L998:;

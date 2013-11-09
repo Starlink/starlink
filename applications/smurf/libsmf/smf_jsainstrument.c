@@ -20,7 +20,9 @@
 
 *  Arguments:
 *     param = const char * (Given)
-*        The name of the ADAM parameter to use - e.g. "INSTRUMENT".
+*        The name of the ADAM parameter to use - e.g. "INSTRUMENT". May
+*        be NULL, in which case the tiling for the default instrument
+*        implied by "fc" and "def" is returned.
 *     fc = AstFitsChan (Given)
 *        If not NULL, any INSTRUME and FILTER values in this FitsChan
 *        will be used to determine the default instrument.
@@ -87,68 +89,64 @@
 #include "smf_typ.h"
 #include "jsatiles.h"
 
-void smf_jsainstrument( const char *param, AstFitsChan *fc,smf_inst_t def,
+void smf_jsainstrument( const char *param, AstFitsChan *fc, smf_inst_t def,
                         smfJSATiling *tiling, int *status ){
 
 /* Local Variables: */
    char text[ 200 ];
    const char *instrume;
    char *cval;
-   const char *filter;
    smf_inst_t instrument;
 
 /* Check the inherited status */
    if (*status != SAI__OK) return;
 
-/* Assume we have no default instrument. */
-   instrume = "";
-
-/* If a FitsChan was supplied, we use it to select the default
+/* If a FitsChan was supplied, we use it to over-ride the supplied default
    instrument, if possible. */
    if( fc ) {
 
 /* Get the INSTRUME header, and (if SCUBA-2) the FILTER header. */
       astGetFitsS( fc, "INSTRUME", &cval );
-      instrume = cval;
 
-/* Compare to known values, and set the appropriate default string. */
-      if( astChrMatch( instrume, "HARP" ) ) {
-         instrume = "HARP";
+/* Compare to known values, and set the appropriate default instrument. */
+      if( astChrMatch( cval, "HARP" ) ) {
+         def = SMF__INST_HARP;
 
-      } else if( astChrMatch( instrume, "SCUBA-2" ) ) {
-         filter = "";
+      } else if( astChrMatch( cval, "SCUBA-2" ) ) {
          astGetFitsS( fc, "FILTER", &cval );
-         filter = cval;
 
-         if( !strcmp( filter, "450" ) ) {
-            instrume = "SCUBA-2(450)";
+         if( !strcmp( cval, "450" ) ) {
+            def = SMF__INST_SCUBA_2_450;
 
-         } else if( !strcmp( filter, "850" ) ) {
-            instrume = "SCUBA-2(850)";
+         } else if( !strcmp( cval, "850" ) ) {
+            def = SMF__INST_SCUBA_2_850;
 
          } else if( *status == SAI__OK ){
             *status = SAI__ERROR;
             errRepf( "", "The input SCUBA-2 NDF has an unknown value "
-                    "'%s' for the FILTER keyword.", status, filter );
+                    "'%s' for the FILTER keyword.", status, cval );
             errFlush( status );
          }
 
-      } else if( astChrLen( instrume ) > 0 ) {
+      } else if( astChrLen( cval ) > 0 ) {
          *status = SAI__ERROR;
          errRepf( "", "The input NDF is for a currently unsupported "
-                 "instrument '%s'.", status, instrume );
+                 "instrument '%s'.", status, cval );
       }
 
 /* Flush any error so that we can continue with no default. */
-      if( *status != SAI__OK ) {
-         errFlush( status );
-         instrume = "";
-      }
+      if( *status != SAI__OK ) errFlush( status );
    }
 
-/* If no default was obtained from the FitsChan, use the default supplied
-   by the caller. */
-   if( astChrLen( instrume ) == 0 && def != SMF__INST_NONE ) {
+/* If no parameter was supplied, just use the default instrument. */
+   if( !param ) {
+      instrument = def;
+
+/* Otherwise, get the JSA instrument name to use, using the above selection
+   as the default. */
+   } else {
+
+/* Get the string correspnding to the default instrument. */
       if( def == SMF__INST_SCUBA_2_450 ) {
          instrume = "SCUBA-2(450)";
       } else if( def == SMF__INST_SCUBA_2_850 ) {
@@ -161,35 +159,36 @@ void smf_jsainstrument( const char *param, AstFitsChan *fc,smf_inst_t def,
          instrume = "RxWD";
       } else if( def == SMF__INST_RXWB ) {
          instrume = "RxWB";
+      } else {
+         instrume = "";
       }
-   }
 
-/* Get the JSA instrument name to use, using the above selection as the
-   default. */
-   parChoic( param, instrume, "SCUBA-2(450),SCUBA-2(850),"
-             "HARP,RxA,RxWD,RxWB", 1, text, sizeof(text), status );
+/* Get the user's choice. */
+      parChoic( param, instrume, "SCUBA-2(450),SCUBA-2(850),"
+                "HARP,RxA,RxWD,RxWB", 1, text, sizeof(text), status );
 
 /* Convert it to an integer identifier. */
-   if( !strcmp( text, "SCUBA-2(450)" ) ) {
-      instrument = SMF__INST_SCUBA_2_450;
+      if( !strcmp( text, "SCUBA-2(450)" ) ) {
+         instrument = SMF__INST_SCUBA_2_450;
 
-   } else if( !strcmp( text, "SCUBA-2(850)" ) ) {
-      instrument = SMF__INST_SCUBA_2_850;
+      } else if( !strcmp( text, "SCUBA-2(850)" ) ) {
+         instrument = SMF__INST_SCUBA_2_850;
 
-   } else if( !strcmp( text, "HARP" ) ) {
-      instrument = SMF__INST_HARP;
+      } else if( !strcmp( text, "HARP" ) ) {
+         instrument = SMF__INST_HARP;
 
-   } else if( !strcmp( text, "RXA" ) ) {
-      instrument = SMF__INST_RXA;
+      } else if( !strcmp( text, "RXA" ) ) {
+         instrument = SMF__INST_RXA;
 
-   } else if( !strcmp( text, "RxWD" ) ) {
-      instrument = SMF__INST_RXWD;
+      } else if( !strcmp( text, "RxWD" ) ) {
+         instrument = SMF__INST_RXWD;
 
-   } else if( !strcmp( text, "RxWB" ) ) {
-      instrument = SMF__INST_RXWB;
+      } else if( !strcmp( text, "RxWB" ) ) {
+         instrument = SMF__INST_RXWB;
 
-   } else {
-      instrument = SMF__INST_NONE;
+      } else {
+         instrument = SMF__INST_NONE;
+      }
    }
 
 /* Get the parameters of the tiling scheme used by the requested

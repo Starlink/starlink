@@ -74,6 +74,9 @@
 *     1-NOV-2013 (GSB):
 *        Change the index of the central tile to take account of the
 *        change in tile numbering scheme from raster to nested.
+*     8-NOV-2013 (DSB):
+*        Allow the REF parameter to be over-ridden by the JSATILES
+*        parameter.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -139,6 +142,7 @@ void smf_getrefwcs( const char *param, Grp *igrp, AstFrameSet **specwcs,
    smf_inst_t inst = SMF__INST_NONE;
    smf_subinst_t subinst;
    size_t code;
+   int jsatiles;
 
 /* Initialise the returned values. */
    *specwcs = NULL;
@@ -150,10 +154,18 @@ void smf_getrefwcs( const char *param, Grp *igrp, AstFrameSet **specwcs,
 /* Begin an AST context. */
    astBegin;
 
-/* First get the parameter value as a string. Use subpar to avoid problem
+/* If the JSAILES parameter is TRUE, then we use the JSA all-sky pixel
+   grid regardless of the setting of REF. */
+   parGet0l( "JSATILES", &jsatiles, status );
+   if( jsatiles ) {
+      strcpy( text, "JSA" );
+
+/* Otherwie, first get the parameter value as a string. Use subpar to avoid problem
    caused by interpretion of the text within the parameter system. */
-   subParFindpar( param, &code, status );
-   subParGetname( code, text, sizeof(text), status );
+   } else {
+      subParFindpar( param, &code, status );
+      subParGetname( code, text, sizeof(text), status );
+   }
 
 /* If no value was supplied, annul the error and do nothing more. */
    if( *status == PAR__NULL ) {
