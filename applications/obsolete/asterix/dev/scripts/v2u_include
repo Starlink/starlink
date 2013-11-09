@@ -1,0 +1,96 @@
+#!/bin/csh -f
+#+ V2U_INCLUDE - Convert VAX to UNIX include filenames for the input parameter
+#
+# Author :
+#
+#  David J. Allan (BHVAD::DJA)
+#
+# History
+#
+#  22 Sep 92 : Original (DJA)
+#   5 May 93 : Look for ROOT= on the command line (DJA)
+#  25 Apr 94 : Strip off -l arguments (DJA)
+#   5 Apr 95 : Added -cf and -f options (DJA)
+#-
+
+#
+# Look for -cf or -f
+#
+if ( "$1" == "-cf" ) then
+  set create=1
+  set apply=0
+  shift argv
+else if ( "$1" == "-f" ) then
+  set create=0
+  set apply=1
+  shift argv
+else
+  set create=1
+  set apply=1
+endif
+#
+# Decide on the ASTERIX root directory
+#
+if ( "$cwd" =~ *obelix* ) then
+  set aroot = "/star/asterix"
+  set doob=1
+  if ( "$1" =~ ROOT=* ) then
+    shift argv
+  endif
+else
+  set doob=0
+  if ( "$1" =~ ROOT=* ) then
+    set aroot = `echo $1 | sed s/ROOT=//`
+    shift argv
+  else
+    if ( ${?AST_ROOT} ) then
+      set aroot = $AST_ROOT
+    else
+      set aroot = "/star/asterix"
+    endif
+  endif
+endif
+#
+# Get routine if applying the translations
+#
+if ( $apply ) then
+  set rtn="$1"
+  shift argv
+endif
+#
+# Create the translations file?
+#
+if ( $create ) then
+  if ( $doob == 1 ) then
+    cat $aroot/${SYSTEM}/etc/sys/*.includes \
+	$OB_ROOT/${SYSTEM}/etc/sys/*.includes | sed s+\$AST_ROOT+$aroot+';'s+\$OB_ROOT+$OB_ROOT+ >include.sub
+  else
+    cat $aroot/${SYSTEM}/etc/sys/*.includes | sed s+\$AST_ROOT+$aroot+ >include.sub
+  endif
+endif
+#
+#  Apply translations if required
+#
+if ( $apply ) then
+#
+#  Make copy of file
+  if ( "$rtn" != "$rtn:r" ) then
+    set ext = "$rtn:e"
+    set rtn = "$rtn:r"
+  else
+    set ext = "f"
+  endif
+  mv $rtn.$ext $rtn.t
+#
+#  Perform translation
+#
+  /star/bin/forconv <$rtn.t >$rtn.$ext
+  chmod +w $rtn.t
+  rm -f $rtn.t
+#
+#  Scrub translations if we created it in this invokation
+#
+  if ( $create ) then
+    rm include.sub
+  endif
+endif

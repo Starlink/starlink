@@ -1,0 +1,90 @@
+
+# NB : first line is intentionally left blank
+# Description:
+#	calink - link an callable ASTERIX program for Unix
+#
+# Invocation:
+#       % calink prog_module [other_arguments]
+#
+# Arguments:
+#       prog_module specifies a file containing the task's main subroutine.
+#         It may take the form prog.f, prog.o or prog. If neither .f or .o is
+#         specified, .o will be assumed. prog must be the name of the task's 
+#         main subroutine, and will be the name of the executable produced.
+#       
+#       other_arguments is a space-separated list list of modules, and 
+#         compiler or linker options to be presented to the fortran compiler.
+#
+# Authors:
+#	CAAG: C A A Goswell (RLVAD::CAAG)
+#       AJC:  A J Chipperfield (Starlink)
+#
+# History:
+#	30.11.1994 (DJA):
+#	   Original version (RLVAD::CAAG)
+#-
+
+set -e
+
+# produce help message if requested
+
+if [ "$1" = "-?" ]
+then
+	cat >&2 <<FOO
+	usage: `basename $0` <name of program> [ other files, libraries and options ]
+	
+	e.g.
+	\$ f77 -c fred-aux.f
+	\$ $0 fred.f fred-aux.o -lgks
+FOO
+	exit 1
+fi
+
+# get name of program by inquiry if necessary
+
+if [ -z "$1" ]
+then
+	echo >&2 -n `basename $0`: 'name of execution module: '
+	read PROGNAME
+else
+:
+# Check is the first argument is a -xdbx option
+        PROGNAME=$1
+# shift all the arguments left by one to remove the first argument
+shift
+fi
+
+# next determine name of program allowing a certain amount of flexibility
+# first get any path component
+
+DIR=`dirname $PROGNAME`
+
+case $PROGNAME in
+*.o)
+	PROGNAME=`basename $PROGNAME .o`
+	ARGS=${DIR}/${PROGNAME}.o
+	;;
+*.f)
+	PROGNAME=`basename $PROGNAME .f`
+	ARGS=${DIR}/${PROGNAME}.f
+	;;
+*)
+	PROGNAME=`basename $PROGNAME`
+	ARGS=${DIR}/${PROGNAME}.o
+	;;
+esac
+
+# Add remaining arguments to ARGS
+
+while [ $# != 0 ]
+do
+	ARGS="$ARGS $1"
+	shift
+done
+ar x $AST_LIB/libastlib.a ast_exec.o
+f77 $FFLAGS -o $PROGNAME \
+-L$AST_LIB -Bstatic ast_exec.o -lcas -lastlib \
+$ARGS \
+-L/star/lib `hds_link` `ast_link` -lcasdum `lex_link_adam` `hds_link` `err_link` \
+-Bdynamic -lucb -lelf -lsocket -lnsl -ldl -lw
+rm -f ast_exec.o

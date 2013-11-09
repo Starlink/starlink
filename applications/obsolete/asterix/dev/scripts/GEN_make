@@ -1,0 +1,292 @@
+#!#TCL_DIR#/tclsh
+#
+#
+#
+#
+# Use path search procedure
+#
+source $env(AST_ROOT)/src/scripts/PathSearch.tcl
+#
+# Substitutions array
+#
+global Subs
+set Subs(DATE)    [exec date {+%d %b %Y}]
+set Subs(CREATOR) "GEN_make Version 2.0"
+set Subs(HOST)    [exec hostname]
+set Subs(PKG)     ASTERIX
+#
+proc files {sym args} {
+  global Subs
+  set Subs($sym) "$args"
+  }
+  
+proc const {sym {value ""}} {
+  global Subs
+  set Subs($sym) $value
+  }
+
+#
+# Translate a token
+#
+proc TransTok {tok} {
+  global Subs
+
+  set newlist ""
+  
+  if {! [info exists Subs($tok)] } { 
+    puts "GEN_make : Symbol $tok is referenced in the makefile\
+      template\n           but is not defined in any of the configuration files"
+    exit
+      
+  } elseif {[lindex $Subs($tok) 0] == "%remext"} {
+    set prevar [lindex $Subs($tok) 1]
+    foreach i [TransTok $prevar] {
+      set ri [file rootname ${i}]
+      append newlist "${ri} "
+      }
+    set newlist [string trimright $newlist]
+
+  } elseif {[lindex $Subs($tok) 0] == "%prefix"} {
+    set prefix [lindex $Subs($tok) 1]
+    set prevar [lindex $Subs($tok) 2]
+    foreach i [split [TransTok $prevar] " "] {
+      append newlist "${prefix}${i} "
+      }
+    set newlist [string trimright $newlist]
+
+  } elseif {[lindex $Subs($tok) 0] == "%suffix"} {
+    set prevar [lindex $Subs($tok) 1]
+    set suffix [lindex $Subs($tok) 2]
+    foreach i [TransTok $prevar] {
+      append newlist "${i}${suffix} "
+      }
+    set newlist [string trimright $newlist]
+    
+  } elseif {[lindex $Subs($tok) 0] == "%presuf"} {
+    set prefix [lindex $Subs($tok) 1]
+    set var [lindex $Subs($tok) 2]
+    set suffix [lindex $Subs($tok) 3]
+    foreach i [TransTok $var] {
+      append newlist "${prefix}${i}${suffix} "
+      }
+    set newlist [string trimright $newlist]
+    
+  } elseif {[lindex $Subs($tok) 0] == "%upper"} {
+    set var [lindex $Subs($tok) 1]
+    foreach i [TransTok $var] {
+      set ui [string toupper $i]
+      append newlist "${ui} "
+      }
+    set newlist [string trimright $newlist]
+    
+  } elseif {[lindex $Subs($tok) 0] == "%lower"} {
+    set var [lindex $Subs($tok) 1]
+    foreach i [TransTok $var] {
+      set li [string tolower $i]
+      append newlist "${li} "
+      }
+    set newlist [string trimright $newlist]
+    
+  } elseif {[lindex $Subs($tok) 0] == "%reverse"} {
+    set prevar [lindex $Subs($tok) 1]
+    set rthings [TransTok $prevar]
+    set nrev [llength $rthings]
+    for {set i 1} {$i <= $nrev} {incr i} {
+      append newlist [lindex $rthings [expr $nrev - $i]] " "
+      }
+    set newlist [string trimright $newlist]
+
+  } else {
+    set newlist "$Subs($tok)"
+    }
+    
+  while {[regexp {:([a-zA-Z0-9_]+):} $newlist x var]} {
+    set sub [TransTok $var]
+    regsub :${var}: "$newlist" "$sub" newlist
+    }
+
+  return "$newlist"
+  }
+
+#
+#
+#
+proc ReduceLine {line} {
+  set lline $line
+  while {[regexp {:([a-zA-Z0-9_]+):} $lline x var]} {
+    set sub [TransTok $var]
+    regsub :${var}: "$lline" "$sub" lline
+    }
+    
+  return $lline
+  }
+  
+  
+#
+# Handle #foreach statement
+#
+proc DoForEach {inp out var argtxt} {
+  set iline 0
+  set txt ""
+  while { "$txt" != "#end" } {
+    gets $inp txt
+    if { "$txt" != "#end" } {
+      set line($iline) $txt
+      incr iline
+      }
+    }
+
+  set vroot [string trim $var &]
+  set uvar "&U_${vroot}&"
+  set lvar "&L_${vroot}&"
+  foreach token [split $argtxt " " ] {
+    if { "$token" > "" } {
+      set ltok [string tolower $token]
+      set utok [string toupper $token]
+      for {set jline 0} {$jline < $iline} {incr jline} {
+        regsub -all ${var} "$line($jline)" "$token" lline
+        regsub -all ${uvar} "$lline" "$utok" lline
+        regsub -all ${lvar} "$lline" "$ltok" lline
+        puts $out [ReduceLine $lline]
+        }
+      }
+    }
+  }
+
+#
+proc GEN_make {carg} {
+#
+  global env Subs
+#
+
+#
+# Get name of Makefile class to build
+#
+  set class [file rootname [lindex $carg 0]]
+#
+# Which system are we in. If obelix is in our current directory then we
+# search up to OBELIX root, otherwise ASTERIX
+#
+  set olddir [pwd]
+  if { [regexp {obelix} $olddir] } {
+    set droot $env(OB_ROOT)
+    set obelix 1
+  } else {
+    set droot $env(AST_ROOT)
+    set obelix 0
+    }
+#
+# Find out how many levels below root we are
+#
+  cd $droot
+  set rootdir [pwd]
+  cd $olddir
+  set curold $olddir
+  set root ""
+  set here ""
+  set indent ""
+  while {$curold != $rootdir} {
+    append root /..
+    append indent "  "
+    set here "[file tail $curold]/$here"
+    set curold [file dirname $curold]
+    }
+  set root [string range $root 1 end]
+  set here [string trim $here /]
+  set module [file dirname $here]
+  if {$module == "."} {
+    set module $here
+    }
+  set modsub [file tail $here]
+
+#
+# Some default substitutions
+#
+# If the last directory of the subsystem name is equal to the class
+# then the module name is the 
+  regsub -all / $here _ Subs(SUBSYS)
+  set Subs(CLASS)   $class
+  set Subs(ROOT)    $root
+  set Subs(HERE)    $here
+  set Subs(MODULE)  $module
+  set Subs(MODSUB)  $modsub
+  set Subs(INDENT)  "$indent"
+
+#
+# Load AST_MAKE_PATH variable
+#
+  set SearchPath [PathVarImport AST_MAKE_PATH]
+
+#
+# Names of temporary files
+#
+  set INP /tmp/genmake_[pid]_1
+  set TMP /tmp/genmake_[pid]_2
+  exec rm -f $INP $TMP
+  
+
+#
+# Make sure templates exist
+#
+  if {[PathSearch $class.make $SearchPath] == ""} {
+    puts "GEN_make : Makefile template does does exist for class /$class/"
+    exit
+    }
+  if {[PathSearch $class.base_config $SearchPath] == ""} {
+    puts "GEN_make : Makefile base substitutions file does does exist for class $class"
+    exit
+  }
+
+#
+# Open output file
+#
+  set out [open $TMP w]
+
+#
+# Load definitions
+#
+  source [PathSearch global.base_config $SearchPath]
+  set tfile [PathSearch $class.base_config $SearchPath]
+  set mfile [PathSearch $class.make $SearchPath]
+  puts "Loading template for class <$class> from $mfile"
+  source $tfile
+  source $class.config
+  if { $obelix == 1 } {
+    source $env(OB_ROOT)/etc/obelix.base_config
+    puts "Loading additional OBELIX configurations"
+    }
+#
+# Perform include file processing. Put each element of SearchPath as an
+# argument to the file streamer
+#
+  exec $env(AST_BIN)/at_strm -s -i $SearchPath $mfile > $INP
+#
+# Load template makefile and translate tokens
+#
+  set inp [open $INP r]
+  while {[gets $inp line] >= 0} {
+    if { [string range $line 0 7] == "#foreach" } {
+      set line [string range $line 9 end]
+      regexp {(\&[a-zA-Z]+\&)[ ]+(.*)} $line x forvar forargs
+      DoForEach $inp $out $forvar [ReduceLine $forargs]
+    } else {
+      puts $out [ReduceLine $line]  
+      }
+    }
+
+# Close the streams
+  close $inp
+  close $out
+#
+# Move temp file to new makefile
+#
+  exec rm -f $INP
+  exec mv $TMP Makefile
+  }
+
+#
+# Invoke using command line argument, if any
+#
+if { [llength $argv] != 0 } {
+  GEN_make [lindex $argv 0]
+  }

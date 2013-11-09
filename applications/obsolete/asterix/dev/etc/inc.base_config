@@ -1,0 +1,8 @@
+#
+# Declaration for 'inc' Makefile class
+#
+const F_INC_INDEX $(SYS)/:SUBSYS:.includes
+const INST_F_INC_INDEX $(INSTALL_ETC_SYS)/:SUBSYS:.includes
+
+files C_INCLUDES
+files F_INCLUDES

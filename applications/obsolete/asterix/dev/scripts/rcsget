@@ -1,0 +1,7 @@
+
+if test "$1" = "RCS"; then
+  shift
+  co -q $*
+else
+  co -q $*
+fi

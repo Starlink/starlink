@@ -1,0 +1,6 @@
+#
+# Declaration for 'master' Makefile class
+#
+const SUBSYS ASTERIX
+const ROOT .
+files SUBDIRS

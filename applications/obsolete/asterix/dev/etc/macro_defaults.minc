@@ -1,0 +1,82 @@
+.SUFFIXES:
+
+#------------------------------------------------------------------------------
+#  Defaults.
+#  ========
+#
+#  This section defines default macros and should rarely need changing.
+#  The values given here should be overridden externally to adapt to
+
+#  Name of computer system.
+
+SYSTEM = unknown
+
+#  Pathname of the root directory beneath which other Starlink software
+#  is currently installed.
+
+STARLINK = /star
+
+#  Pathnames of Starlink sub-directories that may be referenced when
+#  building this package.
+
+STAR_BIN = $(STARLINK)/bin
+STAR_ETC = $(STARLINK)/etc
+STAR_HELP = $(STARLINK)/help
+STAR_INC = $(STARLINK)/include
+STAR_LIB = $(STARLINK)/lib
+
+#  Pathname of the root directory beneath which the built files for
+#  this package should be installed for use. This defaults to the
+#  user's home directory.
+
+INSTALL = $(HOME)
+
+# Directory in which tclsh and wish can be found
+# 
+TCL_DIR = /usr/local/bin
+
+# Directory in which ADAM extended version of tclsh and wish can be found
+#
+ADAM_TCL_DIR = $(STAR_BIN)
+
+# Directory containing ADAM TCL library stuff
+#
+ADAM_TCL_LIB = $(STAR_LIB)/tk/adam
+
+#  Pathname of the directory into which exported tar files will be
+#  placed. This defaults to the current working directory.
+
+EXPORT = .
+
+#  Default macros for compiling C and Fortran source code.
+
+CC = c89
+CFLAGS = -O
+FC = fort77
+FFLAGS = -O
+
+#  Command for forming a link to a file.
+
+LINK = ln
+
+#  Command for "randomizing" an object library. The default acts as a
+#  null command.
+
+RANLIB = echo >/dev/null
+
+#  Commands for adding to and extracting from an archive file (.tar).
+
+TAR_IN = pax -w -v -x ustar -f
+TAR_OUT = pax -r -f
+
+#  Command for adding a file to an object archive (.a).
+
+AR_IN = ar -r
+
+#  Default file type extension for a shareable library and command for
+#  building a shareable library (the default acts as a null command).
+
+SHARE = .so
+BLD_SHR = echo >/dev/null
+
+SCCS = SCCS

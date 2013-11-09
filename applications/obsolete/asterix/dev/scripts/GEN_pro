@@ -1,0 +1,112 @@
+#!/bin/csh
+if ( $#argv == 0 ) then
+  echo "Usage: genpro [-p] <prologue> <output_name>"
+  echo " "
+  echo "where <prologue> is one of the following,"
+  echo " "
+  cat $AST_ROOT/dev/etc/pro.idx
+  echo " "
+#  echo "The optional -p qualifier forces prompting for unresolved template objects"
+  exit
+endif
+#
+# Check for -p qualifier
+#
+if ( "$1" == "-p" ) then
+  set prom=1
+  shift argv
+else
+  set prom=0
+endif
+#
+# Get base ASTERIX version
+#
+setenv AST_VERSION V2.0-0
+set aver=`echo $AST_VERSION|tr '-' ' '|awk '{print $1}'`
+#
+# Get date in nice format
+#
+set date=`date | awk '{printf "%2d %s %d\n",$3,$2,$6}'`
+set year=`date | awk '{print $6}'`
+set rname="$2"
+if ( "${rname:r}.c" == $rname ) then
+  set lang="Starlink ANSI C"
+  set lext=".c"
+else if ( "${rname:r}.g" == $rname ) then
+  set lang="Starlink Fortran"
+  set lext=".f"
+else
+  set lang="Starlink Fortran"
+  set lext=".f"
+endif
+set runame=`echo ${rname:r}|tr '[a-z]' '[A-Z]'`
+set rlname="$rname:r"
+if ( "$lext" == ".f" ) then
+  set rname=`echo ${rname:r}|tr '[a-z]' '[A-Z]'`
+else
+  set rname="${rname:r}"
+  set runame=`echo $runame|sed s%_C%%`
+  set rlname=`echo $rlname|sed s%_c%%`
+endif
+set upkg=`echo $rname|tr '_' ' '|awk '{print $1}'`
+set lpkg=`echo $upkg|tr '[A-Z]' '[a-z]'`
+set lspkg=`echo $lpkg|tr -d '[0-9]'`
+set uspkg=`echo $upkg|tr -d '[0-9]'`
+if ( "$lpkg" == "$lspkg" ) then
+  set acc="public"
+else
+  set acc="private"
+endif
+#
+# Identify the prologue file
+#
+set upro="$AST_ROOT/dev/etc/$1"
+if ( ! -e $upro ) then
+  if ( -e ${upro}.pro${lext} ) then
+    set upro="${upro}.pro${lext}"
+  else if ( -e ${upro}.pro ) then
+    set upro="${upro}.pro"
+  else
+    echo "Unknown prologue form $upro ..."
+    exit
+  endif
+endif
+#
+# Perform the easy substitutions
+#
+if ( "${upro:r}" =~ *task* ) then
+  set rref="{task_references}..."
+  if ( "${upro:r}" =~ *tasksub* ) then
+    set keys="$lspkg, usage:private"
+  else  
+    set keys="$lspkg, usage:public"
+  endif
+else
+  set rref="$uspkg Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/$lspkg.html"
+  set keys="package:$lspkg, usage:$acc"
+endif
+sed <$upro >$2 "\
+s%{package}%$uspkg%g\
+s%{lpackage}%$lspkg%g\
+s%{ast_version}%$aver%\
+s%{year}%$year%\
+s%{routine_name}%$rlname%\
+s%{module_name}%$rlname%\
+s%{ROUTINE_NAME}%$runame%\
+s%{routine_language}%$lang%\
+s%{author_identifier}%$PRO_AUTHOR_ID%\
+s%{authors_name}%$PRO_AUTHORS_NAME%\
+s%{affiliation}%$PRO_AFFILIATION%\
+s%{routine_references}...%$rref%\
+s%{routine_keywords}...%$keys%\
+s%{date}%$date%\
+"
+#
+# Prompt for the rest?
+#
+#if ( $prom != 0 ) then
+#loop:
+#  set lbc=`fgrep -c '{' $2`
+##  if ( $lbc > 0 ) then
+#  endif
+#endif

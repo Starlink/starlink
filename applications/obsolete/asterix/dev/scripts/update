@@ -1,0 +1,6 @@
+if test $AST_REV_CONTROL = "RCS; then
+  co $*
+else
+  sccs get $*
+fi
+replace -o $*

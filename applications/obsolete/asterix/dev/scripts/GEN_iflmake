@@ -1,0 +1,198 @@
+#!/bin/csh
+# Compile modules in a IFL library #2
+#
+echo "ROOT          = $1"
+set subsys	    = "$2"
+shift argv
+shift argv
+set do_mono=1
+set do_tasks=1
+if ( "$1" == "monolith" ) then
+  set do_tasks=0
+  shift argv
+endif
+if ( "$1" == "tasks" ) then
+  set do_mono=0
+  shift argv
+endif
+set iflibs="$*"
+#
+# Extract the source listing command
+#
+set scmd = "$SOURCE_LIST"
+if ( "$scmd" == '$(TAR_LIST)' ) then
+  set scmd = "$TAR_LIST"
+endif
+#
+# Loop over libraries looking for those with qualifying ()'s
+#
+set liblist=" "
+foreach ilib (${iflibs})
+#
+# Loop over contents of library. If the library name contains braces then they
+# contain a list of the names of the modules to use.
+#
+  set plib=`echo "${ilib}"| tr '(' ' '`
+  if ( "$plib" == "$ilib" ) then
+    set thelib="$ilib"
+  else
+    set thelib="'"$ilib"'"
+  endif
+#
+# Add to list of libraries
+#
+  set liblist="${liblist} ${thelib}"
+#
+end
+#
+# Make list of _ifl libraries number from argument 1 upwards
+#
+echo "PKG_NAME      = asterix"
+echo "SUBSYS        = ${subsys}"
+echo 'BIN           = $(ROOT)/$(SYSTEM)/bin'
+#echo "IFL_LIBS      = ${liblist}"
+echo " "
+echo '\
+\
+#  Pathnames of directories into which files may be placed when the\
+#  package is installed.\
+\
+INSTALL_BIN = $(INSTALL)/bin/$(PKG_NAME)\
+INSTALL_DATES = $(INSTALL)/dates\
+INSTALL_HELP = $(INSTALL)/help/$(PKG_NAME)\
+'
+
+#  Pathname of the root directory beneath which other Starlink software
+#  is currently installed.
+
+echo "STARLINK = /star"
+
+#  Pathnames of Starlink sub-directories that may be referenced when
+#  building this package.
+
+echo 'STAR_BIN = $(STARLINK)/bin'
+echo 'STAR_INC = $(STARLINK)/include'
+
+
+echo "\
+.SUFFIXES:	.ifl .ifc\
+"
+set nl=0
+set tifl=" "
+set tifc=" "
+foreach ilib (${iflibs})
+  @ nl++
+  echo "IFL_FILES_${nl}   = \"
+  set tifl="${tifl}"' $(IFL_FILES_'"${nl})"
+  set tifc="${tifc}"' $(IFC_FILES_'"${nl})"
+  set lf=0
+  set osfile=" "
+  set imod=0
+#
+# Loop over contents of library. If the library name contains braces then they
+# contain a list of the names of the modules to use.
+#
+  set plib=`echo "${ilib}"| sed "s%(% %;s%)%%;s%,% %g"`
+  if ( "$plib" == "$ilib" ) then
+    set modules=`$scmd ${ilib}|grep ifl`
+    set thelib="$ilib"
+  else
+    set modules=`echo ${plib} | awk '{for(x=2;x<=NF;x++)print $x}'`
+    set thelib=`echo ${plib} | awk '{print $1}'`
+  endif
+#
+# Loop over required modules
+#
+  set nmod=$#modules
+  foreach module (${modules})
+    set osfile="$osfile ${module:r}.ifl"
+    @ lf++
+    @ imod++
+    if ( $lf > 4 ) then
+      if ( $nmod == $imod ) then
+        echo "$osfile"
+      else
+        echo "$osfile \"
+      endif
+      set lf=0
+      set osfile=" "
+    endif
+  end
+  echo "$osfile"
+  echo " "
+  echo '$(IFL_FILES_'${nl}'):'
+  echo '	@ $(SOURCE_GET) '${thelib}' $@'
+  echo " "
+  echo 'IFC_FILES_'${nl}' = $(IFL_FILES_'${nl}':.ifl=.ifc)'
+  echo " "
+end
+#
+# Macro listing all the IFL files
+#
+echo "IFL_FILES     =${tifl}"
+echo " "
+if ( $do_mono && $do_tasks ) then
+  echo 'IFC_FILES     = '${tifc}' $(SUBSYS)_mono.ifc'
+else 
+  if ( $do_mono ) then
+    echo 'IFC_FILES     = $(SUBSYS)_mono.ifc'
+  else
+    echo 'IFC_FILES     = '${tifc}
+  endif
+endif
+
+echo " "
+echo '$(SUBSYS)_mono.ifl:	$(IFL_FILES)\
+	@- echo MONOLITH $(SUBSYS)_MONO >i.1\
+	@- cat $(IFL_FILES) >i.2\
+	@- echo ENDMONOLITH >i.3\
+	@- cat i.1 i.2 i.3 >$@\
+	@- rm -f i.1 i.2 i.3'
+#	@- $(ROOT)/dev/GEN_monoifl $(SUBSYS)_mono $(IFL_LIBS)'
+echo " "
+#
+echo 'build:	$(IFC_FILES)\
+	-@ rm -f $(IFL_FILES) $(SUBSYS)_mono.ifl\
+	@ mv $(IFC_FILES) $(BIN)/'
+echo " "
+echo 'install:\
+	@ for f in $(IFC_FILES); do \'
+echo '          cp -p $(BIN)/$$f $(INSTALL_BIN);\'
+echo '          chmod 644 $(INSTALL_BIN)/$$f;\'
+echo '          rm $(BIN)/$$f;\'
+echo '          $(LINK) $(INSTALL_BIN)/$$f $(BIN)/$$f; \'
+echo '	done'
+echo " "
+echo 'deinstall:\
+	@ for f in $(IFC_FILES); do \'
+echo '           if test -f $(INSTALL_BIN)/$$f; then \'
+echo '              rm $(BIN)/$$f;\'
+echo '              cp -p $(INSTALL_BIN)/$$f $(BIN)/$$f;\'
+echo '              rm $(INSTALL_BIN)/$$f;\'
+echo '           else :; fi;\'
+echo '        done'
+echo " "
+echo 'unbuild:\
+	@ for f in $(IFC_FILES); do \'
+echo '           if test -f $(BIN)/$$f; then \'
+echo '              rm $(BIN)/$$f 1>/dev/null 2>/dev/null;\'
+echo '           else :; fi;\'
+echo '        done'
+echo " "
+echo 'get_built_files:\
+	@ for f in $(IFC_FILES); do \'
+echo '           if test -f $(BIN)/$$f; then \'
+echo '     ls $(BIN)/$$f; \'
+echo '           else :; fi;\'
+echo '	done'
+
+echo '\
+.ifl.ifc:\
+	@ $(STAR_BIN)/compifl $*.ifl\
+	@ chmod 644 $*.ifc\
+ '
+
+
+rm $$f;\
+              cp -p $(INSTALL_DIR)/$$f ./$$f;\
+              rm $(INSTALL_DIR)/$$f;\

@@ -1,0 +1,66 @@
+#!/bin/csh
+
+#+
+# Generate dummy top-level bits for ASTERIX programs
+#
+#-
+
+#
+# Get sub-system name
+#
+set subsys="$1"
+shift argv
+shift argv
+#
+# Extract the source listing command
+#
+set scmd = "$SOURCE_LIST"
+if ( "$scmd" == '$(TAR_LIST)' ) then
+  set scmd = "$TAR_LIST"
+endif
+#
+# Loop over interface file library names
+#
+set nifl=1
+while ( $#argv > 0)
+#
+# Get the name of the next library
+#
+  set iflib="$argv[1]"
+#
+# Identify the interesting of the library. If the library name contains braces 
+# then they contain a list of the names of the modules to use, separated by
+# commas.
+#
+  set plib=`echo "${iflib}"| sed "s%(% %;s%)%%;s%,% %g"`
+  if ( "$plib" == "$iflib" ) then
+    set modules=" "
+    set thelib="$iflib"
+  else
+    set modules=`echo ${plib} | awk '{for(x=2;x<=NF;x++)print $x}'`
+    set thelib=`echo ${plib} | awk '{print $1}'`
+  endif
+#
+# Loop over all the required modules in the interface file library. We sort 
+# them into descending order to put the test for commands like ISAVE1D before 
+# those for ISAVE which would otherwise be executed for both cases.
+#
+  foreach prog (`$scmd ${thelib} ${modules}|fgrep '.ifl'|sort -r`)
+#
+    sed 's%PROG%'${prog:r}'%' >c_${prog:r}.f <<FOO
+      SUBROUTINE PROG( STATUS )
+      INTEGER STATUS
+      STATUS = -1
+      END
+FOO
+    @ nifl++
+#
+#  next module
+#
+  end
+#
+# next library
+#
+  shift argv
+
+end

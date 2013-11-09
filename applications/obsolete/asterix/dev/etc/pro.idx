@@ -1,0 +1,20 @@
+mod_csh_rc              Module initialisation file
+
+sh                      Bourne shell script
+tcl			Tcl script
+gui			Gui tcl/tk script
+
+task			Standard ASTERIX task
+tasksub			Task internal subroutine
+
+aif			ASTERIX interface file
+aifinc			ASTERIX interface file include file
+
+pkg_cmn			Subroutine package CMN
+pkg_init		BLOCK DATA initialisation of subroutine package CMN
+func			General purpose function
+sub			General purpose subroutine
+fcsub			C function emulating Fortran
+pkgsub			Subroutine in standard package form
+pkgisub			Internal subroutine in standard package form
+pkgmthsub		ADI method subroutine in standard package form

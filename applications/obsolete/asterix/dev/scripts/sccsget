@@ -1,0 +1,12 @@
+
+if test "$2" != ""; then
+  file="$1"
+  dir=`dirname $file`
+  if test "$dir" = "$file"; then
+    dir=" "
+  else
+    dir="-d$dir"
+  fi
+  shift
+  sccs $dir get -s $*
+fi

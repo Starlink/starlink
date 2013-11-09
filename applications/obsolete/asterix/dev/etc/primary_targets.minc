@@ -1,0 +1,140 @@
+#
+# Make developer system in sub-directories
+#
+developer_subs:
+	@- for f in $(SUBDIRS) " "; do \
+           if test -d "$$f"; then \
+   	     cd $$f; $(MAKE) developer; cd .. ;\
+           fi ;\
+        done
+
+#
+# Build export files in sub-directories
+#
+build_export_subs:
+	@- for f in $(SUBDIRS) " "; do \
+           if test -d "$$f"; then \
+   	     cd $$f; $(MAKE) build_export; cd .. ;\
+           fi ;\
+        done
+
+#
+# Unbuild export files in sub-directories
+#
+unbuild_export_subs:
+	@- for f in $(SUBDIRS) " "; do \
+           if test -d "$$f"; then \
+   	     cd $$f; $(MAKE) unbuild_export; cd .. ;\
+           fi ;\
+        done
+
+#
+# Build Makefiles one level below
+#
+makes:
+	@- for f in $(SUBDIRS) " "; do \
+            if test -d "$$f"; then \
+   	      cd $$f; echo source ../$(DEV_SCR)/GEN_make';' GEN_make *.config | tclsh ; $(MAKE) makes; cd .. ;\
+            fi ;\
+          done
+	@ echo ":INDENT:Built subdirectory Makefiles for subsystem $(SUBSYSTEM)"
+
+#
+# Execute named target on matching classes
+#
+class_exec:
+	@- if test ":CLASS:" = "$(CEXEC_CLASS)"; then \
+	  $(MAKE) $(CEXEC_TARGET); \
+    	  fi
+	@- for f in $(REV_SUBDIRS) " "; do \
+            if test -d "$$f"; then \
+   	      cd $$f; $(MAKE) class_exec; cd .. ;\
+            fi ;\
+          done
+
+showtree:
+	@- if test "$(SUBDIRS)" = ""; then \
+	  echo ":INDENT::MODSUB:"; \
+	else \
+	  echo ":INDENT::MODSUB:/"; \
+	  for f in $(SUBDIRS) " "; do \
+            if test -d "$$f"; then \
+   	      cd $$f; $(MAKE) showtree; cd .. ;\
+            fi ;\
+          done ;\
+        fi
+
+#+ G E T _ S O U R C E _ F I L E S
+#
+#  Supplies list of source files to parent make
+#-
+get_s_files:
+	@- for f in $(SUBDIRS) " "; do \
+            if test -d "$$f"; then \
+   	      cd $$f; $(MAKE) $@|sed "s%^%$$f/%"; cd .. ;\
+            fi ;\
+          done
+	@ ls -d $(SOURCE_FILES) | sed "s%$(SCCS)%$(SOURCE_STORE)%"
+
+
+#+ G E T _ B U I L T _ F I L E S
+#
+#  Supplies list of built files to parent make
+#-
+get_b_files:
+	@- for f in $(SUBDIRS) " "; do \
+            if test -d "$$f"; then \
+   	      cd $$f; $(MAKE) $@|sed "s%^%$$f/%"; cd .. ;\
+            fi ;\
+          done
+	@ ls -d $(BUILT_FILES) $(DATE_STAMP) .BUILT_$(SYSTEM) 
+
+
+#  check: 
+#  ------
+#
+#  Check files for build are present, and report state
+
+check:
+	@ echo
+	@ echo \
+   '*** This is the $(SUBSYSTEM) sub-system on system $(SYSTEM)'
+	@ echo
+	@ $(MAKE) do_check
+	@ echo '    All essential source files are present'
+	@ echo
+#
+#  Display the current state.
+	@ if ls -a|grep .BUILT 1>/dev/null; then \
+          first=0; for f in .BUILT*; do \
+            if test $$first = 0; then \
+ 	      echo '    The subsystem is currently:  built for' `echo $$f|cut -c8-`; \
+              first=1;\
+            else \
+ 	      echo '                                 built for' `echo $$f|cut -c8-`; \
+            fi; \
+          done; \
+        else echo '    The subsystem is currently:  not built';\
+        fi
+	@ if ls -a|grep .INSTALLED 1>/dev/null; then \
+          for f in .INSTALLED*; do \
+ 	    echo '                                 installed for' `echo $$f|cut -c12-`; \
+          done; \
+        else echo '                                 not installed';\
+        fi
+	@ if ls -a|grep .TESTED 1>/dev/null; then \
+          for f in .TESTED*; do \
+ 	    echo '                                 tested for' `echo $$f|cut -c9-`; \
+          done; \
+        else echo '                                 not tested';\
+        fi
+	@ echo
+
+do_check:
+	@ for f in $(SOURCE_FILES); do \
+           if test ! "$$f" = "SCCS" -a ! -f "$$f"; then \
+              echo "File $$f is not present and is required for build";\
+              exit 1;\
+           else :; fi;\
+        done
+

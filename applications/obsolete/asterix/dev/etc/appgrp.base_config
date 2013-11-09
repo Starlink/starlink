@@ -1,0 +1,66 @@
+files C_INCLUDES
+files F_INCLUDES
+#
+# Subgrouping of auxilliary routines
+#
+files RTN_GROUPS
+#
+# Fortran modules
+#
+files F_OTHER
+#
+# Fortran applications
+#
+files F_APPLIC
+#
+# Standalone Fortran programs
+#
+files F_STANDALONE
+#
+# C modules
+#
+files C_OTHER
+#
+# C applications
+#
+files C_APPLIC
+#
+# Standalone Fortran programs
+#
+files C_STANDALONE
+#
+# Modules in library which override lower libraries
+#
+files O_OVERRIDE
+#
+# Tasks to be visible from the shell
+#
+files SHELL_TASKS %remext F_APPLIC
+files BIN_SHELL_TASKS %prefix $(BIN)/ SHELL_TASKS
+files SHELL_IFC %suffix SHELL_TASKS .ifc
+files BIN_SHELL_IFC %suffix BIN_SHELL_TASKS .ifc 
+#
+# The monolith to build. Defined like this so we can turn momolith
+# creation off
+#
+const MONOLITH $(MONOLITH)
+#
+# The monolith to build
+#
+const MONOLITH_IFC $(MONOLITH_IFC)
+#
+# Name of generic index file
+#
+const GENERIC_FILE " "
+#
+# Sub-directories to build first
+#
+const SUBDIRS " "
+#
+# The ASTERIX library directory
+#
+const AST_LIB "$(ROOT)/lib"
+#
+# Monolith linkage
+#
+const MONO_LINKAGE {`$(ADAM_MON_LNK) $(LIB)` `$(BIN)/asterix_link $(LIB)`}

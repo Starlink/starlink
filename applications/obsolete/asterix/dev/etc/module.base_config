@@ -1,0 +1,8 @@
+#
+# Declaration for 'module' Makefile class
+#
+files CSH_INIT 
+const BIN_CSH_INIT $(SYS)/start_:MODULE:.csh
+const INST_CSH_INIT $(INSTALL_ETC_SYS)/start_:MODULE:.csh
+
+files SUBDIRS

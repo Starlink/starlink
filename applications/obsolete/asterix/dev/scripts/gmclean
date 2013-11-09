@@ -1,0 +1,4 @@
+#!/bin/csh
+foreach i (`ipcs | grep $user | awk '{print $2}'`)
+  ipcrm -m $i
+end

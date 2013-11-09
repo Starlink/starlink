@@ -1,0 +1,25 @@
+#!/bin/csh
+#
+# Build the main program for a ftool called $1. This calls a Fortran module
+# called $1_launch.f which sets up various things.
+#
+set prog="$1"
+set uprog=`echo $prog|tr '[a-z]' '[A-Z]'`
+set fout="${prog}_applic.f"
+if ( -e $fout ) rm -f $fout
+
+cat <<EOF | sed s%'<'prog'>'%$uprog% >$fout
+      SUBROUTINE AST_FTOOL_APPLIC()
+      INTEGER STATUS
+      CHARACTER*40 TASKNAME
+      EXTERNAL USI_INIT
+      COMMON /TASK/ TASKNAME
+      STATUS = 0
+      TASKNAME='<prog>'
+      CALL FTCMSG()
+      CALL ERR_BEGIN( STATUS )
+      CALL <prog>( STATUS )
+      CALL ERR_END( STATUS )
+
+      END
+EOF

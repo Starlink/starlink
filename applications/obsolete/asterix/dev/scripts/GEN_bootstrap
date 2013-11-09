@@ -1,0 +1,25 @@
+#!/bin/csh
+#
+# Bootstrap the ASTERIX build system. Rebuilds all the make files using
+# only the configuration files
+#
+#_
+
+# Build the file streamer
+#
+echo "Building file streamer..."
+cd src/tools
+cc -o ../../$SYSTEM/bin/at_strm at_strm.c
+cd ../..
+
+# Build the top-level Makefile
+#
+echo source dev/scripts/GEN_make';' GEN_make master.config | tclsh
+
+# Build the makefiles
+#
+mk makes
+
+# Remove the file streamer
+#
+rm $SYSTEM/bin/at_strm
