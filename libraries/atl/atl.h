@@ -89,6 +89,7 @@ void atlKychk( AstKeyMap *, const char *, const char *, int * );
 void atlMapPut1C( AstKeyMap *, const char *, const char *, int, int, const char *, int * );
 void atlMgfts( int, AstFitsChan *, AstFitsChan *, AstFitsChan **, int * );
 void atlMklut( int, int, int, int, AstFrame *, double *, AstMapping **, int * );
+void atlPairAxes( AstFrameSet *, AstFrameSet *, double *, const char *, int *, int * );
 void atlPlroi( AstPlot *, AstKeyMap **, int * );
 void atlPtftd( AstFitsChan *, const char *, double, const char *, int * );
 void atlPtfti( AstFitsChan *, const char *, int, const char *, int * );
