@@ -1,0 +1,27 @@
+
+# N.B. The previous line should be blank
+#+
+#  Name:
+#     xasthelp
+
+#  Type of Module:
+#     Bourne shell script
+
+#  Description:
+#     The xasthelp command provides a command to access the ASTERIX
+#     WWW page. It invokes a WWW browser with a URL both which are
+#     given by the values of the ASTERIX resources wwwBrowser and
+#     wwwHomePage respectively.
+
+#  Authors:
+#     DJA: David J. Allan (Jet-X, University of Birmingham)
+#     {enter_new_authors_here}
+
+#  History:
+#     26 Jan 1996 (DJA):
+#        Original version.
+#     {enter_changes_here}
+
+#-
+res=`$AST_BIN/apiget "" wwwBrowser wwwHomePage`
+$res

@@ -1,0 +1,269 @@
+#!/usr/local/bin/tclsh
+
+#
+# The variable holding the list of resource directories
+#
+global APIloadPath
+
+#
+# Verify resource file contents?
+#
+global APIverify
+set APIverify 1
+
+#
+# Translate environmen variables?
+#
+global APIenvConvert 
+set APIenvConvert 1
+
+#
+# Get resource path
+#
+if [info exists env(AST_RESOURCE_PATH)] {
+  set APIloadPath [split $env(AST_RESOURCE_PATH) :]
+} else {
+  set APIloadPath "./"
+  }
+  
+
+global ResClass
+global EntityClass
+global EntityClass
+
+#
+# Load ASTERIX resources
+#
+proc ResourceClass {name form args} {
+  global ResClass APIverify
+  if {$APIverify} {
+    puts "Define class $name"  
+    }
+  set ResClass($name) "{$form {$args}}"
+  }
+  
+#APIload
+#puts $ResClass(Module)
+#puts $ResClass(ModuleSet)
+#puts $ResClass(Xcolour)
+#
+#puts [lsort [array names ResClass]]
+
+
+#
+# Return a value of an enumerated resource class. If a starting value
+# is already defined then it used to define the highlighted item in
+# the enumeration selection
+#
+#proc APIenumResClassEdit {w class {value 0}} {
+#  }
+  
+#
+# Return a value of an resource class which is a set. If a starting value
+# is already defined then it used to define the highlighted items in
+# the enumeration selection
+#
+#proc APIsetResClassEdit {w class {value 0}} {
+#  }
+
+
+#
+#
+#
+proc APIstrmClose1 handle {
+  global APIflHans APIflLevel
+  
+  set lev $APIflLevel($handle)
+  
+  close $APIflHans($handle,$lev)
+  unset APIflHans($handle,$lev)
+  
+  incr APIflLevel($handle) -1
+  }
+  
+  
+#
+# Open a file for use by the API loader
+#
+proc APIloadOpen {file {handle 0}} {
+  global APIflHans APIflLevel
+
+  catch [set lname [open $file r]] code
+  
+  if {$handle == 0} {
+    set lev 0
+    set name $lname
+  } else {
+    set lev $APIflLevel($handle)
+    incr lev
+    set name $handle
+    }
+    
+  set APIflHans($name,$lev) $lname
+  set APIflLevel($name) $lev
+  
+  if {$lev == 0} {
+    return $lname
+    }
+  }
+
+#
+# Look for an include file in a directory in the AST_RESOURCE_PATH
+# environment variable
+#
+proc APIpathSearch {file} {
+  global APIloadPath env
+
+# Search each component of path for the file specified. Return immediately
+# if found
+  foreach dir $APIloadPath {
+    set ftest "$dir/$file"
+    if [file exists $ftest] {
+      return $ftest
+      }
+    }
+    
+  return
+  }
+  
+
+
+proc APIloadGetLine {handle linevar} {
+  global APIflHans APIflLevel APIloadPath
+  upvar $linevar line
+
+  set lev $APIflLevel($handle)
+  
+  set gotaline 0
+
+  while {$gotaline == 0} {
+
+# Make sure we have the correct handle for this level    
+    set han $APIflHans($handle,$lev)
+
+# Read next line from current stream
+    set code [gets $han line]
+
+# End of file not met?    
+    if { $code >= 0} { 
+    
+#   Lines staring with a hash are special    
+      set fc [string index $line 0]
+      if {$fc == "#"} {
+      
+#     Include directive?
+	if {[regexp {\#include *\"(.+)\"} "$line" mline ifile]} {
+	  
+#       Search for include file in path
+          set isrch [APIpathSearch $ifile]
+	  if {$isrch != ""} {
+	    APIloadOpen $isrch $handle
+	    incr lev
+	  } else {
+	    puts "Cannot find $ifile in path $APIloadPath"
+	    }
+          } 
+	  
+#   Line is not special in any way
+      } else {
+        set gotaline 1
+	}
+
+# End of file met
+    } else {
+      if {$lev > 0} {
+        APIstrmClose1 $handle
+	incr lev -1
+      } else {	
+        set code -1
+        break
+	}
+      }
+    }
+    
+  return $code
+  }
+
+#
+# Look for a number of named files in the API load path
+#
+proc APIloadInt {args} {
+  global APIloadPath APIverify EntityClass EntityValue
+
+# Search all the directories in the resource path
+  foreach dir $APIloadPath {
+
+# Try alternative names. Break after first successful load
+    foreach name $args {
+      if { [file exists $dir/$name] } { 
+        if {$APIverify} {
+          puts "Loading $dir/$name"
+	  }
+        set myhan [APIloadOpen $dir/$name 0]
+	
+#    More lines in stream?	
+        while {[set nc [APIloadGetLine $myhan line]] >= 0} {
+	
+#      Non-blank line?	
+          if {$nc > 0} {
+
+#        ResourceClass command?
+            set cmd [string trimleft $line]
+  	    if {[regexp {ResourceClass} $cmd x]} {
+	      eval $cmd
+            } elseif {[set cpos [string first : $cmd]] > 0} {
+	      set value [string trim [string range $cmd [expr $cpos + 1] end]]
+	      if { [regexp {([A-Z][a-zA-Z0-9]+) +([a-zA-Z0-9_\.\*\?]+)} $cmd x cls ent] } {
+    	        puts "declare $cls $ent = $value"
+		set EntityClass($ent) $cls 
+		set EntityValue($ent) $value
+	      } else {
+	        set ent [string trim [string range $cmd 0 [expr $cpos - 1]]]
+		set EntityValue($ent) $value
+    	        puts "entity : $ent = $value"
+	        }
+	    } elseif { $APIverify } {
+  	      puts "Ignored line : $line"
+  	      }
+	    }
+
+#      Next line in stream
+          }
+
+	break  
+        }
+      }
+    }
+  }
+  
+proc APIload {args} {
+  APIloadInt DOT_ASTERIX_RC .asterixrc
+  foreach entity $args {
+    APIloadInt DOT_[string toupper $entity]_RC .[string tolower $entity]rc
+    }
+  }
+
+proc APIget {{entity ""} {class ""}} {
+  global EntityValue APIenvConvert env
+  set val ""
+  
+  if {$entity != ""} {
+    set val $EntityValue($entity)
+    }
+    
+  if {$val != "" && $APIenvConvert} {
+    while {[regexp {\$\{([A-Z_0-9]+)\}} $val x var]} {
+      if {[info exists env($var)]} {
+        regsub {\$\{([A-Z_0-9]+)\}} $val $env($var) val
+      } else {
+      puts "Var <$var>?"
+        break
+        }
+      }
+    }
+  return $val
+  }
+  
+APIload isys
+puts [APIget xanbin]
+puts [APIget isys.background]

@@ -1,0 +1,71 @@
+#!/bin/csh
+#
+# Description:
+#  This script edits prototype shell scripts and substitutes absolute
+#  directory names for symbolic ones whose names are delimited by colons.
+# 
+# Invokation :
+#
+#  GEN_script [-v version] built|installed root module protofile
+#
+# Algorithm:
+#  A script can run in one of two environments, named 'built' and
+#  'installed'. In the former the ASTERIX installation retains its
+#  hierarchical structure, whereas in the latter it is distributed
+#  into many fewer directories spread through the Starlink tree.
+#  This script edits tokens embedded in prototype shell scripts so
+#  that the script is correctly constructed. The symbolic tokens
+#  recognised and their translations under the two environments are,
+#
+#    Token              Built                   Installed     
+# 
+#    ENVIRON            built			installed
+#    ROOT               $root                   $root/bin/asterix
+#    SYSTEM		$SYSTEM			$SYSTEM
+#    AST_BIN            $root/$SYSTEM/bin	$root/bin/asterix
+#    AST_SYS            $root/$SYSTEM/etc/sys	$root/etc/asterix/sys
+#-
+
+# Defaults for optional substitutions
+set version=""
+
+# Loop for processing optional arguments
+aloop:
+
+# Version specified
+  if ( "$1" == "-v" ) then
+    shift argv
+    set version="$1"
+    shift argv
+    goto aloop
+  endif
+  
+# Import non-optional arguments
+set environ="$1"
+set root="$2"
+set module="$3"
+set protofile="$4"
+
+# Set up translations which switch
+if ( "$environ" == "built" ) then
+  set ROOT="${root}"
+  set astbin="${root}/${SYSTEM}/bin"
+  set astetc="${root}/${SYSTEM}/etc"
+  set astsys="${root}/${SYSTEM}/sys"
+else
+  set ROOT="${root}/bin/asterix"
+  set astbin="${root}/bin"
+  set astetc="${root}/etc/asterix"
+  set astsys="${root}/etc/asterix/sys"
+endif
+
+# Translate tokens
+sed <$protofile "\
+s%:ENVIRON:%${environ}%g;\
+s%:ROOT:%${ROOT}%g;\
+s%:VERSION:%${version}%g;\
+s%:SYSTEM:%${SYSTEM}%g;\
+s%:AST_BIN:%${astbin}%g;\
+s%:AST_ETC:%${astetc}%g;\
+s%:AST_SYS:%${astsys}%g;\
+"

@@ -1,0 +1,8 @@
+#!#TCL_DIR#/tclsh
+
+source $env(AST_ETC)/apiget.tcl
+
+APIload [lindex $argv 0]
+for {set iarg 1} {$iarg < $argc} {incr iarg} {
+  puts [APIget [lindex $argv $iarg]]
+  }

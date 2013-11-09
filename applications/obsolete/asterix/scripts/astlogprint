@@ -1,0 +1,16 @@
+#!/bin/csh
+#
+# Is logging on?
+#
+set state=0
+if ( ${?AST_LOG_STATE} ) then
+  if ( "${AST_LOG_STATE}" != "OFF" ) then
+    if ( `echo ${AST_LOG_STATE}|sed 's% %%'` != "" ) then
+       set state=1
+      echo $AST_LOG_STATE|awk '{print "Command logging is in",$1,"mode, to file",$2}'
+    endif
+  endif
+endif    
+if ( ! $state ) then
+  echo Command logging is OFF
+endif

@@ -1,0 +1,357 @@
+#!/usr/bin/tclsh
+##
+
+#+
+#
+#
+#
+#
+#
+#
+#
+#-
+
+# Initialise
+#
+global TMPid
+set TMP /tmp/aiftoifl_[pid]
+global AIFincludeDirs
+set AIFincludeDirs {}
+
+#
+# Class to type mapping
+#
+global ClassToType
+set ClassToType(filename) LITERAL
+set ClassToType(asciidev) LITERAL
+set ClassToType(literal)  LITERAL
+set ClassToType(ilist)    _CHAR
+set ClassToType(range)    _CHAR
+set ClassToType(integer)  _INTEGER
+set ClassToType(logical)  _LOGICAL
+set ClassToType(real)     _REAL
+set ClassToType(double)   _DOUBLE
+set ClassToType(char)     _CHAR
+
+#
+# Diagnostics
+#
+global Diag
+set Diag 0
+
+#
+# All the things that can be inherited by a parameter class
+#
+global Inheritables
+set Inheritables [list help mode association default prompt position]
+
+#
+# Token system for multi-parameters
+#
+global UseTokens Tokens
+set UseTokens 0
+
+set AIFdefault(asciidev,help) "ASTERIX ascii device, eg. printer, oldfile, newfile or a filename"
+
+set AIFdefault(ilist,help)    "Use ASTERIX list notation, eg. 1,2,3  1:4,8  1,2,3:6,8:*"
+
+# Check number of input arguments
+#
+if {$argc == 0} {
+  puts "Usage: aiftoifl \[-v\] \[-i dir\]... file \[file\]..."
+  exit
+  }
+
+#
+# Procedure to start off a new interface file
+#
+proc BeginInterface {name} {
+  global TMPid
+  set uname [string toupper $name]
+  puts $TMPid "INTERFACE $uname\n"
+  }
+
+proc EndInterface {} {
+  global TMPid
+  puts $TMPid "ENDINTERFACE"
+  }
+
+#
+# Procedure to service 'defcls' commands
+#
+proc defcls {newname derived args} {
+  global ClassToType AIFdefault Inheritables Diag
+
+# If class is not already defined
+  if {! [info exists ClassToType($newname)] } {
+  
+    if {! [info exists ClassToType($derived)] } {
+      puts "aiftoifl: Class $newname cannot be derived from $derived as it doesn't exist!"
+      exit
+      }
+    
+# Inherit the ADAM type    
+    set ClassToType($newname) $ClassToType($derived)
+
+# Inherit stuff from derived type
+    foreach j [array names AIFdefault] {
+      if {[string match ${derived},* $j]} {  
+        set quan [string range $j [expr [string length $derived] + 1] end]
+        set AIFdefault($newname,$quan) $AIFdefault($j)
+        if {$Diag} {
+          puts "$newname inherits $quan = $AIFdefault($j) from $derived"
+          } 
+        }
+      }
+    
+# Process optional arguments as elements of AIFdefault
+    set iarg 0
+    while {[set carg [lindex $args $iarg]] != {}} {
+      incr iarg
+      set cdat [lindex $args $iarg]
+      incr iarg
+      if {$Diag} {
+        puts "$newname defines $carg = $cdat"
+        } 
+      set AIFdefault($newname,$carg) $cdat
+      }
+    }
+  }
+
+#
+# Replace ^NTH and ^N with tokens
+#
+proc subtok {string} {
+  global Tokens UseTokens
+  
+  if {$UseTokens} {
+    regsub -all {\^NTH} $string $Tokens(NTH) new
+    regsub -all {\^N} $new $Tokens(N) new
+
+    return $new
+    
+  } else {
+    return $string
+    }
+  }
+  
+#
+# Procedure to service 'defpar' commands
+#
+proc defpar {name class args} {
+  global TMPid ClassToType AIFdefault Inheritables
+  
+  set upar [string toupper $name]
+
+# Initialise mode so we can test it later on
+  set mode ""
+  
+# Start of parameter marker
+  puts $TMPid "  PARAMETER $upar"
+
+# Convert the AIF class to IFL type
+  if {! [info exists ClassToType($class)]} {
+    puts "aiftoifl: Error, unknown AIF class $class"
+    exit
+    }
+  puts $TMPid "    TYPE '$ClassToType($class)'"
+
+# Process optional arguments
+  set iarg 0
+  while {[set carg [lindex $args $iarg]] != {}} {
+
+# Skip the option name and get its data
+    incr iarg
+    set cdat [lindex $args $iarg]
+    incr iarg
+    
+# Switch on optional keyword
+    switch -glob $carg {
+      po* { 
+        set LocalData(position) [subtok $cdat]
+        }
+      pr* { 
+        set LocalData(prompt) [subtok $cdat]
+        }
+      mo* {
+        set mode $cdat
+	}
+      de* {
+        set LocalData(default) [subtok $cdat]
+	}
+      he* {
+        set LocalData(help) [subtok $cdat]
+	}
+      as* {
+        regexp {(<*\->*)([a-zA-Z]+)} $cdat x dir gname
+	if {[info exists dir] && [info exists gname]} {
+          set LocalData(association) "${dir}GLOBAL.$gname"
+          unset dir gname
+	} else {
+	  puts "aiftoifl: Illegal association string $cdat"
+          exit
+          }
+        }
+      default {
+        puts "Ignored option /$carg/ for parameter $upar"
+        }
+      }
+    }
+
+# Look for defaults for unset quantities
+  foreach j [array names AIFdefault] {
+    if {[string match ${class},* $j]} {  
+      set quan [string range $j [expr [string length $class] + 1] end]
+      if {! [info exists LocalData($quan)]} {
+        set LocalData($quan) $AIFdefault($j)
+        }
+      }
+    }
+    
+# Write the PPATH. If the parameter has the attribute [dyn]amic, we place
+# dynamic defaults highest priority (otherwise
+# what's the point of doing them!). If the user has specified an input 
+# global association then that should be at the head of the list. Append 
+  if { [string first dyn $mode] != -1 } {
+    set ppath DYNAMIC,
+  } else {
+    set ppath ""
+    }
+  if { [string first curr $mode] != -1 } {
+    append ppath CURRENT,
+    }
+  if {[info exists LocalData(association)]} {
+    if {[string index $LocalData(association) 0] == "<"} {
+      append ppath GLOBAL,
+      }
+    }
+  if {[info exists LocalData(default)]} {
+    append ppath DEFAULT,
+    }
+  if {$ppath != ""} {
+    regsub {,$} $ppath "" ppath
+    set LocalData(ppath) $ppath
+    }
+
+# Write the VPATH. The rule here is that if the mode contains 'hidden' then
+# use the same path as PPATH, otherwise use PROMPT.
+  if { [string first hidden $mode] != -1} {
+    set vpath $ppath
+  } else {
+    set vpath PROMPT
+    }
+  if {$vpath != ""} {
+    set LocalData(vpath) $vpath
+    }
+
+# Write out the local data
+  foreach i [array names LocalData] {
+    puts $TMPid "    [string toupper $i] '$LocalData($i)'"
+    }
+
+# End of parameter marker
+  puts $TMPid "  ENDPARAMETER\n"
+  }
+
+#
+# Procedure to service the 'defmpar' command
+#
+proc defmpar {name lo hi class args} {
+  global UseTokens Tokens
+  set UseTokens 1
+  for {set i $lo} {$i <= $hi} {incr i} {
+    set cmd [list defpar $name$i $class]
+    set cmd [concat $cmd $args]
+    set Tokens(N) $i
+    switch -glob $i {
+      *1 {
+        set Tokens(NTH) ${i}st
+	}
+      *2 {
+        set Tokens(NTH) ${i}nd
+	}
+      *3 {
+        set Tokens(NTH) ${i}rd
+	}
+      default {
+        set Tokens(NTH) ${i}th
+	}
+      }
+    eval $cmd
+    }
+  set UseTokens 0
+  }
+
+#
+# Procedure to do the 'include' command in AIF files
+#
+proc include {name} {
+  global AIFincludeDirs
+  set fname ""
+  foreach dir $AIFincludeDirs {
+    set fname "$dir/$name"
+    if {! [file exists $fname]} {
+      set fname "$dir/$name.aif"
+      if {! [file exists $fname]} {
+        set fname ""
+	}
+      }
+    }
+    
+  if {$fname == ""} {
+    puts "aiftoifl: Cannot find include file $name in path $AIFincludeDirs"
+  } else {
+    source $fname
+    }
+  }
+
+
+#
+#
+if {[file exists $TMP]} {
+  exec rm -f $TMP
+  }
+  
+# Loop over input arguments
+#
+for {set iarg 0} {$iarg < $argc} {incr iarg} {
+
+# Extract argument from list
+  set inp [lindex $argv $iarg]
+
+# Add a directory to the include directory list?
+  if {$inp == "-i"} { 
+    incr iarg
+    lappend AIFincludeDirs [lindex $argv $iarg]
+
+# Turn on diagnostics?
+  } elseif {$inp == "-v"} {
+    set Diag 1
+
+# Must be a file name
+  } else {
+
+# Check file exists
+    if {[file exists $inp]} {
+      set inp [string range $inp 0 [expr [string first .aif $inp] -1]]
+    } else {
+      if {! [file exists ${inp}.aif]} {
+        puts "aiftoifl: cannot find AIF named $inp"
+        }
+      }
+
+# Open the temporary file
+    set TMPid [open $TMP w]
+    BeginInterface $inp
+
+# Source the AIF to write the parameters
+    source $inp.aif
+  
+# Close the file
+    EndInterface
+    close $TMPid
+
+# Make the temporary file the new interface file
+    exec mv $TMP $inp.ifl
+    }
+  }

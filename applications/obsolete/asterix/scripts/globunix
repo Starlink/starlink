@@ -1,0 +1,3 @@
+
+ADIR=${ADAM_USER:-"${HOME}/adam"}
+hget $ADIR/GLOBAL.$1 value echo
