@@ -1,0 +1,106 @@
+*                      FIT structure declarations (ASTERIX88)
+*******************************************************************************
+*
+	STRUCTURE /DATASET/
+          INTEGER D_ID, B_ID            ! ADI identifiers to datasets
+          INTEGER V_ID			! Vignetting dataset
+	  INTEGER SETINDEX		! Position in array set (0=>not a set)
+	  INTEGER NDIM			! No of dimensions
+	  INTEGER IDIM(FIT__MXDIM)		! Size of each dimension
+	  INTEGER NDAT			! No of data values =IDIM(1)*IDIM(2)*..
+	  INTEGER DPTR			! Pointer to data array
+	  INTEGER VPTR			! Pointer to error array
+	  INTEGER QPTR			! Pointer to logical quality array
+	  INTEGER WPTR			! Pointer to data weights (=1/variances)
+          INTEGER BPTR			! Pointer to b/g dataset
+          INTEGER VIGPTR		! Vignetting array
+          LOGICAL QFLAG                 ! Use quality array?
+	  CHARACTER*80 DATNAME		! Name of dataset
+          REAL TEFF			! Effective exposure time for data
+          REAL SCALE			! Scaling factor for dataset
+          LOGICAL GFLAG			! Grouping defined?
+          INTEGER NGDAT                 ! # groups
+          INTEGER GPTR                  ! Grouping array
+          INTEGER GDPTR                 ! Grouped primary data
+          INTEGER GWPTR                 ! Grouped weights array
+          INTEGER GQPTR                 ! Grouped quality data
+          INTEGER GVPTR                 ! Grouped variance array
+           INTEGER SPAR(3)
+	END STRUCTURE
+
+	STRUCTURE /PREDICTION/
+	  LOGICAL CONVOLVE		! Folding through instrument response?
+	  INTEGER NMDIM			! No of model dimensions
+	  INTEGER IDIMM(FIT__MXDIM)	! Size of each dimension
+	  INTEGER NMDAT			! No of model values =IDIMM(1)*IDI...
+	  INTEGER NMBOUND		! No of model bin bounds
+	  INTEGER MLBNDPTR		! Ptr to array of model bin lower bounds
+	  INTEGER MUBNDPTR		! Ptr to array of model bin upper bounds
+	  INTEGER DPTR			! Pointer to predicted data array
+	  INTEGER GDPTR			! Pointer to grouped predicted data 
+	  INTEGER MPTR			! Pointer to model space data array
+					! (only needed if CONVOLVE=T)
+	  INTEGER PREDPTR(2)		! Ptrs to workspace for predicted data
+	  INTEGER PGDPTR(2)		! Grouped predicted workspace 
+	  INTEGER DFDPPTR		! Pointer to workspace for dF/dP
+           INTEGER SPAR(4)
+	END STRUCTURE
+
+	STRUCTURE /INSTR_RESP/
+          INTEGER R_ID			! Redistribution matrix
+          INTEGER A_ID			! Area response
+	  INTEGER NRESP			! No of elements in response matrix
+	  INTEGER MIPTR			! Pointer to model indices in response
+	  INTEGER DIPTR			! Pointer to data indices in response
+	  INTEGER RESPTR		! Pointer to response indices
+	END STRUCTURE
+
+	STRUCTURE /MODEL_SPEC/
+	  CHARACTER*4 GENUS		! Model genus - SPEC, STAT etc
+          CHARACTER*80 SPEC 		! cmodel spec
+	  CHARACTER*80 POLISH		! Polish translation of cmodel spec
+	  INTEGER NCOMP			! No of pmodels in cmodel
+	  CHARACTER*(MAXKEYLEN) KEY(MAXCOMP)	! Pmodel keys
+          LOGICAL ADDITIVE(MAXCOMP)	! Pmodel additive?
+          INTEGER NPAR			! Total number of parameters
+	  INTEGER ISTART(MAXCOMP)	! Starting position in PARAM for
+					! parameters of each pmodel
+	  CHARACTER*25 PARNAME(NPAMAX)	! Parameter names
+	  CHARACTER*30 UNITS(NPAMAX)	! Parameter units
+	  CHARACTER*12 FORMAT(NPAMAX)	! Parameter format
+	  INTEGER STACKPTR		! Pointer to model stack array
+          INTEGER NTIE			! Number of parameter ties
+          INTEGER TSTART(MAXTIE)	! First parameter in each tie group
+          INTEGER TGROUP(NPAMAX)	! Tie group per parameter
+          INTEGER	M_ID		! ADI identifier of object
+	END STRUCTURE
+
+        STRUCTURE /GRID_AXIS/            
+          INTEGER   PAR                 ! Parameter number
+          INTEGER   NVAL                ! Number of values in axis
+          LOGICAL   REGULAR             ! Uniformly spaced values, or irregular
+          LOGICAL   LOGARITHMIC         ! Values stored in log(param) space
+          UNION
+           MAP
+            REAL    BASE,SCALE          ! Regular axis values
+           END MAP
+           MAP
+            INTEGER VPTR                ! Ptr to irregular axis values
+           END MAP
+          END UNION
+        END STRUCTURE
+
+*   Minimisation control data
+        STRUCTURE /MIN_CTRL/
+          LOGICAL		INITIALISE		! 
+          INTEGER		METHOD			! See FIT_PAR
+          INTEGER		NITMAX			! 
+          INTEGER		CURIT			! 
+          REAL	       		SLOPE			!
+          INTEGER		INTIT			! Sim/ANN data
+          REAL			TEMP,TDEC		!
+          DOUBLE PRECISION 	OLDSTAT(4)
+          INTEGER		ISPARE(4)
+          REAL			RSPARE(4)
+          DOUBLE PRECISION	DSPARE(4)
+        END STRUCTURE

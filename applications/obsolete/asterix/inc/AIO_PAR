@@ -1,0 +1,20 @@
+*+  symbolic AIO values for ASTERIX
+*-
+
+*    Maximum input stream nesting
+      INTEGER                   AIO__MXNEST
+        PARAMETER               ( AIO__MXNEST = 16 )
+
+*    Output types
+      INTEGER			AIO__T_LIST		! Output types
+        PARAMETER		( AIO__T_LIST = 1 )
+      INTEGER			AIO__T_FORTRAN
+        PARAMETER		( AIO__T_FORTRAN = 2 )
+
+*    Output modes
+      INTEGER			AIO__M_PRINT
+        PARAMETER		( AIO__M_PRINT = 1 )
+      INTEGER			AIO__M_CONSOLE
+        PARAMETER		( AIO__M_CONSOLE = 2 )
+      INTEGER			AIO__M_FILE
+        PARAMETER		( AIO__M_FILE = 3 )

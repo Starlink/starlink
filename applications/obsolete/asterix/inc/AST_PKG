@@ -1,0 +1,56 @@
+*+ AST_PKG - List of package codes
+*
+*  Holds number of ASTERIX sub-packages
+* 
+*-
+
+      INTEGER			AUI__PKG
+        PARAMETER               ( AUI__PKG = 3 )
+
+      INTEGER			BDI__PKG
+        PARAMETER               ( BDI__PKG = 10 )
+
+      INTEGER			DYN__PKG
+        PARAMETER               ( DYN__PKG = 40 )
+      INTEGER			DCI__PKG
+        PARAMETER               ( DCI__PKG = 41 )
+
+      INTEGER			EDI__PKG
+        PARAMETER               ( EDI__PKG = 50 )
+      INTEGER			ERI__PKG
+        PARAMETER               ( ERI__PKG = 51 )
+
+      INTEGER			FCI__PKG
+        PARAMETER               ( FCI__PKG = 60 )
+      INTEGER			FRI__PKG
+        PARAMETER               ( FRI__PKG = 61 )
+
+      INTEGER			GCI__PKG
+        PARAMETER               ( GCI__PKG = 70 )
+
+      INTEGER			HSI__PKG
+        PARAMETER               ( HSI__PKG = 80 )
+
+      INTEGER			PSF__PKG
+        PARAMETER               ( PSF__PKG = 160 )
+
+      INTEGER			SLN__PKG
+        PARAMETER               ( SLN__PKG = 190 )
+      INTEGER			SSO__PKG
+        PARAMETER               ( SSO__PKG = 191 )
+
+      INTEGER			TCI__PKG
+        PARAMETER               ( TCI__PKG = 200 )
+
+      INTEGER			WCI__PKG
+        PARAMETER               ( WCI__PKG = 230 )
+
+      INTEGER			RSP__PKG
+        PARAMETER		( RSP__PKG = 300 )
+
+      INTEGER			EXT__PKG
+        PARAMETER		( EXT__PKG = 400 )
+
+*  Maximum number of ASTERIX packages
+      INTEGER			AST__MXPKG
+        PARAMETER		( AST__MXPKG = 512 )

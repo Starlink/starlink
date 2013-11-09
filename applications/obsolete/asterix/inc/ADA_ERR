@@ -1,0 +1,9 @@
+*+ ADA error codes
+*
+
+      INTEGER ADA__OK
+        PARAMETER (ADA__OK = 0)
+
+*  add 8 to create a new one
+      INTEGER ADA__NOVAL
+        PARAMETER (ADA__NOVAL = 233537546)

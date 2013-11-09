@@ -1,0 +1,10 @@
+#! /bin/sh
+
+for FILE in ${AST_INC}/*.common
+do
+	NEW=`echo $FILE | sed 's/\.common//'`
+	cp $FILE $NEW
+done
+
+echo ASTERIX common blocks defined
+

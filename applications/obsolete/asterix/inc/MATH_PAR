@@ -1,0 +1,26 @@
+*+  MATH_PAR - Common mathematical constants
+*
+*    History :
+*     29 Aug 86:  original (JCMP)
+*     10 Jan 95 : Added D.P. versions of constants (DJA)
+*-
+
+      REAL 			MATH__PI                ! PI to single-precision
+        PARAMETER 		( MATH__PI = 3.1415926536 )
+
+      REAL 			MATH__DTOR              ! Degrees to radians
+        PARAMETER 		( MATH__DTOR = MATH__PI / 180.0 )
+
+      REAL 			MATH__RTOD              ! Radians to degrees
+        PARAMETER 		( MATH__RTOD = 180.0 / MATH__PI )
+
+      DOUBLE PRECISION		MATH__DPI		! PI to double prec
+        PARAMETER		( MATH__DPI = 
+     :                                3.141592653589793238462643D0 )
+
+      DOUBLE PRECISION 		MATH__DDTOR
+        PARAMETER 		( MATH__DDTOR = MATH__DPI / 180D0 )
+
+      DOUBLE PRECISION 		MATH__DRTOD
+        PARAMETER 		( MATH__DRTOD = 180D0 / MATH__DPI )
+

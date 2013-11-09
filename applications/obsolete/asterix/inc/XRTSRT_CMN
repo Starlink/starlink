@@ -1,0 +1,104 @@
+*+  XRTSRT_CMN  Sort control definition
+* Constants
+         INTEGER           MXTIME               ! Max. no of time tanges
+           PARAMETER (MXTIME = 2000)
+*
+* Common blocks
+
+* Input files
+         CHARACTER*110     SRT_ROOTNAME        ! Rootname of each file
+         INTEGER           SRT_NOBRNG          ! Number of observation ranges
+         INTEGER           SRT_OBS(2,10)       ! Observations to use
+*
+* Quality selection
+         LOGICAL           SRT_QUAL_MORE       ! More stringent quality test
+*                                              ! than the pre-processing ?
+         LOGICAL           SRT_QUAL_LESS       ! Less stringent quality test
+         INTEGER           SRT_TEMP_MIN        ! Minimum temp value wanted
+         INTEGER           SRT_TEMP_MAX        ! Maximum temp value wanted
+         INTEGER           SRT_GAIN_MIN        ! Minimum gain value wanted
+         INTEGER           SRT_GAIN_MAX        ! Maximum gain value wanted
+
+*
+* General
+	 CHARACTER*80	   SRT_DTYPE		! 'E' or 'B'
+         DOUBLE PRECISION  SRT_FIELD_RA(2)      ! RA of centre of selected area
+         DOUBLE PRECISION  SRT_FIELD_DEC(2)     ! DEC of centre of selected area
+         LOGICAL           SRT_BCKGND           ! Use a background box ?
+         CHARACTER*20      SRT_FILTER           ! Filter used in observation
+         REAL              SRT_PTOD             ! Conversion from pixels to degs
+* Axes selection
+         INTEGER           SRT_NDATA(2)         ! Total no of elements in output
+         INTEGER           SRT_MIN_X(2)         ! Lowest X to sort (raw pixels)
+         INTEGER           SRT_MAX_X(2)         ! Highest X to sort (raw pixels)
+         INTEGER           SRT_MIN_XD(2)        ! Lowest det. X to sort (raw pixels)
+         INTEGER           SRT_MAX_XD(2)        ! Highest det. X to sort (raw pixels)
+         INTEGER           SRT_CEN_X(2)         ! Centre X to sort (raw pixels)
+         INTEGER           SRT_MIN_Y(2)         ! Lowest Y to sort (raw pixels)
+         INTEGER           SRT_MAX_Y(2)         ! Highest Y to sort (raw pixels)
+         INTEGER           SRT_MIN_YD(2)        ! Lowest det. Y to sort (raw pixels)
+         INTEGER           SRT_MAX_YD(2)        ! Highest det. Y to sort (raw pixels)
+         INTEGER           SRT_CEN_Y(2)         ! Centre Y to sort (raw pixels)
+*
+*   Time ranges
+         INTEGER           SRT_NTIME(2)         ! Number of time ranges
+         DOUBLE PRECISION  SRT_MIN_T(MXTIME,2)  ! Lowest time to sort (secs)
+         DOUBLE PRECISION  SRT_MAX_T(MXTIME,2)  ! Highest time to sort (secs)
+*
+         INTEGER           SRT_MIN_PH(2)        ! Lowest PH amp. to sort (chan.)
+         INTEGER           SRT_MAX_PH(2)        ! Highest PH amp. to sort (chan.)
+         INTEGER           SRT_MIN_EN(2)        ! Lowest corr. PH to sort (chan)
+         INTEGER           SRT_MAX_EN(2)        ! Highest corr. PH to sort (chan)
+         INTEGER           SRT_NAXES(2)         ! No of axes in output array
+         INTEGER           SRT_BINAXIS(7,2)     ! Code for each axis in output.
+                                                ! 1=X,2=Y,3=XD,4=YD,5=T,6=PH,7=EN
+         REAL              SRT_XSTART(2,2)      ! Start X value (arcmin)
+         REAL              SRT_XSTOP(2,2)       ! Stop X value (arcmin)
+         REAL              SRT_YSTART(2,2)      ! Start Y value (arcmin)
+         REAL              SRT_YSTOP(2,2)       ! Stop Y value (arcmin)
+*                                               ! Element two used for annulus
+* Spatial selection
+***************************************************************
+         INTEGER           SRT_RADIN(2)         ! Inner radius of ann. (pix)
+         INTEGER           SRT_RADOUT(2)        ! Outer radius of ann. (pix)
+***************************************************************
+         CHARACTER*1       SRT_SHAPE(2)         ! 'C'ircle,'R'ectangle,'E'llipse
+         REAL              SRT_XCENT(2)         ! X centre (degrees)
+         REAL              SRT_YCENT(2)         ! Y centre (degrees)
+         REAL              SRT_ELAMIN(2)        ! Inner elliptical X axis
+*                                               ! in raw pixels
+         REAL              SRT_ELAMAX(2)        ! Outer elliptical Y axis (pix)
+         REAL              SRT_ELBMIN(2)        ! Inner elliptical Y axis (pix)
+         REAL              SRT_ELBMAX(2)        ! Outer elliptical Y axis (pix)
+         REAL              SRT_PHI(2)           ! The orientation angle (degs)
+         REAL              SRT_COSPHI(2)        ! Cos of the orientation angle
+         REAL              SRT_SINPHI(2)        ! Sine of the orientation angle
+
+         INTEGER           SRT_ARDID(2)		! ID for ARD text
+
+         LOGICAL           SRT_IMAGE(2)		! Output contains image(s)
+*
+
+
+        COMMON /XRTSRT_CMN_D/ 
+     :        SRT_FIELD_RA, SRT_FIELD_DEC, SRT_MIN_T, SRT_MAX_T
+
+        COMMON /XRTSRT_CMN_R/
+     :        SRT_PTOD, SRT_XSTART, SRT_XSTOP, SRT_YSTART, SRT_YSTOP,
+     :        SRT_XCENT, SRT_YCENT, SRT_ELAMIN, SRT_ELAMAX, SRT_ELBMIN,
+     :        SRT_ELBMAX, SRT_PHI, SRT_COSPHI, SRT_SINPHI
+
+        COMMON /XRTSRT_CMN_I/
+     :        SRT_NOBRNG, SRT_OBS, SRT_TEMP_MIN, SRT_TEMP_MAX,
+     :        SRT_GAIN_MIN, SRT_GAIN_MAX, SRT_NDATA, SRT_MIN_X,
+     :        SRT_MAX_X, SRT_MIN_XD, SRT_MAX_XD, SRT_CEN_X,
+     :        SRT_MIN_Y, SRT_MAX_Y, SRT_MIN_YD, SRT_MAX_YD,
+     :        SRT_CEN_Y, SRT_NTIME, SRT_MIN_PH, SRT_MAX_PH,
+     :        SRT_MIN_EN, SRT_MAX_EN, SRT_NAXES, SRT_BINAXIS,
+     :        SRT_RADIN, SRT_RADOUT, SRT_ARDID
+
+       COMMON /XRTSRT_CMN_C/
+     :        SRT_ROOTNAME, SRT_DTYPE, SRT_FILTER, SRT_SHAPE
+
+       Common /XRTSRT_CMN_L/
+     :        SRT_QUAL_MORE, SRT_QUAL_LESS, SRT_BCKGND, SRT_IMAGE 

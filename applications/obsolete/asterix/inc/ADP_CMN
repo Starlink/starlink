@@ -1,0 +1,47 @@
+*+
+*  Name:
+*     ADP_CMN
+
+*  Purpose:
+*     Define ADP_ subroutine package common block
+
+*  Language:
+*     Starlink Fortran
+
+*  Type of Module:
+*     Global variables include file.
+
+*  Description:
+*     This file defines one global variable which is the ADP indentation
+*     level. This variable should be defined to be zero on image startup 
+*     by using an associated BLOCK DATA module.
+
+*  Prior Requirements:
+*     None.
+
+*  References:
+*     ADP Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/adp.html
+
+*  Keywords:
+*     package:adp, usage:public
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     21 Dec 1995 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*-
+
+*  Global Variables:
+      INTEGER                   ADP_INDENT		! Indentation level
+
+*  Word aligned values      
+      COMMON /ADP_CMN/          ADP_INDENT
+
+*  Save common block contents
+      SAVE /ADP_CMN/
+*.

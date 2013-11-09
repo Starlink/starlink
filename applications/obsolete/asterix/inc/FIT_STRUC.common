@@ -1,0 +1,138 @@
+*******************************************************************************
+*		      FIT structure declarations (ASTERIX88)
+*******************************************************************************
+* 1/5/98 (RB) Remove structures to replace with common blocks
+*
+
+      INTEGER		DATASET_D_ID(NDSMAX)
+      INTEGER		DATASET_B_ID(NDSMAX)			! ADI identifiers to datasets
+      INTEGER		DATASET_V_ID(NDSMAX)			! Vignetting dataset
+      INTEGER		DATASET_SETINDEX(NDSMAX)		! Position in array set (0=>not a set)
+      INTEGER		DATASET_NDIM(NDSMAX)			! No of dimensions
+      INTEGER		DATASET_IDIM(FIT__MXDIM,NDSMAX)		! Size of each dimension
+      INTEGER		DATASET_NDAT(NDSMAX)			! No of data values =IDIM(1)*IDIM(2)*..
+      INTEGER		DATASET_DPTR(NDSMAX)			! Pointer to data array
+      INTEGER		DATASET_VPTR(NDSMAX)			! Pointer to error array
+      INTEGER		DATASET_QPTR(NDSMAX)			! Pointer to logical quality array
+      INTEGER		DATASET_WPTR(NDSMAX)			! Pointer to data weights (=1/variances)
+      INTEGER		DATASET_BPTR(NDSMAX)			! Pointer to b/g dataset
+      INTEGER		DATASET_VIGPTR(NDSMAX)			! Vignetting array
+      LOGICAL		DATASET_QFLAG(NDSMAX)			! Use quality array?
+      CHARACTER*80	DATASET_DATNAME(NDSMAX)			! Name of dataset
+      REAL		DATASET_TEFF(NDSMAX)			! Effective exposure time for data
+      REAL		DATASET_SCALE(NDSMAX)			! Scaling factor for dataset
+      LOGICAL		DATASET_GFLAG(NDSMAX)			! Grouping defined?
+      INTEGER		DATASET_NGDAT(NDSMAX)			! # groups
+      INTEGER		DATASET_GPTR(NDSMAX)			! Grouping array
+      INTEGER		DATASET_GDPTR(NDSMAX)			! Grouped primary data
+      INTEGER		DATASET_GWPTR(NDSMAX)			! Grouped weights array
+      INTEGER		DATASET_GQPTR(NDSMAX)			! Grouped quality data
+      INTEGER		DATASET_GVPTR(NDSMAX)			! Grouped variance array
+      INTEGER		DATASET_SPAR(3, NDSMAX)
+
+      COMMON /DATASET/ DATASET_D_ID,DATASET_B_ID,DATASET_V_ID,
+     :		       DATASET_SETINDEX,DATASET_NDIM,DATASET_IDIM,
+     :		       DATASET_NDAT,DATASET_DPTR,DATASET_VPTR,
+     :		       DATASET_QPTR,DATASET_WPTR,DATASET_BPTR,
+     :		       DATASET_VIGPTR,DATASET_QFLAG,DATASET_DATNAME,
+     :		       DATASET_TEFF,DATASET_SCALE,DATASET_GFLAG,
+     :                 DATASET_NGDAT,
+     :		       DATASET_GPTR,DATASET_GDPTR,DATASET_GWPTR,
+     :		       DATASET_GQPTR,DATASET_GVPTR,DATASET_SPAR
+
+      LOGICAL		PREDICTION_CONVOLVE(NDSMAX)		! Folding through instrument response?
+      INTEGER		PREDICTION_NMDIM(NDSMAX)		! No of model dimensions
+      INTEGER		PREDICTION_IDIMM(FIT__MXDIM,NDSMAX)	! Size of each dimension
+      INTEGER		PREDICTION_NMDAT(NDSMAX)		! No of model values =IDIMM(1)*IDI...
+      INTEGER		PREDICTION_NMBOUND(NDSMAX)		! No of model bin bounds
+      INTEGER		PREDICTION_MLBNDPTR(NDSMAX)		! Ptr to array of model bin lower bounds
+      INTEGER		PREDICTION_MUBNDPTR(NDSMAX)		! Ptr to array of model bin upper bounds
+      INTEGER		PREDICTION_DPTR(NDSMAX)			! Pointer to predicted data array
+      INTEGER		PREDICTION_GDPTR(NDSMAX)		! Pointer to grouped predicted data 
+      INTEGER		PREDICTION_MPTR(NDSMAX)			! Pointer to model space data array
+								! (only needed if CONVOLVE=T)
+      INTEGER		PREDICTION_PREDPTR(2,NDSMAX)		! Ptrs to workspace for predicted data
+      INTEGER		PREDICTION_PGDPTR(2,NDSMAX)		! Grouped predicted workspace 
+      INTEGER		PREDICTION_DFDPPTR(NDSMAX)		! Pointer to workspace for dF/dP
+      INTEGER		PREDICTION_SPAR(4,NDSMAX)
+
+      COMMON /PREDICTION/ PREDICTION_CONVOLVE,PREDICTION_NMDIM,
+     :		      PREDICTION_IDIMM,PREDICTION_NMDAT,
+     :		      PREDICTION_NMBOUND,PREDICTION_MLBNDPTR,
+     :		      PREDICTION_MUBNDPTR,PREDICTION_DPTR,
+     :		      PREDICTION_GDPTR,PREDICTION_MPTR,
+     :                PREDICTION_PREDPTR,PREDICTION_PGDPTR,
+     :                PREDICTION_DFDPPTR,PREDICTION_SPAR
+
+      INTEGER		INSTR_RESP_R_ID(NDSMAX)			! Redistribution matrix
+      INTEGER		INSTR_RESP_A_ID(NDSMAX)			! Area response
+      INTEGER		INSTR_RESP_NRESP(NDSMAX)		! No of elements in response matrix
+      INTEGER		INSTR_RESP_MIPTR(NDSMAX)		! Pointer to model indices in response
+      INTEGER		INSTR_RESP_DIPTR(NDSMAX)		! Pointer to data indices in response
+      INTEGER		INSTR_RESP_RESPTR(NDSMAX)		! Pointer to response indices
+
+      COMMON /INSTR_RESP/ INSTR_RESP_R_ID,INSTR_RESP_A_ID,
+     :		      INSTR_RESP_NRESP,INSTR_RESP_MIPTR,
+     :		      INSTR_RESP_DIPTR,INSTR_RESP_RESPTR
+
+      CHARACTER*4	MODEL_SPEC_GENUS(MODMAX)		! Model genus - SPEC, STAT etc
+      CHARACTER*80	MODEL_SPEC_SPEC(MODMAX) 		! cmodel spec
+      CHARACTER*80	MODEL_SPEC_POLISH(MODMAX)		! Polish translation of cmodel spec
+      INTEGER		MODEL_SPEC_NCOMP(MODMAX)		! No of pmodels in cmodel
+      CHARACTER*(MAXKEYLEN) MODEL_SPEC_KEY(MODMAX,MAXCOMP)	! Pmodel keys
+      LOGICAL		MODEL_SPEC_ADDITIVE(MODMAX,MAXCOMP)	! Pmodel additive?
+      INTEGER		MODEL_SPEC_NPAR(MODMAX)			! Total number of parameters
+      INTEGER		MODEL_SPEC_ISTART(MODMAX,MAXCOMP)	! Starting position in PARAM for
+								! parameters of each pmodel
+      CHARACTER*25	MODEL_SPEC_PARNAME(MODMAX,NPAMAX)	! Parameter names
+      CHARACTER*30	MODEL_SPEC_UNITS(MODMAX,NPAMAX)		! Parameter units
+      CHARACTER*12	MODEL_SPEC_FORMAT(MODMAX,NPAMAX)	! Parameter format
+      INTEGER		MODEL_SPEC_STACKPTR(MODMAX)		! Pointer to model stack array
+      INTEGER		MODEL_SPEC_NTIE(MODMAX)			! Number of parameter ties
+      INTEGER		MODEL_SPEC_TSTART(MODMAX,MAXTIE)	! First parameter in each tie group
+      INTEGER		MODEL_SPEC_TGROUP(MODMAX,NPAMAX)	! Tie group per parameter
+      INTEGER		MODEL_SPEC_M_ID(MODMAX)			! ADI identifier of object
+
+      COMMON /MODEL_SPEC/ MODEL_SPEC_GENUS,MODEL_SPEC_SPEC,
+     :		      MODEL_SPEC_POLISH,MODEL_SPEC_NCOMP,
+     :		      MODEL_SPEC_KEY,
+     :		      MODEL_SPEC_NPAR,MODEL_SPEC_ISTART,
+     :		      MODEL_SPEC_PARNAME,MODEL_SPEC_UNITS,
+     :		      MODEL_SPEC_FORMAT,MODEL_SPEC_STACKPTR,
+     :		      MODEL_SPEC_NTIE,MODEL_SPEC_TSTART,
+     :		      MODEL_SPEC_TGROUP,MODEL_SPEC_M_ID,
+     :                MODEL_SPEC_ADDITIVE
+
+      INTEGER		GRID_AXIS_PAR(FIT__MXDIM)		! Parameter number
+      INTEGER		GRID_AXIS_NVAL(FIT__MXDIM)		! Number of values in axis
+      LOGICAL		GRID_AXIS_REGULAR(FIT__MXDIM)		! Uniformly spaced values, or irregular
+      LOGICAL		GRID_AXIS_LOGARITHMIC(FIT__MXDIM)	! Values stored in log(param) space
+      REAL		GRID_AXIS_BASE(FIT__MXDIM)
+      REAL		GRID_AXIS_SCALE(FIT__MXDIM)		! Regular axis values
+      INTEGER		GRID_AXIS_VPTR(FIT__MXDIM)		! Ptr to irregular axis values
+
+      COMMON /GRID_AXIS/ GRID_AXIS_PAR,GRID_AXIS_NVAL,
+     :		     GRID_AXIS_REGULAR,GRID_AXIS_LOGARITHMIC,
+     :		     GRID_AXIS_BASE,GRID_AXIS_SCALE,
+     :		     GRID_AXIS_VPTR
+
+*   Minimisation control data
+
+      LOGICAL		MIN_CTRL_INITIALISE		! 
+      INTEGER		MIN_CTRL_METHOD			! See FIT_PAR
+      INTEGER		MIN_CTRL_NITMAX			! 
+      INTEGER		MIN_CTRL_CURIT			! 
+      REAL	       	MIN_CTRL_SLOPE			!
+      INTEGER		MIN_CTRL_INTIT			! Sim/ANN data
+      REAL		MIN_CTRL_TEMP,MIN_CTRL_TDEC		!
+      DOUBLE PRECISION 	MIN_CTRL_OLDSTAT(4)
+      INTEGER		MIN_CTRL_ISPARE(4)
+      REAL		MIN_CTRL_RSPARE(4)
+      DOUBLE PRECISION	MIN_CTRL_DSPARE(4)
+
+      COMMON /MIN_CTRL/ MIN_CTRL_INITIALISE,MIN_CTRL_METHOD,
+     :		   MIN_CTRL_NITMAX,MIN_CTRL_CURIT,MIN_CTRL_SLOPE,
+     :		   MIN_CTRL_INTIT,MIN_CTRL_TEMP,MIN_CTRL_TDEC,
+     :		   MIN_CTRL_OLDSTAT,MIN_CTRL_ISPARE,
+     :		   MIN_CTRL_RSPARE,MIN_CTRL_DSPARE
+

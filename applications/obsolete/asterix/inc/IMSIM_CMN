@@ -1,0 +1,11 @@
+*+  IMSIM_CMN - Common block for IMSIM
+*
+*    History :
+*
+*     26 jan 93 : Original (DJA)
+*
+*-
+      DOUBLE PRECISION   LNS_SB,LNS_SMIN,LNS_SMAX,
+     :                   LNS_RK,LNS_F,LNS_EU,LNS_ED
+      COMMON /IMSIM_CMN/ LNS_SB,LNS_SMIN,LNS_SMAX,
+     :                   LNS_RK,LNS_F,LNS_EU,LNS_ED

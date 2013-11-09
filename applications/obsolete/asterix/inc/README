@@ -1,0 +1,13 @@
+
+Most, hopefully all necessary include file have been put here, though
+this is not there intended place of residence. It makes compiling
+easier with the flag -I/star/asterix/kernel/lib/inc
+
+The two commands to_struc and to_comm swap over some of the include
+files depending upon whether compilation for Linux (comm) or Solaris/OSF
+(struc) is required.
+
+Eventually only the comm flavour will be required when the full Linux
+port is finished.
+
+Richard Beard - 15/05/98

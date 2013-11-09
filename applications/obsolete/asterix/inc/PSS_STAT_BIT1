@@ -1,0 +1,101 @@
+*+  PSS_STAT_BIT1 - Set's up psf and grid for each pixel
+*
+*    Standard code section for PSS statistic routines. Index stat
+*    array using indices I,J.
+*-
+
+      FV(1) = 0.0
+      FV(2) = 0.0
+      DONE_PIX_YET = .FALSE.
+
+*    Find psf sum for whole box
+      IF ( (PSF_ACCESS.EQ.PER_FILE) .AND. (GR_PASS.EQ.1) ) THEN
+        TPSUM = 0.0
+        DO PJJ=-PSF_UPNR,PSF_UPNR
+          DO PII=-PSF_UPNR,PSF_UPNR
+            TPSUM = TPSUM + PSFV(PII,PJJ)
+          END DO
+        END DO
+      END IF
+
+*    For each point on search grid
+      DO J = 1, SNY
+        CC(2) = GR_Y0 + (J-1)*GR_DY
+        PC(2) = PIX( 2, CC(2) )
+
+*      Y bounds for correlation
+        IF ( .NOT. CP_FREEZE ) THEN
+          CALL PSS_SETRNG( 2, PC(2), 1, NY, PSF_UPNR )
+        END IF
+        IF ( PSF_RESAM ) FV(2) = (DAT(2,PC(2))-CC(2)) / AX_DR(2)
+
+*      Box as big as possible?
+        ALL_Y = ( (PSF_ACCESS.EQ.PER_FILE) .AND.
+     :            (GR_PASS.EQ.1) .AND.
+     :          ((GR_RNG_HI(2)-GR_RNG_LO(2)) .EQ.(PSF_UPNR*2)))
+
+        DO I = 1, SNX
+
+*        The coords of the point for the significance is CC(1..2)
+          CC(1) = GR_X0 + (I-1)*GR_DX
+          PC(1) = PIX( 1, CC(1) )
+          IF ( PSF_RESAM ) FV(1) = (DAT(1,PC(1))-CC(1))/AX_DR(1)
+
+*        Psf radius to use
+
+*        Evaluate psf if needed and define bounds on data grid
+          IF ( PSF_ACCESS .EQ. PER_PIXEL ) THEN
+            CALL PSS_PSF_SUBSET( CC, FV, PSFV, STATUS )
+            CALL PSS_SETRNG( 1, PC(1), 1, NX, PSF_UPNR )
+            CALL PSS_SETRNG( 2, PC(2), 1, NY, PSF_UPNR )
+          ELSE IF ( .NOT. CP_FREEZE ) THEN
+            CALL PSS_SETRNG( 1, PC(1), 1, NX, PSF_UPNR )
+          END IF
+
+*        Resample if necessary
+          IF ( PSF_RESAM .AND. (PSF_ACCESS.NE.PER_PIXEL) .AND.
+     :                                           .NOT. CP_USECON ) THEN
+            CALL PSF_RESAMPLE( PNX, PNY, %VAL(PSF_STORE), -FV(1),
+     :                  -FV(2), %VAL(PSF_RESWPTR), PSFV, STATUS )
+          END IF
+
+*        Box as big as possible?
+          ALL_X = ( (GR_RNG_HI(1)-GR_RNG_LO(1)).EQ. (PSF_UPNR*2) )
+
+*        Set up cache and sums
+          IF ( CP_CASH .AND. CP_OPT .AND. .NOT. CP_RESCALE ) THEN
+            CALL PSS_CACHE_CASH( PC(1), PC(2), (LASTALLXY.AND.
+     :              ALL_X.AND.ALL_Y.AND.DONE_PIX_YET), NX, NY,
+     :              %VAL(IM_DATA_PTR), %VAL(BDS_QUAL_PTR),
+     :              %VAL(BG_DATA_PTR), PNX, PNY, PSFV,
+     :              %VAL(BDS_LBGND_PTR), STATUS )
+          ELSE
+            CALL PSS_CACHE( NX, NY, %VAL(IM_DATA_PTR),
+     :            %VAL(IM_VAR_PTR), %VAL(BDS_QUAL_PTR),
+     :            %VAL(BG_DATA_PTR), %VAL(BG_VAR_PTR),
+     :            PNX, PNY, PSFV, %VAL(BDS_LBGND_PTR),
+     :            CACHE_CTRL, STATUS )
+          END IF
+
+*        Find psf sum?
+          IF ( IAND(CACHE_CTRL,DC_F_PSF_SUM) .NE. 0 ) THEN
+            IF ( ALL_X .AND. ALL_Y ) THEN
+              DC_PSF_S = TPSUM
+            ELSE
+              PSUM = 0.0
+              DO CP = DC_LO, DC_HI
+                PSUM = PSUM + DC_PSF(CP)
+              END DO
+              DC_PSF_S = PSUM
+            END IF
+          END IF
+
+*        Initialise this map entry
+          LASTALLXY = ( ALL_X .AND. ALL_Y )
+          SMAP(I,J) = 0.0
+
+*        Enough data in the cache?
+          IF ( (DC_HI-DC_LO+1).LE.2 ) GOTO 50
+
+*        Enough good psf data?
+          IF ( DC_PSF_S .LT. 1.0E-15 ) GOTO 50

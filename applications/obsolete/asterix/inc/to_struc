@@ -1,0 +1,10 @@
+#! /bin/sh
+
+for FILE in ${AST_INC}/*.structure
+do
+	NEW=`echo $FILE | sed 's/\.structure//'`
+	cp $FILE $NEW
+done
+
+echo ASTERIX structures defined
+

@@ -1,0 +1,18 @@
+*+  WCI_PAR - ASTERIX World Coordinate System constants
+*-
+
+      DOUBLE PRECISION		WCI__FLAG		! Flag value
+        PARAMETER		( WCI__FLAG = -1.0D0 )
+
+*    Projection operation codes
+      INTEGER			WCI__OPN2S		! Native -> standard
+        PARAMETER		( WCI__OPN2S = 1 )
+
+      INTEGER			WCI__OPS2N		! Standard -> Native
+        PARAMETER		( WCI__OPS2N = 2 )
+
+      INTEGER			WCI__OPXLIM		! Return X limits
+         PARAMETER		( WCI__OPXLIM = 3 )
+
+      INTEGER			WCI__OPYLIM		! Return Y limits
+         PARAMETER		( WCI__OPYLIM = 4 )
