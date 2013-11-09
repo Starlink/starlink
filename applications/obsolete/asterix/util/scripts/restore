@@ -1,0 +1,2 @@
+
+$AST_BIN/quality ignore=n set=n restore=y over=y $*
