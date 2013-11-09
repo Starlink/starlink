@@ -1,0 +1,10 @@
+*+  GFX_SKY_CMN - sky coordinate transformations
+
+      DOUBLE PRECISION G_TMAT(3,3,3)
+      REAL G_XYTORAD
+      INTEGER          G_PIXID, G_PRJID, G_SYSID
+      INTEGER		G_ECLSYS, G_GALSYS
+      COMMON /GFX_SKY_CMN/ G_TMAT,G_XYTORAD, G_PIXID, 
+     :                    G_PRJID, G_SYSID, G_ECLSYS, G_GALSYS
+
+*-

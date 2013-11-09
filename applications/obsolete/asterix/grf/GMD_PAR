@@ -1,0 +1,9 @@
+*+  GMD_PAR - parameters for multiple datasets
+
+      INTEGER GMD__MXNDF
+      PARAMETER (GMD__MXNDF=100)
+      INTEGER GMD__MXPLOT
+      PARAMETER (GMD__MXPLOT=32)
+      INTEGER GMD__MXGRAF
+      PARAMETER (GMD__MXGRAF=32)
+*-

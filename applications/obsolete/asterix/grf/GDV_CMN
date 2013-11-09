@@ -1,0 +1,17 @@
+*+  GDV_CMN - internal common block for Grafix Device system
+
+      CHARACTER*40 G_DEVICE		! device name
+      REAL G_PX1,G_PX2,G_PY1,G_PY2	! pixel size of display
+      INTEGER G_XZONES
+      INTEGER G_YZONES
+      INTEGER G_NCOL
+      INTEGER G_BGCOL
+      LOGICAL G_CURSOR
+      LOGICAL G_HARDCOPY
+
+      COMMON /GDV_CMN_C/ G_DEVICE
+      COMMON /GDV_CMN/ G_PX1,G_PX2,G_PY1,G_PY2,
+     :                 G_XZONES,G_YZONES,G_NCOL,G_BGCOL,
+     :                 G_CURSOR,G_HARDCOPY
+
+*-

@@ -1,0 +1,7 @@
+*+  GMD_CMN - common block for multiple dataset handling
+
+      INTEGER                G_MFID
+      LOGICAL G_MULTI
+
+      COMMON /GMD_CMN/ G_MULTI,G_MFID
+*-
