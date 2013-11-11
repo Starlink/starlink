@@ -183,7 +183,7 @@ void smf_jsasplit( int indf, const char *base, int trim,
    double precision GRID bounds. Also store the GRID coords of the centre.
    Also count the number of significant pixel axes. */
    ndfBound( indf, 3, lbnd, ubnd, &ndim, status );
-   nsig = 0
+   nsig = 0;
    for( i = 0; i < ndim; i++ ) {
       dlbnd[ i ] = 0.5;
       dubnd[ i ] = ubnd[ i ] - lbnd[ i ]  + 1.5;
