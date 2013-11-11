@@ -165,6 +165,10 @@
 *          the map. Each of these output NDF will have the tile index number
 *          appended to the end of the path specified by parameter "OUT". If
 *          "JSATILES" is TRUE, the "REF" parameter is ignored. [FALSE]
+*     JSATILELIST() = _INTEGER (Write)
+*          If parameter "JSATILES" is set TRUE, the zero-based indicies of
+*          the created JSA tiles will be written to this output parameter.
+*          The number of such indices is given the "NTILE" parameter
 *     LBND( 2 ) = _INTEGER (Read)
 *          An array of values giving the lower pixel index bound on each
 *          spatial axis of the output NDF. The suggested default values
