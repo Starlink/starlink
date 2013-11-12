@@ -133,6 +133,10 @@ void findclumps( int *status ) {
 *        Note, the other reported clump properties such as total data
 *        value, peak data value, etc, are always based on the full clump
 *        data values, including background. []
+*     CADCPROV = _LOGICAL (Read)
+*        If TRUE, then provenance information is propagated from the input 
+*        NDF to the output catalogue specified by parameter "OUTCAT", in 
+*        the style expected by CADC. [FALSE]
 *     CONFIG = GROUP (Read)
 *        Specifies values for the configuration parameters used by the
 *        clump finding algorithms. If the string "def" (case-insensitive)
@@ -880,6 +884,8 @@ void findclumps( int *status ) {
 *        Add star/irq.h include as it is no longer in star/kaplibs.h.
 *     17-MAY-2011 (DSB):
 *        Use sqrt rather than sqrtf when calculating RMS.
+*     12-NOV-2013 (DSB):
+*        Added parameter CADCPROV.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -907,6 +913,7 @@ void findclumps( int *status ) {
    HDSLoc *xloc;                /* Locator for CUPID extension in main output */
    HDSLoc *xqnloc;              /* Locator for CUPID_NAMES component in extension */
    IRQLocs *qlocs;              /* HDS locators for quality name information */
+   NdgProvenance *prov;         /* Provenance info from input NDF */
    char *pname;                 /* Pointer to input NDF name */
    char *value;                 /* Pointer to GRP element buffer */
    char attr[ 30 ];             /* AST attribute name */
@@ -927,6 +934,7 @@ void findclumps( int *status ) {
    double sum;                  /* Sum of variances */
    float *rmask;                /* Pointer to cump mask array */
    int backoff;                 /* Remove background when finding clump sizes? */
+   int cadcprov;                /* Store CADC provenance in the output catalogue? */
    int confpar;                 /* Is this line a config parameter setting? */
    int deconv;                  /* Should clump parameters be deconvolved? */
    int dim[ NDF__MXDIM ];       /* Pixel axis dimensions */
@@ -1069,6 +1077,10 @@ void findclumps( int *status ) {
                        ( nsig == 3 && nspecax == 1 && nskyax == 2 ),
              status );
    parGet0l( "WCSPAR", &usewcs, status );
+
+/* See if provenance is to be stored in the output catalogue, in CADC
+   form. */
+   parGet0l( "CADCPROV", &cadcprov, status );
 
 /* See what STC-S shape should be used to describe each spatial clump. */
    ishape = 0;
@@ -1508,6 +1520,14 @@ void findclumps( int *status ) {
 /* Release the extension locator.*/
       datAnnul( &xloc, status );
 
+/* If required, get provenance info from the input NDF, and store it
+   in CADC format in the output FITS file. */
+      if( cadcprov ) {
+         prov = ndgReadProv( NDF__NOID, "CUPID:FINDCLUMPS", status );
+         ndgPutProv( prov, indf, NULL, 0, status );
+         fts1Scadc( prov, "OUTCAT", status );
+         prov = ndgFreeProv( prov, status );
+      }
    }
 
 /* Ensure the following has a fair chance of working even if an error has

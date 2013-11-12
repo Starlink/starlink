@@ -288,6 +288,16 @@ package cupid {
             helpkey *
           }
 
+         parameter cadcprov {
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT,DEFAULT
+            prompt {Add CADC-style provenance to outptu catalogue?}
+            default FALSE
+            helpkey *
+          }
+
          parameter config {
             type LITERAL
             ppath CURRENT DEFAULT
