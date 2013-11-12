@@ -51,12 +51,12 @@
 *        The individual integer identifiers to associate with each
 *        position. Only accessed if ID0 is less than or equal to zero.
 *     KEYMAP = INTEGER (Given)
-*        An optional AST KeyMap containing data for extra columns to
-*        add to the catalogue. It can be used (for instance) to add
-*        character columns to the catalogue. If a value of AST__NULL
-*        is supplied, no extra columns are added to the catalogue.
-*        Otherwise, the column names and values can be specified using
-*        either of the following two schemes:
+*        An optional AST KeyMap containing data for extra columns and
+*        headers to add to the catalogue. It can be used (for instance)
+*        to add character columns to the catalogue. If a value of AST__NULL
+*        is supplied, no extra columns or headers are added to the
+*        catalogue. Otherwise, column names and values can be specified
+*        using either of the following two schemes:
 *
 *        - If the KeyMap contains an entry called "COLNAMES", it is
 *        assumed to be a vector entry holding the names of the columns.
@@ -69,10 +69,14 @@
 *        for the column.
 *
 *        - If the KeyMap does not contain an entry called "COLNAMES",
-*        it is assumed that each entry in the KeyMap contains a vector
-*        holding all the values for a single column, in row order. The
-*        entry key is used as the column name, and the column data type
+*        it is assumed that each (non-FitsChan) entry in the KeyMap contains
+*        a vector holding all the values for a single column, in row order.
+*        The entry key is used as the column name, and the column data type
 *        is determined from the entry data type.
+*
+*        In addition, if any entries in the KeyMap contain a FitsChan
+*        pointer, the contents of the FitsChan are copied to the outptu
+*        catalogue.
 *     LABS = INTEGER (Given)
 *        A GRP group identifier containing the labels to be associated
 *        with the positions. The number of elements in this group should
