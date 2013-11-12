@@ -21,17 +21,19 @@ C_ROUTINES = fts1_rnand.c fts1_rnanr.c
 F_ROUTINES = fts1_astwn.f fts1_axis.f fts1_blcar.f \
 fts1_blval.f fts1_bswap.f fts1_comnt.f fts1_dread.f \
 fts1_dtype.f fts1_edfex.f fts1_edkey.f fts1_evkey.f \
+fts1_fioer.f \
 fts1_fndfs.f fts1_frmt.f  fts1_ftwcs.f fts1_gkeyc.f \
 fts1_gparm.f fts1_gvalc.f fts1_hdlog.f \
 fts1_i2vxd.f fts1_i2vxr.f fts1_inkey.f fts1_iskey.f \
-fts1_lokey.f fts1_mandh.f fts1_ndfcm.f fts1_phead.f \
+fts1_lokey.f fts1_mandh.f fts1_ndfcm.f fts1_pcadc.f \
+fts1_phead.f \
 fts1_prval.f fts1_ptkey.f fts1_qtype.f fts1_rdata.f \
 fts1_rfmod.f fts1_rgrda.f fts1_rootn.f \
-fts1_scofb.f fts1_skip.f \
+fts1_scadc.f fts1_scofb.f fts1_skip.f \
 fts1_ukeyc.f fts1_vhead.f fts1_wcsax.f \
 fts1_wcsdf.f fts1_wcsim.f fts1_wcsut.f fts1_wkeyc.f
 
-G_ROUTINES = fts1_gkeyx.gen fts1_ukeyx.gen fts1_wkeyx.gen 
+G_ROUTINES = fts1_gkeyx.gen fts1_ukeyx.gen fts1_wkeyx.gen
 
 GN_ROUTINES = fts1_chva.gn
 

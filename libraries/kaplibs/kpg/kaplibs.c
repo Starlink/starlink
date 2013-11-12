@@ -92,6 +92,7 @@
 #include "f77.h"
 #include "sae_par.h"
 #include "mers.h"
+#include "star/ndg.h"
 #include "star/grp.h"
 #include "star/mem.h"
 #include "star/hds_fortran.h"
@@ -1551,5 +1552,33 @@ void kpg1Hsect( const HDSLoc *loc1, int ndim, int *lbnd, int *ubnd, HDSLoc *loc2
    F77_IMPORT_INTEGER( STATUS, *status );
    F77_FREE_INTEGER( LBND );
    F77_FREE_INTEGER( UBND );
+}
+
+F77_SUBROUTINE(fts1_scadc)( INTEGER(IPROV),
+                            CHARACTER(PARAM),
+                            INTEGER(FC),
+                            INTEGER(STATUS)
+                            TRAIL(PARAM) );
+
+void fts1Scadc( NdgProvenance *prov, const char *param, AstFitsChan *fc,
+                int *status ){
+   DECLARE_INTEGER(IPROV);
+   DECLARE_CHARACTER_DYN(PARAM);
+   DECLARE_INTEGER(FC);
+   DECLARE_INTEGER(STATUS);
+
+   F77_EXPORT_INTEGER( astP2I( prov ), IPROV );
+   F77_CREATE_EXPORT_CHARACTER( param, PARAM );
+   F77_EXPORT_INTEGER( *status, STATUS );
+   F77_EXPORT_INTEGER( astP2I( fc ), FC );
+
+   F77_LOCK( F77_CALL(fts1_scadc)( INTEGER_ARG(&IPROV),
+                                   CHARACTER_ARG(PARAM),
+                                   INTEGER_ARG(&FC),
+                                   INTEGER_ARG(&STATUS)
+                                   TRAIL_ARG(PARAM) ); )
+
+   F77_FREE_CHARACTER( PARAM );
+   F77_IMPORT_INTEGER( STATUS, *status );
 }
 
