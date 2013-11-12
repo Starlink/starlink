@@ -222,21 +222,22 @@ void smf_jsatile( int itile, smfJSATiling *skytiling, int local_origin,
 
 /* Add a PIXEL Frame to the returned FrameSet, making sure to leave the
    current Frame unchanged. */
-   shift[ 0 ] = lbnd[ 0 ] - 1.5;
-   shift[ 1 ] = lbnd[ 1 ] - 1.5;
-   icur = astGetI( lfs, "Current" );
-   astAddFrame( lfs, AST__BASE, astShiftMap( 2, shift, " " ),
-                astFrame( 2, "Domain=PIXEL" ) );
-   astSetI( lfs, "Current", icur );
-
-/* Return and export the required pointers. */
-   if( fc ) astExport( *fc );
-
    if( fs ) {
+      shift[ 0 ] = lbnd[ 0 ] - 1.5;
+      shift[ 1 ] = lbnd[ 1 ] - 1.5;
+      icur = astGetI( lfs, "Current" );
+      astAddFrame( lfs, AST__BASE, astShiftMap( 2, shift, " " ),
+                   astFrame( 2, "Domain=PIXEL" ) );
+      astSetI( lfs, "Current", icur );
+
+/* Export the FrameSet pointer so that it is not annulled by the
+   following astEnd call, and return it. */
       *fs = lfs;
       astExport( *fs );
    }
 
+/* Export and return the FitsChan and Region if required. */
+   if( fc ) astExport( *fc );
    if( region ) {
       *region = lregion;
       astExport( *region );

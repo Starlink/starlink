@@ -62,7 +62,9 @@
 *     7-NOV-2013 (DSB):
 *        Initial version.
 *     11-NOV-2013 (DSB):
-*        Display tile indicies and write them to an output parameter.
+*        - Display tile indicies and write them to an output parameter.
+*        - Re-structured to test for bad values in the supplied NDF
+*          rather than the tiles (testing in tiles is a bigger job).
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -112,32 +114,40 @@ void smf_jsasplit( int indf, const char *base, int trim,
 /* Local Variables: */
    AstBox *box;
    AstFitsChan *fc;
-   AstFrameSet *tile_wcs;
    AstFrameSet *iwcs;
+   AstFrameSet *tile_wcs;
    AstRegion *region;
    Grp *grpt = NULL;
    char *path;
    char type[ NDF__SZTYP + 1 ];
    double *ipd;
+   double *pxd;
+   double *pyd;
+   double *pzd;
    double dlbnd[3];
    double dubnd[3];
    double gcen[3];
    float *ipf;
+   float *pxf;
+   float *pyf;
+   float *pzf;
    int *created_tiles = NULL;
    int *tiles;
    int axes[3];
-   int dims[ 3 ];
    int i;
    int indfo;
    int indfs;
    int indfx;
    int isempty;
    int itile;
+   int ix;
+   int iy;
+   int iz;
    int junk;
    int latax;
    int lbnd[3];
-   int lbnd_lon;
    int lbnd_lat;
+   int lbnd_lon;
    int lbndx[ NDF__MXDIM ];
    int lonax;
    int nbase;
@@ -145,18 +155,20 @@ void smf_jsasplit( int indf, const char *base, int trim,
    int ndimx;
    int nsig;
    int ntiles;
+   int olbnd[ 3 ];
+   int oubnd[ 3 ];
    int place;
-   int tile_ubnd[2];
-   int tile_lbnd[2];
    int tile_index;
+   int tile_lbnd[2];
+   int tile_ubnd[2];
    int ubnd[3];
-   int ubnd_lon;
    int ubnd_lat;
+   int ubnd_lon;
    int ubndx[ NDF__MXDIM ];
-   size_t iel;
    size_t iext;
-   size_t nel;
    size_t size;
+   size_t ystride;
+   size_t zstride;
    smfJSATiling tiling;
 
 /* Initialise */
@@ -219,6 +231,11 @@ void smf_jsasplit( int indf, const char *base, int trim,
    the indicies of th elongitude and latitude axes within the current Frame
    of the NDF. */
    tiles = smf_jsatiles_region( region, &tiling, &ntiles, status );
+   if( ntiles == 0 && *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRep( "", "smf_jsasplit: No JSA tiles found touching supplied NDF "
+              "(programming error).", status );
+   }
 
 /* Initialise to avoid compiler warnings. */
    lbnd_lon = 0;
@@ -228,17 +245,34 @@ void smf_jsasplit( int indf, const char *base, int trim,
    lonax = -1;
    latax = -1;
 
+/* Get the stride (in elements) between adjacent pixels on the 2nd and 32rd
+   pixel axes. The stride on the 1st pixel axis is always 1. */
+   ystride = ubnd[ 0 ] - lbnd[ 0 ] + 1;
+   zstride = ystride*( ubnd[ 1 ] - lbnd[ 1 ] + 1 );
+
+/* First we need to decide which of these tiles to create. Tiles which
+   recieve only bad values are not created. Map the whole supplied NDF
+   so that we can check which tiles receive any good values. */
+   ndfType( indf, "Data", type, sizeof( type ), status );
+   if( !strcmp( type, "_REAL" ) ) {
+      ndfMap( indf, "Data", "_REAL", "Read", (void **) &ipf, &junk,
+              status );
+   } else {
+      ndfMap( indf, "Data", "_DOUBLE", "Read", (void **) &ipd, &junk,
+              status );
+   }
+
 /* Tell the user what is happening. */
    msgBlank( status );
    msgOutf( "", "Splitting %s up into JSA tiles:", status,
             ( nsig == 2 ) ? "map" : "cube" );
 
-/* Loop round all tiles. */
+/* Loop round all tiles that overlap the supplied NDF. */
    for( itile = 0; itile < ntiles && *status == SAI__OK; itile++ ) {
       tile_index = tiles[ itile ];
 
-/* Get the pixel bounds of the current tile within the JSA all-sky pixel
-   grid. Also get the (2D) WCS FrameSet for the tile. */
+/* Get the spatial pixel bounds of the current tile within the JSA all-sky
+   pixel grid. Also get the (2D) WCS FrameSet for the tile. */
       smf_jsatile( tile_index, &tiling, 0, NULL, &tile_wcs, NULL,
                    tile_lbnd, tile_ubnd, status );
 
@@ -274,6 +308,92 @@ void smf_jsasplit( int indf, const char *base, int trim,
          }
       }
 
+/* Get the pixel index bounds of the overlap of the NDF and tile. */
+      for( i = 0; i < ndim; i++ ) {
+         olbnd[ i ] = lbnd[ i ];
+         oubnd[ i ] = ubnd[ i ];
+      }
+      if( tile_lbnd[ 0 ] > olbnd[ lonax ] )  olbnd[ lonax ] = tile_lbnd[ 0 ];
+      if( tile_lbnd[ 1 ] > olbnd[ latax ] )  olbnd[ latax ] = tile_lbnd[ 1 ];
+      if( tile_ubnd[ 0 ] < oubnd[ lonax ] )  oubnd[ lonax ] = tile_ubnd[ 0 ];
+      if( tile_ubnd[ 1 ] < oubnd[ latax ] )  oubnd[ latax ] = tile_ubnd[ 1 ];
+
+/* Loop round all pixels in the overlap, looking for a good pixel value. */
+      isempty = 1;
+      if( !strcmp( type, "_REAL" ) ) {
+         pzf = ipf + ( olbnd[ 2 ] - lbnd[ 2 ] )*zstride;
+         for( iz = olbnd[ 2 ]; iz <= oubnd[ 2 ] && isempty; iz++ ) {
+
+            pyf = pzf + ( olbnd[ 1 ] - lbnd[ 1 ] )*ystride;
+            for( iy = olbnd[ 1 ]; iy <= oubnd[ 1 ] && isempty; iy++ ) {
+
+               pxf = pyf + ( olbnd[ 0 ] - lbnd[ 0 ] );
+               for( ix = olbnd[ 0 ]; ix <= oubnd[ 0 ]; ix++ ) {
+                  if( *(pxf++) != VAL__BADR ) {
+                     isempty = 0;
+                     break;
+                  }
+
+               }
+
+               pyf += ystride;
+            }
+
+            pzf += zstride;
+         }
+
+      } else {
+         pzd = ipd + ( olbnd[ 2 ] - lbnd[ 2 ] )*zstride;
+         for( iz = olbnd[ 2 ]; iz <= oubnd[ 2 ] && isempty; iz++ ) {
+
+            pyd = pzd + ( olbnd[ 1 ] - lbnd[ 1 ] )*ystride;
+            for( iy = olbnd[ 1 ]; iy <= oubnd[ 1 ] && isempty; iy++ ) {
+
+               pxd = pyd + ( olbnd[ 0 ] - lbnd[ 0 ] );
+               for( ix = olbnd[ 0 ]; ix <= oubnd[ 0 ]; ix++ ) {
+                  if( *(pxd++) != VAL__BADD ) {
+                     isempty = 0;
+                     break;
+                  }
+
+               }
+
+               pyd += ystride;
+            }
+
+            pzd += zstride;
+         }
+      }
+
+/* Issue warnings about any empty tiles. */
+      if( isempty ) {
+         msgOutiff( MSG__VERB, "", "   tile %d is empty and so will not be "
+                    "created", status, tile_index );
+
+/* Otherwise, the tile contains some good values so append the index of
+   this tile in the list of tiles to be created. */
+      } else {
+         created_tiles = astGrow( created_tiles, ++(*ntile),
+                                  sizeof( *created_tiles ));
+         if( *status == SAI__OK ) created_tiles[ *ntile - 1 ] = tile_index;
+
+      }
+      tile_wcs = astAnnul( tile_wcs );
+   }
+
+/* We can now unmap the supplied NDF. */
+   ndfUnmap( indf, "*", status );
+
+/* Loop round all tiles that contain some good values. */
+   for( itile = 0; itile < (int) *ntile && *status == SAI__OK; itile++ ) {
+      tile_index = created_tiles[ itile ];
+      msgOutf( "", "   tile %d", status, tile_index );
+
+/* Get the pixel bounds of the current tile within the JSA all-sky pixel
+   grid. */
+      smf_jsatile( tile_index, &tiling, 0, NULL, NULL, NULL,
+                   tile_lbnd, tile_ubnd, status );
+
 /* The supplied NDF is assumed to be gridded on the same grid, so we can
    just use the tile bounds as the pixel bounds of the required section of
    the NDF. */
@@ -293,119 +413,66 @@ void smf_jsasplit( int indf, const char *base, int trim,
 /* Get an identifier for the required section of the input NDF. */
       ndfSect( indf, ndim, lbnd, ubnd, &indfs, status );
 
-/* We need to check it contains some good data, so map the Data array.
-   Get the number of elements using ndfDim since the "nel" argument of
-   ndfMap (the product of all dimensions) is only an int. */
-      ndfDim( indfs, 3, dims, &ndim, status );
-      nel = dims[ 0 ];
-      nel *= dims[ 1 ];
-      nel *= dims[ 2 ];
-
-      isempty = 1;
-      ndfType( indfs, "Data", type, sizeof( type ), status );
-      if( !strcmp( type, "_REAL" ) ) {
-         ndfMap( indfs, "Data", "_REAL", "Read", (void **) &ipf, &junk,
-                 status );
-         if( *status == SAI__OK ) {
-            for( iel = 0; iel < nel; iel++ ) {
-               if( *(ipf++) != VAL__BADR ) {
-                  isempty = 0;
-                  break;
-               }
-            }
-         }
-      } else {
-         ndfMap( indfs, "Data", "_DOUBLE", "Read", (void **) &ipd, &junk,
-                 status );
-         if( *status == SAI__OK ) {
-            for( iel = 0; iel < nel; iel++ ) {
-               if( *(ipd++) != VAL__BADD ) {
-                  isempty = 0;
-                  break;
-               }
-            }
-         }
-      }
-      ndfUnmap( indfs, "*", status );
-
-/* Skip empty tiles. */
-      if( !isempty ) {
-         msgOutf( "", "   tile %d", status, tile_index );
-
-/* Record the index of this tile in the list of created tiles. */
-         (*ntile)++;
-         created_tiles = astGrow( created_tiles, *ntile,
-                                  sizeof( *created_tiles ));
-         if( astOK ) {
-            created_tiles[ *ntile - 1] = tile_index;
-
 /* Get the full path to the output NDF for the current tile, and create an
    NDF placeholder for it. */
-            sprintf( path, "%.*s_%d", nbase, base, tile_index );
-            ndfPlace( NULL, path, &place, status );
+      sprintf( path, "%.*s_%d", nbase, base, tile_index );
+      ndfPlace( NULL, path, &place, status );
 
 /* Copy the section of the input NDF to the output NDF. */
-            ndfCopy( indfs, &place, &indfo, status );
+      ndfCopy( indfs, &place, &indfo, status );
 
 /* Add the name of this output NDF to the group holding the names of the
    output NDFs that have actually been created. */
-            grpPut1( grp, path, 0, status );
+      grpPut1( grp, path, 0, status );
 
 /* Add a JSATILE header to the output FITS extension. */
-            kpgGtfts( indfo, &fc, status );
-            if( *status == KPG__NOFTS ) {
-               errAnnul( status );
-               fc = astFitsChan( NULL, NULL, " " );
-            }
-            atlPtfti( fc, "JSATILE", tile_index, "JSA all-sky tile index",
-                      status );
-            kpgPtfts( indfo, fc, status );
-            fc = astAnnul( fc );
+      kpgGtfts( indfo, &fc, status );
+      if( *status == KPG__NOFTS ) {
+         errAnnul( status );
+         fc = astFitsChan( NULL, NULL, " " );
+      }
+      atlPtfti( fc, "JSATILE", tile_index, "JSA all-sky tile index",
+                status );
+      kpgPtfts( indfo, fc, status );
+      fc = astAnnul( fc );
 
 /* We now reshape any extension NDFs contained within the output NDF to
    have the same spatial bounds as the main NDF (but only for extension
    NDFs that originally have the same spatial bounds as the supplied NDF).
    Get a group containing paths to all extension NDFs in the output NDF. */
-            ndgMoreg( indfo, &grpt, &size, status );
+      ndgMoreg( indfo, &grpt, &size, status );
 
 /* Loop round each output extension NDF. */
-            for( iext = 1; iext <= size; iext++ ) {
-               ndgNdfas( grpt, iext, "Update", &indfx, status );
+      for( iext = 1; iext <= size; iext++ ) {
+         ndgNdfas( grpt, iext, "Update", &indfx, status );
 
 /* Get its bounds. */
-               ndfBound( indfx, NDF__MXDIM, lbndx, ubndx, &ndimx, status );
+         ndfBound( indfx, NDF__MXDIM, lbndx, ubndx, &ndimx, status );
 
 /* See if this extension NDF has the same bounds on the spatial axes as
    the supplied NDF. */
-               if( ndimx > 1 && lbndx[ lonax ] == lbnd_lon &&
-                   lbndx[ latax ] == lbnd_lat &&
-                   ubndx[ lonax ] == ubnd_lon &&
-                   ubndx[ latax ] == ubnd_lat ) {
+         if( ndimx > 1 && lbndx[ lonax ] == lbnd_lon &&
+                          lbndx[ latax ] == lbnd_lat &&
+                          ubndx[ lonax ] == ubnd_lon &&
+                          ubndx[ latax ] == ubnd_lat ) {
 
 /* If so, set the bounds of the output extension NDF so that they are
-   the same as the tile on the spatial axes. */
-                  lbndx[ lonax ] = tile_lbnd[ 0 ];
-                  lbndx[ latax ] = tile_lbnd[ 1 ];
-                  ubndx[ lonax ] = tile_ubnd[ 0 ];
-                  ubndx[ latax ] = tile_ubnd[ 1 ];
-                  ndfSbnd( ndimx, lbndx, ubndx, indfx, status );
-               }
-
-/* Annul the extension NDF identifier. */
-               ndfAnnul( &indfx, status );
-            }
-
-/* Free resources associated with the current tile. */
-            grpDelet( &grpt, status );
-            ndfAnnul( &indfo, status );
+   the same as the main NDF on the spatial axes. */
+            lbndx[ lonax ] = lbnd[ lonax ];
+            lbndx[ latax ] = lbnd[ latax ];
+            ubndx[ lonax ] = ubnd[ lonax ];
+            ubndx[ latax ] = ubnd[ latax ];
+            ndfSbnd( ndimx, lbndx, ubndx, indfx, status );
          }
 
-      } else {
-         msgOutiff( MSG__VERB, "", "   tile %d is empty and so will not be "
-                    "created", status, tile_index );
+/* Annul the extension NDF identifier. */
+         ndfAnnul( &indfx, status );
       }
+
+/* Free resources associated with the current tile. */
+      grpDelet( &grpt, status );
+      ndfAnnul( &indfo, status );
       ndfAnnul( &indfs, status );
-      tile_wcs = astAnnul( tile_wcs );
    }
    msgBlank( status );
 

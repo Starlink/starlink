@@ -2789,6 +2789,24 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter jsatiles {
+                type _LOGICAL
+                access READ
+                vpath DEFAULT
+                ppath CURRENT, DEFAULT
+                prompt {Create the cube as a set of JSA tiles?}
+                default FALSE
+                helpkey *
+            }
+
+            parameter jsatilelist {
+                size *
+                type _INTEGER
+                access WRITE
+                vpath INTERNAL
+                helpkey *
+            }
+
             parameter lbnd {
                 size *
                 type _INTEGER

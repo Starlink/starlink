@@ -162,7 +162,7 @@
 *          If TRUE, the output map is created on the JSA all-sky pixel
 *          grid, and is split up into individual JSA tiles. Thus multiple
 *          output NDFs may be created, one for each JSA tile that touches
-*          the map. Each of these output NDF will have the tile index number
+*          the map. Each of these output NDFs will have the tile index number
 *          appended to the end of the path specified by parameter "OUT". If
 *          "JSATILES" is TRUE, the "REF" parameter is ignored. [FALSE]
 *     JSATILELIST() = _INTEGER (Write)
@@ -295,7 +295,7 @@
 *          be aligned with the supplied reference NDF. The reference can be
 *          either 2D or 3D and the spatial frame will be extracted. If "JSA"
 *          is supplied, the JSA all-sky pixel grid will be used (note,
-*          the map will be still created as a single NDF - if multiple NDFs,
+*          the map will still be created as a single NDF - if multiple NDFs,
 *          one for each JSA tile, are required, the "JSATILES" parameter
 *          should beset TRUE instead of using the "REF" parameter). If a
 *          null (!) value is supplied then the output grid is determined
@@ -486,9 +486,6 @@
 *     and TILENUM are added to the output FITS header. These are the number
 *     of tiles used to hold the output data, and the index of the NDF
 *     containing the header, in the range 1 to NUMTILES.
-*     - If parameter JSATILE is assigned a value, FITS keywords JSATILE
-*     is added to the output FITS header, holding the index of the JSA
-*     tile.
 *     - The model configuration parameters can be sub-instrument dependent.
 *     For example, 850.flt.edgelow will copy the edgelow value into the flt
 *     section only for 850 micron data. Similarly for 450.flt.edgelow.
@@ -1122,9 +1119,9 @@ void smurf_makemap( int *status ) {
     }
   }
 
-  /* If we are not splitting the output up into tiles, then create an array
-     containing a single tile description that encompasses the entire full
-     size output grid. */
+  /* If we are not splitting the output up into user-defined tiles, then
+     create an array containing a single tile description that encompasses
+     the entire full size output grid. */
 
   if( !tiles ) {
     tiledims[ 0 ] = 0;
@@ -1495,8 +1492,8 @@ void smurf_makemap( int *status ) {
       }
       histogram = astFree( histogram );
 
-      /* Store the keywords holding the number of tiles generated and the index
-         of the current tile. */
+      /* Store the keywords holding the number of user-defined tiles generated
+         and the index of the current tile. */
       if( !jsatiles ) {
          atlPtfti( fchan, "NUMTILES", ntile,
                    "No. of tiles covering the field", status );

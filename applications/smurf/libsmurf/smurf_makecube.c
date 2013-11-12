@@ -34,8 +34,8 @@
 *
 *     Optionally, the output cube can be split up into several separate
 *     NDFs, each containing a spatial tile extracted from the full cube
-*     (see parameter TILEDIMS). These tiles abut exactly in pixel
-*     co-ordinates and can be combined (for example) using KAPPA:PASTE.
+*     (see parameter JSATILES and TILEDIMS). These tiles abut exactly in
+*     pixel co-ordinates and can be combined (for example) using KAPPA:PASTE.
 *
 *     In addition, there is an option to divide the output up into separate
 *     polarisation angle bins (see parameter POLBINSIZE). If this option
@@ -280,6 +280,17 @@
 *          If TRUE, the weights used are the reciprocal of the variances
 *          associated with the input spectra, as determined from the Tsys
 *          values in the input. [TRUE]
+*     JSATILES = _LOGICAL (Read)
+*          If TRUE, the output cube is created on the JSA all-sky pixel
+*          grid, and is split up into individual JSA tiles. Thus multiple
+*          output NDFs may be created, one for each JSA tile that touches
+*          the cube. Each of these output NDFs will have the tile index number
+*          appended to the end of the path specified by parameter "OUT". If
+*          "JSATILES" is TRUE, the "REF" parameter is ignored. [FALSE]
+*     JSATILELIST() = _INTEGER (Write)
+*          If parameter "JSATILES" is set TRUE, the zero-based indicies of
+*          the created JSA tiles will be written to this output parameter.
+*          The number of such indices is given the "NTILE" parameter
 *     LBND( 2 ) = _INTEGER (Read)
 *          An array of values giving the lower pixel-index bound on each
 *          spatial axis of the output NDF. The suggested default values
@@ -296,10 +307,10 @@
 *          VERBOSE, DEBUG or ALL. [NORMAL]
 *     NTILE = _INTEGER (Write)
 *          The number of output tiles used to hold the entire output
-*          array (see parameter TILEDIMS). If no input data falls within
-*          a specified tile, then no output NDF will be created for the
-*          tile, but the tile will still be included in the tile numbering
-*          scheme.
+*          array (see parameter JSATILES and TILEDIMS). If no input data
+*          falls within a specified tile, then no output NDF will be created
+*          for the tile, but (if JSATILES is FALSE) the tile will still be
+*          included in the tile numbering scheme.
 *     NPOLBIN = _INTEGER (Write)
 *          The number of polarisation angle bins used to hold the entire
 *          output data (see parameter POLBINSIZE).
@@ -401,12 +412,15 @@
 *          or the string "JSA". If an NDF is supplied, the output grid will
 *          be aligned with the supplied reference NDF. The NDF need not be
 *          three-dimensional. For instance, a two-dimensional image can be
-*          supplied in which case the spatial axes of the output cube will be
-*          aligned with the reference image and the spectral axis will be
-*          inherited form the first input NDF. If "JSA" is supplied, the
-*          JSA all-sky pixel grid will be used. If a null (!) value is
-*          supplied then the output grid is determined by parameters
-*          AUTOGRID, REFLON, REFLAT, etc. [!]
+*          supplied in which case the spatial axes of the output cube will
+*          be aligned with the reference image and the spectral axis will be
+*          inherited form the first input NDF.  If "JSA" is supplied, the
+*          JSA all-sky pixel grid will be used (note, the cube will still be
+*          created as a single NDF - if multiple NDFs, one for each JSA tile,
+*          are required, the "JSATILES" parameter should beset TRUE instead
+*          of using the "REF" parameter). If a null (!) value is supplied
+*          then the output grid is determined by parameters AUTOGRID, REFLON,
+*          REFLAT, etc. [!]
 *     REFLAT = LITERAL (Read)
 *          Only accessed if a null value is supplied for parameter REF.
 *          The formatted celestial-latitude value at the tangent point of
@@ -556,6 +570,8 @@
 *          given number of pixels. Pixels within the overlap border will
 *          be given a quality name of "BORDER" (see KAPPA:SHOWQUAL). [0]
 *     TILEDIMS( 2 ) = _INTEGER (Read)
+*          This parameter is ignored if parameter "JSATILES" is set TRUE.
+*
 *          For large data sets, it may sometimes be beneficial to break
 *          the output array up into a number of smaller rectangular tiles,
 *          each created separately and stored in a separate output NDF. This
@@ -594,9 +610,9 @@
 *          values extending beyond the available data. [TRUE]
 *     TRIMTILES = _LOGICAL (Read)
 *          Only accessed if the output is being split up into more than
-*          one spatial tile (see parameter TILEDIMS). If TRUE, then the
-*          tiles around the border will be trimmed to exclude areas that
-*          fall outside the bounds of the full sized output array. This
+*          one spatial tile (see parameter TILEDIMS and JSATILES). If TRUE,
+*          then the tiles around the border will be trimmed to exclude areas
+*          that fall outside the bounds of the full sized output array. This
 *          will result in the border tiles being smaller than the central
 *          tiles. [FALSE]
 *     UBND( 2 ) = _INTEGER (Read)
@@ -860,9 +876,12 @@
 *     21-AUG-2013 (AGG):
 *        Do not call grpList if no output files are generated. This
 *        avoids a GRP__INVID error in such cases.
+*     11-NOV-2013 (DSB):
+*        Added the "JSATILES" parameter, and made other changes to allow
+*        the output cubew to be split up into JSA tiles.
 
 *  Copyright:
-*     Copyright (C) 2007-2011 Science and Technology Facilities Council.
+*     Copyright (C) 2007-2013 Science and Technology Facilities Council.
 *     Copyright (C) 2006-2007 Particle Physics and Astronomy Research
 *     Council. Copyright (C) 2006-2008,2013 University of British Columbia.
 *     All Rights Reserved.
@@ -917,6 +936,7 @@
 #include "smurflib.h"
 #include "libsmf/smf.h"
 #include "libsmf/smf_typ.h"
+#include "libsmf/jsatiles.h"
 
 #define FUNC_NAME "smurf_makecube"
 #define TASK_NAME "MAKECUBE"
@@ -946,13 +966,14 @@ void smurf_makecube( int *status ) {
    Grp *ogrp = NULL;          /* Group containing output file */
    HDSLoc *smurf_xloc = NULL; /* HDS locator for output SMURF extension */
    HDSLoc *weightsloc = NULL; /* HDS locator of weights array */
+   ThrWorkForce *wf = NULL;   /* Pointer to a pool of worker threads */
    char *pname = NULL;        /* Name of currently opened data file */
    char basename[ GRP__SZNAM + 1 ]; /* Output base file name */
+   char oname[SMF_PATH_MAX+1];/* Name of output NDF */
    char pabuf[ 10 ];          /* Text buffer for parameter value */
    char system[ 10 ];         /* Celestial coord system for output cube */
    double *pangle;            /* Ptr to array holding angle for each pol bin */
    double fcon;               /* Tsys factor for file */
-   float median;              /* Median data value */
    double par[ 7 ];           /* Projection parameter */
    double params[ 4 ];        /* astRebinSeq parameters */
    float *eff_array = NULL;   /* Pointer to array of eff times  */
@@ -965,6 +986,7 @@ void smurf_makecube( int *status ) {
    float *var_array = NULL;   /* Pointer to temporary variance array */
    float *var_out = NULL;     /* Pointer to the output variance array */
    float *work2_array = NULL; /* Pointer to temporary work array */
+   float median;              /* Median data value */
    float polbinsize;          /* Angular size of polarisation bins */
    float polbinzero;          /* Angle at centre of first polarisation bin */
    float teff;                /* Effective integration time */
@@ -977,6 +999,7 @@ void smurf_makecube( int *status ) {
    int axes[ 2 ];             /* Indices of selected axes */
    int badmask;               /* How is the output bad pixel mask chosen? */
    int blank;                 /* Was a blank line just output? */
+   int delete;                /* Delete the output cube? */
    int el0;                   /* Index of 2D array element */
    int el;                    /* Index of 3D array element */
    int first;                 /* Is this the first input file? */
@@ -990,32 +1013,27 @@ void smurf_makecube( int *status ) {
    int ipbin;                 /* Index of current polarisation angle bin */
    int is2d;                  /* Is the weights array 2-dimensional? */
    int ispec;                 /* Index of next spectrum within output NDF */
-   size_t itile;              /* Output tile index */
    int jin;                   /* Input NDF index within igrp */
+   int jsatiles;              /* Create JSA tiles? */
    int junk;                  /* Unused integer */
    int lbnd_out[ 3 ];         /* Lower pixel bounds for full output map */
    int lbnd_wgt[ 4 ];         /* Lower pixel bounds for weight array */
    int moving;                /* Is the telescope base position changing? */
    int naccept;               /* Number of accepted input spectra */
    int nbad;                  /* No. of o/p pixels with good data but bad variance */
-   size_t ndet;               /* Number of detectors supplied for "DETECTORS" */
    int nel;                   /* Number of elements in 3D array */
    int ngood;                 /* No. of o/p pixels with good data */
    int nparam = 0;            /* No. of parameters required for spreading scheme */
    int npbin;                 /* No. of polarisation angle bins */
    int npos;                  /* Number of samples included in output NDF */
    int nreject;               /* Number of rejected input spectra */
-   size_t ntile;              /* Number of output tiles */
-   int64_t nused;             /* No. of input samples pasted into output cube */
    int nval;                  /* Number of parameter values supplied */
    int nwgtdim;               /* No. of axes in the weights array */
    int nxy;                   /* Number of elements in a 2D output tile */
    int ondf = NDF__NOID;      /* Output NDF identifier */
    int outax[ 2 ];            /* Indices of corresponding output axes */
-   size_t outsize;            /* Number of files in output group */
    int polobs;                /* Do the input files contain polarisation data? */
    int savewgt;               /* Should weights be saved in the output NDF? */
-   size_t size;               /* Number of files in input group */
    int smfflags;              /* Flags for smfData */
    int sparse;                /* Create a sparse output array? */
    int specunion;             /* O/p spec range = union of i/p spec ranges? */
@@ -1030,6 +1048,13 @@ void smurf_makecube( int *status ) {
    int use_wgt;               /* Use input variance to weight input data? */
    int usedetpos;             /* Should the detpos array be used? */
    int wgtsize;               /* No. of elements in the weights array */
+   int64_t nused;             /* No. of input samples pasted into output cube */
+   size_t itile;              /* Output tile index */
+   size_t ndet;               /* Number of detectors supplied for "DETECTORS" */
+   size_t njsatile;           /* Number of output JSA tiles */
+   size_t ntile;              /* Number of output tiles */
+   size_t outsize;            /* Number of files in output group */
+   size_t size;               /* Number of files in input group */
    smfBox *boxes = NULL;      /* Pointer to array of i/p file bounding boxes */
    smfData *data = NULL;      /* Pointer to data struct */
    smfData *effdata = NULL;   /* Pointer to o/p struct holding eff time array */
@@ -1040,7 +1065,6 @@ void smurf_makecube( int *status ) {
    smfFile *file = NULL;      /* Pointer to data file struct */
    smfTile *tile = NULL;      /* Pointer to next output tile description */
    smfTile *tiles = NULL;     /* Pointer to array of output tile descriptions */
-   ThrWorkForce *wf = NULL;   /* Pointer to a pool of worker threads */
    void *data_array = NULL;   /* Pointer to the rebinned map data */
    void *wgt_array = NULL;    /* Pointer to the weights map */
 
@@ -1293,8 +1317,10 @@ void smurf_makecube( int *status ) {
    supplied for TILEDIMS, annul the error and retain the original NULL
    pointer for the array of tile structures (this is used as a flag that
    the entire output grid should be stored in a single output NDF). Note,
-   tiling cannot be used with sparse output NDFs. */
-   if( !sparse && *status == SAI__OK ) {
+   tiling cannot be used with sparse output NDFs. If we are producing JSA
+   tiles, do not access the parameters for user-defined tiles. */
+   parGet0l( "JSATILES", &jsatiles, status );
+   if( !jsatiles && !sparse && *status == SAI__OK ) {
       parGet1i( "TILEDIMS", 2, tiledims, &nval, status );
       if( *status == PAR__NULL ) {
          errAnnul( status );
@@ -1308,18 +1334,15 @@ void smurf_makecube( int *status ) {
       }
    }
 
-/* If we are not splitting the output up into tiles, then create an array
-   containing a single tile description that encompasses the entire full
-   size output grid. */
+/* If we are not splitting the output up into user-defined tiles, then create
+   an array containing a single tile description that encompasses the entire
+   full size output grid. */
    if( !tiles ) {
       tiledims[ 0 ] = 0;
       tiles = smf_choosetiles( igrp, size, lbnd_out, ubnd_out, boxes,
                                spread, params, wcsout, tiledims,
                                0, 0, &ntile, status );
    }
-
-/* Write the number of tiles being created to an output parameter. */
-   parPut0i( "NTILE", ntile, status );
 
 /* Output the pixel bounds of the full size output array (not of an
    individual tile). */
@@ -1534,6 +1557,9 @@ void smurf_makecube( int *status ) {
 /* Save some useful pointers. */
          file = odata->file;
          ondf = file->ndfid;
+
+/* Save the output file name. */
+         strcpy( oname, file->name );
 
 /* Create a history component in the output NDF. */
          ndfHcre( ondf, status );
@@ -2011,16 +2037,18 @@ void smurf_makecube( int *status ) {
                       "[s] Median MAKECUBE effective integration time", status );
          }
 
-/* Free the second work array amd histogram array. */
+/* Free the second work array and histogram array. */
          work2_array = astFree( work2_array );
          hist = astFree( hist );
 
-/* Store the keywords holding the number of tiles generated and the index
-   of the current tile. */
-         atlPtfti( fchan, "NUMTILES", ntile,
-                   "No. of tiles covering the field", status );
-         atlPtfti( fchan, "TILENUM", itile,
-                   "Index of this tile (1->NUMTILES)", status );
+/* Store the keywords holding the number of user-defined tiles generated and
+   the index of the current tile. */
+         if( !jsatiles ) {
+            atlPtfti( fchan, "NUMTILES", ntile,
+                      "No. of tiles covering the field", status );
+            atlPtfti( fchan, "TILENUM", itile,
+                      "Index of this tile (1->NUMTILES)", status );
+         }
 
 /* If the FitsChan is not empty, store it in the FITS extension of the
    output NDF (any existing FITS extension is deleted). */
@@ -2035,7 +2063,7 @@ void smurf_makecube( int *status ) {
 
 /* The following calls to smf_reshapendf close the open NDFs. So if we
    will need access to the NDF afterwards, clone the NDF identifier now. */
-         if( trim ) ndfClone( ondf, &tndf, status );
+         if( jsatiles || trim ) ndfClone( ondf, &tndf, status );
 
 /* For each open output NDF (the main tile NDF, and any extension NDFs),
    first clone the NDF identifier, then close the file (which will unmap
@@ -2051,8 +2079,8 @@ void smurf_makecube( int *status ) {
 /* If required trim any remaining bad borders, and annul the cloned output
    NDF identifier. Catch NDFs that have no good data values. Annul the
    error, flag that the output NDF should be deleted and issue a warning. */
-         if( tndf != NDF__NOID ) {
-            int delete = 0;
+         delete = 0;
+         if( trim ) {
             if( trim && *status == SAI__OK ) {
                kpg1Badbx( tndf, 2, &junk, &junk, status );
                if( *status == SAI__ERROR ) {
@@ -2066,17 +2094,28 @@ void smurf_makecube( int *status ) {
                   blank = 1;
                }
             }
+         }
 
-/* Delete (and remove the name from the group of output NDF names) or annul
-   the NDF as required. */
-            if( delete ) {
-               ndfDelet( &tndf, status );
+/* If required, split the output cube up into JSA tiles. */
+         if( jsatiles ) {
+            parGet0l( "TRIMTILES", &trimtiles, status );
+            grpSetsz( igrp4, 0, status );
+            smf_jsasplit( tndf, oname, trimtiles, SMF__INST_NONE, &njsatile,
+                          igrp4, status );
+            delete = -1;
+         }
+
+/* Delete (and if required remove the name from the group of output NDF
+   names) or annul the NDF as required. */
+         if( delete ) {
+            ndfDelet( &tndf, status );
+            if( delete > 0 ) {
                Grp *tgrp = grpRemov( igrp4, basename, status );
                grpDelet( &igrp4, status);
                igrp4 = tgrp;
-            } else {
-               ndfAnnul( &tndf, status );
             }
+         } else {
+            ndfAnnul( &tndf, status );
          }
 
 /* Free other resources related to the current tile. */
@@ -2091,6 +2130,9 @@ void smurf_makecube( int *status ) {
 /* End the tile's AST context. */
       astEnd;
    }
+
+/* Write the number of tiles being created to an output parameter. */
+   parPut0i( "NTILE", jsatiles ? njsatile : ntile, status );
 
 /* Report an error if no output NDFs were created. */
    if( grpGrpsz( igrp4, status ) == 0 && *status == SAI__OK ) {
