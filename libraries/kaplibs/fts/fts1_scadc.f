@@ -1,4 +1,4 @@
-      SUBROUTINE FTS1_SCADC( IPROV, PARAM, FC, STATUS )
+      SUBROUTINE FTS1_SCADC( IPROV, PARAM, STATUS )
 *+
 *  Name:
 *     FTS1_SCADC
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL FTS1_SCADC( IPROV, PARAM, FC, STATUS )
+*     CALL FTS1_SCADC( IPROV, PARAM, STATUS )
 
 *  Description:
 *     This opens the FITS file associated with the specified parameter,
@@ -56,9 +56,6 @@
 *     PARAM = CHARACTER * ( * ) (Given)
 *        The name of the environment parameter associated with the FITS
 *        file.
-*     FC = INTEGER (Given)
-*        Pointer to an AST FitsChan containing additional headers to be
-*        added to the FITS file. Ignored if AST__NULL is supplied.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -109,7 +106,6 @@
 *  Arguments Given:
       INTEGER IPROV
       CHARACTER PARAM*(*)
-      INTEGER FC
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -159,10 +155,6 @@
 *  If all is OK, put the provenance into the primary header.
       ELSE
          CALL FTS1_PCADC( IPROV, FUNIT, STATUS )
-
-*  If a FitsChan was supplied, copy the headers from it to the FITS file
-*  header.
-         IF( FC .NE. AST__NULL ) CALL FTS1_PUTFC( FC, FUNIT, STATUS )
 
 *  Close the FITS file.
          CALL FTCLOS( FUNIT, FSTAT )
