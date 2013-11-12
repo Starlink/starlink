@@ -286,6 +286,8 @@ typedef struct AstFitsChanVtab {
    int (* GetNcard)( AstFitsChan *, int * );
 
    int (* GetCardType)( AstFitsChan *, int * );
+   const char *(* GetCardName)( AstFitsChan *, int * );
+   const char *(* GetCardComm)( AstFitsChan *, int * );
 
    int (* GetNkey)( AstFitsChan *, int * );
 
@@ -529,6 +531,8 @@ void astInitFitsChanGlobals_( AstFitsChanGlobals * );
    int astGetNcard_( AstFitsChan *, int * );
 
    int astGetCardType_( AstFitsChan *, int * );
+   const char *astGetCardName_( AstFitsChan *, int * );
+   const char *astGetCardComm_( AstFitsChan *, int * );
 
    int astGetNkey_( AstFitsChan *, int * );
 
@@ -801,6 +805,12 @@ astINVOKE(V,astGetAllWarnings_(astCheckFitsChan(this),STATUS_PTR))
 
 #define astGetCardType(this) \
 astINVOKE(V,astGetCardType_(astCheckFitsChan(this),STATUS_PTR))
+
+#define astGetCardName(this) \
+astINVOKE(V,astGetCardName_(astCheckFitsChan(this),STATUS_PTR))
+
+#define astGetCardComm(this) \
+astINVOKE(V,astGetCardComm_(astCheckFitsChan(this),STATUS_PTR))
 
 #define astGetNcard(this) \
 astINVOKE(V,astGetNcard_(astCheckFitsChan(this),STATUS_PTR))

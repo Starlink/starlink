@@ -115,6 +115,8 @@ f     encodings), then write operations using AST_WRITE will
 *
 *     - AllWarnings: A list of the available conditions
 *     - Card: Index of current FITS card in a FitsChan
+*     - CardComm: The comment of the current FITS card in a FitsChan
+*     - CardName: The keyword name of the current FITS card in a FitsChan
 *     - CardType: The data type of the current FITS card in a FitsChan
 *     - CarLin: Ignore spherical rotations on CAR projections?
 *     - CDMatrix: Use a CD matrix instead of a PC matrix?
@@ -1087,6 +1089,8 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 *        inverse for each point. People were seeing bad round-trip errors
 *        when transforming points outside the image because the fit was
 *        being used when it was not very accurate.
+*     12-NOV-2013 (DSB):
+*        Added CardName and CardComm attributes.
 *class--
 */
 
@@ -1674,6 +1678,8 @@ static char *UnPreQuote( const char *, int * );
 static char GetMaxS( double ****item, int * );
 static const char *GetAllWarnings( AstFitsChan *, int * );
 static const char *GetAttrib( AstObject *, const char *, int * );
+static const char *GetCardComm( AstFitsChan *, int * );
+static const char *GetCardName( AstFitsChan *, int * );
 static const char *GetFitsSor( const char *, int * );
 static const char *IsSpectral( const char *, char[5], char[5], int * );
 static double **OrthVectorSet( int, int, double **, int * );
@@ -3984,7 +3990,6 @@ static int *CardFlags( AstFitsChan *this, int *status ){
 }
 
 static char *CardName( AstFitsChan *this, int *status ){
-
 /*
 *  Name:
 *     CardName
@@ -3997,7 +4002,6 @@ static char *CardName( AstFitsChan *this, int *status ){
 
 *  Synopsis:
 *     #include "fitschan.h"
-
 *     char *CardName( AstFitsChan *this, int *status )
 
 *  Class Membership:
@@ -4042,7 +4046,6 @@ static char *CardName( AstFitsChan *this, int *status ){
 }
 
 static int CardType( AstFitsChan *this, int *status ){
-
 /*
 *  Name:
 *     CardType
@@ -4055,7 +4058,6 @@ static int CardType( AstFitsChan *this, int *status ){
 
 *  Synopsis:
 *     #include "fitschan.h"
-
 *     int CardType( AstFitsChan *this, int *status )
 
 *  Class Membership:
@@ -6494,7 +6496,6 @@ static int CnvValue( AstFitsChan *this, int type, int undef, void *buff,
 
 *  Synopsis:
 *     #include "fitschan.h"
-
 *     int CnvValue( AstFitsChan *this, int type, int undef, void *buff,
 *                   const char *method, int *status )
 
@@ -15787,6 +15788,16 @@ const char *GetAttrib( AstObject *this_object, const char *attrib, int *status )
          result = getattrib_buff;
       }
 
+/* CardComm. */
+/* --------- */
+   } else if ( !strcmp( attrib, "cardcomm" ) ) {
+      result = astGetCardComm( this );
+
+/* CardName. */
+/* --------- */
+   } else if ( !strcmp( attrib, "cardname" ) ) {
+      result = astGetCardName( this );
+
 /* CardType. */
 /* --------- */
    } else if ( !strcmp( attrib, "cardtype" ) ) {
@@ -16007,6 +16018,92 @@ static int GetCard( AstFitsChan *this, int *status ){
 
 /* Return the card index. */
    return index;
+}
+
+static const char *GetCardComm( AstFitsChan *this, int *status ){
+/*
+*+
+*  Name:
+*     GetCardComm
+
+*  Purpose:
+*     Get the value of the CardComm attribute.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "fitschan.h"
+*     const char *astGetCardComm( AstFitsChan *this)
+
+*  Class Membership:
+*     FitsChan method.
+
+*  Description:
+*     This function returns the value of the CardComm attribute for the
+*     supplied FitsChan. This is the comment for the current card.
+
+*  Parameters:
+*     this
+*        Pointer to the FitsChan.
+
+*  Returned Value:
+*     A pointer to a static string holding the comment.
+
+*  Notes:
+*     - A value of NULL will be returned if an error has already
+*     occurred, or if this function should fail for any reason.
+*-
+*/
+
+/* Ensure the source function has been called */
+   ReadFromSource( this, status );
+
+/* Return the comment of the current card. */
+   return CardComm( this, status );
+}
+
+static const char *GetCardName( AstFitsChan *this, int *status ){
+/*
+*+
+*  Name:
+*     GetCardName
+
+*  Purpose:
+*     Get the value of the CardName attribute.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "fitschan.h"
+*     const char *astGetCardName( AstFitsChan *this)
+
+*  Class Membership:
+*     FitsChan method.
+
+*  Description:
+*     This function returns the value of the CardName attribute for the
+*     supplied FitsChan. This is the keyword name for the current card.
+
+*  Parameters:
+*     this
+*        Pointer to the FitsChan.
+
+*  Returned Value:
+*     A pointer to a static string holding the keyword name.
+
+*  Notes:
+*     - A value of NULL will be returned if an error has already
+*     occurred, or if this function should fail for any reason.
+*-
+*/
+
+/* Ensure the source function has been called */
+   ReadFromSource( this, status );
+
+/* Return the keyword name of the current card. */
+   return CardName( this, status );
 }
 
 static int GetCardType( AstFitsChan *this, int *status ){
@@ -17295,6 +17392,8 @@ void astInitFitsChanVtab_(  AstFitsChanVtab *vtab, const char *name, int *status
    vtab->SetWarnings = SetWarnings;
    vtab->GetWarnings = GetWarnings;
    vtab->GetCardType = GetCardType;
+   vtab->GetCardName = GetCardName;
+   vtab->GetCardComm = GetCardComm;
    vtab->GetNcard = GetNcard;
    vtab->GetNkey = GetNkey;
    vtab->GetAllWarnings = GetAllWarnings;
@@ -25487,6 +25586,8 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
    if a read-only attribute has been specified. */
    } else if ( MATCH( "ncard" ) ||
                MATCH( "cardtype" ) ||
+               MATCH( "cardcomm" ) ||
+               MATCH( "cardname" ) ||
                MATCH( "nkey" ) ||
                MATCH( "allwarnings" ) ){
       astError( AST__NOWRT, "astSet: The setting \"%s\" is invalid for a %s.", status,
@@ -31353,6 +31454,8 @@ static int TestAttrib( AstObject *this_object, const char *attrib, int *status )
    } else if ( !strcmp( attrib, "ncard" ) ||
                !strcmp( attrib, "nkey" ) ||
                !strcmp( attrib, "cardtype" ) ||
+               !strcmp( attrib, "cardcomm" ) ||
+               !strcmp( attrib, "cardname" ) ||
                !strcmp( attrib, "allwarnings" ) ){
       result = 0;
 
@@ -39729,6 +39832,59 @@ astMAKE_GET(FitsChan,FitsDigits,int,DBL_DIG,this->fitsdigits)
 astMAKE_SET(FitsChan,FitsDigits,int,fitsdigits,value)
 astMAKE_TEST(FitsChan,FitsDigits,( this->fitsdigits != DBL_DIG ))
 
+/* CardComm */
+/* ======== */
+
+/*
+*att++
+*  Name:
+*     CardComm
+
+*  Purpose:
+*     The comment for the current card in a FitsChan.
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     String, read-only.
+
+*  Description:
+*     This attribute gives the comment for the current card of the FitsChan.
+
+*  Applicability:
+*     FitsChan
+*        All FitsChans have this attribute.
+*att--
+*/
+
+/* CardName */
+/* ======== */
+
+/*
+*att++
+*  Name:
+*     CardName
+
+*  Purpose:
+*     The keyword name of the current card in a FitsChan.
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     String, read-only.
+
+*  Description:
+*     This attribute gives the name of the keyword for the
+*     current card of the FitsChan.
+
+*  Applicability:
+*     FitsChan
+*        All FitsChans have this attribute.
+*att--
+*/
+
 /* CardType */
 /* ======== */
 
@@ -41619,6 +41775,16 @@ int astGetNcard_( AstFitsChan *this, int *status ){
 int astGetCardType_( AstFitsChan *this, int *status ){
    if( !this ) return AST__NOTYPE;
    return (**astMEMBER(this,FitsChan,GetCardType))( this, status );
+}
+
+const char *astGetCardComm_( AstFitsChan *this, int *status ){
+   if( !this ) return NULL;
+   return (**astMEMBER(this,FitsChan,GetCardComm))( this, status );
+}
+
+const char *astGetCardName_( AstFitsChan *this, int *status ){
+   if( !this ) return NULL;
+   return (**astMEMBER(this,FitsChan,GetCardName))( this, status );
 }
 
 int astGetNkey_( AstFitsChan *this, int *status ){
