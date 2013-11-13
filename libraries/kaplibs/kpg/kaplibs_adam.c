@@ -690,3 +690,26 @@ void kpg1Gtobj( const char *param, const char *class, void (*isa)( void ),
    return;
 }
 
+F77_SUBROUTINE(fts1_scadc)( INTEGER(IPROV),
+                            CHARACTER(PARAM),
+                            INTEGER(STATUS)
+                            TRAIL(PARAM) );
+
+void fts1Scadc( NdgProvenance *prov, const char *param, int *status ){
+   DECLARE_INTEGER(IPROV);
+   DECLARE_CHARACTER_DYN(PARAM);
+   DECLARE_INTEGER(STATUS);
+
+   F77_EXPORT_INTEGER( astP2I( prov ), IPROV );
+   F77_CREATE_EXPORT_CHARACTER( param, PARAM );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_LOCK( F77_CALL(fts1_scadc)( INTEGER_ARG(&IPROV),
+                                   CHARACTER_ARG(PARAM),
+                                   INTEGER_ARG(&STATUS)
+                                   TRAIL_ARG(PARAM) ); )
+
+   F77_FREE_CHARACTER( PARAM );
+   F77_IMPORT_INTEGER( STATUS, *status );
+}
+
