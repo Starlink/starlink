@@ -1091,6 +1091,9 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 *        being used when it was not very accurate.
 *     12-NOV-2013 (DSB):
 *        Added CardName and CardComm attributes.
+*     13-NOV-2013 (DSB):
+*        Use a zero-length string for the CardComm attribute if the card
+*        has no comment.
 *class--
 */
 
@@ -3823,7 +3826,6 @@ static char *CardComm( AstFitsChan *this, int *status ){
 
 *  Synopsis:
 *     #include "fitschan.h"
-
 *     char *CardComm( AstFitsChan *this, int *status )
 
 *  Class Membership:
@@ -16048,7 +16050,8 @@ static const char *GetCardComm( AstFitsChan *this, int *status ){
 *        Pointer to the FitsChan.
 
 *  Returned Value:
-*     A pointer to a static string holding the comment.
+*     A pointer to a static string holding the comment. A zero-length
+*     string is returned if the card has no comment.
 
 *  Notes:
 *     - A value of NULL will be returned if an error has already
@@ -16056,11 +16059,23 @@ static const char *GetCardComm( AstFitsChan *this, int *status ){
 *-
 */
 
+/* Local Variables */
+   const char *result = NULL;
+
+/* Check inherited status */
+   if( !astOK ) return result;
+
 /* Ensure the source function has been called */
    ReadFromSource( this, status );
 
-/* Return the comment of the current card. */
-   return CardComm( this, status );
+/* Get the comment for the current card. */
+   result = CardComm( this, status );
+
+/* Return a zero-length string if the card has no comment. */
+   if( astOK && !result ) result = "";
+
+/* Return the comment. */
+   return result;
 }
 
 static const char *GetCardName( AstFitsChan *this, int *status ){
@@ -39850,7 +39865,8 @@ astMAKE_TEST(FitsChan,FitsDigits,( this->fitsdigits != DBL_DIG ))
 *     String, read-only.
 
 *  Description:
-*     This attribute gives the comment for the current card of the FitsChan.
+*     This attribute gives the comment for the current card of the
+*     FitsChan. A zero-length string is returned if the card has no comment.
 
 *  Applicability:
 *     FitsChan
