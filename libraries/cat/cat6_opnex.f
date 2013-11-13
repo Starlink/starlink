@@ -217,7 +217,7 @@
 *                containing the number of rows etc.
 
                   CIDS__CAT1(CIELM) = CI
-                  BKTYP__CAT1(CIELM) = CAT1__BKTST
+                  BKTYP__CAT1(CIELM) = CAT__BKTST
                   EROW__CAT1(CIELM) = ROWS
                   NROW__CAT1(CIELM) = ROWS
                   NPCOL__CAT1(CIELM) = NUMCOL

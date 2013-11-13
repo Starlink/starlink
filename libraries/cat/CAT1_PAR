@@ -14,6 +14,7 @@
 *     to applications calling the CAT routines.
 *  Authors:
 *     ACD: A C Davenhall (Leicester)
+*     DSB: David S Berry (JAC, HAwaii)
 *  History:
 *     13/5/93 (ACD): Original version.
 *     15/7/93 (ACD): First stable version.
@@ -45,6 +46,8 @@
 *     8/10/99 (ACD): Added CAT1__MXACL.
 *     11/9/00 (ACD): Increased the value of CAT1__SZDRC from 500 to 1000.
 *     13/9/00 (ACD): Increased the value of CAT1__SZDRC from 1000 to 1500.
+*     13/11/2013 (DSB): Move back-end types from here to CAT_PAR since
+*        the back-end type of a catalogue is now a public attribute.
 *-
 
 *
@@ -101,24 +104,6 @@
 
       INTEGER CAT1__MDWRT   ! Mode = 'WRITE'
       PARAMETER (CAT1__MDWRT = 4)
-
-*
-*    Codes to identify the various backends.
-
-      INTEGER CAT1__BKADC   ! ADC / SCAR (binary only).
-      PARAMETER (CAT1__BKADC = 1)
-
-      INTEGER CAT1__BKFIT   ! FITS.
-      PARAMETER (CAT1__BKFIT = 2)
-
-      INTEGER CAT1__BKCHI   ! CHI.
-      PARAMETER (CAT1__BKCHI = 3)
-
-      INTEGER CAT1__BKSTL   ! Small Text List (STL).
-      PARAMETER (CAT1__BKSTL = 4)
-
-      INTEGER CAT1__BKTST   ! Tab-separated table (TST).
-      PARAMETER (CAT1__BKTST = 5)
 
 *
 *    Pi.  This constant is used for Pi throughout CAT.

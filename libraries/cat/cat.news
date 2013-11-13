@@ -1,5 +1,10 @@
 1 CAT_library
 
+  Version 8.3
+
+  o Cataloguues now have attributes PATH and BACK, holding the full path
+    to the catalogue file and the back-end type.
+
   Version 8.1-4
 
   o No longer writes 'D' format floating point values to TST catalogues.

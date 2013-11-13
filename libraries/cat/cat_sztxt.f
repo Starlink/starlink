@@ -116,31 +116,31 @@
 *             for some back-ends the mode will vary depending on
 *             whether the access is 'READ' or 'WRITE'.
 
-               IF (BCKTYP .EQ. CAT1__BKADC) THEN
+               IF (BCKTYP .EQ. CAT__BKADC) THEN
                   IF (ACCESS .EQ. 'READ') THEN
                      LINESZ = 132
                   ELSE
                      LINESZ = 1
                   END IF
 
-               ELSE IF (BCKTYP .EQ. CAT1__BKFIT) THEN
+               ELSE IF (BCKTYP .EQ. CAT__BKFIT) THEN
                   IF (ACCESS .EQ. 'READ') THEN
                      LINESZ = 80
                   ELSE
                      LINESZ = 72
                   END IF
 
-               ELSE IF (BCKTYP .EQ. CAT1__BKCHI) THEN
+               ELSE IF (BCKTYP .EQ. CAT__BKCHI) THEN
                   LINESZ = 1
 
-               ELSE IF (BCKTYP .EQ. CAT1__BKSTL) THEN
+               ELSE IF (BCKTYP .EQ. CAT__BKSTL) THEN
                   IF (ACCESS .EQ. 'READ') THEN
                      LINESZ = CAT1__SZDRC
                   ELSE
                      LINESZ = 78
                   END IF
 
-               ELSE IF (BCKTYP .EQ. CAT1__BKTST) THEN
+               ELSE IF (BCKTYP .EQ. CAT__BKTST) THEN
                   LINESZ = 80
 
                ELSE

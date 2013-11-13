@@ -317,20 +317,20 @@
 *                type.  If the conversion fails then set the status.
 
                   IF (CATYPU .EQ. 'DAT') THEN
-                     BCKTYP = CAT1__BKADC
+                     BCKTYP = CAT__BKADC
 
                   ELSE IF (CATYPU .EQ. 'FIT'  .OR.  CATYPU .EQ. 'FITS'
      :              .OR.  CATYPU .EQ. 'GSC') THEN
-                     BCKTYP = CAT1__BKFIT
+                     BCKTYP = CAT__BKFIT
 
                   ELSE IF (CATYPU .EQ. 'SDF') THEN
-                     BCKTYP = CAT1__BKCHI
+                     BCKTYP = CAT__BKCHI
 
                   ELSE IF (CATYPU .EQ. 'TXT') THEN
-                     BCKTYP = CAT1__BKSTL
+                     BCKTYP = CAT__BKSTL
 
                   ELSE IF (CATYPU .EQ. 'TAB') THEN
-                     BCKTYP = CAT1__BKTST
+                     BCKTYP = CAT__BKTST
 
                   ELSE
                      STATUS = CAT__INVBK
@@ -344,7 +344,7 @@
 
             ELSE
                CATTYP = 'FIT'
-               BCKTYP = CAT1__BKFIT
+               BCKTYP = CAT__BKFIT
 
             END IF
 

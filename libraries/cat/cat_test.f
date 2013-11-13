@@ -45,9 +45,11 @@
 
 *  Authors:
 *     ACD: A C Davenhall (Edinburgh)
+*     DSB: David S Berry (JAC, Hawaii)
 *  History:
 *     25/11/98 (ACD): Original version (from EXAMPLE_WRITE).
 *     28/11/98 (ACD): First stable version.
+*     13/11/2013 (DSB): Added test of new catalogue attributes PATH and BACK.
 *  Bugs:
 *     None known.
 *-
@@ -55,6 +57,7 @@
       IMPLICIT NONE
 *  Global Constants:
       INCLUDE 'CAT_PAR'
+      INCLUDE 'CAT_ERR'
 *  Status:
       INTEGER STATUS             ! Local running status.
 *  Local Variables:
@@ -72,7 +75,8 @@
       REAL
      :  VALR      ! Real value.
       CHARACTER
-     :  VALC*10   ! Character value.
+     :  VALC*10,  ! Character value.
+     :  PATH*255  ! File path
       LOGICAL
      :  NULI,     ! Null flag corresponding to VALI.
      :  NULR,     !  "    "         "       "  VALR.
@@ -88,6 +92,25 @@
 *       Create the new catalogue.
 
          CALL CAT_TOPEN ('testcat.TXT', 'NEW', 'WRITE', CI, STATUS)
+
+*
+*  Check its path and type attributes.
+         CALL CAT_TIQAC (CI, 'PATH', PATH, STATUS)
+         IF( PATH .NE. 'testcat.TXT' .AND. STATUS .EQ. CAT__OK ) THEN
+            STATUS = CAT__ERROR
+            CALL MSG_SETC( 'P', PATH )
+            CALL ERR_REP( ' ', 'Incorrect PATH (^P) - should be '//
+     :                    '"testcat.TXT".', STATUS )
+         END IF
+
+         CALL CAT_TIQAI (CI, 'BACK', VALI, STATUS)
+         IF( VALI .NE. CAT__BKSTL .AND. STATUS .EQ. CAT__OK ) THEN
+            STATUS = CAT__ERROR
+            CALL MSG_SETI( 'T', VALI )
+            CALL MSG_SETI( 'S', CAT__BKSTL )
+            CALL ERR_REP( ' ', 'Incorrect back-end type (^T) - should'//
+     :                    ' be ^S.', STATUS )
+         END IF
 
 *
 *       Create some columns.

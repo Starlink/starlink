@@ -308,7 +308,7 @@ C    :              1x, 'rows, ttrows, skip: ', i5, i5, i5 )
 *                   containing the number of rows etc.
 
                      CIDS__CAT1(CIELM) = CI
-                     BKTYP__CAT1(CIELM) = CAT1__BKSTL
+                     BKTYP__CAT1(CIELM) = CAT__BKSTL
                      EROW__CAT1(CIELM) = ROWS
                      NROW__CAT1(CIELM) = ROWS
                      NPCOL__CAT1(CIELM) = DCOLS__CAT1

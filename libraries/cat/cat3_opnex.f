@@ -543,7 +543,7 @@ C    :                    i3, a15, i4, i4)
 *                of rows etc.
 
                   CIDS__CAT1(CIELM) = CI
-                  BKTYP__CAT1(CIELM) = CAT1__BKFIT
+                  BKTYP__CAT1(CIELM) = CAT__BKFIT
                   NROW__CAT1(CIELM) = ROWS
                   NPCOL__CAT1(CIELM) = PCOLS
                   NVCOL__CAT1(CIELM) = 0

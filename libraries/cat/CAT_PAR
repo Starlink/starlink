@@ -34,6 +34,7 @@
 
 *  Authors:
 *     ACD: A C Davenhall (Leicester)
+*     DSB: David S Berry (JAC, HAwaii)
 *  History:
 *     13/5/93 (ACD): Original version.
 *     8/2/94  (ACD): First stable version.
@@ -58,6 +59,8 @@
 *        complicated table format specifiers for angles.
 *     8/10/99 (ACD): CAT__SZTXL and CAT__ASTSG.
 *     1/11/99 (ACD): changed the value of CAT__ASTSG.
+*     13/11/2013 (DSB): Move back-end types from CAT1_PAR to here since
+*        the back-end type of a catalogue is now a public attribute.
 *-
 
 *    Success status.
@@ -252,6 +255,24 @@
 
       INTEGER CAT__TYPEK   ! 64-bit Integer.
       PARAMETER (CAT__TYPEK = 10)
+
+*
+*    Codes to identify the various backends.
+
+      INTEGER CAT__BKADC   ! ADC / SCAR (binary only).
+      PARAMETER (CAT__BKADC = 1)
+
+      INTEGER CAT__BKFIT   ! FITS.
+      PARAMETER (CAT__BKFIT = 2)
+
+      INTEGER CAT__BKCHI   ! CHI.
+      PARAMETER (CAT__BKCHI = 3)
+
+      INTEGER CAT__BKSTL   ! Small Text List (STL).
+      PARAMETER (CAT__BKSTL = 4)
+
+      INTEGER CAT__BKTST   ! Tab-separated table (TST).
+      PARAMETER (CAT__BKTST = 5)
 
 *
 *    Flag to indicate that a row is not paired or joined; it is used

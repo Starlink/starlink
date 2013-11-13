@@ -118,7 +118,7 @@
       CALL CAT1_CIELM( CI, SLOT, STATUS )
 
 *  First deal with the special case of FITS format.
-      IF( BKTYP__CAT1( SLOT ) .EQ. CAT1__BKFIT ) THEN
+      IF( BKTYP__CAT1( SLOT ) .EQ. CAT__BKFIT ) THEN
 
 *  Get the Fortran IO unit attached to the FITS file.
          FUNIT = FUNT__CAT3( SLOT )

@@ -48,7 +48,7 @@
 
 \newcommand{\stardocnumber}    {181.10}
 \newcommand{\stardocauthors}   {A.C.~Davenhall}
-\newcommand{\stardocdate}      {4th April 2001}
+\newcommand{\stardocdate}      {11th November 2013}
 \newcommand{\stardoctitle}     {CAT \\ [\latex{1ex}]
                               Catalogue and Table Manipulation Library}
 \newcommand{\stardocversion}   {Version \CATversion}
@@ -2308,10 +2308,10 @@ simplicity omitted to mention mutable attributes.}.
 In addition to its collection of column and parameter
 % and index
 components,
-all with their individual attributes, a catalogue also has two
+all with their individual attributes, a catalogue also has several
 attributes which apply directly to the entire catalogue, rather than to
 an individual component (see Figure~\ref{CHIER} in Section~\ref{CCA}).
-These attributes are its name and its modification date.
+These attributes are described below.
 
 \paragraph{NAME}
 (data type: \_CHAR, size = {\tt CAT\_\_SZCNM}) The name of the
@@ -2341,6 +2341,22 @@ not used. It is set to 0.0D0 when the column is created.
 % is created automatically when the catalogue is created and is fixed
 % thereafter.
 
+\paragraph{BACK}
+(data type: \_INTEGER)
+The back-end type of the catalogue. It will be one of the CAT\_\_BKFIT,
+CAT\_\_BKSTL or CAT\_\_BKTST. These symbolic constants are defined in
+include file CAT\_PAR.
+
+In version \CATversion of CAT the modification date is present, but
+not used. It is set to 0.0D0 when the column is created.
+% The creation date of the catalogue. It
+% is created automatically when the catalogue is created and is fixed
+% thereafter.
+
+\paragraph{PATH}
+(data type: \_CHAR, size = {\tt CAT\_\_SZCNF}) The full path of the
+catalogue file. It is specified when the catalogue is created and is
+mandatory and immutable.
 
 \subsection{\label{COLS}Columns}
 

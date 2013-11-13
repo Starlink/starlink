@@ -127,7 +127,7 @@
 *          including setting the number of rows to zero.
 
             CIDS__CAT1(CIELM) = CI
-            BKTYP__CAT1(CIELM) = CAT1__BKSTL
+            BKTYP__CAT1(CIELM) = CAT__BKSTL
             EROW__CAT1(CIELM) = 0
             NROW__CAT1(CIELM) = 0
             NPCOL__CAT1(CIELM) = 0
