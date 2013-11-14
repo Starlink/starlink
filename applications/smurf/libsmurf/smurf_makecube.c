@@ -2107,15 +2107,17 @@ void smurf_makecube( int *status ) {
 
 /* Delete (and if required remove the name from the group of output NDF
    names) or annul the NDF as required. */
-         if( delete ) {
-            ndfDelet( &tndf, status );
-            if( delete > 0 ) {
-               Grp *tgrp = grpRemov( igrp4, basename, status );
-               grpDelet( &igrp4, status);
-               igrp4 = tgrp;
+         if( tndf != NDF__NOID ) {
+            if( delete ) {
+               ndfDelet( &tndf, status );
+               if( delete > 0 ) {
+                  Grp *tgrp = grpRemov( igrp4, basename, status );
+                  grpDelet( &igrp4, status);
+                  igrp4 = tgrp;
+               }
+            } else {
+               ndfAnnul( &tndf, status );
             }
-         } else {
-            ndfAnnul( &tndf, status );
          }
 
 /* Free other resources related to the current tile. */
