@@ -1,0 +1,69 @@
+*+
+*  Name:
+*     CVG_PAR
+
+*  Purpose:
+*     Define public global constants for the CVG_ system.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     Global constants include file.
+
+*  Description:
+*     This file contains definitions of global constants which are used
+*     by the CVG_ system and which may also be needed by software which
+*     calls routines from this system.
+
+*  Copyright:
+*     Copyright (C) 2013 Science & Technology Facilities Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
+*     02110-1301, USA
+
+*  Authors:
+*     DSB: D.S. Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     14-NOV-2013 (DSB):
+*        Original version
+*     {enter_further_changes_here}
+
+*-
+
+*  Global Constants:
+
+
+*  An illegal Fortran logical unit number.
+      INTEGER CVG__NOLUN
+      PARAMETER ( CVG__NOLUN = -999 )
+
+*  Maximum length of a file path.
+      INTEGER CVG__MXPTH
+      PARAMETER ( CVG__MXPTH = 255 )
+
+*  FITSIO success status value
+      INTEGER CVG__FITSOK
+      PARAMETER ( CVG__FITSOK = 0 )
+
+
+*  Length of a FITS header card
+      INTEGER CVG__HEDLEN
+      PARAMETER ( CVG__HEDLEN = 80 )
+

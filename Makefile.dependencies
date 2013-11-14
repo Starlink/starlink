@@ -566,6 +566,31 @@ $(MANIFESTS)/cursa: \
 	cd applications/cursa \
 	  && $(MAKE_CPT)
 
+$(MANIFESTS)/cvg: \
+		$(MANIFESTS)/ary \
+		$(MANIFESTS)/ast \
+		$(MANIFESTS)/chr \
+		$(MANIFESTS)/cnf \
+		$(MANIFESTS)/ems \
+		$(MANIFESTS)/fio \
+		$(MANIFESTS)/generic \
+		$(MANIFESTS)/grp \
+		$(MANIFESTS)/hds \
+		$(MANIFESTS)/hlp \
+		$(MANIFESTS)/mers \
+		$(MANIFESTS)/ndf \
+		$(MANIFESTS)/ndg \
+		$(MANIFESTS)/par \
+		$(MANIFESTS)/pcs \
+		$(MANIFESTS)/prm \
+		$(MANIFESTS)/psx \
+		$(MANIFESTS)/sae \
+		$(MANIFESTS)/star2html \
+		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil
+	cd libraries/cvg \
+	  && $(MAKE_CPT)
+
 $(MANIFESTS)/daophot: \
 		$(MANIFESTS)/agi \
 		$(MANIFESTS)/ary \
@@ -3111,6 +3136,7 @@ SUPPORTED_COMPONENTS = \
 	$(MANIFESTS)/convert \
 	$(MANIFESTS)/cupid \
 	$(MANIFESTS)/cursa \
+	$(MANIFESTS)/cvg \
 	$(MANIFESTS)/datacube \
 	$(MANIFESTS)/dipso \
 	$(MANIFESTS)/docfind \

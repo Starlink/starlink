@@ -265,6 +265,7 @@ SUN                            STARLINK USER NOTES                           SUN
 265.01  2011-01-20 AGG   ??   PICARD - analyze and combine reduced data
 266.01  2011-09-14 DSB   ??   THR - A Thread Management Library
 267.01  2012-03-23 TJ    ??   PAL - Positional Astronomy Library
+268.01  2013-11-14 DSB   ??   CVG - A Library of Format Conversion Utility Routines
 
 AUTHORS                          AUTHORS                                AUTHORS
                                      (Site code)

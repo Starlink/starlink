@@ -1,0 +1,7 @@
+1 CVG_library
+
+The CVG library contains functions related to the conversion of data
+formats. These functions were originally part of the CONVERT package but
+were moved into a new library so that they can be used by other
+applications.
+

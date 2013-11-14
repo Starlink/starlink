@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@" support="S">
+  <version>@PACKAGE_VERSION@</version>
+  <path>libraries/cvg</path>
+  <description>CVG - A Library of Format Conversion Utility Routines</description>
+  <abstract><p>CVG is a library of functions that were originally written
+  as part of the CONVERT package (a data format conversion package). CVG
+  provides software developers with access to many of the internal
+  CONVERT routines, so that applications that use data-conversion can be
+  written and built independently of CONVERT.</p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>David Berry</name>
+      <uname>dsb</uname>
+      <email>dberry@jach,hawaii.edu</email>
+    </person>
+    <person>
+      <name>Malcolm Currie</name>
+      <uname>mjc</uname>
+      <email>m.currie@jach.hawaii.edu</email>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <copyright>
+    <year>2013</year>
+    <name>Science &amp; Technology Facilities Council</name>
+  </copyright>
+  <!-- <notes><p></p></notes> -->
+</component>

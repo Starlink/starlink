@@ -31,6 +31,7 @@ ALL_TARGETS = \
 	$(MANIFESTS)/coco \
 	$(MANIFESTS)/convert \
 	$(MANIFESTS)/cupid \
+	$(MANIFESTS)/cvg \
 	$(MANIFESTS)/datacube \
 	$(MANIFESTS)/daophot \
 	$(MANIFESTS)/dipso \

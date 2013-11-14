@@ -1,0 +1,27 @@
+#!/bin/csh
+
+rm -f cvg_routines.tex cvg_routines_sorted.tex sun268.tex
+touch cvg_routines.tex
+
+foreach n (cvg_*.f)
+   if( $n != "cvg_test.f" ) then
+      $STARCONF_DEFAULT_STARLINK/bin/sst/prolat $n out=head \
+                               noatask nodocument single nopage
+      cat head >> cvg_routines.tex
+      rm head
+   endif
+end
+
+foreach n (cvg*.c)
+   if( $n != "cvg_test.c" && $n != "cvg.c" && $n != "cvg_adam.c"  ) then
+      $STARCONF_DEFAULT_STARLINK/bin/sst/prolat $n out=head \
+                               noatask nodocument nosingle nopage
+      cat head >> cvg_routines.tex
+      rm head
+   endif
+end
+
+./sort-routines.pl
+
+cat sun_head.tex cvg_routines_sorted.tex sun_tail.tex > sun268.tex
+
