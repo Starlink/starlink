@@ -74,6 +74,7 @@
 
 #  Copyright:
 #     Copyright (C) 2007 Particle Physics & Astronomy Research Council.
+#     Copyright (C) 2013 Science and Technology Facilities Council.
 #     All Rights Reserved.
 
 #  Licence:
@@ -94,11 +95,17 @@
 
 #  Authors:
 #     David S. Berry (DSB):
+#     Malcolm J. Currie (MJC):
 #     {enter_new_authors_here}
 
 #  History:
 #     31-JAN-2007 (DSB):
 #        Original version (based on $KAPPA_DIR/fitsedit.csh).
+#     2013 November 14 (MJC):
+#        Restructure obtaining the parameters to permit more
+#        parameter-system-like responses and validation of both prompted
+#        and command-line values.  Determine the maximum index value
+#        and use to constrain Parameter INDEX.
 #     {enter_further_changes_here}
 #
 #-
@@ -110,13 +117,20 @@
 set style = ""
 set narg = $#argv
 
-if ( $narg == 0 ) then
+#   Obtain the NDF name
+#   ===================
 #
 #   Set the logical that says whether or not a valid value has been
 #   supplied.
 #
-   set ok = 0
-   while ( $ok == 0 )
+set ok = 0
+set repeat = 0
+while ( $ok == 0 )
+#
+#   Prompt if the NDF name was not supplied on the command line.
+#
+   if ( $narg == 0 || $repeat ) then
+#
 #
 #   Ensure that the following invocation of parget will return a non-zero
 #   status value if anything goes wrong.
@@ -185,127 +199,229 @@ if ( $narg == 0 ) then
 #   Remove any shell meta-characters
 #
          eval set ndf = "$ndf"
+      endif
+#
+#   If one or more arguments were supplied, assume the first is the
+#   NDF name.
+#
+   else
+      set ndf = $1
+      set ok = 1
+#
+#   Remove the parameter name from the start of the parameter value
+#   (if present).
+#
+      set ndf = `echo $ndf | sed -e 's/^ndf=//'`
+   endif
+
+#   Validate the NDF name
+#   =====================
+#
+#   NDFs with numerical or boolean names might be indicated by an @
+#   prefix.  This must be stripped first.
+#
+   set ndf = `echo $ndf | echo $ndf | sed 's/\(^@\)//'`
 #
 #   Check that the supplied NDF exists.  If there is a specific
 #   extension, test that the file exists.
 #
-         if ( $ndf:e != "" ) then
-            if (! -e $ndf ) then
-               sh -c "echo 'Data file "$ndf" does not exist.' 1>&2"
-               set ok = 0
-            endif
-         else
+   if ( $ndf:e != "" ) then
+      if ( ! -e $ndf ) then
+         sh -c "echo 'Data file "$ndf" does not exist.' 1>&2"
+         set ok = 0
+      endif
+   else
 #
 #   The filename does not have a file extension.  Thus it is either an
 #   NDF or a foreign format defined by the NDF_FORMATS_IN environment
 #   variable.  First test for an NDF.
 #
-            set file = $ndf".sdf"
-            if ( ! -e $file ) then
+      set file = $ndf".sdf"
+      if ( ! -e $file ) then
 #
 #   The file might be in a foreign format.  Obtain the number and a list
 #   of the valid file extensions in search-order from NDF_FORMATS_IN.
 #   The first value gives the number of formats, so if this is 0,
 #   NDF_FORMATS_IN is undefined.
 #
-               set formats = `printenv | grep NDF_FORMATS_IN | awk -f $KAPPA_DIR/nfi.awk`
-               if ( $formats == "" ) then
-                  sh -c "echo 'NDF "$ndf" does not exist.' 1>&2"
-                  set ok = 0
-               else if ( $formats[1] == 0 ) then
-                  sh -c "echo 'NDF "$ndf" does not exist.' 1>&2"
-                  set ok = 0
-               else
-                  set noformats = $formats[1]
-                  shift formats
+         set formats = `printenv | grep NDF_FORMATS_IN | awk -f $KAPPA_DIR/nfi.awk`
+         if ( $formats == "" ) then
+            sh -c "echo 'NDF "$ndf" does not exist.' 1>&2"
+            set ok = 0
+         else if ( $formats[1] == 0 ) then
+            sh -c "echo 'NDF "$ndf" does not exist.' 1>&2"
+            set ok = 0
+         else
+            set noformats = $formats[1]
+            shift formats
 #
 #   Test for the existence of each format in the list, until a match
 #   is found.  Set the flag to indicate failure to find a file, until one
 #   is found.
 #
-                  set ok = 0
-                  set iform = 1
-                  while ( $iform <= $noformats )
-                     set file = $ndf$formats[$iform]
-                     if ( ! -e $file ) then
-                        @ iform = $iform + 1
+            set ok = 0
+            set iform = 1
+            while ( $iform <= $noformats )
+               set file = $ndf$formats[$iform]
+               if ( ! -e $file ) then
+                  @ iform = $iform + 1
 
-                     else
-                        set ok = 1
-                        @ iform = $noformats + 1
-                     endif
-                  end
+               else
+                  set ok = 1
+                  @ iform = $noformats + 1
+               endif
+            end
 #
 #   Report the case where no foreign file could be found.
 #
-                  if ( $ok == 0 ) then
-                     sh -c "echo 'Data file "$ndf" does not exist.' 1>&2"
-                  endif
+            if ( $ok == 0 ) then
+               sh -c "echo 'Data file "$ndf" does not exist.' 1>&2"
                endif
             endif
          endif
       endif
-      unset noglob
-   end
-#
-#  Get the clump index
-#
-   echo -n "INDEX - The index of the clump to be outlined > "
-   set index = $<
-#
-#  If one argument was supplied, assume it is the NDF name. Store it and
-#  prompt for the clump index.
-#
-else if ( $narg == 1 ) then
-   set ndf = $1
-   echo -n "INDEX - The index of the clump to be outlined > "
-   set index = $<
-   if ( "$index" == \!\! || "$index" == \! ) then
-      exit
    endif
+   unset noglob
 #
-#  If both arguments were supplied, store them.
+#  Ensure that the filename will be treated as such.
 #
-else if( $narg == 2 ) then
-   set ndf = $1
-   set index = $2
-#
-#  If a plotting style was also supplied, store it.
-#
-else if( $narg == 3 ) then
-   set ndf = $1
-   set index = $2
-   set style = "$3"
-endif
-#
-#  Remove the parameter name from the start of the parameter value (if
-#  present).
-#
-set ndf = `echo $ndf | sed -e 's/^ndf=//'`
-set index = `echo $index | sed -e 's/^index=//'`
-set style = `echo $style | sed -e 's/^style=//'`
+   set ndf = "@$ndf"
 #
 #   See if the NDF has a CUPID extension.
 #
-$KAPPA_DIR/ndftrace $ndf quiet
-set gotext = 0
-if ( `$KAPPA_DIR/parget nextn ndftrace` > 0 ) then
-   foreach ext (`$KAPPA_DIR/parget extname ndftrace`)
-      if ( $ext == "CUPID" ) set gotext = 1
-   end
-endif
+   if ( $ok ) then
+      $KAPPA_DIR/ndftrace $ndf quiet
+      set gotext = 0
+      if ( `$KAPPA_DIR/parget nextn ndftrace` > 0 ) then
+         foreach ext ( `$KAPPA_DIR/parget extname ndftrace` )
+            if ( $ext == "CUPID" ) set gotext = 1
+         end
+      endif
 #
-#  Report an error if the NDF has no CUPID extension.
+#   Report an error if the NDF has no CUPID extension.
 #
-if ( $gotext != 1 ) then
-   echo "outlineclump: '$ndf' has no CUPID extension!"
-   echo "Please supply an NDF that has been created by the CUPID:FINDCLUMPS command."
-else
-   if( "$style" == "" ) then
-      $KAPPA_DIR/contour ndf="$ndf.more.cupid.clumps\($index\).model" labpos=\! mode=good clear=no
-   else
-      $KAPPA_DIR/contour ndf="$ndf.more.cupid.clumps\($index\).model" \
-                         labpos=\! mode=good clear=no style="$style"
+      if ( $gotext != 1 ) then
+         echo "outlineclump: '$ndf' has no CUPID extension!"
+         echo "Please supply an NDF that has been created by the CUPID:FINDCLUMPS command."
+      endif
+      set ok = $gotext
    endif
+#
+#   Prompt the second time around if a bad name was supplied on the
+#   command line.
+#
+   set repeat = 1
+end
+#
+#   Find the number of clump indices.  Surely there is a better way of
+#   obtaining this number than parsing output.  HDIR probably should
+#   write output parameters.
+#
+set maxindex = `$HDSTOOLS_DIR/hdir ${ndf}.more.cupid.clumps | grep dimensions | awk '{print substr($7,2,length($7)-2)}'`
+#
+#   Get the clump index
+#   ===================
+#
+#   Set the logical that says whether or not a valid value has been
+#   supplied.  If there is only one index, there's no need to ask the
+#   user.
+#
+if ( $maxindex == 1 ) then
+   set ok = 1
+   set index = 1
+else
+   set ok = 0
+   set repeat = 0
 endif
+
+while ( $ok == 0 )
+
+   if ( $narg < 2 || $repeat ) then
+#
+#   Assume that the value will be fine unless we discover otherwise
+#   later. Prompt for the blocking factor.
+#
+      set ok = 1
+      set noglob
+      sh -c "echo -n 'INDEX - The index of the clump to be outlined > ' 1>&2"
+      set index = $<
+#
+#   Write some help information, but continue in the loop.
+#
+      if ( $index == '?' ) then
+         sh -c "echo ' ' 1>&2"
+         sh -c "echo '   INDEX = _INTEGER (Read)' 1>&2"
+         sh -c "echo '      The index of the clump to be plotted.  It should be a positive integer not more than $maxindex.' 1>&2"
+         sh -c "echo ' ' 1>&2"
+         set ok = 0
+#
+#   Set it to a numerical value for validity test.
+#
+         set index = 1
+#
+#   Abort when requested.
+#
+      else if ( "$index" == \!\! ||  "$index" == \! ) then
+         exit
+      else
+         set ok = 1
+      endif
+#
+#   Use the command-line value.
+#
+   else if ( $narg > 1 ) then
+      set index = $2
+      set ok = 1
+#
+#   Remove the parameter name from the start of the parameter value
+#   (if present).
+#
+      set index = `echo $index | sed -e 's/^index=//'`
+   endif
+#
+#   Validate the index.
+#   ===================
+#
+#   Use a logical to expression to decide whether or not the value
+#   given is valid.
+#
+   if ( ! ( $index =~ [0-9]* && $index > 0 && $index <= $maxindex ) && $ok ) then
+      sh -c "echo 'The clump index must be a positive integer between 1 and $maxindex.' 1>&2"
+      set ok = 0
+   endif
+   unset noglob
+
+   set repeat = 1
+end
+#
+#   Obtain the plotting style
+#   =========================
+#
+if ( $narg == 3 ) then
+   set style = "$3"
+#
+#   Remove the parameter name from the start of the parameter value
+#   (if present).
+#
+   set style = `echo $style | sed -e 's/^style=//'`
+endif
+
+#
+#   Plot the clump outline
+#   ======================
+#
+if ( "$style" == "" ) then
+   $KAPPA_DIR/contour ndf="$ndf.more.cupid.clumps\($index\).model" \
+                      labpos=\! mode=good clear=no
+else
+   $KAPPA_DIR/contour ndf="$ndf.more.cupid.clumps\($index\).model" \
+                      labpos=\! mode=good clear=no style="$style"
+endif
+
+#
+#  At this point the current NDF is not what was supplied.
+#  Reset the GLOBAL association by doing a dummy operation.
+#
+$KAPPA_DIR/ndftrace ndf=$ndf > /dev/null
+
 exit
