@@ -423,7 +423,7 @@ void smf_jsasplit( int indf, const char *base, int trim,
 
 /* Add the name of this output NDF to the group holding the names of the
    output NDFs that have actually been created. */
-      grpPut1( grp, path, 0, status );
+      if( grp ) grpPut1( grp, path, 0, status );
 
 /* Add a JSATILE header to the output FITS extension. */
       kpgGtfts( indfo, &fc, status );
@@ -443,7 +443,7 @@ void smf_jsasplit( int indf, const char *base, int trim,
       ndgMoreg( indfo, &grpt, &size, status );
 
 /* Loop round each output extension NDF. */
-      for( iext = 1; iext <= size; iext++ ) {
+      for( iext = 1; iext <= size && *status == SAI__OK; iext++ ) {
          ndgNdfas( grpt, iext, "Update", &indfx, status );
 
 /* Get its bounds. */

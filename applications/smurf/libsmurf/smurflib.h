@@ -161,6 +161,7 @@ void smurf_fts2_transcorr( int * );
 void smurf_gsd2acsis( int * );
 void smurf_gsdshow( int * );
 void smurf_impaztec( int * );
+void smurf_jsasplit( int * );
 void smurf_makecube( int * );
 void smurf_makemap( int * );
 void smurf_rawfixmeta( int * );

@@ -36,6 +36,7 @@ smurf_fts2_transcorr.c \
 smurf_gsd2acsis.c \
 smurf_gsdshow.c \
 smurf_impaztec.c \
+smurf_jsasplit.c \
 smurf_makecube.c \
 smurf_makemap.c \
 smurf_rawpress.c \

@@ -354,6 +354,8 @@ void smurf_mon( int * status ) {
     smurf_gsdshow( status );
   } else if (strcmp( taskname, "IMPAZTEC" ) == 0 ) {
     smurf_impaztec( status );
+  } else if (strcmp( taskname, "JSASPLIT" ) == 0 ) {
+    smurf_jsasplit( status );
   } else if (strcmp( taskname, "MAKECUBE" ) == 0 ) {
     smurf_makecube( status );
   } else if (strcmp( taskname, "MAKEMAP" ) == 0 ) {

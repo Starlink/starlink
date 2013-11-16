@@ -53,6 +53,7 @@ fts2transcorr \
 gsd2acsis \
 gsdshow \
 impaztec \
+jsasplit \
 makecube \
 makemap \
 rawfixmeta \
