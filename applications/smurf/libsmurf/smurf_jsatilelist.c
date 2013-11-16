@@ -1,7 +1,7 @@
 /*
 *+
 *  Name:
-*     TILELIST
+*     JSATILELIST
 
 *  Purpose:
 *     List the sky tiles that overlap a given set of data files or an
@@ -14,7 +14,7 @@
 *     ADAM A-task
 
 *  Invocation:
-*     smurf_tilelist( int *status );
+*     smurf_jsatilelist( int *status );
 
 *  Arguments:
 *     status = int* (Given and Returned)
@@ -30,11 +30,11 @@
 *        Specifies the region of sky for which tiles should be listed. It
 *        may be:
 *
-*        - The name of a text file containing an AST Region. The Region 
+*        - The name of a text file containing an AST Region. The Region
 *        can be either 2D or 3D but must include celestial axes.
 *
 *        - The path to a 2- or 3-D NDF holding a reduced map or cube. This
-*        need not necessarily hold JCMT data, but must have celestial axes 
+*        need not necessarily hold JCMT data, but must have celestial axes
 *        in its current WCS Frame.
 *
 *        - A group of raw JCMT data files.
@@ -47,15 +47,15 @@
 *        "RxWD", "RxWB". If one or more NDFs are supplied for parameter
 *        IN, then a dynamic default is determined if possible from the
 *        first NDF. If this cannot be done, or if a Region is supplied
-*        for parameter IN, then no dynamic default is provided, and the 
-*        user is prompted for a value if none was supplied on the command 
+*        for parameter IN, then no dynamic default is provided, and the
+*        user is prompted for a value if none was supplied on the command
 *        line. []
 *     TILES(*) = _INTEGER (Write)
 *        An output parameter to which is written the list of integer tile
 *        indices.
 
 *  Tile Definitions:
-*     It should never be necessary to know the specific details of the tiling 
+*     It should never be necessary to know the specific details of the tiling
 *     scheme used by SMURF. But for reference, it works as follows:
 *
 *     The whole sky is covered by an HPX (HEALPix) projection containing
@@ -148,10 +148,10 @@
 
 
 F77_SUBROUTINE(ast_isaregion)( INTEGER(THIS), INTEGER(STATUS) );
-static int tilelist_icomp(const void *a, const void *b);
+static int jsatilelist_icomp(const void *a, const void *b);
 
 
-void smurf_tilelist( int *status ) {
+void smurf_jsatilelist( int *status ) {
 
 /* Local Variables */
    AstFitsChan *fc = NULL;
@@ -233,7 +233,7 @@ void smurf_tilelist( int *status ) {
 
 /* Sort the list of overlapping tiles into ascending order. */
    if( *status == SAI__OK ) {
-      qsort( tiles, ntile, sizeof( *tiles ), tilelist_icomp );
+      qsort( tiles, ntile, sizeof( *tiles ), jsatilelist_icomp );
 
 /* Display the list of overlapping tiles. */
       msgBlank( status );
@@ -259,9 +259,9 @@ void smurf_tilelist( int *status ) {
 /* Issue a status indication.*/
    msgBlank( status );
    if( *status == SAI__OK ) {
-      msgOutif( MSG__VERB, "", "TILELIST succeeded.", status);
+      msgOutif( MSG__VERB, "", "JSATILELIST succeeded.", status);
    } else {
-      msgOutif( MSG__VERB, "", "TILELIST failed.", status);
+      msgOutif( MSG__VERB, "", "JSATILELIST failed.", status);
    }
 }
 
@@ -270,8 +270,8 @@ void smurf_tilelist( int *status ) {
 
 
 
-/* Service function for "qsort", called in smurf_tilelist. It sorts
+/* Service function for "qsort", called in smurf_jsatilelist. It sorts
    integers into increasing order. */
-static int tilelist_icomp(const void *a, const void *b){
+static int jsatilelist_icomp(const void *a, const void *b){
    return *((const int *) a) - *((const int *) b);
 }

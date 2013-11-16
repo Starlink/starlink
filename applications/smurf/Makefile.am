@@ -53,6 +53,8 @@ fts2transcorr \
 gsd2acsis \
 gsdshow \
 impaztec \
+jsatileinfo \
+jsatilelist \
 jsasplit \
 makecube \
 makemap \
@@ -76,8 +78,6 @@ smurfcopy \
 smurfhelp \
 stackframes \
 starecalc \
-tileinfo \
-tilelist \
 timesort \
 unmakecube \
 unmakemap

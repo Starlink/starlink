@@ -356,6 +356,10 @@ void smurf_mon( int * status ) {
     smurf_impaztec( status );
   } else if (strcmp( taskname, "JSASPLIT" ) == 0 ) {
     smurf_jsasplit( status );
+  } else if (strcmp( taskname, "JSATILEINFO" ) == 0 ) {
+    smurf_jsatileinfo( status );
+  } else if (strcmp( taskname, "JSATILELIST" ) == 0 ) {
+    smurf_jsatilelist( status );
   } else if (strcmp( taskname, "MAKECUBE" ) == 0 ) {
     smurf_makecube( status );
   } else if (strcmp( taskname, "MAKEMAP" ) == 0 ) {
@@ -400,10 +404,6 @@ void smurf_mon( int * status ) {
     smurf_stackframes( status );
   } else if (strcmp( taskname, "STARECALC" ) == 0 ) {
     smurf_starecalc( status );
-  } else if (strcmp( taskname, "TILEINFO" ) == 0 ) {
-    smurf_tileinfo( status );
-  } else if (strcmp( taskname, "TILELIST" ) == 0 ) {
-    smurf_tilelist( status );
   } else if (strcmp( taskname, "TIMESORT" ) == 0 ) {
     smurf_timesort( status );
   } else if (strcmp( taskname, "UNMAKECUBE" ) == 0 ) {

@@ -1,7 +1,7 @@
 /*
 *+
 *  Name:
-*     TILEINFO
+*     JSATILEINFO
 
 *  Purpose:
 *     Return information about a specified sky tile.
@@ -13,7 +13,7 @@
 *     ADAM A-task
 
 *  Invocation:
-*     smurf_tileinfo( int *status );
+*     smurf_jsatileinfo( int *status );
 
 *  Arguments:
 *     status = int* (Given and Returned)
@@ -205,7 +205,7 @@
 F77_SUBROUTINE(ast_isaregion)( INTEGER(THIS), INTEGER(STATUS) );
 
 
-void smurf_tileinfo( int *status ) {
+void smurf_jsatileinfo( int *status ) {
 
 /* Local Variables */
    AstRegion *region;
@@ -661,9 +661,9 @@ void smurf_tileinfo( int *status ) {
 /* Issue a status indication.*/
    msgBlank( status );
    if( *status == SAI__OK ) {
-      msgOutif( MSG__VERB, "", "TILEINFO succeeded.", status);
+      msgOutif( MSG__VERB, "", "JSATILEINFO succeeded.", status);
    } else {
-      msgOutif( MSG__VERB, "", "TILEINFO failed.", status);
+      msgOutif( MSG__VERB, "", "JSATILEINFO failed.", status);
    }
 }
 
