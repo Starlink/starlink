@@ -1098,6 +1098,8 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 *        has no comment.
 *     15-NOV-2013 (DSB):
 *        - Added method astShowFits.
+*        - Ensure PurgeWcs removes WCS cards even if an error occurs when
+*        reading FrameSets from the FitsChan.
 *class--
 */
 
@@ -23555,12 +23557,23 @@ f        The global status.
 
 /* Local Variables: */
    AstObject *obj;
+   int oldclean;
 
 /* Check the global status. */
    if( !astOK ) return;
 
 /* Ensure the source function has been called */
    ReadFromSource( this, status );
+
+/* Ensure the Clean attribute is set so that WCS keywords are removed
+   even if an error occurs. */
+   if( astTestClean( this ) ) {
+      oldclean = astGetClean( this );
+      astSetClean( this, 1 );
+   } else {
+      astSetClean( this, 1 );
+      oldclean = -1;
+   }
 
 /* Loop round attempting to read AST objects form the FitsChan. This will
    flag cards as used that are involved in the creation of these object
@@ -23596,6 +23609,14 @@ f        The global status.
 
 /* Rewind the FitsChan. */
    astClearCard( this );
+
+/* Reset the Clean attribute. */
+   if( oldclean == -1 ) {
+      astClearClean( this );
+   } else {
+      astSetClean( this, oldclean );
+   }
+
 }
 
 static void PutCards( AstFitsChan *this, const char *cards, int *status ) {
