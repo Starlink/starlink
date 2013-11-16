@@ -607,11 +607,11 @@
 *     extension are written to a binary table in the normal fashion.
 
 *  References:
-*     Bailey, J.A. 1997, 2dF Software Report 14, version 0.5.
+*     Bailey, J.A. 1997, 2dF Software Report 14, Version 0.5.
 *     NASA Office of Standards and Technology, 1994, "A User's Guide
-*       for the Flexible Image Transport System (FITS)", version 3.1.
+*       for the Flexible Image Transport System (FITS)", Version 3.1.
 *     NASA Office of Standards and Technology, 1995, "Definition of
-*       the Flexible Image Transport System (FITS)", version 1.1.
+*       the Flexible Image Transport System (FITS)", Version 1.1.
 
 *  Related Applications:
 *     CONVERT: FITS2NDF; KAPPA: FITSDIN, FITSIN.

@@ -227,7 +227,7 @@
 *        Use KPG_TYPSZ instead of COF_TYPSZ.
 *     2011 March 3 (MJC):
 *        Add USEAXS argument, and changed the documented default for
-*        the ORIGIN header from  "Starlink Project, U.K.".
+*        the ORIGIN header from "Starlink Project, U.K.".
 *     2013 November 15 (MJC):
 *        Add ALWTAB argument and pass it to other routines now using
 *        it.
