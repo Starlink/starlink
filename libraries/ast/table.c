@@ -120,6 +120,8 @@ f     - AST_REMOVEROW: Remove a row from a Table
 *        Original version.
 *     13-MAY-2011 (DSB):
 *        Added support for table parameters.
+*     16-NOV-2013 (DSB):
+*        Fix bug in forming keys in GetColumnLenC.
 *class--
 */
 
@@ -1360,7 +1362,7 @@ static int GetColumnLenC( AstTable *this, const char *column, int *status ) {
       for( irow = 1; irow <= nrow; irow++ ) {
 
 /* Format the cell name. */
-         sprintf( key, "%s(%d)", column, irow );
+         sprintf( key, "%.*s(%d)", (int) astChrLen(column), column, irow );
 
 /* Get the maximum length needed to format a string in the current
    row/column. */
@@ -4177,7 +4179,6 @@ static int TestAttrib( AstObject *this_object, const char *attrib, int *status )
 */
 
 /* Local Variables: */
-   AstTable *this;               /* Pointer to the Table structure */
    int len;                      /* Length of attribute string */
    int nc;                       /* Number of characters read by astSscanf */
    int result;                   /* Result value to return */
@@ -4187,9 +4188,6 @@ static int TestAttrib( AstObject *this_object, const char *attrib, int *status )
 
 /* Check the global error status. */
    if ( !astOK ) return result;
-
-/* Obtain a pointer to the Table structure. */
-   this = (AstTable *) this_object;
 
 /* Get the length of the attribute string. */
    len = strlen( attrib );
