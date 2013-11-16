@@ -49,6 +49,8 @@ f     - AST_SLAADD: Add a celestial coordinate conversion to an SlaMap
 *  Copyright:
 *     Copyright (C) 1997-2006 Council for the Central Laboratory of the
 *     Research Councils
+*     Copyright (C) 2013 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -109,6 +111,10 @@ f     - AST_SLAADD: Add a celestial coordinate conversion to an SlaMap
 *        aberration vector.
 *        - Correct bug in the simplification of adjacent AMP and MAP
 *        conversions.
+*     15-NOV-2013 (DSB):
+*        Fix bug in merging of adjacent AMP and MAP conversions (MapMerge
+*        did not take account of the fact that the arguments for these
+*        two conversions are stored in swapped order).
 
 *class--
 */
@@ -2963,9 +2969,9 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                } else if ( ( PAIR_CVT( AST__SLA_AMP, AST__SLA_MAP ) ||
                              PAIR_CVT( AST__SLA_MAP, AST__SLA_AMP ) ) &&
                            EQUAL( cvtargs[ istep ][ 0 ],
-                                  cvtargs[ istep + 1 ][ 0 ] ) &&
+                                  cvtargs[ istep + 1 ][ 1 ] ) &&
                            EQUAL( cvtargs[ istep ][ 1 ],
-                                  cvtargs[ istep + 1 ][ 1 ] ) ) {
+                                  cvtargs[ istep + 1 ][ 0 ] ) ) {
                   istep++;
                   keep = 0;
 
