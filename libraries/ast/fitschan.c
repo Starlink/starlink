@@ -151,6 +151,7 @@ c     - astReadFits: Read cards in through the source function
 c     - astRemoveTables: Remove one or more FitsTables from a FitsChan
 c     - astRetainFits: Ensure current card is retained in a FitsChan
 c     - astSetFits<X>: Store a new keyword value in a FitsChan
+c     - astShowFits: Display the contents of a FitsChan on standard output
 c     - astTableSource: Register a source function for FITS table access
 c     - astTestFits: Test if a keyword has a defined value in a FitsChan
 c     - astWriteFits: Write all cards out to the sink function
@@ -168,6 +169,7 @@ f     - AST_READFITS: Read cards in through the source function
 f     - AST_REMOVETABLES: Remove one or more FitsTables from a FitsChan
 f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 f     - AST_SETFITS<X>: Store a new keyword value in a FitsChan
+c     - AST_SHOWFITS: Display the contents of a FitsChan on standard output
 f     - AST_TABLESOURCE: Register a source function for FITS table access
 f     - AST_TESTFITS: Test if a keyword has a defined value in a FitsChan
 f     - AST_WRITEFITS: Write all cards out to the sink function
@@ -1094,6 +1096,8 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 *     13-NOV-2013 (DSB):
 *        Use a zero-length string for the CardComm attribute if the card
 *        has no comment.
+*     15-NOV-2013 (DSB):
+*        - Added method astShowFits.
 *class--
 */
 
@@ -1838,6 +1842,7 @@ static void SetItemC( char *****, int, int, char, const char *, int * );
 static void SetSourceFile( AstChannel *, const char *, int * );
 static void SetValue( AstFitsChan *, const char *, void *, int, const char *, int * );
 static void Shpc1( double, double, int, double *, double *, int * );
+static void ShowFits( AstFitsChan *, int * );
 static void SinkWrap( void (*)( const char * ), const char *, int * );
 static void SkyPole( AstWcsMap *, AstMapping *, int, int, int *, char, FitsStore *, const char *, const char *, int * );
 static void TableSource( AstFitsChan *, void (*)( AstFitsChan *, const char *, int, int, int * ), int * );
@@ -17352,6 +17357,7 @@ void astInitFitsChanVtab_(  AstFitsChanVtab *vtab, const char *name, int *status
    vtab->FindFits = FindFits;
    vtab->KeyFields = KeyFields;
    vtab->ReadFits = ReadFits;
+   vtab->ShowFits = ShowFits;
    vtab->WriteFits = WriteFits;
    vtab->EmptyFits = EmptyFits;
    vtab->FitsEof = FitsEof;
@@ -26410,6 +26416,85 @@ static void Shpc1( double xmin, double xmax, int n, double *d, double *w,
    "w[-1]" is zero. */
       w[ 0 ] = d[ n - i - 1 ] + b*w[ 0 ];
    }
+
+}
+
+static void ShowFits( AstFitsChan *this, int *status ){
+
+/*
+*++
+*  Name:
+c     astShowFits
+f     AST_SHOWFITS
+
+*  Purpose:
+*     Display the contents of a FitsChan on standard output.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "fitschan.h"
+c     void astShowFits( AstFitsChan *this )
+f     CALL AST_SHOWFITS( THIS, STATUS )
+
+*  Class Membership:
+*     FitsChan method.
+
+*  Description:
+c     This function
+f     This routine
+*     formats and displays all the cards in a FitsChan on standard output.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the FitsChan.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*--
+*/
+
+/* Local Variables: */
+   astDECLARE_GLOBALS           /* Declare the thread specific global data */
+   char card[ AST__FITSCHAN_FITSCARDLEN + 1]; /* Buffer for header card */
+   int icard;                   /* Current card index on entry */
+   int old_ignore_used;         /* Original value of external variable ignore_used */
+
+/* Check the global status. */
+   if( !astOK ) return;
+
+/* Get a pointer to the structure holding thread-specific global data. */
+   astGET_GLOBALS(this);
+
+/* Store the current card index. */
+   icard = astGetCard( this );
+
+/* Indicate that cards which have been read into an AST object should skipped
+   over by the functions which navigate the linked list of cards. */
+   old_ignore_used = ignore_used;
+   ignore_used = 1;
+
+/* Ensure that the first card in the FitsChan will be the next one to be
+   read. */
+   astSetCard( this, 1 );
+
+/* Loop round obtaining and writing out each card, until all cards have been
+   processed. */
+   while( !astFitsEof( this ) && astOK ){
+
+/* Get the current card, and display it. The call to astFindFits increments
+   the current card. */
+      if( astFindFits( this, "%f", card, 1 ) ) printf( "%s\n", card );
+   }
+
+/* Re-instate the original flag indicating if cards marked as having been
+   read should be skipped over. */
+   ignore_used = old_ignore_used;
+
+/* Set the current card index back to what it was on entry. */
+   astSetCard( this, icard );
 
 }
 
@@ -38305,7 +38390,6 @@ static void WriteObject( AstChannel *this_channel, const char *name,
 }
 
 static void WriteToSink( AstFitsChan *this, int *status ){
-
 /*
 *  Name:
 *     WriteToSink
@@ -38318,7 +38402,6 @@ static void WriteToSink( AstFitsChan *this, int *status ){
 
 *  Synopsis:
 *     #include "fitschan.h"
-
 *     void WriteToSink( AstFitsChan *this, int *status )
 
 *  Class Membership:
@@ -41651,6 +41734,11 @@ void astReadFits_( AstFitsChan *this, int *status ){
 void astEmptyFits_( AstFitsChan *this, int *status ){
    if( !this ) return;
    (**astMEMBER(this,FitsChan,EmptyFits))(this, status );
+}
+
+void astShowFits_( AstFitsChan *this, int *status ){
+   if( !this ) return;
+   (**astMEMBER(this,FitsChan,ShowFits))(this, status );
 }
 
 void astPutCards_( AstFitsChan *this, const char *cards, int *status ){

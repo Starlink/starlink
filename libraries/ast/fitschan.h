@@ -240,6 +240,7 @@ typedef struct AstFitsChanVtab {
    void (* ReadFits)( AstFitsChan *, int * );
    void (* WriteFits)( AstFitsChan *, int * );
    void (* EmptyFits)( AstFitsChan *, int * );
+   void (* ShowFits)( AstFitsChan *, int * );
    void (* PurgeWCS)( AstFitsChan *, int * );
    void (* PutCards)( AstFitsChan *, const char *, int * );
    void (* PutFits)( AstFitsChan *, const char [81], int, int * );
@@ -435,6 +436,7 @@ void astInitFitsChanGlobals_( AstFitsChanGlobals * );
    void astReadFits_( AstFitsChan *, int * );
    void astWriteFits_( AstFitsChan *, int * );
    void astEmptyFits_( AstFitsChan *, int * );
+   void astShowFits_( AstFitsChan *, int * );
    void astPurgeWCS_( AstFitsChan *, int * );
    void astPutCards_( AstFitsChan *, const char *, int * );
    void astPutFits_( AstFitsChan *, const char [81], int, int * );
@@ -692,6 +694,9 @@ astINVOKE(V,astWriteFits_(astCheckFitsChan(this),STATUS_PTR))
 
 #define astEmptyFits(this) \
 astINVOKE(V,astEmptyFits_(astCheckFitsChan(this),STATUS_PTR))
+
+#define astShowFits(this) \
+astINVOKE(V,astShowFits_(astCheckFitsChan(this),STATUS_PTR))
 
 #define astTableSource(this,tabsource) \
 astINVOKE(V,astTableSource_(astCheckFitsChan(this),tabsource,STATUS_PTR))

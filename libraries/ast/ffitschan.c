@@ -931,6 +931,16 @@ F77_SUBROUTINE(ast_emptyfits)( INTEGER(THIS),
    )
 }
 
+F77_SUBROUTINE(ast_showfits)( INTEGER(THIS),
+                              INTEGER(STATUS) ) {
+   GENPTR_INTEGER(THIS)
+
+   astAt( "AST_SHOWFITS", NULL, 0 );
+   astWatchSTATUS(
+      astShowFits( astI2P( *THIS ) );
+   )
+}
+
 
 F77_INTEGER_FUNCTION(ast_gettables)( INTEGER(THIS),
                                      INTEGER(STATUS) ) {
