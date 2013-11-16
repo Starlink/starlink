@@ -1,4 +1,5 @@
-      SUBROUTINE COF_FPWCS( FUNIT, INDF, ENCOD, NATIVE, USEAXS, STATUS )
+      SUBROUTINE COF_FPWCS( FUNIT, INDF, ENCOD, NATIVE, USEAXS,
+     :                      ALWTAB, STATUS )
 *+
 *  Name:
 *     COF_FPWCS
@@ -11,7 +12,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL COF_FPWCS( FUNIT, INDF, ENCOD, NATIVE, USEAXS, STATUS )
+*     CALL COF_FPWCS( FUNIT, INDF, ENCOD, NATIVE, USEAXS, ALWTAB,
+*                     STATUS )
 
 *  Description:
 *     The AST FrameSet (see SUN/210) describing the co-ordinate systems
@@ -49,6 +51,9 @@
 *                    NDF stores co-ordinate information.
 *        "NO"    --- Must not create an alternate world co-ordinate
 *                    representation in the current NDF.
+*     ALWTAB = LOGICAL (Given)
+*        If TRUE, then WCS co-ordinates in tabular form may be written
+*        using the TAB algorithm as defined in FITS WCS Paper III.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -57,8 +62,8 @@
 
 *  Copyright:
 *     Copyright (C) 1997-2000, 2003-2004 Central Laboratory of the
-*     Research Councils. Copyright (C) 2008, 2011 Science & Technology
-*     Facilities Council. All Rights Reserved.
+*     Research Councils. Copyright (C) 2008, 2011, 2013 Science &
+*     Technology Facilities Council.  All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -113,6 +118,8 @@
 *        of a -TAB bintable being created.
 *     2011 February 25 (MJC):
 *        Added USEAXS argument.
+*     2013 November 15 (MJC):
+*        Add ALWTAB argument and enabled a TAB extension to be written.
 *     {enter_further_changes_here}
 
 *-
@@ -130,6 +137,7 @@
       CHARACTER ENCOD*(*)
       LOGICAL NATIVE
       CHARACTER*( * ) USEAXS
+      LOGICAL ALWTAB
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -188,7 +196,7 @@
 *  attribute (ASTVER) is used as the table version number for any tables
 *  created by the AST_WRITE method. The value used is a "magic value"
 *  that is used to identify tables created by AST.
-      CALL AST_SETI( FC, 'TABOK', ASTVER, STATUS )
+      IF ( ALWTAB ) CALL AST_SETI( FC, 'TABOK', ASTVER, STATUS )
 
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
@@ -278,16 +286,13 @@
                KEY = AST_MAPKEY( KEYMAP, ITABLE, STATUS )
                IF( AST_MAPGET0A( KEYMAP, KEY, TABLE, STATUS ) ) THEN
 
-                  IF ( PPGTAB ) THEN
-
 *  Create an extension in the FITS file holding a binary table
 *  containing values copied from the FitsTable, and then annul the
 *  FitsTable pointer. Use the table key in the KeyMap as the extension
 *  name.
-                     CALL COF_FT2BT( TABLE, FUNIT, KEY, ASTVER, STATUS )
-                     CALL AST_ANNUL( TABLE, STATUS )
+                  CALL COF_FT2BT( TABLE, FUNIT, KEY, ASTVER, STATUS )
+                  CALL AST_ANNUL( TABLE, STATUS )
 
-                  END IF
                END IF
             END DO
 

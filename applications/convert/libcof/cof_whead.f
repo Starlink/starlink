@@ -1,6 +1,6 @@
       SUBROUTINE COF_WHEAD( NDFI, NDFFAI, COMP, FUNIT, BITPIX, PROPEX,
      :                      ORIGIN, ENCOD, NATIVE, MULTI, EXTNAM,
-     :                      USEAXS, STATUS )
+     :                      USEAXS, ALWTAB, STATUS )
 *+
 *  Name:
 *     COF_WHEAD
@@ -14,7 +14,7 @@
 *  Invocation:
 *     CALL COF_WHEAD( NDFI, NDFFAI, COMP, FUNIT, BITPIX, PROPEX,
 *                     ORIGIN, ENCOD, NATIVE, MULTI, EXTNAM, USEAXS,
-*                     STATUS )
+*                     ALWTAB, STATUS )
 
 *  Description:
 *     This routine creates the header section of the primary array or
@@ -84,6 +84,9 @@
 *                    NDF stores co-ordinate information.
 *        "NO"    --- Must not create an alternate world co-ordinate
 *                    representation in the current NDF.
+*     ALWTAB = LOGICAL (Given)
+*        If TRUE, then WCS co-ordinates in tabular form may be written
+*        using the TAB algorithm as defined in FITS WCS Paper III.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -164,8 +167,8 @@
 *     Copyright (C) 1994 Science & Engineering Research Council.
 *     Copyright (C) 1995-2000, 2006 Central Laboratory of the Research
 *     Councils.
-*     Copyright (C) 2008, 2009, 2011 Science & Technology Facilities
-*     Council.
+*     Copyright (C) 2008, 2009, 2011, 2013 Science & Technology
+*     Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -271,6 +274,9 @@
 *        modifed WCS from the NDF's WCS component).
 *     2011 February 25 (MJC):
 *        Add USEAXS argument.
+*     2013 November 15 (MJC):
+*        Add ALWTAB argument and pass it to other routines now using
+*        it.
 *     {enter_further_changes_here}
 
 *-
@@ -298,6 +304,7 @@
       LOGICAL   MULTI            ! Multi-NDF container file?
       CHARACTER * ( * ) EXTNAM
       CHARACTER * ( * ) USEAXS
+      LOGICAL ALWTAB
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -910,7 +917,8 @@
 
 *  Write out the NDF WCS information.
 *  ==================================
-      CALL COF_FPWCS( FUNIT, NDFI, ENCOD, NATIVE, USEAXS, STATUS )
+      CALL COF_FPWCS( FUNIT, NDFI, ENCOD, NATIVE, USEAXS, ALWTAB,
+     :                STATUS )
 
   999 CONTINUE
 

@@ -23,7 +23,7 @@
                                 A.J.Chipperfield\\
                                 D.S.Berry\\
                                 A.C.Davenhall}
-\newcommand{\stardocdate}      {2012 May 1}
+\newcommand{\stardocdate}      {2013 November 15}
 \newcommand{\stardoctitle}     {CONVERT\\
                                 A Format-conversion Package}
 \newcommand{\stardocversion}   {Version 1.7}
@@ -4277,6 +4277,20 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
    }
    \sstparameters{
       \sstsubsection{
+         ALLOWTAB = \_LOGICAL (Read)
+      }{
+         If \texttt{TRUE}, tables of world co-ordinates may be written using
+         the TAB algorithm as defined in the
+         \htmladdnormallink{FITS-WCS Paper III}{http://doi.org/10.1051/0004-6361:20053818}.
+         Examples where such a table might be present in the WCS include
+         wavelengths of pre-scrunched spectra, and the presence of
+         distortions that prevent co-ordinates being defined by
+         analytical expressions.  Since many FITS readers are yet to
+         support the TAB algorithm, which uses a FITS binary-table
+         extension to store the co-ordinates, this parameter permits
+         this facility to be disabled.  \texttt{[TRUE]}
+      }
+      \sstsubsection{
          BITPIX = LITERAL (Read)
       }{
          The FITS bits-per-pixel (BITPIX) value for each conversion.
@@ -7619,7 +7633,12 @@ Support for 64-bit integers is now available in
 NDF2FITS now avoids scaling when the range of data values lies within
 the scaled type's range, such as double to single precision.
 
+NDF2FITS has a new boolean parameter called ALLOWTAB to permit or
+disable storage of tabular co-ordinates using the FITS WCS TAB
+algorithm.
+
 \htmlref{SPECX2NDF}{SPECX2NDF} has a new SYSTEM parameter that
 specifies the NDF's co-ordinate system.
+
 
 \end{document}

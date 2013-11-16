@@ -33,6 +33,8 @@
 #        Added PROVENANCE.
 #     2011 February 25 (MJC):
 #        Added USEAXIS.
+#     2013 November 15 (MJC):
+#        Added ALLOWTAB.
 #     {enter_further_changes_here}
 
 #-
@@ -40,6 +42,14 @@
 interface NDF2FITS
 
    helplib        'CONVERT_HELP:'
+
+   parameter      ALLOWTAB       # Permit use of the TAB algorithm?
+      type        '_LOGICAL'
+      prompt      'Permit use of the TAB algorithm of FITS WCS?'
+      vpath       'DEFAULT'
+      default     TRUE
+      helpkey     '*'
+   endparameter
 
    parameter      BITPIX         # No. of bits per pixel
       position    4

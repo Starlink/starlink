@@ -1,7 +1,7 @@
       SUBROUTINE COF_NDF2F( NDF, FILNAM, NOARR, ARRNAM, BITPIX, BLOCKF,
      :                      ORIGIN, PROFIT, DUPLEX, PROEXT, PROHIS,
      :                      PROVEN, SUMS, ENCOD, NATIVE, FOPEN, FCLOSE,
-     :                      USEAXS, STATUS )
+     :                      USEAXS, ALWTAB, STATUS )
 *+
 *  Name:
 *     COF_NDF2F
@@ -15,7 +15,7 @@
 *  Invocation:
 *     CALL COF_NDF2F( NDF, FILNAM, NOARR, ARRNAM, BITPIX, BLOCKF,
 *                     ORIGIN, PROFIT, DUPLEX, PROEXT, PROHIS, PROVEN,
-*                     SUMS, ENCOD, NATIVE, USEAXS, STATUS )
+*                     SUMS, ENCOD, NATIVE, USEAXS, ALWTAB, STATUS )
 
 *  Description:
 *     This routine converts an NDF into a FITS file.  It uses as much
@@ -119,6 +119,9 @@
 *                    NDF stores co-ordinate information.
 *        "NO"    --- Must not create an alternate world co-ordinate
 *                    representation in the current NDF.
+*     ALWTAB = LOGICAL (Given)
+*        If TRUE,then WCS co-ordinates in tabular form may be written
+*        using the TAB algorithm as defined in FITS WCS Paper III.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -258,7 +261,7 @@
 *     Copyright (C) 1994 Science & Engineering Research Council.
 *     Copyright (C) 1995-2000, 2003-2004 Central Laboratory of the
 *     Research Councils. Copyright (C) 2006 Particle Physics &
-*     Astronomy Research Council. Copyright (C) 2007-2009, 2011, 2012
+*     Astronomy Research Council. Copyright (C) 2007-2009, 2011-2013
 *     Science & Technology Facilities Council. All Rights Reserved.
 
 *  Licence:
@@ -386,6 +389,9 @@
 *        Hitherto all the scaled integer output data type used fewer
 *        bits than the floating-point values.  For 64-bit integers
 *        this breaks down.
+*     2013 November 15 (MJC):
+*        Add ALWTAB argument and pass it to other routines now using
+*        it.
 *     {enter_further_changes_here}
 
 *-
@@ -420,6 +426,7 @@
       LOGICAL FOPEN
       LOGICAL FCLOSE
       CHARACTER * ( * ) USEAXS
+      LOGICAL ALWTAB
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -750,7 +757,7 @@
 *  when requested to do so.
          CALL COF_WHEAD( NDF, NDF, ARRNAM( ICOMP ), FUNIT, BPOUT,
      :                   PROPEX, ORIGIN, ENCOD, NATIVE, MULTIN, ' ',
-     :                   USEAXS, STATUS )
+     :                   USEAXS, ALWTAB, STATUS )
          IF ( STATUS .NE. SAI__OK ) GOTO 999
 
 *  Determine whether or not there are history records in the NDF.
@@ -1289,7 +1296,7 @@
      :                               NOARR, ARRNAM, BITPIX, BLOCKF,
      :                               ORIGIN, PROFIT, DUPLEX, PROEXT,
      :                               PROHIS, SUMS, ENCOD, NATIVE,
-     :                               USEAXS, STATUS )
+     :                               USEAXS, ALWTAB, STATUS )
                   END IF
 
 *  Write integrity-check headers.

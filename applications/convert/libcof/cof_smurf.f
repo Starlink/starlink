@@ -1,7 +1,7 @@
       SUBROUTINE COF_SMURF( SNAME, LOC, FUNIT, NDF, FILNAM, NOARR,
      :                      ARRNAM, BITPIX, BLOCKF, ORIGIN, PROFIT,
      :                      DUPLEX, PROEXT, PROHIS, SUMS, ENCOD,
-     :                      NATIVE, USEAXS, STATUS )
+     :                      NATIVE, USEAXS, ALWTAB, STATUS )
 *+
 *  Name:
 *     COF_SMURF
@@ -15,7 +15,7 @@
 *  Invocation:
 *     CALL COF_SMURF( SNAME, LOC, FUNIT, NDF, FILNAM, NOARR, ARRNAM,
 *                     BITPIX, BLOCKF, ORIGIN, PROFIT, DUPLEX, PROEXT,
-*                     PROHIS, ENCOD, NATIVE, USEAXS, STATUS )
+*                     PROHIS, ENCOD, NATIVE, USEAXS, ALWTAB, STATUS )
 
 *  Description:
 *     This routine converts contents of a SMURF extension to FITS.  Each
@@ -113,6 +113,9 @@
 *                    NDF stores co-ordinate information.
 *        "NO"    --- Must not create an alternate world co-ordinate
 *                    representation in the current NDF.
+*     ALWTAB = LOGICAL (Given)
+*        If TRUE, then WCS co-ordinates in tabular form may be written
+*        using the TAB algorithm as defined in FITS WCS Paper III.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -121,8 +124,8 @@
 *     open.
 
 *  Copyright:
-*     Copyright (C) 2007, 2009, 2011 Science & Technology Facilities
-*     Council.
+*     Copyright (C) 2007, 2009, 2011, 2013 Science & Technology
+*     Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -155,6 +158,9 @@
 *        SMURF_EXT.
 *     2011 March 3 (MJC):
 *        Add USEAXS argument.
+*     2013 November 15 (MJC):
+*        Add ALWTAB argument and pass it to other routines now using
+*        it.
 *     {enter_further_changes_here}
 
 *-
@@ -186,6 +192,7 @@
       CHARACTER * ( * ) ENCOD
       LOGICAL NATIVE
       CHARACTER * ( * ) USEAXS
+      LOGICAL ALWTAB
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -296,7 +303,7 @@
             CALL COF_NEX2F( NAME, FUNIT, NDF, NDFE, FILNAM, 1,
      :                      ARRNAM, BITPIX, BLOCKF, ORIGIN, PROFIT,
      :                      DUPLEX, PROHIS, SUMS, ENCOD, NATIVE,
-     :                      USEAXS, STATUS )
+     :                      USEAXS, ALWTAB, STATUS )
 
 *  Process extensions.
 *  ===================

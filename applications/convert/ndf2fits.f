@@ -44,6 +44,16 @@
 *     ndf2fits in out [comp] [bitpix] [origin]
 
 *  ADAM Parameters:
+*     ALLOWTAB = _LOGICAL (Read)
+*        If TRUE, tables of world co-ordinates may be written using
+*        the TAB algorithm as defined in the FITS-WCS Paper III.  
+*        Examples where such a table might be present in the WCS include 
+*        wavelengths of pre-scrunched spectra, and the presence of
+*        distortions that prevent co-ordinates being defined by
+*        analytical expressions.  Since many FITS readers are yet to 
+*        support the TAB algorithm, which uses a FITS binary-table
+*        extension to store the co-ordinates, this parameter permits
+*        this facility to be disabled.  [TRUE]
 *     BITPIX = GROUP (Read)
 *        The FITS bits-per-pixel (BITPIX) value for each conversion.
 *        This specifies the data type of the output FITS file.
@@ -612,9 +622,11 @@
 *  Copyright:
 *     Copyright (C) 1994 Science & Engineering Research Council.
 *     Copyright (C) 1996-2000, 2004 Central Laboratory of the Research
-*     Councils. Copyright (C) 2006 Particle Physics & Astronomy
-*     Research Council. Copyright (C) 2007-2011 Science & Technology
-*     Facilities Council. All Rights Reserved.
+*     Councils.
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2007-2011, 2013 Science & Technology Facilities
+*     Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -713,6 +725,8 @@
 *     2011 March 2 (MJC):
 *        Delineate FITS and NDF extensions by using the sub-file term
 *        for the former (as also used in FITS2NDF).
+*     2013 November 15 (MJC):
+*        Add Parameter ALLOWTAB.
 *     {enter_further_changes_here}
 
 *-
@@ -748,6 +762,7 @@
 *  Local Variables:
       INTEGER ACGRP              ! Group identifier of COMPs
       INTEGER ADDED              ! Number of items added to a group
+      LOGICAL ALWTAB             ! Allow use of TAB algorithm?
       CHARACTER*8 ARRPRE( 3 )    ! Names of selected and present
                                  ! array components
       LOGICAL AVALID             ! Is supplied COMP an allowed
@@ -1248,6 +1263,9 @@
 *  the FITS header, along with the encoding selected above.
       CALL PAR_GET0L( 'NATIVE', NATIVE, STATUS )
 
+*  Is the TAB algorithm to be used?
+      CALL PAR_GET0L( 'ALLOWTAB', ALWTAB, STATUS )
+
 *  Process each file.
 *  ==================
       MERGE = .FALSE.
@@ -1541,7 +1559,7 @@
                CALL COF_NDF2F( NDF, FILNAM, NAPRES, ARRPRE, BITPIX,
      :                         BLOCKF, ORIGIN, PROFIT, DUPLEX, PROEXT,
      :                         PROHIS, PROVEX, CHECKS, ENCOD, NATIVE,
-     :                         FOPEN, FCLOSE, USEAXS, STATUS )
+     :                         FOPEN, FCLOSE, USEAXS, ALWTAB, STATUS )
 
 *  There are no arrays to transfer to the FITS file for the .HEADER
 *  NDF.
@@ -1557,14 +1575,14 @@
                CALL COF_NDF2F( NDF, FILNAM, 1, 'HEADER', -32, BLOCKF,
      :                         ORIGIN, PROFIT, DUPLEX, PROEXT, PROHIS,
      :                         PROVEX, CHECKS, ENCOD, NATIVE, FOPEN,
-     :                         FCLOSE, USEAXS,  STATUS )
+     :                         FCLOSE, USEAXS, ALWTAB, STATUS )
             ELSE
 
 *  Convert the NDF to the FITS file.
                CALL COF_NDF2F( NDF, FILNAM, NAPRES, ARRPRE, BITPIX,
      :                         BLOCKF, ORIGIN, PROFIT, DUPLEX, PROEXT,
      :                         PROHIS, PROVEX, CHECKS, ENCOD, NATIVE,
-     :                         FOPEN, FCLOSE, USEAXS, STATUS )
+     :                         FOPEN, FCLOSE, USEAXS, ALWTAB, STATUS )
             END IF
 
 *  Tidy the NDF.

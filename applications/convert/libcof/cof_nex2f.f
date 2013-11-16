@@ -1,7 +1,7 @@
       SUBROUTINE COF_NEX2F( SNAME, FUNIT, NDFP, NDF, FILNAM, NOARR,
      :                      ARRNAM, BITPIX, BLOCKF, ORIGIN, PROFIT,
      :                      DUPLEX, PROHIS, SUMS, ENCOD, NATIVE,
-     :                      USEAXS, STATUS )
+     :                      USEAXS, ALWTAB, STATUS )
 *+
 *  Name:
 *     COF_NEX2F
@@ -15,7 +15,7 @@
 *  Invocation:
 *     CALL COF_NEX2F( SNAME, FUNIT, NDFP, NDF, FILNAM, NOARR, ARRNAM,
 *                     BITPIX, BLOCKF, ORIGIN, PROFIT, DUPLEX, PROHIS,
-*                     SUMS, ENCOD, NATIVE, USEAXS, STATUS )
+*                     SUMS, ENCOD, NATIVE, USEAXS, ALWTAB, STATUS )
 
 *  Description:
 *     This routine converts an NDF into a FITS file.  It uses as much
@@ -98,6 +98,9 @@
 *                    NDF stores co-ordinate information.
 *        "NO"    --- Must not create an alternate world co-ordinate
 *                    representation in the current NDF.
+*     ALWTAB = LOGICAL (Given)
+*        If TRUE, then WCS co-ordinates in tabular form may be written
+*        using the TAB algorithm as defined in FITS WCS Paper III.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -189,8 +192,8 @@
 *     open.
 
 *  Copyright:
-*     Copyright (C) 2007, 2009, 2011 Science & Technology Facilities
-*     Council.
+*     Copyright (C) 2007, 2009, 2011, 2013 Science & Technology
+*     Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -225,6 +228,9 @@
 *     2011 March 3 (MJC):
 *        Add USEAXS argument, and changed the documented default for
 *        the ORIGIN header from  "Starlink Project, U.K.".
+*     2013 November 15 (MJC):
+*        Add ALWTAB argument and pass it to other routines now using
+*        it.
 *     {enter_further_changes_here}
 
 *-
@@ -258,6 +264,7 @@
       CHARACTER * ( * ) ENCOD
       LOGICAL NATIVE
       CHARACTER * ( * ) USEAXS
+      LOGICAL ALWTAB
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -491,7 +498,7 @@
 *  when requested to do so.
          CALL COF_WHEAD( NDF, NDFP, ARRNAM( ICOMP ), FUNIT, BPOUT,
      :                   PROPEX, ORIGIN, ENCOD, NATIVE, .FALSE., SNAME,
-     :                   USEAXS, STATUS )
+     :                   USEAXS, ALWTAB, STATUS )
          IF ( STATUS .NE. SAI__OK ) GOTO 999
 
 *  Determine whether or not there are history records in the NDF.

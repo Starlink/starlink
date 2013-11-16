@@ -4,8 +4,12 @@
   FITS2NDF, NDF2ASCII, NDF2DA, NDF2FITS, NDF2UNF, and UNF2NDF.
 
   NDF2FITS now avoids scaling when the range of data values lies
-  within   the scaled type's range, such as double to single
+  within the scaled type's range, such as double to single
   precision.
+
+  NDF2FITS has a new boolean parameter called ALLOWTAB to permit or
+  disable storage of tabular co-ordinates using the FITS WCS TAB
+  algorithm.
 
   SPECX2NDF has a new SYSTEM parameter that specifies the NDF's
   co-ordinate system.
@@ -858,5 +862,4 @@ Here is a summary of the main modifications.
   o NDF2DST propagates axis-variance and width arrays, and the
     contents of any axis Figaro extension.  If there is only one
     object in the Figaro extension, it is now copied to the DST.
-
 
