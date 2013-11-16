@@ -76,7 +76,7 @@
 *     Copyright (C) 1994 Science & Engineering Research Council.
 *     Copyright (C) 1996, 1998, 2003-2004 Central Laboratory of the
 *     Research Councils. Copyright (C) 2006 Particle Physics &
-*     Astronomy Research Council. Copyright (C) 2007-2008, 2011, 2012
+*     Astronomy Research Council. Copyright (C) 2007-2008, 2011-2013
 *     Science & Technology Facilities Council. All Rights Reserved.
 
 *  Licence:
@@ -132,6 +132,8 @@
 *        possibility of trailing spaces.
 *     2012 May 29 (MJC):
 *        Support BITPIX=64.
+*     2013 November 15 (MJC):
+*        Continue if COF_ISWCS returns bad status.
 *     {enter_further_changes_here}
 
 *-
@@ -278,8 +280,17 @@
 
 *  If the FITS extension contains usable WCS information and the
 *  contents of the FITS extension are being propagated to the output
-*  FITS file, do not propagate the AXIS information.
-      IF ( PROPEX .AND. COF_ISWCS( NDF, STATUS ) ) GOTWCS = .TRUE.
+*  FITS file, do not propagate the AXIS information.  A TAB algorithm
+*  will cause a bad status, so trap in a new error context.
+      IF ( PROPEX ) THEN
+         CALL ERR_MARK
+         GOTWCS = COF_ISWCS( NDF, STATUS )
+         IF ( STATUS .NE. SAI__OK ) THEN
+            CALL ERR_ANNUL( STATUS )
+            GOTWCS = .FALSE.
+         END IF
+         CALL ERR_RLSE
+      END IF
 
 *  For any axis structure present, the routine checks to see if each
 *  axis data array is linear.  If it is, the start value and incremental
