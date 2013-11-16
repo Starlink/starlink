@@ -107,7 +107,7 @@
 *        the FitsChan before new ones are added. Now uses the new
 *        FitsChan "Clean" attribute.
 *     9-JUN-2003 (DSB):
-*        - Annul any error reported by AST_WRITE sop that any remaining
+*        - Annul any error reported by AST_WRITE so that any remaining
 *        encodings can be checked.
 *        - Ignore any trailing degenerate pixel axes if the number of
 *        pixel axes exceeds the number of WCS axes.
@@ -131,6 +131,11 @@
 *        Added EXCLUD argument.
 *     2011 November 17 (MJC):
 *        Fixed reinstatement of current Frame.
+*     15-NOV-2013 (DSB):
+*        - Use AST_PURGEWCS instead of bespoke code to clean the FitsChan
+*        of all WCS headers.
+*        - If the NDF has no WCS component, ensure any WCS Frames in the
+*        FITS extension are included in the returned header.
 *     {enter_further_changes_here}
 
 *-
@@ -179,35 +184,41 @@
       INTEGER END                ! Index of last char. in EXCLUD element
       INTEGER EXCFRM             ! Index of Frame to exclude
       INTEGER FCT                ! Temporary FitsChan
+      INTEGER FRM                ! A Frame
       INTEGER I, J               ! Loop indices
       INTEGER IAT                ! Used length of string
       INTEGER IAXIS              ! Index of AXIS Frame within the NDF FrameSet
+      INTEGER ICURR              ! Index of new Current Frame
       INTEGER ICURR0             ! Index of original Current Frame
       INTEGER IENCOD             ! Index of the current encoding
       INTEGER IFRAC              ! Index of FRACTION Frame within the NDF FrameSet
+      INTEGER IFRAME             ! Index of Frame in FITS extension FrameSet
+      INTEGER IGRID              ! Index of GRID Frame within the NDF FrameSet
       INTEGER INDF2              ! Section of supplied NDF
       INTEGER IPIXEL             ! Index of PIXEL Frame within the NDF FrameSet
       INTEGER IWCS               ! AST identifier for NDF's WCS information
       INTEGER LBND( NDF__MXDIM ) ! NDF lower pixel bounds
       INTEGER LLEN               ! Used length of Label string
-      INTEGER MAP                ! AST identifier for PIXEL to AXIS Mapping
+      INTEGER MAP                ! A Mapping
       INTEGER NCARD              ! No. of cards
-      INTEGER NCARDP             ! Previous no. of cards in FitsChan
       INTEGER NDIM               ! Number of NDF pixel axes
       INTEGER NEXCH              ! Number of characters in EXCLUD
-      INTEGER NWCS               ! Number of WCS axes
+      INTEGER NFRAME             ! Number of Frames in FITS extension FrameSet
       INTEGER NOBJ               ! No. of objects written to the FitsChan
-      INTEGER OBJ                ! Object read from FitsChan
+      INTEGER NWCS               ! Number of WCS axes
       INTEGER P1                 ! Index of first opening parenthesis in ENCOD0
       INTEGER START              ! Index of first char in EXCLUD element
       INTEGER UBND( NDF__MXDIM ) ! NDF upper pixel bounds
+      INTEGER XWCS               ! WCS FrameSet read from NDF FITS extension
       LOGICAL FITSPR             ! True if FITS extension is present
       LOGICAL MORE               ! Read another object/excluded Frame?
       LOGICAL OK                 ! Are all excess pixel axes degenerate?
+      LOGICAL THERE              ! Does the component exist?
 *.
 
 *  Initialise.
       COF_WCSEX = 0
+      XWCS = AST__NULL
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
@@ -292,6 +303,10 @@
 *  Determine the default WCS encoding on the basis of the contents of the
 *  FITS header.
                DEFENC = AST_GETC( FCT, 'ENCODING', STATUS )
+
+*  Attempt to read a FrameSet from the FITS extension.
+               CALL AST_CLEAR( FCT, 'Card', STATUS )
+               XWCS = AST_READ( FCT, STATUS )
 
 *  Annul the FitsChan used to determine the default WCS encoding.
                CALL AST_ANNUL( FCT, STATUS )
@@ -495,6 +510,67 @@
 
       END IF
 
+*  If the WCS component of the NDF is in an undefined state, we attempt
+*  to extend the FrameSet obtained above (which will contain only
+*  standard NDF Frames) by including any Frames that were read from
+*  any WCS keywords in the NDF extension.
+      CALL NDF_STATE( INDF, 'WCS', THERE, STATUS )
+      IF( THERE .AND. XWCS .NE. AST__NULL ) THEN
+
+*  Note the indicies of the base (i.e. GRID) and current Frames in the
+*  FrameSet read from the NDF FITS extension.
+         IGRID = AST_GETI( XWCS, 'BASE', STATUS )
+         ICURR0 = AST_GETI( XWCS, 'CURRENT', STATUS )
+
+*  Note the original current Frame in the main FrameSet since it will be
+*  changed each time a new Frame is added by AST_ADDFRAME.
+         ICURR = AST_GETI( IWCS, 'CURRENT', STATUS )
+
+*  Loop round all Frames int eh FrameSet read from the NDF FITS extension.
+         NFRAME = AST_GETI( XWCS, 'NFRAME', STATUS )
+         DO IFRAME = 1, NFRAME
+
+*  We already have a GRID Frame in the main FrameSet so skip the GRID Frame.
+            IF( IFRAME .NE. IGRID ) THEN
+
+*  Get the IFRAME'th Frame from the FITS extension FrameSet, and get its
+*  Domain value.
+               FRM = AST_GETFRAME( XWCS, IFRAME, STATUS )
+               EXCNAM = AST_GETC( FRM, 'DOMAIN', STATUS )
+
+*  We do not add any standard NDF Frames since these have already been
+*  dealt with.
+               IF( EXCNAM .NE. 'PIXEL' .AND.
+     :             EXCNAM .NE. 'AXIS' .AND.
+     :             EXCNAM .NE. 'FRACTION' ) THEN
+
+*  Get the Mapping from the GRID Frame to the IFRAME'th Frame, and add
+*  the Frame into the main FrameSet. Then Annull the Mapping pointer.
+                  MAP = AST_GETMAPPING( XWCS, IGRID, IFRAME, STATUS )
+                  CALL AST_ADDFRAME( IWCS, AST__BASE, MAP, FRM, STATUS )
+                  CALL AST_ANNUL( MAP, STATUS )
+
+*  If the Frame we have just added was the current Frame in the FITS
+*  extension FrameSet, record it's index so that we can make it the
+*  current Frame in the main FrameSet once we have finished.
+                  IF( IFRAME .EQ. ICURR0 ) ICURR = AST_GETI( IWCS,
+     :                                               'CURRENT', STATUS )
+               END IF
+
+*  Annul the FITS extension Frame pointer.
+               CALL AST_ANNUL( FRM, STATUS )
+            END IF
+         END DO
+
+*  Reset the current Frame index in the main FrameSet back to the correct
+*  value. This will be the current Frame from the FITS extension FrameSet
+*  so long as that Frame is not an NDF standard Frame. If it was, then
+*  the original current Frame will be re-instated.
+         CALL AST_SETI( IWCS, 'CURRENT', ICURR, STATUS )
+
+      END IF
+
+
 *  Exclude requested Frames.
 *  =========================
       IF ( EXCLUD .NE. ' ' ) THEN
@@ -563,59 +639,19 @@
 *  Write out any remaining WCS information.
 *  ========================================
 
-*  If the current Frame in the FrameSet is the GRID Frame then we do not
-*  need to write any WCS information out since the GRID Frame is
-*  implied by the FITS data array.
-      IF( AST_GETC( AST_GETFRAME( IWCS, AST__CURRENT, STATUS ),
-     :              'DOMAIN', STATUS ) .NE. 'GRID' ) THEN
-
 *  We now clean the supplied FitsChan by removing any keywords which
 *  may interfere with the interpretation of keywords added later. For
 *  instance, if the supplied FitsChan contains astrometric information
 *  using a CDi_j matrix (as produced by STSDAS), then writing a FITS-WCS
 *  encoding to it will add a PCiiijjj matrix, but will not remove the
-*  original CDi_j matrix. First, ensure the Encoding attribute is
-*  cleared first so that all possible encodings will be read.
-         CALL AST_CLEAR( FC, 'ENCODING', STATUS )
+*  original CDi_j matrix.
+      CALL AST_PURGEWCS( FC, STATUS )
 
-*  We will be ignoring any errors that occur whilst cleaning the
-*  FitsChan, so start a new error context.
-         CALL ERR_BEGIN( STATUS )
-
-*  Set the Clean attribute in the FitsChan. This means that all cards
-*  used in an attempt to read an object from the FitsChan will be
-*  removed from the FitsChan, even if an error prevents the final object
-*  from being created. Without this, an error during the read would
-*  result in no cards being removed from the FitsChan. We want to remove
-*  WCS cards even if the cards currently present are not legal.
-         CALL AST_SETL( FC, 'Clean', .TRUE., STATUS )
-
-*  Loop until all WCS cards have been removed from the FitsChan.
-         MORE = .TRUE.
-         DO WHILE( MORE )
-
-*  Rewind the FitsChan so that the next call to AST_READ will read from
-*  the first card.
-            CALL AST_CLEAR( FC, 'CARD', STATUS )
-
-*  Note the number of cards in the FitsChan, then attempt to read an
-*  Object from the FitsChan (annul any error so that we can continue).
-*  Check the number of cards remaining in the FitsChan afterwards. If no
-*  cards have been removed by the read, then we leave the loop. Note, we
-*  do not check whether an object was actually read or not since, even
-*  though an error may have prevented an Object from being created, some
-*  cards may have been used up in the attempt.
-            NCARDP = AST_GETI( FC, 'Ncard', STATUS )
-            OBJ = AST_READ( FC, STATUS )
-            IF( STATUS .NE. SAI__OK ) CALL ERR_FLUSH( STATUS )
-            NCARD = AST_GETI( FC, 'Ncard', STATUS )
-            IF( NCARD .EQ. NCARDP ) MORE = .FALSE.
-
-         END DO
-
-*  End the error context and rest the FitsChan Clean flag.
-         CALL ERR_END( STATUS )
-         CALL AST_CLEAR( FC, 'Clean', STATUS )
+*  If the current Frame in the FrameSet is the GRID Frame then we do not
+*  need to write any WCS information out since the GRID Frame is
+*  implied by the FITS data array.
+      IF( AST_GETC( AST_GETFRAME( IWCS, AST__CURRENT, STATUS ),
+     :              'DOMAIN', STATUS ) .NE. 'GRID' ) THEN
 
 *  Set the FitsChan to "end-of-file" so that new keywords get written
 *  to the end of the FitsChan.
