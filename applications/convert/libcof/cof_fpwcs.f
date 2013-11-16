@@ -120,6 +120,10 @@
 *        Added USEAXS argument.
 *     2013 November 15 (MJC):
 *        Add ALWTAB argument and enabled a TAB extension to be written.
+*     15-NOV-2013 (DSB):
+*        Restructured slightly to ensure any junk WCS-related keywords
+*        that are present in the header on entry are deleted on exit, even 
+*        if the NDF contains no WCS.
 *     {enter_further_changes_here}
 
 *-
@@ -168,6 +172,7 @@
       CHARACTER KEY*30           ! Key name
       INTEGER KEYADD             ! Number of headers that can be added
       INTEGER KEYMAP             ! KeyMap holding FitsTables
+      INTEGER NENC               ! Number of encodings written to FitsChan
       INTEGER NHEAD              ! Number of FITS headers
       INTEGER NTABLE             ! No. of entries in KEYMAP
       LOGICAL PPGTAB             ! Propagate a table?
@@ -260,20 +265,22 @@
       IF ( .NOT. PPGTAB ) EXCLUD = 'AXIS'
 
 *  Now export any WCS information from the NDF into the FitsChan. This
-*  may overwrite any WCS information which already existed in the
-*  FITSIO header on entry. Only modify the supplied FITSIO header if at
-*  least one Object was written to the FitsChan.
-      IF( COF_WCSEX( FC, INDF, ENCOD, NATIVE, EXCLUD, STATUS ) .GE.
-     :    1 ) THEN
+*  will first clear out any WCS-related keywords which already existed
+*  in the FITSIO header on entry. It will then add keywords for the WCS
+*  described by the NDF. Record the number of WCS encodings succesfully
+*  written to the FitsChan.
+      NENC = COF_WCSEX( FC, INDF, ENCOD, NATIVE, EXCLUD, STATUS )
 
-*  Copy the contents of the FitsChan into the CHDU header.
-         CALL COF_FC2HD( FC, FUNIT, STATUS )
+*  Empty the CHDU header, and then copy the contents of the FitsChan into
+*  it.
+      CALL COF_FC2HD( FC, FUNIT, STATUS )
 
 *  If any axes were successfully described using the -TAB algorithm,
 *  there will be one or more FitsTables stored in the FitsChan. For each
 *  such FitsTable, create a corresponding extension in the FITS file
 *  containing a binary table. Get a pointer to a KeyMap that holds
 *  copies of the FitsTables in the FitsChan.
+      IF( NENC .GE. 1 ) THEN
          KEYMAP = AST_GETTABLES( FC, STATUS )
          IF( KEYMAP .NE. AST__NULL ) THEN
 
