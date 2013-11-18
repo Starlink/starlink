@@ -66,6 +66,9 @@
 *        by all array components of the NDF.
 *     13-NOV-2013 (DSB):
 *        Moved from CONVERT to CVG.
+*     18-NOV-2013 (DSB):
+*        The trailing argument for FTPCLS should give the size of a
+*        single string, not the total size of all strings.
 *     {enter_further_changes_here}
 
 *-
@@ -97,6 +100,7 @@
       CHARACTER CARD*(CVG__HEDLEN)! Header card
       CHARACTER CNAME*50         ! Column name
       CHARACTER NAME*50          ! Keyword or attribute name
+      INTEGER CLEN               ! Length of a single fixed-length string
       INTEGER CTYPE              ! Column data type
       INTEGER EXTVER             ! Extension version number
       INTEGER FSTAT              ! FITSIO error status
@@ -272,8 +276,9 @@
      :                      %VAL(CNF_PVAL(IP)), FSTAT )
 
             ELSE IF( CTYPE .EQ. AST__STRINGTYPE ) THEN
+               CLEN = SIZE/TOTNEL
                CALL FTPCLS( FUNIT, ICOL, 1, 1, TOTNEL,
-     :                      %VAL(CNF_PVAL(IP)), FSTAT, %VAL(SIZE) )
+     :                      %VAL(CNF_PVAL(IP)), FSTAT, %VAL(CLEN) )
 
 *  Report an error if the data type of the fits binary data cannot be
 *  stored in a FitsTable.
