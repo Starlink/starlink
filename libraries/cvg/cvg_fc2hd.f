@@ -109,7 +109,6 @@
 * Now copy the contents of the FitsChan into the empty FITSIO header.
       CALL AST_CLEAR( FC, 'Card', STATUS )
       DO WHILE( AST_FINDFITS( FC, '%f', HEADER, .TRUE., STATUS ) )
-      write(*,*) HEADER
          CALL FTPREC( FUNIT, HEADER, FSTAT )
          IF( FSTAT .NE. CVG__FITSOK ) THEN
             FSTAT = CVG__FITSOK
