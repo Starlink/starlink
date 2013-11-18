@@ -1100,6 +1100,7 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 *        - Added method astShowFits.
 *        - Ensure PurgeWcs removes WCS cards even if an error occurs when
 *        reading FrameSets from the FitsChan.
+*        - Change IsMapTab1D to improve chances of a -TAB mapping being found.
 *class--
 */
 
@@ -18300,11 +18301,13 @@ static AstMapping *IsMapTab1D( AstMapping *map, double scale, const char *unit,
 */
 
 /* Local Variables: */
+   AstCmpMap *cm;          /* CmpMap pointer */
    AstMapping **map_list;  /* Mapping array pointer */
    AstMapping *postmap;    /* Total Mapping after LutMap */
    AstMapping *premap;     /* Total Mapping before LutMap */
    AstMapping *ret;        /* Returned WCS axis Mapping */
    AstMapping *tmap;       /* Temporary Mapping */
+   AstPermMap *pm;         /* PermMap pointer */
    char cellname[ 20 ];    /* Buffer for cell name */
    char colname[ 20 ];     /* Buffer for column name */
    double *lut;            /* Pointer to table of Y values */
@@ -18316,13 +18319,20 @@ static AstMapping *IsMapTab1D( AstMapping *map, double scale, const char *unit,
    double x[ 2 ];          /* X values at start and end of interval */
    int *ins;               /* Array of "map" input indices */
    int *invert_list;       /* Invert array pointer */
+   int *outs;              /* Array of "map" output indices */
    int dims[ 2 ];          /* Dimensions of the tab coords array */
+   int iin;                /* Index of Mapping input */
    int ilut;               /* Index of the LutMap within the mappings list */
    int imap;               /* Index of current Mapping in list */
+   int iout;               /* Index of Mapping output */
+   int jout;               /* Index of Mapping output */
+   int nin;                /* Number of Mapping inputs */
    int nlut;               /* Number of elements in "lut" array */
    int nmap;               /* Number of Mappings in the list */
+   int nout;               /* Number of Mapping outputs */
    int ok;                 /* Were columns added to the table? */
    int old_invert;         /* Original value for Mapping's Invert flag */
+   int outperm;            /* Index of input that feeds the single output */
 
 /* Initialise */
    ret = NULL;
@@ -18342,22 +18352,80 @@ static AstMapping *IsMapTab1D( AstMapping *map, double scale, const char *unit,
    need to invert the Mapping first so we can split off a specified output.  */
    astInvert( map );
    ins = astMapSplit( map, 1, &iax, &ret );
+   astInvert( map );
 
-/* If the Mapping could not be split, try again on a copy of the Mapping
-   in which all PermMaps provide an alternative implementation of the
-   astMapSplit method. */
+/* If the Mapping could not be split, try a different approach in which
+   each input is checked in turn to see if it feeds the specified output. */
    if( !ins ) {
+
+/* Loop round each input of "map". */
+      nin = astGetNin( map );
+      for( iin = 0; iin < nin && !ins; iin++ ) {
+
+/* Attempt to find a group of outputs (of "map") that are fed by just
+   this one input. */
+         outs = astMapSplit( map, 1, &iin, &ret );
+
+/* If successful, "ret" will be a Mapping with one input corresponding to
+   input "iin" of "map, and one or more outputs. We loop round these
+   outputs to see if any of them correspond to output "iax" of "map". */
+         if( outs ) {
+            nout = astGetNout( ret );
+            for( iout = 0; iout < nout; iout++ ) {
+               if( outs[ iout ] == iax ) break;
+            }
+
+/* Did input "iin" feed the output "iax" (and possibly other outputs)? */
+            if( iout < nout ) {
+
+/* The "ret" Mapping is now a 1-input (pixel) N-output (WCS) Mapping in which
+   output "iout" corresponds to output "iax" of Mapping. To be compatible
+   with the previous approach, we want "ret" to be a 1-input  (WCS) to
+   1-output (pixel) Mapping in which the input corresponds to output
+   "iax" of Mapping. To get "ret" into this form, we first append a PermMap
+   to "ret" that selects a single output ("iout"), and then invert the
+   whole CmpMap. */
+               for( jout = 0; jout < nout; jout++ ) {
+                  outs[ jout ] = -1;
+               }
+               outs[ iout ] = 0;
+               outperm = iout;
+
+               pm = astPermMap( nout, outs, 1, &outperm, NULL, "", status );
+               cm = astCmpMap( ret, pm, 1, " ", status );
+               (void) astAnnul( ret );
+               pm = astAnnul( pm );
+               ret = (AstMapping *) cm;
+               astInvert( ret );
+
+/* The earlier approach leves ins[ 0 ] holding the index of the input to
+   "map" that feeds output iax. Ensure we have this too. */
+               ins = outs;
+               ins[ 0 ] = iin;
+
+/* Free resources if the current input did not feed the required output. */
+            } else {
+               outs = astFree( outs );
+               ret = astAnnul( ret );
+            }
+         }
+      }
+   }
+
+/* If the Mapping still could not be split, try again on a copy of the
+   Mapping in which all PermMaps provide an alternative implementation of
+   the astMapSplit method. */
+   if( !ins ) {
+      astInvert( map );
       tmap = astCopy( map );
       ChangePermSplit( tmap, status );
       ins = astMapSplit( tmap, 1, &iax, &ret );
       tmap = astAnnul( tmap );
+      astInvert( map );
    }
 
 /* Assume the Mapping cannot be represented by -TAB */
    ok = 0;
-
-/* Revert the Mapping Invert attribute to its original value. */
-   astInvert( map );
 
 /* Check a Mapping was returned by astMapSplit. If so, it will be the
    mapping from the requested output of "map" (the WCS axis) to the
@@ -18707,9 +18775,15 @@ static AstMapping *IsMapTab2D( AstMapping *map, double scale, const char *unit,
 */
 
 /* Local Variables: */
-   AstMapping *ret;        /* Returned WCS axis Mapping */
    AstMapping *ret1;       /* WCS->IWC Mapping for first output */
    AstMapping *ret2;       /* WCS->IWC Mapping for second output */
+   AstMapping *ret;        /* Returned WCS axis Mapping */
+   AstMapping *tmap;
+   AstPermMap *pm;
+   int *pix_axes;          /* Zero-based indicies of corresponding pixel axes */
+   int wcs_axes[ 2 ];      /* Zero-based indicies of selected WCS axes */
+   int inperm[ 1 ];
+   int outperm[ 2 ];
 
 /* Initialise */
    ret = NULL;
@@ -18732,8 +18806,46 @@ static AstMapping *IsMapTab2D( AstMapping *map, double scale, const char *unit,
       *max1 = 1;
       *max2 = 1;
 
-/* Combine the Mappings in parallel to form the returned Mapping. */
-      ret = (AstMapping *) astCmpMap( ret1, ret2, 0, " ", status );
+/* Get a Mapping from the required pair of WCS axes to the corresponding
+   pair of grid axes. First try to split the supplied grid->wcs mapping. */
+      wcs_axes[ 0 ] = iax1;
+      wcs_axes[ 1 ] = iax2;
+
+      astInvert( map );
+      pix_axes = astMapSplit( map, 2, wcs_axes, &ret );
+      astInvert( map );
+
+      if( pix_axes ) {
+         pix_axes = astFree( pix_axes );
+         if( astGetNout( ret ) > 2 ) {
+            ret = astAnnul( ret );
+
+/* If the two output WCS axes are fed by the same grid axis, we need to
+   add another pixel axis to form the pair. */
+         } else if( astGetNout( ret ) == 1 ) {
+            inperm[ 0 ] = 0;
+            outperm[ 0 ] = 0;
+            outperm[ 1 ] = 0;
+            pm = astPermMap( 1, inperm, 2, outperm, NULL, " ", status );
+            tmap = (AstMapping *) astCmpMap( ret, pm, 1, " ", status );
+            ret = astAnnul( ret );
+            pm = astAnnul( pm );
+            ret = tmap;
+         }
+      }
+
+/* If this was unsuccessful, combine the Mappings returned by IsMapTab1D.
+   We only do this if the above astMapSplit call failed, since the IsMapTab1D
+   mappings may well not be independent of each other, and we may end up
+   sticking together in parallel two mappings that are basically the same
+   except for ending with PermMapa that select different axes. Is is hard
+   then to simplify such a parallel CmpMap back into the simpler form
+   that uses only one of the two identical mappings, without a PermMap. */
+      if( !ret ) {
+         ret = (AstMapping *) astCmpMap( ret1, ret2, 0, " ", status );
+      }
+
+/* Free resources. */
       ret1 = astAnnul( ret1 );
       ret2 = astAnnul( ret2 );
 
