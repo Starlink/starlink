@@ -92,7 +92,6 @@
 #include "f77.h"
 #include "sae_par.h"
 #include "mers.h"
-#include "star/ndg.h"
 #include "star/grp.h"
 #include "star/mem.h"
 #include "star/hds_fortran.h"

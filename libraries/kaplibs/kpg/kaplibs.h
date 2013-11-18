@@ -94,7 +94,6 @@
 */
 
 #include "ast.h"
-#include "star/ndg.h"
 #include "star/grp.h"
 #include "star/hds.h"
 #include "star/hds_fortran.h"
@@ -184,7 +183,4 @@ void kpgPixsc( AstFrameSet * iwcs,
 void kpg1Gtobj( const char *, const char *, void (*)(void), AstObject **, int * );
 
 void kpg1Hsect( const HDSLoc *, int, int *, int *, HDSLoc *, const char *, int * );
-
-void fts1Scadc( NdgProvenance *, const char *, int * );
-
 #endif

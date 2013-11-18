@@ -53,12 +53,12 @@
 *        The individual integer identifiers to associate with each
 *        position. Only accessed if ID0 is less than or equal to zero.
 *     KEYMAP = INTEGER (Given)
-*        An optional AST KeyMap containing data for extra columns and
-*        headers to add to the catalogue. It can be used (for instance)
-*        to add character columns to the catalogue. If a value of AST__NULL
-*        is supplied, no extra columns or headers are added to the
-*        catalogue. Otherwise, column names and values can be specified
-*        using either of the following two schemes:
+*        An optional AST KeyMap containing data for extra columns to
+*        add to the catalogue. It can be used (for instance) to add
+*        character columns to the catalogue. If a value of AST__NULL
+*        is supplied, no extra columns are added to the catalogue.
+*        Otherwise, the column names and values can be specified using
+*        either of the following two schemes:
 *
 *        - If the KeyMap contains an entry called "COLNAMES", it is
 *        assumed to be a vector entry holding the names of the columns.
@@ -71,14 +71,10 @@
 *        for the column.
 *
 *        - If the KeyMap does not contain an entry called "COLNAMES",
-*        it is assumed that each (non-FitsChan) entry in the KeyMap contains
-*        a vector holding all the values for a single column, in row order.
-*        The entry key is used as the column name, and the column data type
+*        it is assumed that each entry in the KeyMap contains a vector
+*        holding all the values for a single column, in row order. The
+*        entry key is used as the column name, and the column data type
 *        is determined from the entry data type.
-*
-*        In addition, if any entries in the KeyMap contain a FitsChan
-*        pointer, the contents of the FitsChan are copied to the outptu
-*        catalogue.
 *     LABS = INTEGER (Given)
 *        A GRP group identifier containing the labels to be associated
 *        with the positions. The number of elements in this group should
@@ -137,9 +133,6 @@
 *        based on the use of scalar entries rather than vector entries.
 *     2010-10-04 (TIMJ):
 *        Add SINTTYPE keymap support
-*     12-NOV-2013 (DSB):
-*        Copy headers from any FitsChans supplied in the KEYMAP argument
-*        to the output catalogue.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -188,18 +181,14 @@
 *  Local Variables:
       CHARACTER ATTR*10          ! AST attribute name
       CHARACTER BUFFER*80        ! Text buffer
-      CHARACTER COLNAM( MXKEYS )*30! Column names from KeyMap
-      CHARACTER COMM*80          ! Card comment
-      CHARACTER CVAL*80          ! String keyword value
       CHARACTER HTEXT*(GRP__SZNAM)! A line of history text
       CHARACTER KEY*40           ! KeyMap entry key
-      CHARACTER KNAME*10         ! Card name
       CHARACTER LAB*50           ! Axis label
       CHARACTER LABEL*100        ! Position label
       CHARACTER SYM*20           ! Axis symbol
       CHARACTER UNT*20           ! Axis units
+      CHARACTER COLNAM( MXKEYS )*30! Column names from KeyMap
       DOUBLE PRECISION C( MXDIM) ! Buffer for a single position
-      DOUBLE PRECISION DVAL      ! Floating point keyword value
       INTEGER AXFRM              ! 1D Frame holding current axis
       INTEGER AXMAP              ! Mapping from full Frame to 1D Frame
       INTEGER CATYPE             ! CAT column data type
@@ -207,23 +196,18 @@
       INTEGER COLID( -1:MXDIM )  ! CAT identifiers for columns
       INTEGER FRM                ! Pointer to Frame
       INTEGER I                  ! Position index
-      INTEGER IAST               ! Pointer to AST Object
       INTEGER IAT                ! No. of characters in string
       INTEGER IAT0               ! Length of key root
-      INTEGER ICARD              ! Index of card in FitsChan
       INTEGER IPTEXT             ! Pointer to text buffer
-      INTEGER IVAL               ! Integer keyword value
       INTEGER J                  ! Axis index
       INTEGER KMCOL( MXKEYS )    ! CAT identifiers for extra columns
       INTEGER KMLEN( MXKEYS )    ! No. of values for each extra column
+      INTEGER NKMCOL             ! No. of columns supplied in KeyMap
       INTEGER LABLEN             ! Length of longest label
       INTEGER LENC               ! Length of formatted KeyMap entry
       INTEGER LWCS               ! Pointer to the FrameSet to be stored
-      INTEGER LVAL               ! Logical keyword value
       INTEGER MAXLEN             ! Maximum formatted string length
-      INTEGER NCARD              ! Number of cards in FitsChan
       INTEGER NHIST              ! Number of lines of history text
-      INTEGER NKMCOL             ! No. of columns supplied in KeyMap
       INTEGER NLAB               ! Number of labels supplied
       INTEGER QI                 ! CAT identifier for another parameter
       INTEGER SCHEME             ! Says how columns are stored in KeyMap
@@ -354,89 +338,12 @@
      :                   'Position label', COLID( -1 ), STATUS )
       END IF
 
-*  Copy information in the supplied KeyMap to the catalogue.
+*  Create columns to hold the entries in any supplied KeyMap.
       NKMCOL = 0
       MAXLEN = 0
 
       IF( KEYMAP .NE. AST__NULL ) THEN
 
-*  We first copy the contents of any FitsCHans to the table. Initialise
-*  the number of non-FitsChan entries found.
-         NKMCOL = 0
-
-*  Loop round all entries in the KeyMap.
-         DO I = 1, AST_MAPSIZE( KEYMAP, STATUS )
-
-*  Get the entry key and data type.
-            KEY = AST_MAPKEY( KEYMAP, I, STATUS )
-            TYPE = AST_MAPTYPE( KEYMAP, KEY, STATUS )
-
-*  If it is a FitsChan pointer...
-            IF( TYPE .EQ. AST__OBJECTTYPE .AND.
-     :          AST_MAPGET0A( KEYMAP, KEY, IAST, STATUS ) .AND.
-     :          AST_ISAFITSCHAN( IAST, STATUS ) ) THEN
-
-*  Loop round every card in the FitsChan.
-               NCARD = AST_GETI( IAST, 'NCARD', STATUS )
-               DO ICARD = 1, NCARD
-                  CALL AST_SETI( IAST, 'NCARD', ICARD, STATUS )
-
-*  Get  the data type, name and comment of the card.
-                  TYPE = AST_GETI( IAST, 'CARDTYPE', STATUS )
-                  KNAME = AST_GETC( IAST, 'CARDNAME', STATUS )
-                  COMM = AST_GETC( IAST, 'CARDCOMM', STATUS )
-
-*  Get the card value and store it in the catalogue.
-                  IF( TYPE .EQ . AST__INT .AND.
-     :                AST_GETFITSI( IAST, '.', IVAL, STATUS ) ) THEN
-                     CALL CAT_PPTSI( CI, KNAME, IVAL, COMM, QI, STATUS )
-
-                  ELSE IF( TYPE .EQ . AST__FLOAT .AND.
-     :                AST_GETFITSF( IAST, '.', DVAL, STATUS ) ) THEN
-                     CALL CAT_PPTSD( CI, KNAME, DVAL, COMM, QI, STATUS )
-
-                  ELSE IF( TYPE .EQ . AST__STRING .AND.
-     :                AST_GETFITSS( IAST, '.', CVAL, STATUS ) ) THEN
-                     CALL CAT_PPTSC( CI, KNAME, CVAL, COMM, QI, STATUS )
-                     CALL CAT_TATTI( QI, 'CSIZE', CHR_LEN( CVAL ),
-     :                               STATUS )
-
-                  ELSE IF( TYPE .EQ . AST__LOGICAL .AND.
-     :                AST_GETFITSL( IAST, '.', LVAL, STATUS ) ) THEN
-                     CALL CAT_PPTSL( CI, KNAME, LVAL, COMM, QI, STATUS )
-
-                  ELSE IF( TYPE .EQ . AST__CONTINUE ) THEN
-                     CALL MSG_OUT( ' ', 'Cannot copy FITS CONTINUE '//
-     :                             'cards to the output table.',
-     :                             STATUS )
-
-                  ELSE IF( TYPE .EQ . AST__UNDEF ) THEN
-                     CALL MSG_OUT( ' ', 'Cannot copy undefined FITS '//
-     :                             'keyword values to the output '//
-     :                             'table.', STATUS )
-
-                  ELSE IF( TYPE .EQ . AST__COMMENT ) THEN
-                     CALL CAT_PUTXT( CI, 'COMMENT', COMM, STATUS )
-
-                  ELSE
-                     CALL MSG_OUT( ' ', 'Cannot copy complex FITS '//
-     :                             'keyword values to the output '//
-     :                             'table.', STATUS )
-                  END IF
-               END DO
-
-*  Annull the FitsChan pointer.
-               CALL AST_ANNUL( IAST, STATUS )
-
-*  If it is not a FitsChan pointer, increment the number of non-FitsCHan
-*  entries in the KeyMap.
-            ELSE
-               NKMCOL = NKMCOL + 1
-            END IF
-         END DO
-
-*  Now create columns to hold the entries in any supplied KeyMap.
-*
 *  Scheme 1 - does the KeyMap have an entry called COLNAMES? If so, it
 *  is a vector holding the column names. Each column value is in a separate
 *  scalar entry.
@@ -581,7 +488,9 @@
          ELSE
             SCHEME = 2
 
-*  Check the number of columns described by the KeyMap is not too high.
+*  Get the number of columns described by the KeyMap and check it is
+*  not too high.
+            NKMCOL = AST_MAPSIZE( KEYMAP, STATUS )
             IF( NKMCOL .GT. MXKEYS .AND. STATUS .EQ. SAI__OK ) THEN
                STATUS = SAI__ERROR
                CALL MSG_SETI( 'N', NKMCOL )
@@ -597,63 +506,55 @@
 *  Loop round all columns described by the KeyMap.
             DO I = 1, NKMCOL
 
-*  Get the entry key and type.
+*  Get the entry key and store it as the column name.
                KEY = AST_MAPKEY( KEYMAP, I, STATUS )
+               COLNAM( I ) = KEY
+
+*  Get the column data type, and convert from AST to CAT.
                TYPE = AST_MAPTYPE( KEYMAP, KEY, STATUS )
 
-*  Skip FitsChan entries.
-               IF( TYPE .NE. AST__OBJECTTYPE .OR. .NOT.
-     :             AST_MAPGET0A( KEYMAP, KEY, IAST, STATUS ) .AND.
-     :             AST_ISAFITSCHAN( IAST, STATUS ) ) THEN
+               IF( TYPE .EQ . AST__INTTYPE ) THEN
+                  CATYPE = CAT__TYPEI
 
-*  Store the entry name as the column name.
-                  COLNAM( I ) = KEY
+               ELSE IF( TYPE .EQ . AST__SINTTYPE ) THEN
+                  CATYPE = CAT__TYPEW
 
-*  Convert the column data type from AST to CAT.
-                  IF( TYPE .EQ . AST__INTTYPE ) THEN
-                     CATYPE = CAT__TYPEI
+               ELSE IF( TYPE .EQ . AST__DOUBLETYPE ) THEN
+                  CATYPE = CAT__TYPED
 
-                  ELSE IF( TYPE .EQ . AST__SINTTYPE ) THEN
-                     CATYPE = CAT__TYPEW
+               ELSE IF( TYPE .EQ . AST__FLOATTYPE ) THEN
+                  CATYPE = CAT__TYPER
 
-                  ELSE IF( TYPE .EQ . AST__DOUBLETYPE ) THEN
-                     CATYPE = CAT__TYPED
-
-                  ELSE IF( TYPE .EQ . AST__FLOATTYPE ) THEN
-                     CATYPE = CAT__TYPER
-
-                  ELSE IF( TYPE .EQ . AST__STRINGTYPE ) THEN
-                     CATYPE = CAT__TYPEC
+               ELSE IF( TYPE .EQ . AST__STRINGTYPE ) THEN
+                  CATYPE = CAT__TYPEC
 
 *  Report an error for complex data types.
-                  ELSE IF( STATUS .EQ. SAI__OK ) THEN
-                     STATUS = SAI__ERROR
-                     CALL MSG_SETC( 'K', KEY )
-                     CALL MSG_SETC( 'P', PARAM )
-                     CALL ERR_REP( ' ', 'Cannot create the ''^K'' '//
-     :                             'column within the catalogue '//
-     :                             'associated with parameter ''^P'' '//
-     :                             '- the column data type is '//
-     :                             'inappropriate (programming error).',
-     :                             STATUS )
-                     GO TO 999
-                  END IF
+               ELSE IF( STATUS .EQ. SAI__OK ) THEN
+                  STATUS = SAI__ERROR
+                  CALL MSG_SETC( 'K', KEY )
+                  CALL MSG_SETC( 'P', PARAM )
+                  CALL ERR_REP( ' ', 'Cannot create the ''^K'' column'//
+     :                          ' within the catalogue associated '//
+     :                          'with parameter ''^P'' - the column '//
+     :                          'data type is inappropriate '//
+     :                          '(programming error).', STATUS )
+                  GO TO 999
+               END IF
 
 *  Get the maximum formatted length of any element in this column, and
 *  update the maximum formatted length of any column.
-                  LENC = AST_MAPLENC( KEYMAP, KEY, STATUS )
-                  MAXLEN = MAX( MAXLEN, LENC )
+               LENC = AST_MAPLENC( KEYMAP, KEY, STATUS )
+               MAXLEN = MAX( MAXLEN, LENC )
 
 *  Create the column, storing its CAT identifier in KMCOL.
-                  CALL CAT_CNEWS( CI, COLNAM( I ), CATYPE, LENC, ' ',
-     :                            ' ', ' ', KMCOL( I ), STATUS )
+               CALL CAT_CNEWS( CI, COLNAM( I ), CATYPE, LENC, ' ', ' ',
+     :                         ' ', KMCOL( I ), STATUS )
 
 *  Set the maximum number of values in the column.
-                  KMLEN( I ) = AST_MAPLENGTH( KEYMAP, KEY, STATUS )
-               END IF
+               KMLEN( I ) = AST_MAPLENGTH( KEYMAP, KEY, STATUS )
+
             END DO
          END IF
-
       END IF
 
 *  Allocate memory to hold a string that is large enough for the longest
