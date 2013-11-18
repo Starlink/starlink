@@ -55,6 +55,9 @@
 *  History:
 *     14-NOV-2013 (DSB):
 *        Original version, based on code from COF_NDF2F.
+*     18-NOV-2013 (DSB):
+*        DO not use Fotran INQUIRE statement to get information about the
+*        supplied unit number. Use FITSIO routines instead.
 *     {enter_further_changes_here}
 
 *-
@@ -75,8 +78,6 @@
 *  Local Variables:
       CHARACTER PATH*( CVG__MXPTH )
       INTEGER FSTAT
-      LOGICAL NAMED
-      LOGICAL OPENED
 *.
 
 *  Return immediately if no logical unit number was supplied.
@@ -88,28 +89,26 @@
 *  Initialise the FITSIO status.
       FSTAT = CVG__FITSOK
 
-*  Check that the unit is in use, and get the path of the attached file.
-      INQUIRE( FUNIT, OPENED=OPENED, NAMED=NAMED, NAME=PATH )
-      IF( OPENED ) THEN
+*  Get the path of the attached file.
+      CALL FTFLNM( FUNIT, PATH, FSTAT )
 
 *  Attempt to close the FITS file.
-         CALL FTCLOS( FUNIT, FSTAT )
+      CALL FTCLOS( FUNIT, FSTAT )
 
 *  If it failed, report an error.
-         IF( FSTAT .GT. CVG__FITSOK ) THEN
-            IF( NAMED .AND. PATH .NE. ' ' ) THEN
-               CALL MSG_SETC( 'P', PATH )
-               CALL CVG_FIOER( FSTAT, ' ', 'FTCLOS', 'Error closing '//
-     :                         'FITS file ^P.', STATUS )
-            ELSE
-               CALL CVG_FIOER( FSTAT, ' ', 'FTCLOS', 'Error closing '//
-     :                         'FITS file.', STATUS )
-            END IF
+      IF( FSTAT .GT. CVG__FITSOK ) THEN
+         IF( PATH .NE. ' ' ) THEN
+            CALL MSG_SETC( 'P', PATH )
+            CALL CVG_FIOER( FSTAT, ' ', 'FTCLOS', 'Error closing '//
+     :                      'FITS file ^P.', STATUS )
+         ELSE
+            CALL CVG_FIOER( FSTAT, ' ', 'FTCLOS', 'Error closing '//
+     :                      'FITS file.', STATUS )
          END IF
+      END IF
 
 *  Release the logical-unit.
-         CALL FIO_PUNIT( FUNIT, STATUS )
-      END IF
+      CALL FIO_PUNIT( FUNIT, STATUS )
 
 *  Return an illegal logical unit number.
       FUNIT = CVG__NOLUN
