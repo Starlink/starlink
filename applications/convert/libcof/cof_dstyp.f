@@ -155,7 +155,7 @@
             IF ( FSTAT .GT. FITSOK ) THEN
                BUFFER = 'Error obtaining the string value of keyword '/
      :                  /SCAKEY
-               CALL COF_FIOER( FSTAT, 'COF_DSTAB', 'FTGKEY', BUFFER,
+               CALL CVG_FIOER( FSTAT, 'COF_DSTAB', 'FTGKEY', BUFFER,
      :                         STATUS )
                GOTO 999
             END IF
@@ -185,7 +185,7 @@
                BUFFER = 'Error obtaining the string value of keyword '/
      :                  /ZERKEY
 
-               CALL COF_FIOER( FSTAT, 'COF_DSTAB', 'FTGKEY',
+               CALL CVG_FIOER( FSTAT, 'COF_DSTAB', 'FTGKEY',
      :                         BUFFER, STATUS )
                GOTO 999
             END IF

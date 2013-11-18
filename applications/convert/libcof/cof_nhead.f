@@ -116,7 +116,7 @@
 *  Report an error if something has gone wrong.
          BUFFER = 'Error obtaining the number of header cards from '/
      :            /'the FITS file '//FILE( :NCF )//'.'
-         CALL COF_FIOER( FSTAT, 'COF_NHEAD_NCARD',
+         CALL CVG_FIOER( FSTAT, 'COF_NHEAD_NCARD',
      :                  'FTGHSP', BUFFER, STATUS )
       END IF
 

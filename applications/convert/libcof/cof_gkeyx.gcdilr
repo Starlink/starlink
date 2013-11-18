@@ -79,7 +79,7 @@
 *     {enter_further_changes_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -154,7 +154,7 @@
       ELSE IF ( FSTAT .GT. FITSOK ) THEN
          BUFFER = 'Trying to find the value of the FITS header with '/
      :            /'keyword '//KEYWRD//'. '
-         CALL COF_FIOER( FSTAT, 'COF_GKEY<T>_ERR', ROUTIN,
+         CALL CVG_FIOER( FSTAT, 'COF_GKEY<T>_ERR', ROUTIN,
      :                   BUFFER, STATUS )
 
       ELSE

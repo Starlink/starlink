@@ -130,7 +130,7 @@
       IF ( FSTAT .NE. FITSOK ) THEN
          BUFFER = 'Error reading the headers of the FITS file '/
      :            /FILE( :NCF )//'.'
-         CALL COF_FIOER( FSTAT, 'COF_RHEAD_READ', 'FTGREC',
+         CALL CVG_FIOER( FSTAT, 'COF_RHEAD_READ', 'FTGREC',
      :                   BUFFER, STATUS )
 
 *  Restore the bad status when something went wrong with the FITSIO

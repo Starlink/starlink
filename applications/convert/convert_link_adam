@@ -52,6 +52,8 @@
 #        Add ONE.
 #     2008 March 6 (MJC):
 #        Add KAPLIBS without graphics..
+#     18-NOV-2013 (DSB):
+#        Added CVG
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -59,8 +61,8 @@
 
 #-
 
-      echo `kaplibs_link_adam -nogrf` `sla_link` `cfitsio_link` \
-           `ndf_link_adam` `grp_link_adam` \
+      echo `kaplibs_link_adam -nogrf` `cvg_link_adam` `sla_link` \
+           `cfitsio_link` `ndf_link_adam` `grp_link_adam` \
            `fio_link_adam` `prm_link_adam` `pda_link_adam` `shl_link_adam` \
            `pda_link_adam` `ndg_link_adam` `one_link_adam` `atl_link_adam` \
            | awk 'BEGIN{RS=" ";FS="\n"}

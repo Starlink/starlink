@@ -160,7 +160,7 @@
       FC = AST_FITSCHAN( AST_NULL, AST_NULL, WCSATT, STATUS )
 
 *  Copy all the headers in the current HDU into the FitsChan.
-      CALL COF_HD2FC( FUNT, FC, STATUS )
+      CALL CVG_HD2FC( FUNT, FC, STATUS )
 
 *  Indicate that axes that use the -TAB algorithm defined in FITS-WCS
 *  paper III should be recognised.

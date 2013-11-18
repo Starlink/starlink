@@ -242,7 +242,7 @@
       IF ( FSTAT .NE. FITSOK ) THEN
          BUFFER = 'Error skipping to the extension of the IUE MX FITS '/
      :            /'file '//FILE( :NCF )//'.'
-         CALL COF_FIOER( FSTAT, 'COF_IUEMH_WREXT', 'FTMRHD', BUFFER,
+         CALL CVG_FIOER( FSTAT, 'COF_IUEMH_WREXT', 'FTMRHD', BUFFER,
      :                   STATUS )
 
       ELSE IF ( HDUTYP .NE. 2 ) THEN
@@ -414,7 +414,7 @@
          IF ( FSTAT .NE. FITSOK ) THEN
             BUFFER = 'Error copying the IUE MXHI flux to the NDF '/
      :               /'data array in order '//COR( :NC )//'.'
-            CALL COF_FIOER( FSTAT, 'COF_IUEMH_CRDAT', 'FTGCVx',
+            CALL CVG_FIOER( FSTAT, 'COF_IUEMH_CRDAT', 'FTGCVx',
      :                      BUFFER, STATUS )
             GOTO 999
          END IF
@@ -467,7 +467,7 @@
          IF ( FSTAT .NE. FITSOK ) THEN
             BUFFER = 'Error copying the IUE MXHI quality to the NDF '/
      :                /'quality array in order '//COR( :NC )//'.'
-            CALL COF_FIOER( FSTAT, 'COF_IUEMH_CRQUA', 'FTGCVB',
+            CALL CVG_FIOER( FSTAT, 'COF_IUEMH_CRQUA', 'FTGCVB',
      :                      BUFFER, STATUS )
             GOTO 999
          END IF

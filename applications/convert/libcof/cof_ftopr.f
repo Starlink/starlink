@@ -265,7 +265,7 @@
       END IF ! FITS specifier parsed OK
 
       IF ( FSTAT .GT. FITSOK ) THEN
-         CALL COF_FIOER( FSTAT, 'COF_FTOPR_ERR', FTSUB,
+         CALL CVG_FIOER( FSTAT, 'COF_FTOPR_ERR', FTSUB,
      :     EBUFF, STATUS )
       END IF
 

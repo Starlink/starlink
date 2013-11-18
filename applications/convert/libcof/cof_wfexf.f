@@ -197,7 +197,7 @@
                CALL MSG_SETI( 'IH', IHEAD )
                CALL MSG_SETC( 'FILE', FILE( :NCF ) )
 
-               CALL COF_FIOER( FSTAT, 'COF_WFEXF_GHEAD', 'FTGREC',
+               CALL CVG_FIOER( FSTAT, 'COF_WFEXF_GHEAD', 'FTGREC',
      :           'Error obtaining a FITS header (^IH of ^NH) from '/
      :           /'FITS file ^FILE.', STATUS )
                CALL DAT_ANNUL( FLOC, STATUS )
@@ -261,7 +261,7 @@
                CALL MSG_SETI( 'I', I )
                CALL MSG_SETC( 'FILE', FILE( :NCF ) )
 
-               CALL COF_FIOER( FSTAT, 'COF_WFEXF_GHEAD', 'FTGGPD',
+               CALL CVG_FIOER( FSTAT, 'COF_WFEXF_GHEAD', 'FTGGPD',
      :           'Error obtaining a random-group parameter (^I of '/
      :           /'^PC) from FITS file ^FILE.', STATUS )
                CALL DAT_ANNUL( FLOC, STATUS )

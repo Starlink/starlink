@@ -142,7 +142,7 @@
          BUFFER = 'Error obtaining the number of header cards from '/
      :            /'FITS file '//FILE( :NCF )//'.'
 
-         CALL COF_FIOER( FSTAT, 'COF_HDLOG_NHEAD', 'FTGHSP',
+         CALL CVG_FIOER( FSTAT, 'COF_HDLOG_NHEAD', 'FTGHSP',
      :                   BUFFER, STATUS )
          GOTO 999
       END IF
@@ -192,7 +192,7 @@
             CALL MSG_SETI( 'NH', NHEAD )
             CALL MSG_SETI( 'IH', IHEAD )
             CALL MSG_SETC( 'FILE', FILE( :NCF ) )
-            CALL COF_FIOER( FSTAT, 'COF_HDLOG_GHEAD', 'FTGREC',
+            CALL CVG_FIOER( FSTAT, 'COF_HDLOG_GHEAD', 'FTGREC',
      :        'Error obtaining a FITS header (^IH of ^NH) from '/
      :        /'FITS file ^FILE.', STATUS )
             GOTO 999

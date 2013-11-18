@@ -270,7 +270,7 @@
                   CALL ERR_REP( 'COF_SMFIM_WREXT',
      :              'Error skipping to the ^N^NTH extension ^BUF',
      :              STATUS )
-                  CALL COF_FIOER( FSTAT, 'COF_SMFIM_WREXT', 'FTMRHD',
+                  CALL CVG_FIOER( FSTAT, 'COF_SMFIM_WREXT', 'FTMRHD',
      :              ' ', STATUS )
                END IF
                GOTO 999
@@ -281,7 +281,7 @@
             IF ( FSTAT .NE. FITSOK ) THEN
                BUFFER = 'Error obtaining the extension name from '/
      :                  /'FITS file '//FILE( :NCF )//'.'
-               CALL COF_FIOER( FSTAT, 'COF_SMFIM_MANDH', 'FTGKYS',
+               CALL CVG_FIOER( FSTAT, 'COF_SMFIM_MANDH', 'FTGKYS',
      :                         BUFFER, STATUS )
                GOTO 999
             END IF
@@ -321,7 +321,7 @@
                IF ( FSTAT .GT. FITSOK ) THEN
                   BUFFER = 'Error defaulting the scale and offset for '/
      :                     /'FITS file '//FILE( :NCF )//'.'
-                  CALL COF_FIOER( FSTAT, 'COF_SMFIM_SCOF', 'FTPSCL',
+                  CALL CVG_FIOER( FSTAT, 'COF_SMFIM_SCOF', 'FTPSCL',
      :                            BUFFER, STATUS )
                   GOTO 999
                END IF
@@ -585,7 +585,7 @@
                   NC = CHR_LEN( COMP )
                   BUFFER = 'Error reading the '//COMP( :NC )/
      :                     /' array in FITS file '//FILE( :NCF )//'.'
-                  CALL COF_FIOER( FSTAT, 'COF_SMFIM_READ',
+                  CALL CVG_FIOER( FSTAT, 'COF_SMFIM_READ',
      :                            'FTGPVx', BUFFER, STATUS )
                   CALL NDF_UNMAP( NDFE, COMP, STATUS )
                   GOTO 999

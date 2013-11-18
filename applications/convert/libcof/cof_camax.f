@@ -230,7 +230,7 @@
             CALL CHR_ITOC( OBSNO, CON, NC )
             BUFFER = 'Error obtaining the axis parameters for FITS '/
      :        /'file '//FILE( :NCF )//', observation'//CON( :NC )//'.'
-            CALL COF_FIOER( FSTAT, 'COF_CAMAX_AXCOL', 'FTGCVx',
+            CALL CVG_FIOER( FSTAT, 'COF_CAMAX_AXCOL', 'FTGCVx',
      :                      BUFFER, STATUS )
             GOTO 999
          END IF

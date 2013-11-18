@@ -266,7 +266,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
       IF ( FSTAT .GT. FITSOK ) THEN
-         CALL COF_FIOER( FSTAT, 'COF_WNDFH_ERR1', 'FTPHPR',
+         CALL CVG_FIOER( FSTAT, 'COF_WNDFH_ERR1', 'FTPHPR',
      :                    'Error writing mandatory header cards.',
      :                    STATUS )
          GOTO 999
@@ -490,7 +490,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
          IF ( FSTAT .GT. FITSOK ) THEN
-            CALL COF_FIOER( FSTAT, 'COF_WNDFH_ERR2', 'FTPKYx',
+            CALL CVG_FIOER( FSTAT, 'COF_WNDFH_ERR2', 'FTPKYx',
      :                       'Error writing axis'//C//' header cards.',
      :                      STATUS )
             GOTO 999
@@ -526,7 +526,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
          IF ( FSTAT .GT. FITSOK ) THEN
-            CALL COF_FIOER( FSTAT, 'COF_WNDFH_ERR2', 'FTPKYJ',
+            CALL CVG_FIOER( FSTAT, 'COF_WNDFH_ERR2', 'FTPKYJ',
      :                       'Error writing LBOUNDn header cards.',
      :                      STATUS )
             GOTO 999
@@ -626,7 +626,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
       IF ( FSTAT .GT. FITSOK ) THEN
-         CALL COF_FIOER( FSTAT, 'COF_WNDFH_ERR3', 'FTPKYS',
+         CALL CVG_FIOER( FSTAT, 'COF_WNDFH_ERR3', 'FTPKYS',
      :                    'Error writing an NDF character component '/
      :                    /'to a header card. ', STATUS )
          GOTO 999
@@ -639,7 +639,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
       IF ( FSTAT .GT. FITSOK ) THEN
-         CALL COF_FIOER( FSTAT, 'COF_WNDFH_ERR4', 'FTPDAT',
+         CALL CVG_FIOER( FSTAT, 'COF_WNDFH_ERR4', 'FTPDAT',
      :                    'Error writing the DATE header card.',
      :                    STATUS )
          GOTO 999
@@ -653,7 +653,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
       IF ( FSTAT .GT. FITSOK ) THEN
-         CALL COF_FIOER( FSTAT, 'COF_WNDFH_ERR4', 'FTPKYS',
+         CALL CVG_FIOER( FSTAT, 'COF_WNDFH_ERR4', 'FTPKYS',
      :                   'Error writing the ORIGIN header card.',
      :                   STATUS )
          GOTO 999
@@ -674,7 +674,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
          IF ( FSTAT .GT. FITSOK ) THEN
-            CALL COF_FIOER( FSTAT, 'COF_WNDFH_ERR5', 'FTPKYD',
+            CALL CVG_FIOER( FSTAT, 'COF_WNDFH_ERR5', 'FTPKYD',
      :                       'Error writing the BSCALE or BZERO '/
      :                       /'header card.', STATUS )
             GOTO 999
@@ -710,7 +710,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
             IF ( FSTAT .GT. FITSOK ) THEN
-               CALL COF_FIOER( FSTAT, 'COF_WNDFH_ERR6', 'FTPKYJ',
+               CALL CVG_FIOER( FSTAT, 'COF_WNDFH_ERR6', 'FTPKYJ',
      :                          'Error writing the BLANK header card.',
      :                          STATUS )
                GOTO 999

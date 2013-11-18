@@ -102,7 +102,7 @@
 
 *  Create a FitsTable holding the contents of the binary table in the
 *  named extension.
-      CALL COF_BT2FT( FUNIT, EXTNAM, EXTVER, EXTLEVEL, TABLE, STATUS )
+      CALL CVG_BT2FT( FUNIT, EXTNAM, EXTVER, EXTLEVEL, TABLE, STATUS )
 
 *  If a table was created, add it to the supplied FitsChan, and then
 *  annul the local pointer to it.

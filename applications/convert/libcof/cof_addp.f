@@ -117,7 +117,7 @@
 *  Failed to open new unit
                CALL MSG_SETC( 'CARD', ARRAY(I) )
                CALL MSG_SETI( 'ICARD', ICARD )
-               CALL COF_FIOER( FSTAT, 'COF_MRGHD_GHEAD', 'FTGREC',
+               CALL CVG_FIOER( FSTAT, 'COF_MRGHD_GHEAD', 'FTGREC',
      :           'Error merging Primary header card ^CARD '//
      :           'as header record ^ICARD', STATUS )
                GO TO 999

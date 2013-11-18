@@ -486,7 +486,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
       IF ( FSTAT .GT. FITSOK ) THEN
-         CALL COF_FIOER( FSTAT, 'COF_WHEAD_ERR1', 'FTPKYS',
+         CALL CVG_FIOER( FSTAT, 'COF_WHEAD_ERR1', 'FTPKYS',
      :     'Error writing an EXTNAME, EXTTYPE or HDUCLASn header card.',
      :     STATUS )
          GOTO 999
@@ -513,7 +513,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
             IF ( FSTAT .GT. FITSOK ) THEN
-               CALL COF_FIOER( FSTAT, 'COF_WHEAD_ERR7', 'FTPKYJ',
+               CALL CVG_FIOER( FSTAT, 'COF_WHEAD_ERR7', 'FTPKYJ',
      :           'Error writing extension level in header.', STATUS )
                GOTO 999
             END IF
@@ -545,7 +545,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
          IF ( FSTAT .GT. FITSOK ) THEN
-            CALL COF_FIOER( FSTAT, 'COF_WHEAD_ERR2', 'FTPKYJ',
+            CALL CVG_FIOER( FSTAT, 'COF_WHEAD_ERR2', 'FTPKYJ',
      :        'Error writing extension level in header.', STATUS )
             GOTO 999
          END IF
@@ -557,7 +557,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
          IF ( FSTAT .GT. FITSOK ) THEN
-            CALL COF_FIOER( FSTAT, 'COF_WHEAD_ERR3', 'FTPKYS',
+            CALL CVG_FIOER( FSTAT, 'COF_WHEAD_ERR3', 'FTPKYS',
      :        'Error writing extension type in header.', STATUS )
             GOTO 999
          END IF
@@ -849,7 +849,7 @@
 *  We should aim to have header-validation software.
                IF ( FSTAT .GT. FITSOK ) THEN
                   CALL ERR_MARK
-                  CALL COF_FIOER( FSTAT, 'COF_WHEAD_ERR4', 'FTPREC',
+                  CALL CVG_FIOER( FSTAT, 'COF_WHEAD_ERR4', 'FTPREC',
      :              'Warning: error unable to propagate a header from '/
      :              /'NDF''s FITS airlock.', STATUS )
 
@@ -904,7 +904,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
                      IF ( FSTAT .GT. FITSOK ) THEN
-                        CALL COF_FIOER( FSTAT, 'COF_WHEAD_ERR5',
+                        CALL CVG_FIOER( FSTAT, 'COF_WHEAD_ERR5',
      :                    'FTPREC', 'Error copying FITS axis-rotation '/
      :                    /'header card to the FITS file.', STATUS )
                         GOTO 999

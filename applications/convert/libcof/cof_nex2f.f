@@ -481,7 +481,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
          IF ( FSTAT .GT. FITSOK ) THEN
-            CALL COF_FIOER( FSTAT, 'COF_NEX2F_NHDU', 'FTCRHD',
+            CALL CVG_FIOER( FSTAT, 'COF_NEX2F_NHDU', 'FTCRHD',
      :         'Error creating the header and data unit for an '/
      :         /'IMAGE extension.', STATUS )
             GOTO 999
@@ -650,7 +650,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
             IF ( FSTAT .GT. FITSOK ) THEN
-               CALL COF_FIOER( FSTAT, 'COF_NEX2F_BLANK1', 'FTMKYJ',
+               CALL CVG_FIOER( FSTAT, 'COF_NEX2F_BLANK1', 'FTMKYJ',
      :           'Error modifying the BLANK header card.', STATUS )
                GOTO 999
             END IF
@@ -769,7 +769,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
             IF ( FSTAT .GT. FITSOK ) THEN
-               CALL COF_FIOER( FSTAT, 'COF_NEX2F_HSCOF', 'FTMKYD',
+               CALL CVG_FIOER( FSTAT, 'COF_NEX2F_HSCOF', 'FTMKYD',
      :           'Error modifying the BSCALE or BZERO header card.',
      :           STATUS )
                GOTO 999
@@ -783,7 +783,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
          IF ( FSTAT .GT. FITSOK ) THEN
-            CALL COF_FIOER( FSTAT, 'COF_NEX2F_SCOF', 'FTPSCL',
+            CALL CVG_FIOER( FSTAT, 'COF_NEX2F_SCOF', 'FTPSCL',
      :        'Error defining the scale and offset.', STATUS )
             GOTO 999
          END IF
@@ -802,7 +802,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
             IF ( FSTAT .GT. FITSOK ) THEN
-               CALL COF_FIOER( FSTAT, 'COF_NEX2F_BLANK2', 'FTPNUL',
+               CALL CVG_FIOER( FSTAT, 'COF_NEX2F_BLANK2', 'FTPNUL',
      :           'Error modifying the BLANK value.', STATUS )
                GOTO 999
             END IF
@@ -847,7 +847,7 @@
                BUFFER = 'Error writing '//ARRNAM( ICOMP )( :NC )/
      :                  /' array component to FITS file '/
      :                  /FILNAM( :NCF )//'.'
-               CALL COF_FIOER( FSTAT, 'COF_NEX2F_WRDATAERR',
+               CALL CVG_FIOER( FSTAT, 'COF_NEX2F_WRDATAERR',
      :                         'FTPPNx', BUFFER, STATUS )
                GOTO 999
             END IF
@@ -889,7 +889,7 @@
                BUFFER = 'Error writing '//ARRNAM( ICOMP )( :NC )/
      :                  /' array component to FITS file '/
      :                  /FILNAM( :NCF )//'.'
-               CALL COF_FIOER( FSTAT, 'COF_NEX2F_WRDATAERR',
+               CALL CVG_FIOER( FSTAT, 'COF_NEX2F_WRDATAERR',
      :                         'FTPPRx', BUFFER, STATUS )
                GOTO 999
             END IF

@@ -191,7 +191,7 @@
       IF ( FSTAT .NE. FITSOK ) THEN
          BUFFER = 'Error skipping to the extension of the IUE INES '/
      :            /'FITS file '//FILE( :NCF )//'.'
-         CALL COF_FIOER( FSTAT, 'COF_INES_WREXT', 'FTMRHD', BUFFER,
+         CALL CVG_FIOER( FSTAT, 'COF_INES_WREXT', 'FTMRHD', BUFFER,
      :                   STATUS )
 
       ELSE IF ( HDUTYP .NE. 2 ) THEN
@@ -298,7 +298,7 @@
       IF ( FSTAT .NE. FITSOK ) THEN
          BUFFER = 'Error copying the IUE INES flux to the NDF '/
      :            /'data array in observation '//CON( :NC )//'.'
-         CALL COF_FIOER( FSTAT, 'COF_INES_CRDAT', 'FTGCVx',
+         CALL CVG_FIOER( FSTAT, 'COF_INES_CRDAT', 'FTGCVx',
      :                   BUFFER, STATUS )
          GOTO 999
       END IF
@@ -393,7 +393,7 @@
 
 *  Check that the transfer was correct.
       IF ( FSTAT .NE. FITSOK ) THEN
-         CALL COF_FIOER( FSTAT, 'COF_INES_CRVAR', 'FTGCVx',
+         CALL CVG_FIOER( FSTAT, 'COF_INES_CRVAR', 'FTGCVx',
      :     'Error copying the IUE INES standard deviation to the '/
      :     /'NDF error array.', STATUS )
          GOTO 999
@@ -436,7 +436,7 @@
       IF ( FSTAT .NE. FITSOK ) THEN
          BUFFER = 'Error copying the IUE INES quality to the NDF '/
      :             /'quality array in observation '//CON( :NC )//'.'
-         CALL COF_FIOER( FSTAT, 'COF_INES_CRQUA', 'FTGCVB',
+         CALL CVG_FIOER( FSTAT, 'COF_INES_CRQUA', 'FTGCVB',
      :                   BUFFER, STATUS )
          GOTO 999
       END IF

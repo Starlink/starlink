@@ -183,7 +183,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
       IF ( FSTAT .GT. FITSOK ) THEN
-         CALL COF_FIOER( FSTAT, 'COF_WSTR_ERR1',
+         CALL CVG_FIOER( FSTAT, 'COF_WSTR_ERR1',
      :      'FTPHBN', 'Error writing binary-table header.', STATUS )
          GOTO 999
       END IF
@@ -221,7 +221,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.  Specify from which routine the error arose.
       IF ( FSTAT .GT. FITSOK ) THEN
-         CALL COF_FIOER( FSTAT, 'COF_WSTR_ERR7', 'FTIKYJ',
+         CALL CVG_FIOER( FSTAT, 'COF_WSTR_ERR7', 'FTIKYJ',
      :     'Error writing TNULL1 card for a binary table.',
      :     STATUS )
          GOTO 999
@@ -239,7 +239,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
       IF ( FSTAT .GT. FITSOK ) THEN
-         CALL COF_FIOER( FSTAT, 'COF_WSTR_ERR2', 'FTPKYJ',
+         CALL CVG_FIOER( FSTAT, 'COF_WSTR_ERR2', 'FTPKYJ',
      :     'Error writing extension level in header.', STATUS )
          GOTO 999
       END IF
@@ -251,7 +251,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
       IF ( FSTAT .GT. FITSOK ) THEN
-         CALL COF_FIOER( FSTAT, 'COF_WSTR_ERR3', 'FTPKYS',
+         CALL CVG_FIOER( FSTAT, 'COF_WSTR_ERR3', 'FTPKYS',
      :     'Error writing extension type in header.', STATUS )
          GOTO 999
       END IF
@@ -263,7 +263,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
       IF ( FSTAT .GT. FITSOK ) THEN
-         CALL COF_FIOER( FSTAT, 'COF_WSTR_ERR8', 'FTPKYS',
+         CALL CVG_FIOER( FSTAT, 'COF_WSTR_ERR8', 'FTPKYS',
      :     'Error writing extension shape in header.', STATUS )
          GOTO 999
       END IF
@@ -279,7 +279,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
       IF ( FSTAT .GT. FITSOK ) THEN
-         CALL COF_FIOER( FSTAT, 'COF_WSTR_ERR3', 'FTBDEF',
+         CALL CVG_FIOER( FSTAT, 'COF_WSTR_ERR3', 'FTBDEF',
      :     'Error defining binary-table structure.', STATUS )
          GOTO 999
       END IF
@@ -296,7 +296,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.  Specify from which routine the error arose.
       IF ( FSTAT .GT. FITSOK ) THEN
-         CALL COF_FIOER( FSTAT, 'COF_WSTR_ERR6', 'FTTNUL',
+         CALL CVG_FIOER( FSTAT, 'COF_WSTR_ERR6', 'FTTNUL',
      :     'Error setting null value for a binary-table '/
      :     /'column.', STATUS )
          GOTO 999

@@ -108,7 +108,7 @@
 *        - Changed the 4th argument of every call of FTGCVx from IOBS to
 *        1.
 *     1998 January 22 (MJC):
-*        Corrected an COF_FIOER error report to use a buffer and not an
+*        Corrected an CVG_FIOER error report to use a buffer and not an
 *        MSG token; this makes it consistent with the other error
 *        reports.  Created axis centres for extension NDFs.  Added some
 *        defensive programming in case the MXLO format changes.
@@ -250,7 +250,7 @@
       IF ( FSTAT .NE. FITSOK ) THEN
          BUFFER = 'Error skipping to the extension of the IUE MX FITS '/
      :            /'file '//FILE( :NCF )//'.'
-         CALL COF_FIOER( FSTAT, 'COF_IUEMX_WREXT', 'FTMRHD', BUFFER,
+         CALL CVG_FIOER( FSTAT, 'COF_IUEMX_WREXT', 'FTMRHD', BUFFER,
      :                   STATUS )
 
       ELSE IF ( HDUTYP .NE. 2 ) THEN
@@ -416,7 +416,7 @@
          IF ( FSTAT .NE. FITSOK ) THEN
             BUFFER = 'Error copying the IUE MXLO flux to the NDF '/
      :               /'data array in observation '//CON( :NC )//'.'
-            CALL COF_FIOER( FSTAT, 'COF_IUEMX_CRDAT', 'FTGCVx',
+            CALL CVG_FIOER( FSTAT, 'COF_IUEMX_CRDAT', 'FTGCVx',
      :                      BUFFER, STATUS )
             GOTO 999
          END IF
@@ -511,7 +511,7 @@
 
 *  Check that the transfer was correct.
          IF ( FSTAT .NE. FITSOK ) THEN
-            CALL COF_FIOER( FSTAT, 'COF_IUEMX_CRVAR', 'FTGCVx',
+            CALL CVG_FIOER( FSTAT, 'COF_IUEMX_CRVAR', 'FTGCVx',
      :        'Error copying the IUE MXLO standard deviation to the '/
      :        /'NDF error array.', STATUS )
             GOTO 999
@@ -554,7 +554,7 @@
          IF ( FSTAT .NE. FITSOK ) THEN
             BUFFER = 'Error copying the IUE MXLO quality to the NDF '/
      :                /'quality array in observation '//CON( :NC )//'.'
-            CALL COF_FIOER( FSTAT, 'COF_IUEMX_CRQUA', 'FTGCVB',
+            CALL CVG_FIOER( FSTAT, 'COF_IUEMX_CRQUA', 'FTGCVB',
      :                      BUFFER, STATUS )
             GOTO 999
          END IF

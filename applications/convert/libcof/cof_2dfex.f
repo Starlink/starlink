@@ -293,7 +293,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
       IF ( FSTAT .GT. FITSOK ) THEN
-         CALL COF_FIOER( FSTAT, 'COF_2DFEX_ERR1', 'FTPHBN',
+         CALL CVG_FIOER( FSTAT, 'COF_2DFEX_ERR1', 'FTPHBN',
      :                   'Error writing binary-table header.', STATUS )
          GOTO 999
       END IF
@@ -353,7 +353,7 @@
          IF ( FSTAT .GT. FITSOK ) THEN
             BUFFER = 'Error writing '//CRDNAM( :NC )//' card for a '/
      :               /'binary table.'
-            CALL COF_FIOER( FSTAT, 'COF_2DFEX_ERR3', 'FTIKYx',
+            CALL CVG_FIOER( FSTAT, 'COF_2DFEX_ERR3', 'FTIKYx',
      :                      BUFFER, STATUS )
             GOTO 999
          END IF
@@ -402,7 +402,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
       IF ( FSTAT .GT. FITSOK ) THEN
-         CALL COF_FIOER( FSTAT, 'COF_2DFEX_ERR2', 'FTPKYJ',
+         CALL CVG_FIOER( FSTAT, 'COF_2DFEX_ERR2', 'FTPKYJ',
      :     'Error writing extension level in header.', STATUS )
          GOTO 999
       END IF
@@ -1025,7 +1025,7 @@
             NC = CHR_LEN( TTYPE( I ) )
             BUFFER = 'Error copying vector component '/
      :               /TTYPE( I )( :NC )//' to the binary table.'
-            CALL COF_FIOER( FSTAT, 'COF_2DFEX_ERR4', ROUTIN, BUFFER,
+            CALL CVG_FIOER( FSTAT, 'COF_2DFEX_ERR4', ROUTIN, BUFFER,
      :                      STATUS )
             GOTO 999
          END IF

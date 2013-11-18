@@ -795,7 +795,7 @@
                IF ( FSTAT .NE. FITSOK ) THEN
                   BUFFER =  'Error obtaining the extension name from '/
      :                      /'FITS file '//FILNAM(1:NCF )//'.'
-                  CALL COF_FIOER( FSTAT, 'COF_F2NDF_GKYS', 'FTGKYS',
+                  CALL CVG_FIOER( FSTAT, 'COF_F2NDF_GKYS', 'FTGKYS',
      :                            BUFFER, STATUS )
                   GOTO 999
 
@@ -1367,7 +1367,7 @@
                         BUFFER = 'Error reading the '//COMP( :NC )/
      :                           /' array in FITS file '/
      :                           /FILNAM(1:NCF )//'.'
-                        CALL COF_FIOER( FSTAT, 'COF_F2NDF_READ',
+                        CALL CVG_FIOER( FSTAT, 'COF_F2NDF_READ',
      :                    'FTGPVx', BUFFER, STATUS )
                         CALL NDF_UNMAP( NDFE, COMP, STATUS )
                         GOTO 999
@@ -1601,7 +1601,7 @@
                      CALL ERR_REP( 'COF_F2NDF_WREXT',
      :                 'Error skipping to the ^N^NTH extension ^BUF',
      :                 STATUS )
-                     CALL COF_FIOER( FSTAT, 'COF_F2NDF_WREXT', 'FTMRHD',
+                     CALL CVG_FIOER( FSTAT, 'COF_F2NDF_WREXT', 'FTMRHD',
      :                 ' ', STATUS )
                   END IF  ! Plain error
                   GOTO 999
@@ -1653,7 +1653,7 @@
       CALL FTCLOS( FUNITH, FSTATC )
       IF ( FSTATC .GT. FITSOK ) THEN
          BUFFER = 'Error closing the FITS file '//FILNAM(1:NCF )//'.'
-         CALL COF_FIOER( FSTATC, 'COF_F2NDF_CLOSE', 'FTCLOS', BUFFER,
+         CALL CVG_FIOER( FSTATC, 'COF_F2NDF_CLOSE', 'FTCLOS', BUFFER,
      :                   STATUS )
       END IF
 

@@ -160,7 +160,7 @@
                IF ( FSTAT .NE. FITSOK ) THEN
 
 *  Failed to open new unit.
-                  CALL COF_FIOER( FSTAT, 'COF_MRGHD_GHEAD', 'FTGREC',
+                  CALL CVG_FIOER( FSTAT, 'COF_MRGHD_GHEAD', 'FTGREC',
      :              'Error opening temporary FITS for merged header',
      :              STATUS )
 
@@ -186,7 +186,7 @@
                            CALL MSG_SETI( 'NH', NHEAD + 1 )
                            CALL MSG_SETI( 'IH', IHEAD )
                            CALL MSG_SETC( 'FILE', FILE( :NCF ) )
-                           CALL COF_FIOER( FSTAT, 'COF_MRGHD_GHEAD',
+                           CALL CVG_FIOER( FSTAT, 'COF_MRGHD_GHEAD',
      :                       'FTGREC', 'Error obtaining a FITS header '/
      :                       /'(^IH of ^NH) from FITS file ^FILE.',
      :                       STATUS )

@@ -264,7 +264,7 @@
                   ERRBUF = 'Error obtaining the value of keyword '/
      :                     /COLNAM//' for FITS file '//FILE( :NCF )/
      :                     /', observation '//CON( :NCO )//'.'
-                  CALL COF_FIOER( FSTAT, 'COF_WGBFE_GETVAL', ROUTIN,
+                  CALL CVG_FIOER( FSTAT, 'COF_WGBFE_GETVAL', ROUTIN,
      :                            ERRBUF, STATUS )
                   GOTO 999
                END IF
@@ -292,7 +292,7 @@
      :                     /'keyword '//COLNAM//' for FITS file '/
      :                     /FILE( :NCF )//', observation'//CON( :NCO )/
      :                     /'.'
-                  CALL COF_FIOER( FSTAT, 'COF_WGBFE_GETVAL', 'FTGTHD',
+                  CALL CVG_FIOER( FSTAT, 'COF_WGBFE_GETVAL', 'FTGTHD',
      :                            ERRBUF, STATUS )
                   GOTO 999
                END IF

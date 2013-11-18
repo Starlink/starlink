@@ -247,7 +247,7 @@
          IF ( FSTAT .GT. FITSOK ) THEN
             BUFFER = 'Error defaulting the scale and '/
      :               /'offset for FITS file '//FILE( :NCF )//'.'
-            CALL COF_FIOER( FSTAT, 'COF_IUESI_SCOF', 'FTPSCL',
+            CALL CVG_FIOER( FSTAT, 'COF_IUESI_SCOF', 'FTPSCL',
      :                      BUFFER, STATUS )
             GOTO 999
          END IF
@@ -342,7 +342,7 @@
          IF ( FSTAT .GT. FITSOK ) THEN
             BUFFER = 'Error reading the data array in FITS file '/
      :               /FILE( :NCF )//'.'
-            CALL COF_FIOER( FSTAT, 'COF_IUESI_READ', 'FTGPVx',
+            CALL CVG_FIOER( FSTAT, 'COF_IUESI_READ', 'FTGPVx',
      :                      BUFFER, STATUS )
             CALL NDF_UNMAP( NDF, 'Data', STATUS )
             GOTO 999
@@ -401,7 +401,7 @@
             BUFFER = 'Error skipping to the extension of the '/
      :               /'FITS file '//FILE( :NCF )//'.'
             CALL ERR_REP( 'COF_IUESI_WREXT', BUFFER, STATUS )
-            CALL COF_FIOER( FSTAT, 'COF_IUESI_WREXT', 'FTMRHD',
+            CALL CVG_FIOER( FSTAT, 'COF_IUESI_WREXT', 'FTMRHD',
      :                      ' ', STATUS )
          END IF
          GOTO 999

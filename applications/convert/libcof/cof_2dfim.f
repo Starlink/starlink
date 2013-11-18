@@ -306,7 +306,7 @@
                   CALL ERR_REP( 'COF_2DFIM_WREXT',
      :              'Error skipping to the ^N^NTH extension ^BUF',
      :              STATUS )
-                  CALL COF_FIOER( FSTAT, 'COF_2DFIM_WREXT', 'FTMRHD',
+                  CALL CVG_FIOER( FSTAT, 'COF_2DFIM_WREXT', 'FTMRHD',
      :              ' ', STATUS )
                END IF
                GOTO 999
@@ -317,7 +317,7 @@
             IF ( FSTAT .NE. FITSOK ) THEN
                BUFFER = 'Error obtaining the extension name from '/
      :                  /'FITS file '//FILE( :NCF )//'.'
-               CALL COF_FIOER( FSTAT, 'COF_2DFIM_MANDH', 'FTGKYS',
+               CALL CVG_FIOER( FSTAT, 'COF_2DFIM_MANDH', 'FTGKYS',
      :                         BUFFER, STATUS )
                GOTO 999
             END IF
@@ -357,7 +357,7 @@
                IF ( FSTAT .GT. FITSOK ) THEN
                   BUFFER = 'Error defaulting the scale and offset for '/
      :                     /'FITS file '//FILE( :NCF )//'.'
-                  CALL COF_FIOER( FSTAT, 'COF_2DFIM_SCOF', 'FTPSCL',
+                  CALL CVG_FIOER( FSTAT, 'COF_2DFIM_SCOF', 'FTPSCL',
      :                            BUFFER, STATUS )
                   GOTO 999
                END IF
@@ -615,7 +615,7 @@
                   NC = CHR_LEN( COMP )
                   BUFFER = 'Error reading the '//COMP( :NC )/
      :                     /' array in FITS file '//FILE( :NCF )//'.'
-                  CALL COF_FIOER( FSTAT, 'COF_2DFIM_READ',
+                  CALL CVG_FIOER( FSTAT, 'COF_2DFIM_READ',
      :                            'FTGPVx', BUFFER, STATUS )
                   CALL NDF_UNMAP( NDFE, COMP, STATUS )
                   GOTO 999
@@ -730,7 +730,7 @@
                IF ( FSTAT .NE. FITSOK ) THEN
                   BUFFER = 'Error obtain the class of the observation '/
      :                     /'in file '//FILE( :NCF )//'.'
-                  CALL COF_FIOER( FSTAT, 'COF_2DFIM_GTCLASS', 'FTGCVS',
+                  CALL CVG_FIOER( FSTAT, 'COF_2DFIM_GTCLASS', 'FTGCVS',
      :                            BUFFER, STATUS )
                   GOTO 999
                END IF

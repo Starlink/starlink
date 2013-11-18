@@ -262,7 +262,7 @@
             BUFFER =  'Error obtaining the number of header cards '/
      :                /'from FITS file '//FILE( :NCF )//'.'
 
-            CALL COF_FIOER( FSTAT, 'COF_CAMAA_NHEAD', 'FTGHSP', BUFFER,
+            CALL CVG_FIOER( FSTAT, 'COF_CAMAA_NHEAD', 'FTGHSP', BUFFER,
      :                      STATUS )
             GOTO 999
          END IF
@@ -291,7 +291,7 @@
          BUFFER = 'Error skipping to the extension of the CAM FITS '/
      :            /'file '//FILE( :NCF )//'.'
 
-         CALL COF_FIOER( FSTAT, 'COF_CAM_WREXT', 'FTMRHD', BUFFER,
+         CALL CVG_FIOER( FSTAT, 'COF_CAM_WREXT', 'FTMRHD', BUFFER,
      :                   STATUS )
 
       ELSE IF ( HDUTYP .NE. 2 ) THEN
@@ -441,7 +441,7 @@
      :               /'parameters for FITS file '//FILE( :NCF )/
      :               /', observation'//CON( :NC )//'.'
 
-            CALL COF_FIOER( FSTAT, 'COF_CAMAA_AXCOL', 'FTGCVx',
+            CALL CVG_FIOER( FSTAT, 'COF_CAMAA_AXCOL', 'FTGCVx',
      :                      BUFFER, STATUS )
             GOTO 999
          END IF
@@ -486,7 +486,7 @@
             BUFFER = 'Error defaulting the scale and offset for FITS '/
      :        /'file '//FILE( :NCF )//', observation'//CON( :NC )//'.'
 
-            CALL COF_FIOER( FSTAT, 'COF_CAMAA_SCOF', 'FTTSCL',
+            CALL CVG_FIOER( FSTAT, 'COF_CAMAA_SCOF', 'FTTSCL',
      :                      BUFFER, STATUS )
             GOTO 999
          END IF
@@ -509,7 +509,7 @@
             BUFFER = 'Error assigning the data-blank value for FITS '/
      :        /'file '//FILE( :NCF )//', observation'//CON( :NC )//'.'
 
-            CALL COF_FIOER( FSTAT, 'COF_CAMAA_BLANK', 'FTTNUL',
+            CALL CVG_FIOER( FSTAT, 'COF_CAMAA_BLANK', 'FTTNUL',
      :                      BUFFER, STATUS )
             GOTO 999
          END IF
@@ -632,7 +632,7 @@
          IF ( FSTAT .NE. FITSOK ) THEN
             BUFFER = 'Error copying the CAM flux to the NDF data '/
      :               /'array in observation '//CON( :NC )//'.'
-            CALL COF_FIOER( FSTAT, 'COF_CAMAA_CRDAT', 'FTGCVx', BUFFER,
+            CALL CVG_FIOER( FSTAT, 'COF_CAMAA_CRDAT', 'FTGCVx', BUFFER,
      :                      STATUS )
             GOTO 999
          END IF
@@ -656,7 +656,7 @@
                BUFFER = 'Error obtaining the array units for FITS '/
      :                  /'file '//FILE( :NCF )//', observation'/
      :                  /CON( :NC )//'.'
-               CALL COF_FIOER( FSTAT, 'COF_CAMAA_AXCOL', 'FTGCVx',
+               CALL CVG_FIOER( FSTAT, 'COF_CAMAA_AXCOL', 'FTGCVx',
      :                         BUFFER, STATUS )
                GOTO 999
             END IF

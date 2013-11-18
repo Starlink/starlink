@@ -176,7 +176,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.  Specify from which routine the error arose.
       IF ( FSTAT .GT. FITSOK ) THEN
-         CALL COF_FIOER( FSTAT, 'COF_WENAM_ERR2', '',
+         CALL CVG_FIOER( FSTAT, 'COF_WENAM_ERR2', '',
      :     'Error setting EXTNAMEF keyword.', STATUS )
       END IF
 

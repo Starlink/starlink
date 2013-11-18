@@ -211,7 +211,7 @@
 *  Check for an error.  Handle a bad status.  Negative values are
 *  reserved for non-fatal warnings.
       IF ( FSTAT .GT. FITSOK ) THEN
-         CALL COF_FIOER( FSTAT, 'COF_WHISR_ERR', 'FTPHIS',
+         CALL CVG_FIOER( FSTAT, 'COF_WHISR_ERR', 'FTPHIS',
      :                   'Error writing to HISTORY header card.',
      :                   STATUS )
       END IF

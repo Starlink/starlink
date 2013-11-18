@@ -122,7 +122,7 @@
 *        Add ALWTAB argument and enabled a TAB extension to be written.
 *     15-NOV-2013 (DSB):
 *        Restructured slightly to ensure any junk WCS-related keywords
-*        that are present in the header on entry are deleted on exit, even 
+*        that are present in the header on entry are deleted on exit, even
 *        if the NDF contains no WCS.
 *     {enter_further_changes_here}
 
@@ -214,7 +214,7 @@
 *  current FITSIO header.
       CALL FTGHSP( FUNIT, NHEAD, KEYADD, FSTAT )
       IF( FSTAT .NE. FITSOK ) THEN
-         CALL COF_FIOER( FSTAT, 'COF_FPWCS_NHEAD', 'FTGHSP',
+         CALL CVG_FIOER( FSTAT, 'COF_FPWCS_NHEAD', 'FTGHSP',
      :                   'Error obtaining the number of header cards.',
      :                   STATUS )
          GO TO 999
@@ -273,7 +273,7 @@
 
 *  Empty the CHDU header, and then copy the contents of the FitsChan into
 *  it.
-      CALL COF_FC2HD( FC, FUNIT, STATUS )
+      CALL CVG_FC2HD( FC, FUNIT, STATUS )
 
 *  If any axes were successfully described using the -TAB algorithm,
 *  there will be one or more FitsTables stored in the FitsChan. For each
@@ -297,7 +297,7 @@
 *  containing values copied from the FitsTable, and then annul the
 *  FitsTable pointer. Use the table key in the KeyMap as the extension
 *  name.
-                  CALL COF_FT2BT( TABLE, FUNIT, KEY, ASTVER, STATUS )
+                  CALL CVG_FT2BT( TABLE, FUNIT, KEY, ASTVER, STATUS )
                   CALL AST_ANNUL( TABLE, STATUS )
 
                END IF

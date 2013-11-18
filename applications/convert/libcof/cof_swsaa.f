@@ -195,7 +195,7 @@
       IF ( FSTAT .NE. FITSOK ) THEN
          BUFFER = 'Error skipping to the extension of the SWS FITS '/
      :             /'file '//FILE( :NCF )//'.'
-         CALL COF_FIOER( FSTAT, 'COF_SWS_WREXT', 'FTMRHD', BUFFER,
+         CALL CVG_FIOER( FSTAT, 'COF_SWS_WREXT', 'FTMRHD', BUFFER,
      :                   STATUS )
 
       ELSE IF ( HDUTYP .NE. 2 ) THEN
@@ -280,7 +280,7 @@
 
 *  Check that the transfer was correct.
       IF ( FSTAT .NE. FITSOK ) THEN
-         CALL COF_FIOER( FSTAT, 'COF_SWS_CRDAT', 'FTGCVx',
+         CALL CVG_FIOER( FSTAT, 'COF_SWS_CRDAT', 'FTGCVx',
      :     'Error copying the SWS flux to the NDF data array.', STATUS )
          GOTO 999
       END IF
@@ -384,7 +384,7 @@
 
 *  Check that the transfer was correct.
       IF ( FSTAT .NE. FITSOK ) THEN
-         CALL COF_FIOER( FSTAT, 'COF_SWS_CRVAR', 'FTGCVx',
+         CALL CVG_FIOER( FSTAT, 'COF_SWS_CRVAR', 'FTGCVx',
      :     'Error copying the SWS standard deviation to the NDF '/
      :     /'error array.', STATUS )
          GOTO 999
@@ -418,7 +418,7 @@
 
 *  Check that the transfer was correct.
       IF ( FSTAT .NE. FITSOK ) THEN
-         CALL COF_FIOER( FSTAT, 'COF_SWS_CRQUA', 'FTGCVB',
+         CALL CVG_FIOER( FSTAT, 'COF_SWS_CRQUA', 'FTGCVB',
      :     'Error copying the SWS detector numbers to the NDF '/
      :     /'quality array.', STATUS )
          GOTO 999
@@ -469,7 +469,7 @@
 
 *  Check that the transfer was correct.
       IF ( FSTAT .NE. FITSOK ) THEN
-         CALL COF_FIOER( FSTAT, 'COF_SWS_CRDAT', 'FTGCVx',
+         CALL CVG_FIOER( FSTAT, 'COF_SWS_CRDAT', 'FTGCVx',
      :     'Error copying the SWS wavelengths to the NDF axis array.',
      :     STATUS )
          GOTO 999

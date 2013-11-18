@@ -166,7 +166,7 @@
      :             PCOUNT, GCOUNT, EXTEND, FSTAT )
 
       IF ( FSTAT .NE. FITSOK ) THEN
-         CALL COF_FIOER( FSTAT, 'COF_SBND_KEYWORD', 'FTGHPR',
+         CALL CVG_FIOER( FSTAT, 'COF_SBND_KEYWORD', 'FTGHPR',
      :     'Error obtaining the dimensions of the NDF from the FITS '/
      :     /'keywords.', STATUS )
          GOTO 999
@@ -202,7 +202,7 @@
                BUFFER = 'FITS keyword for lower bounds is invalid.  '/
      :           /'Root is '//KEYROT//'. (Probable programming error.)'
 
-               CALL COF_FIOER( FSTAT, 'COF_SBND_KEYWORD', 'FTKEYN',
+               CALL CVG_FIOER( FSTAT, 'COF_SBND_KEYWORD', 'FTKEYN',
      :                         BUFFER, STATUS )
                GOTO 999
             END IF

@@ -459,7 +459,7 @@
 *  Check for an error.  Handle a bad status.  Negative values are
 *  reserved for non-fatal warnings.
       IF ( FSTAT .GT. FITSOK ) THEN
-         CALL COF_FIOER( FSTAT, 'COF_PCADC_ERR', 'FTPKYJ',
+         CALL CVG_FIOER( FSTAT, 'COF_PCADC_ERR', 'FTPKYJ',
      :                   'Error writing provenance header card.',
      :                   STATUS )
       END IF

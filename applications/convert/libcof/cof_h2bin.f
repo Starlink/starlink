@@ -96,7 +96,7 @@
 *     2004 September 9 (TIMJ):
 *        Use CNF_PVAL.
 *     2006 April 7 (MJC):
-*        Use the correct FITISO routine names in two COF_FIOER calls.
+*        Use the correct FITISO routine names in two CVG_FIOER calls.
 *        Some tidying.
 *     2008 June 13 (MJC):
 *        Only attempt to write null value for integer-valued columns.
@@ -315,7 +315,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
          IF ( FSTAT .GT. FITSOK ) THEN
-            CALL COF_FIOER( FSTAT, 'COF_H2BIN_ERR1',
+            CALL CVG_FIOER( FSTAT, 'COF_H2BIN_ERR1',
      :        'FTPHBN', 'Error writing binary-table header.', STATUS )
             GOTO 999
          END IF
@@ -356,7 +356,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.  Specify from which routine the error arose.
             IF ( FSTAT .GT. FITSOK ) THEN
-               CALL COF_FIOER( FSTAT, 'COF_H2BIN_ERR7', 'FTIKYJ',
+               CALL CVG_FIOER( FSTAT, 'COF_H2BIN_ERR7', 'FTIKYJ',
      :           'Error writing TNULL1 card for a binary table.',
      :           STATUS )
                GOTO 999
@@ -378,7 +378,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.  Specify from which routine the error arose.
             IF ( FSTAT .GT. FITSOK ) THEN
-               CALL COF_FIOER( FSTAT, 'COF_H2BIN_ERR7', 'FTIKYK',
+               CALL CVG_FIOER( FSTAT, 'COF_H2BIN_ERR7', 'FTIKYK',
      :           'Error writing TNULL1 card for a binary table.',
      :           STATUS )
                GOTO 999
@@ -414,7 +414,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.  Specify from which routine the error arose.
             IF ( FSTAT .GT. FITSOK ) THEN
-               CALL COF_FIOER( FSTAT, 'COF_H2BIN_ERR7', 'FTIKYJ',
+               CALL CVG_FIOER( FSTAT, 'COF_H2BIN_ERR7', 'FTIKYJ',
      :           'Error writing TDIM1 card for a binary table.',
      :           STATUS )
                GOTO 999
@@ -431,7 +431,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
          IF ( FSTAT .GT. FITSOK ) THEN
-            CALL COF_FIOER( FSTAT, 'COF_H2BIN_ERR2', 'FTPKYJ',
+            CALL CVG_FIOER( FSTAT, 'COF_H2BIN_ERR2', 'FTPKYJ',
      :        'Error writing extension level in header.', STATUS )
             GOTO 999
          END IF
@@ -443,7 +443,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
          IF ( FSTAT .GT. FITSOK ) THEN
-            CALL COF_FIOER( FSTAT, 'COF_H2BIN_ERR3', 'FTPKYS',
+            CALL CVG_FIOER( FSTAT, 'COF_H2BIN_ERR3', 'FTPKYS',
      :        'Error writing extension type in header.', STATUS )
             GOTO 999
          END IF
@@ -455,7 +455,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
          IF ( FSTAT .GT. FITSOK ) THEN
-            CALL COF_FIOER( FSTAT, 'COF_H2BIN_ERR8', 'FTPKYS',
+            CALL CVG_FIOER( FSTAT, 'COF_H2BIN_ERR8', 'FTPKYS',
      :        'Error writing extension shape in header.', STATUS )
             GOTO 999
          END IF
@@ -471,7 +471,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
          IF ( FSTAT .GT. FITSOK ) THEN
-            CALL COF_FIOER( FSTAT, 'COF_H2BIN_ERR3', 'FTBDEF',
+            CALL CVG_FIOER( FSTAT, 'COF_H2BIN_ERR3', 'FTBDEF',
      :        'Error defining binary-table structure.', STATUS )
             GOTO 999
          END IF
@@ -525,7 +525,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.  Specify from which routine the error arose.
                IF ( FSTAT .GT. FITSOK ) THEN
-                  CALL COF_FIOER( FSTAT, 'COF_H2BIN_ERR6', 'FTTNUL',
+                  CALL CVG_FIOER( FSTAT, 'COF_H2BIN_ERR6', 'FTTNUL',
      :              'Error setting null value for a binary-table '/
      :              /'column.', STATUS )
                   GOTO 999
@@ -577,7 +577,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.  Specify from which routine the error arose.
                IF ( FSTAT .GT. FITSOK ) THEN
-                  CALL COF_FIOER( FSTAT, 'COF_H2BIN_ERR6', 'FTPNULLL',
+                  CALL CVG_FIOER( FSTAT, 'COF_H2BIN_ERR6', 'FTPNULLL',
      :              'Error setting null value for a binary-table '/
      :              /'column.', STATUS )
                   GOTO 999
@@ -739,7 +739,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.  Specify from which routine the error arose.
             IF ( FSTAT .GT. FITSOK ) THEN
-               CALL COF_FIOER( FSTAT, 'COF_H2BIN_ERR4', ROUTIN,
+               CALL CVG_FIOER( FSTAT, 'COF_H2BIN_ERR4', ROUTIN,
      :           'Error copying scalar value to the binary table.',
      :           STATUS )
                GOTO 999
@@ -764,7 +764,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.  Specify from which routine the error arose.
                IF ( FSTAT .GT. FITSOK ) THEN
-                  CALL COF_FIOER( FSTAT, 'COF_H2BIN_ERR6', 'FTTNUL',
+                  CALL CVG_FIOER( FSTAT, 'COF_H2BIN_ERR6', 'FTTNUL',
      :              'Error setting null value for a '/
      :              /'binary-table column.', STATUS )
                   GOTO 999
@@ -779,7 +779,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.  Specify from which routine the error arose.
                IF ( FSTAT .GT. FITSOK ) THEN
-                  CALL COF_FIOER( FSTAT, 'COF_H2BIN_ERR6', 'FTPNULLL',
+                  CALL CVG_FIOER( FSTAT, 'COF_H2BIN_ERR6', 'FTPNULLL',
      :              'Error setting null value for a '/
      :              /'binary-table column.', STATUS )
                   GOTO 999
@@ -964,7 +964,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.  Specify from which routine the error arose.
             IF ( FSTAT .GT. FITSOK ) THEN
-               CALL COF_FIOER( FSTAT, 'COF_H2BIN_ERR5', ROUTIN,
+               CALL CVG_FIOER( FSTAT, 'COF_H2BIN_ERR5', ROUTIN,
      :           'Error copying an array to the binary table.', STATUS )
                GOTO 999
             END IF
@@ -1138,7 +1138,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
                   IF ( FSTAT .GT. FITSOK ) THEN
-                     CALL COF_FIOER( FSTAT, 'COF_H2BIN_ERR1',
+                     CALL CVG_FIOER( FSTAT, 'COF_H2BIN_ERR1',
      :                 'FTPHBN', 'Error writing binary-table header.',
      :                 STATUS )
                      GOTO 999
@@ -1208,7 +1208,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.  Specify from which routine the error arose.
                            IF ( FSTAT .GT. FITSOK ) THEN
-                              CALL COF_FIOER( FSTAT,
+                              CALL CVG_FIOER( FSTAT,
      :                          'COF_H2BIN_ERR7', 'FTIKYJ',
      :                          'Error writing '//CRDNAM( :NC )//' '/
      :                          /'card for a binary table.', STATUS )
@@ -1260,7 +1260,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.  Specify from which routine the error arose.
                         IF ( FSTAT .GT. FITSOK ) THEN
-                           CALL COF_FIOER( FSTAT,
+                           CALL CVG_FIOER( FSTAT,
      :                       'COF_H2BIN_ERR7', 'FTIKYK',
      :                       'Error writing '//CRDNAM( :NC )//' '/
      :                       /'card for a binary table.', STATUS )
@@ -1323,7 +1323,7 @@
                            NC = 4
                            CRDNAM = 'TDIM'
                            CALL CHR_APPND( CN, CRDNAM, NC )
-                           CALL COF_FIOER( FSTAT,
+                           CALL CVG_FIOER( FSTAT,
      :                       'COF_H2BIN_ERR7', 'FTIKYJ',
      :                       'Error writing '//CRDNAM( :NC )//' card '/
      :                       /'for a binary table.', STATUS )
@@ -1342,7 +1342,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
                   IF ( FSTAT .GT. FITSOK ) THEN
-                     CALL COF_FIOER( FSTAT, 'COF_H2BIN_ERR2',
+                     CALL CVG_FIOER( FSTAT, 'COF_H2BIN_ERR2',
      :                 'FTPKYJ', 'Error writing extension level in '/
      :                 /'header.', STATUS )
                      GOTO 999
@@ -1356,7 +1356,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
                   IF ( FSTAT .GT. FITSOK ) THEN
-                     CALL COF_FIOER( FSTAT, 'COF_H2BIN_ERR3',
+                     CALL CVG_FIOER( FSTAT, 'COF_H2BIN_ERR3',
      :                 'FTPKYJ', 'Error writing extension type in '/
      :                 /'header.', STATUS )
                      GOTO 999
@@ -1369,7 +1369,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
                   IF ( FSTAT .GT. FITSOK ) THEN
-                     CALL COF_FIOER( FSTAT, 'COF_H2BIN_ERR8',
+                     CALL CVG_FIOER( FSTAT, 'COF_H2BIN_ERR8',
      :                 'FTPKYJ', 'Error writing extension shape in '/
      :                 /'header.', STATUS )
                      GOTO 999
@@ -1385,7 +1385,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
                   IF ( FSTAT .GT. FITSOK ) THEN
-                     CALL COF_FIOER( FSTAT, 'COF_H2BIN_ERR3',
+                     CALL CVG_FIOER( FSTAT, 'COF_H2BIN_ERR3',
      :                 'FTBDEF', 'Error defining binary-table '/
      :                 /'structure.', STATUS )
                      GOTO 999
@@ -1482,7 +1482,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.  Specify from which routine the error arose.
                               IF ( FSTAT .GT. FITSOK ) THEN
-                                 CALL COF_FIOER( FSTAT,
+                                 CALL CVG_FIOER( FSTAT,
      :                             'COF_H2BIN_ERR6', 'FTTNUL',
      :                             'Error setting null value for a '/
      :                             /'binary-table column.', STATUS )
@@ -1542,7 +1542,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.  Specify from which routine the error arose.
                               IF ( FSTAT .GT. FITSOK ) THEN
-                                 CALL COF_FIOER( FSTAT,
+                                 CALL CVG_FIOER( FSTAT,
      :                             'COF_H2BIN_ERR6', 'FTPNULLL',
      :                             'Error setting null value for a '/
      :                             /'binary-table column.', STATUS )
@@ -1718,7 +1718,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.  Specify from which routine the error arose.
                            IF ( FSTAT .GT. FITSOK ) THEN
-                              CALL COF_FIOER( FSTAT, 'COF_H2BIN_ERR4',
+                              CALL CVG_FIOER( FSTAT, 'COF_H2BIN_ERR4',
      :                           ROUTIN, 'Error copying scalar value '/
      :                           /'to the binary table.', STATUS )
                               GOTO 999
@@ -1755,7 +1755,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.  Specify from which routine the error arose.
                               IF ( FSTAT .GT. FITSOK ) THEN
-                                 CALL COF_FIOER( FSTAT,
+                                 CALL CVG_FIOER( FSTAT,
      :                             'COF_H2BIN_ERR6', 'FTTNUL',
      :                             'Error setting null value for a '/
      :                             /'binary-table column.', STATUS )
@@ -1772,7 +1772,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.  Specify from which routine the error arose.
                               IF ( FSTAT .GT. FITSOK ) THEN
-                                 CALL COF_FIOER( FSTAT,
+                                 CALL CVG_FIOER( FSTAT,
      :                             'COF_H2BIN_ERR6', 'FTPNULLL',
      :                             'Error setting null value for a '/
      :                             /'binary-table column.', STATUS )
@@ -1982,7 +1982,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.  Specify from which routine the error arose.
                            IF ( FSTAT .GT. FITSOK ) THEN
-                              CALL COF_FIOER( FSTAT, 'COF_H2BIN_ERR5',
+                              CALL CVG_FIOER( FSTAT, 'COF_H2BIN_ERR5',
      :                           ROUTIN, 'Error copying an array '/
      :                           /'to the binary table.', STATUS )
                               GOTO 999

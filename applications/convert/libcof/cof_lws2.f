@@ -196,7 +196,7 @@
 
 *  Check that the transfer was correct.
       IF ( FSTAT .NE. FITSOK ) THEN
-         CALL COF_FIOER( FSTAT, 'COF_LWS_RDDAT', 'FTGCVE',
+         CALL CVG_FIOER( FSTAT, 'COF_LWS_RDDAT', 'FTGCVE',
      :     'Error reading the column of LWS fluxes.', STATUS )
          GOTO 999
       END IF
@@ -227,7 +227,7 @@
 
 *  Check that the transfer was correct.
       IF ( FSTAT .NE. FITSOK ) THEN
-         CALL COF_FIOER( FSTAT, 'COF_LWS_RDVAR', 'FTGCVE',
+         CALL CVG_FIOER( FSTAT, 'COF_LWS_RDVAR', 'FTGCVE',
      :     'Error reading the column of LWS standard deviations.',
      :     STATUS )
          GOTO 999
@@ -251,7 +251,7 @@
 
 *  Check that the transfer was correct.
       IF ( FSTAT .NE. FITSOK ) THEN
-         CALL COF_FIOER( FSTAT, 'COF_LWS_RDDID', 'FTGCVB',
+         CALL CVG_FIOER( FSTAT, 'COF_LWS_RDDID', 'FTGCVB',
      :     'Error accessing the LWS detector numbers.', STATUS )
          GOTO 999
       END IF
@@ -274,7 +274,7 @@
 
 *  Check that the transfer was correct.
       IF ( FSTAT .NE. FITSOK ) THEN
-         CALL COF_FIOER( FSTAT, 'COF_LWS_RDSDA', 'FTGCVB',
+         CALL CVG_FIOER( FSTAT, 'COF_LWS_RDSDA', 'FTGCVB',
      :     'Error accessing the LWS scan directions.', STATUS )
          GOTO 999
       END IF

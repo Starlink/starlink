@@ -245,7 +245,7 @@
          BUFFER = 'Error skipping to the extension of the SWS FITS '/
      :            /'file '//FILE( :NCF )//'.'
 
-         CALL COF_FIOER( FSTAT, 'COF_SWS_WREXT', 'FTMRHD',
+         CALL CVG_FIOER( FSTAT, 'COF_SWS_WREXT', 'FTMRHD',
      :                   BUFFER, STATUS )
 
       ELSE IF ( HDUTYP .NE. 2 ) THEN
@@ -311,7 +311,7 @@
 
 *  Check that the transfer was correct.
       IF ( FSTAT .NE. FITSOK ) THEN
-         CALL COF_FIOER( FSTAT, 'COF_LWS_XINDEX', 'FTGSVJ',
+         CALL CVG_FIOER( FSTAT, 'COF_LWS_XINDEX', 'FTGSVJ',
      :     'Error obtaining the LWS x raster identifiers.', STATUS )
          GOTO 999
       END IF
@@ -330,7 +330,7 @@
 
 *  Check that the transfer was correct.
       IF ( FSTAT .NE. FITSOK ) THEN
-         CALL COF_FIOER( FSTAT, 'COF_LWS_YINDEX', 'FTGSVJ',
+         CALL CVG_FIOER( FSTAT, 'COF_LWS_YINDEX', 'FTGSVJ',
      :     'Error obtaining the LWS y raster identifiers.', STATUS )
          GOTO 999
       END IF
@@ -351,7 +351,7 @@
 
 *  Check that the transfer was correct.
       IF ( FSTAT .NE. FITSOK ) THEN
-         CALL COF_FIOER( FSTAT, 'COF_LWS_XINDEX', 'FTGCVI',
+         CALL CVG_FIOER( FSTAT, 'COF_LWS_XINDEX', 'FTGCVI',
      :     'Error obtaining the LWS scan counters.', STATUS )
          GOTO 999
       END IF
@@ -390,7 +390,7 @@
 
 *  Check that the transfer was correct.
       IF ( FSTAT .NE. FITSOK ) THEN
-         CALL COF_FIOER( FSTAT, 'COF_LWS_LAMBDA', 'FTGCVE',
+         CALL CVG_FIOER( FSTAT, 'COF_LWS_LAMBDA', 'FTGCVE',
      :     'Error obtaining the wavelength column.', STATUS )
          GOTO 999
       END IF
@@ -407,7 +407,7 @@
 
 *  Check that the transfer was correct.
       IF ( FSTAT .NE. FITSOK ) THEN
-         CALL COF_FIOER( FSTAT, 'COF_LWS_LAMBER', 'FTGCVE',
+         CALL CVG_FIOER( FSTAT, 'COF_LWS_LAMBER', 'FTGCVE',
      :     'Error obtaining the wavelength-error column.', STATUS )
          GOTO 999
       END IF

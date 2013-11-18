@@ -720,7 +720,7 @@
 *  reserved for non-fatal warnings.  203 is trying to read beyond the
 *  last header.
       IF ( FSTAT .GT. FITSOK .AND. FSTAT .NE. 203 ) THEN
-         CALL COF_FIOER( FSTAT, 'COF_CHISR_ERR', 'FTGREC',
+         CALL CVG_FIOER( FSTAT, 'COF_CHISR_ERR', 'FTGREC',
      :                   'Error converting HISTORY header card to NDF '/
      :                   /'HISTORY component.', STATUS )
       END IF

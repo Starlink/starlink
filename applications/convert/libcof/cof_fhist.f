@@ -116,7 +116,7 @@
 *  Check for a FITSIO error.  Handle a bad status.  Negative values are
 *  reserved for non-fatal warnings.
       IF ( FSTAT .GT. FITSOK ) THEN
-         CALL COF_FIOER( FSTAT, 'COF_FHIST_ERR1', 'FTGHPS',
+         CALL CVG_FIOER( FSTAT, 'COF_FHIST_ERR1', 'FTGHPS',
      :                   'Error finding number of FITS keywords.',
      :                   STATUS )
          GOTO 999
@@ -155,7 +155,7 @@
 *  Check for a FITSIO error.  Handle a bad status.  Negative values are
 *  reserved for non-fatal warnings.
       IF ( FSTAT .GT. FITSOK ) THEN
-         CALL COF_FIOER( FSTAT, 'COF_FHIST_ERR', 'FTGREC',
+         CALL CVG_FIOER( FSTAT, 'COF_FHIST_ERR', 'FTGREC',
      :                   'Error searching for the next HISTORY card '/
      :                   /'in the FITS headers', STATUS )
       END IF

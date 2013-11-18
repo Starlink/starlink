@@ -174,7 +174,7 @@
 *  warnings.
       IF ( FSTAT .GT. FITSOK ) THEN
          BUFFER = 'Error defaulting the scale and offset '
-         CALL COF_FIOER( FSTAT, 'COF_F2NDF_SCOF', 'FTPSCL', BUFFER,
+         CALL CVG_FIOER( FSTAT, 'COF_F2NDF_SCOF', 'FTPSCL', BUFFER,
      :                   STATUS )
       END IF
 

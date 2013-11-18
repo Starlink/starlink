@@ -223,7 +223,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.  Annul active locators.
             IF ( FSTAT .GT. FITSOK ) THEN
-               CALL COF_FIOER( FSTAT, 'COF_WRTAB_COMMENT', 'FTGKEY',
+               CALL CVG_FIOER( FSTAT, 'COF_WRTAB_COMMENT', 'FTGKEY',
      :           'Error obtaining the comment for column '//KEYWRD,
      :           STATUS )
 
@@ -305,7 +305,7 @@
 
 *  Check for an error.  Flush the error stack.
          IF ( FSTAT .GT. FITSOK ) THEN
-            CALL COF_FIOER( FSTAT, 'COF_WRTAB_SHAPE', 'FTGTCL',
+            CALL CVG_FIOER( FSTAT, 'COF_WRTAB_SHAPE', 'FTGTCL',
      :        'Error obtaining the shape of column '//KEYWRD,
      :        STATUS )
             GOTO 999
@@ -389,7 +389,7 @@
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.  Annul active locators.
          IF ( FSTAT .GT. FITSOK ) THEN
-            CALL COF_FIOER( FSTAT, 'COF_WRTAB_VALUES', 'FTGCVx',
+            CALL CVG_FIOER( FSTAT, 'COF_WRTAB_VALUES', 'FTGCVx',
      :        'Error writing the values for column '//KEYWRD,
      :        STATUS )
 
