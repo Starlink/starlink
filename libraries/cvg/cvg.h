@@ -59,5 +59,6 @@ void cvgCreat( const char *param, int blockf, int ovrwrt, int *funit, int *statu
 void cvgFt2bt( AstFitsTable *table, int funit, const char *extnam, int astver, int *status );
 void cvgNew( const char *path, int blockf, int ovrwrt, int *funit, int *status );
 void cvgScadc( NdgProvenance *prov, const char *param, int *status );
+void cvgShowHeader( int funit, int all, int *status );
 
 #endif

@@ -139,3 +139,22 @@ void cvgFt2bt( AstFitsTable *table, int funit, const char *extnam,
 }
 
 
+F77_SUBROUTINE(cvg_showheader)( INTEGER(FUNIT),
+                                LOGICAL(ALL),
+                                INTEGER(STATUS) );
+
+void cvgShowHeader( int funit, int all, int *status ){
+   DECLARE_INTEGER(FUNIT);
+   DECLARE_LOGICAL(ALL);
+   DECLARE_INTEGER(STATUS);
+   F77_EXPORT_INTEGER( funit, FUNIT );
+   F77_EXPORT_LOGICAL( all, ALL );
+   F77_EXPORT_INTEGER( *status, STATUS );
+   F77_LOCK( F77_CALL(cvg_showheader)( INTEGER_ARG(&FUNIT),
+                                       LOGICAL_ARG(&ALL),
+                                       INTEGER_ARG(&STATUS) ); )
+   F77_IMPORT_INTEGER( STATUS, *status );
+   return;
+}
+
+

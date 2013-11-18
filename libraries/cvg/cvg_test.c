@@ -99,6 +99,7 @@ int main( void ){
 
    cvgNew( "test.fit", 1, 1, &funit, &status );
    cvgFt2bt( table, funit, "TESTEX", 0, &status );
+   cvgShowHeader( funit, 1, &status );
    cvgClose( &funit, &status );
 
 /* If an error occurred, then report a contextual message. */

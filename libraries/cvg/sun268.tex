@@ -753,7 +753,7 @@ been moved into a separate library.
 \sstroutine{
    CVG\_FT2BT
 }{
-   Creates an FITS binary table from a AST FitsTable
+   Creates a FITS binary table from a AST FitsTable
 }{
    \sstdescription{
       This function creates a new FITS binary table holding data copied
@@ -1079,6 +1079,45 @@ been moved into a separate library.
          A warning is issued if the OBSIDSS component cannot be found
          for a root ancestor.  The value of OBSCNT gives the number of
          ancestors with an OBSIDSS value.
+      }
+   }
+}
+\sstroutine{
+   CVG\_SHOWHEADER
+}{
+   Displays all headers from one or all HDUs on standard output
+}{
+   \sstdescription{
+      This routine displays headers from the current HDU, or all HDSUs,
+      on standard output.
+   }
+   \sstinvocation{
+      CALL CVG\_SHOWHEADER( FUNIT, ALL, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         FUNIT = INTEGER (Given)
+      }{
+         The FITSIO unit number for the FITS file.
+      }
+      \sstsubsection{
+         ALL = LOGICAL (Given)
+      }{
+         If .TRUE., list headers from all HDUs. Otherwise, list only the
+         current HDU.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+      \sstsubsection{
+         Copyright (C) 2013 Science \& Technology Facilities Council.
+      }{
+      }
+      \sstsubsection{
+         All Rights Reserved.
+      }{
       }
    }
 }

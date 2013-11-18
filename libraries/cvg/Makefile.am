@@ -40,7 +40,7 @@ BASIC_C_ROUTINES = cvg.c
 #  List of Fortran routines required by both ADAM and standalone
 #  libraries.
 BASIC_F_ROUTINES = cvg_pcadc.f cvg_fioer.f cvg_bt2ft.f cvg_fc2hd.f \
-cvg_ft2bt.f cvg_hd2fc.f cvg_new.f cvg_close.f
+cvg_ft2bt.f cvg_hd2fc.f cvg_new.f cvg_close.f cvg_showheader.f
 
 #  Additional Fortran routines required for the ADAM library.
 ADAM_F_ROUTINES = cvg_scadc.f cvg_creat.f
