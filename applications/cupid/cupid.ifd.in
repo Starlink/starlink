@@ -288,16 +288,6 @@ package cupid {
             helpkey *
           }
 
-         parameter cadcprov {
-            type _LOGICAL
-            access READ
-            vpath DEFAULT
-            ppath CURRENT,DEFAULT
-            prompt {Add CADC-style provenance to outptu catalogue?}
-            default FALSE
-            helpkey *
-          }
-
          parameter config {
             type LITERAL
             ppath CURRENT DEFAULT
@@ -338,6 +328,16 @@ package cupid {
             helpkey *
           }
 
+         parameter jsacat {
+            type LITERAL
+            access WRITE
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Output JSA-style catalogue}
+            default !
+            helpkey *
+          }
+
          parameter logfile {
             type LITERAL
             ppath CURRENT DEFAULT
@@ -369,7 +369,7 @@ package cupid {
             position 3
             type LITERAL
             access WRITE
-            prompt {Output catalogue}
+            prompt {Output KAPPA-style catalogue}
             association ->GLOBAL.CATALOGUE
             helpkey *
           }

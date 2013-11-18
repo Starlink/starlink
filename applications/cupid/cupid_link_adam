@@ -60,7 +60,8 @@
 #     {note_any_bugs_here}
 
 #-
-      echo `kaplibs_link_adam -nogrf` `ast_link_adam` `shl_link_adam` `thr_link_adam` \
+      echo `kaplibs_link_adam -nogrf` `ast_link_adam` `shl_link_adam` \
+           `cvg_link_adam` `thr_link_adam` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'

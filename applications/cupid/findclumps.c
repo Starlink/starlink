@@ -133,10 +133,6 @@ void findclumps( int *status ) {
 *        Note, the other reported clump properties such as total data
 *        value, peak data value, etc, are always based on the full clump
 *        data values, including background. []
-*     CADCPROV = _LOGICAL (Read)
-*        If TRUE, then provenance information is propagated from the input 
-*        NDF to the output catalogue specified by parameter "OUTCAT", in 
-*        the style expected by CADC. [FALSE]
 *     CONFIG = GROUP (Read)
 *        Specifies values for the configuration parameters used by the
 *        clump finding algorithms. If the string "def" (case-insensitive)
@@ -201,6 +197,15 @@ void findclumps( int *status ) {
 *        pixel data value. [NORM]
 *     IN = NDF (Read)
 *        The 1, 2 or 3 dimensional NDF to be analysed.
+*     JSACAT = NDF (Read)
+*        An optional JSA-style output catalogue in which to store the clump
+*        parameters (for KAPPA-style catalogues see parameter "OUTCAT"). No
+*        catalogue will be produced if a null (!) value is supplied.
+*        The created file will be a FITS file containing a binary table.
+*        The columns in this catalogue will be the same as those created
+*        by the "OUTCAT" parameter, but the table will in also hold the
+*        contents of the FITS extension of the input NDF, and CADC-style
+*        provenance headers. [!]
 *     LOGFILE = LITERAL (Read)
 *        The name of a text log file to create. If a null (!) value is
 *        supplied, no log file is created. [!]
@@ -236,9 +241,10 @@ void findclumps( int *status ) {
 *        The output NDF will inherit the AXIS and WCS components (plus any
 *        extensions) from the input NDF.
 *     OUTCAT = FILENAME (Write)
-*        An optional output catalogue in which to store the clump parameters.
-*        No catalogue will be produced if a null (!) value is supplied.
-*        The following columns are included in the output catalogue:
+*        An optional KAPPA-style output catalogue in which to store the clump
+*        parameters (for JSA-style catalogues see parameter "JSACAT"). No
+*        catalogue will be produced if a null (!) value is supplied. The
+*        following columns are included in the output catalogue:
 *
 *        - Peak1: The position of the clump peak value on axis 1.
 *        - Peak2: The position of the clump peak value on axis 2.
@@ -886,6 +892,8 @@ void findclumps( int *status ) {
 *        Use sqrt rather than sqrtf when calculating RMS.
 *     12-NOV-2013 (DSB):
 *        Added parameter CADCPROV.
+*     18-NOV-2013 (DSB):
+*        Removed parameter CADCPROV, and added JSACAT.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -913,7 +921,6 @@ void findclumps( int *status ) {
    HDSLoc *xloc;                /* Locator for CUPID extension in main output */
    HDSLoc *xqnloc;              /* Locator for CUPID_NAMES component in extension */
    IRQLocs *qlocs;              /* HDS locators for quality name information */
-   NdgProvenance *prov;         /* Provenance info from input NDF */
    char *pname;                 /* Pointer to input NDF name */
    char *value;                 /* Pointer to GRP element buffer */
    char attr[ 30 ];             /* AST attribute name */
@@ -934,7 +941,6 @@ void findclumps( int *status ) {
    double sum;                  /* Sum of variances */
    float *rmask;                /* Pointer to cump mask array */
    int backoff;                 /* Remove background when finding clump sizes? */
-   int cadcprov;                /* Store CADC provenance in the output catalogue? */
    int confpar;                 /* Is this line a config parameter setting? */
    int deconv;                  /* Should clump parameters be deconvolved? */
    int dim[ NDF__MXDIM ];       /* Pixel axis dimensions */
@@ -1077,10 +1083,6 @@ void findclumps( int *status ) {
                        ( nsig == 3 && nspecax == 1 && nskyax == 2 ),
              status );
    parGet0l( "WCSPAR", &usewcs, status );
-
-/* See if provenance is to be stored in the output catalogue, in CADC
-   form. */
-   parGet0l( "CADCPROV", &cadcprov, status );
 
 /* See what STC-S shape should be used to describe each spatial clump. */
    ishape = 0;
@@ -1410,10 +1412,11 @@ void findclumps( int *status ) {
    (if needed). This may reject further clumps (such clumps will have the
    "Unit" component set to "BAD"). */
       ndfState( indf, "WCS", &gotwcs, status );
-      cupidStoreClumps( "OUTCAT", xloc, ndfs, nsig, deconv, backoff, ishape,
-                        velax, beamcorr, "Output from CUPID:FINDCLUMPS",
-                        usewcs, gotwcs ? iwcs : NULL, dataunits,
-                        confgrp, logfile, &nclumps, status );
+      cupidStoreClumps( "OUTCAT", "JSACAT", indf, xloc, ndfs, nsig, deconv,
+                        backoff, ishape, velax, beamcorr,
+                        "Output from CUPID:FINDCLUMPS", usewcs,
+                        gotwcs ? iwcs : NULL, dataunits, confgrp, logfile,
+                        &nclumps, status );
 
       if( logfile ) fprintf( logfile, "\n\n" );
 
@@ -1519,15 +1522,6 @@ void findclumps( int *status ) {
 
 /* Release the extension locator.*/
       datAnnul( &xloc, status );
-
-/* If required, get provenance info from the input NDF, and store it
-   in CADC format in the output FITS file. */
-      if( cadcprov ) {
-         prov = ndgReadProv( NDF__NOID, "CUPID:FINDCLUMPS", status );
-         ndgPutProv( prov, indf, NULL, 0, status );
-         fts1Scadc( prov, "OUTCAT", status );
-         prov = ndgFreeProv( prov, status );
-      }
    }
 
 /* Ensure the following has a fair chance of working even if an error has

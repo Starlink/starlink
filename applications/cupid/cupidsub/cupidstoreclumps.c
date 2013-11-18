@@ -1,6 +1,9 @@
 #include "sae_par.h"
 #include "prm_par.h"
 #include "star/hds.h"
+#include "star/ndg.h"
+#include "star/cvg.h"
+#include "kpg_err.h"
 #include "star/kaplibs.h"
 #include "par.h"
 #include "ast.h"
@@ -15,9 +18,9 @@
 #define MAXCAT   4096 /* Max length of catalogue name */
 #define LOGTAB   16   /* Width of one log file column, in characters */
 
-void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
-                       int ndim, int deconv, int backoff, int stccol,
-                       int velax, double beamcorr[ 3 ],
+void cupidStoreClumps( const char *param1, const char *param2, int indf,
+                       HDSLoc *xloc, HDSLoc *obj, int ndim, int deconv,
+                       int backoff, int stccol, int velax, double beamcorr[ 3 ],
                        const char *ttl, int usewcs, AstFrameSet *iwcs,
                        const char *dataunits, Grp *hist,
                        FILE *logfile, int *nclumps, int *status ){
@@ -33,12 +36,12 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
 *     Starlink C
 
 *  Synopsis:
-*     void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
-*                            int ndim, int deconv, int backoff, int stccol,
-*                            int velax, double beamcorr[ 3 ], const char *ttl,
-*                            int usewcs, AstFrameSet *iwcs,
-*                            const char *dataunits, Grp *hist,
-*                            FILE *logfile, int *nclumps, int *status )
+*     void cupidStoreClumps( const char *param1, const char *param2, int indf,
+*                            HDSLoc *xloc, HDSLoc *obj, int ndim, int deconv,
+*                            int backoff, int stccol, int velax,
+*                            double beamcorr[ 3 ], const char *ttl, int usewcs,
+*                            AstFrameSet *iwcs, const char *dataunits,
+*                            Grp *hist, FILE *logfile, int *nclumps, int *status )
 
 *  Description:
 *     This function optionally saves the clump properties in an output
@@ -46,8 +49,16 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
 *     the supplied CUPID extension.
 
 *  Parameters:
-*     param
-*        The ADAM parameter to associate with the output catalogue.
+*     param1
+*        The ADAM parameter to associate with the KAPPA-style output
+*        catalogue. This can be in any format supported by the CAT_ library.
+*        It can be used with KAPPA commands such as LISTSHOW.
+*     param2
+*        The ADAM parameter to associate with the JSA-style output catalogue.
+*        This will always be a FITS binary table, including headers
+*        inherited form the input NDF and CADC-style provenance headers.
+*     indf
+*        The input NDF supplied to findclumps by the user.
 *     xloc
 *        HDS locator for the CUPID extension of the NDF in which to store
 *        the clump properties. May be NULL.
@@ -111,8 +122,7 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
 
 *  Copyright:
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2008, 2009 Science & Technology Facilities Council.
-*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     Copyright (C) 2008-2013 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -159,6 +169,9 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
 *        Added parameters "velax" and "stccol".
 *     3-OCT-2012 (DSB):
 *        Clean up static resources allocated in cupidClumpDesc.
+*     18-NOV-2013 (DSB):
+*        Added parameter param2 and indf to allow a JSA-style catalogue
+*        to be created..
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -168,6 +181,8 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
 */
 
 /* Local Variables: */
+   AstFitsChan *fc;         /* Headers to store in FITS binary table */
+   AstFitsTable *table;     /* Staging post for FITS binary table data */
    AstFrame *frm1;          /* Frame describing clump parameters */
    AstFrame *frm2;          /* Frame describing clump centres */
    AstFrame *wcsfrm;        /* Current Frame describing WCS coords */
@@ -179,28 +194,33 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
    HDSLoc *cloc;            /* Locator for array cell */
    HDSLoc *dloc;            /* Locator for cell value */
    HDSLoc *ncloc;           /* Locator for array cell */
+   NdgProvenance *prov;     /* Provenance info from input NDF */
    char *line = NULL;       /* Pointer to buffer for log file output */
+   char *stc_data;          /* Array of fixed-length STC strings */
    char *stcptr = NULL;     /* Pointer to buffer holding STC-S clump description */
    char attr[ 15 ];         /* AST attribute name */
    char buf2[ 2*LOGTAB ];   /* Buffer for a log file unit string */
    char buf[ 2*LOGTAB ];    /* Buffer for a log file column value */
-   char cat[ MAXCAT + 1 ];  /* Catalogue name */
+   char cat1[ MAXCAT + 1 ]; /* KAPPA-style catalogue name */
+   char cat2[ MAXCAT + 1 ]; /* JSA-style catalogue name */
    char key[ 20 ];          /* KeyMap key */
    char unit[ 10 ];         /* String for NDF Unit component */
    const char **names;      /* Component names */
    const char **units;      /* Component units */
+   const char *cname;       /* Pointer to column name string */
    const char *dom;         /* Pointer to domain string */
    double *cpars;           /* Array of parameters for a single clump */
    double *t;               /* Pointer to next table value */
    double *tab;             /* Pointer to catalogue table */
    double *tj;              /* Pointer to next table entry to write*/
    int bad;                 /* Does clump touch an area of bad pixels? */
+   int funit;               /* FITSIO unit number ofr new FITS file */
    int i;                   /* Index of next locator */
    int iclump;              /* Usable clump index */
    int icol;                /* Zero based column index */
    int ifrm;                /* Frame index */
+   int indf1;               /* Identifier for supplied NDF */
    int indf2;               /* Identifier for copied NDF */
-   int indf;                /* Identifier for supplied NDF */
    int irow;                /* One-based row index */
    int istc;                /* Number of STC-S descriptions created */
    int nbad;                /* No. of clumps touching an area of bad pixels */
@@ -213,7 +233,9 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
    int pixfrm;              /* Index of PIXEL Frame */
    int place;               /* Place holder for copied NDF */
    int there;               /* Does component exist?*/
+   size_t max_stclen;       /* Max length of any STC string */
    size_t nndf;             /* Total number of NDFs */
+   size_t stclen;           /* Length of STC string */
 
 /* Initialise */
    *nclumps = 0;
@@ -307,23 +329,24 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
    number corresponding to each one. */
    irow = 0;
    nok = 0;
+   max_stclen = 0;
    for( i = 1; i <= nndf && *status == SAI__OK; i++ ) {
       ncloc = NULL;
       datCell( obj, 1, &i, &ncloc, status );
 
       errBegin( status );
-      ndfFind( ncloc, " ", &indf, status );
+      ndfFind( ncloc, " ", &indf1, status );
       errEnd( status );
 
       datAnnul( &ncloc,status );
-      if( indf != NDF__NOID ) {
+      if( indf1 != NDF__NOID ) {
          irow++;
 
 /* The Unit component of the NDF will be set to "BAD" if the clump
    touches any areas of bad pixels in the input data array. Count how
    many of these clumps there are. */
          unit[ 0 ] = 0;
-         ndfCget( indf, "Unit", unit, 9, status );
+         ndfCget( indf1, "Unit", unit, 9, status );
          if( !strcmp( unit, "BAD" ) ){
             bad = 1;
             nbad++;
@@ -336,7 +359,7 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
    information which is the same for every clump (the parameter names and
    units, the indices of the parameters holding the clump central position,
    and the number of parameters). */
-         cpars = cupidClumpDesc( indf, deconv, wcsmap, wcsfrm, dataunits,
+         cpars = cupidClumpDesc( indf1, deconv, wcsmap, wcsfrm, dataunits,
                                  beamcorr, backoff, stccol, velax, cpars,
                                  &names, &units, &ncpar, &ok, &stcptr,
                                  &region, status );
@@ -388,7 +411,7 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
                ok = 0;
 
             } else if( !ok ) {
-               ndfCput( "BAD", indf, "Unit", status );
+               ndfCput( "BAD", indf1, "Unit", status );
                nsmall++;
             }
 
@@ -438,7 +461,7 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
 /* Store the supplied NDF in a component called "MODEL" of the CLUMP
    structure. */
                ndfPlace( cloc, "MODEL", &place, status );
-               ndfCopy( indf, &place, &indf2, status );
+               ndfCopy( indf1, &place, &indf2, status );
                ndfAnnul( &indf2, status );
 
 /* Store an AST Region in a component called "OUTLINE" of the CLUMP
@@ -458,11 +481,14 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
          if( stc_km && stcptr && ok ) {
             sprintf( key, "Shape_%d", ++istc );
             astMapPut0C( stc_km, key, stcptr, NULL );
+
+            stclen = strlen( stcptr );
+            if( stclen > max_stclen ) max_stclen = stclen;
          }
          stcptr = astFree( stcptr );
 
 /* Free the NDF identifier. */
-         ndfAnnul( &indf, status );
+         ndfAnnul( &indf1, status );
       }
    }
 
@@ -505,14 +531,27 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
    if( aloc && iclump < nndf && iclump ) datAlter( aloc, 1, &iclump, status );
    *nclumps = iclump;
 
-/* See if an output catalogue is to be created. If not, annull the null
-   parameter error. */
-   parGet0c( param, cat, MAXCAT, status );
+/* Abort if an error has occurred. */
+   if( *status != SAI__OK ) goto L999;
+
+/* See if a KAPPA_style output catalogue is to be created. If not, annull the
+   null parameter error. */
+   parGet0c( param1, cat1, MAXCAT, status );
    if( *status == PAR__NULL ) {
       errAnnul( status );
+      cat1[ 0 ] = 0;
+   }
 
-/* Otherwise create the catalogue. */
-   } else if( tab && *status == SAI__OK ) {
+/* See if a JSA_style output catalogue is to be created. If not, annull the
+   null parameter error. */
+   parGet0c( param2, cat2, MAXCAT, status );
+   if( *status == PAR__NULL ) {
+      errAnnul( status );
+      cat2[ 0 ] = 0;
+   }
+
+/* If either catalogue is to be created.... */
+   if( ( cat1[ 0 ] || cat2[ 0 ] ) && *status == SAI__OK ) {
 
 /* Remove any rows in the table which describe clumps smaller than the
    beam size (these will have been set to bad values above). The good
@@ -533,57 +572,67 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
          }
       }
 
+/* Check some clumps remain. */
+      if( !iclump && *status == SAI__OK ) {
+         *status = SAI__ERROR;
+         errRep( "", "No clumps larger than the beam size remain.",
+                 status );
+      }
+
+/* If required, create the KAPPA-style catalogue. */
+      if( cat1[ 0 ] && *status == SAI__OK ){
+
 /* Create a Frame with "ncpar" axes describing the table columns. Set the
    axis Symbols and Units to the column names and units. Any axis which
    initially has a unit of "deg" is a sky axis. Since the AST SkyFrame
    class requires rads rather than degs, we initially set such axes to
    "rad".  */
-      frm1 = astFrame( ncpar, "Domain=PARAMETERS,Title=Clump parameters" );
-      for( icol = 0; icol < ncpar; icol++ ) {
-         sprintf( attr, "Symbol(%d)", icol + 1 );
-         astSetC( frm1, attr, names[ icol ] );
-         sprintf( attr, "Unit(%d)", icol + 1 );
-         if( !strcmp( units[ icol ], "deg" ) ) {
-            astSetC( frm1, attr, "rad" );
-         } else {
-            astSetC( frm1, attr, units[ icol ] );
+         frm1 = astFrame( ncpar, "Domain=PARAMETERS,Title=Clump parameters" );
+         for( icol = 0; icol < ncpar; icol++ ) {
+            sprintf( attr, "Symbol(%d)", icol + 1 );
+            astSetC( frm1, attr, names[ icol ] );
+            sprintf( attr, "Unit(%d)", icol + 1 );
+            if( !strcmp( units[ icol ], "deg" ) ) {
+               astSetC( frm1, attr, "rad" );
+            } else {
+               astSetC( frm1, attr, units[ icol ] );
+            }
          }
-      }
 
 /* Ensure the ActiveUnit flag is set for this frame so that we can swap
    between rads and degs automatically if required. */
-      astSetActiveUnit( frm1, 1 );
+         astSetActiveUnit( frm1, 1 );
 
 /* Create a Mapping (a PermMap) from the Frame representing the "ncpar" clump
    parameters, to the "ndim" Frame representing clump centre pixel positions.
    The inverse transformation supplies bad values for the other parameters. */
-      map = (AstMapping *) astPermMap( ncpar, NULL, ndim, NULL, NULL, " " );
+         map = (AstMapping *) astPermMap( ncpar, NULL, ndim, NULL, NULL, " " );
 
 /* If no WCS FrameSet was supplied.... */
-      if( !iwcs ) {
+         if( !iwcs ) {
 
 /* Create a Frame with "ndim" axes describing the pixel coords at the
    clump centre. */
-         frm2 = astFrame( ndim, "Domain=PIXEL,Title=Pixel coordinates" );
-         astSetC( frm2, "Symbol(1)", "P1" );
-         if( ndim > 1 ) {
-            astSetC( frm2, "Symbol(2)", "P2" );
-            if( ndim > 2 ) astSetC( frm2, "Symbol(3)", "P3" );
-         }
+            frm2 = astFrame( ndim, "Domain=PIXEL,Title=Pixel coordinates" );
+            astSetC( frm2, "Symbol(1)", "P1" );
+            if( ndim > 1 ) {
+               astSetC( frm2, "Symbol(2)", "P2" );
+               if( ndim > 2 ) astSetC( frm2, "Symbol(3)", "P3" );
+            }
 
 /* Create a FrameSet to store in the output catalogue. It has two Frames,
    the base Frame has "ncpar" axes - each axis describes one of the table
    columns. The current Frame has 2 axes and describes the clump (x,y)
    position. The ID value of FIXED_BASE is a special value recognised by
    kpg1Wrlst. */
-         iwcs = astFrameSet( frm1, "ID=FIXED_BASE" );
-         astAddFrame( iwcs, AST__BASE, map, frm2 );
-         astSetI( iwcs, "CURRENT", 1 );
+            iwcs = astFrameSet( frm1, "ID=FIXED_BASE" );
+            astAddFrame( iwcs, AST__BASE, map, frm2 );
+            astSetI( iwcs, "CURRENT", 1 );
 
 /* If a WCS FrameSet was supplied, add in "frm1" as the base Frame,
    connecting it to the original PIXEL Frame or Current Frame (as
    selected by "usewcs") using "map". */
-      } else {
+         } else {
 
 /* Add the new Frame describing the catalogue columns into the FrameSet,
    leaving it the current Frame. If the catalogue position and width
@@ -591,34 +640,108 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
    PIXEL Frame using the "map" mapping. If the catalogue position and width
    columns holds values in WCS coordinates, connect the new Frame to the
    current Frame using the "map" mapping. */
-         astInvert( map );
-         astAddFrame( iwcs, ( usewcs ? AST__CURRENT : pixfrm ), map, frm1 );
+            astInvert( map );
+            astAddFrame( iwcs, ( usewcs ? AST__CURRENT : pixfrm ), map, frm1 );
 
 /* Now change the units associated with any sky axes in the base Frame
    from "rad" to "deg" (the column values are stored in degs). This will
    automatically re-map the Frame so that the column deg values get
    converted to rad values as required by AST. */
-         for( icol = 0; icol < ncpar && *status == SAI__OK; icol++ ) {
-            if( !strcmp( units[ icol ], "deg" ) ){
-               sprintf( attr, "Unit(%d)", icol + 1 );
-               astSetC( iwcs, attr, "deg" );
+            for( icol = 0; icol < ncpar && *status == SAI__OK; icol++ ) {
+               if( !strcmp( units[ icol ], "deg" ) ){
+                  sprintf( attr, "Unit(%d)", icol + 1 );
+                  astSetC( iwcs, attr, "deg" );
+               }
             }
-         }
 
 /* Set the same Frame to be the base Frame as well as the current Frame. */
-         astSetI( iwcs, "Base", astGetI( iwcs, "Current" ) );
+            astSetI( iwcs, "Base", astGetI( iwcs, "Current" ) );
 
 /* Set the ID attribute of the FrameSet to "FIXED_BASE" in order to force
    kpg1_wrlst to write out the positions in the original base Frame. */
-         astSet( iwcs, "ID=FIXED_BASE" );
-      }
+            astSet( iwcs, "ID=FIXED_BASE" );
+         }
 
 /* Create the output catalogue */
-      if( iclump > 0 ) {
-        kpg1Wrcat( param, nndf, iclump, ncpar, tab, AST__BASE, iwcs,
-                   ttl, 1, NULL, stc_km, NULL, hist, 1, status );
+         kpg1Wrcat( param1, nndf, iclump, ncpar, tab, AST__BASE, iwcs,
+                    ttl, 1, NULL, stc_km, NULL, hist, 1, status );
+       }
+
+/* If required, create the JSA-style catalogue. */
+      if( cat2[ 0 ] && *status == SAI__OK ){
+
+/* Create an AST FitsTable structure to act as a staging post for the
+   FITS binary table. */
+         table = astFitsTable( NULL, " " );
+
+/* Add each column of floating point values to the FitsTable. */
+         for( icol = 0; icol < ncpar; icol++ ) {
+            astAddColumn( table, names[ icol ], AST__DOUBLETYPE, 0, NULL,
+                          units[ icol ] );
+            astPutColumnData( table, names[ icol ], 0, iclump*sizeof( double ),
+                              tab + icol );
+         }
+
+/* If required, add a string column holding STC shapes to the FitsTable. */
+         if( stc_km && astMapGet0C( stc_km, "COLNAMES", &cname ) ) {
+            astAddColumn( table, cname, AST__STRINGTYPE, 0, NULL, "" );
+
+            if( istc != iclump ) {
+               if( *status == SAI__OK ) {
+                  *status = SAI__ERROR;
+                  errRepf( "", "cupidstoreclumps: inconsistent numbers of "
+                           "clumps (%d) and STC outlines (%d) (programming "
+                           "error).", status, iclump, istc );
+               }
+
+            } else {
+               stc_data = astCalloc( max_stclen, iclump );
+               if( *status == SAI__OK ) {
+                  for( istc = 0; istc < iclump; istc++ ) {
+                     sprintf( key, "Shape_%d", istc );
+                     astMapGet0C( stc_km, key, (const char **) &stcptr );
+                     strncpy( stc_data + istc*max_stclen, stcptr, max_stclen );
+                  }
+
+                  astPutColumnData( table, cname, max_stclen,
+                                    max_stclen*iclump, stc_data );
+                  stc_data = astFree( stc_data );
+               }
+            }
+         }
+
+/* Get a FitsChan holding the contents of the FITS extension from the
+   input NDF. Annul the error if the NDF has no FITS extension. */
+         if( *status == SAI__OK ) {
+            kpgGtfts( indf, &fc, status );
+            if( *status == KPG__NOFTS ) {
+               errAnnul( status );
+               fc = NULL;
+            }
+         }
+
+/* Put the contents of the FitsChan into the FitsTable. */
+         astPutTableHeader( table, fc );
+
+/* Create a new empty FITS file, and get a FITSIO unit number for it. */
+         cvgCreat( param2, 1, 1, &funit, status );
+
+/* Copy the contents of the FItsTable to the FITS file. */
+         cvgFt2bt( table, funit, "CUPID:FINDCLUMPS", 0, status );
+
+/* Write CADC-style provenance records to the current FITS header. */
+         prov = ndgReadProv( NDF__NOID, "CUPID:FINDCLUMPS", status );
+         ndgPutProv( prov, indf, NULL, 0, status );
+         cvgPcadc( prov, funit, status );
+         prov = ndgFreeProv( prov, status );
+
+/* Close the FITS file. */
+         cvgClose( &funit, status );
+
       }
    }
+
+L999:
 
 /* If required, annul the locator for the array of CLUMP structures. */
    if( aloc ) datAnnul( &aloc, status );
