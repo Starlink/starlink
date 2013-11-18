@@ -158,3 +158,21 @@ void cvgShowHeader( int funit, int all, int *status ){
 }
 
 
+F77_SUBROUTINE(cvg_pcadc)( INTEGER(IPROV),
+                           INTEGER(FUNIT),
+                           INTEGER(STATUS) );
+
+void cvgPcadc( NdgProvenance *prov, int funit, int *status ){
+   DECLARE_INTEGER(IPROV);
+   DECLARE_INTEGER(FUNIT);
+   DECLARE_INTEGER(STATUS);
+   F77_EXPORT_INTEGER( funit, FUNIT );
+   F77_EXPORT_INTEGER( *status, STATUS );
+   F77_EXPORT_INTEGER( astP2I( prov ), IPROV );
+   if( !astOK ) return;
+   F77_LOCK( F77_CALL(cvg_pcadc)( INTEGER_ARG(&IPROV),
+                                  INTEGER_ARG(&FUNIT),
+                                  INTEGER_ARG(&STATUS) ); )
+   F77_IMPORT_INTEGER( STATUS, *status );
+   return;
+}

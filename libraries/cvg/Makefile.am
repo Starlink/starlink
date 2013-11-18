@@ -47,7 +47,7 @@ cvg_ft2bt.f cvg_hd2fc.f cvg_new.f cvg_close.f cvg_showheader.f
 ADAM_F_ROUTINES = cvg_scadc.f cvg_creat.f
 
 #  Additional C routines required for the ADAM library.
-ADAM_C_ROUTINES =
+ADAM_C_ROUTINES =  cvg_adam.c
 
 #  All generic Fortran source files.
 GEN_F_ROUTINES = $(CVG_N_GEN:.gn=.f)
