@@ -16,7 +16,8 @@ libcvg_adam_la_SOURCES = \
         $(BASIC_C_ROUTINES) \
         $(BASIC_F_ROUTINES) \
         $(ADAM_C_ROUTINES) \
-        $(ADAM_F_ROUTINES)
+        $(ADAM_F_ROUTINES) \
+        $(GEN_F_ROUTINES)
 
 include_HEADERS = $(PUBLIC_F_INCLUDES)
 cinclude_HEADERS = $(PUBLIC_C_INCLUDES)
