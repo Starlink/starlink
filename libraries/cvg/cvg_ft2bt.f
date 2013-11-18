@@ -285,7 +285,7 @@
             ELSE IF( STATUS .EQ. SAI__OK ) THEN
                STATUS = SAI__ERROR
                CALL MSG_SETI( 'T', CTYPE )
-               CALL ERR_REP( ' ', 'CVG_BT2FT: Unsupported data type '//
+               CALL ERR_REP( ' ', 'CVG_FT2BT: Unsupported data type '//
      :                       '^T (programming error).', status )
             END IF
 
