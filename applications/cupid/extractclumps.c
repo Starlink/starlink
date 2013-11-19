@@ -85,6 +85,15 @@ void extractclumps( int *status ) {
 *        beam width. If FALSE, the undeconvolved values are stored in the
 *        output catalogue and NDF. Note, the filter to remove clumps smaller
 *        than the beam width is still applied, even if DECONV is FALSE. [TRUE]
+*     JSACAT = NDF (Read)
+*        An optional JSA-style output catalogue in which to store the clump
+*        parameters (for KAPPA-style catalogues see parameter "OUTCAT"). No
+*        catalogue will be produced if a null (!) value is supplied.
+*        The created file will be a FITS file containing a binary table.
+*        The columns in this catalogue will be the same as those created
+*        by the "OUTCAT" parameter, but the table will in also hold the
+*        contents of the FITS extension of the input NDF, and CADC-style
+*        provenance headers. [!]
 *     LOGFILE = LITERAL (Read)
 *        The name of a text log file to create. If a null (!) value is
 *        supplied, no log file is created. [!]
@@ -94,9 +103,10 @@ void extractclumps( int *status ) {
 *     OUT = NDF (Write)
 *        The output NDF.
 *     OUTCAT = FILENAME (Write)
-*        An optional output catalogue in which to store the clump parameters.
-*        See the description of the OUTCAT parameter for the FINDCLUMPS
-*        command for further information.
+*        An optional KAPPA-style output catalogue in which to store the clump
+*        parameters (for JSA-style catalogues see parameter "JSACAT"). See the
+*        description of the OUTCAT parameter for the FINDCLUMPS command for
+*        further information.
 *     VELORES = _REAL (Read)
 *        The velocity resolution of the instrument, in channels. If DECONV is
 *        TRUE, the velocity width of each clump written to the output
@@ -128,7 +138,7 @@ void extractclumps( int *status ) {
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     Copyright (C) 2008,2013 Science & Technology Facilities Council.
 *     Copyright (C) 2009 University of British Columbia.
 *     All Rights Reserved.
 
@@ -149,7 +159,7 @@ void extractclumps( int *status ) {
 *     02110-1301, USA
 
 *  Authors:
-*     DSB: David S. Berry
+*     DSB: David S. Berry (JAC, Hawaii)
 *     EC: Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
@@ -167,6 +177,8 @@ void extractclumps( int *status ) {
 *        Remove ILEVEL arguments.
 *     25-AUG-2009 (EC):
 *        Add star/irq.h include as it is no longer in star/kaplibs.h.
+*     19-NOV-2013 (DSB):
+*        Add parameter JSACAT.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -536,10 +548,10 @@ void extractclumps( int *status ) {
    (if needed). */
       ndfState( indf1, "WCS", &gotwcs, status );
       msgBlank( status );
-      cupidStoreClumps( "OUTCAT", xloc, ndfs, nsig, deconv, backoff, 1,
-                        velax, beamcorr, "Output from CUPID:EXTRACTCLUMPS",
-                        usewcs, gotwcs ? iwcs : NULL, dataunits,
-                        NULL, logfile, &nclumps, status );
+      cupidStoreClumps( "OUTCAT", "JSACAT", indf1, xloc, ndfs, nsig, deconv,
+                        backoff, 1, velax, beamcorr, "Output from CUPID:EXTRACTCLUMPS",
+                        usewcs, gotwcs ? iwcs : NULL, dataunits, NULL, logfile,
+                        &nclumps, status );
 
 /* Map the output pixel assignment array. */
       ndfMap( indf3, "DATA", "_INTEGER", "WRITE", (void *) &ipa, &el, status );

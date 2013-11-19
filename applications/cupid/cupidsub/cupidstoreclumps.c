@@ -52,13 +52,15 @@ void cupidStoreClumps( const char *param1, const char *param2, int indf,
 *     param1
 *        The ADAM parameter to associate with the KAPPA-style output
 *        catalogue. This can be in any format supported by the CAT_ library.
-*        It can be used with KAPPA commands such as LISTSHOW.
+*        It can be used with KAPPA commands such as LISTSHOW. May be NULL.
 *     param2
 *        The ADAM parameter to associate with the JSA-style output catalogue.
 *        This will always be a FITS binary table, including headers
 *        inherited form the input NDF and CADC-style provenance headers.
+*        May be NULL.
 *     indf
-*        The input NDF supplied to findclumps by the user.
+*        The input NDF supplied to findclumps by the user. Only used if a
+*        non-NULL value is supplied for param2.
 *     xloc
 *        HDS locator for the CUPID extension of the NDF in which to store
 *        the clump properties. May be NULL.
@@ -536,17 +538,25 @@ void cupidStoreClumps( const char *param1, const char *param2, int indf,
 
 /* See if a KAPPA_style output catalogue is to be created. If not, annull the
    null parameter error. */
-   parGet0c( param1, cat1, MAXCAT, status );
-   if( *status == PAR__NULL ) {
-      errAnnul( status );
+   if( param1 ) {
+      parGet0c( param1, cat1, MAXCAT, status );
+      if( *status == PAR__NULL ) {
+         errAnnul( status );
+         cat1[ 0 ] = 0;
+      }
+   } else {
       cat1[ 0 ] = 0;
    }
 
 /* See if a JSA_style output catalogue is to be created. If not, annull the
    null parameter error. */
-   parGet0c( param2, cat2, MAXCAT, status );
-   if( *status == PAR__NULL ) {
-      errAnnul( status );
+   if( param2 ) {
+      parGet0c( param2, cat2, MAXCAT, status );
+      if( *status == PAR__NULL ) {
+         errAnnul( status );
+         cat2[ 0 ] = 0;
+      }
+   } else {
       cat2[ 0 ] = 0;
    }
 

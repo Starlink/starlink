@@ -127,6 +127,16 @@ package cupid {
             helpkey *
           }
 
+         parameter jsacat {
+            type LITERAL
+            access WRITE
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Output JSA-style catalogue}
+            default !
+            helpkey *
+          }
+
          parameter logfile {
             type LITERAL
             ppath CURRENT DEFAULT
