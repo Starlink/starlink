@@ -19,7 +19,8 @@
 
 *  Arguments:
 *     PATH = CHARACTER * ( * ) (Given)
-*        The path to the file to be created.
+*        The path to the file to be created. A file type of ".fit" will be
+*        added if there is no file type in the supplied string.
 *     BLOCKF = INTEGER (Given)
 *        The blocking factor for the new file. It must be a positive
 *        integer between 1 and 10.
@@ -60,6 +61,9 @@
 *  History:
 *     14-NOV-2013 (DSB):
 *        Original version, based on code from COF_NDF2F.
+*     19-NOV-2013 (DSB):
+*        Use a file type of ".fit" if the supplied path does not include
+*        any file type.
 *     {enter_further_changes_here}
 
 *-
@@ -86,10 +90,14 @@
       INTEGER CHR_LEN            ! Effective string length
 
 *  Local Variables:
+      CHARACTER EXTRA*( CVG__MXPTH )
+      CHARACTER LPATH*( CVG__MXPTH )
       INTEGER FSTAT
+      INTEGER IAT
+      INTEGER LNROOT
+      INTEGER NAXES(1)
       INTEGER NCF
       LOGICAL FEXIST
-      INTEGER NAXES(1)
 *.
 
 *  Initialise the returned logical unit number.
@@ -109,6 +117,34 @@
      :                'new FITS file.', STATUS )
       END IF
 
+*  Get the path excluding any HDU name or number, or any filtering
+*  specifications.
+      CALL FTRTNM( PATH, LPATH, FSTAT )
+
+*  Extract any HDU name or number, or any filtering specifications into
+*  another variable.
+      LNROOT = CHR_LEN( LPATH )
+      IF( LNROOT .LT. NCF ) THEN
+         EXTRA = PATH( LNROOT + 1 : NCF )
+      ELSE
+         EXTRA = ' '
+      END IF
+
+*  If the section of the root following the final "/" contains no dot,
+*  append ".FIT" to the root, and then append any any HDU name or number,
+*  or any filtering specifications.
+      CALL CHR_LASTO( LPATH, '/', IAT )
+      CALL CHR_LASTO( LPATH( IAT + 1: ), '.', IAT )
+      IF( IAT .EQ. 0 ) THEN
+         CALL CHR_APPND( '.fit', LPATH, LNROOT )
+         IF( EXTRA .NE. ' ' ) CALL CHR_APPND( EXTRA, LPATH, LNROOT )
+         NCF = LNROOT
+
+*  Otherwise just use the supplied path.
+      ELSE
+         LPATH = PATH
+      END IF
+
 *  Find a free logical-unit.
       CALL FIO_GUNIT( FUNIT, STATUS )
 
@@ -117,13 +153,13 @@
 *  error that arises from it.
       IF( OVRWRT .AND. STATUS .EQ. SAI__OK ) THEN
          CALL ERR_MARK
-         CALL PSX_REMOVE( PATH, STATUS )
+         CALL PSX_REMOVE( LPATH, STATUS )
          IF( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
          CALL ERR_RLSE
       END IF
 
 *  Open the FITS file.
-      CALL FTINIT( FUNIT, PATH( : NCF ), BLOCKF, FSTAT )
+      CALL FTINIT( FUNIT, LPATH( : NCF ), BLOCKF, FSTAT )
 
 *  Write the mandatory keywords for the primary header. These can be
 *  changed later as needed.
@@ -136,8 +172,8 @@
 *  must be set bad too) and clear the FITSIO error-message stack.
 *  Record whether the file was actually opened or not.
       IF( FSTAT .GT. CVG__FITSOK ) THEN
-         CALL MSG_SETC( 'F', PATH( :NCF ) )
-         INQUIRE( FILE=PATH( : NCF ), EXIST=FEXIST )
+         CALL MSG_SETC( 'F', LPATH( :NCF ) )
+         INQUIRE( FILE=LPATH( : NCF ), EXIST=FEXIST )
          IF( FEXIST ) THEN
             STATUS = SAI__ERROR
             CALL ERR_REP( ' ', 'Error creating the FITS file ^F '//
