@@ -689,7 +689,7 @@ void cupidStoreClumps( const char *param1, const char *param2, int indf,
             astAddColumn( table, names[ icol ], AST__DOUBLETYPE, 0, NULL,
                           units[ icol ] );
             astPutColumnData( table, names[ icol ], 0, iclump*sizeof( double ),
-                              tab + icol );
+                              tab + nndf*icol );
          }
 
 /* If required, add a string column holding STC shapes to the FitsTable. */
