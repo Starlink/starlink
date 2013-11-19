@@ -286,6 +286,8 @@ void makeclumps( int *status ) {
 *     22-OCT-2009 (DSB):
 *        - Add poisson distribution option.
 *        - Add parameters LIKE and SHAPE.
+*     19-NOV-2013 (DSB):
+*        Ignore degenerate pixel axes when creating clumps.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -342,6 +344,10 @@ void makeclumps( int *status ) {
    int nskyax;                   /* Number of sky axes in the current WCS frame */
    int nspecax;                  /* Number of spectral axes in the current WCS frame */
    int nval;                     /* Number of values supplied */
+   int sdim[ 3 ];                /* Indicies of significant pixel axes */
+   int sdims;                    /* Number of significant pixel axes */
+   int slbnd[ 3 ];               /* Lower bounds of significant pixel axes */
+   int subnd[ 3 ];               /* Upper bounds of significant pixel axes */
    int ubnd[ 3 ];                /* Upper pixel bounds */
    size_t st;                    /* A size_t that can be passed as an argument */
 
@@ -381,6 +387,17 @@ void makeclumps( int *status ) {
       parGet1i( "LBND", 3, lbnd, &ndim, status );
    }
    parExaci( "UBND", ndim, ubnd, status );
+
+/* Get the indices and bounds of the significant pixel axes. */
+   sdims = 0;
+   for( i = 0; i < ndim; i++ ) {
+      if( ubnd[ i ] > lbnd[ i ] ) {
+         sdim[ sdims ] = i;
+         slbnd[ sdims ] = lbnd[ i ];
+         subnd[ sdims ] = ubnd[ i ];
+         sdims++;
+      }
+   }
 
 /* Create the output NDFs. */
    ndfCreat( "OUT", "_REAL", ndim, lbnd, ubnd, &indf, status );
@@ -478,7 +495,7 @@ void makeclumps( int *status ) {
    parGet1r( "PEAK", 2, peak, &nval, status );
    if( nval == 1 ) peak[ 1 ] = 0.0;
 
-   if( ndim == 1 ) {
+   if( sdims == 1 ) {
       parGet0r( "VELFWHM", &velfwhm, status );
       cupidGC.velres_sq = velfwhm*velfwhm;
 
@@ -494,7 +511,7 @@ void makeclumps( int *status ) {
       parGet0r( "BEAMFWHM", &beamfwhm, status );
       cupidGC.beam_sq = beamfwhm*beamfwhm;
 
-      if( ndim == 3 ) {
+      if( sdims == 3 ) {
 
          parGet1r( "FWHM3", 2, fwhm3, &nval, status );
          if( nval == 1 ) fwhm3[ 1 ] = 0.0;
@@ -524,20 +541,20 @@ void makeclumps( int *status ) {
 
 /* Clump positions are chosen from a uniform distribution. Set up the
    arrays describing the mean value and range on each axis. */
-   dims[ 0 ] = ubnd[ 0 ] - lbnd[ 0 ] + 1;
+   dims[ 0 ] = subnd[ 0 ] - slbnd[ 0 ] + 1;
    dims[ 1 ] = 1;
    dims[ 2 ] = 1;
    pos1[ 0 ] = 0.5*( dims[ 0 ]  + 1 );
    pos1[ 1 ] = 0.5*dims[ 0 ];
 
-   if( ndim > 1 ) {
+   if( sdims > 1 ) {
 
-      dims[ 1 ] = ubnd[ 1 ] - lbnd[ 1 ] + 1;
+      dims[ 1 ] = subnd[ 1 ] - slbnd[ 1 ] + 1;
       pos2[ 0 ] = 0.5*( dims[ 1 ]  + 1 );
       pos2[ 1 ] = 0.5*dims[ 1 ];
 
-      if( ndim > 2 ) {
-         dims[ 2 ] = ubnd[ 2 ] - lbnd[ 2 ] + 1;
+      if( sdims > 2 ) {
+         dims[ 2 ] = subnd[ 2 ] - slbnd[ 2 ] + 1;
          pos3[ 0 ] = 0.5*( dims[ 2 ]  + 1 );
          pos3[ 1 ] = 0.5*dims[ 2 ];
       }
@@ -577,12 +594,12 @@ void makeclumps( int *status ) {
       par[ 2 ] = (int) cupidRanVal( 0, pos1, status );
       par[ 3 ] = cupidRanVal( dist, fwhm1, status );
 
-      if( ndim > 1 ) {
+      if( sdims > 1 ) {
          par[ 4 ] = (int) cupidRanVal( 0, pos2, status );
          par[ 5 ] = cupidRanVal( dist, fwhm2, status );
          par[ 6 ] = cupidRanVal( 0, angle, status );
 
-         if( ndim > 2 ) {
+         if( sdims > 2 ) {
             par[ 7 ] = cupidRanVal( 0, pos3, status );
             par[ 8 ] = cupidRanVal( dist, fwhm3, status );
             par[ 9 ] = cupidRanVal( dist, vgrad1, status );
@@ -593,8 +610,8 @@ void makeclumps( int *status ) {
 /* Add the clump into the output array. This also creates a "Clump" NDF
    containing the clump data values, appended to the end of the array of
    NDF structures in the HDS object located by "obj". */
-      cupidGCUpdateArraysF( NULL, NULL, nel, ndim, dims, par, rms, trunc, 0,
-                            0.0, lbnd, &obj, i, 0, 0.0, 0, &area, &sum, status );
+      cupidGCUpdateArraysF( NULL, NULL, nel, sdims, dims, par, rms, trunc, 0,
+                            0.0, slbnd, &obj, i, 0, 0.0, 0, &area, &sum, status );
 
 /* Update the largest peak value. */
       if( par[ 0 ] > maxpeak ) maxpeak = par[ 0 ];
@@ -610,7 +627,7 @@ void makeclumps( int *status ) {
 
 /* Create the output data array by summing the contents of the NDFs
    describing the found clumps. */
-   cupidSumClumps( CUPID__FLOAT, NULL, ndim, lbnd, ubnd, nel, obj,
+   cupidSumClumps( CUPID__FLOAT, NULL, sdims, slbnd, subnd, nel, obj,
                    NULL, ipd2, "GAUSSCLUMPS", status );
 
 /* Add Gaussian noise to the data. */
@@ -634,7 +651,7 @@ void makeclumps( int *status ) {
    beamcorr[ 0 ] = beamfwhm;
    beamcorr[ 1 ] = beamfwhm;
    beamcorr[ 2 ] = velfwhm;
-   cupidStoreClumps( "OUTCAT", NULL, NDF__NOID, xloc, obj, ndim, deconv, 1,
+   cupidStoreClumps( "OUTCAT", NULL, NDF__NOID, xloc, obj, sdims, deconv, 1,
                      ishape, 2, beamcorr, "Output from CUPID:MAKECLUMPS", 1,
                      iwcs, "", NULL, NULL, &nclumps, status );
 
