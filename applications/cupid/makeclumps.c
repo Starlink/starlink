@@ -143,7 +143,7 @@ void makeclumps( int *status ) {
 *        describing the missing axes will not be present in the catalogue.
 *
 *        The catalogue inherits any WCS information from the NDF supplied
-*        for parameter LIKE
+*        for parameter LIKE.
 *
 *        The "size" of the clump on an axis is the RMS deviation of each
 *        pixel centre from the clump centroid, where each pixel is
@@ -667,7 +667,7 @@ void makeclumps( int *status ) {
 /* If an error has occurred, issue another error report identifying the
    program which has failed (i.e. this one). */
    if( *status != SAI__OK ) {
-      errRep( "MAKECLUMPS_ERR", "MAKECLUMPS: Failed to create artifical "
+      errRep( "MAKECLUMPS_ERR", "MAKECLUMPS: Failed to create artificial "
               "clump data.", status );
    }
 }
