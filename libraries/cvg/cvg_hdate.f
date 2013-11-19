@@ -1,7 +1,7 @@
-      SUBROUTINE COF_HDATE( DATE, STATUS )
+      SUBROUTINE CVG_HDATE( DATE, STATUS )
 *+
 *  Name:
-*     COF_HDATE
+*     CVG_HDATE
 
 *  Purpose:
 *     Converts the NDF history date into a more-pleasing format
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL COF_HDATE( DATE, STATUS )
+*     CALL CVG_HDATE( DATE, STATUS )
 
 *  Description:
 *     This makes a few minor modifications to the date string obtained
@@ -49,11 +49,14 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     1997 January 13 (MJC):
 *        Original version rebadged from KPG1_FHDAT.
+*     19-NOV-2013 (DSB):
+*        Moved from CONVERT to CVG.
 *     {enter_changes_here}
 
 *-

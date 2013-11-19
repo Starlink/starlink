@@ -1,7 +1,7 @@
-      SUBROUTINE COF_WHISR( NDF, FUNIT, STATUS )
+      SUBROUTINE CVG_WHISR( NDF, FUNIT, STATUS )
 *+
 *  Name:
-*     COF_WHISR
+*     CVG_WHISR
 
 *  Purpose:
 *     Appends NDF history records to the current FITS header.
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL COF_WHISR( NDF, FUNIT, STATUS )
+*     CALL CVG_WHISR( NDF, FUNIT, STATUS )
 
 *  Description:
 *     This appends all the NDF HISTORY records in an easy-to-read format
@@ -52,11 +52,14 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     1997 January 13 (MJC):
 *        Original version.
+*     19-NOV-2013 (DSB):
+*        Moved from CONVERT to CVG.
 *     {enter_changes_here}
 
 *-
@@ -68,9 +71,10 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF__ public constants
       INCLUDE 'PRM_PAR'          ! VAL__ public constants
+      INCLUDE 'CVG_PAR'          ! CVG constants
 
 *  Global Variables:
-      INCLUDE 'COF_CMN'          ! Common block for passing required
+      INCLUDE 'CVG_CMN'          ! Common block for passing required
                                  ! additional arguments
 *        FFUNIT = INTEGER (Write)
 *           The Fortran logical unit number of the FITS file (equals
@@ -84,15 +88,11 @@
       INTEGER STATUS             ! Global status
 
 *  External References:
-      EXTERNAL COF_HECHO         ! Write history text to FITS
-
-*  Local Constants:
-      INTEGER   FITSOK           ! Good status for FITSIO library
-      PARAMETER( FITSOK = 0 )
+      EXTERNAL CVG_HECHO         ! Write history text to FITS
 
 *  Local Variables:
       CHARACTER * ( NDF__SZAPP ) APPN ! Application name
-      CHARACTER * ( 80 ) CARD    ! FITS header card
+      CHARACTER * ( CVG__HEDLEN ) CARD ! FITS header card
       CHARACTER * ( NDF__SZHDT ) CREATD ! History creation date
       INTEGER CURREC             ! Current record number
       CHARACTER * ( NDF__SZHDT ) DATE ! History record date
@@ -100,7 +100,7 @@
       CHARACTER * ( 3 ) FMTL     ! A-format length for update mode
       INTEGER FSTAT              ! FITSIO status
       INTEGER HLEN               ! Number of characters in history
-      CHARACTER * ( 70 ) HISTRY  ! FITS header card
+      CHARACTER * ( CVG__HEDLEN ) HISTRY  ! FITS header card
       CHARACTER * ( NDF__SZHST ) HOST ! Host machine
       INTEGER IREC               ! Loop counter for history records
       CHARACTER * ( NDF__SZHUM ) MODE ! Update mode
@@ -122,7 +122,7 @@
 
 *  Initialise the FITSIO status.  It's not the same as the Starlink
 *  status, which is reset by the fixed part.
-      FSTAT = FITSOK
+      FSTAT = CVG__FITSOK
 
 *  Write a blank header.
       CARD = ' '
@@ -130,7 +130,7 @@
 
 *  Obtain the creation date.  Convert its format to the IAU style.
       CALL NDF_HINFO( NDF, 'CREATED', 0, CREATD, STATUS )
-      CALL COF_HDATE( CREATD, STATUS )
+      CALL CVG_HDATE( CREATD, STATUS )
 
 *  Complete the heading.
       CALL MSG_SETC( 'CREATD', CREATD )
@@ -168,7 +168,7 @@
             CALL NDF_HINFO( NDF, 'APPLICATION', IREC, APPN, STATUS )
 
 *  Convert the date format to IAU style.
-            CALL COF_HDATE( DATE, STATUS )
+            CALL CVG_HDATE( DATE, STATUS )
 
 *  Write these to the FITS header.
             CALL MSG_SETI( 'IREC', IREC )
@@ -201,7 +201,7 @@
             CALL FTPHIS( FUNIT, HISTRY, FSTAT )
 
 *  Write the associated history text to the headers.
-            CALL NDF_HOUT( NDF, IREC, COF_HECHO, STATUS )
+            CALL NDF_HOUT( NDF, IREC, CVG_HECHO, STATUS )
 
 *  Write a blank header.
             CALL FTPREC( FUNIT, CARD, FSTAT )
@@ -210,8 +210,8 @@
 
 *  Check for an error.  Handle a bad status.  Negative values are
 *  reserved for non-fatal warnings.
-      IF ( FSTAT .GT. FITSOK ) THEN
-         CALL CVG_FIOER( FSTAT, 'COF_WHISR_ERR', 'FTPHIS',
+      IF ( FSTAT .GT. CVG__FITSOK ) THEN
+         CALL CVG_FIOER( FSTAT, 'CVG_WHISR_ERR', 'FTPHIS',
      :                   'Error writing to HISTORY header card.',
      :                   STATUS )
       END IF

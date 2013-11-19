@@ -60,5 +60,6 @@ void cvgFt2bt( AstFitsTable *table, int funit, const char *extnam, int astver, i
 void cvgNew( const char *path, int blockf, int ovrwrt, int *funit, int *status );
 void cvgPcadc( NdgProvenance *prov, int funit, int *status );
 void cvgShowHeader( int funit, int all, int *status );
+void cvgWhisr( int ndf, int funit, int *status );
 
 #endif

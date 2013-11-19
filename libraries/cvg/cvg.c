@@ -180,3 +180,23 @@ void cvgPcadc( NdgProvenance *prov, int funit, int *status ){
    F77_IMPORT_INTEGER( STATUS, *status );
    return;
 }
+
+
+F77_SUBROUTINE(cvg_whisr)( INTEGER(NDF),
+                           INTEGER(FUNIT),
+                           INTEGER(STATUS) );
+
+void cvgWhisr( int ndf, int funit, int *status ){
+   DECLARE_INTEGER(NDF);
+   DECLARE_INTEGER(FUNIT);
+   DECLARE_INTEGER(STATUS);
+   F77_EXPORT_INTEGER( ndf, NDF );
+   F77_EXPORT_INTEGER( funit, FUNIT );
+   F77_EXPORT_INTEGER( *status, STATUS );
+   F77_LOCK( F77_CALL(cvg_whisr)( INTEGER_ARG(&NDF),
+                                  INTEGER_ARG(&FUNIT),
+                                  INTEGER_ARG(&STATUS) ); )
+   F77_IMPORT_INTEGER( STATUS, *status );
+   return;
+}
+

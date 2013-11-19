@@ -15,7 +15,7 @@
 
 *  Description:
 *     The routine searches the FITS header for the HISTORY keywords that
-*     were written by COF_WHISR, and so create the HISTORY structure
+*     were written by CVG_WHISR, and so create the HISTORY structure
 *     in an NDF.  It does assume that the HISTORY text has not been
 *     tampered.  It also flags these HISTORY headers so they may be
 *     excluded from the FITS airlock.
@@ -244,7 +244,7 @@
             CARD = ' '
             CALL FTGREC( FUNIT, KINDEX, CARD, FSTAT )
 
-*  Was the HISTORY card written by COF_WHISR?  Need to find the heading.
+*  Was the HISTORY card written by CVG_WHISR?  Need to find the heading.
 *  If this HISTORY card does not contain it, search for another HISTORY
 *  card, starting from the next card.  Search from the first possible
 *  location but allow for some formatting offset.

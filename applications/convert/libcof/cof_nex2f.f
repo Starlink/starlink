@@ -505,7 +505,7 @@
 *  Append the history records for the first array.
          IF ( PROHIS .AND. ICOMP .EQ. 1 ) THEN
             CALL NDF_STATE( NDFP, 'History', HISPRE, STATUS )
-            IF ( HISPRE ) CALL COF_WHISR( NDFP, FUNIT, STATUS )
+            IF ( HISPRE ) CALL CVG_WHISR( NDFP, FUNIT, STATUS )
          END IF
 
          IF ( STATUS .NE. SAI__OK ) GOTO 999

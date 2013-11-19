@@ -7,12 +7,14 @@ dist_bin_SCRIPTS = cvg_link cvg_link_adam
 
 libcvg_la_SOURCES = \
         $(PUBLIC_INCLUDES) \
+        $(PRIVATE_INCLUDES) \
         $(BASIC_C_ROUTINES) \
         $(BASIC_F_ROUTINES) \
         $(GEN_F_ROUTINES)
 
 libcvg_adam_la_SOURCES = \
         $(PUBLIC_INCLUDES) \
+        $(PRIVATE_INCLUDES) \
         $(BASIC_C_ROUTINES) \
         $(BASIC_F_ROUTINES) \
         $(ADAM_C_ROUTINES) \
@@ -33,6 +35,7 @@ test1_LDADD = libcvg.la `$(srcdir)/cvg_link` @FCLIBS@
 PUBLIC_F_INCLUDES = CVG_PAR
 PUBLIC_C_INCLUDES = cvg.h
 PUBLIC_INCLUDES = $(PUBLIC_F_INCLUDES) $(PUBLIC_C_INCLUDES)
+PRIVATE_INCLUDES = CVG_CMN
 
 #  List of C functions required by both ADAM and standalone
 #  libraries.
@@ -42,7 +45,7 @@ BASIC_C_ROUTINES = cvg.c
 #  libraries.
 BASIC_F_ROUTINES = cvg_pcadc.f cvg_fioer.f cvg_bt2ft.f cvg_fc2hd.f \
 cvg_ft2bt.f cvg_hd2fc.f cvg_new.f cvg_close.f cvg_showheader.f \
-cvg_wprov.f
+cvg_wprov.f cvg_whisr.f cvg_hecho.f cvg_hdate.f
 
 #  Additional Fortran routines required for the ADAM library.
 ADAM_F_ROUTINES = cvg_scadc.f cvg_creat.f

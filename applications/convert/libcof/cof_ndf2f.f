@@ -768,7 +768,7 @@
 *  Append the history records for the first array.
          IF ( PROHIS .AND. ICOMP .EQ. 1 ) THEN
             CALL NDF_STATE( NDF, 'History', HISPRE, STATUS )
-            IF ( HISPRE ) CALL COF_WHISR( NDF, FUNIT, STATUS )
+            IF ( HISPRE ) CALL CVG_WHISR( NDF, FUNIT, STATUS )
          END IF
 
 *  Write provenance headers. First check that there is provenance

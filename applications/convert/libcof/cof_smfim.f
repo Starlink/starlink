@@ -96,7 +96,7 @@
 *     -  The FITS file should already have been opened by FITSIO, and
 *     is in the primary HDU.  The NDF must also exist.
 *     -  The HISTORY propagation assumes that the FITS HISTORY cards
-*     created by routine COF_WHISR have not been tampered.
+*     created by routine CVG_WHISR have not been tampered.
 
 *  Copyright:
 *     Copyright (C) 2008-2009 Science & Technology Facilities Council.

@@ -1,6 +1,6 @@
 *+
 *  Purpose:
-*     Define the common block used by CONVERT routines that write
+*     Define the common block used by routines that write
 *     FITS or FITS-like headers.
 *
 *-
@@ -9,5 +9,5 @@
       INTEGER FFUNIT             ! Fortran logical-unit number of the
                                  ! FITS file
 
-      COMMON /COF_COM/ FFUNIT
+      COMMON /CVG_COM/ FFUNIT
 

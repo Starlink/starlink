@@ -107,6 +107,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants
       INCLUDE 'NDG_PAR'          ! NDG constants
+      INCLUDE 'CVG_PAR'          ! CVG constants
 
 *  Arguments Given:
       INTEGER IPROV
@@ -117,10 +118,6 @@
 
 *  External References:
       CHARACTER*2 CHR_NTH        ! Ordinal string
-
-*  Local Constants:
-      INTEGER FITSOK             ! Good status for FITSIO library
-      PARAMETER ( FITSOK = 0 )
 
 *  Local Variables:
       CHARACTER*47 ANCCOM        ! Ancestor header comment
@@ -150,7 +147,7 @@
 
 *  Initialise the FITSIO status.  It's not the same as the Starlink
 *  status, which is reset by the fixed part.
-      FSTAT = FITSOK
+      FSTAT = CVG__FITSOK
 
 *  First check that there is provenance to record.
       IF ( IPROV .NE. NDG__NULL ) THEN
@@ -373,7 +370,7 @@
 
 *  Check for an error.  Handle a bad status.  Negative values are
 *  reserved for non-fatal warnings.
-      IF ( FSTAT .GT. FITSOK ) THEN
+      IF ( FSTAT .GT. CVG__FITSOK ) THEN
          CALL CVG_FIOER( FSTAT, 'CVG_WPROV_ERR', 'FTPKYS',
      :                   'Error writing provenance header card.',
      :                   STATUS )

@@ -840,6 +840,86 @@ been moved into a separate library.
    }
 }
 \sstroutine{
+   CVG\_HDATE
+}{
+   Converts the NDF history date into a more-pleasing format
+}{
+   \sstdescription{
+      This makes a few minor modifications to the date string obtained
+      from NDF history records to make it more like UNIX and
+      astronomical style.  Specifically two hyphens around the month are
+      replaced by spaces, and the second and third letters of the month
+      are made lowercase.
+   }
+   \sstinvocation{
+      CALL CVG\_HDATE( DATE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         DATE = CHARACTER $*$ ( $*$ ) (Given and Returned)
+      }{
+         On input the NDF format for a date and time, namely
+         YYYY-MMM-DD HH:MM:SS.SSS.  On exit, the ISO-order format for a
+         date and time, namely YYYY Mmm DD HH:MM:SS.SSS
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   CVG\_HECHO
+}{
+   Writes history text to the FITS headers
+}{
+   \sstdescription{
+      This routine appends the history text associated with an
+      NDF to the current FITS header.  It is not called directly (by
+      CVG\_WHISR), but is passed as an external argument to routine
+      NDF\_HOUT.  (It is an equivalent to NDF\_HECHO.  See SUN/33 for
+      more details.)
+   }
+   \sstinvocation{
+      CALL CVG\_HECHO( NLINES, TEXT, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NLINES = INTEGER (Given)
+      }{
+         Number of lines of history text.
+      }
+      \sstsubsection{
+         TEXT( NLINES ) = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The history text.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The argument list should not be changed.
+
+         \sstitem
+         There is no error checking of the FITSIO status.
+      }
+   }
+   \sstdiytopic{
+      Prior Requirements
+   }{
+      The NDF and the FITS file must already be open.  The current
+      HDU in the FITS file should be the primary and the other headers
+      should have been written.
+   }
+}
+\sstroutine{
    CVG\_NEW
 }{
    Create a new FITS file and return a unit number for it
@@ -856,7 +936,8 @@ been moved into a separate library.
       \sstsubsection{
          PATH = CHARACTER $*$ ( $*$ ) (Given)
       }{
-         The path to the file to be created.
+         The path to the file to be created. A file type of {\tt "}.fit{\tt "} will be
+         added if there is no file type in the supplied string.
       }
       \sstsubsection{
          BLOCKF = INTEGER (Given)
@@ -1127,6 +1208,44 @@ been moved into a separate library.
          All Rights Reserved.
       }{
       }
+   }
+}
+\sstroutine{
+   CVG\_WHISR
+}{
+   Appends NDF history records to the current FITS header
+}{
+   \sstdescription{
+      This appends all the NDF HISTORY records in an easy-to-read format
+      to the current FITS header.
+   }
+   \sstinvocation{
+      CALL CVG\_WHISR( NDF, FUNIT, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NDF = INTEGER (Given)
+      }{
+         The identifier of the NDF whose HISTORY records are to be
+         written to the FITSD headers.
+      }
+      \sstsubsection{
+         FUNIT = INTEGER (Given)
+      }{
+         The logical unit number of the output FITS file.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstdiytopic{
+      Prior Requirements
+   }{
+      The NDF and the FITS file must already be open.  The current
+      HDU in the FITS file should be the primary and the other headers
+      should have been written.
    }
 }
 \sstroutine{

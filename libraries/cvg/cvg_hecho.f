@@ -1,7 +1,7 @@
-      SUBROUTINE COF_HECHO( NLINES, TEXT, STATUS )
+      SUBROUTINE CVG_HECHO( NLINES, TEXT, STATUS )
 *+
 *  Name:
-*     COF_HECHO
+*     CVG_HECHO
 
 *  Purpose:
 *     Writes history text to the FITS headers.
@@ -10,12 +10,12 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL COF_HECHO( NLINES, TEXT, STATUS )
+*     CALL CVG_HECHO( NLINES, TEXT, STATUS )
 
 *  Description:
 *     This routine appends the history text associated with an
 *     NDF to the current FITS header.  It is not called directly (by
-*     COF_WHISR), but is passed as an external argument to routine
+*     CVG_WHISR), but is passed as an external argument to routine
 *     NDF_HOUT.  (It is an equivalent to NDF_HECHO.  See SUN/33 for
 *     more details.)
 
@@ -38,6 +38,7 @@
 
 *  Copyright:
 *     Copyright (C) 1997 Central Laboratory of the Research Councils.
+*     Copyright (C) 2013 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -58,11 +59,14 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     1997 January 13 (MJC):
 *        Original version.
+*     19-NOV-2013 (DSB):
+*        Moved from CONVERT to CVG.
 *     {enter_changes_here}
 
 *-
@@ -72,9 +76,10 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'CVG_PAR'          ! CVG constants
 
 *  Global Variables:
-      INCLUDE 'COF_CMN'          ! Common block for passing required
+      INCLUDE 'CVG_CMN'          ! Common block for passing required
                                  ! additional arguemnts
 *        FFUNIT = INTEGER (Read)
 *           The Fortran logical unit number of the FITS file.
@@ -85,10 +90,6 @@
 
 *  Status:
       INTEGER STATUS             ! Global status
-
-*  Local Constants:
-      INTEGER   FITSOK           ! Value of good FITSIO status
-      PARAMETER( FITSOK = 0 )
 
 *  Local Variables:
       INTEGER FSTAT              ! FITSIO status
@@ -101,7 +102,7 @@
 
 *  Initialise the FITSIO status.  It's not the same as the Starlink
 *  status, which is reset by the fixed part.
-      FSTAT = FITSOK
+      FSTAT = CVG__FITSOK
 
 *  Write the text.
       DO I = 1, NLINES
