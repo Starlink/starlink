@@ -392,6 +392,8 @@
 *     2013 November 15 (MJC):
 *        Add ALWTAB argument and pass it to other routines now using
 *        it.
+*     19-NOV-2013 (DSB):
+*        Re-structured to use CVG provenance writing routines.
 *     {enter_further_changes_here}
 
 *-
@@ -475,6 +477,7 @@
       INTEGER IDEL               ! Increment to reduce an integer
                                  ! scaling range
       INTEGER IPNTR              ! Pointer to input array
+      INTEGER IPROV              ! Identifier for provenance structure
       INTEGER*8 KBLANK           ! Data blank for 64-bit integer arrays
       INTEGER*8 KDEL             ! Increment to reduce a 64-bit integer
                                  ! scaling range
@@ -499,6 +502,7 @@
       LOGICAL OPEN               ! FITS file exists?
       LOGICAL PROPEX             ! Propagate FITS extension for the
                                  ! current header?
+      LOGICAL PRVPRS             ! PROVENANCE present?
       CHARACTER*6 ROUTIN         ! FITSIO routine name for error report
       INTEGER SBYTES             ! No. of bytes per scaled array value
       LOGICAL SCALE              ! The array is to be scaled?
@@ -767,13 +771,27 @@
             IF ( HISPRE ) CALL COF_WHISR( NDF, FUNIT, STATUS )
          END IF
 
-*  Write provenance headers.
-         IF ( PROVEN .EQ. 'CADC' ) THEN
-            CALL COF_PCADC( NDF, FUNIT, STATUS )
+*  Write provenance headers. First check that there is provenance
+*  to record.
+         CALL NDF_XSTAT( NDF, 'PROVENANCE', PRVPRS, STATUS )
+         IF ( PRVPRS ) THEN
 
-         ELSE IF ( PROVEN .EQ. 'GENERIC' ) THEN
-            CALL COF_WPROV( NDF, FUNIT, STATUS )
+*  Get an identifier for a structure holding provenance info in the NDF.
+            CALL NDG_READPROV( NDF, ' ', IPROV, STATUS )
+
+*  Now write the records in the required format.
+            IF ( PROVEN .EQ. 'CADC' ) THEN
+               CALL CVG_PCADC( IPROV, FUNIT, STATUS )
+
+            ELSE IF ( PROVEN .EQ. 'GENERIC' ) THEN
+               CALL CVG_WPROV( IPROV, FUNIT, STATUS )
+
+            END IF
+
+*  Free the provenance structure.
+            CALL NDG_FREEPROV( IPROV, STATUS )
          END IF
+
          IF ( STATUS .NE. SAI__OK ) GOTO 999
 
 *  Determine the block-floating point conversion and blank value.
@@ -867,7 +885,7 @@
 
                END IF
 
-*  Determine whether or not scaling is required.  In most cases, 
+*  Determine whether or not scaling is required.  In most cases,
 *  we can compare the component's BITPIX with that supplied for the
 *  output FITS file.  However, there is one exception, converting
 *  a _REAL array to 64-bit integer.

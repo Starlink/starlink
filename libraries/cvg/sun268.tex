@@ -1129,6 +1129,88 @@ been moved into a separate library.
       }
    }
 }
+\sstroutine{
+   CVG\_WPROV
+}{
+   Writes general provenance records to the current FITS header
+}{
+   \sstdescription{
+      This creates headers in the current FITS header that record the
+      supplied provenance information.
+
+      The tabulated indexed headers below, all with string values, are
+      written for each ancestor NDF.  The keyword index n is the
+      provenance identifier for each NDF, starting at 0 corresponding
+      to the current NDF.  All have value {\tt '}$<$unknown$>${\tt '} if the information
+      could not be found, except for MORE information; the PRVMn header
+      is omitted if there is no MORE information to record.
+
+      Keyword   Comment
+      \sstitemlist{
+
+         \sstitem
+         ------   -------
+         PRVPn     Path of the $<$nth$>$ parent
+         PRVIn     Identifiers of direct parents for $<$nth$>$ ancestor
+         PRVDn     Creation date of $<$nth$>$ parent
+         PRVCn     Creator software of $<$nth$>$ parent
+         PRVMn     Contents of MORE of $<$nth$>$ parent
+
+      }
+      where $<$nth$>$ is the appropriate ordinal string, e.g. 1st, 2nd,
+      3rd, 4th.
+
+      The above headers are prefaced by a blank header and a title
+      {\tt "}Provenance:{\tt "} comment.  There is a blank header between each set
+      for improved legibility.
+   }
+   \sstinvocation{
+      CALL CVG\_WPROV( IPROV, FUNIT, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IPROV = INTEGER (Given)
+      }{
+         The identifier of the PROVENANCE that is to be written to
+         the FITS headers. If NDG\_\_NULL is supplied, this function
+         returns without action.
+      }
+      \sstsubsection{
+         FUNIT = INTEGER (Given)
+      }{
+         The logical unit number of the output FITS file.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Supports up to 9999 ancestors.
+
+         \sstitem
+         The PRVPn, PRVIn, and PRVMn keywords may often need more than
+         the maximum 68 characters allowed in a keyword character value.
+         Therefore this routine uses the non-standard Long-string Keyword
+         Convention that permits long strings to continue over multiple
+         headers.  If any of the aforementioned keywords{\tt '} values exceeds 68
+         characters, this routine adds a warning in some COMMENT headers
+         and writes a LONGSTRN header, whose value is the version of the
+         convention being used.
+      }
+   }
+   \sstdiytopic{
+      Prior Requirements
+   }{
+      The FITS file must already be open.  The current HDU in the FITS
+      file should be the primary and the standard headers should have
+      been written.
+   }
+}
 \normalsize
 
 \end{document}

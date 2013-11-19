@@ -1,7 +1,7 @@
-      SUBROUTINE COF_WPROV( NDF, FUNIT, STATUS )
+      SUBROUTINE CVG_WPROV( IPROV, FUNIT, STATUS )
 *+
 *  Name:
-*     COF_WPROV
+*     CVG_WPROV
 
 *  Purpose:
 *     Writes general provenance records to the current FITS header.
@@ -10,15 +10,15 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL COF_WPROV( NDF, FUNIT, STATUS )
+*     CALL CVG_WPROV( IPROV, FUNIT, STATUS )
 
 *  Description:
 *     This creates headers in the current FITS header that record the
-*     provenance information stored in the supplied NDF.
+*     supplied provenance information.
 *
 *     The tabulated indexed headers below, all with string values, are
 *     written for each ancestor NDF.  The keyword index n is the
-*     provenanxce identifier for each NDF, starting at 0 corresponding
+*     provenance identifier for each NDF, starting at 0 corresponding
 *     to the current NDF.  All have value '<unknown>' if the information
 *     could not be found, except for MORE information; the PRVMn header
 *     is omitted if there is no MORE information to record.
@@ -39,9 +39,10 @@
 *     for improved legibility.
 
 *  Arguments:
-*     NDF = INTEGER (Given)
-*        The identifier of the NDF whose PROVENANCE is to be written to
-*        the FITS headers.
+*     IPROV = INTEGER (Given)
+*        The identifier of the PROVENANCE that is to be written to
+*        the FITS headers. If NDG__NULL is supplied, this function
+*        returns without action.
 *     FUNIT = INTEGER (Given)
 *        The logical unit number of the output FITS file.
 *     STATUS = INTEGER (Given and Returned)
@@ -59,13 +60,13 @@
 *     convention being used.
 
 *  Prior Requirements:
-*     The NDF and the FITS file must already be open.  The current
-*     HDU in the FITS file should be the primary and the standard
-*     headers should have been written.
+*     The FITS file must already be open.  The current HDU in the FITS
+*     file should be the primary and the standard headers should have
+*     been written.
 
 *  Copyright:
-*     Copyright (C) 2008 Science & Technology Facilities Council. All
-*     Rights Reserved.
+*     Copyright (C) 2008,2013 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -93,6 +94,8 @@
 *        Original version, adapting some code from DSB's PROVSHOW.
 *     29-JUN-2009 (DSB):
 *        Change to use NDG_READPROV and NDG_FREEPROV.
+*     19-NOV-2013 (DSB):
+*        NDF argument replaced by IPROV.
 *     {enter_changes_here}
 
 *-
@@ -103,9 +106,10 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants
+      INCLUDE 'NDG_PAR'          ! NDG constants
 
 *  Arguments Given:
-      INTEGER NDF
+      INTEGER IPROV
       INTEGER FUNIT
 
 *  Status:
@@ -125,7 +129,6 @@
       INTEGER FSTAT              ! FITSIO status
       CHARACTER*10 ID            ! Integer index for the current NDF
       INTEGER IDENT              ! Identifier undex for the current NDF
-      INTEGER IPROV              ! Identifier for provenance structure
       INTEGER IREC               ! Loop counter for provenance records
       CHARACTER*4 KEY            ! Current key in KeyMap of root anc.
       CHARACTER*8 KEYWRD         ! Header keyword
@@ -150,8 +153,7 @@
       FSTAT = FITSOK
 
 *  First check that there is provenance to record.
-      CALL NDF_XSTAT( NDF, 'PROVENANCE', PRVPRS, STATUS )
-      IF ( PRVPRS ) THEN
+      IF ( IPROV .NE. NDG__NULL ) THEN
 
 *  Write a title for the block of provenance headers.
          CARD = ' '
@@ -159,11 +161,9 @@
          CALL CHR_APPND( '/ Provenance:', CARD, CPOS )
          CALL FTPREC( FUNIT, CARD, FSTAT )
 
-*  Format the provenance information in the NDF.  The resulting strings
+*  Format the supplied provenance information.  The resulting strings
 *  are returned in an AST KeyMap.
-        CALL NDG_READPROV( NDF, ' ', IPROV, STATUS )
         CALL NDG_FORMATPROV( IPROV, .FALSE., KYMAP1, STATUS )
-        CALL NDG_FREEPROV( IPROV, STATUS )
 
 *  Get the number of entries in the returned KeyMap.  This will be one
 *  more than the number of NDFs described in the displayed table.
@@ -374,7 +374,7 @@
 *  Check for an error.  Handle a bad status.  Negative values are
 *  reserved for non-fatal warnings.
       IF ( FSTAT .GT. FITSOK ) THEN
-         CALL CVG_FIOER( FSTAT, 'COF_WPROV_ERR', 'FTPKYS',
+         CALL CVG_FIOER( FSTAT, 'CVG_WPROV_ERR', 'FTPKYS',
      :                   'Error writing provenance header card.',
      :                   STATUS )
       END IF
