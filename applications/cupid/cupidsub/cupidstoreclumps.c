@@ -198,6 +198,7 @@ void cupidStoreClumps( const char *param1, const char *param2, int indf,
    HDSLoc *ncloc;           /* Locator for array cell */
    NdgProvenance *prov;     /* Provenance info from input NDF */
    char *line = NULL;       /* Pointer to buffer for log file output */
+   char *p1;                /* Pointer to next character */
    char *stc_data;          /* Array of fixed-length STC strings */
    char *stcptr = NULL;     /* Pointer to buffer holding STC-S clump description */
    char attr[ 15 ];         /* AST attribute name */
@@ -707,10 +708,13 @@ void cupidStoreClumps( const char *param1, const char *param2, int indf,
             } else {
                stc_data = astCalloc( max_stclen, iclump );
                if( *status == SAI__OK ) {
-                  for( istc = 0; istc < iclump; istc++ ) {
+                  p1 = stc_data;
+                  for( istc = 0; istc < nndf; istc++ ) {
                      sprintf( key, "Shape_%d", istc );
-                     astMapGet0C( stc_km, key, (const char **) &stcptr );
-                     strncpy( stc_data + istc*max_stclen, stcptr, max_stclen );
+                     if( astMapGet0C( stc_km, key, (const char **) &stcptr ) ) {
+                        strncpy( p1, stcptr, max_stclen );
+                        p1 += max_stclen;
+                     }
                   }
 
                   astPutColumnData( table, cname, max_stclen,

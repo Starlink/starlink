@@ -205,7 +205,11 @@ void findclumps( int *status ) {
 *        The columns in this catalogue will be the same as those created
 *        by the "OUTCAT" parameter, but the table will in also hold the
 *        contents of the FITS extension of the input NDF, and CADC-style
-*        provenance headers. [!]
+*        provenance headers. Note, an error will be reported if the current
+*        co-ordinate system of the input NDF does not include a pair of
+*        celestial longitude and latitude axes. The default for parameter
+*        SHAPE is changed to "Polygon" if a JSA-style catalogue is being
+*        created. [!]
 *     LOGFILE = LITERAL (Read)
 *        The name of a text log file to create. If a null (!) value is
 *        supplied, no log file is created. [!]
@@ -377,7 +381,10 @@ void findclumps( int *status ) {
 *
 *        In general, "Ellipse" will outline the brighter, inner regions
 *        of each clump, and "Polygon" will include the fainter outer
-*        regions. ["None"]
+*        regions. The dynamic default is "Polygon" if a JSA-style
+*        catalogue (see parameters JSACAT) is being created, and "None"
+*        otherwise. Note, if a JSA-style catalogue is neing created an
+*        error will be reported if "Ellipse" or "None" is selected. []
 *     WCSPAR = _LOGICAL (Read)
 *        If a TRUE value is supplied, then the clump parameters stored in
 *        the output catalogue and in the CUPID extension of the output NDF,
@@ -395,7 +402,9 @@ void findclumps( int *status ) {
 *        TRUE if the current coordinate system in the input NDF represents
 *        celestial longitude and latitude in some system, plus a recogonised
 *        spectral axis (if the input NDF is 3D). Otherwise, the dynamic
-*        default is FALSE. []
+*        default is FALSE. Note, an error will be reported if a JSA-style
+*        catalogue is being created (see parameter JSACAT) and WCSPAR is
+*        set to FALSE. []
 
 *  Use of CUPID Extension:
 *     This application will create an NDF extension called "CUPID" in the
@@ -953,6 +962,7 @@ void findclumps( int *status ) {
    int indf3;                   /* Identifier for Quality output NDF */
    int indf;                    /* Identifier for input NDF */
    int ishape;                  /* STC-S shape for spatial coverage */
+   int jsacat;                  /* Is a JSA-style catalogue being created? */
    int n;                       /* Number of values summed in "sum" */
    int nclumps;                 /* Number of clumps stored in output NDF */
    int ndim;                    /* Total number of pixel axes */
@@ -1074,6 +1084,25 @@ void findclumps( int *status ) {
       }
    }
 
+/* See if a JSA-style output catalogue is being created. */
+   jsacat = 0;
+   if( *status == SAI__OK ) {
+      parGet0c( "JSACAT", buffer, sizeof( buffer ), status );
+      if( *status == SAI__OK ) {
+         jsacat = 1;
+      } else if( *status == PAR__NULL ) {
+         errAnnul( status );
+      }
+   }
+
+/* If so, report an error unless the WCS of the input NDF contains a pair
+   of sky axes. */
+   if( jsacat && nskyax != 2 && *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRepf( " ", "Cannot create a JSA-style output catalogue since "
+               "the input NDF does not have any WCS sky axes.", status );
+   }
+
 /* See if the clump parameters are to be described using WCS values or
    pixel values. The default is yes if the current WCS Frame consists
    entirely of sky and spectral axes, and does not contain more than 1
@@ -1084,16 +1113,32 @@ void findclumps( int *status ) {
              status );
    parGet0l( "WCSPAR", &usewcs, status );
 
+/* Report an error if we are creating a JSA-style catalogue and the user
+   has selected to use pixel axes. */
+   if( jsacat && !usewcs && *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRepf( " ", "Cannot create a JSA-style output catalogue since "
+               "the WCSPAR parameter is false.", status );
+   }
+
 /* See what STC-S shape should be used to describe each spatial clump. */
    ishape = 0;
-   parChoic( "SHAPE", "None", "Ellipse,Polygon,None", 1, shape, 10,
-             status );
+   parChoic( "SHAPE", jsacat ? "Polygon" : "None", "Ellipse,Polygon,None", 1,
+             shape, 10, status );
    if( *status == SAI__OK ) {
       if( !strcmp( shape, "POLYGON" ) ) {
          ishape = 2;
       } else if( !strcmp( shape, "ELLIPSE" ) ) {
          ishape = 1;
       }
+   }
+
+/* Report an error if we are creating a JSA-style catalogue and the user
+   has selected not to use polygon shapes. */
+   if( jsacat && ishape != 2 && *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRepf( " ", "Cannot create a JSA-style output catalogue since "
+               "the SHAPE parameter is not set to 'Polygon'.", status );
    }
 
 /* Report an error if an attempt is made to produce STC-S descriptions of

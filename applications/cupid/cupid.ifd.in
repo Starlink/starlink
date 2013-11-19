@@ -446,10 +446,9 @@ package cupid {
          parameter shape {
             type LITERAL
             access READ
-            vpath DEFAULT
-            ppath CURRENT,DEFAULT
+            vpath DYNAMIC
+            ppath DYNAMIC
             prompt {Spatial clump shape in output catalogue}
-            default None
             helpkey *
           }
       }
