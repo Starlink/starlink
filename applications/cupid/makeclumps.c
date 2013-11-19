@@ -93,16 +93,16 @@ void makeclumps( int *status ) {
 *        value is supplied, the output catalogue will hold values in
 *        pixel coordinates, and there will be no WCS in any of the output
 *        NDFs. [!]
-*     NCLUMP = _INTEGER (Read)
-*        The number of clumps to create.
-*     OUT = NDF (Write)
-*        The NDF to receive the simulated data, including instrumental
-*        blurring and noise.
 *     MODEL = NDF (Write)
 *        The NDF to receive the simulated data, excluding noise. A CUPID
 *        extension is added to this NDF, containing information about each
 *        clump in the same format as produced by the FINDCLUMPS command. This
 *        includes an NDF holding an of the individual clump.
+*     NCLUMP = _INTEGER (Read)
+*        The number of clumps to create.
+*     OUT = NDF (Write)
+*        The NDF to receive the simulated data, including instrumental
+*        blurring and noise.
 *     OUTCAT = FILENAME (Write)
 *        The output catalogue in which to store the clump parameters.
 *        There will be one row per clump, with the following columns:
