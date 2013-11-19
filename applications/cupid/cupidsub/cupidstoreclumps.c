@@ -721,17 +721,24 @@ void cupidStoreClumps( const char *param1, const char *param2, int indf,
          }
 
 /* Get a FitsChan holding the contents of the FITS extension from the
-   input NDF. Annul the error if the NDF has no FITS extension. */
+   input NDF. Annul the error and create an empty FitsChan if the NDF
+   has no FITS extension. */
          if( *status == SAI__OK ) {
             kpgGtfts( indf, &fc, status );
             if( *status == KPG__NOFTS ) {
                errAnnul( status );
-               fc = NULL;
+               fc = astFitsChan( NULL, NULL, " " );
             }
-         }
+
+/* Ensure the FitsChan contains a PRODUCT keyword, as required by the
+   cvgPcadc function. */
+            astTestFits( fc, "PRODUCT", &there );
+            if( !there ) astSetFitsS( fc, "PRODUCT", "CLUMP CATALOGUE", NULL,
+                                      0 );
 
 /* Put the contents of the FitsChan into the FitsTable. */
-         astPutTableHeader( table, fc );
+            astPutTableHeader( table, fc );
+         }
 
 /* Create a new empty FITS file, and get a FITSIO unit number for it. */
          cvgCreat( param2, 1, 1, &funit, status );
