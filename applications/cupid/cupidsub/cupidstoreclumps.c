@@ -744,7 +744,7 @@ void cupidStoreClumps( const char *param1, const char *param2, int indf,
          cvgCreat( param2, 1, 1, &funit, status );
 
 /* Copy the contents of the FItsTable to the FITS file. */
-         cvgFt2bt( table, funit, "CUPID:FINDCLUMPS", 0, status );
+         cvgFt2bt( table, funit, "CUPID:FINDCLUMPS", 0, 1, status );
 
 /* Write CADC-style provenance records to the current FITS header. */
          prov = ndgReadProv( NDF__NOID, "CUPID:FINDCLUMPS", status );

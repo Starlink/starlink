@@ -98,7 +98,7 @@ int main( void ){
    astPutTableHeader( table, fc );
 
    cvgNew( "test.fit", 1, 1, &funit, &status );
-   cvgFt2bt( table, funit, "TESTEX", 0, &status );
+   cvgFt2bt( table, funit, "TESTEX", 0, 1, &status );
    cvgShowHeader( funit, 1, &status );
    cvgClose( &funit, &status );
 

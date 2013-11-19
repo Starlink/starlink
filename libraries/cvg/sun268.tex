@@ -757,10 +757,11 @@ been moved into a separate library.
 }{
    \sstdescription{
       This function creates a new FITS binary table holding data copied
-      from an AST FitsTable. The current HDU is unchanged on exit.
+      from an AST FitsTable. The current HDU on exit can be indicated
+      using MKCHDU.
    }
    \sstinvocation{
-      CALL CVG\_FT2BT( TABLE, FUNIT, EXTNAM, ASTVER, STATUS )
+      CALL CVG\_FT2BT( TABLE, FUNIT, EXTNAM, ASTVER, MKCHDU, STATUS )
    }
    \sstarguments{
       \sstsubsection{
@@ -788,6 +789,13 @@ been moved into a separate library.
          and the table version for the existing table is equal to the
          value of ASTVER, then no error is reported and this function
          returns without action.
+      }
+      \sstsubsection{
+         MKCHDU = LOGICAL (Given)
+      }{
+         If .TRUE., the new binary table extension is made the current
+         HDU on exit. Otherwise, the original current HDU is unchanged on
+         exit.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)

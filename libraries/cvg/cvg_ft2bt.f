@@ -1,4 +1,5 @@
-      SUBROUTINE CVG_FT2BT( TABLE, FUNIT, EXTNAM, ASTVER, STATUS )
+      SUBROUTINE CVG_FT2BT( TABLE, FUNIT, EXTNAM, ASTVER, MKCHDU,
+     :                      STATUS )
 *+
 *  Name:
 *     CVG_FT2BT
@@ -10,11 +11,12 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CVG_FT2BT( TABLE, FUNIT, EXTNAM, ASTVER, STATUS )
+*     CALL CVG_FT2BT( TABLE, FUNIT, EXTNAM, ASTVER, MKCHDU, STATUS )
 
 *  Description:
 *     This function creates a new FITS binary table holding data copied
-*     from an AST FitsTable. The current HDU is unchanged on exit.
+*     from an AST FitsTable. The current HDU on exit can be indicated
+*     using MKCHDU.
 
 *  Arguments:
 *     TABLE = INTEGER (Given)
@@ -31,6 +33,10 @@
 *        and the table version for the existing table is equal to the
 *        value of ASTVER, then no error is reported and this function
 *        returns without action.
+*     MKCHDU = LOGICAL (Given)
+*        If .TRUE., the new binary table extension is made the current
+*        HDU on exit. Otherwise, the original current HDU is unchanged on
+*        exit.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -69,6 +75,8 @@
 *     18-NOV-2013 (DSB):
 *        The trailing argument for FTPCLS should give the size of a
 *        single string, not the total size of all strings.
+*     19-NOV-2013 (DSB):
+*        Added argument MKCHDU.
 *     {enter_further_changes_here}
 
 *-
@@ -92,6 +100,7 @@
       INTEGER FUNIT
       CHARACTER EXTNAM*(*)
       INTEGER ASTVER
+      LOGICAL MKCHDU
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -128,7 +137,7 @@
       FSTAT = CVG__FITSOK
 
 *  Get the number of the current HDU in the FITS file (primary array
-*  = 1) so that we can re-instate it at the end.
+*  = 1) so that we can re-instate it at the end, if required.
       CALL FTGHDN( FUNIT, IHDU0 )
 
 *  Get a FitsChan holding the other headers to put into extension HDU.
@@ -299,8 +308,8 @@
          END DO
       END IF
 
-*  Reinstate the original current HDU in the FITS file.
-      CALL FTMAHD( FUNIT, IHDU0, HDUTYPE, FSTAT )
+*  If required, reinstate the original current HDU in the FITS file.
+      IF( .NOT. MKCHDU ) CALL FTMAHD( FUNIT, IHDU0, HDUTYPE, FSTAT )
 
  999  CONTINUE
 

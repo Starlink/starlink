@@ -104,15 +104,17 @@ F77_SUBROUTINE(cvg_ft2bt)( INTEGER(TABLE),
                            INTEGER(FUNIT),
                            CHARACTER(EXTNAM),
                            INTEGER(ASTVER),
+                           LOGICAL(MKCHDU),
                            INTEGER(STATUS)
                            TRAIL(EXTNAM) );
 
 void cvgFt2bt( AstFitsTable *table, int funit, const char *extnam,
-               int astver, int *status ){
+               int astver, int mkchdu, int *status ){
    DECLARE_INTEGER(TABLE);
    DECLARE_INTEGER(FUNIT);
    DECLARE_CHARACTER_DYN(EXTNAM);
    DECLARE_INTEGER(ASTVER);
+   DECLARE_LOGICAL(MKCHDU);
    DECLARE_INTEGER(STATUS);
 
    F77_EXPORT_INTEGER( astP2I( table ), TABLE );
@@ -123,12 +125,14 @@ void cvgFt2bt( AstFitsTable *table, int funit, const char *extnam,
    F77_CREATE_CHARACTER( EXTNAM, strlen( extnam ) );
    F77_EXPORT_CHARACTER( extnam, EXTNAM, EXTNAM_length );
    F77_EXPORT_INTEGER( astver, ASTVER );
+   F77_EXPORT_LOGICAL( mkchdu, MKCHDU );
    F77_EXPORT_INTEGER( *status, STATUS );
 
    F77_LOCK( F77_CALL(cvg_ft2bt)( INTEGER_ARG(&TABLE),
                                   INTEGER_ARG(&FUNIT),
                                   CHARACTER_ARG(EXTNAM),
                                   INTEGER_ARG(&ASTVER),
+                                  LOGICAL_ARG(&MKCHDU),
                                   INTEGER_ARG(&STATUS)
                                   TRAIL_ARG(EXTNAM) ); )
 

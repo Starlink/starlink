@@ -297,7 +297,8 @@
 *  containing values copied from the FitsTable, and then annul the
 *  FitsTable pointer. Use the table key in the KeyMap as the extension
 *  name.
-                  CALL CVG_FT2BT( TABLE, FUNIT, KEY, ASTVER, STATUS )
+                  CALL CVG_FT2BT( TABLE, FUNIT, KEY, ASTVER, .FALSE.,
+     :                            STATUS )
                   CALL AST_ANNUL( TABLE, STATUS )
 
                END IF
