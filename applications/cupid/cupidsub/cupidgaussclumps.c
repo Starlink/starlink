@@ -164,6 +164,9 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *        returned by astMalloc if an error has occurred.
 *     14-JAN-2009 (TIMJ):
 *        Use MERS for message filtering.
+*     20-NOV-2013 (DSB):
+*        Supplied config KeyMap now holds the method parameters directly,
+*        rather than holding them in a sub-KeyMap.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -173,7 +176,6 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 */
 
 /* Local Variables: */
-   AstKeyMap *gcconfig; /* Configuration parameters for this algorithm */
    char buf[30];        /* File name buffer */
    HDSLoc *ret;         /* Locator for the returned array of NDFs */
    double *peaks;       /* Holds the "npeak" most recently fitted peak values */
@@ -229,48 +231,34 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    msgOutif( MSG__NORM,  "", "GaussClumps:", status );
    msgBlankif( MSG__VERB, status );
 
-/* Get the AST KeyMap holding the configuration parameters for this
-   algorithm. */
-   if( !astMapGet0A( config, "GAUSSCLUMPS", (AstObject *) &gcconfig ) ) {
-      gcconfig = astKeyMap( " " );
-      astMapPut0A( config, "GAUSSCLUMPS", gcconfig, " " );
-   }
-
-/* The configuration file can optionally omit the algorithm name. In this
-   case the "config" KeyMap may contain values which should really be in
-   the "gcconfig" KeyMap. Add a copy of the "config" KeyMap into "gcconfig"
-   so that it can be searched for any value which cannot be found in the
-   "gcconfig" KeyMap. */
-   astMapPut0A( gcconfig, CUPID__CONFIG, astCopy( config ), NULL );
-
 /* Return the instrumental smoothing FWHMs. For 1D data, we assume the
    axis is spectral and so use VELORES instead of FWHMBEAM.  */
    if( ndim == 1 ) {
-      beamcorr[ 0 ] = cupidConfigD( gcconfig, "VELORES", 2.0, status );
+      beamcorr[ 0 ] = cupidConfigD( config, "VELORES", 2.0, status );
    } else {
-      beamcorr[ 0 ]= cupidConfigD( gcconfig, "FWHMBEAM", 2.0, status );
+      beamcorr[ 0 ]= cupidConfigD( config, "FWHMBEAM", 2.0, status );
       beamcorr[ 1 ] = beamcorr[ 0 ];
       if( ndim == 3 ) {
          beamcorr[ 2 ] = beamcorr[ 0 ];
-         beamcorr[ velax ]= cupidConfigD( gcconfig, "VELORES", 2.0, status );
+         beamcorr[ velax ]= cupidConfigD( config, "VELORES", 2.0, status );
       }
    }
 
 /* See if extra diagnostic info is required. */
-   excols = cupidConfigI( gcconfig, "EXTRACOLS", 0, status );
+   excols = cupidConfigI( config, "EXTRACOLS", 0, status );
 
 /* Get the maximum allowed number of failed fits between succesful fits. */
-   maxskip = cupidConfigI( gcconfig, "MAXSKIP", 10, status );
+   maxskip = cupidConfigI( config, "MAXSKIP", 10, status );
 
 /* Get the maximum allowed number of failed fits between succesful fits. */
-   maxclump = cupidConfigI( gcconfig, "MAXCLUMPS", VAL__MAXI, status );
+   maxclump = cupidConfigI( config, "MAXCLUMPS", VAL__MAXI, status );
 
 /* The iterative process ends when "npad" consecutive clumps all had peak
    values below "peak_thresh" or all had areas below "area_thresh". */
-   npad = cupidConfigI( gcconfig, "NPAD", 10, status );
+   npad = cupidConfigI( config, "NPAD", 10, status );
 
 /* Get the RMS noise level to use. */
-   rms = cupidConfigD( gcconfig, "RMS", rms, status );
+   rms = cupidConfigD( config, "RMS", rms, status );
 
 /* Find the size of each dimension of the data array, and the total number
    of elements in the array. We use the memory management functions of the
@@ -293,18 +281,18 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Set the lower threshold for clump peaks to a user-specified multiple
    of the RMS noise. */
-      peak_thresh = cupidConfigD( gcconfig, "THRESH", 2.0, status );
+      peak_thresh = cupidConfigD( config, "THRESH", 2.0, status );
 
 /* Set the lower threshold for clump area to a user-specified number of
    pixels. */
-      area_thresh = cupidConfigI( gcconfig, "MINPIX", 3, status );
+      area_thresh = cupidConfigI( config, "MINPIX", 3, status );
 
 /* Get the lowest value (normalised to the RMS noise level) at which
    model Gaussians should be evaluated. */
-      mlim = cupidConfigD( gcconfig, "MODELLIM", 0.5, status );
+      mlim = cupidConfigD( config, "MODELLIM", 0.5, status );
 
 /* Get the max allowed fraction of bad pixels in a clump. */
-      maxbad = cupidConfigD( gcconfig, "MAXBAD", 0.05, status );
+      maxbad = cupidConfigD( config, "MAXBAD", 0.05, status );
 
 /* Initialise the number of clumps found so far. */
       iclump = 0;
@@ -316,8 +304,8 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Initialise the variables used to keep track of the mean and standard
    deviation of the most recent "npeak" fitted peak values. */
-      nsig = cupidConfigD( gcconfig, "NSIGMA", 3.0, status );
-      npeak = cupidConfigI( gcconfig, "NPEAK", 9, status );
+      nsig = cupidConfigD( config, "NSIGMA", 3.0, status );
+      npeak = cupidConfigI( config, "NPEAK", 9, status );
       ipeak = 0;
       sum_peak = 0.0;
       sum_peak2 = 0.0;
@@ -385,7 +373,7 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* If not, make an initial guess at the Gaussian clump parameters centred
    on the current peak. */
          if( iter ) {
-            cupidGCSetInit( type, res, ipv, ndim, dims, imax, rms, gcconfig,
+            cupidGCSetInit( type, res, ipv, ndim, dims, imax, rms, config,
                             ( niter == 1 ), velax, x, slbnd, status );
 
 /* Find the best fitting parameters, starting from the above initial guess.
@@ -583,12 +571,6 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
    }
 
-/* Remove the secondary KeyMap added to the KeyMap containing configuration
-   parameters for this algorithm. This prevents the values in the secondary
-   KeyMap being written out to the CUPID extension when cupidStoreConfig is
-   called. */
-   astMapRemove( gcconfig, CUPID__CONFIG );
-
 /* Free resources */
    res = astFree( res );
    dims = astFree( dims );
@@ -600,8 +582,6 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    cupidGC.initmodel = astFree( cupidGC.initmodel );
    cupidGC.model = astFree( cupidGC.model );
    cupidGC.resids = astFree( cupidGC.resids );
-
-   gcconfig = astAnnul( gcconfig );
 
 /* Return the list of clump NDFs. */
    return ret;

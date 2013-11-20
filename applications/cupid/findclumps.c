@@ -906,7 +906,8 @@ void findclumps( int *status ) {
 *     18-NOV-2013 (DSB):
 *        Removed parameter CADCPROV, and added JSACAT.
 *     20-NOV-2013 (DSB):
-*        Copy main output NDF history to output JSA catalogue.
+*        - Copy main output NDF history to output JSA catalogue.
+*        - Do not prompt for RMS if it is in the supplied config.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -1247,62 +1248,6 @@ void findclumps( int *status ) {
 /* See if clump parameters should be deconvolved. */
    parGet0l( "DECONV", &deconv, status );
 
-/* Calculate the default RMS value. If the NDF has a Variance component
-   it is the square root of the mean Variance value. Otherwise, it is found
-   by looking at differences between adjacent pixel values in the Data
-   component. */
-   ndfState( indf, "VARIANCE", &var, status );
-   if( *status == SAI__OK && var ) {
-      ndfMap( indf, "VARIANCE", "_DOUBLE", "READ", (void *) &ipv, &el, status );
-
-      sum = 0.0;
-      n = 0;
-      for( i = 0; i < el; i++ ) {
-         if( ipv[ i ] != VAL__BADD ) {
-            sum += ipv[ i ];
-            n++;
-         }
-      }
-
-      if( n > 0 ) {
-         rms = sqrt( sum/n );
-
-      } else {
-         *status = SAI__ERROR;
-         errRep( "FINDCLUMPS_ERR3", "The supplied data contains insufficient "
-                 "good Variance values to continue.", status );
-      }
-
-   } else {
-      ipv = NULL;
-      rms = cupidRms( type, ipd, el, subnd[ 0 ] - slbnd[ 0 ] + 1, status );
-   }
-
-/* Get the RMS noise level. */
-   parDef0d( "RMS", rms, status );
-   parGet0d( "RMS", &rms, status );
-
-/* Determine which algorithm to use. */
-   parChoic( "METHOD", "GAUSSCLUMPS", "GAUSSCLUMPS,CLUMPFIND,REINHOLD,"
-             "FELLWALKER", 1, method, 15,  status );
-
-/* If the input is a spectral cube, see if spectra are to be processed
-   independetly of their neighbouring spectra. */
-   if( velax != -1 ){
-      parGet0l( "PERSPECTRUM", &perspectrum, status );
-      if( perspectrum && strcmp( method, "FELLWALKER" ) &&
-                         strcmp( method, "CLUMPFIND" ) &&
-          *status == SAI__OK ){
-         *status = SAI__ERROR;
-         msgSetc( "M", method );
-         errRep( "", "Parameter PERSPECTRUM has been set TRUE, but "
-                 "this option cannot currently be used with METHOD=^M.",
-                 status );
-      }
-   } else {
-      perspectrum = 0;
-   }
-
 /* Abort if an error has occurred. */
    if( *status != SAI__OK ) goto L999;
 
@@ -1339,6 +1284,81 @@ void findclumps( int *status ) {
       }
    }
 
+/* Determine which algorithm to use. */
+   parChoic( "METHOD", "GAUSSCLUMPS", "GAUSSCLUMPS,CLUMPFIND,REINHOLD,"
+             "FELLWALKER", 1, method, 15,  status );
+
+/* Get a keymap holding the configuration parameters for the method being
+   used. */
+   if( !astMapGet0A( keymap, method, (AstObject *) &aconfig ) ) {
+      aconfig = astKeyMap( " " );
+      astMapPut0A( keymap, method, aconfig, " " );
+   }
+
+/* The configuration file can optionally omit the algorithm name. In this
+   case the "keymap" KeyMap may contain values which should really be in
+   the "aconfig" KeyMap. Add a copy of the "keymap" KeyMap into "aconfig"
+   so that it can be searched for any value which cannot be found in the
+   "aconfig" KeyMap. */
+   astMapPut0A( aconfig, CUPID__CONFIG, astCopy( keymap ), NULL );
+
+/* Was a value supplied fro "RMS" in th econfig file? If so, get it. */
+   rms = cupidConfigD( aconfig, "RMS", VAL__BADD, status );
+
+/* If no RMS was supplied in the config file, calculate the default RMS value.
+   If the NDF has a Variance component it is the square root of the mean
+   Variance value. Otherwise, it is found by looking at differences between
+   adjacent pixel values in the Data component. */
+   if( rms == VAL__BADD ) {
+      ndfState( indf, "VARIANCE", &var, status );
+      if( *status == SAI__OK && var ) {
+         ndfMap( indf, "VARIANCE", "_DOUBLE", "READ", (void *) &ipv, &el, status );
+
+         sum = 0.0;
+         n = 0;
+         for( i = 0; i < el; i++ ) {
+            if( ipv[ i ] != VAL__BADD ) {
+               sum += ipv[ i ];
+               n++;
+            }
+         }
+
+         if( n > 0 ) {
+            rms = sqrt( sum/n );
+
+         } else {
+            *status = SAI__ERROR;
+            errRep( "FINDCLUMPS_ERR3", "The supplied data contains insufficient "
+                    "good Variance values to continue.", status );
+         }
+
+      } else {
+         ipv = NULL;
+         rms = cupidRms( type, ipd, el, subnd[ 0 ] - slbnd[ 0 ] + 1, status );
+      }
+
+/* Get the RMS noise level. */
+      parDef0d( "RMS", rms, status );
+      parGet0d( "RMS", &rms, status );
+   }
+
+/* If the input is a spectral cube, see if spectra are to be processed
+   independetly of their neighbouring spectra. */
+   if( velax != -1 ){
+      parGet0l( "PERSPECTRUM", &perspectrum, status );
+      if( perspectrum && strcmp( method, "FELLWALKER" ) &&
+                         strcmp( method, "CLUMPFIND" ) &&
+          *status == SAI__OK ){
+         *status = SAI__ERROR;
+         msgSetc( "M", method );
+         errRep( "", "Parameter PERSPECTRUM has been set TRUE, but "
+                 "this option cannot currently be used with METHOD=^M.",
+                 status );
+      }
+   } else {
+      perspectrum = 0;
+   }
+
 /* Ensure that NDG will not add provenance or history to the clump
    cut-out NDFs created below. We will re-start the provenance and GRP
    history blocks before creating the main output NDFs. */
@@ -1348,20 +1368,20 @@ void findclumps( int *status ) {
 /* Switch for each method */
    if( !strcmp( method, "GAUSSCLUMPS" ) ) {
       ndfs = cupidGaussClumps( type, nsig, slbnd, subnd, ipd, ipv, rms,
-                               keymap, velax, beamcorr, status );
+                               aconfig, velax, beamcorr, status );
 
    } else if( !strcmp( method, "CLUMPFIND" ) ) {
       ndfs = cupidClumpFind( type, nsig, slbnd, subnd, ipd, ipv, rms,
-                             keymap, velax, perspectrum, beamcorr,
+                             aconfig, velax, perspectrum, beamcorr,
                              &backoff, status );
 
    } else if( !strcmp( method, "REINHOLD" ) ) {
       ndfs = cupidReinhold( type, nsig, slbnd, subnd, ipd, ipv, rms,
-                            keymap, velax, beamcorr, status );
+                            aconfig, velax, beamcorr, status );
 
    } else if( !strcmp( method, "FELLWALKER" ) ) {
       ndfs = cupidFellWalker( type, nsig, slbnd, subnd, ipd, ipv, rms,
-                              keymap, velax, perspectrum, beamcorr,
+                              aconfig, velax, perspectrum, beamcorr,
                               status );
 
    } else if( *status == SAI__OK ) {
@@ -1371,20 +1391,23 @@ void findclumps( int *status ) {
               "implemented.", status );
    }
 
+/* Remove the secondary KeyMap added to the KeyMap containing configuration
+   parameters for the selected algorithm. This prevents the values in the
+   secondary KeyMap being written out to the CUPID extension when
+   cupidStoreConfig is called. */
+   astMapRemove( aconfig, CUPID__CONFIG );
+
 /* See if the background level is to be subtracted from the clump data
    values before calculating the clump sizes and centroid position. */
    parDef0l( "BACKOFF", backoff, status );
    parGet0l( "BACKOFF", &backoff, status );
 
-/* Get a KeyMap containing the parameters specific to the chosen algorithm,
-   and create a GRP group containing a text form of the KeyMap. */
+/* Create a GRP group containing a text form of the  KeyMap containing
+   the parameters specific to the chosen algorithm. */
    confgrp = grpNew( "", status );
    grpPut1( confgrp, CONF_STRING, 0, status );
    grpPut1( confgrp, LINE_STRING, 0, status );
-
-   if( astMapGet0A( keymap, method, (AstObject *) &aconfig ) ) {
-      kpg1Kygrp( aconfig, &confgrp, status );
-   }
+   kpg1Kygrp( aconfig, &confgrp, status );
 
 /* Append the significant ADAM parameter values. */
    grpPut1( confgrp, " ", 0, status );
@@ -1505,13 +1528,10 @@ void findclumps( int *status ) {
 /* Store the configuration parameters relating to the used algorithm in the
    CUPID extension. We put them into a new KeyMap so that the CUPID NDF
    extension gets names of the form "method.name" rather than just "name". */
-      if( astMapGet0A( keymap, method, (AstObject *) &config ) ) {
-         config2 = astKeyMap( " " );
-         astMapPut0A( config2, method, config, NULL );
-         cupidStoreConfig( xloc, config2, status );
-         config2 = astAnnul( config2 );
-         config = astAnnul( config );
-      }
+      config2 = astKeyMap( " " );
+      astMapPut0A( config2, method, aconfig, NULL );
+      cupidStoreConfig( xloc, config2, status );
+      config2 = astAnnul( config2 );
 
 /* Release the quality name information. */
       rmask = astFree( rmask );

@@ -126,6 +126,9 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *        Use MERS for message filtering.
 *     3-MAR-2011 (DSB):
 *        Report an error if the supplied RMS value is unusable.
+*     20-NOV-2013 (DSB):
+*        Supplied config KeyMap now holds the method parameters directly,
+*        rather than holding them in a sub-KeyMap.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -136,7 +139,6 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Local Variables: */
 
-   AstKeyMap *cfconfig; /* Configuration parameters for this algorithm */
    CupidPixelSet **clumps;/* Pointer to list of PixelSet pointers */
    CupidPixelSet *ps;   /* Pointer to PixelSet */
    HDSLoc *ret;         /* Locator for the returned array of NDFs */
@@ -179,54 +181,40 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    msgOutif( MSG__NORM, "", "ClumpFind:", status );
    msgBlankif( MSG__VERB, status );
 
-/* Get the AST KeyMap holding the configuration parameters for this
-   algorithm. */
-   if( !astMapGet0A( config, "CLUMPFIND", (AstObject *) &cfconfig ) ) {
-      cfconfig = astKeyMap( " " );
-      astMapPut0A( config, "CLUMPFIND", cfconfig, " " );
-   }
-
-/* The configuration file can optionally omit the algorithm name. In this
-   case the "config" KeyMap may contain values which should really be in
-   the "cfconfig" KeyMap. Add a copy of the "config" KeyMap into "cfconfig"
-   so that it can be searched for any value which cannot be found in the
-   "cfconfig" KeyMap. */
-   astMapPut0A( cfconfig, CUPID__CONFIG, astCopy( config ), NULL );
-
 /* Return the instrumental smoothing FWHMs */
    if( !perspectrum ) {
-      beamcorr[ 0 ] = cupidConfigD( cfconfig, "FWHMBEAM", 2.0, status );
+      beamcorr[ 0 ] = cupidConfigD( config, "FWHMBEAM", 2.0, status );
       beamcorr[ 1 ] = beamcorr[ 0 ];
       if( ndim == 3 ) {
          beamcorr[ 2 ] = beamcorr[ 0 ];
-         beamcorr[ velax ]= cupidConfigD( cfconfig, "VELORES", 2.0, status );
+         beamcorr[ velax ]= cupidConfigD( config, "VELORES", 2.0, status );
       }
    } else {
       beamcorr[ 0 ] = 0.0;
       beamcorr[ 1 ] = 0.0;
       beamcorr[ 2 ] = 0.0;
-      beamcorr[ velax ]= cupidConfigD( cfconfig, "VELORES", 2.0, status );
+      beamcorr[ velax ]= cupidConfigD( config, "VELORES", 2.0, status );
    }
 
 /* See if clumps are allowed to touch an edge of the data array. */
-   allow_edge = cupidConfigI( cfconfig, "ALLOWEDGE", 0, status );
+   allow_edge = cupidConfigI( config, "ALLOWEDGE", 0, status );
 
 /* Get the value which defines whether two pixels are neighbours or not.
    The default value is equal to the number of axes in the data array. If
    we are processing each spectrum indepdently, then we always use a value
    of 1. */
    if( !perspectrum ) {
-      naxis = cupidConfigI( cfconfig, "NAXIS", ndim, status );
+      naxis = cupidConfigI( config, "NAXIS", ndim, status );
    } else {
       naxis = 1;
    }
 
 /* Get the RMS noise level to use. */
-   rms = cupidConfigD( cfconfig, "RMS", rms, status );
+   rms = cupidConfigD( config, "RMS", rms, status );
 
 /* See if the IDL implementation of ClumpFind should be emulated rather than
    the algorithm described in the original Williams et al ApJ paper. */
-   idl = cupidConfigI( cfconfig, "IDLALG", 0, status );
+   idl = cupidConfigI( config, "IDLALG", 0, status );
 
 /* Set the default value for the BACKOFF parameter appropriately. */
    *backoff = ( idl == 0 );
@@ -311,7 +299,7 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       }
 
 /* Get the contour levels at which to check for clumps. */
-      levels = cupidCFLevels( cfconfig, maxd, mind, rms, &nlevels, status );
+      levels = cupidCFLevels( config, maxd, mind, rms, &nlevels, status );
 
 /* Initialise the largest data value in the remaining unassigned pixels. */
       maxrem = maxd;
@@ -355,7 +343,7 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       } else {
          minpix = 5;
       }
-      minpix = cupidConfigI( cfconfig, "MINPIX", minpix, status );
+      minpix = cupidConfigI( config, "MINPIX", minpix, status );
 
 /* Loop round each clump */
       nminpix = 0;
@@ -464,7 +452,7 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
          ret = cupidNdfClump( type, ipd, ipa, el, ndim, dims,
                               skip, slbnd, ps->index, ps->lbnd,
                               ps->ubnd, NULL, ret,
-                              cupidConfigD( cfconfig, "MAXBAD", 0.05, status ),
+                              cupidConfigD( config, "MAXBAD", 0.05, status ),
                               status );
       }
 
@@ -478,15 +466,8 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
    }
 
-/* Remove the secondary KeyMap added to the KeyMap containing configuration
-   parameters for this algorithm. This prevents the values in the secondary
-   KeyMap being written out to the CUPID extension when cupidStoreConfig is
-   called. */
-   astMapRemove( cfconfig, CUPID__CONFIG );
-
 /* Free resources */
    ipa = astFree( ipa );
-   cfconfig = astAnnul( cfconfig );
 
    for( i = 0; i < cupid_ps_cache_size; i++ ) {
       cupid_ps_cache[ i ] = cupidCFDeletePS( cupid_ps_cache[ i ], status );

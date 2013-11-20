@@ -108,6 +108,9 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *        Original version.
 *     14-JAN-2009 (TIMJ):
 *        Use MERS for message filtering.
+*     20-NOV-2013 (DSB):
+*        Supplied config KeyMap now holds the method parameters directly,
+*        rather than holding them in a sub-KeyMap.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -118,7 +121,6 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Local Variables: */
 
-   AstKeyMap *rconfig;  /* Configuration parameters for this algorithm */
    HDSLoc *ret;         /* Locator for the returned array of NDFs */
    double *pd;          /* Pointer to next element of data array */
    double *peakvals;    /* Pointer to array holding clump peak values */
@@ -168,26 +170,12 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    msgBlankif( MSG__NORM, status );
    msgOutif( MSG__NORM, "", "Reinhold:", status );
 
-/* Get the AST KeyMap holding the configuration parameters for this
-   algorithm. */
-   if( !astMapGet0A( config, "REINHOLD", (AstObject *) &rconfig ) ) {
-      rconfig = astKeyMap( " " );
-      astMapPut0A( config, "REINHOLD", rconfig, " " );
-   }
-
-/* The configuration file can optionally omit the algorithm name. In this
-   case the "config" KeyMap may contain values which should really be in
-   the "rconfig" KeyMap. Add a copy of the "config" KeyMap into "rconfig"
-   so that it can be searched for any value which cannot be found in the
-   "rconfig" KeyMap. */
-   astMapPut0A( rconfig, CUPID__CONFIG, astCopy( config ), NULL );
-
 /* Return the instrumental smoothing FWHMs */
-   beamcorr[ 0 ] = cupidConfigD( rconfig, "FWHMBEAM", 2.0, status );
+   beamcorr[ 0 ] = cupidConfigD( config, "FWHMBEAM", 2.0, status );
    beamcorr[ 1 ] = beamcorr[ 0 ];
    if( ndim == 3 ) {
       beamcorr[ 2 ] = beamcorr[ 0 ];
-      beamcorr[ velax ]= cupidConfigD( rconfig, "VELORES", 2.0, status );
+      beamcorr[ velax ]= cupidConfigD( config, "VELORES", 2.0, status );
    }
 
 /* Find the size of each dimension of the data array, and the total number
@@ -207,19 +195,19 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    }
 
 /* Get various configuration parameters. */
-   rms = cupidConfigD( rconfig, "RMS", rms, status );
-   minlen = cupidConfigI( rconfig, "MINLEN", 4, status );
-   noise = cupidConfigRMS( rconfig, "NOISE", rms, 2*rms, status );
-   thresh = cupidConfigRMS( rconfig, "THRESH", rms, noise + 2*rms, status );
-   flatslope = cupidConfigRMS( rconfig, "FLATSLOPE", rms, rms, status );
+   rms = cupidConfigD( config, "RMS", rms, status );
+   minlen = cupidConfigI( config, "MINLEN", 4, status );
+   noise = cupidConfigRMS( config, "NOISE", rms, 2*rms, status );
+   thresh = cupidConfigRMS( config, "THRESH", rms, noise + 2*rms, status );
+   flatslope = cupidConfigRMS( config, "FLATSLOPE", rms, rms, status );
    cathresh = pow( 3, ndim ) - 1.0;
-   cathresh = cupidConfigI( rconfig, "CATHRESH", (int) cathresh, status );
-   caiter = cupidConfigI( rconfig, "CAITERATIONS", 1, status );
-   fixiter = cupidConfigI( rconfig, "FIXCLUMPSITERATIONS", 1, status );
+   cathresh = cupidConfigI( config, "CATHRESH", (int) cathresh, status );
+   caiter = cupidConfigI( config, "CAITERATIONS", 1, status );
+   fixiter = cupidConfigI( config, "FIXCLUMPSITERATIONS", 1, status );
 
 /* Get the minimum allowed number of pixels in a clump. */
    minpix = cupidDefMinPix( ndim, beamcorr, noise, thresh, status );
-   minpix = cupidConfigI( rconfig, "MINPIX", minpix, status );
+   minpix = cupidConfigI( config, "MINPIX", minpix, status );
 
 /* Convert CATHRESH from a number of pixels to a fraction. */
    cathresh = cathresh/pow( 3, ndim );
@@ -431,7 +419,7 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
          i = igood[ j ];
          ret = cupidNdfClump( type, ipd, m1, el, ndim, dims, skip, slbnd,
                               i, clbnd + 3*i, cubnd + 3*i, NULL, ret,
-                              cupidConfigD( rconfig, "MAXBAD", 0.05, status ),
+                              cupidConfigD( config, "MAXBAD", 0.05, status ),
                               status );
       }
 
@@ -446,14 +434,7 @@ HDSLoc *cupidReinhold( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 L10:;
 
-/* Remove the secondary KeyMap added to the KeyMap containing configuration
-   parameters for this algorithm. This prevents the values in the secondary
-   KeyMap being written out to the CUPID extension when cupidStoreConfig is
-   called. */
-   astMapRemove( rconfig, CUPID__CONFIG );
-
 /* Free resources */
-   rconfig = astAnnul( rconfig );
    mask = astFree( mask );
    mask2 = astFree( mask2 );
 

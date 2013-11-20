@@ -150,6 +150,9 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *        Added "perspectrum" parameter.
 *     14-JAN-2009 (TIMJ):
 *        Use MERS for message filtering.
+*     20-NOV-2013 (DSB):
+*        Supplied config KeyMap now holds the method parameters directly,
+*        rather than holding them in a sub-KeyMap.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -160,7 +163,6 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Local Variables: */
 
-   AstKeyMap *fwconfig; /* Configuration parameters for this algorithm */
    HDSLoc *ret;         /* Locator for the returned array of NDFs */
    double *pd;          /* Pointer to next element of data array */
    double *peakvals;    /* Pointer to array holding clump peak values */
@@ -209,33 +211,19 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    msgOutif( MSG__NORM, "", "FellWalker:", status );
    msgBlankif( MSG__VERB, status );
 
-/* Get the AST KeyMap holding the configuration parameters for this
-   algorithm. */
-   if( !astMapGet0A( config, "FELLWALKER", (AstObject *) &fwconfig ) ) {
-      fwconfig = astKeyMap( " " );
-      astMapPut0A( config, "FELLWALKER", fwconfig, " " );
-   }
-
-/* The configuration file can optionally omit the algorithm name. In this
-   case the "config" KeyMap may contain values which should really be in
-   the "fwconfig" KeyMap. Add a copy of the "config" KeyMap into "fwconfig"
-   so that it can be searched for any value which cannot be found in the
-   "fwconfig" KeyMap. */
-   astMapPut0A( fwconfig, CUPID__CONFIG, astCopy( config ), NULL );
-
 /* Return the instrumental smoothing FWHMs */
    if( ! perspectrum ) {
-      beamcorr[ 0 ] = cupidConfigD( fwconfig, "FWHMBEAM", 2.0, status );
+      beamcorr[ 0 ] = cupidConfigD( config, "FWHMBEAM", 2.0, status );
       beamcorr[ 1 ] = beamcorr[ 0 ];
       if( ndim == 3 ) {
          beamcorr[ 2 ] = beamcorr[ 0 ];
-         beamcorr[ velax ]= cupidConfigD( fwconfig, "VELORES", 2.0, status );
+         beamcorr[ velax ]= cupidConfigD( config, "VELORES", 2.0, status );
       }
    } else {
       beamcorr[ 0 ] = 0.0;
       beamcorr[ 1 ] = 0.0;
       beamcorr[ 2 ] = 0.0;
-      beamcorr[ velax ]= cupidConfigD( fwconfig, "VELORES", 2.0, status );
+      beamcorr[ velax ]= cupidConfigD( config, "VELORES", 2.0, status );
    }
 
 /* Find the size of each dimension of the data array, and the total number
@@ -258,11 +246,11 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
    ipa = astMalloc( sizeof( int )*el );
 
 /* Get the RMS noise level to use. */
-   rms = cupidConfigD( fwconfig, "RMS", rms, status );
+   rms = cupidConfigD( config, "RMS", rms, status );
 
 /* Assign every data pixel to a clump and stores the clumps index in the
    corresponding pixel in "ipa". */
-   maxid = cupidFWMain( type, ipd, el, ndim, dims, skip, slbnd, rms, fwconfig,
+   maxid = cupidFWMain( type, ipd, el, ndim, dims, skip, slbnd, rms, config,
                         ipa,
                         ( ndim > 2 && perspectrum ) ? velax + 1 : 0, status );
 
@@ -295,10 +283,10 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       mindip = cupidConfigRMS( config, "MINDIP", rms, 3.0*rms, status );
 
 /* Get the lowest allowed clump peak value. */
-      minhgt = cupidConfigRMS( fwconfig, "MINHEIGHT", rms, mindip + noise, status );
+      minhgt = cupidConfigRMS( config, "MINHEIGHT", rms, mindip + noise, status );
 
 /* See if clumps are allowed to touch an edge of the data array. */
-      allow_edge = cupidConfigI( fwconfig, "ALLOWEDGE", 1, status );
+      allow_edge = cupidConfigI( config, "ALLOWEDGE", 1, status );
 
 /* Get the minimum allowed number of pixels in a clump. */
       if( ! perspectrum ) {
@@ -306,7 +294,7 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       } else {
          minpix = 3;
       }
-      minpix = cupidConfigI( fwconfig, "MINPIX", minpix, status );
+      minpix = cupidConfigI( config, "MINPIX", minpix, status );
 
 /* Initialise a list to hold zero for every clump id. These values are
    used to count the number of pixels remaining in each clump. Also
@@ -462,7 +450,7 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
          i = igood[ j ];
          ret = cupidNdfClump( type, ipd, ipa, el, ndim, dims, skip, slbnd,
                               i, clbnd + 3*i, cubnd + 3*i, NULL, ret,
-                              cupidConfigD( fwconfig, "MAXBAD", 0.05, status ),
+                              cupidConfigD( config, "MAXBAD", 0.05, status ),
                               status );
       }
 
@@ -474,14 +462,7 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 L10:;
 
-/* Remove the secondary KeyMap added to the KeyMap containing configuration
-   parameters for this algorithm. This prevents the values in the secondary
-   KeyMap being written out to the CUPID extension when cupidStoreConfig is
-   called. */
-   astMapRemove( fwconfig, CUPID__CONFIG );
-
 /* Free resources */
-   fwconfig = astAnnul( fwconfig );
    ipa = astFree( ipa );
    nrem = astFree( nrem );
    peakvals = astFree( peakvals );

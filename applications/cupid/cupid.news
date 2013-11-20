@@ -6,6 +6,25 @@
  and  analyse clumps of emission within 2- or 3- dimensional
  data arrays.
 
+Changes introduced at V2.0
+
+   - The FINDCLUMPS and EXTRACTCLUMPS commands now have a new parameter
+   called JSACAT that allows an output to be created in a form suitable
+   for ingestion by the CADC as part of the JCMT Science Archive.
+
+   - MAKECLUMPS can now create clumps even if the output NDF includes
+   one or more degenerate pixel axes (i.e pixel axes that span only a
+   single pixel).
+
+   - A bug has been fixed in the Fellwalker method that would cause the
+   default value to be used for configuration parameters "fellwalker.noise"
+   and "fellwalker.mindip" if these parameters were specified in their
+   full form in the configuration (for instance as "fellwalker.mindip"
+   instead of just "mindip").
+
+   - No prompt is now made for the "RMS" parameter if an RMS value is
+   specified in the configuration.
+
 Changes introduced at V1.6
 
    - A bug in the GaussClumps method has been fixed which could cause
