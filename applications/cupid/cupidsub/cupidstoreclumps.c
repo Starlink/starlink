@@ -1,6 +1,7 @@
 #include "sae_par.h"
 #include "prm_par.h"
 #include "star/hds.h"
+#include "star/atl.h"
 #include "star/ndg.h"
 #include "star/cvg.h"
 #include "kpg_err.h"
@@ -725,6 +726,11 @@ void cupidStoreClumps( const char *param1, const char *param2, int indf,
             }
          }
 
+/* Create a new empty FITS file, and get a FITSIO unit number for it.
+   The current HDU is the primary HDU on exit. */
+         cvgCreat( param2, 1, 1, &fptr, status );
+
+
 /* Get a FitsChan holding the contents of the FITS extension from the
    input NDF. Annul the error and create an empty FitsChan if the NDF
    has no FITS extension. */
@@ -735,27 +741,22 @@ void cupidStoreClumps( const char *param1, const char *param2, int indf,
                fc = astFitsChan( NULL, NULL, " " );
             }
 
-/* Ensure the FitsChan contains a PRODUCT keyword, as required by the
-   cvgPcadc function. */
-            astTestFits( fc, "PRODUCT", &there );
-            if( !there ) astSetFitsS( fc, "PRODUCT", "CLUMP CATALOGUE", NULL,
-                                      0 );
+/* Ensure the FitsChan contains a PRODUCT keyword set to "clump". */
+            atlPtfts( fc, "PRODUCT", "clump", "This file contains "
+                      "a clump catalogue", status );
 
-/* Put the contents of the FitsChan into the FitsTable. */
-            astPutTableHeader( table, fc );
+/* Put the contents of the FitsChan into the current (i.e. primary) HDU. */
+            cvgFc2hd( fc, 0, fptr, status );
          }
 
-/* Create a new empty FITS file, and get a FITSIO unit number for it. */
-         cvgCreat( param2, 1, 1, &fptr, status );
-
-/* Copy the contents of the FItsTable to the FITS file. */
-         cvgFt2bt( table, fptr, "CUPID:FINDCLUMPS", 0, 1, status );
-
-/* Write CADC-style provenance records to the current FITS header. */
+/* Write CADC-style provenance records to the current (i.e primary) HDU. */
          prov = ndgReadProv( NDF__NOID, "CUPID:FINDCLUMPS", status );
          ndgPutProv( prov, indf, NULL, 0, status );
          cvgPcadc( prov, fptr, status );
          prov = ndgFreeProv( prov, status );
+
+/* Copy the contents of the FitsTable to the FITS file. */
+         cvgFt2bt( table, fptr, "CUPID:FINDCLUMPS", 0, 0, status );
 
 /* Close the FITS file. */
          cvgClose( &fptr, status );

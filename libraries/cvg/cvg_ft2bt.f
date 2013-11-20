@@ -15,8 +15,10 @@
 
 *  Description:
 *     This function creates a new FITS binary table holding data copied
-*     from an AST FitsTable. The current HDU on exit can be indicated
-*     using MKCHDU.
+*     from an AST FitsTable. If a binary table extension with the given
+*     extension name already exists in the FITS file, it is replaced by
+*     the new one. Otherwise, the table is written into the current HDU.
+*     The current HDU on exit can be selected using MKCHDU.
 
 *  Arguments:
 *     TABLE = INTEGER (Given)
