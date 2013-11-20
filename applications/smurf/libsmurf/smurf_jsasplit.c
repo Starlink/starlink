@@ -114,6 +114,7 @@
 #include "kpg_err.h"
 #include "star/grp.h"
 #include "star/kaplibs.h"
+#include "star/ndg.h"
 
 /* SMURF includes */
 #include "smurf_typ.h"
