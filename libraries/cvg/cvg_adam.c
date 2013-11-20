@@ -107,3 +107,38 @@ void cvgCreat( const char *param, int blockf, int ovrwrt, int *funit,
    F77_IMPORT_INTEGER( STATUS, *status );
 }
 
+F77_SUBROUTINE(cvg_assoc)( CHARACTER(PARAM),
+                           CHARACTER(MODE),
+                           INTEGER(FUNIT),
+                           INTEGER(BLOCKF),
+                           INTEGER(STATUS)
+                           TRAIL(PARAM)
+                           TRAIL(MODE) );
+
+void cvgAssoc( const char *param, const char *mode, int *funit, int *blockf,
+               int *status ){
+   DECLARE_CHARACTER_DYN(PARAM);
+   DECLARE_CHARACTER_DYN(MODE);
+   DECLARE_INTEGER(FUNIT);
+   DECLARE_INTEGER(BLOCKF);
+   DECLARE_INTEGER(STATUS);
+
+   F77_CREATE_EXPORT_CHARACTER( param, PARAM );
+   F77_CREATE_EXPORT_CHARACTER( mode, MODE );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_LOCK( F77_CALL(cvg_assoc)( CHARACTER_ARG(PARAM),
+                                  CHARACTER_ARG(MODE),
+                                  INTEGER_ARG(&FUNIT),
+                                  INTEGER_ARG(&BLOCKF),
+                                  INTEGER_ARG(&STATUS)
+                                  TRAIL_ARG(MODE)
+                                  TRAIL_ARG(PARAM) ); )
+
+   F77_FREE_CHARACTER( PARAM );
+   F77_FREE_CHARACTER( MODE );
+   F77_IMPORT_INTEGER( BLOCKF, *blockf );
+   F77_IMPORT_INTEGER( FUNIT, *funit );
+   F77_IMPORT_INTEGER( STATUS, *status );
+}
+

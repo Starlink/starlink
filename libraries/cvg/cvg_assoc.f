@@ -1,35 +1,33 @@
-      SUBROUTINE CVG_CREAT( PARAM, BLOCKF, OVRWRT, FUNIT, STATUS )
+      SUBROUTINE CVG_ASSOC( PARAM, MODE, FUNIT, BLOCKF, STATUS )
 *+
 *  Name:
-*     CVG_CREAT
+*     CVG_ASSOC
 
 *  Purpose:
-*     Create a new FITS file specified by an environment parameter.
+*     Open an existing FITS file specified by an environment parameter.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CVG_CREAT( PARAM, BLOCKF, OVRWRT, FUNIT, STATUS )
+*     CALL CVG_ASSOC( PARAM, MODE, FUNIT, BLOCKF, STATUS )
 
 *  Description:
-*     This function creates a new FITS file with a path obtained from the
-*     environment, and returns a logical unit number that can be used to
-*     access it using CVG and FITSIO functions.
+*     This function opens an existing FITS file with a path obtained from
+*     the environment, and returns a logical unit number that can be used
+*     to access it using CVG and FITSIO functions.
 
 *  Arguments:
 *     PARAM = CHARACTER * ( * ) (Given)
 *        The name of the environemt parameter to use.
-*     BLOCKF = INTEGER (Given)
-*        The blocking factor for the new file. It must be a positive
-*        integer between 1 and 10.
-*     OVRWRT = LOGICAL (Returned)
-*        If .TRUE., any existing file with the given name is silently
-*        over-written. Otherwise, an error is reported if the file
-*        already exists.
+*     MODE = CHARACTER * ( * ) (Given)
+*        The access mode: 'READ' or 'UPDATE. Case insensitive.
+*        Abbreviations can be used.
 *     FUNIT = INTEGER (Returned)
 *        The logical unit number of the FITS file. Returned equal to
 *        CVG_NOLUN if an error occurs.
+*     BLOCKF = INTEGER (Returned)
+*        The logical record blocking factor.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -55,10 +53,10 @@
 
 *  Authors:
 *     DSB: David S. Berry (JAC, Hawaii)
-*     {enter_CREAT_authors_here}
+*     {enter_ASSOC_authors_here}
 
 *  History:
-*     14-NOV-2013 (DSB):
+*     20-NOV-2013 (DSB):
 *        Original version.
 *     {enter_further_changes_here}
 
@@ -74,11 +72,11 @@
 
 *  Arguments Given:
       CHARACTER PARAM*(*)
-      INTEGER BLOCKF
-      LOGICAL OVRWRT
+      CHARACTER MODE*(*)
 
 *  Arguments Returned:
       INTEGER FUNIT
+      INTEGER BLOCKF
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -108,8 +106,8 @@
 *  Get a string from the user.
          CALL PAR_GET0C( PARAM, PATH, STATUS )
 
-*  Attempt to open it as a new FITS file.
-         CALL CVG_NEW( PATH, BLOCKF, OVRWRT, FUNIT, STATUS )
+*  Attempt to open it as an existing FITS file.
+         CALL CVG_OPEN( PATH, MODE, FUNIT, BLOCKF, STATUS )
       END DO
 
 *  If an error occurred, then classify it...
@@ -121,8 +119,9 @@
 
          STATUS = PAR__ABORT
          CALL MSG_SETC( 'PARAM', PARAM )
-         CALL ERR_REP( ' ', 'Aborted creation of a new FITS file via '//
-     :                 'the ''%^PARAM'' parameter.', STATUS )
+         CALL ERR_REP( ' ', 'Aborted attempt to associate an '//
+     :                 'existing FITS file the the ''%^PARAM'' '//
+     :                 'parameter.', STATUS )
 
 *  If an "null" NDF was specified, then annul any error messages and
 *  issue an appropriate new one.
@@ -137,11 +136,12 @@
 *  For other errors, add context information.
       ELSE IF ( STATUS .NE. SAI__OK ) THEN
          CALL MSG_SETC( 'PARAM', PARAM )
-         CALL ERR_REP( ' ', 'CVG_CREAT: Error creating a new FITS '//
-     :                 'file via the ''%^PARAM'' parameter.', STATUS )
+         CALL ERR_REP( ' ', 'CVG_ASSOC: Error associating an existing'//
+     :                 ' FITS file with the ''%^PARAM'' parameter.',
+     :                 STATUS )
       END IF
 
-*  Attempt to close the file if an error has occurred.
+*  Attempt to close the file if an error occurred.
       IF( STATUS .NE. SAI__OK ) CALL CVG_CLOSE( FUNIT, STATUS )
 
       END

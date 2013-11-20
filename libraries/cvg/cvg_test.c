@@ -68,6 +68,7 @@ int main( void ){
    double coly[ NROW ] = { 101.1, 202.2, 303.3 };
    int funit;
    int status;
+   int blockf;
 
 /* Initialise the global status */
    status = SAI__OK;
@@ -99,8 +100,14 @@ int main( void ){
 
    cvgNew( "test.fit", 1, 1, &funit, &status );
    cvgFt2bt( table, funit, "TESTEX", 0, 1, &status );
+   cvgClose( &funit, &status );
+
+
+
+   cvgOpen( "test.fit", "Read", &funit, &blockf, &status );
    cvgShowHeader( funit, 1, &status );
    cvgClose( &funit, &status );
+
 
 /* If an error occurred, then report a contextual message. */
    if( status != SAI__OK ) {

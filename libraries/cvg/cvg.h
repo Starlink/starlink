@@ -54,6 +54,7 @@
 
 /* Public function prototypes */
 /* -------------------------- */
+void cvgAssoc( const char *param, const char *mode, int *funit, int *blockf, int *status );
 void cvgClose( int *funit, int *status );
 void cvgCreat( const char *param, int blockf, int ovrwrt, int *funit, int *status );
 void cvgFt2bt( AstFitsTable *table, int funit, const char *extnam, int astver, int mkchdu, int *status );
@@ -61,5 +62,6 @@ void cvgNew( const char *path, int blockf, int ovrwrt, int *funit, int *status )
 void cvgPcadc( NdgProvenance *prov, int funit, int *status );
 void cvgShowHeader( int funit, int all, int *status );
 void cvgWhisr( int ndf, int funit, int *status );
+void cvgOpen( const char *path, const char *mode, int *funit, int *blockf, int *status );
 
 #endif

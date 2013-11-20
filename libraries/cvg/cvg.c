@@ -100,6 +100,41 @@ void cvgNew( const char *path, int blockf, int ovrwrt, int *funit,
    F77_IMPORT_INTEGER( STATUS, *status );
 }
 
+F77_SUBROUTINE(cvg_open)( CHARACTER(PATH),
+                          CHARACTER(MODE),
+                          INTEGER(BLOCKF),
+                          INTEGER(FUNIT),
+                          INTEGER(STATUS)
+                          TRAIL(PARAM)
+                          TRAIL(MODE) );
+
+void cvgOpen( const char *path, const char *mode, int *funit, int *blockf,
+              int *status ){
+   DECLARE_CHARACTER_DYN(PATH);
+   DECLARE_CHARACTER_DYN(MODE);
+   DECLARE_INTEGER(FUNIT);
+   DECLARE_INTEGER(BLOCKF);
+   DECLARE_INTEGER(STATUS);
+
+   F77_CREATE_EXPORT_CHARACTER( path, PATH );
+   F77_CREATE_EXPORT_CHARACTER( mode, MODE );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_LOCK( F77_CALL(cvg_open)( CHARACTER_ARG(PATH),
+                                 CHARACTER_ARG(MODE),
+                                 INTEGER_ARG(&FUNIT),
+                                 INTEGER_ARG(&BLOCKF),
+                                INTEGER_ARG(&STATUS)
+                                TRAIL_ARG(PATH)
+                                TRAIL_ARG(MODE) ); )
+
+   F77_FREE_CHARACTER( PATH );
+   F77_FREE_CHARACTER( MODE );
+   F77_IMPORT_INTEGER( FUNIT, *funit );
+   F77_IMPORT_INTEGER( BLOCKF, *blockf );
+   F77_IMPORT_INTEGER( STATUS, *status );
+}
+
 F77_SUBROUTINE(cvg_ft2bt)( INTEGER(TABLE),
                            INTEGER(FUNIT),
                            CHARACTER(EXTNAM),
