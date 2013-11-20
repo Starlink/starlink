@@ -403,6 +403,7 @@ $(MANIFESTS)/convert: \
 		$(MANIFESTS)/cfitsio \
 		$(MANIFESTS)/chr \
 		$(MANIFESTS)/cnf \
+		$(MANIFESTS)/cvg \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/figaro \
 		$(MANIFESTS)/fio \
@@ -480,6 +481,7 @@ $(MANIFESTS)/cupid: \
 		$(MANIFESTS)/chr \
 		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/ctg \
+		$(MANIFESTS)/cvg \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/fio \
 		$(MANIFESTS)/generic \

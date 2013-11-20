@@ -32,7 +32,7 @@ STAR_MONOLITHS
 STAR_MESSGEN( [ cupid_err.msg ] )
 
 dnl CUPID source files depend on include files from the following components
-STAR_DECLARE_DEPENDENCIES([build], [mers cnf ifd irq ndf sae pda thr])
+STAR_DECLARE_DEPENDENCIES([build], [mers cnf cvg ifd irq ndf sae pda thr])
 
 dnl The CUPID link script links against the following components
 STAR_DECLARE_DEPENDENCIES([build], [kaplibs ast shl thr], [link])
