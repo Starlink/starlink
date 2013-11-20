@@ -235,3 +235,47 @@ void cvgWhisr( int ndf, int funit, int *status ){
    return;
 }
 
+F77_SUBROUTINE(cvg_fc2hd)( INTEGER(FC),
+                           LOGICAL(CLEAR),
+                           INTEGER(FUNIT),
+                           INTEGER(STATUS) );
+
+void cvgFc2hd( AstFitsChan *fc, int clear, int funit, int *status ){
+   DECLARE_INTEGER(FC);
+   DECLARE_LOGICAL(CLEAR);
+   DECLARE_INTEGER(FUNIT);
+   DECLARE_INTEGER(STATUS);
+   F77_EXPORT_INTEGER( funit, FUNIT );
+   F77_EXPORT_LOGICAL( clear, CLEAR );
+   F77_EXPORT_INTEGER( *status, STATUS );
+   F77_EXPORT_INTEGER( astP2I( fc ), FC );
+   if( !astOK ) return;
+   F77_LOCK( F77_CALL(cvg_fc2hd)( INTEGER_ARG(&FC),
+                                  LOGICAL_ARG(&CLEAR),
+                                  INTEGER_ARG(&FUNIT),
+                                  INTEGER_ARG(&STATUS) ); )
+   F77_IMPORT_INTEGER( STATUS, *status );
+   return;
+}
+
+
+F77_SUBROUTINE(cvg_hd2fc)( INTEGER(FUNIT),
+                           INTEGER(FC),
+                           INTEGER(STATUS) );
+
+void cvgHd2fc( int funit, AstFitsChan *fc, int *status ){
+   DECLARE_INTEGER(FUNIT);
+   DECLARE_INTEGER(FC);
+   DECLARE_INTEGER(STATUS);
+   F77_EXPORT_INTEGER( funit, FUNIT );
+   F77_EXPORT_INTEGER( *status, STATUS );
+   F77_EXPORT_INTEGER( astP2I( fc ), FC );
+   if( !astOK ) return;
+   F77_LOCK( F77_CALL(cvg_hd2fc)( INTEGER_ARG(&FUNIT),
+                                  INTEGER_ARG(&FC),
+                                  INTEGER_ARG(&STATUS) ); )
+   F77_IMPORT_INTEGER( STATUS, *status );
+   return;
+}
+
+

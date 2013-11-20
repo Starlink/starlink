@@ -63,5 +63,7 @@ void cvgPcadc( NdgProvenance *prov, int funit, int *status );
 void cvgShowHeader( int funit, int all, int *status );
 void cvgWhisr( int ndf, int funit, int *status );
 void cvgOpen( const char *path, const char *mode, int *funit, int *blockf, int *status );
+void cvgFc2hd( AstFitsChan *fc, int clear, int funit, int *status );
+void cvgHd2fc( int funit, AstFitsChan *fc, int *status );
 
 #endif

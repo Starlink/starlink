@@ -56,6 +56,7 @@
 #include "sae_par.h"
 #include "mers.h"
 #include "ast.h"
+#include "fitsio.h"
 
 #define NROW 3
 #define NAMELEN 10
@@ -66,9 +67,12 @@ int main( void ){
    char name[ NROW ][ NAMELEN ] = { "Tom", "Dick", "Harry" };
    double colx[ NROW ] = { -1.0, 0.0, 1.0 };
    double coly[ NROW ] = { 101.1, 202.2, 303.3 };
+   double etal;
+   fitsfile *fitsfile;
+   int blockf;
+   int fstat = 0;
    int funit;
    int status;
-   int blockf;
 
 /* Initialise the global status */
    status = SAI__OK;
@@ -103,11 +107,20 @@ int main( void ){
    cvgClose( &funit, &status );
 
 
-
    cvgOpen( "test.fit", "Read", &funit, &blockf, &status );
+   fitsfile = CUnit2FITS( funit );
+   fits_movabs_hdu( fitsfile, 2, NULL, &fstat );
+
+   fc = astFitsChan( NULL, NULL, " " );
+   cvgHd2fc( funit, fc, &status );
+   astGetFitsF( fc, "ETAL", &etal );
+   if( etal != 0.6 && status == SAI__OK ) {
+      status = SAI__ERROR;
+      errRepf( " ", "Bad ETAL value (%g) - should be 0.6", &status, etal );
+   }
+
    cvgShowHeader( funit, 1, &status );
    cvgClose( &funit, &status );
-
 
 /* If an error occurred, then report a contextual message. */
    if( status != SAI__OK ) {
@@ -117,6 +130,8 @@ int main( void ){
    }
 
    astEnd;
+
+   return status;
 }
 
 
