@@ -1,4 +1,4 @@
-      SUBROUTINE CVG_FC2HD( FC, FUNIT, STATUS )
+      SUBROUTINE CVG_FC2HD( FC, CLEAR, FUNIT, STATUS )
 *+
 *  Name:
 *     CVG_FC2HD
@@ -10,16 +10,19 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CVG_FC2HD( FC, FUNIT, STATUS )
+*     CALL CVG_FC2HD( FC, CLEAR, FUNIT, STATUS )
 
 *  Description:
 *     This routine extracts all headers from the supplied FitsChan and
 *     stores them in the current HDU of the supplied FITS file. The HDU
-*     header is first emptied.
+*     header may be emptied first (see argument CLEAR).
 
 *  Arguments:
 *     FC = INTEGER (Given)
 *        Pointer to the FitsChan.
+*     CLEAR = LOGICAL (Given)
+*        Should he header be cleared before copying in the new cards?
+*        Otherwise, the new cards are appended to the end of teh HDU.
 *     FUNIT = INTEGER (Given)
 *        The FITSIO unit number for the FITS file.
 *     STATUS = INTEGER (Given and Returned)
@@ -57,6 +60,8 @@
 *        Original version.
 *     13-NOV-2013 (DSB):
 *        Moved from CONVERT to CVG.
+*     20-NOV-2013 (DSB):
+*        Added argument CLEAR.
 *     {enter_further_changes_here}
 
 *-
@@ -71,6 +76,7 @@
 
 *  Arguments Given:
       INTEGER FC
+      LOGICAL CLEAR
       INTEGER FUNIT
 
 *  Status:
@@ -92,19 +98,23 @@
 *  status, which is reset by the fixed part.
       FSTAT = CVG__FITSOK
 
+*  Are we clearing the HDU before adding in the new headers?
+      IF( CLEAR ) THEN
+
 *  See how many cards there are in the supplied FITSIO header.
-      CALL FTGHPS( FUNIT, NHEAD, KEYADD, FSTAT )
+         CALL FTGHPS( FUNIT, NHEAD, KEYADD, FSTAT )
 
 *  Empty the FITSIO header. For efficiency, delete from the end of the
 *  list to the start of the list. If an error occurs, reset the status,
 *  clear the message stack, and continue.
-      DO IHEAD = NHEAD, 1, -1
-         CALL FTDREC( FUNIT, IHEAD, FSTAT )
-         IF( FSTAT .NE. CVG__FITSOK ) THEN
-            FSTAT = CVG__FITSOK
-            CALL FTCMSG
-         END IF
-      END DO
+         DO IHEAD = NHEAD, 1, -1
+            CALL FTDREC( FUNIT, IHEAD, FSTAT )
+            IF( FSTAT .NE. CVG__FITSOK ) THEN
+               FSTAT = CVG__FITSOK
+               CALL FTCMSG
+            END IF
+         END DO
+      END IF
 
 * Now copy the contents of the FitsChan into the empty FITSIO header.
       CALL AST_CLEAR( FC, 'Card', STATUS )

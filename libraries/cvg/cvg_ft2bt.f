@@ -208,9 +208,9 @@
          CALL FTCRHD( FUNIT, FSTAT )
 
 *  Extract the headers from the FitsChan and store them in the current
-*  HDU, then annul the header explicitly since we are not using an AST
-*  context.
-         CALL CVG_FC2HD( HEADER, FUNIT, STATUS )
+*  HDU, clearing the HDU first, then annul the header explicitly since
+*  we are not using an AST context.
+         CALL CVG_FC2HD( HEADER, .TRUE., FUNIT, STATUS )
          CALL AST_ANNUL( HEADER, STATUS)
 
 *  Store the extension name in the HDU.

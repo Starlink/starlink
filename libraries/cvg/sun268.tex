@@ -517,6 +517,49 @@ been moved into a separate library.
 % =====================
 \small
 \sstroutine{
+   CVG\_ASSOC
+}{
+   Open an existing FITS file specified by an environment parameter
+}{
+   \sstdescription{
+      This function opens an existing FITS file with a path obtained from
+      the environment, and returns a logical unit number that can be used
+      to access it using CVG and FITSIO functions.
+   }
+   \sstinvocation{
+      CALL CVG\_ASSOC( PARAM, MODE, FUNIT, BLOCKF, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The name of the environemt parameter to use.
+      }
+      \sstsubsection{
+         MODE = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The access mode: {\tt '}READ{\tt '} or {\tt '}UPDATE. Case insensitive.
+         Abbreviations can be used.
+      }
+      \sstsubsection{
+         FUNIT = INTEGER (Returned)
+      }{
+         The logical unit number of the FITS file. Returned equal to
+         CVG\_NOLUN if an error occurs.
+      }
+      \sstsubsection{
+         BLOCKF = INTEGER (Returned)
+      }{
+         The logical record blocking factor.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
    CVG\_BT2FT
 }{
    Creates an AST FitsTable from a FITS binary table
@@ -655,16 +698,22 @@ been moved into a separate library.
    \sstdescription{
       This routine extracts all headers from the supplied FitsChan and
       stores them in the current HDU of the supplied FITS file. The HDU
-      header is first emptied.
+      header may be emptied first (see argument CLEAR).
    }
    \sstinvocation{
-      CALL CVG\_FC2HD( FC, FUNIT, STATUS )
+      CALL CVG\_FC2HD( FC, CLEAR, FUNIT, STATUS )
    }
    \sstarguments{
       \sstsubsection{
          FC = INTEGER (Given)
       }{
          Pointer to the FitsChan.
+      }
+      \sstsubsection{
+         CLEAR = LOGICAL (Given)
+      }{
+         Should he header be cleared before copying in the new cards?
+         Otherwise, the new cards are appended to the end of teh HDU.
       }
       \sstsubsection{
          FUNIT = INTEGER (Given)
@@ -957,6 +1006,50 @@ been moved into a separate library.
       }{
          The logical unit number of the FITS file. Returned equal to
          CVG\_NOLUN if an error occurs.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   CVG\_OPEN
+}{
+   Open an existing FITS file for read or update access
+}{
+   \sstdescription{
+      This function opens an existing FITS file with a given path,
+      and returns a logical unit number that can be used to access it
+      using CVG and FITSIO functions.
+   }
+   \sstinvocation{
+      CALL CVG\_OPEN( PATH, MODE, FUNIT, BLOCKF, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PATH = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The path to the file to be created. A file type of {\tt "}.fit{\tt "} will be
+         added if there is no file type in the supplied string.
+      }
+      \sstsubsection{
+         MODE = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The access mode: {\tt '}READ{\tt '} or {\tt '}UPDATE. Case insensitive.
+         Abbreviations can be used.
+      }
+      \sstsubsection{
+         FUNIT = INTEGER (Returned)
+      }{
+         The logical unit number of the FITS file. Returned equal to
+         CVG\_NOLUN if an error occurs.
+      }
+      \sstsubsection{
+         BLOCKF = INTEGER (Returned)
+      }{
+         The logical record blocking factor.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)

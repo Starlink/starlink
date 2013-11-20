@@ -273,7 +273,7 @@
 
 *  Empty the CHDU header, and then copy the contents of the FitsChan into
 *  it.
-      CALL CVG_FC2HD( FC, FUNIT, STATUS )
+      CALL CVG_FC2HD( FC, .TRUE., FUNIT, STATUS )
 
 *  If any axes were successfully described using the -TAB algorithm,
 *  there will be one or more FitsTables stored in the FitsChan. For each
