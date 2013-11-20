@@ -891,6 +891,8 @@ libraries/cnf/CNF_PAR.processed
 libraries/cnf/cnf.h
 libraries/cnf/f77.h
 
+/libraries/cvg/cvg_retr.f
+
 libraries/ems/ems_fioer.c
 libraries/ems/ems_link
 libraries/ems/ems_link_adam
@@ -1632,6 +1634,7 @@ libraries/cat/sun181.pdf
 libraries/chr/sun40.pdf
 libraries/cnf/sun209.pdf
 libraries/ctg/sun262.pdf
+/libraries/cvg/sun268.pdf
 libraries/ems/ssn4.pdf
 libraries/fio/sun143.pdf
 libraries/gks/sun83.pdf
