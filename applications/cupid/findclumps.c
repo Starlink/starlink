@@ -2,6 +2,7 @@
 #include "mers.h"
 #include "ndf.h"
 #include "star/ndg.h"
+#include "star/cvg.h"
 #include "ast.h"
 #include "star/kaplibs.h"
 #include "star/irq.h"
@@ -903,6 +904,8 @@ void findclumps( int *status ) {
 *        Added parameter CADCPROV.
 *     18-NOV-2013 (DSB):
 *        Removed parameter CADCPROV, and added JSACAT.
+*     20-NOV-2013 (DSB):
+*        Copy main output NDF history to output JSA catalogue.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -950,11 +953,13 @@ void findclumps( int *status ) {
    double sum;                  /* Sum of variances */
    float *rmask;                /* Pointer to cump mask array */
    int backoff;                 /* Remove background when finding clump sizes? */
+   int blockf;                  /* FITS file blocking factor */
    int confpar;                 /* Is this line a config parameter setting? */
    int deconv;                  /* Should clump parameters be deconvolved? */
    int dim[ NDF__MXDIM ];       /* Pixel axis dimensions */
    int dims[3];                 /* Pointer to array of array dimensions */
    int el;                      /* Number of array elements mapped */
+   int funit;                   /* FITS file logical unit number */
    int gotwcs;                  /* Does input NDF contain a WCS FrameSet? */
    int i;                       /* Loop count */
    int ifr;                     /* Index of Frame within WCS FrameSet */
@@ -1625,6 +1630,24 @@ void findclumps( int *status ) {
 /* End the error context. */
    errEnd( status );
 
+/* Now we add history to any output JSA-style catalogue. We leave it
+   until now to be sure the main output NDF is complete. We copy the
+   HISTORY information from the main output NDF to the output JSA
+   catalogue. */
+   if( jsacat ) {
+
+/* Ensure default history has been written to the main output NDF. */
+      ndfHdef( indf2, " ", status );
+
+/* Re-open the output JSA catalogue. */
+      cvgAssoc( "JSACAT", "Update", &funit, &blockf, status );
+
+/* Copy History from the main output NDF to the output catalogue. */
+      cvgWhisr( indf2, funit, status );
+
+/* Close the FITS file. */
+      cvgClose( &funit, status );
+   }
 
 /* Tidy up */
 L999:
