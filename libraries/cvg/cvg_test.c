@@ -68,10 +68,9 @@ int main( void ){
    double colx[ NROW ] = { -1.0, 0.0, 1.0 };
    double coly[ NROW ] = { 101.1, 202.2, 303.3 };
    double etal;
-   fitsfile *fitsfile;
+   fitsfile *fptr;
    int blockf;
    int fstat = 0;
-   int funit;
    int status;
 
 /* Initialise the global status */
@@ -102,25 +101,24 @@ int main( void ){
    astPutFits( fc, "ETAL    =                  0.6 / Telescope efficiency", 0 );
    astPutTableHeader( table, fc );
 
-   cvgNew( "test.fit", 1, 1, &funit, &status );
-   cvgFt2bt( table, funit, "TESTEX", 0, 1, &status );
-   cvgClose( &funit, &status );
+   cvgNew( "test.fit", 1, 1, &fptr, &status );
+   cvgFt2bt( table, fptr, "TESTEX", 0, 1, &status );
+   cvgClose( &fptr, &status );
 
 
-   cvgOpen( "test.fit", "Read", &funit, &blockf, &status );
-   fitsfile = CUnit2FITS( funit );
-   fits_movabs_hdu( fitsfile, 2, NULL, &fstat );
+   cvgOpen( "test.fit", "Read", &fptr, &blockf, &status );
+   fits_movabs_hdu( fptr, 2, NULL, &fstat );
 
    fc = astFitsChan( NULL, NULL, " " );
-   cvgHd2fc( funit, fc, &status );
+   cvgHd2fc( fptr, fc, &status );
    astGetFitsF( fc, "ETAL", &etal );
    if( etal != 0.6 && status == SAI__OK ) {
       status = SAI__ERROR;
       errRepf( " ", "Bad ETAL value (%g) - should be 0.6", &status, etal );
    }
 
-   cvgShowHeader( funit, 1, &status );
-   cvgClose( &funit, &status );
+   cvgShowHeader( fptr, 1, &status );
+   cvgClose( &fptr, &status );
 
 /* If an error occurred, then report a contextual message. */
    if( status != SAI__OK ) {

@@ -6,6 +6,7 @@
 #include "kpg_err.h"
 #include "star/kaplibs.h"
 #include "par.h"
+#include "fitsio.h"
 #include "ast.h"
 #include "ndf.h"
 #include "mers.h"
@@ -216,8 +217,8 @@ void cupidStoreClumps( const char *param1, const char *param2, int indf,
    double *t;               /* Pointer to next table value */
    double *tab;             /* Pointer to catalogue table */
    double *tj;              /* Pointer to next table entry to write*/
+   fitsfile *fptr;          /* Pointer to FITS file structure */
    int bad;                 /* Does clump touch an area of bad pixels? */
-   int funit;               /* FITSIO unit number ofr new FITS file */
    int i;                   /* Index of next locator */
    int iclump;              /* Usable clump index */
    int icol;                /* Zero based column index */
@@ -745,19 +746,19 @@ void cupidStoreClumps( const char *param1, const char *param2, int indf,
          }
 
 /* Create a new empty FITS file, and get a FITSIO unit number for it. */
-         cvgCreat( param2, 1, 1, &funit, status );
+         cvgCreat( param2, 1, 1, &fptr, status );
 
 /* Copy the contents of the FItsTable to the FITS file. */
-         cvgFt2bt( table, funit, "CUPID:FINDCLUMPS", 0, 1, status );
+         cvgFt2bt( table, fptr, "CUPID:FINDCLUMPS", 0, 1, status );
 
 /* Write CADC-style provenance records to the current FITS header. */
          prov = ndgReadProv( NDF__NOID, "CUPID:FINDCLUMPS", status );
          ndgPutProv( prov, indf, NULL, 0, status );
-         cvgPcadc( prov, funit, status );
+         cvgPcadc( prov, fptr, status );
          prov = ndgFreeProv( prov, status );
 
 /* Close the FITS file. */
-         cvgClose( &funit, status );
+         cvgClose( &fptr, status );
 
       }
    }

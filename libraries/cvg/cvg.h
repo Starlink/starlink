@@ -42,6 +42,7 @@
 */
 
 #include "star/ndg.h"
+#include "fitsio.h"
 
 /* Public Constants */
 /* ---------------- */
@@ -52,18 +53,43 @@
 /* Maximum length of a file path. */
 #define CVG__MXPTH 255
 
+/* Private macros */
+/* ============== */
+
+#define CVG_EXPORT_FITS(fptr,funit) \
+   if( fptr ) { \
+      funit = CFITS2Unit( fptr ); \
+      if( funit == 0 && *status == SAI__OK ) { \
+         *status = SAI__ERROR; \
+         errRep( " ", "Failed to export a fitsfile pointer", status ); \
+      } \
+   } else { \
+      funit = CVG__NOLUN; \
+   }
+
+#define CVG_IMPORT_FITS(funit,fptr) \
+   if( funit != CVG__NOLUN ) { \
+      fptr = CUnit2FITS( funit ); \
+      if( fptr == 0 && *status == SAI__OK ) { \
+         *status = SAI__ERROR; \
+         errRep( " ", "Failed to import a fitsfile pointer", status ); \
+      } \
+   } else { \
+      fptr = NULL; \
+   }
+
 /* Public function prototypes */
 /* -------------------------- */
-void cvgAssoc( const char *param, const char *mode, int *funit, int *blockf, int *status );
-void cvgClose( int *funit, int *status );
-void cvgCreat( const char *param, int blockf, int ovrwrt, int *funit, int *status );
-void cvgFt2bt( AstFitsTable *table, int funit, const char *extnam, int astver, int mkchdu, int *status );
-void cvgNew( const char *path, int blockf, int ovrwrt, int *funit, int *status );
-void cvgPcadc( NdgProvenance *prov, int funit, int *status );
-void cvgShowHeader( int funit, int all, int *status );
-void cvgWhisr( int ndf, int funit, int *status );
-void cvgOpen( const char *path, const char *mode, int *funit, int *blockf, int *status );
-void cvgFc2hd( AstFitsChan *fc, int clear, int funit, int *status );
-void cvgHd2fc( int funit, AstFitsChan *fc, int *status );
+void cvgAssoc( const char *param, const char *mode, fitsfile **fptr, int *blockf, int *status );
+void cvgClose( fitsfile **fptr, int *status );
+void cvgCreat( const char *param, int blockf, int ovrwrt, fitsfile **fptr, int *status );
+void cvgFt2bt( AstFitsTable *table, fitsfile *fptr, const char *extnam, int astver, int mkchdu, int *status );
+void cvgNew( const char *path, int blockf, int ovrwrt, fitsfile **fptr, int *status );
+void cvgPcadc( NdgProvenance *prov, fitsfile *fptr, int *status );
+void cvgShowHeader( fitsfile *fptr, int all, int *status );
+void cvgWhisr( int ndf, fitsfile *fptr, int *status );
+void cvgOpen( const char *path, const char *mode, fitsfile **fptr, int *blockf, int *status );
+void cvgFc2hd( AstFitsChan *fc, int clear, fitsfile *fptr, int *status );
+void cvgHd2fc( fitsfile *fptr, AstFitsChan *fc, int *status );
 
 #endif

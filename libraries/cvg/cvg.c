@@ -45,6 +45,8 @@
 /* ============= */
 #include "f77.h"
 #include "cvg.h"
+#include "sae_par.h"
+#include "fitsio.h"
 
 /* Wrapper function implementations. */
 /* ================================= */
@@ -52,18 +54,18 @@
 F77_SUBROUTINE(cvg_close)( INTEGER(FUNIT),
                            INTEGER(STATUS) );
 
-void cvgClose( int *funit, int *status ){
+void cvgClose( fitsfile **fptr, int *status ){
    DECLARE_INTEGER(FUNIT);
    DECLARE_INTEGER(STATUS);
 
-   F77_EXPORT_INTEGER( *funit, FUNIT );
+   CVG_EXPORT_FITS( *fptr, FUNIT );
    F77_EXPORT_INTEGER( *status, STATUS );
 
    F77_LOCK( F77_CALL(cvg_close)( INTEGER_ARG(&FUNIT),
-                        INTEGER_ARG(&STATUS) ); )
+                                  INTEGER_ARG(&STATUS) ); )
 
    F77_IMPORT_INTEGER( STATUS, *status );
-   F77_IMPORT_INTEGER( FUNIT, *funit );
+   CVG_IMPORT_FITS( FUNIT, *fptr );
 
    return;
 }
@@ -75,7 +77,7 @@ F77_SUBROUTINE(cvg_new)( CHARACTER(PATH),
                          INTEGER(STATUS)
                          TRAIL(PARAM) );
 
-void cvgNew( const char *path, int blockf, int ovrwrt, int *funit,
+void cvgNew( const char *path, int blockf, int ovrwrt, fitsfile **fptr,
              int *status ){
    DECLARE_CHARACTER_DYN(PATH);
    DECLARE_INTEGER(BLOCKF);
@@ -96,7 +98,7 @@ void cvgNew( const char *path, int blockf, int ovrwrt, int *funit,
                                 TRAIL_ARG(PATH) ); )
 
    F77_FREE_CHARACTER( PATH );
-   F77_IMPORT_INTEGER( FUNIT, *funit );
+   CVG_IMPORT_FITS( FUNIT, *fptr );
    F77_IMPORT_INTEGER( STATUS, *status );
 }
 
@@ -108,8 +110,8 @@ F77_SUBROUTINE(cvg_open)( CHARACTER(PATH),
                           TRAIL(PARAM)
                           TRAIL(MODE) );
 
-void cvgOpen( const char *path, const char *mode, int *funit, int *blockf,
-              int *status ){
+void cvgOpen( const char *path, const char *mode, fitsfile **fptr,
+              int *blockf, int *status ){
    DECLARE_CHARACTER_DYN(PATH);
    DECLARE_CHARACTER_DYN(MODE);
    DECLARE_INTEGER(FUNIT);
@@ -124,13 +126,13 @@ void cvgOpen( const char *path, const char *mode, int *funit, int *blockf,
                                  CHARACTER_ARG(MODE),
                                  INTEGER_ARG(&FUNIT),
                                  INTEGER_ARG(&BLOCKF),
-                                INTEGER_ARG(&STATUS)
-                                TRAIL_ARG(PATH)
-                                TRAIL_ARG(MODE) ); )
+                                 INTEGER_ARG(&STATUS)
+                                 TRAIL_ARG(PATH)
+                                 TRAIL_ARG(MODE) ); )
 
    F77_FREE_CHARACTER( PATH );
    F77_FREE_CHARACTER( MODE );
-   F77_IMPORT_INTEGER( FUNIT, *funit );
+   CVG_IMPORT_FITS( FUNIT, *fptr );
    F77_IMPORT_INTEGER( BLOCKF, *blockf );
    F77_IMPORT_INTEGER( STATUS, *status );
 }
@@ -143,7 +145,7 @@ F77_SUBROUTINE(cvg_ft2bt)( INTEGER(TABLE),
                            INTEGER(STATUS)
                            TRAIL(EXTNAM) );
 
-void cvgFt2bt( AstFitsTable *table, int funit, const char *extnam,
+void cvgFt2bt( AstFitsTable *table, fitsfile *fptr, const char *extnam,
                int astver, int mkchdu, int *status ){
    DECLARE_INTEGER(TABLE);
    DECLARE_INTEGER(FUNIT);
@@ -156,7 +158,7 @@ void cvgFt2bt( AstFitsTable *table, int funit, const char *extnam,
 
    if( !astOK ) return;
 
-   F77_EXPORT_INTEGER( funit, FUNIT );
+   CVG_EXPORT_FITS( fptr, FUNIT );
    F77_CREATE_CHARACTER( EXTNAM, strlen( extnam ) );
    F77_EXPORT_CHARACTER( extnam, EXTNAM, EXTNAM_length );
    F77_EXPORT_INTEGER( astver, ASTVER );
@@ -182,11 +184,11 @@ F77_SUBROUTINE(cvg_showheader)( INTEGER(FUNIT),
                                 LOGICAL(ALL),
                                 INTEGER(STATUS) );
 
-void cvgShowHeader( int funit, int all, int *status ){
+void cvgShowHeader( fitsfile *fptr, int all, int *status ){
    DECLARE_INTEGER(FUNIT);
    DECLARE_LOGICAL(ALL);
    DECLARE_INTEGER(STATUS);
-   F77_EXPORT_INTEGER( funit, FUNIT );
+   CVG_EXPORT_FITS( fptr, FUNIT );
    F77_EXPORT_LOGICAL( all, ALL );
    F77_EXPORT_INTEGER( *status, STATUS );
    F77_LOCK( F77_CALL(cvg_showheader)( INTEGER_ARG(&FUNIT),
@@ -201,11 +203,11 @@ F77_SUBROUTINE(cvg_pcadc)( INTEGER(IPROV),
                            INTEGER(FUNIT),
                            INTEGER(STATUS) );
 
-void cvgPcadc( NdgProvenance *prov, int funit, int *status ){
+void cvgPcadc( NdgProvenance *prov, fitsfile *fptr, int *status ){
    DECLARE_INTEGER(IPROV);
    DECLARE_INTEGER(FUNIT);
    DECLARE_INTEGER(STATUS);
-   F77_EXPORT_INTEGER( funit, FUNIT );
+   CVG_EXPORT_FITS( fptr, FUNIT );
    F77_EXPORT_INTEGER( *status, STATUS );
    F77_EXPORT_INTEGER( astP2I( prov ), IPROV );
    if( !astOK ) return;
@@ -221,12 +223,12 @@ F77_SUBROUTINE(cvg_whisr)( INTEGER(NDF),
                            INTEGER(FUNIT),
                            INTEGER(STATUS) );
 
-void cvgWhisr( int ndf, int funit, int *status ){
+void cvgWhisr( int ndf, fitsfile *fptr, int *status ){
    DECLARE_INTEGER(NDF);
    DECLARE_INTEGER(FUNIT);
    DECLARE_INTEGER(STATUS);
    F77_EXPORT_INTEGER( ndf, NDF );
-   F77_EXPORT_INTEGER( funit, FUNIT );
+   CVG_EXPORT_FITS( fptr, FUNIT );
    F77_EXPORT_INTEGER( *status, STATUS );
    F77_LOCK( F77_CALL(cvg_whisr)( INTEGER_ARG(&NDF),
                                   INTEGER_ARG(&FUNIT),
@@ -240,12 +242,12 @@ F77_SUBROUTINE(cvg_fc2hd)( INTEGER(FC),
                            INTEGER(FUNIT),
                            INTEGER(STATUS) );
 
-void cvgFc2hd( AstFitsChan *fc, int clear, int funit, int *status ){
+void cvgFc2hd( AstFitsChan *fc, int clear, fitsfile *fptr, int *status ){
    DECLARE_INTEGER(FC);
    DECLARE_LOGICAL(CLEAR);
    DECLARE_INTEGER(FUNIT);
    DECLARE_INTEGER(STATUS);
-   F77_EXPORT_INTEGER( funit, FUNIT );
+   CVG_EXPORT_FITS( fptr, FUNIT );
    F77_EXPORT_LOGICAL( clear, CLEAR );
    F77_EXPORT_INTEGER( *status, STATUS );
    F77_EXPORT_INTEGER( astP2I( fc ), FC );
@@ -263,11 +265,11 @@ F77_SUBROUTINE(cvg_hd2fc)( INTEGER(FUNIT),
                            INTEGER(FC),
                            INTEGER(STATUS) );
 
-void cvgHd2fc( int funit, AstFitsChan *fc, int *status ){
+void cvgHd2fc( fitsfile *fptr, AstFitsChan *fc, int *status ){
    DECLARE_INTEGER(FUNIT);
    DECLARE_INTEGER(FC);
    DECLARE_INTEGER(STATUS);
-   F77_EXPORT_INTEGER( funit, FUNIT );
+   CVG_EXPORT_FITS( fptr, FUNIT );
    F77_EXPORT_INTEGER( *status, STATUS );
    F77_EXPORT_INTEGER( astP2I( fc ), FC );
    if( !astOK ) return;

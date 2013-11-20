@@ -11,6 +11,7 @@
 #include "par.h"
 #include "prm_par.h"
 #include "cupid.h"
+#include "fitsio.h"
 #include <math.h>
 #include <string.h>
 #include <stdio.h>
@@ -951,6 +952,7 @@ void findclumps( int *status ) {
    double beamcorr[ 3 ];        /* Beam width corrections */
    double rms;                  /* Global rms error in data */
    double sum;                  /* Sum of variances */
+   fitsfile *fptr;              /* Pointer to FITS file structure */
    float *rmask;                /* Pointer to cump mask array */
    int backoff;                 /* Remove background when finding clump sizes? */
    int blockf;                  /* FITS file blocking factor */
@@ -959,7 +961,6 @@ void findclumps( int *status ) {
    int dim[ NDF__MXDIM ];       /* Pixel axis dimensions */
    int dims[3];                 /* Pointer to array of array dimensions */
    int el;                      /* Number of array elements mapped */
-   int funit;                   /* FITS file logical unit number */
    int gotwcs;                  /* Does input NDF contain a WCS FrameSet? */
    int i;                       /* Loop count */
    int ifr;                     /* Index of Frame within WCS FrameSet */
@@ -1640,13 +1641,13 @@ void findclumps( int *status ) {
       ndfHdef( indf2, " ", status );
 
 /* Re-open the output JSA catalogue. */
-      cvgAssoc( "JSACAT", "Update", &funit, &blockf, status );
+      cvgAssoc( "JSACAT", "Update", &fptr, &blockf, status );
 
 /* Copy History from the main output NDF to the output catalogue. */
-      cvgWhisr( indf2, funit, status );
+      cvgWhisr( indf2, fptr, status );
 
 /* Close the FITS file. */
-      cvgClose( &funit, status );
+      cvgClose( &fptr, status );
    }
 
 /* Tidy up */

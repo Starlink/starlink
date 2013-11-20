@@ -75,6 +75,12 @@ void cvgScadc( NdgProvenance *prov, const char *param, int *status ){
    F77_IMPORT_INTEGER( STATUS, *status );
 }
 
+
+
+
+
+
+
 F77_SUBROUTINE(cvg_creat)( CHARACTER(PARAM),
                            INTEGER(BLOCKF),
                            LOGICAL(OVRWRT),
@@ -82,7 +88,7 @@ F77_SUBROUTINE(cvg_creat)( CHARACTER(PARAM),
                            INTEGER(STATUS)
                            TRAIL(PARAM) );
 
-void cvgCreat( const char *param, int blockf, int ovrwrt, int *funit,
+void cvgCreat( const char *param, int blockf, int ovrwrt, fitsfile **fptr,
                int *status ){
    DECLARE_CHARACTER_DYN(PARAM);
    DECLARE_INTEGER(BLOCKF);
@@ -103,9 +109,13 @@ void cvgCreat( const char *param, int blockf, int ovrwrt, int *funit,
                                   TRAIL_ARG(PARAM) ); )
 
    F77_FREE_CHARACTER( PARAM );
-   F77_IMPORT_INTEGER( FUNIT, *funit );
+   CVG_IMPORT_FITS( FUNIT, *fptr );
    F77_IMPORT_INTEGER( STATUS, *status );
 }
+
+
+
+
 
 F77_SUBROUTINE(cvg_assoc)( CHARACTER(PARAM),
                            CHARACTER(MODE),
@@ -115,8 +125,8 @@ F77_SUBROUTINE(cvg_assoc)( CHARACTER(PARAM),
                            TRAIL(PARAM)
                            TRAIL(MODE) );
 
-void cvgAssoc( const char *param, const char *mode, int *funit, int *blockf,
-               int *status ){
+void cvgAssoc( const char *param, const char *mode, fitsfile **fptr,
+               int *blockf, int *status ){
    DECLARE_CHARACTER_DYN(PARAM);
    DECLARE_CHARACTER_DYN(MODE);
    DECLARE_INTEGER(FUNIT);
@@ -138,7 +148,7 @@ void cvgAssoc( const char *param, const char *mode, int *funit, int *blockf,
    F77_FREE_CHARACTER( PARAM );
    F77_FREE_CHARACTER( MODE );
    F77_IMPORT_INTEGER( BLOCKF, *blockf );
-   F77_IMPORT_INTEGER( FUNIT, *funit );
+   CVG_IMPORT_FITS( FUNIT, *fptr );
    F77_IMPORT_INTEGER( STATUS, *status );
 }
 
