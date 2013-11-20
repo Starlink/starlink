@@ -427,6 +427,14 @@
       IF ( NHDU .EQ. 1 ) THEN
          CALL FTGKYS( FUNIT, 'PRODUCT', PRODUC, COMENT, FSTAT )
 
+         IF( FSTAT .EQ. 202 .AND. STATUS .EQ. SAI__OK ) THEN
+            FSTAT = CVG__FITSOK
+            CALL FTCMSG
+            STATUS = SAI__ERROR
+            CALL ERR_REP( ' ', 'CVG_PCADC: No ''PRODUCT'' keyword '//
+     :                    'found in supplied FITS header.', STATUS )
+         END IF
+
       ELSE IF ( NHDU .GT. 1 ) THEN
 
 * Obtain the two relevant headers.
@@ -452,8 +460,12 @@
 *  reserved for non-fatal warnings.
       IF ( FSTAT .GT. CVG__FITSOK ) THEN
          CALL CVG_FIOER( FSTAT, 'CVG_PCADC_ERR', 'FTPKYJ',
-     :                   'Error writing provenance header card.',
+     :                   'Error writing CADC provenance header cards.',
      :                   STATUS )
+
+      ELSE IF( STATUS .NE. SAI__OK ) THEN
+         CALL ERR_REP( ' ', 'Error writing CADC provenance header '//
+     :                 'cards.', STATUS )
       END IF
 
       END
