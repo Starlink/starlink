@@ -68,7 +68,7 @@
 #     outlineclump m51b 2 style="'colour=blue,width=4'"
 #        This draws an outline of the second clump (as stored in
 #        m51b.more.cupid.clumps(2).model) on the current graphics device,
-#        using a blue line of four times the default thinkness.
+#        using a blue line of four times the default thickness.
 
 #  Notes:
 #     -  The script is simply a wrapper for the KAPPA command:
@@ -344,7 +344,7 @@ while ( $ok == 0 )
    if ( $narg < 2 || $repeat ) then
 #
 #   Assume that the value will be fine unless we discover otherwise
-#   later. Prompt for the blocking factor.
+#   later.  Prompt for the index.
 #
       set ok = 1
       set noglob
