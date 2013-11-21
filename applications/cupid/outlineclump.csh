@@ -29,7 +29,10 @@
 #        the CUPID extension of this NDF will be used to define the outline
 #        of the clump.
 #     INDEX = _INTEGER (Read)
-#        The integer index of the clump to be identified.
+#        The integer index or indices of the clumps to be identified.
+#        For multiple indices supply a comma-separated list, using
+#        hyphens to express ranges.  For example "2,4-6,9" would draw
+#        the outlines of clumps with indices 2, 4, 5, 6, and 9.
 #     STYLE = LITERAL (Read)
 #        A group of attribute settings describing the plotting style to
 #        use for the outline.
@@ -106,6 +109,8 @@
 #        parameter-system-like responses and validation of both prompted
 #        and command-line values.  Determine the maximum index value
 #        and use to constrain Parameter INDEX.
+#     2013 November 20 (MJC):
+#        Allow Parameter INDEX to be a list of indices.
 #     {enter_further_changes_here}
 #
 #-
@@ -378,6 +383,29 @@ while ( $ok == 0 )
 #
       set index = `echo $index | sed -e 's/^index=//'`
    endif
+
+#   Convert the list into an array of indices.  This is C-shell so
+#   a line continuation of the awk requires a backslash.
+   set indexlist = `echo $index | awk -F,\
+     '{\
+         for ( i=0; ++i <= NF; ) {\
+            if ( index( $i, "-" ) == 0 ){\
+               print $i\
+            } else {\
+               split( $i, b,"-" );\
+               if ( b[1] <= b[2] ) {\
+                  lower=b[1];\
+                  upper=b[2];\
+               } else {\
+                  lower=b[2];\
+                  upper=b[1];\
+               }\
+               for ( j=lower; j<=upper; j++){\
+                  print j;\
+               }\
+            }\
+         }\
+     }'`
 #
 #   Validate the index.
 #   ===================
@@ -385,10 +413,27 @@ while ( $ok == 0 )
 #   Use a logical to expression to decide whether or not the value
 #   given is valid.
 #
-   if ( ! ( $index =~ [0-9]* && $index > 0 && $index <= $maxindex ) && $ok ) then
-      sh -c "echo 'The clump index must be a positive integer between 1 and $maxindex.' 1>&2"
+   if ( ${#indexlist} == 0 ) then
+      sh -c "echo 'No index supplied' 1>&2"
       set ok = 0
+
+   else if ( ${#indexlist} == 1 ) then
+      set index = $indexlist[1];
+      if ( ! ( $index =~ [0-9]* && $index > 0 && $index <= $maxindex ) && $ok ) then
+         sh -c "echo 'The clump index must be a positive integer between 1 and $maxindex.' 1>&2"
+         set ok = 0
+      endif
+
+   else
+      foreach index ( $indexlist )
+         if ( ! ( $index =~ [0-9]* && $index > 0 && $index <= $maxindex ) && $ok ) then
+            sh -c "echo 'The clump index must be a positive integer between 1 and $maxindex.' 1>&2"
+            set ok = 0
+            break
+         endif
+      end
    endif
+
    unset noglob
 
    set repeat = 1
@@ -410,14 +455,16 @@ endif
 #   Plot the clump outline
 #   ======================
 #
-if ( "$style" == "" ) then
-   $KAPPA_DIR/contour ndf="$ndf.more.cupid.clumps\($index\).model" \
-                      labpos=\! mode=good clear=no
-else
-   $KAPPA_DIR/contour ndf="$ndf.more.cupid.clumps\($index\).model" \
-                      labpos=\! mode=good clear=no style="$style"
-endif
-
+foreach index ( $indexlist )
+   if ( ${#indexlist} > 1 ) echo "Plotting clump index $index"
+   if ( "$style" == "" ) then
+      $KAPPA_DIR/contour ndf="$ndf.more.cupid.clumps\($index\).model" \
+                         labpos=\! mode=good clear=no
+   else
+      $KAPPA_DIR/contour ndf="$ndf.more.cupid.clumps\($index\).model" \
+                         labpos=\! mode=good clear=no style="$style"
+   endif
+end
 #
 #  At this point the current NDF is not what was supplied.
 #  Reset the GLOBAL association by doing a dummy operation.
