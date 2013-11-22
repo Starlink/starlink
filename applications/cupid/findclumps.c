@@ -908,6 +908,9 @@ void findclumps( int *status ) {
 *     20-NOV-2013 (DSB):
 *        - Copy main output NDF history to output JSA catalogue.
 *        - Do not prompt for RMS if it is in the supplied config.
+*     22-NOV-2013 (DSN):
+*        We need to map the variance array even if an RMS is supplied
+*        in the configuration.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -1240,8 +1243,15 @@ void findclumps( int *status ) {
       type = CUPID__FLOAT;
    }
 
-/* Map the Data array. */
+/* Map the Data array, and if present, variance array. The variance array
+   is always mapped as _DOUBLE. */
    ndfMap( indf, "DATA", itype, "READ", &ipd, &el, status );
+   ndfState( indf, "VARIANCE", &var, status );
+   if( var ) {
+      ndfMap( indf, "VARIANCE", "_DOUBLE", "READ", (void *) &ipv, &el, status );
+   } else {
+      ipv = NULL;
+   }
 
    msgBlankif( MSG__NORM, status );
 
@@ -1310,9 +1320,7 @@ void findclumps( int *status ) {
    Variance value. Otherwise, it is found by looking at differences between
    adjacent pixel values in the Data component. */
    if( rms == VAL__BADD ) {
-      ndfState( indf, "VARIANCE", &var, status );
       if( *status == SAI__OK && var ) {
-         ndfMap( indf, "VARIANCE", "_DOUBLE", "READ", (void *) &ipv, &el, status );
 
          sum = 0.0;
          n = 0;
@@ -1333,7 +1341,6 @@ void findclumps( int *status ) {
          }
 
       } else {
-         ipv = NULL;
          rms = cupidRms( type, ipd, el, subnd[ 0 ] - slbnd[ 0 ] + 1, status );
       }
 
