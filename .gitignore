@@ -46,6 +46,7 @@ lib*.so
 *.class
 \#*\#
 .\#*
+.dirstamp
 
 # Autoconf/automake build dirs
 
