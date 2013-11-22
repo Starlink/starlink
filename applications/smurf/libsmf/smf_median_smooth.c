@@ -92,6 +92,8 @@
 *        Re-implement using a binary chop to search the sorted list.
 *        Remove arguments mean and sigma which turned out not to be
 *        needed.
+*     22-NOV-2013 (DSB):
+*        Ensure the box is no larger than the size of the array.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -178,6 +180,9 @@ void smf_median_smooth( dim_t box, smf_filt_t filter_type, float wlim,
       *status = SAI__ERROR;
       errRep( " ", "smf_median_smooth: Box is zero.", status );
    }
+
+/* Limit the box to the size of the data array. */
+   if( box > el ) box = el;
 
 /* Store the minimum number of valid input values that must be present in
    a filter box to create a valid output value. */

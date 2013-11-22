@@ -62,6 +62,8 @@
 *        Add ability to skip padding/apodization at time stream ends
 *     2011-12-02 (DSB):
 *        Can now work with bolometer or time ordered data.
+*     2013-11-22 (DSB):
+*        Avoid divide by zero if nchunk is 1.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -197,13 +199,13 @@ double smf_quick_noise( const smfData *data, dim_t bolo, dim_t nsamp, dim_t nchu
   }
 
   dat = data->pntr[0];
-  len = (iend-istart+1)-nsamp;
+  len = ( nchunk > 1 ) ? ( (iend-istart+1)-nsamp )/(nchunk-1) : 0;
   minsig = 0;
 
   for( i=0; i<nchunk; i++ ) {
     /* Calculate the r.m.s. of this chunk */
-    smf_stats1D( dat+bolo*bstride+(istart+i*len/(nchunk-1))*tstride,
-                 tstride, nsamp, qua?qua+bolo*bstride+(istart+i*len/(nchunk-1))*tstride:NULL,
+    smf_stats1D( dat+bolo*bstride+(istart+i*len)*tstride,
+                 tstride, nsamp, qua?qua+bolo*bstride+(istart+i*len)*tstride:NULL,
                  0, mask, NULL, &sig, NULL, &ngood, status );
 
     if( *status == SMF__INSMP ) {
