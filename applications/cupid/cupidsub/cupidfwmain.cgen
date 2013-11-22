@@ -141,6 +141,11 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
 *        Do explicit bounds checking when scanning the 3x3x3
 *        neighbourhood box, rather than just marking the edge pixels bad.
 *        This avoid the output mask having a border of bad pixels.
+*     22-NOV-2013 (DSB):
+-        - Correct calculation of gradient in coastal region (divide by 3, not 4).
+*        - Change handlign of flatslope - a walk is now deemed to leave the 
+*        coastal region when 1) the gradient increases above flatslope, or 
+*        2) the altitude increases above "noise + 2*rms".
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -151,7 +156,7 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
 
 /* Local Variables: */
    CGEN_TYPE *pd;  /* Pointer to next "array" value */
-   double flat[ 4 ];/* Array containing most recent data values along route */
+   double flat[ 3 ];/* Array containing most recent data values along route */
    double flat_slope;/* Lowest gradient which marks the start of the walk */
    double frac;    /* Min fraction of neighbouring good pixels */
    double g;       /* Gradient from central pixel to neighbouring pixel */
@@ -405,13 +410,16 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    each step is the same length. If it is above the user-supplied limit,
    indicate we have got the length of the initial flat section of the
    route. */
-                        if( route_length > 3 ) {
-                           if( ( h -  flat[ iflat ] )/4 > flat_slope ) {
+                        if( h > sea_level ) {
+                           got_flat = 1;
+
+                        } else if( route_length > 3 ) {
+                           if( ( h -  flat[ iflat ] )/3 > flat_slope ) {
                               got_flat = 1;
 
 /* Otherwise, increment the number of steps in the intial flat section. */
                            } else {
-                              nflat++;
+                              nflat = route_length;
                            }
                         }
 
@@ -619,17 +627,25 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
 /* If the central pixel is the highest pixel in the more extended
    neighbourhood, we have reached a peak. If this peak has not already
    been assigned to a clump, increment the number of clumps and assign it
-   the new clump index. */
+   the new clump index. If the entire walk is coastal, we do not assign a
+   clump index to the walk. */
                      if( iv == nv ) {
-                        clump_index = work[ iv ];
-                        if( clump_index < 1 ) clump_index = ++ret;
+                        if( nflat >= 0 && nflat < route_length ) {
+                           clump_index = work[ iv ];
+                           if( clump_index < 1 ) clump_index = ++ret;
 
 /* Report new peak. */
-                        msgSeti( "I", clump_index );
-                        msgSetr( "V", (float) array[ iv ] );
-                        msgOutif( MSG__DEBUG,"",
-                                  "      (a new peak, index = ^I, value=^V)",
-                                  status );
+                           msgSeti( "I", clump_index );
+                           msgSetr( "V", (float) array[ iv ] );
+                           msgOutif( MSG__DEBUG,"",
+                                     "      (a new peak, index = ^I, value=^V)",
+                                     status );
+
+/* Assign a special value to "clump_index" that indicates that no clump
+   was assigned to the current walk. */
+                        } else {
+                           clump_index = -2;
+                        }
 
 /* Otherwise, if the next pixel on the route is already assigned to a
    clump, we now know what peak we are heading towards so use that clump
@@ -654,9 +670,10 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    route and thus know which peak we would get to if we were to carry on.
    We now assign the clump index found above to all the pixels visited on
    the route, except for any low gradient section at the start of the route,
-   which is set unusable (-1). */
+   which is set unusable (-1). We ignore walks that were entirely on the
+   coastal plain (indicated by a value of -2 for clump_index). */
                   for( istep = 0; istep < route_length;istep++ ) {
-                     if( istep < nflat ) {
+                     if( istep < nflat || clump_index < 0 ) {
                         work[ route[ istep ] ] = -1;
                      } else {
                         work[ route[ istep ] ] = clump_index;

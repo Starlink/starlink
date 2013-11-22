@@ -783,12 +783,13 @@ void findclumps( int *status ) {
 *        The supplied value is ignored and a value of zero is assumed if
 *        "PERSPECTRUM" is set TRUE. [1]
 *     FellWalker.FlatSlope:
-*        Any initial section to a walk which has an
-*        average gradient (measured over 4 steps) less than this value will not
-*        be included in the clump. The value is the data increment between
-*        pixels, and can be supplied either as an absolute data value, or as a
-*        mutliple of the RMS noise using the syntax "[x]*RMS", where "[x]" is
-*        a numerical value (e.g. "3.2*RMS"). [1.0*RMS]
+*        Any initial section to a walk which has an average gradient (measured
+*        over 4 steps) less than this value, and for which the data value is
+*        less than "NOISE + 2*RMS", will not be included in the clump. The value
+*        of this parameter is the data increment between pixels, and can be
+*        supplied either as an absolute data value, or as a mutliple of the RMS
+*        noise using the syntax "[x]*RMS", where "[x]" is a numerical value (e.g.
+*        "3.2*RMS"). [1.0*RMS]
 *     FellWalker.FwhmBeam:
 *        The FWHM of the instrument beam, in pixels. If
 *        application paremeter DECONV is set TRUE, the clump widths written to

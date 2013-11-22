@@ -25,6 +25,15 @@ Changes introduced at V2.0
    - No prompt is now made for the "RMS" parameter if an RMS value is
    specified in the configuration.
 
+   - The number of clumps rejected due to being smaller than the beam
+   size are now reported separately for the spatial and spectral beam
+   (but note that a clump reported as rejected due to it spectral width
+   being too small may also be too small on the spatial axes).
+
+   - The handling of the fellwalker.flatslope parameter has been modified
+   slightly - the initial section of the walk that is ignored now ends
+   if the data value exceeds "noise+2*rms" regardless of the gradient.
+
 Changes introduced at V1.6
 
    - A bug in the GaussClumps method has been fixed which could cause
