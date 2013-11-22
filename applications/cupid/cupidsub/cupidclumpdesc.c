@@ -145,7 +145,10 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
 *     ok
 *        Pointer to an int in which to return a flag indicating if the
 *        clump can be used or not. This will be set to zero if the clump
-*        size is zero after correction for the effect of beam smoothing.
+*        size is zero after correction for the effect of spatial beam
+*        smoothing. It will be set to -1 if the clump size is zero after
+*        correction for the effect of spectral resilution. It will be +1
+*        if the clump size is larger than the beam on all axes.
 *     stcs
 *        A pointer to a location at which to return a pointer to a
 *        dynamically allocated string containing an STC-S description of
@@ -664,14 +667,14 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
          if( v0 <= 0.0 ) v0 = 0.25;
 
          v = v0 - beamcorr[ 0 ]*beamcorr[ 0 ]/5.5451774;
-         *ok = ( v > 0 );
+         *ok = ( v > 0 ) ? 1 : ( ( ndim > 1 ) ? 0 : -1 );
          if( !deconv ) {
             v = v0;
             peakfactor = 1;
          } else {
             peakfactor = v0/v;
          }
-         ret[ 2*ndim ] = ( *ok ) ? sqrt( v ) : 0.0;
+         ret[ 2*ndim ] = ( *ok > 0 ) ? sqrt( v ) : 0.0;
 
          if( ndim > 1 ) {
             ret[ 1 ] = py - 0.5;
@@ -712,7 +715,7 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
 
                } else {
                   ret[ 2 + 2*ndim ] = 0.0;
-                  *ok = 0;
+                  *ok = -1;
                }
             }
          }
@@ -743,7 +746,7 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
 /* If the clump looks usable and an STC-S description of it is required,
    call the routine appropriate to the requested shape to create an AST
    Region. */
-      if( stcs && *ok ) {
+      if( stcs && *ok > 0 ) {
          if( shape == 1 ) {
             sig[ 0 ] = ret[ 2*ndim + space_axes[ 0 ] ];
             sig[ 2 ] = ret[ 2*ndim + space_axes[ 1 ] ];

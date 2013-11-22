@@ -176,6 +176,9 @@ void cupidStoreClumps( const char *param1, const char *param2, int indf,
 *     18-NOV-2013 (DSB):
 *        Added parameter param2 and indf to allow a JSA-style catalogue
 *        to be created..
+*     22-NOV-2013 (DSB):
+*        Report the number of clumps that fail the beam width test
+*        separately for spatial and spectral axes.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -233,7 +236,8 @@ void cupidStoreClumps( const char *param1, const char *param2, int indf,
    int ncpar;               /* Number of clump parameters */
    int nfrm;                /* Total number of Frames */
    int nok;                 /* No. of usable clumps */
-   int nsmall;              /* No. of clumps smaller than the beam size */
+   int nsmall1;             /* No. of clumps smaller than the spatial beam size */
+   int nsmall2;             /* No. of clumps smaller than the spectral resolution */
    int ok;                  /* Is the clump usable? */
    int pixfrm;              /* Index of PIXEL Frame */
    int place;               /* Place holder for copied NDF */
@@ -273,7 +277,8 @@ void cupidStoreClumps( const char *param1, const char *param2, int indf,
    cpars = NULL;
 
 /* Indicate we have not yet found any clumps smaller than the beam size. */
-   nsmall = 0;
+   nsmall1 = 0;
+   nsmall2 = 0;
 
 /* Indicate we have not yet found any clumps that touch any areas of
    bad pixels. */
@@ -415,14 +420,18 @@ void cupidStoreClumps( const char *param1, const char *param2, int indf,
             if( bad ){
                ok = 0;
 
-            } else if( !ok ) {
+            } else if( ok <= 0 ) {
                ndfCput( "BAD", indf1, "Unit", status );
-               nsmall++;
+               if( ok == 0 ) {  /* Small on the spatial axes, but not small on the spectral axis */
+                  nsmall1++;
+               } else if( ok < 0 ) { /* Small on the spectral axis, and maybe also the spatial axes */
+                  nsmall2++;
+               }
             }
 
 /* If the row is usable, increment the number of good rows, and write the
    values to the log file if required. */
-            if( ok ) {
+            if( ok > 0 ) {
                nok++;
                if( logfile ) {
                   nc = 0;
@@ -442,12 +451,12 @@ void cupidStoreClumps( const char *param1, const char *param2, int indf,
    is too small. */
             t = tab + irow - 1;
             for( icol = 0; icol < ncpar; icol++ ) {
-               *t = ok ? cpars[ icol ] : VAL__BADD;
+               *t = ( ok > 0 ) ? cpars[ icol ] : VAL__BADD;
                t += nndf;
             }
 
 /* If required, put the clump parameters into the current CLUMP structure. */
-            if( aloc && ok ) {
+            if( aloc && ok > 0  ) {
 
 /* Get an HDS locator for the next cell in the array of CLUMP structures. */
                iclump++;
@@ -483,7 +492,7 @@ void cupidStoreClumps( const char *param1, const char *param2, int indf,
 
 /* If required, store the STC-S clump description in the KeyMap, and then
    free the string returned by cupidClumpDesc. */
-         if( stc_km && stcptr && ok ) {
+         if( stc_km && stcptr && ok > 0 ) {
             sprintf( key, "Shape_%d", ++istc );
             astMapPut0C( stc_km, key, stcptr, NULL );
 
@@ -504,13 +513,29 @@ void cupidStoreClumps( const char *param1, const char *param2, int indf,
 
 /* Tell the user how many usable clumps there are and how many were rejected
    due to being smaller than the beam size. */
-   if( nsmall == 1 ) {
-     msgOutif( MSG__NORM, "", "1 further clump rejected because it "
-             "is smaller than the beam width.", status );
-   } else if( nsmall > 1 ) {
-     msgSeti( "N", nsmall );
-     msgOutif( MSG__NORM, "", "^N further clumps rejected because "
-             "they are smaller than the beam width.", status );
+
+   if( nsmall1 == 1 ) {
+      msgOutiff( MSG__NORM, "", "1 further clump rejected because it "
+                 "is smaller than the spatial beam width.", status );
+   } else if( nsmall1 > 1 ) {
+      msgOutiff( MSG__NORM, "", "%d further clumps rejected because "
+                 "they are smaller than the spatial beam width.",
+                 status, nsmall1 );
+   }
+
+   if( nsmall2 == 1 ) {
+      msgSetc( "W", ( ndim > 1 ) ? "(this clump may also "
+               "be smaller than the spatial beam width)" : "" );
+      msgOutiff( MSG__NORM, "", "1 further clump rejected because it "
+                 "is smaller than the spectral resolution ^W.", status );
+
+   } else if( nsmall2 > 1 ) {
+      msgSeti( "N", nsmall2 );
+      msgSetc( "W", ( ndim > 1 ) ? "(some of these may also "
+               "be smaller than the spatial beam width)" : "" );
+      msgOutif( MSG__NORM, "", "^N further clumps rejected because "
+                 "they are smaller than the spectral resolution ^W.",
+                 status );
    }
 
    if( nbad == 1 ) {
