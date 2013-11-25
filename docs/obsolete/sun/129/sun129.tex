@@ -1,0 +1,323 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {129.3}
+\newcommand{\stardocauthors}   {P M Allan}
+\newcommand{\stardocdate}      {4 October 1993}
+\newcommand{\stardoctitle}     {TPAU --- The Peter Allan Utilities}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+%  \setlength{\parskip}{0mm}
+%  \tableofcontents
+%  \setlength{\parskip}{\medskipamount}
+%  \markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\section{Introduction}
+
+TPAU\footnote{The name of this set of utilities was suggested by the Starlink
+software librarian. If you think it is too pretentious, why not submit some
+utilities of your own so we have to change the name?} is a mixed bag of
+Starlink utilities. They have been grouped together simply to reduce the number
+of small software items. The utilities currently consist of:
+
+\begin{tabular}{lcl}
+\underline{Name} & \underline{Version} & \underline{Description} \\
+LOG & 1.2 & A logical name utility \\
+XDISPLAY & 2.0 & Easy use of remote X windows \\
+\end{tabular}
+
+%\begin{description}
+%\item[LOG] A logical name utility
+%\item[XDISPLAY] Easy use of remote X windows
+%\end{description}
+
+\section{LOG - A logical name utility}
+
+This utility provides the ability to add or remove an item in a VMS logical
+name search list.
+
+\subsection{Description}
+
+Occasionally it is necessary to add an item to a logical name search list.
+Surprisingly, there is no simple way of doing this from DCL. The command
+procedure {\tt ADD\_TO\_SEARCH\_LIST} has been written to perform this task. It
+is invoked with the command ATSL. The procedure has four parameters; two
+mandatory and two optional. These are as follows:
+
+\begin{itemize}
+\item The first parameter is the logical name to be created or modified. 
+\item The second parameter is the item to be added to, or removed from, the
+search list. 
+\item The third (optional) parameter indicates in which logical name table the
+search list should be created.
+\item The fourth (optional) parameter indicates whether the new item should be
+added at the beginning or the end of the current list, or whether it should be
+removed from the list. The default is to add the item at the end of the list.
+If the fourth parameter is BEGIN then the new item will be added at the
+beginning of the list. If the fourth parameter is COPY, then the search list
+will be copied from the current logical name table to the one specified by the
+third parameter, without change. In this case the second parameter is ignored.
+It is also possible to delete an item by specifying DELETE as the value of the
+fourth parameter. If a logical name exists more than once in the search list,
+the DELETE option will remove all occurrences of the name.
+\end{itemize}
+
+If the logical name does not already exist, then the command procedure will
+create it.
+
+Here is an example of building up a search list.
+
+\begin{verbatim}
+      $ ATSL C$INCLUDE EMS_DIR
+      $ ATSL C$INCLUDE CNF_DIR
+      $ ATSL C$INCLUDE CHR_DIR
+\end{verbatim}
+
+Typing
+
+\begin{quote}{\tt 
+\$ SHOW LOGICAL C\$INCLUDE
+}
+\end{quote}
+
+will now give 
+
+\begin{verbatim}
+      "C$INCLUDE" = "EMS_DIR" (LNM$PROCESS_TABLE)
+           = "CNF_DIR"
+           = "CHR_DIR"
+
+    1  "EMS_DIR" = "STARDISK:[STARLINK.LIB.EMS.STANDALONE]" (LNM$SYSTEM_TABLE)
+    1  "CNF_DIR" = "STARDISK:[STARLINK.LIB.CNF]" (LNM$SYSTEM_TABLE)
+    1  "CHR_DIR" = "STARDISK:[STARLINK.LIB.CHR]" (LNM$SYSTEM_TABLE)
+\end{verbatim}
+
+Note that since the items in the search list are themselves logical names, the
+fully recursive translation of those items is also given. The above example is
+not realistic in the sense that you could define the search list much more
+simply with a single DEFINE command. However, if the individual additions to
+the list are spread around several command procedures, then such a sequence is
+the easiest way to create the search list.
+
+\subsection{Different Logical Name Tables}
+
+The third parameter of the command procedure can be given as PROCESS, JOB,
+GROUP, SYSTEM or as the name of another logical name table. If this parameter
+is specified, then a new logical name will be created in the table specified.
+If it is not specified, then the logical name is created in the table that it
+is already in, if it exists, and in the process table if it does not. This
+means that if you wish to add an item to a system search list, but have the
+result in your process table, then you must specify PROCESS for the third
+parameter.
+
+There is one exception to the rule that the new item is added to the current
+logical name table or to the one specified by the third parameter. If the user
+does not have the required privilege to create or modify the logical name, then
+the search list is created in the process logical name table. For example, if a
+logical name exists in the system table and you try to modify it without SYSNAM
+privilege, then the logical name search list will be copied to your process
+logical name table where it will have the new item added.
+
+The third parameter does not affect the logical name tables that get searched
+for the translation of the current logical name, if it exists.
+
+\subsection{Changes from version 1.0}
+
+In version 1.0 of this utility, the function of the fourth parameter was
+slightly different. If it was not specified, then the new item was added at the
+end of the search list (this behaviour has not changed), but if is was anything
+else, then the new item was added to the beginning of the search list. Also,
+you could not copy a search list from one logical name table to another
+unchanged.
+
+The behaviour is now such that if the fourth parameter not specified, or is
+anything other than BEGIN, COPY or DELETE, then the new item is added at the
+end of the search list.
+
+
+\section{XDISPLAY - Easy use of remote X windows}
+
+This section describes how to use the XDISPLAY utility on Starlink systems that
+are running X~windows. It makes no attempt to describe the X~windows system. It
+assumes that you have some familiarity with using X~windows, although not to
+any great depth.
+
+\subsection{The problem}
+
+If you are using X~windows purely on a workstation, then there is no problem.
+Graphical output created by X will appear automatically on your
+screen. The problem arises if you are logged on to an X~client other than
+the machine that you are sat in front of (the X~server). Suppose
+that you are sat in front of a VAXstation called RLSVS2, but that you are
+remotely logged into RLSTAR, a microVAX. To get X output from a program run
+on RLSTAR to be displayed on the screen of RLSVS2, you need to type
+
+\begin{quote}{\tt
+\$ SET DISPLAY/CREATE/NODE=RLSVS2
+}
+\end{quote}
+
+If you are running programs that execute in a subprocess, such as ADAM programs
+run from ICL, then you also need to type
+
+\begin{quote}{\tt
+\$ DEFINE/JOB DECW\$DISPLAY 'F\$TRNLNM( "DECW\$DISPLAY", "LNM\$PROCESS" )
+}
+\end{quote}
+
+This defines the logical name DECW\$DISPLAY to be a job logical name.
+
+If you are sat in front of a Sun, but logged into a VAX then the SET DISPLAY
+command become something like
+
+\begin{quote}{\tt
+\$ SET DISPLAY/CREATE/NODE="rlssp1.bnsc.rl.ac.uk"/TRANSPORT=TCPIP
+}
+\end{quote}
+
+This is becoming far too easy to forget and far too much to type every time you
+do a remote login. If you log into a Sun from a remote X~server the command
+that you type is different, so that is even more to remember.
+
+\subsection{The solution}
+
+To wrap up what you need to type to get X output from the machine that you are
+logged into back to your X~server, procedures called XDISPLAY are available on
+all STARLINK machines. Of course, on the Unix systems, the
+command must be typed in lower case. To get X output drawn on your X~server
+from a remote client, just type {\tt xdisplay} before running the program. If
+you type {\tt xdisplay} when you are not logged into a remote system, then
+nothing will happen and the output will still appear on your screen.
+
+What XDISPLAY does is to see where you logged in from and which protocol you
+came in with (DECnet, LAT or TCP/IP) and executes the appropriate command to
+point the X output back to you. On a VAX, it also executes the DEFINE command
+mentioned above.
+
+\subsection{What can go wrong?}
+
+There are a few things that might stop XDISPLAY from working as you intended.
+These are problems with security, multi-hop logins and inappropriate use.
+
+For example, if you are logged into the microVAX RLSTAR from the VAXstation
+RLSVS2 and you type {\tt xdisplay}, then it is possible that you will get a
+message such as 
+
+\begin{quote}{\tt
+Xlib:  Client is not authorized to access server
+}
+\end{quote}
+
+To fix this, you need to make sure that the client is authorized to send X
+output to the server. If you do not know how to do this, consult your site
+manager.
+
+A problem that is not so easily overcome, but is probably less likely to occur,
+is that of multi-hop logins. If you are using VAXstation RLSVS2 and log into
+RLSTAR and then to STADAT (to give a concrete example), and then type {\tt
+xdisplay} on STADAT, then XDISPLAY thinks that you are on RLSTAR and so tries
+to point the display back to RLSTAR. Since RLSTAR is not a workstation, this
+will fail. A somewhat more embarrassing possibility is that you have
+logged in from one workstation (A) to a second (B), and thence to a third
+machine (C). If you then type {\tt xdisplay} on C it will successfully point
+the X output back to B if the security setting allows it. The trouble is that
+you are sat in front of A wondering where the window has gone and the user sat
+in front of B is wondering why a random window has suddenly appeared! Making
+XDISPLAY automatically cope with multi-hop logins verges on the impossible, but
+there is a simple manual override available. If you type
+
+\begin{quote}{\tt
+xdisplay <nodename>
+}
+\end{quote}
+
+where {\tt <nodename>} is the name of the computer or X-terminal that you want
+the display to appear on, then the display will appear on that X-server,
+regardless of the route that you used to log in.
+
+Note that on Unix systems, you can only use the xdisplay command interactively.
+You cannot put it in a shell script as {\tt xdisplay} is actually an alias that
+uses the shell's command line recall features. If you need to use xdisplay in a
+file there are two possibilities. If you want to have xdisplay work out where
+you logged in from, put:
+
+\begin{quote}{\tt
+\% source /star/etc/xdisplay
+}
+\end{quote}
+
+in your file. This will generally be your {\tt .login} file. If you want to
+explicitly set the node that output will appear on, then simply set the
+environment variable DISPLAY, e.g.
+
+\begin{quote}{\tt
+\% setenv DISPLAY adam4.bnsc.rl.ac.uk:0
+}
+\end{quote}
+
+which is all that XDISPLAY does anyway.
+
+If you give XDISPLAY the explicit node name, it is also possible to specify the
+transport mechanism to use. On Unix systems, you can select the transport to be
+used by the case of the node name. If it is purely in upper case, then DECnet
+will be used. Anything else will cause TCP/IP to be used, which is normally
+what is required. On VMS, the transport can be selected by a second parameter
+to XDISPLAY, which can take one of the values DECNET, TCPIP, LAT or LOCAL. If
+it is omitted, DECNET is the default. If you select the TCP/IP protocol while
+logged into a VAX, you may need to put the node name in double quotes to
+prevent DCL from converting what you type to upper case.
+
+For example:
+
+\begin{quote}{\tt
+\$ xdisplay "rlssp1.bnsc.rl.ac.uk" tcpip
+}
+\end{quote}
+
+Finally, if you try to use XDISPLAY in an inappropriate way then you probably
+will not get what you expected. For example, if you log into a computer from a
+VT type terminal connected to a TCP/IP terminal server, then XDISPLAY will quite
+happily point your X output to the terminal server. It is only when you come to
+run an X application that you will see the problem.
+
+\end{document}
