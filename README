@@ -430,3 +430,13 @@ Fedora:
    As for Ubuntu, but note that package names are usually changed from
    "libxyz-dev" to "libXyz-devel".
 
+Arch Linux:
+   base-devel
+   ed
+   gcc-fortran
+   ghostscript
+   git
+   libx11
+   libxt
+   tcsh
+   texlive-most
