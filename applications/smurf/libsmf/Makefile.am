@@ -54,6 +54,7 @@ smf_calcmodel_pln.c \
 smf_calcmodel_smo.c \
 smf_calcmodel_tmp.c \
 smf_calcmodel_two.c \
+smf_check_coords.c \
 smf_check_detpos.c \
 smf_check_flat.c \
 smf_check_quality.c \
