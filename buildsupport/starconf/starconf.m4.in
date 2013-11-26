@@ -42,22 +42,15 @@
 # (not that that's going to stop folk).
 AC_DEFUN([STAR_DEFAULTS],
 [##
-## Options must be parsed at autoconf time, so that we define
-## _poss_STAR_RESTFP_FIX as a macro.  That must be defined exactly once
-## during this option processing.
+## Options must be parsed at autoconf time.
 m4_ifval([$1],
          [AC_FOREACH([Option], [$1],
                      [m4_case(Option,
                               [per-package-dirs], [_star_per_package_dirs=:],
-                              [docs-only], [m4_define([_poss_STAR_RESTFP_FIX],
-                                                      [])dnl
-                                           _star_docs_only=:],
+                              [docs-only], [_star_docs_only=:],
                               [AC_FATAL([$0: unrecognised option $1])])
                       ])],
          [])
-m4_ifdef([_poss_STAR_RESTFP_FIX],
-         [],
-         [m4_define([_poss_STAR_RESTFP_FIX], [_STAR_RESTFP_FIX])])
 
 ## Define m4 variables per_dir_{PREFIX,STARLINK} to be
 ## STARCONF_DEFAULT_{PREFIX,STARLINK}.
@@ -200,11 +193,6 @@ AC_SUBST(STAR_CPPFLAGS)
 AC_SUBST(STAR_FCFLAGS)
 AC_SUBST(STAR_FFLAGS)
 AC_SUBST(STAR_LDFLAGS)
-
-
-## If the docs-only option was given, this expands to nothing,
-## else to the _STAR_RESTFP_FIX macro. 
-_poss_STAR_RESTFP_FIX
 
 # Installation directory options (these are no longer handled
 # by _STAR_EXTRADIR_COMMON).  There should be an entry here for each of
@@ -1782,112 +1770,6 @@ AC_DEFUN([_STAR_EXTRADIR_COMMON],
 )# _STAR_EXTRADIR_COMMON
 
 
-# _STAR_RESTFP_FIX
-# ----------------
-# Determines if we need to make any library fixes to get things to link 
-# properly.  In fact, there's only a problem on OSX/Darwin, since the
-# GCC installation which provides g77 and the (system) GCC which provides
-# gcc can generate slightly incompatible object code.  The following test
-# is therefore pretty specific to OSX/Darwin.
-#
-# If there are any libraries that need to be added to the path, this adds
-# them to variables <x>_FCLINK_MAGIC.  Compare AC_FC_LIBRARY_LDFLAGS.
-#
-# See the thread: http://lists.apple.com/mhonarc/fortran-dev/msg00768.html
-AC_DEFUN([_STAR_RESTFP_FIX],
-   [AC_CACHE_CHECK([whether we need any library fixups],
-       [star_cv_restfp_fixup],
-       [AC_REQUIRE([AC_CANONICAL_BUILD])
-        dnl AC_REQUIRE([AC_PROG_CC])
-        dnl AC_REQUIRE([AC_PROG_FC])
-        if expr $build_os : 'darwin7' >/dev/null; then
-dnl Only affects OSX/Darwin
-            # Following uses undocumented (but probably fairly stable)
-            # autoconf internal variable.
-            if test "$ac_cv_fc_compiler_gnu" = yes; then
-dnl The problem only affects g77/gcc, so we know we're dealing with these below
-                AC_LANG_PUSH(C)
-                rm -f conftest*
-                star_cv_restfp_fixup=unknown
-                AC_LANG_CONFTEST([AC_LANG_PROGRAM([], restFP())])
-                { AC_TRY_COMMAND($CC -o conftest.x -S conftest.c)
-                  test $ac_status = 0
-                } &&
-                sed 's/_restFP/restFP/g' conftest.x>conftest.s &&
-                { AC_TRY_COMMAND($CC -c -o conftest.$ac_objext conftest.s)
-                  test $ac_status = 0
-                } || star_cv_restfp_fixup=broken
-                AC_LANG_POP(C)
-                if test $star_cv_restfp_fixup = broken; then
-                    AC_MSG_WARN([unable to assemble restFP test])
-                else
-                    # Link this with the C compiler
-                    AC_TRY_COMMAND($CC -o conftest conftest.$ac_objext)
-                    _s_cstatus=$ac_status
-                    # Link this with the Fortran compiler
-                    AC_TRY_COMMAND($FC -o conftest conftest.$ac_objext)
-                    if test $_s_cstatus = 0 -a $ac_status = 0; then
-                        # both compilers can compile it
-                        star_cv_restfp_fixup=no
-                    elif test $_s_cstatus != 0 -a $ac_status != 0; then
-                        # neither compiler can compile it
-                        star_cv_restfp_fixup=no
-                    elif test $_s_cstatus = 0; then
-                        # The C compiler can, but the Fortran cannot
-                        star_cv_restfp_fixup=yes
-                    else
-                        # The C compiler can't compile, but the Fortran can.
-                        # Haven't heard of this case!  Don't know what to do.
-                        star_cv_restfp_fixup=broken
-                    fi
-                fi
-                # Link with -lcc_dynamic.
-                # See http://www.astro.gla.ac.uk/users/norman/note/2004/restFP/
-                if test $star_cv_restfp_fixup = yes; then
-                    AC_TRY_COMMAND($FC -o conftest conftest.$ac_objext -lcc_dynamic)
-                    if test $ac_status = 0; then
-                        star_cv_restfp_fixup=cc_dynamic
-                    fi
-                fi
-                if test $star_cv_restfp_fixup = yes; then
-                    # ooops
-                    AC_MSG_WARN([unable to solve restFP problem])
-                    star_cv_restfp_fixup=broken
-                fi
-                rm -f conftest*
-            elif test -z "$FC"; then
-                # not g77, and indeed no Fortran at all
-                star_cv_restfp_fixup=nofortran
-            else
-                # There is a Fortran, but it's not g77, so either there's no
-                # problem, or it's a mixed-compiler problem that's harder
-                # than we know how to deal with.  But presumably the user
-                # has worked this out.
-                star_cv_restfp_fixup=no
-            fi
-        else # !Darwin
-            star_cv_restfp_fixup=no
-        fi
-        ])
-   C_FC_FCLINK_MAGIC=
-   C_FC_PPFC_FCLINK_MAGIC=
-   case $star_cv_restfp_fixup in
-     cc_dynamic)
-       # Add the required libraries to C_FC_... variables, which are
-       # generated in the required places by (our) automake.
-       C_FC_FCLINK_MAGIC="-lcc_dynamic"
-       C_FC_PPFC_FCLINK_MAGIC="-lcc_dynamic"
-       ;;
-     nofortran)
-       AC_MSG_NOTICE([No Fortran in path, so presumably no g77/gcc library problems])
-       ;;
-     *) ;;
-   esac
-   AC_SUBST(C_FC_FCLINK_MAGIC)
-   AC_SUBST(C_FC_PPFC_FCLINK_MAGIC)
-])# _STAR_RESTFP_FIX
-
-
 # STAR_LARGEFILE_SUPPORT
 # ----------------------
 #
@@ -1939,9 +1821,7 @@ AC_DEFUN([STAR_HAVE_FC_OPEN_READONLY],
 # -----------------------
 #
 # This was once a wrapper for AC_[]FC_LIBRARY_LDFLAGS which added
-# functionality.  That functionality is now incorporated into STAR_[]DEFAULTS,
-# using the helper macro _STAR_[]RESTFP_FIXUP.  Configure.ac files should use
-# use AC_[]FC_LIBRARY_LDFLAGS instead.
+# functionality, use AC_[]FC_LIBRARY_LDFLAGS instead.
 AC_DEFUN([STAR_FC_LIBRARY_LDFLAGS],
    [AC_FATAL([Macro STAR_FC_LIBRARY_LDFLAGS is obsolete: if necessary, use standard AC_FC_LIBRARY_LDFLAGS instead])])
 
