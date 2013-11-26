@@ -1012,6 +1012,7 @@ void smurf_makecube( int *status ) {
    int iout;                  /* Index of next output NDF name */
    int ipbin;                 /* Index of current polarisation angle bin */
    int is2d;                  /* Is the weights array 2-dimensional? */
+   int isjsa;                 /* Is the JSA all-sky pixel grid being used? */
    int ispec;                 /* Index of next spectrum within output NDF */
    int jin;                   /* Input NDF index within igrp */
    int jsatiles;              /* Create JSA tiles? */
@@ -1141,7 +1142,7 @@ void smurf_makecube( int *status ) {
    parGet0l( "TRIM", &trim, status );
 
 /* Attempt to get WCS information from a reference NDF. */
-   smf_getrefwcs( "REF", igrp, &specrefwcs, &spacerefwcs, status );
+   smf_getrefwcs( "REF", igrp, &specrefwcs, &spacerefwcs, &isjsa, status );
 
 /* If no spatial reference WCS was obtained, see if any unspecified
    projection parameters are to be determined using an optimal fitting

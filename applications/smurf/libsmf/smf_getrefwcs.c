@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_getrefwcs( const char *param, Grp *igrp, AstFrameSet **specwcs,
-*                    AstFrameSet **spacewcs, int *status );
+*                    AstFrameSet **spacewcs, int *isjsa, int *status );
 
 *  Arguments:
 *     param = const char * (Given)
@@ -41,6 +41,8 @@
 *        Frame will be a SkyFrame. If no reference NDF is supplied,
 *        or if the reference NDF has no spatial axes, a NULL pointer
 *        will be returned.
+*     isjsa = int * (Returned)
+*        Is the map being made on the JSA all-sky pixel grid?
 *     status = int * (Given and Returned)
 *        The inherited status.
 
@@ -77,6 +79,8 @@
 *     8-NOV-2013 (DSB):
 *        Allow the REF parameter to be over-ridden by the JSATILES
 *        parameter.
+*     25-NOV-2013 (DSB):
+*        Added argument "isjsa".
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -118,7 +122,7 @@
 #include "libsmf/jsatiles.h"
 
 void smf_getrefwcs( const char *param, Grp *igrp, AstFrameSet **specwcs,
-                    AstFrameSet **spacewcs, int *status ){
+                    AstFrameSet **spacewcs, int *isjsa, int *status ){
 
 /* Local Variables */
    AstFrame *bfrm = NULL;       /* Frame describing full PIXEL coords */
@@ -147,6 +151,7 @@ void smf_getrefwcs( const char *param, Grp *igrp, AstFrameSet **specwcs,
 /* Initialise the returned values. */
    *specwcs = NULL;
    *spacewcs = NULL;
+   *isjsa = 0;
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -159,6 +164,7 @@ void smf_getrefwcs( const char *param, Grp *igrp, AstFrameSet **specwcs,
    parGet0l( "JSATILES", &jsatiles, status );
    if( jsatiles ) {
       strcpy( text, "JSA" );
+      *isjsa = 1;
 
 /* Otherwie, first get the parameter value as a string. Use subpar to avoid problem
    caused by interpretion of the text within the parameter system. */
@@ -174,6 +180,7 @@ void smf_getrefwcs( const char *param, Grp *igrp, AstFrameSet **specwcs,
 /* If it is "JSA", we return WCS that describes the JSA all-sky pixel grid. */
    } else if( *status == SAI__OK ) {
       if( astChrMatch( text, "JSA" ) ) {
+         *isjsa = 1;
 
 /* Report an error if the instrument cannot be determined. */
          if( !igrp ) {

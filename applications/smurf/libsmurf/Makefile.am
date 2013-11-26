@@ -11,6 +11,7 @@ smurf_calcflat.c \
 smurf_calcnoise.c \
 smurf_calcqu.c \
 smurf_calcresp.c \
+smurf_checkcoords.c \
 smurf_copyflat.c \
 smurf_dreamsolve.c \
 smurf_dreamweights.c \

@@ -171,6 +171,9 @@
 *        Initialse INPOS to AST__BAD.
 *     2012 May 11 (MJC):
 *        Add support for 64-bit integers.
+*     25-NOV-2013 (DSB):
+*        Since the CENTRE, XCEN and YCEN hold *formatted* axis values,
+*        the axis values should be normalised first.
 *     {enter_further_changes_here}
 
 *-
@@ -863,11 +866,12 @@
 *  Limit the number of returned positions to the maximum allowed.
       IF( NPOS .GT. MXPOS ) NPOS = MXPOS
 
-*  Now write the last position out to the output parameters.
+*  Now write the normalised last position out to the output parameters.
 *  The formatted axis value for axis 1 is written to XCEN, and
 *  the formatted axis value for axis 2 is written to YCEN. The
 *  complete set of axis values (separated by spaces) is written to
 *  CENTRE.
+      CALL AST_NORM( RFRM, REPPOS, STATUS )
       IAT = 0
       LINE = ' '
 

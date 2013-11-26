@@ -28,6 +28,7 @@ calcflat \
 calcnoise \
 calcqu \
 calcresp \
+checkcoords \
 copyflat \
 dreamsolve \
 dreamweights \

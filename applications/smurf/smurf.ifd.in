@@ -918,6 +918,21 @@ package @PACKAGE@ {
 
         }
 
+        action checkcoords {
+            helplib {$SMURF_HELP}
+
+            parameter in {
+                position 1
+                type NDF
+                access READ
+                vpath {PROMPT }
+                association <-GLOBAL.DATA_ARRAY
+                prompt {Input timeseries}
+                helpkey *
+            }
+
+        }
+
         action copyflat {
 
             helplib {$SMURF_HELP}

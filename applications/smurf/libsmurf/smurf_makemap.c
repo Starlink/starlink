@@ -731,6 +731,9 @@
 *     2013-11-08 (DSB):
 *        Added the "JSATILES" parameter, and made other changes to allow
 *        the output map to be split up into JSA tiles.
+*     2013-11-25 (DSB):
+*        smf_mapbounds fast mode does not work for the JSA all-sky pixel
+*        grid since the pixels are not square.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -837,6 +840,7 @@ void smurf_makemap( int *status ) {
   int ilast;                 /* Index of the last input file */
   int iout;                  /* Index of next output NDF name */
   int ipbin=0;               /* Index of current polarisation angle bin */
+  int isjsa;                 /* Are we making a map on the JSA all-sky pixel grid? */
   int iterate=0;             /* Flag to denote ITERATE method */
   int iters;                 /* If interupted, the no. of completed iterations */
   size_t itile;              /* Output tile index */
@@ -1073,7 +1077,7 @@ void smurf_makemap( int *status ) {
 
   /* Calculate the map bounds */
 
-  smf_getrefwcs( "REF", igrp, &specrefwcs, &spacerefwcs, status );
+  smf_getrefwcs( "REF", igrp, &specrefwcs, &spacerefwcs, &isjsa, status );
   if( specrefwcs ) specrefwcs = astAnnul( specrefwcs );
 
   /* See if the input data is to be aligned in the output coordinate system
@@ -1082,7 +1086,7 @@ void smurf_makemap( int *status ) {
 
   msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Determine map bounds", status);
 
-  smf_mapbounds( 1, igrp, size, system, spacerefwcs, alignsys,
+  smf_mapbounds( !isjsa, igrp, size, system, spacerefwcs, alignsys,
                  lbnd_out, ubnd_out, &outfset, &moving, &boxes, fts_port,
                  status );
 
