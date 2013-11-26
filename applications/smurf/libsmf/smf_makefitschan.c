@@ -59,6 +59,16 @@
 *     28-JUL-2008 (TIMJ):
 *        Add CRPIX argument. Tweak arguments to use radians (as calculated
 *        by smf_get_projpar).
+*     26-NOV-2013 (DSB):
+*        Instead of using "crota2" to set the FITS-AIPS "CROTA2" keyword, 
+*        use it to set the FITS-WCS "PCi_j" keywords. In the old scheme the 
+*        pixel dimensions are meaured along the X and Y pixel axes. In the new
+*        scheme they are measured along the celestial north and east axes. Put 
+*        another way, non-square pixels are always elongated along a pixel axis 
+*        in the old scheme, and are always elongated along a celestial axis in 
+*        the new scheme. The two schemes are equivalent if the pixels are square 
+*        or if crota2 is zero. If the pixels are not square and crota2 is not 
+*        zero, they produce different results. 
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -109,6 +119,8 @@ void smf_makefitschan( const char *system, double crpix[2], double crval[2],
 /* Local Variables */
    int i;
    int ncard;
+   double vcos;
+   double vsin;
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -127,7 +139,12 @@ void smf_makefitschan( const char *system, double crpix[2], double crval[2],
    astSetFitsF( fc, "CRVAL2", crval[ 1 ]*AST__DR2D, NULL, 0 );
 
 /* Axis rotation. */
-   astSetFitsF( fc, "CROTA2", crota2*AST__DR2D, NULL, 0 );
+   vcos = cos( crota2 );
+   vsin = sin( crota2 );
+   astSetFitsF( fc, "PC1_1", vcos, NULL, 0 );
+   astSetFitsF( fc, "PC1_2", vsin, NULL, 0 );
+   astSetFitsF( fc, "PC2_1", -vsin, NULL, 0 );
+   astSetFitsF( fc, "PC2_2", vcos, NULL, 0 );
 
 /* Pixel size. AZEL is right-handed. */
    if( !strcmp( system, "AZEL" ) ) {
