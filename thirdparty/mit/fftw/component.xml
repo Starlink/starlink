@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="fftw" support="U">
-  <version>3.1.2</version>
+  <version>3.3.3</version>
   <path>thirdparty/mit/fftw</path>
   <description>Fastest Fourier Transform in the West</description>
   <!-- <abstract><p></p></abstract> -->
