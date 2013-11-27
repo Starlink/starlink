@@ -3197,6 +3197,14 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter poserrfatal {
+                type _LOGICAL
+                vpath DEFAULT
+                ppath DEFAULT
+                prompt {Report error if RECEPPOS and FPLANEX/Y disagree?}
+                default FALSE
+                helpkey *
+            }
             parameter ref {
                 type NDF
                 access READ
