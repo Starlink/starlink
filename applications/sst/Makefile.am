@@ -55,7 +55,7 @@ PRIVATE_INCLUDES = SST_PAR SST_SCB
 # binaries.  Since we have STAR_DEFAULTS(per-package-dirs) in configure.ac, 
 # however, we are allowed to use bin_DATA (don't ask).
 dist_bindata_DATA = sst_preamble.tex forstats.dat html.sty
-bindatadir = $bindir
+bindatadir = $(bindir)
 
 
 EXTRA_DIST = sst.ifd.in $(bin_DATA) sst_master.hlp
