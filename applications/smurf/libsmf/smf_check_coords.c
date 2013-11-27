@@ -229,7 +229,6 @@ void smf_check_coords( smfData *data, int *status ) {
 
       asigma = sqrt( svar*cmean*cmean + cvar*smean*smean );
 
-      msgBlank( status );
       msgOutf( " ", "Comparing tcs_tr_ac1/2 and tcs_az_ac1/2 in %s:",
                status, data->file->name );
       msgOutf( " ", "   RMS separation: %g arc-sec", status, rms*R2AS );
@@ -245,7 +244,6 @@ void smf_check_coords( smfData *data, int *status ) {
       msgBlank( status );
 
    } else {
-      msgBlank( status );
       msgOutf( " ", "No usable boresight positions found in %s:", status,
                data->file->name );
       msgBlank( status );
