@@ -6622,7 +6622,7 @@ Ultrix and for SunOS and may still work for them.
 </component>
 
 <component id="gsl" support="U">
-  <version>1.15</version>
+  <version>1.16</version>
   <path>thirdparty/fsf/gsl</path>
   <description>GNU Scientific Library</description>
   <dependencies >
