@@ -879,6 +879,9 @@
 *     11-NOV-2013 (DSB):
 *        Added the "JSATILES" parameter, and made other changes to allow
 *        the output cubew to be split up into JSA tiles.
+*     27-NOV-2013 (DSB):
+*        Ensure the NTILE parameter is written before the OUT parameter is
+*        accessed (unless JSA tiles are being created).
 
 *  Copyright:
 *     Copyright (C) 2007-2013 Science and Technology Facilities Council.
@@ -1426,6 +1429,14 @@ void smurf_makecube( int *status ) {
 /* Write the number of polarisation angle bins being created to an output
    parameter. */
    parPut0i( "NPOLBIN", npbin, status );
+
+/* If known, write the number of tiles being created to an output
+   parameter. We do it here if possible so that a valid value is
+   available to subsequent commands even if a null value is supplied
+   for "OUT". But we cannot do it here if we are creating JSA tiles
+   since we only know how many JSA tiles are being created once the
+   cube has been created. */
+   if( !jsatiles ) parPut0i( "NTILE", ntile, status );
 
 /* Create a new group to hold the names of the output NDFs that have been
    created. This group does not include any NDFs that correspond to tiles
@@ -2134,8 +2145,9 @@ void smurf_makecube( int *status ) {
       astEnd;
    }
 
-/* Write the number of tiles being created to an output parameter. */
-   parPut0i( "NTILE", jsatiles ? njsatile : ntile, status );
+/* Write the number of tiles being created to an output parameter,
+   unless it was written earlier. */
+   if( jsatiles ) parPut0i( "NTILE", njsatile, status );
 
 /* Report an error if no output NDFs were created. */
    if( grpGrpsz( igrp4, status ) == 0 && *status == SAI__OK ) {

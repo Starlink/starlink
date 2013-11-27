@@ -734,6 +734,9 @@
 *     2013-11-25 (DSB):
 *        smf_mapbounds fast mode does not work for the JSA all-sky pixel
 *        grid since the pixels are not square.
+*     2013-11-27 (DSB):
+*        Ensure the NTILE parameter is written before the OUT parameter is
+*        accessed (unless JSA tiles are being created).
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -1147,6 +1150,14 @@ void smurf_makemap( int *status ) {
 
   /* See if output NDFs are to be trimmed to exclude bad borders. */
   parGet0l( "TRIM", &trim, status );
+
+  /* If known, write the number of tiles being created to an output
+     parameter. We do it here if possible so that a valid value is
+     available to subsequent commands even if a null value is supplied
+     for "OUT". But we cannot do it here if we are creating JSA tiles
+     since we only know how many JSA tiles are being created once the
+     cube has been created. */
+  if( !jsatiles ) parPut0i( "NTILE", ntile, status );
 
   /* Create a new group to hold the names of the output NDFs that have been
      created. This group does not include any NDFs that correspond to tiles
@@ -1918,8 +1929,9 @@ void smurf_makemap( int *status ) {
     if( *status == PAR__NULL ) errAnnul( status );
   }
 
-  /* Write the number of tiles being created to an output parameter. */
-  parPut0i( "NTILE", jsatiles ? njsatile : ntile, status );
+  /* Write the number of tiles being created to an output parameter,
+     unless it was written earlier. */
+  if( jsatiles ) parPut0i( "NTILE", njsatile, status );
 
   /* Arrive here if no output NDF is being created. */
  L998:;
