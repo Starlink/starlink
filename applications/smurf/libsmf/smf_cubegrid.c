@@ -15,8 +15,8 @@
 *  Invocation:
 *     smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
 *                   int autogrid, int alignsys, Grp *detgrp, double par[ 7 ],
-*                   int *moving, AstSkyFrame **skyframe, int *sparse,
-*                   int *gottsys, int *status );
+*                   int isjsa, int *moving, AstSkyFrame **skyframe,
+*                   int *sparse, int *gottsys, int *status );
 
 *  Arguments:
 *     igrp = Grp* (Given)
@@ -64,6 +64,12 @@
 *        If a NULL pointer is supplied for this parameter, then it is
 *        assumed that the spatial projection for the output cube is
 *        already known.
+*     isjsa = int (Given)
+*        Is the JSA all-sky pixel grid being used? If so, an error is
+*        reported if there is significant disagreement between the
+*        detector positions implied by the RECEPPOS and FPLANEX/Y
+*        components of the ACSIS extension (otherwise, a mere warning is
+*        issued).
 *     moving = int* (Returned)
 *        Address of an int in which to return a flag indicating if the
 *        telescope is tracking a moving object. If so, the returned
@@ -192,11 +198,13 @@
 *     2-JUL-2009 (DSB):
 *        Add facility for adding extra columns to the output catalogue as
 *        specified by environment parameter EXTRACOLS.
+*     26-NOV-2013 (DSB):
+*        Add "isjsa" parameter.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2006,2007 Particle Physics and Astronomy Research Council.
-*     Copyright (C) 2008-2009 Science & Technology Facilities Council.
+*     Copyright (C) 2008-2013 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -244,7 +252,7 @@
 
 void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
                    int autogrid, int alignsys, Grp *detgrp, double par[ 7 ],
-                   int *moving, AstSkyFrame **skyframe, int *sparse,
+                   int isjsa, int *moving, AstSkyFrame **skyframe, int *sparse,
                    int *gottsys, int *status ){
 
 /* Local Variables */
@@ -376,7 +384,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
 /* Check that the detector sky positions implied by the RECEPPOS and FPLANEX/Y
    values in the file are consistent. Issue a warning message if not, but
    then continue. */
-      (void) smf_check_detpos( data, 1, status );
+      (void) smf_check_detpos( data, isjsa ? -1 : 1, status );
 
 /* Get some convenient pointers. */
       file = data->file;

@@ -20,8 +20,10 @@
 *        Pointer to the smfData structure holding the data to be
 *        checked.
 *     report = int (Given)
-*        If non-zero, then a warning message is reported if the RECEPPOS
-*        and FPLANEX/Y positions are not consustent.
+*        If greater than zero, then a warning message is reported if the
+*        RECEPPOS and FPLANEX/Y positions are not consistent. If less than
+*        zero, then an error is reported if the RECEPPOS and FPLANEX/Y
+*        positions are not consistent.
 *     status = int* (Given and Returned)
 *        Pointer to inherited status.
 
@@ -37,8 +39,8 @@
 *     the same again using the FPLANEX/Y values. It then finds the
 *     maximum discrepancy on the sky between the converted detector
 *     positions. If this discrepancy is more than 1 arc-second, a warning
-*     message is issued (if "report" is non-zero), and a zero value is
-*     returned as the function value. If the detector positions in the
+*     message or error is issued (if "report" is non-zero), and a zero value
+*     is returned as the function value. If the detector positions in the
 *     first time slice cannot be determined, subsequent time slices are
 *     checked until one is found that can be checked succesfully.
 
@@ -51,10 +53,12 @@
 *        Initial version.
 *     17-APR-2009 (DSB):
 *        Avoid problems caused by breaking out of time slice loop.
+*     25-NOV-2013 (DSB):
+*        Allow an error to be reported instead of a warning.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     Copyright (C) 2009,2013 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -86,6 +90,7 @@
 
 /* SMURF includes */
 #include "smurf_par.h"
+#include "smf_err.h"
 #include "smf.h"
 
 int smf_check_detpos( smfData *data, int report, int *status ){
@@ -217,18 +222,28 @@ int smf_check_detpos( smfData *data, int report, int *status ){
                      if( dist != AST__BAD && dist > max_dist ) max_dist = dist;
                   }
 
-/* If this distance is more than 1 arc-second, report a warning. */
+/* If this distance is more than 1 arc-second, report a warning or error. */
                   if( max_dist != VAL__MIND ) {
                      result = ( max_dist*AST__DR2D <= 1.0/3600 );
                      if( ! result && report ) {
                         smf_smfFile_msg( data->file, "FILE", 1, "<unknown file>" );
                         msgSetr( "MAX", (float)( max_dist*AST__DR2D*3600.0) );
                         msgSeti( "T", itime + 1 );
-                        msgOutif( MSG__QUIET, " ", "   WARNING: The detector "
-                                  "positions implied by the RECEPPOS and FPLANEX/Y "
-                                  "values within '^FILE' (time slice ^T) differ "
-                                  "by up to ^MAX arc-seconds.", status );
-                        msgBlank( status );
+
+                        if( report > 0 ) {
+                           msgOutif( MSG__QUIET, " ", "   WARNING: The detector "
+                                     "positions implied by the RECEPPOS and FPLANEX/Y "
+                                     "values within '^FILE' (time slice ^T) differ "
+                                     "by up to ^MAX arc-seconds.", status );
+                           msgBlank( status );
+
+                        } else if( *status == SAI__OK ) {
+                           *status = SMF__RCPPOS;
+                           errRep( " ", "The detector positions implied by "
+                                   "the RECEPPOS and FPLANEX/Y values within "
+                                   "'^FILE' (time slice ^T) differ by up "
+                                   "to ^MAX arc-seconds.", status );
+                        }
                      }
 
 /* Leave the time slice loop once a test has been completed succesfully. */

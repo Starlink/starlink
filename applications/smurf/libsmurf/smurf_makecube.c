@@ -1162,7 +1162,7 @@ void smurf_makecube( int *status ) {
    of "detgrp" if needed so that it always holds a list of detectors to be
    included (not excluded). */
    smf_cubegrid( igrp,  size, system, usedetpos, autogrid, alignsys,
-                 detgrp, spacerefwcs ? NULL : par, &moving, &oskyfrm,
+                 detgrp, spacerefwcs ? NULL : par, isjsa, &moving, &oskyfrm,
                  &sparse, &hastsys, status );
 
 /* If we have spatial reference WCS, use the SkyFrame from the spatial
