@@ -1,0 +1,2281 @@
+\documentclass[twoside,11pt]{article}
+%
+% NAOS - Finding Guide Stars for NAOMI.
+%
+% Copyright 2001  Starlink, CCLRC.
+%
+% A.C. Davenhall (Edinburgh), 24/10/00.
+%
+%------------------------------------------------------------------------------
+
+%
+% Set the NAOS and CURSA version numbers.
+%
+% Note that CURSAversion is the earliest version of CURSA which is
+% compatible with NAOSversion, which is not necessarily the latest version
+% of CURSA.
+
+\newcommand{\NAOSversion}{1.2~}
+\newcommand{\CURSAversion}{6.3~}
+
+%------------------------------------------------------------------------------
+
+% ? Specify used packages
+% \usepackage{graphicx}        %  Use this one for final production.
+% \usepackage[draft]{graphicx} %  Use this one for drafting.
+% ? End of specify used packages
+
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+
+% Define commands for displaying angles as sexagesimal hours and minutes
+% or degrees and minutes.
+
+\newcommand{\tmin}   {\mbox{$^{\rm m}\!\!.$}}
+\newcommand{\hm}[3] {$#1^{\rm h}\,#2\tmin#3$}
+\newcommand{\dm}[2] {$#1^{\circ}\,#2\raisebox{-0.5ex}{$^{'}$}$}
+\newcommand{\arcmin} {\raisebox{-0.5ex}{$^{'}$} }
+
+\newcommand{\arcsec} {$\hspace{-0.05em}\raisebox{-0.5ex}
+                     {$^{'\hspace{-0.1em}'}$}
+                     \hspace{-0.7em}.\hspace{-0.05em}$}
+\newcommand{\tsec}   {\mbox{$^{\rm s}\!\!.$}}
+\newcommand{\hms}[4] {$#1^{\rm h}\,#2^{\rm m}\,#3\tsec#4$}
+\newcommand{\dms}[4] {$#1^{\circ}\,#2\raisebox{-0.5ex}{$^{'}$}\,#3\arcsec#4$}
+
+%-----------------------------------------------------------------------------
+% ? Document identification
+% Fixed part
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocsource}    {sun\stardocnumber}
+\newcommand{\stardoccopyright} 
+{Copyright \copyright\ 2002 Council for the Central Laboratory of the Research Councils}
+
+% Variable part - replace [xxx] as appropriate.
+\newcommand{\stardocnumber}    {235.3}
+\newcommand{\stardocauthors}   {A.C.~Davenhall}
+\newcommand{\stardocdate}      {24 September 2002}
+\newcommand{\stardoctitle}     {NAOS --- \\ Finding NAOMI Guide Stars}
+\newcommand{\stardocversion}   {Version \NAOSversion}
+\newcommand{\stardocmanual}    {User's Manual}
+\newcommand{\stardocabstract}
+{Observations made with the NAOMI adaptive optics system on the
+William~Herschel Telescope (WHT) usually require a guide star located
+close to the target object being observed.  This manual describes how to
+find such guide stars.  It documents the NAOS package whose purpose is
+precisely to find suitable guide stars and also describes various related
+items of software.  Details of the potential guide stars are produced as
+tabular lists in text files, finding charts and tables in a format
+suitable for input into GAIA or CURSA.
+
+\begin{latexonly}
+\vspace{5mm}
+\end{latexonly}
+
+\begin{center}
+{\bf Who Should Read this Document?}
+\end{center}
+
+This document is aimed at astronomers who are planning to observe
+with the NAOMI adaptive optics system on the WHT and need to find guide
+stars for their target objects.}
+% ? End of document identification
+% -----------------------------------------------------------------------------
+
+% +
+%  Name:
+%     sun.tex
+%
+%  Purpose:
+%     Template for Starlink User Note (SUN) documents.
+%     Refer to SUN/199
+%
+%  Authors:
+%     AJC: A.J.Chipperfield (Starlink, RAL)
+%     BLY: M.J.Bly (Starlink, RAL)
+%     PWD: Peter W. Draper (Starlink, Durham University)
+%
+%  History:
+%     17-JAN-1996 (AJC):
+%        Original with hypertext macros, based on MDL plain originals.
+%     16-JUN-1997 (BLY):
+%        Adapted for LaTeX2e.
+%        Added picture commands.
+%     13-AUG-1998 (PWD):
+%        Converted for use with LaTeX2HTML version 98.2 and
+%        Star2HTML version 1.3.
+%      1-FEB-2000 (AJC):
+%        Add Copyright statement in LaTeX
+%     {Add further history here}
+%
+% -
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markboth{\stardocname}{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+% -----------------------------------------------------------------------------
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
+
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
+%
+%  Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  LaTeX2HTML to signify text it shouldn't process).
+%begin{latexonly}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+\newenvironment{latexonly}{}{}
+\newcommand{\latex}[1]{#1}
+\newcommand{\html}[1]{}
+\newcommand{\latexhtml}[2]{#1}
+\newcommand{\HTMLcode}[2][]{}
+
+%  Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\renewcommand{\_}{\texttt{\symbol{95}}}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Remove % on the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%end{latexonly}
+% -----------------------------------------------------------------------------
+% ? Document specific \newcommand or \newenvironment commands.
+% \input{/star/docs/sst.tex} 
+%+
+%  Name:
+%     SST.TEX
+
+%  Purpose:
+%     Define LaTeX commands for laying out Starlink routine descriptions.
+
+%  Language:
+%     LaTeX
+
+%  Type of Module:
+%     LaTeX data file.
+
+%  Description:
+%     This file defines LaTeX commands which allow routine documentation
+%     produced by the SST application PROLAT to be processed by LaTeX and
+%     by LaTeX2html. The contents of this file should be included in the
+%     source prior to any statements that make of the sst commnds.
+
+%  Notes:
+%     The style file html.sty provided with LaTeX2html needs to be used.
+%     This must be before this file.
+
+%  Authors:
+%     RFWS: R.F. Warren-Smith (STARLINK)
+%     PDRAPER: P.W. Draper (Starlink - Durham University)
+
+%  History:
+%     10-SEP-1990 (RFWS):
+%        Original version.
+%     10-SEP-1990 (RFWS):
+%        Added the implementation status section.
+%     12-SEP-1990 (RFWS):
+%        Added support for the usage section and adjusted various spacings.
+%     8-DEC-1994 (PDRAPER):
+%        Added support for simplified formatting using LaTeX2html.
+%     {enter_further_changes_here}
+
+%  Bugs:
+%     {note_any_bugs_here}
+
+%-
+
+%  Define length variables.
+\newlength{\sstbannerlength}
+\newlength{\sstcaptionlength}
+\newlength{\sstexampleslength}
+\newlength{\sstexampleswidth}
+
+%  Define a \tt font of the required size.
+\latex{\newfont{\ssttt}{cmtt10 scaled 1095}}
+\html{\newcommand{\ssttt}{\tt}}
+
+%  Define a command to produce a routine header, including its name,
+%  a purpose description and the rest of the routine's documentation.
+\newcommand{\sstroutine}[3]{
+   \goodbreak
+   \rule{\textwidth}{0.5mm}
+   \vspace{-7ex}
+   \newline
+   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
+   \setlength{\sstcaptionlength}{\textwidth}
+   \setlength{\sstexampleslength}{\textwidth}
+   \addtolength{\sstbannerlength}{0.5em}
+   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
+   \addtolength{\sstcaptionlength}{-5.0pt}
+   \settowidth{\sstexampleswidth}{{\bf Examples:}}
+   \addtolength{\sstexampleslength}{-\sstexampleswidth}
+   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
+   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
+   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
+   \begin{description}
+      #3
+   \end{description}
+}
+
+%  Format the description section.
+\newcommand{\sstdescription}[1]{\item[Description:] #1}
+
+%  Format the usage section.
+\newcommand{\sstusage}[1]{\item[Usage:] \mbox{}
+\\[1.3ex]{\raggedright \ssttt #1}}
+
+%  Format the invocation section.
+\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
+
+%  Format the arguments section.
+\newcommand{\sstarguments}[1]{
+   \item[Arguments:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the returned value section (for a function).
+\newcommand{\sstreturnedvalue}[1]{
+   \item[Returned Value:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the parameters section (for an application).
+\newcommand{\sstparameters}[1]{
+   \item[Parameters:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the examples section.
+\newcommand{\sstexamples}[1]{
+   \item[Examples:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Define the format of a subsection in a normal section.
+\newcommand{\sstsubsection}[1]{ \item[{#1}] \mbox{} \\}
+
+%  Define the format of a subsection in the examples section.
+\newcommand{\sstexamplesubsection}[2]{\sloppy
+\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \vspace{1.0ex}
+\\ #2 }
+
+%  Format the notes section.
+\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
+
+%  Provide a general-purpose format for additional (DIY) sections.
+\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}]
+\mbox{} \\[1.3ex] #2}
+
+%  Format the implementation status section.
+\newcommand{\sstimplementationstatus}[1]{
+   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
+
+%  Format the bugs section.
+\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
+
+%  Format a list of items while in paragraph mode.
+\newcommand{\sstitemlist}[1]{
+  \mbox{} \\
+  \vspace{-3.5ex}
+  \begin{itemize}
+     #1
+  \end{itemize}
+}
+
+%  Define the format of an item.
+\newcommand{\sstitem}{\item}
+
+%% Now define html equivalents of those already set. These are used by
+%  latex2html and are defined in the html.sty files.
+\begin{htmlonly}
+
+%  sstroutine.
+   \newcommand{\sstroutine}[3]{
+      \subsection{#1\xlabel{#1}-\label{#1}#2}
+      \begin{description}
+         #3
+      \end{description}
+   }
+
+%  sstdescription
+   \newcommand{\sstdescription}[1]{\item[Description:]
+      \begin{description}
+         #1
+      \end{description}
+      \\
+   }
+
+%  sstusage
+   \newcommand{\sstusage}[1]{\item[Usage:]
+      \begin{description}
+         {\ssttt #1}
+      \end{description}
+      \\
+   }
+
+%  sstinvocation
+   \newcommand{\sstinvocation}[1]{\item[Invocation:]
+      \begin{description}
+         {\ssttt #1}
+      \end{description}
+      \\
+   }
+
+%  sstarguments
+   \newcommand{\sstarguments}[1]{
+      \item[Arguments:] \\
+      \begin{description}
+         #1
+      \end{description}
+      \\
+   }
+
+%  sstreturnedvalue
+   \newcommand{\sstreturnedvalue}[1]{
+      \item[Returned Value:] \\
+      \begin{description}
+         #1
+      \end{description}
+      \\
+   }
+
+%  sstparameters
+   \newcommand{\sstparameters}[1]{
+      \item[Parameters:] \\
+      \begin{description}
+         #1
+      \end{description}
+      \\
+   }
+
+%  sstexamples
+   \newcommand{\sstexamples}[1]{
+      \item[Examples:] \\
+      \begin{description}
+         #1
+      \end{description}
+      \\
+   }
+
+%  sstsubsection
+   \newcommand{\sstsubsection}[1]{\item[{#1}]}
+
+%  sstexamplesubsection
+   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] #2}
+
+%  sstnotes
+   \newcommand{\sstnotes}[1]{\item[Notes:] #1 }
+
+%  sstdiytopic
+   \newcommand{\sstdiytopic}[2]{\item[{#1}] #2 }
+
+%  sstimplementationstatus
+   \newcommand{\sstimplementationstatus}[1]{
+      \item[Implementation Status:] #1
+   }
+
+%  sstitemlist
+   \newcommand{\sstitemlist}[1]{
+      \begin{itemize}
+         #1
+      \end{itemize}
+      \\
+   }
+%  sstitem
+   \newcommand{\sstitem}{\item}
+
+\end{htmlonly}
+
+%  End of "sst.tex" layout definitions.
+%.
+% ? End of document specific commands
+% -----------------------------------------------------------------------------
+%  Title Page.
+%  ===========
+\renewcommand{\thepage}{\roman{page}}
+\begin{document}
+\thispagestyle{empty}
+
+%  Latex document header.
+%  ======================
+\begin{latexonly}
+   CCLRC / \textsc{Rutherford Appleton Laboratory} \hfill \textbf{\stardocname}\\
+   {\large Particle Physics \& Astronomy Research Council}\\
+   {\large Starlink Project\\}
+   {\large \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+   {\Huge\textbf{\stardoctitle \\ [2.5ex]}}
+   {\LARGE\textbf{\stardocversion \\ [4ex]}}
+   {\Huge\textbf{\stardocmanual}}
+   \end{center}
+   \vspace{5mm}
+
+% ? Add picture here if required for the LaTeX version.
+%   e.g. \includegraphics[scale=0.3]{filename.ps}
+% ? End of picture
+
+% ? Heading for abstract if used.
+   \vspace{10mm}
+   \begin{center}
+      {\Large\textbf{Abstract}}
+   \end{center}
+% ? End of heading for abstract.
+\end{latexonly}
+
+%  HTML documentation header.
+%  ==========================
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1> \end{rawhtml}
+      \stardoctitle\\
+      \stardocversion\\
+      \stardocmanual
+   \begin{rawhtml} </H1> <HR> \end{rawhtml}
+
+% ? Add picture here if required for the hypertext version.
+%   e.g. \includegraphics[scale=0.7]{filename.ps}
+% ? End of picture
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory\ \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCLRC / Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk} \\
+      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
+                        {http://www.pparc.ac.uk} \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://www.starlink.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://www.starlink.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+%  HTML document table of contents. 
+%  ================================
+%  Add table of contents header and a navigation button to return to this 
+%  point in the document (this should always go before the abstract \section). 
+  \label{stardoccontents}
+  \begin{rawhtml} 
+    <HR>
+    <H2>Contents</H2>
+  \end{rawhtml}
+  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+        {stardoccontents}}
+
+% ? New section for abstract if used.
+  \section{\xlabel{abstract}Abstract}
+% ? End of new section for abstract
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+% ? Document Abstract. (if used)
+%  ==================
+\stardocabstract
+% ? End of document abstract
+
+% -----------------------------------------------------------------------------
+% ? Latex document Table of Contents (if used).
+%  ===========================================
+
+\newpage
+\begin{latexonly}
+\begin{center}
+{\Large\bf Quick Reference}
+\end{center}
+\end{latexonly}
+
+\begin{htmlonly}
+\section*{Quick Reference}
+\end{htmlonly}
+
+\subsection*{NAOS}
+
+\begin{enumerate}
+
+  \item To start NAOS type: {\tt naos}
+
+  \item To find potential guide stars for a list of targets:
+
+  \begin{quote}
+   {\tt naomiguidestars} {\it targets-list}
+  \end{quote}
+
+   where {\it targets-list}\/ is a text file containing a list of targets.
+   Details of the targets are entered one per line, and the format of each
+   line is:
+
+  \begin{quote}
+   $\alpha$ $\delta$ {\it name}
+  \end{quote}
+
+   $\alpha$\/ (Right Ascension) and $\delta$\/ (Declination) are mandatory;
+   {\it name}\/ is optional.  These items should be separated by one or
+   more spaces.
+
+  \item To find potential guide stars for a single object:
+
+  \begin{quote}
+   {\tt naomiremote query usno@eso} $\alpha$ $\delta$ {\it radius}
+  \end{quote}
+
+  \item Units and formats are as below.
+
+\end{enumerate} 
+
+\subsection*{GAIA}
+
+\begin{enumerate}
+
+  \item To start GAIA type: {\tt gaia \&}
+
+  \item To retrieve a two-dimensional image:
+
+  \begin{tabular}{l}
+   {\sf Data-Servers} \\
+   {\sf ~~~ Image Servers} \\
+   {\sf ~~~~~~ Digitized Sky at ESO} \\
+  \end{tabular}
+
+  \item To retrieve and overlay catalogue objects from the PMM:
+
+  \begin{tabular}{l}
+   {\sf Data-Servers} \\
+   {\sf ~~~ Catalogs} \\
+   {\sf ~~~~~~ USNO at ESO} \\
+  \end{tabular}
+
+  \item Units and formats are as below.
+
+\end{enumerate}
+
+\subsection*{Units and formats}
+
+\begin{description}
+
+  \item[$\alpha$] (Right Ascension): sexagesimal hours with a colon
+   (`:') as a separator, for example: {\tt 16:52:59}
+
+  \item[$\delta$] (Declination): sexagesimal degrees with a colon
+   (`:') as a separator, for example: {\tt 2:24:04}
+
+  \item[{\rm The Right Ascension and Declination}] should be for epoch
+   and equinox J2000.
+
+  \item[{\rm Height, width and radius:}] minutes of arc.
+
+\end{description}
+
+\newpage
+\section*{Accessing this document}
+
+A hypertext version of this document is available.  To access it on
+Starlink systems type:
+
+\begin{quote}
+{\tt showme ~ sun235}
+\end{quote}
+
+On non-Starlink systems access URL:
+
+\begin{quote}
+\htmladdnormallink{
+{\tt http://www.starlink.rl.ac.uk/star/docs/sun235.htx/sun235.html}}
+{http://www.starlink.rl.ac.uk/star/docs/sun235.htx/sun235.html}
+\end{quote}
+
+Paper copies can be obtained from the Starlink document librarian,
+who can be contacted as follows.
+
+Postal address: \\
+\begin{tabular}{l}
+The Document Librarian. Starlink Project, Rutherford Appleton Laboratory, 
+  Chilton, \\
+DIDCOT, Oxfordshire, OX11 0QX, United Kingdom.                \\
+\end{tabular}
+
+% \vspace{3mm}
+
+Electronic mail: {\tt ussc@star.rl.ac.uk}
+
+
+% \vspace{3mm}
+
+Fax: \\
+\begin{tabular}{lr}
+from within the United Kingdom: &    01235-445-848 \\
+from overseas:                  & +44-1235-445-848 \\
+\end{tabular}
+
+
+\section*{Obtaining assistance}
+
+Though NAOS is a separate package, it is closely related to the CURSA
+package for manipulating astronomical catalogues and tables.  Consequently,
+bugs in NAOS are reported in the same way as those in CURSA; they should
+always be sent to username {\tt cursa@star.rl.ac.uk}.  However, you are
+welcome to contact me for advice and assistance.  Details of how to do so
+are given below.
+
+Postal address: \\
+\begin{tabular}{l}
+A.C.~Davenhall.  Institute for Astronomy, Royal Observatory, Blackford
+Hill, \\
+Edinburgh, EH9 3HJ, United Kingdom.  \\
+\end{tabular}
+
+% \vspace{4mm}
+
+Electronic mail: {\tt acd@roe.ac.uk}
+
+% \vspace{4mm}
+Fax: \\
+\begin{tabular}{lr}
+from within the United Kingdom: &    0131-668-8416 \\
+from overseas:                  & +44-131-668-8416 \\
+\end{tabular}
+
+% ? Latex Copyright Statement
+\vspace*{\fill}
+\stardoccopyright
+
+\newpage
+\section*{Revision history}
+
+\begin{enumerate}
+
+  \item 5th March 2001: Version 1. Original version (ACD).
+
+  \item 5th June 2001: Version 2. Modified for release 1.1 of the NAOS
+   package.  The changes in version 1.1 are mostly for compatibility
+   with CURSA version 6.3 and are not visible to the user.  However,
+   each finding chart now includes the name of the target object as a
+   title (ACD).
+
+  \item 24th September 2002: Version 3. Modified for release 1.2 of the
+   NAOS package.  In this release the software is unchanged, but there are
+   some minor corrections to the documentation (ACD).
+
+\end{enumerate}
+
+\cleardoublepage
+\begin{latexonly}
+  \setlength{\parskip}{0mm}
+  \tableofcontents
+
+  \newpage
+  \listoffigures
+  \listoftables
+
+  \setlength{\parskip}{\medskipamount}
+  \markboth{\stardocname}{\stardocname}
+\end{latexonly}
+% ? End of Latex document table of contents
+% -----------------------------------------------------------------------------
+
+\cleardoublepage
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
+
+\section{\xlabel{INTRO}\label{INTRO}Introduction}
+
+Observations made with the \htmladdnormallinkfoot{NAOMI}
+{http://www.roe.ac.uk/acdwww/naomi/index.html}
+adaptive optics system on the William~Herschel Telescope (WHT) on La Palma
+usually require a guide star located close to the target object being
+observed.  This manual describes how to find such guide stars.  It
+documents the NAOS\footnote{NAOS is the common name for $\zeta$ Puppis.
+It is simply the transliteration of the Greek for `ship' and its use
+as a star name is relatively recent, originating in a Renaissance text
+which referred to the Ptolemaic constellation of Argo in this way.  These
+details come from a {\it Short Guide to Modern Star Names and Their
+Derivations} by P.~Kunitzsch and T.~Smart\cite{KUNITZSCH86}. (In
+modern nomenclature Argo has been dismantled in Puppis, Carina, Vela and
+Pyxis.)} (NAOMI Stars) package whose purpose is precisely to find suitable
+guide stars and also describes various related items of software.
+You will normally prepare a list of guide stars at your home institution
+prior to travelling to La Palma to use the WHT.  Indeed, the availability
+of suitable guide stars will be one factor which determines whether a
+given potential target object can be observed with NAOMI.
+
+The characteristics required of guide stars are that they should be within
+a given magnitude range and close to the target object; Section~\ref{CHARACT}
+gives the details.  The procedure to find guide stars is to search a
+reference catalogue to locate stars close to the target object which also
+lie in the permitted magnitude range.  A bright guide star is better than
+a faint one.  Also, it is better to have a guide star close to the target
+than one further away.  However, if searching the reference catalogue
+yields several potential guide stars then it usually best to retain all of
+them as possibilities for your observing run.  The acceptable separation
+between target object and guide star varies with meteorological conditions
+and thus the final choice of guide stars is best made at the telescope.
+
+Note that NAOMI can be used in a `self referencing' mode where the
+target object itself takes the r\^{o}le of guide star.  This mode is
+not considered here.
+
+The structure of the document is as follows:
+
+\begin{description}
+
+  \item[{\rm Part I}] -- tutorial examples,
+
+  \item[{\rm Part II}] -- reference material.
+
+\end{description}
+
+Part I comprises a series of worked examples corresponding to the
+tasks that you will usually follow to find guide stars.  Part II gives
+a more complete description of NAOS, and in particular the script
+{\tt naomiguidestars}.  
+The usual method of working is to have a list of potential targets and
+to attempt to find guide stars for them (Section~\ref{LIST}).
+Alternatively, for single target objects more flexible approaches
+are possible (Sections~\ref{SINGLE} and \ref{GAIA}).  Once suitable guide
+stars have been found it is possible to produce finding charts and lists
+as aids to identifying them at the telescope.
+
+\subsection{Software}
+
+NAOS comprises two Perl scripts.  The scripts require version \CURSAversion
+or higher of CURSA (see \xref{SUN/190}{sun190}{}\cite{SUN190}) to be
+installed on your system.  Guide stars can also be found with GAIA (see
+\xref{SUN/214}{sun214}{}\cite{SUN214}).  NAOS, CURSA and GAIA are available
+on all the versions of Unix supported by Starlink: Compaq Alpha/Tru64,
+Sun/Solaris and PC/Linux.
+
+\subsection{\label{CATALOG}Catalogues}
+
+The catalogue currently recommended for providing guide stars is the
+PMM astrometric catalogue compiled by the 
+\htmladdnormallinkfoot{USNO}{http://www.nofs.navy.mil/}, Flagstaff\cite{PMM}.  
+NAOS and GAIA access the version of it provided by ESO remotely via the
+Internet.
+
+\section{\xlabel{CHARACT}\label{CHARACT}Characteristics of Guide Stars}
+
+Guide stars need to lie within a limited separation from their target
+objects and also to be within a given magnitude range.  The requirements
+are summarised in Table~\ref{GSCHARACT}.
+
+\begin{table}[htbp]
+
+\begin{center}
+\begin{tabular}{lc}
+Criterion                           &  Value \\ \hline
+Faint limit (V magnitude)           & 14.5   \\
+Maximum separation (seconds of arc) & 85     \\
+\end{tabular}
+\end{center}
+
+\begin{quote}
+\caption[Summary of guide star characteristics]{Summary of characteristics
+required for guide stars.  The separation is the angular distance between
+the target object and guide star.
+\label{GSCHARACT} }
+\end{quote}
+
+\end{table}
+
+Though guide stars down to a V magnitude of 14.5 can be used, better
+results will be obtained with guide stars brighter than magnitude 12.0.
+There is no bright limit to the range of magnitudes which can be observed;
+if necessary neutral-density filters can be used.  The maximum permissible
+separation between target and guide star varies slightly with wavelength.  
+However, for the purpose of selecting guide stars, a maximum separation
+of 85" is adequate for observations at all the infra-red wavelengths at
+which NAOMI will be used.  Also, there is no simple threshold distance below
+which the adaptive optics corrections `work' and above which they do not.
+Rather, the compensation for atmospheric effects degrades with increasing
+separation.  The value quoted in Table~\ref{GSCHARACT} is adequate to
+achieve satisfactory compensation under typical meteorological conditions
+above the La~Palma site
+
+An additional consideration is that when NAOMI is providing adaptive
+optics corrections for observations made with the infra-red camera
+\htmladdnormallinkfoot{INGRID}
+{http://www.ing.iac.es/Astronomy/instruments/ingrid/index.html},
+flat-field calibrations are usually made by `dithering'.  This process
+involves shifting the field of view by about 6" in either direction of
+either axis.  Either the guide star or the direction of dithering should be
+chosen such that dithering does not take the guide star out of the field of
+view.
+
+% - Part I ------------------------------------------------------------
+\cleardoublepage
+\markboth{\stardocname}{\stardocname}
+\part{Tutorial Examples}
+\markboth{\stardocname}{\stardocname}
+\section{\xlabel{START}\label{START}Getting Started}
+
+\begin{center}
+{\bf Note that NAOS \NAOSversion requires CURSA version \CURSAversion or
+higher.}
+\end{center}
+
+No special quotas or privileges are required to run NAOS, though obviously
+you need enough disk space to accommodate the various files that it
+creates.  NAOS and GAIA access the USNO PMM catalogue (and others)
+via the Internet.  The remote access procedure uses the Web protocols.
+Consequently, you must run NAOS and GAIA on a computer connected to the
+Internet and configured for Web access.
+
+Both NAOS and CURSA are optional Starlink software items. Before proceeding
+you should check with your local site manager whether they are installed
+at your site, and if not attempt to persuade him to install them.  If they
+are installed at your site the following directories should exist:
+
+\begin{quote}
+{\tt /star/bin/naos  \\
+/star/bin/cursa}
+\end{quote}
+
+The procedure to set up for using NAOS is the same on all the variants
+of Unix supported by Starlink. Simply type:
+
+\begin{quote}
+{\tt naos}
+\end{quote}
+
+The following message should appear:
+
+\begin{quote}
+{\tt NAOS commands are now available -- (version 1.2).}
+\end{quote}
+
+If it does not, then the probable cause is that either NAOS or CURSA is not
+installed correctly at your site; check with your local site manager.
+
+Note that though NAOS requires CURSA to be available it is not necessary
+to explicitly set up for running CURSA prior to setting up for NAOS.
+Conversely, explicitly setting up for using CURSA prior to setting up NAOS
+does no harm.
+
+\subsection{Example files}
+
+The various example files mentioned in this document are available in
+directory:
+
+\begin{quote}
+{\tt /star/examples/naos}
+\end{quote}
+
+
+\newpage
+\section{\xlabel{LIST}\label{LIST}Finding Guide Stars for a List of Targets:
+Simple Example}
+
+Usually you will have a list of potential target objects for which you
+want to try to find guide stars.  NAOS provides the script {\tt
+naomiguidestars} for this task.  It is suitable for lists of up to a few
+hundred target objects, but not for very large lists.  Potential guide
+stars are selected from the version of the USNO PMM catalogue\cite{PMM}
+at ESO.
+
+{\tt naomiguidestars} has a number of modes of operation.  In the simplest,
+which is described in this example, it is given a list of target objects
+and it produces a report and finding charts for them.  Additional options,
+are described in Section~\ref{ADDOPT}, below.  The alternatives include
+initially just using {\tt naomiguidestars} to generate tables of
+potential guide stars, and subsequently using it to generate finding charts
+from these tables locally, without further access to the remote catalogue.
+Part II includes a more detailed description of {\tt naomiguidestars}.
+
+Proceed as follows.
+
+\begin{enumerate}
+
+  \item The first step is to create a text file containing the coordinates,
+   and optionally names, of your potential targets.  Figure~\ref{TARGETS}
+   shows an example targets file.  It is available as file {\tt
+   targets.lis}.  The format is more-or-less self-explanatory.  However,
+   for completeness a description follows.
+
+\begin{figure}[htbp]
+
+\begin{quote}
+\begin{verbatim}
+16:52:59  2:24:04   NGC 6240
+20:07:55  18:42:57  IRAS 20056+1834
+19:34:45  30:30:59  BD +30 3639
+10:47:50  12:34:57  NGC 3379
+14:40:38  53:30:16
+14:19:50 -19:28:26  PKS 1417-19
+\end{verbatim}
+\end{quote}
+
+\caption{Example file of targets \label{TARGETS} }
+
+\end{figure}
+
+   Each target occupies a single line of the file.  Blank lines are not
+   permitted; every line must contain a target.  Each line should
+   comprise (in the order given): a Right Ascension, Declination and
+   optionally a name.  These items should be separated by one or more
+   spaces.  The Right Ascension and Declination should be for epoch and
+   equinox J2000.  Their units and formats are:
+
+  \begin{description}
+
+    \item[{\rm Right Ascension:}] sexagesimal hours with a colon (`:')
+     as the separator,
+
+    \item[{\rm Declination:}] sexagesimal degrees with a colon (`:')
+     as the separator.
+
+  \end{description}
+
+   Any characters after the Declination are considered part of the optional
+   object name.  If supplied, the name will be used in the report
+   generated.  If you have coordinates for your targets for some epoch
+   and equinox other than J2000 then you need to convert them to J2000
+   prior to assembling the file.  \xref{COCO}{sun56}{}\cite{SUN56} is
+   available for this purpose.  Alternatively, if your potential targets are
+   in the form of a \xref{CURSA}{sun190}{}\cite{SUN190} catalogue then CURSA
+   application {\tt catcoord} can be used.  If you have a target for which
+   you know the name but not the coordinates then it may be possible to look
+   up the coordinates automatically; see Section~\ref{NAME} for details.
+
+  \item Set up NAOS.  Type:
+
+  \begin{quote}
+   {\tt naos}
+  \end{quote}
+
+  \item To find guide stars for all the targets in your list simply type:
+
+  \begin{quote}
+   {\tt naomiguidestars} ~ {\it file-of-targets}
+  \end{quote}
+
+   For example, to process the example list {\tt targets.lis}:
+
+  \begin{quote}
+   {\tt naomiguidestars ~ targets.lis}
+  \end{quote}
+
+   If you omit the file name it will be prompted for.  The script will
+   work through the list, reporting each target as it is processed.  For
+   every target for which some potential guide stars were found a table
+   of these stars and a finding chart are produced.  A log file and
+   report file are also generated.  The names of these latter two files
+   are reported when {\tt naomiguidestars} terminates; they are derived
+   from the name of the file of targets.  The various output files are
+   described in Section~\ref{OUTFILE}, below.  Note that the report file
+   is quite wide and the most convenient way to print it is to use the
+   \xref{{\tt a2ps}}{sun184}{} utility\cite{SUN184} with the wide file
+   option.  For example, to print report {\tt targets.report} on the
+   default (postscript) printer:
+
+  \begin{quote}
+   {\tt a2ps -nn -w targets.report | lp}
+  \end{quote}
+
+\end{enumerate}
+
+\subsection{Tidying up after misadventure}
+
+If {\tt naomiguidestars} aborts due to some misadventure then various
+temporary files might be left in your current directory.  You must delete
+these files manually.  You will not be able to run {\tt naomiguidestars}
+successfully again until you have done so.  The files which might be
+created are:
+
+\begin{quote}
+{\tt temp*       \\
+catpair.script   \\
+catselect.script \\
+catview.script}
+\end{quote}
+
+where `{\tt *}' is a `wild-card' indicating several files.
+
+\subsection{\label{NAME}Obtaining the coordinates of a named object}
+
+If you have a target for which you know the name but not the coordinates,
+it might be possible to obtain them using {\tt naomiremote}.  Type:
+
+\begin{quote}
+{\tt naomiremote name simbad\_ns@eso} {\it object-name}
+\end{quote}
+
+Object names should be entered without spaces.  The case of letters
+(upper or lower) is not significant.  Some examples are:
+
+\begin{quote}
+{\tt naomiremote name simbad\_ns@eso ngc6240   \\
+naomiremote name simbad\_ns@eso iras20056+1834 \\
+naomiremote name simbad\_ns@eso bd+303639 \\
+naomiremote name simbad\_ns@eso pks1417-19 \\
+naomiremote name simbad\_ns@eso mkn477}
+\end{quote}
+
+If the name is recognised then the Right Ascension and Declination of the
+object are displayed (the Right Ascension is in hours, the Declination is
+in degrees and both are for epoch and equinox J2000).  {\tt naomiremote}
+is invoking the version of the
+\htmladdnormallinkfoot{SIMBAD}{http://simbad.u-strasbg.fr/Simbad}
+name-resolver provided by ESO (the basic SIMBAD is maintained by the
+\htmladdnormallink{Centre de Donn\'{e}es astronomiques de Strasbourg}
+{http://cdsweb.u-strasbg.fr/CDS.html}, CDS).  The technique only works
+if the name is recognised by SIMBAD.
+
+\newpage
+\section{\xlabel{ADDOPT}\label{ADDOPT}Finding Guide Stars for a List of
+Targets: Additional Options}
+
+By default {\tt naomiguidestars} searches the remote USNO PMM catalogue
+for potential guide stars, applies defaults for the faint magnitude limit
+and maximum separation corresponding to the values in Table~\ref{GSCHARACT},
+and produces a table of potential guide stars and finding chart for each
+target object.  However, it is possible to modify its behaviour to suit
+your purposes.
+
+\subsection{Specifying the maximum separation}
+
+To specify the maximum permissible separation between the target object and
+guide star, simply include the required value as an additional argument on
+the command line, after the name of the file of targets.  For example:
+
+\begin{quote}
+{\tt naomiguidestars ~ targets.lis ~ 2}
+\end{quote}
+
+The value should be given in minutes of arc.
+
+\subsection{Specifying the magnitude limits}
+
+In addition to the faint limit given in Table~\ref{GSCHARACT}, {\tt
+naomiguidestars} also applies a default bright magnitude limit of 0 V
+magnitude, though this will have little effect in practice.  The bright
+and faint magnitude limits are specified by the Unix shell environment
+variables {\tt NAOMI\_BRIGHT} and {\tt NAOMI\_FAINT}, respectively.  The
+values required should be set prior to invoking {\tt naomiguidestars}.  For
+example (assuming you are using either the {\tt c} or {\tt tc} shell):
+
+\begin{quote}
+{\tt setenv ~ NAOMI\_BRIGHT ~  8 \\
+setenv ~ NAOMI\_FAINT       ~  16}
+\end{quote}
+
+to set the limits to V magnitudes 8 and 16, respectively.  The environment
+variables used by {\tt naomiguidestars} are fully described in
+Section~\ref{ENVIR}, below.  Then simply run {\tt naomiguidestars} as
+usual, for example:
+
+\begin{quote}
+{\tt naomiguidestars ~ targets.lis}
+\end{quote}
+
+\subsection{\label{REPROC_T}Reprocessing existing tables}
+
+By default, for each object in a list of targets, {\tt naomiguidestars}
+queries the remote catalogue, creates a table of all the potential guide
+stars within the specified separation from the target and produces a
+finding chart.  However, it is possible to configure it so that it
+reprocesses tables of potential guide stars which were created in a
+previous run rather than querying the remote catalogue.  The advantage
+of this option is that usually it is quicker to reprocess existing
+tables than to re-query the remote catalogue.  This option allows you
+to, for example, reprocess existing tables with different magnitude limits.
+% {\sf or maximum separation from the target (though obviously the new
+% maximum separation must be less than that originally used to generate
+% the tables).}
+
+On the first run of {\tt naomiguidestars} you might just generate the
+tables of potential guide stars and only create finding charts on subsequent
+runs.  Suppose that you were using the example list of targets, {\tt
+targets.lis}, then you would proceed as follows.
+
+\begin{enumerate}
+
+  \item First set environment {\tt NAOMI\_KEEPFND} to indicate that
+   finding charts are not to be retained:
+
+  \begin{quote}
+   {\tt setenv ~ NAOMI\_KEEPFND ~  no}
+  \end{quote}
+
+   The environment variables used by {\tt naomiguidestars} are described
+   fully in Section~\ref{ENVIR}, below.  Then run {\tt naomiguidestars}
+   to generate the tables of potential guide stars for each target:
+
+  \begin{quote}
+   {\tt naomiguidestars ~ targets.lis}
+  \end{quote}
+
+   In addition the log file {\tt targets.log} and report file {\tt
+   targets.report} will be created.
+
+  \item Set the bright and faint magnitude limits to be used in the
+   finding charts and specify that finding charts are to be produced:
+
+  \begin{quote}
+   {\tt setenv ~ NAOMI\_BRIGHT ~  8 \\
+   setenv ~ NAOMI\_FAINT       ~  16 \\
+   setenv ~ NAOMI\_KEEPFND ~  yes}
+  \end{quote}
+
+   Here the bright and faint limits are set to V magnitudes 8 and 16,
+   respectively.  Note that the tables generated by {\tt naomiguidestars}
+   include all the objects in the catalogue which lie in the specified
+   region of sky, irrespective of their brightness.  Thus, the tables can
+   be reprocessed using bright and faint limits which are respectively
+   brighter and fainter than the originals, without any danger of losing
+   stars.
+
+  \item Finally, re-run {\tt naomiguidestars} using {\it the log file
+   produced by the previous run as the list of targets:}
+
+  \begin{quote}
+   {\tt naomiguidestars ~ targets.log}
+  \end{quote}
+
+   The log file includes the file-names of the tables of potential guide
+   stars produced in the previous run and these are used in preference
+   to querying the remote catalogue.  The format of the input file for
+   {\tt naomiguidestars} is fully described in Section~\ref{INFILE}.
+   Also note that when {\tt naomiguidestars} queries the remote catalogue
+   and finds that there are no stars within the specified separation
+   from the target then no table of potential guide stars is created and
+   there is no entry for the target in the log file.
+
+\end{enumerate}
+
+
+\newpage
+\section{\xlabel{SINGLE}\label{SINGLE}Finding Guide Stars for a Single Target}
+
+The simplest way of finding guide stars for a single target is to use
+the procedure described in Section~\ref{LIST}, above, for multiple
+guide stars, but to simply have a list with one entry.  However, it is also
+possible to use script {\tt naomiremote}, which allows greater flexibility.
+{\tt naomiremote} simply generates a table of objects within a given
+separation of the target.  This catalogue can then be imported into GAIA
+(see \xref{SUN/214}{sun214}{}\cite{SUN214}) and overlaid on an image which
+has suitable WCS (World Coordinate System) information, or manipulated with
+CURSA (see \xref{SUN/190}{sun190}{}\cite{SUN190}), for example to produce a
+finding chart.
+
+First set up for running the NAOS.  Type:
+
+\begin{quote}
+{\tt naos}
+\end{quote}
+
+The simplest sort of query finds all the objects in the catalogue
+within a given radius of the target coordinate.  Type:
+
+\begin{quote}
+{\tt naomiremote query usno@eso} {\it $\alpha$ $\delta$ radius}
+\end{quote}
+
+For example:
+
+\begin{quote}
+{\tt naomiremote query usno@eso 16:52:59 ~ 2:24:04 ~ 2}
+\end{quote}
+
+All the arguments except the first (`{\tt query}') can be omitted and will
+be prompted for.  `{\tt usno@eso}' is the name of the catalogue.  The
+Right Ascension ($\alpha$) and Declination ($\delta$) should be for epoch and equinox J2000.
+Their units and formats are:
+
+\begin{description}
+
+  \item[{\rm Right Ascension ($\alpha$):}] sexagesimal hours with a colon
+   (`:') as the separator,
+
+  \item[{\rm Declination($\delta$):}] sexagesimal degrees with a colon (`:')
+   as the separator.
+
+\end{description}
+
+The radius should be specified in minutes of arc.  It is also possible to
+retrieve only objects in the given region of sky which are brighter than
+a specified V magnitude.  Type:
+
+\begin{quote}
+{\tt naomiremote query usno@eso} {\it $\alpha$ $\delta$ radius faint-limit}
+\end{quote}
+
+For example:
+
+\begin{quote}
+{\tt naomiremote query usno@eso 16:52:59 ~ 2:24:04 ~ 2 ~ 15}
+\end{quote}
+
+will return only objects brighter than V magnitude 15.  The magnitude
+limit is a `hidden' parameter which is never prompted for.  Hence if it
+is to be specified all the arguments must be included on the command
+line.  A final option is to return only objects in the given region
+which are within a specified V magnitude range.  Type:
+
+\begin{center}
+{\tt naomiremote query usno@eso} {\it $\alpha$ $\delta$ radius
+bright-limit,faint-limit}
+\end{center}
+
+For example:
+
+\begin{quote}
+{\tt naomiremote query usno@eso 16:52:59 ~ 2:24:04 ~ 2 ~ 13,15}
+\end{quote}
+
+will return only objects in the V magnitude range 13 to 15.  Note that
+the magnitude range must be supplied as shown: a single comma with no spaces
+separating the bright and faint limits.  Again the magnitude range is a
+hidden parameter which is never prompted for and hence all the arguments
+must be included on the command line.
+
+\subsection{Plotting finding charts}
+
+A finding chart of the retrieved table can be plotted with CURSA.  Note
+that CURSA version \CURSAversion or higher is required.  Use applications:
+
+\begin{quote}
+{\tt catchartrn  \\
+catchart}
+\end{quote}
+
+{\tt catchartrn} requires a `graphics translation file' to prescribe how
+stars are to be plotted.  A suitable one is provided as file {\tt
+usno.grt}.  It shows stars brighter than magnitude 14.5 as filled circles
+and fainter ones as open circles.  If you wish to use a different limit
+you will need to edit the file.
+
+\subsection{Using a different catalogue}
+
+\begin{quote}
+{\bf Note that though {\tt naomiremote} can use several catalogues,
+{\tt naomiguidestars} must use the ESO version of the USNO PMM.}
+\end{quote}
+
+The USNO PMM catalogue\cite{PMM} is currently recommended for selecting
+guide stars for NAOMI.  However, it is also possible to use the HST {\it
+Guide Star Catalog}\/ (GSC).  Simply give `{\tt gsc@lei}' as the name of
+the catalogue.  For example:
+
+\begin{quote}
+{\tt naomiremote query gsc@lei 16:52:59 ~ 2:24:04 ~ 2}
+\end{quote}
+
+Here the version of the GSC available in the 
+\htmladdnormallinkfoot{LEDAS}{http://ledas-www.star.le.ac.uk/}
+service provided by the Department of Physics and Astronomy, University of
+Leicester is being used.  If you wish to use CURSA to plot the retrieved
+table as a finding chart then the graphics translation file {\tt usno.grt}
+cannot be used because the column names are different.  File {\tt gsc.grt}
+is provided instead.
+
+% {\sf Add details of the SuperCOSMOS catalogues when they are finalised.}
+
+
+\newpage
+\section{\xlabel{GAIA}\label{GAIA}Finding Guide Stars with GAIA}
+
+This section describes how to use GAIA (see
+\xref{SUN/214}{sun214}{}\cite{SUN214}) to find guide stars.  Before
+starting the search for guide stars you need to decide the acceptable
+magnitude range and separation from the target object (see
+Section~\ref{CHARACT} and Table~\ref{GSCHARACT}).  The recommended values
+of, respectively, a faint V magnitude limit of 14.5 and a separation of 85",
+are usually adequate and will be adopted here.  The example will assume
+that the galaxy NGC 6240 is to be observed.  Its J2000 coordinates are:
+
+\begin{center}
+% $\alpha = 16:52:58.8, ~~ \delta = +02:24:04$ \\
+$\alpha =$ \hms{16}{52}{58}{8}, ~~ $\delta =$ \dms{+02}{24}{04}{0}
+\end{center}
+
+In this example an image of the target object will be retrieved from
+the on-line version of the DSS (Digitised Sky Survey) at ESO.  However,
+you could substitute your own alternative image, held as a local file,
+if you so prefer.  It would, however, have to contain appropriate WCS
+(World Coordinate System) header information.  Proceed as follows.
+
+\begin{enumerate}
+
+  \item If the coordinates of your target are not for epoch and equinox
+   J2000 then you should convert them to this system.  COCO (see
+   SUN/56\cite{SUN56}) is available for this purpose.  Though the target
+   coordinates can be converted within GAIA it is probably better to
+   convert them prior to starting it.
+
+  \item Ensure that your terminal or workstation is configured to
+   receive X-output.
+
+  \item Start GAIA.  Type:
+
+  \begin{quote}
+   {\tt gaia \&}
+  \end{quote}
+
+   The ampersand (`{\tt \&}') is simply to run GAIA as a detached process,
+   so that you can continue to issue Unix commands from the command line.
+   A window displaying a start-up message should be displayed, shortly
+   followed by the main GAIA window.  If these windows do not appear then
+   GAIA is not properly installed at your site; in the first instance
+   seek assistance from your site manager.
+
+  \item The first step is to retrieve a two-dimensional image of the
+   region of sky containing your target object.  Click on the {\sf
+   Data-Servers} menu, located towards the right of the menu bar at the
+   top of the main window.  Choose the {\sf Image Servers} option and
+   then {\sf Digitized Sky at ESO} from amongst the list of servers (it
+   will probably be the only choice).  If the {\sf Digitized Sky at ESO}
+   is not amongst the choices offered then see
+   Section~\ref{RESTORE_CONFIG}, below.
+
+   A window titled {\sf Digitized Sky at ESO (1)} should appear; it allows
+   you to specify the region of sky to be retrieved.
+
+  \begin{itemize}
+
+    \item You can simply enter the name of your target object in the {\sf
+     Object Name:} box, if you know it.  GAIA will attempt to resolve
+     the name of the object and look up its coordinates.
+
+    \item However, you are more likely to enter the coordinates
+     directly.  The units and formats required are:
+
+    \begin{description}
+
+      \item[$\alpha$] (Right Ascension): sexagesimal hours with a colon
+       (`:') as a separator,
+
+      \item[$\delta$] (Declination): sexagesimal degrees with a colon
+       (`:') as a separator.
+
+    \end{description}
+
+     In the present example the values required are:
+
+    \begin{description}
+
+      \item[$\alpha${\rm :}] {\tt 16:52:59}
+
+      \item[$\delta${\rm :}] {\tt 2:24:04}
+
+    \end{description}
+
+    \item You also need to specify the height and width of the region to
+     be retrieved.  These values are specified in minutes of arc.  In the
+     present example the radius required is 85".  Doubled (width and
+     height are twice the radius) and rounded up the value required is 2.9
+     minutes of arc.
+
+  \end{itemize}
+
+   When the values are set click on the {\sf Get Image} button.  After
+   a few moments the retrieved image should be displayed in the main
+   GAIA window.  Click on {\sf Close} to close the {\sf Digitized Sky
+   at ESO (1)} window.
+
+  \item You may wish to save the retrieved image as a file for future
+   use.  Click on the {\sf File} menu (the leftmost item in the menu bar
+   along the top of the main window) and choose the {\sf Save as\ldots}
+   item.  A window allowing you to save the image as a file will appear.
+   The file will be written in FITS format.
+
+  \item You may wish to adjust the appearance of the displayed image.
+   The most likely items to change are {\sf Colors\ldots} and {\sf
+   Magnification} in the {\sf View} menu (second from the left in the
+   menu bar along the top of the window).  The present example looks
+   better if the magnification is set to {\sf x4}.
+
+  \item To select objects from the PMM catalogue and overlay them on the
+   image, again click on the {\sf Data-Servers} menu, towards the right of
+   the menu bar at the top of the main window.  Choose the {\sf Catalogs}
+   option and then {\sf USNO at ESO} from amongst the list of catalogues
+   (it will probably be towards the bottom of the list).  If {\sf USNO at
+   ESO} is not amongst the choices offered then see
+   Section~\ref{RESTORE_CONFIG}, below.
+
+   A window titled {\sf USNO at ESO (1)} should appear; it allows you
+   to retrieve objects from the catalogue.  The central position and
+   search radius should be already filled in (the values have been obtained
+   from the two-dimensional image).  Set the magnitude limits by putting
+   values in the appropriate box.  You may also wish to restrict the radius
+   (the suggested maximum separation of 85 seconds of arc is about 1.4
+   minutes of arc):
+
+  \begin{center}
+  \begin{tabular}{ll}
+   {\sf Max Radius:}      & 1.4 \\
+   {\sf Brightest (min):} & 0 \\
+   {\sf Faintest (max):}  & 14.5 \\
+  \end{tabular}
+  \end{center}
+
+   Then simply click on the {\sf Search} button (in the bottom left of the
+   window).  After a couple of moments the selected objects are listed
+   in the {\sf Search Results} box and overlaid on the on the image in
+   the main window.  Visual inspection of the overlays should allow you
+   to decide which objects will make suitable guide stars.  In the example
+   a single object, U0900\_09058900, is selected.  If you apply no magnitude
+   limits then nineteen objects will be selected, but most of them will be
+   too faint for use with NAOMI.
+
+   A useful feature for identifying objects in the list with the
+   corresponding plotted symbol is that if you position the cursor over 
+   either a plot symbol or a row in the table and click with the left
+   mouse button the corresponding row and plot symbol are highlighted.
+
+   To save the selected objects as a text file click on the {\sf File}
+   menu in the {\sf USNO at ESO (1)} window (the leftmost item in its
+   menu bar) and choose either {\sf Save as\ldots} or {\sf Print\ldots}.
+   In both cases a window will appear which allows you to save the list.
+   Note that though both options produce text files they are in different
+   formats.  When you have finished click the {\sf Close} button to close
+   the {\sf USNO at ESO (1)} window.
+
+  \item To close GAIA click on the {\sf File} menu (the leftmost item in
+   the menu bar along the top of the main window) and choose the {\sf
+   Exit} option.
+
+\end{enumerate}
+
+\subsection{\label{RESTORE_CONFIG}Restoring catalogue access}
+
+It is possible to configure the set of catalogues and sky surveys which
+GAIA can access, though the details are not germane here.  However, if
+the {\sf Digitized Sky at ESO} survey or {\sf USNO at ESO} catalogue do
+not appear in the lists of {\sf Image Servers} and {\sf Catalogs}
+respectively then the most likely reason is that the default list of
+catalogues and surveys has been substituted with one which does not
+include them.  The simplest way to restore access is to revert to using
+the default list.  GAIA configuration files are kept in subdirectory {\tt
+.skycat} of your top level directory.  To restore the default catalogues
+and surveys you should delete (or rename) file:
+
+\begin{center}
+\verb+~/.skycat/skycat.cfg+
+\end{center}
+
+and then restart GAIA.
+
+% - Part II ----------------------------------------------------------
+\cleardoublepage
+\markboth{\stardocname}{\stardocname}
+\part{Reference Material}
+\markboth{\stardocname}{\stardocname}
+\section{\xlabel{INFILE}\label{INFILE}naomiguidestars Input File}
+
+The input file for {\tt naomiguidestars} comprises a list of targets
+for which potential guide stars are to be obtained, finding charts produced
+\emph{etc}.  The details provided for each target may be in one of
+two formats, depending on whether either the remote catalogue is to be
+queried to obtain potential guide stars or tables of potential guide
+stars obtained in a previous run are to be reprocessed.  The two forms
+can be mixed in a single file, but usually will not be.
+
+\subsection{Querying a remote catalogue}
+
+Figure~\ref{TARGETS} shows an example targets file in the format for
+querying a remote catalogue.  It is available as file {\tt targets.lis}.
+The format is more-or-less self-explanatory.  However, for completeness a
+description follows.  Each target occupies a single line of the file.
+Blank lines are not permitted; every line must contain a target.  Each
+line should    comprise (in the order given): a Right Ascension, Declination
+and optionally a name.  These items should be separated by one or more
+spaces.  The Right Ascension and Declination should be for epoch and
+equinox J2000.  Their units and formats are:
+
+\begin{description}
+
+  \item[{\rm Right Ascension:}] sexagesimal hours with a colon (`:')
+   as the separator,
+
+  \item[{\rm Declination:}] sexagesimal degrees with a colon (`:')
+   as the separator.
+
+\end{description}
+
+Any characters after the Declination are considered part of the optional
+object name.  If supplied, the name will be used in the report generated by
+{\tt naomiguidestars}.  If you have coordinates for your targets for some
+epoch and equinox other than J2000 then you need to convert them to J2000
+prior to assembling the file.  \xref{COCO}{sun56}{}\cite{SUN56} is available
+for this purpose.  Alternatively, if your potential targets are in the form
+of a \xref{CURSA}{sun190}{}\cite{SUN190} catalogue then CURSA application
+{\tt catcoord} can be used.  If you have a target for which you know the
+name but not the coordinates then it may be possible to look up the
+coordinates automatically; see Section~\ref{NAME} for details.
+
+\subsection{\label{REPROC_R}Reprocessing existing files}
+
+Figure~\ref{RTARGETS} shows an example targets file in the format for
+reprocessing tables of potential guide stars produced by a previous
+run of {\tt naomiguidestars}.  The format is exactly the same as that for
+querying a remote catalogue (above) except that there is an additional
+item at the start of each line:
+
+\begin{quote}
+{\tt \%}{\it table-file-name}
+\end {quote}
+
+where {\it table-file-name}\/ is the file-name of the table of potential
+guide stars which is to be reprocessed.  The {\it table-file-name}\/
+should be separated from the following Right Ascension by one or more
+spaces.  Also note the per-cent sign (`{\tt \%}') that immediately
+precedes the {\it table-file-name}.  The log file produced by {\tt
+naomiguidestars} is in precisely this format and hence can be used to
+reprocess tables of potential guide stars.  In fact, Figure~\ref{RTARGETS}
+shows the log file produced when the example list of targets, {\tt
+targets.lis}, is used to query the remote catalogue.
+
+\begin{center}
+\begin{figure}[htbp]
+
+\begin{verbatim}
+%usno_eso_165259_22404.tab  16:52:59  2:24:04  NGC 6240
+%usno_eso_200755_184257.tab  20:07:55  18:42:57  IRAS 20056+1834
+%usno_eso_193445_303059.tab  19:34:45  30:30:59  BD +30 3639
+%usno_eso_144038_533016.tab  14:40:38  53:30:16  Target 5
+%usno_eso_141950_192826.tab  14:19:50  -19:28:26  PKS 1417-19
+\end{verbatim}
+
+\caption{Example file of targets to be reprocessed \label{RTARGETS} }
+
+\end{figure}
+\end{center}
+
+
+\section{\xlabel{OUTFILE}\label{OUTFILE}naomiguidestars Output Files}
+
+The output files produced by {\tt naomiguidestars} include:
+
+\begin{itemize}
+
+  \item a log file,
+
+  \item a report file
+
+\end{itemize}
+
+and, for each target for which potential guide stars were found:
+
+\begin{itemize}
+
+  \item a table of the potential guide stars,
+
+  \item a finding chart.
+
+\end{itemize}
+
+The log and report files are always produced.  Their file-names are derived
+from the file-name of the input list of targets and are reported by {\tt
+naomiguidestars}.  Unix environment variables can be set to control whether
+the tables of potential guide stars and finding charts are produced (see
+Sections~\ref{ADDOPT} and \ref{ENVIR}).
+
+\subsection{Log file}
+
+The log file has file-type `{\tt .log}'.  It contains an entry for every
+target for which potential guide stars were found.  The details for each
+target occupy a single line and comprise: the name of the table of
+potential guide stars, the Right Ascension and Declination of the target
+and optionally its name.  The log file is, in fact, in precisely the
+right format for reprocessing a set of tables of potential guide
+stars without re-querying the remote catalogue (see Sections~\ref{REPROC_T}
+and \ref{REPROC_R}).  Table~\ref{RTARGETS} is an example.
+
+\subsection{Report file}
+
+The report file has file-type `{\tt .report}'.  It provides a summary
+report for each target and includes an entry for all the targets, including
+any for which no potential guide stars were found.  The start of the file
+gives the options in effect when {\tt naomiguidestars} was run.
+
+For each target the file names of any table of potential guide stars
+and finding chart are given, if appropriate.  Details of the individual
+potential guide stars are also given.  The quantities tabulated for each
+guide star are listed in Table~\ref{REP_TAB}.  The potential guide stars
+are listed in order of increasing separation from the target.  The position
+angle is measured east from north.  The sign convention is that stars east
+of the target have a positive position angle and those west of it a
+negative one.
+
+\begin{table}[htbp]
+
+\begin{center}
+\begin{tabular}{ll}
+Column         & Description              \\ \hline
+{\tt Seq num}  &  Sequence number         \\
+{\tt SEPN}     & Separation from the target (seconds of arc) \\
+{\tt MAG}      & V magnitude (magnitudes) \\
+{\tt RA}       & Right Ascension (J2000)  \\
+{\tt DEC}      & Declination (J2000)      \\
+{\tt RA\_OFF}  & Offset from target in Right Ascension (seconds of arc) \\
+{\tt DEC\_OFF} & Offset from target in Declination (seconds of arc) \\
+{\tt PA}       & Position angle (degrees) \\
+\end{tabular}
+\end{center}
+
+\begin{quote}
+\caption[Columns tabulated for potential guide stars]{Columns tabulated for
+potential guide stars.  See the text for a discussion of the position angle
+\label{REP_TAB} }
+\end{quote}
+
+\end{table}
+
+The report file is quite wide.  The most convenient way to print it is
+to use the {\tt a2ps} utility (see \xref{SUN/184}{sun184}{}\cite{SUN184})
+with the wide file option.  For example, to print report {\tt targets.report}
+on the default (postscript) printer:
+
+\begin{quote}
+{\tt a2ps -nn -w targets.report | lp}
+\end{quote}
+
+\subsection{Tables of potential guide stars}
+
+The tables of potential guide stars have file-type `{\tt .tab}'.  They
+are written in the tab-separated table (TST) format, which is documented
+in \xref{SSN/75}{ssn75}{}\cite{SSN75}.  They can be read into GAIA
+(see \xref{SUN/214}{sun214}{}\cite{SUN214}), where they can be overlaid
+on a direct image of the target object, provided that it has suitable WCS
+(World Coordinate System) information (see Section~\ref{GAIA}).
+Alternatively they can be manipulated with CURSA (see
+\xref{SUN/190}{sun190}{}\cite{SUN190}).
+
+Each table contains an entry for every star in the reference catalogue
+within the specified separation from the target, irrespective of whether
+it falls within any magnitude ranges which may have been set.
+
+\subsection{Finding charts}
+
+The finding charts have file-type `{\tt .ps}' and are in postscript format.
+Each finding chart is centred on the position of its target object, and this
+position is marked with a `gun-sight' open cross.  The name of the target
+object is shown beneath the plot.  Stars bright enough to be used as guide
+stars are shown as filled circles.  Fainter stars are shown as open circles.
+In both cases the radius of the circle scales with magnitude.  
+
+
+\section{\xlabel{ENVIR}\label{ENVIR}Environment Variables}
+
+Both {\tt naomiguidestars} and {\tt naomiremote} take some input from Unix
+shell environment variables and these variables can be used to control their
+behaviour.  You can specify some of these environment variables, but there
+are others which you should not change.  The variables used be {\tt
+naomiguidestars} which you might want to change are listed in
+Table~\ref{ENVARS} and described briefly below.
+
+\begin{table}[htbp]
+
+\begin{center}
+\begin{tabular}{rl}
+Variable             & Description \\ \hline
+{\tt NAOMI\_BRIGHT}  & Bright limit for guide stars (magnitudes) \\
+{\tt NAOMI\_FAINT}   & Faint limit for guide stars (magnitudes) \\
+{\tt NAOMI\_KEEPTAB} & Keep table of guide stars for each object? \\
+{\tt NAOMI\_KEEPFND} & Keep finding chart for each object? \\
+{\tt NAOMI\_ECHO}    & Echo the commands issued by {\tt naomiguidestars}? \\
+\end{tabular}
+\end{center}
+
+\caption{{\tt naomiguidestars} environment variables which the user
+may configure
+\label{ENVARS} }
+
+\end{table}
+
+\begin{description}
+
+  \item[{\tt NAOMI\_BRIGHT}] is the bright magnitude limit for potential
+   guide stars (default: `{\tt 0}').
+
+  \item[{\tt NAOMI\_FAINT}] is the faint magnitude limit for potential
+   guide stars (default: `{\tt 14.5}').
+
+  \item[{\tt NAOMI\_KEEPTAB}] specifies whether the tables of potential
+   guide stars for each target are kept or deleted.  If it is set to
+   `{\tt no}' or `{\tt NO}' they are deleted; otherwise they are kept
+   (default: `{\tt yes}').
+
+  \item[{\tt NAOMI\_KEEPFND}] specifies whether the finding charts for
+   each target are kept or deleted.  If it is set to
+   `{\tt no}' or `{\tt NO}' they are deleted; otherwise they are kept
+   (default: `{\tt yes}').
+
+  \item[{\tt NAOMI\_ECHO}] specifies whether internal Unix shell commands
+   issued by {\tt naomiguidestars} are echoed to the command terminal.
+   Normally you will not wish to see such commands and the option is
+   usually only used for de-bugging.  If {\tt NAOMI\_ECHO} is set to
+   `{\tt yes}' the commands are echoed; otherwise they are not (default:
+   `{\tt no}').
+
+\end{description}
+
+{\tt naomiguidestars} also accesses the following environment variables
+which you should not normally change.  They are documented here for
+completeness.  The ones with names beginning `{\tt CATREM\_}' are also
+used by {\tt naomiremote}.
+
+\begin{description}
+
+  \item[{\tt NAOMI\_REMOTE}] The name and full directory specification
+   of {\tt naomiremote}.
+
+  \item[{\tt NAOMI\_CURSA}] The directory where the CURSA applications
+   are located.
+
+  \item[{\tt NAOMI\_CATALOG}] The remote catalogue used by {\tt
+   naomiguidestars}.  The default value of `{\tt usno\\@eso}' should
+   not be changed.
+
+  \item[{\tt CATREM\_URLREADER}] {\tt naomiremote} uses a separate program
+   to submit the URL constituting a query to the server and return the
+   table of results.  This environment variable specifies the program to
+   be used.  Currently the options are: {\tt geturl} (the default), a C
+   program supplied with CURSA, the
+   \htmladdnormallinkfoot{{\tt lynx}}{http://lynx.browser.org/}
+   command-line browser or the Java program {\tt UrlReader}, also supplied
+   with CURSA.  To use {\tt geturl}, {\tt CATREM\_URLREADER} should be set
+   as follows (for the tc shell):
+
+  \begin{quote}
+   {\tt setenv ~ CATREM\_URLREADER ~ "/star/bin/cursa/geturl"}
+  \end{quote}
+
+   To use {\tt lynx}, the setting should be:
+
+  \begin{quote}
+   {\tt setenv ~ CATREM\_URLREADER ~ "lynx -source"}
+  \end{quote}
+
+   Or to use {\tt UrlReader} it should be:
+
+  \begin{quote}
+   {\tt setenv ~ CATREM\_URLREADER ~ "java  UrlReader"}
+  \end{quote}
+
+   In this last case it is also necessary to set the java environment variable
+   {\tt CLASSPATH} so that {\tt UrlReader} is picked up in addition to the
+   standard Java classes.  For example, I might set:
+
+  \begin{center}
+   {\small \tt setenv~CLASSPATH~/star/bin/cursa:/usr/lib/netscape/java/classes}
+  \end{center}
+
+   Note that it is necessary to specify the location of {\tt UrlReader} using
+   {\tt CLASSPATH} rather than the corresponding Java command-line option
+   because the latter appears not to work on Compaq Alpha/Tru64.  Also
+   note that the {\tt lynx} browser appears to be faster than {\tt
+   UrlReader}.
+
+  \item[{\tt CATREM\_CONFIG}] specifies the configuration file used;
+   this configuration file lists the remote catalogues available.  The
+   default configuration file supplied with NAOS includes the catalogues
+   that you are likely to use when finding guide stars and I recommend
+   that you do not change it.  However, if you insist on doing so,
+   configuration files are documented in \xref{SSN/75}{ssn75}{}\cite{SSN75}.
+
+  \item[{\tt CATREM\_MAXOBJ}] is the maximum number of objects which a
+   table of potential guide stars is allowed to contain.
+
+  \item[{\tt CATREM\_ECHOURL}] Controls whether the URL representing the
+   query submitted to the remote server is also displayed to the user.
+   In NAOS {\tt CATREM\_ECHOURL} {\it must}\/ be set to `{\tt no}'.
+
+\end{description}
+
+
+\section{\xlabel{ACCLOC}\label{ACCLOC}Accessing a Local Version of the
+PMM Catalogue}
+
+NAOS remotely accesses a version of the USNO PMM catalogue\cite{PMM} 
+provided by ESO.  In principle there is no reason why it should not
+access a local version of the catalogue held on a computer at your site,
+in order to speed up access and avoid network problems.  However,
+installing such a local version is not trivial: it is a programming problem
+rather than merely a matter of using existing software.
+
+Firstly you need to obtain a copy of the PMM catalogue.  It is available
+on CD-ROMs from the USNO, Flagstaff, Arizona and requires about 6.5 Gbytes
+of disk space.
+
+To access such a local copy with NAOS you need to write a local server
+which NAOS can communicate with.  Such a server typically comprises: a
+program to search the catalogue and a CGI script to handle the
+communication with NAOS.  The catalogue data format, which the search
+program would need to access, is described in the documentation that
+comes with the PMM.  \xref{SSN/75}{ssn75}{}\cite{SSN75} describes how to
+write a catalogue server CGI script.  Finally, you will need to add an
+entry for the catalogue in the NAOS configuration file; again see SSN/75
+for details.  It is possible that you might be able to simply borrow and
+install the server used by ESO, but this might include obtaining and
+installing commercial software and paying for the associated licences.
+
+An alternative approach is to search a local copy of the PMM using a
+local program rather than a server connected to NAOS.  However, again,
+you would need to write such a program.  The PMM is too large for
+searching it with a general-purpose program, such as CURSA application
+{\tt catselect}, to be practical (and the catalogue would also need to
+be re-formatted into a format which {\tt catselect} could access).
+
+
+\begin{htmlonly}
+\section{Detailed Description of Scripts}
+
+This section gives detailed descriptions of the NAOS scripts.
+
+% \input{sun235help.tex}
+%------------------------------------------------------------------------------
+\newpage
+\sstroutine{
+   NAOMIGUIDESTARS
+}{
+   Find guide stars for NAOMI targets
+}{
+   \sstdescription{
+      naomiguidestars is a script for finding guide stars for target
+      objects which are to be observed with the NAOMI adaptive optics
+      system on the William Herschel Telescope (WHT) on La Palma.
+      naomiguidestars reads an input file listing the equatorial
+      coordinates of the targets and searches the USNO PMM catalogue
+      to find suitable guide stars for each target.  The version of
+      the PMM maintained by ESO is used and it is accessed remotely
+      via the Internet.
+
+      naomiguidestars writes log and report files giving details of the
+      potential guide stars.  Optionally, it will also create, for each
+      target, a finding chart and table of potential guide stars.  These
+      tables of guide stars are written in the tab-separated table (TST)
+      format and may be imported into GAIA or CURSA.  naomiguidestars
+      can also reprocess the tables, for example, using different limits
+      for the brightest and faintest magnitude permitted for a guide star.
+
+      naomiguidestars is fully documented in SUN/235.
+   }
+   \sstusage{
+      naomiguidestars file-of-targets [maximum-separation]
+   }
+   \sstparameters{
+      \sstsubsection{
+         file-of-targets (read)
+      }{
+         A file containing the coordinates (and optionally names) of the
+         targets for which  guide stars are to be found.  The format of
+         the file is described in SUN/235.
+      }
+      \sstsubsection{
+         maximum-separation (read)
+      }{
+         The maximum separation, in minutes of arc, permitted between
+         the target and guide star (default: 1.4 minutes of arc).
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         naomiguidestars  targets.lis
+      }{
+         Find potential guide stars for the targets listed in the file
+         targets.lis.
+      }
+      \sstexamplesubsection{
+         naomiguidestars  targets.lis  2
+      }{
+         Find potential guide stars for the targets listed in the file
+         targets.lis.  The maximum separation permitted between the
+         target and guide star is 2 minutes of arc.
+      }
+   }
+   \sstdiytopic{
+      Environment Variables
+   }{
+      This section briefly describes the environment variables used by
+      naomiguidestars which you may set.  naomiguidestars uses additional
+      environment variables which you should not set and also it internally
+      invokes naomiremote, which uses additional environment variables that
+      are not documented here.  See SUN/235 for further details.
+
+      NAOMI\_BRIGHT (read)
+         The bright magnitude limit for potential guide stars (default: 0).
+
+      NAOMI\_FAINT (read)
+         The faint magnitude limit for potential guide stars (default: 14.5).
+
+      NAOMI\_KEEPTAB (read)
+         Specifies whether the tables of potential guide stars for each
+         target are kept or deleted.  If it is set to `no{\tt '} or `NO{\tt '} they are
+         deleted; otherwise they are kept (default: `yes{\tt '}).
+
+      NAOMI\_KEEPFND (read)
+         Specifies whether the finding charts for each target are kept or
+         deleted.  If it is set to `no{\tt '} or `NO{\tt '} they are deleted; otherwise
+         they are kept (default: `yes{\tt '}).
+
+      NAOMI\_ECHO (read)
+         Specifies whether internal Unix shell commands issued by
+         naomiguidestars are echoed to the command terminal.  Normally you
+         will not wish to see such commands and the option is usually only
+         used for de-bugging.  If NAOMI\_ECHO is set to `yes{\tt '} the commands
+         are echoed; otherwise they are not (default: `no{\tt '}).
+   }
+}
+\newpage
+\sstroutine{
+   NAOMIREMOTE
+}{
+   A simple script to query remote catalogues
+}{
+   \sstdescription{
+      naomiremote is a tool for querying remote astronomical catalogues,
+      databases and archives via the Internet.  It allows remote
+      catalogues to be queried and the resulting table saved as a local
+      file written in the Tab-Separated Table (TST) format.  It also
+      provides a number of related auxiliary functions.
+
+      naomiremote has several different modes of usage, each providing a
+      different function.  The modes are:
+
+      list    - list the catalogues currently available,
+
+      details - show details of a named catalogue,
+
+      query   - submit a query to a remote catalogue and retrieve the results,
+
+      name    - resolve an object name into coordinates,
+
+      help    - list the modes available.
+   }
+   \sstusage{
+      Arguments for naomiremote can be specified on the command line.
+      If arguments other than the first are omitted then they will usually
+      be prompted for.  The first argument is the mode of operation and
+      its value determines the other arguments which are required.  The
+      arguments for the various modes are:
+
+       naomiremote list    server-type
+
+       naomiremote details db-name
+
+       naomiremote query   db-name alpha delta radius additional-condition
+
+       naomiremote name    db-name object-name
+
+       naomiremote help
+
+      The individual arguments are described in the `Arguments{\tt '} section.
+      If the mode is omitted then  {\tt '}help{\tt '} mode is assumed.
+
+      In addition to the command-line arguments, naomiremote takes some
+      input from Unix shell environment variables and these variables can
+      be used to control its behaviour.
+   }
+   \sstparameters{
+      \sstsubsection{
+         mode (read)
+      }{
+         The mode in which naomiremote is to be used.  One of: list,
+         details, query, name or help.
+      }
+      \sstsubsection{
+         server-type (read)
+      }{
+         The server type of the catalogues to be listed in {\tt '}list{\tt '} mode.
+         One of: all, catalog, archive, namesvr, imagesvr, local or
+         directory.  See SSN/76 for further details.
+      }
+      \sstsubsection{
+         db-name (read)
+      }{
+         The name of the remote catalogue (or database) to be queried.
+      }
+      \sstsubsection{
+         alpha (read)
+      }{
+         The Central Right Ascension of the query.  The value should be
+         for equinox J2000 and given in sexagesimal hours with a colon
+         ({\tt '}:{\tt '}) as the separator.  For example: 12:30:00.
+      }
+      \sstsubsection{
+         delta (read)
+      }{
+         The central Declination of the query.  The value should be for
+         equinox J2000 and given in sexagesimal degrees with a colon ({\tt '}:{\tt '})
+         as the separator.  Southern Declinations are negative.  For
+         example: 30:23:00.
+      }
+      \sstsubsection{
+         radius (read)
+      }{
+         The radius of the query in minutes of arc.
+      }
+      \sstsubsection{
+         additional-condition (read)
+      }{
+         Any additional condition applied to the query.  Catalogues vary
+         in which, if any, additional queries they support.  See SSN/76
+         for further details.
+      }
+      \sstsubsection{
+         object-name (read)
+      }{
+         The name of an astronomical object which is to be resolved when
+         naomiremote is being used in {\tt '}name{\tt '} mode.  It should be entered
+         without embedded spaces.  The case of letters (upper or lower) is
+         not usually significant.  That is, case is not significant for
+         the usual name resolver database, simbad\_ns@eso, and probably
+         will not be significant for other name resolvers.  For example:
+         NGC3379.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         naomiremote
+      }{
+      }
+      \sstexamplesubsection{
+         naomiremote help
+      }{
+         List the various modes in which naomiremote may be used.
+      }
+      \sstexamplesubsection{
+         naomiremote list
+      }{
+         List all the catalogues and databases in the current configuration
+         file.
+      }
+      \sstexamplesubsection{
+         naomiremote list namesvr
+      }{
+         List all the name servers (that is, databases of server type
+         {\tt '}namesvr{\tt '}) in the current configuration file.
+      }
+      \sstexamplesubsection{
+         naomiremote details usno@eso
+      }{
+         Show details of the USNO PMM astrometric catalogue (whose name
+         is {\tt '}usno@eso{\tt '}).
+      }
+      \sstexamplesubsection{
+         naomiremote query usno@eso 12:15:00 30:30:00 10
+      }{
+         Find all the objects in the USNO PMM which lie within ten minutes
+         of arc of Right Ascension 12:15:00.0 (sexagesimal hours) and
+         Declination 30:30:00.0 (sexagesimal degrees, both J2000).  The
+         objects selected will be saved as a catalogue called
+         usno\_eso\_121500\_303000.tab created in your current directory.
+         This catalogue will be written in the Tab-Separated Table (TST)
+         format.
+      }
+      \sstexamplesubsection{
+         naomiremote query usno@eso 12:15:00 30:30:00 10 14,16
+      }{
+         Find all the objects in the USNO PMM which lie within ten minutes
+         of arc of Right Ascension 12:15:00.0 (sexagesimal hours) and
+         Declination 30:30:00.0 (sexagesimal degrees, both J2000) which
+         also lie in the magnitude range 14 to 16.
+      }
+      \sstexamplesubsection{
+         naomiremote name simbad\_ns@eso ngc3379
+      }{
+         Find the equatorial coordinates of the galaxy NGC 3379.  The
+         coordinates returned are for equinox J2000.
+      }
+   }
+   \sstdiytopic{
+      Environment Variables
+   }{
+      CATREM\_URLREADER (read)
+         naomiremote uses a separate program to submit the URL constituting
+         a query to the server and return the table of results.  This
+         environment variable specifies the program to be used.  See
+         SSN/76 for further details.  (Mandatory.)
+
+      CATREM\_CONFIG (read)
+         This environment variable specifies the configuration file to be
+         used.  It should be set to either the URL (for a remote file) or
+         the local file name, including a directory specification (for a
+         local file).  Configuration files mediate the interaction between
+         naomiremote and the remote catalogue; see SSN/76 for further
+         details.  (Mandatory.)
+
+      CATREM\_MAXOBJ (read)
+         The maximum number of objects which the returned table is allowed
+         to contain.
+
+      CATREM\_ECHOURL (read)
+         This environment controls whether the URL representing the query
+         submitted to the remote catalogue is also displayed to the user.
+         The default is {\tt '}no{\tt '}; to see the URL set CATREM\_ECHOURL\} to {\tt '}yes{\tt '}.
+         Seeing the URL is potentially useful when debugging configuration
+         files and remote catalogue servers but is not usually required
+         for normal operation.
+   }
+}
+%------------------------------------------------------------------------------
+
+\end{htmlonly}
+
+
+\section{Acknowledgements}
+
+Thanks to Andy~Longmore, Andy~Vick, Martin~Bly, Mike~Read and Peter~Draper
+for useful discussions and/or comments on the draft.  Any mistakes, of
+course, are my own.
+
+
+% References ----------------------------------------------------------
+
+\newpage
+% \section{References}
+
+% \input{refs.tex}
+%------------------------------------------------------------------------------
+% \newpage
+\addcontentsline{toc}{section}{References}
+\begin{thebibliography}{99}
+
+  \bibitem{SUN184} M.J.~Bly, 13 November 1997,
+   \xref{SUN/184.2}{sun184}{}: {\it A2PS --- ASCII to PostScript Converter},
+   Starlink.
+
+  \bibitem{SSN75} A.C.~Davenhall, 26 July 2000,
+   \xref{SSN/75.1}{ssn75}{}: {\it Writing Catalogue and Image Servers for
+   GAIA and CURSA}, Starlink.
+
+  \bibitem{SUN190} A.C.~Davenhall, 4 November 2001,
+   \xref{SUN/190.10}{sun190}{}: {\it CURSA --- Catalogue and Table
+   Manipulation Applications}, Starlink.
+
+  \bibitem{SUN214} P.W.~Draper, N.~Gray and D.S.~Berry, 13 September 2001,
+   \xref{SUN/214.9}{sun214}{}: {\it GAIA --- Graphical Astronomy and
+   Image Analysis Tool}, Starlink.
+
+  \bibitem{KUNITZSCH86} P.~Kunitzsch and T.~Smart, 1986, {\it Short
+   Guide to Modern Star Names and Their Derivations}\, (Otto Harrassowitz:
+   Wiesbaden).
+
+  \bibitem{PMM} D.~Monet, A.~Bird, B.~Canzian, H.~Harris, N.~Reid,
+   A.~Rhodes, S.~Sell, H.~Ables, C.~Dahn, H.~Guetter, A.~Henden,
+   S.~Leggett, H.~Levison, C.~Luginbuhl, J.~Martini, A.~Monet, J.~Pier, 
+   B.~Riepe, R.~Stone, F.~Vrba, R.~Walker,
+   1996, {\it USNO-SA1.0}, (U.S. Naval Observatory: Washington DC). 
+   See also URL: \htmladdnormallink{
+   {\tt http://www.nofs.navy.mil/}}{http://www.nofs.navy.mil/}
+
+  \bibitem{SUN56} P.T.~Wallace, 21 June 1995,
+   \xref{SUN/56.10}{sun56}{}: {\it COCO --- Conversion of Celestial
+   Coordinates}, Starlink.
+
+\end{thebibliography}
+%------------------------------------------------------------------------------
+
+\typeout{  }
+\typeout{*****************************************************}
+\typeout{  }
+\typeout{Reminder: run this document through Latex three times}
+\typeout{to resolve the references.}
+\typeout{  }
+\typeout{*****************************************************}
+\typeout{  }
+
+\end{document}
