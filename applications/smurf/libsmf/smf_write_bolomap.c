@@ -59,6 +59,7 @@
 *  Authors:
 *     EC: Ed Chapin (UBC)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     DSB: David Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -71,6 +72,10 @@
 *        Don't write a different map for each chunk, instead combine them
 *     2011-06-29 (EC):
 *        Remove ast from interface since res+ast sum now in smf_iteratemap
+*     2013-11-29 (DSB):
+*        Ensure smf_rebinmap1 is not used in mult-threaded mode since it
+*        now assumes there is an input maps for every thread. Could change
+*        this some rainy day...
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -258,7 +263,7 @@ void smf_write_bolomap( ThrWorkForce *wf, smfArray *res, smfArray *lut,
              about variance weighting because all samples from
              same detector are about the same. */
 
-          smf_rebinmap1( wf, res->sdata[idx],
+          smf_rebinmap1( NULL, res->sdata[idx],
                          dat->noi ? dat->noi[0]->sdata[idx] : NULL,
                          lut_data, 0, 0, 0, NULL, 0,
                          SMF__Q_GOOD, varmapmethod,

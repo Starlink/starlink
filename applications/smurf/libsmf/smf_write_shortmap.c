@@ -72,6 +72,7 @@
 
 *  Authors:
 *     EC: Ed Chapin (UBC)
+*     DSB: David Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -81,6 +82,10 @@
 *        If shortmap=0, create map each time TCS_INDEX increments
 *     2011-06-29 (EC):
 *        Remove ast from interface since res+ast sum now in smf_iteratemap
+*     2013-11-29 (DSB):
+*        Ensure smf_rebinmap1 is not used in mult-threaded mode since it
+*        now assumes there is an input maps for every thread. Could change
+*        this some rainy day...
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -295,7 +300,7 @@ void smf_write_shortmap( ThrWorkForce *wf, int shortmap, smfArray *res,
         rebinflag |= AST__REBINEND;
       }
 
-      smf_rebinmap1( wf, res->sdata[idx],
+      smf_rebinmap1( NULL, res->sdata[idx],
                      dat->noi ? dat->noi[0]->sdata[idx] : NULL,
                      lut_data, shortstart, shortend, 1, NULL, 0,
                      SMF__Q_GOOD, varmapmethod,
