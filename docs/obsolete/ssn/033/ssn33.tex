@@ -1,0 +1,98 @@
+\documentstyle{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink System Note}
+\newcommand{\stardocinitials}  {SSN}
+\newcommand{\stardocnumber}    {33.6}
+\newcommand{\stardocauthors}   {D L Terrett}
+\newcommand{\stardocdate}      {26 February 1990}
+\newcommand{\stardoctitle}     {Configuring Queues for Starlink Graphics}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+The Starlink Software Collection contains graphics software for plotting on
+Canon Laser and Printronix P300 printer/plotters, and this requires that the
+printer queues for these devices are set up according to the rules given in
+this document.
+NB: This note applies to VMS Version 5.2 onwards.
+
+\section{Printronix P300}
+
+To enable graphics files to be printed on a Printronix you must:
+\begin{enumerate}
+\item Set the printer /PRINTALL
+\item Set the printer width to 132 characters
+\item Ensure that printer logic board A, location 8K, has jumper W5 installed.
+\end{enumerate}
+Software which queues graphics files to the printer automatically
+requires that {\bf SYS\_PRINTRONIX} be the name of a queue, or a logical name
+for a queue, which spools to a Printronix printer.
+Graphics files must be printed with the /PASSALL qualifier.
+
+\section{Canon LBP-8 Laser Printer}
+
+Starlink software which queues graphics files to a Canon Laser Printer
+automatically requires that {\bf SYS\_LASER} be the name of a queue, or a
+logical name for a queue, which spools to a laser printer.
+Graphics files must be printed with the /PASSALL qualifier.
+
+\appendix
+
+\section{Queue startup procedure used on RAL Starlink VAX}
+
+\begin{verbatim}
+    $!++
+    $!  SYS$MANAGER:STARTQ.COM
+    $!
+    $!  Start all queues on RLSSD1
+    $!--
+    $ SET NOON
+    $!
+    $!  Start terminal server queues
+    $!
+    $!@SYS$MANAGER:REMOTE_PRINT
+    $!
+    $!  Printer queues
+    $!
+    $!SET TERMINAL/PERMANENT/DEVICE_TYPE=UNKNOWN/NOWRAP/PAGE=63 -
+    $!		EIGHTBIT/NOTYPEHEAD/NOBROADCAST/FORM/SPEED=9600	TXA6:
+    $!SET DEVICE/SPOOLED=(SYS_LASER,SYS$SYSDEVICE) TXA6:
+    $!START/QUEUE SYS_LASER
+    $!
+    $!  Batch queues
+    $!
+    $ START/QUEUE RLSSD1_BATCH
+    $ START/QUEUE RLSSD1_SHORT
+    $!
+    $ EXIT
+\end{verbatim}
+\end{document}

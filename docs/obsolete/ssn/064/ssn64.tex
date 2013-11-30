@@ -1,0 +1,522 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink System Note}
+\newcommand{\stardocinitials}  {SSN}
+\newcommand{\stardocnumber}    {64.2}
+\newcommand{\stardocauthors}   {A J Chipperfield}
+\newcommand{\stardocdate}      {3 April 1992}
+\newcommand{\stardoctitle}     {ADAM --- VAX Organization of Applications
+Packages}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+\renewcommand{\_}{{\tt\char'137}}
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{20mm}
+%------------------------------------------------------------------------------
+%  Package Description
+\begin{center}
+{\Large\bf Description}
+\end{center}
+This document describes the way in which Starlink uses the facilities
+of the Interactive Command Language (ICL) for setting up easy access to ADAM 
+applications packages whilst keeping the installation of packages separate 
+from the release of ADAM.
+
+Changes in this version of the document are listed in Appendix \ref{changes}.
+\markright{\stardocname}
+\newpage
+%------------------------------------------------------------------------------
+  Add this part if you want a table of contents
+  \setlength{\parskip}{0mm}
+  \tableofcontents
+  \setlength{\parskip}{\medskipamount}
+  \markright{\stardocname}
+%------------------------------------------------------------------------------
+\newpage
+\section{Introduction}
+This document describes the way in which Starlink uses the facilities
+of the Interactive Command Language (ICL) \cite{icl} for setting up easy 
+access to ADAM applications packages whilst keeping the installation of 
+packages separate from the release of ADAM.
+
+The term {\em package} in this document may be taken to mean a related group of 
+ADAM applications. Packages may be described as {\em standard}, {\em option}
+or {\em local}\/ (see SUN/59 \cite{sun59} for an explanation of these terms).
+
+The scheme will be implemented gradually and depends, to some extent, on the
+co-operation of package support programmers.
+When a new package is being developed, the way in which it will fit into the
+scheme should be discussed with the Starlink Software Librarian and the Head 
+of Applications.
+
+\section{Action at ICL Startup}
+\subsection{ICL Login Command Files}
+ICL uses logical names to identify files containing commands which it will 
+obey automatically before taking input from any file specified as a parameter 
+of the ICL command, or prompting for input.
+The logical names, in the order they are accessed, are:
+
+\begin{tabular}{ll}
+ICL\_LOGIN\_SYS   & Intended for `system' login commands\\
+ICL\_LOGIN\_LOCAL & Intended for local site login commands\\
+ICL\_LOGIN      & Intended for user's login commands
+\end{tabular}
+
+Two `system' login command files will form part of the ADAM release.
+\begin{description}
+\item[LOGIN.ICL] This command file will be obeyed unless \$ ADAMSTART has been
+obeyed.
+It will display the ICL version number, warn users that ADAM\-START has not 
+been obeyed (therefore ADAM tasks may not be run) and invite the use of the 
+HELP command.
+\item[ADAMLOGIN.ICL] This command file will be obeyed if \$ ADAM\-START has been
+obeyed.
+It will display the ICL version number then
+obey (by means of a LOAD command) the ICL command file defined by logical name
+ADAM\-\_PACKAGES.
+Finally it will invite the use of the HELP command.
+\end{description}
+A system logical name ADAM\_PACKAGES will be defined as 
+SSC:\-ADAM\-\_PACK\-AGES.
+This will also be used to locate the ADAM\-\_PACKAGES help library, described
+later.
+
+Similarly, a system logical name LADAM\_PACKAGES will be defined as
+LSSC:\-ADAM\-\_PACK\-AGES.
+
+
+\subsection{Notes}
+\begin{enumerate}
+\item The {\em system} logical names associated with this scheme are defined by
+ADAM's SYS\-LOG\-NAM procedure which is obeyed at VMS system startup.
+(For details, see SSN/44 \cite{ssn44}.)
+\item The switch between login command files is achieved by defining
+ICL\-\_LOGIN\-\_SYS as a system logical name and having ADAM\-START define a 
+process logical name to override it. The process logical name is actually
+defined in terms of another {\em system} logical name, ADAM\-LOGIN.
+\item Both the system login command files will be held in ICLDIR and will be
+controlled by ADAM support staff.
+\item ICL\-\_LOGIN\-\_LOCAL and ICL\-\_LOGIN will not be defined in the
+standard ADAM installation.
+\end{enumerate}
+
+\section{The Package}
+Each package will be stored in a directory tree with a system logical name
+{\em package}\_DIR pointing to the top level of the tree.
+For the purposes of this scheme, the top-level directory should contain a
+{\em Package Help Library} and a {\em Package Definition Command File}.
+In most cases the package tasks will all be linked into a single monolith.
+Packages could however be defined to consist of any mixture of task types 
+and ICL procedures.
+They could, in fact, include elements from other packages.
+
+Because a package could well consist of applications written by a number of
+different authors, the term {\em package administrator} is used for the
+person with overall responsibility for the package.
+
+\subsection{The Package Help Library}
+Each package should provide a {\em Package Help Library}.
+This is a VMS help library the top-level topic of which gives a brief 
+description of the package.
+Subtopics giving further information may be arranged at lower levels at the 
+package administrator's discretion.
+A subtopic for each command in the package would be expected.
+
+\subsection{The Package Definition Command File}
+Each package should contain a {\em Package Definition Command File}.
+This is a file containing ICL commands to:
+\begin{enumerate}
+\item define the commands which the user will use to run the package,
+\item specify the source(s) of help information for the package,
+\item display information about the package.
+\end{enumerate}
+ 
+For example, the Package Definition Command File for KAPPA would be
+KAPPA\_DIR:\-KAPPA\-.ICL and could be something like:
+\begin{quote}
+\begin{verbatim}
+{ KAPPA - Package Definition Command File}
+{ History:
+{   26-Sep-1989 Original (RAL::CUR)
+
+DEFINE ADD KAPPA_DIR:KAPPA
+DEFHELP ADD KAPPA_DIR:KAPPA
+
+DEFINE APERADD KAPPA_DIR:KAPPA
+DEFHELP APERADD KAPPA_DIR:KAPPA
+
+... etc...
+
+PRINT
+
+
+PRINT  " --    Initialised for KAPPA    --"
+PRINT  " -- Version 0.5, 1989 September --"
+PRINT
+\end{verbatim}
+\end{quote}
+
+The Package Definition Command File is controlled by the package administrator.
+
+\section{The ADAM\_PACKAGES Help Library}
+A VMS help library, SSC:\-ADAM\-\_PACKAGES\-.HLB will be maintained by the 
+Starlink Software Librarian.
+The top-level topic (PACKAGES) will give a list, with a single line
+description, of all the {\em standard} and {\em option} packages.
+The second level will be subtopics for the individual packages.
+Each subtopic will give a brief description of the package and describe how
+to start using it.
+
+A similar help library should be maintained in LSSC by the Site Manager to
+describe any {\em local} packages in the same way.
+
+\section{The Starlink ADAM\_PACKAGES Command Files}
+\label{packs}
+\subsection{SSC:ADAM\_PACKAGES.ICL}
+This is the ICL command file LOADed by ADAM\-LOGIN\-.ICL at ICL startup.
+The command file will be controlled by the Starlink Software Librarian and
+will:
+\begin{enumerate}
+\item For each {\em standard}\/ or installed {\em option}\/ package, define 
+the {\em Package Startup Command} which, if issued by the user, will cause ICL
+to obey the Package Definition Command File.
+\item For each non-installed {\em option}\/ package, it will define a dummy 
+Package Startup Command which, if issued, will inform the user politely that 
+the package is not available at the site.
+\item For each {\em standard} or {\em option} package, define, for the ICL
+help system, the relevant entry in the ADAM\-\_PACKAGES help library.
+\end{enumerate}
+
+For example, for KAPPA (a {\em standard} package), it will contain:
+\begin{quote}
+\begin{verbatim}
+{  Definitions for KAPPA }
+DEFHELP KAPPA ADAM_PACKAGES PACKAGES KAPPA
+DEFSTRING KAPPA LOAD KAPPA_DIR:KAPPA
+\end{verbatim}
+\end{quote}
+
+For an {\em option} package, it will contain a DEFHELP command and then check
+for the presence an appropriate file to determine whether or not the package 
+is installed. For example:
+\begin{quote}
+\begin{verbatim}
+{ Definitions for  ASTERIX  }
+DEFHELP ASTERIX ADAM_PACKAGES PACKAGES ASTERIX
+IF FILE_EXISTS("AST_ROOT:[EXE]STARTUP.ICL")
+   DEFSTRING ASTERIX LOAD AST_ROOT:[EXE]STARTUP
+ELSE
+   DEFSTRING ASTERIX NOTINSTALLED ASTERIX
+ENDIF
+\end{verbatim}
+\end{quote}
+Where NOTINSTALLED is a procedure which politely tells the user that the
+package is not available.
+
+Following these definitions, SSC:\-ADAM\-\_PACKAGES\-.ICL will check for the
+presence of the command file defined by logical name LADAM\-\_PACKAGES, and
+LOAD it if it is found.
+
+\subsection{LSSC:ADAM\_PACKAGES.ICL}
+This is the ICL command file defined by the Starlink standard logical name
+LADAM\-\_PACK\-AGES and LOADed by SSC:\-ADAM\-\_PACKAGES\-.ICL -- it will define
+both the Package Startup Command and the source of introductory help on the 
+package (possibly an entry in LSSC:\-ADAM\-\_PACKAGES\-.HLB) for {\em local} 
+packages.
+
+LSSC:\-ADAM\-\_PACKAGES\-.ICL will be controlled by the local Site Manager and 
+may also contain any other site specific login commands.
+A template version will be issued by Starlink and the Site Manager can edit 
+this file according to what is installed at his site before installing it in 
+LSSC.
+
+\subsection{Notes}
+\begin{enumerate}
+\item The analogy between this system and the DCL login command files 
+SSC:\-LOGIN\-.COM and LSSC:\-LOGIN\-.COM can easily be seen.
+Some packages may be defined in both systems so that they may be run 
+from ICL or directly from DCL.
+\item If the ADAM\-\_PACKAGES command file is not obeyed ({\em i.e.}
+ ADAM\-START has not been obeyed), the LADAM\-\_PACKAGES command file will not
+be obeyed either.
+If a local login file is required for non-ADAM use of ICL, the logical name
+ICL\-\_LOGIN\-\_LOCAL should be defined.
+\item If a `package' consists of only a single command with the same name
+as the package (for example PHOTOM \cite{photom}), the definition of that 
+command and any associated DEFHELP command may be placed directly in the 
+relevant ADAM\-\_PACKAGES command file.
+\end{enumerate}
+
+\section{Summary}
+\begin{enumerate}
+\item The ADAM release includes two `system' ICL login command files,
+one for non-ADAM users of ICL and the other for ADAM users.
+\item System logical names ADAM\-\_PACKAGES and LADAM\-\_PACKAGES are defined
+to be SSC:\-ADAM\-\_PACKAGES and LSSC:\-ADAM\-\_PACKAGES respectively.
+\item The Starlink Software Librarian provides the ADAM\-\_PACKAGES command file
+and help library which together define introductory help information and
+Package Startup Commands for all the Starlink {\em standard} and
+{\em option} packages.
+\item If there are any {\em local} packages, the local Site Manager provides 
+the LADAM\-\_PACKAGES command file which defines the startup commands and the
+source of introductory help for them.
+\item Package administrators provide a `Package Definition Command 
+File' and a `Package Help Library'.
+\item When ICL is started up for ADAM use on Starlink machines, it obeys
+ICLDIR:\-ADAM\-LOGIN\-.ICL which LOADs the ADAM\-\_PACKAGES command file which,
+in turn, LOADs the LADAM\-\_PACKAGES command file.
+\end{enumerate}
+
+\section{The Effect}
+\label{effect}
+The following example session shows the sort of effect it is hoped to achieve
+by means of this scheme.
+\small
+\begin{quote}
+\begin{verbatim}
+$ ICL
+
+  Interactive Command Language   -   Version 1.5-6
+
+  - Type HELP [command] for help on ICL and its commands
+
+  WARNING - $ ADAMSTART has not been obeyed;
+           therefore ADAM tasks will not run
+
+ICL> EXIT
+$ ADAMSTART
+ ADAM version 2.0 available
+$ ICL
+
+  Interactive Command Language   -   Version 1.5-6
+
+  - Type HELP package_name for help on specific Starlink packages
+  -   or HELP PACKAGES for a list of all Starlink packages
+  - Type HELP [command] for help on ICL and its commands
+
+ICL> HELP PACKAGES 
+  
+PACKAGES 
+  
+   The following ADAM applications packages are available from Starlink: 
+  
+   Standard Packages: 
+    CONVERT   -  Data format conversion. 
+    FIGARO    -  General data-reduction. 
+    KAPPA     -  Image processing. 
+    SPECDRE   -  Spectroscopy Data Reduction 
+    SST       -  Simple Software Tools 
+    TSP       -  Time series and polarimetry data analysis. 
+  
+   Option Packages: 
+    ASTERIX   -  X-ray data analysis. 
+    CCDPACK   -  CCD data reduction 
+    DAOPHOT   -  Stellar photometry. 
+    PHOTOM    -  Aperture photometry. 
+    PISA      -  Position, Intensity and Shape Analysis 
+    SCAR      -  Catalogue access and reporting. 
+  
+  
+  Additional information available: 
+  
+  ASTERIX    CCDPACK    CONVERT    DAOPHOT    FIGARO     KAPPA 
+  MISCELLANEOUS         PHOTOM     PISA       SCAR       SPECDRE    SST 
+  TSP 
+  
+PACKAGES Subtopic? KAPPA 
+  
+PACKAGES 
+  
+  KAPPA 
+  
+     KAPPA---the Kernel APplication PAckage---currently  comprises  applications 
+     for  general  image  processing,  many  of which will function with data of 
+     dimensionality other than two; data visualisation, with flexible control of 
+     the  location and size of pictures; and the manipulation of NDF components. 
+     Some of KAPPA's main features are fast  algorithms;  the  handling  of  bad 
+     pixels  and  quality,  processing  of data errors, a help system, extensive 
+     error  reporting,  the  utilisation  of  the  AGI  graphics  database,  and 
+     graphics-device  independence  via  GKS  and  IDI.   Many applications work 
+     generically, that is  handle  all  non-complex  data  types  directly,  for 
+     efficiency.  KAPPA is fully described in SUN/95. 
+  
+     To make the commands of KAPPA available, type: 
+  
+         ICL> KAPPA 
+  
+PACKAGES Subtopic? 
+Topic? 
+ICL> HELP KAPPA 
+  
+PACKAGES 
+  
+  KAPPA 
+  
+     KAPPA---the Kernel APplication PAckage---currently  comprises  applications 
+     for  general  image  processing,  many  of which will function with data of 
+     dimensionality other than two; data visualisation, with flexible control of 
+     the  location and size of pictures; and the manipulation of NDF components. 
+     Some of KAPPA's main features are fast  algorithms;  the  handling  of  bad 
+     pixels  and  quality,  processing  of data errors, a help system, extensive 
+     error  reporting,  the  utilisation  of  the  AGI  graphics  database,  and 
+     graphics-device  independence  via  GKS  and  IDI.   Many applications work 
+     generically, that is  handle  all  non-complex  data  types  directly,  for 
+     efficiency.  KAPPA is fully described in SUN/95. 
+  
+     To make the commands of KAPPA available, type: 
+  
+         ICL> KAPPA 
+  
+Topic? 
+ICL> KAPPA 
+ Help key KAPPA redefined 
+ 
+ --    Initialised for KAPPA    -- 
+ --   Version 0.8, 1991 August  -- 
+ 
+ Type HELP KAPPA or KAPHELP for KAPPA help 
+  
+ICL> HELP KAPPA 
+  
+HELP 
+ 
+   This is the KAPPA online help system. It invokes the VMS HELP Facility 
+   to display information about a KAPPA command or topic.  If you need 
+   assistance using this help library, enter "Using_help" in response to 
+   the "Topic?" prompt.  If you need more information about getting help 
+   about KAPPA from the ICL level, then enter "Command-line_help". 
+ 
+Topic? ADD 
+ 
+ADD 
+  
+  Add two NDF data structures. 
+  
+  Description: 
+  
+     The routine adds two NDF data structures pixel-by-pixel to produce 
+     a new NDF. 
+  
+  Additional information available: 
+  
+  Parameters Notes      Authors    History 
+  
+ADD Subtopic? PARAMETERS
+  
+ADD 
+  
+  Parameters 
+  
+    For information on individual parameters, select from the list below: 
+  
+    Additional information available: 
+  
+    IN1        IN2        OUT        TITLE 
+  
+ADD Parameters Subtopic? IN1 
+  
+ADD 
+  
+  Parameters 
+  
+    IN1 
+  
+      IN1 = NDF (Read) 
+         First NDF to be added. 
+  
+ADD Parameters Subtopic? 
+ADD Subtopic? 
+Topic? 
+ICL> ASTERIX
+
+      ASTERIX  is not installed at this site.
+   If you really want it, contact your Site Manager.
+
+ICL> EXIT 
+$
+\end{verbatim}
+\end{quote}
+\normalsize
+
+\section{Problems}
+\label{probs}
+\begin{enumerate}
+\item In some cases it would be nicer to come out of HELP than to be prompted
+for another HELP topic.
+For example when HELP package is issued before the package is started.
+\item At the moment, when the source of help on a package is switched from
+the PACKAGES help library to the package's help library, ICL produces a
+warning message.
+It should be possible to have a SET command which will switch this message off
+when it is not required.
+\end{enumerate}
+
+\begin{thebibliography}{9}
+\bibitem{icl} J A Bailey, {\it ICL --- The New ADAM Command Language - Users
+Guide}, Joint Astronomy Centre.
+\bibitem{sun59} M D Lawden, {\it Starlink Software Reorganization}, Starlink
+User Note 59.
+\bibitem{kappa} M J Currie, {\it KAPPA --- Kernel Application Package},
+Starlink User Note 95.
+\bibitem{ssn44} A J Chipperfield, {\it ADAM --- Installation Guide}, Starlink
+System Note 44.
+\bibitem{photom} N Eaton, {\it PHOTOM --- An aperture photometry routine},
+Starlink User Note 45.
+\end{thebibliography}
+
+\newpage
+\appendix
+\section{Document Changes}
+\label{changes}
+The changes made to this document since the previous version are as follows:
+\begin{description}
+\item[Layout] The format of the document has changed.
+\item[Section \ref{packs}] ADAM\_PACKAGES now defines both {\em standard}\/ and
+{\em option}\/ packages. LADAM\-\_PACK\-AGES is reserved for {\em local}\/
+packages.
+\item[Section \ref{effect}] The example has been brought up to date.
+\item[Section \ref{probs}] two of the original problems have been overcome:
+\begin{itemize}
+\item Site Managers are no longer required to edit the local
+LADAM\-\_PACK\-AGES command file for installed {\em option}\/ packages.
+\item Multiple keys are now allowed in the ICL HELP command, {\em e.g.}:
+\begin{quote} \begin{verbatim}
+ICL> HELP ADD PARAMETERS IN1
+\end{verbatim} \end{quote}
+is accepted.
+\end{itemize}
+\end{description}
+
+\end{document}
