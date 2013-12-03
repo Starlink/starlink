@@ -575,6 +575,8 @@ The contents of the library are (in alphabetical order):\\
     Taken from CONVERT, KAPPA and IRCAMPACK.}
 \noteroutine{ONE\_SHELL\_ECHO( FILESPEC, FILENAME, STATUS )}
     {Expands shell metacharacters in a string without file globbing.}
+\noteroutine{one\_snprintf( str, size, format, status, ... )}
+    {Starlink compliant wrapper around the standard snprintf function.}
 \noteroutine{one\_strlcat( dest, src, sizedest, status )}
     {Wrapper around the standard BSD strlcat C function (safer variant
       of strncat).}
@@ -840,6 +842,69 @@ There follows a full description of the library routines in alphabetical order:
             \sstitem
             ONE\_\_MALLOCERR - Malloc error
          }
+      }
+   }
+}
+\sstroutine{
+   one\_snprintf
+}{
+   Starlink compliant wrapper around the standard snprintf function
+}{
+   \sstdescription{
+      The one\_snprintf function replaces all calls to sprintf() and snprintf()
+      to allow the use of inherited status and to trap for truncation.
+   }
+   \sstinvocation{
+      retval = one\_snprintf( char $*$ str, size\_t size,
+                              const char $*$ format, int $*$ status, ... );
+   }
+   \sstarguments{
+      \sstsubsection{
+         str = char $*$ (Returned)
+      }{
+         Buffer to be filled from the format statement. Must be at least "size"
+         characters in length.
+      }
+      \sstsubsection{
+         size = size\_t (Given)
+      }{
+         Allocated size of buffer "str".
+      }
+      \sstsubsection{
+         format = const char $*$ (Given)
+      }{
+         Standard format string as expected by snprintf.
+      }
+      \sstsubsection{
+         status = int $*$ (Given and Returned)
+      }{
+         Inherited status. Will be set to ONE\_\_TRUNC if the formatted version
+         of the string does not fit into the buffer "str".
+      }
+      \sstsubsection{
+         ... (Given)
+      }{
+         Variadic arguments required by snprintf.
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         int retval
+      }{
+         Length of the string after appending. If the value exceeds the size of the
+         supplied buffer status will be set to ONE\_\_TRUNC but the value returned
+         will indicate the size of the buffer that would be required to completely
+         expand the formatted string.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         This is for use from C only.
+
+         \sstitem
+         Use this routine in place of snprintf and sprintf.
       }
    }
 }
