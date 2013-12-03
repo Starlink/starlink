@@ -100,6 +100,7 @@
 #include "ndf.h"
 #include "star/grp.h"
 #include "star/atl.h"
+#include "star/one.h"
 #include "kpg_err.h"
 
 /* SMURF includes */
@@ -120,6 +121,7 @@ void smf_jsasplit( int indf, const char *base, int trim,
    Grp *grpt = NULL;
    char *path;
    char type[ NDF__SZTYP + 1 ];
+   char jsatile_comment[45];
    double *ipd;
    double *pxd;
    double *pyd;
@@ -431,8 +433,9 @@ void smf_jsasplit( int indf, const char *base, int trim,
          errAnnul( status );
          fc = astFitsChan( NULL, NULL, " " );
       }
-      atlPtfti( fc, "JSATILE", tile_index, "JSA all-sky tile index",
-                status );
+      one_snprintf(jsatile_comment, 45, "JSA all-sky tile index (Nside=%i)",
+                   status, tiling.ntpf);
+      atlPtfti( fc, "JSATILE", tile_index, jsatile_comment, status );
       kpgPtfts( indfo, fc, status );
       fc = astAnnul( fc );
 
