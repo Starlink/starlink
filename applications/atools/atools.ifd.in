@@ -3038,6 +3038,18 @@ iraf! {
             default !
             helpkey *
           }
+         parameter xval {
+            type _DOUBLE
+            access WRITE
+            vpath INTERNAL
+            helpkey *
+          }
+         parameter yval {
+            type _DOUBLE
+            access WRITE
+            vpath INTERNAL
+            helpkey *
+          }
       }
 
       action astswitchmap {

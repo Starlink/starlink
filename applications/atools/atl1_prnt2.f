@@ -1,4 +1,5 @@
-      SUBROUTINE ATL1_PRNT2( NP, XOUT, YOUT, XPAR, YPAR, STATUS )
+      SUBROUTINE ATL1_PRNT2( NP, XOUT, YOUT, XPAR, YPAR, XPAR2, YPAR2,
+     :                       STATUS )
 *+
 *  Name:
 *     ATL1_PRNT2
@@ -11,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ATL1_PRNT2( NP, XOUT, YOUT, XPAR, YPAR, STATUS )
+*     CALL ATL1_PRNT2( NP, XOUT, YOUT, XPAR, YPAR, XPAR2, YPAR2, STATUS )
 
 *  Description:
 *     The screen output is one position per line, x followed y y
@@ -35,11 +36,16 @@
 *        receive the Y values. If a null (!) value is obtained no output
 *        file is created and the error is annulled. If a blank value is
 *        supplied for YPAR no output file is created.
+*     XPAR2 = CHARACTER * ( * ) (Given)
+*        An output parameter name to which is written the final X value.
+*     YPAR2 = CHARACTER * ( * ) (Given)
+*        An output parameter name to which is written the final Y value.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Copyright:
 *     Copyright (C) 2003 Central Laboratory of the Research Councils.
+*     Copyright (C) 2013 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -65,6 +71,8 @@
 *  History:
 *     6-JUN-2003 (DSB):
 *        Original version.
+*     3_DEC-2013 (DSB):
+*        Added arguments XPAR2 and YPAR2.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -86,6 +94,8 @@
       DOUBLE PRECISION YOUT( NP )
       CHARACTER XPAR*(*)
       CHARACTER YPAR*(*)
+      CHARACTER XPAR2*(*)
+      CHARACTER YPAR2*(*)
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -165,5 +175,9 @@
          END IF
 
       END IF
+
+*  Write the last values to the output parameters.
+      IF( XPAR2 .NE. ' ' ) CALL PAR_PUT0D( XPAR2, XOUT( NP ), STATUS )
+      IF( YPAR2 .NE. ' ' ) CALL PAR_PUT0D( YPAR2, YOUT( NP ), STATUS )
 
       END

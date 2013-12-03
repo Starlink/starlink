@@ -62,14 +62,22 @@
 *        The name of a text file in which to put the transformed X axis
 *        values. No file is produced if a null (!) value is supplied. One
 *        axis value is stored on each line of the file. [!]
+*     XVAL = _DOUBLE (Write)
+*        An output parameter that is left holding the final transformed
+*        output X value.
 *     YOUT = LITERAL (Read)
 *        The name of a text file in which to put the transformed Y axis
 *        values. No file is produced if a null (!) value is supplied. One
 *        axis value is stored on each line of the file. [!]
+*     YVAL = _DOUBLE (Write)
+*        An output parameter that is left holding the final transformed
+*        output Y value.
 
 *  Copyright:
 *     Copyright (C) 2003-2004 Central Laboratory of the Research
-*     Councils. All Rights Reserved.
+*     Councils.
+*     Copyright (C) 2013 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -97,6 +105,8 @@
 *        Original version.
 *     2004 September 1 (TIMJ):
 *        Use CNF_PVAL
+*     3-DEC-2013 (DSB):
+*        Added parameters XVAL and YVAL.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -191,7 +201,7 @@
 *  Output the results.
       CALL ATL1_PRNT2( NP, %VAL( CNF_PVAL( IPXOUT ) ),
      :                 %VAL( CNF_PVAL( IPYOUT ) ), 'XOUT',
-     :                 'YOUT', STATUS )
+     :                 'YOUT', 'XVAL', 'YVAL', STATUS )
 
 *  Free resources.
       CALL GRP_DELET( IGRP1, STATUS )
