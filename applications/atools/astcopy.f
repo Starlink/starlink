@@ -29,6 +29,10 @@
 *     astcopy this result
 
 *  ADAM Parameters:
+*     CLASS = LITERAL (Read)
+*        Specifies the class of the required result. Currently supported
+*        values are: "Frame", "Mapping", "FrameSet", "Region", "Object".
+*        ["Object"]
 *     FMT = LITERAL (Read)
 *        The format in which to store output objects. Can be "AST", "XML",
 *        "STCS", or any FitsChan encoding such as FITS-WCS. Only used
@@ -42,6 +46,7 @@
 
 *  Copyright:
 *     Copyright (C) 2001 Central Laboratory of the Research Councils.
+*     Copyright (C) 2013 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -67,6 +72,8 @@
 *  History:
 *     12-JAN-2001 (DSB):
 *        Original version.
+*     3-DEC-2013 (DSB):
+*        Added CLASS parameter.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -82,6 +89,10 @@
 
 *  External References:
       EXTERNAL AST_ISAOBJECT
+      EXTERNAL AST_ISAFRAME
+      EXTERNAL AST_ISAFRAMESET
+      EXTERNAL AST_ISAMAPPING
+      EXTERNAL AST_ISAREGION
 
 *  Status:
       INTEGER STATUS
@@ -89,6 +100,7 @@
 *  Local Variables:
       INTEGER RESULT
       INTEGER THIS
+      CHARACTER CLASS*20
 *.
 
 *  Check inherited status.
@@ -97,8 +109,27 @@
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
 
+*  Get the required class.
+      CALL PAR_CHOIC( 'CLASS', 'OBJECT', 'OBJECT,FRAME,FRAMESET,'//
+     :                'MAPPING,REGION', .FALSE., CLASS, STATUS )
+
 *  Get the object to copy.
-      CALL KPG1_GTOBJ( 'THIS', 'Object', AST_ISAOBJECT, THIS, STATUS )
+      IF( CLASS .EQ. 'FRAME' ) THEN
+         CALL KPG1_GTOBJ( 'THIS', 'Frame', AST_FRAME, THIS,
+     :                    STATUS )
+      ELSE IF( CLASS .EQ. 'FRAMESET' ) THEN
+         CALL KPG1_GTOBJ( 'THIS', 'FrameSet', AST_ISAFRAMESET, THIS,
+     :                    STATUS )
+      ELSE IF( CLASS .EQ. 'MAPPING' ) THEN
+         CALL KPG1_GTOBJ( 'THIS', 'Mapping', AST_ISAMAPPING, THIS,
+     :                    STATUS )
+      ELSE IF( CLASS .EQ. 'REGION' ) THEN
+         CALL KPG1_GTOBJ( 'THIS', 'Region', AST_ISAREGION, THIS,
+     :                    STATUS )
+      ELSE
+         CALL KPG1_GTOBJ( 'THIS', 'Object', AST_ISAOBJECT, THIS,
+     :                    STATUS )
+      END IF
 
 *  Write the FrameSet out to a text file.
       CALL ATL1_PTOBJ( 'RESULT', ' ', THIS, STATUS )

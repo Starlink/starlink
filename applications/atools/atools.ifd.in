@@ -418,6 +418,15 @@ package atools {
 
          helplib {$ATOOLS_HELP}
 
+         parameter class {
+            type LITERAL
+            prompt {Class of output object}
+            ppath DEFAULT
+            vpath DEFAULT
+            default Object
+            helpkey *
+          }
+
          parameter fmt {
             type LITERAL
             prompt {Format for output text file}
