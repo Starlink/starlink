@@ -1791,6 +1791,10 @@ class NDG(object):
 	 All NDG objects created so far that refer to the deleted
 	 temporary directory are then reset so that each one represents
 	 an empty group.
+      NDG.tempfile():
+         Returns the path to a new file in the temporary directory. It is
+         guaranteed that this file does not exist, and so can be created
+         safely.
 
    To Do:
       - Allow comment property to be supplied as an argument to each
@@ -1830,6 +1834,18 @@ class NDG(object):
    def __getfile(cls,tempdir):
       return "{0}/group{1}_.lis".format(tempdir,NDG.__nobj)
 
+   # Find and store the next unused "nobj" value, then return the temp
+   # directory path.
+   @classmethod
+   def __setnobj(cls):
+      NDG.__nobj += 1
+      tmpdir = NDG._gettmpdir()
+      pattern = "{0}/group{1}_*".format(tmpdir,NDG.__nobj)
+      if not NDG.overwrite:
+         while len(glob.glob(pattern)) > 0:
+            NDG.__nobj += 1
+            pattern = "{0}/group{1}_*".format(tmpdir,NDG.__nobj)
+      return tmpdir
 
    # The instance initialiser.
    def __init__(self, p1, p2=None ):
@@ -1941,13 +1957,7 @@ class NDG(object):
       # over-writing existing files) find a unique identifying integer for
       # files belonging to the group.
       if nfile > 1 or intemp:
-         self.__tmpdir = NDG._gettmpdir()
-         NDG.__nobj += 1
-         pattern = "{0}/group{1}_*".format(self.__tmpdir,NDG.__nobj)
-         if not NDG.overwrite:
-            while len(glob.glob(pattern)) > 0:
-               NDG.__nobj += 1
-               pattern = "{0}/group{1}_*".format(self.__tmpdir,NDG.__nobj)
+         self.__tmpdir = NDG.__setnobj()
 
       # If the NDG represents more than one NDF, decide on the name of the
       # text file to hold the NDF list.
@@ -2073,6 +2083,12 @@ class NDG(object):
             ndg.__tmpdir = None
       if NDG.tempdir != None:
          shutil.rmtree( NDG.tempdir )
+
+   # Return the path to a new temporary file.
+   @classmethod
+   def tempfile(cls):
+      tmpdir = NDG.__setnobj()
+      return NDG.__getfile( tmpdir )
 
    # Format an NDG into a shell quoted group expression
    def __str__(self):

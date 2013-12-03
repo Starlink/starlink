@@ -5722,6 +5722,10 @@ package @PACKAGE@ {
         obey {python $SMURF_DIR/tilecutout.py}
     }
 
+    command jsajoin {
+        obey {python $SMURF_DIR/jsajoin.py}
+    }
+
     icl {defhelp @PACKAGE@ $@PACKAGE_UPCASE@_HELP 0}
 
     display {
