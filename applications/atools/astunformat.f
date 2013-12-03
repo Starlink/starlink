@@ -35,29 +35,31 @@
 *     astunformat this axis value result
 
 *  ADAM Parameters:
+*     AXIS = _INTEGER (Read)
+*         The number of the Frame axis for which unformatting is to be
+*         performed (axis numbering starts at 1 for the first axis).
+*     DVAL = _DOUBLE (Write)
+*         An output parameter left holding the last unformatted value.
 *     FMT = LITERAL (Read)
 *        The format in which to store output objects. Can be "AST", "XML",
 *        "STCS", or any FitsChan encoding such as FITS-WCS. Only used
 *        if the output object is written to a text file. An error is
 *        reported if the output object cannot be written using the
 *        requested format. ["AST"]
+*     RESULT = LITERAL (Read)
+*        The name of a text file in which to put the unformatted axis
+*        values. No file is produced if a null (!) value is supplied. One
+*        axis value is stored on each line of the file. [!]
 *     THIS = LITERAL (Read)
 *        An NDF, FITS file or text file holding the Frame. If an NDF is
 *        supplied, the current Frame of the WCS FrameSet will be used. If a
 *        FITS file is supplied, the Frame corresponding to the primary axis
 *        descriptions will be used.
-*     AXIS = INTEGER (Read)
-*         The number of the Frame axis for which unformatting is to be
-*         performed (axis numbering starts at 1 for the first axis).
 *     VALUE = GROUP (Read)
 *        A comma-separated list of formatted axis values to be read.
 *        A text file may be specified by preceeding the name of the file
 *        with an up arrow character "^". If the supplied value ends with a
 *        minus sign, the user is re-prompted for additional values.
-*     RESULT = LITERAL (Read)
-*        The name of a text file in which to put the unformatted axis
-*        values. No file is produced if a null (!) value is supplied. One
-*        axis value is stored on each line of the file. [!]
 
 *  Copyright:
 *     Copyright (C) 2006 Central Laboratory of the Research Councils.
@@ -86,6 +88,8 @@
 *  History:
 *     2-NOV-2006 (DSB):
 *        Original version.
+*     3-DEC-2013 (DSB):
+*        Added parameter DVAL.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -173,6 +177,9 @@
          IF( LOG ) CALL FIO_WRITE( FD, BUF( : NC ), STATUS )
 
       END DO
+
+*  Write the last unformatted value to an output parameter.
+      CALL PAR_PUT0D( 'DVAL', VALUE, STATUS )
 
 *  Free resources.
       CALL GRP_DELET( IGRP, STATUS )

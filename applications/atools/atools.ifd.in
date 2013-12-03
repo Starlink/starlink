@@ -2890,6 +2890,15 @@ iraf! {
 
       action astunformat {
          helplib {$ATOOLS_HELP}
+
+         parameter dval {
+            type _DOUBLE
+            access WRITE
+            vpath DEFAULT
+            default 0.0
+            helpkey *
+          }
+
          parameter fmt {
             type LITERAL
             prompt {Format for output text file}
