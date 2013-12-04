@@ -112,7 +112,7 @@ C     unexpected extension need not be placed in parentheses.
 C
 C  External subroutines / functions used:
 C     DSA_DEFEXTS, DTA_VERSNAME, EMS_ANNUL, EMS_BEGIN, EMS_END,
-C     ICH_DELIM, ICH_FOLD, ICH_LEN, GEN_GETCWD, PSX_GETENV
+C     ICH_DELIM, ICH_FOLD, ICH_LEN, PSX_GETCWD, PSX_GETENV
 C
 C  Subroutine / function details:
 C     DSA_DEFEXTS    Returns default file extensions.
@@ -124,7 +124,7 @@ C     EMS_END        End EMS error reporting environment
 C     ICH_DELIM      Position of next of a set of specified delimiters
 C     ICH_FOLD       Convert string to upper case.
 C     ICH_LEN        Return position of last non-blank char in string.
-C     GEN_GETCWD     Get current default directory.
+C     PSX_GETCWD     Get current default directory.
 C     PSX_GETENV     Translate environment variable.
 C
 C  History:
@@ -137,6 +137,7 @@ C                    DTA_*, is a dummy routine anyway.
 C     28th Jul 1993  HME / UoE, Starlink.  Changed PSX_GETCWD to GEN_*.
 C     14th Jan 1994  HME / UoE, Starlink.  Fix small typo in prologue.
 C      1st Jul 2004  AA / Exeter, Starlink. Non-platform specific version
+C      4th Dec 2013  TJ / Use PSX_GETCWD instead of GEN_GETCWD
 C+
       SUBROUTINE DSAZ_FNAME (OBJECT,NEW,DEFEXTS,NEXTS,FILENAME,STRUCT,
      :                                                  ALTFILE,STATUS)
@@ -311,7 +312,7 @@ C     have an absolute file name - ie one that starts with '/'. If we don't
 C     we will need to prepend the current default directory to the filename.
 C
       IF (FULL_NAME(1:1).NE.'/') THEN
-         CALL GEN_GETCWD(TRAN_NAME,STATUS)
+         CALL PSX_GETCWD(TRAN_NAME,STATUS)
          IF (STATUS.EQ.0) THEN
             FULL_NAME=TRAN_NAME(:ICH_LEN(TRAN_NAME))//'/'//FULL_NAME
          END IF

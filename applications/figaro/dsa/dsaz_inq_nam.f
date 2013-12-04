@@ -53,19 +53,20 @@ C  System:
 C     This is the UNIX version of this routine.
 C
 C  External subroutines / functions used:
-C     EMS_ANNUL, EMS_BEGIN, EMS_END, ICH_LEN, GEN_GETCWD
+C     EMS_ANNUL, EMS_BEGIN, EMS_END, ICH_LEN, PSX_GETCWD
 C
 C  Subroutine / function details:
 C     EMS_ANNUL    Clear any EMS error messages
 C     EMS_BEGIN    Start a new EMS reporting environment
 C     EMS_END      End the current EMS reporting environment
 C     ICH_LEN      Position of last non-blank char in string
-C     GEN_GETCWD   Gets absolute pathname of current working directory
+C     PSX_GETCWD   Gets absolute pathname of current working directory
 C
 C  History:
 C     26th Aug 1992  Original version.  KS / AAO.
 C     29th Aug 1992  "INCLUDE" filenames now upper case. KS/AAO
 C     28th Jul 1993  HME / UoE, Starlink.  Changed PSX_GETCWD to GEN_*.
+C      3rd Dec 2013  TJ Use PSX_GETCWD
 C+
       SUBROUTINE DSAZ_INQ_NAME (FILENAME,LU,FULLNAME,STATUS)
 C
@@ -111,13 +112,13 @@ C
 C
 C        This implementation has given us a relative pathname. We need
 C        to get the full pathname by combining this with the current
-C        working directory name. We get this through a call to GEN_GETCWD.
+C        working directory name. We get this through a call to PSX_GETCWD.
 C        Note that since PSX routines use EMS to log errors we need to
-C        control that. (GEN_GETCWD is inteded to become a PSX routine.)
+C        control that.
 C
          EMSTAT=0
          CALL EMS_BEGIN(EMSTAT)
-         CALL GEN_GETCWD(CWD,STATUS)
+         CALL PSX_GETCWD(CWD,STATUS)
          EMSTAT=0
          CALL EMS_ANNUL(EMSTAT)
          CALL EMS_END(EMSTAT)
