@@ -12,7 +12,7 @@ The programs it contains can be used to process a
 wide range of images and spectra.
   </p></abstract>
   <dependencies >
-    <build>pcs</build><build option='link'>pda</build><build option='link'>agi</build><build option='link'>grp</build><build option='link'>ndf</build><build option='link'>fio</build><build option='link'>idi</build><build option='link'>shl</build><build option='link'>sla</build><sourceset>star2html</sourceset>
+    <build>pcs</build><build option='link'>pda</build><build option='link'>agi</build><build option='link'>grp</build><build option='link'>ndf</build><build option='link'>fio</build><build option='link'>idi</build><build option='link'>shl</build><build option='link'>sla</build><build option='link'>psx</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
