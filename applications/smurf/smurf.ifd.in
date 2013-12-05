@@ -2917,6 +2917,23 @@ package @PACKAGE@ {
                 vpath INTERNAL
                 helpkey *
             }
+
+            parameter vertex_dec {
+                type _DOUBLE
+                size *
+                access READ
+                prompt {ICRS Dec at vertices (deg.s)}
+                helpkey *
+            }
+
+            parameter vertex_ra {
+                type _DOUBLE
+                size *
+                access READ
+                prompt {ICRS RA at vertices (deg.s)}
+                helpkey *
+            }
+
         }
 
         action makecube {
