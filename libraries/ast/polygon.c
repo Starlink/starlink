@@ -89,6 +89,11 @@ f     - AST_OUTLINE<X>: Create a Polygon outlining values in a pixel array
 *        Modify RegPins so that it can handle uncertainty regions that straddle
 *        a discontinuity. Previously, such uncertainty Regions could have a huge
 *        bounding box resulting in matching region being far too big.
+*     6-DEC-2013 (DSB):
+*        Reverse the order of the vertices when the Polygon is created,
+*        if necessary, to ensure that the unnegated Polygon is bounded.
+*        The parent Region class assumes that unnegated regions are
+*        bounded.
 *class--
 */
 
@@ -296,6 +301,7 @@ static void Cache( AstPolygon *, int * );
 static void Copy( const AstObject *, AstObject *, int * );
 static void Delete( AstObject *, int * );
 static void Dump( AstObject *, AstChannel *, int * );
+static void EnsureInside( AstPolygon *, int * );
 static void FindMax( Segment *, AstFrame *, double *, double *, int, int, int * );
 static void RegBaseBox( AstRegion *this, double *, double *, int * );
 static void ResetCache( AstRegion *this, int * );
@@ -973,6 +979,102 @@ static AstPointSet *DownsizePoly( AstPointSet *pset, double maxerr,
 
 /* Return the result. */
    return result;
+}
+
+static void EnsureInside( AstPolygon *this, int *status ){
+/*
+*  Name:
+*     EnsureInside
+
+*  Purpose:
+*     Ensure the unnegated Polygon represents the inside of the polygon.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "polygon.h"
+*     void EnsureInside( AstPolygon *this, int *status )
+
+*  Class Membership:
+*     Polygon member function
+
+*  Description:
+*     Reversing the order of the vertices of a Polygon is like negating
+*     the Polygon. But the parent Region class assumes that an unnegated
+*     region bounded by closed curves (e.g. boxes, circles, ellipses, etc)
+*     is bounded. So we need to have a way to ensure that a Polygon also
+*     follows this convention. So this function reverses the order of the
+*     vertices in the Polygon, if necessary, to ensure that the unnegated
+*     Polygon is bounded.
+
+*  Parameters:
+*     this
+*        The Polygon.
+*     status
+*        Pointer to the inherited status variable.
+
+*/
+
+/* Local Variables: */
+   AstRegion *this_region;
+   double **ptr;
+   double *p;
+   double *q;
+   double tmp;
+   int bounded;
+   int i;
+   int j;
+   int jmid;
+   int negated;
+   int np;
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Is the unnegated Polygon unbounded? If so, we need to reverse the
+   vertices. */
+   bounded = astGetBounded( this );
+   negated = astGetNegated( this );
+   if( ( bounded && negated ) || ( !bounded && !negated ) ) {
+      this_region = (AstRegion *) this;
+
+/* Get a pointer to the arrays holding the coordinates at the Polygon
+   vertices. */
+      ptr = astGetPoints( this_region->points );
+
+/* Get the number of vertices. */
+      np = astGetNpoint( this_region->points );
+
+/* Store the index of the last vertex to swap. For odd "np" the central
+   vertex does not need to be swapped. */
+      jmid = np/2;
+
+/* Loop round the two axes spanned by the Polygon. */
+      for( i = 0; i < 2; i++ ) {
+
+/* Get pointers to the first pair of axis values to be swapped - i.e. the
+   first and last axis values. */
+         p = ptr[ i ];
+         q = p + np - 1;
+
+/* Loop round all pairs of axis values. */
+         for( j = 0; j < jmid; j++ ) {
+
+/* Swap the pair. */
+            tmp = *p;
+            *(p++) = *q;
+            *(q--) = tmp;
+         }
+      }
+
+/* Invert the value of the "Negated" attribute to cancel out the effect
+   of the above vertex reversal. */
+      astNegate( this );
+
+/* Indicate the cached information in the Polygon structure is stale. */
+      this->stale = 1;
+   }
 }
 
 /*
@@ -4630,14 +4732,12 @@ static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
 */
 
 /* Local Variables: */
-   AstPolygon *in;                /* Pointer to input Polygon */
    AstPolygon *out;               /* Pointer to output Polygon  */
 
 /* Check the global error status. */
    if ( !astOK ) return;
 
-/* Obtain pointers to the input and output Polygons. */
-   in = (AstPolygon *) objin;
+/* Obtain pointers to the output Polygon. */
    out = (AstPolygon *) objout;
 
 /* For safety, first clear any references to the input memory from
@@ -4744,14 +4844,8 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 *        Pointer to the inherited status variable.
 */
 
-/* Local Variables: */
-   AstPolygon *this;                 /* Pointer to the Polygon structure */
-
 /* Check the global error status. */
    if ( !astOK ) return;
-
-/* Obtain a pointer to the Polygon structure. */
-   this = (AstPolygon *) this_object;
 
 /* Write out values representing the instance variables for the
    Polygon class.  Accompany these with appropriate comment strings,
@@ -5232,6 +5326,10 @@ AstPolygon *astInitPolygon_( void *mem, size_t size, int init, AstPolygonVtab *v
          new->acw = 1;
          new->stale = 1;
 
+/* Ensure the vertices are stored such that the unnegated Polygon
+   represents the inside of the polygon. */
+         EnsureInside( new, status );
+
 /* If an error occurred, clean up by deleting the new Polygon. */
          if ( !astOK ) new = astDelete( new );
       }
@@ -5389,6 +5487,10 @@ AstPolygon *astLoadPolygon_( void *mem, size_t size, AstPolygonVtab *vtab,
    convention, negate the Polygon so that it is consistent with the
    current conevtion (based on STC). */
       if( ! order ) astNegate( new );
+
+/* Ensure the vertices are stored such that the unnegated Polygon
+   represents the inside of the polygon. */
+      EnsureInside( new, status );
 
 /* If an error occurred, clean up by deleting the new Polygon. */
       if ( !astOK ) new = astDelete( new );
