@@ -41,6 +41,7 @@
 
 *  Authors:
 *     DSB: David S Berry (JAC, UCLan)
+*     GSB: Graham S Bell (JAC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -48,6 +49,9 @@
 *        Initial version.
 *     12-JUL-2013 (DSB):
 *        Changed to use NTPF values that are powers of 2.
+*     04-DEC-2013 (GSB):
+*        Update PPT values and increase NTPF for HARP to avoid excessive
+*        file sizes in 8192 channel modes.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -106,36 +110,33 @@ void smf_jsatiling( smf_inst_t instrument, smfJSATiling *skytiling,
 
 /* SCUBA-2 850 - NTPF is chosen to be a power of 2 that gives a tile area
    close to 1 square degree (actually 0.8393 square degrees). PPT is
-   chosen to give a pixel area close to 16 square arc-seconds (actually
-   15.98). */
+   chosen to give a pixel size under 4 arc-seconds (actually 3.22). */
    if( instrument == SMF__INST_SCUBA_2_850 ) {
       skytiling->name = "SCUBA-2(850)";
       skytiling->subdir = "scuba2-850";
       skytiling->ntpf = 64;
-      skytiling->ppt = 825;
+      skytiling->ppt = 1024;
       skytiling->fov = 600.0;
 
 /* SCUBA-2 450 - NTPF is chosen to be a power of 2 that gives a tile area
    close to 1 square degree (actually 0.8393 square degrees). PPT is
-   chosen to give a pixel area close to 4 square arc-seconds (actually
-   3.99). */
+   chosen to give a pixel size under 2 arc-seconds (actually 1.61). */
    } else if( instrument == SMF__INST_SCUBA_2_450 ) {
       skytiling->name = "SCUBA-2(450)";
       skytiling->subdir = "scuba2-450";
       skytiling->ntpf = 64;
-      skytiling->ppt = 1650;
+      skytiling->ppt = 2048;
       skytiling->fov = 600.0;
 
 /* HARP - NTPF is chosen to be a power of 2 that gives a tile area
-   close to 0.25 square degree (actually 0.21 square degrees). PPT is
-   chosen to give a pixel area close to 16 square arc-seconds (actually
-   16.02). */
+   close to 1/16 square degree (actually 0.05 square degrees). PPT is
+   chosen to give a pixel size close to 6 arc-seconds (actually 6.44). */
    } else if( instrument == SMF__INST_HARP ) {
       skytiling->name = "HARP";
       skytiling->subdir = "harp";
       skytiling->type = "_REAL";
-      skytiling->ntpf = 128;
-      skytiling->ppt = 412;
+      skytiling->ntpf = 256;
+      skytiling->ppt = 128;
       skytiling->fov = 130.0;
 
 /* RxA */
