@@ -13,13 +13,15 @@
 *     C function
 
 *  Invocation:
-*     smf_addmap1( double *map1, double *mapweight1, double *boloweight1,
-*                  int *hitsmap1, double *mapvar1, smf_qual_t *mapqual1,
-*                  double *map2, double *boloweight2,
+*     smf_addmap1( int contchunk, double *map1, double *mapweight1,
+*                  double *boloweight1, int *hitsmap1, double *mapvar1,
+*                  smf_qual_t *mapqual1, double *map2, double *boloweight2,
 *                  int *hitsmap2, double *mapvar2, smf_qual_t *mapqual2,
 *                  dim_t msize, double chunkweight2, int *status ) {
 
 *  Arguments:
+*     contchunk = int (Given)
+*        The zero-based index of the chunk being added.
 *     map1 = double* (Given and Returned)
 *        The first map
 *     mapweight1 = double* (Given and Returned)
@@ -60,7 +62,8 @@
 *     variance weighting.
 *
 *  Authors:
-*     Edward Chapin (UBC)
+*     EC: Edward Chapin (UBC)
+*     DSB: David S Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -77,6 +80,9 @@
 *        new arguments "mapweight1" and "chunkweight2". These changes
 *        allow different chunks to be weighted differently in the final
 *        coadded map.
+*     2013-12-09 (DSB):
+*        Added argument "contchunk". Now needed since "map1==map2" is no
+*        longer a valid check that the first contchunk is being processed.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -119,7 +125,7 @@
 
 #define FUNC_NAME "smf_addmap1"
 
-void smf_addmap1( double *map1, double *mapweight1, double *boloweight1,
+void smf_addmap1( int contchunk, double *map1, double *mapweight1, double *boloweight1,
                   int *hitsmap1, double *mapvar1, smf_qual_t *mapqual1,
                   double *map2, double *boloweight2, int *hitsmap2,
                   double *mapvar2, smf_qual_t *mapqual2, dim_t msize,
@@ -140,9 +146,8 @@ void smf_addmap1( double *map1, double *mapweight1, double *boloweight1,
       return;
   }
 
-  /* If the two maps refer to the same array (i.e. the first iteration),
-     just update the mapweight array. */
-  if( map1 == map2 ) {
+  /* If this is the first chunk, just update the mapweight array. */
+  if( contchunk == 0 ) {
     for( i=0; i<msize; i++ ) {
        if( mapvar1[ i ] != VAL__BADD ) {
           mapweight1[ i ] = chunkweight2/mapvar1[ i ];

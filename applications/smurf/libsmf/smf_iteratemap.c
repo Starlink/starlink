@@ -2914,8 +2914,8 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       if( ncontchunks > 1 ) {
         msgOut( " ", FUNC_NAME ": Adding map estimated from this continuous"
                 " chunk to total", status);
-        smf_addmap1( map, mapweights, weights, hitsmap, mapvar, mapqual,
-                     thismap, thisweight, thishits, thisvar, thisqual,
+        smf_addmap1( contchunk, map, mapweights, weights, hitsmap, mapvar,
+                     mapqual, thismap, thisweight, thishits, thisvar, thisqual,
                      msize, chunkweight, status );
       }
 
