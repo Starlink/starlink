@@ -259,10 +259,12 @@
 *        resulting in visible bolometer tracks. If this is a problem, add
 *        "noi.calcfirst=1" to your config., and remove "noi.box_size".
 *     9-DEC-2013 (DSB):
-*        Fix nasty bug which caused the raw (i.e. uncleaned) data to be
+*        - Fix nasty bug which caused the raw (i.e. uncleaned) data to be
 *        used on every iteration, even though "doclean=0" was used on the
 *        second and subsequent iteration, thus causing the map to be
 *        formed from uncleaned data.
+*        - Ensure only one iteration is used on the second and subsequent 
+*        invocations of makemap, even if ast.skip is non-zero.
 
 *-
 '''
@@ -389,10 +391,10 @@ try:
    itermap = parsys["ITERMAP"].value
 
 #  See if we are using pre-cleaned data, in which case there is no need
-#  to export the cleaned data on the first iteration. Note we need to 
-#  convert the string returned by "invoke" to an int explicitly, otherwise 
-#  the equality is never satisfied and we end up assuming that the raw 
-#  data has been precleaned, even if it hasn't been precleaned. 
+#  to export the cleaned data on the first iteration. Note we need to
+#  convert the string returned by "invoke" to an int explicitly, otherwise
+#  the equality is never satisfied and we end up assuming that the raw
+#  data has been precleaned, even if it hasn't been precleaned.
    if int( invoke( "$KAPPA_DIR/configecho name=doclean config={0} "
               "defaults=$SMURF_DIR/smurf_makemap.def "
               "select=\"\'450=0,850=1\'\" defval=1".format(config))) == 1:
@@ -643,7 +645,8 @@ try:
       add["ast.skip"] = 0      # Ensure we do not skip any more AST models
       add["noi.import"] = 0    # Use the NOI model created by iteration 1
       add["noi.export"] = 0    # No need to export the NOI model again
-
+      if ast_skip > 0:
+         add["numiter"] = 1    # First invocation used (1+ast_skip) iterations
 
 #  Now create the config, inheriting the config from the first invocation.
       iconf = 1
