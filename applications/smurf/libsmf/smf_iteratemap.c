@@ -2859,6 +2859,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       dat.ast_mask = astFree( dat.ast_mask );
       dat.com_mask = astFree( dat.com_mask );
       dat.flt_mask = astFree( dat.flt_mask );
+      dat.initqual = astFree( dat.initqual );
     }
 
 #ifdef __ITERATEMAP_SHOW_MEM
@@ -3051,7 +3052,6 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   lastmap = astFree( lastmap );
   mapchange = astFree( mapchange );
   job_data = astFree( job_data );
-  dat.initqual = astFree( dat.initqual );
 
   /* Ensure that FFTW doesn't have any used memory kicking around */
   fftw_cleanup();
