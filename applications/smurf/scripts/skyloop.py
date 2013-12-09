@@ -258,6 +258,11 @@
 *        variances, and thus be over-emphasised in the final map,
 *        resulting in visible bolometer tracks. If this is a problem, add
 *        "noi.calcfirst=1" to your config., and remove "noi.box_size".
+*     9-DEC-2013 (DSB):
+*        Fix nasty bug which caused the raw (i.e. uncleaned) data to be
+*        used on every iteration, even though "doclean=0" was used on the
+*        second and subsequent iteration, thus causing the map to be
+*        formed from uncleaned data.
 
 *-
 '''
@@ -384,10 +389,13 @@ try:
    itermap = parsys["ITERMAP"].value
 
 #  See if we are using pre-cleaned data, in which case there is no need
-#  to export the cleaned data on the first iteration.
-   if invoke( "$KAPPA_DIR/configecho name=doclean config={0} "
+#  to export the cleaned data on the first iteration. Note we need to 
+#  convert the string returned by "invoke" to an int explicitly, otherwise 
+#  the equality is never satisfied and we end up assuming that the raw 
+#  data has been precleaned, even if it hasn't been precleaned. 
+   if int( invoke( "$KAPPA_DIR/configecho name=doclean config={0} "
               "defaults=$SMURF_DIR/smurf_makemap.def "
-              "select=\"\'450=0,850=1\'\" defval=1".format(config)) == 1:
+              "select=\"\'450=0,850=1\'\" defval=1".format(config))) == 1:
       precleaned = False
    else:
       precleaned = True
