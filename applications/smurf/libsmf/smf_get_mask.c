@@ -93,19 +93,13 @@
 *        pixels, do not require source pixels to have a defined variance
 *        since variances are usually not available on the first iteration.
 *     9-JUL-2013 (DSB):
-*        The ZERO_NITER and ZERO_FREEZE values should count the iterations
+*        The ZERO_NITER and ZERO_FREEZE values should count the iterations 
 *        perfomed *after* any initial iterations for which the AST model was
 *        skipped.
-*     10-DEC-2013 (DSB):
-*        The AST model blanks out background pixels, so when masking AST we
-*        check that the mask has a significant number of source pixels. But
-*        the FLT and COM models blank out source pixels. So when masking
-*        these models we should check that the mask has a significant number
-*        of background pixels instead.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2012-2013 Science & Technology Facilities Council.
+*     Copyright (C) 2012 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -183,7 +177,6 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
    int lbnd_grid[ 2 ];        /* Lower bounds of map in GRID coords */
    int mask_types[ NTYPE ];   /* Identifier for the types of mask to use */
    int munion;                /* Use union of supplied masks */
-   int nback;                 /* No. of background pixels in final mask */
    int nel;                   /* Number of mapped NDF pixels */
    int nmask;                 /* The number of masks to be combined */
    int nsource;               /* No. of source pixels in final mask */
@@ -639,37 +632,22 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
 /* Free the individual mask work array if it was used. */
             if( nmask > 1 ) newmask = astFree( newmask );
 
-/* Check that the mask has some source pixels (for AST) or background
-   pixels (for FLT and COM). We do not also check variance values since
-   they are not available until the second iteration. */
+/* Check that the mask has some source pixels (i.e. pixels that have non-bad data values -
+   we do not also check variance values since they are not available until the second
+   iteration). */
             if( *status == SAI__OK ) {
                nsource = 0;
-               nback = 0;
                pm = *mask;
                pd = dat->map;
                for( i = 0; i < dat->msize; i++,pd++,pv++,pm++ ) {
-                  if( *pd != VAL__BADD ){
-                     if( *pm == 0 ) {
-                        nsource++;
-                     } else {
-                        nback++;
-                     }
-                  }
+                  if( *pd != VAL__BADD && *pm == 0 ) nsource++;
                }
-               if( nsource < 5 && mtype == SMF__AST ) {
-                  *status = SAI__ERROR;
-                  errRepf( "", "The AST mask being used has fewer than 5 "
-                           "source pixels.", status );
-                  if( zero_snr > 0.0 ) {
-                     errRepf( "", "Maybe your zero_snr value (%g) is too high?",
-                              status, zero_snr );
-                  }
-               } else if( nback < 5 && mtype != SMF__AST ) {
+               if( nsource < 5 && *status == SAI__OK ) {
                   *status = SAI__ERROR;
                   errRepf( "", "The %s mask being used has fewer than 5 "
-                           "background pixels.", status, modname );
+                           "source pixels.", status, modname );
                   if( zero_snr > 0.0 ) {
-                     errRepf( "", "Maybe your zero_snr value (%g) is too low?",
+                     errRepf( "", "Maybe your zero_snr value (%g) is too high?",
                               status, zero_snr );
                   }
                }
