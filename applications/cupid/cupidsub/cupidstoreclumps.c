@@ -436,11 +436,11 @@ void cupidStoreClumps( const char *param1, const char *param2, int indf,
                if( logfile ) {
                   nc = 0;
 
-                  sprintf( buf, "%-*d", LOGTAB, nok );
+                  sprintf( buf, "%-*d", LOGTAB-1, nok );
                   line = astAppendString( line, &nc, buf );
 
                   for( icol = 0; icol < ncpar; icol++ ) {
-                     sprintf( buf, "%-*.*g", LOGTAB, LOGTAB-5, cpars[ icol ] );
+                     sprintf( buf, " %-*.*g", LOGTAB-1, LOGTAB-5, cpars[ icol ] );
                      line = astAppendString( line, &nc, buf );
                   }
                   fprintf( logfile, "%s\n", line );
