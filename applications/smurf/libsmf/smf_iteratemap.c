@@ -2892,7 +2892,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
       /* Remember how many chunks failed due to lack of samples */
       count_minsmp++;
-    } else {
+    } else if( *status == SAI__OK ){
 
       /* In the multiple contchunk case, add this map to the total if
          we got here with clean status. First get the weight for this
