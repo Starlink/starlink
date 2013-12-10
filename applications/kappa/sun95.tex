@@ -46676,6 +46676,9 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND}.
       quality specified by QNAME, and the quality was then assigned to
       pixel (2,~2) this would not cause the quality to be removed from
       pixel (1,~1).
+
+      This routine can also be used to copy all quality information from
+      one NDF to another (see Parameter LIKE).
    }
    \sstusage{
       setqual ndf qname comment mask
@@ -46745,6 +46748,14 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND}.
          {\tt ["HS"]}
       }
       \sstsubsection{
+         LIKE = NDF (Read)
+      }{
+         An existing NDF from which the quality component and quality names are
+         to be copied. These overwrite any corresponding information in the
+         NDF given by Parameter NDF. If null ({\tt{!}}), then the operation of
+         this command is instead determined by Parameter SELECT. {\tt [!]}
+      }
+      \sstsubsection{
          LIST = LITERAL (Read)
       }{
          A group of pixels positions within the input NDF listing the
@@ -46787,9 +46798,10 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND}.
       \sstsubsection{
          SELECT = LITERAL (Read)
       }{
-         This parameter determines how the pixels are selected, and can
-         take the values {\tt "Mask"}, {\tt "List"} or {\tt "ARD"}
-         (see Parameters MASK, LIST, and ARD).  {\tt ["Mask"]}
+         If Parameter LIKE is null, then this parameter determines how
+         the pixels are selected, and can take the values {\tt "Mask"},
+         {\tt "List"} or {\tt "ARD"} (see Parameters MASK, LIST, and
+         ARD).  {\tt ["Mask"]}
       }
       \sstsubsection{
          XNAME = LITERAL (Read)

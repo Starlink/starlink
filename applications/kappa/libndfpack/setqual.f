@@ -50,6 +50,9 @@
 *     quality specified by QNAME, and the quality was then assigned to
 *     pixel (2,2) this would not cause the quality to be removed from
 *     pixel (1,1).
+*
+*     This routine can also be used to copy all quality information from
+*     one NDF to another (see Parameter LIKE).
 
 *  Usage:
 *     setqual ndf qname comment mask
@@ -102,6 +105,11 @@
 *                  held by all the pixels that have not been selected
 *                  and not held by any of the selected pixels.
 *        ["HS"]
+*     LIKE = NDF (Read)
+*        An existing NDF from which the quality component and quality names are
+*        to be copied. These overwrite any corresponding information in the
+*        NDF given by Parameter NDF. If null (!), then the operation of
+*        this command is instead determined by Parameter SELECT. [!]
 *     LIST = LITERAL (Read)
 *        A group of pixels positions within the input NDF listing the
 *        pixels that are to be `selected' (see parameter FUNCTION).
@@ -128,9 +136,9 @@
 *        subsequently made to remove the quality name (e.g. using
 *        REMQUAL). [FALSE]
 *     SELECT = LITERAL (Read)
-*        This parameter determines how the pixels are selected, and can
-*        take the values "Mask", "List" or "ARD" (see parameters MASK,
-*        LIST, and ARD). ["Mask"]
+*        If Parameter LIKE is null, then this parameter determines how
+*        the pixels are selected, and can take the values "Mask",
+*        "List" or "ARD" (see parameters MASK, LIST, and ARD). ["Mask"]
 *     XNAME = LITERAL (Read)
 *        If an NDF already contains any quality name definitions then
 *        new quality names are put in the same extension as the old
@@ -180,7 +188,7 @@
 *     Copyright (C) 1991, 1994 Science & Engineering Research Council.
 *     Copyright (C) 2002, 2004 Central Laboratory of the Research
 *     Councils. Copyright (C) 2006 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     Copyright (C) 2008,2013 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -219,6 +227,8 @@
 *        Remove unused variables and wrapped long lines.
 *     15-FEB-2008 (DSB):
 *        Add READONLY parameter.
+*     10-DEC-2013 (DSB):
+*        Add LIKE parameter.
 *     {enter_further_changes_here}
 
 *-
@@ -256,6 +266,7 @@
       CHARACTER COMMNT*(IRQ__SZCOM) ! Descriptive comment to store with
                                  ! the supplied quality name.
       LOGICAL CONT               ! ARD description to continue?
+      INTEGER EL                 ! No. of elements in mapped array
       INTEGER ELMASK             ! No. of elements in mapped DATA
                                  ! component of the used mask.
       INTEGER FD                 ! File descriptor
@@ -268,6 +279,7 @@
                                  ! exists within the input NDF.
       CHARACTER FUNC*2           ! Value of parameter FUNCTION.
       INTEGER I                  ! Loop count
+      INTEGER IERR               ! Index of first conversion error
       INTEGER IGRP1              ! Identifier for group holding pixel
                                  ! indices.
       INTEGER IGRP2              ! Identifier for group holding ARD
@@ -277,16 +289,24 @@
                                  ! positions.
       INTEGER IPIX               ! Index of PIXEL Frame within IWCS
       INTEGER IPMASK             ! Pointer to the used mask
+      INTEGER IPQIN              ! Pointer to the input quality array
+      INTEGER IPQOUT             ! Pointer to the output quality array
       INTEGER IWCS               ! NDF WCS FrameSet
       INTEGER LBND( NDF__MXDIM ) ! Lower bounds for input NDF
       CHARACTER LOCS(5)*(DAT__SZLOC) ! Locators used to access quality
                                  ! name information in the input NDF
+      CHARACTER QLOC*(DAT__SZLOC) ! Locator for quality names structure
+      CHARACTER XLOC1*(DAT__SZLOC) ! Locator for quality name extension
+      CHARACTER XLOC2*(DAT__SZLOC) ! Locator for quality name extension
       INTEGER LQNAME             ! Length of the quality name string
       INTEGER NC                 ! No. of pixel positions store in
                                  ! the input text file
       INTEGER NDFIN              ! NDF identifier for input NDF
+      INTEGER NDFLIK             ! NDF identifier for template
       INTEGER NDFMSK             ! NDF identifier for mask NDF
+      INTEGER NDFSEC             ! NDF identifier for section of template
       INTEGER NDIM               ! Number of dimensions in input NDF
+      INTEGER NERR               ! Number of conversion errors
       INTEGER NINDEX             ! The total number of pixel indices
                                  ! obtained.
       CHARACTER QNAME*(IRQ__SZQNM)! Supplied quality name.
@@ -326,6 +346,92 @@
 
 *  Get the bounds and number of dimensions.
       CALL NDF_BOUND( NDFIN, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
+
+*  See if quality info is to be copied from another NDF.
+      IF( STATUS .EQ. SAI__OK ) THEN
+         CALL LPG_ASSOC( 'LIKE', 'READ', NDFLIK, STATUS )
+
+*  If not, annull the error.
+         IF( STATUS .EQ. PAR__NULL ) THEN
+            CALL ERR_ANNUL( STATUS )
+
+*  Otherwise copy the info.
+         ELSE
+
+*  Get a section of the template NDF that matches the main NDF.
+            CALL NDF_SECT( NDFLIK, NDIM, LBND, UBND, NDFSEC, STATUS )
+
+*  If the template NDF has a Quality component, copy it to the main NDF.
+            CALL NDF_STATE( NDFSEC, 'QUALITY', THERE, STATUS )
+            IF( THERE ) THEN
+               CALL NDF_MAP( NDFSEC, 'QUALITY', '_UBYTE', 'READ',
+     :                       IPQIN, EL, STATUS )
+               CALL NDF_MAP( NDFIN, 'QUALITY', '_UBYTE', 'WRITE',
+     :                       IPQOUT, EL, STATUS )
+               CALL VEC_UBTOUB( .FALSE., EL, %VAL( CNF_PVAL( IPQIN ) ),
+     :                          %VAL( CNF_PVAL( IPQOUT ) ), IERR, NERR,
+     :                          STATUS )
+
+*  If the template NDF does not have a Quality component, delete any
+*  Quality component in the main NDF.
+            ELSE
+               CALL NDF_RESET( NDFIN, 'QUALITY', STATUS )
+            END IF
+
+*  Delete any quality name info in the main NDF.
+            CALL IRQ_DELET( NDFIN, STATUS )
+
+*  Abort if an error has occurred.
+            IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Attempt to locate any existing quality name information in the template
+*  NDF. If such information is found, LOCS is returned holding a set of
+*  five HDS locators which identify the NDF and various items of
+*  quality information. XNAME is returned holding the name of the NDF
+*  extension in which the information was found. If no quality name
+*  information is found, then an error is reported.
+            CALL IRQ_FIND( NDFSEC, LOCS, XNAME, STATUS )
+            IF( STATUS .EQ. SAI__OK ) THEN
+
+*  Release the above locators.
+               CALL IRQ_RLSE( LOCS, STATUS )
+
+*  Get a locator to the extension containing the template's quality names.
+               CALL NDF_XLOC( NDFSEC, XNAME, 'READ', XLOC1, STATUS )
+
+*  Get a locator to the quality name structure in the template.
+               CALL DAT_FIND( XLOC1, IRQ__QINAM, QLOC, STATUS )
+
+*  Ensure the main NDF has an extension with the same name, and get a
+*  locator to it.
+               CALL NDF_XSTAT( NDFIN, XNAME, THERE, STATUS )
+               IF( .NOT. THERE ) THEN
+                  CALL DAT_TYPE( XLOC1, XTYPE, STATUS )
+                  CALL NDF_XNEW( NDFIN, XNAME, XTYPE, 0, 0, XLOC2,
+     :                           STATUS )
+               ELSE
+                  CALL NDF_XLOC( NDFIN, XNAME, 'UPDATE', XLOC2, STATUS )
+               END IF
+
+*  Copy the quality names structure from the template to the main NDF.
+               CALL DAT_COPY( QLOC, XLOC2, IRQ__QINAM, STATUS )
+
+*  Annul locators.
+               CALL DAT_ANNUL( QLOC, STATUS )
+               CALL DAT_ANNUL( XLOC1, STATUS )
+               CALL DAT_ANNUL( XLOC2, STATUS )
+
+*  If no quality name info was found in the template, just annull the
+*  error.
+            ELSE
+               CALL ERR_ANNUL( STATUS )
+            END IF
+
+*  Nothing more to do.
+            GO TO 999
+
+         END IF
+      END IF
 
 *  Get a value for parameter QNAME.
       CALL PAR_GET0C( 'QNAME', QNAME, STATUS )
