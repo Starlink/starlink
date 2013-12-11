@@ -101,6 +101,9 @@
 *        gaps were being filled, as they were all merged into one big gap
 *        and the filled data was thus very unconstrained (which is not
 *        good for FLT masking).
+*     2013-12-02 (DSB):
+*        Changed so that it can be used on a smfData with no Quality
+*        array (e.g. the COM model).
 
 *  Copyright:
 *     Copyright (C) 2010 Univeristy of British Columbia.
@@ -206,12 +209,6 @@ void  smf_fillgaps( ThrWorkForce *wf, smfData *data,
   dat = data->pntr[0];
   qua = smf_select_qualpntr( data, NULL, status );
 
-  if( !qua ) {
-    *status = SAI__ERROR;
-    errRep( "", FUNC_NAME ": No valid QUALITY array was provided", status );
-    return;
-  }
-
   if( !dat ) {
     *status = SAI__ERROR;
     errRep( "", FUNC_NAME ": smfData does not contain a DATA component",status);
@@ -234,8 +231,13 @@ void  smf_fillgaps( ThrWorkForce *wf, smfData *data,
   }
 
   /* Find the indices of the first and last non-PAD sample. */
-  smf_get_goodrange( qua, ntslice, tstride, SMF__Q_PAD, &pstart, &pend,
-                     status );
+  if( qua ) {
+     smf_get_goodrange( qua, ntslice, tstride, SMF__Q_PAD, &pstart, &pend,
+                        status );
+  } else {
+    pstart = 0;
+    pend = ntslice - 1;
+  }
 
   /* Report an error if it is too short. */
   if( pend - pstart <= 2*BOX && *status == SAI__OK ) {
@@ -377,16 +379,18 @@ static void smfFillGapsParallel( void *job_data_ptr, int *status ) {
   fillpad = pdata->fillpad;
 
   /* Loop over bolometer */
-  for( i = b1; i <= b2; i++ ) if( !(qua[ i*bstride ] & SMF__Q_BADB) ) {
+  for( i = b1; i <= b2; i++ ) if( !qua || !(qua[ i*bstride ] & SMF__Q_BADB) ) {
 
     /* First, for simplicity, ensure that all flagged samples have bad data
        values. These are replaced with good values by the filling process. */
-    pd = dat + i*bstride;
-    pq = qua + i*bstride;
-    for( j = 0; j < ntslice; j++ ) {
-      if( *pq & mask ) *pd = VAL__BADD;
-      pd += tstride;
-      pq += tstride;
+    if( qua ) {
+      pd = dat + i*bstride;
+      pq = qua + i*bstride;
+      for( j = 0; j < ntslice; j++ ) {
+        if( *pq & mask ) *pd = VAL__BADD;
+        pd += tstride;
+        pq += tstride;
+      }
     }
 
     /* Indicate that the start of the next gap is no sooner than the first

@@ -97,7 +97,10 @@
 *     2011-04-26 (DSB):
 *        Remove the effects of apodisation from the filtered data.
 *     2011-10-26 (EC):
-*        Once again apply normalization here immediately after transforms
+*        Once again apply normalization here immediately after transforms.
+*     2013-12-02 (DSB):
+*        Changed so that it can be used on a smfData with no quality (e.g. the 
+*        COM model).
 
 *  Copyright:
 *     Copyright (C) 2011 Science & Technology Facilities Council.
@@ -559,7 +562,12 @@ void smf_filter_execute( ThrWorkForce *wf, smfData *data, smfFilter *filt,
 
   /* Determine the first and last samples to apodize (after padding), if
      any. Assumed to be the same for all bolometers. */
-  smf_get_goodrange( qua, ntslice, 1, SMF__Q_PAD, &first, &last, status );
+  if( qua ) {
+     smf_get_goodrange( qua, ntslice, 1, SMF__Q_PAD, &first, &last, status );
+  } else {
+     first = 0;
+     last = ntslice - 1;
+  }
 
   /* Can we apodize? */
   apod_length = filt->apod_length;
