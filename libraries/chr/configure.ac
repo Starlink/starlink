@@ -2,10 +2,10 @@ dnl  Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl   Initialisation: package name and version number
-AC_INIT(chr, 2.4-1, starlink@jiscmail.ac.uk)
+AC_INIT([chr],[2.4-1],[starlink@jiscmail.ac.uk])
 
 dnl   Require autoconf-2.50 at least
-AC_PREREQ(2.50)
+AC_PREREQ([2.69])
 dnl   Require automake-1.6 at least
 AM_INIT_AUTOMAKE(1.8.2-starlink)
 
@@ -16,7 +16,7 @@ dnl   Include defaults for Starlink configurations
 STAR_DEFAULTS
 
 AC_PROG_FC
-AC_PROG_LIBTOOL
+LT_INIT
 
 dnl   If --with-pic=no is set we should honour that.
 AM_CONDITIONAL(NOPIC, test x$pic_mode = xno)

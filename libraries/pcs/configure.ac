@@ -1,9 +1,9 @@
 dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
-AC_INIT(pcs, 4.1-4, starlink@jiscmail.ac.uk)
+AC_INIT([pcs],[4.1-4],[starlink@jiscmail.ac.uk])
 
-AC_PREREQ(2.50)
+AC_PREREQ([2.69])
 AM_INIT_AUTOMAKE(1.8.2-starlink)
 
 AC_CONFIG_SRCDIR([compifl.f])
@@ -15,7 +15,7 @@ STAR_DEFAULTS
 AC_PROG_CC
 AC_PROG_FC
 AC_PROG_FPP
-AC_PROG_LIBTOOL
+LT_INIT
 AC_PROG_LN_S
 
 AC_FC_LIBRARY_LDFLAGS
@@ -40,8 +40,8 @@ AC_CHECK_HEADERS([cursesX.h term.h ncurses/term.h])
 
 AC_CHECK_HEADERS([sys/socket.h])
 AC_CHECK_TYPES([socklen_t],[],[],[#include <sys/types.h>
-#if HAVE_SYS_SOCKET_H 
-#include <sys/socket.h> 
+#if HAVE_SYS_SOCKET_H
+#include <sys/socket.h>
 #endif])
 
 dnl    We need to find out whether we are looking for libcurses
@@ -58,10 +58,10 @@ AC_DEFUN([MP_WITH_CURSES],
    then
      AC_CACHE_CHECK([for working curses], mp_cv_curses,
        [LIBS="$LIBS -lcurses -ltinfo"
-        AC_TRY_LINK(
-          [#include <curses.h>],
-          [chtype a; int b=A_STANDOUT, c=KEY_LEFT; initscr(); ],
-          mp_cv_curses=yes, mp_cv_curses=no)])
+        AC_LINK_IFELSE(
+          [AC_LANG_PROGRAM([[#include <curses.h>]],
+             [[chtype a; int b=A_STANDOUT, c=KEY_LEFT; initscr(); ]])],
+          [mp_cv_curses=yes],[mp_cv_curses=no])])
      if test "$mp_cv_curses" = yes
      then
        AC_DEFINE(HAVE_CURSES_H, 1, [Define to 1 if you have the <curses.h> header file available])
@@ -72,10 +72,10 @@ AC_DEFUN([MP_WITH_CURSES],
    then
      AC_CACHE_CHECK([for working ncurses], mp_cv_ncurses,
        [LIBS="$mp_save_LIBS -lncurses"
-        AC_TRY_LINK(
-          [#include <ncurses.h>],
-          [chtype a; int b=A_STANDOUT, c=KEY_LEFT; initscr(); ],
-          mp_cv_ncurses=yes, mp_cv_ncurses=no)])
+        AC_LINK_IFELSE(
+          [AC_LANG_PROGRAM([[#include <ncurses.h>]],
+            [[chtype a; int b=A_STANDOUT, c=KEY_LEFT; initscr(); ]])],
+          [mp_cv_ncurses=yes],[mp_cv_ncurses=no])])
      if test "$mp_cv_ncurses" = yes
      then
        AC_DEFINE(HAVE_NCURSES_H, 1, [Define to 1 if you have the <ncurses.h> header file available])
