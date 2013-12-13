@@ -2,10 +2,10 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT(surf, 1.8-1, starlink@jiscmail.ac.uk)
+AC_INIT([surf],[1.8-1],[starlink@jiscmail.ac.uk])
 
 dnl    Require autoconf-2.50 at least
-AC_PREREQ(2.50)
+AC_PREREQ([2.69])
 AM_INIT_AUTOMAKE(1.8.2-starlink)
 
 dnl    Sanity-check: name a file in the source directory -- if this
@@ -17,7 +17,7 @@ STAR_DEFAULTS(per-package-dirs)
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_FC
 AC_PROG_FPP
-AC_PROG_LIBTOOL
+LT_INIT
 AC_PROG_LN_S
 
 AC_FC_CHECK_INTRINSICS([IEEE_FLAGS])

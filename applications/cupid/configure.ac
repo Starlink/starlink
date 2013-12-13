@@ -2,14 +2,14 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT(cupid, 2.0, starlink@jiscmail.ac.uk)
+AC_INIT([cupid],[2.0],[starlink@jiscmail.ac.uk])
 PACKAGE_UPCASE='CUPID'
 AC_DEFINE( [PACKAGE_UPCASE], "CUPID", [Upper cased package name] )
 AC_SUBST(PACKAGE_UPCASE)
 
 
 dnl    Require autoconf-2.50 at least
-AC_PREREQ(2.50)
+AC_PREREQ([2.69])
 AM_INIT_AUTOMAKE(1.8.2-starlink)
 
 dnl    Sanity-check: name a file in the source directory -- if this
@@ -25,7 +25,7 @@ dnl    Find required versions of the programs we need for configuration
 AC_PROG_CC
 AC_PROG_CPP
 AC_PROG_FC
-AC_PROG_LIBTOOL
+LT_INIT
 
 dnl    Setup for creating a monolith.
 STAR_MONOLITHS

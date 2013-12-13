@@ -2,10 +2,10 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
  
 dnl    Initialisation: package name and version number.
-AC_INIT(dipso, 3.6-5, starlink@jiscmail.ac.uk)
+AC_INIT([dipso],[3.6-5],[starlink@jiscmail.ac.uk])
  
 dnl    Require autoconf-2.50 at least
-AC_PREREQ(2.50)
+AC_PREREQ([2.69])
 
 dnl    Require Starlink automake
 AM_INIT_AUTOMAKE(1.8.2-starlink)
@@ -25,7 +25,7 @@ dnl    Find required versions of the programs we need for configuration
 AC_PROG_CC
 AC_PROG_FC
 AC_PROG_FPP
-AC_PROG_LIBTOOL
+LT_INIT
 
 dnl  Need a main and typeless Hex constants
 AC_FC_MAIN

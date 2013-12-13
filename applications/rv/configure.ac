@@ -2,10 +2,10 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
  
 dnl    Initialisation: package name and version number
-AC_INIT(rv, 2.4-5, starlink@jiscmail.ac.uk)
+AC_INIT([rv],[2.4-5],[starlink@jiscmail.ac.uk])
  
 dnl    Require autoconf-2.50 at least
-AC_PREREQ(2.50)
+AC_PREREQ([2.69])
 AM_INIT_AUTOMAKE(1.8.2-starlink)
  
 dnl    Sanity-check: name a file in the source directory -- if this
@@ -20,7 +20,7 @@ AC_PROG_FC
 AC_PROG_FPP
 
 dnl    Use libtool so that we get to use -rpath without pain
-AC_PROG_LIBTOOL
+LT_INIT
 
 AC_FC_OPEN_SPECIFIERS(readonly)
 AC_FC_OPEN_SPECIFIERS(action='read')

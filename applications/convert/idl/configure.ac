@@ -4,10 +4,10 @@ AC_REVISION($Revision$)
 dnl    Initialisation: package name and version number
 dnl    Note we use the name "convert" not convert-idl, this is a slight of
 dnl    hand to use the same per-package-dirs as convert.
-AC_INIT(convert, 1.5-4, starlink@jiscmail.ac.uk)
+AC_INIT([convert],[1.5-4],[starlink@jiscmail.ac.uk])
 
 dnl    Require autoconf-2.50 at least
-AC_PREREQ(2.50)
+AC_PREREQ([2.69])
 dnl    Require Starlink automake
 AM_INIT_AUTOMAKE(1.8.2-starlink)
 
@@ -18,8 +18,7 @@ AC_CONFIG_SRCDIR(IDL_Load.c)
 dnl    IDL uses a dlopened shareable library.
 AC_DISABLE_STATIC
 AC_ENABLE_SHARED
-AC_LIBTOOL_DLOPEN
-AC_PROG_LIBTOOL
+LT_INIT([dlopen])
 
 AC_CHECK_HEADERS([limits.h])
 AC_CHECK_DECLS([PATH_MAX],,,[#include <limits.h>

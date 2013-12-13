@@ -5,7 +5,7 @@ dnl    Initialisation: package name and version number
 AC_INIT(kappa, 2.1-9, starlink@jiscmail.ac.uk)
 
 dnl    Require autoconf-2.50 at least
-AC_PREREQ(2.50)
+AC_PREREQ([2.69])
 AM_INIT_AUTOMAKE(1.8.2-starlink)
 
 dnl    Sanity-check: name a file in the source directory -- if this
@@ -17,7 +17,7 @@ STAR_DEFAULTS(per-package-dirs)
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_CC
 AC_PROG_FC
-AC_PROG_LIBTOOL
+LT_INIT
 
 STAR_MONOLITHS
 STAR_CNF_COMPATIBLE_SYMBOLS

@@ -1,17 +1,17 @@
 dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
-AC_INIT(startcl, 1.5-7, starlink@jiscmail.ac.uk)
+AC_INIT([startcl],[1.5-7],[starlink@jiscmail.ac.uk])
 
-AC_PREREQ(2.50)
+AC_PREREQ([2.69])
 AM_INIT_AUTOMAKE(1.8.2-starlink)
 AC_CONFIG_SRCDIR([tclAdam.c])
 STAR_DEFAULTS
 
 AC_PROG_CC
 AC_PROG_FC
-AC_PROG_LIBTOOL
-AC_STDC_HEADERS
+LT_INIT
+AC_HEADER_STDC
 AC_CHECK_HEADERS(malloc.h)
 
 dnl    Uses C compiler to link against Fortran libraries, so we need

@@ -2,10 +2,10 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
  
 dnl    Initialisation: package name and version number
-AC_INIT(tsp, 2.3-4, starlink@jiscmail.ac.uk)
+AC_INIT([tsp],[2.3-4],[starlink@jiscmail.ac.uk])
  
 dnl    Require autoconf-2.50 at least
-AC_PREREQ(2.50)
+AC_PREREQ([2.69])
 AM_INIT_AUTOMAKE(1.8.2-starlink)
  
 dnl    Sanity-check: name a file in the source directory -- if this
@@ -22,7 +22,7 @@ AC_PROG_FPP
 STAR_CHECK_PROGS([ifd2star])
 
 dnl    Use libtool for linking since it will try to use the -rpath option
-AC_PROG_LIBTOOL
+LT_INIT
 
 STAR_CNF_COMPATIBLE_SYMBOLS
 

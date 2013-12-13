@@ -1,12 +1,12 @@
-AC_INIT(ccdpack, 4.1-1, ccdpack@starlink.ac.uk)
-AC_PREREQ(2.50)
+AC_INIT([ccdpack],[4.1-1],[ccdpack@starlink.ac.uk])
+AC_PREREQ([2.69])
 AM_INIT_AUTOMAKE(1.8.2-starlink)
 AC_CONFIG_SRCDIR(ccdexercise)
 STAR_DEFAULTS(per-package-dirs)
 STAR_MONOLITHS
 AC_PROG_CC
 AC_PROG_FC
-AC_PROG_LIBTOOL
+LT_INIT
 STAR_CNF_COMPATIBLE_SYMBOLS
 
 STAR_CHECK_PROGS([hlib ifd2star fgeneric])

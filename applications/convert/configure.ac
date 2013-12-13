@@ -2,10 +2,10 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT(convert, 1.7-1, starlink@jiscmail.ac.uk)
+AC_INIT([convert],[1.7-1],[starlink@jiscmail.ac.uk])
 
 dnl    Require autoconf-2.50 at least
-AC_PREREQ(2.50)
+AC_PREREQ([2.69])
 AM_INIT_AUTOMAKE(1.8.2-starlink)
 
 dnl    Sanity-check: name a file in the source directory -- if this
@@ -19,7 +19,7 @@ dnl    Find required versions of the programs we need for configuration
 AC_PROG_CC
 AC_PROG_FC
 AC_PROG_FPP
-AC_PROG_LIBTOOL
+LT_INIT
 
 dnl    Setup for building monoliths.
 STAR_MONOLITHS
@@ -47,7 +47,7 @@ dnl    Ranlib is needed on OS X so that we can update the static libraries
 dnl    (the archive index is considered out of date if it doesn't match the
 dnl    date of the archive file, so a simple copying invalidates this, this
 dnl    is noted in the OS X ranlib man page as a bug, so may not always be
-dnl    true). Note AC_PROG_LIBTOOL claims to obsolete:
+dnl    true). Note LT_INIT claims to obsolete this:
 dnl AC_PROG_RANLIB
 dnl    so commented out.   
 

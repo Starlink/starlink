@@ -2,10 +2,10 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT(specx, 6.8-5, t.jenness@jach.hawaii.edu)
+AC_INIT([specx],[6.8-5],[t.jenness@jach.hawaii.edu])
 
 dnl    Require autoconf-2.50 at least
-AC_PREREQ(2.50)
+AC_PREREQ([2.69])
 dnl    Require Starlink automake at least
 AM_INIT_AUTOMAKE(1.8.2-starlink)
 
@@ -22,7 +22,7 @@ dnl    Find required versions of the programs we need for configuration
 AC_PROG_CC
 AC_PROG_FC
 AC_PROG_FPP
-AC_PROG_LIBTOOL
+LT_INIT
 AC_FC_LIBRARY_LDFLAGS
 
 dnl    Push Fortran for Fortran tests.
