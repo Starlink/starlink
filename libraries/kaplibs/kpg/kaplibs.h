@@ -22,7 +22,7 @@
 
 *  Copyright:
 *     Copyright (C) 2005, 2006 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2007-2010 Science & Technology Facilities Council.
+*     Copyright (C) 2007-2010, 2013 Science & Technology Facilities Council.
 *     Copyright (C) 2009 University of British Columbia.
 *     All Rights Reserved.
 
@@ -88,6 +88,8 @@
 *        Add kpg1Filli.
 *     2011-08-22 (TIMJ):
 *        kpg1GhstX has a new API
+*     2013 December 12 (MJC):
+*        Sort so it's easier to see what is available or missing.
 *     {enter_further_changes_here}
 
 *-
@@ -112,65 +114,72 @@
 
 /* Prototypes for public functions */
 /* =============================== */
-double *kpg1Chcof( int,  HDSLoc **, int *, int *, int * );
+void fts1Astwn( AstFitsChan *, int, int * );
 
+void kpg1Asffr( AstFrameSet *, const char *, int *, int * );
 void kpg1Asget( int, int, int, int, int, int *, int *, int *, AstFrameSet **, int * );
 void kpg1Asndf( int, int, int *, int *, int *, AstFrameSet **, int * );
 void kpg1Axcpy( int, int, int, int, int * );
+
+void kpg1Badbx( int, int, int *, int *, int * );
+
+void kpg1Ch2pm( HDSLoc *, AstPolyMap **, int * );
+AstKeyMap *kpg1Config( const char *, const char *, AstKeyMap *, int, int * );
+
+double *kpg1Chcof( int,  HDSLoc **, int *, int *, int * );
 void kpg1Darad( const char *, int, double *, const char *, int *, double *, double *, int * );
+void kpg1Datcp( const HDSLoc *, HDSLoc *, const char *, int * );
+
+void kpg1Elgau( float *, float *, float *, float *, int * );
+
 void kpg1Filli( int, int, int *, int * );
 void kpg1Fillr( float, int, float *, int * );
+void kpg1Fit1d( int, int, const double x[], const double y[], double *, double *, double *, int * );
+
 void kpg1Gausr( float, int, int, float, int, int, int, int, float *, float *, int *, float *, float *, float *, int * );
-void kpg1Gtgrp( const char *, Grp **, size_t*, int *);
-void kpg1Gtwcs( int, AstFrameSet **, int * );
-void kpg1Kygrp( AstKeyMap *, Grp **, int * );
-void kpg1Kymap( const Grp *, AstKeyMap **, int * );
-void kpg1Manir( int, int *, float *, int, int *, int *, int *, int *, float *, int * );
-void kpg1Pseed( int * );
-void kpg1Rgndf( const char *, size_t, size_t, const char *, Grp **, size_t *, int * );
-void kpg1Wgndf( const char *, const Grp *, size_t, size_t, const char *, Grp **, size_t *, int * );
-void kpg1Wrlst( const char *, int, int, int, double *, int, AstFrameSet *, const char *, int, int *, int, int * );
-void kpg1Wrtab( const char *, int, int, int, double *, int, AstFrameSet *, const char *, int, int *, Grp *, Grp *, int, int * );
-void kpg1Wrcat( const char *, int, int, int, double *, int, AstFrameSet *, const char *, int, int *, AstKeyMap *, Grp *, Grp *, int, int * );
-
-int kpgGtfts( int, AstFitsChan ** fchan, int * status );
-int kpgPtfts( int, const AstFitsChan * fchan, int * status );
-
-void kpgStatd( int, int, const double[], int, const float[], int *, int *,
-               double *, int *, double *, double *, double *, double *,
-               int *, int *, double *, int *, double *, double *, double *,
-               double * , int * );
-
-void kpgStati( int, int, const int[], int, const float[], int *, int *,
-               double *, int *, double *, double *, double *, double *,
-               int *, int *, double *, int *, double *, double *, double *,
-               double * , int * );
-
-void kpg1Wwrt( AstObject *, const char *, const HDSLoc *, int * );
-void kpg1Wread( const HDSLoc *, const char *, AstObject **, int * );
-void kpg1Mxmnr( int, int, float *, int *, float *, float *, int *, int *, int * );
-void kpg1Mxmnd( int, int, double *, int *, double *, double *, int *, int *, int * );
-void kpg1Mxmni( int, int, int *, int *, int *, int *, int *, int *, int * );
-void kpg1Medud( int, int, double *, double *, int *, int * );
-void kpg1Medur( int, int, float *, float *, int *, int * );
-void kpg1Opgrd( int, const double[], int, double *, double *, int * );
-void kpg1Gtaxv( const char *, int, int, AstFrame *, int, double *, int *, int * );
-void kpg1Gilst( int, int, int, const char *, int *, int *, int *, int * );
-void kpg1Asffr( AstFrameSet *, const char *, int *, int * );
-void kpg1Datcp( const HDSLoc *, HDSLoc *, const char *, int * );
-void kpg1Hdsky( const HDSLoc *, AstKeyMap *, int, int, int * );
-void kpg1Kyhds( AstKeyMap *, const int *, int, int, HDSLoc *, int * );
 void kpg1Ghstd( int, int, const double *, const double *, double, int, int, double *, double *, int *, int * );
 void kpg1Ghstr( int, int, const float *, const double *, double, int, int, float *, float *, int *, int * );
+void kpg1Gilst( int, int, int, const char *, int *, int *, int *, int * );
+void kpg1Gtaxv( const char *, int, int, AstFrame *, int, double *, int *, int * );
+void kpg1Gtgrp( const char *, Grp **, size_t*, int * );
+int kpgGtfts( int, AstFitsChan ** fchan, int * status );
+void kpg1Gtobj( const char *, const char *, void (*)(void), AstObject **, int * );
+void kpg1Gtwcs( int, AstFrameSet **, int * );
+
+void kpg1Hdsky( const HDSLoc *, AstKeyMap *, int, int, int * );
+void kpg1Hsect( const HDSLoc *, int, int *, int *, HDSLoc *, const char *, int * );
 void kpg1Hsstp( int, const int *, double, double, double *, double *, double *, double *, int * );
-void fts1Astwn( AstFitsChan *, int, int * );
-void kpg1Elgau( float *, float *, float *, float *, int * );
+
+void kpg1Kygrp( AstKeyMap *, Grp **, int * );
+void kpg1Kyhds( AstKeyMap *, const int *, int, int, HDSLoc *, int * );
+void kpg1Kymap( const Grp *, AstKeyMap **, int * );
+
 void kpg1Loctd( int, const int *, const int *, const double *, const float *, const int *, int, const float *, int, float, int, float *, float *, int * );
-void kpg1Ch2pm( HDSLoc *, AstPolyMap **, int * );
-void kpg1Fit1d( int, int, const double x[], const double y[], double *, double *, double *, int * );
-void kpg1Badbx( int, int, int *, int *, int * );
+
+void kpg1Manir( int, int *, float *, int, int *, int *, int *, int *, float *, int * );
+void kpg1Medud( int, int, double *, double *, int *, int * );
+void kpg1Medur( int, int, float *, float *, int *, int * );
+void kpg1Mxmnd( int, int, double *, int *, double *, double *, int *, int *, int * );
+void kpg1Mxmni( int, int, int *, int *, int *, int *, int *, int *, int * );
+void kpg1Mxmnr( int, int, float *, int *, float *, float *, int *, int *, int * );
+
+void kpg1Opgrd( int, const double[], int, double *, double *, int * );
+
+void kpg1Pseed( int * );
+int kpgPtfts( int, const AstFitsChan * fchan, int * status );
 void kpg1Pxscl( AstFrameSet *, const double *, double *, int * );
-AstKeyMap *kpg1Config( const char *, const char *, AstKeyMap *, int, int * );
+
+void kpg1Rgndf( const char *, size_t, size_t, const char *, Grp **, size_t *, int * );
+
+void kpg1Sdimp( int, int, int *, int * );
+
+void kpg1Wgndf( const char *, const Grp *, size_t, size_t, const char *, Grp **, size_t *, int * );
+void kpg1Wrcat( const char *, int, int, int, double *, int, AstFrameSet *, const char *, int, int *, AstKeyMap *, Grp *, Grp *, int, int * );
+void kpg1Wread( const HDSLoc *, const char *, AstObject **, int * );
+void kpg1Wrlst( const char *, int, int, int, double *, int, AstFrameSet *, const char *, int, int *, int, int * );
+void kpg1Wrtab( const char *, int, int, int, double *, int, AstFrameSet *, const char *, int, int *, Grp *, Grp *, int, int * );
+void kpg1Wwrt( AstObject *, const char *, const HDSLoc *, int * );
+
 
 void kpgPixsc( AstFrameSet * iwcs,
                const double at[],
@@ -180,7 +189,16 @@ void kpgPixsc( AstFrameSet * iwcs,
                int chrarr_length, /* length of each element in "value" and "unit". Can be 0 if no value/unit required */
                int *status );
 
-void kpg1Gtobj( const char *, const char *, void (*)(void), AstObject **, int * );
+void kpgStatd( int, int, const double[], int, const float[], int *, int *,
+               double *, int *, double *, double *, double *, double *,
+               int *, int *, double *, int *, double *, double *, double *,
+               double * , int * );
+void kpgStati( int, int, const int[], int, const float[], int *, int *,
+               double *, int *, double *, double *, double *, double *,
+               int *, int *, double *, int *, double *, double *, double *,
+               double * , int * );
 
-void kpg1Hsect( const HDSLoc *, int, int *, int *, HDSLoc *, const char *, int * );
+
+
+
 #endif
