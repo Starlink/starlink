@@ -1,25 +1,25 @@
 dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
- 
+
 dnl    Initialisation: package name and version number
-AC_INIT(pgplot-base, 5.2.2-1, starlink@jiscmail.ac.uk)
- 
+AC_INIT([pgplot-base],[5.2.2-1],[starlink@jiscmail.ac.uk])
+
 dnl    Require autoconf-2.50 at least
-AC_PREREQ(2.50)
+AC_PREREQ([2.69])
 dnl    Require Starlink automake
 AM_INIT_AUTOMAKE(1.8.2-starlink)
- 
+
 dnl    Sanity-check: name a file in the source directory -- if this
 dnl    isn't found then configure will complain
 AC_CONFIG_SRCDIR([pgbind.c])
- 
+
 dnl    Include defaults for Starlink configurations
 dnl    Need to find out whether we need this
 STAR_DEFAULTS
- 
+
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_CC
-AC_PROG_LIBTOOL
+LT_INIT
 
 AC_HEADER_STDC
 AC_PATH_XTRA

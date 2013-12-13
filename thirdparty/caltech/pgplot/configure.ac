@@ -5,10 +5,10 @@ dnl    Initialisation: package name and version number
 dnl    Note that for GKS the RAL version number is 1.37 but
 dnl    Starlink does not increment that version. Rather than use
 dnl    non-standard nomenclature use the patch level for starlink patching.
-AC_INIT(pgplot, 5.2.2-2, starlink@jiscmail.ac.uk)
+AC_INIT([pgplot],[5.2.2-2],[starlink@jiscmail.ac.uk])
 
 dnl    Require autoconf-2.50 at least
-AC_PREREQ(2.50)
+AC_PREREQ([2.69])
 dnl    Require Starlink automake
 AM_INIT_AUTOMAKE(1.8.2-starlink)
 
@@ -23,7 +23,7 @@ dnl    Find required versions of the programs we need for configuration
 AC_PROG_CC
 AC_PROG_FC
 AC_PROG_FPP
-AC_PROG_LIBTOOL
+LT_INIT
 AC_C_BIGENDIAN
 AC_HEADER_STDC
 AC_PATH_XTRA
@@ -73,8 +73,7 @@ AC_SUBST(STAR_BUILT_DRIVERS)
 dnl    Stuff required for xathena
 have_athena="yes"
 AC_ARG_WITH([athena], 
-             AC_HELP_STRING([--with-athena[=path]],
-             [use Xaw3d (default location /usr/X11R6/)]),
+             AS_HELP_STRING([--with-athena[=path]],[use Xaw3d (default location /usr/X11R6/)]),
   [if test "$withval" = "yes"; then
     # Default place
     LIBS="$LIBS $X_LIBS"
@@ -113,8 +112,7 @@ AM_CONDITIONAL( HAVE_TK, : )
 dnl    xmotif
 have_motif="yes"
 AC_ARG_WITH([motif],
-             AC_HELP_STRING([--with-motif[=path]],
-             [use XMotif (default location /usr/X11R6)]),
+             AS_HELP_STRING([--with-motif[=path]],[use XMotif (default location /usr/X11R6)]),
   [if test "$withval" = "yes"; then
     # Default place
     LIBS="$LIBS $X_LIBS"
