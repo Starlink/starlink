@@ -1,9 +1,9 @@
 dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
-AC_INIT(echomop, 3.3-7, starlink@jiscmail.ac.uk)
+AC_INIT([echomop],[3.3-7],[starlink@jiscmail.ac.uk])
 
-AC_PREREQ(2.50)
+AC_PREREQ([2.69])
 AM_INIT_AUTOMAKE(1.8.2-starlink)
 
 AC_CONFIG_SRCDIR([echomop.f])
@@ -14,14 +14,14 @@ dnl    Find required versions of the programs we need for configuration
 AC_PROG_CC
 AC_PROG_FC
 AC_PROG_FPP
-AC_PROG_LIBTOOL
+LT_INIT
 
 AC_FC_LIBRARY_LDFLAGS
 AC_FC_MAIN
 STAR_CNF_COMPATIBLE_SYMBOLS
 
 AC_PROG_LN_S
-AC_SET_MAKE
+AC_PROG_MAKE_SET
 
 AC_FC_HAVE_PERCENTLOC
 AC_FC_CHECK_INTRINSICS(loc)

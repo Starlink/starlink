@@ -2,10 +2,10 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT(daophot, 1.3-6, starlink@jiscmail.ac.uk)
+AC_INIT([daophot],[1.3-6],[starlink@jiscmail.ac.uk])
 
 dnl    Require autoconf-2.50 at least
-AC_PREREQ(2.50)
+AC_PREREQ([2.69])
 dnl    Require Starlink automake
 AM_INIT_AUTOMAKE(1.8.2-starlink)
 
@@ -20,7 +20,7 @@ STAR_MONOLITHS
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_CC
 AC_PROG_FC
-AC_PROG_LIBTOOL
+LT_INIT
 
 dnl    Some code requires the G95 flag -fsloppy-char, see if the current
 dnl    compiler supports this (could improve this check by including

@@ -1,9 +1,9 @@
 dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
-AC_INIT(astrom, 3.8, starlink@jiscmail.ac.uk)
+AC_INIT([astrom],[3.8],[starlink@jiscmail.ac.uk])
 
-AC_PREREQ(2.50)
+AC_PREREQ([2.69])
 AM_INIT_AUTOMAKE(1.8.2-starlink)
 
 AC_CONFIG_SRCDIR([astrom.f])
@@ -16,7 +16,7 @@ AC_FC_OPEN_SPECIFIERS(readonly)
 AC_FC_OPEN_SPECIFIERS(action='read')
 
 dnl    Use libtool for linking since it will try to use the -rpath option
-AC_PROG_LIBTOOL
+LT_INIT
 
 dnl  Specify the fortran unit numbers for standard input and output.
 dnl  We should test for this, but (a) I'm not sure how I'd write such
