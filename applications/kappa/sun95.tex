@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.40}
 \newcommand{\stardocnumber}    {95.40}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2013 December 6}
+\newcommand{\stardocdate}      {2013 December 12}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {2.1}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -46750,7 +46750,7 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND}.
       \sstsubsection{
          LIKE = NDF (Read)
       }{
-         An existing NDF from which the quality component and quality names are
+         An existing NDF from which the QUALITY component and quality names are
          to be copied. These overwrite any corresponding information in the
          NDF given by Parameter NDF. If null ({\tt{!}}), then the operation of
          this command is instead determined by Parameter SELECT. {\tt [!]}
@@ -59149,6 +59149,11 @@ The following applications have been modified:
       \begin{itemize}
         \item Now writes the number of pixels used to form the correlation
         coefficient to output parameter NPIX.
+      \end{itemize}
+   \item [\htmlref{SETQUAL}{SETQUAL}]\mbox{}
+      \begin{itemize}
+        \item It is now possible to copy all quality information from one
+        NDF to another using a new parameter called LIKE.
       \end{itemize}
 \end{description}
 

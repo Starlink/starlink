@@ -21,12 +21,12 @@
 
 *  Description:
 *     This routine assigns (or optionally removes) the quality
-*     specified by parameter QNAME to (or from) selected pixels in an
+*     specified by Parameter QNAME to (or from) selected pixels in an
 *     NDF.  For more information about using quality within KAPPA see
 *     the appendix "Using Quality Names" within SUN/95.
 *
 *     The user can select the pixels to be operated on in one of three
-*     ways (see parameter SELECT).
+*     ways (see Parameter SELECT).
 *
 *     - By giving a `mask' NDF.  Pixels with bad values in the mask NDF
 *     will be selected from the corresponding input NDF.
@@ -41,11 +41,11 @@
 *     routine can be created interactively using the routine ARDGEN.
 *
 *     The operation to be performed on the pixels is specified by
-*     parameter FUNCTION.  The given quality may be assigned to or
+*     Parameter FUNCTION.  The given quality may be assigned to or
 *     removed from pixels within the NDF.  The pixels operated on
 *     can either be those selected by the user (as described above),
 *     or those not selected.  The quality of all other pixels is left
-*     unchanged (unless the parameter FUNCTION is given the value NS+HU
+*     unchanged (unless the Parameter FUNCTION is given the value NS+HU
 *     or NU+HS).  Thus for instance if pixel (1,1) already held the
 *     quality specified by QNAME, and the quality was then assigned to
 *     pixel (2,2) this would not cause the quality to be removed from
@@ -77,7 +77,7 @@
 *        definition of the quality name.
 *     FUNCTION = LITERAL (Read)
 *        This parameter specifies what function is to be performed on
-*        the "selected" pixels specified using parameters MASK, LIST or
+*        the "selected" pixels specified using Parameters MASK, LIST or
 *        ARD.  It can take any of the following values.
 *
 *        - "HS" -- Ensure that the quality specified by QNAME is held by
@@ -106,23 +106,23 @@
 *                  and not held by any of the selected pixels.
 *        ["HS"]
 *     LIKE = NDF (Read)
-*        An existing NDF from which the quality component and quality names are
+*        An existing NDF from which the QUALITY component and quality names are
 *        to be copied. These overwrite any corresponding information in the
 *        NDF given by Parameter NDF. If null (!), then the operation of
 *        this command is instead determined by Parameter SELECT. [!]
 *     LIST = LITERAL (Read)
 *        A group of pixels positions within the input NDF listing the
-*        pixels that are to be `selected' (see parameter FUNCTION).
+*        pixels that are to be `selected' (see Parameter FUNCTION).
 *        Each position should be giving as a list of pixel indices
 *        (eg X1, Y1, X2, Y2,...  for a two dimensional NDF). LIST is
-*        only prompted for if parameter SELECT is given the value LIST.
+*        only prompted for if Parameter SELECT is given the value LIST.
 *     MASK = NDF (Read)
 *        A mask NDF used to define the `selected' pixels within the
-*        input NDF (see parameter FUNCTION).  The mask should be aligned
+*        input NDF (see Parameter FUNCTION).  The mask should be aligned
 *        pixel-for-pixel with the input NDF.  Pixels that are bad in
 *        the mask NDF are `selected'. The quality of any pixels that
 *        lie outside the bounds of the mask NDF are left unaltered.
-*        This parameter is only prompted for if the parameter SELECT is
+*        This parameter is only prompted for if the Parameter SELECT is
 *        given the value MASK.
 *     NDF = NDF (Update)
 *        The NDF in which the quality information is to be stored.
@@ -138,18 +138,18 @@
 *     SELECT = LITERAL (Read)
 *        If Parameter LIKE is null, then this parameter determines how
 *        the pixels are selected, and can take the values "Mask",
-*        "List" or "ARD" (see parameters MASK, LIST, and ARD). ["Mask"]
+*        "List" or "ARD" (see Parameters MASK, LIST, and ARD). ["Mask"]
 *     XNAME = LITERAL (Read)
 *        If an NDF already contains any quality name definitions then
 *        new quality names are put in the same extension as the old
 *        names.  If no previous quality names have been stored in the
-*        NDF then parameter XNAME will be used to obtain the name of an
+*        NDF then Parameter XNAME will be used to obtain the name of an
 *        NDF extension in which to store the new quality name.  The
 *        extension will be created if it does not already exist (see
-*        parameter XTYPE). [QUALITY_NAMES]
+*        Parameter XTYPE). [QUALITY_NAMES]
 *     XTYPE = LITERAL (Read)
 *        If a new NDF extension is created to hold quality names (see
-*        parameter XNAME), then parameter XTYPE is used to obtain the
+*        Parameter XNAME), then Parameter XTYPE is used to obtain the
 *        HDS data type for the created extension. The run time default
 *        is to give the extension a type identical to its name.  []
 
