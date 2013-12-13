@@ -2,10 +2,10 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision: 27534 $)
   
 dnl    Initialisation: package name and version number
-AC_INIT(starutil, 0.1-1, t.jenness@jach.hawaii.edu)
+AC_INIT([starutil],[0.1-1],[t.jenness@jach.hawaii.edu])
   
 dnl    Require autoconf-2.50 at least
-AC_PREREQ(2.50)
+AC_PREREQ([2.69])
 dnl    Require Starlink automake
 AM_INIT_AUTOMAKE(1.8.2-starlink)
   
@@ -19,7 +19,7 @@ STAR_DEFAULTS
   
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_CC
-AC_PROG_LIBTOOL
+LT_INIT
 
 #   If --with-pic=no is set we should honour that.
 AM_CONDITIONAL(NOPIC, test x$pic_mode = xno)

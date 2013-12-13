@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT(sla, 2.5-7, starlink@jiscmail.ac.uk)
+AC_INIT([sla],[2.5-7],[starlink@jiscmail.ac.uk])
 # Version-info specifications.  See SSN/78 for guidelines, and update the table
 # below for ANY change of version number.
 #
@@ -19,7 +19,7 @@ AC_INIT(sla, 2.5-7, starlink@jiscmail.ac.uk)
 AC_SUBST(libsla_la_version_info, 7:0:0)
 
 dnl    Require autoconf-2.50 at least
-AC_PREREQ(2.50)
+AC_PREREQ([2.69])
 dnl    Require automake-1.8.2-starlink at least
 AM_INIT_AUTOMAKE(1.8.2-starlink)
 
@@ -33,7 +33,7 @@ STAR_DEFAULTS
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_FC
 AC_PROG_FPP
-AC_PROG_LIBTOOL
+LT_INIT
 
 dnl    If --with-pic=no is set we should honour that.
 AM_CONDITIONAL(NOPIC, test x$pic_mode = xno)

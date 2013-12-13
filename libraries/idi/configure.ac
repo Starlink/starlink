@@ -2,10 +2,10 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
   
 dnl    Initialisation: package name and version number
-AC_INIT(idi, 1.4-5, starlink@jiscmail.ac.uk)
+AC_INIT([idi],[1.4-5],[starlink@jiscmail.ac.uk])
   
 dnl    Require autoconf-2.50 at least
-AC_PREREQ(2.50)
+AC_PREREQ([2.69])
 dnl    Require Starlink automake
 AM_INIT_AUTOMAKE(1.8.2-starlink)
   
@@ -22,7 +22,7 @@ AC_PROG_CC
 AC_PROG_FC
 AC_HEADER_STDC
 AC_PATH_XTRA
-AC_PROG_LIBTOOL
+LT_INIT
 AC_C_BIGENDIAN
 
 dnl    Having no X11 is fatal.

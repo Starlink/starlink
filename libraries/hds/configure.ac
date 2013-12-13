@@ -2,10 +2,10 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT(hds, 5.1-1, starlink@jiscmail.ac.uk)
+AC_INIT([hds],[5.1-1],[starlink@jiscmail.ac.uk])
 
 dnl    Require autoconf-2.50 at least
-AC_PREREQ(2.50)
+AC_PREREQ([2.69])
 dnl    Require Starlink automake at least
 AM_INIT_AUTOMAKE([1.8.2-starlink subdir-objects])
 
@@ -28,7 +28,7 @@ if available)])
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_CC
 AC_PROG_FC
-AC_PROG_LIBTOOL
+LT_INIT
 
 #   If --with-pic=no is set we should honour that.
 AM_CONDITIONAL(NOPIC, test x$pic_mode = xno)
@@ -36,7 +36,7 @@ AM_CONDITIONAL(NOPIC, test x$pic_mode = xno)
 AC_C_BIGENDIAN
 
 dnl    Check for OS features we would like
-AC_FUNC_VFORK
+AC_FUNC_FORK
 
 dnl    The AC_FUNC_MMAP test is broken under Cygwin.
 case "$host" in
