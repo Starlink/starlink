@@ -149,6 +149,8 @@
 *     2013-07-30 (TIMJ):
 *        Trap bad seeing and tau values so that they can be correctly
 *        stored as undef FITS headers.
+*     2013 December 4 (MJC):
+*        Choose a non-blank value of MSBID if it is undefined.
 
 *  Copyright:
 *     Copyright (C) 2008-2013 Science and Technology Facilities Council.
@@ -566,7 +568,8 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
 
   astSetFitsU ( fitschan, "DRGROUP", "Data Reduction group ID", 0 );
 
-  astSetFitsU ( fitschan, "MSBID", "ID of minimum schedulable block", 0 );
+  astSetFitsS ( fitschan, "MSBID", "GSD2ACSIS_V1",
+                "ID of minimum schedulable block", 0 );
 
   astSetFitsU ( fitschan, "MSBTID", "Transaction ID of MSB", 0 );
 
