@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+
+<component id="autoconf" buildsupport="yes" support="U">
+  <version>starlink-2.69</version>
+  <path>thirdparty/fsf/autoconf</path>
+  <description>Starlink autoconf</description>
+  <!-- <abstract><p></p></abstract> -->
+  <dependencies/>
+  <developers>
+    <!-- Cast of thousands, but locally to Starlink... -->
+    <person>
+      <name>Norman Gray</name>
+      <uname>nxg</uname>
+      <email>starlink@jiscmail.ac.uk</email>
+      <role>owner</role>
+    </person>
+    <person>
+      <name>Peter W. Draper</name>
+      <uname>pwdraper</uname>
+      <email>starlink@jiscmail.ac.uk</email>
+      <role>owner</role>
+    </person>
+  </developers>
+  <bugreports>@PACKAGE_BUGREPORT</bugreports>
+  <copyright>
+    <year>1994-2013</year>
+    <name>Free Software Foundation</name>
+  </copyright>
+  <copyright>
+    <year>2004-5</year>
+    <name>Council for the Central Laboratory of the Research
+    Councils</name>
+    <notes>
+      <p>Modifications</p>
+    </notes>
+  </copyright>
+  <notes><p>This version of autoconf has been patched to include
+      Fortran preprocessor support and general Fortran portability.
+      </p></notes>
+</component>

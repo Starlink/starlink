@@ -1,0 +1,9 @@
+These are the autotools that we use to build the Starlink software.
+
+They are not normal components so do not "bootstrap" in the usual manner and
+have their configurable states checked in so that they can be built directly
+without the bootstrap phase.
+
+Peter W. Draper
+
+17-DEC-2013.
