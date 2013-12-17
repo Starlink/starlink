@@ -1,0 +1,34 @@
+#!/bin/sh 
+
+#  Commands used to bootstrap the autoconf/ directory after tracking a new
+#  revision, generating various files. You may also need to revisit the
+#  bootstrap_timeorder issues. Remember cd into autoconf before running
+#  this command.
+
+if ! test -f "maint.mk"; then
+  echo "Run this command in autoconf/"
+  exit 1
+fi
+
+#  Cribbed from: http://lifecs.likai.org/2012/06/building-autotools-from-git.html
+
+run () {
+    echo $*
+    eval $*
+}
+
+#  Do this initially.
+# git clean -fdx
+
+run aclocal -I m4
+run automake --add-missing
+run autoconf
+run rm INSTALL
+
+run git status
+
+echo
+echo "*** Now run configure and make to regenerate INSTALL ***"
+echo
+
+exit
