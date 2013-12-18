@@ -157,3 +157,6 @@
 [submodule "thirdparty/perlsys/perlmods/perl-Astro-ITC-SCUBA2"]
 	path = thirdparty/perlsys/perlmods/perl-Astro-ITC-SCUBA2
 	url = git://github.com/jac-h/perl-Astro-ITC-SCUBA2.git
+[submodule "thirdparty/perlsys/perlmods/perl-UKIRT-Archive"]
+	path = thirdparty/perlsys/perlmods/perl-UKIRT-Archive
+	url = git://github.com/jac-h/perl-UKIRT-Archive.git
