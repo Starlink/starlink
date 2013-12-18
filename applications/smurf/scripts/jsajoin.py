@@ -14,8 +14,7 @@
 *  Description:
 *     This script pastes together one or more JSA tiles and then
 *     resamples the resulting montage onto a tangent-plane projection
-*     with square pixels and celestial north upwards. The "SincSinc"
-*     interpolation method is used (see KAPPA:WCSALIGN). It can also
+*     with square pixels and celestial north upwards. It can also
 *     restrict the output NDF to a specified sub-section of this montage.
 *
 *     By default, the output NDF contains all the data from all the tiles
@@ -107,7 +106,10 @@
 
 *  History:
 *     3-DEC-2013 (DSB):
-*        Original version
+*        Original version.
+*     18-DEC-2013 (DSB):
+*        Use Gauss interpolation kernel if output pixels are larger than 
+#        input pixels.
 *-
 '''
 
@@ -339,16 +341,19 @@ try:
    jsa_montage = NDG(1)
    invoke( "$KAPPA_DIR/ndfcopy in={0} out={1} trimbad".format(temp,jsa_montage) )
 
+#  Get the nominal pixel size of the montage.
+   invoke( "$KAPPA_DIR/ndftrace {0} quiet".format(jsa_montage) )
+   pixsize1 = float( starutil.get_task_par( "FPIXSCALE(1)", "ndftrace" ) )
+   pixsize2 = float( starutil.get_task_par( "FPIXSCALE(2)", "ndftrace" ) )
+   pixsize_jsa = math.sqrt( pixsize1*pixsize2 )
+
 #  If the Region was specified as an NDF, use the NDF as the reference
-#  pixel grid to which the tile data will be aligned. Get its pixel size.
+#  pixel grid to which the tile data will be aligned.
    if region_is_ndf:
       ref = region
-      invoke( "$KAPPA_DIR/ndftrace {0} quiet".format(region) )
-      pixsize1 = float( starutil.get_task_par( "FPIXSCALE(1)", "ndftrace" ) )
-      pixsize2 = float( starutil.get_task_par( "FPIXSCALE(2)", "ndftrace" ) )
-      pixsize = math.sqrt( pixsize1*pixsize2 )
 
-#  The bounds of the output image equals the bound sof hte supplied NDF.
+#  The bounds of the output image equals the bounds of the supplied NDF.
+      invoke( "$KAPPA_DIR/ndftrace {0} quiet".format(region) )
       lx = starutil.get_task_par( "LBOUND(1)", "ndftrace" )
       ly = starutil.get_task_par( "LBOUND(2)", "ndftrace" )
       ux = starutil.get_task_par( "UBOUND(1)", "ndftrace" )
@@ -384,13 +389,9 @@ try:
             cen1 = starutil.get_task_par( "XVAL", "asttran2" )
             cen2 = starutil.get_task_par( "YVAL", "asttran2" )
 
-#  Get the nominal pixel size of the tile and set it as the default for
-#  parameter PIXSIZE. Then get a value from the user.
-      invoke( "$KAPPA_DIR/ndftrace {0} quiet".format(jsa_montage) )
-      pixsize1 = float( starutil.get_task_par( "FPIXSCALE(1)", "ndftrace" ) )
-      pixsize2 = float( starutil.get_task_par( "FPIXSCALE(2)", "ndftrace" ) )
-      pixsize = math.sqrt( pixsize1*pixsize2 )
-      parsys["PIXSIZE"].default = pixsize
+#  Set the nominal tile pixel size as the default for parameter PIXSIZE
+#  (the output pixel size), then get a value from the user.
+      parsys["PIXSIZE"].default = pixsize_jsa
       pixsize = parsys["PIXSIZE"].value
 
 #  Create a 1x1 NDF to act as the reference.
@@ -455,7 +456,29 @@ try:
       ux = int( starutil.get_task_par( "UBND(1)", "astgetregbounds" ) )
       uy = int( starutil.get_task_par( "UBND(2)", "astgetregbounds" ) )
 
-#  Create the output NDF by resampling the combined NDF holding all tiles.
+#  Get the nominal pixel size of the reference map.
+   invoke( "$KAPPA_DIR/ndftrace {0} quiet".format(ref) )
+   pixsize1 = float( starutil.get_task_par( "FPIXSCALE(1)", "ndftrace" ) )
+   pixsize2 = float( starutil.get_task_par( "FPIXSCALE(2)", "ndftrace" ) )
+   pixsize_ref = math.sqrt( pixsize1*pixsize2 )
+
+#  If the output pixels are smaller than the tile pixels, we use a
+#  SincSinc interpolation kernel with width equal to 2 JSA pixels.
+   if pixsize_ref < 1.5*pixsize_jsa:
+      method = "sincsinc"
+      width = 2
+
+#  If the output pixels are larger than the tile pixels, we use a
+#  Gauss interpolation kernel with width equal to 0.8 output pixels (se we
+#  need to convert 2 output pixels into the equivalent number of input
+#  pixels, as required for wcsalign). Simulations seem to suggest 0.8 is
+#  a good figure to use. See SCUBA-2 TRAC ticket #1333.
+   else:
+      method = "gauss"
+      width = 0.8*pixsize_ref/pixsize_jsa
+
+#  Create the output NDF by resampling the combined NDF holding all
+#  tiles. Do 2D and 3D separately.
    if region:
       out = outdata
    else:
@@ -463,10 +486,12 @@ try:
 
    if lz == None:
       invoke( "$KAPPA_DIR/wcsalign in={0} out={1} ref={2} lbnd=\[{3},{4}\] "
-              "ubnd=\[{5},{6}\] method=sincsinc".format(jsa_montage,out,ref,lx,ly,ux,uy) )
+              "ubnd=\[{5},{6}\] method={7} params=\[0,{8}\]".
+              format(jsa_montage,out,ref,lx,ly,ux,uy,method,width) )
    else:
       invoke( "$KAPPA_DIR/wcsalign in={0} out={1} ref={2} lbnd=\[{3},{4},{5}\] "
-              "ubnd=\[{6},{7},{8}\] method=sincsinc".format(jsa_montage,out,ref,lx,ly,lz,ux,uy,uz) )
+              "ubnd=\[{6},{7},{8}\] method={9} params=\[0,{10}\]".
+              format(jsa_montage,out,ref,lx,ly,lz,ux,uy,uz,method,width) )
 
 #  If using all input tiles, strip any bad border from the output.
    if region == None:
