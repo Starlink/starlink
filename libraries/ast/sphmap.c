@@ -104,8 +104,11 @@ f     The SphMap class does not define any new routines beyond those
 #include "channel.h"             /* I/O channels */
 #include "unitmap.h"             /* Unit (identity) Mappings */
 #include "sphmap.h"              /* Interface definition for this class */
-#include "pal.h"              /* SLA transformations */
+#include "pal.h"                 /* SLA transformations */
 #include "wcsmap.h"              /* For the AST__DPIBY2 (etc) constants */
+#include "matrixmap.h"           /* Matrix mappings */
+#include "winmap.h"              /* Shift and scale mappings */
+#include "zoommap.h"             /* Scale mappings */
 
 /* Error code definitions. */
 /* ----------------------- */
