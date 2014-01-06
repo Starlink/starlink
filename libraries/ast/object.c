@@ -216,11 +216,13 @@ f     - AST_VERSION: Return the verson of the AST library being used.
 *     2-SEP-2011 (DSB):
 *        Add functions astToString and astFromString.
 *     13-SEP-2013 (DSB):
-*        Report an error in astAnnul if the supplied object handle is owned by 
+*        Report an error in astAnnul if the supplied object handle is owned by
 *        a different thread. Note, the Object itself does not need to be owned
-*        by the current thread, since it should be possible for a thread to 
-*        relinquish a pointer to an object (i.e. a handle) without actually 
-*        owning the object itself. 
+*        by the current thread, since it should be possible for a thread to
+*        relinquish a pointer to an object (i.e. a handle) without actually
+*        owning the object itself.
+*     6-JAN-2014 (DSB):
+*        Added method astEnvSet.
 *class--
 */
 
@@ -268,6 +270,7 @@ f     - AST_VERSION: Return the verson of the AST library being used.
 #include <stdarg.h>
 #include <stddef.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <limits.h>
 
@@ -451,6 +454,7 @@ static void SetID( AstObject *, const char *, int * );
 static void SetIdent( AstObject *, const char *, int * );
 static void Show( AstObject *, int * );
 static void VSet( AstObject *, const char *, char **, va_list, int * );
+static void EnvSet( AstObject *, int * );
 
 static int GetUseDefs( AstObject *, int * );
 static int TestUseDefs( AstObject *, int * );
@@ -1771,6 +1775,91 @@ static void EmptyObjectCache( int *status ){
       vtab->free_list = astFree( vtab->free_list );
       vtab->nfree = 0;
    }
+}
+
+static void EnvSet( AstObject *this, int *status ) {
+/*
+*+
+*  Name:
+*     astEnvSet
+
+*  Purpose:
+*     Set default values for an Object's attributes.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "object.h"
+*     void astEnvSet( AstObject *this )
+
+*  Class Membership:
+*     Object method.
+
+*  Description:
+*     This function assigns a set of attribute values for an Object,
+*     the attributes and their values being specified by means of an
+*     environment variable of the form "<CLASSNAME>_OPTIONS" that has
+*     a value of the form:
+*
+*        "attribute1 = value1, attribute2 = value2, ... "
+*
+*     Here, "attribute" specifies an attribute name and the value to
+*     the right of each "=" sign should be a suitable textual
+*     representation of the value to be assigned to that
+*     attribute. This will be interpreted according to the attribute's
+*     data type.
+
+*  Parameters:
+*     this
+*        Pointer to the Object.
+
+*  Notes:
+*     - See astVSet for details of how the setting strings are
+*     interpreted.
+*-
+*/
+
+/* Local Variables: */
+   char varname[ 100 ];
+   const char *attrs = NULL;
+   const char *class = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Get the string holding default attribute values for the class of the
+   supplied object. This string is held in the class virtual function
+   table. */
+   attrs = this->vtab->defaults;
+
+/* If this is the first time the defaults have been requested, get the
+   list of defaults from the environment variable "<CLASSNAME>_OPTIONS"
+   and store in the virtual function table. */
+   if( !attrs ) {
+
+/* Get the class name. */
+      class = astGetClass( this );
+
+/* Form the upper-case name of the environment variable. */
+      if( class ) {
+         sprintf( varname, "%s_OPTIONS", class );
+         astChrCase( NULL, varname, 1, sizeof( varname ) );
+
+/* Get the value of the environment variable. */
+         attrs = getenv( varname );
+
+/* If no defaults were specified store the string "None". */
+         if( ! attrs ) attrs = "None";
+
+/* Store a copy in the virtual function table. */
+         this->vtab->defaults = astStore( NULL, attrs, strlen( attrs ) + 1 );
+      }
+   }
+
+/* If any defaults were specified, set the corresponding attributes. */
+   if( attrs && strcmp( attrs, "None" ) ) astSet( this, attrs, status );
+
 }
 
 static int Equal( AstObject *this, AstObject *that, int *status ){
@@ -5300,6 +5389,7 @@ void astInitObjectVtab_(  AstObjectVtab *vtab, const char *name, int *status ) {
    vtab->TestAttrib = TestAttrib;
    vtab->TestID = TestID;
    vtab->TestIdent = TestIdent;
+   vtab->EnvSet = EnvSet;
    vtab->VSet = VSet;
    vtab->Cast = Cast;
    vtab->GetObjSize = GetObjSize;
@@ -5331,6 +5421,9 @@ void astInitObjectVtab_(  AstObjectVtab *vtab, const char *name, int *status ) {
    vtab->dump = NULL;
    vtab->dump_class = NULL;
    vtab->dump_comment = NULL;
+
+/* Initialise the default attributes to use when creating objects. */
+   vtab->defaults = NULL;
 
 /* The virtual function table for each class contains a list of pointers
    to memory blocks which have previously been used to store an Object of
@@ -5735,6 +5828,10 @@ void astShow_( AstObject *this, int *status ) {
 int astTestAttrib_( AstObject *this, const char *attrib, int *status ) {
    if ( !astOK ) return 0;
    return (**astMEMBER(this,Object,TestAttrib))( this, attrib, status );
+}
+void astEnvSet_( AstObject *this, int *status ) {
+   if ( !astOK ) return;
+   (**astMEMBER(this,Object,EnvSet))( this, status );
 }
 void astVSet_( AstObject *this, const char *settings, char **text, va_list args, int *status ) {
    if ( !astOK ) return;

@@ -1101,6 +1101,9 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 *        - Ensure PurgeWcs removes WCS cards even if an error occurs when
 *        reading FrameSets from the FitsChan.
 *        - Change IsMapTab1D to improve chances of a -TAB mapping being found.
+*     6-JAN-2014 (DSB):
+*        Allow default options for newly created FitsChans to be
+*        specified by the FITSCHAN_OPTIONS environment variable.
 *class--
 */
 
@@ -40988,6 +40991,9 @@ c        order to supply values to be substituted for these
 c        specifiers. The rules for supplying these are identical to
 c        those for the astSet function (and for the C "printf"
 c        function).
+*
+*        Note, the FITSCHAN_OPTIONS environment variable may be used
+*        to specify default options for all newly created FitsChans.
 f     STATUS = INTEGER (Given and Returned)
 f        The global status.
 
@@ -41045,6 +41051,10 @@ f     pointer.
    if ( astOK ) {
       class_init = 1;
 
+/* Apply any default options specified by "<class>_OPTIONS" environment
+   variable. */
+      astEnvSet( new );
+
 /* Obtain the variable argument list and pass it along with the
    options string to the astVSet method to initialise the new
    FitsChan's attributes. */
@@ -41059,6 +41069,7 @@ f     pointer.
 /* Return a pointer to the new FitsChan. */
    return new;
 }
+
 AstFitsChan *astFitsChanId_( const char *(* source)( void ),
                              void (* sink)( const char * ),
                              const char *options, ... ) {
@@ -41131,6 +41142,10 @@ AstFitsChan *astFitsChanId_( const char *(* source)( void ),
    if ( astOK ) {
       class_init = 1;
 
+/* Apply any default options specified by "<class>_OPTIONS" environment
+   variable. */
+      astEnvSet( new );
+
 /* Obtain the variable argument list and pass it along with the
    options string to the astVSet method to initialise the new
    FitsChan's attributes. */
@@ -41145,6 +41160,7 @@ AstFitsChan *astFitsChanId_( const char *(* source)( void ),
 /* Return an ID value for the new FitsChan. */
    return astMakeId( new );
 }
+
 AstFitsChan *astFitsChanForId_( const char *(* source)( void ),
                               char *(* source_wrap)( const char *(*)( void ), int * ),
                               void (* sink)( const char * ),
@@ -41312,6 +41328,10 @@ AstFitsChan *astFitsChanForId_( const char *(* source)( void ),
    if ( astOK ) {
       class_init = 1;
 
+/* Apply any default options specified by "<class>_OPTIONS" environment
+   variable. */
+      astEnvSet( new );
+
 /* Obtain the variable argument list and pass it along with the
    options string to the astVSet method to initialise the new
    FitsChan's attributes. */
@@ -41326,6 +41346,7 @@ AstFitsChan *astFitsChanForId_( const char *(* source)( void ),
 /* Return an ID value for the new FitsChan. */
    return astMakeId( new );
 }
+
 AstFitsChan *astInitFitsChan_( void *mem, size_t size, int init,
                                AstFitsChanVtab *vtab, const char *name,
                                const char *(* source)( void ),
