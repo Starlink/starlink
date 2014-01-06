@@ -94,6 +94,9 @@ f     - AST_OUTLINE<X>: Create a Polygon outlining values in a pixel array
 *        if necessary, to ensure that the unnegated Polygon is bounded.
 *        The parent Region class assumes that unnegated regions are
 *        bounded.
+*     6-JAN-2014 (DSB):
+*        Free edges when clearing the cache, not when establishing a new
+*        cache, as the number of edges may have changed.
 *class--
 */
 
@@ -3580,7 +3583,7 @@ static Segment *RemoveFromChain( Segment *head, Segment *seg, int *status ){
    return head;
 }
 
-static void ResetCache( AstRegion *this, int *status ){
+static void ResetCache( AstRegion *this_region, int *status ){
 /*
 *  Name:
 *     ResetCache
@@ -3609,10 +3612,33 @@ static void ResetCache( AstRegion *this, int *status ){
 *     status
 *        Pointer to the inherited status variable.
 */
+
+/* Local Variables: */
+   AstPolygon *this;
+   int i;
+   int nv;
+
+/* Get a pointer to the Polygon structure. */
+   this = (AstPolygon *) this_region;
+
+/* If a Polygon was supplied, indicate cached information needs to be
+   recalculated. */
    if( this ) {
-      ( (AstPolygon *) this )->stale = 1;
-      ( (AstPolygon *) this )->lbnd[ 0 ] = AST__BAD;
-      (*parent_resetcache)( this, status );
+      this->stale = 1;
+      this->lbnd[ 0 ] = AST__BAD;
+
+/* Free any edge structures (number of vertices may be about to change so
+   this cannot be left until the next call to "Cache()". */
+      if( this->edges ) {
+         nv = astGetNpoint( this_region->points );
+         for( i = 0; i < nv; i++ ) {
+            this->edges[ i ] = astFree( this->edges[ i ] );
+         }
+         this->edges = astFree( this->edges );
+      }
+
+/* Clear the cache of the parent class. */
+      (*parent_resetcache)( this_region, status );
    }
 }
 
@@ -3652,15 +3678,16 @@ static void SetPointSet( AstPolygon *this, AstPointSet *pset, int *status ){
 /* Check the global error status. */
    if ( !astOK ) return;
 
-/* Annul the pointer to the PointSet already in the supplied Polygon. */
-   (void) astAnnul( ((AstRegion *) this)->points );
-
-/* Store a clone of the supplie dnew PointSet pointer. */
-   ((AstRegion *) this)->points = astClone( pset );
-
 /* Indicate the cached information in the polygon will need to be
    re-calculated when needed. */
    astResetCache( this );
+
+/* Annul the pointer to the PointSet already in the supplied Polygon. */
+   (void) astAnnul( ((AstRegion *) this)->points );
+
+/* Store a clone of the supplied new PointSet pointer. */
+   ((AstRegion *) this)->points = astClone( pset );
+
 }
 
 static void SetRegFS( AstRegion *this_region, AstFrame *frm, int *status ) {
@@ -3701,12 +3728,13 @@ static void SetRegFS( AstRegion *this_region, AstFrame *frm, int *status ) {
 /* Check the global error status. */
    if ( !astOK ) return;
 
+/* Indicate cached information eeds re-calculating. */
+   astResetCache( this_region );
+
 /* Invoke the parent method to store the FrameSet in the parent Region
    structure. */
    (* parent_setregfs)( this_region, frm, status );
 
-/* Indicate cached information eeds re-calculating. */
-   astResetCache( this_region );
 }
 
 static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
