@@ -147,6 +147,8 @@
 *        not free any memory.
 *     21-NOV-2011 (DSB):
 *        Correct matchend value returned by astChrSplitRE.
+*     6-JAN-2014 (DSB):
+*        Optimise access to cache to avoid valgrind warnings.
 */
 
 /* Configuration results. */
@@ -2302,8 +2304,8 @@ void *astMalloc_( size_t size, int init, int *status ) {
 
 /* If the cache is being used and a cached memory block of the required size
    is available, remove it from the cache array and use it. */
-      mem = ( size <= MXCSIZE ) ? cache[ size ] : NULL;
-      if( use_cache && mem ) {
+      mem = ( use_cache && size <= MXCSIZE ) ? cache[ size ] : NULL;
+      if( mem ) {
          cache[ size ] = mem->next;
          mem->next = NULL;
          mem->size = (size_t) size;
