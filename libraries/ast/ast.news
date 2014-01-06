@@ -27,6 +27,11 @@ header did not include an inverse. The accuracy of the inverse
 transformation has also been improved, although it may now be slower to
 evaluate in some circumstances.
 
+- A bug has been fixed that could over-write the FitsChan CarLin attribute
+with a non-zero value if the header contains a spectral axis.
+
+- The default options for each newly created FitsChan can now be
+specified via the environment variable FITSCHAN_OPTIONS.
 
 Main Changes in V7.3.2
 ----------------------
