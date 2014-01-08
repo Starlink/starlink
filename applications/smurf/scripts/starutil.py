@@ -442,7 +442,8 @@ def shell_quote(text):
 
    Put single quotes around a string (and escape any embedded single
    quotes) so that it can be used as a command line argument when
-   running an ATASK from the shell.
+   running an ATASK from the shell. Does nothing if the string is already
+   enclosed in single quotes.
 
    Invocation:
       value = shell_quote(text)
@@ -457,7 +458,10 @@ def shell_quote(text):
    """
 
    if text != None:
-      return "'" + text.replace("'", "'\\''") + "'"
+      if re.search( "^\s*\'(.*)\'\s*$",text):
+         return "'" + text.replace("'", "'\\''") + "'"
+      else:
+         return text
    else:
       return None
 
