@@ -242,6 +242,9 @@ int smf_import_noi( const char *name, smfDIMMHead *head, AstKeyMap *keymap,
       if( *status != SAI__OK ) {
          errRepf( "", "Failed to import NOI values from NDF specified "
                   "by parameter NOI.IMPORT (%s).", status, ename );
+      } else {
+         msgOutiff( MSG__VERB, "", "Imported NOI values from '%s'.", status,
+                    ename );
       }
    }
 
