@@ -14,7 +14,8 @@
 
 *  Invocation:
 *     void smf_import_array( smfData *refdata, const char *name,
-*                            int bad, int expand, double *dataptr, int *status )
+*                            int bad, int expand, smf_dtype type,
+*                            void *dataptr, int *status )
 
 *  Arguments:
 *     refdata = smfData * (Given)
@@ -31,9 +32,13 @@
 *            no good values.
 *     expand = int (Given)
 *        If non-zero, then expand 1D arrays into 3D arrays.
-*     dataptr = double * (Given)
+*     type = smf_dtype (Given)
+*        Data type of the "dataptr" array. Currently, only SMF__DOUBLE
+*        and SMF__INTEGER arrays are supported.
+*     dataptr = void * (Given)
 *        The array in which to store the imported NDF data values. Must
-*        have the same dimensions as "refdata".
+*        have the same dimensions as "refdata" (butmay have a different
+*        data type).
 *     status = int * (Given and Returned)
 *        Pointer to global status.
 
@@ -58,10 +63,12 @@
 *        time-slice mean values.
 *     22-JAN-2013 (DSB):
 *        Add argument expand.
+*     7-JAN-2014 (DSB):
+*        Added support for SMF__INTEGER arrays.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2012 Science & Technology Facilities Council.
+*     Copyright (C) 2012-2014 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -96,7 +103,8 @@
 
 
 void smf_import_array( smfData *refdata, const char *name, int bad,
-                       int expand, double *dataptr, int *status ) {
+                       int expand, smf_dtype type, void *dataptr,
+                       int *status ){
 
 /* Local Variables: */
    Grp *igrp;                  /* Group holding NDF name */
@@ -104,7 +112,9 @@ void smf_import_array( smfData *refdata, const char *name, int bad,
    dim_t ntslice;              /* Number of time slices */
    double *pin;                /* Pointer to next input value */
    double *pout;               /* Pointer to next output value */
-   double mean;                /* Mean value int he plane */
+   int *ipin;                  /* Pointer to next input value */
+   int *ipout;                 /* Pointer to next output value */
+   double mean;                /* Mean value in the plane */
    double vsum;                /* Sum of good data values */
    int nbad;                   /* Number of bad data values */
    int ngood;                  /* Number of good data values */
@@ -121,7 +131,7 @@ void smf_import_array( smfData *refdata, const char *name, int bad,
 /* Attempt to open the NDF. */
    igrp = grpNew( " ", status );
    grpPut1( igrp, name, 0, status );
-   smf_open_file( igrp, 1, "READ", 0, &data, status );
+   smf_open_file( igrp, 1, "READ", SMF__NOTTSERIES, &data, status );
    grpDelet( &igrp, status );
 
 /* Ensure the smfData read from the NDF uses the same data ordering as the
@@ -131,10 +141,11 @@ void smf_import_array( smfData *refdata, const char *name, int bad,
 
 /* Check the data type and dimensions of the NDF are the same as the
    reference NDF. */
-      if( data->dtype != SMF__DOUBLE ) {
+      if( data->dtype != type ) {
+         const char *stype = smf_dtype_str( type, status );
          *status = SAI__ERROR;
          errRepf( " ", "NDF '%s' has incorrect data type - should be "
-                  "DOUBLE PRECISION.", status, name );
+                  "%s.", status, name, stype );
 
       } else if( data->ndims != refdata->ndims ) {
          *status = SAI__ERROR;
@@ -187,9 +198,9 @@ void smf_import_array( smfData *refdata, const char *name, int bad,
                     &tstride, status );
 
 /* Copy the values into the model array, replacing bad values as required. */
-      if( *status == SAI__OK ) {
+      if( *status == SAI__OK && type == SMF__DOUBLE ) {
          pin = data->pntr[0];
-         pout = dataptr;
+         pout = (double *) dataptr;
          if( data->ndims < 3 ) data->dims[2] = 1;
          if( data->ndims < 2 ) data->dims[1] = 1;
 
@@ -198,7 +209,7 @@ void smf_import_array( smfData *refdata, const char *name, int bad,
 
             pin = (double *) data->pntr[0];
             for( i = 0; i < ntslice; i++,pin++ ) {
-               pout = dataptr + i*tstride;
+               pout = (double *) dataptr + i*tstride;
 
                for( j = 0; j < nbolo; j++ ) {
                   if( *pin != VAL__BADD ) {
@@ -219,21 +230,21 @@ void smf_import_array( smfData *refdata, const char *name, int bad,
 
 /* Replace bad values with zero. */
          } else if( bad == 1 )  {
-            pout = dataptr;
+            pout = (double *) dataptr;
             for( i = 0; i < nel; i++,pout++ ) {
                if( *pout == VAL__BADD ) *pout = 0.0;
             }
 
 /* Replace bad values with the mean value in the time slice. */
          } else if( bad == 2 )  {
-            pout = dataptr;
+            pout = (double *) dataptr;
             mean = VAL__BADD;
 
             for( i = 0; i < ntslice; i++ ) {
                vsum = 0.0;
                ngood = 0;
                nbad = 0;
-               pout = dataptr + i*tstride;
+               pout = (double *) dataptr + i*tstride;
 
                for( j = 0; j < nbolo; j++ ) {
                   if( *pout != VAL__BADD ) {
@@ -249,7 +260,7 @@ void smf_import_array( smfData *refdata, const char *name, int bad,
 
                if( nbad > 0 ) {
                   if( mean != VAL__BADD ) {
-                     pout = dataptr + i*tstride;
+                     pout = (double *) dataptr + i*tstride;
                      for( j = 0; j < nbolo; j++ ) {
                         if( *pout == VAL__BADD ) *pout = mean;
                         pout += bstride;
@@ -263,6 +274,90 @@ void smf_import_array( smfData *refdata, const char *name, int bad,
                }
             }
          }
+
+/* Now do the same for integer data. */
+      } else if( *status == SAI__OK && type == SMF__INTEGER ) {
+         ipin = data->pntr[0];
+         ipout = (int *) dataptr;
+         if( data->ndims < 3 ) data->dims[2] = 1;
+         if( data->ndims < 2 ) data->dims[1] = 1;
+
+         /* Copy the data into the returned array unchanged. */
+         if( expand ) {
+
+            ipin = (int *) data->pntr[0];
+            for( i = 0; i < ntslice; i++,ipin++ ) {
+               ipout = (int *) dataptr + i*tstride;
+
+               for( j = 0; j < nbolo; j++ ) {
+                  if( *ipin != VAL__BADI ) {
+                     *ipout = *ipin;
+                  } else {
+                     *ipout = VAL__BADI;
+                  }
+                  ipout += bstride;
+               }
+            }
+
+         } else {
+            memcpy( ipout, ipin, nel*sizeof(*ipin) );
+         }
+
+/* Retain bad values. */
+         if( bad == 0 )  {
+
+/* Replace bad values with zero. */
+         } else if( bad == 1 )  {
+            ipout = (int *) dataptr;
+            for( i = 0; i < nel; i++,ipout++ ) {
+               if( *ipout == VAL__BADI ) *ipout = 0;
+            }
+
+/* Replace bad values with the mean value in the time slice. */
+         } else if( bad == 2 )  {
+            ipout = (int *) dataptr;
+            mean = VAL__BADD;
+
+            for( i = 0; i < ntslice; i++ ) {
+               vsum = 0.0;
+               ngood = 0;
+               nbad = 0;
+               ipout = (int *) dataptr + i*tstride;
+
+               for( j = 0; j < nbolo; j++ ) {
+                  if( *ipout != VAL__BADI ) {
+                     vsum += *ipout;
+                     ngood++;
+                  } else {
+                     nbad++;
+                  }
+                  ipout += bstride;
+               }
+
+               if( ngood > 0 ) mean = vsum/ngood;
+
+               if( nbad > 0 ) {
+                  if( mean != VAL__BADD ) {
+                     ipout = (int *) dataptr + i*tstride;
+                     for( j = 0; j < nbolo; j++ ) {
+                        if( *ipout == VAL__BADI ) *ipout = mean;
+                        ipout += bstride;
+                     }
+                  } else {
+                     *status = SAI__ERROR;
+                     errRepf( " ", "NDF '%s' has no good values in plane "
+                              "%zu.", status, name, i );
+                     break;
+                  }
+               }
+            }
+         }
+
+      } else if( *status == SAI__OK ) {
+         const char *stype = smf_dtype_str( type, status );
+         *status = SAI__ERROR;
+         errRepf( " ", "smf_import_array: Data type '%s' not supported "
+                  "(programming error).", status, stype );
       }
 
 /* Close the NDF. */

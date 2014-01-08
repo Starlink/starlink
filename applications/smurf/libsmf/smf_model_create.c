@@ -216,10 +216,12 @@
 *     2013-03-19 (DSB):
 *        Allocate room for a per-array COM model if either COM.PERARRAY or
 *        COM.PERARRAY_LAST is set.
+*     2014-01-7 (DSB):
+*        Allow LUT to be imported from an NDF.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008,2010-2013 Science and Technology Facilities Council.
+*     Copyright (C) 2008,2010-2014 Science and Technology Facilities Council.
 *     Copyright (C) 2006-2010 University of British Columbia.
 *     All Rights Reserved.
 
@@ -503,11 +505,32 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
             /* Calculate the LUT if necessary */
 
             if( mtype == SMF__LUT ) {
-              smf_calc_mapcoord( wf, keymap, idata, outfset, moving, lbnd_out,
-                                 ubnd_out, fts_port, SMF__NOCREATE_FILE,
-                                 status );
-            }
 
+              /* If importing the LUT values from an NDF... */
+              astMapGet0I( keymap, "IMPORTLUT", &import );
+              if( import ) {
+                 smf_get_dims( idata, NULL, NULL, &nbolo, &ntslice, NULL,
+                               NULL, NULL, status);
+                 idata->lut = astMalloc( (nbolo*ntslice)*sizeof(*(idata->lut)) );
+
+                 nc = strstr( name, "_con" ) - name + 4;
+                 ename = astStore( NULL, name, nc + 1 );
+                 ename[ nc ] = 0;
+                 ename = astAppendString( ename, &nc, "_lut" );
+                 msgOutiff( MSG__VERB, "", FUNC_NAME ": using external LUT "
+                           "model imported from '%s'.", status, ename );
+                 smf_import_array( idata, ename, 0, 0, SMF__INTEGER,
+                                   idata->lut, status );
+                 ename = astFree( ename );
+
+              /* If calculating new LUT values here... */
+              } else {
+                 smf_calc_mapcoord( wf, keymap, idata, outfset, moving, lbnd_out,
+                                    ubnd_out, fts_port, SMF__NOCREATE_FILE,
+                                    status );
+              }
+
+            }
           }
 
         } else {
@@ -964,8 +987,8 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
                  run by setting "exportndf=noi,noi.export=1"). */
               if( smf_import_noi( name, &head, keymap, dataptr,
                                   noi_boxsize, status ) ) {
-                 msgOutif( MSG__VERB, "", FUNC_NAME ": using external NOI "
-                           "model.", status );
+                 msgOutiff( MSG__VERB, "", FUNC_NAME ": using external NOI "
+                           "model imported from '%s'.", status, name );
 
               /* If calcfirst flag is set, we know that there is one
                  variance for each bolometer. initialize NOI using noise
@@ -1027,7 +1050,10 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
                  ename = astStore( NULL, name, nc + 1 );
                  ename[ nc ] = 0;
                  ename = astAppendString( ename, &nc, "_ext" );
-                 smf_import_array( idata, ename, 2, 1, (double *) dataptr, status );
+                 msgOutiff( MSG__VERB, "", FUNC_NAME ": using external EXT "
+                           "model imported from '%s'.", status, ename );
+                 smf_import_array( idata, ename, 2, 1, idata->dtype, dataptr,
+                                   status );
                  ename = astFree( ename );
 
               /* If calculating new EXT values here... */

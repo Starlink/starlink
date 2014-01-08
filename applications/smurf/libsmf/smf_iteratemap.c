@@ -418,8 +418,9 @@
 *     2013-10-25 (AGM):
 *        Allocate extra memory for maps for alternate rebinning scheme
 *     2014-08-01 (DSB):
+*        - Allow LUT model to be exported.
 *        - Undo COM as a separate step at start of each iteration.
-*     {enter_further_changes_here}
+     {enter_further_changes_here}
 
 *  Notes:
 
@@ -934,8 +935,8 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       /* Allocate modeltyps */
       if( nmodels >= 1 ) {
         modeltyps = astCalloc( nmodels, sizeof(*modeltyps) );
-        /* Extra components for exportNDF_which for 'res', 'qua' */
-        exportNDF_which = astCalloc( nmodels+2, sizeof(*exportNDF_which) );
+        /* Extra components for exportNDF_which for 'res', 'qua' and 'lut' */
+        exportNDF_which = astCalloc( nmodels+3, sizeof(*exportNDF_which) );
       } else {
         msgOut(" ", FUNC_NAME ": No valid models in MODELORDER",
                status );
@@ -1042,6 +1043,12 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                 exportNDF_which[nmodels]=1;
               }
             }
+          }
+
+          /* If the model type is 'lut' handle it here */
+          if( thismodel == SMF__LUT ) {
+            exportNDF = 1;
+            exportNDF_which[nmodels+2]=1;
           }
 
           /* If the model type is 'qua' handle it here */
@@ -2628,8 +2635,6 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
 
       /* Export DIMM model components to NDF files.
-         Note that we don't do LUT since it is originally an extension in the
-         input flatfielded data.
          Also - check that a filename is defined in the smfFile! */
 
       if( exportNDF && ((*status == SAI__OK) || (*status == SMF__INSMP)) ) {
@@ -2700,6 +2705,28 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
               } else {
                 msgOut( " ",
                         "SMF__ITERATEMAP: Can't export RES -- NULL filename",
+                        status);
+              }
+            }
+
+
+          /* LUT is stored in a separate NDF. */
+            lut_data = (lut[0]->sdata[idx]->pntr)[0];
+
+            if( exportNDF_which[nmodels+2] ) {
+              if( (res[0]->sdata[idx]->file->name)[0] ) {
+
+                smf_model_createHdr( lut[0]->sdata[idx], SMF__RES, refdata,
+                                     status );
+                smf_stripsuffix( res[0]->sdata[idx]->file->name,
+                                 SMF__DIMM_SUFFIX, name, status );
+                one_strlcat( name, "_lut", SMF_PATH_MAX+1, status );
+
+                smf_write_smfData( lut[0]->sdata[idx], NULL, name, NULL, 0,
+                                   NDF__NOID, MSG__VERB, 0, status );
+              } else {
+                msgOut( " ",
+                        "SMF__ITERATEMAP: Can't export LUT -- NULL filename",
                         status);
               }
             }

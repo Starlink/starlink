@@ -235,11 +235,13 @@
  *     2012-04-03 (TIMJ):
  *        Copy smfFile in deepcopy so that flatfielding can tell the file name
  *        when reporting an error.
+*      2014-08-01 (DSB):
+*          Add option to import LUT model from an external NDF (for SKYLOOP).
  *     {enter_further_changes_here}
 
  *  Copyright:
  *     Copyright (C) 2007-2011 University of British Columbia.
- *     Copyright (C) 2008-2012 Science and Technology Facilities Council.
+ *     Copyright (C) 2008-2014 Science and Technology Facilities Council.
  *
  *     All Rights Reserved.
 
@@ -301,6 +303,7 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
   smfDA *da=NULL;               /* Pointer to smfDA struct */
   smfData *data=NULL;           /* Concatenated smfData */
   dim_t *dslen=NULL;            /* Down-sampled lengths */
+  char *ename = NULL;           /* Name of file to import */
   int flag;                     /* Flag */
   char filename[GRP__SZNAM+1];  /* Input filename, derived from GRP */
   dim_t firstpiece = 0;         /* index to start of whichchunk */
@@ -311,6 +314,7 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
   int havelut=0;                /* flag for pointing LUT present */
   smfHead *hdr;                 /* pointer to smfHead in concat data */
   dim_t i;                      /* Loop counter */
+  int importlut;                /* Import LUT array from an NDF? */
   Grp *ingrp=NULL;              /* Pointer to 1-element input group */
   int isFFT=-1;                 /* Data are 4d FFTs */
   dim_t j;                      /* Loop counter */
@@ -319,6 +323,7 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
   dim_t m;                      /* Loop counter */
   dim_t lastpiece = 0;          /* index to end of whichchunk */
   dim_t nbolo=0;                /* Number of detectors */
+  int nc;                       /* Character count */
   dim_t ncol=0;                 /* Number of columns */
   dim_t ndata;                  /* Total data points: nbolo*tlen */
   dim_t nrelated;               /* Number of subarrays */
@@ -387,6 +392,9 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
             status );
     return;
   }
+
+  /* See if we will be importing a LUT model from an NDF. */
+  astMapGet0I( config, "IMPORTLUT", &importlut );
 
   /* Allocate space for the smfArray if required. */
   if( concat ) *concat = smf_create_smfArray( status );
@@ -703,26 +711,28 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
         /* Apply bad bolometer mask */
         smf_apply_mask( refdata, bbms, SMF__BBM_DATA, 0, status );
 
-        /* Calculate the pointing LUT if requested */
-        if( !(flags & SMF__NOCREATE_LUT) && outfset ) {
+        /* Get reference dimensions/strides */
+        smf_get_dims( refdata, NULL, NULL, &nbolo, &reftlenr, &refndata,
+                      &rbstr, &rtstr, status );
+
+        /* Calculate the pointing LUT if requested, unless we will be
+           importing it from an NDF later. */
+        if( !(flags & SMF__NOCREATE_LUT) && outfset && !importlut ) {
 
           /* Set havelut flag */
           havelut = 1;
 
-          /* Calculate the LUT for this chunk. Note, this call divides up
+          /* Calculate a new LUT for this chunk. Note, this call divides up
              its work between several threads.  It takes care to use a
              separate job context so that any other jobs currently being
              performed by the workforce (e.g. opening the next file) do
              not cause the call to block.  */
           smf_calc_mapcoord( wf, config, refdata, outfset, moving, lbnd_out,
                              ubnd_out, fts_port, SMF__NOCREATE_FILE, status );
+
         } else {
           havelut = 0;
         }
-
-        /* Get reference dimensions/strides */
-        smf_get_dims( refdata, NULL, NULL, &nbolo, &reftlenr, &refndata,
-                      &rbstr, &rtstr, status );
 
         if( dslen && dslen[j-firstpiece] ) {
           reftlen = dslen[j-firstpiece];
@@ -886,7 +896,7 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
               }
 
               /* Allocate space for the pointing LUT, and theta if needed */
-              if( havelut ) {
+              if( havelut || importlut ) {
                 data->lut = astCalloc(ndata, sizeof(*(data->lut)) );
                 data->theta = astCalloc(tlen, sizeof(*(data->theta)) );
               }
@@ -1165,6 +1175,19 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
           if(data->hdr->tswcs) data->hdr->tswcs = astAnnul( data->hdr->tswcs );
         }
 
+      }
+
+      /* If we are importing the LUT model from an NDF, do it now. */
+      if( !(flags & SMF__NOCREATE_LUT) && outfset && importlut ) {
+        nc = strstr( pname, "_con" ) - pname + 4;
+        ename = astStore( NULL, pname, nc + 1 );
+        ename[ nc ] = 0;
+        ename = astAppendString( ename, &nc, "_lut" );
+        msgOutiff( MSG__VERB, "", FUNC_NAME ": using external LUT "
+                  "model imported from '%s'.", status, ename );
+        smf_import_array( data, ename, 0, 0, SMF__INTEGER,
+                          data->lut, status );
+        ename = astFree( ename );
       }
     }
 

@@ -1442,6 +1442,18 @@ flt.zeropad = 0
 flt.zeropad_last = <undef>
 
 #-----------------------------------------------------------------
+#  Name: 	importlut
+#  Type: 	integer
+#  Default: 	0
+#  Purpose: 	Controls the creation of the LUT model.
+#  Description: If non-zero, import the the LUT model (the map pixel index
+#               associated with each data sample) from an NDF created by a
+#               previous run of makemap. The NDF is expected to have the same
+#               name as would be created by setting parameter "exportNDF" to
+#               "(lut)" in the makemap configuration.
+importlut = 0
+
+#-----------------------------------------------------------------
 #  Name: 	importsky
 #  Type: 	integer or string
 #  Default: 	0
