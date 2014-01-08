@@ -417,6 +417,8 @@
 *        model have been done.
 *     2013-10-25 (AGM):
 *        Allocate extra memory for maps for alternate rebinning scheme
+*     2014-08-01 (DSB):
+*        - Undo COM as a separate step at start of each iteration.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -1921,14 +1923,24 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
             j = k%nmodels;
 
             /* If this is the first model component and not the first
-               iteration, we need to undo some models (EXT, GAI, FLT ).
+               iteration, we need to undo some models (COM, GAI, EXT, FLT ).
                Undo them in the reverse order to which they were done. */
 
             if( (j==0) && !firstiter ) {
               dim_t jj = whichast - 1;
               while( jj != whichast ) {
 
-                if( jj == whichext && haveext ) {
+                if( jj == whichcom && havecom ) {
+                  msgOutiff( MSG__VERB, "",
+                             "  ** undoing COM from previous iteration",
+                             status );
+                  smf_calcmodel_com( wf, &dat, 0, keymap, model[whichcom],
+                                     SMF__DIMM_INVERT, status );
+                  msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
+                             ": ** %f s undoing COM",
+                             status, smf_timerupdate(&tv1,&tv2,status) );
+
+                } else if( jj == whichext && haveext ) {
                   msgOutiff( MSG__VERB, "",
                              "  ** undoing EXTinction from previous iteration",
                              status );
