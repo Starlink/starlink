@@ -265,6 +265,8 @@
 *        formed from uncleaned data.
 *        - Ensure only one iteration is used on the second and subsequent 
 *        invocations of makemap, even if ast.skip is non-zero.
+*     8-JAN-2014 (DSB):
+*        Fix bug that caused NOI model to be ignored on all iterations.
 
 *-
 '''
@@ -643,7 +645,7 @@ try:
       add["diag.append"] = 1   # Ensure we append diagnostics to the file
                                # created on the first iteration.
       add["ast.skip"] = 0      # Ensure we do not skip any more AST models
-      add["noi.import"] = 0    # Use the NOI model created by iteration 1
+      add["noi.import"] = 1    # Use the NOI model created by iteration 1
       add["noi.export"] = 0    # No need to export the NOI model again
       if ast_skip > 0:
          add["numiter"] = 1    # First invocation used (1+ast_skip) iterations
