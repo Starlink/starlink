@@ -53,7 +53,7 @@
 *        - First iteration:
 *           numiter=1
 *           noi.export=1
-*           exportNDF=(ext,res,qua)
+*           exportNDF=(lut,ext,res,qua)
 *           noexportsetbad=1
 *           exportclean=1
 *           ast.zero_notlast = 0
@@ -72,6 +72,7 @@
 *           exportNDF=(res,qua)
 *           doclean=0
 *           importsky=ref
+*           importlut=1
 *           ext.import=1
 *           ast.zero_notlast = 0
 *           flt.zero_notlast = 0
@@ -91,6 +92,7 @@
 *           noi.import=1
 *           doclean=0
 *           importsky=ref
+*           importlut=1
 *           ext.import=1
 *           ast.zero_notlast = 1
 *           flt.zero_notlast = 1
@@ -269,7 +271,7 @@
 *     8-JAN-2014 (DSB):
 *        - Fix bug that caused NOI model to be ignored on all iterations.
 *        - Update quality flags in cleaned data after each invocation of makemap.
-
+*        - Cache LUT model values.
 *-
 '''
 
@@ -291,6 +293,10 @@ retain = 0
 #  when the script exist.
 new_ext_ndfs = []
 
+#  A list of the LUT NDFs created by this script. These are created and used
+#  in the current working directory, and are deleted when the script exist.
+new_lut_ndfs = []
+
 #  A list of the NOI model NDFs created by this script. These are created
 #  and used in the current working directory, and are deleted when the
 #  script exist.
@@ -300,15 +306,17 @@ new_noi_ndfs = []
 #  unless the script's RETAIN parameter indicates that they are to be
 #  retained. Also delete the script's temporary ADAM directory.
 def cleanup():
-   global retain, new_ext_ndfs, new_noi_ndfs
+   global retain, new_ext_ndfs, new_lut_ndfs, new_noi_ndfs
    try:
       starutil.ParSys.cleanup()
       if retain:
-         msg_out( "Retaining EXT and NOI models in {0} and temporary files in {1}".format(os.getcwd(),NDG.tempdir))
+         msg_out( "Retaining EXT, LUT and NOI models in {0} and temporary files in {1}".format(os.getcwd(),NDG.tempdir))
       else:
          NDG.cleanup()
          for ext in new_ext_ndfs:
             os.remove( ext )
+         for lut in new_lut_ndfs:
+            os.remove( lut )
          for noi in new_noi_ndfs:
             os.remove( noi )
          for res in qua:
@@ -477,8 +485,8 @@ try:
                            "select=\"\'450=0,850=1\'\"".format(config)))
 
 #  The first invocation of makemap will create NDFs holding cleaned
-#  time-series data, EXT and NOI model values. The NDFs are created with
-#  hard-wired names and put in the current working directory. For
+#  time-series data, EXT, LUT and NOI model values. The NDFs are created
+#  with hard-wired names and put in the current working directory. For
 #  tidyness, we will move the cleaned data files into the NDG temp
 #  directory, where all the other temp files are stored. In order to
 #  distinguish NDFs created by this script from any pre-existing NDFs
@@ -486,8 +494,8 @@ try:
 #  last-accessed times of any relevant pre-existing NDFs. Note, if the
 #  "ext.import" config parameter is set, makemap expects EXT model
 #  values to be in the current working directory, so we do not move
-#  those NDFs to the NDG temp directory. Likewise for NOI model files.
-#  Use last-accessed times rather than inode numbers since something
+#  those NDFs to the NDG temp directory. Likewise for LUT and NOI model
+#  files. Use last-accessed times rather than inode numbers since something
 #  very strange seems to be happening with inode numbers for NDFs
 #  created by the starutil module (two succesive NDFs with the same
 #  path can have the same inode number).
@@ -505,6 +513,11 @@ try:
    for path in glob.glob("s*_con_noi.sdf"):
       orig_noi_ndfs[path] = os.stat(path).st_atime
 
+#  Note any pre-existing NDFs holding LUT values.
+   orig_lut_ndfs = {}
+   for path in glob.glob("s*_con_lut.sdf"):
+      orig_lut_ndfs[path] = os.stat(path).st_atime
+
 #  Find the number of iterations to perform on the initial invocation of
 #  makemap.
    niter0 = 1 + ast_skip
@@ -513,8 +526,8 @@ try:
 
 #  On the first invocation of makemap, we use the raw data files specified
 #  by the IN parameter to create an initial estimate of the sky. We also
-#  save the cleaned time series data, and the EXT and NOI models (if we are
-#  doing more than one iteration), for use on subsequent iterations (this
+#  save the cleaned time series data, and the EXT, LUT and NOI models (if we
+#  are doing more than one iteration), for use on subsequent iterations (this
 #  speeds them up a bit). First create a text file holding a suitably modified
 #  set of configuration parameters. This file is put in the NDG temp
 #  directory (which is where we store all temp files).
@@ -533,7 +546,7 @@ try:
       fd.write("noi.export=1\n") # Export the NOI model. This forces the
                                  # NOI model to be created and exported after
                                  # the first iteration has completed.
-      fd.write("exportNDF=(ext,res,qua)\n")# Save the EXT model values to avoid
+      fd.write("exportNDF=(lut,ext,res,qua)\n")# Save the EXT, LUT model values to avoid
                                  # re-calculation on each invocation of makemap.
                                  # Also need QUA to update time-series flags
       fd.write("noexportsetbad=1\n")# Export good EXT values for bad bolometers
@@ -618,6 +631,13 @@ try:
             elif os.stat(ndf).st_atime > orig_ext_ndfs[ndf]:
                new_ext_ndfs.append(ndf)
 
+#  Get a list of the LUT files created by the first invocation of makemap.
+         for ndf in glob.glob("s*_con_lut.sdf"):
+            if not ndf in orig_lut_ndfs:
+               new_lut_ndfs.append(ndf)
+            elif os.stat(ndf).st_atime > orig_lut_ndfs[ndf]:
+               new_lut_ndfs.append(ndf)
+
 #  Get a list of the NOI model files created by the first invocation of
 #  makemap.
          for ndf in glob.glob("s*_con_noi.sdf"):
@@ -643,10 +663,11 @@ try:
 #  initial guess at the sky. First create a map holding things to add
 #  to the config for subsequent invocations.
       add = {}
-      add["exportNDF"] = "(res,qua)" # Prevent EXT model being exported.
+      add["exportNDF"] = "(res,qua)" # Prevent EXT or LUT model being exported.
       add["exportclean"] = 0   # Prevent cleaned time-series data being exported.
       add["doclean"] = 0       # Do not clean the supplied data (it has
       add["importsky"] = "ref" # Get the initial sky estimate from the REF parameter.
+      add["importlut"] = 1     # Import the LUT model created by the first iteration.
       add["ext.import"] = 1    # Import the EXT model created by the first iteration.
       add["flt.notfirst"] = 0  # Ensure we use FLT on 2nd and subsequent invocations
       add["pln.notfirst"] = 0  # Ensure we use PLN on 2nd and subsequent invocations
