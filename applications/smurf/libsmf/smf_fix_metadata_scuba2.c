@@ -97,9 +97,13 @@
 *        If airmass cannot be determined, only annull the error if it
 *        is SAI__ERROR (i.e. do not hide errors from instra-structure
 *        libraries that might indicate a programming problem).
+*     2014-01-08 (DSB):
+*        Do not modify the STEPTIME value if the data has been pre-cleaned 
+*        by a previous run of MAKEMAP, since the existing header will contain 
+*        the value actually used by the previous run of MAKEMAP>
 
 *  Copyright:
-*     Copyright (C) 2009-2013 Science & Technology Facilities Council.
+*     Copyright (C) 2009-2014 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -209,17 +213,26 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, i
       end_time = (hdr->allState)[iend].rts_end;
     }
 
+
+    /* Is this previously cleaned data? */
+    int cleaned = 0;
+    smf_getfitsi( hdr, "PRECLNED", &cleaned, status );
+
     double steptime = VAL__BADD;
     double newstep;
 
     smf_getfitsd( hdr, "STEPTIME", &steptime, status );
     newstep = steptime;
 
+    nframes = iend - istart + 1;
+
+    /* If the data is pre-cleaned, use the steptime without change. */
+    if( cleaned ) {
+
     /* it is possible for a file to contain only one step since
        the DA just dumps every N-steps. We can not recalculate the
        step time in that case. */
-    nframes = iend - istart + 1;
-    if (nframes > 1) {
+    } else if (nframes > 1) {
 
       /* duration of file in days */
       newstep = end_time - start_time;

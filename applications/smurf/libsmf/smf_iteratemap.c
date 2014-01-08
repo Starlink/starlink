@@ -420,7 +420,8 @@
 *     2014-08-01 (DSB):
 *        - Allow LUT model to be exported.
 *        - Undo COM as a separate step at start of each iteration.
-     {enter_further_changes_here}
+*        - Ensure exported cleaned data contains the STEPTIME value that was actually used.
+*     {enter_further_changes_here}
 
 *  Notes:
 
@@ -1896,6 +1897,15 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
               oldorder = res[0]->sdata[idx]->isTordered;
               smf_dataOrder( res[0]->sdata[idx], 1, status );
               smf_dataOrder( qua[0]->sdata[idx], 1, status );
+
+              /* Add a FITS header indicating that this is cleaned data. */
+              smf_fits_updateI( res[0]->sdata[idx]->hdr, "PRECLNED", 1, NULL,
+                                status );
+
+              /* Store the used STEPTIME. */
+              smf_fits_updateD( res[0]->sdata[idx]->hdr, "STEPTIME",
+                                res[0]->sdata[idx]->hdr->steptime, NULL,
+                                status );
 
               smf_write_smfData( res[0]->sdata[idx], NULL,
                                  name, NULL, 0, NDF__NOID,
