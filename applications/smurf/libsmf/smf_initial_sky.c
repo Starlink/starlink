@@ -55,6 +55,11 @@
 *        - Ensure the bad bits mask is set so that the mapped NDF data
 *        array is masked by the quality array.
 *        - Import variance from supplied NDF if available.
+*     10-DEC-2013 (DSB):
+*        - Re-structured to avoid setting map pixels bad if they are
+*        flagged only by FLT or COM masking. That is, map pixels should
+*        be bad if and only if they are flagged by AST masking.
+*        - Report an error if the NDF contains unexpected quality names.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -99,15 +104,20 @@ int smf_initial_sky( ThrWorkForce *wf, AstKeyMap *keymap, smfDIMMData *dat,
 /* Local Variables: */
    char refparam[ DAT__SZNAM ];/* Name for reference NDF parameter */
    const char *cval;          /* The IMPORTSKY string value */
+   double *p1;                /* Pointer to next input pixel value. */
+   double *p2;                /* Pointer to next output pixel value. */
    double *ptr;               /* Pointer to NDF Data array */
    double *vptr;              /* Pointer to NDF Variance array */
    int indf1;                 /* Id. for supplied reference NDF */
    int indf2;                 /* Id. for used section of reference NDF */
    int nel;                   /* Number of mapped NDF pixels */
    int result;                /* Returned flag */
-   size_t size;               /* Size of mapped array */
-   smf_qual_t *qptr;          /* Pointer to mapped quality values */
    int there;                 /* Is there a smurf extension in the NDF? */
+   size_t i;                  /* Loop index */
+   size_t size;               /* Size of mapped array */
+   smf_qfam_t family;         /* The family of quality flags found in the NDF */
+   smf_qual_t *p3;            /* Pointer to next quality value. */
+   smf_qual_t *qptr;          /* Pointer to mapped quality values */
 
 /* Initialise the returned value to indicate no sky has been subtractred. */
    result = 0;
@@ -157,32 +167,63 @@ int smf_initial_sky( ThrWorkForce *wf, AstKeyMap *keymap, smfDIMMData *dat,
 /* Get a section from this NDF that matches the bounds of the map. */
       ndfSect( indf1, 2, dat->lbnd_out, dat->ubnd_out, &indf2, status );
 
-/* Ensure masked values are set bad in the mapped data array, using the
-   mask defined in the quality array. */
-      ndfSbb( 255, indf2, status );
+/* Map the quality array section, and copy it into the map buffer. */
+      ndfState( indf2, "QUALITY", &there, status );
+      if( there ) {
+         qptr = smf_qual_map( indf2, "READ", &family, &size, status );
+         if( *status == SAI__OK ) {
+            if( family != SMF__QFAM_MAP ) {
+               *status = SAI__ERROR;
+               ndfMsg( "N", indf1 );
+               errRep( "", "Don't know how to interpret the quality flags "
+                       "in the initial sky NDF (^N).", status );
+            } else {
+               memcpy( dat->mapqual, qptr, dat->msize*sizeof(*qptr));
 
-/* Map the data array section, and copy it into the map buffer. */
+/* Also copy it into another array where it can be accessed by smf_get_mask. We
+   only need to do this once. */
+               if( ! dat->initqual ) dat->initqual = astStore( NULL, qptr,
+                                                               dat->msize*sizeof(*qptr));
+            }
+         }
+      } else {
+         qptr = NULL;
+      }
+
+/* Ensure masked values are not set bad in the mapped data array. */
+      ndfSbb( 0, indf2, status );
+
+/* Map the data array section, and copy it into the map buffer. Set
+   AST-masked pixels bad (but not FLT or COM masked pixels). */
       ndfMap( indf2, "DATA", "_DOUBLE", "READ", (void **) &ptr, &nel, status );
-      if( *status == SAI__OK ) memcpy( dat->map, ptr, dat->msize*sizeof(*ptr));
+      if( *status == SAI__OK ) {
+         if( qptr ) {
+            p1 = ptr;
+            p2 = dat->map;
+            p3 = qptr;
+            for( i = 0; i < dat->msize; i++,p1++ ) {
+               *(p2++) = (*(p3++) & SMF__MAPQ_AST) ? VAL__BADD : *p1;
+            }
+         } else {
+            memcpy( dat->map, ptr, dat->msize*sizeof(*ptr));
+         }
+      }
 
 /* Map the variance array section, and copy it into the map buffer. */
       ndfState( indf2, "VARIANCE", &there, status );
       if( there ) {
          ndfMap( indf2, "VARIANCE", "_DOUBLE", "READ", (void **) &vptr, &nel, status );
-         if( *status == SAI__OK ) memcpy( dat->mapvar, vptr, dat->msize*sizeof(*vptr));
-      }
-
-/* Map the quality array section, and copy it into the map buffer. */
-      ndfState( indf2, "QUALITY", &there, status );
-      if( there ) {
-         qptr = smf_qual_map( indf2, "READ", NULL, &size, status );
          if( *status == SAI__OK ) {
-            memcpy( dat->mapqual, qptr, dat->msize*sizeof(*qptr));
-
-/* Also copy it into another array where it can be accessed by smf_get_mask. We
-   only need to do this once. */
-            if( ! dat->initqual ) dat->initqual = astStore( NULL, qptr,
-                                                            dat->msize*sizeof(*qptr));
+            if( qptr ) {
+               p1 = vptr;
+               p2 = dat->mapvar;
+               p3 = qptr;
+               for( i = 0; i < dat->msize; i++,p1++ ) {
+                  *(p2++) = (*(p3++) & SMF__MAPQ_AST) ? VAL__BADD : *p1;
+               }
+            } else {
+               memcpy( dat->mapvar, vptr, dat->msize*sizeof(*vptr));
+            }
          }
       }
 
