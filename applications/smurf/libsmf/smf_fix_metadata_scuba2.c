@@ -98,8 +98,8 @@
 *        is SAI__ERROR (i.e. do not hide errors from instra-structure
 *        libraries that might indicate a programming problem).
 *     2014-01-08 (DSB):
-*        Do not modify the STEPTIME value if the data has been pre-cleaned 
-*        by a previous run of MAKEMAP, since the existing header will contain 
+*        Do not modify the STEPTIME value if the data has been pre-cleaned
+*        by a previous run of MAKEMAP, since the existing header will contain
 *        the value actually used by the previous run of MAKEMAP>
 
 *  Copyright:
@@ -216,7 +216,13 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed, i
 
     /* Is this previously cleaned data? */
     int cleaned = 0;
-    smf_getfitsi( hdr, "PRECLNED", &cleaned, status );
+    if( *status == SAI__OK ) {
+      smf_getfitsi( hdr, "PRECLNED", &cleaned, status );
+      if( *status != SAI__OK ) {
+        cleaned = 0;
+        errAnnul( status );
+      }
+    }
 
     double steptime = VAL__BADD;
     double newstep;
