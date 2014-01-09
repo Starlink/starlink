@@ -249,6 +249,7 @@
 #include "StarRtdImage.h"
 #include "Contour.h"
 #include "XYProfile.h"
+#include "XYHistogram.h"
 #include "RegionStats.h"
 #include <ast.h>
 #include "grf_tkcan.h"
@@ -346,7 +347,8 @@ public:
     { "replaceimagedata",&StarRtdImage::replaceImageDataCmd, 1, 1 },
     { "usingxshm",       &StarRtdImage::usingxshmCmd,       0, 0 },
     { "volatile",        &StarRtdImage::volatileCmd,        0, 1 },
-    { "xyprofile",       &StarRtdImage::xyProfileCmd,      14, 14}
+    { "xyprofile",       &StarRtdImage::xyProfileCmd,      14, 14},
+    { "xyhistogram",     &StarRtdImage::xyHistogramCmd,     9, 9}
 };
 
 
@@ -7020,6 +7022,108 @@ int StarRtdImage::xyProfileCmd(int argc, char *argv[])
     append_element( numValues[1] );
     return status;
 }
+
+
+//+
+//   StarRtdImage::xyHistogramCmd
+//
+//   Purpose:
+//      Updates BLT vectors with a histogram of a rectangular region of the
+//      current image.
+//
+//   Arguments:
+//
+//      <bltGraph> is the path name of a BLT graph widget
+//
+//      <bltElem>  is the name of the element used in graph.
+//
+//      x0, y0,    are the end points of a rectangle in the
+//      x1, y1     given coordinate system (canvas, image, screen,
+//                 wcs, deg).
+//
+//      xy_units   units of the rectangle coordinates.
+//
+//      xVector   (returned) name of a BLT vector to receive the
+//                histogram coordinates.
+//
+//      yVector   (returned) name of a BLT vector to receive the
+//                histogram counts.
+//
+//   Return:
+//      A list containing the number of positions written to the vectors,
+//      and estimates of:
+//         peak position
+//         count at peak position
+//         peak position from parabolic fit
+//         count at parabolic peak position
+//         FWHM from parabolic fit
+//         FWHM from gaussian fit to parabolic position.
+//-
+
+int StarRtdImage::xyHistogramCmd(int argc, char *argv[])
+{
+#ifdef _DEBUG_
+    cout << "Called StarRtdImage::xyHistogramCmd (" << argc << ")" << std::endl;
+#endif
+    if ( !image_ ) {
+        return TCL_OK;
+    }
+
+    //  Convert extent to image coords.
+    double rx0, ry0, rx1, ry1;
+    if (convertCoordsStr(0, argv[2], argv[3], NULL, NULL,
+                         rx0, ry0, argv[6], "image") != TCL_OK
+        || convertCoordsStr(0, argv[4], argv[5], NULL, NULL,
+                            rx1, ry1, argv[6], "image") != TCL_OK) {
+        return TCL_ERROR;
+    }
+
+    //  Get X and Y dimensions.
+    int x0 = int( rx0 ), y0 = int( ry0 ), x1 = int( rx1 ), y1 = int( ry1 );
+
+    //  And get the histogram. Do this by creating a suitable histogram object
+    //  and passing it a reference to the image data values.
+    ImageIO imageIO = image_->image();
+    XYHistogram xyHistogram( imageIO );
+
+    //  Tell the histogram object if it needs to byte swap the image
+    //  data. This is only necessary if the image is FITS on a non
+    //  bigendian machine.
+    xyHistogram.setSwap( swapNeeded() );
+
+    //  Set the region of image to use.
+    xyHistogram.setRegion( x0, y0, x1, y1 );
+
+    //  Get the histogram.
+    Histogram histogram;
+    xyHistogram.extractHistogram( &histogram );
+
+    //  Copy into BLT vectors.
+    int status = TCL_OK;
+    if ( histogram.nbin > 0 ) {
+
+        //  Transfer coords and counts into two BLT vectors.
+        double *values = new double[histogram.nbin*2];
+        for ( int i = 0, j = 0; i < histogram.nbin; i++, j += 2 ) {
+            values[j] = i * histogram.width + histogram.zero;
+            values[j+1] = histogram.hist[i];
+        }
+        status = Blt_GraphElement( interp_, argv[0], argv[1],
+                                   histogram.nbin*2, values,
+                                   argv[7], argv[8] );
+        delete[] values;
+    }
+
+    set_result( histogram.nbin );
+    append_element( histogram.mode * histogram.width + histogram.zero );
+    append_element( histogram.hist[histogram.mode] );
+    append_element( round(histogram.peak) * histogram.width + histogram.zero );
+    append_element( histogram.hist[(int)round(histogram.peak)] );
+    append_element( histogram.pfwhm * histogram.width );
+    append_element( histogram.gfwhm * histogram.width );
+    return status;
+}
+
 
 //+
 //  Name:

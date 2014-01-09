@@ -1,0 +1,367 @@
+/**
+ *  Define members of XYHistogram.C that are data type dependent.
+ *
+ *  The data type used by these overloaded members is controlled by
+ *  the macro "DATA_TYPE". Define this and #include this file as many
+ *  times as required for the data types that you want to support.
+
+ *  Copyright:
+ *     Copyright (C) 2015 Science and Technology Research Council.
+ *     All Rights Reserved.
+ 
+ *  Licence:
+ *     This program is free software; you can redistribute it and/or
+ *     modify it under the terms of the GNU General Public License as
+ *     published by the Free Software Foundation; either version 2 of the
+ *     License, or (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be
+ *     useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ *     of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program; if not, write to the Free Software
+ *     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
+ *     02110-1301, USA
+ */
+
+/*
+ *  Create an optimised histogram of an array from a sub region of image data. 
+ *  Native format image data version.
+ *
+ *  This routine forms a histogram of an array of data values. The histogram
+ *  is formed in such a way that at least MODEFRAC values are present in the
+ *  peak counts bin. The first estimate of the histogram is formed using NHIST
+ *  elements. If more than MODEFRAC counts are present in at least one bin then
+ *  no further action is taken, if less than is number of counts are present
+ *  in the peak bin then the histogram is rebinned to increase the number
+ *  count until MODEFRAC is exceeded. On exit the number of bins used to form
+ *  the histogram is returned together with the bin number which contains the
+ *  peak count level and the width (in data values) of the bin and a zero
+ *  point in the Histogram structure (along with the histogram itself).  The
+ *  original data values are related to the bin number (starting at 0 up to
+ *  nbin) by
+ *
+ *        VALUE = NBIN*WIDTH+ZERO
+ *
+ *   Arguments:
+ *      image = pointer to the image data.
+ *      nx, ny = size of image data.
+ *      bscale, bzero = image data scale and zero point (FITS only).
+ *      x0, y0, x1, y1 = array indices of region to process.
+ *      histogram = the populated histogram structure.
+ */
+void XYHistogram::extractNativeImage( const DATA_TYPE *image, const int nx,
+                                      const int ny, const double bscale,
+                                      const double bzero, const int x0,
+                                      const int y0, const int x1,
+                                      const int y1, 
+                                      Histogram *histogram )
+{
+    DATA_TYPE value;             /* Current value */
+    double dv;                   /* Current value */
+    double dmax;                 /* Data maximum */
+    double dmin;                 /* Data minimum */
+    double scale;                /* Data scaling factor */
+    double width;                /* Current bin width */
+    double zero;                 /* Data value of first bin */
+    int i;                       /* Loop variable */
+    int idiff;                   /* Histogram index of current value */
+    int j;                       /* Loop variable */
+    int minbin;                  /* Minimum number of counts in mode bin */
+    int mode;                    /* Position of mode in histogram */
+    int nbin;                    /* Number of used bins */
+    int now;                     /* Current histogram index */
+    int ok;                      /* Flag which controls optimisation loop */
+    int peak;                    /* Peak bin count */
+
+    /* Initialisation of histogram structure. */
+    memset( histogram, '\0', sizeof( Histogram ) );
+
+    /*  Check width and height of region. */
+    long w = x1 - x0 + 1;
+    long h = y1 - y0 + 1;
+    if ( w < 1 || h < 1 ) {
+        return;
+    }
+    long size = w * h;
+
+    /*  Find the minimum and maximum values in the array. */
+    dmin = DBL_MAX;
+    dmax = -DBL_MAX;
+    for ( j = y0; j <= y1; j++ ) {
+        for ( i = x0; i <= x1; i++ ) {
+            if ( ! badpix( image, nx, i, j ) ) {
+                dv = arrayVal( image, nx, i, j );
+                dmin = min( dmin, dv );
+                dmax = max( dmax, dv );
+            }
+        }
+    }
+
+    /*  Check that array was not single valued. */
+    if ( dmin == dmax ) {
+        return;
+    }
+
+    /*  Convert MODEFRAC into a count for the mode bin. */
+    minbin = (int) ( MODEFRAC * (double) size );
+
+    /*  Clear the histogram of any previous values. */
+    for ( i = 0; i < NHIST; i++ ) {
+        histogram->hist[i] = 0;
+    }
+    nbin = NHIST;
+
+    /*  Form the first estimate of the histogram. */
+    scale = (double) nbin / ( dmax - dmin );
+    for ( j = y0; j <= y1; j++ ) {
+        for ( i = x0; i <= x1; i++ ) {
+            if ( ! badpix( image, nx, i, j ) ) {
+                dv = arrayVal( image, nx, i, j );
+                idiff = (int) round( scale * ( dv - dmin ) );
+                histogram->hist[ idiff ] += 1;
+            }
+        }
+    }
+
+    /*  Set the initial bin width. */
+    width = 1.0 / scale;
+
+    /*  Set the zero point for data values. */
+    zero = dmin - width / 2.0;
+
+    /*  Now loop while required to form optimised histogram. */
+    ok = 1;
+    while ( ok && nbin > 0 ) {
+
+        /*  Look for present peak count (this is the mode bin also). */
+        mode = 0;
+        peak = 0;
+        for ( i = 0; i < nbin; i++ ) {
+            if ( histogram->hist[ i ] > peak ) {
+                peak = histogram->hist[ i ];
+                mode = i;
+            }
+        }
+
+        /*  If mode has a higher count than required then stop. Otherwise
+         *  rebin the histogram to increase the count per bin. */
+        if ( peak > minbin ) {
+            ok = 0;
+        }
+        else {
+            /*  Rebin the histogram. Binning is performed using a factor of
+             *  two to keep things simple. */
+            now = 0;
+            for ( i = 0; i < nbin; i += 2 ) {
+                now += 1;
+                histogram->hist[ now ] = histogram->hist[ i ] +
+                                         histogram->hist[ i + 1 ];
+            }
+
+            /*  Change the number of bins. */
+            nbin = nbin / 2;
+
+            /*  Change the bin width. */
+            width = width * 2.0;
+            zero = dmin - width;
+        }
+    }
+    if ( nbin == 0 ) {
+
+        /*  Use simple histogram without optimisation. */
+        for ( i = 0; i < NHIST; i++ ) {
+            histogram->hist[i] = 0;
+        }
+        nbin = NHIST;
+
+        /*  Form the histogram. */
+        scale = (double) nbin / ( dmax - dmin );
+        for ( j = y0; j <= y1; j++ ) {
+            for ( i = x0; i <= x1; i++ ) {
+                if ( ! badpix( image, nx, i, j ) ) {
+                    dv = arrayVal( image, nx, i, j );
+                    idiff = (int) round( scale * ( dv - dmin ) );
+                    histogram->hist[ idiff ] += 1;
+                }
+            }
+        }
+        mode = 0;
+        peak = 0;
+        for ( i = 0; i < nbin; i++ ) {
+            if ( histogram->hist[ i ] > peak ) {
+                peak = histogram->hist[ i ];
+                mode = i;
+            }
+        }
+        width = 1.0 / scale;
+        zero = dmin - width / 2.0;
+    }
+
+    /*  Update histogram with results. */
+    histogram->mode = mode;
+    histogram->nbin = nbin;
+    histogram->width = width;
+    histogram->zero = zero;
+}
+
+
+/*
+ *   Byte swapped image data version.
+ */
+void XYHistogram::extractSwapImage( const DATA_TYPE *image, const int nx,
+                                    const int ny, const double bscale,
+                                    const double bzero, const int x0,
+                                    const int y0, const int x1,
+                                    const int y1,
+                                    Histogram *histogram )
+{
+    DATA_TYPE value;             /* Current value */
+    double dv;                   /* Current value */
+    double dmax;                 /* Data maximum */
+    double dmin;                 /* Data minimum */
+    double scale;                /* Data scaling factor */
+    double width;                /* Current bin width */
+    double zero;                 /* Data value of first bin */
+    int i;                       /* Loop variable */
+    int idiff;                   /* Histogram index of current value */
+    int j;                       /* Loop variable */
+    int minbin;                  /* Minimum number of counts in mode bin */
+    int mode;                    /* Position of mode in histogram */
+    int nbin;                    /* Number of used bins */
+    int now;                     /* Current histogram index */
+    int ok;                      /* Flag which controls optimisation loop */
+    int peak;                    /* Peak bin count */
+
+    /* Initialisation of histogram structure. */
+    memset( histogram, '\0', sizeof( Histogram ) );
+
+    /*  Check width and height of region. */
+    long w = x1 - x0 + 1;
+    long h = y1 - y0 + 1;
+    if ( w < 1 || h < 1 ) {
+        return;
+    }
+    long size = w * h;
+
+    /*  Find the minimum and maximum values in the array. */
+    dmin = DBL_MAX;
+    dmax = -DBL_MAX;
+    for ( j = y0; j <= y1; j++ ) {
+        for ( i = x0; i <= x1; i++ ) {
+            if ( ! badpix( image, nx, i, j ) ) {
+                dv = swapArrayVal( image, nx, i, j );
+                dmin = min( dmin, dv );
+                dmax = max( dmax, dv );
+            }
+        }
+    }
+
+    /*  Check that array was not single valued. */
+    if ( dmin == dmax ) {
+        return;
+    }
+
+    /*  Convert MODEFRAC into a count for the mode bin. */
+    minbin = (int) ( MODEFRAC * (double) size );
+
+    /*  Clear the histogram of any previous values. */
+    for ( i = 0; i < NHIST; i++ ) {
+        histogram->hist[i] = 0;
+    }
+    nbin = NHIST;
+
+    /*  Form the first estimate of the histogram. */
+    scale = (double) nbin / ( dmax - dmin );
+    for ( j = y0; j <= y1; j++ ) {
+        for ( i = x0; i <= x1; i++ ) {
+            if ( ! badpix( image, nx, i, j ) ) {
+                dv = swapArrayVal( image, nx, i, j );
+                idiff = (int) round( scale * ( dv - dmin ) );
+                histogram->hist[ idiff ] += 1;
+            }
+        }
+    }
+
+    /*  Set the initial bin width. */
+    width = 1.0 / scale;
+
+    /*  Set the zero point for data values. */
+    zero = dmin - width / 2.0;
+
+    /*  Now loop while required to form optimised histogram. */
+    ok = 1;
+    while ( ok && nbin > 0 ) {
+
+        /*  Look for present peak count (this is the mode bin also). */
+        mode = 0;
+        peak = 0;
+        for ( i = 0; i < nbin; i++ ) {
+            if ( histogram->hist[ i ] > peak ) {
+                peak = histogram->hist[ i ];
+                mode = i;
+            }
+        }
+
+        /*  If mode has a higher count than required then stop. Otherwise
+         *  rebin the histogram to increase the count per bin. */
+        if ( peak > minbin ) {
+            ok = 0;
+        }
+        else {
+            /*  Rebin the histogram. Binning is performed using a factor of
+             *  two to keep things simple. */
+            now = 0;
+            for ( i = 0; i < nbin; i += 2 ) {
+                now += 1;
+                histogram->hist[ now ] = histogram->hist[ i ] +
+                                         histogram->hist[ i + 1 ];
+            }
+
+            /*  Change the number of bins. */
+            nbin = nbin / 2;
+
+            /*  Change the bin width. */
+            width = width * 2.0;
+            zero = dmin - width;
+        }
+    }
+    if ( nbin == 0 ) {
+
+        /*  Use simple histogram without optimisation. */
+        for ( i = 0; i < NHIST; i++ ) {
+            histogram->hist[i] = 0;
+        }
+        nbin = NHIST;
+
+        /*  Form the histogram. */
+        scale = (double) nbin / ( dmax - dmin );
+        for ( j = y0; j <= y1; j++ ) {
+            for ( i = x0; i <= x1; i++ ) {
+                if ( ! badpix( image, nx, i, j ) ) {
+                    dv = swapArrayVal( image, nx, i, j );
+                    idiff = (int) round( scale * ( dv - dmin ) );
+                    histogram->hist[ idiff ] += 1;
+                }
+            }
+        }
+        mode = 0;
+        peak = 0;
+        for ( i = 0; i < nbin; i++ ) {
+            if ( histogram->hist[ i ] > peak ) {
+                peak = histogram->hist[ i ];
+                mode = i;
+            }
+        }
+        width = 1.0 / scale;
+        zero = dmin - width / 2.0;
+    }
+
+    /*  Update histogram with results. */
+    histogram->mode = mode;
+    histogram->nbin = nbin;
+    histogram->width = width;
+    histogram->zero = zero;
+}
