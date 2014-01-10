@@ -24,7 +24,9 @@
 *     set of pixels that have a specified value within a 2-dimensional
 *     NDF.
 *
-*     The returned Polygon is defined in the NDF PIXEL coordinate system.
+*     By default, the returned Polygon is defined in the NDF PIXEL
+*     coordinate system, but can be mapped into the current Frame of the
+*     NDF using parameter CURRENT.
 *
 *     The MAXERR and MAXVERT parameters can be used to control how
 *     accurately the returned Polygon represents the required region in
@@ -37,6 +39,10 @@
 *  ADAM Parameters:
 *     ARRAY = NDF (Read)
 *        A 2-dimensional NDF containing the data to be processed.
+*     CURRENT = _LOGICAL (Read)
+*        If TRUE, then the polygon is mapped into the current frame of
+*        the supplied NDF before being returned. Otherwise, it is left in
+*        PIXEL coordinates as created by the astOutline function. [FALSE]
 *     FMT = LITERAL (Read)
 *        The format in which to store output objects. Can be "AST", "XML",
 *        "STCS", or any FitsChan encoding such as FITS-WCS. Only used
@@ -62,7 +68,8 @@
 *        returned Polygon and the accurate outline in the datta array,
 *        expressed as a number of pixels. If this is zero or less, the
 *        returned Polygon will have the number of vertices specified by
-*        MAXVERT.
+*        MAXVERT. Note, this value should be expressed in units of pixels
+*        even if parameter CURRENT is set TRUE.
 *     MAXVERT = _INTEGER (Read)
 *        Together with MAXERR, this determines how accurately the returned
 *        Polygon represents the required region of the data array. It gives
@@ -85,7 +92,7 @@
 *        A data value that specifies the pixels to be outlined, or "bad".
 
 *  Copyright:
-*     Copyright (C) 2009 Science & Technology Facilities Council.
+*     Copyright (C) 2009,2014 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -111,6 +118,8 @@
 *  History:
 *     2-JUN-2009 (DSB):
 *        Original version.
+*     10-JAN-2014 (DSB):
+*        Aded parameter CURRENT.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -140,14 +149,17 @@
       CHARACTER DTYPE*( NDF__SZFTP )
       CHARACTER ITYPE*( NDF__SZTYP )
       CHARACTER TEXT*40
-      DOUBLE PRECISION DVAL
       DOUBLE PRECISION MAXERR
+      DOUBLE PRECISION DVAL
       INTEGER EL
+      INTEGER IAST
       INTEGER INDF
       INTEGER INSIDE( 2 )
       INTEGER IPDATA
+      INTEGER IPIX
       INTEGER IVAL
       INTEGER LBND( 2 )
+      INTEGER MAP
       INTEGER MAXVERT
       INTEGER OPER
       INTEGER RESULT
@@ -156,6 +168,7 @@
       INTEGER*2 UWVAL
       INTEGER*2 WVAL
       LOGICAL BAD
+      LOGICAL CURRENT
       REAL RVAL
 *.
 
@@ -325,6 +338,15 @@
      :                             LBND, UBND, MAXERR, MAXVERT, INSIDE,
      :                             .TRUE., STATUS )
 
+         END IF
+
+*  If required, map the Polygon into the current Frame of the NDF.
+         CALL PAR_GET0L( 'CURRENT', CURRENT, STATUS )
+         IF( CURRENT ) THEN
+            CALL KPG1_GTWCS( INDF, IAST, STATUS )
+            CALL KPG1_ASFFR( IAST, 'PIXEL', IPIX, STATUS )
+            MAP = AST_GETMAPPING( IAST, IPIX, AST__CURRENT, STATUS )
+            RESULT = AST_MAPREGION( RESULT, MAP, IAST, STATUS )
          END IF
 
 *  Write the results out to a text file.

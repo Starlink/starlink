@@ -1614,6 +1614,15 @@ iraf! {
             helpkey *
          }
 
+         parameter current {
+            type _LOGICAL
+            prompt {Map the Polygon into current Frame of the NDF?}
+            ppath CURRENT DEFAULT
+            vpath DEFAULT
+            default FALSE
+            helpkey *
+         }
+
          parameter inside {
             position 6
             type _INTEGER
