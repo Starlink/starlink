@@ -1651,6 +1651,14 @@ iraf! {
             helpkey *
          }
 
+         parameter nvert {
+            type _INTEGER
+            access WRITE
+            vpath DEFAULT
+            default 0
+            helpkey *
+          }
+
          parameter oper {
             position 2
             type LITERAL

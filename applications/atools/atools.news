@@ -13,6 +13,8 @@
 
   - astoutline has new parameter CURRENT to allow the polygon to be
     mapped into the current Frame of the NDF.
+  - astoutline now displays the number of vertices in the polygon, and
+    writes this number to output parameter "NVERT".
 
   Changes in V1.9-13
 

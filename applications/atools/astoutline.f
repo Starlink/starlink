@@ -77,6 +77,8 @@
 *        this is less than 3, the number of vertices in the returned Polygon
 *        will be the minimum needed to achieve the maximum discrepancy
 *        specified by MAXERR.
+*     NVERT = _INTEGER (Write)
+*        The number of vertices in the returned polygon.
 *     OPER = LITERAL (Given)
 *        Indicates how the VALUE parameter is used to select the outlined
 *        pixels. It can have any of the following values:
@@ -119,7 +121,7 @@
 *     2-JUN-2009 (DSB):
 *        Original version.
 *     10-JAN-2014 (DSB):
-*        Aded parameter CURRENT.
+*        Aded parameters CURRENT and NVERT.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -161,6 +163,7 @@
       INTEGER LBND( 2 )
       INTEGER MAP
       INTEGER MAXVERT
+      INTEGER NV
       INTEGER OPER
       INTEGER RESULT
       INTEGER SDIM( 2 )
@@ -339,6 +342,14 @@
      :                             .TRUE., STATUS )
 
          END IF
+
+* Report the number of vertices in the polygon.
+         CALL AST_GETREGIONPOINTS( RESULT, 0, 0, NV, 0, STATUS )
+         CALL MSG_BLANK( STATUS )
+         CALL MSG_SETI( 'N', NV )
+         CALL MSG_OUT( ' ', 'Polygon has ^N vertices', STATUS )
+         CALL MSG_BLANK( STATUS )
+         CALL PAR_PUT0I( 'NVERT', NV, STATUS )
 
 *  If required, map the Polygon into the current Frame of the NDF.
          CALL PAR_GET0L( 'CURRENT', CURRENT, STATUS )
