@@ -97,6 +97,8 @@ f     - AST_OUTLINE<X>: Create a Polygon outlining values in a pixel array
 *     6-JAN-2014 (DSB):
 *        Free edges when clearing the cache, not when establishing a new
 *        cache, as the number of edges may have changed.
+*     10-JAN-2014 (DSB):
+*        - Remove unused parameter description in prologue of for astOutline<X>
 *class--
 */
 
@@ -2169,12 +2171,6 @@ f        such as AST_RESAMPLE, AST_MASK,
 *        etc., is used. In this definition, a pixel with integer index I
 *        spans a range of pixel coordinate from (I-0.5) to (I+0.5) (i.e.
 *        pixel centres have integral pixel coordinates).
-c     boxsize
-f     BOXSIZE = INTEGER (Given)
-*        The full width in pixels of a smoothing box to be applied to the
-*        polygon vertices before downsizing the polygon to a smaller number
-*        of vertices. If an even number is supplied, the next larger odd
-*        number is used. Values of one or zero result in no smoothing.
 f     STATUS = INTEGER (Given and Returned)
 f        The global status.
 
