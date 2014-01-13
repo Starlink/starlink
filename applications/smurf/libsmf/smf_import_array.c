@@ -13,11 +13,13 @@
 *     C function
 
 *  Invocation:
-*     void smf_import_array( smfData *refdata, const char *name,
-*                            int bad, int expand, smf_dtype type,
-*                            void *dataptr, int *status )
+*     void smf_import_array( ThrWorkForce *wf, smfData *refdata,
+*                            const char *name, int bad, int expand,
+*                            smf_dtype type, void *dataptr, int *status )
 
 *  Arguments:
+*     wf = ThrWorkForce * (Given)
+*        Pointer to a pool of worker threads
 *     refdata = smfData * (Given)
 *        Pointer to a smfData that defines the data ordering and dimensions
 *        required of the imported NDF.
@@ -65,6 +67,8 @@
 *        Add argument expand.
 *     7-JAN-2014 (DSB):
 *        Added support for SMF__INTEGER arrays.
+*     10-JAN-2014 (DSB):
+*        Added argument wf.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -96,13 +100,14 @@
 #include "mers.h"
 #include "sae_par.h"
 #include "star/grp.h"
+#include "star/thr.h"
 
 /* SMURF includes */
 #include "libsmf/smf.h"
 #include "libsmf/smf_typ.h"
 
 
-void smf_import_array( smfData *refdata, const char *name, int bad,
+void smf_import_array( ThrWorkForce *wf, smfData *refdata, const char *name, int bad,
                        int expand, smf_dtype type, void *dataptr,
                        int *status ){
 
@@ -131,7 +136,7 @@ void smf_import_array( smfData *refdata, const char *name, int bad,
 /* Attempt to open the NDF. */
    igrp = grpNew( " ", status );
    grpPut1( igrp, name, 0, status );
-   smf_open_file( igrp, 1, "READ", SMF__NOTTSERIES, &data, status );
+   smf_open_file( wf, igrp, 1, "READ", SMF__NOTTSERIES, &data, status );
    grpDelet( &igrp, status );
 
 /* Ensure the smfData read from the NDF uses the same data ordering as the

@@ -13,12 +13,14 @@
 *     C function
 
 *  Invocation:
-*     smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
+*     smf_sparsebounds( ThrWorkForce *wf, Grp *igrp,  int size, AstSkyFrame *oskyframe,
 *                       int usedetpos, Grp *detgrp, int lbnd[ 3 ],
 *                       int ubnd[ 3 ], AstFrameSet **wcsout, int *hasoffexp,
 *                       int *polobs, int *status )
 
 *  Arguments:
+*     wf = ThrWorkForce * (Given)
+*        Pointer to a pool of worker threads
 *     igrp = Grp * (Given)
 *        Group of input NDFs.
 *     size = int (Given)
@@ -83,10 +85,12 @@
 *        Update to use new smf_free behaviour
 *     21-JAN-2008 (DSB):
 *        Added argument polobs.
+*     10-JAN-2014 (DSB):
+*        Added argument wf.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     Copyright (C) 2008,2014 Science & Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
@@ -121,6 +125,7 @@
 #include "mers.h"
 #include "sae_par.h"
 #include "prm_par.h"
+#include "star/thr.h"
 #include "star/ndg.h"
 #include "star/kaplibs.h"
 
@@ -131,7 +136,7 @@
 
 #define FUNC_NAME "smf_sparsebounds"
 
-void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
+void smf_sparsebounds( ThrWorkForce *wf, Grp *igrp,  int size, AstSkyFrame *oskyframe,
                        int usedetpos, Grp *detgrp, int lbnd[ 3 ],
                        int ubnd[ 3 ], AstFrameSet **wcsout, int *hasoffexp,
                        int *polobs, int *status ){
@@ -219,7 +224,7 @@ void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    for( ifile = 1; ifile <= size && *status == SAI__OK; ifile++ ) {
 
 /* Obtain information about the current input NDF. */
-      smf_open_file( igrp, ifile, "READ", 0, &data, status );
+      smf_open_file( wf, igrp, ifile, "READ", 0, &data, status );
 
 /* Issue a suitable message and abort if anything went wrong. */
       if( *status != SAI__OK ) {

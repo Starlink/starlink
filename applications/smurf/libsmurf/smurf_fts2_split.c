@@ -225,7 +225,7 @@ void smurf_fts2_split(int* status)
   /* Loop through each input file */
   for(fIndex = 1; fIndex <= nFiles; fIndex++) {
     /* Open Observation file */
-    smf_open_file(gIn, fIndex, "READ", 0, &inData, status);
+    smf_open_file(NULL, gIn, fIndex, "READ", 0, &inData, status);
     if(*status != SAI__OK) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Unable to open the source file!", status);
@@ -433,7 +433,7 @@ void smurf_fts2_split(int* status)
                 errRepf(TASK_NAME, "Error saving outData file name", status);
                 goto CLEANUP;
             }
-            smf_write_smfData(outData, NULL, outData->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
+            smf_write_smfData(NULL, outData, NULL, outData->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
             if(*status != SAI__OK) {
                 errRepf(TASK_NAME, "Error writing outData file", status);
                 goto CLEANUP;

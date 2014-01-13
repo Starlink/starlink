@@ -310,7 +310,7 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
     box->ubnd[ 1 ] = VAL__MIND;
 
     /* Read data from the ith input file in the group */
-    smf_open_file( igrp, i, "READ", SMF__NOCREATE_DATA, &data, status );
+    smf_open_file( NULL, igrp, i, "READ", SMF__NOCREATE_DATA, &data, status );
 
     if (*status != SAI__OK) {
       msgSeti( "I", i );

@@ -926,7 +926,7 @@ void smurf_makemap( int *status ) {
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
   /* Filter out darks */
-  smf_find_science( igrp, &fgrp, 0, NULL, NULL, 1, 1, SMF__NULL, &darks,
+  smf_find_science( wf, igrp, &fgrp, 0, NULL, NULL, 1, 1, SMF__NULL, &darks,
                     &flatramps, &heateffmap, &meanstep, status );
 
   /*** TIMER ***/
@@ -958,7 +958,7 @@ void smurf_makemap( int *status ) {
   }
 
   /* Get group of bolometer masks and read them into a smfArray */
-  smf_request_mask( "BBM", &bbms, status );
+  smf_request_mask( wf, "BBM", &bbms, status );
 
   /* Get the celestial coordinate system for the output map */
   parChoic( "SYSTEM", "TRACKING", "TRACKING,FK5,ICRS,AZEL,GALACTIC,"
@@ -1271,7 +1271,7 @@ void smurf_makemap( int *status ) {
       /* Create the 2D output NDF for this tile. */
       smfflags = 0;
       smfflags |= SMF__MAP_VAR;
-      smf_open_newfile ( ogrp, iout++, SMF__DOUBLE, 2, tile->elbnd, tile->eubnd,
+      smf_open_newfile ( NULL, ogrp, iout++, SMF__DOUBLE, 2, tile->elbnd, tile->eubnd,
                          smfflags, &odata, status );
 
       /* Abort if an error has occurred. */
@@ -1361,7 +1361,7 @@ void smurf_makemap( int *status ) {
         if( !pt || pt[ 0 ] < VAL__MAXI ) {
 
           /* Read data from the ith input file in the group */
-          smf_open_and_flatfield( tile->grp, NULL, ifile, darks, flatramps,
+          smf_open_and_flatfield( wf, tile->grp, NULL, ifile, darks, flatramps,
                                   heateffmap, &data,status );
 
           /* Check that the data dimensions are 3 (for time ordered data) */
@@ -1584,7 +1584,7 @@ void smurf_makemap( int *status ) {
     /************************* I T E R A T E *************************************/
 
     smfflags = SMF__MAP_VAR | SMF__MAP_QUAL;
-    smf_open_newfile ( ogrp, 1, SMF__DOUBLE, 2, lbnd_out, ubnd_out, smfflags,
+    smf_open_newfile ( wf, ogrp, 1, SMF__DOUBLE, 2, lbnd_out, ubnd_out, smfflags,
                        &odata, status );
 
     if ( *status == SAI__OK ) {
@@ -1752,7 +1752,7 @@ void smurf_makemap( int *status ) {
        history information and provenance can now be stored in the output.
        Loop over all input data files to setup provenance handling */
     for(i=1; (i<=size) && ( *status == SAI__OK ); i++ ) {
-      smf_open_file( igrp, i, "READ", SMF__NOCREATE_DATA, &data, status );
+      smf_open_file( wf, igrp, i, "READ", SMF__NOCREATE_DATA, &data, status );
       if( *status != SAI__OK) {
         msgSeti("I",i);
         msgSeti("S",size);

@@ -225,7 +225,7 @@ smf_flat_params( const smfData * refdata, const char resistpar[],
       smfData * heatefftmp = NULL;
       heateffgrp = grpNew( "heateff", status );
       grpPut1( heateffgrp, heateffstr, 0, status );
-      smf_open_file( heateffgrp, 1, "READ", SMF__NOTTSERIES|SMF__NOFIX_METADATA, &heatefftmp, status );
+      smf_open_file( NULL, heateffgrp, 1, "READ", SMF__NOTTSERIES|SMF__NOFIX_METADATA, &heatefftmp, status );
 
       /* Divorce the smfData from the underlying file. This file stays open for the entire
          duration of the data processing and can some times lead to issues when we attempt

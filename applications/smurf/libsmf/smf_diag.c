@@ -671,7 +671,7 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
 
 /* If required, map the Quality array and copy the values, then unmap it. */
       if( qbuffer ) {
-         qua = smf_qual_map( indf, mode, NULL, &nmap, status );
+         qua = smf_qual_map( wf, indf, mode, NULL, &nmap, status );
          if( *status == SAI__OK ) memcpy( qua + ( irow + 1 - lbnd[1] )*ndata,
                                           qbuffer, sizeof(*qua)*ndata );
          smf_qual_unmap( indf, SMF__QFAM_TSERIES, qua, status );
@@ -713,7 +713,7 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
               status );
 
 /* If required, map the quality array. */
-      if( addqual ) qua = smf_qual_map( indf, "wRITE", NULL, &nmap, status );
+      if( addqual ) qua = smf_qual_map( wf, indf, "wRITE", NULL, &nmap, status );
 
 /* Copy the data values from the smfData to the NDF Data component,
    setting flagged values to VAL__BADD if required. */

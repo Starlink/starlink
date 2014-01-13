@@ -13,9 +13,11 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     smf_request_mask( const char *param, smfArray ** bbms, int *status);
+*     smf_request_mask( ThrWorkForce *wf, const char *param, smfArray ** bbms, int *status);
 
 *  Arguments:
+*     wf = ThrWorkForce * (Given)
+*        Pointer to a pool of worker threads
 *     param = const char * (Given)
 *        Name of ADAM parameter to use when requesting bad bolometer mask
 *        group of files. Usually "BBM".
@@ -80,7 +82,7 @@
 
 #include "smf.h"
 
-void smf_request_mask( const char *param, smfArray ** bbms, int *status) {
+void smf_request_mask( ThrWorkForce *wf, const char *param, smfArray ** bbms, int *status) {
   Grp * bbmgrp = NULL;
   size_t nbbm;
 
@@ -95,7 +97,7 @@ void smf_request_mask( const char *param, smfArray ** bbms, int *status) {
     bbms = NULL;
     errAnnul( status );
   } else {
-    smf_open_group( bbmgrp, NULL, bbms, status );
+    smf_open_group( wf, bbmgrp, NULL, bbms, status );
   }
   if (bbmgrp) grpDelet( &bbmgrp, status );
 }

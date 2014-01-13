@@ -865,7 +865,7 @@ int smf_correct_extinction( ThrWorkForce * wf, smfData *data, smf_tausrc *thetau
                              smf_extmeth method, AstKeyMap * extpars, double tau,
                              double *allextcorr, double **wvmtaucache, int *status);
 
-void smf_create_bolfile( const Grp * rgrp, size_t index,
+void smf_create_bolfile( ThrWorkForce * wf, const Grp * rgrp, size_t index,
                          const smfData* refdata, const char * datalabel,
                          const char *units, int hasqual, smfData **respmap, int *status );
 
@@ -1106,7 +1106,7 @@ int smf_find_gains_array( ThrWorkForce *wf, int noflag, smfArray *data,
 int *smf_find_median( const float *farray, const double *darray, size_t nel,
                       int *hist, float *median, int *status );
 
-void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
+void smf_find_science( ThrWorkForce *wf, const Grp * ingrp, Grp **outgrp, int reverttodark,
                       Grp **darkgrp, Grp **flatgrp, int reducedark, int calcflat,
                       smf_dtype darktype, smfArray ** darks, smfArray **fflats,
                       AstKeyMap **heateffmap, double * meanstep, int * status );
@@ -1218,10 +1218,10 @@ void smf_flat_assign ( int use_da, smf_flatmeth inflatmeth, double refres,
                        smfData * updata, int *status );
 
 void
-smf_flat_badflat( smfData * refdata, smfData ** resp, int * status );
+smf_flat_badflat( ThrWorkForce *wf, smfData * refdata, smfData ** resp, int * status );
 
 size_t
-smf_flat_calcflat( msglev_t msglev, const char flatname[],
+smf_flat_calcflat( ThrWorkForce *wf, msglev_t msglev, const char flatname[],
                    const char resistpar[],
                    const char methpar[], const char orderpar[],
                    const char resppar[], const char respmaskpar[],
@@ -1270,7 +1270,7 @@ void smf_flat_standardpow( const smfData * bolvald, double refohms,
                            const double resistance[],
                            smfData ** powref, smfData ** bolref, int * status);
 
-void smf_flat_write( smf_flatmeth flatmeth, const char * flatname,
+void smf_flat_write( ThrWorkForce *wf, smf_flatmeth flatmeth, const char * flatname,
                      double refres, const smfData * bolval,
                      const smfData * powref, const smfData * bolref,
                      const smfData * polyfit, const Grp * prvgrp, int * status );
@@ -1415,7 +1415,7 @@ void smf_history_read( smfData* data, int *status);
 
 void smf_history_write( const smfData* data, int *status);
 
-void smf_import_array( smfData *refdata, const char *name, int bad,
+void smf_import_array( ThrWorkForce *wf,  smfData *refdata, const char *name, int bad,
                        int expand, smf_dtype type, void *dataptr, int *status );
 
 int smf_import_noi( const char *name, smfDIMMHead *head,
@@ -1574,22 +1574,22 @@ const char * smf_obsmode_str( smf_obsmode type, int * status );
 
 const char * smf_obstype_str( smf_obstype type, int * status );
 
-int smf_open_and_flatfield ( const Grp *igrp, const Grp *ogrp, size_t index,
+int smf_open_and_flatfield ( ThrWorkForce *wf, const Grp *igrp, const Grp *ogrp, size_t index,
                              const smfArray * darks, const smfArray * ramps,
                              AstKeyMap * heateffmap, smfData **ffdata, int *status);
 
-void smf_open_asdouble( const Grp *igrp, size_t index, const smfArray* darks,
+void smf_open_asdouble( ThrWorkForce *wf,  const Grp *igrp, size_t index, const smfArray* darks,
                         const smfArray* flatramps, AstKeyMap * heateffmap, int ensureflat,
                         smfData **data, int *status );
 
-void smf_open_file( const Grp * igrp, size_t index, const char * mode,
+void smf_open_file( ThrWorkForce *wf, const Grp * igrp, size_t index, const char * mode,
                     int withHdr, smfData ** data, int *status);
 
 void smf_open_file_job( ThrWorkForce *wf, int wait, const Grp *igrp,
                         size_t index, const char *mode, int flags,
                         smfData **data, int *status );
 
-void smf_open_group( const Grp * igrp, const dim_t refdims[],
+void smf_open_group( ThrWorkForce *wf, const Grp * igrp, const dim_t refdims[],
                      smfArray **files, int *status );
 
 void smf_open_mapcoord( smfData *data, const char *mode, int *status );
@@ -1609,15 +1609,15 @@ void smf_open_ndfname( const HDSLoc *loc, const char accmode[],
                        const AstFrameSet * wcs,
                        smfData **ndfdata, int *status);
 
-void smf_open_newfile( const Grp * igrp, int index, smf_dtype dtype,
+void smf_open_newfile( ThrWorkForce *wf, const Grp * igrp, int index, smf_dtype dtype,
                        const int ndims, const int *lbnd, const int *ubnd,
                        int flags, smfData ** data, int *status);
 
 void
-smf_open_raw_asdouble( const Grp *igrp, size_t index, const smfArray* darks,
+smf_open_raw_asdouble( ThrWorkForce *wf, const Grp *igrp, size_t index, const smfArray* darks,
                        smfData **data, int *status );
 
-void smf_open_related( const smfGroup *group, const dim_t subindex,
+void smf_open_related( ThrWorkForce *wf, const smfGroup *group, const dim_t subindex,
                        const char *accmode, smfArray **relfiles,
                        int *status );
 
@@ -1643,7 +1643,7 @@ size_t smf_qfamily_count( smf_qfam_t qfamily, int * status );
 
 const char * smf_qfamily_str( smf_qfam_t qfamily, int * status );
 
-smf_qual_t * smf_qual_map( int indf, const char mode[],
+smf_qual_t * smf_qual_map( ThrWorkForce *wf, int indf, const char mode[],
                            smf_qfam_t *family, size_t *nmap, int * status );
 
 const char *smf_qual_str( smf_qfam_t family, int usebit, int bit_or_val,
@@ -1797,7 +1797,7 @@ void smf_reorder( const char *type, void *in, int len, int ndim, int *dims,
 
 void smf_reportprogress( int max, int *status );
 
-void smf_request_mask( const char *param, smfArray ** bpms, int *status);
+void smf_request_mask( ThrWorkForce *wf, const char *param, smfArray ** bpms, int *status);
 
 void smf_resampcube( smfData *data, AstSkyFrame *abskyfrm, AstMapping *iskymap,
                      AstFrame *ispecfrm, AstMapping *ispecmap,
@@ -1877,7 +1877,7 @@ void smf_snrmask( ThrWorkForce *wf, const double *map, const double *mapvar,
 
 int smf_sort_bydouble ( const void *in1, const void *in2 );
 
-void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
+void smf_sparsebounds( ThrWorkForce * wf, Grp *igrp,  int size, AstSkyFrame *oskyframe,
                        int usedetpos, Grp *detgrp, int lbnd[ 3 ], int ubnd[ 3 ],
                        AstFrameSet **wcsout, int *hasoffexp, int *polobs,
                        int *status );
@@ -1974,7 +1974,7 @@ void smf_write_bolomap( ThrWorkForce *wf, smfArray *res, smfArray *lut,
 
 void smf_write_clabels( const smfData* data, int * status );
 
-void smf_write_flagmap( smf_qual_t mask, smfArray *lut, smfArray *qua,
+void smf_write_flagmap( ThrWorkForce *wf, smf_qual_t mask, smfArray *lut, smfArray *qua,
                         smfDIMMData *dat, const Grp *flagrootgrp,
                         size_t contchunk, const int *lbnd_out,
                         const int *ubnd_out, AstFrameSet *outfset,
@@ -1987,7 +1987,7 @@ void smf_write_itermap( ThrWorkForce *wf, const double *map, const double *mapva
                         AstFrameSet *outfset, const smfHead *hdr,
                         const smfArray *qua, int *status );
 
-void smf_write_sampcube( const smfArray *res, const smfArray *lut,
+void smf_write_sampcube( ThrWorkForce *wf, const smfArray *res, const smfArray *lut,
                          const smfArray *qua, const smfDIMMData *dat,
                          const int *hits, const Grp *samprootgrp,
                          size_t contchunk, const int *lbnd, const int *ubnd,
@@ -2000,12 +2000,12 @@ void smf_write_shortmap( ThrWorkForce *wf, int shortmap, smfArray *res, smfArray
                          const int *ubnd_out, AstFrameSet *outfset,
                          int *status );
 
-void smf_write_smfData ( const smfData *data, const smfData *variance,
+void smf_write_smfData ( ThrWorkForce *wf, const smfData *data, const smfData *variance,
                          const char * filename,
                          const Grp * igrp, size_t grpindex,
                          int provid, msglev_t msglev, int single, int * status );
 
-void smf_write_smfFilter( const smfFilter *filt, const char *filename,
+void smf_write_smfFilter( ThrWorkForce *wf, const smfFilter *filt, const char *filename,
                           const Grp * igrp, size_t grpindex,
                           int *status );
 

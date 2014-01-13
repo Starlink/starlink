@@ -906,7 +906,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
     }
 
     /* Obtain sample length from header of first file in igrp */
-    smf_open_file( igrp, 1, "READ", SMF__NOCREATE_DATA, &data, status );
+    smf_open_file( wf, igrp, 1, "READ", SMF__NOCREATE_DATA, &data, status );
     if( (*status == SAI__OK) && (data->hdr) ) {
         steptime = data->hdr->steptime;
     } else {
@@ -1907,7 +1907,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                                 res[0]->sdata[idx]->hdr->steptime, NULL,
                                 status );
 
-              smf_write_smfData( res[0]->sdata[idx], NULL,
+              smf_write_smfData( wf, res[0]->sdata[idx], NULL,
                                  name, NULL, 0, NDF__NOID,
                                  MSG__VERB, 0, status );
 
@@ -2566,7 +2566,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
          land in each pixel */
 
       if( sampcube ) {
-        smf_write_sampcube( res[0], lut[0], qua[0], &dat, thishits,
+        smf_write_sampcube( wf, res[0], lut[0], qua[0], &dat, thishits,
                             samprootgrp, contchunk, lbnd_out, ubnd_out,
                             status );
 
@@ -2609,7 +2609,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       /* Create maps indicating locations of flags matching bitmask */
 
       if( flagmap ) {
-        smf_write_flagmap( flagmap, lut[0], qua[0], &dat, flagrootgrp,
+        smf_write_flagmap( wf, flagmap, lut[0], qua[0], &dat, flagrootgrp,
                            contchunk, lbnd_out, ubnd_out, outfset, status );
         /*** TIMER ***/
         msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
@@ -2707,7 +2707,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                                      NULL, 0, 0, SMF__Q_BADB, status );
                 }
 
-                smf_write_smfData( res[0]->sdata[idx],
+                smf_write_smfData( wf, res[0]->sdata[idx],
                                    (havenoi && exportNDF_which[whichnoi]) ?
                                    dat.noi[0]->sdata[idx] : NULL,
                                    name, NULL, 0, NDF__NOID,
@@ -2732,7 +2732,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                                  SMF__DIMM_SUFFIX, name, status );
                 one_strlcat( name, "_lut", SMF_PATH_MAX+1, status );
 
-                smf_write_smfData( lut[0]->sdata[idx], NULL, name, NULL, 0,
+                smf_write_smfData( wf, lut[0]->sdata[idx], NULL, name, NULL, 0,
                                    NDF__NOID, MSG__VERB, 0, status );
               } else {
                 msgOut( " ",
@@ -2804,7 +2804,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                 }
 
                 /* Export AST */
-                smf_write_smfData( ast, NULL, name, NULL, 0, NDF__NOID,
+                smf_write_smfData( wf, ast, NULL, name, NULL, 0, NDF__NOID,
                                    MSG__VERB, 0, status );
 
                 /* Clean up */
@@ -2875,7 +2875,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                   kmap = astAnnul( kmap );
                 }
 
-                smf_write_smfData( model[j][0]->sdata[idx], NULL,
+                smf_write_smfData( wf, model[j][0]->sdata[idx], NULL,
                                    name, NULL, 0, NDF__NOID,
                                    MSG__VERB, single, status );
 

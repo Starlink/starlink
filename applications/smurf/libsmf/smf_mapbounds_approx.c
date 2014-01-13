@@ -207,7 +207,7 @@ void smf_mapbounds_approx( Grp *igrp,  size_t index, char *system,
   /* Read data from the given input file in the group - note index
      should be 1 as we use the first file in the Grp to define the map
      bounds */
-  smf_open_file( igrp, index, "READ", SMF__NOCREATE_DATA, &data, status );
+  smf_open_file( NULL, igrp, index, "READ", SMF__NOCREATE_DATA, &data, status );
 
   /* Simply abort if it is not a scan */
   if (*status == SAI__OK && data->hdr->obsmode != SMF__OBS_SCAN) {

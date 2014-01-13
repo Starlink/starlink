@@ -246,7 +246,7 @@ void smf_write_shortmap( ThrWorkForce *wf, int shortmap, smfArray *res,
     msgOutf( "", "*** Writing short map (%zu / %zu) %s", status,
              sc+1, nshort, name );
 
-    smf_open_newfile ( mgrp, 1, SMF__DOUBLE, 2, lbnd_out,
+    smf_open_newfile ( wf, mgrp, 1, SMF__DOUBLE, 2, lbnd_out,
                        ubnd_out, SMF__MAP_VAR, &mapdata,
                        status);
 

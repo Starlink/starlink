@@ -238,7 +238,7 @@ void smf_write_bolomap( ThrWorkForce *wf, smfArray *res, smfArray *lut,
              array, and then later we'll add it to the existing
              one. If it isn't there, create it. */
 
-          smf_open_file( mgrp, 1, "UPDATE", 0, &mapdata, status );
+          smf_open_file( wf, mgrp, 1, "UPDATE", 0, &mapdata, status );
 
           if( *status == SAI__OK ) {
             /* Allocate memory for the new rebinned data */
@@ -248,7 +248,7 @@ void smf_write_bolomap( ThrWorkForce *wf, smfArray *res, smfArray *lut,
           } else if( *status == DAT__NAMIN ) {
             /* Create a new extension */
             errAnnul( status );
-            smf_open_newfile ( mgrp, 1, SMF__DOUBLE, 2, lbnd_out,
+            smf_open_newfile ( wf, mgrp, 1, SMF__DOUBLE, 2, lbnd_out,
                                ubnd_out, SMF__MAP_VAR, &mapdata, status);
 
             /* Rebin directly into the newly mapped space */
@@ -263,7 +263,7 @@ void smf_write_bolomap( ThrWorkForce *wf, smfArray *res, smfArray *lut,
              about variance weighting because all samples from
              same detector are about the same. */
 
-          smf_rebinmap1( NULL, res->sdata[idx],
+          smf_rebinmap1( wf, res->sdata[idx],
                          dat->noi ? dat->noi[0]->sdata[idx] : NULL,
                          lut_data, 0, 0, 0, NULL, 0,
                          SMF__Q_GOOD, varmapmethod,

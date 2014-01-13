@@ -215,7 +215,7 @@ void smurf_remsky( int * status ) {
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
   /* Filter out darks */
-  smf_find_science( igrp, &fgrp, 0, NULL, NULL, 1, 1, SMF__NULL, &darks,
+  smf_find_science( NULL, igrp, &fgrp, 0, NULL, NULL, 1, 1, SMF__NULL, &darks,
                     &flatramps, &heateffmap, NULL, status );
 
   /* input group is now the filtered group so we can use that and
@@ -237,7 +237,7 @@ void smurf_remsky( int * status ) {
   if (*status != SAI__OK) goto CLEANUP;
 
   /* Get group of bad bolometer masks and read them into a smfArray */
-  smf_request_mask( "BBM", &bbms, status );
+  smf_request_mask( NULL, "BBM", &bbms, status );
 
   /* Get sky subtraction METHOD */
   parChoic( "METHOD", "PLANE", "Plane, Polynomial", 1,  method,
@@ -259,7 +259,7 @@ void smurf_remsky( int * status ) {
     /* Propagate input files to output */
     for (i=1; i<=size; i++) {
       /* This seems inefficient but it works */
-      smf_open_and_flatfield( igrp, ogrp, i, darks, flatramps,
+      smf_open_and_flatfield( NULL, igrp, ogrp, i, darks, flatramps,
                               heateffmap, &odata, status );
       /* Mask out bad bolometers - mask data array not quality array */
       smf_apply_mask( odata, bbms, SMF__BBM_DATA, 0, status );
@@ -271,7 +271,7 @@ void smurf_remsky( int * status ) {
     if ( *status == SAI__OK ) {
       /* Open and process related files */
       for (i=0; i<ogroup->ngroups; i++) {
-        smf_open_related( ogroup, i, "UPDATE", &relfiles, status );
+        smf_open_related( NULL, ogroup, i, "UPDATE", &relfiles, status );
         smf_subtract_plane( NULL, relfiles, fittype, status );
         smf_close_related( &relfiles, status );
       }
@@ -280,7 +280,7 @@ void smurf_remsky( int * status ) {
   } else {
     for (i=1; i<=size && *status == SAI__OK; i++) {
       /* Flatfield - if necessary */
-      smf_open_and_flatfield( igrp, ogrp, i, darks, flatramps,
+      smf_open_and_flatfield( NULL, igrp, ogrp, i, darks, flatramps,
                               heateffmap, &odata, status );
 
       /* Mask out bad bolometers - mask data array not quality array */

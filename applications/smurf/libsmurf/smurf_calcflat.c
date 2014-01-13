@@ -212,7 +212,7 @@ void smurf_calcflat( int *status ) {
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
   /* Find darks (might be all) */
-  smf_find_science( igrp, &fgrp, 0, &dkgrp, &ffgrp, 1, 0, SMF__DOUBLE, &darks,
+  smf_find_science( NULL, igrp, &fgrp, 0, &dkgrp, &ffgrp, 1, 0, SMF__DOUBLE, &darks,
                     &fflats, NULL, NULL, status );
 
   /* input group is now the filtered group so we can use that and
@@ -274,7 +274,7 @@ void smurf_calcflat( int *status ) {
         smfData *outfile = NULL;
         smfData *infile = NULL;
         if (*status != SAI__OK) break;
-        smf_open_file( igrp, i, "READ", 0, &infile, status );
+        smf_open_file( NULL, igrp, i, "READ", 0, &infile, status );
 
         if (*status == SAI__OK && infile
             && infile->hdr->obstype != SMF__TYP_FLATFIELD) {
@@ -436,7 +436,7 @@ void smurf_calcflat( int *status ) {
        expected measurement from each bolometer at each power setting.
      */
 
-    ngood = smf_flat_calcflat( MSG__NORM, flatname, "RESIST", "METHOD", "ORDER",
+    ngood = smf_flat_calcflat( NULL, MSG__NORM, flatname, "RESIST", "METHOD", "ORDER",
                                "RESP", "RESPMASK", "SNRMIN", igrp, bolval, NULL, status );
     parPut0i( "NGOOD", ngood, status );
 

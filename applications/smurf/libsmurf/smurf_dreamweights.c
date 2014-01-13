@@ -223,7 +223,7 @@ void smurf_dreamweights ( int *status ) {
   /* Loop over number of files */
   for ( i=1; (i<= size) && (*status == SAI__OK); i++) {
     /* Open file */
-    smf_open_file( igrp, i, "READ", 0, &data, status );
+    smf_open_file( NULL, igrp, i, "READ", 0, &data, status );
 
     /* Calculate weights based on this file */
     smf_dream_calcweights( data, ogrp, i, gridstep, ngrid, gridminmax,

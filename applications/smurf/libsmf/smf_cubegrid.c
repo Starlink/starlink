@@ -350,7 +350,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    for( ifile = 1; ifile <= size && *status == SAI__OK; ifile++ ) {
 
 /* Obtain information about the current input NDF. */
-      smf_open_file( igrp, ifile, "READ", 0, &data, status );
+      smf_open_file( NULL, igrp, ifile, "READ", 0, &data, status );
 
 /* Issue a suitable message and abort if anything went wrong. */
       if( *status != SAI__OK ) {

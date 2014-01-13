@@ -255,7 +255,7 @@ void smurf_sc2fft( int *status ) {
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
   /* Filter out darks */
-  smf_find_science( igrp, &fgrp, 1, NULL, NULL, 1, 1, SMF__NULL, &darks,
+  smf_find_science( wf, igrp, &fgrp, 1, NULL, NULL, 1, 1, SMF__NULL, &darks,
                     &flatramps, &heateffmap, NULL, status );
 
   /* input group is now the filtered group so we can use that and
@@ -281,7 +281,7 @@ void smurf_sc2fft( int *status ) {
   }
 
   /* Get group of bolometer masks and read them into a smfArray */
-  smf_request_mask( "BBM", &bbms, status );
+  smf_request_mask( wf, "BBM", &bbms, status );
 
   /* Obtain the number of continuous chunks and subarrays */
   if( *status == SAI__OK ) {
@@ -485,7 +485,7 @@ void smurf_sc2fft( int *status ) {
           ndgNdfas( basegrp, gcount, "READ", &provid, status );
 
           /* Export the data to a new file */
-          smf_write_smfData( odata, NULL, NULL, ogrp, gcount, provid,
+          smf_write_smfData( wf, odata, NULL, NULL, ogrp, gcount, provid,
                              MSG__VERB, 0, status );
 
           /* Free resources */

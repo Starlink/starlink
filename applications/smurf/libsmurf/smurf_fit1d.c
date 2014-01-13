@@ -585,7 +585,7 @@ void smurf_fit1d( int * status )
     /*
     ** Re-open the output file for UPDATE using standard routine
     */
-    smf_open_file( ogrp, in, "UPDATE",
+    smf_open_file( NULL, ogrp, in, "UPDATE",
 		   SMF__NOCREATE_DA | SMF__NOTTSERIES | SMF__NOCREATE_QUALITY,
 		   &data, status );
 
@@ -1700,7 +1700,7 @@ static void copy_parameter_ndfs ( smfArray *pardata, int *status )
       }
 
       /* Open and copy the component NDF data. */
-      smf_open_file( pgrp, in, "READ",
+      smf_open_file( NULL, pgrp, in, "READ",
 		 SMF__NOCREATE_DA | SMF__NOTTSERIES | SMF__NOCREATE_QUALITY,
 		 &cdata, status );
 

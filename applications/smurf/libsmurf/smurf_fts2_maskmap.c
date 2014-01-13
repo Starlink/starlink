@@ -188,7 +188,7 @@ void smurf_fts2_maskmap(int* status) {
       ndfAnnul(&indfout, status);
 
 /* We now re-open the output NDF and then modify its data values. */
-      smf_open_file(ogrp, ifile + 1, "UPDATE", SMF__NOTTSERIES, &odata, status);
+      smf_open_file(NULL, ogrp, ifile + 1, "UPDATE", SMF__NOTTSERIES, &odata, status);
 
 /* Issue a suitable message and abort if anything went wrong. */
       if (*status != SAI__OK) {

@@ -161,7 +161,7 @@ void smurf_starecalc ( int *status ) {
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
   /* Filter out darks */
-  smf_find_science( igrp, &fgrp, 0, NULL, NULL, 1, 0, SMF__NULL, &darks,
+  smf_find_science( NULL, igrp, &fgrp, 0, NULL, NULL, 1, 0, SMF__NULL, &darks,
                     &flatramps, &heateffmap, NULL, status );
 
   /* input group is now the filtered group so we can use that and
@@ -181,7 +181,7 @@ void smurf_starecalc ( int *status ) {
   }
 
   /* Get group of bad bolometer masks and read them into a smfArray */
-  smf_request_mask( "BBM", &bbms, status );
+  smf_request_mask( NULL, "BBM", &bbms, status );
 
   /* Get number of frames to average over */
   if ( *status == SAI__OK ) {
@@ -200,7 +200,7 @@ void smurf_starecalc ( int *status ) {
   /* Loop over number of files */
   for ( i=1; i<=size; i++) {
     /* Open file and flatfield the data */
-    smf_open_and_flatfield( igrp, ogrp, i, darks, flatramps,
+    smf_open_and_flatfield( NULL, igrp, ogrp, i, darks, flatramps,
                             heateffmap, &data, status );
 
     /* Mask out bad bolometers - mask data array not quality array */

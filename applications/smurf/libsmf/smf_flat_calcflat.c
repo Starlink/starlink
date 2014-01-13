@@ -13,14 +13,16 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     size_t smf_flat_calcflat( msglev_t msglev, const char flatname[],
-*                   const char resistpar[],
+*     size_t smf_flat_calcflat( ThrWorkForce *wf, msglev_t msglev,
+*                   const char flatname[], const char resistpar[],
 *                   const char methpar[], const char orderpar[],
 *                   const char resppar[], const char respmaskpar[],
 *                   const char snrminpar[], const Grp * prvgrp,
 *                   smfData *flatdata, smfData **respmapout, int *status );
 
 *  Arguments:
+*     wf = ThrWorkForce * (Given)
+*        Pointer to a pool of worker threads
 *     msglev = msglev_t (Given)
 *        Messaging level to use for any messages.
 *     flatname = const char [] (Given)
@@ -132,7 +134,7 @@
 #include "smf_typ.h"
 
 size_t
-smf_flat_calcflat( msglev_t msglev, const char flatname[],
+smf_flat_calcflat( ThrWorkForce *wf, msglev_t msglev, const char flatname[],
                    const char resistpar[],
                    const char methpar[], const char orderpar[],
                    const char resppar[], const char respmaskpar[],
@@ -221,7 +223,7 @@ smf_flat_calcflat( msglev_t msglev, const char flatname[],
 
     /* Create the file on disk or malloc it as required.
        (units will normalise so no need for prefix) */
-    smf_create_bolfile( rgrp, 1, flatdata, "Responsivity",
+    smf_create_bolfile( wf, rgrp, 1, flatdata, "Responsivity",
                         "A/W", SMF__MAP_VAR, &respmap, status );
     if (rgrp) grpDelet( &rgrp, status );
   }
@@ -275,7 +277,7 @@ smf_flat_calcflat( msglev_t msglev, const char flatname[],
   smf_flat_assign( 0, flatmeth, refohms, powref, bolref, flatdata, status );
 
   /* write out the flatfield */
-  if (flatname) smf_flat_write( flatmeth, flatname, refohms, flatdata, powref, bolref,
+  if (flatname) smf_flat_write( wf, flatmeth, flatname, refohms, flatdata, powref, bolref,
                                 flatpoly, prvgrp, status );
 
   if (respmap) {

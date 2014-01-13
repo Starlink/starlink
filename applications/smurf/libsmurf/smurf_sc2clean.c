@@ -308,7 +308,7 @@ void smurf_sc2clean( int *status ) {
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
   /* Filter out darks */
-  smf_find_science( igrp, &fgrp, 1, NULL, NULL, 1, 1, SMF__NULL, &darks,
+  smf_find_science( wf, igrp, &fgrp, 1, NULL, NULL, 1, 1, SMF__NULL, &darks,
                     &flatramps, &heateffmap, NULL, status );
 
   /* input group is now the filtered group so we can use that and
@@ -347,7 +347,7 @@ void smurf_sc2clean( int *status ) {
   parGet0l( "GAI", &writegai, status );
 
   /* Get group of bolometer masks and read them into a smfArray */
-  smf_request_mask( "BBM", &bbms, status );
+  smf_request_mask( wf, "BBM", &bbms, status );
 
   /* Group the input files by subarray and continuity ----------------------- */
   smf_grp_related( igrp, size, 1, 0, maxlen-padStart-padEnd, NULL, NULL,
@@ -463,7 +463,7 @@ void smurf_sc2clean( int *status ) {
 
             smf_dataOrder( com->sdata[idx], 1, status );
 
-            smf_write_smfData( com->sdata[idx], NULL, filename, NULL, 0,
+            smf_write_smfData( wf, com->sdata[idx], NULL, filename, NULL, 0,
                                NDF__NOID, MSG__NORM, 0, status );
           }
         }
@@ -476,7 +476,7 @@ void smurf_sc2clean( int *status ) {
                              SMF__DIMM_SUFFIX, filename, status );
 
             smf_dataOrder( gai->sdata[idx], 1, status );
-            smf_write_smfData( gai->sdata[idx], NULL, filename, NULL, 0,
+            smf_write_smfData( wf, gai->sdata[idx], NULL, filename, NULL, 0,
                                NDF__NOID, MSG__NORM, 0, status );
           }
         }
@@ -512,7 +512,7 @@ void smurf_sc2clean( int *status ) {
       smf_dataOrder( odata, 1, status );
 
       if( odata->file && odata->file->name ) {
-        smf_write_smfData( odata, NULL, NULL, ogrp, gcount, NDF__NOID,
+        smf_write_smfData( wf, odata, NULL, NULL, ogrp, gcount, NDF__NOID,
                            MSG__VERB, 0, status );
       } else {
         *status = SAI__ERROR;

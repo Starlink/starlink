@@ -217,7 +217,7 @@ int ***smf_choosepolbins( Grp *igrp, int size, float binsize, float binzero,
    for( ifile = 0; ifile < size && *status == SAI__OK; ifile++ ) {
 
 /* Obtain information about the current input NDF. */
-      smf_open_file( igrp, ifile + 1, "READ", 0, &data, status );
+      smf_open_file( NULL, igrp, ifile + 1, "READ", 0, &data, status );
       hdr = data->hdr;
 
 /* Store the number of time slices in this input NDF. */

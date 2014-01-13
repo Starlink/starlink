@@ -430,7 +430,7 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
     for( j=firstpiece; j<=lastpiece; j++ ) {
       /* First pass through the data - get dimensions */
 
-      smf_open_file( igrp->grp, igrp->subgroups[j][i], "READ",
+      smf_open_file( wf, igrp->grp, igrp->subgroups[j][i], "READ",
                      flags, &refdata, status );
 
       if( isFFT == -1 ) {
@@ -591,7 +591,7 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
         /* Loop over subgroups (number of time chunks). j is really only
            going to take on a single value in this loop (whichchunk) */
         for( j=firstpiece; j<=lastpiece; j++ ) {
-          smf_open_file( igrp->grp, igrp->subgroups[j][i], "READ", 0,
+          smf_open_file( wf, igrp->grp, igrp->subgroups[j][i], "READ", 0,
                          &tmpdata, status );
 
           /* Make a deepcopy since we are going to close the memory-mapped
@@ -639,7 +639,7 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
           grpDelet( &ingrp, status );
           grpDelet( &outgrp, status );
 
-          smf_open_file( igrp->grp, igrp->subgroups[j][i], "READ", 0,
+          smf_open_file( wf, igrp->grp, igrp->subgroups[j][i], "READ", 0,
                          &tmpdata, status );
         }
 
@@ -1185,7 +1185,7 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
         ename = astAppendString( ename, &nc, "_lut" );
         msgOutiff( MSG__VERB, "", FUNC_NAME ": using external LUT "
                   "model imported from '%s'.", status, ename );
-        smf_import_array( data, ename, 0, 0, SMF__INTEGER,
+        smf_import_array( wf, data, ename, 0, 0, SMF__INTEGER,
                           data->lut, status );
         ename = astFree( ename );
       }

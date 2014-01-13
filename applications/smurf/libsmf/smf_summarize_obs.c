@@ -95,7 +95,7 @@ void smf_summarize_obs( const Grp * igrp, int * status ) {
 
   for (i = 1; i <= size; i++) {
     /* open the file but just to get the header */
-    smf_open_file( igrp, i, "READ", SMF__NOCREATE_DATA, &data, status );
+    smf_open_file( NULL, igrp, i, "READ", SMF__NOCREATE_DATA, &data, status );
     if (*status != SAI__OK) break;
     smf_obsmap_fill( data, obsmap, objmap, status );
     smf_close_file( &data, status );

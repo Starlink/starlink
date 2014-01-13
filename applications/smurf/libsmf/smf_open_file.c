@@ -13,10 +13,13 @@
  *     Library routine
 
  *  Invocation:
- *     smf_open_file( const Grp * ingrp, size_t index, const char * mode,
- *                    int flags, smfData ** data, int *status);
+ *     smf_open_file( ThrWorkForce *wf, const Grp * ingrp, size_t index,
+ *                    const char * mode, int flags, smfData ** data,
+ *                    int *status);
 
  *  Arguments:
+ *     wf = ThrWorkForce * (Given)
+ *        Pointer to a pool of worker threads
  *     ingrp = const Grp * (Given)
  *        NDG group identifier
  *     index = size_t (Given)
@@ -239,10 +242,12 @@
  *     2012-01-19 (DSB):
  *        If the isFFT header cannot be read for any reason, annul the
  *        error and continue.
+ *     2014-01-10 (DSB):
+ *        Added argument wf.
  *     {enter_further_changes_here}
 
  *  Copyright:
- *     Copyright (C) 2007-2011 Science and Technology Facilities Council.
+ *     Copyright (C) 2007-2014 Science and Technology Facilities Council.
  *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
  *     Copyright (C) 2005-2008,2010-2011 University of British Columbia.
  *     All Rights Reserved.
@@ -276,6 +281,7 @@
 /* Starlink includes */
 #include "sae_par.h"
 #include "star/ndg.h"
+#include "star/thr.h"
 #include "ndf.h"
 #include "ast.h"
 #include "smf.h"
@@ -309,8 +315,9 @@ typedef struct smfOpenFileData {
 
 #define FUNC_NAME "smf_open_file"
 
-void smf_open_file( const Grp * igrp, size_t index, const char * mode,
-                    int flags, smfData ** data, int *status) {
+void smf_open_file( ThrWorkForce *wf, const Grp * igrp, size_t index,
+                    const char * mode, int flags, smfData ** data,
+                    int *status) {
 
   int canwrite = 0;          /* We can write to the file if true */
   char datatype[NDF__SZTYP+1];  /* String for DATA type */
@@ -693,7 +700,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
           } else if ( canwrite ) {
             one_strlcpy( qmode, "WRITE/ZERO", sizeof(qmode), status );
           }
-          outqual = smf_qual_map( indf, qmode, &qfamily, &nqout, status );
+          outqual = smf_qual_map( wf, indf, qmode, &qfamily, &nqout, status );
 
           /* Since we may not technically be mapping the QUALITY at this
              point (if it was mapped, copied, unmapped) we have to tell
@@ -761,7 +768,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
           }
           if (strlen(qmode)) {
             size_t nqmap;
-            qpntr = smf_qual_map( dkndf, qmode, NULL, &nqmap, status );
+            qpntr = smf_qual_map( wf, dkndf, qmode, NULL, &nqmap, status );
           }
 
           /* Map DATA after quality to prevent automatic quality masking */
@@ -1540,7 +1547,7 @@ static void smf1_open_file_caller( void *data, int *status ){
    pdata = (smfOpenFileData *) data;
 
 /* Open the file. */
-   smf_open_file( pdata->grp, pdata->index, pdata->mode, pdata->flags,
+   smf_open_file( NULL, pdata->grp, pdata->index, pdata->mode, pdata->flags,
                   pdata->data, status );
 
 /* If this file is associated with an NDF then we do a deep copy

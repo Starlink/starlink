@@ -13,13 +13,15 @@
 *     Library routine
 
 *  Invocation:
-*     smf_write_sampcube( const smfArray *res, const smfArray *lut,
+*     smf_write_sampcube( ThrWorkForce *wf,  const smfArray *res, const smfArray *lut,
 *                         const smfArray *qua, const smfDIMMData *dat,
 *                         const int *hits, const Grp *samprootgrp,
 *                         size_t contchunk, const int *lbnd, const int *ubnd,
 *                         int *status );
 
 *  Arguments:
+*     wf = ThrWorkForce * (Given)
+*        Pointer to a pool of worker threads
 *     res = const smfArray* (Given)
 *        RES model smfArray
 *     lut = const smfArray* (Given)
@@ -102,6 +104,7 @@
 #include "prm_par.h"
 #include "par_par.h"
 #include "star/one.h"
+#include "star/thr.h"
 #include "star/atl.h"
 
 /* SMURF includes */
@@ -110,7 +113,7 @@
 
 #define FUNC_NAME "smf_write_sampcube"
 
-void smf_write_sampcube( const smfArray *res, const smfArray *lut,
+void smf_write_sampcube( ThrWorkForce *wf, const smfArray *res, const smfArray *lut,
                          const smfArray *qua, const smfDIMMData *dat,
                          const int *hits, const Grp *samprootgrp,
                          size_t contchunk, const int *lbnd, const int *ubnd,
@@ -215,7 +218,7 @@ void smf_write_sampcube( const smfArray *res, const smfArray *lut,
 
     msgOutf( "", "*** Writing sampcube %s", status, name );
 
-    smf_open_newfile ( mgrp, 1, SMF__DOUBLE, 3, lbnd_out,
+    smf_open_newfile ( wf, mgrp, 1, SMF__DOUBLE, 3, lbnd_out,
                        ubnd_out, noi ? SMF__MAP_VAR : 0, &sampcube,
                        status);
 

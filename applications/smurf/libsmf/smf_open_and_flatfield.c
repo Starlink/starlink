@@ -13,12 +13,14 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     didflat = smf_open_and_flatfield( const Grp *igrp, const Grp *ogrp,
-*                             size_t index, const smfArray* darks,
+*     didflat = smf_open_and_flatfield( ThrWorkForce *wf, const Grp *igrp,
+*                             const Grp *ogrp, size_t index, const smfArray* darks,
 *                             const smfArray* flatramps, AstKeyMap * heateffmap,
 *                             smfData **data, int *status );
 
 *  Arguments:
+*     wf = ThrWorkForce * (Given)
+*        Pointer to a pool of worker threads
 *     igrp = const Grp* (Given)
 *        Pointer to an input group
 *     ogrp = const Grp* (Given)
@@ -119,6 +121,8 @@
 *        Assign flatfield overrides.
 *     2010-08-19 (DSB):
 *        Stop default NDF history being written when the output NDF is closed.
+*     2014-01-10 (DSB):
+*        Added argument wf.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -158,6 +162,7 @@
 
 #include "star/ndg.h"
 #include "star/grp.h"
+#include "star/thr.h"
 #include "ndf.h"
 #include "mers.h"
 #include "prm_par.h"
@@ -172,7 +177,7 @@
 
 #define FUNC_NAME "smf_open_and_flatfield"
 
-int smf_open_and_flatfield ( const Grp *igrp, const Grp *ogrp, size_t index,
+int smf_open_and_flatfield ( ThrWorkForce *wf, const Grp *igrp, const Grp *ogrp, size_t index,
                              const smfArray *darks, const smfArray * flatramps,
                              AstKeyMap * heateffmap, smfData **ffdata, int *status) {
 
@@ -216,7 +221,7 @@ int smf_open_and_flatfield ( const Grp *igrp, const Grp *ogrp, size_t index,
      because sc2store can not open two files at once
      22-Mar-2006: no longer true? hdr needed anyway */
   if (*status == SAI__OK) {
-    smf_open_file( igrp, index, "READ", 0, &data, status);
+    smf_open_file( wf, igrp, index, "READ", 0, &data, status);
     if ( *status != SAI__OK) {
       errRep("", FUNC_NAME ": Unable to open input file(s)", status);
     }
@@ -228,7 +233,7 @@ int smf_open_and_flatfield ( const Grp *igrp, const Grp *ogrp, size_t index,
 
   if (*status == SAI__OK) {
     /* Returns without action if ogrp is not defined */
-    smf_open_file( ogrp, index, "UPDATE", 0, ffdata, status);
+    smf_open_file( wf, ogrp, index, "UPDATE", 0, ffdata, status);
     if ( *status == SAI__ERROR) {
       errRep("", FUNC_NAME ": Unable to open output flatfielded file(s)",
              status);

@@ -124,7 +124,7 @@ void smurf_copyflat( int *status ) {
   /* Get reference NDF and open it in the normal way (to get
      the DA extensions). */
   kpg1Rgndf( "REF", 1, 1, "Reference file", &refgrp, &size, status );
-  smf_open_file( refgrp, 1, "READ", SMF__NOCREATE_DATA, &refdata, status );
+  smf_open_file( NULL, refgrp, 1, "READ", SMF__NOCREATE_DATA, &refdata, status );
   grpDelet( &refgrp, status );
 
   /* make sure that we do have a flatfield solution */
@@ -163,7 +163,7 @@ void smurf_copyflat( int *status ) {
 
     /* need to open the file ourselves to work out the
        subarray and get the FITS header */
-    smf_open_file( flatgrp, i, "READ", SMF__NOCREATE_DATA,
+    smf_open_file( NULL, flatgrp, i, "READ", SMF__NOCREATE_DATA,
                    &moddata, status );
 
     if (*status != SAI__OK) break;

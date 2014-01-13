@@ -490,7 +490,7 @@ void smurf_timesort( int *status ) {
    were not found in the first input cube. If the supplied group holds the
    detectors to be excluded, modify it so that it holds the detectors to be
    included. */
-   smf_open_file( igrp1, 1, "READ", 0, &data, status );
+   smf_open_file( NULL, igrp1, 1, "READ", 0, &data, status );
    smf_checkdets( detgrp, data, status );
 
 /* Extend the detector mask to exclude any detectors that are excluded as a
@@ -1630,7 +1630,7 @@ void smurf_timesort( int *status ) {
 /* If so, loop round all the output NDFs. */
    if( genvar ) {
       for( ifile = 1; ifile <= totout && *status == SAI__OK; ifile++ ) {
-         smf_open_file( igrp4, ifile, "UPDATE", 0, &data, status );
+         smf_open_file( NULL, igrp4, ifile, "UPDATE", 0, &data, status );
          if( *status != SAI__OK ) break;
          nchan = data->dims[0];
          ndet = data->dims[1];

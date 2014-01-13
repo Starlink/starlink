@@ -109,7 +109,7 @@ void smf_labelunit( Grp *igrp,  int size, smfData *odata, int *status ){
      char * label = NULL;
 
 /* Obtain information about the current input NDF. */
-     smf_open_file( igrp, ifile, "READ", 0, &data, status );
+     smf_open_file( NULL, igrp, ifile, "READ", 0, &data, status );
 
      if (*status == SAI__OK) {
        unit = data->hdr->units;

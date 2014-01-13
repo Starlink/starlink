@@ -302,7 +302,7 @@ void smurf_extinction( int * status ) {
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
   /* Filter out darks */
-  smf_find_science( igrp, &fgrp, 0, NULL, NULL, 1, 1, SMF__NULL, &darks,
+  smf_find_science( wf, igrp, &fgrp, 0, NULL, NULL, 1, 1, SMF__NULL, &darks,
                     &flatramps, &heateffmap, NULL, status );
 
   /* input group is now the filtered group so we can use that and
@@ -322,7 +322,7 @@ void smurf_extinction( int * status ) {
   }
 
   /* Get group of pixel masks and read them into a smfArray */
-  smf_request_mask( "BBM", &bbms, status );
+  smf_request_mask( wf, "BBM", &bbms, status );
 
   /* Read the tau relations from config file or group. We do not
      allow sub instrument overloading because these are all values
@@ -356,7 +356,7 @@ void smurf_extinction( int * status ) {
   for (i=1; i<=size && ( *status == SAI__OK ); i++) {
 
     /* Flatfield - if necessary */
-    smf_open_and_flatfield( igrp, ogrp, i, darks, flatramps, heateffmap,
+    smf_open_and_flatfield( wf, igrp, ogrp, i, darks, flatramps, heateffmap,
                             &odata, status );
 
     if (*status != SAI__OK) {

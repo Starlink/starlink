@@ -251,7 +251,7 @@ void smurf_fixsteps( int *status ) {
                &ogrp, &outsize, status );
 
 /* Open the input data file, read-only. */
-   smf_open_file( igrp, 1, "Read", 0, &indata, status );
+   smf_open_file( NULL, igrp, 1, "Read", 0, &indata, status );
 
 /* Since we will be modifying the data values, we need a deep copy. */
    data = smf_deepcopy_smfData( indata, 0, 0, 0, 0, status );
@@ -340,7 +340,7 @@ void smurf_fixsteps( int *status ) {
 
 /* If required, create the output NDF. */
    if( outsize > 0 && indata && indata->file ) {
-      smf_write_smfData( data, NULL, NULL, ogrp, 1,
+      smf_write_smfData( NULL, data, NULL, NULL, ogrp, 1,
                          indata->file->ndfid, MSG__VERB, 0, status );
    }
 

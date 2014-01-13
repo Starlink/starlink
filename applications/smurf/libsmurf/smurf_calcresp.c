@@ -160,7 +160,7 @@ void smurf_calcresp( int *status ) {
 
 
     /* We do *not* need the data array itself, just flatfield information */
-    smf_open_file( igrp, i, "READ", SMF__NOCREATE_DATA, &idata, status);
+    smf_open_file( NULL, igrp, i, "READ", SMF__NOCREATE_DATA, &idata, status);
 
     /* Abort if we have no flatfield information */
     if (*status == SAI__OK && ! idata->da ) {
@@ -177,7 +177,7 @@ void smurf_calcresp( int *status ) {
     }
 
     /* Create an output responsivity file. */
-    smf_create_bolfile( ogrp, i, idata, "Responsivity", "A/W", SMF__MAP_VAR, &respmap, status );
+    smf_create_bolfile( NULL, ogrp, i, idata, "Responsivity", "A/W", SMF__MAP_VAR, &respmap, status );
 
     /* "bolref" and "powref" written by CALCFLAT correspond to parameters
        "flatcal" and "flatpar" in sc2store_wrtstream. */

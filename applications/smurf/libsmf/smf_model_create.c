@@ -494,12 +494,12 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
                do an open_and_flatfield */
 
             if( !(oflag&SMF__NOCREATE_DATA) ) {
-              smf_open_and_flatfield( igroup->grp, NULL, idx, darks, flatramps,
+              smf_open_and_flatfield( wf, igroup->grp, NULL, idx, darks, flatramps,
                                       heateffmap, &idata, status );
               smf_apply_mask( idata, bbms, SMF__BBM_DATA, 0, status );
 
             } else {
-              smf_open_file( igroup->grp, idx, "READ", oflag, &idata, status );
+              smf_open_file( wf, igroup->grp, idx, "READ", oflag, &idata, status );
             }
 
             /* Calculate the LUT if necessary */
@@ -519,7 +519,7 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
                  ename = astAppendString( ename, &nc, "_lut" );
                  msgOutiff( MSG__VERB, "", FUNC_NAME ": using external LUT "
                            "model imported from '%s'.", status, ename );
-                 smf_import_array( idata, ename, 0, 0, SMF__INTEGER,
+                 smf_import_array( wf, idata, ename, 0, 0, SMF__INTEGER,
                                    idata->lut, status );
                  ename = astFree( ename );
 
@@ -1052,7 +1052,7 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
                  ename = astAppendString( ename, &nc, "_ext" );
                  msgOutiff( MSG__VERB, "", FUNC_NAME ": using external EXT "
                            "model imported from '%s'.", status, ename );
-                 smf_import_array( idata, ename, 2, 1, idata->dtype, dataptr,
+                 smf_import_array( wf, idata, ename, 2, 1, idata->dtype, dataptr,
                                    status );
                  ename = astFree( ename );
 
@@ -1213,7 +1213,7 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
               grpPut1( ggrp, bmapname, 0, status );
 
               /* First gain map */
-              smf_open_file( ggrp, 1, "READ", 0, &gdata, status );
+              smf_open_file( wf, ggrp, 1, "READ", 0, &gdata, status );
               gptr1 = dataptr;
               gptr1 += ntslice;
               gptr2 = gdata->pntr[0];
@@ -1227,7 +1227,7 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
               smf_close_file( &gdata, status );
 
               /* Second gain map */
-              smf_open_file( ggrp, 2, "READ", 0, &gdata, status );
+              smf_open_file( wf, ggrp, 2, "READ", 0, &gdata, status );
               gptr1 = dataptr;
               gptr1 += ntslice + nbolo + ntslice;
               gptr2 = gdata->pntr[0];

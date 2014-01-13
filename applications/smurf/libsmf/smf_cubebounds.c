@@ -383,7 +383,7 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
       box->ubnd[ 1 ] = VAL__MIND;
 
 /* Obtain information about the current input NDF. */
-      smf_open_file( igrp, ifile, "READ", 0, &data, status );
+      smf_open_file( NULL, igrp, ifile, "READ", 0, &data, status );
 
 /* Issue a suitable message and abort if anything went wrong. */
       if( *status != SAI__OK ) {

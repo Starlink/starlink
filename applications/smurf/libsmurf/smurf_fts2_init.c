@@ -207,7 +207,7 @@ void smurf_fts2_init(int* status)
   }
 
   /* Open the ZPD calibration file */
-  smf_open_file(gZpd, 1, "READ", SMF__NOCREATE_QUALITY, &zpdData, status);
+  smf_open_file(NULL, gZpd, 1, "READ", SMF__NOCREATE_QUALITY, &zpdData, status);
   if(*status != SAI__OK) {
     *status = SAI__ERROR;
     errRep(FUNC_NAME, "Unable to open the ZPD calibration file!", status);
@@ -217,7 +217,7 @@ void smurf_fts2_init(int* status)
   /* Loop through each input file */
   for(fIndex = 1; fIndex <= nFiles; fIndex++) {
     /* Open Observation file */
-    smf_open_and_flatfield(gIn, gOut, fIndex, NULL, NULL, NULL, &inData, status);
+    smf_open_and_flatfield(NULL, gIn, gOut, fIndex, NULL, NULL, NULL, &inData, status);
     if(*status != SAI__OK) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Unable to open the source file!", status);
@@ -499,7 +499,7 @@ void smurf_fts2_init(int* status)
 
     /* Write to output */
     outData->fts = smf_construct_smfFts(NULL, zpd, fpm, sigma, status);
-    smf_write_smfData(outData, NULL, NULL, gOut, fIndex, 0, MSG__VERB, 0, status);
+    smf_write_smfData(NULL, outData, NULL, NULL, gOut, fIndex, 0, MSG__VERB, 0, status);
     smf_close_file(&outData, status);
   }
   CLEANUP:

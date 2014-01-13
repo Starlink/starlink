@@ -211,7 +211,7 @@ void smurf_sc2concat( int *status ) {
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &isize, status );
 
   /* Filter out darks */
-  smf_find_science( igrp, &fgrp, 1, NULL, NULL, 1, 1, SMF__NULL, &darks,
+  smf_find_science( wf, igrp, &fgrp, 1, NULL, NULL, 1, 1, SMF__NULL, &darks,
                     &flatramps, &heateffmap, NULL, status );
 
   /* input group is now the filtered group so we can use that and
@@ -273,7 +273,7 @@ void smurf_sc2concat( int *status ) {
     /* Export concatenated data for each subarray to NDF file */
     for( idx=0; (*status==SAI__OK)&&idx<concat->ndat; idx++ ) {
       if( concat->sdata[idx]->file && concat->sdata[idx]->file->name ) {
-        smf_write_smfData( concat->sdata[idx], NULL, NULL, ogrp, gcount,
+        smf_write_smfData( wf, concat->sdata[idx], NULL, NULL, ogrp, gcount,
                            NDF__NOID, MSG__VERB, 0, status );
       } else {
         *status = SAI__ERROR;

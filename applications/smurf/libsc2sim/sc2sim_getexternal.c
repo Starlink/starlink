@@ -99,18 +99,18 @@ void sc2sim_getexternal
   grpPut1(igrp,external,0,status);
 
   /* Load in that file name */
-  smf_open_file(igrp,1,"READ",SMF__NOCREATE_DATA,&data,status);
+  smf_open_file(NULL, igrp,1,"READ",SMF__NOCREATE_DATA,&data,status);
 
   /* Get the size of the scan */
   *scancount = data->hdr->nframes;
 
   /* Allocate memory for the list of positions */
   *posptr = astCalloc( (*scancount)*2, sizeof(**posptr) );
- 
- 
+
+
   /* Get the scan positions */
   for (frame = 0; frame < *scancount; frame++)
-  { 
+  {
     /* Calculate the coordinate transformation */
     fc = astFitsChan ( NULL, NULL, " " );
     sc2ast_makefitschan( 0.0, 0.0, AST__DR2D, AST__DR2D,
@@ -131,11 +131,11 @@ void sc2sim_getexternal
     (*posptr)[frame*2]= temp1b / DAS2R;
     (*posptr)[frame*2+1]= temp2b / DAS2R;
 
-//    if( frame == 0 ) 
+//    if( frame == 0 )
 //    {
 //      printf("Base coordinates: %f   %f\n", data->hdr->allState[frame].tcs_az_bc1,
-//            data->hdr->allState[frame].tcs_az_bc2);  
-//      printf("pointing:         %f   %f\n", temp1a, temp2a);  
+//            data->hdr->allState[frame].tcs_az_bc2);
+//      printf("pointing:         %f   %f\n", temp1a, temp2a);
 //      astShow( fs );
 //      printf("offset:           %e   %e\n", (*posptr)[frame*2], (*posptr)[frame*2+1]);
 //    }

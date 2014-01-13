@@ -130,7 +130,7 @@ void smf_mask_noisy( ThrWorkForce *wf, smfData *data, smfData **noise,
                 NULL, NULL, status );
 
   /* Create some space for the result */
-  smf_create_bolfile( NULL, 1, data, "Noise", "blahs s**0.5",
+  smf_create_bolfile( wf, NULL, 1, data, "Noise", "blahs s**0.5",
                       SMF__MAP_VAR, &noisemap, status );
   if (noisemap) noisedata = (noisemap->pntr)[0];
 

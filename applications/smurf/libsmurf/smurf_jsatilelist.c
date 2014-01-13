@@ -267,7 +267,7 @@ void smurf_jsatilelist( int *status ) {
       kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
 /* Get a group containing just the files holding science data. */
-      smf_find_science( igrp, &sgrp, 0, NULL, NULL, 1, 1, SMF__NULL, NULL,
+      smf_find_science( NULL, igrp, &sgrp, 0, NULL, NULL, 1, 1, SMF__NULL, NULL,
                         NULL, NULL, NULL, status );
 
 /* Check we have at least once science file. */

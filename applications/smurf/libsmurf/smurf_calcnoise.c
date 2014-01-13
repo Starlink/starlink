@@ -300,7 +300,7 @@
 #define CREATOR PACKAGE_UPCASE ":" TASK_NAME
 
 static smfData *
-smf__create_bolfile_extension( const Grp * ogrp, size_t gcount,
+smf__create_bolfile_extension( ThrWorkForce *wf, const Grp * ogrp, size_t gcount,
                                const smfData *refdata, const char hdspath[],
                                const char datalabel[], const char units[],
                                int * status );
@@ -382,7 +382,7 @@ void smurf_calcnoise( int *status ) {
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
   /* Filter out darks */
-  smf_find_science( igrp, &fgrp, 1, NULL, NULL, 1, 1, SMF__NULL, NULL,
+  smf_find_science( wf, igrp, &fgrp, 1, NULL, NULL, 1, 1, SMF__NULL, NULL,
                     &flatramps, NULL, NULL, status );
 
   /* input group is now the filtered group so we can use that and
@@ -648,11 +648,11 @@ void smurf_calcnoise( int *status ) {
         }
 
         /* Create the output file if required, else a malloced smfData */
-        smf_create_bolfile( ogrp, gcount, thedata, "Noise",
+        smf_create_bolfile( wf, ogrp, gcount, thedata, "Noise",
                             noiseunits, SMF__MAP_QUAL, &outdata, status );
 
         /* Create groups to handle the NEP and ratio images */
-        ratdata = smf__create_bolfile_extension( ogrp, gcount, thedata,
+        ratdata = smf__create_bolfile_extension( wf, ogrp, gcount, thedata,
                                                  ".MORE.SMURF.NOISERATIO",
                                                  "Noise Ratio", NULL, status );
 
@@ -679,7 +679,7 @@ void smurf_calcnoise( int *status ) {
             int provid = NDF__NOID;
             /* open a reference input file for provenance propagation */
             ndgNdfas( basegrp, gcount, "READ", &provid, status );
-            smf_write_smfData( powdata, NULL, NULL, powgrp, gcount, provid,
+            smf_write_smfData( wf, powdata, NULL, NULL, powgrp, gcount, provid,
                                MSG__VERB, 0, status );
             smf_close_file( &powdata, status );
             ndfAnnul( &provid, status );
@@ -694,7 +694,7 @@ void smurf_calcnoise( int *status ) {
             smf_dataOrder( thedata, 1, status );
 
             /* Write it out */
-            smf_write_smfData( thedata, NULL, NULL, tsgrp, gcount, provid,
+            smf_write_smfData( wf, thedata, NULL, NULL, tsgrp, gcount, provid,
                                MSG__VERB, 0, status );
             ndfAnnul( &provid, status );
           }
@@ -711,7 +711,7 @@ void smurf_calcnoise( int *status ) {
           smfData * respmap = NULL;
 
           if (da && da->nflat) {
-            smf_create_bolfile( NULL, 1, thedata, "Responsivity", "A/W",
+            smf_create_bolfile( wf, NULL, 1, thedata, "Responsivity", "A/W",
                                 SMF__MAP_VAR, &respmap, status );
             if (*status == SAI__OK) {
               /* use a snr of 5 since we don't mind if we get a lot of
@@ -752,7 +752,7 @@ void smurf_calcnoise( int *status ) {
             }
 
             /* now create the output image for NEP data */
-            nepdata = smf__create_bolfile_extension( ogrp, gcount, thedata,
+            nepdata = smf__create_bolfile_extension( wf, ogrp, gcount, thedata,
                                                      ".MORE.SMURF.NEP", "NEP",
                                                      "W s**0.5", status );
 
@@ -910,7 +910,7 @@ void smurf_calcnoise( int *status ) {
 
  CLEANUP:
   /* Write out the list of output NDF names, annulling the error if a null
-     parameter value is supplied. Do not attempt do this if no output files 
+     parameter value is supplied. Do not attempt do this if no output files
      were created. */
   if( *status == SAI__OK && ogrp ) {
     grpList( "OUTFILES", 0, 0, NULL, ogrp, status );
@@ -933,7 +933,7 @@ void smurf_calcnoise( int *status ) {
 }
 
 static smfData *
-smf__create_bolfile_extension( const Grp * ogrp, size_t gcount,
+smf__create_bolfile_extension( ThrWorkForce *wf, const Grp * ogrp, size_t gcount,
                                const smfData *refdata, const char hdspath[],
                                const char datalabel[], const char units[],
                                int * status ) {
@@ -949,7 +949,7 @@ smf__create_bolfile_extension( const Grp * ogrp, size_t gcount,
   one_strlcat( tempfile, hdspath, sizeof(tempfile), status);
   tempgrp = grpNew( "Ratio", status );
   grpPut1( tempgrp, tempfile, 0, status );
-  smf_create_bolfile( tempgrp, 1, refdata, datalabel, units,
+  smf_create_bolfile( wf, tempgrp, 1, refdata, datalabel, units,
                       SMF__MAP_QUAL, &newdata, status );
   if (tempgrp) grpDelet( &tempgrp, status );
   return newdata;

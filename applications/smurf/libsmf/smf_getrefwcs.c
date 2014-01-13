@@ -191,7 +191,7 @@ void smf_getrefwcs( const char *param, Grp *igrp, AstFrameSet **specwcs,
          } else {
 
 /* Open the first input file. */
-            smf_open_file( igrp, 1, "READ", SMF__NOCREATE_DATA, &data,
+            smf_open_file( NULL, igrp, 1, "READ", SMF__NOCREATE_DATA, &data,
                            status );
             if( *status == SAI__OK ) {
 

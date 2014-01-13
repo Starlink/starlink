@@ -1465,7 +1465,7 @@ void smurf_dsutils( int *status ) {
    if( igrp && * status == SAI__OK ) {
 
 /* Obtain information about the input NDF. */
-      smf_open_file( igrp, 1, "READ", 0, &data, status );
+      smf_open_file( NULL, igrp, 1, "READ", 0, &data, status );
 
 /* Display the indicies of time slices for which the reference position
    is close a to a specified bolometer. */

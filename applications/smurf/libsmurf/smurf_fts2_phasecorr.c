@@ -193,7 +193,7 @@ void smurf_fts2_phasecorr(int* status)
   // ===========================================================================
   for(fileIndex = 1; fileIndex <= numInputFile; fileIndex++) {
     // OPEN FILE
-    smf_open_file(grpInput, fileIndex, "READ", 0, &inputData, status);
+    smf_open_file(NULL,grpInput, fileIndex, "READ", 0, &inputData, status);
     if(*status != SAI__OK) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Unable to open source file!", status);
@@ -431,7 +431,7 @@ void smurf_fts2_phasecorr(int* status)
 
     // WRITE OUTPUT
     outputData->fts = smf_construct_smfFts(NULL, zpd, fpm, sigma, status);
-    smf_write_smfData(outputData, NULL, NULL, grpOutput, fileIndex, 0, MSG__VERB, 0, status);
+    smf_write_smfData(NULL, outputData, NULL, NULL, grpOutput, fileIndex, 0, MSG__VERB, 0, status);
     smf_close_file(&outputData, status);
   } // END FILE LOOP
 

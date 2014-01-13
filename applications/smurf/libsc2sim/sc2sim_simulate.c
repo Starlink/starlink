@@ -556,14 +556,14 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
     grpPut1 ( skygrp, sinx->astname, 1, status );
     grpPut1 ( skygrp, sinx->atmname, 2, status );
 
-    smf_open_file( skygrp, 1, "READ", 0, &astdata, status);
+    smf_open_file( NULL, skygrp, 1, "READ", 0, &astdata, status);
     if ( *status != SAI__OK ) {
       msgSetc ( "FILENAME", sinx->astname );
       errRep( " ", "Unable to open astronomical file ^FILENAME", status );
       goto CLEANUP;
     }
 
-    smf_open_file( skygrp, 2, "READ", 0, &atmdata, status);
+    smf_open_file( NULL, skygrp, 2, "READ", 0, &atmdata, status);
     if ( *status != SAI__OK ) {
       msgSetc ( "FILENAME", sinx->atmname );
       errRep( " ", "Unable to open atmospheric file ^FILENAME", status);

@@ -174,7 +174,7 @@ void smurf_rawpress( int *status ) {
        to create the output file */
 
     /* Open the input file */
-    smf_open_file( igrp, i, "READ", 0, &data, status );
+    smf_open_file( NULL, igrp, i, "READ", 0, &data, status );
     if (*status != SAI__OK || !data) break;
 
     /* Get the subarray id */

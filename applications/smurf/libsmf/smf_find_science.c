@@ -13,13 +13,15 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
+*     smf_find_science( ThrWorkForce *wf, const Grp * ingrp, Grp **outgrp, int reverttodark,
 *                     Grp **darkgrp, Grp **flatgrp, int reducedark, int calcflat,
 *                     smf_dtype darktype, smfArray ** darks,
 *                     smfArray **fflats, AstKeyMap **heateffmap,
 *                     double * meanstep, int * status );
 
 *  Arguments:
+*     wf = ThrWorkForce * (Given)
+*        Pointer to a pool of worker threads
 *     ingrp = const Grp* (Given)
 *        Input group consisting of science and non-science observations.
 *     outgrp = Grp ** (Returned)
@@ -213,6 +215,7 @@
 #include "sae_par.h"
 #include "mers.h"
 #include "ndf.h"
+#include "star/thr.h"
 #include "star/ndg.h"
 #include "star/grp.h"
 #include "msg_par.h"
@@ -243,7 +246,7 @@ smf__addto_durations( const smfData *indata, double * duration,
 static void smf__calc_flatobskey( smfHead *hdr, char * keystr, size_t keylen,
                                   int *status );
 
-void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
+void smf_find_science(ThrWorkForce *wf, const Grp * ingrp, Grp **outgrp, int reverttodark,
                       Grp **darkgrp, Grp **flatgrp, int reducedark,
                       int calcflat, smf_dtype darktype, smfArray ** darks,
                       smfArray **fflats, AstKeyMap ** heateffmap,
@@ -326,7 +329,7 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
     char keystr[100];  /* Key for scimap entry */
 
     /* open the file but just to get the header */
-    smf_open_file( ingrp, i, "READ", SMF__NOCREATE_DATA, &infile, status );
+    smf_open_file( NULL, ingrp, i, "READ", SMF__NOCREATE_DATA, &infile, status );
     if (*status != SAI__OK) break;
 
     /* Fill in the keymap with observation details */
@@ -470,7 +473,7 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
 
         /* read filename from group */
         infile = NULL;
-        smf_open_file( ingrp, ori_index, "READ", 0, &infile, status );
+        smf_open_file( NULL, ingrp, ori_index, "READ", 0, &infile, status );
         if ( *status != SAI__OK ) {
           /* This should not happen because we have already opened
              the file. If it does happen we abort with error. */
@@ -522,7 +525,7 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
             int utdate;
 
             if (*status == SAI__OK) {
-              ngood = smf_flat_calcflat( MSG__VERB, NULL, "RESIST",
+              ngood = smf_flat_calcflat( wf, MSG__VERB, NULL, "RESIST",
                                          "FLATMETH", "FLATORDER", NULL, "RESPMASK",
                                          "FLATSNR", NULL, infile, &curresp, status );
               if (*status != SAI__OK) {
@@ -537,7 +540,7 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
                 ngood = 0;
 
                 /* Generate a blank flatfield and blank responsivity image */
-                smf_flat_badflat( infile, &curresp, status );
+                smf_flat_badflat( wf, infile, &curresp, status );
               }
 
               /* Retrieve the UT date so we can decide whether to compare
@@ -842,7 +845,7 @@ void smf_find_science(const Grp * ingrp, Grp **outgrp, int reverttodark,
         if (darks) {
 
           /* read the value from the new group */
-          smf_open_file( dgrp, i+1, "READ", 0, &infile, status );
+          smf_open_file( NULL, dgrp, i+1, "READ", 0, &infile, status );
 
           /* do we have to process these darks? */
           if (reducedark) {

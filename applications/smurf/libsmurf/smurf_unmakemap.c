@@ -446,7 +446,7 @@ void smurf_unmakemap( int *status ) {
       ndfAnnul( &indfout, status );
 
 /* We now re-open the output NDF and then modify its data values. */
-      smf_open_file( ogrp, ifile, "UPDATE", 0, &odata, status );
+      smf_open_file( wf, ogrp, ifile, "UPDATE", 0, &odata, status );
 
 /* Issue a suitable message and abort if anything went wrong. */
       if( *status != SAI__OK ) {

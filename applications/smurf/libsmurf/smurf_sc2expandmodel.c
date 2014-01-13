@@ -125,7 +125,7 @@ void smurf_sc2expandmodel( int *status ) {
   for( i=1; (*status==SAI__OK) && (i<=size); i++ ) {
 
     /* Open file */
-    smf_open_file(igrp, i, "READ", 0, &idata, status);
+    smf_open_file(NULL, igrp, i, "READ", 0, &idata, status);
 
     /* Check to see if this is a DIMM model component before expanding */
     if( idata && idata->hdr && (idata->hdr->mtype != SMF__NUL) ) {
@@ -133,7 +133,7 @@ void smurf_sc2expandmodel( int *status ) {
 
       if( *status == SAI__OK ) {
         (*expptr)( idata, &odata, status );
-        smf_write_smfData( odata, NULL, NULL, ogrp, i, 0, MSG__VERB, 0, status );
+        smf_write_smfData( NULL, odata, NULL, NULL, ogrp, i, 0, MSG__VERB, 0, status );
       }
     }
   }

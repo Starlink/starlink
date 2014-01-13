@@ -200,7 +200,7 @@ smfDream *smf_construct_smfDream( smfData *data, size_t nvert,
 	       in a circular loop because the weights data do not
 	       satisfy the condition for reading and storing them in a
 	       smfDream. */
-	    smf_open_file( wtgrp, 1, "READ", SMF__NOCREATE_HEAD, &wtdata,
+	    smf_open_file( NULL, wtgrp, 1, "READ", SMF__NOCREATE_HEAD, &wtdata,
 			   status );
 	    if ( *status == SAI__OK ) {
 	      /* Get locator to DREAM parameters */

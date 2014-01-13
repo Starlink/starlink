@@ -143,7 +143,7 @@ void smurf_dreamsolve ( int *status ) {
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
   /* Filter out darks */
-  smf_find_science( igrp, &fgrp, 0, NULL, NULL, 1, 0, SMF__NULL, &darks, &flatramps,
+  smf_find_science( NULL, igrp, &fgrp, 0, NULL, NULL, 1, 0, SMF__NULL, &darks, &flatramps,
                     &heateffmap, NULL, status );
 
   /* input group is now the filtered group so we can use that and
@@ -165,7 +165,7 @@ void smurf_dreamsolve ( int *status ) {
   /* Loop over number of files */
   for ( i=1; i<=size; i++) {
     /* Open file and flatfield the data */
-    smf_open_and_flatfield( igrp, ogrp, i, darks, flatramps, heateffmap,
+    smf_open_and_flatfield( NULL, igrp, ogrp, i, darks, flatramps, heateffmap,
                             &data, status );
     smf_dreamsolve( data, status );
 

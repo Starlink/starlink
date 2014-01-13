@@ -1300,7 +1300,7 @@ void smurf_makecube( int *status ) {
 
 /* Validate the input files, create the WCS FrameSet to store in the
    output cube, and get the pixel index bounds of the output cube. */
-      smf_sparsebounds( igrp, size, oskyfrm, usedetpos, detgrp, lbnd_out,
+      smf_sparsebounds( wf, igrp, size, oskyfrm, usedetpos, detgrp, lbnd_out,
                         ubnd_out, &wcsout, &hasoffexp, &polobs, status );
 
 /* See how the output Variances are to be created (the "Spread" option is
@@ -1574,7 +1574,7 @@ void smurf_makecube( int *status ) {
    polarisation angle bin. */
          smfflags = 0;
          if( genvar && !is2d ) smfflags |= SMF__MAP_VAR;
-         smf_open_newfile( ogrp, iout++, SMF__FLOAT, 3, tile->elbnd,
+         smf_open_newfile( wf, ogrp, iout++, SMF__FLOAT, 3, tile->elbnd,
                            tile->eubnd, smfflags, &odata, status );
 
 /* Abort if an error has occurred. */
@@ -1727,7 +1727,7 @@ void smurf_makecube( int *status ) {
             if( !pt || pt[ 0 ] < VAL__MAXI ) {
 
 /* Obtain information about the current input NDF. */
-               smf_open_file( tile->grp, ifile, "READ", 0, &data, status );
+               smf_open_file( wf, tile->grp, ifile, "READ", 0, &data, status );
 
 /* Issue a suitable message and abort if anything went wrong. */
                if( *status != SAI__OK ) {

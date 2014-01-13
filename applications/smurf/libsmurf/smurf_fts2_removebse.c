@@ -154,7 +154,7 @@ void smurf_fts2_removebse(int* status)
   // ===========================================================================
   // BSE CALIBRATION FILE
   // ===========================================================================
-  smf_open_file( grpBSE, 1, "READ",
+  smf_open_file( NULL, grpBSE, 1, "READ",
                  SMF__NOCREATE_DA |
                  SMF__NOCREATE_FTS,
                  &bseData, status);
@@ -193,7 +193,7 @@ void smurf_fts2_removebse(int* status)
   // LOOP THROUGH EACH NDF FILE IN THE INPUT GROUP
   // ===========================================================================
   for(fileIndex = 1; fileIndex <= numInputFile; fileIndex++) {
-    smf_open_and_flatfield(grpInput, grpOutput, fileIndex, NULL, NULL,
+    smf_open_and_flatfield(NULL, grpInput, grpOutput, fileIndex, NULL, NULL,
                            NULL, &inputData, status);
     if(*status != SAI__OK) {
       *status = SAI__ERROR;

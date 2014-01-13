@@ -197,7 +197,7 @@ int smf_initial_sky( ThrWorkForce *wf, AstKeyMap *keymap, smfDIMMData *dat,
 /* Map the quality array section, and copy it into the map buffer. */
       ndfState( indf2, "QUALITY", &there, status );
       if( there ) {
-         qptr = smf_qual_map( indf2, "READ", &family, &size, status );
+         qptr = smf_qual_map( wf, indf2, "READ", &family, &size, status );
          if( *status == SAI__OK ) {
             if( family != SMF__QFAM_MAP ) {
                *status = SAI__ERROR;
@@ -279,10 +279,10 @@ int smf_initial_sky( ThrWorkForce *wf, AstKeyMap *keymap, smfDIMMData *dat,
       if( dat->ext ) smf_calcmodel_ext( wf, dat, 0, keymap, dat->ext,
                                         SMF__DIMM_INVERT, status);
 
-/* Now clear quality flags SMF__Q_COM and SMF__Q_RING in the bolometer data. 
-   This is usually done when undoing the COM model. But the COM model is  not  
-   undone at the start of the first iteration, so when running skyloop (which 
-   only performs one iteration on each invocation of makemap) we need 
+/* Now clear quality flags SMF__Q_COM and SMF__Q_RING in the bolometer data.
+   This is usually done when undoing the COM model. But the COM model is  not
+   undone at the start of the first iteration, so when running skyloop (which
+   only performs one iteration on each invocation of makemap) we need
    to clear the flags here instead. How many threads do we get to play with */
       nw = wf ? wf->nworker : 1;
 

@@ -13,12 +13,14 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     smf_write_smfData ( const smfData *data, const smfData *variance,
+*     smf_write_smfData ( ThrWorkForce *wf, const smfData *data, const smfData *variance,
 *                        const char * filename,
 *                        const Grp * igrp, size_t grpindex,
 *                        int provid, msglev_t msglev, int single, int * status );
 
 *  Arguments:
+*     wf = ThrWorkForce * (Given)
+*        Pointer to a pool of worker threads
 *     data = const smfData* (Given)
 *        Pointer to smfData to dump to disk file. Returns without action
 *        if NULL pointer.
@@ -163,8 +165,8 @@
 
 #define FUNC_NAME "smf_write_smfData"
 
-void smf_write_smfData( const smfData *data, const smfData *variance,
-                        const char * filename,
+void smf_write_smfData( ThrWorkForce *wf, const smfData *data,
+                        const smfData *variance, const char * filename,
                         const Grp * igrp, size_t grpindex,
                         int provid, msglev_t msglev, int single, int * status ) {
 
@@ -326,7 +328,7 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
   msgOutif( msglev, "", FUNC_NAME ": writing ^NAME", status );
 
   /* Open the file */
-  smf_open_newfile( ogrp, 1, data->dtype, data->ndims, lbnd, ubnd,
+  smf_open_newfile( wf, ogrp, 1, data->dtype, data->ndims, lbnd, ubnd,
                     flags, &outdata, status );
 
   if (*status == SAI__OK) {
@@ -469,7 +471,7 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
            quality, unmap it to force write to disk. */
         if( da->dksquid->qual ) {
           size_t nqmap;
-          smf_qual_t * outdkqual = smf_qual_map( id, "WRITE", NULL, &nqmap, status );
+          smf_qual_t * outdkqual = smf_qual_map( wf, id, "WRITE", NULL, &nqmap, status );
           da->dksquid->qfamily = SMF__QFAM_TSERIES; /* always */
           if( (*status==SAI__OK) && outdkqual ) {
             memcpy( outdkqual, da->dksquid->qual, nmap*sizeof(*outdkqual) );

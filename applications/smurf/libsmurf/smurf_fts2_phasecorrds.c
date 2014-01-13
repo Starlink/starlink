@@ -303,7 +303,7 @@ void smurf_fts2_phasecorrds(int* status)
     /* Loop through each input file */
     for(fIndex = 1; fIndex <= nFiles; fIndex++) {
         /* Open Observation file */
-    smf_open_file(gIn, fIndex, "READ", SMF__NOFIX_METADATA, &inData, status);
+    smf_open_file(NULL, gIn, fIndex, "READ", SMF__NOFIX_METADATA, &inData, status);
         if(*status != SAI__OK) {
             *status = SAI__ERROR;
             errRep(FUNC_NAME, "Unable to open the source file!", status);
@@ -862,7 +862,7 @@ void smurf_fts2_phasecorrds(int* status)
             errRepf(TASK_NAME, "Error creating outDataIFGINR->file->name", status);
             goto CLEANUP;
         }
-        smf_write_smfData(outDataIFGINR, NULL, outDataIFGINR->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
+        smf_write_smfData(NULL, outDataIFGINR, NULL, outDataIFGINR->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error writing outDataIFGINR file", status);
             goto CLEANUP;
@@ -880,7 +880,7 @@ void smurf_fts2_phasecorrds(int* status)
             errRepf(TASK_NAME, "Error creating outDataIFGDFR->file->name", status);
             goto CLEANUP;
         }
-        smf_write_smfData(outDataIFGDFR, NULL, outDataIFGDFR->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
+        smf_write_smfData(NULL, outDataIFGDFR, NULL, outDataIFGDFR->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error writing outDataIFGDFR file", status);
             goto CLEANUP;
@@ -898,7 +898,7 @@ void smurf_fts2_phasecorrds(int* status)
             errRepf(TASK_NAME, "Error creating outDataIFGDFI->file->name", status);
             goto CLEANUP;
         }
-        smf_write_smfData(outDataIFGDFI, NULL, outDataIFGDFI->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
+        smf_write_smfData(NULL, outDataIFGDFI, NULL, outDataIFGDFI->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error writing outDataIFGDFI file", status);
             goto CLEANUP;
@@ -916,7 +916,7 @@ void smurf_fts2_phasecorrds(int* status)
             errRepf(TASK_NAME, "Error creating outDataSR->file->name", status);
             goto CLEANUP;
         }
-        smf_write_smfData(outDataSR, NULL, outDataSR->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
+        smf_write_smfData(NULL, outDataSR, NULL, outDataSR->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error writing outDataSR file", status);
             goto CLEANUP;
@@ -934,7 +934,7 @@ void smurf_fts2_phasecorrds(int* status)
             errRepf(TASK_NAME, "Error creating outDataSI->file->name", status);
             goto CLEANUP;
         }
-        smf_write_smfData(outDataSI, NULL, outDataSI->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
+        smf_write_smfData(NULL, outDataSI, NULL, outDataSI->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error writing outDataSI file", status);
             goto CLEANUP;
@@ -952,7 +952,7 @@ void smurf_fts2_phasecorrds(int* status)
             errRepf(TASK_NAME, "Error creating outDataSRC->file->name", status);
             goto CLEANUP;
         }
-        smf_write_smfData(outDataSRC, NULL, outDataSRC->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
+        smf_write_smfData(NULL, outDataSRC, NULL, outDataSRC->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error writing outDataSRC file", status);
             goto CLEANUP;
@@ -971,7 +971,7 @@ void smurf_fts2_phasecorrds(int* status)
             errRepf(TASK_NAME, "Error creating outDataSIC->file->name", status);
             goto CLEANUP;
         }
-        smf_write_smfData(outDataSIC, NULL, outDataSIC->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
+        smf_write_smfData(NULL, outDataSIC, NULL, outDataSIC->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error writing outDataSIC file", status);
             goto CLEANUP;
@@ -989,7 +989,7 @@ void smurf_fts2_phasecorrds(int* status)
             errRepf(TASK_NAME, "Error creating outDataSP->file->name", status);
             goto CLEANUP;
         }
-        smf_write_smfData(outDataSP, NULL, outDataSP->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
+        smf_write_smfData(NULL, outDataSP, NULL, outDataSP->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error writing outDataSP file", status);
             goto CLEANUP;
@@ -1007,7 +1007,7 @@ void smurf_fts2_phasecorrds(int* status)
             errRepf(TASK_NAME, "Error creating outDataPCFR->file->name", status);
             goto CLEANUP;
         }
-        smf_write_smfData(outDataPCFR, NULL, outDataPCFR->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
+        smf_write_smfData(NULL, outDataPCFR, NULL, outDataPCFR->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error writing outDataPCFR file", status);
             goto CLEANUP;
@@ -1025,7 +1025,7 @@ void smurf_fts2_phasecorrds(int* status)
             errRepf(TASK_NAME, "Error creating outDataPCFI->file->name", status);
             goto CLEANUP;
         }
-        smf_write_smfData(outDataPCFI, NULL, outDataPCFI->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
+        smf_write_smfData(NULL, outDataPCFI, NULL, outDataPCFI->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error writing outDataPCFI file", status);
             goto CLEANUP;
@@ -1043,7 +1043,7 @@ void smurf_fts2_phasecorrds(int* status)
             errRepf(TASK_NAME, "Error creating outDataSPF->file->name", status);
             goto CLEANUP;
         }
-        smf_write_smfData(outDataSPF, NULL, outDataSPF->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
+        smf_write_smfData(NULL, outDataSPF, NULL, outDataSPF->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error writing outDataSPF file", status);
             goto CLEANUP;
@@ -1061,7 +1061,7 @@ void smurf_fts2_phasecorrds(int* status)
             errRepf(TASK_NAME, "Error creating outDataWN->file->name", status);
             goto CLEANUP;
         }
-        smf_write_smfData(outDataWN, NULL, outDataWN->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
+        smf_write_smfData(NULL, outDataWN, NULL, outDataWN->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error writing outDataWN file", status);
             goto CLEANUP;
@@ -1079,7 +1079,7 @@ void smurf_fts2_phasecorrds(int* status)
             errRepf(TASK_NAME, "Error creating outDataWT->file->name", status);
             goto CLEANUP;
         }
-        smf_write_smfData(outDataWT, NULL, outDataWT->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
+        smf_write_smfData(NULL, outDataWT, NULL, outDataWT->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error writing outDataWT file", status);
             goto CLEANUP;
@@ -1098,7 +1098,7 @@ void smurf_fts2_phasecorrds(int* status)
             errRepf(TASK_NAME, "Error creating outDataFPM->file->name", status);
             goto CLEANUP;
         }
-        smf_write_smfData(outDataFPM, NULL, outDataFPM->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
+        smf_write_smfData(NULL, outDataFPM, NULL, outDataFPM->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error writing outDataFPM file", status);
             goto CLEANUP;
@@ -1116,7 +1116,7 @@ void smurf_fts2_phasecorrds(int* status)
             errRepf(TASK_NAME, "Error creating outData->file->name", status);
             goto CLEANUP;
         }
-        smf_write_smfData(outData, NULL, NULL, gOut, fIndex, 0, MSG__VERB, 0, status);
+        smf_write_smfData(NULL, outData, NULL, NULL, gOut, fIndex, 0, MSG__VERB, 0, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error writing outData file", status);
             goto CLEANUP;

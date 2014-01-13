@@ -201,7 +201,7 @@ void smurf_sc2pca( int *status ) {
   parGet0l( "FLAT", &ensureflat, status );
 
   /* Filter out useful data (revert to darks if no science data) */
-  smf_find_science( igrp, &fgrp, 1, NULL, NULL, 1, 1, SMF__NULL, &darks,
+  smf_find_science( wf, igrp, &fgrp, 1, NULL, NULL, 1, 1, SMF__NULL, &darks,
                     &flatramps, &heateffmap, NULL, status );
 
   /* input group is now the filtered group so we can use that and
@@ -224,14 +224,14 @@ void smurf_sc2pca( int *status ) {
   }
 
   /* Get group of bolometer masks and read them into a smfArray */
-  smf_request_mask( "BBM", &bbms, status );
+  smf_request_mask( wf, "BBM", &bbms, status );
 
   for( i=1; i<=size; i++ ) {
 
     if( *status != SAI__OK ) break;
 
     /* Load data, flatfielding and/or opening raw as double as necessary */
-    smf_open_asdouble( igrp, i, darks, flatramps, heateffmap, ensureflat, &data, status );
+    smf_open_asdouble( wf, igrp, i, darks, flatramps, heateffmap, ensureflat, &data, status );
 
     /* Mask out bad bolometers */
     smf_apply_mask( data, bbms, SMF__BBM_DATA|SMF__BBM_QUAL, 0, status );
@@ -244,9 +244,9 @@ void smurf_sc2pca( int *status ) {
                    status );
 
     /* Write out to the new files */
-    smf_write_smfData( amplitudes, NULL, NULL, outampgrp, i, 0, MSG__VERB,
+    smf_write_smfData( wf, amplitudes, NULL, NULL, outampgrp, i, 0, MSG__VERB,
                        0, status );
-    smf_write_smfData( components, NULL, NULL, outcompgrp, i, 0, MSG__VERB,
+    smf_write_smfData( wf, components, NULL, NULL, outcompgrp, i, 0, MSG__VERB,
                        0, status );
 
     /* Free resources for output data */
