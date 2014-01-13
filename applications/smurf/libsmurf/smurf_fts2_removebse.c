@@ -275,7 +275,7 @@ void smurf_fts2_removebse(int* status)
 
     if(bseIFG) { astFree(bseIFG); bseIFG = NULL; }
     if(bseIFGNew) { astFree(bseIFGNew); bseIFGNew = NULL; }
-    if(inputData) { smf_close_file(&inputData, status); }
+    if(inputData) { smf_close_file( NULL,&inputData, status); }
   }
 
   CLEANUP:
@@ -286,8 +286,8 @@ void smurf_fts2_removebse(int* status)
     if(srcX) { astFree(srcX); srcX = NULL; }
 
     // CLOSE FILES
-    if(bseData) { smf_close_file(&bseData, status); }
-    if(inputData) { smf_close_file(&inputData, status); }
+    if(bseData) { smf_close_file( NULL,&bseData, status); }
+    if(inputData) { smf_close_file( NULL,&inputData, status); }
 
     // END NDF
     ndfEnd(status);

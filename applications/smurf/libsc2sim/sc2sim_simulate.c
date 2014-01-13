@@ -1654,8 +1654,8 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
   if ( !hitsonly ) {
 
-    smf_close_file( &astdata, status);
-    smf_close_file( &atmdata, status);
+    smf_close_file( NULL, &astdata, status);
+    smf_close_file( NULL, &atmdata, status);
 
     if ( sky2map ) sky2map = astAnnul( sky2map );
 

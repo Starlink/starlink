@@ -254,11 +254,11 @@ void smurf_fts2_spatialwcs(int* status)
 
     astEnd;
 
-    smf_close_file(&outputData, status);
+    smf_close_file( NULL,&outputData, status);
   }
 
   CLEANUP:
-    if(outputData) { smf_close_file(&outputData, status); }
+    if(outputData) { smf_close_file( NULL,&outputData, status); }
 
     ndfEnd(status);
 

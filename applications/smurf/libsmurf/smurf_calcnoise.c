@@ -529,7 +529,7 @@ void smurf_calcnoise( int *status ) {
       pad = smf_get_padding( keymap, 0, firstdata->hdr, VAL__BADD, status );
 
       /* Free the first smfData. */
-      smf_close_file( &firstdata, status );
+      smf_close_file( wf, &firstdata, status );
 
     } else {
       pad = 0;
@@ -570,7 +570,7 @@ void smurf_calcnoise( int *status ) {
           smf_clean_smfArray( wf, array, NULL, NULL, NULL, kmap, status );
           if( array ) {
             array->owndata = 0;
-            smf_close_related( &array, status );
+            smf_close_related( wf, &array, status );
           }
           if( kmap ) kmap = astAnnul( kmap );
 
@@ -681,7 +681,7 @@ void smurf_calcnoise( int *status ) {
             ndgNdfas( basegrp, gcount, "READ", &provid, status );
             smf_write_smfData( wf, powdata, NULL, NULL, powgrp, gcount, provid,
                                MSG__VERB, 0, status );
-            smf_close_file( &powdata, status );
+            smf_close_file( wf, &powdata, status );
             ndfAnnul( &provid, status );
           }
 
@@ -726,8 +726,8 @@ void smurf_calcnoise( int *status ) {
               ngood = smf_flat_responsivity( flatmethod, respmap, 5.0, 1,
                                              powval, bolval, refres,
                                              NULL, status);
-              if (powval) smf_close_file( &powval, status );
-              if (bolval) smf_close_file( &bolval, status );
+              if (powval) smf_close_file( wf, &powval, status );
+              if (bolval) smf_close_file( wf, &bolval, status );
             }
           } else {
             if (do_nep) {
@@ -803,7 +803,7 @@ void smurf_calcnoise( int *status ) {
               smf_accumulate_prov( NULL, basegrp, 1, nepdata->file->ndfid,
                                    CREATOR, NULL, status );
             }
-            if (nepdata) smf_close_file( &nepdata, status );
+            if (nepdata) smf_close_file( wf, &nepdata, status );
           }
 
           /* Clip outlier noise values now that we've finished with the
@@ -851,19 +851,19 @@ void smurf_calcnoise( int *status ) {
 
           }
 
-          if (respmap) smf_close_file( &respmap, status );
+          if (respmap) smf_close_file( wf, &respmap, status );
         }
 
         if (*status == SAI__OK && outdata->file) {
           smf_accumulate_prov( NULL, basegrp, 1, outdata->file->ndfid,
                                CREATOR, NULL, status );
         }
-        if (outdata) smf_close_file( &outdata, status );
+        if (outdata) smf_close_file( wf, &outdata, status );
         if (*status == SAI__OK && ratdata && ratdata->file) {
           smf_accumulate_prov( NULL, basegrp, 1, ratdata->file->ndfid,
                                CREATOR, NULL, status );
         }
-        if (ratdata) smf_close_file( &ratdata, status );
+        if (ratdata) smf_close_file( wf, &ratdata, status );
 
       } else {
         *status = SAI__ERROR;
@@ -877,7 +877,7 @@ void smurf_calcnoise( int *status ) {
     }
 
     /* Close the smfArray */
-    smf_close_related( &concat, status );
+    smf_close_related( wf, &concat, status );
 
     /* Annul the configuration keymap. */
     if (keymap) keymap = astAnnul( keymap );
@@ -924,7 +924,7 @@ void smurf_calcnoise( int *status ) {
   if (tsgrp) grpDelet( &tsgrp, status );
   if (basegrp) grpDelet( &basegrp, status );
   if( igroup ) smf_close_smfGroup( &igroup, status );
-  if( flatramps ) smf_close_related( &flatramps, status );
+  if( flatramps ) smf_close_related( wf, &flatramps, status );
 
   ndfEnd( status );
 

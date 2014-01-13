@@ -142,7 +142,7 @@ void smurf_rawrecreatewcs( int * status ) {
     }
 
     /* close up and skip if this is not a good file */
-    smf_close_file( &data, status );
+    smf_close_file( NULL, &data, status );
     if (!isok) continue;
 
     /* Now we try to update the file */

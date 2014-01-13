@@ -217,7 +217,7 @@ void smurf_starecalc ( int *status ) {
 	     "Unable to produce STARE images for data from file ^I of ^N", status);
     }
     /* Free resources for output data */
-    smf_close_file( &data, status );
+    smf_close_file( NULL, &data, status );
   }
 
   /* Write out the list of output NDF names, annulling the error if a null
@@ -228,9 +228,9 @@ void smurf_starecalc ( int *status ) {
   }
 
   /* Free up resources */
-  if (darks) smf_close_related( &darks, status );
-  if (bbms) smf_close_related( &bbms, status );
-  if (flatramps) smf_close_related( &flatramps, status );
+  if (darks) smf_close_related( NULL, &darks, status );
+  if (bbms) smf_close_related( NULL, &bbms, status );
+  if (flatramps) smf_close_related( NULL, &flatramps, status );
   if (heateffmap) heateffmap = smf_free_effmap( heateffmap, status );
   grpDelet( &igrp, status);
   grpDelet( &ogrp, status);

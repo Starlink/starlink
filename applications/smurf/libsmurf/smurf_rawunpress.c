@@ -176,7 +176,7 @@ void smurf_rawunpress( int *status ) {
 
     /* Free resources for files */
     ndfAnnul( &outndf, status);
-    smf_close_file( &data, status );
+    smf_close_file( NULL, &data, status );
   }
 
   /* Tidy up after ourselves: release the resources used by the grp routines  */

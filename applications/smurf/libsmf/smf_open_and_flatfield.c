@@ -323,7 +323,7 @@ int smf_open_and_flatfield ( ThrWorkForce *wf, const Grp *igrp, const Grp *ogrp,
   }
 
   /* Free resources for input data */
-  smf_close_file( &data, status );
+  smf_close_file( wf, &data, status );
 
   return retval;
 }

@@ -152,7 +152,7 @@ void smf_labelunit( Grp *igrp,  int size, smfData *odata, int *status ){
      }
 
 /* Close the current input data file. */
-      smf_close_file( &data, status );
+      smf_close_file( NULL, &data, status );
       data = NULL;
 
    }

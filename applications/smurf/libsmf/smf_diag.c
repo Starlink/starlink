@@ -556,7 +556,7 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
                      wcs = astClone( pow->hdr->wcs );
                   }
                   memcpy( buffer, pow->pntr[ 0 ], ndata*sizeof( buffer ) );
-                  smf_close_file( &pow, status );
+                  smf_close_file( wf, &pow, status );
 
 /* If too few good values, store a set of bad values in place of the
    power spectrum. */
@@ -674,7 +674,7 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
          qua = smf_qual_map( wf, indf, mode, NULL, &nmap, status );
          if( *status == SAI__OK ) memcpy( qua + ( irow + 1 - lbnd[1] )*ndata,
                                           qbuffer, sizeof(*qua)*ndata );
-         smf_qual_unmap( indf, SMF__QFAM_TSERIES, qua, status );
+         smf_qual_unmap( wf, indf, SMF__QFAM_TSERIES, qua, status );
 
 /* Set the bad bits mask so that the data array will not be masked when
    it is mapped when dumping diagnostics for the next iteration. */
@@ -731,7 +731,7 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
       thrWait( wf, status );
 
 /* If required, unmap the quality array. */
-      if( addqual ) smf_qual_unmap( indf, SMF__QFAM_TSERIES, qua, status );
+      if( addqual ) smf_qual_unmap( wf, indf, SMF__QFAM_TSERIES, qua, status );
 
 /* Annul the NDF identifier. */
       ndfAnnul( &indf, status );

@@ -526,7 +526,7 @@ void smurf_unmakecube( int *status ) {
 
 /* Close the input time series file. */
       if( data != NULL ) {
-         smf_close_file( &data, status );
+         smf_close_file( NULL, &data, status );
          data = NULL;
       }
 
@@ -537,7 +537,7 @@ void smurf_unmakecube( int *status ) {
 /* Close any input data file that is still open due to an early exit from
    the above loop. */
    if( data != NULL ) {
-      smf_close_file( &data, status );
+      smf_close_file( NULL, &data, status );
       data = NULL;
    }
 

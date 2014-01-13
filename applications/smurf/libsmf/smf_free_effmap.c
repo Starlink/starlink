@@ -83,7 +83,7 @@ AstKeyMap * smf_free_effmap ( AstKeyMap * effmap, int * status ) {
     astMapGet0P( effmap, key, &tmp );
     if (tmp) {
       smfData * thisdata = tmp;
-      smf_close_file( &thisdata, status );
+      smf_close_file( NULL, &thisdata, status );
     }
   }
   return astAnnul( effmap );

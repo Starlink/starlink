@@ -221,7 +221,7 @@ smfDream *smf_construct_smfDream( smfData *data, size_t nvert,
 		    memcpy( gridwts, gridptr, nelem*sizeof(double) );
 		    dream->gridwts = gridwts;
 		  }
-		  smf_close_file( &griddata, status);
+		  smf_close_file( NULL, &griddata, status);
 		}
 
 		/* Then the inverse matrix */
@@ -236,7 +236,7 @@ smfDream *smf_construct_smfDream( smfData *data, size_t nvert,
 		    memcpy( invmatx, gridptr, nelem*sizeof(double) );
 		    dream->invmatx = invmatx;
 		  }
-		  smf_close_file( &griddata, status);
+		  smf_close_file( NULL, &griddata, status);
 		}
 
 		/* Now for the gridpts array */
@@ -259,7 +259,7 @@ smfDream *smf_construct_smfDream( smfData *data, size_t nvert,
 		      k++;
 		    }
 		  }
-		  smf_close_file( &griddata, status);
+		  smf_close_file( NULL, &griddata, status);
 		}
 		/* And finally, read the size of the grid step */
 		wtfile = wtdata->file;
@@ -275,7 +275,7 @@ smfDream *smf_construct_smfDream( smfData *data, size_t nvert,
 			 status);
 		}
 	      }
-	      smf_close_file( &wtdata, status );
+	      smf_close_file( NULL, &wtdata, status );
 	    } else {
 	      /* If we fail to open the file, can we assume we're trying
 		 to create it? */

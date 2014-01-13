@@ -541,7 +541,7 @@ void smurf_timesort( int *status ) {
    }
 
 /* Close the ifrst input file. */
-   smf_close_file( &data, status);
+   smf_close_file( NULL, &data, status);
    data = NULL;
 
 /* Initialise the number of output NDFs created. */
@@ -1682,7 +1682,7 @@ void smurf_timesort( int *status ) {
          }
 
 /* Close the current output file. */
-         smf_close_file( &data, status);
+         smf_close_file( NULL, &data, status);
       }
    }
 

@@ -237,7 +237,7 @@ void smurf_dreamweights ( int *status ) {
              status);
     }
 
-    smf_close_file( &data, status );
+    smf_close_file( NULL, &data, status );
   }
 
   /* Free up resources */

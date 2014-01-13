@@ -210,7 +210,7 @@ int *smf_jsatiles_data( Grp *igrp, size_t size, smfJSATiling *tiling,
       }
 
 /* Close the current input data file. */
-      smf_close_file( &data, status);
+      smf_close_file( NULL, &data, status);
       data = NULL;
    }
 

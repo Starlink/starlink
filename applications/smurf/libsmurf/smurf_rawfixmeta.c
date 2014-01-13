@@ -132,7 +132,7 @@ void smurf_rawfixmeta( int * status ) {
       parPut0d("STEPTIME", steptime, status);
     }
 
-    smf_close_file( &data, status );
+    smf_close_file( NULL, &data, status );
   }
 
   /* Cleanup */

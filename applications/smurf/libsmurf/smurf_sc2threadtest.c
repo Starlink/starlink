@@ -539,7 +539,7 @@ void smurf_sc2threadtest( int *status ) {
   if( res ) {
     for( i=0; i<nchunks; i++ ) {
       if( res[i] ) {
-        smf_close_related( &res[i], status );
+        smf_close_related( wf, &res[i], status );
       }
     }
     res = astFree( res );

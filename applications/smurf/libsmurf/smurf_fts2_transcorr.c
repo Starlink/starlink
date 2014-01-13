@@ -267,7 +267,7 @@ void smurf_fts2_transcorr(int* status)
       smf_fits_getD(inData->hdr, "WNFACT", &wnFact, status);
       if(*status != SAI__OK) {
         errRep(FUNC_NAME, "Unable to find wave number factor!", status);
-        smf_close_file(&inData, status);
+        smf_close_file( NULL,&inData, status);
         break;
       }
 
@@ -361,12 +361,12 @@ void smurf_fts2_transcorr(int* status)
 
       smf_write_smfData(NULL, outData, NULL, NULL, outGrp, fIndex, 0, MSG__VERB,
                         0, status);
-      smf_close_file(&outData, status);
-      smf_close_file(&inData, status);
+      smf_close_file( NULL,&outData, status);
+      smf_close_file( NULL,&inData, status);
     } else {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Unable to deep copy!", status);
-      smf_close_file(&inData, status);
+      smf_close_file( NULL,&inData, status);
       break;
     }
   }
@@ -379,7 +379,7 @@ void smurf_fts2_transcorr(int* status)
     astFree(TAU[0]);
     astFree(TAU[1]);
     astFree(GAUSSIANKERNEL);
-    smf_close_file(&tauData, status);
+    smf_close_file( NULL,&tauData, status);
     if(inGrp) { grpDelet(&inGrp, status); }
     if(outGrp) { grpDelet(&outGrp, status); }
     if(tauGrp) { grpDelet(&tauGrp, status); }

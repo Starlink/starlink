@@ -343,7 +343,7 @@ void smurf_stackframes( int *status ) {
       badbit |= bb;
     }
 
-    smf_close_file( &data, status );
+    smf_close_file( NULL, &data, status );
   }
 
   if (*status != SAI__OK) goto CLEANUP;
@@ -436,7 +436,7 @@ void smurf_stackframes( int *status ) {
     smf_accumulate_prov( data, igrp, sortinfo[i-1].index, outdata->file->ndfid,
                          "SMURF:" TASK_NAME, NULL, status );
 
-    smf_close_file( &data, status );
+    smf_close_file( NULL, &data, status );
   }
 
   /* Now need to sort out the WCS */
@@ -485,7 +485,7 @@ void smurf_stackframes( int *status ) {
   }
 
  CLEANUP:
-  smf_close_file( &outdata, status );
+  smf_close_file( NULL, &outdata, status );
   if (sortinfo) sortinfo = astFree( sortinfo );
   grpDelet( &igrp, status );
   grpDelet( &ogrp, status );

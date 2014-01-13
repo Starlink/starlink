@@ -253,7 +253,7 @@ void smurf_flatfield( int *status ) {
     smf_apply_mask( ffdata, bbms, SMF__BBM_DATA, 0, status );
 
     /* Free resources for output data */
-    smf_close_file( &ffdata, status );
+    smf_close_file( NULL, &ffdata, status );
   }
 
   /* Write out the list of output NDF names, annulling the error if a null
@@ -266,8 +266,8 @@ void smurf_flatfield( int *status ) {
   /* Tidy up after ourselves: release the resources used by the grp routines  */
   if (igrp) grpDelet( &igrp, status);
   if (ogrp) grpDelet( &ogrp, status);
-  if (bbms) smf_close_related( &bbms, status );
-  if( flatramps ) smf_close_related( &flatramps, status );
+  if (bbms) smf_close_related( NULL, &bbms, status );
+  if( flatramps ) smf_close_related( NULL, &flatramps, status );
   if (heateffmap) heateffmap = smf_free_effmap( heateffmap, status );
   ndfEnd( status );
 }

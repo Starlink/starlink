@@ -315,5 +315,5 @@ void smf_write_sampcube( ThrWorkForce *wf, const smfArray *res, const smfArray *
 
   /* Clean up */
   if( hitscount ) hitscount = astFree( hitscount );
-  if( sampcube ) smf_close_file( &sampcube, status );
+  if( sampcube ) smf_close_file( wf, &sampcube, status );
 }

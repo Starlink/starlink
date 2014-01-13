@@ -147,5 +147,5 @@ void sc2sim_getexternal
 
   /* clean up */
   if( igrp ) grpDelet(&igrp, status);
-  if( data ) smf_close_file(&data, status);
+  if( data ) smf_close_file( NULL, &data, status);
 }

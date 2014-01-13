@@ -465,7 +465,7 @@ void smurf_fts2_deglitch(int* status)
     } // END LOOP THROUGH BOLOMETERS
 
     if(IFG) { astFree(IFG); IFG = NULL; }
-    if(inputData) { smf_close_file(&inputData, status); }
+    if(inputData) { smf_close_file( NULL,&inputData, status); }
   } // END FILE LOOP
 
   CLEANUP:
@@ -477,7 +477,7 @@ void smurf_fts2_deglitch(int* status)
     if(cSDEV) { astFree(cSDEV); cSDEV = NULL;}
 
     // CLOSE FILES
-    if(inputData) { smf_close_file(&inputData, status); }
+    if(inputData) { smf_close_file( NULL,&inputData, status); }
 
     // END NDF
     ndfEnd(status);

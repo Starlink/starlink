@@ -453,7 +453,7 @@ void smurf_sc2fft( int *status ) {
             tempdata = smf_fft_avpspec( odata, bolomask, 1, SMF__Q_BADB,
                                         weightavpspec ? whitenoise : NULL,
                                         status );
-            smf_close_file( &odata, status );
+            smf_close_file( wf, &odata, status );
             whitenoise = astFree( whitenoise );
             bolomask = astFree( bolomask );
             odata = tempdata;
@@ -490,7 +490,7 @@ void smurf_sc2fft( int *status ) {
 
           /* Free resources */
           ndfAnnul( &provid, status );
-          smf_close_file( &odata, status );
+          smf_close_file( wf, &odata, status );
         } else {
           msgOutif( MSG__NORM, " ",
                     "Data are already transformed. No output will be produced",
@@ -503,7 +503,7 @@ void smurf_sc2fft( int *status ) {
     }
 
     /* Close the smfArray */
-    smf_close_related( &concat, status );
+    smf_close_related( wf, &concat, status );
   }
 
   /* Write out the list of output NDF names, annulling the error if a null
@@ -518,9 +518,9 @@ void smurf_sc2fft( int *status ) {
   grpDelet( &ogrp, status);
   if (basegrp) grpDelet( &basegrp, status );
   if( igroup ) smf_close_smfGroup( &igroup, status );
-  if( flatramps ) smf_close_related( &flatramps, status );
+  if( flatramps ) smf_close_related( wf, &flatramps, status );
   if (heateffmap) heateffmap = smf_free_effmap( heateffmap, status );
-  if (bbms) smf_close_related( &bbms, status );
+  if (bbms) smf_close_related( wf, &bbms, status );
 
   ndfEnd( status );
 

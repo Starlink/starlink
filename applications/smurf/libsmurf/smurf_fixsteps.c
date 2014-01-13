@@ -348,8 +348,8 @@ void smurf_fixsteps( int *status ) {
    nx = data ? data->dims[ 0 ] : 0;
 
 /* Close the NDFs. */
-   smf_close_file( &data, status );
-   smf_close_file( &indata, status );
+   smf_close_file( wf, &data, status );
+   smf_close_file( wf, &indata, status );
 
 /* Attempt to open a file containing descriptions of steps fixed by a
    previous invocation of this program. */

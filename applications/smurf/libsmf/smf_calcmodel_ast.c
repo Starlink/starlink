@@ -339,7 +339,7 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
         filtermap->pntr[0] = NULL;
       }
 
-      smf_close_file( &filtermap, status );
+      smf_close_file( wf, &filtermap, status );
       filt = smf_free_smfFilter( filt, status );
     }
 

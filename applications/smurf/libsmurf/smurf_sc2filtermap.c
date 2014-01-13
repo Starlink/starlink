@@ -193,7 +193,7 @@ void smurf_sc2filtermap( int *status ) {
 
     smf_open_file( wf, wgrp, 1, "READ", SMF__NOTTSERIES, &tempdata, status );
     wrefmap = smf_deepcopy_smfData( wf, tempdata, 0, 0, 0, 0, status );
-    smf_close_file( &tempdata, status );
+    smf_close_file( wf, &tempdata, status );
 
     /* Set VAL__BADD to zero if requested */
     if( (*status==SAI__OK) && zerobad ) {
@@ -331,8 +331,8 @@ void smurf_sc2filtermap( int *status ) {
   if( ogrp ) grpDelet( &ogrp, status);
   if( wgrp ) grpDelet( &wgrp, status );
 
-  if( odata ) smf_close_file( &odata, status );
-  if( wrefmap ) smf_close_file( &wrefmap, status );
+  if( odata ) smf_close_file( wf, &odata, status );
+  if( wrefmap ) smf_close_file( wf, &wrefmap, status );
 
   if( mask ) mask = astFree( mask );
 

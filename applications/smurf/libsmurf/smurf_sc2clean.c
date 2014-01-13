@@ -433,7 +433,7 @@ void smurf_sc2clean( int *status ) {
           smf_clean_smfArray( wf, array, NULL, NULL, NULL, kmap, status );
           if( array ) {
             array->owndata = 0;
-            smf_close_related( &array, status );
+            smf_close_related( wf, &array, status );
           }
           if( kmap ) kmap = astAnnul( kmap );
 
@@ -482,8 +482,8 @@ void smurf_sc2clean( int *status ) {
         }
 
         /* Close com and gai */
-        if( com ) smf_close_related( &com, status );
-        if( gai ) smf_close_related( &gai, status );
+        if( com ) smf_close_related( wf, &com, status );
+        if( gai ) smf_close_related( wf, &gai, status );
 
       }
 
@@ -526,7 +526,7 @@ void smurf_sc2clean( int *status ) {
     }
 
     /* Close the smfArray */
-    smf_close_related( &concat, status );
+    smf_close_related( wf, &concat, status );
   }
 
   /* Write out the list of output NDF names, annulling the error if a null
@@ -539,10 +539,10 @@ void smurf_sc2clean( int *status ) {
  CLEANUP:
 
   /* Tidy up after ourselves: release the resources used by the grp routines */
-  if( darks ) smf_close_related( &darks, status );
-  if( flatramps ) smf_close_related( &flatramps, status );
+  if( darks ) smf_close_related( wf, &darks, status );
+  if( flatramps ) smf_close_related( wf, &flatramps, status );
   if (heateffmap) heateffmap = smf_free_effmap( heateffmap, status );
-  if( bbms ) smf_close_related( &bbms, status );
+  if( bbms ) smf_close_related( wf, &bbms, status );
   if( igrp ) grpDelet( &igrp, status);
   if( ogrp ) grpDelet( &ogrp, status);
   if( basegrp ) grpDelet( &basegrp, status );

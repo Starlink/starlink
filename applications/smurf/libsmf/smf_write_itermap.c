@@ -230,5 +230,5 @@ void smf_write_itermap( ThrWorkForce *wf, const double *map, const double *mapva
 
   /* Clean up */
   if( mgrp ) grpDelet( &mgrp, status );
-  smf_close_file( &imapdata, status );
+  smf_close_file( wf, &imapdata, status );
 }

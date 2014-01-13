@@ -1735,7 +1735,7 @@ void smurf_dsutils( int *status ) {
       work = astFree( work );
 
 /* Close the input data file. */
-      smf_close_file( &data, status);
+      smf_close_file( NULL, &data, status);
 
 /* Free resources. */
       if( igrp != NULL ) grpDelet( &igrp, status);

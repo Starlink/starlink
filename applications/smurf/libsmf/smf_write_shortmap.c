@@ -347,7 +347,7 @@ void smf_write_shortmap( ThrWorkForce *wf, int shortmap, smfArray *res,
 
     /* Clean up */
     if( mgrp ) grpDelet( &mgrp, status );
-    smf_close_file( &mapdata, status );
+    smf_close_file( wf, &mapdata, status );
 
   }
 

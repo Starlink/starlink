@@ -276,7 +276,7 @@ void smurf_fts2_maskmap(int* status) {
       }
 
 /* Close the output time series file. */
-      smf_close_file(&odata, status);
+      smf_close_file( NULL,&odata, status);
 
 /* End the NDF context. */
       ndfEnd(status);
@@ -285,7 +285,7 @@ void smurf_fts2_maskmap(int* status) {
 /* Close any input data file that is still open due to an early exit from
    the above loop. */
    if (odata != NULL) {
-      smf_close_file(&odata, status);
+      smf_close_file( NULL,&odata, status);
       odata = NULL;
    }
 

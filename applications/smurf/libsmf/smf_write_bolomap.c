@@ -330,7 +330,7 @@ void smf_write_bolomap( ThrWorkForce *wf, smfArray *res, smfArray *lut,
 
           /* Clean up */
           if( mgrp ) grpDelet( &mgrp, status );
-          if( mapdata ) smf_close_file( &mapdata, status );
+          if( mapdata ) smf_close_file( wf, &mapdata, status );
 
         }
       }

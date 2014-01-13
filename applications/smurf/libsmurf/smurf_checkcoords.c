@@ -127,7 +127,7 @@ void smurf_checkcoords( int *status ) {
       smf_check_coords( data, status );
 
 /* Close the file. */
-      smf_close_file( &data, status);
+      smf_close_file( NULL, &data, status);
    }
 
 /* Free resources. */

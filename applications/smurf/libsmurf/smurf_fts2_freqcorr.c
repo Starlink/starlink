@@ -152,7 +152,7 @@ void smurf_fts2_freqcorr(int* status)
         (inData->dims[1] != calData->dims[1]) ) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Incompatible Theta file!", status);
-      smf_close_file(&inData, status);
+      smf_close_file( NULL,&inData, status);
       break;
     }
 
@@ -212,17 +212,17 @@ void smurf_fts2_freqcorr(int* status)
 
       smf_write_smfData(NULL, outData, NULL, NULL, ogrp, fIndex, 0, MSG__VERB,
                         0, status);
-      smf_close_file(&outData, status);
+      smf_close_file( NULL,&outData, status);
 
-      smf_close_file(&inData, status);
+      smf_close_file( NULL,&inData, status);
     } else {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Unable to deep copy!", status);
-      smf_close_file(&inData, status);
+      smf_close_file( NULL,&inData, status);
       break;
     }
   }
-  smf_close_file(&calData, status);
+  smf_close_file( NULL,&calData, status);
 
   CLEANUP:
     ndfEnd(status);

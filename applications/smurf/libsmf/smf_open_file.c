@@ -1308,10 +1308,10 @@ void smf_open_file( ThrWorkForce *wf, const Grp * igrp, size_t index,
 
         /* Free up the smfDatas for jigvert and jigpath */
         if ( jigvert != NULL ) {
-          smf_close_file( &jigvdata, status );
+          smf_close_file( wf, &jigvdata, status );
         }
         if ( jigpath != NULL ) {
-          smf_close_file( &jigpdata, status );
+          smf_close_file( wf, &jigpdata, status );
         }
         datAnnul( &xloc, status );
       }
@@ -1374,7 +1374,7 @@ void smf_open_file( ThrWorkForce *wf, const Grp * igrp, size_t index,
 
   /* free resources on error */
   if (*status != SAI__OK) {
-    smf_close_file( data, status );
+    smf_close_file( wf, data, status );
   }
 
 }
@@ -1558,7 +1558,7 @@ static void smf1_open_file_caller( void *data, int *status ){
    if (thisdata && thisdata->file && thisdata->file->ndfid != NDF__NOID) {
      smfData *tmpdata = NULL;
      tmpdata = smf_deepcopy_smfData( NULL, thisdata, 0, 0, 0, 0, status );
-     smf_close_file( pdata->data, status );
+     smf_close_file( NULL, pdata->data, status );
      *(pdata->data) = tmpdata;
    }
 

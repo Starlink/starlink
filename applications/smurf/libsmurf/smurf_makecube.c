@@ -1805,7 +1805,7 @@ void smurf_makecube( int *status ) {
 
 /* Close the input data file. */
                if( data != NULL ) {
-                  smf_close_file( &data, status );
+                  smf_close_file( wf, &data, status );
                   data = NULL;
                }
             }
@@ -1829,7 +1829,7 @@ void smurf_makecube( int *status ) {
 /* Close the input data file that remains open due to an early exit from
    the above loop. */
          if( data != NULL ) {
-            smf_close_file( &data, status );
+            smf_close_file( wf, &data, status );
             data = NULL;
          }
 

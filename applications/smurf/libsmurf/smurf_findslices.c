@@ -293,7 +293,7 @@ void smurf_findslices( int *status ) {
       }
 
 /* Close the file. */
-      smf_close_file( &data, status );
+      smf_close_file( NULL, &data, status );
    }
 
    msgBlank( status );

@@ -539,7 +539,7 @@ void smf_sparsebounds( ThrWorkForce *wf, Grp *igrp,  int size, AstSkyFrame *osky
       }
 
 /* Close the current input data file. */
-      smf_close_file( &data, status);
+      smf_close_file( wf, &data, status);
       data = NULL;
 
 /* Free work space. */
@@ -551,7 +551,7 @@ void smf_sparsebounds( ThrWorkForce *wf, Grp *igrp,  int size, AstSkyFrame *osky
 
 /* Close any data file that was left open due to an early exit from the
    above loop. */
-   if( data != NULL ) smf_close_file( &data, status );
+   if( data != NULL ) smf_close_file( wf, &data, status );
 
 /* Check we found some usable data. */
    if( lutsize == 0 ) {

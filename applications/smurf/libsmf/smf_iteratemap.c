@@ -886,7 +886,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           localmap->hdr->wcs = NULL;
         }
 
-        if( localmap ) smf_close_file( &localmap, status );
+        if( localmap ) smf_close_file( wf, &localmap, status );
       }
 
       msgOutf( "", FUNC_NAME
@@ -912,7 +912,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
     } else {
         steptime = -1;
     }
-    smf_close_file( &data, status );
+    smf_close_file( wf, &data, status );
 
     /* Maximum length of a continuous chunk */
     if( *status == SAI__OK ) {
@@ -1775,7 +1775,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       /* We can close noisemaps here because they will already have
          been used to initialize the NOI model if needed. */
 
-      if( noisemaps ) smf_close_related( &noisemaps, status );
+      if( noisemaps ) smf_close_related( wf, &noisemaps, status );
 
       /* Allow an initial guess at the sky brightness to be supplied, in
          which case copy it into "thismap", sample it and subtract it from
@@ -2808,7 +2808,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                                    MSG__VERB, 0, status );
 
                 /* Clean up */
-                smf_close_file( &ast, status );
+                smf_close_file( wf, &ast, status );
               } else {
                 msgOut( " ",
                         "SMF__ITERATEMAP: Can't export AST -- NULL filename",
@@ -2881,7 +2881,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
                 /* if we had temporary quality free it */
                 if ( modeltyps[j] == SMF__COM && qua_data ) {
-                  smf_close_file( &(model[j][0]->sdata[idx]->sidequal),
+                  smf_close_file( wf, &(model[j][0]->sdata[idx]->sidequal),
                                   status );
                 }
 
@@ -2994,17 +2994,17 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
     /* fixed model smfArrays */
     if( res ) {
-      if( res[0] ) smf_close_related( &res[0], status );
+      if( res[0] ) smf_close_related( wf, &res[0], status );
       res = astFree( res );
     }
 
     if( lut ) {
-      if( lut[0] ) smf_close_related( &lut[0], status );
+      if( lut[0] ) smf_close_related( wf, &lut[0], status );
       lut = astFree( lut );
     }
 
     if( qua ) {
-      if( qua[0] ) smf_close_related( &qua[0], status );
+      if( qua[0] ) smf_close_related( wf, &qua[0], status );
       qua = astFree( qua );
     }
 
@@ -3014,7 +3014,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         if( model[imodel] ) {
 
           /* Close each model component smfArray */
-          if( model[imodel][0] ) smf_close_related( &(model[imodel][0]), status );
+          if( model[imodel][0] ) smf_close_related( wf, &(model[imodel][0]), status );
 
           /* Free array of smfArray pointers for this model */
           model[imodel] = astFree( model[imodel] );

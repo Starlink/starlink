@@ -366,7 +366,7 @@ void smf_import_array( ThrWorkForce *wf, smfData *refdata, const char *name, int
       }
 
 /* Close the NDF. */
-      smf_close_file( &data, status );
+      smf_close_file( wf, &data, status );
    }
 }
 

@@ -425,14 +425,14 @@ void smurf_fts2_phasecorr(int* status)
     } // END LOOP THROUGH ROWS
 
     // CLOSE FILE
-    if(inputData) { smf_close_file(&inputData, status); }
+    if(inputData) { smf_close_file( NULL,&inputData, status); }
 	  if(planA)     { fftw_destroy_plan(planA);  planA     = NULL; }
 	  if(planB)     { fftw_destroy_plan(planB);  planB     = NULL; }
 
     // WRITE OUTPUT
     outputData->fts = smf_construct_smfFts(NULL, zpd, fpm, sigma, status);
     smf_write_smfData(NULL, outputData, NULL, NULL, grpOutput, fileIndex, 0, MSG__VERB, 0, status);
-    smf_close_file(&outputData, status);
+    smf_close_file( NULL,&outputData, status);
   } // END FILE LOOP
 
   CLEANUP:
@@ -457,7 +457,7 @@ void smurf_fts2_phasecorr(int* status)
 	  fftw_cleanup();
 
     // CLOSE FILE
-    if(inputData)  { smf_close_file(&inputData, status); }
+    if(inputData)  { smf_close_file( NULL,&inputData, status); }
 
     // END NDF
     ndfEnd(status);

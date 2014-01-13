@@ -686,7 +686,7 @@ void smf_calc_mapcoord( ThrWorkForce *wf, AstKeyMap *config, smfData *data,
 
       if( pdata->data ) {
         smf_lock_data( pdata->data, 1, status );
-        smf_close_file( &(pdata->data), status );
+        smf_close_file( wf, &(pdata->data), status );
       }
       astLock( pdata->abskyfrm, 0 );
       pdata->abskyfrm = astAnnul( pdata->abskyfrm );

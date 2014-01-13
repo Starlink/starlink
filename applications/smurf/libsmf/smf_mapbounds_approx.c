@@ -398,7 +398,7 @@ void smf_mapbounds_approx( Grp *igrp,  size_t index, char *system,
   }
 
   if( data != NULL )
-    smf_close_file( &data, status);
+    smf_close_file( NULL, &data, status);
 
   astEnd;
 

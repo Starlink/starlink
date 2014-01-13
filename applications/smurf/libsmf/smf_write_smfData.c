@@ -476,7 +476,7 @@ void smf_write_smfData( ThrWorkForce *wf, const smfData *data,
           if( (*status==SAI__OK) && outdkqual ) {
             memcpy( outdkqual, da->dksquid->qual, nmap*sizeof(*outdkqual) );
           }
-          outdkqual = smf_qual_unmap( id, da->dksquid->qfamily, outdkqual, status );
+          outdkqual = smf_qual_unmap( wf, id, da->dksquid->qfamily, outdkqual, status );
         }
 
         ndfAnnul( &id, status );
@@ -563,7 +563,7 @@ void smf_write_smfData( ThrWorkForce *wf, const smfData *data,
   }
 
   /* Close the output file */
-  smf_close_file( &outdata, status );
+  smf_close_file( wf, &outdata, status );
   grpDelet( &ogrp, status );
 
 }

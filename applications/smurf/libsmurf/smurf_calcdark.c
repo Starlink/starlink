@@ -165,8 +165,8 @@ void smurf_calcdark( int *status ) {
   /* Tidy up after ourselves: release the resources used by the grp routines  */
   grpDelet( &dgrp, status);
   grpDelet( &ogrp, status);
-  smf_close_related( &darks, status );
-  smf_close_related( &bbms, status );
+  smf_close_related( NULL, &darks, status );
+  smf_close_related( NULL, &bbms, status );
 
   ndfEnd( status );
 }

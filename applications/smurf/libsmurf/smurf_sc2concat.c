@@ -287,7 +287,7 @@ void smurf_sc2concat( int *status ) {
     }
 
     /* Close the smfArray */
-    smf_close_related( &concat, status );
+    smf_close_related( wf, &concat, status );
 
   }
 
@@ -299,8 +299,8 @@ void smurf_sc2concat( int *status ) {
   }
 
  CLEANUP:
-  if( darks ) smf_close_related( &darks, status );
-  if( flatramps ) smf_close_related( &flatramps, status );
+  if( darks ) smf_close_related( wf, &darks, status );
+  if( flatramps ) smf_close_related( wf, &flatramps, status );
   if (heateffmap) heateffmap = smf_free_effmap( heateffmap, status );
   if( igrp ) grpDelet( &igrp, status);
   if( basegrp ) grpDelet( &basegrp, status );

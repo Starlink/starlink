@@ -125,8 +125,8 @@ void smf_flat_smfData ( const smfData *data, smf_flatmeth * flatmethod,
   *refres = da->refres;
 
   if (*status != SAI__OK) {
-    if (*bolval) smf_close_file( bolval, status );
-    if (*powval) smf_close_file( powval, status );
+    if (*bolval) smf_close_file( NULL, bolval, status );
+    if (*powval) smf_close_file( NULL, powval, status );
   }
 
   return;

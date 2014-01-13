@@ -596,7 +596,7 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
       }
 
       /* Close the reference file */
-      smf_close_file( &refdata, status );
+      smf_close_file( wf, &refdata, status );
 
       /* If we are not concatenating any data, we can leave the "j"
          loop now that we have the returned "first" value. */
@@ -704,7 +704,7 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
         if( dslen && dslen[j-firstpiece] ) {
           smf_downsamp_smfData( wf, tmpdata, &refdata, dslen[j-firstpiece],
                                 1, 0, status );
-          smf_close_file( &tmpdata, status );
+          smf_close_file( wf, &tmpdata, status );
 
         /* Otherwise, if the data is raw, convert it to double precision
            then release the original. We copy the smfFile so that the
@@ -712,7 +712,7 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
         } else if( israw ) {
           refdata = smf_deepcopy_smfData( wf, tmpdata, 1,  0, 0, 0,
                                           status );
-          smf_close_file( &tmpdata, status );
+          smf_close_file( wf, &tmpdata, status );
 
         /* Otherwise, just continue to use the original data. */
         } else {
@@ -1077,7 +1077,7 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
         }
 
         /* Close the file we had open */
-        smf_close_file( &refdata, status );
+        smf_close_file( wf, &refdata, status );
 
         /* If any pieces remain to be processed, wait for the completion
            of the job that is opening the next piece. Then lock the

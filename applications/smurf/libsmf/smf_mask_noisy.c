@@ -187,13 +187,13 @@ void smf_mask_noisy( ThrWorkForce *wf, smfData *data, smfData **noise,
     smf_addto_smfArray( masks, noisemap, status );
     smf_apply_mask( data, masks, SMF__BBM_QUAL, SMF__Q_NOISE,
                     status );
-    smf_close_related( &masks, status );
+    smf_close_related( wf, &masks, status );
   }
 
   /* Give noisemap back to caller if requested, or close it */
   if( noise ) {
     *noise = noisemap;
   } else {
-    smf_close_file( &noisemap, status );
+    smf_close_file( wf, &noisemap, status );
   }
 }

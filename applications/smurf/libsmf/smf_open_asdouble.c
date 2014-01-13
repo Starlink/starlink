@@ -111,7 +111,7 @@ void smf_open_asdouble( ThrWorkForce *wf, const Grp *igrp, size_t index, const s
       smf_open_and_flatfield( wf, igrp, NULL, index, darks, flatramps, heateffmap,
                               data, status );
     }
-    smf_close_file( &tmpdata, status );
+    smf_close_file( wf, &tmpdata, status );
   }
 
 }

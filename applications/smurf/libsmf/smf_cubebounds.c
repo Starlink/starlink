@@ -847,7 +847,7 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
       }
 
 /* Close the current input data file. */
-      smf_close_file( &data, status);
+      smf_close_file( NULL, &data, status);
       data = NULL;
 
 /* Free work space. */
@@ -859,7 +859,7 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 
 /* Close any data file that was left open due to an early exit from the
    above loop. */
-   if( data != NULL ) smf_close_file( &data, status );
+   if( data != NULL ) smf_close_file( NULL, &data, status );
 
 /* Check we found some usable data. */
    if( dlbnd[ 0 ] == VAL__MAXD || dlbnd[ 1 ] == VAL__MAXD ) {

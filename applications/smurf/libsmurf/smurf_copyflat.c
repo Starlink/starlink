@@ -188,7 +188,7 @@ void smurf_copyflat( int *status ) {
     fitshdr = astClone( moddata->hdr->fitshdr );
 
     /* No longer need the smfData */
-    smf_close_file( &moddata, status );
+    smf_close_file( NULL, &moddata, status );
 
     /* Get the filename and update the flatfield */
     grpGet( flatgrp, i, 1, &pname, SMF_PATH_MAX, status );
@@ -204,7 +204,7 @@ void smurf_copyflat( int *status ) {
   }
 
  CLEANUP:
-  if (refdata) smf_close_file( &refdata, status );
+  if (refdata) smf_close_file( NULL, &refdata, status );
   if (flatgrp) grpDelet( &flatgrp, status );
   ndfEnd( status );
 

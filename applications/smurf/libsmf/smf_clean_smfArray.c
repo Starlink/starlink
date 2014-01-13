@@ -487,13 +487,13 @@ void smf_clean_smfArray( ThrWorkForce *wf, smfArray *array,
     if( com ) {
       *com = comdata;
     } else {
-      if( comdata ) smf_close_related( &comdata, status );
+      if( comdata ) smf_close_related( wf, &comdata, status );
     }
 
     if( gai ) {
       *gai = gaidata;
     } else {
-      if( gaidata ) smf_close_related( &gaidata, status );
+      if( gaidata ) smf_close_related( wf, &gaidata, status );
     }
 
     if( comgroup ) smf_close_smfGroup( &comgroup, status );
@@ -505,7 +505,7 @@ void smf_clean_smfArray( ThrWorkForce *wf, smfArray *array,
       for( idx=0; idx<quadata->ndat; idx++ ) {
         quadata->sdata[idx]->pntr[0] = NULL;
       }
-      if( quadata ) smf_close_related( &quadata, status );
+      if( quadata ) smf_close_related( wf, &quadata, status );
     }
   }
 

@@ -281,7 +281,7 @@ void smf_apply_mask( smfData *indata,
     }
 
     /* clean up resources */
-    smf_close_file(&bbm, status );
+    smf_close_file(NULL, &bbm, status );
 
     /* we had a valid mask but did not use it */
     if (!masked && *status == SAI__OK) {

@@ -287,7 +287,7 @@ void smurf_calcflat( int *status ) {
            S/N < 1 and constant signal data. Also clip at 3sigma */
         smf_collapse_tseries( infile, 1, clip, 1.0, 1, SMF__DOUBLE,
                               &outfile, status );
-        smf_close_file( &infile, status );
+        smf_close_file( NULL, &infile, status );
         smf_addto_smfArray( flatfiles, outfile, status );
       }
     }
@@ -444,10 +444,10 @@ void smurf_calcflat( int *status ) {
 
   /* Tidy up after ourselves: release the resources used by the grp routines  */
  CLEANUP:
-  if (bbhtframe) smf_close_related( &bbhtframe, status );
-  if (darks) smf_close_related( &darks, status );
-  if (fflats) smf_close_related( &fflats, status );
-  if (flatfiles) smf_close_related( &flatfiles, status );
+  if (bbhtframe) smf_close_related( NULL, &bbhtframe, status );
+  if (darks) smf_close_related( NULL, &darks, status );
+  if (fflats) smf_close_related( NULL, &fflats, status );
+  if (flatfiles) smf_close_related( NULL, &flatfiles, status );
   if (igrp) grpDelet( &igrp, status);
   if (fgrp) grpDelet( &fgrp, status);
   if (ffgrp) grpDelet( &ffgrp, status);
@@ -456,7 +456,7 @@ void smurf_calcflat( int *status ) {
 
   /* bolval is a simple pointer copy in fast ramp mode and will be freed when fflats is freed */
   if (!isfastramp) {
-    if (bolval) smf_close_file( &bolval, status );
+    if (bolval) smf_close_file( NULL, &bolval, status );
   }
 
   ndfEnd( status );

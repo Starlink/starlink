@@ -341,7 +341,7 @@ void smf_rebinmap( ThrWorkForce *wf, smfData *data, double *bolovar,
          if( pdata->ijob == ijob ) {
             pdata->ijob = -1;
             smf_lock_data( pdata->data, 1, status );
-            smf_close_file( &(pdata->data), status );
+            smf_close_file( wf, &(pdata->data), status );
             pdata->bolovar = astFree( pdata->bolovar );
             *nused += pdata->nused;
             break;
@@ -387,7 +387,7 @@ void smf_rebinmap( ThrWorkForce *wf, smfData *data, double *bolovar,
 
          if( pdata->data ) {
             smf_lock_data( pdata->data, 1, status );
-            smf_close_file( &(pdata->data), status );
+            smf_close_file( wf, &(pdata->data), status );
             pdata->bolovar = astFree( pdata->bolovar );
             *nused += pdata->nused;
          }

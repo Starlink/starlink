@@ -135,7 +135,7 @@ AstKeyMap *smf_subinst_keymap( smf_subinst_t subinst, const smfData * indata,
     }
   }
 
-  if (sub_data) smf_close_file( &sub_data, status );
+  if (sub_data) smf_close_file( NULL, &sub_data, status );
 
   /* Free the keymap if we have bad status */
   if (*status != SAI__OK && sub_instruments) {

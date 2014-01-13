@@ -624,7 +624,7 @@ void smf_calcmodel_noi( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   if( box ) {
      box->pntr[0] = astFree( box->pntr[0] );
      box->qual = astFree( box->qual );
-     smf_close_file( &box, status );
+     smf_close_file( wf, &box, status );
   }
 
   /* Free the job data. */

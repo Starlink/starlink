@@ -438,7 +438,7 @@ void smurf_extinction( int * status ) {
     smf_write_clabels( odata, status );
 
     /* Free resources for output data */
-    smf_close_file( &odata, status );
+    smf_close_file( wf, &odata, status );
   }
 
   /* Write out the list of output NDF names, annulling the error if a null
@@ -449,9 +449,9 @@ void smurf_extinction( int * status ) {
   }
 
   /* Tidy up after ourselves: release the resources used by the grp routines  */
-  if (darks) smf_close_related( &darks, status );
-  if (bbms) smf_close_related( &bbms, status );
-  if( flatramps ) smf_close_related( &flatramps, status );
+  if (darks) smf_close_related( wf, &darks, status );
+  if (bbms) smf_close_related( wf, &bbms, status );
+  if( flatramps ) smf_close_related( wf, &flatramps, status );
   if (heateffmap) heateffmap = smf_free_effmap( heateffmap, status );
   grpDelet( &igrp, status);
   grpDelet( &ogrp, status);

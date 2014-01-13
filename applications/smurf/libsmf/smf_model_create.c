@@ -1134,7 +1134,7 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
                 smf_clean_smfArray( wf, array, NULL, NULL, NULL, kmap, status );
                 if( array ) {
                   array->owndata = 0;
-                  smf_close_related( &array, status );
+                  smf_close_related( wf, &array, status );
                 }
                 if( kmap ) kmap = astAnnul( kmap );
 
@@ -1224,7 +1224,7 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
                   gptr1[k] = gptr2[k];
                 }
               }
-              smf_close_file( &gdata, status );
+              smf_close_file( wf, &gdata, status );
 
               /* Second gain map */
               smf_open_file( wf, ggrp, 2, "READ", 0, &gdata, status );
@@ -1238,7 +1238,7 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
                   gptr1[k] = gptr2[k];
                 }
               }
-              smf_close_file( &gdata, status );
+              smf_close_file( wf, &gdata, status );
 
               grpDelet( &ggrp, status );
             } else {
@@ -1288,7 +1288,7 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
 
           /* Close the input template file if it was opened here */
           if( igroup ) {
-            smf_close_file( &idata, status );
+            smf_close_file( wf, &idata, status );
           }
         }
 

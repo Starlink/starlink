@@ -250,9 +250,9 @@ void smurf_sc2pca( int *status ) {
                        0, status );
 
     /* Free resources for output data */
-    smf_close_file( &data, status );
-    smf_close_file( &amplitudes, status );
-    smf_close_file( &components, status );
+    smf_close_file( wf, &data, status );
+    smf_close_file( wf, &amplitudes, status );
+    smf_close_file( wf, &components, status );
   }
 
   /* Write out the list of output NDF names, annulling the error if a null
@@ -270,9 +270,9 @@ void smurf_sc2pca( int *status ) {
   if( igrp ) grpDelet( &igrp, status);
   if( outampgrp ) grpDelet( &outampgrp, status);
   if( outcompgrp ) grpDelet( &outcompgrp, status);
-  if( darks ) smf_close_related( &darks, status );
-  if( bbms ) smf_close_related( &bbms, status );
-  if( flatramps ) smf_close_related( &flatramps, status );
+  if( darks ) smf_close_related( wf, &darks, status );
+  if( bbms ) smf_close_related( wf, &bbms, status );
+  if( flatramps ) smf_close_related( wf, &flatramps, status );
   if (heateffmap) heateffmap = smf_free_effmap( heateffmap, status );
   ndfEnd( status );
 }

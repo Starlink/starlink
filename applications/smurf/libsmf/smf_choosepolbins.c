@@ -354,7 +354,7 @@ int ***smf_choosepolbins( Grp *igrp, int size, float binsize, float binzero,
       }
 
 /* Close the current input data file. */
-      smf_close_file( &data, status);
+      smf_close_file( NULL, &data, status);
       data = NULL;
 
 /* Next input NDF. */

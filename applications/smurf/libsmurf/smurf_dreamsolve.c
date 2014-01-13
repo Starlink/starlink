@@ -180,12 +180,12 @@ void smurf_dreamsolve ( int *status ) {
       msgOutif(MSG__VERB," ", "DREAM solution applied", status);
     }
     /* Free resources for output data */
-    smf_close_file( &data, status );
+    smf_close_file( NULL, &data, status );
   }
 
   /* Free up resources */
-  if (darks) smf_close_related( &darks, status );
-  if (flatramps) smf_close_related( &flatramps, status );
+  if (darks) smf_close_related( NULL, &darks, status );
+  if (flatramps) smf_close_related( NULL, &flatramps, status );
   if (heateffmap) heateffmap = smf_free_effmap( heateffmap, status );
 
   grpDelet( &igrp, status);

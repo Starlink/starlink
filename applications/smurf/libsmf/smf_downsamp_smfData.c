@@ -319,9 +319,9 @@ void smf_downsamp_smfData( ThrWorkForce *wf, const smfData *idata,
       }
 
       /* Clean up */
-      smf_close_file( &fft_idata, status );
-      smf_close_file( &fft_odata, status );
-      smf_close_file( &tempdata, status );
+      smf_close_file( wf, &fft_idata, status );
+      smf_close_file( wf, &fft_odata, status );
+      smf_close_file( wf, &tempdata, status );
     } else {
       /* Time-domain filter method ----------------------------------------- */
 

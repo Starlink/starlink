@@ -188,7 +188,7 @@ smf_flat_calcflat( ThrWorkForce *wf, msglev_t msglev, const char flatname[],
       double *flatpar = (powref->pntr)[0];
       dim_t idx = 0;
 
-      smf_close_file( &bolref, status );
+      smf_close_file( wf, &bolref, status );
       bolref = coeffs;
 
       /* Fix up powref to reflect the change in bolref to store coefficients
@@ -289,13 +289,13 @@ smf_flat_calcflat( ThrWorkForce *wf, msglev_t msglev, const char flatname[],
     if ( respmapout ) {
       *respmapout = respmap;
     } else {
-      smf_close_file( &respmap, status );
+      smf_close_file( wf, &respmap, status );
     }
   }
 
-  if (bolref) smf_close_file( &bolref, status );
-  if (powref) smf_close_file( &powref, status );
-  if (flatpoly) smf_close_file( &flatpoly, status );
+  if (bolref) smf_close_file( wf, &bolref, status );
+  if (powref) smf_close_file( wf, &powref, status );
+  if (flatpoly) smf_close_file( wf, &flatpoly, status );
   if (resistance) resistance = astFree( resistance );
 
   return ngood;

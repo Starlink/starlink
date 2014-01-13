@@ -172,7 +172,7 @@ void smurf_calcresp( int *status ) {
     /* Abort if we had trouble. Alternative is to loop round to the next file but
        it is safer to tell people there is a problem */
     if (*status != SAI__OK) {
-      if (idata) smf_close_file( &idata, status );
+      if (idata) smf_close_file( NULL, &idata, status );
       break;
     }
 
@@ -189,8 +189,8 @@ void smurf_calcresp( int *status ) {
       smf_flat_smfData( idata, &flatmethod, &refres, &powval, &bolval, status );
       ngood[i-1] = smf_flat_responsivity( flatmethod, respmap, snrmin, 1, powval, bolval,
                                           refres, NULL, status );
-      if (powval) smf_close_file( &powval, status );
-      if (bolval) smf_close_file( &bolval, status );
+      if (powval) smf_close_file( NULL, &powval, status );
+      if (bolval) smf_close_file( NULL, &bolval, status );
 
       /* Report the number of good responsivities */
       if (flatmethod == SMF__FLATMETH_TABLE) {
@@ -205,8 +205,8 @@ void smurf_calcresp( int *status ) {
     }
 
     /* close files */
-    if (idata) smf_close_file( &idata, status );
-    if (respmap) smf_close_file( &respmap, status );
+    if (idata) smf_close_file( NULL, &idata, status );
+    if (respmap) smf_close_file( NULL, &respmap, status );
 
   }
 

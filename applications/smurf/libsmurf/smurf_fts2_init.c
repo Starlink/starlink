@@ -478,7 +478,7 @@ void smurf_fts2_init(int* status)
     if(SPLINE)  { gsl_spline_free(SPLINE);      SPLINE  = NULL; }
 
     /* Close the file */
-    smf_close_file(&inData, status);
+    smf_close_file( NULL,&inData, status);
 
     /* Create a 3D empty fpm array */
     fpm = smf_create_smfData(SMF__NOCREATE_DA | SMF__NOCREATE_FTS, status);
@@ -500,7 +500,7 @@ void smurf_fts2_init(int* status)
     /* Write to output */
     outData->fts = smf_construct_smfFts(NULL, zpd, fpm, sigma, status);
     smf_write_smfData(NULL, outData, NULL, NULL, gOut, fIndex, 0, MSG__VERB, 0, status);
-    smf_close_file(&outData, status);
+    smf_close_file( NULL,&outData, status);
   }
   CLEANUP:
   /* Deallocate memory used by arrays */
@@ -509,8 +509,8 @@ void smurf_fts2_init(int* status)
   if(OPD_EVEN){ OPD_EVEN  = astFree(OPD_EVEN); }
   if(ACC)     { gsl_interp_accel_free(ACC);   ACC     = NULL; }
   if(SPLINE)  { gsl_spline_free(SPLINE);      SPLINE  = NULL; }
-  if(inData)  { smf_close_file(&inData, status); }
-  if(outData) { smf_close_file(&outData, status); }
+  if(inData)  { smf_close_file( NULL,&inData, status); }
+  if(outData) { smf_close_file( NULL,&outData, status); }
 
   /* END NDF */
   ndfEnd(status);

@@ -848,7 +848,7 @@ void smurf_fts2_phasecorrds(int* status)
         }
 
         /* Close the file */
-        if(inData) { smf_close_file(&inData, status); }
+        if(inData) { smf_close_file( NULL,&inData, status); }
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error closing inData file %s", status, inData->file->name);
             goto CLEANUP;
@@ -867,7 +867,7 @@ void smurf_fts2_phasecorrds(int* status)
             errRepf(TASK_NAME, "Error writing outDataIFGINR file", status);
             goto CLEANUP;
         }
-        smf_close_file(&outDataIFGINR, status);
+        smf_close_file( NULL,&outDataIFGINR, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error closing outDataIFGINR file", status);
             goto CLEANUP;
@@ -885,7 +885,7 @@ void smurf_fts2_phasecorrds(int* status)
             errRepf(TASK_NAME, "Error writing outDataIFGDFR file", status);
             goto CLEANUP;
         }
-        smf_close_file(&outDataIFGDFR, status);
+        smf_close_file( NULL,&outDataIFGDFR, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error closing outDataIFGDFR file", status);
             goto CLEANUP;
@@ -903,7 +903,7 @@ void smurf_fts2_phasecorrds(int* status)
             errRepf(TASK_NAME, "Error writing outDataIFGDFI file", status);
             goto CLEANUP;
         }
-        smf_close_file(&outDataIFGDFI, status);
+        smf_close_file( NULL,&outDataIFGDFI, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error closing outDataIFGDFI file", status);
             goto CLEANUP;
@@ -921,7 +921,7 @@ void smurf_fts2_phasecorrds(int* status)
             errRepf(TASK_NAME, "Error writing outDataSR file", status);
             goto CLEANUP;
         }
-        smf_close_file(&outDataSR, status);
+        smf_close_file( NULL,&outDataSR, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error closing outDataSR file", status);
             goto CLEANUP;
@@ -939,7 +939,7 @@ void smurf_fts2_phasecorrds(int* status)
             errRepf(TASK_NAME, "Error writing outDataSI file", status);
             goto CLEANUP;
         }
-        smf_close_file(&outDataSI, status);
+        smf_close_file( NULL,&outDataSI, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error closing outDataSI file", status);
             goto CLEANUP;
@@ -958,7 +958,7 @@ void smurf_fts2_phasecorrds(int* status)
             goto CLEANUP;
         }
         /* printf("%s DEBUG: Closing outFileNameSRC=%s\n", TASK_NAME, outDataSRC->file->name); */
-        smf_close_file(&outDataSRC, status);
+        smf_close_file( NULL,&outDataSRC, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error closing outDataSRC file", status);
             goto CLEANUP;
@@ -976,7 +976,7 @@ void smurf_fts2_phasecorrds(int* status)
             errRepf(TASK_NAME, "Error writing outDataSIC file", status);
             goto CLEANUP;
         }
-        smf_close_file(&outDataSIC, status);
+        smf_close_file( NULL,&outDataSIC, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error closing outDataSIC file", status);
             goto CLEANUP;
@@ -994,7 +994,7 @@ void smurf_fts2_phasecorrds(int* status)
             errRepf(TASK_NAME, "Error writing outDataSP file", status);
             goto CLEANUP;
         }
-        smf_close_file(&outDataSP, status);
+        smf_close_file( NULL,&outDataSP, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error closing outDataSP file", status);
             goto CLEANUP;
@@ -1012,7 +1012,7 @@ void smurf_fts2_phasecorrds(int* status)
             errRepf(TASK_NAME, "Error writing outDataPCFR file", status);
             goto CLEANUP;
         }
-        smf_close_file(&outDataPCFR, status);
+        smf_close_file( NULL,&outDataPCFR, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error closing outDataPCFR file", status);
             goto CLEANUP;
@@ -1030,7 +1030,7 @@ void smurf_fts2_phasecorrds(int* status)
             errRepf(TASK_NAME, "Error writing outDataPCFI file", status);
             goto CLEANUP;
         }
-        smf_close_file(&outDataPCFI, status);
+        smf_close_file( NULL,&outDataPCFI, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error closing outDataPCFI file", status);
             goto CLEANUP;
@@ -1048,7 +1048,7 @@ void smurf_fts2_phasecorrds(int* status)
             errRepf(TASK_NAME, "Error writing outDataSPF file", status);
             goto CLEANUP;
         }
-        smf_close_file(&outDataSPF, status);
+        smf_close_file( NULL,&outDataSPF, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error closing outDataSPF file", status);
             goto CLEANUP;
@@ -1066,7 +1066,7 @@ void smurf_fts2_phasecorrds(int* status)
             errRepf(TASK_NAME, "Error writing outDataWN file", status);
             goto CLEANUP;
         }
-        smf_close_file(&outDataWN, status);
+        smf_close_file( NULL,&outDataWN, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error closing outDataWN file", status);
             goto CLEANUP;
@@ -1084,7 +1084,7 @@ void smurf_fts2_phasecorrds(int* status)
             errRepf(TASK_NAME, "Error writing outDataWT file", status);
             goto CLEANUP;
         }
-        smf_close_file(&outDataWT, status);
+        smf_close_file( NULL,&outDataWT, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error closing outDataWT file", status);
             goto CLEANUP;
@@ -1103,7 +1103,7 @@ void smurf_fts2_phasecorrds(int* status)
             errRepf(TASK_NAME, "Error writing outDataFPM file", status);
             goto CLEANUP;
         }
-        smf_close_file(&outDataFPM, status);
+        smf_close_file( NULL,&outDataFPM, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error closing outDataFPM file", status);
             goto CLEANUP;
@@ -1121,7 +1121,7 @@ void smurf_fts2_phasecorrds(int* status)
             errRepf(TASK_NAME, "Error writing outData file", status);
             goto CLEANUP;
         }
-        smf_close_file(&outData, status);
+        smf_close_file( NULL,&outData, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error closing outData file", status);
             goto CLEANUP;
@@ -1157,7 +1157,7 @@ CLEANUP:
 
     /* Close files if still open */
     if(inData) {
-        smf_close_file(&inData, status);
+        smf_close_file( NULL,&inData, status);
         if(*status != SAI__OK)
             errRepf(TASK_NAME, "Error closing inData file", status);
     }

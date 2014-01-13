@@ -296,7 +296,7 @@ void smf_open_newfile( ThrWorkForce *wf, const Grp * igrp, int index, smf_dtype 
         if (newndf != NDF__NOID) ndfAnnul( &newndf, status );
         if (file) file = astFree( file );
       }
-      smf_close_file( data, status );
+      smf_close_file( wf, data, status );
     } else {
       if (qual) qual = astFree( qual );
       if (newndf != NDF__NOID) ndfAnnul( &newndf, status );

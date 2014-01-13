@@ -205,7 +205,7 @@ void smurf_sc2mapfft( int *status ) {
       size_t ndata;
 
       tempdata = smf_deepcopy_smfData( wf, idata, 0, 0, 0, 0, status );
-      smf_close_file( &idata, status );
+      smf_close_file( wf, &idata, status );
       idata = tempdata;
 
       ndata=1;
@@ -244,7 +244,7 @@ void smurf_sc2mapfft( int *status ) {
         smfData *tempdata=NULL;
 
         tempdata = smf_fft_2dazav( odata, NULL, status );
-        smf_close_file( &odata, status );
+        smf_close_file( wf, &odata, status );
         odata = tempdata;
       }
 
@@ -262,7 +262,7 @@ void smurf_sc2mapfft( int *status ) {
   grpDelet( &igrp, status);
   grpDelet( &ogrp, status);
 
-  smf_close_file( &odata, status );
+  smf_close_file( wf, &odata, status );
 
   ndfEnd( status );
 

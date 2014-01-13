@@ -189,6 +189,6 @@ void smf_write_flagmap( ThrWorkForce *wf, smf_qual_t mask, smfArray *lut, smfArr
 
   /* Clean up */
   if( mgrp ) grpDelet( &mgrp, status );
-  smf_close_file( &mapdata, status );
+  smf_close_file( wf, &mapdata, status );
 
 }

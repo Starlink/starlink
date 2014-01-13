@@ -145,7 +145,7 @@ void smf_open_group( ThrWorkForce *wf, const Grp * igrp, const dim_t refdims[],
   }
 
   if (*status != SAI__OK) {
-    smf_close_related( files, status );
+    smf_close_related( wf, files, status );
   }
 
 }

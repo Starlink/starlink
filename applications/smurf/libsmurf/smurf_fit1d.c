@@ -712,7 +712,7 @@ void smurf_fit1d( int * status )
 
     /* Free resources */
     msgOutiff(MSG__DEBUG, " ", "Free data file resources", status);
-    smf_close_file( &data, status );
+    smf_close_file( NULL, &data, status );
     parndfs = astFree( parndfs );
     pardata = astFree( pardata );
   }
@@ -1737,7 +1737,7 @@ static void copy_parameter_ndfs ( smfArray *pardata, int *status )
 	errRep(" ",
 		"ERROR: IN ndf and %s differ in size or number of axes\n",
 		status );
-	smf_close_file( &cdata, status );
+	smf_close_file( NULL, &cdata, status );
       }
       if ( *status != SAI__OK ) goto CLEANUP2;
 

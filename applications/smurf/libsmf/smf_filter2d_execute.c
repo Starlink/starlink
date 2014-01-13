@@ -251,7 +251,7 @@ void smf_filter2d_execute( ThrWorkForce *wf, smfData *data, smfFilter *filt,
     }
 
     realfilter = smf_fft_data( wf, varfilt, NULL, 1, 0, status );
-    smf_close_file( &varfilt, status );
+    smf_close_file( wf, &varfilt, status );
 
     /* Square each element of the real-space filter and then transform
        back to the frequency domain and stuff into a smfFilter
@@ -308,8 +308,8 @@ void smf_filter2d_execute( ThrWorkForce *wf, smfData *data, smfFilter *filt,
     }
 
     /* Clean up */
-    if( realfilter ) smf_close_file( &realfilter, status );
-    if( vardata ) smf_close_file( &vardata, status );
+    if( realfilter ) smf_close_file( wf, &realfilter, status );
+    if( vardata ) smf_close_file( wf, &vardata, status );
     if( vfilt ) {
       vfilt->real = NULL;
       vfilt->imag = NULL;
@@ -323,7 +323,7 @@ void smf_filter2d_execute( ThrWorkForce *wf, smfData *data, smfFilter *filt,
   if( complement == -1 ) smf_filter_complement( filt, status );
 
   /* Clean up */
-  if( varfilt ) smf_close_file( &varfilt, status );
-  if( fdata ) smf_close_file( &fdata, status );
+  if( varfilt ) smf_close_file( wf, &varfilt, status );
+  if( fdata ) smf_close_file( wf, &fdata, status );
 
 }

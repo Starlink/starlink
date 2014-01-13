@@ -207,7 +207,7 @@ void smurf_smurfcopy ( int * status ) {
 
     if (*status == SAI__OK) {
       if (!data->file->isTstream  || data->ndims != 3) {
-        smf_close_file( &data, status );
+        smf_close_file( NULL, &data, status );
         *status = SAI__ERROR;
         errRep(" ", "Input data do not represent time series", status);
         break;
@@ -293,8 +293,8 @@ void smurf_smurfcopy ( int * status ) {
     }
 
     /* cleanup */
-    smf_close_file( &data, status );
-    smf_close_file( &odata, status );
+    smf_close_file( NULL, &data, status );
+    smf_close_file( NULL, &odata, status );
 
   }
 

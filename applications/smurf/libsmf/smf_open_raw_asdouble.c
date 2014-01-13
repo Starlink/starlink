@@ -138,6 +138,6 @@ smf_open_raw_asdouble( ThrWorkForce *wf, const Grp *igrp, size_t index,
   smf_apply_dark( *data, darks, status );
 
  CLEANUP:
-  if (indata) smf_close_file( &indata, status );
+  if (indata) smf_close_file( wf, &indata, status );
 
 }

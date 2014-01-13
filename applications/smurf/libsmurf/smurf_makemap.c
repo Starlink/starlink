@@ -1768,7 +1768,7 @@ void smurf_makemap( int *status ) {
       smf_fits_outhdr( data->hdr->fitshdr, &fchan, status );
 
       /* close the input file */
-      smf_close_file( &data, status );
+      smf_close_file( wf, &data, status );
     }
 
     /* Flush the provenance */
@@ -1888,9 +1888,9 @@ void smurf_makemap( int *status ) {
        closing the file, to avoid any chance of the changes introduced by
        smf_add_spectral_axis upsetting the behaviour of smf_close_file. */
     ndfClone( ondf, &tndf, status );
-    smf_close_file ( &tdata, status );
-    smf_close_file ( &wdata, status );
-    smf_close_file ( &odata, status );
+    smf_close_file ( wf, &tdata, status );
+    smf_close_file ( wf, &wdata, status );
+    smf_close_file ( wf, &odata, status );
 
     /* If required trim any remaining bad borders. Note, this will
        unmap the NDF, but we do not need access to the data arrays
@@ -1945,10 +1945,10 @@ void smurf_makemap( int *status ) {
   if( ogrp != NULL ) grpDelet( &ogrp, status);
   boxes = astFree( boxes );
   if( tiles ) tiles = smf_freetiles( tiles, ntile, status );
-  if( darks ) smf_close_related( &darks, status );
-  if( flatramps ) smf_close_related( &flatramps, status );
+  if( darks ) smf_close_related( wf, &darks, status );
+  if( flatramps ) smf_close_related( wf, &flatramps, status );
   if (heateffmap) heateffmap = smf_free_effmap( heateffmap, status );
-  if( bbms ) smf_close_related( &bbms, status );
+  if( bbms ) smf_close_related( wf, &bbms, status );
   if( keymap ) keymap = astAnnul( keymap );
 
   ndfEnd( status );

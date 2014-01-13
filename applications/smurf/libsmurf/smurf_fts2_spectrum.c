@@ -452,7 +452,7 @@ void smurf_fts2_spectrum(int* status)
 
         /* Close the file */
         if(inData) {
-            smf_close_file(&inData, status);
+            smf_close_file( NULL,&inData, status);
             if(*status != SAI__OK) {
                 *status = SAI__ERROR;
                 errRep(FUNC_NAME, "Unable to close the input file!", status);
@@ -467,7 +467,7 @@ void smurf_fts2_spectrum(int* status)
             errRep(FUNC_NAME, "Unable to write the output file!", status);
             goto CLEANUP;
         }
-        smf_close_file(&outData, status);
+        smf_close_file( NULL,&outData, status);
         if(*status != SAI__OK) {
             *status = SAI__ERROR;
             errRep(FUNC_NAME, "Unable to close the output file!", status);
@@ -484,14 +484,14 @@ CLEANUP:
 
     /* Close files if still open */
     if(inData) {
-        smf_close_file(&inData, status);
+        smf_close_file( NULL,&inData, status);
         if(*status != SAI__OK) {
             *status = SAI__ERROR;
             errRep(FUNC_NAME, "CLEANUP: Unable to close the input file!", status);
         }
     }
     if(outData) {
-        smf_close_file(&outData, status);
+        smf_close_file( NULL,&outData, status);
         if(*status != SAI__OK) {
             *status = SAI__ERROR;
             errRep(FUNC_NAME, "CLEANUP: Unable to close the output file!", status);

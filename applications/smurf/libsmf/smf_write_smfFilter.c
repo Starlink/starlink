@@ -151,6 +151,6 @@ void smf_write_smfFilter( ThrWorkForce *wf, const smfFilter *filt, const char *f
   smf_write_smfData( wf, data, NULL, filename, igrp, grpindex, 0, MSG__NORM,
                      0, status );
 
-  if( data ) smf_close_file( &data, status );
+  if( data ) smf_close_file( wf, &data, status );
 
 }

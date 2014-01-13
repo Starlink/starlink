@@ -321,8 +321,8 @@ smf_flat_standardpow( const smfData * bolvald, double refohms,
   if (powbol) powbol = astFree( powbol );
 
   if (*status != SAI__OK) {
-    if (*bolrefd) smf_close_file( bolrefd, status );
-    if (*powrefd) smf_close_file( powrefd, status );
+    if (*bolrefd) smf_close_file( NULL, bolrefd, status );
+    if (*powrefd) smf_close_file( NULL, powrefd, status );
   }
 
 }

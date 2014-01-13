@@ -247,7 +247,7 @@ void smf_getrefwcs( const char *param, Grp *igrp, AstFrameSet **specwcs,
             }
 
 /* Close the current input data file. */
-            smf_close_file( &data, status);
+            smf_close_file( NULL, &data, status);
          }
 
 /* If it is not "JSA", get the parameter value as an NDF. */

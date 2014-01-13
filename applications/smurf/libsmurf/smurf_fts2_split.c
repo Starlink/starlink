@@ -438,7 +438,7 @@ void smurf_fts2_split(int* status)
                 errRepf(TASK_NAME, "Error writing outData file", status);
                 goto CLEANUP;
             }
-            smf_close_file(&outData, status);
+            smf_close_file( NULL,&outData, status);
             if(*status != SAI__OK) {
                 errRepf(TASK_NAME, "Error closing outData file", status);
                 goto CLEANUP;
@@ -465,13 +465,13 @@ void smurf_fts2_split(int* status)
     if(MIRPOS)  { MIRPOS    = astFree(MIRPOS); }
 
     /* Close the file */
-    smf_close_file(&inData, status);
+    smf_close_file( NULL,&inData, status);
 
   }
   CLEANUP:
   /* Deallocate memory used by arrays */
-  if(inData)  { smf_close_file(&inData, status); }
-  if(outData) { smf_close_file(&outData, status); }
+  if(inData)  { smf_close_file( NULL,&inData, status); }
+  if(outData) { smf_close_file( NULL,&outData, status); }
 
   /* END NDF */
   ndfEnd(status);
