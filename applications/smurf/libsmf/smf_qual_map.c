@@ -150,6 +150,11 @@ smf_qual_t * smf_qual_map( ThrWorkForce *wf, int indf, const char mode[],
 
   if (*status != SAI__OK) return retval;
 
+  /* Ensure jobs submitted to the workforce within this function are
+     handled separately to any jobs submitted earlier (or later) by any
+     other function. */
+  thrBeginJobContext( wf, status );
+
   /* how many elements do we need */
   ndfSize( indf, &itemp, status );
   nout = itemp;
@@ -337,6 +342,9 @@ smf_qual_t * smf_qual_map( ThrWorkForce *wf, int indf, const char mode[],
     ndfUnmap( indf, "QUALITY", status );
   }
 
+  /* End the Thr job context */
+  thrEndJobContext( wf, status );
+
   if (family) *family = lfamily;
   return retval;
 }
@@ -383,22 +391,22 @@ static void smf1_qual_map( void *job_data_ptr, int *status ) {
    i2 = pdata->i2;
 
    if( pdata->operation == 1 ){
-      p1 = pdata->retval;
-      for( i = i1; i < i2; i++) {
+      p1 = pdata->retval + i1;
+      for( i = i1; i <= i2; i++) {
          *(p1++) = VAL__BADQ;
       }
 
    } else if( pdata->operation == 2 ){
-      p1 = pdata->retval;
-      p2 = pdata->qmap;
-      for( i = i1; i < i2; i++) {
+      p1 = pdata->retval + i1;
+      p2 = pdata->qmap + i1;
+      for( i = i1; i <= i2; i++) {
          *(p1++) = *(p2++);
       }
 
    } else if( pdata->operation == 3 ){
-      p1 = pdata->retval;
-      p2 = pdata->qmap;
-      for( i = i1; i < i2; i++,p1++,p2++) {
+      p1 = pdata->retval + i1;
+      p2 = pdata->qmap + i1;
+      for( i = i1; i <= i2; i++,p1++,p2++) {
 
 /* Output buffer would be set to zero but it already has that value so do
    nothing. */
