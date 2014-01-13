@@ -664,7 +664,7 @@ void smf_find_science(ThrWorkForce *wf, const Grp * ingrp, Grp **outgrp, int rev
                 /* get some memory for the ratio if we have not already.
                    We could get some memory once assuming each flat has the
                    same number of bolometers... */
-                ratio = smf_deepcopy_smfData( curresp, 0, 0, 0, 0, status );
+                ratio = smf_deepcopy_smfData( wf, curresp, 0, 0, 0, 0, status );
                 if( *status == SAI__OK ) {
 
                   /* divide: smf_divide_smfData ? */

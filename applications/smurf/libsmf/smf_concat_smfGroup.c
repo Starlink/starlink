@@ -592,7 +592,7 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
       /* If required return a deep copy of the first data being
          concatenated. */
       if( first && *first == NULL ) {
-        *first = smf_deepcopy_smfData( refdata, 0, 0, 0, 0, status );
+        *first = smf_deepcopy_smfData( wf, refdata, 0, 0, 0, 0, status );
       }
 
       /* Close the reference file */
@@ -624,7 +624,7 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
 
           /* Make a deepcopy since we are going to close the memory-mapped
              tmpdata. */
-          data = smf_deepcopy_smfData( tmpdata, 0, 0, 0, 0, status );
+          data = smf_deepcopy_smfData( wf, tmpdata, 0, 0, 0, 0, status );
         }
       }
 
@@ -710,7 +710,7 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
            then release the original. We copy the smfFile so that the
            flatfielding can report a file name associated with any failure. */
         } else if( israw ) {
-          refdata = smf_deepcopy_smfData( tmpdata, 1,  0, 0, 0,
+          refdata = smf_deepcopy_smfData( wf, tmpdata, 1,  0, 0, 0,
                                           status );
           smf_close_file( &tmpdata, status );
 
@@ -781,7 +781,7 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
             data = smf_create_smfData(SMF__NOCREATE_DA, status );
             if (refdata->da && data) {
               /* do not copy dark squids. We do that below */
-              data->da = smf_deepcopy_smfDA( refdata, 0, status );
+              data->da = smf_deepcopy_smfDA( wf, refdata, 0, status );
               da = data->da;
             }
 

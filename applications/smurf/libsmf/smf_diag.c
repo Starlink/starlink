@@ -247,7 +247,7 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
    if( ! array ) {
 
 /* Ensure we use the RES model ordering */
-      smf_model_dataOrder( dat, NULL, 0, SMF__RES|SMF__LUT|SMF__QUA,
+      smf_model_dataOrder( wf, dat, NULL, 0, SMF__RES|SMF__LUT|SMF__QUA,
                            dat->res[0]->sdata[0]->isTordered, status );
 
 /* We temporarily hijack the RES smfData to hold the AST model. */

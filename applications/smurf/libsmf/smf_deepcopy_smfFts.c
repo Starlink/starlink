@@ -100,7 +100,7 @@ smf_deepcopy_smfFts(const smfData* old, int* status)
   if(oldFts == NULL) { return NULL; }
 
   if(oldFts->zpd) {
-    zpd = smf_deepcopy_smfData(
+    zpd = smf_deepcopy_smfData( NULL,
               oldFts->zpd, 0,
               SMF__NOCREATE_VARIANCE |
               SMF__NOCREATE_QUALITY |
@@ -112,7 +112,7 @@ smf_deepcopy_smfFts(const smfData* old, int* status)
   }
 
   if(oldFts->fpm) {
-    fpm = smf_deepcopy_smfData(
+    fpm = smf_deepcopy_smfData( NULL,
               oldFts->fpm, 0,
               SMF__NOCREATE_VARIANCE |
               SMF__NOCREATE_QUALITY |
@@ -123,7 +123,7 @@ smf_deepcopy_smfFts(const smfData* old, int* status)
               0, 0, status);
   }
   if(oldFts->sigma) {
-    sigma = smf_deepcopy_smfData(
+    sigma = smf_deepcopy_smfData( NULL,
               oldFts->sigma, 0,
               SMF__NOCREATE_VARIANCE |
               SMF__NOCREATE_QUALITY |

@@ -265,7 +265,7 @@ void smf_calcmodel_noi( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   astMapGet0A( keymap, "NOI", &kmap );
 
   /* Assert bolo-ordered data */
-  smf_model_dataOrder( dat, allmodel, chunk, SMF__RES|SMF__QUA, 0, status );
+  smf_model_dataOrder( wf, dat, allmodel, chunk, SMF__RES|SMF__QUA, 0, status );
 
   /* Obtain pointers to relevant smfArrays for this chunk */
   res = dat->res[chunk];
@@ -423,7 +423,7 @@ void smf_calcmodel_noi( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
                  instate = res->sdata[idx]->hdr->allState;
                  res->sdata[idx]->hdr->allState = NULL;
               }
-              box = smf_deepcopy_smfData( res->sdata[idx], 0,
+              box = smf_deepcopy_smfData( wf, res->sdata[idx], 0,
                                           SMF__NOCREATE_DATA |
                                           SMF__NOCREATE_VARIANCE |
                                           SMF__NOCREATE_QUALITY,

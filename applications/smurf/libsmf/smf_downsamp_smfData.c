@@ -194,7 +194,7 @@ void smf_downsamp_smfData( ThrWorkForce *wf, const smfData *idata,
     idata->da->dksquid = NULL;
   }
 
-  *odata = smf_deepcopy_smfData( idata, 0, SMF__NOCREATE_DATA |
+  *odata = smf_deepcopy_smfData( wf, idata, 0, SMF__NOCREATE_DATA |
                                  SMF__NOCREATE_VARIANCE | SMF__NOCREATE_QUALITY,
                                  0, 0, status );
 
@@ -257,7 +257,7 @@ void smf_downsamp_smfData( ThrWorkForce *wf, const smfData *idata,
          so that smf_isfft can get the unambiguous real-space axis length
          when we do the inverse transform. */
 
-      fft_odata = smf_deepcopy_smfData( fft_idata, 0, SMF__NOCREATE_DATA |
+      fft_odata = smf_deepcopy_smfData( wf, fft_idata, 0, SMF__NOCREATE_DATA |
                                         SMF__NOCREATE_VARIANCE |
                                         SMF__NOCREATE_QUALITY |
                                         SMF__NOCREATE_FILE | SMF__NOCREATE_HEAD,
@@ -294,7 +294,7 @@ void smf_downsamp_smfData( ThrWorkForce *wf, const smfData *idata,
       /* Transform back to the time-domain and convert to the same order
          as the input */
       tempdata = smf_fft_data( NULL, fft_odata, NULL, 1, 0, status );
-      smf_dataOrder( tempdata, idata->isTordered, status );
+      smf_dataOrder( wf, tempdata, idata->isTordered, status );
 
       if( *status == SAI__OK ) {
         /* Copy over the data pointer and then null it in tempdata to

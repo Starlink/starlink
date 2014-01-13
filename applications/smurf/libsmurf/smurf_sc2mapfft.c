@@ -204,7 +204,7 @@ void smurf_sc2mapfft( int *status ) {
       size_t j;
       size_t ndata;
 
-      tempdata = smf_deepcopy_smfData( idata, 0, 0, 0, 0, status );
+      tempdata = smf_deepcopy_smfData( wf, idata, 0, 0, 0, 0, status );
       smf_close_file( &idata, status );
       idata = tempdata;
 

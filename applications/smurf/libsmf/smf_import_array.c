@@ -141,7 +141,7 @@ void smf_import_array( ThrWorkForce *wf, smfData *refdata, const char *name, int
 
 /* Ensure the smfData read from the NDF uses the same data ordering as the
    reference smfData. */
-   smf_dataOrder( data, refdata->isTordered, status );
+   smf_dataOrder( wf, data, refdata->isTordered, status );
    if( *status == SAI__OK ) {
 
 /* Check the data type and dimensions of the NDF are the same as the

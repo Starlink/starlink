@@ -412,7 +412,7 @@ void smf_calc_smoothedwvm ( ThrWorkForce *wf, const smfArray * alldata,
         thrdata = smf_create_smfArray( status );
         for (i=0;i<nrelated;i++) {
           smfData *tmpdata = NULL;
-          tmpdata = smf_deepcopy_smfData( (thesedata->sdata)[i], 0, SMF__NOCREATE_FILE |
+          tmpdata = smf_deepcopy_smfData( wf, (thesedata->sdata)[i], 0, SMF__NOCREATE_FILE |
                                           SMF__NOCREATE_DA |
                                           SMF__NOCREATE_FTS |
                                           SMF__NOCREATE_DATA |

@@ -540,7 +540,7 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
         }
 
         /* Assert the data order in the template */
-        smf_dataOrder( idata, isTordered, status );
+        smf_dataOrder( wf, idata, isTordered, status );
 
         /* Check that the template is time-varying data */
         if( *status == SAI__OK ) {

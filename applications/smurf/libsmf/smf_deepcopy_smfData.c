@@ -13,11 +13,14 @@
 *     Subroutine
 
 *  Invocation:
-*     new = smf_deepcopy_smfData( const smfData *old, const int rawconvert,
+*     new = smf_deepcopy_smfData( ThrWorkForce *wf, const smfData *old,
+*                                 const int rawconvert,
 *                                 const int flags, int assertOrder,
 *                                 int isTordered, int * status );
 
 *  Arguments:
+*     wf = ThrWorkForce * (Given)
+*        Pointer to a pool of worker threads (can be NULL)
 *     old = const smfData* (Given)
 *        Pointer to smfData to be copied
 *     rawconvert = const int (Given)
@@ -143,6 +146,7 @@
 #include "mers.h"
 #include "ndf.h"
 #include "prm_par.h"
+#include "star/thr.h"
 
 /* SMURF routines */
 #include "smf.h"
@@ -152,7 +156,7 @@
 #define FUNC_NAME "smf_deepcopy_smfData"
 
 smfData *
-smf_deepcopy_smfData( const smfData *old, const int rawconvert,
+smf_deepcopy_smfData( ThrWorkForce *wf, const smfData *old, const int rawconvert,
                       const int flags, int assertOrder, int isTordered,
                       int * status ) {
 
@@ -313,7 +317,7 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
         /* Use smf_dataOrder if we are re-ordering (this is guaranteed to
            be 3-D data). This routine also does typecasting if needed. */
 
-        pntr[i] = smf_dataOrder_array( old->pntr[i], oldtype, newtype, npts,
+        pntr[i] = smf_dataOrder_array( wf, old->pntr[i], oldtype, newtype, npts,
                                        ntslice, nbolo, tstr1, bstr1, tstr2,
                                        bstr2, 0, 0, status );
 
@@ -352,7 +356,7 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
 
     if( reOrder ) {
       /* Re-ordering copy */
-      qual = smf_dataOrder_array( old->qual, SMF__QUALTYPE, SMF__QUALTYPE, npts,
+      qual = smf_dataOrder_array( wf, old->qual, SMF__QUALTYPE, SMF__QUALTYPE, npts,
                                   ntslice, nbolo, tstr1, bstr1, tstr2,
                                   bstr2, 0, 0, status );
     } else {
@@ -403,7 +407,7 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
 
   /* Copy smfDA if desired */
   if (! (flags & SMF__NOCREATE_DA) )
-    da = smf_deepcopy_smfDA( old, 1, status );
+    da = smf_deepcopy_smfDA( wf, old, 1, status );
 
   /* Copy smfFts if desired */
   if(!(flags & SMF__NOCREATE_FTS)) {

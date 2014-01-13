@@ -231,7 +231,7 @@ void smurf_fts2_phasecorr(int* status)
 
     // READY OUTPUT FILE
     // =========================================================================
-    smfData* outputData = smf_deepcopy_smfData( inputData, 0,
+    smfData* outputData = smf_deepcopy_smfData( NULL, inputData, 0,
                                                 SMF__NOCREATE_DATA |
                                                 SMF__NOCREATE_FTS, 0, 0,
                                                 status);

@@ -196,7 +196,7 @@ void smfParallelTime( void *job_data_ptr, int *status ) {
 
       if( data->type == 0 ) {
         /* --- Re-order the data --- */
-        smf_dataOrder( array[i]->sdata[j], 0, status );
+        smf_dataOrder( NULL, array[i]->sdata[j], 0, status );
       }
 
       smf_get_dims( array[i]->sdata[j], NULL, NULL, &nbolo, &ntslice, &ndata,

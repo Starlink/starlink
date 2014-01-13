@@ -474,7 +474,7 @@ void smurf_sc2fft( int *status ) {
 
             if( inverse ) {
               /* If output is time-domain, ensure that it is ICD bolo-ordered */
-              smf_dataOrder( odata, 1, status );
+              smf_dataOrder( wf, odata, 1, status );
             } else if( polar ) {
               /* Store FFT of data in polar form */
               smf_fft_cart2pol( wf, odata, 0, power, status );

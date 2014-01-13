@@ -705,7 +705,7 @@ void smf_calcmodel_com_old( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   job_data = astCalloc( nw, sizeof(*job_data) );
 
   /* Assert bolo-ordered data */
-  smf_model_dataOrder( dat, NULL, chunk, SMF__RES|SMF__QUA|SMF__GAI|SMF__NOI, 0,
+  smf_model_dataOrder( wf, dat, NULL, chunk, SMF__RES|SMF__QUA|SMF__GAI|SMF__NOI, 0,
                        status );
 
 

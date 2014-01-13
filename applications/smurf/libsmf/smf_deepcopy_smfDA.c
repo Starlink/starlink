@@ -13,9 +13,11 @@
 *     Subroutine
 
 *  Invocation:
-*     newda = smf_deepcopy_smfDA( const smfData *old, int cpdks, int * status );
+*     newda = smf_deepcopy_smfDA( ThrWorkForce *wf, const smfData *old, int cpdks, int * status );
 
 *  Arguments:
+*     wf = ThrWorkForce * (Given)
+*        Pointer to a pool of worker threads (can be NULL)
 *     old = const smfData* (Given)
 *        Pointer to smfData containing smfDA to be copied
 *     cpdks = int (Given)
@@ -113,7 +115,7 @@
 #define FUNC_NAME "smf_deepcopy_smfDA"
 
 smfDA *
-smf_deepcopy_smfDA( const smfData *old, int cpdks, int * status ) {
+smf_deepcopy_smfDA( ThrWorkForce *wf, const smfData *old, int cpdks, int * status ) {
 
   smfData *dksquid = NULL;/* pointer to dark squid */
   double *flatcal = NULL; /* pointer to flatfield calibration */
@@ -168,7 +170,7 @@ smf_deepcopy_smfDA( const smfData *old, int cpdks, int * status ) {
   }
 
   if (cpdks && oldda->dksquid) {
-    dksquid = smf_deepcopy_smfData( oldda->dksquid, 0, SMF__NOCREATE_HEAD |
+    dksquid = smf_deepcopy_smfData( wf, oldda->dksquid, 0, SMF__NOCREATE_HEAD |
                                     SMF__NOCREATE_FILE | SMF__NOCREATE_DA |
                                     SMF__NOCREATE_FTS, 0, 0, status );
   }

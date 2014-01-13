@@ -192,7 +192,7 @@ void smurf_sc2filtermap( int *status ) {
     }
 
     smf_open_file( wf, wgrp, 1, "READ", SMF__NOTTSERIES, &tempdata, status );
-    wrefmap = smf_deepcopy_smfData( tempdata, 0, 0, 0, 0, status );
+    wrefmap = smf_deepcopy_smfData( wf, tempdata, 0, 0, 0, 0, status );
     smf_close_file( &tempdata, status );
 
     /* Set VAL__BADD to zero if requested */
@@ -237,7 +237,7 @@ void smurf_sc2filtermap( int *status ) {
     /* smf_filter_execute operates in-place, so first create the output
        data as a copy of the input */
 
-    odata = smf_deepcopy_smfData( idata, 0, 0, 0, 0, status );
+    odata = smf_deepcopy_smfData( wf, idata, 0, 0, 0, 0, status );
 
     /* Set VAL__BADD to zero if requested */
     if( (*status==SAI__OK) && zerobad ) {

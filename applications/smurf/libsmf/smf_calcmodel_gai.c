@@ -175,7 +175,7 @@ void smf_calcmodel_gai( ThrWorkForce *wf __attribute__((unused)),
   if (*status != SAI__OK) return;
 
   /* Ensure everything is in bolo-order */
-  smf_model_dataOrder( dat, allmodel, chunk, SMF__RES|SMF__QUA|SMF__NOI, 0, status );
+  smf_model_dataOrder( wf, dat, allmodel, chunk, SMF__RES|SMF__QUA|SMF__NOI, 0, status );
 
   /* Loop over index in subgrp (subarray) */
   for( idx=0; idx<res->ndat; idx++ ) {

@@ -192,7 +192,7 @@ void smf_calcmodel_smo( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   }
 
   /* Assert bolo-ordered data */
-  smf_model_dataOrder( dat, allmodel, chunk, SMF__RES|SMF__QUA,
+  smf_model_dataOrder( wf, dat, allmodel, chunk, SMF__RES|SMF__QUA,
                        0, status );
 
   smf_get_dims( res->sdata[0],  NULL, NULL, NULL, &ntslice,

@@ -325,7 +325,7 @@ void smurf_fts2_spectrum(int* status)
 
 
         /* Copy input data into output data */
-        outData = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA, 0, 0, status);
+        outData = smf_deepcopy_smfData(NULL, inData, 0, SMF__NOCREATE_DATA, 0, 0, status);
         outData->dtype   = SMF__DOUBLE;
         outData->ndims   = 3;
         outData->dims[0] = nWidth;

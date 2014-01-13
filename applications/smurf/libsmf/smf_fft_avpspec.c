@@ -169,7 +169,7 @@ smfData *smf_fft_avpspec( const smfData *pspec, smf_qual_t *quality,
   /* Create a new smfData, copying over everything except for the bolo
      data itself */
 
-  retdata = smf_deepcopy_smfData( pspec, 0, SMF__NOCREATE_DATA |
+  retdata = smf_deepcopy_smfData( NULL, pspec, 0, SMF__NOCREATE_DATA |
                                   SMF__NOCREATE_VARIANCE |
                                   SMF__NOCREATE_QUALITY |
                                   SMF__NOCREATE_FILE |

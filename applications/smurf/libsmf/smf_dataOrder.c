@@ -13,9 +13,11 @@
 *     C function
 
 *  Invocation:
-*     waschanged = smf_dataOrder( smfData *data, int isTordered, *status );
+*     waschanged = smf_dataOrder( ThrWorkForce *wf, smfData *data, int isTordered, *status );
 
 *  Arguments:
+*     wf = ThrWorkForce * (Given)
+*        Pointer to a pool of worker threads (can be NULL)
 *     data = smfData* (Given and Returned)
 *        Group of input data files
 *     isTordered = int (Given)
@@ -132,6 +134,7 @@
 #include "star/ndg.h"
 #include "prm_par.h"
 #include "par_par.h"
+#include "star/thr.h"
 
 /* SMURF includes */
 #include "libsmf/smf.h"
@@ -141,7 +144,8 @@
 
 #define FUNC_NAME "smf_dataOrder"
 
-int smf_dataOrder( smfData *data, int isTordered, int *status ) {
+int smf_dataOrder( ThrWorkForce *wf, smfData *data, int isTordered,
+                   int *status ) {
 
   /* Local Variables */
   size_t bstr1;                 /* bolometer index stride input */
@@ -246,14 +250,14 @@ int smf_dataOrder( smfData *data, int isTordered, int *status ) {
 
   /* Loop over elements of data->ptr and re-form arrays */
   for( i=0; i<2; i++ ) {
-    data->pntr[i] = smf_dataOrder_array( data->pntr[i], data->dtype,
+    data->pntr[i] = smf_dataOrder_array( wf, data->pntr[i], data->dtype,
                                          data->dtype, ndata,
                                          ntslice, nbolo, tstr1, bstr1, tstr2,
                                          bstr2, inPlace, freeold, status );
   }
 
   /* And Quality */
-  data->qual = smf_dataOrder_array( data->qual, SMF__QUALTYPE, SMF__QUALTYPE,
+  data->qual = smf_dataOrder_array( wf, data->qual, SMF__QUALTYPE, SMF__QUALTYPE,
                                     ndata, ntslice, nbolo, tstr1, bstr1, tstr2,
                                     bstr2, inPlace, freeold, status );
 
@@ -265,7 +269,7 @@ int smf_dataOrder( smfData *data, int isTordered, int *status ) {
   }
 
   /* If there is a LUT re-order it here */
-  data->lut = smf_dataOrder_array( data->lut, SMF__INTEGER, SMF__INTEGER, ndata,
+  data->lut = smf_dataOrder_array( wf, data->lut, SMF__INTEGER, SMF__INTEGER, ndata,
                                    ntslice, nbolo, tstr1, bstr1, tstr2, bstr2,
                                    inPlace, 1, status );
 
@@ -279,7 +283,7 @@ int smf_dataOrder( smfData *data, int isTordered, int *status ) {
   /* Force any external quality to same ordering */
   if (data->sidequal) {
     int qchanged = 0;
-    qchanged = smf_dataOrder( data->sidequal, isTordered, status );
+    qchanged = smf_dataOrder( wf, data->sidequal, isTordered, status );
     /* and indicate if we changed anything (but not if we did not) */
     if (qchanged) waschanged = qchanged;
   }

@@ -13,10 +13,12 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     smf_flatfield( smfData *idata, const smfArray * flats, AstKeyMap * heateffmap,
+*     smf_flatfield( ThrWorForce *wf, smfData *idata, const smfArray * flats, AstKeyMap * heateffmap,
 *                    smfData **odata, const int flags, int *status );
 
 *  Arguments:
+*     wf = ThrWorkForce * (Given)
+*        Pointer to a pool of worker threads (can be NULL)
 *     idata = smfData* (Given)
 *        Pointer to a smfData struct
 *     flats = const smfArray * (Given)
@@ -127,6 +129,7 @@
 #include "msg_par.h"
 #include "ast.h"
 #include "ndf.h"
+#include "star/thr.h"
 
 #include "smurf_par.h"
 #include "libsmf/smf.h"
@@ -134,7 +137,7 @@
 
 #define FUNC_NAME "smf_flatfield"
 
-void smf_flatfield ( const smfData *idata, const smfArray * flats, AstKeyMap * heateffmap,
+void smf_flatfield ( ThrWorkForce *wf, const smfData *idata, const smfArray * flats, AstKeyMap * heateffmap,
                      smfData **odata, const int flags, int *status ) {
 
   if ( *status != SAI__OK ) return;
@@ -170,7 +173,7 @@ void smf_flatfield ( const smfData *idata, const smfArray * flats, AstKeyMap * h
          (i.e. leave smfFile NULL) */
       /* Allocate space for *odata and all necessary cpts */
       /* Set the rawconvert flag to return doubles in the DATA array */
-      *odata = smf_deepcopy_smfData( idata, 1, flags, 0, 0, status );
+      *odata = smf_deepcopy_smfData( wf, idata, 1, flags, 0, 0, status );
     } else {
       /* OK, *odata exists */
       msgOutif(MSG__DEBUG1," ","Data not flatfielded, output data file exists.", status);

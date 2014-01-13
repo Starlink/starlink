@@ -306,7 +306,7 @@ void smf_check_smfData( const smfData *idata, smfData *odata, const int flags, i
   /* Check DA if desired */
   if (! (flags & SMF__NOCREATE_DA) ) {
     if ( odata->da == NULL && idata->da != NULL ) {
-      da = smf_deepcopy_smfDA( idata, 1, status );
+      da = smf_deepcopy_smfDA( NULL, idata, 1, status );
       if ( *status == SAI__OK ) {
         odata->da = da;
       } else {

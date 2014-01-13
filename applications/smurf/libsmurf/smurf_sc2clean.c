@@ -461,7 +461,7 @@ void smurf_sc2clean( int *status ) {
             smf_stripsuffix( com->sdata[idx]->file->name,
                              SMF__DIMM_SUFFIX, filename, status );
 
-            smf_dataOrder( com->sdata[idx], 1, status );
+            smf_dataOrder( wf, com->sdata[idx], 1, status );
 
             smf_write_smfData( wf, com->sdata[idx], NULL, filename, NULL, 0,
                                NDF__NOID, MSG__NORM, 0, status );
@@ -475,7 +475,7 @@ void smurf_sc2clean( int *status ) {
             smf_stripsuffix( gai->sdata[idx]->file->name,
                              SMF__DIMM_SUFFIX, filename, status );
 
-            smf_dataOrder( gai->sdata[idx], 1, status );
+            smf_dataOrder( wf, gai->sdata[idx], 1, status );
             smf_write_smfData( wf, gai->sdata[idx], NULL, filename, NULL, 0,
                                NDF__NOID, MSG__NORM, 0, status );
           }
@@ -509,7 +509,7 @@ void smurf_sc2clean( int *status ) {
       smf_puthistory( odata, "SMURF:SC2CLEAN", status );
 
       /* Ensure ICD data order */
-      smf_dataOrder( odata, 1, status );
+      smf_dataOrder( wf, odata, 1, status );
 
       if( odata->file && odata->file->name ) {
         smf_write_smfData( wf, odata, NULL, NULL, ogrp, gcount, NDF__NOID,

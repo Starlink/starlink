@@ -136,7 +136,7 @@ void smf_expmodel_init( const smfData *indata, smfData **outdata, int *status) {
      or associated file information. Also replace the tswcs with one
      appropriate for a full time series cube. */
 
-  data = smf_deepcopy_smfData( indata, 0, SMF__NOCREATE_DATA |
+  data = smf_deepcopy_smfData( NULL, indata, 0, SMF__NOCREATE_DATA |
                                SMF__NOCREATE_VARIANCE | SMF__NOCREATE_QUALITY |
                                SMF__NOCREATE_FILE | SMF__NOCREATE_DA |
                                SMF__NOCREATE_FTS, 0, 0,

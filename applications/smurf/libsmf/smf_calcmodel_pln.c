@@ -136,7 +136,7 @@ void smf_calcmodel_pln( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   lut = dat->lut[chunk];
 
   /* Assert ICD-ordered data */
-  smf_model_dataOrder( dat, allmodel, chunk, SMF__RES|SMF__QUA|SMF__LUT,
+  smf_model_dataOrder( wf, dat, allmodel, chunk, SMF__RES|SMF__QUA|SMF__LUT,
                        1, status );
 
   smf_get_dims( res->sdata[0],  NULL, NULL, NULL, NULL,

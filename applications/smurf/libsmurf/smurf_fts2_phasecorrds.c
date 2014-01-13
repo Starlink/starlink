@@ -346,7 +346,7 @@ void smurf_fts2_phasecorrds(int* status)
         dSigma = fNyquist / nFrames2;      /* Spectral sampling interval */
 
         /* Copy input data into output data */
-        outData = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
+        outData = smf_deepcopy_smfData( NULL, inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
         outData->dtype   = SMF__DOUBLE;
         outData->ndims   = 3;
         outData->dims[0] = nWidth;
@@ -358,7 +358,7 @@ void smurf_fts2_phasecorrds(int* status)
         /* DEBUG: Process default or alternative output type */
 #if DEBUG
         /* Copy input data into output data Interferogram Digitally Filtered Real DEBUG */
-        outDataIFGINR = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
+        outDataIFGINR = smf_deepcopy_smfData( NULL, inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
         outDataIFGINR->dtype   = SMF__DOUBLE;
         outDataIFGINR->ndims   = 3;
         outDataIFGINR->dims[0] = nWidth;
@@ -368,7 +368,7 @@ void smurf_fts2_phasecorrds(int* status)
         outDataIFGINR->pntr[0] = outDataIFGINR_pntr;
 
         /* Copy input data into output data Interferogram Digitally Filtered Real DEBUG */
-        outDataIFGDFR = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
+        outDataIFGDFR = smf_deepcopy_smfData( NULL, inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
         outDataIFGDFR->dtype   = SMF__DOUBLE;
         outDataIFGDFR->ndims   = 3;
         outDataIFGDFR->dims[0] = nWidth;
@@ -378,7 +378,7 @@ void smurf_fts2_phasecorrds(int* status)
         outDataIFGDFR->pntr[0] = outDataIFGDFR_pntr;
 
         /* Copy input data into output data Interferogram Digitally Filtered Imaginary DEBUG */
-        outDataIFGDFI = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
+        outDataIFGDFI = smf_deepcopy_smfData( NULL, inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
         outDataIFGDFI->dtype   = SMF__DOUBLE;
         outDataIFGDFI->ndims   = 3;
         outDataIFGDFI->dims[0] = nWidth;
@@ -388,7 +388,7 @@ void smurf_fts2_phasecorrds(int* status)
         outDataIFGDFI->pntr[0] = outDataIFGDFI_pntr;
 
         /* Copy input data into output data Spectrum Real DEBUG */
-        outDataSR = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
+        outDataSR = smf_deepcopy_smfData( NULL, inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
         outDataSR->dtype   = SMF__DOUBLE;
         outDataSR->ndims   = 3;
         outDataSR->dims[0] = nWidth;
@@ -398,7 +398,7 @@ void smurf_fts2_phasecorrds(int* status)
         outDataSR->pntr[0] = outDataSR_pntr;
 
         /* Copy input data into output data Spectrum Imaginary DEBUG */
-        outDataSI = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
+        outDataSI = smf_deepcopy_smfData( NULL, inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
         outDataSI->dtype   = SMF__DOUBLE;
         outDataSI->ndims   = 3;
         outDataSI->dims[0] = nWidth;
@@ -408,7 +408,7 @@ void smurf_fts2_phasecorrds(int* status)
         outDataSI->pntr[0] = outDataSI_pntr;
 
         /* Copy input data into output data Spectrum Phase DEBUG */
-        outDataSP = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
+        outDataSP = smf_deepcopy_smfData( NULL, inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
         outDataSP->dtype   = SMF__DOUBLE;
         outDataSP->ndims   = 3;
         outDataSP->dims[0] = nWidth;
@@ -418,7 +418,7 @@ void smurf_fts2_phasecorrds(int* status)
         outDataSP->pntr[0] = outDataSP_pntr;
 
         /* Copy input data into output data Phase Correction Function Real DEBUG */
-        outDataPCFR = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
+        outDataPCFR = smf_deepcopy_smfData( NULL, inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
         outDataPCFR->dtype   = SMF__DOUBLE;
         outDataPCFR->ndims   = 3;
         outDataPCFR->dims[0] = nWidth;
@@ -428,7 +428,7 @@ void smurf_fts2_phasecorrds(int* status)
         outDataPCFR->pntr[0] = outDataPCFR_pntr;
 
         /* Copy input data into output data Phase Correction Function Imaginary DEBUG */
-        outDataPCFI = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
+        outDataPCFI = smf_deepcopy_smfData( NULL, inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
         outDataPCFI->dtype   = SMF__DOUBLE;
         outDataPCFI->ndims   = 3;
         outDataPCFI->dims[0] = nWidth;
@@ -438,7 +438,7 @@ void smurf_fts2_phasecorrds(int* status)
         outDataPCFI->pntr[0] = outDataPCFI_pntr;
 
         /* Copy input data into output data Wave Numbers DEBUG */
-        outDataSPF = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
+        outDataSPF = smf_deepcopy_smfData( NULL, inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
         outDataSPF->dtype   = SMF__DOUBLE;
         outDataSPF->ndims   = 3;
         outDataSPF->dims[0] = nWidth;
@@ -448,7 +448,7 @@ void smurf_fts2_phasecorrds(int* status)
         outDataSPF->pntr[0] = outDataSPF_pntr;
 
         /* Copy input data into output data Wave Numbers DEBUG */
-        outDataWN = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
+        outDataWN = smf_deepcopy_smfData( NULL, inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
         outDataWN->dtype   = SMF__DOUBLE;
         outDataWN->ndims   = 3;
         outDataWN->dims[0] = nWidth;
@@ -458,7 +458,7 @@ void smurf_fts2_phasecorrds(int* status)
         outDataWN->pntr[0] = outDataWN_pntr;
 
         /* Copy input data into output data Weights DEBUG */
-        outDataWT = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
+        outDataWT = smf_deepcopy_smfData( NULL, inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
         outDataWT->dtype   = SMF__DOUBLE;
         outDataWT->ndims   = 3;
         outDataWT->dims[0] = nWidth;
@@ -468,7 +468,7 @@ void smurf_fts2_phasecorrds(int* status)
         outDataWT->pntr[0] = outDataWT_pntr;
 
         /* Copy input data into output data Spectrum Real phase Corrected DEBUG */
-        outDataSRC = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
+        outDataSRC = smf_deepcopy_smfData( NULL, inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
         outDataSRC->dtype   = SMF__DOUBLE;
         outDataSRC->ndims   = 3;
         outDataSRC->dims[0] = nWidth;
@@ -478,7 +478,7 @@ void smurf_fts2_phasecorrds(int* status)
         outDataSRC->pntr[0] = outDataSRC_pntr;
 
         /* Copy input data into output data Spectrum Imaginary phase Corrected DEBUG */
-        outDataSIC = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
+        outDataSIC = smf_deepcopy_smfData( NULL, inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
         outDataSIC->dtype   = SMF__DOUBLE;
         outDataSIC->ndims   = 3;
         outDataSIC->dims[0] = nWidth;
@@ -488,7 +488,7 @@ void smurf_fts2_phasecorrds(int* status)
         outDataSIC->pntr[0] = outDataSIC_pntr;
 #endif
         /* Copy input data into output data chi^2 goodness of fit */
-        outDataFPM = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
+        outDataFPM = smf_deepcopy_smfData( NULL, inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
         outDataFPM->dtype   = SMF__DOUBLE;
         outDataFPM->ndims   = 3;
         outDataFPM->dims[0] = nWidth;
@@ -498,7 +498,7 @@ void smurf_fts2_phasecorrds(int* status)
         outDataFPM->pntr[0] = outDataFPM_pntr;
 
         /* MORE.FTS2.ZPD */
-        zpd = smf_deepcopy_smfData(inData->fts->zpd, 0, SMF__NOCREATE_FTS, 0, 0, status);
+        zpd = smf_deepcopy_smfData( NULL, inData->fts->zpd, 0, SMF__NOCREATE_FTS, 0, 0, status);
         /* MORE.FTS2.FPM, Polynomial fit coefficients */
         fpm = smf_create_smfData(SMF__NOCREATE_DA | SMF__NOCREATE_FTS, status);
         fpm->dtype   = SMF__DOUBLE;

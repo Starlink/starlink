@@ -243,6 +243,10 @@ void smurf_fixsteps( int *status ) {
 /* begin an NDF context. */
    ndfBegin();
 
+/* Find the number of cores/processors available and create a pool of
+   threads of the same size. */
+   wf = thrGetWorkforce( thrGetNThread( SMF__THREADS, status ), status );
+
 /* Get the name of the input NDF. */
    kpg1Rgndf( "IN", 1, 1, "", &igrp, &size, status );
 
@@ -254,7 +258,7 @@ void smurf_fixsteps( int *status ) {
    smf_open_file( NULL, igrp, 1, "Read", 0, &indata, status );
 
 /* Since we will be modifying the data values, we need a deep copy. */
-   data = smf_deepcopy_smfData( indata, 0, 0, 0, 0, status );
+   data = smf_deepcopy_smfData( wf, indata, 0, 0, 0, 0, status );
 
 /* Place cleaning parameters into a keymap and set defaults. Note that we
    use the map-maker defaults file here so that we populate the locked
@@ -298,10 +302,6 @@ void smurf_fixsteps( int *status ) {
    parGet0d( "DCTHRESH", &dcthresh, status );
 
    parGet0l( "MEANSHIFT", &meanshift, status );
-
-/* Find the number of cores/processors available and create a pool of
-   threads of the same size. */
-   wf = thrGetWorkforce( thrGetNThread( SMF__THREADS, status ), status );
 
 /* Fix the steps. */
    smf_fix_steps( wf, data, dcthresh, dcsmooth, dcfitbox, dcmaxsteps,

@@ -1895,8 +1895,8 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
               /* Use the correct order */
               oldorder = res[0]->sdata[idx]->isTordered;
-              smf_dataOrder( res[0]->sdata[idx], 1, status );
-              smf_dataOrder( qua[0]->sdata[idx], 1, status );
+              smf_dataOrder( wf, res[0]->sdata[idx], 1, status );
+              smf_dataOrder( wf, qua[0]->sdata[idx], 1, status );
 
               /* Add a FITS header indicating that this is cleaned data. */
               smf_fits_updateI( res[0]->sdata[idx]->hdr, "PRECLNED", 1, NULL,
@@ -1912,8 +1912,8 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                                  MSG__VERB, 0, status );
 
               /* Revert the order */
-              smf_dataOrder( res[0]->sdata[idx], oldorder, status );
-              smf_dataOrder( qua[0]->sdata[idx], oldorder, status );
+              smf_dataOrder( wf, res[0]->sdata[idx], oldorder, status );
+              smf_dataOrder( wf, qua[0]->sdata[idx], oldorder, status );
             }
           }
         }
@@ -2059,7 +2059,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         if( *status == SAI__OK ) {
 
           /* Ensure we use the RES model ordering */
-          smf_model_dataOrder( &dat, NULL, 0, SMF__RES|SMF__LUT|SMF__QUA,
+          smf_model_dataOrder( wf, &dat, NULL, 0, SMF__RES|SMF__LUT|SMF__QUA,
                                res[0]->sdata[0]->isTordered, status );
 
           /* Loop over subgroup index (subarray), placing last map
@@ -2500,7 +2500,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       if( bolomap || shortmap || sampcube ) {
 
         /* Ensure we use the RES model ordering. */
-        smf_model_dataOrder( &dat, NULL, 0, SMF__RES|SMF__LUT|SMF__QUA,
+        smf_model_dataOrder( wf, &dat, NULL, 0, SMF__RES|SMF__LUT|SMF__QUA,
                              res[0]->sdata[0]->isTordered, status );
 
         for( idx=0; (idx<res[0]->ndat)&&(*status==SAI__OK); idx++ ){
@@ -2581,7 +2581,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       if( bolomap || shortmap || sampcube ) {
 
         /* Ensure we use the RES model ordering.  */
-        smf_model_dataOrder( &dat, NULL, 0, SMF__RES|SMF__LUT|SMF__QUA,
+        smf_model_dataOrder( wf, &dat, NULL, 0, SMF__RES|SMF__LUT|SMF__QUA,
                              res[0]->sdata[0]->isTordered, status );
 
         for( idx=0; (idx<res[0]->ndat)&&(*status==SAI__OK); idx++ ){
@@ -2661,9 +2661,9 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
            SMF__Q_BADB flag is encountered (if requested), and
            export */
         for( idx=0; idx<res[0]->ndat; idx++ ) {
-          smf_dataOrder( qua[0]->sdata[idx], 1, status );
-          smf_dataOrder( res[0]->sdata[idx], 1, status );
-          smf_dataOrder( lut[0]->sdata[idx], 1, status );
+          smf_dataOrder( wf, qua[0]->sdata[idx], 1, status );
+          smf_dataOrder( wf, res[0]->sdata[idx], 1, status );
+          smf_dataOrder( wf, lut[0]->sdata[idx], 1, status );
 
           /* Get quality array strides for smf_update_valbad */
           smf_get_dims( qua[0]->sdata[idx], NULL, NULL, &nbolo, &ntslice,
@@ -2675,7 +2675,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                some cases, like COM, there is only a file for one subarray,
                unlike RES from which the range of idx is derived */
             if( model[j][0]->sdata[idx] ) {
-              smf_dataOrder( model[j][0]->sdata[idx], 1, status );
+              smf_dataOrder( wf, model[j][0]->sdata[idx], 1, status );
               if( *status == SMF__WDIM ) {
                 /* fails if not 3-dimensional data. Just annul and write out
                    data as-is. */

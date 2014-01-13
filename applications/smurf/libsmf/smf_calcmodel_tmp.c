@@ -139,7 +139,7 @@ void smf_calcmodel_tmp( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   obj = NULL;
 
   /* Assert bolo-ordered data */
-  smf_model_dataOrder( dat, NULL, chunk, SMF__RES|SMF__QUA|SMF__NOI, 0,
+  smf_model_dataOrder( wf, dat, NULL, chunk, SMF__RES|SMF__QUA|SMF__NOI, 0,
                        status );
 
   /* Obtain pointers to relevant smfArrays for this chunk */

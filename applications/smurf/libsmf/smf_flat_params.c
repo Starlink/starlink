@@ -231,7 +231,7 @@ smf_flat_params( const smfData * refdata, const char resistpar[],
          duration of the data processing and can some times lead to issues when we attempt
          to close it an hour after we opened it (it's usually on an NFS disk) */
       if (*status == SAI__OK) {
-        *heateff = smf_deepcopy_smfData( heatefftmp, 0,
+        *heateff = smf_deepcopy_smfData( NULL, heatefftmp, 0,
                                          SMF__NOCREATE_FILE | SMF__NOCREATE_FTS |
                                          SMF__NOCREATE_DA,
                                          0, 0, status );

@@ -13,7 +13,6 @@
 *     Library routine
 
 *  Invocation:
-
 *     smf_filter2d_execute( ThrWorkForce *wf, smfData *data, smfFilter *filt,
 *                           int complement, int *status )
 
@@ -180,7 +179,7 @@ void smf_filter2d_execute( ThrWorkForce *wf, smfData *data, smfFilter *filt,
      since this will get us a useful container of the correct dimensions
      for the squared filter */
   if( data->pntr[1] ) {
-    varfilt = smf_deepcopy_smfData( fdata, 0, SMF__NOCREATE_VARIANCE |
+    varfilt = smf_deepcopy_smfData( wf, fdata, 0, SMF__NOCREATE_VARIANCE |
                                     SMF__NOCREATE_QUALITY |
                                     SMF__NOCREATE_FILE |
                                     SMF__NOCREATE_DA, 0, 0, status );
@@ -291,7 +290,7 @@ void smf_filter2d_execute( ThrWorkForce *wf, smfData *data, smfFilter *filt,
     }
 
     /* Now stuff the variance array into a smfData and filter it. */
-    vardata = smf_deepcopy_smfData( data, 0, SMF__NOCREATE_VARIANCE |
+    vardata = smf_deepcopy_smfData( wf, data, 0, SMF__NOCREATE_VARIANCE |
                                     SMF__NOCREATE_QUALITY |
                                     SMF__NOCREATE_FILE |
                                     SMF__NOCREATE_DA, 0, 0, status );

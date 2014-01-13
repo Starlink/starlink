@@ -154,7 +154,7 @@ void smf_calcmodel_dks( ThrWorkForce *wf __attribute__((unused)),
   }
 
   /* Assert bolo-ordered data */
-  smf_model_dataOrder( dat, NULL, chunk, SMF__RES|SMF__QUA|SMF__NOI, 0, status );
+  smf_model_dataOrder( wf, dat, NULL, chunk, SMF__RES|SMF__QUA|SMF__NOI, 0, status );
 
   /* Obtain pointers to relevant smfArrays for this chunk */
   res = dat->res[chunk];

@@ -368,7 +368,7 @@ void smurf_fts2_split(int* status)
             (nFramesOutPrev == 0 ||
               (nFramesOutPrev > 0 && nFramesOut > 0 && (double)hrFramesOut/(double)hrFramesOutPrev >= 0.5))) {
             /* Copy single scan NDF data from input to output */
-            outData = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
+            outData = smf_deepcopy_smfData(NULL, inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
             outData->dtype   = SMF__DOUBLE;
             outData->ndims   = 3;
             outData->dims[0] = nWidth;

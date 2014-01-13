@@ -99,7 +99,7 @@
 *     2011-10-26 (EC):
 *        Once again apply normalization here immediately after transforms.
 *     2013-12-02 (DSB):
-*        Changed so that it can be used on a smfData with no quality (e.g. the 
+*        Changed so that it can be used on a smfData with no quality (e.g. the
 *        COM model).
 
 *  Copyright:
@@ -547,7 +547,7 @@ void smf_filter_execute( ThrWorkForce *wf, smfData *data, smfFilter *filt,
   nw = wf ? wf->nworker : 1;
 
   /* Ensure that the smfData is ordered correctly (bolo ordered) */
-  smf_dataOrder( data, 0, status );
+  smf_dataOrder( wf, data, 0, status );
 
   /* Obtain the dimensions of the array being filtered */
   smf_get_dims( data, NULL, NULL, &nbolo, &ntslice, &ndata, NULL, NULL, status);

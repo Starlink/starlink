@@ -378,7 +378,7 @@ void smurf_fts2_init(int* status)
     smf_fits_updateD(inData->hdr, "OPDSTEP", dz, "OPD step size", status);
 
     /* Copy input data into output data */
-    outData = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA
+    outData = smf_deepcopy_smfData( NULL, inData, 0, SMF__NOCREATE_DATA
             | SMF__NOCREATE_FTS | SMF__NOCREATE_QUALITY, 0, 0, status);
     outData->dtype   = SMF__DOUBLE;
     outData->ndims   = 3;

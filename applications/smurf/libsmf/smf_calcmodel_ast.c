@@ -375,7 +375,7 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
     }
 
     /* Ensure everything is in the same data order */
-    smf_model_dataOrder( dat, NULL, chunk,SMF__LUT|SMF__RES|SMF__QUA,
+    smf_model_dataOrder( wf, dat, NULL, chunk,SMF__LUT|SMF__RES|SMF__QUA,
                          lut->sdata[0]->isTordered, status );
 
     /* Loop over index in subgrp (subarray) */

@@ -241,7 +241,7 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
 
 /* Ensure the data is bolo-ordered (i.e. adjacent values in memory are
    adjacent time slices from the same bolometer). */
-   smf_model_dataOrder( dat, NULL, chunk, SMF__RES|SMF__QUA|SMF__GAI|
+   smf_model_dataOrder( wf, dat, NULL, chunk, SMF__RES|SMF__QUA|SMF__GAI|
                         SMF__LUT, 0, status );
 
 /* Obtain pointers to relevant smfArrays for this chunk */

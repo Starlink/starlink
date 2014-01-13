@@ -272,7 +272,7 @@ int smf_open_and_flatfield ( ThrWorkForce *wf, const Grp *igrp, const Grp *ogrp,
       /* Note that we don't need to create a smfFile but we ask
        the new smfData to be a _DOUBLE using the rawconvert flag */
       flags |= SMF__NOCREATE_FILE;
-      *ffdata = smf_deepcopy_smfData( data, 1, flags, 0, 0, status );
+      *ffdata = smf_deepcopy_smfData( wf, data, 1, flags, 0, 0, status );
       if (*status != SAI__OK) {
         errRep( "", FUNC_NAME
                 ": Error, unable to allocate memory for new smfData",
@@ -287,7 +287,7 @@ int smf_open_and_flatfield ( ThrWorkForce *wf, const Grp *igrp, const Grp *ogrp,
 
     /* Flatfield the data */
     flags |= SMF__NOCREATE_FTS;
-    smf_flatfield( data, flatramps, heateffmap, ffdata, flags, status );
+    smf_flatfield( wf, data, flatramps, heateffmap, ffdata, flags, status );
 
     if (*status == SAI__OK) retval = 1;
 
@@ -304,7 +304,7 @@ int smf_open_and_flatfield ( ThrWorkForce *wf, const Grp *igrp, const Grp *ogrp,
     if ( *ffdata == NULL ) {
       /* Don't need the smfFile */
       flags |= SMF__NOCREATE_FILE;
-      *ffdata = smf_deepcopy_smfData( data, 0, flags, 0, 0, status );
+      *ffdata = smf_deepcopy_smfData( wf, data, 0, flags, 0, 0, status );
     } else {
       memcpy( ((*ffdata)->pntr)[0], (data->pntr)[0], npts * sizeof (double) );
     }

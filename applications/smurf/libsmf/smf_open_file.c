@@ -1557,7 +1557,7 @@ static void smf1_open_file_caller( void *data, int *status ){
    thisdata = *(pdata->data);
    if (thisdata && thisdata->file && thisdata->file->ndfid != NDF__NOID) {
      smfData *tmpdata = NULL;
-     tmpdata = smf_deepcopy_smfData( thisdata, 0, 0, 0, 0, status );
+     tmpdata = smf_deepcopy_smfData( NULL, thisdata, 0, 0, 0, 0, status );
      smf_close_file( pdata->data, status );
      *(pdata->data) = tmpdata;
    }

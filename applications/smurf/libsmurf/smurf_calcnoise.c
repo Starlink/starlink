@@ -691,7 +691,7 @@ void smurf_calcnoise( int *status ) {
             ndgNdfas( basegrp, gcount, "READ", &provid, status );
 
             /* Ensure ICD data order */
-            smf_dataOrder( thedata, 1, status );
+            smf_dataOrder( wf, thedata, 1, status );
 
             /* Write it out */
             smf_write_smfData( wf, thedata, NULL, NULL, tsgrp, gcount, provid,
