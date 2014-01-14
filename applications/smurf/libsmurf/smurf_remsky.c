@@ -262,7 +262,7 @@ void smurf_remsky( int * status ) {
       smf_open_and_flatfield( NULL, igrp, ogrp, i, darks, flatramps,
                               heateffmap, &odata, status );
       /* Mask out bad bolometers - mask data array not quality array */
-      smf_apply_mask( odata, bbms, SMF__BBM_DATA, 0, status );
+      smf_apply_mask( NULL, odata, bbms, SMF__BBM_DATA, 0, status );
       smf_close_file( NULL, &odata, status);
     }
     /* Group output files together now that they exist */
@@ -284,7 +284,7 @@ void smurf_remsky( int * status ) {
                               heateffmap, &odata, status );
 
       /* Mask out bad bolometers - mask data array not quality array */
-      smf_apply_mask( odata, bbms, SMF__BBM_DATA, 0, status );
+      smf_apply_mask( NULL, odata, bbms, SMF__BBM_DATA, 0, status );
 
       if (*status != SAI__OK) {
         /* Tell the user which file it was... */

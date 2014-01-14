@@ -496,7 +496,7 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
             if( !(oflag&SMF__NOCREATE_DATA) ) {
               smf_open_and_flatfield( wf, igroup->grp, NULL, idx, darks, flatramps,
                                       heateffmap, &idata, status );
-              smf_apply_mask( idata, bbms, SMF__BBM_DATA, 0, status );
+              smf_apply_mask( wf, idata, bbms, SMF__BBM_DATA, 0, status );
 
             } else {
               smf_open_file( wf, igroup->grp, idx, "READ", oflag, &idata, status );

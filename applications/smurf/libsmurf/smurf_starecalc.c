@@ -204,7 +204,7 @@ void smurf_starecalc ( int *status ) {
                             heateffmap, &data, status );
 
     /* Mask out bad bolometers - mask data array not quality array */
-    smf_apply_mask( data, bbms, SMF__BBM_DATA, 0, status );
+    smf_apply_mask( NULL, data, bbms, SMF__BBM_DATA, 0, status );
 
     smf_calc_stareimage( data, naver, status );
 

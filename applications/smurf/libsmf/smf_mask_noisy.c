@@ -185,7 +185,7 @@ void smf_mask_noisy( ThrWorkForce *wf, smfData *data, smfData **noise,
     smfArray *masks = smf_create_smfArray( status );
     if (masks) masks->owndata = 0;  /* someone else owns the smfData */
     smf_addto_smfArray( masks, noisemap, status );
-    smf_apply_mask( data, masks, SMF__BBM_QUAL, SMF__Q_NOISE,
+    smf_apply_mask( wf, data, masks, SMF__BBM_QUAL, SMF__Q_NOISE,
                     status );
     smf_close_related( wf, &masks, status );
   }

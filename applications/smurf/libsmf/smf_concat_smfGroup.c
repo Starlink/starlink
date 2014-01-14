@@ -737,7 +737,7 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
         }
 
         /* Apply bad bolometer mask */
-        smf_apply_mask( refdata, bbms, SMF__BBM_DATA, 0, status );
+        smf_apply_mask( wf, refdata, bbms, SMF__BBM_DATA, 0, status );
 
         /* Get reference dimensions/strides */
         smf_get_dims( refdata, NULL, NULL, &nbolo, &reftlenr, &refndata,

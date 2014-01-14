@@ -13,11 +13,13 @@
 *     C function
 
 *  Invocation:
-*     void smf_apply_mask( smfData *indata,
+*     void smf_apply_mask( ThrWorkForce *wf, smfData *indata,
 *                          const smfArray *bbms, smf_bbm_meth method,
 *                          smf_qual_t addqual, int *status)
 
 *  Arguments:
+*     wf = ThrWorkForce * (Given)
+*        Pointer to a pool of worker threads
 *     indata = smfData * (Given)
 *        Observation to be masked.
 *     bbms = smfArray * (Given)
@@ -110,7 +112,7 @@
 
 #define FUNC_NAME "smf_apply_mask"
 
-void smf_apply_mask( smfData *indata,
+void smf_apply_mask( ThrWorkForce *wf, smfData *indata,
                      const smfArray *bbms, smf_bbm_meth method,
                      smf_qual_t addqual, int *status) {
 
@@ -253,7 +255,7 @@ void smf_apply_mask( smfData *indata,
       masked = 1;
       if (qua) {
         if (method & SMF__BBM_QUAL) {
-          smf_update_quality( indata, 1, bbm->pntr[0], addqual, 0, status);
+          smf_update_quality( wf, indata, 1, bbm->pntr[0], addqual, 0, status);
         } else {
           /* just mask the first nelem items */
           smf_qual_t maskqual = SMF__Q_BADB | addqual;

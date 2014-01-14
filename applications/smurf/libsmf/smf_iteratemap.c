@@ -1567,7 +1567,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                smf_filter_mce( filt, 1, status );
              }
 
-             smf_update_quality( res[0]->sdata[idx], 1, NULL, 0, 0.05, status );
+             smf_update_quality( wf, res[0]->sdata[idx], 1, NULL, 0, 0.05, status );
              smf_filter_execute( wf, res[0]->sdata[idx], filt, 0, 0, status );
 
              filt = smf_free_smfFilter( filt, status );
@@ -1628,7 +1628,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         /* Ensure all bad values in the pre-cleaned data have a bad
            quality. */
         for( idx=0; idx<res[0]->ndat; idx++ ) {
-           smf_update_quality( res[0]->sdata[idx], 1, NULL, 0, 0.25, status );
+           smf_update_quality( wf, res[0]->sdata[idx], 1, NULL, 0, 0.25, status );
         }
 
         msgOut( "", FUNC_NAME ": *** Warning *** doclean=0, "

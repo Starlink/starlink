@@ -249,7 +249,7 @@ void smf_clean_smfArray( ThrWorkForce *wf, smfArray *array,
 
     /* Update quality by synchronizing to the data array VAL__BADD values */
     msgOutif(MSG__VERB,"", FUNC_NAME ": update quality", status);
-    smf_update_quality( data, 1, NULL, 0, badfrac, status );
+    smf_update_quality( wf, data, 1, NULL, 0, badfrac, status );
 
     /*** TIMER ***/
     msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME ":   ** %f s updating quality",
