@@ -7396,7 +7396,7 @@ static void CreateKeyword( AstFitsChan *this, const char *name,
 /* Copy the name supplied into the output array, converting to upper
    case. Leave space for two characters to encode a sequence
    number. Terminate the resulting string. */
-   for( nc = 0; name[ nc ] && ( nc < ( FITSNAMLEN - 2 ) ); nc++ ) {
+   for( nc = 0; ( nc < ( FITSNAMLEN - 2 ) ) && name[ nc ]; nc++ ) {
       keyword[ nc ] = toupper( name[ nc ] );
    }
    keyword[ nc ] = '\0';
