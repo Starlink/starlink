@@ -22,7 +22,9 @@
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
-*        Pointer to a pool of worker threads (can be NULL)
+*        Pointer to a pool of worker threads (can be NULL). [Currently
+*        unused since using multiple threads slows down the algorithm
+*        rather than speeding it up.]
 *     oldbuf = void * (Given and Returned)
 *        Pointer to the data buffer to be re-ordered. Also contains the
 *        re-ordered data if inPlace=1
@@ -240,6 +242,14 @@ void * smf_dataOrder_array( ThrWorkForce *wf, void * oldbuf, smf_dtype oldtype,
       memcpy( newbuf, oldbuf, sznew*ndata );
 
     } else {
+
+      /* We currently ignore any supplied WorkForce, since using multiple
+         threads slows down the re-ordered rather than speeding it up - I
+         presume because of contention issues. I've tried ensuring that
+         the output array is accessed sequenctially but that does not seem
+         to improve anything. Leave the mult-threaded infrastructure
+         here, in case a better solution is found. */
+      wf = NULL;
 
       /* How many threads do we get to play with */
       nw = wf ? wf->nworker : 1;
