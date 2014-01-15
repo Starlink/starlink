@@ -355,15 +355,15 @@ static void smf1_update_quality( void *job_data_ptr, int *status ) {
    if( pdata->operation == 1 ){
       p1 = pdata->ddata + i1;
       p2 = pdata->qual + i1;
-      for( i = i1; i <= i2; i++) {
-         if( *p1 == VAL__BADD ) *p2 |= SMF__Q_BADDA;
+      for( i = i1; i <= i2; i++,p2++) {
+         if( *(p1++) == VAL__BADD ) *p2 |= SMF__Q_BADDA;
       }
 
    } else if( pdata->operation == 2 ){
       p3 = pdata->idata + i1;
       p2 = pdata->qual + i1;
-      for( i = i1; i <= i2; i++) {
-         if( *p3 == VAL__BADI ) *p2 |= SMF__Q_BADDA;
+      for( i = i1; i <= i2; i++,p2++) {
+         if( *(p3++) == VAL__BADI ) *p2 |= SMF__Q_BADDA;
       }
 
    } else if( pdata->operation == 3 ){
@@ -381,17 +381,16 @@ static void smf1_update_quality( void *job_data_ptr, int *status ) {
       p2 = pdata->qual;
       p3 = pdata->idata;
       p4 = pdata->badmask;
-      if( p4 ) p4 += b1;
 
       for( i = b1; i <= b2; i++ ) {
          dim_t c = bstride * i;  /* constant offset for this bolometer */
          int isbad = 0;
 
 /* preset bad flag based on mask (if defined) */
-         if( p4 && *p4 == VAL__BADI) isbad = 1;
+         if( p4 && p4[ i ] == VAL__BADI) isbad = 1;
 
 /* Update badmask if badfrac specified */
-         if( p4 && !isbad ) {
+         if( ( badthresh < ntslice ) && !isbad ) {
             nbad = 0;
 
 /* Loop over samples and count the number with SMF__Q_BADDA set. Note that
