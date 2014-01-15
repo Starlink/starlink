@@ -458,7 +458,7 @@ def shell_quote(text):
    """
 
    if text != None:
-      if re.search( "^\s*\'(.*)\'\s*$",text):
+      if not re.search( "^\s*\'(.*)\'\s*$",text):
          return "'" + text.replace("'", "'\\''") + "'"
       else:
          return text
