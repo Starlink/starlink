@@ -151,15 +151,17 @@
 *        stored as undef FITS headers.
 *     2013 December 4 (MJC):
 *        Choose a non-blank value of MSBID if it is undefined.
+*     2014 January 13 (MJC):
+*        Change the case of OBSID and PROJECT to match ACSIS.
 
 *  Copyright:
-*     Copyright (C) 2008-2013 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2014 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 3 of
+*     published by the Free Software Foundation; either Version 3 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -170,7 +172,7 @@
 *     You should have received a copy of the GNU General Public
 *     License along with this program; if not, write to the Free
 *     Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-*     MA 02110-1301, USA
+*     MA 02110-1301, USA.
 
 *  Bugs:
 *-
@@ -560,7 +562,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   astSetFitsCM ( fitschan,
                  "---- OMP and ORAC-DR Specific ----", 0 );
 
-  astSetFitsS ( fitschan, "PROJECT", gsdVars->project,
+  astSetFitsS ( fitschan, "PROJECT", toupper( char( gsdVars->project ) ),
 	        "PATT number", 0 );
 
 /***** NOTE: possibly REDUCE_POINTING for spectral 5 points *****/
@@ -611,7 +613,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   astSetFitsF ( fitschan, "DUT1", gsdVars->obsUT1C,
                 "[d] UT1-UTC correction", 0 );
 
-  astSetFitsS ( fitschan, "OBSID", dateVars->obsID,
+  astSetFitsS ( fitschan, "OBSID", tolower( char( dateVars->obsID ) ),
                 "Unique observation identifier", 0 );
 
   astSetFitsS ( fitschan, "OBSIDSS", obsIDSS,
