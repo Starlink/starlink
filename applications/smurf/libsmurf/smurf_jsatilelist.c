@@ -46,13 +46,12 @@
 *        The JCMT instrument (different instruments have different
 *        tiling schemes and pixel sizes). The following instrument
 *        names are recognised (unambiguous abbreviations may be
-*        supplied): "SCUBA-2(450)", "SCUBA-2(850)", "HARP", "RxA",
-*        "RxWD", "RxWB". If one or more NDFs are supplied for parameter
-*        IN, then a dynamic default is determined if possible from the
-*        first NDF. If this cannot be done, or if a Region is supplied
-*        for parameter IN, then no dynamic default is provided, and the
-*        user is prompted for a value if none was supplied on the command
-*        line. []
+*        supplied): "SCUBA-2(450)", "SCUBA-2(850)", "ACSIS", "DAS". If one
+*        or more NDFs are supplied for parameter IN, then a dynamic default
+*        is determined if possible from the first NDF. If this cannot be
+*        done, or if a Region is supplied for parameter IN, then no dynamic
+*        default is provided, and the user is prompted for a value if none
+*        was supplied on the command line. []
 *     TILES(*) = _INTEGER (Write)
 *        An output parameter to which is written the list of integer tile
 *        indices.
@@ -74,8 +73,8 @@
 *     that the edges of each facet are parallel to X and Y (as in Fig.3 of
 *     the A&A paper "Mapping on the HEALPix grid" by Calabretta and Roukema).
 *     Each facet is then divided up into NxN tiles, where N is 64 for
-*     SCUBA-2 and 128 for HARP. Each tile is then divided into PxP pixels,
-*     where P is 412 for HARP, 825 for SCUBA-2 850 um, 1650 for SCUBA-2
+*     SCUBA-2 and 128 for ACSIS. Each tile is then divided into PxP pixels,
+*     where P is 412 for ACSIS, 825 for SCUBA-2 850 um, 1650 for SCUBA-2
 *     450 um. Facets are numbered from 0 to 11 as defined in the HEALPix
 *     paper (Gorsky et. al. 2005 ApJ 622, 759) (note that the facet six is
 *     split equally into two triangles, one at the bottom left and one at

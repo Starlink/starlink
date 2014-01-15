@@ -5,10 +5,8 @@ typedef enum {
   SMF__INST_NONE,
   SMF__INST_SCUBA_2_450,
   SMF__INST_SCUBA_2_850,
-  SMF__INST_HARP,
-  SMF__INST_RXA,
-  SMF__INST_RXWD,
-  SMF__INST_RXWB
+  SMF__INST_ACSIS,
+  SMF__INST_DAS
 } smf_inst_t;
 
 

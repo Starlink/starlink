@@ -205,7 +205,7 @@ void smf_getrefwcs( const char *param, Grp *igrp, AstFrameSet **specwcs,
                   }
 
                } else if( data->hdr->instrument == INST__ACSIS ) {
-                  inst = SMF__INST_HARP;
+                  inst = SMF__INST_ACSIS;
 
                } else if( *status == SAI__OK ) {
                   *status = SAI__ERROR;

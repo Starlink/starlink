@@ -69,12 +69,12 @@
 *     INSTRUMENT = LITERAL (Read)
 *        Indicates the JCMT instrument for which data is required. The
 *        following instrument names are recognised (unambiguous abbreviations
-*        may be supplied): "SCUBA-2(450)", "SCUBA-2(850)", "HARP", "RxA",
-*        "RxWD", "RxWB". NDFs containing co-added data for the selected
+*        may be supplied): "SCUBA-2(450)", "SCUBA-2(850)", "ACSIS", "DAS".
+*        NDFs containing co-added data for the selected
 *        instrument reside within a corresponding sub-directory of the
 *        directory specified by environment variable JSA_TILE_DIR. These
-*        sub-directories are called "scuba2-450", "scuba2-850", "harp",
-*        "rxa", "rxwd" and "rxwb".
+*        sub-directories are called "scuba2-450", "scuba2-850", "acsis",
+*        and "das".
 *     LOGFILE = LITERAL (Read)
 *        The name of the log file to create if GLEVEL is not NONE. The
 *        default is "<command>.log", where <command> is the name of the
@@ -175,8 +175,8 @@ try:
                                   exists=False, minsize=0, maxsize=1 ))
 
    params.append(starutil.ParChoice("INSTRUMENT",
-                                    ["SCUBA-2(450)", "SCUBA-2(850)", "HARP",
-                                    "RxA", "RxWD", "RxWB"],
+                                    ["SCUBA-2(450)", "SCUBA-2(850)", "ACSIS",
+                                    "DAS"],
                                     "The JCMT instrument", "SCUBA-2(850)"))
 
    params.append(starutil.Par0L("RETAIN", "Retain temporary files?", False,

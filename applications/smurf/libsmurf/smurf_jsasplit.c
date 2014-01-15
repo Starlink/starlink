@@ -36,11 +36,11 @@
 *        The JCMT instrument (different instruments have different
 *        tiling schemes and pixel sizes). The following instrument
 *        names are recognised (unambiguous abbreviations may be
-*        supplied): "SCUBA-2(450)", "SCUBA-2(850)", "HARP", "RxA",
-*        "RxWD", "RxWB".  The dynamic default is determined from the
-*        input NDF if possible. If this cannot be done, then no dynamic
-*        default is provided, and the user is prompted for a value if
-*        none was supplied on the command line. []
+*        supplied): "SCUBA-2(450)", "SCUBA-2(850)", "ACSIS", "DAS". The
+*        dynamic default is determined from the input NDF if possible.
+*        If this cannot be done, then no dynamic default is provided,
+*        and the user is prompted for a value if none was supplied on
+*        the command line. []
 *     JSATILELIST() = _INTEGER (Write)
 *        Returned holding the zero-based indicies of the created JSA
 *        tiles. The number of such indices is given the "NTILE" parameter

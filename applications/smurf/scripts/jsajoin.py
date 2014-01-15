@@ -108,7 +108,7 @@
 *     3-DEC-2013 (DSB):
 *        Original version.
 *     18-DEC-2013 (DSB):
-*        Use Gauss interpolation kernel if output pixels are larger than 
+*        Use Gauss interpolation kernel if output pixels are larger than
 #        input pixels.
 *-
 '''
@@ -196,15 +196,12 @@ try:
    tiles = parsys["TILES"].value
 
 #  Get the JCMT instrument to which the tiles relate by looking at the
-#  "INSTRUME" and "FILTER" FITS headers in the first tile. Check all
-#  tiles have the same value.
+#  "INSTRUME", "BACKEND" and "FILTER" FITS headers in the first tile. Check
+#  all tiles have the same value.
    instrument0 = None
    for tile in tiles:
       cval = starutil.get_fits_header( tile, "INSTRUME" )
-      if cval == "HARP":
-         instrument = "HARP"
-
-      elif cval == "SCUBA-2":
+      if cval == "SCUBA-2":
          cval = starutil.get_fits_header( tile, "FILTER" )
 
          if cval == "450":
@@ -220,13 +217,23 @@ try:
          else:
             raise starutil.InvalidParameterError("Tile {0} has no value for "
                                          "the FILTER header.".format(tile) )
-      elif cval != None:
-         raise starutil.InvalidParameterError("Tile {0} has an unknown "
-                        "value '{1}' for the INSTRUME header.".format(tile,cval) )
 
       else:
-         raise starutil.InvalidParameterError("Tile {0} has no value for "
-                                      "the INSTRUME header.".format(tile) )
+         cval = starutil.get_fits_header( tile, "BACKEND" )
+
+         if cval == "ACSIS":
+            instrument = "ACSIS"
+
+         elif cval == "DAS":
+            instrument = "DAS"
+
+         elif cval != None:
+            raise starutil.InvalidParameterError("Tile {0} has an unknown "
+                           "value '{1}' for the BACKEND header.".format(tile,cval) )
+
+         else:
+            raise starutil.InvalidParameterError("Tile {0} has no value for "
+                                         "the BACKEND header.".format(tile) )
 
       if instrument0 == None:
          instrument0 = instrument
