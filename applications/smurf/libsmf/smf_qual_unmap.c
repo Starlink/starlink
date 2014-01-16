@@ -386,7 +386,8 @@ smf_qual_t * smf_qual_unmap( ThrWorkForce *wf, int indf, smf_qfam_t family,
 
  CLEANUP:
   /* Tidy up */
-  if (qual) qual = astFree( qual );
+  qual = astFree( qual );
+  job_data = astFree( job_data );
   return NULL;
 
 }

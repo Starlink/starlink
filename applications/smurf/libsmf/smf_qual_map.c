@@ -345,6 +345,9 @@ smf_qual_t * smf_qual_map( ThrWorkForce *wf, int indf, const char mode[],
   /* End the Thr job context */
   thrEndJobContext( wf, status );
 
+  /* Free other resources. */
+  job_data = astFree( job_data );
+
   if (family) *family = lfamily;
   return retval;
 }
