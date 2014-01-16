@@ -38,6 +38,15 @@ extern "C" {
 /*  Required fraction of values in mode bin. */
 #define MODEFRAC 0.01
 
+/*  Number of good points required to attempt fits. */
+#define MINBIN 50
+
+/*  Maximum iterations for minisation */
+#define MAXITER 50
+
+/*  Convergence criteria for all fit parameters. */
+#define DELTA 1.0E-2
+
 /**  Histogram structure. */
 typedef struct Histogram {
     double width;           /* Data width of a bin */
@@ -45,12 +54,23 @@ typedef struct Histogram {
     int hist[NHIST];        /* The histogram */
     int mode;               /* Index of peak bin */
     int nbin;               /* Number of bins being used */
+    int ghist[NHIST];       /* The gaussian fit to histogram */
+    double gpeak;           /* Position of peak from Gaussian fit */
+    double gdpeak;          /* Error in position of Gaussian peak */
     double gfwhm;           /* FWHM of gaussian (bins) */
     double gsd;             /* Width of gaussian fit to histogram (bins) */
-    double peak;            /* Position of peak from parabolic fit */
+    double gdsd;            /* Error in width of gaussian fit */
+    double ppeak;           /* Position of peak from parabolic fit */
     double pfwhm;           /* FWHM of parabola (bins) */
     double psd;             /* Width of parabolic fit to histogram (bins) */
 } Histogram;
+
+/**  Structure for passing data into GSL minimising functions. */
+typedef struct FunctionData {
+    size_t n;
+    double *x;
+    double *y;
+} FunctionData;
 
 class XYHistogram {
 
@@ -71,8 +91,15 @@ public:
   //  Get the region that is to be used.
   void getRegion( int& x0, int& y0, int& x1, int& y1 );
 
-  //  Set whether image data is byte swapped
+  //  Set whether image data is byte swapped.
   void setSwap( const int swap ) { swap_ = swap; }
+
+  //  Use data limits of ImageIO instance.
+  void setDataLimits( const double low, const double high ) { 
+      low_ = low;
+      high_ = high;
+  }
+  void setUseDataLimits( const int datalimits ) { datalimits_ = datalimits; }
 
  protected:
 
@@ -88,6 +115,11 @@ public:
   //  Whether the image data is byte swapped (from the machine native
   //  form).
   int swap_;
+
+  //  Whether to use data limits.
+  int datalimits_;
+  double low_;
+  double high_;
 
   //  Get pixel value from 2D array, "span" is second dimension. Use a
   //  macro to define this and expand for all possible data types.
@@ -206,11 +238,20 @@ public:
   GENERATE_SWAPBADPIXA(double, VAL__BADD);
 
 
-
   //  Histogram analysis.
   void fitGauss( Histogram *histogram );
   void fitHistParabola( Histogram *histogram );
   void fitParabola( int n, double *x, double *y, double c[3] );
+
+  //  Safe lookup of histogram count.
+  inline int lookupHist_( Histogram *histogram, int index ) {
+      if ( index >= 0 && index < NHIST ) {
+          return histogram->hist[index];
+      }
+      return histogram->hist[index];
+      //return 0;
+  }
+
 
   //  Data type dependent definitions, use overloaded members.
 #define DATA_TYPE char

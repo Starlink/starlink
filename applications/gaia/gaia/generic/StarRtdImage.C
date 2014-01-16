@@ -348,7 +348,7 @@ public:
     { "usingxshm",       &StarRtdImage::usingxshmCmd,       0, 0 },
     { "volatile",        &StarRtdImage::volatileCmd,        0, 1 },
     { "xyprofile",       &StarRtdImage::xyProfileCmd,      14, 14},
-    { "xyhistogram",     &StarRtdImage::xyHistogramCmd,     9, 9}
+    { "xyhistogram",     &StarRtdImage::xyHistogramCmd,    12, 12}
 };
 
 
@@ -7043,11 +7043,20 @@ int StarRtdImage::xyProfileCmd(int argc, char *argv[])
 //
 //      xy_units   units of the rectangle coordinates.
 //
+//      datalimits whether to use the image low/high cuts to limit
+//                 data range.
+//
 //      xVector   (returned) name of a BLT vector to receive the
 //                histogram coordinates.
 //
 //      yVector   (returned) name of a BLT vector to receive the
 //                histogram counts.
+//
+//      gxVector  (returned) name of a BLT vector to receive the
+//                gaussian fit coordinates.
+//
+//      gyVector  (returned) name of a BLT vector to receive the
+//                gaussian fit counts.
 //
 //   Return:
 //      A list containing the number of positions written to the vectors,
@@ -7057,7 +7066,10 @@ int StarRtdImage::xyProfileCmd(int argc, char *argv[])
 //         peak position from parabolic fit
 //         count at parabolic peak position
 //         FWHM from parabolic fit
-//         FWHM from gaussian fit to parabolic position.
+//         peak position from gaussian fit
+//         error in peak position from gaussian fit
+//         sigma from gaussian fit
+//         error in sigma position from gaussian fit
 //-
 
 int StarRtdImage::xyHistogramCmd(int argc, char *argv[])
@@ -7094,6 +7106,15 @@ int StarRtdImage::xyHistogramCmd(int argc, char *argv[])
     //  Set the region of image to use.
     xyHistogram.setRegion( x0, y0, x1, y1 );
 
+    //  Whether to use the ImageIO data limits.
+    xyHistogram.setDataLimits( image_->lowCut(), image_->highCut() );
+    if ( *argv[7] == '0' ) {
+        xyHistogram.setUseDataLimits( 0 );
+    }
+    else {
+        xyHistogram.setUseDataLimits( 1 );
+    }
+
     //  Get the histogram.
     Histogram histogram;
     xyHistogram.extractHistogram( &histogram );
@@ -7110,17 +7131,32 @@ int StarRtdImage::xyHistogramCmd(int argc, char *argv[])
         }
         status = Blt_GraphElement( interp_, argv[0], argv[1],
                                    histogram.nbin*2, values,
-                                   argv[7], argv[8] );
+                                   argv[8], argv[9] );
+
+        //  Same for gaussian fit.
+        for ( int i = 0, j = 0; i < histogram.nbin; i++, j += 2 ) {
+            values[j] = i * histogram.width + histogram.zero;
+            values[j+1] = histogram.ghist[i];
+        }
+        status = Blt_GraphElement( interp_, argv[0], argv[1],
+                                   histogram.nbin*2, values,
+                                   argv[10], argv[11] );
         delete[] values;
     }
 
     set_result( histogram.nbin );
     append_element( histogram.mode * histogram.width + histogram.zero );
     append_element( histogram.hist[histogram.mode] );
-    append_element( round(histogram.peak) * histogram.width + histogram.zero );
-    append_element( histogram.hist[(int)round(histogram.peak)] );
+
+    append_element( histogram.ppeak * histogram.width + histogram.zero );
+    append_element( histogram.hist[(int)round(histogram.ppeak)] );
     append_element( histogram.pfwhm * histogram.width );
-    append_element( histogram.gfwhm * histogram.width );
+
+    append_element( histogram.gpeak * histogram.width + histogram.zero );
+    append_element( histogram.gdpeak* histogram.width );
+    append_element( histogram.gsd * histogram.width );
+    append_element( histogram.gdsd * histogram.width );
+
     return status;
 }
 

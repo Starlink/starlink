@@ -128,6 +128,26 @@ itcl::class gaia::GaiaXYHistogram {
          {Continuous updates} \
          {Change histogram during rectangle motion}
 
+      #  Add toggle for using data limits of main image.
+      $Options add checkbutton -label {Use data limits} \
+         -variable [scope itk_option(-use_data_limits)] \
+         -onvalue 1 \
+         -offvalue 0 \
+         -command [code $this toggle_use_data_limits_]
+      $short_help_win_ add_menu_short_help $Options \
+         {Use data limits} \
+         {Use the data limits of the main image to clip histogram range}
+
+      #  Display gaussian fit.
+      $Options add checkbutton -label {Display gaussian fit} \
+         -variable [scope itk_option(-show_gaussian_histogram)] \
+         -onvalue 1 \
+         -offvalue 0 \
+         -command [code $this toggle_show_gaussian_histogram_]
+      $short_help_win_ add_menu_short_help $Options \
+         {Display gaussian fit} \
+         {Display the gaussian git}
+
       #  Display the previous histogram.
       $Options add checkbutton -label {Display previous histogram} \
          -variable [scope itk_option(-show_last_histogram)] \
@@ -151,6 +171,19 @@ itcl::class gaia::GaiaXYHistogram {
       }
       add_menu_short_help $Options {Histogram color} \
          {Change the colour of the histogram}
+
+      $Options add cascade -label {Gaussian histogram color} \
+         -menu [menu $Options.gaussianhistogram]
+      foreach colour $simplecolours_ {
+         $Options.gaussianhistogram add radiobutton \
+             -background $colour \
+             -variable [scope itk_option(-gaussian_histogram_colour)] \
+             -value $colour \
+             -label {    } \
+             -command [code $this set_gaussian_histogram_colour_ $colour]
+      }
+      add_menu_short_help $Options {Gaussian histogram color} \
+         {Change the colour of the gaussian histogram}
 
       $Options add cascade -label {Previous histogram color} \
          -menu [menu $Options.lasthistogram]
@@ -177,6 +210,18 @@ itcl::class gaia::GaiaXYHistogram {
       }
       add_menu_short_help $Options {Histogram width} \
          {Set width of lines used to draw histogram}
+
+      $Options add cascade -label {Gaussian histogram width} \
+         -menu [menu $Options.gaussianwidth]
+      foreach i {1 2 3 4} {
+         $Options.gaussianwidth add radiobutton \
+            -value $i \
+            -bitmap width$i \
+            -variable [scope itk_option(-gaussian_histogram_width)] \
+            -command [code $this set_gaussian_histogram_width_ $i]
+      }
+      add_menu_short_help $Options {Gaussian histogram width} \
+         {Set width of lines used to draw gaussian histogram fit}
 
       $Options add cascade -label {Previous histogram width} \
          -menu [menu $Options.lastwidth]
@@ -215,7 +260,7 @@ itcl::class gaia::GaiaXYHistogram {
          blt::vector destroy $last_xVector_ $last_xiVector_
       }
       catch {
-         blt::vector destroy $dxVector_ $diVector_
+         blt::vector destroy $gxVector_ $giVector_
       }
 
       #  Remove rectangle.
@@ -299,7 +344,7 @@ itcl::class gaia::GaiaXYHistogram {
       #  Display derived results of various kinds.
       itk_component add intactual {
          util::LabelValue $itk_component(tableframe).intactual \
-            -text "Peak intensity:" \
+            -text "Peak:" \
             -labelfont $itk_option(-labelfont) \
             -valuefont $itk_option(-valuefont) \
             -labelwidth $lwidth \
@@ -309,7 +354,7 @@ itcl::class gaia::GaiaXYHistogram {
       }
       itk_component add countactual {
          util::LabelValue $itk_component(tableframe).countactual \
-            -text "count:" \
+            -text ":" \
             -labelfont $itk_option(-labelfont) \
             -valuefont $itk_option(-valuefont) \
             -labelwidth $lwidth \
@@ -320,7 +365,7 @@ itcl::class gaia::GaiaXYHistogram {
 
       itk_component add intfit {
          util::LabelValue $itk_component(tableframe).intfit \
-            -text "Peak intensity (fit):" \
+            -text "Parabolic fit:" \
             -labelfont $itk_option(-labelfont) \
             -valuefont $itk_option(-valuefont) \
             -labelwidth $lwidth \
@@ -330,7 +375,7 @@ itcl::class gaia::GaiaXYHistogram {
       }
       itk_component add countfit {
          util::LabelValue $itk_component(tableframe).countfit \
-            -text "count:" \
+            -text ":" \
             -labelfont $itk_option(-labelfont) \
             -valuefont $itk_option(-valuefont) \
             -labelwidth $lwidth \
@@ -349,9 +394,9 @@ itcl::class gaia::GaiaXYHistogram {
             -anchor e
       }
 
-      itk_component add fwhmgauss {
-         util::LabelValue $itk_component(tableframe).fwhmgauss \
-            -text "FWHM (gauss):" \
+      itk_component add intgauss {
+         util::LabelValue $itk_component(tableframe).intgauss \
+            -text "Gaussian fit:" \
             -labelfont $itk_option(-labelfont) \
             -valuefont $itk_option(-valuefont) \
             -labelwidth $lwidth \
@@ -359,6 +404,37 @@ itcl::class gaia::GaiaXYHistogram {
             -relief flat \
             -anchor e
       }
+      itk_component add intgausserr {
+         util::LabelValue $itk_component(tableframe).intgausserr \
+            -text "std:" \
+            -labelfont $itk_option(-labelfont) \
+            -valuefont $itk_option(-valuefont) \
+            -labelwidth $lwidth \
+            -valuewidth $vwidth \
+            -relief flat \
+            -anchor e
+      }
+      itk_component add sigmagauss {
+         util::LabelValue $itk_component(tableframe).sigmagauss \
+            -text "Sigma:" \
+            -labelfont $itk_option(-labelfont) \
+            -valuefont $itk_option(-valuefont) \
+            -labelwidth $lwidth \
+            -valuewidth $vwidth \
+            -relief flat \
+            -anchor e
+      }
+      itk_component add sigmagausserr {
+         util::LabelValue $itk_component(tableframe).sigmagausserr \
+            -text ":" \
+            -labelfont $itk_option(-labelfont) \
+            -valuefont $itk_option(-valuefont) \
+            -labelwidth $lwidth \
+            -valuewidth $vwidth \
+            -relief flat \
+            -anchor e
+      }
+
 
       blt::blttable $itk_component(tableframe) $itk_component(intactual) \
             1,0 -fill both
@@ -372,8 +448,14 @@ itcl::class gaia::GaiaXYHistogram {
       blt::blttable $itk_component(tableframe) $itk_component(fwhmfit) \
             2,2 -fill both
 
-      blt::blttable $itk_component(tableframe) $itk_component(fwhmgauss) \
-            3,2 -fill both
+      blt::blttable $itk_component(tableframe) $itk_component(intgauss) \
+            3,0 -fill both
+      blt::blttable $itk_component(tableframe) $itk_component(intgausserr) \
+            4,0 -fill both
+      blt::blttable $itk_component(tableframe) $itk_component(sigmagauss) \
+            3,1 -fill both
+      blt::blttable $itk_component(tableframe) $itk_component(sigmagausserr) \
+            4,1 -fill both
 
       #  Set axes labels.
       $xgraph_ xaxis configure -title {Intensity}
@@ -390,19 +472,28 @@ itcl::class gaia::GaiaXYHistogram {
          set last_xVector_ [blt::vector create \#auto]
          set last_iVector_ [blt::vector create \#auto]
 
-         #  Dummies for throwing away.
-         set dxVector_ [blt::vector create \#auto]
-         set diVector_ [blt::vector create \#auto]
+         #  Gaussian realisation.
+         set gxVector_ [blt::vector create \#auto]
+         set giVector_ [blt::vector create \#auto]
       }
+
       set symbol {}
-      $xgraph_ element create elem \
-         -xdata $xVector_ -ydata $iVector_ -symbol $symbol \
-         -color $itk_option(-histogram_colour)
 
       #  Last vectors for comparison. Only enabled when requested.
       $xgraph_ element create last_elem \
          -xdata $last_xVector_ -ydata $last_iVector_ -symbol $symbol \
-         -color $itk_option(-last_histogram_colour)
+         -color $itk_option(-last_histogram_colour) \
+         -smooth step
+
+      #  Gaussian fit. Only enabled when requested.
+      $xgraph_ element create gaussian_elem \
+         -xdata $gxVector_ -ydata $giVector_ -symbol $symbol \
+         -color $itk_option(-gaussian_histogram_colour)
+
+      #  Main graph element.
+      $xgraph_ element create elem \
+         -xdata $xVector_ -ydata $iVector_ -symbol $symbol \
+         -color $itk_option(-histogram_colour)
 
       #  Do the initial plot.
       add_notify_
@@ -447,15 +538,25 @@ itcl::class gaia::GaiaXYHistogram {
 
       #  Get the histogram.
       set results [$itk_option(-rtdimage) xyhistogram $xgraph_ elem \
-                      $x0_ $y0_ $x1_ $y1_ image \
-                      $xVector_ $iVector_]
+                      $x0_ $y0_ $x1_ $y1_ image $itk_option(-use_data_limits) \
+                      $xVector_ $iVector_ $gxVector_ $giVector_]
 
       $itk_component(intactual) config -value [lindex $results 1]
       $itk_component(countactual) config -value [lindex $results 2]
       $itk_component(intfit) config -value [lindex $results 3]
       $itk_component(countfit) config -value [lindex $results 4]
       $itk_component(fwhmfit) config -value [lindex $results 5]
-      $itk_component(fwhmgauss) config -value [lindex $results 6]
+
+      $itk_component(intgauss) config -value [lindex $results 6]
+      $itk_component(intgausserr) config -value [lindex $results 7]
+      $itk_component(sigmagauss) config -value [lindex $results 8]
+      $itk_component(sigmagausserr) config -value [lindex $results 9]
+
+      #  DEBUG
+      #set n [$xVector_ length]
+      #for {set i 0} {$i < $n} {incr i} {
+      #   puts "# [$xVector_ index $i] [$iVector_ index $i]"
+      #}
 
       return 0
    }
@@ -569,6 +670,13 @@ itcl::class gaia::GaiaXYHistogram {
       add_short_help $itk_component(print) \
          {Print histogram to a printer or disk file}
 
+      itk_component add refresh {
+         button $itk_component(bframe).refresh -text "Refresh" \
+            -command [code $this notify_cmd]
+      }
+      add_short_help $itk_component(refresh) \
+         {Refresh histogram using current limits etc.}
+
       itk_component add close {
          button $itk_component(bframe).close -text "Close" \
             -command [code $this close]
@@ -581,7 +689,7 @@ itcl::class gaia::GaiaXYHistogram {
       blt::blttable $itk_component(rframe) $itk_component(ymin) 0,2 -fill both
       blt::blttable $itk_component(rframe) $itk_component(ymax) 0,3 -fill both
 
-      pack $itk_component(print) $itk_component(close) \
+      pack $itk_component(print) $itk_component(refresh) $itk_component(close) \
          -side left -expand 1 -padx 1m -pady 1m
 
       pack $itk_component(rframe) -side top -fill x
@@ -625,31 +733,25 @@ itcl::class gaia::GaiaXYHistogram {
       notify_cmd
    }
 
-   #  Toggle whether to fix the Y axes ranges to the current limits.
-   protected method toggle_fix_data_range_ {} {
-      if { $fixed_ } {
-         $xdVector_ variable vec
-         set xmin $vec(min)
-         set xmax $vec(max)
-         $ydVector_ variable vec
-         set ymin $vec(min)
-         set ymax $vec(max)
+   #  Toggle if the data limits are used
+   protected method toggle_use_data_limits_ {} {
+      notify_cmd
+   }
 
-         $xgraph_ yaxis configure -min $xmin -max $xmax
-         $ygraph_ xaxis configure -min $ymin -max $ymax
-      } else {
-         $xgraph_ yaxis configure -min {} -max {}
-         $ygraph_ xaxis configure -min {} -max {}
+   #  Toggle display of the gaussian histogram.
+   protected method toggle_show_gaussian_histogram_ {} {
+      if { ! $itk_option(-show_gaussian_histogram) } {
+         $gxVector_ length 0
+         $giVector_ length 0
       }
+      notify_cmd
    }
 
    #  Toggle display of the last histogram.
    protected method toggle_show_last_histogram_ {} {
       if { ! $itk_option(-show_last_histogram) } {
-         $last_xxVector_ length 0
-         $last_xdVector_ length 0
-         $last_yyVector_ length 0
-         $last_ydVector_ length 0
+         $last_xVector_ length 0
+         $last_iVector_ length 0
       }
       notify_cmd
    }
@@ -664,6 +766,18 @@ itcl::class gaia::GaiaXYHistogram {
    protected method set_histogram_width_ {width} {
       configure -histogram_width $width
       $xgraph_ element configure elem -linewidth $width
+   }
+
+   #  Set the colour of the gaussian histogram.
+   protected method set_gaussian_histogram_colour_ {colour} {
+      configure -gaussian_histogram_colour $colour
+      $xgraph_ element configure gaussian_elem -color $colour
+   }
+
+   #  Set the line width of the gaussian histogram.
+   protected method set_gaussian_histogram_width_ {width} {
+      configure -gaussian_histogram_width $width
+      $xgraph_ element configure gaussian_elem -linewidth $width
    }
 
    #  Set the colour of the last histogram.
@@ -711,9 +825,10 @@ itcl::class gaia::GaiaXYHistogram {
    #  Canvas identifier of rectangle.
    itk_option define -rect_id rect_id Rect_Id {}
 
-   #  Whether changes in position of rectangle are continuous.
+   #  Whether changes in position of rectangle are continuous. False as
+   #  significant computation can be done.
    itk_option define -continuous_updates continuous_updates \
-      Continuous_updates 1
+      Continuous_updates 0
 
    #  Whether to show the peak lines.
    itk_option define -show_peak_lines show_peak_lines Show_Peak_Lines 0
@@ -742,17 +857,33 @@ itcl::class gaia::GaiaXYHistogram {
    itk_option define -image_peak_width image_peak_width \
       Image_Peak_Width 1
 
+   #  Colour for the gaussian histogram.
+   itk_option define -gaussian_histogram_colour gaussian_histogram_colour \
+      Gaussian_Histogram_Colour green
+
+   #  Line width for the gaussian histogram.
+   itk_option define -gaussian_histogram_width gaussian_histogram_width \
+      Gaussian_Histogram_Width 1
+
+   #  Whether to display the gaussian histogram fit for reference.
+   itk_option define -show_gaussian_histograms show_gaussian_histograms \
+      Show_Gaussian_Histograms 1
+
    #  Colour for the previous histograms.
    itk_option define -last_histogram_colour last_histogram_colour \
       Last_Histogram_Colour red
 
    #  Line width for the previous histograms.
    itk_option define -last_histogram_width last_histogram_width \
-         Last_Histogram_Width 1
+      Last_Histogram_Width 1
 
    #  Whether to display the previous histograms for reference.
    itk_option define -show_last_histograms show_last_histograms \
       Show_Last_Histograms 0
+
+   #  Whether to use data limits for histogram.
+   itk_option define -use_data_limits use_data_limits \
+      Use_Data_Limits 1
 
    #  Protected variables: (available to instance)
    #  --------------------
@@ -763,6 +894,9 @@ itcl::class gaia::GaiaXYHistogram {
    #  X histogram BLT vectors.
    protected variable xVector_ {}
    protected variable iVector_ {}
+
+   protected variable gxVector_ {}
+   protected variable giVector_ {}
 
    protected variable last_xVector_ {}
    protected variable last_iVector_ {}

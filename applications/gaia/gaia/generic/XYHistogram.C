@@ -15,7 +15,8 @@
  *     create the histogram of the data values for a given region of the
  *     image. The histogram is assumed to be peaked and has a background
  *     estimation performed by fitting a parabola to get a best peak position
- *     and a gaussian to determine the width.
+ *     and a least squares gaussian to determine the width and a second
+ *     estimate of the position.
 
  *  Authors:
  *     P.W. Draper (PWD)
@@ -55,6 +56,14 @@
 #include <cstring>
 #include <cstdlib>
 #include <cfloat>
+
+/* GSL for fit */
+#include <gsl/gsl_rng.h>
+#include <gsl/gsl_randist.h>
+#include <gsl/gsl_vector.h>
+#include <gsl/gsl_blas.h>
+#include <gsl/gsl_multifit_nlin.h>
+
 #include "define.h"
 #include "XYHistogram.h"
 
@@ -67,7 +76,10 @@ XYHistogram::XYHistogram( const ImageIO imio )
      y0_(0),
      x1_(0),
      y1_(0),
-     swap_(0)
+     swap_(0),
+     datalimits_(0),
+     low_(-DBL_MAX),
+     high_(DBL_MAX)
 {
 }
 
@@ -122,87 +134,95 @@ void XYHistogram::extractHistogram( Histogram *histogram )
     int x1 = min( nx, max( x1_, x0_ ) ) - 1;
     int y1 = min( ny, max( y1_, y0_ ) ) - 1;
 
+    //  Get data limits, if used. Note these are unscaled.
+    double low = -DBL_MAX;
+    double high = DBL_MAX;
+    if ( datalimits_ ) {
+        low = (low_ - bzero) / bscale;
+        high = (high_ - bzero) / bscale;
+    }
+
     //  Create the histograms. Call appropriate member for data format.
     switch ( type ) {
     case BYTE_IMAGE:
         if ( swap_ ) {
             extractSwapImage( (unsigned char *) image, nx, ny, bscale, bzero,
-                              x0, y0, x1, y1, histogram );
+                              low, high, x0, y0, x1, y1, histogram );
         } else {
             extractNativeImage( (unsigned char *) image, nx, ny, bscale, bzero,
-                                x0, y0, x1, y1, histogram );
+                                low, high, x0, y0, x1, y1, histogram );
         }
         break;
     case X_IMAGE:
         if ( swap_ ) {
-            extractSwapImage( (char *) image, nx, ny, bscale,
-                              bzero, x0, y0, x1, y1, histogram );
+            extractSwapImage( (char *) image, nx, ny, bscale, bzero, 
+                              low, high, x0, y0, x1, y1, histogram );
         } else {
-            extractNativeImage( (char *) image, nx, ny,
-                                bscale, bzero, x0, y0, x1, y1,
-                                histogram );
+            extractNativeImage( (char *) image, nx, ny, bscale, bzero, 
+                                low, high, x0, y0, x1, y1, histogram );
         }
         break;
     case USHORT_IMAGE:
         if ( swap_ ) {
             extractSwapImage( (ushort *) image, nx, ny, bscale, bzero,
-                              x0, y0, x1, y1, histogram );
+                              low, high, x0, y0, x1, y1, histogram );
         } else {
-            extractNativeImage( (ushort *) image, nx, ny, bscale,
-                                bzero, x0, y0, x1, y1, histogram );
+            extractNativeImage( (ushort *) image, nx, ny, bscale, bzero, 
+                                low, high, x0, y0, x1, y1, histogram );
         }
         break;
     case SHORT_IMAGE:
         if ( swap_ ) {
-            extractSwapImage( (short *) image, nx, ny, bscale, bzero, x0, y0,
-                              x1, y1, histogram );
+            extractSwapImage( (short *) image, nx, ny, bscale, bzero, 
+                              low, high, x0, y0, x1, y1, histogram );
         } else {
-            extractNativeImage( (short *) image, nx, ny, bscale,
-                                bzero, x0, y0, x1, y1, histogram );
+            extractNativeImage( (short *) image, nx, ny, bscale, bzero, 
+                                low, high, x0, y0, x1, y1, histogram );
         }
         break;
     case LONG_IMAGE:
         if ( swap_ ) {
-            extractSwapImage( (int *) image, nx, ny, bscale,
-                              bzero, x0, y0, x1, y1, histogram );
+            extractSwapImage( (int *) image, nx, ny, bscale, bzero, 
+                              low, high, x0, y0, x1, y1, histogram );
         } else {
-            extractNativeImage( (int *) image, nx, ny, bscale,
-                                bzero, x0, y0, x1, y1, histogram );
+            extractNativeImage( (int *) image, nx, ny, bscale, bzero, 
+                                low, high, x0, y0, x1, y1, histogram );
         }
         break;
     case LONGLONG_IMAGE:
         if ( swap_ ) {
-            extractSwapImage( (INT64 *) image, nx, ny, bscale,
-                              bzero, x0, y0, x1, y1, histogram );
+            extractSwapImage( (INT64 *) image, nx, ny, bscale, bzero, 
+                              low, high, x0, y0, x1, y1, histogram );
         } else {
-            extractNativeImage( (INT64 *) image, nx, ny, bscale,
-                                bzero, x0, y0, x1, y1, histogram );
+            extractNativeImage( (INT64 *) image, nx, ny, bscale, bzero, 
+                                low, high, x0, y0, x1, y1, histogram );
         }
         break;
     case FLOAT_IMAGE:
         if ( swap_ ) {
             extractSwapImage( (float *) image, nx, ny, bscale, bzero,
-                              x0, y0, x1, y1, histogram );
+                              low, high, x0, y0, x1, y1, histogram );
         } else {
-            extractNativeImage( (float *) image, nx, ny, bscale,
-                                bzero, x0, y0, x1, y1, histogram );
+            extractNativeImage( (float *) image, nx, ny, bscale, bzero, 
+                                low, high, x0, y0, x1, y1, histogram );
         }
         break;
     case DOUBLE_IMAGE:
         if ( swap_ ) {
             extractSwapImage( (double *) image, nx, ny, bscale, bzero,
-                              x0, y0, x1, y1, histogram );
+                              low, high, x0, y0, x1, y1, histogram );
         } else {
-            extractNativeImage( (double *) image, nx, ny, bscale,
-                                bzero, x0, y0, x1, y1, histogram );
+            extractNativeImage( (double *) image, nx, ny, bscale, bzero, 
+                                low, high, x0, y0, x1, y1, histogram );
         }
         break;
     }
 
-
-    //  Now do the analysis.
-    fitHistParabola( histogram );
-    fitGauss( histogram );
+    //  Now do the analysis, if we have any chance of success.
+    if ( histogram->nbin > MINBIN ) {
+        fitHistParabola( histogram );
+        fitGauss( histogram );
+    }
 }
 
 /**
@@ -261,11 +281,11 @@ void XYHistogram::fitHistParabola( Histogram *histogram )
     fitParabola( ngood, x, y, coeff );
 
     /*  Record peak bin. */
-    histogram->peak = -0.5 * coeff[1] / coeff[2];
+    histogram->ppeak = -0.5 * coeff[1] / coeff[2];
 
     /*  Expected count for that bin. */
-    double peak = coeff[0] + coeff[1] * histogram->peak +
-                  coeff[2] * histogram->peak * histogram->peak;
+    double peak = coeff[0] + coeff[1] * histogram->ppeak +
+                  coeff[2] * histogram->ppeak * histogram->ppeak;
 
     /*  Half peak value for FWHM est. */
     peak *= 0.5;
@@ -370,147 +390,198 @@ void XYHistogram::fitParabola( int n, double *x, double *y, double c[3] )
     c[2] = m_c / d;
 }
 
+
 /**
- *  Fits a gaussian to histogram data with known peak to determine the
- *  standard deviation.
+ *  Support functions for Gaussian fitting. 
+ **/
+static int Gaussian_f( const gsl_vector *v, void *data, gsl_vector *f )
+{
+    size_t n = ((FunctionData *)data)->n;
+    double *x = ((FunctionData *)data)->x;
+    double *y = ((FunctionData *)data)->y;
+
+    double sigma = gsl_vector_get( v, 2 );
+    double x0 = gsl_vector_get( v, 1 );
+    double A = gsl_vector_get( v, 0 );
+
+    double sigmasq = sigma * sigma;
+
+    for ( size_t i = 0; i < n; i++ ) {
+        double dx = x[i] - x0;
+        double dy = A * exp( -0.5 * dx * dx / sigmasq ) - y[i];
+        gsl_vector_set( f, i, dy );
+    }
+    return GSL_SUCCESS;
+}
+
+static int Gaussian_df( const gsl_vector *v, void *data, gsl_matrix *J )
+{
+    size_t n = ((FunctionData *)data)->n;
+    double *x = ((FunctionData *)data)->x;
+
+    double sigma = gsl_vector_get( v, 2 );
+    double x0 = gsl_vector_get( v, 1 );
+    double A = gsl_vector_get( v, 0 );
+
+    for ( size_t i = 0; i < n; i++ ) {
+        double rbys = ( x[i] - x0 ) / sigma;
+        double yy = exp( -0.5 * rbys * rbys );
+
+        gsl_matrix_set( J, i, 2, A * yy * rbys * rbys / sigma );
+        gsl_matrix_set( J, i, 1, A * yy * rbys / sigma );
+        gsl_matrix_set( J, i, 0, yy );
+    }
+    return GSL_SUCCESS;
+}
+
+static int Gaussian_fdf( const gsl_vector *v, void *data,
+                         gsl_vector *f, gsl_matrix *J )
+{
+    Gaussian_f( v, data, f );
+    Gaussian_df( v, data, J );
+    return GSL_SUCCESS;
+}
+
+/**
+ *  Non-linear least squares fit of a Gaussian to the distribution.
+ *  Requires a guess at the peak position and width (from the parabola fit).
  *
- *  The routine uses a logarithmic transformation of a histogram of values to
- *  fit a gaussian whose peak position is known. This routine just determines
- *  the standard deviation of the fit.  An iterative refinement of the fit is
- *  performed to reduce the effects of non-gaussian outliers.
- *
- *  The iterative refinement is performed three times. Each time data outside
- *  of 95% of the peak count level are removed from the sums.
- *
- *  The standard deviation of the gaussian is determined using a logarithmic
- *  transformation of the equation:
- *
- *    y = Io * exp( -0.5* ( (x-Xo) /sigma ) **2 )
- *
- *  which breaks down to:
- *
- *    Y = ln( Io ) + (X/sigma)**2
- *
- *  where Y = ln(y) and X=(x-Xo).
- *
- *  A least squares solution to this gives:
- *
- *    2*sigma**2 = S(X*X)/(n*C-S(Y))
- *
- *  where:
- *     S() = sum of
- *     n = number of values
- *     C = ln(Io)
- *
- *  histogram of values to fit the gaussian  on return the sd field of this
- *  will be updated. 
+ *  On return the gaussian fields of the given histogram structure this
+ *  will be updated.
  *
  */
 void XYHistogram::fitGauss( Histogram *histogram )
 {
-    /*  Get the position of the peak count. */
-    double peak = histogram->peak;
+    /*  Get the initial guesses. */
+    double peak = histogram->ppeak;
+    double width = histogram->psd;
+    double scale = lookupHist_( histogram, (int)round(histogram->ppeak));
 
-    /*  Take the natural logarithm. */
-    double lnpeak = log( peak );
+    /*  Trap nan issues, assuming any indicate complete failure. */
+    if ( isnan( width ) || isnan( peak ) || isnan( width ) ) {
+        width = histogram->nbin * 0.05;
+        peak = histogram->mode;
+        scale = histogram->hist[histogram->mode];
+    }
 
-    /*  Set fraction of SD to convert into 95% of peak intensity. */
-    double frac = sqrt( -2.0 * log( 0.05 ) );
-    
-    /*  Set the range of bins to consider when determining fit. Look for the
-     *  nearest left and right bins with 5% of the number count of the modal
-     *  bin. */
+    /*  Set the range of bins to consider when determining fit and not using
+     *  user set limits. Look for the nearest left and right bins with 5% of
+     *  the number count of the modal bin, attempt to reduce weight of
+     *  interesting parts of image, and any badly masked parts. 
+     */
     double limit = 0.05 * peak;
-    int start = 1;
-    int iend = histogram->nbin;
+    int start = 0;
+    int iend = histogram->nbin - 1;
 
-    /*  Upper half */
-    for ( int i = histogram->mode; i < histogram->nbin; i++ ) {
-        if ( histogram->hist[ i ] != 0 ) {
-            if ( histogram->hist[i] <= limit ) {
-                iend = i;
-                break;
+    if ( ! datalimits_ ) {
+        /*  Upper half */
+        for ( int i = histogram->mode; i < histogram->nbin; i++ ) {
+            if ( histogram->hist[ i ] != 0 ) {
+                if ( histogram->hist[i] <= limit ) {
+                    iend = i;
+                    break;
+                }
+            }
+        }
+
+        /*  Lower half */
+        for ( int i = histogram->mode; i >= 0; i-- ) {
+            if ( histogram->hist[ i ] != 0 ) {
+                if ( histogram->hist[i] <= limit ) {
+                    start = i;
+                    break;
+                }
             }
         }
     }
 
-    /*  Lower half */
-    for ( int i = histogram->mode; i >= 0; i-- ) {
-        if ( histogram->hist[ i ] != 0 ) {
-            if ( histogram->hist[i] <= limit ) {
-                start = i;
-                break;
-            }
+    /*  Extract data. */
+    size_t ncount = iend - start + 1;
+    double *y = new double[ncount];
+    double *x = new double[ncount];
+    ncount = 0;
+    for ( int j = start, i = 0; j <= iend; j++, i++ ) {
+        if ( histogram->hist[ j ] != 0 ) {
+            y[i] = (double) histogram->hist[ j ];
+            x[i] = (double) j;
+            ncount++;
         }
     }
 
-    /*  Loop determining the gaussian standard deviation until the required
-     *  number of iterations has been performed or the standard deviation is
-     *  not changed by one bin. */
-    double change;
-    double denom = 0.0;
-    double sdold = 0.0;
-    double x = 0.0;
-    double xsum = 0.0;
-    double y = 0.0;
-    double ysum = 0.0;
-    int ncount = 0;
-    int range = 0;
-    for ( int i = 0; i < 3; i++ ) {
-        /*  Form the current estimate of the deviation. */
-        ncount = 0;
-        ysum = 0.0;
-        xsum = 0.0;
-        for ( int j = start; j <= iend; j++ ) {
-            if ( histogram->hist[ j ] != 0 ) {
-                y = (double) histogram->hist[ j ];
-                ysum = ysum + log( y );
-                x = (double)( j - histogram->mode );
-                xsum += x * x;
-                ncount += 1;
-            }
-        }
+    /*  Need sufficient points to be worthwhile. */
+    if ( ncount < MINBIN ) {
+        delete[] x;
+        delete[] y;
+        return;
+    }
 
-        /*  Form the sigma estimate. */
-        denom = (double) ncount * lnpeak - ysum;
-        if ( denom != 0.0 ) {
-            histogram->gsd = xsum / ( (double) ncount * lnpeak - ysum );
-            histogram->gsd = sqrt( fabs( histogram->gsd / 2.0 ) );
-        }
-        else {
-            /*  Force another iteration. */
-            histogram->gsd = sdold + 2.0;
-        }
+    /*  Use non-linear least squares solver from GSL library, lots of
+     *  setup required... */
+    const gsl_multifit_fdfsolver_type *T;
+    const size_t n = ncount;
+    const size_t p = 3;
+    gsl_multifit_fdfsolver *s;
+    int status;
+    int iter = 0;
 
-        /*  Now look at change from last estimate. */
-        if ( i != 1 ) {
-            change = histogram->gsd - sdold;
-        }
-        else {
-            change = 2.0;
-        }
+    gsl_matrix *covar = gsl_matrix_alloc( p, p );
+    FunctionData data = { n, x, y };
+    gsl_multifit_function_fdf f;
+    double x_init[3] = { scale, peak, width };
+    gsl_vector_view guess = gsl_vector_view_array( x_init, p );
 
-        if ( fabs( change ) > 1.0 ) {
+    /*  Register callable functions that evaluate the Gaussian. */
+    f.f = &Gaussian_f;
+    f.df = &Gaussian_df;
+    f.fdf = &Gaussian_fdf;
 
-            /*  Try again. Set the range of bins so that 95% of the current
-             *  gaussian is used. */
-            range = round( histogram->gsd * frac );
-            start = max( 1, min( ( histogram->mode - range ),
-                                 histogram->nbin ) );
-            iend = max( 1, min( ( histogram->mode + range ),
-                                histogram->nbin ) );
+    f.n = n;
+    f.p = p;
+    f.params = &data;
 
-            /*  Record the current SD estimate. */
-            sdold = histogram->gsd;
-        }
-        else {
-            /*  End the refinement. */
+    T = gsl_multifit_fdfsolver_lmsder;
+    s = gsl_multifit_fdfsolver_alloc( T, n, p );
+    gsl_multifit_fdfsolver_set( s, &f, &guess.vector );
+
+    do {
+        iter++;
+        status = gsl_multifit_fdfsolver_iterate( s );
+        if ( status ) {
             break;
         }
+        status = gsl_multifit_test_delta( s->dx, s->x, DELTA, DELTA );
     }
+    while ( status == GSL_CONTINUE && iter < MAXITER );
+
+    /*  Gather fits and use covariance to estimate errors (weights not
+     *  used so these will not be great). */
+    gsl_multifit_covar( s->J, 0.0, covar );
+
+    double chi = gsl_blas_dnrm2( s->f );
+    double dof = n - p;
+    double c = GSL_MAX_DBL( 1, chi / sqrt( dof ) );
+
+    scale = gsl_vector_get( s->x, 0 );
+    histogram->gpeak = gsl_vector_get( s->x, 1 );
+    histogram->gdpeak = c * sqrt( gsl_matrix_get( covar, 1, 1 ) );
+    histogram->gsd = gsl_vector_get( s->x, 2 );
+    histogram->gdsd = c * sqrt( gsl_matrix_get( covar, 2, 2 ) );
+
+    gsl_multifit_fdfsolver_free( s );
+    gsl_matrix_free( covar );
+    delete[] x;
+    delete[] y;
 
     /* Sigma to FWHM */
     histogram->gfwhm = histogram->gsd * 2.35;
+
+    /* Full evaluation for reference. */
+    double sigmasq = (histogram->gsd * histogram->gsd);
+    for ( int i = 0; i < histogram->nbin; i++ ) {
+        double dx = (double) i - histogram->gpeak;
+        histogram->ghist[i] = 
+            (int) round( scale * exp( -0.5 * dx * dx / sigmasq ) );
+    }
 }
 
 /*  Define members that are data type dependent. See XYHistogramTemplates.icc

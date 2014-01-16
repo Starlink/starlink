@@ -8,7 +8,7 @@
  *  Copyright:
  *     Copyright (C) 2015 Science and Technology Research Council.
  *     All Rights Reserved.
- 
+
  *  Licence:
  *     This program is free software; you can redistribute it and/or
  *     modify it under the terms of the GNU General Public License as
@@ -27,7 +27,7 @@
  */
 
 /*
- *  Create an optimised histogram of an array from a sub region of image data. 
+ *  Create an optimised histogram of an array from a sub region of image data.
  *  Native format image data version.
  *
  *  This routine forms a histogram of an array of data values. The histogram
@@ -54,12 +54,12 @@
  */
 void XYHistogram::extractNativeImage( const DATA_TYPE *image, const int nx,
                                       const int ny, const double bscale,
-                                      const double bzero, const int x0,
-                                      const int y0, const int x1,
-                                      const int y1, 
+                                      const double bzero,
+                                      const double low, const double high,
+                                      const int x0, const int y0, const int x1,
+                                      const int y1,
                                       Histogram *histogram )
 {
-    DATA_TYPE value;             /* Current value */
     double dv;                   /* Current value */
     double dmax;                 /* Data maximum */
     double dmin;                 /* Data minimum */
@@ -85,28 +85,38 @@ void XYHistogram::extractNativeImage( const DATA_TYPE *image, const int nx,
     if ( w < 1 || h < 1 ) {
         return;
     }
-    long size = w * h;
+    long count = 0;
 
-    /*  Find the minimum and maximum values in the array. */
+    /*  Find the minimum and maximum values in the array. Also count good and
+     *  valid pixels. */
     dmin = DBL_MAX;
     dmax = -DBL_MAX;
     for ( j = y0; j <= y1; j++ ) {
         for ( i = x0; i <= x1; i++ ) {
             if ( ! badpix( image, nx, i, j ) ) {
                 dv = arrayVal( image, nx, i, j );
-                dmin = min( dmin, dv );
-                dmax = max( dmax, dv );
+                if ( dv >= low && dv <= high ) {
+                    dmin = min( dmin, dv );
+                    dmax = max( dmax, dv );
+                    count++;
+                }
             }
         }
     }
 
     /*  Check that array was not single valued. */
-    if ( dmin == dmax ) {
+    if ( dmin == dmax || count == 0 ) {
         return;
     }
 
     /*  Convert MODEFRAC into a count for the mode bin. */
-    minbin = (int) ( MODEFRAC * (double) size );
+    minbin = (int) ( MODEFRAC * (double) count );
+
+    /*  Use datalimits, if given. */
+    if ( low != -DBL_MAX ) {
+        dmin = low;
+        dmax = high;
+    }
 
     /*  Clear the histogram of any previous values. */
     for ( i = 0; i < NHIST; i++ ) {
@@ -120,8 +130,10 @@ void XYHistogram::extractNativeImage( const DATA_TYPE *image, const int nx,
         for ( i = x0; i <= x1; i++ ) {
             if ( ! badpix( image, nx, i, j ) ) {
                 dv = arrayVal( image, nx, i, j );
-                idiff = (int) round( scale * ( dv - dmin ) );
-                histogram->hist[ idiff ] += 1;
+                if ( dv >= low && dv <= high ) {
+                    idiff = (int) round( scale * ( dv - dmin ) );
+                    histogram->hist[ idiff ] += 1;
+                }
             }
         }
     }
@@ -183,8 +195,10 @@ void XYHistogram::extractNativeImage( const DATA_TYPE *image, const int nx,
             for ( i = x0; i <= x1; i++ ) {
                 if ( ! badpix( image, nx, i, j ) ) {
                     dv = arrayVal( image, nx, i, j );
-                    idiff = (int) round( scale * ( dv - dmin ) );
-                    histogram->hist[ idiff ] += 1;
+                    if ( dv >= low && dv <= high ) {
+                        idiff = (int) round( scale * ( dv - dmin ) );
+                        histogram->hist[ idiff ] += 1;
+                    }
                 }
             }
         }
@@ -203,8 +217,10 @@ void XYHistogram::extractNativeImage( const DATA_TYPE *image, const int nx,
     /*  Update histogram with results. */
     histogram->mode = mode;
     histogram->nbin = nbin;
-    histogram->width = width;
-    histogram->zero = zero;
+
+    /*  Adjust these for FITS bscale and bzero. */
+    histogram->width = width * bscale;
+    histogram->zero = zero + bzero;
 }
 
 
@@ -213,12 +229,12 @@ void XYHistogram::extractNativeImage( const DATA_TYPE *image, const int nx,
  */
 void XYHistogram::extractSwapImage( const DATA_TYPE *image, const int nx,
                                     const int ny, const double bscale,
-                                    const double bzero, const int x0,
-                                    const int y0, const int x1,
+                                    const double bzero,
+                                    const double low, const double high,
+                                    const int x0, const int y0, const int x1,
                                     const int y1,
                                     Histogram *histogram )
 {
-    DATA_TYPE value;             /* Current value */
     double dv;                   /* Current value */
     double dmax;                 /* Data maximum */
     double dmin;                 /* Data minimum */
@@ -244,28 +260,32 @@ void XYHistogram::extractSwapImage( const DATA_TYPE *image, const int nx,
     if ( w < 1 || h < 1 ) {
         return;
     }
-    long size = w * h;
+    long count = 0;
 
-    /*  Find the minimum and maximum values in the array. */
+    /*  Find the minimum and maximum values in the array. Also count good and
+     *  valid pixels. */
     dmin = DBL_MAX;
     dmax = -DBL_MAX;
     for ( j = y0; j <= y1; j++ ) {
         for ( i = x0; i <= x1; i++ ) {
             if ( ! badpix( image, nx, i, j ) ) {
                 dv = swapArrayVal( image, nx, i, j );
-                dmin = min( dmin, dv );
-                dmax = max( dmax, dv );
+                if ( dv >= low && dv <= high ) {
+                    dmin = min( dmin, dv );
+                    dmax = max( dmax, dv );
+                    count++;
+                }
             }
         }
     }
 
     /*  Check that array was not single valued. */
-    if ( dmin == dmax ) {
+    if ( dmin == dmax || count == 0 ) {
         return;
     }
 
     /*  Convert MODEFRAC into a count for the mode bin. */
-    minbin = (int) ( MODEFRAC * (double) size );
+    minbin = (int) ( MODEFRAC * (double) count );
 
     /*  Clear the histogram of any previous values. */
     for ( i = 0; i < NHIST; i++ ) {
@@ -279,8 +299,10 @@ void XYHistogram::extractSwapImage( const DATA_TYPE *image, const int nx,
         for ( i = x0; i <= x1; i++ ) {
             if ( ! badpix( image, nx, i, j ) ) {
                 dv = swapArrayVal( image, nx, i, j );
-                idiff = (int) round( scale * ( dv - dmin ) );
-                histogram->hist[ idiff ] += 1;
+                if ( dv >= low && dv <= high ) {
+                    idiff = (int) round( scale * ( dv - dmin ) );
+                    histogram->hist[ idiff ] += 1;
+                }
             }
         }
     }
@@ -342,8 +364,10 @@ void XYHistogram::extractSwapImage( const DATA_TYPE *image, const int nx,
             for ( i = x0; i <= x1; i++ ) {
                 if ( ! badpix( image, nx, i, j ) ) {
                     dv = swapArrayVal( image, nx, i, j );
-                    idiff = (int) round( scale * ( dv - dmin ) );
-                    histogram->hist[ idiff ] += 1;
+                    if ( dv >= low && dv <= high ) {
+                        idiff = (int) round( scale * ( dv - dmin ) );
+                        histogram->hist[ idiff ] += 1;
+                    }
                 }
             }
         }
@@ -362,6 +386,8 @@ void XYHistogram::extractSwapImage( const DATA_TYPE *image, const int nx,
     /*  Update histogram with results. */
     histogram->mode = mode;
     histogram->nbin = nbin;
-    histogram->width = width;
-    histogram->zero = zero;
+
+    /*  Adjust these for FITS bscale and bzero. */
+    histogram->width = width * bscale;
+    histogram->zero = zero + bzero;
 }
