@@ -272,6 +272,8 @@
 *        - Fix bug that caused NOI model to be ignored on all iterations.
 *        - Update quality flags in cleaned data after each invocation of makemap.
 *        - Cache LUT model values.
+*     14-JAN-2014 (DSB):
+*        Ensure same map bounds are used on every invocation of makemap.
 *-
 '''
 
@@ -591,6 +593,13 @@ try:
          invoke("$KAPPA_DIR/ndftrace ndf={0} quiet=yes".format(newmap))
          msg_out( "Re-using existing map {0}".format(newmap) )
          gotit = True
+
+#  Get the pixel index bounds of the map.
+         lx = starutil.get_task_par( "lbound(1)", "ndftrace" )
+         ly = starutil.get_task_par( "lbound(2)", "ndftrace" )
+         ux = starutil.get_task_par( "ubound(1)", "ndftrace" )
+         uy = starutil.get_task_par( "ubound(2)", "ndftrace" )
+
       except:
          pass
 
@@ -608,6 +617,12 @@ try:
       if extra:
          cmd += " "+extra
       invoke(cmd)
+
+#  Get the pixel index bounds of the map.
+      lx = starutil.get_task_par( "lbound(1)", "makemap" )
+      ly = starutil.get_task_par( "lbound(2)", "makemap" )
+      ux = starutil.get_task_par( "ubound(1)", "makemap" )
+      uy = starutil.get_task_par( "ubound(2)", "makemap" )
 
 #  Unless the supplied data was pre-cleaned, the NDFs holding the cleaned
 #  time-series data will have been created by makemap in the current working
@@ -802,10 +817,12 @@ try:
                pass
 
 #  If required, construct the text of the makemap command and invoke it. We
-#  specify the map from the previous iteration as the REF image.
+#  specify the map from the previous iteration as the REF image. Since we are
+#  re-using the LUT model from the first invocation, we need to ensure that
+#  the maps bounds never change (as they may because of new data being
+#  flagged for instance). So specify them explicitly when running makemap.
          if not gotit:
-            cmd = "$SMURF_DIR/makemap in={0} out={1} method=iter config='^{2}' ref={3}"\
-                  .format(cleaned,newmap,confname,prevmap)
+            cmd = "$SMURF_DIR/makemap in={0} out={1} method=iter config='^{2}' ref={3} lbnd=\[{4},{5}\] ubnd=\[{6},{7}\]".format(cleaned,newmap,confname,prevmap,lx,ly,ux,uy)
             if pixsize:
                cmd += " pixsize={0}".format(pixsize)
             if mask2:
