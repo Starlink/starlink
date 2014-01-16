@@ -79,7 +79,8 @@ XYHistogram::XYHistogram( const ImageIO imio )
      swap_(0),
      datalimits_(0),
      low_(-DBL_MAX),
-     high_(DBL_MAX)
+     high_(DBL_MAX),
+     factor_(0.001)
 {
 }
 
@@ -283,6 +284,14 @@ void XYHistogram::fitHistParabola( Histogram *histogram )
     /*  Record peak bin. */
     histogram->ppeak = -0.5 * coeff[1] / coeff[2];
 
+    /*  Must be in range 0 to NHIST - 1. */
+    if ( isnan( histogram->ppeak ) ) {
+        histogram->ppeak = 0;
+    }
+    else {
+        histogram->ppeak = min( NHIST - 1.0, max( 0.0, histogram->ppeak ) );
+    }
+
     /*  Expected count for that bin. */
     double peak = coeff[0] + coeff[1] * histogram->ppeak +
                   coeff[2] * histogram->ppeak * histogram->ppeak;
@@ -455,7 +464,7 @@ void XYHistogram::fitGauss( Histogram *histogram )
     /*  Get the initial guesses. */
     double peak = histogram->ppeak;
     double width = histogram->psd;
-    double scale = lookupHist_( histogram, (int)round(histogram->ppeak));
+    double scale = histogram->hist[(int)round(histogram->ppeak)];
 
     /*  Trap nan issues, assuming any indicate complete failure. */
     if ( isnan( width ) || isnan( peak ) || isnan( width ) ) {
@@ -566,6 +575,14 @@ void XYHistogram::fitGauss( Histogram *histogram )
     histogram->gdpeak = c * sqrt( gsl_matrix_get( covar, 1, 1 ) );
     histogram->gsd = gsl_vector_get( s->x, 2 );
     histogram->gdsd = c * sqrt( gsl_matrix_get( covar, 2, 2 ) );
+
+    /*  Peak must be in range 0 to NHIST - 1. */
+    if ( isnan( histogram->gpeak ) ) {
+        histogram->gpeak = 0;
+    }
+    else {
+        histogram->gpeak = min( NHIST - 1.0, max( 0.0, histogram->gpeak ) );
+    }
 
     gsl_multifit_fdfsolver_free( s );
     gsl_matrix_free( covar );

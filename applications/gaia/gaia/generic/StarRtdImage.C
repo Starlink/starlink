@@ -348,7 +348,7 @@ public:
     { "usingxshm",       &StarRtdImage::usingxshmCmd,       0, 0 },
     { "volatile",        &StarRtdImage::volatileCmd,        0, 1 },
     { "xyprofile",       &StarRtdImage::xyProfileCmd,      14, 14},
-    { "xyhistogram",     &StarRtdImage::xyHistogramCmd,    12, 12}
+    { "xyhistogram",     &StarRtdImage::xyHistogramCmd,    13, 13}
 };
 
 
@@ -7046,6 +7046,8 @@ int StarRtdImage::xyProfileCmd(int argc, char *argv[])
 //      datalimits whether to use the image low/high cuts to limit
 //                 data range.
 //
+//      factor     binning factor, value in range 0 to 1.
+//
 //      xVector   (returned) name of a BLT vector to receive the
 //                histogram coordinates.
 //
@@ -7115,48 +7117,59 @@ int StarRtdImage::xyHistogramCmd(int argc, char *argv[])
         xyHistogram.setUseDataLimits( 1 );
     }
 
-    //  Get the histogram.
-    Histogram histogram;
-    xyHistogram.extractHistogram( &histogram );
-
-    //  Copy into BLT vectors.
+    //  Set the binning factor.
+    double factor;
     int status = TCL_OK;
-    if ( histogram.nbin > 0 ) {
-
-        //  Transfer coords and counts into two BLT vectors.
-        double *values = new double[histogram.nbin*2];
-        for ( int i = 0, j = 0; i < histogram.nbin; i++, j += 2 ) {
-            values[j] = i * histogram.width + histogram.zero;
-            values[j+1] = histogram.hist[i];
-        }
-        status = Blt_GraphElement( interp_, argv[0], argv[1],
-                                   histogram.nbin*2, values,
-                                   argv[8], argv[9] );
-
-        //  Same for gaussian fit.
-        for ( int i = 0, j = 0; i < histogram.nbin; i++, j += 2 ) {
-            values[j] = i * histogram.width + histogram.zero;
-            values[j+1] = histogram.ghist[i];
-        }
-        status = Blt_GraphElement( interp_, argv[0], argv[1],
-                                   histogram.nbin*2, values,
-                                   argv[10], argv[11] );
-        delete[] values;
+    if ( Tcl_GetDouble(interp_, argv[8], &factor ) != TCL_OK ) {
+        status = TCL_ERROR;
     }
+    else {
+        xyHistogram.setBinningFactor( factor );
 
-    set_result( histogram.nbin );
-    append_element( histogram.mode * histogram.width + histogram.zero );
-    append_element( histogram.hist[histogram.mode] );
+        //  Get the histogram.
+        Histogram histogram;
+        xyHistogram.extractHistogram( &histogram );
 
-    append_element( histogram.ppeak * histogram.width + histogram.zero );
-    append_element( histogram.hist[(int)round(histogram.ppeak)] );
-    append_element( histogram.pfwhm * histogram.width );
+        //  Copy into BLT vectors.
+        if ( histogram.nbin > 0 ) {
 
-    append_element( histogram.gpeak * histogram.width + histogram.zero );
-    append_element( histogram.gdpeak* histogram.width );
-    append_element( histogram.gsd * histogram.width );
-    append_element( histogram.gdsd * histogram.width );
-
+            //  Transfer coords and counts into two BLT vectors.
+            double *values = new double[histogram.nbin*2];
+            for ( int i = 0, j = 0; i < histogram.nbin; i++, j += 2 ) {
+                values[j] = i * histogram.width + histogram.zero;
+                values[j+1] = histogram.hist[i];
+            }
+            status = Blt_GraphElement( interp_, argv[0], argv[1],
+                                       histogram.nbin*2, values,
+                                       argv[9], argv[10] );
+            
+            if ( status == TCL_OK ) {
+                //  Same for gaussian fit.
+                for ( int i = 0, j = 0; i < histogram.nbin; i++, j += 2 ) {
+                    values[j] = i * histogram.width + histogram.zero;
+                    values[j+1] = histogram.ghist[i];
+                }
+                status = Blt_GraphElement( interp_, argv[0], argv[1],
+                                           histogram.nbin*2, values,
+                                           argv[11], argv[12] );
+            }
+            delete[] values;
+        }
+        
+        set_result( histogram.nbin );
+        append_element( histogram.mode * histogram.width + histogram.zero );
+        append_element( histogram.hist[histogram.mode] );
+        
+        append_element( histogram.ppeak * histogram.width + histogram.zero );
+        append_element( histogram.hist[(int)round(histogram.ppeak)] );
+        append_element( histogram.pfwhm * histogram.width );
+        
+        append_element( histogram.gpeak * histogram.width + histogram.zero );
+        append_element( histogram.gdpeak* histogram.width );
+        append_element( histogram.gsd * histogram.width );
+        append_element( histogram.gdsd * histogram.width );
+        
+    }
     return status;
 }
 

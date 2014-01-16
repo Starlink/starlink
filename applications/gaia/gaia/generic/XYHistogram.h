@@ -35,9 +35,6 @@ extern "C" {
 /*  XXX make these configurable. */
 #define NHIST 2048
 
-/*  Required fraction of values in mode bin. */
-#define MODEFRAC 0.01
-
 /*  Number of good points required to attempt fits. */
 #define MINBIN 50
 
@@ -101,6 +98,9 @@ public:
   }
   void setUseDataLimits( const int datalimits ) { datalimits_ = datalimits; }
 
+  //  Set fraction of counts for mode bin.
+  void setBinningFactor( const double factor ) { factor_ = factor; };
+
  protected:
 
   //  Pointer to imageIO object. This has the image data and its type.
@@ -120,6 +120,9 @@ public:
   int datalimits_;
   double low_;
   double high_;
+
+  //  Binning factor.
+  double factor_;
 
   //  Get pixel value from 2D array, "span" is second dimension. Use a
   //  macro to define this and expand for all possible data types.
@@ -242,16 +245,6 @@ public:
   void fitGauss( Histogram *histogram );
   void fitHistParabola( Histogram *histogram );
   void fitParabola( int n, double *x, double *y, double c[3] );
-
-  //  Safe lookup of histogram count.
-  inline int lookupHist_( Histogram *histogram, int index ) {
-      if ( index >= 0 && index < NHIST ) {
-          return histogram->hist[index];
-      }
-      return histogram->hist[index];
-      //return 0;
-  }
-
 
   //  Data type dependent definitions, use overloaded members.
 #define DATA_TYPE char

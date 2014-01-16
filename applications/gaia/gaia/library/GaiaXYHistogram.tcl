@@ -112,6 +112,15 @@ itcl::class gaia::GaiaXYHistogram {
       $short_help_win_ add_menu_short_help $File \
          {New window} {Create a new toolbox}
 
+
+      #  Save histogram to text file.
+      $File add command -label {Save as...} \
+         -command [code $this save_as_] \
+         -accelerator {Control-s}
+      bind $w_ <Control-s> [code $this save_as_]
+      $short_help_win_ add_menu_short_help $File \
+         {Save as...} {Save histogram to text file}
+
       #  Set the exit menu item.
       $File add command -label Exit \
          -command [code $this close] \
@@ -289,6 +298,9 @@ itcl::class gaia::GaiaXYHistogram {
    #  Create the BLT graph and vectors.
    protected method make_graph_ {} {
 
+      set lwidth 14
+      set vwidth 8
+
       #  Create the X graph and add it to the upper pane.
       itk_component add xgraph {
          blt::graph $w_.xgraph \
@@ -303,6 +315,27 @@ itcl::class gaia::GaiaXYHistogram {
       add_short_help $itk_component(xgraph) \
          {Graph: histogram, {bitmap dragb1} = zoom, {bitmap b2} = restore}
 
+      #  Binning factor.
+      itk_component add factor {
+         LabelEntryScale $w_.factor \
+            -text "Binning factor:" \
+            -labelwidth $lwidth \
+            -from 0.0 \
+            -to 0.1 \
+            -increment 0.001 \
+            -resolution 0.001 \
+            -show_arrows 1 \
+            -anchor e \
+            -delay 250 \
+            -command [code $this set_binning_factor_]
+      }
+      pack $itk_component(factor) -side top -fill x -ipadx 1m -ipady 2m
+      add_short_help $itk_component(factor) \
+         {Binning factor: fraction of counts required in modal bin}
+
+      #  Best delayed for some reason.
+      $itk_component(factor) configure -value $factor_
+
       #  Readouts for this graph.
       #  Table for current values.
       itk_component add tableframe {
@@ -312,8 +345,6 @@ itcl::class gaia::GaiaXYHistogram {
       pack $itk_component(tableframe) -fill none -expand 0
 
       #  Readout coordinate.
-      set lwidth 14
-      set vwidth 8
       itk_component add uppercoord {
          util::LabelValue $itk_component(tableframe).coord \
             -text "Intensity:" \
@@ -349,7 +380,6 @@ itcl::class gaia::GaiaXYHistogram {
             -valuefont $itk_option(-valuefont) \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
-            -relief flat \
             -anchor e
       }
       itk_component add countactual {
@@ -359,7 +389,6 @@ itcl::class gaia::GaiaXYHistogram {
             -valuefont $itk_option(-valuefont) \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
-            -relief flat \
             -anchor e
       }
 
@@ -370,7 +399,6 @@ itcl::class gaia::GaiaXYHistogram {
             -valuefont $itk_option(-valuefont) \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
-            -relief flat \
             -anchor e
       }
       itk_component add countfit {
@@ -380,7 +408,6 @@ itcl::class gaia::GaiaXYHistogram {
             -valuefont $itk_option(-valuefont) \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
-            -relief flat \
             -anchor e
       }
       itk_component add fwhmfit {
@@ -390,7 +417,6 @@ itcl::class gaia::GaiaXYHistogram {
             -valuefont $itk_option(-valuefont) \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
-            -relief flat \
             -anchor e
       }
 
@@ -401,7 +427,6 @@ itcl::class gaia::GaiaXYHistogram {
             -valuefont $itk_option(-valuefont) \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
-            -relief flat \
             -anchor e
       }
       itk_component add intgausserr {
@@ -411,7 +436,6 @@ itcl::class gaia::GaiaXYHistogram {
             -valuefont $itk_option(-valuefont) \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
-            -relief flat \
             -anchor e
       }
       itk_component add sigmagauss {
@@ -421,7 +445,6 @@ itcl::class gaia::GaiaXYHistogram {
             -valuefont $itk_option(-valuefont) \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
-            -relief flat \
             -anchor e
       }
       itk_component add sigmagausserr {
@@ -431,7 +454,6 @@ itcl::class gaia::GaiaXYHistogram {
             -valuefont $itk_option(-valuefont) \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
-            -relief flat \
             -anchor e
       }
 
@@ -539,7 +561,14 @@ itcl::class gaia::GaiaXYHistogram {
       #  Get the histogram.
       set results [$itk_option(-rtdimage) xyhistogram $xgraph_ elem \
                       $x0_ $y0_ $x1_ $y1_ image $itk_option(-use_data_limits) \
-                      $xVector_ $iVector_ $gxVector_ $giVector_]
+                      $factor_ $xVector_ $iVector_ $gxVector_ $giVector_]
+
+
+      #  Kill gaussian if not wanted (XXX don't generate).
+      if { ! $itk_option(-show_gaussian_histogram) } {
+         $gxVector_ length 0
+         $giVector_ length 0
+      }
 
       $itk_component(intactual) config -value [lindex $results 1]
       $itk_component(countactual) config -value [lindex $results 2]
@@ -551,12 +580,6 @@ itcl::class gaia::GaiaXYHistogram {
       $itk_component(intgausserr) config -value [lindex $results 7]
       $itk_component(sigmagauss) config -value [lindex $results 8]
       $itk_component(sigmagausserr) config -value [lindex $results 9]
-
-      #  DEBUG
-      #set n [$xVector_ length]
-      #for {set i 0} {$i < $n} {incr i} {
-      #   puts "# [$xVector_ index $i] [$iVector_ index $i]"
-      #}
 
       return 0
    }
@@ -808,6 +831,45 @@ itcl::class gaia::GaiaXYHistogram {
       }
    }
 
+   #  Save histogram as a text file.
+   protected method save_as_ {} {
+      set w [FileSelect .\#auto -title "Save histogram to text file"]
+      if { [$w activate] } {
+         if { [catch {write_to_file_ [$w get]} msg] } {
+            error_dialog "Failed to write histogram: $msg"
+         }
+      }
+      destroy $w
+   }
+
+   #  Write histogram to a given text file. Use TOPCAT friendly format.
+   public method write_to_file_ { filename } {
+      if { $filename != {} } {
+
+         #  Open the output file.
+         set fid [::open $filename w]
+
+         #  Write the header section.
+         puts $fid "# Intensity  Count"
+
+         #  Now write the values.
+         set vl [$xVector_ length]
+         for { set i 0 } {$i < $vl} {incr i} {
+            puts $fid "[$xVector_ index $i] [$iVector_ index $i]"
+         }
+
+         #  Finally close the file.
+         ::close $fid
+      }
+   }
+
+   #  Set the binning factor.
+   protected method set_binning_factor_ {value} {
+      set factor_ $value
+      notify_cmd
+   }
+
+
    #  Configuration options: (public variables)
    #  ----------------------
    #  Name of canvas.
@@ -866,8 +928,8 @@ itcl::class gaia::GaiaXYHistogram {
       Gaussian_Histogram_Width 1
 
    #  Whether to display the gaussian histogram fit for reference.
-   itk_option define -show_gaussian_histograms show_gaussian_histograms \
-      Show_Gaussian_Histograms 1
+   itk_option define -show_gaussian_histogram show_gaussian_histogram \
+      Show_Gaussian_Histogram 1
 
    #  Colour for the previous histograms.
    itk_option define -last_histogram_colour last_histogram_colour \
@@ -915,6 +977,9 @@ itcl::class gaia::GaiaXYHistogram {
    protected variable cx1_ 0
    protected variable cy0_ 0
    protected variable cy1_ 0
+
+   #  Binning factor.
+   protected variable factor_ 0.001
 
    #  Possible colours.
    protected variable simplecolours_ {

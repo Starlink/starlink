@@ -8,29 +8,57 @@
     <a name="xref_xyhistogramusage"></a>
     <h2 align=center><font color=red>Histogram Toolbox</font></h2>
 
-    <p>This window displays a histogram of the image data bounded by the
-    rectangle that you have drawn on the image. It also displays the intensity
-    and count of the peak value and the limits of the rectangle drawn over the
-    main image, as well as providing an interactive readout of the intensity
-    and count.
+    <p>
+      This window displays a histogram of the image data bounded by the
+      rectangle that you have drawn on the image. Normally this is with the
+      data limits of the main image, but you can optionally use all the data
+      range using the "Options->Use data limits" option.
+    </p>
+    <p>
+      One other feature to control the histogram creation is the "Binning
+      factor". This value represents the fraction of total counts that should
+      be found in at least one bin, so increasing it will increase the bin
+      width, but only if the default histogram requires this (the default
+      histogram is based on the data range, displayed or complete, and 2048
+      bins).
+    </p>
+    <p>
+      The intensity and peak values are shown, along with an interactive
+      readout of the intensity and count under the pointer and parabolic and
+      gaussian fits (when using the full data range these fits are to a
+      selected portion of that, the expectation being that a peak in the
+      background will be found and that should be analysed).
     </p>
 
-    <p>Options include the ability to stop the histogram from being constantly
-    updated when you move the rectangle, which is the <tt>continuous
-    updates</tt> item (when this is switched off updates only happend when you
-    release the rectangle) 
+    <p>
+      Other options include the ability to stop the histogram from being
+      constantly updated when you move the rectangle, which is the
+      <tt>continuous updates</tt> item (when this is switched off updates only
+      happen when you release the rectangle), switched off is the default,
+      note you can force an update by pressing the "Refresh" button.
     </p>
 
-    <p>The <tt>Print...</tt> option will produce a dialog which allows you to
-    print the histogram to a file or printer.
+    <p>
+      The <tt>Print...</tt> option will produce a dialog which allows you to
+      print the histogram to a file or printer.
     </p>
 
-    <p> There are various colour and line thickness items in the
-    <tt>Options</tt> menu.
+    <p>
+      In the "File" menu you can find an option to save the histogram as a
+      text file to disk. This is just a simple format with two columns of
+      data.
     </p>
 
-    <p>If you want to have more than one histogram choose the 
-      <tt>New window</tt> item in the <tt>File</tt> menu.
+    <p>
+      There are various colour and line thickness items in the
+      <tt>Options</tt> menu.
+    </p>
+
+    <p>
+      If you want to have more than one histogram choose the <tt>New
+      window</tt> item in the <tt>File</tt> menu to have an independent
+      window, or pick the "Display previous histogram option" (only make's
+      sense when the continuouos update option is disabled).
     </p>
 
   </body>

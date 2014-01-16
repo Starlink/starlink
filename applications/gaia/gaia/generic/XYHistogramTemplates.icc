@@ -31,17 +31,17 @@
  *  Native format image data version.
  *
  *  This routine forms a histogram of an array of data values. The histogram
- *  is formed in such a way that at least MODEFRAC values are present in the
- *  peak counts bin. The first estimate of the histogram is formed using NHIST
- *  elements. If more than MODEFRAC counts are present in at least one bin then
- *  no further action is taken, if less than is number of counts are present
- *  in the peak bin then the histogram is rebinned to increase the number
- *  count until MODEFRAC is exceeded. On exit the number of bins used to form
- *  the histogram is returned together with the bin number which contains the
- *  peak count level and the width (in data values) of the bin and a zero
- *  point in the Histogram structure (along with the histogram itself).  The
- *  original data values are related to the bin number (starting at 0 up to
- *  nbin) by
+ *  is formed in such a way that at least a given fraction of the total counts
+ *  are present in the modal bin. The first estimate of the histogram is
+ *  formed using NHIST elements. If more the expected counts are present in at
+ *  least one bin then no further action is taken, if less than this number of
+ *  counts are present in the peak bin then the histogram is rebinned to
+ *  increase the number count until the expectec fraction is exceeded. On exit
+ *  the number of bins used to form the histogram is returned together with
+ *  the bin number which contains the peak count level and the width (in data
+ *  values) of the bin and a zero point in the Histogram structure (along with
+ *  the histogram itself).  The original data values are related to the bin
+ *  number (starting at 0 up to nbin) by
  *
  *        VALUE = NBIN*WIDTH+ZERO
  *
@@ -109,8 +109,8 @@ void XYHistogram::extractNativeImage( const DATA_TYPE *image, const int nx,
         return;
     }
 
-    /*  Convert MODEFRAC into a count for the mode bin. */
-    minbin = (int) ( MODEFRAC * (double) count );
+    /*  Convert factor_ into a count for the mode bin. */
+    minbin = (int) ( factor_ * (double) count );
 
     /*  Use datalimits, if given. */
     if ( low != -DBL_MAX ) {
@@ -178,7 +178,7 @@ void XYHistogram::extractNativeImage( const DATA_TYPE *image, const int nx,
 
             /*  Change the bin width. */
             width = width * 2.0;
-            zero = dmin - width;
+            zero = dmin - width / 2.0;
         }
     }
     if ( nbin == 0 ) {
@@ -284,8 +284,8 @@ void XYHistogram::extractSwapImage( const DATA_TYPE *image, const int nx,
         return;
     }
 
-    /*  Convert MODEFRAC into a count for the mode bin. */
-    minbin = (int) ( MODEFRAC * (double) count );
+    /*  Convert fraction_ into a count for the mode bin. */
+    minbin = (int) ( factor_ * (double) count );
 
     /*  Clear the histogram of any previous values. */
     for ( i = 0; i < NHIST; i++ ) {
