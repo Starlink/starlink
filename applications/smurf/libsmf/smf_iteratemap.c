@@ -421,6 +421,9 @@
 *        - Allow LUT model to be exported.
 *        - Undo COM as a separate step at start of each iteration.
 *        - Ensure exported cleaned data contains the STEPTIME value that was actually used.
+*     2014-01-16 (DSB):
+*        Do not allocate models to hold AST since the astronomical signal is 
+*        determined from the current map. 
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -1666,8 +1669,11 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
       for( imodel = 0; imodel < nmodels; imodel++ ) {
 
-        /* Don't do SMF__LUT or SMF__EXT as they were handled earlier */
-        if( (modeltyps[imodel] != SMF__LUT) && (modeltyps[imodel] != SMF__EXT) ) {
+        /* Don't do SMF__LUT or SMF__EXT as they were handled earlier.
+           Also we do not need to allocate models to hodl AST as the AST
+           values are calculated on-the-fly from the current map.  */
+        if( (modeltyps[imodel] != SMF__LUT) && (modeltyps[imodel] != SMF__EXT) &&
+            (modeltyps[imodel] != SMF__AST) ) {
           smf_model_create( wf, NULL, res, darks, bbms, flatramps, heateffmap,
                             noisemaps, 1, modeltyps[imodel], 0, NULL, 0, NULL, NULL,
                             NO_FTS, NULL, model[imodel], keymap,
