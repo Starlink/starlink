@@ -149,6 +149,9 @@
 *        Correct matchend value returned by astChrSplitRE.
 *     6-JAN-2014 (DSB):
 *        Optimise access to cache to avoid valgrind warnings.
+*     16-JAN-2014 (DSB):
+*        Dump details of all active memory blocks if the total memory allocation 
+*        specified by astMemoryWarning is exceeded.
 */
 
 /* Configuration results. */
@@ -4831,9 +4834,32 @@ static void Issue( Memory *mem, int *status ) {
    debugger breakpoint to be set. */
    if( Current_Usage > Warn_Usage &&
        Warn_Usage > 0 ) {
-      printf( "Warning - AST memory allocation has exceeded %ld bytes\n",
+      printf( "Warning - AST memory allocation has exceeded %ld bytes - "
+              "dumping catalogue of active memory blocks to file 'memory.dump'\n",
               Warn_Usage );
-      astMemoryWarning( 0 );
+
+/* Create a file holding the details of all currently active memory blocks. It can be 
+   examined using topcat. */
+      FILE *fd = fopen( "memory.dump", "w" );
+      if( fd ) {
+         Memory *next;
+
+         fprintf( fd, "# id size perm file line\n");
+         next = Active_List;
+         if( next ) {
+            while( next ) {
+               if( !next->perm ) {
+                  fprintf( fd, "%d %zu %d %s %d\n", next->id, next->size,
+                           next->perm, next->file, next->line );
+               }
+               next = next->next;
+            }
+         }
+
+         fclose(fd );
+      }
+
+      Warn_Usage  = 0;
    }
 
    UNLOCK_DEBUG_MUTEX;
