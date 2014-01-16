@@ -1853,7 +1853,9 @@ static void EnvSet( AstObject *this, int *status ) {
          if( ! attrs ) attrs = "None";
 
 /* Store a copy in the virtual function table. */
+         astBeginPM;
          this->vtab->defaults = astStore( NULL, attrs, strlen( attrs ) + 1 );
+         astEndPM;
       }
    }
 
