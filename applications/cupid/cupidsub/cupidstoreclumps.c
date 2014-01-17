@@ -179,6 +179,9 @@ void cupidStoreClumps( const char *param1, const char *param2, int indf,
 *     22-NOV-2013 (DSB):
 *        Report the number of clumps that fail the beam width test
 *        separately for spatial and spectral axes.
+*     17-JAN-2014 (DSB):
+*        Do not report an error if there ar no usable clumps (requested
+*        by Andy and Malcolm).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -610,15 +613,8 @@ void cupidStoreClumps( const char *param1, const char *param2, int indf,
          }
       }
 
-/* Check some clumps remain. */
-      if( !iclump && *status == SAI__OK ) {
-         *status = SAI__ERROR;
-         errRep( "", "No clumps larger than the beam size remain.",
-                 status );
-      }
-
 /* If required, create the KAPPA-style catalogue. */
-      if( cat1[ 0 ] && *status == SAI__OK ){
+      if( cat1[ 0 ] && *status == SAI__OK && iclump ){
 
 /* Create a Frame with "ncpar" axes describing the table columns. Set the
    axis Symbols and Units to the column names and units. Any axis which
@@ -706,7 +702,7 @@ void cupidStoreClumps( const char *param1, const char *param2, int indf,
        }
 
 /* If required, create the JSA-style catalogue. */
-      if( cat2[ 0 ] && *status == SAI__OK ){
+      if( cat2[ 0 ] && *status == SAI__OK && iclump ){
 
 /* Create an AST FitsTable structure to act as a staging post for the
    FITS binary table. */
