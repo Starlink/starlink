@@ -131,7 +131,9 @@
 *  If the ADAM Parameter Block does not yet have a KeyMap to hold
 *  parameter information, create one now.
       IF( APB_PARS .EQ. 0 ) THEN
+         CALL AST_BEGINPM
          APB_PARS = AST_KEYMAP( ' ', STATUS )
+         CALL AST_ENDPM
          CALL AST_EXEMPT( APB_PARS, STATUS )
       END IF
 

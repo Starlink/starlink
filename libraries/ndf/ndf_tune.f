@@ -332,7 +332,7 @@
                   CALL AST_BEGINPM
                   TCB_PXT = AST_KEYMAP( ' ', STATUS )
                   CALL AST_EXEMPT( TCB_PXT, STATUS )
-                  CALL AST_BEGINPM
+                  CALL AST_ENDPM
                END IF
 
 *  Store the supplied value flag in the KeyMap, using the supplied
