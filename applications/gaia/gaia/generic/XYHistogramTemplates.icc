@@ -220,7 +220,7 @@ void XYHistogram::extractNativeImage( const DATA_TYPE *image, const int nx,
 
     /*  Adjust these for FITS bscale and bzero. */
     histogram->width = width * bscale;
-    histogram->zero = zero + bzero;
+    histogram->zero = zero * bscale + bzero;
 }
 
 
@@ -268,7 +268,7 @@ void XYHistogram::extractSwapImage( const DATA_TYPE *image, const int nx,
     dmax = -DBL_MAX;
     for ( j = y0; j <= y1; j++ ) {
         for ( i = x0; i <= x1; i++ ) {
-            if ( ! badpix( image, nx, i, j ) ) {
+            if ( ! swapBadpix( image, nx, i, j ) ) {
                 dv = swapArrayVal( image, nx, i, j );
                 if ( dv >= low && dv <= high ) {
                     dmin = min( dmin, dv );
@@ -297,7 +297,7 @@ void XYHistogram::extractSwapImage( const DATA_TYPE *image, const int nx,
     scale = (double) nbin / ( dmax - dmin );
     for ( j = y0; j <= y1; j++ ) {
         for ( i = x0; i <= x1; i++ ) {
-            if ( ! badpix( image, nx, i, j ) ) {
+            if ( ! swapBadpix( image, nx, i, j ) ) {
                 dv = swapArrayVal( image, nx, i, j );
                 if ( dv >= low && dv <= high ) {
                     idiff = (int) round( scale * ( dv - dmin ) );
@@ -362,7 +362,7 @@ void XYHistogram::extractSwapImage( const DATA_TYPE *image, const int nx,
         scale = (double) nbin / ( dmax - dmin );
         for ( j = y0; j <= y1; j++ ) {
             for ( i = x0; i <= x1; i++ ) {
-                if ( ! badpix( image, nx, i, j ) ) {
+                if ( ! swapBadpix( image, nx, i, j ) ) {
                     dv = swapArrayVal( image, nx, i, j );
                     if ( dv >= low && dv <= high ) {
                         idiff = (int) round( scale * ( dv - dmin ) );
@@ -389,5 +389,5 @@ void XYHistogram::extractSwapImage( const DATA_TYPE *image, const int nx,
 
     /*  Adjust these for FITS bscale and bzero. */
     histogram->width = width * bscale;
-    histogram->zero = zero + bzero;
+    histogram->zero = zero * bscale + bzero;
 }

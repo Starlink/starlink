@@ -509,7 +509,7 @@ void XYHistogram::fitGauss( Histogram *histogram )
     double *y = new double[ncount];
     double *x = new double[ncount];
     ncount = 0;
-    for ( int j = start, i = 0; j <= iend; j++, i++ ) {
+    for ( int j = start; j <= iend; j++ ) {
         if ( histogram->hist[ j ] != 0 ) {
             y[ncount] = (double) histogram->hist[ j ];
             x[ncount] = (double) j;

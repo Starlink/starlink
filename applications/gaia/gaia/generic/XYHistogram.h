@@ -212,7 +212,7 @@ public:
      }
 
 
-  //  Test for a BAD pixel. XXX Note NDF specific doesn't check BLANK or NaN.
+  //  Test for a BAD pixel. XXX Note NDF specific doesn't check BLANK.
 #define GENERATE_BADPIXA( T, BADVAL ) \
    inline int badpix( const T *image, const int& span, \
                       const int& i, const int& j ) \
@@ -223,8 +223,14 @@ public:
   GENERATE_BADPIXA(unsigned short, VAL__BADUS);
   GENERATE_BADPIXA(int, VAL__BADI);
   GENERATE_BADPIXA(INT64, VAL__BADK);
-  GENERATE_BADPIXA(float, VAL__BADF);
-  GENERATE_BADPIXA(double, VAL__BADD);
+
+#define GENERATE_BADPIXAF( T, BADVAL ) \
+   inline int badpix( const T *image, const int& span, \
+                      const int& i, const int& j ) \
+       {  T v = arrayVal( image, span, i, j ); \
+          return ( v == BADVAL || isnan( v ) ); }
+  GENERATE_BADPIXAF(float, VAL__BADF);
+  GENERATE_BADPIXAF(double, VAL__BADD);
 
   //  Test for a BAD pixel, swapped version.
 #define GENERATE_SWAPBADPIXA( T, BADVAL ) \
@@ -237,8 +243,14 @@ public:
   GENERATE_SWAPBADPIXA(unsigned short, VAL__BADUS);
   GENERATE_SWAPBADPIXA(int, VAL__BADI);
   GENERATE_SWAPBADPIXA(INT64, VAL__BADK);
-  GENERATE_SWAPBADPIXA(float, VAL__BADF);
-  GENERATE_SWAPBADPIXA(double, VAL__BADD);
+
+#define GENERATE_SWAPBADPIXAF( T, BADVAL ) \
+   inline int swapBadpix( const T *image, const int& span, \
+                      const int& i, const int& j ) \
+       {  T v = swapArrayVal( image, span, i, j ); \
+          return ( v == BADVAL || isnan( v ) ); }
+  GENERATE_SWAPBADPIXAF(float, VAL__BADF);
+  GENERATE_SWAPBADPIXAF(double, VAL__BADD);
 
 
   //  Histogram analysis.
