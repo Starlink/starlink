@@ -1906,7 +1906,7 @@ void smurf_makemap( int *status ) {
     if( jsatiles ) {
        parGet0l( "TRIMTILES", &trimtiles, status );
        grpSetsz( igrp4, 0, status );
-       smf_jsasplit( tndf, oname, trimtiles, SMF__INST_NONE, &njsatile,
+       smf_jsadicer( tndf, oname, trimtiles, SMF__INST_NONE, &njsatile,
                      igrp4, status );
        ndfDelet( &tndf, status );
     } else {

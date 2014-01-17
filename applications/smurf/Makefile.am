@@ -56,7 +56,7 @@ gsdshow \
 impaztec \
 jsatileinfo \
 jsatilelist \
-jsasplit \
+jsadicer \
 makecube \
 makemap \
 rawfixmeta \

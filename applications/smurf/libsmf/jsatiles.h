@@ -31,7 +31,7 @@ typedef struct smfJSATiling {
 void         smf_jsainstrument( const char *param, AstFitsChan *fc,
                                 smf_inst_t def, smfJSATiling *tiling,
                                 int *status );
-void         smf_jsasplit( int indf, const char *base, int trim,
+void         smf_jsadicer( int indf, const char *base, int trim,
                            smf_inst_t instrument, size_t *ntile, Grp *grp,
                            int *status );
 void         smf_jsatile( int itile, smfJSATiling *jsatiling,

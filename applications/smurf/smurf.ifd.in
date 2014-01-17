@@ -2651,7 +2651,7 @@ package @PACKAGE@ {
 
         }
 
-        action jsasplit {
+        action jsadicer {
             helplib {$SMURF_HELP}
 
             parameter in {
