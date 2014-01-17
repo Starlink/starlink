@@ -173,6 +173,7 @@ smf_create_smfData( int flags, int * status ) {
     (data->pntr)[i] = NULL;
   }
   data->qual = NULL;
+  data->isdyn = 0;
   data->sidequal = NULL;
   data->qfamily = SMF__QFAM_NULL;
 

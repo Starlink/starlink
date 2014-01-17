@@ -213,6 +213,8 @@ int smf_initial_sky( ThrWorkForce *wf, AstKeyMap *keymap, smfDIMMData *dat,
                                                                dat->msize*sizeof(*qptr));
             }
          }
+         qptr = smf_qual_unmap( wf, indf2, family, qptr, status );
+
       } else {
          qptr = NULL;
       }
@@ -323,6 +325,8 @@ int smf_initial_sky( ThrWorkForce *wf, AstKeyMap *keymap, smfDIMMData *dat,
 
          thrWait( wf, status );
       }
+
+      job_data = astFree( job_data );
    }
 
 /* End the AST context. */

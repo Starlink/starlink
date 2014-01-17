@@ -93,6 +93,13 @@
 *        no idea what the Description comment "If flags set to
 *        SMF__NOCREATE_FILE..." means, so check the NDF access directly
 *        using the NDF library.
+*     2014-01-17 (DSB):
+*        Re-ordering a smfData associated with a read-only NDF results in
+*        new memory being allocated for the results. But the smfData
+*        still has an associated NDF identifier, so we now set a flag
+*        in the smfData to indicate that the memory has been allocated by
+*        smurf and is no longer the mapped NDF arrays. This is used by
+*        smf_clsoe_fiel to decide whether to free the memory or not.
 
 *  Notes:
 *     Nothing is done about the FITS channels or WCS information stored in
@@ -287,6 +294,11 @@ int smf_dataOrder( ThrWorkForce *wf, smfData *data, int isTordered,
     /* and indicate if we changed anything (but not if we did not) */
     if (qchanged) waschanged = qchanged;
   }
+
+  /* If the re-ordering was not done in-place, then the new buffer must
+     have been allocated here. Set a flag so that smf_close_file knows to
+     deallocate the memory. */
+  if( ! inPlace ) data->isdyn = 1;
 
   return waschanged;
 }

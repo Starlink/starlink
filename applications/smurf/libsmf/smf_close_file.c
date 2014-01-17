@@ -108,6 +108,15 @@
 *        Free smfFts
 *     2010-10-19 (COBA):
 *        Reformat smfFts cleanup
+*     2014-01-17 (DSB):
+*        It is possible for a smfData to have an associated NDF
+*        identifier, but for the data pointers to refer to locally
+*        allocated memory rather than mapped NDF arrays (e.g.
+*        smf_dataOrder can cause this condition). In such cases the data
+*        pointers should be freed here. Previously, this was not done
+*        because the smfData has an assocuated NDF identifier. Now, an
+*        extra flag ("isdyn") is used to over-ride this to force the
+*        data pointers to be freed.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -262,6 +271,13 @@ void smf_close_file( ThrWorkForce *wf, smfData ** data, int * status ) {
       /* No file so free the data */
       freedata = 1;
     }
+
+    /* Free the data - even if there is an associated NDF - if it was
+       allocated by a smurf function. Note, a value of 1 for "isdyn"
+       guarantees the memory was allocated within smurf, but a value of
+       zero does not guarantee it was *not* allocated within smurf,
+       which is why we still do the above checks */
+    if( (*data)->isdyn ) freedata = 1;
 
     (*data)->file = astFree( (*data)->file );
   } else {
