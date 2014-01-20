@@ -48,6 +48,13 @@
 *        SYSTEM. It is only accessed if a null (!) value is supplied for
 *        parameter REGION and a non-null value is supplied for parameter
 *        CENTRE1.
+*     INSTRUMENT = LITERAL (Read)
+*        Selects the tiling scheme to be used. The following instrument
+*        names are recognised (unambiguous abbreviations may be supplied):
+*        "SCUBA-2(450)", "SCUBA-2(850)", "ACSIS", "DAS". If the first input
+*        NDF contains JCMT data, the default value for this parameter is
+*        determined from the FITS headers in the input NDF. Otherwise,
+*        there is no default and an explicit value must be supplied. []
 *     OUT = NDF (Read)
 *        The output NDF.
 *     PIXSIZE = _REAL (Read)
@@ -179,6 +186,11 @@ try:
    params.append(starutil.Par0F("PIXSIZE", "Output pixel size (arcsec)", None,
                                  maxval=1000, minval=0.01, noprompt=True))
 
+   params.append(starutil.ParChoice("INSTRUMENT",
+                                    ["SCUBA-2(450)", "SCUBA-2(850)", "ACSIS",
+                                    "DAS"],
+                                    "The JCMT instrument", "SCUBA-2(850)"))
+
    params.append(starutil.Par0L("RETAIN", "Retain temporary files?", False,
                                  noprompt=True))
 
@@ -200,6 +212,8 @@ try:
 #  all tiles have the same value.
    instrument0 = None
    for tile in tiles:
+      instrument = None
+
       cval = starutil.get_fits_header( tile, "INSTRUME" )
       if cval == "SCUBA-2":
          cval = starutil.get_fits_header( tile, "FILTER" )
@@ -210,14 +224,6 @@ try:
          elif cval == "850":
             instrument = "SCUBA-2(850)"
 
-         elif cval != None:
-            raise starutil.InvalidParameterError("Tile {0} has an unknown "
-                           "value '{1}' for the FILTER header.".format(tile,cval) )
-
-         else:
-            raise starutil.InvalidParameterError("Tile {0} has no value for "
-                                         "the FILTER header.".format(tile) )
-
       else:
          cval = starutil.get_fits_header( tile, "BACKEND" )
 
@@ -227,20 +233,19 @@ try:
          elif cval == "DAS":
             instrument = "DAS"
 
-         elif cval != None:
-            raise starutil.InvalidParameterError("Tile {0} has an unknown "
-                           "value '{1}' for the BACKEND header.".format(tile,cval) )
-
-         else:
-            raise starutil.InvalidParameterError("Tile {0} has no value for "
-                                         "the BACKEND header.".format(tile) )
-
       if instrument0 == None:
+         if instrument != None:
+            parsys["INSTRUMENT"].default = instrument
+            parsys["INSTRUMENT"].noprompt = True
+         instrument = parsys["INSTRUMENT"].value
          instrument0 = instrument
 
-      elif instrument0 != instrument:
-         raise starutil.InvalidParameterError("Tile {0} is for instrument "
+      elif instrument != None:
+         if instrument0 != instrument:
+            raise starutil.InvalidParameterError("Tile {0} is for instrument "
                      "{1} - others are for {2}.".format(tile,instrument,instrument0) )
+      else:
+         instrument = instrument0;
 
    instrument = starutil.shell_quote( instrument )
 
