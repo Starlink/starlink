@@ -448,7 +448,14 @@ void smf_jsadicer( int indf, const char *base, int trim,
       if( *status == KPG__NOFTS ) {
          errAnnul( status );
          fc = astFitsChan( NULL, NULL, " " );
+
+/* If the last card is "END", remove it. */
+      } else {
+         astSetI( fc, "Card", astGetI( fc, "NCARD" ) );
+         const char *keyword = astGetC( fc, "CardName" );
+         if( keyword && !strcmp( keyword, "END" ) ) astDelFits( fc );
       }
+
       one_snprintf(jsatile_comment, 45, "JSA all-sky tile index (Nside=%i)",
                    status, tiling.ntpf);
       atlPtfti( fc, "JSATILE", tile_index, jsatile_comment, status );

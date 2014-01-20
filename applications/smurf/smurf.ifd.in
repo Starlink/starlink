@@ -5743,6 +5743,10 @@ package @PACKAGE@ {
         obey {python $SMURF_DIR/jsajoin.py}
     }
 
+    command jsasplit {
+        obey {python $SMURF_DIR/jsasplit.py}
+    }
+
     icl {defhelp @PACKAGE@ $@PACKAGE_UPCASE@_HELP 0}
 
     display {
