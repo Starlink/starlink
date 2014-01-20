@@ -272,6 +272,8 @@
 #        Add fts2gaia
 #     2013-09-04 (MS):
 #        Add low resolution bandpass parameter (in +/- mm from centre) to fts2split
+#     2013-11-10 (MS):
+#        Add optional rtsdelay parameter to compensate for RTS timing delay for FTS-2 mirror position
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -2171,6 +2173,16 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter rtsdelay {
+                type _REAL
+                access READ
+                vpath DEFAULT
+                ppath DEFAULT
+                default 0.0
+                prompt {RTS delay (ms)}
+                helpkey *
+            }
+
             parameter in {
                 position 1
                 type NDF
@@ -3901,13 +3913,13 @@ package @PACKAGE@ {
                 helpkey *
             }
 
-	    parameter steptime {
-                type _DOUBLE
-                access WRITE
-                vpath DEFAULT
-		default 0
-                helpkey *
-	    }
+	        parameter steptime {
+                    type _DOUBLE
+                    access WRITE
+                    vpath DEFAULT
+                    default 0
+                    helpkey *
+	        }
 
         }
 
@@ -4551,7 +4563,7 @@ package @PACKAGE@ {
                 vpath DEFAULT
                 prompt {Number of good bolometers in average power spectrum}
                 helpkey *
-		default 0
+                default 0
             }
 
             parameter out {

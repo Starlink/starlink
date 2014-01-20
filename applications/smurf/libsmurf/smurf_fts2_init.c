@@ -63,6 +63,12 @@
 *        Set the step time to a nominal value to produce uniformly sized zero-padded spectra
 *     2013-08-27 (MS)
 *        Temporary fix for segfault due to incorrect array sizes
+*     2013-11-08 (MS)
+*        Add RTS delay interpolation
+*        Due to a delay discovered between the real time signal (RTS) timing pulses
+*        and the corresponding mirror positions of ~6.3 ms,
+*        interpolation of raw interferograms has been added.
+*        An optional parameter: RTSDELAY accepts a double value representing time in ms.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -125,6 +131,7 @@ void smurf_fts2_init(int* status)
   if( *status != SAI__OK ) { return; }
 
   double STAGE_CENTER       = 0.0;      /* mm */
+  double deltaT             = 0.0;      /* sec */
   Grp* gIn                  = NULL;     /* Input group */
   Grp* gOut                 = NULL;     /* Output group */
   Grp* gZpd                 = NULL;     /* ZPD group */
@@ -144,11 +151,15 @@ void smurf_fts2_init(int* status)
   double dz                 = 0.0;      /* Step size in evenly spaced OPD grid */
   double dx                 = 0.0;      /* Step size in evenly spaced mirror position grid */
   double* MIRPOS            = NULL;     /* Mirror positions */
+  double* MIRRTS            = NULL;     /* Mirror times */
   double* IFG               = NULL;     /* Interferogram */
+  double* IFGT              = NULL;     /* Interferogram time shifted*/
   double* OPD               = NULL;     /* Optical Path Difference */
   double* OPD_EVEN          = NULL;     /* Optical Path Difference, evenly spaced */
-  gsl_interp_accel* ACC     = NULL;
-  gsl_spline* SPLINE        = NULL;
+  gsl_interp_accel* ACC     = NULL;     /* OPD IFG interpolator */
+  gsl_interp_accel* ACCT    = NULL;     /* Time shifted IFG interpolator */
+  gsl_spline* SPLINE        = NULL;     /* OPD IFG interpolation spline */
+  gsl_spline* SPLINET       = NULL;     /* Time shifted IFG interpolation spline */
 
   size_t nFiles             = 0;        /* Size of the input group */
   size_t nOutFiles          = 0;        /* Size of the output group */
@@ -206,6 +217,13 @@ void smurf_fts2_init(int* status)
     goto CLEANUP;
   }
 
+  /* RTS delay */
+  parGet0d("RTSDELAY", &deltaT, status);
+  if (*status != SAI__OK) {
+      errRep(FUNC_NAME, "Could not read parameters", status);
+      goto CLEANUP;
+  }
+
   /* Open the ZPD calibration file */
   smf_open_file(NULL, gZpd, 1, "READ", SMF__NOCREATE_QUALITY, &zpdData, status);
   if(*status != SAI__OK) {
@@ -230,24 +248,28 @@ void smurf_fts2_init(int* status)
     nFrames = inData->dims[2];
     nPixels = nWidth * nHeight;
 
-    /* Mirror positions in mm */
+    /* Mirror positions in mm and times in sec*/
     nTmp = nFrames;
     MIRPOS = astCalloc(nFrames, sizeof(*MIRPOS));
-    fts2_getmirrorpositions(inData, MIRPOS, &nTmp, status); /* (mm) */
+    MIRRTS = astCalloc(nFrames, sizeof(*MIRRTS));
+    fts2_getmirrorpositions(inData, MIRPOS, MIRRTS, &nTmp, status); /* (mm) */
     if(*status != SAI__OK) {
       *status = SAI__ERROR;
       errRep( FUNC_NAME, "Unable to get the mirror positions!", status);
       goto CLEANUP;
     }
-    fts2_validatemirrorpositions(MIRPOS, nFrames, &nStart, &nStop, inData, status);
+    fts2_validatemirrorpositions(MIRPOS, MIRRTS, nFrames, &nStart, &nStop, inData, status);
     if(*status != SAI__OK) {
       *status = SAI__ERROR;
       errRep( FUNC_NAME, "Unable to validate the mirror positions!", status);
       goto CLEANUP;
     }
 
+    /* Shift mirror times by RTSDELAY (convert from ms to s, and shift to days) */
+    if(deltaT) for(k = 0; k < nFrames; k++) { MIRRTS[k] -= deltaT/(1000.0*24*3600); }
+
     /* Transform mirror positions from measured coordinates to [-225, 225] */
-       for(k = 0; k < nFrames; k++) { MIRPOS[k] -= STAGE_CENTER; }
+    for(k = 0; k < nFrames; k++) { MIRPOS[k] -= STAGE_CENTER; }
 
     /* The number of mirror positions with unique values */
     nMirPos = nStop - nStart + 1;
@@ -340,6 +362,50 @@ void smurf_fts2_init(int* status)
     /* Nyquist frequency */
     fNyquist = 10.0 / (8.0 * scanVel * stepTime);
     dz = 1.0 / (2.0 * fNyquist);
+
+    /* Time shifted IFG */
+    if(deltaT) {
+        /* Allocate memory for arrays */
+        IFGT = astCalloc(nFrames, sizeof(*IFGT));
+        /* Prepare GSL interpolator */
+        ACCT   = gsl_interp_accel_alloc();
+        SPLINET= gsl_spline_alloc(gsl_interp_cspline, nFrames);
+
+        /* Interpolate interferograms in each pixel onto a time shifted grid */
+        for(i = 0; i < nWidth; i++) {
+            for(j = 0; j < nHeight; j++) {
+                bolIndex = i + j * nWidth;
+
+                badPixel = 0;
+                /* Read in interferogram */
+                for(k = nStart; k <= nStop; k++) {
+                    index = bolIndex + nPixels * k;
+
+                    IFGT[k] = *((double*) (inData->pntr[0]) + index);
+
+                    /* See if this is a bad pixel */
+                    if(IFGT[k] == VAL__BADD) { badPixel = 1; break; }
+                }
+                /* If this is a bad pixel, go to next */
+                if(badPixel) {
+                    for(k = 0; k < nOPD; k++) {
+                        index = bolIndex + k * nPixels;
+                        *((double*)(inData->pntr[0]) + index) = VAL__BADD;
+                    }
+                    continue;
+                }
+
+                /* Interpolate interferogram onto time shifted grid */
+                gsl_spline_init(SPLINET, MIRRTS, IFGT, nFrames);
+
+                /* Update the time shifted IFG */
+                for(k = 0; k < nFrames; k++) {
+                    index = bolIndex + nPixels * k;
+                    *((double*)(inData->pntr[0]) + index) = gsl_spline_eval(SPLINET, MIRRTS[k], ACCT);
+                }
+            }
+        }
+    }
 
     /* Evenly spaced OPD grid */
     minOPD = OPD[0];
@@ -445,7 +511,7 @@ void smurf_fts2_init(int* status)
           continue;
         }
 
-        /* Interpolate */
+        /* Interpolate time shifted interferogram onto OPD grid */
         gsl_spline_init(SPLINE, OPD, IFG, nMirPos);
 
         /* Update the output and OPD
@@ -458,11 +524,6 @@ void smurf_fts2_init(int* status)
             *((double*)(outData->pntr[0]) + index) = gsl_spline_eval(SPLINE,  OPD_EVEN[k], ACC);
             /* Update the ZPD index position */
             if(OPD_EVEN[k] <= ZPD) { indexZPD = k;}
-          } else {
-            /* TODO: Convert to Starlink warning message, and maybe only for more than 1 skip per iteration */
-            /* NOTE: This shouldn't be happening anymore since other code has been revised to prevent it */
-            /*printf("smurf_fts2_init: Warning: Skipping OPD_EVEN[k(%d)]=%f of nOPD(%d) positions, with OPD[nMirPos-1(%d)]=%f\n",
-                   k, OPD_EVEN[k], nOPD, nMirPos-1, OPD[nMirPos-1]);*/
           }
         }
         *((int*) (zpd->pntr[0]) + bolIndex) = indexZPD;
@@ -470,10 +531,13 @@ void smurf_fts2_init(int* status)
     }
 
     /* Deallocate memory used by arrays */
+    if(IFGT)    { IFGT      = astFree(IFGT); }
     if(IFG)     { IFG       = astFree(IFG); }
     if(OPD)     { OPD       = astFree(OPD); }
     if(OPD_EVEN){ OPD_EVEN  = astFree(OPD_EVEN); }
     if(MIRPOS)  { MIRPOS    = astFree(MIRPOS); }
+    if(ACCT)    { gsl_interp_accel_free(ACCT);  ACCT    = NULL; }
+    if(SPLINET) { gsl_spline_free(SPLINET);     SPLINET = NULL; }
     if(ACC)     { gsl_interp_accel_free(ACC);   ACC     = NULL; }
     if(SPLINE)  { gsl_spline_free(SPLINE);      SPLINE  = NULL; }
 
@@ -504,10 +568,13 @@ void smurf_fts2_init(int* status)
   }
   CLEANUP:
   /* Deallocate memory used by arrays */
+  if(IFGT)    { IFGT      = astFree(IFGT); }
   if(IFG)     { IFG       = astFree(IFG); }
   if(OPD)     { OPD       = astFree(OPD); }
   if(OPD_EVEN){ OPD_EVEN  = astFree(OPD_EVEN); }
   if(ACC)     { gsl_interp_accel_free(ACC);   ACC     = NULL; }
+  if(ACCT)    { gsl_interp_accel_free(ACCT);  ACCT    = NULL; }
+  if(SPLINET) { gsl_spline_free(SPLINET);     SPLINET = NULL; }
   if(SPLINE)  { gsl_spline_free(SPLINE);      SPLINE  = NULL; }
   if(inData)  { smf_close_file( NULL,&inData, status); }
   if(outData) { smf_close_file( NULL,&outData, status); }

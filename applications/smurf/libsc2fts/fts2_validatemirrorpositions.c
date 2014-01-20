@@ -25,19 +25,21 @@
 
 *  Authors:
 *     COBA: Coskun Oba (UoL)
-*     MSHERWOOD: Matt Sherwood (UofL)
+*     MS: Matt Sherwood (UofL)
 
 *  History :
 *     2012-05-24 (COBA):
 *        Original version.
-*     2012-12-12 (MSHERWOOD):
+*     2012-12-12 (MS):
 *           Removed temporary testing code.
-*     2012-12-21 (MSHERWOOD)
+*     2012-12-21 (MS)
 *         Changed validation logic to trim non-uniform data from ends
 *         while adapting to mirror speed.
 *         Also reverse mirror position array in case of opposite scan direction.
-*     2013-04-05 (MSHERWOOD)
+*     2013-04-05 (MS)
 *         Reverse data also with mirror position array in case of opposite scan direction.
+*     2013-11-25 (MS)
+*         Also treat RTS timing values.
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -93,7 +95,7 @@
 
 #define FUNC_NAME "fts2_validatemirrorpositions"
 
-void fts2_validatemirrorpositions(double* positions, int count, int* ni, int* nf, smfData* inData, int* status)
+void fts2_validatemirrorpositions(double* positions, double* times, int count, int* ni, int* nf, smfData* inData, int* status)
 {
   if(*status != SAI__OK) { return; }
 
@@ -140,7 +142,8 @@ void fts2_validatemirrorpositions(double* positions, int count, int* ni, int* nf
   direction = positive - negative;
 
   /* Invert negative scan */
-  double* inverted = NULL;
+  double* invertedP = NULL;         /* Inverted positions */
+  double* invertedT = NULL;         /* Inverted times */
   if(direction < 0) {
     /* Copy input data into output data for inversion */
     nWidth  = inData->dims[0];
@@ -149,9 +152,11 @@ void fts2_validatemirrorpositions(double* positions, int count, int* ni, int* nf
     nPixels = nWidth * nHeight;
     copyData = (double*) astMalloc((nPixels * nFrames) * sizeof(*copyData));
 
-    inverted = (double*) astCalloc(count, sizeof(*inverted));
+    invertedP = (double*) astCalloc(count, sizeof(*invertedP));
+    invertedT = (double*) astCalloc(count, sizeof(*invertedT));
     for(i=0,j=count-1; i < count; i++,j--) {
-      inverted[i] = positions[j];
+      invertedP[i] = positions[j];
+      invertedT[i] = times[j];
       for(x = 0; x < nWidth; x++) {
         for(y = 0; y < nHeight; y++) {
           bolIndex = x + y * nWidth;
@@ -159,9 +164,10 @@ void fts2_validatemirrorpositions(double* positions, int count, int* ni, int* nf
         }
       }
     }
-    // Copy inverted values back to positions
+    // Copy inverted values back to positions and times
     for(i=0; i < count; i++) {
-      positions[i] = inverted[i];
+      positions[i] = invertedP[i];
+      times[i] = invertedT[i];
       for(x = 0; x < nWidth; x++) {
         for(y = 0; y < nHeight; y++) {
           bolIndex = x + y * nWidth;
@@ -216,9 +222,13 @@ void fts2_validatemirrorpositions(double* positions, int count, int* ni, int* nf
   if(delta) {astFree(delta); delta = NULL;}
 /*if(shifted) {astFree(shifted); shifted = NULL;}*/
   if(direction < 0) {
-    if(inverted) {
-        astFree(inverted);
-        inverted = NULL;
+    if(invertedP) {
+        astFree(invertedP);
+        invertedP = NULL;
+    }
+    if(invertedT) {
+        astFree(invertedT);
+        invertedT = NULL;
     }
     if(copyData) {
       astFree(copyData);

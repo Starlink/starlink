@@ -18,10 +18,13 @@
 
 *  Authors:
 *     COBA: Coskun Oba (UoL)
+*     MS: Matt Sherwood (UofL)
 
 *  History :
 *     2011-05-04 (COBA):
 *        Original version.
+*     2013-11-25 (MS)
+*         Also return RTS timing values.
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -77,7 +80,7 @@
 
 #define FUNC_NAME "fts2_getmirrorpositions"
 
-void fts2_getmirrorpositions(smfData* data, double* positions, int* size, int* status)
+void fts2_getmirrorpositions(smfData* data, double* positions, double* times, int* size, int* status)
 {
   if(*status != SAI__OK) { return; }
 
@@ -85,6 +88,7 @@ void fts2_getmirrorpositions(smfData* data, double* positions, int* size, int* s
   size_t count      = 0;    /* Size */
   HDSLoc* hdsLoc    = NULL; /* Pointer to HDS location */
   HDSLoc* hdsLocPos = NULL; /* Pointer to mirror positions */
+  HDSLoc* hdsLocRTS = NULL; /* Pointer to mirror times */
 
   smf_fits_getS(data->hdr, "FTS_MODE", ftsMode, sizeof(ftsMode), status);
   if(strncmp(ftsMode, "FSCAN", 5) == 0 || strncmp(ftsMode, "ZPD", 3) == 0) {
@@ -92,6 +96,10 @@ void fts2_getmirrorpositions(smfData* data, double* positions, int* size, int* s
     datFind(hdsLoc, "FTS_POS", &hdsLocPos, status);
     datSize(hdsLocPos, &count, status);
     datGetVD(hdsLocPos, count, positions, &count, status);
+    *size = (int) count;
+    datFind(hdsLoc, "RTS_END", &hdsLocRTS, status);
+    datSize(hdsLocRTS, &count, status);
+    datGetVD(hdsLocRTS, count, times, &count, status);
     *size = (int) count;
   } else if(strncmp(ftsMode, "STEPINT", 7) == 0 ) {
     *status = SAI__ERROR;
@@ -103,4 +111,5 @@ void fts2_getmirrorpositions(smfData* data, double* positions, int* size, int* s
 
   if(hdsLoc) { datAnnul(&hdsLoc, status); }
   if(hdsLocPos) { datAnnul(&hdsLocPos, status); }
+  if(hdsLocRTS) { datAnnul(&hdsLocRTS, status); }
 }

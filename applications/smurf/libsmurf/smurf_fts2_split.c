@@ -36,10 +36,10 @@
 
 *  Authors:
 *     AGG: Andy Gibb (UBC)
-*     MSHERWOOD: Matt Sherwood (UofL)
+*     MS: Matt Sherwood (UofL)
 
 *  History :
-*     2013-05-16 (MSHERWOOD)
+*     2013-05-16 (MS)
 *        Initial version
 *     2013-05-21 (MS)
 *        Skip scans that are too short
@@ -56,6 +56,9 @@
 *          bandpass=0 means retain the entire scan
 *     2013-09-10 (MS)
 *        Fixed bug introduced in base case by previous addition of low resolution extraction
+*     2013-11-25 (MS)
+*        Add mirror times treatment
+*
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -143,6 +146,7 @@ void smurf_fts2_split(int* status)
   double fNyquist           = 0.0;      /* Nyquist frequency */
   double dz                 = 0.0;      /* Step size in evenly spaced OPD grid */
   double* MIRPOS            = NULL;     /* Mirror positions */
+  double* MIRRTS            = NULL;     /* Mirror times */
 
   size_t nFiles             = 0;        /* Size of the input group */
   size_t nOutFiles          = 0;        /* Size of the output group */
@@ -284,7 +288,8 @@ void smurf_fts2_split(int* status)
     /* Mirror positions in mm */
     nTmp = nFrames;
     MIRPOS = astCalloc(nFrames, sizeof(*MIRPOS));
-    fts2_getmirrorpositions(inData, MIRPOS, &nTmp, status); // (mm)
+    MIRRTS = astCalloc(nFrames, sizeof(*MIRRTS));
+    fts2_getmirrorpositions(inData, MIRPOS, MIRRTS, &nTmp, status); // (mm)
     if(*status != SAI__OK) {
       *status = SAI__ERROR;
       errRep( FUNC_NAME, "Unable to get the mirror positions!", status);
@@ -463,6 +468,7 @@ void smurf_fts2_split(int* status)
 
     /* Deallocate memory used by arrays */
     if(MIRPOS)  { MIRPOS    = astFree(MIRPOS); }
+    if(MIRRTS)  { MIRRTS    = astFree(MIRRTS); }
 
     /* Close the file */
     smf_close_file( NULL,&inData, status);
@@ -470,6 +476,8 @@ void smurf_fts2_split(int* status)
   }
   CLEANUP:
   /* Deallocate memory used by arrays */
+  if(MIRPOS)  { MIRPOS    = astFree(MIRPOS); }
+  if(MIRRTS)  { MIRRTS    = astFree(MIRRTS); }
   if(inData)  { smf_close_file( NULL,&inData, status); }
   if(outData) { smf_close_file( NULL,&outData, status); }
 

@@ -32,6 +32,7 @@
 
 *  Authors:
 *     COBA: Coskun Oba (UoL)
+*     MS: Matt Sherwood (UofL)
 
 *  History:
 *     2010-06-13 (COBA):
@@ -48,6 +49,8 @@
 *        - Get mirror positions via fts2_getmirrorpositions
 *        - Fixed possible memory leaks
 *        - Removed redundancies
+*     2013-11-25 (MS):
+*        Added mirror timing values treatment
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -130,6 +133,7 @@ void smurf_fts2_removebse(int* status)
   double* bseIFG        = NULL; /* BSE interferogram */
   double* bseIFGNew     = NULL; /* New BSE interferogram */
   double* bseX          = NULL; /* BSE mirror positions */
+  double* RTS           = NULL; /* BSE mirror times */
   double* srcX          = NULL; /* Source mirror positions */
 
   Grp* grpBSE           = NULL; /* BSE group */
@@ -182,7 +186,8 @@ void smurf_fts2_removebse(int* status)
   // GET BSE MIRROR POSITIONS
   int num = 0;
   bseX = astMalloc(bseN * sizeof(*bseX));
-  fts2_getmirrorpositions(bseData, bseX, &num, status);
+  RTS = astMalloc(bseN * sizeof(*RTS));
+  fts2_getmirrorpositions(bseData, bseX, RTS, &num, status);
   if(*status != SAI__OK) {
     *status = SAI__ERROR;
     errRep( FUNC_NAME, "Unable to get the BSE mirror positions!", status);
@@ -236,7 +241,8 @@ void smurf_fts2_removebse(int* status)
     // GET SOURCE MIRROR POSITIONS
     num = 0;
     srcX = astMalloc(srcN * sizeof(*srcX));
-    fts2_getmirrorpositions(inputData, srcX, &num, status);
+    RTS = astMalloc(srcN * sizeof(*RTS));
+    fts2_getmirrorpositions(inputData, srcX, RTS, &num, status);
     if(*status != SAI__OK) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Unable to get the source mirror positions!", status);
@@ -275,6 +281,9 @@ void smurf_fts2_removebse(int* status)
 
     if(bseIFG) { astFree(bseIFG); bseIFG = NULL; }
     if(bseIFGNew) { astFree(bseIFGNew); bseIFGNew = NULL; }
+    if(bseX) { astFree(bseX); bseX = NULL; }
+    if(RTS) { astFree(RTS); RTS = NULL; }
+    if(srcX) { astFree(srcX); srcX = NULL; }
     if(inputData) { smf_close_file( NULL,&inputData, status); }
   }
 
@@ -283,6 +292,7 @@ void smurf_fts2_removebse(int* status)
     if(bseIFG) { astFree(bseIFG); bseIFG = NULL; }
     if(bseIFGNew) { astFree(bseIFGNew); bseIFGNew = NULL; }
     if(bseX) { astFree(bseX); bseX = NULL; }
+    if(RTS) { astFree(RTS); RTS = NULL; }
     if(srcX) { astFree(srcX); srcX = NULL; }
 
     // CLOSE FILES
