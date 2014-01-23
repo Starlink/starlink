@@ -325,8 +325,9 @@ try:
       ntile = 0
       used_tile_list = []
       for jsatile in jsatile_list:
-         if tile_dict[ str(jsatile) ]:
-            used_tile_list.append( tile_dict[ str(jsatile) ] )
+         key = str(jsatile)
+         if key in tile_dict and tile_dict[ key ]:
+            used_tile_list.append( tile_dict[ key ] )
             ntile += 1
 
 #  Create an NDG holding the group of tile NDFs.
