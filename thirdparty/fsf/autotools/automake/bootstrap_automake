@@ -1,19 +1,20 @@
 #!/bin/sh 
 
-#  Commands used to bootstrap the autoconf/ directory after tracking a new
+#  Commands used to bootstrap the automake/ directory after tracking a new
 #  revision, generating various files. You may also need to revisit the
-#  bootstrap_timeorder issues. Remember cd into autoconf before running
+#  bootstrap_timeorder issues. Remember cd into automake before running
 #  this command.
 #
 #  Note that you should ideally use a build of the vendor autoconf for this
 #  part, not the old Starlink patched version.
 
-if ! test -f "maint.mk"; then
-  echo "Run this command in autoconf/"
+if ! test -f "bin/automake.in"; then
+  echo "Run this command in automake/"
   exit 1
 fi
 
 #  Cribbed from: http://lifecs.likai.org/2012/06/building-autotools-from-git.html
+#  and used for automake?
 
 run () {
     echo $*
@@ -22,15 +23,14 @@ run () {
 
 #  Do this initially.
 git clean -fdx
-run aclocal -I m4
+run aclocal
 run automake --add-missing
 run autoconf
-run rm INSTALL
 
 run git status
 
 echo
-echo "*** Now run configure and make to regenerate INSTALL ***"
+echo "*** Now run configure and make to regenerate other files if needed ***"
 echo
 
 exit
