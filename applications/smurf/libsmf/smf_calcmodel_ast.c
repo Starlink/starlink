@@ -130,6 +130,9 @@
 *        Multi-threaded the data loop.
 *     2013-7-9 (DSB):
 *        Allow an initial number of iterations to be skipped.
+*     2014-1-23 (DSB):
+*        Do not assume that the map is already masked if we are removing an 
+*        initial sky.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -344,12 +347,8 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
     }
 
     /* Get a mask to apply to the map. This is determined by the "Zero_..."
-       parameters in the configuration KeyMap. Do not mask when subtracting
-       off the initial sky estimate, as the initial sky estimate will
-       already be masked. */
-    if( !(flags&SMF__DIMM_PREITER) ) {
-      zmask = smf_get_mask( wf, SMF__AST, keymap, dat, flags, status );
-    }
+       parameters in the configuration KeyMap. */
+    zmask = smf_get_mask( wf, SMF__AST, keymap, dat, flags, status );
 
     /* Reset the SMF__MAPQ_AST bit (but retain it on the last iteration so
       that it gets written to the quality component of the output NDF). */

@@ -61,6 +61,8 @@
 *        be bad if and only if they are flagged by AST masking.
 *        - Report an error if the NDF contains unexpected quality names.
 *        - Clear and RING or COM flags in the quality array of the time series data.
+*     23-JAN-2014 (DSB):
+*        Mask the AST map in smf_calcmodel_ast as normal, rather than masking it here.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -222,20 +224,10 @@ int smf_initial_sky( ThrWorkForce *wf, AstKeyMap *keymap, smfDIMMData *dat,
 /* Ensure masked values are not set bad in the mapped data array. */
       ndfSbb( 0, indf2, status );
 
-/* Map the data array section, and copy it into the map buffer. Set
-   AST-masked pixels bad (but not FLT or COM masked pixels). */
+/* Map the data array section, and copy it into the map buffer. */
       ndfMap( indf2, "DATA", "_DOUBLE", "READ", (void **) &ptr, &nel, status );
       if( *status == SAI__OK ) {
-         if( qptr ) {
-            p1 = ptr;
-            p2 = dat->map;
-            p3 = qptr;
-            for( i = 0; i < dat->msize; i++,p1++ ) {
-               *(p2++) = (*(p3++) & SMF__MAPQ_AST) ? VAL__BADD : *p1;
-            }
-         } else {
-            memcpy( dat->map, ptr, dat->msize*sizeof(*ptr));
-         }
+         memcpy( dat->map, ptr, dat->msize*sizeof(*ptr));
       }
 
 /* Map the variance array section, and copy it into the map buffer. */
@@ -243,16 +235,7 @@ int smf_initial_sky( ThrWorkForce *wf, AstKeyMap *keymap, smfDIMMData *dat,
       if( there ) {
          ndfMap( indf2, "VARIANCE", "_DOUBLE", "READ", (void **) &vptr, &nel, status );
          if( *status == SAI__OK ) {
-            if( qptr ) {
-               p1 = vptr;
-               p2 = dat->mapvar;
-               p3 = qptr;
-               for( i = 0; i < dat->msize; i++,p1++ ) {
-                  *(p2++) = (*(p3++) & SMF__MAPQ_AST) ? VAL__BADD : *p1;
-               }
-            } else {
-               memcpy( dat->mapvar, vptr, dat->msize*sizeof(*vptr));
-            }
+            memcpy( dat->mapvar, vptr, dat->msize*sizeof(*vptr));
          }
       }
 
@@ -272,9 +255,7 @@ int smf_initial_sky( ThrWorkForce *wf, AstKeyMap *keymap, smfDIMMData *dat,
                                         status);
 
 /* Sample the above map at the position of each bolometer sample and
-   subtract the sampled value from the cleaned bolometer value. Indicate
-   that no masking should be done (SMF__PREITER flag) since the mapped
-   NDF array is assumed to be masked already. */
+   subtract the sampled value from the cleaned bolometer value. */
       smf_calcmodel_ast( wf, dat, 0, keymap, NULL, SMF__DIMM_PREITER, status);
 
 /* Remove any existinction correction to the modifed bolometer data. */
