@@ -244,6 +244,10 @@
  *        error and continue.
  *     2014-01-10 (DSB):
  *        Added argument wf.
+ *     2014-01-21 (DSB):
+ *        Use the STEPTIME and SCANVEL values from the SMURF extension, if
+ *        any, in preference to the FITS headers. These extension items are
+ *        created by makemap when exporting cleaned time series data.
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -1325,13 +1329,24 @@ void smf_open_file( ThrWorkForce *wf, const Grp * igrp, size_t index,
     double scanvel = VAL__BADD;
 
     /* Store the STEPTIME in the hdr - assumes that smf_fix_metadata has
-       fixed things up or complained. */
+       fixed things up or complained. If there is a STEPTIME value in the
+       SMURF NDF extension we use it in preference to the FITS header.
+       Such an extension item will be present if the data has been
+       pre-cleaned by a previous run of makemap, and will be the value
+       actually used by the previous run of makemap. Similarly get the
+       SCAN_VEL (in arcsec/sec). */
     smf_getfitsd( hdr, "STEPTIME", &steptime, status );
-    hdr->steptime = steptime;
-
-    /* Similarly get the SCAN_VEL (in arcsec/sec) from the header */
     smf_getfitsd( hdr, "SCAN_VEL", &scanvel, status );
+    if( file && file->ndfid != NDF__NOID ) {
+      int there = 0;
+      ndfXstat( file->ndfid, SMURF__EXTNAME, &there, status );
+      if( there ) {
+         ndfXgt0d( file->ndfid, SMURF__EXTNAME, "STEPTIME", &steptime, status );
+         ndfXgt0d( file->ndfid, SMURF__EXTNAME, "SCAN_VEL", &scanvel, status );
+      }
+    }
     hdr->scanvel = scanvel;
+    hdr->steptime = steptime;
 
     /* If this looks like a SCUBA-2 image but we are missing
        STEPTIME or SCAN_VEL we do not really mind if this is

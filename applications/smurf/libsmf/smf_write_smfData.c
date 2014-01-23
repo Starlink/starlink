@@ -113,6 +113,11 @@
 *        Try to writing wcs if tswcs doesn't exist to handle images
 *     2013-01-22 (DSB):
 *        Added argument single.
+*     2014-01-23 (DSB):
+*        Add items to the SMURF extension in the output NDF to hold the 
+*        STEPTIME and SCANVEL values that were actually used. These may be 
+*        different to the values in the FITS header. This helps when importing 
+*        the data into a subsequent run of makemap (i.e. SKYLOOP). 
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -434,6 +439,18 @@ void smf_write_smfData( ThrWorkForce *wf, const smfData *data,
                                  inhdr->allState, status );
 
       }
+
+      /* Other stuff - more accurate than using a FITS header. */
+      HDSLoc *xloc = NULL;
+      int there = 0;
+      ndfXstat( outfile->ndfid, SMURF__EXTNAME, &there, status );
+      if( !there ) ndfXnew( outfile->ndfid, SMURF__EXTNAME, SMURF__EXTTYPE,
+                            0, NULL, &xloc, status );
+      ndfXpt0d( inhdr->steptime, outfile->ndfid, SMURF__EXTNAME,
+                "STEPTIME", status );
+      ndfXpt0d( inhdr->scanvel, outfile->ndfid, SMURF__EXTNAME,
+                "SCAN_VEL", status );
+      datAnnul( &xloc, status );
     }
 
     /* Dark squids */
