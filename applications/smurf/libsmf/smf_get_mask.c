@@ -96,6 +96,9 @@
 *        The ZERO_NITER and ZERO_FREEZE values should count the iterations 
 *        perfomed *after* any initial iterations for which the AST model was
 *        skipped.
+*     23-JAN-2014 (DSB):
+*        When creating a mask from a quality array imported from an initial 
+*        sky NDF, only check the quality bit relevant to the mask being created.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -189,6 +192,7 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
    int zero_notlast;          /* Don't zero on last iteration? */
    size_t ngood;              /* Number good samples for stats */
    smf_qual_t *pq;            /* Pinter to map quality */
+   smf_qual_t qv;             /* Map quality value to use */
    unsigned char **mask;      /* Address of model's mask pointer */
    unsigned char *newmask;    /* Individual mask work space */
    unsigned char *pm;         /* Pointer to next returned mask pixel */
@@ -210,15 +214,19 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
    if( mtype == SMF__COM ) {
       modname = "COM";
       mask = &(dat->com_mask);
+      qv = SMF__MAPQ_COM;
    } else if( mtype == SMF__AST ) {
       modname = "AST";
       mask = &(dat->ast_mask);
+      qv = SMF__MAPQ_AST;
    } else if( mtype == SMF__FLT ) {
       modname = "FLT";
       mask = &(dat->flt_mask);
+      qv = SMF__MAPQ_FLT;
    } else {
       modname = NULL;
       mask = NULL;
+      qv = 0;
       *status = SAI__ERROR;
       errRepf( " ", "smf_get_mask: Unsupported model type %d supplied - "
                "must be COM, FLT or AST.", status, mtype );
@@ -334,7 +342,7 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
                      pm = *mask;
                      pq = dat->initqual;
                      for( i = 0; i < dat->msize; i++ ) {
-                        *(pm++) = ( *(pq++) != 0 );
+                        *(pm++) = ( *(pq++) & qv );
                      }
                   }
                } else{
