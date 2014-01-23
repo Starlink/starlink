@@ -1,0 +1,20 @@
+#  Establish the time order of some files directories.
+#  Don't want to regenerate these automatically.
+libtool/configure.ac
+libtool/acinclude.m4
+libtool/aclocal.m4
+libtool/configure
+libtool/Makefile.in
+libtool/doc/Makefile.in
+libtool/libltdl/configure.ac
+libtool/libltdl/acinclude.m4
+libtool/libltdl/aclocal.m4
+libtool/libltdl/configure
+libtool/libltdl/config-h.in
+libtool/libltdl/Makefile.in
+libtool/libltdl/config/ltmain.sh
+libtool/libtoolize.in
+libtool/tests/Makefile.in
+libtool/config-h.in
+libtool/doc/libtool.1
+libtool/doc/libtoolize.1

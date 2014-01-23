@@ -1,0 +1,15 @@
+#  Establish the time order of some files directories.
+#  Don't want to regenerate these automatically.
+automake/configure.ac
+automake/aclocal.m4
+automake/configure
+automake/t/testsuite-part.am
+automake/Makefile.in
+automake/doc/stamp-vti
+automake/doc/Makefile.in
+automake/doc/automake.info
+automake/doc/amhello-1.0.tar.gz
+automake/lib/Automake/Makefile.in
+automake/lib/Automake/tests/Makefile.in
+automake/lib/Makefile.in
+automake/m4/Makefile.in

@@ -1,0 +1,8 @@
+
+This is libtool 2.4.2, without any patches.
+
+The "libtool" directory contains the vendor source. It should be updated as
+appropriate and files regenerated with an unmodified autoconf/automake (as
+same version as from the original distribution) as there are no Starlink
+configuration requirements, they should only be found in this directory. The
+intention is to keep patches against vendor as simple as possible.
