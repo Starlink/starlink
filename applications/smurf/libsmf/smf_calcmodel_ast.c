@@ -131,8 +131,11 @@
 *     2013-7-9 (DSB):
 *        Allow an initial number of iterations to be skipped.
 *     2014-1-23 (DSB):
-*        Do not assume that the map is already masked if we are removing an 
+*        - Do not assume that the map is already masked if we are removing an 
 *        initial sky.
+*        - Despike if we have noise values regardless of whether this is the 
+*        first iteration (we will have noise values on the first iteration 
+*        when running from SKYLOOP).
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -275,8 +278,18 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
            ": WARNING: ignoring negative value for ast.mapspike", status );
   }
 
-  if( (mapspike > 0) && noi && !(flags&SMF__DIMM_FIRSTITER) &&
-                               !(flags&SMF__DIMM_PREITER) ) {
+  /* Do we have usable NOI values? The NOI values are initialised to 1.0
+     when the model is created so that smf_rebinmap1 will give all samples
+     equal weights on the first iteration (i.e. before real NOI values are
+     found by smf_calcmodel_noi). */
+  int have_noi = 0;
+  if( noi && noi->sdata[idx] ) {
+     have_noi = ( ((double *) noi->sdata[idx]->pntr[0])[ 0 ] != 1.0 );
+  }
+
+  /* Despike if we have usable NOI values and this function was not
+     called as part of subtracting off an initial sky. */
+  if( (mapspike > 0) && have_noi && !(flags&SMF__DIMM_PREITER) ) {
     size_t nflagged;
     smf_map_spikes( wf, res->sdata[idx], noi->sdata[idx], lut->sdata[idx]->pntr[0],
                     SMF__Q_GOOD, map, mapweight, hitsmap, mapvar, mapspike,

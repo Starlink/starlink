@@ -231,8 +231,13 @@ int smf_import_noi( const char *name, smfDIMMHead *head, AstKeyMap *keymap,
             }
          }
 
-/* Indicate we have succesfully imported some NOI values. */
-         if( *status == SAI__OK ) result = 1;
+/* Indicate we have succesfully imported some NOI values, and ensure the
+   first value is not 1.0 (this is used as flag to indicate to later
+   functions that the NOI values have been calculated). */
+         if( *status == SAI__OK ) {
+            result = 1;
+            if( *dataptr == 1.0 ) *dataptr = VAL__BADD;
+         }
       }
 
 /* Close the NDF. */

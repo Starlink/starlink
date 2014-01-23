@@ -995,6 +995,13 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
                  measured in the bolometer now (i.e. before the first
                  iteration). Use pre-calculated noise values if provided. */
               } else if( calcfirst ) {
+
+                /* First ensure the initial value is not 1.0. This is
+                   used as a test in smf_calcmodel_ast to check that the
+                   NOI model values ahave been set. The first element
+                   will be 1.0 if they have not been set. */
+                ((double*)dataptr)[ 0 ] = VAL__BADD;
+
                 *noi_boxsize = ntslice;
                 if( noisemaps ) {
                   memcpy( dataptr, noisemaps->sdata[j]->pntr[0],

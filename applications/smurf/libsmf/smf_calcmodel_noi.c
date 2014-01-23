@@ -128,6 +128,10 @@
 *        simply looking at the variance of the residuals in each group of
 *        noi.box_size samples. This can result in far fewer samples being
 *        flagged as unusable.
+*     2014-01-23 (DSB):
+*        Use the value of the first NOI data value as an indicator of whether
+*        the noise values have already been calculated, rather than relying on
+*        knowledge of when this will be the case.
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
@@ -347,13 +351,18 @@ void smf_calcmodel_noi( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
 
       /* Only estimate the white noise level once at the beginning - the
          reason for this is to make measurements of the convergence
-         easier. We either do it prior to the start of iterations (in which
+         easier. We may have done it prior to the start of iterations (in which
          case the relative weights will be influeced by low-frequency noise,
-         this is initialized in smf_model_create), or else we calculate
-         the noise after the first iteration. We also skip this
-         calculation if we have already imported external noise values into
-         the NOI model. */
-      if( (flags & SMF__DIMM_FIRSTITER) && (!calcfirst) && (!import) ) {
+         this is initialized in smf_model_create), or or we may have already 
+         imported external noise values into the NOI model. If not, we calculate
+         the noise now. */
+      if( model_data[ 0 ] == 1.0 ) {
+
+        /* First ensure the initial value is not 1.0. This is
+           used as a test in smf_calcmodel_ast to check that the
+           NOI model values ahave been set. The first element
+           will be 1.0 if they have not been set. */
+        model_data[ 0 ] = VAL__BADD;
 
         /* There are two forms for the NOI model: one constant noise value
            for each bolometer, or "ntslice" noise values for each bolometer.
