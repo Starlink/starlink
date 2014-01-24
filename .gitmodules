@@ -31,9 +31,6 @@
 [submodule "thirdparty/latex2html/latex2html/latex2html"]
 	path = thirdparty/latex2html/latex2html/latex2html
 	url = ../latex2html.git
-[submodule "thirdparty/fsf/m4"]
-	path = thirdparty/fsf/m4
-	url = ../m4.git
 [submodule "thirdparty/mesa3d/mesa/mesa"]
 	path = thirdparty/mesa3d/mesa/mesa
 	url = ../mesa.git
@@ -160,3 +157,6 @@
 [submodule "thirdparty/fsf/autotools/libtool/libtool"]
 	path = thirdparty/fsf/autotools/libtool/libtool
 	url = git@github.com:Starlink/libtool.git
+[submodule "thirdparty/fsf/autotools/m4/m4"]
+	path = thirdparty/fsf/autotools/m4/m4
+	url = git@github.com:Starlink/m4.git
