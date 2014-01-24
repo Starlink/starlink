@@ -3,7 +3,7 @@
 '''
 *+
 *  Name:
-*     jsasplit
+*     JSASPLIT
 
 *  Purpose:
 *     Split a single NDF up into a set of JSA tiles.

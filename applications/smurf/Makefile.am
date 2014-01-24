@@ -3,7 +3,7 @@
 # Build libsmf before the applications
 
 SUBDIRS = defaults libsmf libsmurf libsc2sim libacsis libaztec libgsd \
-          libsc2fts docs
+          libsc2fts docs scripts
 
 # can not use surf_mon_FCFLAGS yet
 AM_FCFLAGS = -Isrc -Isc2da -Isc2sim -Icsofit
@@ -206,7 +206,7 @@ stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 	@HLIB@ $<
 
 # Make help file
-smurf.hlp: smurf_master.hlp libsmurf/smurfmon.hlp
-	cat smurf_master.hlp libsmurf/smurfmon.hlp > smurf.hlp
+smurf.hlp: smurf_master.hlp libsmurf/smurfmon.hlp scripts/scripts.hlp
+	cat smurf_master.hlp libsmurf/smurfmon.hlp scripts/scripts.hlp > smurf.hlp
 
 

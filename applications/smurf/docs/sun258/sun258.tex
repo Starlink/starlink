@@ -3054,7 +3054,33 @@ number within those parentheses indicates the size of the array.
 
 \input{../../libsmurf/smurfmon}
 \clearpage
-\subsection{Scripts}
+
+\section{Python Scripts}
+
+The following scripts use \KAPPA\ and \SMURF\ commands to do the number
+crunching, but use Python rather than shell script to glue these commands
+together. The parameter system used by these scripts has been designed to
+be similar to the ADAM parameter system used by most other Starlink
+commands. So for instance, values can be specified by keyword or position
+on the command line, and the user will be prompted for any required parameter
+values that were not specified on the command line. However, there are some
+significant differences, including:
+
+\begin{itemize}
+\item The used parameter values are \emph{not} stored in a parameter file for
+later use. So for instance, the \KAPPA\ \parget\ command cannot be used
+to recover parameter values.
+\item Parameters that take logical parameters must always specify their
+value using an equal sign (\emph{e.g.} \verb+retain=yes+ rather than
+\verb+retain+, and \verb+retain=no+ rather than \verb+noretain+).
+\item The documentation for the command may be displayed by running the
+command with the \verb+--help+ option on the command line.
+\end{itemize}
+
+\input{../../scripts/scripts}
+\clearpage
+
+\section{Other Scripts}
 
 %% These are currently generated manually
 
@@ -3156,91 +3182,6 @@ number within those parentheses indicates the size of the array.
   }
 }
 
-\clearpage
-\sstroutine{
-   CONFIGMELD
-}{
-   Compare two MAKEMAP configs using a visual file comparison tool
-}{
-   \sstdescription{
-      This script uses a visual file comparison tool such as {\tt "}meld{\tt "}, to
-      display two sets of configuration parameters, highlighting the
-      differences between them. Each config may be supplied directly, as
-      is done when running MAKEMAP, or can be read from the History
-      component of an NDF that was created by MAKEMAP.
-   }
-   \sstusage{
-      configmeld config1 config2 waveband defaults tool
-   }
-   \sstdiylist{
-      Parameters
-   }{
-      \sstsubsection{
-         CONFIG1 = LITERAL (Read)
-      }{
-         The first configuration. This can be a normal config such as is
-         supplied for the CONFIG parameter of MAKEMAP, or an NDF created
-         by MAKEMAP.
-      }
-      \sstsubsection{
-         CONFIG2 = LITERAL (Read)
-      }{
-         The first configuration. This can be a normal config such as is
-         supplied for the CONFIG parameter of MAKEMAP, or an NDF created
-         by MAKEMAP.
-      }
-      \sstsubsection{
-         WAVEBAND = LITERAL (Read)
-      }{
-         This parameter is not used if either CONFIG1 or CONFIG2 is
-         an NDF created by MAKEMAP. It should be one of {\tt "}450{\tt "} or {\tt "}850{\tt "}. It
-         specifies which value should be displayed for configuration
-         parameters that have separate values for 450 and 850 um. If either
-         CONFIG1 or CONFIG2 is an NDF created by MAKEMAP, then the
-         wavebands to use are determined from the headers in the NDFs.
-      }
-      \sstsubsection{
-         DEFAULTS = \_LOGICAL (Read)
-      }{
-         If TRUE, then each supplied configuration (CONFIG1 and CONFIG2)
-         is extended to include default values are any MAKEMAP parameters
-         that it does not specify. These defaults are read from file
-         {\tt "}\$SMURF\_DIR/smurf\_makemap.def{\tt "}. [TRUE]
-      }
-      \sstsubsection{
-         TOOL = LITERAL (Read)
-      }{
-         Gives the name of the file comparison tool to use. The named
-         command should be available on the current PATH. It should take
-         the names of two files to compare as command line arguments. If
-         null (!) is supplied, the first available tool in the following
-         list is used:
-
-         \sstitemlist{
-
-            \sstitem
-            meld: www.meldmerge.org
-
-            \sstitem
-            opendiff: developer.apple.com
-
-            \sstitem
-            diffmerge: www.sourcegear.com/diffmerge
-
-            \sstitem
-            kdiff3: kdiff3.sourceforge.net
-
-            \sstitem
-            tkdiff: sourceforge.net/projects/tkdiff
-
-            \sstitem
-            diffuse: diffuse.sourceforge.net
-
-         }
-         [!]
-      }
-   }
-}
 \clearpage
 \sstroutine{
    DUMPOCSCFG
@@ -3608,262 +3549,6 @@ as additional lines of median, mean and standard deviation.
   }{
     SMURF: ACSIS\_INDEX, GETTSYS
   }
-}
-
-\clearpage
-\sstroutine{
-   SKYLOOP
-}{
-   Create a map including data from all chunks in each iteration.
-}{
-   \sstdescription{
-      This script makes a map from specified raw time-series data using the
-      {\tt "}inside-out{\tt "} algorithm described at \\
-      \htmladdnormallink{\texttt{http://pipelinesandarchives.blogspot.co.uk/2012/10/inside-out-map-making.html.}
-      }{http://pipelinesandarchives.blogspot.co.uk/2012/10/inside-out-map-making.html}
-      It runs SMURF:MAKEMAP multiple times, performing a single iteration of
-      the Dynamic Iterative Map-Maker algorithm on each invocation,
-      including data from all chunks. Each map created by MAKEMAP is used
-      as the initial sky estimate for the next invocation. MAKEMAP subtracts
-      this initial sky estimate from the time-series data before starting
-      the first (and only) iteration, and then adds the initial sky estimate
-      back on at the end prior to creating the output map.
-
-      The script produces several intermediate files: a set of cleaned
-      time-series files that may be 2 to 3 times the size of the entire
-      set of raw data files included in the map, and a 2D map for every
-      iteration. These files are placed in a newly created directory that
-      is normally deleted before the script exits. The files can be retained
-      for debugging purposes if required by running the script with
-      {\tt "}retain=yes{\tt "} on the command line.
-
-      The temporary files are placed in a directory name {\tt "}NDG\_xxxxx{\tt "},
-      located within the directory specified by environment variable
-      STAR\_TEMP. If STAR\_TEMP is not defined, they are placed in the system{\tt '}s
-      temporary directory (e.g. {\tt "}/tmp{\tt "}).
-
-      In addition, files holding the extinction correction factor for each
-      data sample are written to the current working directory. These are
-      deleted when the script ends.
-   }
-   \sstusage{
-      skyloop in out niter pixsize config [itermap] [ref] [mask2] [mask3]
-              [extra] [retain] [msg\_filter] [ilevel] [glevel] [logfile]
-   }
-   \sstdiylist{
-      Parameters
-   }{
-      \sstsubsection{
-         CONFIG = LITERAL (Read)
-      }{
-         The MAKEMAP configuration parameter values to use. Additions
-         will be made as follows:
-
-         \sstitemlist{
-            \sstitem
-            First iteration:
-            {\tt \\
-               numiter=1 \\
-               noi.calcfirst=1 \\
-               exportNDF=ext \\
-               noexportsetbad=1 \\
-               exportclean=1 \\
-               ast.zero\_notlast=0 \\
-               flt.zero\_notlast=0 \\
-               com.zero\_notlast=0 \\
-               itermap=0 \\
-               shortmap=0 \\
-               bolomap=0 \\
-               flagmap=<undef> \\
-               sampcube=0 \\
-               diag.append=0
-            }
-
-            \sstitem
-            Subsequent iterations:
-            {\tt \\
-               numiter=1 \\
-               noi.calcfirst=1 \\
-               doclean=0 \\
-               importsky=ref \\
-               ext.import=1 \\
-               ast.zero\_notlast=0 \\
-               flt.zero\_notlast=0 \\
-               com.zero\_notlast=0 \\
-               flt.notfirst=0 \\
-               pln.notfirst=0 \\
-               smo.notfirst=0 \\
-               itermap=0 \\
-               shortmap=0 \\
-               bolomap=0 \\
-               flagmap=<undef> \\
-               sampcube=0 \\
-               diag.append=1
-            }
-
-            \sstitem
-            Last iteration:
-            {\tt \\
-               numiter=1 \\
-               noi.calcfirst=1 \\
-               doclean=0 \\
-               importsky=ref \\
-               ext.import=1 \\
-               ast.zero\_notlast=1 \\
-               flt.zero\_notlast=1 \\
-               com.zero\_notlast=1 \\
-               flt.notfirst=0 \\
-               pln.notfirst=0 \\
-               smo.notfirst=0 \\
-               itermap=0 \\
-               shortmap=0 \\
-               bolomap=0 \\
-               flagmap=<undef> \\
-               sampcube=0 \\
-               diag.append=1
-            }
-         }
-      }
-      \sstsubsection{
-         GLEVEL = LITERAL (Read)
-      }{
-         Controls the level of information to write to a text log file.
-         Allowed values are as for {\tt "}ILEVEL{\tt "}. The log file to create is
-         specified via parameter {\tt "}LOGFILE. [{\tt "}ATASK{\tt "}]
-      }
-      \sstsubsection{
-         ILEVEL = LITERAL (Read)
-      }{
-         Controls the level of information displayed on the screen by the
-         script. It can take any of the following values (note, these values
-         are purposefully different to the SUN/104 values to avoid confusion
-         in their effects):
-
-         \sstitemlist{
-
-            \sstitem
-            {\tt "}NONE{\tt "}: No screen output is created
-
-            \sstitem
-            {\tt "}CRITICAL{\tt "}: Only critical messages are displayed such as warnings.
-
-            \sstitem
-            {\tt "}PROGRESS{\tt "}: Extra messages indicating script progress are also
-            displayed.
-
-            \sstitem
-            {\tt "}ATASK{\tt "}: Extra messages are also displayed describing each atask
-            invocation. Lines starting with {\tt "}$>$$>$$>${\tt "} indicate the command name
-            and parameter values, and subsequent lines hold the screen output
-            generated by the command.
-
-            \sstitem
-            {\tt "}DEBUG{\tt "}: Extra messages are also displayed containing unspecified
-            debugging information.
-
-         }
-         [{\tt "}PROGRESS{\tt "}]
-      }
-      \sstsubsection{
-         IN = NDF (Read)
-      }{
-         The group of time series NDFs to include in the output map.
-      }
-      \sstsubsection{
-         ITERMAP = NDF (Write)
-      }{
-         A 3D NDF to create holding the maps from all iterations. [!]
-      }
-      \sstsubsection{
-         LOGFILE = LITERAL (Read)
-      }{
-         The name of the log file to create if GLEVEL is not NONE. The
-         default is {\tt "}$<$command$>$.log{\tt "}, where $<$command$>$ is the name of the
-         executing script (minus any trailing {\tt "}.py{\tt "} suffix), and will be
-         created in the current directory. Any file with the same name is
-         over-written. []
-      }
-      \sstsubsection{
-         NITER = \_INTEGER (Read)
-      }{
-         The number of iterations to perform. A positive value specifies
-         a fixed number of iterations to perform. A negative value
-         indicates that iterations should continue until the normalized
-         change in the map between iterations is less than the value of
-         the {\tt "}maptol{\tt "} parameter in the configuration supplied by
-         parameter CONFIG. If a value of zero is supplied for NITER, the
-         value to use will be read from the {\tt "}numiter{\tt "} parameter in the
-         configuration. [0]
-      }
-      \sstsubsection{
-         MASK2 = NDF (Read)
-      }{
-         An existing NDF that can be used to specify a second external mask
-         for use with either the AST, FLT or COM model. See configuration
-         parameters AST.ZERO\_MASK, FLT.ZERO\_MASK and COM.ZERO\_MASK. Note,
-         it is assumed that this image is aligned in pixel coordinate with
-         the output map. [!]
-      }
-      \sstsubsection{
-         MASK3 = NDF (Read)
-      }{
-         An existing NDF that can be used to specify a third external mask
-         for use with either the AST, FLT or COM model. See configuration
-         parameters AST.ZERO\_MASK, FLT.ZERO\_MASK and COM.ZERO\_MASK. Note,
-         it is assumed that this image is aligned in pixel coordinate with
-         the output map. [!]
-      }
-      \sstsubsection{
-         EXTRA = LITERAL (Read)
-      }{
-         A string holding any extra command line options to be passed to
-         MAKEMAP (all invocations). [!]
-      }
-      \sstsubsection{
-         MSG\_FILTER = LITERAL (Read)
-      }{
-         Controls the default level of information reported by Starlink
-         atasks invoked within the executing script. The accepted values
-         are the list defined in SUN/104 ({\tt "}None{\tt "}, {\tt "}Quiet{\tt "}, {\tt "}Normal{\tt "},
-         {\tt "}Verbose{\tt "}, etc). [{\tt "}Normal{\tt "}]
-      }
-      \sstsubsection{
-         OUT = NDF (Write)
-      }{
-         The NDF holding the output map.
-      }
-      \sstsubsection{
-         PIXSIZE = \_REAL (Read)
-      }{
-         Pixel dimensions in the output image, in arcsec. The same value
-         will be used for both axes. The default depends on the wavelength
-         of the input data. []
-      }
-      \sstsubsection{
-         REF = NDF (Read)
-      }{
-         An existing NDF that is to be used to define the output grid.
-         If supplied, the output grid will be aligned with the supplied
-         reference NDF. The reference can be either 2D or 3D and the spatial
-         frame will be extracted. If a null (!) value is supplied then the
-         output grid is determined by parameters REFLON, REFLAT, etc.
-         In addition, this NDF can be used to mask the AST, FLT or COM
-         model. See configuration parameters AST.ZERO\_MASK, FLT.ZERO\_MASK
-         and COM.ZERO\_MASK.
-
-         On the second and subsequent invocations of MAKEMAP, any
-         supplied REF image is replaced by the map created by the previous
-         invocation of MAKEMAP. [!]
-      }
-      \sstsubsection{
-         RETAIN = \_LOGICAL (Read)
-      }{
-         Should the temporary directory containing the intermediate files
-         created by this script be retained? If not, it will be deleted
-         before the script exits. If retained, a message will be
-         displayed at the end specifying the path to the directory. [FALSE]
-      }
-   }
 }
 
 \clearpage

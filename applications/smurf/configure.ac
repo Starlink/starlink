@@ -130,7 +130,7 @@ AC_CONFIG_FILES(Makefile smurf.ifd component.xml libsmurf/Makefile \
                 libsmf/Makefile libsc2sim/Makefile libacsis/Makefile \
                 libaztec/Makefile libgsd/Makefile libsc2fts/Makefile \
                 docs/Makefile docs/sun258/Makefile docs/sun259/Makefile \
-                docs/sc19/Makefile defaults/Makefile )
+                docs/sc19/Makefile defaults/Makefile scripts/Makefile )
 
 AC_CONFIG_FILES([defaults/make_pardocs], [chmod 755 defaults/make_pardocs])
 AC_CONFIG_FILES([libsmf/make_h], [chmod 755 libsmf/make_h])

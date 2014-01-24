@@ -3,7 +3,7 @@
 '''
 *+
 *  Name:
-*     jsajoin
+*     JSAJOIN
 
 *  Purpose:
 *     Create a single tangent-plane NDF from a set of JSA tiles.

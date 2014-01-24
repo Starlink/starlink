@@ -13,6 +13,8 @@
 *     python (2.7 or 3.*)
 
 *  Description:
+*     This script combines multiple Q, U and I images and creates a
+*     vector catalogue from them.
 
 *  Usage:
 *     pol2stack in cat pi [retain] [qui] [msg_filter] [ilevel] [glevel]

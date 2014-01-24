@@ -3,7 +3,7 @@
 '''
 *+
 *  Name:
-*     skyloop
+*     SKYLOOP
 
 *  Purpose:
 *     Create a map using the "inside-out" algorithm.
