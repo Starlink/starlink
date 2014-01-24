@@ -1,0 +1,7 @@
+
+This is an unpatched version of GNU m4 (previously it was patched, mainly with
+the files now found in this directory).
+
+To import a new release, add the new source to the vendor branch of the m4/
+repository and merge to master.
+

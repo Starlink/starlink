@@ -1,0 +1,18 @@
+#  Establish the time order of some files directories.
+#  Don't want to regenerate these automatically.
+#  XXX now this is unpatched, this may be unnecessary.
+m4/configure.ac
+m4/aclocal.m4
+m4/config-h.in
+m4/configure
+m4/Makefile.am
+m4/Makefile.in
+m4/checks/Makefile.am
+m4/checks/Makefile.in
+m4/doc/Makefile.am
+m4/doc/Makefile.in
+m4/lib/Makefile.am
+m4/lib/Makefile.in
+m4/src/Makefile.am
+m4/src/Makefile.in
+m4/stamp-h.in
