@@ -5,7 +5,6 @@ autoconf/aclocal.m4
 autoconf/configure
 autoconf/Makefile.in
 autoconf/bin/Makefile.in
-autoconf/config/Makefile.in
 autoconf/doc/Makefile.in
 autoconf/lib/Autom4te/Makefile.in
 autoconf/lib/Makefile.in

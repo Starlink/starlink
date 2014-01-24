@@ -237,7 +237,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 RECURSIVE_TARGETS = all check
-EXTRA_DIST = libtool
+EXTRA_DIST = autoconf
 all: all-am
 
 .SUFFIXES:
@@ -485,7 +485,7 @@ install-manifest:
 	  $(mkdir_p) $$STG ; \
 	  ( DESTDIR=$$STG; prefix=$(prefix); \
 	      export DESTDIR prefix; \
-	       ( cd libtool; $(MAKE) prefix=$$prefix exec_prefix=$$prefix INSTALL_ROOT=$$DESTDIR DESTDIR=$$DESTDIR install );  ) || MF_INST_OK=false ; \
+	       ( cd autoconf; $(MAKE) prefix=$$prefix exec_prefix=$$prefix INSTALL_ROOT=$$DESTDIR DESTDIR=$$DESTDIR install );  ) || MF_INST_OK=false ; \
 	  if $$MF_INST_OK; then \
 	    test -d $(DESTDIR)$(prefix) || $(mkdir_p) $(DESTDIR)$(prefix) ; \
 	    (cd $$STG && find . ! -type d | \
@@ -636,17 +636,17 @@ uninstall-am:
 @SET_MAKE@
 
 $(RECURSIVE_TARGETS):
-	( cd libtool; $(MAKE) $@; )
+	( cd autoconf; $(MAKE) $@; )
 
 distclean-local:
-	( cd libtool; $(MAKE) distclean )
+	( cd autoconf; $(MAKE) distclean )
 
 clean-local:
-	( cd libtool; $(MAKE) clean )
+	( cd autoconf; $(MAKE) clean )
 
 dist-hook:
 	rm -rf `find $(distdir) -type l`
-	(cd $(distdir)/libtool; make distclean)
+	(cd $(distdir)/autoconf; make distclean)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
