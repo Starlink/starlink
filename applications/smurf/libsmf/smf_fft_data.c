@@ -399,7 +399,7 @@ smfData *smf_fft_data( ThrWorkForce *wf, const smfData *indata,
      if needed to ensure the copy is bolometer ordered. Finally, if
      the data are raw integers, the deepcopy will convert them
      to doubles. */
-  data = smf_deepcopy_smfData( indata, 1,
+  data = smf_deepcopy_smfData( wf, indata, 1,
                                SMF__NOCREATE_VARIANCE |
                                SMF__NOCREATE_QUALITY |
                                SMF__NOCREATE_FILE |
@@ -416,7 +416,7 @@ smfData *smf_fft_data( ThrWorkForce *wf, const smfData *indata,
        quality with bolometer order. */
 
     if (inqual) {
-      data->qual = smf_dataOrder_array( (void *)inqual, SMF__QUALTYPE,
+      data->qual = smf_dataOrder_array( wf, (void *)inqual, SMF__QUALTYPE,
                                         SMF__QUALTYPE, nbolo*nr, nr,
                                         nbolo, intstr, inbstr, 1, nr, 0, 0,
                                         status );
@@ -497,7 +497,7 @@ smfData *smf_fft_data( ThrWorkForce *wf, const smfData *indata,
     /* Otherwise create a new smfData, copying over everything except
        for the bolo data itself */
 
-    retdata = smf_deepcopy_smfData( data, 0,
+    retdata = smf_deepcopy_smfData( wf, data, 0,
                                     SMF__NOCREATE_DATA |
                                     SMF__NOCREATE_VARIANCE |
                                     SMF__NOCREATE_QUALITY |
@@ -879,7 +879,7 @@ smfData *smf_fft_data( ThrWorkForce *wf, const smfData *indata,
   }
 
  CLEANUP:
-  if( data ) smf_close_file( &data, status );
+  if( data ) smf_close_file( wf, &data, status );
   if( dims ) dims = astFree( dims );
 
   /* Clean up the job data array */

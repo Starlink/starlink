@@ -319,7 +319,7 @@ void smf_bolonoise( ThrWorkForce *wf, smfData *data, double gfrac,
     if (fftpow) {
       *fftpow = pow;
     } else {
-      smf_close_file( &pow, status );
+      smf_close_file( wf, &pow, status );
     }
   }
 }

@@ -13,9 +13,11 @@
 *     Library routine
 
 *  Invocation:
-*     smf_close_file( smfData **data, int * status );
+*     smf_close_file( ThrWorkForce *wf, smfData **data, int * status );
 
 *  Arguments:
+*     wf = ThrWorkForce * (Given)
+*        Pointer to a pool of worker threads
 *     data = smfData ** (Returned)
 *        Pointer to Pointer to smfData struct containing file info and data.
 *        Will be NULLed on exit.
@@ -106,6 +108,15 @@
 *        Free smfFts
 *     2010-10-19 (COBA):
 *        Reformat smfFts cleanup
+*     2014-01-17 (DSB):
+*        It is possible for a smfData to have an associated NDF
+*        identifier, but for the data pointers to refer to locally
+*        allocated memory rather than mapped NDF arrays (e.g.
+*        smf_dataOrder can cause this condition). In such cases the data
+*        pointers should be freed here. Previously, this was not done
+*        because the smfData has an assocuated NDF identifier. Now, an
+*        extra flag ("isdyn") is used to over-ride this to force the
+*        data pointers to be freed.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -148,6 +159,7 @@
 #include "sae_par.h"
 #include "star/hds.h"
 #include "star/kaplibs.h"
+#include "star/thr.h"
 #include "ndf.h"
 #include "mers.h"
 #include "sc2da/sc2store.h"
@@ -155,7 +167,7 @@
 
 #define ERRFUNC "smf_close_file"
 
-void smf_close_file( smfData ** data, int * status ) {
+void smf_close_file( ThrWorkForce *wf, smfData ** data, int * status ) {
 
   void *buf=NULL;         /* Buffer pointer */
   size_t buflen=0;        /* Size of buffer */
@@ -216,7 +228,7 @@ void smf_close_file( smfData ** data, int * status ) {
 
       /* Handle quality as a special case */
       if ( (*data)->qual) {
-        (*data)->qual = smf_qual_unmap( file->ndfid, (*data)->qfamily,
+        (*data)->qual = smf_qual_unmap( wf, file->ndfid, (*data)->qfamily,
                                         (*data)->qual, status );
       }
 
@@ -260,6 +272,13 @@ void smf_close_file( smfData ** data, int * status ) {
       freedata = 1;
     }
 
+    /* Free the data - even if there is an associated NDF - if it was
+       allocated by a smurf function. Note, a value of 1 for "isdyn"
+       guarantees the memory was allocated within smurf, but a value of
+       zero does not guarantee it was *not* allocated within smurf,
+       which is why we still do the above checks */
+    if( (*data)->isdyn ) freedata = 1;
+
     (*data)->file = astFree( (*data)->file );
   } else {
     /* no file - data is ours to free */
@@ -302,7 +321,7 @@ void smf_close_file( smfData ** data, int * status ) {
     da = (*data)->da;
     da->flatcal = astFree( da->flatcal );
     da->flatpar = astFree( da->flatpar );
-    if( da->dksquid) smf_close_file( &da->dksquid, status );
+    if( da->dksquid) smf_close_file( wf, &da->dksquid, status );
     da->heatval = astFree( da->heatval );
     da = astFree( da );
   }
@@ -310,9 +329,9 @@ void smf_close_file( smfData ** data, int * status ) {
   /* Free smfFts */
   if((*data)->fts != NULL) {
     fts = (*data)->fts;
-    if(fts->zpd) { smf_close_file(&fts->zpd, status); }
-    if(fts->fpm) { smf_close_file(&fts->fpm, status); }
-    if(fts->sigma) { smf_close_file(&fts->sigma, status); }
+    if(fts->zpd) { smf_close_file(wf, &fts->zpd, status); }
+    if(fts->fpm) { smf_close_file(wf, &fts->fpm, status); }
+    if(fts->sigma) { smf_close_file(wf, &fts->sigma, status); }
     fts = astFree(fts);
   }
 

@@ -446,10 +446,10 @@ void smf_fix_steps( ThrWorkForce *wf, smfData *data, double dcthresh,
    int isT = data->isTordered;
    msgOut( "", "Dumping smf_fix_steps input data to NDF 'fix_steps_input.sdf'.",
            status );
-   smf_dataOrder( data, 1, status );
-   smf_write_smfData ( data, NULL,
+   smf_dataOrder( wf, data, 1, status );
+   smf_write_smfData ( wf, data, NULL,
                        "fix_steps_input", NULL, 0, 0, MSG__VERB, 0, status );
-   smf_dataOrder( data, isT, status );
+   smf_dataOrder( wf, data, isT, status );
 #endif
 
 /* Get pointers to data and quality arrays. */

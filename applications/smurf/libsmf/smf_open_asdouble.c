@@ -13,11 +13,13 @@
  *     SMURF subroutine
 
  *  Invocation:
- *     smf_open_asdouble( const Grp *igrp, size_t index, const smfArray* darks,
+ *     smf_open_asdouble( ThrWorkForce *wf, const Grp *igrp, size_t index, const smfArray* darks,
  *                        const smfArray* flatramps, AstKeyMap * heateffmap,
  *                        int ensureflat, smfData **data, int *status );
 
  *  Arguments:
+ *     wf = ThrWorkForce * (Given)
+ *        Pointer to a pool of worker threads
  *     igrp = const Grp* (Given)
  *        Pointer to an input group
  *     index = size_t (Given)
@@ -51,6 +53,8 @@
  *  History:
  *     18-Mar-2011 (EC):
  *        First version factored out of smf_concat_smfGroup
+ *     10-Jan-2014 (DSB):
+ *        Added argument wf.
 
  *  Notes:
 
@@ -81,12 +85,13 @@
 #include "mers.h"
 #include "smf_err.h"
 #include "prm_par.h"
+#include "star/thr.h"
 
 #include "smf.h"
 
 #define FUNC_NAME "smf_open_asdouble"
 
-void smf_open_asdouble( const Grp *igrp, size_t index, const smfArray* darks,
+void smf_open_asdouble( ThrWorkForce *wf, const Grp *igrp, size_t index, const smfArray* darks,
                         const smfArray* flatramps, AstKeyMap * heateffmap,
                         int ensureflat, smfData **data, int *status ) {
 
@@ -94,19 +99,19 @@ void smf_open_asdouble( const Grp *igrp, size_t index, const smfArray* darks,
 
   /* Load data, flatfielding and/or opening raw as double as necessary */
   if( ensureflat ) {
-    smf_open_and_flatfield( igrp, NULL, index, darks, flatramps, heateffmap,
+    smf_open_and_flatfield( wf, igrp, NULL, index, darks, flatramps, heateffmap,
                             data, status );
   } else {
     /* open as raw if raw else just open as whatever we have */
     smfData *tmpdata = NULL;
-    smf_open_file( igrp, index, "READ", SMF__NOCREATE_DATA, &tmpdata, status );
+    smf_open_file( wf, igrp, index, "READ", SMF__NOCREATE_DATA, &tmpdata, status );
     if (tmpdata && tmpdata->file && tmpdata->file->isSc2store) {
-      smf_open_raw_asdouble( igrp, index, darks, data, status );
+      smf_open_raw_asdouble( wf, igrp, index, darks, data, status );
     } else {
-      smf_open_and_flatfield( igrp, NULL, index, darks, flatramps, heateffmap,
+      smf_open_and_flatfield( wf, igrp, NULL, index, darks, flatramps, heateffmap,
                               data, status );
     }
-    smf_close_file( &tmpdata, status );
+    smf_close_file( wf, &tmpdata, status );
   }
 
 }

@@ -90,6 +90,9 @@
 *        now just use the map everywhere.
 *     2013-03-25 (TIMJ):
 *        Silence compiler warning in default case.
+*     2014-01-16 (DSB):
+*        The NOI model has "maxlen" times slices, not 1, if NOI.BOXSIZE 
+*        is non-zero.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -168,6 +171,7 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
 
   /* Local Variables */
   int dofft=0;                 /* flag if we need temp space for FFTs */
+  double dval;                 /* Parameter value */
   dim_t i;                     /* Loop counter */
   dim_t gain_box;              /* Length of blocks for GAI/COM model */
   AstKeyMap *kmap=NULL;        /* Local keymap */
@@ -285,9 +289,19 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
 	case SMF__NOI:
           /* SMF__NOI also estimates the noise in each detector from the
              power spectra, requiring a temporary buffer to store an FFT.
-             Currently we just store one variance per detector */
+             The number of variances per detector depends on NOI.BOX_SIZE 
+             - 1 if NOI.BOXSIZE is zero and "maxlen" otherwise. . */
           dofft = 1;
-          total += ndet*smf_dtype_sz(SMF__DOUBLE,status)*nrelated;
+
+          if( astMapGet0A( keymap, "NOI", &kmap ) ) {
+             astMapGet0D( kmap, "BOX_SIZE", &dval );
+             if( dval == 0 ) {
+                total += ndet*smf_dtype_sz(SMF__DOUBLE,status)*nrelated;
+             } else {
+                total += nsamp*smf_dtype_sz(SMF__DOUBLE,status)*nrelated;
+             }
+             kmap = astAnnul( kmap );
+          }
 	  break;
 	case SMF__COM:
           CHECK_MASK("COM")

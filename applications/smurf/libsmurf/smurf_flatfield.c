@@ -202,7 +202,7 @@ void smurf_flatfield( int *status ) {
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
   /* Filter out darks */
-  smf_find_science( igrp, &fgrp, 0, NULL, NULL, 1, 1, SMF__NULL, NULL,
+  smf_find_science( NULL, igrp, &fgrp, 0, NULL, NULL, 1, 1, SMF__NULL, NULL,
                     &flatramps, &heateffmap, NULL, status );
 
   /* input group is now the filtered group so we can use that and
@@ -222,7 +222,7 @@ void smurf_flatfield( int *status ) {
   }
 
   /* Get group of bolometer masks and read them into a smfArray */
-  smf_request_mask( "BBM", &bbms, status );
+  smf_request_mask( NULL, "BBM", &bbms, status );
 
   for (i=1; i<=size; i++ ) {
     int didflat;
@@ -230,8 +230,8 @@ void smurf_flatfield( int *status ) {
     if (*status != SAI__OK) break;
 
     /* Call flatfield routine */
-    didflat = smf_open_and_flatfield(igrp, ogrp, i, NULL, flatramps,
-                                     heateffmap, &ffdata, status);
+    didflat = smf_open_and_flatfield( NULL, igrp, ogrp, i, NULL, flatramps,
+                                      heateffmap, &ffdata, status);
 
     /* Report failure by adding a message indicating which file failed */
     msgSeti("I",i);
@@ -250,10 +250,10 @@ void smurf_flatfield( int *status ) {
     }
 
     /* Mask out bad bolometers - mask data array not quality array */
-    smf_apply_mask( ffdata, bbms, SMF__BBM_DATA, 0, status );
+    smf_apply_mask( NULL, ffdata, bbms, SMF__BBM_DATA, 0, status );
 
     /* Free resources for output data */
-    smf_close_file( &ffdata, status );
+    smf_close_file( NULL, &ffdata, status );
   }
 
   /* Write out the list of output NDF names, annulling the error if a null
@@ -266,8 +266,8 @@ void smurf_flatfield( int *status ) {
   /* Tidy up after ourselves: release the resources used by the grp routines  */
   if (igrp) grpDelet( &igrp, status);
   if (ogrp) grpDelet( &ogrp, status);
-  if (bbms) smf_close_related( &bbms, status );
-  if( flatramps ) smf_close_related( &flatramps, status );
+  if (bbms) smf_close_related( NULL, &bbms, status );
+  if( flatramps ) smf_close_related( NULL, &flatramps, status );
   if (heateffmap) heateffmap = smf_free_effmap( heateffmap, status );
   ndfEnd( status );
 }

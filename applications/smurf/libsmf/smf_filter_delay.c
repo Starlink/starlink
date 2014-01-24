@@ -180,7 +180,7 @@ void smf_filter_delay( smfFilter *filt, double delay, int *status ) {
       double delay_wrapped;
       double dist;
       double N;
-      
+
       N = filt->rdims[0];
 
       if( delay_samp < 0 ) {
@@ -229,6 +229,6 @@ void smf_filter_delay( smfFilter *filt, double delay, int *status ) {
 
   /* Clean up */
 
-  smf_close_file( &sfunc, status );
-  smf_close_file( &sfunc_ft, status );
+  smf_close_file( NULL, &sfunc, status );
+  smf_close_file( NULL, &sfunc_ft, status );
 }

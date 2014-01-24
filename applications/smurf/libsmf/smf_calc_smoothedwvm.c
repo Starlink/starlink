@@ -412,7 +412,7 @@ void smf_calc_smoothedwvm ( ThrWorkForce *wf, const smfArray * alldata,
         thrdata = smf_create_smfArray( status );
         for (i=0;i<nrelated;i++) {
           smfData *tmpdata = NULL;
-          tmpdata = smf_deepcopy_smfData( (thesedata->sdata)[i], 0, SMF__NOCREATE_FILE |
+          tmpdata = smf_deepcopy_smfData( wf, (thesedata->sdata)[i], 0, SMF__NOCREATE_FILE |
                                           SMF__NOCREATE_DA |
                                           SMF__NOCREATE_FTS |
                                           SMF__NOCREATE_DATA |
@@ -447,7 +447,7 @@ void smf_calc_smoothedwvm ( ThrWorkForce *wf, const smfArray * alldata,
         for (i=0;i<thrdata->ndat;i++) {
           smf_lock_data( (thrdata->sdata)[i], 1, status );
         }
-        smf_close_related( &thrdata, status );
+        smf_close_related( wf, &thrdata, status );
         ngood += pdata->ngood;
       }
     }
@@ -502,7 +502,7 @@ void smf_calc_smoothedwvm ( ThrWorkForce *wf, const smfArray * alldata,
   } */
 
   /* Free resources */
-  if (tmpthesedata) smf_close_related( &tmpthesedata, status );
+  if (tmpthesedata) smf_close_related( wf, &tmpthesedata, status );
 
   if (*status != SAI__OK) {
     if (taudata) taudata = astFree( taudata );

@@ -159,7 +159,7 @@ smfData *smf_fft_2dazav( const smfData *data, double *df, int *status ) {
   }
 
   /* Allocate space for the answer */
-  retdata = smf_deepcopy_smfData( data, 0, SMF__NOCREATE_DATA |
+  retdata = smf_deepcopy_smfData( NULL, data, 0, SMF__NOCREATE_DATA |
                                   SMF__NOCREATE_VARIANCE |
                                   SMF__NOCREATE_QUALITY |
                                   SMF__NOCREATE_FILE |

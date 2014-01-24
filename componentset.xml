@@ -1590,7 +1590,7 @@ reduce your SCUBA-2 data. It can also be used to make maps obtained
 with the ACSIS correlator at JCMT.
   </p></abstract>
   <dependencies >
-    <build>pcs</build><sourceset>messgen</sourceset><build>ast</build><build>sae</build><build>pcs</build><build>mers</build><build>ndf</build><build>shl</build><build>gsl</build><build>ndg</build><build>fftw</build><build>ard</build><build>kaplibs</build><build>pda</build><build>gsd</build><build>irq</build><build>sofa</build><build>pal</build><link>ndf</link><link>ast</link><link>hlp</link><link>ndg</link><link>shl</link><link>pda</link><link>gsd</link><link>irq</link><link>sofa</link><link>pal</link><sourceset>sst</sourceset><sourceset>star2html</sourceset>
+    <build>pcs</build><sourceset>messgen</sourceset><build>ast</build><build>sae</build><build>pcs</build><build>mers</build><build>ndf</build><build>shl</build><build>gsl</build><build>ndg</build><build>fftw</build><build>ard</build><build>kaplibs</build><build>pda</build><build>gsd</build><build>irq</build><build>sofa</build><build>pal</build><build>one</build><link>ndf</link><link>ast</link><link>hlp</link><link>ndg</link><link>shl</link><link>pda</link><link>gsd</link><link>irq</link><link>sofa</link><link>pal</link><link>one</link><sourceset>sst</sourceset><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -6622,7 +6622,7 @@ Ultrix and for SunOS and may still work for them.
 </component>
 
 <component id="gsl" support="U">
-  <version>1.15</version>
+  <version>1.16</version>
   <path>thirdparty/fsf/gsl</path>
   <description>GNU Scientific Library</description>
   <dependencies >
@@ -6729,7 +6729,7 @@ Pence for giving his permission for CFITSIO to be released on Starlink.
 </component>
 
 <component id="vtk" support="U">
-  <version>5.10.0</version>
+  <version>5.10.1</version>
   <path>thirdparty/kitware/vtk</path>
   <description>VTK/CMAKE</description>
   <dependencies >
@@ -6813,7 +6813,7 @@ documents to hypertext.
 </component>
 
 <component id="fftw" support="U">
-  <version>3.1.2</version>
+  <version>3.3.3</version>
   <path>thirdparty/mit/fftw</path>
   <description>Fastest Fourier Transform in the West</description>
   <dependencies >

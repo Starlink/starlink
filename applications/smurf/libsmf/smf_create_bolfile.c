@@ -13,12 +13,14 @@
 *     C function
 
 *  Invocation:
-*     void smf_create_bolfile( const Grp * bgrp, size_t index,
+*     void smf_create_bolfile( ThrWorkForce *wf, const Grp * bgrp, size_t index,
 *               const smfData* refdata, const char * datalabel,
 *               const char * units, int flags, smfData **bolmap,
 *               int *status );
 
 *  Arguments:
+*     wf = ThrWorkForce * (Given)
+*        Pointer to a pool of worker threads
 *     bgrp = const Grp * (Given)
 *        Group containing the relevant file name. If NULL no file
 *        is created and the smfData is malloced.
@@ -108,10 +110,11 @@
 #include "sae_par.h"
 #include "ndf.h"
 #include "star/kaplibs.h"
+#include "star/thr.h"
 #include "ast.h"
 #include "star/one.h"
 
-void smf_create_bolfile( const Grp * bgrp, size_t index,
+void smf_create_bolfile( ThrWorkForce *wf, const Grp * bgrp, size_t index,
                          const smfData* refdata, const char *datalabel,
                          const char *units, int flags, smfData **bolmap,
                          int *status ) {
@@ -142,7 +145,7 @@ void smf_create_bolfile( const Grp * bgrp, size_t index,
   /* either create the file or use malloc */
   if (bgrp) {
     /* create the file for WRITE access */
-    smf_open_newfile( bgrp, index, SMF__DOUBLE, 2, lbnd, ubnd,
+    smf_open_newfile( wf, bgrp, index, SMF__DOUBLE, 2, lbnd, ubnd,
                       flags, bolmap, status );
     if (*bolmap) (*bolmap)->qfamily = SMF__QFAM_TSERIES;
   } else {

@@ -1,10 +1,10 @@
 /*
 *+
 *  Name:
-*     JSASPLIT
+*     JSADICER
 
 *  Purpose:
-*     Split an image or cube into JSA tiles
+*     Dice an image or cube into JSA tiles
 
 *  Language:
 *     Starlink ANSI C
@@ -13,34 +13,32 @@
 *     ADAM A-task
 
 *  Invocation:
-*     smurf_jsasplit( int *status );
+*     smurf_jsadicer( int *status );
 
 *  Arguments:
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
 *  Description:
-*     This routine creates multiple output NDFs by splitting a supplied
-*     2D- or 3D- NDF up into JSA tiles. Currently, it is assumed that the
-*     spatial WCS of the input NDF matches the JSA all-sky grid.
+*     This routine creates multiple output NDFs by dicing a supplied
+*     2D- or 3D- NDF up into JSA tiles. The spatial WCS of the input NDF
+*     must matches the JSA all-sky grid.
 
 *  ADAM Parameters:
 *     IN = NDF (Read)
 *        The input 2D or 3D NDF - it need not have been created by a
 *        smurf task. Currently, it should be gridded on the JSA all-sky
 *        pixel grid, which means that in practice it probably will have
-*        been created by MAKEMAP or MAKECUBE. Future versions of this
-*        command should be able to resample the supplied NDF onto the JSA
-*        all-sky grid before doing the splitting.
+*        been created by MAKEMAP or MAKECUBE.
 *     INSTRUMENT = LITERAL (Read)
 *        The JCMT instrument (different instruments have different
 *        tiling schemes and pixel sizes). The following instrument
 *        names are recognised (unambiguous abbreviations may be
-*        supplied): "SCUBA-2(450)", "SCUBA-2(850)", "HARP", "RxA",
-*        "RxWD", "RxWB".  The dynamic default is determined from the
-*        input NDF if possible. If this cannot be done, then no dynamic
-*        default is provided, and the user is prompted for a value if
-*        none was supplied on the command line. []
+*        supplied): "SCUBA-2(450)", "SCUBA-2(850)", "ACSIS", "DAS". The
+*        dynamic default is determined from the input NDF if possible.
+*        If this cannot be done, then no dynamic default is provided,
+*        and the user is prompted for a value if none was supplied on
+*        the command line. []
 *     JSATILELIST() = _INTEGER (Write)
 *        Returned holding the zero-based indicies of the created JSA
 *        tiles. The number of such indices is given the "NTILE" parameter
@@ -123,10 +121,10 @@
 
 
 /* Local constants */
-#define FUNC_NAME "smurf_jsasplit"
+#define FUNC_NAME "smurf_jsadicer"
 
 /* Main entry */
-void smurf_jsasplit( int *status ) {
+void smurf_jsadicer( int *status ) {
 
 /* Local Variables */
    AstFitsChan *fc;
@@ -184,9 +182,9 @@ void smurf_jsasplit( int *status ) {
    that contain no input data. */
    ogrp = grpNew( "", status );
 
-/* Split the map into output NDFs. */
-   smf_jsasplit( indf, basename, trim, tiling.instrument, &ntile,
-                  ogrp, status );
+/* Dice the map into output NDFs. */
+   smf_jsadicer( indf, basename, trim, tiling.instrument, &ntile,
+                 ogrp, status );
 
 /* Write out the list of output NDF names, annulling the error if a null
    parameter value is supplied. */
@@ -207,7 +205,7 @@ void smurf_jsasplit( int *status ) {
    astEnd;
 
 /* If anything went wrong issue a context message. */
-   if( *status != SAI__OK ) msgOutif( MSG__VERB, " ", "JSASPLIT failed.",
+   if( *status != SAI__OK ) msgOutif( MSG__VERB, " ", "JSADICER failed.",
                                       status );
 }
 

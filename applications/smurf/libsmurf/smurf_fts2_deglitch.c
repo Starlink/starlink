@@ -176,7 +176,7 @@ void smurf_fts2_deglitch(int* status)
   // LOOP THROUGH EACH NDF FILE IN THE INPUT GROUP
   // ===========================================================================
   for(fileIndex = 1; fileIndex <= numInputFile; fileIndex++) {
-    smf_open_and_flatfield(grpInput, grpOutput, fileIndex, NULL, NULL, NULL, &inputData, status);
+    smf_open_and_flatfield(NULL, grpInput, grpOutput, fileIndex, NULL, NULL, NULL, &inputData, status);
     if(*status != SAI__OK) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Unable to open source file!", status);
@@ -465,7 +465,7 @@ void smurf_fts2_deglitch(int* status)
     } // END LOOP THROUGH BOLOMETERS
 
     if(IFG) { astFree(IFG); IFG = NULL; }
-    if(inputData) { smf_close_file(&inputData, status); }
+    if(inputData) { smf_close_file( NULL,&inputData, status); }
   } // END FILE LOOP
 
   CLEANUP:
@@ -477,7 +477,7 @@ void smurf_fts2_deglitch(int* status)
     if(cSDEV) { astFree(cSDEV); cSDEV = NULL;}
 
     // CLOSE FILES
-    if(inputData) { smf_close_file(&inputData, status); }
+    if(inputData) { smf_close_file( NULL,&inputData, status); }
 
     // END NDF
     ndfEnd(status);

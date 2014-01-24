@@ -280,7 +280,7 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   /* Assert bolo-ordered data */
   order_list = SMF__RES|SMF__QUA|SMF__NOI;
   if( mask ) order_list |= SMF__LUT;
-  smf_model_dataOrder( dat, allmodel, chunk, order_list, 0, status );
+  smf_model_dataOrder( wf, dat, allmodel, chunk, order_list, 0, status );
 
   /* Obtain pointers to relevant smfArrays for this chunk */
   res = dat->res[chunk];
@@ -364,7 +364,7 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
           pdata = job_data + iw;
           pdata->oper = 1;
           pdata->clear_ring = ( ring_box1 > 0.0 && ( ring_freeze <= 0 ||
-                                dat->iter <= ring_freeze ) ); 
+                                dat->iter <= ring_freeze ) );
           thrAddJob( wf, 0, pdata, smf1_calcmodel_flt, 0, NULL, status );
         }
         thrWait( wf, status );

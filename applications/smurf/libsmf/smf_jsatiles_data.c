@@ -133,7 +133,7 @@ int *smf_jsatiles_data( Grp *igrp, size_t size, smfJSATiling *tiling,
    for( ifile = 1; ifile <= size && *status == SAI__OK; ifile++ ) {
 
 /* Obtain information about the current input NDF. */
-      smf_open_file( igrp, ifile, "READ", SMF__NOCREATE_DATA, &data,
+      smf_open_file( NULL, igrp, ifile, "READ", SMF__NOCREATE_DATA, &data,
                      status );
 
 /* Get a pointer to the header. */
@@ -210,7 +210,7 @@ int *smf_jsatiles_data( Grp *igrp, size_t size, smfJSATiling *tiling,
       }
 
 /* Close the current input data file. */
-      smf_close_file( &data, status);
+      smf_close_file( NULL, &data, status);
       data = NULL;
    }
 

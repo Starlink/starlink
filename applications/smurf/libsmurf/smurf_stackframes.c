@@ -207,7 +207,7 @@ void smurf_stackframes( int *status ) {
   for (i=1; i<=size; i++) {
     smfData * data = NULL;
 
-    smf_open_file( igrp, i, "READ", SMF__NOCREATE_DATA|SMF__NOTTSERIES, &data, status);
+    smf_open_file( NULL, igrp, i, "READ", SMF__NOCREATE_DATA|SMF__NOTTSERIES, &data, status);
     if (*status == SAI__OK) {
       /* Remove trailing dims that are size 1 */
       size_t j;
@@ -343,7 +343,7 @@ void smurf_stackframes( int *status ) {
       badbit |= bb;
     }
 
-    smf_close_file( &data, status );
+    smf_close_file( NULL, &data, status );
   }
 
   if (*status != SAI__OK) goto CLEANUP;
@@ -390,7 +390,7 @@ void smurf_stackframes( int *status ) {
      values in the variance slice if the input file does not have
      variance.
   */
-  smf_open_file( ogrp, 1, "UPDATE", SMF__NOCREATE_HEAD|SMF__NOTTSERIES, &outdata, status );
+  smf_open_file( NULL, ogrp, 1, "UPDATE", SMF__NOCREATE_HEAD|SMF__NOTTSERIES, &outdata, status );
   if (*status != SAI__OK) goto CLEANUP;
 
   /* Create an array of doubles to store the LutMap information */
@@ -409,7 +409,7 @@ void smurf_stackframes( int *status ) {
      header this time around */
   for (i = 1; i <= size; i++ ) {
     smfData * data = NULL;
-    smf_open_file( igrp, sortinfo[i-1].index, "READ", SMF__NOCREATE_HEAD|SMF__NOTTSERIES, &data, status );
+    smf_open_file( NULL, igrp, sortinfo[i-1].index, "READ", SMF__NOCREATE_HEAD|SMF__NOTTSERIES, &data, status );
     if (*status == SAI__OK && !smf_dtype_check( data, NULL, outdata->dtype, status ) ) {
       *status = SAI__ERROR;
       errRep("", "Input data type differs from output data type. Possible programming error.",
@@ -436,7 +436,7 @@ void smurf_stackframes( int *status ) {
     smf_accumulate_prov( data, igrp, sortinfo[i-1].index, outdata->file->ndfid,
                          "SMURF:" TASK_NAME, NULL, status );
 
-    smf_close_file( &data, status );
+    smf_close_file( NULL, &data, status );
   }
 
   /* Now need to sort out the WCS */
@@ -485,7 +485,7 @@ void smurf_stackframes( int *status ) {
   }
 
  CLEANUP:
-  smf_close_file( &outdata, status );
+  smf_close_file( NULL, &outdata, status );
   if (sortinfo) sortinfo = astFree( sortinfo );
   grpDelet( &igrp, status );
   grpDelet( &ogrp, status );

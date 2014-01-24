@@ -170,7 +170,7 @@ void smf_write_itermap( ThrWorkForce *wf, const double *map, const double *mapva
   flags = SMF__MAP_VAR;
   if( mapqua ) flags |= SMF__MAP_QUAL;
 
-  smf_open_newfile ( mgrp, 1, SMF__DOUBLE, 2, lbnd_out,
+  smf_open_newfile ( wf, mgrp, 1, SMF__DOUBLE, 2, lbnd_out,
                      ubnd_out, flags, &imapdata, status);
 
   /* Copy over the signal and variance maps */
@@ -230,5 +230,5 @@ void smf_write_itermap( ThrWorkForce *wf, const double *map, const double *mapva
 
   /* Clean up */
   if( mgrp ) grpDelet( &mgrp, status );
-  smf_close_file( &imapdata, status );
+  smf_close_file( wf, &imapdata, status );
 }

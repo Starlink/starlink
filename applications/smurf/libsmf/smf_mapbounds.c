@@ -310,7 +310,7 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
     box->ubnd[ 1 ] = VAL__MIND;
 
     /* Read data from the ith input file in the group */
-    smf_open_file( igrp, i, "READ", SMF__NOCREATE_DATA, &data, status );
+    smf_open_file( NULL, igrp, i, "READ", SMF__NOCREATE_DATA, &data, status );
 
     if (*status != SAI__OK) {
       msgSeti( "I", i );
@@ -431,7 +431,7 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
         smf_smfFile_msg( data->file, "FILE", 1, "<unknown>");
         msgOutif( MSG__QUIET, "", "No good telescope positions found in file ^FILE. Ignoring",
                   status );
-        smf_close_file( &data, status );
+        smf_close_file( NULL, &data, status );
         continue;
       }
 
@@ -687,7 +687,7 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
     }
 
     /* Close the data file */
-    smf_close_file( &data, status);
+    smf_close_file( NULL, &data, status);
 
     /* Break out of loop over data files if bad status */
     if (*status != SAI__OK) goto CLEANUP;
@@ -824,7 +824,7 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
   if (fitschan) fitschan = astAnnul( fitschan );
 
   if( data != NULL )
-    smf_close_file( &data, status );
+    smf_close_file( NULL, &data, status );
 
   refsys = astFree( refsys );
 

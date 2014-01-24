@@ -25,19 +25,26 @@
 
 *  Authors:
 *     COBA: Coskun Oba (UoL)
-*     MSHERWOOD: Matt Sherwood (UofL)
+*     MS: Matt Sherwood (UofL)
 
 *  History :
 *     2012-05-24 (COBA):
 *        Original version.
-*     2012-12-12 (MSHERWOOD):
+*     2012-12-12 (MS):
 *           Removed temporary testing code.
-*     2012-12-21 (MSHERWOOD)
+*     2012-12-21 (MS)
 *         Changed validation logic to trim non-uniform data from ends
 *         while adapting to mirror speed.
 *         Also reverse mirror position array in case of opposite scan direction.
-*     2013-04-05 (MSHERWOOD)
+*     2013-04-05 (MS)
 *         Reverse data also with mirror position array in case of opposite scan direction.
+*     2013-11-25 (MS)
+*         Also treat RTS timing values.
+*     2014-01-21 (MS)
+*         Rewrite RTS values for reverse scans to be increasing in time
+*         - The GSL interpolator requires monotonically increasing values for the X dimension
+*           so the first reordered RTS timestamp is set to the time of the first original timestamp
+*           and subsequent timestamps are incremented by the original difference between successive values
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -93,7 +100,7 @@
 
 #define FUNC_NAME "fts2_validatemirrorpositions"
 
-void fts2_validatemirrorpositions(double* positions, int count, int* ni, int* nf, smfData* inData, int* status)
+void fts2_validatemirrorpositions(double* positions, double* times, int count, int* ni, int* nf, smfData* inData, int* status)
 {
   if(*status != SAI__OK) { return; }
 
@@ -114,9 +121,7 @@ void fts2_validatemirrorpositions(double* positions, int count, int* ni, int* nf
   double EPSILON = s/2;
 
   int i,j,x,y = 0;
-  double positive = 0.0;
-  double negative = 0.0;
-  double direction = 0.0;
+  int scanDir      = 0;             /* Mirror scan direction forward==1, reverse==-1 */
 
   double * copyData;                /* Array of pointers to DATA/VARIANCE/QUALITY */
   size_t nWidth             = 0;
@@ -125,23 +130,12 @@ void fts2_validatemirrorpositions(double* positions, int count, int* ni, int* nf
   size_t nPixels            = 0;
   int bolIndex              = 0;
 
-
-  /* Determine scan direction */
-  /* Mirror scans are supposed to be unidirectional (monotonically increasing or decreasing)
-     but can have slow starts or trailing ends where there is little to no significant change.
-     Determine the majority direction of this scan: positive or negative.
-  */
-  for(i=0; i<count-1; i++) {
-    if(positions[i] < positions[i+1])
-      positive += (positions[i+1] - positions[i]);
-    else if(positions[i] > positions[i+1])
-      negative += (positions[i] - positions[i+1]);
-  }
-  direction = positive - negative;
+  smf_fits_getI(inData->hdr, "SCANDIR", &scanDir, status);
 
   /* Invert negative scan */
-  double* inverted = NULL;
-  if(direction < 0) {
+  double* invertedP = NULL;         /* Inverted positions */
+  double* invertedT = NULL;         /* Inverted times */
+  if(scanDir < 0) {
     /* Copy input data into output data for inversion */
     nWidth  = inData->dims[0];
     nHeight = inData->dims[1];
@@ -149,9 +143,15 @@ void fts2_validatemirrorpositions(double* positions, int count, int* ni, int* nf
     nPixels = nWidth * nHeight;
     copyData = (double*) astMalloc((nPixels * nFrames) * sizeof(*copyData));
 
-    inverted = (double*) astCalloc(count, sizeof(*inverted));
+    invertedP = (double*) astCalloc(count, sizeof(*invertedP));
+    invertedT = (double*) astCalloc(count, sizeof(*invertedT));
     for(i=0,j=count-1; i < count; i++,j--) {
-      inverted[i] = positions[j];
+      /* Do a simple reversal on the positions */
+      invertedP[i] = positions[j];
+      /* Set the first inverted time to the first original time of the reverse scan */
+      if(i==0) invertedT[i] = times[j];
+      /* Set subsequent inverted times to be equal to the previous value plus the original difference to the next value */
+      invertedT[i] = invertedT[i-1] + (times[j+1] - times[j]);
       for(x = 0; x < nWidth; x++) {
         for(y = 0; y < nHeight; y++) {
           bolIndex = x + y * nWidth;
@@ -159,9 +159,10 @@ void fts2_validatemirrorpositions(double* positions, int count, int* ni, int* nf
         }
       }
     }
-    // Copy inverted values back to positions
+    /* Copy inverted values back to positions and times */
     for(i=0; i < count; i++) {
-      positions[i] = inverted[i];
+      positions[i] = invertedP[i];
+      times[i] = invertedT[i];
       for(x = 0; x < nWidth; x++) {
         for(y = 0; y < nHeight; y++) {
           bolIndex = x + y * nWidth;
@@ -170,15 +171,6 @@ void fts2_validatemirrorpositions(double* positions, int count, int* ni, int* nf
       }
     }
   }
-
-/*
-  // CREATE SHIFTED MIRROR POSITIONS
-  double* shifted = (double*) astCalloc(count, sizeof(double));
-  for(i = 1; i < count; i++) {
-    shifted[i] = positions[i - 1];
-  }
-  shifted[0] = positions[count - 1];
-*/
 
   /* COMPUTE DELTA MIRROR POSITIONS */
   double* delta = (double*) astCalloc(count, sizeof(double));
@@ -202,23 +194,17 @@ void fts2_validatemirrorpositions(double* positions, int count, int* ni, int* nf
     }
   }
 
-/*
-  // CHECK TO SEE IF THE POSITIONS HAVE REPEATING VALUES IN BETWEEN
-  for(i = *ni + 1; i < *nf; i++) {
-    if(abs(delta[i]) <= EPSILON) {
-      *status = SAI__ERROR;
-      errRep(FUNC_NAME, "Repeating mirror position values found!", status);
-    }
-  }
-*/
-
 /* CLEANUP: */
   if(delta) {astFree(delta); delta = NULL;}
 /*if(shifted) {astFree(shifted); shifted = NULL;}*/
-  if(direction < 0) {
-    if(inverted) {
-        astFree(inverted);
-        inverted = NULL;
+  if(scanDir < 0) {
+    if(invertedP) {
+        astFree(invertedP);
+        invertedP = NULL;
+    }
+    if(invertedT) {
+        astFree(invertedT);
+        invertedT = NULL;
     }
     if(copyData) {
       astFree(copyData);

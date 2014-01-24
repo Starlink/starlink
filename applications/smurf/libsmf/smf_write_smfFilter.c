@@ -13,11 +13,13 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_write_smfFilter( const smfFilter *filt, const char *filename,
-*                          const Grp *igrp, size_t grpindex,
-*                          int *status );
+*     smf_write_smfFilter( ThrWorkForce *wf, const smfFilter *filt,
+*                          const char *filename, const Grp *igrp,
+*                          size_t grpindex, int *status );
 
 *  Arguments:
+*     wf = ThrWorkForce * (Given)
+*        Pointer to a pool of worker threads
 *     filt = const smfFilter * (Given)
 *        Pointer to 2d smfFilter to be written
 *     filename = const char * (Given)
@@ -80,6 +82,7 @@
 /* Starlink includes */
 #include "sae_par.h"
 #include "mers.h"
+#include "star/thr.h"
 #include "ndf.h"
 
 /* SMURF routines */
@@ -89,7 +92,7 @@
 
 #define FUNC_NAME "smf_write_smfFilter"
 
-void smf_write_smfFilter( const smfFilter *filt, const char *filename,
+void smf_write_smfFilter( ThrWorkForce *wf, const smfFilter *filt, const char *filename,
                           const Grp * igrp, size_t grpindex, int *status ) {
 
   double *d = NULL;             /* Data array pointer */
@@ -145,9 +148,9 @@ void smf_write_smfFilter( const smfFilter *filt, const char *filename,
   }
 
   /* Write out the file */
-  smf_write_smfData( data, NULL, filename, igrp, grpindex, 0, MSG__NORM,
+  smf_write_smfData( wf, data, NULL, filename, igrp, grpindex, 0, MSG__NORM,
                      0, status );
 
-  if( data ) smf_close_file( &data, status );
+  if( data ) smf_close_file( wf, &data, status );
 
 }

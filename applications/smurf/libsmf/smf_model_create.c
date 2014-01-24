@@ -216,10 +216,12 @@
 *     2013-03-19 (DSB):
 *        Allocate room for a per-array COM model if either COM.PERARRAY or
 *        COM.PERARRAY_LAST is set.
+*     2014-01-7 (DSB):
+*        Allow LUT to be imported from an NDF.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008,2010-2013 Science and Technology Facilities Council.
+*     Copyright (C) 2008,2010-2014 Science and Technology Facilities Council.
 *     Copyright (C) 2006-2010 University of British Columbia.
 *     All Rights Reserved.
 
@@ -492,22 +494,43 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
                do an open_and_flatfield */
 
             if( !(oflag&SMF__NOCREATE_DATA) ) {
-              smf_open_and_flatfield( igroup->grp, NULL, idx, darks, flatramps,
+              smf_open_and_flatfield( wf, igroup->grp, NULL, idx, darks, flatramps,
                                       heateffmap, &idata, status );
-              smf_apply_mask( idata, bbms, SMF__BBM_DATA, 0, status );
+              smf_apply_mask( wf, idata, bbms, SMF__BBM_DATA, 0, status );
 
             } else {
-              smf_open_file( igroup->grp, idx, "READ", oflag, &idata, status );
+              smf_open_file( wf, igroup->grp, idx, "READ", oflag, &idata, status );
             }
 
             /* Calculate the LUT if necessary */
 
             if( mtype == SMF__LUT ) {
-              smf_calc_mapcoord( wf, keymap, idata, outfset, moving, lbnd_out,
-                                 ubnd_out, fts_port, SMF__NOCREATE_FILE,
-                                 status );
-            }
 
+              /* If importing the LUT values from an NDF... */
+              astMapGet0I( keymap, "IMPORTLUT", &import );
+              if( import ) {
+                 smf_get_dims( idata, NULL, NULL, &nbolo, &ntslice, NULL,
+                               NULL, NULL, status);
+                 idata->lut = astMalloc( (nbolo*ntslice)*sizeof(*(idata->lut)) );
+
+                 nc = strstr( name, "_con" ) - name + 4;
+                 ename = astStore( NULL, name, nc + 1 );
+                 ename[ nc ] = 0;
+                 ename = astAppendString( ename, &nc, "_lut" );
+                 msgOutiff( MSG__VERB, "", FUNC_NAME ": using external LUT "
+                           "model imported from '%s'.", status, ename );
+                 smf_import_array( wf, idata, ename, 0, 0, SMF__INTEGER,
+                                   idata->lut, status );
+                 ename = astFree( ename );
+
+              /* If calculating new LUT values here... */
+              } else {
+                 smf_calc_mapcoord( wf, keymap, idata, outfset, moving, lbnd_out,
+                                    ubnd_out, fts_port, SMF__NOCREATE_FILE,
+                                    status );
+              }
+
+            }
           }
 
         } else {
@@ -517,7 +540,7 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
         }
 
         /* Assert the data order in the template */
-        smf_dataOrder( idata, isTordered, status );
+        smf_dataOrder( wf, idata, isTordered, status );
 
         /* Check that the template is time-varying data */
         if( *status == SAI__OK ) {
@@ -964,14 +987,21 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
                  run by setting "exportndf=noi,noi.export=1"). */
               if( smf_import_noi( name, &head, keymap, dataptr,
                                   noi_boxsize, status ) ) {
-                 msgOutif( MSG__VERB, "", FUNC_NAME ": using external NOI "
-                           "model.", status );
+                 msgOutiff( MSG__VERB, "", FUNC_NAME ": using external NOI "
+                           "model imported from '%s'.", status, name );
 
               /* If calcfirst flag is set, we know that there is one
                  variance for each bolometer. initialize NOI using noise
                  measured in the bolometer now (i.e. before the first
                  iteration). Use pre-calculated noise values if provided. */
               } else if( calcfirst ) {
+
+                /* First ensure the initial value is not 1.0. This is
+                   used as a test in smf_calcmodel_ast to check that the
+                   NOI model values ahave been set. The first element
+                   will be 1.0 if they have not been set. */
+                ((double*)dataptr)[ 0 ] = VAL__BADD;
+
                 *noi_boxsize = ntslice;
                 if( noisemaps ) {
                   memcpy( dataptr, noisemaps->sdata[j]->pntr[0],
@@ -1027,7 +1057,10 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
                  ename = astStore( NULL, name, nc + 1 );
                  ename[ nc ] = 0;
                  ename = astAppendString( ename, &nc, "_ext" );
-                 smf_import_array( idata, ename, 2, 1, (double *) dataptr, status );
+                 msgOutiff( MSG__VERB, "", FUNC_NAME ": using external EXT "
+                           "model imported from '%s'.", status, ename );
+                 smf_import_array( wf, idata, ename, 2, 1, idata->dtype, dataptr,
+                                   status );
                  ename = astFree( ename );
 
               /* If calculating new EXT values here... */
@@ -1108,7 +1141,7 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
                 smf_clean_smfArray( wf, array, NULL, NULL, NULL, kmap, status );
                 if( array ) {
                   array->owndata = 0;
-                  smf_close_related( &array, status );
+                  smf_close_related( wf, &array, status );
                 }
                 if( kmap ) kmap = astAnnul( kmap );
 
@@ -1187,7 +1220,7 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
               grpPut1( ggrp, bmapname, 0, status );
 
               /* First gain map */
-              smf_open_file( ggrp, 1, "READ", 0, &gdata, status );
+              smf_open_file( wf, ggrp, 1, "READ", 0, &gdata, status );
               gptr1 = dataptr;
               gptr1 += ntslice;
               gptr2 = gdata->pntr[0];
@@ -1198,10 +1231,10 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
                   gptr1[k] = gptr2[k];
                 }
               }
-              smf_close_file( &gdata, status );
+              smf_close_file( wf, &gdata, status );
 
               /* Second gain map */
-              smf_open_file( ggrp, 2, "READ", 0, &gdata, status );
+              smf_open_file( wf, ggrp, 2, "READ", 0, &gdata, status );
               gptr1 = dataptr;
               gptr1 += ntslice + nbolo + ntslice;
               gptr2 = gdata->pntr[0];
@@ -1212,7 +1245,7 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
                   gptr1[k] = gptr2[k];
                 }
               }
-              smf_close_file( &gdata, status );
+              smf_close_file( wf, &gdata, status );
 
               grpDelet( &ggrp, status );
             } else {
@@ -1262,7 +1295,7 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
 
           /* Close the input template file if it was opened here */
           if( igroup ) {
-            smf_close_file( &idata, status );
+            smf_close_file( wf, &idata, status );
           }
         }
 

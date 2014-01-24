@@ -13,11 +13,14 @@
 *     Library routine
 
 *  Invocation:
-*     smf_model_dataOrder( smfDIMMData *dat, smfArray ** allmodel,
+*     smf_model_dataOrder( ThrWorkForce *wf, smfDIMMData *dat,
+*                          smfArray ** allmodel,
 *                          int chunk, smf_modeltype toOrder,
 *                          int isTordered, int * status );
 
 *  Arguments:
+*     wf = ThrWorkForce * (Given)
+*        Pointer to a pool of worker threads (can be NULL)
 *     dat = smfDIMMData * (Given)
 *        Struct of pointers to information required by model calculation
 *     allmodel = smfArray ** (Given)
@@ -92,7 +95,7 @@
       int waschanged = 0;                                               \
       int old_order = 0;                                                \
       if ( ARR->sdata[idx] ) old_order = ARR->sdata[idx]->isTordered;   \
-      waschanged = smf_dataOrder( ARR->sdata[idx], isTordered, status ); \
+      waschanged = smf_dataOrder( wf, ARR->sdata[idx], isTordered, status ); \
       if ( waschanged && ARR->sdata[idx] ) {                            \
         const char tordered[] = "time ordered";                         \
         const char bordered[] = "bolo ordered";                         \
@@ -106,7 +109,7 @@
   }
 
 void
-smf_model_dataOrder( smfDIMMData *dat, smfArray ** allmodel, int chunk, smf_modeltype toOrder,
+smf_model_dataOrder( ThrWorkForce *wf, smfDIMMData *dat, smfArray ** allmodel, int chunk, smf_modeltype toOrder,
                      int isTordered, int * status ) {
 
   if (*status != SAI__OK) return;

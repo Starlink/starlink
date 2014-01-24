@@ -201,8 +201,10 @@ double smf_calc_wvm( const smfHead *hdr, double approxam, AstKeyMap * extpars,
   /* Initialise the cache and store it in the thread specific data
      KeyMap. */
   if (!cache) {
+     astBeginPM;
      cache = astKeyMap( "" );
      astMapPut0A( thrThreadData( status ), CACHE_NAME, cache, "" );
+     astEndPM;
   }
 
   /* Store TCS info */
@@ -280,7 +282,9 @@ double smf_calc_wvm( const smfHead *hdr, double approxam, AstKeyMap * extpars,
         tau225 = pwv2tau_bydate( wvmtime, pwv );
 
         /* Store the result in the cache */
+        astBeginPM;
         astMapPut0D( cache, cachekey, tau225, "" );
+        astEndPM;
 
       }
     }

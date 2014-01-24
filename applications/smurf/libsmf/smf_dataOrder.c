@@ -13,9 +13,11 @@
 *     C function
 
 *  Invocation:
-*     waschanged = smf_dataOrder( smfData *data, int isTordered, *status );
+*     waschanged = smf_dataOrder( ThrWorkForce *wf, smfData *data, int isTordered, *status );
 
 *  Arguments:
+*     wf = ThrWorkForce * (Given)
+*        Pointer to a pool of worker threads (can be NULL)
 *     data = smfData* (Given and Returned)
 *        Group of input data files
 *     isTordered = int (Given)
@@ -91,6 +93,13 @@
 *        no idea what the Description comment "If flags set to
 *        SMF__NOCREATE_FILE..." means, so check the NDF access directly
 *        using the NDF library.
+*     2014-01-17 (DSB):
+*        Re-ordering a smfData associated with a read-only NDF results in
+*        new memory being allocated for the results. But the smfData
+*        still has an associated NDF identifier, so we now set a flag
+*        in the smfData to indicate that the memory has been allocated by
+*        smurf and is no longer the mapped NDF arrays. This is used by
+*        smf_clsoe_fiel to decide whether to free the memory or not.
 
 *  Notes:
 *     Nothing is done about the FITS channels or WCS information stored in
@@ -132,6 +141,7 @@
 #include "star/ndg.h"
 #include "prm_par.h"
 #include "par_par.h"
+#include "star/thr.h"
 
 /* SMURF includes */
 #include "libsmf/smf.h"
@@ -141,7 +151,8 @@
 
 #define FUNC_NAME "smf_dataOrder"
 
-int smf_dataOrder( smfData *data, int isTordered, int *status ) {
+int smf_dataOrder( ThrWorkForce *wf, smfData *data, int isTordered,
+                   int *status ) {
 
   /* Local Variables */
   size_t bstr1;                 /* bolometer index stride input */
@@ -246,14 +257,14 @@ int smf_dataOrder( smfData *data, int isTordered, int *status ) {
 
   /* Loop over elements of data->ptr and re-form arrays */
   for( i=0; i<2; i++ ) {
-    data->pntr[i] = smf_dataOrder_array( data->pntr[i], data->dtype,
+    data->pntr[i] = smf_dataOrder_array( wf, data->pntr[i], data->dtype,
                                          data->dtype, ndata,
                                          ntslice, nbolo, tstr1, bstr1, tstr2,
                                          bstr2, inPlace, freeold, status );
   }
 
   /* And Quality */
-  data->qual = smf_dataOrder_array( data->qual, SMF__QUALTYPE, SMF__QUALTYPE,
+  data->qual = smf_dataOrder_array( wf, data->qual, SMF__QUALTYPE, SMF__QUALTYPE,
                                     ndata, ntslice, nbolo, tstr1, bstr1, tstr2,
                                     bstr2, inPlace, freeold, status );
 
@@ -265,7 +276,7 @@ int smf_dataOrder( smfData *data, int isTordered, int *status ) {
   }
 
   /* If there is a LUT re-order it here */
-  data->lut = smf_dataOrder_array( data->lut, SMF__INTEGER, SMF__INTEGER, ndata,
+  data->lut = smf_dataOrder_array( wf, data->lut, SMF__INTEGER, SMF__INTEGER, ndata,
                                    ntslice, nbolo, tstr1, bstr1, tstr2, bstr2,
                                    inPlace, 1, status );
 
@@ -279,10 +290,15 @@ int smf_dataOrder( smfData *data, int isTordered, int *status ) {
   /* Force any external quality to same ordering */
   if (data->sidequal) {
     int qchanged = 0;
-    qchanged = smf_dataOrder( data->sidequal, isTordered, status );
+    qchanged = smf_dataOrder( wf, data->sidequal, isTordered, status );
     /* and indicate if we changed anything (but not if we did not) */
     if (qchanged) waschanged = qchanged;
   }
+
+  /* If the re-ordering was not done in-place, then the new buffer must
+     have been allocated here. Set a flag so that smf_close_file knows to
+     deallocate the memory. */
+  if( ! inPlace ) data->isdyn = 1;
 
   return waschanged;
 }

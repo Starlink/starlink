@@ -255,7 +255,7 @@ void smurf_sc2fft( int *status ) {
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
   /* Filter out darks */
-  smf_find_science( igrp, &fgrp, 1, NULL, NULL, 1, 1, SMF__NULL, &darks,
+  smf_find_science( wf, igrp, &fgrp, 1, NULL, NULL, 1, 1, SMF__NULL, &darks,
                     &flatramps, &heateffmap, NULL, status );
 
   /* input group is now the filtered group so we can use that and
@@ -281,7 +281,7 @@ void smurf_sc2fft( int *status ) {
   }
 
   /* Get group of bolometer masks and read them into a smfArray */
-  smf_request_mask( "BBM", &bbms, status );
+  smf_request_mask( wf, "BBM", &bbms, status );
 
   /* Obtain the number of continuous chunks and subarrays */
   if( *status == SAI__OK ) {
@@ -343,7 +343,7 @@ void smurf_sc2fft( int *status ) {
         dim_t ndata;                /* Number of data points */
 
         /* Apply a mask to the quality array and data array */
-        smf_apply_mask( idata, bbms, SMF__BBM_QUAL|SMF__BBM_DATA, 0, status );
+        smf_apply_mask( wf, idata, bbms, SMF__BBM_QUAL|SMF__BBM_DATA, 0, status );
 
         smf_get_dims( idata,  NULL, NULL, &nbolo, NULL, &ndata, NULL, NULL,
                       status );
@@ -453,7 +453,7 @@ void smurf_sc2fft( int *status ) {
             tempdata = smf_fft_avpspec( odata, bolomask, 1, SMF__Q_BADB,
                                         weightavpspec ? whitenoise : NULL,
                                         status );
-            smf_close_file( &odata, status );
+            smf_close_file( wf, &odata, status );
             whitenoise = astFree( whitenoise );
             bolomask = astFree( bolomask );
             odata = tempdata;
@@ -474,7 +474,7 @@ void smurf_sc2fft( int *status ) {
 
             if( inverse ) {
               /* If output is time-domain, ensure that it is ICD bolo-ordered */
-              smf_dataOrder( odata, 1, status );
+              smf_dataOrder( wf, odata, 1, status );
             } else if( polar ) {
               /* Store FFT of data in polar form */
               smf_fft_cart2pol( wf, odata, 0, power, status );
@@ -485,12 +485,12 @@ void smurf_sc2fft( int *status ) {
           ndgNdfas( basegrp, gcount, "READ", &provid, status );
 
           /* Export the data to a new file */
-          smf_write_smfData( odata, NULL, NULL, ogrp, gcount, provid,
+          smf_write_smfData( wf, odata, NULL, NULL, ogrp, gcount, provid,
                              MSG__VERB, 0, status );
 
           /* Free resources */
           ndfAnnul( &provid, status );
-          smf_close_file( &odata, status );
+          smf_close_file( wf, &odata, status );
         } else {
           msgOutif( MSG__NORM, " ",
                     "Data are already transformed. No output will be produced",
@@ -503,7 +503,7 @@ void smurf_sc2fft( int *status ) {
     }
 
     /* Close the smfArray */
-    smf_close_related( &concat, status );
+    smf_close_related( wf, &concat, status );
   }
 
   /* Write out the list of output NDF names, annulling the error if a null
@@ -518,9 +518,9 @@ void smurf_sc2fft( int *status ) {
   grpDelet( &ogrp, status);
   if (basegrp) grpDelet( &basegrp, status );
   if( igroup ) smf_close_smfGroup( &igroup, status );
-  if( flatramps ) smf_close_related( &flatramps, status );
+  if( flatramps ) smf_close_related( wf, &flatramps, status );
   if (heateffmap) heateffmap = smf_free_effmap( heateffmap, status );
-  if (bbms) smf_close_related( &bbms, status );
+  if (bbms) smf_close_related( wf, &bbms, status );
 
   ndfEnd( status );
 

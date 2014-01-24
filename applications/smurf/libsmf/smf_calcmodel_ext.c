@@ -140,7 +140,7 @@ void smf_calcmodel_ext( ThrWorkForce *wf __attribute__((unused)),
   model = allmodel[chunk];
 
   /* Ensure everything is in bolo-order */
-  smf_model_dataOrder( dat, allmodel, chunk, SMF__RES|SMF__QUA, 0, status);
+  smf_model_dataOrder( wf, dat, allmodel, chunk, SMF__RES|SMF__QUA, 0, status);
 
   /* How many threads do we get to play with */
   nw = wf ? wf->nworker : 1;

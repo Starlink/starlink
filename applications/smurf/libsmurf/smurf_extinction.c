@@ -302,7 +302,7 @@ void smurf_extinction( int * status ) {
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
   /* Filter out darks */
-  smf_find_science( igrp, &fgrp, 0, NULL, NULL, 1, 1, SMF__NULL, &darks,
+  smf_find_science( wf, igrp, &fgrp, 0, NULL, NULL, 1, 1, SMF__NULL, &darks,
                     &flatramps, &heateffmap, NULL, status );
 
   /* input group is now the filtered group so we can use that and
@@ -322,7 +322,7 @@ void smurf_extinction( int * status ) {
   }
 
   /* Get group of pixel masks and read them into a smfArray */
-  smf_request_mask( "BBM", &bbms, status );
+  smf_request_mask( wf, "BBM", &bbms, status );
 
   /* Read the tau relations from config file or group. We do not
      allow sub instrument overloading because these are all values
@@ -356,7 +356,7 @@ void smurf_extinction( int * status ) {
   for (i=1; i<=size && ( *status == SAI__OK ); i++) {
 
     /* Flatfield - if necessary */
-    smf_open_and_flatfield( igrp, ogrp, i, darks, flatramps, heateffmap,
+    smf_open_and_flatfield( wf, igrp, ogrp, i, darks, flatramps, heateffmap,
                             &odata, status );
 
     if (*status != SAI__OK) {
@@ -366,7 +366,7 @@ void smurf_extinction( int * status ) {
     }
 
     /* Mask out bad pixels - mask data array not quality array */
-    smf_apply_mask( odata, bbms, SMF__BBM_DATA, 0, status );
+    smf_apply_mask( wf, odata, bbms, SMF__BBM_DATA, 0, status );
 
     /* Now check that the data are sky-subtracted */
     if ( !smf_history_check( odata, "smf_subtract_plane", status ) ) {
@@ -438,7 +438,7 @@ void smurf_extinction( int * status ) {
     smf_write_clabels( odata, status );
 
     /* Free resources for output data */
-    smf_close_file( &odata, status );
+    smf_close_file( wf, &odata, status );
   }
 
   /* Write out the list of output NDF names, annulling the error if a null
@@ -449,9 +449,9 @@ void smurf_extinction( int * status ) {
   }
 
   /* Tidy up after ourselves: release the resources used by the grp routines  */
-  if (darks) smf_close_related( &darks, status );
-  if (bbms) smf_close_related( &bbms, status );
-  if( flatramps ) smf_close_related( &flatramps, status );
+  if (darks) smf_close_related( wf, &darks, status );
+  if (bbms) smf_close_related( wf, &bbms, status );
+  if( flatramps ) smf_close_related( wf, &flatramps, status );
   if (heateffmap) heateffmap = smf_free_effmap( heateffmap, status );
   grpDelet( &igrp, status);
   grpDelet( &ogrp, status);

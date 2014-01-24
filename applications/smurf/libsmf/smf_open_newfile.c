@@ -13,12 +13,14 @@
 *     Library routine
 
 *  Invocation:
-*     smf_open_newfile( const Grp * ingrp, int index, smf_dtype dtype,
+*     smf_open_newfile( ThrWorkForce *wf, const Grp * ingrp, int index, smf_dtype dtype,
 *                       int ndims, const int lbnd[], const inst ubnd[],
 *                       int flags, smfData ** data,
 *                       int *status);
 
 *  Arguments:
+*     wf = ThrWorkForce * (Given)
+*        Pointer to a pool of worker threads
 *     ingrp = const Grp * (Given)
 *        NDG group identifier
 *     index = int (Given)
@@ -131,6 +133,7 @@
 #include "sae_par.h"
 #include "star/ndg.h"
 #include "star/grp.h"
+#include "star/thr.h"
 #include "ndf.h"
 #include "mers.h"
 #include "msg_par.h"
@@ -144,7 +147,7 @@
 
 #define FUNC_NAME "smf_open_newfile"
 
-void smf_open_newfile( const Grp * igrp, int index, smf_dtype dtype, const int ndims,
+void smf_open_newfile( ThrWorkForce *wf, const Grp * igrp, int index, smf_dtype dtype, const int ndims,
 		       const int *lbnd, const int *ubnd, int flags, smfData ** data,
 		       int *status) {
 
@@ -237,7 +240,7 @@ void smf_open_newfile( const Grp * igrp, int index, smf_dtype dtype, const int n
   if ( flags & SMF__MAP_QUAL ) {
     /* this is a clean slate so no need to worry about quality family */
     size_t nqout;
-    qual = smf_qual_map( newndf, "WRITE/ZERO", NULL, &nqout, status );
+    qual = smf_qual_map( wf, newndf, "WRITE/ZERO", NULL, &nqout, status );
 
     if ( *status != SAI__OK ) {
       errRep(FUNC_NAME, "Unable to map quality array", status);
@@ -293,7 +296,7 @@ void smf_open_newfile( const Grp * igrp, int index, smf_dtype dtype, const int n
         if (newndf != NDF__NOID) ndfAnnul( &newndf, status );
         if (file) file = astFree( file );
       }
-      smf_close_file( data, status );
+      smf_close_file( wf, data, status );
     } else {
       if (qual) qual = astFree( qual );
       if (newndf != NDF__NOID) ndfAnnul( &newndf, status );

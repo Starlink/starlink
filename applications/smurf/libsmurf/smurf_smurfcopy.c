@@ -173,7 +173,7 @@ void smurf_smurfcopy ( int * status ) {
   kpg1Rgndf( "IN", 1, 1, "", &igrp, &size, status );
 
   /* Filter out darks */
-  smf_find_science( igrp, &fgrp, 1, NULL, NULL, 0, 0, SMF__NULL, NULL, NULL,
+  smf_find_science( NULL, igrp, &fgrp, 1, NULL, NULL, 0, 0, SMF__NULL, NULL, NULL,
                     NULL, NULL, status );
 
   /* input group is now the filtered group so we can use that and
@@ -202,12 +202,12 @@ void smurf_smurfcopy ( int * status ) {
   for (i=1; i<=size; i++) {
 
     /* Open the input file using standard routine */
-    smf_open_and_flatfield( igrp, NULL, i, NULL, NULL, NULL, &data, status );
+    smf_open_and_flatfield( NULL, igrp, NULL, i, NULL, NULL, NULL, &data, status );
     if (*status != SAI__OK) break;
 
     if (*status == SAI__OK) {
       if (!data->file->isTstream  || data->ndims != 3) {
-        smf_close_file( &data, status );
+        smf_close_file( NULL, &data, status );
         *status = SAI__ERROR;
         errRep(" ", "Input data do not represent time series", status);
         break;
@@ -253,7 +253,7 @@ void smurf_smurfcopy ( int * status ) {
     /* Open an output file (losing history) but we do not want
        to propagate the full NDF size to the output file */
 
-    smf_open_newfile( ogrp, i, data->dtype, 2, lbnd, ubnd,
+    smf_open_newfile( NULL, ogrp, i, data->dtype, 2, lbnd, ubnd,
                       qua?SMF__MAP_QUAL:0, &odata, status );
     ofile = odata->file;
     ifile = data->file;
@@ -293,8 +293,8 @@ void smurf_smurfcopy ( int * status ) {
     }
 
     /* cleanup */
-    smf_close_file( &data, status );
-    smf_close_file( &odata, status );
+    smf_close_file( NULL, &data, status );
+    smf_close_file( NULL, &odata, status );
 
   }
 

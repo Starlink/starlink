@@ -303,7 +303,7 @@ void smurf_fts2_phasecorrds(int* status)
     /* Loop through each input file */
     for(fIndex = 1; fIndex <= nFiles; fIndex++) {
         /* Open Observation file */
-    smf_open_file(gIn, fIndex, "READ", SMF__NOFIX_METADATA, &inData, status);
+    smf_open_file(NULL, gIn, fIndex, "READ", SMF__NOFIX_METADATA, &inData, status);
         if(*status != SAI__OK) {
             *status = SAI__ERROR;
             errRep(FUNC_NAME, "Unable to open the source file!", status);
@@ -346,7 +346,7 @@ void smurf_fts2_phasecorrds(int* status)
         dSigma = fNyquist / nFrames2;      /* Spectral sampling interval */
 
         /* Copy input data into output data */
-        outData = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
+        outData = smf_deepcopy_smfData( NULL, inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
         outData->dtype   = SMF__DOUBLE;
         outData->ndims   = 3;
         outData->dims[0] = nWidth;
@@ -358,7 +358,7 @@ void smurf_fts2_phasecorrds(int* status)
         /* DEBUG: Process default or alternative output type */
 #if DEBUG
         /* Copy input data into output data Interferogram Digitally Filtered Real DEBUG */
-        outDataIFGINR = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
+        outDataIFGINR = smf_deepcopy_smfData( NULL, inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
         outDataIFGINR->dtype   = SMF__DOUBLE;
         outDataIFGINR->ndims   = 3;
         outDataIFGINR->dims[0] = nWidth;
@@ -368,7 +368,7 @@ void smurf_fts2_phasecorrds(int* status)
         outDataIFGINR->pntr[0] = outDataIFGINR_pntr;
 
         /* Copy input data into output data Interferogram Digitally Filtered Real DEBUG */
-        outDataIFGDFR = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
+        outDataIFGDFR = smf_deepcopy_smfData( NULL, inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
         outDataIFGDFR->dtype   = SMF__DOUBLE;
         outDataIFGDFR->ndims   = 3;
         outDataIFGDFR->dims[0] = nWidth;
@@ -378,7 +378,7 @@ void smurf_fts2_phasecorrds(int* status)
         outDataIFGDFR->pntr[0] = outDataIFGDFR_pntr;
 
         /* Copy input data into output data Interferogram Digitally Filtered Imaginary DEBUG */
-        outDataIFGDFI = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
+        outDataIFGDFI = smf_deepcopy_smfData( NULL, inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
         outDataIFGDFI->dtype   = SMF__DOUBLE;
         outDataIFGDFI->ndims   = 3;
         outDataIFGDFI->dims[0] = nWidth;
@@ -388,7 +388,7 @@ void smurf_fts2_phasecorrds(int* status)
         outDataIFGDFI->pntr[0] = outDataIFGDFI_pntr;
 
         /* Copy input data into output data Spectrum Real DEBUG */
-        outDataSR = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
+        outDataSR = smf_deepcopy_smfData( NULL, inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
         outDataSR->dtype   = SMF__DOUBLE;
         outDataSR->ndims   = 3;
         outDataSR->dims[0] = nWidth;
@@ -398,7 +398,7 @@ void smurf_fts2_phasecorrds(int* status)
         outDataSR->pntr[0] = outDataSR_pntr;
 
         /* Copy input data into output data Spectrum Imaginary DEBUG */
-        outDataSI = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
+        outDataSI = smf_deepcopy_smfData( NULL, inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
         outDataSI->dtype   = SMF__DOUBLE;
         outDataSI->ndims   = 3;
         outDataSI->dims[0] = nWidth;
@@ -408,7 +408,7 @@ void smurf_fts2_phasecorrds(int* status)
         outDataSI->pntr[0] = outDataSI_pntr;
 
         /* Copy input data into output data Spectrum Phase DEBUG */
-        outDataSP = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
+        outDataSP = smf_deepcopy_smfData( NULL, inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
         outDataSP->dtype   = SMF__DOUBLE;
         outDataSP->ndims   = 3;
         outDataSP->dims[0] = nWidth;
@@ -418,7 +418,7 @@ void smurf_fts2_phasecorrds(int* status)
         outDataSP->pntr[0] = outDataSP_pntr;
 
         /* Copy input data into output data Phase Correction Function Real DEBUG */
-        outDataPCFR = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
+        outDataPCFR = smf_deepcopy_smfData( NULL, inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
         outDataPCFR->dtype   = SMF__DOUBLE;
         outDataPCFR->ndims   = 3;
         outDataPCFR->dims[0] = nWidth;
@@ -428,7 +428,7 @@ void smurf_fts2_phasecorrds(int* status)
         outDataPCFR->pntr[0] = outDataPCFR_pntr;
 
         /* Copy input data into output data Phase Correction Function Imaginary DEBUG */
-        outDataPCFI = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
+        outDataPCFI = smf_deepcopy_smfData( NULL, inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
         outDataPCFI->dtype   = SMF__DOUBLE;
         outDataPCFI->ndims   = 3;
         outDataPCFI->dims[0] = nWidth;
@@ -438,7 +438,7 @@ void smurf_fts2_phasecorrds(int* status)
         outDataPCFI->pntr[0] = outDataPCFI_pntr;
 
         /* Copy input data into output data Wave Numbers DEBUG */
-        outDataSPF = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
+        outDataSPF = smf_deepcopy_smfData( NULL, inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
         outDataSPF->dtype   = SMF__DOUBLE;
         outDataSPF->ndims   = 3;
         outDataSPF->dims[0] = nWidth;
@@ -448,7 +448,7 @@ void smurf_fts2_phasecorrds(int* status)
         outDataSPF->pntr[0] = outDataSPF_pntr;
 
         /* Copy input data into output data Wave Numbers DEBUG */
-        outDataWN = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
+        outDataWN = smf_deepcopy_smfData( NULL, inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
         outDataWN->dtype   = SMF__DOUBLE;
         outDataWN->ndims   = 3;
         outDataWN->dims[0] = nWidth;
@@ -458,7 +458,7 @@ void smurf_fts2_phasecorrds(int* status)
         outDataWN->pntr[0] = outDataWN_pntr;
 
         /* Copy input data into output data Weights DEBUG */
-        outDataWT = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
+        outDataWT = smf_deepcopy_smfData( NULL, inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
         outDataWT->dtype   = SMF__DOUBLE;
         outDataWT->ndims   = 3;
         outDataWT->dims[0] = nWidth;
@@ -468,7 +468,7 @@ void smurf_fts2_phasecorrds(int* status)
         outDataWT->pntr[0] = outDataWT_pntr;
 
         /* Copy input data into output data Spectrum Real phase Corrected DEBUG */
-        outDataSRC = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
+        outDataSRC = smf_deepcopy_smfData( NULL, inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
         outDataSRC->dtype   = SMF__DOUBLE;
         outDataSRC->ndims   = 3;
         outDataSRC->dims[0] = nWidth;
@@ -478,7 +478,7 @@ void smurf_fts2_phasecorrds(int* status)
         outDataSRC->pntr[0] = outDataSRC_pntr;
 
         /* Copy input data into output data Spectrum Imaginary phase Corrected DEBUG */
-        outDataSIC = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
+        outDataSIC = smf_deepcopy_smfData( NULL, inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
         outDataSIC->dtype   = SMF__DOUBLE;
         outDataSIC->ndims   = 3;
         outDataSIC->dims[0] = nWidth;
@@ -488,7 +488,7 @@ void smurf_fts2_phasecorrds(int* status)
         outDataSIC->pntr[0] = outDataSIC_pntr;
 #endif
         /* Copy input data into output data chi^2 goodness of fit */
-        outDataFPM = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
+        outDataFPM = smf_deepcopy_smfData( NULL, inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
         outDataFPM->dtype   = SMF__DOUBLE;
         outDataFPM->ndims   = 3;
         outDataFPM->dims[0] = nWidth;
@@ -498,7 +498,7 @@ void smurf_fts2_phasecorrds(int* status)
         outDataFPM->pntr[0] = outDataFPM_pntr;
 
         /* MORE.FTS2.ZPD */
-        zpd = smf_deepcopy_smfData(inData->fts->zpd, 0, SMF__NOCREATE_FTS, 0, 0, status);
+        zpd = smf_deepcopy_smfData( NULL, inData->fts->zpd, 0, SMF__NOCREATE_FTS, 0, 0, status);
         /* MORE.FTS2.FPM, Polynomial fit coefficients */
         fpm = smf_create_smfData(SMF__NOCREATE_DA | SMF__NOCREATE_FTS, status);
         fpm->dtype   = SMF__DOUBLE;
@@ -848,7 +848,7 @@ void smurf_fts2_phasecorrds(int* status)
         }
 
         /* Close the file */
-        if(inData) { smf_close_file(&inData, status); }
+        if(inData) { smf_close_file( NULL,&inData, status); }
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error closing inData file %s", status, inData->file->name);
             goto CLEANUP;
@@ -862,12 +862,12 @@ void smurf_fts2_phasecorrds(int* status)
             errRepf(TASK_NAME, "Error creating outDataIFGINR->file->name", status);
             goto CLEANUP;
         }
-        smf_write_smfData(outDataIFGINR, NULL, outDataIFGINR->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
+        smf_write_smfData(NULL, outDataIFGINR, NULL, outDataIFGINR->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error writing outDataIFGINR file", status);
             goto CLEANUP;
         }
-        smf_close_file(&outDataIFGINR, status);
+        smf_close_file( NULL,&outDataIFGINR, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error closing outDataIFGINR file", status);
             goto CLEANUP;
@@ -880,12 +880,12 @@ void smurf_fts2_phasecorrds(int* status)
             errRepf(TASK_NAME, "Error creating outDataIFGDFR->file->name", status);
             goto CLEANUP;
         }
-        smf_write_smfData(outDataIFGDFR, NULL, outDataIFGDFR->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
+        smf_write_smfData(NULL, outDataIFGDFR, NULL, outDataIFGDFR->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error writing outDataIFGDFR file", status);
             goto CLEANUP;
         }
-        smf_close_file(&outDataIFGDFR, status);
+        smf_close_file( NULL,&outDataIFGDFR, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error closing outDataIFGDFR file", status);
             goto CLEANUP;
@@ -898,12 +898,12 @@ void smurf_fts2_phasecorrds(int* status)
             errRepf(TASK_NAME, "Error creating outDataIFGDFI->file->name", status);
             goto CLEANUP;
         }
-        smf_write_smfData(outDataIFGDFI, NULL, outDataIFGDFI->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
+        smf_write_smfData(NULL, outDataIFGDFI, NULL, outDataIFGDFI->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error writing outDataIFGDFI file", status);
             goto CLEANUP;
         }
-        smf_close_file(&outDataIFGDFI, status);
+        smf_close_file( NULL,&outDataIFGDFI, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error closing outDataIFGDFI file", status);
             goto CLEANUP;
@@ -916,12 +916,12 @@ void smurf_fts2_phasecorrds(int* status)
             errRepf(TASK_NAME, "Error creating outDataSR->file->name", status);
             goto CLEANUP;
         }
-        smf_write_smfData(outDataSR, NULL, outDataSR->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
+        smf_write_smfData(NULL, outDataSR, NULL, outDataSR->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error writing outDataSR file", status);
             goto CLEANUP;
         }
-        smf_close_file(&outDataSR, status);
+        smf_close_file( NULL,&outDataSR, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error closing outDataSR file", status);
             goto CLEANUP;
@@ -934,12 +934,12 @@ void smurf_fts2_phasecorrds(int* status)
             errRepf(TASK_NAME, "Error creating outDataSI->file->name", status);
             goto CLEANUP;
         }
-        smf_write_smfData(outDataSI, NULL, outDataSI->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
+        smf_write_smfData(NULL, outDataSI, NULL, outDataSI->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error writing outDataSI file", status);
             goto CLEANUP;
         }
-        smf_close_file(&outDataSI, status);
+        smf_close_file( NULL,&outDataSI, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error closing outDataSI file", status);
             goto CLEANUP;
@@ -952,13 +952,13 @@ void smurf_fts2_phasecorrds(int* status)
             errRepf(TASK_NAME, "Error creating outDataSRC->file->name", status);
             goto CLEANUP;
         }
-        smf_write_smfData(outDataSRC, NULL, outDataSRC->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
+        smf_write_smfData(NULL, outDataSRC, NULL, outDataSRC->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error writing outDataSRC file", status);
             goto CLEANUP;
         }
         /* printf("%s DEBUG: Closing outFileNameSRC=%s\n", TASK_NAME, outDataSRC->file->name); */
-        smf_close_file(&outDataSRC, status);
+        smf_close_file( NULL,&outDataSRC, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error closing outDataSRC file", status);
             goto CLEANUP;
@@ -971,12 +971,12 @@ void smurf_fts2_phasecorrds(int* status)
             errRepf(TASK_NAME, "Error creating outDataSIC->file->name", status);
             goto CLEANUP;
         }
-        smf_write_smfData(outDataSIC, NULL, outDataSIC->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
+        smf_write_smfData(NULL, outDataSIC, NULL, outDataSIC->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error writing outDataSIC file", status);
             goto CLEANUP;
         }
-        smf_close_file(&outDataSIC, status);
+        smf_close_file( NULL,&outDataSIC, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error closing outDataSIC file", status);
             goto CLEANUP;
@@ -989,12 +989,12 @@ void smurf_fts2_phasecorrds(int* status)
             errRepf(TASK_NAME, "Error creating outDataSP->file->name", status);
             goto CLEANUP;
         }
-        smf_write_smfData(outDataSP, NULL, outDataSP->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
+        smf_write_smfData(NULL, outDataSP, NULL, outDataSP->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error writing outDataSP file", status);
             goto CLEANUP;
         }
-        smf_close_file(&outDataSP, status);
+        smf_close_file( NULL,&outDataSP, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error closing outDataSP file", status);
             goto CLEANUP;
@@ -1007,12 +1007,12 @@ void smurf_fts2_phasecorrds(int* status)
             errRepf(TASK_NAME, "Error creating outDataPCFR->file->name", status);
             goto CLEANUP;
         }
-        smf_write_smfData(outDataPCFR, NULL, outDataPCFR->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
+        smf_write_smfData(NULL, outDataPCFR, NULL, outDataPCFR->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error writing outDataPCFR file", status);
             goto CLEANUP;
         }
-        smf_close_file(&outDataPCFR, status);
+        smf_close_file( NULL,&outDataPCFR, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error closing outDataPCFR file", status);
             goto CLEANUP;
@@ -1025,12 +1025,12 @@ void smurf_fts2_phasecorrds(int* status)
             errRepf(TASK_NAME, "Error creating outDataPCFI->file->name", status);
             goto CLEANUP;
         }
-        smf_write_smfData(outDataPCFI, NULL, outDataPCFI->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
+        smf_write_smfData(NULL, outDataPCFI, NULL, outDataPCFI->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error writing outDataPCFI file", status);
             goto CLEANUP;
         }
-        smf_close_file(&outDataPCFI, status);
+        smf_close_file( NULL,&outDataPCFI, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error closing outDataPCFI file", status);
             goto CLEANUP;
@@ -1043,12 +1043,12 @@ void smurf_fts2_phasecorrds(int* status)
             errRepf(TASK_NAME, "Error creating outDataSPF->file->name", status);
             goto CLEANUP;
         }
-        smf_write_smfData(outDataSPF, NULL, outDataSPF->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
+        smf_write_smfData(NULL, outDataSPF, NULL, outDataSPF->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error writing outDataSPF file", status);
             goto CLEANUP;
         }
-        smf_close_file(&outDataSPF, status);
+        smf_close_file( NULL,&outDataSPF, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error closing outDataSPF file", status);
             goto CLEANUP;
@@ -1061,12 +1061,12 @@ void smurf_fts2_phasecorrds(int* status)
             errRepf(TASK_NAME, "Error creating outDataWN->file->name", status);
             goto CLEANUP;
         }
-        smf_write_smfData(outDataWN, NULL, outDataWN->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
+        smf_write_smfData(NULL, outDataWN, NULL, outDataWN->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error writing outDataWN file", status);
             goto CLEANUP;
         }
-        smf_close_file(&outDataWN, status);
+        smf_close_file( NULL,&outDataWN, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error closing outDataWN file", status);
             goto CLEANUP;
@@ -1079,12 +1079,12 @@ void smurf_fts2_phasecorrds(int* status)
             errRepf(TASK_NAME, "Error creating outDataWT->file->name", status);
             goto CLEANUP;
         }
-        smf_write_smfData(outDataWT, NULL, outDataWT->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
+        smf_write_smfData(NULL, outDataWT, NULL, outDataWT->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error writing outDataWT file", status);
             goto CLEANUP;
         }
-        smf_close_file(&outDataWT, status);
+        smf_close_file( NULL,&outDataWT, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error closing outDataWT file", status);
             goto CLEANUP;
@@ -1098,12 +1098,12 @@ void smurf_fts2_phasecorrds(int* status)
             errRepf(TASK_NAME, "Error creating outDataFPM->file->name", status);
             goto CLEANUP;
         }
-        smf_write_smfData(outDataFPM, NULL, outDataFPM->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
+        smf_write_smfData(NULL, outDataFPM, NULL, outDataFPM->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error writing outDataFPM file", status);
             goto CLEANUP;
         }
-        smf_close_file(&outDataFPM, status);
+        smf_close_file( NULL,&outDataFPM, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error closing outDataFPM file", status);
             goto CLEANUP;
@@ -1116,12 +1116,12 @@ void smurf_fts2_phasecorrds(int* status)
             errRepf(TASK_NAME, "Error creating outData->file->name", status);
             goto CLEANUP;
         }
-        smf_write_smfData(outData, NULL, NULL, gOut, fIndex, 0, MSG__VERB, 0, status);
+        smf_write_smfData(NULL, outData, NULL, NULL, gOut, fIndex, 0, MSG__VERB, 0, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error writing outData file", status);
             goto CLEANUP;
         }
-        smf_close_file(&outData, status);
+        smf_close_file( NULL,&outData, status);
         if(*status != SAI__OK) {
             errRepf(TASK_NAME, "Error closing outData file", status);
             goto CLEANUP;
@@ -1157,7 +1157,7 @@ CLEANUP:
 
     /* Close files if still open */
     if(inData) {
-        smf_close_file(&inData, status);
+        smf_close_file( NULL,&inData, status);
         if(*status != SAI__OK)
             errRepf(TASK_NAME, "Error closing inData file", status);
     }

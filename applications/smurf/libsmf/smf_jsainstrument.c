@@ -24,8 +24,8 @@
 *        be NULL, in which case the tiling for the default instrument
 *        implied by "fc" and "def" is returned.
 *     fc = AstFitsChan (Given)
-*        If not NULL, any INSTRUME and FILTER values in this FitsChan
-*        will be used to determine the default instrument.
+*        If not NULL, any INSTRUME, BACKEND and FILTER values in this
+*        FitsChan will be used to determine the default instrument.
 *     def = smf_inst_t (Given)
 *        The default instrument. Only used if a default cannot be
 *        determined from the supplied FitsChan.
@@ -48,9 +48,12 @@
 *  History:
 *     7-NOV-2013 (DSB):
 *        Initial version.
+*     15-JAN-2014 (DSB):
+*        Changed to identify heterodyne data using the backend rather than
+*        the receiver.
 
 *  Copyright:
-*     Copyright (C) 2013 Science and Technology Facilities Council.
+*     Copyright (C) 2013-2014 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -106,32 +109,55 @@ void smf_jsainstrument( const char *param, AstFitsChan *fc, smf_inst_t def,
    if( fc ) {
 
 /* Get the INSTRUME header, and (if SCUBA-2) the FILTER header. */
-      astGetFitsS( fc, "INSTRUME", &cval );
+      if( astGetFitsS( fc, "INSTRUME", (char **) &cval ) ) {
 
-/* Compare to known values, and set the appropriate default instrument. */
-      if( astChrMatch( cval, "HARP" ) ) {
-         def = SMF__INST_HARP;
+/* If this is is SCUBA-2 data, get the FILTER header, and choose the
+   corresponding default instrument. */
+         if( astChrMatch( cval, "SCUBA-2" ) ) {
+            if( astGetFitsS( fc, "FILTER", &cval ) ) {
 
-      } else if( astChrMatch( cval, "SCUBA-2" ) ) {
-         astGetFitsS( fc, "FILTER", &cval );
+               if( !strcmp( cval, "450" ) ) {
+                  def = SMF__INST_SCUBA_2_450;
 
-         if( !strcmp( cval, "450" ) ) {
-            def = SMF__INST_SCUBA_2_450;
+               } else if( !strcmp( cval, "850" ) ) {
+                  def = SMF__INST_SCUBA_2_850;
 
-         } else if( !strcmp( cval, "850" ) ) {
-            def = SMF__INST_SCUBA_2_850;
+               } else if( *status == SAI__OK ){
+                  *status = SAI__ERROR;
+                  errRepf( "", "The input SCUBA-2 NDF has an unknown value "
+                          "'%s' for the FILTER keyword.", status, cval );
+                  errFlush( status );
+               }
 
-         } else if( *status == SAI__OK ){
+            } else if( *status == SAI__OK ){
+               *status = SAI__ERROR;
+               errRepf( "", "The input SCUBA-2 NDF has no FILTER keyword.",
+                        status );
+               errFlush( status );
+            }
+
+/* For everything except SCUBA-2, get the BACKEND header and select the
+   instrument for each supported backend. */
+         } else if( astTestFits( fc, "BACKEND", NULL ) ){
+            astGetFitsS( fc, "BACKEND", &cval );
+            if( !strcmp( cval, "ACSIS" ) ) {
+               def = SMF__INST_ACSIS;
+
+            } else if( !strcmp( cval, "DAS" ) ) {
+               def = SMF__INST_DAS;
+
+            } else if( *status == SAI__OK ){
+               *status = SAI__ERROR;
+               errRepf( "", "The input NDF has an unknown value "
+                       "'%s' for the BACKEND keyword.", status, cval );
+               errFlush( status );
+            }
+
+         } else if( astChrLen( cval ) > 0 ) {
             *status = SAI__ERROR;
-            errRepf( "", "The input SCUBA-2 NDF has an unknown value "
-                    "'%s' for the FILTER keyword.", status, cval );
-            errFlush( status );
+            errRepf( "", "The input NDF is for a currently unsupported "
+                    "instrument '%s'.", status, cval );
          }
-
-      } else if( astChrLen( cval ) > 0 ) {
-         *status = SAI__ERROR;
-         errRepf( "", "The input NDF is for a currently unsupported "
-                 "instrument '%s'.", status, cval );
       }
 
 /* Flush any error so that we can continue with no default. */
@@ -151,21 +177,17 @@ void smf_jsainstrument( const char *param, AstFitsChan *fc, smf_inst_t def,
          instrume = "SCUBA-2(450)";
       } else if( def == SMF__INST_SCUBA_2_850 ) {
          instrume = "SCUBA-2(850)";
-      } else if( def == SMF__INST_HARP ) {
-         instrume = "HARP";
-      } else if( def == SMF__INST_RXA ) {
-         instrume = "RXA";
-      } else if( def == SMF__INST_RXWD ) {
-         instrume = "RxWD";
-      } else if( def == SMF__INST_RXWB ) {
-         instrume = "RxWB";
+      } else if( def == SMF__INST_ACSIS ) {
+         instrume = "ACSIS";
+      } else if( def == SMF__INST_DAS ) {
+         instrume = "DAS";
       } else {
          instrume = "";
       }
 
 /* Get the user's choice. */
       parChoic( param, instrume, "SCUBA-2(450),SCUBA-2(850),"
-                "HARP,RxA,RxWD,RxWB", 1, text, sizeof(text), status );
+                "ACSIS,DAS", 1, text, sizeof(text), status );
 
 /* Convert it to an integer identifier. */
       if( !strcmp( text, "SCUBA-2(450)" ) ) {
@@ -174,17 +196,11 @@ void smf_jsainstrument( const char *param, AstFitsChan *fc, smf_inst_t def,
       } else if( !strcmp( text, "SCUBA-2(850)" ) ) {
          instrument = SMF__INST_SCUBA_2_850;
 
-      } else if( !strcmp( text, "HARP" ) ) {
-         instrument = SMF__INST_HARP;
+      } else if( !strcmp( text, "ACSIS" ) ) {
+         instrument = SMF__INST_ACSIS;
 
-      } else if( !strcmp( text, "RXA" ) ) {
-         instrument = SMF__INST_RXA;
-
-      } else if( !strcmp( text, "RxWD" ) ) {
-         instrument = SMF__INST_RXWD;
-
-      } else if( !strcmp( text, "RxWB" ) ) {
-         instrument = SMF__INST_RXWB;
+      } else if( !strcmp( text, "DAS" ) ) {
+         instrument = SMF__INST_DAS;
 
       } else {
          instrument = SMF__INST_NONE;

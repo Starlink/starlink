@@ -39,20 +39,28 @@
 *
 *        - A group of raw JCMT data files.
 *
+*        - A null (!) value, in which case a polygon region is used
+*        as defined by the parameters VERTEX_RA and VERTEX_DEC.
+*
 *     INSTRUMENT = LITERAL (Read)
 *        The JCMT instrument (different instruments have different
 *        tiling schemes and pixel sizes). The following instrument
 *        names are recognised (unambiguous abbreviations may be
-*        supplied): "SCUBA-2(450)", "SCUBA-2(850)", "HARP", "RxA",
-*        "RxWD", "RxWB". If one or more NDFs are supplied for parameter
-*        IN, then a dynamic default is determined if possible from the
-*        first NDF. If this cannot be done, or if a Region is supplied
-*        for parameter IN, then no dynamic default is provided, and the
-*        user is prompted for a value if none was supplied on the command
-*        line. []
+*        supplied): "SCUBA-2(450)", "SCUBA-2(850)", "ACSIS", "DAS". If one
+*        or more NDFs are supplied for parameter IN, then a dynamic default
+*        is determined if possible from the first NDF. If this cannot be
+*        done, or if a Region is supplied for parameter IN, then no dynamic
+*        default is provided, and the user is prompted for a value if none
+*        was supplied on the command line. []
 *     TILES(*) = _INTEGER (Write)
 *        An output parameter to which is written the list of integer tile
 *        indices.
+*     VERTEX_DEC(*) = _DOUBLE (Read)
+*        The ICRA Dec value at each vertex of a polygon, in degrees. Only
+*        used if IN is null.
+*     VERTEX_RA(*) = _DOUBLE (Read)
+*        The ICRA RA value at each vertex of a polygon, in degrees. Only
+*        used if IN is null.
 
 *  Tile Definitions:
 *     It should never be necessary to know the specific details of the tiling
@@ -65,8 +73,8 @@
 *     that the edges of each facet are parallel to X and Y (as in Fig.3 of
 *     the A&A paper "Mapping on the HEALPix grid" by Calabretta and Roukema).
 *     Each facet is then divided up into NxN tiles, where N is 64 for
-*     SCUBA-2 and 128 for HARP. Each tile is then divided into PxP pixels,
-*     where P is 412 for HARP, 825 for SCUBA-2 850 um, 1650 for SCUBA-2
+*     SCUBA-2 and 128 for ACSIS. Each tile is then divided into PxP pixels,
+*     where P is 412 for ACSIS, 825 for SCUBA-2 850 um, 1650 for SCUBA-2
 *     450 um. Facets are numbered from 0 to 11 as defined in the HEALPix
 *     paper (Gorsky et. al. 2005 ApJ 622, 759) (note that the facet six is
 *     split equally into two triangles, one at the bottom left and one at
@@ -100,6 +108,8 @@
 *        - Call smf_jsainstrument to get the instrument and tiling scheme.
 *        - Allow this command to be used on a reduced map or cube, or
 *        other NDF.
+*     5-DEC-2013 (DSB):
+*        Added parameter VERTEX_RA and VERTEX_DEC.
 
 *  Copyright:
 *     Copyright (C) 2011,2013 Science and Technology Facilities Council.
@@ -146,6 +156,7 @@
 #include "smurflib.h"
 #include "libsmf/jsatiles.h"
 
+#define MAXVERT 100
 
 F77_SUBROUTINE(ast_isaregion)( INTEGER(THIS), INTEGER(STATUS) );
 static int jsatilelist_icomp(const void *a, const void *b);
@@ -155,14 +166,20 @@ void smurf_jsatilelist( int *status ) {
 
 /* Local Variables */
    AstFitsChan *fc = NULL;
+   AstFrameSet *fs = NULL;
    AstObject *obj;
    AstRegion *region;
    Grp *igrp = NULL;
    Grp *sgrp = NULL;
+   double vertex_data[ 2*MAXVERT ];
    int *tiles = NULL;
    int i;
    int indf;
+   int lbnd[2];
    int ntile;
+   int nvert_dec;
+   int nvert_ra;
+   int ubnd[2];
    size_t size;
    size_t ssize;
    smfJSATiling tiling;
@@ -203,6 +220,43 @@ void smurf_jsatilelist( int *status ) {
 
 /* Get the list of identifiers for tiles that overlap the region. */
       tiles = smf_jsatiles_region( region, &tiling, &ntile, status );
+
+/* If a null value was supplied for IN, attempt to get the positions of
+   vertices on the sky to define the region. */
+   } else if( *status == PAR__NULL ) {
+      errAnnul( status );
+      parGet1d( "VERTEX_RA", MAXVERT, vertex_data, &nvert_ra, status );
+      parGet1d( "VERTEX_DEC", MAXVERT, vertex_data + MAXVERT, &nvert_dec,
+                 status );
+      if( nvert_ra != nvert_dec && *status == SAI__OK ) {
+         *status = SAI__ERROR;
+         errRepf( "", "Differing numbers of RA (%d) and Dec (%d) vertex values "
+                 "supplied.", status, nvert_ra, nvert_dec );
+      }
+
+/* Convert from degrees to radians. */
+      for( i = 0; i < nvert_ra; i++ ) {
+         vertex_data[ i ] *= AST__DD2R;
+         vertex_data[ MAXVERT + i ] *= AST__DD2R;
+      }
+
+/* Select a JSA instrument and get the parameters defining the layout of
+   tiles for the selected instrument. */
+      smf_jsainstrument( "INSTRUMENT", NULL, SMF__INST_NONE, &tiling,
+                         status );
+
+/* Create a frame in which to define the region - we arbitrarily use tile 1. */
+      smf_jsatile( 1, &tiling, 0, NULL, &fs, NULL, lbnd, ubnd, status );
+
+/* Create the region. */
+      region = (AstRegion *) astPolygon( fs, nvert_ra, MAXVERT, vertex_data, NULL, " " );
+
+/* If the region is unbounded, it is probably because the vertices were
+   given in the wrong order. Invert the Polyfon to correct this. */
+      if( !astGetI( region, "bounded" ) ) astNegate( region );
+
+/* Get the list of identifiers for tiles that overlap the region. */
+      tiles = smf_jsatiles_region( region, &tiling, &ntile, status );
    }
 
 /* If the IN parameter could not be accessed as a Region, annull any error
@@ -212,7 +266,7 @@ void smurf_jsatilelist( int *status ) {
       kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
 /* Get a group containing just the files holding science data. */
-      smf_find_science( igrp, &sgrp, 0, NULL, NULL, 1, 1, SMF__NULL, NULL,
+      smf_find_science( NULL, igrp, &sgrp, 0, NULL, NULL, 1, 1, SMF__NULL, NULL,
                         NULL, NULL, NULL, status );
 
 /* Check we have at least once science file. */

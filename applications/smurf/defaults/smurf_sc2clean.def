@@ -354,6 +354,59 @@ com.perarray = 0
 com.perarray_last = <undef>
 
 #-----------------------------------------------------------------
+#  Name: 	com.sig_limit
+#  Type: 	real
+#  Default: 	0
+#  Purpose: 	Controls the rejection of time slices with inconsistent
+#               common-modes.
+#  Description: This value is only used if data from more than one
+#               sub-array is being included in the map, and parameter
+#               "com.perarray" is zero, causing a single mean COM model to
+#               be used for all sub-arrays. In such cases, if the
+#               common-mode signals estimated from the individual
+#               sub-arrays show significantly different structure,
+#               subtracting a mean COM model will leave large residuals in
+#               the bolometer time streams. If a FLT model is being used,
+#               the high pass filter will remove much of this residual
+#               signal, but any high frequency component will remain,
+#               often causing strong "blobs" in the map.
+#
+#               The COM model can identify and flag time slices where the
+#               individual common-mode signals appear to be significantly
+#               different to the mean common-mode signal. The individual
+#               common-mode signals are first high-pass filtered using the
+#               same filter as the FLT model. At each time slice, the
+#               mean and standard deviation of the remaining high frequency
+#               common-modes are found. The RMS of these standard
+#               deviations, taken over the whole time stream, is then found.
+#               All bolometers within individual time slices for which the 
+#               standard deviation exceeds "com.sig_limit" times the RMS value 
+#               are flagged in all sub-arrays, causing them to be excluded 
+#               from the FLT model and the map. Note, this flagging process is
+#               performed from scratch on each iteration - that is, samples 
+#               flagged on a previous iteration are tested again on each 
+#               subsequent iteration and may be "unflagged" if the differences
+#               between individual common-mode signal become smaller.
+#
+#               Setting this parameter to 3 is a good starting point.
+#               Setting it to zero (the default) causes this consistency
+#               filter to be skipped. See also parameter "com.sig_wing".
+com.sig_limit = 0
+
+#-----------------------------------------------------------------
+#  Name: 	com.sig_wing
+#  Type: 	real
+#  Default: 	1.0
+#  Purpose: 	Controls the rejection of time slices with inconsistent
+#               common-modes.
+#  Description: This value is only used if parameter "com.sig_limit" is
+#               set to a non-zero value. Each contiguous block of time
+#               slices flagged by the consistency filter is extended at
+#               its start and end by an extra block of samples equal in
+#               length to "com.sig_wing" times the FLT filter size.
+com.sig_wing = 1.0
+
+#-----------------------------------------------------------------
 #  Name: 	compreprocess
 #  Type: 	integer
 #  Default: 	0

@@ -168,7 +168,7 @@ void smf_filter2d_whiten( ThrWorkForce *wf, smfFilter *filt, smfData *map,
     nf = pspec->dims[0];
     pspec_data = pspec->pntr[0];
   }
-  smf_close_file( &map_fft, status );
+  smf_close_file( wf, &map_fft, status );
 
   /* Fit power-law + white level model */
   smf_fit_pspec( pspec_data, pspec->dims[0], 10, df, minfreq, 0.1,
@@ -286,6 +286,6 @@ void smf_filter2d_whiten( ThrWorkForce *wf, smfFilter *filt, smfData *map,
   }
 
   /* Clean up */
-  if( pspec ) smf_close_file( &pspec, status );
+  if( pspec ) smf_close_file( wf, &pspec, status );
   if( smoothed_filter ) smoothed_filter = astFree( smoothed_filter );
 }

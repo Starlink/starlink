@@ -8,7 +8,7 @@ lib_LTLIBRARIES = libfiggen.la
 libfiggen_la_SOURCES = $(C_ROUTINES) $(F_ROUTINES) $(FPP_ROUTINES)
 
 C_ROUTINES = \
-gen_getcwd.c gen_qfisort.c gen_qfmed.c gen_qfsort.c gen_rename.c
+gen_qfisort.c gen_qfmed.c gen_qfsort.c gen_rename.c
 
 F_ROUTINES = \
 gen_addad.f gen_addaf.f gen_addafe.f gen_addcaf.f gen_addcafe.f \

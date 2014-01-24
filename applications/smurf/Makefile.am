@@ -3,7 +3,7 @@
 # Build libsmf before the applications
 
 SUBDIRS = defaults libsmf libsmurf libsc2sim libacsis libaztec libgsd \
-          libsc2fts docs
+          libsc2fts docs scripts
 
 # can not use surf_mon_FCFLAGS yet
 AM_FCFLAGS = -Isrc -Isc2da -Isc2sim -Icsofit
@@ -56,7 +56,7 @@ gsdshow \
 impaztec \
 jsatileinfo \
 jsatilelist \
-jsasplit \
+jsadicer \
 makecube \
 makemap \
 rawfixmeta \
@@ -186,7 +186,8 @@ scripts/distortion scripts/showdistortion scripts/tobeam scripts/print_index \
 scripts/pol2cat.py scripts/pol2stack.py scripts/starutil.py scripts/skyloop.py \
 scripts/cbas scripts/bolcoords scripts/matched-filter scripts/smas scripts/canfar_scuba2_map.sh \
 scripts/sc2tsnoise scripts/canfar_sc2noise scripts/configmeld.py scripts/pol2catb.py \
-scripts/fts2gaia.py scripts/tilepaste.py scripts/tilecutout.py scripts/smurfutil.py
+scripts/fts2gaia.py scripts/tilepaste.py scripts/tilecutout.py scripts/smurfutil.py \
+scripts/jsajoin.py scripts/jsasplit.py
 
 # IFL files
 IFL_FILES = $(smurf_mon_TASKS:=.ifl) smurf_mon.ifl
@@ -205,7 +206,7 @@ stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 	@HLIB@ $<
 
 # Make help file
-smurf.hlp: smurf_master.hlp libsmurf/smurfmon.hlp
-	cat smurf_master.hlp libsmurf/smurfmon.hlp > smurf.hlp
+smurf.hlp: smurf_master.hlp libsmurf/smurfmon.hlp scripts/scripts.hlp
+	cat smurf_master.hlp libsmurf/smurfmon.hlp scripts/scripts.hlp > smurf.hlp
 
 

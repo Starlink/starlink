@@ -255,7 +255,7 @@ void smf_resampmap( ThrWorkForce *wf, smfData *data, AstSkyFrame *abskyfrm,
 /* Similarly, make a copy of the smfData, including only the header
    information which each thread will need in order to make calls to
    smf_rebin_totmap */
-         pdata->data = smf_deepcopy_smfData( data, 0, SMF__NOCREATE_FILE |
+         pdata->data = smf_deepcopy_smfData( wf, data, 0, SMF__NOCREATE_FILE |
                                              SMF__NOCREATE_DA |
                                              SMF__NOCREATE_FTS |
                                              SMF__NOCREATE_DATA |
@@ -294,7 +294,7 @@ void smf_resampmap( ThrWorkForce *wf, smfData *data, AstSkyFrame *abskyfrm,
 
          if( pdata->data ) {
             smf_lock_data( pdata->data, 1, status );
-            smf_close_file( &(pdata->data), status );
+            smf_close_file( wf, &(pdata->data), status );
          }
          astLock( pdata->abskyfrm, 0 );
          pdata->abskyfrm = astAnnul( pdata->abskyfrm );

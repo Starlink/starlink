@@ -191,7 +191,7 @@ void smf_getrefwcs( const char *param, Grp *igrp, AstFrameSet **specwcs,
          } else {
 
 /* Open the first input file. */
-            smf_open_file( igrp, 1, "READ", SMF__NOCREATE_DATA, &data,
+            smf_open_file( NULL, igrp, 1, "READ", SMF__NOCREATE_DATA, &data,
                            status );
             if( *status == SAI__OK ) {
 
@@ -205,7 +205,7 @@ void smf_getrefwcs( const char *param, Grp *igrp, AstFrameSet **specwcs,
                   }
 
                } else if( data->hdr->instrument == INST__ACSIS ) {
-                  inst = SMF__INST_HARP;
+                  inst = SMF__INST_ACSIS;
 
                } else if( *status == SAI__OK ) {
                   *status = SAI__ERROR;
@@ -247,7 +247,7 @@ void smf_getrefwcs( const char *param, Grp *igrp, AstFrameSet **specwcs,
             }
 
 /* Close the current input data file. */
-            smf_close_file( &data, status);
+            smf_close_file( NULL, &data, status);
          }
 
 /* If it is not "JSA", get the parameter value as an NDF. */

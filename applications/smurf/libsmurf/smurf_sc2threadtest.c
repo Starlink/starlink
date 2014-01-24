@@ -196,7 +196,7 @@ void smfParallelTime( void *job_data_ptr, int *status ) {
 
       if( data->type == 0 ) {
         /* --- Re-order the data --- */
-        smf_dataOrder( array[i]->sdata[j], 0, status );
+        smf_dataOrder( NULL, array[i]->sdata[j], 0, status );
       }
 
       smf_get_dims( array[i]->sdata[j], NULL, NULL, &nbolo, &ntslice, &ndata,
@@ -539,7 +539,7 @@ void smurf_sc2threadtest( int *status ) {
   if( res ) {
     for( i=0; i<nchunks; i++ ) {
       if( res[i] ) {
-        smf_close_related( &res[i], status );
+        smf_close_related( wf, &res[i], status );
       }
     }
     res = astFree( res );

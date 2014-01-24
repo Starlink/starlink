@@ -13,9 +13,11 @@
 *     Library routine
 
 *  Invocation:
-*     void smf_flat_bad( smfData * refdata, smfData ** resp, int * status );
+*     void smf_flat_bad( ThrWorkForce *wf, smfData * refdata, smfData ** resp, int * status );
 
 *  Arguments:
+*     wf = ThrWorkForce * (Given)
+*        Pointer to a pool of worker threads
 *     refdata = smfData * (Given)
 *        smfData to be populated with the bad flatfield.
 *     resp = smfData ** (Returned)
@@ -70,7 +72,7 @@ static void
 smf__fill_smfData ( smfData * data, double dval, int *status );
 
 void
-smf_flat_badflat( smfData * refdata, smfData ** resp, int * status ) {
+smf_flat_badflat( ThrWorkForce *wf, smfData * refdata, smfData ** resp, int * status ) {
   smfData * bolrefd = NULL;
   smfData * powrefd = NULL;
   size_t nheat = 1;
@@ -91,7 +93,7 @@ smf_flat_badflat( smfData * refdata, smfData ** resp, int * status ) {
 
   /* Create a responsivity image and fill with bad values */
   if (resp) {
-    smf_create_bolfile( NULL, 0, refdata, "Responsivity",
+    smf_create_bolfile( wf, NULL, 0, refdata, "Responsivity",
                         "A/W", SMF__MAP_VAR, resp, status );
 
     smf__fill_smfData ( *resp, VAL__BADD, status );

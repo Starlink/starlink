@@ -2216,6 +2216,16 @@ package kappa {
             helpkey *
          }
 
+         parameter like {
+            type NDF
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default !
+            prompt {NDF from which quality information should be copied}
+            helpkey *
+         }
+
          parameter list {
             type LITERAL
             access READ

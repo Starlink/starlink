@@ -58,7 +58,7 @@ dnl    so that we can use CNF_PREG
 AC_CHECK_SIZEOF(void*)
 
 dnl    Dependences on Starlink packages
-STAR_DECLARE_DEPENDENCIES([build], [pda agi grp ndf fio idi shl sla], [link])
+STAR_DECLARE_DEPENDENCIES([build], [pda agi grp ndf fio idi shl sla psx], [link])
 
 dnl     Needs hlib to build the help library.
 STAR_CHECK_PROGS(hlib)

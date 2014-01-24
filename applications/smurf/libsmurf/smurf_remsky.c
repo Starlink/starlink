@@ -215,7 +215,7 @@ void smurf_remsky( int * status ) {
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
   /* Filter out darks */
-  smf_find_science( igrp, &fgrp, 0, NULL, NULL, 1, 1, SMF__NULL, &darks,
+  smf_find_science( NULL, igrp, &fgrp, 0, NULL, NULL, 1, 1, SMF__NULL, &darks,
                     &flatramps, &heateffmap, NULL, status );
 
   /* input group is now the filtered group so we can use that and
@@ -237,7 +237,7 @@ void smurf_remsky( int * status ) {
   if (*status != SAI__OK) goto CLEANUP;
 
   /* Get group of bad bolometer masks and read them into a smfArray */
-  smf_request_mask( "BBM", &bbms, status );
+  smf_request_mask( NULL, "BBM", &bbms, status );
 
   /* Get sky subtraction METHOD */
   parChoic( "METHOD", "PLANE", "Plane, Polynomial", 1,  method,
@@ -259,11 +259,11 @@ void smurf_remsky( int * status ) {
     /* Propagate input files to output */
     for (i=1; i<=size; i++) {
       /* This seems inefficient but it works */
-      smf_open_and_flatfield( igrp, ogrp, i, darks, flatramps,
+      smf_open_and_flatfield( NULL, igrp, ogrp, i, darks, flatramps,
                               heateffmap, &odata, status );
       /* Mask out bad bolometers - mask data array not quality array */
-      smf_apply_mask( odata, bbms, SMF__BBM_DATA, 0, status );
-      smf_close_file( &odata, status);
+      smf_apply_mask( NULL, odata, bbms, SMF__BBM_DATA, 0, status );
+      smf_close_file( NULL, &odata, status);
     }
     /* Group output files together now that they exist */
     smf_grp_related( ogrp, outsize, 1, 0, 0, NULL, NULL, NULL, NULL, &ogroup,
@@ -271,20 +271,20 @@ void smurf_remsky( int * status ) {
     if ( *status == SAI__OK ) {
       /* Open and process related files */
       for (i=0; i<ogroup->ngroups; i++) {
-        smf_open_related( ogroup, i, "UPDATE", &relfiles, status );
+        smf_open_related( NULL, ogroup, i, "UPDATE", &relfiles, status );
         smf_subtract_plane( NULL, relfiles, fittype, status );
-        smf_close_related( &relfiles, status );
+        smf_close_related( NULL, &relfiles, status );
       }
     }
     smf_close_smfGroup( &ogroup, status );
   } else {
     for (i=1; i<=size && *status == SAI__OK; i++) {
       /* Flatfield - if necessary */
-      smf_open_and_flatfield( igrp, ogrp, i, darks, flatramps,
+      smf_open_and_flatfield( NULL, igrp, ogrp, i, darks, flatramps,
                               heateffmap, &odata, status );
 
       /* Mask out bad bolometers - mask data array not quality array */
-      smf_apply_mask( odata, bbms, SMF__BBM_DATA, 0, status );
+      smf_apply_mask( NULL, odata, bbms, SMF__BBM_DATA, 0, status );
 
       if (*status != SAI__OK) {
         /* Tell the user which file it was... */
@@ -311,7 +311,7 @@ void smurf_remsky( int * status ) {
       smf_write_clabels( odata, status );
 
       /* Tidy */
-      smf_close_file( &odata, status );
+      smf_close_file( NULL, &odata, status );
     }
   }
 
@@ -324,9 +324,9 @@ void smurf_remsky( int * status ) {
 
   /* Tidy up after ourselves: release the resources used by the grp routines  */
  CLEANUP:
-  if (darks) smf_close_related( &darks, status );
-  if (bbms) smf_close_related( &bbms, status );
-  if ( flatramps ) smf_close_related( &flatramps, status );
+  if (darks) smf_close_related( NULL, &darks, status );
+  if (bbms) smf_close_related( NULL, &bbms, status );
+  if ( flatramps ) smf_close_related( NULL, &flatramps, status );
   if (heateffmap) heateffmap = smf_free_effmap( heateffmap, status );
   grpDelet( &igrp, status);
   grpDelet( &ogrp, status);

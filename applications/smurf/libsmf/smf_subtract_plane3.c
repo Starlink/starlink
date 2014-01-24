@@ -125,7 +125,7 @@ smf_subtract_plane3( ThrWorkForce *wf, smfData *data,
   if (*status != SAI__OK) return;
 
   /* ensure we are working with time slices */
-  smf_dataOrder( data, 1, status );
+  smf_dataOrder( wf, data, 1, status );
 
   /* Select quality */
   qua = smf_select_qualpntr( data, NULL, status );

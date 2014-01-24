@@ -214,7 +214,7 @@ void smurf_fts2_transcorr(int* status)
     return;
   }
 
-  smf_open_file(tauGrp, 1, "READ", 0, &tauData, status);
+  smf_open_file(NULL, tauGrp, 1, "READ", 0, &tauData, status);
   smf_fits_getD(tauData->hdr, "PWV0", &PWV0, status);
   smf_fits_getD(tauData->hdr, "DELTAPWV", &DELTAPWV, status);
   if(*status != SAI__OK) {
@@ -237,14 +237,14 @@ void smurf_fts2_transcorr(int* status)
   // ===========================================================================
   for(fIndex = 1; fIndex <= inSize; fIndex++) {
     // OPEN INPUT FILE
-    smf_open_file(inGrp, fIndex, "READ", 0, &inData, status);
+    smf_open_file(NULL, inGrp, fIndex, "READ", 0, &inData, status);
     if(*status != SAI__OK) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Unable to open source file!", status);
       break;
     }
 
-    outData = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA, 0, 0, status);
+    outData = smf_deepcopy_smfData(NULL, inData, 0, SMF__NOCREATE_DATA, 0, 0, status);
     if(*status == SAI__OK) {
       inPntr   = inData->pntr[0];
       nbolX    = inData->dims[0];
@@ -267,7 +267,7 @@ void smurf_fts2_transcorr(int* status)
       smf_fits_getD(inData->hdr, "WNFACT", &wnFact, status);
       if(*status != SAI__OK) {
         errRep(FUNC_NAME, "Unable to find wave number factor!", status);
-        smf_close_file(&inData, status);
+        smf_close_file( NULL,&inData, status);
         break;
       }
 
@@ -359,14 +359,14 @@ void smurf_fts2_transcorr(int* status)
       astFree(TAtm);
       astFree(TAtmNew);
 
-      smf_write_smfData(outData, NULL, NULL, outGrp, fIndex, 0, MSG__VERB,
+      smf_write_smfData(NULL, outData, NULL, NULL, outGrp, fIndex, 0, MSG__VERB,
                         0, status);
-      smf_close_file(&outData, status);
-      smf_close_file(&inData, status);
+      smf_close_file( NULL,&outData, status);
+      smf_close_file( NULL,&inData, status);
     } else {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Unable to deep copy!", status);
-      smf_close_file(&inData, status);
+      smf_close_file( NULL,&inData, status);
       break;
     }
   }
@@ -379,7 +379,7 @@ void smurf_fts2_transcorr(int* status)
     astFree(TAU[0]);
     astFree(TAU[1]);
     astFree(GAUSSIANKERNEL);
-    smf_close_file(&tauData, status);
+    smf_close_file( NULL,&tauData, status);
     if(inGrp) { grpDelet(&inGrp, status); }
     if(outGrp) { grpDelet(&outGrp, status); }
     if(tauGrp) { grpDelet(&tauGrp, status); }

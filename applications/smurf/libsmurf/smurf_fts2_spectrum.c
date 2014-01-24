@@ -203,7 +203,7 @@ void smurf_fts2_spectrum(int* status)
     /* Loop through each input file */
     for(fIndex = 1; fIndex <= nFiles; fIndex++) {
         /* Open Observation file */
-    smf_open_file(gIn, fIndex, "READ", SMF__NOFIX_METADATA, &inData, status);
+    smf_open_file(NULL, gIn, fIndex, "READ", SMF__NOFIX_METADATA, &inData, status);
         if(*status != SAI__OK) {
             *status = SAI__ERROR;
             errRep(FUNC_NAME, "Unable to open the source file!", status);
@@ -325,7 +325,7 @@ void smurf_fts2_spectrum(int* status)
 
 
         /* Copy input data into output data */
-        outData = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA, 0, 0, status);
+        outData = smf_deepcopy_smfData(NULL, inData, 0, SMF__NOCREATE_DATA, 0, 0, status);
         outData->dtype   = SMF__DOUBLE;
         outData->ndims   = 3;
         outData->dims[0] = nWidth;
@@ -452,7 +452,7 @@ void smurf_fts2_spectrum(int* status)
 
         /* Close the file */
         if(inData) {
-            smf_close_file(&inData, status);
+            smf_close_file( NULL,&inData, status);
             if(*status != SAI__OK) {
                 *status = SAI__ERROR;
                 errRep(FUNC_NAME, "Unable to close the input file!", status);
@@ -461,13 +461,13 @@ void smurf_fts2_spectrum(int* status)
         }
 
         /* Write output */
-        smf_write_smfData(outData, NULL, NULL, gOut, fIndex, 0, MSG__VERB, 0, status);
+        smf_write_smfData(NULL, outData, NULL, NULL, gOut, fIndex, 0, MSG__VERB, 0, status);
         if(*status != SAI__OK) {
             *status = SAI__ERROR;
             errRep(FUNC_NAME, "Unable to write the output file!", status);
             goto CLEANUP;
         }
-        smf_close_file(&outData, status);
+        smf_close_file( NULL,&outData, status);
         if(*status != SAI__OK) {
             *status = SAI__ERROR;
             errRep(FUNC_NAME, "Unable to close the output file!", status);
@@ -484,14 +484,14 @@ CLEANUP:
 
     /* Close files if still open */
     if(inData) {
-        smf_close_file(&inData, status);
+        smf_close_file( NULL,&inData, status);
         if(*status != SAI__OK) {
             *status = SAI__ERROR;
             errRep(FUNC_NAME, "CLEANUP: Unable to close the input file!", status);
         }
     }
     if(outData) {
-        smf_close_file(&outData, status);
+        smf_close_file( NULL,&outData, status);
         if(*status != SAI__OK) {
             *status = SAI__ERROR;
             errRep(FUNC_NAME, "CLEANUP: Unable to close the output file!", status);

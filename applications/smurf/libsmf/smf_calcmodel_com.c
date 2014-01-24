@@ -76,9 +76,15 @@
 *     19-MAR-2013 (DSB):
 *        Allow a different value to be used for COM.PERARRAY on the final
 *        iteration.
+*     2-DEC-2013 (DSB):
+*        Add a filter to flag time slices with inconsistent common mode
+*        values, controlled by parameter com.sig_limit.
+*     18-DEC-2013 (DSB):
+*        Undo the old COM model as a separate step (performed at the
+*        start of each new iteration - like FLT and EXT).
 
 *  Copyright:
-*     Copyright (C) 2012 Science and Technology Facilities Council.
+*     Copyright (C) 2012-2013 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -118,18 +124,25 @@ static void smf1_calcmodel_com( void *job_data_ptr, int *status );
 typedef struct smfCalcModelComData {
    dim_t b1;
    dim_t b2;
-   dim_t icom;
    dim_t idx_hi;
    dim_t idx_lo;
+   dim_t nb;
    dim_t nbolo;
    dim_t ntslice;
+   dim_t nvar;
    dim_t t1;
    dim_t t2;
+   dim_t wing;
+   double **com_datas;
+   double *com_data;
+   double limit;
    double mean;
    double nsigma;
    double stddev;
+   double svar;
    int flag;
    int gain_box;
+   int icom;
    int nblock;
    int niter;
    int operation;
@@ -146,20 +159,33 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
                         int *status ){
 
 /* Local Variables: */
+   AstKeyMap *kfmap;
    AstKeyMap *kmap;
    AstObject *obj;
-   SmfCalcModelComData *pdata;
    SmfCalcModelComData *job_data = NULL;
+   SmfCalcModelComData *pdata;
    dim_t bolostep;
    dim_t gain_box;
    dim_t i;
+   dim_t idx;
    dim_t idx_hi;
    dim_t idx_lo;
+   dim_t itime;
+   dim_t nb;
    dim_t nbolo;
    dim_t ntslice;
+   dim_t nvar;
    dim_t timestep;
+   double *com_datas[ 4 ];
+   double *lof;
+   double *p1;
+   double *p2;
    double nsigma;
+   double period;
+   double sig_limit;
+   double svar;
    int *nrej = NULL;
+   int dofft;
    int iblock;
    int icom;
    int iw;
@@ -169,12 +195,15 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    int nw;
    int oldalg;
    int perarray;
+   int sig_wing;
+   int whiten;
    smfArray *gai;
    smfArray *lut;
    smfArray *model;
    smfArray *res;
-   smf_qual_t qmask;
+   smfFilter *filt=NULL;
    unsigned char *mask;
+   void *old_model;
 
 /* Check inherited status. */
    if( *status != SAI__OK ) return;
@@ -210,18 +239,9 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    this function. */
    astBegin;
 
-/* Define a quality mask that defines all samples to be included in the
-   new COM estimate. Note, we explicitly exclude the SMF__Q_COM flag from
-   this mask so that we do not exclude samples from the new COM estimate
-   just because they were flagged as unusual on the previous makemap
-   iteration. Some samples (e.g. source samples) may have looked unusual
-   on early iterations but may become "normal" on later iterations once
-   the source signal has been moved into the AST model. */
-   qmask = ( SMF__Q_GOOD & ~SMF__Q_COM & ~SMF__Q_RING );
-
 /* Ensure the data is bolo-ordered (i.e. adjacent values in memory are
    adjacent time slices from the same bolometer). */
-   smf_model_dataOrder( dat, NULL, chunk, SMF__RES|SMF__QUA|SMF__GAI|
+   smf_model_dataOrder( wf, dat, NULL, chunk, SMF__RES|SMF__QUA|SMF__GAI|
                         SMF__LUT, 0, status );
 
 /* Obtain pointers to relevant smfArrays for this chunk */
@@ -263,6 +283,8 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    smf_get_nsamp( kmap, "GAIN_BOX", res->sdata[ 0 ], &gain_box, status );
    astMapGet0I( kmap, "NITER", &niter );
    astMapGet0D( kmap, "NSIGMA", &nsigma );
+   astMapGet0D( kmap, "SIG_LIMIT", &sig_limit );
+   astMapGet0I( kmap, "SIG_WING", &sig_wing );
 
 /* Get the number of time slices in the first residuals smfData. We
    report an error if any subsequent smfData has a different number of
@@ -338,6 +360,9 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    previous iteration. */
    astMapGet0I( kmap, "PERARRAY", &perarray );
 
+/* If there is only one sub-array, use com.perarray=1. */
+   if( res->ndat == 1 ) perarray = 1;
+
 /* If "perarray" is non-zero, a separate common mode signal was calculated
    for each available subarrays on the previous iteration and is stored as
    a separate 1d vector. If "perarray" is zero, a single common mode signal
@@ -359,43 +384,49 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
       ncom = 1;
    }
 
-/* Loop round undoing each old COM model. */
-   for( icom = 0; icom < ncom && *status == SAI__OK; icom++ ) {
+/* If we are inverting the the model, loop round undoing each old COM model. */
+   if( flags & SMF__DIMM_INVERT ) {
+
+      for( icom = 0; icom < ncom && *status == SAI__OK; icom++ ) {
 
 /* Set the index of the first and last subarray that contributes to the
    current COM model. */
-      if( perarray ) {
-         idx_lo = icom;
-         idx_hi = icom;
-      } else {
-         idx_lo = 0;
-         idx_hi = res->ndat - 1;
-      }
+         if( perarray ) {
+            idx_lo = icom;
+            idx_hi = icom;
+         } else {
+            idx_lo = 0;
+            idx_hi = res->ndat - 1;
+         }
 
 /* Set up jobs to add the previous estimate of COM back on to the
    residuals, and then wait for the jobs to complete. These jobs also
    clear any SMF__Q_COM flags set by previous iterations. */
-      for( iw = 0; iw < nw; iw++ ) {
-         pdata = job_data + iw;
-         pdata->operation = 1;
-         pdata->icom = icom;
-         pdata->idx_lo = idx_lo;
-         pdata->idx_hi = idx_hi;
-         thrAddJob( wf, 0, pdata, smf1_calcmodel_com, 0, NULL, status );
-      }
-      thrWait( wf, status );
-
-/* If we are using a GAI model, reset gains and correlation coefficients to
-   unity and offsets to zero. */
-      if( gai ) {
          for( iw = 0; iw < nw; iw++ ) {
             pdata = job_data + iw;
-            pdata->operation = 2;
+            pdata->operation = 1;
+            pdata->icom = icom;
+            pdata->idx_lo = idx_lo;
+            pdata->idx_hi = idx_hi;
             thrAddJob( wf, 0, pdata, smf1_calcmodel_com, 0, NULL, status );
          }
          thrWait( wf, status );
+
+/* If we are using a GAI model, reset gains and correlation coefficients to
+   unity and offsets to zero. */
+         if( gai ) {
+            for( iw = 0; iw < nw; iw++ ) {
+               pdata = job_data + iw;
+               pdata->operation = 2;
+               thrAddJob( wf, 0, pdata, smf1_calcmodel_com, 0, NULL, status );
+            }
+            thrWait( wf, status );
+         }
       }
-   }
+
+/* Otherwise, form a new COM model and subtract form the residuals. */
+   } else {
+
 
 /* If this is the last iteration, the user may request a different value
    for COM.PERARRAY by assigning a value ot COM.PERARRAY_LAST. For
@@ -405,8 +436,8 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    background "mottling" in the regions outside the mask. Note, the current
    value of the "perarray" variable will be left unchanged by astMapGet0I
    if PERARRAY_LAST is "<undef>" (the default). */
-   if( flags & SMF__DIMM_LASTITER ) astMapGet0I( kmap, "PERARRAY_LAST",
-                                                 &perarray );
+      if( flags & SMF__DIMM_LASTITER ) astMapGet0I( kmap, "PERARRAY_LAST",
+                                                    &perarray );
 
 /* If "perarray" is now non-zero, a separate common mode signal will be
    calculated for each available subarrays on this iteration and will be
@@ -414,77 +445,227 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    mode signal will be calculated from all available subarrays and will be
    stored as a 1d vector. The corresponding smfData is at position 0 in the
    model sdata. Store the number of COM models to create. */
-   if( perarray ) {
-      msgOutif( MSG__VERB, "", "  Calculating separate COM models for each array.",
-                status );
-      ncom = model->ndat;
-      if( (int) res->ndat != ncom && *status == SAI__OK  ) {
-         *status = SAI__ERROR;
-         errRep( "", "smf_calcmodel_com: COM model and residuals contain "
-                 "different number of data arrays!", status);
-      }
-   } else {
-      msgOutif( MSG__VERB, "", "  Calculating a single COM model for all arrays.",
-                status );
-      ncom = 1;
-   }
-
-/* Loop round creating each new COM model. */
-   for( icom = 0; icom < ncom && *status == SAI__OK; icom++ ) {
-
-/* Set the index of the first and last subarray that contributes to the
-   current COM model. */
       if( perarray ) {
-         idx_lo = icom;
-         idx_hi = icom;
-         msgSeti( "I", icom + 1 );
-         msgSeti( "N", ncom );
-         msgOutif( MSG__VERB, "", "  Calculating COM model for array ^I of ^N",
+         msgOutif( MSG__VERB, "", "  Calculating separate COM models for each array.",
                    status );
+         ncom = model->ndat;
+         if( (int) res->ndat != ncom && *status == SAI__OK  ) {
+            *status = SAI__ERROR;
+            errRep( "", "smf_calcmodel_com: COM model and residuals contain "
+                    "different number of data arrays!", status);
+         }
       } else {
-         idx_lo = 0;
-         idx_hi = res->ndat - 1;
+         msgOutif( MSG__VERB, "", "  Calculating a single COM model for all arrays.",
+                   status );
+         ncom = 1;
       }
 
-/* Form a refined COM model. This is just the sigma-clipped mean of the
+/* Loop round creating a new COM model for each sub-array. */
+      for( idx = 0; idx < res->ndat && *status == SAI__OK; idx++ ) {
+         msgSeti( "I", idx + 1 );
+         msgSeti( "N", res->ndat );
+         msgOutif( MSG__VERB, "", "  Calculating common-mode signal for array ^I of ^N",
+                   status );
+
+/* Choose where to put the comon-mode signal for this sub-array. If
+   com.perarray is 1 we use the COM models, otherwise we allocate temporary
+   memory for the individual common-mode signals. */
+         if( perarray ) {
+            com_datas[ idx ] =  model->sdata[ idx ]->pntr[ 0 ];
+         } else {
+            com_datas[ idx ] =  astMalloc( ntslice*sizeof( **com_datas ) );
+         }
+
+/* Form the new common-mode signal. This is just the sigma-clipped mean of the
    residuals at every time slice. */
-      for( iw = 0; iw < nw; iw++ ) {
-         pdata = job_data + iw;
-         pdata->icom = icom;
-         pdata->idx_lo = idx_lo;
-         pdata->idx_hi = idx_hi;
-         pdata->operation = 3;
-         thrAddJob( wf, 0, pdata, smf1_calcmodel_com, 0, NULL, status );
+         for( iw = 0; iw < nw; iw++ ) {
+            pdata = job_data + iw;
+            pdata->icom = -1;
+            pdata->com_data = com_datas[ idx ];
+            pdata->idx_lo = idx;
+            pdata->idx_hi = idx;
+            pdata->operation = 3;
+            thrAddJob( wf, 0, pdata, smf1_calcmodel_com, 0, NULL, status );
+         }
+         thrWait( wf, status );
+
       }
-      thrWait( wf, status );
+
+/* If com.perarray is zero (i.e. one shared COM model for all
+   sub-arrays), we now combined the individual common-mode signals into a
+   single mean COM model. */
+      if( ! perarray ) {
+
+/* Form the mean common-mode signal, placing it in model->sdata[0]. */
+         for( iw = 0; iw < nw; iw++ ) {
+            pdata = job_data + iw;
+            pdata->com_datas = com_datas;
+            pdata->idx_lo = 0;
+            pdata->idx_hi = res->ndat - 1;
+            pdata->operation = 4;
+            thrAddJob( wf, 0, pdata, smf1_calcmodel_com, 0, NULL, status );
+         }
+         thrWait( wf, status );
+
+/* Test if the following filtering has been regeusted. */
+         if( sig_limit > 0.0 ) {
+
+/* We now attempt to flag times slices in the above COM model that
+   correspond to times when the high frequency component of the common-mode
+   signal is very different in each sub-arrays. If the high-frequency
+   structure of the individual common-modes are different, then forcing
+   a single mean common-mode to be subtracted from all subarrays will
+   introduce strong high frequency structure into the residuals, which
+   will get through the FLT filter (maybe causing ringing) and end up in
+   the map as blobs. We first smooth each individual common-mode signal
+   using a highpass filter. First create the filter. */
+            astMapGet0A( keymap, "FLT", &kfmap );
+            filt = smf_create_smfFilter( res->sdata[0], status );
+            smf_filter_fromkeymap( filt, kfmap,
+                                   (flags & SMF__DIMM_LASTITER) ? "_LAST" : NULL,
+                                   res->sdata[0]->hdr, &dofft, &whiten, status );
+
+/* Get the filter wisthd, in samples. */
+            smf_filter_getlowf( filt, res->sdata[ 0 ]->hdr, &period, status );
+
+/* Allocate an array to hold the low frequency component of a single
+   common-mode signal. */
+            lof = astMalloc( ntslice*sizeof( *lof ) );
+
+/* Use this filter to fiter the common-mode signal for each sub-array. We
+   temporarily hijack the model smfData. */
+            old_model = model->sdata[ 0 ]->pntr[ 0 ];
+            model->sdata[ 0 ]->pntr[ 0 ] = lof;
+            for( idx = 0; idx < res->ndat && *status == SAI__OK; idx++ ) {
+
+/* Copy the common-mode signal to the "lof" array. */
+               memcpy( lof, com_datas[ idx ], ntslice*sizeof( *lof ) );
+
+/* Filter the "lof" array to retain just the low frequencies. */
+               smf_filter_execute( wf, model->sdata[ 0 ], filt, -1, whiten, status );
+
+/* Remove the low frequencies from the total common-mode signal, to
+   leave just the high frequencies. */
+               p1 = lof;
+               p2 = com_datas[ idx ];
+               for( itime = 0; itime < ntslice; itime++,p1++,p2++ ){
+                  if( *p1 != VAL__BADD && *p2 != VAL__BADD ) {
+                     *p2 -= *p1;
+                  } else {
+                     *p2 = VAL__BADD;
+                  }
+               }
+            }
+
+/* Re-instate the data array pointer in the model smfData. */
+            model->sdata[ 0 ]->pntr[ 0 ] = old_model;
+
+/* Free the filter, etc. */
+            filt = smf_free_smfFilter( filt, status );
+            kfmap = astAnnul( kfmap );
+            lof = astFree( lof );
+
+/* Now form the standard deviation at each time slice of the high
+   frequency common-mode signals. The resulting sigma values are left in
+   com_datas[ 0 ]. */
+            for( iw = 0; iw < nw; iw++ ) {
+               pdata = job_data + iw;
+               pdata->operation = 6;
+               thrAddJob( wf, 0, pdata, smf1_calcmodel_com, 0, NULL, status );
+            }
+            thrWait( wf, status );
+
+/* Find the total of the variances, and the number of variances. */
+            nvar = 0;
+            svar = 0.0;
+            for( iw = 0; iw < nw; iw++ ) {
+               pdata = job_data + iw;
+               nvar += pdata->nvar;
+               svar += pdata->svar;
+            }
+
+/* Find the square root of the mean variance, and convert it to a
+   threshold to apply to the stanadrad deviations array. */
+            sig_limit *= sqrt( svar/nvar );
+
+/* Convert the "sig_wing" parameter from a multiple of the filter width
+   to a number of samples. */
+            sig_wing = (int)( sig_wing*period + 0.5 );
+            if( sig_wing < 1 ) sig_wing = 1;
+
+/* Flag all time slices for which the standard deviation of the individual
+   common-mode signals (the high frequency part) exceeds the above limit. */
+            for( iw = 0; iw < nw; iw++ ) {
+               pdata = job_data + iw;
+               pdata->operation = 7;
+               pdata->idx_lo = 0;
+               pdata->idx_hi = res->ndat - 1;
+               pdata->limit = sig_limit;
+               pdata->wing = sig_wing;
+               thrAddJob( wf, 0, pdata, smf1_calcmodel_com, 0, NULL, status );
+            }
+            thrWait( wf, status );
+
+            nb = 0;
+            for( iw = 0; iw < nw; iw++ ) {
+               pdata = job_data + iw;
+               nb += pdata->nb;
+            }
+
+            msgOutiff( MSG__DEBUG, "", "  %zu timeslices set bad due to high dispersion "
+                       "between common-mode signals.", status, nb );
+         }
+
+/* Free resourcess. */
+         for( idx = 0; idx < res->ndat && *status == SAI__OK; idx++ ) {
+            com_datas[ idx ] =  astFree( com_datas[ idx ] );
+         }
+
+      }
 
 /* If we are using a GAI model, evaluate the gains and offsets of each
    bolometer block by doing a least squares linear fit between the residuals
    in the bolometer block, and the current estimate of COM. Additionally
    flag time slices within unusual bolometer blocks with the SMF_Q_COM flag.
    The correlation coefficient for such blocks is set to VAL__BADD. */
-      if( gai ) {
-         if( perarray ) {
-            smf_find_gains( wf, 6, res->sdata[ icom ], mask,
-                            lut ? lut->sdata[ icom ] : NULL,
-                            model->sdata[ icom ]->pntr[0], kmap, qmask,
-                            SMF__Q_COM, gai->sdata[ icom ], nrej, status );
-         } else {
-            smf_find_gains_array( wf, 6, res, mask, lut,
-                                  model->sdata[ icom ]->pntr[0], kmap,
-                                  qmask, SMF__Q_COM, gai, nrej, status );
+      for( icom = 0; icom < ncom && *status == SAI__OK; icom++ ) {
+         if( gai ) {
+            if( perarray ) {
+               smf_find_gains( wf, 6, res->sdata[ icom ], mask,
+                               lut ? lut->sdata[ icom ] : NULL,
+                               model->sdata[ icom ]->pntr[0], kmap,
+                               ( SMF__Q_GOOD & ~SMF__Q_RING ),
+                               SMF__Q_COM, gai->sdata[ icom ], nrej, status );
+            } else {
+               smf_find_gains_array( wf, 6, res, mask, lut,
+                                     model->sdata[ icom ]->pntr[0], kmap,
+                                     ( SMF__Q_GOOD & ~SMF__Q_RING ),
+                                     SMF__Q_COM, gai, nrej, status );
+            }
          }
-      }
+
+/* Set the index of the first and last subarray that contributes to the
+   current COM model. */
+         if( perarray ) {
+            idx_lo = icom;
+            idx_hi = icom;
+         } else {
+            idx_lo = 0;
+            idx_hi = res->ndat - 1;
+         }
 
 /* Subtract the COM estimate from every bolometer. */
-      for( iw = 0; iw < nw; iw++ ) {
-         pdata = job_data + iw;
-         pdata->operation = 5;
-         thrAddJob( wf, 0, pdata, smf1_calcmodel_com, 0, NULL, status );
+         for( iw = 0; iw < nw; iw++ ) {
+            pdata = job_data + iw;
+            pdata->icom = icom;
+            pdata->idx_lo = idx_lo;
+            pdata->idx_hi = idx_hi;
+            pdata->operation = 5;
+            thrAddJob( wf, 0, pdata, smf1_calcmodel_com, 0, NULL, status );
+         }
+         thrWait( wf, status );
       }
-      thrWait( wf, status );
    }
-
 
 /* Free resources allocated in this function. */
 L999:
@@ -522,19 +703,23 @@ static void smf1_calcmodel_com( void *job_data_ptr, int *status ) {
 */
 
 /* Local Variables: */
+   int state;
+   dim_t jtime;
    SmfCalcModelComData *pdata;
    dim_t btime;
-   size_t gbstride;
-   size_t gcstride;
    dim_t ibolo;
    dim_t idx;
    dim_t itime;
+   dim_t jlim;
    dim_t nbolo;
    dim_t ntslice;
    double *gai_data;
    double *model_data;
+   dim_t nvar;
+   double svar;
    double *pb;
    double *pm;
+   double *pmi[ 4 ];
    double *pr;
    double *pwg;
    double *pwoff;
@@ -542,10 +727,17 @@ static void smf1_calcmodel_com( void *job_data_ptr, int *status ) {
    double *resbuf;
    double *wg;
    double *woff;
+   double s1;
+   double s2;
+   double v;
    int *pl;
    int iblock;
+   int ns1;
+   size_t gbstride;
+   size_t gcstride;
    size_t izero;
    smf_qual_t *pq;
+   smf_qual_t *pq0[ 4 ];
    smf_qual_t *qua_data;
    smf_qual_t qmask;
 
@@ -698,7 +890,11 @@ static void smf1_calcmodel_com( void *job_data_ptr, int *status ) {
       }
 
 /* Initialise a pointer to the next model value. */
-      pm = pdata->model->sdata[ pdata->icom ]->pntr[ 0 ];
+      if( pdata->icom >= 0 ) {
+         pm = pdata->model->sdata[ pdata->icom ]->pntr[ 0 ];
+      } else {
+         pm = pdata->com_data;
+      }
       pm += pdata->t1;
 
 /* Buffer to hold all bolometer residuals at a single time slice. */
@@ -771,6 +967,188 @@ static void smf1_calcmodel_com( void *job_data_ptr, int *status ) {
 /* Free resources. */
       resbuf = astFree( resbuf );
 
+
+/* Combined individual common-mode signals into a single COM model.
+   ============================================================== */
+   } else if( pdata->operation == 4 ) {
+
+/* Initialise a pointer to the next output model value. */
+      pm = pdata->model->sdata[ 0 ]->pntr[ 0 ];
+      pm += pdata->t1;
+
+/* Initialise pointers to the next input model value for each subarray. */
+      for( idx = pdata->idx_lo; idx <= pdata->idx_hi; idx++ ) {
+         pmi[ idx ]  = pdata->com_datas[ idx ];
+         pmi[ idx ] += pdata->t1;
+      }
+
+/* Loop over the time slices to be processed by this thread. */
+      for( itime = pdata->t1; itime <= pdata->t2 && *status == SAI__OK;
+           itime++ ) {
+
+/* Initialise running sums. */
+         s1 = 0.0;
+         ns1 = 0;
+
+/* Loop over all sub-arrays, adding good values into the running sums. */
+         for( idx = pdata->idx_lo; idx <= pdata->idx_hi; idx++ ) {
+            v = *(pmi[ idx ]++);
+            if( v != VAL__BADD ) {
+               s1 += v;
+               ns1++;
+            }
+         }
+
+/* Store the mean. */
+         *(pm++) = ns1 ? s1/ns1 : VAL__BADD;
+      }
+
+
+/* Find the standard deviation of the high frequency components of the
+   separate common-mode signals.
+   ============================================================== */
+   } else if( pdata->operation == 6 ) {
+
+/* Initialise the um of the variances and the number of variances. */
+      nvar =0;
+      svar = 0.0;
+
+/* Initialise a pointer to the next output standard deviation value. */
+      pm  = pdata->com_datas[ 0 ] + pdata->t1;
+
+/* Initialise pointers to the next input model value for each subarray. */
+      for( idx = pdata->idx_lo; idx <= pdata->idx_hi; idx++ ) {
+         pmi[ idx ]  = pdata->com_datas[ idx ] + pdata->t1;
+      }
+
+/* Loop over the time slices to be processed by this thread. */
+      for( itime = pdata->t1; itime <= pdata->t2 && *status == SAI__OK;
+           itime++ ) {
+
+/* Initialise running sums. */
+         s1 = 0.0;
+         s2 = 0.0;
+         ns1 = 0;
+
+/* Loop over all sub-arrays, adding good values into the running sums. */
+         for( idx = pdata->idx_lo; idx <= pdata->idx_hi; idx++ ) {
+            v = *(pmi[ idx ]++);
+            if( v != VAL__BADD ) {
+               s1 += v;
+               s2 += v*v;
+               ns1++;
+            }
+         }
+
+/* Store the standard deviation, and increment the statistics for the
+   variance values. */
+         if( ns1 > 1 ) {
+            s1 /= ns1;
+            s2 = s2/ns1 - s1*s1;
+
+            if( s2 > 0.0 ) {
+               *(pm++) = sqrt( s2 );
+               svar += s2;
+
+            } else {
+               *(pm++) = 0.0;
+            }
+
+            nvar++;
+
+         } else {
+            *(pm++) = VAL__BADD;
+         }
+      }
+
+/* Return the sum of the variances and the number of variances. */
+      pdata->svar = svar;
+      pdata->nvar = nvar;
+
+/* Flag time slices with high dispersion between the indivudual
+   common-mode signals.
+   ============================================================== */
+   } else if( pdata->operation == 7 ) {
+      dim_t nb = 0;
+
+/* Initialise a pointer to the next dispersion value. */
+      pm  = pdata->com_datas[ 0 ] + pdata->t1;
+
+/* Store a pointer to the first COM model value value. */
+      model_data = pdata->model->sdata[ 0 ]->pntr[ 0 ];
+
+/* Pointers to the quality values for each subarray. */
+      for( idx = pdata->idx_lo; idx <= pdata->idx_hi; idx++ ) {
+         pq0[ idx ] = smf_select_qualpntr( pdata->res->sdata[ idx ], NULL,
+                                           status );
+      }
+
+/* Set a flag if we are in a block of high-dispersion samples. */
+      state = 0;
+
+/* Loop over the time slices to be processed by this thread. */
+      for( itime = pdata->t1; itime <= pdata->t2 && *status == SAI__OK;
+           itime++,pm++ ) {
+
+/* If we have just entered a block of high-dispersion time slices... */
+         if( state == 0 ) {
+            if( *pm != VAL__BADD && *pm > pdata->limit ) {
+               state = 1;
+               nb++;
+
+/* Ensure all the previous "wing" samples are also bad. */
+               if( itime > pdata->wing ) {
+                  jtime = itime - pdata->wing;
+               } else {
+                  jtime = 0;
+               }
+               if( jtime < pdata->t1 ) jtime = pdata->t1;
+               for( ; jtime <= itime; jtime++ ) {
+
+                  for( idx = pdata->idx_lo; idx <= pdata->idx_hi; idx++ ) {
+                     pq = pq0[ idx ] + jtime;
+                     for( ibolo = 0; ibolo < pdata->nbolo; ibolo++ ) {
+                        *pq |= SMF__Q_COM;
+                        pq += pdata->ntslice;
+                     }
+                  }
+
+               }
+            }
+
+/* If we have just left a block of high-dispersion time slices... */
+         } else {
+            if( *pm != VAL__BADD && *pm <= pdata->limit ) {
+               state = 0;
+
+/* Ensure all the next "wing" samples are also bad. */
+               jlim = itime + pdata->wing - 1;
+               if( jlim > pdata->t2 ) jlim = pdata->t2;
+               for( jtime = itime; jtime <= jlim; jtime++ ) {
+                  for( idx = pdata->idx_lo; idx <= pdata->idx_hi; idx++ ) {
+                     pq = pq0[ idx ] + jtime;
+                     for( ibolo = 0; ibolo < pdata->nbolo; ibolo++ ) {
+                        *pq |= SMF__Q_COM;
+                        pq += pdata->ntslice;
+                     }
+                  }
+               }
+
+/* If we are in the middle of a block of high-dispersion time slices... */
+            } else {
+               nb++;
+               for( idx = pdata->idx_lo; idx <= pdata->idx_hi; idx++ ) {
+                  pq = pq0[ idx ] + itime;
+                  for( ibolo = 0; ibolo < pdata->nbolo; ibolo++ ) {
+                     *pq |= SMF__Q_COM;
+                     pq += pdata->ntslice;
+                  }
+               }
+            }
+         }
+      }
+
+      pdata->nb = nb;
 
 /* Report an error if the worker was to do an unknown job.
    ====================================================== */

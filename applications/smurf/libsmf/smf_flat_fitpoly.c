@@ -477,8 +477,8 @@ void smf_flat_fitpoly ( const smfData * powvald, const smfData * bolvald,
   if (corrs) corrs = astFree( corrs );
 
   if (*status != SAI__OK) {
-    if (*coeffs) smf_close_file( coeffs, status );
-    if (*polyfit) smf_close_file( polyfit, status );
+    if (*coeffs) smf_close_file( NULL, coeffs, status );
+    if (*polyfit) smf_close_file( NULL, polyfit, status );
   }
 
 }

@@ -13,12 +13,14 @@
 *     Subroutine
 
 *  Invocation:
-*     void smf_flat_write( smf_flatmeth flatmeth, const char * flatname,
+*     void smf_flat_write( ThrWorkForce *wf, smf_flatmeth flatmeth, const char * flatname,
 *                          double refres, const smfData * bolval,
 *                          const smfData * powref,const smfData * bolref,
 *                          const smfData * polyfit, const Grp * prvgrp, int * status );
 
 *  Arguments:
+*     wf = ThrWorkForce * (Given)
+*        Pointer to a pool of worker threads
 *     flatmeth = smf_flatmeth (Given)
 *        Flatfield method (TABLE or POLYNOMIAL) used for powref and
 *        bolref.
@@ -119,6 +121,7 @@
 #include "star/atl.h"
 #include "star/kaplibs.h"
 #include "star/one.h"
+#include "star/thr.h"
 #include "star/grp.h"
 #include "prm_par.h"
 #include "sae_par.h"
@@ -129,7 +132,7 @@
 #include "sc2da/sc2ast.h"
 
 
-void smf_flat_write( smf_flatmeth flatmeth, const char * flatname,
+void smf_flat_write( ThrWorkForce *wf, smf_flatmeth flatmeth, const char * flatname,
                      double refres, const smfData * bolval,
                      const smfData * powref, const smfData * bolref,
                      const smfData * polyfit, const Grp * prvgrp, int * status ) {
@@ -308,7 +311,7 @@ void smf_flat_write( smf_flatmeth flatmeth, const char * flatname,
     one_strlcat( fitfile, ".MORE.SMURF.FLATFIT", sizeof(fitfile), status );
 
     /* create the file */
-    smf_write_smfData( polyfit, NULL, fitfile, NULL, 0, NDF__NOID,
+    smf_write_smfData( wf, polyfit, NULL, fitfile, NULL, 0, NDF__NOID,
                        MSG__VERB, 0, status );
 
     /* Same WCS as the main file */

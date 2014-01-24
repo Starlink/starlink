@@ -127,7 +127,7 @@ void smurf_fts2_freqcorr(int* status)
   ndfBegin();
 
   // OPEN THETA
-  smf_open_file( calgrp, 1, "READ",
+  smf_open_file( NULL, calgrp, 1, "READ",
                  SMF__NOCREATE_DA | SMF__NOCREATE_FTS,
                  &calData, status);
   if(*status != SAI__OK) {
@@ -140,7 +140,7 @@ void smurf_fts2_freqcorr(int* status)
 
   // LOOP THROUGH EACH NDF FILE IN THE GROUP
   for(fIndex = 1; fIndex <= inSize; fIndex++) {
-    smf_open_file(igrp, fIndex, "READ", 0, &inData, status);
+    smf_open_file( NULL, igrp, fIndex, "READ", 0, &inData, status);
     if(*status != SAI__OK) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Unable to open source file!", status);
@@ -152,11 +152,11 @@ void smurf_fts2_freqcorr(int* status)
         (inData->dims[1] != calData->dims[1]) ) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Incompatible Theta file!", status);
-      smf_close_file(&inData, status);
+      smf_close_file( NULL,&inData, status);
       break;
     }
 
-    outData = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA, 0, 0, status);
+    outData = smf_deepcopy_smfData(NULL, inData, 0, SMF__NOCREATE_DATA, 0, 0, status);
 
     if(*status == SAI__OK) {
       inPntr   = inData->pntr[0];
@@ -210,19 +210,19 @@ void smurf_fts2_freqcorr(int* status)
       astFree(spec);
       astFree(specNew);
 
-      smf_write_smfData(outData, NULL, NULL, ogrp, fIndex, 0, MSG__VERB,
+      smf_write_smfData(NULL, outData, NULL, NULL, ogrp, fIndex, 0, MSG__VERB,
                         0, status);
-      smf_close_file(&outData, status);
+      smf_close_file( NULL,&outData, status);
 
-      smf_close_file(&inData, status);
+      smf_close_file( NULL,&inData, status);
     } else {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Unable to deep copy!", status);
-      smf_close_file(&inData, status);
+      smf_close_file( NULL,&inData, status);
       break;
     }
   }
-  smf_close_file(&calData, status);
+  smf_close_file( NULL,&calData, status);
 
   CLEANUP:
     ndfEnd(status);

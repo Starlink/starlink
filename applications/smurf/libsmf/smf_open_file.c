@@ -13,10 +13,13 @@
  *     Library routine
 
  *  Invocation:
- *     smf_open_file( const Grp * ingrp, size_t index, const char * mode,
- *                    int flags, smfData ** data, int *status);
+ *     smf_open_file( ThrWorkForce *wf, const Grp * ingrp, size_t index,
+ *                    const char * mode, int flags, smfData ** data,
+ *                    int *status);
 
  *  Arguments:
+ *     wf = ThrWorkForce * (Given)
+ *        Pointer to a pool of worker threads
  *     ingrp = const Grp * (Given)
  *        NDG group identifier
  *     index = size_t (Given)
@@ -239,10 +242,16 @@
  *     2012-01-19 (DSB):
  *        If the isFFT header cannot be read for any reason, annul the
  *        error and continue.
+ *     2014-01-10 (DSB):
+ *        Added argument wf.
+ *     2014-01-21 (DSB):
+ *        Use the STEPTIME and SCANVEL values from the SMURF extension, if
+ *        any, in preference to the FITS headers. These extension items are
+ *        created by makemap when exporting cleaned time series data.
  *     {enter_further_changes_here}
 
  *  Copyright:
- *     Copyright (C) 2007-2011 Science and Technology Facilities Council.
+ *     Copyright (C) 2007-2014 Science and Technology Facilities Council.
  *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
  *     Copyright (C) 2005-2008,2010-2011 University of British Columbia.
  *     All Rights Reserved.
@@ -276,6 +285,7 @@
 /* Starlink includes */
 #include "sae_par.h"
 #include "star/ndg.h"
+#include "star/thr.h"
 #include "ndf.h"
 #include "ast.h"
 #include "smf.h"
@@ -309,8 +319,9 @@ typedef struct smfOpenFileData {
 
 #define FUNC_NAME "smf_open_file"
 
-void smf_open_file( const Grp * igrp, size_t index, const char * mode,
-                    int flags, smfData ** data, int *status) {
+void smf_open_file( ThrWorkForce *wf, const Grp * igrp, size_t index,
+                    const char * mode, int flags, smfData ** data,
+                    int *status) {
 
   int canwrite = 0;          /* We can write to the file if true */
   char datatype[NDF__SZTYP+1];  /* String for DATA type */
@@ -693,7 +704,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
           } else if ( canwrite ) {
             one_strlcpy( qmode, "WRITE/ZERO", sizeof(qmode), status );
           }
-          outqual = smf_qual_map( indf, qmode, &qfamily, &nqout, status );
+          outqual = smf_qual_map( wf, indf, qmode, &qfamily, &nqout, status );
 
           /* Since we may not technically be mapping the QUALITY at this
              point (if it was mapped, copied, unmapped) we have to tell
@@ -761,7 +772,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
           }
           if (strlen(qmode)) {
             size_t nqmap;
-            qpntr = smf_qual_map( dkndf, qmode, NULL, &nqmap, status );
+            qpntr = smf_qual_map( wf, dkndf, qmode, NULL, &nqmap, status );
           }
 
           /* Map DATA after quality to prevent automatic quality masking */
@@ -1301,10 +1312,10 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
 
         /* Free up the smfDatas for jigvert and jigpath */
         if ( jigvert != NULL ) {
-          smf_close_file( &jigvdata, status );
+          smf_close_file( wf, &jigvdata, status );
         }
         if ( jigpath != NULL ) {
-          smf_close_file( &jigpdata, status );
+          smf_close_file( wf, &jigpdata, status );
         }
         datAnnul( &xloc, status );
       }
@@ -1318,13 +1329,24 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
     double scanvel = VAL__BADD;
 
     /* Store the STEPTIME in the hdr - assumes that smf_fix_metadata has
-       fixed things up or complained. */
+       fixed things up or complained. If there is a STEPTIME value in the
+       SMURF NDF extension we use it in preference to the FITS header.
+       Such an extension item will be present if the data has been
+       pre-cleaned by a previous run of makemap, and will be the value
+       actually used by the previous run of makemap. Similarly get the
+       SCAN_VEL (in arcsec/sec). */
     smf_getfitsd( hdr, "STEPTIME", &steptime, status );
-    hdr->steptime = steptime;
-
-    /* Similarly get the SCAN_VEL (in arcsec/sec) from the header */
     smf_getfitsd( hdr, "SCAN_VEL", &scanvel, status );
+    if( file && file->ndfid != NDF__NOID ) {
+      int there = 0;
+      ndfXstat( file->ndfid, SMURF__EXTNAME, &there, status );
+      if( there ) {
+         ndfXgt0d( file->ndfid, SMURF__EXTNAME, "STEPTIME", &steptime, status );
+         ndfXgt0d( file->ndfid, SMURF__EXTNAME, "SCAN_VEL", &scanvel, status );
+      }
+    }
     hdr->scanvel = scanvel;
+    hdr->steptime = steptime;
 
     /* If this looks like a SCUBA-2 image but we are missing
        STEPTIME or SCAN_VEL we do not really mind if this is
@@ -1367,7 +1389,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
 
   /* free resources on error */
   if (*status != SAI__OK) {
-    smf_close_file( data, status );
+    smf_close_file( wf, data, status );
   }
 
 }
@@ -1540,7 +1562,7 @@ static void smf1_open_file_caller( void *data, int *status ){
    pdata = (smfOpenFileData *) data;
 
 /* Open the file. */
-   smf_open_file( pdata->grp, pdata->index, pdata->mode, pdata->flags,
+   smf_open_file( NULL, pdata->grp, pdata->index, pdata->mode, pdata->flags,
                   pdata->data, status );
 
 /* If this file is associated with an NDF then we do a deep copy
@@ -1550,8 +1572,8 @@ static void smf1_open_file_caller( void *data, int *status ){
    thisdata = *(pdata->data);
    if (thisdata && thisdata->file && thisdata->file->ndfid != NDF__NOID) {
      smfData *tmpdata = NULL;
-     tmpdata = smf_deepcopy_smfData( thisdata, 0, 0, 0, 0, status );
-     smf_close_file( pdata->data, status );
+     tmpdata = smf_deepcopy_smfData( NULL, thisdata, 0, 0, 0, 0, status );
+     smf_close_file( NULL, pdata->data, status );
      *(pdata->data) = tmpdata;
    }
 

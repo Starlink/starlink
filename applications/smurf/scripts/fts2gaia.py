@@ -3,7 +3,7 @@
 '''
 *+
 *  Name:
-*     fts2gaia
+*     FTS2GAIA
 
 *  Purpose:
 *     Display in-band FTS-2 spectrum in gaia
@@ -15,12 +15,12 @@
 *     Display those frames of an FTS-2 spectrum which fall within the band-pass.
 *     For 850 um, this band is between 11.2 and 12.2 cm^-1 wave numbers, and
 *     for 450 um, it is between 22.1 and 23.3 cm^-1 wave numbers.
-*     This translates to the peak of the spectrum of the target, 
-*     found near the middle of the sensor array plus and minus some number of 
-*     frames corresponding to the desired portion of the band pass.    
+*     This translates to the peak of the spectrum of the target,
+*     found near the middle of the sensor array plus and minus some number of
+*     frames corresponding to the desired portion of the band pass.
 
 *  Usage:
-*     fts2gaia in 
+*     fts2gaia in
 
 *  Parameters:
 *     IN = NDF (Read)
@@ -73,7 +73,7 @@ from starutil import msg_out
 if len(sys.argv) < 2:
     print "Usage: fts2gaia <NDF_file>"
     sys.exit(0)
-      
+
 indata = sys.argv[1]
 # print "indata="+indata
 if os.path.exists(indata) == False:
@@ -93,7 +93,7 @@ if band == None:
     print "and observation-date has the form: YYYYMMDD"
     sys.exit(0)
 
-    
+
 # print "band={0}".format(band)
 
 # Get WNFACT value and nFrames from data file

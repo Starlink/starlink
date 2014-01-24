@@ -211,7 +211,7 @@ void smurf_sc2concat( int *status ) {
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &isize, status );
 
   /* Filter out darks */
-  smf_find_science( igrp, &fgrp, 1, NULL, NULL, 1, 1, SMF__NULL, &darks,
+  smf_find_science( wf, igrp, &fgrp, 1, NULL, NULL, 1, 1, SMF__NULL, &darks,
                     &flatramps, &heateffmap, NULL, status );
 
   /* input group is now the filtered group so we can use that and
@@ -273,7 +273,7 @@ void smurf_sc2concat( int *status ) {
     /* Export concatenated data for each subarray to NDF file */
     for( idx=0; (*status==SAI__OK)&&idx<concat->ndat; idx++ ) {
       if( concat->sdata[idx]->file && concat->sdata[idx]->file->name ) {
-        smf_write_smfData( concat->sdata[idx], NULL, NULL, ogrp, gcount,
+        smf_write_smfData( wf, concat->sdata[idx], NULL, NULL, ogrp, gcount,
                            NDF__NOID, MSG__VERB, 0, status );
       } else {
         *status = SAI__ERROR;
@@ -287,7 +287,7 @@ void smurf_sc2concat( int *status ) {
     }
 
     /* Close the smfArray */
-    smf_close_related( &concat, status );
+    smf_close_related( wf, &concat, status );
 
   }
 
@@ -299,8 +299,8 @@ void smurf_sc2concat( int *status ) {
   }
 
  CLEANUP:
-  if( darks ) smf_close_related( &darks, status );
-  if( flatramps ) smf_close_related( &flatramps, status );
+  if( darks ) smf_close_related( wf, &darks, status );
+  if( flatramps ) smf_close_related( wf, &flatramps, status );
   if (heateffmap) heateffmap = smf_free_effmap( heateffmap, status );
   if( igrp ) grpDelet( &igrp, status);
   if( basegrp ) grpDelet( &basegrp, status );

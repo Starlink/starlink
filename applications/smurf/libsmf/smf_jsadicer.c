@@ -1,10 +1,10 @@
 /*
 *+
 *  Name:
-*     smf_jsasplit
+*     smf_jsadicer
 
 *  Purpose:
-*     Split a supplied NDF up into JSA tiles and create a new NDF for each
+*     Dice a supplied NDF up into JSA tiles and create a new NDF for each
 *     tile.
 
 *  Language:
@@ -14,13 +14,13 @@
 *     C function
 
 *  Invocation:
-*     void smf_jsasplit( int indf, const char *base, int trim,
+*     void smf_jsadicer( int indf, const char *base, int trim,
 *                        smf_inst_t instrument, size_t *ntile,
 *                        Grp *grp, int *status )
 
 *  Arguments:
 *     indf = int (Given)
-*        An identifier for the NDF to be split. This may be 2D or 3D. The
+*        An identifier for the NDF to be diced. This may be 2D or 3D. The
 *        NDF is assumed to be gridded on the JSA all-sky pixel grid, and
 *        the current Frame of the NDF's WCS FrameSet must contain a SkyFrame
 *        (but they need not be axes 1 and 2).
@@ -65,10 +65,13 @@
 *        - Display tile indicies and write them to an output parameter.
 *        - Re-structured to test for bad values in the supplied NDF
 *          rather than the tiles (testing in tiles is a bigger job).
+*     17-JAN-2014 (DSB):
+*        - Report an error if the NDFs projection is not HEALPix.
+*        - Renamed from smf_jsasplit to smf_jsadicer.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2013 Science & Technology Facilities Council.
+*     Copyright (C) 2013-2014 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -100,6 +103,7 @@
 #include "ndf.h"
 #include "star/grp.h"
 #include "star/atl.h"
+#include "star/one.h"
 #include "kpg_err.h"
 
 /* SMURF includes */
@@ -107,7 +111,7 @@
 #include "libsmf/jsatiles.h"
 
 
-void smf_jsasplit( int indf, const char *base, int trim,
+void smf_jsadicer( int indf, const char *base, int trim,
                    smf_inst_t instrument, size_t *ntile, Grp *grp,
                    int *status ){
 
@@ -120,6 +124,7 @@ void smf_jsasplit( int indf, const char *base, int trim,
    Grp *grpt = NULL;
    char *path;
    char type[ NDF__SZTYP + 1 ];
+   char jsatile_comment[45];
    double *ipd;
    double *pxd;
    double *pyd;
@@ -191,6 +196,15 @@ void smf_jsasplit( int indf, const char *base, int trim,
 /* Get the WCS from the NDF. */
    kpg1Gtwcs( indf, &iwcs, status );
 
+/* Report an error if the NDFs projection is not "HEALPix". */
+   if( !astChrMatch( astGetC( iwcs, "Projection" ), "HEALPix" ) &&
+       *status == SAI__OK ) {
+      ndfMsg( "N", indf );
+      *status = SAI__ERROR;
+      errRep( "", "The input NDF (^N) does not appear to be gridded "
+              "on the JSA all-sky pixel grid.", status );
+   }
+
 /* Get the bounds of the NDF in pixel indices and the the corresponding
    double precision GRID bounds. Also store the GRID coords of the centre.
    Also count the number of significant pixel axes. */
@@ -233,7 +247,7 @@ void smf_jsasplit( int indf, const char *base, int trim,
    tiles = smf_jsatiles_region( region, &tiling, &ntiles, status );
    if( ntiles == 0 && *status == SAI__OK ) {
       *status = SAI__ERROR;
-      errRep( "", "smf_jsasplit: No JSA tiles found touching supplied NDF "
+      errRep( "", "smf_jsadicer: No JSA tiles found touching supplied NDF "
               "(programming error).", status );
    }
 
@@ -264,7 +278,7 @@ void smf_jsasplit( int indf, const char *base, int trim,
 
 /* Tell the user what is happening. */
    msgBlank( status );
-   msgOutf( "", "Splitting %s up into JSA tiles:", status,
+   msgOutf( "", "Dicing %s into JSA tiles:", status,
             ( nsig == 2 ) ? "map" : "cube" );
 
 /* Loop round all tiles that overlap the supplied NDF. */
@@ -294,7 +308,7 @@ void smf_jsasplit( int indf, const char *base, int trim,
             if( *status == SAI__OK ) {
                *status = SAI__ERROR;
                ndfMsg( "N", indf );
-               errRep( "", "smf_jsasplit: Cannot find the RA and Dec axes "
+               errRep( "", "smf_jsadicer: Cannot find the RA and Dec axes "
                        "in '^N'.", status );
             }
             break;
@@ -312,6 +326,10 @@ void smf_jsasplit( int indf, const char *base, int trim,
       for( i = 0; i < ndim; i++ ) {
          olbnd[ i ] = lbnd[ i ];
          oubnd[ i ] = ubnd[ i ];
+      }
+      for( ; i < 3; i++ ) {
+         olbnd[ i ] = 1;
+         oubnd[ i ] = 1;
       }
       if( tile_lbnd[ 0 ] > olbnd[ lonax ] )  olbnd[ lonax ] = tile_lbnd[ 0 ];
       if( tile_lbnd[ 1 ] > olbnd[ latax ] )  olbnd[ latax ] = tile_lbnd[ 1 ];
@@ -430,9 +448,17 @@ void smf_jsasplit( int indf, const char *base, int trim,
       if( *status == KPG__NOFTS ) {
          errAnnul( status );
          fc = astFitsChan( NULL, NULL, " " );
+
+/* If the last card is "END", remove it. */
+      } else {
+         astSetI( fc, "Card", astGetI( fc, "NCARD" ) );
+         const char *keyword = astGetC( fc, "CardName" );
+         if( keyword && !strcmp( keyword, "END" ) ) astDelFits( fc );
       }
-      atlPtfti( fc, "JSATILE", tile_index, "JSA all-sky tile index",
-                status );
+
+      one_snprintf(jsatile_comment, 45, "JSA all-sky tile index (Nside=%i)",
+                   status, tiling.ntpf);
+      atlPtfti( fc, "JSATILE", tile_index, jsatile_comment, status );
       kpgPtfts( indfo, fc, status );
       fc = astAnnul( fc );
 
@@ -477,7 +503,7 @@ void smf_jsasplit( int indf, const char *base, int trim,
    msgBlank( status );
 
 /* Write the indicies of the created tiles out to a parameter. */
-   parPut1i( "JSATILELIST", *ntile, created_tiles, status );
+   if( *ntile ) parPut1i( "JSATILELIST", *ntile, created_tiles, status );
 
 /* Free resources. */
    created_tiles = astFree( created_tiles );

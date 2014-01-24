@@ -147,6 +147,11 @@
 *        not free any memory.
 *     21-NOV-2011 (DSB):
 *        Correct matchend value returned by astChrSplitRE.
+*     6-JAN-2014 (DSB):
+*        Optimise access to cache to avoid valgrind warnings.
+*     16-JAN-2014 (DSB):
+*        Dump details of all active memory blocks if the total memory allocation 
+*        specified by astMemoryWarning is exceeded.
 */
 
 /* Configuration results. */
@@ -2302,8 +2307,8 @@ void *astMalloc_( size_t size, int init, int *status ) {
 
 /* If the cache is being used and a cached memory block of the required size
    is available, remove it from the cache array and use it. */
-      mem = ( size <= MXCSIZE ) ? cache[ size ] : NULL;
-      if( use_cache && mem ) {
+      mem = ( use_cache && size <= MXCSIZE ) ? cache[ size ] : NULL;
+      if( mem ) {
          cache[ size ] = mem->next;
          mem->next = NULL;
          mem->size = (size_t) size;
@@ -4829,9 +4834,32 @@ static void Issue( Memory *mem, int *status ) {
    debugger breakpoint to be set. */
    if( Current_Usage > Warn_Usage &&
        Warn_Usage > 0 ) {
-      printf( "Warning - AST memory allocation has exceeded %ld bytes\n",
+      printf( "Warning - AST memory allocation has exceeded %ld bytes - "
+              "dumping catalogue of active memory blocks to file 'memory.dump'\n",
               Warn_Usage );
-      astMemoryWarning( 0 );
+
+/* Create a file holding the details of all currently active memory blocks. It can be 
+   examined using topcat. */
+      FILE *fd = fopen( "memory.dump", "w" );
+      if( fd ) {
+         Memory *next;
+
+         fprintf( fd, "# id size perm file line\n");
+         next = Active_List;
+         if( next ) {
+            while( next ) {
+               if( !next->perm ) {
+                  fprintf( fd, "%d %zu %d %s %d\n", next->id, next->size,
+                           next->perm, next->file, next->line );
+               }
+               next = next->next;
+            }
+         }
+
+         fclose(fd );
+      }
+
+      Warn_Usage  = 0;
    }
 
    UNLOCK_DEBUG_MUTEX;

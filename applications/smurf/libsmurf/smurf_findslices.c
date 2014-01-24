@@ -167,7 +167,7 @@ void smurf_findslices( int *status ) {
    for( i = 0; i < ssize && *status == SAI__OK; i++ ) {
 
 /* Open the file. */
-      smf_open_file( igrp, i + 1, "Read", SMF__NOCREATE_DATA, &data,
+      smf_open_file( NULL, igrp, i + 1, "Read", SMF__NOCREATE_DATA, &data,
                      status );
 
 /* If this is the first one, get the position to search for, and convert
@@ -293,7 +293,7 @@ void smurf_findslices( int *status ) {
       }
 
 /* Close the file. */
-      smf_close_file( &data, status );
+      smf_close_file( NULL, &data, status );
    }
 
    msgBlank( status );

@@ -212,7 +212,7 @@ void smurf_calcflat( int *status ) {
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
   /* Find darks (might be all) */
-  smf_find_science( igrp, &fgrp, 0, &dkgrp, &ffgrp, 1, 0, SMF__DOUBLE, &darks,
+  smf_find_science( NULL, igrp, &fgrp, 0, &dkgrp, &ffgrp, 1, 0, SMF__DOUBLE, &darks,
                     &fflats, NULL, NULL, status );
 
   /* input group is now the filtered group so we can use that and
@@ -274,7 +274,7 @@ void smurf_calcflat( int *status ) {
         smfData *outfile = NULL;
         smfData *infile = NULL;
         if (*status != SAI__OK) break;
-        smf_open_file( igrp, i, "READ", 0, &infile, status );
+        smf_open_file( NULL, igrp, i, "READ", 0, &infile, status );
 
         if (*status == SAI__OK && infile
             && infile->hdr->obstype != SMF__TYP_FLATFIELD) {
@@ -287,7 +287,7 @@ void smurf_calcflat( int *status ) {
            S/N < 1 and constant signal data. Also clip at 3sigma */
         smf_collapse_tseries( infile, 1, clip, 1.0, 1, SMF__DOUBLE,
                               &outfile, status );
-        smf_close_file( &infile, status );
+        smf_close_file( NULL, &infile, status );
         smf_addto_smfArray( flatfiles, outfile, status );
       }
     }
@@ -436,7 +436,7 @@ void smurf_calcflat( int *status ) {
        expected measurement from each bolometer at each power setting.
      */
 
-    ngood = smf_flat_calcflat( MSG__NORM, flatname, "RESIST", "METHOD", "ORDER",
+    ngood = smf_flat_calcflat( NULL, MSG__NORM, flatname, "RESIST", "METHOD", "ORDER",
                                "RESP", "RESPMASK", "SNRMIN", igrp, bolval, NULL, status );
     parPut0i( "NGOOD", ngood, status );
 
@@ -444,10 +444,10 @@ void smurf_calcflat( int *status ) {
 
   /* Tidy up after ourselves: release the resources used by the grp routines  */
  CLEANUP:
-  if (bbhtframe) smf_close_related( &bbhtframe, status );
-  if (darks) smf_close_related( &darks, status );
-  if (fflats) smf_close_related( &fflats, status );
-  if (flatfiles) smf_close_related( &flatfiles, status );
+  if (bbhtframe) smf_close_related( NULL, &bbhtframe, status );
+  if (darks) smf_close_related( NULL, &darks, status );
+  if (fflats) smf_close_related( NULL, &fflats, status );
+  if (flatfiles) smf_close_related( NULL, &flatfiles, status );
   if (igrp) grpDelet( &igrp, status);
   if (fgrp) grpDelet( &fgrp, status);
   if (ffgrp) grpDelet( &ffgrp, status);
@@ -456,7 +456,7 @@ void smurf_calcflat( int *status ) {
 
   /* bolval is a simple pointer copy in fast ramp mode and will be freed when fflats is freed */
   if (!isfastramp) {
-    if (bolval) smf_close_file( &bolval, status );
+    if (bolval) smf_close_file( NULL, &bolval, status );
   }
 
   ndfEnd( status );

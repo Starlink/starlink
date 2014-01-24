@@ -193,11 +193,9 @@
 *        - "SombCos" -- Uses the somb(pi*x)cos(k*pi*x) kernel. This
 *        scheme is similar to the "SincCos" scheme.
 *
-*        - "Gauss" -- Uses the exp(-k*x*x) kernel. This option is only
-*        available when rebinning (i.e. if REBIN is set to TRUE).
-*        The FWHM of the Gaussian is given by Parameter PARAMS(2), and
-*        the point at which to truncate the Gaussian to zero is given by
-*        Parameter PARAMS(1).
+*        - "Gauss" -- Uses the exp(-k*x*x) kernel. The FWHM of the Gaussian
+*        is given by Parameter PARAMS(2), and the point at which to truncate
+*        the Gaussian to zero is given by Parameter PARAMS(1).
 *
 *        All methods propagate variances from input to output, but the
 *        variance estimates produced by interpolation schemes other than
@@ -455,6 +453,8 @@
 *        all input NDFs being used as ancestors of all output NDFs.
 *     18-JUL-2013 (DSB):
 *        Allow an ACC value of zero to be supplied.
+*     6-DEC-2013 (DSB):
+*        No longer any reason prevent Gauss kernel being used with REBIN=NO.
 *     {enter_further_changes_here}
 
 *-
@@ -614,22 +614,9 @@
       CALL PAR_GET0L( 'REBIN', REBIN, STATUS )
 
 *  Get the interpolation/spreading method to be used.
-      MORE = .TRUE.
-      DO WHILE( MORE .AND. STATUS .EQ. SAI__OK )
-         CALL PAR_CHOIC( 'METHOD', 'SincSinc', 'Nearest,Bilinear,'//
-     :                   'Sinc,Gauss,SincSinc,SincCos,SincGauss,'//
-     :                   'Somb,SombCos', .TRUE., METHOD, STATUS )
-         IF( .NOT. REBIN .AND. METHOD( 1 : 1 ) .EQ. 'G' ) THEN
-            CALL MSG_OUT( ' ', 'Method "Gauss" cannot be used '//
-     :                    'because REBIN is set false.', STATUS )
-            CALL MSG_OUT( ' ', 'Please supply a new value for '//
-     :                    'Parameter METHOD.', STATUS )
-            CALL PAR_CANCL( 'METHOD', STATUS )
-         ELSE
-            MORE = .FALSE.
-         END IF
-         CALL MSG_BLANK( STATUS )
-      END DO
+      CALL PAR_CHOIC( 'METHOD', 'SincSinc', 'Nearest,Bilinear,'//
+     :                'Sinc,Gauss,SincSinc,SincCos,SincGauss,'//
+     :                'Somb,SombCos', .TRUE., METHOD, STATUS )
 
 *  Tell the user what method is being used, and convert value of
 *  METHOD to one of the values expected by AST_RESAMPLE<x>.

@@ -13,9 +13,11 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     smf_close_related( smfArray **relfiles, int *status );
+*     smf_close_related( ThrWorkForce *wf, smfArray **relfiles, int *status );
 
 *  Arguments:
+*     wf = ThrWorkForce * (Given)
+*        Pointer to a pool of worker threads
 *     relfiles = smfArray** (Given and Returned)
 *        Pointer to smfArray containing files to be closed. No action
 *        performed if *relfiles is NULL.
@@ -93,6 +95,7 @@
 #include "mers.h"
 #include "ndf.h"
 #include "star/ndg.h"
+#include "star/thr.h"
 #include "star/grp.h"
 #include "msg_par.h"
 
@@ -103,7 +106,7 @@
 
 #define FUNC_NAME "smf_close_related"
 
-void smf_close_related ( smfArray **relfiles, int *status ) {
+void smf_close_related ( ThrWorkForce *wf, smfArray **relfiles, int *status ) {
 
   /* Local variables */
   dim_t i;                  /* Loop counter */
@@ -121,7 +124,7 @@ void smf_close_related ( smfArray **relfiles, int *status ) {
     for (i=0; i<nrelated; i++) {
       data = ((*relfiles)->sdata)[i];
       if ( data != NULL ) {
-        smf_close_file( &data, status );
+        smf_close_file( wf, &data, status );
       }
     }
   }

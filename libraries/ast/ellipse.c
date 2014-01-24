@@ -62,6 +62,9 @@ c     - AST_ELLIPSEPARS: Get the geometric parameters of the Ellipse
 *        Modify RegPins so that it can handle uncertainty regions that straddle
 *        a discontinuity. Previously, such uncertainty Regions could have a huge
 *        bounding box resulting in matching region being far too big.
+*     6-JAN-2014 (DSB):
+*        Ensure cached information is available in RegCentre even if no new 
+*        centre is supplied.
 *class--
 */
 
@@ -1284,6 +1287,9 @@ static double *RegCentre( AstRegion *this_region, double *cen, double **ptr,
 /* Get a pointer to the Ellipse structure. */
    this = (AstEllipse *) this_region;
 
+/* Ensure cached information is available. */
+   Cache( this, status );
+
 /* Get the number of axis values per point in the current Frame. */
    ncc = astGetNout( this_region->frameset );
 
@@ -1303,9 +1309,6 @@ static double *RegCentre( AstRegion *this_region, double *cen, double **ptr,
 /* Otherwise, we store the supplied new centre coords and return a NULL
    pointer. */
    } else {
-
-/* Ensure cached information is available. */
-      Cache( this, status );
 
 /* Get a pointer to the axis values stored in the Region structure. */
       rptr = astGetPoints( this_region->points );

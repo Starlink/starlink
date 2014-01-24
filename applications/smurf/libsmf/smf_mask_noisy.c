@@ -130,7 +130,7 @@ void smf_mask_noisy( ThrWorkForce *wf, smfData *data, smfData **noise,
                 NULL, NULL, status );
 
   /* Create some space for the result */
-  smf_create_bolfile( NULL, 1, data, "Noise", "blahs s**0.5",
+  smf_create_bolfile( wf, NULL, 1, data, "Noise", "blahs s**0.5",
                       SMF__MAP_VAR, &noisemap, status );
   if (noisemap) noisedata = (noisemap->pntr)[0];
 
@@ -185,15 +185,15 @@ void smf_mask_noisy( ThrWorkForce *wf, smfData *data, smfData **noise,
     smfArray *masks = smf_create_smfArray( status );
     if (masks) masks->owndata = 0;  /* someone else owns the smfData */
     smf_addto_smfArray( masks, noisemap, status );
-    smf_apply_mask( data, masks, SMF__BBM_QUAL, SMF__Q_NOISE,
+    smf_apply_mask( wf, data, masks, SMF__BBM_QUAL, SMF__Q_NOISE,
                     status );
-    smf_close_related( &masks, status );
+    smf_close_related( wf, &masks, status );
   }
 
   /* Give noisemap back to caller if requested, or close it */
   if( noise ) {
     *noise = noisemap;
   } else {
-    smf_close_file( &noisemap, status );
+    smf_close_file( wf, &noisemap, status );
   }
 }

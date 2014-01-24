@@ -120,7 +120,7 @@ void smf_reshapendf( smfData **data, smfTile *tile, int *status ){
       }
 
 /* Close the smfData structure holding the NDF description. */
-      smf_close_file( data, status );
+      smf_close_file( NULL, data, status );
 
 /* Get the number of pixel axes in the original NDF (should be 3 for the
    main arrays, and 2 for the extension arrays). */

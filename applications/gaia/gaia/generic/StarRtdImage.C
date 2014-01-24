@@ -249,6 +249,7 @@
 #include "StarRtdImage.h"
 #include "Contour.h"
 #include "XYProfile.h"
+#include "XYHistogram.h"
 #include "RegionStats.h"
 #include <ast.h>
 #include "grf_tkcan.h"
@@ -346,7 +347,8 @@ public:
     { "replaceimagedata",&StarRtdImage::replaceImageDataCmd, 1, 1 },
     { "usingxshm",       &StarRtdImage::usingxshmCmd,       0, 0 },
     { "volatile",        &StarRtdImage::volatileCmd,        0, 1 },
-    { "xyprofile",       &StarRtdImage::xyProfileCmd,      14, 14}
+    { "xyprofile",       &StarRtdImage::xyProfileCmd,      14, 14},
+    { "xyhistogram",     &StarRtdImage::xyHistogramCmd,    13, 13}
 };
 
 
@@ -7020,6 +7022,157 @@ int StarRtdImage::xyProfileCmd(int argc, char *argv[])
     append_element( numValues[1] );
     return status;
 }
+
+
+//+
+//   StarRtdImage::xyHistogramCmd
+//
+//   Purpose:
+//      Updates BLT vectors with a histogram of a rectangular region of the
+//      current image.
+//
+//   Arguments:
+//
+//      <bltGraph> is the path name of a BLT graph widget
+//
+//      <bltElem>  is the name of the element used in graph.
+//
+//      x0, y0,    are the end points of a rectangle in the
+//      x1, y1     given coordinate system (canvas, image, screen,
+//                 wcs, deg).
+//
+//      xy_units   units of the rectangle coordinates.
+//
+//      datalimits whether to use the image low/high cuts to limit
+//                 data range.
+//
+//      factor     binning factor, value in range 0 to 1.
+//
+//      xVector   (returned) name of a BLT vector to receive the
+//                histogram coordinates.
+//
+//      yVector   (returned) name of a BLT vector to receive the
+//                histogram counts.
+//
+//      gxVector  (returned) name of a BLT vector to receive the
+//                gaussian fit coordinates.
+//
+//      gyVector  (returned) name of a BLT vector to receive the
+//                gaussian fit counts.
+//
+//   Return:
+//      A list containing the number of positions written to the vectors,
+//      and estimates of:
+//         peak position
+//         count at peak position
+//         peak position from parabolic fit
+//         count at parabolic peak position
+//         FWHM from parabolic fit
+//         peak position from gaussian fit
+//         error in peak position from gaussian fit
+//         sigma from gaussian fit
+//         error in sigma position from gaussian fit
+//-
+
+int StarRtdImage::xyHistogramCmd(int argc, char *argv[])
+{
+#ifdef _DEBUG_
+    cout << "Called StarRtdImage::xyHistogramCmd (" << argc << ")" << std::endl;
+#endif
+    if ( !image_ ) {
+        return TCL_OK;
+    }
+
+    //  Convert extent to image coords.
+    double rx0, ry0, rx1, ry1;
+    if (convertCoordsStr(0, argv[2], argv[3], NULL, NULL,
+                         rx0, ry0, argv[6], "image") != TCL_OK
+        || convertCoordsStr(0, argv[4], argv[5], NULL, NULL,
+                            rx1, ry1, argv[6], "image") != TCL_OK) {
+        return TCL_ERROR;
+    }
+
+    //  Get X and Y dimensions.
+    int x0 = int( rx0 ), y0 = int( ry0 ), x1 = int( rx1 ), y1 = int( ry1 );
+
+    //  And get the histogram. Do this by creating a suitable histogram object
+    //  and passing it a reference to the image data values.
+    ImageIO imageIO = image_->image();
+    XYHistogram xyHistogram( imageIO );
+
+    //  Tell the histogram object if it needs to byte swap the image
+    //  data. This is only necessary if the image is FITS on a non
+    //  bigendian machine.
+    xyHistogram.setSwap( swapNeeded() );
+
+    //  Set the region of image to use.
+    xyHistogram.setRegion( x0, y0, x1, y1 );
+
+    //  Whether to use the ImageIO data limits.
+    xyHistogram.setDataLimits( image_->lowCut(), image_->highCut() );
+    if ( *argv[7] == '0' ) {
+        xyHistogram.setUseDataLimits( 0 );
+    }
+    else {
+        xyHistogram.setUseDataLimits( 1 );
+    }
+
+    //  Set the binning factor.
+    double factor;
+    int status = TCL_OK;
+    if ( Tcl_GetDouble(interp_, argv[8], &factor ) != TCL_OK ) {
+        status = TCL_ERROR;
+    }
+    else {
+        xyHistogram.setBinningFactor( factor );
+
+        //  Get the histogram.
+        Histogram histogram;
+        xyHistogram.extractHistogram( &histogram );
+
+        //  Copy into BLT vectors.
+        if ( histogram.nbin > 0 ) {
+
+            //  Transfer coords and counts into two BLT vectors.
+            double *values = new double[histogram.nbin*2];
+            for ( int i = 0, j = 0; i < histogram.nbin; i++, j += 2 ) {
+                values[j] = i * histogram.width + histogram.zero;
+                values[j+1] = histogram.hist[i];
+            }
+            status = Blt_GraphElement( interp_, argv[0], argv[1],
+                                       histogram.nbin*2, values,
+                                       argv[9], argv[10] );
+            
+            if ( status == TCL_OK ) {
+                //  Same for gaussian fit.
+                for ( int i = 0, j = 0; i < histogram.nbin; i++, j += 2 ) {
+                    values[j] = i * histogram.width + histogram.zero;
+                    values[j+1] = histogram.ghist[i];
+                }
+                status = Blt_GraphElement( interp_, argv[0], argv[1],
+                                           histogram.nbin*2, values,
+                                           argv[11], argv[12] );
+            }
+            delete[] values;
+        }
+        
+        set_result( histogram.nbin );
+        append_element( histogram.mode * histogram.width + histogram.zero );
+        append_element( histogram.hist[histogram.mode] );
+        
+        append_element( histogram.ppeak * histogram.width + histogram.zero );
+        append_element( histogram.hist[(int)round(histogram.ppeak)] );
+        append_element( histogram.pfwhm * histogram.width );
+        
+        append_element( histogram.gpeak * histogram.width + histogram.zero );
+        append_element( histogram.gdpeak* histogram.width );
+        append_element( histogram.gsd * histogram.width );
+        append_element( histogram.gdsd * histogram.width );
+        
+    }
+    return status;
+}
+
 
 //+
 //  Name:

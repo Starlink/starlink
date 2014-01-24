@@ -13,10 +13,12 @@
 *     Library routine
 
 *  Invocation:
-*     smf_qual_t * smf_qual_map( int indf, const char mode[], smf_qfam_t *family,
-*               size_t *nmap, int * status );
+*     smf_qual_t *smf_qual_map( ThrWorkForce *wf, int indf, const char mode[],
+*                               smf_qfam_t *family, size_t *nmap, int * status );
 
 *  Arguments:
+*     wf = ThrWorkForce * (Given)
+*        Pointer to a pool of worker threads
 *     indf = int (Given)
 *        NDF identifier
 *     mode = const char [] (Given)
@@ -44,6 +46,7 @@
 
 *  Authors:
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     DSB:  David S Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  Notes:
@@ -66,6 +69,8 @@
 *     2012-12-5 (DSB):
 *        If the NDF has not Quality component, return an array full of zeros,
 *        with "*family" set to SMF__QFAM_NULL.
+*     2014-1-10 (DSB):
+*        Multi-threaded.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -96,6 +101,7 @@
 #include "smf.h"
 #include "smf_err.h"
 
+#include "star/thr.h"
 #include "star/irq.h"
 #include "ndf.h"
 #include "sae_par.h"
@@ -106,8 +112,23 @@
 /* number of NDF quality bits */
 #define NDFBITS 8
 
-smf_qual_t * smf_qual_map( int indf, const char mode[], smf_qfam_t *family,
-                           size_t *nmap, int * status ) {
+/* Prototypes for local static functions. */
+static void smf1_qual_map( void *job_data_ptr, int *status );
+
+/* Local data types */
+typedef struct smfQualMapData {
+   int *ndfqtoval;
+   int *ndfqval;
+   int operation;
+   size_t i1;
+   size_t i2;
+   smf_qfam_t lfamily;
+   smf_qual_t *retval;
+   unsigned char *qmap;
+} SmfQualMapData;
+
+smf_qual_t * smf_qual_map( ThrWorkForce *wf, int indf, const char mode[],
+                           smf_qfam_t *family, size_t *nmap, int * status ) {
 
   size_t i;             /* Loop counter */
   int itemp = 0;        /* temporary int */
@@ -120,9 +141,19 @@ smf_qual_t * smf_qual_map( int indf, const char mode[], smf_qfam_t *family,
   smf_qual_t *retval = NULL; /* Returned pointer */
   int there;            /* Does the NDF Have a Quality component? */
   char xname[DAT__SZNAM+1];  /* Name of extension holding quality names */
+  SmfQualMapData *job_data = NULL;
+  SmfQualMapData *pdata;
+  int nw;
+  size_t step;
+  int iw;
 
 
   if (*status != SAI__OK) return retval;
+
+  /* Ensure jobs submitted to the workforce within this function are
+     handled separately to any jobs submitted earlier (or later) by any
+     other function. */
+  thrBeginJobContext( wf, status );
 
   /* how many elements do we need */
   ndfSize( indf, &itemp, status );
@@ -133,6 +164,30 @@ smf_qual_t * smf_qual_map( int indf, const char mode[], smf_qfam_t *family,
      below. It is difficult to determine in advance which case can use
      initialisation. */
   retval = astCalloc( nout, sizeof(*retval) );
+
+  /* How many threads do we get to play with */
+  nw = wf ? wf->nworker : 1;
+
+  /* Find how many elements to process in each worker thread. */
+  step = nout/nw;
+  if( step == 0 ) step = 1;
+
+  /* Allocate job data for threads, and store common values. Ensure that the
+     last thread picks up any left-over elements.  */
+  job_data = astCalloc( nw, sizeof(*job_data) );
+  if( *status == SAI__OK ) {
+    for( iw = 0; iw < nw; iw++ ) {
+      pdata = job_data + iw;
+      pdata->i1 = iw*step;
+      if( iw < nw - 1 ) {
+        pdata->i2 = pdata->i1 + step - 1;
+      } else {
+        pdata->i2 = nout - 1 ;
+      }
+      pdata->retval = retval;
+
+    }
+  }
 
   /* If the NDF has no QUality component, return the buffer filled with
      zeros. */
@@ -148,9 +203,12 @@ smf_qual_t * smf_qual_map( int indf, const char mode[], smf_qfam_t *family,
       /* WRITE and WRITE/ZERO are actually treated the same way
          because we always initialise */
       if ( strcmp( mode, "WRITE/BAD") == 0 ) {
-        for (i=0; i<nout; i++) {
-          retval[i] = VAL__BADQ;
+        for( iw = 0; iw < nw; iw++ ) {
+            pdata = job_data + iw;
+            pdata->operation = 1;
+            thrAddJob( wf, 0, pdata, smf1_qual_map, 0, NULL, status );
         }
+        thrWait( wf, status );
       }
 
       /* unmap the NDF buffer and return the pointer */
@@ -173,9 +231,14 @@ smf_qual_t * smf_qual_map( int indf, const char mode[], smf_qfam_t *family,
       if (*status != SAI__OK) errAnnul( status );
 
       /* simple copy with type conversion */
-      for (i=0; i<nout; i++) {
-        retval[i] = qmap[i];
+
+      for( iw = 0; iw < nw; iw++ ) {
+        pdata = job_data + iw;
+        pdata->qmap = qmap;
+        pdata->operation = 2;
+        thrAddJob( wf, 0, pdata, smf1_qual_map, 0, NULL, status );
       }
+      thrWait( wf, status );
 
     } else {
       IRQcntxt contxt = 0;
@@ -240,54 +303,31 @@ smf_qual_t * smf_qual_map( int indf, const char mode[], smf_qfam_t *family,
          identity mapping or we do not know the family then we go quick. */
       if (*status == SAI__OK) {
         if ( (identity && lfamily != SMF__QFAM_TCOMP) || lfamily == SMF__QFAM_NULL) {
-          for (i=0; i<nout; i++) {
-            retval[i] = qmap[i];
+          for( iw = 0; iw < nw; iw++ ) {
+            pdata = job_data + iw;
+            pdata->qmap = qmap;
+            pdata->ndfqval = ndfqval;
+            pdata->lfamily = lfamily;
+            pdata->ndfqtoval = ndfqtoval;
+            pdata->ndfqval = ndfqval;
+            pdata->operation = 2;
+            thrAddJob( wf, 0, pdata, smf1_qual_map, 0, NULL, status );
           }
+          thrWait( wf, status );
+
         } else {
-          for (i=0; i<nout; i++) {
-            if (qmap[i] == 0) {
-              /* Output buffer would be set to zero but it already has that value */
-            } else {
-              /* this becomes a very laborious bitwise copy.
-                 One to one mapping for TSERIES and MAP families. */
-              if (lfamily == SMF__QFAM_TSERIES ||
-                  lfamily == SMF__QFAM_MAP ) {
-                size_t k;
-                for (k=0; k<NDFBITS; k++) {
-                  if ( qmap[i] & ndfqval[k] ) retval[i] |= ndfqtoval[k];
-                }
 
-              } else if (lfamily == SMF__QFAM_TCOMP) {
-                size_t k;
-                /* This requires some guess work */
-                for (k=0; k<NDFBITS; k++) {
-                  if ( qmap[i] & ndfqval[k]) {
-                    if (ndfqtoval[k] & SMF__TCOMPQ_BAD ) {
-                      retval[i] |= (SMF__Q_BADB|SMF__Q_BADDA);
-                    } else if (ndfqtoval[k] & SMF__TCOMPQ_ENDS) {
-                      retval[i] |= (SMF__Q_PAD|SMF__Q_APOD);
-                    } else if (ndfqtoval[k] & SMF__TCOMPQ_BLIP) {
-                      retval[i] |= (SMF__Q_SPIKE | SMF__Q_JUMP | SMF__Q_FILT | SMF__Q_LOWAP | SMF__Q_BADEF);
-                    } else if (ndfqtoval[k] & SMF__TCOMPQ_MATCH) {
-                      retval[i] |= SMF__Q_COM;
-                    } else if (ndfqtoval[k] & SMF__TCOMPQ_TEL) {
-                      retval[i] |= SMF__Q_STAT;
-                    } else {
-                      /* just do the normal mapping */
-                      retval[i] |= ndfqtoval[k];
-                    }
-                  }
-                }
-
-              } else {
-                *status = SAI__ERROR;
-                errRep("", "Did not recognize quality family. "
-                       "(Possible programming error)", status );
-                break;
-              }
-
-            }
+          for( iw = 0; iw < nw; iw++ ) {
+            pdata = job_data + iw;
+            pdata->qmap = qmap;
+            pdata->ndfqval = ndfqval;
+            pdata->lfamily = lfamily;
+            pdata->ndfqtoval = ndfqtoval;
+            pdata->ndfqval = ndfqval;
+            pdata->operation = 3;
+            thrAddJob( wf, 0, pdata, smf1_qual_map, 0, NULL, status );
           }
+          thrWait( wf, status );
 
           /* we have uncompressed */
           if (lfamily == SMF__QFAM_TCOMP) lfamily = SMF__QFAM_TSERIES;
@@ -302,6 +342,129 @@ smf_qual_t * smf_qual_map( int indf, const char mode[], smf_qfam_t *family,
     ndfUnmap( indf, "QUALITY", status );
   }
 
+  /* End the Thr job context */
+  thrEndJobContext( wf, status );
+
+  /* Free other resources. */
+  job_data = astFree( job_data );
+
   if (family) *family = lfamily;
   return retval;
 }
+
+
+
+static void smf1_qual_map( void *job_data_ptr, int *status ) {
+/*
+*  Name:
+*     smf1_qual_map
+
+*  Purpose:
+*     Executed in a worker thread to do various calculations for
+*     smf_qual_map.
+
+*  Invocation:
+*     smf1_qual_map( void *job_data_ptr, int *status )
+
+*  Arguments:
+*     job_data_ptr = SmfQualMapData * (Given)
+*        Data structure describing the job to be performed by the worker
+*        thread.
+*     status = int * (Given and Returned)
+*        Inherited status.
+
+*/
+
+/* Local Variables: */
+   SmfQualMapData *pdata;
+   size_t i1;
+   size_t i2;
+   size_t i;
+   smf_qual_t *p1;
+   unsigned char *p2;
+
+/* Check inherited status */
+   if( *status != SAI__OK ) return;
+
+/* Get a pointer that can be used for accessing the required items in the
+   supplied structure. */
+   pdata = (SmfQualMapData *) job_data_ptr;
+
+   i1 = pdata->i1;
+   i2 = pdata->i2;
+
+   if( pdata->operation == 1 ){
+      p1 = pdata->retval + i1;
+      for( i = i1; i <= i2; i++) {
+         *(p1++) = VAL__BADQ;
+      }
+
+   } else if( pdata->operation == 2 ){
+      p1 = pdata->retval + i1;
+      p2 = pdata->qmap + i1;
+      for( i = i1; i <= i2; i++) {
+         *(p1++) = *(p2++);
+      }
+
+   } else if( pdata->operation == 3 ){
+      p1 = pdata->retval + i1;
+      p2 = pdata->qmap + i1;
+      for( i = i1; i <= i2; i++,p1++,p2++) {
+
+/* Output buffer would be set to zero but it already has that value so do
+   nothing. */
+         if( *p2 == 0 ) {
+
+/* This becomes a very laborious bitwise copy. */
+         } else {
+
+/* One to one mapping for TSERIES and MAP families. */
+            if( pdata->lfamily == SMF__QFAM_TSERIES ||
+                pdata->lfamily == SMF__QFAM_MAP ) {
+               size_t k;
+               for( k = 0; k < NDFBITS; k++ ) {
+                  if( *p2 & pdata->ndfqval[k] ) *p1 |=  pdata->ndfqtoval[ k ];
+               }
+
+            } else if( pdata->lfamily == SMF__QFAM_TCOMP ) {
+               size_t k;
+
+/* This requires some guess work */
+               for( k = 0; k < NDFBITS; k++ ) {
+                  if( *p2 &  pdata->ndfqval[k] ) {
+                     if(  pdata->ndfqtoval[k] & SMF__TCOMPQ_BAD ) {
+                        *p1 |= (SMF__Q_BADB|SMF__Q_BADDA);
+                     } else if( pdata->ndfqtoval[k] & SMF__TCOMPQ_ENDS ) {
+                        *p1 |= (SMF__Q_PAD|SMF__Q_APOD);
+                     } else if( pdata->ndfqtoval[k] & SMF__TCOMPQ_BLIP ) {
+                        *p1 |= (SMF__Q_SPIKE | SMF__Q_JUMP | SMF__Q_FILT | SMF__Q_LOWAP | SMF__Q_BADEF);
+                     } else if( pdata->ndfqtoval[k] & SMF__TCOMPQ_MATCH ) {
+                        *p1 |= SMF__Q_COM;
+                     } else if( pdata->ndfqtoval[k] & SMF__TCOMPQ_TEL ) {
+                        *p1 |= SMF__Q_STAT;
+                     } else {
+
+/* just do the normal mapping */
+                        *p1 |= pdata->ndfqtoval[k];
+                     }
+                  }
+               }
+
+            } else {
+               *status = SAI__ERROR;
+               errRep("", "Did not recognize quality family. "
+                      "(Possible programming error)", status );
+               break;
+            }
+         }
+      }
+
+   } else {
+      *status = SAI__ERROR;
+      errRepf( "", "smf1_qual_map: Invalid operation (%d) supplied.",
+               status, pdata->operation );
+   }
+}
+
+
+

@@ -301,7 +301,7 @@ void smurf_calcqu( int *status ) {
    kpg1Rgndf( "IN", 0, 1, "  Give more NDFs...", &igrp, &ssize, status );
 
 /* Get a group containing just the files holding science data. */
-   smf_find_science( igrp, &sgrp, 0, NULL, NULL, 1, 1, SMF__NULL, NULL,
+   smf_find_science( wf, igrp, &sgrp, 0, NULL, NULL, 1, 1, SMF__NULL, NULL,
                      &flatramps, &heateffmap, NULL, status );
 
 /* Check we have at least once science file. */
@@ -431,7 +431,7 @@ void smurf_calcqu( int *status ) {
 /* Free the smfArray holding the dark squid data, but do not free the
    individual smfDatas within it. */
                dkarray->owndata = 0;
-               smf_close_related( &dkarray, status );
+               smf_close_related( wf, &dkarray, status );
             }
          }
 
@@ -670,7 +670,7 @@ void smurf_calcqu( int *status ) {
          config = astAnnul( config );
 
 /* Close the smfArray. */
-         smf_close_related( &concat, status );
+         smf_close_related( wf, &concat, status );
       }
 
 /* Annul the locators for the output container files. */
@@ -686,7 +686,7 @@ void smurf_calcqu( int *status ) {
    }
 
 /* Free resources. */
-   smf_close_related( &flatramps, status );
+   smf_close_related( wf, &flatramps, status );
 
    if( igrp ) grpDelet( &igrp, status);
    if( sgrp ) grpDelet( &sgrp, status);

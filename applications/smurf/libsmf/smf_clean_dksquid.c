@@ -196,7 +196,7 @@ void smf_clean_dksquid( smfData *indata, smf_qual_t mask, size_t window, smfData
     }
 
     /* Assert the correct data order here */
-    smf_dataOrder( indata->da->dksquid, 1, status );
+    smf_dataOrder( NULL, indata->da->dksquid, 1, status );
   }
 
   /* Check for 3-d data and get dimensions */

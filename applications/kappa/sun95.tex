@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.40}
 \newcommand{\stardocnumber}    {95.40}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2013 September 10}
+\newcommand{\stardocdate}      {2013 December 12}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {2.1}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -46676,6 +46676,9 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND}.
       quality specified by QNAME, and the quality was then assigned to
       pixel (2,~2) this would not cause the quality to be removed from
       pixel (1,~1).
+
+      This routine can also be used to copy all quality information from
+      one NDF to another (see Parameter LIKE).
    }
    \sstusage{
       setqual ndf qname comment mask
@@ -46745,6 +46748,14 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND}.
          {\tt ["HS"]}
       }
       \sstsubsection{
+         LIKE = NDF (Read)
+      }{
+         An existing NDF from which the QUALITY component and quality names are
+         to be copied. These overwrite any corresponding information in the
+         NDF given by Parameter NDF. If null ({\tt{!}}), then the operation of
+         this command is instead determined by Parameter SELECT. {\tt [!]}
+      }
+      \sstsubsection{
          LIST = LITERAL (Read)
       }{
          A group of pixels positions within the input NDF listing the
@@ -46787,9 +46798,10 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND}.
       \sstsubsection{
          SELECT = LITERAL (Read)
       }{
-         This parameter determines how the pixels are selected, and can
-         take the values {\tt "Mask"}, {\tt "List"} or {\tt "ARD"}
-         (see Parameters MASK, LIST, and ARD).  {\tt ["Mask"]}
+         If Parameter LIKE is null, then this parameter determines how
+         the pixels are selected, and can take the values {\tt "Mask"},
+         {\tt "List"} or {\tt "ARD"} (see Parameters MASK, LIST, and
+         ARD).  {\tt ["Mask"]}
       }
       \sstsubsection{
          XNAME = LITERAL (Read)
@@ -50688,11 +50700,9 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
             scheme is similar to the {\tt "SincCos"} scheme.
 
             \sstitem
-            {\tt "Gauss"} --- Uses the $e^{-kx^2}$ kernel.  This option is only
-            available when rebinning (\emph{i.e.} if REBIN is set to {\tt TRUE}).
-            The FWHM of the Gaussian is given by Parameter PARAMS(2), and
-            the point at which to truncate the Gaussian to zero is given by
-            Parameter PARAMS(1).
+            {\tt "Gauss"} --- Uses the $e^{-kx^2}$ kernel.  The FWHM of the
+            Gaussian is given by Parameter PARAMS(2), and the point at which to
+            truncate the Gaussian to zero is given by Parameter PARAMS(1).
 
          }
          All methods propagate variances from input to output, but the
@@ -54342,7 +54352,8 @@ and HDS data types is as follows:
 {\bf HDS Type} & {\bf Number of bytes} & {\bf FORTRAN Type}\\ \hline
 \_DOUBLE & 8 & DOUBLE PRECISION \\
 \_INTEGER & 4 & INTEGER \\
-\_REAL & 8 & REAL \\
+\_INT64 & 8 & INTEGER*8 (non-standard) \\
+\_REAL & 4 & REAL \\
 \_UBYTE & 1 & BYTE \\
 \_BYTE & 1 & BYTE \\
 \_UWORD & 2 & INTEGER*2 \\
@@ -59138,6 +59149,11 @@ The following applications have been modified:
       \begin{itemize}
         \item Now writes the number of pixels used to form the correlation
         coefficient to output parameter NPIX.
+      \end{itemize}
+   \item [\htmlref{SETQUAL}{SETQUAL}]\mbox{}
+      \begin{itemize}
+        \item It is now possible to copy all quality information from one
+        NDF to another using a new parameter called LIKE.
       \end{itemize}
 \end{description}
 

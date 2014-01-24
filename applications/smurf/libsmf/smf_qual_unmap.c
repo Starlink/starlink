@@ -13,10 +13,12 @@
 *     Library routine
 
 *  Invocation:
-*     smf_qual_t * smf_qual_unmap( int indf, smf_qfam_t family,
+*     smf_qual_t * smf_qual_unmap( ThrWorkForce *wf, int indf, smf_qfam_t family,
 *                                  smf_qual_t * qual, int * status );
 
 *  Arguments:
+*     wf = ThrWorkForce * (Given)
+*        Pointer to a pool of worker threads
 *     indf = int (Given)
 *        NDF identifier
 *     family = smf_qfam_t (Given)
@@ -76,6 +78,8 @@
 *        Attempt to free QUAL memory even if status is bad.
 *     2011-09-19 (DSB):
 *        Add SMF__Q_BADEF
+*     2014-1-13 (DSB):
+*        Multi-threaded.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -111,12 +115,36 @@
 #include "star/irq.h"
 #include "mers.h"
 #include "irq_err.h"
+#include "star/thr.h"
 
 #define FUNC_NAME "smf_qual_unmap"
 
-smf_qual_t * smf_qual_unmap( int indf, smf_qfam_t family, smf_qual_t * qual, int * status ) {
+/* Prototypes for local static functions. */
+static void smf1_qual_unmap( void *job_data_ptr, int *status );
+
+/* Local data types */
+typedef struct smfQualUnmapData {
+   int operation;
+   size_t highbit;
+   size_t i1;
+   size_t i2;
+   size_t lowbit;
+   size_t nout;
+   size_t nqbits;
+   size_t qcount[SMF__NQBITS];
+   smf_qual_t *qual;
+   unsigned char *qmap;
+} SmfQualUnmapData;
+
+smf_qual_t * smf_qual_unmap( ThrWorkForce *wf, int indf, smf_qfam_t family,
+                             smf_qual_t * qual, int * status ) {
   int canwrite = 0;   /* can we write to the file? */
   size_t nqbits = 0;  /* Number of quality bits in this family */
+  SmfQualUnmapData *job_data = NULL;
+  SmfQualUnmapData *pdata;
+  int nw;
+  size_t step;
+  int iw;
 
   if (*status != SAI__OK) goto CLEANUP;
 
@@ -189,23 +217,55 @@ smf_qual_t * smf_qual_unmap( int indf, smf_qfam_t family, smf_qual_t * qual, int
     ndfSize( indf, &itemp, status );
     nout = itemp;
 
+    /* How many threads do we get to play with */
+    nw = wf ? wf->nworker : 1;
+
+    /* Find how many elements to process in each worker thread. */
+    step = nout/nw;
+    if( step == 0 ) step = 1;
+
+    /* Allocate job data for threads, and store common values. Ensure that the
+       last thread picks up any left-over elements.  */
+    job_data = astCalloc( nw, sizeof(*job_data) );
+    if( *status == SAI__OK ) {
+      for( iw = 0; iw < nw; iw++ ) {
+        pdata = job_data + iw;
+        pdata->i1 = iw*step;
+        if( iw < nw - 1 ) {
+          pdata->i2 = pdata->i1 + step - 1;
+        } else {
+          pdata->i2 = nout - 1 ;
+        }
+        pdata->nqbits = nqbits;
+        pdata->qual = qual;
+        pdata->nout = nout;
+      }
+    }
+
     /* Work out which bits are actually used */
     if (*status == SAI__OK) {
       size_t k;
       /* now we try to be a bit clever. It may be a mistake since we have to
          do multiple passes through "qual". First determine how many quality
          bits are actually set. */
-      for (i = 0; i<nout; i++) {
-        /* try all the bits */
+
+      for( iw = 0; iw < nw; iw++ ) {
+        pdata = job_data + iw;
+        pdata->operation = 1;
+        thrAddJob( wf, 0, pdata, smf1_qual_unmap, 0, NULL, status );
+      }
+      thrWait( wf, status );
+
+      for( iw = 0; iw < nw; iw++ ) {
+        pdata = job_data + iw;
         for( k=0; k<nqbits; k++ ) {
-          if( qual[i] & BIT_TO_VAL(k) ) {
-            qcount[k]++;
-          }
+          qcount[k] += pdata->qcount[k];
         }
       }
 
       /* see how many we got */
       for (k=0; k<nqbits; k++) {
+
         if ( qcount[k] ) {
           nqual++;
           highbit = k;
@@ -264,21 +324,18 @@ smf_qual_t * smf_qual_unmap( int indf, smf_qfam_t family, smf_qual_t * qual, int
         }
 
         /* shift them down */
-        for (i=0; i<nout; i++) {
-          curbit = 0;
-          qmap[i] = 0;
-
-          for (k=lowbit; k<=(size_t)highbit; k++) {
-            /* was this bit used by this data array? */
-            if (qcount[k]) {
-              /* was the bit set for this location? */
-              if ( qual[i]&BIT_TO_VAL(k)) {
-                qmap[i] |= BIT_TO_VAL(curbit);
-              }
-              curbit++;
-            }
+        for( iw = 0; iw < nw; iw++ ) {
+          pdata = job_data + iw;
+          pdata->operation = 2;
+          pdata->qmap = qmap;
+          pdata->highbit = highbit;
+          pdata->lowbit = lowbit;
+          for( k=0; k<nqbits; k++ ) {
+            pdata->qcount[k] = qcount[k];
           }
+          thrAddJob( wf, 0, pdata, smf1_qual_unmap, 0, NULL, status );
         }
+        thrWait( wf, status );
 
       } else {
         size_t curbit = 0;
@@ -305,32 +362,13 @@ smf_qual_t * smf_qual_unmap( int indf, smf_qfam_t family, smf_qual_t * qual, int
         }
 
         /* compress them */
-        for (i = 0; i<nout; i++) {
-          qmap[i] = 0;
-          if (qual[i]) {
-            if ( qual[i] & (SMF__Q_BADDA|SMF__Q_BADB|SMF__Q_NOISE) ) {
-              qmap[i] |= SMF__TCOMPQ_BAD;
-            }
-            if ( qual[i] & (SMF__Q_APOD|SMF__Q_PAD) ) {
-              qmap[i] |= SMF__TCOMPQ_ENDS;
-            }
-            if ( qual[i] & (SMF__Q_JUMP|SMF__Q_SPIKE|SMF__Q_FILT|SMF__Q_EXT|SMF__Q_LOWAP|SMF__Q_BADEF) ) {
-              qmap[i] |= SMF__TCOMPQ_BLIP;
-            }
-            if ( qual[i] & (SMF__Q_COM) ) {
-              qmap[i] |= SMF__TCOMPQ_MATCH;
-            }
-            if ( qual[i] & (SMF__Q_STAT) ) {
-              qmap[i] |= SMF__TCOMPQ_TEL;
-            }
-            if (qmap[i] == 0 ) {
-              /* something went wrong. We missed a quality bit somewhere */
-              msgOutiff(MSG__QUIET, "", FUNC_NAME ": Untested quality bit found"
-                        " in position %zu with value %u", status,
-                        i, (unsigned int)qual[i]);
-            }
-          }
+        for( iw = 0; iw < nw; iw++ ) {
+          pdata = job_data + iw;
+          pdata->operation = 3;
+          pdata->qmap = qmap;
+          thrAddJob( wf, 0, pdata, smf1_qual_unmap, 0, NULL, status );
         }
+        thrWait( wf, status );
 
       }
     }
@@ -348,7 +386,138 @@ smf_qual_t * smf_qual_unmap( int indf, smf_qfam_t family, smf_qual_t * qual, int
 
  CLEANUP:
   /* Tidy up */
-  if (qual) qual = astFree( qual );
+  qual = astFree( qual );
+  job_data = astFree( job_data );
   return NULL;
 
 }
+
+
+
+
+
+static void smf1_qual_unmap( void *job_data_ptr, int *status ) {
+/*
+*  Name:
+*     smf1_qual_unmap
+
+*  Purpose:
+*     Executed in a worker thread to do various calculations for
+*     smf_qual_unmap.
+
+*  Invocation:
+*     smf1_qual_unmap( void *job_data_ptr, int *status )
+
+*  Arguments:
+*     job_data_ptr = SmfQualUnmapData * (Given)
+*        Data structure describing the job to be performed by the worker
+*        thread.
+*     status = int * (Given and Returned)
+*        Inherited status.
+
+*/
+
+/* Local Variables: */
+   SmfQualUnmapData *pdata;
+   size_t *qcount;
+   size_t i1;
+   size_t i2;
+   size_t i;
+   size_t k;
+   size_t nqbits;
+   smf_qual_t *p1;
+   unsigned char *p2;
+
+/* Check inherited status */
+   if( *status != SAI__OK ) return;
+
+/* Get a pointer that can be used for accessing the required items in the
+   supplied structure. */
+   pdata = (SmfQualUnmapData *) job_data_ptr;
+
+   i1 = pdata->i1;
+   i2 = pdata->i2;
+   nqbits = pdata->nqbits;
+   qcount = pdata->qcount;
+
+   if( pdata->operation == 1 ){
+      for( k=0; k<nqbits; k++ ) {
+        qcount[k] = 0;
+      }
+
+      p1 = pdata->qual + i1;
+      for( i = i1; i <= i2; i++,p1++) {
+        for( k=0; k<nqbits; k++ ) {
+          if( *p1 & BIT_TO_VAL(k) ) {
+            qcount[k]++;
+          }
+        }
+      }
+
+   } else if( pdata->operation == 2 ){
+      size_t curbit;
+      size_t lowbit = pdata->lowbit;
+      size_t highbit = pdata->highbit;
+      p1 = pdata->qual + i1;
+      p2 = pdata->qmap + i1;
+      for( i = i1; i <= i2; i++,p1++,p2++) {
+         curbit = 0;
+         *p2 = 0;
+         for( k=lowbit; k<=highbit; k++) {
+
+/* was this bit used by this data array? */
+            if( qcount[k] ) {
+
+/* was the bit set for this location? */
+              if( *p1 & BIT_TO_VAL(k) ) {
+                *p2 |= BIT_TO_VAL(curbit);
+              }
+
+              curbit++;
+            }
+          }
+        }
+
+   } else if( pdata->operation == 3 ){
+
+      p1 = pdata->qual + i1;
+      p2 = pdata->qmap + i1;
+      for( i = i1; i <= i2; i++,p1++,p2++) {
+
+        *p2 = 0;
+        if( *p1 ) {
+          if ( *p1 & (SMF__Q_BADDA|SMF__Q_BADB|SMF__Q_NOISE) ) {
+            *p2 |= SMF__TCOMPQ_BAD;
+          }
+          if ( *p1 & (SMF__Q_APOD|SMF__Q_PAD) ) {
+            *p2 |= SMF__TCOMPQ_ENDS;
+          }
+          if ( *p1 & (SMF__Q_JUMP|SMF__Q_SPIKE|SMF__Q_FILT|SMF__Q_EXT|SMF__Q_LOWAP|SMF__Q_BADEF) ) {
+            *p2 |= SMF__TCOMPQ_BLIP;
+          }
+          if ( *p1 & (SMF__Q_COM) ) {
+            *p2 |= SMF__TCOMPQ_MATCH;
+          }
+          if ( *p1 & (SMF__Q_STAT) ) {
+            *p2 |= SMF__TCOMPQ_TEL;
+          }
+          if (*p2 == 0 ) {
+
+/* something went wrong. We missed a quality bit somewhere */
+            msgOutiff(MSG__QUIET, "", FUNC_NAME ": Untested quality bit found"
+                      " in position %zu with value %u", status,
+                      i, (unsigned int)*p1);
+          }
+        }
+      }
+
+   } else {
+      *status = SAI__ERROR;
+      errRepf( "", "smf1_qual_unmap: Invalid operation (%d) supplied.",
+               status, pdata->operation );
+   }
+}
+
+
+
+

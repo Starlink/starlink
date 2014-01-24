@@ -183,7 +183,7 @@ double *smf_smoothmask( ThrWorkForce *wf, smf_qual_t qual,
 
       }
 
-      smf_close_file( &filtermap, status );
+      smf_close_file( wf, &filtermap, status );
    }
 
 /* Return the pointer to the new mask. */

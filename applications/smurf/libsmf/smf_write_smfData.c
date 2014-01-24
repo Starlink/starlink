@@ -13,12 +13,14 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     smf_write_smfData ( const smfData *data, const smfData *variance,
+*     smf_write_smfData ( ThrWorkForce *wf, const smfData *data, const smfData *variance,
 *                        const char * filename,
 *                        const Grp * igrp, size_t grpindex,
 *                        int provid, msglev_t msglev, int single, int * status );
 
 *  Arguments:
+*     wf = ThrWorkForce * (Given)
+*        Pointer to a pool of worker threads
 *     data = const smfData* (Given)
 *        Pointer to smfData to dump to disk file. Returns without action
 *        if NULL pointer.
@@ -111,6 +113,11 @@
 *        Try to writing wcs if tswcs doesn't exist to handle images
 *     2013-01-22 (DSB):
 *        Added argument single.
+*     2014-01-23 (DSB):
+*        Add items to the SMURF extension in the output NDF to hold the 
+*        STEPTIME and SCANVEL values that were actually used. These may be 
+*        different to the values in the FITS header. This helps when importing 
+*        the data into a subsequent run of makemap (i.e. SKYLOOP). 
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -163,8 +170,8 @@
 
 #define FUNC_NAME "smf_write_smfData"
 
-void smf_write_smfData( const smfData *data, const smfData *variance,
-                        const char * filename,
+void smf_write_smfData( ThrWorkForce *wf, const smfData *data,
+                        const smfData *variance, const char * filename,
                         const Grp * igrp, size_t grpindex,
                         int provid, msglev_t msglev, int single, int * status ) {
 
@@ -326,7 +333,7 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
   msgOutif( msglev, "", FUNC_NAME ": writing ^NAME", status );
 
   /* Open the file */
-  smf_open_newfile( ogrp, 1, data->dtype, data->ndims, lbnd, ubnd,
+  smf_open_newfile( wf, ogrp, 1, data->dtype, data->ndims, lbnd, ubnd,
                     flags, &outdata, status );
 
   if (*status == SAI__OK) {
@@ -432,6 +439,18 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
                                  inhdr->allState, status );
 
       }
+
+      /* Other stuff - more accurate than using a FITS header. */
+      HDSLoc *xloc = NULL;
+      int there = 0;
+      ndfXstat( outfile->ndfid, SMURF__EXTNAME, &there, status );
+      if( !there ) ndfXnew( outfile->ndfid, SMURF__EXTNAME, SMURF__EXTTYPE,
+                            0, NULL, &xloc, status );
+      ndfXpt0d( inhdr->steptime, outfile->ndfid, SMURF__EXTNAME,
+                "STEPTIME", status );
+      ndfXpt0d( inhdr->scanvel, outfile->ndfid, SMURF__EXTNAME,
+                "SCAN_VEL", status );
+      datAnnul( &xloc, status );
     }
 
     /* Dark squids */
@@ -469,12 +488,12 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
            quality, unmap it to force write to disk. */
         if( da->dksquid->qual ) {
           size_t nqmap;
-          smf_qual_t * outdkqual = smf_qual_map( id, "WRITE", NULL, &nqmap, status );
+          smf_qual_t * outdkqual = smf_qual_map( wf, id, "WRITE", NULL, &nqmap, status );
           da->dksquid->qfamily = SMF__QFAM_TSERIES; /* always */
           if( (*status==SAI__OK) && outdkqual ) {
             memcpy( outdkqual, da->dksquid->qual, nmap*sizeof(*outdkqual) );
           }
-          outdkqual = smf_qual_unmap( id, da->dksquid->qfamily, outdkqual, status );
+          outdkqual = smf_qual_unmap( wf, id, da->dksquid->qfamily, outdkqual, status );
         }
 
         ndfAnnul( &id, status );
@@ -561,7 +580,7 @@ void smf_write_smfData( const smfData *data, const smfData *variance,
   }
 
   /* Close the output file */
-  smf_close_file( &outdata, status );
+  smf_close_file( wf, &outdata, status );
   grpDelet( &ogrp, status );
 
 }

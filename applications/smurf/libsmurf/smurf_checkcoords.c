@@ -40,6 +40,8 @@
 *  History:
 *     25-NOV-2013 (DSB):
 *        Initial version.
+*     27-NOV-2013 (DSB):
+*        Also check the detector positions for ACSIS data.
 
 *  Copyright:
 *     Copyright (C) 2013 Science and Technology Facilities Council.
@@ -114,14 +116,18 @@ void smurf_checkcoords( int *status ) {
    for( i = 1; i <= size; i++ ) {
 
 /* Open the file. */
-      smf_open_file( igrp, i, "READ", SMF__NOCREATE_DATA, &data, status );
+      smf_open_file( NULL, igrp, i, "READ", SMF__NOCREATE_DATA, &data, status );
+
+/* Check the detector positions (for ACSIS data). */
+      msgBlank( status );
+      smf_check_detpos( data, 1, status );
 
 /* Calculate and display statistics of the AZEL <> TRACKING separations
    in the current file. */
       smf_check_coords( data, status );
 
 /* Close the file. */
-      smf_close_file( &data, status);
+      smf_close_file( NULL, &data, status);
    }
 
 /* Free resources. */

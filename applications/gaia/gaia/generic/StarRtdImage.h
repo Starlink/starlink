@@ -415,6 +415,9 @@ class StarRtdImage : public Skycat
    //  Create X and Y profiles of rectangular region.
    int xyProfileCmd( int argc, char *argv[] );
 
+   //  Create histogram of rectangular region.
+   int xyHistogramCmd( int argc, char *argv[] );
+
    //  Enable readouts etc. to show milli-arcsec precision.
    int astmilliCmd( int argc, char *argv[] );
 

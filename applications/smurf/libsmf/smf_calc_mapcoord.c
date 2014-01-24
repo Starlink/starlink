@@ -332,7 +332,7 @@ void smf_calc_mapcoord( ThrWorkForce *wf, AstKeyMap *config, smfData *data,
   smf_close_mapcoord( data, status );
 
   /* Assert ICD data order */
-  smf_dataOrder( data, 1, status );
+  smf_dataOrder( wf, data, 1, status );
 
   /* Get the data dimensions */
   smf_get_dims( data,  NULL, NULL, &nbolo, &ntslice, NULL, NULL, NULL, status );
@@ -584,7 +584,7 @@ void smf_calc_mapcoord( ThrWorkForce *wf, AstKeyMap *config, smfData *data,
              information which each thread will need in order to make calls to
              smf_rebin_totmap */
 
-          pdata->data = smf_deepcopy_smfData( data, 0, SMF__NOCREATE_FILE |
+          pdata->data = smf_deepcopy_smfData( wf, data, 0, SMF__NOCREATE_FILE |
                                               SMF__NOCREATE_DA |
                                               SMF__NOCREATE_FTS |
                                               SMF__NOCREATE_DATA |
@@ -686,7 +686,7 @@ void smf_calc_mapcoord( ThrWorkForce *wf, AstKeyMap *config, smfData *data,
 
       if( pdata->data ) {
         smf_lock_data( pdata->data, 1, status );
-        smf_close_file( &(pdata->data), status );
+        smf_close_file( wf, &(pdata->data), status );
       }
       astLock( pdata->abskyfrm, 0 );
       pdata->abskyfrm = astAnnul( pdata->abskyfrm );

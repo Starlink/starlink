@@ -235,11 +235,15 @@
  *     2012-04-03 (TIMJ):
  *        Copy smfFile in deepcopy so that flatfielding can tell the file name
  *        when reporting an error.
+ *     2014-08-01 (DSB):
+ *        Add option to import LUT model from an external NDF (for SKYLOOP).
+ *     2014-13-01 (DSB):
+ *        Multi-thread copying of arrays from reference to outptu data.
  *     {enter_further_changes_here}
 
  *  Copyright:
  *     Copyright (C) 2007-2011 University of British Columbia.
- *     Copyright (C) 2008-2012 Science and Technology Facilities Council.
+ *     Copyright (C) 2008-2014 Science and Technology Facilities Council.
  *
  *     All Rights Reserved.
 
@@ -284,6 +288,28 @@
 #include "libsmf/smf_err.h"
 #include "libaztec/aztec.h"
 
+/* Prototypes for local static functions. */
+static void smf1_concat_smfGroup( void *job_data_ptr, int *status );
+
+/* Local data types */
+typedef struct smfConcatSmfGroupData {
+   dim_t b1;
+   dim_t b2;
+   dim_t ntslice;
+   size_t bstride;
+   size_t tstride;
+   size_t rbstride;
+   size_t rtstride;
+   dim_t tchunk;
+   int oper;
+   const double *in;
+   double *out;
+   const int *ini;
+   int *outi;
+   const smf_qual_t *inq;
+   smf_qual_t *outq;
+} SmfConcatSmfGroupData;
+
 #define FUNC_NAME "smf_concat_smfGroup"
 
 void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *igrp,
@@ -301,6 +327,7 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
   smfDA *da=NULL;               /* Pointer to smfDA struct */
   smfData *data=NULL;           /* Concatenated smfData */
   dim_t *dslen=NULL;            /* Down-sampled lengths */
+  char *ename = NULL;           /* Name of file to import */
   int flag;                     /* Flag */
   char filename[GRP__SZNAM+1];  /* Input filename, derived from GRP */
   dim_t firstpiece = 0;         /* index to start of whichchunk */
@@ -311,22 +338,27 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
   int havelut=0;                /* flag for pointing LUT present */
   smfHead *hdr;                 /* pointer to smfHead in concat data */
   dim_t i;                      /* Loop counter */
+  int importlut;                /* Import LUT array from an NDF? */
   Grp *ingrp=NULL;              /* Pointer to 1-element input group */
   int isFFT=-1;                 /* Data are 4d FFTs */
+  int iw;
   dim_t j;                      /* Loop counter */
+  SmfConcatSmfGroupData *job_data = NULL;
   dim_t k;                      /* Loop counter */
   dim_t l;                      /* Loop counter */
-  dim_t m;                      /* Loop counter */
   dim_t lastpiece = 0;          /* index to end of whichchunk */
   dim_t nbolo=0;                /* Number of detectors */
+  int nc;                       /* Character count */
   dim_t ncol=0;                 /* Number of columns */
   dim_t ndata;                  /* Total data points: nbolo*tlen */
   dim_t nrelated;               /* Number of subarrays */
   dim_t nrow;                   /* Number of rows */
+  int nw;
   Grp *outgrp=NULL;             /* Pointer to 1-element output group */
   size_t outgrpsize;            /* Size of outgrp */
   dim_t padEnd = 0;             /* Padding to use for end of this chunk */
   dim_t padStart = 0;           /* Padding to use for start of this chunk */
+  SmfConcatSmfGroupData *pdata;
   char *pname;                  /* Pointer to input filename */
   smfData *refdata=NULL;        /* Reference smfData */
   smf_dtype refdtype;           /* reference DATA/VARIANCE type */
@@ -345,6 +377,7 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
   dim_t tlen;                   /* Time length entire concatenated array */
   dim_t tstart;                 /* Time at end of padded region */
   size_t tstr;                  /* Concatenated time slice stride */
+  dim_t bolostep;
 
   /* Initialise returned values. */
   if( first ) *first = NULL;
@@ -388,6 +421,9 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
     return;
   }
 
+  /* See if we will be importing a LUT model from an NDF. */
+  astMapGet0I( config, "IMPORTLUT", &importlut );
+
   /* Allocate space for the smfArray if required. */
   if( concat ) *concat = smf_create_smfArray( status );
 
@@ -422,7 +458,7 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
     for( j=firstpiece; j<=lastpiece; j++ ) {
       /* First pass through the data - get dimensions */
 
-      smf_open_file( igrp->grp, igrp->subgroups[j][i], "READ",
+      smf_open_file( wf, igrp->grp, igrp->subgroups[j][i], "READ",
                      flags, &refdata, status );
 
       if( isFFT == -1 ) {
@@ -556,11 +592,11 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
       /* If required return a deep copy of the first data being
          concatenated. */
       if( first && *first == NULL ) {
-        *first = smf_deepcopy_smfData( refdata, 0, 0, 0, 0, status );
+        *first = smf_deepcopy_smfData( wf, refdata, 0, 0, 0, 0, status );
       }
 
       /* Close the reference file */
-      smf_close_file( &refdata, status );
+      smf_close_file( wf, &refdata, status );
 
       /* If we are not concatenating any data, we can leave the "j"
          loop now that we have the returned "first" value. */
@@ -583,12 +619,12 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
         /* Loop over subgroups (number of time chunks). j is really only
            going to take on a single value in this loop (whichchunk) */
         for( j=firstpiece; j<=lastpiece; j++ ) {
-          smf_open_file( igrp->grp, igrp->subgroups[j][i], "READ", 0,
+          smf_open_file( wf, igrp->grp, igrp->subgroups[j][i], "READ", 0,
                          &tmpdata, status );
 
           /* Make a deepcopy since we are going to close the memory-mapped
              tmpdata. */
-          data = smf_deepcopy_smfData( tmpdata, 0, 0, 0, 0, status );
+          data = smf_deepcopy_smfData( wf, tmpdata, 0, 0, 0, 0, status );
         }
       }
 
@@ -631,7 +667,7 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
           grpDelet( &ingrp, status );
           grpDelet( &outgrp, status );
 
-          smf_open_file( igrp->grp, igrp->subgroups[j][i], "READ", 0,
+          smf_open_file( wf, igrp->grp, igrp->subgroups[j][i], "READ", 0,
                          &tmpdata, status );
         }
 
@@ -668,15 +704,15 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
         if( dslen && dslen[j-firstpiece] ) {
           smf_downsamp_smfData( wf, tmpdata, &refdata, dslen[j-firstpiece],
                                 1, 0, status );
-          smf_close_file( &tmpdata, status );
+          smf_close_file( wf, &tmpdata, status );
 
         /* Otherwise, if the data is raw, convert it to double precision
            then release the original. We copy the smfFile so that the
            flatfielding can report a file name associated with any failure. */
         } else if( israw ) {
-          refdata = smf_deepcopy_smfData( tmpdata, 1,  0, 0, 0,
+          refdata = smf_deepcopy_smfData( wf, tmpdata, 1,  0, 0, 0,
                                           status );
-          smf_close_file( &tmpdata, status );
+          smf_close_file( wf, &tmpdata, status );
 
         /* Otherwise, just continue to use the original data. */
         } else {
@@ -701,28 +737,30 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
         }
 
         /* Apply bad bolometer mask */
-        smf_apply_mask( refdata, bbms, SMF__BBM_DATA, 0, status );
+        smf_apply_mask( wf, refdata, bbms, SMF__BBM_DATA, 0, status );
 
-        /* Calculate the pointing LUT if requested */
-        if( !(flags & SMF__NOCREATE_LUT) && outfset ) {
+        /* Get reference dimensions/strides */
+        smf_get_dims( refdata, NULL, NULL, &nbolo, &reftlenr, &refndata,
+                      &rbstr, &rtstr, status );
+
+        /* Calculate the pointing LUT if requested, unless we will be
+           importing it from an NDF later. */
+        if( !(flags & SMF__NOCREATE_LUT) && outfset && !importlut ) {
 
           /* Set havelut flag */
           havelut = 1;
 
-          /* Calculate the LUT for this chunk. Note, this call divides up
+          /* Calculate a new LUT for this chunk. Note, this call divides up
              its work between several threads.  It takes care to use a
              separate job context so that any other jobs currently being
              performed by the workforce (e.g. opening the next file) do
              not cause the call to block.  */
           smf_calc_mapcoord( wf, config, refdata, outfset, moving, lbnd_out,
                              ubnd_out, fts_port, SMF__NOCREATE_FILE, status );
+
         } else {
           havelut = 0;
         }
-
-        /* Get reference dimensions/strides */
-        smf_get_dims( refdata, NULL, NULL, &nbolo, &reftlenr, &refndata,
-                      &rbstr, &rtstr, status );
 
         if( dslen && dslen[j-firstpiece] ) {
           reftlen = dslen[j-firstpiece];
@@ -743,7 +781,7 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
             data = smf_create_smfData(SMF__NOCREATE_DA, status );
             if (refdata->da && data) {
               /* do not copy dark squids. We do that below */
-              data->da = smf_deepcopy_smfDA( refdata, 0, status );
+              data->da = smf_deepcopy_smfDA( wf, refdata, 0, status );
               da = data->da;
             }
 
@@ -886,7 +924,7 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
               }
 
               /* Allocate space for the pointing LUT, and theta if needed */
-              if( havelut ) {
+              if( havelut || importlut ) {
                 data->lut = astCalloc(ndata, sizeof(*(data->lut)) );
                 data->theta = astCalloc(tlen, sizeof(*(data->theta)) );
               }
@@ -903,6 +941,33 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
             }
           }
 
+          /* If we have not yet done so, set up threading info. */
+          if( ! job_data ) {
+
+            /* How many threads do we get to play with */
+            nw = wf ? wf->nworker : 1;
+
+            /* Find how many bolometers to process in each worker thread. */
+            bolostep = nbolo/nw;
+            if( bolostep == 0 ) bolostep = 1;
+
+            /* Allocate job data for threads, and store the range of
+               bolos, to be processed by each one. Ensure that the last
+               thread picks up any left-over bolos.  */
+            job_data = astCalloc( nw, sizeof(*job_data) );
+            if( *status == SAI__OK ) {
+              for( iw = 0; iw < nw; iw++ ) {
+                pdata = job_data + iw;
+                pdata->b1 = iw*bolostep;
+                if( iw < nw - 1 ) {
+                   pdata->b2 = pdata->b1 + bolostep - 1;
+                } else {
+                   pdata->b2 = nbolo - 1 ;
+                }
+              }
+            }
+          }
+
           /* Copy DATA/QUALITY/VARIANCE and JCMTstate information into
              concatenated smfData */
           if( *status == SAI__OK ) {
@@ -915,12 +980,23 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
 
             /* Copy LUT and theta */
             if( havelut ) {
-              for( l=0; l<nbolo; l++ ) {
-                for( m=0; m<reftlen; m++ ) {
-                  data->lut[(tchunk+m)*tstr + l*bstr] =
-                    refdata->lut[m*rtstr + l*rbstr];
-                }
+
+              thrBeginJobContext( wf, status );
+              for( iw = 0; iw < nw; iw++ ) {
+                pdata = job_data + iw;
+                pdata->oper = 1;
+                pdata->ini = refdata->lut;
+                pdata->outi = data->lut;
+                pdata->tchunk = tchunk;
+                pdata->bstride = bstr;
+                pdata->tstride = tstr;
+                pdata->rbstride = rbstr;
+                pdata->rtstride = rtstr;
+                pdata->ntslice = reftlen;
+                thrAddJob( wf, 0, pdata, smf1_concat_smfGroup, 0, NULL, status );
               }
+              thrWait( wf, status );
+              thrEndJobContext( wf, status );
 
               if( data->theta && refdata->theta ) {
                 memcpy( data->theta + tchunk, refdata->theta,
@@ -948,12 +1024,24 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
             for( k=0; k<2; k++ ) if( havearray[k] ) {
                 switch( data->dtype ) {
                 case SMF__DOUBLE:
-                  for( l=0; l<nbolo; l++ ) {
-                    for( m=0; m<reftlen; m++ ) {
-                      ((double *)data->pntr[k])[(tchunk+m)*tstr + l*bstr] =
-                        ((double *)refdata->pntr[k])[m*rtstr + l*rbstr];
-                    }
+
+                  thrBeginJobContext( wf, status );
+                  for( iw = 0; iw < nw; iw++ ) {
+                    pdata = job_data + iw;
+                    pdata->oper = 2;
+                    pdata->in = refdata->pntr[k];
+                    pdata->out = data->pntr[k];
+                    pdata->tchunk = tchunk;
+                    pdata->bstride = bstr;
+                    pdata->tstride = tstr;
+                    pdata->rbstride = rbstr;
+                    pdata->rtstride = rtstr;
+                    pdata->ntslice = reftlen;
+                    thrAddJob( wf, 0, pdata, smf1_concat_smfGroup, 0, NULL, status );
                   }
+                  thrWait( wf, status );
+                  thrEndJobContext( wf, status );
+
                   break;
                 default:
                   msgSetc("DTYPE",smf_dtype_string(data, status));
@@ -964,12 +1052,23 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
               }
             /* Quality */
             if ( havequal ) {
-              for( l=0; l<nbolo; l++ ) {
-                for( m=0; m<reftlen; m++ ) {
-                  (data->qual)[(tchunk+m)*tstr + l*bstr] =
-                    (refdata->qual)[m*rtstr + l*rbstr];
-                }
+
+              thrBeginJobContext( wf, status );
+              for( iw = 0; iw < nw; iw++ ) {
+                pdata = job_data + iw;
+                pdata->oper = 3;
+                pdata->inq = refdata->qual;
+                pdata->outq = data->qual;
+                pdata->tchunk = tchunk;
+                pdata->bstride = bstr;
+                pdata->tstride = tstr;
+                pdata->rbstride = rbstr;
+                pdata->rtstride = rtstr;
+                pdata->ntslice = reftlen;
+                thrAddJob( wf, 0, pdata, smf1_concat_smfGroup, 0, NULL, status );
               }
+              thrWait( wf, status );
+              thrEndJobContext( wf, status );
             }
 
             /* increment tchunk */
@@ -978,7 +1077,7 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
         }
 
         /* Close the file we had open */
-        smf_close_file( &refdata, status );
+        smf_close_file( wf, &refdata, status );
 
         /* If any pieces remain to be processed, wait for the completion
            of the job that is opening the next piece. Then lock the
@@ -1166,6 +1265,19 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
         }
 
       }
+
+      /* If we are importing the LUT model from an NDF, do it now. */
+      if( !(flags & SMF__NOCREATE_LUT) && outfset && importlut ) {
+        nc = strstr( pname, "_con" ) - pname + 4;
+        ename = astStore( NULL, pname, nc + 1 );
+        ename[ nc ] = 0;
+        ename = astAppendString( ename, &nc, "_lut" );
+        msgOutiff( MSG__VERB, "", FUNC_NAME ": using external LUT "
+                  "model imported from '%s'.", status, ename );
+        smf_import_array( wf, data, ename, 0, 0, SMF__INTEGER,
+                          data->lut, status );
+        ename = astFree( ename );
+      }
     }
 
     /* Put this concatenated subarray (or directly copied subarray in the
@@ -1175,4 +1287,142 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
 
   /* Clean up */
   dslen = astFree( dslen );
+  job_data = astFree( job_data );
 }
+
+
+
+
+static void smf1_concat_smfGroup( void *job_data_ptr, int *status ) {
+/*
+*  Name:
+*     smf1_concat_smfGroup
+
+*  Purpose:
+*     Executed in a worker thread to do various calculations for
+*     smf_concat_smfGroup.
+
+*  Invocation:
+*     smf1_concat_smfGroup( void *job_data_ptr, int *status )
+
+*  Arguments:
+*     job_data_ptr = SmfConcatSmfGroupData * (Given)
+*        Data structure describing the job to be performed by the worker
+*        thread.
+*     status = int * (Given and Returned)
+*        Inherited status.
+
+*/
+
+/* Local Variables: */
+   SmfConcatSmfGroupData *pdata;
+   const double *dp2;
+   const double *dp4;
+   const int *ip2;
+   const int *ip4;
+   const smf_qual_t *qp4;
+   const smf_qual_t *qp2;
+   dim_t b1;
+   dim_t b2;
+   dim_t ibolo;
+   dim_t itime;
+   dim_t ntslice;
+   double *dp1;
+   double *dp3;
+   int *ip1;
+   int *ip3;
+   size_t bstride;
+   size_t rbstride;
+   size_t rtstride;
+   size_t tstride;
+   smf_qual_t *qp3;
+   smf_qual_t *qp1;
+
+/* Check inherited status */
+   if( *status != SAI__OK ) return;
+
+/* Get a pointer that can be used for accessing the required items in the
+   supplied structure. */
+   pdata = (SmfConcatSmfGroupData *) job_data_ptr;
+
+   b1 = pdata->b1;
+   b2 = pdata->b2;
+   ntslice = pdata->ntslice;
+   bstride = pdata->bstride;
+   rbstride = pdata->rbstride;
+   tstride = pdata->tstride;
+   rtstride = pdata->rtstride;
+
+/* Integer copy.
+   ============= */
+   if( pdata->oper == 1 ) {
+      ip3 = pdata->outi + pdata->tchunk*tstride + b1*bstride;
+      ip4 = pdata->ini + b1*rbstride;
+      for( ibolo = b1; ibolo <= b2; ibolo++ ) {
+         ip1 = ip3;
+         ip2 = ip4;
+
+         for( itime = 0; itime < ntslice; itime++ ) {
+            *ip1 = *ip2;
+            ip1 += tstride;
+            ip2 += rtstride;
+         }
+
+         ip3 += bstride;
+         ip4 += rbstride;
+      }
+
+/* Double precision copy.
+   ==================== */
+   } else if( pdata->oper == 2 ) {
+      dp3 = pdata->out + pdata->tchunk*tstride + b1*bstride;
+      dp4 = pdata->in + b1*rbstride;
+      for( ibolo = b1; ibolo <= b2; ibolo++ ) {
+         dp1 = dp3;
+         dp2 = dp4;
+
+         for( itime = 0; itime < ntslice; itime++ ) {
+            *dp1 = *dp2;
+            dp1 += tstride;
+            dp2 += rtstride;
+         }
+
+         dp3 += bstride;
+         dp4 += rbstride;
+      }
+
+/* Quality copy.
+   ==================== */
+   } else if( pdata->oper == 3 ) {
+      qp3 = pdata->outq + pdata->tchunk*tstride + b1*bstride;
+      qp4 = pdata->inq + b1*rbstride;
+      for( ibolo = b1; ibolo <= b2; ibolo++ ) {
+         qp1 = qp3;
+         qp2 = qp4;
+
+         for( itime = 0; itime < ntslice; itime++ ) {
+            *qp1 = *qp2;
+            qp1 += tstride;
+            qp2 += rtstride;
+         }
+
+         qp3 += bstride;
+         qp4 += rbstride;
+      }
+
+/* Report an error if the worker was to do an unknown job.
+   ====================================================== */
+   } else {
+      *status = SAI__ERROR;
+      errRepf( "", "smf1_concat_smfGroup: Invalid operation (%d) supplied.",
+               status, pdata->oper );
+   }
+}
+
+
+
+
+
+
+
+

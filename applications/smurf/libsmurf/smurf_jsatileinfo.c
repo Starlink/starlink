@@ -67,12 +67,11 @@
 *        The JCMT instrument (different instruments have different
 *        tiling schemes and pixel sizes). The following instrument
 *        names are recognised (unambiguous abbreviations may be
-*        supplied): "SCUBA-2(450)", "SCUBA-2(850)", "HARP", "RxA",
-*        "RxWD", "RxWB". NDFs containing co-added data for the selected
-*        instrument reside within a corresponding sub-directory of the
-*        directory specified by environment variable JSA_TILE_DIR. These
-*        sub-directories are called "scuba2-450", "scuba2-850", "harp",
-*        "rxa", "rxwd" and "rxwb".
+*        supplied): "SCUBA-2(450)", "SCUBA-2(850)", "ACSIS", "DAS". NDFs
+*        containing co-added data for the selected instrument reside
+*        within a corresponding sub-directory of the directory specified
+*        by environment variable JSA_TILE_DIR. These sub-directories are
+*        called "scuba2-450", "scuba2-850", "acsis" and "das".
 *     ITILE = _INTEGER (Read)
 *        The index of the tile about which information is required. The
 *        first tile has index 0. The  largest allowed tile index is

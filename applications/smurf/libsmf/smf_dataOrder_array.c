@@ -13,15 +13,18 @@
 *     C function
 
 *  Invocation:
-
-*     newbuf = smf_dataOrder_array( void * oldbuf, smf_dtype oldtype,
-*                                   smf_dtype newtype,
+*     newbuf = smf_dataOrder_array( ThrWorkForce *wf, void * oldbuf,
+*                                   smf_dtype oldtype, smf_dtype newtype,
 *                                   size_t ndata, size_t ntslice,
 *                                   size_t nbolo, size_t tstr1, size_t bstr1,
 *                                   size_t tstr2, size_t bstr2, int inPlace,
 *                                   int freeOld, int * status )
 
 *  Arguments:
+*     wf = ThrWorkForce * (Given)
+*        Pointer to a pool of worker threads (can be NULL). [Currently
+*        unused since using multiple threads slows down the algorithm
+*        rather than speeding it up.]
 *     oldbuf = void * (Given and Returned)
 *        Pointer to the data buffer to be re-ordered. Also contains the
 *        re-ordered data if inPlace=1
@@ -78,11 +81,13 @@
 *        Trap case when input and output strides are the same.
 *     2011-06-22 (EC):
 *        Add ability to typecast while copying (oldtype/newtype)
+*     2014-01-13 (DSB):
+*        Added multi-threading.
 
 *  Notes:
 
 *  Copyright:
-*     Copyright (C) 2010-2011 Science & Technology Facilities Council.
+*     Copyright (C) 2010-2014 Science & Technology Facilities Council.
 *     Copyright (C) 2010-2011 University of British Columbia.
 *     All Rights Reserved.
 
@@ -120,17 +125,78 @@
 #include "libsmf/smf.h"
 #include "libsmf/smf_err.h"
 
+/* Prototypes for local static functions. */
+static void smf1_dataOrder_array( void *job_data_ptr, int *status );
+
+/* Local data types */
+typedef struct smfDataOrderArrayData {
+   size_t itime1;
+   size_t itime2;
+   dim_t nbolo;
+   size_t bstr1;
+   size_t tstr1;
+   size_t bstr2;
+   size_t tstr2;
+   smf_dtype newtype;
+   smf_dtype oldtype;
+   void *oldbuf;
+   void *newbuf;
+} SmfDataOrderArrayData;
+
 #define FUNC_NAME "smf_dataOrder_array"
 
-void * smf_dataOrder_array( void * oldbuf, smf_dtype oldtype, smf_dtype newtype,
-                            size_t ndata, size_t ntslice, size_t nbolo,
-                            size_t tstr1, size_t bstr1,
+#define COPY1(Type) { \
+         Type *pout, *qout; \
+         Type *pin, *qin; \
+\
+         qin = (Type *) pdata->oldbuf + itime1*tstr1; \
+         qout = (Type *) pdata->newbuf + itime1*tstr2; \
+\
+         for( itime=itime1; itime<=itime2; itime++ ) { \
+            pin = qin; \
+            pout = qout; \
+            for( ibolo=0; ibolo<nbolo; ibolo++ ) { \
+               *pout = *pin; \
+               pin += bstr1; \
+               pout += bstr2; \
+            } \
+            qin += tstr1; \
+            qout += tstr2; \
+         } }
+
+#define COPY2(Type_in,Type_out,Bad_in,Bad_out) { \
+         Type_out *pout, *qout; \
+         Type_in *pin, *qin; \
+\
+         qin = (Type_in *) pdata->oldbuf + itime1*tstr1; \
+         qout = (Type_out *) pdata->newbuf + itime1*tstr2; \
+\
+         for( itime=itime1; itime<=itime2; itime++ ) { \
+            pin = qin; \
+            pout = qout; \
+            for( ibolo=0; ibolo<nbolo; ibolo++ ) { \
+               *pout = ( *pin != Bad_in ) ? *pin : Bad_out; \
+               pin += bstr1; \
+               pout += bstr2; \
+            } \
+            qin += tstr1; \
+            qout += tstr2; \
+         } }
+
+
+void * smf_dataOrder_array( ThrWorkForce *wf, void * oldbuf, smf_dtype oldtype,
+                            smf_dtype newtype, size_t ndata, size_t ntslice,
+                            size_t nbolo, size_t tstr1, size_t bstr1,
                             size_t tstr2, size_t bstr2, int inPlace,
                             int freeOld, int * status ) {
-  size_t szold = 0;        /* Size of old data type */
   size_t sznew = 0;        /* Size of new data type */
   void * newbuf = NULL;    /* Space to do the reordering */
   void * retval = NULL;    /* Return value with reordered buffer */
+  SmfDataOrderArrayData *job_data = NULL;
+  SmfDataOrderArrayData *pdata;
+  int nw;
+  size_t step;
+  int iw;
 
   retval = oldbuf;
   if (*status != SAI__OK) return retval;
@@ -163,7 +229,6 @@ void * smf_dataOrder_array( void * oldbuf, smf_dtype oldtype, smf_dtype newtype,
 
   /* Size of data type */
   sznew = smf_dtype_sz(newtype, status);
-  szold = smf_dtype_sz(oldtype, status);
 
   /* Allocate buffer */
   newbuf = astMalloc( ndata*sznew );
@@ -177,78 +242,56 @@ void * smf_dataOrder_array( void * oldbuf, smf_dtype oldtype, smf_dtype newtype,
       memcpy( newbuf, oldbuf, sznew*ndata );
 
     } else {
-      size_t j;
-      size_t k;
 
-      /* Loop over all of the elements and re-order the data */
-      switch( oldtype ) {
-      case SMF__INTEGER:
-        if( newtype == SMF__DOUBLE ) {
-          /* Convert integer to double */
-          for( j=0; j<ntslice; j++ ) {
-            for( k=0; k<nbolo; k++ ) {
-              int val = ((int *)oldbuf)[j*tstr1+k*bstr1];
-              if( val != VAL__BADI ) {
-                ((double *)newbuf)[j*tstr2+k*bstr2] = val;
-              } else {
-                ((double *)newbuf)[j*tstr2+k*bstr2] = VAL__BADD;
-              }
-            }
+      /* We currently ignore any supplied WorkForce, since using multiple
+         threads slows down the re-ordered rather than speeding it up - I
+         presume because of contention issues. I've tried ensuring that
+         the output array is accessed sequenctially but that does not seem
+         to improve anything. Leave the mult-threaded infrastructure
+         here, in case a better solution is found. */
+      wf = NULL;
+
+      /* How many threads do we get to play with */
+      nw = wf ? wf->nworker : 1;
+
+      /* Find how many time slices to process in each worker thread. */
+      step = ntslice/nw;
+      if( ntslice == 0 ) step = 1;
+
+      /* Allocate job data for threads, and store common values. Ensure that
+         the last thread picks up any left-over time slices.  Store the
+         info required by the wrker threads, then submit jobs to the work
+         force. */
+      job_data = astCalloc( nw, sizeof(*job_data) );
+      if( *status == SAI__OK ) {
+
+        for( iw = 0; iw < nw; iw++ ) {
+          pdata = job_data + iw;
+          pdata->itime1 = iw*step;
+          if( iw < nw - 1 ) {
+            pdata->itime2 = pdata->itime1 + step - 1;
+          } else {
+            pdata->itime2 = ntslice - 1 ;
           }
 
-        } else {
-          /* integer to integer */
-          for( j=0; j<ntslice; j++ ) {
-            for( k=0; k<nbolo; k++ ) {
-              ((int *)newbuf)[j*tstr2+k*bstr2] =
-                ((int *)oldbuf)[j*tstr1+k*bstr1];
-            }
-          }
+          pdata->nbolo = nbolo;
+          pdata->bstr1 = bstr1;
+          pdata->tstr1 = tstr1;
+          pdata->bstr2 = bstr2;
+          pdata->tstr2 = tstr2;
+          pdata->newtype = newtype;
+          pdata->oldtype = oldtype;
+          pdata->newbuf = newbuf;
+          pdata->oldbuf = oldbuf;
+
+          thrAddJob( wf, 0, pdata, smf1_dataOrder_array, 0, NULL, status );
         }
-        break;
 
-      case SMF__FLOAT:
-        for( j=0; j<ntslice; j++ ) {
-          for( k=0; k<nbolo; k++ ) {
-            ((float *)newbuf)[j*tstr2+k*bstr2] =
-              ((float *)oldbuf)[j*tstr1+k*bstr1];
-          }
-        }
-        break;
-
-      case SMF__DOUBLE:
-        for( j=0; j<ntslice; j++ ) {
-          for( k=0; k<nbolo; k++ ) {
-            ((double *)newbuf)[j*tstr2+k*bstr2] =
-              ((double *)oldbuf)[j*tstr1+k*bstr1];
-          }
-        }
-        break;
-
-      case SMF__USHORT:
-        for( j=0; j<ntslice; j++ ) {
-          for( k=0; k<nbolo; k++ ) {
-            ((unsigned short *)newbuf)[j*tstr2+k*bstr2] =
-              ((unsigned short *)oldbuf)[j*tstr1+k*bstr1];
-          }
-        }
-        break;
-
-      case SMF__UBYTE:
-        for( j=0; j<ntslice; j++ ) {
-          for( k=0; k<nbolo; k++ ) {
-            ((unsigned char *)newbuf)[j*tstr2+k*bstr2] =
-              ((unsigned char *)oldbuf)[j*tstr1+k*bstr1];
-          }
-        }
-        break;
-
-      default:
-        msgSetc("DTYPE",smf_dtype_str(oldtype, status));
-        *status = SAI__ERROR;
-        errRep( "", FUNC_NAME
-                ": Don't know how to handle ^DTYPE type.", status);
+        /* Wait for the jobs to complete. */
+        thrWait( wf, status );
       }
+
+      job_data = astFree( job_data );
     }
 
     if( inPlace ) {
@@ -272,3 +315,89 @@ void * smf_dataOrder_array( void * oldbuf, smf_dtype oldtype, smf_dtype newtype,
 
   return retval;
 }
+
+
+static void smf1_dataOrder_array( void *job_data_ptr, int *status ) {
+/*
+*  Name:
+*     smf1_dataOrder_array
+
+*  Purpose:
+*     Executed in a worker thread to do various calculations for
+*     smf_dataOrder_array.
+
+*  Invocation:
+*     smf1_dataOrder_array( void *job_data_ptr, int *status )
+
+*  Arguments:
+*     job_data_ptr = SmfDataOrderArrayData * (Given)
+*        Data structure describing the job to be performed by the worker
+*        thread.
+*     status = int * (Given and Returned)
+*        Inherited status.
+
+*/
+
+/* Local Variables: */
+   SmfDataOrderArrayData *pdata;
+   dim_t itime;
+   dim_t ibolo;
+   dim_t itime1;
+   dim_t itime2;
+   size_t bstr1;
+   size_t tstr1;
+   size_t bstr2;
+   size_t tstr2;
+   dim_t nbolo;
+
+/* Check inherited status */
+   if( *status != SAI__OK ) return;
+
+/* Get a pointer that can be used for accessing the required items in the
+   supplied structure. */
+   pdata = (SmfDataOrderArrayData *) job_data_ptr;
+
+   itime1 = pdata->itime1;
+   itime2 = pdata->itime2;
+   nbolo = pdata->nbolo;
+   bstr1 = pdata->bstr1;
+   tstr1 = pdata->tstr1;
+   bstr2 = pdata->bstr2;
+   tstr2 = pdata->tstr2;
+
+/* Loop over all of the elements and re-order the data */
+   switch( pdata->oldtype ) {
+
+   case SMF__INTEGER:
+      if( pdata->newtype == SMF__DOUBLE ) {
+         COPY2(int,double,VAL__BADI,VAL__BADD)
+      } else {
+         COPY1(int)
+      }
+      break;
+
+   case SMF__FLOAT:
+     COPY1(float)
+     break;
+
+   case SMF__DOUBLE:
+     COPY1(double)
+     break;
+
+   case SMF__USHORT:
+     COPY1(unsigned short)
+     break;
+
+   case SMF__UBYTE:
+     COPY1(unsigned char)
+     break;
+
+   default:
+     msgSetc("DTYPE",smf_dtype_str(pdata->oldtype, status));
+     *status = SAI__ERROR;
+     errRep( "", FUNC_NAME
+             ": Don't know how to handle ^DTYPE type.", status);
+   }
+
+}
+

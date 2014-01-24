@@ -1,0 +1,386 @@
+.title SSN/45.7
+.set date 20,4,1989
+.autoparagraph
+.set paragraph 0,1,2
+.layout 3,2
+.page size 57,70
+.flags substitute
+.nofill
+.keep
+.justify
+SCIENCE#AND#ENGINEERING#RESEARCH#COUNCIL SSN/45.7
+RUTHERFORD#APPLETON#LABORATORY
+SPACE#_&#ASTROPHYSICS#DIVISION
+
+Starlink#Project Issued#by
+Starlink#System#Note#45.7
+
+.right;A J Chipperfield
+.right;$$date
+
+.fill
+.repeat 70,"-"
+.blank
+.centre;ADAM - Release 1.5
+.centre;------------------
+.blank 2
+.! DSRTOC version V2.1-09
+.! RUNOFF/CONTENTS/INDENT SSN45
+.SAVE
+.NO FLAGS ALL
+.NO FLAGS BREAK		.NO FLAGS CAPITALIZE	.NO FLAGS ENDFOOTNOTE
+.NO FLAGS HYPHENATE	.NO FLAGS INDEX		.NO FLAGS PERIOD
+.NO FLAGS SPACE		.NO FLAGS SUBSTITUTE
+.FLAGS ACCEPT _		.FLAGS BOLD *		.FLAGS COMMENT !
+.FLAGS LOWERCASE \	.FLAGS OVERSTRIKE %	.FLAGS UNDERLINE &
+.FLAGS UPPERCASE ^
+.FLAGS ALL
+.NO FILL		.NO JUSTIFY
+.LEFT MARGIN 8		.RIGHT MARGIN 70	.PAGE SIZE , 70
+.CENTER;CONTENTS
+.BLANK
+.TEST PAGE 2
+
+1       SUMMARY  . . . . . . . . . . . . . . . . . . . . . . 2
+2       INSTALLATION . . . . . . . . . . . . . . . . . . . . 2
+3       NEW FEATURES IN THIS RELEASE . . . . . . . . . . . . 2
+3_.1       DOCUMENTATION  . . . . . . . . . . . . . . . . . . 2
+3_.2       SYSLOGNAM  . . . . . . . . . . . . . . . . . . . . 2
+3_.3       SMS  . . . . . . . . . . . . . . . . . . . . . . . 3
+3_.4       CHR  . . . . . . . . . . . . . . . . . . . . . . . 3
+3_.5       FIO  . . . . . . . . . . . . . . . . . . . . . . . 3
+3_.6       MSP/AZUSS  . . . . . . . . . . . . . . . . . . . . 4
+3_.7       ALINK  . . . . . . . . . . . . . . . . . . . . . . 4
+3_.8       MAGLINK_.OPT And FIOLINK_.OPT  . . . . . . . . . . . 4
+3_.9       ADAMSHARE  . . . . . . . . . . . . . . . . . . . . 4
+3_.10      ADAMCL . . . . . . . . . . . . . . . . . . . . . . 4
+3_.11      LOGIN PROCEDURES . . . . . . . . . . . . . . . . . 4
+3_.12      SYSDEV . . . . . . . . . . . . . . . . . . . . . . 4
+3_.13      TASK Library . . . . . . . . . . . . . . . . . . . 5
+3_.14      SMS UFACE  . . . . . . . . . . . . . . . . . . . . 5
+3_.15      ICL UFACE  . . . . . . . . . . . . . . . . . . . . 5
+3_.16      TAPEMOUNT  . . . . . . . . . . . . . . . . . . . . 5
+3_.17      TAPEDISM . . . . . . . . . . . . . . . . . . . . . 5
+4       BUGS FIXED FROM PREVIOUS RELEASE . . . . . . . . . . 5
+4_.1       ICL  . . . . . . . . . . . . . . . . . . . . . . . 5
+4_.2       SMS  . . . . . . . . . . . . . . . . . . . . . . . 7
+4_.3       UFACE  . . . . . . . . . . . . . . . . . . . . . . 7
+4_.4       SUBPAR . . . . . . . . . . . . . . . . . . . . . . 7
+5       CLEANUP  . . . . . . . . . . . . . . . . . . . . . . 7
+5_.1       ITEMS REMOVED  . . . . . . . . . . . . . . . . . . 8
+5_.2       CANDIDATES FOR REMOVAL . . . . . . . . . . . . . . 8
+5_.2_.1       CHR  . . . . . . . . . . . . . . . . . . . . . . 8
+5_.2_.2       TEL  . . . . . . . . . . . . . . . . . . . . . . 8
+5_.2_.3       CLITASK  . . . . . . . . . . . . . . . . . . . . 8
+6       KNOWN BUGS . . . . . . . . . . . . . . . . . . . . . 8
+.RESTORE
+.!now switch off overstrike, substitute, accept and uppercase flags
+.!as we wish to use %, $, ^ and _ regularly
+.no flags overstrike
+.no flags substitute
+.no flags accept
+.no flags uppercase
+.flags accept %
+.!
+.hl 1 SUMMARY
+This release consists of bug fixes and some enhancements. It has been
+linked under VMS version 5 and is therefore not suitable for running
+under VMS version 4.
+
+Applications will not, in general, need to be re-linked with this release
+but command language monoliths should be re-linked.
+
+The full release requires about 42000 blocks of disk storage and
+includes a mini-release which can be extracted and put up 
+separately. 
+The mini-release requires about 13100 blocks and allows the system 
+to be run and tasks to be developed and linked.
+
+.hl 1 INSTALLATION
+Full installation instructions are given in the Starlink Software Change
+Notice and in SSN/44.5.
+
+A change, which may affect non-Starlink sites, has been made to the 
+installation instructions. See below under SYSLOGNAM.
+
+.hl 1 NEW FEATURES IN THIS RELEASE
+
+.hl 2 DOCUMENTATION
+SSN/45.7 and ARN/15.1 describe ADAM release 1.5.
+
+The following documents have been re-issued:
+.lm 1
+.list ,"o"
+.le;SSN/44.5 ADAM - Installation Guide (Converted to TeX and updated).
+.le;APN/9.3  ADAM Programmers' Guide to the FIO Package (FIO_RWIND added).
+.els
+.lm 0
+The following document has been added to DOCS_DIR but not to the mini-
+release.
+.lm 1
+.list "o"
+.le;ASP/8.1   Suggested improvements to the Dtask facilities
+.els
+.lm 0
+
+.hl 2 SYSLOGNAM
+The section of SYSLOGNAM.COM (supplied commented out) to re-define 
+LNM$TEMPORARY_MAILBOX so that tasks can communicate with jobs other than their 
+own, has been removed into a separate procedure, ADAM_DIR:MBLOGNAM.COM.
+This means that sites will not need to change SYSLOGNAM.COM at each release
+just to define LNM$TEMPORARY_MAILBOX appropriately.
+If you have not been doing this, the change will make no difference to you.
+
+The supplied version of MBLOGNAM.COM  defines LNM$TEMPORARY_MAILBOX as LNM$GROUP
+and, if this is appropriate, it can be obeyed in addition to SYSLOGNAM.COM
+at system startup; otherwise sites can make their own arrangements.
+
+.hl 2 SMS
+.lm 1
+.list ,"o"
+.le;SMS_LOADTABLE has been altered in the sections producing output for printout
+by the stand-alone control table compiler as follows:
+.list ,"o"
+.le;Include help entries in the printout.
+.le;Some formats have been changed (actually to prevent crashes).
+.els
+.le;Changes have been made to avoid unnecessary refreshing of the permanent
+one-line help facility.
+.els
+.lm 0
+
+.hl 2 CHR
+The CHR library has been replaced by the version which will shortly be
+released as a Starlink software item. At that time ADAM CHR will be
+removed and the Starlink version used directly.
+
+Users of ADAM CHR should note the following differences which may require
+code changes:
+.lm 1
+.list ,"o"
+.le;Subroutine CHR_STRDEC is renamed CHR_DCWRD.
+.le;Subroutine CHR_LDBLNK is renamed CHR_LDBLK.
+.els
+.lm 0
+The ADAM shared image ADAMSHARE will permit either old or new forms for a
+period to permit the changes to be made.
+Some additional routines are also available; details will appear in SUN/40.
+
+.hl 2 FIO
+Subroutine FIO_RWIND has been added to the library.
+APN/9 is revised accordingly.
+
+.hl 2 MSP/AZUSS
+The AZUSS system services have been modified for VMS version 5 and the MSP
+shareable image re-linked accordingly.
+MSP is still not used by ADAM.
+
+.hl 2 ALINK
+A modification, requested by JACH, has been made to ALINK.COM.
+There is no functional difference.
+
+.hl 2 MAGLINK.OPT and FIOLINK.OPT
+These link option files declare relevant common blocks non-shareable to permit
+their use in ICL shareable monoliths.
+
+.hl 2 ADAMSHARE
+Entries for additional and renamed CHR routines have been added to the end 
+of the transfer vector.
+
+.hl 2 ADAMCL
+ADAMCL_KILLW will now kill when ADAM_PATH is interrupted by cntrl/C.
+
+.hl 2 LOGIN PROCEDURES
+The user-interface login procedures ADAM_DIR:GOD.PRC, ICLDIR:LOGIN.ICL and
+ICLDIR:ADAMLOGIN.ICL are updated to display new version numbers.
+
+.hl 2 SYSDEV
+Logical name ATASKS is no longer defined.
+Logical name SCREEN_DIR is no longer defined by DTASKS:DIR.COM.
+It is now set correctly by LIB_DIR:DIR.COM to point to the directory containing 
+the SCREEN task.
+
+.hl 2 TASK Library
+TASK_DONE now returns VALUE on success.
+
+.hl 2 SMS UFACE
+This library has been re-organized and routines which are not SMS
+specific brought into line with standard UFACE.
+
+.hl 2 ICL UFACE
+Routines in the ICL UFACE library which are not ICL specific have been brought
+into line with standard UFACE.
+
+.hl 2 TAPEMOUNT
+The interface file now specifies:
+.literal
+
+      vpath  'prompt'
+      ppath  'current,default'
+.el
+
+.hl 2 TAPEDISM
+The interface file now specifies:
+.literal
+
+      vpath  'prompt'
+      ppath  'global'
+.el
+
+.hl 1 BUGS FIXED FROM PREVIOUS RELEASE
+.hl 2 ICL
+ICL Version 1.42 was not officially released due to various problems.
+ICL Version 1.43 is released herewith.
+The following problems have been fixed since Version 1.41.
+
+.lm 1
+.list ,"o"
+.le;In version 1.41 new versions of procedures were not loaded 
+following an EDIT from inside ICL.
+.le;The maximum length of a statement input from the terminal was 80
+characters and the %~ continuation character did not work from terminal
+input. In version 1.42 statements of up to 300 characters may be input from
+the terminal (which is the maximum statement length allowed). The %~
+continuation character may only be used in LOAD file input.
+.le;ADAM monoliths run using the DEFSHARE facility could not return
+values into ICL variables.
+.le;ADAM tasks could not return values into an ICL variable in the
+case where the variable was represented by a formal parameter of a procedure.
+.le;The bug in ICLTERMADAM which caused ADAM tasks to hang when run from
+DCL command procedures has been corrected.
+.le;Passing a variable parameter in the form of an HDS  name
+(so  that  the  task can return a value to ICL) is no longer
+used in the case of the OBEYW command.  It is used only  for
+commands defined using DEFINE and DEFSHARE.  The aim of this
+change is to reduce the likelihood of this method being used
+for D-tasks for which it is not appropriate.
+.le;An exception (HDSERR) is signalled if ICL is  unable  to
+write the value of a variable to its HDS file for passing to
+an ADAM task (e.g.  if the file is locked by another task).
+.le;When a procedure formal parameter is passed to  an  ADAM
+task  it is passed correctly through any number of levels of
+procedure calls.
+
+E.g.
+.literal
+
+      DEFINE SQUARE SQUARE
+
+      PROC TEST1 X
+      SQUARE (X)
+      END PROC
+
+      PROC TEST2 Y
+      TEST1 (Y)
+      END PROC
+
+      PROC TEST3 Z
+      TEST2 (Z)
+      END PROC
+
+.el
+The command:
+.literal
+
+      TEST3 (Q)     
+
+.el
+will pass the variable Q (as an  HDS  name)  to  SQUARE  and
+allow  SQUARE  to  return a value in the variable Q.  In ICL
+1.42 this would only work through  one  level  of  procedure
+calls.
+.literal
+
+      TEST3 (5)
+
+.el
+will pass the constant value 5 (as a  string)  to  the  ADAM
+task.   In ICL 1.42 the name of an HDS object containing the
+value 5 would have been passed in this case, if the constant
+was passed through one or more levels of procedure calls. 
+.els
+.lm 0
+
+.hl 2 SMS
+A bug in routine SMS_ASTHDLR, which caused keystrokes resulting in escape 
+sequences to be misread on occasions, has been corrected.
+(See also "KNOWN BUGS")
+
+.hl 2 UFACE
+.lm 1
+.list ,"o"
+.le;UFACE_LOAD now ensures that SYS$CREPRC is always called with the filename
+specified by the user.
+This overcomes a problem with loading privileged images.
+.le;UFACE_CHECKQUOT now checks remaining page file quota and buffered I/O byte
+count quota against the defaults used when creating a process.
+.els
+.lm 0
+
+.hl 2 SUBPAR
+A bug, which resulted in parameters being set incorrectly if a parameter 
+position on the command line was not allocated to a parameter by the interface
+file, has been corrected.
+(See also "KNOWN BUGS")
+
+.hl 1 CLEANUP
+.hl 2 ITEMS REMOVED
+.lm 1
+.list ,"o"
+.le;FIO/RIO -
+The old versions have been removed.
+All applications using them should have been converted.
+APN/9 section 6 describes the differences.
+.le;ICL_DIR -
+Various unnecessary files have been removed.
+.le;DTASKS -
+Executable images have been deleted from the example Dtasks 
+directory structure.
+These were all out of date and could not be used anyway.
+.le;CAM_DIR -
+CAMSUBM.LIS has been deleted to save 747 blocks.
+.le;COPY procedures - The procedures in ADAMEXE_DIR which were used to update
+the 'executables' directory in the mini-release have been removed. The process
+is now carried out by the BUILD procedures in ADAM_ADAMEXE.
+.els
+.lm 0
+
+.hl 2 CANDIDATES FOR REMOVAL
+.hl 3 CHR 
+Note that it is proposed to delete the ADAM CHR library at the next release.
+By that time the Starlink version should be released.
+Note also that the option to use the old subroutine names will probably be
+withdrawn at the same time.
+.hl 3 TEL
+The TEL library of UKIRT utilities seems rather specific to be part of the
+released system.
+Are there any objections to their removal from the release?
+.hl 3 CLITASK
+There is a bug in CLITASK (ADAMCL running as a task) which means that it has
+not worked for some time. As this has not been reported, presumably nobody
+is using it.
+Is it a useful facility?
+.hl 1 KNOWN BUGS
+.lm 1
+.list ,"o"
+.le;SMS - If keys producing escape sequences are hit in rapid succession, later
+ones may be misread.
+.le;Arrays in interface files - Arrays specified as defaults in interface files
+must be enclosed in parentheses. Square brackets (the normal parameter system
+syntax) are not accepted.
+.le;Parameter POSITION Fields - AED/3 says that every parameter should be 
+allocated a position.
+The interface file parsing permits POSITION fields to be omitted.  
+It should not be necessary to define a position for every parameter, especially
+if there are a large number of them, but it must be a mistake to have non-
+contiguous positions allocated.
+A fix in this release means that if parameter position N is unallocated, the
+Nth non-keyword parameter on the command line will be ignored.
+.le;Figaro - cannot be run from ICL unless the following logical names
+are defined:  FIGSHR, BIGFIG, FGRSHR, TVPSHR.
+They should point to shared images in FIGARO_PROG_S.
+.le;HDS - There is a bug which causes a crash if an attempt is made to create a
+file smaller than the disk cluster size.
+.le;CLITASK - Reports %PAR-I-NOUSR if an attempt is made to use it.
+.els
+.lm 0

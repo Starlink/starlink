@@ -300,7 +300,7 @@
 #define CREATOR PACKAGE_UPCASE ":" TASK_NAME
 
 static smfData *
-smf__create_bolfile_extension( const Grp * ogrp, size_t gcount,
+smf__create_bolfile_extension( ThrWorkForce *wf, const Grp * ogrp, size_t gcount,
                                const smfData *refdata, const char hdspath[],
                                const char datalabel[], const char units[],
                                int * status );
@@ -382,7 +382,7 @@ void smurf_calcnoise( int *status ) {
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
   /* Filter out darks */
-  smf_find_science( igrp, &fgrp, 1, NULL, NULL, 1, 1, SMF__NULL, NULL,
+  smf_find_science( wf, igrp, &fgrp, 1, NULL, NULL, 1, 1, SMF__NULL, NULL,
                     &flatramps, NULL, NULL, status );
 
   /* input group is now the filtered group so we can use that and
@@ -529,7 +529,7 @@ void smurf_calcnoise( int *status ) {
       pad = smf_get_padding( keymap, 0, firstdata->hdr, VAL__BADD, status );
 
       /* Free the first smfData. */
-      smf_close_file( &firstdata, status );
+      smf_close_file( wf, &firstdata, status );
 
     } else {
       pad = 0;
@@ -570,7 +570,7 @@ void smurf_calcnoise( int *status ) {
           smf_clean_smfArray( wf, array, NULL, NULL, NULL, kmap, status );
           if( array ) {
             array->owndata = 0;
-            smf_close_related( &array, status );
+            smf_close_related( wf, &array, status );
           }
           if( kmap ) kmap = astAnnul( kmap );
 
@@ -648,11 +648,11 @@ void smurf_calcnoise( int *status ) {
         }
 
         /* Create the output file if required, else a malloced smfData */
-        smf_create_bolfile( ogrp, gcount, thedata, "Noise",
+        smf_create_bolfile( wf, ogrp, gcount, thedata, "Noise",
                             noiseunits, SMF__MAP_QUAL, &outdata, status );
 
         /* Create groups to handle the NEP and ratio images */
-        ratdata = smf__create_bolfile_extension( ogrp, gcount, thedata,
+        ratdata = smf__create_bolfile_extension( wf, ogrp, gcount, thedata,
                                                  ".MORE.SMURF.NOISERATIO",
                                                  "Noise Ratio", NULL, status );
 
@@ -679,9 +679,9 @@ void smurf_calcnoise( int *status ) {
             int provid = NDF__NOID;
             /* open a reference input file for provenance propagation */
             ndgNdfas( basegrp, gcount, "READ", &provid, status );
-            smf_write_smfData( powdata, NULL, NULL, powgrp, gcount, provid,
+            smf_write_smfData( wf, powdata, NULL, NULL, powgrp, gcount, provid,
                                MSG__VERB, 0, status );
-            smf_close_file( &powdata, status );
+            smf_close_file( wf, &powdata, status );
             ndfAnnul( &provid, status );
           }
 
@@ -691,10 +691,10 @@ void smurf_calcnoise( int *status ) {
             ndgNdfas( basegrp, gcount, "READ", &provid, status );
 
             /* Ensure ICD data order */
-            smf_dataOrder( thedata, 1, status );
+            smf_dataOrder( wf, thedata, 1, status );
 
             /* Write it out */
-            smf_write_smfData( thedata, NULL, NULL, tsgrp, gcount, provid,
+            smf_write_smfData( wf, thedata, NULL, NULL, tsgrp, gcount, provid,
                                MSG__VERB, 0, status );
             ndfAnnul( &provid, status );
           }
@@ -711,7 +711,7 @@ void smurf_calcnoise( int *status ) {
           smfData * respmap = NULL;
 
           if (da && da->nflat) {
-            smf_create_bolfile( NULL, 1, thedata, "Responsivity", "A/W",
+            smf_create_bolfile( wf, NULL, 1, thedata, "Responsivity", "A/W",
                                 SMF__MAP_VAR, &respmap, status );
             if (*status == SAI__OK) {
               /* use a snr of 5 since we don't mind if we get a lot of
@@ -726,8 +726,8 @@ void smurf_calcnoise( int *status ) {
               ngood = smf_flat_responsivity( flatmethod, respmap, 5.0, 1,
                                              powval, bolval, refres,
                                              NULL, status);
-              if (powval) smf_close_file( &powval, status );
-              if (bolval) smf_close_file( &bolval, status );
+              if (powval) smf_close_file( wf, &powval, status );
+              if (bolval) smf_close_file( wf, &bolval, status );
             }
           } else {
             if (do_nep) {
@@ -752,7 +752,7 @@ void smurf_calcnoise( int *status ) {
             }
 
             /* now create the output image for NEP data */
-            nepdata = smf__create_bolfile_extension( ogrp, gcount, thedata,
+            nepdata = smf__create_bolfile_extension( wf, ogrp, gcount, thedata,
                                                      ".MORE.SMURF.NEP", "NEP",
                                                      "W s**0.5", status );
 
@@ -803,7 +803,7 @@ void smurf_calcnoise( int *status ) {
               smf_accumulate_prov( NULL, basegrp, 1, nepdata->file->ndfid,
                                    CREATOR, NULL, status );
             }
-            if (nepdata) smf_close_file( &nepdata, status );
+            if (nepdata) smf_close_file( wf, &nepdata, status );
           }
 
           /* Clip outlier noise values now that we've finished with the
@@ -851,19 +851,19 @@ void smurf_calcnoise( int *status ) {
 
           }
 
-          if (respmap) smf_close_file( &respmap, status );
+          if (respmap) smf_close_file( wf, &respmap, status );
         }
 
         if (*status == SAI__OK && outdata->file) {
           smf_accumulate_prov( NULL, basegrp, 1, outdata->file->ndfid,
                                CREATOR, NULL, status );
         }
-        if (outdata) smf_close_file( &outdata, status );
+        if (outdata) smf_close_file( wf, &outdata, status );
         if (*status == SAI__OK && ratdata && ratdata->file) {
           smf_accumulate_prov( NULL, basegrp, 1, ratdata->file->ndfid,
                                CREATOR, NULL, status );
         }
-        if (ratdata) smf_close_file( &ratdata, status );
+        if (ratdata) smf_close_file( wf, &ratdata, status );
 
       } else {
         *status = SAI__ERROR;
@@ -877,7 +877,7 @@ void smurf_calcnoise( int *status ) {
     }
 
     /* Close the smfArray */
-    smf_close_related( &concat, status );
+    smf_close_related( wf, &concat, status );
 
     /* Annul the configuration keymap. */
     if (keymap) keymap = astAnnul( keymap );
@@ -910,7 +910,7 @@ void smurf_calcnoise( int *status ) {
 
  CLEANUP:
   /* Write out the list of output NDF names, annulling the error if a null
-     parameter value is supplied. Do not attempt do this if no output files 
+     parameter value is supplied. Do not attempt do this if no output files
      were created. */
   if( *status == SAI__OK && ogrp ) {
     grpList( "OUTFILES", 0, 0, NULL, ogrp, status );
@@ -924,7 +924,7 @@ void smurf_calcnoise( int *status ) {
   if (tsgrp) grpDelet( &tsgrp, status );
   if (basegrp) grpDelet( &basegrp, status );
   if( igroup ) smf_close_smfGroup( &igroup, status );
-  if( flatramps ) smf_close_related( &flatramps, status );
+  if( flatramps ) smf_close_related( wf, &flatramps, status );
 
   ndfEnd( status );
 
@@ -933,7 +933,7 @@ void smurf_calcnoise( int *status ) {
 }
 
 static smfData *
-smf__create_bolfile_extension( const Grp * ogrp, size_t gcount,
+smf__create_bolfile_extension( ThrWorkForce *wf, const Grp * ogrp, size_t gcount,
                                const smfData *refdata, const char hdspath[],
                                const char datalabel[], const char units[],
                                int * status ) {
@@ -949,7 +949,7 @@ smf__create_bolfile_extension( const Grp * ogrp, size_t gcount,
   one_strlcat( tempfile, hdspath, sizeof(tempfile), status);
   tempgrp = grpNew( "Ratio", status );
   grpPut1( tempgrp, tempfile, 0, status );
-  smf_create_bolfile( tempgrp, 1, refdata, datalabel, units,
+  smf_create_bolfile( wf, tempgrp, 1, refdata, datalabel, units,
                       SMF__MAP_QUAL, &newdata, status );
   if (tempgrp) grpDelet( &tempgrp, status );
   return newdata;

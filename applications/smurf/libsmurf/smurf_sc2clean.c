@@ -308,7 +308,7 @@ void smurf_sc2clean( int *status ) {
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
   /* Filter out darks */
-  smf_find_science( igrp, &fgrp, 1, NULL, NULL, 1, 1, SMF__NULL, &darks,
+  smf_find_science( wf, igrp, &fgrp, 1, NULL, NULL, 1, 1, SMF__NULL, &darks,
                     &flatramps, &heateffmap, NULL, status );
 
   /* input group is now the filtered group so we can use that and
@@ -347,7 +347,7 @@ void smurf_sc2clean( int *status ) {
   parGet0l( "GAI", &writegai, status );
 
   /* Get group of bolometer masks and read them into a smfArray */
-  smf_request_mask( "BBM", &bbms, status );
+  smf_request_mask( wf, "BBM", &bbms, status );
 
   /* Group the input files by subarray and continuity ----------------------- */
   smf_grp_related( igrp, size, 1, 0, maxlen-padStart-padEnd, NULL, NULL,
@@ -433,7 +433,7 @@ void smurf_sc2clean( int *status ) {
           smf_clean_smfArray( wf, array, NULL, NULL, NULL, kmap, status );
           if( array ) {
             array->owndata = 0;
-            smf_close_related( &array, status );
+            smf_close_related( wf, &array, status );
           }
           if( kmap ) kmap = astAnnul( kmap );
 
@@ -461,9 +461,9 @@ void smurf_sc2clean( int *status ) {
             smf_stripsuffix( com->sdata[idx]->file->name,
                              SMF__DIMM_SUFFIX, filename, status );
 
-            smf_dataOrder( com->sdata[idx], 1, status );
+            smf_dataOrder( wf, com->sdata[idx], 1, status );
 
-            smf_write_smfData( com->sdata[idx], NULL, filename, NULL, 0,
+            smf_write_smfData( wf, com->sdata[idx], NULL, filename, NULL, 0,
                                NDF__NOID, MSG__NORM, 0, status );
           }
         }
@@ -475,15 +475,15 @@ void smurf_sc2clean( int *status ) {
             smf_stripsuffix( gai->sdata[idx]->file->name,
                              SMF__DIMM_SUFFIX, filename, status );
 
-            smf_dataOrder( gai->sdata[idx], 1, status );
-            smf_write_smfData( gai->sdata[idx], NULL, filename, NULL, 0,
+            smf_dataOrder( wf, gai->sdata[idx], 1, status );
+            smf_write_smfData( wf, gai->sdata[idx], NULL, filename, NULL, 0,
                                NDF__NOID, MSG__NORM, 0, status );
           }
         }
 
         /* Close com and gai */
-        if( com ) smf_close_related( &com, status );
-        if( gai ) smf_close_related( &gai, status );
+        if( com ) smf_close_related( wf, &com, status );
+        if( gai ) smf_close_related( wf, &gai, status );
 
       }
 
@@ -509,10 +509,10 @@ void smurf_sc2clean( int *status ) {
       smf_puthistory( odata, "SMURF:SC2CLEAN", status );
 
       /* Ensure ICD data order */
-      smf_dataOrder( odata, 1, status );
+      smf_dataOrder( wf, odata, 1, status );
 
       if( odata->file && odata->file->name ) {
-        smf_write_smfData( odata, NULL, NULL, ogrp, gcount, NDF__NOID,
+        smf_write_smfData( wf, odata, NULL, NULL, ogrp, gcount, NDF__NOID,
                            MSG__VERB, 0, status );
       } else {
         *status = SAI__ERROR;
@@ -526,7 +526,7 @@ void smurf_sc2clean( int *status ) {
     }
 
     /* Close the smfArray */
-    smf_close_related( &concat, status );
+    smf_close_related( wf, &concat, status );
   }
 
   /* Write out the list of output NDF names, annulling the error if a null
@@ -539,10 +539,10 @@ void smurf_sc2clean( int *status ) {
  CLEANUP:
 
   /* Tidy up after ourselves: release the resources used by the grp routines */
-  if( darks ) smf_close_related( &darks, status );
-  if( flatramps ) smf_close_related( &flatramps, status );
+  if( darks ) smf_close_related( wf, &darks, status );
+  if( flatramps ) smf_close_related( wf, &flatramps, status );
   if (heateffmap) heateffmap = smf_free_effmap( heateffmap, status );
-  if( bbms ) smf_close_related( &bbms, status );
+  if( bbms ) smf_close_related( wf, &bbms, status );
   if( igrp ) grpDelet( &igrp, status);
   if( ogrp ) grpDelet( &ogrp, status);
   if( basegrp ) grpDelet( &basegrp, status );

@@ -164,7 +164,7 @@ void smurf_fts2_spatialwcs(int* status)
     }
 
     // OPEN OUTPUT FILE AND COMPENSATE FOR FTS2 OPTICS
-    smf_open_file(outputGrp, fIndex, "UPDATE", SMF__NOTTSERIES, &outputData, status);
+    smf_open_file(NULL,outputGrp, fIndex, "UPDATE", SMF__NOTTSERIES, &outputData, status);
     if(*status != SAI__OK) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Unable to open source file!", status);
@@ -254,11 +254,11 @@ void smurf_fts2_spatialwcs(int* status)
 
     astEnd;
 
-    smf_close_file(&outputData, status);
+    smf_close_file( NULL,&outputData, status);
   }
 
   CLEANUP:
-    if(outputData) { smf_close_file(&outputData, status); }
+    if(outputData) { smf_close_file( NULL,&outputData, status); }
 
     ndfEnd(status);
 

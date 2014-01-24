@@ -272,6 +272,8 @@
 #        Add fts2gaia
 #     2013-09-04 (MS):
 #        Add low resolution bandpass parameter (in +/- mm from centre) to fts2split
+#     2013-11-10 (MS):
+#        Add optional rtsdelay parameter to compensate for RTS timing delay for FTS-2 mirror position
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -2171,6 +2173,16 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter rtsdelay {
+                type _REAL
+                access READ
+                vpath DEFAULT
+                ppath DEFAULT
+                default 0.0
+                prompt {RTS delay (ms)}
+                helpkey *
+            }
+
             parameter in {
                 position 1
                 type NDF
@@ -2651,7 +2663,7 @@ package @PACKAGE@ {
 
         }
 
-        action jsasplit {
+        action jsadicer {
             helplib {$SMURF_HELP}
 
             parameter in {
@@ -2917,6 +2929,23 @@ package @PACKAGE@ {
                 vpath INTERNAL
                 helpkey *
             }
+
+            parameter vertex_dec {
+                type _DOUBLE
+                size *
+                access READ
+                prompt {ICRS Dec at vertices (deg.s)}
+                helpkey *
+            }
+
+            parameter vertex_ra {
+                type _DOUBLE
+                size *
+                access READ
+                prompt {ICRS RA at vertices (deg.s)}
+                helpkey *
+            }
+
         }
 
         action makecube {
@@ -3197,6 +3226,14 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter poserrfatal {
+                type _LOGICAL
+                vpath DEFAULT
+                ppath DEFAULT
+                prompt {Report error if RECEPPOS and FPLANEX/Y disagree?}
+                default FALSE
+                helpkey *
+            }
             parameter ref {
                 type NDF
                 access READ
@@ -3876,13 +3913,13 @@ package @PACKAGE@ {
                 helpkey *
             }
 
-	    parameter steptime {
-                type _DOUBLE
-                access WRITE
-                vpath DEFAULT
-		default 0
-                helpkey *
-	    }
+	        parameter steptime {
+                    type _DOUBLE
+                    access WRITE
+                    vpath DEFAULT
+                    default 0
+                    helpkey *
+	        }
 
         }
 
@@ -4526,7 +4563,7 @@ package @PACKAGE@ {
                 vpath DEFAULT
                 prompt {Number of good bolometers in average power spectrum}
                 helpkey *
-		default 0
+                default 0
             }
 
             parameter out {
@@ -5712,6 +5749,14 @@ package @PACKAGE@ {
 
     command tilecutout {
         obey {python $SMURF_DIR/tilecutout.py}
+    }
+
+    command jsajoin {
+        obey {python $SMURF_DIR/jsajoin.py}
+    }
+
+    command jsasplit {
+        obey {python $SMURF_DIR/jsasplit.py}
     }
 
     icl {defhelp @PACKAGE@ $@PACKAGE_UPCASE@_HELP 0}

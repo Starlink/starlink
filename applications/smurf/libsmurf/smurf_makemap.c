@@ -734,6 +734,9 @@
 *     2013-11-25 (DSB):
 *        smf_mapbounds fast mode does not work for the JSA all-sky pixel
 *        grid since the pixels are not square.
+*     2013-11-27 (DSB):
+*        Ensure the NTILE parameter is written before the OUT parameter is
+*        accessed (unless JSA tiles are being created).
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -923,7 +926,7 @@ void smurf_makemap( int *status ) {
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
   /* Filter out darks */
-  smf_find_science( igrp, &fgrp, 0, NULL, NULL, 1, 1, SMF__NULL, &darks,
+  smf_find_science( wf, igrp, &fgrp, 0, NULL, NULL, 1, 1, SMF__NULL, &darks,
                     &flatramps, &heateffmap, &meanstep, status );
 
   /*** TIMER ***/
@@ -955,7 +958,7 @@ void smurf_makemap( int *status ) {
   }
 
   /* Get group of bolometer masks and read them into a smfArray */
-  smf_request_mask( "BBM", &bbms, status );
+  smf_request_mask( wf, "BBM", &bbms, status );
 
   /* Get the celestial coordinate system for the output map */
   parChoic( "SYSTEM", "TRACKING", "TRACKING,FK5,ICRS,AZEL,GALACTIC,"
@@ -1148,6 +1151,14 @@ void smurf_makemap( int *status ) {
   /* See if output NDFs are to be trimmed to exclude bad borders. */
   parGet0l( "TRIM", &trim, status );
 
+  /* If known, write the number of tiles being created to an output
+     parameter. We do it here if possible so that a valid value is
+     available to subsequent commands even if a null value is supplied
+     for "OUT". But we cannot do it here if we are creating JSA tiles
+     since we only know how many JSA tiles are being created once the
+     cube has been created. */
+  if( !jsatiles ) parPut0i( "NTILE", ntile, status );
+
   /* Create a new group to hold the names of the output NDFs that have been
      created. This group does not include any NDFs that correspond to tiles
      that contain no input data. */
@@ -1260,7 +1271,7 @@ void smurf_makemap( int *status ) {
       /* Create the 2D output NDF for this tile. */
       smfflags = 0;
       smfflags |= SMF__MAP_VAR;
-      smf_open_newfile ( ogrp, iout++, SMF__DOUBLE, 2, tile->elbnd, tile->eubnd,
+      smf_open_newfile ( NULL, ogrp, iout++, SMF__DOUBLE, 2, tile->elbnd, tile->eubnd,
                          smfflags, &odata, status );
 
       /* Abort if an error has occurred. */
@@ -1350,7 +1361,7 @@ void smurf_makemap( int *status ) {
         if( !pt || pt[ 0 ] < VAL__MAXI ) {
 
           /* Read data from the ith input file in the group */
-          smf_open_and_flatfield( tile->grp, NULL, ifile, darks, flatramps,
+          smf_open_and_flatfield( wf, tile->grp, NULL, ifile, darks, flatramps,
                                   heateffmap, &data,status );
 
           /* Check that the data dimensions are 3 (for time ordered data) */
@@ -1403,7 +1414,7 @@ void smurf_makemap( int *status ) {
           smf_update_valbad( data, SMF__NUL, NULL, 0, 0, SMF__Q_GOOD, status );
 
           /* Mask out bad bolometers - mask data array not quality array */
-          smf_apply_mask( data, bbms, SMF__BBM_DATA, 0, status );
+          smf_apply_mask( wf, data, bbms, SMF__BBM_DATA, 0, status );
 
           /* Rebin the data onto the output grid. This also closes the
              data file.  */
@@ -1573,7 +1584,7 @@ void smurf_makemap( int *status ) {
     /************************* I T E R A T E *************************************/
 
     smfflags = SMF__MAP_VAR | SMF__MAP_QUAL;
-    smf_open_newfile ( ogrp, 1, SMF__DOUBLE, 2, lbnd_out, ubnd_out, smfflags,
+    smf_open_newfile ( wf, ogrp, 1, SMF__DOUBLE, 2, lbnd_out, ubnd_out, smfflags,
                        &odata, status );
 
     if ( *status == SAI__OK ) {
@@ -1741,7 +1752,7 @@ void smurf_makemap( int *status ) {
        history information and provenance can now be stored in the output.
        Loop over all input data files to setup provenance handling */
     for(i=1; (i<=size) && ( *status == SAI__OK ); i++ ) {
-      smf_open_file( igrp, i, "READ", SMF__NOCREATE_DATA, &data, status );
+      smf_open_file( wf, igrp, i, "READ", SMF__NOCREATE_DATA, &data, status );
       if( *status != SAI__OK) {
         msgSeti("I",i);
         msgSeti("S",size);
@@ -1757,7 +1768,7 @@ void smurf_makemap( int *status ) {
       smf_fits_outhdr( data->hdr->fitshdr, &fchan, status );
 
       /* close the input file */
-      smf_close_file( &data, status );
+      smf_close_file( wf, &data, status );
     }
 
     /* Flush the provenance */
@@ -1877,9 +1888,9 @@ void smurf_makemap( int *status ) {
        closing the file, to avoid any chance of the changes introduced by
        smf_add_spectral_axis upsetting the behaviour of smf_close_file. */
     ndfClone( ondf, &tndf, status );
-    smf_close_file ( &tdata, status );
-    smf_close_file ( &wdata, status );
-    smf_close_file ( &odata, status );
+    smf_close_file ( wf, &tdata, status );
+    smf_close_file ( wf, &wdata, status );
+    smf_close_file ( wf, &odata, status );
 
     /* If required trim any remaining bad borders. Note, this will
        unmap the NDF, but we do not need access to the data arrays
@@ -1895,7 +1906,7 @@ void smurf_makemap( int *status ) {
     if( jsatiles ) {
        parGet0l( "TRIMTILES", &trimtiles, status );
        grpSetsz( igrp4, 0, status );
-       smf_jsasplit( tndf, oname, trimtiles, SMF__INST_NONE, &njsatile,
+       smf_jsadicer( tndf, oname, trimtiles, SMF__INST_NONE, &njsatile,
                      igrp4, status );
        ndfDelet( &tndf, status );
     } else {
@@ -1918,8 +1929,9 @@ void smurf_makemap( int *status ) {
     if( *status == PAR__NULL ) errAnnul( status );
   }
 
-  /* Write the number of tiles being created to an output parameter. */
-  parPut0i( "NTILE", jsatiles ? njsatile : ntile, status );
+  /* Write the number of tiles being created to an output parameter,
+     unless it was written earlier. */
+  if( jsatiles ) parPut0i( "NTILE", njsatile, status );
 
   /* Arrive here if no output NDF is being created. */
  L998:;
@@ -1933,10 +1945,10 @@ void smurf_makemap( int *status ) {
   if( ogrp != NULL ) grpDelet( &ogrp, status);
   boxes = astFree( boxes );
   if( tiles ) tiles = smf_freetiles( tiles, ntile, status );
-  if( darks ) smf_close_related( &darks, status );
-  if( flatramps ) smf_close_related( &flatramps, status );
+  if( darks ) smf_close_related( wf, &darks, status );
+  if( flatramps ) smf_close_related( wf, &flatramps, status );
   if (heateffmap) heateffmap = smf_free_effmap( heateffmap, status );
-  if( bbms ) smf_close_related( &bbms, status );
+  if( bbms ) smf_close_related( wf, &bbms, status );
   if( keymap ) keymap = astAnnul( keymap );
 
   ndfEnd( status );

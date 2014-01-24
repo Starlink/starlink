@@ -13,7 +13,6 @@
 *     Library routine
 
 *  Invocation:
-
 *     smf_filter2d_execute( ThrWorkForce *wf, smfData *data, smfFilter *filt,
 *                           int complement, int *status )
 
@@ -180,7 +179,7 @@ void smf_filter2d_execute( ThrWorkForce *wf, smfData *data, smfFilter *filt,
      since this will get us a useful container of the correct dimensions
      for the squared filter */
   if( data->pntr[1] ) {
-    varfilt = smf_deepcopy_smfData( fdata, 0, SMF__NOCREATE_VARIANCE |
+    varfilt = smf_deepcopy_smfData( wf, fdata, 0, SMF__NOCREATE_VARIANCE |
                                     SMF__NOCREATE_QUALITY |
                                     SMF__NOCREATE_FILE |
                                     SMF__NOCREATE_DA, 0, 0, status );
@@ -252,7 +251,7 @@ void smf_filter2d_execute( ThrWorkForce *wf, smfData *data, smfFilter *filt,
     }
 
     realfilter = smf_fft_data( wf, varfilt, NULL, 1, 0, status );
-    smf_close_file( &varfilt, status );
+    smf_close_file( wf, &varfilt, status );
 
     /* Square each element of the real-space filter and then transform
        back to the frequency domain and stuff into a smfFilter
@@ -291,7 +290,7 @@ void smf_filter2d_execute( ThrWorkForce *wf, smfData *data, smfFilter *filt,
     }
 
     /* Now stuff the variance array into a smfData and filter it. */
-    vardata = smf_deepcopy_smfData( data, 0, SMF__NOCREATE_VARIANCE |
+    vardata = smf_deepcopy_smfData( wf, data, 0, SMF__NOCREATE_VARIANCE |
                                     SMF__NOCREATE_QUALITY |
                                     SMF__NOCREATE_FILE |
                                     SMF__NOCREATE_DA, 0, 0, status );
@@ -309,8 +308,8 @@ void smf_filter2d_execute( ThrWorkForce *wf, smfData *data, smfFilter *filt,
     }
 
     /* Clean up */
-    if( realfilter ) smf_close_file( &realfilter, status );
-    if( vardata ) smf_close_file( &vardata, status );
+    if( realfilter ) smf_close_file( wf, &realfilter, status );
+    if( vardata ) smf_close_file( wf, &vardata, status );
     if( vfilt ) {
       vfilt->real = NULL;
       vfilt->imag = NULL;
@@ -324,7 +323,7 @@ void smf_filter2d_execute( ThrWorkForce *wf, smfData *data, smfFilter *filt,
   if( complement == -1 ) smf_filter_complement( filt, status );
 
   /* Clean up */
-  if( varfilt ) smf_close_file( &varfilt, status );
-  if( fdata ) smf_close_file( &fdata, status );
+  if( varfilt ) smf_close_file( wf, &varfilt, status );
+  if( fdata ) smf_close_file( wf, &fdata, status );
 
 }

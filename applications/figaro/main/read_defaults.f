@@ -23,9 +23,6 @@
 *        (include file opt_cmn)
 *        USEPEAK = LOGICAL (Given)
 *        (include file opt_cmn)
-* Variables
-*        CONTEXT = INTEGER
-*          From find_file
 * Subroutines/functions referenced:
 *
 * Author:
@@ -34,6 +31,7 @@
 *   T.D.C.Ash, RAL, Starlink
 *   A.C. Davenhall, Starlink, Edinburgh.
 *   Malcolm J Currie, RAL, Starlink
+*   Tim Jenness
 *
 * History:
 *   TNW: 4-OCT-1990 Original version
@@ -52,10 +50,10 @@
 *        exceeded.
 *   ACD: 28/9/00 Remove local unused variables.
 *   MJC: 2004 July 23 Initialised READVARS array.
+*   TJ: 2013 Dec 4 Remove unused find_file call
 *-
       implicit none
       integer ival
-      integer context
       character*100 name
       integer status,pstat,i,j,ndim,dims(2)
 C      integer len1
@@ -77,7 +75,6 @@ C      integer find_file
 *
 
       status = 0
-      context = 0
 
       CALL PSX_GETENV( 'FIG_DIR', BINPATH, STATUS)
 
@@ -93,14 +90,6 @@ C      integer find_file
 *      newpath = binpath(1:spacepos)//'/twodspec_defaults.dst'
       newpath = binpath(1:spacepos)//'/twodspec_defaults'
 
-
-*     Returns 1 if o.k.
-*      status = find_file(newpath,name,context)
-*      i=1
-*      do while(name(i:i).NE.' ')
-*       i=i+1
-*      enddo
-*      spacepos=i-1-4
 
       name=newpath
       status = 0

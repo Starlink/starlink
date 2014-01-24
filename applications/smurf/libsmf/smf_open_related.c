@@ -13,11 +13,13 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     smf_open_related( const smfGroup *group, const dim_t subindex,
-*                       const char *accmode, smfArray **relfiles,
-*                       int *status );
+*     smf_open_related( ThrWorkForce *wf, const smfGroup *group,
+*                       const dim_t subindex, const char *accmode,
+*                       smfArray **relfiles, int *status );
 
 *  Arguments:
+*     wf = ThrWorkForce * (Given)
+*        Pointer to a pool of worker threads
 *     group = const smfGroup* (Given)
 *        Input smfGroup
 *     subindex = const dim_t (Given)
@@ -57,6 +59,8 @@
 *        Use dim_t for subindex
 *     2011-02-10 (COBA):
 *        Changed data type of indices and subgroups from dim_t to size_t
+*     2014-01-10 (DSB):
+*        Added argument wf.
 
 *  Copyright:
 *     Copyright (C) 2006 University of British Columbia.  All Rights
@@ -98,6 +102,7 @@
 #include "ndf.h"
 #include "star/ndg.h"
 #include "star/grp.h"
+#include "star/thr.h"
 #include "msg_par.h"
 
 /* SMURF routines */
@@ -107,9 +112,9 @@
 
 #define FUNC_NAME "smf_open_related"
 
-void smf_open_related ( const smfGroup *group, const dim_t subindex,
-                        const char *accmode, smfArray **relfiles,
-                        int *status ) {
+void smf_open_related ( ThrWorkForce *wf, const smfGroup *group,
+                        const dim_t subindex, const char *accmode,
+                        smfArray **relfiles, int *status ) {
 
   /* Local variables */
   smfData *data = NULL;      /* Data struct for file */
@@ -138,7 +143,7 @@ void smf_open_related ( const smfGroup *group, const dim_t subindex,
     index = indices[i];
     /* Open file with this index and add to smfArray */
     if ( index != 0 ) {
-      smf_open_file( grp, index, accmode, 0, &data, status );
+      smf_open_file( wf, grp, index, accmode, 0, &data, status );
       smf_addto_smfArray( *relfiles, data, status );
     }
   }

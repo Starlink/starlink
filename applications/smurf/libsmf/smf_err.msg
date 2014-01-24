@@ -24,5 +24,6 @@ BADFLAT    <Bad flatfield data>
 NOSCI      <No science data found>
 TELSTAT    <Telescope is stationary>
 BADFIT     <Fit failed>
+RCPPOS     <Inconsistent RECEPPOS detectors posisitions>
 
 .END

@@ -417,6 +417,12 @@
 *        model have been done.
 *     2013-10-25 (AGM):
 *        Allocate extra memory for maps for alternate rebinning scheme
+*     2014-08-01 (DSB):
+*        - Allow LUT model to be exported.
+*        - Undo COM as a separate step at start of each iteration.
+*     2014-01-16 (DSB):
+*        Do not allocate models to hold AST since the astronomical signal is
+*        determined from the current map.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -882,7 +888,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           localmap->hdr->wcs = NULL;
         }
 
-        if( localmap ) smf_close_file( &localmap, status );
+        if( localmap ) smf_close_file( wf, &localmap, status );
       }
 
       msgOutf( "", FUNC_NAME
@@ -902,13 +908,13 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
     }
 
     /* Obtain sample length from header of first file in igrp */
-    smf_open_file( igrp, 1, "READ", SMF__NOCREATE_DATA, &data, status );
+    smf_open_file( wf, igrp, 1, "READ", SMF__NOCREATE_DATA, &data, status );
     if( (*status == SAI__OK) && (data->hdr) ) {
         steptime = data->hdr->steptime;
     } else {
         steptime = -1;
     }
-    smf_close_file( &data, status );
+    smf_close_file( wf, &data, status );
 
     /* Maximum length of a continuous chunk */
     if( *status == SAI__OK ) {
@@ -932,8 +938,8 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       /* Allocate modeltyps */
       if( nmodels >= 1 ) {
         modeltyps = astCalloc( nmodels, sizeof(*modeltyps) );
-        /* Extra components for exportNDF_which for 'res', 'qua' */
-        exportNDF_which = astCalloc( nmodels+2, sizeof(*exportNDF_which) );
+        /* Extra components for exportNDF_which for 'res', 'qua' and 'lut' */
+        exportNDF_which = astCalloc( nmodels+3, sizeof(*exportNDF_which) );
       } else {
         msgOut(" ", FUNC_NAME ": No valid models in MODELORDER",
                status );
@@ -1040,6 +1046,12 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                 exportNDF_which[nmodels]=1;
               }
             }
+          }
+
+          /* If the model type is 'lut' handle it here */
+          if( thismodel == SMF__LUT ) {
+            exportNDF = 1;
+            exportNDF_which[nmodels+2]=1;
           }
 
           /* If the model type is 'qua' handle it here */
@@ -1557,7 +1569,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                smf_filter_mce( filt, 1, status );
              }
 
-             smf_update_quality( res[0]->sdata[idx], 1, NULL, 0, 0.05, status );
+             smf_update_quality( wf, res[0]->sdata[idx], 1, NULL, 0, 0.05, status );
              smf_filter_execute( wf, res[0]->sdata[idx], filt, 0, 0, status );
 
              filt = smf_free_smfFilter( filt, status );
@@ -1618,7 +1630,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         /* Ensure all bad values in the pre-cleaned data have a bad
            quality. */
         for( idx=0; idx<res[0]->ndat; idx++ ) {
-           smf_update_quality( res[0]->sdata[idx], 1, NULL, 0, 0.25, status );
+           smf_update_quality( wf, res[0]->sdata[idx], 1, NULL, 0, 0.25, status );
         }
 
         msgOut( "", FUNC_NAME ": *** Warning *** doclean=0, "
@@ -1656,8 +1668,11 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
       for( imodel = 0; imodel < nmodels; imodel++ ) {
 
-        /* Don't do SMF__LUT or SMF__EXT as they were handled earlier */
-        if( (modeltyps[imodel] != SMF__LUT) && (modeltyps[imodel] != SMF__EXT) ) {
+        /* Don't do SMF__LUT or SMF__EXT as they were handled earlier.
+           Also we do not need to allocate models to hold SMF__AST as the
+           AST values are calculated on-the-fly from the current map.  */
+        if( (modeltyps[imodel] != SMF__LUT) && (modeltyps[imodel] != SMF__EXT) &&
+            (modeltyps[imodel] != SMF__AST) ) {
           smf_model_create( wf, NULL, res, darks, bbms, flatramps, heateffmap,
                             noisemaps, 1, modeltyps[imodel], 0, NULL, 0, NULL, NULL,
                             NO_FTS, NULL, model[imodel], keymap,
@@ -1765,7 +1780,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       /* We can close noisemaps here because they will already have
          been used to initialize the NOI model if needed. */
 
-      if( noisemaps ) smf_close_related( &noisemaps, status );
+      if( noisemaps ) smf_close_related( wf, &noisemaps, status );
 
       /* Allow an initial guess at the sky brightness to be supplied, in
          which case copy it into "thismap", sample it and subtract it from
@@ -1885,16 +1900,16 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
               /* Use the correct order */
               oldorder = res[0]->sdata[idx]->isTordered;
-              smf_dataOrder( res[0]->sdata[idx], 1, status );
-              smf_dataOrder( qua[0]->sdata[idx], 1, status );
+              smf_dataOrder( wf, res[0]->sdata[idx], 1, status );
+              smf_dataOrder( wf, qua[0]->sdata[idx], 1, status );
 
-              smf_write_smfData( res[0]->sdata[idx], NULL,
+              smf_write_smfData( wf, res[0]->sdata[idx], NULL,
                                  name, NULL, 0, NDF__NOID,
                                  MSG__VERB, 0, status );
 
               /* Revert the order */
-              smf_dataOrder( res[0]->sdata[idx], oldorder, status );
-              smf_dataOrder( qua[0]->sdata[idx], oldorder, status );
+              smf_dataOrder( wf, res[0]->sdata[idx], oldorder, status );
+              smf_dataOrder( wf, qua[0]->sdata[idx], oldorder, status );
             }
           }
         }
@@ -1921,14 +1936,24 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
             j = k%nmodels;
 
             /* If this is the first model component and not the first
-               iteration, we need to undo some models (EXT, GAI, FLT ).
+               iteration, we need to undo some models (COM, GAI, EXT, FLT ).
                Undo them in the reverse order to which they were done. */
 
             if( (j==0) && !firstiter ) {
               dim_t jj = whichast - 1;
               while( jj != whichast ) {
 
-                if( jj == whichext && haveext ) {
+                if( jj == whichcom && havecom ) {
+                  msgOutiff( MSG__VERB, "",
+                             "  ** undoing COM from previous iteration",
+                             status );
+                  smf_calcmodel_com( wf, &dat, 0, keymap, model[whichcom],
+                                     SMF__DIMM_INVERT, status );
+                  msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
+                             ": ** %f s undoing COM",
+                             status, smf_timerupdate(&tv1,&tv2,status) );
+
+                } else if( jj == whichext && haveext ) {
                   msgOutiff( MSG__VERB, "",
                              "  ** undoing EXTinction from previous iteration",
                              status );
@@ -2030,7 +2055,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         if( *status == SAI__OK ) {
 
           /* Ensure we use the RES model ordering */
-          smf_model_dataOrder( &dat, NULL, 0, SMF__RES|SMF__LUT|SMF__QUA,
+          smf_model_dataOrder( wf, &dat, NULL, 0, SMF__RES|SMF__LUT|SMF__QUA,
                                res[0]->sdata[0]->isTordered, status );
 
           /* Loop over subgroup index (subarray), placing last map
@@ -2471,7 +2496,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       if( bolomap || shortmap || sampcube ) {
 
         /* Ensure we use the RES model ordering. */
-        smf_model_dataOrder( &dat, NULL, 0, SMF__RES|SMF__LUT|SMF__QUA,
+        smf_model_dataOrder( wf, &dat, NULL, 0, SMF__RES|SMF__LUT|SMF__QUA,
                              res[0]->sdata[0]->isTordered, status );
 
         for( idx=0; (idx<res[0]->ndat)&&(*status==SAI__OK); idx++ ){
@@ -2537,7 +2562,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
          land in each pixel */
 
       if( sampcube ) {
-        smf_write_sampcube( res[0], lut[0], qua[0], &dat, thishits,
+        smf_write_sampcube( wf, res[0], lut[0], qua[0], &dat, thishits,
                             samprootgrp, contchunk, lbnd_out, ubnd_out,
                             status );
 
@@ -2552,7 +2577,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       if( bolomap || shortmap || sampcube ) {
 
         /* Ensure we use the RES model ordering.  */
-        smf_model_dataOrder( &dat, NULL, 0, SMF__RES|SMF__LUT|SMF__QUA,
+        smf_model_dataOrder( wf, &dat, NULL, 0, SMF__RES|SMF__LUT|SMF__QUA,
                              res[0]->sdata[0]->isTordered, status );
 
         for( idx=0; (idx<res[0]->ndat)&&(*status==SAI__OK); idx++ ){
@@ -2580,7 +2605,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       /* Create maps indicating locations of flags matching bitmask */
 
       if( flagmap ) {
-        smf_write_flagmap( flagmap, lut[0], qua[0], &dat, flagrootgrp,
+        smf_write_flagmap( wf, flagmap, lut[0], qua[0], &dat, flagrootgrp,
                            contchunk, lbnd_out, ubnd_out, outfset, status );
         /*** TIMER ***/
         msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
@@ -2616,8 +2641,6 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
 
       /* Export DIMM model components to NDF files.
-         Note that we don't do LUT since it is originally an extension in the
-         input flatfielded data.
          Also - check that a filename is defined in the smfFile! */
 
       if( exportNDF && ((*status == SAI__OK) || (*status == SMF__INSMP)) ) {
@@ -2634,9 +2657,9 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
            SMF__Q_BADB flag is encountered (if requested), and
            export */
         for( idx=0; idx<res[0]->ndat; idx++ ) {
-          smf_dataOrder( qua[0]->sdata[idx], 1, status );
-          smf_dataOrder( res[0]->sdata[idx], 1, status );
-          smf_dataOrder( lut[0]->sdata[idx], 1, status );
+          smf_dataOrder( wf, qua[0]->sdata[idx], 1, status );
+          smf_dataOrder( wf, res[0]->sdata[idx], 1, status );
+          smf_dataOrder( wf, lut[0]->sdata[idx], 1, status );
 
           /* Get quality array strides for smf_update_valbad */
           smf_get_dims( qua[0]->sdata[idx], NULL, NULL, &nbolo, &ntslice,
@@ -2647,8 +2670,8 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
             /* Check for existence of the model for this subarray - in
                some cases, like COM, there is only a file for one subarray,
                unlike RES from which the range of idx is derived */
-            if( model[j][0]->sdata[idx] ) {
-              smf_dataOrder( model[j][0]->sdata[idx], 1, status );
+            if( (modeltyps[j] != SMF__AST) && model[j][0]->sdata[idx] ) {
+              smf_dataOrder( wf, model[j][0]->sdata[idx], 1, status );
               if( *status == SMF__WDIM ) {
                 /* fails if not 3-dimensional data. Just annul and write out
                    data as-is. */
@@ -2680,7 +2703,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                                      NULL, 0, 0, SMF__Q_BADB, status );
                 }
 
-                smf_write_smfData( res[0]->sdata[idx],
+                smf_write_smfData( wf, res[0]->sdata[idx],
                                    (havenoi && exportNDF_which[whichnoi]) ?
                                    dat.noi[0]->sdata[idx] : NULL,
                                    name, NULL, 0, NDF__NOID,
@@ -2688,6 +2711,28 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
               } else {
                 msgOut( " ",
                         "SMF__ITERATEMAP: Can't export RES -- NULL filename",
+                        status);
+              }
+            }
+
+
+          /* LUT is stored in a separate NDF. */
+            lut_data = (lut[0]->sdata[idx]->pntr)[0];
+
+            if( exportNDF_which[nmodels+2] ) {
+              if( (res[0]->sdata[idx]->file->name)[0] ) {
+
+                smf_model_createHdr( lut[0]->sdata[idx], SMF__RES, refdata,
+                                     status );
+                smf_stripsuffix( res[0]->sdata[idx]->file->name,
+                                 SMF__DIMM_SUFFIX, name, status );
+                one_strlcat( name, "_lut", SMF_PATH_MAX+1, status );
+
+                smf_write_smfData( wf, lut[0]->sdata[idx], NULL, name, NULL, 0,
+                                   NDF__NOID, MSG__VERB, 0, status );
+              } else {
+                msgOut( " ",
+                        "SMF__ITERATEMAP: Can't export LUT -- NULL filename",
                         status);
               }
             }
@@ -2755,11 +2800,11 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                 }
 
                 /* Export AST */
-                smf_write_smfData( ast, NULL, name, NULL, 0, NDF__NOID,
+                smf_write_smfData( wf, ast, NULL, name, NULL, 0, NDF__NOID,
                                    MSG__VERB, 0, status );
 
                 /* Clean up */
-                smf_close_file( &ast, status );
+                smf_close_file( wf, &ast, status );
               } else {
                 msgOut( " ",
                         "SMF__ITERATEMAP: Can't export AST -- NULL filename",
@@ -2826,13 +2871,13 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                   kmap = astAnnul( kmap );
                 }
 
-                smf_write_smfData( model[j][0]->sdata[idx], NULL,
+                smf_write_smfData( wf, model[j][0]->sdata[idx], NULL,
                                    name, NULL, 0, NDF__NOID,
                                    MSG__VERB, single, status );
 
                 /* if we had temporary quality free it */
                 if ( modeltyps[j] == SMF__COM && qua_data ) {
-                  smf_close_file( &(model[j][0]->sdata[idx]->sidequal),
+                  smf_close_file( wf, &(model[j][0]->sdata[idx]->sidequal),
                                   status );
                 }
 
@@ -2859,6 +2904,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       dat.ast_mask = astFree( dat.ast_mask );
       dat.com_mask = astFree( dat.com_mask );
       dat.flt_mask = astFree( dat.flt_mask );
+      dat.initqual = astFree( dat.initqual );
     }
 
 #ifdef __ITERATEMAP_SHOW_MEM
@@ -2891,7 +2937,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
       /* Remember how many chunks failed due to lack of samples */
       count_minsmp++;
-    } else {
+    } else if( *status == SAI__OK ){
 
       /* In the multiple contchunk case, add this map to the total if
          we got here with clean status. First get the weight for this
@@ -2913,8 +2959,8 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       if( ncontchunks > 1 ) {
         msgOut( " ", FUNC_NAME ": Adding map estimated from this continuous"
                 " chunk to total", status);
-        smf_addmap1( map, mapweights, weights, hitsmap, mapvar, mapqual,
-                     thismap, thisweight, thishits, thisvar, thisqual,
+        smf_addmap1( contchunk, map, mapweights, weights, hitsmap, mapvar,
+                     mapqual, thismap, thisweight, thishits, thisvar, thisqual,
                      msize, chunkweight, status );
       }
 
@@ -2944,17 +2990,17 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
     /* fixed model smfArrays */
     if( res ) {
-      if( res[0] ) smf_close_related( &res[0], status );
+      if( res[0] ) smf_close_related( wf, &res[0], status );
       res = astFree( res );
     }
 
     if( lut ) {
-      if( lut[0] ) smf_close_related( &lut[0], status );
+      if( lut[0] ) smf_close_related( wf, &lut[0], status );
       lut = astFree( lut );
     }
 
     if( qua ) {
-      if( qua[0] ) smf_close_related( &qua[0], status );
+      if( qua[0] ) smf_close_related( wf, &qua[0], status );
       qua = astFree( qua );
     }
 
@@ -2964,7 +3010,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         if( model[imodel] ) {
 
           /* Close each model component smfArray */
-          if( model[imodel][0] ) smf_close_related( &(model[imodel][0]), status );
+          if( model[imodel][0] ) smf_close_related( wf, &(model[imodel][0]), status );
 
           /* Free array of smfArray pointers for this model */
           model[imodel] = astFree( model[imodel] );
@@ -3051,7 +3097,6 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   lastmap = astFree( lastmap );
   mapchange = astFree( mapchange );
   job_data = astFree( job_data );
-  dat.initqual = astFree( dat.initqual );
 
   /* Ensure that FFTW doesn't have any used memory kicking around */
   fftw_cleanup();

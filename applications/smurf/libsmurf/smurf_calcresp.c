@@ -160,7 +160,7 @@ void smurf_calcresp( int *status ) {
 
 
     /* We do *not* need the data array itself, just flatfield information */
-    smf_open_file( igrp, i, "READ", SMF__NOCREATE_DATA, &idata, status);
+    smf_open_file( NULL, igrp, i, "READ", SMF__NOCREATE_DATA, &idata, status);
 
     /* Abort if we have no flatfield information */
     if (*status == SAI__OK && ! idata->da ) {
@@ -172,12 +172,12 @@ void smurf_calcresp( int *status ) {
     /* Abort if we had trouble. Alternative is to loop round to the next file but
        it is safer to tell people there is a problem */
     if (*status != SAI__OK) {
-      if (idata) smf_close_file( &idata, status );
+      if (idata) smf_close_file( NULL, &idata, status );
       break;
     }
 
     /* Create an output responsivity file. */
-    smf_create_bolfile( ogrp, i, idata, "Responsivity", "A/W", SMF__MAP_VAR, &respmap, status );
+    smf_create_bolfile( NULL, ogrp, i, idata, "Responsivity", "A/W", SMF__MAP_VAR, &respmap, status );
 
     /* "bolref" and "powref" written by CALCFLAT correspond to parameters
        "flatcal" and "flatpar" in sc2store_wrtstream. */
@@ -189,8 +189,8 @@ void smurf_calcresp( int *status ) {
       smf_flat_smfData( idata, &flatmethod, &refres, &powval, &bolval, status );
       ngood[i-1] = smf_flat_responsivity( flatmethod, respmap, snrmin, 1, powval, bolval,
                                           refres, NULL, status );
-      if (powval) smf_close_file( &powval, status );
-      if (bolval) smf_close_file( &bolval, status );
+      if (powval) smf_close_file( NULL, &powval, status );
+      if (bolval) smf_close_file( NULL, &bolval, status );
 
       /* Report the number of good responsivities */
       if (flatmethod == SMF__FLATMETH_TABLE) {
@@ -205,8 +205,8 @@ void smurf_calcresp( int *status ) {
     }
 
     /* close files */
-    if (idata) smf_close_file( &idata, status );
-    if (respmap) smf_close_file( &respmap, status );
+    if (idata) smf_close_file( NULL, &idata, status );
+    if (respmap) smf_close_file( NULL, &respmap, status );
 
   }
 

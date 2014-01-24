@@ -1101,6 +1101,10 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 *        - Ensure PurgeWcs removes WCS cards even if an error occurs when
 *        reading FrameSets from the FitsChan.
 *        - Change IsMapTab1D to improve chances of a -TAB mapping being found.
+*     6-JAN-2014 (DSB):
+*        - Allow default options for newly created FitsChans to be
+*        specified by the FITSCHAN_OPTIONS environment variable.
+*        - Ensure the used CarLin value is not changed by a trailing frequency axis.
 *class--
 */
 
@@ -7392,7 +7396,7 @@ static void CreateKeyword( AstFitsChan *this, const char *name,
 /* Copy the name supplied into the output array, converting to upper
    case. Leave space for two characters to encode a sequence
    number. Terminate the resulting string. */
-   for( nc = 0; name[ nc ] && ( nc < ( FITSNAMLEN - 2 ) ); nc++ ) {
+   for( nc = 0; ( nc < ( FITSNAMLEN - 2 ) ) && name[ nc ]; nc++ ) {
       keyword[ nc ] = toupper( name[ nc ] );
    }
    keyword[ nc ] = '\0';
@@ -33173,21 +33177,6 @@ static AstMapping *WcsCelestial( AstFitsChan *this, FitsStore *store, char s,
          Warn( this, "noctype", buf, method, class, status );
       } else {
 
-/* Find the projection type as specified by the last 4 characters
-   in the CTYPE keyword value. AST__WCSBAD is stored in "prj" if the
-   last 4 characters do not specify a known WCS projection, but no error
-   is reported. Assume simple linear axes if no projection code is
-   supplied. Note, AST__WCSBAD is used to indicate a TAB header. */
-         ctlen = strlen( ctype );
-         if( ctlen > 4 ) {
-            prj = astWcsPrjType( ctype + ctlen - 4 );
-         } else if( tabmap && *tabmap ) {
-            prj = AST__WCSBAD;
-         } else {
-            prj = AST__CAR;
-            carlin = 1;
-         }
-
 /* See if this is a longitude axis (e.g. if the first 4 characters of CTYPE
    are "RA--" or "xLON" or "yzLN" ). If so, store the value of "x" or "yz"
    (or "EQU" for equatorial coordinates) in variable "type" to indicate which
@@ -33215,6 +33204,21 @@ static AstMapping *WcsCelestial( AstFitsChan *this, FitsStore *store, char s,
 
 /* Check that this is the first longitude axis to be found. */
             if( axlon == -1 ){
+
+/* Find the projection type as specified by the last 4 characters
+   in the CTYPE keyword value. AST__WCSBAD is stored in "prj" if the
+   last 4 characters do not specify a known WCS projection, but no error
+   is reported. Assume simple linear axes if no projection code is
+   supplied. Note, AST__WCSBAD is used to indicate a TAB header. */
+               ctlen = strlen( ctype );
+               if( ctlen > 4 ) {
+                  prj = astWcsPrjType( ctype + ctlen - 4 );
+               } else if( tabmap && *tabmap ) {
+                  prj = AST__WCSBAD;
+               } else {
+                  prj = AST__CAR;
+                  carlin = 1;
+               }
 
 /* Report an error if the projection is unknown. */
                if( prj == AST__WCSBAD && ctlen > 4 ){
@@ -33261,6 +33265,16 @@ static AstMapping *WcsCelestial( AstFitsChan *this, FitsStore *store, char s,
          }
          if( gotax ){
             if( axlat == -1 ){
+               ctlen = strlen( ctype );
+               if( ctlen > 4 ) {
+                  prj = astWcsPrjType( ctype + ctlen - 4 );
+               } else if( tabmap && *tabmap ) {
+                  prj = AST__WCSBAD;
+               } else {
+                  prj = AST__CAR;
+                  carlin = 1;
+               }
+
                if( prj == AST__WCSBAD && ctlen > 4 ){
                   astError( AST__BDFTS, "%s(%s): FITS keyword '%s' refers to "
                         "an unknown projection type '%s'.", status, method, class,
@@ -39788,10 +39802,7 @@ astMAKE_TEST(FitsChan,TabOK,( this->tabok != -INT_MAX ))
 *     coordinates to celestial coordinates is a simple linear transformation
 *     (hence the attribute name "CarLin"). This is appropriate for some older
 *     FITS data which claims to have a "CAR" projection, but which in fact do
-*     not conform to the conventions of the FITS-WCS paper. Furthermore, if
-*     CarLin is non-zero, it is assumed that CDELT and CD keywords are
-*     in units of degrees rather than radians (as required by the
-*     FITS-WCS papers).
+*     not conform to the conventions of the FITS-WCS paper.
 *
 *     The FITS-WCS paper specifies that headers which include a CAR projection
 *     represent a linear mapping from pixel coordinates to "native spherical
@@ -40988,6 +40999,9 @@ c        order to supply values to be substituted for these
 c        specifiers. The rules for supplying these are identical to
 c        those for the astSet function (and for the C "printf"
 c        function).
+*
+*        Note, the FITSCHAN_OPTIONS environment variable may be used
+*        to specify default options for all newly created FitsChans.
 f     STATUS = INTEGER (Given and Returned)
 f        The global status.
 
@@ -41045,6 +41059,10 @@ f     pointer.
    if ( astOK ) {
       class_init = 1;
 
+/* Apply any default options specified by "<class>_OPTIONS" environment
+   variable. */
+      astEnvSet( new );
+
 /* Obtain the variable argument list and pass it along with the
    options string to the astVSet method to initialise the new
    FitsChan's attributes. */
@@ -41059,6 +41077,7 @@ f     pointer.
 /* Return a pointer to the new FitsChan. */
    return new;
 }
+
 AstFitsChan *astFitsChanId_( const char *(* source)( void ),
                              void (* sink)( const char * ),
                              const char *options, ... ) {
@@ -41131,6 +41150,10 @@ AstFitsChan *astFitsChanId_( const char *(* source)( void ),
    if ( astOK ) {
       class_init = 1;
 
+/* Apply any default options specified by "<class>_OPTIONS" environment
+   variable. */
+      astEnvSet( new );
+
 /* Obtain the variable argument list and pass it along with the
    options string to the astVSet method to initialise the new
    FitsChan's attributes. */
@@ -41145,6 +41168,7 @@ AstFitsChan *astFitsChanId_( const char *(* source)( void ),
 /* Return an ID value for the new FitsChan. */
    return astMakeId( new );
 }
+
 AstFitsChan *astFitsChanForId_( const char *(* source)( void ),
                               char *(* source_wrap)( const char *(*)( void ), int * ),
                               void (* sink)( const char * ),
@@ -41312,6 +41336,10 @@ AstFitsChan *astFitsChanForId_( const char *(* source)( void ),
    if ( astOK ) {
       class_init = 1;
 
+/* Apply any default options specified by "<class>_OPTIONS" environment
+   variable. */
+      astEnvSet( new );
+
 /* Obtain the variable argument list and pass it along with the
    options string to the astVSet method to initialise the new
    FitsChan's attributes. */
@@ -41326,6 +41354,7 @@ AstFitsChan *astFitsChanForId_( const char *(* source)( void ),
 /* Return an ID value for the new FitsChan. */
    return astMakeId( new );
 }
+
 AstFitsChan *astInitFitsChan_( void *mem, size_t size, int init,
                                AstFitsChanVtab *vtab, const char *name,
                                const char *(* source)( void ),

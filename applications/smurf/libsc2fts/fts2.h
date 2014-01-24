@@ -107,10 +107,11 @@
 
 void fts2_validatemirrorpositions(
     double* positions,
+    double* times,
     int count,
     int* ni,
     int* nf,
-	smfData* inData,
+    smfData* inData,
     int* status);
 
 void fts2_arraycopy(
@@ -165,6 +166,7 @@ sc2astCache* fts2ast_createwcs2(
 void fts2_getmirrorpositions(
     smfData* data,
     double* positions,
+    double* times,
     int* size,
     int* status);
 

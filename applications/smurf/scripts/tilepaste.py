@@ -85,11 +85,11 @@
 *        only if a supported instrument cannot be determined from the FITS
 *        headers. The following instrument names are recognised (unambiguous
 *        abbreviations may be supplied): "SCUBA-2(450)", "SCUBA-2(850)",
-*        "HARP", "RxA", "RxWD", "RxWB". NDFs containing co-added data for
+*        "ACSIS", "DAS". NDFs containing co-added data for
 *        the selected instrument reside within a corresponding sub-directory
 *        of the directory specified by environment variable JSA_TILE_DIR.
-*        These sub-directories are called "scuba2-450", "scuba2-850", "harp",
-*        "rxa", "rxwd" and "rxwb". []
+*        These sub-directories are called "scuba2-450", "scuba2-850", "acsis"
+*        and "das". []
 *     JSA = _LOGICAL (Read)
 *        TRUE if the supplied input NDFs are gridded on the JSA all-sky
 *        pixel grid associated with the specified JCMT instrument. If
@@ -192,8 +192,8 @@ try:
                                                        default=Parameter.UNSET)))
 
    params.append(starutil.ParChoice("INSTRUMENT",
-                                    ["SCUBA-2(450)", "SCUBA-2(850)", "HARP",
-                                    "RxA", "RxWD", "RxWB"],
+                                    ["SCUBA-2(450)", "SCUBA-2(850)", "ACSIS",
+                                    "DAS"],
                                     "The JCMT instrument", "SCUBA-2(850)"))
 
    params.append(starutil.Par0L("JSA", "Are the input NDFs on the JSA "
@@ -220,18 +220,30 @@ try:
 #  See if we can determine a good default for INSTRUMENT by looking at
 #  the FITS headers of the first input NDF.
    try:
-      instrume = starutil.get_fits_header( indata[0], "INSTRUME" ).strip();
-      if instrume == "HARP":
-         deflt = "HARP"
+      cval = starutil.get_fits_header( indata[0], "INSTRUME" ).strip()
+      if cval == "SCUBA-2":
+         cval = starutil.get_fits_header( indata[0], "FILTER" ).strip()
 
-      elif instrume == "SCUBA-2":
-         filter = starutil.get_fits_header( indata[0], "FILTER" ).strip();
-         if filter == "850":
-            deflt = "SCUBA-2(850)";
+         if cval == "450":
+            deflt = "SCUBA-2(450)"
+
+         elif cval == "850":
+            deflt = "SCUBA-2(850)"
+
          else:
-            deflt = "SCUBA-2(450)";
+            deflt = None
+
       else:
-         deflt = None
+         cval = starutil.get_fits_header( indata[0], "BACKEND" )
+
+         if cval == "ACSIS":
+            deflt = "ACSIS"
+
+         elif cval == "DAS":
+            deflt = "DAS"
+
+         else:
+            deflt = None
 
    except:
       deflt = None

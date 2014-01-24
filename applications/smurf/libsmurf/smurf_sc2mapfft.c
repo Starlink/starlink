@@ -187,7 +187,7 @@ void smurf_sc2mapfft( int *status ) {
 
 
   for( i=1;(*status==SAI__OK)&&i<=size; i++ ) {
-    smf_open_file( igrp, i, "READ", SMF__NOTTSERIES, &idata, status );
+    smf_open_file( wf, igrp, i, "READ", SMF__NOTTSERIES, &idata, status );
     isfft = smf_isfft( idata, NULL, NULL, NULL, NULL, &ndims, status);
 
     if( (*status==SAI__OK) && (ndims != 2) ) {
@@ -204,8 +204,8 @@ void smurf_sc2mapfft( int *status ) {
       size_t j;
       size_t ndata;
 
-      tempdata = smf_deepcopy_smfData( idata, 0, 0, 0, 0, status );
-      smf_close_file( &idata, status );
+      tempdata = smf_deepcopy_smfData( wf, idata, 0, 0, 0, 0, status );
+      smf_close_file( wf, &idata, status );
       idata = tempdata;
 
       ndata=1;
@@ -244,12 +244,12 @@ void smurf_sc2mapfft( int *status ) {
         smfData *tempdata=NULL;
 
         tempdata = smf_fft_2dazav( odata, NULL, status );
-        smf_close_file( &odata, status );
+        smf_close_file( wf, &odata, status );
         odata = tempdata;
       }
 
       /* Export the data to a new file */
-      smf_write_smfData( odata, NULL, NULL, ogrp, i, 0, MSG__VERB, 0, status );
+      smf_write_smfData( wf, odata, NULL, NULL, ogrp, i, 0, MSG__VERB, 0, status );
     }  else {
       msgOutif( MSG__NORM, " ",
                 "Data are already transformed. No output will be produced",
@@ -262,7 +262,7 @@ void smurf_sc2mapfft( int *status ) {
   grpDelet( &igrp, status);
   grpDelet( &ogrp, status);
 
-  smf_close_file( &odata, status );
+  smf_close_file( wf, &odata, status );
 
   ndfEnd( status );
 

@@ -446,7 +446,7 @@ void smurf_unmakemap( int *status ) {
       ndfAnnul( &indfout, status );
 
 /* We now re-open the output NDF and then modify its data values. */
-      smf_open_file( ogrp, ifile, "UPDATE", 0, &odata, status );
+      smf_open_file( wf, ogrp, ifile, "UPDATE", 0, &odata, status );
 
 /* Issue a suitable message and abort if anything went wrong. */
       if( *status != SAI__OK ) {
@@ -531,7 +531,7 @@ void smurf_unmakemap( int *status ) {
       }
 
 /* Close the output time series file. */
-      smf_close_file( &odata, status );
+      smf_close_file( wf, &odata, status );
 
 /* End the NDF context. */
       ndfEnd( status );
@@ -540,7 +540,7 @@ void smurf_unmakemap( int *status ) {
 /* Close any input data file that is still open due to an early exit from
    the above loop. */
    if( odata != NULL ) {
-      smf_close_file( &odata, status );
+      smf_close_file( wf, &odata, status );
       odata = NULL;
    }
 

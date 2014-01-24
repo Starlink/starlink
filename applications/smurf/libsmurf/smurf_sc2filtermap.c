@@ -191,9 +191,9 @@ void smurf_sc2filtermap( int *status ) {
               status );
     }
 
-    smf_open_file( wgrp, 1, "READ", SMF__NOTTSERIES, &tempdata, status );
-    wrefmap = smf_deepcopy_smfData( tempdata, 0, 0, 0, 0, status );
-    smf_close_file( &tempdata, status );
+    smf_open_file( wf, wgrp, 1, "READ", SMF__NOTTSERIES, &tempdata, status );
+    wrefmap = smf_deepcopy_smfData( wf, tempdata, 0, 0, 0, 0, status );
+    smf_close_file( wf, &tempdata, status );
 
     /* Set VAL__BADD to zero if requested */
     if( (*status==SAI__OK) && zerobad ) {
@@ -217,7 +217,7 @@ void smurf_sc2filtermap( int *status ) {
   }
 
   for( i=1;(*status==SAI__OK)&&i<=size; i++ ) {
-    smf_open_file( igrp, i, "READ", SMF__NOTTSERIES, &idata, status );
+    smf_open_file( wf, igrp, i, "READ", SMF__NOTTSERIES, &idata, status );
     isfft = smf_isfft( idata, NULL, NULL, NULL, NULL, &ndims, status);
 
     if( (*status==SAI__OK) && isfft ) {
@@ -237,7 +237,7 @@ void smurf_sc2filtermap( int *status ) {
     /* smf_filter_execute operates in-place, so first create the output
        data as a copy of the input */
 
-    odata = smf_deepcopy_smfData( idata, 0, 0, 0, 0, status );
+    odata = smf_deepcopy_smfData( wf, idata, 0, 0, 0, 0, status );
 
     /* Set VAL__BADD to zero if requested */
     if( (*status==SAI__OK) && zerobad ) {
@@ -316,10 +316,10 @@ void smurf_sc2filtermap( int *status ) {
     }
 
     /* Export the data to a new file */
-    smf_write_smfData( odata, NULL, NULL, ogrp, i, 0, MSG__NORM, 0, status );
+    smf_write_smfData( wf, odata, NULL, NULL, ogrp, i, 0, MSG__NORM, 0, status );
 
     /* Write out filters? */
-    if( fgrp ) smf_write_smfFilter( filt, NULL, fgrp, i, status );
+    if( fgrp ) smf_write_smfFilter( wf, filt, NULL, fgrp, i, status );
     if( filt ) smf_free_smfFilter( filt, status );
 
   }
@@ -331,8 +331,8 @@ void smurf_sc2filtermap( int *status ) {
   if( ogrp ) grpDelet( &ogrp, status);
   if( wgrp ) grpDelet( &wgrp, status );
 
-  if( odata ) smf_close_file( &odata, status );
-  if( wrefmap ) smf_close_file( &wrefmap, status );
+  if( odata ) smf_close_file( wf, &odata, status );
+  if( wrefmap ) smf_close_file( wf, &wrefmap, status );
 
   if( mask ) mask = astFree( mask );
 

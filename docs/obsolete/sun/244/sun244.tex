@@ -1,0 +1,1379 @@
+\documentclass[twoside,11pt]{article}
+
+% ? Specify used packages
+\usepackage{graphicx}        %  Use this one for final production.
+% \usepackage[draft]{graphicx} %  Use this one for drafting.
+% ? End of specify used packages
+
+\pagestyle{myheadings}
+\raggedbottom
+
+% -----------------------------------------------------------------------------
+% ? Document identification
+% Fixed part
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocsource}    {sun\stardocnumber}
+\newcommand{\stardoccopyright}
+{Copyright \copyright\ 2001 Council for the Central Laboratory of the Research Councils}
+
+% Variable part - replace [xxx] as appropriate.
+\newcommand{\stardocnumber}    {244.1}
+\newcommand{\stardocauthors}   {Mark Taylor}
+\newcommand{\stardocdate}      {30 October 2001}
+\newcommand{\stardoctitle}     {TREEVIEW - Hierarchical data viewer}
+\newcommand{\stardocversion}   {1.0}
+\newcommand{\stardocmanual}    {User's Manual}
+\newcommand{\stardocabstract}  {
+TREEVIEW is a graphical tool for examination of hierarchical data structures.
+It knows all about the Starlink HDS and NDF file formats, as well
+as being able to do basic examination of XML documents, 
+FITS files, Zip or Jar files, and filesystem directory trees.
+}
+% ? End of document identification
+% -----------------------------------------------------------------------------
+
+% +
+%  Name:
+%     sun.tex
+%
+%  Purpose:
+%     Template for Starlink User Note (SUN) documents.
+%     Refer to SUN/199
+%
+%  Authors:
+%     AJC: A.J.Chipperfield (Starlink, RAL)
+%     BLY: M.J.Bly (Starlink, RAL)
+%     PWD: Peter W. Draper (Starlink, Durham University)
+%
+%  History:
+%     17-JAN-1996 (AJC):
+%        Original with hypertext macros, based on MDL plain originals.
+%     16-JUN-1997 (BLY):
+%        Adapted for LaTeX2e.
+%        Added picture commands.
+%     13-AUG-1998 (PWD):
+%        Converted for use with LaTeX2HTML version 98.2 and
+%        Star2HTML version 1.3.
+%      1-FEB-2000 (AJC):
+%        Add Copyright statement in LaTeX
+%     {Add further history here}
+%
+% -
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markboth{\stardocname}{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+% -----------------------------------------------------------------------------
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
+
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
+%
+%  Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
+%  LaTeX2HTML to signify text it shouldn't process).
+%begin{latexonly}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+\newenvironment{latexonly}{}{}
+\newcommand{\latex}[1]{#1}
+\newcommand{\html}[1]{}
+\newcommand{\latexhtml}[2]{#1}
+\newcommand{\HTMLcode}[2][]{}
+
+%  Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\renewcommand{\_}{\texttt{\symbol{95}}}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Remove % on the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%end{latexonly}
+% -----------------------------------------------------------------------------
+% ? Document specific \newcommand or \newenvironment commands.
+% ? End of document specific commands
+% -----------------------------------------------------------------------------
+
+%+
+%  Name:
+%     SST.TEX
+
+%  Purpose:
+%     Define LaTeX commands for laying out Starlink routine descriptions.
+
+%  Language:
+%     LaTeX
+
+%  Type of Module:
+%     LaTeX data file.
+
+%  Description:
+%     This file defines LaTeX commands which allow routine documentation
+%     produced by the SST application PROLAT to be processed by LaTeX and
+%     by LaTeX2html. The contents of this file should be included in the
+%     source prior to any statements that make of the sst commnds.
+
+%  Notes:
+%     The style file html.sty provided with LaTeX2html needs to be used.
+%     This must be before this file.
+
+%  Authors:
+%     RFWS: R.F. Warren-Smith (STARLINK)
+%     PDRAPER: P.W. Draper (Starlink - Durham University)
+
+%  History:
+%     10-SEP-1990 (RFWS):
+%        Original version.
+%     10-SEP-1990 (RFWS):
+%        Added the implementation status section.
+%     12-SEP-1990 (RFWS):
+%        Added support for the usage section and adjusted various spacings.
+%     8-DEC-1994 (PDRAPER):
+%        Added support for simplified formatting using LaTeX2html.
+%     {enter_further_changes_here}
+
+%  Bugs:
+%     {note_any_bugs_here}
+
+%-
+
+%  Define length variables.
+\newlength{\sstbannerlength}
+\newlength{\sstcaptionlength}
+\newlength{\sstexampleslength}
+\newlength{\sstexampleswidth}
+
+%  Define a \tt font of the required size.
+\latex{\newfont{\ssttt}{cmtt10 scaled 1095}}
+\html{\newcommand{\ssttt}{\tt}}
+
+%  Define a command to produce a routine header, including its name,
+%  a purpose description and the rest of the routine's documentation.
+\newcommand{\sstroutine}[3]{
+   \newpage
+   \label{#1}
+   \goodbreak
+   \rule{\textwidth}{0.5mm}
+   \vspace{-7ex}
+   \newline
+   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
+   \setlength{\sstcaptionlength}{\textwidth}
+   \setlength{\sstexampleslength}{\textwidth}
+   \addtolength{\sstbannerlength}{0.5em}
+   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
+   \addtolength{\sstcaptionlength}{-5.0pt}
+   \settowidth{\sstexampleswidth}{{\bf Examples:}}
+   \addtolength{\sstexampleslength}{-\sstexampleswidth}
+   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
+   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
+   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
+   \begin{description}
+      #3
+   \end{description}
+}
+
+%  Format the description section.
+\newcommand{\sstdescription}[1]{\item[Description:] #1}
+
+%  Format the usage section.
+\newcommand{\sstusage}[1]{\item[Usage:] \mbox{}
+   \begin{description}
+      {\ssttt \item #1}
+   \end{description}
+}
+% \newcommand{\sstusage}[1]{\item[Usage:] \mbox{}
+% \\[1.3ex]{\raggedright \ssttt #1}}
+
+%  Format the invocation section.
+\newcommand{\sstinvocation}[1]{\sloppy \item[Invocation:]\hspace{0.4em}{\tt #1}}
+%\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
+
+%  Format the arguments section.
+\newcommand{\sstarguments}[1]{
+   \item[Arguments:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the returned value section (for a function).
+\newcommand{\sstreturnedvalue}[1]{
+   \item[Returned Value:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the parameters section (for an application).
+\newcommand{\sstparameters}[1]{
+   \item[Parameters:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the examples section.
+\newcommand{\sstexamples}[1]{
+   \item[Examples:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Define the format of a subsection in a normal section.
+\newcommand{\sstsubsection}[1]{ \item[{#1}] \mbox{} \\}
+
+%  Define the format of a subsection in the examples section.
+\newcommand{\sstexamplesubsection}[2]{\sloppy \item{\ssttt #1} \mbox{} \\ #2 }
+%\newcommand{\sstexamplesubsection}[2]{\sloppy
+%\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \vspace{1.0ex}
+%\\ #2 }
+
+%  Format the notes section.
+\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
+
+%  Provide a general-purpose format for additional (DIY) sections.
+\newcommand{\sstdiytopic}[2]{\item[#1:] \mbox{} \\[1.3ex] #2}
+%\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}]
+%\mbox{} \\[1.3ex] #2}
+
+%  Format the implementation status section.
+\newcommand{\sstimplementationstatus}[1]{
+   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
+
+%  Format the bugs section.
+\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
+
+%  Format a list of items while in paragraph mode.
+\newcommand{\sstitemlist}[1]{
+  \mbox{} \\
+  \vspace{-3.5ex}
+  \begin{itemize}
+     #1
+  \end{itemize}
+}
+
+%  Define the format of an item.
+\newcommand{\sstitem}{\item}
+
+%% Now define html equivalents of those already set. These are used by
+%  latex2html and are defined in the html.sty files.
+\begin{htmlonly}
+
+%  sstroutine.
+   \newcommand{\sstroutine}[3]{
+      \subsection{#1\xlabel{#1}-\label{#1}#2}
+      \begin{description}
+         #3
+      \end{description}
+   }
+
+%  sstdescription
+   \newcommand{\sstdescription}[1]{\item[Description:]
+      \begin{description}
+         #1
+      \end{description}
+      \\
+   }
+
+%  sstusage
+   \newcommand{\sstusage}[1]{\item[Usage:]
+      \begin{description}
+         {\ssttt #1}
+      \end{description}
+      \\
+   }
+
+%  sstinvocation
+   \newcommand{\sstinvocation}[1]{\item[Invocation:]
+      \begin{description}
+         {\ssttt #1}
+      \end{description}
+      \\
+   }
+
+%  sstarguments
+   \newcommand{\sstarguments}[1]{
+      \item[Arguments:] \\
+      \begin{description}
+         #1
+      \end{description}
+      \\
+   }
+
+%  sstreturnedvalue
+   \newcommand{\sstreturnedvalue}[1]{
+      \item[Returned Value:] \\
+      \begin{description}
+         #1
+      \end{description}
+      \\
+   }
+
+%  sstparameters
+   \newcommand{\sstparameters}[1]{
+      \item[Parameters:] \\
+      \begin{description}
+         #1
+      \end{description}
+      \\
+   }
+
+%  sstexamples
+   \newcommand{\sstexamples}[1]{
+      \item[Examples:] \\
+      \begin{description}
+         #1
+      \end{description}
+      \\
+   }
+
+%  sstsubsection
+   \newcommand{\sstsubsection}[1]{\item[{#1}]}
+
+%  sstexamplesubsection
+   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] #2}
+
+%  sstnotes
+   \newcommand{\sstnotes}[1]{\item[Notes:] #1 }
+
+%  sstdiytopic
+   \newcommand{\sstdiytopic}[2]{\item[{#1:}] #2 }
+
+%  sstimplementationstatus
+   \newcommand{\sstimplementationstatus}[1]{
+      \item[Implementation Status:] #1
+   }
+
+%  sstitemlist
+   \newcommand{\sstitemlist}[1]{
+      \begin{itemize}
+         #1
+      \end{itemize}
+      \\
+   }
+%  sstitem
+   \newcommand{\sstitem}{\item}
+
+\end{htmlonly}
+
+%  End of "sst.tex" layout definitions.
+%.
+
+%  Title Page.
+%  ===========
+\renewcommand{\thepage}{\roman{page}}
+\begin{document}
+\thispagestyle{empty}
+
+%  Latex document header.
+%  ======================
+\begin{latexonly}
+   CCLRC / \textsc{Rutherford Appleton Laboratory} \hfill \textbf{\stardocname}\\
+   {\large Particle Physics \& Astronomy Research Council}\\
+   {\large Starlink Project\\}
+   {\large \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+      {\LARGE\textbf{\stardoctitle \\ [2.5ex]}}
+   \end{center}
+   \vspace{5mm}
+
+% ? Add picture here if required for the LaTeX version.
+% \begin{center}
+% \includegraphics[scale=0.6]{sun244treefront.eps}
+% \end{center}
+% ? End of picture
+
+% ? Heading for abstract if used.
+   %\vspace{10mm}
+   \begin{center}
+      {\Large\textbf{Abstract}}
+   \end{center}
+% ? End of heading for abstract.
+\end{latexonly}
+
+%  HTML documentation header.
+%  ==========================
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1 ALIGN=CENTER>\end{rawhtml}
+      \stardoctitle
+   \begin{rawhtml} </FONT></H1> \end{rawhtml}
+
+% ? Add picture here if required for the hypertext version.
+% \begin{center}
+%    \htmladdimg{treefront.gif}
+% \end{center}
+% ? End of picture
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory\ \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCLRC / Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk} \\
+      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
+                        {http://www.pparc.ac.uk} \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://www.starlink.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://www.starlink.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+%  HTML document table of contents.
+%  ================================
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
+  \label{stardoccontents}
+  \begin{rawhtml}
+    <HR>
+    <H2>Contents</H2>
+  \end{rawhtml}
+  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+        {stardoccontents}}
+
+% ? New section for abstract if used.
+  \section{\xlabel{abstract}Abstract}
+% ? End of new section for abstract
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+% ? Document Abstract. (if used)
+%  ==================
+\stardocabstract
+% ? End of document abstract
+
+% -----------------------------------------------------------------------------
+% ? Latex Copyright Statement
+%  =========================
+\begin{latexonly}
+\newpage
+\vspace*{\fill}
+\stardoccopyright
+\end{latexonly}
+% ? End of Latex copyright statement
+
+% -----------------------------------------------------------------------------
+% ? Latex document Table of Contents (if used).
+%  ===========================================
+\newpage
+\begin{latexonly}
+  \setlength{\parskip}{0mm}
+  \tableofcontents
+  \setlength{\parskip}{\medskipamount}
+  \markboth{\stardocname}{\stardocname}
+\end{latexonly}
+% ? End of Latex document table of contents
+% -----------------------------------------------------------------------------
+
+% Icon definitions.
+\newcommand{\iconOpen}
+    {\latexhtml{`+'}{\htmladdimg{Plus.gif}}}
+\newcommand{\iconClose}
+    {\latexhtml{`-'}{\htmladdimg{Minus.gif}}}
+\newcommand{\iconCascade}
+    {\latexhtml{`++'}{\htmladdimg{PlusPlus.gif}}}
+\newcommand{\iconExcise}
+    {\latexhtml{`-\,-'}{\htmladdimg{MinusMinus.gif}}}
+\newcommand{\iconSplitNone}
+    {\latexhtml{`\texttt{O}'}{\htmladdimg{Frame.gif}}}
+\newcommand{\iconSplitBelow}
+    {\latexhtml{`\texttt{=}'}{\htmladdimg{SplitHorizontal.gif}}}
+\newcommand{\iconSplitBeside}
+    {\latexhtml{`\texttt{||}'}{\htmladdimg{SplitVertical.gif}}}
+\newcommand{\iconExit}
+    {\latexhtml{`$\times$'}{\htmladdimg{exit1.gif}}}
+\newcommand{\iconHelp}
+    {\latexhtml{`\texttt{?}'}{\htmladdimg{Help2.gif}}}
+
+\newcommand{\iconHandleOpen}
+    {\latexhtml{`o-'}{\htmladdimg{handle_open1.gif}}}
+\newcommand{\iconHandleClosed}
+    {\latexhtml{`P'}{\htmladdimg{handle_closed1.gif}}}
+
+\newcommand{\iconAryZero}
+    {\latexhtml{ARY}{\htmladdimg{cell.gif}}}
+\newcommand{\iconAryOne}
+    {\latexhtml{ARY}{\htmladdimg{row.gif}}}
+\newcommand{\iconAryTwo}
+    {\latexhtml{ARY}{\htmladdimg{Sheet.gif}}}
+\newcommand{\iconAryThree}
+    {\latexhtml{ARY}{\htmladdimg{Sheets.gif}}}
+\newcommand{\iconDir}
+    {\latexhtml{DIR}{\htmladdimg{defaultClosed2.gif}}}
+\newcommand{\iconFile}
+    {\latexhtml{File}{\htmladdimg{defaultLeaf2.gif}}}
+\newcommand{\iconFits}
+    {\latexhtml{FIT}{\htmladdimg{star_bul.gif}}}
+\newcommand{\iconFrame}
+    {\latexhtml{FRM}{\htmladdimg{axes42.gif}}}
+\newcommand{\iconHdu}
+    {\latexhtml{HDU}{\htmladdimg{TileCascade.gif}}}
+\newcommand{\iconTable}
+    {\latexhtml{TBL}{\htmladdimg{table10.gif}}}
+\newcommand{\iconNdf}
+    {\latexhtml{NDF}{\htmladdimg{star_gold.gif}}}
+\newcommand{\iconSkyframe}
+    {\latexhtml{SKY}{\htmladdimg{axes62.gif}}}
+\newcommand{\iconStructure}
+    {\latexhtml{HDS}{\htmladdimg{closed.gif}}}
+\newcommand{\iconWcs}
+    {\latexhtml{WCS}{\htmladdimg{world1.gif}}}
+\newcommand{\iconZipentry}
+    {\latexhtml{ZIP}{\htmladdimg{squishfile2.gif}}}
+\newcommand{\iconZipfile}
+    {\latexhtml{ZPE}{\htmladdimg{squishdir2.gif}}}
+\newcommand{\iconHistory}
+    {\latexhtml{HIS}{\htmladdimg{book2.gif}}}
+\newcommand{\iconHistoryRecord}
+    {\latexhtml{HRE}{\htmladdimg{mini-doc.gif}}}
+% \newcommand{\iconNdx}
+%     {\latexhtml{NDX}{\htmladdimg{jsky2.gif}}}
+% \newcommand{\iconHdx}
+%     {\latexhtml{HDX}{\htmladdimg{box7.gif}}}
+
+\newcommand{\iconXmlDocument}
+    {\latexhtml{XML}{\htmladdimg{xml_doc.gif}}}
+\newcommand{\iconXmlElement}
+    {\latexhtml{ELE}{\htmladdimg{xml_el.gif}}}
+\newcommand{\iconXmlComment}
+    {\latexhtml{COM}{\htmladdimg{xml_comm.gif}}}
+\newcommand{\iconXmlPi}
+    {\latexhtml{XPI}{\htmladdimg{xml_pi.gif}}}
+\newcommand{\iconXmlCdata}
+    {\latexhtml{CDA}{\htmladdimg{xml_txt.gif}}}
+\newcommand{\iconXmlEref}
+    {\latexhtml{XER}{\htmladdimg{xml_eref.gif}}}
+\newcommand{\iconXmlString}
+    {\latexhtml{TXT}{\htmladdimg{xml_txt.gif}}}
+
+
+% Figure display.
+\newcommand{\showpicture}[1]{
+   \begin{quote} 
+   \latexhtml{\includegraphics[scale=0.6]{sun244#1.eps}}{\htmladdimg{#1.gif}}
+   \end{quote}}
+%\newcommand{\showpicture}[1]{
+%   \begin{quote} 
+%   \latexhtml{\fbox{Picture #1 here}}{\htmladdimg{#1.gif}}
+%   \end{quote}}
+
+\cleardoublepage
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
+
+% ? Main text
+
+\section{Introduction\xlabel{introduction}}
+
+Treeview gives a convenient way to display and explore 
+hierarchical data structures;  
+it provides similar functionality to the \xref{HDSTRACE}{sun102}{}
+and \xref{NDFTRACE}{sun95}{NDFTRACE} tasks but with a graphical 
+interface (though it can be used in text mode if desired).
+It also knows about 
+many other data structures such as file system directory
+hierarchies, zip files, FITS files and XML documents.
+% , and HDX containers.
+
+The program is installed as a Starlink package in the normal way;
+it requires installation of the JNIAST package 
+(\texttt{uk.ac.starlink.ast.*} classes and associated shared libraries)
+and of a J2SE Java
+Runtime Environment (JRE) at version 1.3 or higher in order to run.
+Installation installs a script in \texttt{\$INSTALL/bin/treeview}
+which is used to run the application.
+
+As long as the installation binary directory is on your path, 
+you can just type
+\begin{quote}
+\begin{verbatim}
+% treeview item [item...]
+\end{verbatim}
+\end{quote}
+where each \texttt{item} is the name of a file, directory, or HDS or NDF 
+component.
+Following a short delay, a window will pop up showing the item or
+items you named, and you can point and click to see the 
+images and what is inside them.
+Navigation and usage is pretty intuitive
+(especially if you have encountered a java JTree widget before, which
+is the basis of the visual display), and you may well find you can
+see how it works by playing with it.
+If you want more details on the workings however, 
+you can read the following sections.
+\begin{latexonly}
+
+\it Note: 
+This document includes representations of icons used in the Treeview GUI.
+In the \LaTeX\ version they are represented using rather crude textual
+versions.  If you are keen to know what they look like, you may be
+better off with the HTML version.
+\end{latexonly}
+
+\section{The Treeview window}
+
+Suppose you wish to display all the NDFs in the current directory
+starting with the string `reduced\_'.  You could invoke Treeview like this:
+\begin{quote}
+\begin{verbatim}
+% treeview reduced_*.sdf
+\end{verbatim}
+\end{quote}
+which would bring up a window looking something like this:
+\showpicture{treeshut}
+As you can see, the window is divided into several parts,
+described in the following sections.
+
+\subsection{Tree display}
+
+The main area to the left of the window displays the tree with the
+data nodes in it.  Each node is shown on a single line,
+and is represented by an icon,
+followed by its name, followed by some brief descriptive information.
+Additionally, there may be a {\em handle} 
+\begin{htmlonly}
+like this \iconHandleClosed\  
+\end{htmlonly}
+at the left of the line
+if this node can be opened up to see inside.
+In the example shown in the previous section, 
+each icon is a little star, indicating that the nodes
+have been recognised as NDF structures, the names are as given,
+and the descriptive information gives the pixel bounds of the NDFs.
+These nodes do have handles, since Treeview knows how to understand
+the data inside them.
+The different types of nodes which Treeview knows about are listed
+in section \ref{sec:nodetypes}.
+
+Nodes with handles can be opened up to display their {\em children}.
+The easiest way to do this is to click on the handle itself with
+the mouse, though various other actions will do the trick, 
+including double-clicking on the name, and if the node is 
+{\em selected} (see \ref{sec:detail}) pressing the return key or clicking
+the \iconOpen\ icon in the toolbar.  Once opened, they can be
+closed in a similar way.  The child nodes behave like their
+parents, and can be opened and closed in the same fashion.
+\begin{htmlonly}
+When a node is open the handle is rotated to look like this
+\iconHandleOpen.
+\end{htmlonly}
+
+Here is a what the window looks like when a couple of the nodes
+have been opened:
+\showpicture{treeopen}
+
+\subsubsection{Popup menu}
+
+If you activate a popup menu on one of the displayed nodes in the
+tree display (this is normally done by pressing the right mouse button)
+you will in most cases see a menu which offers you two types of option:
+\begin{description}
+\item[Reload]\mbox{}\\
+This forgets what it knows about the node in question and its children, 
+reloads it.  It can be used to refresh information about the state
+of an object which has changed since it was first read by Treeview.
+{\it Note: reload currently does not always work for HDS-type nodes}.
+\item[Alter-egos]\mbox{}\\
+The remaining options present different ways of looking at the node.
+For instance an NDF file may also be considered as an HDS container file
+or as a normal file.  By selecting one of these, the node will be 
+replaced by the alternative view.
+\end{description}
+Some types of node cannot be reloaded or viewed as alteregos in this
+way - you will get a beep rather than a popup menu in this case.
+
+
+\subsection{\label{sec:detail}Detail display}
+
+The panel to the right of the tree display initially shows a short 
+help message.  However, for the most part, this panel is used to
+display further details about the node which is currently
+{\em selected}.
+
+The easiest way to select a node is to click on its name in the 
+tree display.  Other methods include using the arrow keys on the
+keyboard to move the selection up and down.  There can be at most
+one selected node at any time.
+When a node is selected, its line in the tree display panel is
+highlighted, and further information about it is shown 
+in the detail display panel.  What information this is will 
+depend on the kind of node it is. 
+
+At the least, an overview panel will be shown giving at least the
+node's name and type.  It may also include other information 
+about the contents of the node according to what Treeview knows
+about its structure, though hierarchical information of the sort
+that can be seen by expanding it in the tree panel will generally
+not be shown.  In some cases a limited amount of the data content 
+itself may be shown, for instance the detail overview for an HDS 
+data array node will show the values of the first few elements of the 
+data array itself, but if there are too many they will not all be given.
+Here is a simple example of a selected element and its overview:
+\showpicture{selected}
+
+In some cases, where there are various ways you might want to look
+at the data of a node, a set of tabs will be shown at the top of
+the details panel.  The Overview one will be shown by default, but
+to look at the other ones, click the tab you want and you will see
+the relevant display.  For instance, if you are looking at a 
+two-dimensional NDF, you can switch between the summary overview 
+and a drawing of the area represented by the data grid in its
+various World Coordinate System frames.
+Here is an example of such a tabbed detail panel:
+\showpicture{withgrids}
+
+If help text is shown, for instance on startup or if you have
+selected it from the menu, the text will be displayed in the
+detail display panel.
+
+The divider which separates the detail display panel from the
+tree panel can be dragged by moving the mouse while holding down
+the button.  This enables the relative sizes of the two panels
+to be changed.  The entire window can be resized in the usual way.
+
+Although the detail display panel by default appears to the right of
+the tree panel, you can change its position according to taste, so that it 
+appears below the tree panel, or not at all.  This can be done using
+the \iconSplitNone, \iconSplitBeside\ and \iconSplitBelow\ 
+icons in the toolbar, 
+or the {\em View} menu, or on the \texttt{treeview} command line.
+
+% Define actions which will appear in both the Menu and Toolbar subsections.
+\newcommand{\actionOpen}{
+   Brings up a dialog box in which you can choose a new file
+   to add as a top-level node of the tree.  When you select
+   a file and click the `Add node' button in the selection
+   dialog it will be added as the bottom line in the tree
+   display window.
+}
+\newcommand{\actionExit}{
+   Exits Treeview without further ado.
+}
+\newcommand{\actionBeside}{
+   The details panel is shown to the right of the tree panel.
+}
+\newcommand{\actionBelow}{
+   The details panel is shown below the tree panel.
+}
+\newcommand{\actionNone}{
+   The entire window is used for the tree panel;
+   no details display is shown.
+}
+\newcommand{\actionCollapse}{
+   The selected node is closed, so that its children are no longer
+   visible.  This option is not available if no node is currently 
+   selected, or if the selected node is already closed.
+}
+\newcommand{\actionExpand}{
+   The selected node is opened, so that its children become 
+   visible.  This option is not available if no node is currently 
+   selected, or if the selected node is already open.
+}
+\newcommand{\actionRCollapse}{
+   The selected node, and all its children, and all its children's 
+   children\ldots\ are closed, and if it is opened again its children
+   will be treated as if they had not been encountered before, and
+   re-read.  This will be slower, but may result in more up-to-date
+   information about the nodes.
+   Since the child nodes are forgotten during a recursive collapse,
+   this may be useful if viewing very large data structures if 
+   memory needs to be freed up.
+   This option is not available if no node is currently 
+   selected.
+}
+\newcommand{\actionRExpand}{
+   The selected node, and all its children, and all its children's
+   children\ldots\ are opened.  This enables you to see the entire
+   contents of a given node.  If performed on a node containing a
+   lot of data, e.g.\ a directory containing many HDS files, it
+   can result in many nodes being added to the tree which may be slow.
+   This option is not available if no node is currently
+   selected.
+}
+\newcommand{\actionRCollapseAll}{
+   All the children of all the top-level nodes, and all their children,
+   and all their children's children\ldots\ are collapsed.
+   This returns the tree state to what it was when the application started
+   (apart from any nodes added using the File|Open menu).
+   Children of the top-level nodes will be re-read if they are opened
+   again, though note the top-level nodes themselves 
+   will not.
+}
+\newcommand{\actionRExpandAll}{
+   All the children of all the top-level nodes, and all their children,
+   and all their children's children\ldots\ are expanded.
+   This means that every node at every level within the top-level nodes
+   will be visible.  If some or all of the top-level nodes represent
+   large data structures, this can be rather a long job.
+   This option should be used with care.
+}
+\newcommand{\actionHelp}{
+   A short help message is displayed in the details display panel.
+   This has the side-effect of deselecting any currently
+   selected node.
+}
+\newcommand{\actionSun}{
+   This document (SUN/244) is displayed in the details display panel.
+   This has the side-effect of deselecting any currently
+   selected node.
+}
+
+\subsection{Toolbar}
+
+The toolbar provides one-click access to several of the menu options.
+The actions provided are as follows\latexhtml{
+   {\it (Sorry about the icons in the \LaTeX\ version)}}{}:
+\begin{description}
+\item[\iconExit] \actionExit
+\item[\iconSplitBeside] \actionBeside
+\item[\iconSplitBelow] \actionBelow
+\item[\iconSplitNone] \actionNone
+\item[\iconClose] \actionCollapse
+\item[\iconOpen] \actionExpand
+\item[\iconExcise] \actionRCollapse
+\item[\iconCascade] \actionRExpand
+\item[\iconHelp] \actionHelp
+\end{description}
+
+\subsection{Menu bar}
+
+The menu bar operates in the usual way, and contains the following menu
+items:
+\begin{description}
+\item[File menu]\mbox{}\\
+   \begin{description}
+   \item[Open] \actionOpen
+   \item[Exit] \actionExit
+   \end{description}
+\item[View menu]\mbox{}\\
+   This menu allows you to choose where the detail display window is displayed,
+   if at all.  Only one of the radio buttons can be selected at any one
+   time:
+   \begin{description}
+   \item[Details beside] \actionBeside
+   \item[Details below] \actionBelow
+   \item[No details] \actionNone
+   \end{description}
+\item[Tree menu]\mbox{}\\
+   \begin{description}
+   \item[Collapse selected] \actionCollapse
+   \item[Expand selected] \actionExpand
+   \item[Recursive collapse selected] \actionRCollapse
+   \item[Recursive expand selected] \actionRExpand
+   \item[Recursive collapse all] \actionRCollapseAll
+   \item[Recursive expand all] \actionRExpandAll
+   \end{description}
+\item[Help menu]\mbox{}\\
+   \begin{description}
+   \item[Show help text] \actionHelp
+   \item[Show user document] \actionSun
+   \end{description}
+\end{description}
+      
+Most of the actions available from the menu are also available from
+the toolbar and/or in other ways.
+
+\section{\label{sec:nodetypes}Types of node}
+
+Treeview works by examining files and other data and trying to see
+if they appear to be the kind of data it knows about.
+It then constructs the most specific type of node it can 
+for each file (or whatever it is) that it has encountered.
+Below is a list of the types of node which it knows about, 
+along with the 
+\latexhtml{three-letter code used in the text mode output}
+          {icon used in the display},
+the {\em Eligibility\/} (type of node which Treeview will have a 
+go at analysing to see if it is the node type in question)
+and a list of {\em Detail views\/} available in the detail
+panel when such a node is selected.
+\newcommand{\datanode}[4]{
+\item[#1] #2 
+\begin{quote}
+{\em Eligibility: } #3\\
+{\em Detail views: } #4
+\end{quote}}
+\begin{itemize}
+\datanode{\iconNdf}
+   {An \xref{NDF}{sun33}{} data structure.}
+   {Any HDS object, path name, or file with extension \texttt{.sdf}}
+   {Overview, WCS grids for 2-d arrays, Image view for 2-d arrays}
+\datanode{\iconWcs}
+   {The WCS (World Coordinate System) component of an NDF data structure.
+    This is an AST \xref{FrameSet}{sun211}{FrameSet} which contains 
+    all the coordinate information concerning its data array.}
+   {A 1-d array of strings in the WCS component of an NDF data structure}
+   {Overview, Text view, XML view, FITS view}
+\datanode{\iconAryOne}
+   {A data array.  This may represent either a simple HDS data array, 
+    an \xref{ARY}{sun11}{} structure, or an NDArray.
+    \latexhtml{}{The icons \iconAryOne, \iconAryTwo and \iconAryThree\
+    are used to represent arrays with one, two, or more than two 
+    dimensions respectively.}}
+   {Any HDS object, path name, or file with extension \texttt{.sdf}}
+%     or array component of an HDX object}
+   {Overview, Array data, Graph view for 1-d arrays, 
+    Image view for 2-d arrays}
+\datanode{\iconStructure}
+   {An \xref{HDS}{sun92}{} component of some kind.
+    \latexhtml{}{The icon \iconAryZero\ is used if the component is scalar
+    and hence has no internal structure.}}
+   {Any HDS object, path name, or file with extension \texttt{.sdf}}
+   {Overview, Array data, Graph view for 1-d arrays, 
+    Image view for 2-d arrays}
+\datanode{\iconDir}
+   {A directory within the filesystem.}
+   {Any file}
+   {Overview only}
+\datanode{\iconFile}
+   {A normal file within the filesystem.}
+   {Any file}
+   {Overview, File text if it looks like a text file}
+\datanode{\iconFits}
+   {A FITS file.}
+   {Files with extensions
+    \texttt{.fit}, \texttt{.dst}, \texttt{.fits}, \texttt{.fts}, 
+    \texttt{.lilo}, \texttt{.lihi}, \texttt{.silo},
+    \texttt{.sihi}, \texttt{.mxlo}, \texttt{.mxhi}, \texttt{.rilo},
+    \texttt{.rihi}, \texttt{.vdlo}, or \texttt{.vdhi}}
+   {Overview only}
+\datanode{\iconHdu}
+   {A FITS generic Header plus Data Unit.}
+   {HDUs found inside FITS files}
+   {Overview, Header cards}
+\datanode{\iconTable}
+   {A FITS table HDU.}
+   {HDUs found inside FITS files}
+   {Overview, header cards, table view}
+\datanode{\iconAryOne}
+   {A FITS image HDU.
+    \latexhtml{}{The icons \iconAryOne, \iconAryTwo and \iconAryThree\
+    are used to represent arrays with one, two, or more than two
+    dimensions respectively.}}
+   {HDUs found inside FITS files}
+   {Overview, Header cards, Array data, Graph view for 1-d arrays,
+    WCS grid for 2-d arrays, Image view for 2-d arrays,
+    Slice view for >2-d arrays}
+\datanode{\iconSkyframe}
+   {An AST \xref{SkyFrame}{sun211}{SkyFrame} object;
+    this is a special type of AST Frame.}
+   {AST objects found inside the WCS component of NDFs}
+   {Overview, Text view, XML view}
+\datanode{\iconFrame}
+   {An AST \xref{Frame}{sun211}{Frame} object.}
+   {AST objects found inside the WCS components of NDFs}
+   {Overview, Text view, XML view}
+\datanode{\iconZipfile}
+   {A ZIP file, which is an archive that can contain, possibly compressed, 
+   a number of other files.  Note that a JAR file is a special kind of
+   ZIP file -- Treeview makes no distinction.}
+   {Files with extensions \texttt{.zip} or \texttt{.jar}}
+   {Overview only}
+\datanode{\iconZipentry}
+   {An entry, which may represent a file or directory,
+    in a ZIP or JAR archive.}
+   {Items found within a Zip archive}
+   {Overview, Entry text if it looks like a text file}
+\datanode{\iconHistory}
+   {The History component of an NDF}
+   {An HDS object with the name HISTORY}
+   {Overview only}
+\datanode{\iconHistoryRecord}
+   {Records within the History component of an NDF}
+   {Children of an NDF History component}
+   {Overview only}
+% \datanode{\iconHdx}
+%    {An HDX container object}
+%    {XML file}
+%    {Overview only}
+% \datanode{\iconNdx}
+%    {An NDX object}
+%    {NDX-type child of an HDX container object}
+%    {Overview, Normalised XML}
+\datanode{\iconXmlDocument}
+   {An well-formed XML document}
+   {Any file}
+   {Overview, Full text}
+\datanode{\iconXmlElement}
+   {An element within an XML document}
+   {A child of an XML document or element}
+   {Overview, Full text}
+\datanode{\iconXmlComment}
+   {A comment within an XML document}
+   {A child of an XML document or element}
+   {Overview only}
+\datanode{\iconXmlPi}
+   {An XML processing instruction}
+   {A child of an XML document or element}
+   {Overview only}
+\datanode{\iconXmlCdata}
+   {An XML CDATA marked section}
+   {A child of an XML element}
+   {Overview only}
+\datanode{\iconXmlEref}
+   {An XML entity reference}
+   {A child of an XML element}
+   {Overview only}
+\datanode{\iconXmlString}
+   {An XML text node}
+   {A child of an XML element}
+   {Overview only}
+\end{itemize}
+
+
+\section{Text mode}
+
+Treeview can be invoked to display the structure of objects
+in a textual form instead of using a graphical interface, 
+by using the \texttt{-text} flag.
+In this case it opens all the nodes recursively, so that the
+structure is fully visible.  This can result in a lot of output
+if the object you are examining (e.g.\ a directory containing
+many data files) has a lot of strucure.  The result is simply
+written to the screen.  In text mode only the tree structure
+is written, the data shown in the detail panel is not accessible.
+
+Here is the output you would get from examining a normal NDF in this way.
+\begin{quote}
+\begin{verbatim}
+% treeview -text mosaic
+  + [NDF] mosaic  ( -17:154, 2:202 )
+    - [HDS] TITLE  <_CHAR*19>  "Output from MAKEMOS"
+    + [ARY] DATA_ARRAY  ( -17:154, 2:202 )  <_REAL>
+      - [HDS] DATA  ( 172, 201 )  <_REAL>
+      - [HDS] ORIGIN  ( 2 )  <_INTEGER>
+    + [ARY] VARIANCE  ( -17:154, 2:202 )  <_REAL>
+      - [HDS] DATA  ( 172, 201 )  <_REAL>
+      - [HDS] ORIGIN  ( 2 )  <_INTEGER>
+    + [WCS] WCS  5 frames; current domain "CCD_REG"
+      - [FRM] GRID  (2 axes) "2-d coordinate system"
+      - [FRM] PIXEL  (2 axes) "2-d coordinate system"
+      - [FRM] AXIS  (2 axes) "2-d coordinate system"
+      - [FRM] CCD_GEN  (2 axes) "Alignment of CCDGENERATE test data"
+      - [FRM] CCD_REG  (2 axes) "Alignment by REGISTER"
+    + [HDS] MORE  <EXT>
+      - [HDS] FITS  ( 16 )  <_CHAR*80>
+      + [HDS] CCDPACK  <CCDPACK_EXT>
+        - [HDS] DEBIAS  <_CHAR*24>  "Tue Jan 16 16:52:34 2001"
+        - [HDS] FLATCOR  <_CHAR*24>  "Tue Jan 16 16:52:42 2001"
+        - [HDS] CURRENT_LIST  <_CHAR*18>  "reduced_data1.off"
+\end{verbatim}
+\end{quote}
+
+The text mode output of Treeview somewhat resembles that of 
+\xref{HDSTRACE}{sun102}{}, but differs in that the elements of
+HDS data arrays are not listed at all, while all elements,
+rather than just the first one, of HDS structure arrays are listed.
+
+\newpage
+\appendix
+\section{Reference Section}
+
+% \include{treeview}
+\sstroutine{
+   treeview
+}{
+   Display a hierarchical structure graphically or textually
+}{
+   \sstdescription{
+      Treeview is a utility for viewing hierarchical data structures
+      such as Starlink NDF and HDS files, XML documents, jar files,
+      directory structures, and other items.  In normal use it displays
+      a graphical user interface which initially shows a set of top-level
+      nodes, each of which can be {\tt '}opened{\tt '} to see the structure inside,
+      or {\tt '}selected{\tt '} to display more detail in various formats
+      depending on the nature of the item being examined.
+      An intuitive point and click interface is used, and detailed
+      help is available from within the tool if required.
+      If the {\tt '}-text{\tt '} flag is used, a textual view of the object is
+      printed to standard output instead.
+
+      Items to be viewed are given on the command line.  These will
+      often be filenames, but in general they represent a set of
+      strings which the utility will try to turn into {\tt '}nodes{\tt '} -
+      it will try one node type after another until it succeeds.
+      If it cannot make any kind of node it will fail with an error
+      message.  The order of preference in which it tries to
+      construct nodes from strings on the command line can
+      be altered using flags if required, but by default it is:
+      \sstitemlist{
+
+         \sstitem
+            NDF structure
+
+         \sstitem
+            WCS component of an NDF
+
+         \sstitem
+            HDS object
+
+         \sstitem
+            XML document
+
+         \sstitem
+            zip/jar file
+
+         \sstitem
+            FITS file
+
+         \sstitem
+            normal file
+
+      }
+      The HDS-like nodes can be given as container file names or HDS paths
+      (so that the .sdf extension may be included or omitted).
+
+      Flags are provided to modify the order of construction if required.
+      When interpreting the commmand line arguments, treeview keeps
+      an ordered list of node types, which starts off as above.
+      If a flag specifying one of the node types is encountered, the
+      corresponding type is brought to the head of the list, and
+      if the {\tt '}-strict{\tt '} flag is encountered the list is cleared.
+      The order in which the flags and item strings are encountered on the
+      line is significant.  In this way it is possible to specify exactly
+      what kind of node you would like to make from a given string.
+      Modifying the node type preference list is not often necessary,
+      but it can be useful in the case of name clashes or to view an
+      item of one sort in its aspect as another.
+   }
+   \sstusage{
+      treeview [flags] item [item ...]
+   }
+   \sstparameters{
+      \sstsubsection{
+         item [item ...]
+      }{
+         One or more items must be named on the command line.  These
+         will often be filenames, but in general they represent a set
+         of strings which the utility will try to turn into {\tt '}nodes{\tt '}
+         for display.  If one item is given it will be opened so that
+         its children are visible in the GUI, but if more than one
+         are given they will initially be displayed closed.
+         If any of the items listed does not exist (i.e. cannot be
+         made into a node), then treeview will exit with an error
+         message.
+      }
+      \sstsubsection{
+         -text
+      }{
+         If this flag is specified, instead of starting a graphical
+         interface, a fully expanded view of the item(s) named on
+         the command line is printed to standard output.  Since all
+         nodes are recursively expanded, the amount of output may
+         be quite large.
+      }
+      \sstsubsection{
+         -split(x$|$y$|$0)
+      }{
+         These flags control the initial orientation of the tree and
+         detail viewing panels in the GUI.  Specifying {\tt '}-splitx{\tt '}
+         (the default) causes the tree and detail display panels to
+         appear beside each other.  Specifying {\tt '}-splity{\tt '} causes the
+         detail panel to appear below the tree panel.  Specifying
+         {\tt '}-split0{\tt '} displays only the tree panel.  The orientation can
+         be changed while the GUI is running using toolbar buttons.
+      }
+      \sstsubsection{
+         -help
+      }{
+         Supplying -help (or any unrecognised flag) will display a short
+         usage message.
+      }
+      \sstsubsection{
+         -debug
+      }{
+         This flag is intended for debugging and not recommended for
+         general use.  It generates verbose output about attempts made
+         to construct nodes from strings.
+      }
+      \sstsubsection{
+         -strict
+      }{
+         Clears the node type list.  To make sense, it must be followed
+         by at least one of the node type specific flags.
+      }
+      \sstsubsection{
+         -ary
+      }{
+         Adds ARY to the head of the node type list.
+         Subsequent items will by preference be turned into
+         ARY data structure nodes if possible.
+      }
+      \sstsubsection{
+         -file
+      }{
+         Adds File to the head of the node type list.
+         Subsequent items will by preference be turned into
+         ordinary file or directory nodes if possible.
+      }
+      \sstsubsection{
+         -fit
+      }{
+         Adds FITS to the head of the node type list.
+         Subsequent items will by preference be turned into
+         FITS file nodes if possible.
+      }
+      \sstsubsection{
+         -ndf
+      }{
+         Adds NDF to the head of the node type list.
+         Subsequent items will by preference be turned into
+         NDF structure nodes if possible.
+      }
+      \sstsubsection{
+         -hds
+      }{
+         Adds HDS to the head of the node type list.
+         Subsequent items will by preference be turned into
+         HDS object nodes if possible.
+      }
+      \sstsubsection{
+         -wcs
+      }{
+         Adds WCS to the head of the node type list.
+         Subsequent items will by preference be turned into
+         World Coordinate System description nodes if possible.
+      }
+      \sstsubsection{
+         -xml
+      }{
+         Adds XML to the head of the node type list.
+         Subsequent items will by preference be turned into
+         XML document nodes if possible.
+      }
+      \sstsubsection{
+         -zip
+      }{
+         Adds Zip to the head of the node type list.
+         Subsequent items will by preference be turned into
+         ZIP file nodes if possible.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         treeview $*$.sdf
+      }{
+         This will bring up a GUI displaying all the HDS data files in
+         the current directory.
+      }
+      \sstexamplesubsection{
+         treeview -text ngc1038.more
+      }{
+         This will write to the screen a fully expanded view of the
+         .MORE component (the extensions) of an NDF in the file
+         ngc1038.sdf.
+      }
+      \sstexamplesubsection{
+         treeview -split0 jpackage.jar
+      }{
+         This displays the jar archive {\tt '}jpackage.jar{\tt '} in a window which
+         has a tree display but no detail display panel.
+      }
+      \sstexamplesubsection{
+         treeview myndf.wcs -hds myndf.wcs
+      }{
+         This examines the WCS component of the named NDF twice, first
+         in the default way, and then looking at it preferentially as
+         an HDS object.  The first node displayed will be as a WCS
+         frameset, and the second one will be as the HDS array of
+         character data which encodes the WCS information in the NDF
+         data structure.
+      }
+   }
+}
+
+\end{document}

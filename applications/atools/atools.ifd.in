@@ -418,6 +418,15 @@ package atools {
 
          helplib {$ATOOLS_HELP}
 
+         parameter class {
+            type LITERAL
+            prompt {Class of output object}
+            ppath DEFAULT
+            vpath DEFAULT
+            default Object
+            helpkey *
+          }
+
          parameter fmt {
             type LITERAL
             prompt {Format for output text file}
@@ -1605,6 +1614,15 @@ iraf! {
             helpkey *
          }
 
+         parameter current {
+            type _LOGICAL
+            prompt {Map the Polygon into current Frame of the NDF?}
+            ppath CURRENT DEFAULT
+            vpath DEFAULT
+            default FALSE
+            helpkey *
+         }
+
          parameter inside {
             position 6
             type _INTEGER
@@ -1632,6 +1650,14 @@ iraf! {
             default 10
             helpkey *
          }
+
+         parameter nvert {
+            type _INTEGER
+            access WRITE
+            vpath DEFAULT
+            default 0
+            helpkey *
+          }
 
          parameter oper {
             position 2
@@ -2881,6 +2907,15 @@ iraf! {
 
       action astunformat {
          helplib {$ATOOLS_HELP}
+
+         parameter dval {
+            type _DOUBLE
+            access WRITE
+            vpath DEFAULT
+            default 0.0
+            helpkey *
+          }
+
          parameter fmt {
             type LITERAL
             prompt {Format for output text file}
@@ -3027,6 +3062,20 @@ iraf! {
             ppath CURRENT
             vpath DEFAULT
             default !
+            helpkey *
+          }
+         parameter xval {
+            type _DOUBLE
+            access WRITE
+            vpath DEFAULT
+            default 0.0
+            helpkey *
+          }
+         parameter yval {
+            type _DOUBLE
+            access WRITE
+            vpath DEFAULT
+            default 0.0
             helpkey *
           }
       }

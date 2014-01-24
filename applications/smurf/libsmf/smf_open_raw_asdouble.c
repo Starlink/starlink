@@ -13,11 +13,13 @@
  *     SMURF subroutine
 
  *  Invocation:
- *     smf_open_raw_as_double( const Grp *igrp,
+ *     smf_open_raw_as_double( ThrWorkForce *wf, const Grp *igrp,
  *                             size_t index, const smfArray* darks,
  *                             smfData **data, int *status );
 
  *  Arguments:
+ *     wf = ThrWorkForce * (Given)
+ *        Pointer to a pool of worker threads
  *     igrp = const Grp* (Given)
  *        Pointer to an input group
  *     index = size_t (Given)
@@ -47,12 +49,14 @@
  *  History:
  *     02-Oct-2009 (TIMJ):
  *        First version.
+ *     10-Jan-2014 (DSB):
+ *        Added argument wf.
 
  *  Notes:
  *     - No file will be associated with the returned smfData.
 
  *  Copyright:
- *     Copyright (C) 2009 Science & Technology Facilities Council.
+ *     Copyright (C) 2009,2014 Science & Technology Facilities Council.
  *     All Rights Reserved.
 
  *  Licence:
@@ -78,21 +82,22 @@
 #include "mers.h"
 #include "smf_err.h"
 #include "prm_par.h"
+#include "star/thr.h"
 
 #include "smf.h"
 
 #define FUNC_NAME "smf_open_raw_asdouble"
 
 void
-smf_open_raw_asdouble( const Grp *igrp, size_t index, const smfArray* darks,
-                       smfData **data, int *status ) {
+smf_open_raw_asdouble( ThrWorkForce *wf, const Grp *igrp, size_t index,
+                       const smfArray* darks, smfData **data, int *status ) {
 
   int flags = 0;            /* Flags for creating smfData clone */
   smfData * indata = NULL;  /* initial smfData associated with file */
 
   if (*status != SAI__OK) return;
 
-  smf_open_file( igrp, index, "READ", 0, &indata, status );
+  smf_open_file( wf, igrp, index, "READ", 0, &indata, status );
 
   if (*status != SAI__OK) goto CLEANUP;
 
@@ -117,7 +122,7 @@ smf_open_raw_asdouble( const Grp *igrp, size_t index, const smfArray* darks,
   /* Create a new smfData and copy the data across, converting to _DOUBLE. There shouldn't
      be any variance. */
   flags |= SMF__NOCREATE_FILE;
-  *data = smf_deepcopy_smfData( indata, 1, flags, 0, 0, status );
+  *data = smf_deepcopy_smfData( wf, indata, 1, flags, 0, 0, status );
 
   if ( *status != SAI__OK) {
     errRep( " ", "Unable to allocate enough memory to create _DOUBLE version of smfData",
@@ -133,6 +138,6 @@ smf_open_raw_asdouble( const Grp *igrp, size_t index, const smfArray* darks,
   smf_apply_dark( *data, darks, status );
 
  CLEANUP:
-  if (indata) smf_close_file( &indata, status );
+  if (indata) smf_close_file( wf, &indata, status );
 
 }

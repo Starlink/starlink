@@ -201,7 +201,7 @@ void smurf_sc2pca( int *status ) {
   parGet0l( "FLAT", &ensureflat, status );
 
   /* Filter out useful data (revert to darks if no science data) */
-  smf_find_science( igrp, &fgrp, 1, NULL, NULL, 1, 1, SMF__NULL, &darks,
+  smf_find_science( wf, igrp, &fgrp, 1, NULL, NULL, 1, 1, SMF__NULL, &darks,
                     &flatramps, &heateffmap, NULL, status );
 
   /* input group is now the filtered group so we can use that and
@@ -224,35 +224,35 @@ void smurf_sc2pca( int *status ) {
   }
 
   /* Get group of bolometer masks and read them into a smfArray */
-  smf_request_mask( "BBM", &bbms, status );
+  smf_request_mask( wf, "BBM", &bbms, status );
 
   for( i=1; i<=size; i++ ) {
 
     if( *status != SAI__OK ) break;
 
     /* Load data, flatfielding and/or opening raw as double as necessary */
-    smf_open_asdouble( igrp, i, darks, flatramps, heateffmap, ensureflat, &data, status );
+    smf_open_asdouble( wf, igrp, i, darks, flatramps, heateffmap, ensureflat, &data, status );
 
     /* Mask out bad bolometers */
-    smf_apply_mask( data, bbms, SMF__BBM_DATA|SMF__BBM_QUAL, 0, status );
+    smf_apply_mask( wf, data, bbms, SMF__BBM_DATA|SMF__BBM_QUAL, 0, status );
 
     /* Sync quality with bad values */
-    smf_update_quality( data, 1, NULL, 0, 0.05, status );
+    smf_update_quality( wf, data, 1, NULL, 0, 0.05, status );
 
     /* Calculate the PCA */
     smf_clean_pca( wf, data, 0, 0, 0, &components, &amplitudes, 0, NULL,
                    status );
 
     /* Write out to the new files */
-    smf_write_smfData( amplitudes, NULL, NULL, outampgrp, i, 0, MSG__VERB,
+    smf_write_smfData( wf, amplitudes, NULL, NULL, outampgrp, i, 0, MSG__VERB,
                        0, status );
-    smf_write_smfData( components, NULL, NULL, outcompgrp, i, 0, MSG__VERB,
+    smf_write_smfData( wf, components, NULL, NULL, outcompgrp, i, 0, MSG__VERB,
                        0, status );
 
     /* Free resources for output data */
-    smf_close_file( &data, status );
-    smf_close_file( &amplitudes, status );
-    smf_close_file( &components, status );
+    smf_close_file( wf, &data, status );
+    smf_close_file( wf, &amplitudes, status );
+    smf_close_file( wf, &components, status );
   }
 
   /* Write out the list of output NDF names, annulling the error if a null
@@ -270,9 +270,9 @@ void smurf_sc2pca( int *status ) {
   if( igrp ) grpDelet( &igrp, status);
   if( outampgrp ) grpDelet( &outampgrp, status);
   if( outcompgrp ) grpDelet( &outcompgrp, status);
-  if( darks ) smf_close_related( &darks, status );
-  if( bbms ) smf_close_related( &bbms, status );
-  if( flatramps ) smf_close_related( &flatramps, status );
+  if( darks ) smf_close_related( wf, &darks, status );
+  if( bbms ) smf_close_related( wf, &bbms, status );
+  if( flatramps ) smf_close_related( wf, &flatramps, status );
   if (heateffmap) heateffmap = smf_free_effmap( heateffmap, status );
   ndfEnd( status );
 }

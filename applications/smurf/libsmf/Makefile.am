@@ -276,7 +276,7 @@ smf_isdark.c \
 smf_isfft.c \
 smf_iteratemap.c \
 smf_jsainstrument.c \
-smf_jsasplit.c \
+smf_jsadicer.c \
 smf_jsatileheader.c \
 smf_jsatile.c \
 smf_jsatiling.c \

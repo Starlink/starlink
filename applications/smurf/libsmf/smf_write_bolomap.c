@@ -59,6 +59,7 @@
 *  Authors:
 *     EC: Ed Chapin (UBC)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     DSB: David Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -71,6 +72,10 @@
 *        Don't write a different map for each chunk, instead combine them
 *     2011-06-29 (EC):
 *        Remove ast from interface since res+ast sum now in smf_iteratemap
+*     2013-11-29 (DSB):
+*        Ensure smf_rebinmap1 is not used in mult-threaded mode since it
+*        now assumes there is an input maps for every thread. Could change
+*        this some rainy day...
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -233,7 +238,7 @@ void smf_write_bolomap( ThrWorkForce *wf, smfArray *res, smfArray *lut,
              array, and then later we'll add it to the existing
              one. If it isn't there, create it. */
 
-          smf_open_file( mgrp, 1, "UPDATE", 0, &mapdata, status );
+          smf_open_file( wf, mgrp, 1, "UPDATE", 0, &mapdata, status );
 
           if( *status == SAI__OK ) {
             /* Allocate memory for the new rebinned data */
@@ -243,7 +248,7 @@ void smf_write_bolomap( ThrWorkForce *wf, smfArray *res, smfArray *lut,
           } else if( *status == DAT__NAMIN ) {
             /* Create a new extension */
             errAnnul( status );
-            smf_open_newfile ( mgrp, 1, SMF__DOUBLE, 2, lbnd_out,
+            smf_open_newfile ( wf, mgrp, 1, SMF__DOUBLE, 2, lbnd_out,
                                ubnd_out, SMF__MAP_VAR, &mapdata, status);
 
             /* Rebin directly into the newly mapped space */
@@ -325,7 +330,7 @@ void smf_write_bolomap( ThrWorkForce *wf, smfArray *res, smfArray *lut,
 
           /* Clean up */
           if( mgrp ) grpDelet( &mgrp, status );
-          if( mapdata ) smf_close_file( &mapdata, status );
+          if( mapdata ) smf_close_file( wf, &mapdata, status );
 
         }
       }

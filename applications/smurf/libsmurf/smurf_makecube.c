@@ -407,6 +407,13 @@
 *          centre of the first analyser angle bin. A value of zero
 *          corresponds to north in the celestial co-ordinate system specified
 *          by parameter SYSTEM. [0]
+*     POSERRFATAL = _LOGICAL (Read)
+*          If a true value is supplied, then an error is reported and the
+*          application terminates if a significant difference is found
+*          between the detector positions array (RECEPPOS) and positions
+*          implied by the FPLANEX/Y arrays. If a false value is supplied,
+*          a warning is issued but the application proceeds. See also
+*          parameter USEDETPOS. [FALSE]
 *     REF = NDF (Read)
 *          An existing NDF that is to be used to define the output grid,
 *          or the string "JSA". If an NDF is supplied, the output grid will
@@ -630,7 +637,8 @@
 *          read from the detector position arrays in each input NDF.
 *          Otherwise, the detector positions are calculated on the basis
 *          of the FPLANEX/Y arrays. Both methods should (in the absence
-*          of bugs) result in identical cubes. [TRUE]
+*          of bugs) result in identical cubes. See also parameter
+*          POSERRFATAL. [TRUE]
 *     WEIGHTS = _LOGICAL (Read)
 *          If TRUE, then the weights associated with the array of output
 *          pixels are stored in an extension named ACSISRED, within the output
@@ -879,6 +887,10 @@
 *     11-NOV-2013 (DSB):
 *        Added the "JSATILES" parameter, and made other changes to allow
 *        the output cubew to be split up into JSA tiles.
+*     27-NOV-2013 (DSB):
+*        - Ensure the NTILE parameter is written before the OUT parameter is
+*        accessed (unless JSA tiles are being created).
+*        - Added parameter POSERRFATAL.
 
 *  Copyright:
 *     Copyright (C) 2007-2013 Science and Technology Facilities Council.
@@ -1034,6 +1046,7 @@ void smurf_makecube( int *status ) {
    int ondf = NDF__NOID;      /* Output NDF identifier */
    int outax[ 2 ];            /* Indices of corresponding output axes */
    int polobs;                /* Do the input files contain polarisation data? */
+   int poserrfatal;           /* Report an error if RECEPPOS and FPLANEX/Y disagree? */
    int savewgt;               /* Should weights be saved in the output NDF? */
    int smfflags;              /* Flags for smfData */
    int sparse;                /* Create a sparse output array? */
@@ -1157,13 +1170,17 @@ void smurf_makecube( int *status ) {
    rather than teh default of ICRS. */
    parGet0l( "ALIGNSYS", &alignsys, status );
 
+/* See whether any significant discrepancy between RECEPPOS and FPLANEX/Y
+   should trigger a fatal error. */
+   parGet0l( "POSERRFATAL", &poserrfatal, status );
+
 /* Calculate the default grid parameters (these are only used if no
    reference spatial WCS was obtained). This also modifies the contents
    of "detgrp" if needed so that it always holds a list of detectors to be
    included (not excluded). */
    smf_cubegrid( igrp,  size, system, usedetpos, autogrid, alignsys,
-                 detgrp, spacerefwcs ? NULL : par, &moving, &oskyfrm,
-                 &sparse, &hastsys, status );
+                 detgrp, spacerefwcs ? NULL : par, poserrfatal, &moving,
+                 &oskyfrm, &sparse, &hastsys, status );
 
 /* If we have spatial reference WCS, use the SkyFrame from the spatial
    reference WCS. */
@@ -1283,7 +1300,7 @@ void smurf_makecube( int *status ) {
 
 /* Validate the input files, create the WCS FrameSet to store in the
    output cube, and get the pixel index bounds of the output cube. */
-      smf_sparsebounds( igrp, size, oskyfrm, usedetpos, detgrp, lbnd_out,
+      smf_sparsebounds( wf, igrp, size, oskyfrm, usedetpos, detgrp, lbnd_out,
                         ubnd_out, &wcsout, &hasoffexp, &polobs, status );
 
 /* See how the output Variances are to be created (the "Spread" option is
@@ -1427,6 +1444,14 @@ void smurf_makecube( int *status ) {
    parameter. */
    parPut0i( "NPOLBIN", npbin, status );
 
+/* If known, write the number of tiles being created to an output
+   parameter. We do it here if possible so that a valid value is
+   available to subsequent commands even if a null value is supplied
+   for "OUT". But we cannot do it here if we are creating JSA tiles
+   since we only know how many JSA tiles are being created once the
+   cube has been created. */
+   if( !jsatiles ) parPut0i( "NTILE", ntile, status );
+
 /* Create a new group to hold the names of the output NDFs that have been
    created. This group does not include any NDFs that correspond to tiles
    that contain no input data. */
@@ -1549,7 +1574,7 @@ void smurf_makecube( int *status ) {
    polarisation angle bin. */
          smfflags = 0;
          if( genvar && !is2d ) smfflags |= SMF__MAP_VAR;
-         smf_open_newfile( ogrp, iout++, SMF__FLOAT, 3, tile->elbnd,
+         smf_open_newfile( wf, ogrp, iout++, SMF__FLOAT, 3, tile->elbnd,
                            tile->eubnd, smfflags, &odata, status );
 
 /* Abort if an error has occurred. */
@@ -1702,7 +1727,7 @@ void smurf_makecube( int *status ) {
             if( !pt || pt[ 0 ] < VAL__MAXI ) {
 
 /* Obtain information about the current input NDF. */
-               smf_open_file( tile->grp, ifile, "READ", 0, &data, status );
+               smf_open_file( wf, tile->grp, ifile, "READ", 0, &data, status );
 
 /* Issue a suitable message and abort if anything went wrong. */
                if( *status != SAI__OK ) {
@@ -1780,7 +1805,7 @@ void smurf_makecube( int *status ) {
 
 /* Close the input data file. */
                if( data != NULL ) {
-                  smf_close_file( &data, status );
+                  smf_close_file( wf, &data, status );
                   data = NULL;
                }
             }
@@ -1804,7 +1829,7 @@ void smurf_makecube( int *status ) {
 /* Close the input data file that remains open due to an early exit from
    the above loop. */
          if( data != NULL ) {
-            smf_close_file( &data, status );
+            smf_close_file( wf, &data, status );
             data = NULL;
          }
 
@@ -2101,7 +2126,7 @@ void smurf_makecube( int *status ) {
          if( jsatiles ) {
             parGet0l( "TRIMTILES", &trimtiles, status );
             grpSetsz( igrp4, 0, status );
-            smf_jsasplit( tndf, oname, trimtiles, SMF__INST_NONE, &njsatile,
+            smf_jsadicer( tndf, oname, trimtiles, SMF__INST_NONE, &njsatile,
                           igrp4, status );
             delete = -1;
          }
@@ -2134,8 +2159,9 @@ void smurf_makecube( int *status ) {
       astEnd;
    }
 
-/* Write the number of tiles being created to an output parameter. */
-   parPut0i( "NTILE", jsatiles ? njsatile : ntile, status );
+/* Write the number of tiles being created to an output parameter,
+   unless it was written earlier. */
+   if( jsatiles ) parPut0i( "NTILE", njsatile, status );
 
 /* Report an error if no output NDFs were created. */
    if( grpGrpsz( igrp4, status ) == 0 && *status == SAI__OK ) {

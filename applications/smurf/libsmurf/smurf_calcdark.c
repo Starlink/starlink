@@ -136,7 +136,7 @@ void smurf_calcdark( int *status ) {
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
   /* Filter out non-darks and reduce the darks themselves */
-  smf_find_science( igrp, NULL, 0, &dgrp, NULL, 1, 0, SMF__DOUBLE, &darks, NULL,
+  smf_find_science( NULL, igrp, NULL, 0, &dgrp, NULL, 1, 0, SMF__DOUBLE, &darks, NULL,
                     NULL, NULL, status );
 
   /* no longer need the input group */
@@ -148,7 +148,7 @@ void smurf_calcdark( int *status ) {
              &ogrp, &outsize, status );
 
   /* Get group of bolometer masks and read them into a smfArray */
-  smf_request_mask( "BBM", &bbms, status );
+  smf_request_mask( NULL, "BBM", &bbms, status );
 
   for (i=1; i<=size && *status == SAI__OK; i++ ) {
     smfData * dark = (darks->sdata)[i-1]; /* This dark */
@@ -157,16 +157,16 @@ void smurf_calcdark( int *status ) {
        since we do not want to get a large file the wrong size */
     ndgNdfas( dgrp, i, "READ", &indf, status );
 
-    smf_apply_mask( dark, bbms, SMF__BBM_DATA, 0, status );
-    smf_write_smfData( dark, NULL, NULL, ogrp, i, indf, MSG__VERB, 0, status );
+    smf_apply_mask( NULL, dark, bbms, SMF__BBM_DATA, 0, status );
+    smf_write_smfData( NULL, dark, NULL, NULL, ogrp, i, indf, MSG__VERB, 0, status );
     ndfAnnul( &indf, status);
   }
 
   /* Tidy up after ourselves: release the resources used by the grp routines  */
   grpDelet( &dgrp, status);
   grpDelet( &ogrp, status);
-  smf_close_related( &darks, status );
-  smf_close_related( &bbms, status );
+  smf_close_related( NULL, &darks, status );
+  smf_close_related( NULL, &bbms, status );
 
   ndfEnd( status );
 }

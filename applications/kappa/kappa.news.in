@@ -68,6 +68,11 @@
       -  Now writes the number of pixels used to form the correlation
       coefficient to output parameter NPIX.
 
+   o  SETQUAL
+
+      -  It is now possible to copy all quality information from one
+      NDF to another using a new parameter called LIKE.
+
 1 KAPPA_Version_2.0
 
    A new release of KAPPA (@PACKAGE_VERSION@) is available.  The main

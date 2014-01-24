@@ -128,6 +128,10 @@
 *        simply looking at the variance of the residuals in each group of
 *        noi.box_size samples. This can result in far fewer samples being
 *        flagged as unusable.
+*     2014-01-23 (DSB):
+*        Use the value of the first NOI data value as an indicator of whether
+*        the noise values have already been calculated, rather than relying on
+*        knowledge of when this will be the case.
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
@@ -265,7 +269,7 @@ void smf_calcmodel_noi( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   astMapGet0A( keymap, "NOI", &kmap );
 
   /* Assert bolo-ordered data */
-  smf_model_dataOrder( dat, allmodel, chunk, SMF__RES|SMF__QUA, 0, status );
+  smf_model_dataOrder( wf, dat, allmodel, chunk, SMF__RES|SMF__QUA, 0, status );
 
   /* Obtain pointers to relevant smfArrays for this chunk */
   res = dat->res[chunk];
@@ -347,13 +351,18 @@ void smf_calcmodel_noi( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
 
       /* Only estimate the white noise level once at the beginning - the
          reason for this is to make measurements of the convergence
-         easier. We either do it prior to the start of iterations (in which
+         easier. We may have done it prior to the start of iterations (in which
          case the relative weights will be influeced by low-frequency noise,
-         this is initialized in smf_model_create), or else we calculate
-         the noise after the first iteration. We also skip this
-         calculation if we have already imported external noise values into
-         the NOI model. */
-      if( (flags & SMF__DIMM_FIRSTITER) && (!calcfirst) && (!import) ) {
+         this is initialized in smf_model_create), or or we may have already 
+         imported external noise values into the NOI model. If not, we calculate
+         the noise now. */
+      if( model_data[ 0 ] == 1.0 ) {
+
+        /* First ensure the initial value is not 1.0. This is
+           used as a test in smf_calcmodel_ast to check that the
+           NOI model values ahave been set. The first element
+           will be 1.0 if they have not been set. */
+        model_data[ 0 ] = VAL__BADD;
 
         /* There are two forms for the NOI model: one constant noise value
            for each bolometer, or "ntslice" noise values for each bolometer.
@@ -423,7 +432,7 @@ void smf_calcmodel_noi( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
                  instate = res->sdata[idx]->hdr->allState;
                  res->sdata[idx]->hdr->allState = NULL;
               }
-              box = smf_deepcopy_smfData( res->sdata[idx], 0,
+              box = smf_deepcopy_smfData( wf, res->sdata[idx], 0,
                                           SMF__NOCREATE_DATA |
                                           SMF__NOCREATE_VARIANCE |
                                           SMF__NOCREATE_QUALITY,
@@ -624,7 +633,7 @@ void smf_calcmodel_noi( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   if( box ) {
      box->pntr[0] = astFree( box->pntr[0] );
      box->qual = astFree( box->qual );
-     smf_close_file( &box, status );
+     smf_close_file( wf, &box, status );
   }
 
   /* Free the job data. */

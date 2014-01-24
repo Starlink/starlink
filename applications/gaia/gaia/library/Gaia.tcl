@@ -987,6 +987,11 @@ itcl::class gaia::Gaia {
          -accelerator {Control-e}
       bind $w_ <Control-e> [code $this make_xyprofile_toolbox xyprofile 0 0]
 
+      add_menuitem $m command "Histograms of XY region...  " \
+         {Show histogram of a rectangular region} \
+         -command [code $this make_toolbox xyhistogram 0 1]
+      bind $w_ <Control-e> [code $this make_xyhistogram_toolbox xyhistogram 0 0]
+
       add_menuitem $m command "Polarimetry toolbox... " \
          {Display and manipulate POLPACK vector maps} \
          -command [code $this make_toolbox polarimetry 0 1] \
@@ -1406,6 +1411,54 @@ itcl::class gaia::Gaia {
 
       #  Trap real-time events for this tool.
       $image_ configure -real_time_command [code $this real_time_event_]
+   }
+
+   #  Make XY histogram toolbox. Slightly different as need to get
+   #  rectangle on canvas first. Note don't need a backing image.
+   public method make_xyhistogram_toolbox {name {cloned 0} {prompt 1}} {
+      if { [$image_ isclear] } {
+         warning_dialog "No image is currently loaded" $w_
+         return
+      }
+
+      #  If the window exists then just raise it. Can happen if control-e is
+      #  pressed repeatably.
+      if { [info exists itk_component($name)] &&
+           [winfo exists $itk_component($name)] } {
+         wm deiconify $itk_component($name)
+         raise $itk_component($name)
+         if { $itk_option(-ukirt_xy) } {
+            $itk_component($name) restore
+         }
+         return
+      }
+
+      if { $prompt } {
+         if {[action_dialog "Press OK and then drag out a \
+                             rectangle over the image with button 1" $w_]} {
+            set proceed 1
+         } else {
+            set proceed 0
+         }
+      } else {
+         set proceed 1
+      }
+      if { $proceed } {
+         [$image_ component draw] set_drawing_mode rectangle \
+            [code $this make_xyhistogram_ $name $cloned]
+      }
+   }
+   public method make_xyhistogram_ {name cloned rect_id x0 y0 x1 y1} {
+      itk_component add $name {
+         GaiaXYHistogram $w_.\#auto \
+            -rtdimage [$image_ get_image] \
+            -canvasdraw [$image_ component draw] \
+            -canvas [$image_ get_canvas] \
+            -transient 1 \
+            -number $clone_ \
+            -clone_cmd [code $this make_toolbox xyhistogram 1] \
+            -rect_id $rect_id
+      }
    }
 
    #  Make polarimetry toolbox.

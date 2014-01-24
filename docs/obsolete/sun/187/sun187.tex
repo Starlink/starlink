@@ -1,0 +1,98 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {187.1}
+\newcommand{\stardocauthors}   {M. J. Bly}
+\newcommand{\stardocdate}      {16 January 1995}
+\newcommand{\stardoctitle}     {SKYCAL --- Interactive Almanac and Calculator}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+DRAL / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
+{\large Particle Physics \& Astronomy Research Council}\\
+{\large Starlink Project\\}
+{\large \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+%  \setlength{\parskip}{0mm}
+%  \tableofcontents
+%  \setlength{\parskip}{\medskipamount}
+%  \markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\section{Introduction}
+
+SKYCAL consists of two programs, {\tt skycalc} and {\tt skycalendar}. 
+
+The {\tt skycalc} program is an ``Interactive Almanac''. It is intended
+for use by astronomers planning and executing observing runs, and
+allows easy calculation of airmasses, twilight, lunar interference,
+coordinate transformations, and such --- nearly everything except the
+weather.
+
+The {\tt skycalendar} program is a ``Nighttime Astronomical Calendar'',
+for calculating and printing astronomical calendars.  Both have a
+number of preset Observatory locations to choose from, or you can load
+your own.
+
+\section{Using Skycalc and Skycalendar}
+
+Both programs have been installed in the USSC, so you just type their
+names at the Unix shell prompt, thus:
+
+\begin{quote}
+{\tt \% skycalc} \\
+or \\
+{\tt \% skycalendar}
+\end{quote}
+
+where {\tt \%} is the Unix shell prompt.
+
+More information about both {\tt skycalc} and {\tt skycalendar} can be
+found in the ``{\sc Skycalc User's Manual}'', copies of which are
+available from Site Managers.
+
+\section{Acknowledgement}
+
+The {\tt skycalc} and {\tt skycalendar} programs were written by John 
+Thorstensen, who has kindly given permission for their distribution as part
+of the Starlink Software Collection.  
+
+John Thorstensen may be contacted at The Department of Physics and
+Astronomy, Dartmouth College, Hanover, NH 03755, USA; and by email at
+{\tt john.thorstensen@dartmouth.edu}.
+
+
+\end{document}

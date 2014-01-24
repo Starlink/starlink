@@ -107,7 +107,7 @@ void smurf_rawrecreatewcs( int * status ) {
     int isok = 1;
 
     /* First open in READ mode as a sanity check */
-    smf_open_file( igrp, i, "READ", 0, &data, status );
+    smf_open_file( NULL, igrp, i, "READ", 0, &data, status );
     if (*status != SAI__OK) break;
     if (data->hdr->instrument != INST__ACSIS) {
       isok = 0;
@@ -142,7 +142,7 @@ void smurf_rawrecreatewcs( int * status ) {
     }
 
     /* close up and skip if this is not a good file */
-    smf_close_file( &data, status );
+    smf_close_file( NULL, &data, status );
     if (!isok) continue;
 
     /* Now we try to update the file */

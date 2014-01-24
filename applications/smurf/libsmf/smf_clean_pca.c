@@ -858,9 +858,9 @@ void smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
     if( data_array ) {
       /* Data doesn't belong to us, so avoid freeing */
       data_array->owndata = 0;
-      smf_close_related( &data_array, status );
+      smf_close_related( wf, &data_array, status );
     }
-    if( gain_array ) smf_close_related( &gain_array, status );
+    if( gain_array ) smf_close_related( wf, &gain_array, status );
     if( gain_group ) smf_close_smfGroup( &gain_group, status );
     if( kmap ) kmap = astAnnul( kmap );
   }

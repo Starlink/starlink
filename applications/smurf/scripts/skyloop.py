@@ -3,7 +3,7 @@
 '''
 *+
 *  Name:
-*     skyloop
+*     SKYLOOP
 
 *  Purpose:
 *     Create a map using the "inside-out" algorithm.
@@ -53,7 +53,7 @@
 *        - First iteration:
 *           numiter=1
 *           noi.export=1
-*           exportNDF=ext
+*           exportNDF=(lut,ext,res,qua)
 *           noexportsetbad=1
 *           exportclean=1
 *           ast.zero_notlast = 0
@@ -69,8 +69,10 @@
 *        - Subsequent iterations:
 *           numiter=1
 *           noi.import=1
+*           exportNDF=(res,qua)
 *           doclean=0
 *           importsky=ref
+*           importlut=1
 *           ext.import=1
 *           ast.zero_notlast = 0
 *           flt.zero_notlast = 0
@@ -90,6 +92,7 @@
 *           noi.import=1
 *           doclean=0
 *           importsky=ref
+*           importlut=1
 *           ext.import=1
 *           ast.zero_notlast = 1
 *           flt.zero_notlast = 1
@@ -258,7 +261,19 @@
 *        variances, and thus be over-emphasised in the final map,
 *        resulting in visible bolometer tracks. If this is a problem, add
 *        "noi.calcfirst=1" to your config., and remove "noi.box_size".
-
+*     9-DEC-2013 (DSB):
+*        - Fix nasty bug which caused the raw (i.e. uncleaned) data to be
+*        used on every iteration, even though "doclean=0" was used on the
+*        second and subsequent iteration, thus causing the map to be
+*        formed from uncleaned data.
+*        - Ensure only one iteration is used on the second and subsequent
+*        invocations of makemap, even if ast.skip is non-zero.
+*     8-JAN-2014 (DSB):
+*        - Fix bug that caused NOI model to be ignored on all iterations.
+*        - Update quality flags in cleaned data after each invocation of makemap.
+*        - Cache LUT model values.
+*     14-JAN-2014 (DSB):
+*        Ensure same map bounds are used on every invocation of makemap.
 *-
 '''
 
@@ -280,6 +295,10 @@ retain = 0
 #  when the script exist.
 new_ext_ndfs = []
 
+#  A list of the LUT NDFs created by this script. These are created and used
+#  in the current working directory, and are deleted when the script exist.
+new_lut_ndfs = []
+
 #  A list of the NOI model NDFs created by this script. These are created
 #  and used in the current working directory, and are deleted when the
 #  script exist.
@@ -289,17 +308,21 @@ new_noi_ndfs = []
 #  unless the script's RETAIN parameter indicates that they are to be
 #  retained. Also delete the script's temporary ADAM directory.
 def cleanup():
-   global retain, new_ext_ndfs, new_noi_ndfs
+   global retain, new_ext_ndfs, new_lut_ndfs, new_noi_ndfs
    try:
       starutil.ParSys.cleanup()
       if retain:
-         msg_out( "Retaining EXT and NOI models in {0} and temporary files in {1}".format(os.getcwd(),NDG.tempdir))
+         msg_out( "Retaining EXT, LUT and NOI models in {0} and temporary files in {1}".format(os.getcwd(),NDG.tempdir))
       else:
          NDG.cleanup()
          for ext in new_ext_ndfs:
             os.remove( ext )
+         for lut in new_lut_ndfs:
+            os.remove( lut )
          for noi in new_noi_ndfs:
             os.remove( noi )
+         for res in qua:
+            os.remove( res )
    except:
       pass
 
@@ -384,10 +407,13 @@ try:
    itermap = parsys["ITERMAP"].value
 
 #  See if we are using pre-cleaned data, in which case there is no need
-#  to export the cleaned data on the first iteration.
-   if invoke( "$KAPPA_DIR/configecho name=doclean config={0} "
+#  to export the cleaned data on the first iteration. Note we need to
+#  convert the string returned by "invoke" to an int explicitly, otherwise
+#  the equality is never satisfied and we end up assuming that the raw
+#  data has been precleaned, even if it hasn't been precleaned.
+   if int( invoke( "$KAPPA_DIR/configecho name=doclean config={0} "
               "defaults=$SMURF_DIR/smurf_makemap.def "
-              "select=\"\'450=0,850=1\'\" defval=1".format(config)) == 1:
+              "select=\"\'450=0,850=1\'\" defval=1".format(config))) == 1:
       precleaned = False
    else:
       precleaned = True
@@ -461,8 +487,8 @@ try:
                            "select=\"\'450=0,850=1\'\"".format(config)))
 
 #  The first invocation of makemap will create NDFs holding cleaned
-#  time-series data, EXT and NOI model values. The NDFs are created with
-#  hard-wired names and put in the current working directory. For
+#  time-series data, EXT, LUT and NOI model values. The NDFs are created
+#  with hard-wired names and put in the current working directory. For
 #  tidyness, we will move the cleaned data files into the NDG temp
 #  directory, where all the other temp files are stored. In order to
 #  distinguish NDFs created by this script from any pre-existing NDFs
@@ -470,8 +496,8 @@ try:
 #  last-accessed times of any relevant pre-existing NDFs. Note, if the
 #  "ext.import" config parameter is set, makemap expects EXT model
 #  values to be in the current working directory, so we do not move
-#  those NDFs to the NDG temp directory. Likewise for NOI model files.
-#  Use last-accessed times rather than inode numbers since something
+#  those NDFs to the NDG temp directory. Likewise for LUT and NOI model
+#  files. Use last-accessed times rather than inode numbers since something
 #  very strange seems to be happening with inode numbers for NDFs
 #  created by the starutil module (two succesive NDFs with the same
 #  path can have the same inode number).
@@ -489,6 +515,11 @@ try:
    for path in glob.glob("s*_con_noi.sdf"):
       orig_noi_ndfs[path] = os.stat(path).st_atime
 
+#  Note any pre-existing NDFs holding LUT values.
+   orig_lut_ndfs = {}
+   for path in glob.glob("s*_con_lut.sdf"):
+      orig_lut_ndfs[path] = os.stat(path).st_atime
+
 #  Find the number of iterations to perform on the initial invocation of
 #  makemap.
    niter0 = 1 + ast_skip
@@ -497,8 +528,8 @@ try:
 
 #  On the first invocation of makemap, we use the raw data files specified
 #  by the IN parameter to create an initial estimate of the sky. We also
-#  save the cleaned time series data, and the EXT and NOI models (if we are
-#  doing more than one iteration), for use on subsequent iterations (this
+#  save the cleaned time series data, and the EXT, LUT and NOI models (if we
+#  are doing more than one iteration), for use on subsequent iterations (this
 #  speeds them up a bit). First create a text file holding a suitably modified
 #  set of configuration parameters. This file is put in the NDG temp
 #  directory (which is where we store all temp files).
@@ -517,8 +548,9 @@ try:
       fd.write("noi.export=1\n") # Export the NOI model. This forces the
                                  # NOI model to be created and exported after
                                  # the first iteration has completed.
-      fd.write("exportNDF=ext\n")# Save the EXT model values to avoid
+      fd.write("exportNDF=(lut,ext,res,qua)\n")# Save the EXT, LUT model values to avoid
                                  # re-calculation on each invocation of makemap.
+                                 # Also need QUA to update time-series flags
       fd.write("noexportsetbad=1\n")# Export good EXT values for bad bolometers
       if not precleaned:
          fd.write("exportclean=1\n")  # Likewise save the cleaned time-series data.
@@ -561,6 +593,13 @@ try:
          invoke("$KAPPA_DIR/ndftrace ndf={0} quiet=yes".format(newmap))
          msg_out( "Re-using existing map {0}".format(newmap) )
          gotit = True
+
+#  Get the pixel index bounds of the map.
+         lx = starutil.get_task_par( "lbound(1)", "ndftrace" )
+         ly = starutil.get_task_par( "lbound(2)", "ndftrace" )
+         ux = starutil.get_task_par( "ubound(1)", "ndftrace" )
+         uy = starutil.get_task_par( "ubound(2)", "ndftrace" )
+
       except:
          pass
 
@@ -578,6 +617,12 @@ try:
       if extra:
          cmd += " "+extra
       invoke(cmd)
+
+#  Get the pixel index bounds of the map.
+      lx = starutil.get_task_par( "lbound(1)", "makemap" )
+      ly = starutil.get_task_par( "lbound(2)", "makemap" )
+      ux = starutil.get_task_par( "ubound(1)", "makemap" )
+      uy = starutil.get_task_par( "ubound(2)", "makemap" )
 
 #  Unless the supplied data was pre-cleaned, the NDFs holding the cleaned
 #  time-series data will have been created by makemap in the current working
@@ -601,6 +646,13 @@ try:
             elif os.stat(ndf).st_atime > orig_ext_ndfs[ndf]:
                new_ext_ndfs.append(ndf)
 
+#  Get a list of the LUT files created by the first invocation of makemap.
+         for ndf in glob.glob("s*_con_lut.sdf"):
+            if not ndf in orig_lut_ndfs:
+               new_lut_ndfs.append(ndf)
+            elif os.stat(ndf).st_atime > orig_lut_ndfs[ndf]:
+               new_lut_ndfs.append(ndf)
+
 #  Get a list of the NOI model files created by the first invocation of
 #  makemap.
          for ndf in glob.glob("s*_con_noi.sdf"):
@@ -609,12 +661,16 @@ try:
             elif os.stat(ndf).st_atime > orig_noi_ndfs[ndf]:
                new_noi_ndfs.append(ndf)
 
-#  Get the paths to the the moved cleaned files.
+#  Get the paths to the the moved cleaned files. Also get the paths to the
+#  files holding the quality flags at the end of each invocation of
+#  makemap.
    if niter > 1:
       if not precleaned:
          cleaned = NDG( os.path.join( NDG.tempdir,"s*_con_res_cln.sdf"))
+         qua = NDG( cleaned, "./*|_cln||" )
       else:
          cleaned = indata
+         qua = None
 
 #  Now do the second and subsequent iterations. These use the cleaned
 #  time-series data created by the first iteration as their time-series
@@ -622,10 +678,11 @@ try:
 #  initial guess at the sky. First create a map holding things to add
 #  to the config for subsequent invocations.
       add = {}
-      add["exportNDF"] = 0     # Prevent EXT model being exported.
+      add["exportNDF"] = "(res,qua)" # Prevent EXT or LUT model being exported.
       add["exportclean"] = 0   # Prevent cleaned time-series data being exported.
       add["doclean"] = 0       # Do not clean the supplied data (it has
       add["importsky"] = "ref" # Get the initial sky estimate from the REF parameter.
+      add["importlut"] = 1     # Import the LUT model created by the first iteration.
       add["ext.import"] = 1    # Import the EXT model created by the first iteration.
       add["flt.notfirst"] = 0  # Ensure we use FLT on 2nd and subsequent invocations
       add["pln.notfirst"] = 0  # Ensure we use PLN on 2nd and subsequent invocations
@@ -633,9 +690,10 @@ try:
       add["diag.append"] = 1   # Ensure we append diagnostics to the file
                                # created on the first iteration.
       add["ast.skip"] = 0      # Ensure we do not skip any more AST models
-      add["noi.import"] = 0    # Use the NOI model created by iteration 1
+      add["noi.import"] = 1    # Use the NOI model created by iteration 1
       add["noi.export"] = 0    # No need to export the NOI model again
-
+      if ast_skip > 0:
+         add["numiter"] = 1    # First invocation used (1+ast_skip) iterations
 
 #  Now create the config, inheriting the config from the first invocation.
       iconf = 1
@@ -723,6 +781,9 @@ try:
                add["com.perarray_last"] = com_perarray_last
                newcon = 1
 
+#  No need to export quality flags on the last iteration.
+            add["exportNDF"] = 0
+
 #  If this is not the last iteration, get the name of a temporary NDF that
 #  can be used to store the current iteration's map. This NDF is put in
 #  the NDG temp directory.
@@ -740,6 +801,11 @@ try:
                fd.write("{0}={1}\n".format( key, add[key] ))
             fd.close()
 
+#  Update the quality flags in the cleaned time-series data to be the
+#  same as the flags exported at the end of the previous iteration.
+         if qua != None:
+            invoke( "$KAPPA_DIR/setqual ndf={0} like={1}".format(cleaned,qua) )
+
 #  See if the output NDF already exists.
          gotit = False
          if restart != None:
@@ -751,10 +817,12 @@ try:
                pass
 
 #  If required, construct the text of the makemap command and invoke it. We
-#  specify the map from the previous iteration as the REF image.
+#  specify the map from the previous iteration as the REF image. Since we are
+#  re-using the LUT model from the first invocation, we need to ensure that
+#  the maps bounds never change (as they may because of new data being
+#  flagged for instance). So specify them explicitly when running makemap.
          if not gotit:
-            cmd = "$SMURF_DIR/makemap in={0} out={1} method=iter config='^{2}' ref={3}"\
-                  .format(cleaned,newmap,confname,prevmap)
+            cmd = "$SMURF_DIR/makemap in={0} out={1} method=iter config='^{2}' ref={3} lbnd=\[{4},{5}\] ubnd=\[{6},{7}\]".format(cleaned,newmap,confname,prevmap,lx,ly,ux,uy)
             if pixsize:
                cmd += " pixsize={0}".format(pixsize)
             if mask2:
@@ -787,6 +855,10 @@ try:
 #  itermap cube.
          maps.append(newmap)
 
+#  Update the NDF from which new quality info is to be read.
+         if qua:
+            qua = NDG( cleaned, "./*_con_res" )
+
 #  Increment the iteration number
          iter += 1
 
@@ -807,7 +879,7 @@ try:
 #  zero. This is to provide a record of the final used mask.
    if prevmap != None:
       try:
-         invoke("$HDSTOOLS_DIR/hcopy inp={0} out={1}".format(prevmap,newmap) )
+         invoke("$KAPPA_DIR/setqual ndf={0} like={1}".format(newmap,prevmap) )
       except starutil.StarUtilError as err:
          pass
    if niter > 1 : invoke("$KAPPA_DIR/setbb ndf={0} bb=0".format(newmap) )

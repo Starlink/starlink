@@ -17,12 +17,13 @@
 {Copyright \copyright\ 2000 Council for the Central Laboratory of the Research Councils}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {92.12}
-\newcommand{\stardocauthors}   {R.F.~Warren-Smith \& M.D.~Lawden}
-\newcommand{\stardocdate}      {23rd February 1999}
+\newcommand{\stardocnumber}    {92.13}
+\newcommand{\stardocauthors}   {R.F.~Warren-Smith\\ M.D.~Lawden\\
+                                B.K.~McIlwrath \\ T.~Jenness\\ P.W.~Draper}
+\newcommand{\stardocdate}      {18th April 2008}
 \newcommand{\stardoctitle}     {HDS\\ [\latex{1ex}]
                                 Hierarchical Data System}
-\newcommand{\stardocversion}   {Version 4.3}
+\newcommand{\stardocversion}   {Version 5.1}
 \newcommand{\stardocmanual}    {Programmer's Manual}
 \newcommand{\stardocabstract}  {
 HDS is a file-based hierarchical data system designed for the storage
@@ -757,6 +758,7 @@ underscore and are \qt{pre-defined} by HDS, as follows:
 \st{HDS Type} & \st{Fortran Type} & \st{Description}\\
 \hline \hline
 \_INTEGER & INTEGER & Integer (signed)\\
+\_INT64 & INTEGER{\astar}8 & 64-bit Integer (signed)\\
 \_REAL & REAL & Single precision\\
 \_DOUBLE & DOUBLE PRECISION & Double precision\\
 \_LOGICAL & LOGICAL & Logical\\

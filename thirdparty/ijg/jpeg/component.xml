@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="jpeg" support="U">
-  <version>6b</version>
+  <version>9</version>
   <path>thirdparty/ijg/jpeg</path>
   <description>Independent JPEG Group library</description>
   <!-- <abstract><p></p></abstract> -->

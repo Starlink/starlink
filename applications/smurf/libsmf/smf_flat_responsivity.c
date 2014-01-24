@@ -267,10 +267,10 @@ size_t smf_flat_responsivity ( smf_flatmeth method, smfData *respmap, double snr
 
   }
 
-  if (tabbolval) smf_close_file(&tabbolval, status );
-  if (heateff) smf_close_file(&heateff, status);
+  if (tabbolval) smf_close_file(NULL, &tabbolval, status );
+  if (heateff) smf_close_file(NULL, &heateff, status);
   if (*status != SAI__OK) {
-    if (polyfit && *polyfit) smf_close_file( polyfit, status );
+    if (polyfit && *polyfit) smf_close_file( NULL, polyfit, status );
   }
 
   return ngood;

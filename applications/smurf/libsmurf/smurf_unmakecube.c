@@ -424,7 +424,7 @@ void smurf_unmakecube( int *status ) {
 
 /* Obtain information about the current template NDF, but do not map the
    arrays. */
-      smf_open_file( igrp2, ifile, "READ", SMF__NOCREATE_DATA, &data, status );
+      smf_open_file( NULL, igrp2, ifile, "READ", SMF__NOCREATE_DATA, &data, status );
 
 /* Issue a suitable message and abort if anything went wrong. */
       if( *status != SAI__OK ) {
@@ -526,7 +526,7 @@ void smurf_unmakecube( int *status ) {
 
 /* Close the input time series file. */
       if( data != NULL ) {
-         smf_close_file( &data, status );
+         smf_close_file( NULL, &data, status );
          data = NULL;
       }
 
@@ -537,7 +537,7 @@ void smurf_unmakecube( int *status ) {
 /* Close any input data file that is still open due to an early exit from
    the above loop. */
    if( data != NULL ) {
-      smf_close_file( &data, status );
+      smf_close_file( NULL, &data, status );
       data = NULL;
    }
 

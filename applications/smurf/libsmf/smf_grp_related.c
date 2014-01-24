@@ -326,7 +326,7 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
     AstKeyMap * indexmap = NULL;
 
     /* First step: open file and harvest metadata */
-    smf_open_file( igrp, i, "READ", SMF__NOCREATE_DATA, &data, status );
+    smf_open_file( NULL, igrp, i, "READ", SMF__NOCREATE_DATA, &data, status );
     if (*status != SAI__OK) break;
 
     if( i==1 ) {
@@ -545,7 +545,7 @@ void smf_grp_related( const Grp *igrp, const size_t grpsize,
     /* Free resources */
     filemap = astAnnul( filemap );
     indexmap = astAnnul( indexmap );
-    smf_close_file( &data, status );
+    smf_close_file( NULL, &data, status );
   }
 
   /* We now know how many groups there are */

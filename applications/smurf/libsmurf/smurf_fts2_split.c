@@ -36,10 +36,10 @@
 
 *  Authors:
 *     AGG: Andy Gibb (UBC)
-*     MSHERWOOD: Matt Sherwood (UofL)
+*     MS: Matt Sherwood (UofL)
 
 *  History :
-*     2013-05-16 (MSHERWOOD)
+*     2013-05-16 (MS)
 *        Initial version
 *     2013-05-21 (MS)
 *        Skip scans that are too short
@@ -56,6 +56,9 @@
 *          bandpass=0 means retain the entire scan
 *     2013-09-10 (MS)
 *        Fixed bug introduced in base case by previous addition of low resolution extraction
+*     2013-11-25 (MS)
+*        Add mirror times treatment
+*
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -143,6 +146,7 @@ void smurf_fts2_split(int* status)
   double fNyquist           = 0.0;      /* Nyquist frequency */
   double dz                 = 0.0;      /* Step size in evenly spaced OPD grid */
   double* MIRPOS            = NULL;     /* Mirror positions */
+  double* MIRRTS            = NULL;     /* Mirror times */
 
   size_t nFiles             = 0;        /* Size of the input group */
   size_t nOutFiles          = 0;        /* Size of the output group */
@@ -225,7 +229,7 @@ void smurf_fts2_split(int* status)
   /* Loop through each input file */
   for(fIndex = 1; fIndex <= nFiles; fIndex++) {
     /* Open Observation file */
-    smf_open_file(gIn, fIndex, "READ", 0, &inData, status);
+    smf_open_file(NULL, gIn, fIndex, "READ", 0, &inData, status);
     if(*status != SAI__OK) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Unable to open the source file!", status);
@@ -284,7 +288,8 @@ void smurf_fts2_split(int* status)
     /* Mirror positions in mm */
     nTmp = nFrames;
     MIRPOS = astCalloc(nFrames, sizeof(*MIRPOS));
-    fts2_getmirrorpositions(inData, MIRPOS, &nTmp, status); // (mm)
+    MIRRTS = astCalloc(nFrames, sizeof(*MIRRTS));
+    fts2_getmirrorpositions(inData, MIRPOS, MIRRTS, &nTmp, status); // (mm)
     if(*status != SAI__OK) {
       *status = SAI__ERROR;
       errRep( FUNC_NAME, "Unable to get the mirror positions!", status);
@@ -368,7 +373,7 @@ void smurf_fts2_split(int* status)
             (nFramesOutPrev == 0 ||
               (nFramesOutPrev > 0 && nFramesOut > 0 && (double)hrFramesOut/(double)hrFramesOutPrev >= 0.5))) {
             /* Copy single scan NDF data from input to output */
-            outData = smf_deepcopy_smfData(inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
+            outData = smf_deepcopy_smfData(NULL, inData, 0, SMF__NOCREATE_DATA | SMF__NOCREATE_FTS, 0, 0, status);
             outData->dtype   = SMF__DOUBLE;
             outData->ndims   = 3;
             outData->dims[0] = nWidth;
@@ -433,12 +438,12 @@ void smurf_fts2_split(int* status)
                 errRepf(TASK_NAME, "Error saving outData file name", status);
                 goto CLEANUP;
             }
-            smf_write_smfData(outData, NULL, outData->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
+            smf_write_smfData(NULL, outData, NULL, outData->file->name, gOut, fIndex, 0, MSG__VERB, 0, status);
             if(*status != SAI__OK) {
                 errRepf(TASK_NAME, "Error writing outData file", status);
                 goto CLEANUP;
             }
-            smf_close_file(&outData, status);
+            smf_close_file( NULL,&outData, status);
             if(*status != SAI__OK) {
                 errRepf(TASK_NAME, "Error closing outData file", status);
                 goto CLEANUP;
@@ -463,15 +468,18 @@ void smurf_fts2_split(int* status)
 
     /* Deallocate memory used by arrays */
     if(MIRPOS)  { MIRPOS    = astFree(MIRPOS); }
+    if(MIRRTS)  { MIRRTS    = astFree(MIRRTS); }
 
     /* Close the file */
-    smf_close_file(&inData, status);
+    smf_close_file( NULL,&inData, status);
 
   }
   CLEANUP:
   /* Deallocate memory used by arrays */
-  if(inData)  { smf_close_file(&inData, status); }
-  if(outData) { smf_close_file(&outData, status); }
+  if(MIRPOS)  { MIRPOS    = astFree(MIRPOS); }
+  if(MIRRTS)  { MIRRTS    = astFree(MIRRTS); }
+  if(inData)  { smf_close_file( NULL,&inData, status); }
+  if(outData) { smf_close_file( NULL,&outData, status); }
 
   /* END NDF */
   ndfEnd(status);

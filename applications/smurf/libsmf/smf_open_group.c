@@ -13,10 +13,12 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     smf_open_group( const Grp * igrp, const dim_t *refdims,
+*     smf_open_group( ThrWorkForce *wf, const Grp * igrp, const dim_t *refdims,
 *                     smfArray **files, int *status );
 
 *  Arguments:
+*     wf = ThrWorkForce * (Given)
+*        Pointer to a pool of worker threads
 *     igrp = const Grp* (Given)
 *        Pointer to an input group of files
 *     refdims[2] = const dim_t * (Given)
@@ -44,10 +46,12 @@
 *  History:
 *     2008-11-24 (TIMJ):
 *       Original.
+*     2014-01-10 (DSB):
+*       Added argument wf.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008,2014 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -82,12 +86,13 @@
 #include "sae_par.h"
 #include "mers.h"
 #include "star/grp.h"
+#include "star/thr.h"
 
 /* SMURF routines */
 #include "smf.h"
 #include "smf_typ.h"
 
-void smf_open_group( const Grp * igrp, const dim_t refdims[],
+void smf_open_group( ThrWorkForce *wf, const Grp * igrp, const dim_t refdims[],
                      smfArray **files, int *status ) {
 
   size_t i = 0;            /* Loop counter */
@@ -112,7 +117,7 @@ void smf_open_group( const Grp * igrp, const dim_t refdims[],
 
   for (i = 1; i <= nfiles; i++) {
     smfData *ifile = NULL;
-    smf_open_file( igrp, i, "READ", 0, &ifile, status );
+    smf_open_file( wf, igrp, i, "READ", 0, &ifile, status );
     if (*status != SAI__OK) break;
 
     if (i == 1 && !refdims) {
@@ -140,7 +145,7 @@ void smf_open_group( const Grp * igrp, const dim_t refdims[],
   }
 
   if (*status != SAI__OK) {
-    smf_close_related( files, status );
+    smf_close_related( wf, files, status );
   }
 
 }

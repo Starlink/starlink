@@ -13,13 +13,15 @@
 *     Library routine
 
 *  Invocation:
-*     smf_write_flagmap( smf_qual_t mask, smfArray *lut, smfArray *qua,
+*     smf_write_flagmap( ThrWorkForce *wf, smf_qual_t mask, smfArray *lut, smfArray *qua,
 *                        smfDIMMData *dat, const Grp *flagrootgrp,
 *                        size_t contchunk, const int *lbnd_out,
 *                        const int *ubnd_out, AstFrameSet *outfset,
 *                        int *status )
 
 *  Arguments:
+*     wf = ThrWorkForce * (Given)
+*        Pointer to a pool of worker threads
 *     mask = smf_qual_t (Given)
 *        Mask indicating which quality bits should be counted when making map.
 *     lut = smfArray* (Given)
@@ -94,6 +96,7 @@
 #include "prm_par.h"
 #include "par_par.h"
 #include "star/one.h"
+#include "star/thr.h"
 #include "star/atl.h"
 
 /* SMURF includes */
@@ -102,7 +105,7 @@
 
 #define FUNC_NAME "smf_write_flagmap"
 
-void smf_write_flagmap( smf_qual_t mask, smfArray *lut, smfArray *qua,
+void smf_write_flagmap( ThrWorkForce *wf, smf_qual_t mask, smfArray *lut, smfArray *qua,
                         smfDIMMData *dat, const Grp *flagrootgrp,
                         size_t contchunk, const int *lbnd_out,
                         const int *ubnd_out, AstFrameSet *outfset,
@@ -153,7 +156,7 @@ void smf_write_flagmap( smf_qual_t mask, smfArray *lut, smfArray *qua,
 
   msgOutf( "", "*** Writing flagmap %s", status, name );
 
-  smf_open_newfile( mgrp, 1, SMF__INTEGER, 2, lbnd_out, ubnd_out, 0, &mapdata,
+  smf_open_newfile( wf, mgrp, 1, SMF__INTEGER, 2, lbnd_out, ubnd_out, 0, &mapdata,
                     status);
   flagmap = mapdata->pntr[0];
 
@@ -186,6 +189,6 @@ void smf_write_flagmap( smf_qual_t mask, smfArray *lut, smfArray *qua,
 
   /* Clean up */
   if( mgrp ) grpDelet( &mgrp, status );
-  smf_close_file( &mapdata, status );
+  smf_close_file( wf, &mapdata, status );
 
 }
