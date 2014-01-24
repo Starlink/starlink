@@ -3067,13 +3067,15 @@ iraf! {
          parameter xval {
             type _DOUBLE
             access WRITE
-            vpath INTERNAL
+            vpath DEFAULT
+            default 0.0
             helpkey *
           }
          parameter yval {
             type _DOUBLE
             access WRITE
-            vpath INTERNAL
+            vpath DEFAULT
+            default 0.0
             helpkey *
           }
       }
