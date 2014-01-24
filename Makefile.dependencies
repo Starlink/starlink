@@ -199,7 +199,7 @@ $(MANIFESTS)/atools: \
 
 # Component autoconf is a buildsupport component
 $(MANIFESTS)/autoconf:
-	cd thirdparty/fsf/autoconf \
+	cd thirdparty/fsf/autotools/autoconf \
 	    && if test -f bootstrap; then \
 	       ./bootstrap > bootstrap.log; \
 	    fi \
@@ -219,7 +219,7 @@ $(MANIFESTS)/autoconf:
 $(MANIFESTS)/automake: \
 		$(MANIFESTS)/autoconf \
 		$(MANIFESTS)/libtool
-	cd thirdparty/fsf/automake \
+	cd thirdparty/fsf/autotools/automake \
 	    && if test -f bootstrap; then \
 	       ./bootstrap > bootstrap.log; \
 	    fi \
@@ -1633,7 +1633,7 @@ $(MANIFESTS)/latex2html:
 
 # Component libtool is a buildsupport component
 $(MANIFESTS)/libtool:
-	cd thirdparty/fsf/libtool \
+	cd thirdparty/fsf/autotools/libtool \
 	    && if test -f bootstrap; then \
 	       ./bootstrap > bootstrap.log; \
 	    fi \
@@ -1679,7 +1679,7 @@ $(MANIFESTS)/lpg: \
 $(MANIFESTS)/m4:
 	cd thirdparty/fsf/m4 \
 	    && if test -f bootstrap; then \
-	       ./bootstrap > bootstrap.log; \
+	       ./bootstrap_buildsupprt > bootstrap.log; \
 	    fi \
 	    && if test -n "$$BUILDSUPPORT_PREFIX"; then \
 	        ./configure --prefix=$$BUILDSUPPORT_PREFIX \
