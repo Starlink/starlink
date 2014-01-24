@@ -151,3 +151,12 @@
 [submodule "thirdparty/perlsys/perlmods/perl-UKIRT-Archive"]
 	path = thirdparty/perlsys/perlmods/perl-UKIRT-Archive
 	url = git://github.com/jac-h/perl-UKIRT-Archive.git
+[submodule "thirdparty/fsf/autotools/autoconf/autoconf"]
+	path = thirdparty/fsf/autotools/autoconf/autoconf
+	url = git@github.com:Starlink/autoconf.git
+[submodule "thirdparty/fsf/autotools/automake/automake"]
+	path = thirdparty/fsf/autotools/automake/automake
+	url = git@github.com:Starlink/automake.git
+[submodule "thirdparty/fsf/autotools/libtool/libtool"]
+	path = thirdparty/fsf/autotools/libtool/libtool
+	url = git@github.com:Starlink/libtool.git
