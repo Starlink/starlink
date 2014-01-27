@@ -3,7 +3,7 @@
 
 <component id="libtool" buildsupport="yes" support="U">
   <version>2.4.2</version>
-  <path>thirdparty/fsf/libtool</path>
+  <path>thirdparty/fsf/autotools/libtool</path>
   <description>GNU libtool</description>
   <!-- <abstract><p></p></abstract> -->
   <dependencies/>

@@ -4,7 +4,7 @@
 
 <component id="@PACKAGE@" buildsupport="yes" support="U">
   <version>@PACKAGE_VERSION@</version>
-  <path>thirdparty/fsf/automake</path>
+  <path>thirdparty/fsf/autotools/automake</path>
   <description>GNU automake, patched</description>
   <!-- <abstract><p></p></abstract> -->
   <dependencies>

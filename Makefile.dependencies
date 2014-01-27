@@ -1006,6 +1006,7 @@ $(MANIFESTS)/gaia: \
 		$(MANIFESTS)/fio \
 		$(MANIFESTS)/generic \
 		$(MANIFESTS)/grp \
+		$(MANIFESTS)/gsl \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/img \
@@ -1677,9 +1678,9 @@ $(MANIFESTS)/lpg: \
 
 # Component m4 is a buildsupport component
 $(MANIFESTS)/m4:
-	cd thirdparty/fsf/m4 \
+	cd thirdparty/fsf/autotools/m4 \
 	    && if test -f bootstrap; then \
-	       ./bootstrap_buildsupprt > bootstrap.log; \
+	       ./bootstrap > bootstrap.log; \
 	    fi \
 	    && if test -n "$$BUILDSUPPORT_PREFIX"; then \
 	        ./configure --prefix=$$BUILDSUPPORT_PREFIX \
