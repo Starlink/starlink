@@ -1418,9 +1418,8 @@ void smf_history_write( const smfData* data, int *status);
 void smf_import_array( ThrWorkForce *wf,  smfData *refdata, const char *name, int bad,
                        int expand, smf_dtype type, void *dataptr, int *status );
 
-int smf_import_noi( const char *name, smfDIMMHead *head,
-                    AstKeyMap *keymap, double *dataptr, dim_t *noi_boxsize,
-                    int *status );
+int smf_import_noi( const char *name, smfDIMMHead *head, AstKeyMap *keymap,
+                    double *dataptr, int *status );
 
 void smf_inbeam_str ( smf_inbeam_t inbeam, char *inbeamstr, size_t lenstr, int * status );
 
@@ -1545,7 +1544,7 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
                        AstFrameSet *outfset, int moving,
                        int *lbnd_out, int *ubnd_out, fts2Port fts_port,
                        smfGroup **mgroup, smfArray **mdata,
-                       AstKeyMap *keymap, dim_t *noi_boxsize, int *status );
+                       AstKeyMap *keymap, int *status );
 
 void smf_model_createHdr( smfData *model, smf_modeltype type,
                           smfData *refdata, int *status );

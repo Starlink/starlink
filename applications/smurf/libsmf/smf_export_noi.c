@@ -22,8 +22,7 @@
 *     name = const char * (Given)
 *        The name of the NDF to create.
 *     boxsize = int (Given)
-*        The number of samples in one noise box, corresponding to
-*        NOI.BOX_SIZE.
+*        The number of adjacent times slices that have the same noise value.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -38,6 +37,10 @@
 *  History:
 *     24-SEP-2013 (DSB):
 *        Original version.
+*     24-JAN-2014 (DSB):
+*        Put the time axis first in the output NDF in order to avoid
+*        unnecessary re-ordering of the values when it is read in by the
+*        next invocation of makemap.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -96,39 +99,51 @@ void smf_export_noi( smfData *noi, const char *name, int boxsize, int *status ){
    int place;
    int ubnd[ 3 ];
    size_t bstride;
+   size_t tstride;
    int iz;
 
 /* Check inherited status. */
    if( *status != SAI__OK ) return;
 
+/* Report an error if the number of time slices that share a single NOI
+   value is not known. */
+   if( boxsize == 0 ) {
+      *status = SAI__ERROR;
+      errRep( "", "smf_export_noi: noise boxsize is not yet known "
+              "(programming error).", status );
+   }
+
 /* Get the dimensions of the NOI model. */
    smf_get_dims( noi, &nrows, &ncols, &nbolo, &ntslice, NULL, &bstride,
-                 NULL, status );
-   if( ntslice == 1 ) boxsize = 0;
+                 &tstride, status );
 
 /* Determine the number of boxes to use. This is the length of 3rd axis.
-   of the new NDF. A boxsize of zero means "there is one box". */
-   nz = 1;
-   if( boxsize > 0 ) {
-      nz = ntslice/boxsize;
-      if( nz == 0 ) nz = 1;
-   } else if( ntslice > 1 ){
+   of the new NDF. */
+   if( ntslice == 1 ) {
+      nz = 1;
+   } else {
+      nz = ntslice / boxsize;
+   }
+
+   if( nz <= 0 && *status == SAI__OK ){
       *status = SAI__ERROR;
-      errRepf("", "smf_export_noi: boxsize is zero but ntslice (%d) is "
-              "larger than 1 (programming error).", status, (int) ntslice );
+      errRepf("", "smf_export_noi: boxsize (%d) and ntslice (%d) are "
+              "inconsistent (programming error).", status, boxsize,
+              (int) ntslice );
    }
 
 /* Get a pointer to the NOI data values. */
    dataptr = noi->pntr[ 0 ];
 
-/* Create the NDF. */
+/* Create the NDF. Use the axis ordering needed by smf_model_create. This
+   avoid re-ordering the values every time it is read in. */
    ndfPlace( NULL, name, &place, status );
    lbnd[ 0 ] = 1;
    lbnd[ 1 ] = 1;
    lbnd[ 2 ] = 1;
-   ubnd[ 0 ] = ncols;
-   ubnd[ 1 ] = nrows;
-   ubnd[ 2 ] = nz;
+   ubnd[ 0 ] = nz;
+   ubnd[ 1 ] = ncols;
+   ubnd[ 2 ] = nrows;
    ndfNew( "_DOUBLE", 3, lbnd, ubnd, &place, &indf, status );
 
 /* Map the Data array of the NDF and copy the NOI values into it. */
@@ -138,34 +153,28 @@ void smf_export_noi( smfData *noi, const char *name, int boxsize, int *status ){
 /* Initialise the time slice at the middle of the current box in the model. */
       itime = ( nz == 1 ) ? 0 : boxsize/2;
 
-/* Loop round all planes in the NDF. */
-      for( iz = 0; iz < nz; iz++ ) {
+/* We step sequentially through teh NDF pixels. Initialise a pointer to
+   the first pixel value. */
+      pd = ip;
 
-/* First deal with a time ordered model. The NOI model is filled with 1.0
-   values by smf_model_create, and can also be set to zero to indicate
-   missing values. Therefore convert both these values into VAL__BADD. */
-         if( bstride == 1 ){
-            pd = ip;
-            dp = dataptr + itime*nbolo;
-            for( ibolo = 0; ibolo < (int) nbolo; ibolo++,dp++ ) {
-               *(pd++) = (*dp == 0.0 || *dp == 1.0) ? VAL__BADD : *dp;
-            }
+/* Loop round each bolometer. */
+      for( ibolo = 0; ibolo < (int) nbolo; ibolo++ ) {
 
-/* Now deal with a bolo ordered model. The NOI model is filled with 1.0
-   values by smf_model_create, and can also be set to zero to indicate
-   missing values. Therefore convert both these values into VAL__BADD. */
-         } else {
-            pd = ip;
-            dp = dataptr + itime;
-            for( ibolo = 0; ibolo < (int) nbolo; ibolo++ ) {
-               *(pd++) = (*dp == 0.0 || *dp == 1.0) ? VAL__BADD : *dp;
-               dp += ntslice;
-            }
+/* Get a pointer to the noise value for the current bolometer at the
+   centre of the first box. */
+         dp = dataptr + ibolo*bstride + itime*tstride;
+
+/* Now loop round each box of time slices. */
+         for( iz = 0; iz < nz; iz++ ) {
+
+/* The NOI model is filled with 1.0 values by smf_model_create, and can also
+   be set to zero to indicate missing values. Therefore convert both these
+   values into VAL__BADD. */
+            *(pd++) = (*dp == 0.0 || *dp == 1.0) ? VAL__BADD : *dp;
+
+/* Move the input pointer on to the next box. */
+            dp += boxsize*tstride;
          }
-
-/* Point to the start of the next plane in the NDF. */
-         ip += nbolo;
-         itime += boxsize;
       }
 
 /* Store the box size as an extension item in the NDF. */
@@ -176,6 +185,5 @@ void smf_export_noi( smfData *noi, const char *name, int boxsize, int *status ){
 
 /* Annul the NDF identifier. */
    ndfAnnul( &indf, status );
-
 }
 

@@ -132,6 +132,10 @@
 *        Use the value of the first NOI data value as an indicator of whether
 *        the noise values have already been calculated, rather than relying on
 *        knowledge of when this will be the case.
+*     2014-01-24 (DSB):
+*        dat->noi_boxsize should be set to the number of times each NOI value is 
+*        duplicated. For box type 2 each time slice has a different NOI value and 
+*        so dat.noi_boxsize should be 1 in this case.
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
@@ -353,7 +357,7 @@ void smf_calcmodel_noi( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
          reason for this is to make measurements of the convergence
          easier. We may have done it prior to the start of iterations (in which
          case the relative weights will be influeced by low-frequency noise,
-         this is initialized in smf_model_create), or or we may have already 
+         this is initialized in smf_model_create), or or we may have already
          imported external noise values into the NOI model. If not, we calculate
          the noise now. */
       if( model_data[ 0 ] == 1.0 ) {
@@ -557,6 +561,7 @@ void smf_calcmodel_noi( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
             }
           }
           thrWait( wf, status );
+          dat->noi_boxsize = 1;
 
         /* Report an error if the number of samples for each bolometer in
            the NOI model is not 1 or "ntslice". */

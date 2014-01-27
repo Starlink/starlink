@@ -1432,7 +1432,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
       smf_model_create( wf, NULL, res, darks, bbms, flatramps, heateffmap,
                         NULL, 1, SMF__QUA, 0, NULL, 0, NULL, NULL, NO_FTS,
-                        NULL, qua, keymap, &noi_boxsize, status );
+                        NULL, qua, keymap, status );
 
       /* Associate quality with the res model, and do cleaning before we
          start using more memory for other things. Note that we are
@@ -1454,7 +1454,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
       smf_model_create( wf, NULL, res, darks, bbms, flatramps, heateffmap,
                         NULL, 1, SMF__LUT, 0, NULL, 0, NULL, NULL, NO_FTS,
-                        NULL, lut, keymap, &noi_boxsize, status );
+                        NULL, lut, keymap, status );
 
       if( *status == SAI__OK ) {
          for( idat = 0; idat < res[0]->ndat; idat++ ) {
@@ -1472,8 +1472,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       if( haveext ) {
         smf_model_create( wf, NULL, res, darks, bbms, flatramps, heateffmap,
                           noisemaps, 1, modeltyps[whichext], 0, NULL, 0, NULL,
-                          NULL, NO_FTS, NULL, model[whichext], keymap,
-                          &noi_boxsize, status);
+                          NULL, NO_FTS, NULL, model[whichext], keymap, status);
       }
 
       /*** TIMER ***/
@@ -1675,8 +1674,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
             (modeltyps[imodel] != SMF__AST) ) {
           smf_model_create( wf, NULL, res, darks, bbms, flatramps, heateffmap,
                             noisemaps, 1, modeltyps[imodel], 0, NULL, 0, NULL, NULL,
-                            NO_FTS, NULL, model[imodel], keymap,
-                            &noi_boxsize, status );
+                            NO_FTS, NULL, model[imodel], keymap, status );
         }
 
         /* Associate quality with some models */
