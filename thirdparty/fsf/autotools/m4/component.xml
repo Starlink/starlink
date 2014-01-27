@@ -12,7 +12,7 @@
        not include it in the list of buildsupport dependencies, so that it
        is not build automatically. -->
   <version>1.4.17</version>
-  <path>thirdparty/fsf/m4</path>
+  <path>thirdparty/fsf/autotools/m4</path>
   <description>GNU m4</description>
   <dependencies/>
   <developers>

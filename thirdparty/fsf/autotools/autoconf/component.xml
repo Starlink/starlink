@@ -3,7 +3,7 @@
 
 <component id="autoconf" buildsupport="yes" support="U">
   <version>starlink-2.69</version>
-  <path>thirdparty/fsf/autoconf</path>
+  <path>thirdparty/fsf/autotools/autoconf</path>
   <description>Starlink autoconf</description>
   <!-- <abstract><p></p></abstract> -->
   <dependencies/>
