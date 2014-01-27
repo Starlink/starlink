@@ -423,6 +423,10 @@
 *     2014-01-16 (DSB):
 *        Do not allocate models to hold AST since the astronomical signal is
 *        determined from the current map.
+*     2014-01-27 (DSB):
+*        Dump the itermap after the map quality array has been set (i.e. 
+*        after smf_calcmodel_ast). Previously each itermap has the quality 
+*        associated with the previous iteration.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -2145,21 +2149,6 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                      ": ** %f s rebinning map",
                      status, smf_timerupdate(&tv1,&tv2,status) );
 
-          /* If storing each iteration in an extension do it here if this
-             was the last filegroup of data to be added */
-
-          if( itermap > 0 ) {
-            smf_write_itermap( wf, thismap, thisvar,
-                               ( itermap > 1 ) ? thisqual : NULL, msize,
-                               iterrootgrp, contchunk, iter, lbnd_out,
-                               ubnd_out, outfset, res[0]->sdata[0]->hdr,
-                               qua[0], status );
-
-            /*** TIMER ***/
-            msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
-                       ": ** %f s writing itermap",
-                       status, smf_timerupdate(&tv1,&tv2,status) );
-          }
         }
 
 
@@ -2226,6 +2215,22 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
                      ": ** %f s calculating AST",
                      status, smf_timerupdate(&tv1,&tv2,status) );
+
+          /* If storing each iteration in an extension do it here if this
+             was the last filegroup of data to be added */
+
+          if( itermap > 0 ) {
+            smf_write_itermap( wf, thismap, thisvar,
+                               ( itermap > 1 ) ? thisqual : NULL, msize,
+                               iterrootgrp, contchunk, iter, lbnd_out,
+                               ubnd_out, outfset, res[0]->sdata[0]->hdr,
+                               qua[0], status );
+
+            /*** TIMER ***/
+            msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
+                       ": ** %f s writing itermap",
+                       status, smf_timerupdate(&tv1,&tv2,status) );
+          }
 
           /* After subtraction of the model, dump the model itself
              and the modified residuals. */
