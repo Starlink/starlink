@@ -116,7 +116,9 @@
 *        Original version.
 *     18-DEC-2013 (DSB):
 *        Use Gauss interpolation kernel if output pixels are larger than
-#        input pixels.
+*        input pixels.
+*     27-JAN-2014 (DSB):
+*        Fix mapping of non-NDF regions onto the reference image.
 *-
 '''
 
@@ -391,8 +393,9 @@ try:
                     format(jsatile,instrument,tile_header) )
             lbnd = starutil.get_task_par( "LBND", "jsatileinfo" )
             ubnd = starutil.get_task_par( "UBND", "jsatileinfo" )
-            ix = ( ubnd[ 0 ] + lbnd[ 0 ] )/2
-            iy = ( ubnd[ 1 ] + lbnd[ 1 ] )/2
+
+            ix = ( ubnd[ 0 ] - lbnd[ 0 ] + 1 )/2
+            iy = ( ubnd[ 1 ] - lbnd[ 1 ] + 1 )/2
 
             tile_wcs = NDG.tempfile()
             invoke( "$ATOOLS_DIR/astset {0} system {1} {2}".
@@ -450,14 +453,31 @@ try:
 
       reg = NDG.tempfile()
       invoke( "$ATOOLS_DIR/astcopy {0} {1} class=region".format(this_reg,reg) )
+
       reg_2d = NDG.tempfile()
       invoke( "$ATOOLS_DIR/astpickaxes {0} \[1,2\] ! {1}".format(reg,reg_2d) )
 
+#  We want the mapping from the Region's frame (icrs,galatic,etc) to the
+#  grid coordinate system of the reference image. We use astConvert for
+#  this. But astConvert converts to the current Frame of the target, so we
+#  need to invert the reference FrameSet first so that grid coords becomes
+#  the current Frame, rather than the base Frame.
+      ref_fs = NDG.tempfile()
+      invoke( "$ATOOLS_DIR/astinvert {0} {1}".format(ref,ref_fs) )
+
+#  Now use astConvert to get a FrameSet in which the base Frame is the
+#  region's frame, the current Frame is the reference GRID system, and
+#  the alignment occurs in sky coordinates.
+      tmp_fs = NDG.tempfile()
+      invoke( "$ATOOLS_DIR/astconvert {0} {1} SKY {2}".format(reg_2d,ref_fs,tmp_fs) )
+
+
+#  Get the mapping from the region's frame to the reference GRID system.
       map = NDG.tempfile()
-      invoke( "$ATOOLS_DIR/astgetmapping {0} AST__CURRENT AST__BASE {1}".
-                 format(ref,map) )
+      invoke( "$ATOOLS_DIR/astgetmapping {0} AST__BASE AST__CURRENT {1}".
+                 format(tmp_fs,map) )
       frm = NDG.tempfile()
-      invoke( "$ATOOLS_DIR/astgetframe {0} AST__BASE {1}".format(ref,frm) )
+      invoke( "$ATOOLS_DIR/astgetframe {0} AST__CURRENT {1}".format(tmp_fs,frm) )
       mapped_reg = NDG.tempfile()
       invoke( "$ATOOLS_DIR/astmapregion {0} {1} {2} {3}".
               format(reg_2d,map,frm,mapped_reg) )
