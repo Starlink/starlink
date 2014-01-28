@@ -235,10 +235,12 @@
  *     2012-04-03 (TIMJ):
  *        Copy smfFile in deepcopy so that flatfielding can tell the file name
  *        when reporting an error.
- *     2014-08-01 (DSB):
+ *     2014-01-08 (DSB):
  *        Add option to import LUT model from an external NDF (for SKYLOOP).
- *     2014-13-01 (DSB):
- *        Multi-thread copying of arrays from reference to outptu data.
+ *     2014-01-13 (DSB):
+ *        Multi-thread copying of arrays from reference to output data.
+ *     2014-01-28 (DSB):
+ *        Correct ordering of grid axes in time series WCS.
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -362,7 +364,6 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
   char *pname;                  /* Pointer to input filename */
   smfData *refdata=NULL;        /* Reference smfData */
   smf_dtype refdtype;           /* reference DATA/VARIANCE type */
-  const char *refdtypestr;      /* const string for reference data type */
   smfHead *refhdr=NULL;         /* pointer to smfHead in ref data */
   dim_t refncol=0;              /* reference number of rows */
   dim_t refndata;               /* Number data points in reference file */
@@ -533,7 +534,6 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
 
           /* Concatenated data is always double precision */
           refdtype = SMF__DOUBLE;
-          refdtypestr = smf_dtype_string(refdata, status);
 
         } else {
           /* Check these dims against refdims */
@@ -934,9 +934,11 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
                 hdr->fitshdr = astCopy( refhdr->fitshdr );
               }
 
-              /* Copy over the TSWCS */
+              /* Copy over the TSWCS, ensuring the axes are in the required
+                 order. */
               if( (*status == SAI__OK) && (refhdr->tswcs) ) {
                 hdr->tswcs = astCopy( refhdr->tswcs );
+                smf_tswcsOrder( &(hdr->tswcs), isTordered, status );
               }
             }
           }
@@ -1251,7 +1253,7 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
 
         if( data->hdr->tswcs ) data->hdr->tswcs = astAnnul( data->hdr->tswcs );
 
-        smf_create_tswcs( data->hdr, &data->hdr->tswcs, status );
+        smf_create_tswcs( data->hdr, isTordered, &data->hdr->tswcs, status );
 
         /* If we couldn't make the tswcs just annul error and continue... we
            don't really need it for anything */

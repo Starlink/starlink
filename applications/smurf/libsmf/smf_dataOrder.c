@@ -100,14 +100,16 @@
 *        in the smfData to indicate that the memory has been allocated by
 *        smurf and is no longer the mapped NDF arrays. This is used by
 *        smf_clsoe_fiel to decide whether to free the memory or not.
+*     2014-01-28 (DSB):
+*        Update the WCS when re-ordering axes.
 
 *  Notes:
-*     Nothing is done about the FITS channels or WCS information stored in
-*     the header, so anything that depends on them will get confused by
-*     bolo-ordered data produced with this routine.
+*     Nothing is done about the FITS channels stored in the header, so
+*     anything that depends on them will get confused by bolo-ordered
+*     data produced with this routine.
 
 *  Copyright:
-*     Copyright (C) 2009-2010 Science & Technology Facilities Council.
+*     Copyright (C) 2009-2010,2014 Science & Technology Facilities Council.
 *     Copyright (C) 2005-2009 University of British Columbia.
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
@@ -293,6 +295,11 @@ int smf_dataOrder( ThrWorkForce *wf, smfData *data, int isTordered,
     qchanged = smf_dataOrder( wf, data->sidequal, isTordered, status );
     /* and indicate if we changed anything (but not if we did not) */
     if (qchanged) waschanged = qchanged;
+  }
+
+  /* Re-order the axes in the time-series WCS FrameSet */
+  if( data->hdr && data->hdr->tswcs ) {
+    smf_tswcsOrder( &(data->hdr->tswcs), isTordered, status );
   }
 
   /* If the re-ordering was not done in-place, then the new buffer must

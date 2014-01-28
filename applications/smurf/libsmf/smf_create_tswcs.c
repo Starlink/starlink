@@ -13,12 +13,15 @@
 *     Library routine
 
 *  Invocation:
-*     smf_create_tswcs( const smfHead *hdr, AstFrameSet **frameset, int *status )
+*     smf_create_tswcs( const smfHead *hdr, int isTordered, AstFrameSet **frameset, int *status )
 
 *  Arguments:
 *     hdr = smfHead* (Given)
 *        The supplied smfHead must have allState, telpos, nframes, instap, and
 *        a complete fitshdr populated.
+*     isTordered = int (Given)
+*        The required axis order: isTorered==0 implies the time axis is the first
+*        axis, isTorered==1 implies the time axis is the last axis.
 *     fset = AstFrameSet **fset (Returned)
 *        Newly constructed frameset for time-series data cube.
 *     status = int* (Given and Returned)
@@ -32,8 +35,9 @@
 *  Notes:
 
 *  Authors:
-*     Edward Chapin (UBC)
-*     Tim Jenness (JAC, Hawaii)
+*     EC: Edward Chapin (UBC)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
+*     DSB: David S Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -41,10 +45,13 @@
 *        Initial version -- based on timeWcs() in sc2store.c
 *     2010-12-06 (TIMJ):
 *        Missing DUT1 is not fatal.
+*     2014-01-28 (DSB):
+*        Allow the required axis order to be specified.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2010 University of British Columbia.
+*     Copyright (C) 2014 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -82,7 +89,7 @@
 
 #define FUNC_NAME "smf_create_tswcs"
 
-void smf_create_tswcs( smfHead *hdr, AstFrameSet **frameset, int *status ){
+void smf_create_tswcs( smfHead *hdr, int isTordered, AstFrameSet **frameset, int *status ){
 
   /* Local Variables */
   JCMTState *allState=NULL;     /* Full array of JCMTState for time series */
@@ -154,6 +161,11 @@ void smf_create_tswcs( smfHead *hdr, AstFrameSet **frameset, int *status ){
     if( *status == SAI__OK ) {
       astClear( *frameset, "LToffset" );
     }
+
+    /* sc2store_timeWcs assumes that the time axis is the third axis
+       (i.e. isTordered=1). If the requested ordering is different,
+       permute the base frame (i.e. grid) axes to take account of it. */
+    smf_tswcsOrder( frameset, isTordered, status );
   }
   /* Clean up */
   times = astFree( times );

@@ -417,6 +417,7 @@ smf_terr.c \
 smf_timerinit.c \
 smf_timerupdate.c \
 smf_tslice_ast.c \
+smf_tswcsOrder.c \
 smf_uncalc_iqu.c \
 smf_update_quality.c \
 smf_update_valbad.c \

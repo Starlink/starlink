@@ -110,7 +110,7 @@ void smurf_rawrewrtsc2wcs( int * status ) {
 
     /* Get a fixed WCS frameset */
     if (isok) {
-      smf_create_tswcs( data->hdr, &fixedwcs, status );
+      smf_create_tswcs( data->hdr, data->isTordered, &fixedwcs, status );
     }
 
     /* close up and skip if this is not a good file */

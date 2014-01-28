@@ -899,7 +899,7 @@ smfFts* smf_create_smfFts(int* status);
 
 smfHead* smf_create_smfHead( int * status );
 
-void smf_create_tswcs( smfHead *hdr, AstFrameSet **frameset, int *status );
+void smf_create_tswcs( smfHead *hdr, int isTordered, AstFrameSet **frameset, int *status );
 
 double smf_cso2filt_applycoeff( double csotau, const double coeff[2],
                                 int *status );
@@ -1939,6 +1939,8 @@ double smf_timerupdate( struct timeval *tv1, struct timeval *tv2, int *status);
 
 void smf_tslice_ast (smfData * data, dim_t index, int needwcs, fts2Port fts_port,
                      int * status );
+
+void smf_tswcsOrder( AstFrameSet **tswcs, int isTordered, int *status );
 
 void smf_uncalc_iqu( ThrWorkForce *wf, smfData *data, double *idata,
                      double *qdata, double *udata, double *angdata,
