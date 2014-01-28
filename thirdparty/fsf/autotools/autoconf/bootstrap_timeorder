@@ -19,6 +19,7 @@ autoconf/lib/autotest/Makefile.in
 autoconf/lib/emacs/Makefile.in
 autoconf/lib/m4sugar/Makefile.in
 autoconf/man/Makefile.in
+autoconf/man/*.1
 autoconf/doc/autoconf.info
 autoconf/doc/standards.info
 autoconf/doc/stamp-vti
