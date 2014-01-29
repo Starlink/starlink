@@ -8,6 +8,7 @@ dnl   automake 1.6 or better.
 
 dnl   Initialisation: package name and version number
 AC_INIT([ast],[7.3.3],[starlink@jiscmail.ac.uk])
+AC_CONFIG_AUX_DIR([build-aux])
 
 dnl   Require autoconf-2.50 at least
 AC_PREREQ([2.69])

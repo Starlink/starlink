@@ -3,6 +3,7 @@ AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
 AC_INIT([cupid],[2.0],[starlink@jiscmail.ac.uk])
+AC_CONFIG_AUX_DIR([build-aux])
 PACKAGE_UPCASE='CUPID'
 AC_DEFINE( [PACKAGE_UPCASE], "CUPID", [Upper cased package name] )
 AC_SUBST(PACKAGE_UPCASE)

@@ -1,5 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
+ACLOCAL_AMFLAGS = -I build-aux
+
 bin_SCRIPTS = figaro.csh figaro.icl figaro.sh
 
 dist_bin_SCRIPTS = specdre.csh specdre.icl twodspec.csh twodspec.icl \

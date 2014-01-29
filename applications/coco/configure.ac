@@ -3,7 +3,8 @@ AC_REVISION($Revision$)
  
 dnl    Initialisation: package name and version number
 AC_INIT([coco],[2.2-8],[starlink@jiscmail.ac.uk])
- 
+AC_CONFIG_AUX_DIR([build-aux])
+
 dnl    Require autoconf-2.50 at least
 AC_PREREQ([2.69])
 AM_INIT_AUTOMAKE(1.8.2-starlink)

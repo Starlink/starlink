@@ -3,6 +3,10 @@ AC_REVISION($Revision$)
 
 dnl   Initialisation: package name and version number
 AC_INIT([fio],[1.5-4],[starlink@jiscmail.ac.uk])
+AC_CONFIG_AUX_DIR([build-aux])
+
+AC_CONFIG_AUX_DIR([build-aux])
+AC_CONFIG_MACRO_DIR([m4])
 
 dnl   Require autoconf-2.50 at least
 AC_PREREQ([2.69])

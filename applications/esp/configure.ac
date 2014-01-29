@@ -2,6 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 AC_INIT([esp],[0.11-4],[starlink@jiscmail.ac.uk])
+AC_CONFIG_AUX_DIR([build-aux])
 
 AC_PREREQ([2.69])
 AM_INIT_AUTOMAKE(1.8.2-starlink)
@@ -14,6 +15,8 @@ dnl    Find required versions of the programs we need for configuration
 AC_PROG_FC
 dnl AC_PROG_LIBTOOL
 STAR_MONOLITHS
+
+LT_INIT
 
 dnl    Other options here, such as
 STAR_CNF_COMPATIBLE_SYMBOLS

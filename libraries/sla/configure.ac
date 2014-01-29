@@ -3,6 +3,7 @@ AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
 AC_INIT([sla],[2.5-7],[starlink@jiscmail.ac.uk])
+AC_CONFIG_AUX_DIR([build-aux])
 # Version-info specifications.  See SSN/78 for guidelines, and update the table
 # below for ANY change of version number.
 #

@@ -1,6 +1,7 @@
 dnl    Process this file with autoconf to produce a configure script
 
 AC_INIT(sgmlkit, 0.7-13, starlink@jiscmail.ac.uk)
+AC_CONFIG_AUX_DIR([build-aux])
 
 AC_PREREQ(2.50)
 AM_INIT_AUTOMAKE(1.8.2-starlink)
