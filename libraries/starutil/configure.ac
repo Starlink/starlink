@@ -3,6 +3,7 @@ AC_REVISION($Revision: 27534 $)
   
 dnl    Initialisation: package name and version number
 AC_INIT([starutil],[0.1-1],[t.jenness@jach.hawaii.edu])
+AC_CONFIG_AUX_DIR([build-aux])
   
 dnl    Require autoconf-2.50 at least
 AC_PREREQ([2.69])

@@ -1,4 +1,5 @@
 AC_INIT([ccdpack],[4.1-1],[ccdpack@starlink.ac.uk])
+AC_CONFIG_AUX_DIR([build-aux])
 AC_PREREQ([2.69])
 AM_INIT_AUTOMAKE(1.8.2-starlink)
 AC_CONFIG_SRCDIR(ccdexercise)

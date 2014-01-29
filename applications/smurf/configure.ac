@@ -3,6 +3,7 @@ AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
 AC_INIT([smurf],[1.5.0],[scuba2dr@phas.ubc.ca])
+AC_CONFIG_AUX_DIR([build-aux])
 PACKAGE_UPCASE='SMURF'
 AC_DEFINE( [PACKAGE_UPCASE], "SMURF", [Upper cased package name] )
 AC_SUBST(PACKAGE_UPCASE)

@@ -8,12 +8,12 @@ dnl    scripts have been updated (this normally requires a bootstrap,
 dnl    configure, bootstrap, the configure updates the local directories 
 dnl    which then require regenerating again).
 AC_INIT([gaia],[4.4-5],[starlink@jiscmail.ac.uk])
+AC_CONFIG_AUX_DIR([build-aux])
 
 dnl    Require autoconf-2.50 at least
 AC_PREREQ([2.69])
 dnl    Require Starlink automake
 AM_INIT_AUTOMAKE([1.8.2-starlink])
-AC_CONFIG_MACRO_DIR([m4])
 
 dnl    Sanity-check: name a file in the source directory -- if this
 dnl    isn't found then configure will complain
