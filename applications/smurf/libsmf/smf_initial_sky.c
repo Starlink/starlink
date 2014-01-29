@@ -127,8 +127,6 @@ int smf_initial_sky( ThrWorkForce *wf, AstKeyMap *keymap, smfDIMMData *dat,
    dim_t idx;                 /* Index within subgroup */
    dim_t nbolo;               /* Number of bolometers */
    dim_t ntslice;             /* Number of time slices */
-   double *p1;                /* Pointer to next input pixel value. */
-   double *p2;                /* Pointer to next output pixel value. */
    double *ptr;               /* Pointer to NDF Data array */
    double *vptr;              /* Pointer to NDF Variance array */
    int indf1;                 /* Id. for supplied reference NDF */
@@ -139,12 +137,10 @@ int smf_initial_sky( ThrWorkForce *wf, AstKeyMap *keymap, smfDIMMData *dat,
    int result;                /* Returned flag */
    int there;                 /* Is there a smurf extension in the NDF? */
    size_t bstride;            /* bolo stride */
-   size_t i;                  /* Loop index */
    size_t size;               /* Size of mapped array */
    size_t tstride;            /* Time slice stride in data array */
    smfArray *qua=NULL;        /* Pointer to QUA at chunk */
    smf_qfam_t family;         /* The family of quality flags found in the NDF */
-   smf_qual_t *p3;            /* Pointer to next quality value. */
    smf_qual_t *qptr;          /* Pointer to mapped quality values */
    smf_qual_t *qua_data=NULL; /* Pointer to quality data */
 

@@ -424,8 +424,8 @@
 *        Do not allocate models to hold AST since the astronomical signal is
 *        determined from the current map.
 *     2014-01-27 (DSB):
-*        Dump the itermap after the map quality array has been set (i.e. 
-*        after smf_calcmodel_ast). Previously each itermap has the quality 
+*        Dump the itermap after the map quality array has been set (i.e.
+*        after smf_calcmodel_ast). Previously each itermap has the quality
 *        associated with the previous iteration.
 *     {enter_further_changes_here}
 
@@ -628,7 +628,6 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   int nm=0;                     /* Signed int version of nmodels */
   dim_t nmodels=0;              /* Number of model components / iteration */
   int noidone;                  /* Has the NOI model been calculated yet? */
-  dim_t noi_boxsize;            /* No. of time slices in each NOI box */
   int noi_export;               /* Export the compressed NOI model? */
   size_t nsamples_tot = 0;      /* Number of valid samples in all chunks */
   dim_t nthetabin;              /* Number of scan angle bins */
@@ -1753,7 +1752,6 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       dat.mdims[0] = mdims[0];
       dat.mdims[1] = mdims[1];
       dat.msize = msize;
-      dat.noi_boxsize = noi_boxsize;
       dat.outfset = outfset;
       dat.lbnd_out = lbnd_out;
       dat.ubnd_out = ubnd_out;
