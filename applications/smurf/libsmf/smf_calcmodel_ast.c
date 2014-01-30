@@ -131,11 +131,18 @@
 *     2013-7-9 (DSB):
 *        Allow an initial number of iterations to be skipped.
 *     2014-1-23 (DSB):
-*        - Do not assume that the map is already masked if we are removing an 
+*        - Do not assume that the map is already masked if we are removing an
 *        initial sky.
-*        - Despike if we have noise values regardless of whether this is the 
-*        first iteration (we will have noise values on the first iteration 
+*        - Despike if we have noise values regardless of whether this is the
+*        first iteration (we will have noise values on the first iteration
 *        when running from SKYLOOP).
+*     2014-1-29 (DSB):
+*        Use the map quality array rather than the raw mask array to define 
+*        the areas to mask. The quality array contains the raw mask but also 
+*        masks out all map pixels with bad data values or variances. It is 
+*        the quality array, not the raw mask, that is used in smf_iteratemap 
+*        when adding on the previous AST model prior to forming a new map,
+*        so we really must be consistent and use the same thing here.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -190,8 +197,8 @@ typedef struct smfCalcModelAstData {
    int oper;
    size_t bstride;
    size_t tstride;
+   smf_qual_t *mapqual;
    smf_qual_t *qua_data;
-   unsigned char *zmask;
 } SmfCalcModelAstData;
 
 
@@ -422,7 +429,6 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
              pdata->b2 = nbolo - 1 ;
           }
 
-          pdata->zmask = zmask;
           pdata->ntslice = ntslice;
           pdata->qua_data = qua_data;
           pdata->res_data = res_data;
@@ -430,6 +436,7 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
           pdata->bstride = bstride;
           pdata->tstride = tstride;
           pdata->map = map;
+          pdata->mapqual = mapqual;
           pdata->oper = 1;
 
           thrAddJob( wf, 0, pdata, smf1_calcmodel_ast, 0, NULL, status );
@@ -515,7 +522,7 @@ static void smf1_calcmodel_ast( void *job_data_ptr, int *status ) {
    components we do *not* first add the previous realization back in. This
    is because we've already done this in smf_iteratemap before calling
    smf_rebinmap1. */
-                  if( pdata->zmask && pdata->zmask[ *pl ] ) {
+                  if( pdata->mapqual[ *pl ] & SMF__MAPQ_AST ) {
                      m = VAL__BADD;
                   } else {
                      m = pdata->map[ *pl ];

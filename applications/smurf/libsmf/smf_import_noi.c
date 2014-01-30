@@ -14,8 +14,7 @@
 
 *  Invocation:
 *     int smf_import_noi( const char *name, smfDIMMHead *head,
-*                         AstKeyMap *keymap, double *dataptr,
-*                         dim_t *noi_boxsize, int *status )
+*                         AstKeyMap *keymap, double *dataptr, int *status )
 
 *  Arguments:
 *     name = const char * (Given)
@@ -26,8 +25,6 @@
 *        The config parameters for makemap.
 *     dataptr = double * (Returned)
 *        The array in which to return the noise values.
-*     noi_boxsize = dim_t * (Returned)
-*        The boxsize, in samples, for the NOI model.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -48,6 +45,10 @@
 *  History:
 *     24-SEP-2013 (DSB):
 *        Original version.
+*     24-JAN-2014 (DSB):
+*        - Re-written to follow the changes to smf_export_noi (the time axis 
+*        is now the first axis in the NDF, not the third axis). 
+*        - Remove argument "noi_boxsize".
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -85,33 +86,36 @@
 #include "libsmf/smf.h"
 
 int smf_import_noi( const char *name, smfDIMMHead *head, AstKeyMap *keymap,
-                    double *dataptr, dim_t *noi_boxsize, int *status ){
+                    double *dataptr, int *status ){
 
 /* Local Variables */
-   AstKeyMap *kmap = NULL;   /* NOI config parameters */
-   char *ename = NULL;       /* Name of file to import */
-   int import;               /* The value of the IMPORT parameter */
-   double *dp;               /* Pointer to next element of NOI model */
-   double *pd;               /* Pointer to next element of NDF */
-   double *ip;               /* Pointer to NDF array */
-   int dims[ 3 ];            /* NDF dimensions */
-   int el;                   /* Number of mapped array elements */
-   int ibolo;                /* Index of current bolometer */
-   int repeat;               /* No. of times to repeat each noise value */
-   int indf;                 /* NDF identifier */
-   int isTordered;           /* Is NOI model time ordered? */
-   int itime;                /* Index of current time slice */
-   int itime_hi;             /* Index of last time slice */
-   int nbolo;                /* Number of bolometers */
-   int nc;                   /* Current length of string */
-   int ndim;                 /* Number of NDF dimensions */
-   int nointslice;           /* Number of time slices in NOI model */
-   int result ;              /* Value to return */
-   int iz;                   /* Index of current NDF plane */
+   AstKeyMap *kmap = NULL;
+   char *ename = NULL;
+   dim_t ibolo;
+   dim_t nbolo;
+   dim_t ncols;
+   dim_t nrows;
+   dim_t ntslice;
+   double *dp;
+   double *ip;
+   double *pd;
+   double noival;
+   int dims[ 3 ];
+   int el;
+   int ibox;
+   int import;
+   int indf;
+   int itime;
+   int itime_hi;
+   int nc;
+   int ndim;
+   int repeat;
+   int result ;
+   size_t bstride;
+   size_t tstride;
 
 /* Initialise. */
    result = 0;
-   *noi_boxsize = 0;
 
 /* Check inherited status. */
    if( *status != SAI__OK ) return result;
@@ -124,11 +128,9 @@ int smf_import_noi( const char *name, smfDIMMHead *head, AstKeyMap *keymap,
    astMapGet0I( kmap, "IMPORT", &import );
    if( import ){
 
-/* Is the NOI model time-ordered? */
-      isTordered = ( head->data.dims[ 0 ] == 32 && head->data.dims[ 1 ] == 40 );
-
-/* Number of time slices in NOI model. */
-      nointslice = isTordered ? head->data.dims[ 2 ] : head->data.dims[ 0 ];
+/* Get the dimensions and strides for the NOI model. */
+      smf_get_dims( &((*head).data), &nrows, &ncols, &nbolo, &ntslice, NULL,
+                    &bstride, &tstride, status );
 
 /* Append "_noi" to the container file name. */
       nc = strstr( name, "_con" ) - name + 4;
@@ -147,87 +149,73 @@ int smf_import_noi( const char *name, smfDIMMHead *head, AstKeyMap *keymap,
                   "must be 3.", status, ndim, ename );
       }
 
-      if( ( dims[ 0 ] != 32 || dims[ 1 ] != 40 ) && *status == SAI__OK ) {
+      if( ( dims[ 1 ] != (int) ncols || dims[ 2 ] != (int) nrows ) && *status == SAI__OK ) {
          *status = SAI__ERROR;
-         errRepf( "", "Illegal dimensions (%d,%d) for axes 1 and 2 in "
-                  "'%s' - must be (32,40).", status, dims[0], dims[1],
+         errRepf( "", "Illegal dimensions (%d,%d) for axes 2 and 3 in "
+                  "'%s' - must be (32,40).", status, dims[1], dims[2],
                   ename );
       }
 
-      if( nointslice == 1 && dims[ 2 ] > 1 && *status == SAI__OK ) {
+      if( ntslice == 1 && dims[ 0 ] > 1 && *status == SAI__OK ) {
          *status = SAI__ERROR;
-         errRepf( "", "Illegal dimension (%d) for axes 3 in "
-                  "'%s' - must be 1.", status, dims[2], ename );
+         errRepf( "", "Illegal dimension (%d) for axes 1 in "
+                  "'%s' - must be 1.", status, dims[0], ename );
       }
 
 /* Map the Data component of the NDF. */
       ndfMap( indf, "Data", "_DOUBLE", "READ", (void **) &ip, &el, status );
 
+/* Get the number of times to repeat each noise value in the NDF. This is
+   stored in the SMURF extension of the supplied NDF. */
+      ndfXgt0i( indf, "SMURF", "NOI_BOXSIZE", &repeat, status );
+
 /* Check we can use the pointers safely. */
       if( *status == SAI__OK ) {
-
-/* Number of bolometers. */
-         nbolo = dims[ 0 ]*dims[ 1 ];
 
 /* If the NOI model contains only a single value for each bolometer, we
    copy one slice from the NDF. Time or bolo ordering makes no difference
    in this case. Return boxsize as zero to indicate that a single box is
    used for all time slaices. */
-         if( nointslice == 1 ) {
+         if( ntslice == 1 ) {
             memcpy( dataptr, ip, nbolo*sizeof( *dataptr ) );
-            *noi_boxsize = 0;
 
 /* If the NOI model contains bolometer values for every time slice, we
    may need to expand and re-order the data. */
          } else {
 
-/* Get the number of times to repeat each noise value in the NDF. This is
-   stored in the SMURF extension of the supplied NDF. */
-            ndfXgt0i( indf, "SMURF", "NOI_BOXSIZE", &repeat, status );
-            *noi_boxsize = repeat;
+/* Pointer to the next input NDF value. */
+            pd = ip;
 
-/* Initialise the current time slice in the model. */
-            itime = 0;
-            itime_hi = 0;
+/* Loop round each bolometer. */
+            for( ibolo = 0; ibolo < nbolo; ibolo++ ) {
 
-/* Loop round all planes in the NDF. */
-            for( iz = 0; iz < dims[ 2 ]; iz++ ) {
-               if( iz == dims[ 2 ] - 1 ) {
-                  itime_hi = nointslice;
-               } else {
-                  itime_hi += repeat;
-               }
+/* Pointer to the first output NOI value for the current bolometer. */
+               dp = dataptr + ibolo*bstride;
 
-               if( itime_hi > nointslice && *status == SAI__OK ) {
-                  *status = SAI__ERROR;
-                  errRepf( "", "Illegal dimension (%d) for axes 3 in "
-                           "'%s' or wrong NOI boxsize (%d).", status,
-                           dims[2], ename, repeat );
-                  break;
-               }
+/* Initialise the index of the next time slice to write. */
+               itime = 0;
 
-/* Loop round all time slices in the NOI model that use the current NDF
-   plane. */
-               for( ; itime < itime_hi; itime++ ) {
+/* Loop round each box of time slices. */
+               for( ibox = 0; ibox < dims[ 0 ]; ibox++ ) {
 
-/* First deal with a time ordered model. */
-                  if( isTordered ){
-                     memcpy( dataptr + itime*nbolo, ip,
-                             nbolo*sizeof( *dataptr ) );
-
-/* Now deal with a bolo ordered model. */
+/* Set the index of the first time slice beywond the current box. The last
+   box picks up any left over boxes. */
+                  if( ibox < dims[ 0 ] - 1 ) {
+                     itime_hi = itime + repeat;
                   } else {
-                     pd = ip;
-                     dp = dataptr + itime;
-                     for( ibolo = 0; ibolo < nbolo; ibolo++ ) {
-                        *dp = *(pd++);
-                        dp += nointslice;
-                     }
+                     itime_hi = ntslice;
+                  }
+
+/* Get the noise value from the NDF, and convert bad values to zero. */
+                  noival = *(pd++);
+                  if( noival == VAL__BADD ) noival = 0.0;
+
+/* Duplicate this value for the size of the box. */
+                  for( ; itime < itime_hi; itime++ ) {
+                     *dp = noival;
+                     dp += tstride;
                   }
                }
-
-/* Point to the start of the next plane in the NDF. */
-               ip += nbolo;
             }
          }
 
@@ -236,7 +224,7 @@ int smf_import_noi( const char *name, smfDIMMHead *head, AstKeyMap *keymap,
    functions that the NOI values have been calculated). */
          if( *status == SAI__OK ) {
             result = 1;
-            if( *dataptr == 1.0 ) *dataptr = VAL__BADD;
+            if( *dataptr == 1.0 ) *dataptr = 0.0;
          }
       }
 

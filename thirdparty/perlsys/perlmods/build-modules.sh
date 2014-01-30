@@ -33,7 +33,12 @@ do
         echo Installing modules from $root
         for i in `cat $root`
         do
-            ${cpanm} $i
+            if grep -x "$i" cpan.skip-test > /dev/null
+            then
+                ${cpanm} $i --notest
+            else
+                ${cpanm} $i
+            fi
             if (( $? ))
             then
                 echo Failed to install $i

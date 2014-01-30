@@ -55,11 +55,12 @@
 *        all the output NDFs created by this application via parameter
 *        OUT (one per line). If a null (!) value is supplied no file is
 *        created. [!]
-*     TRIM = _LOGICAL (Read)
-*        If TRUE, the output NDFs are trimmmed to the edges of the
-*        supplied NDF. Otherwise, each output NDF covers the full area of
-*        the corresponding JSA tile, with unused areas filled with bad
-*        values.
+*     TRIM = _INTEGER (Read)
+*        A zero or negative value results in each output NDF covering the
+*        full area of the corresponding JSAtile. A value of one results in
+*        each output NDF being cropped to the bounds of the supplied NDF. A
+*        value of two or more results in each output NDF being cropped to
+*        remove any blank borders. [2]
 
 *  Authors:
 *     DSB: David Berry (JAC, Hawaii)
@@ -68,9 +69,12 @@
 *  History:
 *     16-NOV-2013 (DSB):
 *        Initial version.
+*     30-JAN-2014 (DSB):
+*        Changed TRIM to allow output NDFs to be trimmed of any bad
+*        borders.
 
 *  Copyright:
-*     Copyright (C) 2013 Science and Technology Facilities Council.
+*     Copyright (C) 2013-2014 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -159,8 +163,8 @@ void smurf_jsadicer( int *status ) {
       }
    }
 
-/* See if output NDFs are to be trimmed. */
-   parGet0l( "TRIM", &trim, status );
+/* See how the output NDFs are to be trimmed. */
+   parGet0i( "TRIM", &trim, status );
 
 /* Get a FitsChan holding the contents of the FITS extension from the
    input NDF. Annul the error if the NDF has no FITS extension. */

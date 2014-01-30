@@ -29,9 +29,11 @@
 *        and underscore, will be appended to this base name to create the
 *        name of the corresponding output NDF.
 *     trim = int (Given)
-*        If non-zero, the output NDFs are trimmmed to the edges of the
-*        supplied NDF. Otherwise, each output NDF covers the full area of
-*        the tile, with unused areas filled with bad values.
+*        A zero or negative value results in each output NDF covering the
+*        full area of the corresponding JSAtile. A value of one results in
+*        each output NDF being cropped to the bounds of the supplied NDF. A
+*        value of two or more results in each output NDF being cropped to
+*        remove any blank borders.
 *     instrument = smf_inst_t
 *        The instrument that created the supplied NDF.
 *     ntile = * size_t
@@ -68,6 +70,8 @@
 *     17-JAN-2014 (DSB):
 *        - Report an error if the NDFs projection is not HEALPix.
 *        - Renamed from smf_jsasplit to smf_jsadicer.
+*     30-JAN-2014 (DSB):
+*        Changed to allow output NDFs to be trimmed of any bad borders.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -136,14 +140,17 @@ void smf_jsadicer( int indf, const char *base, int trim,
    float *pxf;
    float *pyf;
    float *pzf;
+   int *bboxes = NULL;
    int *created_tiles = NULL;
+   int *pbox;
    int *tiles;
    int axes[3];
+   int bbox[ 6 ];
    int i;
    int indfo;
    int indfs;
    int indfx;
-   int isempty;
+   int more;
    int itile;
    int ix;
    int iy;
@@ -336,22 +343,41 @@ void smf_jsadicer( int indf, const char *base, int trim,
       if( tile_ubnd[ 0 ] < oubnd[ lonax ] )  oubnd[ lonax ] = tile_ubnd[ 0 ];
       if( tile_ubnd[ 1 ] < oubnd[ latax ] )  oubnd[ latax ] = tile_ubnd[ 1 ];
 
-/* Loop round all pixels in the overlap, looking for a good pixel value. */
-      isempty = 1;
+/* Find the bounding box of the good values in the overlap. We can leave the
+   loop as soon as we have found a single good value unless we will later be
+   trimming the output NDF to remove bad borders, in which case we require
+   the full bounding box. */
+      bbox[ 0 ] = INT_MAX;
+      bbox[ 1 ] = INT_MAX;
+      bbox[ 2 ] = INT_MAX;
+      bbox[ 3 ] = -INT_MAX;
+      bbox[ 4 ] = -INT_MAX;
+      bbox[ 5 ] = -INT_MAX;
+
+      more = 1;
       if( !strcmp( type, "_REAL" ) ) {
          pzf = ipf + ( olbnd[ 2 ] - lbnd[ 2 ] )*zstride;
-         for( iz = olbnd[ 2 ]; iz <= oubnd[ 2 ] && isempty; iz++ ) {
+         for( iz = olbnd[ 2 ]; iz <= oubnd[ 2 ] && more; iz++ ) {
 
             pyf = pzf + ( olbnd[ 1 ] - lbnd[ 1 ] )*ystride;
-            for( iy = olbnd[ 1 ]; iy <= oubnd[ 1 ] && isempty; iy++ ) {
+            for( iy = olbnd[ 1 ]; iy <= oubnd[ 1 ] && more; iy++ ) {
 
                pxf = pyf + ( olbnd[ 0 ] - lbnd[ 0 ] );
                for( ix = olbnd[ 0 ]; ix <= oubnd[ 0 ]; ix++ ) {
                   if( *(pxf++) != VAL__BADR ) {
-                     isempty = 0;
-                     break;
-                  }
 
+                     if( ix < bbox[ 0 ] ) bbox[ 0 ] = ix;
+                     if( iy < bbox[ 1 ] ) bbox[ 1 ] = iy;
+                     if( iz < bbox[ 2 ] ) bbox[ 2 ] = iz;
+                     if( ix > bbox[ 3 ] ) bbox[ 3 ] = ix;
+                     if( iy > bbox[ 4 ] ) bbox[ 4 ] = iy;
+                     if( iz > bbox[ 5 ] ) bbox[ 5 ] = iz;
+
+                     if( trim < 2 ) {
+                        more = 0;
+                        break;
+                     }
+                  }
                }
 
                pyf += ystride;
@@ -362,18 +388,27 @@ void smf_jsadicer( int indf, const char *base, int trim,
 
       } else {
          pzd = ipd + ( olbnd[ 2 ] - lbnd[ 2 ] )*zstride;
-         for( iz = olbnd[ 2 ]; iz <= oubnd[ 2 ] && isempty; iz++ ) {
+         for( iz = olbnd[ 2 ]; iz <= oubnd[ 2 ] && more; iz++ ) {
 
             pyd = pzd + ( olbnd[ 1 ] - lbnd[ 1 ] )*ystride;
-            for( iy = olbnd[ 1 ]; iy <= oubnd[ 1 ] && isempty; iy++ ) {
+            for( iy = olbnd[ 1 ]; iy <= oubnd[ 1 ] && more; iy++ ) {
 
                pxd = pyd + ( olbnd[ 0 ] - lbnd[ 0 ] );
                for( ix = olbnd[ 0 ]; ix <= oubnd[ 0 ]; ix++ ) {
                   if( *(pxd++) != VAL__BADD ) {
-                     isempty = 0;
-                     break;
-                  }
 
+                     if( ix < bbox[ 0 ] ) bbox[ 0 ] = ix;
+                     if( iy < bbox[ 1 ] ) bbox[ 1 ] = iy;
+                     if( iz < bbox[ 2 ] ) bbox[ 2 ] = iz;
+                     if( ix > bbox[ 3 ] ) bbox[ 3 ] = ix;
+                     if( iy > bbox[ 4 ] ) bbox[ 4 ] = iy;
+                     if( iz > bbox[ 5 ] ) bbox[ 5 ] = iz;
+
+                     if( trim < 2 ) {
+                        more = 0;
+                        break;
+                     }
+                  }
                }
 
                pyd += ystride;
@@ -384,7 +419,7 @@ void smf_jsadicer( int indf, const char *base, int trim,
       }
 
 /* Issue warnings about any empty tiles. */
-      if( isempty ) {
+      if( bbox[ 0 ] == INT_MAX ) {
          msgOutiff( MSG__VERB, "", "   tile %d is empty and so will not be "
                     "created", status, tile_index );
 
@@ -392,15 +427,22 @@ void smf_jsadicer( int indf, const char *base, int trim,
    this tile in the list of tiles to be created. */
       } else {
          created_tiles = astGrow( created_tiles, ++(*ntile),
-                                  sizeof( *created_tiles ));
+                                  sizeof( *created_tiles ) );
          if( *status == SAI__OK ) created_tiles[ *ntile - 1 ] = tile_index;
-
+         if( trim >= 2 ) {
+            bboxes = astGrow( bboxes, *ntile, 6*sizeof( *bboxes ) );
+            if( *status == SAI__OK ) memcpy( bboxes + 6*( *ntile - 1 ), bbox,
+                                             6*sizeof( *bboxes ) );
+         }
       }
       tile_wcs = astAnnul( tile_wcs );
    }
 
 /* We can now unmap the supplied NDF. */
    ndfUnmap( indf, "*", status );
+
+/* Initialise a pointer to the start of the next bounding box. */
+   pbox = bboxes;
 
 /* Loop round all tiles that contain some good values. */
    for( itile = 0; itile < (int) *ntile && *status == SAI__OK; itile++ ) {
@@ -421,11 +463,20 @@ void smf_jsadicer( int indf, const char *base, int trim,
       ubnd[ latax ] = tile_ubnd[ 1 ];
 
 /* Trim to the edges of the supplied NDF if required. */
-      if( trim ) {
+      if( trim < 2 ) {
          if( lbnd[ lonax ] < lbnd_lon ) lbnd[ lonax ] = lbnd_lon;
          if( ubnd[ lonax ] > ubnd_lon ) ubnd[ lonax ] = ubnd_lon;
          if( lbnd[ latax ] < lbnd_lat ) lbnd[ latax ] = lbnd_lat;
          if( ubnd[ latax ] > ubnd_lat ) ubnd[ latax ] = ubnd_lat;
+
+/* Otherwise, trim to remove any bad borders if required. */
+      } else if( pbox ) {
+         lbnd[ lonax ] = pbox[ lonax ];
+         lbnd[ latax ] = pbox[ latax ];
+         pbox += 3;
+         ubnd[ lonax ] = pbox[ lonax ];
+         ubnd[ latax ] = pbox[ latax ];
+         pbox += 3;
       }
 
 /* Get an identifier for the required section of the input NDF. */
@@ -508,6 +559,7 @@ void smf_jsadicer( int indf, const char *base, int trim,
 /* Free resources. */
    created_tiles = astFree( created_tiles );
    tiles = astFree( tiles );
+   bboxes = astFree( bboxes );
    path = astFree( path );
 
 /* End the AST context. */

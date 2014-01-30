@@ -116,7 +116,13 @@
 *        Original version.
 *     18-DEC-2013 (DSB):
 *        Use Gauss interpolation kernel if output pixels are larger than
-#        input pixels.
+*        input pixels.
+*     27-JAN-2014 (DSB):
+*        Fix mapping of non-NDF regions onto the reference image.
+*     30-JAN-2014 (DSB):
+*        - Fix problem invoking kappa:paste if only one tile has been
+*        supplied.
+*        - Change sincsinc kernel width from 2 to 3.
 *-
 '''
 
@@ -346,9 +352,13 @@ try:
       jsatile = starutil.get_fits_header( tiles[ jsatile ], "JSATILE" )
 
 #  Paste these tile NDFs into a single image by abutting them in pixel
-#  space. This image still uses the JSA all-sky pixel grid.
-   temp = NDG(1)
-   invoke( "$KAPPA_DIR/paste in={0} out={1}".format(used_tiles,temp) )
+#  space. This image still uses the JSA all-sky pixel grid. If we have
+#  only a single tile, then just use it as it is.
+   if len(used_tiles) > 1:
+      temp = NDG(1)
+      invoke( "$KAPPA_DIR/paste in={0} out={1}".format(used_tiles,temp) )
+   else:
+      temp = used_tiles
 
 #  Strip any bad border from the montage.
    jsa_montage = NDG(1)
@@ -391,8 +401,9 @@ try:
                     format(jsatile,instrument,tile_header) )
             lbnd = starutil.get_task_par( "LBND", "jsatileinfo" )
             ubnd = starutil.get_task_par( "UBND", "jsatileinfo" )
-            ix = ( ubnd[ 0 ] + lbnd[ 0 ] )/2
-            iy = ( ubnd[ 1 ] + lbnd[ 1 ] )/2
+
+            ix = ( ubnd[ 0 ] - lbnd[ 0 ] + 1 )/2
+            iy = ( ubnd[ 1 ] - lbnd[ 1 ] + 1 )/2
 
             tile_wcs = NDG.tempfile()
             invoke( "$ATOOLS_DIR/astset {0} system {1} {2}".
@@ -450,14 +461,31 @@ try:
 
       reg = NDG.tempfile()
       invoke( "$ATOOLS_DIR/astcopy {0} {1} class=region".format(this_reg,reg) )
+
       reg_2d = NDG.tempfile()
       invoke( "$ATOOLS_DIR/astpickaxes {0} \[1,2\] ! {1}".format(reg,reg_2d) )
 
+#  We want the mapping from the Region's frame (icrs,galatic,etc) to the
+#  grid coordinate system of the reference image. We use astConvert for
+#  this. But astConvert converts to the current Frame of the target, so we
+#  need to invert the reference FrameSet first so that grid coords becomes
+#  the current Frame, rather than the base Frame.
+      ref_fs = NDG.tempfile()
+      invoke( "$ATOOLS_DIR/astinvert {0} {1}".format(ref,ref_fs) )
+
+#  Now use astConvert to get a FrameSet in which the base Frame is the
+#  region's frame, the current Frame is the reference GRID system, and
+#  the alignment occurs in sky coordinates.
+      tmp_fs = NDG.tempfile()
+      invoke( "$ATOOLS_DIR/astconvert {0} {1} SKY {2}".format(reg_2d,ref_fs,tmp_fs) )
+
+
+#  Get the mapping from the region's frame to the reference GRID system.
       map = NDG.tempfile()
-      invoke( "$ATOOLS_DIR/astgetmapping {0} AST__CURRENT AST__BASE {1}".
-                 format(ref,map) )
+      invoke( "$ATOOLS_DIR/astgetmapping {0} AST__BASE AST__CURRENT {1}".
+                 format(tmp_fs,map) )
       frm = NDG.tempfile()
-      invoke( "$ATOOLS_DIR/astgetframe {0} AST__BASE {1}".format(ref,frm) )
+      invoke( "$ATOOLS_DIR/astgetframe {0} AST__CURRENT {1}".format(tmp_fs,frm) )
       mapped_reg = NDG.tempfile()
       invoke( "$ATOOLS_DIR/astmapregion {0} {1} {2} {3}".
               format(reg_2d,map,frm,mapped_reg) )
@@ -476,10 +504,10 @@ try:
    pixsize_ref = math.sqrt( pixsize1*pixsize2 )
 
 #  If the output pixels are smaller than the tile pixels, we use a
-#  SincSinc interpolation kernel with width equal to 2 JSA pixels.
+#  SincSinc interpolation kernel with width equal to 3 JSA pixels.
    if pixsize_ref < 1.5*pixsize_jsa:
       method = "sincsinc"
-      width = 2
+      width = 3.0
 
 #  If the output pixels are larger than the tile pixels, we use a
 #  Gauss interpolation kernel with width equal to 0.8 output pixels (se we

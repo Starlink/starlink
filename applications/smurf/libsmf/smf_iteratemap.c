@@ -423,6 +423,10 @@
 *     2014-01-16 (DSB):
 *        Do not allocate models to hold AST since the astronomical signal is
 *        determined from the current map.
+*     2014-01-27 (DSB):
+*        Dump the itermap after the map quality array has been set (i.e.
+*        after smf_calcmodel_ast). Previously each itermap has the quality
+*        associated with the previous iteration.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -624,7 +628,6 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   int nm=0;                     /* Signed int version of nmodels */
   dim_t nmodels=0;              /* Number of model components / iteration */
   int noidone;                  /* Has the NOI model been calculated yet? */
-  dim_t noi_boxsize;            /* No. of time slices in each NOI box */
   int noi_export;               /* Export the compressed NOI model? */
   size_t nsamples_tot = 0;      /* Number of valid samples in all chunks */
   dim_t nthetabin;              /* Number of scan angle bins */
@@ -1432,7 +1435,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
       smf_model_create( wf, NULL, res, darks, bbms, flatramps, heateffmap,
                         NULL, 1, SMF__QUA, 0, NULL, 0, NULL, NULL, NO_FTS,
-                        NULL, qua, keymap, &noi_boxsize, status );
+                        NULL, qua, keymap, status );
 
       /* Associate quality with the res model, and do cleaning before we
          start using more memory for other things. Note that we are
@@ -1454,7 +1457,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
       smf_model_create( wf, NULL, res, darks, bbms, flatramps, heateffmap,
                         NULL, 1, SMF__LUT, 0, NULL, 0, NULL, NULL, NO_FTS,
-                        NULL, lut, keymap, &noi_boxsize, status );
+                        NULL, lut, keymap, status );
 
       if( *status == SAI__OK ) {
          for( idat = 0; idat < res[0]->ndat; idat++ ) {
@@ -1472,8 +1475,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       if( haveext ) {
         smf_model_create( wf, NULL, res, darks, bbms, flatramps, heateffmap,
                           noisemaps, 1, modeltyps[whichext], 0, NULL, 0, NULL,
-                          NULL, NO_FTS, NULL, model[whichext], keymap,
-                          &noi_boxsize, status);
+                          NULL, NO_FTS, NULL, model[whichext], keymap, status);
       }
 
       /*** TIMER ***/
@@ -1675,8 +1677,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
             (modeltyps[imodel] != SMF__AST) ) {
           smf_model_create( wf, NULL, res, darks, bbms, flatramps, heateffmap,
                             noisemaps, 1, modeltyps[imodel], 0, NULL, 0, NULL, NULL,
-                            NO_FTS, NULL, model[imodel], keymap,
-                            &noi_boxsize, status );
+                            NO_FTS, NULL, model[imodel], keymap, status );
         }
 
         /* Associate quality with some models */
@@ -1751,7 +1752,6 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       dat.mdims[0] = mdims[0];
       dat.mdims[1] = mdims[1];
       dat.msize = msize;
-      dat.noi_boxsize = noi_boxsize;
       dat.outfset = outfset;
       dat.lbnd_out = lbnd_out;
       dat.ubnd_out = ubnd_out;
@@ -2147,21 +2147,6 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                      ": ** %f s rebinning map",
                      status, smf_timerupdate(&tv1,&tv2,status) );
 
-          /* If storing each iteration in an extension do it here if this
-             was the last filegroup of data to be added */
-
-          if( itermap > 0 ) {
-            smf_write_itermap( wf, thismap, thisvar,
-                               ( itermap > 1 ) ? thisqual : NULL, msize,
-                               iterrootgrp, contchunk, iter, lbnd_out,
-                               ubnd_out, outfset, res[0]->sdata[0]->hdr,
-                               qua[0], status );
-
-            /*** TIMER ***/
-            msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
-                       ": ** %f s writing itermap",
-                       status, smf_timerupdate(&tv1,&tv2,status) );
-          }
         }
 
 
@@ -2228,6 +2213,22 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
                      ": ** %f s calculating AST",
                      status, smf_timerupdate(&tv1,&tv2,status) );
+
+          /* If storing each iteration in an extension do it here if this
+             was the last filegroup of data to be added */
+
+          if( itermap > 0 ) {
+            smf_write_itermap( wf, thismap, thisvar,
+                               ( itermap > 1 ) ? thisqual : NULL, msize,
+                               iterrootgrp, contchunk, iter, lbnd_out,
+                               ubnd_out, outfset, res[0]->sdata[0]->hdr,
+                               qua[0], status );
+
+            /*** TIMER ***/
+            msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
+                       ": ** %f s writing itermap",
+                       status, smf_timerupdate(&tv1,&tv2,status) );
+          }
 
           /* After subtraction of the model, dump the model itself
              and the modified residuals. */

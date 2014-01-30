@@ -161,7 +161,7 @@ void smf_expmodel_init( const smfData *indata, smfData **outdata, int *status) {
   data->lbnd[2] = lbnd_t;
 
   outhdr = data->hdr;
-  smf_create_tswcs( outhdr, &tswcs, status );
+  smf_create_tswcs( outhdr, data->isTordered, &tswcs, status );
 
   if( outhdr->tswcs ) {
     outhdr->tswcs = astAnnul( outhdr->tswcs );

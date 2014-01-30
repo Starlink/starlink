@@ -2720,11 +2720,11 @@ package @PACKAGE@ {
             }
 
             parameter trim {
-                type _LOGICAL
+                type _INTEGER
                 vpath DEFAULT
                 ppath CURRENT
-                prompt {Trim bad border from output NDFs?}
-                default FALSE
+                prompt {How to trim the output NDFs}
+                default 2
                 helpkey *
             }
 

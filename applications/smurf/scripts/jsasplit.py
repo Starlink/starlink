@@ -81,11 +81,12 @@
 *        created by this script be retained? If not, it will be deleted
 *        before the script exits. If retained, a message will be
 *        displayed at the end specifying the path to the directory. [FALSE]
-*     TRIM = _LOGICAL (Read)
-*        If TRUE, the output NDFs are trimmmed to the edges of the
-*        supplied NDF. Otherwise, each output NDF covers the full area of
-*        the corresponding JSA tile, with unused areas filled with bad
-*        values. [TRUE]
+*     TRIM = _INTEGER (Read)
+*        A zero or negative value results in each output NDF covering the
+*        full area of the corresponding JSAtile. A value of one results in
+*        each output NDF being cropped to the bounds of the supplied NDF. A
+*        value of two or more results in each output NDF being cropped to
+*        remove any blank borders. [2]
 
 *  Copyright:
 *     Copyright (C) 2014 Science & Technology Facilities Council.
@@ -114,6 +115,9 @@
 *  History:
 *     17-JAN-2014 (DSB):
 *        Original version.
+*     30-JAN-2014 (DSB):
+*        Changed TRIM to allow output NDFs to be trimmed of any bad
+*        borders.
 *-
 '''
 
@@ -169,7 +173,7 @@ try:
                                     "DAS"],
                                     "The JCMT instrument", "SCUBA-2(850)"))
 
-   params.append(starutil.Par0L("TRIM", "Trim output NDFs?", True,
+   params.append(starutil.Par0I("TRIM", "How to trim the output NDFs", 2,
                                  noprompt=True))
 
    params.append(starutil.Par0L("RETAIN", "Retain temporary files?", False,
@@ -185,7 +189,7 @@ try:
 #  Get the name of the output NDF.
    outndf = parsys["OUT"].value
 
-#  See if output NDFs are to be trimmed.
+#  See how the output NDFs are to be trimmed.
    trim = parsys["TRIM"].value
 
 #  See if temp files are to be retained.
