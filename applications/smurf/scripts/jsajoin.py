@@ -120,8 +120,9 @@
 *     27-JAN-2014 (DSB):
 *        Fix mapping of non-NDF regions onto the reference image.
 *     30-JAN-2014 (DSB):
-*        Fix problem invoking kappa:paste if only one tile has been
+*        - Fix problem invoking kappa:paste if only one tile has been
 *        supplied.
+*        - Change sincsinc kernel width from 2 to 3.
 *-
 '''
 
@@ -503,10 +504,10 @@ try:
    pixsize_ref = math.sqrt( pixsize1*pixsize2 )
 
 #  If the output pixels are smaller than the tile pixels, we use a
-#  SincSinc interpolation kernel with width equal to 2 JSA pixels.
+#  SincSinc interpolation kernel with width equal to 3 JSA pixels.
    if pixsize_ref < 1.5*pixsize_jsa:
       method = "sincsinc"
-      width = 2
+      width = 3.0
 
 #  If the output pixels are larger than the tile pixels, we use a
 #  Gauss interpolation kernel with width equal to 0.8 output pixels (se we
