@@ -119,6 +119,9 @@
 *        input pixels.
 *     27-JAN-2014 (DSB):
 *        Fix mapping of non-NDF regions onto the reference image.
+*     30-JAN-2014 (DSB):
+*        Fix problem invoking kappa:paste if only one tile has been
+*        supplied.
 *-
 '''
 
@@ -348,9 +351,13 @@ try:
       jsatile = starutil.get_fits_header( tiles[ jsatile ], "JSATILE" )
 
 #  Paste these tile NDFs into a single image by abutting them in pixel
-#  space. This image still uses the JSA all-sky pixel grid.
-   temp = NDG(1)
-   invoke( "$KAPPA_DIR/paste in={0} out={1}".format(used_tiles,temp) )
+#  space. This image still uses the JSA all-sky pixel grid. If we have
+#  only a single tile, then just use it as it is.
+   if len(used_tiles) > 1:
+      temp = NDG(1)
+      invoke( "$KAPPA_DIR/paste in={0} out={1}".format(used_tiles,temp) )
+   else:
+      temp = used_tiles
 
 #  Strip any bad border from the montage.
    jsa_montage = NDG(1)
