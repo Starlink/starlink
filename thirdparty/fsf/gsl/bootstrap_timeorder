@@ -1,10 +1,5 @@
 #  Establish the time order of some files directories.
 #  Don't want to regenerate these automatically.
-configure.ac
-Makefile.am
-aclocal.m4
-configure
-Makefile.in
 gsl/configure.ac
 gsl/aclocal.m4
 gsl/configure

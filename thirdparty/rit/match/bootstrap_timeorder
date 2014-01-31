@@ -1,4 +1,6 @@
-#  Establish the time order of some pre-generated autotools files.
-#  Don't want to regenerate these.
-match-0.8/configure
-match-0.8/Makefile.in
+#  Establish the time order of some files directories.
+#  Don't want to regenerate these automatically.
+match/configure.in
+match/aclocal.m4
+match/configure
+match/Makefile.in
