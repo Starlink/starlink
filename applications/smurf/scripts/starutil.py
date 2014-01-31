@@ -741,7 +741,7 @@ class ParSys(object):
       #  for unknown parameters were supplied on the command line), raise an
       #  exception.
       if len(byName) > 0:
-         name = byName.keys()[0]
+         name = list(byName.keys())[0]
          text = "\n\n{0}: Unknown parameter '{1}' specified on the command line.".format(cmd(),name)
 
       elif len(byPosition) > 0:
