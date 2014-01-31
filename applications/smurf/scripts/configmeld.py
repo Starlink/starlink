@@ -46,7 +46,7 @@
 *     PARAM = LITERAL (Read)
 *        If supplied, then the value used for the specified parameter
 *        is displayed on standard output, and no visual comparison is
-*        displayed. Separate values are displayed for CONFIG1 and (if 
+*        displayed. Separate values are displayed for CONFIG1 and (if
 *        supplied) CONFIG2. [!]
 *     TOOL = LITERAL (Read)
 *        Gives the name of the file comparison tool to use. The named
@@ -311,9 +311,9 @@ try:
 
 #  Get the waveband selection specifier for config1.
    if waveband1 == "450":
-      select = starutil.shell_quote( "'850=0,450=1'" )
+      select = starutil.shell_quote( '"850=0,450=1"' )
    else:
-      select = starutil.shell_quote( "'850=1,450=0'" )
+      select = starutil.shell_quote( '"850=1,450=0"' )
 
 #  Deal with cases where we are comparing two whole configs...
    if param == None:
@@ -336,9 +336,9 @@ try:
 
 #  Do the same with the second configuration.
       if waveband2 == "450":
-         select = starutil.shell_quote( "'850=0,450=1'" )
+         select = starutil.shell_quote( '"850=0,450=1"' )
       else:
-         select = starutil.shell_quote( "'850=1,450=0'" )
+         select = starutil.shell_quote( '"850=1,450=0"' )
 
       if isndf2:
          conf2 = invoke("$KAPPA_DIR/configecho ndf={0} application=makemap "
