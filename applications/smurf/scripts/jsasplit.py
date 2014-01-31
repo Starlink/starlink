@@ -75,7 +75,8 @@
 *     OUT = LITERAL (Read)
 *        The basename for the output NDFs. Each output NDF will have a
 *        name formed by appending the integer tile index to the supplied
-*        basename, preceeded by and underscore.
+*        basename, preceeded by and underscore. A null (!) value causes
+*        the name of the input NDF to be used.
 *     RETAIN = _LOGICAL (Read)
 *        Should the temporary directory containing the intermediate files
 *        created by this script be retained? If not, it will be deleted
@@ -186,8 +187,11 @@ try:
 #  Get the input NDF.
    inndf = parsys["IN"].value
 
-#  Get the name of the output NDF.
+#  Get the name of the output NDF. If not supplied, use the name of hte
+#  input NDF.
    outndf = parsys["OUT"].value
+   if outndf == None:
+      outndf = inndf
 
 #  See how the output NDFs are to be trimmed.
    trim = parsys["TRIM"].value
