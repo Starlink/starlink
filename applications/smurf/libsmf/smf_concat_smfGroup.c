@@ -30,8 +30,7 @@
  *     config = AstKeyMap * (Given)
  *        Pointer to a KeyMap holding configuration parameters. May
  *        be NULL, in which case hard-wired defaults are used for any
- *        configuration parameters that are needed (currently just
- *        TSIZE=1 and EXPORTLONLAT=0).
+ *        configuration parameters that are needed.
  *     igrp = const smfGroup* (Given)
  *        Group of input data files
  *     darks = const smfArray * (Given)
@@ -241,6 +240,8 @@
  *        Multi-thread copying of arrays from reference to output data.
  *     2014-01-28 (DSB):
  *        Correct ordering of grid axes in time series WCS.
+ *     2014-01-31 (DSB):
+ *        Ensure it is safe to supply a NULL value for config.
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -423,7 +424,8 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
   }
 
   /* See if we will be importing a LUT model from an NDF. */
-  astMapGet0I( config, "IMPORTLUT", &importlut );
+  importlut = 0;
+  if( config ) astMapGet0I( config, "IMPORTLUT", &importlut );
 
   /* Allocate space for the smfArray if required. */
   if( concat ) *concat = smf_create_smfArray( status );

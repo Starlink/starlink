@@ -26,7 +26,7 @@
 *        Pointer to a KeyMap holding configuration parameters. May
 *        be NULL, in which case hard-wired defaults are used for any
 *        configuration parameters that are needed (currently just
-*        TSIZE=1 and EXPORTLONLAT=0).
+*        TSTEP=1 and EXPORTLONLAT=0).
 *     data = smfData* (Given)
 *        Pointer to smfData struct
 *     outfset = AstFrameSet* (Given)
@@ -478,9 +478,12 @@ void smf_calc_mapcoord( ThrWorkForce *wf, AstKeyMap *config, smfData *data,
 
     /* Get the increment in time slices between full Mapping calculations.
        The Mapping for intermediate time slices will be approximated. */
-    dim_t dimval;
-    smf_get_nsamp( config, "TSTEP", data, &dimval, status );
-    tstep = dimval;
+    tstep = 1;
+    if( config ) {
+       dim_t dimval;
+       smf_get_nsamp( config, "TSTEP", data, &dimval, status );
+       tstep = dimval;
+    }
 
     /* Get space for the LUT */
     if( doextension ) {
