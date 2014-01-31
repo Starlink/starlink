@@ -498,6 +498,7 @@ void smurf_calcnoise( int *status ) {
   refunits[0] = '\0';
 
   /* Loop over input data as contiguous chunks */
+  pad = 0;
   gcount = 1;
   for( contchunk=0;(*status==SAI__OK)&&contchunk<ncontchunks; contchunk++ ) {
     size_t idx;
@@ -526,13 +527,12 @@ void smurf_calcnoise( int *status ) {
       astMapGet0D( keymap, "DOWNSAMPSCALE", &downsampscale );
 
       /* Get the padding to use. */
-      pad = smf_get_padding( keymap, 0, firstdata->hdr, VAL__BADD, status );
+      if( firstdata ) pad = smf_get_padding( keymap, 0, firstdata->hdr, VAL__BADD, status );
 
       /* Free the first smfData. */
       smf_close_file( wf, &firstdata, status );
 
     } else {
-      pad = 0;
       zeropad = 1; /* full apodisation */
     }
 
