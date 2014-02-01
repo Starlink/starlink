@@ -166,7 +166,7 @@
 
 *  Local Constants :
       INTEGER GS
-      PARAMETER ( GS = 64 )
+      PARAMETER ( GS = 256 )
 
 *  Local Variables :
       LOGICAL CENTRO, CLEAR, CONCEN, MORE, POSTVE, SGSOFF, MAGS,
@@ -315,7 +315,7 @@
 *   SEE    = approx seeing in pixels
 
       CALL PAR_GET0R( 'SEMIM', A, STATUS )
-      CALL CHPARR( 'SEMIM', A, 0.0, VAL__MAXR, STATUS )
+      CALL CHPARR( 'SEMIM', A, 0.0, GS * 0.5, STATUS )
       CALL PAR_GET0R( 'ECCEN', E, STATUS )
       CALL CHPARR( 'ECCEN', E, 0.0, 1.0, STATUS )
       CALL PAR_GET0R( 'ANGLE', THETA, STATUS )
@@ -702,7 +702,7 @@
                CALL PAR_DEF0R( 'ECCEN', E, STATUS )
                CALL PAR_DEF0R( 'ANGLE', THETA, STATUS )
                CALL PAR_GET0R( 'SEMIM', A, STATUS )
-               CALL CHPARR( 'SEMIM', A, 0.0, VAL__MAXR, STATUS )
+               CALL CHPARR( 'SEMIM', A, 0.0, GS * 0.5, STATUS )
                CALL PAR_GET0R( 'ECCEN', E, STATUS )
                CALL CHPARR( 'ECCEN', E, 0.0, 1.0, STATUS )
                CALL PAR_GET0R( 'ANGLE', THETA, STATUS )

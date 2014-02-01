@@ -45,6 +45,11 @@
   Bug Fixes
   ---------
 
+
+    The maximum semi-major axis has been increased to 128 (previously
+    this was 32) and it is no longer possible to supply a value greater
+    than 128. This fixes a potential crash.
+
     v 1.12
     ------
     A error in the gaussian error calculations has been corrected.
