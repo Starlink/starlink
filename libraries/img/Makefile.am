@@ -21,11 +21,13 @@ libimg_adam_la_SOURCES = \
 
 ##  Distribute the original sources, in case these are needed for further
 ##  development.
-EXTRA_DIST = $(G_ROUTINES) $(GNP_ROUTINES) $(GCP_ROUTINES)
+EXTRA_DIST = $(G_ROUTINES) $(GNP_ROUTINES) $(GCP_ROUTINES) img_err.msg
 
 ## List headers which are to be installed -- these are built first if necessary
 include_HEADERS = img.h
 include_MESSAGES = IMG_ERR img_err.h
+
+BUILT_ROUTINES = $(include_MESSAGES)
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
