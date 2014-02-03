@@ -1645,11 +1645,6 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                  ": ** %f s pre-conditioning data",
                  status, smf_timerupdate(&tv1,&tv2,status) );
 
-      /*** TIMER ***/
-      msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
-                 ": ** %f s creating last set of static models",
-                 status, smf_timerupdate(&tv1,&tv2,status) );
-
 #ifdef __ITERATEMAP_SHOW_MEM
         _smf_iteratemap_showmem(status);
 #endif
