@@ -217,6 +217,8 @@ f     - AST_SHOWMESH: Display a mesh of points on the surface of a Region
 *        Guard against division by zero in RegBase Grid if "ipr" is zero.
 *     7-NOV-2013 (DSB):
 *        Added method astGetRegionFrameSet.
+*     3-FEB-2014 (DSB):
+*        Fix bug masking regions that have no overlap with the supplied array.
 *class--
 
 *  Implementation Notes:
@@ -5665,12 +5667,21 @@ static int Mask##X( AstRegion *this, AstMapping *map, int inside, int ndim, \
             ubndg[ idim ] = ubnd[ idim ]; \
          } \
          npix *= ( ubnd[ idim ] - lbnd[ idim ] + 1 ); \
-         npixg *= ( ubndg[ idim ] - lbndg[ idim ] + 1 ); \
-         if( npixg <= 0 ) break; \
+         if( npixg >= 0 ) npixg *= ( ubndg[ idim ] - lbndg[ idim ] + 1 ); \
       } \
 \
+/* If the bounding box is null, fill the mask with the supplied value if \
+   we assigning the value to the outside of the region (do the opposite if \
+   the Region has been negated). */ \
+      if( npixg <= 0 && astOK ) { \
+         if( ( inside != 0 ) == ( astGetNegated( used_region ) != 0 ) ) { \
+            c = in; \
+            for( ipix = 0; ipix < npix; ipix++ ) *(c++) = val; \
+            result = npix; \
+         } \
+\
 /* If the bounding box is null, return without action. */ \
-      if( npixg > 0 && astOK ) { \
+      } else if( npixg > 0 && astOK ) { \
 \
 /* All points outside this box are either all inside, or all outside, the \
    Region. So we can speed up processing by setting all the points which are \
