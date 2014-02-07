@@ -753,9 +753,8 @@ exportclean = 0
 #  Purpose: 	Export sample sky positions for use with other software.
 #  Description: If non-zero, the logitude/latitude of every sample will
 #		be exported into a pair of NDFs. The file names will be the
-#		same as model components, except with sufficies equal to
-#		the "Symbol" attribute associated with the celestial axes
-#		("ra"/"dec", "glon"/"glat", etc).
+#		same as model components, except with sufficies of "lon"
+#       and "lat".
 exportlonlat = 0
 
 #-----------------------------------------------------------------

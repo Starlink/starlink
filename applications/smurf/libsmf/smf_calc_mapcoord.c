@@ -101,6 +101,9 @@
 *        Added exportlonlat to API.
 *     2012-02-20 (DSB):
 *        Added "config" to API, and removed "tstep" and "exportlonlat".
+*     2014-02-06 (DSB):
+*        Use "_lon" and "_lat" for exportlonlat file names, rather than the
+*        AST symbols for the skyframe axes.
 
 *  Notes:
 *     This routines asserts ICD data order.
@@ -755,7 +758,6 @@ static double *smf1_calc_mapcoord1( smfData *data, dim_t nbolo,
 
 /* Local Variables: */
    char name[SMF_PATH_MAX+1];
-   char sym[ 100 ];
    const char *label = NULL;
    const char *ttl = NULL;
    double *result = NULL;
@@ -777,14 +779,12 @@ static double *smf1_calc_mapcoord1( smfData *data, dim_t nbolo,
       ttl = astGetC( oskyfrm, "Title" );
       label = astGetC( oskyfrm, ( axis == 1 ) ? "Label(1)" : "Label(2)" );
 
-/* Get a lower case copy of the axis symbol. */
-      astChrCase( astGetC( oskyfrm,
-                           ( axis == 1 ) ? "Symbol(1)" : "Symbol(2)" ), sym,
-                           0, sizeof(sym) );
-
-/* Append the lower case axis symbol to the file base name. */
-       one_strlcat( name, "_", SMF_PATH_MAX + 1, status );
-       one_strlcat( name, sym, SMF_PATH_MAX + 1, status );
+/* Append a suitable string to the file base name. */
+       if( astGetI( oskyfrm, "LatAxis" ) == axis ) {
+          one_strlcat( name, "_lat", SMF_PATH_MAX + 1, status );
+       } else {
+          one_strlcat( name, "_lon", SMF_PATH_MAX + 1, status );
+       }
 
 /* Store the pixel bounds for the NDF. */
        pos_lbnd[ 0 ] = pos_lbnd[ 1 ] = 0;

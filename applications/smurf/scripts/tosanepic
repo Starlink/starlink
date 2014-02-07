@@ -67,7 +67,7 @@ $KAPPA_DIR/ndfcopy ${file}_con_res_cln comp=qua out=qua
 
 #  Set up arrays of input NDF names and corresponding names required by sanepic.
 #  The cleaned time series data must be first.
-set ndfs = `echo "qua ${file}_con_res_cln  ${file}_DRA ${file}_DDEC"`
+set ndfs = `echo "qua ${file}_con_res_cln  ${file}_lon ${file}_lat"`
 set names = `echo "mask signal lon lat"`
 
 #  Process each 3D time series NDF
