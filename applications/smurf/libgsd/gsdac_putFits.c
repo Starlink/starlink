@@ -151,11 +151,9 @@
 *        stored as undef FITS headers.
 *     2013 December 4 (MJC):
 *        Choose a non-blank value of MSBID if it is undefined.
-*     2014 January 13 (MJC):
-*        Change the case of OBSID and PROJECT to match ACSIS.
 
 *  Copyright:
-*     Copyright (C) 2008-2014 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2013 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -562,7 +560,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   astSetFitsCM ( fitschan,
                  "---- OMP and ORAC-DR Specific ----", 0 );
 
-  astSetFitsS ( fitschan, "PROJECT", toupper( char( gsdVars->project ) ),
+  astSetFitsS ( fitschan, "PROJECT", gsdVars->project,
 	        "PATT number", 0 );
 
 /***** NOTE: possibly REDUCE_POINTING for spectral 5 points *****/
@@ -613,7 +611,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   astSetFitsF ( fitschan, "DUT1", gsdVars->obsUT1C,
                 "[d] UT1-UTC correction", 0 );
 
-  astSetFitsS ( fitschan, "OBSID", tolower( char( dateVars->obsID ) ),
+  astSetFitsS ( fitschan, "OBSID", dateVars->obsID,
                 "Unique observation identifier", 0 );
 
   astSetFitsS ( fitschan, "OBSIDSS", obsIDSS,
