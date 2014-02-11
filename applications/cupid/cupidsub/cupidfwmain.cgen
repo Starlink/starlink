@@ -147,7 +147,8 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
 *        coastal region when 1) the gradient increases above flatslope, or
 *        2) the altitude increases above "noise + 2*rms".
 *     11-FEB-2014 (DSB):
-*        Add facility to dump the clump assignment array after a nominated
+*        - Produce more diagnostic information at debug level 3.
+*        - Add facility to dump the clump assignment array after a nominated
 *        peak is first reached or after a walk from a nominated starting
 *        pixel has been completed. These are specified via new configuration
 *        parameters DUMPPEAK and DUMPWALK.
@@ -178,6 +179,7 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    int cleaniter;  /* Number of cleaning  iterations to perform */
    int clump_index;/* Index of the peak to which the walk ascends */
    int count;      /* Number of pixels checked */
+   int debug3;     /* Are we displaying level 3 debug info? */
    int dump_peak;  /* The clump index at which to dump the clump assignment array */
    int dump_walk;  /* The starting pixel at which to dump the clump assignment array */
    int got_flat;   /* Has the length of the initial flat section been found? */
@@ -240,6 +242,10 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
 
 /* Initialise */
    ret = 0;
+
+/* For speed, get a local flag indicating if we are displaying level
+   3 debugging info. */
+   debug3 = msgFlevok( MSG__DEBUG2, status );
 
 /* See if the user wants to dump the clump assignment array after a
    specified peak is reached for the first time. The supplied value is
@@ -665,11 +671,16 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
                            msgOutif( MSG__DEBUG,"",
                                      "      (a new peak, index = ^I, value=^V)",
                                      status );
+                           if( debug3 ) msgOutf( "", "    Walk from pixel %d "
+                                      "terminates at this peak", status, iv0 );
 
 /* Assign a special value to "clump_index" that indicates that no clump
    was assigned to the current walk. */
                         } else {
                            clump_index = -2;
+                           if( debug3 ) msgOutf( "", "    Walk from pixel %d "
+                                              "terminates at a low-land pixel",
+                                              status, iv0 );
                         }
 
 /* Otherwise, if the next pixel on the route is already assigned to a
@@ -677,6 +688,10 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    index for the route so far, and abandon the rest of the walk. */
                      } else if( work[ nv ] > 0 ) {
                         clump_index = work[ nv ];
+                        if( debug3 ) msgOutf( "", "    Walk from pixel %d "
+                                              "met clump %d after %d steps.",
+                                              status, iv0, clump_index,
+                                              route_length );
 
 /* Otherwise, move to the next pixel on the route. */
                      } else {
