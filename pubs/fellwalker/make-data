@@ -67,7 +67,7 @@ rm pgplot.ps
 $KAPPA_DIR/lutable mapping=linear coltab=external lut=$KAPPA_DIR/warm_lut
 $KAPPA_DIR/display tot'(2:,2:)' noaxes border=yes mode=sca accept
 epstopdf pgplot.ps
-mv pgplot.pdf sim.pdf
+pdfcrop pgplot.pdf sim.pdf
 
 $KAPPA_DIR/gdclear
 rm pgplot.ps
@@ -75,7 +75,7 @@ $KAPPA_DIR/display fred'(2:,2:)' noaxes border=yes mode=sca lut=lutndf nn=yes ac
 $KAPPA_DIR/contour tot nokey noclear mode=sca style="'colour=red,width=3'" ncont=10 \
                    firstcnt=0.006 lastcnt=0.45
 epstopdf pgplot.ps
-mv pgplot.pdf walks.pdf
+pdfcrop pgplot.pdf walks.pdf
 
 $KAPPA_DIR/lutable mapping=linear coltab=grey
 $KAPPA_DIR/gdclear
@@ -84,7 +84,7 @@ $KAPPA_DIR/display rawmask'(2:,2:)' noaxes border=yes mode=sca low=2 high=6 badc
 $KAPPA_DIR/contour tot nokey noclear mode=sca style="'colour=red,width=3'" ncont=10 \
                    firstcnt=0.006 lastcnt=0.45
 epstopdf pgplot.ps
-mv pgplot.pdf rawmask.pdf
+pdfcrop pgplot.pdf rawmask.pdf
 
 
 
