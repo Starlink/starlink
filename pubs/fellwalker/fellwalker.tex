@@ -260,7 +260,94 @@ This initial CAA is then searched for any isolated individual pixels
 above the threshold. Such pixels are set to -1 in the CAA, indicating
 they should be ignored.
 
+The main loop is then entered, which considers each pixel in turn as the
+potential start of a walk to a peak. Pixels which have a non-zero value
+in the CAA are skipped since they have either already been assigned to a
+clump (if the CAA value is positive) or have been flagged as unusable (if
+the CAA value is negative). A single walk consists of stepping from pixel
+to pixel until a pixel is reached which is already known to be part of a
+clump, or significant isolated peak is encountered. The vector indicies of
+the pixels visited along a walk are recorded in a temporary array so that
+they  can be identified later.
 
+At each step, the pixel values within a box of width three pixels are compared
+to the central pixel to find the neighbouring pixel which give the highest
+gradient\footnote{This gradient takes into account the fact that corner
+pixels are further away from the box centre than mid-side pixels.}. Thus
+2 neighbours are checked if the data is 1-dimensional data, 8 are
+checked if the data is 2-dimensional and 26 are checked if the data is
+3-dimensional.
+
+If the highest gradient found above is greater than zero - that is, if
+there is an upward route out of the current pixel - the walk steps to the
+selected neighbouring pixel. If this new pixel has already been assigned
+to a clump (\emph{i.e.} if the CAA holds a positive value at the new
+pixel), then the new walk has joined an older walk and so will eventually
+end up at the same peak as the older walk. The existing positive CAA
+value of the new pixel (\emph{i.e.} the clump index assigned to the older
+walk) is copied into the CAA for all pixels visited so far on the new
+walk, and a new walk from the next starting pixel is initiated.
+
+If the highest gradient found to any neighbouring pixel is less than or
+equal to zero, then there is no upward route from the central pixel. This
+could mean the walk has reached a significant peak, but it could also
+mean it has merely reached a noise spike. To distinguish these two cases,
+a search is made over a larger box\footnote{By default a box of width 9
+pixels, but the user can specify a different size.}. If the maximum pixel
+value in this larger box is smaller than the central pixel value, then
+the central pixel is considered to be a significant peak. A new clump
+identifier is issued for it and stored in the CAA at all pixels visited
+on the walk. A new walk from the next starting pixel is then initiated.
+
+If the maximum pixel value found in the larger box is greater than the
+central pixel value, then the central pixel is considered to be a noise
+spike. The walk then ``jumps across the gap'' and continues from the
+highest pixel found in the box.
+
+\begin{figure}
+\includegraphics[width=0.45\textwidth]{sim.pdf}
+\caption{A 50x50 array of artificial data used to illustrate the
+FellWalker algorithm below.}
+\label{fig:sim}
+\end{figure}
+
+\begin{figure}
+\includegraphics[width=0.45\textwidth]{walks.pdf}
+\caption{Two walks up a peak within the artificial data shown in
+Fig.~\ref{fig:sim}. The contours show
+the data values themselves. The white pixels are below the nominated threshold,
+the grey pixels are above the threshold but have not yet been assigned to a
+clump. The green pixels trace the first walk that reached the peak. The
+green pixels trace a later walk to the same peak that was terminated when it
+met the first walk. The green and blue pixels are all assigned to the same
+clump. These walks follow the steepest line of ascent. Note
+the gap in the green line near its start at the lowest contour - this is
+where a jump was made from a noise spike to the highest value in a 9x9 box of
+neighbouring pixels.}
+\label{fig:walks}
+\end{figure}
+
+The above process results in the CAA holding a clump identifier for every
+usable pixel in the supplied data array. However, some of the walks
+performed above may start with a section of very low gradient before any
+significant ascent begins. The user is allowed to specify a minimum
+gradient which must be achieved before a walk is considered to have
+begun. Any section of the walk that occurs before the first such
+``steep'' section is flagged as unusable in the CAA. For this test,
+the gradient of a walk is averaged over four consecutive steps.
+
+This process is illustrated in Fig.~\ref{fig:walks} which shows two
+example up-hill walks produced by FellWalker for the artificial data shown
+in Fig.~\ref{fig:sim}. The final CAA produced by the above process for
+this data is shown in Fig.~\ref{fig:rawmask}.
+
+\begin{figure}
+\includegraphics[width=0.45\textwidth]{rawmask.pdf}
+\caption{The raw clump mask created for the artificial data shown in
+Fig.~\ref{fig:sim}. Two clumps are found, indicated by the black and grey
+pixels.}
+\label{fig:rawmask}
+\end{figure}
 
 
 \subsection{Merging Clumps}

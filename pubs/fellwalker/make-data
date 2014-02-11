@@ -1,0 +1,95 @@
+#!/bin/tcsh
+
+cat << EOF > aa
+1 1 0
+20 20 10
+18 25 12
+22 30 25
+35 30 15
+50 50 0
+EOF
+
+$KAPPA_DIR/trandat aa auto=no poscols=\[1,2\] valcol=3 bad=no ndf=spikes
+$KAPPA_DIR/gausmooth spikes fwhm=8 out=sp15
+
+cat << EOF > aa
+1 1 0
+30 30 35
+25 20 25
+50 50 0
+EOF
+
+$KAPPA_DIR/trandat aa auto=no poscols=\[1,2\] valcol=3 bad=no ndf=spikes
+$KAPPA_DIR/gausmooth spikes fwhm=12 out=sp25
+
+setenv STAR_SEED 4.0
+$KAPPA_DIR/creframe lbound=\[1,1\] ubound=\[100,100\] mode=gn mean=0 \
+                    sigma=0.003 out=noise
+
+$KAPPA_DIR/maths exp="'ia+ib+ic'" ia=sp25 ib=sp15 ic=noise out=tot
+
+$KAPPA_DIR/erase tot.axis ok
+
+$CUPID_DIR/findclumps method=fellwalker config='dumppeak=2' tot \
+                      msg_filter=quiet out=mask outcat=! rms=0.003
+mv idata1.sdf peak2.sdf
+
+$CUPID_DIR/findclumps method=fellwalker config='dumpwalk=630' tot \
+                      msg_filter=quiet out=mask outcat=! rms=0.003
+mv idata1.sdf walk630.sdf
+
+$CUPID_DIR/findclumps method=fellwalker config='dumpwalk=627' tot \
+                      msg_filter=debug2 out=mask outcat=! rms=0.003 > /dev/null
+mv idata3.sdf walk627.sdf
+$KAPPA_DIR/setmagic idata4 rawmask -1
+
+$KAPPA_DIR/sub walk630.sdf walk627.sdf diffwalk
+$KAPPA_DIR/maths exp="'qif((ia==2),3,ib)'" ia=diffwalk ib=peak2 out=fred
+
+
+cat << EOF > lut
+1.0 1.0 1.0
+0.6 0.6 0.6
+1.0 0.0 0.0
+0.0 1.0 0.0
+0.0 0.0 1.0
+EOF
+
+$KAPPA_DIR/trandat lut lutndf shape=\[3,5\] auto
+
+$KAPPA_DIR/gdset /AVCPS
+
+
+
+
+$KAPPA_DIR/gdclear
+rm pgplot.ps
+$KAPPA_DIR/lutable mapping=linear coltab=external lut=$KAPPA_DIR/warm_lut
+$KAPPA_DIR/display tot'(2:,2:)' noaxes border=yes mode=sca accept
+epstopdf pgplot.ps
+mv pgplot.pdf sim.pdf
+
+$KAPPA_DIR/gdclear
+rm pgplot.ps
+$KAPPA_DIR/display fred'(2:,2:)' noaxes border=yes mode=sca lut=lutndf nn=yes accept
+$KAPPA_DIR/contour tot nokey noclear mode=sca style="'colour=red,width=3'" ncont=10 \
+                   firstcnt=0.006 lastcnt=0.45
+epstopdf pgplot.ps
+mv pgplot.pdf walks.pdf
+
+$KAPPA_DIR/lutable mapping=linear coltab=grey
+$KAPPA_DIR/gdclear
+rm pgplot.ps
+$KAPPA_DIR/display rawmask'(2:,2:)' noaxes border=yes mode=sca low=2 high=6 badcol=white
+$KAPPA_DIR/contour tot nokey noclear mode=sca style="'colour=red,width=3'" ncont=10 \
+                   firstcnt=0.006 lastcnt=0.45
+epstopdf pgplot.ps
+mv pgplot.pdf rawmask.pdf
+
+
+
+
+rm aa spikes.sdf sp15.sdf sp25.sdf noise.sdf tot.sdf mask.sdf peak2.sdf \
+   walk630.sdf walk627.sdf diffwalk.sdf fred.sdf lut lutndf.sdf idata*sdf \
+   rawmask.sdf
+
