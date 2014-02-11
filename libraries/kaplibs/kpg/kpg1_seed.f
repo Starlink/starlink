@@ -15,6 +15,9 @@
 *  Description:
 *     This function uses the computer time from an arbitrary date, plus
 *     the current process id., to generate a non-repeatable seed.
+*
+*     Alternatively, a fixed seed can be used by assigning the seed value
+*     to environment variable STAR_SEED.
 
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
@@ -22,8 +25,8 @@
 
 *  Returned Value:
 *     KPG1_SEED = REAL
-*        The non-repeatable seed for use in SLA_RANDOM.  Note that
-*        it is not necessarily in the range 0 to 1.
+*        The seed for use in SLA_RANDOM.  Note that it is not necessarily
+*        in the range 0 to 1.
 
 *  [optional_function_items]...
 *  Copyright:
@@ -69,6 +72,8 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! VAL__ constants
+      INCLUDE 'MSG_PAR'          ! MSG__ constants
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -85,6 +90,7 @@
       INTEGER NTICKS             ! Number of computer clock ticks
       INTEGER PID                ! Process id.
       LOGICAL DONE               ! Has seed been set before?
+      REAL MYSEED                ! The seed obtained from STAR_SEED
       REAL SEED                  ! The returned seed
 
 *  Ensure DONE is set false on the first call to this routine for
@@ -97,9 +103,19 @@
 *  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  If a seed is specified via the environment variable "STAR_SEED", use it.
+      MYSEED = VAL__BADR
+      CALL KPG1_ENV0R( 'STAR_SEED', MYSEED, STATUS )
+      IF( MYSEED .NE. VAL__BADR ) THEN
+         SEED = MYSEED
+         CALL MSG_SETR( 'S', SEED )
+         CALL MSG_OUTIF( MSG__VERB, ' ', 'Using random number seed '//
+     :                   '^S specified by environment variable '//
+     :                   'STAR_SEED', status )
+
 *  If the seed has already been set, just update the previous seed by a
 *  random amount.
-      IF( DONE ) THEN
+      ELSE IF( DONE ) THEN
          SEED = 2*SEED*SLA_RANDOM( SEED )
 
 *  If this is the first time the seed has been set in this process...
