@@ -142,10 +142,15 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
 *        neighbourhood box, rather than just marking the edge pixels bad.
 *        This avoid the output mask having a border of bad pixels.
 *     22-NOV-2013 (DSB):
--        - Correct calculation of gradient in coastal region (divide by 3, not 4).
-*        - Change handlign of flatslope - a walk is now deemed to leave the 
-*        coastal region when 1) the gradient increases above flatslope, or 
+*        - Correct calculation of gradient in coastal region (divide by 3, not 4).
+*        - Change handlign of flatslope - a walk is now deemed to leave the
+*        coastal region when 1) the gradient increases above flatslope, or
 *        2) the altitude increases above "noise + 2*rms".
+*     11-FEB-2014 (DSB):
+*        Add facility to dump the clump assignment array after a nominated
+*        peak is first reached or after a walk from a nominated starting
+*        pixel has been completed. These are specified via new configuration
+*        parameters DUMPPEAK and DUMPWALK.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -173,6 +178,8 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    int cleaniter;  /* Number of cleaning  iterations to perform */
    int clump_index;/* Index of the peak to which the walk ascends */
    int count;      /* Number of pixels checked */
+   int dump_peak;  /* The clump index at which to dump the clump assignment array */
+   int dump_walk;  /* The starting pixel at which to dump the clump assignment array */
    int got_flat;   /* Has the length of the initial flat section been found? */
    int iflat;      /* Index of next element in "flat" to be written or read */
    int iix;        /* GRID index on 1st axis at central pixel */
@@ -181,6 +188,7 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    int istep;      /* Index within "route" array */
    int iter;       /* Iteration count */
    int iv;         /* 1D Vector index of current central pixel. */
+   int iv0;        /* 1D Vector index of starting pixel. */
    int ix;         /* GRID index on 1st axis at starting pixel */
    int ixoff;      /* Offset in GRID index on 1st axis */
    int iy;         /* GRID index on 2nd axis at starting pixel */
@@ -204,6 +212,7 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    int mix;        /* Grid index on 1st axis of 3x3x3 pixel being tested */
    int miy;        /* Grid index on 2nd axis of 3x3x3 pixel being tested */
    int miz;        /* Grid index on 3rd axis of 3x3x3 pixel being tested */
+   int new_peak;   /* Has this walk arrived at a new peak? */
    int nflat;      /* Number of starting pixels in "route" which are flat */
    int nix;        /* GRID index on 1st axis at central pixel */
    int niy;        /* GRID index on 2nd axis at central pixel */
@@ -231,6 +240,16 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
 
 /* Initialise */
    ret = 0;
+
+/* See if the user wants to dump the clump assignment array after a
+   specified peak is reached for the first time. The supplied value is
+   the clump index. */
+   dump_peak = cupidConfigI( config, "DUMPPEAK", 0, status );
+
+/* See if the user wants to dump the clump assignment array after the
+   walk from a specified pixel has been completed. The supplied value is
+   the zero-based vector index of the start pixel. */
+   dump_walk = cupidConfigI( config, "DUMPWALK", -1, status );
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return ret;
@@ -366,6 +385,9 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
             for( ix = 1; ix <= dims[ 0 ]; ix++, pa++ ) {
                if( *pa == 0 ) {
 
+/* Indicate we have not yet arrived at a new peak on this walk. */
+                  new_peak = 0;
+
 /* Indicate we have not yet assertained which clump this pixel belongs to. */
                   clump_index = -1;
 
@@ -373,7 +395,7 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
    so that it always refers to the current position of the "walker". The
    variables iix, iiy and iiz are likewise modified to represent the grid
    coords of the pixel with vector index "iv". */
-                  iv = pa - work;
+                  iv0 = iv = pa - work;
                   iix = ix;
                   iiy = iy;
                   iiz = iz;
@@ -632,7 +654,10 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
                      if( iv == nv ) {
                         if( nflat >= 0 && nflat < route_length ) {
                            clump_index = work[ iv ];
-                           if( clump_index < 1 ) clump_index = ++ret;
+                           if( clump_index < 1 ) {
+                              clump_index = ++ret;
+                              new_peak = 1;
+                           }
 
 /* Report new peak. */
                            msgSeti( "I", clump_index );
@@ -678,6 +703,22 @@ int CGEN_FUNCTION(cupidFWMain)( CGEN_TYPE *array, int nel, int ndim,
                      } else {
                         work[ route[ istep ] ] = clump_index;
                      }
+                  }
+
+/* If this is the clump specified by config parameter DUMP_PEAK, and the
+   current path is the first path to reach the peak, dump the clump
+   assignment array. */
+                  if( new_peak && clump_index == dump_peak ) {
+                     char text[200];
+                     sprintf( text, "first walk to peak %d", dump_peak );
+                     cupidDumpI( work, ndim, dims, slbnd, text, status );
+
+/* Otherwise, if this is the walk specified by config parameter DUMP_WALK,
+   dump the clump assignment array. */
+                  } else if( iv0 == dump_walk ) {
+                     char text[200];
+                     sprintf( text, "walk from pixel %d", dump_walk );
+                     cupidDumpI( work, ndim, dims, slbnd, text, status );
                   }
                }
 
