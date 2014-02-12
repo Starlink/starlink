@@ -104,6 +104,17 @@ to a new file.
 <p>You can also use the results files together with the AUTOPHOTOM
 program (see SUN/45) to redo the same measurements non-interactively.
 
+<h3>Reading in a list of positions for measurement</h3>
+<p>If you have a number of sources that you would like to measure using the
+same apertures, then you can read in a simple text file of X and Y positions
+using the dialog "File->Read positions...".
+The format of this file is flexible and can contain columns of X and Y,
+ID, X and Y. X and Y positions are in NDF coordinates, so for FITS files
+these are just pixel coordinates. Once read in you can adjust the aperture
+size and sky annuli to be the same by selecting "Options->Keep apertures
+same size" and then using the usual controls.
+
+
 <h3>Changing the frame zero point (magnitudes only)</h3>
 <p>Just type in the frame zero point into the entry window and press
 return. All the existing apertures will now be re-measured.

@@ -117,6 +117,9 @@
 #           an existing list using a selection dialog. Any existing
 #           apertures are updated using the new values if update
 #           is true.
+#        read_positions [filename] [update]
+#           Reads a set of object positions from a file in "id x y"
+#           format and creates objects for each position.
 #        save_objects [filename]
 #           Saves the apertures and their measurments into a file.
 #           If not given the file name is given using a selection
@@ -335,6 +338,15 @@ itcl::class gaia::GaiaApPhotom {
       bind $w_ <Control-r> [code $this read_file]
       add_menu_short_help $File {Read measurements...} \
          {Read existing measurements from a selected file}
+
+      #  Read simple positions from a file.
+      $File add command \
+         -label {Read positions...} \
+         -command [code $this read_positions] \
+         -accelerator {Control-p}
+      bind $w_ <Control-p> [code $this read_positions]
+      add_menu_short_help $File {Read positions...} \
+         {Read object positions from a positions file}
 
       #  Set the exit menu items.
       $File add command -label Exit -command [code $this close] \
@@ -599,6 +611,19 @@ itcl::class gaia::GaiaApPhotom {
          set w [FileSelect .\#auto -title "Choose PHOTOM file"]
          if {[$w activate]} {
             $object_list_ read_file [$w get] $update
+         }
+         destroy $w
+      } else {
+         $object_list_ read_file $filename $update
+      }
+   }
+
+   #  Read positions from a positions file.
+   method read_positions {{filename ""} {update 0}} {
+      if { $filename == "" } {
+         set w [FileSelect .\#auto -title "Choose positions file"]
+         if {[$w activate]} {
+            $object_list_ read_positions_file [$w get] $update
          }
          destroy $w
       } else {

@@ -711,6 +711,87 @@ itcl::class gaia::GaiaPhotomList {
       return $ok
    }
 
+   #  Read a positions list and create phometry objects with default
+   #  settings at those positions. A position list is a simple file
+   #  of "x y", "id x y" or "id ra dec x y" values. Only supported for
+   #  aperture photometry.
+   public method read_positions_file {filename update} {
+      if { $phottype != "aperture" } {
+         error "Cannot read a positions file for non-aperture photometry"
+      }
+      if { [file readable $filename] } {
+         set fid [open $filename r]
+         read_ap_positions_file_ $fid $filename $update
+         close $fid
+
+         #  Finally update the scrollbox and the selected object details.
+         update_scrollbox_
+         update_details_
+
+         #  Objects have changed, so update modified flag.
+         set modified 1
+      } else {
+         error "Cannot read file: $filename."
+      }
+   }
+
+
+   #  Read a positions file and create photometry objects with default
+   #  settings for all unknown configuration data.
+   protected method read_ap_positions_file_ {fid filename update} {
+      set old_selected $selected_
+      set ok 1
+
+      # XXX get these from the caller.
+      set object_defaults_ "0.0 0.0 0.0 0.0 OK 9.0 0.0 0.0 annulus circle"
+      set sky_defaults_ "1.5 2.5"
+
+
+      #  Loop over non-blank lines. If line starts with # it is a comment.
+      #  Other lines should be "id x y"
+      set index 0
+      while { $ok  } {
+         set llen [gets $fid line]
+         if { $llen > 0 && [string index $line 0] != "\#" } {
+            set nwords [llength $line]
+            if { $nwords == 2 } {
+
+               #  Simple x y, fake an index.
+               incr index
+               eval add $update "$index $line" $object_defaults_
+               #  Sky region.
+               eval $objects_($index) setsky ANN $sky_defaults_
+            } elseif { $nwords == 3 } {
+
+               #  Simple id x y
+               eval add $update $line $object_defaults_
+               #  Sky region.
+               lassign $line index
+               eval $objects_($index) setsky ANN $sky_defaults_
+            } elseif { $nwords == 5 } {
+
+               #  GAIA positions file. Should support those.
+               lappend {id ra dec x y}
+               eval add $update "$id $x $y" $object_defaults_
+               lassign $line index
+               eval $objects_($index) setsky ANN $sky_defaults_
+            } else {
+
+               error "Unknown contents: $line"
+            }
+         } elseif { $llen < 0 } {
+
+            #  End of file.
+            set ok 0
+         }
+      }
+
+      if { $old_selected != {} } {
+         set selected_ $old_selected
+      }
+   }
+
+
    #  Set a configuration option for the currently selected
    #  objects. If in "psf" mode then only one object exists.
    public method config_selected {item value} {

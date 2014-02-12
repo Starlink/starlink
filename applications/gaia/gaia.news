@@ -4,6 +4,11 @@
     A new toolbox for displaying histograms of rectangular regions
     of the displayed image has been added.
 
+    It is now possible to load a list of positions into the aperture
+    photometry toolbox. Apertures loaded this way will be given default
+    parameters avoiding the need to create a full AUTOPHOTOM format
+    input.
+
     A serious bug that stopped images with modified astrometries from
     being saved to disk has been fixed. Users experiencing this issue 
     should downgrade or get the development release.
