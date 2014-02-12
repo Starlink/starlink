@@ -232,28 +232,27 @@ try:
       invoke("$KAPPA_DIR/setlabel {0} !".format(fla))
       invoke("$KAPPA_DIR/setunits {0} !".format(fla))
 
-#  Extract the required sections from the other files.
-      ra = NDG(1)
-      invoke("$KAPPA_DIR/ndfcopy {0}_lon\(,{1}:{2}\) out={3}".format(base,tlo,thi,ra))
-      dec = NDG(1)
-      invoke("$KAPPA_DIR/ndfcopy {0}_lat\(,{1}:{2}\) out={3}".format(base,tlo,thi,dec))
+#  Extract the required sections from the other files. RA and Dec files
+#  do not need to be trimmed since they do not include padding.
+      ra = "{0}_lon".format(base)
+      dec = "{0}_lat".format(base)
       tcs_index = NDG(1)
       invoke("$KAPPA_DIR/ndfcopy {0}\({1}:{2}\) out={3}".format(tcs_index_full,tlo,thi,tcs_index))
 
 #  Erase unwanted stuff.
-      invoke("$KAPPA_DIR/erase {0}.quality ok ".format(val), annull=True)
-      invoke("$KAPPA_DIR/erase {0}.wcs ok ".format(val), annull=True)
-      invoke("$KAPPA_DIR/erase {0}.more ok ".format(val), annull=True)
-      invoke("$KAPPA_DIR/erase {0}.history ok ".format(val), annull=True)
+      invoke("$KAPPA_DIR/erase {0}.quality ok ".format(val), annul=True)
+      invoke("$KAPPA_DIR/erase {0}.wcs ok ".format(val), annul=True)
+      invoke("$KAPPA_DIR/erase {0}.more ok ".format(val), annul=True)
+      invoke("$KAPPA_DIR/erase {0}.history ok ".format(val), annul=True)
 
-      invoke("$KAPPA_DIR/erase {0}.quality ok ".format(fla), annull=True)
-      invoke("$KAPPA_DIR/erase {0}.wcs ok ".format(fla), annull=True)
-      invoke("$KAPPA_DIR/erase {0}.more ok ".format(fla), annull=True)
+      invoke("$KAPPA_DIR/erase {0}.quality ok ".format(fla), annul=True)
+      invoke("$KAPPA_DIR/erase {0}.wcs ok ".format(fla), annul=True)
+      invoke("$KAPPA_DIR/erase {0}.more ok ".format(fla), annul=True)
 
-      invoke("$KAPPA_DIR/erase {0}.history ok ".format(ra), annull=True)
-      invoke("$KAPPA_DIR/erase {0}.axis ok ".format(ra), annull=True)
-      invoke("$KAPPA_DIR/erase {0}.history ok ".format(dec), annull=True)
-      invoke("$KAPPA_DIR/erase {0}.axis ok ".format(dec), annull=True)
+      invoke("$KAPPA_DIR/erase {0}.history ok ".format(ra), annul=True)
+      invoke("$KAPPA_DIR/erase {0}.axis ok ".format(ra), annul=True)
+      invoke("$KAPPA_DIR/erase {0}.history ok ".format(dec), annul=True)
+      invoke("$KAPPA_DIR/erase {0}.axis ok ".format(dec), annul=True)
 
 #  Convert the NDFs to individual FITS files.
       valfits = NDG.tempfile(".fit")
@@ -277,7 +276,7 @@ try:
       striphdr( dechdus[0] )
 
       tcsfits = NDG.tempfile(".fit")
-      invoke("$CONVERT_DIR/ndf2fits {0} {1} comp=d prohis=f".format(tcs_index,tcsfits))
+      invoke("$CONVERT_DIR/ndf2fits {0} {1} bitpix=32 comp=d prohis=f".format(tcs_index,tcsfits))
       tcshdus = pyfits.open(tcsfits)
       striphdr( tcshdus[0] )
 
@@ -294,13 +293,14 @@ try:
       hdulist[5].scale('int32')
 
 #  Create a unit mapping for bolometer index.
-      hdulist.append( pyfits.ImageHDU(numpy.arange(0, nbolo, 1 )) )
+      hdulist.append( pyfits.ImageHDU(numpy.arange(0, nbolo, 1, dtype=numpy.int32 )) )
 
 #  Number of bolometers.
       hdulist.append( pyfits.ImageHDU(numpy.array( [nbolo], dtype=numpy.int32 )))
 
 #  Copy the TCS_INDEX array into the next extension.
       hdulist.append( tcshdus[0] )
+      hdulist[8].scale('int32')
 
 #  Create a 1D HDU holding the number of time slices for each bolo.
       a = numpy.empty( nbolo, dtype=numpy.int32 )
@@ -319,6 +319,10 @@ try:
       dechdus.close()
       tcshdus.close()
 
+#  Remove local temp files for this chunk.
+      os.remove( "{0}_con_res_cln.sdf".format(base) )
+      os.remove( "{0}_lat.sdf".format(base) )
+      os.remove( "{0}_lon.sdf".format(base) )
 
 #  Remove temporary files.
    cleanup()

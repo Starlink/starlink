@@ -233,7 +233,7 @@ def _findLevel( level, default  ):
 
 #  -------------------  Using ATASKS ---------------------------
 
-def invoke(command,aslist=False,buffer=None):
+def invoke(command,aslist=False,buffer=None,annul=False):
    """
 
    Invoke an ADAM atask. An AtaskError is raised if the command fails.
@@ -242,7 +242,7 @@ def invoke(command,aslist=False,buffer=None):
    on the value of the "ilevel" and "glevel" module variables.
 
    Invocation:
-      value = invoke(command,aslist=False,buffer=None)
+      value = invoke(command,aslist=False,buffer=None,annul=False)
 
    Arguments:
       command = string
@@ -271,6 +271,9 @@ def invoke(command,aslist=False,buffer=None):
          reason. If "buffer" is not specified, the default is always to
          buffer unless the screen information level ("ILEVEL") is set to
          ATASK or higher.
+      annul = boolean
+         If False, then an AtaskError exception is raised if the command
+         fails for any reason. If True, then no exception is raised.
 
    Returned Value:
       A single string, or a list of strings, holding the standard output
@@ -329,7 +332,8 @@ def invoke(command,aslist=False,buffer=None):
       msg_out( outtxt, ATASK )
 
       if status != 0:
-         raise AtaskError("\n\n{0}".format(outtxt))
+         if not annul:
+            raise AtaskError("\n\n{0}".format(outtxt))
       elif aslist:
          outtxt = outtxt.split("\n")
 
@@ -362,7 +366,7 @@ def invoke(command,aslist=False,buffer=None):
 
          time.sleep(1.0)
 
-      if status != 0:
+      if status != 0 and not annul:
          if outtxt:
             if aslist:
                msg = ""
@@ -1795,10 +1799,11 @@ class NDG(object):
 	 All NDG objects created so far that refer to the deleted
 	 temporary directory are then reset so that each one represents
 	 an empty group.
-      NDG.tempfile():
+      NDG.tempfile(suffix=".lis"):
          Returns the path to a new file in the temporary directory. It is
          guaranteed that this file does not exist, and so can be created
-         safely.
+         safely. The file type (suffix) fo the file may be specified, but
+         defaults to ".lis".
 
    To Do:
       - Allow comment property to be supplied as an argument to each
@@ -1835,8 +1840,8 @@ class NDG(object):
    # Return the path to the temporary list file to use for a group. It is
    # placed in the specified tempdir.
    @classmethod
-   def __getfile(cls,tempdir):
-      return "{0}/group{1}_.lis".format(tempdir,NDG.__nobj)
+   def __getfile(cls,tempdir,suffix=".lis"):
+      return "{0}/group{1}_{2}".format(tempdir,NDG.__nobj,suffix)
 
    # Find and store the next unused "nobj" value, then return the temp
    # directory path.
@@ -2090,9 +2095,9 @@ class NDG(object):
 
    # Return the path to a new temporary file.
    @classmethod
-   def tempfile(cls):
+   def tempfile(cls,suffix=".lis"):
       tmpdir = NDG.__setnobj()
-      return NDG.__getfile( tmpdir )
+      return NDG.__getfile( tmpdir, suffix )
 
    # Format an NDG into a shell quoted group expression
    def __str__(self):
