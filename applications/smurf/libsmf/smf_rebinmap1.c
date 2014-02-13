@@ -66,7 +66,8 @@
 *     hitsmap = unsigned int* (Returned)
 *        Number of samples that land in a pixel.
 *     mapvar = double* (Returned)
-*        Variance of each pixel in map
+*        Variance of each pixel in map. May be NULL if no map variances
+*        are required.
 *     msize = dim_t (Given)
 *        Number of pixels in map
 *     scalevariance = double* (Returned)
@@ -88,8 +89,9 @@
 *     that each thread can accumulate into its own map.
 *
 *  Authors:
-*     Edward Chapin (UBC)
-*     Gaelen Marsden (AGM, UBC)
+*     EC: Edward Chapin (UBC)
+*     AGM: Gaelen Marsden (UBC)
+*     DSB: David S Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -124,13 +126,15 @@
 *        Use threads.
 *     2013-5-28 (DSB):
 *        Ensure the "no variances" cases use the same weighted incremental
-*        algorithm used by the other cases. Prior to this chance, the "no 
+*        algorithm used by the other cases. Prior to this chance, the "no
 *        variances" cases produced unnormalised maps.
 *     2013-10-25 (AGM):
 *        Alternate method for multithreading. Each thread now operates on a
 *        separate chunk of data rather than a seperate chunk of map. Input
 *        maps now need to be nw times longer so that each thread can
 *        accumulate into its own map.
+*     2014-2-13 (DSB):
+*        Allow NULL to be supplied for mapvar.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -297,8 +301,7 @@ void smf_rebinmap1( ThrWorkForce *wf, smfData *data, smfData *variance, int *lut
   if (*status != SAI__OK) return;
 
   /* Check inputs */
-  if( !data || !map || !lut || !mapweight || !mapweightsq || !mapvar ||
-      !hitsmap ) {
+  if( !data || !map || !lut || !mapweight || !mapweightsq || !hitsmap ) {
     *status = SAI__ERROR;
     errRep(" ", FUNC_NAME ": Null inputs", status );
     return;
@@ -369,7 +372,7 @@ void smf_rebinmap1( ThrWorkForce *wf, smfData *data, smfData *variance, int *lut
     memset( map, 0, nw*mbufsize*sizeof(*map) );
     memset( mapweight, 0, nw*mbufsize*sizeof(*mapweight) );
     memset( mapweightsq, 0, nw*mbufsize*sizeof(*mapweightsq) );
-    memset( mapvar, 0, nw*mbufsize*sizeof(*mapvar) );
+    if( mapvar ) memset( mapvar, 0, nw*mbufsize*sizeof(*mapvar) );
     memset( hitsmap, 0, nw*mbufsize*sizeof(*hitsmap) );
   }
 
@@ -528,7 +531,7 @@ void smf_rebinmap1( ThrWorkForce *wf, smfData *data, smfData *variance, int *lut
       if( scaleweight ) {
         scalevar /= scaleweight;
 
-        if( scalevariance ) {
+        if( scalevariance && mapvar ) {
           *scalevariance = scalevar;
         }
       }
@@ -571,11 +574,11 @@ static void smf1_rebinmap1( void *job_data_ptr, int *status ) {
    double varacc;             /* variance accumulator */
    double weightsqacc;        /* weights squared accumulator */
    int hitsacc;               /* hits accumulator */
+   int imap;                  /* Submap index */
    size_t ibolo;              /* Bolometer index */
    size_t ipix;               /* Map pixel index */
    size_t tipix;              /* index into sub map */
    size_t itime;              /* Time slice index */
-   size_t imap;               /* Submap index */
    size_t tmap0;              /* index for start of current submap */
 
 /* Check inherited status */
@@ -608,9 +611,9 @@ static void smf1_rebinmap1( void *job_data_ptr, int *status ) {
                ipix = pdata->lut[ di ];
 
 /* Test that pixel falls in map range */
-               if( ipix >= 0 && ipix < pdata->msize ) {
+               if(  pdata->lut[ di ] >= 0 && ipix < pdata->msize ) {
 
-/* Get the 1D vector index of the corresponding variane value. */
+/* Get the 1D vector index of the corresponding variance value. */
                   vi = ibolo*pdata->vbstride +
                        ( itime % pdata->vntslice )*pdata->vtstride;
 
@@ -641,8 +644,8 @@ static void smf1_rebinmap1( void *job_data_ptr, int *status ) {
                      delta = pdata->dat[ di ] - pdata->map[ tipix ];
                      R = delta * thisweight / temp;
                      pdata->map[ tipix ] += R;
-                     pdata->mapvar[ tipix ] +=
-                       pdata->mapweight[ tipix ]*delta*R;
+                     if( pdata->mapvar ) pdata->mapvar[ tipix ] +=
+                                         pdata->mapweight[ tipix ]*delta*R;
                      pdata->mapweight[ tipix ] = temp;
 
 /* We don't need this sum anymore, but calculate it for consistency with the
@@ -666,7 +669,7 @@ static void smf1_rebinmap1( void *job_data_ptr, int *status ) {
 
             di = ibolo*pdata->dbstride + itime*pdata->dtstride;
             ipix = pdata->lut[ di ];
-            if( ipix >= 0 && ipix < pdata->msize ) {
+            if(  pdata->lut[ di ] >= 0 && ipix < pdata->msize ) {
                vi = ibolo*pdata->vbstride +
                     ( itime % pdata->vntslice )*pdata->vtstride;
 
@@ -691,7 +694,7 @@ static void smf1_rebinmap1( void *job_data_ptr, int *status ) {
                   delta = pdata->dat[ di ] - pdata->map[ tipix ];
                   R = delta * thisweight / temp;
                   pdata->map[ tipix ] += R;
-                  pdata->mapvar[ tipix ] += pdata->mapweight[ tipix ]*delta*R;
+                  if( pdata->mapvar ) pdata->mapvar[ tipix ] += pdata->mapweight[ tipix ]*delta*R;
                   pdata->mapweight[ tipix ] = temp;
 
                   pdata->mapweightsq[ tipix ] += thisweight*thisweight;
@@ -711,7 +714,7 @@ static void smf1_rebinmap1( void *job_data_ptr, int *status ) {
             for( itime = pdata->t1; itime <= pdata->t2; itime++ ) {
                di = ibolo*pdata->dbstride + itime*pdata->dtstride;
                ipix = pdata->lut[ di ];
-               if( ipix >= 0 && ipix < pdata->msize ) {
+               if( pdata->lut[ di ] >= 0 && ipix < pdata->msize ) {
                   vi = ibolo*pdata->vbstride +
                        ( itime % pdata->vntslice )*pdata->vtstride;
                   if( pdata->whichmap ) {
@@ -749,7 +752,7 @@ static void smf1_rebinmap1( void *job_data_ptr, int *status ) {
          for( itime = pdata->t1; itime <= pdata->t2; itime++ ) {
             di = ibolo*pdata->dbstride + itime*pdata->dtstride;
             ipix = pdata->lut[ di ];
-            if( ipix >= 0 && ipix < pdata->msize ) {
+            if( pdata->lut[ di ] >= 0 && ipix < pdata->msize ) {
                vi = ibolo*pdata->vbstride +
                     ( itime % pdata->vntslice )*pdata->vtstride;
                if( pdata->whichmap ) {
@@ -787,7 +790,7 @@ static void smf1_rebinmap1( void *job_data_ptr, int *status ) {
             for( itime = pdata->t1; itime <= pdata->t2; itime++ ) {
                di = ibolo*pdata->dbstride + itime*pdata->dtstride;
                ipix = pdata->lut[ di ];
-               if( ipix >= 0 && ipix < pdata->msize ) {
+               if( pdata->lut[ di ] >= 0 && ipix < pdata->msize ) {
                   if( pdata->whichmap ) {
                     if( pdata->whichmap[ itime ] != VAL__BADI ) {
                       ipix += pdata->whichmap[ itime ]*pdata->msize;
@@ -804,8 +807,8 @@ static void smf1_rebinmap1( void *job_data_ptr, int *status ) {
                      delta = pdata->dat[ di ] - pdata->map[ tipix ];
                      R = delta / temp;
                      pdata->map[ tipix ] += R;
-                     pdata->mapvar[ tipix ] +=
-                       pdata->mapweight[ tipix ]*delta*R;
+                     if( pdata->mapvar ) pdata->mapvar[ tipix ] +=
+                                         pdata->mapweight[ tipix ]*delta*R;
                      pdata->mapweight[ tipix ] = temp;
 
 /* We don't need this sum anymore, but calculate it for consistency with the
@@ -827,7 +830,7 @@ static void smf1_rebinmap1( void *job_data_ptr, int *status ) {
          for( itime = pdata->t1; itime <= pdata->t2; itime++ ) {
             di = ibolo*pdata->dbstride + itime*pdata->dtstride;
             ipix = pdata->lut[ di ];
-            if( ipix >= 0 && ipix < pdata->msize ) {
+            if( pdata->lut[ di ] >= 0 && ipix < pdata->msize ) {
                if( pdata->whichmap ) {
                  if( pdata->whichmap[ itime ] != VAL__BADI ) {
                    ipix += pdata->whichmap[ itime ]*pdata->msize;
@@ -844,7 +847,7 @@ static void smf1_rebinmap1( void *job_data_ptr, int *status ) {
                   delta = pdata->dat[ di ] - pdata->map[ tipix ];
                   R = delta / temp;
                   pdata->map[ tipix ] += R;
-                  pdata->mapvar[ tipix ] += pdata->mapweight[ tipix ]*delta*R;
+                  if( pdata->mapvar ) pdata->mapvar[ tipix ] += pdata->mapweight[ tipix ]*delta*R;
                   pdata->mapweight[ tipix ] = temp;
 
 /* We don't need this sum anymore, but calculate it for consistency with the
@@ -885,7 +888,7 @@ static void smf1_rebinmap1( void *job_data_ptr, int *status ) {
             temp = thisweight * pdata->map[ tmap0+ipix ];
             mapacc += temp; /* mean accumulator */
             weightacc += thisweight; /* weight accumulator */
-            varacc +=
+            if( pdata->mapvar ) varacc +=
               pdata->mapvar[ tmap0+ipix ] + temp * pdata->map[ tmap0+ipix ];
 
             weightsqacc += thisweight*thisweight;
@@ -898,7 +901,7 @@ static void smf1_rebinmap1( void *job_data_ptr, int *status ) {
 
         if( weightacc > 0 ) {
           pdata->map[ ipix ] = mapacc / weightacc;
-          pdata->mapvar[ ipix ] = varacc - mapacc * mapacc / weightacc;
+          if( pdata->mapvar ) pdata->mapvar[ ipix ] = varacc - mapacc * mapacc / weightacc;
         }
 
 
@@ -906,23 +909,25 @@ static void smf1_rebinmap1( void *job_data_ptr, int *status ) {
          if( pdata->mapweight[ ipix ] == 0.0 ) {
             pdata->mapweight[ ipix ] = VAL__BADD;
             pdata->map[ ipix ] = VAL__BADD;
-            pdata->mapvar[ ipix ] = VAL__BADD;
+            if( pdata->mapvar ) pdata->mapvar[ ipix ] = VAL__BADD;
 
 /* Otherwise re-normalize... although variance only reliable if we had
    enough samples */
          } else if( pdata->hitsmap[ ipix ] >= SMF__MINSTATSAMP ) {
-            double variance_n = pdata->mapvar[ ipix ]/pdata->mapweight[ ipix ];
-            pdata->mapvar[ ipix ] = variance_n/( (double)(pdata->hitsmap[ ipix ]) - 1 );
+            if( pdata->mapvar ) {
+               double variance_n = pdata->mapvar[ ipix ]/pdata->mapweight[ ipix ];
+               pdata->mapvar[ ipix ] = variance_n/( (double)(pdata->hitsmap[ ipix ]) - 1 );
 
 /* Work out average scale factor so that supplied weights would produce the
    same map variance estimate as the sample variance calculation that we just
    did. The average value is weighted by number of hits in the pixel to weight
    well-sampled pixels more heavily */
-            pdata->scalevar += pdata->hitsmap[ ipix ]*pdata->mapvar[ ipix ]
-                                                     *pdata->mapweight[ ipix ];
+               pdata->scalevar += pdata->hitsmap[ ipix ]*pdata->mapvar[ ipix ]
+                                                        *pdata->mapweight[ ipix ];
+            }
             pdata->scaleweight += pdata->hitsmap[ ipix ];
          } else {
-            pdata->mapvar[ ipix ] = VAL__BADD;
+            if( pdata->mapvar ) pdata->mapvar[ ipix ] = VAL__BADD;
          }
       }
 
@@ -963,12 +968,12 @@ static void smf1_rebinmap1( void *job_data_ptr, int *status ) {
             pdata->mapweight[ ipix ] = VAL__BADD;
             pdata->mapweightsq[ ipix ] = VAL__BADD;
             pdata->map[ ipix ] = VAL__BADD;
-            pdata->mapvar[ ipix ] = VAL__BADD;
+            if( pdata->mapvar ) pdata->mapvar[ ipix ] = VAL__BADD;
 
 /* Otherwise re-normalize */
          } else {
-            pdata->mapvar[ ipix ] = 1.0/pdata->mapweight[ ipix ];
-            pdata->map[ ipix ] *= pdata->mapvar[ ipix ];
+            if( pdata->mapvar ) pdata->mapvar[ ipix ] = 1.0/pdata->mapweight[ ipix ];
+            pdata->map[ ipix ] /= pdata->mapweight[ ipix ];
          }
       }
 

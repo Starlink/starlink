@@ -427,12 +427,15 @@
 *        Dump the itermap after the map quality array has been set (i.e.
 *        after smf_calcmodel_ast). Previously each itermap has the quality
 *        associated with the previous iteration.
+*     2014-02-13 (DSB):
+*        If a different filter size is used on the last iteration, return
+*        the map variances from the penultimate iteration.
 *     {enter_further_changes_here}
 
 *  Notes:
 
 *  Copyright:
-*     Copyright (C) 2008-2012 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2014 Science and Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2006-2011 University of British Columbia.
 *     All Rights Reserved.
@@ -646,6 +649,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   smfArray **res=NULL;          /* Residual signal */
   double *res_data=NULL;        /* Pointer to DATA component of res */
   smfGroup *resgroup=NULL;      /* smfGroup of model residual files */
+  int reuse_var;                /* Reuse map variances from previous iteration? */
   int sampcube;                 /* write SAMPCUBES extensions? */
   double scalevar=0;            /* scale factor for variance */
   int shortmap=0;               /* If set, produce maps every shortmap tslices*/
@@ -2105,6 +2109,26 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
             }
           }
 
+          /* See if the map variances calculated on the previous iteration
+             should be retained. This is the case if we are doing the
+             last iteration and a different FLT filter has been used for this
+             iteration. */
+          reuse_var = 0;
+          if( quit == 0 && astMapGet0A( keymap, "FLT", &kmap ) ) {
+             double val, lastval;
+             astMapGet0D( kmap, "FILT_EDGE_LARGESCALE", &val );
+             lastval = val;
+             astMapGet0D( kmap, "FILT_EDGE_LARGESCALE_LAST", &lastval );
+             if( val != lastval ) {
+                reuse_var = 1;
+                msgOutif( MSG__VERB, "", FUNC_NAME
+                          ": FLT.FILT_EDGE_LARGESCALE_LAST is set so the "
+                          "map variances from the penultimate iteration "
+                          "will be returned.", status );
+             }
+             kmap = astAnnul( kmap );
+          }
+
           /* Loop over subgroup index (subarray) again. This time rebin and
              calculate the new map. */
           for( idx=0; idx<res[0]->ndat; idx++ ) {
@@ -2133,8 +2157,8 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                            dat.noi ? dat.noi[0]->sdata[idx] : NULL,
                            lut_data, 0, 0, 0, NULL, 0, SMF__Q_GOOD,
                            varmapmethod, rebinflags, thismap, thisweight,
-                           thisweightsq, thishits, thisvar, msize,
-                           &scalevar, status );
+                           thisweightsq, thishits, reuse_var ? NULL : thisvar,
+                           msize, &scalevar, status );
           }
 
           /*** TIMER ***/
