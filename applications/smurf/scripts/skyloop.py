@@ -86,6 +86,8 @@
 *           flagmap=<undef>
 *           sampcube=0
 *           diag.append=1
+*           downsampscale=0
+*           downsampfreq=0
 *
 *        - Last iteration:
 *           numiter=1
@@ -106,6 +108,8 @@
 *           flagmap=<undef>
 *           sampcube=0
 *           diag.append=1
+*           downsampscale=0
+*           downsampfreq=0
 *
 *     GLEVEL = LITERAL (Read)
 *        Controls the level of information to write to a text log file.
@@ -274,6 +278,8 @@
 *        - Cache LUT model values.
 *     14-JAN-2014 (DSB):
 *        Ensure same map bounds are used on every invocation of makemap.
+*     14-FEB-2014 (DSB):
+*        Ensure downsampling occurs only on the first invocation of makemap.
 *-
 '''
 
@@ -568,6 +574,9 @@ try:
    fd.write("flt.filt_edgelow_last=<undef>\n")         # reset them here in
    fd.write("flt.whiten_last=<undef>\n")               # case they are set in
    fd.write("com.perarray_last=<undef>\n")             # the supplied config.
+   if precleaned:
+      add["downsampscale"] = 0 # Cleaned data will have been downsampled already.
+      add["downsampfreq"] = 0
 
    fd.close()                 # Close the config file.
 
@@ -694,6 +703,9 @@ try:
       add["noi.export"] = 0    # No need to export the NOI model again
       if ast_skip > 0:
          add["numiter"] = 1    # First invocation used (1+ast_skip) iterations
+      add["downsampscale"] = 0 # Iter. 1 did any required downsampling. Later iters
+      add["downsampfreq"] = 0  # must not further downsampling because the cache files
+                               # are only appropriate for the origin downsampling.
 
 #  Now create the config, inheriting the config from the first invocation.
       iconf = 1
