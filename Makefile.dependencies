@@ -1006,6 +1006,7 @@ $(MANIFESTS)/gaia: \
 		$(MANIFESTS)/fio \
 		$(MANIFESTS)/generic \
 		$(MANIFESTS)/grp \
+		$(MANIFESTS)/gsl \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/img \
