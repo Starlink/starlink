@@ -168,15 +168,18 @@ try:
    indata = parsys["IN"].value
    retain = parsys["RETAIN"].value
 
-#  Erase any NDFs holding cleaned data or pointing data form previous runs.
+#  Erase any NDFs holding cleaned data or pointing data from previous runs.
    for path in glob.glob("s*_con_res_cln.sdf"):
       myremove(path)
       base = path[:-16]
       myremove("{0}_lat.sdf".format(base))
       myremove("{0}_lon.sdf".format(base))
 
-#  Use makemap to concatenate and flatfield the data, and generate pointing
-#  info.
+#  Use sc2concat to concatenate and flatfield the data.
+   invoke("$SMURF_DIR/sc2concat in={0} out='./*_umap'".format(indata))
+
+#  Use makemap to generate quaity and pointing info.
+   concdata = NDG("*_umap")
    confname = NDG.tempfile()
    fd = open(confname,"w")
    fd.write("^$STARLINK_DIR/share/smurf/dimmconfig.lis\n")
@@ -190,17 +193,16 @@ try:
    fd.close()
 
    map = NDG(1)
-   invoke("$SMURF_DIR/makemap in={0} out={1} config='^{2}'".format(indata,map,confname))
+   invoke("$SMURF_DIR/makemap in={0} out={1} config='^{2}'".format(concdata,map,confname))
 
-#  Process each NDF holding cleaned data created by makemap.
+#  We do not need the concatenated data any more (we use the cleaned data
+#  created by makemap instead since it includes a quality array). */
+   for path in concdata:
+      os.remove("{0}.sdf".format(path))
+
+#  Process each NDF holding cleaned data created by sc2concat.
    for path in glob.glob("s*_con_res_cln.sdf"):
       base = path[:-16]
-
-#  Copy the JCMTSTATE.TCS_INDEX array into an NDF.
-      tcs_index_full = NDG(1)
-      invoke( "$HDSTOOLS_DIR/hcreate {0} image".format(tcs_index_full) )
-      invoke( "$HDSTOOLS_DIR/hcopy {0}.more.jcmtstate.tcs_index {1}.data_array".format( path, tcs_index_full))
-      invoke( "$KAPPA_DIR/setlabel {0} Scan_index".format( tcs_index_full))
 
 #  Get a copy of the cleaned data but with PAD samples trimmed from start
 #  and end.
@@ -231,6 +233,19 @@ try:
       invoke("$KAPPA_DIR/settitle {0} Quality_flags".format(fla))
       invoke("$KAPPA_DIR/setlabel {0} !".format(fla))
       invoke("$KAPPA_DIR/setunits {0} !".format(fla))
+
+#  Copy the JCMTSTATE.TCS_INDEX array into an NDF. If it only one element
+#  long (i.e. a scalar - compressed), create a full length NDF of the
+#  array and fill it with ones.
+      tcs_index_full = NDG(1)
+      res = invoke( "$HDSTOOLS_DIR/hget {0}.more.jcmtstate.tcs_index ndim".format(path), aslist=True )
+      if res[0] == '0':
+         invoke( "$KAPPA_DIR/creframe lbound=\[1,1\] ubound=\[{0},1\] "
+                 "mode=fl mean=1 out={1}".format(ntslice,tcs_index_full))
+      else:
+         invoke( "$HDSTOOLS_DIR/hcreate {0} image".format(tcs_index_full) )
+         invoke( "$HDSTOOLS_DIR/hcopy {0}.more.jcmtstate.tcs_index {1}.data_array".format( path, tcs_index_full))
+         invoke( "$KAPPA_DIR/setlabel {0} Scan_index".format( tcs_index_full))
 
 #  Extract the required sections from the other files. RA and Dec files
 #  do not need to be trimmed since they do not include padding.
