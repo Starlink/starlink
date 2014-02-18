@@ -111,6 +111,7 @@ void smf_export_noi( smfData *noi, const char *name, int boxsize, int *status ){
       *status = SAI__ERROR;
       errRep( "", "smf_export_noi: noise boxsize is not yet known "
               "(programming error).", status );
+      return;
    }
 
 /* Get the dimensions of the NOI model. */
