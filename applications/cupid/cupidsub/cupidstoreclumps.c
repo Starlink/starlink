@@ -182,6 +182,8 @@ void cupidStoreClumps( const char *param1, const char *param2, int indf,
 *     17-JAN-2014 (DSB):
 *        Do not report an error if there ar no usable clumps (requested
 *        by Andy and Malcolm).
+*     18-FEB-2014 (DSB):
+*        Erase any CADC provenance headers inherited form the input NDF.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -765,6 +767,18 @@ void cupidStoreClumps( const char *param1, const char *param2, int indf,
 /* Ensure the FitsChan contains a PRODUCT keyword set to "clump". */
             atlPtfts( fc, "PRODUCT", "clump", "This file contains "
                       "a clump catalogue", status );
+
+/* Erase all CADC style provenance headers. */
+            astClear( fc, "Card" );
+            while( astFindFits( fc, "PRVCNT", NULL, 0 ) ) astDelFits( fc );
+            astClear( fc, "Card" );
+            while( astFindFits( fc, "PRV%d", NULL, 0 ) ) astDelFits( fc );
+            astClear( fc, "Card" );
+            while( astFindFits( fc, "OBSCNT", NULL, 0 ) ) astDelFits( fc );
+            astClear( fc, "Card" );
+            while( astFindFits( fc, "OBS%d", NULL, 0 ) ) astDelFits( fc );
+            astClear( fc, "Card" );
+            while( astFindFits( fc, "FILEID", NULL, 0 ) ) astDelFits( fc );
 
 /* Put the contents of the FitsChan into the current (i.e. primary) HDU. */
             cvgFc2hd( fc, 0, fptr, status );
