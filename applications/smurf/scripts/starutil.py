@@ -1767,6 +1767,9 @@ class NDG(object):
 
 
    Methods:
+      result = ndg_instance.empty()
+         This deletes the files associated with the NDG, leaving the NDG
+         empty. It always returns None.
       new_instance = ndg_instance.filter( pattern=None )
          Creates a new NDG object by filtering the NDF names contained
          in an existing NDG object. The pattern should conform to the
@@ -1866,6 +1869,9 @@ class NDG(object):
 
       # As yet we do not have a list of NDFs to put in the group.
       self.__ndfs = None
+
+      # The integer object count associated with the NDG instance.
+      self.__nobj = None
 
       # As yet we do not have a comment
       self.__comment = None
@@ -1977,13 +1983,14 @@ class NDG(object):
       # of names for new (currently non-existent) NDFs within the temp
       # directory.
       if self.__ndfs == None:
+         self.__nobj = NDG.__nobj
          self.__ndfs = []
          for i in range(nfile):
             ndf = "{0}/group{1}_{2}".format(self.__tmpdir,NDG.__nobj,i+1)
             self.__ndfs.append(ndf)
 
 
-      # If there is more than one NDF in the group, write th enames of
+      # If there is more than one NDF in the group, write the names of
       # the NDFs to a text file in the tempdir.
       if nfile > 1:
          self.__writeFile()
@@ -2004,6 +2011,29 @@ class NDG(object):
       #  Record a reference to this instance in the class "instances"
       #  variables so that the NDG.cleanup() method can empty it.
       NDG.instances.append(self)
+
+
+   # The files associated with the NDG are deleted, and the NDG structure
+   # itself is reset to represent an empty group. Use kappa:erase to
+   # delete the NDFs since they may be NDFs stored within other NDFs.
+   def empty( self ):
+      global DEBUG
+      msg_out( "Emptying NDG \"group{0}\" in {1}".format(self.__nobj,self.__tmpdir), DEBUG )
+
+      for ndf in self.__ndfs:
+         invoke("$KAPPA_DIR/erase \"{0}\" ok=yes".format(ndf),annul=True)
+      if self.__file != None:
+         try:
+            os.remove( self.__file )
+         except:
+            pass
+
+      self.__file = None
+      self.__ndfs = []
+      self.__tmpdir = None
+
+      return None
+
 
 
    #  Create a new NDG by filtering an existing NDG.
@@ -2079,10 +2109,8 @@ class NDG(object):
          fd.close()
 
 
-   # The list file and NDFs are deleted for all NDG objects that have
-   # a True "temp" property. All NDG objects, regardless of their
-   # "temp" property, are then reset so that they represent an empty
-   # group. If the NDG.tempdir directory is then empty, it is deleted.
+   # Each active NDG object is reset so that it represents an empty
+   # group. The NDG.tempdir directory is then deleted.
    @classmethod
    def cleanup(cls):
       for ndg in NDG.instances:
