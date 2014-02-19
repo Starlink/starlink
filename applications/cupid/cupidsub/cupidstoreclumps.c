@@ -780,6 +780,9 @@ void cupidStoreClumps( const char *param1, const char *param2, int indf,
             astClear( fc, "Card" );
             while( astFindFits( fc, "FILEID", NULL, 0 ) ) astDelFits( fc );
 
+/* Clean all standard cards from the FitsChan. */
+            cvgClean( fc, status );
+
 /* Put the contents of the FitsChan into the current (i.e. primary) HDU. */
             cvgFc2hd( fc, 0, fptr, status );
          }
@@ -792,6 +795,12 @@ void cupidStoreClumps( const char *param1, const char *param2, int indf,
 
 /* Copy the contents of the FitsTable to the FITS file. */
          cvgFt2bt( table, fptr, "CUPID:FINDCLUMPS", 0, 0, status );
+
+/* Add CHECKSUM and DATASUM headers. */
+         if( *status == SAI__OK ) {
+            int fstat = 0;
+            ffpcks( fptr, &fstat );
+         }
 
 /* Close the FITS file. */
          cvgClose( &fptr, status );

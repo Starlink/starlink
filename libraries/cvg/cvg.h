@@ -81,6 +81,7 @@
 /* Public function prototypes */
 /* -------------------------- */
 void cvgAssoc( const char *param, const char *mode, fitsfile **fptr, int *blockf, int *status );
+void cvgClean( AstFitsChan *fc, int *status );
 void cvgClose( fitsfile **fptr, int *status );
 void cvgCreat( const char *param, int blockf, int ovrwrt, fitsfile **fptr, int *status );
 void cvgFt2bt( AstFitsTable *table, fitsfile *fptr, const char *extnam, int astver, int mkchdu, int *status );

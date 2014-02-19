@@ -260,6 +260,21 @@ void cvgFc2hd( AstFitsChan *fc, int clear, fitsfile *fptr, int *status ){
    return;
 }
 
+F77_SUBROUTINE(cvg_clean)( INTEGER(FC),
+                           INTEGER(STATUS) );
+
+void cvgClean( AstFitsChan *fc, int *status ){
+   DECLARE_INTEGER(FC);
+   DECLARE_INTEGER(STATUS);
+   F77_EXPORT_INTEGER( *status, STATUS );
+   F77_EXPORT_INTEGER( astP2I( fc ), FC );
+   if( !astOK ) return;
+   F77_LOCK( F77_CALL(cvg_clean)( INTEGER_ARG(&FC),
+                                  INTEGER_ARG(&STATUS) ); )
+   F77_IMPORT_INTEGER( STATUS, *status );
+   return;
+}
+
 
 F77_SUBROUTINE(cvg_hd2fc)( INTEGER(FUNIT),
                            INTEGER(FC),

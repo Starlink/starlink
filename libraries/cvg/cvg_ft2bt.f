@@ -310,6 +310,9 @@
          END DO
       END IF
 
+*  Add CHECKSUM and DATASUM keywords.
+      CALL FTPCKS( FUNIT, FSTAT )
+
 *  If required, reinstate the original current HDU in the FITS file.
       IF( .NOT. MKCHDU ) CALL FTMAHD( FUNIT, IHDU0, HDUTYPE, FSTAT )
 

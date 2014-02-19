@@ -1674,6 +1674,12 @@ void findclumps( int *status ) {
 /* Copy History from the main output NDF to the output catalogue. */
       cvgWhisr( indf2, fptr, status );
 
+/* Add CHECKSUM and DATASUM headers. */
+      if( *status == SAI__OK ) {
+         int fstat = 0;
+         ffpcks( fptr, &fstat );
+      }
+
 /* Close the FITS file. */
       cvgClose( &fptr, status );
    }
