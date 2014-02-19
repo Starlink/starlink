@@ -22,7 +22,7 @@
 *        Pointer to the FitsChan.
 *     CLEAR = LOGICAL (Given)
 *        Should he header be cleared before copying in the new cards?
-*        Otherwise, the new cards are appended to the end of teh HDU.
+*        Otherwise, the new cards are appended to the end of the HDU.
 *     FUNIT = INTEGER (Given)
 *        The FITSIO unit number for the FITS file.
 *     STATUS = INTEGER (Given and Returned)
@@ -62,6 +62,8 @@
 *        Moved from CONVERT to CVG.
 *     20-NOV-2013 (DSB):
 *        Added argument CLEAR.
+*     19-FEB-2014 (DSB):
+*        Do not copy the final END card, since FITSIO handles ENDs itself.
 *     {enter_further_changes_here}
 
 *-
@@ -116,13 +118,16 @@
          END DO
       END IF
 
-* Now copy the contents of the FitsChan into the empty FITSIO header.
+*  Now copy the contents of the FitsChan into the empty FITSIO header. Do
+*  not store the final END card as this seems to do odd things to FITSIO.
       CALL AST_CLEAR( FC, 'Card', STATUS )
       DO WHILE( AST_FINDFITS( FC, '%f', HEADER, .TRUE., STATUS ) )
-         CALL FTPREC( FUNIT, HEADER, FSTAT )
-         IF( FSTAT .NE. CVG__FITSOK ) THEN
-            FSTAT = CVG__FITSOK
-            CALL FTCMSG
+         IF( HEADER .NE. 'END' ) THEN
+            CALL FTPREC( FUNIT, HEADER, FSTAT )
+            IF( FSTAT .NE. CVG__FITSOK ) THEN
+               FSTAT = CVG__FITSOK
+               CALL FTCMSG
+            END IF
          END IF
       END DO
 
