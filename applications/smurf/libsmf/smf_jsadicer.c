@@ -72,6 +72,9 @@
 *        - Renamed from smf_jsasplit to smf_jsadicer.
 *     30-JAN-2014 (DSB):
 *        Changed to allow output NDFs to be trimmed of any bad borders.
+*     20-FEB-2014 (DSB):
+*        Changed to add a bounding STC-S polygon to each tile NDF. The
+*        polygon is stored in extension "OUTLINE" of each NDF.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -512,6 +515,10 @@ void smf_jsadicer( int indf, const char *base, int trim,
       atlPtfti( fc, "JSATILE", tile_index, jsatile_comment, status );
       kpgPtfts( indfo, fc, status );
       fc = astAnnul( fc );
+
+/* Now store an STC-S polygon that describes the boundary of the good
+   data in the output NDF, and store it as an NDF extension. */
+      kpgOutline( indfo, 0.5, status );
 
 /* We now reshape any extension NDFs contained within the output NDF to
    have the same spatial bounds as the main NDF (but only for extension
