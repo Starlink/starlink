@@ -123,6 +123,10 @@
 *        If a Region is requested, and an NDF is supplied by the user,
 *        return a Box that covers the rectangular pixel grid, and which
 *        is mapped into the current Frame of the NDF's WCS FrameSet.
+*     21-FEB-2014 (DSB):
+*        If a Region is requested, and an NDF is supplied by the user
+*        that has an OUTLINE extension, read the region form the outline
+*        (see kpgPutOutline).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -154,6 +158,7 @@
 
 *  External References:
       EXTERNAL ISA
+      INTEGER KPG1_GETOUTLINE
 
 *  Local Variables:
       CHARACTER LOC1*(DAT__SZLOC)
@@ -172,6 +177,7 @@
       INTEGER INDF
       INTEGER IPAR
       INTEGER NDIM
+      INTEGER OUTLINE
       LOGICAL OK
 *.
 
@@ -179,6 +185,7 @@
       IAST = AST__NULL
       IGRP = GRP__NOID
       NDIM = 0
+      OUTLINE = AST__NULL
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
@@ -246,6 +253,9 @@
 *  If succesful, get the WCS FrameSet from it.
          IF( INDF .NE. NDF__NOID ) THEN
             CALL KPG1_GTWCS( INDF, IAST, STATUS )
+
+*  Also get any outline region.
+            OUTLINE = KPG1_GETOUTLINE( INDF, STATUS )
 
 *  Also get the dimensions of the NDF in case the caller wants a Region.
             CALL NDF_DIM( INDF, NDF__MXDIM, DIMS, NDIM, STATUS )
@@ -341,6 +351,15 @@
                END IF
             END IF
 
+*  If not, and we have an outline region, see if the outline region
+*  is of the required class.
+            IF( .NOT. OK .AND. OUTLINE .NE. AST__NULL ) THEN
+               IF( ISA( OUTLINE, STATUS ) ) THEN
+                  OK = .TRUE.
+                  IAST = AST_CLONE( OUTLINE, STATUS )
+               END IF
+            END IF
+
 *  If not, and the FrameSet was read from an NDF, create a Region defined
 *  in the base Frame of the FrameSet (GRID coords), re-map it into the
 *  current Frame, and check if it is of the required class. If so return
@@ -424,5 +443,8 @@
 
 *  Delete any groups.
       IF( IGRP .NE. GRP__NOID ) CALL GRP_DELET( IGRP, STATUS )
+
+*  Annul any outline region.
+      IF( OUTLINE .NE. AST__NULL ) CALL AST_ANNUL( OUTLINE, STATUS )
 
       END

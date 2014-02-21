@@ -137,6 +137,7 @@ void kpg1Fillr( float, int, float *, int * );
 void kpg1Fit1d( int, int, const double x[], const double y[], double *, double *, double *, int * );
 
 void kpg1Gausr( float, int, int, float, int, int, int, int, float *, float *, int *, float *, float *, float *, int * );
+AstRegion *kpgGetOutline( int, int * );
 void kpg1Ghstd( int, int, const double *, const double *, double, int, int, double *, double *, int *, int * );
 void kpg1Ghstr( int, int, const float *, const double *, double, int, int, float *, float *, int *, int * );
 void kpg1Gilst( int, int, int, const char *, int *, int *, int *, int * );
