@@ -150,7 +150,7 @@
 *     6-JAN-2014 (DSB):
 *        Optimise access to cache to avoid valgrind warnings.
 *     16-JAN-2014 (DSB):
-*        Dump details of all active memory blocks if the total memory allocation 
+*        Dump details of all active memory blocks if the total memory allocation
 *        specified by astMemoryWarning is exceeded.
 */
 
@@ -2007,6 +2007,10 @@ void *astFreeDouble_( void *ptr, int *status ) {
 *     the supplied pointer is a pointer to an array of pointers. Each
 *     of these pointers is first freed, and then the supplied pointer
 *     is freed.
+*
+*     Note, this routine should not be used with arrays allocated
+*     by astGrow since astGrow over-allocates and so there may be
+*     non-initialised pointers at the end of the array.
 
 *  Parameters:
 *     ptr
@@ -4838,7 +4842,7 @@ static void Issue( Memory *mem, int *status ) {
               "dumping catalogue of active memory blocks to file 'memory.dump'\n",
               Warn_Usage );
 
-/* Create a file holding the details of all currently active memory blocks. It can be 
+/* Create a file holding the details of all currently active memory blocks. It can be
    examined using topcat. */
       FILE *fd = fopen( "memory.dump", "w" );
       if( fd ) {
