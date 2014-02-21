@@ -1328,8 +1328,6 @@ static const char *GetNextWord( AstStcsChan *this, WordContext *con,
       }
    }
 
-   if( result ) printf(">> %s\n", result );
-
 /* Return the pointer to the next word. */
    return result;
 }
