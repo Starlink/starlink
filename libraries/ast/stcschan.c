@@ -454,6 +454,19 @@ static char *AddItem( AstStcsChan *this, AstKeyMap *km, const char *key,
 /* If the KeyMap contains the required property... */
    if( astMapGet0C( km, key, &text ) ) {
 
+/* Add any supplied prefix to the returned buffer. */
+      if( prefix ) {
+         len = strlen( prefix );
+         if( len > *crem && len < linelen ) {
+            astPutNextText( this, result );
+            *nc = 0;
+            result = astAppendString( result, nc, "   " );
+            *crem = linelen - 3;
+         }
+         result = astAppendString( result, nc, prefix );
+         *crem -= len;
+      }
+
 /* Split the property into words. */
       words = astChrSplit( text, &nw );
 
@@ -463,7 +476,7 @@ static char *AddItem( AstStcsChan *this, AstKeyMap *km, const char *key,
 
 /* If required, get the number of characters to be added to the buffer. */
          if( linelen ) {
-            len = ( prefix ? strlen( prefix ) : 0 ) + strlen( word );
+            len = strlen( word );
 
 /* If there is insufficient room left, write out the text through the
    Channel sink function, and start a new line with three spaces. Then
@@ -479,9 +492,6 @@ static char *AddItem( AstStcsChan *this, AstKeyMap *km, const char *key,
    line. */
             *crem -= len;
          }
-
-/* Add any supplied prefix to the returned buffer. */
-         if( prefix ) result = astAppendString( result, nc, prefix );
 
 /* Add the property value to the returned buffer. */
          result = astAppendString( result, nc, word );
@@ -1317,6 +1327,8 @@ static const char *GetNextWord( AstStcsChan *this, WordContext *con,
          result = "";
       }
    }
+
+   if( result ) printf(">> %s\n", result );
 
 /* Return the pointer to the next word. */
    return result;
