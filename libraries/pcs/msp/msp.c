@@ -1154,6 +1154,8 @@ int *status              /* global status (given and returned) */
 *        Revised version
 *     14-MAR-1994 (BDK):
 *        Changed to use STREAM sockets
+*     2014-02-21 (TIMJ):
+*        Ask OS for free port rather than trying lots ourselves
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -1169,6 +1171,8 @@ int *status              /* global status (given and returned) */
                                         incoming connection requests */
    char string[80];                  /* error messages */
    int portno;                       /* this task's port number */
+   struct sockaddr_in query_addr;    /* To retrieve port number */
+   socklen_t len;                    /* length of query_addr */
 
    if ( *status != SAI__OK ) return;
 
@@ -1226,18 +1230,11 @@ int *status              /* global status (given and returned) */
    connect_addr.sin_family = AF_INET;
    connect_addr.sin_addr.s_addr = htonl ( INADDR_ANY );
 
-/*   Repeatedly try port numbers until a free one found */
+/*   If we ask for port 0 the OS will give us a free port */
 
-   for ( portno = 5001; portno < 5100; portno++ )
-   {
-      connect_addr.sin_port = htons ( portno );
-      istat = bind ( mysockets[0], (struct sockaddr *) &connect_addr,
-        sizeof(connect_addr) );
-      if ( istat == 0 )
-      {
-         break;
-      }
-   }
+   connect_addr.sin_port = htons ( 0 );
+   istat = bind ( mysockets[0], (struct sockaddr *) &connect_addr,
+                  sizeof(connect_addr) );
 
    if ( istat != 0 )
    {
@@ -1257,6 +1254,18 @@ int *status              /* global status (given and returned) */
         my_name );
       perror ( string );
       exit(1);
+   }
+
+/*   Now find out what port number we were assigned */
+
+   len = sizeof( query_addr );
+   if (getsockname( mysockets[0], (struct sockaddr *)&query_addr, &len) == -1 ) {
+     sprintf ( string, "%s aborting, failed in getsockname",
+        my_name );
+      perror ( string );
+      exit(1);
+   } else {
+     portno = ntohs( query_addr.sin_port );
    }
 
 /*   create task rendezvous file with a name of the form
