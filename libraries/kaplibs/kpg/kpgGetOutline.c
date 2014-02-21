@@ -157,9 +157,6 @@ static const char *mysource( void ){
       buff[ nc ] = ' ';
       buff[ nc + 1 ] = 0;
 
-      if( status == SAI__OK ) printf("!! %s\n", buff);
-
-
       return ( status == SAI__OK ) ? buff : NULL;
    } else {
       return NULL;
