@@ -164,6 +164,7 @@ void kpg1Mxmni( int, int, int *, int *, int *, int *, int *, int *, int * );
 void kpg1Mxmnr( int, int, float *, int *, float *, float *, int *, int *, int * );
 
 void kpg1Opgrd( int, const double[], int, double *, double *, int * );
+void kpgOutline( int, float, int * );
 
 void kpg1Pseed( int * );
 int kpgPtfts( int, const AstFitsChan * fchan, int * status );
