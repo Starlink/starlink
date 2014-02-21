@@ -20,11 +20,11 @@ static void mysink( const char *line );
 /* The required accuracy of the outline, in pixels. */
 #define ACC 3.0
 
-void kpgOutline( int indf, float wlim, int *status ){
+void kpgPutOutline( int indf, float wlim, int *status ){
 /*
 *+
 *  Name:
-*     kpgOutline
+*     kpgPutOutline
 
 *  Purpose:
 *     Create and store an STC polygon describing the spatial extent of an NDF.
@@ -36,7 +36,7 @@ void kpgOutline( int indf, float wlim, int *status ){
 *     SMURF subroutine
 
 *  Invocation:
-*     void kpgOutline( int indf, float wlim, int *status )
+*     void kpgPutOutline( int indf, float wlim, int *status )
 
 *  Arguments:
 *     indf = int (Given)
@@ -142,7 +142,7 @@ void kpgOutline( int indf, float wlim, int *status ){
       *status = SAI__ERROR;
       ndfMsg( "N", indf );
       msgSeti( "I", ndim );
-      errRep( "", "kpgOutline: Cannot create a polygon outlining the good "
+      errRep( "", "kpgPutOutline: Cannot create a polygon outlining the good "
               "data in '^N' because the NDF has ^I axes (must be 2 or 3).",
               status );
    }
@@ -158,7 +158,7 @@ void kpgOutline( int indf, float wlim, int *status ){
    if( !astIsASkyFrame( frm2d ) && *status == SAI__OK ) {
       *status = SAI__ERROR;
       ndfMsg( "N", indf );
-      errRep( "", "kpgOutline: Cannot create a polygon outlining the good "
+      errRep( "", "kpgPutOutline: Cannot create a polygon outlining the good "
               "data in '^N' because the first two WCS axes are not sky axes.",
               status );
    }
@@ -170,7 +170,7 @@ void kpgOutline( int indf, float wlim, int *status ){
        ( out[ 0 ] + out[ 1 ] != 3 ) ) {
       *status = SAI__ERROR;
       ndfMsg( "N", indf );
-      errRep( "", "kpgOutline: Cannot create a polygon outlining the good "
+      errRep( "", "kpgPutOutline: Cannot create a polygon outlining the good "
               "data in '^N' because the sky axes cannot be split from the "
               "other axes.", status );
    }
@@ -250,7 +250,7 @@ void kpgOutline( int indf, float wlim, int *status ){
    if( astWrite( chan, region ) == 0 && *status == SAI__OK ) {
       *status = SAI__ERROR;
       ndfMsg( "N", indf );
-      errRep( "", "kpgOutline: Cannot create a polygon outlining the good "
+      errRep( "", "kpgPutOutline: Cannot create a polygon outlining the good "
               "data in '^N' because the polygon could not be converted "
               "to STC-S format.", status );
    }

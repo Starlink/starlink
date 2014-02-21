@@ -164,10 +164,10 @@ void kpg1Mxmni( int, int, int *, int *, int *, int *, int *, int *, int * );
 void kpg1Mxmnr( int, int, float *, int *, float *, float *, int *, int *, int * );
 
 void kpg1Opgrd( int, const double[], int, double *, double *, int * );
-void kpgOutline( int, float, int * );
 
 void kpg1Pseed( int * );
 int kpgPtfts( int, const AstFitsChan * fchan, int * status );
+void kpgPutOutline( int, float, int * );
 void kpg1Pxscl( AstFrameSet *, const double *, double *, int * );
 
 void kpg1Rgndf( const char *, size_t, size_t, const char *, Grp **, size_t *, int * );

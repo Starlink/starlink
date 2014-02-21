@@ -518,7 +518,7 @@ void smf_jsadicer( int indf, const char *base, int trim,
 
 /* Now store an STC-S polygon that describes the boundary of the good
    data in the output NDF, and store it as an NDF extension. */
-      kpgOutline( indfo, 0.5, status );
+      kpgPutOutline( indfo, 0.5, status );
 
 /* We now reshape any extension NDFs contained within the output NDF to
    have the same spatial bounds as the main NDF (but only for extension
