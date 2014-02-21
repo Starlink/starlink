@@ -42,6 +42,7 @@ extern "C" {
 extern int Itcl_Init(Tcl_Interp *interp);
 extern int Tclx_Init(Tcl_Interp *interp);
 extern int Tcladam_Init(Tcl_Interp *interp);
+extern int TclWorldCoords_Init(Tcl_Interp *interp);
 }
 
 /* Fortran initialisation. */
@@ -121,6 +122,11 @@ Tcl_AppInit(Tcl_Interp *interp)
   }
   if (Tcladam_Init(interp) == TCL_ERROR) {
     return TCL_ERROR;
+  }
+
+  /*  wcs command for coordinate conversions. */
+  if ( TclWorldCoords_Init(interp) == TCL_ERROR ) {
+      return TCL_ERROR;
   }
 
   //  Run the initialisation command.

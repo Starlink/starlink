@@ -1,0 +1,165 @@
+#!/bin/sh
+# The next line is executed by /bin/sh, but not Tcl \
+exec $GAIA_DIR/gaia_tcl $0 ${1+"$@"}
+#+
+#   Name:
+#      querynedcone
+
+#   Purpose:
+#      Query the NED database for objects in an area on the sky.
+
+#   Usage:
+#      querynedcone ra dec radius
+
+#   Description:
+#      Sends a query to the NED astrophysical database for all the known
+#      objects in a region of the sky (a cone search).  Required as NED does
+#      not return Skycat compatible catalogues so we must do that
+#      transformation here. Also the NED service at ESO has now been
+#      withdrawn. Note output is written to the standard output not a file,
+#      ra and dec should be in decimal degrees or sexagesimal FK5 and radius
+#      in arcminutes.
+
+#   Authors:
+#      PWD: Peter W. Draper
+
+#  Copyright:
+#     Copyright (C) 2014 Science and Technology Facilties Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of the
+#     License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+#     of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
+#     02110-1301, USA
+
+#   History:
+#      20-FEB-2014 (PWD):
+#         Original version.
+#-
+#.
+
+package require http
+package require uri
+
+#  Base URL for NED.
+set BASEURL {http://ned.ipac.caltech.edu/cgi-bin/nph-objsearch?search_type=Near+Position+Search&of=ascii_tab}
+
+#  Check the command-line arguments.
+if { $argc >= 3 } {
+   set ra [lindex $argv 0]
+   set dec [lindex $argv 1]
+   set radius [lindex $argv 2]
+} else {
+   puts stderr "Usage: querynedcone ra dec radius"
+   exit 1
+}
+
+#  Establish the standard proxy define using http_proxy.
+set proxy {}
+set port {}
+if { [info exists ::env(http_proxy)] } {
+   if { [scan $::env(http_proxy) {http://%[^:/]:%d} proxy port] != 2 } {
+      scan $::env(http_proxy) {http://%[^:/]} proxy
+   }
+}
+::http::config -proxyhost $proxy
+::http::config -proxyport $port
+
+#  Proc to do the query. Needed as can be recursive if redirected.
+proc get {query} {
+
+   #  Download the response.
+   if { [catch {set response [::http::geturl $query] } msg] } {
+
+      #  Failed.
+      puts stderr "$msg"
+      exit 1
+   }
+
+   #  Check for a moved response and handle the re-direct.
+   if { [::http::ncode $response] == 302 || [::http::ncode $response] == 303 } {
+      array set meta [eval set $response\(meta\)]
+      set location $meta(Location)
+
+      if { [string first "http://" $location] == -1 } {
+
+         #  Need to rebuild the query (usual case).
+         array set parts [::uri::split $query]
+         if { $parts(port) != {} } {
+            set newquery "$parts(scheme)://$parts(host):$parts(port)${location}"
+         } else {
+            set newquery "$parts(scheme)://$parts(host)${location}"
+         }
+      } else {
+
+         #  Funny location is already a URL, probably broken, but try it
+         #  anyway.
+         set newquery $location
+      }
+      get $newquery
+      return
+   }
+
+   #  Get content which we return as the result.
+   return [::http::data $response]
+}
+
+#  Make sure RA and Dec are in degrees.
+wcs .wcs
+lassign [.wcs hmstod $ra $dec] ra dec
+
+#  And convert from arcminutes into degrees.
+set radius [expr $radius/60.0]
+
+#  Construct the query.
+set query ${BASEURL}&RA=${ra}&DEC=${dec}&SR=${radius}
+
+#  Get the response
+set result [get $query]
+
+#  Add a header for a standard TAB table.
+puts {
+QueryResult
+serv_type: catalog
+long_name: NED
+short_name: ned@eso
+symbol: {} square 2
+id_col: 0
+ra_col: 1
+dec_col: 2
+x_col: -1
+y_col: -1
+}
+
+#  Need to parse this into TAB format, skipping the first column.
+set ok 0
+foreach line [split $result "\n"] {
+   if { [string length $line] > 0 } {
+      if { $ok } {
+         puts [join [lrange [split $line "\t"] 1 end] "\t"]
+      } elseif { [string match {No.*} $line] } {
+
+         #  Header line, so start output and add TST magic.
+         puts [join [lrange [split $line "\t"] 1 end] "\t"]
+         puts "----"
+         set ok 1
+      }
+   }
+}
+puts {[EOD]}
+
+flush stdout
+
+exit 0
+

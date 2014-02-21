@@ -21,6 +21,13 @@
     been fixed. Previously when logged into a machine remotely printing
     did not work correctly depending on the image zoom and scroll position.
 
+    Various skycat catalogues that have been abandoned have been removed
+    from the default list. Some of these have been replaced with Vizier
+    equivalents.
+
+    The NED object searches have been changed to use the NED service
+    directly, rather than the ESO services which have been retired.
+
     Version 4.4-4
     =============
 
