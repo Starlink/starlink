@@ -8,10 +8,10 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 \newcommand{\stardocnumber}    {238.8}
 \newcommand{\stardocauthors}   {D.S. Berry \\Malcolm J. Currie}
-\newcommand{\stardocdate}      {2011 April 12}
+\newcommand{\stardocdate}      {2013 August 23}
 \newcommand{\stardoctitle}     {KAPLIBS -- Internal subroutines used within
                                 the KAPPA package.}
-\newcommand{\stardocversion}   {Version 3.2}
+\newcommand{\stardocversion}   {Version 3.5}
 \newcommand{\stardocmanual}    {Programmer's Reference}
 \newcommand{\stardocabstract}  {KAPLIBS is a package of Fortran subroutine
 libraries which were originally written as part of the KAPPA package (a
@@ -798,6 +798,31 @@ related items to be removed.
 
 \newpage
 \appendix
+
+\section{Changes in Version 3.5}
+\begin{itemize}
+\item New generic KPG\_STOCx calculates clipped ordered statistics,
+      enabling the API of KPG\_STOSx to remain unchanged.
+\end{itemize}
+
+
+\section{Changes in Version 3.4}
+\begin{itemize}
+\item Handles 64-bit integers.
+\item New KPG1\_KY2HD and kpg1Ky2hd have been moved to the ATL library.
+\item Added KPG1\_QUOTE to put single quotes round a string and escape any
+      embedded single quotes.
+\end{itemize}
+
+
+\section{Changes in Version 3.3}
+\begin{itemize}
+\item New generic KPG1\_CORRx routine to calculate the Pearson correlation
+      coefficient of two arrays.
+\item New methods in CCG\_COMNB1/2 to combine lines to give the number (or
+      fraction) of good (or bad) pixels.
+\end{itemize}
+
 
 \section{Changes in Version 3.2}
 \begin{itemize}
@@ -16631,7 +16656,7 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
       string. The asterisk marks the end of the minimum abbreviation.
    }
    \sstinvocation{
-      CALL KPG1\_ASSTY( SETTNG, NAME, VALUE, STATUS )
+      CALL KPG1\_ASSTY( SETTNG, IQUAL, NAME, VALUE, NQUAL, STATUS )
    }
    \sstarguments{
       \sstsubsection{
@@ -16641,14 +16666,29 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
          colour names.
       }
       \sstsubsection{
+         IQUAL = INTEGER (Given)
+      }{
+         If the attribute name includes one or more qualifiers (e.g.
+         {\tt "}colour(ticks,border){\tt "} ), then the returned name includes the
+         qualifier with index IQUAL (starting at one). The IQUAL value
+         is ignored if the attribute name contains no qualifiers.
+      }
+      \sstsubsection{
          NAME = CHARACTER $*$ ( $*$ ) (Returned)
       }{
-         The corresponding AST attribute name (with a possible qualifier).
+         The corresponding AST attribute name (including at most one
+         qualifier, as selected by IQUAL).
       }
       \sstsubsection{
          VALUE = CHARACTER $*$ ( $*$ ) (Returned)
       }{
          The corresponding AST attribute value.
+      }
+      \sstsubsection{
+         NQUAL = INTEGER (Returned)
+      }{
+         The number of qualifers included in the attribute name within
+         the supplied SETTNG string. May be zero.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)
@@ -19639,8 +19679,8 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
       \sstsubsection{
          N = INTEGER (Returned)
       }{
-         The number of points used to form the returned
-         correlation coefficient.
+         The number of points used to form the returned correlation
+         coefficient.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)
@@ -23329,6 +23369,39 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
    }
 }
 \sstroutine{
+   KPG1\_GETOUTLINE
+}{
+   Retrieve an STC polygon describing the spatial extent of an NDF
+}{
+   \sstdescription{
+      If The NDF contains an OUTLINE extension, it is expected to be a
+      character array containing an STC-S description of a polygon. If
+      this is the case, the polygon is returned as the function value.
+      Otherwise a NULL pointer is returned.
+   }
+   \sstinvocation{
+      RESULT = KPG1\_GETOUTLINE( Indf, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         INDF = INTEGER (Given)
+      }{
+         Identifier for the NDF.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         A pointer to an AST Region, or AST\_\_NULL if no Region can be created.
+      }{
+      }
+   }
+}
+\sstroutine{
    KPG1\_GETYP
 }{
    Obtains a valid HDS primitive data type via a parameter
@@ -25307,7 +25380,11 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
 
       If the above attempt fails, attempt to interpret the parameter
       value as an NDF name. If the NDF is opened succesfully, its WCS
-      FrameSet is returned.
+      FrameSet is returned. If a FrameSet is required, its current Frame
+      is returned if a Frame is required. Its base-$>$current Mapping is
+      returned if a Mapping is required. A Box covering the pixel grid
+      and re-mapped into the current WCS Frame is returned if a Regin is
+      required.
 
       If the above attempt fails, and the parameter value ends with
       {\tt "}.FIT{\tt "}, attempt to interpret the parameter value as the name of a
@@ -29811,8 +29888,8 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
    Moves bad data values to the end of an index of array values
 }{
    \sstdescription{
-      This routine modifies the supplied index array by removing indicies
-      of all bad data values and shuffling indicies for good data values
+      This routine modifies the supplied index array by removing indices
+      of all bad data values and shuffling indices for good data values
       down to fill the gaps.
    }
    \sstinvocation{
@@ -29840,7 +29917,7 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
          Each element of this array is an index into the ARRAY array. On
          exit, the contents of INDX are re-arranged so that indices that
          refer to bad data values are removed and indices that refer to
-         good data values are shuffled down to fill the gaps. Any indicies
+         good data values are shuffled down to fill the gaps. Any indices
          which are outside the bounds of the data array are treated as if
          they referred to bad data values (i.e. they are removed).
       }
@@ -36099,6 +36176,9 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
    \sstdescription{
       This function uses the computer time from an arbitrary date, plus
       the current process id., to generate a non-repeatable seed.
+
+      Alternatively, a fixed seed can be used by assigning the seed value
+      to environment variable STAR\_SEED.
    }
    \sstinvocation{
       RESULT = KPG1\_SEED( STATUS )
@@ -36114,8 +36194,8 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
       \sstsubsection{
          KPG1\_SEED = REAL
       }{
-         The non-repeatable seed for use in SLA\_RANDOM.  Note that
-         it is not necessarily in the range 0 to 1.
+         The seed for use in SLA\_RANDOM.  Note that it is not necessarily
+         in the range 0 to 1.
       }
    }
 }
@@ -40333,6 +40413,106 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
    }
 }
 \sstroutine{
+   KPG\_STOCx
+}{
+   Calculates accurate order statistics by sorting an array
+}{
+   \sstdescription{
+      This routine calculates the median and optionally up to
+      one-hundred percentiles.  It achieves this by using Quicksort
+      to order the good array values, and hence provide correct values
+      (unlike the faster histogram approximation used by KPG1\_HSTAx).
+
+      A clipped range may be supplied, such as found by KPG\_OSTAx, to
+      derive ordered statistics after clipping of outliers.
+   }
+   \sstinvocation{
+      CALL KPG\_STOCx( EL, ARRAY, NGOOD, NUMPER, PERCNT, RANGE,
+                      MEDIAN, PERVAL, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         EL = INTEGER (Given)
+      }{
+         Total number of pixels in the array.
+      }
+      \sstsubsection{
+         ARRAY( EL ) = ? (Given)
+      }{
+         The vectorised array of values whose ordered statistics are
+         to be calculated.
+      }
+      \sstsubsection{
+         NGOOD = INTEGER (Given)
+      }{
+         Number of valid pixels which contributed to the statistics.
+      }
+      \sstsubsection{
+         NUMPER = INTEGER (Given)
+      }{
+         Number of percentiles values to report.  This should be in
+         the range 1 to 100.  Set this to 1 and PERCNT(1) to VAL\_\_BADR
+         if percentiles are not required.
+      }
+      \sstsubsection{
+         PERCNT( NUMPER ) = REAL (Given)
+      }{
+         The percentiles to derive.  Valid percentiles must be in the
+         range 0.0 to 100.0, and preferably in ascending order.  If the
+         first element is set to the bad value, then no percentiles are
+         calculated.
+      }
+      \sstsubsection{
+         RANGE( 2 ) = DOUBLE\_PRECISION (Read)
+      }{
+         The clipping limits between which to statistics are to be
+         determined, lower then upper.  A bad value means no limit
+         is needed at its respective end.
+      }
+      \sstsubsection{
+         MEDIAN( 2 ) = DOUBLE PRECISION (Returned)
+      }{
+         Median value.  If there is an even number of good values
+         present in the array, the median is the average of the middle
+         pair.  The second value is the clipped median after application
+         of the RANGE bounds.  If both RANGE values are bad no clipping
+         is performed and the clipped median is set to the bad value.
+      }
+      \sstsubsection{
+         PERVAL( NUMPER, 2 ) = DOUBLE PRECISION (Returned)
+      }{
+         Percentile values corresponding to the percentile fractions
+         in PERCNT.  The second set of percentiles are the clipped
+         values after application of the RANGE bounds.  If both RANGE
+         values are bad no clipping is performed and the clipped
+         percentiles are set to the bad value.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for byte, double-precision, integer, 64-bit
+         integer, real, and word data types: replace {\tt "}x{\tt "} in the routine name
+         by B, D, I, K, R, or W as  appropriate.  The data type of the
+         ARRAY argument must match the particular routine used.
+
+         \sstitem
+         If the value of NGOOD is not at least two, then this routine
+         will abort.  The median and percentiles will have the bad value.
+
+         \sstitem
+         The sorting is recorded in an index leaving the order of the
+         supplied array values intact.
+      }
+   }
+}
+\sstroutine{
    KPG\_STOSx
 }{
    Calculates accurate order statistics by sorting an array
@@ -40402,10 +40582,10 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
       \sstitemlist{
 
          \sstitem
-         There is a routine for double-precision, integer, and real data
-         types: replace {\tt "}x{\tt "} in the routine name by D, I, or R as
-         appropriate.  The data type of the ARRAY argument must match the
-         particular routine used.
+         There is a routine for byte, double-precision, integer, 64-bit
+         integer, real, and word data types: replace {\tt "}x{\tt "} in the routine name
+         by B, D, I, K, R, or W as  appropriate.  The data type of the
+         ARRAY argument must match the particular routine used.
 
          \sstitem
          If the value of NGOOD is not at least two, then this routine
@@ -40837,6 +41017,33 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
    }
 }
 \sstroutine{
+   kpgGetOutline
+}{
+   Retrieve an STC polygon describing the spatial extent of an NDF
+}{
+   \sstdescription{
+      If The NDF contains an OUTLINE extension, it is expected to be a
+      character array copntaining an STC-S description of a polygon. If
+      this is the case, the polygon is returned as the function value.
+      Otherwise a NULL pointer is returned.
+   }
+   \sstinvocation{
+      AstRegion $*$kpgGetOutline( int indf, int $*$status )
+   }
+   \sstarguments{
+      \sstsubsection{
+         indf = int (Given)
+      }{
+         Identifier for the NDF.
+      }
+      \sstsubsection{
+         status = int $*$ (Given and Returned)
+      }{
+         Pointer to global status.
+      }
+   }
+}
+\sstroutine{
    kpgGtfts
 }{
    Obtains FITS header information from an NDF
@@ -40934,6 +41141,45 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
       Return Value
    }{
       Returns the status.
+   }
+}
+\sstroutine{
+   kpgPutOutline
+}{
+   Create and store an STC polygon describing the spatial extent of an NDF
+}{
+   \sstdescription{
+      If the NDF is 3D it is collapsed onto the spatial pixel axes (which
+      must be pixel axes 1 and 2), and all pixels with less than the specified
+      fraction of good values in each pixel are set bad. An AST Polygon is
+      then created describing the good values in the collapsed array. This
+      polygon is mapped into the SKY Frame and converted to an STC-S
+      description, which is stored in an extension called {\tt "}OUTLINE{\tt "} in
+      the supplied NDF (the extension is a character array).
+   }
+   \sstinvocation{
+      void kpgPutOutline( int indf, float wlim, int $*$status )
+   }
+   \sstarguments{
+      \sstsubsection{
+         indf = int (Given)
+      }{
+         Identifier for the NDF. Must be 2-D or 3-D. The WCS must contain
+         a SkyFrame, and the first two pixel axes must map onto the two
+         sky axes.
+      }
+      \sstsubsection{
+         wlim = float (Given)
+      }{
+         Minimum fraction of good values per pixel required when
+         collapsing a 3D NDF. Ignored if the NDF has only two significant
+         pixel axes.
+      }
+      \sstsubsection{
+         status = int $*$ (Given and Returned)
+      }{
+         Pointer to global status.
+      }
    }
 }
 
