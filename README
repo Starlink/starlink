@@ -438,5 +438,6 @@ Arch Linux:
    git
    libx11
    libxt
+   netpbm
    tcsh
    texlive-most
