@@ -1685,6 +1685,89 @@ iraf! {
           }
       }
 
+      action astconvex {
+         helplib {$ATOOLS_HELP}
+
+         parameter fmt {
+            type LITERAL
+            prompt {Format for output text file}
+            ppath DEFAULT
+            vpath DEFAULT
+            default AST
+            helpkey *
+          }
+
+         parameter array {
+            position 3
+            type NDF
+            access READ
+            ppath GLOBAL
+            association <-GLOBAL.DATA_ARRAY
+            prompt {The input NDF}
+            helpkey *
+         }
+
+         parameter current {
+            type _LOGICAL
+            prompt {Map the Polygon into current Frame of the NDF?}
+            ppath CURRENT DEFAULT
+            vpath DEFAULT
+            default FALSE
+            helpkey *
+         }
+
+         parameter maxerr {
+            position 4
+            type _DOUBLE
+            prompt {The maximum allowed positional error in the polygon}
+            ppath CURRENT DEFAULT
+            default 0.0
+            helpkey *
+         }
+
+         parameter maxvert {
+            position 5
+            type _INTEGER
+            prompt {The maximum number of vertices in the polygon}
+            ppath CURRENT DEFAULT
+            default 10
+            helpkey *
+         }
+
+         parameter nvert {
+            type _INTEGER
+            access WRITE
+            vpath DEFAULT
+            default 0
+            helpkey *
+          }
+
+         parameter oper {
+            position 2
+            type LITERAL
+            prompt {Operation defining the pixels to be included}
+            ppath CURRENT DEFAULT
+            default EQ
+            helpkey *
+          }
+
+         parameter result {
+            position 6
+            type LITERAL
+            prompt {Name of file in which to store the Polygon}
+            helpkey *
+          }
+
+         parameter value {
+            position 1
+            type LITERAL
+            prompt {The value that defines the pixels to be included}
+            ppath CURRENT DEFAULT
+            default BAD
+            helpkey *
+          }
+      }
+
       action astunitmap {
          helplib {$ATOOLS_HELP}
 

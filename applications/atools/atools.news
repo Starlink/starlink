@@ -15,6 +15,7 @@
     mapped into the current Frame of the NDF.
   - astoutline now displays the number of vertices in the polygon, and
     writes this number to output parameter "NVERT".
+  - New command astconvex.
 
   Changes in V1.9-13
 
