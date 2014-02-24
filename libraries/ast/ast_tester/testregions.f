@@ -8,6 +8,7 @@
 c      call ast_watchmemory( 282905 )
 
       call ast_begin( status )
+      call checkConvex( status )
       call checkRemoveRegions( status )
       call checkInterval( status )
       call checkEllipse( status )
@@ -3947,4 +3948,66 @@ C
 
 
 
+
+      subroutine checkConvex( status )
+      implicit none
+
+      include 'SAE_PAR'
+      include 'AST_PAR'
+
+      integer nx, ny, nel
+      parameter( nx  = 8 )
+      parameter( ny  = 7 )
+      parameter( nel  = nx*ny )
+
+      integer status, poly, lbnd(2), ubnd(2), npoint
+      real array( nx, ny )
+      double precision points( 10, 2 )
+
+      data array / nel*0.0 /
+      data lbnd / -10, 3 /
+
+      if( status .ne. sai__ok ) return
+
+      call ast_begin( status )
+
+      ubnd( 1 ) = lbnd( 1 ) + nx- 1
+      ubnd( 2 ) = lbnd( 2 ) + ny- 1
+
+      array( 6, 1 ) = 1.0
+      array( 7, 1 ) = 1.0
+      array( 8, 1 ) = 1.0
+      array( 7, 2 ) = 1.0
+      array( 8, 2 ) = 1.0
+      array( 2, 3 ) = 1.0
+      array( 8, 3 ) = 1.0
+      array( 1, 4 ) = 1.0
+      array( 1, 6 ) = 1.0
+      array( 2, 6 ) = 1.0
+      array( 6, 6 ) = 1.0
+
+      poly = ast_convexr( 1.0, AST__EQ, array, lbnd, ubnd, 0.0D0,
+     :                    0, .FALSE., status )
+
+      call ast_getregionpoints( poly, 10, 2, npoint, points, status )
+
+      if( npoint .ne. 7 ) call stopit( status, 'Convex 1' )
+      if( points( 1, 1 ) .ne. -3) call stopit( status, 'Convex 2' )
+      if( points( 1, 2 ) .ne. 3) call stopit( status, 'Convex 3' )
+      if( points( 2, 1 ) .ne. -3) call stopit( status, 'Convex 4' )
+      if( points( 2, 2 ) .ne. 5) call stopit( status, 'Convex 5' )
+      if( points( 3, 1 ) .ne. -5) call stopit( status, 'Convex 6' )
+      if( points( 3, 2 ) .ne. 8) call stopit( status, 'Convex 7' )
+      if( points( 4, 1 ) .ne. -10) call stopit( status, 'Convex 8' )
+      if( points( 4, 2 ) .ne. 8) call stopit( status, 'Convex 9' )
+      if( points( 5, 1 ) .ne. -10) call stopit( status, 'Convex 10' )
+      if( points( 5, 2 ) .ne.  6) call stopit( status, 'Convex 11' )
+      if( points( 6, 1 ) .ne.  -9) call stopit( status, 'Convex 12' )
+      if( points( 6, 2 ) .ne.  5) call stopit( status, 'Convex 13' )
+      if( points( 7, 1 ) .ne.  -5) call stopit( status, 'Convex 14' )
+      if( points( 7, 2 ) .ne.  3) call stopit( status, 'Convex 15' )
+
+      call ast_end( status )
+
+      end
 

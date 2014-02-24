@@ -48,6 +48,8 @@ f     following routines may also be applied to all Polygons:
 *
 c     - astDownsize: Reduce the number of vertices in a Polygon.
 f     - AST_DOWNSIZE: Reduce the number of vertices in a Polygon.
+c     - astConvex<X>: Create a Polygon giving the convex hull of a pixel array
+f     - AST_CONVEX<X>: Create a Polygon giving the convex hull of a pixel array
 c     - astOutline<X>: Create a Polygon outlining values in a pixel array
 f     - AST_OUTLINE<X>: Create a Polygon outlining values in a pixel array
 
@@ -99,6 +101,8 @@ f     - AST_OUTLINE<X>: Create a Polygon outlining values in a pixel array
 *        cache, as the number of edges may have changed.
 *     10-JAN-2014 (DSB):
 *        - Remove unused parameter description in prologue of for astOutline<X>
+*     24-FEB-2014 (DSB):
+*        Added astConvex<X>.
 *class--
 */
 
@@ -117,6 +121,23 @@ f     - AST_OUTLINE<X>: Create a Polygon outlining values in a pixel array
    compare bad values directory because of the danger of floating point
    exceptions, so bad values are dealt with explicitly. */
 #define EQUAL(aa,bb) (((aa)==AST__BAD)?(((bb)==AST__BAD)?1:0):(((bb)==AST__BAD)?0:(fabs((aa)-(bb))<=1.0E9*MAX((fabs(aa)+fabs(bb))*DBL_EPSILON,DBL_MIN))))
+
+/* Define a macro for testing if a pixel value <V> satisfies the requirements
+   specified by <Oper> and <Value>. Compiler optimisation should remove
+   all the "if" testing from this expression. */
+#define ISVALID(V,OperI,Value) ( \
+   ( OperI == AST__LT ) ? ( (V) < Value ) : ( \
+      ( OperI == AST__LE ) ? ( (V) <= Value ) : ( \
+         ( OperI == AST__EQ ) ? ( (V) == Value ) : ( \
+            ( OperI == AST__GE ) ? ( (V) >= Value ) : ( \
+               ( OperI == AST__NE ) ? ( (V) != Value ) : ( \
+                  (V) > Value \
+               ) \
+            ) \
+         ) \
+      ) \
+   ) \
+)
 
 /* Macros specifying whether a point is inside, outside or on the
    boundary of the polygon. */
@@ -287,6 +308,107 @@ TRACEEDGE_PROTO(US,unsigned short int)
 TRACEEDGE_PROTO(B,signed char)
 TRACEEDGE_PROTO(UB,unsigned char)
 TRACEEDGE_PROTO(F,float)
+
+/* Define a macro that expands to a single prototype for function
+   PartHull for a given data type and operation. */
+#define PARTHULL_PROTO0(X,Xtype,Oper) \
+static void PartHull##Oper##X( Xtype, const Xtype[], int, int, int, int, int, int, int, const int[2], double **, double **, int *, int * );
+
+/* Define a macro that expands to a set of prototypes for all operations
+   for function PartHull for a given data type. */
+#define PARTHULL_PROTO(X,Xtype) \
+PARTHULL_PROTO0(X,Xtype,LT) \
+PARTHULL_PROTO0(X,Xtype,LE) \
+PARTHULL_PROTO0(X,Xtype,EQ) \
+PARTHULL_PROTO0(X,Xtype,GE) \
+PARTHULL_PROTO0(X,Xtype,GT) \
+PARTHULL_PROTO0(X,Xtype,NE)
+
+/* Use the above macros to define all PartHull prototypes for all
+   data types and operations. */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
+PARTHULL_PROTO(LD,long double)
+#endif
+PARTHULL_PROTO(D,double)
+PARTHULL_PROTO(L,long int)
+PARTHULL_PROTO(UL,unsigned long int)
+PARTHULL_PROTO(I,int)
+PARTHULL_PROTO(UI,unsigned int)
+PARTHULL_PROTO(S,short int)
+PARTHULL_PROTO(US,unsigned short int)
+PARTHULL_PROTO(B,signed char)
+PARTHULL_PROTO(UB,unsigned char)
+PARTHULL_PROTO(F,float)
+
+/* Define a macro that expands to a single prototype for function
+   ConvexHull for a given data type and operation. */
+#define CONVEXHULL_PROTO0(X,Xtype,Oper) \
+static AstPointSet *ConvexHull##Oper##X( Xtype, const Xtype[], const int[2], int, int, int, int * );
+
+/* Define a macro that expands to a set of prototypes for all operations
+   for function ConvexHull for a given data type. */
+#define CONVEXHULL_PROTO(X,Xtype) \
+CONVEXHULL_PROTO0(X,Xtype,LT) \
+CONVEXHULL_PROTO0(X,Xtype,LE) \
+CONVEXHULL_PROTO0(X,Xtype,EQ) \
+CONVEXHULL_PROTO0(X,Xtype,GE) \
+CONVEXHULL_PROTO0(X,Xtype,GT) \
+CONVEXHULL_PROTO0(X,Xtype,NE)
+
+/* Use the above macros to define all ConvexHull prototypes for all
+   data types and operations. */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
+CONVEXHULL_PROTO(LD,long double)
+#endif
+CONVEXHULL_PROTO(D,double)
+CONVEXHULL_PROTO(L,long int)
+CONVEXHULL_PROTO(UL,unsigned long int)
+CONVEXHULL_PROTO(I,int)
+CONVEXHULL_PROTO(UI,unsigned int)
+CONVEXHULL_PROTO(S,short int)
+CONVEXHULL_PROTO(US,unsigned short int)
+CONVEXHULL_PROTO(B,signed char)
+CONVEXHULL_PROTO(UB,unsigned char)
+CONVEXHULL_PROTO(F,float)
+
+/* Define a macro that expands to a single prototype for function
+   FindBoxEdge for a given data type and operation. */
+#define FINDBOXEDGE_PROTO0(X,Xtype,Oper) \
+static void FindBoxEdge##Oper##X( Xtype, const Xtype[], int, int, int, int, int *, int *, int *, int * );
+
+/* Define a macro that expands to a set of prototypes for all operations
+   for function FindBoxEdge for a given data type. */
+#define FINDBOXEDGE_PROTO(X,Xtype) \
+FINDBOXEDGE_PROTO0(X,Xtype,LT) \
+FINDBOXEDGE_PROTO0(X,Xtype,LE) \
+FINDBOXEDGE_PROTO0(X,Xtype,EQ) \
+FINDBOXEDGE_PROTO0(X,Xtype,GE) \
+FINDBOXEDGE_PROTO0(X,Xtype,GT) \
+FINDBOXEDGE_PROTO0(X,Xtype,NE)
+
+/* Use the above macros to define all FindBoxEdge prototypes for all
+   data types and operations. */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
+FINDBOXEDGE_PROTO(LD,long double)
+#endif
+FINDBOXEDGE_PROTO(D,double)
+FINDBOXEDGE_PROTO(L,long int)
+FINDBOXEDGE_PROTO(UL,unsigned long int)
+FINDBOXEDGE_PROTO(I,int)
+FINDBOXEDGE_PROTO(UI,unsigned int)
+FINDBOXEDGE_PROTO(S,short int)
+FINDBOXEDGE_PROTO(US,unsigned short int)
+FINDBOXEDGE_PROTO(B,signed char)
+FINDBOXEDGE_PROTO(UB,unsigned char)
+FINDBOXEDGE_PROTO(F,float)
+
+
+
+
+
+
+
+
 
 /* Non-generic function prototypes. */
 static AstMapping *Simplify( AstMapping *, int * );
@@ -540,6 +662,602 @@ static void Cache( AstPolygon *this, int *status ){
       this->stale = 0;
    }
 }
+
+/*
+*++
+*  Name:
+c     astConvex<X>
+f     AST_CONVEX<X>
+
+*  Purpose:
+*     Create a new Polygon representing the convex hull of a 2D data grid.
+
+*  Type:
+*     Public function.
+
+*  Synopsis:
+c     #include "polygon.h"
+c     AstPolygon *astConvex<X>( <Xtype> value, int oper, const <Xtype> array[],
+c                                const int lbnd[2], const int ubnd[2], double maxerr,
+c                                int maxvert, int starpix )
+f     RESULT = AST_CONVEX<X>( VALUE, OPER, ARRAY, LBND, UBND, MAXERR,
+f                              MAXVERT, STARPIX, STATUS )
+
+*  Class Membership:
+*     Polygon method.
+
+*  Description:
+*     This is a set of functions that create the shortest Polygon that
+*     encloses all pixels with a specified value within a gridded
+*     2-dimensional data array (e.g. an image).
+*
+*     A basic 2-dimensional Frame is used to represent the pixel coordinate
+*     system in the returned Polygon. The Domain attribute is set to
+*     "PIXEL", the Title attribute is set to "Pixel coordinates", and the
+*     Unit attribute for each axis is set to "pixel". All other
+*     attributes are left unset. The nature of the pixel coordinate system
+*     is determined by parameter
+c     "starpix".
+f     STARPIX.
+*
+*     The
+c     "maxerr" and "maxvert"
+f     MAXERR and MAXVERT
+*     parameters can be used to control how accurately the returned
+*     Polygon represents the required region in the data array. The
+*     number of vertices in the returned Polygon will be the minimum
+*     needed to achieve the required accuracy.
+*
+*     You should use a function which matches the numerical type of the
+*     data you are processing by replacing <X> in the generic function
+*     name
+c     astConvex<X>
+f     AST_CONVEX<X>
+c     by an appropriate 1- or 2-character type code. For example, if you
+*     are procesing data with type
+c     "float", you should use the function astConvexF
+f     REAL, you should use the function AST_CONVEXR
+*     (see the "Data Type Codes" section below for the codes appropriate to
+*     other numerical types).
+
+*  Parameters:
+c     value
+f     VALUE = <Xtype> (Given)
+*        A data value that specifies the pixels to be included within the
+*        convex hull.
+c     oper
+f     OPER = INTEGER (Given)
+*        Indicates how the
+c        "value"
+f        VALUE
+*        parameter is used to select the required pixels. It can
+*        have any of the following values:
+c        - AST__LT: include pixels with value less than "value".
+c        - AST__LE: include pixels with value less than or equal to "value".
+c        - AST__EQ: include pixels with value equal to "value".
+c        - AST__NE: include pixels with value not equal to "value".
+c        - AST__GE: include pixels with value greater than or equal to "value".
+c        - AST__GT: include pixels with value greater than "value".
+f        - AST__LT: include pixels with value less than VALUE.
+f        - AST__LE: include pixels with value less than or equal to VALUE.
+f        - AST__EQ: include pixels with value equal to VALUE.
+f        - AST__NE: include pixels with value not equal to VALUE.
+f        - AST__GE: include pixels with value greater than or equal to VALUE.
+f        - AST__GT: include pixels with value greater than VALUE.
+c     array
+f     ARRAY( * ) = <Xtype> (Given)
+c        Pointer to a
+f        A
+*        2-dimensional array containing the data to be processed.  The
+*        numerical type of this array should match the 1- or
+*        2-character type code appended to the function name (e.g. if
+c        you are using astConvexF, the type of each array element
+c        should be "float").
+f        you are using AST_CONVEXR, the type of each array element
+f        should be REAL).
+*
+*        The storage order of data within this array should be such
+*        that the index of the first grid dimension varies most
+*        rapidly and that of the second dimension least rapidly
+c        (i.e. Fortran array indexing is used).
+f        (i.e. normal Fortran array storage order).
+c     lbnd
+f     LBND( 2 ) = INTEGER (Given)
+c        Pointer to an array of two integers
+f        An array
+*        containing the coordinates of the centre of the first pixel
+*        in the input grid along each dimension.
+c     ubnd
+f     UBND( 2) = INTEGER (Given)
+c        Pointer to an array of two integers
+f        An array
+*        containing the coordinates of the centre of the last pixel in
+*        the input grid along each dimension.
+*
+c        Note that "lbnd" and "ubnd" together define the shape
+f        Note that LBND and UBND together define the shape
+*        and size of the input grid, its extent along a particular
+c        (j'th) dimension being ubnd[j]-lbnd[j]+1 (assuming the
+c        index "j" to be zero-based). They also define
+f        (J'th) dimension being UBND(J)-LBND(J)+1. They also define
+*        the input grid's coordinate system, each pixel having unit
+*        extent along each dimension with integral coordinate values
+*        at its centre or upper corner, as selected by parameter
+c        "starpix".
+f        STARPIX.
+c     maxerr
+f     MAXERR = DOUBLE PRECISION (Given)
+*        Together with
+c        "maxvert",
+f        MAXVERT,
+*        this determines how accurately the returned Polygon represents
+*        the required region of the data array. It gives the target
+*        discrepancy between the returned Polygon and the accurate outline
+*        in the data array, expressed as a number of pixels. Insignificant
+*        vertices are removed from the accurate outline, one by one, until
+*        the number of vertices remaining in the returned Polygon equals
+c        "maxvert",
+f        MAXVERT,
+*        or the largest discrepancy between the accurate outline and the
+*        returned Polygon is greater than
+c        "maxerr". If "maxerr"
+f        MAXERR. If MAXERR
+*        is zero or less, its value is ignored and the returned Polygon will
+*        have the number of vertices specified by
+c        "maxvert".
+f        MAXVERT.
+c     maxvert
+f     MAXVERT = INTEGER (Given)
+*        Together with
+c        "maxerr",
+f        MAXERR,
+*        this determines how accurately the returned Polygon represents
+*        the required region of the data array. It gives the maximum
+*        allowed number of vertices in the returned Polygon. Insignificant
+*        vertices are removed from the accurate outline, one by one, until
+*        the number of vertices remaining in the returned Polygon equals
+c        "maxvert",
+f        MAXVERT,
+*        or the largest discrepancy between the accurate outline and the
+*        returned Polygon is greater than
+c        "maxerr". If "maxvert"
+f        MAXERR. If MAXVERT
+*        is less than 3, its value is ignored and the number of vertices in
+*        the returned Polygon will be the minimum needed to ensure that the
+*        discrepancy between the accurate outline and the returned
+*        Polygon is less than
+c        "maxerr".
+f        MAXERR.
+c     starpix
+f     STARPIX = LOGICAL (Given)
+*        A flag indicating the nature of the pixel coordinate system used
+*        to describe the vertex positions in the returned Polygon. If
+c        non-zero,
+f        .TRUE.,
+*        the standard Starlink definition of pixel coordinate is used in
+*        which a pixel with integer index I spans a range of pixel coordinate
+*        from (I-1) to I (i.e. pixel corners have integral pixel coordinates).
+c        If zero,
+f        If .FALSE.,
+*        the definition of pixel coordinate used by other AST functions
+c        such as astResample, astMask,
+f        such as AST_RESAMPLE, AST_MASK,
+*        etc., is used. In this definition, a pixel with integer index I
+*        spans a range of pixel coordinate from (I-0.5) to (I+0.5) (i.e.
+*        pixel centres have integral pixel coordinates).
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Returned Value:
+c     astConvex<X>()
+f     AST_CONVEX<X> = INTEGER
+*        A pointer to the required Polygon.
+c        NULL
+f        AST__NULL
+*        is returned without error if the array contains no pixels that
+*        satisfy the criterion specified by
+c        "value" and "oper".
+f        VALUE and OPER.
+
+*  Notes:
+*     - This function proceeds by first finding a very accurate polygon,
+*     and then removing insignificant vertices from this fine polygon
+*     using
+c     astDownsize.
+f     AST_DOWNSIZE.
+c     - NULL
+f     - AST__NULL
+*     will be returned if this function is invoked with the global
+*     error status set, or if it should fail for any reason.
+
+*  Data Type Codes:
+*     To select the appropriate masking function, you should
+c     replace <X> in the generic function name astConvex<X> with a
+f     replace <X> in the generic function name AST_CONVEX<X> with a
+*     1- or 2-character data type code, so as to match the numerical
+*     type <Xtype> of the data you are processing, as follows:
+c     - D: double
+c     - F: float
+c     - L: long int
+c     - UL: unsigned long int
+c     - I: int
+c     - UI: unsigned int
+c     - S: short int
+c     - US: unsigned short int
+c     - B: byte (signed char)
+c     - UB: unsigned byte (unsigned char)
+f     - D: DOUBLE PRECISION
+f     - R: REAL
+f     - I: INTEGER
+f     - UI: INTEGER (treated as unsigned)
+f     - S: INTEGER*2 (short integer)
+f     - US: INTEGER*2 (short integer, treated as unsigned)
+f     - B: BYTE (treated as signed)
+f     - UB: BYTE (treated as unsigned)
+*
+c     For example, astConvexD would be used to process "double"
+c     data, while astConvexS would be used to process "short int"
+c     data, etc.
+f     For example, AST_CONVEXD would be used to process DOUBLE
+f     PRECISION data, while AST_CONVEXS would be used to process
+f     short integer data (stored in an INTEGER*2 array), etc.
+f
+f     For compatibility with other Starlink facilities, the codes W
+f     and UW are provided as synonyms for S and US respectively (but
+f     only in the Fortran interface to AST).
+
+*--
+*/
+/* Define a macro to implement the function for a specific data
+   type. Note, this function cannot be a virtual function since the
+   argument list does not include a Polygon, and so no virtual function
+   table is available. */
+#define MAKE_CONVEX(X,Xtype) \
+AstPolygon *astConvex##X##_( Xtype value, int oper, const Xtype array[], \
+                             const int lbnd[2], const int ubnd[2], double maxerr, \
+                             int maxvert, int starpix, int *status ) { \
+\
+/* Local Variables: */ \
+   AstFrame *frm;            /* Frame in which to define the Polygon */ \
+   AstPointSet *candidate;   /* Candidate polygon vertices */ \
+   AstPointSet *pset;        /* PointSet holding downsized polygon vertices */ \
+   AstPolygon *result;       /* Result value to return */ \
+   int boxsize;              /* Half width of smoothign box in vertices */ \
+   int nv0;                  /* Number of vertices in accurate outline */ \
+   int tmp;                  /* Alternative boxsize */ \
+   int xdim;                 /* Number of pixels per row */ \
+   int ydim;                 /* Number of rows */ \
+   static double junk[ 6 ] = {0.0, 0.0, 1.0, 1.0, 0.0, 1.0 }; /* Junk poly */ \
+\
+/* Initialise. */ \
+   result = NULL; \
+\
+/* Check the global error status. */ \
+   if ( !astOK ) return result; \
+\
+/* Get the array dimensions. */ \
+   xdim = ubnd[ 0 ] - lbnd[ 0 ] + 1; \
+   ydim = ubnd[ 1 ] - lbnd[ 1 ] + 1; \
+\
+/* Get the basic concvex hull. */ \
+   if( oper == AST__LT ) { \
+      candidate = ConvexHullLT##X( value, array, lbnd, starpix, xdim, ydim, status ); \
+\
+   } else if( oper == AST__LE ) { \
+      candidate = ConvexHullLE##X( value, array, lbnd, starpix, xdim, ydim, status ); \
+\
+   } else if( oper == AST__EQ ) { \
+      candidate = ConvexHullEQ##X( value, array, lbnd, starpix, xdim, ydim, status ); \
+\
+   } else if( oper == AST__NE ) { \
+      candidate = ConvexHullNE##X( value, array, lbnd, starpix, xdim, ydim, status ); \
+\
+   } else if( oper == AST__GE ) { \
+      candidate = ConvexHullGE##X( value, array, lbnd, starpix, xdim, ydim, status ); \
+\
+   } else if( oper == AST__GT ) { \
+      candidate = ConvexHullGT##X( value, array, lbnd, starpix, xdim, ydim, status ); \
+\
+   } else if( astOK ){ \
+      astError( AST__OPRIN, "astConvex"#X": Invalid operation code " \
+                "(%d) supplied (programming error).", status, oper ); \
+   } \
+\
+/* Check some good selected values were found. */ \
+   if( candidate ) { \
+\
+/* If required smooth the full resolution polygon before downsizing it. */ \
+      if(  maxerr > 0.0 || maxvert > 2 ) { \
+\
+/* Initially, set the boxsize to be equal to the required accuracy. */ \
+         if( maxerr > 0 ) { \
+            boxsize = (int) maxerr; \
+         } else { \
+            boxsize = INT_MAX; \
+         } \
+\
+/* Determine a second box size equal to the average number of vertices in \
+   the accurate outline, per vertex in the returned Polygon. */ \
+         nv0 = astGetNpoint( candidate ); \
+         if( maxvert > 2 ) { \
+            tmp = nv0/(2*maxvert); \
+         } else { \
+            tmp = INT_MAX; \
+         } \
+\
+/* Use the minimum of the two box sizes. */ \
+         if( tmp < boxsize ) boxsize = tmp; \
+\
+/* Ensure the box is sufficiently small to allow at least 10 full boxes \
+   (=20 half boxes) around the polygon. */ \
+         tmp = nv0/20; \
+         if( tmp < boxsize ) boxsize = tmp; \
+         if( boxsize == 0 ) boxsize = 1; \
+\
+/* Smooth the polygon. */ \
+         SmoothPoly( candidate, boxsize, 1.0, status ); \
+      } \
+\
+/* Reduce the number of vertices in the outline. */ \
+      frm = astFrame( 2, "Domain=PIXEL,Unit(1)=pixel,Unit(2)=pixel," \
+                      "Title=Pixel coordinates", status ); \
+      pset = DownsizePoly( candidate, maxerr, maxvert, frm, status ); \
+\
+/* Create a default Polygon with 3 junk vertices. */ \
+      result = astPolygon( frm, 3, 3, junk, NULL, " ", status ); \
+\
+/* Change the PointSet within the Polygon to the one created above. */ \
+      SetPointSet( result, pset, status ); \
+\
+/* Free resources. */ \
+      pset = astAnnul( pset ); \
+      frm = astAnnul( frm ); \
+      candidate = astAnnul( candidate ); \
+   } \
+\
+/* If an error occurred, clear the returned result. */ \
+   if ( !astOK ) result = astAnnul( result ); \
+\
+/* Return the result. */ \
+   return result; \
+}
+
+
+/* Expand the above macro to generate a function for each required
+   data type. */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
+MAKE_CONVEX(LD,long double)
+#endif
+MAKE_CONVEX(D,double)
+MAKE_CONVEX(L,long int)
+MAKE_CONVEX(UL,unsigned long int)
+MAKE_CONVEX(I,int)
+MAKE_CONVEX(UI,unsigned int)
+MAKE_CONVEX(S,short int)
+MAKE_CONVEX(US,unsigned short int)
+MAKE_CONVEX(B,signed char)
+MAKE_CONVEX(UB,unsigned char)
+MAKE_CONVEX(F,float)
+
+/* Undefine the macros. */
+#undef MAKE_CONVEX
+
+/*
+*  Name:
+*     ConvexHull
+
+*  Purpose:
+*     Find the convex hull enclosing selected pixels in a 2D array.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "polygon.h"
+*     AstPointSet *ConvexHull<Oper><X>( <Xtype> value, const <Xtype> array[],
+*                                       const int lbnd[2], int starpix,
+*                                       int xdim, int ydim, int *status )
+
+*  Class Membership:
+*     Polygon member function
+
+*  Description:
+*     This function uses an algorithm similar to "Andrew's Monotone Chain
+*     Algorithm" to create a list of vertices describing the convex hull
+*     enclosing the selected pixels in the supplied array. The vertices
+*     are returned in a PointSet.
+
+*  Parameters:
+*     value
+*        A data value that specifies the pixels to be selected.
+*     array
+*        Pointer to a 2-dimensional array containing the data to be
+*        processed. The numerical type of this array should match the 1-
+*        or 2-character type code appended to the function name.
+*     lbnd
+*        The lower pixel index bounds of the array.
+*     starpix
+*        If non-zero, the usual Starlink definition of pixel coordinate
+*        is used (integral values at pixel corners). Otherwise, the
+*        system used by other AST functions such as astResample is used
+*        (integral values at pixel centres).
+*     xdim
+*        The number of pixels along each row of the array.
+*     ydim
+*        The number of rows in the array.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     A PointSet holding the vertices of the convex hull, or NULL if an
+*     error occurs.
+
+*  Notes:
+*     - The following code has been designed with a view to it being
+*     multi-threaded at some point.
+
+*/
+
+/* Define a macro to implement the function for a specific data
+   type and operation. */
+#define MAKE_CONVEXHULL(X,Xtype,Oper,OperI) \
+static AstPointSet *ConvexHull##Oper##X( Xtype value, const Xtype array[], \
+                                         const int lbnd[2], int starpix, \
+                                         int xdim, int ydim, int *status ) { \
+\
+/* Local Variables: */ \
+   AstPointSet *result; \
+   double **ptr; \
+   double *xv1; \
+   double *xv2; \
+   double *xv3; \
+   double *xv4; \
+   double *xvert; \
+   double *yv1; \
+   double *yv2; \
+   double *yv3; \
+   double *yv4; \
+   double *yvert; \
+   int nv1; \
+   int nv2; \
+   int nv3; \
+   int nv4; \
+   int xhi; \
+   int xhiymax; \
+   int xhiymin; \
+   int xlo; \
+   int xloymax; \
+   int xloymin; \
+   int yhi; \
+   int yhixmax; \
+   int yhixmin; \
+   int ylo; \
+   int yloxmax; \
+   int yloxmin; \
+\
+/* Initialise */ \
+   result = NULL; \
+\
+/* Check the global error status. */ \
+   if ( !astOK ) return result; \
+\
+/* Find the lowest Y value at any selected pixel, and find the max and \
+   min X value of the selected pixels at that lowest Y value. */ \
+   FindBoxEdge##Oper##X( value, array, xdim, ydim, 1, 1, &ylo, &yloxmax,  \
+                         &yloxmin, status ); \
+\
+/* Skip if there are no selected values in the array. */ \
+   if( ylo > 0 ) { \
+\
+/* Find the highest Y value at any selected pixel, and find the max and \
+   min X value of the selected pixels at that highest Y value. */ \
+      FindBoxEdge##Oper##X( value, array, xdim, ydim, 1, 0, &yhi, &yhixmax,  \
+                            &yhixmin, status ); \
+\
+/* Find the lowest X value at any selected pixel, and find the max and \
+   min Y value of the selected pixels at that lowest X value. */ \
+      FindBoxEdge##Oper##X( value, array, xdim, ydim, 0, 1, &xlo, &xloymax,  \
+                            &xloymin, status ); \
+\
+/* Find the highest X value at any selected pixel, and find the max and \
+   min Y value of the selected pixels at that highest X value. */ \
+      FindBoxEdge##Oper##X( value, array, xdim, ydim, 0, 0, &xhi, &xhiymax,  \
+                            &xhiymin, status ); \
+\
+/* Create a list of vertices for the bottom right corner of the bounding \
+   box of the selected pixels. */ \
+      PartHull##Oper##X( value, array, xdim, ydim, yloxmax, ylo, xhi, xhiymin, \
+                         starpix, lbnd, &xv1, &yv1, &nv1, status ); \
+\
+/* Create a list of vertices for the top right corner of the bounding \
+   box of the selected pixels. */ \
+      PartHull##Oper##X( value, array, xdim, ydim, xhi, xhiymax, yhixmax, yhi, \
+                         starpix, lbnd, &xv2, &yv2, &nv2, status ); \
+\
+/* Create a list of vertices for the top left corner of the bounding \
+   box of the selected pixels. */ \
+      PartHull##Oper##X( value, array, xdim, ydim, yhixmin, yhi, xlo, xloymax, \
+                         starpix, lbnd, &xv3, &yv3, &nv3, status ); \
+\
+/* Create a list of vertices for the bottom left corner of the bounding \
+   box of the selected pixels. */ \
+      PartHull##Oper##X( value, array, xdim, ydim, xlo, xloymin, yloxmin, ylo, \
+                         starpix, lbnd, &xv4, &yv4, &nv4, status ); \
+\
+/* Concatenate the four vertex lists and store them in the returned \
+   PointSet. */ \
+      result = astPointSet( nv1 + nv2 + nv3 + nv4, 2, " ", status ); \
+      ptr = astGetPoints( result ); \
+      if( astOK ) { \
+         xvert = ptr[ 0 ]; \
+         yvert = ptr[ 1 ]; \
+\
+         memcpy( xvert, xv1, nv1*sizeof( double ) ); \
+         memcpy( yvert, yv1, nv1*sizeof( double ) ); \
+         xvert += nv1; \
+         yvert += nv1; \
+\
+         memcpy( xvert, xv2, nv2*sizeof( double ) ); \
+         memcpy( yvert, yv2, nv2*sizeof( double ) ); \
+         xvert += nv2; \
+         yvert += nv2; \
+\
+         memcpy( xvert, xv3, nv3*sizeof( double ) ); \
+         memcpy( yvert, yv3, nv3*sizeof( double ) ); \
+         xvert += nv3; \
+         yvert += nv3; \
+\
+         memcpy( xvert, xv4, nv4*sizeof( double ) ); \
+         memcpy( yvert, yv4, nv4*sizeof( double ) ); \
+      } \
+\
+/* Free resources. */ \
+      xv1 = astFree( xv1 ); \
+      xv2 = astFree( xv2 ); \
+      xv3 = astFree( xv3 ); \
+      xv4 = astFree( xv4 ); \
+      yv1 = astFree( yv1 ); \
+      yv2 = astFree( yv2 ); \
+      yv3 = astFree( yv3 ); \
+      yv4 = astFree( yv4 ); \
+   } \
+\
+/* Free the returned PointSet if an error occurred. */ \
+   if( result && !astOK ) result = astAnnul( result ); \
+\
+/* Return the result. */ \
+   return result; \
+}
+
+/* Define a macro that uses the above macro to to create implementations
+   of ConvexHull for all operations. */
+#define MAKEALL_CONVEXHULL(X,Xtype) \
+MAKE_CONVEXHULL(X,Xtype,LT,AST__LT) \
+MAKE_CONVEXHULL(X,Xtype,LE,AST__LE) \
+MAKE_CONVEXHULL(X,Xtype,EQ,AST__EQ) \
+MAKE_CONVEXHULL(X,Xtype,NE,AST__NE) \
+MAKE_CONVEXHULL(X,Xtype,GE,AST__GE) \
+MAKE_CONVEXHULL(X,Xtype,GT,AST__GT)
+
+/* Expand the above macro to generate a function for each required
+   data type and operation. */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
+MAKEALL_CONVEXHULL(LD,long double)
+#endif
+MAKEALL_CONVEXHULL(D,double)
+MAKEALL_CONVEXHULL(L,long int)
+MAKEALL_CONVEXHULL(UL,unsigned long int)
+MAKEALL_CONVEXHULL(I,int)
+MAKEALL_CONVEXHULL(UI,unsigned int)
+MAKEALL_CONVEXHULL(S,short int)
+MAKEALL_CONVEXHULL(US,unsigned short int)
+MAKEALL_CONVEXHULL(B,signed char)
+MAKEALL_CONVEXHULL(UB,unsigned char)
+MAKEALL_CONVEXHULL(F,float)
+
+/* Undefine the macros. */
+#undef MAKE_CONVEXHULL
+#undef MAKEALL_CONVEXHULL
 
 static AstPolygon *Downsize( AstPolygon *this, double maxerr, int maxvert,
                              int *status ) {
@@ -1081,6 +1799,200 @@ static void EnsureInside( AstPolygon *this, int *status ){
       this->stale = 1;
    }
 }
+
+/*
+*  Name:
+*     FindBoxEdge
+
+*  Purpose:
+*     Find an edge of the bounding box containing the selected pixels.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "polygon.h"
+*     void FindBoxEdge<Oper><X>( <Xtype> value, const <Xtype> array[],
+*                                int xdim, int ydim, int axis, int low,
+*                                int *val, int *valmax, int *valmin,
+*                                int *status )
+
+*  Class Membership:
+*     Polygon member function
+
+*  Description:
+*     This function search for an edge of the bounding box containing the
+*     selected pixels in the supplied array.
+
+*  Parameters:
+*     value
+*        A data value that specifies the pixels to be selected.
+*     array
+*        Pointer to a 2-dimensional array containing the data to be
+*        processed. The numerical type of this array should match the 1-
+*        or 2-character type code appended to the function name.
+*     xdim
+*        The number of pixels along each row of the array.
+*     ydim
+*        The number of rows in the array.
+*     axis
+*        The index (0 or 1) of the pixel axis perpendicular to the edge of the
+*        bounding box being found.
+*     low
+*        If non-zero, the lower edge of the bounding box on the axis
+*        specified by "axis" is found and returned. Otherwise, the higher
+*        edge of the bounding box on the axis specified by "axis" is
+*        found and returned.
+*     val
+*        Address of an int in which to return the value on axis "axis" of
+*        the higher or lower (as specified by "low") edge of the bounding
+*        box.
+*     valmax
+*        Address of an int in which to return the highest value on axis
+*        "1-axis" of the selected pixels on the returned edge.
+*     valmin
+*        Address of an int in which to return the lowest value on axis
+*        "1-axis" of the selected pixels on the returned edge.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Notes;
+*     - Zero is returned for "*val" if no good  values are found, or if
+*     an error occurs.
+
+*/
+
+/* Define a macro to implement the function for a specific data
+   type and operation. */
+#define MAKE_FINDBOXEDGE(X,Xtype,Oper,OperI) \
+static void FindBoxEdge##Oper##X( Xtype value, const Xtype array[], int xdim, \
+                                  int ydim, int axis, int low, int *val, \
+                                  int *valmax, int *valmin, int *status ) { \
+\
+/* Local Variables: */ \
+   int astep; \
+   int bstep; \
+   int a0; \
+   int a1; \
+   int b0; \
+   int b1; \
+   int inc; \
+   int a; \
+   int b; \
+   const Xtype *pc; \
+\
+/* Initialise. */ \
+   *val = 0; \
+   *valmin = 0; \
+   *valmax = 0; \
+\
+/* Check the global error status. */ \
+   if ( !astOK ) return; \
+\
+/* If we are finding an edge that is parallel to the X axis... */ \
+   if(  axis ) { \
+\
+/* Get the vector step between adjacent pixels on the selected axis, and \
+   on the other axis. */ \
+      astep = xdim; \
+      bstep = 1; \
+\
+/* Get the first and last value to check on the selected axis, and the  \
+   increment between checks. */ \
+      if( low ) { \
+         a0 = 1; \
+         a1 = ydim; \
+         inc = 1; \
+      } else { \
+         a0 = ydim; \
+         a1 = 1; \
+         inc = -1; \
+      } \
+\
+/* The first and last value to check on the other axis. */ \
+      b0 = 1; \
+      b1 = xdim; \
+\
+/* Do the same if we are finding an edge that is parallel to the Y axis. */ \
+   } else {  \
+      astep = 1; \
+      bstep = xdim; \
+\
+      if( low ) { \
+         a0 = 1; \
+         a1 = xdim; \
+         inc = 1; \
+      } else { \
+         a0 = xdim; \
+         a1 = 1; \
+         inc = -1; \
+      } \
+\
+      b0 = 1; \
+      b1 = ydim; \
+   }  \
+\
+/* Loop round the axis values. */ \
+   a = a0; \
+   while( 1 ) { \
+\
+/* Get a pointer to the first value to be checked at this axis value. */ \
+      pc = array + (a - 1)*astep + (b0 - 1)*bstep; \
+\
+/* Scan the other axis to find the first and last selected pixel. */ \
+      for( b = b0; b <= b1; b++ ) { \
+         if( ISVALID(*pc,OperI,value) ) {  \
+            if( *valmin == 0 ) *valmin = b; \
+            *valmax = b; \
+         } \
+         pc += bstep; \
+      } \
+\
+/* If any selected pixels were found, store the axis value and exit. */ \
+      if( *valmax ) { \
+         *val = a; \
+         break; \
+      } \
+\
+/* Move on to the next axis value. */ \
+      if( a != a1 ) { \
+         a += inc; \
+      } else { \
+         break; \
+      } \
+\
+   } \
+}
+
+/* Define a macro that uses the above macro to to create implementations
+   of FindBoxEdge for all operations. */
+#define MAKEALL_FINDBOXEDGE(X,Xtype) \
+MAKE_FINDBOXEDGE(X,Xtype,LT,AST__LT) \
+MAKE_FINDBOXEDGE(X,Xtype,LE,AST__LE) \
+MAKE_FINDBOXEDGE(X,Xtype,EQ,AST__EQ) \
+MAKE_FINDBOXEDGE(X,Xtype,NE,AST__NE) \
+MAKE_FINDBOXEDGE(X,Xtype,GE,AST__GE) \
+MAKE_FINDBOXEDGE(X,Xtype,GT,AST__GT)
+
+/* Expand the above macro to generate a function for each required
+   data type and operation. */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
+MAKEALL_FINDBOXEDGE(LD,long double)
+#endif
+MAKEALL_FINDBOXEDGE(D,double)
+MAKEALL_FINDBOXEDGE(L,long int)
+MAKEALL_FINDBOXEDGE(UL,unsigned long int)
+MAKEALL_FINDBOXEDGE(I,int)
+MAKEALL_FINDBOXEDGE(UI,unsigned int)
+MAKEALL_FINDBOXEDGE(S,short int)
+MAKEALL_FINDBOXEDGE(US,unsigned short int)
+MAKEALL_FINDBOXEDGE(B,signed char)
+MAKEALL_FINDBOXEDGE(UB,unsigned char)
+MAKEALL_FINDBOXEDGE(F,float)
+
+/* Undefine the macros. */
+#undef MAKE_FINDBOXEDGE
+#undef MAKEALL_FINDBOXEDGE
 
 /*
 *  Name:
@@ -2177,10 +3089,7 @@ f        The global status.
 *  Returned Value:
 c     astOutline<X>()
 f     AST_OUTLINE<X> = INTEGER
-*        The number of pixels to which a value of
-c        "badval"
-f        BADVAL
-*        has been assigned.
+*        A pointer to the required Polygon.
 
 *  Notes:
 *     - This function proceeds by first finding a very accurate polygon,
@@ -2193,9 +3102,10 @@ f     AST_DOWNSIZE.
 *     the specified value requirement. This set of pixels may potentially
 *     include "holes" where the pixel values fail to meet the specified
 *     value requirement. Such holes will be ignored by this function.
-*     - A value of zero will be returned if this function is invoked
-*     with the global error status set, or if it should fail for any
-*     reason.
+c     - NULL
+f     - AST__NULL
+*     will be returned if this function is invoked with the global
+*     error status set, or if it should fail for any reason.
 
 *  Data Type Codes:
 *     To select the appropriate masking function, you should
@@ -2434,7 +3344,7 @@ AstPolygon *astOutline##X##_( Xtype value, int oper, const Xtype array[], \
 \
 /* If the candidate polygon is the required polygon, break out of the \
    loop. Otherwise, indicate that we want to continue moving right, \
-   across the hole, until we reach the far side of the hole (i.e. find   \
+   across the hole, until we reach the far side of the hole (i.e. find \
    the next valid pixel). */ \
             if( candidate ) { \
                break; \
@@ -2568,6 +3478,296 @@ MAKE_OUTLINE(F,float)
 
 /* Undefine the macros. */
 #undef MAKE_OUTLINE
+
+/*
+*  Name:
+*     PartHull
+
+*  Purpose:
+*     Find the convex hull enclosing selected pixels in one corner of a 2D array.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "polygon.h"
+*     void PartHull<Oper><X>( <Xtype> value, const <Xtype> array[], int xdim,
+*                             int ydim, int xs, int ys, int xe, int ye,
+*                             int starpix, const int lbnd[2], double **xvert,
+*                             double **yvert, int *nvert, int *status )
+
+*  Class Membership:
+*     Polygon member function
+
+*  Description:
+*     This function uses an algorithm similar to "Andrew's Monotone Chain
+*     Algorithm" to create a list of vertices describing one corner of the
+*     convex hull enclosing the selected pixels in the supplied array.
+*     The corner is defined to be the area of the array to the right of
+*     the line from (xs,ys) to (xe,ye).
+
+*  Parameters:
+*     value
+*        A data value that specifies the pixels to be selected.
+*     array
+*        Pointer to a 2-dimensional array containing the data to be
+*        processed. The numerical type of this array should match the 1-
+*        or 2-character type code appended to the function name.
+*     xdim
+*        The number of pixels along each row of the array.
+*     ydim
+*        The number of rows in the array.
+*     xs
+*        The X GRID index of the first pixel on the line to be checked.
+*     ys
+*        The Y GRID index of the first pixel on the line to be checked.
+*     xe
+*        The X GRID index of the last pixel on the line to be checked.
+*     ye
+*        The Y GRID index of the last pixel on the line to be checked.
+*     starpix
+*        If non-zero, the usual Starlink definition of pixel coordinate
+*        is used (integral values at pixel corners). Otherwise, the
+*        system used by other AST functions such as astResample is used
+*        (integral values at pixel centres).
+*     lbnd
+*        The lower pixel index bounds of the array.
+*     xvert
+*        Address of a pointer in which to return a pointer to the list
+*        of GRID x values on the hull.
+*     yvert
+*        Address of a pointer in which to return a pointer to the list
+*        of GRID y values on the hull.
+*     nvert
+*        Address of a pointer in which to return the number of points in
+*        the returned xvert and yvert arrays.
+*     status
+*        Pointer to the inherited status variable.
+
+*/
+
+/* Define a macro to implement the function for a specific data
+   type and operation. */
+#define MAKE_PARTHULL(X,Xtype,Oper,OperI) \
+static void PartHull##Oper##X( Xtype value, const Xtype array[], int xdim, \
+                               int ydim, int xs, int ys, int xe, int ye, \
+                               int starpix, const int lbnd[2], \
+                               double **xvert, double **yvert, int *nvert, \
+                               int *status ) { \
+\
+/* Local Variables: */ \
+   const Xtype *pc; \
+   double *pxy; \
+   double dx2; \
+   double dx1; \
+   double dy1; \
+   double dy2; \
+   double off; \
+   double xdelta; \
+   int ivert; \
+   int ix; \
+   int iy; \
+   int x0; \
+   int x1; \
+   int xl; \
+   int xlim; \
+   int xr; \
+   int yinc; \
+\
+/* Initialise */ \
+   *yvert = NULL; \
+   *xvert = NULL; \
+   *nvert = 0; \
+\
+/* Check the global error status. */ \
+   if ( !astOK ) return; \
+\
+/* If the line has zero length. just return a single vertex. */ \
+   if( xs == xe && ys == ye ) { \
+      *xvert = astMalloc( sizeof( double ) ); \
+      *yvert = astMalloc( sizeof( double ) ); \
+      if( astOK ) { \
+         if( starpix ) { \
+            (*xvert)[ 0 ] = xs + lbnd[ 0 ] - 1.5; \
+            (*yvert)[ 0 ] = ys + lbnd[ 1 ] - 1.5; \
+         } else { \
+            (*xvert)[ 0 ] = xs + lbnd[ 0 ] - 1.0; \
+            (*yvert)[ 0 ] = ys + lbnd[ 1 ] - 1.0; \
+         } \
+         *nvert = 1; \
+      } \
+      return; \
+   } \
+\
+/* Otherwise check the line is sloping. */ \
+   if( xs == xe ) { \
+      astError( AST__INTER, "astOutline(Polygon): Bounding box " \
+                "has zero width (internal AST programming error).", \
+                status ); \
+      return; \
+   } else if( ys == ye ) { \
+      astError( AST__INTER, "astOutline(Polygon): Bounding box " \
+                "has zero height (internal AST programming error).", \
+                status ); \
+      return; \
+   } \
+\
+/* Calculate the difference in length between adjacent rows of the area \
+   to be tested. */ \
+   xdelta = ((double)( xe - xs ))/((double)( ye - ys )); \
+\
+/* The left and right X limits */ \
+   if( xe > xs ) { \
+      xl = xs; \
+      xr = xe; \
+   } else { \
+      xl = xe; \
+      xr = xs; \
+   } \
+\
+/* Get the increment in row number as we move from the start to the end \
+   of the line. */ \
+   yinc = ( ye > ys ) ? 1 : -1; \
+\
+/* Loop round all rows that cross the region to be tested, from start to \
+   end of the supplied line. */ \
+   iy = ys; \
+   while( astOK ) { \
+\
+/* Get the GRID X coord where the line crosses this row. */ \
+      xlim = (int)( 0.5 + xs + xdelta*( iy - ys ) ); \
+\
+/* Get the index of the first and last columns to be tested on this row. */ \
+      if( yinc < 0 ) { \
+         x0 = xl; \
+         x1 = xlim; \
+      } else { \
+         x0 = xlim; \
+         x1 = xr; \
+      } \
+\
+/* Get a pointer to the first pixel to be tested at this row. */ \
+      pc = array + ( iy - 1 )*xdim + x0 - 1; \
+\
+/* Loop round all columns to be tested in this row. */ \
+      for( ix = x0; ix <= x1 && astOK; ix++,pc++ ) { \
+\
+/* Ignore pixels that are not selected. */ \
+         if( ISVALID(*pc,OperI,value) ) { \
+\
+/* If this is the very first pixel, initialise the hull to contain just \
+   the first pixel. */ \
+            if( *nvert == 0 ){ \
+               *xvert = astMalloc( 200*sizeof( double ) ); \
+               *yvert = astMalloc( 200*sizeof( double ) ); \
+               if( astOK ) { \
+                  (*xvert)[ 0 ] = ix; \
+                  (*yvert)[ 0 ] = iy; \
+                  *nvert = 1; \
+               } else { \
+                  break; \
+               } \
+\
+/* If the hull currently contains only one pixel, add the current pixel to \
+   the end of the hull. */ \
+            } else if( *nvert == 1 ){ \
+               (*xvert)[ 1 ] = ix; \
+               (*yvert)[ 1 ] = iy; \
+               *nvert = 2; \
+\
+/* Otherwise.... */ \
+            } else { \
+\
+/* Loop until the hull has been corrected to include the current pixel. */ \
+               while( 1 ) { \
+\
+/* Extend the line from the last-but-one pixel on the hull to the last \
+   pixel on the hull, and see if the current pixel is to the left of \
+   this line. If it is, it too is on the hull and so push it onto the end \
+   of the list of vertices. */ \
+                  dx1 = (*xvert)[ *nvert - 1 ] - (*xvert)[ *nvert - 2 ]; \
+                  dy1 = (*yvert)[ *nvert - 1 ] - (*yvert)[ *nvert - 2 ]; \
+                  dx2 = ix - (*xvert)[ *nvert - 2 ]; \
+                  dy2 = iy - (*yvert)[ *nvert - 2 ]; \
+\
+                  if( dx1*dy2 > dx2*dy1 ) { \
+                     ivert = (*nvert)++; \
+                     *xvert = astGrow( *xvert, *nvert, sizeof( double ) );  \
+                     *yvert = astGrow( *yvert, *nvert, sizeof( double ) );  \
+                     if( astOK ) {  \
+                        (*xvert)[ ivert ] = ix; \
+                        (*yvert)[ ivert ] = iy; \
+                     }  \
+\
+/* Leave the loop now that the new point is on the hull. */ \
+                     break; \
+\
+/* If the new point is to the left of the line, then the last point \
+   previously thought to be on hull is in fact not on the hull, so remove \
+   it. We then loop again to compare the new pixel with modified hull. */ \
+                  } else { \
+                     (*nvert)--; \
+                  } \
+               } \
+            } \
+         } \
+      } \
+\
+      if( iy == ye ) { \
+         break; \
+      } else { \
+         iy += yinc; \
+      } \
+\
+   } \
+\
+/* Convert GRID coords to PIXEL coords. */ \
+   if( astOK ) { \
+      pxy = *xvert; \
+      off = starpix ? lbnd[ 0 ] - 1.5 : lbnd[ 0 ] - 1.0; \
+      for( ivert = 0; ivert < *nvert; ivert++ ) *(pxy++) += off; \
+\
+      pxy = *yvert; \
+      off = starpix ? lbnd[ 1 ] - 1.5 : lbnd[ 1 ] - 1.0; \
+      for( ivert = 0; ivert < *nvert; ivert++ ) *(pxy++) += off; \
+\
+/* Free lists if an error has occurred. */ \
+   } else { \
+      *xvert = astFree( *xvert ); \
+      *yvert = astFree( *yvert ); \
+      *nvert = 0; \
+   } \
+}
+
+/* Define a macro that uses the above macro to to create implementations
+   of PartHull for all operations. */
+#define MAKEALL_PARTHULL(X,Xtype) \
+MAKE_PARTHULL(X,Xtype,LT,AST__LT) \
+MAKE_PARTHULL(X,Xtype,LE,AST__LE) \
+MAKE_PARTHULL(X,Xtype,EQ,AST__EQ) \
+MAKE_PARTHULL(X,Xtype,NE,AST__NE) \
+MAKE_PARTHULL(X,Xtype,GE,AST__GE) \
+MAKE_PARTHULL(X,Xtype,GT,AST__GT)
+
+/* Expand the above macro to generate a function for each required
+   data type and operation. */
+#if HAVE_LONG_DOUBLE     /* Not normally implemented */
+MAKEALL_PARTHULL(LD,long double)
+#endif
+MAKEALL_PARTHULL(D,double)
+MAKEALL_PARTHULL(L,long int)
+MAKEALL_PARTHULL(UL,unsigned long int)
+MAKEALL_PARTHULL(I,int)
+MAKEALL_PARTHULL(UI,unsigned int)
+MAKEALL_PARTHULL(S,short int)
+MAKEALL_PARTHULL(US,unsigned short int)
+MAKEALL_PARTHULL(B,signed char)
+MAKEALL_PARTHULL(UB,unsigned char)
+MAKEALL_PARTHULL(F,float)
+
+/* Undefine the macros. */
+#undef MAKE_PARTHULL
+#undef MAKEALL_PARTHULL
 
 static double Polywidth( AstFrame *frm, AstLineDef **edges, int i, int nv,
                          double cen[ 2 ], int *status ){
@@ -4425,23 +5625,6 @@ static AstPointSet *TraceEdge##Oper##X( Xtype value, const Xtype array[], \
    return result; \
 }
 
-/* Define a macro for testing if a pixel value <V> satisfies the requirements
-   specified by <Oper> and <Value>. Compiler optimisation should remove
-   all the "if" testing from this expression. */
-#define ISVALID(V,OperI,Value) ( \
-   ( OperI == AST__LT ) ? ( (V) < Value ) : ( \
-      ( OperI == AST__LE ) ? ( (V) <= Value ) : ( \
-         ( OperI == AST__EQ ) ? ( (V) == Value ) : ( \
-            ( OperI == AST__GE ) ? ( (V) >= Value ) : ( \
-               ( OperI == AST__NE ) ? ( (V) != Value ) : ( \
-                  (V) > Value \
-               ) \
-            ) \
-         ) \
-      ) \
-   ) \
-)
-
 /* Define a macro to add a vertex position to dynamically allocated
    arrays of X and Y positions. */
 #define ADD(X,Y) {\
@@ -4483,7 +5666,6 @@ MAKEALL_TRACEEDGE(F,float)
 /* Undefine the macros. */
 #undef MAKE_TRACEEDGE
 #undef MAKEALL_TRACEEDGE
-#undef ISVALID
 
 static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
                                int forward, AstPointSet *out, int *status ) {
