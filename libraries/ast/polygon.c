@@ -922,6 +922,7 @@ AstPolygon *astConvex##X##_( Xtype value, int oper, const Xtype array[], \
    AstPointSet *candidate;   /* Candidate polygon vertices */ \
    AstPointSet *pset;        /* PointSet holding downsized polygon vertices */ \
    AstPolygon *result;       /* Result value to return */ \
+   double **ptr;             /* PointSet data pointers */ \
    int boxsize;              /* Half width of smoothign box in vertices */ \
    int nv0;                  /* Number of vertices in accurate outline */ \
    int tmp;                  /* Alternative boxsize */ \
@@ -1009,9 +1010,16 @@ AstPolygon *astConvex##X##_( Xtype value, int oper, const Xtype array[], \
 /* Change the PointSet within the Polygon to the one created above. */ \
       SetPointSet( result, pset, status ); \
 \
-/* Free resources. */ \
+/* Free resources. Note, we need to free the arrays within the candidate \
+   PointSet explicitly, since they were not created as part of the \
+   construction of the PointSet (see ConvexHull). */ \
       pset = astAnnul( pset ); \
       frm = astAnnul( frm ); \
+      ptr = astGetPoints( candidate ); \
+      if( astOK ) { \
+         astFree( ptr[ 0 ] ); \
+         astFree( ptr[ 1 ] ); \
+      } \
       candidate = astAnnul( candidate ); \
    } \
 \
@@ -1107,7 +1115,7 @@ static AstPointSet *ConvexHull##Oper##X( Xtype value, const Xtype array[], \
 \
 /* Local Variables: */ \
    AstPointSet *result; \
-   double **ptr; \
+   double *ptr[2]; \
    double *xv1; \
    double *xv2; \
    double *xv3; \
@@ -1118,6 +1126,7 @@ static AstPointSet *ConvexHull##Oper##X( Xtype value, const Xtype array[], \
    double *yv3; \
    double *yv4; \
    double *yvert; \
+   int nv; \
    int nv1; \
    int nv2; \
    int nv3; \
@@ -1186,11 +1195,14 @@ static AstPointSet *ConvexHull##Oper##X( Xtype value, const Xtype array[], \
 \
 /* Concatenate the four vertex lists and store them in the returned \
    PointSet. */ \
-      result = astPointSet( nv1 + nv2 + nv3 + nv4, 2, " ", status ); \
-      ptr = astGetPoints( result ); \
+      nv =  nv1 + nv2 + nv3 + nv4; \
+      result = astPointSet( nv, 2, " ", status ); \
+      xvert = astMalloc( nv*sizeof( double ) ); \
+      yvert = astMalloc( nv*sizeof( double ) ); \
       if( astOK ) { \
-         xvert = ptr[ 0 ]; \
-         yvert = ptr[ 1 ]; \
+         ptr[ 0 ] = xvert; \
+         ptr[ 1 ] = yvert; \
+         astSetPoints( result, ptr ); \
 \
          memcpy( xvert, xv1, nv1*sizeof( double ) ); \
          memcpy( yvert, yv1, nv1*sizeof( double ) ); \
@@ -3668,45 +3680,50 @@ static void PartHull##Oper##X( Xtype value, const Xtype array[], int xdim, \
                   break; \
                } \
 \
-/* If the hull currently contains only one pixel, add the current pixel to \
-   the end of the hull. */ \
-            } else if( *nvert == 1 ){ \
-               (*xvert)[ 1 ] = ix; \
-               (*yvert)[ 1 ] = iy; \
-               *nvert = 2; \
-\
 /* Otherwise.... */ \
             } else { \
 \
 /* Loop until the hull has been corrected to include the current pixel. */ \
                while( 1 ) { \
 \
+/* If the hull currently contains only one pixel, add the current pixel to \
+   the end of the hull. */ \
+                  if( *nvert == 1 ){ \
+                     (*xvert)[ 1 ] = ix; \
+                     (*yvert)[ 1 ] = iy; \
+                     *nvert = 2; \
+                     break; \
+\
+/* Otherwise... */ \
+                  } else { \
+\
 /* Extend the line from the last-but-one pixel on the hull to the last \
    pixel on the hull, and see if the current pixel is to the left of \
    this line. If it is, it too is on the hull and so push it onto the end \
    of the list of vertices. */ \
-                  dx1 = (*xvert)[ *nvert - 1 ] - (*xvert)[ *nvert - 2 ]; \
-                  dy1 = (*yvert)[ *nvert - 1 ] - (*yvert)[ *nvert - 2 ]; \
-                  dx2 = ix - (*xvert)[ *nvert - 2 ]; \
-                  dy2 = iy - (*yvert)[ *nvert - 2 ]; \
+                     dx1 = (*xvert)[ *nvert - 1 ] - (*xvert)[ *nvert - 2 ]; \
+                     dy1 = (*yvert)[ *nvert - 1 ] - (*yvert)[ *nvert - 2 ]; \
+                     dx2 = ix - (*xvert)[ *nvert - 2 ]; \
+                     dy2 = iy - (*yvert)[ *nvert - 2 ]; \
 \
-                  if( dx1*dy2 > dx2*dy1 ) { \
-                     ivert = (*nvert)++; \
-                     *xvert = astGrow( *xvert, *nvert, sizeof( double ) );  \
-                     *yvert = astGrow( *yvert, *nvert, sizeof( double ) );  \
-                     if( astOK ) {  \
-                        (*xvert)[ ivert ] = ix; \
-                        (*yvert)[ ivert ] = iy; \
-                     }  \
+                     if( dx1*dy2 > dx2*dy1 ) { \
+                        ivert = (*nvert)++; \
+                        *xvert = astGrow( *xvert, *nvert, sizeof( double ) );  \
+                        *yvert = astGrow( *yvert, *nvert, sizeof( double ) );  \
+                        if( astOK ) {  \
+                           (*xvert)[ ivert ] = ix; \
+                           (*yvert)[ ivert ] = iy; \
+                        }  \
 \
 /* Leave the loop now that the new point is on the hull. */ \
-                     break; \
+                        break; \
 \
 /* If the new point is to the left of the line, then the last point \
    previously thought to be on hull is in fact not on the hull, so remove \
    it. We then loop again to compare the new pixel with modified hull. */ \
-                  } else { \
-                     (*nvert)--; \
+                     } else { \
+                        (*nvert)--; \
+                     } \
                   } \
                } \
             } \
