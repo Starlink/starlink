@@ -102,7 +102,6 @@ void kpgPutOutline( int indf, float wlim, int convex, int *status ){
 
 
 /* Local Variables: */
-   AstCircle *unc;
    AstFrame *frm2d;
    AstFrameSet *wcs;
    AstMapping *map2d;
@@ -114,7 +113,6 @@ void kpgPutOutline( int indf, float wlim, int convex, int *status ){
    char xtype[10];
    const double *data;
    const double *p0;
-   double centre[ 2 ];
    double radius;
    int *data_2d = NULL;
    int *p1;
@@ -251,18 +249,8 @@ void kpgPutOutline( int indf, float wlim, int convex, int *status ){
                  "data in '^N' because no good values were found.", status );
       }
 
-/* Assign some uncertainty in each vertex position. Without this fuzzyness,
-   the conversion from AST to STC-S fails because the polygon is defined
-   in pixel coordinates and is distorted too much by conversion to sky
-   coordinates. */
-   } else {
-      centre[ 0 ] = 0.0;
-      centre[ 1 ] = 0.0;
-      radius = ACC;
-      astSetUnc( poly, astCircle( astFrame( 2, "Domain=PIXEL" ), 1, centre,
-                                  &radius, NULL, " " ) );
-
 /* Map the above polygon from GRID coords into the current WCS Frame. */
+   } else {
       region = astMapRegion( poly, map2d, frm2d );
 
 /* Create an StcsChan that can be used to convert the AST Region into an
