@@ -330,6 +330,9 @@ f     - AST_SKYOFFSETMAP: Obtain a Mapping from absolute to offset coordinates
 *        access to the table of cached LAST values. This bug could
 *        cause occasional problems where an AST pointer would became
 *        invalid for no apparent reason.
+*     21-FEB-2014 (DSB):
+*        Rounding errors in the SkyLineDef constructor could result in the line 
+*        between coincident points being given a non-zero length.
 *class--
 */
 
@@ -5421,7 +5424,9 @@ static AstLineDef *LineDef( AstFrame *this, const double start[2],
 /* Local Variables: */
    SkyLineDef *result;           /* Returned value */
    const int *perm;              /* Axis permutation array */
+   double le;                    /* Length of end vector */
    double len;                   /* Permuted point1 coordinates */
+   double ls;                    /* Length of start vector */
    double p1[ 2 ];               /* Permuted point1 coordinates */
    double p2[ 2 ];               /* Permuted point2 coordinates */
    double temp[3];               /* Cartesian coords at offset position */
@@ -5456,8 +5461,16 @@ static AstLineDef *LineDef( AstFrame *this, const double start[2],
          palDcs2c( p2[ 0 ], p2[ 1 ], result->end );
 
 /* Calculate the great circle distance between the points in radians and
-   store in the result structure. */
-         result->length = acos( palDvdv( result->start, result->end ) );
+   store in the result structure. Correct for rounding errors in palDcs2c
+   that can result in the vectors not having exactly unit length. */
+         result->length = palDvdv( result->start, result->end );
+         ls = result->start[0]*result->start[0] +
+              result->start[1]*result->start[1] +
+              result->start[2]*result->start[2];
+         le = result->end[0]*result->end[0] +
+              result->end[1]*result->end[1] +
+              result->end[2]*result->end[2];
+         result->length = acos( result->length/sqrt( ls*le ) );
 
 /* Find a unit vector representing the pole of the system in which the
    equator is given by the great circle. This is such that going the
@@ -5484,15 +5497,15 @@ static AstLineDef *LineDef( AstFrame *this, const double start[2],
    end points. */
          result->infinite = 0;
 
+/* Normalise the spherical start and end positions stored in the returned
+   structure. */
+         result->start_2d[ 0 ] = start[ 0 ];
+         result->start_2d[ 1 ] = start[ 1 ];
+         result->end_2d[ 0 ] = end[ 0 ];
+         result->end_2d[ 1 ] = end[ 1 ];
 
-   result->start_2d[ 0 ] = start[ 0 ];
-   result->start_2d[ 1 ] = start[ 1 ];
-   result->end_2d[ 0 ] = end[ 0 ];
-   result->end_2d[ 1 ] = end[ 1 ];
-
-   astNorm( this, result->start_2d );
-   astNorm( this, result->end_2d );
-
+         astNorm( this, result->start_2d );
+         astNorm( this, result->end_2d );
       }
    }
 
