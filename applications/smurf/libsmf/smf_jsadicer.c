@@ -51,7 +51,8 @@
 *     already gridded on the JSA all-sky pixel grid.
 *
 *     A new output NDF is generated for each tile touched by the supplied
-*     NDF.
+*     NDF. An STC-S polygon is created describing the spatial outline of
+*     the good data values in the NDF, and stored in NDF extension OUTLINE.
 *
 *     The zero-based indicies of the created tiles are written to an output
 *     paramater called "JSATILELIST".
@@ -75,6 +76,10 @@
 *     20-FEB-2014 (DSB):
 *        Changed to add a bounding STC-S polygon to each tile NDF. The
 *        polygon is stored in extension "OUTLINE" of each NDF.
+*     25-FEB-2014 (DSB):
+*        The polygon stored in the OUTLINE extension of each NDF is 
+*        now a convex hull rather than a true outline. This is better
+*        for ACSIS data which can have muiple blobs of good data.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -516,9 +521,9 @@ void smf_jsadicer( int indf, const char *base, int trim,
       kpgPtfts( indfo, fc, status );
       fc = astAnnul( fc );
 
-/* Now store an STC-S polygon that describes the boundary of the good
-   data in the output NDF, and store it as an NDF extension. */
-      kpgPutOutline( indfo, 0.5, status );
+/* Now store an STC-S polygon that describes the shortest boundary
+   enclosing the good data in the output NDF, and store it as an NDF extension. */
+      kpgPutOutline( indfo, 0.5, 1, status );
 
 /* We now reshape any extension NDFs contained within the output NDF to
    have the same spatial bounds as the main NDF (but only for extension

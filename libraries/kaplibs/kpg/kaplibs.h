@@ -168,7 +168,7 @@ void kpg1Opgrd( int, const double[], int, double *, double *, int * );
 
 void kpg1Pseed( int * );
 int kpgPtfts( int, const AstFitsChan * fchan, int * status );
-void kpgPutOutline( int, float, int * );
+void kpgPutOutline( int, float, int, int * );
 void kpg1Pxscl( AstFrameSet *, const double *, double *, int * );
 
 void kpg1Rgndf( const char *, size_t, size_t, const char *, Grp **, size_t *, int * );

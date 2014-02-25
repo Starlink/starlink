@@ -20,7 +20,7 @@ static void mysink( const char *line );
 /* The required accuracy of the outline, in pixels. */
 #define ACC 3.0
 
-void kpgPutOutline( int indf, float wlim, int *status ){
+void kpgPutOutline( int indf, float wlim, int convex, int *status ){
 /*
 *+
 *  Name:
@@ -36,7 +36,7 @@ void kpgPutOutline( int indf, float wlim, int *status ){
 *     SMURF subroutine
 
 *  Invocation:
-*     void kpgPutOutline( int indf, float wlim, int *status )
+*     void kpgPutOutline( int indf, float wlim, int convex, int *status )
 
 *  Arguments:
 *     indf = int (Given)
@@ -47,6 +47,14 @@ void kpgPutOutline( int indf, float wlim, int *status ){
 *        Minimum fraction of good values per pixel required when
 *        collapsing a 3D NDF. Ignored if the NDF has only two significant
 *        pixel axes.
+*     convex = int (Given)
+*        Indicates the nature of the polygon. If zero, the polygon will
+*        be a simple outline that hugs the edges of the good pixels. If
+*        the NDF contains multiple dis-contiguous regions of good pixels,
+*        the outline will be of a randomly selected contiguous clump of
+*        good pixels. If "convex" is non-zero, the polygon will be the
+*        shortest polygon that encloses all good pixels in the NDF. Such
+*        a polygon will not in general hug the edges of the good pixels.
 *     status = int * (Given and Returned)
 *        Pointer to global status.
 
@@ -203,12 +211,16 @@ void kpgPutOutline( int indf, float wlim, int *status ){
          lbnd[ 1 ] = 1;
          ubnd[ 0 ] = dims[ 0 ];
          ubnd[ 1 ] = dims[ 1 ];
-         inside[ 0 ] = -1;
-         inside[ 1 ] = -1;
          lim = (int) ( 0.5 + wlim*dims[ 2 ] );
          if( lim == 0 ) lim = 1;
-         poly = astOutlineI( lim, AST__GE, data_2d, lbnd, ubnd, ACC,
-                             500, inside, 0 );
+         if( convex ) {
+            poly = astConvexI( lim, AST__GE, data_2d, lbnd, ubnd, 0 );
+         } else {
+            inside[ 0 ] = -1;
+            inside[ 1 ] = -1;
+            poly = astOutlineI( lim, AST__GE, data_2d, lbnd, ubnd, ACC,
+                                500, inside, 0 );
+         }
 
 /* Clear up. */
          data_2d= astFree( data_2d );
@@ -220,60 +232,75 @@ void kpgPutOutline( int indf, float wlim, int *status ){
       lbnd[ 1 ] = 1;
       ubnd[ 0 ] = dims[ 0 ];
       ubnd[ 1 ] = dims[ 1 ];
-      inside[ 0 ] = -1;
-      inside[ 1 ] = -1;
-      poly = astOutlineD( VAL__BADD, AST__NE, data, lbnd, ubnd, ACC,
-                          500, inside, 0 );
+      if( convex ) {
+         poly = astConvexD( VAL__BADD, AST__NE, data, lbnd, ubnd, 0 );
+      } else {
+         inside[ 0 ] = -1;
+         inside[ 1 ] = -1;
+         poly = astOutlineD( VAL__BADD, AST__NE, data, lbnd, ubnd, ACC,
+                             500, inside, 0 );
+      }
    }
+
+/* Report an error if no polygon was created. */
+   if( ! poly ) {
+      if( *status == SAI__OK ) {
+         *status = SAI__ERROR;
+         ndfMsg( "N", indf );
+         errRep( "", "kpgPutOutline: Cannot create a polygon outlining the good "
+                 "data in '^N' because no good values were found.", status );
+      }
 
 /* Assign some uncertainty in each vertex position. Without this fuzzyness,
    the conversion from AST to STC-S fails because the polygon is defined
    in pixel coordinates and is distorted too much by conversion to sky
    coordinates. */
-   centre[ 0 ] = 0.0;
-   centre[ 1 ] = 0.0;
-   radius = ACC;
-   astSetUnc( poly, astCircle( astFrame( 2, "Domain=PIXEL" ), 1, centre,
-                               &radius, NULL, " " ) );
+   } else {
+      centre[ 0 ] = 0.0;
+      centre[ 1 ] = 0.0;
+      radius = ACC;
+      astSetUnc( poly, astCircle( astFrame( 2, "Domain=PIXEL" ), 1, centre,
+                                  &radius, NULL, " " ) );
 
 /* Map the above polygon from GRID coords into the current WCS Frame. */
-   region = astMapRegion( poly, map2d, frm2d );
+      region = astMapRegion( poly, map2d, frm2d );
 
 /* Create an StcsChan that can be used to convert the AST Region into an
    STC-S polygon description. It is split into strings of up to 80
    characters. */
-   text = NULL;
-   nc = 0;
-   chan = astStcsChan( NULL, mysink, "indent=1,StcsLength=80" );
+      text = NULL;
+      nc = 0;
+      chan = astStcsChan( NULL, mysink, "indent=1,StcsLength=80" );
 
 /* Do the conversion. */
-   if( astWrite( chan, region ) == 0 && *status == SAI__OK ) {
-      *status = SAI__ERROR;
-      ndfMsg( "N", indf );
-      errRep( "", "kpgPutOutline: Cannot create a polygon outlining the good "
-              "data in '^N' because the polygon could not be converted "
-              "to STC-S format.", status );
-   }
+      if( astWrite( chan, region ) == 0 && *status == SAI__OK ) {
+         *status = SAI__ERROR;
+         ndfMsg( "N", indf );
+         errRep( "", "kpgPutOutline: Cannot create a polygon outlining the good "
+                 "data in '^N' because the polygon could not be converted "
+                 "to STC-S format.", status );
+      }
 
 /* Create an NDF extension to hold the STC-S polygon, deleting any
    pre-existing extension first. */
-   ndfXstat( indf, XNAME, &there, status );
-   if( there ) ndfXdel( indf, XNAME, status );
-   sprintf( xtype, "_CHAR*%d", maxlinelen );
-   ndfXnew( indf, XNAME, xtype, 1, &nc, &xloc, status );
+      ndfXstat( indf, XNAME, &there, status );
+      if( there ) ndfXdel( indf, XNAME, status );
+      sprintf( xtype, "_CHAR*%d", maxlinelen );
+      ndfXnew( indf, XNAME, xtype, 1, &nc, &xloc, status );
 
 /* Copy the strings into the extension, freeing the memory at the same time. */
-   for( i = 1; i <= nc; i++ ) {
-      datCell( xloc, 1, &i, &cloc, status );
-      datPut0C( cloc, text[ i - 1 ], status );
-      text[ i - 1 ] = astFree( text[ i - 1 ] );
-      datAnnul( &cloc, status );
-   }
+      for( i = 1; i <= nc; i++ ) {
+         datCell( xloc, 1, &i, &cloc, status );
+         datPut0C( cloc, text[ i - 1 ], status );
+         text[ i - 1 ] = astFree( text[ i - 1 ] );
+         datAnnul( &cloc, status );
+      }
 
 /* Free resources. */
-   datAnnul( &xloc, status );
+      datAnnul( &xloc, status );
+      text = astFree( text );
+   }
    ndfUnmap( indf, "*", status );
-   text = astFree( text );
 
 /* End the AST context. */
    astBegin;
