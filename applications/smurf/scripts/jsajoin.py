@@ -364,6 +364,9 @@ try:
    jsa_montage = NDG(1)
    invoke( "$KAPPA_DIR/ndfcopy in={0} out={1} trimbad".format(temp,jsa_montage) )
 
+#  Erase any outline polygon from the montage since it will be incorrect.
+   invoke( "$KAPPA_DIR/erase {0}.more.outline ok".format(jsa_montage) )
+
 #  Get the nominal pixel size of the montage.
    invoke( "$KAPPA_DIR/ndftrace {0} quiet".format(jsa_montage) )
    pixsize1 = float( starutil.get_task_par( "FPIXSCALE(1)", "ndftrace" ) )
