@@ -1716,24 +1716,6 @@ iraf! {
             helpkey *
          }
 
-         parameter maxerr {
-            position 4
-            type _DOUBLE
-            prompt {The maximum allowed positional error in the polygon}
-            ppath CURRENT DEFAULT
-            default 0.0
-            helpkey *
-         }
-
-         parameter maxvert {
-            position 5
-            type _INTEGER
-            prompt {The maximum number of vertices in the polygon}
-            ppath CURRENT DEFAULT
-            default 10
-            helpkey *
-         }
-
          parameter nvert {
             type _INTEGER
             access WRITE
@@ -1752,7 +1734,7 @@ iraf! {
           }
 
          parameter result {
-            position 6
+            position 4
             type LITERAL
             prompt {Name of file in which to store the Polygon}
             helpkey *

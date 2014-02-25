@@ -678,10 +678,8 @@ f     AST_CONVEX<X>
 *  Synopsis:
 c     #include "polygon.h"
 c     AstPolygon *astConvex<X>( <Xtype> value, int oper, const <Xtype> array[],
-c                                const int lbnd[2], const int ubnd[2], double maxerr,
-c                                int maxvert, int starpix )
-f     RESULT = AST_CONVEX<X>( VALUE, OPER, ARRAY, LBND, UBND, MAXERR,
-f                              MAXVERT, STARPIX, STATUS )
+c                                const int lbnd[2], const int ubnd[2], int starpix )
+f     RESULT = AST_CONVEX<X>( VALUE, OPER, ARRAY, LBND, UBND, STARPIX, STATUS )
 
 *  Class Membership:
 *     Polygon method.
@@ -699,14 +697,6 @@ f                              MAXVERT, STARPIX, STATUS )
 *     is determined by parameter
 c     "starpix".
 f     STARPIX.
-*
-*     The
-c     "maxerr" and "maxvert"
-f     MAXERR and MAXVERT
-*     parameters can be used to control how accurately the returned
-*     Polygon represents the required region in the data array. The
-*     number of vertices in the returned Polygon will be the minimum
-*     needed to achieve the required accuracy.
 *
 *     You should use a function which matches the numerical type of the
 *     data you are processing by replacing <X> in the generic function
@@ -785,49 +775,6 @@ f        (J'th) dimension being UBND(J)-LBND(J)+1. They also define
 *        at its centre or upper corner, as selected by parameter
 c        "starpix".
 f        STARPIX.
-c     maxerr
-f     MAXERR = DOUBLE PRECISION (Given)
-*        Together with
-c        "maxvert",
-f        MAXVERT,
-*        this determines how accurately the returned Polygon represents
-*        the required region of the data array. It gives the target
-*        discrepancy between the returned Polygon and the accurate outline
-*        in the data array, expressed as a number of pixels. Insignificant
-*        vertices are removed from the accurate outline, one by one, until
-*        the number of vertices remaining in the returned Polygon equals
-c        "maxvert",
-f        MAXVERT,
-*        or the largest discrepancy between the accurate outline and the
-*        returned Polygon is greater than
-c        "maxerr". If "maxerr"
-f        MAXERR. If MAXERR
-*        is zero or less, its value is ignored and the returned Polygon will
-*        have the number of vertices specified by
-c        "maxvert".
-f        MAXVERT.
-c     maxvert
-f     MAXVERT = INTEGER (Given)
-*        Together with
-c        "maxerr",
-f        MAXERR,
-*        this determines how accurately the returned Polygon represents
-*        the required region of the data array. It gives the maximum
-*        allowed number of vertices in the returned Polygon. Insignificant
-*        vertices are removed from the accurate outline, one by one, until
-*        the number of vertices remaining in the returned Polygon equals
-c        "maxvert",
-f        MAXVERT,
-*        or the largest discrepancy between the accurate outline and the
-*        returned Polygon is greater than
-c        "maxerr". If "maxvert"
-f        MAXERR. If MAXVERT
-*        is less than 3, its value is ignored and the number of vertices in
-*        the returned Polygon will be the minimum needed to ensure that the
-*        discrepancy between the accurate outline and the returned
-*        Polygon is less than
-c        "maxerr".
-f        MAXERR.
 c     starpix
 f     STARPIX = LOGICAL (Given)
 *        A flag indicating the nature of the pixel coordinate system used
@@ -860,11 +807,6 @@ c        "value" and "oper".
 f        VALUE and OPER.
 
 *  Notes:
-*     - This function proceeds by first finding a very accurate polygon,
-*     and then removing insignificant vertices from this fine polygon
-*     using
-c     astDownsize.
-f     AST_DOWNSIZE.
 c     - NULL
 f     - AST__NULL
 *     will be returned if this function is invoked with the global
@@ -914,18 +856,13 @@ f     only in the Fortran interface to AST).
    table is available. */
 #define MAKE_CONVEX(X,Xtype) \
 AstPolygon *astConvex##X##_( Xtype value, int oper, const Xtype array[], \
-                             const int lbnd[2], const int ubnd[2], double maxerr, \
-                             int maxvert, int starpix, int *status ) { \
+                             const int lbnd[2], const int ubnd[2], \
+                             int starpix, int *status ) { \
 \
 /* Local Variables: */ \
    AstFrame *frm;            /* Frame in which to define the Polygon */ \
    AstPointSet *candidate;   /* Candidate polygon vertices */ \
-   AstPointSet *pset;        /* PointSet holding downsized polygon vertices */ \
    AstPolygon *result;       /* Result value to return */ \
-   double **ptr;             /* PointSet data pointers */ \
-   int boxsize;              /* Half width of smoothign box in vertices */ \
-   int nv0;                  /* Number of vertices in accurate outline */ \
-   int tmp;                  /* Alternative boxsize */ \
    int xdim;                 /* Number of pixels per row */ \
    int ydim;                 /* Number of rows */ \
    static double junk[ 6 ] = {0.0, 0.0, 1.0, 1.0, 0.0, 1.0 }; /* Junk poly */ \
@@ -967,59 +904,16 @@ AstPolygon *astConvex##X##_( Xtype value, int oper, const Xtype array[], \
 /* Check some good selected values were found. */ \
    if( candidate ) { \
 \
-/* If required smooth the full resolution polygon before downsizing it. */ \
-      if(  maxerr > 0.0 || maxvert > 2 ) { \
-\
-/* Initially, set the boxsize to be equal to the required accuracy. */ \
-         if( maxerr > 0 ) { \
-            boxsize = (int) maxerr; \
-         } else { \
-            boxsize = INT_MAX; \
-         } \
-\
-/* Determine a second box size equal to the average number of vertices in \
-   the accurate outline, per vertex in the returned Polygon. */ \
-         nv0 = astGetNpoint( candidate ); \
-         if( maxvert > 2 ) { \
-            tmp = nv0/(2*maxvert); \
-         } else { \
-            tmp = INT_MAX; \
-         } \
-\
-/* Use the minimum of the two box sizes. */ \
-         if( tmp < boxsize ) boxsize = tmp; \
-\
-/* Ensure the box is sufficiently small to allow at least 10 full boxes \
-   (=20 half boxes) around the polygon. */ \
-         tmp = nv0/20; \
-         if( tmp < boxsize ) boxsize = tmp; \
-         if( boxsize == 0 ) boxsize = 1; \
-\
-/* Smooth the polygon. */ \
-         SmoothPoly( candidate, boxsize, 1.0, status ); \
-      } \
-\
-/* Reduce the number of vertices in the outline. */ \
+/* Create a default Polygon with 3 junk vertices. */ \
       frm = astFrame( 2, "Domain=PIXEL,Unit(1)=pixel,Unit(2)=pixel," \
                       "Title=Pixel coordinates", status ); \
-      pset = DownsizePoly( candidate, maxerr, maxvert, frm, status ); \
-\
-/* Create a default Polygon with 3 junk vertices. */ \
       result = astPolygon( frm, 3, 3, junk, NULL, " ", status ); \
 \
 /* Change the PointSet within the Polygon to the one created above. */ \
-      SetPointSet( result, pset, status ); \
+      SetPointSet( result, candidate, status ); \
 \
-/* Free resources. Note, we need to free the arrays within the candidate \
-   PointSet explicitly, since they were not created as part of the \
-   construction of the PointSet (see ConvexHull). */ \
-      pset = astAnnul( pset ); \
+/* Free resources. */ \
       frm = astAnnul( frm ); \
-      ptr = astGetPoints( candidate ); \
-      if( astOK ) { \
-         astFree( ptr[ 0 ] ); \
-         astFree( ptr[ 1 ] ); \
-      } \
       candidate = astAnnul( candidate ); \
    } \
 \
@@ -1115,7 +1009,7 @@ static AstPointSet *ConvexHull##Oper##X( Xtype value, const Xtype array[], \
 \
 /* Local Variables: */ \
    AstPointSet *result; \
-   double *ptr[2]; \
+   double **ptr; \
    double *xv1; \
    double *xv2; \
    double *xv3; \
@@ -1126,11 +1020,11 @@ static AstPointSet *ConvexHull##Oper##X( Xtype value, const Xtype array[], \
    double *yv3; \
    double *yv4; \
    double *yvert; \
-   int nv; \
    int nv1; \
    int nv2; \
    int nv3; \
    int nv4; \
+   int nv; \
    int xhi; \
    int xhiymax; \
    int xhiymin; \
@@ -1197,12 +1091,10 @@ static AstPointSet *ConvexHull##Oper##X( Xtype value, const Xtype array[], \
    PointSet. */ \
       nv =  nv1 + nv2 + nv3 + nv4; \
       result = astPointSet( nv, 2, " ", status ); \
-      xvert = astMalloc( nv*sizeof( double ) ); \
-      yvert = astMalloc( nv*sizeof( double ) ); \
+      ptr = astGetPoints( result ); \
       if( astOK ) { \
-         ptr[ 0 ] = xvert; \
-         ptr[ 1 ] = yvert; \
-         astSetPoints( result, ptr ); \
+         xvert = ptr[ 0 ]; \
+         yvert = ptr[ 1 ]; \
 \
          memcpy( xvert, xv1, nv1*sizeof( double ) ); \
          memcpy( yvert, yv1, nv1*sizeof( double ) ); \
@@ -4874,14 +4766,14 @@ static void SetPointSet( AstPolygon *this, AstPointSet *pset, int *status ){
 *     Polygon member function
 
 *  Description:
-*     The PointSet in the supplied Polygon is annulled, are stored in the supplied
-*     Polygon, replacing the existing data pointers.
+*     The PointSet in the supplied Polygon is annulled, and replaced by a
+*     clone of the supplied PointSet pointer.
 
 *  Parameters:
 *     this
 *        Pointer to the Polygon to be changed.
 *     pset
-*        The PointSet containing the enw vertex information.
+*        The PointSet containing the new vertex information.
 *     status
 *        Pointer to the inherited status variable.
 

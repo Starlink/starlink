@@ -186,8 +186,6 @@ F77_INTEGER_FUNCTION(ast_convex##f)( Ftype(VALUE), \
                                       Ftype##_ARRAY(ARRAY), \
                                       INTEGER_ARRAY(LBND), \
                                       INTEGER_ARRAY(UBND), \
-                                      DOUBLE(MAXERR), \
-                                      INTEGER(MAXVERT), \
                                       LOGICAL(STARPIX), \
                                       INTEGER(STATUS) ) { \
    GENPTR_##Ftype(VALUE) \
@@ -195,8 +193,6 @@ F77_INTEGER_FUNCTION(ast_convex##f)( Ftype(VALUE), \
    GENPTR_##Ftype##_ARRAY(ARRAY) \
    GENPTR_INTEGER_ARRAY(LBND) \
    GENPTR_INTEGER_ARRAY(UBND) \
-   GENPTR_DOUBLE(MAXERR) \
-   GENPTR_INTEGER(MAXVERT) \
    GENPTR_LOGICAL(STARPIX) \
    GENPTR_INTEGER(STATUS) \
 \
@@ -205,8 +201,7 @@ F77_INTEGER_FUNCTION(ast_convex##f)( Ftype(VALUE), \
    astAt( "AST_CONVEX"#F, NULL, 0 ); \
    astWatchSTATUS( \
       RESULT = astP2I( astConvex##X( *VALUE, *OPER, (Xtype *) ARRAY, LBND, \
-                                       UBND, *MAXERR, *MAXVERT, \
-                                       F77_ISTRUE( *STARPIX ) ? 1 : 0 ) ); \
+                                     UBND, F77_ISTRUE( *STARPIX ) ? 1 : 0 ) ); \
    ) \
    return RESULT; \
 }

@@ -26,14 +26,9 @@
 *     By default, the returned Polygon is defined in the NDF PIXEL
 *     coordinate system, but can be mapped into the current Frame of the
 *     NDF using parameter CURRENT.
-*
-*     The MAXERR and MAXVERT parameters can be used to control how
-*     accurately the returned Polygon represents the required region in
-*     the data array. The number of vertices in the returned Polygon will
-*     be the minimum needed to achieve the required accuracy.
 
 *  Usage:
-*     astconvex value oper array maxerr maxvert result
+*     astconvex value oper array result
 
 *  ADAM Parameters:
 *     ARRAY = NDF (Read)
@@ -48,22 +43,6 @@
 *        if the output object is written to a text file. An error is
 *        reported if the output object cannot be written using the
 *        requested format. ["AST"]
-*     MAXERR = _DOUBLE (Read)
-*        Together with MAXVERT, this determines how accurately the
-*        returned Polygon represents the required region of the data
-*        array. It gives the maximum allowed discrepancy between the
-*        returned Polygon and the accurate convex in the datta array,
-*        expressed as a number of pixels. If this is zero or less, the
-*        returned Polygon will have the number of vertices specified by
-*        MAXVERT. Note, this value should be expressed in units of pixels
-*        even if parameter CURRENT is set TRUE.
-*     MAXVERT = _INTEGER (Read)
-*        Together with MAXERR, this determines how accurately the returned
-*        Polygon represents the required region of the data array. It gives
-*        the maximum allowed number of vertices in the returned Polygon. If
-*        this is less than 3, the number of vertices in the returned Polygon
-*        will be the minimum needed to achieve the maximum discrepancy
-*        specified by MAXERR.
 *     NVERT = _INTEGER (Write)
 *        The number of vertices in the returned polygon.
 *     OPER = LITERAL (Given)
@@ -136,7 +115,6 @@
       CHARACTER DTYPE*( NDF__SZFTP )
       CHARACTER ITYPE*( NDF__SZTYP )
       CHARACTER TEXT*40
-      DOUBLE PRECISION MAXERR
       DOUBLE PRECISION DVAL
       INTEGER EL
       INTEGER IAST
@@ -146,7 +124,6 @@
       INTEGER IVAL
       INTEGER LBND( 2 )
       INTEGER MAP
-      INTEGER MAXVERT
       INTEGER NV
       INTEGER OPER
       INTEGER RESULT
@@ -186,10 +163,7 @@
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
-*  Get the other required parameter values.
-      CALL PAR_GET0D( 'MAXERR', MAXERR, STATUS )
-      CALL PAR_GET0I( 'MAXVERT', MAXVERT, STATUS )
-
+*  Get the operation used to select the required pixels.
       CALL PAR_CHOIC( 'OPER', 'EQ', 'LT,LE,EQ,NE,GE,GT', .FALSE., TEXT,
      :                STATUS )
       IF( TEXT .EQ. 'LT' ) THEN
@@ -225,8 +199,7 @@
 
             RESULT = AST_CONVEXB( BVAL, OPER,
      :                             %VAL( CNF_PVAL( IPDATA )),
-     :                             LBND, UBND, MAXERR, MAXVERT,
-     :                             .TRUE., STATUS )
+     :                             LBND, UBND, .TRUE., STATUS )
 
          ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
 
@@ -241,8 +214,7 @@
 
             RESULT = AST_CONVEXUB( UBVAL, OPER,
      :                              %VAL( CNF_PVAL( IPDATA )),
-     :                              LBND, UBND, MAXERR, MAXVERT,
-     :                              .TRUE., STATUS )
+     :                              LBND, UBND, .TRUE., STATUS )
 
          ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
 
@@ -257,8 +229,7 @@
 
             RESULT = AST_CONVEXW( WVAL, OPER,
      :                             %VAL( CNF_PVAL( IPDATA )),
-     :                             LBND, UBND, MAXERR, MAXVERT,
-     :                             .TRUE., STATUS )
+     :                             LBND, UBND, .TRUE., STATUS )
 
          ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
 
@@ -273,8 +244,7 @@
 
             RESULT = AST_CONVEXUW( UWVAL, OPER,
      :                              %VAL( CNF_PVAL( IPDATA )),
-     :                              LBND, UBND, MAXERR, MAXVERT,
-     :                              .TRUE., STATUS )
+     :                              LBND, UBND, .TRUE., STATUS )
 
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
 
@@ -286,8 +256,7 @@
 
             RESULT = AST_CONVEXI( IVAL, OPER,
      :                             %VAL( CNF_PVAL( IPDATA )),
-     :                             LBND, UBND, MAXERR, MAXVERT,
-     :                             .TRUE., STATUS )
+     :                             LBND, UBND, .TRUE., STATUS )
 
          ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
 
@@ -299,8 +268,7 @@
 
             RESULT = AST_CONVEXR( RVAL, OPER,
      :                             %VAL( CNF_PVAL( IPDATA )),
-     :                             LBND, UBND, MAXERR, MAXVERT,
-     :                             .TRUE., STATUS )
+     :                             LBND, UBND, .TRUE., STATUS )
 
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
 
@@ -312,8 +280,7 @@
 
             RESULT = AST_CONVEXD( DVAL, OPER,
      :                             %VAL( CNF_PVAL( IPDATA )),
-     :                             LBND, UBND, MAXERR, MAXVERT,
-     :                             .TRUE., STATUS )
+     :                             LBND, UBND, .TRUE., STATUS )
 
          END IF
 

@@ -3986,8 +3986,8 @@ C
       array( 2, 6 ) = 1.0
       array( 6, 6 ) = 1.0
 
-      poly = ast_convexr( 1.0, AST__EQ, array, lbnd, ubnd, 0.0D0,
-     :                    0, .FALSE., status )
+      poly = ast_convexr( 1.0, AST__EQ, array, lbnd, ubnd, .FALSE.,
+     :                    status )
 
       call ast_getregionpoints( poly, 10, 2, npoint, points, status )
 

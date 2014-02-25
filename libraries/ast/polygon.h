@@ -203,18 +203,18 @@ AstPolygon *astOutlineUL_( unsigned long int, int, const unsigned long int[], co
 AstPolygon *astOutlineUS_( unsigned short int, int, const unsigned short int[], const int[2], const int[2], double, int, const int[2], int, int * );
 
 #if HAVE_LONG_DOUBLE     /* Not normally implemented */
-AstPolygon *astConvexLD_( long double, int, const long double[], const int[2], const int[2], double, int, int, int * );
+AstPolygon *astConvexLD_( long double, int, const long double[], const int[2], const int[2], int, int * );
 #endif
-AstPolygon *astConvexB_( signed char, int, const signed char[], const int[2], const int[2], double, int, int, int * );
-AstPolygon *astConvexD_( double, int, const double[], const int[2], const int[2], double, int, int, int * );
-AstPolygon *astConvexF_( float, int, const float[], const int[2], const int[2], double, int, int, int * );
-AstPolygon *astConvexI_( int, int, const int[], const int[2], const int[2], double, int, int, int * );
-AstPolygon *astConvexL_( long int, int, const long int[], const int[2], const int[2], double, int, int, int * );
-AstPolygon *astConvexS_( short int, int, const short int[], const int[2], const int[2], double, int, int, int * );
-AstPolygon *astConvexUB_( unsigned char, int, const unsigned char[], const int[2], const int[2], double, int, int, int * );
-AstPolygon *astConvexUI_( unsigned int, int, const unsigned int[], const int[2], const int[2], double, int, int, int * );
-AstPolygon *astConvexUL_( unsigned long int, int, const unsigned long int[], const int[2], const int[2], double, int, int, int * );
-AstPolygon *astConvexUS_( unsigned short int, int, const unsigned short int[], const int[2], const int[2], double, int, int, int * );
+AstPolygon *astConvexB_( signed char, int, const signed char[], const int[2], const int[2], int, int * );
+AstPolygon *astConvexD_( double, int, const double[], const int[2], const int[2], int, int * );
+AstPolygon *astConvexF_( float, int, const float[], const int[2], const int[2], int, int * );
+AstPolygon *astConvexI_( int, int, const int[], const int[2], const int[2], int, int * );
+AstPolygon *astConvexL_( long int, int, const long int[], const int[2], const int[2], int, int * );
+AstPolygon *astConvexS_( short int, int, const short int[], const int[2], const int[2], int, int * );
+AstPolygon *astConvexUB_( unsigned char, int, const unsigned char[], const int[2], const int[2], int, int * );
+AstPolygon *astConvexUI_( unsigned int, int, const unsigned int[], const int[2], const int[2], int, int * );
+AstPolygon *astConvexUL_( unsigned long int, int, const unsigned long int[], const int[2], const int[2], int, int * );
+AstPolygon *astConvexUS_( unsigned short int, int, const unsigned short int[], const int[2], const int[2], int, int * );
 
 # if defined(astCLASS)           /* Protected */
 #endif
@@ -299,30 +299,30 @@ astINVOKE(O,astOutlineUS_(value,oper,array,lbnd,ubnd,maxerr,maxvert,inside,starp
 
 
 #if HAVE_LONG_DOUBLE     /* Not normally implemented */
-#define astConvexLD(value,oper,array,lbnd,ubnd,maxerr,maxvert,starpix) \
-astINVOKE(O,astConvexLD_(value,oper,array,lbnd,ubnd,maxerr,maxvert,starpix,STATUS_PTR))
+#define astConvexLD(value,oper,array,lbnd,ubnd,starpix) \
+astINVOKE(O,astConvexLD_(value,oper,array,lbnd,ubnd,starpix,STATUS_PTR))
 #endif
 
-#define  astConvexB(value,oper,array,lbnd,ubnd,maxerr,maxvert,starpix) \
-astINVOKE(O, astConvexB_(value,oper,array,lbnd,ubnd,maxerr,maxvert,starpix,STATUS_PTR))
-#define  astConvexD(value,oper,array,lbnd,ubnd,maxerr,maxvert,starpix) \
-astINVOKE(O, astConvexD_(value,oper,array,lbnd,ubnd,maxerr,maxvert,starpix,STATUS_PTR))
-#define  astConvexF(value,oper,array,lbnd,ubnd,maxerr,maxvert,starpix) \
-astINVOKE(O, astConvexF_(value,oper,array,lbnd,ubnd,maxerr,maxvert,starpix,STATUS_PTR))
-#define  astConvexI(value,oper,array,lbnd,ubnd,maxerr,maxvert,starpix) \
-astINVOKE(O, astConvexI_(value,oper,array,lbnd,ubnd,maxerr,maxvert,starpix,STATUS_PTR))
-#define  astConvexL(value,oper,array,lbnd,ubnd,maxerr,maxvert,starpix) \
-astINVOKE(O, astConvexL_(value,oper,array,lbnd,ubnd,maxerr,maxvert,starpix,STATUS_PTR))
-#define  astConvexS(value,oper,array,lbnd,ubnd,maxerr,maxvert,starpix) \
-astINVOKE(O, astConvexS_(value,oper,array,lbnd,ubnd,maxerr,maxvert,starpix,STATUS_PTR))
-#define  astConvexUB(value,oper,array,lbnd,ubnd,maxerr,maxvert,starpix) \
-astINVOKE(O, astConvexUB_(value,oper,array,lbnd,ubnd,maxerr,maxvert,starpix,STATUS_PTR))
-#define  astConvexUI(value,oper,array,lbnd,ubnd,maxerr,maxvert,starpix) \
-astINVOKE(O, astConvexUI_(value,oper,array,lbnd,ubnd,maxerr,maxvert,starpix,STATUS_PTR))
-#define  astConvexUL(value,oper,array,lbnd,ubnd,maxerr,maxvert,starpix) \
-astINVOKE(O, astConvexUL_(value,oper,array,lbnd,ubnd,maxerr,maxvert,starpix,STATUS_PTR))
-#define  astConvexUS(value,oper,array,lbnd,ubnd,maxerr,maxvert,starpix) \
-astINVOKE(O, astConvexUS_(value,oper,array,lbnd,ubnd,maxerr,maxvert,starpix,STATUS_PTR))
+#define  astConvexB(value,oper,array,lbnd,ubnd,starpix) \
+astINVOKE(O, astConvexB_(value,oper,array,lbnd,ubnd,starpix,STATUS_PTR))
+#define  astConvexD(value,oper,array,lbnd,ubnd,starpix) \
+astINVOKE(O, astConvexD_(value,oper,array,lbnd,ubnd,starpix,STATUS_PTR))
+#define  astConvexF(value,oper,array,lbnd,ubnd,starpix) \
+astINVOKE(O, astConvexF_(value,oper,array,lbnd,ubnd,starpix,STATUS_PTR))
+#define  astConvexI(value,oper,array,lbnd,ubnd,starpix) \
+astINVOKE(O, astConvexI_(value,oper,array,lbnd,ubnd,starpix,STATUS_PTR))
+#define  astConvexL(value,oper,array,lbnd,ubnd,starpix) \
+astINVOKE(O, astConvexL_(value,oper,array,lbnd,ubnd,starpix,STATUS_PTR))
+#define  astConvexS(value,oper,array,lbnd,ubnd,starpix) \
+astINVOKE(O, astConvexS_(value,oper,array,lbnd,ubnd,starpix,STATUS_PTR))
+#define  astConvexUB(value,oper,array,lbnd,ubnd,starpix) \
+astINVOKE(O, astConvexUB_(value,oper,array,lbnd,ubnd,starpix,STATUS_PTR))
+#define  astConvexUI(value,oper,array,lbnd,ubnd,starpix) \
+astINVOKE(O, astConvexUI_(value,oper,array,lbnd,ubnd,starpix,STATUS_PTR))
+#define  astConvexUL(value,oper,array,lbnd,ubnd,starpix) \
+astINVOKE(O, astConvexUL_(value,oper,array,lbnd,ubnd,starpix,STATUS_PTR))
+#define  astConvexUS(value,oper,array,lbnd,ubnd,starpix) \
+astINVOKE(O, astConvexUS_(value,oper,array,lbnd,ubnd,starpix,STATUS_PTR))
 
 #if defined(astCLASS)            /* Protected */
 #endif
