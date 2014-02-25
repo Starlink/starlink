@@ -24,12 +24,12 @@ f+
 \newcommand{\stardocnumber}    {210.27}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {29th April 2013}
+\newcommand{\stardocdate}      {25th February 2013}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
                                 in Astronomy}
-\newcommand{\stardoccopyright} {Copyright (C) 2013 Science \& Technology Facilities Council}
+\newcommand{\stardoccopyright} {Copyright (C) 2014 Science \& Technology Facilities Council}
 \newcommand{\stardoctitlehtml} {AST - A Library for Handling World Coordinate
                                       Systems in Astronomy}
 \newcommand{\stardocversion}   {V<VERSION_NUMBER>}
@@ -22894,12 +22894,10 @@ FITS header, if the corresponding CTYPE values included no projection code.
 
 \end{enumerate}
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V7.3.3}
+\subsection{Changes Introduced in V7.3.3}
 
-The following describes the most significant changes which have
-occurred in the AST library between versions V7.3.2 and V7.3.3 (the
-current version):
+The following describes the most significant changes which
+occurred in the AST library between versions V7.3.2 and V7.3.3:
 
 \begin{enumerate}
 
@@ -22913,6 +22911,31 @@ on the supplied forward transformation. Previously, an inverse was created
 only if the header did not include an inverse. The accuracy of the inverse
 transformation has also been improved, although it may now be slower to
 evaluate in some circumstances.
+
+\end{enumerate}
+
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V7.3.4}
+
+The following describes the most significant changes which have
+occurred in the AST library between versions V7.3.3 and V7.3.4 (the
+current version):
+
+\begin{enumerate}
+
+\item By default, the simplification of Polygons no longer checks that the
+edges are not bent by the simplification. A new attribute, SimpVertices,
+can be set to zero in order to re-instate this check.
+
+\item The Polygon class has a new mathod,
+c+
+astConvex,
+c-
+f+
+AST\_CONVEX,
+f-
+that returns a Polygon representing the shortest polygon (i.e. convex
+hull) enclosing a specified set of pixel values within a supplied array.
 
 \end{enumerate}
 

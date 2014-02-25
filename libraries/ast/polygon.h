@@ -117,6 +117,7 @@ typedef struct AstPolygon {
    double totlen;          /* Total perimeter distance round polygon */
    int acw;                /* Are vertices stored in anti-clockwise order? */
    int stale;              /* Is cached information stale? */
+   int simp_vertices;      /* Simplify by transforming vertices? */
 } AstPolygon;
 
 /* Virtual function table. */
@@ -135,6 +136,11 @@ typedef struct AstPolygonVtab {
 /* Properties (e.g. methods) specific to this class. */
    AstPolygon *(* Downsize)( AstPolygon *, double, int, int * );
 
+   int (* GetSimpVertices)( AstPolygon *, int * );
+   int (* TestSimpVertices)( AstPolygon *, int * );
+   void (* ClearSimpVertices)( AstPolygon *, int * );
+   void (* SetSimpVertices)( AstPolygon *, int, int * );
+
 } AstPolygonVtab;
 
 #if defined(THREAD_SAFE)
@@ -145,6 +151,7 @@ typedef struct AstPolygonVtab {
 typedef struct AstPolygonGlobals {
    AstPolygonVtab Class_Vtab;
    int Class_Init;
+   char GetAttrib_Buff[ 51 ];
 } AstPolygonGlobals;
 
 
@@ -217,6 +224,10 @@ AstPolygon *astConvexUL_( unsigned long int, int, const unsigned long int[], con
 AstPolygon *astConvexUS_( unsigned short int, int, const unsigned short int[], const int[2], const int[2], int, int * );
 
 # if defined(astCLASS)           /* Protected */
+int astGetSimpVertices_( AstPolygon *, int * );
+int astTestSimpVertices_( AstPolygon *, int * );
+void astClearSimpVertices_( AstPolygon *, int * );
+void astSetSimpVertices_( AstPolygon *, int, int * );
 #endif
 
 /* Function interfaces. */
@@ -325,6 +336,14 @@ astINVOKE(O, astConvexUL_(value,oper,array,lbnd,ubnd,starpix,STATUS_PTR))
 astINVOKE(O, astConvexUS_(value,oper,array,lbnd,ubnd,starpix,STATUS_PTR))
 
 #if defined(astCLASS)            /* Protected */
+#define astClearSimpVertices(this) \
+astINVOKE(V,astClearSimpVertices_(astCheckPolygon(this),STATUS_PTR))
+#define astGetSimpVertices(this) \
+astINVOKE(V,astGetSimpVertices_(astCheckPolygon(this),STATUS_PTR))
+#define astSetSimpVertices(this,value) \
+astINVOKE(V,astSetSimpVertices_(astCheckPolygon(this),value,STATUS_PTR))
+#define astTestSimpVertices(this) \
+astINVOKE(V,astTestSimpVertices_(astCheckPolygon(this),STATUS_PTR))
 #endif
 #endif
 

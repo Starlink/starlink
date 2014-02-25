@@ -37,8 +37,9 @@ f     AST_POLYGON
 *     The Polygon class inherits from the Region class.
 
 *  Attributes:
-*     The Polygon class does not define any new attributes beyond
-*     those which are applicable to all Regions.
+*     In addition to those attributes common to all Regions, every
+*     Polygon also has the following attributes:
+*     - SimpVertices: Simplify by transforming the vertices?
 
 *  Functions:
 c     In addition to those functions applicable to all Regions, the
@@ -103,6 +104,8 @@ f     - AST_OUTLINE<X>: Create a Polygon outlining values in a pixel array
 *        - Remove unused parameter description in prologue of for astOutline<X>
 *     24-FEB-2014 (DSB):
 *        Added astConvex<X>.
+*     25-FEB-2014 (DSB):
+*        Added attribute SimpVertices.
 *class--
 */
 
@@ -209,12 +212,17 @@ static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstP
 static AstMapping *(* parent_simplify)( AstMapping *, int * );
 static void (* parent_setregfs)( AstRegion *, AstFrame *, int * );
 static void (* parent_resetcache)( AstRegion *, int * );
+static const char *(* parent_getattrib)( AstObject *, const char *, int * );
+static int (* parent_testattrib)( AstObject *, const char *, int * );
+static void (* parent_clearattrib)( AstObject *, const char *, int * );
+static void (* parent_setattrib)( AstObject *, const char *, int * );
 
 
 #ifdef THREAD_SAFE
 /* Define how to initialise thread-specific globals. */
 #define GLOBAL_inits \
-   globals->Class_Init = 0;
+   globals->Class_Init = 0; \
+   globals->GetAttrib_Buff[ 0 ] = 0;
 
 /* Create the function that initialises global data for this module. */
 astMAKE_INITGLOBALS(Polygon)
@@ -222,6 +230,7 @@ astMAKE_INITGLOBALS(Polygon)
 /* Define macros for accessing each item of thread specific global data. */
 #define class_init astGLOBAL(Polygon,Class_Init)
 #define class_vtab astGLOBAL(Polygon,Class_Vtab)
+#define getattrib_buff astGLOBAL(Polygon,GetAttrib_Buff)
 
 
 #include <pthread.h>
@@ -229,6 +238,7 @@ astMAKE_INITGLOBALS(Polygon)
 
 #else
 
+static char getattrib_buff[ 51 ];
 
 /* Define the class virtual function table and its initialisation flag
    as static variables. */
@@ -435,6 +445,17 @@ static void ResetCache( AstRegion *this, int * );
 static void SetPointSet( AstPolygon *, AstPointSet *, int * );
 static void SetRegFS( AstRegion *, AstFrame *, int * );
 static void SmoothPoly( AstPointSet *, int, double, int * );
+
+static const char *GetAttrib( AstObject *, const char *, int * );
+static void ClearAttrib( AstObject *, const char *, int * );
+static void SetAttrib( AstObject *, const char *, int * );
+static int TestAttrib( AstObject *, const char *, int * );
+
+static int GetSimpVertices( AstPolygon *, int * );
+static int TestSimpVertices( AstPolygon *, int * );
+static void ClearSimpVertices( AstPolygon *, int * );
+static void SetSimpVertices( AstPolygon *, int, int * );
+
 
 /* Member functions. */
 /* ================= */
@@ -660,6 +681,63 @@ static void Cache( AstPolygon *this, int *status ){
 
 /* Indicate cached information is up to date. */
       this->stale = 0;
+   }
+}
+
+static void ClearAttrib( AstObject *this_object, const char *attrib, int *status ) {
+/*
+*  Name:
+*     ClearAttrib
+
+*  Purpose:
+*     Clear an attribute value for a Polygon.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "polygon.h"
+*     void ClearAttrib( AstObject *this, const char *attrib, int *status )
+
+*  Class Membership:
+*     Polygon member function (over-rides the astClearAttrib protected
+*     method inherited from the Region class).
+
+*  Description:
+*     This function clears the value of a specified attribute for a
+*     Polygon, so that the default value will subsequently be used.
+
+*  Parameters:
+*     this
+*        Pointer to the Polygon.
+*     attrib
+*        Pointer to a null terminated string specifying the attribute
+*        name.  This should be in lower case with no surrounding white
+*        space.
+*     status
+*        Pointer to the inherited status variable.
+*/
+
+/* Local Variables: */
+   AstPolygon *this;             /* Pointer to the Polygon structure */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the Polygon structure. */
+   this = (AstPolygon *) this_object;
+
+/* Check the attribute name and clear the appropriate attribute. */
+
+/* SimpVertices. */
+/* ------------- */
+   if ( !strcmp( attrib, "simpvertices" ) ) {
+      astClearSimpVertices( this );
+
+/* If the attribute is not recognised, pass it on to the parent method
+   for further interpretation. */
+   } else {
+      (*parent_clearattrib)( this_object, attrib, status );
    }
 }
 
@@ -2475,6 +2553,98 @@ static void FindMax( Segment *seg, AstFrame *frm, double *x, double *y,
    }
 }
 
+static const char *GetAttrib( AstObject *this_object, const char *attrib, int *status ) {
+/*
+*  Name:
+*     GetAttrib
+
+*  Purpose:
+*     Get the value of a specified attribute for a Polygon.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "polygon.h"
+*     const char *GetAttrib( AstObject *this, const char *attrib, int *status )
+
+*  Class Membership:
+*     Polygon member function (over-rides the protected astGetAttrib
+*     method inherited from the Region class).
+
+*  Description:
+*     This function returns a pointer to the value of a specified
+*     attribute for a Polygon, formatted as a character string.
+
+*  Parameters:
+*     this
+*        Pointer to the Polygon.
+*     attrib
+*        Pointer to a null-terminated string containing the name of
+*        the attribute whose value is required. This name should be in
+*        lower case, with all white space removed.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     - Pointer to a null-terminated string containing the attribute
+*     value.
+
+*  Notes:
+*     - The returned string pointer may point at memory allocated
+*     within the Polygon, or at static memory. The contents of the
+*     string may be over-written or the pointer may become invalid
+*     following a further invocation of the same function or any
+*     modification of the Polygon. A copy of the string should
+*     therefore be made if necessary.
+*     - A NULL pointer will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*/
+
+/* Local Variables: */
+   astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
+   AstPolygon *this;             /* Pointer to the Polygon structure */
+   const char *result;           /* Pointer value to return */
+   int ival;                     /* Integer attribute value */
+
+/* Initialise. */
+   result = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS(this_object);
+
+/* Obtain a pointer to the Polygon structure. */
+   this = (AstPolygon *) this_object;
+
+/* Compare "attrib" with each recognised attribute name in turn,
+   obtaining the value of the required attribute. If necessary, write
+   the value into "getattrib_buff" as a null-terminated string in an appropriate
+   format.  Set "result" to point at the result string. */
+
+/* SimpVertices. */
+/* ------------- */
+   if ( !strcmp( attrib, "simpvertices" ) ) {
+      ival = astGetSimpVertices( this );
+      if ( astOK ) {
+         (void) sprintf( getattrib_buff, "%d", ival );
+         result = getattrib_buff;
+      }
+
+/* If the attribute name was not recognised, pass it on to the parent
+   method for further interpretation. */
+   } else {
+      result = (*parent_getattrib)( this_object, attrib, status );
+   }
+
+/* Return the result. */
+   return result;
+
+}
+
 static int GetBounded( AstRegion *this, int *status ) {
 /*
 *  Name:
@@ -2584,6 +2754,7 @@ void astInitPolygonVtab_(  AstPolygonVtab *vtab, const char *name, int *status )
    astDECLARE_GLOBALS            /* Pointer to thread-specific global data */
    AstMappingVtab *mapping;      /* Pointer to Mapping component of Vtab */
    AstRegionVtab *region;        /* Pointer to Region component of Vtab */
+   AstObjectVtab *object;        /* Pointer to Object component of Vtab */
 
 /* Check the local error status. */
    if ( !astOK ) return;
@@ -2610,6 +2781,7 @@ void astInitPolygonVtab_(  AstPolygonVtab *vtab, const char *name, int *status )
 
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
+   object = (AstObjectVtab *) vtab;
    mapping = (AstMappingVtab *) vtab;
    region = (AstRegionVtab *) vtab;
 
@@ -2625,11 +2797,25 @@ void astInitPolygonVtab_(  AstPolygonVtab *vtab, const char *name, int *status )
    parent_resetcache = region->ResetCache;
    region->ResetCache = ResetCache;
 
+   parent_clearattrib = object->ClearAttrib;
+   object->ClearAttrib = ClearAttrib;
+   parent_getattrib = object->GetAttrib;
+   object->GetAttrib = GetAttrib;
+   parent_setattrib = object->SetAttrib;
+   object->SetAttrib = SetAttrib;
+   parent_testattrib = object->TestAttrib;
+   object->TestAttrib = TestAttrib;
+
    region->RegPins = RegPins;
    region->RegBaseMesh = RegBaseMesh;
    region->RegBaseBox = RegBaseBox;
    region->RegTrace = RegTrace;
    region->GetBounded = GetBounded;
+
+   vtab->ClearSimpVertices = ClearSimpVertices;
+   vtab->GetSimpVertices = GetSimpVertices;
+   vtab->SetSimpVertices = SetSimpVertices;
+   vtab->TestSimpVertices = TestSimpVertices;
 
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
@@ -4747,6 +4933,86 @@ static void ResetCache( AstRegion *this_region, int *status ){
    }
 }
 
+static void SetAttrib( AstObject *this_object, const char *setting, int *status ) {
+/*
+*  Name:
+*     SetAttrib
+
+*  Purpose:
+*     Set an attribute value for a Polygon.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "polygon.h"
+*     void SetAttrib( AstObject *this, const char *setting, int *status )
+
+*  Class Membership:
+*     Polygon member function (extends the astSetAttrib method inherited from
+*     the Region class).
+
+*  Description:
+*     This function assigns an attribute value for a Polygon, the attribute
+*     and its value being specified by means of a string of the form:
+*
+*        "attribute= value "
+*
+*     Here, "attribute" specifies the attribute name and should be in lower
+*     case with no white space present. The value to the right of the "="
+*     should be a suitable textual representation of the value to be assigned
+*     and this will be interpreted according to the attribute's data type.
+*     White space surrounding the value is only significant for string
+*     attributes.
+
+*  Parameters:
+*     this
+*        Pointer to the Polygon.
+*     setting
+*        Pointer to a null terminated string specifying the new attribute
+*        value.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     void
+*/
+
+/* Local Vaiables: */
+   AstPolygon *this;             /* Pointer to the Polygon structure */
+   int ival;                     /* Integer attribute value */
+   int len;                      /* Length of setting string */
+   int nc;                       /* Number of characters read by astSscanf */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the Polygon structure. */
+   this = (AstPolygon *) this_object;
+
+/* Obtain the length of the setting string. */
+   len = strlen( setting );
+
+/* Test for each recognised attribute in turn, using "astSscanf" to parse the
+   setting string and extract the attribute value (or an offset to it in the
+   case of string values). In each case, use the value set in "nc" to check
+   that the entire string was matched. Once a value has been obtained, use the
+   appropriate method to set it. */
+
+/* SimpVertices. */
+/* ------------- */
+   if ( nc = 0,
+               ( 1 == astSscanf( setting, "simpvertices= %d %n", &ival, &nc ) )
+               && ( nc >= len ) ) {
+      astSetSimpVertices( this, ival );
+
+/* Pass any unrecognised setting to the parent method for further
+   interpretation. */
+   } else {
+      (*parent_setattrib)( this_object, setting, status );
+   }
+}
+
 static void SetPointSet( AstPolygon *this, AstPointSet *pset, int *status ){
 /*
 *  Name:
@@ -4925,9 +5191,9 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
 
 /* We attempt to simplify the Polygon by re-defining it within its current
    Frame. Transforming the Polygon from its base to its current Frame may
-   result in the region no longer being an polygon. We test this by
-   transforming a set of bounds on the Polygon boundary. This can only be
-   done if the current Frame is 2-dimensional. Also, there is only any
+   result in the region no having the same edges. If required, we test this
+   by transforming a set of bounds on the Polygon boundary. This can only
+   be done if the current Frame is 2-dimensional. Also, there is only any
    point in doing it if the Mapping from base to current Frame in the
    Polygon is not a UnitMap. */
    map = astGetMapping(  new->frameset, AST__BASE, AST__CURRENT );
@@ -4935,9 +5201,6 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
 
 /* Get a pointer to the Frame represented by the Polgon. */
       frm = astGetFrame( new->frameset, AST__CURRENT );
-
-/* Get a mesh of points covering the Polygon in this Frame. */
-      mesh = astRegMesh( new );
 
 /* Get the Region describing the positional uncertainty in this Frame. */
       unc = astGetUncFrm( new, AST__CURRENT );
@@ -4963,25 +5226,40 @@ static AstMapping *Simplify( AstMapping *this_mapping, int *status ) {
          for( iv = 0; iv < nv; iv++ ) *(p++) = *(q++);
 
 /* Create a new Polygon using these transformed vertices. */
-         newpol = ok ? astPolygon( frm, nv, nv, mem, unc, "", status ) : NULL;
+         if( ok ) {
+            newpol = astPolygon( frm, nv, nv, mem, unc, "", status );
+
+/* If the SimpVertices attribute is zero, we now check that the
+   transformation has not bent the edges of the polygon significantly.
+   If it has, we annul the new Polygon. */
+            if( !astGetSimpVertices( this ) ) {
+
+/* Get a mesh of points covering the Polygon in this Frame. */
+               mesh = astRegMesh( new );
 
 /* See if all points within the mesh created from the original Polygon fall
    on the boundary of the new Polygon, to within the uncertainty of the
-   Region. */
-         if( newpol && astRegPins( newpol, mesh, NULL, NULL ) ) {
+   Region. If not, annul the new Polgon. */
+               if( !astRegPins( newpol, mesh, NULL, NULL ) ) {
+                  newpol = astAnnul( newpol );
+               }
 
-/* If so, use the new Polygon in place of the original Region. */
-            (void) astAnnul( new );
-            new = astClone( newpol );
-            simpler =1;
+/* Free the mesh. */
+               mesh = astAnnul( mesh );
+            }
+
+/* If we still have a new polygon, use the new Polygon in place of the
+   original Region. */
+            if( newpol ) {
+               (void) astAnnul( new );
+               new = (AstRegion *) newpol;
+               simpler = 1;
+            }
          }
-
-/* Free resources. */
-         if( newpol ) newpol = astAnnul( newpol );
       }
 
+/* Free other resources. */
       frm = astAnnul( frm );
-      mesh = astAnnul( mesh );
       unc = astAnnul( unc );
       ps2 = astAnnul( ps2 );
       mem = astFree( mem );
@@ -5184,6 +5462,77 @@ static void SmoothPoly( AstPointSet *pset, int boxsize, double strength,
       oldx = astFree( oldx );
       oldy = astFree( oldy );
    }
+}
+
+static int TestAttrib( AstObject *this_object, const char *attrib, int *status ) {
+/*
+*  Name:
+*     TestAttrib
+
+*  Purpose:
+*     Test if a specified attribute value is set for a Polygon.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "polygon.h"
+*     int TestAttrib( AstObject *this, const char *attrib, int *status )
+
+*  Class Membership:
+*     Polygon member function (over-rides the astTestAttrib protected
+*     method inherited from the Region class).
+
+*  Description:
+*     This function returns a boolean result (0 or 1) to indicate whether
+*     a value has been set for one of a Polygon's attributes.
+
+*  Parameters:
+*     this
+*        Pointer to the Polygon.
+*     attrib
+*        Pointer to a null terminated string specifying the attribute
+*        name.  This should be in lower case with no surrounding white
+*        space.
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     One if a value has been set, otherwise zero.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstPolygon *this;             /* Pointer to the Polygon structure */
+   int result;                   /* Result value to return */
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointer to the Polygon structure. */
+   this = (AstPolygon *) this_object;
+
+/* Check the attribute name and test the appropriate attribute. */
+
+/* SimpVertices. */
+/* ------------- */
+   if ( !strcmp( attrib, "simpvertices" ) ) {
+      result = astTestSimpVertices( this );
+
+/* If the attribute is not recognised, pass it on to the parent method
+   for further interpretation. */
+   } else {
+      result = (*parent_testattrib)( this_object, attrib, status );
+   }
+
+/* Return the result, */
+   return result;
 }
 
 /*
@@ -5595,7 +5944,7 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
 
 *  Class Membership:
 *     Polygon member function (over-rides the astTransform protected
-*     method inherited from the Mapping class).
+*     method inherited from the Region class).
 
 *  Description:
 *     This function takes a Polygon and a set of points encapsulated in a
@@ -5815,6 +6164,48 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
    "object.h" file. For a description of each attribute, see the class
    interface (in the associated .h file). */
 
+/*
+*att++
+*  Name:
+*     SimpVertices
+
+*  Purpose:
+*     Simplify a Polygon by transforming its vertices?
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Integer (boolean).
+
+*  Description:
+*     This attribute controls the behaviour of the
+c     astSimplify
+f     AST_SIMPLIFY
+*     method when applied to a Polygon. The simplified Polygon is created
+*     by transforming the vertices from the Frame in which the Polygon
+*     was originally defined into the Frame currently represented by the
+*     Polygon. If SimpVertices is non-zero (the default) then this
+*     simplified Polygon is returned without further checks. If SimpVertices
+*     is zero, a check is made that the edges of the new Polygon do not
+*     depart significantly from the edges of the original Polygon (as
+*     determined by the uncertainty associated with the Polygon). This
+*     could occur, for instance, if the Mapping frrm the original to the
+*     current Frame is highly non-linear. If this check fails, the
+*     original unsimplified Polygon is returned without change.
+
+*  Applicability:
+*     Polygon
+*        All Polygons have this attribute.
+
+*att--
+*/
+astMAKE_CLEAR(Polygon,SimpVertices,simp_vertices,-INT_MAX)
+astMAKE_GET(Polygon,SimpVertices,int,0,( ( this->simp_vertices != -INT_MAX ) ?
+                                   this->simp_vertices : 1 ))
+astMAKE_SET(Polygon,SimpVertices,int,simp_vertices,( value != 0 ))
+astMAKE_TEST(Polygon,SimpVertices,( this->simp_vertices != -INT_MAX ))
+
 /* Copy constructor. */
 /* ----------------- */
 static void Copy( const AstObject *objin, AstObject *objout, int *status ) {
@@ -5959,8 +6350,16 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
 *        Pointer to the inherited status variable.
 */
 
+/* Local Variables: */
+   AstPolygon *this;             /* Pointer to the Polygon structure */
+   int ival;                     /* Integer attribute value */
+   int set;                      /* Attribute value set? */
+
 /* Check the global error status. */
    if ( !astOK ) return;
+
+/* Obtain a pointer to the Polygon structure. */
+   this = (AstPolygon *) this_object;
 
 /* Write out values representing the instance variables for the
    Polygon class.  Accompany these with appropriate comment strings,
@@ -5977,6 +6376,13 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
    which is more useful to a human reader as it corresponds to the
    actual default attribute value.  Since "set" will be zero, these
    values are for information only and will not be read back. */
+
+/* SimpVertices. */
+/* ------------ */
+/* Write out the forward-inverse simplification flag. */
+   set = TestSimpVertices( this, status );
+   ival = set ? GetSimpVertices( this, status ) : astGetSimpVertices( this );
+   astWriteInt( channel, "SimpVT", set, 0, ival, "Simplify by transforming vertices?" );
 
 /* A flag indicating the convention used for determining the interior of
    the polygon. A zero value indicates that the old AST system is in
@@ -6435,6 +6841,7 @@ AstPolygon *astInitPolygon_( void *mem, size_t size, int init, AstPolygonVtab *v
          new->ubnd[ 0 ] = AST__BAD;
          new->lbnd[ 1 ] = AST__BAD;
          new->ubnd[ 1 ] = AST__BAD;
+         new->simp_vertices = -INT_MAX;
          new->edges = NULL;
          new->startsat = NULL;
          new->totlen = 0.0;
@@ -6582,6 +6989,9 @@ AstPolygon *astLoadPolygon_( void *mem, size_t size, AstPolygonVtab *vtab,
    supplying the "unset" value as the default. If a "set" value is
    obtained, we then use the appropriate (private) Set... member
    function to validate and set the value properly. */
+
+   new->simp_vertices = astReadInt( channel, "simpvt", -INT_MAX );
+   if ( TestSimpVertices( new, status ) ) SetSimpVertices( new, new->simp_vertices, status );
 
 /* A flag indicating what order the vertices are stored in. See the Dump
    function. */
