@@ -65,7 +65,14 @@
 *          NONE (no messages), QUIET (minimal messages), NORMAL,
 *          VERBOSE, DEBUG or ALL. [NORMAL]
 *     OUT = NDF (Write)
-*          Output concatenated files
+*          Output concatenated files. Only used if OUTBASE is null (!). Note,
+*          the correct number of output files must be specified for OUT. If
+*          this number is not known, use parameter OUTBASE instead.
+*     OUTBASE = LITERAL (Write)
+*          The base name for the output NDFs. Each output NDF has a name
+*          equal to "base_<n>" where <n> is an integer greater than or
+*          equal to 1. If a null (!) value is supplied, the output NDFs
+*          are instead specified by parameter OUT. [!]
 *     OUTFILES = LITERAL (Write)
 *          The name of text file to create, in which to put the names of
 *          all the output NDFs created by this application (one per
@@ -112,12 +119,14 @@
 *     2013-08-21 (AGG):
 *        Do not call grpList if no output files are generated. This
 *        avoids a GRP__INVID error in such cases.
+*     2014-02-26 (DSB):
+*        Added parameter OUTBASE.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2005-2009,2013 University of British Columbia.
-*     Copyright (C) 2008-2010 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2014 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -193,6 +202,7 @@ void smurf_sc2concat( int *status ) {
   size_t ncontchunks=0;      /* Number continuous chunks outside iter loop */
   Grp *ogrp = NULL;          /* Output files  */
   size_t osize;              /* Number of files in input group */
+  char outbase[ 200 ];       /* Base name for output NDFs */
   dim_t padStart=0;          /* How many samples padding at start */
   dim_t padEnd=0;            /* How many samples padding at end */
   int temp;                  /* Temporary signed integer */
@@ -256,10 +266,32 @@ void smurf_sc2concat( int *status ) {
 
   basesize = grpGrpsz( basegrp, status );
 
-  /* Get output file(s) */
-  kpg1Wgndf( "OUT", basegrp, basesize, basesize,
-             "More output files required...",
-             &ogrp, &osize, status );
+  /* First see the output NDF names are to be generated automatically
+     from a supplied base name. */
+  if( *status == SAI__OK ) {
+    parGet0c( "OUTBASE", outbase, sizeof( outbase ), status );
+
+    /* If yes, generate the names and put them in "ogrp". */
+    if( *status == SAI__OK ) {
+       char *fname = astMalloc( sizeof( outbase ) + 10 );
+       if( fname ) {
+          ogrp = grpNew( "Output NDFs", status );
+          for( gcount = 0; gcount < basesize; gcount++ ) {
+             sprintf( fname, "%s_%zu", outbase, gcount + 1 );
+             grpPut1( ogrp, fname, 0, status );
+          }
+          osize = basesize;
+          fname = astFree( fname );
+       }
+
+    /* If not, anull the error and get an explicit list of output NDFs. */
+    } else if( *status == PAR__NULL ) {
+       errAnnul( status );
+       kpg1Wgndf( "OUT", basegrp, basesize, basesize,
+                  "More output files required...",
+                  &ogrp, &osize, status );
+    }
+  }
 
   /* Loop over continuous chunks */
   gcount = 1;

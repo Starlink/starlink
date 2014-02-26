@@ -4369,6 +4369,15 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter outbase {
+                type LITERAL
+                ppath CURRENT
+                vpath DEFAULT
+                prompt {Base-name for output NDF data structures}
+                default !
+                helpkey *
+            }
+
             parameter outfiles {
                 type LITERAL
                 prompt {Text file in which to put the output NDF names}
