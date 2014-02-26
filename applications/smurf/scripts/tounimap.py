@@ -211,18 +211,18 @@ try:
 #  We do not need the concatenated data any more (we use the cleaned data
 #  created by makemap instead since it includes a quality array). */
    nout = len( concdata )
-   iout = 0
    for path in concdata:
       os.remove("{0}.sdf".format(path))
+
+#  Process each NDF holding cleaned data created by sc2concat.
+   iout = 0
+   for path in glob.glob("*_con_res_cln.sdf"):
+      base = path[:-16]
 
 #  Get the name of the next output FITS file, and report it.
       iout += 1
       outdata = "{0}_{1}.fit".format(outbase,iout)
       msg_out( "Creating output FITS file {0}/{1}: {2}".format(iout,nout,outdata) )
-
-#  Process each NDF holding cleaned data created by sc2concat.
-   for path in glob.glob("*_con_res_cln.sdf"):
-      base = path[:-16]
 
 #  Get a copy of the cleaned data but with PAD samples trimmed from start
 #  and end.
