@@ -175,7 +175,7 @@ try:
    retain = parsys["RETAIN"].value
    outbase = parsys["OUT"].value
 
-#  Erase any NDFs holding cleaned data, extinction or pointing data from
+#  Erase any NDFs holding cleaned data, exteinction or pointing data from
 #  previous runs.
    for path in glob.glob("*_con_res_cln.sdf"):
       myremove(path)
@@ -185,8 +185,10 @@ try:
       myremove("{0}_con_ext.sdf".format(base))
 
 #  Use sc2concat to concatenate and flatfield the data.
-   concdata = NDG(1)
-   invoke("$SMURF_DIR/sc2concat in={0} out={1} maxlen=120".format(indata,concdata))
+   msg_out( "Concatenating and flatfielding..." )
+   concbase = NDG.tempfile("")
+   invoke("$SMURF_DIR/sc2concat in={0} outbase={1} maxlen=120".format(indata,concbase))
+   concdata = NDG( "{0}_*".format(concbase) )
 
 #  Use makemap to generate quality, extinction and pointing info.
    confname = NDG.tempfile()
@@ -203,13 +205,20 @@ try:
    fd.close()
 
    map = NDG(1)
+   msg_out( "Generating quality, pointing and extinction..." )
    invoke("$SMURF_DIR/makemap in={0} out={1} config='^{2}'".format(concdata,map,confname))
 
 #  We do not need the concatenated data any more (we use the cleaned data
 #  created by makemap instead since it includes a quality array). */
-   nout = 0
+   nout = len( concdata )
+   iout = 0
    for path in concdata:
       os.remove("{0}.sdf".format(path))
+
+#  Get the name of the next output FITS file, and report it.
+      iout += 1
+      outdata = "{0}_{1}.fit".format(outbase,iout)
+      msg_out( "Creating output FITS file {0}/{1}: {2}".format(iout,nout,outdata) ):
 
 #  Process each NDF holding cleaned data created by sc2concat.
    for path in glob.glob("*_con_res_cln.sdf"):
@@ -353,8 +362,6 @@ try:
       hdulist.append( exthdus[0] )
 
 #  Write out the HDS list to a multi-extension FITS file.
-      nout += 1
-      outdata = "{0}_{1}.fit".format(outbase,nout)
       myremove(outdata)
       hdulist.writeto(outdata)
 
