@@ -1748,6 +1748,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       dat.mapvar = thisvar;
       dat.mapweight = thisweight;
       dat.mapweightsq = thisweightsq;
+      dat.mapok = 0;
       dat.mdims[0] = mdims[0];
       dat.mdims[1] = mdims[1];
       dat.msize = msize;
@@ -2160,6 +2161,10 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                            thisweightsq, thishits, reuse_var ? NULL : thisvar,
                            msize, &scalevar, status );
           }
+
+          /* Indicate the map arrays within the supplied smfDIMMData
+             structure now contain usable values. */
+          dat.mapok = 1;
 
           /*** TIMER ***/
           msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME

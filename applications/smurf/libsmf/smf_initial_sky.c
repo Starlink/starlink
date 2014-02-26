@@ -246,6 +246,12 @@ int smf_initial_sky( ThrWorkForce *wf, AstKeyMap *keymap, smfDIMMData *dat,
 /* End the NDF context. */
       ndfEnd( status );
 
+/* Indicate the map arrays within the supplied smfDIMMData structure now
+   contain usable values. We need to do this before calling
+   smf_calcmodel_ast below so that the right mask gets used in
+   smf_calcmodel_ast. */
+      dat->mapok = 1;
+
 /* Apply any existinction correction to the cleaned bolometer data. */
       if( dat->ext ) smf_calcmodel_ext( wf, dat, 0, keymap, dat->ext, 0,
                                         status);
@@ -304,6 +310,7 @@ int smf_initial_sky( ThrWorkForce *wf, AstKeyMap *keymap, smfDIMMData *dat,
       }
 
       job_data = astFree( job_data );
+
    }
 
 /* End the AST context. */

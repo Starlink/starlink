@@ -93,12 +93,19 @@
 *        pixels, do not require source pixels to have a defined variance
 *        since variances are usually not available on the first iteration.
 *     9-JUL-2013 (DSB):
-*        The ZERO_NITER and ZERO_FREEZE values should count the iterations 
+*        The ZERO_NITER and ZERO_FREEZE values should count the iterations
 *        perfomed *after* any initial iterations for which the AST model was
 *        skipped.
 *     23-JAN-2014 (DSB):
-*        When creating a mask from a quality array imported from an initial 
+*        When creating a mask from a quality array imported from an initial
 *        sky NDF, only check the quality bit relevant to the mask being created.
+*     25-FEB-2014 (DSB):
+*        Do not rely on the FIRSTITER bit in "flags" as an indication of
+*        whether a dynamic mask can be created. This is because a map may
+*        be available even on the first iteration if an external map is
+*        being used as the initial sky map (as used by skyloop). Instead,
+*        use an explicit flag ("dat->mapok") that indicates if the map can
+*        be used.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -260,10 +267,9 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
    parameters in the supplied KeyMap. Static masks (predefined, circles
    or external NDFs) may be used on any iteration, but dynamic masks
    (lowhits, snr) will only be avialable once the map has been determined
-   at the end of the first iteration. This means that when masking anything
-   but the AST model (which is determined after the map), the dynamic masks
-   cannot be used on the first iteration. Make a note if all masks being
-   used are static. */
+   (usually at the end of the first iteration). So check that the values
+   in the map are usable before creating a dynamic mask. Make a note if
+   all masks being used are static. */
 
          isstatic = 1;
          nmask = 0;
@@ -271,7 +277,7 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
          zero_lowhits = 0.0;
          astMapGet0D( subkm, "ZERO_LOWHITS", &zero_lowhits );
          if( zero_lowhits > 0.0 ) {
-            if( mtype == SMF__AST || !( flags & SMF__DIMM_FIRSTITER ) ) {
+            if( dat->mapok ) {
                mask_types[ nmask++] = LOWHITS;
                isstatic = 0;
             }
@@ -311,7 +317,7 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
          zero_snr = 0.0;
          astMapGet0D( subkm, "ZERO_SNR", &zero_snr );
          if( zero_snr > 0.0 ) {
-            if( mtype == SMF__AST || !( flags & SMF__DIMM_FIRSTITER ) ) {
+            if( dat->mapok ) {
                mask_types[ nmask++] = SNR;
                isstatic = 0;
             }
