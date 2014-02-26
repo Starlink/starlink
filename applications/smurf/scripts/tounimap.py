@@ -21,7 +21,7 @@
 *     s4a20091214_00015_0002_unimap.fit.
 
 *  Usage:
-*     unimap in [retain] [msg_filter] [ilevel] [glevel] [logfile]
+*     unimap in out [retain] [msg_filter] [ilevel] [glevel] [logfile]
 
 *  Parameters:
 *     GLEVEL = LITERAL (Read)
@@ -64,6 +64,10 @@
 *        atasks invoked within the executing script. The accepted values
 *        are the list defined in SUN/104 ("None", "Quiet", "Normal",
 *        "Verbose", etc). ["Normal"]
+*     OUT = LITERAL (Read)
+*        The base name for the output FITS files. The file names will be
+*        the supplied base name followed by "_<n>.fit", where <n> is an
+*        integer greater than or equal to 1.
 *     RETAIN = _LOGICAL (Read)
 *        Should the temporary directory containing the intermediate files
 *        created by this script be retained? If not, it will be deleted
@@ -154,6 +158,8 @@ try:
    params.append(starutil.ParNDG("IN", "The input time-series NDFs",
                  "$STARLINK_DIR/share/smurf/s4a20091214_00015_0002.sdf"))
 
+   params.append(starutil.Par0S("OUT", "The base name for the output FITS files"))
+
    params.append(starutil.Par0L("RETAIN", "Retain temporary files?", False,
                                  noprompt=True))
 
@@ -167,24 +173,28 @@ try:
 #  see a later parameter prompt or error.
    indata = parsys["IN"].value
    retain = parsys["RETAIN"].value
+   outbase = parsys["OUT"].value
 
-#  Erase any NDFs holding cleaned data or pointing data from previous runs.
-   for path in glob.glob("s*_con_res_cln.sdf"):
+#  Erase any NDFs holding cleaned data, extinction or pointing data from
+#  previous runs.
+   for path in glob.glob("*_con_res_cln.sdf"):
       myremove(path)
       base = path[:-16]
       myremove("{0}_lat.sdf".format(base))
       myremove("{0}_lon.sdf".format(base))
+      myremove("{0}_con_ext.sdf".format(base))
 
 #  Use sc2concat to concatenate and flatfield the data.
-   invoke("$SMURF_DIR/sc2concat in={0} out='./*_umap'".format(indata))
+   concdata = NDG(1)
+   invoke("$SMURF_DIR/sc2concat in={0} out={1} maxlen=120".format(indata,concdata))
 
-#  Use makemap to generate quaity and pointing info.
-   concdata = NDG("*_umap")
+#  Use makemap to generate quality, extinction and pointing info.
    confname = NDG.tempfile()
    fd = open(confname,"w")
    fd.write("^$STARLINK_DIR/share/smurf/dimmconfig.lis\n")
    fd.write("numiter=1\n")
    fd.write("exportclean=1\n")
+   fd.write("exportndf=ext\n")
    fd.write("exportlonlat=1\n")
    fd.write("dcfitbox=0\n")
    fd.write("noisecliphigh=0\n")
@@ -197,11 +207,12 @@ try:
 
 #  We do not need the concatenated data any more (we use the cleaned data
 #  created by makemap instead since it includes a quality array). */
+   nout = 0
    for path in concdata:
       os.remove("{0}.sdf".format(path))
 
 #  Process each NDF holding cleaned data created by sc2concat.
-   for path in glob.glob("s*_con_res_cln.sdf"):
+   for path in glob.glob("*_con_res_cln.sdf"):
       base = path[:-16]
 
 #  Get a copy of the cleaned data but with PAD samples trimmed from start
@@ -247,10 +258,15 @@ try:
          invoke( "$HDSTOOLS_DIR/hcopy {0}.more.jcmtstate.tcs_index {1}.data_array".format( path, tcs_index_full))
          invoke( "$KAPPA_DIR/setlabel {0} Scan_index".format( tcs_index_full))
 
+#  Collapse the extinction NDF so that it contains one mean value for each
+#  time slice. Chop off the padding at the same time.
+      ext = "{0}_con_ext".format(base)
+      ext1d = NDG(1)
+      invoke( "$KAPPA_DIR/collapse {0}\(,,{1}:{2}\) estimator=mean out={3} axis=MJD".format(ext,tlo,thi,ext1d))
+      invoke( "$KAPPA_DIR/setlabel {0} Extinction".format( ext1d ))
+
 #  Extract the required sections from the other files. RA and Dec files
 #  do not need to be trimmed since they do not include padding.
-      ra = "{0}_lon".format(base)
-      dec = "{0}_lat".format(base)
       tcs_index = NDG(1)
       invoke("$KAPPA_DIR/ndfcopy {0}\({1}:{2}\) out={3}".format(tcs_index_full,tlo,thi,tcs_index))
 
@@ -263,7 +279,15 @@ try:
       invoke("$KAPPA_DIR/erase {0}.quality ok ".format(fla), annul=True)
       invoke("$KAPPA_DIR/erase {0}.wcs ok ".format(fla), annul=True)
       invoke("$KAPPA_DIR/erase {0}.more ok ".format(fla), annul=True)
+      invoke("$KAPPA_DIR/erase {0}.history ok ".format(fla), annul=True)
 
+      invoke("$KAPPA_DIR/erase {0}.quality ok ".format(ext1d), annul=True)
+      invoke("$KAPPA_DIR/erase {0}.wcs ok ".format(ext1d), annul=True)
+      invoke("$KAPPA_DIR/erase {0}.more ok ".format(ext1d), annul=True)
+      invoke("$KAPPA_DIR/erase {0}.history ok ".format(ext1d), annul=True)
+
+      ra = "{0}_lon".format(base)
+      dec = "{0}_lat".format(base)
       invoke("$KAPPA_DIR/erase {0}.history ok ".format(ra), annul=True)
       invoke("$KAPPA_DIR/erase {0}.axis ok ".format(ra), annul=True)
       invoke("$KAPPA_DIR/erase {0}.history ok ".format(dec), annul=True)
@@ -271,8 +295,8 @@ try:
 
 #  Convert the NDFs to individual FITS files.
       valfits = NDG.tempfile(".fit")
-      invoke("$CONVERT_DIR/ndf2fits {0} {1} comp=d prohis=f".format(val,valfits))
-      valhdus = pyfits.open(valfits)
+      invoke("$CONVERT_DIR/ndf2fits {0} {1} bitpix=-32 comp=d prohis=f".format(val,valfits))
+      valhdus = pyfits.open(valfits, scale_back=True)
       striphdr( valhdus[0] )
 
       flafits = NDG.tempfile(".fit")
@@ -281,13 +305,13 @@ try:
       striphdr( flahdus[0] )
 
       rafits = NDG.tempfile(".fit")
-      invoke("$CONVERT_DIR/ndf2fits {0} {1} comp=d prohis=f".format(ra,rafits))
-      rahdus = pyfits.open(rafits)
+      invoke("$CONVERT_DIR/ndf2fits {0} {1} comp=d  bitpix=-32 prohis=f".format(ra,rafits))
+      rahdus = pyfits.open(rafits, scale_back=True)
       striphdr( rahdus[0] )
 
       decfits = NDG.tempfile(".fit")
-      invoke("$CONVERT_DIR/ndf2fits {0} {1} comp=d prohis=f".format(dec,decfits))
-      dechdus = pyfits.open(decfits)
+      invoke("$CONVERT_DIR/ndf2fits {0} {1} comp=d  bitpix=-32 prohis=f".format(dec,decfits))
+      dechdus = pyfits.open(decfits, scale_back=True)
       striphdr( dechdus[0] )
 
       tcsfits = NDG.tempfile(".fit")
@@ -295,16 +319,19 @@ try:
       tcshdus = pyfits.open(tcsfits)
       striphdr( tcshdus[0] )
 
+      extfits = NDG.tempfile(".fit")
+      invoke("$CONVERT_DIR/ndf2fits {0} {1} bitpix=-32 comp=d prohis=f".format(ext1d,extfits))
+      exthdus = pyfits.open(extfits, scale_back=True)
+      striphdr( exthdus[0] )
+
       hdulist = pyfits.HDUList()
       hdulist.append( pyfits.PrimaryHDU() )
       hdulist.append( pyfits.ImageHDU() )
       hdulist.append( valhdus[0] )
       hdulist.append( rahdus[0] )
       hdulist.append( dechdus[0] )
-      hdulist.append( flahdus[0] )
 
-#  Ensure the quality array remains integer (without this it seems to get
-#  converted to float).
+      hdulist.append( flahdus[0] )
       hdulist[5].scale('int32')
 
 #  Create a unit mapping for bolometer index.
@@ -322,8 +349,12 @@ try:
       a.fill( ntslice )
       hdulist.append( pyfits.ImageHDU(a) )
 
+#  Add the 1D extinction data as an extra extension.
+      hdulist.append( exthdus[0] )
+
 #  Write out the HDS list to a multi-extension FITS file.
-      outdata = "{0}_unimap.fit".format(base)
+      nout += 1
+      outdata = "{0}_{1}.fit".format(outbase,nout)
       myremove(outdata)
       hdulist.writeto(outdata)
 
@@ -333,10 +364,12 @@ try:
       rahdus.close()
       dechdus.close()
       tcshdus.close()
+      exthdus.close()
 
 #  Remove local temp files for this chunk.
       os.remove( "{0}_con_res_cln.sdf".format(base) )
       os.remove( "{0}_lat.sdf".format(base) )
+      os.remove( "{0}_con_ext.sdf".format(base) )
       os.remove( "{0}_lon.sdf".format(base) )
 
 #  Remove temporary files.
