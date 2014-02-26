@@ -218,7 +218,7 @@ try:
 #  Get the name of the next output FITS file, and report it.
       iout += 1
       outdata = "{0}_{1}.fit".format(outbase,iout)
-      msg_out( "Creating output FITS file {0}/{1}: {2}".format(iout,nout,outdata) ):
+      msg_out( "Creating output FITS file {0}/{1}: {2}".format(iout,nout,outdata) )
 
 #  Process each NDF holding cleaned data created by sc2concat.
    for path in glob.glob("*_con_res_cln.sdf"):
@@ -270,8 +270,15 @@ try:
 #  Collapse the extinction NDF so that it contains one mean value for each
 #  time slice. Chop off the padding at the same time.
       ext = "{0}_con_ext".format(base)
+      invoke("$KAPPA_DIR/ndftrace {0} quiet".format(ext))
+      nxe = starutil.get_task_par( "dims(1)", "ndftrace" )
+      nye = starutil.get_task_par( "dims(2)", "ndftrace" )
+      nte = starutil.get_task_par( "dims(3)", "ndftrace" )
+      nbe = nxe*nye
+      ext2d = NDG(1)
+      invoke( "$KAPPA_DIR/reshape {0} out={1} shape=\[{2},{3}\]".format(ext,ext2d,nbe,nte))
       ext1d = NDG(1)
-      invoke( "$KAPPA_DIR/collapse {0}\(,,{1}:{2}\) estimator=mean out={3} axis=MJD".format(ext,tlo,thi,ext1d))
+      invoke( "$KAPPA_DIR/collapse {0}\(,{1}:{2}\) estimator=mean out={3} axis=p1".format(ext2d,tlo,thi,ext1d))
       invoke( "$KAPPA_DIR/setlabel {0} Extinction".format( ext1d ))
 
 #  Extract the required sections from the other files. RA and Dec files
