@@ -2,10 +2,11 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
   
 dnl    Initialisation: package name and version number
-AC_INIT(nbs, 2.5-10, starlink@jiscmail.ac.uk)
+AC_INIT([nbs],[2.5-10],[starlink@jiscmail.ac.uk])
+AC_CONFIG_AUX_DIR([build-aux])
   
 dnl    Require autoconf-2.50 at least
-AC_PREREQ(2.50)
+AC_PREREQ([2.69])
 dnl    Require Starlink automake
 AM_INIT_AUTOMAKE(1.8.2-starlink)
   
@@ -34,7 +35,7 @@ AC_CHECK_FUNCS([atexit on_exit])
 AC_CHECK_FUNCS([memcpy ots\$move3])
 AC_CHECK_FUNCS([shmctl])
 AC_CHECK_FUNCS([LIB\$WAIT select])
-AC_PROG_LIBTOOL
+LT_INIT
 
 dnl    Declare the build and use dependencies for this package
 STAR_DECLARE_DEPENDENCIES([build], [sae ems cnf])

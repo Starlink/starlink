@@ -36,7 +36,7 @@
 </component>
 
 <component id="atools" support="S">
-  <version>1.9-13</version>
+  <version>1.9-14</version>
   <path>applications/atools</path>
   <description>ATOOLS - AST applications</description>
   <abstract><p>
@@ -176,7 +176,7 @@ Starlink applications, and a number of other common data formats.
 </component>
 
 <component id="cupid" support="S">
-  <version>1.6-2</version>
+  <version>2.0</version>
   <path>applications/cupid</path>
   <description>CUPID - AST applications</description>
   <abstract><p>
@@ -658,7 +658,7 @@ JCMT telescope based on Mauna Kea, Hawaii.
 </component>
 
 <component id="gaia" support="S">
-  <version>4.4-4</version>
+  <version>4.4-5</version>
   <path>applications/gaia</path>
   <description>GAIA - Graphical Astronomy and Image Analysis</description>
   <abstract><p>
@@ -867,7 +867,7 @@ Traces an HDS file
 </component>
 
 <component id="kappa" support="S">
-  <version>2.1-8</version>
+  <version>2.1-9</version>
   <path>applications/kappa</path>
   <description>KAPPA - Kernel Application Package</description>
   <abstract><p>
@@ -6553,21 +6553,27 @@ Ultrix and for SunOS and may still work for them.
 </component>
 
 <component id="autoconf" buildsupport="yes" support="U">
-  <version>2.59</version>
-  <path>thirdparty/fsf/autoconf</path>
+  <version>starlink-2.69</version>
+  <path>thirdparty/fsf/autotools/autoconf</path>
   <description>Starlink autoconf</description>
   <dependencies/>
   <developers>
     <person>
       <name>Norman Gray</name>
       <uname>nxg</uname>
-      <email>norman@astro.gla.ac.uk</email>
+      <email>starlink@jiscmail.ac.uk</email>
+      <role>owner</role>
+    </person>
+    <person>
+      <name>Peter W. Draper</name>
+      <uname>pwdraper</uname>
+      <email>starlink@jiscmail.ac.uk</email>
       <role>owner</role>
     </person>
   </developers>
   <bugreports>@PACKAGE_BUGREPORT</bugreports>
   <copyright>
-    <year>1994-2004</year>
+    <year>1994-2013</year>
     <name>Free Software Foundation</name>
   </copyright>
   <copyright>
@@ -6579,14 +6585,13 @@ Ultrix and for SunOS and may still work for them.
     </notes>
   </copyright>
   <notes><p>This version of autoconf has been patched to include
-      Fortran preprocessor support.  Those patches were submitted
-      to autoconf-patches@gnu.org in January 2004, and were being
-      examined after that.</p></notes>
+      Fortran preprocessor support and general Fortran portability.
+      </p></notes>
 </component>
 
 <component id="automake" buildsupport="yes" support="U">
-  <version>1.9.6-starlink</version>
-  <path>thirdparty/fsf/automake</path>
+  <version>starlink-1.14</version>
+  <path>thirdparty/fsf/autotools/automake</path>
   <description>GNU automake, patched</description>
   <dependencies>
     <!-- hard-code these, rather than requiring us to put
@@ -6621,6 +6626,57 @@ Ultrix and for SunOS and may still work for them.
       examined after that.</p></notes>
 </component>
 
+<component id="libtool" buildsupport="yes" support="U">
+  <version>2.4.2</version>
+  <path>thirdparty/fsf/autotools/libtool</path>
+  <description>GNU libtool</description>
+  <dependencies/>
+  <developers>
+    <person>
+      <name>Norman Gray</name>
+      <uname>nxg</uname>
+      <email>norman@astro.gla.ac.uk</email>
+      <role>owner</role>
+    </person>
+  </developers>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
+  <copyright>
+    <year>1996-2013</year>
+    <name>Free Software Foundation</name>
+  </copyright>
+  <notes><p>This version of libtool is unpatched -- just the standard
+      version.</p></notes>
+</component>
+
+<component id="m4" buildsupport="noauto" support="U">
+  <!-- Note that, although m4 is a 'buildsupport' tool, we do NOT
+       add the buildsupport="yes" attribute.  If we did, then this would
+       ALWAYS be built at the beginning of the bootstrap process.
+       Instead, we want to build it only if the system m4 is not GNU m4.
+       Thus set the attribute to be "noauto", which causes the correct
+       build rule to be generated (by GenerateDependencies.java), but does
+       not include it in the list of buildsupport dependencies, so that it
+       is not build automatically. -->
+  <version>1.4.17</version>
+  <path>thirdparty/fsf/autotools/m4</path>
+  <description>GNU m4</description>
+  <dependencies/>
+  <developers>
+    <person>
+      <name>Norman Gray</name>
+      <uname>nxg</uname>
+      <email>norman@astro.gla.ac.uk</email>
+      <role>owner</role>
+    </person>
+  </developers>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
+  <copyright>
+    <year>1990-1994, 2000-2013</year>
+    <name>Free Software Foundation</name>
+  </copyright>
+  <notes></notes>
+</component>
+
 <component id="gsl" support="U">
   <version>1.16</version>
   <path>thirdparty/fsf/gsl</path>
@@ -6637,57 +6693,6 @@ Ultrix and for SunOS and may still work for them.
     </person>
   </developers>
   <bugreports>starlink@jiscmail.ac.uk</bugreports>
-</component>
-
-<component id="libtool" buildsupport="yes" support="U">
-  <version>1.5.18</version>
-  <path>thirdparty/fsf/libtool</path>
-  <description>GNU libtool</description>
-  <dependencies/>
-  <developers>
-    <person>
-      <name>Norman Gray</name>
-      <uname>nxg</uname>
-      <email>norman@astro.gla.ac.uk</email>
-      <role>owner</role>
-    </person>
-  </developers>
-  <bugreports>starlink@jiscmail.ac.uk</bugreports>
-  <copyright>
-    <year>1996-2005</year>
-    <name>Free Software Foundation</name>
-  </copyright>
-  <notes><p>This version of libtool is unpatched -- just the standard
-      version.</p></notes>
-</component>
-
-<component id="m4" buildsupport="noauto" support="U">
-  <!-- Note that, although m4 is a 'buildsupport' tool, we do NOT
-       add the buildsupport="yes" attribute.  If we did, then this would
-       ALWAYS be built at the beginning of the bootstrap process.
-       Instead, we want to build it only if the system m4 is not GNU m4.
-       Thus set the attribute to be "noauto", which causes the correct
-       build rule to be generated (by GenerateDependencies.java), but does
-       not include it in the list of buildsupport dependencies, so that it
-       is not build automatically. -->
-  <version>1.4.12.47-7896-dirty</version>
-  <path>thirdparty/fsf/m4</path>
-  <description>GNU m4</description>
-  <dependencies/>
-  <developers>
-    <person>
-      <name>Norman Gray</name>
-      <uname>nxg</uname>
-      <email>norman@astro.gla.ac.uk</email>
-      <role>owner</role>
-    </person>
-  </developers>
-  <bugreports>starlink@jiscmail.ac.uk</bugreports>
-  <copyright>
-    <year>1990-1994, 2000-2005</year>
-    <name>Free Software Foundation</name>
-  </copyright>
-  <notes></notes>
 </component>
 
 <component id="cfitsio" support="U">
@@ -6715,7 +6720,7 @@ Pence for giving his permission for CFITSIO to be released on Starlink.
 </component>
 
 <component id="jpeg" support="U">
-  <version>6b</version>
+  <version>9</version>
   <path>thirdparty/ijg/jpeg</path>
   <description>Independent JPEG Group library</description>
   <dependencies >
@@ -6899,7 +6904,7 @@ and some distortion.
 </component>
 
 <component id="sofa" support="U">
-  <version>2012-03-01</version>
+  <version>2012-07-10</version>
   <path>thirdparty/sofa/sofa</path>
   <description>Standards of Fundamental Astronomy</description>
   <abstract><p>

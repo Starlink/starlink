@@ -46,6 +46,7 @@ lib*.so
 *.class
 \#*\#
 .\#*
+.dirstamp
 
 # Autoconf/automake build dirs
 
@@ -80,6 +81,7 @@ Makefile.in
 missing
 stamp-h1
 stamp-h2
+test-driver
 ylwrap
 *-stamp
 

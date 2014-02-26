@@ -7,21 +7,12 @@
 [submodule "thirdparty/kitware/vtk/cmake"]
 	path = thirdparty/kitware/vtk/cmake
 	url = ../cmake.git
-[submodule "thirdparty/fsf/autoconf"]
-	path = thirdparty/fsf/autoconf
-	url = ../autoconf.git
 [submodule "thirdparty/norman/dvi2bitmap/dvi2bitmap"]
 	path = thirdparty/norman/dvi2bitmap/dvi2bitmap
 	url = ../dvi2bitmap.git
-[submodule "thirdparty/fsf/automake"]
-	path = thirdparty/fsf/automake
-	url = ../automake.git
 [submodule "thirdparty/eso/skycat/skycat"]
 	path = thirdparty/eso/skycat/skycat
 	url = ../skycat.git
-[submodule "thirdparty/fsf/libtool"]
-	path = thirdparty/fsf/libtool
-	url = ../libtool.git
 [submodule "thirdparty/perlsys/perl/perl"]
 	path = thirdparty/perlsys/perl/perl
 	url = git://github.com/Perl/perl5.git
@@ -40,9 +31,6 @@
 [submodule "thirdparty/latex2html/latex2html/latex2html"]
 	path = thirdparty/latex2html/latex2html/latex2html
 	url = ../latex2html.git
-[submodule "thirdparty/fsf/m4"]
-	path = thirdparty/fsf/m4
-	url = ../m4.git
 [submodule "thirdparty/mesa3d/mesa/mesa"]
 	path = thirdparty/mesa3d/mesa/mesa
 	url = ../mesa.git
@@ -160,3 +148,15 @@
 [submodule "thirdparty/perlsys/perlmods/perl-UKIRT-Archive"]
 	path = thirdparty/perlsys/perlmods/perl-UKIRT-Archive
 	url = git://github.com/jac-h/perl-UKIRT-Archive.git
+[submodule "thirdparty/fsf/autotools/autoconf/autoconf"]
+	path = thirdparty/fsf/autotools/autoconf/autoconf
+	url = git@github.com:Starlink/autoconf.git
+[submodule "thirdparty/fsf/autotools/automake/automake"]
+	path = thirdparty/fsf/autotools/automake/automake
+	url = git@github.com:Starlink/automake.git
+[submodule "thirdparty/fsf/autotools/libtool/libtool"]
+	path = thirdparty/fsf/autotools/libtool/libtool
+	url = git@github.com:Starlink/libtool.git
+[submodule "thirdparty/fsf/autotools/m4/m4"]
+	path = thirdparty/fsf/autotools/m4/m4
+	url = git@github.com:Starlink/m4.git

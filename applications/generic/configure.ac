@@ -3,6 +3,7 @@ AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
 AC_INIT(generic, 1.3, starlink@jiscmail.ac.uk)
+AC_CONFIG_AUX_DIR([build-aux])
 
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -15,6 +16,7 @@ AC_CONFIG_SRCDIR([generic])
 
 dnl    Include defaults for Starlink configurations
 STAR_DEFAULTS
+AC_PROG_CC
 
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_LN_S

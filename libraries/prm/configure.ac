@@ -2,10 +2,11 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT(prm, 1.6-1, starlink@jiscmail.ac.uk)
+AC_INIT([prm],[1.6-1],[starlink@jiscmail.ac.uk])
+AC_CONFIG_AUX_DIR([build-aux])
 
 dnl    Require autoconf-2.50 at least
-AC_PREREQ(2.50)
+AC_PREREQ([2.69])
 dnl    Require Starlink automake
 AM_INIT_AUTOMAKE(1.8.2-starlink)
 
@@ -20,7 +21,7 @@ dnl    Find required versions of the programs we need for configuration
 AC_PROG_CC
 AC_PROG_FC
 AC_PROG_FPP
-AC_PROG_LIBTOOL
+LT_INIT
 
 STAR_CHECK_PROGS([fgeneric])
 
@@ -74,9 +75,9 @@ dnl    PWD: note in passing, this test always fails as it does not use
 dnl    Fortran, might be just as well.
 AC_CACHE_CHECK([whether ${FC} supports type-kind notation],
    [ac_cv_fc_type_kind],
-   [AC_COMPILE_IFELSE(AC_LANG_PROGRAM([], [
+   [AC_COMPILE_IFELSE([AC_LANG_PROGRAM([], [
       I=1_8
-]),
+])],
         ac_cv_fc_type_kind=yes,
         ac_cv_fc_type_kind=no)])
 if test $ac_cv_fc_type_kind = yes; then

@@ -1,10 +1,10 @@
 dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision: 16442 $)
 
-AC_INIT(mesa, 7.0.1, starlink@jiscmail.ac.uk)
+AC_INIT([mesa],[7.0.1],[starlink@jiscmail.ac.uk])
 
 dnl    Require autoconf-2.50 at least
-AC_PREREQ(2.50)
+AC_PREREQ([2.68])
 dnl    Require Starlink automake
 AM_INIT_AUTOMAKE(1.8.2-starlink)
 

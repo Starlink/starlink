@@ -1,7 +1,8 @@
 dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
-AC_INIT(kaplibs, 3.5, starlink@jiscmail.ac.uk)
-AC_PREREQ(2.50)
+AC_INIT([kaplibs],[3.5],[starlink@jiscmail.ac.uk])
+AC_CONFIG_AUX_DIR([build-aux])
+AC_PREREQ([2.69])
 AM_INIT_AUTOMAKE(1.8.2-starlink)
 
 dnl    Sanity-check: name a file in the source directory -- if this
@@ -14,7 +15,7 @@ STAR_DEFAULTS
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_CC
 AC_PROG_FC
-AC_PROG_LIBTOOL
+LT_INIT
 
 STAR_CHECK_PROGS([fgeneric])
 

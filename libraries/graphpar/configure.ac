@@ -2,10 +2,11 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT(graphpar, 1.1-6, starlink@jiscmail.ac.uk)
+AC_INIT([graphpar],[1.1-6],[starlink@jiscmail.ac.uk])
+AC_CONFIG_AUX_DIR([build-aux])
 
 dnl    Require autoconf-2.50 at least
-AC_PREREQ(2.50)
+AC_PREREQ([2.69])
 dnl    Require Starlink automake at least
 AM_INIT_AUTOMAKE(1.8.2-starlink)
 
@@ -17,7 +18,7 @@ dnl    Include defaults for Starlink configurations
 STAR_DEFAULTS
 
 AC_PROG_FC
-AC_PROG_LIBTOOL
+LT_INIT
 STAR_MONOLITHS
 
 STAR_CNF_COMPATIBLE_SYMBOLS

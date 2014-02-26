@@ -1,4 +1,5 @@
-##### http://autoconf-archive.cryp.to/mdl_have_opengl.html
+#  Originally from the autoconf macro archive.
+#  This code is now a fork so update with care.
 #
 # SYNOPSIS
 #
@@ -91,8 +92,7 @@ dnl Check for Mesa first, unless we were asked not to.
       GLX_search_list="GLX MesaGLX"
     fi
 
-    AC_LANG_SAVE
-    AC_LANG_C
+    AC_LANG_PUSH([C])
 
 dnl If we are running under X11 then add in the appropriate libraries.
     if test x"$no_x" != xyes; then
@@ -126,8 +126,6 @@ dnl    and GL_X_LIBS.
     if test -n "$LIBS"; then
       mdl_cv_have_OpenGL=yes
       GL_LIBS="$LIBS"
-      AC_SUBST(GL_CFLAGS)
-      AC_SUBST(GL_LIBS)
     else
       mdl_cv_have_OpenGL=no
       GL_CFLAGS=
@@ -140,7 +138,7 @@ dnl and we don't want to be global namespace polluters.
     LIBS="$GL_save_LIBS"
     CPPFLAGS="$GL_save_CPPFLAGS"
 
-    AC_LANG_RESTORE
+    AC_LANG_POP([C])
 
 dnl bugfix: dont forget to cache this variables, too
     mdl_cv_GL_CFLAGS="$GL_CFLAGS"
@@ -150,11 +148,19 @@ dnl bugfix: dont forget to cache this variables, too
     mdl_cv_have_GLX="$have_GLX"
     mdl_cv_have_glut="$have_glut"
   ])
+
+
   GL_CFLAGS="$mdl_cv_GL_CFLAGS"
   GL_LIBS="$mdl_cv_GL_LIBS"
   have_GL="$mdl_cv_have_GL"
   have_GLU="$mdl_cv_have_GLU"
   have_GLX="$mdl_cv_have_GLX"
   have_glut="$mdl_cv_have_glut"
+
+dnl Do this outside of the cache check. That cannot have side-effects in case
+dnl the cache check succeeds and the code is not ran.
+  AC_SUBST([GL_CFLAGS])
+  AC_SUBST([GL_LIBS])
+
 ])
 dnl endof bugfix -ainan

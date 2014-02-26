@@ -2,10 +2,11 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
  
 dnl    Initialisation: package name and version number
-AC_INIT(icl, 3.1-11, starlink@jiscmail.ac.uk)
+AC_INIT([icl],[3.1-11],[starlink@jiscmail.ac.uk])
+AC_CONFIG_AUX_DIR([build-aux])
  
 dnl    Require autoconf-2.50 at least
-AC_PREREQ(2.50)
+AC_PREREQ([2.69])
 dnl    Require Starlink automake at least
 AM_INIT_AUTOMAKE(1.8.2-starlink)
  
@@ -50,7 +51,7 @@ if test "$LEX" != flex; then
 fi
 
 AC_HEADER_STDC
-AC_PROG_LIBTOOL
+LT_INIT
 
 # icl_io.c
 AC_CHECK_FUNCS([atexit on_exit])

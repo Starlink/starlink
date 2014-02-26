@@ -2,10 +2,11 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT(cfitsio, 3.36, starlink@jiscmail.ac.uk)
+AC_INIT([cfitsio],[3.36],[starlink@jiscmail.ac.uk])
+AC_CONFIG_AUX_DIR([.])
 
 dnl    Require autoconf-2.50 at least
-AC_PREREQ(2.50)
+AC_PREREQ([2.69])
 dnl    Require Starlink automake
 AM_INIT_AUTOMAKE(1.8.2-starlink)
 
@@ -43,7 +44,7 @@ dnl    automake to assume it's allowed to play there, too.
 )
 
 dnl    Find required versions of the programs we need for configuration
-AC_PROG_LIBTOOL
+LT_INIT
 AC_PROG_MAKE_SET
 
 dnl    Check for libraries needed for network services. These are added 

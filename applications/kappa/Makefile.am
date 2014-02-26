@@ -173,7 +173,7 @@ ICL_FILES = colstar.icl fancylook.icl flatfield.icl kappa_proc.icl \
 multistat.icl unsharpmask.icl
 
 TCL_FILES = tkast.tcl dialog.tcl stardemo.tcl stardemo_procs.tcl \
-pazo.csh lutedit.tcl
+lutedit.tcl
 
 #  Define the set of all interface files.
 

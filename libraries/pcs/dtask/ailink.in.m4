@@ -552,8 +552,7 @@ linkcmd="$LIBTOOL --mode=link @FC@ @FCFLAGS@ $star_fcflags $extra_mode_args $sta
         $ARGS \
         -lhdspar_adam \
         -lpar_adam \
-        @DTASK_LINK_ADAM@ \
-        @C_FC_FCLINK_MAGIC@"
+        @DTASK_LINK_ADAM@"
 
 # Substitute any -lX options which refer to a libtool library
 # @libdir@/libX.la,

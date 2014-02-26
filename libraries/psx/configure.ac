@@ -2,10 +2,11 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT(psx, 0.5-6, starlink@jiscmail.ac.uk)
+AC_INIT([psx],[0.5-6],[starlink@jiscmail.ac.uk])
+AC_CONFIG_AUX_DIR([build-aux])
 
 dnl    Require autoconf-2.50 at least
-AC_PREREQ(2.50)
+AC_PREREQ([2.69])
 dnl    Require Starlink automake at least
 AM_INIT_AUTOMAKE(1.8.2-starlink)
 
@@ -43,22 +44,22 @@ AC_CHECK_FUNCS([getwd getcwd])
 dnl    On Solaris ctime_r and asctime_r have three arguments (or two if 
 dnl    _POSIX_PTHREAD_SEMANTICS is defined, but let's avoid that). This
 dnl    test is taken to apply to both functions.
-AC_CACHE_CHECK([if ctime_r wants three arguments], psx_ctime_r_three_args,
+AC_CACHE_CHECK([if ctime_r wants three arguments], psx_cv_ctime_r_three_args,
 [
-   AC_TRY_COMPILE( [
+   AC_COMPILE_IFELSE([AC_LANG_PROGRAM([
       #include <time.h>
-   ],[
+   ], [
       char buf[27];
       time_t clock;
       ctime_r( &clock, buf, 26 );
+   ])],[
+      psx_cv_ctime_r_three_args=yes
    ],[
-      psx_ctime_r_three_args=yes
-   ],[
-      psx_ctime_r_three_args=no
-   ] )
-] )
+      psx_cv_ctime_r_three_args=no
+   ])
+])
 
-if test x"$psx_ctime_r_three_args" = xyes ; then
+if test x"$psx_cv_ctime_r_three_args" = xyes ; then
    AC_DEFINE(HAVE_CTIME_R_THREE_ARGS, 1, [Solaris-style ctime_r])
    AC_DEFINE(HAVE_ASCTIME_R_THREE_ARGS, 1, [Solaris-style ctime_r])
 fi
@@ -67,7 +68,7 @@ dnl    MinGW Windows libraries and functions. Checking for the functions,
 dnl    fails (not enough like UNIX) so must check for the declaration only.
 AC_CHECK_DECLS([GetUserName],,,[#include <windows.h>])
 
-AC_PROG_LIBTOOL
+LT_INIT
 
 dnl    If --with-pic=no is set we should honour that.
 AM_CONDITIONAL(NOPIC, test x$pic_mode = xno)

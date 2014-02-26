@@ -1,0 +1,12 @@
+#  Establish the time order of some files directories.
+#  Don't want to regenerate these automatically.
+gsl/configure.ac
+gsl/aclocal.m4
+gsl/configure
+gsl/Makefile.in
+gsl/doc/Makefile.in
+gsl/doc/stamp-vti
+gsl/doc/version.texi
+gsl/doc/gsl-ref.info
+gsl/doc/gsl-ref.info-1
+gsl/doc/gsl-ref.info-2

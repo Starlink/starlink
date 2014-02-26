@@ -7,12 +7,13 @@ dnl    run and gaia/configure, gaia3d/configure and gaiavo/configure
 dnl    scripts have been updated (this normally requires a bootstrap, 
 dnl    configure, bootstrap, the configure updates the local directories 
 dnl    which then require regenerating again).
-AC_INIT(gaia, 4.4-4, starlink@jiscmail.ac.uk)
+AC_INIT([gaia],[4.4-5],[starlink@jiscmail.ac.uk])
+AC_CONFIG_AUX_DIR([build-aux])
 
 dnl    Require autoconf-2.50 at least
-AC_PREREQ(2.50)
+AC_PREREQ([2.69])
 dnl    Require Starlink automake
-AM_INIT_AUTOMAKE(1.8.2-starlink)
+AM_INIT_AUTOMAKE([1.8.2-starlink])
 
 dnl    Sanity-check: name a file in the source directory -- if this
 dnl    isn't found then configure will complain
@@ -21,7 +22,7 @@ AC_CONFIG_SRCDIR([gaia.news])
 dnl    Include defaults for Starlink configurations
 dnl    Option `per-package-dirs' means that executables and help files
 dnl    are installed in package-specific directories.
-STAR_DEFAULTS(per-package-dirs)
+STAR_DEFAULTS([per-package-dirs])
 
 dnl    Need to build an atask, depends on much the same as a full monolith.
 STAR_MONOLITHS
@@ -30,12 +31,12 @@ dnl    Find required versions of the programs we need for configuration
 AC_PROG_CC
 AC_PROG_CXX
 AC_PROG_FC
-AC_PROG_LIBTOOL
+LT_INIT
 
 dnl    We have a C++ main function, but we call Fortran.  This defines
 dnl    the cpp macro of the same name, which will do any 
 dnl    initialisation which is necessary with this platform/compiler.
-STAR_INITIALISE_FORTRAN
+STAR_INITIALISE_FORTRAN_RTL
 
 dnl    Sometimes also need to know the name of the Fortran MAIN.
 AC_FC_MAIN

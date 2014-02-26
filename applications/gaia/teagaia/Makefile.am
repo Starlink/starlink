@@ -17,7 +17,7 @@ STARLINK=@STARLINK@
 CONFIGURE_ARGS=@CONFIGURE_ARGS@
 
 ## Fake dependency to make things happen.
-nodist_bin_SCRIPTS = ../gaia/Makefile ../gaia3d/Makefile \
+noinst_SCRIPTS = ../gaia/Makefile ../gaia3d/Makefile \
                      ../gaiavo/Makefile ../gaia/Makefile
 
 ../gaia/Makefile: $(MANIFESTS)/skycat ../gaia/Makefile.in

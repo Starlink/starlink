@@ -2,10 +2,11 @@ dnl  Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl   Initialisation: package name and version number
-AC_INIT(cnf, 5.1-0, starlink@jiscmail.ac.uk)
+AC_INIT([cnf],[5.1-0],[starlink@jiscmail.ac.uk])
+AC_CONFIG_AUX_DIR([build-aux])
 
 dnl   Require autoconf-2.50 at least
-AC_PREREQ(2.50)
+AC_PREREQ([2.69])
 dnl   Require automake-1.6 at least
 AM_INIT_AUTOMAKE(1.8.2-starlink)
 
@@ -18,14 +19,14 @@ STAR_DEFAULTS
 AC_PROG_CC
 AC_PROG_FC
 AC_PROG_FPP(substitute)
-AC_PROG_LIBTOOL
+LT_INIT
 AC_PROG_LN_S
 AC_FC_MAIN
 
 dnl   If --with-pic=no is set we should honour that.
 AM_CONDITIONAL(NOPIC, test x$pic_mode = xno)
 
-STAR_INITIALISE_FORTRAN
+STAR_INITIALISE_FORTRAN_RTL
 STAR_CNF_COMPATIBLE_SYMBOLS
 
 dnl    Check for %LOC, if not present assume we have LOC.
@@ -91,7 +92,7 @@ dnl   This package has no dependencies
 STAR_LATEX_DOCUMENTATION(sun209)
 
 dnl   Header checks.
-AM_CONFIG_HEADER(config.h)
+AC_CONFIG_HEADERS(config.h)
 
 AC_CONFIG_FILES(Makefile component.xml f77.h)
 

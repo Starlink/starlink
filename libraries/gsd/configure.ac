@@ -2,10 +2,11 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT(gsd, 1.0-2, t.jenness@jach.hawaii.edu)
+AC_INIT([gsd],[1.0-2],[t.jenness@jach.hawaii.edu])
+AC_CONFIG_AUX_DIR([build-aux])
 
 dnl    Require autoconf-2.50 at least
-AC_PREREQ(2.50)
+AC_PREREQ([2.69])
 dnl    Require Starlink automake at least
 AM_INIT_AUTOMAKE(1.8.2-starlink)
 
@@ -20,7 +21,7 @@ dnl    Find required versions of the programs we need for configuration
 AC_PROG_FC
 AC_HEADER_STDC
 AC_C_BIGENDIAN
-AC_PROG_LIBTOOL
+LT_INIT
 
 STAR_CNF_COMPATIBLE_SYMBOLS
 STAR_PRM_COMPATIBLE_SYMBOLS

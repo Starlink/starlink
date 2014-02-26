@@ -5,10 +5,11 @@ dnl    Initialisation: package name and version number
 dnl    Note that for GKS the RAL version number is 1.37 but
 dnl    Starlink does not increment that version. Rather than use
 dnl    non-standard nomenclature use the patch level for starlink patching.
-AC_INIT(gks, 1.37-1, starlink@jiscmail.ac.uk)
+AC_INIT([gks],[1.37-1],[starlink@jiscmail.ac.uk])
+AC_CONFIG_AUX_DIR([build-aux])
 
 dnl    Require autoconf-2.50 at least
-AC_PREREQ(2.50)
+AC_PREREQ([2.69])
 dnl    Require Starlink automake
 AM_INIT_AUTOMAKE(1.8.2-starlink)
 
@@ -23,7 +24,7 @@ dnl    Find required versions of the programs we need for configuration
 AC_PROG_CC
 AC_PROG_FC
 AC_PROG_FPP
-AC_PROG_LIBTOOL
+LT_INIT
 AC_PROG_MAKE_SET
 
 dnl    Other options here, such as

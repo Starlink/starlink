@@ -75,7 +75,6 @@ edit = sed \
     -e 's,@STAR_CPPFLAGS\@,@STAR_CPPFLAGS@,g' \
     -e 's,@STAR_LDFLAGS\@,@STAR_LDFLAGS@,g' \
     -e 's,@FCLIBS\@,$(FCLIBS),g' \
-    -e 's,@C_FC_FCLINK_MAGIC\@,$(C_FC_FCLINK_MAGIC),g' \
     -e 's,@FCFLAGS\@,@FCFLAGS@,g' \
     -e "s!@DTASK_LINK_ADAM\@!`PATH=../subpar:$$PATH ./dtask_link_adam`!g" \
     -e 's,@PACKAGE_NAME\@,$(PACKAGE_NAME),g' \

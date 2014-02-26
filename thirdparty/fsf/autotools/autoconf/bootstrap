@@ -1,0 +1,33 @@
+#! /bin/sh -
+#  This is not a starconf component bootstrap file; it should be maintained
+#  as a copy of buildsupport/starconf/bootstrap.buildsupport:
+#   $Source$
+#   $Revision: 14708 $
+#
+#  Instead, it is a bootstrap script used for thirdparty buildsupport
+#  directories that require some of their files time ordering restored after a
+#  checkout from a repository (but are not part of a normal recursive
+#  bootstrap), that is it works with a bootstrap_timeorder file containing a
+#  list of local files that should be touched in a specific order to stop the
+#  automatic re-generation of comitted files, like Makefile.in, configure
+#  etc., when they look out of date wrt to their Makefile.am, configure.ac
+#  etc.
+#  
+#  Look for a file "bootstrap_timeorder" in the local directory, if
+#  found just read each line and touch the existing files in turn.
+#  Need to sleep between touches as the resolution of these times
+#  is usually about 1 second (so keep the files to be touched to a 
+#  minimum).
+if test -f "bootstrap_timeorder"; then
+   echo "bootstrap of buildsupport directory: restoring timestamp order..."
+   for f in `cat bootstrap_timeorder` ""
+   do
+      if test -f "$f"; then
+         touch "$f"
+         sleep 1
+         echo "   $f"
+      fi
+   done
+fi
+
+exit 0

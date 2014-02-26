@@ -2,12 +2,13 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT(extractor, 2.5-1, starlink@jiscmail.ac.uk)
+AC_INIT([extractor],[2.5-1],[starlink@jiscmail.ac.uk])
+AC_CONFIG_AUX_DIR([build-aux])
 
 dnl    Require autoconf-2.50 at least
-AC_PREREQ(2.50)
+AC_PREREQ([2.69])
 dnl    Require Starlink automake
-AM_INIT_AUTOMAKE(1.8.2-starlink)
+AM_INIT_AUTOMAKE([1.8.2-starlink subdir-objects])
 
 dnl    Sanity-check: name a file in the source directory -- if this
 dnl    isn't found then configure will complain
@@ -36,7 +37,7 @@ dnl    automake to assume it's allowed to play there, too.
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_CC
 AC_PROG_FC
-AC_PROG_LIBTOOL
+LT_INIT
 
 dnl    Declare the build and use dependencies for this package
 STAR_DECLARE_DEPENDENCIES(build, [ast ndg sae], [link])

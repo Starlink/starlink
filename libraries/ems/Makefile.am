@@ -24,6 +24,8 @@ libemsf_la_SOURCES = \
 	$(CF_ROUTINES) \
 	$(PLATFORM_CF)
 
+libemsf_la_LIBADD = libems.la
+
 include_HEADERS = $(PUBLIC_INCLUDES)
 include_MESSAGES = ems_err.h EMS_ERR
 

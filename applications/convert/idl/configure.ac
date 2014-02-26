@@ -4,10 +4,11 @@ AC_REVISION($Revision$)
 dnl    Initialisation: package name and version number
 dnl    Note we use the name "convert" not convert-idl, this is a slight of
 dnl    hand to use the same per-package-dirs as convert.
-AC_INIT(convert, 1.5-4, starlink@jiscmail.ac.uk)
+AC_INIT([convert],[1.5-4],[starlink@jiscmail.ac.uk])
+AC_CONFIG_AUX_DIR([build-aux])
 
 dnl    Require autoconf-2.50 at least
-AC_PREREQ(2.50)
+AC_PREREQ([2.69])
 dnl    Require Starlink automake
 AM_INIT_AUTOMAKE(1.8.2-starlink)
 
@@ -18,8 +19,7 @@ AC_CONFIG_SRCDIR(IDL_Load.c)
 dnl    IDL uses a dlopened shareable library.
 AC_DISABLE_STATIC
 AC_ENABLE_SHARED
-AC_LIBTOOL_DLOPEN
-AC_PROG_LIBTOOL
+LT_INIT([dlopen])
 
 AC_CHECK_HEADERS([limits.h])
 AC_CHECK_DECLS([PATH_MAX],,,[#include <limits.h>
@@ -37,6 +37,7 @@ STAR_CNF_COMPATIBLE_SYMBOLS
 dnl Link against fortran libraries. Don't want the Fortran main
 dnl in this, so remove the known libraries that contain it 
 dnl (g77/frtbegin and gfortran/gfortranbegin).
+AC_PROG_FC
 AC_FC_LIBRARY_LDFLAGS
 FCLIBS=`echo $FCLIBS | sed 's:\ \-l.*begin\ : :g'`
 

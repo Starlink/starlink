@@ -1,0 +1,26 @@
+#  Establish the time order of some files directories.
+#  Don't want to regenerate these automatically.
+configure.ac
+Makefile.am
+aclocal.m4
+configure
+Makefile.in
+autoconf/configure.ac
+autoconf/aclocal.m4
+autoconf/configure
+autoconf/Makefile.in
+autoconf/bin/Makefile.in
+autoconf/doc/Makefile.in
+autoconf/lib/Autom4te/Makefile.in
+autoconf/lib/Makefile.in
+autoconf/lib/autoconf/Makefile.in
+autoconf/lib/autoscan/Makefile.in
+autoconf/lib/autotest/Makefile.in
+autoconf/lib/emacs/Makefile.in
+autoconf/lib/m4sugar/Makefile.in
+autoconf/man/Makefile.in
+autoconf/man/*.1
+autoconf/doc/autoconf.info
+autoconf/doc/standards.info
+autoconf/doc/stamp-vti
+autoconf/INSTALL
