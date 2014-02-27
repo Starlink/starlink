@@ -4941,7 +4941,7 @@ to handle data from a variety of different instruments.
 </component>
 
 <component id="ast" support="S">
-  <version>7.3.3</version>
+  <version>7.3.4</version>
   <path>libraries/ast</path>
   <description>WCS library</description>
   <abstract>
@@ -6696,7 +6696,7 @@ Ultrix and for SunOS and may still work for them.
 </component>
 
 <component id="cfitsio" support="U">
-  <version>3.35</version>
+  <version>3.36</version>
   <path>thirdparty/heasarc/cfitsio</path>
   <description>CFITSIO -- C and Fortran libraries for access to FITS files
         </description>
