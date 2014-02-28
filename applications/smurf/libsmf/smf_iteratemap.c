@@ -430,6 +430,12 @@
 *     2014-02-13 (DSB):
 *        If a different filter size is used on the last iteration, return
 *        the map variances from the penultimate iteration.
+*     2014-02-28 (DSB):
+*        If the AST model was skipped on some initial iterations, do not
+*        converge until at least one complete iteration has been
+*        performed that included an AST Model. Previously, termination
+*        could occur as soon as the initial AST-free iterations had been
+*        completed.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -604,6 +610,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   size_t l;                     /* Loop counter */
   double *lastchisquared=NULL;  /* chisquared for last iter */
   double *lastmap=NULL;         /* map from the last iter */
+  int last_skipped=0;           /* Was the AST model skipped on the previous iteration? */
   smfArray **lut=NULL;          /* Pointing LUT for each file */
   int *lut_data=NULL;           /* Pointer to DATA component of lut */
   smfGroup *lutgroup=NULL;      /* smfGroup of lut model files */
@@ -2074,8 +2081,9 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                not yet have a map estimate so we skip this step (in multiple
                chunk case thismap will still contain the old map from
                the previous chunk). Ignore map pixels that have been
-               constrained to zero. We also skip this bit if the subtraction
-               of AST was skipped on the previous iteration. */
+               constrained to zero. We also skip this bit if the
+               subtraction of AST was skipped on the previous invocation
+               of smf_calcmodel_ast. */
             if( ( iter > 0 || importsky ) && !dat.ast_skipped ) {
 
               /* First find how many samples to process in each worker thread. */
@@ -2230,6 +2238,12 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           smf_diagnostics( wf, 0, &dat, contchunk, keymap, NULL,
                            SMF__AST, status );
 
+          /* Remember if no AST model was subtracted from the
+             previous iteration. The dat.ast_skipped flag is updated
+             within smf_Calcmodel_ast, so we store its current value
+             now, before it is changed */
+          last_skipped = dat.ast_skipped;
+
           /* Estimate the AST model and subtract from the residuals. */
           smf_calcmodel_ast( wf, &dat, 0, keymap, NULL, dimmflags, status );
 
@@ -2337,8 +2351,9 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                   }
                 }
 
-                /* If the AST model was skipped, we have not converged yet. */
-                if( untilconverge && dat.ast_skipped ) converged=0;
+                /* If the AST model was skipped on the previous iteration,
+                   we have not converged yet. */
+                if( untilconverge && last_skipped ) converged=0;
 
               } else {
                 /* Can't converge until at least 2 consecutive chi^2... */
@@ -2389,11 +2404,11 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           /* Check for the map change stopping criterion. Do not modify
              the converged flag on the extra iteration that is done after
              convergence has been reached (i.e. when quit=0).  We do not
-             allow convergence to be reached until we have finished any
-             initial iterations that skip the AST model. */
+             allow convergence to be reached until we have done at least
+             one iteration in which the AST model was not skipped. */
           if( untilconverge &&
               ( ( (maptol!=VAL__BADD) && (mapchange_mean > maptol) ) ||
-                dat.ast_skipped ) && quit == -1 ) {
+                last_skipped ) && quit == -1 ) {
             /* Map hasn't converged yet */
             converged=0;
           }
