@@ -80,10 +80,12 @@
 *        Add SMF__Q_BADEF
 *     2014-1-13 (DSB):
 *        Multi-threaded.
+*     2014-2-28(DSB):
+*        Add SMF__Q_RING
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2010-2011 Science and Technology Facilities Council.
+*     Copyright (C) 2010-2014 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -497,6 +499,9 @@ static void smf1_qual_unmap( void *job_data_ptr, int *status ) {
           }
           if ( *p1 & (SMF__Q_COM) ) {
             *p2 |= SMF__TCOMPQ_MATCH;
+          }
+          if ( *p1 & (SMF__Q_RING) ) {
+            *p2 |= SMF__TCOMPQ_RING;
           }
           if ( *p1 & (SMF__Q_STAT) ) {
             *p2 |= SMF__TCOMPQ_TEL;
