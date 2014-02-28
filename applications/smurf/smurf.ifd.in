@@ -5768,6 +5768,10 @@ package @PACKAGE@ {
         obey {python $SMURF_DIR/jsasplit.py}
     }
 
+    command rawregion {
+        obey {python $SMURF_DIR/rawregion.py}
+    }
+
     icl {defhelp @PACKAGE@ $@PACKAGE_UPCASE@_HELP 0}
 
     display {
