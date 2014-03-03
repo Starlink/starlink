@@ -6,6 +6,11 @@
 
 2 Modified_applications
 
+   o  ARDPLOT
+
+      -  Can now display the outline of a Region even if no picture has
+      been displayed previously on the graphics device.
+
    o  BEAMFIT
 
       -  There is now more control on the initial or fixed sizes and
@@ -75,7 +80,7 @@
 
 1 KAPPA_Version_2.0
 
-   A new release of KAPPA (@PACKAGE_VERSION@) is available.  The main
+   A new release of KAPPA (2.0) is available.  The main
    changes are listed below.  For complete details of all
    changes, see the "Release Notes" appendix in SUN/95.
 
@@ -132,7 +137,7 @@ The following new applications have been added:
 
 1 KAPPA_Version_1.13
 
-   A new release of KAPPA (@PACKAGE_VERSION@) has been released.  The main
+   A new release of KAPPA (1.13) has been released.  The main
    changes are listed below.  For complete details of all
    changes, see the "Release Notes" appendix in SUN/95.
 

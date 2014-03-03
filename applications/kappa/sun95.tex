@@ -14644,9 +14644,15 @@ KAPPA: \htmlref{ARDGEN}{ARDGEN},
    \sstdescription{
       This application draws the outlines of regions described in
       a supplied two-dimensional ARD file (an `ARD Description' (see
-      \xref{SUN/183}{sun183}{}).  The outlines are drawn over the top of a previously
-      displayed picture, aligned (if possible) in the current co-ordinate
-      Frame of the previously drawn picture.
+      \xref{SUN/183}{sun183}{}).  If there is an existing picture on
+      the graphics device, the outlines are drawn over the top of the
+      previously displayed picture, aligned (if possible) in the current
+      co-ordinate Frame of the previously drawn picture.  If the graphics
+      device is empty (or if the CLEAR parameter is set TRUE) the
+      outlines are drawn using a default projection - the size of the
+      area plotted can be controlled by the SIZE parameter. Note, the
+      facility to plot on an empty device is currently only avaialble for
+      2-dimensional regions specified using parameter REGION.
    }
    \sstusage{
       ardplot ardfile [device] [regval]
@@ -14666,6 +14672,12 @@ KAPPA: \htmlref{ARDGEN}{ARDGEN},
          indicates explicitly that positions are specified in pixel
          co-ordinates.  The ARDFILE parameter is only accessed if
          Parameter REGION is given a null ({\tt{!}}) value.
+      }
+      \sstsubsection{
+         CLEAR = \_LOGICAL (Read)
+      }{
+         TRUE if the current picture is to be cleared before the Region
+         is display. {\tt [FALSE]}
       }
       \sstsubsection{
          DEVICE = \htmlref{DEVICE}{se:selgradev} (Read)
@@ -14694,6 +14706,16 @@ KAPPA: \htmlref{ARDGEN}{ARDGEN},
          SUN/183 for further information on the numbering of regions
          within an ARD description.  The REGVAL parameter is only accessed
          if Parameter REGION is given a null ({\tt{!}}) value.  {\tt [0]}
+      }
+      \sstsubsection{
+         SIZE = \_REAL (Read)
+      }{
+         The size of the plot to create, given as a multiple of the size
+         of the Region being plotted.  This parameter is only accessed if
+         no DATA picture can be found on the graphics device, or CLEAR is
+         TRUE.  A SIZE value of 1.0 causes the plot to be the same size as
+         the Region being plotted.  A value of 2.0 causes the plot to be
+         twice the size of the Region, \emph{etc}. {\tt [2.0]}
       }
       \sstsubsection{
          STYLE = \htmlref{GROUP}{se:groups} (Read)
@@ -59085,6 +59107,13 @@ The following applications have been modified:
 The following applications have been modified:
 
 \begin{description}
+   \item [\htmlref{ARDGEN}{ARDGEN}]\mbox{}
+      \begin{itemize}
+        \item Can now display the outline of a Region even if no picture has
+         been displayed previously on the graphics device. The size of
+         the plot is controlled by the new SIZE parameter. Any existing
+         picture can be ignored by setting the new CLEAR parameter to TRUE.
+      \end{itemize}
    \item [\htmlref{BEAMFIT}{BEAMFIT}]\mbox{}
       \begin{itemize}
         \item There is now more control of the initial or fixed sizes

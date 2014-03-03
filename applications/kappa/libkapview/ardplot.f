@@ -22,9 +22,15 @@
 *  Description:
 *     This application draws the outlines of regions described in
 *     a supplied two-dimensional ARD file (an `ARD Description'--see
-*     SUN/183). The outlines are drawn over the top of a previously
-*     displayed picture, aligned (if possible) in the current
-*     co-ordinate Frame of the previously drawn picture.
+*     SUN/183). If there is an existing picture on the graphics device,
+*     the outlines are drawn over the top of the previously displayed
+*     picture, aligned (if possible) in the current co-ordinate Frame
+*     of the previously drawn picture. If the graphics device is empty
+*     (or if the CLEAR parameter is set TRUE) the outlines are drawn
+*     using a default projection - the size of the area plotted can be
+*     controlled by the SIZE parameter. Note, the facility to plot on
+*     an empty device is currently only avaialble for 2-dimensional
+*     regions specified using parameter REGION.
 
 *  Usage:
 *     ardplot ardfile [device] [regval]
@@ -42,6 +48,9 @@
 *        indicates explicitly that positions are specified in pixel
 *        co-ordinates. The ARDFILE parameter is only accessed if
 *        Parameter REGION is given a null (!) value.
+*     CLEAR = _LOGICAL (Read)
+*        TRUE if the current picture is to be cleared before the Region
+*        is display. [FALSE]
 *     DEVICE = DEVICE (Read)
 *        The plotting device.  [Current graphics device]
 *     REGION = FILENAME (Read)
@@ -61,6 +70,13 @@
 *        SUN/183 for further information on the numbering of regions
 *        within an ARD description. The REGVAL parameter is only accessed
 *        if Parameter REGION is given a null (!) value.   [0]
+*     SIZE = _REAL (Read)
+*        The size of the plot to create, given as a multiple of the size
+*        of the Region being plotted. This parameter is only accessed if
+*        no DATA picture can be found on the graphics device, or CLEAR is
+*        TRUE. A SIZE value of 1.0 causes the plot to be the same size as
+*        the Region being plotted. A value of 2.0 causes the plot to be
+*        twice the size of the Region, etc. [2.0]
 *     STYLE = GROUP (Read)
 *        A group of attribute settings describing the plotting style to use
 *        for the curves.
@@ -157,6 +173,8 @@
 *        axes would not otherwise match.
 *     2010 October 14 (MJC):
 *        Document temporary style attributes.
+*     3-MAR-2014 (DSB):
+*        Allow Regions to be plotted over an empty picture.
 *     {enter_further_changes_here}
 
 *-
@@ -178,7 +196,18 @@
 *  Local Variables:
       CHARACTER ADOM*30          ! Name of alignment Domain
       CHARACTER FILNAM*(GRP__SZFNM)! Name of ARD file
+      DOUBLE PRECISION ARDIS     ! Aspect ratio of display surface
+      DOUBLE PRECISION ARREG     ! Aspect ratio of Region
       DOUBLE PRECISION BOX( 4 )  ! Bounds of used region of (X,Y) axes
+      DOUBLE PRECISION DX        ! Size of Region on axis 1
+      DOUBLE PRECISION DY        ! Size of Region on axis 2
+      DOUBLE PRECISION HW        ! Half-width of plotting area in NDC
+      DOUBLE PRECISION INA( 2 )  ! Bottom left corner of PIXEL area
+      DOUBLE PRECISION INB( 2 )  ! Top right corner of PIXEL area
+      DOUBLE PRECISION PEND( 2 ) ! The end of the line
+      DOUBLE PRECISION RLBND( 2 )! Lower bounds of Region
+      DOUBLE PRECISION RUBND( 2 )! Upper bounds of Region
+      INTEGER FC                 ! Temporary FitsChan
       INTEGER FD                 ! File descriptor
       INTEGER FS                 ! Pointer to conversion FrameSet
       INTEGER IBASE              ! Index of original Base frame
@@ -189,18 +218,21 @@
       INTEGER IPIX               ! Index of PIXEL Frame
       INTEGER IPLOT              ! Pointer to AST Plot for DATA picture
       INTEGER IREG               ! Pointer to supplied AST Region
+      INTEGER MAP                ! Pixel->Region mapping
       INTEGER NEWREG             ! Pointer to AST Region to outline
       INTEGER NFRM               ! Frame index increment between IWCS and IPLOT
       INTEGER REGVAL             ! Requested region value
+      INTEGER RFRM               ! The Region's Frame
       INTEGER RV                 ! Max available region value
       LOGICAL ALIGN              ! DATA pic. aligned with a previous picture?
       LOGICAL CONT               ! ARD description to continue?
       LOGICAL SPARSE             ! Were there holds in the coord frame?
       REAL GBOX( 4 )             ! Bounds of used region of (X,Y) axes
       REAL MARGIN( 4 )           ! Margins round DATA picture
+      REAL SIZE                  ! Size of plot if no DAT pic found
 
 *  Initialisations:
-      DATA MARGIN / 0.0, 0.0, 0.0, 0.0 /
+      DATA MARGIN / 0.15, 0.15, 0.15, 0.15 /
       DATA BOX / 0.0, 0.0, 1.0, 1.0 /
 *.
 
@@ -210,7 +242,7 @@
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
 
-*  Start up the graphics system, checking that there is an existing DATA
+*  Start up the graphics system, allowing there to be an existing DATA
 *  picture on the device. This stores a new DATA picture in the AGI
 *  database with the same bounds as the existing DATA picture. The
 *  PGPLOT viewport is set so that it matches the area of the DATA picture.
@@ -220,9 +252,9 @@
 *  corresponds to millimetres from the bottom left corner of the view
 *  port, and the Current Frame is inherited from the existing DATA
 *  picture's WCS FrameSet.
-      CALL KPG1_PLOT( AST__NULL, 'OLD', 'KAPPA_ARDPLOT', ' ', MARGIN, 0,
-     :                ' ', ' ', 0.0, 0.0, 'PIXEL', BOX, IPICD, IPICF,
-     :                IPICK, IPLOT, NFRM, ALIGN, STATUS )
+      CALL KPG1_PLOT( AST__NULL, 'UNKNOWN', 'KAPPA_ARDPLOT', ' ',
+     :                MARGIN, 0, ' ', ' ', 0.0, 0.0, 'NDC', BOX,
+     :                IPICD, IPICF, IPICK, IPLOT, NFRM, ALIGN, STATUS )
 
 *  Abort if an error occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
@@ -241,6 +273,15 @@
 *  ARD file.
       IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
+
+*  Currently, the option for plotting on an empty device is only
+*  available for AST Regions, not ARD files. So report an error if
+*  no existing DATA picture was found when the device was opened.
+         IF( .NOT. ALIGN ) THEN
+            STATUS = SAI__ERROR
+            CALL ERR_REP( ' ', 'No existing DATA picture found.',
+     :                    STATUS )
+         END IF
 
 *  Use a literal parameter to obtain the value to avoid having to give
 *  the indirection and continuation.  Call FIO to open the file to
@@ -289,6 +330,147 @@
 *  Now handle cases where an AST Region was supplied.
       ELSE IF( STATUS .EQ. SAI__OK ) THEN
 
+*  If there was no suitable existing DATA picture on ther graphics
+*  device, we now modify the Plot returned by KPG1_PLOT so that it
+*  represents the a suitable area within the current Frame of the
+*  ARD region. We can then use the blank screen as a background for
+*  plotting the Region.
+         IF( .NOT. ALIGN ) THEN
+
+*  We can only do this if the Region is 2-dimensional.
+            IF( AST_GETI( IREG, "Naxes", STATUS ) .EQ. 2 ) THEN
+
+* Get the size for the plot.
+               CALL PAR_GET0R( 'SIZE', SIZE, STATUS )
+
+*  Get the bounds of the Region, and it's Frame.
+               CALL AST_GETREGIONBOUNDS( IREG, RLBND, RUBND, STATUS )
+               RFRM = AST_GETREGIONFRAME( IREG, STATUS )
+
+*  Get the length of the bounding box along its bottom edge (DX) and
+*  along its left edge (DY). Use AST_DISTANCE since the Frame may be a
+*  SKYFRAME.
+               PEND( 1 ) = RUBND( 1 )
+               PEND( 2 ) = RLBND( 2 )
+               DX = AST_DISTANCE( RFRM, RLBND, PEND, STATUS )
+
+               PEND( 1 ) = RLBND( 1 )
+               PEND( 2 ) = RUBND( 2 )
+               DY = AST_DISTANCE( RFRM, RLBND, PEND, STATUS )
+
+*  Get the aspect ratio (normalised height) of the region, within its
+*  frame.
+               ARREG = DY/DX
+
+*  We want to draw the region on a uniform coordinate system (i.e. unit
+*  aspect ratio) in order to avoid stretching it. So get the bounds of
+*  the display surface in mm, and so get the aspect ratio of the display
+*  surface.
+               CALL PGQWIN( GBOX( 1 ), GBOX( 3 ), GBOX( 2 ), GBOX( 4 ) )
+               ARDIS = ( GBOX( 4 ) - GBOX( 2 ) )/
+     :                 ( GBOX( 3 ) - GBOX( 1 ) )
+
+*  Decide on the bounds of the area to be used, in "NDC" coords (where
+*  the whole plotting surface corresponds to a unit box). INA is the
+*  bottom left corner, and INB is the top right corner.
+               IF( ARDIS .LE. ARREG ) THEN
+                  HW = ARDIS/(2.0*SIZE*ARREG)
+                  INA( 1 ) = 0.5D0 - HW
+                  INB( 1 ) = 0.5D0 + HW
+                  HW = 1.0/(2.0*SIZE)
+                  INA( 2 ) = 0.5D0 - HW
+                  INB( 2 ) = 0.5D0 + HW
+               ELSE
+                  HW = 1.0/(2.0*SIZE)
+                  INA( 1 ) = 0.5D0 - HW
+                  INB( 1 ) = 0.5D0 + HW
+                  HW = ARREG/(2.0*SIZE*ARDIS)
+                  INA( 2 ) = 0.5D0 - HW
+                  INB( 2 ) = 0.5D0 + HW
+               END IF
+
+*  Get the bounds of the Region, and it's Frame.
+               CALL AST_GETREGIONBOUNDS( IREG, RLBND, RUBND, STATUS )
+               RFRM = AST_GETREGIONFRAME( IREG, STATUS )
+
+*  If the Region is defined on the sky, create a TAN projection that maps
+*  the central half of the DATA picture to the bounds of the Region.
+*  Using only the central half of the DATA picture leaves a border round
+*  the Region, which may be useful if for instance another Region is later
+*  to be over-plotted.
+               IF( AST_ISASKYFRAME( RFRM, STATUS ) ) THEN
+
+*  Calculate the pixel sizes that result in the required area of the DATA
+*  picture spanning an area of (DX,DY), and convert to degrees.
+                  DX = AST__DR2D*DX/( INB(1) - INA(1) )
+                  DY = AST__DR2D*DY/( INB(2) - INA(2) )
+
+*  Create a FitsChan holding the FITS-WCS equivalent of the required
+*  mapping. Assume the sky frame is (RA,Dec) for the moment. The DATA
+*  picture is assumed to span a single pixel (as indicated by variable
+*  BOX), so one pixel is mapped onto an area twice the size of the
+*  Region. The tangent point is placed as the south east corner of the
+*  Region's bounding box.
+                  FC = AST_FITSCHAN( AST_NULL, AST_NULL, ' ', STATUS )
+
+                  CALL AST_SETFITSI( FC, 'NAXIS', 2, ' ', .FALSE.,
+     :                               STATUS )
+                  CALL AST_SETFITSI( FC, 'NAXIS1', 1, ' ', .FALSE.,
+     :                               STATUS )
+                  CALL AST_SETFITSI( FC, 'NAXIS2', 1, ' ', .FALSE.,
+     :                               STATUS )
+                  CALL AST_SETFITSS( FC, 'CTYPE1', 'RA---TAN', ' ',
+     :                               .FALSE., STATUS )
+                  CALL AST_SETFITSS( FC, 'CTYPE2', 'DEC--TAN', ' ',
+     :                               .FALSE., STATUS )
+                  CALL AST_SETFITSF( FC, 'CRPIX1', INA( 1 ), ' ',
+     :                               .FALSE., STATUS )
+                  CALL AST_SETFITSF( FC, 'CRPIX2', INA( 2 ), ' ',
+     :                               .FALSE., STATUS )
+                  CALL AST_SETFITSF( FC, 'CDELT1', -DX, ' ', .FALSE.,
+     :                               STATUS )
+                  CALL AST_SETFITSF( FC, 'CDELT2', DY, ' ', .FALSE.,
+     :                               STATUS )
+                  CALL AST_SETFITSF( FC, 'CRVAL1',  AST__DR2D*RUBND(1),
+     :                               ' ', .FALSE., STATUS )
+                  CALL AST_SETFITSF( FC, 'CRVAL2',  AST__DR2D*RLBND(2),
+     :                               ' ', .FALSE., STATUS )
+
+*  Read the WCS FrameSet from this header.
+                  CALL AST_CLEAR( FC, 'Card', STATUS )
+                  FS = AST_READ( FC, STATUS )
+
+*  Get the pixel->sky Mapping
+                  MAP = AST_GETMAPPING( FS, AST__BASE, AST__CURRENT,
+     :                                  STATUS )
+
+*  If the Region is not defined on the sky, create a linear projection that
+*  maps the central half of the DATA picture to the bounds of the Region.
+               ELSE
+                  MAP = AST_WINMAP( 2, INA, INB, RLBND, RUBND, ' ',
+     :                              STATUS )
+               END IF
+
+*  Add a copy of the Region's Frame into the FrameSet, using the above
+*  mapping to connect it to the single-pixel frame that spans the DATA
+*  picture.
+               CALL AST_ADDFRAME( IPLOT, AST__CURRENT, MAP, RFRM,
+     :                            STATUS )
+
+*  Store the Plot with the new DATA picture.
+               CALL KPG1_GDPUT( -1, ' ', ' ', IPLOT, STATUS )
+
+*  Display a coordinate grid.
+               CALL AST_GRID( IPLOT, STATUS )
+
+* Report an error if the Region is not 2-dimensional.
+            ELSE
+               STATUS = SAI__ERROR
+               CALL ERR_REP( ' ', 'Supplied Region is not '//
+     :                       '2-dimensional', STATUS )
+            END IF
+         END IF
+
 *  We now try to get a region in which the axes are the same in number and
 *  type (but not necessarily order - AST_CONVERT, called later, will take
 *  account of any difference in axis order) as those spanned by the current
@@ -326,7 +508,13 @@
      :                                         AST__CURRENT, STATUS ),
      :                         NEWREG, STATUS )
 
-*  Plot a boundary round the Region.
+*  Plot a boundary round the Region. For consistency with the plotting of
+*  ARD region's, the colour of this boundary should be obtained from the
+*  "colour(curves)" attribute. So first set the border colour to the
+*  request curves colour.
+            CALL AST_SETC( IPLOT, 'Colour(border)',
+     :                     AST_GETC( IPLOT, 'Colour(curves)', STATUS ),
+     :                     STATUS )
             SPARSE = AST_BORDER( IPLOT, STATUS )
 
 *  Tell the user what Domain alignment occurred in.

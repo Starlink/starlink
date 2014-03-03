@@ -7,8 +7,8 @@
 
 #  Description:
 #     This file contains default settings for plotting style attributes
-#     to be used by ardplot. These defaults can be over-ridden by the user 
-#     by supplying a value for the STYLE parameter when running ardplot. 
+#     to be used by ardplot. These defaults can be over-ridden by the user
+#     by supplying a value for the STYLE parameter when running ardplot.
 #     The defaults in this file over-ride the defaults in kappa_style.def.
 #     See $KAPPA_DIR/kappa_style.def for more information on KAPPA style
 #     files.
@@ -27,5 +27,9 @@
 #        Original version.
 #-
 
+# Include the defaults from KAPPA_STYLE
+      ^$KAPPA_DIR/kappa_style.def
+
+#  Make the region outlines red
       colour(curves)=red
 

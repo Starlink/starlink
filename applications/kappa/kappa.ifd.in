@@ -3775,6 +3775,15 @@ package kappa {
             helpkey *
         }
 
+         parameter clear {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Is the current picture to be cleared before plotting?}
+            helpkey *
+            default FALSE
+         }
+
          parameter device {
             position 2
             ptype DEVICE
@@ -3801,6 +3810,15 @@ package kappa {
             vpath DEFAULT
             ppath CURRENT DEFAULT
             default 0
+            helpkey *
+        }
+
+         parameter size {
+            type _REAL
+            prompt {Size of plot (in units of the Region size)}
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default 2.0
             helpkey *
         }
 
