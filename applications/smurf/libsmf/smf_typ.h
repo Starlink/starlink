@@ -556,7 +556,7 @@ typedef enum {
 typedef enum {
   SMF__NQBITS_TSERIES = 14,
   SMF__NQBITS_MAP     = 3,
-  SMF__NQBITS_TCOMP   = 5,
+  SMF__NQBITS_TCOMP   = 6,
   SMF__NQBITS         = 14    /* Largest number of bits in a family */
 } smf_qfam_count_t;
 
