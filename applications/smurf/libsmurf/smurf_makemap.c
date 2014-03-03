@@ -1910,6 +1910,7 @@ void smurf_makemap( int *status ) {
                      igrp4, status );
        ndfDelet( &tndf, status );
     } else {
+       grpPut1( igrp4, oname, 0, status );
        ndfAnnul( &tndf, status );
     }
 
