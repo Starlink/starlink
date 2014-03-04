@@ -1,0 +1,28 @@
+
+^$STARLINK_DIR/share/smurf/dimmconfig.lis
+
+noisecliphigh=10.0
+dcthresh = 100
+
+# Similar to bright compact and bright extended,
+# with extra 5 to make up for ast.skip=5 below.
+numiter=-45
+
+maptol = 0.01
+
+# not worrying about extended structure
+com.perarray = 1
+
+# with com.perarray might not be needed split data into 15s chunks and
+# compare noise -- e.g removing timechunks with anomolous high noise
+noi.box_size=-15
+
+# Don't care about anything larger than 200 arcseconds.
+flt.filt_edge_largescale=200
+
+flt.notfirst=1
+
+# Ast.skip options from pipelines blog
+ast.skip=5
+flt.zero_snr=5
+flt.zero_snrlo=3
