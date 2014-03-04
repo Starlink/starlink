@@ -163,6 +163,11 @@
 *        Find the first valid TCS position when building up framesets.
 *     2012-03-06 (TIMJ):
 *        Use PAL instead of SLA.
+*     2014-03-04 (DSB):
+*        Set the reference position in the returned SkyFrame even if a
+*        reference SkyFrame was supplied. Without this, ZERO_CIRCLE
+*        masking does not know where the source is, and assumes it is at
+*        (RA,Dec) = (0,0).
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -435,84 +440,96 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
         continue;
       }
 
-      /* Create output SkyFrame if it has not come from a reference */
-      if ( oskyframe == NULL ) {
+      /* If we are dealing with the first file, create the output SkyFrame. */
+      if( i == 1 ) {
 
-        /* smf_tslice_ast only needs to get called once to set up framesets */
-        if( hdr->wcs == NULL ) {
-          smf_tslice_ast( data, goodidx, 1, fts_port, status);
-        }
+        /* Create output SkyFrame if it has not come from a reference */
+        if ( oskyframe == NULL ) {
 
-        /* Retrieve input SkyFrame */
-        skyin = astGetFrame( hdr->wcs, AST__CURRENT );
+          /* smf_tslice_ast only needs to get called once to set up framesets */
+          if( hdr->wcs == NULL ) {
+            smf_tslice_ast( data, goodidx, 1, fts_port, status);
+          }
 
-        smf_calc_skyframe( skyin, system, hdr, alignsys, &oskyframe, skyref,
-                           moving, status );
+          /* Retrieve input SkyFrame */
+          skyin = astGetFrame( hdr->wcs, AST__CURRENT );
 
-        /* Get the orientation of the map vertical within the output celestial
-           coordinate system. This is derived form the MAP_PA FITS header, which
-           gives the orientation of the map vertical within the tracking system. */
-        map_pa = smf_calc_mappa( hdr, system, skyin, status );
+          smf_calc_skyframe( skyin, system, hdr, alignsys, &oskyframe, skyref,
+                             moving, status );
 
-        /* Provide a sensible default for the pixel size based on wavelength */
-        par[4] = smf_calc_telres( hdr->fitshdr, status );
-        par[4] *= AST__DD2R/3600.0;
-        par[5] = par[4];
+          /* Get the orientation of the map vertical within the output celestial
+             coordinate system. This is derived form the MAP_PA FITS header, which
+             gives the orientation of the map vertical within the tracking system. */
+          map_pa = smf_calc_mappa( hdr, system, skyin, status );
 
-        /* Calculate the projection parameters. We do not enable autogrid determination
-           for SCUBA-2 so we do not need to obtain all the data before calculating
-           projection parameters. */
-        smf_get_projpar( oskyframe, skyref, *moving, 0, 0, NULL, 0,
-                         map_pa, par, NULL, NULL, status );
+          /* Provide a sensible default for the pixel size based on wavelength */
+          par[4] = smf_calc_telres( hdr->fitshdr, status );
+          par[4] *= AST__DD2R/3600.0;
+          par[5] = par[4];
 
-        if (skyin) skyin = astAnnul( skyin );
+          /* Calculate the projection parameters. We do not enable autogrid determination
+             for SCUBA-2 so we do not need to obtain all the data before calculating
+             projection parameters. */
+          smf_get_projpar( oskyframe, skyref, *moving, 0, 0, NULL, 0,
+                           map_pa, par, NULL, NULL, status );
 
-      /* If the output skyframe has been supplied, we still need to
-         determine whether the source is moving or not. */
-      } else {
+          if (skyin) skyin = astAnnul( skyin );
 
-        /* smf_tslice_ast only needs to get called once to set up framesets */
-        if( hdr->wcs == NULL ) {
-          smf_tslice_ast( data, goodidx, 1, fts_port, status);
-        }
-
-        /* Retrieve input SkyFrame */
-        skyin = astGetFrame( hdr->wcs, AST__CURRENT );
-        smf_calc_skyframe( skyin, system, hdr, alignsys, &junksky, skyref,
-                           moving, status );
-      }
-
-      if ( *outframeset == NULL && oskyframe != NULL && (*status == SAI__OK)){
-        /* Now created a spatial Mapping. Use the supplied reference frameset
-           if supplied */
-        if (spacerefwcs) {
-          oskymap = astGetMapping( spacerefwcs, AST__BASE, AST__CURRENT );
+        /* If the output skyframe has been supplied, we still need to
+           determine whether the source is moving or not, and set the
+           reference position. */
         } else {
-          /* Now populate a FitsChan with FITS-WCS headers describing
-             the required tan plane projection. The longitude and
-             latitude axis types are set to either (RA,Dec) or (AZ,EL)
-             to get the correct handedness. */
-          fitschan = astFitsChan ( NULL, NULL, " " );
-          smf_makefitschan( astGetC( oskyframe, "System"), &(par[0]),
-                            &(par[2]), &(par[4]), par[6], fitschan, status );
-          astClear( fitschan, "Card" );
-          fs = astRead( fitschan );
 
-          /* Extract the output PIXEL->SKY Mapping. */
-          oskymap = astGetMapping( fs, AST__BASE, AST__CURRENT );
-          /* Tidy up */
-          fs = astAnnul( fs );
+          /* smf_tslice_ast only needs to get called once to set up framesets */
+          if( hdr->wcs == NULL ) {
+            smf_tslice_ast( data, goodidx, 1, fts_port, status);
+          }
+
+          /* Retrieve input SkyFrame */
+          skyin = astGetFrame( hdr->wcs, AST__CURRENT );
+          smf_calc_skyframe( skyin, system, hdr, alignsys, &junksky, skyref,
+                             moving, status );
+
+          /* Store the sky reference position. If the target is moving,
+             ensure the returned SkyFrame represents offsets from the
+             reference position rather than absolute coords. */
+          astSetD( oskyframe, "SkyRef(1)", skyref[ 0 ] );
+          astSetD( oskyframe, "SkyRef(2)", skyref[ 1 ] );
+          if( *moving ) astSet( oskyframe, "SkyRefIs=Origin" );
         }
 
-        /* Create the output FrameSet */
-        *outframeset = astFrameSet( astFrame(2, "Domain=GRID"), " " );
+        if ( *outframeset == NULL && oskyframe != NULL && (*status == SAI__OK)){
+          /* Now created a spatial Mapping. Use the supplied reference frameset
+             if supplied */
+          if (spacerefwcs) {
+            oskymap = astGetMapping( spacerefwcs, AST__BASE, AST__CURRENT );
+          } else {
+            /* Now populate a FitsChan with FITS-WCS headers describing
+               the required tan plane projection. The longitude and
+               latitude axis types are set to either (RA,Dec) or (AZ,EL)
+               to get the correct handedness. */
+            fitschan = astFitsChan ( NULL, NULL, " " );
+            smf_makefitschan( astGetC( oskyframe, "System"), &(par[0]),
+                              &(par[2]), &(par[4]), par[6], fitschan, status );
+            astClear( fitschan, "Card" );
+            fs = astRead( fitschan );
 
-        /* Now add the SkyFrame to it */
-        astAddFrame( *outframeset, AST__BASE, oskymap, oskyframe );
-        /* Invert the oskymap mapping */
-        astInvert( oskymap );
+            /* Extract the output PIXEL->SKY Mapping. */
+            oskymap = astGetMapping( fs, AST__BASE, AST__CURRENT );
+            /* Tidy up */
+            fs = astAnnul( fs );
+          }
 
-      } /* End WCS FrameSet construction */
+          /* Create the output FrameSet */
+          *outframeset = astFrameSet( astFrame(2, "Domain=GRID"), " " );
+
+          /* Now add the SkyFrame to it */
+          astAddFrame( *outframeset, AST__BASE, oskymap, oskyframe );
+          /* Invert the oskymap mapping */
+          astInvert( oskymap );
+
+        } /* End WCS FrameSet construction */
+      }
 
       /* Get a copy of the output SkyFrame and ensure it represents
          absolute coords rather than offset coords. */
