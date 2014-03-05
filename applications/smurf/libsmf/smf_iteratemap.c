@@ -2944,7 +2944,6 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       dat.ast_mask = astFree( dat.ast_mask );
       dat.com_mask = astFree( dat.com_mask );
       dat.flt_mask = astFree( dat.flt_mask );
-      dat.initqual = astFree( dat.initqual );
     }
 
 #ifdef __ITERATEMAP_SHOW_MEM

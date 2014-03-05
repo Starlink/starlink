@@ -106,6 +106,9 @@
 *        being used as the initial sky map (as used by skyloop). Instead,
 *        use an explicit flag ("dat->mapok") that indicates if the map can
 *        be used.
+*     5-MAR-2014 (DSB):
+*        No need to import mask from the initial sky map since the mask
+*        will be recalculated anyway.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -342,18 +345,7 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
    initialise it to hold the mask defined by the initial sky map. */
             if( *mask == NULL ) {
                have_mask = 0;
-               if( dat->initqual ) {
-                  *mask = astMalloc( dat->msize*sizeof( **mask ) );
-                  if( *mask ) {
-                     pm = *mask;
-                     pq = dat->initqual;
-                     for( i = 0; i < dat->msize; i++ ) {
-                        *(pm++) = ( *(pq++) & qv );
-                     }
-                  }
-               } else{
-                  *mask = astCalloc( dat->msize, sizeof( **mask ) );
-               }
+               *mask = astCalloc( dat->msize, sizeof( **mask ) );
             } else {
                have_mask = 1;
             }

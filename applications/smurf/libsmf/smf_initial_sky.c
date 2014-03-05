@@ -66,6 +66,8 @@
 *     4-MAR-2014 (DSB):
 *        Do not clear and RING or COM flags in the quality array of the time
 *        series data (it will never be present anyway).
+*     5-MAR-2014 (DSB):
+*        Ignore the quality in the supplied map.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -117,8 +119,6 @@ int smf_initial_sky( ThrWorkForce *wf, AstKeyMap *keymap, smfDIMMData *dat,
    int result;                /* Returned flag */
    int there;                 /* Is there a smurf extension in the NDF? */
    size_t size;               /* Size of mapped array */
-   smf_qfam_t family;         /* The family of quality flags found in the NDF */
-   smf_qual_t *qptr;          /* Pointer to mapped quality values */
 
 /* Initialise the returned value to indicate no sky has been subtractred. */
    result = 0;
@@ -167,31 +167,6 @@ int smf_initial_sky( ThrWorkForce *wf, AstKeyMap *keymap, smfDIMMData *dat,
 
 /* Get a section from this NDF that matches the bounds of the map. */
       ndfSect( indf1, 2, dat->lbnd_out, dat->ubnd_out, &indf2, status );
-
-/* Map the quality array section, and copy it into the map buffer. */
-      ndfState( indf2, "QUALITY", &there, status );
-      if( there ) {
-         qptr = smf_qual_map( wf, indf2, "READ", &family, &size, status );
-         if( *status == SAI__OK ) {
-            if( family != SMF__QFAM_MAP ) {
-               *status = SAI__ERROR;
-               ndfMsg( "N", indf1 );
-               errRep( "", "Don't know how to interpret the quality flags "
-                       "in the initial sky NDF (^N).", status );
-            } else {
-               memcpy( dat->mapqual, qptr, dat->msize*sizeof(*qptr));
-
-/* Also copy it into another array where it can be accessed by smf_get_mask. We
-   only need to do this once. */
-               if( ! dat->initqual ) dat->initqual = astStore( NULL, qptr,
-                                                               dat->msize*sizeof(*qptr));
-            }
-         }
-         qptr = smf_qual_unmap( wf, indf2, family, qptr, status );
-
-      } else {
-         qptr = NULL;
-      }
 
 /* Ensure masked values are not set bad in the mapped data array. */
       ndfSbb( 0, indf2, status );
