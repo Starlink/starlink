@@ -137,12 +137,14 @@
 *        first iteration (we will have noise values on the first iteration
 *        when running from SKYLOOP).
 *     2014-1-29 (DSB):
-*        Use the map quality array rather than the raw mask array to define 
-*        the areas to mask. The quality array contains the raw mask but also 
-*        masks out all map pixels with bad data values or variances. It is 
-*        the quality array, not the raw mask, that is used in smf_iteratemap 
+*        Use the map quality array rather than the raw mask array to define
+*        the areas to mask. The quality array contains the raw mask but also
+*        masks out all map pixels with bad data values or variances. It is
+*        the quality array, not the raw mask, that is used in smf_iteratemap
 *        when adding on the previous AST model prior to forming a new map,
 *        so we really must be consistent and use the same thing here.
+*     2014-3-4 (DSB):
+*        Do despiking even if an initial sky is being subtracted.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -294,9 +296,8 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
      have_noi = ( ((double *) noi->sdata[idx]->pntr[0])[ 0 ] != 1.0 );
   }
 
-  /* Despike if we have usable NOI values and this function was not
-     called as part of subtracting off an initial sky. */
-  if( (mapspike > 0) && have_noi && !(flags&SMF__DIMM_PREITER) ) {
+  /* Despike if we have usable NOI values. */
+  if( (mapspike > 0) && have_noi ) {
     size_t nflagged;
     smf_map_spikes( wf, res->sdata[idx], noi->sdata[idx], lut->sdata[idx]->pntr[0],
                     SMF__Q_GOOD, map, mapweight, hitsmap, mapvar, mapspike,
