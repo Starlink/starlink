@@ -29,7 +29,7 @@
 *     (or if the CLEAR parameter is set TRUE) the outlines are drawn
 *     using a default projection - the size of the area plotted can be
 *     controlled by the SIZE parameter. Note, the facility to plot on
-*     an empty device is currently only avaialble for 2-dimensional
+*     an empty device is currently only available for two-dimensional
 *     regions specified using parameter REGION.
 
 *  Usage:
@@ -37,17 +37,18 @@
 
 *  ADAM Parameters:
 *     ARDFILE = FILENAME (Read)
-*        The name of a file containing an `ARD Description' of the regions
-*        to be outlined. The co-ordinate system in which positions within
-*        this file are given should be indicated by including suitable
-*        COFRAME or WCS statements within the file (see SUN/183), but will
-*        default to pixel co-ordinates in the absence of any such
-*        statements. For instance, starting the file with a line containing
-*        the text "COFRAME(SKY,System=FK5)" would indicate that positions
-*        are specified in RA/DEC (FK5,J2000). The statement "COFRAME(PIXEL)"
-*        indicates explicitly that positions are specified in pixel
-*        co-ordinates. The ARDFILE parameter is only accessed if
-*        Parameter REGION is given a null (!) value.
+*        The name of a file containing an `ARD Description' of the
+*        regions to be outlined. The co-ordinate system in which
+*        positions within this file are given should be indicated by
+*        including suitable COFRAME or WCS statements within the file
+*        (see SUN/183), but will default to pixel co-ordinates in the
+*        absence of any such statements. For instance, starting the file
+*        with a line containing the text "COFRAME(SKY,System=FK5)"
+*        would indicate that positions are specified in RA/DEC
+*        (FK5,J2000). The statement "COFRAME(PIXEL)" indicates
+*        explicitly that positions are specified in pixel co-ordinates.
+*        The ARDFILE parameter is only accessed if Parameter REGION is
+*        given a null (!) value.
 *     CLEAR = _LOGICAL (Read)
 *        TRUE if the current picture is to be cleared before the Region
 *        is display. [FALSE]
@@ -55,8 +56,8 @@
 *        The plotting device.  [Current graphics device]
 *     REGION = FILENAME (Read)
 *        The name of a file containing an AST Region to be outlined, or
-*        null (!) if the ARD region defined by Parameter ARDFILE is to be
-*        outlined. Suitable files can be created using the ATOOLS
+*        null (!) if the ARD region defined by Parameter ARDFILE is to
+*        be outlined. Suitable files can be created using the ATOOLS
 *        package.  [!]
 *     REGVAL = _INTEGER (Read)
 *        Indicates which regions within the ARD description are to be
@@ -68,18 +69,18 @@
 *        supplied, then all regions with indices greater than or equal
 *        to the absolute value of the supplied index are outlined. See
 *        SUN/183 for further information on the numbering of regions
-*        within an ARD description. The REGVAL parameter is only accessed
-*        if Parameter REGION is given a null (!) value.   [0]
+*        within an ARD description. The REGVAL parameter is only
+*        accessed if Parameter REGION is given a null (!) value.   [0]
 *     SIZE = _REAL (Read)
 *        The size of the plot to create, given as a multiple of the size
 *        of the Region being plotted. This parameter is only accessed if
-*        no DATA picture can be found on the graphics device, or CLEAR is
-*        TRUE. A SIZE value of 1.0 causes the plot to be the same size as
-*        the Region being plotted. A value of 2.0 causes the plot to be
-*        twice the size of the Region, etc. [2.0]
+*        no DATA picture can be found on the graphics device, or CLEAR
+*        is TRUE. A SIZE value of 1.0 causes the plot to be the same
+*        size as the Region being plotted. A value of 2.0 causes the
+*        plot to be twice the size of the Region, etc. [2.0]
 *     STYLE = GROUP (Read)
-*        A group of attribute settings describing the plotting style to use
-*        for the curves.
+*        A group of attribute settings describing the plotting style to
+*        use for the curves.
 *
 *        A comma-separated list of strings should be given in which each
 *        string is either an attribute setting, or the name of a text
@@ -114,13 +115,13 @@
 *  Examples:
 *     ardplot bulge
 *        Draws an outline around all the regions included in the ardfile
-*        named "bulge". The outline is drawn on the current graphics device
-*        and is drawn in alignment with the previous picture.
+*        named "bulge". The outline is drawn on the current graphics
+*        device and is drawn in alignment with the previous picture.
 
 *  Notes:
 *     -  A DATA picture must already exist on the selected graphics
-*     device before running this command. An error will be reported if no
-*     DATA picture can be found.
+*     device before running this command. An error will be reported if
+*     no DATA picture can be found.
 *     -  The application stores a new DATA picture in the graphics
 *     database. On exit the current database picture for the chosen
 *     device reverts to the input picture.
@@ -132,7 +133,8 @@
 *     Copyright (C) 2001, 2004 Central Laboratory of the Research
 *     Councils. Copyright (C) 2005 Particle Physics & Astronomy
 *     Research Council.
-*     Copyright (C) 2007, 2010 Science & Technology Facilities Council.
+*     Copyright (C) 2007, 2010, 2014 Science & Technology Facilities
+*     Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -166,7 +168,8 @@
 *     15-NOV-2005 (DSB):
 *        Delete the GRP identifier before returning.
 *     28-MAY-2007 (DSB):
-*        Modified to support outlining of AST Regions as well as ARD files.
+*        Modified to support outlining of AST Regions as well as ARD
+*        files.
 *     30-SEP-2009 (DSB):
 *        Use ATL_MATCHREGION to ensure the Region axes correspond to the
 *        Plot axes. This should speed up the plotting in cases where the
@@ -245,13 +248,13 @@
 *  Start up the graphics system, allowing there to be an existing DATA
 *  picture on the device. This stores a new DATA picture in the AGI
 *  database with the same bounds as the existing DATA picture. The
-*  PGPLOT viewport is set so that it matches the area of the DATA picture.
-*  World co-ordinates within the PGPLOT window are set to millimetres
-*  from the bottom left corner of the view surface. An AST Plot is returned
-*  for drawing in the DATA picture. The Base (GRAPHICS) Frame in the Plot
-*  corresponds to millimetres from the bottom left corner of the view
-*  port, and the Current Frame is inherited from the existing DATA
-*  picture's WCS FrameSet.
+*  PGPLOT viewport is set so that it matches the area of the DATA
+*  picture.  World co-ordinates within the PGPLOT window are set to
+*  millimetres from the bottom-left corner of the view surface. An AST
+*  Plot is returned for drawing in the DATA picture. The Base (GRAPHICS)
+*  Frame in the Plot corresponds to millimetres from the bottom-left
+*  corner of the view port, and the Current Frame is inherited from the
+*  existing DATA picture's WCS FrameSet.
       CALL KPG1_PLOT( AST__NULL, 'UNKNOWN', 'KAPPA_ARDPLOT', ' ',
      :                MARGIN, 0, ' ', ' ', 0.0, 0.0, 'NDC', BOX,
      :                IPICD, IPICF, IPICK, IPLOT, NFRM, ALIGN, STATUS )
@@ -300,8 +303,8 @@
 *  Get the index of the region to draw.
          CALL PAR_GET0I( 'REGVAL', REGVAL, STATUS )
 
-*  We want to draw the ARD region over the entire plotting area, so get the
-*  bounds of the PGPLOT window (this will be in millimetres).
+*  We want to draw the ARD region over the entire plotting area, so get
+*  the bounds of the PGPLOT window (this will be in millimetres).
          CALL PGQWIN( GBOX( 1 ), GBOX( 3 ), GBOX( 2 ), GBOX( 4 ) )
 
 *  Select the PIXEL Frame as the current Frame in the Plot so that
@@ -393,15 +396,15 @@
                CALL AST_GETREGIONBOUNDS( IREG, RLBND, RUBND, STATUS )
                RFRM = AST_GETREGIONFRAME( IREG, STATUS )
 
-*  If the Region is defined on the sky, create a TAN projection that maps
-*  the central half of the DATA picture to the bounds of the Region.
-*  Using only the central half of the DATA picture leaves a border round
-*  the Region, which may be useful if for instance another Region is later
-*  to be over-plotted.
+*  If the Region is defined on the sky, create a TAN projection that
+*  maps the central half of the DATA picture to the bounds of the
+*  Region. Using only the central half of the DATA picture leaves a
+*  border round the Region, which may be useful if for instance another
+*  Region is later to be over-plotted.
                IF( AST_ISASKYFRAME( RFRM, STATUS ) ) THEN
 
-*  Calculate the pixel sizes that result in the required area of the DATA
-*  picture spanning an area of (DX,DY), and convert to degrees.
+*  Calculate the pixel sizes that result in the required area of the
+*  DATA picture spanning an area of (DX,DY), and convert to degrees.
                   DX = AST__DR2D*DX/( INB(1) - INA(1) )
                   DY = AST__DR2D*DY/( INB(2) - INA(2) )
 
@@ -444,8 +447,9 @@
                   MAP = AST_GETMAPPING( FS, AST__BASE, AST__CURRENT,
      :                                  STATUS )
 
-*  If the Region is not defined on the sky, create a linear projection that
-*  maps the central half of the DATA picture to the bounds of the Region.
+*  If the Region is not defined on the sky, create a linear projection
+*  that maps the central half of the DATA picture to the bounds of the
+*  Region.
                ELSE
                   MAP = AST_WINMAP( 2, INA, INB, RLBND, RUBND, ' ',
      :                              STATUS )
@@ -471,10 +475,10 @@
             END IF
          END IF
 
-*  We now try to get a region in which the axes are the same in number and
-*  type (but not necessarily order - AST_CONVERT, called later, will take
-*  account of any difference in axis order) as those spanned by the current
-*  Frame in the Plot.
+*  We now try to get a region in which the axes are the same in number
+*  and type (but not necessarily order - AST_CONVERT, called later, will
+*  take account of any difference in axis order) as those spanned by the
+*  current Frame in the Plot.
          CALL ATL_MATCHREGION( IREG, IPLOT, NEWREG, STATUS )
 
 *  Find the Mapping from the existing Plot to the Frame represented by
@@ -508,10 +512,10 @@
      :                                         AST__CURRENT, STATUS ),
      :                         NEWREG, STATUS )
 
-*  Plot a boundary round the Region. For consistency with the plotting of
-*  ARD region's, the colour of this boundary should be obtained from the
-*  "colour(curves)" attribute. So first set the border colour to the
-*  request curves colour.
+*  Plot a boundary round the Region. For consistency with the plotting
+*  of ARD region's, the colour of this boundary should be obtained from
+*  the "colour(curves)" attribute. So first set the border colour to the
+*  requested curves colour.
             CALL AST_SETC( IPLOT, 'Colour(border)',
      :                     AST_GETC( IPLOT, 'Colour(curves)', STATUS ),
      :                     STATUS )
