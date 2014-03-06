@@ -301,20 +301,21 @@ c      call ast_flushmemory( 1 )
      :                 '179.0 -11.5 0.5 Position 179.0 -11.5', status )
 
          call assertc( 'line 5 2', buff(5), '   Error 0.000889 '//
-     :                 '0.000889 Resolution 0.001778', status )
+     :                 '0.000889 Resolution 0.001778 Size 0.000333',
+     :                 status )
 
-         call assertc( 'line 6 2', buff(6), '   Size 0.000333 '//
-     :                 '0.000278 PixSize 0.000083 0.000083', status )
+         call assertc( 'line 6 2', buff(6), '   0.000278 PixSize '//
+     :                 '0.000083 0.000083', status )
 
          call assertc( 'line 7 2', buff(7), 'Spectral BARYCENTER '//
      :                 '1420.4 unit MHz Resolution 10.0', status )
 
          call assertc( 'line 8 2', buff(8), 'RedshiftInterval '//
-     :                 'BARYCENTER VELOCITY OPTICAL 200 2300 '//
-     :                 'Redshift 300', status )
+     :                 'BARYCENTER VELOCITY OPTICAL 200 2300 ',
+     :                 status )
 
-         call assertc( 'line 9 2', buff(9), '   Resolution 0.7 '//
-     :                 'PixSize 0.3', status )
+         call assertc( 'line 9 2', buff(9), '   Redshift 300 '//
+     :                 'Resolution 0.7 PixSize 0.3', status )
 
       else
          write(*,*) 'No object read from doc 3'
