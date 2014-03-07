@@ -109,10 +109,14 @@
 *     5-MAR-2014 (DSB):
 *        No need to import mask from the initial sky map since the mask
 *        will be recalculated anyway.
+*     7-MAR-2014 (DSB):
+*        If the mask contains fewer than 5 source pixels, issue a warning
+*        rather than an error, since a null mask does not prevent a map
+*        being cerated.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2012 Science & Technology Facilities Council.
+*     Copyright (C) 2012-2014 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -201,8 +205,6 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
    int zero_niter;            /* Only mask for the first "niter" iterations. */
    int zero_notlast;          /* Don't zero on last iteration? */
    size_t ngood;              /* Number good samples for stats */
-   smf_qual_t *pq;            /* Pinter to map quality */
-   smf_qual_t qv;             /* Map quality value to use */
    unsigned char **mask;      /* Address of model's mask pointer */
    unsigned char *newmask;    /* Individual mask work space */
    unsigned char *pm;         /* Pointer to next returned mask pixel */
@@ -224,19 +226,15 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
    if( mtype == SMF__COM ) {
       modname = "COM";
       mask = &(dat->com_mask);
-      qv = SMF__MAPQ_COM;
    } else if( mtype == SMF__AST ) {
       modname = "AST";
       mask = &(dat->ast_mask);
-      qv = SMF__MAPQ_AST;
    } else if( mtype == SMF__FLT ) {
       modname = "FLT";
       mask = &(dat->flt_mask);
-      qv = SMF__MAPQ_FLT;
    } else {
       modname = NULL;
       mask = NULL;
-      qv = 0;
       *status = SAI__ERROR;
       errRepf( " ", "smf_get_mask: Unsupported model type %d supplied - "
                "must be COM, FLT or AST.", status, mtype );
@@ -640,7 +638,8 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
 
 /* Check that the mask has some source pixels (i.e. pixels that have non-bad data values -
    we do not also check variance values since they are not available until the second
-   iteration). */
+   iteration). We can make a map even if the mask has no source pixels at
+   all, so make this a warning rather than an error. */
             if( *status == SAI__OK ) {
                nsource = 0;
                pm = *mask;
@@ -648,12 +647,11 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
                for( i = 0; i < dat->msize; i++,pd++,pv++,pm++ ) {
                   if( *pd != VAL__BADD && *pm == 0 ) nsource++;
                }
-               if( nsource < 5 && *status == SAI__OK ) {
-                  *status = SAI__ERROR;
-                  errRepf( "", "The %s mask being used has fewer than 5 "
-                           "source pixels.", status, modname );
+               if( nsource < 5 ) {
+                  msgOutf( "", "WARNING: The %s mask being used has fewer "
+                           "than 5 source pixels.", status, modname );
                   if( zero_snr > 0.0 ) {
-                     errRepf( "", "Maybe your zero_snr value (%g) is too high?",
+                     msgOutf( "", "Maybe your zero_snr value (%g) is too high?",
                               status, zero_snr );
                   }
                }
