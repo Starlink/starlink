@@ -34,6 +34,7 @@
 *  Authors:
 *     J.Balfour (UBC)
 *     V.Tilanus (JAC)
+*     Malcolm J. Currie (JAC)
 *     {enter_new_authors_here}
 
 *  History :
@@ -54,15 +55,17 @@
 *     2010-07-01 (VT):
 *        Fixed string equalities.
 *        Renamed Raster to Scan.
+*     2014 March 7 (MJC):
+*        Switch mode freq should be freqsw for CAOM2 ingestion.
 
 *  Copyright:
-*     Copyright (C) 2008,2010 Science and Technology Facilities Council.
+*     Copyright (C) 2008, 2010, 2014 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 3 of
+*     published by the Free Software Foundation; either Version 3 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -73,7 +76,7 @@
 *     You should have received a copy of the GNU General Public
 *     License along with this program; if not, write to the Free
 *     Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-*     MA 02110-1301, USA
+*     MA 02110-1301, USA.
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -103,16 +106,19 @@ void gsdac_getMapVars ( const gsdVars *gsdVars, const char *samMode,
   /* Check inherited status */
   if ( *status != SAI__OK ) return;
 
+
+  /* Translate Switch mode. */
   if ( strncmp ( gsdVars->swMode, "POSITION_SWITCH", 15 ) == 0 ) {
 
     if ( gsdVars->chopping ) {
       if ( gsdVars->referenceX == 0.0 && gsdVars->referenceY == 0.0 )
-        strcpy ( mapVars->swMode, "freq" );
+        strcpy ( mapVars->swMode, "freqsw" );
       else
         strcpy ( mapVars->swMode, "pssw" );
     } else {
       if ( gsdVars->referenceX == 0.0 && gsdVars->referenceY == 0.0 ) {
-        strcpy ( mapVars->swMode, "freq" );
+        strcpy ( mapVars->swMode, "freqsw" );
+
         /* Print a message, this was likely intended as a freq. sw. */
         msgOutif(MSG__VERB," ", "SWITCH_MODE was POSITION_SWITCH and CHOPPING was 0, this was likely intended to be a frequency switch", status);
       } else strcpy ( mapVars->swMode, "pssw" );
@@ -129,7 +135,7 @@ void gsdac_getMapVars ( const gsdVars *gsdVars, const char *samMode,
 
   } else if ( strncmp ( gsdVars->swMode, "CHOPPING", 8 ) == 0 ) {
 
-    strcpy ( mapVars->swMode, "freq" );
+    strcpy ( mapVars->swMode, "freqsw" );
     if ( gsdVars->chopping ) {
       msgOutif(MSG__VERB," ", "SWITCH_MODE was CHOPPING and CHOPPING was 1, this appears to be a misconfigured frequency switch", status);
     }
