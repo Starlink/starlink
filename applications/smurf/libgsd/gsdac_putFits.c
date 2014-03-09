@@ -151,9 +151,12 @@
 *        stored as undef FITS headers.
 *     2013 December 4 (MJC):
 *        Choose a non-blank value of MSBID if it is undefined.
+*     2014 March 4 (MJC):
+*        Set SB_MODE default for metadata missing the value.  Test swMode
+*        against "freqsw" not "freq" to set frequency-switch recipe.
 
 *  Copyright:
-*     Copyright (C) 2008-2013 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2014 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -236,6 +239,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   char recipe[25];            /* ORAC-DR recipe name */
   char recptors[SZFITSTR];    /* active FE receptor IDs for this obs */
   double refChan;             /* reference IF channel no. */
+  char sbMode[7];             /* Side band */
   int seeingok;               /* True if the seeing measurement is okay */
   char seeDatSt[SZFITSTR];    /* time of seeingSt in format
                                  YYYY-MM-DDTHH:MM:SS */
@@ -358,7 +362,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   else if ( gsdVars->velocity > 120 )
      strcpy( recipe, "REDUCE_SCIENCE_BROADLINE" );
 
-  else if ( strncmp( mapVars->swMode, "freq", 4 ) == 0  )
+  else if ( strncmp( mapVars->swMode, "freqsw", 6 ) == 0  )
      strcpy( recipe, "REDUCE_SCIENCE_FSW" );
 
   /* FE Specific. */
@@ -744,7 +748,20 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   astSetFitsS ( fitschan, "INSTRUME", instrume,
 	        "Front-end receiver", 0 );
 
-  astSetFitsS ( fitschan, "SB_MODE", gsdVars->sbMode,
+  /* There are some unknown null values, set those here as they are
+     dependent on the UT date and frontend as well as GSDVars.  In brief
+     Russell Redman's analysis indicates that SB_MODE was filled from
+     19940414.  Before that all were DSB instruments except RxB3. */
+  if ( strcmp( gsdVars->sbMode, "" ) == 0 ) {
+     if ( strncmp( instrume, "RXB3", 4 ) == 0 && utDate < 19940414 ) {
+        strcpy( sbMode, "UNKNOWN" );
+     } else {
+        strcpy( sbMode, "DSB" );
+     }
+  } else {
+     strcpy( sbMode, gsdVars->sbMode );
+  }
+  astSetFitsS ( fitschan, "SB_MODE", sbMode,
 	        "Sideband mode", 0 );
 
   astSetFitsF ( fitschan, "IFFREQ", IFFreqs[subBandNum],
