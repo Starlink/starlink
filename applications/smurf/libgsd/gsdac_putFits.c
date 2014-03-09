@@ -154,6 +154,9 @@
 *     2014 March 4 (MJC):
 *        Set SB_MODE default for metadata missing the value.  Test swMode
 *        against "freqsw" not "freq" to set frequency-switch recipe.
+*     2014 March 7 (MJC):
+*        Protect SEEDATST and SEEDATEN from having non-valid minute
+*        value.
 
 *  Copyright:
 *     Copyright (C) 2008-2014 Science and Technology Facilities Council.
@@ -469,9 +472,25 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
       if ( year > 70 ) year = year + 1900;
       else year = year + 2000;
 
+      /* There are some times with minutes more than 59.  Assume
+         that something like 04:64 means 05:04, and that we do not
+         cross a UT date too so just increment the hour.  If the date
+         were affected, then something very wrong has happened to the
+         time string and it might best not to export it.  We can go
+         the whole hog incrementing through to year if it actually
+         proves necessary. There is a good argument to make such time
+         values null, since it is clearly anomalous. For the example I
+         have, the seeing time bears no resemblance to the other times
+         unless it is in HST instead of UTC.  The main thing here is
+         prevent problems storing in databases. */
+      if ( min > 59 ) {
+         min = min % 60;
+         hour++;
+         if ( hour > 23 ) seeingok = 0;
+      }
+
       sprintf ( seeDatSt, "%04d-%02d-%02dT%02d:%02d:00",
                 year, month, day, hour, min );
-
     }
   }
 
