@@ -36,6 +36,7 @@
 
 *  Authors:
 *     J.Balfour (UBC)
+*     Malcolm J. Currie (JAC)
 *     {enter_new_authors_here}
 
 *  History :
@@ -55,15 +56,17 @@
 *        Accept AOSC as backend.
 *     2008-04-10 (JB):
 *        Correct for difference in solar and sidereal times.
+*     2014 March 3 (MJC):
+*        Set obsid value to uppercase.
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008, 2014 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 3 of
+*     published by the Free Software Foundation; either Version 3 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -74,7 +77,7 @@
 *     You should have received a copy of the GNU General Public
 *     License along with this program; if not, write to the Free
 *     Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-*     MA 02110-1301, USA
+*     MA 02110-1301, USA.
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -178,6 +181,10 @@ void gsdac_getDateVars ( const gsdVars *gsdVars, const char *backend,
 
   sprintf ( dateVars->obsID, "%s_%05d_%04d%02d%02dT%02d%02d%02d",
             backend, obsNum, year, month, day, hour, min, (int)sec );
+
+  /* Convert to lowercase to give a consistent format for the JSA. */
+  astChrCase( NULL, dateVars->obsID, 0, 0 );
+
 
   /* Get the DATE-END. This will be DATE-OBS + ( last LST - first LST ). */
   tableSize = gsdVars->nScanVars1 * gsdVars->nScan;
