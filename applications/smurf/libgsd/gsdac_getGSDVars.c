@@ -31,6 +31,7 @@
 
 *  Authors:
 *     Jen Balfour (JAC, UBC)
+*     Malcolm J. Currie (JAC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -54,15 +55,20 @@
 *        Move flagging of bad values to gsdac_flagBad.
 *     2008-04-25 (JB):
 *        Check for presence of C3MIXNUM array.
+*     2014 March 3 (MJC):
+*        Set project and switch mode values to uppercase and
+*        lowercase respectively.  Replace non-standard switch mode
+*        "freq" with "freqsw".  Make default sbMode UNKNOWN rather
+*        than null.
 
 *  Copyright:
-*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008, 2014 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 3 of
+*     published by the Free Software Foundation; either Version 3 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -72,8 +78,8 @@
 *
 *     You should have received a copy of the GNU General Public
 *     License along with this program; if not, write to the Free
-*     Software Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston,
-*     MA 02110-1301, USA
+*     Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+*     MA 02110-1301, USA.
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -83,6 +89,7 @@
 /* STARLINK includes */
 #include "sae_par.h"
 #include "prm_par.h"
+#include "ast.h"
 #include "mers.h"
 
 /* SMURF includes */
@@ -98,6 +105,7 @@ void gsdac_getGSDVars ( const gsd *gsd, const dasFlag dasFlag,
   /* Local variables.*/
   long i;                     /* loop counter */
   int gsdcode;                /* Coordinate code integer */
+  char swMode[15];            /* Switch mode lowercase copy */
 
   /* Check inherited status */
   if ( *status != SAI__OK ) return;
@@ -105,8 +113,10 @@ void gsdac_getGSDVars ( const gsd *gsd, const dasFlag dasFlag,
   /* Get the telescope name. */
   gsdac_get0c ( gsd, "C1TEL", gsdVars->telName, status );
 
-  /* Get the Project name. */
+  /* Get the Project name.  Convert to uppercase to give a
+     consistent format for the JSA. */
   gsdac_get0c ( gsd, "C1PID", gsdVars->project, status );
+  astChrCase( NULL, gsdVars->project, 1, 0 );
 
   /* Get the Project details. */
   gsdac_get0c ( gsd, "C1OBS", gsdVars->projectObs1, status );
@@ -316,8 +326,16 @@ void gsdac_getGSDVars ( const gsd *gsd, const dasFlag dasFlag,
   /* Get the units of the data. */
   gsdac_get0c ( gsd, "C12CAL", gsdVars->dataUnits, status );
 
-  /* Get the switch mode. */
+  /* Get the switch mode.  Ensure that it is in lowercase for
+     CADC and consistency with ACSIS, and that the early "freq"
+     is converted to one of the four permitted values. */
   gsdac_get0c ( gsd, "C6MODE", gsdVars->swMode, status );
+  strcpy( swMode, gsdVars->swMode );
+  astChrCase( NULL, swMode, 0, 0 );
+
+  if ( strncmp( swMode, "freq", 4 ) == 0 ) {
+     strcpy( gsdVars->swMode, "freqsw" );
+  }
 
   /* Get the calibration parameters. */
   gsdac_get0c ( gsd, "C12CALTASK", gsdVars->calInstrument, status );
@@ -395,7 +413,7 @@ void gsdac_getGSDVars ( const gsd *gsd, const dasFlag dasFlag,
     gsdac_get0c ( gsd, "C3SBMODE", gsdVars->sbMode, status );
     if ( *status != SAI__OK ) {
       errAnnul ( status );
-      strcpy ( gsdVars->sbMode, "" );
+      strcpy ( gsdVars->sbMode, "UNKNOWN" );
     }
   }
 
