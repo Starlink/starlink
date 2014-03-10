@@ -113,6 +113,9 @@
 *        If the mask contains fewer than 5 source pixels, issue a warning
 *        rather than an error, since a null mask does not prevent a map
 *        being cerated.
+*     10-MAR-2014 (DSB):
+*        Allow source pixels defined by SNR to be accumulated from iteration 
+*        to iteration, rather than replaced.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -200,13 +203,16 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
    int skip;                  /* No. of iters for which AST is not subtracted */
    int thresh;                /* Absolute threshold on hits */
    int ubnd_grid[ 2 ];        /* Upper bounds of map in GRID coords */
+   int zero_accum;            /* Accumulate source pixels? */
    int zero_c_n;              /* Number of zero circle parameters read */
    int zero_mask;             /* Use the reference NDF as a mask? */
    int zero_niter;            /* Only mask for the first "niter" iterations. */
    int zero_notlast;          /* Don't zero on last iteration? */
    size_t ngood;              /* Number good samples for stats */
    unsigned char **mask;      /* Address of model's mask pointer */
+   unsigned char *accmask;    /* Mask to be accumulated into the new mask */
    unsigned char *newmask;    /* Individual mask work space */
+   unsigned char *pa;         /* Point to next accumulated mask pixel */
    unsigned char *pm;         /* Pointer to next returned mask pixel */
    unsigned char *pn;         /* Pointer to next new mask pixel */
    unsigned char *result;     /* Returned mask pointer */
@@ -241,6 +247,10 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
    }
    subkm = NULL;
    astMapGet0A( config, modname, &subkm );
+
+/* See if the source pixels should be acculated from iteration to
+   iteration, rather than being replaced. */
+   astMapGet0I( subkm, "ZERO_ACCUM", &zero_accum );
 
 /* Get the "ast.skip" value - when considering "zero_niter" and
    "zero_freeze", we only count iterations for which the AST model
@@ -339,8 +349,7 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
 /* Decide if we are using the union or intersection of the masks. */
             astMapGet0I( subkm, "ZERO_UNION", &munion );
 
-/* Note if a mask existed on entry. If not, create a mask now, and
-   initialise it to hold the mask defined by the initial sky map. */
+/* Note if a mask existed on entry. If not, create a mask now. */
             if( *mask == NULL ) {
                have_mask = 0;
                *mask = astCalloc( dat->msize, sizeof( **mask ) );
@@ -355,6 +364,14 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
                newmask = astMalloc( dat->msize*sizeof( *newmask ) );
             } else {
                newmask = *mask;
+            }
+
+/* Save a pointer to the mask defining the pixels that must definitely be
+   set as source pixels in the returned mask. */
+            if( zero_accum && have_mask ) {
+               accmask = *mask;
+            } else {
+               accmask = NULL;
             }
 
 /* Get the number of iterations after which the mask is to be frozen.
@@ -543,9 +560,23 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
                      pd = dat->map;
                      pv = dat->mapvar;
                      pn = newmask;
-                     for( i = 0; i < dat->msize; i++,pd++,pv++ ) {
-                        *(pn++) = ( *pd != VAL__BADD && *pv != VAL__BADD &&
-                                    *pv >= 0.0 && *pd < zero_snr*sqrt( *pv ) ) ? 1 : 0;
+
+                     if( accmask ) {
+                        pa = accmask;
+                        for( i = 0; i < dat->msize; i++,pd++,pv++ ) {
+                           if( *(pa++) == 0 ) {
+                              *(pn++) = 0;
+                           } else {
+                              *(pn++) = ( *pd != VAL__BADD && *pv != VAL__BADD &&
+                                          *pv >= 0.0 && *pd < zero_snr*sqrt( *pv ) ) ? 1 : 0;
+                           }
+                        }
+
+                     } else {
+                        for( i = 0; i < dat->msize; i++,pd++,pv++ ) {
+                           *(pn++) = ( *pd != VAL__BADD && *pv != VAL__BADD &&
+                                       *pv >= 0.0 && *pd < zero_snr*sqrt( *pv ) ) ? 1 : 0;
+                        }
                      }
 
 /* Report masking info. */
@@ -564,8 +595,9 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
    mask by thresholding at the ZERO_SNR value, and then extend the source
    areas within the mask down to an SNR limit of ZERO_SNRLO. */
                   } else {
-                     smf_snrmask( wf, dat->map, dat->mapvar, dat->mdims,
-                                  zero_snr, zero_snrlo, newmask, status );
+                     smf_snrmask( wf, accmask, dat->map, dat->mapvar,
+                                  dat->mdims, zero_snr, zero_snrlo,
+                                  newmask, status );
 
 /* Report masking info. */
                      if( !have_mask ) {

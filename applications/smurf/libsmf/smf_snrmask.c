@@ -13,13 +13,20 @@
 *     C function
 
 *  Invocation:
-*     void smf_snrmask( ThrWorkForce *wf, const double *map,
-*                       const double *mapvar, const dim_t *dims, double snr_hi,
-*                       double snr_lo, unsigned char *mask, int *status )
+*     void smf_snrmask( ThrWorkForce *wf,  unsigned char *oldmask,
+*                       const double *map, const double *mapvar,
+*                       const dim_t *dims, double snr_hi, double snr_lo,
+*                       unsigned char *mask, int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
 *        Pointer to a pool of worker threads (can be NULL)
+*     oldmask = unsigned char * (Given)
+*        May be NULL. If supplied, any source pixels in the old mask (i.e.
+*        zero values) are copied unchanged into the returned new mask. Only
+*        background pixels in the old mask are allowed to be changed.
+*        Thus source pixels are accumulated form itgeration to iteration.
+*        In other words, "once a source pixel, always a source pixel".
 *     map = const double * (Read)
 *        The 2D map containing the data values.
 *     mapvar = const double * (Read)
@@ -32,7 +39,7 @@
 *        The lower SNR value to which the mask defined by the initial cut
 *        should be extended.
 *     mask =  unsigned char * (Returned)
-*        The marray to recieve the mask - mask pixels are zero in the
+*        The array to recieve the mask - mask pixels are zero in the
 *        "source" (i.e. high SNR) regions and zero in "background" regions.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -67,6 +74,8 @@
 *        - Prevent segfault caused by erroneously using the
 *        uninitialised first value of the "table" arrays.
 *        - Further fixes to merging of adjoining clumps.
+*     10-MAR-2014 (DSB):
+*        Added argument oldmask.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -113,6 +122,7 @@ typedef struct smfSnrMaskJobData {
    dim_t jhi;
    dim_t rowlen;
    unsigned char *mask;
+   unsigned char *maskold;
    int *table;
 } smfSnrMaskJobData;
 
@@ -124,9 +134,10 @@ static void smf1_snrmask_job( void *job_data, int *status );
 
 
 
-void smf_snrmask( ThrWorkForce *wf, const double *map, const double *mapvar,
+void smf_snrmask( ThrWorkForce *wf,  unsigned char *oldmask,
+                  const double *map, const double *mapvar,
                   const dim_t *dims, double snr_hi, double snr_lo,
-                  unsigned char *mask, int *status ) {
+                  unsigned char *mask, int *status ){
 
 /* Local Variables: */
    const double *pm = NULL;
@@ -152,9 +163,15 @@ void smf_snrmask( ThrWorkForce *wf, const double *map, const double *mapvar,
    int top;
    smfSnrMaskJobData *job_data = NULL;
    smfSnrMaskJobData *pdata = NULL;
+   unsigned char *maskold = NULL;
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
+
+/* Save a copy of the old mask, if supplied. Doing it now, means that the
+   old and new mask pointers can be the same. */
+   if( oldmask ) maskold = astStore( NULL, oldmask,
+                                     sizeof(*oldmask)*dims[0]*dims[1] );
 
 /* Allocate an array to hold a clump index for every map pixel. Initialise
    it to hold zeros. */
@@ -418,18 +435,33 @@ void smf_snrmask( ThrWorkForce *wf, const double *map, const double *mapvar,
 /* Wait for the workforce to complete all jobs. */
          thrWait( wf, status );
 
-/* Transfer the new mask from the "cindex" array back to the "mask" array. */
+/* Transfer the new mask from the "cindex" array back to the "mask" array.
+   Add in any source pixels from the old mask if required. */
          for( iworker = 0; iworker < nworker; iworker++ ) {
             pdata = job_data + iworker;
+            pdata->maskold = maskold;
             pdata->operation = 3;
             thrAddJob( wf, 0, pdata, smf1_snrmask_job, 0, NULL, status );
          }
          thrWait( wf, status );
+
+/* If an old mask was supplied, ensure any source pixels in the old mask
+   are also source pixels in the new mask. */
+         if( oldmask ) {
+            for( iworker = 0; iworker < nworker; iworker++ ) {
+               pdata = job_data + iworker;
+               pdata->maskold = maskold;
+               pdata->operation = 4;
+               thrAddJob( wf, 0, pdata, smf1_snrmask_job, 0, NULL, status );
+            }
+            thrWait( wf, status );
+         }
       }
    }
 
 /* Free resources. */
    job_data = astFree( job_data );
+   maskold = astFree( maskold );
    table = astFree( table );
    cindex = astFree( cindex );
 }
@@ -466,6 +498,7 @@ static void smf1_snrmask_job( void *job_data, int *status ) {
    int neb_offset[ 8 ];
    smfSnrMaskJobData *pdata;
    unsigned char *pk;
+   unsigned char *po;
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -546,7 +579,7 @@ static void smf1_snrmask_job( void *job_data, int *status ) {
 
 /* Transfer rows of the cleaned mask from the "cindex" array back to the
    "mask" array. */
-   } else {
+   } else if( pdata->operation == 3 ) {
 
 /* Loop round the rows of the mask to be processed by this thread. We
    exclude the first and last pixel in each row since we know their mask
@@ -561,6 +594,16 @@ static void smf1_snrmask_job( void *job_data, int *status ) {
          }
          pk += 2;
          ps += 2;
+      }
+
+/* Add in any source pixels in the supplied old mask. */
+   } else {
+      pk = pdata->mask + pdata->rowlen*pdata->jlo;
+      po = pdata->maskold + pdata->rowlen*pdata->jlo;
+      for( j = pdata->jlo; j <= pdata->jhi; j++ ) {
+         for( i = 0; i < pdata->rowlen; i++,pk++,po++ ) {
+            if( *po == 0 ) *pk = 0;
+         }
       }
    }
 }
