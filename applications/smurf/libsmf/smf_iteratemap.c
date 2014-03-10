@@ -618,6 +618,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   double mapchange_mean=0;      /* Mean change in map */
   double mapchange_max=0;       /* Maximum change in the map */
   double maptol=VAL__BADD;      /* map change tolerance for stopping */
+  int maptol_mean;              /* Use mean map change instead of max map change? */
   double *mapweights=NULL;      /* Weight for each pixel including chunk weight */
   double *mapweightsq=NULL;     /* Sum of bolometer weights squared */
   dim_t maxconcat;              /* Longest continuous chunk that fits in mem.*/
@@ -676,6 +677,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   size_t try;                   /* Try to concatenate this many samples */
   size_t tstride;               /* Time stride */
   struct timeval tv1, tv2;      /* Timers */
+  double tol;                   /* Map change value to compare to maptol */
   int untilconverge=0;          /* Set if iterating to convergence */
   int varmapmethod=0;           /* Method for calculating varmap */
   dim_t whichast=0;             /* Model index of AST (must be specified) */
@@ -799,6 +801,9 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         errRep(FUNC_NAME,
                FUNC_NAME ": MAPTOL is ^MAPTOL, must be > 0", status);
       }
+
+      /* Does maptol refer to mean map change or max map change? */
+      astMapGet0I( keymap, "MAPTOL_MEAN", &maptol_mean );
 
       /* Number of iterations */
       astMapGet0I( keymap, "NUMITER", &numiter );
@@ -2406,8 +2411,10 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
              convergence has been reached (i.e. when quit=0).  We do not
              allow convergence to be reached until we have done at least
              one iteration in which the AST model was not skipped. */
+
+          tol = maptol_mean ? mapchange_mean : mapchange_max;
           if( untilconverge &&
-              ( ( (maptol!=VAL__BADD) && (mapchange_mean > maptol) ) ||
+              ( ( (maptol!=VAL__BADD) && (tol > maptol) ) ||
                 last_skipped ) && quit == -1 ) {
             /* Map hasn't converged yet */
             converged=0;

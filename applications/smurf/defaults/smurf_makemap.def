@@ -1555,18 +1555,31 @@ itermap = 0
 #  Type: 	real
 #  Default: 	0.05
 #  Purpose: 	Specifies when to stop iterating.
-#  Description: If the normalised mean change between the maps created on
-#		subsequent iterations falls below the value of maptol, then the
-#		map-maker performs one more iteration and then terminates. Only
-#		used if parameter "numiter" is negative. The normalised mean
-#		change between maps is defined as the mean of the absolute
-#		change in map pixel value, averaged over all pixels within the
-#		region of the AST mask (if any, see parameter "ast.zero_mask",
-#		etc), and normalised by the RMS of the square root of the
-#		pixel variances. Compared to parameter "chitol", this is much
-#		more like a "by eye" test, that will stop the solution when
-#		the map stops changing.
+#  Description: If the normalised change (either the mean or maximum change -
+#               see parameter "maptol_mean") between the maps created on
+#               subsequent iterations falls below the value of maptol, then the
+#               map-maker performs one more iteration and then terminates. Only
+#               used if parameter "numiter" is negative. The normalised mean
+#               (or maximum) change between maps is defined as the mean (or
+#               maximum) of the absolute change in map pixel value, taken
+#               over all pixels within the region of the AST mask (if any,
+#               see parameter "ast.zero_mask", etc), and normalised by the RMS
+#               of the square root of the pixel variances. Compared to parameter
+#               "chitol", this is much more like a "by eye" test, that will stop
+#               the solution when the map stops changing.
 maptol = 0.05
+
+#-----------------------------------------------------------------
+#  Name: 	maptol_mean
+#  Type: 	integer
+#  Default: 	1
+#  Purpose: 	Specifies when to stop iterating.
+#  Description: If this value is non-zero, then the value specified by
+#               parameter "maptol" defines a target value for the mean
+#               change in normalised pixel value between iterations.
+#               Otherwise, "maptol"  defines a target value for the
+#               maximum change in normalised pixel value between iterations.
+maptol_mean = 1
 
 #-----------------------------------------------------------------
 #  Name: 	maxlen
