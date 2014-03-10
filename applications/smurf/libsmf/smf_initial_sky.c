@@ -68,10 +68,13 @@
 *        series data (it will never be present anyway).
 *     5-MAR-2014 (DSB):
 *        Ignore the quality in the supplied map.
+*     10-MAR-2014 (DSB):
+*        Update the Quality component of the supplied NDF to match the
+*        mask created by smf_calcmodel_ast.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2012-2013 Science & Technology Facilities Council.
+*     Copyright (C) 2012-2014 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -118,7 +121,7 @@ int smf_initial_sky( ThrWorkForce *wf, AstKeyMap *keymap, smfDIMMData *dat,
    int nel;                   /* Number of mapped NDF pixels */
    int result;                /* Returned flag */
    int there;                 /* Is there a smurf extension in the NDF? */
-   size_t size;               /* Size of mapped array */
+   int update;                /* Was NDF opened for UPDATE access? */
 
 /* Initialise the returned value to indicate no sky has been subtractred. */
    result = 0;
@@ -153,13 +156,21 @@ int smf_initial_sky( ThrWorkForce *wf, AstKeyMap *keymap, smfDIMMData *dat,
    }
 
 /* Do nothing more if we are not subtracting an initial sky from the data. */
-   if( result ) {
+   if( result && *status == SAI__OK ) {
 
 /* Begin an NDF context. */
       ndfBegin();
 
-/* Get an identifier for the NDF using the associated ADAM parameter. */
-      ndfAssoc( refparam, "READ", &indf1, status );
+/* Get an identifier for the NDF using the associated ADAM parameter.
+   First try UPDATE access. If this fails try READ access. */
+      ndfAssoc( refparam, "UPDATE", &indf1, status );
+      if( *status != SAI__OK ) {
+         errAnnul( status );
+         ndfAssoc( refparam, "READ", &indf1, status );
+         update = 0;
+      } else {
+         update = 1;
+      }
 
 /* Tell the user what we are doing. */
       ndfMsg( "N", indf1 );
@@ -194,9 +205,6 @@ int smf_initial_sky( ThrWorkForce *wf, AstKeyMap *keymap, smfDIMMData *dat,
       if( there ) ndfXgt0i( indf1, SMURF__EXTNAME, "NUMITER", iters,
                             status );
 
-/* End the NDF context. */
-      ndfEnd( status );
-
 /* Indicate the map arrays within the supplied smfDIMMData structure now
    contain usable values. We need to do this before calling
    smf_calcmodel_ast below so that the right mask gets used in
@@ -214,6 +222,16 @@ int smf_initial_sky( ThrWorkForce *wf, AstKeyMap *keymap, smfDIMMData *dat,
 /* Remove any existinction correction to the modifed bolometer data. */
       if( dat->ext ) smf_calcmodel_ext( wf, dat, 0, keymap, dat->ext,
                                         SMF__DIMM_INVERT, status);
+
+/* If the NDF was opened with UPDATE access, update the quality array in
+   the NDF to reflect the AST mask created by smf_calcmodel_ast above. */
+      if( update ) {
+         smf_qual_t *qarray = astStore( NULL, dat->mapqual, dat->msize*sizeof(*qarray) );
+         qarray = smf_qual_unmap( wf, indf2, SMF__QFAM_MAP, qarray, status );
+      }
+
+/* End the NDF context. */
+      ndfEnd( status );
    }
 
 /* End the AST context. */
