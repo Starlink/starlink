@@ -95,6 +95,12 @@ ast.mapspike = 10
 #               masking for the FLT and/or COM models, since it allows a
 #               reasonable mask to be formed before subtracting off the
 #               first estimate of the astronommical signal.
+#
+#               If ast.skip is set to a negative value, it gives the
+#               largest number of iterations to perform and indicates
+#               that the AST model should be skipped on all of them. In
+#               this case the value supplied for parameter "numiter" is
+#               ignored.
 ast.skip = 0
 
 #-----------------------------------------------------------------

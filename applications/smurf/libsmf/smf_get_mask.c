@@ -114,7 +114,7 @@
 *        rather than an error, since a null mask does not prevent a map
 *        being cerated.
 *     10-MAR-2014 (DSB):
-*        Allow source pixels defined by SNR to be accumulated from iteration 
+*        Allow source pixels defined by SNR to be accumulated from iteration
 *        to iteration, rather than replaced.
 *     {enter_further_changes_here}
 
@@ -259,6 +259,7 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
    astMapGet0A( config, "AST", &akm );
    astMapGet0I( akm, "SKIP", &skip );
    akm = astAnnul( akm );
+   if( skip < 0 ) skip = -skip;
 
 /* Get the number of iterations over which the mask is to be applied. Zero
    means all. Return with no mask if this number of iterations has

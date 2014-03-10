@@ -436,6 +436,10 @@
 *        performed that included an AST Model. Previously, termination
 *        could occur as soon as the initial AST-free iterations had been
 *        completed.
+*     2014-03-10 (DSB):
+*        Provide an option to skip the AST model on all iterations,
+*        terminating using the normal maptol criterion. This is done by
+*        setting a negative value for AST.SKIP.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -549,6 +553,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                      size_t *numcnvg, int *iters, int *status ) {
 
   /* Local Variables */
+  int ast_skip;                 /* Number of iterations with no AST model */
   int bolomap=0;                /* If set, produce single bolo maps */
   size_t bstride;               /* Bolometer stride */
   double *chisquared=NULL;      /* chisquared for each chunk each iter */
@@ -805,8 +810,20 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       /* Does maptol refer to mean map change or max map change? */
       astMapGet0I( keymap, "MAPTOL_MEAN", &maptol_mean );
 
+      /* A negative AST.SKIP value over-rides NUMITER. */
+      ast_skip = 0;
+      if( astMapGet0A( keymap, "AST", &kmap ) ) {
+         astMapGet0I( kmap, "SKIP", &ast_skip );
+         kmap = astAnnul( kmap );
+      }
+
       /* Number of iterations */
-      astMapGet0I( keymap, "NUMITER", &numiter );
+      if( ast_skip < 0 ) {
+         numiter = ast_skip;
+      } else {
+         astMapGet0I( keymap, "NUMITER", &numiter );
+      }
+
       if( numiter == 0 ) {
         *status = SAI__ERROR;
         errRep("", FUNC_NAME ": NUMITER cannot be 0", status);
@@ -2245,9 +2262,12 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
           /* Remember if no AST model was subtracted from the
              previous iteration. The dat.ast_skipped flag is updated
-             within smf_Calcmodel_ast, so we store its current value
-             now, before it is changed */
-          last_skipped = dat.ast_skipped;
+             within smf_calcmodel_ast, so we store its current value
+             now, before it is changed. It is used to decide on
+             convergence. But if all iterations are being skipped
+             we leave it set to zero to prevent it influencing the
+             termination critirion. */
+          if( ast_skip > 0 ) last_skipped = dat.ast_skipped;
 
           /* Estimate the AST model and subtract from the residuals. */
           smf_calcmodel_ast( wf, &dat, 0, keymap, NULL, dimmflags, status );

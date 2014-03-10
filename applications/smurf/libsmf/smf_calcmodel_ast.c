@@ -310,6 +310,8 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
 
   /* We only do the rest if we are not skipping this iteration. */
   astMapGet0I( kmap, "SKIP", &skip );
+  if( skip < 0 ) skip = -skip;
+
   if( dat->iter < skip ) {
     dat->ast_skipped = 1;
     msgOutf( " ","   skipping AST model on this iteration (AST.SKIP=%d)\n",
