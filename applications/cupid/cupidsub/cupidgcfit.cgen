@@ -258,7 +258,7 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, int imax, double *x,
 
 /* Check none of the parameters are Nan */
    for( i = 0; i < n; i++ ) {
-      if( !finite( x[ i ] ) ) {
+      if( !isfinite( x[ i ] ) ) {
          ret = 0;
          msgOutif( MSG__QUIET, "",
                    "   pdaSumsl returned NaN parameters", status );
