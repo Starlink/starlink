@@ -48,10 +48,13 @@
 *        Check instap
 *     2009-06-23 (TIMJ):
 *        Check ocsconfig
+*     2014-03-11 (DSB):
+*        Fix bug that caused segfault when copying ocsconfig and/or detname
+*        from input to output. 
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2009 Science and Technology Facilities Council.
+*     Copyright (C) 2009,2014 Science and Technology Facilities Council.
 *     Copyright (C) 2006-2007 University of British Columbia. Particle
 *     Physics And Astronomy Research Council. All Rights Reserved.
 
@@ -245,22 +248,15 @@ void smf_check_smfHead( const smfData *idata, smfData *odata, int * status ) {
     }
 
     /* Detector names */
-    if (ohdr->detname == NULL ){
-      ohdr->detname = astMalloc( ihdr->ndet*
-                                 ( strlen( ohdr->detname ) + 1 ) );
-      if( ohdr->detname ) {
-        memcpy( ohdr->detname, ihdr->detname,
-                ihdr->ndet*( strlen( ohdr->detname ) + 1 ) );
-      }
+    if (ohdr->detname == NULL && ihdr->detname != NULL ){
+      ohdr->detname = astStore( NULL, ihdr->detname,
+                                ihdr->ndet*( strlen( ihdr->detname ) + 1 ) );
     }
 
     /* OCS Config */
-    if (ohdr->ocsconfig == NULL ){
-      ohdr->ocsconfig = astMalloc( ihdr->ndet*
-                                   ( strlen( ohdr->ocsconfig ) + 1 ) );
-      if( ohdr->ocsconfig ) {
-        strcpy( ohdr->ocsconfig, ihdr->ocsconfig );
-      }
+    if (ohdr->ocsconfig == NULL && ihdr->ocsconfig != NULL ){
+      ohdr->ocsconfig = astStore( NULL, ihdr->ocsconfig,
+                                  strlen( ihdr->ocsconfig ) + 1 );
     }
 
 
