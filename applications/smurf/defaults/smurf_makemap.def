@@ -1596,6 +1596,22 @@ importsky = 0
 itermap = 0
 
 #-----------------------------------------------------------------
+#  Name: 	maplag
+#  Type: 	real
+#  Default: 	0.0
+#  Purpose: 	Specifies the degree of lagging between iterations
+#  Description: If maplag is non-zero, then the map created at the end of
+#               each iteration is replaced by a weighted mean of the new
+#               map and the map from the previous iteration. The "maplag"
+#               parameter gives the weight for the previous map, and
+#               should be in the range 0.0 to 1.0. The weight for the
+#               new map is (1.0-maplag). Thus if maplag=0.0 (the
+#               default), no change is made to the new map. Using a
+#               non-zero value for maplag may help to prevent oscillations
+#               in the SNR mask from iteration to iteration.
+maplag = 0.0
+
+#-----------------------------------------------------------------
 #  Name: 	maptol
 #  Type: 	real
 #  Default: 	0.05

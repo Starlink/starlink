@@ -440,6 +440,9 @@
 *        Provide an option to skip the AST model on all iterations,
 *        terminating using the normal maptol criterion. This is done by
 *        setting a negative value for AST.SKIP.
+*     2014-03-11 (DSB):
+*        Allow the map to be lagged between iterations. May help to
+*        prevent oscillations in the SNR mask from iteration to iteration.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -2201,6 +2204,23 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                      ": ** %f s rebinning map",
                      status, smf_timerupdate(&tv1,&tv2,status) );
 
+          /* Replace the map with a linear combination of the original map
+            and the map from the previous iteration. This may help to
+            damp oscillations in the map from iteration to iteration. */
+          if( iter > 1 ) {
+            double maplag = 0.0;
+            astMapGet0D( keymap, "MAPLAG", &maplag );
+            if( iter > 1 && maplag != 0.0 ) {
+              double *p1 = thismap;
+              double *p2 = lastmap;
+              double w1 = 1.0 - maplag;
+              for( ipix = 0; ipix < msize; ipix++,p1++,p2++ ) {
+                if( *p1 != VAL__BADD && *p2 != VAL__BADD ) {
+                   *p1 = w1*( *p1 ) + maplag*( *p2 );
+                }
+              }
+            }
+          }
         }
 
 
