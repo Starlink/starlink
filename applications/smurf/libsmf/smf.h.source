@@ -1937,6 +1937,9 @@ void smf_timerinit( struct timeval *tv1, struct timeval *tv2, int *status);
 
 double smf_timerupdate( struct timeval *tv1, struct timeval *tv2, int *status);
 
+double *smf_tophat2( ThrWorkForce *wf, const double *map, const dim_t dims[2],
+                     dim_t box, int sub, int *status );
+
 void smf_tslice_ast (smfData * data, dim_t index, int needwcs, fts2Port fts_port,
                      int * status );
 

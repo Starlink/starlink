@@ -116,6 +116,8 @@
 *     10-MAR-2014 (DSB):
 *        Allow source pixels defined by SNR to be accumulated from iteration
 *        to iteration, rather than replaced.
+*     11-MAR-2014 (DSB):
+*        Allow map to be high-pass filtered before creating the SNR mask.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -177,6 +179,7 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
    const char *modname;       /* The name of the model  being masked */
    const char *skyrefis;      /* Pointer to SkyRefIs attribute value */
    dim_t i;                   /* Pixel index */
+   double *mapuse;            /* Map to use for SNR mask */
    double *pd;                /* Pointer to next element of map data */
    double *predef;            /* Pointer to mask defined by previous run */
    double *ptr;               /* Pointer to NDF  Data array */
@@ -203,6 +206,7 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
    int skip;                  /* No. of iters for which AST is not subtracted */
    int thresh;                /* Absolute threshold on hits */
    int ubnd_grid[ 2 ];        /* Upper bounds of map in GRID coords */
+   int zero_snr_hipass;       /* Size of box for smoothing SNR map */
    int zero_accum;            /* Accumulate source pixels? */
    int zero_c_n;              /* Number of zero circle parameters read */
    int zero_mask;             /* Use the reference NDF as a mask? */
@@ -326,12 +330,14 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
             }
          }
 
+         zero_snr_hipass = 0;
          zero_snr = 0.0;
          astMapGet0D( subkm, "ZERO_SNR", &zero_snr );
          if( zero_snr > 0.0 ) {
             if( dat->mapok ) {
                mask_types[ nmask++] = SNR;
                isstatic = 0;
+               astMapGet0I( subkm, "ZERO_SNR_HIPASS", &zero_snr_hipass );
             }
          } else if( zero_snr <  0.0 && *status == SAI__OK ) {
             *status = SAI__ERROR;
@@ -542,6 +548,15 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
 /* SNR masking... */
                } else if( mask_types[ imask ] == SNR ) {
 
+
+/* If required, subtract off a smoothed background from the nmap. */
+                  if( zero_snr_hipass > 0 ) {
+                     mapuse = smf_tophat2( wf, dat->map, dat->mdims,
+                                           zero_snr_hipass, 1, status );
+                  } else {
+                     mapuse = dat->map;
+                  }
+
 /* Get the lower SNR limit. */
                   zero_snrlo = 0.0;
                   astMapGet0D( subkm, "ZERO_SNRLO", &zero_snrlo );
@@ -558,7 +573,7 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
 /* If the higher and lower SNR limits are equal, just do a simple
    threshold on the SNR values to get the mask. */
                   if( zero_snr == zero_snrlo ) {
-                     pd = dat->map;
+                     pd = mapuse;
                      pv = dat->mapvar;
                      pn = newmask;
 
@@ -596,7 +611,7 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
    mask by thresholding at the ZERO_SNR value, and then extend the source
    areas within the mask down to an SNR limit of ZERO_SNRLO. */
                   } else {
-                     smf_snrmask( wf, accmask, dat->map, dat->mapvar,
+                     smf_snrmask( wf, accmask, mapuse, dat->mapvar,
                                   dat->mdims, zero_snr, zero_snrlo,
                                   newmask, status );
 
@@ -613,6 +628,8 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
                                    words, zero_snr, zero_snrlo );
                      }
                   }
+
+                  if( zero_snr_hipass > 0 ) mapuse = astFree( mapuse );
 
 /* Predefined masking... */
                } else if( mask_types[ imask ] == PREDEFINED ) {

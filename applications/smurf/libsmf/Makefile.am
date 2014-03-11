@@ -416,6 +416,7 @@ smf_telpos_get.c \
 smf_terr.c \
 smf_timerinit.c \
 smf_timerupdate.c \
+smf_tophat2.c \
 smf_tslice_ast.c \
 smf_tswcsOrder.c \
 smf_uncalc_iqu.c \
