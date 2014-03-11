@@ -87,7 +87,12 @@ epstopdf pgplot.ps
 pdfcrop pgplot.pdf rawmask.pdf
 
 
-
+$KAPPA_DIR/gdclear
+rm pgplot.ps
+$KAPPA_DIR/setmagic idata6 rawmask -1
+$KAPPA_DIR/display rawmask'(2:,2:)' noaxes border=yes mode=sca badcol=white low=2 high=6
+epstopdf pgplot.ps
+pdfcrop pgplot.pdf cleaned.pdf
 
 rm aa spikes.sdf sp15.sdf sp25.sdf noise.sdf tot.sdf mask.sdf peak2.sdf \
    walk630.sdf walk627.sdf diffwalk.sdf fred.sdf lut lutndf.sdf idata*sdf \

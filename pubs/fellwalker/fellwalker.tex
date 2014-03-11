@@ -318,7 +318,7 @@ Fig.~\ref{fig:sim}. The contours show
 the data values themselves. The white pixels are below the nominated threshold,
 the grey pixels are above the threshold but have not yet been assigned to a
 clump. The green pixels trace the first walk that reached the peak. The
-green pixels trace a later walk to the same peak that was terminated when it
+blue pixels trace a later walk to the same peak that was terminated when it
 met the first walk. The green and blue pixels are all assigned to the same
 clump. These walks follow the steepest line of ascent. Note
 the gap in the green line near its start at the lowest contour - this is
@@ -352,7 +352,56 @@ pixels.}
 
 \subsection{Merging Clumps}
 
+The number of significant peaks found by the above process is determined
+primarily by the maximum distance a walk can jump when searching for a
+higher neighbouring pixel value. This parameter - known as \emph{MaxJump}
+- defaults to 4 pixels. Using a larger value results in more local peaks
+being interpreted as noise spikes, with a corresponding reduction in the
+number of significant peaks found. Thus peaks are discriminated simply on the
+basis of their spatial separation.
+
+This means it is possible for a clump with a wide, flat summit to be
+fragmented into multiple clumps on the basis of any noise spikes that are
+separated by more than \emph{MaxJump} pixels.
+
+To correct this, FellWalker merges adjacent clumps if the ``valley''
+between the two adjacent peaks is very shallow.
+
+Each clump (the ``central'' clump) is considered in turn to see if it
+should be merged with one of its neighbouring clumps. The height of the
+``col\footnote{The highest point on the boundary between the two
+clumps.}'' between the central clump and each neighbouring clump is found
+in turn, and the neighbouring clump with the highest col is selected as a
+candidate for merging. If the peak value in the central clump is less
+than a specified value, \emph{MinDip}\footnote{The default is three times
+the noise level in the data.}, above the col, the two clumps are merged
+into a single clump.
+
+Once all central clumps have been checked in this way, the whole process
+is repeated to see if any of the merged clumps should themselves be
+merged. This process repeats until no further clumps can be merged.
+
 \subsection{Cleaning Clump Outlines}
+
+Once neighbouring clumps separated by shallow valleys have been merged,
+there is an option to smooth the boundaries between adjacent clumps to
+reduce the effects of noise. This is done using a specified number of
+steps of a cellular automaton to modify the integer values in the CAA.
+
+A single step creates a new CAA from the old CAA. Each pixel in the new
+CAA is set to the most commonly occurring clump index within a box of
+width 3 pixels centred on the corresponding pixel within the old CAA. The
+output CAA from one step becomes the input CAA to the next step. By
+default, only one step is performed. Fig.~\ref{fig:cleanedmask} shows the
+effects of applying a single step to the CAA shown in Fig.~\ref{fig:rawmask}.
+
+\begin{figure}
+\includegraphics[width=\columnwidth]{cleaned}
+\caption{The smoothing effect of a single step of the cellular automaton
+on the clump outlines shown in Fig.~\ref{fig:rawmask}.}
+\label{fig:cleanedmask}
+\end{figure}
+
 
 \subsection{Characterising Each Clump}
 
