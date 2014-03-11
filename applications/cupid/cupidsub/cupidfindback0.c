@@ -1,5 +1,6 @@
 #include "sae_par.h"
 #include "cupid.h"
+#include "mers.h"
 
 void cupidFindback0( void *data, int *status ){
 /*
