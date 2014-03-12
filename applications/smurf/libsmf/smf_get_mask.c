@@ -190,9 +190,11 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
    double zero_circle[ 3 ];   /* LON/LAT/Radius of circular mask */
    double zero_lowhits;       /* Fraction of mean hits at which to threshold */
    double zero_snr;           /* Higher SNR at which to threshold */
+   double zero_snr_hipass;    /* Size of box for smoothing SNR map */
    double zero_snrlo;         /* Lower SNR at which to threshold */
    int *ph;                   /* Pointer to next hits value */
    int have_mask;             /* Did a mask already exist on entry? */
+   int hipass;                /* mask filter size in pixels */
    int imask;                 /* Index of next mask type */
    int indf1;                 /* Id. for supplied reference NDF */
    int indf2;                 /* Id. for used section of reference NDF */
@@ -206,7 +208,6 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
    int skip;                  /* No. of iters for which AST is not subtracted */
    int thresh;                /* Absolute threshold on hits */
    int ubnd_grid[ 2 ];        /* Upper bounds of map in GRID coords */
-   int zero_snr_hipass;       /* Size of box for smoothing SNR map */
    int zero_accum;            /* Accumulate source pixels? */
    int zero_c_n;              /* Number of zero circle parameters read */
    int zero_mask;             /* Use the reference NDF as a mask? */
@@ -330,14 +331,14 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
             }
          }
 
-         zero_snr_hipass = 0;
+         zero_snr_hipass = 0.0;
          zero_snr = 0.0;
          astMapGet0D( subkm, "ZERO_SNR", &zero_snr );
          if( zero_snr > 0.0 ) {
             if( dat->mapok ) {
                mask_types[ nmask++] = SNR;
                isstatic = 0;
-               astMapGet0I( subkm, "ZERO_SNR_HIPASS", &zero_snr_hipass );
+               astMapGet0D( subkm, "ZERO_SNR_HIPASS", &zero_snr_hipass );
             }
          } else if( zero_snr <  0.0 && *status == SAI__OK ) {
             *status = SAI__ERROR;
@@ -549,10 +550,13 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
                } else if( mask_types[ imask ] == SNR ) {
 
 
-/* If required, subtract off a smoothed background from the nmap. */
-                  if( zero_snr_hipass > 0 ) {
+/* If required, subtract off a smoothed background from the nmap. First
+   convert the high pass filter size from arc-seconds to pixels, and
+   round to the nearest integer. */
+                  hipass = (int)( 0.5 + zero_snr_hipass/dat->pixsize );
+                  if( hipass > 0 ) {
                      mapuse = smf_tophat2( wf, dat->map, dat->mdims,
-                                           zero_snr_hipass, 1, status );
+                                           hipass, 1, status );
                   } else {
                      mapuse = dat->map;
                   }
@@ -629,7 +633,7 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
                      }
                   }
 
-                  if( zero_snr_hipass > 0 ) mapuse = astFree( mapuse );
+                  if( hipass > 0 ) mapuse = astFree( mapuse );
 
 /* Predefined masking... */
                } else if( mask_types[ imask ] == PREDEFINED ) {

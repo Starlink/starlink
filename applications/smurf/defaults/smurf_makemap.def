@@ -240,16 +240,16 @@ ast.zero_snr = 0.0
 
 #-----------------------------------------------------------------
 #  Name: 	ast.zero_snr_hipass
-#  Type: 	integer
-#  Default: 	0
+#  Type: 	real
+#  Default: 	0.0
 #  Purpose: 	Smooths map before making SNR mask
 #  Description: Setting this parameter to a positive value causes the
 #               SNR mask requested by parameter "ast.zero_snr" to be
 #               based on a copy of the map that has been high-pass
 #               filtering to remove structures larger than the number of
-#               pixels given by ast.zero_snr_hipass. This will in general
-#               reduce the number of source pixels in the mask.
-ast.zero_snr_hipass = 0
+#               arc-seconds given by ast.zero_snr_hipass. This will in
+#               general reduce the number of source pixels in the mask.
+ast.zero_snr_hipass = 0.0
 
 #-----------------------------------------------------------------
 #  Name: 	ast.zero_snr_fwhm
@@ -500,16 +500,16 @@ com.zero_snr = 0
 
 #-----------------------------------------------------------------
 #  Name: 	com.zero_snr_hipass
-#  Type: 	integer
-#  Default: 	0
+#  Type: 	real
+#  Default: 	0.0
 #  Purpose: 	Smooths map before making SNR mask
 #  Description: Setting this parameter to a positive value causes the
 #               SNR mask requested by parameter "com.zero_snr" to be
 #               based on a copy of the map that has been high-pass
 #               filtering to remove structures larger than the number of
-#               pixels given by com.zero_snr_hipass. This will in general
-#               reduce the number of source pixels in the mask.
-com.zero_snr_hipass = 0
+#               arc-seconds given by com.zero_snr_hipass. This will in
+#               general reduce the number of source pixels in the mask.
+com.zero_snr_hipass = 0.0
 
 #-----------------------------------------------------------------
 #  Name: 	com.zero_snrlo
@@ -1469,16 +1469,16 @@ flt.zero_snr = 0
 
 #-----------------------------------------------------------------
 #  Name: 	flt.zero_snr_hipass
-#  Type: 	integer
-#  Default: 	0
+#  Type: 	real
+#  Default: 	0.0
 #  Purpose: 	Smooths map before making SNR mask
 #  Description: Setting this parameter to a positive value causes the
 #               SNR mask requested by parameter "flt.zero_snr" to be
 #               based on a copy of the map that has been high-pass
 #               filtering to remove structures larger than the number of
-#               pixels given by flt.zero_snr_hipass. This will in general
-#               reduce the number of source pixels in the mask.
-flt.zero_snr_hipass = 0
+#               arc-seconds given by flt.zero_snr_hipass. This will in
+#               general reduce the number of source pixels in the mask.
+flt.zero_snr_hipass = 0.0
 
 #-----------------------------------------------------------------
 #  Name: 	flt.zero_snrlo

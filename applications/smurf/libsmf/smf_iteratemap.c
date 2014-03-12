@@ -619,6 +619,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   double *lastchisquared=NULL;  /* chisquared for last iter */
   double *lastmap=NULL;         /* map from the last iter */
   int last_skipped=0;           /* Was the AST model skipped on the previous iteration? */
+  smfData *localmap = NULL;     /* A temporary container for the map */
   smfArray **lut=NULL;          /* Pointing LUT for each file */
   int *lut_data=NULL;           /* Pointer to DATA component of lut */
   smfGroup *lutgroup=NULL;      /* smfGroup of lut model files */
@@ -656,6 +657,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   int numiter=0;                /* Total number iterations */
   int nw;                       /* Number of worker threads */
   dim_t pad=0;                  /* How many samples of padding at both ends */
+  double pixsize;               /* Pixel size */
   size_t qcount_last[SMF__NQBITS_TSERIES];/* quality bit counter -- last iter */
   smfArray **qua=NULL;          /* Quality flags for each file */
   smf_qual_t *qua_data=NULL;    /* Pointer to DATA component of qua */
@@ -898,36 +900,26 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                  " variance map", status );
       }
 
-      /* Are we downsampling the data? */
+      /* Get the pixel size from the map header. We fudge a local map
+         smfData so that we can call smf_map_getpixsize */
+      localmap = smf_create_smfData( 0, status );
+      if( localmap && (localmap->hdr) ) {
+        localmap->hdr->wcs = outfset;
+        memcpy( localmap->lbnd, lbnd_out, sizeof(localmap->lbnd) );
+        pixsize = smf_map_getpixsize( localmap, status );
+
+        /* Set the WCS to null again to avoid freeing the memory */
+        localmap->hdr->wcs = NULL;
+      }
+
+      if( localmap ) smf_close_file( wf, &localmap, status );
+
+      /* Are we downsampling the data? If the user specified a value
+         less than 0, the scale is a multiple of PIXSIZE. */
       astMapGet0D( keymap, "DOWNSAMPSCALE", &downsampscale );
-
       if( (*status == SAI__OK) && (downsampscale < 0) ) {
-        /* If the user specified a value less than 0, the scale is
-           a multiple of PIXSIZE, which is obtained from the map header.
-           We fudge a local map smfData so that we can call
-           smf_map_getpixsize */
-
-        smfData *localmap = NULL;
-        double pixsize;
-
-        localmap = smf_create_smfData( 0, status );
-
-        if( localmap && (localmap->hdr) ) {
-          localmap->hdr->wcs = outfset;
-          memcpy( localmap->lbnd, lbnd_out, sizeof(localmap->lbnd) );
-
-          pixsize = smf_map_getpixsize( localmap, status );
-
-          if( *status == SAI__OK ) {
-            downsampscale = abs(downsampscale) * pixsize;
-            astMapPut0D( keymap, "DOWNSAMPSCALE", downsampscale, NULL );
-          }
-
-          /* Set the WCS to null again to avoid freeing the memory */
-          localmap->hdr->wcs = NULL;
-        }
-
-        if( localmap ) smf_close_file( wf, &localmap, status );
+         downsampscale = abs(downsampscale) * pixsize;
+         astMapPut0D( keymap, "DOWNSAMPSCALE", downsampscale, NULL );
       }
 
       msgOutf( "", FUNC_NAME
@@ -1788,6 +1780,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       dat.lbnd_out = lbnd_out;
       dat.ubnd_out = ubnd_out;
       dat.chisquared = chisquared;
+      dat.pixsize = pixsize;
       if( havenoi ) {
         dat.noi = model[whichnoi];
       } else {
