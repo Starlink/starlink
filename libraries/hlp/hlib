@@ -25,4 +25,9 @@
 #
 foreach file ($*)
    crehlp $file $file:r.shl
+   if ( $? != 0 ) then
+     echo Error running crehlp
+     if (-e $file:r.shl) rm $file:r.shl
+     exit 1
+   end
 end
