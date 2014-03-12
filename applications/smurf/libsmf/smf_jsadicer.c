@@ -471,7 +471,7 @@ void smf_jsadicer( int indf, const char *base, int trim,
       ubnd[ latax ] = tile_ubnd[ 1 ];
 
 /* Trim to the edges of the supplied NDF if required. */
-      if( trim < 2 ) {
+      if( trim == 1 ) {
          if( lbnd[ lonax ] < lbnd_lon ) lbnd[ lonax ] = lbnd_lon;
          if( ubnd[ lonax ] > ubnd_lon ) ubnd[ lonax ] = ubnd_lon;
          if( lbnd[ latax ] < lbnd_lat ) lbnd[ latax ] = lbnd_lat;
