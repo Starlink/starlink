@@ -58,6 +58,9 @@
 *        Correct for difference in solar and sidereal times.
 *     2014 March 3 (MJC):
 *        Set obsid value to uppercase.
+*     2014 March 12 (MJC):
+*        Make LST times have two digits in the seconds part of the
+*        sexagesimal format.
 
 *  Copyright:
 *     Copyright (C) 2008, 2014 Science and Technology Facilities Council.
@@ -212,14 +215,14 @@ void gsdac_getDateVars ( const gsdVars *gsdVars, const char *backend,
   min =  60.0 * fmodf( gsdVars->scanTable1[0], 1.0 );
   sec =  60.0 * fmodf( 60.0*gsdVars->scanTable1[0], 1.0 );
 
-  sprintf ( dateVars->LSTstart, "%02d:%02d:%6.4f", hour, min, sec );
+  sprintf ( dateVars->LSTstart, "%02d:%02d:%07.4f", hour, min, sec );
 
   /* Get the LSTend. */
   hour = (int) gsdVars->scanTable1[tableElement];
   min =  60.0 * fmodf( gsdVars->scanTable1[tableElement], 1.0 );
   sec =  60.0 * fmodf( 60.0*gsdVars->scanTable1[tableElement], 1.0 );
 
-  sprintf ( dateVars->LSTend, "%02d:%02d:%6.4f", hour, min, sec );
+  sprintf ( dateVars->LSTend, "%02d:%02d:%07.4f", hour, min, sec );
 
   /* Get the HSTstart and HSTend. */
   HSTstart = utcStart - 10.0 / 24.0;
