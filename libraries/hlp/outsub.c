@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include "help.h"
+
 int hlpOutsub ( char *string )
 /*
 **  - - - - - - - - - -
@@ -16,9 +18,9 @@ int hlpOutsub ( char *string )
 **  Returned (function value):
 **                 int      always 1
 **
-**  Last revision:   9 October 1995
+**  Last revision:   14 January 2008
 **
-**  Copyright 1996 P.T.Wallace.  All rights reserved.
+**  Copyright P.T.Wallace.  All rights reserved.
 */
 {
    puts ( string );

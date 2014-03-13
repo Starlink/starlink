@@ -1,4 +1,6 @@
+#include "help.h"
 #include "hlpsys.h"
+
 char* hlpErrmes ( int nerror )
 /*
 **  - - - - - - - - - -
@@ -13,12 +15,12 @@ char* hlpErrmes ( int nerror )
 **  Returned (function value)
 **               char*       message (may be up to 50 characters)
 **
-**  The HELP system error codes are defined in the hlpsys.h
-**  #include file.
+**  The HELP system error codes are defined in the hlpsys.h header
+**  file.
 **
-**  Last revision:   10 March 1996
+**  Last revision:   14 January 2008
 **
-**  Copyright 1996 P.T.Wallace.  All rights reserved.
+**  Copyright P.T.Wallace.  All rights reserved.
 */
 {
    switch ( nerror ) {

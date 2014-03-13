@@ -1,4 +1,6 @@
+#include "help.h"
 #include "hlpsys.h"
+
 int hlpHdread ( int lstring, long *iadr, char *string, int *nc )
 /*
 **  - - - - - - - - - -
@@ -16,7 +18,7 @@ int hlpHdread ( int lstring, long *iadr, char *string, int *nc )
 **     lstring   int        length of string
 **     *iadr     long       character address within HELP file (1st = 0)
 **
-**  Returned (argument)
+**  Returned (arguments):
 **     *iadr     long       points to next character in sequence
 **     *string   char       input record
 **     *nc       int        length of record (0 or more)
@@ -28,19 +30,19 @@ int hlpHdread ( int lstring, long *iadr, char *string, int *nc )
 **                       hlp_READ_WIDE = attempt to read outside file
 **                 hlp_RECORD_OVERSIZE = record overflows STRING (note 2)
 **
-**  The above error codes are defined in #include file hlpsys.h.
+**  The above error codes are defined in header file hlpsys.h.
 **
 **  Notes:
 **
-**  1)  No check is made that *iadr points to the start of a record.
+**  1)  No check is made that iadr points to the start of a record.
 **
 **  2)  If the record overflows string, the first lstring-1 characters
 **      are stored in string followed by '\0', nc is set to lstring-1
 **      and an error status is returned.
 **
-**  Last revision:   13 September 1995
+**  Last revision:   22 November 2010
 **
-**  Copyright 1996 P.T.Wallace.  All rights reserved.
+**  Copyright P.T.Wallace.  All rights reserved.
 */
 
 #define EOS '\0'
@@ -72,7 +74,8 @@ int hlpHdread ( int lstring, long *iadr, char *string, int *nc )
    while ( c != EOS ) {
 
    /* Read the next character. */
-      if ( ( c = fgetc ( fphl ) ) == EOF ) {
+      c = fgetc ( fphl );
+      if ( c == EOF ) {
 
       /* Error: set status and prepare to terminate string. */
          j = hlp_READ_ERROR;

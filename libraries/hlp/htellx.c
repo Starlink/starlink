@@ -1,5 +1,7 @@
 #include <string.h>
+#include "help.h"
 #include "hlpsys.h"
+
 void hlpHtellx ( char *fname, long *iadrx, int *loglev )
 /*
 **  - - - - - - - - - -
@@ -19,7 +21,7 @@ void hlpHtellx ( char *fname, long *iadrx, int *loglev )
 **     *iadrx    long    index address within HELP library file (1st = 0)
 **     *loglev   int     logical level of HELP library
 **
-**  Defined in #include:
+**  Defined in hlpsys.h:
 **     LFNAME            maximum length of filenames
 **
 **  Note that no checks are made that the file is open, or that the iadrx
@@ -28,12 +30,14 @@ void hlpHtellx ( char *fname, long *iadrx, int *loglev )
 **  reported when attempts to access the file are made based on the
 **  result of calling the present routine.
 **
-**  Last revision:   22 February 1996
+**  Called:  hlpStrncp
 **
-**  Copyright 1996 P.T.Wallace.  All rights reserved.
+**  Last revision:   11 March 2014
+**
+**  Copyright P.T.Wallace.  All rights reserved.
 */
 {
-   strncpy ( fname, hlnext, LFNAME );
+   hlpStrncp ( fname, hlnext, LFNAME );
    *iadrx = nextx;
    *loglev = loffnu;
 }

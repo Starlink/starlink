@@ -1,5 +1,7 @@
 #include <string.h>
+#include "help.h"
 #include "hlpsys.h"
+
 int hlpHopenr ( int ( * nametr ) ( int, char*, int, char* ) )
 /*
 **  - - - - - - - - - -
@@ -7,9 +9,6 @@ int hlpHopenr ( int ( * nametr ) ( int, char*, int, char* ) )
 **  - - - - - - - - - -
 **
 **  Open or re-open the HELP library file for reading.
-**
-**  Defined in #include file:
-**     error codes (see below)
 **
 **  Given (argument):
 **     nametr    func    user-supplied name translation routine (note 1)
@@ -34,7 +33,7 @@ int hlpHopenr ( int ( * nametr ) ( int, char*, int, char* ) )
 **                    hlp_OPEN_ERROR = open error (or bad header)
 **                   hlp_WRITE_ERROR = write error
 **
-**  The above error codes are defined in #include file hlpsys.h.
+**  The above error codes are defined in header file hlpsys.h.
 **
 **  Notes:
 **
@@ -69,11 +68,11 @@ int hlpHopenr ( int ( * nametr ) ( int, char*, int, char* ) )
 **      first index record; nextd is initialized to point to the
 **      final end marker.
 **
-**  Called:  hlpFopr, hlpDread, hlpDec
+**  Called:  hlpFopr, hlpHdread, hlpDec
 **
-**  Last revision:   16 June 2000
+**  Last revision:   22 November 2010
 **
-**  Copyright 2000 P.T.Wallace.  All rights reserved.
+**  Copyright P.T.Wallace.  All rights reserved.
 */
 
 #define LBUF 500

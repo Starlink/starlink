@@ -1,4 +1,6 @@
 #include <ctype.h>
+#include "help.h"
+
 int hlpLength ( char *string )
 /*
 **  - - - - - - - - - -
@@ -15,16 +17,19 @@ int hlpLength ( char *string )
 **
 **  The minimum length returned is 0.
 **
-**  Last revision:   7 January 1996
+**  Last revision:   30 July 2009
 **
-**  Copyright 1996 P.T.Wallace.  All rights reserved.
+**  Copyright P.T.Wallace.  All rights reserved.
 */
 {
-   int l, i, c;
+   int i, l, c;
 
-   l = 0;
-   for ( i = 0;
-         ( c = (int) string [ i++ ] );
-         l = isspace ( c ) ? l : i );
+
+   i = l = 0;
+   for ( ; ; ) {
+      c = (int) string[i++];
+      if ( ! c ) break;
+      if ( ! isspace ( c ) ) l = i;
+   }
    return l;
 }

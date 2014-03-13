@@ -1,5 +1,6 @@
 #include <string.h>
-#include "hlpsys.h"
+#include "help.h"
+
 int hlpLinout ( int ( * outsub ) ( char* ),
                 int lout, int indent, char *buffer )
 /*
@@ -32,27 +33,34 @@ int hlpLinout ( int ( * outsub ) ( char* ),
 **
 **     3)  It is the caller's responsibility to ensure that the
 **         character array buffer is big enough to hold both the
-**         original string and the leading spaces.
+**         original string and the leading spaces, plus the null
+**         terminator.
 **
 **  Called:  hlpTrim
 **
-**  Last revision:   2 January 2004
+**  Last revision:   11 February 2008
 **
-**  Copyright 2004 P.T.Wallace.  All rights reserved.
+**  Copyright P.T.Wallace.  All rights reserved.
 */
 {
-   int l, ito, ifrom;
+   int l, ilast, ito, ifrom;
 
 
 /* Useful length of string. */
    l = (int) strlen ( hlpTrim ( buffer ) );
 
-/* Move the active part of the string to the right and pad with spaces. */
-   for ( ifrom = l, ito = l + ( ( indent >= 0 ) ? indent : 0 );
-         ito >= 0;
-         ifrom--, ito-- ) {
-      buffer [ ito ] = ( ifrom >= 0 ) ? buffer [ ifrom ] : (char) ' ';
+/* Highest buffer index to be used. */
+   ilast = l + ( indent >= 0 ? indent : 0 );
+
+/* Move the active part of the string rightwards and pad with spaces. */
+   for ( ifrom = l, ito = ilast; ito >= 0; ifrom--, ito-- ) {
+      if ( ito <= lout ) {
+         buffer[ito] = ( ifrom >= 0 ) ? buffer[ifrom] : (char) ' ';
+      }
    }
+
+/* String terminator. */
+   buffer[ilast+1] = (char) '\0';
 
 /* Output the line. */
    return outsub ( buffer );

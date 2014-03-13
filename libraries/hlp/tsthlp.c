@@ -1,8 +1,7 @@
 #include <string.h>
+#include "help.h"
 #include "hlpsys.h"
-int hlpHelp ( int ( * ) ( char* ), int, char*, char*, int,
-              int ( * ) ( char*, char*, int* ),
-              int ( * ) ( int, char*, int, char* ) );
+
 int main ( int argc, char *argv[] )
 /*
 **  - - - - - - -
@@ -23,15 +22,15 @@ int main ( int argc, char *argv[] )
 **               int     status: 0 = OK
 **                       other -ve = error reported by hlpHelp
 **
-**  The error codes are defined in the hlpsys.h #include file, also
+**  The error codes are defined in the hlpsys.h header file, also
 **  the maximum length of filenames LFNAME.
 **
-**  Called:  hlpHelp, hlpErrmes and the user-replaceable
-**           routines hlpInsub, hlpOutsub and hlpNametr.
+**  Called:  hlpStrncp, hlpHelp, hlpErrmes and the user-replaceable
+**           functions hlpInsub, hlpOutsub and hlpNametr.
 **
-**  Last revision:   16 June 2000
+**  Last revision:   11 March 2014
 **
-**  Copyright 2000 P.T.Wallace.  All rights reserved.
+**  Copyright P.T.Wallace.  All rights reserved.
 */
 
 /* Maximum length of HELP lines to be output. */
@@ -53,41 +52,52 @@ int main ( int argc, char *argv[] )
 
 /* Get the library-file name. */
    if (argc >= 2 ) {
-      strncpy ( lib, argv [1], LFNAME );
+      hlpStrncp ( lib, argv [1], LFNAME );
    } else {
-      if ( ( jstat = hlpInsub ( lib, "Name of help library? ",
-                                &l ) ) != 1 ) goto badinput;
+      jstat = hlpInsub ( lib, "Name of help library? ",  &l );
+      if ( jstat != 1 ) goto badinput;
    }
 
 /* Make an announcement. */
-   if ( ( jstat = hlpOutsub ( " " ) ) != 1 ) goto badoutput;
-   if ( ( jstat = hlpOutsub (
+   jstat = hlpOutsub ( " " );
+   if ( jstat != 1 ) goto badoutput;
+   jstat = hlpOutsub (
        "This is the tsthlp program, which runs a help session using"
-                                  ) ) != 1 ) goto badoutput;
-   if ( ( jstat = hlpOutsub (
+                     );
+   if ( jstat != 1 ) goto badoutput;
+   jstat = hlpOutsub (
        "a nominated library.  To leave tsthlp, enter a period at"
-                                  ) ) != 1 ) goto badoutput;
-   if ( ( jstat = hlpOutsub ( "the colon prompt."
-                                  ) ) != 1 ) goto badoutput;
-   if ( ( jstat = hlpOutsub ( " " ) ) != 1 ) goto badoutput;
-   if ( ( jstat = hlpOutsub (
+                     );
+   if ( jstat != 1 ) goto badoutput;
+   jstat = hlpOutsub ( "the colon prompt." );
+   if ( jstat != 1 ) goto badoutput;
+   jstat = hlpOutsub ( " " );
+   if ( jstat != 1 ) goto badoutput;
+   jstat = hlpOutsub (
        "Please note that tsthlp is merely a simple demonstration, not"
-                                  ) ) != 1 ) goto badoutput;
-   if ( ( jstat = hlpOutsub (
+                     );
+   if ( jstat != 1 ) goto badoutput;
+   jstat = hlpOutsub (
        "a fully-fledged help utility!  It lacks sophisticated,"
-                                  ) ) != 1 ) goto badoutput;
-   if ( ( jstat = hlpOutsub (
+                    );
+   if ( jstat != 1 ) goto badoutput;
+   jstat = hlpOutsub (
        "platform-specific features such as screen management, quick"
-                                  ) ) != 1 ) goto badoutput;
-   if ( ( jstat = hlpOutsub (
+                     );
+   if ( jstat != 1 ) goto badoutput;
+   jstat = hlpOutsub (
        "exits via control characters, and so on.  These capabilities"
-                                  ) ) != 1 ) goto badoutput;
-   if ( ( jstat = hlpOutsub (
+                     );
+   if ( jstat != 1 ) goto badoutput;
+   jstat = hlpOutsub (
        "are provided by the various application packages which use"
-                                  ) ) != 1 ) goto badoutput;
-   if ( ( jstat = hlpOutsub ( "the help system."
-                                  ) ) != 1 ) goto badoutput;
-   if ( ( jstat = hlpOutsub ( " " ) ) != 1 ) goto badoutput;
+                     );
+   if ( jstat != 1 ) goto badoutput;
+   jstat = hlpOutsub ( "the help system." );
+   if ( jstat != 1 ) goto badoutput;
+   jstat = hlpOutsub ( " " );
+   if ( jstat != 1 ) goto badoutput;
+
 
 /* Initialize the command string. */
    ipline [ 0 ] = '\0';
@@ -96,16 +106,17 @@ int main ( int argc, char *argv[] )
    for ( ; ; ) {
 
    /* Get a command line. */
-      if ( ( jstat = hlpInsub ( ipline, ": ", &l ) ) != 1 ) goto badinput;
+      jstat = hlpInsub ( ipline, ": ", &l );
+      if ( jstat != 1 ) goto badinput;
 
    /* Unless period, begin an interactive HELP session. */
       if ( ! strcmp ( ipline, "." ) ) {
          jstat = 0;
          goto exit;
       } else {
-         if ( ( jstat = hlpHelp ( hlpOutsub, LOUT, ipline, lib, 1,
-                                  hlpInsub, hlpNametr ) ) != 1 )
-            goto abort;
+         jstat = hlpHelp ( hlpOutsub, LOUT, ipline, lib, 1,
+                           hlpInsub, hlpNametr );
+         if ( jstat != 1 ) goto abort;
       }
 
 /* Next command line. */

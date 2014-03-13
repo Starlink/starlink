@@ -1,4 +1,5 @@
-#include "hlpsys.h"
+#include "help.h"
+
 int hlpInsub ( char *string, char *prompt, int *l )
 /*
 **  - - - - - - - - -
@@ -24,18 +25,17 @@ int hlpInsub ( char *string, char *prompt, int *l )
 **
 **  Called:  hlpLength
 **
-**  Last revision:   7 January 1996
+**  Last revision:   30 July 2009
 **
-**  Copyright 1996 P.T.Wallace.  All rights reserved.
+**  Copyright P.T.Wallace.  All rights reserved.
 */
 {
-   int i, n, c;
+   int n, c;
    char *cs;
 
+
 /* Output the prompt string */
-   for ( i = 0;
-         ( c = (int) prompt [ i++ ] );
-         fputc ( c, stdout ) );
+   fputs ( prompt, stdout );
 
 /* Read the input string, stopping at and eliminating any newline */
    cs = string;

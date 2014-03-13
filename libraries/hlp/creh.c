@@ -1,6 +1,8 @@
-#include "hlpsys.h"
 #include <string.h>
 #include <ctype.h>
+#include "help.h"
+#include "hlpsys.h"
+
 int hlpCreh ( int ( * nametr ) ( int, char*, int, char* ),
                                                  char *source, char *lib )
 /*
@@ -19,9 +21,10 @@ int hlpCreh ( int ( * nametr ) ( int, char*, int, char* ),
 **               int     status: 0 = OK
 **            hlp_CREATION_FAILURE = fail
 **
-**  The error codes are defined in the hlpsys.h #include file.
+**  The error codes are defined in the hlpsys.h header file.
 **
 **  Note:
+**
 **      The user-supplied name translation function nametr has
 **      arguments command, string1, lstring2, string2 and returns
 **      a status:
@@ -76,7 +79,7 @@ int hlpCreh ( int ( * nametr ) ( int, char*, int, char* ),
 **     The file pointer variant of a keyword record is just the same as
 **     the variant without a pointer, except that it begins with the name
 **     of a HELP library to be attached at that point, prefixed by an '@'
-**     character.  This file pointer, complete with the '@' prefix is
+**     character.  This file pointer, complete with the '@' prefix, is
 **     embedded in the direct-access HELP library produced by the present
 **     routine, and is accessed at run-time.  Thus, a level 2 topic for
 **     the keyword EXAMPLE contained in the HELP library LIB_EXAMPLE
@@ -153,12 +156,11 @@ int hlpCreh ( int ( * nametr ) ( int, char*, int, char* ),
 **     intervening space and text following a keyword is ignored.
 **
 **  Called:  hlpFopr, hlpHinit, hlpHopenw, hlpHdwrit, hlpLength,
-**           hlpHclose, hlpErrmes, hlpTrim
+**           hlpStrncp, hlpHclose, hlpErrmes, hlpTrim
 **
-**  Last revision:   16 June 2000 (PTW)
-**                   7 January 2006 (TIMJ)
+**  Last revision:   11 March 2014
 **
-**  Copyright 2000 P.T.Wallace.  All rights reserved.
+**  Copyright P.T.Wallace.  All rights reserved.
 */
 
 #define TRUE 1
@@ -207,8 +209,8 @@ int hlpCreh ( int ( * nametr ) ( int, char*, int, char* ),
 
 /* Last aindex entry, its level and its address (0=none). */
    char lastob [ LOUT ];
-   int lastlv;
-   long lastad;
+   int lastlv=0;
+   long lastad=0L;
 
 /* State:  0 = expecting first keyword          */
 /*         1 = current record is keyword        */
@@ -216,20 +218,15 @@ int hlpCreh ( int ( * nametr ) ( int, char*, int, char* ),
 /*         3 = processing HELP text             */
    int kstate;
 
-   int jstat, more, need, ipass, levold, level, i, c1, nfp,
-       levtop, npbl, ifrom, ito, l, nd, nx, k;
+   int jstat, more, need, ipass, levold=0, level, i, c1, nfp,
+       levtop=0, npbl=0, ifrom, ito, l, nd, nx, k;
 
-   long nhind, nindex, nhelp, iadr, il;
+   long nhind=0L, nindex=0L, nhelp=0L, iadr, il;
+
+
 
 /* Initialize the HELP system. */
    hlpHinit ( lib );
-
-/* Initialise some variables */
-   nhind = 0;
-   lastad = 0;
-   levtop = 0;
-   npbl = 0;
-   lastlv = 0;
 
 /* Open the input file for the first pass. */
    if ( hlpFopr ( nametr, source, &fps ) ) goto soperr;
@@ -251,12 +248,13 @@ int hlpCreh ( int ( * nametr ) ( int, char*, int, char* ),
          rewind ( fps );
 
       /* Open the output file (length allows for '\0' characters). */
-         if ( ( jstat = hlpHopenw ( nametr, nhind + nhelp + 1l ) ) )
-            goto loperr;
+         jstat = hlpHopenw ( nametr, nhind + nhelp + 1l );
+         if ( jstat ) goto loperr;
 
       /* Write the end-of-index record. */
          iadr = nhind - 1l;
-         if ( ( jstat = hlpHdwrit( "\0", &iadr ) ) ) goto loperr;
+         jstat = hlpHdwrit( "\0", &iadr );
+         if ( jstat ) goto loperr;
 
       /* Flag no buffer waiting to be output. */
          lastad = 0l;
@@ -371,18 +369,19 @@ int hlpCreh ( int ( * nametr ) ( int, char*, int, char* ),
             /* index record.                                     */
                i = NOVERH;
                if ( nfp > 0 ) {
-                  strncpy ( outbuf + i, iobuf, nfp );
+                  hlpStrncp ( outbuf + i, iobuf, nfp );
                   i += nfp + 1;
                }
                outbuf [ i ] = (char) c1;
                outbuf [ ++i ] = (char) ' ';
-               strncpy ( outbuf + ++i, iobuf + ifrom, ito - ifrom + 1 );
+               hlpStrncp ( outbuf + ++i,
+                           iobuf + ifrom, ito - ifrom + 1 );
 
             /* Build the data record. */
                iobuf [ 0 ] = (char) c1;
                iobuf [ 1 ] = (char) ' ';
                l = ito - ifrom + 1;
-               strncpy ( iobuf + 2, iobuf + ifrom, l );
+               hlpStrncp ( iobuf + 2, iobuf + ifrom, l );
                for ( i = 2 + l; i < LIN - 1; iobuf [ i++ ] = (char) ' ' );
                iobuf [ i ] = (char) '\0';
 
@@ -428,9 +427,9 @@ int hlpCreh ( int ( * nametr ) ( int, char*, int, char* ),
                      /* record and reset the list entry.           */
                         sprintf ( jumpob [ l ] + 20, "%9.9ld", lastad );
                         jumpob [ l ] [ 29 ] = (char) ' ';
-                        if ( ( jstat = hlpHdwrit ( hlpTrim ( jumpob [ l ] ),
-                                                 & jumpad [ l ] ) ) )
-                           goto syserr;
+                        jstat = hlpHdwrit ( hlpTrim ( jumpob [ l ] ),
+                                                   & jumpad [ l ] );
+                        if ( jstat ) goto syserr;
                         jumpad [ l ] = 0l;
                      }
                   }
@@ -438,13 +437,13 @@ int hlpCreh ( int ( * nametr ) ( int, char*, int, char* ),
                /* Store the current partially-completed record and its   */
                /* future disc address, to be completed and output when   */
                /* the next entry at this or a higher level is available. */
-                  strncpy ( jumpob [ lastlv ], lastob, LOUT );
+                  hlpStrncp ( jumpob [ lastlv ], lastob, LOUT );
                   jumpad [ lastlv ] = lastad;
                }
 
             /* Store the current record, level and address for next */
             /* time.                                                */
-               strncpy ( lastob, outbuf, LOUT );
+               hlpStrncp ( lastob, outbuf, LOUT );
                lastlv = level;
                lastad = iadr;
             }
@@ -471,8 +470,8 @@ int hlpCreh ( int ( * nametr ) ( int, char*, int, char* ),
                   for ( i = 1; i <= npbl; i++ ) {
                      if ( ipass == 2 ) {
                         iadr = nhind + nhelp;
-                        if ( ( jstat = hlpHdwrit ( " ", &iadr ) ) )
-                           goto syserr;
+                        jstat = hlpHdwrit ( " ", &iadr );
+                        if ( jstat ) goto syserr;
                      }
                      nhelp += 2l;
                   }
@@ -490,8 +489,8 @@ int hlpCreh ( int ( * nametr ) ( int, char*, int, char* ),
                iobuf [ k ] = (char) '\0';
                if ( ipass == 2 ) {
                   iadr = nhind + nhelp;
-                  if ( ( jstat = hlpHdwrit ( iobuf, &iadr ) ) )
-                     goto syserr;
+                  jstat = hlpHdwrit ( iobuf, &iadr );
+                  if ( jstat ) goto syserr;
                }
                nhelp += (long) ( k + 1 );
             }
@@ -538,8 +537,9 @@ iend:
                   /* and reset the list entry.                         */
                      sprintf ( jumpob [ l ] + 20, "%9.9ld", lastad );
                      jumpob [ l ] [ 29 ] = (char) ' ';
-                     if ( ( jstat = hlpHdwrit ( hlpTrim ( jumpob [ l ] ),
-                                              jumpad + l ) ) ) goto syserr;
+                     jstat = hlpHdwrit ( hlpTrim ( jumpob [ l ] ),
+                                                   jumpad + l );
+                     if ( jstat ) goto syserr;
                      jumpad [ l ] = 0l;
                   }
                }
@@ -547,7 +547,7 @@ iend:
             /* Store the current partially-completed record and its     */
             /* future disc address, to be completed and output when the */
             /* next entry at this or a higher level is available.       */
-               strncpy ( jumpob [ lastlv ], lastob, LOUT );
+               hlpStrncp ( jumpob [ lastlv ], lastob, LOUT );
                jumpad [ lastlv ] = lastad;
 
             /* Look again at the list of deferred records. */
@@ -560,8 +560,9 @@ iend:
                   /* record.                                       */
                      sprintf ( jumpob [ l ] + 20, "%9.9ld", iadr );
                      jumpob [ l ] [ 29 ] = (char) ' ';
-                     if ( ( jstat = hlpHdwrit ( hlpTrim ( jumpob [ l ] ),
-                                              jumpad + l ) ) ) goto syserr;
+                     jstat = hlpHdwrit ( hlpTrim ( jumpob [ l ] ),
+                                                   jumpad + l );
+                     if ( jstat ) goto syserr;
                   }
                }
             }
@@ -577,11 +578,13 @@ nextip:
 
 /* Endmark, write header, close the output file, and exit. */
    iadr = nhind + nhelp;
-   if ( ( jstat = hlpHdwrit ( "\0", &iadr ) ) ) goto syserr;
+   jstat = hlpHdwrit ( "\0", &iadr );
+   if ( jstat ) goto syserr;
    sprintf ( header, "%12.12ld", nhind + nhelp + 1l );
    iadr = 0;
-   if ( ( jstat = hlpHdwrit ( header, &iadr ) ) )
-   if ( ( jstat = hlpHclose ( ) ) ) goto syserr;
+   jstat = hlpHdwrit ( header, &iadr );
+   if ( jstat ) jstat = hlpHclose ( );
+   if ( jstat) goto syserr;
    goto wrapup;
 
 /*

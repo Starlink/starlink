@@ -1,5 +1,6 @@
-#include <string.h>
+#include "help.h"
 #include "hlpsys.h"
+
 void hlpHseekx ( char *fname, long iadrx, int loglev )
 /*
 **  - - - - - - - - - -
@@ -19,7 +20,7 @@ void hlpHseekx ( char *fname, long iadrx, int loglev )
 **     nextx     long    address for next sequential access of index
 **     loffnu    int     logical level of next HELP library
 **
-**  Defined in #include:
+**  Defined in hlpsys.h:
 **     LFNAME            maximum length of filenames
 **
 **  Note that no checks are made that the file is open, or that the iadrx
@@ -27,14 +28,14 @@ void hlpHseekx ( char *fname, long iadrx, int loglev )
 **  any of these conditions are violated, appropriate errors will be
 **  reported when attempts to access the file are made.
 **
-**  Called:  hlpCopyn.
+**  Called:  hlpStrncp
 **
-**  Last revision:   22 February 1996
+**  Last revision:   12 March 2014
 **
-**  Copyright 1996 P.T.Wallace.  All rights reserved.
+**  Copyright P.T.Wallace.  All rights reserved.
 */
 {
-   strncpy ( hlnext, fname, LFNAME );
+   hlpStrncp ( hlnext, fname, LFNAME );
    nextx = iadrx;
    loffnu = loglev;
 }

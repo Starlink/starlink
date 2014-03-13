@@ -1,5 +1,7 @@
 #include <string.h>
+#include "help.h"
 #include "hlpsys.h"
+
 int hlpHdwrit ( char *string, long *iadr )
 /*
 **  - - - - - - - - - -
@@ -26,7 +28,7 @@ int hlpHdwrit ( char *string, long *iadr )
 **                       hlp_WRITE_WIDE = attempt to write outside file
 **                      hlp_WRITE_ERROR = write error
 **
-**  The above error codes are defined in #include file hlpsys.h.
+**  The above error codes are defined in header file hlpsys.h.
 **
 **  Notes:
 **
@@ -34,9 +36,9 @@ int hlpHdwrit ( char *string, long *iadr )
 **      single character, namely '\0'.  If not, the record is string
 **      including the '\0'.
 **
-**  Last revision:   29 August 1995
+**  Last revision:   14 January 2008
 **
-**  Copyright 1996 P.T.Wallace.  All rights reserved.
+**  Copyright P.T.Wallace.  All rights reserved.
 */
 {
    long i;
