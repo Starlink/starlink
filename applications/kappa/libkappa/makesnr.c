@@ -45,7 +45,7 @@ F77_SUBROUTINE(makesnr)( INTEGER(STATUS) ){
 *     set bad in the output NDF.
 
 *  Usage:
-*     makesnr in out minvar
+*     makesnr in out [minvar]
 
 *  ADAM Parameters:
 *     IN = NDF (Read)
