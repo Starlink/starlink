@@ -414,6 +414,7 @@
 
 *  See if we are to copy equivalent sections of any NDFs contained in
 *  the extensions of the supplied NDF.
+      EXTEN = .FALSE.
       CALL PAR_GET0L( 'EXTEN', EXTEN, STATUS )
 
 *  If so, get a GRP group containing paths to any NDFs contained with

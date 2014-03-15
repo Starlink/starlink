@@ -135,6 +135,9 @@
       LOGICAL STRUCT               ! Is extension a structure?
 *.
 
+*  Initialize returned value.
+      SIZE = 0
+
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
