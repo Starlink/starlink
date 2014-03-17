@@ -382,7 +382,8 @@ int hlpCreh ( int ( * nametr ) ( int, char*, int, char* ),
                iobuf [ 0 ] = (char) c1;
                iobuf [ 1 ] = (char) ' ';
                l = ito - ifrom + 1;
-               strncpy ( iobuf + 2, iobuf + ifrom, l );
+               memmove( &(iobuf[2]), &(iobuf[ifrom]), l );
+               iobuf[l+2] = '\0';
                for ( i = 2 + l; i < LIN - 1; iobuf [ i++ ] = (char) ' ' );
                iobuf [ i ] = (char) '\0';
 
