@@ -1,6 +1,4 @@
-#include "help.h"
 #include "hlpsys.h"
-
 int hlpHreadd ( int lstring, char *string, int *nc )
 /*
 **  - - - - - - - - - -
@@ -17,8 +15,8 @@ int hlpHreadd ( int lstring, char *string, int *nc )
 **
 **  Returned (arguments)
 **     lstring   int     length of string
-**     *string   char    input record (not including end-of-string)
-**     *nc       int     length of record (0 or more)
+**     *string   char     input record (not including end-of-string)
+**     *nc       int      length of record (0 or more)
 **
 **  Returned (function value):
 **               int      status: +1 = OK, but quasi-end-of-file
@@ -28,7 +26,7 @@ int hlpHreadd ( int lstring, char *string, int *nc )
 **                     hlp_READ_WIDE = attempt to read outside file
 **               hlp_RECORD_OVERSIZE = record overflows STRING (see note)
 **
-**  The above error codes are defined in header file hlpsys.h.
+**  The above error codes are defined in #include file hlpsys.h.
 **
 **  Notes:
 **
@@ -48,9 +46,9 @@ int hlpHreadd ( int lstring, char *string, int *nc )
 **
 **  Called:  hlpHdread
 **
-**  Last revision:   14 January 2008
+**  Last revision:   13 September 1995
 **
-**  Copyright P.T.Wallace.  All rights reserved.
+**  Copyright 1996 P.T.Wallace.  All rights reserved.
 */
 {
    int j;

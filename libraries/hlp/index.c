@@ -1,7 +1,5 @@
 #include <stdio.h>
 #include <string.h>
-#include "help.h"
-
 int hlpIndex ( char *string, char *pattern )
 /*
 **  - - - - - - - - -
@@ -23,13 +21,13 @@ int hlpIndex ( char *string, char *pattern )
 **                      can't be found or pattern is bigger
 **                      than string.
 **
-**  Last revision:   14 January 2008
+**  Last revision:   30 August 1995
 **
-**  Copyright P.T.Wallace.  All rights reserved.
+**  Copyright 1996 P.T.Wallace.  All rights reserved.
 */
 {
    char *ptr;
 
    ptr = strstr ( string, pattern );
-   return (int) ( ( ptr != NULL ) ? ptr - string : -1 );
+   return ( ( ptr != NULL ) ? ptr - string : -1 );
 }

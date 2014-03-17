@@ -1,7 +1,5 @@
 #include <string.h>
 #include <ctype.h>
-#include "help.h"
-
 long hlpDec ( char *string, int *iptr )
 /*
 **  - - - - - - -
@@ -34,9 +32,7 @@ long hlpDec ( char *string, int *iptr )
 **  5)  No decode is attempted if iptr is initially outside the
 **      string.
 **
-**  Last revision:   14 January 2008
-**
-**  Copyright P.T.Wallace.  All rights reserved.
+**  P.T.Wallace   Starlink   29 August 1995
 */
 {
 /* Decode state:  0 = accepting leading spaces

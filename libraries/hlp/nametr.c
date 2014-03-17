@@ -1,20 +1,19 @@
 #include <string.h>
-#include "help.h"
 #include "hlpsys.h"
-
 int hlpNametr ( int kmd, char *strin, int lstrout, char *strout )
 /*
 **  - - - - - - - - - -
 **   h l p N a m e t r
 **  - - - - - - - - - -
 **
-**  Translate a HELP library name into an actual file name.
+**  Translate a HELP library name into an actual file name for use
+**  in by the fopen function.
 **
 **  This is a SPECIFIC IMPLEMENTATION of a routine supplied by the
 **  calling package.  It sandwiches the given name between a prefix
 **  and a suffix.  As well as providing the mandatory "translate"
-**  function (kmd=0), this implementation also provides for the
-**  setting up and enquiring of the prefix and suffix strings (kmd=1-4).
+**  function (K=0), this implementation also provides for the
+**  setting up and enquiring of the prefix and suffix strings (k=1-4).
 **
 **  Given:
 **     kmd        int     command:  0 = translate
@@ -27,7 +26,7 @@ int hlpNametr ( int kmd, char *strin, int lstrout, char *strout )
 **                                          kmd=2, suffix
 **                                          kmd=3, not used
 **                                          kmd=4, not used
-**     lstrout    int     length of output string
+**      lstrout   int     length of output string
 **
 **  Returned (argument):
 **      *strout   char    output string: for kmd=0, filename for fopen
@@ -41,7 +40,7 @@ int hlpNametr ( int kmd, char *strin, int lstrout, char *strout )
 **                hlp_TRANSLATE_ERROR = illegal kmd, or no translation
 **                                      possible
 **
-**  Defined in hlpsys.h:
+**  Defined in #include file:
 **      error codes
 **
 **  Notes:
@@ -56,11 +55,9 @@ int hlpNametr ( int kmd, char *strin, int lstrout, char *strout )
 **      handle uppercase/lowercase, use lookup tables, and so on,
 **      may be developed as the need arises.
 **
-**  Called:  hlpStrncp
+**  Last revision:   22 February 1996
 **
-**  Last revision:   11 March 2014
-**
-**  Copyright P.T.Wallace.  All rights reserved.
+**  Copyright 1996 P.T.Wallace.  All rights reserved.
 */
 
 #define OK 0
@@ -135,7 +132,7 @@ int hlpNametr ( int kmd, char *strin, int lstrout, char *strout )
    */
 
    /* Copy the prefix and report if truncated. */
-      hlpStrncp ( strout, prefix, lstrout );
+      strncpy ( strout, prefix, lstrout );
       return ( ( lp <= lstrout ) ? OK : hlp_STRING_OVERFLOW );
 
    case 4:
@@ -146,7 +143,7 @@ int hlpNametr ( int kmd, char *strin, int lstrout, char *strout )
    */
 
    /* Copy the suffix and report if truncated. */
-      hlpStrncp ( strout, suffix, lstrout );
+      strncpy ( strout, suffix, lstrout );
       return ( ( ls <= lstrout ) ? OK : hlp_STRING_OVERFLOW );
 
    default:

@@ -1,7 +1,5 @@
 #include <string.h>
-#include "help.h"
 #include "hlpsys.h"
-
 int hlpHclose ( void )
 /*
 **  - - - - - - - - - -
@@ -24,11 +22,11 @@ int hlpHclose ( void )
 **                    hlp_ILLEGAL_STATE = HELP system in illegal state
 **                      hlp_CLOSE_ERROR = close error
 **
-**  The above error codes are defined in header file hlpsys.h.
+**  The above error codes are defined in #include file hlpsys.h.
 **
-**  Last revision:   14 January 2008
+**  Last revision:   2 September 1995
 **
-**  Copyright P.T.Wallace.  All rights reserved.
+**  Copyright 1996 P.T.Wallace.  All rights reserved.
 */
 {
 /* Abort if the system isn't in the right state. */

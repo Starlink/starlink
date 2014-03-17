@@ -1,7 +1,5 @@
 #include <string.h>
-#include "help.h"
 #include "hlpsys.h"
-
 int hlpHopenw ( int ( * nametr ) ( int, char*, int, char* ), long nchars )
 /*
 **  - - - - - - - - - -
@@ -18,10 +16,10 @@ int hlpHopenw ( int ( * nametr ) ( int, char*, int, char* ), long nchars )
 **     nametr    func        user-supplied name translation routine (note 1)
 **     nchars    long        size the file will be (characters)
 **
-**  Returned (in global data):
+**  Returned (in COMMON):
 **     jhelp     int         state of HELP system: 1=open/write
 **     nextx     long        index address for spurious sequential read
-**     nextd     long        data address for 1st hlpHdwrit access
+**     nextd     long        data address for 1st hlp_HDWRIT access
 **     nchh      long        size of file (characters)
 **     *hlopen   char        name of HELP library
 **     *fphl     FILE        file pointer for HELP library file
@@ -33,7 +31,7 @@ int hlpHopenw ( int ( * nametr ) ( int, char*, int, char* ), long nchars )
 **                      hlp_WRITE_ERROR = write error
 **                                 else = errors from called routines
 **
-**  The above error codes are defined in header file hlpsys.h.
+**  The above error codes are defined in #include file hlpsys.h.
 **
 **  Notes:
 **
@@ -72,9 +70,9 @@ int hlpHopenw ( int ( * nametr ) ( int, char*, int, char* ), long nchars )
 **
 **  Called:  nametr (user-supplied)
 **
-**  Last revision:   22 November 2010
+**  Last revision:   16 June 2000
 **
-**  Copyright P.T.Wallace.  All rights reserved.
+**  Copyright 2000 P.T.Wallace.  All rights reserved.
 */
 {
    int j;
@@ -88,8 +86,7 @@ int hlpHopenw ( int ( * nametr ) ( int, char*, int, char* ), long nchars )
    if ( jhelp != -1 ) return hlp_ILLEGAL_STATE;
 
 /* Translate the HELP library name and open the file. */
-   j = ( * nametr) ( 0, hlnext, 200, file );
-   if ( j ) return j;
+   if ( ( j = ( * nametr) ( 0, hlnext, 200, file ) ) ) return j;
    if ( ( fphl = fopen ( file, "w" ) ) == NULL ) return hlp_OPEN_ERROR;
 
 /* Note its name. */

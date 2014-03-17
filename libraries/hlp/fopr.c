@@ -1,6 +1,4 @@
 #include <stdio.h>
-#include "help.h"
-
 int hlpFopr ( int ( *nametr ) ( int, char*, int, char* ),
               char *file, FILE **fp )
 /*
@@ -56,9 +54,9 @@ int hlpFopr ( int ( *nametr ) ( int, char*, int, char* ),
 **      subjected to any required translation by means of the nametr
 **      routine specified in the call.
 **
-**  Last revision:   30 July 2009
+**  Last revision:   7 January 1996
 **
-**  Copyright P.T.Wallace.   All rights reserved.
+**  Copyright 1996 P.T.Wallace.   All rights reserved.
 */
 #define LFILETR 200  /* Maximum length of filename */
 {
@@ -66,8 +64,7 @@ int hlpFopr ( int ( *nametr ) ( int, char*, int, char* ),
    int j;
 
 /* Translate the HELP library name into a filename. */
-   j = ( *nametr ) ( 0, file, LFILETR, filetr );
-   if ( j ) return j;
+   if ( ( j = ( * nametr ) ( 0, file, LFILETR, filetr ) ) ) return j;
 
 /* Open for reading. */
    return ( ( ( *fp = fopen ( filetr, "r" ) ) == NULL ) ? -1 : 0 );

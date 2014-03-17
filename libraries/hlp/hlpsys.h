@@ -1,6 +1,10 @@
 #ifndef HLPSYSIC
 #define HLPSYSIC
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*
 **  - - - - - - - - -
 **   h l p s y s . h
@@ -8,12 +12,13 @@
 **
 **  HELP system functions, macros and global data include file.
 **
-**  Last revision:   14 January 2008
+**  Last revision:   27 January 2000
 **
 **  Copyright P.T.Wallace.  All rights reserved.
 */
 
 /* Function prototypes and error status codes */
+#include "help1.h"
 #include "help.h"
 
 /* Maximum length of HELP library names (including '\0') */
@@ -44,5 +49,9 @@
 
 /* Number of characters in HELP library file */
    extern long nchh;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

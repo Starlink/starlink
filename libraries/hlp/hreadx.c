@@ -1,7 +1,5 @@
 #include <string.h>
-#include "help.h"
 #include "hlpsys.h"
-
 int hlpHreadx ( int ( * nametr ) ( int, char*, int, char* ),
                 int navig, int lstring, char *string, int *nc )
 /*
@@ -13,12 +11,10 @@ int hlpHreadx ( int ( * nametr ) ( int, char*, int, char* ),
 **  the sequential-access addresses pointing to the indexed record.
 **
 **  Given (in global data):
-**     jhelp      int    state of HELP system: 2=open/read
 **     *fphl      FILE   file pointer for HELP library file
 **     *hlopen    char   name of open HELP library
 **     *hlnext    char   name of next HELP library
 **     nextx      long   index address for this sequential access
-**     nextd      long   data address for next sequential access
 **     levoff     int    logical level for the current HELP library
 **
 **  Given (arguments):
@@ -49,8 +45,9 @@ int hlpHreadx ( int ( * nametr ) ( int, char*, int, char* ),
 **                    hlp_BAD_INDEX = illegal index record
 **                     hlp_SELF_REF = attempted switch to current file
 **
-**  Defined in header file hlpsys.h:
+**  Defined in #include file hlpsys.h:
 **      error codes
+**      POINTR
 **
 **  Notes:
 **
@@ -120,11 +117,11 @@ int hlpHreadx ( int ( * nametr ) ( int, char*, int, char* ),
 **      by an extra field, beginning with the character '@', after the
 **      three addresses and before the level number and topic name.
 **
-**  Called:  hlpHopenr, hlpHdread, hlpHopenr, hlpDec, hlpStrncp.
+**  Called:  hlpHopenr, hlpHdread, hlpHopenr, hlpDec, hlpCopyn.
 **
-**  Last revision:   12 March 2014
+**  Last revision:   2 January 2004
 **
-**  Copyright P.T.Wallace.  All rights reserved.
+**  Copyright 2004 P.T.Wallace.  All rights reserved.
 */
 
 /* Character signifying a pointer to another HELP library */
@@ -145,12 +142,11 @@ int hlpHreadx ( int ( * nametr ) ( int, char*, int, char* ),
       iadrx = nextx;
 
    /* Close any open HELP library file. */
-      old = *hlopen;
-      if ( old ) if ( ( fclose ( fphl ) ) ) return hlp_CLOSE_ERROR;
+      if ( ( old = *hlopen ) )
+         if ( ( fclose ( fphl ) ) ) return hlp_CLOSE_ERROR;
 
    /* Open the new HELP library file and set its logical level number. */
-      jstat = hlpHopenr ( nametr );
-      if ( jstat ) return jstat;
+      if ( ( jstat = hlpHopenr ( nametr ) ) ) return jstat;
       levoff = loffnu;
 
    /* Restore the address. */
@@ -162,15 +158,14 @@ int hlpHreadx ( int ( * nametr ) ( int, char*, int, char* ),
       /* Yes: it will have contained an entry for the current */
       /* level and keyword, so read and ignore the top-level  */
       /* entry in the new library.                            */
-         jstat = hlpHdread ( lstring, &nextx, string, nc );
-         if ( jstat ) return jstat;
+         if ( ( jstat = hlpHdread ( lstring, &nextx, string, nc ) ) )
+            return jstat;
       }
    } else if ( nextx <= 0 ) {
 
    /* The right library is already open, but we are trying */
    /* to read the first record: reopen.                    */
-      jstat = hlpHopenr ( nametr );
-      if ( jstat ) return jstat;
+      if ( ( jstat = hlpHopenr ( nametr ) ) ) return jstat;
    }
 
 /* Remember the current positions. */
@@ -178,8 +173,8 @@ int hlpHreadx ( int ( * nametr ) ( int, char*, int, char* ),
    iadrd = nextd;
 
 /* Read the next index entry. */
-   jstat = hlpHdread ( lstring, &nextx, string, nc );
-   if ( jstat ) return jstat;
+   if ( ( jstat = hlpHdread ( lstring, &nextx, string, nc ) ) )
+      return jstat;
 
 /* Quasi-end-of-file? */
    if ( ! *nc ) {
@@ -236,14 +231,14 @@ int hlpHreadx ( int ( * nametr ) ( int, char*, int, char* ),
 
          /* Store the library name, causing library switch on next */
          /* read, and set the address to indicate the first entry. */
-            hlpStrncp ( hlnext, string + ifrom + 1, l );
+            hlpCopyn (hlnext, string + ifrom + 1, l );
             nextx = 0l;
 
          /* Decode the level number to determine the logical level */
          /* of the new library.                                    */
             loffnu = (int) hlpDec ( string, &iptr );
             if ( loffnu < 0 ) return hlp_BAD_INDEX;
-            loffnu += levoff;
+            loffnu = loffnu + levoff;
 
          /* Point iptr back at the level number. */
             iptr--;

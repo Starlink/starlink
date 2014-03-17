@@ -1,6 +1,4 @@
 #include <ctype.h>
-#include "help.h"
-
 char *hlpUpcase ( char *string )
 /*
 **  - - - - - - - - - -
@@ -14,15 +12,15 @@ char *hlpUpcase ( char *string )
 **
 **  The string pointer is also returned as the function value.
 **
-**  Last revision:   1 September 2009
+**  Last revision:   6 November 1996
 **
-**  Copyright P.T.Wallace.  All Rights Reserved.
+**  Copyright 1996 P.T.Wallace.  All Rights Reserved.
 */
 {
-   char *s;
+   int i;
 
-   for ( s = string; *s; s++ ) {
-      *s = (char) toupper ( (int) *s );
-   }
+   for ( i = 0;
+         ( string [ i ] = (char) toupper ( (int) string [ i ] ) );
+         i++ );
    return string;
 }

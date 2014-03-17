@@ -1,7 +1,5 @@
 #include <string.h>
-#include "help.h"
 #include "hlpsys.h"
-
 int main ( int argc, char *argv[] )
 /*
 **  - - - - - - -
@@ -19,7 +17,7 @@ int main ( int argc, char *argv[] )
 **  If not specified through command-line arguments, the filenames
 **  are prompted for.
 **
-**  Error codes defined in hlpsys.h:
+**  Error codes defined in hlpsys.h #include file:
 **      hlp_READ_WIDE
 **      hlp_OPEN_ERROR
 **
@@ -28,12 +26,12 @@ int main ( int argc, char *argv[] )
 **                  hlp_OPEN_ERROR = error opening report file
 **                       other -ve = error reported by called routine
 **
-**  Called:  hlpStrncp, hlpHinit, hlpHopenr, hlpHdread, hlpErrmes,
-**           hlpTrim, hlpNametr
+**  Called:  hlpHinit, hlpHopenr, hlpHdread, hlpErrmes, hlpTrim,
+**           hlpNametr
 **
-**  Last revision:   11 March 2014
+**  Last revision:   16 June 2000
 **
-**  Copyright P.T.Wallace.  All rights reserved.
+**  Copyright 2000 P.T.Wallace.  All rights reserved.
 */
 
 /* Maximum length of filenames (including '\0'). */
@@ -58,7 +56,7 @@ int main ( int argc, char *argv[] )
 
 /* Get the library-file name. */
    if (argc >= 2 ) {
-      hlpStrncp ( lib, argv [1], LFN );
+      strncpy ( lib, argv [1], LFN );
    } else {
       puts ( "Name of help library to be read?" );
       hlpTrim ( fgets ( lib, LFN, stdin ) );
@@ -66,7 +64,7 @@ int main ( int argc, char *argv[] )
 
 /* Get the report-file name. */
    if (argc >= 3 ) {
-      hlpStrncp ( rep, argv [2], LFN );
+      strncpy ( rep, argv [2], LFN );
    } else {
       puts ( "Name of report file to be written?" );
       hlpTrim ( fgets ( rep, LFN, stdin ) );
@@ -76,15 +74,13 @@ int main ( int argc, char *argv[] )
    hlpHinit ( lib );
 
 /* Open the HELP library file. */
-   jstat = hlpHopenr ( hlpNametr );
-   if ( jstat ) {
+   if ( ( jstat = hlpHopenr ( hlpNametr ) ) ) {
       puts ( hlpErrmes ( jstat ) );
       return jstat;
    }
 
 /* Open the report file. */
-   fpr = fopen ( rep, "w+" );
-   if ( fpr == NULL ) {
+   if ( ( fpr = fopen ( rep, "w+" ) ) == NULL ) {
       jstat = hlp_OPEN_ERROR;
       puts ( hlpErrmes ( jstat ) );
       return jstat;

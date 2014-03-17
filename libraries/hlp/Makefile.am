@@ -32,6 +32,7 @@ libhlp_la_SOURCES = \
 
 C_ROUTINES = \
 	comstr.c \
+	copyn.c \
 	creh.c \
 	dec.c \
 	errmes.c \
@@ -56,7 +57,6 @@ C_ROUTINES = \
 	nametr.c \
 	outsub.c \
 	split.c \
-        strncp.c \
 	trim.c \
 	upcase.c
 

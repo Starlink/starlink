@@ -1,12 +1,8 @@
 #include <stdio.h>
 #include <string.h>
-
-#include "help.h"
-
 #define extern
 #include "hlpsys.h"
 #undef extern
-
 void hlpHinit ( char *fname )
 /*
 **  - - - - - - - - -
@@ -24,12 +20,12 @@ void hlpHinit ( char *fname )
 **     *hlopen   char    name of open HELP library (reset to null)
 **     *hlnext   char    name of HELP library for next access
 **
-**  Defined in hlpsys.h:
+**  Defined in #include:
 **     LFNAME            maximum length of filenames
 **
-**  Last revision:   14 January 2008
+**  Last revision:   16 June 2000
 **
-**  Copyright P.T.Wallace.  All rights reserved.
+**  Copyright 2000 P.T.Wallace.  All rights reserved.
 */
 {
    *hlopen = '\0';

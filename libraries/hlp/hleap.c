@@ -1,7 +1,5 @@
 #include <string.h>
-#include "help.h"
 #include "hlpsys.h"
-
 int hlpHleap ( int ( * nametr ) ( int, char*, int, char* ),
                int lstring, char *string, char *fname,
                long *iadr, int *logl )
@@ -41,7 +39,7 @@ int hlpHleap ( int ( * nametr ) ( int, char*, int, char* ),
 **                      hlp_BAD_INDEX = illegal index record
 **                               else = status from called routines
 **
-**  Defined in hlpsys.h:
+**  Defined in #include file:
 **     LFNAME     int      maximum length of file names (including '\0')
 **     Error codes
 **
@@ -76,9 +74,9 @@ int hlpHleap ( int ( * nametr ) ( int, char*, int, char* ),
 **
 **  Called:  hlpHopenr, hlpHtellx, hlpHdread, hlpDec
 **
-**  Last revision:   29 July 2009
+**  Last revision:   7 January 1996
 **
-**  Copyright P.T.Wallace.  All rights reserved.
+**  Copyright 1996 P.T.Wallace.  All rights reserved.
 */
 {
    int jstat, nc, iptr;
@@ -91,14 +89,13 @@ int hlpHleap ( int ( * nametr ) ( int, char*, int, char* ),
       if ( fclose ( fphl ) ) return hlp_CLOSE_ERROR;
 
    /* Open the new HELP library file and set its logical level number. */
-      jstat = hlpHopenr ( nametr );
-      if ( jstat ) return jstat;
+      if ( ( jstat = hlpHopenr ( nametr ) ) ) return jstat;
       levoff = loffnu;
 
    /* Return the position of the first index entry and read it. */
       hlpHtellx ( fname, iadr, logl );
-      jstat = hlpHdread ( lstring, &nextx, string, &nc );
-      if ( jstat ) return jstat;
+      if ( ( jstat = hlpHdread ( lstring, &nextx, string, &nc ) ) )
+         return jstat;
       if ( nc <= 0 ) return hlp_BAD_INDEX;
 
    /* Decode the "data" address. */

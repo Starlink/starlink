@@ -1,7 +1,4 @@
-#include <string.h>
 #include <ctype.h>
-#include "help.h"
-
 char *hlpTrim ( char *string )
 /*
 **  - - - - - - - -
@@ -19,17 +16,17 @@ char *hlpTrim ( char *string )
 **  Returned (function value):
 **                  char*    the string without trailing whitespace
 **
-**  Last revision:   1 September 2009
+**  Last revision:   7 January 1996
 **
-**  Copyright P.T.Wallace.  All rights reserved.
+**  Copyright 1996 P.T.Wallace.  All rights reserved.
 */
 {
-   int i;
+   int l, i, c;
 
-
-   i = (int) strlen ( string ) - 1;
-   while ( i >= 0 && isspace ( (char) string[i] ) ) {
-      string[i--] = (char) '\0';
-   }
+   l = 0;
+   for ( i = 0;
+         ( c = (int) string [ i++ ] );
+         l = isspace ( c ) ? l : i );
+   string [ l ] = (char) '\0';
    return string;
 }

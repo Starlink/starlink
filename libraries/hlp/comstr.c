@@ -1,6 +1,5 @@
 #include <string.h>
-#include "help.h"
-
+#include "hlpsys.h"
 int hlpComstr ( char *fulstr, char *str )
 /*
 **  - - - - - - - - - -
@@ -46,9 +45,10 @@ int hlpComstr ( char *fulstr, char *str )
 **
 **  Called:  hlpLength
 **
-**  Last revision:   22 November 2010
+**  Last revision:   7 January 1996
+**                   3 January 2006 (TIMJ)
 **
-**  Copyright P.T.Wallace.  All rights reserved.
+**  Copyright 1996 P.T.Wallace.  All rights reserved.
 */
 
 #define TRUE 1
@@ -89,7 +89,10 @@ int hlpComstr ( char *fulstr, char *str )
 
 /* str indices defining the beginning and end of the movable substring, */
 /* and their saved values; movbeg=-1 means "no movable substring".      */
-   int movbeg, movend=0, mb, me=0;
+   int movbeg = 0;
+   int movend = 0;
+   int mb = 0;
+   int me = 0;
 
 /* Movable substring not yet matched - keep searching fulstr */
    int notfnd;
@@ -137,7 +140,7 @@ int hlpComstr ( char *fulstr, char *str )
                  lwbs = hlpIndex ( str + lwbs + 2, WDSEP ) + lwbs;
 
       /* Test if there is a word boundary in str which is not */
-      /* present in fulstr.                                   */
+      /* present in fulstr                                    */
          if ( lwbf < jf && lwbs >= is ) {
 
          /* There is: the strings do not match. */
@@ -348,8 +351,7 @@ int hlpComstr ( char *fulstr, char *str )
                      mcl = str [ mis - 1 ];
 
                   /* If it was an escape, correct the index. */
-                     if ( mcl == ESCAPE ) mis -= 1;
-
+                     if ( ( mcl = ESCAPE ) ) mis -= 1;
                   } else {
                      mcl = ' ';
                   }

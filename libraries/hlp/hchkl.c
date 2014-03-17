@@ -1,7 +1,5 @@
 #include <string.h>
-#include "help.h"
 #include "hlpsys.h"
-
 void hlpHchkl ( char *record, int *level, char *name )
 /*
 **  - - - - - - - - -
@@ -27,9 +25,9 @@ void hlpHchkl ( char *record, int *level, char *name )
 **
 **  Called:  hlpSplit, hlpDec
 **
-**  Last revision:   14 January 2008
+**  Last revision:   27 August 1995
 **
-**  Copyright P.T.Wallace.  All rights reserved.
+**  Copyright 1996 P.T.Wallace.  All rights reserved.
 */
 {
    int ips, ipf, l, i;

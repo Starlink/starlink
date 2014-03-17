@@ -1,6 +1,5 @@
 #include <ctype.h>
-#include "help.h"
-
+#include "hlpsys.h"
 void hlpSplit ( char *string, int istart, int *ifrom, int *ito )
 /*
 **  - - - - - - - - -
@@ -25,9 +24,9 @@ void hlpSplit ( char *string, int istart, int *ifrom, int *ito )
 **
 **  Called: hlpLength
 **
-**  Last revision:   14 January 2008
+**  Last revision:   10 November 1998
 **
-**  Copyright P.T.Wallace.  All rights reserved.
+**  Copyright 1998 P.T.Wallace.  All rights reserved.
 */
 {
    int l, i, j;
