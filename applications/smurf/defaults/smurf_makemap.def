@@ -235,8 +235,25 @@ ast.zero_notlast = 1
 #		iteration all map pixels with an SNR below this threshold
 #		will be forced to zero. the mask is re-evaluated on each
 #		iteration. An ast.zero_snr value of zero means no SNR mask
-#		is used.
+#		is used. See also parameter "ast.zero_snr_ffclean".
 ast.zero_snr = 0.0
+
+#-----------------------------------------------------------------
+#  Name: 	ast.zero_snr_ffclean
+#  Type: 	int
+#  Default: 	0
+#  Purpose: 	Provides alternative method for SNR masking.
+#  Description: Setting this parameter to a non-zero value causes the
+#               SNR mask requested by parameter "ast.zero_snr" to be
+#               created using an algorithm like that used by the KAPPA
+#               command "FFCLEAN" (see SUN/95), instead of using a simple
+#               thresholding of the SNR map. The parameter "ast.zero_snr"
+#               gives the clipping level of the ffclean algorithm, and the
+#               parameter "ast.zero_snr_hipass" gives the box size. Using
+#               an ffclean algorithm prevents the source regions within
+#               the mask being larger than the box size, and may thus
+#               produce faster convergence and avoid blobs developing.
+ast.zero_snr_ffclean = 0
 
 #-----------------------------------------------------------------
 #  Name: 	ast.zero_snr_hipass
@@ -249,6 +266,7 @@ ast.zero_snr = 0.0
 #               filtering to remove structures larger than the number of
 #               arc-seconds given by ast.zero_snr_hipass. This will in
 #               general reduce the number of source pixels in the mask.
+#               See also parameter "ast.zero_snr_ffclean".
 ast.zero_snr_hipass = 0.0
 
 #-----------------------------------------------------------------
@@ -496,7 +514,7 @@ com.zero_notlast = 1
 #  Description: Setting the com.zero_snr parameter will exclude samples from
 #               the COM estimate that fall within map pixels with SNR values
 #               greater than com.zero_snr. A com.zero_snr value of zero means
-#               no SNR mask is used.
+#               no SNR mask is used. See also parameter "com.zero_snr_ffclean".
 #
 #               Note, the SNR values are only available once a map has been
 #               created, and so using this parameter results in no COM masking
@@ -514,6 +532,22 @@ com.zero_notlast = 1
 com.zero_snr = 0
 
 #-----------------------------------------------------------------
+#  Name: 	com.zero_snr_ffclean
+#  Type: 	int
+#  Default: 	0
+#  Purpose: 	Provides alternative method for SNR masking.
+#  Description: Setting this parameter to a non-zero value causes the
+#               SNR mask requested by parameter "com.zero_snr" to be
+#               created using an algorithm like that used by the KAPPA
+#               command "FFCLEAN" (see SUN/95), instead of using a simple
+#               thresholding of the SNR map. The parameter "com.zero_snr"
+#               gives the clipping level of the ffclean algorithm, and the
+#               parameter "com.zero_snr_hipass" gives the box size. Using
+#               an ffclean algorithm prevents the source regions within
+#               the mask being larger than the box size.
+com.zero_snr_ffclean = 0
+
+#-----------------------------------------------------------------
 #  Name: 	com.zero_snr_hipass
 #  Type: 	real
 #  Default: 	0.0
@@ -524,6 +558,7 @@ com.zero_snr = 0
 #               filtering to remove structures larger than the number of
 #               arc-seconds given by com.zero_snr_hipass. This will in
 #               general reduce the number of source pixels in the mask.
+#               See also parameter "com.zero_snr_ffclean".
 com.zero_snr_hipass = 0.0
 
 #-----------------------------------------------------------------
@@ -1480,7 +1515,8 @@ flt.zero_notlast = 1
 #  Description: Setting the flt.zero_snr parameter will prevent samples
 #		contributing to the FLT model if they fall within map pixels
 #		that have SNR values greater than flt.zero_snr. A flt.zero_snr
-#		value of zero means no SNR mask is used.
+#		value of zero means no SNR mask is used. See also parameter
+#               "flt.zero_snr_ffclean".
 #
 #               Note, the SNR values are only available once a map has been
 #               created, and so using this parameter results in no FLT masking
@@ -1498,6 +1534,23 @@ flt.zero_notlast = 1
 flt.zero_snr = 0
 
 #-----------------------------------------------------------------
+#  Name: 	flt.zero_snr_ffclean
+#  Type: 	int
+#  Default: 	0
+#  Purpose: 	Provides alternative method for SNR masking.
+#  Description: Setting this parameter to a non-zero value causes the
+#               SNR mask requested by parameter "flt.zero_snr" to be
+#               created using an algorithm like that used by the KAPPA
+#               command "FFCLEAN" (see SUN/95), instead of using a simple
+#               thresholding of the SNR map. The parameter "flt.zero_snr"
+#               gives the clipping level of the ffclean algorithm, and the
+#               parameter "flt.zero_snr_hipass" gives the box size. Using
+#               an ffclean algorithm prevents the source regions within
+#               the mask being larger than the box size, and may thus
+#               produce faster convergence and avoid blobs developing.
+flt.zero_snr_ffclean = 0
+
+#-----------------------------------------------------------------
 #  Name: 	flt.zero_snr_hipass
 #  Type: 	real
 #  Default: 	0.0
@@ -1508,6 +1561,7 @@ flt.zero_snr = 0
 #               filtering to remove structures larger than the number of
 #               arc-seconds given by flt.zero_snr_hipass. This will in
 #               general reduce the number of source pixels in the mask.
+#               See also parameter "flt.zero_snr_ffclean".
 flt.zero_snr_hipass = 0.0
 
 #-----------------------------------------------------------------

@@ -151,6 +151,7 @@ smf_expmodel_init.c \
 smf_export_noi.c \
 smf_ext2km.c \
 smf_extracols.c \
+smf_ffclean.c \
 smf_fft_2dazav.c \
 smf_fft_avpspec.c \
 smf_fft_cart2pol.c \

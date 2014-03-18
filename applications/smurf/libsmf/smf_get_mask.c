@@ -120,6 +120,9 @@
 *        Allow map to be high-pass filtered before creating the SNR mask.
 *     16-MAR-2014 (DSB):
 *        Allow map to be low-pass filtered before creating the SNR mask.
+*     18-MAR-2014 (DSB):
+*        Allow masks to be created using an algorithm like the
+*        kappa:ffclean command.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -216,6 +219,7 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
    int zero_mask;             /* Use the reference NDF as a mask? */
    int zero_niter;            /* Only mask for the first "niter" iterations. */
    int zero_notlast;          /* Don't zero on last iteration? */
+   int zero_snr_ffclean;      /* Define mask using ffclean algorithm? */
    int zero_snr_lopass;       /* Size of box for low-pass smoothing SNR map */
    size_t ngood;              /* Number good samples for stats */
    unsigned char **mask;      /* Address of model's mask pointer */
@@ -335,6 +339,7 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
             }
          }
 
+         zero_snr_ffclean = 0;
          zero_snr_lopass = 0;
          zero_snr_hipass = 0.0;
          zero_snr = 0.0;
@@ -345,6 +350,7 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
                isstatic = 0;
                astMapGet0D( subkm, "ZERO_SNR_HIPASS", &zero_snr_hipass );
                astMapGet0I( subkm, "ZERO_SNR_LOPASS", &zero_snr_lopass );
+               astMapGet0I( subkm, "ZERO_SNR_FFCLEAN", &zero_snr_ffclean );
             }
          } else if( zero_snr <  0.0 && *status == SAI__OK ) {
             *status = SAI__ERROR;
@@ -555,100 +561,141 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
 /* SNR masking... */
                } else if( mask_types[ imask ] == SNR ) {
 
-
 /* If required, smooth the map to remove high spatial frequencies (noise,
    etc). */
                   if( zero_snr_lopass > 0 ) {
+                     msgOutiff( MSG__DEBUG, " ", "smf_get_mask: Smoothing "
+                                "the map using a %d pixel box filter prior "
+                                "to forming the %s mask.", status,
+                                zero_snr_lopass, modname );
                      mapuset = smf_tophat2( wf, dat->map, dat->mdims,
                                            zero_snr_lopass, 0, status );
                   } else {
                      mapuset = dat->map;
                   }
 
-/* If required, subtract off a smoothed background from the map. First
-   convert the high pass filter size from arc-seconds to pixels, and
+/* Convert the high pass filter size from arc-seconds to pixels, and
    round to the nearest integer. */
                   hipass = (int)( 0.5 + zero_snr_hipass/dat->pixsize );
-                  if( hipass > 0 ) {
-                     mapuse = smf_tophat2( wf, mapuset, dat->mdims,
-                                           hipass, 1, status );
+
+/* If required, form the mask using an ffclean-like algorithm. */
+                  if( zero_snr_ffclean ) {
+                     if( hipass > 1 ) {
+                        msgOutiff( MSG__DEBUG, " ", "smf_get_mask: The %s model "
+                                   "will be masked using an FFCLEAN algorithm "
+                                   "with box=%d and thresh=%g.", status, modname,
+                                   hipass, zero_snr );
+
+                        mapuse = smf_ffclean( wf, mapuset, dat->mdims,
+                                              hipass, zero_snr, status );
+                        if( *status == SAI__OK ) {
+                           pd = mapuse;
+                           pn = newmask;
+                           for( i = 0; i < dat->msize; i++ ) {
+                              *(pn++) = ( *(pd++) != VAL__BADD ) ? 1 : 0;
+                           }
+                        }
+
+                        mapuse = astFree( mapuse );
+
+                     } else if( *status == SAI__OK ) {
+                        *status = SAI__ERROR;
+                        errRepf( "", "smf_get_mask: Non-zero value supplied for"
+                                 " %s.ZERO_SNR_FFCLEAN but zero supplied for "
+                                 "%s.ZERO_SNR_HIPASS.", status, modname, modname );
+                     }
+
+/* Otherwise, form the mask by thresholding the map at the requested SNR
+   level, possible after removal of low frequency structures. */
                   } else {
-                     mapuse = mapuset;
-                  }
+
+/* If required, subtract off a smoothed background from the map. */
+                     if( hipass > 0 ) {
+                        msgOutiff( MSG__DEBUG, " ", "smf_get_mask: Removing "
+                                   "background from map using a %g arc-sec "
+                                   "box filter prior to forming the %s mask.",
+                                   status, zero_snr_hipass, modname );
+                        mapuse = smf_tophat2( wf, mapuset, dat->mdims,
+                                              hipass, 1, status );
+                     } else {
+                        mapuse = mapuset;
+                     }
 
 /* Get the lower SNR limit. */
-                  zero_snrlo = 0.0;
-                  astMapGet0D( subkm, "ZERO_SNRLO", &zero_snrlo );
-                  if( zero_snrlo <= 0.0 ) {
-                     zero_snrlo = zero_snr;
-                  } else if( zero_snrlo > zero_snr && *status == SAI__OK ) {
-                     *status = SAI__ERROR;
-                     errRepf( " ", "Bad value for config parameter "
-                              "%s.ZERO_SNRLO (%g) - it must not be higher "
-                              "than %s.ZERO_SNR (%g).", status, modname,
-                              zero_snrlo, modname, zero_snr );
-                  }
+                     zero_snrlo = 0.0;
+                     astMapGet0D( subkm, "ZERO_SNRLO", &zero_snrlo );
+                     if( zero_snrlo <= 0.0 ) {
+                        zero_snrlo = zero_snr;
+                     } else if( zero_snrlo > zero_snr && *status == SAI__OK ) {
+                        *status = SAI__ERROR;
+                        errRepf( " ", "Bad value for config parameter "
+                                 "%s.ZERO_SNRLO (%g) - it must not be higher "
+                                 "than %s.ZERO_SNR (%g).", status, modname,
+                                 zero_snrlo, modname, zero_snr );
+                     }
 
 /* If the higher and lower SNR limits are equal, just do a simple
    threshold on the SNR values to get the mask. */
-                  if( zero_snr == zero_snrlo ) {
-                     pd = mapuse;
-                     pv = dat->mapvar;
-                     pn = newmask;
+                     if( zero_snr == zero_snrlo ) {
+                        pd = mapuse;
+                        pv = dat->mapvar;
+                        pn = newmask;
 
-                     if( accmask ) {
-                        pa = accmask;
-                        for( i = 0; i < dat->msize; i++,pd++,pv++ ) {
-                           if( *(pa++) == 0 ) {
-                              *(pn++) = 0;
-                           } else {
+                        if( accmask ) {
+                           pa = accmask;
+                           for( i = 0; i < dat->msize; i++,pd++,pv++ ) {
+                              if( *(pa++) == 0 ) {
+                                 *(pn++) = 0;
+                              } else {
+                                 *(pn++) = ( *pd != VAL__BADD && *pv != VAL__BADD &&
+                                             *pv >= 0.0 && *pd < zero_snr*sqrt( *pv ) ) ? 1 : 0;
+                              }
+                           }
+
+                        } else {
+                           for( i = 0; i < dat->msize; i++,pd++,pv++ ) {
                               *(pn++) = ( *pd != VAL__BADD && *pv != VAL__BADD &&
                                           *pv >= 0.0 && *pd < zero_snr*sqrt( *pv ) ) ? 1 : 0;
                            }
                         }
 
-                     } else {
-                        for( i = 0; i < dat->msize; i++,pd++,pv++ ) {
-                           *(pn++) = ( *pd != VAL__BADD && *pv != VAL__BADD &&
-                                       *pv >= 0.0 && *pd < zero_snr*sqrt( *pv ) ) ? 1 : 0;
-                        }
-                     }
-
 /* Report masking info. */
-                     if( !have_mask ) {
-                        if( zero_niter == 0 ) {
-                           sprintf( words, "on each iteration" );
-                        } else {
-                           sprintf( words, "for %d iterations", zero_niter );
+                        if( !have_mask ) {
+                           if( zero_niter == 0 ) {
+                              sprintf( words, "on each iteration" );
+                           } else {
+                              sprintf( words, "for %d iterations", zero_niter );
+                           }
+                           msgOutiff( MSG__DEBUG, " ", "smf_get_mask: The %s model "
+                                      "will be masked %s using an SNR limit of %g.",
+                                      status, modname, words, zero_snr );
                         }
-                        msgOutiff( MSG__DEBUG, " ", "smf_get_mask: The %s model "
-                                   "will be masked %s using an SNR limit of %g.",
-                                   status, modname, words, zero_snr );
-                     }
 
 /* If the higher and lower SNR limits are different, create an initial
    mask by thresholding at the ZERO_SNR value, and then extend the source
    areas within the mask down to an SNR limit of ZERO_SNRLO. */
-                  } else {
-                     smf_snrmask( wf, accmask, mapuse, dat->mapvar,
-                                  dat->mdims, zero_snr, zero_snrlo,
-                                  newmask, status );
+                     } else {
+                        smf_snrmask( wf, accmask, mapuse, dat->mapvar,
+                                     dat->mdims, zero_snr, zero_snrlo,
+                                     newmask, status );
 
 /* Report masking info. */
-                     if( !have_mask ) {
-                        if( zero_niter == 0 ) {
-                           sprintf( words, "on each iteration" );
-                        } else {
-                           sprintf( words, "for %d iterations", zero_niter );
+                        if( !have_mask ) {
+                           if( zero_niter == 0 ) {
+                              sprintf( words, "on each iteration" );
+                           } else {
+                              sprintf( words, "for %d iterations", zero_niter );
+                           }
+                           msgOutiff( MSG__DEBUG, " ", "smf_get_mask: The %s model "
+                                      "will be masked %s using an SNR limit of %g "
+                                      "extended down to %g.", status, modname,
+                                      words, zero_snr, zero_snrlo );
                         }
-                        msgOutiff( MSG__DEBUG, " ", "smf_get_mask: The %s model "
-                                   "will be masked %s using an SNR limit of %g "
-                                   "extended down to %g.", status, modname,
-                                   words, zero_snr, zero_snrlo );
                      }
+
+                     if( hipass > 0 ) mapuse = astFree( mapuse );
                   }
 
-                  if( hipass > 0 ) mapuse = astFree( mapuse );
                   if( zero_snr_lopass > 0 ) mapuset = astFree( mapuset );
 
 /* Predefined masking... */
