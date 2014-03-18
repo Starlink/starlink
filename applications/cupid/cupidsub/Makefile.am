@@ -36,7 +36,7 @@ noinst_LTLIBRARIES = libcupidsub.la
 
 libcupidsub_la_SOURCES = $(C_ROUTINES) $(CGENERIC_ROUTINES)
 
-AM_CFLAGS = -I..
+AM_CFLAGS = -I.. -std=c99
 
 $(C_ROUTINES:.c=.o): ../cupid.h
 
