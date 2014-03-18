@@ -85,6 +85,8 @@
 *  History:
 *     30-OCT-2008 (DSB):
 *        Original version.
+*     17-MAR-2014 (DSB):
+*        Update bad pixel flag in output NDF.
 *     {enter_further_changes_here}
 
 *-
@@ -97,6 +99,7 @@
       INCLUDE 'AST_PAR'          ! AST constants and functions
       INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
+      INCLUDE 'PRM_PAR'          ! For VAL__ constants
 
 *  Arguments Given:
       INTEGER INDF
@@ -183,6 +186,14 @@
          CALL ERR_REP( 'KPS1_RMASK_ERR1', 'KPS1_RMASK: This '//
      :                 'application does not yet support the '//
      :                 '^T data type.', STATUS )
+      END IF
+
+*  Update the bad pixel flag in the output NDF. If we have assigned any
+*  bad values above, we know that there are bad pixels present. If we
+*  have not modified any pixels, or if we have stored non-bad values,
+*  we can retain the existing bad pixel flag inherited from the input.
+      IF( VAL .EQ. VAL__BADD .AND. N .GT. 0 ) THEN
+         CALL NDF_SBAD( .TRUE., INDF, COMP, STATUS )
       END IF
 
 *  Map the NDF component.
