@@ -1,7 +1,7 @@
 /*
 *+
 *  Name:
-*     smf_sigmaclip
+*     smf_sigmaclip<X>
 
 *  Purpose:
 *     Find the weighted mean of a supplied set of values, using N-sigma
@@ -14,14 +14,14 @@
 *     C function
 
 *  Invocation:
-*     double smf_sigmaclip( int nval, double *val, double *wgt,
-*                           double nsigma, int niter, double *stddev,
-*                           int *status )
+*     double smf_sigmaclip<X>( int nval, const CGEN_TYPE *val, double *wgt,
+*                              double nsigma, int niter, double *stddev,
+*                              int *status )
 
 *  Arguments:
 *     nval = int (Given)
 *        The number of points supplied.
-*     val = double * (Given)
+*     val = const CGEN_TYPE* (Given)
 *        Pointer to the array of "nval" values.
 *     wgt = double * (Given)
 *        Pointer to the array of "nval" weights. May be NULL, in which
@@ -48,8 +48,8 @@
 *     are found. This process is repeated "niter" times.
 
 *  Notes:
-*     - VAL__BADD values in the "val" and "wgt" arrays are handled
-*     correctly.
+*     - VAL__BAD<X> values in the "val" array are handled correctly, as are
+*     VAL__BADD values in the "wgt" array.
 
 *  Authors:
 *     David S Berry (JAC, Hawaii)
@@ -58,6 +58,8 @@
 *  History:
 *     6-MAY-2012 (DSB):
 *        Original version.
+*     17-MAR-2014 (DSB):
+*        Made generic.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -92,14 +94,15 @@
 /* SMURF includes */
 #include "libsmf/smf.h"
 
-double smf_sigmaclip( int nval, double *val, double *wgt, double nsigma,
-                      int niter, double *stddev, int *status ){
+double CGEN_FUNCTION(smf_sigmaclip)( int nval,  const CGEN_TYPE *val,
+                                     double *wgt, double nsigma, int niter,
+                                     double *stddev, int *status ){
 
 /* Local Variables: */
    double *pw;
-   double *pv;
-   double hilim;
-   double lolim;
+   const CGEN_TYPE *pv;
+   CGEN_TYPE hilim;
+   CGEN_TYPE lolim;
    double result;
    double sigma;
    double swv;
@@ -116,8 +119,8 @@ double smf_sigmaclip( int nval, double *val, double *wgt, double nsigma,
    if( *status != SAI__OK ) return result;
 
 /* Initialise upper and lower limits on acceptable input values. */
-   lolim = VAL__MIND;
-   hilim = VAL__MAXD;
+   lolim = CGEN_MIN;
+   hilim = CGEN_MAX;
 
 /* Do the required number of iterations. */
    for( iter = 0; iter < niter; iter++ ) {
@@ -137,7 +140,7 @@ double smf_sigmaclip( int nval, double *val, double *wgt, double nsigma,
 
 /* If the input value and weight are good, and the value is between the
    current acceptable limits, add the input value into the running sums. */
-            if( *pv != VAL__BADD && *pw != VAL__BADD &&
+            if( *pv != CGEN_BAD && *pw != VAL__BADD &&
                 *pv >= lolim && *pv <= hilim ) {
                wv = ( *pv )*( *pw );
                swv += wv;
@@ -155,7 +158,7 @@ double smf_sigmaclip( int nval, double *val, double *wgt, double nsigma,
 
 /* If the input value and weight are good, and the value is between the
    current acceptable limits, add the input value into the running sums. */
-            if( *pv != VAL__BADD && *pv >= lolim && *pv <= hilim ) {
+            if( *pv != CGEN_BAD && *pv >= lolim && *pv <= hilim ) {
                swv += *pv;
                swvv += ( *pv )*( *pv );
                sw += 1.0;

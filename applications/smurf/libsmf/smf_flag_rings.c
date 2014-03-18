@@ -165,7 +165,7 @@ int smf_flag_rings( double *data, size_t stride, int nel, int box1,
 
 /* Find the clipped mean and standard deviation of these mean squared
    amplitudes. */
-   mean = smf_sigmaclip( nel, work1, NULL, 3.0, 3, &stddev, status );
+   mean = smf_sigmaclipD( nel, work1, NULL, 3.0, 3, &stddev, status );
 
 /* Now flag samples that have a mean squared amplitude greater than the
    mean plus "nsigma" standard deviations. Also flag extra samples at

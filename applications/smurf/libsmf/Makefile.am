@@ -7,7 +7,7 @@ libsmf_la_SOURCES = $(C_ROUTINES)
 
 CGENERIC_ROUTINES = smf_boxcar1.cgen smf_templateFit1.cgen smf_sort.cgen \
 	smf_average_data.cgen smf_stats1.cgen smf_tophat1.cgen \
-	smf_downsamp1.cgen smf_weightstats1.cgen
+	smf_downsamp1.cgen smf_weightstats1.cgen smf_sigmaclip.cgen
 
 # The .c files which are built from the above .cgen files.
 BUILT_C_ROUTINES = $(CGENERIC_ROUTINES:.cgen=.c)
@@ -390,7 +390,6 @@ smf_select_cqualpntr.c \
 smf_select_qualpntr.c \
 smf_set_clabels.c \
 smf_set_moving.c \
-smf_sigmaclip.c \
 smf_snrmask.c \
 smf_smfFile_msg.c \
 smf_smoothmask.c \
