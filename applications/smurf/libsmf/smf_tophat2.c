@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     double *smf_tophat2( ThrWorkForce *wf, const double *map, dim_t dims[2],
-*                          dim_t box, int sub, int *status )
+*                          dim_t box, int sub, double wlim, int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -30,6 +30,9 @@
 *        If zero, the returned array contains the smoothed array. If
 *        non-zero, the returned array contains the supplied array
 *        minus the smoothed array.
+*     wlim = double (Given)
+*        The fraction of good input pixels for a good output pixel. If
+*        zero, the bad pixel mask is copied from the input to the output.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -97,6 +100,7 @@ typedef struct smfTophat2JobData {
    dim_t rlo;
    double *dout;
    double *wout;
+   double wlim;
    int oper;
    int sub;
 } smfTophat2JobData;
@@ -106,7 +110,7 @@ static void smf1_tophat2_job( void *job_data, int *status );
 
 /* Main entry point. */
 double *smf_tophat2( ThrWorkForce *wf, const double *map, const dim_t dims[2],
-                     dim_t box, int sub, int *status ){
+                     dim_t box, int sub, double wlim, int *status ){
 
 /* Local Variables: */
    double *work = NULL;
@@ -160,7 +164,7 @@ double *smf_tophat2( ThrWorkForce *wf, const double *map, const dim_t dims[2],
          pdata->in = map;
          pdata->dout = result;
          pdata->wout = work;
-
+         pdata->wlim = wlim;
          pdata->oper = 0;
          thrAddJob( wf, 0, pdata, smf1_tophat2_job, 0, NULL, status );
       }
@@ -226,6 +230,7 @@ static void smf1_tophat2_job( void *job_data, int *status ) {
    double *pwout;
    double *work;
    double sum;
+   double wlim;
    double wsum;
    int cl;
    int cr;
@@ -308,6 +313,20 @@ static void smf1_tophat2_job( void *job_data, int *status ) {
       work = astMalloc( pdata->nrow*sizeof( *work ) );
       if( *status == SAI__OK ) {
 
+/* The number of good input pixels needed for a good output pixel. */
+         if( pdata->wlim > 0.0 ) {
+            wlim = 1 + 2*pdata->hbox;
+            if( pdata->wlim <= 1.0 ) {
+               wlim = pdata->wlim*(wlim*wlim);
+               if( wlim < 1 ) wlim = 0.001;
+            } else {
+               wlim = wlim*wlim;
+            }
+
+         } else {
+            wlim = 0.0;
+         }
+
 /* Note the step between row values. */
          ncol = pdata->ncol;
 
@@ -315,6 +334,7 @@ static void smf1_tophat2_job( void *job_data, int *status ) {
          for( icol = pdata->clo; icol <= pdata->chi; icol++ ) {
 
 /* Pointers to the first input and output values in the current column. */
+            pin = pdata->in + icol;
             pdin = pdata->dout + icol;
             pwin = pdata->wout + icol;
             pdout = work;
@@ -352,8 +372,20 @@ static void smf1_tophat2_job( void *job_data, int *status ) {
             for( irow = 0; irow < pdata->nrow; irow++ ) {
 
 /* Store the mean of the data value current in the box. */
-               if( wsum > 0.0 ) {
-                  *(pdout++) = sum/wsum;
+               if( wlim > 0.0 ) {
+                  if( wsum > wlim ) {
+                     *(pdout++) = sum/wsum;
+                  } else {
+                     *(pdout++) = VAL__BADD;
+                  }
+
+               } else if( *pin != VAL__BADD ) {
+                  if( wsum > 0.0 ) {
+                     *(pdout++) = sum/wsum;
+                  } else {
+                     *(pdout++) = VAL__BADD;
+                  }
+
                } else {
                   *(pdout++) = VAL__BADD;
                }
@@ -375,6 +407,8 @@ static void smf1_tophat2_job( void *job_data, int *status ) {
                   sum += *pdt;
                   wsum += *pwt;
                }
+
+               pin += ncol;
             }
 
 /* Finally copy the smoothed values from the work array to the returned

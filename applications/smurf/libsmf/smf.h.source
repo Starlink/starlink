@@ -1028,8 +1028,9 @@ void smf_ext2km( int indf, const char *xname, AstKeyMap *keymap, int mode,
 void smf_extracols( smfHead *hdr, Grp *colgrp, void **cols_info,
                     AstKeyMap **km, int *status );
 
-double *smf_ffclean( ThrWorkForce *wf, const double *map, const dim_t dims[2],
-                     dim_t box, double thresh, int *status );
+double *smf_ffclean( ThrWorkForce *wf, const double *map, const double *mapvar,
+                     const dim_t dims[2], dim_t box, dim_t box0, double thresh,
+                     int *status );
 
 smfData *smf_fft_2dazav( const smfData *data, double *df, int *status );
 
@@ -1938,7 +1939,7 @@ void smf_timerinit( struct timeval *tv1, struct timeval *tv2, int *status);
 double smf_timerupdate( struct timeval *tv1, struct timeval *tv2, int *status);
 
 double *smf_tophat2( ThrWorkForce *wf, const double *map, const dim_t dims[2],
-                     dim_t box, int sub, int *status );
+                     dim_t box, int sub, double wlim, int *status );
 
 void smf_tslice_ast (smfData * data, dim_t index, int needwcs, fts2Port fts_port,
                      int * status );

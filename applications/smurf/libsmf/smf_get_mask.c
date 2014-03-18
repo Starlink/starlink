@@ -561,19 +561,6 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
 /* SNR masking... */
                } else if( mask_types[ imask ] == SNR ) {
 
-/* If required, smooth the map to remove high spatial frequencies (noise,
-   etc). */
-                  if( zero_snr_lopass > 0 ) {
-                     msgOutiff( MSG__DEBUG, " ", "smf_get_mask: Smoothing "
-                                "the map using a %d pixel box filter prior "
-                                "to forming the %s mask.", status,
-                                zero_snr_lopass, modname );
-                     mapuset = smf_tophat2( wf, dat->map, dat->mdims,
-                                           zero_snr_lopass, 0, status );
-                  } else {
-                     mapuset = dat->map;
-                  }
-
 /* Convert the high pass filter size from arc-seconds to pixels, and
    round to the nearest integer. */
                   hipass = (int)( 0.5 + zero_snr_hipass/dat->pixsize );
@@ -585,9 +572,14 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
                                    "will be masked using an FFCLEAN algorithm "
                                    "with box=%d and thresh=%g.", status, modname,
                                    hipass, zero_snr );
+                        msgOutiff( MSG__DEBUG, " ", "smf_get_mask: The SNR "
+                                   "map will first be smoothed using a box "
+                                   "filter of %d pixels.", status,
+                                   zero_snr_lopass );
 
-                        mapuse = smf_ffclean( wf, mapuset, dat->mdims,
-                                              hipass, zero_snr, status );
+                        mapuse = smf_ffclean( wf, dat->map, dat->mapvar,
+                                              dat->mdims, hipass,
+                                              zero_snr_lopass, zero_snr, status );
                         if( *status == SAI__OK ) {
                            pd = mapuse;
                            pn = newmask;
@@ -609,6 +601,20 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
    level, possible after removal of low frequency structures. */
                   } else {
 
+/* If required, smooth the map to remove high spatial frequencies (noise,
+   etc). */
+                     if( zero_snr_lopass > 0 ) {
+                        msgOutiff( MSG__DEBUG, " ", "smf_get_mask: Smoothing "
+                                   "the map using a %d pixel box filter prior "
+                                   "to forming the %s mask.", status,
+                                   zero_snr_lopass, modname );
+                        mapuset = smf_tophat2( wf, dat->map, dat->mdims,
+                                               zero_snr_lopass, 0, 1.0E-6,
+                                               status );
+                     } else {
+                        mapuset = dat->map;
+                     }
+
 /* If required, subtract off a smoothed background from the map. */
                      if( hipass > 0 ) {
                         msgOutiff( MSG__DEBUG, " ", "smf_get_mask: Removing "
@@ -616,7 +622,7 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
                                    "box filter prior to forming the %s mask.",
                                    status, zero_snr_hipass, modname );
                         mapuse = smf_tophat2( wf, mapuset, dat->mdims,
-                                              hipass, 1, status );
+                                              hipass, 1, 1.0E-6, status );
                      } else {
                         mapuse = mapuset;
                      }
@@ -694,9 +700,8 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
                      }
 
                      if( hipass > 0 ) mapuse = astFree( mapuse );
+                     if( zero_snr_lopass > 0 ) mapuset = astFree( mapuset );
                   }
-
-                  if( zero_snr_lopass > 0 ) mapuset = astFree( mapuset );
 
 /* Predefined masking... */
                } else if( mask_types[ imask ] == PREDEFINED ) {
