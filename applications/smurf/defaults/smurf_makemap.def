@@ -242,7 +242,7 @@ ast.zero_snr = 0.0
 #  Name: 	ast.zero_snr_hipass
 #  Type: 	real
 #  Default: 	0.0
-#  Purpose: 	Smooths map before making SNR mask
+#  Purpose: 	Flatten map before making SNR mask
 #  Description: Setting this parameter to a positive value causes the
 #               SNR mask requested by parameter "ast.zero_snr" to be
 #               based on a copy of the map that has been high-pass
@@ -250,6 +250,21 @@ ast.zero_snr = 0.0
 #               arc-seconds given by ast.zero_snr_hipass. This will in
 #               general reduce the number of source pixels in the mask.
 ast.zero_snr_hipass = 0.0
+
+#-----------------------------------------------------------------
+#  Name: 	ast.zero_snr_lopass
+#  Type: 	real
+#  Default: 	0.0
+#  Purpose: 	Smooths map before making SNR mask
+#  Description: Setting this parameter to a positive value causes the
+#               SNR mask requested by parameter "ast.zero_snr" to be
+#               based on a copy of the map that has been low-pass
+#               filtering (i.e smoothed) to remove noise and other
+#               features smaller than the number of arc-seconds given
+#               by ast.zero_snr_lopass. This may help to prevent pixels
+#               oscillating in and out of the mask on successive
+#               iterations, and thus aid smoother convergence.
+ast.zero_snr_lopass = 0.0
 
 #-----------------------------------------------------------------
 #  Name: 	ast.zero_snr_fwhm
@@ -502,7 +517,7 @@ com.zero_snr = 0
 #  Name: 	com.zero_snr_hipass
 #  Type: 	real
 #  Default: 	0.0
-#  Purpose: 	Smooths map before making SNR mask
+#  Purpose: 	FLatten map before making SNR mask
 #  Description: Setting this parameter to a positive value causes the
 #               SNR mask requested by parameter "com.zero_snr" to be
 #               based on a copy of the map that has been high-pass
@@ -510,6 +525,21 @@ com.zero_snr = 0
 #               arc-seconds given by com.zero_snr_hipass. This will in
 #               general reduce the number of source pixels in the mask.
 com.zero_snr_hipass = 0.0
+
+#-----------------------------------------------------------------
+#  Name: 	com.zero_snr_lopass
+#  Type: 	real
+#  Default: 	0.0
+#  Purpose: 	Smooths map before making SNR mask
+#  Description: Setting this parameter to a positive value causes the
+#               SNR mask requested by parameter "com.zero_snr" to be
+#               based on a copy of the map that has been low-pass
+#               filtering (i.e smoothed) to remove noise and other
+#               features smaller than the number of arc-seconds given
+#               by com.zero_snr_lopass. This may help to prevent pixels
+#               oscillating in and out of the mask on successive
+#               iterations, and thus aid smoother convergence.
+com.zero_snr_lopass = 0.0
 
 #-----------------------------------------------------------------
 #  Name: 	com.zero_snrlo
@@ -1471,7 +1501,7 @@ flt.zero_snr = 0
 #  Name: 	flt.zero_snr_hipass
 #  Type: 	real
 #  Default: 	0.0
-#  Purpose: 	Smooths map before making SNR mask
+#  Purpose: 	Flatten map before making SNR mask
 #  Description: Setting this parameter to a positive value causes the
 #               SNR mask requested by parameter "flt.zero_snr" to be
 #               based on a copy of the map that has been high-pass
@@ -1479,6 +1509,21 @@ flt.zero_snr = 0
 #               arc-seconds given by flt.zero_snr_hipass. This will in
 #               general reduce the number of source pixels in the mask.
 flt.zero_snr_hipass = 0.0
+
+#-----------------------------------------------------------------
+#  Name: 	flt.zero_snr_lopass
+#  Type: 	real
+#  Default: 	0.0
+#  Purpose: 	Smooths map before making SNR mask
+#  Description: Setting this parameter to a positive value causes the
+#               SNR mask requested by parameter "flt.zero_snr" to be
+#               based on a copy of the map that has been low-pass
+#               filtering (i.e smoothed) to remove noise and other
+#               features smaller than the number of arc-seconds given
+#               by flt.zero_snr_lopass. This may help to prevent pixels
+#               oscillating in and out of the mask on successive
+#               iterations, and thus aid smoother convergence.
+flt.zero_snr_lopass = 0.0
 
 #-----------------------------------------------------------------
 #  Name: 	flt.zero_snrlo
