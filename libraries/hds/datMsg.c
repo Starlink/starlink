@@ -47,6 +47,7 @@
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     PWD: Peter W. Draper (JAC, Durham University)
 *     {enter_new_authors_here}
 
 *  History:
@@ -77,6 +78,11 @@
 *        Rewrite in C.
 *     28-DEC-2005 (TIMJ):
 *        Use DAT__FLEXT instead of hard-coded ".sdf"
+*     20-MAR-2014:
+*        Make buff large enough to accommodate file[] and path[].
+*        Previously when file was EMS__SZMSG big this left no
+*        room for the path, and possible quotes when odd. EMS will
+*        truncate this if needed.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -108,9 +114,9 @@
 void datMsg( const char * token, const HDSLoc * loc ) {
 
   /*  Local Variables: */
-  char buff[EMS__SZMSG+1];  /* Buffer */
-  char file[EMS__SZMSG+1];  /* Container file name */
-  char path[EMS__SZMSG+1];  /* Object path name */
+  char buff[EMS__SZMSG+EMS__SZMSG+2];  /* Buffer for file+path */
+  char file[EMS__SZMSG+1];             /* Container file name */
+  char path[EMS__SZMSG+1];             /* Object path name */
 
   char *bra;   /* Position of '(' character */
   char *dot;   /* Position of '.' */
