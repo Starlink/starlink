@@ -26,10 +26,13 @@
 *        Original version.
 *     15-JUL-2008 (TIMJ):
 *        Use size_t for index argument.
+*     2014-03-21 (TIMJ):
+*        Add grpGroup
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2008 Science & Technology Facilities Council.
+*     Copyright (C) 2014 Cornell University
 *     All Rights Reserved.
 
 *  Licence:
@@ -114,3 +117,53 @@ void grpList( const char *param, size_t indxlo, size_t indxhi,
 }
 
 
+F77_SUBROUTINE(grp_group)( CHARACTER(PARAM),
+                           INTEGER(IGRP1),
+                           INTEGER(IGRP2),
+                           INTEGER(SIZE),
+                           INTEGER(ADDED),
+                           LOGICAL(FLAG),
+                           INTEGER(STATUS)
+                           TRAIL(PARAM)
+                           );
+
+void grpGroup( const char * param,
+               const Grp * grp1,
+               Grp * grp2,
+               size_t * size,
+               int * added,
+               int * flag,
+               int * status
+               ) {
+  DECLARE_CHARACTER_DYN(PARAM);
+  DECLARE_INTEGER(IGRP1);
+  DECLARE_INTEGER(IGRP2);
+  DECLARE_INTEGER(SIZE);
+  DECLARE_INTEGER(ADDED);
+  DECLARE_LOGICAL(FLAG);
+  DECLARE_INTEGER(STATUS);
+
+  F77_CREATE_CHARACTER( PARAM, strlen( param ) );
+  F77_EXPORT_CHARACTER( param, PARAM, PARAM_length );
+
+  IGRP1 = grpC2F( grp1, status );
+  IGRP2 = grpC2F( grp2, status );
+
+  F77_EXPORT_INTEGER( *status, STATUS );
+
+  F77_LOCK( F77_CALL(grp_group)( CHARACTER_ARG(PARAM),
+                                 INTEGER_ARG(&IGRP1),
+                                 INTEGER_ARG(&IGRP2),
+                                 INTEGER_ARG(&SIZE),
+                                 INTEGER_ARG(&ADDED),
+                                 LOGICAL_ARG(&FLAG),
+                                 INTEGER_ARG(&STATUS)
+                                 TRAIL_ARG(PARAM) ); )
+
+  F77_IMPORT_INTEGER(SIZE, *size);
+  F77_IMPORT_INTEGER(ADDED, *added);
+  F77_IMPORT_LOGICAL(FLAG, *flag );
+
+  F77_FREE_CHARACTER( PARAM );
+  F77_IMPORT_INTEGER( STATUS, *status );
+}

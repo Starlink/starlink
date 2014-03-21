@@ -133,6 +133,7 @@ Grp * grpCopy( const Grp *, size_t, size_t, int, int * );
 void grpDelet( Grp **, int * );
 void grpGrpex( const char *, const Grp *, Grp *, size_t *, int *, int *, int * );
 size_t grpGrpsz( const Grp *, int * );
+void grpGroup( const char *, const Grp *, Grp *, size_t *, int *, int *, int * );
 void grpGet( const Grp *, size_t, size_t, char *const *, size_t, int * );
 void grpGetcc( const Grp *, const char *, char *, size_t, int * );
 void grpInfoc( const Grp *, size_t, const char *, char *, size_t, int * );
