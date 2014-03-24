@@ -1011,6 +1011,8 @@ size_t smf_dtype_sz( const smf_dtype dtype, int *status );
 
 void smf_dump_smfData( const smfData *data, int showflags, int *status );
 
+Grp * smf_expand_filegroup( const Grp * igrp, int * status );
+
 void smf_expand_tilegroup ( Grp * ogrp, size_t ntile, int npbin,
                             size_t * outsize, int * status);
 

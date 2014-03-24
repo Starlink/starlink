@@ -144,6 +144,7 @@ smf_dtype_str.c \
 smf_dtype_string.c \
 smf_dtype_sz.c \
 smf_dump_smfData.c \
+smf_expand_filegroup.c \
 smf_expand_tilegroup.c \
 smf_expmodel_dks.c \
 smf_expmodel_two.c \
