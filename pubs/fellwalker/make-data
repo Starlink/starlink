@@ -102,6 +102,6 @@ epstopdf pgplot.ps
 pdfcrop pgplot.pdf cleaned.pdf
 
 rm aa spikes.sdf sp15.sdf sp25.sdf noise.sdf tot.sdf mask.sdf peak2.sdf \
-   walk272.sdf walk326.sdf walk367.sdf diffwalk.sdf fred.sdf lut lutndf.sdf \
+   walka.sdf walk326.sdf walk367.sdf walkb.sdf fred.sdf lut lutndf.sdf \
    idata*sdf rawmask.sdf
 
