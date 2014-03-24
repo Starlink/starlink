@@ -34,17 +34,22 @@ $CUPID_DIR/findclumps method=fellwalker config='dumppeak=2' tot \
                       msg_filter=quiet out=mask outcat=! rms=0.003
 mv idata1.sdf peak2.sdf
 
-$CUPID_DIR/findclumps method=fellwalker config='dumpwalk=630' tot \
+$CUPID_DIR/findclumps method=fellwalker config='dumpwalk=272' tot \
                       msg_filter=quiet out=mask outcat=! rms=0.003
-mv idata1.sdf walk630.sdf
+$KAPPA_DIR/setmagic idata1 walka -1
 
-$CUPID_DIR/findclumps method=fellwalker config='dumpwalk=627' tot \
+$CUPID_DIR/findclumps method=fellwalker config='dumpwalk=326' tot \
+                      msg_filter=quiet out=mask outcat=! rms=0.003
+mv idata1.sdf walk326.sdf
+
+$CUPID_DIR/findclumps method=fellwalker config='dumpwalk=367' tot \
                       msg_filter=debug2 out=mask outcat=! rms=0.003 > /dev/null
-mv idata3.sdf walk627.sdf
+mv idata3.sdf walk367.sdf
+
 $KAPPA_DIR/setmagic idata4 rawmask -1
 
-$KAPPA_DIR/sub walk630.sdf walk627.sdf diffwalk
-$KAPPA_DIR/maths exp="'qif((ia==2),3,ib)'" ia=diffwalk ib=peak2 out=fred
+$KAPPA_DIR/sub walk367.sdf walk326.sdf walkb
+$KAPPA_DIR/maths exp="'qif((ia>0),3,ib)'" ia=walkb ib=walka out=fred
 
 
 cat << EOF > lut
@@ -71,7 +76,7 @@ pdfcrop pgplot.pdf sim.pdf
 
 $KAPPA_DIR/gdclear
 rm pgplot.ps
-$KAPPA_DIR/display fred'(2:,2:)' noaxes border=yes mode=sca lut=lutndf nn=yes accept
+$KAPPA_DIR/display fred'(2:,2:)' noaxes border=yes mode=sca lut=lutndf nn=yes badcol=white low=-1 high=2
 $KAPPA_DIR/contour tot nokey noclear mode=sca style="'colour=red,width=3'" ncont=10 \
                    firstcnt=0.006 lastcnt=0.45
 epstopdf pgplot.ps
@@ -80,7 +85,9 @@ pdfcrop pgplot.pdf walks.pdf
 $KAPPA_DIR/lutable mapping=linear coltab=grey
 $KAPPA_DIR/gdclear
 rm pgplot.ps
-$KAPPA_DIR/display rawmask'(2:,2:)' noaxes border=yes mode=sca low=2 high=6 badcol=white
+
+$KAPPA_DIR/display rawmask'(2:,2:)' noaxes border=yes mode=sca low=1 high=3 badcol=white
+
 $KAPPA_DIR/contour tot nokey noclear mode=sca style="'colour=red,width=3'" ncont=10 \
                    firstcnt=0.006 lastcnt=0.45
 epstopdf pgplot.ps
@@ -90,11 +97,11 @@ pdfcrop pgplot.pdf rawmask.pdf
 $KAPPA_DIR/gdclear
 rm pgplot.ps
 $KAPPA_DIR/setmagic idata6 rawmask -1
-$KAPPA_DIR/display rawmask'(2:,2:)' noaxes border=yes mode=sca badcol=white low=2 high=6
+$KAPPA_DIR/display rawmask'(2:,2:)' noaxes border=yes mode=sca badcol=white low=1 high=3
 epstopdf pgplot.ps
 pdfcrop pgplot.pdf cleaned.pdf
 
 rm aa spikes.sdf sp15.sdf sp25.sdf noise.sdf tot.sdf mask.sdf peak2.sdf \
-   walk630.sdf walk627.sdf diffwalk.sdf fred.sdf lut lutndf.sdf idata*sdf \
-   rawmask.sdf
+   walk272.sdf walk326.sdf walk367.sdf diffwalk.sdf fred.sdf lut lutndf.sdf \
+   idata*sdf rawmask.sdf
 
