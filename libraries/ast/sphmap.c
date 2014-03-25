@@ -79,6 +79,8 @@ f     The SphMap class does not define any new routines beyond those
 *        Modify MapMerge so that it can spot and simplify an
 *        (inverted SphMap,MatrixMap,SphMap) sequence in which the
 *        MatrixMap just magnifies or reflects the radius vector.
+*     25-MAR-2014 (DSB):
+*        Correct 5-NOV-2013 MapMerge change.
 *class--
 */
 
@@ -868,10 +870,10 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
          if( diag[ 0 ] < 0.0 ) {
             if( diag[ 1 ] < 0.0 ) {
                wm->a[ 0 ] = AST__DPI;
-               wm->b[ 0 ] = -1.0;
+               wm->b[ 0 ] = 1.0;
             } else {
                wm->a[ 0 ] = AST__DPI;
-               wm->b[ 0 ] = 1.0;
+               wm->b[ 0 ] = -1.0;
             }
 
          } else {
