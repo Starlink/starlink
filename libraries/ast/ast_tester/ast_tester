@@ -16,9 +16,9 @@
 #     compared visually with the file "*.ps". The new files are displayed
 #     automatically unless the -nd option is supplied on the command line
 #
-#     This script assumes the gnu g95 compiler is available. If this is not
-#     the case, do a global edit of g95 to whatever fortran 77 compiler you
-#     have available (you will probably also need to change the compiler
+#     This script assumes the gfortran compiler is available. If this is not
+#     the case, do a global edit of gfortran to whatever fortran 77 compiler
+#     you have available (you will probably also need to change the compiler
 #     flags).
 
 #  Options:
@@ -31,7 +31,8 @@
 #        STARLINK - should be set to the root of the tree in which the SSC is
 #              installed. A default of /star is used if not set.
 #        AST - should be set to the root of the tree in which the version of
-#              AST to be tested is installed. A default of $HOME is used if not set.
+#              AST to be tested is installed. A default of $STARLINK is used
+#              if not set.
 
 #  Author:
 #     DSB: David Berry (JAC, Hawaii)
@@ -42,17 +43,17 @@ if( ! $?STARLINK ) then
 endif
 
 if( ! $?AST ) then
-   setenv AST $HOME
+   setenv AST $STARLINK
 endif
 
 setenv PATH $AST/bin\:$STARLINK/bin\:$PATH
 
 
 # Build the progs
-#g95 -fno-second-underscore -o regression regression.f -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -ems` `chr_link`
-g95 -fno-second-underscore -o plotter plotter.f -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -pgp -ems` `pgplot_link`
-g95 -fno-second-underscore -o wcsconverter wcsconverter.f -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -ems` `chr_link` `err_link`
-g95 -fno-second-underscore -o simplify simplify.f -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -ems` `chr_link` `err_link`
+#gfortran -fno-second-underscore -o regression regression.f -fno-range-check -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -ems` `chr_link`
+gfortran -fno-second-underscore -o plotter plotter.f -fno-range-check -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -pgp -ems` `pgplot_link`
+gfortran -fno-second-underscore -o wcsconverter wcsconverter.f -fno-range-check -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -ems` `chr_link` `err_link`
+gfortran -fno-second-underscore -o simplify simplify.f -fno-range-check -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -ems` `chr_link` `err_link`
 
 # Run the other test progs
 echo ""
@@ -60,7 +61,7 @@ echo ""
 
 foreach prog (testframeset testchannel testpolymap testcmpmap testlutmap testfitstable testtable teststcschan teststc testspecframe testfitschan testswitchmap testrebin testrebinseq testtrangrid testnormmap testtime testrate testflux testratemap testspecflux testxmlchan testregions testkeymap )
 
-g95 -fno-second-underscore -w -g -o $prog -g $prog.f -I$AST/include \
+gfortran -fno-second-underscore -w -g -o $prog -g $prog.f -fno-range-check -I$AST/include \
      -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -ems` \
      `psx_link` `prm_link` `chr_link` `err_link`
 
