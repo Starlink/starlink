@@ -263,7 +263,7 @@ void smf_write_bolomap( ThrWorkForce *wf, smfArray *res, smfArray *lut,
              about variance weighting because all samples from
              same detector are about the same. */
 
-          smf_rebinmap1( wf, res->sdata[idx],
+          smf_rebinmap1( NULL, res->sdata[idx],
                          dat->noi ? dat->noi[0]->sdata[idx] : NULL,
                          lut_data, 0, 0, 0, NULL, 0,
                          SMF__Q_GOOD, varmapmethod,
