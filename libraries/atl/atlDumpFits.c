@@ -4,6 +4,8 @@
 #include "atl.h"
 #include "ast.h"
 #include "sae_par.h"
+#include "par.h"
+#include "mers.h"
 
 void atlDumpFits( const char *param, AstFitsChan *fc, int *status ){
 /*
