@@ -34,6 +34,11 @@
 *        3 - Overlap: For every header in FC1, see if FC2 contains the same
 *            keyword. If it does, and if the keyword value is the same in
 *            both FitsChans, copy the FC1 header to the returned FitsChan.
+*
+*        4 - Union (with priority given to FC1): Copy FC1 to the output, then
+*            for every header in FC2 append it to the end of the returned
+*            FitsChan unless the card already exists. This is similar to method
+*            2 except that cards from FC2 are dropped instead of cards from FC1.
 *     FC1 = INTEGER (Given)
 *        Pointer to the first FitsChan.
 *     FC2 = INTEGER (Given)
@@ -49,10 +54,13 @@
 *     by formatting into a string (using the accuracy specified by the
 *     FitsDigits attributes of the two supplied FitsChans) and then
 *     comparing the formatted strings for exact equality.
+*     -  Method 4 exists to allow a new header to be appended whilst
+*     retaining the primary order of the cards from the first header.
 
 *  Copyright:
 *     Copyright (C) 2008-2009 Science and Technology Facilities Council.
 *     Copyright (C) 2007 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2014 Cornell University.
 *     All Rights Reserved.
 
 *  Licence:
@@ -94,6 +102,8 @@
 *        it would remove the card following the two contiguous blank cards...
 *     6-JUL-2009 (TIMJ):
 *        Move contiguous blank removal code to new ATL function ATL_RMBLFT
+*     2014-03-26 (TIMJ):
+*        Add Method 4.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -285,6 +295,31 @@
      :                        AST_GETI( FC3, 'CARD', STATUS ) + 1,
      :                        STATUS )
             END IF
+         END DO
+
+*  Method 4: Append FC2 to the end of FC1, excluding FC2 keywords that are
+*  also present in FC1 (even if they have different values).
+*  --------------------------------------------------------------------
+      ELSE IF( METHOD .EQ. 4 ) THEN
+
+*  Initialise FC3 to be a deep copy of FC1
+         FC3 = AST_COPY( FC1, STATUS )
+
+*  Ensure the current card in FC3 is the "end-of-file".
+         CALL AST_SETI( FC3, 'CARD',
+     :                  AST_GETI( FC3, 'NCARD', STATUS ) + 1, STATUS )
+
+*  Loop round all the cards in FC2
+         DO WHILE( AST_FINDFITS( FC2, '%f', CARD, .TRUE., STATUS ) )
+
+*  Append the card from FC2 to the end of FC3 unless it is already present.
+*  We always copy cards from FC2 that do not have a value (i.e. cards which do
+*  not have an equals sign in column 10 )
+            ISDEF2 = AST_TESTFITS( FC3, CARD, ISTHERE2, STATUS )
+            IF( .NOT. ISTHERE2 .OR. CARD( 9 : 10 ) .NE. '= ' ) THEN
+               CALL AST_PUTFITS( FC3, CARD, .FALSE., STATUS )
+            END IF
+
          END DO
 
 *  Report an error for any other method.
