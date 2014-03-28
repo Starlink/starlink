@@ -349,6 +349,15 @@ typedef enum smf_obstype {
   SMF__TYP_SETUP
 } smf_obstype;
 
+/* The real instrument, rather than the interface */
+typedef enum {
+  SMF__RINST_NONE,
+  SMF__RINST_SCUBA2,
+  SMF__RINST_ACSIS,
+  SMF__RINST_DAS,
+  SMF__RINST_AZTEC
+} smf_realinst_t;
+
 typedef enum {
   SMF__INBEAM_NOTHING = 0,
   SMF__INBEAM_POL = BIT_TO_VAL(0),
@@ -602,7 +611,7 @@ typedef struct smfFile {
 
 typedef struct smfHead {
   const JCMTState *state;   /* Pointer to current STATE */
-  inst_t     instrument;    /* Instrument code */
+  inst_t     instrument;    /* Instrument code - specifies the interface */
   AstFrameSet * wcs;        /* Frameset for a particular time slice (frame) */
   AstFrameSet * tswcs;      /* Frameset for full time series (if tseries) */
   AstFitsChan * fitshdr;    /* FITS header from the file */
@@ -616,6 +625,7 @@ typedef struct smfHead {
   smf_swmode swmode;        /* switching mode */
   smf_obstype seqtype;      /* Sequence type */
   smf_inbeam_t inbeam;      /* What is in the beam (bitmask) */
+  smf_realinst_t realinst;  /* Real instrument */
   int isCloned;             /* If false, allState is owned by this
                                struct, if true it should not be freed */
   JCMTState *allState;     /* Array of STATE for every time slice */

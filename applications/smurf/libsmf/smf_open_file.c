@@ -849,7 +849,7 @@ void smf_open_file( ThrWorkForce *wf, const Grp * igrp, size_t index,
         }
 
         /* Determine the instrument - assume that header fixups are not required for this */
-        hdr->instrument = smf_inst_get( hdr, status );
+        smf_inst_get( hdr, &(hdr->instrument), &(hdr->realinst), status );
 
         /* We always try to read the JCMTSTATE even if we don't expect it to be
            here. This lets us write out map models that have strangely compressed
@@ -1132,7 +1132,7 @@ void smf_open_file( ThrWorkForce *wf, const Grp * igrp, size_t index,
           }
 
           /* Determine the instrument */
-          hdr->instrument = smf_inst_get( hdr, status );
+          smf_inst_get( hdr, &(hdr->instrument), &(hdr->realinst), status );
 
           /* We need to assign a number of frames to the header just in case
              it is needed in the metadata fixup */

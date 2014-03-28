@@ -71,6 +71,8 @@
 *        Check for missing FFT_WIN header.
 *     2009-11-27 (TIMJ):
 *        Call SCUBA-2 and ACSIS specialist fixup routines.
+*     2014-03-28 (TIMJ):
+*        Only run ACSIS and SCUBA-2 fixups with those specific instruments.
 
 *  Copyright:
 *     Copyright (C) 2009 Science & Technology Facilities Council.
@@ -218,10 +220,10 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
     }
   }
 
-  /* Only do something for ACSIS and SCUBA-2 data */
-  if (hdr->instrument == INST__ACSIS) {
+  /* Only do something for ACSIS and SCUBA-2 data. Not data matching the interface */
+  if (hdr->realinst == SMF__RINST_ACSIS) {
     have_fixed = smf_fix_metadata_acsis( msglev, data, have_fixed, &ncards, status );
-  } else if (hdr->instrument == INST__SCUBA2) {
+  } else if (hdr->realinst == SMF__RINST_SCUBA2) {
     have_fixed = smf_fix_metadata_scuba2( msglev, data, have_fixed, &ncards, status );
   }
 

@@ -4,10 +4,11 @@
 *     smf_inst_get
 
 *  Purpose:
-*     Determine the instrument code associated with the supplied header.
+*     Determine the instrument codes associated with the supplied header.
 
 *  Invocation:
-*     inst_t inst = smf_inst_get( const smfHead *hdr, int * status );
+*     smf_inst_get( const smfHead *hdr, inst_t * inst, smf_realinst_t * realinst,
+*                   int * status );
 
 *  Language:
 *     ANSI C
@@ -15,18 +16,20 @@
 *  Description:
 *     Uses the header information to determine which instrument is
 *     being processed. The instrument is returned as an integer constant
-*     defined in "jcmt/state.h".
+*     defined in "jcmt/state.h" for the specific interface, and as a separate
+*     code for a particular instrument.
 
 *  Arguments:
 *     hdr = smfHead* (Given)
 *        Header information.
+*     inst = inst_t * (Returned)
+*        Instrument interface code as defined in "jcmt/state.h"
+*        INST__NONE if the instrument could not be determined.
+*     realinst = smf_realinst * (Returned)
+*        Actual instrument as a code defined in "smf_typ.h"
+*        SMF__RINST_NONE if the instrument could not be determined.
 *     status = int* (Given & Returned)
 *        Inherited status.
-
-*  Return Value:
-*     inst_t = smf_inst_get
-*        Instrument code (see jcmt/state.h) corresponding to this instrument.
-*        Returns INST__NONE if the instrument could not be determined.
 
 *  Notes:
 *     -  Status is not set to bad if the instrument can not be determined.
@@ -45,9 +48,13 @@
 *        Add verbose messaging. (at least for now)
 *     31-MAR-2008 (JB):
 *        Check for DAS backend and treat as ACSIS.
+*     2014-03-27 (TIMJ):
+*        Change interface to take pointer arguments so that we can return
+*        the interface instrument and the actual instrument code.
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2014 Cornell University.
 *     All Rights Reserved.
 
 *  Licence:
@@ -82,26 +89,29 @@
 
 #define FUNC_NAME "smf_inst_get"
 
-inst_t
-smf_inst_get( const smfHead * hdr, int * status ) {
+void
+smf_inst_get( const smfHead * hdr, inst_t * instrument,
+              smf_realinst_t * realinst, int * status ) {
 
   /* Variables */
   char instrume[SZFITSTR];     /* contents of INSTRUME header */
   char backend[SZFITSTR];      /* contents of BACKEND header */
 
   /* Program logic */
+  *instrument = INST__NONE;
+  *realinst = SMF__RINST_NONE;
 
-  if (*status != SAI__OK) return INST__NONE;
+  if (*status != SAI__OK) return;
 
   /* A null hdr does cause an error */
   if (hdr == NULL) {
     *status = SAI__ERROR;
     errRep( " ", FUNC_NAME ": Supplied hdr is NULL", status );
-    return INST__NONE;
+    return;
   }
 
   /* if we do not have a Fits header */
-  if (!hdr->fitshdr) return INST__NONE;
+  if (!hdr->fitshdr) return;
 
   /* we need the INSTRUME keyword and possibly the backend card */
   astClear( hdr->fitshdr, "Card" );
@@ -111,11 +121,15 @@ smf_inst_get( const smfHead * hdr, int * status ) {
     if ( strncmp( instrume, "SCUBA-2", sizeof(instrume) ) == 0 ) {
       msgOutif( MSG__DEBUG, " ", "Data file contains SCUBA-2 data",
 		status );
-      return INST__SCUBA2;
+      *instrument = INST__SCUBA2;
+      *realinst = SMF__RINST_SCUBA2;
+      return;
     } else if ( strncmp( instrume, "AZTEC", sizeof(instrume) ) == 0 ) {
       msgOutif( MSG__DEBUG, " ", "Data file contains AzTEC data",
 		status );
-      return INST__AZTEC;
+      *instrument = INST__AZTEC;
+      *realinst = SMF__RINST_AZTEC;
+      return;
     }
   }
 
@@ -132,12 +146,16 @@ smf_inst_get( const smfHead * hdr, int * status ) {
       if (strncmp( backend, "ACSIS", sizeof(backend) ) == 0) {
 	msgOutif( MSG__DEBUG, " ", "Data file contains ACSIS data",
 		  status );
-	return INST__ACSIS;
+        *instrument = INST__ACSIS;
+        *realinst = SMF__RINST_ACSIS;
+	return;
       } else if (strncmp( backend, "DAS", sizeof(backend)) == 0) {
 	msgOutif( MSG__DEBUG, " ",
                   "Data file contains DAS data, treating as ACSIS",
 		  status );
-	return INST__ACSIS;
+        *instrument = INST__ACSIS;
+        *realinst = SMF__RINST_DAS;
+	return;
       }
     } else {
       /* Clear status if BACKEND was missing since this is not fatal. */
@@ -149,5 +167,5 @@ smf_inst_get( const smfHead * hdr, int * status ) {
 	    status );
 
   /* only get here if we've run out of choices */
-  return INST__NONE;
+  return;
 }

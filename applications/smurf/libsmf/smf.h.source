@@ -1432,7 +1432,9 @@ void smf_inbeam_str ( smf_inbeam_t inbeam, char *inbeamstr, size_t lenstr, int *
 int smf_initial_sky( ThrWorkForce *wf, AstKeyMap *config, smfDIMMData *dat,
                      int *iters, int *status );
 
-inst_t smf_inst_get( const smfHead * hdr, int * status );
+void
+smf_inst_get( const smfHead * hdr, inst_t * instrument,
+              smf_realinst_t * realinst, int * status );
 
 void smf_instap_get( smfHead * hdr, int * status );
 
