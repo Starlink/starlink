@@ -82,6 +82,7 @@ void atlAxtrm( AstFrameSet *, int *, int *, int *, double *, int * );
 void atlCreat( const char *, AstObject *, int * );
 void atlDumpFits( const char *, AstFitsChan *, int * );
 void atlFindSky( AstFrame *, AstSkyFrame **, int *, int *, int * );
+AstFrameSet *atlFrameSetSplit( AstFrameSet *, const char *, int * );
 void atlGetParam( const char *, AstKeyMap *, int * );
 void atlGetPixelParams( AstFrameSet *fset, int *dims, int degs, double *crpix, double *crval, double *cdelt, double *crota, int *status );
 void atlHd2ky( HDSLoc *, AstKeyMap *, int * );

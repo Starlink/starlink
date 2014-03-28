@@ -70,11 +70,13 @@ const char *Source( void );
 
 int main( void ){
    AstChannel *channel;
-   AstFrameSet *fs;
+   AstFitsChan *fc;
    AstFrame *cfrm;
-   int status;
-   int axes[2], lbnd[2], ubnd[2];
+   AstFrameSet *fs;
+   AstFrameSet *fs2;
    double work[2700];
+   int axes[2], lbnd[2], ubnd[2];
+   int status;
 
 /* Initialise the global status */
    status = SAI__OK;
@@ -114,6 +116,58 @@ int main( void ){
       status = SAI__ERROR;
       errRep( "", "Error 2; Incorrect Domain for SkyFrame.", &status );
    }
+
+
+/* Create a FitsChan and put a basic spectral cube header in it. */
+   fc = astFitsChan( NULL, NULL, " " );
+   astPutFits( fc, "NAXIS   =                    3", 0 );
+   astPutFits( fc, "CTYPE1  = 'VELO-LSR'          ", 0 );
+   astPutFits( fc, "CRVAL1  =                9000.", 0 );
+   astPutFits( fc, "CRPIX1  =                450.5", 0 );
+   astPutFits( fc, "CDELT1  =    -232.827120536449", 0 );
+   astPutFits( fc, "CTYPE2  = 'GLON--GLS'         ", 0 );
+   astPutFits( fc, "CRVAL2  =     208.992297968235", 0 );
+   astPutFits( fc, "CRPIX2  =                    0", 0 );
+   astPutFits( fc, "CDELT2  =               0.0125", 0 );
+   astPutFits( fc, "CTYPE3  = 'GLAT--GLS'         ", 0 );
+   astPutFits( fc, "CRVAL3  =    -19.3843855749591", 0 );
+   astPutFits( fc, "CRPIX3  =                    0", 0 );
+   astPutFits( fc, "CDELT3  =               0.0125", 0 );
+
+/* Read a FrameSet from it. */
+   astClear( fc, "Card" );
+   fs = astRead( fc );
+
+/* Split this FrameSet to extract the sky axes. */
+   fs2 = atlFrameSetSplit( fs, "SKY", &status );
+   if( astOK && !fs2 ) {
+      status = SAI__ERROR;
+      errRep( "", "Error 2; atlFrameSetSplit failed.", &status );
+   }
+   if( astOK && ( astGetI( fs2, "Nin" ) != 2 || astGetI( fs2, "Nout" ) != 2 ) ){
+      status = SAI__ERROR;
+      errRep( "", "Error 3; atlFrameSetSplit failed.", &status );
+   }
+   if( astOK && !astIsASkyFrame( astGetFrame( fs2, AST__CURRENT ) ) ){
+      status = SAI__ERROR;
+      errRep( "", "Error 4; atlFrameSetSplit failed.", &status );
+   }
+
+/* Split this FrameSet to extract the spectral axes. */
+   fs2 = atlFrameSetSplit( fs, "SPECTRUM", &status );
+   if( astOK && !fs2 ) {
+      status = SAI__ERROR;
+      errRep( "", "Error 5; atlFrameSetSplit failed.", &status );
+   }
+   if( astOK && ( astGetI( fs2, "Nin" ) != 1 || astGetI( fs2, "Nout" ) != 1 ) ){
+      status = SAI__ERROR;
+      errRep( "", "Error 6; atlFrameSetSplit failed.", &status );
+   }
+   if( astOK && !astIsASpecFrame( astGetFrame( fs2, AST__CURRENT ) ) ){
+      status = SAI__ERROR;
+      errRep( "", "Error 7; atlFrameSetSplit failed.", &status );
+   }
+
 
 /* If an error occurred, then report a contextual message. */
    if( status != SAI__OK ) {
