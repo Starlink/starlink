@@ -98,6 +98,8 @@
 *         Rename smurf_fts2_phasecorrss
 *     2011-10-24 (EC):
 *         Add sc2filtermap
+*     2014-03-19 (TIMJ):
+*         Add smurf_supercam2acsis
 
 *     {enter_further_changes_here}
 
@@ -187,6 +189,7 @@ void smurf_smurfcopy( int * );
 void smurf_smurfhelp( int * );
 void smurf_stackframes( int * );
 void smurf_starecalc( int * );
+void smurf_supercam2acsis( int * );
 void smurf_timesort( int * );
 void smurf_unmakecube( int * );
 void smurf_unmakemap( int * );

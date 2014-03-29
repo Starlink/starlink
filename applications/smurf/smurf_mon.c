@@ -169,6 +169,8 @@
 *        about dangling HDS locators.
 *     2013-05-08 (MSHERWOOD):
 *         Add FTS2SPLIT
+*     2014-03-19 (TIMJ):
+*        Call SUPERCAM2ACSIS
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -406,6 +408,8 @@ void smurf_mon( int * status ) {
     smurf_stackframes( status );
   } else if (strcmp( taskname, "STARECALC" ) == 0 ) {
     smurf_starecalc( status );
+  } else if (strcmp( taskname, "SUPERCAM2ACSIS" ) == 0 ) {
+    smurf_supercam2acsis( status );
   } else if (strcmp( taskname, "TIMESORT" ) == 0 ) {
     smurf_timesort( status );
   } else if (strcmp( taskname, "UNMAKECUBE" ) == 0 ) {

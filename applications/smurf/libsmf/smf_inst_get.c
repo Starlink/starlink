@@ -51,6 +51,8 @@
 *     2014-03-27 (TIMJ):
 *        Change interface to take pointer arguments so that we can return
 *        the interface instrument and the actual instrument code.
+*     2014-03-28 (TIMJ):
+*        Add Supercam.
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
@@ -155,6 +157,13 @@ smf_inst_get( const smfHead * hdr, inst_t * instrument,
 		  status );
         *instrument = INST__ACSIS;
         *realinst = SMF__RINST_DAS;
+	return;
+      } else if (strncmp( backend, "SUPERCAM", sizeof(backend)) == 0) {
+	msgOutif( MSG__DEBUG, " ",
+                  "Data file contains Supercam data, treating as ACSIS",
+		  status );
+        *instrument = INST__ACSIS;
+        *realinst = SMF__RINST_SUPERCAM;
 	return;
       }
     } else {

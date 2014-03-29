@@ -3,6 +3,7 @@
 # Build libsmf before the applications
 
 SUBDIRS = defaults libsmf libsmurf libsc2sim libacsis libaztec libgsd \
+          libsupercam \
           libsc2fts scripts docs
 
 # can not use surf_mon_FCFLAGS yet
@@ -79,6 +80,7 @@ smurfcopy \
 smurfhelp \
 stackframes \
 starecalc \
+supercam2acsis \
 timesort \
 unmakecube \
 unmakemap
@@ -174,6 +176,7 @@ dist_pkgdata_DATA = LICENCE $(EXAMPLE_FILES)
 smurf_mon_LDADD = libsmurf/libsmurf.la libsc2sim/libsc2sim.la \
                   libgsd/libgsd.la \
                   libsmf/libsmf.la libaztec/libaztec.la \
+                  libsupercam/libsupercam.la \
                   libacsis/libacsis.la \
                   libsc2fts/libsc2fts.la                \
                   `$(srcdir)/smurf_link_adam`

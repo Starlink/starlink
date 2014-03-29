@@ -5377,6 +5377,32 @@ package @PACKAGE@ {
 
         }
 
+        action supercam2acsis {
+            helplib {$SMURF_HELP}
+
+            parameter directory {
+                position 2
+                type _CHAR
+                access WRITE
+                vpath {PROMPT }
+                association ->GLOBAL.DATA_ARRAY
+                prompt {Output Directory}
+                ppath GLOBAL CURRENT
+                helpkey *
+            }
+
+            parameter in {
+                position 1
+                type _CHAR
+                access READ
+                vpath {PROMPT }
+                prompt {Input SuperCam SDFITS File}
+                ppath GLOBAL CURRENT
+                helpkey *
+            }
+
+        }
+
         action timesort {
 
             helplib {$SMURF_HELP}

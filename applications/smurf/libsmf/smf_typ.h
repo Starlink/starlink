@@ -355,7 +355,8 @@ typedef enum {
   SMF__RINST_SCUBA2,
   SMF__RINST_ACSIS,
   SMF__RINST_DAS,
-  SMF__RINST_AZTEC
+  SMF__RINST_AZTEC,
+  SMF__RINST_SUPERCAM
 } smf_realinst_t;
 
 typedef enum {

@@ -62,6 +62,7 @@ smurf_smurfcopy.c \
 smurf_smurfhelp.c \
 smurf_stackframes.c \
 smurf_starecalc.c \
+smurf_supercam2acsis.c \
 smurf_timesort.c \
 smurf_unmakecube.c \
 smurf_unmakemap.c

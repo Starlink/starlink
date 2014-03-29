@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT([smurf],[1.5.0],[scuba2dr@phas.ubc.ca])
+AC_INIT([smurf],[1.6.0],[scuba2dr@phas.ubc.ca])
 AC_CONFIG_AUX_DIR([build-aux])
 PACKAGE_UPCASE='SMURF'
 AC_DEFINE( [PACKAGE_UPCASE], "SMURF", [Upper cased package name] )
@@ -109,8 +109,8 @@ AC_CHECK_HEADERS(mach/mach.h)
 dnl    Build dependencies for this package.
 dnl    Includes: fio, par, sae;
 dnl    links to: chr, mers, fio, psx, task.
-STAR_DECLARE_DEPENDENCIES([build], [ast sae pcs mers ndf shl gsl ndg fftw ard kaplibs pda gsd irq sofa pal one])
-STAR_DECLARE_DEPENDENCIES([link], [ndf ast hlp ndg shl pda gsd irq sofa pal one])
+STAR_DECLARE_DEPENDENCIES([build], [ast sae pcs mers ndf shl gsl ndg fftw ard kaplibs pda gsd irq sofa pal one cfitsio])
+STAR_DECLARE_DEPENDENCIES([link], [ndf ast hlp ndg shl pda gsd irq sofa pal one cfitsio])
 dnl We use the sst package to build documentation (prohlp and prolat)
 STAR_DECLARE_DEPENDENCIES([sourceset], [sst])
 
@@ -130,6 +130,7 @@ AC_SUBST(DOCS_SUBDIRS)
 AC_CONFIG_FILES(Makefile smurf.ifd component.xml libsmurf/Makefile \
                 libsmf/Makefile libsc2sim/Makefile libacsis/Makefile \
                 libaztec/Makefile libgsd/Makefile libsc2fts/Makefile \
+                libsupercam/Makefile \
                 docs/Makefile docs/sun258/Makefile docs/sun259/Makefile \
                 docs/sc19/Makefile defaults/Makefile scripts/Makefile )
 

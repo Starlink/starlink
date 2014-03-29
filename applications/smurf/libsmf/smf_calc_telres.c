@@ -40,10 +40,13 @@
 *        Initial version.
 *     2009-10-29 (TIMJ):
 *        Add support for SCUBA-2
+*     2014-03-28 (TIMJ):
+*        Add SMT
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2008-2009 Science & Technology Facilities Council.
+*     Copyright (C) 2014 Cornell University.
 *     All Rights Reserved.
 
 *  Licence:
@@ -133,6 +136,23 @@ float smf_calc_telres( AstFitsChan *hdr, int *status ) {
          } else {
             lambda = 2.0E-9*AST__C/( los + loe );
          }
+
+/* SMT has Supercam */
+      } else if ( !strncmp( value, "SMT", nc ) ) {
+
+        /* Diameter in metres */
+        diam = 10.0;
+
+        /* Get the LO frequency */
+        if (  ! astGetFitsF( hdr, "LOFREQS", &los ) ) {
+          if( *status == SAI__OK ) {
+            *status = SAI__ERROR;
+            errRep( "", "The \"LOFREQS\" FITS header was not found.",
+                    status );
+          }
+        }
+
+        lambda = 2.0E-9 * AST__C / los;
 
 /* Report an error if we do not recognise the telescope. */
       } else {
