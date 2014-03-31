@@ -28,6 +28,12 @@
     The NED object searches have been changed to use the NED service
     directly, rather than the ESO services which have been retired.
 
+    Saving the graphics toolbox context in world coordinates did not
+    work correctly for the circle, ellipse and rotbox types. The problem
+    was mainly seen when restoring graphics at different zooms -- when
+    the figures were offset or scaled to the wrong size. This problem
+    has been fixed.
+
     Version 4.4-4
     =============
 

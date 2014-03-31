@@ -117,6 +117,7 @@ proc save_graphics {w} {
          if {"$type" == "image"} {
             continue
          }
+
          # get item coords and convert from canvas coords to $units
          set coords [convert_coords [$canvas coords $item] canvas $units $image]
 
@@ -125,10 +126,36 @@ proc save_graphics {w} {
 
          # get list of configuration options for the item
          set config {}
-         foreach cfg [$canvas itemconfigure $item] {
-            lappend config [list [lindex $cfg 0] [lindex $cfg 4]]
+
+         # wart: rtd_ellipse and rtd_rotbox need various options to be stripped.
+         if { "$type" == "rtd_ellipse" || $type == "rtd_rotbox" } {
+            foreach cfg [$canvas itemconfigure $item] {
+               set name [lindex $cfg 0]
+               switch $name {
+                  -angle -
+                  -semimajor -
+                  -semiminor -
+                  -semimajorx -
+                  -semiminorx -
+                  -semimajory -
+                  -semiminory -
+                  -xcenter -
+                  -ycenter {
+                     #  Do nothing.
+                  }
+                  default {
+                     lappend config [list $name [lindex $cfg 4]]
+                  }
+               }
+            }
+            puts $fd [list $type $coords $config]
+
+         } else {
+            foreach cfg [$canvas itemconfigure $item] {
+               lappend config [list [lindex $cfg 0] [lindex $cfg 4]]
+            }
+            puts $fd [list $type $coords $config]
          }
-         puts $fd [list $type $coords $config]
       }
    }
    set ::tcl_precision $old_tcl_precision
