@@ -96,6 +96,7 @@ smf_expand_filegroup( const Grp * igrp, int * status ) {
   /* Somewhere to store the expanded information */
   ogrp = grpNew( "Files", status );
 
+  /* Input group size */
   grpsize = grpGrpsz( igrp, status );
 
   /* For each member of the group we will use wordexp() to
@@ -113,10 +114,31 @@ smf_expand_filegroup( const Grp * igrp, int * status ) {
        of expanded entries and pointers to each string */
     wstat = wordexp( pname, &pwordexp, 0 );
     if (wstat != 0) {
+      const char * errstr;
+
+      switch(wstat) {
+      case WRDE_BADCHAR:
+        errstr = "illegal unquoted characters";
+        break;
+      case WRDE_BADVAL:
+        errstr = "undefined shell variable";
+        break;
+      case WRDE_CMDSUB:
+        errstr = "command substitution is not allowed";
+        break;
+      case WRDE_NOSPACE:
+        errstr = "out of memory for expansion";
+        break;
+      case WRDE_SYNTAX:
+        errstr = "shell syntax error";
+        break;
+      default:
+        errstr = "error of unkown meaning";
+      }
+
       *status = SAI__ERROR;
-      errRepf("", "Error expanding wildcards in '%s'", status,
-              pname);
-      wordfree(&pwordexp);
+      errRepf("", "Error expanding wildcards in '%s': %s", status,
+              pname, errstr);
       break;
     }
 
@@ -131,6 +153,10 @@ smf_expand_filegroup( const Grp * igrp, int * status ) {
 
   msgOutiff(MSG__DEBUG, "", "Got %zu entries in expanded group", status,
             grpGrpsz(ogrp, status));
+
+  if (*status != SAI__OK) {
+    grpDelet( &ogrp, status );
+  }
 
   return ogrp;
 
