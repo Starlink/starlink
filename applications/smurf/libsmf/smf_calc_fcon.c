@@ -232,6 +232,7 @@ double smf_calc_fcon( smfData *data, dim_t nchan, int report,
    variances, report an error. */
    if( report && fcon2 == VAL__BADD ) {
       if( *status == SAI__OK ) {
+         *status = SAI__ERROR;
          smf_smfFile_msg( data->file, "F", 1, "<unknown file>");
          errRep( "", "Cannot calculate input variances for ^F",
                  status );
