@@ -443,6 +443,11 @@
 *     2014-03-11 (DSB):
 *        Allow the map to be lagged between iterations. May help to
 *        prevent oscillations in the SNR mask from iteration to iteration.
+*     2014-03-27 (DSB):
+*        When calculating the mean and max mapchange at the end of each
+*        iteration, exclude any map pixels that have a very low number of
+*        hits (fewer than 10% of the mean number of hits per pixel) since
+*        these will have unreliable (potentially tiny) variances.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -2411,12 +2416,19 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
            map. Ignore bad and zero-constrained pixels. */
 
         if( *status == SAI__OK ) {
+
+          /* Pixels with very low hits will have unreliable variances. So exclude
+             pixels with hits below 10% of the mean from the mapchange estimate. */
+          size_t hitslim = 0;
+          int *ph = thishits;
+          for( ipix = 0; ipix < msize; ipix++ ) hitslim += *(ph++);
+          hitslim /= 10*msize;
+
           mapchange_max = 0;
           for( ipix = 0; ipix < msize; ipix++ ) {
             if( !(thisqual[ipix]&SMF__MAPQ_AST) && (thismap[ipix] != VAL__BADD) &&
                 (lastmap[ipix] != VAL__BADD) && (thisvar[ipix] != VAL__BADD) &&
-                (thisvar[ipix] > 0) ) {
-
+                (thisvar[ipix] > 0) && (thishits[ipix] > (int) hitslim) ) {
               mapchange[ipix] = fabs(thismap[ipix] - lastmap[ipix]) / sqrt(thisvar[ipix]);
 
               /* Update max */
