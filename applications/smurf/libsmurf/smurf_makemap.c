@@ -733,10 +733,13 @@
 *        the output map to be split up into JSA tiles.
 *     2013-11-25 (DSB):
 *        smf_mapbounds fast mode does not work for the JSA all-sky pixel
-*        grid since the pixels are not square.
+*        grid since the maps are rotated with respect to north.
 *     2013-11-27 (DSB):
 *        Ensure the NTILE parameter is written before the OUT parameter is
 *        accessed (unless JSA tiles are being created).
+*     2014-03-31 (DSB):
+*        smf_mapbounds fast mode has been fixed so that it now works for
+#        the JSA all-sky pixel grid.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -1089,7 +1092,7 @@ void smurf_makemap( int *status ) {
 
   msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Determine map bounds", status);
 
-  smf_mapbounds( !isjsa, igrp, size, system, spacerefwcs, alignsys,
+  smf_mapbounds( 1, igrp, size, system, spacerefwcs, alignsys,
                  lbnd_out, ubnd_out, &outfset, &moving, &boxes, fts_port,
                  status );
 

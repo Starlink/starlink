@@ -15,10 +15,9 @@
 
 *  Invocation:
 *     smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
-*                   const AstFrameSet *refwcs,
-*                   int alignsys, int *lbnd_out, int *ubnd_out,
-*                   AstFrameSet **outframeset, int *moving, smfBox ** boxes,
-*                   fts2Port fts_port, int *status );
+*                    AstFrameSet *refwcs, int alignsys, int *lbnd_out,
+*                    int *ubnd_out, AstFrameSet **outframeset, int *moving,
+*                    smfBox ** boxes, fts2Port fts_port, int *status );
 
 *  Arguments:
 *     fast = int (Given)
@@ -31,7 +30,7 @@
 *        Number of elements in igrp
 *     system = const char* (Given)
 *        String indicating the sky coordinate system (e.g. "icrs")
-*     spacerefwcs = const AstFrameSet * (Given)
+*     spacerefwcs = AstFrameSet * (Given)
 *        Frameset corresponding to a reference WCS that should be
 *        used to define the output pixel grid. Can be NULL.
 *     alignsys = int (Given)
@@ -168,6 +167,11 @@
 *        reference SkyFrame was supplied. Without this, ZERO_CIRCLE
 *        masking does not know where the source is, and assumes it is at
 *        (RA,Dec) = (0,0).
+*     2014-03-31 (DSB):
+*        - Remove const qualifier from spacerefwcs since it generates 
+*        loads of compiler warnings. AST has no concept of "const" objects.
+*        - Fast-mode re-written to avoid assuming that the map Y axis is
+*        parallel to north.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -220,9 +224,8 @@
 #define MAX_PIXELS (20000*20000)
 
 void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
-                    const AstFrameSet *spacerefwcs,
-                    int alignsys, int *lbnd_out, int *ubnd_out,
-                    AstFrameSet **outframeset, int *moving,
+                    AstFrameSet *spacerefwcs, int alignsys, int *lbnd_out,
+                    int *ubnd_out, AstFrameSet **outframeset, int *moving,
                     smfBox ** boxes, fts2Port fts_port, int *status ) {
 
   /* Local Variables */
@@ -516,6 +519,7 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
 
             /* Extract the output PIXEL->SKY Mapping. */
             oskymap = astGetMapping( fs, AST__BASE, AST__CURRENT );
+
             /* Tidy up */
             fs = astAnnul( fs );
           }
@@ -525,6 +529,7 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
 
           /* Now add the SkyFrame to it */
           astAddFrame( *outframeset, AST__BASE, oskymap, oskyframe );
+
           /* Invert the oskymap mapping */
           astInvert( oskymap );
 
@@ -547,19 +552,12 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
           textreme[0] = 0;
           textreme[1] = (data->dims)[2] - 1;
           maxloop = 2;
-        } else {
-          const char * tracksys;
-          double flbnd[2], fubnd[2];
-          int usefixedbase = 0;
-          double bc1 = 0.0;
-          double bc2 = 0.0;
 
-          /* initialise */
-          flbnd[ 0 ] = VAL__MAXD;
-          flbnd[ 1 ] = VAL__MAXD;
-          fubnd[ 0 ] = VAL__MIND;
-          fubnd[ 1 ] = VAL__MIND;
-          for (j=0; j<4; j++) { textreme[j] = (dim_t)VAL__BADI; }
+        } else {
+          const char *tracksys;
+          double *ac1list, *ac2list, *bc1list, *bc2list, *p1, *p2, *p3, *p4;
+          double flbnd[4], fubnd[4];
+          JCMTState state;
 
           /* If the output and tracking systems are different, get a
              Mapping between them. */
@@ -572,65 +570,88 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
              fast_map = astGetMapping( tempfs, AST__BASE, AST__CURRENT );
              tempsf = astAnnul( tempsf );
              tempfs = astAnnul( tempfs );
+          } else {
+             fast_map = NULL;
           }
 
-          /* see if the input frame is moving but the output is not */
-          if (strcmp(tracksys, "GAPPT") == 0 ||
-              strcmp(tracksys, "AZEL") == 0) {
-            if (strcmp(system, "APP") != 0 &&
-                strcmp(system, "AZEL") != 0) {
-              usefixedbase = 1;
-              bc1 = (hdr->allState)[goodidx].tcs_tr_bc1;
-              bc2 = (hdr->allState)[goodidx].tcs_tr_bc2;
-              if( fast_map ) astTran2( fast_map, 1, &bc1, &bc2, 1, &bc1, &bc2 );
-            }
+          /* Copy all ac1/2 positions into two array, and transform them
+             from tracking to absolute output sky coords. */
+          ac1list = astMalloc( maxloop*sizeof( *ac1list ) );
+          ac2list = astMalloc( maxloop*sizeof( *ac2list ) );
+          if( *status == SAI__OK ) {
+             p1 = ac1list;
+             p2 = ac2list;
+             for( j = 0; j < maxloop; j++ ) {
+                state = (hdr->allState)[ j ];
+                *(p1++) = state.tcs_tr_ac1;
+                *(p2++) = state.tcs_tr_ac2;
+             }
+             if( fast_map ) astTran2( fast_map, maxloop, ac1list, ac2list, 1,
+                                      ac1list, ac2list );
           }
 
-          /* Loop over each time slice to calculate the maximum
-             excursion */
-          for (j=0; j<maxloop; j++) {
-            JCMTState state = (hdr->allState)[j];
-            double ac1 = state.tcs_tr_ac1;
-            double ac2 = state.tcs_tr_ac2;
-            double smu = state.smu_az_jig_x;
-            double offx, offy;
-            int jstat = 0;
+          /* If the target is moving, we need to adjust these ac1/2 values
+             to represent offsets from the base position. */
+          if( *moving ) {
 
-            /* we also trap the case where we are missing SMU information
-               since this will affect the position of the telescope later
-               on. Have to test jos state first but data before 20091205 do
-               not have this set. Use SMU_AZ_JIG_X as a proxy for all SMU
-               data. Between 20091125 and 20091204 we had a -1 in DRCONTROL. */
-            if ( (state.jos_drcontrol >= 0 && state.jos_drcontrol & drcntrl_mask) ||
-                ac1 == VAL__BADD || ac2 == VAL__BADD || smu == VAL__BADD ) {
-              /* missing telescope info */
-              nbadt++;
-              continue;
-            }
-            ngoodt++;
+          /* Copy all bc1/2 positions into two arrays. */
+             bc1list = astMalloc( maxloop*sizeof( *bc1list ) );
+             bc2list = astMalloc( maxloop*sizeof( *bc2list ) );
+             if( *status == SAI__OK ) {
+                p1 = bc1list;
+                p2 = bc2list;
 
-            if (!usefixedbase) {
-              bc1 = state.tcs_tr_bc1;
-              bc2 = state.tcs_tr_bc2;
-              if( fast_map ) astTran2( fast_map, 1, &bc1, &bc2, 1, &bc1, &bc2 );
-            }
+                for( j = 0; j < maxloop; j++ ) {
+                   state = (hdr->allState)[ j ];
+                   *(p1++) = state.tcs_tr_bc1;
+                   *(p2++) = state.tcs_tr_bc2;
+                }
 
-            /* If required, map actual position into absolute output
-               coords. */
-            if( fast_map ) astTran2( fast_map, 1, &ac1, &ac2, 1, &ac1, &ac2 );
+                /* Transform them from tracking to absolute output sky coords. */
+                if( fast_map ) astTran2( fast_map, maxloop, bc1list, bc2list,
+                                         1, bc1list, bc2list );
 
-            /* calculate the separation of ACTUAL from BASE */
-            palDs2tp(ac1,ac2,bc1,bc2, &offx, &offy, &jstat );
+                /* Replace each ac1/2 position with the offsets from the
+                   corresponding base position. */
+                p1 = bc1list;
+                p2 = bc2list;
+                p3 = ac1list;
+                p4 = ac2list;
+                for( j = 0; j < maxloop; j++ ) {
+                  smf_offsets( *(p1++), *(p2++), p3++, p4++, status );
+                }
+             }
 
-            /* add on the smu tangent plane correction */
-            if (state.smu_tr_jig_x != VAL__BADD) offx += state.smu_tr_jig_x * DAS2R;
-            if (state.smu_tr_jig_y != VAL__BADD) offy += state.smu_tr_jig_y * DAS2R;
-
-            if ( offx < flbnd[0] ) { flbnd[0] = offx; textreme[0] = j; }
-            if ( offy < flbnd[1] ) { flbnd[1] = offy; textreme[1] = j; }
-            if ( offx > fubnd[0] ) { fubnd[0] = offx; textreme[2] = j; }
-            if ( offy > fubnd[1] ) { fubnd[1] = offy; textreme[3] = j; }
+             /* We no longer need the base positions. */
+             bc1list = astFree( bc1list );
+             bc2list = astFree( bc2list );
           }
+
+          /* Transform the ac1/2 position from output sky coords to
+             output pixel coords. */
+          astTran2( oskymap, maxloop, ac1list, ac2list, 1, ac1list, ac2list );
+
+          /* Find the bounding box containing these pixel coords and the
+             time slices at which the boresight touches each edge of this
+             box. */
+          flbnd[ 0 ] = VAL__MAXD;
+          flbnd[ 1 ] = VAL__MAXD;
+          fubnd[ 0 ] = VAL__MIND;
+          fubnd[ 1 ] = VAL__MIND;
+          for( j = 0; j < 4; j++ ) textreme[ j ] = (dim_t) VAL__BADI;
+
+          p1 = ac1list;
+          p2 = ac2list;
+          for( j = 0; j < maxloop; j++,p1++,p2++ ) {
+             if( *p1 != VAL__BADD && *p2 != VAL__BADD ){
+
+                if ( *p1 < flbnd[0] ) { flbnd[0] = *p1; textreme[0] = j; }
+                if ( *p2 < flbnd[1] ) { flbnd[1] = *p2; textreme[1] = j; }
+                if ( *p1 > fubnd[0] ) { fubnd[0] = *p1; textreme[2] = j; }
+                if ( *p2 > fubnd[1] ) { fubnd[1] = *p2; textreme[3] = j; }
+             }
+          }
+
           maxloop = 4;
           msgSetd("X1", textreme[0]);
           msgSetd("X2", textreme[1]);

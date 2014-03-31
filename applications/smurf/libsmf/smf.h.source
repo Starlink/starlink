@@ -1498,7 +1498,7 @@ void smf_map_spikes( ThrWorkForce *wf, smfData *data, smfData *variance,
                      size_t *nflagged, int *status );
 
 void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
-                    const AstFrameSet * spacesrefwcs, int alignsys,
+                    AstFrameSet * spacesrefwcs, int alignsys,
                     int *lbnd_out, int *ubnd_out, AstFrameSet **outframeset,
                     int *moving, smfBox ** boxes, fts2Port fts_port,
                     int *status );
@@ -1580,6 +1580,9 @@ void smf_obsmap_report( msglev_t msglev, AstKeyMap * obsmap, AstKeyMap * objmap,
 const char * smf_obsmode_str( smf_obsmode type, int * status );
 
 const char * smf_obstype_str( smf_obstype type, int * status );
+
+void smf_offsets( double baselon, double baselat, double *lon, double *lat,
+                  int *status );
 
 int smf_open_and_flatfield ( ThrWorkForce *wf, const Grp *igrp, const Grp *ogrp, size_t index,
                              const smfArray * darks, const smfArray * ramps,
