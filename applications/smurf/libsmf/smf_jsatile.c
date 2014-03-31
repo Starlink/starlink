@@ -73,6 +73,10 @@
 *        returned FrameSet.
 *        - Correct definition of PIXEL Frame in returned FrameSet.
 *        - Ensure FITS ref. point is placed somewhere in pixel zero.
+*     31-MAR-2014 (DSB):
+*        Tiles in the split facet (facet 6) use RA=12H as the FITS
+*        reference point, and so their pixel bounds need to be
+*        corrected to refer to the NDF pixel origin at RA=0h.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -122,6 +126,7 @@ void smf_jsatile( int itile, smfJSATiling *skytiling, int local_origin,
    AstRegion *lregion = NULL;
    double crpix1;
    double crpix2;
+   double crval1;
    double point1[ 2 ];
    double point2[ 2 ];
    double shift[ 2 ];
@@ -129,6 +134,7 @@ void smf_jsatile( int itile, smfJSATiling *skytiling, int local_origin,
    int icrpix1;
    int icrpix2;
    int icur;
+   int offset;
 
 /* Initialise the returned pointers. */
    if( fc ) *fc = NULL;
@@ -158,6 +164,9 @@ void smf_jsatile( int itile, smfJSATiling *skytiling, int local_origin,
 /* Get the GRID coords of the FITS reference point. */
    astGetFitsF( lfc, "CRPIX1", &crpix1 );
    astGetFitsF( lfc, "CRPIX2", &crpix2 );
+
+/* Get the RA at the FITS reference point. */
+   astGetFitsF( lfc, "CRVAL1", &crval1 );
 
 /* If required, return a deep copy of the FitsChan, before the
    WCS-related cards are removed by the following astRead call. */
@@ -212,11 +221,41 @@ void smf_jsatile( int itile, smfJSATiling *skytiling, int local_origin,
       if( icrpix2 == tmp ) icrpix2++;
    }
 
-/* Find the lower and upper bounds of the tile in NDF PIXEL indicies. This
-   is chosen so that the FITS reference point (CRPIX) is always somewhere
-   inside pixel zero. */
+/* Find the lower bounds of the tile in NDF PIXEL indicies. These are
+   chosen so that the origin of (RA,Dec) is always somewhere inside pixel
+   zero. Note, the FITS reference point may be at either (RA,Dec)=(0h,0deg)
+   or at (12h,0deg), depending on the tile. */
    lbnd[ 0 ] = 1 - icrpix1;
    lbnd[ 1 ] = 1 - icrpix2;
+
+/* Now correct the above bounds if the tile is in a facet that uses RA=12H
+   as the reference (there is only one such facet - the first facet,
+   which is split bottm left and top right of the all-sky map). */
+   if( fabs( crval1 ) > 0.1 ) {
+
+/* The required shift is the same on both pixel axes, and is the number
+   of pixels across two facets. */
+      offset = 2*skytiling->ntpf*skytiling->ppt;
+
+/* For tiles in the top right half-facet of the all sky map, the current
+   lbnd values are with repect to a pixel origin at the middle of the top
+   right diagonal edge of the all-sky map. Shift them to refer to the
+   centre of the all sky map. */
+      if( icrpix1 > 0 ) {
+         lbnd[ 0 ] += offset;
+         lbnd[ 1 ] += offset;
+
+/* For tiles in the bottom left half-facet of the all sky map, the current
+   lbnd values are with repect to a pixel origin at the middle of the bottom
+   left diagonal edge of the all-sky map. Shift them to refer to the
+   centre of the all sky map. */
+      } else {
+         lbnd[ 0 ] -= offset;
+         lbnd[ 1 ] -= offset;
+      }
+   }
+
+/* Find the corresponding upper bounds of the tile in NDF PIXEL indicies. */
    ubnd[ 0 ] += lbnd[ 0 ] - 1;
    ubnd[ 1 ] += lbnd[ 1 ] - 1;
 
