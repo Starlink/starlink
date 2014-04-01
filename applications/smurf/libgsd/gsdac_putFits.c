@@ -157,6 +157,9 @@
 *     2014 March 7 (MJC):
 *        Protect SEEDATST and SEEDATEN from having non-valid minute
 *        value.
+*     2014 March 8 (MJC):
+*        Set a default of UNKNOWN for missing sbMode.  This is either
+*        UNKNOWN or DSB depending on the front end and UT date.
 
 *  Copyright:
 *     Copyright (C) 2008-2014 Science and Technology Facilities Council.
@@ -770,9 +773,9 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   /* There are some unknown null values, set those here as they are
      dependent on the UT date and frontend as well as GSDVars.  In brief
      Russell Redman's analysis indicates that SB_MODE was filled from
-     19940414.  Before that all were DSB instruments except RxB3. */
+     19980414.  Before that all were DSB instruments except RxB3. */
   if ( strcmp( gsdVars->sbMode, "" ) == 0 ) {
-     if ( strncmp( instrume, "RXB3", 4 ) == 0 && utDate < 19940414 ) {
+     if ( strncmp( instrume, "RXB3", 4 ) == 0 && utDate < 19980414 ) {
         strcpy( sbMode, "UNKNOWN" );
      } else {
         strcpy( sbMode, "DSB" );
