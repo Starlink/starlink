@@ -1046,6 +1046,9 @@ smfData *smf_fft_data( ThrWorkForce *wf, const smfData *indata,
                        smfData *outdata, int inverse, size_t len,
                        int *status );
 
+void smf_fill2d( int mingood, int box, double fillval, dim_t nx, dim_t ny,
+                 double *data, double *work, int *status );
+
 void  smf_fillgaps( ThrWorkForce *wf, smfData *data,
                     smf_qual_t mask, int *status );
 

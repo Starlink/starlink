@@ -120,6 +120,8 @@
 /* Prototypes for local static functions. */
 static void smf1_calcmodel_com( void *job_data_ptr, int *status );
 
+#define FILLVAL -1.23456E20
+
 /* Local data types */
 typedef struct smfCalcModelComData {
    dim_t b1;
@@ -128,6 +130,8 @@ typedef struct smfCalcModelComData {
    dim_t idx_lo;
    dim_t nb;
    dim_t nbolo;
+   dim_t ncol;
+   dim_t nrow;
    dim_t ntslice;
    dim_t nvar;
    dim_t t1;
@@ -140,6 +144,7 @@ typedef struct smfCalcModelComData {
    double nsigma;
    double stddev;
    double svar;
+   int fill;
    int flag;
    int gain_box;
    int icom;
@@ -173,6 +178,8 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    dim_t itime;
    dim_t nb;
    dim_t nbolo;
+   dim_t ncol;
+   dim_t nrow;
    dim_t ntslice;
    dim_t nvar;
    dim_t timestep;
@@ -186,6 +193,7 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    double svar;
    int *nrej = NULL;
    int dofft;
+   int fill;
    int iblock;
    int icom;
    int iw;
@@ -256,8 +264,7 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
 
 /* If we have a mask, copy it into the quality array of the map.
    Also set map pixels that are not used (e.g. corner pixels, etc)
-   to be background pixels in the mask. Do not do this on the firrst
-   iteration as the map has not yet been determined.*/
+   to be background pixels in the mask. */
 
    if( mask ) {
       double *map = dat->map;
@@ -285,11 +292,20 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    astMapGet0D( kmap, "NSIGMA", &nsigma );
    astMapGet0D( kmap, "SIG_LIMIT", &sig_limit );
    astMapGet0I( kmap, "SIG_WING", &sig_wing );
+   astMapGet0I( kmap, "FILL", &fill );
+   if( fill ) msgOutif( MSG__VERB, "", "  Flagged values will be filled "
+                        "before finding COM.", status );
+
+/* Store the length of the second and third pixel axes of the smfData so
+   that we can treat the array as a 2D image (note, do not use the
+   smf_get_dims ncols and nrows values as these may be swapped). */
+   ncol = res->sdata[ 0 ]->dims[ 1 ];
+   nrow = res->sdata[ 0 ]->dims[ 2 ];
 
 /* Get the number of time slices in the first residuals smfData. We
    report an error if any subsequent smfData has a different number of
    time slices (except for GAI). */
-   smf_get_dims( res->sdata[ 0 ],  NULL, NULL, &nbolo, &ntslice, NULL, NULL,
+   smf_get_dims( res->sdata[ 0 ], NULL, NULL, &nbolo, &ntslice, NULL, NULL,
                  NULL, status );
    if( *status != SAI__OK ) goto L999;
 
@@ -344,6 +360,8 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
 /* Store other values common to all jobs. */
          pdata->ntslice = ntslice;
          pdata->nbolo = nbolo;
+         pdata->nrow = nrow;
+         pdata->ncol = ncol;
          pdata->res = res;
          pdata->gai = gai;
          pdata->lut = lut;
@@ -353,6 +371,7 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
          pdata->mask = mask;
          pdata->niter = niter;
          pdata->nsigma = nsigma;
+         pdata->fill = fill;
       }
    }
 
@@ -703,20 +722,18 @@ static void smf1_calcmodel_com( void *job_data_ptr, int *status ) {
 */
 
 /* Local Variables: */
-   int state;
-   dim_t jtime;
    SmfCalcModelComData *pdata;
-   dim_t btime;
    dim_t ibolo;
    dim_t idx;
    dim_t itime;
    dim_t jlim;
+   dim_t jtime;
    dim_t nbolo;
    dim_t ntslice;
+   dim_t nvar;
+   double *fillwork = NULL;
    double *gai_data;
    double *model_data;
-   dim_t nvar;
-   double svar;
    double *pb;
    double *pm;
    double *pmi[ 4 ];
@@ -729,15 +746,17 @@ static void smf1_calcmodel_com( void *job_data_ptr, int *status ) {
    double *woff;
    double s1;
    double s2;
+   double svar;
    double v;
    int *pl;
    int iblock;
    int ns1;
+   int state;
    size_t gbstride;
    size_t gcstride;
    size_t izero;
-   smf_qual_t *pq;
    smf_qual_t *pq0[ 4 ];
+   smf_qual_t *pq;
    smf_qual_t *qua_data;
    smf_qual_t qmask;
 
@@ -873,21 +892,17 @@ static void smf1_calcmodel_com( void *job_data_ptr, int *status ) {
 /* Form new estimate of the COM model.
    ================================== */
    } else if( pdata->operation == 3 ) {
+      double sigma;
+      double thr_hi;
+      double thr_lo;
+      int iter;
+
+/* Allocate work space needed for filling holes in each time slices. */
+      if( pdata->fill ) fillwork = astMalloc( 2*pdata->ncol*pdata->nrow*sizeof(*fillwork ) );
 
 /* Quality mask that includes samples previously flagged by the COM
    model or ringing filter. */
       qmask = ( SMF__Q_FIT & ~SMF__Q_COM & ~SMF__Q_RING );
-
-/* Store the index of the block containing the first time slice to be
-   processed by this thread. Also store the index of the time slice at which
-   the next block begins. */
-      iblock = pdata->t1/pdata->gain_box;
-      if( iblock >= pdata->nblock ) iblock = pdata->nblock - 1;
-      if( iblock == pdata->nblock - 1 ){
-         btime = pdata->ntslice;
-      } else {
-         btime = ( iblock + 1 )*pdata->gain_box;
-      }
 
 /* Initialise a pointer to the next model value. */
       if( pdata->icom >= 0 ) {
@@ -905,68 +920,99 @@ static void smf1_calcmodel_com( void *job_data_ptr, int *status ) {
       for( itime = pdata->t1; itime <= pdata->t2 && *status == SAI__OK;
            itime++,pm++ ) {
 
-/* If we have reached the first time slice in the next block, increment
-   the block index and the index of the first time slice in the next
-   block. The last block (index (nblock-1) ) contains any left over time
-   slices and so may contain more than gain_box elements. */
-         if( itime == btime ) {
-            iblock++;
-            if( iblock == pdata->nblock - 1 ) {
-               btime = pdata->ntslice;
-            } else {
-               btime += pdata->gain_box;
-            }
-         }
+/* Initialise the thresholds to include all bolometer values. */
+         thr_lo = VAL__MIND;
+         thr_hi = VAL__MAXD;
+
+/* Do any required sigma-clipping iterations. */
+         for( iter = 0; iter < pdata->niter; iter++ ) {
 
 /* Initialise pointers to the buffers holding the normalised residual,
    and the weights. */
-         pb = resbuf;
+            pb = resbuf;
 
 /* Loop over all subarrays that contribute to the current common-mode
    model. */
-         for( idx = pdata->idx_lo; idx <= pdata->idx_hi; idx++ ) {
+            for( idx = pdata->idx_lo; idx <= pdata->idx_hi; idx++ ) {
 
 /* Get required data pointers. These are known to be bolo-ordered.
    Increment them to point to the first time slice processed by this thread. */
-            pr = pdata->res->sdata[ idx ]->pntr[ 0 ];
-            pr += itime;
-            pq = itime + smf_select_qualpntr( pdata->res->sdata[ idx ], NULL, status );
-            if( pdata->lut ) {
-               pl = pdata->lut->sdata[ idx ]->pntr[ 0 ];
-               pl += itime;
-            } else {
-               pl = NULL;
-            }
+               pr = pdata->res->sdata[ idx ]->pntr[ 0 ];
+               pr += itime;
+               pq = itime + smf_select_qualpntr( pdata->res->sdata[ idx ], NULL, status );
+               if( pdata->lut ) {
+                  pl = pdata->lut->sdata[ idx ]->pntr[ 0 ];
+                  pl += itime;
+               } else {
+                  pl = NULL;
+               }
 
 /* Loop over all bolometers. */
-            for( ibolo = 0; ibolo < pdata->nbolo; ibolo++ ) {
+               for( ibolo = 0; ibolo < pdata->nbolo; ibolo++ ) {
 
 /* Check the sample has not been flagged as unusable. */
-               if( !(*pq & qmask) && *pr != VAL__BADD ) {
+                  if( !(*pq & qmask) && *pr != VAL__BADD ) {
 
 /* If a mask and LUT have been supplied, check that the sample is not
-   masked out. If not, store it in the sample buffer. */
-                  if( !pdata->mask || !pl || *pl == VAL__BADI ||
-                       pdata->mask[ *pl ] ) *(pb++) = *pr;
-               }
+   masked out. */
+                     if( !pdata->mask || !pl || *pl == VAL__BADI ||
+                          pdata->mask[ *pl ] ) {
+
+/* Check that the bolometer value is within the current clipping limits.
+   If so, store it in the sample buffer. */
+                        if( *pr >= thr_lo && *pr <= thr_hi ) {
+                           *(pb++) = *pr;
+
+/* If required store a magic value in the buffer that indicates that the
+   bolometer value needs to be replaced by interpolation from the
+   surrounding spatial neighbours. Entirely bad bolometers are excluded
+   from this process. */
+                        } else if( pdata->fill ) {
+                           *(pb++) = FILLVAL;
+                        }
+
+                     } else if( pdata->fill ) {
+                        *(pb++) = FILLVAL;
+                     }
+
+                  } else if( pdata->fill ){
+                     if( !(*pq & SMF__Q_BADB) ) {
+                        *(pb++) = FILLVAL;
+                     } else {
+                        *(pb++) = VAL__BADD;
+                     }
+                  }
 
 /* Increment residual and quality pointers to point to the next
    bolometer. */
-               pr += pdata->ntslice;
-               if( pl ) pl += pdata->ntslice;
-               pq += pdata->ntslice;
-            }
-         }
+                  pr += pdata->ntslice;
+                  if( pl ) pl += pdata->ntslice;
+                  pq += pdata->ntslice;
+               }
 
-/* Find the mean of the samples at the current time slice, including
-   nsigma-clipping. */
-         *pm = smf_sigmaclipD( (int)( pb - resbuf ), resbuf, NULL,
-                               pdata->nsigma, pdata->niter, NULL, status );
+/* If required, replace bad values in the buffer by interpolation from their
+   spatial neighbours. This avoids bias in the COM value due to the
+   spatial distribution of flagged bolometer values. */
+               if( pdata->fill ) {
+                  smf_fill2d( 50, 5, FILLVAL, pdata->ncol, pdata->nrow,
+                              resbuf + ( idx - pdata->idx_lo )*pdata->nbolo,
+                              fillwork, status );
+               }
+            }
+
+/* Find the mean and sigma of the samples now in the buffer. */
+            *pm = smf_sigmaclipD( (int)( pb - resbuf ), resbuf, NULL, 0.0,
+                                  1, &sigma, status );
+
+/* Update the thresholds for the next iteration. */
+            thr_lo = *pm - pdata->nsigma*sigma;
+            thr_hi = *pm + pdata->nsigma*sigma;
+         }
       }
 
 /* Free resources. */
       resbuf = astFree( resbuf );
-
+      fillwork = astFree( fillwork );
 
 /* Combined individual common-mode signals into a single COM model.
    ============================================================== */

@@ -176,6 +176,19 @@ com.corr_abstol = 0.2
 com.corr_tol = 5
 
 #-----------------------------------------------------------------
+#  Name: 	com.fill
+#  Type: 	integer
+#  Default: 	0
+#  Purpose: 	Controls the estimate of the common-mode signal
+#  Description: If com.fill is non-zero, then any holes in each time slice
+#               left by the previous flagging of bolometer values will be
+#               filled with values representative of the neighbouring 
+#               bolometers before finding the mean value. This avoids bias
+#               in the common-mode caused by areas of systematically high 
+#               or low bolometer values being flagged.
+com.fill = 0
+
+#-----------------------------------------------------------------
 #  Name: 	com.fit_box
 #  Type: 	integer
 #  Default: 	<undef>
@@ -379,12 +392,12 @@ com.perarray_last = <undef>
 #               mean and standard deviation of the remaining high frequency
 #               common-modes are found. The RMS of these standard
 #               deviations, taken over the whole time stream, is then found.
-#               All bolometers within individual time slices for which the 
-#               standard deviation exceeds "com.sig_limit" times the RMS value 
-#               are flagged in all sub-arrays, causing them to be excluded 
+#               All bolometers within individual time slices for which the
+#               standard deviation exceeds "com.sig_limit" times the RMS value
+#               are flagged in all sub-arrays, causing them to be excluded
 #               from the FLT model and the map. Note, this flagging process is
-#               performed from scratch on each iteration - that is, samples 
-#               flagged on a previous iteration are tested again on each 
+#               performed from scratch on each iteration - that is, samples
+#               flagged on a previous iteration are tested again on each
 #               subsequent iteration and may be "unflagged" if the differences
 #               between individual common-mode signal become smaller.
 #

@@ -157,6 +157,7 @@ smf_fft_2dazav.c \
 smf_fft_avpspec.c \
 smf_fft_cart2pol.c \
 smf_fft_data.c \
+smf_fill2d.c \
 smf_fillgaps.c \
 smf_filter_complement.c \
 smf_filter_delay.c \
