@@ -319,10 +319,10 @@ try:
 #  the path to the NDF holding the tile.
       tile_dict = {}
       for tile in tiles:
-         jsatile = starutil.get_fits_header( tile, "JSATILE" )
+         jsatile = starutil.get_fits_header( tile, "TILENUM" )
          if jsatile == None:
             raise starutil.InvalidParameterError("Supplied tile '{0}' has no value for "
-                                                 "the JSATILE header.".format(tile) )
+                                                 "the TILENUM header.".format(tile) )
          else:
             tile_dict[ jsatile ] = tile
 
@@ -349,7 +349,7 @@ try:
    else:
       used_tiles = tiles
       jsatile = int( len(tiles)/2 )
-      jsatile = starutil.get_fits_header( tiles[ jsatile ], "JSATILE" )
+      jsatile = starutil.get_fits_header( tiles[ jsatile ], "TILENUM" )
 
 #  Paste these tile NDFs into a single image by abutting them in pixel
 #  space. This image still uses the JSA all-sky pixel grid. If we have

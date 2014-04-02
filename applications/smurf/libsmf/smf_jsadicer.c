@@ -502,7 +502,7 @@ void smf_jsadicer( int indf, const char *base, int trim,
    output NDFs that have actually been created. */
       if( grp ) grpPut1( grp, path, 0, status );
 
-/* Add a JSATILE header to the output FITS extension. */
+/* Add a TILENUM header to the output FITS extension. */
       kpgGtfts( indfo, &fc, status );
       if( *status == KPG__NOFTS ) {
          errAnnul( status );
@@ -517,7 +517,7 @@ void smf_jsadicer( int indf, const char *base, int trim,
 
       one_snprintf(jsatile_comment, 45, "JSA all-sky tile index (Nside=%i)",
                    status, tiling.ntpf);
-      atlPtfti( fc, "JSATILE", tile_index, jsatile_comment, status );
+      atlPtfti( fc, "TILENUM", tile_index, jsatile_comment, status );
       kpgPtfts( indfo, fc, status );
       fc = astAnnul( fc );
 

@@ -485,7 +485,10 @@
 *     - If parameter TILEDIMS is assigned a value, FITS keywords NUMTILES
 *     and TILENUM are added to the output FITS header. These are the number
 *     of tiles used to hold the output data, and the index of the NDF
-*     containing the header, in the range 1 to NUMTILES.
+*     containing the header, in the range 1 to NUMTILES, but if
+*     JSATILES is TRUE then FITS keyword TILENUM is also added
+*     but is instead used for the JSA tile number in the range 0 to
+*     12 * Nside ^ 2 - 1.
 *     - The model configuration parameters can be sub-instrument dependent.
 *     For example, 850.flt.edgelow will copy the edgelow value into the flt
 *     section only for 850 micron data. Similarly for 450.flt.edgelow.
