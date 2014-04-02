@@ -28,9 +28,12 @@
 *        Thus source pixels are accumulated form itgeration to iteration.
 *        In other words, "once a source pixel, always a source pixel".
 *     map = const double * (Read)
-*        The 2D map containing the data values.
+*        The 2D map containing the data values, or SNR values if "mapvar"
+*        is NULL.
 *     mapvar = const double * (Read)
-*        The 2D map containing the variance values.
+*        The 2D map containing the variance values. If this is NULL, then
+*        the "map" array is assumed to contain SNR values rather than data
+*        values.
 *     dims = const dim_t * (Read)
 *        The dimensions of the map.
 *     snr_hi = double (Read)
@@ -76,6 +79,9 @@
 *        - Further fixes to merging of adjoining clumps.
 *     10-MAR-2014 (DSB):
 *        Added argument oldmask.
+*     2-APR-2014 (DSB):
+*        Allow SNR values to be supplied, rather than separate data and 
+*        variance values.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -144,6 +150,7 @@ void smf_snrmask( ThrWorkForce *wf,  unsigned char *oldmask,
    const double *pv = NULL;
    dim_t i;
    dim_t j;
+   double snr;
    int *cindex = NULL;
    int *ps = NULL;
    int *psn = NULL;
@@ -204,8 +211,20 @@ void smf_snrmask( ThrWorkForce *wf,  unsigned char *oldmask,
    ps = cindex;
    for( j = 0; j < dims[ 1 ] && *status == SAI__OK; j++ ) {
       for( i = 0; i < dims[ 0 ]; i++, pm++, pv++, ps++ ) {
-         if( *pm != VAL__BADD && *pv != VAL__BADD && *pv > 0.0 &&
-             *pm > snr_lo*( sqrt( *pv ) ) ){
+
+/* Get the SNR value. */
+         if( mapvar ) {
+            if( *pm != VAL__BADD && *pv != VAL__BADD && *pv > 0.0 ){
+               snr = *pm / sqrt( *pv );
+            } else {
+               snr = VAL__BADD;
+            }
+         } else {
+            snr = *pm;
+         }
+
+/* Check the SNR is good and above the lower limit. */
+         if( snr != VAL__BADD && snr > snr_lo ){
 
 /* The three neighbouring pixels on row (j-1), and the left hand
    neighbouring pixel on row j, have already been checked on earlier
@@ -301,8 +320,20 @@ void smf_snrmask( ThrWorkForce *wf,  unsigned char *oldmask,
    ps = cindex;
    for( j = 0; j < dims[ 1 ]; j++ ) {
       for( i = 0; i < dims[ 0 ]; i++, pm++, pv++, ps++ ) {
-         if( *pm != VAL__BADD && *pv != VAL__BADD && *pv > 0.0 &&
-             *pm > snr_hi*( sqrt( *pv ) ) ){
+
+/* Get the SNR value. */
+         if( mapvar ) {
+            if( *pm != VAL__BADD && *pv != VAL__BADD && *pv > 0.0 ){
+               snr = *pm / sqrt( *pv );
+            } else {
+               snr = VAL__BADD;
+            }
+         } else {
+            snr = *pm;
+         }
+
+/* Check the SNR is good and above the upper limit. */
+         if( snr != VAL__BADD && snr > snr_hi ){
 
 /* Since this pixel is above the higher SNR limit, it must also be above
    the lower SNR Limit, and so will have a non-zero clump index. We flag that

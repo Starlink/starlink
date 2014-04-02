@@ -262,7 +262,7 @@ ast.zero_snr_ffclean = 0
 #  Purpose: 	Flatten map before making SNR mask
 #  Description: Setting this parameter to a positive value causes the
 #               SNR mask requested by parameter "ast.zero_snr" to be
-#               based on a copy of the map that has been high-pass
+#               based on a copy of the SNR map that has been high-pass
 #               filtering to remove structures larger than the number of
 #               arc-seconds given by ast.zero_snr_hipass. This will in
 #               general reduce the number of source pixels in the mask.
@@ -276,7 +276,7 @@ ast.zero_snr_hipass = 0.0
 #  Purpose: 	Smooths map before making SNR mask
 #  Description: Setting this parameter to a positive value causes the
 #               SNR mask requested by parameter "ast.zero_snr" to be
-#               based on a copy of the map that has been low-pass
+#               based on a copy of the SNR map that has been low-pass
 #               filtering (i.e smoothed) to remove noise and other
 #               features smaller than the number of arc-seconds given
 #               by ast.zero_snr_lopass. This may help to prevent pixels
@@ -554,7 +554,7 @@ com.zero_snr_ffclean = 0
 #  Purpose: 	FLatten map before making SNR mask
 #  Description: Setting this parameter to a positive value causes the
 #               SNR mask requested by parameter "com.zero_snr" to be
-#               based on a copy of the map that has been high-pass
+#               based on a copy of the SNR map that has been high-pass
 #               filtering to remove structures larger than the number of
 #               arc-seconds given by com.zero_snr_hipass. This will in
 #               general reduce the number of source pixels in the mask.
@@ -568,7 +568,7 @@ com.zero_snr_hipass = 0.0
 #  Purpose: 	Smooths map before making SNR mask
 #  Description: Setting this parameter to a positive value causes the
 #               SNR mask requested by parameter "com.zero_snr" to be
-#               based on a copy of the map that has been low-pass
+#               based on a copy of the SNR map that has been low-pass
 #               filtering (i.e smoothed) to remove noise and other
 #               features smaller than the number of arc-seconds given
 #               by com.zero_snr_lopass. This may help to prevent pixels
@@ -1557,7 +1557,7 @@ flt.zero_snr_ffclean = 0
 #  Purpose: 	Flatten map before making SNR mask
 #  Description: Setting this parameter to a positive value causes the
 #               SNR mask requested by parameter "flt.zero_snr" to be
-#               based on a copy of the map that has been high-pass
+#               based on a copy of the SNR map that has been high-pass
 #               filtering to remove structures larger than the number of
 #               arc-seconds given by flt.zero_snr_hipass. This will in
 #               general reduce the number of source pixels in the mask.
@@ -1571,7 +1571,7 @@ flt.zero_snr_hipass = 0.0
 #  Purpose: 	Smooths map before making SNR mask
 #  Description: Setting this parameter to a positive value causes the
 #               SNR mask requested by parameter "flt.zero_snr" to be
-#               based on a copy of the map that has been low-pass
+#               based on a copy of the SNR map that has been low-pass
 #               filtering (i.e smoothed) to remove noise and other
 #               features smaller than the number of arc-seconds given
 #               by flt.zero_snr_lopass. This may help to prevent pixels
