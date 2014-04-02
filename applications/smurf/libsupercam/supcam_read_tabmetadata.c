@@ -108,12 +108,12 @@ supcam_read_tabmetadata( fitsfile * fits, size_t maxRows, int * status ) {
   /* Find relevant column */                                            \
   /* cast because cfitsio does not use const */                         \
   CALLCFITSIO( fits_get_colnum(fits, CASEINSEN, (char *)COLUMN, &colnum, &fitsStatus), \
-               "Error getting column number for CDELT2" );              \
+               "Error getting number of column " COLUMN " in table" );  \
                                                                         \
   /* Read column */                                                     \
   CALLCFITSIO( fits_read_col(fits, TDOUBLE, colnum, 1, 1,               \
                              nRows, NULL, coldata, NULL, &fitsStatus),  \
-               "Error reading spectra from Binary Column " COLUMN );    \
+               "Error reading spectra from Binary table column " COLUMN );    \
                                                                         \
   if (*status == SAI__OK) {                                             \
     /* Copy from column to struct */                                    \
