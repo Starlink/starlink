@@ -3,6 +3,7 @@
 # Build libsmf before the applications
 
 SUBDIRS = defaults libsmf libsmurf libsc2sim libacsis libaztec libgsd \
+          libsmfftsio \
           libsupercam \
           libsc2fts scripts docs
 
@@ -176,6 +177,7 @@ dist_pkgdata_DATA = LICENCE $(EXAMPLE_FILES)
 smurf_mon_LDADD = libsmurf/libsmurf.la libsc2sim/libsc2sim.la \
                   libgsd/libgsd.la \
                   libsmf/libsmf.la libaztec/libaztec.la \
+                  libsmfftsio/libsmfftsio.la \
                   libsupercam/libsupercam.la \
                   libacsis/libacsis.la \
                   libsc2fts/libsc2fts.la                \

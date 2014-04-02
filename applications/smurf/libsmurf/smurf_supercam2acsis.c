@@ -106,6 +106,7 @@
 #include "libsmf/smf.h"
 #include "smurflib.h"
 #include "jcmt/state.h"
+#include "libsmfftsio/smfftsio.h"
 #include "libsupercam/supercam.h"
 #include "libacsis/specwrite/specwrite.h"
 
@@ -223,7 +224,7 @@ void smurf_supercam2acsis( int *status ) {
     /* Read the HDU and store it in a FitsChan for easy parsing  */
     /* Read early so that we can get the observation number */
     fitschan = astFitsChan ( NULL, NULL, " " );
-    supcam_read_fitshdr( fits, fitschan, status );
+    smfftsio_read_fitshdr( fits, fitschan, status );
 
     /* Form ACSIS header from this Supercam header */
     acsisfits = astFitsChan( NULL, NULL, " " );

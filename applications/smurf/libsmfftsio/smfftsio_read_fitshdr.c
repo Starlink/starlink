@@ -1,7 +1,7 @@
 /*
 *+
 *  Name:
-*     supcam_read_fitshdu
+*     smfftsio_read_fitshdr
 
 *  Purpose:
 *     Populate a FitsChan from a FITS file opened with CFITSIO
@@ -13,12 +13,12 @@
 *     Library routine
 
 *  Invocation:
-*     void supcam_read_fitshdr( fitsfile *fptr, AstFitsChan * fitschan, int * status );
+*     void smfftsio_read_fitshdr( fitsfile *fptr, AstFitsChan * fitschan, int * status );
 
 *  Arguments:
 *     fptr = fitsfile * (Given)
 *        CFITSIO pointer
-*     fitschan = AstrFitsChan * (Given and Returned)
+*     fitschan = AstFitsChan * (Given and Returned)
 *        FitsChan to be populated from the FITS file.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -33,7 +33,7 @@
 
 *  Notes:
 *     - The currently selected HDU will be read.
-*     - The routine is not Supercam-specific.
+*     - The routine is not instrument-specific.
 *     - We may want to consider adding this routine to ATL (which would
 *       require a new cfitsio dependency on it but it could be a separate
 *       library for linking purposes).
@@ -68,14 +68,14 @@
 *-
 */
 
-#include "supercam.h"
+#include "smfftsio.h"
 
 #include "ast.h"
 #include "fitsio.h"
 #include "sae_par.h"
 
 void
-supcam_read_fitshdr( fitsfile *fptr, AstFitsChan * fitschan, int * status ) {
+smfftsio_read_fitshdr( fitsfile *fptr, AstFitsChan * fitschan, int * status ) {
 
   int fitsStatus = 0;
   int nkeys = 0;

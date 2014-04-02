@@ -86,29 +86,7 @@ size_t supcam_name_to_beam_num( const char * name, int * status );
 float *
 supcam_read_data( fitsfile * fits, size_t * numRows, size_t * numChans, int * status );
 
-void
-supcam_read_fitshdr( fitsfile *fptr, AstFitsChan * fitschan, int * status );
-
 SupercamSpecHdr *
 supcam_read_tabmetadata( fitsfile * fits, size_t maxRows, int * status );
-
-/* Macro to wrap calls to cfitsio so that Starlink error status is handled.
-   Assumes that Starlink is *status and FITS is fitsStatus.
-   Will add messages from the CFITSIO message stack.
-   If errmsg=NULL no additional message will be added.
- */
-#define CALLCFITSIO(X, errmsg )                                         \
-  if (*status == SAI__OK) {                                             \
-    X;                                                                  \
-    if ( fitsStatus != 0 ) {                                            \
-      char xxerrmsg[FLEN_ERRMSG];                                       \
-      *status = SAI__ERROR;                                             \
-      fits_get_errstatus( fitsStatus, xxerrmsg );                       \
-      errRepf( "", "FITSIO: %d -- %s", status, fitsStatus, xxerrmsg );  \
-      while ( fits_read_errmsg(xxerrmsg) ) errRepf("", "FITSIO: %s", status, xxerrmsg ); \
-      if (errmsg) errRep( "", errmsg, status );                         \
-    }                                                                   \
-  }
-
 
 #endif

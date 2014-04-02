@@ -67,6 +67,7 @@
 *-
 */
 
+#include "libsmfftsio/smfftsio.h"
 #include "supercam.h"
 #include "fitsio.h"
 
