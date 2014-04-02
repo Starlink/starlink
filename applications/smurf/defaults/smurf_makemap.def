@@ -278,7 +278,7 @@ ast.zero_snr_hipass = 0.0
 #               SNR mask requested by parameter "ast.zero_snr" to be
 #               based on a copy of the SNR map that has been low-pass
 #               filtering (i.e smoothed) to remove noise and other
-#               features smaller than the number of arc-seconds given
+#               features smaller than the number of map pixels given
 #               by ast.zero_snr_lopass. This may help to prevent pixels
 #               oscillating in and out of the mask on successive
 #               iterations, and thus aid smoother convergence.
@@ -570,7 +570,7 @@ com.zero_snr_hipass = 0.0
 #               SNR mask requested by parameter "com.zero_snr" to be
 #               based on a copy of the SNR map that has been low-pass
 #               filtering (i.e smoothed) to remove noise and other
-#               features smaller than the number of arc-seconds given
+#               features smaller than the number of map pixels given
 #               by com.zero_snr_lopass. This may help to prevent pixels
 #               oscillating in and out of the mask on successive
 #               iterations, and thus aid smoother convergence.
@@ -1573,7 +1573,7 @@ flt.zero_snr_hipass = 0.0
 #               SNR mask requested by parameter "flt.zero_snr" to be
 #               based on a copy of the SNR map that has been low-pass
 #               filtering (i.e smoothed) to remove noise and other
-#               features smaller than the number of arc-seconds given
+#               features smaller than the number of map pixels given
 #               by flt.zero_snr_lopass. This may help to prevent pixels
 #               oscillating in and out of the mask on successive
 #               iterations, and thus aid smoother convergence.
