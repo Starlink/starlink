@@ -34,7 +34,7 @@
 #     Performs the given method on this object.
 
 #  Copyright:
-#     Copyright (C) 2008-2009 Science and Technology Facilities Council
+#     Copyright (C) 2008-2014 Science and Technology Facilities Council
 #     All Rights Reserved.
 
 #  Licence:
@@ -253,7 +253,7 @@ itcl::class gaiavo::GaiaVORegistrySearch {
    #  Read the query directly from an existing file.
    public method read_query {filename} {
 
-      #  Convert to a TST file so we can open it up as usual.
+      #  Convert to a TST file so we can open it up as usual. 
       set vot [gaiavotable::open $filename]
 
       #  Check the STATUS return.
@@ -266,6 +266,32 @@ itcl::class gaiavo::GaiaVORegistrySearch {
 
          #  This is the current VOTable now.
          set votable_ $filename
+
+         #  Wart: seems that registries do not only return resources with the
+         #  expected capability class, so apply a retrospective filter. Esp.
+         #  bad for TAP services. Shouldn't be a large response so just eat the
+         #  file process into the same name.
+         set fp [::open $tempname]
+         set data [::read $fp]
+         ::close $fp
+         set fp [::open $tempname "w"]
+         set pattern [get_service_]
+         set ok 1
+         foreach line [split $data "\n"] {
+            if { $ok } {
+               #  Just passthrough header section.
+               if { [string first "--" $line] == 0 } {
+                  set ok 0
+               }
+               puts $fp $line
+            } else {
+               if { [string first $pattern $line] != -1 } {
+                  puts $fp $line
+               }
+            }
+         }
+         ::close $fp
+
       } else {
          set status 0
          set tempname \
@@ -284,7 +310,7 @@ itcl::class gaiavo::GaiaVORegistrySearch {
    #  The type of VO registry to query, NVO or AstroGrid.
    itk_option define -registry registry Registry "NVO"
 
-   #  The type of query, SIAP, SSAP or CONE.
+   #  The type of query, SIAP, SSAP, CONE or TAP.
    itk_option define -service service Service "SIAP"
 
    #  Command to execute when a list of servers is accepted.
@@ -333,12 +359,14 @@ itcl::class gaiavo::GaiaVORegistrySearch {
    set services_(SIAP) "SimpleImageAccess"
    set services_(SSAP) "SimpleSpectralAccess"
    set services_(CONE) "ConeSearch"
+   set services_(TAP)  "TableAccess"
 
    #  Mapping of short service names to their standard ids.
    protected common standardIDs_
    set standardIDs_(SIAP) "ivo://ivoa.net/std/SIA"
    set standardIDs_(SSAP) "ivo://ivoa.net/std/SSA"
    set standardIDs_(CONE) "ivo://ivoa.net/std/ConeSearch"
+   set standardIDs_(TAP)  "ivo://ivoa.net/std/TAP"
 
    #  Possible columns for adding a predicate.
    protected common columns_ "title shortName"

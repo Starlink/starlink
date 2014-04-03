@@ -1,0 +1,121 @@
+#!/bin/sh
+# The next line is executed by /bin/sh, but not Tcl \
+exec $GAIA_DIR/gaiavo_tcl $0 ${1+"$@"}
+#+
+#   Name:
+#      querytap
+
+#   Purpose:
+#      Query a TAP service synchronously.
+
+#   Usage:
+#      querytap endpoint "adql-query" outfile
+
+#   Description:
+#      Queries a TAP service using the given ADQL expression. Currently
+#      we do this synchronously so the result is a VOTable catalogue
+#      containing the result.
+
+#   Authors:
+#      Peter W. Draper (PWD):
+
+#  Copyright:
+#     Copyright (C) 2014 Science and Technology Facilties Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of the
+#     License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+#     of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
+#     02110-1301, USA
+
+#   History:
+#      28-MAR-2014 (PWD):
+#         Original version.
+#-
+#.
+
+package require uri
+
+#  Check the command-line arguments.
+if { $argc == 3 } {
+   set endpoint [lindex $argv 0]
+   set adql [lindex $argv 1]
+   set outfile [lindex $argv 2]
+} else {
+   puts stderr {Usage: querytap endpoint adql outfile}
+   exit 1
+}
+
+#  Open the output file, just a test.
+if { [catch "::open $outfile w" fid] } {
+   puts stderr "Failed to open output file: $outfile"
+   exit 1
+}
+::close $fid
+
+#  Establish the standard proxy define using http_proxy.
+#cat::ProxyDialog::check_proxies $::env(HOME)/.skycat/proxies
+set proxy {}
+set port {}
+if { [info exists ::env(http_proxy)] } {
+   if { [scan $::env(http_proxy) {http://%[^:/]:%d} proxy port] != 2 } {
+      scan $::env(http_proxy) {http://%[^:/]} proxy
+   }
+}
+::http::config -proxyhost $proxy
+::http::config -proxyport $port
+
+#  Proc to do the query. Needed as can be recursive if redirected.
+proc get {endpoint query outfile} {
+
+   #  Open the result file.
+   set fid [::open $outfile w]
+
+   #  Download the response.
+   if { [catch {set response [::http::geturl $endpoint -query $query] } msg] } {
+
+      #  Failed, so delete file and exit with an error.
+      catch {
+         ::close $fid
+         ::file delete $outfile
+      }
+      puts stderr "$msg"
+      return 1
+   }
+
+   #  Check for a moved response and handle the re-direct.
+   if { [::http::ncode $response] == 302 || [::http::ncode $response] == 303 } {
+      array set meta [eval set $response\(meta\)]
+      set location $meta(Location)
+      puts "Redirected to: $newquery"
+      catch {::close $fid}
+      get $location $query $outfile
+      return
+   }
+
+   #  Get content and copy to the file.
+   puts $fid [::http::data $response]
+
+   catch {::close $fid}
+   return 0
+}
+
+#  Construct a query suitable for POSTing to the service.
+set query [::http::formatQuery REQUEST doQuery LANG ADQL QUERY "$adql"]
+
+#  Do it.
+if { [get "${endpoint}/sync" "$query" $outfile] == 1 } {
+   exit 1
+}
+exit

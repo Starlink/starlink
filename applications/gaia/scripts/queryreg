@@ -134,7 +134,7 @@ set where "\
     </Condition>
 
     <Condition xsi:type=\"likePredType\">
-       <Arg Table=\"\" name=\"title\" xpathName=\"title\" xsi:type=\"columnReferenceType\"/>
+       <Arg Table=\"\" name=\"${column}\" xpathName=\"${column}\" xsi:type=\"columnReferenceType\"/>
        <Pattern xsi:type=\"atomType\">
           <Literal Value=\"%${substring}%\" xsi:type=\"stringType\"/>
        </Pattern>

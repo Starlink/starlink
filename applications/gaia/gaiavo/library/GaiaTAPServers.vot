@@ -1,0 +1,1413 @@
+<VOTABLE xmlns="http://www.ivoa.net/xml/VOTable/v1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:vs="http://www.ivoa.net/xml/VODataService/v1.0" xmlns:stc="http://www.ivoa.net/xml/STC/stc-v1.30.xsd" xmlns:vr="http://www.ivoa.net/xml/VOResource/v1.0" xmlns:ri="http://www.ivoa.net/xml/RegistryInterface/v1.0" xmlns:vot="http://www.ivoa.net/xml/VOTable/v1.1">
+    <DESCRIPTION>Registry Search Results</DESCRIPTION>
+    <RESOURCE name="Search Results">
+        <TABLE name="results">
+            <FIELD ID="tags" name="categories" datatype="char" arraysize="*"/>
+            <FIELD ID="shortName" name="shortName" datatype="char" arraysize="*"/>
+            <FIELD ID="title" name="title" datatype="char" arraysize="*"/>
+            <FIELD ID="description" name="description" datatype="char" arraysize="*"/>
+            <FIELD ID="publisher" name="publisher" datatype="char" arraysize="*"/>
+            <FIELD ID="waveband" name="waveband" datatype="char" arraysize="*"/>
+            <FIELD ID="identifier" name="identifier" datatype="char" arraysize="*" ucd="ID_MAIN"/>
+            <FIELD ID="updated" name="descriptionUpdated" datatype="char" arraysize="*"/>
+            <FIELD ID="subject" name="subject" datatype="char" arraysize="*"/>
+            <FIELD ID="type" name="type" datatype="char" arraysize="*"/>
+            <FIELD ID="contentLevel" name="contentLevel" datatype="char" arraysize="*"/>
+            <FIELD ID="regionOfRegard" name="typicalRegionSize" datatype="int" unit="arcsec"/>
+            <FIELD ID="version" name="version" datatype="char" arraysize="*"/>
+            <FIELD ID="capabilityClass" name="capabilityClass" datatype="char" arraysize="*"/>
+            <FIELD ID="capabilityID" name="capabilityStandardID" datatype="char" arraysize="*"/>
+            <FIELD ID="capabilityValidationLevel" name="capabilityValidationLevel" datatype="char" arraysize="*"/>
+            <FIELD ID="interfaceClass" name="interfaceClass" datatype="char" arraysize="*"/>
+            <FIELD ID="interfaceVersion" name="interfaceVersion" datatype="char" arraysize="*"/>
+            <FIELD ID="interfaceRole" name="interfaceRole" datatype="char" arraysize="*"/>
+            <FIELD ID="accessURL" name="accessURL" datatype="char" arraysize="*"/>
+            <FIELD ID="supportedInputParam" name="supportedInputParam" datatype="char" arraysize="*"/>
+            <FIELD ID="maxRadius" name="maxSearchRadius" datatype="int"/>
+            <FIELD ID="maxRecords" name="maxRecords" datatype="int"/>
+            <FIELD ID="publisherID" name="publisherIdentifier" datatype="char" arraysize="*"/>
+            <FIELD ID="referenceURL" name="referenceURL" datatype="char" arraysize="*"/>
+            <DATA>
+                <TABLEDATA>
+                    <TR>
+                        <TD>#Catalog#Catalog#HTTP Request#Custom Service#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#</TD>
+                        <TD>VMC DR2</TD>
+                        <TD>VMC DR2 - VISTA Magellanic System survey</TD>
+                        <TD>The VMC survey aims to obtain YJKs band photometry across the system down to Ks=20.3 at S/N=10. This sensitivity corresponds to the bottom of the red giant branch field stellar population and allows us to determine the global spatially resolved star formation history with unprecedented quality and to construct a three-dimensional map of the system. A wide-area encompassing the D25 as well as major features delineated by the distribution of stars and HI gas, will both trace the structure of the galaxies and signatures of past and present interactions. Contemporary optical and kinematic observations of comparable sensitivity will provide the community with a superior database for future studies of the system and will give us an excellent insight as to what has happened elsewhere in the Universe.</TD>
+                        <TD>WFAU, Institute for Astronomy, University of Edinburgh</TD>
+                        <TD/>
+                        <TD>ivo://wfau.roe.ac.uk/vmcDR2-dsa</TD>
+                        <TD>2014-03-05T15:21:25</TD>
+                        <TD>#Infrared, survey, galaxy, Marellanic Cloud#</TD>
+                        <TD>#Survey#</TD>
+                        <TD>#Research#</TD>
+                        <TD/>
+                        <TD>Data Release 2</TD>
+                        <TD>ConeSearch</TD>
+                        <TD>ivo://ivoa.net/std/ConeSearch</TD>
+                        <TD/>
+                        <TD>ParamHTTP</TD>
+                        <TD/>
+                        <TD>std</TD>
+                        <TD>http://wfaudata.roe.ac.uk/vmcDR2-dsa/DirectCone?DSACAT=VMC_DR2&amp;DSATAB=vmcSource&amp;</TD>
+                        <TD/>
+                        <TD>1.500000</TD>
+                        <TD>2000000</TD>
+                        <TD>ivo://wfau.roe.ac.uk</TD>
+                        <TD>http://www.star.herts.ac.uk/~mcioni/vmc/</TD>
+                    </TR>
+                    <TR>
+                        <TD>#Catalog#Catalog#HTTP Request#Custom Service#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#</TD>
+                        <TD>VIDEO DR3</TD>
+                        <TD>VIDEO DR3 - VISTA Deep Extragalactic Observations survey</TD>
+                        <TD>The VIDEO survey is a 30 sq. degree, Z,Y,J,H,K survey that is specifically designed to enable exploration of the main issues in observational cosmology. It allows galaxy and cluster/structure evolution to be traced as a function of both epoch and environment from the present day out to z=4 and AGN/QSO evolution up to and into the epoch of reionization at z &gt; 6. The multi-band nature of the survey ensures many key science drivers can be tackled using the survey alone, without recourse to data from other wavebands.</TD>
+                        <TD>WFAU, Institute for Astronomy, University of Edinburgh</TD>
+                        <TD/>
+                        <TD>ivo://wfau.roe.ac.uk/videoDR3-dsa</TD>
+                        <TD>2014-03-05T15:21:05</TD>
+                        <TD>#Observational cosmology, galaxy, cluster, evolution, infrared#</TD>
+                        <TD>#Survey#</TD>
+                        <TD>#Research#</TD>
+                        <TD/>
+                        <TD>Data Release 3</TD>
+                        <TD>ConeSearch</TD>
+                        <TD>ivo://ivoa.net/std/ConeSearch</TD>
+                        <TD/>
+                        <TD>ParamHTTP</TD>
+                        <TD/>
+                        <TD>std</TD>
+                        <TD>http://wfaudata.roe.ac.uk/videoDR3-dsa/DirectCone?DSACAT=VIDEO_DR3&amp;DSATAB=videoSource&amp;</TD>
+                        <TD/>
+                        <TD>1.500000</TD>
+                        <TD>2000000</TD>
+                        <TD>ivo://wfau.roe.ac.uk</TD>
+                        <TD>http://arxiv.org/abs/1206.4263</TD>
+                    </TR>
+                    <TR>
+                        <TD>#Catalog#Catalog#HTTP Request#Custom Service#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#</TD>
+                        <TD>VHS DR2</TD>
+                        <TD>VHS DR2 - VISTA Hemisphere Survey Data Release 2</TD>
+                        <TD>The VHS will image the entire ~20 000 square degrees of the Southern Sky, with the exception of the areas already covered by the VIKING and VVV surveys, in J and Ks. The resulting data will be about 4 magnitudes deeper than 2MASS and DENIS. The 5000 square degrees covered by the Dark Energy Survey (DES), another imaging survey scheduled to begin in 2010 at the CTIO 4 metre Blanco telescope, will also be observed in H-band. The area around both of the Galactic Caps will be observed in Y- and H- band as well to be combined with the data from the VST ATLAS survey. The main science drivers of the VHS include: examining low mass and nearby stars, studying the merger history of the Galaxy, measuring the properties of Dark Energy through the examination of large-scale structure to a redshift of ~1, and searches for high redshift quasars.</TD>
+                        <TD>WFAU, Institute for Astronomy, University of Edinburgh</TD>
+                        <TD/>
+                        <TD>ivo://wfau.roe.ac.uk/vhsDR2-dsa</TD>
+                        <TD>2014-03-05T15:21:56</TD>
+                        <TD>#Stars,Survey,Galaxy, low mass stars, dark energy#</TD>
+                        <TD>#Survey#</TD>
+                        <TD>#Research#</TD>
+                        <TD/>
+                        <TD>Data Release 2</TD>
+                        <TD>ConeSearch</TD>
+                        <TD>ivo://ivoa.net/std/ConeSearch</TD>
+                        <TD/>
+                        <TD>ParamHTTP</TD>
+                        <TD/>
+                        <TD>std</TD>
+                        <TD>http://wfaudata.roe.ac.uk/vhsDR2-dsa/DirectCone?DSACAT=VHS_DR2&amp;DSATAB=vhsSource&amp;</TD>
+                        <TD/>
+                        <TD>1.500000</TD>
+                        <TD>2000000</TD>
+                        <TD>ivo://wfau.roe.ac.uk</TD>
+                        <TD>http://www.ast.cam.ac.uk/~rgm/vhs/</TD>
+                    </TR>
+                    <TR>
+                        <TD>#Catalog#Catalog#HTTP Request#Custom Service#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#</TD>
+                        <TD>VIKING DR3</TD>
+                        <TD>VIKING - VISTA Kilo-degree Infrared Galaxy survey Data Release 3</TD>
+                        <TD>The VIKING survey is the VISTA counterpart to the VST KIDS survey. The KIDS survey will cover 1500 deg^2 in u,g,r,i divided in two stripes (NGP, centred on equator ; SGP, centred on Dec = -30). The matching VISTA survey will cover (almost) all of these stripes in Z,Y,J,H, Ks with ~ 400s exposures per band.</TD>
+                        <TD>WFAU, Institute for Astronomy, University of Edinburgh</TD>
+                        <TD/>
+                        <TD>ivo://wfau.roe.ac.uk/vikingDR3-dsa</TD>
+                        <TD>2013-12-17T11:24:57</TD>
+                        <TD>#Infrared, survey, galaxy, point source, KIDS#</TD>
+                        <TD>#Survey#</TD>
+                        <TD>#Research#</TD>
+                        <TD/>
+                        <TD>Data Release 3</TD>
+                        <TD>ConeSearch</TD>
+                        <TD>ivo://ivoa.net/std/ConeSearch</TD>
+                        <TD/>
+                        <TD>ParamHTTP</TD>
+                        <TD/>
+                        <TD>std</TD>
+                        <TD>http://wfaudata.roe.ac.uk/vikingDR3-dsa/DirectCone?DSACAT=VIKING_DR3&amp;DSATAB=vikingSource&amp;</TD>
+                        <TD/>
+                        <TD>1.500000</TD>
+                        <TD>2000000</TD>
+                        <TD>ivo://wfau.roe.ac.uk</TD>
+                        <TD>http://www.astro-wise.org/projects/VIKING/</TD>
+                    </TR>
+                    <TR>
+                        <TD>#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#HTTP Request#Custom Service#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#</TD>
+                        <TD>UKIDSS DR9</TD>
+                        <TD>UKIDSS DR9 - UKIRT Infrared Deep Sky Survey Data Release 9</TD>
+                        <TD>This DSA hosts data release 9 of the UKIRT Infrared Deep Sky Survey housed at the Wide Field Astronomy Unit at the Univeristy of Edinburgh. This catalog contains WFCAM data primarily originating from four of the five UKIDSS surveys: Large Area Survey, Galactic Clusters Survey, Deep Extragalactic Survey, and Ultra Deep Survey. (see www.ukidss.org for survey descriptions)</TD>
+                        <TD>WFAU, Institute for Astronomy, University of Edinburgh</TD>
+                        <TD/>
+                        <TD>ivo://wfau.roe.ac.uk/ukidssDR9-dsa</TD>
+                        <TD>2013-12-17T12:01:59</TD>
+                        <TD>#Infrared, survey, galaxy, point source#</TD>
+                        <TD>#Survey#</TD>
+                        <TD>#Research#</TD>
+                        <TD/>
+                        <TD>Data Release 9</TD>
+                        <TD>ConeSearch</TD>
+                        <TD>ivo://ivoa.net/std/ConeSearch</TD>
+                        <TD/>
+                        <TD>ParamHTTP</TD>
+                        <TD/>
+                        <TD>std</TD>
+                        <TD>http://wfaudata.roe.ac.uk/ukidssDR9-dsa/DirectCone?DSACAT=UKIDSS_DR9&amp;DSATAB=lasSource&amp;</TD>
+                        <TD/>
+                        <TD>1.500000</TD>
+                        <TD>2000000</TD>
+                        <TD>ivo://wfau.roe.ac.uk</TD>
+                        <TD>http://surveys.roe.ac.uk/wsa</TD>
+                    </TR>
+                    <TR>
+                        <TD>#Catalog#HTTP Request#Custom Service#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#</TD>
+                        <TD/>
+                        <TD>2MASS Photometric Redshift catalogue (2MPZ)</TD>
+                        <TD>The 2MASS Photometric Redshift catalogue (2MPZ) is constructed by cross-matching 2MASS XSC, WISE and SuperCOSMOS all-sky samples and employing the artificial neural network approach (the ANNz algorithm, Collister &amp; Lahav 2004), trained on several redshift surveys (2MRS, SDSS, 6dFGS, 2dFGRS and ZCAT). The derived photometric redshifts have errors nearly independent of distance, with an all-sky accuracy of Ïz = 0.015, and a very small percentage of outliers. These redshift estimates have a typical precision of 12% for all the 2MASS XSC galaxies that lack spectroscopy. The resulting 2MPZ sample contains almost 1 million galaxies with a median redshift of z=0.07. This catalogue is described in Bilicki et al. 2014, ApJS, 210, 9.</TD>
+                        <TD>WFAU, Institute for Astronomy, University of Edinburgh</TD>
+                        <TD/>
+                        <TD>ivo://wfau.roe.ac.uk/twompz-dsa</TD>
+                        <TD>2013-12-17T14:03:25</TD>
+                        <TD>#survey, Twomass, galaxy, redshift#</TD>
+                        <TD>#Catalog#</TD>
+                        <TD>#Research#</TD>
+                        <TD/>
+                        <TD>Data Release 1</TD>
+                        <TD>ConeSearch</TD>
+                        <TD>ivo://ivoa.net/std/ConeSearch</TD>
+                        <TD/>
+                        <TD>ParamHTTP</TD>
+                        <TD/>
+                        <TD>std</TD>
+                        <TD>http://wfaudata.roe.ac.uk/twompz-dsa/DirectCone?DSACAT=TwoMPZ&amp;DSATAB=twompzPhotoz&amp;</TD>
+                        <TD/>
+                        <TD>1.500000</TD>
+                        <TD>2000000</TD>
+                        <TD>ivo://wfau.roe.ac.uk</TD>
+                        <TD>http://surveys.roe.ac.uk/ssa/TWOMPZ</TD>
+                    </TR>
+                    <TR>
+                        <TD>#Catalog#Catalog#HTTP Request#Custom Service#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#</TD>
+                        <TD/>
+                        <TD>ATLAS DR1 - VST ATLAS Survey</TD>
+                        <TD>This DSA hosts data release 1 of the ATLAS Survey housed at the Wide Field Astronomy Unit at the Univeristy of Edinburgh. The initial aim of ATLAS is to survey 4500 deg2 of the Southern Sky at high galactic latitudes to comparable depths to the SDSS in the North. The VST ATLAS will be the first step towards a panoramic digital survey of the Southern Sky in the optical bands. The ATLAS will complement the proposed VISTA Hemisphere Survey in the South.</TD>
+                        <TD>WFAU, Institute for Astronomy, University of Edinburgh</TD>
+                        <TD/>
+                        <TD>ivo://wfau.roe.ac.uk/atlasDR1-dsa</TD>
+                        <TD>2013-12-05T12:08:38</TD>
+                        <TD>#survey, galaxy, point source#</TD>
+                        <TD>#Survey#</TD>
+                        <TD>#Research#</TD>
+                        <TD/>
+                        <TD>Data Release 1</TD>
+                        <TD>ConeSearch</TD>
+                        <TD>ivo://ivoa.net/std/ConeSearch</TD>
+                        <TD/>
+                        <TD>ParamHTTP</TD>
+                        <TD/>
+                        <TD>std</TD>
+                        <TD>http://wfaudata.roe.ac.uk/atlasDR1-dsa/DirectCone?DSACAT=ATLAS_DR1&amp;DSATAB=atlasDetection&amp;</TD>
+                        <TD/>
+                        <TD>1.500000</TD>
+                        <TD>2000000</TD>
+                        <TD>ivo://wfau.roe.ac.uk</TD>
+                        <TD>http://astro.dur.ac.uk/Cosmology/vstatlas/</TD>
+                    </TR>
+                    <TR>
+                        <TD>#Catalog#HTTP Request#Custom Service#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#</TD>
+                        <TD/>
+                        <TD>WISE (Wide-field Infrared Survey Explorer)</TD>
+                        <TD>NASA's Wide-field Infrared Survey Explorer (WISE; Wright et al. 2010) mapped the sky at 3.4, 4.6, 12, and 22 Î¼m (W1, W2, W3, W4) in 2010 with an angular resolution of 6.1", 6.4", 6.5", &amp; 12.0" in the four bands. WISE achieved 5Ï? point source sensitivities better than 0.08, 0.11, 1 and 6 mJy in unconfused regions on the ecliptic in the four bands. Sensitivity improves toward the ecliptic poles due to denser coverage and lower zodiacal background.</TD>
+                        <TD>WFAU, Institute for Astronomy, University of Edinburgh</TD>
+                        <TD>#Infrared#</TD>
+                        <TD>ivo://wfau.roe.ac.uk/wise-dsa</TD>
+                        <TD>2013-05-30T16:20:40</TD>
+                        <TD>#WISE all-sky infrared#</TD>
+                        <TD>#Survey#</TD>
+                        <TD>#Research#</TD>
+                        <TD/>
+                        <TD>Data Release March 14, 2012</TD>
+                        <TD>ConeSearch</TD>
+                        <TD>ivo://ivoa.net/std/ConeSearch</TD>
+                        <TD/>
+                        <TD>ParamHTTP</TD>
+                        <TD/>
+                        <TD>std</TD>
+                        <TD>http://wfaudata.roe.ac.uk/wise-dsa/DirectCone?DSACAT=WISE&amp;DSATAB=wise_allskysc&amp;</TD>
+                        <TD/>
+                        <TD>1.500000</TD>
+                        <TD>2000000</TD>
+                        <TD>ivo://wfau.roe.ac.uk</TD>
+                        <TD>http://wise2.ipac.caltech.edu/docs/release/allsky/</TD>
+                    </TR>
+                    <TR>
+                        <TD>#Catalog#HTTP Request#Custom Service#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#</TD>
+                        <TD/>
+                        <TD>Millennium Galaxy Catalogue (MGC)</TD>
+                        <TD>The Millennium Galaxy Catalogue (MGC) is a 37.5 deg2, medium-deep, B-band imaging survey obtained with the Wide Field Camera on the INT. The survey region is a long, 35 arcmin wide strip along the equator, covering from 10h 00m to 14h 45m and is fully contained within the regions of both the Two Degree Field Galaxy Redshift Survey (2dFGRS) and the Sloan Digital Sky Survey (SDSS).</TD>
+                        <TD>WFAU, Institute for Astronomy, University of Edinburgh</TD>
+                        <TD>#Optical#</TD>
+                        <TD>ivo://wfau.roe.ac.uk/mgc-dsa</TD>
+                        <TD>2013-05-30T16:20:00</TD>
+                        <TD>#MGC B-band Galaxy Survey#</TD>
+                        <TD>#Survey#</TD>
+                        <TD>#Research#</TD>
+                        <TD/>
+                        <TD>1.0</TD>
+                        <TD>ConeSearch</TD>
+                        <TD>ivo://ivoa.net/std/ConeSearch</TD>
+                        <TD/>
+                        <TD>ParamHTTP</TD>
+                        <TD/>
+                        <TD>std</TD>
+                        <TD>http://wfaudata.roe.ac.uk/mgc-dsa/DirectCone?DSACAT=MGC&amp;DSATAB=mgcDetection&amp;</TD>
+                        <TD/>
+                        <TD>1.500000</TD>
+                        <TD>2000000</TD>
+                        <TD>ivo://wfau.roe.ac.uk</TD>
+                        <TD>http://www.eso.org/~jliske/mgc/</TD>
+                    </TR>
+                    <TR>
+                        <TD>#Catalog#HTTP Request#Custom Service#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#</TD>
+                        <TD/>
+                        <TD>GALEX Release 6</TD>
+                        <TD>The Galaxy Evolution Explorer (GALEX) satellite is a NASA mission led by the California Institute of Technology to investigate how star formation in galaxies evolved from the early Universe up to the present. GALEX uses microchannel plate detectors to obtain direct images in the near-UV (NUV) and far-UV (FUV) and a grism to disperse light for low resolution spectroscopy</TD>
+                        <TD>WFAU, Institute for Astronomy, University of Edinburgh</TD>
+                        <TD>#UV#</TD>
+                        <TD>ivo://wfau.roe.ac.uk/galexgr6-dsa</TD>
+                        <TD>2013-05-30T16:19:49</TD>
+                        <TD>#UV#</TD>
+                        <TD>#Survey#</TD>
+                        <TD>#Research#</TD>
+                        <TD/>
+                        <TD>6</TD>
+                        <TD>ConeSearch</TD>
+                        <TD>ivo://ivoa.net/std/ConeSearch</TD>
+                        <TD/>
+                        <TD>ParamHTTP</TD>
+                        <TD/>
+                        <TD>std</TD>
+                        <TD>http://wfaudata.roe.ac.uk/galexgr6-dsa/DirectCone?DSACAT=GALEXGR6&amp;DSATAB=photoobjall&amp;</TD>
+                        <TD/>
+                        <TD>1.500000</TD>
+                        <TD>2000000</TD>
+                        <TD>ivo://wfau.roe.ac.uk</TD>
+                        <TD>http://galex.stsci.edu/GR6/</TD>
+                    </TR>
+                    <TR>
+                        <TD>#Catalog#HTTP Request#Custom Service#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#</TD>
+                        <TD/>
+                        <TD>Deep Near Infrared Survey of the Southern Sky (DENIS)</TD>
+                        <TD>Catalog of astrometry and photometry of detected point sources in the Far red optical (0.82-micron I-band) and near-infrared (1.25-micron J- and 2.15-micron Ks bands). ~16,700 square degrees of the southern sky</TD>
+                        <TD>WFAU, Institute for Astronomy, University of Edinburgh</TD>
+                        <TD>#Infrared#</TD>
+                        <TD>ivo://wfau.roe.ac.uk/denis-dsa</TD>
+                        <TD>2013-05-30T16:19:12</TD>
+                        <TD>#IR#</TD>
+                        <TD>#Survey#</TD>
+                        <TD>#Research#</TD>
+                        <TD/>
+                        <TD>1.0</TD>
+                        <TD>ConeSearch</TD>
+                        <TD>ivo://ivoa.net/std/ConeSearch</TD>
+                        <TD/>
+                        <TD>ParamHTTP</TD>
+                        <TD/>
+                        <TD>std</TD>
+                        <TD>http://wfaudata.roe.ac.uk/denis-dsa/DirectCone?DSACAT=DENIS&amp;DSATAB=denisDR3Source&amp;</TD>
+                        <TD/>
+                        <TD>1.500000</TD>
+                        <TD>2000000</TD>
+                        <TD>ivo://wfau.roe.ac.uk</TD>
+                        <TD>http://irsa.ipac.caltech.edu/Missions/denis.html</TD>
+                    </TR>
+                    <TR>
+                        <TD>#Catalog#Catalog#HTTP Request#Custom Service#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#</TD>
+                        <TD/>
+                        <TD>SDSS DR9 - Sloan Digital Sky Survey Data Release 9</TD>
+                        <TD>This is an AstroGrid Dataset Access installation of the Sloan Digital Sky Survey (SDSS) DR9 hosted by the Wide Field Astronomy Unit (WFAU), University of Edinburgh. WFAU would like to thank John Hopkins University and the University of Chicago for permission to host the data.</TD>
+                        <TD>WFAU, Institute for Astronomy, University of Edinburgh</TD>
+                        <TD/>
+                        <TD>ivo://wfau.roe.ac.uk/sdssdr9-dsa</TD>
+                        <TD>2013-05-07T16:08:44</TD>
+                        <TD>#Stars,Survey,Galaxy#</TD>
+                        <TD>#Survey#</TD>
+                        <TD>#Research#</TD>
+                        <TD/>
+                        <TD>Data Release 9</TD>
+                        <TD>ConeSearch</TD>
+                        <TD>ivo://ivoa.net/std/ConeSearch</TD>
+                        <TD/>
+                        <TD>ParamHTTP</TD>
+                        <TD/>
+                        <TD>std</TD>
+                        <TD>http://wfaudata.roe.ac.uk/sdssdr9-dsa/DirectCone?DSACAT=SDSS_DR9&amp;DSATAB=PhotoObjAll&amp;</TD>
+                        <TD/>
+                        <TD>1.500000</TD>
+                        <TD>2000000</TD>
+                        <TD>ivo://wfau.roe.ac.uk</TD>
+                        <TD>http://www.sdss.org/dr9/</TD>
+                    </TR>
+                    <TR>
+                        <TD>#HTTP Request#</TD>
+                        <TD>vo_mars</TD>
+                        <TD>august onboard Phobos2, atmospheric composition of mars</TD>
+                        <TD/>
+                        <TD>VO-Paris Data Centre - IPSL</TD>
+                        <TD/>
+                        <TD>ivo://vopdc.obspm/ipsl/epn_august</TD>
+                        <TD>2012-09-07T18:00:00.00</TD>
+                        <TD>#Virtual Observatory#Planets#</TD>
+                        <TD>#Archive#</TD>
+                        <TD>#General#University#Research#Amateur#</TD>
+                        <TD/>
+                        <TD>1</TD>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD>ivo://vopdc.obspm/IPSL</TD>
+                        <TD>TBD</TD>
+                    </TR>
+                    <TR>
+                        <TD>#HTTP Request#HTTP Request#HTTP Request#HTTP Request#Web Page#</TD>
+                        <TD>GAVO DC TAP</TD>
+                        <TD>GAVO Data Center TAP service</TD>
+                        <TD>The GAVO Data Center's TAP end point. The Table Access Protocol (TAP) lets you execute queries against our database tables, inspect various metadata, and upload your own data. It is thus the VO's premier way to access public data holdings. Tables exposed through this endpoint include: amanda.nucand, apo.frames, arigfh.gfh, arigfh.id, arigfh.identified, arigfh.master, arigfh.nid, arigfh.unidentified, arihip.main, basti.chemical, basti.key_points, basti.out_file, basti.physic_file, basti.program_param, basti.proprieties, basti.scenario, basti.units, browndwarfs.cat, califadr1.cubes, califadr1.fluxposv1200, califadr1.fluxposv500, califadr1.fluxv1200, califadr1.fluxv500, califadr1.objects, cars.images, cars.srccat, carsarcs.meta, danish.data, dmubin.main, fk6.fk6join, fk6.part1, fk6.part3, gcpms.data, glots.columns, glots.services, glots.tables, gums.galaxies, gums.lmc, gums.mw, gums.quasars, gums.smc, gums.sn, hiicounter.data, hipparcos.main, icecube.nucand, inflight.data, ivoa.obscore, katkat.katkat, lightmeter.measurements, lightmeter.stations, liverpool.rawframes, lspm.main, lsw.plates, maidanak.rawframes, mcextinct.exts, mlqso.cubes, mpc.mpcorb, obscode.data, ohmaser.bibrefs, ohmaser.masers, plc.data, potsdam.plates, potsdam.rawplates, ppmx.data, ppmxl.main, ppmxl.usnocorr, rave.dr3, rave.main, rr.capability, rr.interface, rr.intf_param, rr.relationship, rr.res_date, rr.res_detail, rr.res_role, rr.res_schema, rr.res_table, rr.resource, rr.stc_redshift, rr.stc_spatial, rr.stc_spectral, rr.stc_temporal, rr.subject, rr.table_column, rr.validation, sdssdr7.sources, spm4.main, supercosmos.sources, tap_schema.columns, tap_schema.examples, tap_schema.groups, tap_schema.key_columns, tap_schema.keys, tap_schema.schemas, tap_schema.tables, taptest.main, theossa.data, twomass.data, ucac3.icrscorr, ucac3.main, ucac3.ppmxlcross, ucac4.main, usnob.data, usnob.platecorrs, usnob.plates, usnob.ppmxcross, usnob.spurious, usnob.twomasscross, veronqsos.data.</TD>
+                        <TD>The GAVO DC team</TD>
+                        <TD/>
+                        <TD>ivo://org.gavo.dc/__system__/tap/run</TD>
+                        <TD>2013-01-28T11:27:33</TD>
+                        <TD>#Virtual observatory#Catalogs#ADQL#</TD>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD>TableAccess</TD>
+                        <TD>ivo://ivoa.net/std/TAP</TD>
+                        <TD/>
+                        <TD>ParamHTTP</TD>
+                        <TD/>
+                        <TD>std</TD>
+                        <TD>http://dc.zah.uni-heidelberg.de/__system__/tap/run/tap</TD>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD>http://dc.zah.uni-heidelberg.de/__system__/tap/run/info</TD>
+                    </TR>
+                    <TR>
+                        <TD>#Catalog#Catalog#HTTP Request#Custom Service#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#</TD>
+                        <TD>VVV DR1</TD>
+                        <TD>VVV DR1 - VISTA Variables in the Via Lactea survey</TD>
+                        <TD>The VVV survey will perform wide FOV multi-epoch observations of the Galaxy's bulge and part of the disk, providing the astronomical public community with a high resolution 3-D (or 4-D if you include the time dimension) map of the bulge.</TD>
+                        <TD>WFAU, Institute for Astronomy, University of Edinburgh</TD>
+                        <TD>#Infrared#</TD>
+                        <TD>ivo://wfau.roe.ac.uk/vvvDR1-dsa</TD>
+                        <TD>2012-07-17T15:36:05</TD>
+                        <TD>#Infrared, survey, Milky Way, bulge#</TD>
+                        <TD>#Survey#</TD>
+                        <TD>#Research#</TD>
+                        <TD/>
+                        <TD>Data Release 1</TD>
+                        <TD>ConeSearch</TD>
+                        <TD>ivo://ivoa.net/std/ConeSearch</TD>
+                        <TD/>
+                        <TD>ParamHTTP</TD>
+                        <TD/>
+                        <TD>std</TD>
+                        <TD>http://wfaudata.roe.ac.uk/vvvDR1-dsa/DirectCone?DSACAT=VVV_DR1&amp;DSATAB=vvvSource&amp;</TD>
+                        <TD/>
+                        <TD>1.500000</TD>
+                        <TD>2000000</TD>
+                        <TD>ivo://wfau.roe.ac.uk</TD>
+                        <TD>http://mwm.astro.puc.cl/mw/index.php/Main_Page</TD>
+                    </TR>
+                    <TR>
+                        <TD>#Catalog#Catalog#HTTP Request#Custom Service#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#</TD>
+                        <TD>VMC DR1</TD>
+                        <TD>VMC DR1 - VISTA Magellanic System survey</TD>
+                        <TD>The VMC survey aims to obtain YJKs band photometry across the system down to Ks=20.3 at S/N=10. This sensitivity corresponds to the bottom of the red giant branch field stellar population and allows us to determine the global spatially resolved star formation history with unprecedented quality and to construct a three-dimensional map of the system. A wide-area encompassing the D25 as well as major features delineated by the distribution of stars and HI gas, will both trace the structure of the galaxies and signatures of past and present interactions. Contemporary optical and kinematic observations of comparable sensitivity will provide the community with a superior database for future studies of the system and will give us an excellent insight as to what has happened elsewhere in the Universe.</TD>
+                        <TD>WFAU, Institute for Astronomy, University of Edinburgh</TD>
+                        <TD>#Infrared#</TD>
+                        <TD>ivo://wfau.roe.ac.uk/vmcDR1-dsa</TD>
+                        <TD>2012-07-17T16:00:21</TD>
+                        <TD>#Infrared, survey, galaxy, Marellanic Cloud#</TD>
+                        <TD>#Survey#</TD>
+                        <TD>#Research#</TD>
+                        <TD/>
+                        <TD>Data Release 1</TD>
+                        <TD>ConeSearch</TD>
+                        <TD>ivo://ivoa.net/std/ConeSearch</TD>
+                        <TD/>
+                        <TD>ParamHTTP</TD>
+                        <TD/>
+                        <TD>std</TD>
+                        <TD>http://wfaudata.roe.ac.uk/vmcDR1-dsa/DirectCone?DSACAT=VMC_DR1&amp;DSATAB=vmcSource&amp;</TD>
+                        <TD/>
+                        <TD>1.500000</TD>
+                        <TD>2000000</TD>
+                        <TD>ivo://wfau.roe.ac.uk</TD>
+                        <TD>http://www.star.herts.ac.uk/~mcioni/vmc/</TD>
+                    </TR>
+                    <TR>
+                        <TD>#Catalog#Catalog#HTTP Request#Custom Service#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#</TD>
+                        <TD>VIKING DR2</TD>
+                        <TD>VIKING - VISTA Kilo-degree Infrared Galaxy survey Data Release 2</TD>
+                        <TD>The VIKING survey is the VISTA counterpart to the VST KIDS survey. The KIDS survey will cover 1500 deg^2 in u,g,r,i divided in two stripes (NGP, centred on equator ; SGP, centred on Dec = -30). The matching VISTA survey will cover (almost) all of these stripes in Z,Y,J,H, Ks with ~ 400s exposures per band.</TD>
+                        <TD>WFAU, Institute for Astronomy, University of Edinburgh</TD>
+                        <TD>#Infrared#</TD>
+                        <TD>ivo://wfau.roe.ac.uk/vikingDR2-dsa</TD>
+                        <TD>2012-07-17T15:45:28</TD>
+                        <TD>#Infrared, survey, galaxy, KIDS#</TD>
+                        <TD>#Survey#</TD>
+                        <TD>#Research#</TD>
+                        <TD/>
+                        <TD>Data Release 2</TD>
+                        <TD>ConeSearch</TD>
+                        <TD>ivo://ivoa.net/std/ConeSearch</TD>
+                        <TD/>
+                        <TD>ParamHTTP</TD>
+                        <TD/>
+                        <TD>std</TD>
+                        <TD>http://wfaudata.roe.ac.uk/vikingDR2-dsa/DirectCone?DSACAT=VIKING_DR2&amp;DSATAB=vikingSource&amp;</TD>
+                        <TD/>
+                        <TD>1.500000</TD>
+                        <TD>2000000</TD>
+                        <TD>ivo://wfau.roe.ac.uk</TD>
+                        <TD>http://www.astro-wise.org/projects/VIKING/</TD>
+                    </TR>
+                    <TR>
+                        <TD>#Catalog#Catalog#HTTP Request#Custom Service#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#</TD>
+                        <TD>VIDEO DR2</TD>
+                        <TD>VIDEO DR2 - VISTA Deep Extragalactic Observations survey</TD>
+                        <TD>The VIDEO survey is a 30 sq. degree, Z,Y,J,H,K survey that is specifically designed to enable exploration of the main issues in observational cosmology. It allows galaxy and cluster/structure evolution to be traced as a function of both epoch and environment from the present day out to z=4 and AGN/QSO evolution up to and into the epoch of reionization at z &gt; 6. The multi-band nature of the survey ensures many key science drivers can be tackled using the survey alone, without recourse to data from other wavebands.</TD>
+                        <TD>WFAU, Institute for Astronomy, University of Edinburgh</TD>
+                        <TD>#Infrared#</TD>
+                        <TD>ivo://wfau.roe.ac.uk/videoDR2-dsa</TD>
+                        <TD>2012-07-17T16:13:45</TD>
+                        <TD>#Observational cosmology, galaxy, cluster, evolution, infrared#</TD>
+                        <TD>#Survey#</TD>
+                        <TD>#Research#</TD>
+                        <TD/>
+                        <TD>Data Release 2</TD>
+                        <TD>ConeSearch</TD>
+                        <TD>ivo://ivoa.net/std/ConeSearch</TD>
+                        <TD/>
+                        <TD>ParamHTTP</TD>
+                        <TD/>
+                        <TD>std</TD>
+                        <TD>http://wfaudata.roe.ac.uk/videoDR2-dsa/DirectCone?DSACAT=VIDEO_DR2&amp;DSATAB=videoSource&amp;</TD>
+                        <TD/>
+                        <TD>1.500000</TD>
+                        <TD>2000000</TD>
+                        <TD>ivo://wfau.roe.ac.uk</TD>
+                        <TD>http://arxiv.org/abs/1206.4263</TD>
+                    </TR>
+                    <TR>
+                        <TD>#HTTP Request#</TD>
+                        <TD>apis</TD>
+                        <TD>auroral planetary imaging and spectroscopy</TD>
+                        <TD>Planetary aurorae are powerful emissions radiated from auroral regions of magnetized planets by accelerated charged particles, in a wide range of wavelengths (from radio to X-rays). The UV range in particular is adequate to measure collisionaly excited transitions of H and H2, the dominant species in the upper atmosphere of giant planets, produced by precipitating auroral particles, and benefits a good angular resolution. Auroral UV observations therefore provide a rich source of informations on planetary atmospheres and magnetospheres. They also offer a unique diagnostic to remotely probe the solar wind activity throughout the heliosphere..</TD>
+                        <TD>VO-Paris Data Centre - LESIA</TD>
+                        <TD/>
+                        <TD>ivo://vopdc.obspm/lesia/epn_apis</TD>
+                        <TD>2012-09-07T19:00:00.00</TD>
+                        <TD>#Virtual Observatory#Planets#</TD>
+                        <TD>#Archive#</TD>
+                        <TD>#General#University#Research#Amateur#</TD>
+                        <TD/>
+                        <TD>1</TD>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD>ivo://vopdc.obspm/lesia</TD>
+                        <TD>TBD</TD>
+                    </TR>
+                    <TR>
+                        <TD>#HTTP Request#</TD>
+                        <TD>titan</TD>
+                        <TD>Temperature vertical profiles in the Titan middle atmosphere</TD>
+                        <TD>This database displays the temperature vertical profiles in Titan's atmosphere at nine different latitudes between 100 and 500 km. These profiles were retrieved from the infrared spectra acquired by the Composite Infrared Spectrometer (CIRS) aboard the Cassini spacecraft. The retrieval method and the description of the used dataset is detailed by Vinatier et al., 2009, Analysis of Cassini/CIRS limb spectra of Titan acquired during the nominal mission. I: Hydrocarbons, nitriles and CO2 vertical mixing ratio profiles, Icarus, in press. doi:10.1016/j.icarus.2009.08.013.</TD>
+                        <TD>VO-Paris Data Centre - LESIA</TD>
+                        <TD/>
+                        <TD>ivo://vopdc.obspm/lesia/epn_titan</TD>
+                        <TD>2012-09-07T19:00:00.00</TD>
+                        <TD>#Virtual Observatory#Planets#</TD>
+                        <TD>#Archive#</TD>
+                        <TD>#General#University#Research#Amateur#</TD>
+                        <TD/>
+                        <TD>1</TD>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD>ivo://vopdc.obspm/lesia</TD>
+                        <TD>TBD</TD>
+                    </TR>
+                    <TR>
+                        <TD>#HTTP Request#</TD>
+                        <TD>bdip</TD>
+                        <TD>Base de Donnees d'Images Planetaires</TD>
+                        <TD>The database of planetary images (BDIP) comes from the digitization of photographs collected and preserved by the Center for Photographic Documentation of the planets held by the IAU at the Meudon Observatory in 1961 under the the curation of J.H. Focas (IAUC, 12th General Assembly, Report 1964). A similar center was established at the Lowell Observatory in Arizona, under the responsibility of W.A. Baum. The photographs were duplicated between the two centers.</TD>
+                        <TD>VO-Paris Data Centre - LESIA</TD>
+                        <TD/>
+                        <TD>ivo://vopdc.obspm/lesia/epn_bdip</TD>
+                        <TD>2012-09-07T19:00:00.00</TD>
+                        <TD>#Virtual Observatory#Planets#</TD>
+                        <TD>#Archive#</TD>
+                        <TD>#General#University#Research#Amateur#</TD>
+                        <TD/>
+                        <TD>1</TD>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD>ivo://vopdc.obspm/lesia</TD>
+                        <TD>TBD</TD>
+                    </TR>
+                    <TR>
+                        <TD>#HTTP Request#</TD>
+                        <TD>BASECOM</TD>
+                        <TD>The Nançay Cometary Database</TD>
+                        <TD>Since 1973, the 18-cm lines of the OH radical have been systematically observed in a number of comets with the Nançay radio telescope. This allowed an evaluation of the cometary water… production rates and their evolution with time, as well as a study of several physical processes: the excitation mechanisms of the OH radio lines, the expansion of the cometary atmospheres, their anisotropy in relation with non-gravitational forces, the Zeeman effect in relation with the cometary magnetic field. The Nançay observations of 53 cometary apparitions between 1982 and 2009 are now organized in this database.</TD>
+                        <TD>VO-Paris Data Centre - LESIA</TD>
+                        <TD>#Radio#</TD>
+                        <TD>ivo://vopdc.obspm/lesia/basecom</TD>
+                        <TD>2010-09-27T13:00:00</TD>
+                        <TD>#Virtual Observatory#Spectrum#Comets#</TD>
+                        <TD>#Archive#</TD>
+                        <TD>#General#University#Research#Amateur#</TD>
+                        <TD/>
+                        <TD>1</TD>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD>ivo://vopdc.obspm/lesia</TD>
+                        <TD>http://www.lesia.obspm.fr/planeto/cometes/basecom/</TD>
+                    </TR>
+                    <TR>
+                        <TD>#HTTP Request#</TD>
+                        <TD>TBD</TD>
+                        <TD>Abundance vertical profiles in the Titan middle atmosphere</TD>
+                        <TD>This database displays the abundance vertical profiles of C2H2, C2H4, C2H6, C3H8, CH3C2H, C4H2, C6H6, HCN, HC3N and CO2 in Titan's atmosphere at nine different latitudes between 100 and 500 km.… These profiles were retrieved from the infrared spectra acquired by the Composite Infrared Spectrometer (CIRS) aboard the Cassini spacecraft. The retrieval method and the description of the used dataset is detailed by Vinatier et al., 2009, Analysis of Cassini/CIRS limb spectra of Titan acquired during the nominal mission. I: Hydrocarbons, nitriles and CO2 vertical mixing ratio profiles, Icarus, in press. doi:10.1016/j.icarus.2009.08.013.</TD>
+                        <TD>VO-Paris Data Centre - LESIA</TD>
+                        <TD/>
+                        <TD>ivo://vopdc.obspm/lesia/titan/abundance</TD>
+                        <TD>2010-09-27T13:00:00</TD>
+                        <TD>#Virtual Observatory#Planets#</TD>
+                        <TD>#Archive#</TD>
+                        <TD>#General#University#Research#Amateur#</TD>
+                        <TD/>
+                        <TD>1</TD>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD>ivo://vopdc.obspm/lesia</TD>
+                        <TD>TBD</TD>
+                    </TR>
+                    <TR>
+                        <TD>#HTTP Request#</TD>
+                        <TD>TBD</TD>
+                        <TD>Temperature vertical profiles in the Titan middle atmosphere</TD>
+                        <TD>This database displays the temperature vertical profiles in Titan's atmosphere at nine different latitudes between 100 and 500 km. These profiles were retrieved from the infrared spectra acquired… by the Composite Infrared Spectrometer (CIRS) aboard the Cassini spacecraft. The retrieval method and the description of the used dataset is detailed by Vinatier et al., 2009, Analysis of Cassini/CIRS limb spectra of Titan acquired during the nominal mission. I: Hydrocarbons, nitriles and CO2 vertical mixing ratio profiles, Icarus, in press. doi:10.1016/j.icarus.2009.08.013.</TD>
+                        <TD>VO-Paris Data Centre - LESIA</TD>
+                        <TD/>
+                        <TD>ivo://vopdc.obspm/lesia/titan/temperature</TD>
+                        <TD>2010-09-27T13:00:00</TD>
+                        <TD>#Virtual Observatory#Planets#</TD>
+                        <TD>#Archive#</TD>
+                        <TD>#General#University#Research#Amateur#</TD>
+                        <TD/>
+                        <TD>1</TD>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD>ivo://vopdc.obspm/lesia</TD>
+                        <TD>TBD</TD>
+                    </TR>
+                    <TR>
+                        <TD>#HTTP Request#</TD>
+                        <TD/>
+                        <TD>HEASARC Xamin Catalog Interface</TD>
+                        <TD>The HEASARC is NASA domain archive for high-energy and microwave astronomy. The Xamin interface provides access to over 600 observation and object tables. This includes observation tables for more than 30 missions and observatories and hundreds of derived object tables. Non-high energy tables are included to make it easier for users to compare information.</TD>
+                        <TD>NASA/HEASARC</TD>
+                        <TD/>
+                        <TD>ivo://nasa.heasarc/services/xamin</TD>
+                        <TD>2012-01-19T00:00:00</TD>
+                        <TD>#high energy and microwave astronomy#</TD>
+                        <TD>#Catalog#</TD>
+                        <TD>#Research#</TD>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD>http://heasarc.gsfc.nasa.gov</TD>
+                    </TR>
+                    <TR>
+                        <TD>#Catalog#HTTP Request#Custom Service#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#</TD>
+                        <TD>2XMM</TD>
+                        <TD>XMM-Newton Serendipitous Source Catalogue (2XMM)</TD>
+                        <TD>XMM is the second comprehensive catalogue of serendipitous X-ray sources from the European Space Agency's (ESA) XMM-Newton observatory. The 2XMM catalogue is the largest X-ray source catalogue ever produced, containing almost twice as many discrete sources as either the ROSAT survey or pointed catalogues. 2XMM complements deeper Chandra and XMM-Newton small area surveys, probing a much larger sky area.</TD>
+                        <TD>WFAU, Institute for Astronomy, University of Edinburgh</TD>
+                        <TD/>
+                        <TD>ivo://wfau.roe.ac.uk/xmm_dsa</TD>
+                        <TD>2012-07-18T12:52:10</TD>
+                        <TD>#x-ray xray XMM#</TD>
+                        <TD>#Catalog#</TD>
+                        <TD>#Research#</TD>
+                        <TD/>
+                        <TD>Version 2</TD>
+                        <TD>ConeSearch</TD>
+                        <TD>ivo://ivoa.net/std/ConeSearch</TD>
+                        <TD/>
+                        <TD>ParamHTTP</TD>
+                        <TD/>
+                        <TD>std</TD>
+                        <TD>http://wfaudata.roe.ac.uk/xmm-dsa/DirectCone?DSACAT=TwoXMM&amp;DSATAB=twoxmm&amp;</TD>
+                        <TD/>
+                        <TD>1.500000</TD>
+                        <TD>2000000</TD>
+                        <TD>ivo://wfau.roe.ac.uk</TD>
+                        <TD>http://xmmssc-www.star.le.ac.uk/Catalogue/2XMM/</TD>
+                    </TR>
+                    <TR>
+                        <TD>#Catalog#Catalog#HTTP Request#Custom Service#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#</TD>
+                        <TD>VHS DR1</TD>
+                        <TD>VHS DR1 - VISTA Hemisphere Survey Data Release 1</TD>
+                        <TD>The VHS will image the entire ~20 000 square degrees of the Southern Sky, with the exception of the areas already covered by the VIKING and VVV surveys, in J and Ks. The resulting data will be about 4 magnitudes deeper than 2MASS and DENIS. The 5000 square degrees covered by the Dark Energy Survey (DES), another imaging survey scheduled to begin in 2010 at the CTIO 4 metre Blanco telescope, will also be observed in H-band. The area around both of the Galactic Caps will be observed in Y- and H- band as well to be combined with the data from the VST ATLAS survey. The main science drivers of the VHS include: examining low mass and nearby stars, studying the merger history of the Galaxy, measuring the properties of Dark Energy through the examination of large-scale structure to a redshift of ~1, and searches for high redshift quasars.</TD>
+                        <TD>WFAU, Institute for Astronomy, University of Edinburgh</TD>
+                        <TD>#Infrared#</TD>
+                        <TD>ivo://wfau.roe.ac.uk/vhsDR1-dsa</TD>
+                        <TD>2012-07-17T15:37:19</TD>
+                        <TD>#Stars,Survey,Galaxy, low mass stars, dark energy#</TD>
+                        <TD>#Survey#</TD>
+                        <TD>#Research#</TD>
+                        <TD/>
+                        <TD>Data Release 1</TD>
+                        <TD>ConeSearch</TD>
+                        <TD>ivo://ivoa.net/std/ConeSearch</TD>
+                        <TD/>
+                        <TD>ParamHTTP</TD>
+                        <TD/>
+                        <TD>std</TD>
+                        <TD>http://wfaudata.roe.ac.uk/vhsDR1-dsa/DirectCone?DSACAT=VHS_DR1&amp;DSATAB=vhsSource&amp;</TD>
+                        <TD/>
+                        <TD>1.500000</TD>
+                        <TD>2000000</TD>
+                        <TD>ivo://wfau.roe.ac.uk</TD>
+                        <TD>http://www.ast.cam.ac.uk/~rgm/vhs/</TD>
+                    </TR>
+                    <TR>
+                        <TD>#Catalog#HTTP Request#Custom Service#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#</TD>
+                        <TD/>
+                        <TD>UKIDSS DR2 World Release</TD>
+                        <TD>World release UKIRT Infrared Deep Sky Survey Data Release 2 data for demonstration purposes (contains only a tiny sample of data).</TD>
+                        <TD>WFAU, Institute for Astronomy, University of Edinburgh</TD>
+                        <TD/>
+                        <TD>ivo://wfau.roe.ac.uk/ukidssWorld-dsa</TD>
+                        <TD>2010-02-15T13:56:33</TD>
+                        <TD>#Infrared, survey, galaxy, point source#</TD>
+                        <TD>#Catalog#</TD>
+                        <TD>#Research#</TD>
+                        <TD/>
+                        <TD>World Release DR2</TD>
+                        <TD>ConeSearch</TD>
+                        <TD>ivo://ivoa.net/std/ConeSearch</TD>
+                        <TD/>
+                        <TD>ParamHTTP</TD>
+                        <TD/>
+                        <TD>std</TD>
+                        <TD>http://wfaudata.roe.ac.uk/ukidssWorld-dsa/SubmitCone?DSACAT=UKIDSS_World_Release&amp;DSATAB=lasSource&amp;</TD>
+                        <TD/>
+                        <TD>1.500000</TD>
+                        <TD>2000000</TD>
+                        <TD>ivo://wfau.roe.ac.uk</TD>
+                        <TD>http://surveys.roe.ac.uk/wsa/publicData.html</TD>
+                    </TR>
+                    <TR>
+                        <TD>#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#HTTP Request#Custom Service#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#</TD>
+                        <TD>UKIDSS DR8</TD>
+                        <TD>UKIDSS DR8 - UKIRT Infrared Deep Sky Survey Data Release 8</TD>
+                        <TD>This DSA hosts data release 8 of the UKIRT Infrared Deep Sky Survey housed at the Wide Field Astronomy Unit at the Univeristy of Edinburgh. This catalog contains WFCAM data primarily originating from four of the five UKIDSS surveys: Large Area Survey, Galactic Clusters Survey, Deep Extragalactic Survey, and Ultra Deep Survey. The Galactic Plane Survey will be available in January 2014. (see www.ukidss.org for survey descriptions)</TD>
+                        <TD>WFAU, Institute for Astronomy, University of Edinburgh</TD>
+                        <TD>#Infrared#</TD>
+                        <TD>ivo://wfau.roe.ac.uk/ukidssDR8-dsa</TD>
+                        <TD>2013-12-17T12:04:15</TD>
+                        <TD>#Infrared, survey, galaxy, point source#</TD>
+                        <TD>#Survey#</TD>
+                        <TD>#Research#</TD>
+                        <TD/>
+                        <TD>Data Release 8</TD>
+                        <TD>ConeSearch</TD>
+                        <TD>ivo://ivoa.net/std/ConeSearch</TD>
+                        <TD/>
+                        <TD>ParamHTTP</TD>
+                        <TD/>
+                        <TD>std</TD>
+                        <TD>http://wfaudata.roe.ac.uk/ukidssDR8-dsa/DirectCone?DSACAT=UKIDSS_DR8&amp;DSATAB=lasSource&amp;</TD>
+                        <TD/>
+                        <TD>1.500000</TD>
+                        <TD>2000000</TD>
+                        <TD>ivo://wfau.roe.ac.uk</TD>
+                        <TD>http://surveys.roe.ac.uk/wsa</TD>
+                    </TR>
+                    <TR>
+                        <TD>#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#HTTP Request#Custom Service#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#</TD>
+                        <TD>UKIDSS DR7</TD>
+                        <TD>UKIDSS DR7 - UKIRT Infrared Deep Sky Survey Data Release 7</TD>
+                        <TD>This DSA hosts data release 7 of the UKIRT Infrared Deep Sky Survey housed at the Wide Field Astronomy Unit at the Univeristy of Edinburgh. This catalog contains WFCAM data primarily originating from three of the five UKIDSS surveys: Large Area Survey, Galactic Clusters Survey, Deep Extragalactic Survey. The Galactic Plane Survey will be available in march 2012. (see www.ukidss.org for survey descriptions)</TD>
+                        <TD>WFAU, Institute for Astronomy, University of Edinburgh</TD>
+                        <TD>#Infrared#</TD>
+                        <TD>ivo://wfau.roe.ac.uk/ukidssDR7-dsa</TD>
+                        <TD>2012-07-18T12:47:40</TD>
+                        <TD>#Infrared, survey, galaxy, point source#</TD>
+                        <TD>#Survey#</TD>
+                        <TD>#Research#</TD>
+                        <TD/>
+                        <TD>Data Release 7</TD>
+                        <TD>ConeSearch</TD>
+                        <TD>ivo://ivoa.net/std/ConeSearch</TD>
+                        <TD/>
+                        <TD>ParamHTTP</TD>
+                        <TD/>
+                        <TD>std</TD>
+                        <TD>http://wfaudata.roe.ac.uk/ukidssDR7-dsa/DirectCone?DSACAT=UKIDSS_DR7&amp;DSATAB=lasSource&amp;</TD>
+                        <TD/>
+                        <TD>1.500000</TD>
+                        <TD>2000000</TD>
+                        <TD>ivo://wfau.roe.ac.uk</TD>
+                        <TD>http://surveys.roe.ac.uk/wsa</TD>
+                    </TR>
+                    <TR>
+                        <TD>#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#HTTP Request#Custom Service#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#</TD>
+                        <TD>UKIDSS DR6</TD>
+                        <TD>UKIDSS DR6 - UKIRT Infrared Deep Sky Survey Data Release 6</TD>
+                        <TD>This DSA hosts data release 6 of the UKIRT Infrared Deep Sky Survey housed at the Wide Field Astronomy Unit at the Univeristy of Edinburgh. This catalog contains WFCAM data primarily originating from four of the five UKIDSS surveys: Large Area Survey, Galactic Clusters Survey, Deep Extragalactic Survey and the Galactic Plane Survey. (see www.ukidss.org for survey descriptions)</TD>
+                        <TD>WFAU, Institute for Astronomy, University of Edinburgh</TD>
+                        <TD>#Infrared#</TD>
+                        <TD>ivo://wfau.roe.ac.uk/ukidssDR6-dsa</TD>
+                        <TD>2012-07-18T12:46:08</TD>
+                        <TD>#Infrared, survey, galaxy, point source#</TD>
+                        <TD>#Survey#</TD>
+                        <TD>#Research#</TD>
+                        <TD/>
+                        <TD>Data Release 6</TD>
+                        <TD>ConeSearch</TD>
+                        <TD>ivo://ivoa.net/std/ConeSearch</TD>
+                        <TD/>
+                        <TD>ParamHTTP</TD>
+                        <TD/>
+                        <TD>std</TD>
+                        <TD>http://wfaudata.roe.ac.uk/ukidssDR6-dsa/DirectCone?DSACAT=UKIDSS_DR6&amp;DSATAB=lasSource&amp;</TD>
+                        <TD/>
+                        <TD>1.500000</TD>
+                        <TD>2000000</TD>
+                        <TD>ivo://wfau.roe.ac.uk</TD>
+                        <TD>http://surveys.roe.ac.uk/wsa</TD>
+                    </TR>
+                    <TR>
+                        <TD>#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#HTTP Request#Custom Service#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#</TD>
+                        <TD>UKIDSS DR5</TD>
+                        <TD>UKIDSS DR5 - UKIRT Infrared Deep Sky Survey Data Release 5</TD>
+                        <TD>This DSA hosts data release 5 of the UKIRT Infrared Deep Sky Survey housed at the Wide Field Astronomy Unit at the Univeristy of Edinburgh. This catalog contains WFCAM data primarily originating from four of the five UKIDSS surveys: Large Area Survey, Galactic Clusters Survey, Deep Extragalactic Survey and the Ultra Deep Survey. (see www.ukidss.org for survey descriptions)</TD>
+                        <TD>WFAU, Institute for Astronomy, University of Edinburgh</TD>
+                        <TD>#Infrared#</TD>
+                        <TD>ivo://wfau.roe.ac.uk/ukidssDR5-dsa</TD>
+                        <TD>2012-07-18T12:43:17</TD>
+                        <TD>#Infrared, survey, galaxy, point source#</TD>
+                        <TD>#Survey#</TD>
+                        <TD>#Research#</TD>
+                        <TD/>
+                        <TD>Data Release 5</TD>
+                        <TD>ConeSearch</TD>
+                        <TD>ivo://ivoa.net/std/ConeSearch</TD>
+                        <TD/>
+                        <TD>ParamHTTP</TD>
+                        <TD/>
+                        <TD>std</TD>
+                        <TD>http://wfaudata.roe.ac.uk/ukidssDR5-dsa/DirectCone?DSACAT=UKIDSS_DR5&amp;DSATAB=lasSource&amp;</TD>
+                        <TD/>
+                        <TD>1.500000</TD>
+                        <TD>2000000</TD>
+                        <TD>ivo://wfau.roe.ac.uk</TD>
+                        <TD>http://surveys.roe.ac.uk/wsa</TD>
+                    </TR>
+                    <TR>
+                        <TD>#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#HTTP Request#Custom Service#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#</TD>
+                        <TD>UKIDSS DR4</TD>
+                        <TD>UKIDSS DR4 - UKIRT Infrared Deep Sky Survey Data Release 4</TD>
+                        <TD>This DSA hosts data release 4 of the UKIRT Infrared Deep Sky Survey housed at the Wide Field Astronomy Unit at the Univeristy of Edinburgh. This catalog contains WFCAM data primarily originating from four of the five UKIDSS surveys: Large Area Survey, Galactic Clusters Survey, Deep Extragalactic Survey and the Ultra Deep Survey. The data for the Galactic Plane Survey will not be available until April 22, 2010. (see www.ukidss.org for survey descriptions)</TD>
+                        <TD>WFAU, Institute for Astronomy, University of Edinburgh</TD>
+                        <TD>#Infrared#</TD>
+                        <TD>ivo://wfau.roe.ac.uk/ukidssDR4-dsa</TD>
+                        <TD>2012-07-18T12:42:31</TD>
+                        <TD>#Infrared, survey, galaxy, point source#</TD>
+                        <TD>#Survey#</TD>
+                        <TD>#Research#</TD>
+                        <TD/>
+                        <TD>Data Release 4</TD>
+                        <TD>ConeSearch</TD>
+                        <TD>ivo://ivoa.net/std/ConeSearch</TD>
+                        <TD/>
+                        <TD>ParamHTTP</TD>
+                        <TD/>
+                        <TD>std</TD>
+                        <TD>http://wfaudata.roe.ac.uk/ukidssDR4-dsa/DirectCone?DSACAT=UKIDSS_DR4&amp;DSATAB=lasSource&amp;</TD>
+                        <TD/>
+                        <TD>1.500000</TD>
+                        <TD>2000000</TD>
+                        <TD>ivo://wfau.roe.ac.uk</TD>
+                        <TD>http://surveys.roe.ac.uk/wsa</TD>
+                    </TR>
+                    <TR>
+                        <TD>#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#HTTP Request#Custom Service#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#</TD>
+                        <TD>UKIDSS DR3</TD>
+                        <TD>UKIDSS DR3 - UKIRT Infrared Deep Sky Survey Data Release 3</TD>
+                        <TD>This DSA hosts data release 3 of the UKIRT Infrared Deep Sky Survey housed at the Wide Field Astronomy Unit at the Univeristy of Edinburgh. This catalog contains WFCAM data primarily originating from the five UKIDSS surveys: Large Area Survey, Galactic Plane Survey, Galactic Clusters Survey, Deep Extragalactic Survey and the Ultra Deep Survey (see the www.ukidss.org for survey descriptions).</TD>
+                        <TD>WFAU, Institute for Astronomy, University of Edinburgh</TD>
+                        <TD>#Infrared#</TD>
+                        <TD>ivo://wfau.roe.ac.uk/ukidssDR3-dsa</TD>
+                        <TD>2012-07-18T12:41:51</TD>
+                        <TD>#Infrared, survey, galaxy, point source#</TD>
+                        <TD>#Survey#</TD>
+                        <TD>#Research#</TD>
+                        <TD/>
+                        <TD>Data Release 3</TD>
+                        <TD>ConeSearch</TD>
+                        <TD>ivo://ivoa.net/std/ConeSearch</TD>
+                        <TD/>
+                        <TD>ParamHTTP</TD>
+                        <TD/>
+                        <TD>std</TD>
+                        <TD>http://wfaudata.roe.ac.uk/ukidssDR3-dsa/DirectCone?DSACAT=UKIDSS_DR3&amp;DSATAB=lasSource&amp;</TD>
+                        <TD/>
+                        <TD>1.500000</TD>
+                        <TD>2000000</TD>
+                        <TD>ivo://wfau.roe.ac.uk</TD>
+                        <TD>http://surveys.roe.ac.uk/wsa</TD>
+                    </TR>
+                    <TR>
+                        <TD>#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#HTTP Request#Custom Service#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#</TD>
+                        <TD>UKIDSS DR2</TD>
+                        <TD>UKIDSS DR2 - UKIRT Infrared Deep Sky Survey Data Release 2</TD>
+                        <TD>This DSA hosts data release 2 of the UKIRT Infrared Deep Sky Survey housed at the Wide Field Astronomy Unit at the Univeristy of Edinburgh. This catalog contains WFCAM data primarily originating from the five UKIDSS surveys: Large Area Survey, Galactic Plane Survey, Galactic Clusters Survey, Deep Extragalactic Survey and the Ultra Deep Survey (see the www.ukidss.org for survey descriptions).</TD>
+                        <TD>WFAU, Institute for Astronomy, University of Edinburgh</TD>
+                        <TD>#Infrared#</TD>
+                        <TD>ivo://wfau.roe.ac.uk/ukidssDR2-dsa</TD>
+                        <TD>2012-07-18T12:41:11</TD>
+                        <TD>#Infrared, survey, galaxy, point source#</TD>
+                        <TD>#Survey#</TD>
+                        <TD>#Research#</TD>
+                        <TD/>
+                        <TD>Data Release 2</TD>
+                        <TD>ConeSearch</TD>
+                        <TD>ivo://ivoa.net/std/ConeSearch</TD>
+                        <TD/>
+                        <TD>ParamHTTP</TD>
+                        <TD/>
+                        <TD>std</TD>
+                        <TD>http://wfaudata.roe.ac.uk/ukidssDR2-dsa/DirectCone?DSACAT=UKIDSS_DR2&amp;DSATAB=lasSource&amp;</TD>
+                        <TD/>
+                        <TD>1.500000</TD>
+                        <TD>2000000</TD>
+                        <TD>ivo://wfau.roe.ac.uk</TD>
+                        <TD>http://surveys.roe.ac.uk/wsa</TD>
+                    </TR>
+                    <TR>
+                        <TD>#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#HTTP Request#Custom Service#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#</TD>
+                        <TD>UKIDSS DR1</TD>
+                        <TD>UKIDSS DR1 - UKIRT Infrared Deep Sky Survey Data Release 1</TD>
+                        <TD>This DSA hosts data release 1 of the UKIRT Infrared Deep Sky Survey housed at the Wide Field Astronomy Unit at the Univeristy of Edinburgh. This catalog contains WFCAM data primarily originating from the five UKIDSS surveys: Large Area Survey, Galactic Plane Survey, Galactic Clusters Survey, Deep Extragalactic Survey and the Ultra Deep Survey (see the www.ukidss.org for survey descriptions).</TD>
+                        <TD>WFAU, Institute for Astronomy, University of Edinburgh</TD>
+                        <TD>#Infrared#</TD>
+                        <TD>ivo://wfau.roe.ac.uk/ukidssDR1-dsa</TD>
+                        <TD>2012-07-18T12:40:27</TD>
+                        <TD>#Infrared, survey, galaxy, point source#</TD>
+                        <TD>#Survey#</TD>
+                        <TD>#Research#</TD>
+                        <TD/>
+                        <TD>Data Release 1</TD>
+                        <TD>ConeSearch</TD>
+                        <TD>ivo://ivoa.net/std/ConeSearch</TD>
+                        <TD/>
+                        <TD>ParamHTTP</TD>
+                        <TD/>
+                        <TD>std</TD>
+                        <TD>http://wfaudata.roe.ac.uk/ukidssDR1-dsa/DirectCone?DSACAT=UKIDSS_DR1&amp;DSATAB=lasSource&amp;</TD>
+                        <TD/>
+                        <TD>1.500000</TD>
+                        <TD>2000000</TD>
+                        <TD>ivo://wfau.roe.ac.uk</TD>
+                        <TD>http://surveys.roe.ac.uk/wsa</TD>
+                    </TR>
+                    <TR>
+                        <TD>#Catalog#Catalog#HTTP Request#Custom Service#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#</TD>
+                        <TD>2MASS</TD>
+                        <TD>Two Micron All Sky Survey (2MASS)</TD>
+                        <TD>The Two Micron All Sky Survey (2MASS) will provide a uniform survey of the entire sky at three near-infrared wavebands: J(lambdaeff = 1.25 micrometers), H(lambdaeff = 1.65 micrometers), and Ks(lambdaeff = 2.16 micrometers). A major goal of the survey is to probe large scale structures in the Milky Way and in the Local Universe, exploiting the relatively high transparency of the interstellar medium in the near-infrared, and the high near-infrared luminosities of evolved low- and intermediate-mass stars.Home page at http://pegasus.phast.umass.edu/</TD>
+                        <TD>WFAU, Institute for Astronomy, University of Edinburgh</TD>
+                        <TD>#Infrared#</TD>
+                        <TD>ivo://wfau.roe.ac.uk/twomass-dsa</TD>
+                        <TD>2012-08-02T15:31:26</TD>
+                        <TD>#Infrared all-sky survey#</TD>
+                        <TD>#Catalog#</TD>
+                        <TD>#Research#</TD>
+                        <TD/>
+                        <TD>Version 1</TD>
+                        <TD>ConeSearch</TD>
+                        <TD>ivo://ivoa.net/std/ConeSearch</TD>
+                        <TD/>
+                        <TD>ParamHTTP</TD>
+                        <TD/>
+                        <TD>std</TD>
+                        <TD>http://wfaudata.roe.ac.uk/twomass-dsa/DirectCone?DSACAT=TWOMASS&amp;DSATAB=twomass_psc&amp;</TD>
+                        <TD/>
+                        <TD>1.500000</TD>
+                        <TD>2000000</TD>
+                        <TD>ivo://wfau.roe.ac.uk</TD>
+                        <TD>http://www.ipac.caltech.edu/2mass/</TD>
+                    </TR>
+                    <TR>
+                        <TD>#Catalog#Catalog#HTTP Request#Custom Service#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#</TD>
+                        <TD>SuperCOSMOS</TD>
+                        <TD>SuperCOSMOS Science Archive (SSA)</TD>
+                        <TD>The SuperCOSMOS data held in the SSA primarily originate from scans of Palomar and UK Schmidt blue, red and near-IR southern sky surveys. The ESO Schmidt R (dec &lt; -17.5) and Palomar POSS-I E (dec &gt; -17.5) surveys have also been scanned and provide a 1st epoch red measurement. Further details on the surveys, the scanning process and the raw parameters extracted can be found on the further information link. The SSA is housed in a relational database running on Microsoft SQL Server 2000. Data are stored in tables which are inter-linked via reference ID numbers. In addition to the astronomical object catalogues these tables also contain information on the plates that were scanned, survey field centres and calibration coefficients. Most user science queries will only need to access the SOURCE table or to a lesser extent the DETECTION table.</TD>
+                        <TD>WFAU, Institute for Astronomy, University of Edinburgh</TD>
+                        <TD>#Optical#</TD>
+                        <TD>ivo://wfau.roe.ac.uk/ssa-dsa</TD>
+                        <TD>2012-07-19T11:53:55</TD>
+                        <TD>#Digitised photographic optical all-sky photometric astrometric survey#</TD>
+                        <TD>#Catalog#</TD>
+                        <TD>#Research#</TD>
+                        <TD/>
+                        <TD>Version 1</TD>
+                        <TD>ConeSearch</TD>
+                        <TD>ivo://ivoa.net/std/ConeSearch</TD>
+                        <TD/>
+                        <TD>ParamHTTP</TD>
+                        <TD/>
+                        <TD>std</TD>
+                        <TD>http://wfaudata.roe.ac.uk/ssa-dsa/DirectCone?DSACAT=SSA&amp;DSATAB=Detection&amp;</TD>
+                        <TD/>
+                        <TD>1.500000</TD>
+                        <TD>2000000</TD>
+                        <TD>ivo://wfau.roe.ac.uk</TD>
+                        <TD>http://surveys.roe.ac.uk/ssa</TD>
+                    </TR>
+                    <TR>
+                        <TD>#Catalog#Catalog#HTTP Request#Custom Service#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#</TD>
+                        <TD>SDSS DR8</TD>
+                        <TD>SDSS DR8 - Sloan Digital Sky Survey Data Release 8</TD>
+                        <TD>This is an AstroGrid Dataset Access installation of the Sloan Digital Sky Survey (SDSS) DR8 hosted by the Wide Field Astronomy Unit (WFAU), University of Edinburgh. WFAU would like to thank John Hopkins University and the University of Chicago for permission to host the data.</TD>
+                        <TD>WFAU, Institute for Astronomy, University of Edinburgh</TD>
+                        <TD>#Optical#</TD>
+                        <TD>ivo://wfau.roe.ac.uk/sdssdr8-dsa</TD>
+                        <TD>2012-07-18T12:37:33</TD>
+                        <TD>#Stars,Survey,Galaxy#</TD>
+                        <TD>#Survey#</TD>
+                        <TD>#Research#</TD>
+                        <TD/>
+                        <TD>Data Release 8</TD>
+                        <TD>ConeSearch</TD>
+                        <TD>ivo://ivoa.net/std/ConeSearch</TD>
+                        <TD/>
+                        <TD>ParamHTTP</TD>
+                        <TD/>
+                        <TD>std</TD>
+                        <TD>http://wfaudata.roe.ac.uk/sdssdr8-dsa/DirectCone?DSACAT=SDSS_DR8&amp;DSATAB=PhotoObjAll&amp;</TD>
+                        <TD/>
+                        <TD>1.500000</TD>
+                        <TD>2000000</TD>
+                        <TD>ivo://wfau.roe.ac.uk</TD>
+                        <TD>http://www.sdss.org/dr8/</TD>
+                    </TR>
+                    <TR>
+                        <TD>#Catalog#Catalog#Catalog#Catalog#HTTP Request#Custom Service#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#</TD>
+                        <TD>SDSS DR7</TD>
+                        <TD>SDSS DR7 - Sloan Digital Sky Survey Data Release 7</TD>
+                        <TD>This is an AstroGrid Dataset Access installation of the Sloan Digital Sky Survey (SDSS) DR7 hosted by the Wide Field Astronomy Unit (WFAU), University of Edinburgh. WFAU would like to thank John Hopkins University and the University of Chicago for permission to host the data.</TD>
+                        <TD>WFAU, Institute for Astronomy, University of Edinburgh</TD>
+                        <TD>#Optical#</TD>
+                        <TD>ivo://wfau.roe.ac.uk/sdssdr7-dsa</TD>
+                        <TD>2012-07-18T12:36:49</TD>
+                        <TD>#Stars,Survey,Galaxy#</TD>
+                        <TD>#Survey#</TD>
+                        <TD>#Research#</TD>
+                        <TD/>
+                        <TD>Data Release 7</TD>
+                        <TD>ConeSearch</TD>
+                        <TD>ivo://ivoa.net/std/ConeSearch</TD>
+                        <TD/>
+                        <TD>ParamHTTP</TD>
+                        <TD/>
+                        <TD>std</TD>
+                        <TD>http://wfaudata.roe.ac.uk/sdssdr7-dsa/DirectCone?DSACAT=SDSS_DR7&amp;DSATAB=Galaxy&amp;</TD>
+                        <TD/>
+                        <TD>1.500000</TD>
+                        <TD>2000000</TD>
+                        <TD>ivo://wfau.roe.ac.uk</TD>
+                        <TD>http://www.sdss.org/dr7/</TD>
+                    </TR>
+                    <TR>
+                        <TD>#Catalog#HTTP Request#Custom Service#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#</TD>
+                        <TD>SDSS DR6</TD>
+                        <TD>SDSS DR6 SEGUE - Sloan Digital Sky Survey Data Release 6</TD>
+                        <TD>This is an AstroGrid Dataset Access installation of the Sloan Digital Sky Survey (SDSS) DR6 SEGUE hosted by the Wide Field Astronomy Unit (WFAU), University of Edinburgh. WFAU would like to thank John Hopkins University and the University of Chicago for permission to host the data. This database does not include the entire DR6 release, only the SEGUE portion.</TD>
+                        <TD>WFAU, Institute for Astronomy, University of Edinburgh</TD>
+                        <TD>#Optical#</TD>
+                        <TD>ivo://wfau.roe.ac.uk/sdssdr6-dsa</TD>
+                        <TD>2012-07-18T12:36:37</TD>
+                        <TD>#Stars,Survey,Galaxy#</TD>
+                        <TD>#Survey#</TD>
+                        <TD>#Research#</TD>
+                        <TD/>
+                        <TD>Data Release 6</TD>
+                        <TD>ConeSearch</TD>
+                        <TD>ivo://ivoa.net/std/ConeSearch</TD>
+                        <TD/>
+                        <TD>ParamHTTP</TD>
+                        <TD/>
+                        <TD>std</TD>
+                        <TD>http://wfaudata.roe.ac.uk/sdssdr6-dsa/DirectCone?DSACAT=SDSS_DR5&amp;DSATAB=PhotoObjAll&amp;</TD>
+                        <TD/>
+                        <TD>1.500000</TD>
+                        <TD>2000000</TD>
+                        <TD>ivo://wfau.roe.ac.uk</TD>
+                        <TD>http://www.sdss.org/dr6/</TD>
+                    </TR>
+                    <TR>
+                        <TD>#Catalog#Catalog#Catalog#Catalog#Catalog#HTTP Request#Custom Service#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#</TD>
+                        <TD>SDSS DR5</TD>
+                        <TD>SDSS DR5 - Sloan Digital Sky Survey Data Release 5</TD>
+                        <TD>This is an AstroGrid Dataset Access installation of the Sloan Digital Sky Survey (SDSS) DR5 hosted by the Wide Field Astronomy Unit (WFAU), University of Edinburgh. WFAU would like to thank John Hopkins University and the University of Chicago for permission to host the data.</TD>
+                        <TD>WFAU, Institute for Astronomy, University of Edinburgh</TD>
+                        <TD>#Optical#</TD>
+                        <TD>ivo://wfau.roe.ac.uk/sdssdr5-dsa</TD>
+                        <TD>2012-07-18T12:35:04</TD>
+                        <TD>#Stars,Survey,Galaxy#</TD>
+                        <TD>#Survey#</TD>
+                        <TD>#Research#</TD>
+                        <TD/>
+                        <TD>Data Release 5</TD>
+                        <TD>ConeSearch</TD>
+                        <TD>ivo://ivoa.net/std/ConeSearch</TD>
+                        <TD/>
+                        <TD>ParamHTTP</TD>
+                        <TD/>
+                        <TD>std</TD>
+                        <TD>http://wfaudata.roe.ac.uk/sdssdr5-dsa/DirectCone?DSACAT=SDSS_DR5&amp;DSATAB=SpecObj&amp;</TD>
+                        <TD/>
+                        <TD>1.500000</TD>
+                        <TD>2000000</TD>
+                        <TD>ivo://wfau.roe.ac.uk</TD>
+                        <TD>http://www.sdss.org/dr5/</TD>
+                    </TR>
+                    <TR>
+                        <TD>#Catalog#Catalog#HTTP Request#Custom Service#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#</TD>
+                        <TD>SDSS DR3</TD>
+                        <TD>SDSS DR3 - Sloan Digital Sky Survey Data Release 3</TD>
+                        <TD>This is an AstroGrid Dataset Access installation of the Sloan Digital Sky Survey (SDSS) DR3 hosted by the Wide Field Astronomy Unit (WFAU), University of Edinburgh. WFAU would like to thank John Hopkins University and the University of Chicago for permission to host the data.</TD>
+                        <TD>WFAU, Institute for Astronomy, University of Edinburgh</TD>
+                        <TD>#Optical#</TD>
+                        <TD>ivo://wfau.roe.ac.uk/sdssdr3-dsa</TD>
+                        <TD>2012-07-18T12:34:44</TD>
+                        <TD>#Stars,Survey,Galaxy#</TD>
+                        <TD>#Survey#</TD>
+                        <TD>#Research#</TD>
+                        <TD/>
+                        <TD>Data Release 3</TD>
+                        <TD>ConeSearch</TD>
+                        <TD>ivo://ivoa.net/std/ConeSearch</TD>
+                        <TD/>
+                        <TD>ParamHTTP</TD>
+                        <TD/>
+                        <TD>std</TD>
+                        <TD>http://wfaudata.roe.ac.uk/sdssdr3-dsa/DirectCone?DSACAT=SDSS_DR3&amp;DSATAB=PhotoObjAll&amp;</TD>
+                        <TD/>
+                        <TD>1.500000</TD>
+                        <TD>2000000</TD>
+                        <TD>ivo://wfau.roe.ac.uk</TD>
+                        <TD>http://www.sdss.org/dr3/</TD>
+                    </TR>
+                    <TR>
+                        <TD>#Catalog#Catalog#HTTP Request#Custom Service#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#</TD>
+                        <TD>ROSAT</TD>
+                        <TD>Rontgen Satellite Archive (ROSAT)</TD>
+                        <TD>The Rontgen Satellite Archive is an implementation of the ROSAT All-Sky Survey Bright Source Catalogue (RASS-BSC, revision 1RXS) and the ROSAT All-Sky Survey Faint Source Catalogue (RASS-FSC, revision 1RXS). The RASS-BSC is derived from the all-sky survey performed during the first half year of the ROSAT mission in 1990/91. 18,811 sources are catalogued, with a limiting ROSAT PSPC countrate of 0.05 cts/s in the 0.1-2.4 keV energy band. The sources have a detection likelihood of at least 15 and contain at least 15 source photons. At a brightness limit of 0.1 cts/s (8,547 sources) the catalogue represents a sky coverage of 92%. The typical positional accuracy is 30 arcsec. The RASS-FSC is derived from the all-sky survey performed during the ROSAT mission in the energy band 0.1- 2.4 keV. 105,924 sources are catalogued and represent the faint extension to the RASS bright source catalogue. The sources have a detection likelihood of at least 7 and contain at least 6 source photons. (The likelihood of source detection is defined as L =-ln (1-P) , with P = probability of source detection).</TD>
+                        <TD>WFAU, Institute for Astronomy, University of Edinburgh</TD>
+                        <TD>#X-ray#</TD>
+                        <TD>ivo://wfau.roe.ac.uk/rosat-dsa</TD>
+                        <TD>2012-07-18T12:34:21</TD>
+                        <TD>#ROSAT xray x-ray sources faint bright#</TD>
+                        <TD>#Catalog#</TD>
+                        <TD>#Research#</TD>
+                        <TD/>
+                        <TD>revision 1RXS</TD>
+                        <TD>ConeSearch</TD>
+                        <TD>ivo://ivoa.net/std/ConeSearch</TD>
+                        <TD/>
+                        <TD>ParamHTTP</TD>
+                        <TD/>
+                        <TD>std</TD>
+                        <TD>http://wfaudata.roe.ac.uk/rosat-dsa/DirectCone?DSACAT=ROSAT&amp;DSATAB=rosat_bsc&amp;</TD>
+                        <TD/>
+                        <TD>1.500000</TD>
+                        <TD>2000000</TD>
+                        <TD>ivo://wfau.roe.ac.uk</TD>
+                        <TD>http://www.mpe.mpg.de/xray/wave/rosat/index.php?lang=en</TD>
+                    </TR>
+                    <TR>
+                        <TD>#Catalog#Catalog#HTTP Request#Custom Service#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#</TD>
+                        <TD/>
+                        <TD>Personal SuperCOSMOS Science Archive (SSA)</TD>
+                        <TD>Small subset of the SuperCOSMOS Science Archive, useful for testing queries. The SuperCOSMOS data held in the SSA primarily originate from scans of Palomar and UK Schmidt blue, red and near-IR southern sky surveys. The ESO Schmidt R (dec &lt; -17.5) and Palomar POSS-I E (dec &gt; -17.5) surveys have also been scanned and provide a 1st epoch red measurement. Further details on the surveys, the scanning process and the raw parameters extracted can be found on the further information link. The SSA is housed in a relational database running on Microsoft SQL Server 2000. Data are stored in tables which are inter-linked via reference ID numbers. In addition to the astronomical object catalogues these tables also contain information on the plates that were scanned, survey field centres and calibration coefficients. Most user science queries will only need to access the SOURCE table or to a lesser extent the DETECTION table.</TD>
+                        <TD>WFAU, Institute for Astronomy, University of Edinburgh</TD>
+                        <TD>#Optical#</TD>
+                        <TD>ivo://wfau.roe.ac.uk/pssa-dsa</TD>
+                        <TD>2011-05-09T11:33:35</TD>
+                        <TD>#Digitised photographic Schmidt field test photometry astrometry#</TD>
+                        <TD>#Catalog#</TD>
+                        <TD>#Research#</TD>
+                        <TD/>
+                        <TD>Version 1</TD>
+                        <TD>ConeSearch</TD>
+                        <TD>ivo://ivoa.net/std/ConeSearch</TD>
+                        <TD/>
+                        <TD>ParamHTTP</TD>
+                        <TD/>
+                        <TD>std</TD>
+                        <TD>http://wfaudata.roe.ac.uk/pssa-dsa/DirectCone?DSACAT=SSA&amp;DSATAB=Detection&amp;</TD>
+                        <TD/>
+                        <TD>1.500000</TD>
+                        <TD>2000000</TD>
+                        <TD>ivo://wfau.roe.ac.uk</TD>
+                        <TD>http://thoth.roe.ac.uk/ssa/</TD>
+                    </TR>
+                    <TR>
+                        <TD>#Catalog#HTTP Request#Custom Service#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#</TD>
+                        <TD>IRAS</TD>
+                        <TD>Infrared Astronomical Satellite Archive (IRAS)</TD>
+                        <TD>The Infrared Astronomical Satellite Archive is an implementation of the IRAS catalogue of Point Sources, Version 2.0 (IPAC 1986). This is a catalogue of some 250,000 well-confirmed infrared point sources observed by the Infrared Astronomical Satellite, i.e., sources with angular extents less than approximately 0.5, 0.5, 1.0, and 2.0 arcmin in the in-scan direction at 12, 25, 60, and 100 microns, respectively.</TD>
+                        <TD>WFAU, Institute for Astronomy, University of Edinburgh</TD>
+                        <TD>#Infrared#</TD>
+                        <TD>ivo://wfau.roe.ac.uk/iras-dsa</TD>
+                        <TD>2012-07-18T12:34:02</TD>
+                        <TD>#Infrared point-source survey#</TD>
+                        <TD>#Catalog#</TD>
+                        <TD>#Research#</TD>
+                        <TD/>
+                        <TD>Version 2.0 (IPAC 1986)</TD>
+                        <TD>ConeSearch</TD>
+                        <TD>ivo://ivoa.net/std/ConeSearch</TD>
+                        <TD/>
+                        <TD>ParamHTTP</TD>
+                        <TD/>
+                        <TD>std</TD>
+                        <TD>http://wfaudata.roe.ac.uk/iras-dsa/DirectCone?DSACAT=IRAS&amp;DSATAB=iras_psc&amp;</TD>
+                        <TD/>
+                        <TD>1.500000</TD>
+                        <TD>2000000</TD>
+                        <TD>ivo://wfau.roe.ac.uk</TD>
+                        <TD>http://irsa.ipac.caltech.edu/Missions/iras.html</TD>
+                    </TR>
+                    <TR>
+                        <TD>#Catalog#Catalog#HTTP Request#Custom Service#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#</TD>
+                        <TD>GLIMPSE</TD>
+                        <TD>GLIMPSE (Galactic Legacy Infrared Mid-Plane Survey Extraordinaire)</TD>
+                        <TD>The GLIMPSE (Galactic Legacy Infrared Mid-Plane Survey Extraordinaire) Archive is an implementation of the GLIMPSE Highly Reliable Catalogue (GLMC, Intermediate revision; dated 9th April 2005) and the GLIMPSE More Complete Archive (GLMA, Intermediate revision; dated 9th April 2005). This implementation uses the same default values as specified by GLIMPSE.</TD>
+                        <TD>WFAU, Institute for Astronomy, University of Edinburgh</TD>
+                        <TD>#Infrared#</TD>
+                        <TD>ivo://wfau.roe.ac.uk/glimpse-dsa</TD>
+                        <TD>2012-07-18T12:33:44</TD>
+                        <TD>#Galactic Legacy Infrared Mid-Plane Survey GLIMPSE#</TD>
+                        <TD>#Catalog#</TD>
+                        <TD>#Research#</TD>
+                        <TD/>
+                        <TD>Intermediate revision; dated 9th April 2005</TD>
+                        <TD>ConeSearch</TD>
+                        <TD>ivo://ivoa.net/std/ConeSearch</TD>
+                        <TD/>
+                        <TD>ParamHTTP</TD>
+                        <TD/>
+                        <TD>std</TD>
+                        <TD>http://wfaudata.roe.ac.uk/glimpse-dsa/DirectCone?DSACAT=GLIMPSE&amp;DSATAB=glimpse_hrc_inter&amp;</TD>
+                        <TD/>
+                        <TD>1.500000</TD>
+                        <TD>2000000</TD>
+                        <TD>ivo://wfau.roe.ac.uk</TD>
+                        <TD>http://www.astro.wisc.edu/sirtf/</TD>
+                    </TR>
+                    <TR>
+                        <TD>#Catalog#HTTP Request#Custom Service#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#</TD>
+                        <TD>FIRST</TD>
+                        <TD>FIRST Survey Catalogue (03Apr11 Version)</TD>
+                        <TD>FIRST (Faint Images of the Radio Sky at Twenty-cm) is a project designed to produce the radio equivalent of the Palomar Observatory Sky Survey over 10,000 square degrees of the North and South Galactic Caps. The catalogue covers a total of about 9033 square degrees of sky (8422 square degrees in the north Galactic cap and 611 square degrees in the south Galactic cap.)</TD>
+                        <TD>WFAU, Institute for Astronomy, University of Edinburgh</TD>
+                        <TD>#Radio#</TD>
+                        <TD>ivo://wfau.roe.ac.uk/first-dsa</TD>
+                        <TD>2012-07-18T12:33:30</TD>
+                        <TD>#Faint Images of the Radio Sky at Twenty-cm FIRST#</TD>
+                        <TD>#Catalog#</TD>
+                        <TD>#Research#</TD>
+                        <TD/>
+                        <TD>03Apr11 Version</TD>
+                        <TD>ConeSearch</TD>
+                        <TD>ivo://ivoa.net/std/ConeSearch</TD>
+                        <TD/>
+                        <TD>ParamHTTP</TD>
+                        <TD/>
+                        <TD>std</TD>
+                        <TD>http://wfaudata.roe.ac.uk/first-dsa/DirectCone?DSACAT=FIRST&amp;DSATAB=firstSource&amp;</TD>
+                        <TD/>
+                        <TD>1.500000</TD>
+                        <TD>2000000</TD>
+                        <TD>ivo://wfau.roe.ac.uk</TD>
+                        <TD>http://sundog.stsci.edu/first/catalogs/readme.html</TD>
+                    </TR>
+                    <TR>
+                        <TD>#HTTP Request#Custom Service#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#</TD>
+                        <TD>AstroDAbis</TD>
+                        <TD>AstroDAbis Notation Service</TD>
+                        <TD>The AstroDAbis service database stores user notations of celestial objects found in VO enabled datasets around the world.</TD>
+                        <TD>WFAU, Institute for Astronomy, University of Edinburgh</TD>
+                        <TD/>
+                        <TD>ivo://wfau.roe.ac.uk/astrodabis-dsa</TD>
+                        <TD>2012-07-18T12:33:22</TD>
+                        <TD>#AstroDAbis, notation#</TD>
+                        <TD>#Other#</TD>
+                        <TD>#Research#</TD>
+                        <TD/>
+                        <TD>Version 1</TD>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD/>
+                        <TD>ivo://wfau.roe.ac.uk</TD>
+                        <TD>http://astrodabis.roe.ac.uk/astrodabis-abd</TD>
+                    </TR>
+                    <TR>
+                        <TD>#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#HTTP Request#Custom Service#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#</TD>
+                        <TD>6dF DR3</TD>
+                        <TD>6dF Galaxy Survey Data Release 3</TD>
+                        <TD>The 6dF Galaxy Survey (6dFGS) aims to measure the redshifts of around 150 000 galaxies, and the peculiar velocities of a 15 000-member subsample, over almost the entire southern sky. The table called Spectra contains the redshifts and qualities of all the observations. When complete, it will be the largest redshift survey of the nearby Universe, reaching out to about z ~ 0.15, and more than an order of magnitude larger than any peculiar velocity survey to date. The targets are all galaxies brighter than K tot = 12.75 in the 2MASS Extended Source Catalog (XSC), supplemented by 2MASS and SuperCOSMOS galaxies that complete the sample to limits of (H, J , r F, bJ) = (13.05, 13.75, 15.6, 16.75). This is the Data Release 3 version.</TD>
+                        <TD>WFAU, Institute for Astronomy, University of Edinburgh</TD>
+                        <TD>#Optical#</TD>
+                        <TD>ivo://wfau.roe.ac.uk/6dfdr3-dsa</TD>
+                        <TD>2012-07-18T12:22:27</TD>
+                        <TD>#6dF survey galaxy galaxies redshift redshifts 2MASS#</TD>
+                        <TD>#Catalog#</TD>
+                        <TD>#Research#</TD>
+                        <TD/>
+                        <TD>Data Release 3</TD>
+                        <TD>ConeSearch</TD>
+                        <TD>ivo://ivoa.net/std/ConeSearch</TD>
+                        <TD/>
+                        <TD>ParamHTTP</TD>
+                        <TD/>
+                        <TD>std</TD>
+                        <TD>http://wfaudata.roe.ac.uk/6dfdr3-dsa/DirectCone?DSACAT=SixdF&amp;DSATAB=twomass&amp;</TD>
+                        <TD/>
+                        <TD>1.500000</TD>
+                        <TD>2000000</TD>
+                        <TD>ivo://wfau.roe.ac.uk</TD>
+                        <TD>http://www-wfau.roe.ac.uk/6dfgs/</TD>
+                    </TR>
+                    <TR>
+                        <TD>#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#Catalog#HTTP Request#Custom Service#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#HTTP Request#</TD>
+                        <TD>6dF DR2</TD>
+                        <TD>6dF Galaxy Survey Data Release 2</TD>
+                        <TD>The 6dF Galaxy Survey (6dFGS) aims to measure the redshifts of around 150 000 galaxies, and the peculiar velocities of a 15 000-member subsample, over almost the entire southern sky. The table called Spectra contains the redshifts and qualities of all the observations. When complete, it will be the largest redshift survey of the nearby Universe, reaching out to about z ~ 0.15, and more than an order of magnitude larger than any peculiar velocity survey to date. The targets are all galaxies brighter than K tot = 12.75 in the 2MASS Extended Source Catalog (XSC), supplemented by 2MASS and SuperCOSMOS galaxies that complete the sample to limits of (H, J , r F, bJ) = (13.05, 13.75, 15.6, 16.75).</TD>
+                        <TD>WFAU, Institute for Astronomy, University of Edinburgh</TD>
+                        <TD>#Optical#</TD>
+                        <TD>ivo://wfau.roe.ac.uk/6df-dsa</TD>
+                        <TD>2012-07-18T12:22:20</TD>
+                        <TD>#6dF survey galaxy galaxies redshift redshifts 2MASS#</TD>
+                        <TD>#Catalog#</TD>
+                        <TD>#Research#</TD>
+                        <TD/>
+                        <TD>Data Release 2</TD>
+                        <TD>ConeSearch</TD>
+                        <TD>ivo://ivoa.net/std/ConeSearch</TD>
+                        <TD/>
+                        <TD>ParamHTTP</TD>
+                        <TD/>
+                        <TD>std</TD>
+                        <TD>http://wfaudata.roe.ac.uk/6df-dsa/DirectCone?DSACAT=SixdF&amp;DSATAB=twomass&amp;</TD>
+                        <TD/>
+                        <TD>1.500000</TD>
+                        <TD>2000000</TD>
+                        <TD>ivo://wfau.roe.ac.uk</TD>
+                        <TD>http://www-wfau.roe.ac.uk/6dfgs/</TD>
+                    </TR>
+                </TABLEDATA>
+            </DATA>
+        </TABLE>
+    </RESOURCE>
+</VOTABLE>
