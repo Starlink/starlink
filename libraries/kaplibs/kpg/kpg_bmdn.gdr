@@ -408,12 +408,11 @@
                      OUT( OVO ) = VAL__BAD<T>
                      BADOUT = .TRUE.
                   END IF
+               END IF
 
 *  Increment the output-pixel index by a stride along the first
 *  dimension.
-                  M = M + 1
-               END IF
-
+               M = M + 1
             END IF
 
 *  Save the filter-box bounds used to create this output row/column/
