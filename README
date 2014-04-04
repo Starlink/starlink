@@ -120,6 +120,10 @@ rebuild the native parts of JNIAST, JNIHDS or SPLAT.
    ./configure -C
    make world
 
+   cd thirdparty/perlsys/perlmods
+   setenv STARLINK_DIR $STARCONF_DEFAULT_PREFIX
+   ./build-modules.sh
+
  Each of these steps is described in detail below.
 
  - First bootstrap the system.
@@ -160,7 +164,7 @@ rebuild the native parts of JNIAST, JNIHDS or SPLAT.
 
       % make configure-deps
 
- - Finally configure and build everything.
+ - Configure and build everything.
 
    Now configure and build the system.  The dependencies within the
    Makefile ensure that everthing is built in the correct order.
@@ -177,6 +181,19 @@ rebuild the native parts of JNIAST, JNIHDS or SPLAT.
    Don't do this unless you discover you have to.
 
    Each of these steps can also take some non-trivial time.
+
+ - Finally install the Perl modules.
+
+   The Perl modules can be installed using the build-modules.sh script
+   in the perlmods directory.  This script requires that the environment
+   variable STARLINK_DIR be set to the Starlink installation into which
+   you would like to install the Perl modules, i.e. $STARCONF_DEFAULT_PREFIX.
+
+      % cd thirdparty/perlsys/perlmods
+      % ./build-modules.sh
+
+   This will install or update if needed the dependencies from CPAN and
+   then install all the modules present in the perlmods directory itself.
 
  Additional hints
  ----------------
