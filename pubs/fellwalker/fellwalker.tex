@@ -314,16 +314,16 @@ FellWalker algorithm below.}
 \begin{figure}
 \includegraphics[width=\columnwidth]{walks}
 \caption{Two walks up a peak within the artificial data shown in
-Fig.~\ref{fig:sim}. The contours show
-the data values themselves. The white pixels are below the nominated threshold,
-the grey pixels are above the threshold but have not yet been assigned to a
-clump. The green pixels trace the first walk that reached the peak. The
-blue pixels trace a later walk to the same peak that was terminated when it
-met the first walk. The green and blue pixels are all assigned to the same
-clump. These walks follow the steepest line of ascent. Note
-the gap in the green line near its start at the lowest contour - this is
-where a jump was made from a noise spike to the highest value in a 9x9 box of
-neighbouring pixels.}
+Fig.~\ref{fig:sim}. The contours show the data values themselves. The white
+background pixels are below the nominated threshold, the grey pixels are
+above the threshold but have not yet been assigned to a clump. The green
+pixels trace the first walk that reached the left-hand peak. The blue pixels
+trace a later walk to the same peak that was terminated when it met the first
+walk. The green and blue pixels are all assigned to the same clump. These
+walks follow the steepest line of ascent. Note the gap in the green line
+near its start at the lowest contour - this is where a jump was made from
+a noise spike to the highest value in a 9x9 box of neighbouring pixels.}
+
 \label{fig:walks}
 \end{figure}
 
@@ -356,26 +356,27 @@ The number of significant peaks found by the above process is determined
 primarily by the maximum distance a walk can jump when searching for a
 higher neighbouring pixel value. This parameter - known as \emph{MaxJump}
 - defaults to 4 pixels. Using a larger value results in more local peaks
-being interpreted as noise spikes, with a corresponding reduction in the
-number of significant peaks found. Thus peaks are discriminated simply on the
-basis of their spatial separation.
+being interpreted as noise spikes rather than significant peaks, with a
+corresponding reduction in the number of significant peaks found. Thus at
+this point, peaks are discriminated simply on the basis of their spatial
+separation.
 
 This means it is possible for a clump with a wide, flat summit to be
-fragmented into multiple clumps on the basis of any noise spikes that are
+fragmented into multiple clumps on the basis of noise spikes that are
 separated by more than \emph{MaxJump} pixels.
 
 To correct this, FellWalker merges adjacent clumps if the ``valley''
 between the two adjacent peaks is very shallow.
 
-Each clump (the ``central'' clump) is considered in turn to see if it
-should be merged with one of its neighbouring clumps. The height of the
-``col\footnote{The highest point on the boundary between the two
-clumps.}'' between the central clump and each neighbouring clump is found
-in turn, and the neighbouring clump with the highest col is selected as a
-candidate for merging. If the peak value in the central clump is less
-than a specified value, \emph{MinDip}\footnote{The default is three times
-the noise level in the data.}, above the col, the two clumps are merged
-into a single clump.
+Each clump (referred to as the ``central'' clump below) is considered in
+turn to see if it should be merged with any of its neighbouring clumps.
+The height of the ``col\footnote{The highest point on the boundary
+between the two clumps.}'' between the central clump and each
+neighbouring clump is found in turn, and the neighbouring clump with the
+highest col is selected as a candidate for merging. If the peak value in
+the central clump is less than a specified value,
+\emph{MinDip}\footnote{The default is three times the noise level in the
+data.}, above the col, the two clumps are merged into a single clump.
 
 Once all central clumps have been checked in this way, the whole process
 is repeated to see if any of the merged clumps should themselves be
@@ -404,9 +405,51 @@ on the clump outlines shown in Fig.~\ref{fig:rawmask}.}
 
 
 \subsection{Characterising Each Clump}
+The FellWalker algorithm is implemented within the {\tt findclumps}
+command of the Starlink CUPID package (see section~\ref{sec:cupid}). This
+command implements several other clump finding algorithms, and one of its
+design requirements was that each algorithm should characterise clumps in
+the same way, so that results from different algorithms can be compared
+directly. Thre results are presented in the following ways:
+
+\begin{enumerate}
+
+\item A pixel mask which is the same shape and size as the supplied data
+array. Each pixel value is an integer which gives the index of the clump
+to which the pixel has been assigned. Pixels that have not been assigned
+to any clump are flagged with a special value.
+
+\item A set of minimal cut-outs from the supplied data array. Each cut-out
+holds the supplied pixels values corresponding to a single clump, with pixels
+outside the clump set to a special ``blank'' value.
+
+\item A table in which each row describes a single clump. The columns are:
+
+\begin{description}
+\item[Peak1] The position of the clump peak value on axis 1.
+\item[Peak2] The position of the clump peak value on axis 2.
+\item[Peak3] The position of the clump peak value on axis 3.
+\item[Cen1] The position of the clump centroid on axis 1.
+\item[Cen2] The position of the clump centroid on axis 2.
+\item[Cen3] The position of the clump centroid on axis 3.
+\item[Size1] The size of the clump along pixel axis 1.
+\item[Size2] The size of the clump along pixel axis 2.
+\item[Size3] The size of the clump along pixel axis 3.
+\item[Sum] The total data sum in the clump.
+\item[Peak] The peak value in the clump.
+\item[Volume] The total number of pixels falling within the clump.
+\end{description}
+
+There is also an optional column called ``Shape'' containing an STC-S
+description
+(\htmladdnormallink{http://www.ivoa.net/Documents/latest/STC-S.html}~) of
+the spatial coverage of each clump.
+
+\end{enumerate}
 
 
-\section{CUPID - an Implementation of FellWalker}
+
+\section{\label{sec:cupid}CUPID - an Implementation of FellWalker}
 The Starlink CUPID package \citep[][ascl:1311.007]{CupidAdass,SUN255} provides
 implementations of various clump-finding algorithms, including FellWalker
 and CLUMPFIND. In common with the rest of the Starlink software \citep[][ascl:1110.012]{StarlinkAdass},
