@@ -184,6 +184,11 @@ void cupidStoreClumps( const char *param1, const char *param2, int indf,
 *        by Andy and Malcolm).
 *     18-FEB-2014 (DSB):
 *        Erase any CADC provenance headers inherited form the input NDF.
+*     4-APR-2014 (DSB):
+*        Correct the entry names used when retrieving STC descriptions
+*        from the STC KeyMap, when writing JSA catalogues. The names are
+*        of the form "Shape_%d", where the integer value "%d" is one-based,
+*        not zero-based.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -734,7 +739,7 @@ void cupidStoreClumps( const char *param1, const char *param2, int indf,
                stc_data = astCalloc( max_stclen, iclump );
                if( *status == SAI__OK ) {
                   p1 = stc_data;
-                  for( istc = 0; istc < nndf; istc++ ) {
+                  for( istc = 1; istc <= nndf; istc++ ) {
                      sprintf( key, "Shape_%d", istc );
                      if( astMapGet0C( stc_km, key, (const char **) &stcptr ) ) {
                         strncpy( p1, stcptr, max_stclen );
