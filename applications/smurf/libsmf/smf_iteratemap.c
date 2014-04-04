@@ -448,6 +448,12 @@
 *        iteration, exclude any map pixels that have a very low number of
 *        hits (fewer than 10% of the mean number of hits per pixel) since
 *        these will have unreliable (potentially tiny) variances.
+*     2014-04-4(DSB):
+*        If the AST mask area drops to zero pixels, there are no bright
+*        pixels in the map. But this is no reason to report an error - a
+*        map can still be made, albeit it will contain only background
+*        areas. So annull the error when reporting mapchange values in
+*        this case.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -662,7 +668,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   int numiter=0;                /* Total number iterations */
   int nw;                       /* Number of worker threads */
   dim_t pad=0;                  /* How many samples of padding at both ends */
-  double pixsize;               /* Pixel size */
+  double pixsize = 0.0;         /* Pixel size */
   size_t qcount_last[SMF__NQBITS_TSERIES];/* quality bit counter -- last iter */
   smfArray **qua=NULL;          /* Quality flags for each file */
   smf_qual_t *qua_data=NULL;    /* Pointer to DATA component of qua */
@@ -2441,6 +2447,16 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           /* Calculate the mean change */
           smf_stats1D( mapchange, 1, msize, NULL, 0, 0, &mapchange_mean, NULL,
                        NULL, NULL, status );
+
+          /* If there were insufficient samples in the masked area, then
+             just annul the error since it just means that there are no
+             bright sources in the map. */
+          if( *status == SMF__INSMP ) {
+             msgOutf( "", FUNC_NAME ": *** No source pixels found", status );
+             mapchange_mean = 0.0;
+             mapchange_max = 0.0;
+             errAnnul( status );
+          }
 
           memcpy( lastmap, thismap, msize*sizeof(*lastmap) );
 
