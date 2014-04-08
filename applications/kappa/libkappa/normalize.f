@@ -373,6 +373,10 @@
 *        Added LOOP parameter.
 *     27-AUG-2013 (DSB):
 *        Allow looping over IN2 as well as over IN1.
+*     8-APR-2014 (DSB):
+*        Fix a bug in looping mode that caused a "no pixels in common"
+*        error from NDF_MBND if the single line NDF did not have an
+*        origin of 1 on the axis that spans a single pixel.
 *     {enter_further_changes_here}
 
 *-
@@ -554,6 +558,8 @@
 *  position to normalize (or be normalized by) the first row or column of
 *  IN1 (or IN2).
       IF( AXIS .GT. 0 ) THEN
+         SHIFT( 1 ) = 0
+         SHIFT( 2 ) = 0
          IF( LPOVR1 ) THEN
             ILO = LBND1( AXIS )
             IHI = UBND1( AXIS )
@@ -563,8 +569,6 @@
             IHI = UBND2( AXIS )
             SHIFT( AXIS ) = ILO - LBND1( AXIS )
          END IF
-         SHIFT( 1 ) = 0
-         SHIFT( 2 ) = 0
 
 *  If we are not looping, we only pass through the loop once, using the
 *  supplied NDF identifiers without change.
