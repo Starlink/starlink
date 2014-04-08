@@ -72,6 +72,7 @@
 *         additional stations
 *
 *  P.T.Wallace   Starlink   15 March 2002
+*  Added NANTEN2 and APEX - 2014
 *
 *  Copyright (C) 2002 Rutherford Appleton Laboratory
 *
@@ -108,7 +109,7 @@
       PARAMETER (AS2R=0.484813681109535994D-5)
 
 *  Table of station identifiers
-      PARAMETER (NMAX=83)
+      PARAMETER (NMAX=85)
       CHARACTER*10 CTAB(NMAX)
       DATA CTAB  (1) /'AAT       '/
       DATA CTAB  (2) /'LPO4.2    '/
@@ -193,6 +194,8 @@
       DATA CTAB (81) /'KOSMA3M   '/
       DATA CTAB (82) /'MAGELLAN1 '/
       DATA CTAB (83) /'MAGELLAN2 '/
+      DATA CTAB (84) /'APEX      '/
+      DATA CTAB (85) /'NANTEN2   '/
 
 *  Degrees, arcminutes, arcseconds to radians
       WEST(ID,IAM,AS)=AS2R*(DBLE(60*(60*ID+IAM))+DBLE(AS))
@@ -244,7 +247,7 @@
      :       510,520,530,540,550,560,570,580,590,600,
      :       610,620,630,640,650,660,670,680,690,700,
      :       710,720,730,740,750,760,770,780,790,800,
-     :       810,820,830) M
+     :       810,820,830,840,850) M
       GO TO 9000
 
 *  AAT (Observer's Guide)                                            AAT
@@ -930,6 +933,24 @@
       W=WEST(70,41,33.5)
       P=SOUTH(29,00,50.3)
       H=2408D0
+      GO TO 9999
+
+*  APEX - Atacama Pathfinder EXperiment, Llano de Chajnantor    APEX
+*  (APEX web site)
+ 840  CONTINUE
+      NAME='APEX 12m telescope, Llano de Chajnantor'
+      W=WEST(67,45,33.0)
+      P=SOUTH(23,00,20.8)
+      H=5105D0
+      GO TO 9999
+
+*  NANTEN2 Submillimeter Observatory, 4m telescope Atacama desert NANTEN2
+*  (NANTEN2 web site)
+ 850  CONTINUE
+      NAME='NANTEN2 4m telescope, Pampa la Bola'
+      W=WEST(67,42,08.0)
+      P=SOUTH(22,57,47.0)
+      H=4865D0
       GO TO 9999
 
 *  Unrecognized station
