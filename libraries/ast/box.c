@@ -99,6 +99,10 @@ f     The Box class does not define any new routines beyond those
 *        Modify RegPins so that it can handle uncertainty regions that straddle
 *        a discontinuity. Previously, such uncertainty Regions could have a huge
 *        bounding box resulting in matching region being far too big.
+*     10-APR-2014 (DSB):
+*        More work (in function Cache() ) on handling uncertainty regions that straddle
+*        a discontinuity. This time ensure that the extent of the box on each axis takes 
+*        account of the possibly cyclic nature of the base Frame.
 *class--
 */
 
@@ -751,16 +755,18 @@ static void Cache( AstBox *this, int lohi, int *status ){
 /* Calculate the geodesic half-dimensions of the box. */
       frm = astGetFrame( ((AstRegion *) this)->frameset, AST__BASE );
       GeoLengths( frm, nc, centre, hi, geolen, status );
-      frm = astAnnul( frm );
 
 /* Calculate the half-width and store in the above array. Also store the
    shrunk half-widths, and the shrunk lower and upper bounds. */
       for( i = 0; i < nc; i++ ) {
-         extent[ i ] = fabs( ptr[ i ][ 1 ] - centre[ i ] );
+         extent[ i ] = fabs( astAxDistance( frm, i + 1, ptr[ i ][ 1 ],
+                                            centre[ i ] ) );
          shextent[ i ] = extent[ i ]*this->shrink;
          lo[ i ] = centre[ i ] - shextent[ i ];
          hi[ i ] = centre[ i ] + shextent[ i ];
       }
+
+      frm = astAnnul( frm );
 
 /* Store the pointers to these arrays in the Box structure, and indicate
    the information is usable. */
