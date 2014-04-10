@@ -2148,7 +2148,6 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd, int 
 
 /* Local Variables: */
    AstBox *this;                 /* Pointer to Box structure */
-   AstFrame *bfrm;               /* Pointer to base Frame */
    double axcen;                 /* Central axis value */
    double axlen;                 /* Half width of box on axis */
    int i;                        /* Axis index */
@@ -2163,23 +2162,17 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd, int 
 /* Ensure cached information is up to date. */
    Cache( this, 0, status );
 
-/* Get a pointer to the base Frame, in which the Region is defined. */
-   bfrm = astGetFrame( this_region->frameset, AST__BASE );
-
 /* Get the number of base Frame axes in the Region. */
-   nc = astGetNin( bfrm );
+   nc = astGetNin( this_region->frameset );
 
 /* The first point is the centre of the box, the second point is the half
    size of the box on each axis.*/
    for( i = 0; i < nc; i++ ) {
       axcen = this->centre[ i ];
       axlen = this->extent[ i ]*this->shrink;
-      lbnd[ i ] = astAxOffset( bfrm, i + 1, axcen, -axlen );
-      ubnd[ i ] = astAxOffset( bfrm, i + 1, axcen, axlen );
+      lbnd[ i ] = axcen - axlen;
+      ubnd[ i ] = axcen + axlen;
    }
-
-/* Free resources. */
-   bfrm = astAnnul( bfrm );
 }
 
 static AstPointSet *RegBaseGrid( AstRegion *this, int *status ){
