@@ -73,6 +73,8 @@
 *        Call SCUBA-2 and ACSIS specialist fixup routines.
 *     2014-03-28 (TIMJ):
 *        Only run ACSIS and SCUBA-2 fixups with those specific instruments.
+*     2014-04-11 (TIMJ):
+*        Do not run STEPTIME guessing code unless we really are ACSIS or SCUBA-2.
 
 *  Copyright:
 *     Copyright (C) 2009 Science & Technology Facilities Council.
@@ -143,8 +145,13 @@ int smf_fix_metadata ( msglev_t msglev, smfData * data, int * status ) {
   /* find out where the FITS header currently ends */
   ncards = astGetI( fits, "NCard" );
 
-  /* Get the step time from the header if we have a hdr */
-  if ( hdr->instrument!=INST__NONE  ) {
+  /* Get the step time from the header if we have a hdr. These fixups are
+     specifically for JCMT instruments which can access the OCS configuration XML.
+     The fixups are not relevant for translated instrumentation which should be
+     putting in a correct STEPTIME during translation.
+  */
+  if ( hdr->realinst == SMF__RINST_ACSIS ||
+       hdr->realinst == SMF__RINST_SCUBA2 ) {
     /* for a handful of observations, the STEPTIME seems to be a clone
        of UEL header. These occur between 20080301 and 20090112
        (specifically 20080301#3, 20080316#55, 20090104#30, 20090111#10 and
