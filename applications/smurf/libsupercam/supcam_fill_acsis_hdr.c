@@ -187,7 +187,7 @@ supcam_fill_acsis_hdr( AstFitsChan * supcamhdr, AstFitsChan * acsishdr, int * st
   /* Now create a TimeFrame to format the MJD back to ISO */
   AstTimeFrame * tf = astTimeFrame( "Format=iso.3T" );
   atlPtfts( acsishdr, "DATE-OBS", astFormat( tf, 1, mjdobs ),
-            "UTD Datetime of start of observation", status );
+            "UTC Datetime of start of observation", status );
   astAnnul(tf);
 
   /* The Supercam DATE-OBS is actually DATE-END */
