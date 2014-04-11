@@ -71,6 +71,9 @@ AstFrameSet *atlFrameSetSplit( AstFrameSet *fset, const char *domain, int *statu
 *  History:
 *     28-MAR-2014 (DSB):
 *        Original version.
+*     10-APR-2014 (DSB):
+*        The index of the base Frame in the returned FrameSet is not necessarily the
+*        same as in the supplied FrameSet.
 *     {enter_further_changes_here}
 *-
 */
@@ -199,7 +202,7 @@ AstFrameSet *atlFrameSetSplit( AstFrameSet *fset, const char *domain, int *statu
                      ffrm = astPickAxes( frm, nax, faxes, NULL );
 
 /* Add the axes into the returned FrameSet. */
-                     astAddFrame( result, ibase, fmap, ffrm );
+                     astAddFrame( result, AST__BASE, fmap, ffrm );
                   }
 
                   faxes = astFree( faxes );
@@ -208,7 +211,7 @@ AstFrameSet *atlFrameSetSplit( AstFrameSet *fset, const char *domain, int *statu
 
 /* Finally add in the current Frame (which then remains the curent Frame
    because this is the last call to astAddFrame). */
-            astAddFrame( result, ibase, bcmap, cfrm_out );
+            astAddFrame( result, AST__BASE, bcmap, cfrm_out );
          }
       }
    }
