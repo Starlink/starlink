@@ -414,6 +414,7 @@ void smurf_supercam2acsis( int *status ) {
       AstTimeFrame * tf = astTimeFrame( "TimeScale=UTC, TimeOrigin=%.*g", DBL_DIG, dateend );
       astSet( tf, "TimeScale=TAI" );
       record.rts_end = astGetD( tf, "TimeOrigin" );
+      tf = astAnnul(tf);
 
       /* Exposure time in seconds */
       ihdr.fitshdr = fitschan;
@@ -443,7 +444,8 @@ void smurf_supercam2acsis( int *status ) {
     record.smu_tr_chop_y = 0.0;
 
     strcpy( record.tcs_tr_sys, "GALACTIC" );
-    strcpy( record.tcs_source, "M" );
+    strcpy( record.tcs_source, "SCIENCE" );
+    strcpy( record.tcs_beam, "M" );
     strcpy( record.acs_source_ro, "SPECTRUM_RESULT" );
 
     /* Now we need to loop through the data array dumping all numRows spectra */
