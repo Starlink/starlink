@@ -222,7 +222,7 @@ supcam_fill_acsis_hdr( AstFitsChan * supcamhdr, AstFitsChan * acsishdr, int * st
 
   /* Azimuth and elevation start and end are easy */
   smf_fits_getD(&ihdr, "ELEVATIO", &dvalue, status );
-  dvalue = palAirmas( PAL__DPI - dvalue );
+  dvalue = palAirmas( AST__DPIBY2 - (dvalue*PAL__DD2R) );
   atlPtftd( acsishdr, "AMSTART", dvalue, "Airmass at start of observation", status );
   atlPtftd( acsishdr, "AMEND", dvalue, "Airmass at end of observation", status );
 
