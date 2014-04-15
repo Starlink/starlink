@@ -160,6 +160,8 @@
 *     2014 March 8 (MJC):
 *        Set a default of UNKNOWN for missing sbMode.  This is either
 *        UNKNOWN or DSB depending on the front end and UT date.
+*     2014 April 14 (MJC):
+*        Add a null INBEAM to mimic ACSIS.
 
 *  Copyright:
 *     Copyright (C) 2008-2014 Science and Technology Facilities Council.
@@ -943,6 +945,8 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
 
   astSetFitsS ( fitschan, "SW_MODE", mapVars->swMode,
                 "Switch Mode", 0 );
+
+  astSetFitsU ( fitschan, "INBEAM", "Hardware in the beam", 0 );
 
   astSetFitsS ( fitschan, "SKYREFX", mapVars->skyRefX,
                 "X co-ord of Reference Position", 0 );
