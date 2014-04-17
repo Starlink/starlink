@@ -274,6 +274,14 @@
 #        Add low resolution bandpass parameter (in +/- mm from centre) to fts2split
 #     2013-11-10 (MS):
 #        Add optional rtsdelay parameter to compensate for RTS timing delay for FTS-2 mirror position
+#     2014-03-28 (MS):
+#        Add optional spectral filter profile (sfp) parameter to fts2spectrum for sub-array specific calibration files
+#     2014-04-16 (MS):
+#        Add optional Nyquist frequency (fNyquist) parameter to fts2init
+#        to override default calculated value of 50.0 when SCANVEL is at the usual rate of 4.2 mm/sec
+#     2014-04-17 (MS):
+#        Revise fts2spectrum resolution parameter to directly enter the desired spectral resolution value
+#        The default resolution is 0.005, but one could enter any sensible alternative as an override
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -2212,6 +2220,16 @@ package @PACKAGE@ {
                 prompt {ZPD calibration file}
                 helpkey *
             }
+
+            parameter fnyquist {
+                type _DOUBLE
+                access READ
+                vpath {PROMPT}
+                ppath CURRENT DEFAULT
+                prompt {Override the default Nyquist frequency}
+                default 0
+                helpkey *
+            }
         }
 
         action fts2maskmap {
@@ -2500,13 +2518,25 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter sfp {
+                position 3
+                type NDF
+                access READ
+                vpath {PROMPT}
+                ppath GLOBAL CURRENT
+                prompt {SFP calibration file}
+                default !
+                helpkey *
+            }
+
             parameter resolution {
-                type _INTEGER
+                type _DOUBLE
+
                 access READ
                 vpath {PROMPT}
                 ppath CURRENT DEFAULT
-                prompt {Spectral Resolution: 0=LowRes, 1=MediumRes, Any=HighRes}
-                default 2
+                prompt {Spectral Resolution: }
+                default 0.0
                 helpkey *
             }
 
@@ -3939,13 +3969,13 @@ package @PACKAGE@ {
                 helpkey *
             }
 
-	        parameter steptime {
+            parameter steptime {
                     type _DOUBLE
                     access WRITE
                     vpath DEFAULT
                     default 0
                     helpkey *
-	        }
+            }
 
         }
 

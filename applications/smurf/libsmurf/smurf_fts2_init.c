@@ -31,6 +31,9 @@
 *          Output files.
 *     ZPD = NDF (Read)
 *          ZPD calibration file.
+*     FNYQUIST = DOUBLE (Read)
+*          Override the default Nyquist frequency
+*          (default scalculated to be 50.0 at SCANVEL of 4.2 mm/sec) (Optional)
 
 *  Notes:
 *     - The CENTRE parameter should be the same value as was used when
@@ -148,6 +151,7 @@ void smurf_fts2_init(int* status)
   int j                     = 0;        /* Counter */
   int k                     = 0;        /* Counter */
   double fNyquist           = 0.0;      /* Nyquist frequency */
+  double fNyquistOverride   = 0.0;      /* Nyquist frequency command line override */
   double dz                 = 0.0;      /* Step size in evenly spaced OPD grid */
   double dx                 = 0.0;      /* Step size in evenly spaced mirror position grid */
   double* MIRPOS            = NULL;     /* Mirror positions */
@@ -200,7 +204,8 @@ void smurf_fts2_init(int* status)
          midZPD             = 0.0;      /* Mirror position half side measures */
   int midZPDPos             = 0;        /* Middle ZPD position in mirror position array */
 
-#define STEPTIME              0.0055    /* Nominal step time to produce uniformly sized zero-padded spectra */
+#define STEPTIME              1.0/168.0 /* Nominal step time chosen to produce a fNyquist of 50.0
+                                           at the usual SCANVEL of 4.2 mmm/sec */
 
   /* Get Input, Output and ZPD groups */
   kpg1Rgndf("IN", 0, 1, "", &gIn, &nFiles, status);
@@ -221,6 +226,13 @@ void smurf_fts2_init(int* status)
   parGet0d("RTSDELAY", &deltaT, status);
   if (*status != SAI__OK) {
       errRep(FUNC_NAME, "Could not read parameters", status);
+      goto CLEANUP;
+  }
+
+  /* fNyquist */
+  parGet0d("FNYQUIST", &fNyquistOverride, status);
+  if (*status != SAI__OK) {
+      errRep(FUNC_NAME, "Could not read fNyqust parameter", status);
       goto CLEANUP;
   }
 
@@ -360,7 +372,11 @@ void smurf_fts2_init(int* status)
     stepTime = STEPTIME;
 
     /* Nyquist frequency */
-    fNyquist = 10.0 / (8.0 * scanVel * stepTime);
+    if(fNyquistOverride > 0.0) {
+        fNyquist = fNyquistOverride;
+    } else {
+        fNyquist = 10.0 / (8.0 * scanVel * stepTime);
+    }
     dz = 1.0 / (2.0 * fNyquist);
 
     /* Time shifted IFG */

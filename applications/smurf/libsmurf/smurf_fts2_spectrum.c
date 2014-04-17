@@ -27,6 +27,13 @@
 *          Input files to be transformed.
 *     OUT = NDF (Write)
 *          Output files.
+*     SFP = NDF (Read)
+*          Spectral Filter Profile (optional)
+*          Supply this sub-array specific NDF calibration file
+*          to fine tune each bolometer
+*          by factoring out its unique heat response deviation
+*          from the expected Planck curve response
+*          as measured through black body heated load scans
 *     ZEROPAD = LOGICAL (Read)
 *          Determines whether to zeropad.
 *     RESOLUTION = _INTEGER (Read)
@@ -38,7 +45,7 @@
 
 *  Authors:
 *     COBA: Coskun Oba (UoL)
-*     MSHERWOOD: Matt Sherwood (UofL)
+*     MS: Matt Sherwood (UofL)
 
 *  History :
 *     2011-06-24 (COBA):
@@ -47,7 +54,7 @@
 *        Add Zero-Padding.
 *     2011-10-18 (COBA):
 *        Add subarray check.
-*     2013-03-12 (MSHERWOOD)
+*     2013-03-12 (MS)
 *        Beginning to correct zeropadding
 *     2013-03-12 (MS)
 *        Aligned with OPD grid
@@ -74,6 +81,17 @@
 *        Correct off-by-one ZPD index error causing attenuation at half nyquist
 *     2013-08-27 (MS)
 *        Temporary fix for segfault due to incorrect array sizes
+*     2014-04-01 (MS)
+*        Add optional Spectral Filter Profile calibration file handling
+*        A new 'SFP' optional calibration file parameter has been added for this purpose.
+*        The SFP data is in a 1D array of 32 x 40 x nSfp values,
+*        with an expected resolution of 0.025 (1/cm), normalized to 1.
+*        For the 850 band, this ranges from wave number 11.22 to 12.395 in 1/cm units, and
+*        for the 450 band, it ranges from wave number   21.63 to 23.105 in 1/cm units
+*        This data is interpolated to the resolution of the spectrum before dividing it out.
+*     2014-04-17 (MS)
+*        Add optional RESOLUTION override
+*        If defined as a command line parameter, an arbitrary output resolution is applied.
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -107,6 +125,7 @@
 /* STANDARD includes */
 #include <string.h>
 #include <stdio.h>
+#include <gsl/gsl_spline.h>
 
 /* STARLINK includes */
 #include "ast.h"
@@ -136,12 +155,17 @@ void smurf_fts2_spectrum(int* status)
     const char*  dataLabel    = "Spectrum";     /* Data label */
     Grp* gIn                  = NULL;           /* Input group */
     Grp* gOut                 = NULL;           /* Output group */
+    Grp* gSfp                 = NULL;           /* SFP group */
     smfData* inData           = NULL;           /* Pointer to input data */
     smfData* outData          = NULL;           /* Pointer to output data */
+    smfData* sfpData          = NULL;           /* Pointer to SFP data */
+    smfData* sfp              = NULL;           /* Pointer to SFP index data */
+    int doSFP                 = 0;              /* Only apply SFP if given */
     int zeropad               = 1;              /* Determines whether to zeropad */
     double resolution         = 0.0;            /* Spectral Resolution */
     double resolutionin       = 0.0;            /* Spectral Resolution input */
     double resolutionzp       = 0.0;            /* Spectral Resolution zero padded */
+    double resolution_override= 0.0;            /* Spectral Resolution override */
     int i                     = 0;              /* Counter */
     int j                     = 0;              /* Counter */
     int k                     = 0;              /* Counter */
@@ -153,19 +177,32 @@ void smurf_fts2_spectrum(int* status)
     double dSigmain           = 0.0;            /* Spectral Sampling Interval zero padded */
     double dSigmazp           = 0.0;            /* Spectral Sampling Interval zero padded */
     double* IFG               = NULL;           /* Interferogram */
+    double* SFP               = NULL;           /* Spectral Filter Profile for all pixels */
+    double* SFPij             = NULL;           /* Spectral Filter Profile for a single pixel */
+    double wavelen            = 0.0;            /* The central wave length of the subarray filter (m) */
+    double wnSfp850First      = 11.220;         /* Starting 850 band SFP wave number */
+    double wnSfp850Last       = 12.395;         /* Ending 850 band SFP wave number */
+    double wnSfp450First      = 21.630;         /* Starting 450 band SFP wave number */
+    double wnSfp450Last       = 23.105;         /* Ending 450 band SFP wave number */
+    double wnSfpResolution    = 0.025;          /* The resolution of the SFP wave numbers (1/cm) */
+    double* WN                = NULL;           /* Wave Numbers from SFP */
     double* DS                = NULL;           /* Double Sided Interferogram */
     fftw_complex* DSIN        = NULL;           /* Double-Sided interferogram, FFT input */
     fftw_complex* SPEC        = NULL;           /* Spectrum */
     fftw_plan plan            = NULL;           /* fftw plan */
     int pland                 = 0;              /* fftw plan destroyed? */
+    gsl_interp_accel* ACC     = NULL;           /* SFP interpolator */
+    gsl_spline* SPLINE        = NULL;           /* SFP interpolation spline */
 
     size_t nFiles             = 0;              /* Size of the input group */
     size_t nOutFiles          = 0;              /* Size of the output group */
+    size_t nSFPFiles          = 0;              /* Size of the SFP group */
+    size_t nSfp               = 89;             /* Number of SFP calibration file values */
     size_t fIndex             = 0;              /* File index */
-    size_t nWidth             = 0;              /* Data cube width */
-    size_t nHeight            = 0;              /* Data cube height */
+    size_t nWidth             = 32;             /* Data cube width */
+    size_t nHeight            = 40;             /* Data cube height */
     size_t nFrames            = 0;              /* Data cube depth */
-    size_t nPixels            = 0;              /* Number of bolometers in the subarray */
+    size_t nPixels            = nWidth*nHeight; /* Number of bolometers in the subarray */
 
     double dIntensity         = 0;
     int N                     = 0;
@@ -175,7 +212,9 @@ void smurf_fts2_spectrum(int* status)
     int N2in                  = 0;                /* N/2 input */
     int N2zp                  = 0;                /* N/2 zero padded */
     int bolIndex              = 0;
+    int cubeIndex             = 0;
     int badPixel              = 0;
+    int index                 = 0;
     int indexZPD              = 0;
     int indexZPDin            = 0;
     int indexZPDzp            = 0;
@@ -187,23 +226,42 @@ void smurf_fts2_spectrum(int* status)
     double OPDMax             = 0.0;             /* OPD max in cm */
     double OPDMaxin           = 0.0;             /* OPD max in cm input */
     double OPDMaxzp           = 0.0;             /* OPD max in cm zero padded */
+    double s                  = 0.0;             /* spectrum value */
+    double f                  = 0.0;             /* filter value */
 
 #define DEBUG 0
 
     /* Get Input & Output groups */
     kpg1Rgndf("IN", 0, 1, "", &gIn, &nFiles, status);
     kpg1Wgndf("OUT", gOut, nFiles, nFiles, "Equal number of input and output files expected!", &gOut, &nOutFiles, status);
+    kpg1Gtgrp("SFP", &gSfp, &nSFPFiles, status);
+    if(*status != SAI__OK) {
+        /* TODO: Check for any other possible error conditions */
+        /* Assume SFP calibration file not given, and proceed without it */
+        doSFP = 0;
+        *status = SAI__OK;
+    } else {
+        doSFP = 1;
+    }
 
     /* Read in ADAM parameters */
     parGet0i("ZEROPAD", &zeropad, status);
 
+    /* Resolution */
+    parGet0d("RESOLUTION", &resolution_override, status);
+    if (*status != SAI__OK) {
+        errRep(FUNC_NAME, "Could not read resolution_override parameter", status);
+        goto CLEANUP;
+    }
+
     /* BEGIN NDF */
     ndfBegin();
+
 
     /* Loop through each input file */
     for(fIndex = 1; fIndex <= nFiles; fIndex++) {
         /* Open Observation file */
-    smf_open_file(NULL, gIn, fIndex, "READ", SMF__NOFIX_METADATA, &inData, status);
+        smf_open_file(NULL, gIn, fIndex, "READ", SMF__NOFIX_METADATA, &inData, status);
         if(*status != SAI__OK) {
             *status = SAI__ERROR;
             errRep(FUNC_NAME, "Unable to open the source file!", status);
@@ -233,6 +291,14 @@ void smurf_fts2_spectrum(int* status)
             goto CLEANUP;
         }
 
+        /* Read in the wave length (m) from the FITS header to determine the band */
+        smf_fits_getD(inData->hdr, "WAVELEN", &wavelen, status);
+        if(*status != SAI__OK) {
+            *status = SAI__ERROR;
+            errRep(FUNC_NAME, "Unable to find the wavelen in the FITS header!", status);
+            goto CLEANUP;
+        }
+
         fNyquistin = fNyquistzp = 0.0;
         dx = dxin = dxzp = 0.0;
         N2 = N2in = N2zp = 0;
@@ -246,8 +312,13 @@ void smurf_fts2_spectrum(int* status)
         indexZPDin = N2in - 1;
         Nin = 2 * N2in;
         OPDMaxin = N2in * dxin;
-        resolution = 1 / (2 * OPDMaxin);
-        resolutionin = resolution;
+        if(resolution_override > 0.0) {
+            resolution = resolution_override;
+            resolutionin = resolution_override;
+        } else {
+            resolution = 1 / (2 * OPDMaxin);
+            resolutionin = resolution;
+        }
         dSigmain = fNyquistin / N2in;
 
         if(zeropad) {
@@ -273,10 +344,14 @@ void smurf_fts2_spectrum(int* status)
                 /* Calculate resolution as 1 / (2*OPDMax) */
                 /* Calculate OPDMax as N2 * dx */
 
-                if(resolution > 0.05) {
-                    resolutionzp = floor(resolution/0.05) * 0.05;
+                if(resolution_override) {
+                    resolutionzp = resolution_override;
                 } else {
-                    resolutionzp = 0.005;
+                    if(resolution > 0.05) {
+                        resolutionzp = floor(resolution/0.05) * 0.05;
+                    } else {
+                        resolutionzp = 0.005;
+                    }
                 }
 
                 /* Calculate OPDMaxOut  as 1 / (2 * resolutionzp) */
@@ -334,6 +409,7 @@ void smurf_fts2_spectrum(int* status)
         outData->pntr[0] = (double*) astMalloc((nPixels * (N2+1)) * sizeof(double));
         if (dataLabel) { one_strlcpy(outData->hdr->dlabel, dataLabel, sizeof(outData->hdr->dlabel), status ); }
 
+        /* Allocate memory for arrays */
         IFG  = astCalloc(N,  sizeof(*IFG));
         DS   = astCalloc(N, sizeof(*DS));
         DSIN = fftw_malloc(N * sizeof(*DSIN));
@@ -341,6 +417,70 @@ void smurf_fts2_spectrum(int* status)
 
         /* Initialize arrays */
         for(k = 0; k < N; k++) { SPEC[k][0] = SPEC[k][1] = DSIN[k][0] = DSIN[k][1] = DS[k] = IFG[k] = 0.0; }
+
+        /* Open the SFP calibration file, if given */
+        if(doSFP) {
+            smf_open_file(NULL, gSfp, 1, "READ", SMF__NOCREATE_QUALITY, &sfpData, status);
+            if(*status != SAI__OK) {
+                *status = SAI__ERROR;
+                errRep(FUNC_NAME, "Unable to open the SFP calibration file!", status);
+                goto CLEANUP;
+            }
+
+            /* Read in the number of data elements */
+            nSfp = sfpData->dims[1] / nPixels;
+            /* Allocate memory for arrays */
+            SFP = astCalloc(nSfp*nPixels, sizeof(*SFP));
+            SFPij = astCalloc(nSfp, sizeof(*SFP));
+            WN  = astCalloc(nSfp, sizeof(*WN));
+
+            /* DEBUG: Dispay SFP data */
+            // printf("smurf_fts2_spectrum ([%d,%d,%d] elements): WN, SFP\n", (int)sfpData->dims[0],(int)sfpData->dims[1],(int)sfpData->dims[2]);
+            for(k=0;k<((int)nSfp);k++){
+                //  printf("WN:%.3f,SFP:%.10f\n", *((double*) (sfpData->pntr[0]) + i), *((double*) (sfpData->pntr[0]) + i+1));
+                /* Adjust starting and ending wave number ranges for 450 or 850 bands */
+                if(wavelen == 0.00085) {
+                    WN[k] = wnSfp850First + k * wnSfpResolution;
+                } else if(wavelen == 0.00045) {
+                    WN[k] = wnSfp450First + k * wnSfpResolution;
+                } else {
+                    *status = SAI__ERROR;
+                    errRep(FUNC_NAME, "Unexpected WAVELEN value found in the FITS header!", status);
+                    goto CLEANUP;
+                }
+                // printf("SFP WN[%d]=%f\n",k,WN[k]);
+                for(j=0;j<nHeight;j++) {
+                    for(i=0;i<nWidth;i++) {
+                        bolIndex = i + j * nWidth;
+                        cubeIndex = bolIndex + k * nPixels;
+                        SFP[cubeIndex] = *((double*) (sfpData->pntr[0]) + cubeIndex);
+                        //  if(i==10 && j==20) printf("SFP i:%d,j:%d,k:%d,bolIndex:%d,cubeIndex:%d=%f\n",i,j,k,bolIndex,cubeIndex,SFP[cubeIndex]);
+                    }
+                }
+            }
+
+            //printf("smurf_fts2_spectrum DEBUG: early exiting!\n");
+            //exit(0);
+
+            /* Create a 2D SFP index array and store it in the file, if given
+            sfp = smf_create_smfData(SMF__NOCREATE_DA | SMF__NOCREATE_FTS, status);
+            sfp->dtype   = SMF__INTEGER;
+            sfp->ndims   = 2;
+            sfp->dims[0] = nSfp;
+            sfp->dims[1] = 2;
+            sfp->pntr[0] = (int*) astCalloc(nSfp*2,  sizeof(double));
+            // By default set ZPD indices to a bad value
+            for(i = 0; i < nSfp; i++) {
+                for(j = 0; j < 2; j++) {
+                    bolIndex = i + j * 2;
+                    *((int*) (sfp->pntr[0]) + bolIndex) = VAL__BADI;
+                }
+            } */
+
+            /* Prepare GSL interpolator to convert SFP data to this spectrum's resolution */
+            ACC    = gsl_interp_accel_alloc();
+            SPLINE = gsl_spline_alloc(gsl_interp_cspline, nSfp);
+        }
 
         for(i = 0; i < nWidth; i++) {
             for(j = 0; j < nHeight; j++) {
@@ -434,9 +574,31 @@ void smurf_fts2_spectrum(int* status)
                 plan = fftw_plan_dft_1d(N, DSIN, SPEC, FFTW_FORWARD, FFTW_ESTIMATE);
                 fftw_execute(plan);
 
-                /* Write out the positive real component of the spectrum and normalize */
+                /* Normalize spectrum */
+                for(k=0;k<N;k++) { SPEC[k][0] = SPEC[k][0] / (double)(N * resolution); }
+
+                /* Apply SFP calibration, if given */
+                if(doSFP){
+                    /* Get the SFP for this pixel */
+                    for(k=0;k<nSfp;k++) { SFPij[k] = SFP[i + j*nWidth + k*nPixels]; }
+                    /* Interpolate the SFP values from its original WN scale to the current spectrum scale */
+                    gsl_spline_init(SPLINE, WN, SFPij, nSfp);
+
+                    /* Divide the spectrum in the band pass region by the interpolated SFP value at each position */
+                    for(k = 0; k < N; k++) {
+                        if(k*dSigma >= WN[0] && k*dSigma <= WN[nSfp-1]) {
+                            f = gsl_spline_eval(SPLINE, k*dSigma, ACC);
+                            //index = bolIndex + nPixels * k;
+                            s = SPEC[k][0];
+                            SPEC[k][0] = s / f;
+                         // if(i==10 && j==20) { printf("SFP i=%d, j=%d, k=%d, dSigma=%f, k*dSigma=%f, s=%f, f=%f, s/f=%f, \n", i, j, k, dSigma, k*dSigma, s, f, s/f); }
+                        }
+                    }
+                }
+
+                /* Write out the positive real component of the spectrum */
                 for(k = 0; k <= N2; k++) {
-                    *((double*)(outData->pntr[0]) + (bolIndex + k * nPixels)) = (SPEC[k][0] / (double)(N * resolution));
+                    *((double*)(outData->pntr[0]) + (bolIndex + k * nPixels)) = SPEC[k][0];
                   /*if(i==16 && j==25) {
                         printf("%s: SPEC[%d,%d,%d]=%E\n",TASK_NAME, i, j, k, SPEC[k][0] / (double)(N * resolution));
                     }*/
@@ -444,11 +606,17 @@ void smurf_fts2_spectrum(int* status)
             }
         }
 
+        /* Deallocate memory used by arrays */
         if(IFG)  { IFG = astFree(IFG); }
         if(DS)   { DS = astFree(DS); }
+        if(SFP)  { SFP = astFree(SFP); }
+        if(SFPij)  { SFPij = astFree(SFPij); }
+        if(WN)   { WN = astFree(WN); }
         if(plan) { fftw_destroy_plan(plan); pland = 1; }
         if(DSIN) { fftw_free(DSIN); DSIN = NULL; }
         if(SPEC) { fftw_free(SPEC); SPEC = NULL; }
+        if(ACC)     { gsl_interp_accel_free(ACC);   ACC     = NULL; }
+        if(SPLINE)  { gsl_spline_free(SPLINE);      SPLINE  = NULL; }
 
         /* Close the file */
         if(inData) {
@@ -461,6 +629,7 @@ void smurf_fts2_spectrum(int* status)
         }
 
         /* Write output */
+        /* outData->fts = smf_construct_smfFts(NULL, sfp, fpm, sigma, status);   // TODO: Add interpolated SFP to FITS header */
         smf_write_smfData(NULL, outData, NULL, NULL, gOut, fIndex, 0, MSG__VERB, 0, status);
         if(*status != SAI__OK) {
             *status = SAI__ERROR;
@@ -478,9 +647,14 @@ void smurf_fts2_spectrum(int* status)
 CLEANUP:
     if(IFG)  { IFG = astFree(IFG); }
     if(DS)   { DS = astFree(DS); }
+    if(SFP)  { SFP = astFree(SFP); }
+    if(SFPij)  { SFPij = astFree(SFPij); }
+    if(WN)   { WN = astFree(WN); }
     if(plan && !pland) { fftw_destroy_plan(plan); }
     if(DSIN) { fftw_free(DSIN); DSIN = NULL; }
     if(SPEC) { fftw_free(SPEC); SPEC = NULL; }
+    if(ACC)     { gsl_interp_accel_free(ACC);   ACC     = NULL; }
+    if(SPLINE)  { gsl_spline_free(SPLINE);      SPLINE  = NULL; }
 
     /* Close files if still open */
     if(inData) {
@@ -497,11 +671,19 @@ CLEANUP:
             errRep(FUNC_NAME, "CLEANUP: Unable to close the output file!", status);
         }
     }
+    if(sfpData) {
+        smf_close_file( NULL,&sfpData, status);
+        if(*status != SAI__OK) {
+            *status = SAI__ERROR;
+            errRep(FUNC_NAME, "CLEANUP: Unable to close the SFP file!", status);
+        }
+    }
 
     /* END NDF */
     ndfEnd(status);
 
     /* Delete Groups */
-    grpDelet(&gIn, status);
-    grpDelet(&gOut, status);
+    if(gIn) grpDelet(&gIn, status);
+    if(gOut) grpDelet(&gOut, status);
+    if(gSfp) grpDelet(&gSfp, status);
 }
