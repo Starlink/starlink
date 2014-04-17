@@ -169,6 +169,7 @@ void smurf_jsatilelist( int * );
 void smurf_jsatileinfo( int * );
 void smurf_makecube( int * );
 void smurf_makemap( int * );
+void smurf_nanten2acsis( int * );
 void smurf_rawfixmeta( int * );
 void smurf_rawpress( int * );
 void smurf_rawrecreatewcs( int * );

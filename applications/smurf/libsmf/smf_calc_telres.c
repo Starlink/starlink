@@ -42,6 +42,8 @@
 *        Add support for SCUBA-2
 *     2014-03-28 (TIMJ):
 *        Add SMT
+*     2014-04-10 (TIMJ):
+*        Add NANTEN2
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -142,6 +144,22 @@ float smf_calc_telres( AstFitsChan *hdr, int *status ) {
 
         /* Diameter in metres */
         diam = 10.0;
+
+        /* Get the LO frequency */
+        if (  ! astGetFitsF( hdr, "LOFREQS", &los ) ) {
+          if( *status == SAI__OK ) {
+            *status = SAI__ERROR;
+            errRep( "", "The \"LOFREQS\" FITS header was not found.",
+                    status );
+          }
+        }
+
+        lambda = 2.0E-9 * AST__C / los;
+
+      } else if ( !strncmp( value, "NANTEN2", nc ) ) {
+
+        /* Diameter in metres */
+        diam = 4.0;
 
         /* Get the LO frequency */
         if (  ! astGetFitsF( hdr, "LOFREQS", &los ) ) {

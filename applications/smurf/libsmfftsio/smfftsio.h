@@ -67,6 +67,9 @@ smfftsio_read_data( fitsfile * fits, size_t * numRows, size_t * numChans, int * 
 void
 smfftsio_read_fitshdr( fitsfile *fptr, AstFitsChan * fitschan, int * status );
 
+void
+smfftsio_table_to_fitschan( fitsfile *fptr, size_t rownum, AstFitsChan * fitschan, int * status );
+
 /* Macro to wrap calls to cfitsio so that Starlink error status is handled.
    Assumes that Starlink is *status and FITS is fitsStatus.
    Will add messages from the CFITSIO message stack.

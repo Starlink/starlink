@@ -53,6 +53,8 @@
 *        the interface instrument and the actual instrument code.
 *     2014-03-28 (TIMJ):
 *        Add Supercam.
+*     2014-04-10 (TIMJ):
+*        Add NANTEN2 GREAT
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
@@ -164,6 +166,13 @@ smf_inst_get( const smfHead * hdr, inst_t * instrument,
 		  status );
         *instrument = INST__ACSIS;
         *realinst = SMF__RINST_SUPERCAM;
+	return;
+      } else if (strncmp( backend, "SMART", sizeof(backend)) == 0) {
+	msgOutif( MSG__DEBUG, " ",
+                  "Data file contains SMART data, treating as ACSIS",
+		  status );
+        *instrument = INST__ACSIS;
+        *realinst = SMF__RINST_SMART;
 	return;
       }
     } else {

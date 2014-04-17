@@ -131,6 +131,7 @@ AC_CONFIG_FILES(Makefile smurf.ifd component.xml libsmurf/Makefile \
                 libsmf/Makefile libsc2sim/Makefile libacsis/Makefile \
                 libaztec/Makefile libgsd/Makefile libsc2fts/Makefile \
                 libsmfftsio/Makefile \
+                libnanten/Makefile \
                 libsupercam/Makefile \
                 docs/Makefile docs/sun258/Makefile docs/sun259/Makefile \
                 docs/sc19/Makefile defaults/Makefile scripts/Makefile )

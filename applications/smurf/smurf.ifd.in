@@ -3889,6 +3889,32 @@ package @PACKAGE@ {
 
         }
 
+        action nanten2acsis {
+            helplib {$SMURF_HELP}
+
+            parameter directory {
+                position 2
+                type _CHAR
+                access WRITE
+                vpath {PROMPT }
+                association ->GLOBAL.DATA_ARRAY
+                prompt {Output Directory}
+                ppath GLOBAL CURRENT
+                helpkey *
+            }
+
+            parameter in {
+                position 1
+                type _CHAR
+                access READ
+                vpath {PROMPT }
+                prompt {Input NANTEN2 FITS Files}
+                ppath GLOBAL CURRENT
+                helpkey *
+            }
+
+        }
+
         action rawfixmeta {
 
             helplib {$SMURF_HELP}

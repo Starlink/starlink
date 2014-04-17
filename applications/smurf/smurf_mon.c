@@ -171,12 +171,15 @@
 *         Add FTS2SPLIT
 *     2014-03-19 (TIMJ):
 *        Call SUPERCAM2ACSIS
+*     2014-04-01 (TIMJ):
+*        Call NANTEN2ACSIS
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2007-2012 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2005-2008,2010-2011 University of British Columbia.
+*     Copyright (C) 2014 Cornell University.
 *     All Rights Reserved.
 
 *  Licence:
@@ -368,6 +371,8 @@ void smurf_mon( int * status ) {
     smurf_makecube( status );
   } else if (strcmp( taskname, "MAKEMAP" ) == 0 ) {
     smurf_makemap( status );
+  } else if (strcmp( taskname, "NANTEN2ACSIS" ) == 0 ) {
+    smurf_nanten2acsis( status );
   } else if (strcmp( taskname, "RAWFIXMETA" ) == 0 ) {
     smurf_rawfixmeta( status );
   } else if (strcmp( taskname, "RAWPRESS" ) == 0 ) {
