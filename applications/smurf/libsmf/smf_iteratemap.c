@@ -2452,10 +2452,15 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
              just annul the error since it just means that there are no
              bright sources in the map. */
           if( *status == SMF__INSMP ) {
-             msgOutf( "", FUNC_NAME ": *** No source pixels found", status );
+             errAnnul( status );
+             msgOut( "", FUNC_NAME ": *** No source pixels found", status );
              mapchange_mean = 0.0;
              mapchange_max = 0.0;
-             errAnnul( status );
+
+             /* No point in doing any more iterations, since the AST model
+                is zero and so we'll get exactly the same map on subsequent
+                iterations. */
+             quit = 0;
           }
 
           memcpy( lastmap, thismap, msize*sizeof(*lastmap) );
