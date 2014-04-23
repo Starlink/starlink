@@ -61,11 +61,15 @@ void makeclumps( int *status ) {
 *        The spatial FHWM (Full Width at Half Max) of the instrumental beam,
 *        in pixels. The generated clumps are smoothed with a Gaussian beam
 *        of this FWHM, before noise is added. No spatial smoothing is
-*        performed if BEAMFWHM is zero. [current value]
+*        performed if BEAMFWHM is zero. See also parameter PRECAT.
+*        [current value]
 *     DECONV = _LOGICAL (Read)
 *        If TRUE, the clump properties stored in the output catalogue
 *        will be modified to take account of the smoothing caused by the
-*        instrumental beam width. [TRUE]
+*        instrumental beam width. Note, if parameter PRECAT is TRUE,
+*        then this deconvolution has no effect since no smoothing has
+*        been applied to the clumps at the time when the catalogue is
+*        created. [TRUE]
 *     FWHM1( 2 ) = _REAL (Read)
 *        Defines the distribution from which the FWHM (Full Width at Half
 *        Max) for pixel axis 1 of each clump is chosen. Values should be
@@ -173,6 +177,12 @@ void makeclumps( int *status ) {
 *        Defines the distribution from which the peak value (above the
 *        local background) of each clump is chosen. See parameter PARDIST
 *        for additional information. [current value]
+*     PRECAT = _LOGICAL (Read)
+*        If FALSE, the output catalogue is created from the clumps after
+*        the instrumental smoothing specified by parameters BEAMFWHM and
+*        VELFWHM has been applied. If TRUE, the catalogue is created from
+*        the data before the instrumental smoothing is applied (in which
+*        case parameter DECONV has no effect). [FALSE]
 *     RMS = _REAL (Read)
 *        The RMS (Gaussian) noise to be added to the output data. [current value]
 *     SHAPE = LITERAL (Read)
@@ -226,7 +236,8 @@ void makeclumps( int *status ) {
 *        The FWHM of the Gaussian velocity resolution of the instrument, in
 *        pixels. The generated clumps are smoothed on the velocity axis with
 *        a Gaussian beam of this FWHM, before noise is added. No velocity
-*        smoothing is performed if VELFWHM is zero. [current value]
+*        smoothing is performed if VELFWHM is zero. See also parameter PRECAT.
+*        [current value]
 *     VGRAD1( 2 ) = _REAL (Read)
 *        Defines the distribution from which the projection of the internal
 *        velocity gradient vector onto pixel axis 1 of each clump is chosen.
@@ -288,6 +299,8 @@ void makeclumps( int *status ) {
 *        - Add parameters LIKE and SHAPE.
 *     19-NOV-2013 (DSB):
 *        Ignore degenerate pixel axes when creating clumps.
+*     23-APR-2014 (DSB):
+*        Added parameter PRECAT.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -299,6 +312,7 @@ void makeclumps( int *status ) {
 /* Local Variables: */
    AstFrameSet *iwcs;            /* WCS FrameSet */
    HDSLoc *obj;                  /* HDS array of NDF structures */
+   HDSLoc *obj_precat;           /* HDS array of NDF structures without smoothing */
    HDSLoc *xloc;                 /* HDS locator for CUPID extension */
    char attr[ 11 ];              /* AST attribute name */
    char shape[ 10 ];             /* Shape for spatial STC-S regions */
@@ -339,11 +353,13 @@ void makeclumps( int *status ) {
    int nc;                       /* Number of clumps created */
    int nclump;                   /* Number of clumps to create */
    int nclumps;                  /* Number of stored clumps */
+   int ncold;                    /* Previous value of "nc" */
    int ndim;                     /* Number of pixel axes */
    int nel;                      /* Number of elements in array */
    int nskyax;                   /* Number of sky axes in the current WCS frame */
    int nspecax;                  /* Number of spectral axes in the current WCS frame */
    int nval;                     /* Number of values supplied */
+   int precat;                   /* Create catalogue before beam smoothing? */
    int sdim[ 3 ];                /* Indicies of significant pixel axes */
    int sdims;                    /* Number of significant pixel axes */
    int slbnd[ 3 ];               /* Lower bounds of significant pixel axes */
@@ -468,6 +484,10 @@ void makeclumps( int *status ) {
       }
    }
 
+/* See if the output catalogue is to be created from clumps that have not
+   been smoothed using the instrumental beam. */
+   parGet0l( "PRECAT", &precat, status );
+
 /* Map the DATA component of the output NDFs. */
    ndfMap( indf, "DATA", "_REAL", "WRITE", (void *) &ipd, &nel, status );
    ndfMap( indf2, "DATA", "_REAL", "WRITE", (void *) &ipd2, &nel, status );
@@ -565,9 +585,11 @@ void makeclumps( int *status ) {
 
 /* Loop round creating clumps. */
    obj = NULL;
+   obj_precat = NULL;
    maxpeak = 1.0;
    sum = 0.0;
    nc = 0;
+   ncold = 0;
    i = 0;
    while( nc < nclump && *status == SAI__OK) {
       if( i++ == 100*nclump ) {
@@ -617,20 +639,48 @@ void makeclumps( int *status ) {
       if( par[ 0 ] > maxpeak ) maxpeak = par[ 0 ];
 
 /* See how many clumps we now have (no NDF will have been created for
-   this clump if it touches an edge of eh output array). */
+   this clump if it touches an edge of the output array). */
       if( obj ) {
          datSize( obj, &st, status );
          nc = (int) st;
+
+/* If an NDF was created, and if PRECAT is true, we create the clump a
+   second time, but this time without any beam smoothing. These secondary
+   clumps are the ones that go into the output catalogue. */
+         if( precat && nc == ncold + 1 ) {
+            cupidGC.velres_sq = 0.0;
+            cupidGC.beam_sq = 0.0;
+
+/* Create the clump, appending it to the end of the array of NDF structures
+   in the HDS object located by "obj_precat". */
+            cupidGCUpdateArraysF( NULL, NULL, nel, sdims, dims, par, rms,
+                                  trunc, 0, 0.0, slbnd, &obj_precat, i, 0,
+                                  0.0, 0, &area, &sum, status );
+
+/* Check we have the same number of NDFs as in the main HDS array. */
+            datSize( obj_precat, &st, status );
+            if( (int) st != nc && *status == SAI__OK ) {
+               *status = SAI__ERROR;
+               errRepf( "", "Wrong number of precat NDFs (%d, should be "
+                        "%d) - programming error.", status, (int) st, nc );
+               break;
+            }
+
+/* Re-instate the original beam smoothing parameters. */
+            if( sdims == 1 || sdims == 3 ) cupidGC.velres_sq = velfwhm*velfwhm;
+            if( sdims == 2 || sdims == 3 ) cupidGC.beam_sq = beamfwhm*beamfwhm;
+         }
       }
 
+      ncold = nc;
    }
 
 /* Create the output data array by summing the contents of the NDFs
-   describing the found clumps. */
+   describing the beam-smoothed clumps. */
    cupidSumClumps( CUPID__FLOAT, NULL, sdims, slbnd, subnd, nel, obj,
                    NULL, ipd2, "GAUSSCLUMPS", status );
 
-/* Add Gaussian noise to the data. */
+/* Add Gaussian noise to the beam-smoothed data. */
    if( *status == SAI__OK ) {
       memcpy( ipd, ipd2,sizeof( float )*nel );
       if( addnoise ) {
@@ -648,15 +698,29 @@ void makeclumps( int *status ) {
    parGet0l( "DECONV", &deconv, status );
 
 /* Store the clump properties in the output catalogue. */
-   beamcorr[ 0 ] = beamfwhm;
-   beamcorr[ 1 ] = beamfwhm;
-   beamcorr[ 2 ] = velfwhm;
-   cupidStoreClumps( "OUTCAT", NULL, NDF__NOID, xloc, obj, sdims, deconv, 1,
-                     ishape, 2, beamcorr, "Output from CUPID:MAKECLUMPS", 1,
-                     iwcs, "", NULL, NULL, &nclumps, status );
+   if( precat ) {
+      beamcorr[ 0 ] = 0.0;
+      beamcorr[ 1 ] = 0.0;
+      beamcorr[ 2 ] = 0.0;
+      cupidStoreClumps( "OUTCAT", NULL, NDF__NOID, xloc, obj_precat, sdims, 0,
+                        1, ishape, 2, beamcorr, "Output from CUPID:MAKECLUMPS",
+                        1, iwcs, "", NULL, NULL, &nclumps, status );
+   } else {
+      beamcorr[ 0 ] = beamfwhm;
+      beamcorr[ 1 ] = beamfwhm;
+      beamcorr[ 2 ] = velfwhm;
+      cupidStoreClumps( "OUTCAT", NULL, NDF__NOID, xloc, obj, sdims, deconv, 1,
+                        ishape, 2, beamcorr, "Output from CUPID:MAKECLUMPS", 1,
+                        iwcs, "", NULL, NULL, &nclumps, status );
+   }
 
 /* Relase the extension locator.*/
    datAnnul( &xloc, status );
+
+/* Release the HDS object containing the list of NDFs describing the
+   clumps. */
+   if( obj ) datAnnul( &obj, status );
+   if( obj_precat ) datAnnul( &obj_precat, status );
 
 /* End the NDF context */
    ndfEnd( status );

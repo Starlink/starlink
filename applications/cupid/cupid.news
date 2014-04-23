@@ -6,6 +6,16 @@
  and  analyse clumps of emission within 2- or 3- dimensional
  data arrays.
 
+Changes introduced at V2.1
+
+   - The MAKECLUMPS command now has a new boolean parameter called PRECAT
+   that specifies the clump data that should be used to create the output
+   catalogue. If PRECAT is FALSE (the default), the catalogue is created
+   from the clumps after they have been smoothed with the instrumental beam.
+   If PRECAT is TRUE, the catalogue is created from the clumps before they
+   have been smoothed. Note, if PRECAT is TRUE, setting DECONV=TRUE will
+   have no effect since there is no smoothing to deconvolve in the catalogue.
+
 Changes introduced at V2.0
 
    - The FINDCLUMPS and EXTRACTCLUMPS commands now have a new parameter

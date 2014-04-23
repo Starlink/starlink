@@ -646,6 +646,16 @@ package cupid {
             helpkey *
           }
 
+         parameter precat {
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT,DEFAULT
+            prompt {Create catalogue before instrumental smoothing is applied?}
+            default FALSE
+            helpkey *
+          }
+
          parameter rms {
             type _REAL
             access READ
