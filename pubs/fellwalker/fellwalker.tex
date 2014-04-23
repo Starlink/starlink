@@ -208,32 +208,35 @@ this fell-walking metaphor at frequent intervals.
 fells of northern England. The FellWalker algorithm performs many walks
 starting at various low-land pixels, and for each one follows a line of steepest ascent
 until a significant summit is reached. All walks that terminate at the
-same peak are assigned to the same clump.}
+same peak are assigned to the same clump, indicated by different colours
+in the above figure.}
 \label{fig:fellwalking}
 \end{figure}
 
 \section{The FellWalker Algorithm}
 
-The core of the FellWalker algorithm consists of repeatedly following
-different paths of steepest ascent in order to reach a significant
-summit, each of which is associated with a clump, as illustrated in
-Fig.~\ref{fig:fellwalking}. Every pixel with a data value above a
-user-specified threshold is used in turn as the start of a ``walk''. A
-walk consists of a series of steps, each of which takes the algorithm
-from the current pixel to an immediately neighbouring pixel of higher
-value, until a pixel is found which is higher than any of its neighbours.
-When this happens, a search for a higher pixel is made over a larger
-neighbourhood. If such a pixel is found the walk continues from this
-higher pixel. If no higher pixel is found it is assumed that a new summit
-has been reached - a new clump identifier is issued and all pixels
-visited on the walk are assigned to the new clump. If at any point a walk
-encounters a pixel which has already been assigned to a clump, then all
-pixels so far visited on the walk are assigned to that same clump and the
-walk terminates.
+The core of the FellWalker algorithm consists of following many different
+paths of steepest ascent in order to reach a significant summit, each of
+which is associated with a clump, as illustrated in Fig.~\ref{fig:fellwalking}.
+Every pixel with a data value above a user-specified threshold is used in
+turn as the start of a ``walk''. A walk consists of a series of steps,
+each of which takes the algorithm from the current pixel to an immediately
+neighbouring pixel of higher value, until a pixel is found which is
+higher than any of its immediate neighbours. When this happens, a search
+for a higher pixel is made over a larger neighbourhood. If such a pixel
+is found the walk jumps the gap and continues from this higher pixel. If no
+higher pixel is found it is assumed that a new summit has been reached -
+a new clump identifier is issued and all pixels visited on the walk are
+assigned to the new clump. If at any point a walk encounters a pixel
+which has already been assigned to a clump, then all pixels so far
+visited on the walk are assigned to that same clump and the walk
+terminates.
 
 It is possible for this basic algorithm to fragment up-land plateau
 regions into lots of small clumps which are well separated spatially but
-have minimal dips between them. The raw clumps identified by the above
+have only minimal dips between them\footnote{In common with other
+parameters, this minimum dip parameter is specified as a multiple of the
+noise level in the data.}. The raw clumps identified by the above
 process can be merged to avoid such fragmentation, on the basis of a
 user-specified minimum dip between clumps. These merged clumps may,
 optionally, be cleaned by smoothing their boundaries using a single step
@@ -252,10 +255,10 @@ and size as the supplied data array. This ``clump assignment array''
 (CAA) is used to record the integer identifier of the clump, if any, to
 which each pixel has been assigned. All clump identifiers are greater
 than zero. An initial pass is made through the supplied data array to
-identify pixels which have data values above a user-specified threshold
+identify pixels which have a value above a user-specified threshold
 value. Such pixels are assigned a value of zero in the CAA indicating
 that the pixel is usable but has not yet been assigned to a clump, and
-all other pixels are assigned a value of -1 indicating that the pixel is
+all other pixels are assigned a value of -1 indicating that they are
 unusable and should never be assigned to a clump.
 
 This initial CAA is then searched for any isolated individual pixels
@@ -268,27 +271,28 @@ in the CAA are skipped since they have either already been assigned to a
 clump (if the CAA value is positive) or have been flagged as unusable (if
 the CAA value is negative). A single walk consists of stepping from pixel
 to pixel until a pixel is reached which is already known to be part of a
-clump, or significant isolated peak is encountered. The vector indicies of
+clump, or a significant isolated peak is encountered. The vector indicies of
 the pixels visited along a walk are recorded in a temporary array so that
 they  can be identified later.
 
 At each step, the pixel values within a box of width three pixels are compared
 to the central pixel to find the neighbouring pixel which give the highest
-gradient\footnote{This gradient takes into account the fact that corner
-pixels are further away from the box centre than mid-side pixels.}. Thus
-2 neighbours are checked if the data is 1-dimensional data, 8 are
-checked if the data is 2-dimensional and 26 are checked if the data is
-3-dimensional.
+gradient\footnote{This gradient takes into account the fact that the
+centres of the corner pixels are further away from the box centre than
+are the centres of the mid-side pixels.}. Thus 2 neighbours are checked if
+the data is 1-dimensional data, 8 are checked if the data is 2-dimensional
+and 26 are checked if the data is 3-dimensional.
 
 If the highest gradient found above is greater than zero - that is, if
 there is an upward route out of the current pixel - the walk steps to the
 selected neighbouring pixel. If this new pixel has already been assigned
 to a clump (\emph{i.e.} if the CAA holds a positive value at the new
 pixel), then the new walk has joined an older walk and so will eventually
-end up at the same peak as the older walk. The existing positive CAA
-value of the new pixel (\emph{i.e.} the clump index assigned to the older
-walk) is copied into the CAA for all pixels visited so far on the new
-walk, and a new walk from the next starting pixel is initiated.
+end up at the same peak as the older walk. In this case, the existing
+positive CAA value of the new pixel (\emph{i.e.} the clump index assigned
+to the older walk) is copied into the CAA for all pixels visited so far
+on the new walk, and a new walk from the next starting pixel is
+initiated.
 
 If the highest gradient found to any neighbouring pixel is less than or
 equal to zero, then there is no upward route from the central pixel. This
@@ -315,7 +319,7 @@ FellWalker algorithm below.}
 
 \begin{figure}
 \includegraphics[width=\columnwidth]{walks}
-\caption{Two walks up a peak within the artificial data shown in
+\caption{Two walks to a peak within the artificial data shown in
 Fig.~\ref{fig:sim}. The contours show the data values themselves. The white
 background pixels are below the nominated threshold, the grey pixels are
 above the threshold but have not yet been assigned to a clump. The green
@@ -391,12 +395,13 @@ there is an option to smooth the boundaries between adjacent clumps to
 reduce the effects of noise. This is done using a specified number of
 steps of a cellular automaton to modify the integer values in the CAA.
 
-A single step creates a new CAA from the old CAA. Each pixel in the new
-CAA is set to the most commonly occurring clump index within a box of
-width 3 pixels centred on the corresponding pixel within the old CAA. The
-output CAA from one step becomes the input CAA to the next step. By
-default, only one step is performed. Fig.~\ref{fig:cleanedmask} shows the
-effects of applying a single step to the CAA shown in Fig.~\ref{fig:rawmask}.
+A single step of the cellular automaton creates a new CAA from the old
+CAA. Each pixel in the new CAA is set to the most commonly occurring
+clump index within a box of width 3 pixels centred on the corresponding
+pixel within the old CAA. The output CAA from one step becomes the input
+CAA to the next step. By default, only one step is performed.
+Fig.~\ref{fig:cleanedmask} shows the effects of applying a single step to
+the CAA shown in Fig.~\ref{fig:rawmask}.
 
 \begin{figure}
 \includegraphics[width=\columnwidth]{cleaned}
@@ -405,14 +410,26 @@ on the clump outlines shown in Fig.~\ref{fig:rawmask}.}
 \label{fig:cleanedmask}
 \end{figure}
 
+\subsection{Removing Unusable Clumps}
+Various criteria are available to select unusable clumps and exclude them
+from the final data products. These include:
+
+\begin{itemize}
+\item Clumps that touch an edge of the supplied data array may be excluded.
+\item Clumps that touch areas of missing (\emph{i.e.} blank) pixels may be excluded.
+\item Clumps that have a peak value less than a given limit may be excluded.
+\item Clumps that contain fewer than a given number of pixels may be excluded.
+\end{itemize}
+
+The number of clumps rejected for each of these reasons is reported.
 
 \subsection{Characterising Each Clump}
 The FellWalker algorithm is implemented within the {\tt findclumps}
 command of the Starlink CUPID package (see section~\ref{sec:cupid}). This
-command implements several other clump finding algorithms, and one of its
-design requirements was that each algorithm should characterise clumps in
+command implements several other clump finding algorithms in addition to
+FellWalker, and one of its design requirements was that each algorithm should characterise clumps in
 the same way, so that results from different algorithms can be compared
-directly. Thre results are presented in the following ways:
+directly. The results of each algorithm are presented in the following ways:
 
 \begin{enumerate}
 
@@ -443,8 +460,27 @@ outside the clump set to a special ``blank'' value.
 \end{description}
 
 There is also an optional column called ``Shape'' containing an STC-S
-description \citep{2007STCS,2010ASPC..434..213B} of
-the spatial coverage of each clump.
+description \citep{2007STCS,2010ASPC..434..213B} of the spatial coverage of
+each clump.
+
+The values stored in the size columns are the RMS deviation of each pixel
+centre from the clump centroid, where each pixel is weighted by the
+corresponding pixel data value minus an estimate of the background value
+in the clump\footnote{The minimum data value in the clump is used as the
+background value.}.
+
+\[ size = \sqrt{ \frac{a}{b} - \left( \frac{c}{d}\right)^2 } \]
+
+
+For a clump with a Gaussian profile, this
+``size'' value is equal to the standard deviation of the Gaussian.
+
+These sizes can then optionally be reduced to take account of the
+smoothing introduced by the instrumental beam\footnote{The FWHM of the
+instrumental smoothing on each axis must be specified by the user.}. This
+correction also increases the peak values stored within the table.
+
+[more maths needed here]
 
 \end{enumerate}
 

@@ -87,7 +87,6 @@ $KAPPA_DIR/gdclear
 rm pgplot.ps
 
 $KAPPA_DIR/display rawmask'(2:,2:)' noaxes border=yes mode=sca low=1 high=3 badcol=white
-
 $KAPPA_DIR/contour tot nokey noclear mode=sca style="'colour=red,width=3'" ncont=10 \
                    firstcnt=0.006 lastcnt=0.45
 epstopdf pgplot.ps
@@ -98,6 +97,8 @@ $KAPPA_DIR/gdclear
 rm pgplot.ps
 $KAPPA_DIR/setmagic idata6 rawmask -1
 $KAPPA_DIR/display rawmask'(2:,2:)' noaxes border=yes mode=sca badcol=white low=1 high=3
+$KAPPA_DIR/contour tot nokey noclear mode=sca style="'colour=red,width=3'" ncont=10 \
+                   firstcnt=0.006 lastcnt=0.45
 epstopdf pgplot.ps
 pdfcrop pgplot.pdf cleaned.pdf
 
