@@ -92,7 +92,6 @@ kpg1_sclb.gn kpg1_scli.gn kpg1_scluw.gn kpg1_sclub.gn \
 kpg1_sclw.gn kpg1_sclk.gn kpg1_ptnd.gn kpg1_bbox.gn kpg_osta.gn \
 kpg_fise.gn  kpg_immm.gn kpg1_corr.gn
 
-
 # All except logical (include char)
 KPG_XL_GEN = kpg1_qsrt.gxl
 
@@ -127,7 +126,8 @@ kpg1_xyzw.gdr kpg1_ker1.gdr kpg_blon.gdr  kpg_bmdn.gdr
 KPG_DIK_GEN = kpg1_ctcp.gdik
 
 KPG_DIKR_GEN = kpg1_chel.gdikr kpg1_figr.gdikr \
-kpg1_mul.gdikr kpg1_prsa.gdikr kpg1_sqsu.gdikr
+kpg1_mul.gdikr kpg1_prsa.gdikr kpg1_sqsu.gdikr \
+kpg1_env0.gdikr
 
 KPG_IR_GEN =
 
@@ -191,7 +191,6 @@ kpg1_dnag2r.f \
 kpg1_dr2nag.f \
 kpg1_dsfr1.f \
 kpg1_elgau.f \
-kpg1_env0r.f \
 kpg1_envdf.f \
 kpg1_fftbd.f \
 kpg1_fftbr.f \

@@ -24,6 +24,9 @@
 *     machines it is possible for an application to be called several times
 *     each second, resulting in the same seed being used each time if the
 *     seed is based only on the time.
+*
+*     Alternatively, a fixed seed can be used by assigning the seed value
+*     to environment variable STAR_SEED.
 
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
@@ -56,6 +59,8 @@
 *  History:
 *     7-JUL-1999 (DSB):
 *        Original version.
+*     23-APR-2014 (DSB):
+*        Allow seed to be set via environment variable STAR_SEED.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -69,6 +74,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! VAL__ constants
+      INCLUDE 'MSG_PAR'          ! MSG__ constants
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -93,26 +99,39 @@
 *  If the seed has already been set do not change it.
       IF( SEED .EQ. -1 ) THEN
 
+*  If a seed is specified via the environment variable "STAR_SEED", use it.
+         SEED = VAL__BADI
+         CALL KPG1_ENV0I( 'STAR_SEED', SEED, STATUS )
+         IF( SEED .NE. VAL__BADI ) THEN
+            CALL MSG_SETI( 'S', SEED )
+            CALL MSG_OUTIF( MSG__VERB, ' ', 'Using random number seed'//
+     :                      ' ^S specified by environment variable '//
+     :                      'STAR_SEED', status )
+
+*  Otherise, choose a new seed.
+         ELSE
+
 *  Get the current system time as a number of seconds since some starting
 *  time.
-         CALL PSX_TIME( TICKS, STATUS )
+            CALL PSX_TIME( TICKS, STATUS )
 
 *  Get the process ID.
-         CALL PSX_GETPID( PID, STATUS )
+            CALL PSX_GETPID( PID, STATUS )
 
 *  The intial seed is the sum of these.
-         SEED = TICKS + PID
+            SEED = TICKS + PID
 
 *  PDA requires that the seed be one more than a mutiple of 4. We will
 *  therefore multiply the above seed by 4. To avoid the possibility of
 *  integer overflow, first find the remainder on dividing the initial
 *  seed by a quarter of the maximum integer value.
-         SEED = MOD( SEED, VAL__MAXI/4 )*4 + 1
+            SEED = MOD( SEED, VAL__MAXI/4 )*4 + 1
 
 *  In addition, PDA ignores seeds over 2**28 or below zero, using a
 *  constant fixed seed instead. Ensure that the seed is betwen these
 *  limits.
-         SEED = MOD( SEED, 2**28 )
+            SEED = MOD( SEED, 2**28 )
+         END IF
 
 *  Set the seed.
          CALL PDA_RNSED( SEED )

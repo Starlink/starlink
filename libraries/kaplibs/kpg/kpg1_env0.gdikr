@@ -1,33 +1,34 @@
-      SUBROUTINE KPG1_ENV0R( VARNAM, RVAL, STATUS )
+      SUBROUTINE KPG1_ENV0<T>( VARNAM, VALUE, STATUS )
 *+
 *  Name:
-*     KPG1_ENV0R
+*     KPG1_ENV0x
 
 *  Purpose:
-*     Reads a floating-point value from an environment variable.
+*     Reads a numerical value from an environment variable.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_ENV0R( VARNAM, RVAL, STATUS )
+*     CALL KPG1_ENV0x( VARNAM, VALUE, STATUS )
 
 *  Description:
-*     This routine reads a floating-point value from a specified
-*     environment variable. No error occurs if the environment variable
-*     is not defined, or has a non-numeric value, and the supplied value
-*     is returned unchanged.
+*     This routine reads a numerical value from a specified environment
+*     variable. No error occurs if the environment variable is not
+*     defined, or has a non-numeric value, and the supplied value is
+*     returned unchanged.
 
 *  Arguments:
 *     VARNAM = CHARACTER * ( * ) (Given)
 *        The environment variable to check.
-*     RVAL = REAL (Returned)
-*        The value.
+*     VALUE = ? (Returned)
+*        The numerical value.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils.
+*     Copyright (C) 2014 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -53,6 +54,8 @@
 *  History:
 *     3-SEP-1999 (DSB):
 *        Original version.
+*     23-APR-2014 (DSB):
+*        Made generic.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -71,7 +74,7 @@
       CHARACTER VARNAM*(*)
 
 *  Arguments Returned:
-      REAL RVAL
+      <TYPE> VALUE
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -79,7 +82,7 @@
 *  Local Variables:
       CHARACTER VAL*40           ! Value of the environment variable
       INTEGER ISTAT              ! CHR status
-      REAL RRVAL                 ! Value read from the variable
+      <TYPE> RRVAL               ! Value read from the variable
 *.
 
 *  Check the inherited status.
@@ -96,8 +99,8 @@
 *  environment variable's value.
       ELSE IF( STATUS .EQ. SAI__OK ) THEN
          ISTAT = SAI__OK
-         CALL CHR_CTOR( VAL, RRVAL, ISTAT )
-         IF( ISTAT .EQ. SAI__OK ) RVAL = RRVAL
+         CALL CHR_CTO<T>( VAL, RRVAL, ISTAT )
+         IF( ISTAT .EQ. SAI__OK ) VALUE = RRVAL
       END IF
 
       END
