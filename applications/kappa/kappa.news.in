@@ -4,6 +4,15 @@
    changes are listed below.  For complete details of all
    changes, see the "Release Notes" appendix in SUN/95.
 
+2 New_applications
+
+The following new applications have been added:
+
+   o  EXCLUDEBAD will copy a 2D NDF, excluding any rows or columns that
+   contain too many bad values. Good rows or columns are shuffled
+   down to lower indices to fill the gaps left by the exluded rows or
+   columns, thus causing the output NDF to be smaller than the input NDF.
+
 2 Modified_applications
 
    o  ARDPLOT

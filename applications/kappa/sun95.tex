@@ -12567,6 +12567,8 @@ picture.}
  Erases an HDS object.}
 \menuitem{ERRCLIP}{
  Removes pixels with large errors from an NDF.}
+\menuitem{EXCLUDEBAD}{
+ Copies a 2D NDF excluding any bad rows or columns.}
 \menuitem{EXP10}{
  Takes the base-10 exponential of each pixel of an NDF.}
 \menuitem{EXPE}{
@@ -13452,6 +13454,8 @@ WCS component of an NDF.
  Copies the \htmlref{bad-pixel}{se:masking}~ mask from one NDF to another.
 \classitem{ERRCLIP}
  Removes pixels with large errors from an NDF.
+\classitem{EXCLUDEBAD}
+ Copies a 2D NDF excluding any bad rows or columns.
 \classitem{FFCLEAN}
  Removes defects from a substantially flat one- or two-dimensional NDF.
 \classitem{FILLBAD}
@@ -23462,6 +23466,80 @@ KAPPA: \htmlref{FFCLEAN}{FFCLEAN},
          All \htmlref{non-complex numeric data types}{ap:HDStypes} can be handled.  The output
          NDF has the same numeric type as the input NDF.  However, all
          internal calculations are performed in double precision.
+      }
+   }
+}
+
+\sstroutine{
+   EXCLUDEBAD
+}{
+   Exclude bad rows or columns from a 2D NDF
+}{
+   \sstdescription{
+      This application produces a copy of a 2-d \NDFref{NDF}, but excludes
+      any rows that contain too many \htmlref{bad Data values}{se:masking}.
+      Rows with higher pixel indices are shuffled down to fill the gaps left
+      by the omission of bad rows. Thus if any bad rows are found, the output
+      NDF will have fewer rows than the input NDF, but the order of the
+      remaining rows will be unchanged. The number of good pixels required
+      in a row for the row to be retained is specified by parameter WLIM.
+
+      Bad columns may be omitted instead of bad rows (see parameter ROWS).
+   }
+   \sstusage{
+      excludebad in out [rows] [wlim]
+   }
+   \sstparameters{
+      \sstsubsection{
+         IN = NDF (Read)
+      }{
+         The input 2D NDF.
+      }
+      \sstsubsection{
+         OUT = NDF (Write)
+      }{
+         The output NDF.
+      }
+      \sstsubsection{
+         ROWS = \_LOGICAL (Read)
+      }{
+         If TRUE, bad rows are excluded from the output NDF. If FALSE bad
+         columns are excluded. {\tt [TRUE] }
+      }
+      \sstsubsection{
+         WLIM = \_REAL (Read)
+      }{
+         The minimum fraction of pixel which must be good in order for
+         a row to be retained. A value of 1.0 results in rows being
+         excluded if they contain one or more bad values. A value of
+         0.0 results in rows being excluded only if they contain no good
+         values. {\tt [0.0] }
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         excludebad ifuframe goodonly false
+      }{
+         Columns within NDF ifuframe that contain any good data are
+         copied to NDF goodonly.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The lower pixel bounds of the output will be the same as trhose
+         of the input, but the upper pixel bounds will be different if any
+         bad rows or columns are excluded.
+      }
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
+
+         \sstitem
+         This routine correctly processes the AXIS, DATA, QUALITY,
+         VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of the
+         input NDF and propagates all extensions.
       }
    }
 }
@@ -59103,6 +59181,17 @@ The following applications have been modified:
 
 \section{\xlabel{se_changes}Release Notes---V2.1\label{se:changes}}
 
+\subsection{New Commands}
+The following new applications have been added:
+
+\begin{description}
+   \item [\htmlref{EXCLUDEBAD}{EXCLUDEBAD}] \mbox{}
+   This will copy a 2D NDF, excluding any rows or columns that
+   contain too many bad values. Good rows or columns are shuffled
+   down to lower indices to fill the gaps left by the exluded rows or
+   columns, thus causing the output NDF to be smaller than the input NDF.
+\end{description}
+
 \subsection{Modified Commands}
 The following applications have been modified:
 
@@ -59733,6 +59822,8 @@ functions as follows.
  Copies the bad-pixel mask  from one NDF to another.
 \classitem{ERRCLIP}
  Removes pixels with large errors from an NDF.
+\classitem{EXCLUDEBAD}
+ Copies a 2D NDF excluding any bad rows or columns.
 \classitem{FFCLEAN}
  Removes defects from a substantially flat one- or two-dimensional NDF.
 \classitem{FILLBAD}

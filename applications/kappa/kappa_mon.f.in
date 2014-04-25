@@ -359,6 +359,10 @@
          ELSE IF ( NAME .EQ. 'ERRCLIP' ) THEN
             CALL ERRCLIP ( STATUS )
 
+*  Exclude bad rows or columsn form a 2D NDF.
+         ELSE IF ( NAME .EQ. 'EXCLUDEBAD' ) THEN
+            CALL EXCLUDEBAD ( STATUS )
+
 *  Takes the exponential of each pixel of a data array (specified base).
          ELSE IF ( NAME .EQ. 'EXPON' ) THEN
             CALL EXPON ( STATUS )

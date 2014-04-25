@@ -1,0 +1,426 @@
+      SUBROUTINE KPS1_EXB<T>( WLIM, ROWS, VAR, QUA, AXI, SLBND, SUBND,
+     :                        DARRAY, VARRAY, QARRAY, ACARRAY, AWARRAY,
+     :                        AVARRAY, WORK1, WORK2, MAP, NEX, STATUS )
+*+
+*  Name:
+*     KPS1_EXB<T>
+
+*  Purpose:
+*     Shuffles good rows/columns down to overwrite bad ones.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL KPS1_EXB<T>( WLIM, ROWS, VAR, QUA, AXI, SLBND, SUBND,
+*                       DARRAY, VARRAY, QARRAY, ACARRAY, AWARRAY,
+*                       AVARRAY, WORK1, WORK2, MAP, NEX, STATUS )
+
+*  Description:
+*     This routine is called by excludebad. It first locates rows or
+*     columns in the supplied DARRAY that contain too many bad values.
+*     Other rows or columns are shuffled down in the array to overwrite
+*     the bad rows or columns. The other arrays are shuffled in the
+*     same way. The bounds of the arrays, excluding the bad rows, are
+*     returned.
+
+*  Arguments:
+*     WLIM = REAL (Given)
+*        The minimum fraction of pixel which must be good in order for
+*        a row to be retained. A value of 1.0 results in rows being
+*        excluded if they contain one or more bad values. A value of
+*        0.0 results in rows being excluded only if they contain no good
+*        values.
+*     ROWS = LOGICAL (Given)
+*        If .TRUE., remove bad rows. Otherwise remove bad columns.
+*     VAR = LOGICAL (Given)
+*        If .TRUE., shuffle the VARRAY array.
+*     QUA = LOGICAL (Given)
+*        If .TRUE., shuffle the QARRAY array.
+*     AXI( 3 ) = LOGICAL (Given)
+*        If an element is .TRUE., shuffle the correspond ACARRAY,
+*        AWARRAY or AVARRAY array.
+*     SLBND( 2 ) = INTEGER (Given)
+*        On entry the lower pixel bounds of the full array.
+*     SUBND( 2 ) = INTEGER (Given and Returned)
+*        On entry the upper pixel bounds of the full array. On exit, the
+*        element corresponding to the collapsed axis (1 or 2, depending
+*        on ROWS), will be reduced by the numnber of excluded rows or
+*        columns.
+*     DARRAY( * ) = <TYPE> (Given and Returned)
+*        Array containing the data values to be shuffled.
+*     DARRAY( * ) = <TYPE> (Given and Returned)
+*        Array containing the data values to be shuffled.
+*     VARRAY( * ) = <TYPE> (Given and Returned)
+*        Array containing the variance values to be shuffled. Only used
+*        if VAR is .TRUE.
+*     QARRAY( * ) = _UBYTE (Given and Returned)
+*        Array containing the quality values to be shuffled. Only used
+*        if QUA is .TRUE.
+*     ACARRAY( * ) = DOUBLE PRECISION (Given and Returned)
+*        Array containing the axis centre values to be shuffled. Only used
+*        if AXI( 1 ) is .TRUE.
+*     AWARRAY( * ) = DOUBLE PRECISION (Given and Returned)
+*        Array containing the axis width values to be shuffled. Only used
+*        if AXI( 2 ) is .TRUE.
+*     AVARRAY( * ) = DOUBLE PRECISION (Given and Returned)
+*        Array containing the axis variance values to be shuffled. Only
+*        used if AXI( 3 ) is .TRUE.
+*     WORK1( * ) = DOUBLE PRECISION (Given and Returned)
+*        Work array that should have a length at least as long as the
+*        pixel axis being collapsed.
+*     WORK2( * ) = DOUBLE PRECISION (Given and Returned)
+*        Work array that should have a length at least as long as the
+*        pixel axis being collapsed.
+*     MAP = Integer (Returned)
+*        A 1D AST Mapping that transforms GRID coord on the collapsed
+*        axis within the supplied arrays to the corresponding GRID coord
+*        within the returned arrays. AST__NULL is returned if no bad
+*        rows or columns are found (i.e. the array is unchanged).
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Copyright:
+*     Copyright (C) 2014 Science & Technology Facilities Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
+*     02110-1301, USA
+
+*  Authors:
+*     DSB: David S. Berry (JAC, Hawaii)
+*     {enter_new_authors_here}
+
+*  History:
+*     24-APR-2014 (DSB):
+*        Original version.
+*     {enter_further_changes_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'PRM_PAR'
+      INCLUDE 'AST_PAR'
+
+*  Arguments Given:
+      REAL WLIM
+      LOGICAL ROWS
+      LOGICAL VAR
+      LOGICAL QUA
+      LOGICAL AXI( 3 )
+      INTEGER SLBND( 2 )
+
+*  Arguments Given  and Returned:
+      INTEGER SUBND( 2 )
+      <LTYPE> DARRAY( * )
+      <LTYPE> VARRAY( * )
+      BYTE QARRAY( * )
+      DOUBLE PRECISION ACARRAY( * )
+      DOUBLE PRECISION AWARRAY( * )
+      DOUBLE PRECISION AVARRAY( * )
+      DOUBLE PRECISION WORK1( * )
+      DOUBLE PRECISION WORK2( * )
+
+*  Arguments Returned:
+      INTEGER MAP
+      INTEGER NEX
+
+*  Status:
+      INTEGER STATUS
+
+*  Local Variables:
+      INTEGER FWDMAP       ! Mapping defining forward transformation
+      INTEGER INVMAP       ! Mapping defining inverse transformation
+      INTEGER IR           ! Zero-based index of next row/col to read
+      INTEGER IV           ! One-based vector index of next read element
+      INTEGER IVLAST       ! One-based vector index of last element
+      INTEGER IVW          ! One-based vector index of next write element
+      INTEGER IW           ! Zero-based index of next row/col to write
+      INTEGER MINGOOD      ! Min. no. of good values for a good row
+      INTEGER NCOL         ! Original number of columns
+      INTEGER NGOOD        ! No. of good values found so far
+      INTEGER NLUT1        ! Length of forward look-up-table
+      INTEGER NROW         ! Original number of rows
+      LOGICAL ALLBAD       ! Is all data bad?
+      LOGICAL ALLGOOD      ! Is all data good?
+      LOGICAL BAD          ! Is the current row/col bad?
+*.
+
+*  Initialise
+      MAP = AST__NULL
+      NEX = 0
+
+*  Check inherited status.
+      IF( STATUS .NE. SAI__OK ) RETURN
+
+*  Assume there is no bad data in the input.
+      ALLBAD = .FALSE.
+      ALLGOOD = .TRUE.
+
+*  Store the length of each row and column
+      NCOL = SUBND( 1 ) - SLBND( 1 ) + 1
+      NROW = SUBND( 2 ) - SLBND( 2 ) + 1
+
+*  First do exclusion of bad rows
+      IF( ROWS ) THEN
+
+*  Note the original length of the collapsed axis.
+         NLUT1 = NROW
+
+*  Note the minimum number of good values within a row for the row
+*  to be retained.
+         MINGOOD = NINT( WLIM*NCOL )
+         IF( MINGOOD .LE. 0 ) MINGOOD = 1
+
+*  Initialise the zero-based row index at which to store the next good
+*  row in the returned arrays.
+         IW = 0
+
+*  Loop round all input rows, using a zero-based index.
+         DO IR = 0, NROW - 1
+
+*  Get the one-based vector index of the first pixel in the current
+*  row.
+            IV = IR*NCOL + 1
+
+*  Get the one-based vector index of the last pixel in the current
+*  row.
+            IVLAST = IV + NCOL - 1
+
+*  Count the number of good values in this row. Leave the loop when
+*  sufficient good values have been found to justify retaining the row.
+            BAD = .TRUE.
+            NGOOD = 0
+            DO WHILE( IV .LE. IVLAST .AND. BAD )
+               IF( DARRAY( IV ) .NE. VAL__BAD<T> ) THEN
+                  NGOOD = NGOOD + 1
+                  IF( NGOOD .GE. MINGOOD ) BAD = .FALSE.
+               END IF
+               IV = IV + 1
+            END DO
+
+*  If there are sufficient good values in the row, copy it to its
+*  output position.
+            IF( .NOT. BAD ) THEN
+
+*  Only move values if they are not already in their correct place.
+               IF( IR .GT. IW ) THEN
+
+*  First the data array.
+                  IV = IR*NCOL + 1
+                  IVLAST = IV + NCOL - 1
+                  IVW = IW*NCOL + 1
+                  DO WHILE( IV .LE. IVLAST )
+                     DARRAY( IVW ) = DARRAY( IV )
+                     IV = IV + 1
+                     IVW = IVW + 1
+                  END DO
+
+*  Now the Variance array.
+                  IF( VAR ) THEN
+                     IV = IR*NCOL + 1
+                     IVLAST = IV + NCOL - 1
+                     IVW = IW*NCOL + 1
+                     DO WHILE( IV .LE. IVLAST )
+                        VARRAY( IVW ) = VARRAY( IV )
+                        IV = IV + 1
+                        IVW = IVW + 1
+                     END DO
+                  END IF
+
+*  Now the Quality array.
+                  IF( QUA ) THEN
+                     IV = IR*NCOL + 1
+                     IVLAST = IV + NCOL - 1
+                     IVW = IW*NCOL + 1
+                     DO WHILE( IV .LE. IVLAST )
+                        QARRAY( IVW ) = QARRAY( IV )
+                        IV = IV + 1
+                        IVW = IVW + 1
+                     END DO
+                  END IF
+
+*  Now each axis array.
+                  IF( AXI( 1 ) ) ACARRAY( IW + 1 ) = ACARRAY( IR + 1 )
+                  IF( AXI( 2 ) ) AVARRAY( IW + 1 ) = AVARRAY( IR + 1 )
+                  IF( AXI( 3 ) ) AWARRAY( IW + 1 ) = AWARRAY( IR + 1 )
+               END IF
+
+*  Store the look-up-table values needed to create the mapping between
+*  the old and new GRID coordinate values on the collapsed axis.
+               WORK1( IR + 1 ) = DBLE( IW + 1 )
+               WORK2( IW + 1 ) = DBLE( IR + 1 )
+
+*  Increment the row index at which to store the next good row in the
+*  returned arrays.
+               IW = IW + 1
+
+*  If the row is bad, store a bad value fir the row in the look-up-table
+*  that defines the old->new GRID transformation.
+            ELSE
+               WORK1( IR + 1 ) = AST__BAD
+               ALLGOOD = .FALSE.
+            END IF
+
+         END DO
+
+*  Update the returned upper pixel bound.
+         IF( IW .GT. 0 ) THEN
+            SUBND( 2 ) = IW + SLBND( 2 ) - 1
+         ELSE
+            ALLBAD = .TRUE.
+         END IF
+
+*  Now do exclusion of bad columns
+      ELSE
+
+*  Note the original length of the collapsed axis.
+         NLUT1 = NCOL
+
+*  Note the minimum number of good values within a column for the
+*  column to be retained.
+         MINGOOD = NINT( WLIM*NROW )
+         IF( MINGOOD .LE. 0 ) MINGOOD = 1
+
+*  Initialise the zero-based column index at which to store the next
+*  good column in the returned arrays.
+         IW = 0
+
+*  Loop round all input columns, using a zero-based index.
+         DO IR = 0, NCOL - 1
+
+*  Get the one-based vector index of the first pixel in the current
+*  column.
+            IV = IR + 1
+
+*  Get the one-based vector index of the last pixel in the current
+*  column.
+            IVLAST = IV + ( NROW - 1 )*NCOL
+
+*  Count the number of good values in this column. Leave the loop when
+*  sufficient good values have been found to justify retaining the
+*  column.
+            BAD = .TRUE.
+            NGOOD = 0
+            DO WHILE( IV .LE. IVLAST .AND. BAD )
+               IF( DARRAY( IV ) .NE. VAL__BAD<T> ) THEN
+                  NGOOD = NGOOD + 1
+                  IF( NGOOD .GE. MINGOOD ) BAD = .FALSE.
+               END IF
+               IV = IV + NROW
+            END DO
+
+*  If there are sufficient good values in the column, copy it to its
+*  output position.
+            IF( .NOT. BAD ) THEN
+
+*  Only move values if they are not already in their correct place.
+               IF( IR .GT. IW ) THEN
+
+*  First the data array.
+                  IV = IR + 1
+                  IVLAST = IV + ( NROW - 1 )*NCOL
+                  IVW = IW + 1
+                  DO WHILE( IV .LE. IVLAST )
+                     DARRAY( IVW ) = DARRAY( IV )
+                     IV = IV + NROW
+                     IVW = IVW + NROW
+                  END DO
+
+*  Now the Variance array.
+                  IF( VAR ) THEN
+                     IV = IR + 1
+                     IVLAST = IV + ( NROW - 1 )*NCOL
+                     IVW = IW + 1
+                     DO WHILE( IV .LE. IVLAST )
+                        VARRAY( IVW ) = VARRAY( IV )
+                        IV = IV + NROW
+                        IVW = IVW + NROW
+                     END DO
+                  END IF
+
+*  Now the Quality array.
+                  IF( QUA ) THEN
+                     IV = IR + 1
+                     IVLAST = IV + ( NROW - 1 )*NCOL
+                     IVW = IW + 1
+                     DO WHILE( IV .LE. IVLAST )
+                        QARRAY( IVW ) = QARRAY( IV )
+                        IV = IV + NROW
+                        IVW = IVW + NROW
+                     END DO
+                  END IF
+
+*  Now each axis array.
+                  IF( AXI( 1 ) ) ACARRAY( IW + 1 ) = ACARRAY( IR + 1 )
+                  IF( AXI( 2 ) ) AVARRAY( IW + 1 ) = AVARRAY( IR + 1 )
+                  IF( AXI( 3 ) ) AWARRAY( IW + 1 ) = AWARRAY( IR + 1 )
+               END IF
+
+*  Store the look-up-table values needed to create the mapping between
+*  the old and new GRID coordinate values on the collapsed axis.
+               WORK1( IR + 1 ) = DBLE( IW + 1 )
+               WORK2( IW + 1 ) = DBLE( IR + 1 )
+
+*  Increment the column index at which to store the next good column
+*  in the returned arrays.
+               IW = IW + 1
+
+*  If the column is bad, store a bad value for the column in the
+*  look-up-table that defines the old->new GRID transformation.
+            ELSE
+               WORK1( IR + 1 ) = AST__BAD
+               ALLGOOD = .FALSE.
+            END IF
+
+         END DO
+
+*  Update the returned upper pixel bound.
+         IF( IW .GT. 0 ) THEN
+            SUBND( 1 ) = IW + SLBND( 1 ) - 1
+         ELSE
+            ALLBAD = .TRUE.
+         END IF
+
+      END IF
+
+*  If required, create the returned Mapping. The forward transformation
+*  transforms old GRID coordinate into new GRID coordinate on the collapsed
+*  axis. We use a TranMap rather than a basic LutMap so that we can
+*  ensure that both forward and inverse transformations are defined.
+      IF( .NOT. ALLGOOD ) THEN
+         FWDMAP = AST_LUTMAP( NLUT1, WORK1, 1.0D0, 1.0D0, ' ', STATUS )
+         INVMAP = AST_LUTMAP( IW, WORK2, 1.0D0, 1.0D0, ' ', STATUS )
+         CALL AST_INVERT( INVMAP, STATUS )
+         MAP = AST_TRANMAP( FWDMAP, INVMAP, ' ', STATUS )
+         CALL AST_ANNUL( FWDMAP, STATUS )
+         CALL AST_ANNUL( INVMAP, STATUS )
+      END IF
+
+*  Return the number of rows/columns excluded.
+      NEX = NLUT1 - IW
+
+*  Report an error if the input array was entirely bad.
+      IF( ALLBAD .AND. STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( ' ', 'All input data is bad.', STATUS )
+      END IF
+
+      END
