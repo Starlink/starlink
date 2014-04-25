@@ -54,7 +54,7 @@
 *     2014-03-28 (TIMJ):
 *        Add Supercam.
 *     2014-04-10 (TIMJ):
-*        Add NANTEN2 GREAT
+*        Add NANTEN2 SMART
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
