@@ -108,6 +108,7 @@ import numpy
 import pyfits
 import glob
 import os
+import re
 import shutil
 import starutil
 from starutil import invoke
@@ -187,7 +188,7 @@ try:
 #  Use sc2concat to concatenate and flatfield the data.
    msg_out( "Concatenating and flatfielding..." )
    concbase = NDG.tempfile("")
-   invoke("$SMURF_DIR/sc2concat in={0} outbase={1} maxlen=120".format(indata,concbase))
+   invoke("$SMURF_DIR/sc2concat in={0} outbase={1} maxlen=360".format(indata,concbase))
    concdata = NDG( "{0}_*".format(concbase) )
 
 #  Use makemap to generate quality, extinction and pointing info.
@@ -215,14 +216,19 @@ try:
       os.remove("{0}.sdf".format(path))
 
 #  Process each NDF holding cleaned data created by sc2concat.
-   iout = 0
-   for path in glob.glob("*_con_res_cln.sdf"):
+   jout = 0
+   for path in sorted( glob.glob("*_con_res_cln.sdf") ):
       base = path[:-16]
 
+#  Extract the index from thge file name.
+      print( path )
+      matchObj = re.match( r'.*_(\d+)_con_res_cln.*', path )
+      iout = matchObj.group(1)
+
 #  Get the name of the next output FITS file, and report it.
-      iout += 1
+      jout += 1
       outdata = "{0}_{1}.fit".format(outbase,iout)
-      msg_out( "Creating output FITS file {0}/{1}: {2}".format(iout,nout,outdata) )
+      msg_out( "Creating output FITS file {0}/{1}: {2}".format(jout,nout,outdata) )
 
 #  Get a copy of the cleaned data but with PAD samples trimmed from start
 #  and end.
