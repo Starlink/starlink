@@ -250,10 +250,10 @@ while ( $ok == 0 )
 #   NDF_FORMATS_IN is undefined.
 #
          set formats = `printenv | grep NDF_FORMATS_IN | awk -f $KAPPA_DIR/nfi.awk`
-         if ( $formats == "" ) then
+         if ( "$formats" == "" ) then
             sh -c "echo 'NDF "$ndf" does not exist.' 1>&2"
             set ok = 0
-         else if ( $formats[1] == 0 ) then
+         else if ( "$formats" == "0" ) then
             sh -c "echo 'NDF "$ndf" does not exist.' 1>&2"
             set ok = 0
          else
