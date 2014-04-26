@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.40}
 \newcommand{\stardocnumber}    {95.40}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2013 December 12}
+\newcommand{\stardocdate}      {2014 April 24}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {2.1}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -12568,7 +12568,7 @@ picture.}
 \menuitem{ERRCLIP}{
  Removes pixels with large errors from an NDF.}
 \menuitem{EXCLUDEBAD}{
- Copies a 2D NDF excluding any bad rows or columns.}
+ Copies a two-dimensional NDF excluding any bad rows or columns.}
 \menuitem{EXP10}{
  Takes the base-10 exponential of each pixel of an NDF.}
 \menuitem{EXPE}{
@@ -13455,7 +13455,7 @@ WCS component of an NDF.
 \classitem{ERRCLIP}
  Removes pixels with large errors from an NDF.
 \classitem{EXCLUDEBAD}
- Copies a 2D NDF excluding any bad rows or columns.
+ Copies a two-dimensional NDF excluding any bad rows or columns.
 \classitem{FFCLEAN}
  Removes defects from a substantially flat one- or two-dimensional NDF.
 \classitem{FILLBAD}
@@ -23473,18 +23473,18 @@ KAPPA: \htmlref{FFCLEAN}{FFCLEAN},
 \sstroutine{
    EXCLUDEBAD
 }{
-   Exclude bad rows or columns from a 2D NDF
+   Excludes bad rows or columns from a two-dimensional NDF
 }{
    \sstdescription{
-      This application produces a copy of a 2-d \NDFref{NDF}, but excludes
-      any rows that contain too many \htmlref{bad Data values}{se:masking}.
+      This application produces a copy of a two-dimensional \NDFref{NDF}, but excludes
+      any rows that contain too many \htmlref{bad aata values}{se:masking}.
       Rows with higher pixel indices are shuffled down to fill the gaps left
       by the omission of bad rows. Thus if any bad rows are found, the output
       NDF will have fewer rows than the input NDF, but the order of the
       remaining rows will be unchanged. The number of good pixels required
-      in a row for the row to be retained is specified by parameter WLIM.
+      in a row for the row to be retained is specified by Parameter WLIM.
 
-      Bad columns may be omitted instead of bad rows (see parameter ROWS).
+      Bad columns may be omitted instead of bad rows (see Parameter ROWS).
    }
    \sstusage{
       excludebad in out [rows] [wlim]
@@ -23493,7 +23493,7 @@ KAPPA: \htmlref{FFCLEAN}{FFCLEAN},
       \sstsubsection{
          IN = NDF (Read)
       }{
-         The input 2D NDF.
+         The input two-dimensional NDF.
       }
       \sstsubsection{
          OUT = NDF (Write)
@@ -23503,16 +23503,16 @@ KAPPA: \htmlref{FFCLEAN}{FFCLEAN},
       \sstsubsection{
          ROWS = \_LOGICAL (Read)
       }{
-         If TRUE, bad rows are excluded from the output NDF. If FALSE bad
-         columns are excluded. {\tt [TRUE] }
+         If {\tt TRUE}, bad rows are excluded from the output NDF. If {\tt FALSE},
+         bad columns are excluded. {\tt [TRUE] }
       }
       \sstsubsection{
          WLIM = \_REAL (Read)
       }{
-         The minimum fraction of pixel which must be good in order for
-         a row to be retained. A value of 1.0 results in rows being
+         The minimum fraction of the pixels which must be good in order for
+         a row to be retained. A value of {\tt 1.0} results in rows being
          excluded if they contain one or more bad values. A value of
-         0.0 results in rows being excluded only if they contain no good
+         {\tt 0.0} results in rows being excluded only if they contain no good
          values. {\tt [0.0] }
       }
    }
@@ -23528,18 +23528,32 @@ KAPPA: \htmlref{FFCLEAN}{FFCLEAN},
       \sstitemlist{
 
          \sstitem
-         The lower pixel bounds of the output will be the same as trhose
+         The lower pixel bounds of the output will be the same as those
          of the input, but the upper pixel bounds will be different if any
          bad rows or columns are excluded.
       }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+KAPPA: \htmlref{CHPIX}{CHPIX},
+\htmlref{FILLBAD}{FILLBAD},
+\htmlref{GLITCH}{GLITCH},
+\htmlref{NOMAGIC}{NOMAGIC},
+\htmlref{ZAPLIN}{ZAPLIN};
+\xref{FIGARO}{sun86}{}: \xref{BCLEAN}{sun86}{BCLEAN},
+\xref{CLEAN}{sun86}{CLEAN},
+\xref{ISEDIT}{sun86}{ISEDIT},
+\xref{REMBAD}{sun86}{REMBAD},
+\xref{TIPPEX}{sun86}{TIPPEX}.
    }
    \sstimplementationstatus{
       \sstitemlist{
 
          \sstitem
-         This routine correctly processes the AXIS, DATA, QUALITY,
-         VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of the
-         input NDF and propagates all extensions.
+         This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, \htmlref{QUALITY}{apndf:quality},
+         \htmlref{VARIANCE}{apndf:variance}, \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs}, and \htmlref{HISTORY}{apndf:history}~ components of an NDF data
+         structure and propagates all \htmlref{extensions}{apndf:extensions}.
       }
    }
 }
@@ -59186,9 +59200,9 @@ The following new applications have been added:
 
 \begin{description}
    \item [\htmlref{EXCLUDEBAD}{EXCLUDEBAD}] \mbox{}
-   This will copy a 2D NDF, excluding any rows or columns that
-   contain too many bad values. Good rows or columns are shuffled
-   down to lower indices to fill the gaps left by the exluded rows or
+   This will copy a two-dimensional NDF, excluding any rows or columns
+   that contain too many bad values. Good rows or columns are shuffled
+   down to lower indices to fill the gaps left by the excluded rows or
    columns, thus causing the output NDF to be smaller than the input NDF.
 \end{description}
 

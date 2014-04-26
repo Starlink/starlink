@@ -87,7 +87,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -97,8 +97,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
-*     02110-1301, USA
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
 
 *  Authors:
 *     DSB: David S. Berry (JAC, Hawaii)
@@ -272,7 +272,7 @@
 *  returned arrays.
                IW = IW + 1
 
-*  If the row is bad, store a bad value fir the row in the look-up-table
+*  If the row is bad, store a bad value for the row in the look-up-table
 *  that defines the old->new GRID transformation.
             ELSE
                WORK1( IR + 1 ) = AST__BAD
@@ -288,7 +288,7 @@
             ALLBAD = .TRUE.
          END IF
 
-*  Now do exclusion of bad columns
+*  Now do exclusion of bad columns.
       ELSE
 
 *  Note the original length of the collapsed axis.
@@ -402,9 +402,10 @@
       END IF
 
 *  If required, create the returned Mapping. The forward transformation
-*  transforms old GRID coordinate into new GRID coordinate on the collapsed
-*  axis. We use a TranMap rather than a basic LutMap so that we can
-*  ensure that both forward and inverse transformations are defined.
+*  transforms old GRID coordinate into new GRID coordinate on the
+*  collapsed axis. We use a TranMap rather than a basic LutMap so that
+*  we can ensure that both forward and inverse transformations are
+*  defined.
       IF( .NOT. ALLGOOD ) THEN
          FWDMAP = AST_LUTMAP( NLUT1, WORK1, 1.0D0, 1.0D0, ' ', STATUS )
          INVMAP = AST_LUTMAP( IW, WORK2, 1.0D0, 1.0D0, ' ', STATUS )

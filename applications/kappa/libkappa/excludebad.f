@@ -4,7 +4,7 @@
 *     EXCLUDEBAD
 
 *  Purpose:
-*     Exclude bad rows or columns from a 2D NDF.
+*     Excludes bad rows or columns from a two-dimensional NDF.
 
 *  Language:
 *     Starlink Fortran 77
@@ -20,36 +20,38 @@
 *        The global status.
 
 *  Description:
-*     This application produces a copy of a 2D NDF, but excludes any
-*     rows that contain too many bad Data values. Rows with higher pixel
-*     indices are shuffled down to fill the gaps left by the omission of
-*     bad rows. Thus if any bad rows are found, the output NDF will have
-*     fewer rows than the input NDF, but the order of the remaining rows
-*     will be unchanged. The number of good pixels required in a row for
-*     the row to be retained is specified by parameter WLIM.
+*     This application produces a copy of a two-dimensional NDF, but
+*     excludes any rows that contain too many bad data values. Rows
+*     with higher pixel indices are shuffled down to fill the gaps left
+*     by the omission of bad rows. Thus if any bad rows are found, the
+*     output NDF will have fewer rows than the input NDF, but the order
+*     of the remaining rows will be unchanged. The number of good pixels
+*     required in a row for the row to be retained is specified by
+*     Parameter WLIM.
 *
-*     Bad columns may be omitted instead of bad rows (see parameter ROWS).
+*     Bad columns may be omitted instead of bad rows (see Parameter
+*     ROWS).
 
 *  Usage:
 *     excludebad in out [rows] [wlim]
 
 *  ADAM Parameters:
 *     IN = NDF (Read)
-*        The input 2D NDF.
+*        The input two-dimensional NDF.
 *     OUT = NDF (Write)
 *        The output NDF.
 *     ROWS = _LOGICAL (Read)
-*        If TRUE, bad rows are excluded from the output NDF. If FALSE bad
-*        columns are excluded. [TRUE]
+*        If TRUE, bad rows are excluded from the output NDF. If FALSE,
+*        bad columns are excluded.  [TRUE]
 *     WLIM = _REAL (Read)
-*        The minimum fraction of pixel which must be good in order for
-*        a row to be retained. A value of 1.0 results in rows being
+*        The minimum fraction of the pixels that must be good in order
+*        for a row to be retained. A value of 1.0 results in rows being
 *        excluded if they contain one or more bad values. A value of
 *        0.0 results in rows being excluded only if they contain no good
-*        values. [0.0]
+*        values.  [0.0]
 
 *  Notes:
-*     -  The lower pixel bounds of the output will be the same as trhose
+*     -  The lower pixel bounds of the output will be the same as those
 *     of the input, but the upper pixel bounds will be different if any
 *     bad rows or columns are excluded.
 
@@ -57,6 +59,10 @@
 *     excludebad ifuframe goodonly false
 *        Columns within NDF ifuframe that contain any good data are
 *        copied to NDF goodonly.
+
+*  Related Applications:
+*     KAPPA: CHPIX, FILLBAD, GLITCH, NOMAGIC, ZAPLIN; Figaro: BCLEAN,
+*     CLEAN, ISEDIT, REMBAD, TIPPEX.
 
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, QUALITY,
@@ -70,7 +76,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -80,8 +86,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
-*     02110-1301, USA
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
 
 *  Authors:
 *     DSB: David Berry (JAC, Hawaii)
@@ -153,16 +159,16 @@
       CALL AST_BEGIN( STATUS )
       CALL NDF_BEGIN
 
-*  Obtain the input NDF, checking it has no more than 2 significant pixel
-*  axes. Get the indices and bounds of the significant pixel axes.
+*  Obtain the input NDF, checking it has no more than two significant
+*  pixel axes. Get the indices and bounds of the significant pixel axes.
       CALL KPG1_GTNDF( 'IN', NDIM, .FALSE., 'Read', INDF1, SDIM, SLBND,
      :                 SUBND, STATUS )
 
 *  See if rows or columns are to be excluded.
       CALL PAR_GET0L( 'ROWS', ROWS, STATUS )
 
-*  Get the minimum fraction of good pixels needed in a row for the row to
-*  be retained in the output.
+*  Get the minimum fraction of good pixels needed in a row for the row
+*  to be retained in the output.
       CALL PAR_GDR0R( 'WLIM', 0.0, 0.0, 1.0, .FALSE., WLIM, STATUS )
 
 *  Note the index of the axis within the full NDF that is to be
@@ -175,8 +181,8 @@
          AXLEN = SUBND( 1 ) - SLBND( 1 ) + 1
       END IF
 
-*  Create the output with the same shape and size as the input. Its shape
-*  will be changed later. Copy everything.
+*  Create the output with the same shape and size as the input. Its
+*  shape will be changed later. Copy everything.
       CALL LPG_PROP( INDF1, 'DATA,QUALITY,VARIANCE,WCS,AXIS,UNITS',
      :               'OUT', INDF2, STATUS )
 
@@ -184,7 +190,7 @@
       CALL NDF_TYPE( INDF2, 'Data', TYPE, STATUS )
       CALL NDF_MAP( INDF2, 'Data', TYPE, 'WRITE', IPD, NEL, STATUS )
 
-*  If present, map the variance component.
+*  If present, map the VARIANCE component.
       CALL NDF_STATE( INDF2, 'Variance', VAR, STATUS )
       IF( VAR ) THEN
          CALL NDF_MAP( INDF2, 'Variance', TYPE, 'WRITE', IPV, NEL,
@@ -193,7 +199,7 @@
          IPV = IPD
       END IF
 
-*  If present, map the quality component.
+*  If present, map the QUALITY component.
       CALL NDF_STATE( INDF2, 'Quality', QUA, STATUS )
       IF( QUA ) THEN
          CALL NDF_MAP( INDF2, 'Quality', '_UBYTE', 'WRITE', IPQ, NEL,
@@ -360,9 +366,9 @@
          CALL NDF_SBND( NDIMS, LBND, UBND, INDF2, STATUS )
 
 *  Create a Mapping that translated N-dimensional GRID coords in the
-*  input to N-dimensional GRID coords in the output. This is the 1D
-*  mapping returned by KPS1_EXBx, in parallel with a pair of UnitMaps
-*  that  map the unchanged pixel axes.
+*  input to N-dimensional GRID coords in the output. This is the
+*  one-dimensional mapping returned by KPS1_EXBx, in parallel with a
+*  pair of UnitMaps that map the unchanged pixel axes.
          IF( AXIS .GT. 1 ) THEN
             MAP1 = AST_CMPMAP( AST_UNITMAP( AXIS - 1, ' ', STATUS ),
      :                         MAP, .FALSE., ' ', STATUS )
