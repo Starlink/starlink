@@ -359,7 +359,7 @@
 *     16-JUN-2011 (DSB):
 *        Changed to allow display of data values outside range of _REAL.
 *     19-AUG-2011 (DSB):
-*        Added parameter WEIGHTS and WEIGHTSTEP.
+*        Added Parameters WEIGHTS and WEIGHTSTEP.
 *     2012-05-08 (TIMJ):
 *        Add _INT64 support.
 *     2014 April 26 (MJC):
@@ -381,13 +381,6 @@
                                  ! declarations
       INCLUDE 'CNF_PAR'          ! CNF functions
 
-*  Local Constants:
-      CHARACTER BCKSLH*1         ! A single backslash
-*  Some compilers need '\\' to get '\', which isn't a problem as Fortran
-*  will truncate the string '\\' to '\' on the occasions when that isn't
-*  needed.
-      PARAMETER( BCKSLH = '\\' )
-
 *  Status:
       INTEGER STATUS             ! Global status
 
@@ -395,6 +388,12 @@
       INTEGER CHR_LEN            ! Used length of a string
 
 *  Local Constants:
+      CHARACTER BCKSLH*1         ! A single backslash
+*  Some compilers need '\\' to get '\', which isn't a problem as Fortran
+*  will truncate the string '\\' to '\' on the occasions when that isn't
+*  needed.
+      PARAMETER( BCKSLH = '\\' )
+
       INTEGER MAXBIN             ! Maximum number of histogram bins
       PARAMETER( MAXBIN = 10000 )!
 
