@@ -79,6 +79,7 @@
 *     NUMBIN = _INTEGER (Read)
 *        The number of histogram bins to be used.  This must lie in the
 *        range 2 to 10000.  The suggested default is the current value.
+*        It is ignored if WIDTH is not null.
 *     OUT = NDF (Read)
 *        Name of the NDF structure to save the histogram in its data
 *        array.  If null (!) is entered the histogram NDF is not
@@ -188,6 +189,12 @@
 *        Only accessed if a value is supplied for parameter WEIGHTS.
 *        WEIGHTSTEP is the increment in weight value that corresponds to
 *        a unit increment in histogram count.
+*     WIDTH = _DOUBLE (Read)
+*        The bin width.  This is the alternative to setting the number of
+*        bins.  The bins of the chosen width start from the minimum value
+*        and do not exceed the maximum value.  If this parameter is set to
+*        null (!), the data range and Parameter NUMBIN are used to specify
+*        the bin width. [!]
 *     XLEFT = _DOUBLE (Read)
 *        The axis value to place at the left hand end of the horizontal
 *        axis of the plot.  If a null (!) value is supplied, the minimum
@@ -226,6 +233,10 @@
 *        the NDF called spectrum.  The histogram has 20 bins and spans
 *        the values between 100 and 200.  A plot is made to the current
 *        graphics device.
+*     histogram ndf=spectrum comp=variance range="100,204" width=5
+*        This behaves the same as the previous example, even though it
+*        specifies a larger maximum, as the same number of width=5 bins
+*        are used. 
 *     histogram cube(3,4,) 10 si out=c3_4_hist device=!
 *        Computes and reports the histogram for the z-vector at (x,y)
 *        element (3,4) of the data array in the 3-dimensional NDF called
@@ -274,7 +285,8 @@
 *     Research Councils.
 *     Copyright (C) 2005-2006 Particle Physics & Astronomy Research
 *     Council.
-*     Copyright (C) 2008-2010 Science and Technology Facilities Council.
+*     Copyright (C) 2008-2012, 2014 Science and Technology Facilities
+*     Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -350,6 +362,8 @@
 *        Added parameter WEIGHTS and WEIGHTSTEP.
 *     2012-05-08 (TIMJ):
 *        Add _INT64 support.
+*     2014 April 26 (MJC):
+*        Add Parameter WIDTH.
 *     {enter_further_changes_here}
 
 *-
@@ -413,11 +427,13 @@
       REAL MAXIM                 ! Maximum value of pixels in array
                                  ! standardised for locus
       INTEGER MAXPOS             ! Index of maximum-valued pixel
+      DOUBLE PRECISION MAXWID    ! Maximum histogram bin width
       CHARACTER * ( 8 ) MCOMP    ! Component name for mapping arrays
       INTEGER MINH               ! Minimum number in an histogram bin
       REAL MINIM                 ! Minimum value of pixels in array
                                  ! standardised for locus
       INTEGER MINPOS             ! Index of minimum-valued pixel
+      DOUBLE PRECISION MINWID    ! Minimum histogram bin width
       INTEGER NC                 ! No. characters in text buffer
       INTEGER NDFI               ! Identifier for input NDF
       INTEGER NDFO               ! NDF identifier of output histogram
@@ -434,6 +450,7 @@
       INTEGER UBND( NDF__MXDIM ) ! Upper pixel bounds of input NDF
       CHARACTER * ( 256 ) UNITS  ! Units of the histogram NDF
       DOUBLE PRECISION WEIGHT    ! Value of WEIGHTSTEP parameter
+      DOUBLE PRECISION WIDTH     ! Bin width
       INTEGER WPNTR              ! Pointer to weights array
       CHARACTER * ( 255 ) XL     ! Default X axis label
       LOGICAL XLOG               ! X axis of plot is logarithmic
@@ -545,9 +562,28 @@
 *  See if a cumulative histogram is required.
       CALL PAR_GET0L( 'CUMUL', CUMUL, STATUS )
 
+*  Optionally obtain the bin width.
+      CALL ERR_MARK
+      MAXWID = 0.5D0 * ( DRANGE(2) - DRANGE( 1 ) )
+      MINWID = ( DRANGE(2) - DRANGE( 1 ) ) / DBLE( MAXBIN )
+      CALL PAR_GDR0D( 'WIDTH', -1.0D0, MINWID, MAXWID, .FALSE.,
+     :                WIDTH, STATUS )
+
+*  Null means specify the number of bins instead.
+      IF ( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+
 *  Get the number of histogram bins to be used, within a sensible
 *  range.
-      CALL PAR_GDR0I( 'NUMBIN', 20, 2, MAXBIN, .TRUE., NUMBIN, STATUS )
+         CALL PAR_GDR0I( 'NUMBIN', 20, 2, MAXBIN, .TRUE., NUMBIN,
+     :                   STATUS )
+
+      ELSE IF ( STATUS .EQ. SAI__OK ) THEN
+         NUMBIN = INT( ( DRANGE( 2 ) - DRANGE( 1 ) ) / WIDTH )
+         DRANGE( 2 ) = DRANGE( 1 ) + DBLE( NUMBIN ) * WIDTH
+      END IF
+      CALL ERR_RLSE
+
       IF ( STATUS .NE. SAI__OK ) GOTO 999
 
 *  Obtain weights for each data value.

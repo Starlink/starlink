@@ -11802,6 +11802,15 @@ package kappa {
             helpkey *
          }
 
+         parameter width {
+            type _DOUBLE
+            vpath DEFAULT
+            ppath CURRENT DYNAMIC
+            default !
+            prompt {Width of histogram bins}
+            helpkey *
+         }
+
          parameter xleft {
             type _DOUBLE
             prompt {Axis value at left end of horizontal axis}

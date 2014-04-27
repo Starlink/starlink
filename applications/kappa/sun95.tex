@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.40}
 \newcommand{\stardocnumber}    {95.40}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2014 April 24}
+\newcommand{\stardocdate}      {2014 April 25}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {2.1}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -28983,6 +28983,7 @@ scaling limits are used for both images.
       }{
          The number of histogram bins to be used.  This must lie in the
          range 2 to 10000.  The suggested default is the current value.
+         It is ignored if WIDTH is not null.
       }
       \sstsubsection{
          OUT = NDF (Read)
@@ -29121,6 +29122,15 @@ scaling limits are used for both images.
          a unit increment in histogram count.
       }
       \sstsubsection{
+         WIDTH = \_DOUBLE (Read)
+      }{
+         The bin width.  This is the alternative to setting the number of
+         bins.  The bins of the chosen width start from the minimum value
+         and do not exceed the maximum value.  If this parameter is set to
+         null ({\tt{!}}), the data range and Parameter NUMBIN are used to
+         specify the bin width.  {\tt [!]}
+      }
+      \sstsubsection{
          XLEFT = \_DOUBLE (Read)
       }{
          The axis value to place at the left hand end of the horizontal
@@ -29181,6 +29191,13 @@ scaling limits are used for both images.
          the NDF called spectrum.  The histogram has 20 bins and spans
          the values between 100 and 200.  A plot is made to the current
          graphics device.
+      }
+      \sstexamplesubsection{
+         histogram ndf=spectrum comp=variance range="100,204" width=5
+      }{
+         This behaves the same as the previous example, even though it
+         specifies a larger maximum, as the same number of width=5 bins
+         are used.
       }
       \sstexamplesubsection{
          histogram cube(3,4,) 10 si out=c3\_4\_hist device=!
@@ -59253,6 +59270,11 @@ The following applications have been modified:
       \begin{itemize}
         \item Will now remove any unused space from the graphics-database file,
         thus keeping its size to a minimum.
+      \end{itemize}
+   \item [\htmlref{HISTOGRAM}{HISTOGRAM}]\mbox{}
+      \begin{itemize}
+        \item The new WIDTH parameter offers the option to specify the bin
+        width instead of the number of bins.
       \end{itemize}
    \item [\htmlref{MFITTREND}{MFITTREND}]\mbox{}
       \begin{itemize}

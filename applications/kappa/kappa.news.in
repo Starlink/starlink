@@ -56,6 +56,11 @@ The following new applications have been added:
       -  Will now remove any unused space from the graphics-database
       file, thus keeping its size to a minimum.
 
+   o  HISTOGRAM
+
+      -  The new parameter WIDTH offers the option to specify the bin
+      width instead of the number of bins.
+
    o  MFITTREND
 
       -  Now has a parameter called PROPBAD, which controls whether to
