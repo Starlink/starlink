@@ -193,7 +193,8 @@
 *     WIDTH = _DOUBLE (Read)
 *        The bin width.  This is the alternative to setting the number of
 *        bins.  The bins of the chosen width start from the minimum value
-*        and do not exceed the maximum value.  If this parameter is set to
+*        and do not exceed the maximum value.  Values are constrained
+*        to give between 2 and 10000 bins.  If this parameter is set to
 *        null (!), the data range and Parameter NUMBIN are used to specify
 *        the bin width. [!]
 *     XLEFT = _DOUBLE (Read)
