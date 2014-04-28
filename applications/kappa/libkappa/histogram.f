@@ -28,7 +28,7 @@
 *
 *     By default, each data value contributes a value of one to the
 *     corresponding histogram bin, but alternative weights may be
-*     supplied via parameter WEIGHTS.
+*     supplied via Parameter WEIGHTS.
 
 *  Usage:
 *     histogram in numbin range [comp] [logfile]
@@ -237,7 +237,7 @@
 *     histogram ndf=spectrum comp=variance range="100,204" width=5
 *        This behaves the same as the previous example, even though it
 *        specifies a larger maximum, as the same number of width=5 bins
-*        are used. 
+*        are used.
 *     histogram cube(3,4,) 10 si out=c3_4_hist device=!
 *        Computes and reports the histogram for the z-vector at (x,y)
 *        element (3,4) of the data array in the 3-dimensional NDF called
