@@ -21,9 +21,10 @@
 
 *  Description:
 *     This application derives histogram information for an NDF array
-*     between specified limits.  The histogram is reported, and may
-*     optionally be written to a text log file, and/or plotted
-*     graphically.
+*     between specified limits, using either a set number of bins
+*     (Parameter NUMBIN) or a chosen bin width (Parameter WIDTH).  The
+*     histogram is reported, and may optionally be written to a text log
+*     file, and/or plotted graphically.
 *
 *     By default, each data value contributes a value of one to the
 *     corresponding histogram bin, but alternative weights may be
