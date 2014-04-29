@@ -45,6 +45,10 @@
 *         - The GSL interpolator requires monotonically increasing values for the X dimension
 *           so the first reordered RTS timestamp is set to the time of the first original timestamp
 *           and subsequent timestamps are incremented by the original difference between successive values
+*     2014-04-28 (MS)
+*         Detect and override inconsistent SCANDIR
+*         - Some historical data indicates a SCANDIR that differs from the actual positions array values.
+*           This is now being detected and corrected where necessary.
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -118,7 +122,7 @@ void fts2_validatemirrorpositions(double* positions, double* times, int count, i
   double v = 0.0;
   smf_fits_getD(inData->hdr, "SCANVEL", &v, status);
   s = v*t;
-  double EPSILON = s/2;
+  double EPSILON = s/2.0;
 
   int i,j,x,y = 0;
   int scanDir      = 0;             /* Mirror scan direction forward==1, reverse==-1 */
@@ -131,6 +135,15 @@ void fts2_validatemirrorpositions(double* positions, double* times, int count, i
   int bolIndex              = 0;
 
   smf_fits_getI(inData->hdr, "SCANDIR", &scanDir, status);
+  /* Some historical data has a mismatched SCANDIR
+     so check for this condition and override as necessary */
+  if(scanDir < 0 && positions[count-1] > positions[0]) {
+    /*printf("fts2_validatemirrorpositions: Correcting for mismatched SCANDIR of %d!\n", scanDir);*/
+      scanDir = 1;
+  } else if(scanDir > 0 && positions[0] > positions[count-1]) {
+    /*printf("fts2_validatemirrorpositions: Correcting for mismatched SCANDIR of %d!\n", scanDir);*/
+      scanDir = -1;
+  }
 
   /* Invert negative scan */
   double* invertedP = NULL;         /* Inverted positions */
@@ -177,19 +190,24 @@ void fts2_validatemirrorpositions(double* positions, double* times, int count, i
   for(i = 0; i < count-1; i++) {
     delta[i] = positions[i+1] - positions[i];
   }
+/*printf("fts2_validatemirrorpositions: count=%d, EPSILON=%f\n", count, EPSILON);*/
 
   /* FIND THE START INDEX */
   for(i = 0; i < count-1; i++) {
+  /*printf("fts2_validatemirrorpositions: delta[%d]=%f\n", i, delta[i]);*/
     if(delta[i] >= EPSILON) {
       *ni = i;
+    /*printf("fts2_validatemirrorpositions: delta[%d]=%f, ni=%d\n", i, delta[i], *ni);*/
       break;
     }
   }
 
   /* FIND THE END INDEX */
   for(i = count - 1; i > -1; i--) {
+  /*printf("fts2_validatemirrorpositions: delta[%d]=%f\n", i, delta[i]);*/
     if(delta[i] >= EPSILON) {
       *nf = i+1;
+    /*printf("fts2_validatemirrorpositions: delta[%d]=%f, nf=%d\n", i, delta[i], *nf);*/
       break;
     }
   }
