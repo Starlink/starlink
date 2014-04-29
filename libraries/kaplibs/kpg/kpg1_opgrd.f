@@ -268,13 +268,15 @@
 *        reason, loop round trying larger sample spacing until the pixel
 *        size converges.
 *     28-JUN-2013 (DSB):
-*        - The linear interpolation scheme used by kpg1_opgr2 can cause 
-*        some points to fall partially off the end of the histogram, 
-*        so add some extra bins to the start and end of the histogram 
+*        - The linear interpolation scheme used by kpg1_opgr2 can cause
+*        some points to fall partially off the end of the histogram,
+*        so add some extra bins to the start and end of the histogram
 *        so that these points are not lost.
-*        - If the pixel size in the perpendicular direction cannot be 
-*        found, assume it is the same as in the first direction instead of 
+*        - If the pixel size in the perpendicular direction cannot be
+*        found, assume it is the same as in the first direction instead of
 *        aborting.
+*     29-APR-2014 (DSB):
+*        Add special case code to handle points that are in a straight line.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -316,6 +318,7 @@
 *  Local Variables:
       DOUBLE PRECISION ANG
       DOUBLE PRECISION ANG0
+      DOUBLE PRECISION ANGLIN
       DOUBLE PRECISION DIAM
       DOUBLE PRECISION MXAMP
       DOUBLE PRECISION MXANG
@@ -509,6 +512,12 @@
       XC = 0.5*( XHI + XLO )
       YC = 0.5*( YHI + YLO )
 
+*  If the points are not coincident, do a special case check for cases
+*  where all the pixel positions are on a straight line. If they are,
+*  the angle of the line is returned in ANGLIN. It also updates SPC to be
+*  a better estimate of the distance between points.
+      CALL KPG1_OPGR5( NPOS, XOUT, YOUT, SPC, ANGLIN, STATUS )
+
 *  The next bit is to do with determining the optimal pixel sizes and
 *  orientation, so we can skip it if these were supplied by the caller.
       IF( SPC .GT. 0.0 .AND. ( PAR( 5 ) .EQ. AST__BAD .OR.
@@ -562,11 +571,13 @@ c      write(*,*) ' '
 *  through all orientations of this line in units of 3 degrees. Zero
 *  angle corresponds to the second axis in the initial projection (i.e.
 *  celestial north), and the first axis of the initial projection
-*  (either east or west) is at angle of +90 degrees.
+*  (either east or west) is at angle of +90 degrees. If we already know
+*  the angle to use, just use that one angle.
             MXAMP = -1.0
             MXWAVE = 0.0
-            DO IANG = 0, 177, 3
-               ANG = IANG*AST__DD2R
+            IF( ANGLIN .EQ. AST__BAD ) THEN
+               DO IANG = 0, 177, 3
+                  ANG = IANG*AST__DD2R
 
 *  For the current line orientation, project every initial grid position
 *  onto the line, and record where about the projected point falls on
@@ -578,13 +589,22 @@ c      write(*,*) ' '
 *  periodicity (in units of initial grid pixels). The details of the
 *  orientation with the strongest periodicity are retained in MXAMP,
 *  MXANG and MXWAVE.
-               CALL KPG1_OPGR2( NPOS, XOUT, YOUT, ANG, SPC, XC, YC,
+                  CALL KPG1_OPGR2( NPOS, XOUT, YOUT, ANG, SPC, XC, YC,
+     :                             SPC0, .TRUE., HISTSZ,
+     :                             %VAL( CNF_PVAL( IPHIST ) ), MXAMP,
+     :                             MXWAVE, MXANG, STATUS )
+
+*  Next orientation.
+               END DO
+
+*  If we already know the angle to use (because the sampels are all in a
+*  straight line), just use it.
+            ELSE
+               CALL KPG1_OPGR2( NPOS, XOUT, YOUT, ANGLIN, SPC, XC, YC,
      :                          SPC0, .TRUE., HISTSZ,
      :                          %VAL( CNF_PVAL( IPHIST ) ), MXAMP,
      :                          MXWAVE, MXANG, STATUS )
-
-*  Next orientation.
-            END DO
+            END IF
 
          END DO
 
@@ -600,18 +620,20 @@ c      write(*,*)
 *  angle found above. The cone is 3 degrees wide and we use 0.1-degree
 *  intervals. In this loop the IANG variable is angular offset from
 *  ANG0 in units of 0.1 degree. This time, we use linear interpolation
-*  to create the histogram, to get a more-accurate result.
-            ANG0 = MXANG
-            MXAMP = -1.0
-            MXWAVE = 0.0
-
-            DO IANG = -15, 15
-               ANG = ANG0 + 0.1*DBLE( IANG )*AST__DD2R
-               CALL KPG1_OPGR2( NPOS, XOUT, YOUT, ANG, SPC, XC, YC,
-     :                          SPC0, .TRUE., HISTSZ,
-     :                          %VAL( CNF_PVAL( IPHIST ) ), MXAMP,
-     :                          MXWAVE, MXANG, STATUS )
-            END DO
+*  to create the histogram, to get a more-accurate result. If we already
+*  know the angle to use, we can skip this bit.
+            IF( ANGLIN .EQ. AST__BAD ) THEN
+               ANG0 = MXANG
+               MXAMP = -1.0
+               MXWAVE = 0.0
+               DO IANG = -15, 15
+                  ANG = ANG0 + 0.1*DBLE( IANG )*AST__DD2R
+                  CALL KPG1_OPGR2( NPOS, XOUT, YOUT, ANG, SPC, XC, YC,
+     :                             SPC0, .TRUE., HISTSZ,
+     :                             %VAL( CNF_PVAL( IPHIST ) ), MXAMP,
+     :                             MXWAVE, MXANG, STATUS )
+               END DO
+            END IF
 
 *  Calculate the wavelength of the periodicity at right angles to the
 *  above chosen direction.
@@ -1722,10 +1744,163 @@ c      write(*,*) '   Using new total - setting MXAMP to ',NEWAMP
       END
 
 
+      SUBROUTINE KPG1_OPGR5( N, X, Y, SPC, ANG, STATUS )
+*+
+*  Name:
+*     KPG1_OPGR5
 
+*  Purpose:
+*     Check if the positions are on a straight line.
 
+*  Language:
+*     Starlink Fortran 77
 
+*  Invocation:
+*     CALL KPG1_OPGR5( N, X, Y, SPC, ANG, STATUS )
 
+*  Description:
+*     This routine checks if the supplied pixel positions are close to
+*     being on a straight line.
+
+*  Arguments:
+*     N = INTEGER (Given)
+*        The length of the array.
+*     X( N ) = DOUBLE PRECISION (Given)
+*        The GRID X value at each position.
+*     Y( N ) = DOUBLE PRECISION (Given)
+*        The GRID Y value at each position.
+*     SPC = DOUBLE PRECISION (Given and Returned)
+*        The typical distance between points (in pixels). This function
+*        returns immediately with ANG set to AST__BAD if SPC is zero
+*        on entry.
+*     ANG = DOUBLE PRECISION (Returned)
+*        The angle of the straight line in radians, or AST__BAD if the
+*        positions do not all fall on a straight line. Measured from the
+*        grid Y axis through the grid X axis.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  History:
+*     16-NOV-2006 (DSB):
+*        Original version.
+*     {enter_further_changes_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! VAL constants
+      INCLUDE 'AST_PAR'          ! AST constants
+
+*  Arguments Given:
+      INTEGER N
+      DOUBLE PRECISION X( N )
+      DOUBLE PRECISION Y( N )
+
+*  Arguments Given and Returned:
+      DOUBLE PRECISION SPC
+
+*  Arguments Returned:
+      DOUBLE PRECISION ANG
+
+*  Status argument:
+      INTEGER STATUS
+
+*  Local Variables:
+      DOUBLE PRECISION D2MAX
+      DOUBLE PRECISION D2
+      DOUBLE PRECISION DST
+      DOUBLE PRECISION DX
+      DOUBLE PRECISION DY
+      DOUBLE PRECISION MAXDST
+      DOUBLE PRECISION MAXERR
+      DOUBLE PRECISION MINDST
+      DOUBLE PRECISION X0
+      DOUBLE PRECISION X1
+      DOUBLE PRECISION Y0
+      DOUBLE PRECISION Y1
+      INTEGER I
+
+*.
+
+*  Initialise
+      ANG = AST__BAD
+
+*  Check the inherited global status. Also return if the points are known
+*  to be coincident.
+      IF( STATUS .NE. SAI__OK .OR. SPC .LE. 0.0D0 ) RETURN
+
+*  Find the first valid position. Then find the position which is
+*  furthest away from the first valid position.
+      D2MAX = -1.0D0
+      X0 = AST__BAD
+      Y0 = AST__BAD
+      X1 = AST__BAD
+      Y1 = AST__BAD
+      DO I = 1, N
+         IF( X( I ) .NE. AST__BAD .AND. Y( I ) .NE. AST__BAD ) THEN
+            IF( X0 .EQ. AST__BAD ) THEN
+               X0 = X( I )
+               Y0 = Y( I )
+            ELSE
+               D2 = ( X( I ) - X0 )**2 + ( Y( I ) - Y0 )**2
+               IF( D2 .GE. D2MAX ) THEN
+                  D2MAX = D2
+                  X1 = X( I )
+                  Y1 = Y( I )
+               END IF
+            END IF
+         END IF
+      END DO
+
+*  Check we have at least two valid positions.
+      IF( D2MAX .LE. 0.0 ) THEN
+         CALL ERR_REP( ' ', 'KPG1_OPGRD: Insufficient valid points '//
+     :                 'in KPG1_OPGR5 (programming error).', STATUS )
+      ELSE
+
+*  Get the components of the unit vector from the first point to the
+*  second point.
+         DX = X1 - X0
+         DY = Y1 - Y0
+         D2 = SQRT( DX**2 + DY**2 )
+         DX = DX/D2
+         DY = DY/D2
+
+*  Loop round all positions looking for the largest distance of any point
+*  from the line joining the above two positions. Also record the max and
+*  min distances along this line of any position from position (X0,Y0).
+         MAXERR = -1.0D0
+         MINDST = VAL__MAXD
+         MAXDST = VAL__MIND
+         DO I = 1, N
+            IF( X( I ) .NE. AST__BAD .AND. Y( I ) .NE. AST__BAD ) THEN
+               MAXERR = MAX( MAXERR,
+     :                  ABS( DX*( Y( I ) - Y0 ) - DY*( X( I ) - X0 ) ) )
+               DST = DX*( X( I ) - X0 ) + DY*( Y( I ) - Y0 )
+               MINDST = MIN( MINDST, DST )
+               MAXDST = MAX( MAXDST, DST )
+            END IF
+         END DO
+
+*  If the maximum error from the line is less than 1% of the length of
+*  the line, assume this is a straight line.
+         IF( MAXERR .LE. 0.01*( MAXDST - MINDST ) ) THEN
+
+* Update the typical pixel spacing.
+            SPC = ( MAXDST - MINDST ) / ( N - 1 )
+
+*  Return the angle of the line, in the range 0 - 2PI.
+            ANG = ATAN2( DX, DY )
+            IF( ANG .LT. 0.0 ) ANG = ANG + 2*AST__DPI
+         END IF
+
+      END IF
+
+      END
 
 
 
