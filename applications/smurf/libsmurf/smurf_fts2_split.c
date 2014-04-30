@@ -58,6 +58,8 @@
 *        Fixed bug introduced in base case by previous addition of low resolution extraction
 *     2013-11-25 (MS)
 *        Add mirror times treatment
+*     2014-04-30 (MS)
+*        Prevent extra iteration when any remaining scan data is too short to be useful
 *
 *     {enter_further_changes_here}
 
@@ -323,8 +325,8 @@ void smurf_fts2_split(int* status)
                 nFramesOutPrev = hrFramesOutPrev;
                 nFramesOut = hrFramesOut;
 
-                /*printf("%s: Split: %d of %d frames found at hrStart=%d, hrStop=%d\n",
-                       TASK_NAME, outDataCount, hrFramesOut, hrStart, hrStop);*/
+                /*printf("%s: Split: %d of %d frames found at hrStart=%d, hrStop=%d, where nFrames=%d\n",
+                       TASK_NAME, outDataCount, hrFramesOut, hrStart, hrStop, nFrames);*/
                 break;
             }
         }
@@ -360,8 +362,7 @@ void smurf_fts2_split(int* status)
         }
 
         /* Check for end of data condition */
-        if(hrStop < hrStart  || hrStop >= nFrames-1) {
-            hrStop = nFrames-1;
+        if(hrStop < hrStart  || (nFrames - hrStop) < (hrStop - hrStart)/2) {
             done = 1;
         }
 
