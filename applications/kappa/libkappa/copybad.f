@@ -100,7 +100,7 @@
 *     02110-1301, USA.
 
 *  Authors:
-*     TDCA: Tim D.C. Ash(STARLINK)
+*     TDCA: Tim D.C. Ash (STARLINK)
 *     DSB: David S. Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
 *     BEC: Brad Cavanagh (JAC, Hawaii)
@@ -109,7 +109,7 @@
 
 *  History:
 *     10-OCT-1998 (TDCA):
-*        Original version, partially based on the KAPPA routine ADD
+*        Original version, partially based on the KAPPA routine ADD.
 *     13-OCT-1998 (DSB):
 *        - Tidied up the prologue and code a touch.
 *        - Corrected distinction between the data type in which values are
@@ -150,7 +150,7 @@
 *     2012 May 8 (MJC):
 *        Add _INT64 support.
 *     5-SEP-2013 (DSB):
-*        Added output parameter NBAD and NGOOD.
+*        Added output parameters NBAD and NGOOD.
 *     2014 May 1 (MJC):
 *        NBAD is not the number of bad values but the number of bad
 *        values copied.  Remove NDF_SBAD call which could disable
