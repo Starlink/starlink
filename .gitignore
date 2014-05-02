@@ -537,6 +537,7 @@ applications/kappa/kapsub/kps1_cnse.f
 applications/kappa/kapsub/kps1_cpb.f
 applications/kappa/kapsub/kps1_cpwd.f
 applications/kappa/kapsub/kps1_dscl.f
+applications/kappa/kapsub/kps1_exb.f
 applications/kappa/kapsub/kps1_fain.f
 applications/kappa/kapsub/kps1_fofo.f
 applications/kappa/kapsub/kps1_fohe.f
