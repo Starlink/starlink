@@ -145,7 +145,7 @@
 *     software that performed the action.
 
 *  Copyright:
-*     Copyright (C) 2009-2012 Science & Technology Facilities Council.
+*     Copyright (C) 2009-2014 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -281,8 +281,13 @@
 *         variable into account.
 *      27-MAY-2013 (DSB):
 *         Modify ndgAddProv so that it checks the input NDFs for
-*         existing provenance info, rather than (incorrectly) checking the 
+*         existing provenance info, rather than (incorrectly) checking the
 *         output NDF.
+*      2-MAY-2014 (DSB):
+*         When encoding a Prov structure into a list of bytes, use a
+*         special magic string to represent NULL pointers so that they
+*         can be distinguished from zero-length strings when being read
+*         back in again.
 */
 
 
@@ -345,6 +350,10 @@
    are evaluated multiple times in this macro, so they should not have any
    side effects. Macro value is non-zero if the strings match. */
 #define CMP_STRING(a,b) ((!(a)&&!(b))||((a)&&(b)&&!strcmp((a),(b))))
+
+/* The string used to flag null pointers in an encoded provenance structure. */
+#define NULL_DATA "NDG_NULL"
+#define NULL_DATA_LEN 9
 
 
 /* Include files. */
@@ -3891,8 +3900,11 @@ static char *ndg1DecodeProvData( char *pdata, int iprov, int version,
    generous upper limit on the reaonable expected length of the string. */
 #define STORESTRING(Item,MaxLen) \
       len = result ? strlen( result ) + 1 : MaxLen; \
-      if( len < MaxLen ) { \
-         Item = ( len > 1 ) ? astStore( NULL, result, len ) : NULL; \
+      if( len == NULL_DATA_LEN && !strcmp( result, NULL_DATA ) ) { \
+         Item = NULL; \
+         result += len; \
+      } else if( len > 0 && len < MaxLen ) { \
+         Item = astStore( NULL, result, len ); \
          result += len; \
       } else { \
          Item = NULL; \
@@ -7313,8 +7325,8 @@ static char *ndg1StoreCharData( char *mem, const void *data, size_t len,
 *        Pointer to the inherited status variable.
 
 *  Notes:
-*     - If "data" is NULL or "len" is zero, a zero length string (i.e. a
-*     single null character) is appended to the end of "mem"
+*     - If "data" is NULL or "len" is zero, the string "NDG_NULL" is
+*     appended to the end of "mem"
 
 *  Returned Value:
 *     Pointer to the extended memory area containing the original
@@ -7328,7 +7340,6 @@ static char *ndg1StoreCharData( char *mem, const void *data, size_t len,
    size_t newlen;
    const char *adata;
    size_t alen;
-   char cval;
 
 /* Initialise the returned memory pointer. */
    result = mem;
@@ -7341,12 +7352,10 @@ static char *ndg1StoreCharData( char *mem, const void *data, size_t len,
       adata = data;
       alen = len;
 
-/* If no data has been supplied, store a zero-length string (i.e. a
-   single null character). */
+/* If no data has been supplied, store a magic string. */
    } else {
-      cval = 0;
-      adata = &cval;
-      alen = sizeof( char );
+      adata = NULL_DATA;
+      alen = NULL_DATA_LEN;
    }
 
 /* Get the new size of the memory area. */
@@ -7355,7 +7364,7 @@ static char *ndg1StoreCharData( char *mem, const void *data, size_t len,
 /* Extend the memory area to become the required new size. */
    result = astGrow( result, newlen, sizeof( char ) );
 
-/* If the memory was allocated succesfully, copy the new data to teh end
+/* If the memory was allocated succesfully, copy the new data to the end
    of it, and update the size of the memory area. */
    if( *status == SAI__OK ) {
       memcpy( result + *memsize, adata, alen );
