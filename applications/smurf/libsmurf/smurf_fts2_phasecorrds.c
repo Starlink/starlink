@@ -102,6 +102,9 @@
 *       Replace one_snprintf SMF_PATH_MAX parameter to sizeof(fileName) for safety sake
 *     2013-08-27 (MS)
 *        Temporary fix for segfault due to incorrect array sizes
+*     2014-05-02 (MS)
+*        Fixed memory leak with fftw plan
+*        - Added fftw plan destructor for each instance constructed.
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -608,6 +611,9 @@ void smurf_fts2_phasecorrds(int* status)
                 planA = fftw_plan_dft_1d(nFrames, DSIN, DSOUT, FFTW_FORWARD, FFTW_ESTIMATE);
                 fftw_execute(planA);
 
+                /* Destroy each allocated plan */
+                if(planA) { fftw_destroy_plan(planA); }
+
                 /* Compute wavenumbers within [0, FNYQ] */
                 for(k = 0; k <= nFrames2; k++) { WN[k] = k * dSigma; }
 
@@ -635,6 +641,9 @@ void smurf_fts2_phasecorrds(int* status)
                 planB = fftw_plan_dft_1d(nFrames, DSOUT, IFGDF, FFTW_BACKWARD, FFTW_ESTIMATE);
                 fftw_execute(planB);
 
+                /* Destroy each allocated plan */
+                if(planB) { fftw_destroy_plan(planB); }
+
                 /* DF: Normalize the reverse FFT interferogram back to original scale */
                 for(k=0; k<nFrames; k++) {
                     IFGDF[k][0] /= nFrames;
@@ -657,6 +666,7 @@ void smurf_fts2_phasecorrds(int* status)
                         peakIFGIndex = k;
                     }
                 }
+
                 /* DF: TODO: Save problem flagged pixels to a bolometer mask array */
                 /* DF: TODO: Make peak test more robust so as to handle noisy data better */
                 if(!badPixel && abs(indexZPD - peakIFGIndex) * dz > IFG_PEAK_THRESHOLD){  /* TODO: use dSigma instead of dz? */
@@ -673,6 +683,9 @@ void smurf_fts2_phasecorrds(int* status)
                 planA = fftw_plan_dft_1d(nFrames, DSIN, DSOUT, FFTW_FORWARD, FFTW_ESTIMATE); */
                 planA = fftw_plan_dft_1d(nFrames, IFGDF, DSOUT, FFTW_FORWARD, FFTW_ESTIMATE);
                 fftw_execute(planA);
+
+                /* Destroy each allocated plan */
+                if(planA) { fftw_destroy_plan(planA); }
 
                 /* Compute phase */
                 phaseDiff = 0.0;
@@ -780,6 +793,9 @@ void smurf_fts2_phasecorrds(int* status)
                 /* Inverse FFT spectrum to get the phase corrected interferogram */
                 planB = fftw_plan_dft_1d(nFrames, SPEC, SPEC, FFTW_BACKWARD, FFTW_ESTIMATE);
                 fftw_execute(planB);
+
+                /* Destroy each allocated plan */
+                if(planB) { fftw_destroy_plan(planB); }
 
                 /* Phase corrected interferogram */
                 M = indexZPD;

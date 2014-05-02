@@ -92,6 +92,9 @@
 *     2014-04-17 (MS)
 *        Add optional RESOLUTION override
 *        If defined as a command line parameter, an arbitrary output resolution is applied.
+*     2014-05-02 (MS)
+*        Fixed memory leak with fftw plan
+*        - Moved fftw plan destructor inside the loop in which it was created.
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -603,6 +606,9 @@ void smurf_fts2_spectrum(int* status)
                         printf("%s: SPEC[%d,%d,%d]=%E\n",TASK_NAME, i, j, k, SPEC[k][0] / (double)(N * resolution));
                     }*/
                 }
+
+                /* Destroy each allocated plan */
+                if(plan) { fftw_destroy_plan(plan); }
             }
         }
 
@@ -612,7 +618,6 @@ void smurf_fts2_spectrum(int* status)
         if(SFP)  { SFP = astFree(SFP); }
         if(SFPij)  { SFPij = astFree(SFPij); }
         if(WN)   { WN = astFree(WN); }
-        if(plan) { fftw_destroy_plan(plan); pland = 1; }
         if(DSIN) { fftw_free(DSIN); DSIN = NULL; }
         if(SPEC) { fftw_free(SPEC); SPEC = NULL; }
         if(ACC)     { gsl_interp_accel_free(ACC);   ACC     = NULL; }
@@ -650,7 +655,6 @@ CLEANUP:
     if(SFP)  { SFP = astFree(SFP); }
     if(SFPij)  { SFPij = astFree(SFPij); }
     if(WN)   { WN = astFree(WN); }
-    if(plan && !pland) { fftw_destroy_plan(plan); }
     if(DSIN) { fftw_free(DSIN); DSIN = NULL; }
     if(SPEC) { fftw_free(SPEC); SPEC = NULL; }
     if(ACC)     { gsl_interp_accel_free(ACC);   ACC     = NULL; }
