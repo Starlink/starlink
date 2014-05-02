@@ -121,11 +121,11 @@
 
 *.
 
+*  Initialise the number of bad values copied.
+      NBAD = 0
+
 *  Check inherited status.
       IF( STATUS .NE. SAI__OK ) RETURN
-
-*  Initialise the number of bad values copied.
-      NBAD=0
 
 *  First do normal (not inverted) case.
       IF( .NOT. INVERT ) THEN
