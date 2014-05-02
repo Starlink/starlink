@@ -37,13 +37,14 @@
 *     VAROUT( NEL ) = <TYPE> (Given and Returned)
 *         Array containing the variance values of NDF OUT.
 *     NBAD = Integer (Returned)
-*         Number of bad pixels in the output NDF.
+*         Number of bad pixels copied to the output NDF.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils.
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2014 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -65,6 +66,7 @@
 *  Authors:
 *     TDCA: Tim D.C. Ash (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     MJC: Malcolm J. Currie (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -85,6 +87,8 @@
 *        - Include the required check on the inherited status value.
 *     27-ARP-2006 (DSB):
 *        Made generic and added INVERT argument.
+*     2014 May 1 (MJC):
+*        Documented actual meaning of NBAD argument.
 *     {enter_further_changes_here}
 
 *-

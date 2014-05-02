@@ -40,6 +40,8 @@ The following new applications have been added:
 
       -  Now writes the number of good and bad pixels in the output NDF
       to output parameters NGOOD and NBAD.
+      -  No longer sets the BAD_PIXEL flag for the DATA and VARIANCE
+      components.
 
    o  DISPLAY
 

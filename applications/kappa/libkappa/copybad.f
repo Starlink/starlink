@@ -42,9 +42,9 @@
 *        is, good pixels are treated as bad and bad pixels are treated as
 *        good). [FALSE]
 *     NBAD = _INTEGER (Write)
-*        The number of bad pixels in the output NDF.
+*        The number of bad pixels copied to the output NDF.
 *     NGOOD = _INTEGER (Write)
-*        The number of good pixels in the output NDF.
+*        The number of pixels not made bad in the output NDF.
 *     OUT = NDF (Write)
 *        The output NDF.
 *     REF = NDF (Read)
@@ -79,8 +79,8 @@
 *     Copyright (C) 1998, 2000, 2003-2004 Central Laboratory of the
 *     Research Councils.
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2008, 2009, 2012 Science and Technology Facilities
-*     Council.
+*     Copyright (C) 2008, 2009, 2012, 2014 Science and Technology
+*     Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -104,6 +104,7 @@
 *     DSB: David S. Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
 *     BEC: Brad Cavanagh (JAC, Hawaii)
+*     MJC: Malcolm J. Currie (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -150,6 +151,11 @@
 *        Add _INT64 support.
 *     5-SEP-2013 (DSB):
 *        Added output parameter NBAD and NGOOD.
+*     2014 May 1 (MJC):
+*        NBAD is not the number of bad values but the number of bad
+*        values copied.  Remove NDF_SBAD call which could disable
+*        the BAD_PIXEL flag even though bad values were present in
+*        either data or variance arrays.
 *     {enter_further_changes_here}
 
 *-
@@ -264,17 +270,18 @@
 *  Report the number of pixels in the output NDF.
       CALL NDF_MSG( 'NDF', OUT )
       IF ( NBAD .EQ. 0 ) THEN
-         CALL MSG_OUT( 'COPYBAD_NBAD', '  There are no bad pixels in '//
-     :                 'the output NDF ''^NDF''.', STATUS)
+         CALL MSG_OUT( 'COPYBAD_NBAD', '  There were no bad pixels '//
+     :                 'copied to the output NDF ''^NDF''.', STATUS )
 
       ELSE IF ( NBAD .EQ. 1 ) THEN
-         CALL MSG_OUT( 'COPYBAD_NBAD', '  There is 1 bad pixel in the'//
-     :                 ' output NDF ''^NDF''.', STATUS)
+         CALL MSG_OUT( 'COPYBAD_NBAD', '  There was one bad pixel '//
+     :                 'copied to the output NDF ''^NDF''.', STATUS )
 
       ELSE
          CALL MSG_SETI( 'NBAD', NBAD )
-         CALL MSG_OUT( 'COPYBAD_NBAD', '  There are ^NBAD bad pixels '//
-     :                 'in the output NDF ''^NDF''.', STATUS)
+         CALL MSG_OUT( 'COPYBAD_NBAD', '  There were ^NBAD bad '//
+     :                 'pixels copied to the output NDF ''^NDF''.',
+     :                 STATUS )
       END IF
 
 *  Display a blank line to highlight the previous message.
@@ -286,9 +293,6 @@
 
 *  Obtain the output title and insert it into the output NDF.
       CALL NDF_CINP( 'TITLE', OUT, 'Title', STATUS )
-
-*  Set the BAD-PIXEL flag in the output NDF.
-      CALL NDF_SBAD( ( NBAD .GT. 0 ), OUT, 'Data,Variance', STATUS )
 
 *  End the NDF context.
       CALL NDF_END( STATUS )

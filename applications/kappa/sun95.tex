@@ -20781,12 +20781,12 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
       \sstsubsection{
          NBAD = \_INTEGER (Write)
       }{
-         The number of bad pixels in the output NDF.
+         The number of bad pixels copied to the output NDF.
       }
       \sstsubsection{
          NGOOD = \_INTEGER (Write)
       }{
-         The number of good pixels in the output NDF.
+         The number of pixels not made bad in the output NDF.
       }
    }
    \sstexamples{
@@ -59257,6 +59257,8 @@ The following applications have been modified:
       \begin{itemize}
         \item  Now writes the number of good and bad pixels in the output
         NDF to output parameters NGOOD and NBAD.
+        \item No longer sets the BAD\_PIXEL flag for the DATA and
+        VARIANCE components.
       \end{itemize}
    \item [\htmlref{DISPLAY}{DISPLAY}]\mbox{}
       \begin{itemize}
