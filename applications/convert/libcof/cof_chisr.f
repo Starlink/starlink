@@ -39,7 +39,7 @@
 
 *  Copyright:
 *     Copyright (C) 1997, 1999, 2001, 2004 Central Laboratory of the
-*     Research Councils. Copyright (C) 2009 Science & Technology
+*     Research Councils. Copyright (C) 2009, 2014 Science & Technology
 *     Facilities Council. All Rights Reserved.
 
 *  Licence:
@@ -109,6 +109,10 @@
 *     12-NOV-2010 (DSB):
 *        Deleting the pre-existing history component using HDS confuses
 *        NDF. So delete it using NDF instead.
+*     2014 May 3 (MJC):
+*        Handle continuation records following a change to FITSIO and
+*        much longer records, say for groups of configuration parameters
+*        and filenames.
 *     {enter_further_changes_here}
 
 *-
@@ -182,6 +186,7 @@
       INTEGER IPAR               ! Index of "Parameters:" heading
       INTEGER IREC               ! Loop counter for history records
       INTEGER ISOF               ! Index of "Software:" heading
+      INTEGER IW                 ! Index of extracted word
       INTEGER JREC               ! Loop counter for text lines
       INTEGER KINDEX             ! Keyword index
       CHARACTER*8 KEYWRD         ! FITS keyword
@@ -194,7 +199,7 @@
       INTEGER NC                 ! Number of characters
       INTEGER NEXREC             ! Number of existing HISTORY records
       INTEGER NWORD              ! Number of words in HISTORY card
-      CHARACTER*2048 PARAGR      ! Paragraph of HISTORY text
+      CHARACTER*10000 PARAGR     ! Paragraph of HISTORY text
       INTEGER PARCOL             ! Paragraph column where to append text
       LOGICAL PARSKP             ! There is a paragraph of text?
       CHARACTER*( NDF__SZREF ) REFER ! Reference dataset
@@ -377,13 +382,10 @@
 *  =============================
             DO IREC = NEXREC + 1, NEXREC + CURREC
 
-*  Skip to the next header card.  Here we assume that these headers have
-*  not been tampered.
-               KINDEX = KINDEX + 1
-               CALL FTGREC( FUNIT, KINDEX, CARD, FSTAT )
-
-*  Record that this card is not to be propagated to the FITS airlock.
-               RETAIN( KINDEX ) = .FALSE.
+*  Obtain from the headers the text containing the record number,
+*  date, command name and version.
+               CALL COF_MHISR( FUNIT, ALIGN, NHEAD, RETAIN,
+     :                         KINDEX, PARAGR, STATUS )
 
 *  Calculate the length of the record number.
                CALL CHR_ITOC( IREC, IC, NC )
@@ -393,7 +395,7 @@
 
 *  Extract for the date and convert it from KAPPA-style to its NDF form.
                NC = NC + ALIGN
-               DATE = CARD( 11 + NC: 34 + NC )
+               DATE = PARAGR( 3 + NC: 26 + NC )
                CALL COF_DATEH( DATE, STATUS )
 
 *  Make the DATE component and assign it the date via a locator.
@@ -403,7 +405,7 @@
                CALL DAT_ANNUL( CLOC, STATUS )
 
 *  Extract for the command.
-               APPN = CARD( 38 + NC: )
+               APPN = PARAGR( 30 + NC: )
                CSIZE = MAX( 1, MIN( CHR_LEN( APPN ), NDF__SZAPP ) )
 
 *  Make the COMMAND component and assign it the application name via a
@@ -413,40 +415,40 @@
                CALL DAT_PUT0C( CLOC, APPN, STATUS )
                CALL DAT_ANNUL( CLOC, STATUS )
 
-*  Skip to the next header card.  We assume that these headers have
-*  not been tampered.
-               KINDEX = KINDEX + 1
-               CALL FTGREC( FUNIT, KINDEX, CARD, FSTAT )
-
-*  Record that this card is not to be propagated to the FITS airlock.
-               RETAIN( KINDEX ) = .FALSE.
+*  Obtain from the headers the text containing the user, host, and
+*  width.  The text excludes the HISTORY keyword.
+               CALL COF_MHISR( FUNIT, ALIGN, NHEAD, RETAIN,
+     :                         KINDEX, PARAGR, STATUS )
 
 *  Break the line into words.
-               CALL CHR_DCWRD( CARD, MAXWRD, NWORD, START, END, WORDS,
+               CALL CHR_DCWRD( PARAGR, MAXWRD, NWORD, START, END, WORDS,
      :                         LSTAT )
 
-*  The username is the third word.  Make the USER component and assign
+*  The username is the second word.  Make the USER component and assign
 *  it the username via a locator.
-               CSIZE = MIN( END( 3 ) - START( 3 ) + 1, NDF__SZUSR )
+               IW = 2
+               CSIZE = MIN( END( IW ) - START( IW ) + 1, NDF__SZUSR )
                CALL DAT_NEW0C( ELOC, 'USER', CSIZE, STATUS )
                CALL DAT_FIND( ELOC, 'USER', CLOC, STATUS )
-               CALL DAT_PUT0C( CLOC, WORDS( 3 ), STATUS )
+               CALL DAT_PUT0C( CLOC, WORDS( IW ), STATUS )
                CALL DAT_ANNUL( CLOC, STATUS )
 
-*  The host machine is the fifth word.  Make the HOST component and assign
+*  The host machine is the fourth word.  Make the HOST component and assign
 *  it the machine name via a locator.
-               CSIZE = MIN( END( 5 ) - START( 5 ) + 1, NDF__SZHST )
+               IW = 4
+               CSIZE = MIN( END( IW ) - START( IW ) + 1, NDF__SZHST )
                CALL DAT_NEW0C( ELOC, 'HOST', CSIZE, STATUS )
                CALL DAT_FIND( ELOC, 'HOST', CLOC, STATUS )
-               CALL DAT_PUT0C( CLOC, WORDS( 5 ), STATUS )
+               CALL DAT_PUT0C( CLOC, WORDS( IW ), STATUS )
                CALL DAT_ANNUL( CLOC, STATUS )
 
-*  The width is the seventh word.
+*  The width is the sixth word.
+               IW = 6
                IF ( STATUS .EQ. SAI__OK ) THEN
-                  CALL CHR_CTOI( WORDS( 7 ), WIDTH, STATUS )
+                  CALL CHR_CTOI( WORDS( IW ), WIDTH, STATUS )
                   IF ( STATUS .NE. SAI__OK ) THEN
                      CALL MSG_SETC( 'C', CARD )
-                     CALL MSG_SETC( 'F', WORDS( 7 ) )
+                     CALL MSG_SETC( 'F', WORDS( IW ) )
                      CALL ERR_REP( 'COF_CHISR_ERR1', 'Bad integer '//
      :                             'field ''^F'' in FITS card ''^C''.',
      :                             STATUS )
@@ -455,16 +457,12 @@
 
                WIDTH = MIN( MAXWID, WIDTH )
 
-*  Skip to the next header card.  We assume that these headers have
-*  not been tampered.
-               KINDEX = KINDEX + 1
-               CALL FTGREC( FUNIT, KINDEX, CARD, FSTAT )
-
-*  Record that this card is not to be propagated to the FITS airlock.
-               RETAIN( KINDEX ) = .FALSE.
+*  Obtain from the headers the text containing the dataset.
+               CALL COF_MHISR( FUNIT, ALIGN, NHEAD, RETAIN,
+     :                         KINDEX, PARAGR, STATUS )
 
 *  Extract the dataset name.
-               REFER = CARD( 18 + ALIGN: )
+               REFER = PARAGR( 10 + ALIGN: )
                CSIZE = MAX( 1, MIN( CHR_LEN( REFER ), NDF__SZREF ) )
 
 *  Make the DATASET component and assign it the reference dataset via a
@@ -480,6 +478,7 @@
                CRETEX = .TRUE.
                PARCOL = 0
                JREC = 0
+               PARAGR = ' '
   140          CONTINUE
                IF ( MORTEX ) THEN
 
@@ -524,7 +523,6 @@
 
 *  Convert the text into paragraphs of up to WIDTH characters.
                         TEXCOL = 1
-                        PARAGR = ' '
   160                   CONTINUE     ! Start of DO WHILE loop
 
 *  TEXCOL = 0 indicates that there are no more lines in the paragraph.
