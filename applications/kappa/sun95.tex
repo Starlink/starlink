@@ -42232,24 +42232,12 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
          information.  {\tt [FALSE]}
       }
       \sstsubsection{
-         MORE = UNIV (Read)
-      }{
-         This is only accessed if a null value is supplied for Parameter
-         MORETEXT.  If supplied, it should be an HDS object containing
-         arbitrary additional information about the parent NDF, and how
-         it was used in the creation of the main NDF.  This information
-         is stored with the provenance in the main NDF.  If a null ({\tt{!}})
-         value is supplied no additional information is stored.  {\tt [!]}
-      }
-      \sstsubsection{
          MORETEXT = \htmlref{GROUP}{se:groups} (Read)
       }{
          A group of ``keyword=value'' strings that give additional
          information about the parent NDF, and how it was used in the
          creation of the main NDF.  If supplied, this information is
-         stored with the provenance in the main NDF.  If a null ({\tt{!}})
-         value is supplied, then the MORE parameter will be used to
-         obtain this extra information instead of MORETEXT.
+         stored with the provenance in the main NDF.
 
          The supplied value should be either a comma-separated list of
          strings, or the name of a text file preceded by an up-arrow
@@ -59302,6 +59290,10 @@ The following applications have been modified:
       \begin{itemize}
         \item The USEAXIS parameter now works, needed when the supplied NDF
         has more than two axes.
+      \end{itemize}
+   \item [\htmlref{PROVADD}{PROVADD}]\mbox{}
+      \begin{itemize}
+        \item The inoperative parameter MORE has been removed.
       \end{itemize}
    \item [\htmlref{SCATTER}{SCATTER}]\mbox{}
       \begin{itemize}

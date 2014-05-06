@@ -2644,15 +2644,6 @@ package kappa {
             helpkey *
          }
 
-         parameter more {
-            type UNIV
-            ppath CURRENT DEFAULT
-            vpath DEFAULT
-            prompt {HDS object containing extra information about the parent}
-            helpkey *
-            default !
-         }
-
          parameter moretext {
             position 5
             type LITERAL

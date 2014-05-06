@@ -85,6 +85,10 @@ The following new applications have been added:
       -  The USEAXIS parameter now works, needed when the supplied NDF
       has more than two axes.
 
+   o  PROVADD
+
+      -  The inoperative parameter MORE has been removed.
+
    o  SCATTER
 
       -  Now writes the number of pixels used to form the correlation
