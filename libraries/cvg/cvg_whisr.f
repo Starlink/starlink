@@ -32,6 +32,7 @@
 
 *  Copyright:
 *     Copyright (C) 1997 Central Laboratory of the Research Councils.
+*     Copyright (C) 2013-2014 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -60,7 +61,11 @@
 *        Original version.
 *     19-NOV-2013 (DSB):
 *        Moved from CONVERT to CVG.
-*     {enter_changes_here}
+*     2014 May 6 (MJC):
+*        Put an empty HISTORY line after Dataset so that parsing by
+*        COF_MHISR can disriminate from recently introduced continuation
+*        line and the start of records.
+*     {enter_further_changes_here}
 
 *-
 
@@ -199,6 +204,11 @@
             CALL MSG_LOAD( ' ', 'Dataset: ^REFER', HISTRY, HLEN,
      :                     STATUS )
             CALL FTPHIS( FUNIT, HISTRY, FSTAT )
+
+*  Write a blank header to separate the Dataset from the records.
+*  FTPHIS does nothing is given blank history text.
+            HISTRY = 'HISTORY    '
+            CALL FTPREC( FUNIT, HISTRY, FSTAT )
 
 *  Write the associated history text to the headers.
             CALL NDF_HOUT( NDF, IREC, CVG_HECHO, STATUS )
