@@ -325,6 +325,8 @@ void smurf_mon( int * status ) {
     smurf_fit1d( status );
   } else if (strcmp( taskname, "FINDSLICES" ) == 0 ) {
     smurf_findslices( status );
+  } else if (strcmp( taskname, "FITSMERGE" ) == 0 ) {
+    smurf_fitsmerge( status );
   } else if (strcmp( taskname, "FIXSTEPS" ) == 0 ) {
     smurf_fixsteps( status );
   } else if (strcmp( taskname, "FLATFIELD" ) == 0 ) {

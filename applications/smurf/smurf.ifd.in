@@ -1710,6 +1710,31 @@ package @PACKAGE@ {
 
         }
 
+        action fitsmerge {
+
+            helplib {$SMURF_HELP}
+
+            parameter in {
+                position 1
+                type NDF
+                access READ
+                vpath PROMPT
+                ppath CURRENT
+                prompt {Files containing input FITS headers}
+                helpkey *
+            }
+
+            parameter ndf {
+               position 2
+               type NDF
+               access UPDATE
+               vpath PROMPT
+               ppath CURRENT
+               prompt {File to receive merged FITS headers}
+               helpkey *
+            }
+        }
+
         action fixsteps {
             helplib {$SMURF_HELP}
 

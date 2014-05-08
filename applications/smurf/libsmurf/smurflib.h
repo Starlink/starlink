@@ -147,6 +147,7 @@ void smurf_extinction( int * );
 void smurf_flatfield( int * );
 void smurf_findslices( int * );
 void smurf_fit1d( int * );
+void smurf_fitsmerge( int * );
 void smurf_fixsteps( int * );
 void smurf_fts2_deglitch( int * );
 void smurf_fts2_flatfield( int * );

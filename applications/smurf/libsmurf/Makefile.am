@@ -19,6 +19,7 @@ smurf_dsutils.c \
 smurf_extinction.c \
 smurf_findslices.c \
 smurf_fit1d.c \
+smurf_fitsmerge.c \
 smurf_fixsteps.c \
 smurf_flatfield.c \
 smurf_fts2_deglitch.c \

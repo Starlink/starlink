@@ -39,6 +39,7 @@ dsutils \
 extinction \
 findslices\
 fit1d\
+fitsmerge \
 fixsteps \
 flatfield \
 fts2deglitch \
