@@ -75,6 +75,9 @@
 *        Allow header merging even if a date is not available.
 *     2013-05-31 (GSB):
 *        Copy START and END FITS headers as floating point if possible.
+*     2014-05-08 (GSB):
+*        Add OBSGEO headers to the list of items to keep from the end of
+*        the group.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -166,6 +169,9 @@ void smf_fits_outhdr( AstFitsChan * inhdr, AstFitsChan ** outhdr,
      "SEEINGEN",
      "FRLEGTEN",
      "BKLEGTEN",
+     "OBSGEO-X",
+     "OBSGEO-Y",
+     "OBSGEO-Z",
      NULL
    };
 
