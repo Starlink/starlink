@@ -150,6 +150,7 @@
 #include "par.h"
 #include "sae_par.h"
 #include "kpg_err.h"
+#include "star/thr.h"
 
 /* SMURF includes */
 #include "libsmf/smf.h"
@@ -183,12 +184,17 @@ void smurf_jsatilelist( int *status ) {
    size_t size;
    size_t ssize;
    smfJSATiling tiling;
+   ThrWorkForce *wf = NULL;
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
 
 /* Start a new AST context. */
    astBegin;
+
+/* Find the number of cores/processors available and create a pool of
+   threads of the same size. */
+   wf = thrGetWorkforce( thrGetNThread( SMF__THREADS, status ), status );
 
 /* Attempt to to get an AST Region. */
    kpg1Gtobj( "IN", "Region",
@@ -266,7 +272,7 @@ void smurf_jsatilelist( int *status ) {
       kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
 /* Get a group containing just the files holding science data. */
-      smf_find_science( NULL, igrp, &sgrp, 0, NULL, NULL, 1, 1, SMF__NULL, NULL,
+      smf_find_science( wf, igrp, &sgrp, 0, NULL, NULL, 1, 1, SMF__NULL, NULL,
                         NULL, NULL, NULL, status );
 
 /* Check we have at least once science file. */
@@ -277,7 +283,7 @@ void smurf_jsatilelist( int *status ) {
 
 /* Get the list of identifiers for tiles that receive any data. */
       } else {
-         tiles = smf_jsatiles_data( sgrp, ssize, &tiling, &ntile, status );
+         tiles = smf_jsatiles_data( wf, sgrp, ssize, &tiling, &ntile, status );
       }
 
 /* Delete the groups. */
