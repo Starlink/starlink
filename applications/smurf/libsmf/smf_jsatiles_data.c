@@ -20,7 +20,8 @@
 *     wf = ThrWorkForce * (Given)
 *        Pointer to a pool of worker threads
 *     igrp = Grp * (Given)
-*        A group holding the paths to the data files.
+*        A group holding the paths to the data files. This can include
+*        non-science files.
 *     size = size_t (Given)
 *        The number of data files in "igrp".
 *     tiling = smfJSATiling * (Returned)
@@ -34,7 +35,8 @@
 *  Returned Value:
 *     A pointer to a newly allocated array of ints, each being the
 *     identifier of a tile that overlaps the given data. The array
-*     should be freed using astFree when no longer needed.
+*     should be freed using astFree when no longer needed. NULL is
+*     returned without error if non of the input files are science files.
 
 *  Description:
 *     This routine returns a list containing the indices of the sky tiles
@@ -56,7 +58,7 @@
 *     9-MAP-2014 (DSB):
 *        Speed up by using a recursive algorithm to test only a subset of
 *        time slices in each files, and also use a separate thread for
-*        opening the files.
+*        opening the files. Also allow non-science files to be supplied.
 
 *  Copyright:
 *     Copyright (C) 2013 Science and Technology Facilities Council.
@@ -454,8 +456,10 @@ static void smf1_checkslices( smfData *data, AstFrameSet *fs, double search,
    for( istep = 0; istep < nstep && iframe <= iend; istep++ ) {
 
 /* Get the WCS FrameSet for this slice, and get a pointer to the current
-   Frame (should be an AZEL SkyFrame). */
+   Frame (should be an AZEL SkyFrame). Non-science files will produce a
+   NULL FrameSet pointyer, so check for this. */
       smf_tslice_ast( data, iframe, 1, NO_FTS, status );
+      if( !hdr->wcs ) break;
       frm = astGetFrame( hdr->wcs, AST__CURRENT );
 
 /* Get a Mapping from AZEL to GRID coords in the hits map. */

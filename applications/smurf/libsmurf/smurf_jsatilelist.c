@@ -110,9 +110,12 @@
 *        other NDF.
 *     5-DEC-2013 (DSB):
 *        Added parameter VERTEX_RA and VERTEX_DEC.
+*     9-MAY-2014 (DSB):
+*        No need to check for science files before calling
+*        smf_jsatiles_data. This speeds things up a lot.
 
 *  Copyright:
-*     Copyright (C) 2011,2013 Science and Technology Facilities Council.
+*     Copyright (C) 2011,2013,2014 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -171,7 +174,6 @@ void smurf_jsatilelist( int *status ) {
    AstObject *obj;
    AstRegion *region;
    Grp *igrp = NULL;
-   Grp *sgrp = NULL;
    double vertex_data[ 2*MAXVERT ];
    int *tiles = NULL;
    int i;
@@ -182,7 +184,6 @@ void smurf_jsatilelist( int *status ) {
    int nvert_ra;
    int ubnd[2];
    size_t size;
-   size_t ssize;
    smfJSATiling tiling;
    ThrWorkForce *wf = NULL;
 
@@ -271,28 +272,21 @@ void smurf_jsatilelist( int *status ) {
       if( *status != SAI__OK ) errAnnul( status );
       kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
-/* Get a group containing just the files holding science data. */
-      smf_find_science( wf, igrp, &sgrp, 0, NULL, NULL, 1, 1, SMF__NULL, NULL,
-                        NULL, NULL, NULL, status );
+/* Get the list of identifiers for tiles that receive any data. */
+      tiles = smf_jsatiles_data( wf, igrp, size, &tiling, &ntile, status );
 
 /* Check we have at least once science file. */
-      ssize = grpGrpsz( sgrp, status );
-      if( ssize == 0 ) {
+      if( !tiles && *status == SAI__OK ) {
          msgOutif( MSG__NORM, " ", "None of the supplied input frames were SCIENCE.",
                    status );
-
-/* Get the list of identifiers for tiles that receive any data. */
-      } else {
-         tiles = smf_jsatiles_data( wf, sgrp, ssize, &tiling, &ntile, status );
       }
 
-/* Delete the groups. */
+/* Delete the group. */
       if( igrp ) grpDelet( &igrp, status);
-      if( sgrp ) grpDelet( &sgrp, status);
    }
 
 /* Sort the list of overlapping tiles into ascending order. */
-   if( *status == SAI__OK ) {
+   if( tiles && *status == SAI__OK ) {
       qsort( tiles, ntile, sizeof( *tiles ), jsatilelist_icomp );
 
 /* Display the list of overlapping tiles. */
