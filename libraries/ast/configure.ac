@@ -7,13 +7,13 @@ dnl   1.5.  It should work with autoconf versions 2.50 or better, and
 dnl   automake 1.6 or better.
 
 dnl   Initialisation: package name and version number
-AC_INIT([ast],[7.3.4],[starlink@jiscmail.ac.uk])
+AC_INIT([ast],[8.0.0],[starlink@jiscmail.ac.uk])
 AC_CONFIG_AUX_DIR([build-aux])
 
 dnl   Require autoconf-2.50 at least
 AC_PREREQ([2.69])
 dnl   Require Starlink automake
-AM_INIT_AUTOMAKE(1.8.2-starlink)
+AM_INIT_AUTOMAKE([1.8.2-starlink subdir-objects])
 
 dnl   Sanity-check: name a file in the source directory
 AC_CONFIG_SRCDIR([ast_link.in])
@@ -39,11 +39,11 @@ AC_ARG_WITH(
 )
 
 #   See if the --with-external_pal option has been provided. This sets the
-#   preprocesor macro EXTERNAL_PAL which prevents use of the PAL & SOFA
+#   preprocesor macro EXTERNAL_PAL which prevents use of the PAL & ERFA
 #   library functions that are included in the AST distribution. Suitable
 #   link options are used within ast_link(_adam) scripts to pull in libpal.
 AC_ARG_WITH([external_pal],
-            [ --with-external_pal   Use external PAL and SOFA libraries],
+            [ --with-external_pal   Use external PAL and ERFA libraries],
         if test "$withval" = "yes"; then
            external_pal="1"
         else
@@ -53,7 +53,7 @@ AC_ARG_WITH([external_pal],
 AC_SUBST( EXTERNAL_PAL, $external_pal )
 if test "$external_pal" = "1"; then
    AC_SUBST( LIBPAL, "-lpal" )
-   AC_DEFINE([EXTERNAL_PAL],[1],[use external PAL and SOFA libraries]),
+   AC_DEFINE([EXTERNAL_PAL],[1],[use external PAL and ERFA libraries]),
 else
    AC_SUBST( LIBPAL, "" )
 fi

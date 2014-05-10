@@ -116,15 +116,14 @@
 #     result in an error at run time if AST routines are invoked that
 #     attempt to generate graphical output.
 
-#  SOFA & PAL:
-#     The AST distribution includes bundled copies of the IAU SOFA and
-#     Starlink PAL libraries. These will be used for fundamental
-#     positional astronomy calculations unless the "--with-external_pal"
-#     option was used when AST was configured. If "--with-external_pal"
-#     is used, this script will include "-lpal" in the returned list of
-#     linking options, and the user should then ensure that extrnal copies
-#     of the PAL and SOFA libraries are available (SOFA functions are used
-#     within PAL).
+#  ERFA & PAL:
+#     The AST distribution includes bundled copies of the ERFA and PAL
+#     libraries. These will be used for fundamental positional astronomy
+#     calculations unless the "--with-external_pal" option was used when
+#     AST was configured. If "--with-external_pal" is used, this script
+#     will include "-lpal" in the returned list of linking options, and
+#     the user should then ensure that external copies of the PAL and
+#     ERFA libraries are available (ERFA functions are used within PAL).
 
 #  Examples:
 #c     cc display.c -L/star/lib `ast_link -pgplot` -o display
@@ -340,7 +339,7 @@
 #  an external PAL library.
       1) args="${args} -lpal";;
 
-#  Otherwise, use the internal PAL & SOFA libraries.
+#  Otherwise, use the internal PAL & ERFA libraries.
       *) args="${args} -last_pal";;
 
       esac

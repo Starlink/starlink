@@ -71,7 +71,7 @@
 */
 
 #include "pal.h"
-#include "sofa.h"
+#include "erfa.h"
 
 void palEqgal ( double dr, double dd, double *dl, double *db ) {
 
@@ -99,16 +99,16 @@ void palEqgal ( double dr, double dd, double *dl, double *db ) {
   };
 
   /* Spherical to Cartesian */
-  iauS2c( dr, dd, v1 );
+  eraS2c( dr, dd, v1 );
 
   /* Equatorial to Galactic */
-  iauRxp( rmat, v1, v2 );
+  eraRxp( rmat, v1, v2 );
 
   /* Cartesian to spherical */
-  iauC2s( v2, dl, db );
+  eraC2s( v2, dl, db );
 
   /* Express in conventional ranges */
-  *dl = iauAnp( *dl );
-  *db = iauAnpm( *db );
+  *dl = eraAnp( *dl );
+  *db = eraAnpm( *db );
 
 }

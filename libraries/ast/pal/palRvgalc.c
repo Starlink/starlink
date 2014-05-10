@@ -78,7 +78,7 @@
 */
 
 #include "pal.h"
-#include "sofa.h"
+#include "erfa.h"
 
 double palRvgalc( double r2000, double d2000 ){
 
@@ -102,8 +102,8 @@ double palRvgalc( double r2000, double d2000 ){
    double va[ 3 ] = { -108.70408, +97.86251, -164.33610 };
 
 /* Convert given J2000 RA,Dec to x,y,z. */
-   iauS2c( r2000, d2000, vb );
+   eraS2c( r2000, d2000, vb );
 
 /* Compute dot product with LSR motion vector. */
-   return iauPdp( va, vb );
+   return eraPdp( va, vb );
 }

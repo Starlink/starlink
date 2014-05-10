@@ -32,9 +32,9 @@
 *     {enter_new_authors_here}
 
 *  Notes:
-*     - Consider a comprehensive upgrade to use the time transformations in SOFA's time
-*       cookbook:  http://www.iausofa.org/sofa_ts_c.pdf.
-*     - See iauDat for a description of error conditions when calling this function
+*     - Consider a comprehensive upgrade to use the time transformations in ERFA's time
+*       cookbook:  http://www.eraerfa.org/erfa_ts_c.pdf.
+*     - See eraDat for a description of error conditions when calling this function
 *       with a time outside of the UTC range. This behaviour differs from slaDtt.
 
 *  History:

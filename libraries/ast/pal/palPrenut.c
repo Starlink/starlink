@@ -64,7 +64,7 @@
 
 #include "pal.h"
 #include "palmac.h"
-#include "sofa.h"
+#include "erfa.h"
 
 void palPrenut ( double epoch, double date, double rmatpn[3][3] ){
 
@@ -91,20 +91,20 @@ void palPrenut ( double epoch, double date, double rmatpn[3][3] ){
    double zetaa;
 
 /* Specified Julian epoch as a 2-part JD. */
-   iauEpj2jd( epoch, &d1, &d2 );
+   eraEpj2jd( epoch, &d1, &d2 );
 
 /* P matrix, from specified epoch to J2000.0. */
-   iauP06e( d1, d2, &eps0, &psia, &oma, &bpa, &bqa, &pia, &bpia, &epsa,
+   eraP06e( d1, d2, &eps0, &psia, &oma, &bpa, &bqa, &pia, &bpia, &epsa,
             &chia, &za, &zetaa, &thetaa, &pa, &gam, &phi, &psi );
-   iauIr( r1 );
-   iauRz( -chia, r1 );
-   iauRx( oma, r1 );
-   iauRz( psia, r1 );
-   iauRx( -eps0, r1 );
+   eraIr( r1 );
+   eraRz( -chia, r1 );
+   eraRx( oma, r1 );
+   eraRz( psia, r1 );
+   eraRx( -eps0, r1 );
 
 /* NPB matrix, from J2000.0 to date. */
-   iauPnm06a( PAL__MJD0, date, r2 );
+   eraPnm06a( PAL__MJD0, date, r2 );
 
 /* NPB matrix, from specified epoch to date. */
-   iauRxr( r2, r1, rmatpn );
+   eraRxr( r2, r1, rmatpn );
 }

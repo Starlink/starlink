@@ -28,9 +28,9 @@
 *        Initial version. Define all SLA prototypes in PAL form even
 *        though none are implemented.
 *     16-FEB-2012 (DSB):
-*        If the PAL and SOFA libraries distributed within AST are being
+*        If the PAL and ERFA libraries distributed within AST are being
 *        used, rename the public symbols defined by both to avoid clashes
-*        with any external PAL or SOFA library.
+*        with any external PAL or ERFA library.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -65,7 +65,7 @@
 #include <config.h>
 #endif
 
-/* If we not using external PAL and SOFA libraries, rename all PAL
+/* If we not using external PAL and ERFA libraries, rename all PAL
    functions so that references to "palXxx" below get translated to
    "astPalXxx". */
 #ifndef EXTERNAL_PAL

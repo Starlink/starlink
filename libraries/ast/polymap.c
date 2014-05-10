@@ -86,6 +86,8 @@ f     - AST_POLYTRAN: Fit a PolyMap inverse or forward transformation
 *        - Do not report an error if astPolyTran fails to fit an inverse.
 *     15-OCT-2011 (DSB):
 *        Improve argument checking and error reporting in PolyTran
+*     8-MAY-2014 (DSB):
+*        Move to using CMinPack for minimisations.
 *class--
 */
 
@@ -119,7 +121,7 @@ exceptions, so bad values are dealt with explicitly. */
 #include "cmpmap.h"              /* Compound mappings */
 #include "polymap.h"             /* Interface definition for this class */
 #include "unitmap.h"             /* Unit mappings */
-#include "levmar.h"              /* Levenberg - Marquardt minimization */
+#include "cminpack/cminpack.h"   /* Levenberg - Marquardt minimization */
 #include "pal.h"                 /* SLALIB function definitions */
 
 /* Error code definitions. */
@@ -134,6 +136,7 @@ exceptions, so bad values are dealt with explicitly. */
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
+#include <float.h>
 
 /* Module Variables. */
 /* ================= */
@@ -189,14 +192,14 @@ static int class_init = 0;       /* Virtual function table initialised? */
 
 /* Structure used to pass data to the Levenberg - Marquardt non-linear
    minimization algorithm. */
-typedef struct LevMarData {
+typedef struct MinPackData {
    int order;      /* Max power of X1 or X2, plus one. */
    int nsamp;      /* No. of polynomial samples to fit */
    int init_jac;   /* Has the constant Jacobian been found yet? */
    double *xp1;    /* Pointer to powers of X1 (1st poly i/p) at all samples */
    double *xp2;    /* Pointer to powers of X2 (2nd poly i/p) at all samples */
    double *y[ 2 ]; /* Pointers to Y1 and Y2 values at all samples */
-} LevMarData;
+} MinPackData;
 
 
 
@@ -221,6 +224,8 @@ static int Equal( AstObject *, AstObject *, int * );
 static int GetObjSize( AstObject *, int * );
 static int GetTranForward( AstMapping *, int * );
 static int GetTranInverse( AstMapping *, int * );
+static int MPFunc1D( void *, int, int, const double *, double *, double *, int, int );
+static int MPFunc2D( void *, int, int, const double *, double *, double *, int, int );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
 static int ReplaceTransformation( AstPolyMap *, int, double, double, int, const double *, const double *, int * );
 static void Copy( const AstObject *, AstObject *, int * );
@@ -228,10 +233,10 @@ static void Delete( AstObject *obj, int * );
 static void Dump( AstObject *, AstChannel *, int * );
 static void FreeArrays( AstPolyMap *, int, int * );
 static void IterInverse( AstPolyMap *, AstPointSet *, AstPointSet *, int * );
-static void LMFunc1D(  double *, double *, int, int, void * );
-static void LMFunc2D(  double *, double *, int, int, void * );
-static void LMJacob1D( double *, double *, int, int, void * );
-static void LMJacob2D( double *, double *, int, int, void * );
+static void LMFunc1D(  const double *, double *, int, int, void * );
+static void LMFunc2D(  const double *, double *, int, int, void * );
+static void LMJacob1D( const double *, double *, int, int, void * );
+static void LMJacob2D( const double *, double *, int, int, void * );
 static void StoreArrays( AstPolyMap *, int, int, const double *, int * );
 
 #if defined(THREAD_SAFE)
@@ -519,7 +524,7 @@ static double *FitPoly1D( int nsamp, double acc, int order, double **table,
 *        The required accuracy, expressed as an offset within the polynomials
 *        output space.
 *     order
-*        The maximum power (minus one) of x1 within P1. So for instance, a
+*        The maximum power (plus one) of x1 within P1. So for instance, a
 *        value of 3 refers to a quadratic polynomial.
 *     table
 *        Pointer to an array of 2 pointers. Each of these pointers points
@@ -541,35 +546,34 @@ static double *FitPoly1D( int nsamp, double acc, int order, double **table,
 *  Returned Value:
 *     A pointer to an array of doubles defining the polynomial in the
 *     form required by the PolyMap contructor. The number of coefficients
-*     is returned via "ncoeff". If the polynomial could not be found with
-*     sufficient accuracy , then NULL is returned. The returned pointer
-*     should be freed using astFree when no longer needed.
+*     is returned via "ncoeff". If the polynomial could not be found,
+*     then NULL is returned. The returned pointer should be freed using
+*     astFree when no longer needed.
 
 */
 
 /* Local Variables: */
-   LevMarData data;
+   MinPackData data;
    double *coeffs;
    double *pc;
    double *pr;
    double *px1;
    double *pxp1;
    double *result;
+   double *work1;
+   double *work2;
+   double *work4;
    double f1;
    double f2;
-   double facc;
-   double info[10];
    double maxterm;
    double term;
    double tv;
    double x1;
+   int *work3;
+   int info;
    int k;
    int ncof;
-   int niter;
    int w1;
-
-/* Termination criteria for the minimisation - see levmar.c */
-   double opts[] = { 1E-3, 1E-7, 1E-10, 1E-17 };
 
 /* Initialise returned value */
    result = NULL;
@@ -593,12 +597,13 @@ static double *FitPoly1D( int nsamp, double acc, int order, double **table,
 
 /* Work space to hold coefficients. */
    coeffs = astMalloc( ncof*sizeof( double ) );
-   if( astOK ) {
 
-/* Store required squared acccuracy, taking account of the fact that the
-   optimisation uses scaled axis values rather than PolyMap axis values. */
-      facc = 1.0/(scales[1]*scales[1]);
-      opts[ 3 ] = nsamp*acc*acc*facc;
+/* Other work space. */
+   work1 = astMalloc( nsamp*sizeof( double ) );
+   work2 = astMalloc( ncof*nsamp*sizeof( double ) );
+   work3 = astMalloc( ncof*sizeof( int ) );
+   work4 = astMalloc( (5*ncof+nsamp)*sizeof( double ) );
+   if( astOK ) {
 
 /* Get pointers to the supplied x1 values. */
       px1 = table[ 0 ];
@@ -627,11 +632,16 @@ static double *FitPoly1D( int nsamp, double acc, int order, double **table,
       coeffs[ 1 ] = scales[ 0 ]/scales[ 1 ];
 
 /* Find the best coefficients */
-      niter = dlevmar_der( LMFunc1D, LMJacob1D, coeffs, NULL, ncof, nsamp,
-                           1000, opts, info, NULL, NULL, &data );
+      info = lmder1( MPFunc1D, &data, nsamp, ncof, coeffs, work1, work2, nsamp,
+                     sqrt(DBL_EPSILON), work3, work4, (5*ncof+nsamp) );
+      if( info == 0 ) astError( AST__MNPCK, "astPolyMap(PolyTran): Minpack error "
+                                "detected (possible programming error).", status );
 
 /* Return the achieved accuracy. */
-      *racc = sqrt( info[ 1 ]/(nsamp*facc) );
+      pr = work1;
+      tv = 0.0;
+      for( k = 0; k < nsamp; k++,pr++ ) tv += (*pr)*(*pr);
+      *racc = scales[ 1 ]*sqrt( tv/nsamp );
 
 /* The best fitting polynomial coefficient found above relate to the
    polynomial between the scaled positions stored in "table". These
@@ -704,6 +714,10 @@ static double *FitPoly1D( int nsamp, double acc, int order, double **table,
 /* Free resources. */
    coeffs = astFree( coeffs );
    data.xp1 = astFree( data.xp1 );
+   work1 = astFree( work1 );
+   work2 = astFree( work2 );
+   work3 = astFree( work3 );
+   work4 = astFree( work4 );
 
 /* Return the coefficient array. */
    return result;
@@ -747,10 +761,10 @@ static double *FitPoly2D( int nsamp, double acc, int order, double **table,
 *        The required accuracy, expressed as a geodesic distance within
 *        the polynomials output space.
 *     order
-*        The maximum power (minus one) of x1 or x2 within P1 and P2. So for
+*        The maximum power (plus one) of x1 or x2 within P1 and P2. So for
 *        instance, a value of 3 refers to a quadratic polynomial. Note, cross
 *        terms with total powers greater than or equal to "order" are not
-*        inlcuded in the fit. So the maximum number of terms in the fitted
+*        included in the fit. So the maximum number of terms in the fitted
 *        polynomial is order*(order+1)/2.
 *     table
 *        Pointer to an array of 4 pointers. Each of these pointers points
@@ -779,7 +793,7 @@ static double *FitPoly2D( int nsamp, double acc, int order, double **table,
 */
 
 /* Local Variables: */
-   LevMarData data;
+   MinPackData data;
    double *coeffs;
    double *pc;
    double *pr;
@@ -788,27 +802,27 @@ static double *FitPoly2D( int nsamp, double acc, int order, double **table,
    double *pxp1;
    double *pxp2;
    double *result;
+   double *work1;
+   double *work2;
+   double *work4;
    double f1;
-   double f2;
    double f20;
+   double f2;
    double f3;
    double facc;
-   double info[10];
    double maxterm;
    double term;
    double tv;
    double x1;
    double x2;
+   int *work3;
+   int info;
    int iout;
    int k;
    int ncof;
-   int niter;
    int w12;
    int w1;
    int w2;
-
-/* Termination criteria for the minimisation - see levmar.c */
-   double opts[] = { 1E-3, 1E-7, 1E-10, 1E-17 };
 
 /* Initialise returned value */
    result = NULL;
@@ -832,12 +846,13 @@ static double *FitPoly2D( int nsamp, double acc, int order, double **table,
 
 /* Work space to hold coefficients. */
    coeffs = astMalloc( 2*ncof*sizeof( double ) );
-   if( astOK ) {
 
-/* Store required squared acccuracy, taking account of the fact that the
-   optimisation uses scaled axis values rather than PolyMap axis values. */
-      facc = 1.0/(scales[2]*scales[2]) + 1.0/(scales[3]*scales[3]);
-      opts[ 3 ] = nsamp*acc*acc*facc;
+/* Other work space. */
+   work1 = astMalloc( 2*nsamp*sizeof( double ) );
+   work2 = astMalloc( 4*ncof*nsamp*sizeof( double ) );
+   work3 = astMalloc( 2*ncof*sizeof( int ) );
+   work4 = astMalloc( 2*(5*ncof+nsamp)*sizeof( double ) );
+   if( astOK ) {
 
 /* Get pointers to the supplied x1 and x2 values. */
       px1 = table[ 0 ];
@@ -875,14 +890,20 @@ static double *FitPoly2D( int nsamp, double acc, int order, double **table,
    transformation in PolyMap axis values. */
       for( k = 0; k < 2*ncof; k++ ) coeffs[ k ] = 0.0;
       coeffs[ 1 ] = scales[ 0 ]/scales[ 2 ];
-      coeffs[ 2 ] = scales[ 1 ]/scales[ 3 ];
+      coeffs[ 5 ] = scales[ 1 ]/scales[ 3 ];
 
 /* Find the best coefficients */
-      niter = dlevmar_der( LMFunc2D, LMJacob2D, coeffs, NULL, 2*ncof, 2*nsamp,
-                           1000, opts, info, NULL, NULL, &data );
+      info = lmder1( MPFunc2D, &data, 2*nsamp, 2*ncof, coeffs, work1, work2,
+                     2*nsamp, sqrt(DBL_EPSILON), work3, work4, 2*(5*ncof+nsamp) );
+      if( info == 0 ) astError( AST__MNPCK, "astPolyMap(PolyTran): Minpack error "
+                                "detected (possible programming error).", status );
 
 /* Return the achieved accuracy. */
-      *racc = sqrt( info[ 1 ]/(nsamp*facc) );
+      pr = work1;
+      tv = 0.0;
+      for( k = 0; k < 2*nsamp; k++,pr++ ) tv += (*pr)*(*pr);
+      facc = 1.0/(scales[2]*scales[2]) + 1.0/(scales[3]*scales[3]);
+      *racc = sqrt( tv/(2*nsamp*facc) );
 
 /* Pointer to the first coefficient. */
       pc = coeffs;
@@ -978,6 +999,10 @@ static double *FitPoly2D( int nsamp, double acc, int order, double **table,
    coeffs = astFree( coeffs );
    data.xp1 = astFree( data.xp1 );
    data.xp2 = astFree( data.xp2 );
+   work1 = astFree( work1 );
+   work2 = astFree( work2 );
+   work3 = astFree( work3 );
+   work4 = astFree( work4 );
 
 /* Return the coefficient array. */
    return result;
@@ -1914,7 +1939,7 @@ static void IterInverse( AstPolyMap *this, AstPointSet *out, AstPointSet *result
 
 }
 
-static void LMFunc1D(  double *p, double *hx, int m, int n, void *adata ){
+static void LMFunc1D( const double *p, double *hx, int m, int n, void *adata ){
 /*
 *  Name:
 *     LMFunc1D
@@ -1926,7 +1951,7 @@ static void LMFunc1D(  double *p, double *hx, int m, int n, void *adata ){
 *     Private function.
 
 *  Synopsis:
-*     void LMFunc1D(  double *p, double *hx, int m, int n, void *adata )
+*     void LMFunc1D( const double *p, double *hx, int m, int n, void *adata )
 
 *  Description:
 *     This function finds the residuals implied by a supplied set of
@@ -1954,17 +1979,17 @@ static void LMFunc1D(  double *p, double *hx, int m, int n, void *adata ){
 */
 
 /* Local Variables: */
-   LevMarData *data;
+   MinPackData *data;
    double *px1;
    double *py;
-   double *vp;
+   const double *vp;
    double *vr;
    double res;
    int k;
    int w1;
 
 /* Get a pointer to the data structure. */
-   data = (LevMarData *) adata;
+   data = (MinPackData *) adata;
 
 /* Initialise a pointer to the current returned residual value. */
    vr = hx;
@@ -2002,7 +2027,7 @@ static void LMFunc1D(  double *p, double *hx, int m, int n, void *adata ){
    }
 }
 
-static void LMFunc2D(  double *p, double *hx, int m, int n, void *adata ){
+static void LMFunc2D( const double *p, double *hx, int m, int n, void *adata ){
 /*
 *  Name:
 *     LMFunc2D
@@ -2014,7 +2039,7 @@ static void LMFunc2D(  double *p, double *hx, int m, int n, void *adata ){
 *     Private function.
 
 *  Synopsis:
-*     void LMFunc2D(  double *p, double *hx, int m, int n, void *adata )
+*     void LMFunc2D( const double *p, double *hx, int m, int n, void *adata )
 
 *  Description:
 *     This function finds the residuals implied by a supplied set of
@@ -2047,23 +2072,23 @@ static void LMFunc2D(  double *p, double *hx, int m, int n, void *adata ){
 */
 
 /* Local Variables: */
-   LevMarData *data;
+   MinPackData *data;
+   const double *vp0;
+   const double *vp;
+   double *py;
    double *px1;
    double *px10;
    double *px20;
-   double *px2;
-   double *py;
-   double *vp0;
-   double *vp;
    double *vr;
    double res;
+   double *px2;
    int iout;
    int k;
    int w12;
    int w2;
 
 /* Get a pointer to the data structure. */
-   data = (LevMarData *) adata;
+   data = (MinPackData *) adata;
 
 /* Initialise a pointer to the current returned residual value. */
    vr = hx;
@@ -2134,7 +2159,7 @@ static void LMFunc2D(  double *p, double *hx, int m, int n, void *adata ){
    }
 }
 
-static void LMJacob1D( double *p, double *jac, int m, int n, void *adata ){
+static void LMJacob1D( const double *p, double *jac, int m, int n, void *adata ){
 /*
 *  Name:
 *     LMJacob1D
@@ -2146,7 +2171,7 @@ static void LMJacob1D( double *p, double *jac, int m, int n, void *adata ){
 *     Private function.
 
 *  Synopsis:
-*     void LMJacob1D( double *p, double *jac, int m, int n, void *adata )
+*     void LMJacob1D( const double *p, double *jac, int m, int n, void *adata )
 
 *  Description:
 *     This function finds the Jacobian matrix that describes the rate of
@@ -2180,14 +2205,12 @@ static void LMJacob1D( double *p, double *jac, int m, int n, void *adata ){
 */
 
 /* Local Variables: */
-   LevMarData *data;
-   double *pj;
+   MinPackData *data;
    int k;
-   int ncof;
    int w1;
 
 /* Get a pointer to the data structure. */
-   data = (LevMarData *) adata;
+   data = (MinPackData *) adata;
 
 /* The Jacobian of the residuals with respect to the polynomial
    coefficients is constant (i.e. does not depend on the values of the
@@ -2199,12 +2222,6 @@ static void LMJacob1D( double *p, double *jac, int m, int n, void *adata ){
    if( data->init_jac ) {
       data->init_jac = 0;
 
-/* Store the number of coefficients in one polynomial. */
-      ncof = data->order;
-
-/* Store a pointer to the next element of the returned Jacobian. */
-      pj = jac;
-
 /* Loop over all residuals. */
       for( k = 0; k < n; k++ ) {
 
@@ -2212,13 +2229,13 @@ static void LMJacob1D( double *p, double *jac, int m, int n, void *adata ){
          for( w1 = 0; w1 < m; w1++ ) {
 
 /* Store the Jacobian. */
-            *(pj++) = (data->xp1)[ w1 + k*data->order ];
+            jac[ k + w1*n ] = (data->xp1)[ w1 + k*data->order ];
          }
       }
    }
 }
 
-static void LMJacob2D( double *p, double *jac, int m, int n, void *adata ){
+static void LMJacob2D( const double *p, double *jac, int m, int n, void *adata ){
 /*
 *  Name:
 *     LMJacob2D
@@ -2230,7 +2247,7 @@ static void LMJacob2D( double *p, double *jac, int m, int n, void *adata ){
 *     Private function.
 
 *  Synopsis:
-*     void LMJacob2D( double *p, double *jac, int m, int n, void *adata )
+*     void LMJacob2D( const double *p, double *jac, int m, int n, void *adata )
 
 *  Description:
 *     This function finds the Jacobian matrix that describes the rate of
@@ -2269,8 +2286,7 @@ static void LMJacob2D( double *p, double *jac, int m, int n, void *adata ){
 */
 
 /* Local Variables: */
-   LevMarData *data;
-   double *pj;
+   MinPackData *data;
    int iout;
    int k;
    int ncof;
@@ -2281,7 +2297,7 @@ static void LMJacob2D( double *p, double *jac, int m, int n, void *adata ){
    int w2;
 
 /* Get a pointer to the data structure. */
-   data = (LevMarData *) adata;
+   data = (MinPackData *) adata;
 
 /* The Jacobian of the residuals with respect to the polynomial
    coefficients is constant (i.e. does not depend on the values of the
@@ -2295,9 +2311,6 @@ static void LMJacob2D( double *p, double *jac, int m, int n, void *adata ){
 
 /* Store the number of coefficients in one polynomial. */
       ncof = data->order*( 1 + data->order )/2;
-
-/* Store a pointer to the next element of the returned Jacobian. */
-      pj = jac;
 
 /* Loop over all residuals. */
       for( vr = 0; vr < n; vr++ ) {
@@ -2313,7 +2326,7 @@ static void LMJacob2D( double *p, double *jac, int m, int n, void *adata ){
 /* If this coefficient is not used in the creation of the current
    polynomial output value, then the Jacobian value is zero. */
             if( vp/ncof != iout ) {
-               *(pj++) = 0.0;
+               jac[ vr + vp*n ] = 0.0;
 
 /* Otherwise, get the powers of the two polynomial inputs, to which
    the current coefficient relates. */
@@ -2323,8 +2336,8 @@ static void LMJacob2D( double *p, double *jac, int m, int n, void *adata ){
                w1 = w12 - w2;
 
 /* Store the Jacobian. */
-               *(pj++) = (data->xp1)[ w1 + k*data->order ]*
-                         (data->xp2)[ w2 + k*data->order ];
+               jac[ vr + vp*n ] = (data->xp1)[ w1 + k*data->order ]*
+                                  (data->xp2)[ w2 + k*data->order ];
             }
          }
       }
@@ -2703,6 +2716,125 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    return result;
 }
 
+static int MPFunc1D( void *p, int m, int n, const double *x, double *fvec,
+                     double *fjac, int ldfjac, int iflag ) {
+/*
+*  Name:
+*     MPFunc1D
+
+*  Purpose:
+*     Evaluate a test 1D polynomal or its Jacobian.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     int MPFunc1D( void *p, int m, int n, const double *x, double *fvec,
+*                   double *fjac, int ldfjac, int iflag )
+
+*  Description:
+*     This function finds the residuals or Jacobian implied by a supplied
+*     set of candidate polynomial coefficients. Each residual is a candidate
+*     polynomial evaluated at one of the sample points, minus the
+*     supplied target value for the polynomial at that test point.
+*
+*     The minimisation process minimises the sum of the squared residuals.
+
+*  Parameters:
+*     p
+*        A pointer to data needed to evaluate the required residuals or
+*        Jacobians.
+*     m
+*        The number of residuals.
+*     n
+*        The number of coefficients.
+*     x
+*        An array of "n" coefficients for the candidate polynomial.
+*     fvec
+*        An array in which to return the "m" residuals.
+*     fjac
+*        An array in which to return the "mxn" Jacobian values.
+*     ldflac
+*        Unused (should always be equal to "m").
+*     iflag
+*        If 1 calculate the residuals, otherwise calculate the Jacobians.
+
+*/
+
+/* If required, calculate the function values at X, and return this
+   vector in fvec. Do not alter fjac. */
+   if( iflag == 1 ) {
+      LMFunc1D( x, fvec, n, m, p );
+
+/* Otherwise, calculate the Jacobian values at X, and return this
+   matrix in fjac. Do not alter fvec. */
+   } else {
+      LMJacob1D( x, fjac, n, m, p );
+   }
+
+   return 0;
+}
+
+static int MPFunc2D( void *p, int m, int n, const double *x, double *fvec,
+                     double *fjac, int ldfjac, int iflag ) {
+/*
+*  Name:
+*     MPFunc1D
+
+*  Purpose:
+*     Evaluate a test 2D polynomal or its Jacobian.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     int MPFunc2D( void *p, int m, int n, const double *x, double *fvec,
+*                   double *fjac, int ldfjac, int iflag )
+
+*  Description:
+*     This function finds the residuals or Jacobian implied by a supplied
+*     set of candidate polynomial coefficients. Each residual is a candidate
+*     polynomial evaluated at one of the sample points, minus the
+*     supplied target value for the polynomial at that test point.
+*
+*     The minimisation process minimises the sum of the squared residuals.
+
+*  Parameters:
+*     p
+*        A pointer to data needed to evaluate the required residuals or
+*        Jacobians.
+*     m
+*        The number of residuals.
+*     n
+*        The number of coefficients.
+*     x
+*        An array of "n" coefficients for the candidate polynomial.
+*     fvec
+*        An array in which to return the "m" residuals.
+*     fjac
+*        An array in which to return the "mxn" Jacobian values.
+*     ldflac
+*        Unused (should always be equal to "m").
+*     iflag
+*        If 1 calculate the residuals, otherwise calculate the Jacobians.
+
+*/
+
+/* If required, calculate the function values at X, and return this
+   vector in fvec. Do not alter fjac. */
+   if( iflag == 1 ) {
+      LMFunc2D( x, fvec, n, m, p );
+
+/* Otherwise, calculate the Jacobian values at X, and return this
+   matrix in fjac. Do not alter fvec. */
+   } else {
+      LMJacob2D( x, fjac, n, m, p );
+
+   }
+
+   return 0;
+}
+
 static AstPolyMap *PolyTran( AstPolyMap *this, int forward, double acc,
                              double maxacc, int maxorder, const double *lbnd,
                              const double *ubnd, int *status ){
@@ -3077,7 +3209,7 @@ static int ReplaceTransformation( AstPolyMap *this, int forward, double acc,
                                &nsamp, scales, status );
 
 /* Fit the polynomial. Always fit a linear polynomial ("order" 2) to any
-   dummy second axis. If succesful, replace the PolyMap transformation
+   dummy second axis. If successfull, replace the PolyMap transformation
    and break out of the order loop. */
          cofs = FitPoly2D( nsamp, acc, order, table, scales, &ncof, &racc,
                            status );
@@ -3329,7 +3461,7 @@ static double **SamplePoly2D( AstPolyMap *this, int forward, double **table,
 *        for the sampled transformation (these are spaced on the regular
 *        grid specified by lbnd, ubnd and npoint), and (y1,y2) are the
 *        output positions produced by the sampled transformation. The
-*        returned cvalues are scaled so that each column has an RMS value
+*        returned values are scaled so that each column has an RMS value
 *        of 1.0. The scaling factors that convert scaled values into
 *        original values are returned in "scales". The returned pointer
 *        should be freed using astFreeDouble when no longer needed.

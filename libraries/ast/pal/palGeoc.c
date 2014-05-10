@@ -34,7 +34,7 @@
 
 *  Notes:
 *     - Geocentric latitude can be obtained by evaluating atan2(z,r)
-*     - Uses WGS84 reference ellipsoid and calls iauGd2gc
+*     - Uses WGS84 reference ellipsoid and calls eraGd2gc
 
 *  History:
 *     2012-03-01 (TIMJ):
@@ -67,14 +67,14 @@
 */
 
 #include "pal.h"
-#include "sofa.h"
+#include "erfa.h"
 
 void palGeoc ( double p, double h, double *r, double *z ) {
   double xyz[3];
   const double elong = 0.0;   /* Use zero longitude */
   const double AU = 1.49597870E11;
   /* WGS84 looks to be the closest match */
-  iauGd2gc( 1, elong, p, h, xyz );
+  eraGd2gc( 1, elong, p, h, xyz );
   *r = xyz[0] / (AU * cos(elong) );
   *z = xyz[2] / AU;
 }

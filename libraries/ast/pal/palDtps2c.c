@@ -97,7 +97,7 @@
 */
 
 #include "pal.h"
-#include "sofa.h"
+#include "erfa.h"
 
 #include <math.h>
 
@@ -130,12 +130,12 @@ palDtps2c( double xi, double eta, double ra, double dec,
     if (xi == 0. && r == 0.) {
       r = 1.;
     }
-    *raz1 = iauAnp(ra - atan2(xi, r));
+    *raz1 = eraAnp(ra - atan2(xi, r));
     *decz1 = atan2(s, c);
     r = -r;
     s = sdf - eta * r;
     c = sdf * eta + r;
-    *raz2 = iauAnp(ra - atan2(xi, r));
+    *raz2 = eraAnp(ra - atan2(xi, r));
     *decz2 = atan2(s, c);
     if (fabs(sdf) < 1.) {
       *n = 1;

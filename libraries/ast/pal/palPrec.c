@@ -69,8 +69,8 @@
 */
 
 #include "pal.h"
-#include "sofa.h"
-#include "sofam.h"
+#include "erfa.h"
+#include "erfam.h"
 
 void palPrec( double ep0, double ep1, double rmatp[3][3] ){
 
@@ -80,27 +80,27 @@ void palPrec( double ep0, double ep1, double rmatp[3][3] ){
    double ep1_days;
 
 /* Convert supplied dates to days since J2000 */
-   ep0_days = ( ep0 - 2000.0 )*DJY;
-   ep1_days = ( ep1 - 2000.0 )*DJY;
+   ep0_days = ( ep0 - 2000.0 )*ERFA_DJY;
+   ep1_days = ( ep1 - 2000.0 )*ERFA_DJY;
 
 /* If beginning epoch is J2000, just return the rotation matrix from
    J2000 to EP1. */
    if( ep0 == 2000.0 ) {
-      iauPmat06( DJ00, ep1_days, rmatp );
+      eraPmat06( ERFA_DJ00, ep1_days, rmatp );
 
 /* If end epoch is J2000, get the rotation matrix from J2000 to EP0 and
    then transpose it to get the rotation matrix from EP0 to J2000. */
    } else if( ep1 == 2000.0 ) {
-      iauPmat06( DJ00, ep0_days, rmatp );
-      iauTr( rmatp, rmatp );
+      eraPmat06( ERFA_DJ00, ep0_days, rmatp );
+      eraTr( rmatp, rmatp );
 
 /* Otherwise. get the two matrices used above and multiply them
    together. */
    } else {
-      iauPmat06( DJ00, ep0_days, rmatp );
-      iauTr( rmatp, rmatp );
-      iauPmat06( DJ00, ep1_days, rmatq );
-      iauRxr( rmatp, rmatq, rmatp );
+      eraPmat06( ERFA_DJ00, ep0_days, rmatp );
+      eraTr( rmatp, rmatp );
+      eraPmat06( ERFA_DJ00, ep1_days, rmatq );
+      eraRxr( rmatp, rmatq, rmatp );
    }
 
 }

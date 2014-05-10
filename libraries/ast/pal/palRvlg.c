@@ -71,7 +71,7 @@
 */
 
 #include "pal.h"
-#include "sofa.h"
+#include "erfa.h"
 
 double palRvlg( double r2000, double d2000 ){
 
@@ -97,8 +97,8 @@ double palRvlg( double r2000, double d2000 ){
    double va[ 3 ] = { -148.23284, +133.44888, -224.09467 };
 
 /* Convert given J2000 RA,Dec to x,y,z. */
-   iauS2c( r2000, d2000, vb );
+   eraS2c( r2000, d2000, vb );
 
 /* Compute dot product with Solar motion vector. */
-   return iauPdp( va, vb );
+   return eraPdp( va, vb );
 }

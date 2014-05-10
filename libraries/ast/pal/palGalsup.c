@@ -75,7 +75,7 @@
 */
 
 #include "pal.h"
-#include "sofa.h"
+#include "erfa.h"
 
 void palGalsup ( double dl, double db, double *dsl, double *dsb ) {
 
@@ -98,16 +98,16 @@ void palGalsup ( double dl, double db, double *dsl, double *dsb ) {
   };
 
   /* Spherical to Cartesian */
-  iauS2c( dl, db, v1 );
+  eraS2c( dl, db, v1 );
 
   /* Galactic to Supergalactic */
-  iauRxp( rmat, v1, v2 );
+  eraRxp( rmat, v1, v2 );
 
   /* Cartesian to spherical */
-  iauC2s( v2, dsl, dsb );
+  eraC2s( v2, dsl, dsb );
 
   /* Express in conventional ranges */
-  *dsl = iauAnp( *dsl );
-  *dsb = iauAnpm( *dsb );
+  *dsl = eraAnp( *dsl );
+  *dsb = eraAnpm( *dsb );
 
 }

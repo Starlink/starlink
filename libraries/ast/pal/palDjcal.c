@@ -23,7 +23,7 @@
 *     iymdf[4] = int[] (Returned)
 *       Year, month, day, fraction in Gregorian calendar.
 *     j = status (Returned)
-*       0 = OK. See iauJd2cal for other values.
+*       0 = OK. See eraJd2cal for other values.
 
 *  Description:
 *     Modified Julian Date to Gregorian Calendar, expressed
@@ -42,7 +42,7 @@
 *     {enter_further_changes_here}
 
 *  Notes:
-*     - Uses iauJd2cal
+*     - Uses eraJd2cal
 
 *  Copyright:
 *     Copyright (C) 2012 Science and Technology Facilities Council.
@@ -73,13 +73,13 @@
 
 #include "pal.h"
 #include "palmac.h"
-#include "sofa.h"
+#include "erfa.h"
 
 void palDjcal ( int ndp, double djm, int iymdf[4], int *j ) {
   double frac = 0.0;
   double nfd;
 
-  *j = iauJd2cal( PAL__MJD0, djm, &(iymdf[0]),
+  *j = eraJd2cal( PAL__MJD0, djm, &(iymdf[0]),
 		  &(iymdf[1]), &(iymdf[2]),
 		  &frac);
 

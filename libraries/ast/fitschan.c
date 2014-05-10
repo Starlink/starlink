@@ -1292,7 +1292,7 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 #include "timeframe.h"
 #include "keymap.h"
 #include "pal.h"
-#include "sofa.h"
+#include "erfa.h"
 #include "slamap.h"
 #include "specframe.h"
 #include "dsbspecframe.h"
@@ -27630,7 +27630,7 @@ static int SkySys( AstFitsChan *this, AstSkyFrame *skyfrm, int wcstype,
       geolat = astGetObsLat( skyfrm );
       h = astGetObsAlt( skyfrm );
       if( geolat != AST__BAD && geolon != AST__BAD && h != AST__BAD ) {
-         iauGd2gc( 1, geolon, geolat, h, xyz );
+         eraGd2gc( 1, geolon, geolat, h, xyz );
          SetItem( &(store->obsgeox), 0, 0, ' ', xyz[0], status );
          SetItem( &(store->obsgeoy), 0, 0, ' ', xyz[1], status );
          SetItem( &(store->obsgeoz), 0, 0, ' ', xyz[2], status );
@@ -28390,7 +28390,7 @@ static AstMapping *SpectralAxes( AstFitsChan *this, AstFrameSet *fs,
                   geolat = astGetObsLat( specfrm );
                   h = astGetObsAlt( specfrm );
                   if( geolat != AST__BAD && geolon != AST__BAD && h != AST__BAD ) {
-                     iauGd2gc( 1, geolon, geolat, h, xyz );
+                     eraGd2gc( 1, geolon, geolat, h, xyz );
                      SetItem( &(store->obsgeox), 0, 0, ' ', xyz[0], status );
                      SetItem( &(store->obsgeoy), 0, 0, ' ', xyz[1], status );
                      SetItem( &(store->obsgeoz), 0, 0, ' ', xyz[2], status );
@@ -36743,7 +36743,7 @@ static AstSkyFrame *WcsSkyFrame( AstFitsChan *this, FitsStore *store, char s,
       if( obsgeo[ 0 ] != AST__BAD &&
           obsgeo[ 1 ] != AST__BAD &&
           obsgeo[ 2 ] != AST__BAD ) {
-         iauGc2gd( 1, obsgeo, &geolon, &geolat, &h );
+         eraGc2gd( 1, obsgeo, &geolon, &geolat, &h );
          astSetObsLat( ret, geolat );
          astSetObsLon( ret, geolon );
          astSetObsAlt( ret, h );
@@ -36959,7 +36959,7 @@ static AstMapping *WcsSpectral( AstFitsChan *this, FitsStore *store, char s,
             if( obsgeo[ 0 ] != AST__BAD &&
                 obsgeo[ 1 ] != AST__BAD &&
                 obsgeo[ 2 ] != AST__BAD ) {
-               iauGc2gd( 1, obsgeo, &geolon, &geolat, &h );
+               eraGc2gd( 1, obsgeo, &geolon, &geolat, &h );
                astSetObsLat( specfrm, geolat );
                astSetObsLon( specfrm, geolon );
                astSetObsAlt( specfrm, h );

@@ -69,7 +69,7 @@
 */
 
 #include "pal.h"
-#include "sofa.h"
+#include "erfa.h"
 
 #include <math.h>
 
@@ -86,7 +86,7 @@ palDtp2s ( double xi, double eta, double raz, double decz,
   cdecz = cos(decz);
   denom = cdecz - eta * sdecz;
   d = atan2(xi, denom) + raz;
-  *ra = iauAnp(d);
+  *ra = eraAnp(d);
   *dec = atan2(sdecz + eta * cdecz, sqrt(xi * xi + denom * denom));
 
   return;

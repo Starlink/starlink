@@ -4,7 +4,7 @@
 *     palOne2One
 
 *  Purpose:
-*     File containing simple PAL wrappers for SLA routines that are identical in SOFA
+*     File containing simple PAL wrappers for SLA routines that are identical in ERFA
 
 *  Invocation:
 *     Matches SLA API
@@ -16,11 +16,11 @@
 *     Library routine
 
 *  Description:
-*     Some SOFA routines are identical to their SLA counterparts. PAL provides
+*     Some ERFA routines are identical to their SLA counterparts. PAL provides
 *     direct counterparts to these although it is generally a better idea to
-*     use the SOFA routine directly in new code.
+*     use the ERFA routine directly in new code.
 *
-*     The PAL routines with direct equivalents in SOFA are:
+*     The PAL routines with direct equivalents in ERFA are:
 *     - palCldj
 *     - palDbear
 *     - palDaf2r
@@ -61,11 +61,11 @@
 
 *  Notes:
 *     - Do not call these functions from other PAL functions. Always use
-*       the SOFA routines directly in new code.
+*       the ERFA routines directly in new code.
 *     - These are implemented as real functions rather than C preprocessor
 *       macros so there may be a performance penalty in using the PAL
-*       version instead of the SOFA version.
-*     - Routines that take MJDs have SOFA equivalents that have an explicit
+*       version instead of the ERFA version.
+*     - Routines that take MJDs have ERFA equivalents that have an explicit
 *       MJD offset included.
 *     - palEqeqx, palGmst and palGmsta use the IAU 2006 precession model.
 
@@ -105,132 +105,132 @@
 
 #include "pal.h"
 #include "palmac.h"
-#include "sofa.h"
+#include "erfa.h"
 
 void palCldj ( int iy, int im, int id, double *djm, int *j ) {
   double djm0;
-  *j = iauCal2jd( iy, im, id, &djm0, djm );
+  *j = eraCal2jd( iy, im, id, &djm0, djm );
 }
 
 double palDbear ( double a1, double b1, double a2, double b2 ) {
-  return iauPas( a1, b1, a2, b2 );
+  return eraPas( a1, b1, a2, b2 );
 }
 
 /* Arguments differ slightly. Assumes that the sign is always positive
    and dealt with externally. */
 void palDaf2r ( int ideg, int iamin, double asec, double *rad, int *j ) {
-  *j = iauAf2a( ' ', ideg, iamin, asec, rad );
+  *j = eraAf2a( ' ', ideg, iamin, asec, rad );
 }
 
 void palDav2m ( double axvec[3], double rmat[3][3] ) {
-  iauRv2m( axvec, rmat );
+  eraRv2m( axvec, rmat );
 }
 
 void palDcc2s ( double v[3], double *a, double *b ) {
-  iauC2s( v, a, b );
+  eraC2s( v, a, b );
 }
 
 void palDcs2c ( double a, double b, double v[3] ) {
-  iauS2c( a, b, v );
+  eraS2c( a, b, v );
 }
 
 void palDd2tf ( int ndp, double days, char *sign, int ihmsf[4] ) {
-  iauD2tf( ndp, days, sign, ihmsf );
+  eraD2tf( ndp, days, sign, ihmsf );
 }
 
 void palDimxv ( double dm[3][3], double va[3], double vb[3] ) {
-  iauTrxp( dm, va, vb );
+  eraTrxp( dm, va, vb );
 }
 
 void palDm2av ( double rmat[3][3], double axvec[3] ) {
-  iauRm2v( rmat, axvec );
+  eraRm2v( rmat, axvec );
 }
 
 /* Requires additional SLA MJD reference date */
 void palDjcl ( double djm, int *iy, int *im, int *id, double *fd, int *j ) {
-  *j = iauJd2cal( PAL__MJD0, djm, iy, im, id, fd );
+  *j = eraJd2cal( PAL__MJD0, djm, iy, im, id, fd );
 }
 
 void palDmxm ( double a[3][3], double b[3][3], double c[3][3] ) {
-  iauRxr( a, b, c );
+  eraRxr( a, b, c );
 }
 
 void palDmxv ( double dm[3][3], double va[3], double vb[3] ) {
-  iauRxp( dm, va, vb );
+  eraRxp( dm, va, vb );
 }
 
 double palDpav ( double v1[3], double v2[3] ) {
-  return iauPap( v1, v2 );
+  return eraPap( v1, v2 );
 }
 
 void palDr2af ( int ndp, double angle, char *sign, int idmsf[4] ) {
-  iauA2af( ndp, angle, sign, idmsf );
+  eraA2af( ndp, angle, sign, idmsf );
 }
 
 void palDr2tf( int ndp, double angle, char *sign, int ihmsf[4] ) {
-  iauA2tf( ndp, angle, sign, ihmsf );
+  eraA2tf( ndp, angle, sign, ihmsf );
 }
 
 double palDranrm ( double angle ) {
-  return iauAnp( angle );
+  return eraAnp( angle );
 }
 
 double palDsep ( double a1, double b1, double a2, double b2 ) {
-  return iauSeps( a1, b1, a2, b2 );
+  return eraSeps( a1, b1, a2, b2 );
 }
 
 double palDsepv ( double v1[3], double v2[3] ) {
-  return iauSepp( v1, v2 );
+  return eraSepp( v1, v2 );
 }
 
 /* Assumes that the sign is always positive and is dealt with externally */
 void palDtf2d ( int ihour, int imin, double sec, double *days, int *j ) {
-  *j = iauTf2d( ' ', ihour, imin, sec, days );
+  *j = eraTf2d( ' ', ihour, imin, sec, days );
 }
 
 /* Assumes that the sign is dealt with outside this routine */
 void palDtf2r ( int ihour, int imin, double sec, double *rad, int *j ) {
-  *j = iauTf2a( ' ', ihour, imin, sec, rad );
+  *j = eraTf2a( ' ', ihour, imin, sec, rad );
 }
 
 double palDvdv ( double va[3], double vb[3] ) {
-  return iauPdp( va, vb );
+  return eraPdp( va, vb );
 }
 
 /* Note that the arguments are flipped */
 void palDvn ( double v[3], double uv[3], double *vm ) {
-  iauPn( v, vm, uv );
+  eraPn( v, vm, uv );
 }
 
 void palDvxv ( double va[3], double vb[3], double vc[3] ) {
-  iauPxp( va, vb, vc );
+  eraPxp( va, vb, vc );
 }
 
 /* Requires additional SLA MJD reference date */
 double palEpb ( double date ) {
-  return iauEpb( PAL__MJD0, date );
+  return eraEpb( PAL__MJD0, date );
 }
 
 double palEpb2d ( double epb ) {
   double djm0, djm;
-  iauEpb2jd( epb, &djm0, &djm );
+  eraEpb2jd( epb, &djm0, &djm );
   return djm;
 }
 
 /* Requires additional SLA MJD reference date */
 double palEpj ( double date ) {
-  return iauEpj( PAL__MJD0, date );
+  return eraEpj( PAL__MJD0, date );
 }
 
 double palEpj2d ( double epj ) {
   double djm0, djm;
-  iauEpj2jd( epj, &djm0, &djm );
+  eraEpj2jd( epj, &djm0, &djm );
   return djm;
 }
 
 /* Requires additional SLA MJD reference date */
 double palEqeqx ( double date ) {
-  return iauEe06a( PAL__MJD0, date );
+  return eraEe06a( PAL__MJD0, date );
 }
 
 /* Do not use palEvp just yet */
@@ -239,27 +239,27 @@ void palFk5hz ( double r5, double d5, double epoch,
                 double *rh, double *dh ) {
   /* Need to convert epoch to Julian date first */
   double date1, date2;
-  iauEpj2jd( epoch, &date1, &date2 );
-  iauFk5hz( r5, d5, date1, date2, rh, dh );
+  eraEpj2jd( epoch, &date1, &date2 );
+  eraFk5hz( r5, d5, date1, date2, rh, dh );
 }
 
-/* Note that SOFA has more accurate time arguments and we use the 2006 precession model */
+/* Note that ERFA has more accurate time arguments and we use the 2006 precession model */
 double palGmst ( double ut1 ) {
-  return iauGmst06( PAL__MJD0, ut1, PAL__MJD0, ut1 );
+  return eraGmst06( PAL__MJD0, ut1, PAL__MJD0, ut1 );
 }
 
-/* Slightly better but still not as accurate as SOFA */
+/* Slightly better but still not as accurate as ERFA */
 
 double palGmsta( double date, double ut ) {
   date += PAL__MJD0;
-  return iauGmst06( date, ut, date, ut );
+  return eraGmst06( date, ut, date, ut );
 }
 
 void palHfk5z ( double rh, double dh, double epoch,
                 double *r5, double *d5, double *dr5, double *dd5 ) {
   /* Need to convert epoch to Julian date first */
   double date1, date2;
-  iauEpj2jd( epoch, &date1, &date2 );
-  iauHfk5z( rh, dh, date1, date2, r5, d5, dr5, dd5 );
+  eraEpj2jd( epoch, &date1, &date2 );
+  eraHfk5z( rh, dh, date1, date2, r5, d5, dr5, dd5 );
 }
 

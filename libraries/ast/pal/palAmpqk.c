@@ -78,7 +78,7 @@
 */
 
 #include "pal.h"
-#include "sofa.h"
+#include "erfa.h"
 
 void palAmpqk ( double ra, double da, double amprms[21], double *rm,
                 double *dm ){
@@ -97,10 +97,10 @@ void palAmpqk ( double ra, double da, double amprms[21], double *rm,
    }
 
 /* Apparent RA,Dec to Cartesian */
-   iauS2c( ra, da, p3 );
+   eraS2c( ra, da, p3 );
 
 /* Precession and nutation */
-   iauTrxp( (double(*)[3]) &amprms[12], p3, p2 );
+   eraTrxp( (double(*)[3]) &amprms[12], p3, p2 );
 
 /* Aberration */
    ab1p1 = ab1 + 1.0;
@@ -108,19 +108,19 @@ void palAmpqk ( double ra, double da, double amprms[21], double *rm,
       p1[i] = p2[i];
    }
    for( j = 0; j < 2; j++ ) {
-      p1dv = iauPdp( p1, abv );
+      p1dv = eraPdp( p1, abv );
       p1dvp1 = 1.0 + p1dv;
       w = 1.0 + p1dv / ab1p1;
       for( i = 0; i < 3; i++ ) {
          p1[i] = ( p1dvp1 * p2[i] - w * abv[i] ) / ab1;
       }
-      iauPn( p1, &w, p3 );
+      eraPn( p1, &w, p3 );
       for( i = 0; i < 3; i++ ) {
          p1[i] = p3[i];
       }
    }
 
 /* Mean RA,Dec */
-   iauC2s( p1, rm, dm );
-   *rm = iauAnp( *rm );
+   eraC2s( p1, rm, dm );
+   *rm = eraAnp( *rm );
 }

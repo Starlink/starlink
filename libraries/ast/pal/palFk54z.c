@@ -90,7 +90,7 @@
 */
 
 #include "pal.h"
-#include "sofa.h"
+#include "erfa.h"
 
 void palFk54z( double r2000, double d2000, double bepoch, double *r1950,
                double *d1950, double *dr1950, double *dd1950 ){

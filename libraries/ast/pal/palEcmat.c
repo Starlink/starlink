@@ -66,13 +66,13 @@
 
 #include "pal.h"
 #include "palmac.h"
-#include "sofa.h"
+#include "erfa.h"
 
 void palEcmat( double date, double rmat[3][3] ) {
 
 /* Mean obliquity (the angle between the ecliptic and mean equator of
    date). */
-   double eps0 = iauObl06( PAL__MJD0, date );
+   double eps0 = eraObl06( PAL__MJD0, date );
 
 /* Matrix */
    palDeuler( "X", eps0, 0.0, 0.0, rmat );

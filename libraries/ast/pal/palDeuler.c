@@ -87,7 +87,7 @@
 */
 
 #include "pal.h"
-#include "sofa.h"
+#include "erfa.h"
 
 void
 palDeuler( const char *order, double phi, double theta, double psi,
@@ -96,7 +96,7 @@ palDeuler( const char *order, double phi, double theta, double psi,
   double rotations[3];
 
   /* Initialise rmat */
-  iauIr( rmat );
+  eraIr( rmat );
 
   /* copy the rotations into an array */
   rotations[0] = phi;
@@ -110,19 +110,19 @@ palDeuler( const char *order, double phi, double theta, double psi,
     case 'X':
     case 'x':
     case '1':
-      iauRx( rotations[i], rmat );
+      eraRx( rotations[i], rmat );
       break;
 
     case 'Y':
     case 'y':
     case '2':
-      iauRy( rotations[i], rmat );
+      eraRy( rotations[i], rmat );
       break;
 
     case 'Z':
     case 'z':
     case '3':
-      iauRz( rotations[i], rmat );
+      eraRz( rotations[i], rmat );
       break;
 
     default:

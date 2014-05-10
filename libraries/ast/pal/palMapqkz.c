@@ -90,7 +90,7 @@
 */
 
 #include "pal.h"
-#include "sofa.h"
+#include "erfa.h"
 
 void palMapqkz ( double rm, double dm, double amprms[21], double *ra,
                  double *da ){
@@ -106,10 +106,10 @@ void palMapqkz ( double rm, double dm, double amprms[21], double *ra,
    }
 
 /* Spherical to x,y,z. */
-   iauS2c( rm, dm, p );
+   eraS2c( rm, dm, p );
 
 /* Aberration. */
-   p1dv = iauPdp( p, abv );
+   p1dv = eraPdp( p, abv );
    p1dvp1 = p1dv + 1.0;
    w = 1.0 + p1dv / ( ab1 + 1.0 );
    for( i = 0; i < 3; i++ ) {
@@ -117,9 +117,9 @@ void palMapqkz ( double rm, double dm, double amprms[21], double *ra,
    }
 
 /* Precession and nutation. */
-   iauRxp( (double(*)[3]) &amprms[12], p2, p3 );
+   eraRxp( (double(*)[3]) &amprms[12], p2, p3 );
 
 /* Geocentric apparent RA,dec. */
-   iauC2s( p3, ra, da );
-   *ra = iauAnp( *ra );
+   eraC2s( p3, ra, da );
+   *ra = eraAnp( *ra );
 }

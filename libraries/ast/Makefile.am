@@ -138,7 +138,6 @@ GRP_C_ROUTINES = \
 AST_H_FILES = \
     xml.h \
     wcstrig.h \
-    levmar.h \
     proj.h \
     memory.h \
     error.h \
@@ -223,7 +222,7 @@ GRP_C_INCLUDE_FILES = \
     loader.h \
     pal2ast.h \
     skyaxis.h \
-    sofa2ast.h \
+    erfa2ast.h \
     stc.h \
     stcresourceprofile.h \
     stcsearchlocation.h \
@@ -282,10 +281,6 @@ WCSLIB_FILES = \
     wcsmath.h \
     wcstrig.h
 
-LEVMAR_FILES = \
-    levmar.c \
-    levmar.h
-
 STAR_PAL_FILES = \
     pal/pal.h \
     pal/palAddet.c \
@@ -326,202 +321,213 @@ STAR_PAL_FILES = \
     pal/palSupgal.c \
     pal/palmac.h
 
-IAU_SOFA_FILES = \
-    sofa/00READ.ME \
-    sofa/sofa.h \
-    sofa/sofam.h \
-    sofa/a2af.c \
-    sofa/a2tf.c \
-    sofa/af2a.c \
-    sofa/anp.c \
-    sofa/anpm.c \
-    sofa/bi00.c \
-    sofa/bp00.c \
-    sofa/bp06.c \
-    sofa/bpn2xy.c \
-    sofa/c2i00a.c \
-    sofa/c2i00b.c \
-    sofa/c2i06a.c \
-    sofa/c2ibpn.c \
-    sofa/c2ixy.c \
-    sofa/c2ixys.c \
-    sofa/c2s.c \
-    sofa/c2t00a.c \
-    sofa/c2t00b.c \
-    sofa/c2t06a.c \
-    sofa/c2tcio.c \
-    sofa/c2teqx.c \
-    sofa/c2tpe.c \
-    sofa/c2txy.c \
-    sofa/cal2jd.c \
-    sofa/cp.c \
-    sofa/cpv.c \
-    sofa/cr.c \
-    sofa/d2dtf.c \
-    sofa/d2tf.c \
-    sofa/dat.c \
-    sofa/dtdb.c \
-    sofa/dtf2d.c \
-    sofa/ee00.c \
-    sofa/ee00a.c \
-    sofa/ee00b.c \
-    sofa/ee06a.c \
-    sofa/eect00.c \
-    sofa/eform.c \
-    sofa/eo06a.c \
-    sofa/eors.c \
-    sofa/epb.c \
-    sofa/epb2jd.c \
-    sofa/epj.c \
-    sofa/epj2jd.c \
-    sofa/epv00.c \
-    sofa/eqeq94.c \
-    sofa/era00.c \
-    sofa/fad03.c \
-    sofa/fae03.c \
-    sofa/faf03.c \
-    sofa/faju03.c \
-    sofa/fal03.c \
-    sofa/falp03.c \
-    sofa/fama03.c \
-    sofa/fame03.c \
-    sofa/fane03.c \
-    sofa/faom03.c \
-    sofa/fapa03.c \
-    sofa/fasa03.c \
-    sofa/faur03.c \
-    sofa/fave03.c \
-    sofa/fk52h.c \
-    sofa/fk5hip.c \
-    sofa/fk5hz.c \
-    sofa/fw2m.c \
-    sofa/fw2xy.c \
-    sofa/gc2gd.c \
-    sofa/gc2gde.c \
-    sofa/gd2gc.c \
-    sofa/gd2gce.c \
-    sofa/gmst00.c \
-    sofa/gmst06.c \
-    sofa/gmst82.c \
-    sofa/gst00a.c \
-    sofa/gst00b.c \
-    sofa/gst06.c \
-    sofa/gst06a.c \
-    sofa/gst94.c \
-    sofa/h2fk5.c \
-    sofa/hfk5z.c \
-    sofa/ir.c \
-    sofa/jd2cal.c \
-    sofa/jdcalf.c \
-    sofa/num00a.c \
-    sofa/num00b.c \
-    sofa/num06a.c \
-    sofa/numat.c \
-    sofa/nut00a.c \
-    sofa/nut00b.c \
-    sofa/nut06a.c \
-    sofa/nut80.c \
-    sofa/nutm80.c \
-    sofa/obl06.c \
-    sofa/obl80.c \
-    sofa/p06e.c \
-    sofa/p2pv.c \
-    sofa/p2s.c \
-    sofa/pap.c \
-    sofa/pas.c \
-    sofa/pb06.c \
-    sofa/pdp.c \
-    sofa/pfw06.c \
-    sofa/plan94.c \
-    sofa/pm.c \
-    sofa/pmat00.c \
-    sofa/pmat06.c \
-    sofa/pmat76.c \
-    sofa/pmp.c \
-    sofa/pn.c \
-    sofa/pn00.c \
-    sofa/pn00a.c \
-    sofa/pn00b.c \
-    sofa/pn06.c \
-    sofa/pn06a.c \
-    sofa/pnm00a.c \
-    sofa/pnm00b.c \
-    sofa/pnm06a.c \
-    sofa/pnm80.c \
-    sofa/pom00.c \
-    sofa/ppp.c \
-    sofa/ppsp.c \
-    sofa/pr00.c \
-    sofa/prec76.c \
-    sofa/pv2p.c \
-    sofa/pv2s.c \
-    sofa/pvdpv.c \
-    sofa/pvm.c \
-    sofa/pvmpv.c \
-    sofa/pvppv.c \
-    sofa/pvstar.c \
-    sofa/pvu.c \
-    sofa/pvup.c \
-    sofa/pvxpv.c \
-    sofa/pxp.c \
-    sofa/rm2v.c \
-    sofa/rv2m.c \
-    sofa/rx.c \
-    sofa/rxp.c \
-    sofa/rxpv.c \
-    sofa/rxr.c \
-    sofa/ry.c \
-    sofa/rz.c \
-    sofa/s00.c \
-    sofa/s00a.c \
-    sofa/s00b.c \
-    sofa/s06.c \
-    sofa/s06a.c \
-    sofa/s2c.c \
-    sofa/s2p.c \
-    sofa/s2pv.c \
-    sofa/s2xpv.c \
-    sofa/sepp.c \
-    sofa/seps.c \
-    sofa/sp00.c \
-    sofa/starpm.c \
-    sofa/starpv.c \
-    sofa/sxp.c \
-    sofa/sxpv.c \
-    sofa/taitt.c \
-    sofa/taiut1.c \
-    sofa/taiutc.c \
-    sofa/tcbtdb.c \
-    sofa/tcgtt.c \
-    sofa/tdbtcb.c \
-    sofa/tdbtt.c \
-    sofa/tf2a.c \
-    sofa/tf2d.c \
-    sofa/tr.c \
-    sofa/trxp.c \
-    sofa/trxpv.c \
-    sofa/tttai.c \
-    sofa/tttcg.c \
-    sofa/tttdb.c \
-    sofa/ttut1.c \
-    sofa/ut1tai.c \
-    sofa/ut1tt.c \
-    sofa/ut1utc.c \
-    sofa/utctai.c \
-    sofa/utcut1.c \
-    sofa/xy06.c \
-    sofa/xys00a.c \
-    sofa/xys00b.c \
-    sofa/xys06a.c \
-    sofa/zp.c \
-    sofa/zpv.c \
-    sofa/zr.c
+ERFA_FILES = \
+    erfa/00READ.ME \
+    erfa/erfa.h \
+    erfa/erfam.h \
+    erfa/a2af.c \
+    erfa/a2tf.c \
+    erfa/af2a.c \
+    erfa/anp.c \
+    erfa/anpm.c \
+    erfa/bi00.c \
+    erfa/bp00.c \
+    erfa/bp06.c \
+    erfa/bpn2xy.c \
+    erfa/c2i00a.c \
+    erfa/c2i00b.c \
+    erfa/c2i06a.c \
+    erfa/c2ibpn.c \
+    erfa/c2ixy.c \
+    erfa/c2ixys.c \
+    erfa/c2s.c \
+    erfa/c2t00a.c \
+    erfa/c2t00b.c \
+    erfa/c2t06a.c \
+    erfa/c2tcio.c \
+    erfa/c2teqx.c \
+    erfa/c2tpe.c \
+    erfa/c2txy.c \
+    erfa/cal2jd.c \
+    erfa/cp.c \
+    erfa/cpv.c \
+    erfa/cr.c \
+    erfa/d2dtf.c \
+    erfa/d2tf.c \
+    erfa/dat.c \
+    erfa/dtdb.c \
+    erfa/dtf2d.c \
+    erfa/ee00.c \
+    erfa/ee00a.c \
+    erfa/ee00b.c \
+    erfa/ee06a.c \
+    erfa/eect00.c \
+    erfa/eform.c \
+    erfa/eo06a.c \
+    erfa/eors.c \
+    erfa/epb.c \
+    erfa/epb2jd.c \
+    erfa/epj.c \
+    erfa/epj2jd.c \
+    erfa/epv00.c \
+    erfa/eqeq94.c \
+    erfa/era00.c \
+    erfa/fad03.c \
+    erfa/fae03.c \
+    erfa/faf03.c \
+    erfa/faju03.c \
+    erfa/fal03.c \
+    erfa/falp03.c \
+    erfa/fama03.c \
+    erfa/fame03.c \
+    erfa/fane03.c \
+    erfa/faom03.c \
+    erfa/fapa03.c \
+    erfa/fasa03.c \
+    erfa/faur03.c \
+    erfa/fave03.c \
+    erfa/fk52h.c \
+    erfa/fk5hip.c \
+    erfa/fk5hz.c \
+    erfa/fw2m.c \
+    erfa/fw2xy.c \
+    erfa/gc2gd.c \
+    erfa/gc2gde.c \
+    erfa/gd2gc.c \
+    erfa/gd2gce.c \
+    erfa/gmst00.c \
+    erfa/gmst06.c \
+    erfa/gmst82.c \
+    erfa/gst00a.c \
+    erfa/gst00b.c \
+    erfa/gst06.c \
+    erfa/gst06a.c \
+    erfa/gst94.c \
+    erfa/h2fk5.c \
+    erfa/hfk5z.c \
+    erfa/ir.c \
+    erfa/jd2cal.c \
+    erfa/jdcalf.c \
+    erfa/num00a.c \
+    erfa/num00b.c \
+    erfa/num06a.c \
+    erfa/numat.c \
+    erfa/nut00a.c \
+    erfa/nut00b.c \
+    erfa/nut06a.c \
+    erfa/nut80.c \
+    erfa/nutm80.c \
+    erfa/obl06.c \
+    erfa/obl80.c \
+    erfa/p06e.c \
+    erfa/p2pv.c \
+    erfa/p2s.c \
+    erfa/pap.c \
+    erfa/pas.c \
+    erfa/pb06.c \
+    erfa/pdp.c \
+    erfa/pfw06.c \
+    erfa/plan94.c \
+    erfa/pm.c \
+    erfa/pmat00.c \
+    erfa/pmat06.c \
+    erfa/pmat76.c \
+    erfa/pmp.c \
+    erfa/pn.c \
+    erfa/pn00.c \
+    erfa/pn00a.c \
+    erfa/pn00b.c \
+    erfa/pn06.c \
+    erfa/pn06a.c \
+    erfa/pnm00a.c \
+    erfa/pnm00b.c \
+    erfa/pnm06a.c \
+    erfa/pnm80.c \
+    erfa/pom00.c \
+    erfa/ppp.c \
+    erfa/ppsp.c \
+    erfa/pr00.c \
+    erfa/prec76.c \
+    erfa/pv2p.c \
+    erfa/pv2s.c \
+    erfa/pvdpv.c \
+    erfa/pvm.c \
+    erfa/pvmpv.c \
+    erfa/pvppv.c \
+    erfa/pvstar.c \
+    erfa/pvu.c \
+    erfa/pvup.c \
+    erfa/pvxpv.c \
+    erfa/pxp.c \
+    erfa/rm2v.c \
+    erfa/rv2m.c \
+    erfa/rx.c \
+    erfa/rxp.c \
+    erfa/rxpv.c \
+    erfa/rxr.c \
+    erfa/ry.c \
+    erfa/rz.c \
+    erfa/s00.c \
+    erfa/s00a.c \
+    erfa/s00b.c \
+    erfa/s06.c \
+    erfa/s06a.c \
+    erfa/s2c.c \
+    erfa/s2p.c \
+    erfa/s2pv.c \
+    erfa/s2xpv.c \
+    erfa/sepp.c \
+    erfa/seps.c \
+    erfa/sp00.c \
+    erfa/starpm.c \
+    erfa/starpv.c \
+    erfa/sxp.c \
+    erfa/sxpv.c \
+    erfa/taitt.c \
+    erfa/taiut1.c \
+    erfa/taiutc.c \
+    erfa/tcbtdb.c \
+    erfa/tcgtt.c \
+    erfa/tdbtcb.c \
+    erfa/tdbtt.c \
+    erfa/tf2a.c \
+    erfa/tf2d.c \
+    erfa/tr.c \
+    erfa/trxp.c \
+    erfa/trxpv.c \
+    erfa/tttai.c \
+    erfa/tttcg.c \
+    erfa/tttdb.c \
+    erfa/ttut1.c \
+    erfa/ut1tai.c \
+    erfa/ut1tt.c \
+    erfa/ut1utc.c \
+    erfa/utctai.c \
+    erfa/utcut1.c \
+    erfa/xy06.c \
+    erfa/xys00a.c \
+    erfa/xys00b.c \
+    erfa/xys06a.c \
+    erfa/zp.c \
+    erfa/zpv.c \
+    erfa/zr.c
 
 PAL_FILES = \
     pal.c \
     pal.h \
-    sofa.h \
-    sofam.h
+    erfa.h \
+    erfam.h
+
+CMINPACK_FILES = \
+    cminpack/cminpack.h \
+    cminpack/cminpackP.h \
+    cminpack/lmder1.c \
+    cminpack/lmder.c \
+    cminpack/dpmpar.c \
+    cminpack/enorm.c \
+    cminpack/qrfac.c \
+    cminpack/lmpar.c \
+    cminpack/qrsolv.c
 
 bin_SCRIPTS = ast_link
 dist_bin_SCRIPTS = ast_link_adam
@@ -601,7 +607,7 @@ libast_la_SOURCES = \
     $(GRP_C_ROUTINES) \
     $(GRP_C_INCLUDE_FILES) \
     $(GRP_F_INCLUDE_FILES) \
-    $(LEVMAR_FILES) \
+    $(CMINPACK_FILES) \
     $(WCSLIB_FILES) \
     ast_err.h
 
@@ -680,7 +686,7 @@ AST_PAR: ast_par.source astbad
 # configure.ac, and so is not distributed automatically.
 #
 # makeh is required in order to build ast.h after distribution (see below).
-EXTRA_DIST = ast_par.source sun210_figures sun211_figures pal sofa
+EXTRA_DIST = ast_par.source sun210_figures sun211_figures pal erfa cminpack
 
 # ast.h depends on the error-facility files.  ast.h _could_ be made
 # before distribution, but since it's generated from other distributed

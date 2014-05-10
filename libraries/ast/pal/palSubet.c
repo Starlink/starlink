@@ -78,7 +78,7 @@
 */
 
 #include "pal.h"
-#include "sofa.h"
+#include "erfa.h"
 
 void palSubet ( double rc, double dc, double eq, double *rm, double *dm ) {
   double a[3];   /* The E-terms */
@@ -92,18 +92,18 @@ void palSubet ( double rc, double dc, double eq, double *rm, double *dm ) {
   palEtrms( eq, a );
 
   /* Spherical to Cartesian */
-  iauS2c( rc, dc, v );
+  eraS2c( rc, dc, v );
 
   /* Include the E-terms */
-  f = 1.0 + iauPdp( v, a );
+  f = 1.0 + eraPdp( v, a );
   for (i=0; i<3; i++) {
     v[i] = f*v[i] - a[i];
   }
 
   /* Cartesian to spherical */
-  iauC2s( v, rm, dm );
+  eraC2s( v, rm, dm );
 
   /* Bring RA into conventional range */
-  *rm = iauAnp( *rm );
+  *rm = eraAnp( *rm );
 
 }

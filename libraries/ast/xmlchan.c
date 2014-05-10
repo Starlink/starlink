@@ -222,7 +222,7 @@ f     The XmlChan class does not define any new routines beyond those
 #include "object.h"              /* Base Object class */
 #include "wcsmap.h"              /* Angular conversion constants */
 #include "xml.h"                 /* AST XML facilities */
-#include "sofa.h"                /* IAU SOFA functions */
+#include "erfa.h"                /* ERFA functions */
 #include "stcresourceprofile.h"  /* IVOA StcResourceProfile class */
 #include "stcsearchlocation.h"   /* IVOA SearchLocation class */
 #include "stccatalogentrylocation.h"/* IVOA CatalogEntryLocation class */
@@ -5928,7 +5928,7 @@ static AstPointList *ObservatoryLocationReader( AstXmlChan *this,
          pos[ 2 ] *= A0;
 
 /* Get the corresponding geodetic lon/lat. */
-         iauGc2gd( 1, pos, &lambda, &phi, &height );
+         eraGc2gd( 1, pos, &lambda, &phi, &height );
       }
 
       if( lambda != AST__BAD ) {

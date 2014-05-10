@@ -117,7 +117,7 @@
 
 #include "pal.h"
 #include "palmac.h"
-#include "sofa.h"
+#include "erfa.h"
 
 void palFk45z( double r1950, double d1950, double bepoch, double *r2000,
                double *d2000 ){
@@ -147,7 +147,7 @@ void palFk45z( double r1950, double d1950, double bepoch, double *r2000,
 
 
 /* Spherical to Cartesian. */
-   iauS2c( r1950, d1950, r0 );
+   eraS2c( r1950, d1950, r0 );
 
 /* Adjust vector A to give zero proper motion in FK5. */
    w = ( bepoch - 1950.0 )/PAL__PMF;
@@ -177,8 +177,8 @@ void palFk45z( double r1950, double d1950, double bepoch, double *r2000,
    }
 
 /* Revert to spherical coordinates. */
-   iauC2s( v2, &w, d2000 );
-   *r2000 = iauAnp( w );
+   eraC2s( v2, &w, d2000 );
+   *r2000 = eraAnp( w );
 }
 
 

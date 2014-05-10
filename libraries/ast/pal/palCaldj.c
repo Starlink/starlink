@@ -25,7 +25,7 @@
 *     djm = double * (Returned)
 *        Modified Julian Date (JD-2400000.5) for 0 hrs
 *     j = status (Returned)
-*       0 = OK. See iauCal2jd for other values.
+*       0 = OK. See eraCal2jd for other values.
 
 *  Description:
 *     Modified Julian Date to Gregorian Calendar with special
@@ -42,11 +42,11 @@
 *     {enter_further_changes_here}
 
 *  Notes:
-*     - Uses iauCal2jd
-*     - Unlike iauCal2jd this routine treats the years 0-100 as
+*     - Uses eraCal2jd
+*     - Unlike eraCal2jd this routine treats the years 0-100 as
 *       referring to the end of the 20th Century and beginning of
 *       the 21st Century. If this behaviour is not acceptable
-*       use the SOFA routine directly or palCldj.
+*       use the ERFA routine directly or palCldj.
 *       Acceptable years are 00-49, interpreted as 2000-2049,
 *                            50-99,     "       "  1950-1999,
 *                            all others, interpreted literally.
@@ -79,7 +79,7 @@
 
 #include "pal.h"
 #include "palmac.h"
-#include "sofa.h"
+#include "erfa.h"
 
 void palCaldj ( int iy, int im, int id, double *djm, int *j ) {
   int adj = 0;   /* Year adjustment */
@@ -92,5 +92,5 @@ void palCaldj ( int iy, int im, int id, double *djm, int *j ) {
   }
   iy += adj;
 
-  *j = iauCal2jd( iy, im, id, &djm0, djm );
+  *j = eraCal2jd( iy, im, id, &djm0, djm );
 }

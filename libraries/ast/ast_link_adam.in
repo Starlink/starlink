@@ -301,7 +301,7 @@
 #  an external PAL library.
       1) args="${args} -lpal";;
 
-#  Otherwise, use the internal PAL & SOFA libraries.
+#  Otherwise, use the internal PAL & ERFA libraries.
       *) args="${args} -last_pal";;
 
       esac

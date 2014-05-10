@@ -72,7 +72,7 @@ end
 
 
 
-foreach prog (testobject testconvert testlevmar)
+foreach prog (testobject testconvert)
 
 gcc -o $prog $prog.c -I.. -DHAVE_CONFIG_H -L/star/lib `ast_link`
 

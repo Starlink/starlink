@@ -70,7 +70,7 @@
 #include "pal.h"
 #include "palmac.h"
 #include "palmac.h"
-#include "sofam.h"
+#include "erfam.h"
 
 void palPvobs( double p, double h, double stl, double pv[6] ){
 
@@ -78,11 +78,11 @@ void palPvobs( double p, double h, double stl, double pv[6] ){
    double xyz[3], z, r, s, c, v;
 
 /* Geodetic to geocentric conversion (WGS84 reference ellipsoid). */
-   iauGd2gc( 1, 0.0, p, h, xyz );
+   eraGd2gc( 1, 0.0, p, h, xyz );
 
 /* Convert from metres to AU */
-   r = xyz[ 0 ]/DAU;
-   z = xyz[ 2 ]/DAU;
+   r = xyz[ 0 ]/ERFA_DAU;
+   z = xyz[ 2 ]/ERFA_DAU;
 
 /* Functions of ST. */
    s = sin( stl );

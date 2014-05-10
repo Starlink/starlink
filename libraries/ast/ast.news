@@ -1,6 +1,6 @@
 AST Library
 -----------
-   A new release (V7.3.4) of the Starlink AST (astrometry) library is
+   A new release (V8.0.0) of the Starlink AST (astrometry) library is
 now available.
 
    AST provides a comprehensive range of facilities for attaching
@@ -14,6 +14,17 @@ celestial coordinate systems. AST is portable and
 environment-independent.
 
 Main Changes in this Version
+----------------------------
+
+- Least squares fitting of N-dimensional polynomials is now done using
+files copied from the C/C++ Minpack package (see
+http://devernay.free.fr/hacks/cminpack/index.html).
+
+- Use of the IAU SOFA library has been replaced by ERFA library, which is
+a re-badged copy of SOFA distributed under a less restrictive license. A
+copy of ERFA is included within AST.
+
+Main Changes in V7.3.4
 ----------------------------
 
 - By default, the simplification of Polygons no longer checks that the
