@@ -630,7 +630,8 @@
                            ELSE
                               TEXT = ' '
                               CALL CHR_PFORM( 1, PARAGR, .FALSE.,
-     :                                        TEXCOL, TEXT( 4:LWIDTH ) )
+     :                                        TEXCOL,
+     :                                        TEXT( INDENT+1:LWIDTH ) )
                            END IF
 
 *  Increment the text line counter, and extend the TEXT component.
