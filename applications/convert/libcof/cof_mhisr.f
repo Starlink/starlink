@@ -236,7 +236,11 @@
          CALL CHR_DCWRD( CARD, MAXWRD, NWORD, START, END, WORDS, LSTAT )
 
 *  If it's a new heading, we have come too far.
-         MORTEX = CARD( END( 2 ):END( 2 ) ) .NE. ':'
+         IF ( NWORD .LT. 2 ) THEN
+            MORTEX = .FALSE.
+         ELSE
+            MORTEX = CARD( END( 2 ):END( 2 ) ) .NE. ':'
+         END IF
 
 *  Any non-HISTORY card will denote end of HISTORY record.
          IF ( KEYWRD .EQ. 'HISTORY' .AND. MORTEX ) THEN
