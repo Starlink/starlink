@@ -567,7 +567,7 @@
                             END IF
 
 *  First line of paragraph, hence no indentation.
-                           IF ( IREC .EQ. 0 ) THEN
+                           IF ( IREC .EQ. 0 .OR. TEXCOL .EQ. 1 ) THEN
                               CALL CHR_PFORM( 1, PARAGR, .FALSE.,
      :                                        TEXCOL, TEXT( :LWIDTH ) )
 
