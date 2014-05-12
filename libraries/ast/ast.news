@@ -16,6 +16,8 @@ environment-independent.
 Main Changes in this Version
 ----------------------------
 
+- AST is now distributed under the Lesser GPL licence.
+
 - Least squares fitting of N-dimensional polynomials is now done using
 files copied from the C/C++ Minpack package (see
 http://devernay.free.fr/hacks/cminpack/index.html).
