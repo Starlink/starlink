@@ -38,6 +38,8 @@
 *  History:
 *     07-MAY-2014 (GSB):
 *        Original version.
+*     12-MAY-2014 (GSB):
+*        Remove smf_open_file dependency.
 
 *  Copyright:
 *     Copyright (C) 2014 Science and Technology Facilities Council.
@@ -76,7 +78,6 @@
 #include "prm_par.h"
 #include "ndf.h"
 #include "sae_par.h"
-#include "star/hds.h"
 #include "star/ndg.h"
 #include "star/grp.h"
 #include "star/kaplibs.h"
@@ -91,14 +92,14 @@
 #define LEN__METHOD 20
 
 void smurf_fitsmerge(int* status) {
-   AstFitsChan *fc = NULL;    /* Merged FITS headers */
+   AstFitsChan* fc = NULL;    /* Merged FITS headers */
+   AstFitsChan* ifc = NULL;   /* FITS header from input file */
    Grp* igrp = NULL;          /* Group of input files */
-   int ondf;                  /* NDF to update */
+   int indf = NDF__NOID;      /* Input NDF */
+   int ondf = NDF__NOID;      /* NDF to update */
    int flag;                  /* Was the group expression flagged? */
    size_t i;                  /* Input file index */
    size_t isize;              /* Number of files in input group */
-   smfData* data = NULL;      /* Pointer to input data struct */
-   smfHead *hdr = NULL;       /* Pointer to data header */
 
 /* Check inherited status */
    if (*status != SAI__OK) return;
@@ -119,31 +120,32 @@ void smurf_fitsmerge(int* status) {
    for (i = 0; i < isize && *status == SAI__OK; i ++) {
       ndfBegin();
 
-      smf_open_file(NULL, igrp, i + 1, "READ",
-         SMF__NOTTSERIES | SMF__NOCREATE_DATA |
-         SMF__NOCREATE_FTS | SMF__NOFIX_METADATA,
-         &data, status);
+      ndgNdfas(igrp, i + 1, "READ", &indf, status);
 
       if (*status != SAI__OK) {
          errRep(FUNC_NAME, "Could not open input file.", status);
-         break;
-      }
-      else if ((hdr = data->hdr) == NULL) {
-         *status = SAI__ERROR;
-         errRep(FUNC_NAME, "No smfHead associated with smfData.", status);
+         ndfEnd(status);
          break;
       }
 
-      smf_fits_outhdr(hdr->fitshdr, &fc, status);
+      kpgGtfts(indf, &ifc, status);
 
-      smf_close_file(NULL, &data, status);
+      if (*status != SAI__OK) {
+         errRep(FUNC_NAME, "Could not read FITS header.", status);
+         ndfEnd(status);
+         break;
+      }
+
+      smf_fits_outhdr(ifc, &fc, status);
+
+      ndfAnnul(&indf, status);
 
       ndfEnd(status);
    }
 
 /* Close any input data file that is still open due to an early exit from
    the above loop. */
-   if (data != NULL) smf_close_file(NULL, &data, status);
+   if (indf != NDF__NOID) ndfAnnul(&indf, status);
 
 /* Write the merged FITS headers into the output file. */
    kpgPtfts(ondf, fc, status);
