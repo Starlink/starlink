@@ -31,6 +31,9 @@
 *     NDF = NDF (Read and Write)
 *          File to receive merged FITS headers.
 
+*  Related Applications:
+*     KAPPA: FITSLIST, FITSMOD
+
 *  Authors:
 *     Graham Bell (JAC)
 *     {enter_new_authors_here}
