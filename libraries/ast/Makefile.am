@@ -568,7 +568,7 @@ lib_LTLIBRARIES = \
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 dist_starnews_DATA = ast.news
-dist_pkgdata_DATA = LICENCE
+dist_pkgdata_DATA = COPYING COPYING.LESSER COPYING.LIB
 
 # Make all library code position independent by default. This is handy for
 # creating shareable libraries from the static ones (Java JNI libraries).
