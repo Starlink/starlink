@@ -29,6 +29,7 @@
 *     2012-02-08 (TIMJ):
 *        Initial version. Define all SLA prototypes in PAL form even
 *        though none are implemented.
+*        Adapted with permission from the Fortran SLALIB library.
 *     {enter_further_changes_here}
 
 *  Copyright:

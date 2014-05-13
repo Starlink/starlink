@@ -72,6 +72,7 @@
 *  History:
 *     2012-02-10 (TIMJ):
 *        Initial version
+*        Adapted with permission from the Fortran SLALIB library.
 *     2012-03-23 (TIMJ):
 *        Update prologue.
 *     2012-05-09 (DSBJ):

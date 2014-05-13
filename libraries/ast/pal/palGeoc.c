@@ -39,6 +39,7 @@
 *  History:
 *     2012-03-01 (TIMJ):
 *        Initial version moved from palOne2One
+*        Adapted with permission from the Fortran SLALIB library.
 *     {enter_further_changes_here}
 
 *  Copyright:

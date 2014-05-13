@@ -29,6 +29,7 @@
 *  History:
 *     2012-02-08 (TIMJ):
 *        Initial version.
+*        Adapted with permission from the Fortran SLALIB library.
 *     2012-04-13 (DSB):
 *        Added PAL__DR2H and PAL__DR2S
 *     {enter_further_changes_here}

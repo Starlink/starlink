@@ -37,6 +37,7 @@
 *  History:
 *     2012-02-10 (DSB):
 *        Initial version with documentation taken from Fortran SLA
+*        Adapted with permission from the Fortran SLALIB library.
 *     {enter_further_changes_here}
 
 *  Copyright:

@@ -35,6 +35,7 @@
 *  History:
 *     2012-02-10 (PTW):
 *        Initial version.
+*        Adapted with permission from the Fortran SLALIB library.
 *     {enter_further_changes_here}
 
 *  Copyright:

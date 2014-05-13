@@ -40,6 +40,7 @@
 *  History:
 *     2012-02-16 (DSB):
 *        Initial version.
+*        Adapted with permission from the Fortran SLALIB library.
 *     {enter_further_changes_here}
 
 *  Copyright:
