@@ -54,6 +54,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'USER_ERR'
 
@@ -350,18 +351,24 @@ C
 *  Call IRISSTOKES for the first pair of frames (0 and 45) and
 *  derive the U stokes parameter
 
-                    CALL TSP_IRISSTOKES(DIMS(1),DIMS(2),%VAL(IPTR),
-     :                %VAL(IPTR2),X1,Y1,WIDTH,HEIGHT,XSEP,YSEP,
-     :                %VAL(T1PTR),%VAL(UPTR),
-     :                %VAL(XPTR),%VAL(OXPTR),%VAL(YPTR),%VAL(OYPTR))
+                    CALL TSP_IRISSTOKES(DIMS(1),DIMS(2),
+     :       %VAL(CNF_PVAL(IPTR)),
+     :                %VAL(CNF_PVAL(IPTR2)),X1,Y1,WIDTH,HEIGHT,XSEP,
+     :       YSEP,
+     :                %VAL(CNF_PVAL(T1PTR)),%VAL(CNF_PVAL(UPTR)),
+     :                %VAL(CNF_PVAL(XPTR)),%VAL(CNF_PVAL(OXPTR)),
+     :       %VAL(CNF_PVAL(YPTR)),%VAL(CNF_PVAL(OYPTR)))
 
 *  Call IRISSTOKES for the second pair of frames (22.5 and 67.5) and
 *  derive the Q stokes parameter
 
-                    CALL TSP_IRISSTOKES(DIMS(1),DIMS(2),%VAL(IPTR3),
-     :                %VAL(IPTR4),X1,Y1,WIDTH,HEIGHT,XSEP,YSEP,
-     :                %VAL(T2PTR),%VAL(QPTR),
-     :                %VAL(XPTR),%VAL(OXPTR),%VAL(YPTR),%VAL(OYPTR))
+                    CALL TSP_IRISSTOKES(DIMS(1),DIMS(2),
+     :       %VAL(CNF_PVAL(IPTR3)),
+     :                %VAL(CNF_PVAL(IPTR4)),X1,Y1,WIDTH,HEIGHT,XSEP,
+     :       YSEP,
+     :                %VAL(CNF_PVAL(T2PTR)),%VAL(CNF_PVAL(QPTR)),
+     :                %VAL(CNF_PVAL(XPTR)),%VAL(CNF_PVAL(OXPTR)),
+     :       %VAL(CNF_PVAL(YPTR)),%VAL(CNF_PVAL(OYPTR)))
                 ELSE
 
 *  Alternative versions for the scaling algorithm
@@ -369,25 +376,33 @@ C
 *  Call CCD2STOKES for the first pair of frames (0 and 45) and
 *  derive the U stokes parameter
 
-                    CALL TSP_IRISSTOKES2(DIMS(1),DIMS(2),%VAL(IPTR),
-     :                %VAL(IPTR2),X1,Y1,WIDTH,HEIGHT,XSEP,YSEP,
-     :                %VAL(T1PTR),%VAL(UPTR),
-     :                %VAL(XPTR),%VAL(OXPTR),%VAL(YPTR),%VAL(OYPTR))
+                    CALL TSP_IRISSTOKES2(DIMS(1),DIMS(2),
+     :       %VAL(CNF_PVAL(IPTR)),
+     :                %VAL(CNF_PVAL(IPTR2)),X1,Y1,WIDTH,HEIGHT,XSEP,
+     :       YSEP,
+     :                %VAL(CNF_PVAL(T1PTR)),%VAL(CNF_PVAL(UPTR)),
+     :                %VAL(CNF_PVAL(XPTR)),%VAL(CNF_PVAL(OXPTR)),
+     :       %VAL(CNF_PVAL(YPTR)),%VAL(CNF_PVAL(OYPTR)))
 
 *  Call IRISSTOKES for the second pair of frames (22.5 and 67.5) and
 *  derive the Q stokes parameter
 
-                    CALL TSP_IRISSTOKES2(DIMS(1),DIMS(2),%VAL(IPTR3),
-     :                %VAL(IPTR4),X1,Y1,WIDTH,HEIGHT,XSEP,YSEP,
-     :                %VAL(T2PTR),%VAL(QPTR),
-     :                %VAL(XPTR),%VAL(OXPTR),%VAL(YPTR),%VAL(OYPTR))
+                    CALL TSP_IRISSTOKES2(DIMS(1),DIMS(2),
+     :       %VAL(CNF_PVAL(IPTR3)),
+     :                %VAL(CNF_PVAL(IPTR4)),X1,Y1,WIDTH,HEIGHT,XSEP,
+     :       YSEP,
+     :                %VAL(CNF_PVAL(T2PTR)),%VAL(CNF_PVAL(QPTR)),
+     :                %VAL(CNF_PVAL(XPTR)),%VAL(CNF_PVAL(OXPTR)),
+     :       %VAL(CNF_PVAL(YPTR)),%VAL(CNF_PVAL(OYPTR)))
 
                 ENDIF
 
 *  Merge the Q and U data
 
-                CALL TSP_IRISMERGE(WIDTH,HEIGHT,%VAL(T1PTR),%VAL(T2PTR),
-     :           %VAL(OIPTR),%VAL(QPTR),%VAL(UPTR),STATUS)
+                CALL TSP_IRISMERGE(WIDTH,HEIGHT,%VAL(CNF_PVAL(T1PTR)),
+     :       %VAL(CNF_PVAL(T2PTR)),
+     :           %VAL(CNF_PVAL(OIPTR)),%VAL(CNF_PVAL(QPTR)),
+     :       %VAL(CNF_PVAL(UPTR)),STATUS)
              ENDIF
 
 *  Unmap output arrays and annul locators
@@ -438,6 +453,7 @@ C
 *+
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'PRM_PAR'
 

@@ -36,6 +36,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'USER_ERR'
 
@@ -83,7 +84,8 @@ C
 
 *  Select range for subset in Lambda
       IF (STATUS .EQ. SAI__OK) THEN
-          CALL TSP_SUBLRANGE(LSIZE,%VAL(LPTR),XSTART,XFIN,STATUS)
+          CALL TSP_SUBLRANGE(LSIZE,%VAL(CNF_PVAL(LPTR)),XSTART,XFIN,
+     :       STATUS)
       ENDIF
 
 *  Calculate new size in the wavelength axis
@@ -102,7 +104,8 @@ C
 
 *  Get limits for subset in time axis
           IF (STATUS .EQ. SAI__OK) THEN
-              CALL TSP_SUBTRANGE(TSIZE,%VAL(TPTR),YSTART,YFIN,STATUS)
+              CALL TSP_SUBTRANGE(TSIZE,%VAL(CNF_PVAL(TPTR)),YSTART,YFIN,
+     :       STATUS)
           ENDIF
 
 *  Calculate new size for the time axis
@@ -149,7 +152,8 @@ C
 
       CALL TSP_MAP_DATA(OLOC,'WRITE',OPTR,ODLOC,STATUS)
       IF (STATUS .EQ. SAI__OK) THEN
-          CALL TSP_GEN_MOVE(NLSIZE*NTSIZE,%VAL(DPTR),%VAL(OPTR))
+          CALL TSP_GEN_MOVE(NLSIZE*NTSIZE,%VAL(CNF_PVAL(DPTR)),
+     :       %VAL(CNF_PVAL(OPTR)))
       ENDIF
       CALL TSP_UNMAP(ODLOC,STATUS)
       CALL TSP_UNMAP(DLOC,STATUS)
@@ -159,7 +163,8 @@ C
       IF (VARIANCE) THEN
           CALL TSP_MAP_VAR(OLOC,'WRITE',OPTR,ODLOC,STATUS)
           IF (STATUS .EQ. SAI__OK) THEN
-              CALL TSP_GEN_MOVE(NLSIZE*NTSIZE,%VAL(VPTR),%VAL(OPTR))
+              CALL TSP_GEN_MOVE(NLSIZE*NTSIZE,%VAL(CNF_PVAL(VPTR)),
+     :       %VAL(CNF_PVAL(OPTR)))
           ENDIF
           CALL TSP_UNMAP(ODLOC,STATUS)
           CALL TSP_UNMAP(VLOC,STATUS)
@@ -202,7 +207,8 @@ C
           IF (STATUS .EQ. SAI__OK) THEN
 
 *  Copy Q stokes data
-              CALL TSP_GEN_MOVE(NLSIZE*NTSIZE,%VAL(DPTR),%VAL(OPTR))
+              CALL TSP_GEN_MOVE(NLSIZE*NTSIZE,%VAL(CNF_PVAL(DPTR)),
+     :       %VAL(CNF_PVAL(OPTR)))
           ENDIF
 
 *  Unmap arrays
@@ -215,7 +221,8 @@ C
               IF (STATUS .EQ. SAI__OK) THEN
 
 *  Copy the Q stokes variance
-                  CALL TSP_GEN_MOVE(NLSIZE*NTSIZE,%VAL(VPTR),%VAL(OPTR))
+                  CALL TSP_GEN_MOVE(NLSIZE*NTSIZE,%VAL(CNF_PVAL(VPTR)),
+     :       %VAL(CNF_PVAL(OPTR)))
               ENDIF
 
 *  Unmap arrays
@@ -260,7 +267,8 @@ C
           IF (STATUS .EQ. SAI__OK) THEN
 
 *  Copy the U Stokes data
-              CALL TSP_GEN_MOVE(NLSIZE*NTSIZE,%VAL(DPTR),%VAL(OPTR))
+              CALL TSP_GEN_MOVE(NLSIZE*NTSIZE,%VAL(CNF_PVAL(DPTR)),
+     :       %VAL(CNF_PVAL(OPTR)))
           ENDIF
 
 *  Unmap arrays
@@ -273,7 +281,8 @@ C
               IF (STATUS .EQ. SAI__OK) THEN
 
 *  Copy the U Stokes variance
-                  CALL TSP_GEN_MOVE(NLSIZE*NTSIZE,%VAL(VPTR),%VAL(OPTR))
+                  CALL TSP_GEN_MOVE(NLSIZE*NTSIZE,%VAL(CNF_PVAL(VPTR)),
+     :       %VAL(CNF_PVAL(OPTR)))
               ENDIF
 
 *  Unmap the arrays
@@ -318,7 +327,8 @@ C
           IF (STATUS .EQ. SAI__OK) THEN
 
 *  Copy the V stokes data
-              CALL TSP_GEN_MOVE(NLSIZE*NTSIZE,%VAL(DPTR),%VAL(OPTR))
+              CALL TSP_GEN_MOVE(NLSIZE*NTSIZE,%VAL(CNF_PVAL(DPTR)),
+     :       %VAL(CNF_PVAL(OPTR)))
           ENDIF
 
 *  Unmap the arrays
@@ -331,7 +341,8 @@ C
               IF (STATUS .EQ. SAI__OK) THEN
 
 *  Copy the V stokes variance
-                  CALL TSP_GEN_MOVE(NLSIZE*NTSIZE,%VAL(VPTR),%VAL(OPTR))
+                  CALL TSP_GEN_MOVE(NLSIZE*NTSIZE,%VAL(CNF_PVAL(VPTR)),
+     :       %VAL(CNF_PVAL(OPTR)))
               ENDIF
 
 *  Unmap the arrays
@@ -351,7 +362,8 @@ C
 
       CALL TSP_MAP_LAMBDA(OLOC,'WRITE',OPTR,ODLOC,STATUS)
       IF (STATUS .EQ. SAI__OK) THEN
-          CALL TSP_GEN_MOVE(NLSIZE,%VAL(LPTR+4*(XSTART-1)),%VAL(OPTR))
+          CALL TSP_GEN_MOVE(NLSIZE,%VAL(CNF_PVAL(LPTR+4*(XSTART-1))),
+     :       %VAL(CNF_PVAL(OPTR)))
       ENDIF
 
 *  Unmap the arrays
@@ -367,8 +379,9 @@ C
       IF (ACTDIM .GT. 1) THEN
           CALL TSP_MAP_TIME(OLOC,'WRITE',OPTR,ODLOC,STATUS)
           IF (STATUS .EQ. SAI__OK) THEN
-            CALL TSP_GEN_MOVE(2*NTSIZE,%VAL(TPTR+8*(YSTART-1)),
-     :             %VAL(OPTR))
+            CALL TSP_GEN_MOVE(2*NTSIZE,
+     :       %VAL(CNF_PVAL(TPTR+8*(YSTART-1))),
+     :             %VAL(CNF_PVAL(OPTR)))
           ENDIF
 
 *  Unmap arrays

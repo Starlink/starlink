@@ -38,6 +38,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'USER_ERR'
 
@@ -134,7 +135,8 @@ C
 *  Copy the X axis
 
          IF (STATUS .EQ. SAI__OK) THEN
-             CALL TSP_XCOPY(SIZE,%VAL(IPTR),%VAL(XPTR))
+             CALL TSP_XCOPY(SIZE,%VAL(CNF_PVAL(IPTR)),
+     :       %VAL(CNF_PVAL(XPTR)))
          ENDIF
 
 *  Unmap output arrays and annul locators

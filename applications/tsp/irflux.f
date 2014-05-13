@@ -46,6 +46,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'USER_ERR'
 
@@ -186,8 +187,9 @@ C
 *  Calibrate Intensity data
          IF (STATUS .EQ. SAI__OK) THEN
              CALL TSP_IRFLUX(ERROR1,ERROR2,SIZE,FLAM,WAVE,TEMP,
-     :          %VAL(DPTR),%VAL(DEPTR),%VAL(CPTR),%VAL(CEPTR),
-     :          %VAL(XPTR))
+     :          %VAL(CNF_PVAL(DPTR)),%VAL(CNF_PVAL(DEPTR)),
+     :       %VAL(CNF_PVAL(CPTR)),%VAL(CNF_PVAL(CEPTR)),
+     :          %VAL(CNF_PVAL(XPTR)))
          ENDIF
 
 *  Unmap the arrays
@@ -220,8 +222,9 @@ C
 *   Calibrate stokes data
              IF (STATUS .EQ. SAI__OK) THEN
                  CALL TSP_IRFLUX(ERROR1,ERROR2,SIZE,FLAM,WAVE,TEMP,
-     :             %VAL(DPTR),%VAL(DEPTR),%VAL(CPTR),%VAL(CEPTR),
-     :             %VAL(XPTR))
+     :             %VAL(CNF_PVAL(DPTR)),%VAL(CNF_PVAL(DEPTR)),
+     :       %VAL(CNF_PVAL(CPTR)),%VAL(CNF_PVAL(CEPTR)),
+     :             %VAL(CNF_PVAL(XPTR)))
              ENDIF
 
 *   Unmap arrays
@@ -248,8 +251,9 @@ C
 *  Calibrate U Stokes data
              IF (STATUS .EQ. SAI__OK) THEN
                  CALL TSP_IRFLUX(ERROR1,ERROR2,SIZE,FLAM,WAVE,TEMP,
-     :             %VAL(DPTR),%VAL(DEPTR),%VAL(CPTR),%VAL(CEPTR),
-     :             %VAL(XPTR))
+     :             %VAL(CNF_PVAL(DPTR)),%VAL(CNF_PVAL(DEPTR)),
+     :       %VAL(CNF_PVAL(CPTR)),%VAL(CNF_PVAL(CEPTR)),
+     :             %VAL(CNF_PVAL(XPTR)))
              ENDIF
 
 *  Unmap arrays
@@ -276,8 +280,9 @@ C
 *  Calibrate V Stokes data
              IF (STATUS .EQ. SAI__OK) THEN
                  CALL TSP_IRFLUX(ERROR1,ERROR2,SIZE,FLAM,WAVE,TEMP,
-     :             %VAL(DPTR),%VAL(DEPTR),%VAL(CPTR),%VAL(CEPTR),
-     :             %VAL(XPTR))
+     :             %VAL(CNF_PVAL(DPTR)),%VAL(CNF_PVAL(DEPTR)),
+     :       %VAL(CNF_PVAL(CPTR)),%VAL(CNF_PVAL(CEPTR)),
+     :             %VAL(CNF_PVAL(XPTR)))
              ENDIF
 
 *  Unmap arrays

@@ -48,6 +48,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'USER_ERR'
 
@@ -94,8 +95,8 @@ C
          CALL PAR_GET0L('LOG',LOGWR,STATUS)
 
 *  Get wavelength start, end and number of bins parameters
-         CALL PAR_DEF0R('WSTART',%VAL(XPTR),STATUS)
-         CALL PAR_DEF0R('WEND',%VAL(XPTR+4*(SIZE-1)),STATUS)
+         CALL PAR_DEF0R('WSTART',%VAL(CNF_PVAL(XPTR)),STATUS)
+         CALL PAR_DEF0R('WEND',%VAL(CNF_PVAL(XPTR+4*(SIZE-1))),STATUS)
          CALL PAR_GET0R('WSTART',WSTART,STATUS)
          CALL PAR_GET0R('WEND',WEND,STATUS)
          CALL PAR_DEF0I('BINS',SIZE,STATUS)
@@ -139,7 +140,7 @@ C
          CALL TSP_MAP_LAMBDA(OLOC,'WRITE',RXPTR,RXLOC,STATUS)
 
 *  Fill the output wavelength axis with new values
-         CALL FIG_WFILL(WSTART,WEND,LOGWR,NBINR,%VAL(RXPTR))
+         CALL FIG_WFILL(WSTART,WEND,LOGWR,NBINR,%VAL(CNF_PVAL(RXPTR)))
 
          IF (NDIM .EQ. 2) THEN
             NY = DIMS(2)
@@ -150,7 +151,8 @@ C
 *  Scrunch Intensity array
 
          IF (STATUS .EQ. SAI__OK) THEN
-            CALL TSP_SCRUNCH(ILOC,OLOC,%VAL(XPTR),%VAL(RXPTR),SIZE,
+            CALL TSP_SCRUNCH(ILOC,OLOC,%VAL(CNF_PVAL(XPTR)),
+     :       %VAL(CNF_PVAL(RXPTR)),SIZE,
      :             NBINR,NY,QUAD,LOGWR,FLUX,STATUS)
 
 *  Scrunch the Stokes arrays
@@ -163,7 +165,8 @@ C
                CALL TSP_GET_STOKES(OLOC,'Q',SOLOC,STATUS)
 
 *  Scrunch the Q stokes parameter
-               CALL TSP_SCRUNCH(SILOC,SOLOC,%VAL(XPTR),%VAL(RXPTR),
+               CALL TSP_SCRUNCH(SILOC,SOLOC,%VAL(CNF_PVAL(XPTR)),
+     :       %VAL(CNF_PVAL(RXPTR)),
      :             SIZE,NBINR,NY,QUAD,LOGWR,FLUX,STATUS)
 
 *  Annul locators
@@ -177,7 +180,8 @@ C
                CALL TSP_GET_STOKES(OLOC,'U',SOLOC,STATUS)
 
 *  Scrunch the U stokes parameter
-               CALL TSP_SCRUNCH(SILOC,SOLOC,%VAL(XPTR),%VAL(RXPTR),
+               CALL TSP_SCRUNCH(SILOC,SOLOC,%VAL(CNF_PVAL(XPTR)),
+     :       %VAL(CNF_PVAL(RXPTR)),
      :             SIZE,NBINR,NY,QUAD,LOGWR,FLUX,STATUS)
 
 *  Annul locators
@@ -191,7 +195,8 @@ C
                CALL TSP_GET_STOKES(OLOC,'V',SOLOC,STATUS)
 
 *  Scrunch the V stokes parameter
-               CALL TSP_SCRUNCH(SILOC,SOLOC,%VAL(XPTR),%VAL(RXPTR),
+               CALL TSP_SCRUNCH(SILOC,SOLOC,%VAL(CNF_PVAL(XPTR)),
+     :       %VAL(CNF_PVAL(RXPTR)),
      :             SIZE,NBINR,NY,QUAD,LOGWR,FLUX,STATUS)
 
 *  Annul locators
@@ -241,6 +246,7 @@ C
 *+
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
 
 *  Parameters
@@ -285,14 +291,16 @@ C
       DO I=1,NY
 
 *  Do the rebinning
-         CALL TSP_REBIN(IMODE,IQUAD,%VAL(IPTR),NX1,%VAL(OPTR),NX2,
+         CALL TSP_REBIN(IMODE,IQUAD,%VAL(CNF_PVAL(IPTR)),NX1,
+     :       %VAL(CNF_PVAL(OPTR)),NX2,
      :         NADD,SSKEW,FLUX,X1,X2,.FALSE.,LOG,.FALSE.)
          OPTR = OPTR+NX2*4
          IPTR = IPTR+NX1*4
          IF (VARIANCE) THEN
 
 *  Rebin the variances
-            CALL TSP_REBIN(IMODE,IQUAD,%VAL(VIPTR),NX1,%VAL(VOPTR),
+            CALL TSP_REBIN(IMODE,IQUAD,%VAL(CNF_PVAL(VIPTR)),NX1,
+     :       %VAL(CNF_PVAL(VOPTR)),
      :         NX2,NADD,SSKEW,FLUX,X1,X2,.FALSE.,LOG,.TRUE.)
             VOPTR = VOPTR+NX2*4
             VIPTR = VIPTR+NX1*4

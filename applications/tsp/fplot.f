@@ -51,6 +51,7 @@ C    9/12/1991   Handle bad values.   JAB/AAO
 C
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
 
 *  Status argument
@@ -161,9 +162,12 @@ C
 *  Do the binning and get the maximum and minimum values
 
       IF (STATUS .EQ. SAI__OK) THEN
-         CALL TSP_FPBIN(SIZE,%VAL(IPTR),%VAL(QPTR),%VAL(UPTR),
-     :     %VAL(QEPTR),%VAL(UEPTR),%VAL(T1PTR),CIRC,BINSIZE,STATUS)
-         CALL TSP_FPSCALE(SIZE,%VAL(IPTR),%VAL(T1PTR),IMIN,IMAX,
+         CALL TSP_FPBIN(SIZE,%VAL(CNF_PVAL(IPTR)),%VAL(CNF_PVAL(QPTR)),
+     :       %VAL(CNF_PVAL(UPTR)),
+     :     %VAL(CNF_PVAL(QEPTR)),%VAL(CNF_PVAL(UEPTR)),
+     :       %VAL(CNF_PVAL(T1PTR)),CIRC,BINSIZE,STATUS)
+         CALL TSP_FPSCALE(SIZE,%VAL(CNF_PVAL(IPTR)),
+     :       %VAL(CNF_PVAL(T1PTR)),IMIN,IMAX,
      :     PMIN,PMAX,STATUS)
       ENDIF
 
@@ -184,8 +188,8 @@ C
 *  Do the plot
 
       IF (STATUS .EQ. SAI__OK) THEN
-        CALL TSP_FPLOT(SIZE,%VAL(IPTR),%VAL(T1PTR),
-     :   %VAL(LPTR),PMIN,PMAX,IMIN,IMAX,XLABEL,YLABEL,STATUS)
+        CALL TSP_FPLOT(SIZE,%VAL(CNF_PVAL(IPTR)),%VAL(CNF_PVAL(T1PTR)),
+     :   %VAL(CNF_PVAL(LPTR)),PMIN,PMAX,IMIN,IMAX,XLABEL,YLABEL,STATUS)
       ENDIF
 
 *  Tidy up
@@ -230,6 +234,7 @@ C
        IMPLICIT NONE
 
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'PRM_PAR'
 
@@ -331,6 +336,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'PRM_PAR'
 
@@ -468,6 +474,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'PRM_PAR'
 

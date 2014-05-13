@@ -39,6 +39,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'USER_ERR'
 
@@ -179,14 +180,17 @@ C
 
              IF (STATUS .EQ. SAI__OK) THEN
                 CALL TSP_RCGS2_COPY(NPLATES,NPOINTS,NBEAMS,NCYCLES,
-     :           %VAL(IPTR),%VAL(OIPTR),%VAL(OVPTR),%VAL(QPTR),
-     :           %VAL(QVPTR),%VAL(UPTR),%VAL(UVPTR),NSIGMA)
+     :           %VAL(CNF_PVAL(IPTR)),%VAL(CNF_PVAL(OIPTR)),
+     :       %VAL(CNF_PVAL(OVPTR)),%VAL(CNF_PVAL(QPTR)),
+     :           %VAL(CNF_PVAL(QVPTR)),%VAL(CNF_PVAL(UPTR)),
+     :       %VAL(CNF_PVAL(UVPTR)),NSIGMA)
              ENDIF
 
 *  Copy the wavelength axis data
 
              CALL TSP_MAP_LAMBDA(OLOC,'WRITE',DPTR,DLOC,STATUS)
-             CALL GEN_MOVE(4*NPOINTS,%VAL(XPTR),%VAL(DPTR))
+             CALL GEN_MOVE(4*NPOINTS,%VAL(CNF_PVAL(XPTR)),
+     :       %VAL(CNF_PVAL(DPTR)))
              CALL TSP_WLU_LAMBDA(OLOC,XLABEL,XUNITS,STATUS)
              CALL TSP_UNMAP(DLOC,STATUS)
 

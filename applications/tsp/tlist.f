@@ -37,6 +37,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'USER_ERR'
       INTEGER STATUS
@@ -89,7 +90,8 @@ C
 
 *   Find X plotting limits
 
-          CALL TSP_PHSXLIMITS(%VAL(XPTR),STRT,FIN,%VAL(XXPTR),STATUS)
+          CALL TSP_PHSXLIMITS(%VAL(CNF_PVAL(XPTR)),STRT,FIN,
+     :       %VAL(CNF_PVAL(XXPTR)),STATUS)
           SIZE = FIN-STRT+1
           FSIZE = SIZE
 
@@ -119,8 +121,9 @@ C
 *   List data
 
           IF (STATUS .EQ. SAI__OK) THEN
-              CALL TSP_TLIST(SIZE,%VAL(XXPTR),%VAL(IPTR),%VAL(QPTR),
-     :          %VAL(UPTR),%VAL(VPTR),FD,STATUS)
+              CALL TSP_TLIST(SIZE,%VAL(CNF_PVAL(XXPTR)),
+     :       %VAL(CNF_PVAL(IPTR)),%VAL(CNF_PVAL(QPTR)),
+     :          %VAL(CNF_PVAL(UPTR)),%VAL(CNF_PVAL(VPTR)),FD,STATUS)
           ENDIF
 
 *  Close file

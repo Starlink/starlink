@@ -39,6 +39,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'USER_ERR'
 
@@ -132,9 +133,11 @@ C
 *  for the new intensity
 
       IF (STATUS .EQ. SAI__OK) THEN
-         CALL TSP_QUMERGE(SIZE,%VAL(QPTR),%VAL(UPTR),%VAL(QSPTR),
-     :      %VAL(USPTR),%VAL(QVPTR),%VAL(UVPTR),%VAL(OUSPTR),
-     :      %VAL(OUVPTR),STATUS)
+         CALL TSP_QUMERGE(SIZE,%VAL(CNF_PVAL(QPTR)),
+     :       %VAL(CNF_PVAL(UPTR)),%VAL(CNF_PVAL(QSPTR)),
+     :      %VAL(CNF_PVAL(USPTR)),%VAL(CNF_PVAL(QVPTR)),
+     :       %VAL(CNF_PVAL(UVPTR)),%VAL(CNF_PVAL(OUSPTR)),
+     :      %VAL(CNF_PVAL(OUVPTR)),STATUS)
       ENDIF
 
 *  Tidy up
@@ -190,6 +193,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'PRM_PAR'
 

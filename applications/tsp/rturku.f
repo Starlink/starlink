@@ -45,6 +45,7 @@ C
 *  Status argument
       INTEGER STATUS
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'USER_ERR'
 
@@ -294,10 +295,11 @@ C
          CALL TSP_MAP_VAR(LOC,'WRITE',VPTR,VLOC,STATUS)
 
 *  Copy the intensity data
-         CALL TSP_TURKUCOPY(5,BIN,I,MAXLEN,%VAL(DPTR),STATUS)
+         CALL TSP_TURKUCOPY(5,BIN,I,MAXLEN,%VAL(CNF_PVAL(DPTR)),STATUS)
 
 *  Copy the intensity variance
-         CALL TSP_TURKUCOPY(5,BIN,IE,MAXLEN,%VAL(VPTR),STATUS)
+         CALL TSP_TURKUCOPY(5,BIN,IE,MAXLEN,%VAL(CNF_PVAL(VPTR)),
+     :       STATUS)
 
 *  Unmap the arrays
          CALL TSP_UNMAP(DLOC,STATUS)
@@ -315,10 +317,11 @@ C
          CALL TSP_MAP_VAR(SLOC,'WRITE',VPTR,VLOC,STATUS)
 
 *  Copy the Q stokes data
-         CALL TSP_TURKUCOPY(5,BIN,Q,MAXLEN,%VAL(DPTR),STATUS)
+         CALL TSP_TURKUCOPY(5,BIN,Q,MAXLEN,%VAL(CNF_PVAL(DPTR)),STATUS)
 
 *  Copy the Q stokes variance
-         CALL TSP_TURKUCOPY(5,BIN,QE,MAXLEN,%VAL(VPTR),STATUS)
+         CALL TSP_TURKUCOPY(5,BIN,QE,MAXLEN,%VAL(CNF_PVAL(VPTR)),
+     :       STATUS)
 
 *  Unmap the arrays
          CALL TSP_UNMAP(DLOC,STATUS)
@@ -338,10 +341,11 @@ C
          CALL TSP_MAP_VAR(SLOC,'WRITE',VPTR,VLOC,STATUS)
 
 *  Copy the U stokes data
-         CALL TSP_TURKUCOPY(5,BIN,U,MAXLEN,%VAL(DPTR),STATUS)
+         CALL TSP_TURKUCOPY(5,BIN,U,MAXLEN,%VAL(CNF_PVAL(DPTR)),STATUS)
 
 *  Copy the U stokes variance
-         CALL TSP_TURKUCOPY(5,BIN,UE,MAXLEN,%VAL(VPTR),STATUS)
+         CALL TSP_TURKUCOPY(5,BIN,UE,MAXLEN,%VAL(CNF_PVAL(VPTR)),
+     :       STATUS)
 
 *  Unmap the U stokes data
          CALL TSP_UNMAP(DLOC,STATUS)
@@ -362,10 +366,12 @@ C
             CALL TSP_MAP_VAR(SLOC,'WRITE',VPTR,VLOC,STATUS)
 
 *  Copy the V stokes data
-            CALL TSP_TURKUCOPY(5,BIN,V,MAXLEN,%VAL(DPTR),STATUS)
+            CALL TSP_TURKUCOPY(5,BIN,V,MAXLEN,%VAL(CNF_PVAL(DPTR)),
+     :       STATUS)
 
 *  Copy the V stokes variance
-            CALL TSP_TURKUCOPY(5,BIN,VE,MAXLEN,%VAL(VPTR),STATUS)
+            CALL TSP_TURKUCOPY(5,BIN,VE,MAXLEN,%VAL(CNF_PVAL(VPTR)),
+     :       STATUS)
 
 *  Unmap the arrays
             CALL TSP_UNMAP(DLOC,STATUS)
@@ -375,7 +381,7 @@ C
 
 *  Copy wavelength axis data
          CALL TSP_MAP_LAMBDA(LOC,'WRITE',DPTR,DLOC,STATUS)
-         CALL TSP_GEN_MOVE(5,WAVES,%VAL(DPTR))
+         CALL TSP_GEN_MOVE(5,WAVES,%VAL(CNF_PVAL(DPTR)))
 
 *  Set the units of the wavelength axis
          CALL TSP_WLU_LAMBDA(LOC,'Wavelength','Angstroms',STATUS)
@@ -387,7 +393,7 @@ C
          CALL TSP_MAP_TIME(LOC,'WRITE',DPTR,DLOC,STATUS)
 
 *  Copy the time axis data
-         CALL TSP_GEN_MOVE(2*BIN,TIMES,%VAL(DPTR))
+         CALL TSP_GEN_MOVE(2*BIN,TIMES,%VAL(CNF_PVAL(DPTR)))
 
 *  Set units of the time axis
          CALL TSP_WLU_TIME(LOC,'MJD(UTC)','Days',STATUS)
@@ -422,6 +428,7 @@ C
 *+
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
 
 *  Parameters

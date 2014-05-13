@@ -48,6 +48,7 @@ C     15/3/1991   NDF version        JAB / JAC.
 C
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
 C
 C     Parameters
@@ -142,6 +143,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       CHARACTER*(DAT__SZLOC) LOC
       INTEGER STATUS
@@ -151,7 +153,7 @@ C
       DIM(1)=SIZE
       CALL DAT_MAPR(LOC,'WRITE',1,DIM,PTR,STATUS)
       IF (STATUS .EQ. SAI__OK) THEN
-          CALL TSP__FILL2(SIZE,%VAL(PTR))
+          CALL TSP__FILL2(SIZE,%VAL(CNF_PVAL(PTR)))
       ENDIF
       END
 

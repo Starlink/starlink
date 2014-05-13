@@ -39,6 +39,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'USER_ERR'
 
@@ -239,7 +240,7 @@ C
 
 *  Set the wavelength
              IF (STATUS .EQ. SAI__OK) THEN
-                 CALL GEN_MOVE(4,FL,%VAL(APTR))
+                 CALL GEN_MOVE(4,FL,%VAL(CNF_PVAL(APTR)))
              ENDIF
 
 *  Unmap the wavelength axis array
@@ -255,7 +256,8 @@ C
 
              IF (STATUS .EQ. SAI__OK) THEN
                 CALL TSP_RIRPS_COPY(NCYCLES,NPOINTS,NDWELLS,AG,IT,ZPT,
-     :           FL,DJ1,DJ2,%VAL(IPTR),%VAL(OIPTR),%VAL(XPTR))
+     :           FL,DJ1,DJ2,%VAL(CNF_PVAL(IPTR)),%VAL(CNF_PVAL(OIPTR)),
+     :       %VAL(CNF_PVAL(XPTR)))
              ENDIF
 
 *  Unmap output arrays and annul locators

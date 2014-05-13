@@ -44,6 +44,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'USER_ERR'
       INTEGER STATUS
@@ -129,9 +130,11 @@ C
 *  Do the fit
 
       IF (STATUS .EQ. SAI__OK) THEN
-          CALL TSP_CALFIT(SIZE,DEG,%VAL(IPTR),%VAL(SPTR),%VAL(VPTR),
-     :      %VAL(XPTR),%VAL(YPTR),%VAL(WPTR),%VAL(W1PTR),
-     :      %VAL(W2PTR),STATUS)
+          CALL TSP_CALFIT(SIZE,DEG,%VAL(CNF_PVAL(IPTR)),
+     :       %VAL(CNF_PVAL(SPTR)),%VAL(CNF_PVAL(VPTR)),
+     :      %VAL(CNF_PVAL(XPTR)),%VAL(CNF_PVAL(YPTR)),
+     :       %VAL(CNF_PVAL(WPTR)),%VAL(CNF_PVAL(W1PTR)),
+     :      %VAL(CNF_PVAL(W2PTR)),STATUS)
       ENDIF
 
 *  Tidy up
@@ -223,7 +226,8 @@ C              BKM/Starlink/RAL
      :                STATUS)
       IF (NDEG .NE. DEG .OR. IFAIL .NE. 1) THEN
           CALL MSG_SETI('IFAIL',IFAIL)
-          CALL MSG_OUT('MSG','PDA_DPOLFT Error - IFAIL = ^IFAIL',STATUS)
+          CALL MSG_OUT('MSG','PDA_DPOLFT Error - IFAIL = ^IFAIL',
+     :       STATUS)
           RETURN
       ENDIF
 

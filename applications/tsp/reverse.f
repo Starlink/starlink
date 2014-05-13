@@ -34,6 +34,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'USER_ERR'
 
@@ -79,7 +80,7 @@ C
 
 *  Reverse the intensity data
       IF (STATUS .EQ. SAI__OK) THEN
-          CALL TSP_REVERSE(SIZE,%VAL(SPTR))
+          CALL TSP_REVERSE(SIZE,%VAL(CNF_PVAL(SPTR)))
       ENDIF
 
 *  Unmap the data
@@ -90,7 +91,7 @@ C
 
 *  Reverse the intensity variance
       IF (STATUS .EQ. SAI__OK) THEN
-          CALL TSP_REVERSE(SIZE,%VAL(SPTR))
+          CALL TSP_REVERSE(SIZE,%VAL(CNF_PVAL(SPTR)))
       ELSE
           STATUS = SAI__OK
       ENDIF
@@ -110,7 +111,7 @@ C
 
 *  Reverse the Q stokes data
           IF (STATUS .EQ. SAI__OK) THEN
-              CALL TSP_REVERSE(SIZE,%VAL(SPTR))
+              CALL TSP_REVERSE(SIZE,%VAL(CNF_PVAL(SPTR)))
           ENDIF
 
 *  Unmap the Q stokes data
@@ -121,7 +122,7 @@ C
 
 *  Reverse the Q stokes variance
           IF (STATUS .EQ. SAI__OK) THEN
-              CALL TSP_REVERSE(SIZE,%VAL(SPTR))
+              CALL TSP_REVERSE(SIZE,%VAL(CNF_PVAL(SPTR)))
           ELSE
               STATUS = SAI__OK
           ENDIF
@@ -140,7 +141,7 @@ C
 
 *  Reverse the U stokes data
           IF (STATUS .EQ. SAI__OK) THEN
-              CALL TSP_REVERSE(SIZE,%VAL(SPTR))
+              CALL TSP_REVERSE(SIZE,%VAL(CNF_PVAL(SPTR)))
           ENDIF
 
 *  Unmap the U stokes data
@@ -151,7 +152,7 @@ C
 
 *  Reverse the U stokes variance
           IF (STATUS .EQ. SAI__OK) THEN
-              CALL TSP_REVERSE(SIZE,%VAL(SPTR))
+              CALL TSP_REVERSE(SIZE,%VAL(CNF_PVAL(SPTR)))
           ELSE
               STATUS = SAI__OK
           ENDIF
@@ -170,7 +171,7 @@ C
 
 *  Reverse the V stokes data
           IF (STATUS .EQ. SAI__OK) THEN
-              CALL TSP_REVERSE(SIZE,%VAL(SPTR))
+              CALL TSP_REVERSE(SIZE,%VAL(CNF_PVAL(SPTR)))
           ENDIF
 
 *  Unmap the V stokes data
@@ -179,7 +180,7 @@ C
 *  Map the V stokes variance
           CALL TSP_MAP_VAR(SLOC,'UPDATE',SPTR,DLOC,STATUS)
           IF (STATUS .EQ. SAI__OK) THEN
-              CALL TSP_REVERSE(SIZE,%VAL(SPTR))
+              CALL TSP_REVERSE(SIZE,%VAL(CNF_PVAL(SPTR)))
           ELSE
               STATUS = SAI__OK
           ENDIF

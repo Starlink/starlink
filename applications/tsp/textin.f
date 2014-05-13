@@ -43,6 +43,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'USER_ERR'
 
@@ -206,15 +207,16 @@ C
          ENDDO
 
          CALL TSP_TEMP(SIZE,'_REAL',APTR,ALOC,STATUS)
-         CALL TSP_AIRMASS(RM,DM,LONG,LAT,SIZE,%VAL(PTR),
-     :        %VAL(APTR),STATUS)
+         CALL TSP_AIRMASS(RM,DM,LONG,LAT,SIZE,%VAL(CNF_PVAL(PTR)),
+     :        %VAL(CNF_PVAL(APTR)),STATUS)
 
          CALL TSP_TEMP(CHANS,'_REAL',EPTR,ELOC,STATUS)
          DO I=1,CHANS
              CALL MSG_SETI('CHN',I)
              CALL MSG_OUT(' ',
      :        'Enter Extinction Coefficient for channel ^CHN',STATUS)
-             CALL PAR_GET0R('EXTCOEF',%VAL(EPTR+(I-1)*4),STATUS)
+             CALL PAR_GET0R('EXTCOEF',%VAL(CNF_PVAL(EPTR+(I-1))*4),
+     :       STATUS)
              CALL PAR_CANCL('EXTCOEF',STATUS)
          ENDDO
 
@@ -225,8 +227,8 @@ C
 *  Correct Intensity data
 
          IF (STATUS .EQ. SAI__OK) THEN
-             CALL TSP_TEXTIN(SIZE,CHANS,%VAL(APTR),
-     :                   %VAL(EPTR),%VAL(DPTR))
+             CALL TSP_TEXTIN(SIZE,CHANS,%VAL(CNF_PVAL(APTR)),
+     :                   %VAL(CNF_PVAL(EPTR)),%VAL(CNF_PVAL(DPTR)))
          ENDIF
          CALL TSP_UNMAP(DLOC,STATUS)
 
@@ -234,10 +236,10 @@ C
 
          CALL TSP_MAP_VAR(OLOC,'UPDATE',DPTR,DLOC,STATUS)
          IF (STATUS .EQ. SAI__OK) THEN
-             CALL TSP_TEXTIN(SIZE,CHANS,%VAL(APTR),
-     :                   %VAL(EPTR),%VAL(DPTR))
-             CALL TSP_TEXTIN(SIZE,CHANS,%VAL(APTR),
-     :                   %VAL(EPTR),%VAL(DPTR))
+             CALL TSP_TEXTIN(SIZE,CHANS,%VAL(CNF_PVAL(APTR)),
+     :                   %VAL(CNF_PVAL(EPTR)),%VAL(CNF_PVAL(DPTR)))
+             CALL TSP_TEXTIN(SIZE,CHANS,%VAL(CNF_PVAL(APTR)),
+     :                   %VAL(CNF_PVAL(EPTR)),%VAL(CNF_PVAL(DPTR)))
              CALL TSP_UNMAP(DLOC,STATUS)
          ELSE
              CALL ERR_ANNUL(STATUS)
@@ -255,8 +257,8 @@ C
              CALL TSP_GET_STOKES(OLOC,'Q',SLOC,STATUS)
              CALL TSP_MAP_DATA(SLOC,'UPDATE',DPTR,DLOC,STATUS)
              IF (STATUS .EQ. SAI__OK) THEN
-                 CALL TSP_TEXTIN(SIZE,CHANS,%VAL(APTR),
-     :                   %VAL(EPTR),%VAL(DPTR))
+                 CALL TSP_TEXTIN(SIZE,CHANS,%VAL(CNF_PVAL(APTR)),
+     :                   %VAL(CNF_PVAL(EPTR)),%VAL(CNF_PVAL(DPTR)))
              ENDIF
              CALL TSP_UNMAP(DLOC,STATUS)
 
@@ -264,10 +266,10 @@ C
 
              CALL TSP_MAP_VAR(SLOC,'UPDATE',DPTR,DLOC,STATUS)
              IF (STATUS .EQ. SAI__OK) THEN
-                 CALL TSP_TEXTIN(SIZE,CHANS,%VAL(APTR),
-     :                   %VAL(EPTR),%VAL(DPTR))
-                 CALL TSP_TEXTIN(SIZE,CHANS,%VAL(APTR),
-     :                   %VAL(EPTR),%VAL(DPTR))
+                 CALL TSP_TEXTIN(SIZE,CHANS,%VAL(CNF_PVAL(APTR)),
+     :                   %VAL(CNF_PVAL(EPTR)),%VAL(CNF_PVAL(DPTR)))
+                 CALL TSP_TEXTIN(SIZE,CHANS,%VAL(CNF_PVAL(APTR)),
+     :                   %VAL(CNF_PVAL(EPTR)),%VAL(CNF_PVAL(DPTR)))
                  CALL TSP_UNMAP(DLOC,STATUS)
              ELSE
                  CALL ERR_ANNUL(STATUS)
@@ -281,8 +283,8 @@ C
              CALL TSP_GET_STOKES(OLOC,'U',SLOC,STATUS)
              CALL TSP_MAP_DATA(SLOC,'UPDATE',DPTR,DLOC,STATUS)
              IF (STATUS .EQ. SAI__OK) THEN
-                 CALL TSP_TEXTIN(SIZE,CHANS,%VAL(APTR),
-     :                   %VAL(EPTR),%VAL(DPTR))
+                 CALL TSP_TEXTIN(SIZE,CHANS,%VAL(CNF_PVAL(APTR)),
+     :                   %VAL(CNF_PVAL(EPTR)),%VAL(CNF_PVAL(DPTR)))
              ENDIF
              CALL TSP_UNMAP(DLOC,STATUS)
 
@@ -290,10 +292,10 @@ C
 
              CALL TSP_MAP_VAR(SLOC,'UPDATE',DPTR,DLOC,STATUS)
              IF (STATUS .EQ. SAI__OK) THEN
-                 CALL TSP_TEXTIN(SIZE,CHANS,%VAL(APTR),
-     :                   %VAL(EPTR),%VAL(DPTR))
-                 CALL TSP_TEXTIN(SIZE,CHANS,%VAL(APTR),
-     :                   %VAL(EPTR),%VAL(DPTR))
+                 CALL TSP_TEXTIN(SIZE,CHANS,%VAL(CNF_PVAL(APTR)),
+     :                   %VAL(CNF_PVAL(EPTR)),%VAL(CNF_PVAL(DPTR)))
+                 CALL TSP_TEXTIN(SIZE,CHANS,%VAL(CNF_PVAL(APTR)),
+     :                   %VAL(CNF_PVAL(EPTR)),%VAL(CNF_PVAL(DPTR)))
                  CALL TSP_UNMAP(DLOC,STATUS)
              ELSE
                  CALL ERR_ANNUL(STATUS)
@@ -307,8 +309,8 @@ C
              CALL TSP_GET_STOKES(OLOC,'V',SLOC,STATUS)
              CALL TSP_MAP_DATA(SLOC,'UPDATE',DPTR,DLOC,STATUS)
              IF (STATUS .EQ. SAI__OK) THEN
-                 CALL TSP_TEXTIN(SIZE,CHANS,%VAL(APTR),
-     :                   %VAL(EPTR),%VAL(DPTR))
+                 CALL TSP_TEXTIN(SIZE,CHANS,%VAL(CNF_PVAL(APTR)),
+     :                   %VAL(CNF_PVAL(EPTR)),%VAL(CNF_PVAL(DPTR)))
              ENDIF
              CALL TSP_UNMAP(DLOC,STATUS)
 
@@ -316,10 +318,10 @@ C
 
              CALL TSP_MAP_VAR(SLOC,'UPDATE',DPTR,DLOC,STAT)
              IF (STATUS .EQ. SAI__OK) THEN
-                 CALL TSP_TEXTIN(SIZE,CHANS,%VAL(APTR),
-     :                   %VAL(EPTR),%VAL(DPTR))
-                 CALL TSP_TEXTIN(SIZE,CHANS,%VAL(APTR),
-     :                   %VAL(EPTR),%VAL(DPTR))
+                 CALL TSP_TEXTIN(SIZE,CHANS,%VAL(CNF_PVAL(APTR)),
+     :                   %VAL(CNF_PVAL(EPTR)),%VAL(CNF_PVAL(DPTR)))
+                 CALL TSP_TEXTIN(SIZE,CHANS,%VAL(CNF_PVAL(APTR)),
+     :                   %VAL(CNF_PVAL(EPTR)),%VAL(CNF_PVAL(DPTR)))
                  CALL TSP_UNMAP(DLOC,STATUS)
              ELSE
                  CALL ERR_ANNUL(STATUS)

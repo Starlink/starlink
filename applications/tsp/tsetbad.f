@@ -36,6 +36,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'USER_ERR'
 
@@ -134,8 +135,10 @@ C
 
 *  Set a pixel to bad
                   IF (X .GE. 1 .AND. X .LE. XSIZE) THEN
-                      CALL TSP_TSETBAD(CHANS,XSIZE,CHAN,X,%VAL(PTR),
-     :                  %VAL(QPTR),%VAL(UPTR),%VAL(VPTR))
+                      CALL TSP_TSETBAD(CHANS,XSIZE,CHAN,X,
+     :       %VAL(CNF_PVAL(PTR)),
+     :                  %VAL(CNF_PVAL(QPTR)),%VAL(CNF_PVAL(UPTR)),
+     :       %VAL(CNF_PVAL(VPTR)))
                   ENDIF
               ENDDO
           ENDIF

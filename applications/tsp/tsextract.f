@@ -43,6 +43,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'USER_ERR'
 
@@ -118,7 +119,7 @@ C
       CALL TSP_MAP_LAMBDA(OLOC,'WRITE',LPTR,LLOC,STATUS)
 
 *  Copy to output file
-      CALL TSP_CCDPHOT_LAMBDA(LAMBDA,%VAL(LPTR))
+      CALL TSP_CCDPHOT_LAMBDA(LAMBDA,%VAL(CNF_PVAL(LPTR)))
       CALL TSP_UNMAP(LLOC,STATUS)
 
 *  Set units of wavelength
@@ -129,7 +130,8 @@ C
 
 *  Copy the time axis
       IF (STATUS .EQ. SAI__OK) THEN
-          CALL TSP_CCDPHOT_COPYT(DIMS(3),%VAL(TPTR),%VAL(OTPTR))
+          CALL TSP_CCDPHOT_COPYT(DIMS(3),%VAL(CNF_PVAL(TPTR)),
+     :       %VAL(CNF_PVAL(OTPTR)))
       ENDIF
 
 *  Copy units and label of time axis
@@ -139,7 +141,8 @@ C
 *  Do the photometry on the frames
       IF (STATUS .EQ. SAI__OK) THEN
            CALL TSP_TSEXTRACT(DIMS(1),DIMS(2),DIMS(3),
-     :           ZEROPT,%VAL(PTR),%VAL(PPTR),%VAL(OPTR),
+     :           ZEROPT,%VAL(CNF_PVAL(PTR)),%VAL(CNF_PVAL(PPTR)),
+     :       %VAL(CNF_PVAL(OPTR)),
      :           STATUS)
       ENDIF
 

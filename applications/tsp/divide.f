@@ -40,6 +40,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'USER_ERR'
 
@@ -124,7 +125,8 @@ C
 *  Calibrate Intensity data
 
          IF (STATUS .EQ. SAI__OK) THEN
-             CALL TSP_DIVIDE(SIZE,%VAL(DPTR),%VAL(DEPTR),%VAL(CPTR))
+             CALL TSP_DIVIDE(SIZE,%VAL(CNF_PVAL(DPTR)),
+     :       %VAL(CNF_PVAL(DEPTR)),%VAL(CNF_PVAL(CPTR)))
          ENDIF
 
 *  Unmap the arrays
@@ -156,7 +158,8 @@ C
 *  Do the division
 
              IF (STATUS .EQ. SAI__OK) THEN
-              CALL TSP_DIVIDE(SIZE,%VAL(DPTR),%VAL(DEPTR),%VAL(CPTR))
+              CALL TSP_DIVIDE(SIZE,%VAL(CNF_PVAL(DPTR)),
+     :       %VAL(CNF_PVAL(DEPTR)),%VAL(CNF_PVAL(CPTR)))
              ENDIF
 
 *  Unmap the data
@@ -186,7 +189,8 @@ C
 *  Do the division
 
              IF (STATUS .EQ. SAI__OK) THEN
-              CALL TSP_DIVIDE(SIZE,%VAL(DPTR),%VAL(DEPTR),%VAL(CPTR))
+              CALL TSP_DIVIDE(SIZE,%VAL(CNF_PVAL(DPTR)),
+     :       %VAL(CNF_PVAL(DEPTR)),%VAL(CNF_PVAL(CPTR)))
              ENDIF
 
 *  Unmap data
@@ -216,7 +220,8 @@ C
 *  Do the division
 
              IF (STATUS .EQ. SAI__OK) THEN
-              CALL TSP_DIVIDE(SIZE,%VAL(DPTR),%VAL(DEPTR),%VAL(CPTR))
+              CALL TSP_DIVIDE(SIZE,%VAL(CNF_PVAL(DPTR)),
+     :       %VAL(CNF_PVAL(DEPTR)),%VAL(CNF_PVAL(CPTR)))
              ENDIF
 
 *  Unmap the data

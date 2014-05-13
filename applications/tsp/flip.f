@@ -30,6 +30,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'USER_ERR'
 
@@ -90,7 +91,7 @@ C
 *  Do the sign flip
 
       IF (STATUS .EQ. SAI__OK) THEN
-        CALL TSP_FLIP(SIZE,%VAL(SPTR))
+        CALL TSP_FLIP(SIZE,%VAL(CNF_PVAL(SPTR)))
       ENDIF
 
 *  Tidy up

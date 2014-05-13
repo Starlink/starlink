@@ -36,6 +36,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'USER_ERR'
 
@@ -110,8 +111,8 @@ C
 
 *  If everything OK do the position angle rotation
       IF (STATUS .EQ. SAI__OK) THEN
-         CALL TSP_ROTPA(SIZE,THETA,%VAL(QPTR1),
-     :       %VAL(UPTR1))
+         CALL TSP_ROTPA(SIZE,THETA,%VAL(CNF_PVAL(QPTR1)),
+     :       %VAL(CNF_PVAL(UPTR1)))
       ENDIF
 
 *  Tidy up

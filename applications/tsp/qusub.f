@@ -34,6 +34,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'USER_ERR'
 
@@ -101,7 +102,8 @@ C
 *  Do the subtraction
 
       IF (STATUS .EQ. SAI__OK) THEN
-        CALL TSP_QUSUB(SIZE,%VAL(IPTR),%VAL(QPTR),%VAL(UPTR),
+        CALL TSP_QUSUB(SIZE,%VAL(CNF_PVAL(IPTR)),%VAL(CNF_PVAL(QPTR)),
+     :       %VAL(CNF_PVAL(UPTR)),
      :    QVAL,UVAL,STATUS)
       ENDIF
 
@@ -144,6 +146,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'PRM_PAR'
 

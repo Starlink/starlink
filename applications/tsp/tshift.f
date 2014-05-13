@@ -34,6 +34,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'USER_ERR'
       INTEGER STATUS
@@ -76,7 +77,7 @@ C
 
 *  Perform Shift
       IF (STATUS .EQ. SAI__OK) THEN
-         CALL TSP_SHIFT(SIZE,%VAL(PTR),SHIFT,STATUS)
+         CALL TSP_SHIFT(SIZE,%VAL(CNF_PVAL(PTR)),SHIFT,STATUS)
       ENDIF
 
 *  Unmap data and annul locators

@@ -44,6 +44,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'USER_ERR'
 
@@ -323,26 +324,30 @@ C
 *  Call CCD2STOKES for the first pair of frames (0 and 45) and
 *  derive the U stokes parameter
 
-                    CALL TSP_CGS4STOKES(DIMS(1),DIMS(2),%VAL(IPTR),
-     :                %VAL(IPTR2),ASTART,BSTART,
-     :                WIDTH,AP,%VAL(T1PTR),
-     :                %VAL(UPTR),%VAL(UEPTR),
-     :                %VAL(XPTR),%VAL(OXPTR))
+                    CALL TSP_CGS4STOKES(DIMS(1),DIMS(2),
+     :       %VAL(CNF_PVAL(IPTR)),
+     :                %VAL(CNF_PVAL(IPTR2)),ASTART,BSTART,
+     :                WIDTH,AP,%VAL(CNF_PVAL(T1PTR)),
+     :                %VAL(CNF_PVAL(UPTR)),%VAL(CNF_PVAL(UEPTR)),
+     :                %VAL(CNF_PVAL(XPTR)),%VAL(CNF_PVAL(OXPTR)))
 
 *  Call CCD2STOKES for the second pair of frames (22.5 and 67.5) and
 *  derive the Q stokes parameter
 
-                    CALL TSP_CGS4STOKES(DIMS(1),DIMS(2),%VAL(IPTR3),
-     :                %VAL(IPTR4),ASTART,BSTART,
-     :                WIDTH,AP,%VAL(T2PTR),
-     :                %VAL(QPTR),%VAL(QEPTR),
-     :                %VAL(XPTR),%VAL(OXPTR))
+                    CALL TSP_CGS4STOKES(DIMS(1),DIMS(2),
+     :       %VAL(CNF_PVAL(IPTR3)),
+     :                %VAL(CNF_PVAL(IPTR4)),ASTART,BSTART,
+     :                WIDTH,AP,%VAL(CNF_PVAL(T2PTR)),
+     :                %VAL(CNF_PVAL(QPTR)),%VAL(CNF_PVAL(QEPTR)),
+     :                %VAL(CNF_PVAL(XPTR)),%VAL(CNF_PVAL(OXPTR)))
 
 *  Merge the Q and U data
 
-                CALL TSP_CCDPOLMERGE(DIMS(1),%VAL(T1PTR),%VAL(T2PTR),
-     :           %VAL(OIPTR),%VAL(QPTR),%VAL(UPTR),%VAL(QEPTR),
-     :           %VAL(UEPTR),STATUS)
+                CALL TSP_CCDPOLMERGE(DIMS(1),%VAL(CNF_PVAL(T1PTR)),
+     :       %VAL(CNF_PVAL(T2PTR)),
+     :           %VAL(CNF_PVAL(OIPTR)),%VAL(CNF_PVAL(QPTR)),
+     :       %VAL(CNF_PVAL(UPTR)),%VAL(CNF_PVAL(QEPTR)),
+     :           %VAL(CNF_PVAL(UEPTR)),STATUS)
              ENDIF
 
 *  Unmap output arrays and annul locators

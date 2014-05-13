@@ -43,6 +43,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'USER_ERR'
 
@@ -181,7 +182,7 @@ C
                  WAVES(3) = 5500.0
                  WAVES(4) = 4400.0
                  WAVES(5) = 3600.0
-                 CALL GEN_MOVE(20,WAVES,%VAL(APTR))
+                 CALL GEN_MOVE(20,WAVES,%VAL(CNF_PVAL(APTR)))
              ENDIF
 
 *  Unmap the wavelength data
@@ -196,7 +197,8 @@ C
 *  Copy the data
              IF (STATUS .EQ. SAI__OK) THEN
                 CALL TSP_RHATHSP_COPY(SIZE,
-     :           DJ1,SEC,IT,%VAL(IPTR),%VAL(OIPTR),%VAL(XPTR))
+     :           DJ1,SEC,IT,%VAL(CNF_PVAL(IPTR)),%VAL(CNF_PVAL(OIPTR)),
+     :       %VAL(CNF_PVAL(XPTR)))
              ENDIF
 
 *  Unmap output arrays and annul locators

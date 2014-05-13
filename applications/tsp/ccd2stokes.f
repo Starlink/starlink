@@ -66,6 +66,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'USER_ERR'
 
@@ -291,17 +292,19 @@ C
 *  Copy the data
              IF (STATUS .EQ. SAI__OK) THEN
                 IF (RATIO) THEN
-                    CALL TSP_CCD2STOKES(DIMS(1),DIMS(2),%VAL(IPTR),
-     :                  %VAL(IPTR2),ASTART,BSTART,OESEP,
-     :                  WIDTH,AP,BIAS,RDN,PHOTADU,%VAL(OIPTR),
-     :                  %VAL(OSPTR),%VAL(OEPTR),
-     :                  %VAL(XPTR),%VAL(OXPTR))
+                    CALL TSP_CCD2STOKES(DIMS(1),DIMS(2),
+     :       %VAL(CNF_PVAL(IPTR)),
+     :                  %VAL(CNF_PVAL(IPTR2)),ASTART,BSTART,OESEP,
+     :                  WIDTH,AP,BIAS,RDN,PHOTADU,%VAL(CNF_PVAL(OIPTR)),
+     :                  %VAL(CNF_PVAL(OSPTR)),%VAL(CNF_PVAL(OEPTR)),
+     :                  %VAL(CNF_PVAL(XPTR)),%VAL(CNF_PVAL(OXPTR)))
                 ELSE
-                    CALL TSP_CCD2ST_OLD(DIMS(1),DIMS(2),%VAL(IPTR),
-     :                  %VAL(IPTR2),ASTART,BSTART,OESEP,
-     :                  WIDTH,AP,BIAS,RDN,PHOTADU,%VAL(OIPTR),
-     :                  %VAL(OSPTR),%VAL(OEPTR),
-     :                  %VAL(XPTR),%VAL(OXPTR))
+                    CALL TSP_CCD2ST_OLD(DIMS(1),DIMS(2),
+     :       %VAL(CNF_PVAL(IPTR)),
+     :                  %VAL(CNF_PVAL(IPTR2)),ASTART,BSTART,OESEP,
+     :                  WIDTH,AP,BIAS,RDN,PHOTADU,%VAL(CNF_PVAL(OIPTR)),
+     :                  %VAL(CNF_PVAL(OSPTR)),%VAL(CNF_PVAL(OEPTR)),
+     :                  %VAL(CNF_PVAL(XPTR)),%VAL(CNF_PVAL(OXPTR)))
                 ENDIF
              ENDIF
 

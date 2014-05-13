@@ -49,6 +49,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'USER_ERR'
 
@@ -179,7 +180,7 @@ C
 
          IF (STATUS .EQ. SAI__OK) THEN
              CALL TSP_LTCORR(RM,DM,SINGLE,BARY,REVERSE,SIZE,
-     :           %VAL(PTR),STATUS)
+     :           %VAL(CNF_PVAL(PTR)),STATUS)
          ENDIF
 
 *  Update Axis label by appending 'Barycentric' or 'Heliocentric'

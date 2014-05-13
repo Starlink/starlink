@@ -54,6 +54,7 @@ C    15/8/1990   Add TMIN, TMAX.      JAB/AAO
 C
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
 
 *  Status argument
@@ -155,13 +156,16 @@ C
 
 *  Calculate Binned P and Theta arrays and errors
 
-         CALL TSP_PPBIN(SIZE,%VAL(IPTR),%VAL(QPTR),%VAL(UPTR),
-     :     %VAL(QEPTR),%VAL(UEPTR),%VAL(T1PTR),%VAL(T2PTR),BINERR,
+         CALL TSP_PPBIN(SIZE,%VAL(CNF_PVAL(IPTR)),%VAL(CNF_PVAL(QPTR)),
+     :       %VAL(CNF_PVAL(UPTR)),
+     :     %VAL(CNF_PVAL(QEPTR)),%VAL(CNF_PVAL(UEPTR)),
+     :       %VAL(CNF_PVAL(T1PTR)),%VAL(CNF_PVAL(T2PTR)),BINERR,
      :     TMIN,TMAX,STATUS)
 
 *  Find maximum and minimum values
 
-         CALL TSP_EPSCALE(SIZE,%VAL(IPTR),%VAL(T1PTR),IMIN,IMAX,
+         CALL TSP_EPSCALE(SIZE,%VAL(CNF_PVAL(IPTR)),
+     :       %VAL(CNF_PVAL(T1PTR)),IMIN,IMAX,
      :     PMIN,PMAX,STATUS)
       ENDIF
 
@@ -182,8 +186,10 @@ C
 *  Do the plot
 
       IF (STATUS .EQ. SAI__OK) THEN
-        CALL TSP_PPLOT(SIZE,%VAL(IPTR),%VAL(T1PTR),%VAL(T2PTR),
-     :   %VAL(LPTR),PMIN,PMAX,IMIN,IMAX,XLABEL,YLABEL,TMIN,TMAX,
+        CALL TSP_PPLOT(SIZE,%VAL(CNF_PVAL(IPTR)),%VAL(CNF_PVAL(T1PTR)),
+     :       %VAL(CNF_PVAL(T2PTR)),
+     :   %VAL(CNF_PVAL(LPTR)),PMIN,PMAX,IMIN,IMAX,XLABEL,YLABEL,TMIN,
+     :       TMAX,
      :   STATUS)
       ENDIF
 
@@ -244,6 +250,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'PRM_PAR'
 
@@ -396,6 +403,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'PRM_PAR'
 

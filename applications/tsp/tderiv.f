@@ -37,6 +37,7 @@ C
 *  Status argument
       INTEGER STATUS
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
 
 *  HDS locators
@@ -80,8 +81,9 @@ C
 
 *  Calculate the time derivative dataset
       IF (STATUS .EQ. SAI__OK) THEN
-          CALL TSP_TDERIV(DIMS(1),DIMS(2),NPTS,%VAL(IPTR),
-     :             %VAL(OPTR),%VAL(TPTR),%VAL(TIPTR))
+          CALL TSP_TDERIV(DIMS(1),DIMS(2),NPTS,%VAL(CNF_PVAL(IPTR)),
+     :             %VAL(CNF_PVAL(OPTR)),%VAL(CNF_PVAL(TPTR)),
+     :       %VAL(CNF_PVAL(TIPTR)))
       ENDIF
 
 *  Tidy up

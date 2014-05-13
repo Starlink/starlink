@@ -43,6 +43,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'USER_ERR'
 
@@ -169,10 +170,12 @@ C
               CALL TSP_MAP_VAR(QLOC2,'READ',VPTR2,VDLOC2,STATUS)
 
 *  Subtract the Q stokes data
-              CALL TSP_SUBTRACT(SIZE,%VAL(SPTR1),%VAL(SPTR2))
+              CALL TSP_SUBTRACT(SIZE,%VAL(CNF_PVAL(SPTR1)),
+     :       %VAL(CNF_PVAL(SPTR2)))
 
 *  Add the Q stokes variance
-              CALL TSP_SCOMBINE(SIZE,%VAL(VPTR1),%VAL(VPTR2))
+              CALL TSP_SCOMBINE(SIZE,%VAL(CNF_PVAL(VPTR1)),
+     :       %VAL(CNF_PVAL(VPTR2)))
 
 *  Unmap the arrays
               CALL TSP_UNMAP(SDLOC2,STATUS)
@@ -203,10 +206,12 @@ C
               CALL TSP_MAP_VAR(ULOC2,'READ',VPTR2,VDLOC2,STATUS)
 
 *  Subtract the U Stokes data
-              CALL TSP_SUBTRACT(SIZE,%VAL(SPTR1),%VAL(SPTR2))
+              CALL TSP_SUBTRACT(SIZE,%VAL(CNF_PVAL(SPTR1)),
+     :       %VAL(CNF_PVAL(SPTR2)))
 
 *  Add the U Stokes variance
-              CALL TSP_SCOMBINE(SIZE,%VAL(VPTR1),%VAL(VPTR2))
+              CALL TSP_SCOMBINE(SIZE,%VAL(CNF_PVAL(VPTR1)),
+     :       %VAL(CNF_PVAL(VPTR2)))
 
 *  Unmap the arrays
               CALL TSP_UNMAP(SDLOC2,STATUS)
@@ -237,10 +242,12 @@ C
               CALL TSP_MAP_VAR(VLOC2,'READ',VPTR2,VDLOC2,STATUS)
 
 *  Subtract the V stokes parameter arrays
-              CALL TSP_SUBTRACT(SIZE,%VAL(SPTR1),%VAL(SPTR2))
+              CALL TSP_SUBTRACT(SIZE,%VAL(CNF_PVAL(SPTR1)),
+     :       %VAL(CNF_PVAL(SPTR2)))
 
 *  Add the V stokes variance arrays
-              CALL TSP_SCOMBINE(SIZE,%VAL(VPTR1),%VAL(VPTR2))
+              CALL TSP_SCOMBINE(SIZE,%VAL(CNF_PVAL(VPTR1)),
+     :       %VAL(CNF_PVAL(VPTR2)))
 
 *  Unmap the arrays
               CALL TSP_UNMAP(SDLOC2,STATUS)
@@ -258,7 +265,8 @@ C
 *  subtract the intensities
 
       IF (STATUS .EQ. SAI__OK) THEN
-         CALL TSP_SUBTRACT(SIZE,%VAL(PTR1),%VAL(PTR2))
+         CALL TSP_SUBTRACT(SIZE,%VAL(CNF_PVAL(PTR1)),
+     :       %VAL(CNF_PVAL(PTR2)))
       ENDIF
 
 *  Tidy up
@@ -296,6 +304,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'PRM_PAR'
 
@@ -342,6 +351,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'PRM_PAR'
 

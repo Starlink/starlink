@@ -39,6 +39,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'USER_ERR'
 
@@ -108,7 +109,8 @@ C
 
 *  List data to output file
             IF (STATUS .EQ. SAI__OK) THEN
-                CALL TSP_LHATPOL(NCYCLES,N2,NPOINTS,%VAL(IPTR),
+                CALL TSP_LHATPOL(NCYCLES,N2,NPOINTS,
+     :       %VAL(CNF_PVAL(IPTR)),
      :                  FD,STATUS)
             ENDIF
 

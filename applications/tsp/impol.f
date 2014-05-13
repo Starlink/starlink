@@ -39,6 +39,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
 
 *  Status argument
@@ -171,8 +172,10 @@ C
 *  Reduce the data
 
              IF (STATUS .EQ. SAI__OK) THEN
-                CALL TSP_IMPOL(NELM,%VAL(I1PTR),%VAL(I2PTR),%VAL(I3PTR),
-     :                  %VAL(I4PTR),%VAL(OPTR),%VAL(QPTR),%VAL(UPTR))
+                CALL TSP_IMPOL(NELM,%VAL(CNF_PVAL(I1PTR)),
+     :       %VAL(CNF_PVAL(I2PTR)),%VAL(CNF_PVAL(I3PTR)),
+     :                  %VAL(CNF_PVAL(I4PTR)),%VAL(CNF_PVAL(OPTR)),
+     :       %VAL(CNF_PVAL(QPTR)),%VAL(CNF_PVAL(UPTR)))
              ENDIF
 
 *  Unmap output arrays and annul locators
@@ -226,6 +229,7 @@ C
 *+
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'PRM_PAR'
 
 *  Parameters

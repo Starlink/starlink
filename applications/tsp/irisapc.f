@@ -45,6 +45,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'USER_ERR'
 
@@ -194,8 +195,9 @@ C
              IF (STATUS .EQ. SAI__OK) THEN
 
 
-                    CALL TSP_IRISAPC(DIMS(1),DIMS(2),%VAL(IPTR),
-     :                %VAL(IPTR2),
+                    CALL TSP_IRISAPC(DIMS(1),DIMS(2),
+     :       %VAL(CNF_PVAL(IPTR)),
+     :                %VAL(CNF_PVAL(IPTR2)),
      :                X,Y,R,XSEP,YSEP,STATUS)
 
              ENDIF
@@ -238,6 +240,7 @@ C
 *+
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'PRM_PAR'
 

@@ -37,6 +37,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'USER_ERR'
 
@@ -153,18 +154,22 @@ C
           NY2=DIMS(2)*INTERP
 *          CALL TSP_BICUBIC(DIMS(1),DIMS(2),NZ,IZ,%VAL(PTR),INTERP,
 *     :          NX2,NY2,%VAL(PTR1),STATUS)
-          CALL TSP_BILINT(DIMS(1),DIMS(2),NZ,IZ,%VAL(PTR),INTERP,
-     :          NX2,NY2,%VAL(PTR1),STATUS)
+          CALL TSP_BILINT(DIMS(1),DIMS(2),NZ,IZ,%VAL(CNF_PVAL(PTR)),
+     :       INTERP,
+     :          NX2,NY2,%VAL(CNF_PVAL(PTR1)),STATUS)
 
 *  Shift temporary frame
-          CALL TSP_GETSHIFT(NZ,IZ,%VAL(PPTR),INTERP,SHIFT,STATUS)
-          CALL TSP_SHIFTADD(NX2,NY2,SHIFT,%VAL(PTR1),%VAL(PTR2),
-     :         %VAL(PTR3),STATUS)
+          CALL TSP_GETSHIFT(NZ,IZ,%VAL(CNF_PVAL(PPTR)),INTERP,SHIFT,
+     :       STATUS)
+          CALL TSP_SHIFTADD(NX2,NY2,SHIFT,%VAL(CNF_PVAL(PTR1)),
+     :       %VAL(CNF_PVAL(PTR2)),
+     :         %VAL(CNF_PVAL(PTR3)),STATUS)
       ENDDO
 
 *  Squash summed image back to original size
-      CALL TSP_SQUASH(NX2,NY2,%VAL(PTR2),%VAL(PTR3),DIMS(1),DIMS(2),
-     :      %VAL(OPTR),INTERP,STATUS)
+      CALL TSP_SQUASH(NX2,NY2,%VAL(CNF_PVAL(PTR2)),%VAL(CNF_PVAL(PTR3)),
+     :       DIMS(1),DIMS(2),
+     :      %VAL(CNF_PVAL(OPTR)),INTERP,STATUS)
 
 *  Tidy up
 100   CONTINUE

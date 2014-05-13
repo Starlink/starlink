@@ -53,6 +53,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'PRM_PAR'
       INCLUDE 'USER_ERR'
@@ -159,11 +160,12 @@ C
             CALL ERR_REP(' ','Error getting workspace ^STATUS',STATUS)
             GOTO 999
         ENDIF
-        CALL TSP_EPZERO(SIZE,%VAL(ZPTR))
+        CALL TSP_EPZERO(SIZE,%VAL(CNF_PVAL(ZPTR)))
 
 *   Find X plotting limits
 
-        CALL TSP_QPLTXLIMITS(%VAL(XPTR),STRT,FIN,%VAL(XXPTR),STATUS)
+        CALL TSP_QPLTXLIMITS(%VAL(CNF_PVAL(XPTR)),STRT,FIN,
+     :       %VAL(CNF_PVAL(XXPTR)),STATUS)
         SIZE = FIN-STRT+1
         FSIZE = SIZE
 
@@ -263,15 +265,20 @@ C
 
             IF (ITEM .EQ. 'I' .OR. ITEM .EQ. 'FLUX'
      :          .OR. ITEM .EQ. 'MAG') THEN
-              CALL TSP_TSPBIN(SIZE,%VAL(XXPTR),%VAL(XDPTR),
-     :             %VAL(IPTR),%VAL(IEPTR),%VAL(YRPTR),%VAL(YEPTR),
-     :             BINSIZE,%VAL(TIPTR),%VAL(TDPTR),NEWSIZE,STATUS)
+              CALL TSP_TSPBIN(SIZE,%VAL(CNF_PVAL(XXPTR)),
+     :       %VAL(CNF_PVAL(XDPTR)),
+     :             %VAL(CNF_PVAL(IPTR)),%VAL(CNF_PVAL(IEPTR)),
+     :       %VAL(CNF_PVAL(YRPTR)),%VAL(CNF_PVAL(YEPTR)),
+     :             BINSIZE,%VAL(CNF_PVAL(TIPTR)),%VAL(CNF_PVAL(TDPTR)),
+     :       NEWSIZE,STATUS)
               SIZE = NEWSIZE
               IF (ITEM .EQ. 'FLUX') THEN
-                CALL TSP_PHSFLUX(SIZE,%VAL(YRPTR),%VAL(YEPTR),STATUS)
+                CALL TSP_PHSFLUX(SIZE,%VAL(CNF_PVAL(YRPTR)),
+     :       %VAL(CNF_PVAL(YEPTR)),STATUS)
               ELSE IF (ITEM .EQ. 'MAG') THEN
-                CALL TSP_PHSMAG(SIZE,%VAL(YRPTR),%VAL(YEPTR),
-     :             %VAL(WPTR),CHAN,STATUS)
+                CALL TSP_PHSMAG(SIZE,%VAL(CNF_PVAL(YRPTR)),
+     :       %VAL(CNF_PVAL(YEPTR)),
+     :             %VAL(CNF_PVAL(WPTR)),CHAN,STATUS)
               ENDIF
 
 *  Stokes Q, U or V (%)
@@ -285,15 +292,22 @@ C
                  QPTR=VPTR
                  QEPTR=VEPTR
               ENDIF
-              CALL TSP_TSPBIN(SIZE,%VAL(XXPTR),%VAL(XDPTR),
-     :             %VAL(IPTR),%VAL(IEPTR),%VAL(YRPTR),%VAL(YEPTR),
-     :             BINSIZE,%VAL(TIPTR),%VAL(TDPTR),NEWSIZE,STATUS)
-              CALL TSP_TSPBIN(SIZE,%VAL(XXPTR),%VAL(XDPTR),
-     :             %VAL(QPTR),%VAL(QEPTR),%VAL(SRPTR),%VAL(SEPTR),
-     :             BINSIZE,%VAL(TIPTR),%VAL(TDPTR),NEWSIZE,STATUS)
+              CALL TSP_TSPBIN(SIZE,%VAL(CNF_PVAL(XXPTR)),
+     :       %VAL(CNF_PVAL(XDPTR)),
+     :             %VAL(CNF_PVAL(IPTR)),%VAL(CNF_PVAL(IEPTR)),
+     :       %VAL(CNF_PVAL(YRPTR)),%VAL(CNF_PVAL(YEPTR)),
+     :             BINSIZE,%VAL(CNF_PVAL(TIPTR)),%VAL(CNF_PVAL(TDPTR)),
+     :       NEWSIZE,STATUS)
+              CALL TSP_TSPBIN(SIZE,%VAL(CNF_PVAL(XXPTR)),
+     :       %VAL(CNF_PVAL(XDPTR)),
+     :             %VAL(CNF_PVAL(QPTR)),%VAL(CNF_PVAL(QEPTR)),
+     :       %VAL(CNF_PVAL(SRPTR)),%VAL(CNF_PVAL(SEPTR)),
+     :             BINSIZE,%VAL(CNF_PVAL(TIPTR)),%VAL(CNF_PVAL(TDPTR)),
+     :       NEWSIZE,STATUS)
               SIZE = NEWSIZE
-              CALL TSP_PHSSTOKES(SIZE,%VAL(YRPTR),%VAL(YEPTR),
-     :             %VAL(SRPTR),%VAL(SEPTR),STATUS)
+              CALL TSP_PHSSTOKES(SIZE,%VAL(CNF_PVAL(YRPTR)),
+     :       %VAL(CNF_PVAL(YEPTR)),
+     :             %VAL(CNF_PVAL(SRPTR)),%VAL(CNF_PVAL(SEPTR)),STATUS)
 
 *  Polarization (%) or position angle (degrees)
 
@@ -301,34 +315,48 @@ C
 
 *  Bin the I, Q and U data
 
-              CALL TSP_TSPBIN(SIZE,%VAL(XXPTR),%VAL(XDPTR),
-     :             %VAL(IPTR),%VAL(IEPTR),%VAL(YRPTR),%VAL(YEPTR),
-     :             BINSIZE,%VAL(TIPTR),%VAL(TDPTR),NEWSIZE,STATUS)
-              CALL TSP_TSPBIN(SIZE,%VAL(XXPTR),%VAL(XDPTR),
-     :             %VAL(QPTR),%VAL(QEPTR),%VAL(SRPTR),%VAL(SEPTR),
-     :             BINSIZE,%VAL(TIPTR),%VAL(TDPTR),NEWSIZE,STATUS)
-              CALL TSP_TSPBIN(SIZE,%VAL(XXPTR),%VAL(XDPTR),
-     :             %VAL(UPTR),%VAL(UEPTR),%VAL(S2RPTR),%VAL(S2EPTR),
-     :             BINSIZE,%VAL(TIPTR),%VAL(TDPTR),NEWSIZE,STATUS)
+              CALL TSP_TSPBIN(SIZE,%VAL(CNF_PVAL(XXPTR)),
+     :       %VAL(CNF_PVAL(XDPTR)),
+     :             %VAL(CNF_PVAL(IPTR)),%VAL(CNF_PVAL(IEPTR)),
+     :       %VAL(CNF_PVAL(YRPTR)),%VAL(CNF_PVAL(YEPTR)),
+     :             BINSIZE,%VAL(CNF_PVAL(TIPTR)),%VAL(CNF_PVAL(TDPTR)),
+     :       NEWSIZE,STATUS)
+              CALL TSP_TSPBIN(SIZE,%VAL(CNF_PVAL(XXPTR)),
+     :       %VAL(CNF_PVAL(XDPTR)),
+     :             %VAL(CNF_PVAL(QPTR)),%VAL(CNF_PVAL(QEPTR)),
+     :       %VAL(CNF_PVAL(SRPTR)),%VAL(CNF_PVAL(SEPTR)),
+     :             BINSIZE,%VAL(CNF_PVAL(TIPTR)),%VAL(CNF_PVAL(TDPTR)),
+     :       NEWSIZE,STATUS)
+              CALL TSP_TSPBIN(SIZE,%VAL(CNF_PVAL(XXPTR)),
+     :       %VAL(CNF_PVAL(XDPTR)),
+     :             %VAL(CNF_PVAL(UPTR)),%VAL(CNF_PVAL(UEPTR)),
+     :       %VAL(CNF_PVAL(S2RPTR)),%VAL(CNF_PVAL(S2EPTR)),
+     :             BINSIZE,%VAL(CNF_PVAL(TIPTR)),%VAL(CNF_PVAL(TDPTR)),
+     :       NEWSIZE,STATUS)
               SIZE = NEWSIZE
               IF (ITEM .EQ. 'P') THEN
 
 *  Calculate P
 
-                 CALL TSP_PHSPOL(SIZE,%VAL(YRPTR),%VAL(YEPTR),
-     :             %VAL(SRPTR),%VAL(SEPTR),%VAL(S2RPTR),
-     :             %VAL(S2EPTR),STATUS)
+                 CALL TSP_PHSPOL(SIZE,%VAL(CNF_PVAL(YRPTR)),
+     :       %VAL(CNF_PVAL(YEPTR)),
+     :             %VAL(CNF_PVAL(SRPTR)),%VAL(CNF_PVAL(SEPTR)),
+     :       %VAL(CNF_PVAL(S2RPTR)),
+     :             %VAL(CNF_PVAL(S2EPTR)),STATUS)
               ELSE
 
 *  Calculate Theta
 
-                 CALL TSP_PHSTHETA(SIZE,%VAL(YRPTR),%VAL(YEPTR),
-     :             %VAL(SRPTR),%VAL(SEPTR),%VAL(S2RPTR),
-     :             %VAL(S2EPTR),STATUS)
+                 CALL TSP_PHSTHETA(SIZE,%VAL(CNF_PVAL(YRPTR)),
+     :       %VAL(CNF_PVAL(YEPTR)),
+     :             %VAL(CNF_PVAL(SRPTR)),%VAL(CNF_PVAL(SEPTR)),
+     :       %VAL(CNF_PVAL(S2RPTR)),
+     :             %VAL(CNF_PVAL(S2EPTR)),STATUS)
               ENDIF
             ENDIF
-            CALL TSP_PHSSCALE(SIZE,%VAL(XDPTR),%VAL(YRPTR),
-     :             %VAL(YEPTR),IMIN,IMAX,STATUS)
+            CALL TSP_PHSSCALE(SIZE,%VAL(CNF_PVAL(XDPTR)),
+     :       %VAL(CNF_PVAL(YRPTR)),
+     :             %VAL(CNF_PVAL(YEPTR)),IMIN,IMAX,STATUS)
           ELSE
             GOTO 999
           ENDIF
@@ -379,8 +407,10 @@ C
 *  Do the plot
 
           IF (STATUS .EQ. SAI__OK) THEN
-            CALL TSP_PHSLOT(SIZE,FSIZE,%VAL(XXPTR),%VAL(XDPTR),
-     :        %VAL(YRPTR),%VAL(YEPTR),%VAL(T1PTR),%VAL(T2PTR),
+            CALL TSP_PHSLOT(SIZE,FSIZE,%VAL(CNF_PVAL(XXPTR)),
+     :       %VAL(CNF_PVAL(XDPTR)),
+     :        %VAL(CNF_PVAL(YRPTR)),%VAL(CNF_PVAL(YEPTR)),
+     :       %VAL(CNF_PVAL(T1PTR)),%VAL(CNF_PVAL(T2PTR)),
      :        XLABEL,YLABEL,TOP,BOT,FIRST,PHSTART,PHEND,
      :        LAST,ITEM,IMIN,IMAX,BINSIZE,PLABEL,FILE,STATUS)
           ENDIF
@@ -464,6 +494,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'PRM_PAR'
       INCLUDE 'USER_ERR'

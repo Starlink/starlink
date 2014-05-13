@@ -39,6 +39,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'USER_ERR'
       INTEGER STATUS
@@ -102,8 +103,10 @@ C     Maximum polynomial degree
       IF (STATUS .EQ. SAI__OK) THEN
           CALL PROFILE_WORK(DIMS(1),DIMS(2),DIMS(3),
      :       DIMS(3)*3+3*(DEGREE+1),
-     :       %VAL(PTR),%VAL(RPTR),%VAL(XPTR),%VAL(YPTR),
-     :       %VAL(WPTR),%VAL(W1PTR),%VAL(W2PTR),XS,XE,YS,YE,DEGREE,
+     :       %VAL(CNF_PVAL(PTR)),%VAL(CNF_PVAL(RPTR)),
+     :       %VAL(CNF_PVAL(XPTR)),%VAL(CNF_PVAL(YPTR)),
+     :       %VAL(CNF_PVAL(WPTR)),%VAL(CNF_PVAL(W1PTR)),
+     :       %VAL(CNF_PVAL(W2PTR)),XS,XE,YS,YE,DEGREE,
      :       0,STATUS)
       ENDIF
 

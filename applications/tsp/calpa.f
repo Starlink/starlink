@@ -39,6 +39,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'USER_ERR'
 
@@ -122,8 +123,10 @@ C
 *  Apply the correction
 
       IF (STATUS .EQ. SAI__OK) THEN
-         CALL TSP_CALPA(SIZE,%VAL(QPTR2),%VAL(UPTR2),%VAL(QPTR1),
-     :       %VAL(UPTR1),%VAL(QVPTR1),%VAL(UVPTR1))
+         CALL TSP_CALPA(SIZE,%VAL(CNF_PVAL(QPTR2)),
+     :       %VAL(CNF_PVAL(UPTR2)),%VAL(CNF_PVAL(QPTR1)),
+     :       %VAL(CNF_PVAL(UPTR1)),%VAL(CNF_PVAL(QVPTR1)),
+     :       %VAL(CNF_PVAL(UVPTR1)))
       ENDIF
 
 *  Tidy up

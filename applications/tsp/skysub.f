@@ -42,6 +42,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'USER_ERR'
 
@@ -84,7 +85,8 @@ C
 *  Do the sky subtraction
       IF (STATUS .EQ. SAI__OK) THEN
           CALL TSP_SKYSUB(DIMS(1),DIMS(2),DIMS(3),Y1,Y2,XL1,XL2,XR1,XR2,
-     :         %VAL(PTR),MEDIAN,DIMS(1)*DIMS(2),%VAL(TPTR))
+     :         %VAL(CNF_PVAL(PTR)),MEDIAN,DIMS(1)*DIMS(2),
+     :       %VAL(CNF_PVAL(TPTR)))
       ENDIF
 
 *  Tidy up

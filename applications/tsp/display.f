@@ -53,6 +53,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'USER_ERR'
 
@@ -130,7 +131,8 @@ C
 
 *  Get maximum and minimum of data for first frame
       IF (STATUS .EQ. SAI__OK) THEN
-          CALL TSP_DISPLAY_SCALE(DIMS(1),DIMS(2),DIMS(3),%VAL(PTR),
+          CALL TSP_DISPLAY_SCALE(DIMS(1),DIMS(2),DIMS(3),
+     :       %VAL(CNF_PVAL(PTR)),
      :        XMIN,XMAX,STATUS)
       ENDIF
 
@@ -144,8 +146,9 @@ C
       F1=1
       F2=1
       IF (STATUS .EQ. SAI__OK) THEN
-          CALL TSP_DISPLAY(DIMS(1),DIMS(2),DIMS(3),%VAL(PTR),%VAL(IPTR),
-     :           %VAL(TPTR),XMIN,XMAX,F1,F2,COLS,CMIN,STATUS)
+          CALL TSP_DISPLAY(DIMS(1),DIMS(2),DIMS(3),%VAL(CNF_PVAL(PTR)),
+     :       %VAL(CNF_PVAL(IPTR)),
+     :           %VAL(CNF_PVAL(TPTR)),XMIN,XMAX,F1,F2,COLS,CMIN,STATUS)
       ENDIF
 
 *  Enter command mode - get a command and process it
@@ -182,8 +185,10 @@ C
 
 *  Display the movie
               IF (STATUS .EQ. SAI__OK) THEN
-                  CALL TSP_DISPLAY(DIMS(1),DIMS(2),DIMS(3),%VAL(PTR),
-     :              %VAL(IPTR),%VAL(TPTR),XMIN,XMAX,F1,F2,COLS,CMIN,
+                  CALL TSP_DISPLAY(DIMS(1),DIMS(2),DIMS(3),
+     :       %VAL(CNF_PVAL(PTR)),
+     :              %VAL(CNF_PVAL(IPTR)),%VAL(CNF_PVAL(TPTR)),XMIN,XMAX,
+     :       F1,F2,COLS,CMIN,
      :              STATUS)
               ENDIF
           ELSE IF (COMMAND(1:1) .EQ. 'F' .OR.
@@ -201,8 +206,10 @@ C
 
 *  Display the frame
               IF (STATUS .EQ. SAI__OK) THEN
-                  CALL TSP_DISPLAY(DIMS(1),DIMS(2),DIMS(3),%VAL(PTR),
-     :              %VAL(IPTR),%VAL(TPTR),XMIN,XMAX,F1,F2,COLS,CMIN,
+                  CALL TSP_DISPLAY(DIMS(1),DIMS(2),DIMS(3),
+     :       %VAL(CNF_PVAL(PTR)),
+     :              %VAL(CNF_PVAL(IPTR)),%VAL(CNF_PVAL(TPTR)),XMIN,XMAX,
+     :       F1,F2,COLS,CMIN,
      :              STATUS)
               ENDIF
 
@@ -230,7 +237,7 @@ C
 *  Get the data value for pixel
               IF (STATUS .EQ. SAI__OK) THEN
                   CALL TSP_DISPLAY_GET(DIMS(1),DIMS(2),DIMS(3),
-     :                NX,NY,F2,%VAL(PTR),XX)
+     :                NX,NY,F2,%VAL(CNF_PVAL(PTR)),XX)
               ENDIF
 
 *  Output results

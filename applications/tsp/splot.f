@@ -50,6 +50,7 @@ C    19/8/1988   Handle abort on LABEL or DEVICE.  JAB/AAO
 C
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'USER_ERR'
 
@@ -183,11 +184,13 @@ C
       IF (STATUS .EQ. SAI__OK) THEN
 
 *   Bin the data
-         CALL TSP_SPBIN(SIZE,%VAL(IPTR),%VAL(SPTR),%VAL(EPTR),
-     :      BINERR,%VAL(TPTR),STATUS)
+         CALL TSP_SPBIN(SIZE,%VAL(CNF_PVAL(IPTR)),%VAL(CNF_PVAL(SPTR)),
+     :       %VAL(CNF_PVAL(EPTR)),
+     :      BINERR,%VAL(CNF_PVAL(TPTR)),STATUS)
 
 *   Find maximum and minimum values
-         CALL TSP_QUPLTSCALE(SIZE,%VAL(IPTR),%VAL(TPTR),IMIN,IMAX,PMIN,
+         CALL TSP_QUPLTSCALE(SIZE,%VAL(CNF_PVAL(IPTR)),
+     :       %VAL(CNF_PVAL(TPTR)),IMIN,IMAX,PMIN,
      :      PMAX,STATUS)
       ENDIF
 
@@ -207,8 +210,8 @@ C
 *  Do the plot
 
       IF (STATUS .EQ. SAI__OK) THEN
-        CALL TSP_SPLOT(SIZE,%VAL(IPTR),%VAL(TPTR),
-     :   %VAL(LPTR),PMIN,PMAX,IMIN,IMAX,XLABEL,YLABEL,STATUS)
+        CALL TSP_SPLOT(SIZE,%VAL(CNF_PVAL(IPTR)),%VAL(CNF_PVAL(TPTR)),
+     :   %VAL(CNF_PVAL(LPTR)),PMIN,PMAX,IMIN,IMAX,XLABEL,YLABEL,STATUS)
       ENDIF
 
       print *,'finished'
@@ -260,6 +263,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'PRM_PAR'
 
@@ -375,6 +379,7 @@ C
 *+
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
 
 *  Parameters

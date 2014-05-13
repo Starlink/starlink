@@ -31,6 +31,7 @@ C  History:
 C    15/6/1988   Original Version.   JAB/AAO
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INTEGER STATUS
       INTEGER IPTR,QPTR,UPTR,QEPTR,UEPTR,LPTR
@@ -72,8 +73,10 @@ C    15/6/1988   Original Version.   JAB/AAO
 *  Calculate the results
 
       IF (STATUS .EQ. SAI__OK) THEN
-        CALL TSP_PTHETA(SIZE,%VAL(IPTR),%VAL(QPTR),%VAL(QEPTR),
-     :   %VAL(UPTR),%VAL(UEPTR),LSTART,LEND,%VAL(LPTR),STATUS)
+        CALL TSP_PTHETA(SIZE,%VAL(CNF_PVAL(IPTR)),%VAL(CNF_PVAL(QPTR)),
+     :       %VAL(CNF_PVAL(QEPTR)),
+     :   %VAL(CNF_PVAL(UPTR)),%VAL(CNF_PVAL(UEPTR)),LSTART,LEND,
+     :       %VAL(CNF_PVAL(LPTR)),STATUS)
       ENDIF
 
 *  Tidy up

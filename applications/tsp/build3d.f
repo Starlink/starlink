@@ -42,6 +42,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'USER_ERR'
       INTEGER STATUS
@@ -98,8 +99,8 @@ C
 *  Do the copy for the frame
       IF (STATUS .EQ. SAI__OK) THEN
           CALL TSP_BUILD3D_COPY(DIMS(1),DIMS(2),
-     :         NFRAMES,FRAME,%VAL(IPTR),
-     :         %VAL(OPTR),MJD,%VAL(TPTR))
+     :         NFRAMES,FRAME,%VAL(CNF_PVAL(IPTR)),
+     :         %VAL(CNF_PVAL(OPTR)),MJD,%VAL(CNF_PVAL(TPTR)))
       ENDIF
 
 *  Tidy up
@@ -174,6 +175,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
 
 *  Parameters

@@ -44,6 +44,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
 
 *  Status argument
@@ -113,12 +114,15 @@ C
 
 *  Convert to Q and U and bin the data
 
-      CALL TSP_QUPLTBIN(SIZE,%VAL(IPTR),%VAL(QPTR),%VAL(UPTR),
-     :   %VAL(QEPTR),%VAL(UEPTR),%VAL(T1PTR),%VAL(T2PTR),BINERR,STATUS)
+      CALL TSP_QUPLTBIN(SIZE,%VAL(CNF_PVAL(IPTR)),%VAL(CNF_PVAL(QPTR)),
+     :       %VAL(CNF_PVAL(UPTR)),
+     :   %VAL(CNF_PVAL(QEPTR)),%VAL(CNF_PVAL(UEPTR)),
+     :       %VAL(CNF_PVAL(T1PTR)),%VAL(CNF_PVAL(T2PTR)),BINERR,STATUS)
 
 *  Get scaling limits
 
-      CALL TSP_QUPLTSCALE(SIZE,%VAL(T1PTR),%VAL(T2PTR),QMIN,QMAX,
+      CALL TSP_QUPLTSCALE(SIZE,%VAL(CNF_PVAL(T1PTR)),
+     :       %VAL(CNF_PVAL(T2PTR)),QMIN,QMAX,
      :   UMIN,UMAX,STATUS)
 
 *  If we are not autoscaling prompt for the scaling levels using
@@ -138,7 +142,8 @@ C
 *  Do the plot
 
       IF (STATUS .EQ. SAI__OK) THEN
-        CALL TSP_QUPLOT(SIZE,%VAL(T1PTR),%VAL(T2PTR),
+        CALL TSP_QUPLOT(SIZE,%VAL(CNF_PVAL(T1PTR)),
+     :       %VAL(CNF_PVAL(T2PTR)),
      :  UMIN,UMAX,QMIN,QMAX,STATUS)
       ENDIF
 
@@ -199,6 +204,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'PRM_PAR'
 
@@ -330,6 +336,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'PRM_PAR'
 

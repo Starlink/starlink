@@ -31,6 +31,7 @@ C    17/2/1993   Original Version.   JAB/AAO
 C
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INTEGER STATUS
       INTEGER IPTR,QPTR,UPTR,QEPTR,UEPTR,LPTR
@@ -71,8 +72,10 @@ C
 *  Output the data
 
       IF (STATUS .EQ. SAI__OK) THEN
-        CALL TSP_SLIST(SIZE,%VAL(IPTR),%VAL(QPTR),%VAL(QEPTR),
-     :   %VAL(UPTR),%VAL(UEPTR),%VAL(LPTR),FD,STATUS)
+        CALL TSP_SLIST(SIZE,%VAL(CNF_PVAL(IPTR)),%VAL(CNF_PVAL(QPTR)),
+     :       %VAL(CNF_PVAL(QEPTR)),
+     :   %VAL(CNF_PVAL(UPTR)),%VAL(CNF_PVAL(UEPTR)),
+     :       %VAL(CNF_PVAL(LPTR)),FD,STATUS)
       ENDIF
 
 *  Tidy up

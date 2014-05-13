@@ -52,6 +52,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'USER_ERR'
 
@@ -269,10 +270,13 @@ C
 *  Call IRISSTOKES for the first pair of frames (0 and 45) and
 *  derive the U stokes parameter
 
-                    CALL TSP_IRISSTOKES(DIMS(1),DIMS(2),%VAL(IPTR),
-     :                %VAL(IPTR2),X1,Y1,WIDTH,HEIGHT,XSEP,YSEP,
-     :                %VAL(OIPTR),%VAL(VPTR),
-     :                %VAL(XPTR),%VAL(OXPTR),%VAL(YPTR),%VAL(OYPTR))
+                    CALL TSP_IRISSTOKES(DIMS(1),DIMS(2),
+     :       %VAL(CNF_PVAL(IPTR)),
+     :                %VAL(CNF_PVAL(IPTR2)),X1,Y1,WIDTH,HEIGHT,XSEP,
+     :       YSEP,
+     :                %VAL(CNF_PVAL(OIPTR)),%VAL(CNF_PVAL(VPTR)),
+     :                %VAL(CNF_PVAL(XPTR)),%VAL(CNF_PVAL(OXPTR)),
+     :       %VAL(CNF_PVAL(YPTR)),%VAL(CNF_PVAL(OYPTR)))
 
                 ELSE
 
@@ -281,10 +285,13 @@ C
 *  Call CCD2STOKES for the first pair of frames (0 and 45) and
 *  derive the U stokes parameter
 
-                    CALL TSP_IRISSTOKES2(DIMS(1),DIMS(2),%VAL(IPTR),
-     :                %VAL(IPTR2),X1,Y1,WIDTH,HEIGHT,XSEP,YSEP,
-     :                %VAL(OIPTR),%VAL(VPTR),
-     :                %VAL(XPTR),%VAL(OXPTR),%VAL(YPTR),%VAL(OYPTR))
+                    CALL TSP_IRISSTOKES2(DIMS(1),DIMS(2),
+     :       %VAL(CNF_PVAL(IPTR)),
+     :                %VAL(CNF_PVAL(IPTR2)),X1,Y1,WIDTH,HEIGHT,XSEP,
+     :       YSEP,
+     :                %VAL(CNF_PVAL(OIPTR)),%VAL(CNF_PVAL(VPTR)),
+     :                %VAL(CNF_PVAL(XPTR)),%VAL(CNF_PVAL(OXPTR)),
+     :       %VAL(CNF_PVAL(YPTR)),%VAL(CNF_PVAL(OYPTR)))
 
 
                 ENDIF

@@ -40,6 +40,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'USER_ERR'
 
@@ -116,7 +117,8 @@ C
 
 *   Find X limits
 
-        CALL TSP_PHSXLIMITS(%VAL(XPTR),STRT,FIN,%VAL(XXPTR),STATUS)
+        CALL TSP_PHSXLIMITS(%VAL(CNF_PVAL(XPTR)),STRT,FIN,
+     :       %VAL(CNF_PVAL(XXPTR)),STATUS)
         SIZE = FIN-STRT+1
         FSIZE = SIZE
 
@@ -137,9 +139,12 @@ C
 
 *  Bin data
 
-          CALL TSP_TBBIN(SIZE,%VAL(XXPTR),%VAL(XDPTR),
-     :             %VAL(IPTR),%VAL(YRPTR),%VAL(YEPTR),BINSIZE,
-     :             %VAL(TIPTR),%VAL(TDPTR),NEWSIZE,STATUS)
+          CALL TSP_TBBIN(SIZE,%VAL(CNF_PVAL(XXPTR)),
+     :       %VAL(CNF_PVAL(XDPTR)),
+     :             %VAL(CNF_PVAL(IPTR)),%VAL(CNF_PVAL(YRPTR)),
+     :       %VAL(CNF_PVAL(YEPTR)),BINSIZE,
+     :             %VAL(CNF_PVAL(TIPTR)),%VAL(CNF_PVAL(TDPTR)),NEWSIZE,
+     :       STATUS)
 
 *  Create the output file
 
@@ -149,7 +154,8 @@ C
 
 *  Get new size
 
-              CALL TSP_TBSIZE(NEWSIZE,%VAL(XDPTR),ACTSIZE,%VAL(XXPTR))
+              CALL TSP_TBSIZE(NEWSIZE,%VAL(CNF_PVAL(XDPTR)),ACTSIZE,
+     :       %VAL(CNF_PVAL(XXPTR)))
 
 *  Build the string describing the Stokes parameters needed in the
 *  output dataset
@@ -184,7 +190,8 @@ C
 *  Write Wavelength axis (X-axis) data
 
               CALL TSP_MAP_LAMBDA(OLOC,'WRITE',APTR,ALOC,STATUS)
-              CALL TSP_GEN_MOVE(DIMS(1),%VAL(WPTR),%VAL(APTR))
+              CALL TSP_GEN_MOVE(DIMS(1),%VAL(CNF_PVAL(WPTR)),
+     :       %VAL(CNF_PVAL(APTR)))
               CALL TSP_UNMAP(ALOC,STATUS)
 
 *  Copy the wavelength axis label and units
@@ -195,7 +202,8 @@ C
 
               IF (ACTDIM .EQ. 3) THEN
                   CALL TSP_MAP_Y(OLOC,'WRITE',APTR,ALOC,STATUS)
-                  CALL TSP_GEN_MOVE(DIMS(2),%VAL(WPTR),%VAL(APTR))
+                  CALL TSP_GEN_MOVE(DIMS(2),%VAL(CNF_PVAL(WPTR)),
+     :       %VAL(CNF_PVAL(APTR)))
                   CALL TSP_UNMAP(ALOC,STATUS)
                   CALL TSP_RLU_Y(LOC,LABEL,UNITS,STATUS)
                   CALL TSP_WLU_Y(OLOC,LABEL,UNITS,STATUS)
@@ -204,7 +212,8 @@ C
 *  Write Time axis data
 
               CALL TSP_MAP_TIME(OLOC,'WRITE',APTR,ALOC,STATUS)
-              CALL TSP_GEN_MOVE(2*ACTSIZE,%VAL(XXPTR),%VAL(APTR))
+              CALL TSP_GEN_MOVE(2*ACTSIZE,%VAL(CNF_PVAL(XXPTR)),
+     :       %VAL(CNF_PVAL(APTR)))
               CALL TSP_UNMAP(ALOC,STATUS)
 
 *  Copy label and units of time axis
@@ -263,47 +272,64 @@ C
 
 *  Copy the points containing good data to the output array
           IF (STATUS .EQ. SAI__OK) THEN
-            CALL TSP_TBCPY(NEWSIZE,ACTSIZE,CHAN,NCHANS,%VAL(YRPTR),
-     :        %VAL(YEPTR),%VAL(OIPTR),%VAL(OIVPTR),%VAL(XDPTR))
+            CALL TSP_TBCPY(NEWSIZE,ACTSIZE,CHAN,NCHANS,
+     :       %VAL(CNF_PVAL(YRPTR)),
+     :        %VAL(CNF_PVAL(YEPTR)),%VAL(CNF_PVAL(OIPTR)),
+     :       %VAL(CNF_PVAL(OIVPTR)),%VAL(CNF_PVAL(XDPTR)))
           ENDIF
 
           IF (QPTR .NE. 0) THEN
 
 *  Bin the Q Stokes parameter
-              CALL TSP_TBBIN(SIZE,%VAL(XXPTR),%VAL(XDPTR),
-     :             %VAL(QPTR),%VAL(YRPTR),%VAL(YEPTR),BINSIZE,
-     :             %VAL(TIPTR),%VAL(TDPTR),NEWSIZE,STATUS)
+              CALL TSP_TBBIN(SIZE,%VAL(CNF_PVAL(XXPTR)),
+     :       %VAL(CNF_PVAL(XDPTR)),
+     :             %VAL(CNF_PVAL(QPTR)),%VAL(CNF_PVAL(YRPTR)),
+     :       %VAL(CNF_PVAL(YEPTR)),BINSIZE,
+     :             %VAL(CNF_PVAL(TIPTR)),%VAL(CNF_PVAL(TDPTR)),NEWSIZE,
+     :       STATUS)
               IF (STATUS .EQ. SAI__OK) THEN
 
 *  Copy the points containing good data to the output array
-                CALL TSP_TBCPY(NEWSIZE,ACTSIZE,CHAN,NCHANS,%VAL(YRPTR),
-     :            %VAL(YEPTR),%VAL(QIPTR),%VAL(QIVPTR),%VAL(XDPTR))
+                CALL TSP_TBCPY(NEWSIZE,ACTSIZE,CHAN,NCHANS,
+     :       %VAL(CNF_PVAL(YRPTR)),
+     :            %VAL(CNF_PVAL(YEPTR)),%VAL(CNF_PVAL(QIPTR)),
+     :       %VAL(CNF_PVAL(QIVPTR)),%VAL(CNF_PVAL(XDPTR)))
              ENDIF
           ENDIF
           IF (UPTR .NE. 0) THEN
 
 *  Bin the U Stokes parameter
-              CALL TSP_TBBIN(SIZE,%VAL(XXPTR),%VAL(XDPTR),
-     :             %VAL(UPTR),%VAL(YRPTR),%VAL(YEPTR),BINSIZE,
-     :             %VAL(TIPTR),%VAL(TDPTR),NEWSIZE,STATUS)
+              CALL TSP_TBBIN(SIZE,%VAL(CNF_PVAL(XXPTR)),
+     :       %VAL(CNF_PVAL(XDPTR)),
+     :             %VAL(CNF_PVAL(UPTR)),%VAL(CNF_PVAL(YRPTR)),
+     :       %VAL(CNF_PVAL(YEPTR)),BINSIZE,
+     :             %VAL(CNF_PVAL(TIPTR)),%VAL(CNF_PVAL(TDPTR)),NEWSIZE,
+     :       STATUS)
               IF (STATUS .EQ. SAI__OK) THEN
 
 *  Copy the points containing good data to the output
-                CALL TSP_TBCPY(NEWSIZE,ACTSIZE,CHAN,NCHANS,%VAL(YRPTR),
-     :            %VAL(YEPTR),%VAL(UIPTR),%VAL(UIVPTR),%VAL(XDPTR))
+                CALL TSP_TBCPY(NEWSIZE,ACTSIZE,CHAN,NCHANS,
+     :       %VAL(CNF_PVAL(YRPTR)),
+     :            %VAL(CNF_PVAL(YEPTR)),%VAL(CNF_PVAL(UIPTR)),
+     :       %VAL(CNF_PVAL(UIVPTR)),%VAL(CNF_PVAL(XDPTR)))
               ENDIF
           ENDIF
           IF (VPTR .NE. 0) THEN
 
 *  Bin the V Stokes parameter
-              CALL TSP_TBBIN(SIZE,%VAL(XXPTR),%VAL(XDPTR),
-     :             %VAL(VPTR),%VAL(YRPTR),%VAL(YEPTR),BINSIZE,
-     :             %VAL(TIPTR),%VAL(TDPTR),NEWSIZE,STATUS)
+              CALL TSP_TBBIN(SIZE,%VAL(CNF_PVAL(XXPTR)),
+     :       %VAL(CNF_PVAL(XDPTR)),
+     :             %VAL(CNF_PVAL(VPTR)),%VAL(CNF_PVAL(YRPTR)),
+     :       %VAL(CNF_PVAL(YEPTR)),BINSIZE,
+     :             %VAL(CNF_PVAL(TIPTR)),%VAL(CNF_PVAL(TDPTR)),NEWSIZE,
+     :       STATUS)
               IF (STATUS .EQ. SAI__OK) THEN
 
 *  Copy the points containing good data to the output
-                 CALL TSP_TBCPY(NEWSIZE,ACTSIZE,CHAN,NCHANS,%VAL(YRPTR),
-     :             %VAL(YEPTR),%VAL(VIPTR),%VAL(VIVPTR),%VAL(XDPTR))
+                 CALL TSP_TBCPY(NEWSIZE,ACTSIZE,CHAN,NCHANS,
+     :       %VAL(CNF_PVAL(YRPTR)),
+     :             %VAL(CNF_PVAL(YEPTR)),%VAL(CNF_PVAL(VIPTR)),
+     :       %VAL(CNF_PVAL(VIVPTR)),%VAL(CNF_PVAL(XDPTR)))
               ENDIF
           ENDIF
 
@@ -491,6 +517,7 @@ C
 *+
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'PRM_PAR'
       INCLUDE 'USER_ERR'

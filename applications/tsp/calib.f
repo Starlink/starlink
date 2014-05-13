@@ -38,6 +38,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'USER_ERR'
       INTEGER STATUS
@@ -124,7 +125,8 @@ C
 
 *  Calibrate the Q data
           IF (STATUS .EQ. SAI__OK) THEN
-              CALL TSP_CALIB(SIZE,%VAL(SPTR1),%VAL(VPTR1),%VAL(SPTR2))
+              CALL TSP_CALIB(SIZE,%VAL(CNF_PVAL(SPTR1)),
+     :       %VAL(CNF_PVAL(VPTR1)),%VAL(CNF_PVAL(SPTR2)))
           ENDIF
           CALL TSP_UNMAP(SDLOC1,STATUS)
           CALL TSP_UNMAP(VDLOC1,STATUS)
@@ -140,7 +142,8 @@ C
 
 *  Calibrate the U data
           IF (STATUS .EQ. SAI__OK) THEN
-              CALL TSP_CALIB(SIZE,%VAL(SPTR1),%VAL(VPTR1),%VAL(SPTR2))
+              CALL TSP_CALIB(SIZE,%VAL(CNF_PVAL(SPTR1)),
+     :       %VAL(CNF_PVAL(VPTR1)),%VAL(CNF_PVAL(SPTR2)))
           ENDIF
           CALL TSP_UNMAP(SDLOC1,STATUS)
           CALL TSP_UNMAP(VDLOC1,STATUS)
@@ -155,7 +158,8 @@ C
 
 *  Calibrate the V data
           IF (STATUS .EQ. SAI__OK) THEN
-              CALL TSP_CALIB(SIZE,%VAL(SPTR1),%VAL(VPTR1),%VAL(SPTR2))
+              CALL TSP_CALIB(SIZE,%VAL(CNF_PVAL(SPTR1)),
+     :       %VAL(CNF_PVAL(VPTR1)),%VAL(CNF_PVAL(SPTR2)))
           ENDIF
           CALL TSP_UNMAP(SDLOC1,STATUS)
           CALL TSP_UNMAP(VDLOC1,STATUS)

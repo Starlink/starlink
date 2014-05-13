@@ -41,6 +41,7 @@ C+
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'USER_ERR'
       INTEGER STATUS
@@ -137,8 +138,10 @@ C+
                   CALL ERR_ANNUL(STATUS)
                   VARS = .FALSE.
               ENDIF
-              CALL TSP_COMBINE(SIZE,%VAL(SPTR1),%VAL(SPTR2))
-              IF (VARS) CALL TSP_COMBINE(SIZE,%VAL(VPTR1),%VAL(VPTR2))
+              CALL TSP_COMBINE(SIZE,%VAL(CNF_PVAL(SPTR1)),
+     :       %VAL(CNF_PVAL(SPTR2)))
+              IF (VARS) CALL TSP_COMBINE(SIZE,%VAL(CNF_PVAL(VPTR1)),
+     :       %VAL(CNF_PVAL(VPTR2)))
               CALL TSP_UNMAP(SDLOC2,STATUS)
               IF (VARS) CALL TSP_UNMAP(VDLOC2,STATUS)
               CALL DAT_ANNUL(QLOC2,STATUS)
@@ -165,8 +168,10 @@ C+
                   CALL ERR_ANNUL(STATUS)
                   VARS = .FALSE.
               ENDIF
-              CALL TSP_COMBINE(SIZE,%VAL(SPTR1),%VAL(SPTR2))
-              IF (VARS) CALL TSP_COMBINE(SIZE,%VAL(VPTR1),%VAL(VPTR2))
+              CALL TSP_COMBINE(SIZE,%VAL(CNF_PVAL(SPTR1)),
+     :       %VAL(CNF_PVAL(SPTR2)))
+              IF (VARS) CALL TSP_COMBINE(SIZE,%VAL(CNF_PVAL(VPTR1)),
+     :       %VAL(CNF_PVAL(VPTR2)))
               CALL TSP_UNMAP(SDLOC2,STATUS)
               IF (VARS) CALL TSP_UNMAP(VDLOC2,STATUS)
               CALL DAT_ANNUL(ULOC2,STATUS)
@@ -193,8 +198,10 @@ C+
                   CALL ERR_ANNUL(STATUS)
                   VARS = .FALSE.
               ENDIF
-              CALL TSP_COMBINE(SIZE,%VAL(SPTR1),%VAL(SPTR2))
-              IF (VARS) CALL TSP_COMBINE(SIZE,%VAL(VPTR1),%VAL(VPTR2))
+              CALL TSP_COMBINE(SIZE,%VAL(CNF_PVAL(SPTR1)),
+     :       %VAL(CNF_PVAL(SPTR2)))
+              IF (VARS) CALL TSP_COMBINE(SIZE,%VAL(CNF_PVAL(VPTR1)),
+     :       %VAL(CNF_PVAL(VPTR2)))
               CALL TSP_UNMAP(SDLOC2,STATUS)
               IF (VARS) CALL TSP_UNMAP(VDLOC2,STATUS)
               CALL DAT_ANNUL(VLOC2,STATUS)
@@ -210,7 +217,8 @@ C+
 *  sum the intensities
 
       IF (STATUS .EQ. SAI__OK) THEN
-         CALL TSP_COMBINE(SIZE,%VAL(PTR1),%VAL(PTR2))
+         CALL TSP_COMBINE(SIZE,%VAL(CNF_PVAL(PTR1)),
+     :       %VAL(CNF_PVAL(PTR2)))
       ENDIF
 
 *  Tidy up

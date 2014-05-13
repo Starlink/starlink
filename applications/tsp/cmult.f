@@ -34,6 +34,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'USER_ERR'
       INTEGER STATUS
@@ -75,7 +76,7 @@ C
 *  Scale Intensity data
 
          IF (STATUS .EQ. SAI__OK) THEN
-             CALL TSP_CMULT(FACTOR,SIZE,%VAL(DPTR))
+             CALL TSP_CMULT(FACTOR,SIZE,%VAL(CNF_PVAL(DPTR)))
          ENDIF
          CALL TSP_UNMAP(DLOC,STATUS)
 
@@ -84,8 +85,8 @@ C
          STAT = SAI__OK
          CALL TSP_MAP_VAR(OLOC,'UPDATE',DPTR,DLOC,STAT)
          IF (STAT .EQ. SAI__OK) THEN
-             CALL TSP_CMULT(FACTOR,SIZE,%VAL(DPTR))
-             CALL TSP_CMULT(FACTOR,SIZE,%VAL(DPTR))
+             CALL TSP_CMULT(FACTOR,SIZE,%VAL(CNF_PVAL(DPTR)))
+             CALL TSP_CMULT(FACTOR,SIZE,%VAL(CNF_PVAL(DPTR)))
              CALL TSP_UNMAP(DLOC,STATUS)
          ENDIF
 
@@ -102,7 +103,7 @@ C
 
              CALL TSP_MAP_DATA(SLOC,'UPDATE',DPTR,DLOC,STATUS)
              IF (STATUS .EQ. SAI__OK) THEN
-                 CALL TSP_CMULT(FACTOR,SIZE,%VAL(DPTR))
+                 CALL TSP_CMULT(FACTOR,SIZE,%VAL(CNF_PVAL(DPTR)))
              ENDIF
              CALL TSP_UNMAP(DLOC,STATUS)
              STAT = SAI__OK
@@ -111,8 +112,8 @@ C
 
              CALL TSP_MAP_VAR(SLOC,'UPDATE',DPTR,DLOC,STAT)
              IF (STAT .EQ. SAI__OK) THEN
-                 CALL TSP_CMULT(FACTOR,SIZE,%VAL(DPTR))
-                 CALL TSP_CMULT(FACTOR,SIZE,%VAL(DPTR))
+                 CALL TSP_CMULT(FACTOR,SIZE,%VAL(CNF_PVAL(DPTR)))
+                 CALL TSP_CMULT(FACTOR,SIZE,%VAL(CNF_PVAL(DPTR)))
                  CALL TSP_UNMAP(DLOC,STATUS)
              ENDIF
              CALL DAT_ANNUL(SLOC,STATUS)
@@ -127,7 +128,7 @@ C
 
              CALL TSP_MAP_DATA(SLOC,'UPDATE',DPTR,DLOC,STATUS)
              IF (STATUS .EQ. SAI__OK) THEN
-                 CALL TSP_CMULT(FACTOR,SIZE,%VAL(DPTR))
+                 CALL TSP_CMULT(FACTOR,SIZE,%VAL(CNF_PVAL(DPTR)))
              ENDIF
              CALL TSP_UNMAP(DLOC,STATUS)
 
@@ -136,8 +137,8 @@ C
              STAT = SAI__OK
              CALL TSP_MAP_VAR(SLOC,'UPDATE',DPTR,DLOC,STAT)
              IF (STAT .EQ. SAI__OK) THEN
-                 CALL TSP_CMULT(FACTOR,SIZE,%VAL(DPTR))
-                 CALL TSP_CMULT(FACTOR,SIZE,%VAL(DPTR))
+                 CALL TSP_CMULT(FACTOR,SIZE,%VAL(CNF_PVAL(DPTR)))
+                 CALL TSP_CMULT(FACTOR,SIZE,%VAL(CNF_PVAL(DPTR)))
                  CALL TSP_UNMAP(DLOC,STATUS)
              ENDIF
              CALL DAT_ANNUL(SLOC,STATUS)
@@ -152,7 +153,7 @@ C
 
              CALL TSP_MAP_DATA(SLOC,'UPDATE',DPTR,DLOC,STATUS)
              IF (STATUS .EQ. SAI__OK) THEN
-                 CALL TSP_CMULT(FACTOR,SIZE,%VAL(DPTR))
+                 CALL TSP_CMULT(FACTOR,SIZE,%VAL(CNF_PVAL(DPTR)))
              ENDIF
              CALL TSP_UNMAP(DLOC,STATUS)
 
@@ -161,8 +162,8 @@ C
              STAT = SAI__OK
              CALL TSP_MAP_VAR(SLOC,'UPDATE',DPTR,DLOC,STAT)
              IF (STAT .EQ. SAI__OK) THEN
-                 CALL TSP_CMULT(FACTOR,SIZE,%VAL(DPTR))
-                 CALL TSP_CMULT(FACTOR,SIZE,%VAL(DPTR))
+                 CALL TSP_CMULT(FACTOR,SIZE,%VAL(CNF_PVAL(DPTR)))
+                 CALL TSP_CMULT(FACTOR,SIZE,%VAL(CNF_PVAL(DPTR)))
                  CALL TSP_UNMAP(DLOC,STATUS)
              ENDIF
              CALL DAT_ANNUL(SLOC,STATUS)

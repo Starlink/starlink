@@ -46,6 +46,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'USER_ERR'
 
@@ -205,10 +206,11 @@ C
 *  Copy the data
 
              IF (STATUS .EQ. SAI__OK) THEN
-                CALL TSP_IPCS2STOKES(DIMS(1),DIMS(2),%VAL(IPTR),
-     :           ASTART,BSTART,OESEP,WIDTH,AP,SEP,%VAL(OIPTR),
-     :           %VAL(OSPTR),%VAL(OEPTR),
-     :           %VAL(XPTR),%VAL(OXPTR))
+                CALL TSP_IPCS2STOKES(DIMS(1),DIMS(2),
+     :       %VAL(CNF_PVAL(IPTR)),
+     :           ASTART,BSTART,OESEP,WIDTH,AP,SEP,%VAL(CNF_PVAL(OIPTR)),
+     :           %VAL(CNF_PVAL(OSPTR)),%VAL(CNF_PVAL(OEPTR)),
+     :           %VAL(CNF_PVAL(XPTR)),%VAL(CNF_PVAL(OXPTR)))
              ENDIF
 
 *  Unmap output arrays and annul locators

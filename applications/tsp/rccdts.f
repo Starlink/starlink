@@ -40,6 +40,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'USER_ERR'
 
@@ -118,8 +119,8 @@ C
 
 *  Copy the data
       IF (STATUS .EQ. SAI__OK) THEN
-          CALL TSP_RCCDTS_COPY(ELEMENTS,NFRAMES,%VAL(IPTR),
-     :         %VAL(OPTR),MJD,PERIOD,%VAL(TPTR))
+          CALL TSP_RCCDTS_COPY(ELEMENTS,NFRAMES,%VAL(CNF_PVAL(IPTR)),
+     :         %VAL(CNF_PVAL(OPTR)),MJD,PERIOD,%VAL(CNF_PVAL(TPTR)))
       ENDIF
 
 *  Tidy up

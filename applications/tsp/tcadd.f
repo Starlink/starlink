@@ -35,6 +35,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'USER_ERR'
 
@@ -94,7 +95,8 @@ C
 *  Correct Intensity data
 
          IF (STATUS .EQ. SAI__OK) THEN
-             CALL TSP_TCADD(SIZE,CHANS,%VAL(DPTR),FIRST,LAST,%VAL(OPTR))
+             CALL TSP_TCADD(SIZE,CHANS,%VAL(CNF_PVAL(DPTR)),FIRST,LAST,
+     :       %VAL(CNF_PVAL(OPTR)))
          ENDIF
          CALL TSP_UNMAP(DLOC,STATUS)
          CALL TSP_UNMAP(ODLOC,STATUS)
@@ -104,7 +106,8 @@ C
          CALL TSP_MAP_VAR(ILOC,'READ',DPTR,DLOC,STATUS)
          CALL TSP_MAP_VAR(OLOC,'UPDATE',OPTR,ODLOC,STATUS)
          IF (STATUS .EQ. SAI__OK) THEN
-             CALL TSP_TCADD(SIZE,CHANS,%VAL(DPTR),FIRST,LAST,%VAL(OPTR))
+             CALL TSP_TCADD(SIZE,CHANS,%VAL(CNF_PVAL(DPTR)),FIRST,LAST,
+     :       %VAL(CNF_PVAL(OPTR)))
              CALL TSP_UNMAP(DLOC,STATUS)
              CALL TSP_UNMAP(ODLOC,STATUS)
          ELSE
@@ -125,8 +128,9 @@ C
              CALL TSP_MAP_DATA(SLOC,'READ',DPTR,DLOC,STATUS)
              CALL TSP_MAP_DATA(OSLOC,'UPDATE',OPTR,ODLOC,STATUS)
              IF (STATUS .EQ. SAI__OK) THEN
-                CALL TSP_TCADD(SIZE,CHANS,%VAL(DPTR),FIRST,LAST,
-     :              %VAL(OPTR))
+                CALL TSP_TCADD(SIZE,CHANS,%VAL(CNF_PVAL(DPTR)),FIRST,
+     :       LAST,
+     :              %VAL(CNF_PVAL(OPTR)))
              ENDIF
              CALL TSP_UNMAP(DLOC,STATUS)
              CALL TSP_UNMAP(ODLOC,STATUS)
@@ -135,8 +139,9 @@ C
              CALL TSP_MAP_VAR(SLOC,'READ',DPTR,DLOC,STATUS)
              CALL TSP_MAP_VAR(OSLOC,'UPDATE',OPTR,ODLOC,STATUS)
              IF (STATUS .EQ. SAI__OK) THEN
-                 CALL TSP_TCADD(SIZE,CHANS,%VAL(DPTR),FIRST,LAST,
-     :               %VAL(OPTR))
+                 CALL TSP_TCADD(SIZE,CHANS,%VAL(CNF_PVAL(DPTR)),FIRST,
+     :       LAST,
+     :               %VAL(CNF_PVAL(OPTR)))
                  CALL TSP_UNMAP(DLOC,STATUS)
                  CALL TSP_UNMAP(ODLOC,STATUS)
              ELSE
@@ -154,8 +159,9 @@ C
              CALL TSP_MAP_DATA(SLOC,'READ',DPTR,DLOC,STATUS)
              CALL TSP_MAP_DATA(OSLOC,'UPDATE',OPTR,ODLOC,STATUS)
              IF (STATUS .EQ. SAI__OK) THEN
-                CALL TSP_TCADD(SIZE,CHANS,%VAL(DPTR),FIRST,LAST,
-     :              %VAL(OPTR))
+                CALL TSP_TCADD(SIZE,CHANS,%VAL(CNF_PVAL(DPTR)),FIRST,
+     :       LAST,
+     :              %VAL(CNF_PVAL(OPTR)))
              ENDIF
              CALL TSP_UNMAP(DLOC,STATUS)
              CALL TSP_UNMAP(ODLOC,STATUS)
@@ -164,8 +170,9 @@ C
              CALL TSP_MAP_VAR(SLOC,'READ',DPTR,DLOC,STATUS)
              CALL TSP_MAP_VAR(OSLOC,'UPDATE',OPTR,ODLOC,STATUS)
              IF (STATUS .EQ. SAI__OK) THEN
-                 CALL TSP_TCADD(SIZE,CHANS,%VAL(DPTR),FIRST,LAST,
-     :               %VAL(OPTR))
+                 CALL TSP_TCADD(SIZE,CHANS,%VAL(CNF_PVAL(DPTR)),FIRST,
+     :       LAST,
+     :               %VAL(CNF_PVAL(OPTR)))
                  CALL TSP_UNMAP(DLOC,STATUS)
                  CALL TSP_UNMAP(ODLOC,STATUS)
              ELSE
@@ -184,8 +191,9 @@ C
              CALL TSP_MAP_DATA(SLOC,'READ',DPTR,DLOC,STATUS)
              CALL TSP_MAP_DATA(OSLOC,'UPDATE',OPTR,ODLOC,STATUS)
              IF (STATUS .EQ. SAI__OK) THEN
-                CALL TSP_TCADD(SIZE,CHANS,%VAL(DPTR),FIRST,LAST,
-     :              %VAL(OPTR))
+                CALL TSP_TCADD(SIZE,CHANS,%VAL(CNF_PVAL(DPTR)),FIRST,
+     :       LAST,
+     :              %VAL(CNF_PVAL(OPTR)))
              ENDIF
              CALL TSP_UNMAP(DLOC,STATUS)
              CALL TSP_UNMAP(ODLOC,STATUS)
@@ -194,8 +202,9 @@ C
              CALL TSP_MAP_VAR(SLOC,'READ',DPTR,DLOC,STATUS)
              CALL TSP_MAP_VAR(OSLOC,'UPDATE',OPTR,ODLOC,STATUS)
              IF (STATUS .EQ. SAI__OK) THEN
-                 CALL TSP_TCADD(SIZE,CHANS,%VAL(DPTR),FIRST,LAST,
-     :               %VAL(OPTR))
+                 CALL TSP_TCADD(SIZE,CHANS,%VAL(CNF_PVAL(DPTR)),FIRST,
+     :       LAST,
+     :               %VAL(CNF_PVAL(OPTR)))
                  CALL TSP_UNMAP(DLOC,STATUS)
                  CALL TSP_UNMAP(ODLOC,STATUS)
              ELSE

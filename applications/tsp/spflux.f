@@ -40,6 +40,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'USER_ERR'
 
@@ -151,8 +152,9 @@ C
 *  Calibrate Intensity data
 
          IF (STATUS .EQ. SAI__OK) THEN
-             CALL TSP_SPFLUX(TIME,SIZE,%VAL(XPTR),%VAL(CPTR),
-     :                  %VAL(DPTR))
+             CALL TSP_SPFLUX(TIME,SIZE,%VAL(CNF_PVAL(XPTR)),
+     :       %VAL(CNF_PVAL(CPTR)),
+     :                  %VAL(CNF_PVAL(DPTR)))
          ENDIF
          CALL TSP_UNMAP(DLOC,STATUS)
 
@@ -167,10 +169,12 @@ C
 
 *  Calibrate it twice to scale by the square of the intensity factor
 
-             CALL TSP_SPFLUX(TIME,SIZE,%VAL(XPTR),%VAL(CPTR),
-     :                     %VAL(DPTR))
-             CALL TSP_SPFLUX(TIME,SIZE,%VAL(XPTR),%VAL(CPTR),
-     :                     %VAL(DPTR))
+             CALL TSP_SPFLUX(TIME,SIZE,%VAL(CNF_PVAL(XPTR)),
+     :       %VAL(CNF_PVAL(CPTR)),
+     :                     %VAL(CNF_PVAL(DPTR)))
+             CALL TSP_SPFLUX(TIME,SIZE,%VAL(CNF_PVAL(XPTR)),
+     :       %VAL(CNF_PVAL(CPTR)),
+     :                     %VAL(CNF_PVAL(DPTR)))
              CALL TSP_UNMAP(DLOC,STATUS)
          ENDIF
 
@@ -192,8 +196,9 @@ C
              IF (STATUS .EQ. SAI__OK) THEN
 
 *  Calibrate the Q stokes data
-                 CALL TSP_SPFLUX(TIME,SIZE,%VAL(XPTR),%VAL(CPTR),
-     :                     %VAL(DPTR))
+                 CALL TSP_SPFLUX(TIME,SIZE,%VAL(CNF_PVAL(XPTR)),
+     :       %VAL(CNF_PVAL(CPTR)),
+     :                     %VAL(CNF_PVAL(DPTR)))
              ENDIF
 
 *  Unmap the array
@@ -205,10 +210,12 @@ C
              IF (STAT .EQ. SAI__OK) THEN
 
 *  Calibrate it twice to scale by the square of the intensity factor
-                 CALL TSP_SPFLUX(TIME,SIZE,%VAL(XPTR),%VAL(CPTR),
-     :                     %VAL(DPTR))
-                 CALL TSP_SPFLUX(TIME,SIZE,%VAL(XPTR),%VAL(CPTR),
-     :                     %VAL(DPTR))
+                 CALL TSP_SPFLUX(TIME,SIZE,%VAL(CNF_PVAL(XPTR)),
+     :       %VAL(CNF_PVAL(CPTR)),
+     :                     %VAL(CNF_PVAL(DPTR)))
+                 CALL TSP_SPFLUX(TIME,SIZE,%VAL(CNF_PVAL(XPTR)),
+     :       %VAL(CNF_PVAL(CPTR)),
+     :                     %VAL(CNF_PVAL(DPTR)))
                  CALL TSP_UNMAP(DLOC,STATUS)
              ENDIF
              CALL DAT_ANNUL(SLOC,STATUS)
@@ -223,8 +230,9 @@ C
              IF (STATUS .EQ. SAI__OK) THEN
 
 *  Calibrate the U stokes data
-                 CALL TSP_SPFLUX(TIME,SIZE,%VAL(XPTR),%VAL(CPTR),
-     :                     %VAL(DPTR))
+                 CALL TSP_SPFLUX(TIME,SIZE,%VAL(CNF_PVAL(XPTR)),
+     :       %VAL(CNF_PVAL(CPTR)),
+     :                     %VAL(CNF_PVAL(DPTR)))
              ENDIF
 
 *  Unmap the array
@@ -236,10 +244,12 @@ C
              IF (STAT .EQ. SAI__OK) THEN
 
 *  Calibrate it twice to scale by the square of the intensity factor
-                 CALL TSP_SPFLUX(TIME,SIZE,%VAL(XPTR),%VAL(CPTR),
-     :                     %VAL(DPTR))
-                 CALL TSP_SPFLUX(TIME,SIZE,%VAL(XPTR),%VAL(CPTR),
-     :                     %VAL(DPTR))
+                 CALL TSP_SPFLUX(TIME,SIZE,%VAL(CNF_PVAL(XPTR)),
+     :       %VAL(CNF_PVAL(CPTR)),
+     :                     %VAL(CNF_PVAL(DPTR)))
+                 CALL TSP_SPFLUX(TIME,SIZE,%VAL(CNF_PVAL(XPTR)),
+     :       %VAL(CNF_PVAL(CPTR)),
+     :                     %VAL(CNF_PVAL(DPTR)))
 
 *  Unmap the array
                  CALL TSP_UNMAP(DLOC,STATUS)
@@ -256,8 +266,9 @@ C
              IF (STATUS .EQ. SAI__OK) THEN
 
 *  Calibrate the V stokes data
-                 CALL TSP_SPFLUX(TIME,SIZE,%VAL(XPTR),%VAL(CPTR),
-     :                     %VAL(DPTR))
+                 CALL TSP_SPFLUX(TIME,SIZE,%VAL(CNF_PVAL(XPTR)),
+     :       %VAL(CNF_PVAL(CPTR)),
+     :                     %VAL(CNF_PVAL(DPTR)))
              ENDIF
 
 *  Unmap the array
@@ -269,10 +280,12 @@ C
              IF (STAT .EQ. SAI__OK) THEN
 
 *  Calibrate it twice to scale by the sqaure of the intensity factor
-                 CALL TSP_SPFLUX(TIME,SIZE,%VAL(XPTR),%VAL(CPTR),
-     :                     %VAL(DPTR))
-                 CALL TSP_SPFLUX(TIME,SIZE,%VAL(XPTR),%VAL(CPTR),
-     :                     %VAL(DPTR))
+                 CALL TSP_SPFLUX(TIME,SIZE,%VAL(CNF_PVAL(XPTR)),
+     :       %VAL(CNF_PVAL(CPTR)),
+     :                     %VAL(CNF_PVAL(DPTR)))
+                 CALL TSP_SPFLUX(TIME,SIZE,%VAL(CNF_PVAL(XPTR)),
+     :       %VAL(CNF_PVAL(CPTR)),
+     :                     %VAL(CNF_PVAL(DPTR)))
 
 *  Unmap the data
                  CALL TSP_UNMAP(DLOC,STATUS)

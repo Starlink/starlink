@@ -45,6 +45,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'USER_ERR'
 
@@ -108,7 +109,8 @@ C
 
 *   Find X plotting limits
 
-        CALL TSP_QPLTXLIMITS(%VAL(XPTR),STRT,FIN,%VAL(XXPTR),STATUS)
+        CALL TSP_QPLTXLIMITS(%VAL(CNF_PVAL(XPTR)),STRT,FIN,
+     :       %VAL(CNF_PVAL(XXPTR)),STATUS)
         SIZE = FIN-STRT+1
         FSIZE = SIZE
 
@@ -180,18 +182,20 @@ C
 *  Take square root of variance to get sigma
 
               IF (IEPTR .NE. 0) THEN
-                  CALL TSP_QPLTSQ(SIZE,%VAL(IEPTR),%VAL(T2PTR))
+                  CALL TSP_QPLTSQ(SIZE,%VAL(CNF_PVAL(IEPTR)),
+     :       %VAL(CNF_PVAL(T2PTR)))
               ELSE
 
 *  If there is no error array set the temp array to zero
 
-                  CALL TSP_QPLTZERO(SIZE,%VAL(T2PTR))
+                  CALL TSP_QPLTZERO(SIZE,%VAL(CNF_PVAL(T2PTR)))
               ENDIF
 
 *  Find the scaling limits
 
-              CALL TSP_PHSSCALE(SIZE,%VAL(XXPTR),%VAL(IPTR),
-     :             %VAL(T2PTR),IMIN,IMAX,STATUS)
+              CALL TSP_PHSSCALE(SIZE,%VAL(CNF_PVAL(XXPTR)),
+     :       %VAL(CNF_PVAL(IPTR)),
+     :             %VAL(CNF_PVAL(T2PTR)),IMIN,IMAX,STATUS)
               YRPTR = IPTR
 
 *  Stokes Q
@@ -201,18 +205,20 @@ C
 *  Take square root of variance to get sigma
 
               IF (QEPTR .NE. 0) THEN
-                  CALL TSP_QPLTSQ(SIZE,%VAL(QEPTR),%VAL(T2PTR))
+                  CALL TSP_QPLTSQ(SIZE,%VAL(CNF_PVAL(QEPTR)),
+     :       %VAL(CNF_PVAL(T2PTR)))
               ELSE
 
 *  If there is no error array set the temp array to zero
 
-                  CALL TSP_QPLTZERO(SIZE,%VAL(T2PTR))
+                  CALL TSP_QPLTZERO(SIZE,%VAL(CNF_PVAL(T2PTR)))
               ENDIF
 
 *  Find the scaling limits
 
-              CALL TSP_PHSSCALE(SIZE,%VAL(XXPTR),%VAL(QPTR),
-     :             %VAL(T2PTR),IMIN,IMAX,STATUS)
+              CALL TSP_PHSSCALE(SIZE,%VAL(CNF_PVAL(XXPTR)),
+     :       %VAL(CNF_PVAL(QPTR)),
+     :             %VAL(CNF_PVAL(T2PTR)),IMIN,IMAX,STATUS)
               YRPTR = QPTR
 
 *  Stokes U
@@ -222,18 +228,20 @@ C
 
 *  Take square root of variance to get sigma
 
-                  CALL TSP_QPLTSQ(SIZE,%VAL(UEPTR),%VAL(T2PTR))
+                  CALL TSP_QPLTSQ(SIZE,%VAL(CNF_PVAL(UEPTR)),
+     :       %VAL(CNF_PVAL(T2PTR)))
               ELSE
 
 *  If there is no error array set the temp array to zero
 
-                  CALL TSP_QPLTZERO(SIZE,%VAL(T2PTR))
+                  CALL TSP_QPLTZERO(SIZE,%VAL(CNF_PVAL(T2PTR)))
               ENDIF
 
 *  Find the scaling limits
 
-              CALL TSP_PHSSCALE(SIZE,%VAL(XXPTR),%VAL(UPTR),
-     :             %VAL(T2PTR),IMIN,IMAX,STATUS)
+              CALL TSP_PHSSCALE(SIZE,%VAL(CNF_PVAL(XXPTR)),
+     :       %VAL(CNF_PVAL(UPTR)),
+     :             %VAL(CNF_PVAL(T2PTR)),IMIN,IMAX,STATUS)
               YRPTR = UPTR
 
 *  Stokes V
@@ -243,18 +251,20 @@ C
 
 *  Take square root of variance to get sigma
 
-                  CALL TSP_QPLTSQ(SIZE,%VAL(VEPTR),%VAL(T2PTR))
+                  CALL TSP_QPLTSQ(SIZE,%VAL(CNF_PVAL(VEPTR)),
+     :       %VAL(CNF_PVAL(T2PTR)))
               ELSE
 
 *  If there is no error array set the temp array to zero
 
-                  CALL TSP_QPLTZERO(SIZE,%VAL(T2PTR))
+                  CALL TSP_QPLTZERO(SIZE,%VAL(CNF_PVAL(T2PTR)))
               ENDIF
 
 *  Find the scaling limits
 
-              CALL TSP_PHSSCALE(SIZE,%VAL(XXPTR),%VAL(VPTR),
-     :             %VAL(T2PTR),IMIN,IMAX,STATUS)
+              CALL TSP_PHSSCALE(SIZE,%VAL(CNF_PVAL(XXPTR)),
+     :       %VAL(CNF_PVAL(VPTR)),
+     :             %VAL(CNF_PVAL(T2PTR)),IMIN,IMAX,STATUS)
               YRPTR = VPTR
 
           ENDIF
@@ -283,8 +293,9 @@ C
 *  Do the plot
 
           IF (STATUS .EQ. SAI__OK) THEN
-            CALL TSP_QPLTPLOT(SIZE,%VAL(XXPTR),
-     :        %VAL(YRPTR),%VAL(T2PTR),%VAL(T1PTR),
+            CALL TSP_QPLTPLOT(SIZE,%VAL(CNF_PVAL(XXPTR)),
+     :        %VAL(CNF_PVAL(YRPTR)),%VAL(CNF_PVAL(T2PTR)),
+     :       %VAL(CNF_PVAL(T1PTR)),
      :        XLABEL,YLABEL,IMIN,IMAX,STATUS)
           ENDIF
           CALL TSP_QPLTUNMAPITEM(LOC,STATUS)
@@ -418,6 +429,7 @@ C
 
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
+      INCLUDE 'CNF_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'PRM_PAR'
 
