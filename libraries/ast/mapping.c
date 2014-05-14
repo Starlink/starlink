@@ -87,12 +87,12 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -11990,6 +11990,53 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
       npix_out *= ubnd_out[ idim ] - lbnd_out[ idim ] + 1; \
    } \
 \
+/* Obtain values for the Nin and Nout attributes of the Mapping. */ \
+   nin = astGetNin( this ); \
+   nout = astGetNout( this ); \
+\
+/* If OK, check that the number of input grid dimensions matches the \
+   number required by the Mapping and is at least 1. Report an error \
+   if necessary. */ \
+   if ( astOK && ( ( ndim_in != nin ) || ( ndim_in < 1 ) ) ) { \
+      astError( AST__NGDIN, "astRebinSeq"#X"(%s): Bad number of input grid " \
+                "dimensions (%d).", status, astGetClass( this ), ndim_in ); \
+      if ( ndim_in != nin ) { \
+         astError( AST__NGDIN, "The %s given requires %d coordinate value%s " \
+                   "to specify an input position.", status, \
+                   astGetClass( this ), nin, ( nin == 1 ) ? "" : "s" ); \
+      } \
+   } \
+\
+/* If OK, also check that the number of output grid dimensions matches \
+   the number required by the Mapping and is at least 1. Report an \
+   error if necessary. */ \
+   if ( astOK && ( ( ndim_out != nout ) || ( ndim_out < 1 ) ) ) { \
+      astError( AST__NGDIN, "astRebinSeq"#X"(%s): Bad number of output grid " \
+                "dimensions (%d).", status, astGetClass( this ), ndim_out ); \
+      if ( ndim_out != nout ) { \
+         astError( AST__NGDIN, "The %s given generates %s%d coordinate " \
+                   "value%s for each output position.", status, astGetClass( this ), \
+                   ( nout < ndim_out ) ? "only " : "", nout, \
+                   ( nout == 1 ) ? "" : "s" ); \
+      } \
+   } \
+\
+/* Check that the lower and upper bounds of the input grid are \
+   consistent. Report an error if any pair is not. */ \
+   if ( astOK ) { \
+      for ( idim = 0; idim < ndim_in; idim++ ) { \
+         if ( lbnd_in[ idim ] > ubnd_in[ idim ] ) { \
+            astError( AST__GBDIN, "astRebinSeq"#X"(%s): Lower bound of " \
+                      "input grid (%d) exceeds corresponding upper bound " \
+                      "(%d).", status, astGetClass( this ), \
+                      lbnd_in[ idim ], ubnd_in[ idim ] ); \
+            astError( AST__GBDIN, "Error in input dimension %d.", status, \
+                      idim + 1 ); \
+            break; \
+         } \
+      } \
+   } \
+\
 /* If no input data was supplied, jump to the normalisation section. */ \
    simple = NULL; \
    if( in ) { \
@@ -12004,53 +12051,6 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
    being created. */ \
       if( !( flags & AST__USEVAR ) && !( flags & AST__GENVAR ) ) { \
          out_var = NULL; \
-      } \
-\
-/* Obtain values for the Nin and Nout attributes of the Mapping. */ \
-      nin = astGetNin( this ); \
-      nout = astGetNout( this ); \
-\
-/* If OK, check that the number of input grid dimensions matches the \
-   number required by the Mapping and is at least 1. Report an error \
-   if necessary. */ \
-      if ( astOK && ( ( ndim_in != nin ) || ( ndim_in < 1 ) ) ) { \
-         astError( AST__NGDIN, "astRebinSeq"#X"(%s): Bad number of input grid " \
-                   "dimensions (%d).", status, astGetClass( this ), ndim_in ); \
-         if ( ndim_in != nin ) { \
-            astError( AST__NGDIN, "The %s given requires %d coordinate value%s " \
-                      "to specify an input position.", status, \
-                      astGetClass( this ), nin, ( nin == 1 ) ? "" : "s" ); \
-         } \
-      } \
-\
-/* If OK, also check that the number of output grid dimensions matches \
-   the number required by the Mapping and is at least 1. Report an \
-   error if necessary. */ \
-      if ( astOK && ( ( ndim_out != nout ) || ( ndim_out < 1 ) ) ) { \
-         astError( AST__NGDIN, "astRebinSeq"#X"(%s): Bad number of output grid " \
-                   "dimensions (%d).", status, astGetClass( this ), ndim_out ); \
-         if ( ndim_out != nout ) { \
-            astError( AST__NGDIN, "The %s given generates %s%d coordinate " \
-                      "value%s for each output position.", status, astGetClass( this ), \
-                      ( nout < ndim_out ) ? "only " : "", nout, \
-                      ( nout == 1 ) ? "" : "s" ); \
-         } \
-      } \
-\
-/* Check that the lower and upper bounds of the input grid are \
-   consistent. Report an error if any pair is not. */ \
-      if ( astOK ) { \
-         for ( idim = 0; idim < ndim_in; idim++ ) { \
-            if ( lbnd_in[ idim ] > ubnd_in[ idim ] ) { \
-               astError( AST__GBDIN, "astRebinSeq"#X"(%s): Lower bound of " \
-                         "input grid (%d) exceeds corresponding upper bound " \
-                         "(%d).", status, astGetClass( this ), \
-                         lbnd_in[ idim ], ubnd_in[ idim ] ); \
-               astError( AST__GBDIN, "Error in input dimension %d.", status, \
-                         idim + 1 ); \
-               break; \
-            } \
-         } \
       } \
 \
 /* Check that the positional accuracy tolerance supplied is valid and \
