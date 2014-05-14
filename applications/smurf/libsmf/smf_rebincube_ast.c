@@ -175,7 +175,10 @@
 *        Retain all flags when calling astRebinSeq for the last time to
 *        normalise the returned values. Previously, lack of the AST__USEVAR
 *        flag was causing all output varianes to be set bad within astRebinseq.
-.*     {enter_further_changes_here}
+*     14-MAY-2014 (DSB):
+*        Do not attempt to normalise empty cubes, but issue a warning
+*        instead.
+*     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2007-2009 Science & Technology Facilities Council.
@@ -663,18 +666,37 @@ void smf_rebincube_ast( ThrWorkForce *wf, smfData *data, int first, int last,
    data and variance values. */
    if( last ) {
 
+/* Check some data was pasted into the output. */
+      if( *nused > 0 ) {
+
 /* Create a dummy mapping that can be used with astRebinSeq (it is not
    actually used for anything since we are not adding any more data into the
    output arrays). */
-      fullmap = (AstMapping *) astPermMap( 2, NULL, 3, NULL, NULL, " " );
+         fullmap = (AstMapping *) astPermMap( 2, NULL, 3, NULL, NULL, " " );
 
 /* Normalise the data values. We do not normalise the exposure time arrays. */
-      astRebinSeqF( fullmap, 0.0, 2, lbnd_in,
-                    ubnd_in, NULL, NULL, spread, params,
-                    AST__REBINEND | ast_flags, 0.0, 50, VAL__BADR, 3,
-                    ldim, udim, lbnd_in, ubnd_in, data_array, var_array,
-                    wgt_array, nused );
-      fullmap = astAnnul(fullmap);
+         astRebinSeqF( fullmap, 0.0, 2, lbnd_in,
+                       ubnd_in, NULL, NULL, spread, params,
+                       AST__REBINEND | ast_flags, 0.0, 50, VAL__BADR, 3,
+                       ldim, udim, lbnd_in, ubnd_in, data_array, var_array,
+                       wgt_array, nused );
+         fullmap = astAnnul(fullmap);
+
+/* If no data was pasted into the output, fill it with bad values and
+   issue a warning. */
+      } else {
+         size_t nel = dim[0]*dim[1]*dim[2];
+         size_t iel;
+
+         float *p1 = data_array;
+         for( iel = 0; iel < nel; iel++ ) *(p1++) = VAL__BADR;
+
+         if( genvar ) {
+            p1 = var_array;
+            for( iel = 0; iel < nel; iel++ ) *(p1++) = VAL__BADR;
+         }
+         msgOut( "", "WARNING: No good values in output cube.", status );
+      }
    }
 
 /* Free resources. */
