@@ -281,6 +281,8 @@
 *        Ensure downsampling occurs only on the first invocation of makemap.
 *     4-MAR-2014 (DSB):
 *        Do not update quality flags at the end of each iteration.
+*     14-MAY-2014 (DSB):
+*        Abort if ast.skip is negative.
 *-
 '''
 
@@ -289,6 +291,7 @@ import glob
 import os
 import shutil
 import starutil
+import sys
 from starutil import invoke
 from starutil import NDG
 from starutil import msg_out
@@ -490,6 +493,14 @@ try:
    ast_skip = int( invoke( "$KAPPA_DIR/configecho name=ast.skip config={0} "
                            "defaults=$SMURF_DIR/smurf_makemap.def "
                            "select=\"\'450=0,850=1\'\"".format(config)))
+   if ast_skip < 0 :
+      msg_out("\nThe ast.skip parameter is set to {0} in the supplied "
+              "config. skyloop does not handle negative ast.skip "
+              "values. Use makemap instead (there is no benefit "
+              "in a skyloop-style algorithm since no AST model "
+              "is used).".format(ast_skip))
+      cleanup()
+      sys.exit()
 
 #  The first invocation of makemap will create NDFs holding cleaned
 #  time-series data, EXT, LUT and NOI model values. The NDFs are created
