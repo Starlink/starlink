@@ -83,8 +83,11 @@
 *        from i and window we need to cast to long before negating.
 *     2013-10-21 (DSB):
 *        - Added arguments stride, update and var.
-*        - Fix nasty bug that could cause spurious values to be returned 
+*        - Fix nasty bug that could cause spurious values to be returned
 *        at the end of the array, when using QUALITY masking.
+*     2014-05-14 (DSB):
+*        Fix bug that causes the same element to be removed twice from
+*        the smoothing box.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -212,8 +215,14 @@ void CGEN_FUNCTION(smf_boxcar1)( CGEN_TYPE *series, const size_t ninpts,
 
       }
 
-      /* at the end of the array smooth using the partial window */
-      for( i=ninpts-window; i<ninpts; i++ ) {
+      /* at the end of the array smooth using the partial window. The
+         last pass through the above loop has i=(ninpts-1), so the last
+         value to have been removed from the box in the above loop is the
+         value at index "stride*((ninpts-1)-(window-1))" which is
+         "stride*(ninpts-window)". Therefore we start this loop at the
+         next sample, i=(ninpts-window+1), in order to avoid subtracting
+         the same element a second time. */
+      for( i=ninpts-window+1; i<ninpts; i++ ) {
 	off = (ninpts-i-1)/2;
 
 	if( (count > 1) && !(qual[stride*(i+off)]&mask) ) {
@@ -264,8 +273,14 @@ void CGEN_FUNCTION(smf_boxcar1)( CGEN_TYPE *series, const size_t ninpts,
 
       }
 
-      /* at the end of the array smooth using the partial window */
-      for( i=ninpts-window; i<ninpts; i++ ) {
+      /* at the end of the array smooth using the partial window. The
+         last pass through the above loop has i=(ninpts-1), so the last
+         value to have been removed from the box in the above loop is the
+         value at index "stride*((ninpts-1)-(window-1))" which is
+         "stride*(ninpts-window)". Therefore we start this loop at the
+         next sample, i=(ninpts-window+1), in order to avoid subtracting
+         the same element a second time. */
+      for( i=ninpts-window+1; i<ninpts; i++ ) {
 	off = (ninpts-i-1)/2;
 
 	if( (count > 1) && (series[stride*(i+off)] != CGEN_BAD) ) {
