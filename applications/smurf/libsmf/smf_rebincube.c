@@ -187,6 +187,8 @@
 *     26-SEP-2008 (DSB):
 *        Increased tolerance for variations in Tsys conversion factor
 *        from 0.001% to 1.0%.
+*     14-MAY-2014 (DSB):
+*        Report the number of samples pasted into the output cube.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -248,10 +250,10 @@ void  smf_rebincube( ThrWorkForce *wf, smfData *data, int first, int last,
    AstFrame *specframe = NULL; /* SpecFrame in input WCS */
    AstFrameSet *fs = NULL;     /* WCS FramesSet from input */
    AstMapping *specmap = NULL; /* GRID->Spectral Mapping for current input file */
-   dim_t ndet;                 /* No of detectors in the input */
    dim_t dim[ 3 ];             /* Output array dimensions */
    dim_t iv;                   /* Vector index into output 3D array */
    dim_t nchan;                /* Number of input spectral channels */
+   dim_t ndet;                 /* No of detectors in the input */
    dim_t nel;                  /* No. of pixels in output */
    dim_t nout;                 /* Total number of elements in output cube */
    dim_t nslice;               /* No of time slices in the input */
@@ -261,6 +263,7 @@ void  smf_rebincube( ThrWorkForce *wf, smfData *data, int first, int last,
    double gout[2];             /* Output grid coords */
    double tfac;                /* Factor describing spectral overlap */
    int good_tsys;              /* Flag indicating some good Tsys values found */
+   int64_t nused_orig;         /* Supplied value of *nused */
    smfHead *hdr = NULL;        /* Pointer to data header for this time slice */
 
 /* Check the inherited status. */
@@ -347,6 +350,10 @@ void  smf_rebincube( ThrWorkForce *wf, smfData *data, int first, int last,
 /* Indicate we have not yet found any good Tsys values in the input NDF. */
    good_tsys = 0;
 
+/* Record the original number of input samples that have been pasted into
+   the output cube. */
+   nused_orig = *nused;
+
 /* If we are using nearest neighbour rebinning, we can use specialist
    code that is faster than AST. */
    if( spread == AST__NEAREST ) {
@@ -385,6 +392,18 @@ void  smf_rebincube( ThrWorkForce *wf, smfData *data, int first, int last,
       smf_smfFile_msg( data->file, "FILE", 1, "<unknown file>" );
       msgOutif( MSG__NORM, " ", "WARNING: ^FILE contains no Tsys values "
                 "and will be ignored.", status );
+   }
+
+/* Report the number of samples from the input file that were pasted into
+   the output cube. */
+   smf_smfFile_msg( data->file, "FILE", 1, "<unknown file>" );
+   if( nused_orig < *nused ){
+      msgSetk( "N", *nused - nused_orig );
+      msgOutif( MSG__VERB, " ", " ^N good samples from ^FILE were included in "
+                "the output cube.", status );
+   } else {
+      msgOutif( MSG__NORM, " ", "WARNING: No good samples from ^FILE were "
+                "included in the output cube.", status );
    }
 
 /* End the AST context. This will annul all the AST objects created
