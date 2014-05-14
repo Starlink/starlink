@@ -70,10 +70,12 @@
 *  History:
 *     21-MAY-2008 (DSB):
 *        Initial version.
+*     14-MAY-2014 (DSB):
+*        Do not attempt to rebin empty blocks.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     Copyright (C) 2008,2014 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -228,13 +230,17 @@ void smf_rebincube_seqf( ThrWorkForce *workforce, int njobs,
                (data->ubnd)[ j ] = ubnd[ j ];
             }
 
+/* Skip empty blocks. */
+            if( (data->ubnd)[ 0 ] >= (data->lbnd)[ 0 ] ) {
+
 /* Add this job to the workforce. It may start immediately if a worker
    thread is available, otherwise it will start as soon as a worker
    becomes available. The worker thread does its work by invoking the
    smf_rebinseq_thread function, passing it the data structure
    created above. */
-            thrAddJob( workforce, 0, data, smf_rebinseq_thread,
-                         0, NULL, status );
+               thrAddJob( workforce, 0, data, smf_rebinseq_thread,
+                          0, NULL, status );
+            }
          }
 
 /* Wait until the work force has done all the re-binning. This call blocks
@@ -272,9 +278,13 @@ void smf_rebincube_seqf( ThrWorkForce *workforce, int njobs,
                (data->lbnd)[ 0 ] = (int)( blk_bot[ 2*i + 1 ] + 0.5 );
                (data->ubnd)[ 0 ] = (int)( blk_bot[ 2*i + 2 ] - 0.5 );
 
+/* Skip empty blocks. */
+               if( (data->ubnd)[ 0 ] >= (data->lbnd)[ 0 ] ) {
+
 /* Add the new job to the workforce. */
-               thrAddJob( workforce, 0, data, smf_rebinseq_thread,
-                            0, NULL, status );
+                  thrAddJob( workforce, 0, data, smf_rebinseq_thread,
+                             0, NULL, status );
+               }
             }
 
 /* Wait for the work force to complete the re-binning. This call blocks until
