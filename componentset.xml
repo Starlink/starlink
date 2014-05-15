@@ -176,7 +176,7 @@ Starlink applications, and a number of other common data formats.
 </component>
 
 <component id="cupid" support="S">
-  <version>2.0</version>
+  <version>2.1</version>
   <path>applications/cupid</path>
   <description>CUPID - AST applications</description>
   <abstract><p>
@@ -867,7 +867,7 @@ Traces an HDS file
 </component>
 
 <component id="kappa" support="S">
-  <version>2.1-9</version>
+  <version>2.1-12</version>
   <path>applications/kappa</path>
   <description>KAPPA - Kernel Application Package</description>
   <abstract><p>
@@ -1599,7 +1599,7 @@ package.
 </component>
 
 <component id="smurf">
-  <version>1.5.0</version>
+  <version>1.6.0</version>
   <path>applications/smurf</path>
   <description>SMURF - Sub-mm User Reduction Facility</description>
   <abstract><p>
@@ -1610,7 +1610,7 @@ reduce your SCUBA-2 data. It can also be used to make maps obtained
 with the ACSIS correlator at JCMT.
   </p></abstract>
   <dependencies >
-    <build>pcs</build><sourceset>messgen</sourceset><build>ast</build><build>sae</build><build>pcs</build><build>mers</build><build>ndf</build><build>shl</build><build>gsl</build><build>ndg</build><build>fftw</build><build>ard</build><build>kaplibs</build><build>pda</build><build>gsd</build><build>irq</build><build>sofa</build><build>pal</build><build>one</build><link>ndf</link><link>ast</link><link>hlp</link><link>ndg</link><link>shl</link><link>pda</link><link>gsd</link><link>irq</link><link>sofa</link><link>pal</link><link>one</link><sourceset>sst</sourceset><sourceset>star2html</sourceset>
+    <build>pcs</build><sourceset>messgen</sourceset><build>ast</build><build>sae</build><build>pcs</build><build>mers</build><build>ndf</build><build>shl</build><build>gsl</build><build>ndg</build><build>fftw</build><build>ard</build><build>kaplibs</build><build>pda</build><build>gsd</build><build>irq</build><build>sofa</build><build>pal</build><build>one</build><build>cfitsio</build><link>ndf</link><link>ast</link><link>hlp</link><link>ndg</link><link>shl</link><link>pda</link><link>gsd</link><link>irq</link><link>sofa</link><link>pal</link><link>one</link><link>cfitsio</link><sourceset>sst</sourceset><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -4841,7 +4841,7 @@ to handle data from a variety of different instruments.
 </component>
 
 <component id="pal" support="S">
-  <version>0.3.0</version>
+  <version>0.3.1</version>
   <path>libext/pal</path>
   <description>Position Astronomy Library</description>
   <abstract><p>
@@ -4961,7 +4961,7 @@ to handle data from a variety of different instruments.
 </component>
 
 <component id="ast" support="S">
-  <version>7.3.4</version>
+  <version>8.0.0</version>
   <path>libraries/ast</path>
   <description>WCS library</description>
   <abstract>
@@ -5361,7 +5361,7 @@ No longer under active control.
 </component>
 
 <component id="grp" support="S">
-  <version>3.7</version>
+  <version>3.7.2</version>
   <path>libraries/grp</path>
   <description>GRP - Routines for Managing Groups of Objects</description>
   <abstract><p>GRP provides facilities for handling groups of objects which
@@ -6885,7 +6885,7 @@ documents to hypertext.
 </component>
 
 <component id="perl" support="U">
-  <version>5.16.1</version>
+  <version>5.18.2</version>
   <path>thirdparty/perlsys/perl</path>
   <description>Perl</description>
   <dependencies >
@@ -6982,7 +6982,7 @@ and some distortion.
 </component>
 
 <component id="tcl" support="U">
-  <version>8.4.19</version>
+  <version>8.5.15</version>
   <path>thirdparty/tclsys/tcl</path>
   <description>The Tcl system</description>
   <dependencies >
@@ -7056,7 +7056,7 @@ and some distortion.
 </component>
 
 <component id="tk" support="U">
-  <version>8.4.19</version>
+  <version>8.5.15</version>
   <path>thirdparty/tclsys/tk</path>
   <description>The Tk system</description>
   <dependencies >

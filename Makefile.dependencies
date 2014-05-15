@@ -2487,6 +2487,7 @@ $(MANIFESTS)/smurf: \
 		$(MANIFESTS)/ast \
 		$(MANIFESTS)/atl \
 		$(MANIFESTS)/cat \
+		$(MANIFESTS)/cfitsio \
 		$(MANIFESTS)/chr \
 		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/ems \
