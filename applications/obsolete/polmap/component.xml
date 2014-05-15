@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="polmap" support="U">
+  <version>1.0-1</version>
+  <path>applications/polmap</path>
+  <description>POLMAP - Interactive analysis of linear spectropolarimetry</description>
+  <abstract><p>
+POLMAP is a package designed for interactive analysis of linear
+spectropolarimetry data, complimenting facilities available in TSP.
+  </p></abstract>
+  <dependencies >
+    <build>pcs</build><build option='link'>psx</build><build option='link'>ndf</build><build option='link'>pgplot</build><use>tsp</use><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>T. J. Harries</name>
+    </person>
+  </developers>
+  <documentation> sun204</documentation>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
