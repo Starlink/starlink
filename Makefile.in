@@ -87,6 +87,7 @@ ALL_TARGETS = \
 	$(MANIFESTS)/photom \
 	$(MANIFESTS)/pisa \
 	$(MANIFESTS)/pongo \
+	$(MANIFESTS)/polmap \
 	$(MANIFESTS)/polpack \
 	$(MANIFESTS)/prm \
 	$(MANIFESTS)/psmerge \

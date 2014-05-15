@@ -2055,6 +2055,31 @@ $(MANIFESTS)/pisa: \
 	cd applications/pisa \
 	  && $(MAKE_CPT)
 
+$(MANIFESTS)/polmap: \
+		$(MANIFESTS)/ary \
+		$(MANIFESTS)/ast \
+		$(MANIFESTS)/chr \
+		$(MANIFESTS)/cnf \
+		$(MANIFESTS)/ems \
+		$(MANIFESTS)/gwm \
+		$(MANIFESTS)/hds \
+		$(MANIFESTS)/hlp \
+		$(MANIFESTS)/mers \
+		$(MANIFESTS)/ndf \
+		$(MANIFESTS)/pcs \
+		$(MANIFESTS)/pgplot \
+		$(MANIFESTS)/prm \
+		$(MANIFESTS)/psx \
+		$(MANIFESTS)/sae \
+		$(MANIFESTS)/star2html \
+		$(MANIFESTS)/starmem \
+		$(MANIFESTS)/starutil \
+		$(MANIFESTS)/starx \
+		$(MANIFESTS)/tcl \
+		$(MANIFESTS)/tk
+	cd applications/polmap \
+	  && $(MAKE_CPT)
+
 $(MANIFESTS)/polpack: \
 		$(MANIFESTS)/agi \
 		$(MANIFESTS)/ary \
