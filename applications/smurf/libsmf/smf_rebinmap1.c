@@ -135,6 +135,9 @@
 *        accumulate into its own map.
 *     2014-2-13 (DSB):
 *        Allow NULL to be supplied for mapvar.
+*     2014-5-15 (DSB):
+*        Check for bad and negative bolometer variance values, as well as
+*        zero values.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -629,7 +632,8 @@ static void smf1_rebinmap1( void *job_data_ptr, int *status ) {
 
 /* Check that the data and variance values are valid */
                   if( !( pdata->qual[ di ] & pdata->mask ) &&
-                       ( pdata->var[ vi ] != 0.0 ) &&
+                       ( pdata->var[ vi ] > 0.0 ) &&
+                       ( pdata->var[ vi ] != VAL__BADD ) &&
                        ( ipix != SMF__BADDIMT ) ) {
 
 /* index into (temporary) sub map */
@@ -683,7 +687,7 @@ static void smf1_rebinmap1( void *job_data_ptr, int *status ) {
 
                if( pdata->dat[ di ] != VAL__BADD &&
                    pdata->var[ vi ] != VAL__BADD &&
-                   pdata->var[ vi ] != 0.0 && ipix != SMF__BADDIMT ) {
+                   pdata->var[ vi ] > 0.0 && ipix != SMF__BADDIMT ) {
 
                   tipix = tmap0 + ipix;
 
@@ -726,7 +730,8 @@ static void smf1_rebinmap1( void *job_data_ptr, int *status ) {
                   }
 
                   if( !( pdata->qual[ di ] & pdata->mask ) &&
-                       ( pdata->var[ vi ] != 0.0 ) &&
+                       ( pdata->var[ vi ] > 0.0 ) &&
+                       ( pdata->var[ vi ] != VAL__BADD ) &&
                        ( ipix != SMF__BADDIMT ) ) {
 
                      tipix = tmap0 + ipix;
@@ -765,7 +770,7 @@ static void smf1_rebinmap1( void *job_data_ptr, int *status ) {
 
                if( pdata->dat[ di ] != VAL__BADD &&
                    pdata->var[ vi ] != VAL__BADD &&
-                   pdata->var[ vi ] != 0.0 && ipix != SMF__BADDIMT  ) {
+                   pdata->var[ vi ] > 0.0 && ipix != SMF__BADDIMT  ) {
 
                   tipix = tmap0 + ipix;
 
