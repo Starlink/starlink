@@ -33,7 +33,7 @@ C
 C
 C-
       IMPLICIT NONE
-      INCLUDE 'array_size.inc'
+      INCLUDE 'ARRAY_SIZE'
 C
 C The command parameters
 C

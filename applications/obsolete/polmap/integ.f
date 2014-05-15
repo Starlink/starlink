@@ -25,7 +25,7 @@ C
 C-
 
       IMPLICIT NONE
-      INCLUDE 'array_size.inc'
+      INCLUDE 'ARRAY_SIZE'
       INTEGER NPARAMS,NPTS,OUT_LU
       REAL PARAMS(*)
       REAL STOKES_I(*)

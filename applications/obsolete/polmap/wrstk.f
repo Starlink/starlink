@@ -38,7 +38,7 @@ C HDS includes
 C
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'array_size.inc'
+      INCLUDE 'ARRAY_SIZE'
 C
 C The stack arrays
 C

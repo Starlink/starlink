@@ -24,7 +24,7 @@ C
 C
 C-
       IMPLICIT NONE
-      INCLUDE 'array_size.inc'
+      INCLUDE 'ARRAY_SIZE'
       INTEGER J,NN
       REAL  RA(*),RB(*),RC(*),RD(*),RE(*),RF(*)
       REAL WKSP(MAXPTS)

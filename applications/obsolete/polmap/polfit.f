@@ -31,7 +31,7 @@ C
 C     DECLARE EVERYTHING TO BE REAL*8
 C
       IMPLICIT REAL*8(A-H,O-Z)
-      INCLUDE 'array_size.inc'
+      INCLUDE 'ARRAY_SIZE'
 C
 C     SET UP ARRAYS
 C

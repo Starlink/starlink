@@ -35,7 +35,7 @@ C-
       IMPLICIT NONE
       INTEGER OUT_LU
       INTEGER IO_LU
-      INCLUDE 'array_size.inc'
+      INCLUDE 'ARRAY_SIZE'
       INTEGER NPTS
       REAL POL
       REAL LAMBDA(MAXPTS)

@@ -35,7 +35,7 @@ C
 C-
       IMPLICIT NONE
       INTEGER OUT_LU
-      INCLUDE 'array_size.inc'
+      INCLUDE 'ARRAY_SIZE'
 C
 C The actual stack arrays
 C

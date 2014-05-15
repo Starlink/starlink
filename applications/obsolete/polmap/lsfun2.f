@@ -19,7 +19,7 @@ C
 C
 C-
       IMPLICIT NONE
-      INCLUDE 'array_size.inc'
+      INCLUDE 'ARRAY_SIZE'
       INTEGER NA
       REAL PARAMS(*)
       REAL LAMBDA,HQ,HU

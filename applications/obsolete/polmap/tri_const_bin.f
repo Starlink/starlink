@@ -39,7 +39,7 @@ C-
       IMPLICIT NONE
       INTEGER OUT_LU
 C
-      INCLUDE 'array_size.inc'
+      INCLUDE 'ARRAY_SIZE'
 C
       REAL OLD_LAMBDA(MAXPTS)
       REAL OLD_STOKES_I(MAXPTS)

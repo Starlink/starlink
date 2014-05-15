@@ -34,7 +34,7 @@ C-
 C
 C The current arrays
 C
-      INCLUDE 'array_size.inc'
+      INCLUDE 'ARRAY_SIZE'
       REAL STOKES_I(*)
       REAL STOKES_Q(*)
       REAL STOKES_QV(*)

@@ -35,7 +35,7 @@ C-
 
       IMPLICIT NONE
       INTEGER OUT_LU
-      INCLUDE 'array_size.inc'
+      INCLUDE 'ARRAY_SIZE'
       INTEGER MAXORDER
       PARAMETER(MAXORDER=10)
 C

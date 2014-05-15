@@ -32,7 +32,7 @@ C
       IMPLICIT NONE
       INTEGER OUT_LU
       INTEGER NPTS
-      INCLUDE 'array_size.inc'
+      INCLUDE 'ARRAY_SIZE'
 C
 C The command parameters
 C

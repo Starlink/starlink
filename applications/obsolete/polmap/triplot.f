@@ -43,7 +43,7 @@ C-
 C
       IMPLICIT NONE
 C
-      INCLUDE 'array_size.inc'
+      INCLUDE 'ARRAY_SIZE'
       INTEGER J
       INTEGER LCOL,LSTYLE
       INTEGER NEW_NPTS

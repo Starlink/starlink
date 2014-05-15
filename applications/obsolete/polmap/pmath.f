@@ -37,7 +37,7 @@ C
 C-
       IMPLICIT NONE
       INTEGER OUT_LU
-      INCLUDE 'array_size.inc'
+      INCLUDE 'ARRAY_SIZE'
 C
 C Stack polarization spectra.
 C

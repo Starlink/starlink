@@ -31,7 +31,7 @@ C
 C
 C-
       IMPLICIT NONE
-      INCLUDE 'array_size.inc'
+      INCLUDE 'ARRAY_SIZE'
 C
       REAL PARAMS(*)
       INTEGER NPARAMS

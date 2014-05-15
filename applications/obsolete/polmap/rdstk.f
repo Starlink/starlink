@@ -38,7 +38,7 @@ C
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
 C
-      INCLUDE 'array_size.inc'
+      INCLUDE 'ARRAY_SIZE'
 C
 C The stack arrays
 C

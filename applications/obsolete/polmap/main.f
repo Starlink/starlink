@@ -23,7 +23,7 @@ C First, define the variables....
 C
 C The array sizes are parameters...
 C
-      INCLUDE 'array_size.inc'
+      INCLUDE 'ARRAY_SIZE'
 C
 C Declare various EXTERNALs so as not to confuse compilers when
 C INTRINSICs have the same name.

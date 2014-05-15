@@ -28,7 +28,7 @@ C
 C-
 
       IMPLICIT NONE
-      INCLUDE 'array_size.inc'
+      INCLUDE 'ARRAY_SIZE'
       REAL STOKES_I(*)
       REAL STOKES_Q(*)
       REAL STOKES_QV(*)

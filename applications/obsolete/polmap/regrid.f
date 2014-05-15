@@ -26,7 +26,7 @@ C
 C
 C-
       IMPLICIT NONE
-      INCLUDE 'array_size.inc'
+      INCLUDE 'ARRAY_SIZE'
       INTEGER NPARAMS
       INTEGER OUT_LU
       INTEGER NPTS,BINSIZE

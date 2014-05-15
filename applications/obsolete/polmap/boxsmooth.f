@@ -29,7 +29,7 @@ C-
 
 
       IMPLICIT NONE
-      INCLUDE 'array_size.inc'
+      INCLUDE 'ARRAY_SIZE'
       INTEGER NPARAMS
       REAL PARAMS(*)
       INTEGER OUT_LU,I
