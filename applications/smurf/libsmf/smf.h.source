@@ -1428,7 +1428,7 @@ void smf_import_array( ThrWorkForce *wf,  smfData *refdata, const char *name, in
                        int expand, smf_dtype type, void *dataptr, int *status );
 
 int smf_import_noi( const char *name, smfDIMMHead *head, AstKeyMap *keymap,
-                    double *dataptr, int *status );
+                    smfData *qua, double *dataptr, int *status );
 
 void smf_inbeam_str ( smf_inbeam_t inbeam, char *inbeamstr, size_t lenstr, int * status );
 
@@ -1552,9 +1552,9 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
                        const smfArray *bbms, const smfArray *flatramps,
                        AstKeyMap * heateffmap, const smfArray *noisemaps,
                        dim_t nchunks, smf_modeltype mtype, int isTordered,
-                       AstFrameSet *outfset, int moving,
-                       int *lbnd_out, int *ubnd_out, fts2Port fts_port,
-                       smfGroup **mgroup, smfArray **mdata,
+                       AstFrameSet *outfset, int moving, int *lbnd_out,
+                       int *ubnd_out, fts2Port fts_port,
+                       smfArray **qua, smfGroup **mgroup, smfArray **mdata,
                        AstKeyMap *keymap, int *status );
 
 void smf_model_createHdr( smfData *model, smf_modeltype type,

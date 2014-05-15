@@ -19,8 +19,9 @@
 *                       AstKeyMap * heateffmap, const smfArray *noisemaps,
 *                       dim_t nchunks, smf_modeltype mtype, int isTordered,
 *                       AstFrameSet *outfset, int moving, int *lbnd_out,
-*                       int *ubnd_out, fts2Port fts_port, smfGroup **mgroup,
-*                       smfArray **mdata, AstKeyMap *keymap, int *status )
+*                       int *ubnd_out, fts2Port fts_port, smfArray **qua,
+*                       smfGroup **mgroup, smfArray **mdata,
+*                       AstKeyMap *keymap, int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -64,6 +65,8 @@
 *        (if outfset specified)
 *     fts_port = fts2Port (Given)
 *        FTS-2 port.
+*     qua = smfArray ** (Given)
+*        Container holding existing quality data. May be NULL.
 *     mgroup = smfGroup ** (Returned)
 *        Pointer to smfGroup pointer that will contain model file names
 *     mdata = smfArray ** (Given and Returned)
@@ -216,6 +219,8 @@
 *        Allow LUT to be imported from an NDF.
 *     2014-01-24 (DSB):
 *        Remove argument noi_boxsize.
+*     2014-05-15 (DSB):
+*        Add argument "qua".
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -279,8 +284,8 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
                        dim_t nchunks, smf_modeltype mtype, int isTordered,
                        AstFrameSet *outfset, int moving,
                        int *lbnd_out, int *ubnd_out, fts2Port fts_port,
-                       smfGroup **mgroup, smfArray **mdata, AstKeyMap *keymap,
-                       int *status ) {
+                       smfArray **qua, smfGroup **mgroup, smfArray **mdata,
+                       AstKeyMap *keymap, int *status ) {
 
   /* Local Variables */
   size_t bstride;               /* Bolometer stride in data array */
@@ -983,7 +988,8 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
               /* Initialise the NOI model from any external NOI model
                  supplied by the user (such as may be dumped on a previous
                  run by setting "exportndf=noi,noi.export=1"). */
-              if( smf_import_noi( name, &head, keymap, dataptr, status ) ) {
+              if( smf_import_noi( name, &head, keymap, qua ? qua[i]->sdata[j] : NULL,
+                                  dataptr, status ) ) {
                  msgOutiff( MSG__VERB, "", FUNC_NAME ": using external NOI "
                            "model imported from '%s'.", status, name );
 

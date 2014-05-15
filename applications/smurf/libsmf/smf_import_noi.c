@@ -14,7 +14,8 @@
 
 *  Invocation:
 *     int smf_import_noi( const char *name, smfDIMMHead *head,
-*                         AstKeyMap *keymap, double *dataptr, int *status )
+*                         AstKeyMap *keymap, smfData *qua,
+*                         double *dataptr, int *status )
 
 *  Arguments:
 *     name = const char * (Given)
@@ -23,6 +24,9 @@
 *        Defines the shape and size of the NOI model.
 *     *keymap = AstKeyMap * (Given)
 *        The config parameters for makemap.
+*     qua = smfData * (Given and Returned)
+*        The associated quality data - bad or non-positive noise values
+*        are flagged with SMF__Q_NOISE. May be NULL.
 *     dataptr = double * (Returned)
 *        The array in which to return the noise values.
 *     status = int* (Given and Returned)
@@ -46,9 +50,11 @@
 *     24-SEP-2013 (DSB):
 *        Original version.
 *     24-JAN-2014 (DSB):
-*        - Re-written to follow the changes to smf_export_noi (the time axis 
-*        is now the first axis in the NDF, not the third axis). 
+*        - Re-written to follow the changes to smf_export_noi (the time axis
+*        is now the first axis in the NDF, not the third axis).
 *        - Remove argument "noi_boxsize".
+*     15-MAY-2014 (DSB):
+*        Flag bad variances in the quality array.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -86,7 +92,7 @@
 #include "libsmf/smf.h"
 
 int smf_import_noi( const char *name, smfDIMMHead *head, AstKeyMap *keymap,
-                    double *dataptr, int *status ){
+                    smfData *qua, double *dataptr, int *status ){
 
 /* Local Variables */
    AstKeyMap *kmap = NULL;
@@ -230,6 +236,47 @@ int smf_import_noi( const char *name, smfDIMMHead *head, AstKeyMap *keymap,
 
 /* Close the NDF. */
       ndfAnnul( &indf, status );
+
+/* If a quality array was supplied, flag any samples that have unusable
+   noise values (i.e. bad or non-positive). */
+      if( qua ) {
+         size_t qbstride;
+         size_t qtstride;
+         dim_t qntslice;
+         smf_qual_t *pq;
+
+/* Get the dimensions and strides for the Quality array. */
+         smf_get_dims( qua, NULL, NULL, NULL, &qntslice, NULL,
+                       &qbstride, &qtstride, status );
+
+/* Loop round each bolometer. */
+         for( ibolo = 0; ibolo < nbolo; ibolo++ ) {
+
+/* Pointers to the first quality and noise values for this bolometer. */
+            pq = (smf_qual_t *) qua->pntr[0] + ibolo*qbstride;
+            pd = dataptr + ibolo*bstride;
+
+/* Ignore entirely bad bolometers. */
+            if( !( *pq & SMF__Q_BADB ) ) {
+
+/* Loop round each time slice. */
+               for( itime = 0; itime < qntslice; itime++ ) {
+
+/* If the noise value is bad or non-positive, flag the sample with
+   the SMF__Q_NOISE flag. */
+                  if( *pd == VAL__BADD || *pd <= 0.0 ) *pq |= SMF__Q_NOISE;
+
+/* Move the quality pointer on to the next time slice. */
+                  pq += qtstride;
+
+/* The noise pointer only needs to be moved on if there is more than one
+   noise value per bolometer (in which case there will be the same number
+   of noise values as there are quality values). */
+                  if( ntslice > 1 ) pd += tstride;
+               }
+            }
+         }
+      }
 
 /* Add a context message if anything went wrong. */
       if( *status != SAI__OK ) {
