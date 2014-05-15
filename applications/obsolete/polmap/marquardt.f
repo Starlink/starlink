@@ -64,7 +64,7 @@ C
        CHI1 = 99.9d0
        NCALLS = 1
   500  CONTINUE
-          WRITE (*,'('' '',0PI3,8F9.3)')
+          WRITE (*,'('' '',0P,I3,8F9.3)')
      :            NCALLS, (SP(J), J=1,MFIT),CHI1
           CALL SOLVE
      :    (XDATA, X2, X3, SETP, MFIT, YDATA, WT, YCALC,
