@@ -38,6 +38,7 @@ C
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'ARRAY_SIZE'
+      INCLUDE 'CNF_PAR'
 C
 C The current arrays
 C
@@ -95,9 +96,10 @@ C
        IF (STATUS.EQ.SAI__OK) THEN
        NPTS = NELM
        CALL READ_IT(NPTS,LAMBDA,STOKES_I,STOKES_Q,STOKES_QV,STOKES_U,
-     & STOKES_UV,
-     & NELM,%VAL(IPTR),%VAL(PTRQ),%VAL(PTRQV),%VAL(PTRU),
-     & %VAL(PTRUV),%VAL(APTR))
+     &        STOKES_UV,
+     &        NELM,%VAL(CNF_PVAL(IPTR)),%VAL(CNF_PVAL(PTRQ)),
+     &        %VAL(CNF_PVAL(PTRQV)),%VAL(CNF_PVAL(PTRU)),
+     &        %VAL(CNF_PVAL(PTRUV)),%VAL(CNF_PVAL(APTR)))
        ENDIF
       ENDIF
       CALL DAT_ANNUL(PLOC,STATUS)

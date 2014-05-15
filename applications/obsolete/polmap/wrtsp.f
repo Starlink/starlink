@@ -32,6 +32,7 @@ C-
       INTEGER OUT_LU
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
+      INCLUDE 'CNF_PAR'
 C
 C The current arrays
 C
@@ -109,8 +110,9 @@ C
       IF (STATUS.EQ.SAI__OK) THEN
       CALL WRITE_IT(NPTS,LAMBDA,STOKES_I,STOKES_Q,STOKES_QV,STOKES_U,
      &              STOKES_UV,
-     &UBND(1),%VAL(IPTR),%VAL(QPTR),%VAL(QVPTR),%VAL(UPTR),
-     &%VAL(UVPTR),%VAL(OAXISP))
+     &              UBND(1),%VAL(CNF_PVAL(IPTR)),%VAL(CNF_PVAL(QPTR)),
+     &              %VAL(CNF_PVAL(QVPTR)),%VAL(CNF_PVAL(UPTR)),
+     &              %VAL(CNF_PVAL(UVPTR)),%VAL(CNF_PVAL(OAXISP)))
       ENDIF
 C
 C Close down the ndf and hds

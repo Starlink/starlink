@@ -39,6 +39,7 @@ C
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'ARRAY_SIZE'
+      INCLUDE 'CNF_PAR'
 C
 C The stack arrays
 C
@@ -121,8 +122,10 @@ C
       IF (STATUS.EQ.SAI__OK) THEN
       CALL WRITE_STK(STK_NPTS,STK_LAMBDA,STK_STOKES_I,STK_STOKES_Q,
      &      STK_STOKES_QV,STK_STOKES_U,STK_STOKES_UV,
-     &TOP_STK,%VAL(NPTR),%VAL(APTR),%VAL(IPTR),%VAL(QPTR),
-     &%VAL(QVPTR),%VAL(UPTR),%VAL(UVPTR))
+     &      TOP_STK,%VAL(CNF_PVAL(NPTR)),%VAL(CNF_PVAL(APTR)),
+     &      %VAL(CNF_PVAL(IPTR)),%VAL(CNF_PVAL(QPTR)),
+     &      %VAL(CNF_PVAL(QVPTR)),%VAL(CNF_PVAL(UPTR)),
+     &      %VAL(CNF_PVAL(UVPTR)))
       ENDIF
 C
 C Annul the locators and quit

@@ -39,6 +39,7 @@ C
       INCLUDE 'DAT_PAR'
 C
       INCLUDE 'ARRAY_SIZE'
+      INCLUDE 'CNF_PAR'
 C
 C The stack arrays
 C
@@ -122,9 +123,11 @@ C
        CALL READ_STK(TOP_STK,STK_NPTS,STK_LAMBDA,
      &              STK_STOKES_I,STK_STOKES_Q,
      &      STK_STOKES_QV,STK_STOKES_U,STK_STOKES_UV,STK_TITLE,
-     & NO_IN_SAVE,SPEC_SIZE,%VAL(NPTR),
-     & %VAL(APTR),%VAL(IPTR),%VAL(QPTR),
-     & %VAL(QVPTR),%VAL(UPTR),%VAL(UVPTR),TMP_STK_TITLE,OUT_LU)
+     &      NO_IN_SAVE,SPEC_SIZE,%VAL(CNF_PVAL(NPTR)),
+     &      %VAL(CNF_PVAL(APTR)),%VAL(CNF_PVAL(IPTR)),
+     &      %VAL(CNF_PVAL(QPTR)),%VAL(CNF_PVAL(QVPTR)),
+     &      %VAL(CNF_PVAL(UPTR)),%VAL(CNF_PVAL(UVPTR)),
+     &      TMP_STK_TITLE,OUT_LU)
       ENDIF
        ELSE
        CALL WR_ERROR('Stack spectra are too big',OUT_LU)
