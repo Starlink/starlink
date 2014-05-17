@@ -11,6 +11,8 @@ libtsp_la_SOURCES = $(TSP_LIB_F_ROUTINES)
 
 dist_starnews_DATA = tsp.news
 
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
+
 mydatadir=$(bindir)
 mydata_DATA = exo.sdf sn1987a.sdf
 

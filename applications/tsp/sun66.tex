@@ -2562,15 +2562,12 @@ calibrated
 
 \manroutineitem{Parameters}{}
 \begin{manparametertable}
-\manparameterentry{1}{{\mantt{INPUT1}}}{{\mantt{TSP}}, nD}\begin{manitemize}
-\manitemizeitem The first input dataset.
-\end{manitemize}
-\manparameterentry{2}{{\mantt{INPUT2}}}{{\mantt{TSP}}, nD}\begin{manitemize}
-\manitemizeitem The second input dataset.
-\end{manitemize}
-\manparameterentry{3}{{\mantt{OUTPUT}}}{{\mantt{TSP}}, nD}\begin{manitemize}
-\manitemizeitem The output dataset.
-\end{manitemize}
+\manparameterentry{1}{{\mantt{INPUT1}}}{{\mantt{TSP}}, nD}
+The first input dataset.
+\manparameterentry{2}{{\mantt{INPUT2}}}{{\mantt{TSP}}, nD}
+The second input dataset.
+\manparameterentry{3}{{\mantt{OUTPUT}}}{{\mantt{TSP}}, nD}
+The output dataset.
 
 \end{manparametertable}
 \manroutineitem{Support}{Jeremy Bailey, {\mantt{AAO}}}
@@ -2621,15 +2618,12 @@ DSTOKES}
 
 \manroutineitem{Parameters}{}
 \begin{manparametertable}
-\manparameterentry{1}{{\mantt{INPUT}}}{{\mantt{TSP}}, nD}\begin{manitemize}
-\manitemizeitem The input Stokes dataset.
-\end{manitemize}
-\manparameterentry{2}{{\mantt{STOKESPAR}}}{Char}\begin{manitemize}
-\manitemizeitem The Stokes parameter (Q, U or V)
-\end{manitemize}
-\manparameterentry{3}{{\mantt{OUTPUT}}}{{\mantt{TSP}}, nD}\begin{manitemize}
-\manitemizeitem The output dataset.
-\end{manitemize}
+\manparameterentry{1}{{\mantt{INPUT}}}{{\mantt{TSP}}, nD}
+The input Stokes dataset.
+\manparameterentry{2}{{\mantt{STOKESPAR}}}{Char}
+The Stokes parameter (Q, U or V)
+\manparameterentry{3}{{\mantt{OUTPUT}}}{{\mantt{TSP}}, nD}
+The output dataset.
 
 \end{manparametertable}
 \manroutineitem{Support}{Jeremy Bailey, {\mantt{AAO}}}
@@ -2755,14 +2749,10 @@ spectrum.}{FLIP}
 
 \manroutineitem{Parameters}{}
 \begin{manparametertable}
-\manparameterentry{1}{{\mantt{INPUT}}}{{\mantt{TSP}}, {\mantt{1D}}}\begin{%
-manitemize}
-\manitemizeitem The input Stokes dataset.
-\end{manitemize}
-\manparameterentry{2}{{\mantt{OUTPUT}}}{{\mantt{TSP}}, {\mantt{1D}}}\begin{%
-manitemize}
-\manitemizeitem The output dataset.
-\end{manitemize}
+\manparameterentry{1}{{\mantt{INPUT}}}{{\mantt{TSP}}, {\mantt{1D}}}
+The input Stokes dataset.
+\manparameterentry{2}{{\mantt{OUTPUT}}}{{\mantt{TSP}}, {\mantt{1D}}}
+The output dataset.
 
 \end{manparametertable}
 \manroutineitem{Support}{Jeremy Bailey, {\mantt{AAO}}}
@@ -3481,18 +3471,12 @@ spectrum}{PTHETA}
 
 \manroutineitem{Parameters}{}
 \begin{manparametertable}
-\manparameterentry{1}{{\mantt{INPUT}}}{{\mantt{TSP}}, {\mantt{1D}}}\begin{%
-manitemize}
-\manitemizeitem The input dataset, a spectrum which must
-                               have Q and U Stokes parameters present.
-\end{manitemize}
-\manparameterentry{2}{{\mantt{LSTART}}}{Real}\begin{manitemize}
-\manitemizeitem The starting wavelength for the section
-                               to be used.
-\end{manitemize}
-\manparameterentry{3}{{\mantt{LEND}}}{Real}\begin{manitemize}
-\manitemizeitem The end wavelength for the section.
-\end{manitemize}
+\manparameterentry{1}{{\mantt{INPUT}}}{{\mantt{TSP}}, {\mantt{1D}}}
+The input dataset, a spectrum which must have Q and U Stokes parameters present.
+\manparameterentry{2}{{\mantt{LSTART}}}{Real}
+The starting wavelength for the section to be used.
+\manparameterentry{3}{{\mantt{LEND}}}{Real}
+The end wavelength for the section.
 
 \end{manparametertable}
 \manroutineitem{Support}{Jeremy Bailey, {\mantt{AAO}}}
@@ -3854,22 +3838,16 @@ Hatfield
 
 \manroutineitem{Parameters}{}
 \begin{manparametertable}
-\manparameterentry{}{{\mantt{FILENAME}}}{Char}\begin{manitemize}
-\manitemizeitem The name of the {\mantt{HDSPLOT}} file to be read.
-\end{manitemize}
-\manparameterentry{}{{\mantt{NCHANS}}}{Integer}\begin{manitemize}
-\manitemizeitem The number of wavelength channels.
-\end{manitemize}
-\manparameterentry{}{{\mantt{OUTPUT}}}{{\mantt{TSP}}, {\mantt{2D}}}\begin{%
-manitemize}
-\manitemizeitem The output dataset to be created.
-\end{manitemize}
-\manparameterentry{}{{\mantt{CHANNEL}}}{Char}\begin{manitemize}
-\manitemizeitem Name of channel.
-\end{manitemize}
-\manparameterentry{}{{\mantt{WAVELENGTH}}}{Real}\begin{manitemize}
-\manitemizeitem Wavelength of channel.
-\end{manitemize}
+\manparameterentry{}{{\mantt{FILENAME}}}{Char}
+The name of the {\mantt{HDSPLOT}} file to be read.
+\manparameterentry{}{{\mantt{NCHANS}}}{Integer}
+The number of wavelength channels.
+\manparameterentry{}{{\mantt{OUTPUT}}}{{\mantt{TSP}}, {\mantt{2D}}}
+The output dataset to be created.
+\manparameterentry{}{{\mantt{CHANNEL}}}{Char}
+Name of channel.
+\manparameterentry{}{{\mantt{WAVELENGTH}}}{Real}
+Wavelength of channel.
 
 \end{manparametertable}
 \manroutineitem{Support}{}
