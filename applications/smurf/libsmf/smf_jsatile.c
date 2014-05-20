@@ -114,7 +114,7 @@
 #include "libsmf/jsatiles.h"
 
 /* Local constants */
-#define DELTA 0.01          /* Pixel offset to avoid edges */
+#define DELTA 0.05          /* Pixel offset to avoid edges */
 
 void smf_jsatile( int itile, smfJSATiling *skytiling, int local_origin,
                   AstFitsChan **fc, AstFrameSet **fs, AstRegion **region,
