@@ -768,6 +768,7 @@ buildsupport/starconf/starconf-deinstall
 buildsupport/starconf/starconf-finder
 buildsupport/starconf/starconf-validate
 
+applications/tsp/sun66.pdf
 applications/tsp/tsp.csh
 applications/tsp/tsp.icl
 applications/tsp/tsp.sh
