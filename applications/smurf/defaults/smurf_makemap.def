@@ -1651,6 +1651,18 @@ flt.zeropad_last = <undef>
 importlut = 0
 
 #-----------------------------------------------------------------
+#  Name: 	hitslimit
+#  Type: 	real
+#  Default: 	0.0
+#  Purpose: 	Rejects map pixels that receive very few samples.
+#  Description: If non-zero, pixels that receive very few bolometer samples
+#               are set to bad in the final map. The limiting number of
+#               bolometer samples is equal to "hitslimt" times the mean
+#               number of hits per pixel, averaged over the map pixels
+#               that recieve at least one bolometer sample.
+hitslimit = 0.0
+
+#-----------------------------------------------------------------
 #  Name: 	importsky
 #  Type: 	integer or string
 #  Default: 	0

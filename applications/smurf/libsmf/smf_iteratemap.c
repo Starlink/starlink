@@ -454,6 +454,9 @@
 *        map can still be made, albeit it will contain only background
 *        areas. So annull the error when reporting mapchange values in
 *        this case.
+*     2014-05-26 (DSB):
+*        Add the "hitslimit" config parameter, that allows map pixels
+*        with very low hits to be set bad.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -607,6 +610,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   int haveflt=0;                /* Set if FLT is one of the models */
   int havegai=0;                /* Set if GAI is one of the models */
   int havenoi=0;                /* Set if NOI is one of the models */
+  double hitslim;               /* Min fraction of hits allowed in a map pixel */
   smfData *refdata=NULL;        /* Pointer to reference smfData */
 /*  size_t i;                     */ /* Loop counter */
   size_t idat;                  /* smfData counter */
@@ -656,6 +660,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   char name[GRP__SZNAM+1];      /* Buffer for storing exported model names */
   dim_t nbolo;                  /* Number of bolometers */
   size_t ncontchunks=0;         /* Number continuous chunks outside iter loop*/
+  int nhitslim;                 /* Min number of hits allowed in a map pixel */
   int nm=0;                     /* Signed int version of nmodels */
   dim_t nmodels=0;              /* Number of model components / iteration */
   int noidone;                  /* Has the NOI model been calculated yet? */
@@ -857,6 +862,10 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         }
       }
 
+      /* Lower limit for acceptable hits per pixel, expressed as a
+         fraction of the mean hits per pixel over the map (excluding
+         pixels that get no hits). */
+      astMapGet0D( keymap, "HITSLIMIT", &hitslim );
     }
 
     /* Do iterations completely in memory - minimize disk I/O */
@@ -2423,18 +2432,29 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
         if( *status == SAI__OK ) {
 
-          /* Pixels with very low hits will have unreliable variances. So exclude
-             pixels with hits below 10% of the mean from the mapchange estimate. */
-          size_t hitslim = 0;
-          int *ph = thishits;
-          for( ipix = 0; ipix < msize; ipix++ ) hitslim += *(ph++);
-          hitslim /= 10*msize;
+          /* Pixels with very low hits will have unreliable variances. So
+             exclude pixels with hits below "hitslim" times the mean from
+             the mapchange estimate. */
+          if( hitslim > 0.0 ) {
+            int *ph = thishits;
+            int ngood = 0;
+            nhitslim = 0;
+            for( ipix = 0; ipix < msize; ipix++,ph++ ) {
+               if( *ph > 0 ) {
+                  nhitslim += *ph;
+                  ngood++;
+               }
+            }
+            nhitslim *= hitslim/ngood;
+          } else {
+            nhitslim = 0;
+          }
 
           mapchange_max = 0;
           for( ipix = 0; ipix < msize; ipix++ ) {
             if( !(thisqual[ipix]&SMF__MAPQ_AST) && (thismap[ipix] != VAL__BADD) &&
                 (lastmap[ipix] != VAL__BADD) && (thisvar[ipix] != VAL__BADD) &&
-                (thisvar[ipix] > 0) && (thishits[ipix] > (int) hitslim) ) {
+                (thisvar[ipix] > 0) && (thishits[ipix] > nhitslim) ) {
               mapchange[ipix] = fabs(thismap[ipix] - lastmap[ipix]) / sqrt(thisvar[ipix]);
 
               /* Update max */
@@ -2572,11 +2592,22 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         }
       }
 
-
-
-
-
-
+      /* Set map pixels bad if they have very low hits. */
+      if( hitslim > 0 ) {
+        int *ph = thishits;
+        int nrej = 0;
+        for( ipix = 0; ipix < msize; ipix++ ) {
+          if( *(ph++) < nhitslim ) {
+            thismap[ ipix ] = thisvar[ ipix ] = thisweight[ ipix ] = VAL__BADD;
+            nrej++;
+          }
+        }
+        if( nrej > 0 ) {
+           msgOutf( "", "Setting %d map pixels bad because they contain "
+                    "fewer than %d samples (=%g of the mean samples per pixel).",
+                    status, nrej, nhitslim, hitslim );
+        }
+      }
 
 
 
