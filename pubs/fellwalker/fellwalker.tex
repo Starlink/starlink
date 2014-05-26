@@ -204,7 +204,7 @@ this fell-walking metaphor at frequent intervals.
 
 \begin{figure}
 \includegraphics[width=\columnwidth]{fellwalking}
-\caption{In 2-dimensions, peaks in data value are reminiscent of the
+\caption{In 2-dimensions, peaks in data value are often reminiscent of the
 fells of northern England. The FellWalker algorithm performs many walks
 starting at various low-land pixels, and for each one follows a line of steepest ascent
 until a significant summit is reached. All walks that terminate at the
@@ -234,11 +234,11 @@ terminates.
 
 It is possible for this basic algorithm to fragment up-land plateau
 regions into lots of small clumps which are well separated spatially but
-have only minimal dips between them\footnote{In common with other
-parameters, this minimum dip parameter is specified as a multiple of the
-noise level in the data.}. The raw clumps identified by the above
+have only minimal dips between them. The raw clumps identified by the above
 process can be merged to avoid such fragmentation, on the basis of a
-user-specified minimum dip between clumps. These merged clumps may,
+user-specified minimum dip between clumps\footnote{In common with other
+parameters, this minimum dip parameter is specified as a multiple of the
+noise level in the data.}. These merged clumps may,
 optionally, be cleaned by smoothing their boundaries using a single step
 of a cellular automaton.
 
@@ -255,7 +255,7 @@ and size as the supplied data array. This ``clump assignment array''
 (CAA) is used to record the integer identifier of the clump, if any, to
 which each pixel has been assigned. All clump identifiers are greater
 than zero. An initial pass is made through the supplied data array to
-identify pixels which have a value above a user-specified threshold
+identify pixels which have a data value above a user-specified threshold
 value. Such pixels are assigned a value of zero in the CAA indicating
 that the pixel is usable but has not yet been assigned to a clump, and
 all other pixels are assigned a value of -1 indicating that they are
@@ -460,27 +460,35 @@ outside the clump set to a special ``blank'' value.
 \end{description}
 
 There is also an optional column called ``Shape'' containing an STC-S
-description \citep{2007STCS,2010ASPC..434..213B} of the spatial coverage of
-each clump.
+description \citep{2010ASPC..434..213B,2007STCS} of the spatial coverage
+of each clump.
 
 The values stored in the size columns are the RMS deviation of each pixel
 centre from the clump centroid, where each pixel is weighted by the
 corresponding pixel data value minus an estimate of the background value
 in the clump\footnote{The minimum data value in the clump is used as the
-background value.}.
+background value.}. So for each axis, the size of the clump on that axis
+is given by:
 
-\[ size = \sqrt{ \frac{a}{b} - \left( \frac{c}{d}\right)^2 } \]
+\[ size = \sqrt{ \frac{ \sum d_{i}.x_{i}^{2} }{ \sum d_{i} } -
+\left( \frac{\sum d_{i}.x_{i} }{\sum d_{i}}  \right)^2 } \]
 
-
-For a clump with a Gaussian profile, this
+where $d_{i}$ is the data value of pixel $i$, and $x_{i}$ is the axis
+value of pixel $i$. For a clump with a Gaussian profile, this
 ``size'' value is equal to the standard deviation of the Gaussian.
 
-These sizes can then optionally be reduced to take account of the
-smoothing introduced by the instrumental beam\footnote{The FWHM of the
-instrumental smoothing on each axis must be specified by the user.}. This
-correction also increases the peak values stored within the table.
+For observational data, the clumps will be blurred by the telescope beam.
+FellWalker includes an option to remove this blurring if the beam size of
+the telescope is known:
 
-[more maths needed here]
+\[ size_{corrected} = \sqrt{ size^{2} - beam^{2} } \]
+
+where $beam$ is the standard deviation of the Gaussian beam profile. A
+corresponding correction is also applied to the peak values stored within
+the table, on the assumption that the product of the peak value and the
+clump volume should be unchanged by the instrumental blurring:
+
+\[ peak_{corrected} = peak.(size/size_{corrected}) \]
 
 \end{enumerate}
 
