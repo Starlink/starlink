@@ -36,7 +36,7 @@
 #     2012-02-24 (DSB):
 #        Added COM zero masking options.
 #     2013-02-07 (DSB):
-#        This file is now the primary source od documentation for these
+#        This file is now the primary source of documentation for these
 #	 parameters. It has been reformatted to enable automatic documentation.
 
 #-
@@ -47,21 +47,30 @@
 
 
 #-----------------------------------------------------------------
-#  Name: 	ast.gaussbg
+#  Name: 	ast.filt_diff
 #  Type: 	real
 #  Default: 	0.0
 #  Purpose: 	Reduces spurious large scale structure in the final map - an
-#               experimental alternative to AST masking
-#  Description: If ast.gaussbg is non-zero, the background in the map will
-#        	be determined at the end of each iteration by smoothing
-#    		the map with a 2D Gaussian point spread function. This
-#     		background is then subtracted from the map before sampling
-#     		the map to form the AST model to be used on the next
-#     		iteration. The non-zero value specifies the full-width at
-#     		half-maximum of the Gaussian in arc-seconds.  The purpose
-#     		is to remove large scale redundant structures from the map
-#     		without resorting to masking.
-ast.gaussbg = 0
+#               experimental alternative or addition to AST masking
+#  Description: If ast.filt_diff is non-zero, the map created at the end
+#               of each iteration is modified by removing any large scale
+#               structures that have been introduced by the iteration.
+#               Such structures are a natural outcome of the iterative
+#               process and often take the form of ripples on the scale
+#               of the FLT filter size that get stronger with each
+#               iteration.
+#
+#               If "ast.filt_diff" is non-zero it gives the size of the
+#               largest features to be retained, in arc-sconds. At the
+#               end of each iteration the difference is taken between the
+#               new map and the previous map. This difference is filtered
+#               using a sharp-edged high-pass filter, of size specified
+#               by "ast.filt_diff". The remaining high frequencies (i.e.
+#               small structures that have been introduced by the new
+#               iteration) are added back onto the map created by the
+#               previous iteration. This modified map is then used, instead
+#               of the original map, to define the AST model.
+ast.filt_diff = 0
 
 #-----------------------------------------------------------------
 #  Name: 	ast.mapspike

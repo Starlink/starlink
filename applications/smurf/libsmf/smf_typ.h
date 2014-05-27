@@ -761,6 +761,7 @@ typedef struct smfDIMMData {
   smfArray **gai;            /* array of smfArray's of bolo gain corrections */
   smfArray **com;            /* array of smfArray's of common mode signal */
   double *map;               /* pointer to the current map estimate */
+  double *lastmap;           /* pointer to the previous map estimate */
   int *hitsmap;              /* pointer to the current hits map */
   smf_qual_t *mapqual;       /* pointer to the current map quality */
   double *mapvar;            /* pointer to the current map variance estimate */

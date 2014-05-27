@@ -1787,6 +1787,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       dat.qua = qua;
       dat.lut = lut;
       dat.map = thismap;
+      dat.lastmap = lastmap;
       dat.hitsmap = thishits;
       dat.mapqual = thisqual;
       dat.mapvar = thisvar;

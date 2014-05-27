@@ -145,11 +145,17 @@
 *        so we really must be consistent and use the same thing here.
 *     2014-3-4 (DSB):
 *        Do despiking even if an initial sky is being subtracted.
+*     2014-5-27 (DSB):
+*        Change the facility for removing low frequencies in the map. The
+*        new facility removes low frequencies in the map change, rather
+*        than the map itself, and uses a hard edged filter rather than a
+*        Gaussian filter. The config parameter name is changed from
+*        "gaussbg" to "filt_diff".
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2006-2011 University of British Columbia.
-*     Copyright (C) 2010-2012 Science and Technology Facilities Council.
+*     Copyright (C) 2010-2014 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -214,7 +220,7 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
 
   /* Local Variables */
   size_t bstride;               /* bolo stride */
-  double gaussbg;               /* gaussian background filter */
+  double filt_diff;             /* Size of background filter */
   int *hitsmap;                 /* Pointer to hitsmap data */
   dim_t i;                      /* Loop counter */
   dim_t idx=0;                  /* Index within subgroup */
@@ -240,7 +246,6 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
   smf_qual_t *mapqual = NULL;/* Quality map */
   double *mapvar = NULL;        /* Variance map */
   double *mapweight = NULL;     /* Weight map */
-  int zero_notlast;             /* Don't zero on last iteration? */
   unsigned char *zmask = NULL;  /* Pointer to map mask */
 
   /* Main routine */
@@ -271,10 +276,10 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
   /* Parse parameters */
 
   /* Will we apply a smoothing constraint? */
-  astMapGet0D( kmap, "GAUSSBG", &gaussbg );
-  if( gaussbg < 0 ) {
+  astMapGet0D( kmap, "FILT_DIFF", &filt_diff );
+  if( filt_diff < 0 && *status == SAI__OK ) {
     *status = SAI__ERROR;
-    errRep( "", FUNC_NAME ": AST.GAUSSBG cannot be < 0.", status );
+    errRep( "", FUNC_NAME ": AST.FILT_DIFF cannot be < 0.", status );
   }
 
   /* Before applying boundary conditions, removing AST signal from residuals
@@ -319,26 +324,33 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
   } else {
     dat->ast_skipped = 0;
 
-    /* Constrain map. We don't if this is the very last iteration, and
-       if zero_notlast is set. */
-
-    zero_notlast = 0;
-    astMapGet0I( kmap, "ZERO_NOTLAST", &zero_notlast );
-    if( gaussbg && !(zero_notlast && (flags&SMF__DIMM_LASTITER)) ) {
-      /* Calculate and remove a background using a simple Gaussian filter...
-         the idea is to help remove saddles. Maybe this should go after
-         zero_lowhits? Really there should be some sort of map apodization
-         routine */
-
+    /* Constrain the change in the map. We don't if this if no previous
+       map is available. */
+    if( filt_diff > 0.0 && dat->iter > 1 ) {
       smfData *filtermap=NULL;
       smfFilter *filt=NULL;
+      double *change = NULL;
 
-      /* Put the map data in a smfData wrapper */
+      msgOutiff( MSG__DEBUG, "","   high-pass filtering the map-change to "
+                 "remove features larger than %g arc-sec.", status, filt_diff );
+
+      /* Form the change in the map since the previous iteration,
+         remove low frequencies from the map change, and then add the
+         remaining high frequency changes back onto the previous map to
+         get the new map. We filter the map change rather than the map
+         itself since the astronomical signal wil be far weaker (compared
+         to the spurious low frequency structures introduced by the
+         iterative process) in the map change than in the map. This means
+         we probably do not need to worry about ringing round sources etc
+         caused by the filtering process. */
+
+      /* Create a smfData to hold the changes in the map. */
+      change = astMalloc( dat->msize*sizeof( *change ) );
       filtermap = smf_create_smfData( 0, status );
       if( *status == SAI__OK ) {
         filtermap->isFFT = -1;
         filtermap->dtype = SMF__DOUBLE;
-        filtermap->pntr[0] = map;
+        filtermap->pntr[0] = change;
         filtermap->ndims = 2;
         filtermap->lbnd[0] = dat->lbnd_out[0];
         filtermap->lbnd[1] = dat->lbnd_out[1];
@@ -346,25 +358,37 @@ void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
         filtermap->dims[1] = dat->ubnd_out[1]-dat->lbnd_out[1]+1;
         filtermap->hdr->wcs = astClone( dat->outfset );
 
-        /* Set bad values to 0... should really be some sort of apodization */
+        /* Form the map change, setting bad values to 0. */
         for( i=0; i<dat->msize; i++ ) {
-          if( map[i] == VAL__BADD ) map[i] = 0;
+          if( map[i] != VAL__BADD && dat->lastmap[i] != VAL__BADD ) {
+             change[i] = map[i] - dat->lastmap[i];
+          } else {
+             change[i] = 0;
+          }
         }
 
-        /* Create and apply a Gaussian filter to remove large-scale
-           structures -- we do this by taking the complement of a
-           Gaussian smoothing filter to turn it into a smooth
-           high-pass filter */
-
+        /* Create and apply a sharp-edged high-pass filter to remove
+           large-scale structures from the map change image. */
         filt = smf_create_smfFilter( filtermap, status );
-        smf_filter2d_gauss( filt, gaussbg, status );
-        smf_filter_complement( filt, status );
+
+        smf_filter2d_edge( filt, 1.0/filt_diff, 0, status );
         smf_filter_execute( wf, filtermap, filt, 0, 0, status );
+
+        /* Add the remining high frequencies of the filtered map-change
+           image back onto the previous map. */
+        for( i=0; i<dat->msize; i++ ) {
+          if( map[i] != VAL__BADD && dat->lastmap[i] != VAL__BADD ) {
+             map[i] = change[i] + dat->lastmap[i];
+          } else {
+             map[i] = VAL__BADD;
+          }
+        }
 
         /* Unset pointers to avoid freeing them */
         filtermap->pntr[0] = NULL;
       }
 
+      change = astFree( change );
       smf_close_file( wf, &filtermap, status );
       filt = smf_free_smfFilter( filt, status );
     }
