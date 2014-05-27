@@ -4,10 +4,6 @@
 noisecliphigh=10.0
 dcthresh = 100
 
-#  Terminate when the *max* (not mean) change is less than 4.0
-maptol_mean=0
-maptol=4.0
-
 #  Don't want extended structure, so avoid problems with COM model by using
 #  individual common-mode models for each subarray.
 com.perarray = 1
@@ -21,25 +17,16 @@ flt.filt_edge_largescale=200
 noi.box_size=-15
 noi.box_type=1
 
-#  Use a maximum of 20 iterations, and do not subtract the ASTronomical signal
-#  on any of these iterations.
-ast.skip=-20
+#  Use a maximum of 20 iterations
+numiter=-25
+maptol_mean=1
+maptol=0.01
 
-#  Use a soft-edged filter to reduce bowling around sources.
-flt.filt_order=3
+# new recommendations and using an ast model
+ast.zero_snr = 5
+ast.zero_snrlo = 3
 
-#  Do FLT masking on every iteration, based on an SNR cut of 3.0, using
-#  an algorithm similar to the kappa:ffclean command. This should
-#  restrict source regions to sizes smaller than 200 arc-sec (given by
-#  "zero_snr_hipass"). Ensure the filtering happens on the last iteration
-#  as well.
-flt.zero_snr=3
-flt.zero_snr_ffclean=1
-flt.zero_snr_hipass=200
-flt.zero_notlast=0
+ast.skip=5
+flt.zero_snr=5
+flt.zero_snrlo=3
 
-#  Also use similar COM filtering.
-com.zero_snr=3
-com.zero_snr_ffclean=1
-com.zero_snr_hipass=200
-com.zero_notlast=0
