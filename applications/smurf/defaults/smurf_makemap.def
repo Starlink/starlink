@@ -876,6 +876,39 @@ downsampscale = -1
 ensureflat = 1
 
 #-----------------------------------------------------------------
+#  Name: 	epsin
+#  Type: 	string
+#  Default: 	<undef>
+#  Purpose: 	Aid convergence and image flatness
+#  Description: In some cases, each iteration can add a fixed constant
+#               "error map" into the astronomical map, which accumulates
+#               with each subsequent iteration, preventing convergence
+#               and causing strong large-scale structures to appear in
+#               the final map (typically ripples on the scale of the FLT 
+#               filter). This parameter attempts to counteract this by
+#               allowing a map to be specified which will be subtracted
+#               from the astronomical map at the end of each iteration.
+# 		        At present, the dimensions of this map must be identical to
+#               those of the real map. See also parameter "epsout".
+epsin = <undef>
+
+#-----------------------------------------------------------------
+#  Name: 	epsout
+#  Type: 	string
+#  Default: 	<undef>
+#  Purpose: 	Aid convergence and image flatness
+#  Description: If a value is supplied for this parameter, an output NDF
+#               will be created holding the median of the difference maps
+#               created on the three final iterations (a difference map
+#               is the difference between the astronoimical maps created
+#               on two succesive iterations). This may be suitable for
+#               feeding back in using parameter "epsin" on a subsequent
+#               run of makemap. Note, currently this parameter may only
+#               be used if the data is processed in a single continuous
+#               chunk (an error is reported if this is not the case).
+epsout = <undef>
+
+#-----------------------------------------------------------------
 #  Name: 	exportclean
 #  Type: 	integer
 #  Default: 	0
@@ -1761,6 +1794,25 @@ maptol = 0.05
 #               Otherwise, "maptol"  defines a target value for the
 #               maximum change in normalised pixel value between iterations.
 maptol_mean = 1
+
+#-----------------------------------------------------------------
+#  Name: 	maptol_rate
+#  Type: 	real
+#  Default: 	<undef>
+#  Purpose: 	Specifies when to stop iterating.
+#  Description: The normalised mean change in pixel value (see parameter
+#               "maptol") con sometimes settle down to a constant value,
+#               and thus never drop to the target "maptol" value. This may 
+#               be the case for instance, if every iteration adds a fixed 
+#               error map onto the current astronomical signal (see parameter 
+#               "epsin"). Specifying a value for "maptol_rate" causes the 
+#               iterative loop to be left if the normalised mean change 
+#               seems to settle down to a fix value. The supplied value for
+#               "maptol_rate" should be a fraction in the range 0.0 to 1.0,
+#               and gives the minimum required fractional change in "normalised
+#               mean change" between iteration. If the actual value falls
+#               below this minimum value, the iterative loop is left.
+maptol_rate = <undef>
 
 #-----------------------------------------------------------------
 #  Name: 	maxlen

@@ -719,7 +719,8 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
                         size_t *necessary, int *status );
 
 void smf_checkmem_map( const int lbnd[2], const int ubnd[2], int rebin, int nw,
-                       size_t available, size_t *necessary, int *status );
+                       size_t available, const char *epsout, size_t *necessary,
+                       int *status );
 
 double smf_chunkweight( smfData *data, AstKeyMap *keymap, int contchunk,
                         int *status );

@@ -14,8 +14,8 @@
 
 *  Invocation:
 *     smf_checkmem_map( const int lbnd[2], const int ubnd[2], int rebin,
-*                       int nw, size_t available, size_t *necessary,
-*                       int *status );
+*                       int nw, size_t available, const char *epsout,
+*                       size_t *necessary, int *status );
 
 *  Arguments:
 *     lbnd = const int[2] (Given)
@@ -28,6 +28,9 @@
 *        Number of worker threads, since iteratemap uses nw temp maps
 *     available = size_t (Given)
 *        Maximum memory in bytes that the mapped arrays may occupy
+*     epsout = const char * (Given)
+*        If non-NULL, then two buffers map-sized buffers are needed to
+*        hold the difference maps needed by the EPSOUT config parameter.
 *     necessary = size_t * (Returned)
 *        If non-null return estimate of the actual amount of memory required
 *     status = int* (Given and Returned)
@@ -55,6 +58,8 @@
 *        We are using MiB not Mb
 *     2013-10-24 (AGM):
 *        smf_iteratemap uses nw maps for temporary calculations
+*     2014-05-27 (DSB):
+*        Add epsout parameter.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -101,7 +106,8 @@
 #define FUNC_NAME "smf_checkmem_map"
 
 void smf_checkmem_map( const int lbnd[], const int ubnd[], int rebin, int nw,
-		       size_t available, size_t *necessary, int *status ) {
+		       size_t available, const char *epsout, size_t *necessary,
+                       int *status ) {
 
  /* Local Variables */
   size_t mapsize;              /* Elements in output map */
@@ -162,6 +168,9 @@ void smf_checkmem_map( const int lbnd[], const int ubnd[], int rebin, int nw,
       /* add (nw - 1) maps for threaded calculations
          uses 4 doubles (map, mapvar, weight, weightsq) and 1 int (hitsmap) */
       total += 4*(nw-1)*sizeof(double)*mapsize + (nw-1)*sizeof(int)*mapsize;
+
+      /* add 3 data arrays (no variance or quality) if EPSOUT is specified. */
+      if( epsout ) total += 3*sizeof(double)*mapsize;
     }
 
     /* Set bad status if too big */

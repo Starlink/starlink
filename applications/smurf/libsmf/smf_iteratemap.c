@@ -448,7 +448,7 @@
 *        iteration, exclude any map pixels that have a very low number of
 *        hits (fewer than 10% of the mean number of hits per pixel) since
 *        these will have unreliable (potentially tiny) variances.
-*     2014-04-4(DSB):
+*     2014-04-4 (DSB):
 *        If the AST mask area drops to zero pixels, there are no bright
 *        pixels in the map. But this is no reason to report an error - a
 *        map can still be made, albeit it will contain only background
@@ -457,6 +457,13 @@
 *     2014-05-26 (DSB):
 *        Add the "hitslimit" config parameter, that allows map pixels
 *        with very low hits to be set bad.
+*     2014-05-27 (DSB):
+*        Add config parameters epsin and epsout to allow a constant error
+*        map to be subtracted from the map at the end of each iteration.
+*        Currently, the epsout parameter can only be used if the data
+*        is processed in a single continuous chunk (an error is reported
+*        otherwise). Ideally, each chunk should probably have its own
+*        independent error map, since the errors may be chunk-dependent.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -540,14 +547,18 @@ static void smf1_iteratemap( void *job_data_ptr, int *status );
 
 /* Local data types */
 typedef struct smfIterateMapData {
+   double *epsout;
+   double *err1;
+   double *err2;
+   double *err3;
+   double *res_data;
+   double *thismap;
+   int *lut_data;
+   int operation;
    size_t d1;
    size_t d2;
    smf_qual_t *qua_data;
-   double *res_data;
-   int *lut_data;
-   double *thismap;
    smf_qual_t *thisqual;
-   int operation;
 } SmfIterateMapData;
 
 #define FUNC_NAME "smf_iteratemap"
@@ -588,6 +599,13 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   int doclean=1;                /* Are we doing data pre-processing? */
   dim_t dsize;                  /* Size of data arrays in containers */
   int ensureflat=1;             /* flatfield data as they are loaded */
+  double *epsbuf1=NULL;         /* Buffer for diff map */
+  double *epsbuf2=NULL;         /* Buffer for diff map */
+  double *epsbuf3=NULL;         /* Buffer for diff map */
+  char *epsin=NULL;             /* Name of external error map to use */
+  char *epsout=NULL;            /* Name of external error map to create */
+  double *emapdata=NULL;        /* epsin data values */
+  int epsndf=NDF__NOID;         /* NDF id for epsin */
   int exportclean=0;            /* Are we doing to export clean data? */
   int exportNDF=0;              /* If set export DIMM files to NDF at end */
   int *exportNDF_which=NULL;    /* Which models in modelorder will be exported*/
@@ -640,7 +658,10 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   smfGroup *lutgroup=NULL;      /* smfGroup of lut model files */
   double *mapchange=NULL;       /* Array storing change (map - lastmap)/sigma*/
   double mapchange_mean=0;      /* Mean change in map */
+  double mapchange_l2;          /* Mean change from previous iteration */
+  double mapchange_l3;          /* Mean change from previous iteration */
   double mapchange_max=0;       /* Maximum change in the map */
+  double maptol_rate=VAL__BADD; /* Min rate of change of mean map change */
   double maptol=VAL__BADD;      /* map change tolerance for stopping */
   int maptol_mean;              /* Use mean map change instead of max map change? */
   double *mapweights=NULL;      /* Weight for each pixel including chunk weight */
@@ -679,6 +700,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   smf_qual_t *qua_data=NULL;    /* Pointer to DATA component of qua */
   smfGroup *quagroup=NULL;      /* smfGroup of quality model files */
   int quit=0;                   /* flag indicates when to quit */
+  int rate_limited;             /* Was the MAPTOL_RATE limit hit? */
   int rebinflags;               /* Flags to control rebinning */
   smfArray **res=NULL;          /* Residual signal */
   double *res_data=NULL;        /* Pointer to DATA component of res */
@@ -831,6 +853,10 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       /* Does maptol refer to mean map change or max map change? */
       astMapGet0I( keymap, "MAPTOL_MEAN", &maptol_mean );
 
+      /* Abort if the "mean change in map value" changes by less than
+         "MAPTOL_RATE" between iterations. */
+      astMapGet0D( keymap, "MAPTOL_RATE", &maptol_rate );
+
       /* A negative AST.SKIP value over-rides NUMITER. */
       ast_skip = 0;
       if( astMapGet0A( keymap, "AST", &kmap ) ) {
@@ -947,6 +973,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                "arcsec", status, downsampscale );
 
       /* Adding in signal from an external fakemap? */
+      tempstr = NULL;
       astMapGet0C( keymap, "FAKEMAP", &tempstr );
       if( tempstr ) {
         fakemap = astCalloc( 255, 1 );
@@ -956,6 +983,23 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       astMapGet0D( keymap, "FAKESCALE", &fakescale );
       astMapGet0I( keymap, "FAKEMCE", &fakemce );
       astMapGet0D( keymap, "FAKEDELAY", &fakedelay );
+
+      /* Subtracting an error map after each iteration? */
+      tempstr = NULL;
+      astMapGet0C( keymap, "EPSIN", &tempstr );
+      if( tempstr ) {
+        epsin = astCalloc( 255, 1 );
+        one_strlcpy( epsin, tempstr, 255, status );
+      }
+
+      /* Dump the error map after the final iteration? */
+      tempstr = NULL;
+      astMapGet0C( keymap, "EPSOUT", &tempstr );
+      if( tempstr ) {
+        epsout = astCalloc( 255, 1 );
+        one_strlcpy( epsout, tempstr, 255, status );
+      }
+
     }
 
     /* Obtain sample length from header of first file in igrp */
@@ -1222,7 +1266,8 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
     /* First check memory for the map and subtract off total memory to
        see what is available for model components. */
-    smf_checkmem_map( lbnd_out, ubnd_out, 0, nw, maxmem, &mapmem, status );
+    smf_checkmem_map( lbnd_out, ubnd_out, 0, nw, maxmem, epsout, &mapmem,
+                      status );
     maxdimm = maxmem-mapmem;
 
     /* Then the iterative components that are proportional to time */
@@ -1325,16 +1370,39 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
     fmapdata = ptr;
   }
 
+  /* Load in the error map */
+  if( epsin && (*status==SAI__OK) ) {
+    int nmap, tndf;
+    void *ptr;
+    msgOutf( "", FUNC_NAME ": loading external error map `%s'", status, epsin );
 
+    /* Open the NDF, get a section from it matching the bounds of the
+       output map, then close the original NDF - retaining the section. .  */
+    ndfFind( NULL, epsin, &tndf, status );
+    ndfSect( tndf, 2, lbnd_out, ubnd_out, &epsndf, status );
+    ndfAnnul( &tndf, status );
 
+    /* Map the data as double precision */
+    ndfMap( epsndf, "DATA", "_DOUBLE", "READ", &ptr, &nmap, status );
+    emapdata = ptr;
+  }
 
-
-
-
-
-
-
-
+  /* Report an error if epsout specified but we are creating more than one
+     chunk. Otherwise allocate two map-sized buffers to store the second
+     and third penultimate difference maps. The "mapchange" array will
+     hold the first penultimate difference map. */
+  if( epsout ) {
+     if( ncontchunks > 1 && *status == SAI__OK ) {
+        *status = SAI__ERROR;
+        errRep( "", FUNC_NAME ": error, config parameter EPSOUT cannot be "
+                "used since the data is being split into multiple chunks.",
+                status );
+     } else {
+        epsbuf1 = astMalloc( msize*sizeof( *epsbuf1 ) );
+        epsbuf2 = astMalloc( msize*sizeof( *epsbuf2 ) );
+        epsbuf3 = astMalloc( msize*sizeof( *epsbuf3 ) );
+     }
+  }
 
 
 
@@ -1724,7 +1792,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         }
 
         /* Associate quality with some models */
-        if( modeltyps[imodel] == SMF__FLT ) {
+        if( modeltyps[imodel] == SMF__FLT && *status == SAI__OK ) {
           for( idx=0; idx<res[0]->ndat; idx++ ) {
             smfData *thisqua = qua[0]->sdata[idx];
             model[imodel][0]->sdata[idx]->sidequal = thisqua;
@@ -1783,6 +1851,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
       /* Stuff pointers into smfDIMMData to pass around to model component
          solvers */
+      dat.ast_skipped = 1;
       dat.res = res;
       dat.qua = qua;
       dat.lut = lut;
@@ -1867,6 +1936,10 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
       /* The NOI model has not been calculated yet. */
       noidone = 0;
+
+      /* The mean mapchange for the previous two iterations. */
+      mapchange_l2 = mapchange_l3 = VAL__BADD;
+      rate_limited = 0;
 
       /* The "iter" variable counts how many iterations have been done in
          total, including any from a previous run of makemap if an initial sky
@@ -2218,6 +2291,43 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                      ": ** %f s rebinning map",
                      status, smf_timerupdate(&tv1,&tv2,status) );
 
+          /* If required, subtract an external error map from the map
+             created above. */
+          if( emapdata && !dat.ast_skipped ) {
+              double *p1 = thismap;
+              double *p2 = lastmap;
+
+              p1 = thismap;
+              p2 = emapdata;
+              for( ipix = 0; ipix < msize; ipix++,p1++,p2++ ) {
+                if( *p1 != VAL__BADD && *p2 != VAL__BADD ) {
+                  *p1 -= *p2;
+                } else {
+                  *p1 = VAL__BADD;
+                }
+              }
+
+              msgOutf( "", FUNC_NAME ": subtracted external error map `%s'", status, epsin );
+          }
+
+
+
+           /* Pixels with very low hits will be unreliable and may upset
+              global behaviour. So exclude pixels with hits below 10% of the
+              mean from the mapchange estimate. */
+           size_t hitslim = 0;
+           int *ph = thishits;
+           for( ipix = 0; ipix < msize; ipix++ ) hitslim += *(ph++);
+           hitslim /= 10*msize;
+
+           for( ipix = 0; ipix < msize; ipix++ ) {
+             if( thishits[ipix] <= (int) hitslim ) {
+               thismap[ipix] = VAL__BADD;
+               thisvar[ipix] = VAL__BADD;
+               mapweights[ipix] = 0.0;
+             }
+           }
+
           /* Replace the map with a linear combination of the original map
             and the map from the previous iteration. This may help to
             damp oscillations in the map from iteration to iteration. */
@@ -2451,17 +2561,34 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
             nhitslim = 0;
           }
 
+          /* If we will be dumping the final error map, we need to retain
+             copies of the three most recent difference maps. "epsbuf3"
+             currently holds the most recent difference map, so copy it to
+             epsbuf1 or epsbuf2 (which ever is oldest) before changing
+             its contents. */
+          if( epsout ) memcpy( ( iter % 2 == 0 ) ? epsbuf1 : epsbuf2,
+                               epsbuf3, msize*sizeof(*epsbuf3) );
+
           mapchange_max = 0;
           for( ipix = 0; ipix < msize; ipix++ ) {
-            if( !(thisqual[ipix]&SMF__MAPQ_AST) && (thismap[ipix] != VAL__BADD) &&
-                (lastmap[ipix] != VAL__BADD) && (thisvar[ipix] != VAL__BADD) &&
-                (thisvar[ipix] > 0) && (thishits[ipix] > nhitslim) ) {
-              mapchange[ipix] = fabs(thismap[ipix] - lastmap[ipix]) / sqrt(thisvar[ipix]);
 
-              /* Update max */
-              if( mapchange[ipix] > mapchange_max ) mapchange_max = mapchange[ipix];
+            if( thismap[ipix] != VAL__BADD && lastmap[ipix] != VAL__BADD ) {
+              double vdiff = thismap[ipix] - lastmap[ipix];
+              if( epsout) epsbuf3[ipix] = vdiff;
+
+              if( !(thisqual[ipix]&SMF__MAPQ_AST) && (thisvar[ipix] != VAL__BADD)
+                  && (thisvar[ipix] > 0) && (thishits[ipix] > nhitslim) ) {
+                mapchange[ipix] = fabs( vdiff ) / sqrt(thisvar[ipix]);
+
+                /* Update max */
+                if( mapchange[ipix] > mapchange_max ) mapchange_max = mapchange[ipix];
+              } else {
+                mapchange[ipix] = VAL__BADD;
+              }
+
             } else {
               mapchange[ipix] = VAL__BADD;
+              if( epsout ) epsbuf3[ipix] = VAL__BADD;
             }
           }
 
@@ -2507,6 +2634,24 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
             converged=0;
           }
 
+
+          /* if the mean mapchange becomes constant, we'll never get to
+             convergence, so quit. */
+          if( !last_skipped && maptol_rate != VAL__BADD && mapchange_l3 != VAL__BADD ) {
+             double mmc = ( mapchange_mean + mapchange_l2 + mapchange_l3 )/3;
+             double mclim = maptol_rate*mmc;
+             if( fabs( mapchange_mean - mmc ) < mclim &&
+                 fabs( mapchange_l2 - mmc ) < mclim &&
+                 fabs( mapchange_l3 - mmc ) < mclim ) {
+                msgOutf( "", FUNC_NAME ": *** Normalised map change has "
+                         "not changed significantly over the previous 3 "
+                         "iterations - quiting immediately.", status );
+                quit = 1;
+                rate_limited = 1;
+             }
+          }
+          mapchange_l3 = mapchange_l2;
+          mapchange_l2 = mapchange_mean;
         }
 
         /* Increment iteration counter */
@@ -2519,7 +2664,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
              loop */
           if( quit == 0 ) {
             quit = 1;
-          } else {
+          } else if( quit < 0 ){
             /* Check that we will exceed maxiter next time through */
             if( iter > (maxiter-1) ) {
               quit = 1;
@@ -2573,6 +2718,59 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           quit = 1;
         }
       }
+
+      /* If we are dumping the final error map, check we have done at
+         least 3 iterations. */
+      if( epsout && *status == SAI__OK ) {
+         if( iter < 4 ) {
+            *status = SAI__ERROR;
+            errRep( "", FUNC_NAME ": error, config parameter EPSOUT cannot be "
+                    "used since too few iterations have been performed.",
+                    status );
+
+         /* Otherwise map the epsout NDF data array and store the median of
+            the three last difference maps in it. */
+         } else {
+            int place, tndf, el;
+            double *ip;
+            size_t pixstep;
+
+            msgOutf( "", FUNC_NAME ": creating output error map `%s'",
+                     status, epsout );
+            ndfPlace( NULL, epsout, &place, status );
+            ndfNew( "_DOUBLE", 2, lbnd_out, ubnd_out, &place, &tndf, status );
+            ndfMap( tndf, "DATA", "_DOUBLE", "WRITE", (void **) &ip, &el,
+                    status );
+
+            pixstep = msize/nw;
+            if( pixstep == 0 ) pixstep = 1;
+
+            for( iw = 0; iw < nw; iw++ ) {
+              pdata = job_data + iw;
+              pdata->d1 = iw*pixstep;
+              if( iw < nw - 1 ) {
+                pdata->d2 = pdata->d1 + pixstep - 1;
+              } else {
+                pdata->d2 = msize - 1;
+              }
+
+              pdata->epsout = ip;
+              pdata->err1 = epsbuf1;
+              pdata->err2 = epsbuf2;
+              pdata->err3 = epsbuf3;
+              pdata->operation = 2;
+
+              /* Submit the job to the workforce. */
+              thrAddJob( wf, 0, pdata, smf1_iteratemap, 0, NULL, status );
+            }
+
+            /* Wait for all jobs to complete. */
+            thrWait( wf, status );
+
+            ndfAnnul( &tndf, status );
+         }
+      }
+
 
       msgSeti("ITER",iter);
       msgOut( " ",
@@ -3177,7 +3375,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
     whichthetabin = astFree( whichthetabin );
   }
 
-/* Normalise the returned exposure times to a mean chunk weight of unity. */
+  /* Normalise the returned exposure times to a mean chunk weight of unity. */
   if( *status == SAI__OK ) {
     double meanw = sumchunkweights/ncontchunks;
     for (ipix = 0; ipix < msize; ipix++ ) {
@@ -3186,11 +3384,8 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   }
 
 
-
-
-
-
-
+  /* Store a flag indicating if the MAPTOL_RATE limit was hit. */
+  parPut0l( "RATE_LIMITED", rate_limited, status );
 
 
 
@@ -3234,6 +3429,14 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   if( igroup ) {
     smf_close_smfGroup( &igroup, status );
   }
+
+  epsout = astFree( epsout );
+  epsbuf1 = astFree( epsbuf1 );
+  epsbuf2 = astFree( epsbuf2 );
+  epsbuf3 = astFree( epsbuf3 );
+
+  epsin = astFree( epsin );
+  if( epsndf != NDF__NOID ) ndfAnnul( &epsndf, status );
 
   fakemap = astFree( fakemap );
   if( fakendf != NDF__NOID ) ndfAnnul( &fakendf, status );
@@ -3321,6 +3524,34 @@ static void smf1_iteratemap( void *job_data_ptr, int *status ) {
                 !(pdata->thisqual[ *pl ] & SMF__MAPQ_AST ) ) {
                *pr += ast_data;
             }
+         }
+      }
+
+/* Find the median of the three last difference maps. */
+   } else if( pdata->operation == 2 ) {
+      double *p0, *p1, *p2, *p3;
+
+      p0 = pdata->epsout +  pdata->d1;
+      p1 = pdata->err1 +  pdata->d1;
+      p2 = pdata->err2 +  pdata->d1;
+      p3 = pdata->err3 +  pdata->d1;
+      for( idata = pdata->d1; idata <= pdata->d2; idata++,p0++,p1++,p2++,p3++ ) {
+         if( *p1 != VAL__BADD && *p2 != VAL__BADD && *p3 != VAL__BADD ) {
+            if( *p1 > *p2 ) {
+               if( *p2 > *p3 ) {
+                  *p0 = *p2;
+               } else {
+                  *p0 = *p3;
+               }
+            } else {
+               if( *p1 > *p3 ) {
+                  *p0 = *p1;
+               } else {
+                  *p0 = *p3;
+               }
+            }
+         } else {
+            *p0 = VAL__BADD;
          }
       }
 

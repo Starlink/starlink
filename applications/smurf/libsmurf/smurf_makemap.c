@@ -289,6 +289,10 @@
 *          The DLON and DLAT values are added onto the SMU jiggle positions
 *          stored in the JCMTSTATE extension of the input NDFs. DLON and DLAT
 *          values for non-tabulated times are determined by interpolation. [!]
+*     RATE_LIMITED = _LOGICAL (Write)
+*          Set TRUE on exit if the iterative loop was terminated because
+*          the mean normalised change in the map does not seem to be
+*          falling (see config parameter "MAPTOL_RATE").
 *     REF = NDF (Read)
 *          An existing NDF that is to be used to define the output grid,
 *          or the string "JSA". If an NDF is supplied, the output grid will

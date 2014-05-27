@@ -3752,6 +3752,15 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter rate_limited {
+                type _LOGICAL
+                access WRITE
+                vpath DEFAULT
+                prompt {Was MAPTOL_RATE limit hit?}
+                default FALSE
+                helpkey *
+            }
+
             parameter ref {
                 type NDF
                 access READ
