@@ -44,7 +44,8 @@ void makeclumps( int *status ) {
 *     The clumps profiles are Gaussian, with elliptical isophotes. The
 *     values of each parameter defining the clump shape can be either
 *     fixed at a constant value or selected from a given probability
-*     distribution.
+*     distribution. The clump positions can be distributed randomly, or
+*     may be on a regular grid (see parameter GRID).
 
 *  Usage:
 *     makeclumps out outcat
@@ -85,6 +86,13 @@ void makeclumps( int *status ) {
 *        Max) for pixel axis 3 of each clump is chosen. Values should be
 *        supplied in units of pixel. See parameter PARDIST for additional
 *        information. [current value]
+*     GRID = _INTEGER (Read)
+*        If null (!), the clump centres are distributed randomly over the
+*        array. If not null, the clump centres are positioned on a regular
+*        grid with dimensions specified by parameter NCLUMPS. The grid
+*        occupies the entire output array, excluding a border of width
+*        equal to the integer value supplied for parameter GRID (in
+*        pixels). [!]
 *     LBND() = _INTEGER (Read)
 *        The lower pixel bounds of the output NDF. The number of values
 *        supplied (1, 2 or 3) defines the number of pixel axes in the output
@@ -102,8 +110,15 @@ void makeclumps( int *status ) {
 *        extension is added to this NDF, containing information about each
 *        clump in the same format as produced by the FINDCLUMPS command. This
 *        includes an NDF holding an of the individual clump.
-*     NCLUMP = _INTEGER (Read)
-*        The number of clumps to create.
+*     NCLUMP() = _INTEGER (Read)
+*        The number of clumps to create. If parameter GRID is null (!),
+*        a single value should be supplied, and the specified number of
+*        clumps are positioned randomly over the output array. If
+*        parameter GRID is not null, the number of values supplied should
+*        match the number of pixel axes in the output array, and each
+*        value is then the number of clumps along the corresponding
+*        pixel axis. Note, any clumps that touch an edge of the aray will
+*        be excluded from the output array.
 *     OUT = NDF (Write)
 *        The NDF to receive the simulated data, including instrumental
 *        blurring and noise.
@@ -301,6 +316,8 @@ void makeclumps( int *status ) {
 *        Ignore degenerate pixel axes when creating clumps.
 *     23-APR-2014 (DSB):
 *        Added parameter PRECAT.
+*     28-MAY-2014 (DSB):
+*        Added parameter GRID.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -344,11 +361,19 @@ void makeclumps( int *status ) {
    int deconv;                   /* Store deconvolved clump properties */
    int dims[ 3 ];                /* Dimensions before axis permutation */
    int dist;                     /* Clump parameters distribution */
+   int grid;                     /* Border for regular grid (-ve if random) */
+   int grid_delta1;              /* Clump spacing on pixel axis 1 */
+   int grid_delta2;              /* Clump spacing on pixel axis 2 */
+   int grid_delta3;              /* Clump spacing on pixel axis 3 */
+   int grid_dims[ 3 ];           /* No. of clumps along each pixel axis */
    int i;                        /* Loop count */
    int indf2;                    /* Identifier for output NDF without noise */
    int indf3;                    /* Identifier for input WCS NDF */
    int indf;                     /* Identifier for output NDF with noise */
    int ishape;                   /* STC-S shape for spatial coverage */
+   int ix;                       /* Clump centre on pixel axis 1 */
+   int iy;                       /* Clump centre on pixel axis 2 */
+   int iz;                       /* Clump centre on pixel axis 3 */
    int lbnd[ 3 ];                /* Lower pixel bounds */
    int nc;                       /* Number of clumps created */
    int nclump;                   /* Number of clumps to create */
@@ -492,6 +517,30 @@ void makeclumps( int *status ) {
    ndfMap( indf, "DATA", "_REAL", "WRITE", (void *) &ipd, &nel, status );
    ndfMap( indf2, "DATA", "_REAL", "WRITE", (void *) &ipd2, &nel, status );
 
+/* See if clumps are to be placed on a regular grid. If so, "grid" holds
+   the width of the border to place round the outer edge of the grid, in
+   pixels. If not, "grid" is set negative. */
+   if( *status == SAI__OK ) {
+      parGet0i( "GRID", &grid, status );
+      if( *status == PAR__NULL ) {
+         errAnnul( status );
+         grid = -1;
+      }
+   }
+
+/* Get the number of clumps to create. */
+   if( grid >= 0 ) {
+      parExaci( "NCLUMP", ndim, grid_dims, status );
+      nclump = grid_dims[0];
+      if( ndim > 1 ) nclump *= grid_dims[1];
+      if( ndim > 2 ) nclump *= grid_dims[2];
+   } else {
+      parGet0i( "NCLUMP", &nclump, status );
+      grid_dims[0] = 1;
+      grid_dims[1] = 1;
+      grid_dims[2] = 1;
+   }
+
 /* Get the other needed parameters. Which are needed depends on whether
    we are producing 1, 2 or 3 dimensional data. */
 
@@ -506,7 +555,6 @@ void makeclumps( int *status ) {
    }
 
    parGet0r( "TRUNC", &trunc, status );
-   parGet0i( "NCLUMP", &nclump, status );
    parGet0r( "RMS", &rms, status );
 
    parGet1r( "FWHM1", 2, fwhm1, &nval, status );
@@ -559,31 +607,37 @@ void makeclumps( int *status ) {
    peak[ 0 ] /= rms;
    peak[ 1 ] /= rms;
 
-/* Clump positions are chosen from a uniform distribution. Set up the
-   arrays describing the mean value and range on each axis. */
+/* If clump positions are random, they are chosen from a uniform distribution.
+   Set up the arrays describing the mean value and range on each axis. */
    dims[ 0 ] = subnd[ 0 ] - slbnd[ 0 ] + 1;
    dims[ 1 ] = 1;
    dims[ 2 ] = 1;
    pos1[ 0 ] = 0.5*( dims[ 0 ]  + 1 );
    pos1[ 1 ] = 0.5*dims[ 0 ];
+   grid_delta1 = (int)( 0.5 + ( (float) dims[ 0 ] - 2*grid )/grid_dims[ 0 ] );
 
    if( sdims > 1 ) {
 
       dims[ 1 ] = subnd[ 1 ] - slbnd[ 1 ] + 1;
       pos2[ 0 ] = 0.5*( dims[ 1 ]  + 1 );
       pos2[ 1 ] = 0.5*dims[ 1 ];
+      grid_delta2 = (int)( 0.5 + ( (float) dims[ 1 ] - 2*grid )/grid_dims[ 1 ] );
 
       if( sdims > 2 ) {
          dims[ 2 ] = subnd[ 2 ] - slbnd[ 2 ] + 1;
          pos3[ 0 ] = 0.5*( dims[ 2 ]  + 1 );
          pos3[ 1 ] = 0.5*dims[ 2 ];
+         grid_delta3 = (int)( 0.5 + ( (float) dims[ 2 ] - 2*grid )/grid_dims[ 2 ] );
       }
    }
 
 /* Set the PDA random number seed to a non-repeatable value */
    kpg1Pseed( status );
 
-/* Loop round creating clumps. */
+/* Loop round creating clumps. Clumps that touch the edge of the output
+   array will be ignored by cupidGCUpdateArrays, so we keep on looping
+   until we have created the required number of clumps (but we do not do
+   this if the clumps are on a regular grid). */
    obj = NULL;
    obj_precat = NULL;
    maxpeak = 1.0;
@@ -591,7 +645,11 @@ void makeclumps( int *status ) {
    nc = 0;
    ncold = 0;
    i = 0;
-   while( nc < nclump && *status == SAI__OK) {
+   ix = grid + grid_delta1/2;
+   iy = grid + grid_delta2/2;
+   iz = grid + grid_delta3/2;
+
+   while( (grid >= 0 ? i : nc ) < nclump && *status == SAI__OK) {
       if( i++ == 100*nclump ) {
          if( nc == 0 ) {
             *status = SAI__ERROR;
@@ -613,16 +671,30 @@ void makeclumps( int *status ) {
 /* Determine the parameter values to use for the clump. */
       par[ 0 ] = cupidRanVal( dist, peak, status );
       par[ 1 ] = 0.0;
-      par[ 2 ] = (int) cupidRanVal( 0, pos1, status );
+
+      if( grid >= 0 ) {
+         par[ 2 ] = ix;
+      } else {
+         par[ 2 ] = (int) cupidRanVal( 0, pos1, status );
+      }
+
       par[ 3 ] = cupidRanVal( dist, fwhm1, status );
 
       if( sdims > 1 ) {
-         par[ 4 ] = (int) cupidRanVal( 0, pos2, status );
+         if( grid >= 0 ) {
+            par[ 4 ] = iy;
+         } else {
+            par[ 4 ] = (int) cupidRanVal( 0, pos2, status );
+         }
          par[ 5 ] = cupidRanVal( dist, fwhm2, status );
          par[ 6 ] = cupidRanVal( 0, angle, status );
 
          if( sdims > 2 ) {
-            par[ 7 ] = cupidRanVal( 0, pos3, status );
+            if( grid >= 0 ) {
+               par[ 7 ] = iz;
+            } else {
+               par[ 7 ] = cupidRanVal( 0, pos3, status );
+            }
             par[ 8 ] = cupidRanVal( dist, fwhm3, status );
             par[ 9 ] = cupidRanVal( dist, vgrad1, status );
             par[ 10 ] = cupidRanVal( dist, vgrad2, status );
@@ -673,6 +745,18 @@ void makeclumps( int *status ) {
       }
 
       ncold = nc;
+
+/* Move onto the next point in the regular grid. */
+      ix += grid_delta1;
+      if( ix > dims[ 0 ] - grid ) {
+         ix = grid + grid_delta1/2;
+         iy += grid_delta2;
+         if( iy > dims[ 1 ]  - grid ) {
+            iy = grid + grid_delta2/2;
+            iz += grid_delta3;
+         }
+      }
+
    }
 
 /* Create the output data array by summing the contents of the NDFs

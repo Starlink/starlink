@@ -570,6 +570,16 @@ package cupid {
             helpkey *
           }
 
+         parameter grid {
+            type _INTEGER
+            access READ
+            vpath DEFAULT
+            ppath CURRENT,DEFAULT
+            prompt {Margin to place round outside of regular grid}
+            default !
+            helpkey *
+          }
+
          parameter lbnd {
             size *
             type _INTEGER
