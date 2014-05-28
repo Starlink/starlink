@@ -100,10 +100,9 @@
 
 #define FUNC_NAME "smf_calcmodel_gai"
 
-void smf_calcmodel_gai( ThrWorkForce *wf __attribute__((unused)),
-                        smfDIMMData *dat, int chunk,
-                        AstKeyMap *keymap __attribute__((unused)),
-                        smfArray **allmodel, int flags, int *status) {
+void smf_calcmodel_gai( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
+                        AstKeyMap *keymap, smfArray **allmodel, int flags,
+                        int *status) {
 
   /* Local Variables */
   size_t bstride;               /* bolometer stride */

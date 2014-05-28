@@ -212,9 +212,9 @@ typedef struct smfCalcModelAstData {
 
 #define FUNC_NAME "smf_calcmodel_ast"
 
-void smf_calcmodel_ast( ThrWorkForce *wf __attribute__((unused)),
+void smf_calcmodel_ast( ThrWorkForce *wf,
                         smfDIMMData *dat, int chunk,
-                        AstKeyMap *keymap __attribute__((unused)),
+                        AstKeyMap *keymap,
                         smfArray **allmodel __attribute__((unused)),
                         int flags, int *status) {
 
