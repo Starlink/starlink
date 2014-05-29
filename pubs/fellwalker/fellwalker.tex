@@ -457,18 +457,18 @@ outside the clump set to a special ``blank'' value.
 \item[Sum] The total data sum in the clump.
 \item[Peak] The peak value in the clump.
 \item[Volume] The total number of pixels falling within the clump.
+\item[Shape] An optional column containing an STC-S description
+\citep{2007STCS,2010ASPC..434..213B} of the spatial coverage of the clump.
 \end{description}
 
-There is also an optional column called ``Shape'' containing an STC-S
-description \citep{2010ASPC..434..213B,2007STCS} of the spatial coverage
-of each clump.
+\end{enumerate}
 
-The values stored in the size columns are the RMS deviation of each pixel
-centre from the clump centroid, where each pixel is weighted by the
-corresponding pixel data value minus an estimate of the background value
-in the clump\footnote{The minimum data value in the clump is used as the
-background value.}. So for each axis, the size of the clump on that axis
-is given by:
+The values stored in the size columns of the output table are the RMS
+deviation of each pixel centre from the clump centroid, where each pixel
+is weighted by the corresponding pixel data value minus an estimate of
+the background value in the clump\footnote{The minimum data value in the
+clump is used as the background value.}. So for each axis, the size of
+the clump on that axis is given by:
 
 \[ size = \sqrt{ \frac{ \sum d_{i}.x_{i}^{2} }{ \sum d_{i} } -
 \left( \frac{\sum d_{i}.x_{i} }{\sum d_{i}}  \right)^2 } \]
@@ -490,7 +490,6 @@ clump volume should be unchanged by the instrumental blurring:
 
 \[ peak_{corrected} = peak.(size/size_{corrected}) \]
 
-\end{enumerate}
 
 
 
