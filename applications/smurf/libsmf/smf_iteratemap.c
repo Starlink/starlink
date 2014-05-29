@@ -464,6 +464,11 @@
 *        is processed in a single continuous chunk (an error is reported
 *        otherwise). Ideally, each chunk should probably have its own
 *        independent error map, since the errors may be chunk-dependent.
+*     2014-5-29 (DSB):
+*        If the AST mask is found to contain zero pixels, then ensure one
+*        more iteration is performed in order to ensure any "xxx_LAST"
+*        parameter values (i.e. values to be used on the last iteration
+*        only) are used.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -2601,14 +2606,27 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
              bright sources in the map. */
           if( *status == SMF__INSMP ) {
              errAnnul( status );
-             msgOut( "", FUNC_NAME ": *** No source pixels found", status );
              mapchange_mean = 0.0;
              mapchange_max = 0.0;
 
-             /* No point in doing any more iterations, since the AST model
-                is zero and so we'll get exactly the same map on subsequent
-                iterations. */
-             quit = 0;
+             if( quit < 0 ) {
+                msgOut( "", FUNC_NAME ": *** No source pixels found", status );
+
+             /* There is almost no point in doing any more iterations, since
+                the AST model is zero and so we'll get exactly the same map
+                on subsequent iterations. But it may be that a different
+                set of config parameters have been specified for the final
+                iteration (the "xxx_LAST" parameters), so we do one more
+                in order to ensure these parameters are used. Setting
+                mapchange_xxx to zero above will cause the following code
+                to think that convergence has been achieved and will so
+                trigger a final iteration. */
+                msgOutif( MSG__VERB, "", FUNC_NAME ":     Doing one more iteration "
+                          "to use any '..._LAST' config parameter values", status );
+             }
+             last_skipped = 0;
+             converged = 1;
+
           }
 
           memcpy( lastmap, thismap, msize*sizeof(*lastmap) );
