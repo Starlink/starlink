@@ -91,7 +91,7 @@ void cnfLock( void ) {
 *-
 */
 
-/* Do nothing if the pthreads library is not availanle. */
+/* Do nothing if the pthreads library is not available. */
 #if USE_PTHREADS
 
 /* Ensure the cnf recursive mutex has been initialised. */
@@ -121,7 +121,7 @@ void cnfUnlock( void ) {
 *-
 */
 
-/* Do nothing if the pthreads library is not availanle. */
+/* Do nothing if the pthreads library is not available. */
 #if USE_PTHREADS
 
 /* Unlock the mutex */
@@ -146,7 +146,11 @@ static void cnf1Initialise( void ) {
 *     attributes so that it is a recursive mutex.
 
 */
+/* Do nothing if the pthreads library is not available. */
+#if USE_PTHREADS
+
    pthread_mutexattr_init( &cnf_mutex_attr );
    pthread_mutexattr_settype( &cnf_mutex_attr, PTHREAD_MUTEX_RECURSIVE );
    pthread_mutex_init( &cnf_mutex, &cnf_mutex_attr );
+#endif
 }
