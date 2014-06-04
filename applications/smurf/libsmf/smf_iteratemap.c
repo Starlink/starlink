@@ -2315,24 +2315,6 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
               msgOutf( "", FUNC_NAME ": subtracted external error map `%s'", status, epsin );
           }
 
-
-
-           /* Pixels with very low hits will be unreliable and may upset
-              global behaviour. So exclude pixels with hits below 10% of the
-              mean from the mapchange estimate. */
-           size_t hitslim = 0;
-           int *ph = thishits;
-           for( ipix = 0; ipix < msize; ipix++ ) hitslim += *(ph++);
-           hitslim /= 10*msize;
-
-           for( ipix = 0; ipix < msize; ipix++ ) {
-             if( thishits[ipix] <= (int) hitslim ) {
-               thismap[ipix] = VAL__BADD;
-               thisvar[ipix] = VAL__BADD;
-               mapweights[ipix] = 0.0;
-             }
-           }
-
           /* Replace the map with a linear combination of the original map
             and the map from the previous iteration. This may help to
             damp oscillations in the map from iteration to iteration. */
