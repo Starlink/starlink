@@ -82,9 +82,12 @@
 *     18-DEC-2013 (DSB):
 *        Undo the old COM model as a separate step (performed at the
 *        start of each new iteration - like FLT and EXT).
+*     6-JUN-2014 (DSB):
+*        Allow COM flagging to be frozen after a specified number of
+*        iterations. This can help convergence.
 
 *  Copyright:
-*     Copyright (C) 2012-2013 Science and Technology Facilities Council.
+*     Copyright (C) 2012-2014 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -147,6 +150,7 @@ typedef struct smfCalcModelComData {
    int fill;
    int flag;
    int gain_box;
+   int freeze_flags;
    int icom;
    int nblock;
    int niter;
@@ -165,6 +169,7 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
 
 /* Local Variables: */
    AstKeyMap *kfmap;
+   AstKeyMap *kamap;
    AstKeyMap *kmap;
    AstObject *obj;
    SmfCalcModelComData *job_data = NULL;
@@ -194,6 +199,7 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    int *nrej = NULL;
    int dofft;
    int fill;
+   int freeze_flags;
    int iblock;
    int icom;
    int iw;
@@ -289,12 +295,34 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
 /* Get some configuration parameters. */
    smf_get_nsamp( kmap, "GAIN_BOX", res->sdata[ 0 ], &gain_box, status );
    astMapGet0I( kmap, "NITER", &niter );
+   astMapGet0I( kmap, "FREEZE_FLAGS", &freeze_flags );
    astMapGet0D( kmap, "NSIGMA", &nsigma );
    astMapGet0D( kmap, "SIG_LIMIT", &sig_limit );
    astMapGet0I( kmap, "SIG_WING", &sig_wing );
    astMapGet0I( kmap, "FILL", &fill );
    if( fill ) msgOutif( MSG__VERB, "", "  Flagged values will be filled "
                         "before finding COM.", status );
+
+/* If the COM flags are to be frozen at any point, we need to find out
+   how many initial AST-skipped iterations are being used (the
+   COM.FREEZE_FLAGS value does not include any iterations specified by
+   AST.SKIP). */
+   if( freeze_flags ) {
+      int skip;
+      astMapGet0A( keymap, "AST", &kamap );
+      astMapGet0I( kamap, "SKIP", &skip );
+      kamap = astAnnul( kamap );
+
+/* Convert "freeze_flags" from an iteration count into a boolean flag
+   indicating if the COM flags are now frozen. */
+      if( dat->iter == freeze_flags + skip ) {
+         msgOutif( MSG__VERB, "", "  COM flagging is now frozen due to "
+                   "COM.FREEZE_FLAGS setting.", status );
+         freeze_flags = 1;
+      } else if( dat->iter > freeze_flags + skip ) {
+         freeze_flags = 1;
+      }
+   }
 
 /* Store the length of the second and third pixel axes of the smfData so
    that we can treat the array as a 2D image (note, do not use the
@@ -372,6 +400,7 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
          pdata->niter = niter;
          pdata->nsigma = nsigma;
          pdata->fill = fill;
+         pdata->freeze_flags = freeze_flags;
       }
    }
 
@@ -420,7 +449,9 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
 
 /* Set up jobs to add the previous estimate of COM back on to the
    residuals, and then wait for the jobs to complete. These jobs also
-   clear any SMF__Q_COM flags set by previous iterations. */
+   clear any SMF__Q_COM flags set by previous iterations, so long as we
+   have not passed the iteration at which these flags are to be frozen
+   (which can help convergence). */
          for( iw = 0; iw < nw; iw++ ) {
             pdata = job_data + iw;
             pdata->operation = 1;
@@ -443,7 +474,7 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
          }
       }
 
-/* Otherwise, form a new COM model and subtract form the residuals. */
+/* Otherwise, form a new COM model and subtract from the residuals. */
    } else {
 
 
@@ -526,8 +557,9 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
          }
          thrWait( wf, status );
 
-/* Test if the following filtering has been regeusted. */
-         if( sig_limit > 0.0 ) {
+/* Test if the following filtering has been requested. We do not do this
+   filtering if the COM flaggingis frozen. */
+         if( sig_limit > 0.0 && !freeze_flags ) {
 
 /* We now attempt to flag times slices in the above COM model that
    correspond to times when the high frequency component of the common-mode
@@ -649,14 +681,16 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    The correlation coefficient for such blocks is set to VAL__BADD. */
       for( icom = 0; icom < ncom && *status == SAI__OK; icom++ ) {
          if( gai ) {
+            int gai_flags = pdata->freeze_flags ? 7 : 6;
+
             if( perarray ) {
-               smf_find_gains( wf, 6, res->sdata[ icom ], mask,
+               smf_find_gains( wf, gai_flags, res->sdata[ icom ], mask,
                                lut ? lut->sdata[ icom ] : NULL,
                                model->sdata[ icom ]->pntr[0], kmap,
                                ( SMF__Q_GOOD & ~SMF__Q_RING ),
                                SMF__Q_COM, gai->sdata[ icom ], nrej, status );
             } else {
-               smf_find_gains_array( wf, 6, res, mask, lut,
+               smf_find_gains_array( wf, gai_flags, res, mask, lut,
                                      model->sdata[ icom ]->pntr[0], kmap,
                                      ( SMF__Q_GOOD & ~SMF__Q_RING ),
                                      SMF__Q_COM, gai, nrej, status );
@@ -847,8 +881,9 @@ static void smf1_calcmodel_com( void *job_data_ptr, int *status ) {
                      if( pdata->operation == 1 ) {
                         (*pr) += (*pwg)*(*pm) + (*pwoff);
 
-/* Ensure no samples have the SMF__Q_COM flag. */
-                        (*pq) &= ~SMF__Q_COM;
+/* If we have not yet passed the iteration at which COM flaggign is
+   frozen, ensure no samples have the SMF__Q_COM flag. */
+                        if( !pdata->freeze_flags ) (*pq) &= ~SMF__Q_COM;
 
                      } else {
                         (*pr) -= (*pwg)*(*pm) + (*pwoff);
@@ -900,9 +935,9 @@ static void smf1_calcmodel_com( void *job_data_ptr, int *status ) {
 /* Allocate work space needed for filling holes in each time slices. */
       if( pdata->fill ) fillwork = astMalloc( 2*pdata->ncol*pdata->nrow*sizeof(*fillwork ) );
 
-/* Quality mask that includes samples previously flagged by the COM
-   model or ringing filter. */
-      qmask = ( SMF__Q_FIT & ~SMF__Q_COM & ~SMF__Q_RING );
+/* Quality mask that includes samples previously flagged by the ringing
+   filter. */
+      qmask = ( SMF__Q_FIT & ~SMF__Q_RING );
 
 /* Initialise a pointer to the next model value. */
       if( pdata->icom >= 0 ) {
@@ -1111,7 +1146,7 @@ static void smf1_calcmodel_com( void *job_data_ptr, int *status ) {
       pdata->svar = svar;
       pdata->nvar = nvar;
 
-/* Flag time slices with high dispersion between the indivudual
+/* Flag time slices with high dispersion between the individual
    common-mode signals.
    ============================================================== */
    } else if( pdata->operation == 7 ) {

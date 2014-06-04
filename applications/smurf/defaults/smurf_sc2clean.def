@@ -159,10 +159,12 @@ com.boxmin = 0
 #		in them). These are basically sigma-clippers; outliers are
 #		removed at the given threshold and then new means and sample
 #		standard deviations are measured until convergence. The time
-#		axis is divided up into one or more equal sized boxes, and a
-#		separate fit is performed for each box. If you wish to
+#		axis is divided up into one or more equal sized boxes, and
+#		a separate fit is performed for each box. If you wish to
 #		completely disable the flagging of outlier bolometers
-#		compared with the common-mode, simply set com.noflag=1
+#		compared with the common-mode, simply set com.noflag=1.
+#		The flags may be frozen after a specified number of
+#		iterations - see parameter "com.freeze_flags".
 com.corr_abstol = 0.2
 
 #-----------------------------------------------------------------
@@ -182,9 +184,9 @@ com.corr_tol = 5
 #  Purpose: 	Controls the estimate of the common-mode signal
 #  Description: If com.fill is non-zero, then any holes in each time slice
 #               left by the previous flagging of bolometer values will be
-#               filled with values representative of the neighbouring 
+#               filled with values representative of the neighbouring
 #               bolometers before finding the mean value. This avoids bias
-#               in the common-mode caused by areas of systematically high 
+#               in the common-mode caused by areas of systematically high
 #               or low bolometer values being flagged.
 com.fill = 0
 
@@ -199,6 +201,19 @@ com.fill = 0
 #		smaller than the value of parameter "com.gain_box". If it
 #		is not supplied, it defaults to the value of com.gain_box.
 com.fit_box = <undef>
+
+#-----------------------------------------------------------------
+#  Name: 	com.freeze_flags
+#  Type: 	integer
+#  Default: 	0
+#  Purpose: 	Controls flagging of samples that differ from the common-mode.
+#  Description: If non-zero, the flags marking bolometers that differ
+#               from the common-mode are frozen after the specified number
+#               of iterations. this can help convergence. See parameter
+#               "com.corr_abstol". Note - any initial iterations
+#               specified by parameter "ast.skip" are not included in the
+#               count of iterations.
+com.freeze_flags = 0
 
 #-----------------------------------------------------------------
 #  Name: 	com.gain_abstol
