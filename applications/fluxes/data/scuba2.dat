@@ -1,7 +1,7 @@
  Number of filters defined =  5
  Number beams defined per filter =  2
 
- NF  Wavelngth     Freq.  Width  HPBW  HPBW2    A1    A2
+ NF  Wavelength    Freq.  Width  HPBW  HPBW2    A1    A2
   1  850           350.0   30.0  13.0   48.0  0.98  0.02
   2  450           677.0   30.0   7.9   25.0  0.94  0.06
   3  1300          234.5    1.0  20.0    0.0  1.00  0.00
