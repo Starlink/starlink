@@ -884,7 +884,7 @@ ensureflat = 1
 #               "error map" into the astronomical map, which accumulates
 #               with each subsequent iteration, preventing convergence
 #               and causing strong large-scale structures to appear in
-#               the final map (typically ripples on the scale of the FLT 
+#               the final map (typically ripples on the scale of the FLT
 #               filter). This parameter attempts to counteract this by
 #               allowing a map to be specified which will be subtracted
 #               from the astronomical map at the end of each iteration.
@@ -1352,7 +1352,9 @@ flt.notfirst = 0
 #               from ringing. It gives the size of the box used to smooth
 #               the residuals in order to determine the background. It
 #               is specified as a multiple of the filter size. A value of
-#               0.5 could be a good starting point.
+#               0.5 could be a good starting point. Note, the ringing
+#               filter is not applied on any initial iterations specified
+#               by parameter "ast.skip".
 flt.ring_box1 = 0
 
 #-----------------------------------------------------------------
@@ -1372,8 +1374,10 @@ flt.ring_box2 = 1.5
 #  Default: 	10
 #  Purpose: 	Controls the flagging of samples that suffer from ringing.
 #  Description: The flags will be frozen after the number of iterations
-#               specified by thsi parameter. This helps convergence. Set
+#               specified by this parameter. This helps convergence. Set
 #               it to zero to allow the flags to change on every iteration.
+#               Note, any initial iterations specified by parameter
+#               "ast.skip" are not included in the count of iterations.
 flt.ring_freeze = 10
 
 #-----------------------------------------------------------------
@@ -1802,11 +1806,11 @@ maptol_mean = 1
 #  Purpose: 	Specifies when to stop iterating.
 #  Description: The normalised mean change in pixel value (see parameter
 #               "maptol") con sometimes settle down to a constant value,
-#               and thus never drop to the target "maptol" value. This may 
-#               be the case for instance, if every iteration adds a fixed 
-#               error map onto the current astronomical signal (see parameter 
-#               "epsin"). Specifying a value for "maptol_rate" causes the 
-#               iterative loop to be left if the normalised mean change 
+#               and thus never drop to the target "maptol" value. This may
+#               be the case for instance, if every iteration adds a fixed
+#               error map onto the current astronomical signal (see parameter
+#               "epsin"). Specifying a value for "maptol_rate" causes the
+#               iterative loop to be left if the normalised mean change
 #               seems to settle down to a fix value. The supplied value for
 #               "maptol_rate" should be a fraction in the range 0.0 to 1.0,
 #               and gives the minimum required fractional change in "normalised

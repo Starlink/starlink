@@ -277,6 +277,18 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   astMapGet0D( kmap, "RING_MINSIZE", &ring_minsize );
   astMapGet0I( kmap, "RING_FREEZE", &ring_freeze );
 
+  /* If the ringing filter flags are to be frozen at any point,
+     we need to find out how many initial AST-skipped iterations
+     are being used (the FLT.RING_FREEZE value does not include
+     any iterations specified by AST.SKIP). */
+  if( ring_freeze ) {
+    AstKeyMap *kamap;
+    astMapGet0A( keymap, "AST", &kamap );
+    astMapGet0I( kamap, "SKIP", &skip );
+    kamap = astAnnul( kamap );
+    ring_freeze += skip;
+  }
+
   /* Assert bolo-ordered data */
   order_list = SMF__RES|SMF__QUA|SMF__NOI;
   if( mask ) order_list |= SMF__LUT;
@@ -483,9 +495,10 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
 
           /* If required, locate and flag any residuals that seem to suffer
              from ringing now that the low frequency FLT model has been
-             removed. */
-          if( ring_box1 > 0.0 && ( ring_freeze <= 0 ||
-                                   dat->iter <= ring_freeze ) ){
+             removed. DO not apply a ringing filter unless an AST model 
+             was used on the previous iteration. */
+          if( ring_box1 > 0.0 && !dat->ast_skipped &&
+              ( ring_freeze <= 0 || dat->iter <= ring_freeze ) ){
              msgOutif( MSG__DEBUG, "", "Flagging residuals that appear "
                        "to suffer from ringing.", status );
 
