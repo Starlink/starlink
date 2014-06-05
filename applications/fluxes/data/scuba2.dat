@@ -1,12 +1,12 @@
- Number of filters defined =  2
+ Number of filters defined =  5
  Number beams defined per filter =  2
 
  NF  Wavelngth     Freq.  Width  HPBW  HPBW2    A1    A2
   1  850           350.0   30.0  13.0   48.0  0.98  0.02
   2  450           677.0   30.0   7.9   25.0  0.94  0.06
-  3                  0.0    0.0   0.0    0.0  0.00  0.00
-  4                  0.0    0.0   0.0    0.0  0.00  0.00
-  5                  0.0    0.0   0.0    0.0  0.00  0.00
+  3  1300          234.5    1.0  20.0    0.0  1.00  0.00
+  4  868           345.8    1.0  14.0    0.0  1.00  0.00
+  5  434           691.5    1.0   8.0    0.0  1.00  0.00
   6                  0.0    0.0   0.0    0.0  0.00  0.00
   7                  0.0    0.0   0.0    0.0  0.00  0.00
   8                  0.0    0.0   0.0    0.0  0.00  0.00
@@ -24,9 +24,9 @@
                Mars         Jupiter      Saturn       Uranus       Neptune
  850          0.0   0.0  163.8   4.0  124.3   5.0   82.7   1.0   78.1   5.0
  450          0.0   0.0  148.5   5.0  111.0   5.0   68.4   0.5   65.6   3.0
-              0.0   0.0    0.0   0.0    0.0   0.0    0.0   0.0    0.0   0.0
-              0.0   0.0    0.0   0.0    0.0   0.0    0.0   0.0    0.0   0.0
-              0.0   0.0    0.0   0.0    0.0   0.0    0.0   0.0    0.0   0.0
+1300          0.0   0.0  170.0   5.0  133.0   5.0   96.9   0.5   95.2   0.5
+ 868          0.0   0.0  163.8   4.0  124.3   5.0   86.6   0.0   71.8   0.0
+ 434          0.0   0.0  148.5   5.0  111.0   5.0   70.2   0.0   64.2   0.0
               0.0   0.0    0.0   0.0    0.0   0.0    0.0   0.0    0.0   0.0
               0.0   0.0    0.0   0.0    0.0   0.0    0.0   0.0    0.0   0.0
               0.0   0.0    0.0   0.0    0.0   0.0    0.0   0.0    0.0   0.0
@@ -69,3 +69,7 @@ published works should reference the appropriate papers as noted above.
 
 The filter frequencies are the effective frequencies for 1mm of water vapour. 
 These are the SCUBA-2 filters.
+
+1300, 868, and 434 micron (234.5, 345.8, 691.5 GHz) are for heterodyne
+receivers. Saturn, Mars copied from scuba.dat; Uranus and Neptune from ESA4
+(values for 234.5 GHz are CO in LSB as normally observed with RxA3).
