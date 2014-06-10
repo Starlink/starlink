@@ -343,6 +343,7 @@ int *status             /* global status (given and returned) */
                  likely to be how users will want to refer to them.  Also simplified
                  the code on the basis that there are only two possible situations
                  (TRACKING and IMAGE) rather than four. (GSB)
+     10Jun2014:  Store the telescope altitude in the returned skyframe.
 */
 {
 
@@ -1733,6 +1734,7 @@ int *status             /* global status (given and returned) */
    	 be consistent with smf_calc_telpos here */
          astSetD( cache->skyframe, "ObsLon", -telpos[0] );
          astSetD( cache->skyframe, "ObsLat", telpos[1] );
+         astSetD( cache->skyframe, "ObsAlt", telpos[2] );
 
          astExempt( cache->skyframe );
 
