@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     AstFitsChan *smf_jsatileheader( int itile, smfJSATiling *skytiling,
-*                                     int local_origin, int *status )
+*                                     int local_origin, int *move, int *status )
 
 *  Arguments:
 *     itile = int (Given)
@@ -28,6 +28,11 @@
 *        projection parameters PVi_1 and PVi_2 that causes the origin of
 *        grid coordinates to be moved to the centre of the tile. If zero,
 *        the origin of pixel coordinates will be at RA=0, Dec=0.
+*     move = int * (Returned)
+*        Pointer to an int which is returned non-zero if the tile is in
+*        the bottom left part of the bottom left tile (the one that is
+*        truncated by RA=12 hours). Such tiles are moved up to the top
+*        right corner of the all-sky grid in pixel coords. May be NULL.
 *     status = int * (Given)
 *        Pointer to the inherited status variable.
 
@@ -89,8 +94,9 @@
 *     30-OCT-2013 (GSB):
 *        Use nested numbering scheme for JSA tiles.
 *     10-JUN-2014 (DSB):
-*        Ensure the returned FITS header include the telescope position
+*        - Ensure the returned FITS header include the telescope position
 *        (keywords "OBSGEO-X/Y/Z").
+*        - Added argument "move".
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -137,7 +143,7 @@ static AstFitsChan *smfMakeFC( int nx, int ny, int n, int p, double crpix1,
                                int *status );
 
 AstFitsChan *smf_jsatileheader( int itile, smfJSATiling *skytiling,
-                                int local_origin, int *status ){
+                                int local_origin, int *move, int *status ){
 
 /* Local Variables: */
    AstFitsChan *fc = NULL;
@@ -156,6 +162,9 @@ AstFitsChan *smf_jsatileheader( int itile, smfJSATiling *skytiling,
    int ng;            /* The number of tile along one edge of the FITS grid */
    int xt;            /* X offset to the requested tile */
    int yt;            /* Y offset to the requested tile */
+
+/* Initialise */
+   if( move ) *move = 0;
 
 /* Check inherited status */
    if( *status != SAI__OK ) return fc;
@@ -205,6 +214,10 @@ AstFitsChan *smf_jsatileheader( int itile, smfJSATiling *skytiling,
    facet in this case). */
          gx_ref = 0.5*( m + 1.0) - xt*skytiling->ppt;
          gy_ref = 0.5*( m + 1.0) - yt*skytiling->ppt;
+
+/* Indicate if the tile is in the lower left section (the section that
+   needs to be moved up to the top right in pixel coords). */
+         if( move )  *move = yt < skytiling->ntpf - 1 && xt < skytiling->ntpf - 1 - yt;
       }
 
 /* The Declination at the reference point is zero for all tiles. */

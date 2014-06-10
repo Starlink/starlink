@@ -40,7 +40,7 @@ void         smf_jsatile( int itile, smfJSATiling *jsatiling,
                           AstFrameSet **fs, AstRegion **region, int lbnd[2],
                           int ubnd[2], int *status );
 AstFitsChan *smf_jsatileheader( int itile, smfJSATiling *jsatiling,
-                                int local_origin, int *status );
+                                int local_origin, int *move, int *status );
 void         smf_jsatilei2xy( int itile, smfJSATiling *jsatiling, int *xt,
                               int *yt, int *fi, int *status );
 int *        smf_jsatiles_region( AstRegion *region, smfJSATiling *tiling,

@@ -77,6 +77,9 @@
 *        Tiles in the split facet (facet 6) use RA=12H as the FITS
 *        reference point, and so their pixel bounds need to be
 *        corrected to refer to the NDF pixel origin at RA=0h.
+*     10-JUN-2014 (DSB):
+*        Correct choice of which tiles to move from bottom left to top 
+*        right of the all sky pixel grid.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -134,6 +137,7 @@ void smf_jsatile( int itile, smfJSATiling *skytiling, int local_origin,
    int icrpix1;
    int icrpix2;
    int icur;
+   int move;
    int offset;
 
 /* Initialise the returned pointers. */
@@ -149,7 +153,7 @@ void smf_jsatile( int itile, smfJSATiling *skytiling, int local_origin,
 
 /* Get a FitsChan holding the FITS headers defining the tile WCS and
    extent. */
-   lfc = smf_jsatileheader( itile, skytiling, local_origin, status );
+   lfc = smf_jsatileheader( itile, skytiling, local_origin, &move, status );
 
 /* Store the upper bounds of the tile in GRID coords (later changed to
    PIXEL coords). */
@@ -241,7 +245,7 @@ void smf_jsatile( int itile, smfJSATiling *skytiling, int local_origin,
    lbnd values are with repect to a pixel origin at the middle of the top
    right diagonal edge of the all-sky map. Shift them to refer to the
    centre of the all sky map. */
-      if( icrpix1 > 0 ) {
+      if( move ) {
          lbnd[ 0 ] += offset;
          lbnd[ 1 ] += offset;
 
