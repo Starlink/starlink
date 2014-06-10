@@ -88,10 +88,13 @@
 *        smf_jsatilei2xy.
 *     30-OCT-2013 (GSB):
 *        Use nested numbering scheme for JSA tiles.
+*     10-JUN-2014 (DSB):
+*        Ensure the returned FITS header include the telescope position
+*        (keywords "OBSGEO-X/Y/Z").
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2011,2013 Science & Technology Facilities Council.
+*     Copyright (C) 2011,2013-2014 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -120,6 +123,7 @@
 #include "sae_par.h"
 #include "mers.h"
 #include "star/atl.h"
+#include "star/pal.h"
 
 /* SMURF includes */
 #include "libsmf/smf.h"
@@ -310,10 +314,24 @@ static AstFitsChan *smfMakeFC( int nx, int ny, int n, int p, double crpix1,
 /* Local Variables: */
    AstFitsChan *fc = NULL;
    char card[ 81 ];
+   char retname[41];
+   char shortname[11];
+   double height;
+   double lat;
+   double lon;
+   double xyz[3];
    int m;
 
 /* Check inherited status */
    if( *status != SAI__OK ) return fc;
+
+/* Get the geodetic longitude and latitude, and altitude of JCMT. */
+   (void) palObs( 0, "JCMT", shortname, sizeof(shortname), retname,
+                  sizeof(retname), &lon, &lat, &height );
+
+/* Convert the above observatory spherical coords to Cartesian form as
+   required by FITS-WCS. */
+   smf_terr( lat, height, lon, xyz );
 
 /* Create the returned FitsChan. */
    fc = astFitsChan( NULL, NULL, " " );
@@ -368,6 +386,15 @@ static AstFitsChan *smfMakeFC( int nx, int ny, int n, int p, double crpix1,
    astPutFits( fc, card, 1 );
 
    sprintf( card, "EPOCH   = 2013" );
+   astPutFits( fc, card, 1 );
+
+   sprintf( card, "OBSGEO-X= %.16g", xyz[ 0 ] );
+   astPutFits( fc, card, 1 );
+
+   sprintf( card, "OBSGEO-Y= %.16g", xyz[ 1 ] );
+   astPutFits( fc, card, 1 );
+
+   sprintf( card, "OBSGEO-Z= %.16g", xyz[ 2 ] );
    astPutFits( fc, card, 1 );
 
 /* Return the result. */
