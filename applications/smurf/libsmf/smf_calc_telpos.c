@@ -46,9 +46,12 @@
 *        Use const.
 *     2012-03-07 (TIMJ):
 *        Use PAL instead of SLA.
+*     10-JUN-2014 (DSB):
+*        Round obslon and obslat to the nearest 0.01 arc-second (about 30 cm 
+*        on the earths surface) since AST only stores them to that accuracy.
 
 *  Copyright:
-*     Copyright (C) 2008, 2012 Science and Technology Facilities Council.
+*     Copyright (C) 2008, 2012, 2014 Science and Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
@@ -132,10 +135,25 @@ void smf_calc_telpos( const double obsgeo[3], const char telName[],
             status );
   }
 
-  /* Store values in telpos */
+  /* Round lon and lat to the nearest 0.01 arc-second (about 30 cm on the
+     earths surface) since AST only stores them to that accuracy.  Then
+     store them in telpos. */
   if( *status == SAI__OK ) {
-    telpos[0] = lon*DR2D;
-    telpos[1] = lat*DR2D;
+    lon *= DR2D;
+    lat *= DR2D;
+
+    if( lon >= 0 ) {
+       telpos[ 0 ] = ( (int)( lon*360000.0 + 0.5 ) )/360000.0;
+    } else {
+       telpos[ 0 ] = -( (int)( (-lon)*360000.0 + 0.5 ) )/360000.0;
+    }
+
+    if( lat >= 0 ) {
+       telpos[ 1 ] = ( (int)( lat*360000.0 + 0.5 ) )/360000.0;
+    } else {
+       telpos[ 1 ] = -( (int)( (-lat)*360000.0 + 0.5 ) )/360000.0;
+    }
+
     telpos[2] = height;
   }
 
