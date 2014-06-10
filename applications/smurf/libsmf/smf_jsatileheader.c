@@ -331,7 +331,7 @@ static AstFitsChan *smfMakeFC( int nx, int ny, int n, int p, double crpix1,
 
 /* Convert the above observatory spherical coords to Cartesian form as
    required by FITS-WCS. */
-   smf_terr( lat, height, lon, xyz );
+   smf_terr( lat, height, -lon, xyz );
 
 /* Create the returned FitsChan. */
    fc = astFitsChan( NULL, NULL, " " );
