@@ -6,9 +6,9 @@
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardocnumber}    {238.8}
+\newcommand{\stardocnumber}    {238.9}
 \newcommand{\stardocauthors}   {D.S. Berry \\Malcolm J. Currie}
-\newcommand{\stardocdate}      {2013 August 23}
+\newcommand{\stardocdate}      {2014 June 9}
 \newcommand{\stardoctitle}     {KAPLIBS -- Internal subroutines used within
                                 the KAPPA package.}
 \newcommand{\stardocversion}   {Version 3.5}
@@ -803,6 +803,21 @@ related items to be removed.
 \begin{itemize}
 \item New generic KPG\_STOCx calculates clipped ordered statistics,
       enabling the API of KPG\_STOSx to remain unchanged.
+\item New routine kpgPutOutline creates and stores an STC polygon
+      describing the spatial extent of an NDF.  It has an option to
+      define a convex hull enclosing specified pixels in an array.
+\item KPG1\_WRCAT can store arbitrary headers in the output catalogue.
+\item KPG1\_CORRx has a new argument which returns the number of used
+      points.
+\item The random number seed can now be set via environment variable
+      STAR\_SEED.
+\item kpgGtobj can now create an AST Region describing the coverage of
+      a supplied NDF.
+\item Fixed a bug in CCG\_FLX1 affecting variance calculations where the
+      width was not squared in summations.  This would affect the integ
+      estimator in tasks such as KAPPA::COLLAPSE.
+\item Prevent values falling outside the histogram in KPG1\_OPGR1.
+\item Fixed a memory leak in kpg1Kygp1.
 \end{itemize}
 
 

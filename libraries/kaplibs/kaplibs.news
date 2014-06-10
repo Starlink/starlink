@@ -9,8 +9,22 @@ applications (see SUN/238).
 Version 3.5
    - New generic KPG_STOCx calculates clipped ordered statistics,
      enabling the API of KPG_STOSx to remain unchanged.
-   - KPG1_CORRx has an new argument, N, in which the number of used
-    points is returned.
+   - New routine kpgPutOutline creates and stores an STC polygon
+     describing the spatial extent of an NDF.  It has an option to
+     define a convex hull enclosing specified pixels in an array.
+   - KPG1_WRCAT can store arbitrary headers in the output
+     catalogue.
+   - KPG1_CORRx has a new argument, N, which returns the number
+     of used points.
+   - The random number seed can now be set via environment
+     variable STAR_SEED.
+   - kpgGtobj can now create an AST Region describing the
+     coverage of a supplied NDF.
+   - Fixed a bug in CCG\_FLX1 affecting variance calculations
+     where the width was not squared in summations.  This would
+     affect the integ estimator in tasks such as KAPPA::COLLAPSE.
+   - Prevent values falling outside the histogram in KPG1_OPGR1.
+   - Fixed a memory leak in kpg1Kygp1.
 
 Version 3.4
    - New KPG1_KY2HD and kpg1Ky2hd have been moved to the ATL library.
