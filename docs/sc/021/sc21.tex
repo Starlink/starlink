@@ -485,8 +485,8 @@
 
 % Typographical shortcuts
 \newcommand{\fcfbe}{$\mathrm{FCF_{beamequiv}}$}
-\newcommand{\fcfb}{$\mathrm{FCF_{peak}}$}
-\newcommand{\fcfa}{$\mathrm{FCF_{aperture}}$}
+\newcommand{\fcfb}{$\mathrm{FCF_{beam}}$}
+\newcommand{\fcfa}{$\mathrm{FCF_{arcsec}}$}
 \newcommand{\fcfm}{$\mathrm{FCF_{match}}$}
 
 % SCUBA reference
@@ -2871,24 +2871,28 @@ consult the \picard\ manual (see \picardsun) for a full list of
 available recipes. General \picard\ options can be accessed by typing
 \texttt{picard -h} in a terminal.
 
-\subsection{\xlabel{apply_fcf}Flux Conversion Factor (FCF)}
+\subsection{\xlabel{apply_fcf}Flux Conversion Factors (FCFs)}
 \label{sec:cmult}
 
-When your data comes out of the map-maker it is unit of picowatts
+When your data comes out of the map-maker it is in units of picowatts
 (pW). A flux conversion factor, or FCF, needs to be applied to scale
 your data from units of pW to Janskys. For more information on calibrating
 SCUBA-2 data see Dempsey et al. (2013) \cite{dempsey12}.
 \\*\\*
-JAC provides default values for the various FCFs which have been proven
-to be stable. These standard numbers are applied by the pipeline when
-reducing your data with \oracdr. For reduction dates from July 2012
-onwards the FCF factors are:
+Below are our default FCFs. Note that the \fcfb\ will be applied
+by the pipeline when reducing your data with \oracdr.
+
+\vspace{0.5cm}
+\renewcommand*\arraystretch{1.2}
 \begin{table}[h!]
 \centering
 \begin{tabular}{|c|c|c|c|}
 \hline
-\multicolumn{2}{|c|}{FCF$_{aperture}$ (Jy/pW/arcsec$^2$) } &
-\multicolumn{2}{c|}{FCF$_{peak}$ (Jy/pW/beam)} \\
+\multicolumn{2}{|c|}{\textbf{APERTURE}}  &
+\multicolumn{2}{c|}{\textbf{PEAK}}      \\
+\hline
+\multicolumn{2}{|c|}{\fcfa\ (Jy/pW/arcsec$^2$) }  &
+\multicolumn{2}{c|}{\fcfb\ (Jy/pW/beam)}      \\
 \hline
 \hspace{0.4cm} 450\,$\mu$m \hspace{0.3cm} & 850\,$\mu$m & \hspace{0.4cm} 450\,$\mu$m \hspace{0.3cm}& 850\,$\mu$m \\
 \hline
@@ -2896,43 +2900,48 @@ onwards the FCF factors are:
 \hline
 \end{tabular}
 \end{table}
-\\
-\textbf{IMPORTANT NOTES: (1) The standard FCF to be applied depends on
-the reduction date for your data. For data that have been
-\emph{reduced prior} to July 2012 you should see
-\cref{Appendix}{app:fcfs}{FCFs by Reduction Date} for alternative
-FCFs. (2) Due to a glitch in the WVM, data reduced between Sept. 19,
-2012 and Jan. 18, 2013 must be re-reduced using the latest version of
-Starlink (Hikianalia or later), or should have an FCF derived from a
-calibrator reduced at the same time (and not our standard FCF) applied
-to it. }
+\renewcommand*\arraystretch{1.0}
+\vspace{0.5cm}
 
-\subsubsection{Peak FCF}
+\textbf{IMPORTANT NOTES:
+  \newline
+  (1) The standard FCF to be applied depends on
+  the reduction date for your data. For data that have been
+  \emph{reduced prior} to July 2012 you should see
+  \cref{Appendix}{app:fcfs}{FCFs by Reduction Date} for alternative FCFs.
+  \newline
+  (2) Due to a glitch in the WVM, data reduced between 2012 Sept. 19,
+  and 2013 Jan. 18 must be re-reduced using the latest version of
+  Starlink (Hikianalia or later), or should have an FCF derived from a
+  calibrator reduced at the same time (and not our standard FCF) applied
+  to it.
+}
 
-If you want to read off the \textbf{peak flux} from your map, you
-should multiply your map by the \fcfb\ (also known as the peak FCF).
-Thus, when you open your map in \gaia\ the value of the brightest
-pixel will be the peak flux of your source. Applying \fcfb\ will
-result in a map with units of Jy/beam. For point-like or compact
-sources smaller than the beam (with a Gaussian profile), this peak
-value will be the flux density of your source. Be aware that the
-pipeline (see \cref{Section}{sec:pipe}{SCUBA-2 Pipeline}) reports FCFs
-in units of mJy/beam.  Note that \fcfb\ applies to the default pixel
-sizes (4\,arcsec at 850\,$\mu$m and 2\,arcsec at 450\,$\mu$m). For
-pixel sizes other than these, \fcfb\ will need to be scaled accordingly.
+\subsubsection{Aperture flux}
 
-\subsubsection{Aperture FCF}
+To get the flux density of extended sources with aperture
+photometry you should apply the \fcfa.  You can then sum the emission
+in an aperture. \fcfa\ was determined using a 60-arcsec diameter
+aperture. If your aperture differs from this you should scale your
+flux accordingly---the scaling factor can be read off the curve of
+growth (see \cref{Appendix}{app:cog}{this appendix}). This graph gives
+the ratio of aperture flux to total flux for a range of aperture diameters.
 
-To get the flux density of extended sources with \textbf{aperture
-photometry} you should apply the \fcfa. You will also need to multiply
-your map by the square of the pixel size (i.e. 16 for 4'' pixels).
-Only then can you sum the emission in an aperture. \fcfa\ was
-determined using a 60\,arcsec diameter aperture. If your aperture
-differs from this you should scale your flux accordingly---the scaling
-factor can be read off the curve of growth (see
-\cref{Appendix}{app:cog}{Aperture Photometry Curve of Growth}). This
-graph gives the ratio of aperture flux to total flux for a range of
-aperture diameters.
+\fcfa\ is determined using 1\,arcsec pixels. For different pixel sizes
+you will also need to apply a factor of pixelsize squared.
+
+\subsubsection{Peak flux}
+
+If you want to read off the peak flux from your map, you should apply
+the \fcfb\ (also known as the peak FCF).  When you open your map in
+\gaia\ the value of the brightest pixel will be the peak flux of your
+source. (If your source is point-like, the peak value in the map is
+the total flux density). Applying \fcfb\ will result in a map with
+units of Jy/beam. For point-like or compact sources smaller than the
+beam (with a Gaussian profile), this peak value will be the flux
+density of your source. Note that the pipeline
+(\cref{Section}{sec:pipe}{SCUBA-2 Pipeline}) reports FCFs in units of
+mJy/beam.
 
 \subsubsection{Determining your own FCF}
 
@@ -2947,15 +2956,15 @@ changed significantly.
 \texttt{(1)}
 \end{minipage}
 \begin{minipage}[t]{0.95\linewidth}
- You should first reduce the calibrator with the map-maker using
- \texttt{dimmconfig\_bright\_compact.lis} as your configuration file.
+Reduce the calibrator with the map-maker using
+\texttt{dimmconfig\_bright\_compact.lis} as the configuration file.
 \end{minipage}
 \vspace{1mm}\\
 \begin{minipage}[t]{0.05\linewidth}
 \texttt{(2)}
 \end{minipage}
 \begin{minipage}[t]{0.95\linewidth}
-Next determine the FCF value by passing the resulting map to the
+Determine the FCF value by passing the output map to the
 \picard\ recipe \xref{\drrecipe{SCUBA2\_CHECK\_CAL}}{sun265}{SCUBA2_CHECK_CAL}.
 \begin{myquote}
 \begin{verbatim}
@@ -2972,30 +2981,45 @@ standard FCF values given above.
 \end{minipage}
 \begin{minipage}[t]{0.95\linewidth}
 Re-reduce the calibrator using the map-maker with the \emph{same}
-configuration file you used for your science observations. Once again
-determine the FCF using \drrecipe{SCUBA2\_CHECK\_CAL}.
+configuration file you used for your science observations.
 \end{minipage}
 \vspace{1mm}\\
 \begin{minipage}[t]{0.05\linewidth}
 \texttt{(4)}
 \end{minipage}
 \begin{minipage}[t]{0.95\linewidth}
-Apply this FCF to your reduced science data using \cmult. (Remember to
-also apply the pixel size squared factor if using \fcfa.)
+Again determine the FCF using \drrecipe{SCUBA2\_CHECK\_CAL}.
+\end{minipage}
+\vspace{1mm}\\
+\begin{minipage}[t]{0.05\linewidth}
+\texttt{(5)}
+\end{minipage}
+\begin{minipage}[t]{0.95\linewidth}
+Apply this FCF to your reduced science data using \cmult-- see next
+section. Remember to apply the pixel size squared factor if using
+\fcfa.
 \end{minipage}
 
-\subsubsection{Applying the FCF using \cmult}
+\subsubsection{Applying the FCF}
 
-You can multiply your data file by the FCF, or by any other constant
-factor, using the \Kappa\ command \cmult. This application multiplies
-each pixel in an NDF by a scalar to produce a new NDF. In the example
-below the output map is in units of mJy/beam.
+You can apply the FCF using the \picard\ recipe
+CALIBRATE\_SCUBA2\_DATA. By default this will multiply your map by
+1000$\times$\fcfb\ from the start of
+\cref{section}{sec:cmult}{Flux Conversion Factors}. This produces a
+calibrated map with units of mJy/beam.
+
+You can supply a parameter file if you wish to use a different value
+for the FCF or use \fcfa\. The recipe will write out the calibrated
+file with an \texttt{\_cal} suffix and will change the units in the
+map header.
 
 \begin{myquote}
 \begin{verbatim}
-% cmult in=850map.sdf out=850map_cal scalar=537000
+% picard CALIBRATE_SCUBA2_DATA  mapinpW.sdf
 \end{verbatim}
 \end{myquote}
+Note that the recipe will also take account of the pixel size when
+applying \fcfa.
 
 
 \subsection{\xlabel{coadd}Coadding multiple maps}
