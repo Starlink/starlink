@@ -3943,23 +3943,23 @@ This recipe uses the default configuration file for \makemap, unless
 the sources is identified as a calibrator. After all observations have
 been processed the data is co-added and calibrated using the default
 FCF.  The noise and NEFD properties for the co-add are calculated and
-written to log files (log.noise and log.nefd respectively). Finally,
-the \cupid\ task \findclumps\ is run using the fellwalker algorithm to
-create a source catalogue.
+written to log files (\texttt{log.noise} and \texttt{log.nefd}
+respectively). Finally, the \cupid\ task \findclumps\ is run using the
+FellWalker algorithm to create a source catalogue.
 
-For calibrators, dimmconfig\_bright\_compact.lis is used and FCFs are
-derived from the map.
+For calibrators, \texttt{dimmconfig\_bright\_compact.lis} is used and
+FCFs are derived from the map.
 
 
 \subsubsection{\xlabel{extsources}REDUCE\_SCAN\_CHECKRMS}
 \vspace{-0.3cm}
 \textbullet\  Configuration file = \texttt{dimmconfig.lis}
 
-This recipe is the same as REDUCE\_SCAN, but includes extra
-performance estimations determined by SCUBA2\_CHECK\_RMS (see
+This recipe is the same as \drrecipe{REDUCE\_SCAN}, but includes extra
+performance estimations determined by \drrecipe{SCUBA2\_CHECK\_RMS} (see
 \cref{Section}{sec:checkrms}{Getting the noise}). These extra metrics
 are written to a log file log.checkrms. The advantage of running
-SCUBA2\_CHECK\_RMS in the pipeline rather than as a standalone
+\drrecipe{SCUBA2\_CHECK\_RMS} in the pipeline rather than as a standalone
 \picard\ recipe is that is able to calculate results for co-added
 files.
 
@@ -3980,10 +3980,10 @@ local catalogue into \gaia.
 \textbullet\  Configuration file = \texttt{dimmconfig\_blank\_field.lis}
 
 This is the recipe for processing maps containing faint compact
-sources. This time the configuration file called by \texttt{makemap}
+sources. This time the configuration file called by \makemap\
 is \texttt{dimmconfig\_blank\_field.lis}. The resulting map is further
 processed with a matched filter to give the first output map. Then the
-signal-to-noise ratio is taken to enhance point sources, this
+S/N is taken to enhance point sources, this
 signal-to-noise map is written out as a second output file. This
 recipe also performs a source finder routine; the results are written
 as a FITS catalogue (with file extension \texttt{.FIT}) which can be
@@ -4031,14 +4031,13 @@ example both of these options will return the same result:
 
 Although each recipe calls one of the standard configuration files the
 user can specify their own. You will need to create a recipe parameter
-file. This file will contain set the parameter MAKEMAP\_CONFIG to be
+file. This file will contain set the parameter \param{MAKEMAP\_CONFIG} to be
 your new configuration file. This must be preceded by the recipe name
 used in the reduction.
 
-For example, to run the pipeline with REDUCE\_SCAN\_CHECKRMS but your
+For example, to run the pipeline with \drrecipe{REDUCE\_SCAN\_CHECKRMS} but your
 own configuration file (\texttt{myconfig.lis}), the recipe parameter file
 (named \texttt{mypars.ini}) will look like this:
-\begin{center}
 \vspace{0.2cm}
 \begin{myquote}
 \begin{verbatim}
@@ -4047,8 +4046,8 @@ MAKEMAP_CONFIG = myconfig.lis
 \end{verbatim}
 \end{myquote}
 \vspace{0.4cm}
-\end{center}
-Then run the pipeline calling the parameter file via the -recpars option.
+Then run the pipeline calling the parameter file via the
+\texttt{-recpars} option.
 \begin{myquote}
 \begin{verbatim}
 % oracdr -file mylist -loop file -log x -recpars=myparams.ini REDUCE_SCAN_CHECKRMS
@@ -4056,7 +4055,7 @@ Then run the pipeline calling the parameter file via the -recpars option.
 \end{myquote}
 
 
-\section{\xlabel{running_pl}Running the Science Pipeline}
+\subsection{\xlabel{running_pl}Running the Science Pipeline}
 \label{sec:plsteps}
 
 \begin{minipage}[t]{0.15\linewidth}
@@ -4075,7 +4074,7 @@ Then run the pipeline calling the parameter file via the -recpars option.
 \textbf{Step 2:}
 \end{minipage}
 \begin{minipage}[t]{0.85\linewidth}
-\textbf{Set environment variables}. \\These ensure the data is read
+\textbf{Set environment variables}. \\These ensure the data are read
 from and written to the right places. Many are set automatically when
 the pipeline is initialised but others must be set manually. Details
 of the optional variables are given in \pipelinesun\ but the three
@@ -4096,8 +4095,8 @@ written. Also used as the location for a user-specified configuration file.\\
 \begin{minipage}[t]{0.85\linewidth}
 \textbf{(Optional) Create your personalised configuration file and/or parameter file.} \\
 See \cref{Section}{sec:parameterfile}{Changing the defaults} for
-details. In this example we check the RECIPE parameter and find the
-recipe REDUCE\_SCAN is assigned to our data. We are happy with the
+details. In this example we check the \param{RECIPE} parameter and find the
+recipe \drrecipe{REDUCE\_SCAN} is assigned to our data. We are happy with the
 steps in this recipe but want to supply a new configuration file. To
 do so we create a parameter file called \texttt{mypars.ini}.\\*
 
@@ -4118,7 +4117,7 @@ do so we create a parameter file called \texttt{mypars.ini}.\\*
 \end{minipage}
 
 
-\section{\xlabel{pl_output}Pipeline output}
+\subsection{\xlabel{pl_output}Pipeline output}
 
 The pipeline will produce a group file for each object being
 processed. If the pipeline is given data from multiple nights, all
@@ -4138,7 +4137,7 @@ observation is being processed.
 Additionally, PNG images are made of the reduced files at a variety of
 resolutions.
 
-\subsection{\xlabel{cadc}Getting your data from CADC}
+\subsubsection{\xlabel{cadc}Getting your data from CADC}
 
 The JCMT Science Archive is hosted by The Canadian Astronomy Data
 Centre (CADC). Both raw data and data processed by the science pipeline
