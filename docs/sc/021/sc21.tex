@@ -836,17 +836,27 @@ throughout the observation. This is shown in the top panel of
 
 \clearpage
 
-\section{\xlabel{data_files}Raw SCUBA-2 Data}
+\section{\xlabel{data_files}Handling raw SCUBA-2 data}
 \label{sec:raw}
 
+This section describes a number of procedures visualising
+and assessing the quality of raw data files.  These steps need not be part of
+your data reduction process and do not concern the iterative map-maker.
+
+However, there are reasons you may wish to examine your raw data in
+greater depth. The most likely motivation is unusual result from the
+map-maker such as higher than expected noise, artifacts in your map or
+inconsistent noise across multiple tiles.  This section will help you
+get to the bottom of many of these issues.
+
+\subsection{Data acquisition explained}
 A normal science observation will follow the following sequence.
 \vspace{-2mm}
-\begin{itemize}\itemsep-0.5em
-\item Noise
+\begin{enumerate}\itemsep-0.2em
 \item Flat-field
-\item Multiple Science scans
+\item Multiple science scans
 \item Flat-field
-\end{itemize}
+\end{enumerate}
 \vspace{-2mm}
 The \param{SEQ\_TYPE} parameter in the FITS header may be used to
 identify the nature of each scan (see
@@ -860,45 +870,51 @@ you will get \emph{all} of the files listed above. Later when you
 reduce your data using the map-maker you will include \emph{all} of
 the files (noise + flat-fields + science).
 Shown below is a list of the raw files for a single sub-array (in this
-case s8a) for a short calibration observation. The first file is a
-short, dark noise; the second and last scans are fast flat-field
+case s8a) for a short calibration observation. The first file is the
+short, dark noise; the second and last scans are the fast flat-field
 observations which occur after the shutter opens to the sky at the
 start of the observation and closes at the end (note the identical
-file size); all of the scans in between are science. The SCUBA-2 data
-acquisition (DA) system writes out a data file every 30 seconds; each
-of which contains 23\,MB of data. The only exception is the final science
-scan which will usually be smaller (7.3\,MB in the example below), typically
-requiring less than 30 seconds of data to complete the observation.
+file size); all of the scans in between are science.
+
+
 \begin{myquote}
 \begin{verbatim}
--rw-r--r-- 1 jcmtarch jcmt 6.2M Jul 19 21:33 s8a20120720_00030_0001.sdf
--rw-r--r-- 1 jcmtarch jcmt 9.6M Jul 19 21:34 s8a20120720_00030_0002.sdf
--rw-r--r-- 1 jcmtarch jcmt 23M Jul 19 21:34 s8a20120720_00030_0003.sdf
--rw-r--r-- 1 jcmtarch jcmt 23M Jul 19 21:35 s8a20120720_00030_0004.sdf
--rw-r--r-- 1 jcmtarch jcmt 23M Jul 19 21:36 s8a20120720_00030_0005.sdf
--rw-r--r-- 1 jcmtarch jcmt 23M Jul 19 21:36 s8a20120720_00030_0006.sdf
--rw-r--r-- 1 jcmtarch jcmt 7.3M Jul 19 21:36 s8a20120720_00030_0007.sdf
--rw-r--r-- 1 jcmtarch jcmt 9.6M Jul 19 21:37 s8a20120720_00030_0008.sdf
+% ls -lh /jcmtdata/raw/scuba2/s8a/20131227/00034
+
+-rw-r--r-- 1 jcmtarch jcmt 8.0M Dec 27 03:00 s8a20131227_00034_0001.sdf
+-rw-r--r-- 1 jcmtarch jcmt  22M Dec 27 03:00 s8a20131227_00034_0002.sdf
+-rw-r--r-- 1 jcmtarch jcmt  22M Dec 27 03:01 s8a20131227_00034_0003.sdf
+-rw-r--r-- 1 jcmtarch jcmt  22M Dec 27 03:02 s8a20131227_00034_0004.sdf
+-rw-r--r-- 1 jcmtarch jcmt  22M Dec 27 03:02 s8a20131227_00034_0005.sdf
+-rw-r--r-- 1 jcmtarch jcmt 6.8M Dec 27 03:02 s8a20131227_00034_0006.sdf
+-rw-r--r-- 1 jcmtarch jcmt 8.0M Dec 27 03:03 s8a20131227_00034_0007.sdf
 \end{verbatim}
 \end{myquote}
-\textbf{Note:} All of these files are written out 8 times for each of the
-8 sub-arrays.
+The SCUBA-2 data
+acquisition (DA) system writes out a data file every 30 seconds; each
+of which contains 22\,MB of data. The only exception is the final science
+scan which will usually be smaller (6.8\,MB in the example below), typically
+requiring less than 30 seconds of data to complete the observation.
+
+\textbf{Note:} All of these files are written out eight times, once for each of
+the eight sub-arrays.
 
 The main data arrays of each file are cubes, with the first two
 dimensions enumerating columns and rows, and the third time slices
 (sampled at 200\,Hz).
-
-Raw SCUBA-2 data are written as uncalibrated digitised data. The first calibration
+\\*\\*
+\textbf{Units}\\*
+Raw SCUBA-2 data come in uncalibrated units. The first calibration
 step is to scale the raw data to units proportional to picowatts (pW)
-by applying the flat-field solution. From there the data must be
-scaled by the flux conversion factor (FCF) to give units of janskys
-(Jy).
-
-The first step is applied internally by the map-maker but can be done
-manually when examining the raw data---see
+by applying the flat-field solution. This step is performed internally
+ by the map-maker but can be done manually when examining the raw data---see
 \cref{Section}{sec:concat}{Concatenate \& apply a flat-field}.
-The second step must be done manually with the instructions given in
-\cref{Section}{sec:cmult}{Applying the FCF and determining fluxes}.
+
+The second step is to scale the data by the flux conversion factor
+(FCF) to give units of janskys. Unless you are running the
+\textsc{Orac-dr} pipeline, this must be done manually with the
+instructions given in \cref{Section}{sec:cmult}{Applying the FCF and
+determining fluxes}.
 
 
 \subsection{\xlabel{examine}Examining raw data}
