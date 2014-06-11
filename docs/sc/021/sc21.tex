@@ -486,7 +486,7 @@
 % Typographical shortcuts
 \newcommand{\fcfbe}{$\mathrm{FCF_{beamequiv}}$}
 \newcommand{\fcfb}{$\mathrm{FCF_{peak}}$}
-\newcommand{\fcfa}{$\mathrm{FCF_{aperature}}$}
+\newcommand{\fcfa}{$\mathrm{FCF_{aperture}}$}
 \newcommand{\fcfm}{$\mathrm{FCF_{match}}$}
 
 % SCUBA reference
@@ -4164,7 +4164,7 @@ quality of their data.
 \item The science pipeline is run the following day. Data from the
 previous night is processed using an optimal reduction routine, that
 includes the map-maker and a number of post-processing steps (outlined
-below). This data is transferred to CADC and available for download
+below). These data are transferred to CADC and available for download
 by project members the following day.
 \end{itemize}
 
@@ -4353,7 +4353,7 @@ resolutions.
 
 The JCMT Science Archive is hosted by The Canadian Astronomy Data
 Centre (CADC). Both raw data and data processed by the science pipeline
-is made available to PIs and co-Is through the CADC interface
+are made available to PIs and co-Is through the CADC interface
 (\texttt{http://www3.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/jcmt/}).
 
 To access proprietary data you will need to have your CADC username
@@ -4427,7 +4427,7 @@ Draper~P.~W., Gray~N., Berry~D.~S., Taylor~M., 2012,
 \xref{Starlink User Note 214}{sun214}{}
 
 \bibitem{picard}
-Gibb~A.~G., Jenness~T., Economou~F., 2012, \textit{PICARD -- a
+Gibb~A.~G., Jenness~T., Economou~F., 2012, \textit{PICARD --- a
 PIpeline for Combining and Analyzing Reduced Data}
 \xref{Starlink User Note 265}{sun265}{}
 
@@ -4513,7 +4513,7 @@ all of the bolometers. This may be accomplished by
 
 \begin{myquote}
 \begin{verbatim}
-sc2clean $FILES clean \
+% sc2clean $FILES clean \
    config='"^$STARLINK_DIR/share/smurf/dimmconfig.lis,compreprocess=1"'
 \end{verbatim}
 \end{myquote}
