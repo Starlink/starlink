@@ -785,7 +785,7 @@
 \textbf{PSF}    & Point Spread Function\\
 \textbf{SCUBA-2}& Submillimetre Common User Bolometer Array-2\\
 \textbf{SMURF}  & Sub-Millimetre User Reduction Facility\\
-\textbf{SNR}    & Signal-to-Noise ratio\\
+\textbf{S/N}    & Signal-to-Noise ratio\\
 \textbf{SQUID}  & Superconducting QUantum Interference Device\\
 \textbf{SUN}    & Starlink User Note\\
 \textbf{TES}    & Transition Edge Sensor\\
@@ -1026,7 +1026,7 @@ inverse linear gradient of the current as a function of heater power.
 
 At this point bolometers with responsivities above or below a
 threshold limit are rejected, along with bolometers which display a
-non-linear response or have a poor SNR. A second flat-field is
+non-linear response or have a poor S/N. A second flat-field is
 performed at the end of an observation so bolometers whose
 responsivity has changed over the course of the observation can be
 flagged.
@@ -1592,7 +1592,7 @@ compreprocess& 0 &s& If set, include a COM removal in the pre-processing.\\
 maxlen& 0 &s &Maximum number of seconds of data to be loaded at once.\\
 doclean& 1 &s&Perform pre-processing/cleaning operations. \\
 exportclean& 0 &n&If set, the data will be exported after cleaning and before map-making. \\
-dcthresh & 25.0 &s& The SNR threshold at which to detect DC step\\
+dcthresh & 25.0 &s& The S/N threshold at which to detect DC step\\
 dcfitbox & 30 &s& Box size over which to fit data with a straight
                         line on either side of a potential DC jump\\
 dcmaxsteps & 10 &s& The maximum number of steps that can be corrected
@@ -1602,7 +1602,7 @@ dclimcorr & 0 &s& If more than this number of bolometers have a step at
                         a step.\\
 dcsmooth & 50 &s& The width of the median filter used to smooth a
                         bolometer data stream prior to finding DC jump\\
-spikethresh & 0 &s& The SNR at which to flag spikes.\\
+spikethresh & 0 &s& The S/N at which to flag spikes.\\
 spikebox & 50 &s& Size of the filter box in which to detect spikes from a rolling median.\\
 whiten & 0 &&Whether to apply a whitening filter to time stream data. \\
 filt\_edgelow & 0 &s&The highest frequency to be retained by the initial cleaning. \\
@@ -1666,8 +1666,8 @@ com.gain\_rat & 4.0  &s&Ratio of the largest gain to the mean gain for a bolomet
 com.zero\_mask & 0  &s&Use if wish to provide an external COM mask. Must specify this on the command-line using the REF option.  \\
 com.zero\_circle & undef &s &Use to set a circular mask; any samples within the mask are excluded from the COM estimation. \\
 com.zero\_lowhits & 0  &s&Samples are excluded from the COM estimation if they fall where the number of samples exceeds this number times the mean. \\
-com.zero\_snr & 0 & s&Samples are excluded from the COM estimation if they fall in pixels with SNR values greater than com.zero\_snr. \\
-com.zero\_snrlo & 0  &s& Allows the mask of com.zero\_snr to expand down an SNR of com.zero\_snrlo.\\
+com.zero\_snr & 0 & s&Samples are excluded from the COM estimation if they fall in pixels with S/N values greater than com.zero\_snr. \\
+com.zero\_snrlo & 0  &s& Allows the mask of com.zero\_snr to expand down an S/N of com.zero\_snrlo.\\
 com.zero\_union & 1 &s & Details how to combine multiple COM masks. \\
 com.zero\_freeze & 0 &s & Specifies whether the COM model should be frozen after com.zero\_freeze number of iterations. \\
 
@@ -1689,8 +1689,8 @@ flt.notfirst & 0 &s & Whether to apply the high pass filter filter on the first 
 flt.zero\_mask & 0 &p & Use if wish to provide an external FLT mask. Must specify this on the command-line using the REF option.\\
 flt.zero\_circle & undef  &p&Use to set a circular mask; any samples within the mask are excluded from the filtering. \\
 flt.zero\_lowhits & 0 &p & Samples are excluded from the filtering if they fall where the number of samples exceeds this number times the mean. \\
-flt.zero\_snr &0 &p &Samples are excluded from the filtering if they lie in pixels with SNR values greater than flt.zero\_snr. \\
-flt.zero\_snrlo & 0   &p& Allows the mask of flt.zero\_snr to expand down an SNR of flt.zero\_snrlo.\\
+flt.zero\_snr &0 &p &Samples are excluded from the filtering if they lie in pixels with S/N values greater than flt.zero\_snr. \\
+flt.zero\_snrlo & 0   &p& Allows the mask of flt.zero\_snr to expand down an S/N of flt.zero\_snrlo.\\
 flt.zero\_union & 1  &p&Details how to combine multiple FLT masks. \\
 flt.zero\_freeze & 0  &p&Specifies whether the FLT model should be frozen after flt.zero\_freeze number of iterations.  \\
 flt.zero\_niter & 2  &p& The number of iterations for which the FLT model should be masked.\\
@@ -1726,8 +1726,8 @@ ast.zero\_mask  & 0 &p &Use if wish to provide an external AST mask. Must specif
 \hline
 ast.zero\_circle  & undef&p&Use to set a circular mask; any samples outside the mask will be constrained to zero on each iteration. \\
 ast.zero\_lowhits & 0  &p& Forces the map to zero where the number of samples is less than this number times the mean.\\
-ast.zero\_snr  & 0 &p & Creates a mask after each iteration based on the SNR of the pixels. Map areas outside this mask will be forced to zero.\\
-ast.zero\_snrlo  & 0 & p& Allows the mask of ast.zero\_snr to expand down an SNR of ast.zero\_snrlo.\\
+ast.zero\_snr  & 0 &p & Creates a mask after each iteration based on the S/N of the pixels. Map areas outside this mask will be forced to zero.\\
+ast.zero\_snrlo  & 0 & p& Allows the mask of ast.zero\_snr to expand down an S/N of ast.zero\_snrlo.\\
 ast.zero\_snr\_fwhm & 0 & s&The FWHM by which to smooth the AST mask created by ast.zero\_snr. The map-maker is then run again using this smoothed mask on each iteration.  \\
 ast.zero\_snr\_low &-1.1&s & The value at which to threshold the smooth mask produced by ast.zero\_snr\_fwhm.\\
 ast.zero\_union & 1  &p&Details how to combine multiple AST masks. \\
@@ -2025,7 +2025,7 @@ compreprocess& 0 &s& If set, include a COM removal in the pre-processing.\\
 maxlen& 0 &s &Maximum number of seconds of data to be loaded at once.\\
 doclean& 1 &s&Perform pre-processing/cleaning operations. \\
 exportclean& 0 &n&If set, the data will be exported after cleaning and before map-making. \\
-dcthresh & 25.0 &s& The SNR threshold at which to detect DC step\\
+dcthresh & 25.0 &s& The S/N threshold at which to detect DC step\\
 dcfitbox & 30 &s& Box size over which to fit data with a straight
                         line on either side of a potential DC jump\\
 dcmaxsteps & 10 &s& The maximum number of steps that can be corrected
@@ -2035,7 +2035,7 @@ dclimcorr & 0 &s& If more than this number of bolometers have a step at
                         a step.\\
 dcsmooth & 50 &s& The width of the median filter used to smooth a
                         bolometer data stream prior to finding DC jump\\
-spikethresh & 0 &s& The SNR at which to flag spikes.\\
+spikethresh & 0 &s& The S/N at which to flag spikes.\\
 spikebox & 50 &s& Size of the filter box in which to detect spikes from a rolling median.\\
 whiten & 0 &&Whether to apply a whitening filter to time-stream data. \\
 filt\_edgelow & 0 &s&The highest frequency to be retained by the initial cleaning. \\
@@ -2077,8 +2077,8 @@ com.gain\_rat & 4.0  &s&Ratio of the largest gain to the mean gain for a bolomet
 com.zero\_mask & 0  &s&Use if wish to provide an external COM mask. Must specify this on the command-line using the REF option.  \\
 com.zero\_circle & undef &s &Use to set a circular mask; any samples within the mask are excluded from the COM estimation. \\
 com.zero\_lowhits & 0  &s&Samples are excluded from the COM estimation if they fall where the number of samples exceeds this number times the mean. \\
-com.zero\_snr & 0 & s&Samples are excluded from the COM estimation if they fall in pixels with SNR values greater than com.zero\_snr. \\
-com.zero\_snrlo & 0  &s& Allows the mask of com.zero\_snr to expand down an SNR of com.zero\_snrlo.\\
+com.zero\_snr & 0 & s&Samples are excluded from the COM estimation if they fall in pixels with S/N values greater than com.zero\_snr. \\
+com.zero\_snrlo & 0  &s& Allows the mask of com.zero\_snr to expand down an S/N of com.zero\_snrlo.\\
 com.zero\_union & 1 &s & Details how to combine multiple COM masks. \\
 com.zero\_freeze & 0 &s & Specifies whether the COM model should be frozen after com.zero\_freeze number of iterations. \\
 \hline
@@ -2091,8 +2091,8 @@ flt.notfirst & 0 &s & Whether to apply the high pass filter filter on the first 
 flt.zero\_mask & 0 &p & Use if wish to provide an external FLT mask. Must specify this on the command-line using the REF option.\\
 flt.zero\_circle & undef  &p&Use to set a circular mask; any samples within the mask are excluded from the filtering. \\
 flt.zero\_lowhits & 0 &p & Samples are excluded from the filtering if they fall where the number of samples exceeds this number times the mean. \\
-flt.zero\_snr &0 &p &Samples are excluded from the filtering if they lie in pixels with SNR values greater than flt.zero\_snr. \\
-flt.zero\_snrlo & 0   &p& Allows the mask of flt.zero\_snr to expand down an SNR of flt.zero\_snrlo.\\
+flt.zero\_snr &0 &p &Samples are excluded from the filtering if they lie in pixels with S/N values greater than flt.zero\_snr. \\
+flt.zero\_snrlo & 0   &p& Allows the mask of flt.zero\_snr to expand down an S/N of flt.zero\_snrlo.\\
 flt.zero\_union & 1  &p&Details how to combine multiple FLT masks. \\
 flt.zero\_freeze & 0  &p&Specifies whether the FLT model should be frozen after flt.zero\_freeze number of iterations.  \\
 flt.zero\_niter & 2  &p& The number of iterations for which the FLT model should be masked.\\
@@ -2109,8 +2109,8 @@ ast.mapspike & 10  &s&Removes spikes from the map by removing residuals in each 
 ast.zero\_mask  & 0 &p &Use if wish to provide an external AST mask. Must specify this on the command-line. \\
 ast.zero\_circle  & undef&p&Use to set a circular mask; any samples outside the mask will be constrained to zero on each iteration. \\
 ast.zero\_lowhits & 0  &p& Forces the map to zero where the number of samples is less than this number times the mean.\\
-ast.zero\_snr  & 0 &p & Creates a mask after each iteration based on the SNR of the pixels. Map areas outside this mask will be forced to zero.\\
-ast.zero\_snrlo  & 0 & p& Allows the mask of ast.zero\_snr to expand down an SNR of ast.zero\_snrlo.\\
+ast.zero\_snr  & 0 &p & Creates a mask after each iteration based on the S/N of the pixels. Map areas outside this mask will be forced to zero.\\
+ast.zero\_snrlo  & 0 & p& Allows the mask of ast.zero\_snr to expand down an S/N of ast.zero\_snrlo.\\
 ast.zero\_snr\_fwhm & 0 & s&The FWHM by which to smooth the AST mask created by ast.zero\_snr. The map-maker is then run again using this smoothed mask on each iteration.  \\
 ast.zero\_snr\_low &-1.1&s & The value at which to threshold the smooth mask produced by ast.zero\_snr\_fwhm.\\
 ast.zero\_union & 1  &p&Details how to combine multiple AST masks. \\
@@ -2409,7 +2409,7 @@ along a single position angle on the sky.
 should be fit separately for each sub-array. This is not advised for
 extended sources as signal on scales larger than a single sub-array is
 lost but is fine for a compact central source. Likewise, the filtering
-is tighter. The SNR threshold for DC steps is relaxed from 25 in the
+is tighter. The S/N threshold for DC steps is relaxed from 25 in the
 default file to 100 to avoid problems associated with bright sources.
 
 This is the recipe that is commonly used to reduce calibration
@@ -2448,7 +2448,7 @@ is the default at 450\,$\mu$m), to aid the recovery of extended
 emission.
 
 Masking is used in this recipe where \texttt{ast.zero\_snr} is used to
-constrain the \texttt{AST} model to zero wherever the SNR is lower
+constrain the \texttt{AST} model to zero wherever the S/N is lower
 than 5$\,\sigma$. Everywhere the signal is below this threshold, the
 \texttt{AST} model is set to zero for all but the final iteration
 (\texttt{ast.zero\_notlast} is set to 1 in the default file). This
@@ -3571,7 +3571,7 @@ mask.
 
 \texttt{FLT} masking is used to omit bright sources from the estimate
 of the low frequency background subtracted from the residuals on each
-iteration. This can help prevent ringing in the final map. SNR based
+iteration. This can help prevent ringing in the final map. S/N based
 \texttt{FLT} masking cannot be used on the first iteration and
 \texttt{FLT} masking should be used sparingly to aid convergence (it
 is limited to the first 2 iterations by default by
@@ -3579,7 +3579,7 @@ is limited to the first 2 iterations by default by
 
 \texttt{COM} masking is used to omit very bright sources from the
 estimate of the common-mode signal, this can prevent sources being
-rejected due to their dissimilarity to the common-mode. SNR based
+rejected due to their dissimilarity to the common-mode. S/N based
 \texttt{COM} masking cannot be used on the first iteration and the
 mask should always be small.
 
@@ -3603,24 +3603,24 @@ dimmconfig.lis} for more information on each.
 
 Finally there is signal-to-noise based masking as utilised by
 \texttt{dimmconfig\_bright\_extended.lis}. It uses the parameter
-\texttt{ast.zero\_snr} to define a mask based on the SNR. The default
-is 5, meaning that pixels below an SNR of 5\,$\sigma$ will be set to
-zero. This is dynamic with the SNR mask being re-determined after each
+\texttt{ast.zero\_snr} to define a mask based on the S/N. The default
+is 5, meaning that pixels below an S/N of 5\,$\sigma$ will be set to
+zero. This is dynamic with the S/N mask being re-determined after each
 iteration. Setting \texttt{ast.zero\_snr} too low can cause noise
 spikes to be interpreted as signal. Instead, \texttt{ast.zero\_snrlo}
-can be set which allows the mask to grow to include pixels with an SNR
+can be set which allows the mask to grow to include pixels with an S/N
 down to \texttt{ast.zero\_snrlo}. This typically improves the
 resulting map so is well worth experimenting with.
 
 An alternative to setting \texttt{ast.zero\_snrlo} is to smooth the
-SNR mask by setting the parameter \texttt{ast.zero\_snr\_fwhm}.
+S/N mask by setting the parameter \texttt{ast.zero\_snr\_fwhm}.
 
 Remember for all \texttt{AST} masking to include
 \texttt{ast.zero\_notlast = 1} so that mask is not applied on the
 final iteration. This means that the background regions in the map are
 only generated by this single, final iteration.
 
-An alternative to SNR masking is to supply an external mask using the
+An alternative to S/N masking is to supply an external mask using the
 \texttt{REF} parameter.  Setting the parameter
 \texttt{ast.zero\_snr\_fwhm} allows you to automate this step for a
 specific case. Here, the map-maker is run once, then the mask
@@ -3639,14 +3639,14 @@ a false (i.e. zero) value; this means that only pixels that fall into
 both masks independently will be flagged/masked. Here, only the
 intersection of the masks is considered the final masked area.
 
-For example, if you find an SNR mask allow bright regions to develop
+For example, if you find an S/N mask allow bright regions to develop
 towards the edges of your map, you can force these to zero by using
-the intersection of the SNR mask with a `low-hits' mask.
+the intersection of the S/N mask with a `low-hits' mask.
 
 \subsection{\xlabel{maskbe}Supplying an external mask}
 \label{sec:maskbe}
 
-As an SNR mask is redetermined after each iteration it varies as the
+As an S/N mask is redetermined after each iteration it varies as the
 map varies which can sometimes cause convergence problems. The mask
 will also depend on the amount of data going into the map and the
 pixel size. An externally supplied mask is fixed and tells the
@@ -3678,7 +3678,7 @@ Archive. For instructions on converting from fits format to NDF see
 % makesnr 850map 850map_snr
 \end{verbatim}
 \end{myquote}
-\textbf{(c)} This SNR map is thresholded to set everything below 3$\sigma$ to 0 and
+\textbf{(c)} This S/N map is thresholded to set everything below 3$\sigma$ to 0 and
 everything above to 1.
 \begin{myquote}
 \begin{verbatim}
@@ -3870,9 +3870,9 @@ in this case to a 900-arcsec radius circle. The output file will be named
   Signal-to-noise map made the \Kappa\ command \makesnr.
   The map has been scaled from 0 to +3.}
 
-\textbf{(e) Make an SNR map}\\
+\textbf{(e) Make an S/N map}\\
 Finally, we need to find sources. The filtered map contains a
-VARIANCE component, so it is easy to produce an SNR map using the
+VARIANCE component, so it is easy to produce an S/N map using the
 \textsc{Kappa} task \task{makesnr}:
 \begin{myquote}
 \begin{verbatim}
@@ -3888,7 +3888,7 @@ by the larger noise values where there were less data.
 \\ \\
 \textbf{(f) Identify sources}\\
 The basic procedure for identifying sources would be to locate peaks
-above some threshold SNR. The SNR image above shows peaks that are
+above some threshold S/N. The S/N image above shows peaks that are
 likely to be real sources. For a start, a source appears where
 expected at the 0,0 position.
 
@@ -3896,10 +3896,10 @@ But how can we check if these sources are real?
 \begin{itemize}
 
 \item One option is to split your data into mutually exclusive subsets
-  and produce independent maps. Are the highest SNR peaks detected in each of
+  and produce independent maps. Are the highest S/N peaks detected in each of
   them?
 \item A second test is to compare the number of {\em negative} peaks above
-  a given SNR with the number of {\em positive} peaks.
+  a given S/N with the number of {\em positive} peaks.
 \end{itemize}
 
 \subsubsection{Example 2 - Advanced pipeline method}
@@ -4031,7 +4031,7 @@ We run the map-maker using \texttt{dimmconfig\_bright\_extended.lis};
 we have also specified a couple of overrides on the command line --
 \texttt{maptol}=0.04 is slightly more stringent than default and
 \texttt{ast.zero\_snrlo = 3} allows the 5\,$\sigma$ mask set by the
-configuration file to grow out to an SNR of 3\,$\sigma$; however, it
+configuration file to grow out to an S/N of 3\,$\sigma$; however, it
 will only expand to include adjacent pixels.
 
 In this example we give the map-maker a file containing a list of the
@@ -4064,7 +4064,7 @@ follow the steps outlined in \cref{Section}{sec:mask}{Masking options}.
 \end{verbatim}
 \end{myquote}
 
-This SNR map is thresholded to set everything below 3\,$\sigma$ to 0 and
+This S/N map is thresholded to set everything below 3\,$\sigma$ to 0 and
 everything above to 1.
 
 \begin{myquote}
@@ -4628,8 +4628,8 @@ in \texttt{dimmconfig.lis}---see \cref{Appendix}{app:par_full}{here}.
 #     "/star").
 #
 #     For bright extended regions we turn on AST zero-masking based on a map
-#     pixel SNR threshold of 5-sigma. This prevents ringing around bright
-#     sources, but will completely flatten the map in low-SNR regions.
+#     pixel S/N threshold of 5-sigma. This prevents ringing around bright
+#     sources, but will completely flatten the map in low-S/N regions.
 
 #  Notes:
 #     - This file inherits the parameter values defined in file
