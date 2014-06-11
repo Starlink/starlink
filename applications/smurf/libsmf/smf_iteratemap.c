@@ -469,6 +469,9 @@
 *        more iteration is performed in order to ensure any "xxx_LAST"
 *        parameter values (i.e. values to be used on the last iteration
 *        only) are used.
+*     2014-6-11 (DSB):
+*        If chunking causes the last chunk to contain very few time slices, 
+*        reduce the max chunk size so that all chunks have more equal sizes.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -672,6 +675,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   double *mapweights=NULL;      /* Weight for each pixel including chunk weight */
   double *mapweightsq=NULL;     /* Sum of bolometer weights squared */
   dim_t maxconcat;              /* Longest continuous chunk that fits in mem.*/
+  dim_t maxconcat2;             /* Better estimate of longest chunk */
   dim_t maxfile;                /* Longest file length in time samples*/
   int maxiter=0;                /* Maximum number of iterations */
   double maxlen=0;              /* Max length in seconds of cont. chunk */
@@ -1294,8 +1298,8 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
          that fits in memory. The first step uses the ratio of
          requested to available memory (rounded up to an integral
          number) to estimate the number of time steps for try. */
-
-      try = (size_t) ceil(maxconcat / ceil((double)memneeded/(double)maxdimm));
+      ncontchunks = ceil((double)memneeded/(double)maxdimm);
+      try = (size_t) ceil( maxconcat / ncontchunks );
 
       /* Then figure out how many files this corresponds to, round up
          to get integral number of files, and finally multiply by file
@@ -1321,7 +1325,6 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       msgOutf( "", "  Will try to re-group data in chunks < %zu samples long "
                "(%lg s)",
                status, try, ceil((double)try/srate_maxlen) );
-      msgOut( " ", FUNC_NAME ": ***************", status );
 
       /* Close igroup if needed before re-running smf_grp_related */
 
@@ -1331,11 +1334,42 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
       smf_grp_related( igrp, isize, 1+groupsubarray, 1,
                        ceil((double)try/srate_maxlen), NULL, keymap,
-                       &maxconcat, NULL, &igroup, NULL, NULL, status );
+                       &maxconcat2, NULL, &igroup, NULL, NULL, status );
+
+      /* If the chosen number of groups, each of the new chunk size, does
+         not account for all the available data, then there will a little
+         bit left over requiring another, very small, chunk which may
+         cause an error because it is so small. To avoid this, increment
+         the number of chunks and calculate a new chunk size. This will
+         not change the number of chunks actually used, but may help to
+         make them of more equal size. */
+      if( maxconcat2*ncontchunks < maxconcat - 2*pad && *status == SAI__OK ) {
+         ncontchunks++;
+         try = (size_t) ceil( maxconcat / ncontchunks );
+         try = (size_t) ceil((double)try/(double)maxfile)*maxfile + pad;
+         if( (try > (maxconcat*( (double) maxdimm / (double) memneeded ))) &&
+             (try > maxfile) ) try -= maxfile;
+
+         if( try < (maxfile + pad) ) {
+           *status = SMF__NOMEM;
+           errRep( "", FUNC_NAME ": not enough memory available to break job "
+                   "into smaller pieces.", status );
+         }
+
+         msgOutf( "", "  Will try to re-group data in chunks < %zu samples long "
+                  "(%lg s)", status, try, ceil((double)try/srate_maxlen) );
+
+         if( igroup ) smf_close_smfGroup( &igroup, status );
+
+         smf_grp_related( igrp, isize, 1+groupsubarray, 1,
+                          ceil((double)try/srate_maxlen), NULL, keymap,
+                          &maxconcat2, NULL, &igroup, NULL, NULL, status );
+      }
+      msgOut( " ", FUNC_NAME ": ***************", status );
 
       /* Re-check memory usage using shorter chunks */
       if( *status == SAI__OK ) {
-         smf_checkmem_dimm( maxconcat, INST__SCUBA2, igroup->nrelated, modeltyps,
+         smf_checkmem_dimm( maxconcat2, INST__SCUBA2, igroup->nrelated, modeltyps,
                             nmodels, msize, keymap, maxdimm, maxfile,
                             &memneeded, status );
       }
