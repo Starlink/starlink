@@ -634,14 +634,14 @@
 
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
-%  Title Page.
-%  ===========
+%  Title Page
+%  ==========
 \renewcommand{\thepage}{\roman{page}}
 \begin{document}
 \thispagestyle{empty}
 
-%  Latex document header.
-%  ======================
+%  Latex document header
+%  =====================
 \begin{latexonly}
    \textsc{Joint Astronomy Centre} \hfill \textbf{\stardocname}\\
    {\large Science \& Technology Facilities Council}\\
@@ -679,8 +679,8 @@
 % ? End of heading for abstract.
 \end{latexonly}
 
-%  HTML documentation header.
-%  ==========================
+%  HTML documentation header
+%  =========================
 \begin{htmlonly}
    \xlabel{}
    \begin{rawhtml} <H1> \end{rawhtml}
@@ -709,8 +709,8 @@
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents.
-%  ================================
+%  HTML document table of contents
+%  ===============================
 %  Add table of contents header and a navigation button to return to this
 %  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
@@ -727,24 +727,24 @@
 \end{htmlonly}
 
 % -----------------------------------------------------------------------------
-% ? Document Abstract. (if used)
-%  ==================
+%  Document Abstract
+%  =================
 \stardocabstract
 % ? End of document abstract
 
 % -----------------------------------------------------------------------------
-% ? Latex Copyright Statement
+%  Latex Copyright Statement
 %  =========================
 \begin{latexonly}
-\newpage
-\vspace*{\fill}
-\stardoccopyright
+  \newpage
+  \vspace*{\fill}
+  \stardoccopyright
 \end{latexonly}
 % ? End of Latex copyright statement
 
 % -----------------------------------------------------------------------------
-% ? Latex document Table of Contents (if used).
-%  ===========================================
+%  Latex document Table of Contents
+%  ================================
   \newpage
   \begin{latexonly}
     \setlength{\parskip}{0mm}
