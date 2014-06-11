@@ -547,7 +547,7 @@ the map-maker and what to look out for, while
 \cref{Section}{sec:postprocess}{Post-processing Reduction Steps}
 outlines the main post-processing steps you may wish to apply to your
 science map, this includes applying the flux conversion
-factor (FCF), coadding multiple maps and estimating the noise.
+factor (FCF), co-adding multiple maps and estimating the noise.
 \cref{Section}{sec:tweak}{Tweaking the configuration file}
 discusses your options for adjusting the configuration
 parameters when running the map-maker; this gives you added control
@@ -759,7 +759,7 @@ For full details of the array setup and operation see Holland et al.
   \small The layout of the arrays at 450$\mu$m (left) and
   850$\mu$m (right). The labels denote the name assigned to each
   sub-array. Raw data files are generated separately for each sub-array
-  and must be coadded. This figure was made my running \wcsmosaic\ on
+  and must be co-added. This figure was made my running \wcsmosaic\ on
   raw files from each sub-array.
 }
 \end{center}
@@ -2483,7 +2483,7 @@ Chunking occurs when there is insufficient computer memory available
 for the map-maker or when there is a gap in the time-series data (e.g.
 from a missing sub-scan). In these cases, the map-maker divides up the
 time-series and reduces each sub-portion independently, producing a
-separate map for each, before finally coadding all the maps at the
+separate map for each, before finally co-adding all the maps at the
 end. Ideally you want your data reduced in a single chunk, however
 this can be unfeasible for large maps.
 \vspace{0.2cm}\\
@@ -2563,9 +2563,9 @@ various useful quantities. The standard log files from reducing
 science data are:
 \\*
 \begin{itemize}
-\item log.noise---noise in the map for each observation and the coadd
+\item log.noise---noise in the map for each observation and the co-add
 (calculated from median of error component)
-\item log.nefd---NEFD calculated for each observation and for the coadded map(s)
+\item log.nefd---NEFD calculated for each observation and for the co-added map(s)
 \end{itemize}
 The pipeline will produce calibrated maps; by default these are
 calibrated using the standard FCFs, although users can specify their
@@ -2764,13 +2764,13 @@ Note that the recipe will also take account of the pixel size when
 applying \fcfa.
 
 
-\subsection{\xlabel{coadd}Coadding multiple maps}
+\subsection{\xlabel{coadd}Co-adding multiple maps}
 \label{sec:coadd}
 
 You may have multiple maps of the same source which you would like to
-coadd. \picard\ has a recipe called
+co-add. \picard\ has a recipe called
 \xref{\drrecipe{MOSAIC\_JCMT\_IMAGES}}{sun265}{MOSAIC_JCMT_IMAGES}
-that coadds maps while correctly dealing with the exposure time and
+that co-adds maps while correctly dealing with the exposure time and
 weights NDF extensions.
 \begin{myquote}
 \begin{verbatim}
@@ -2816,7 +2816,7 @@ use the \texttt{cat} command with back quotes like so:
 
 Currently there is no advantage in terms of data quality to reducing
 all observations simultaneously or separately. However, the latter
-does allow the option of assessing the individual maps before coadding
+does allow the option of assessing the individual maps before co-adding
 and is the method followed in this example.
 
 \subsection{\xlabel{crop}Cropping your map}
@@ -3492,7 +3492,7 @@ ref=850map_mask_zm
 
 Traditionally, the map-maker divides a non-contiguous sequence of time
 series data into chunks. It processes each chuck independently
-before coadding them as a final step in the the reduction.
+before co-adding them as a final step in the the reduction.
 
 This means for each chunk the map-maker has to start from scratch
 determining the \texttt{AST} model and the benefit of long integration
@@ -3504,7 +3504,7 @@ extended structure is not recovered.
 This new \skyloop\ command runs \makemap\ multiple times
 performing just a single iteration on each occasion. It starts by
 performing a single iteration of \texttt{makemap} from which a final
-coadded map is generated. This map is then supplied as an initial
+co-added map is generated. This map is then supplied as an initial
 estimate of the sky for the next loop through \texttt{makemap}. On
 this next iteration, the initial sky estimate is subtracted from the
 cleaned time-series data and the \texttt{COM}, \texttt{GAI},
@@ -3724,7 +3724,7 @@ gsYYYYMMD*\_mf
 \begin{minipage}[t]{0.7\linewidth}
 The map for each observation\\
 The map for each observation with an artificial\\point source added at the map centre\\
-The coadd of all the \_fmos files\\
+The co-add of all the \_fmos files\\
 The whitened version of \_wmos\\
 The calibrated version of \_whiten\\
 The matched-filtered version of \_cal\\
@@ -3737,13 +3737,13 @@ filter output map.
 
 The recipe processes each observation twice, a standard reduction
 first, then a re-run with a fake point source added to the time
-series. This produces a coadded signal map (\_wmos) and a
-coadded PSF map (\_mappsf).
+series. This produces a co-added signal map (\_wmos) and a
+co-added PSF map (\_mappsf).
 
 After the map-maker has completed, the recipe will call
 \xref{\drrecipe{SCUBA2\_JACKKNIFE}}{sun265}{SCUBA2_JACKKNIFE}. This
 routine divides the observations into two groups (odd and even) which
-are coadded and then subtracted to create a jack-knife map. This map
+are co-added and then subtracted to create a jack-knife map. This map
 contains only noise with no contribution from astronomical signal. The
 angular power spectrum of this map is then used to estimate and remove
 the residual 1/\emph{f} noise from the signal map and the PSF map;
@@ -3761,13 +3761,13 @@ You may wish to run the \drrecipe{SCUBA2\_JACKKNIFE} step again
 independently from the pipeline. If your final map does not look as
 expected you might first examine the individual mosaics from the
 pipeline (\_fmos), one of these observations might show visible
-artifacts that you wish to exclude from the coadd. The size of the
+artifacts that you wish to exclude from the co-add. The size of the
 region in the jackknife image which is used to do the whitening step
 is determined automatically, but the method may fail if the box is too
 small.
 
-If you decide to re-run this step you first coadd all the `\_mappsf'
-files to create a coadded PSF using the \picard\ recipe
+If you decide to re-run this step you first co-add all the `\_mappsf'
+files to create a co-added PSF using the \picard\ recipe
 \xref{\drrecipe{MOSAIC\_JCMT\_IMAGES}}{sun265}{MOSAIC_JCMT_IMAGES}.
 \begin{myquote}
 \begin{verbatim}
@@ -3779,7 +3779,7 @@ recipe (\drrecipe{SCUBA2\_JACKKNIFE}) with the following:
 \begin{myquote}
 \begin{verbatim}
 [SCUBA2_JACKKNIFE]
-PSF_MATCHFILTER = <name_of_above_coadded_PSF>.sdf
+PSF_MATCHFILTER = <name_of_above_co-added_PSF>.sdf
 \end{verbatim}
 \end{myquote}
 Another option for this parameter file is `WHITEN\_BOX' to set the
@@ -4010,7 +4010,7 @@ The science pipeline will automate many of the steps discussed in
 \begin{itemize}\itemsep-0.3em
 \item Run the iterative map-maker.
 \item Apply the FCF to calibrate to mJy/beam.
-\item Coadd multiple observations of the same object.
+\item co-add multiple observations of the same object.
 \item Apply the matched-filter if the blank-field configuration file
 has been requested.
 \end{itemize}
@@ -4111,7 +4111,7 @@ found in \pipelinesun.
 
 This is the recipe for processing extended sources, with the
 \texttt{dimmconfig\_bright\_extended.lis} configuration file called by
-\makemap. Multiple observations are coadded and the output
+\makemap. Multiple observations are co-added and the output
 map is calibrated in units of mJy/arcsec$^2$. This recipe also
 performs a source finder routine; the results are written as a FITS
 catalogue (with file extension \texttt{.FIT}) which can be read as a
@@ -4164,14 +4164,14 @@ map-maker.
 
 The pipeline will produce a group file for each object being
 processed. If the pipeline is given data from multiple nights, all
-those data will be included in the group coadd using inverse variance
+those data will be included in the group co-add using inverse variance
 weighting.
 
 The final maps in your output directory will have the suffix
 \texttt{\_reduced}. Maps will be made for individual observations,
 which will start with an \texttt{s} (e.g.
 \texttt{s20120720\_00030\_850\_reduced.sdf}). Group maps, which may contain
-coadded observations from a single night, are also produced which
+co-added observations from a single night, are also produced which
 have the prefix \texttt{gs} (e.g. \texttt{gs20120720\_30\_850\_reduced.sdf}).
 
 \textbf{Note:} A group file is \emph{always} created, even if only a single
@@ -4200,7 +4200,7 @@ options are Simple, Night, Project and Public. Simple (which becomes
 the group file from the pipeline (these may or may not include more
 than one observation; the `Group Members' value will tell you), the
 project option is generated if an entire project has been run through
-the pipeline and identical sources across the project are coadded
+the pipeline and identical sources across the project are co-added
 into master group files.  However, project processing has yet to be
 implemented.
 
