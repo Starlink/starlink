@@ -763,7 +763,7 @@
 \begin{latexonly}
 \addcontentsline{toc}{section}{Acronyms}
 
-%  Heading for glossary if used.
+% ? Heading for glossary if used.
    \vspace{10mm}
    \begin{center}
       {\Large\textbf{Acronyms}}
@@ -1395,8 +1395,8 @@ unaffected.
 \subsubsection{\xlabel{display_cube}Displaying time-series data}
 \label{sec:gaiacube}
 
-Use the \starlink\ application \textsc{Gaia} to visualise the bolometer time
-series data (or indeed \emph{any} SCUBA-2 data file). This is
+Use the \starlink\ application \textsc{Gaia} to visualise the bolometer
+time-series data (or indeed \emph{any} SCUBA-2 data file). This is
 initiated simply typing \texttt{gaia} into a terminal.
 
 \begin{myquote}
@@ -1581,7 +1581,7 @@ These can also be found in in the default parameter file at
 \hline
 \multicolumn{4}{|l|}{\textbf{Pre-Processing - General}}\\
 \hline
-downsampscale & -1 &p &Down-sample to save computer memory and time. Negative value = its
+downsampscale & $-$1 &p &Down-sample to save computer memory and time. Negative value = its
                        magnitude will be multiplied by the PIXSIZE for the
                        requested map.\\
 
@@ -1665,7 +1665,7 @@ com.corr\_abstol  &  0.2 & s &Lower limit of acceptable correlation between a bo
 
 com.gain\_tol & 5  &s& Number of sigma away from mean gain coefficient tolerance\\
 com.gain\_abstol & 3  &s& Maximum absolute ratio between a bolometers gain and the mean gain.\\
-com.gain\_box &-30.0 &s & The number of time slices (or seconds if negative)
+com.gain\_box &$-$30.0 &s & The number of time slices (or seconds if negative)
                           in a box\\
 com.gain\_fgood & 0.25 &s &Minimum fraction of good gain boxes for bolometer not to be rejected. \\
 com.gain\_rat & 4.0  &s&Ratio of the largest gain to the mean gain for a bolometer not to be rejected. \\
@@ -1736,7 +1736,7 @@ ast.zero\_lowhits & 0  &p& Forces the map to zero where the number of samples is
 ast.zero\_snr  & 0 &p & Creates a mask after each iteration based on the S/N of the pixels. Map areas outside this mask will be forced to zero.\\
 ast.zero\_snrlo  & 0 & p& Allows the mask of ast.zero\_snr to expand down an S/N of ast.zero\_snrlo.\\
 ast.zero\_snr\_fwhm & 0 & s&The FWHM by which to smooth the AST mask created by ast.zero\_snr. The map-maker is then run again using this smoothed mask on each iteration.  \\
-ast.zero\_snr\_low &-1.1&s & The value at which to threshold the smooth mask produced by ast.zero\_snr\_fwhm.\\
+ast.zero\_snr\_low &$-$1.1&s & The value at which to threshold the smooth mask produced by ast.zero\_snr\_fwhm.\\
 ast.zero\_union & 1  &p&Details how to combine multiple AST masks. \\
 ast.zero\_freeze & 0 &p & Specifies whether the AST model should be frozen after ast.zero\_freeze number of iterations. \\
 \hline
@@ -2016,7 +2016,7 @@ a correction but, if specified, is used to weight the bolometers on subsequent i
 \hline
 \multicolumn{4}{|l|}{\textbf{Pre-Processing - General}}\\
 \hline
-downsampscale & -1 &p &Down-sample to save computer memory and time. Negative value = its
+downsampscale & $-$1 &p &Down-sample to save computer memory and time. Negative value = its
                        magnitude will be multiplied by the PIXSIZE for the
                        requested map.\\
 
@@ -2078,7 +2078,7 @@ com.corr\_abstol  &  0.2 & s &Lower limit of acceptable correlation between a bo
 
 com.gain\_tol & 5  &s& Number of sigma away from mean gain coefficient tolerance\\
 com.gain\_abstol & 3  &s& Maximum absolute ratio between a bolometers gain and the mean gain.\\
-com.gain\_box &-30.0 &s & The number of time slices (or seconds if negative)
+com.gain\_box &$-$30.0 &s & The number of time slices (or seconds if negative)
                           in a box\\
 com.gain\_fgood & 0.25 &s &Minimum fraction of good gain boxes for bolometer not to be rejected. \\
 com.gain\_rat & 4.0  &s&Ratio of the largest gain to the mean gain for a bolometer not to be rejected. \\
@@ -2121,7 +2121,7 @@ ast.zero\_lowhits & 0  &p& Forces the map to zero where the number of samples is
 ast.zero\_snr  & 0 &p & Creates a mask after each iteration based on the S/N of the pixels. Map areas outside this mask will be forced to zero.\\
 ast.zero\_snrlo  & 0 & p& Allows the mask of ast.zero\_snr to expand down an S/N of ast.zero\_snrlo.\\
 ast.zero\_snr\_fwhm & 0 & s&The FWHM by which to smooth the AST mask created by ast.zero\_snr. The map-maker is then run again using this smoothed mask on each iteration.  \\
-ast.zero\_snr\_low &-1.1&s & The value at which to threshold the smooth mask produced by ast.zero\_snr\_fwhm.\\
+ast.zero\_snr\_low &$-$1.1&s & The value at which to threshold the smooth mask produced by ast.zero\_snr\_fwhm.\\
 ast.zero\_union & 1  &p&Details how to combine multiple AST masks. \\
 ast.zero\_freeze & 0 &p & Specifies whether the AST model should be frozen after ast.zero\_freeze number of iterations. \\
 \hline
@@ -2230,7 +2230,7 @@ looking (as expected) like white noise.}
 \end{figure}
 \end{latexonly}
 
-By default, the final values of these fitted models are {\em not}
+By default, the final values of these fitted models are \emph{not}
 written out to files. However, this can be changed by setting
 \texttt{exportndf} in the configuration file to the list of models
 that you wish to view.
@@ -2567,8 +2567,8 @@ calling the map-maker as this this the default option.
 
 Out of 32 input files, 4 were darks, 8 were fast flats and 20 were science
 Processing data from instrument 'SCUBA-2' for object 'CRL2688' from the
-following observation :
-20120720 #30 scan /shutter
+following observation  :
+  20120720 #30 scan  /shutter
 
 MAKEMAP: Map-maker will use no more than 68401 MiB of memory
 
@@ -2597,7 +2597,7 @@ smf_iteratemap: Continuous chunk 1 / 1 =========
 smf_calc_smoothedwvm: 0.977444 s to calculate unsmoothed WVM tau values
 smf_iteratemap: Iteration 1 / 5 ---------------
 --- Size of the entire data array ------------------------------------------
-bolos : 5120
+bolos  : 5120
 tslices: bnd:0(0.0 min), map:5957(2.6 min), tot:5957(2.6 min)
 Total samples: 30499840
 --- Quality flagging statistics --------------------------------------------
@@ -2685,15 +2685,15 @@ name, UT date and scan number.
 \\ \\
 \textbf{Map dimensions}\\
 Next the basic dimensions of the data being processed are listed near
-the start of the first iteration. The example above has 4\,arcsec pixels
--- the default at 850\,$\mu$m.
+the start of the first iteration. The example above has 4\,arcsec
+pixels---the default at 850$\mu$m.
 \\ \\
 \textbf{Chunking}\\
 \label{box:chunk}
 The map-maker then determines if the raw data should be split and
 processed in more than one chunk. In this map the data is reduced in
 one continuous piece: \param{Continuous chunk 1 / 1}. Chunking is
-where the map-maker processes sub sections of the time-series data
+where the map-maker processes sub-sections of the time-series data
 independently and should be avoided if possible---see the text box
 \begin{latexonly}
 on Page~\pageref{page:text}.
@@ -2870,7 +2870,7 @@ your specification will be made available at CADC. This is
 particularly useful for very large survey-scale projects.
 
 For a more in-depth discussion on running the pipeline and a discussion
-of the various outputs see \cref{section}{sec:pipe}{The SCUBA-2
+of the various outputs see \cref{Section}{sec:pipe}{The SCUBA-2
 Pipeline} or \pipelinesun.
 \clearpage
 
@@ -3024,7 +3024,7 @@ section. Remember to apply the pixel size squared factor if using
 You can apply the FCF using the \picard\ recipe
 CALIBRATE\_SCUBA2\_DATA. By default this will multiply your map by
 1000$\times$\fcfb\ from the start of
-\cref{section}{sec:cmult}{Flux Conversion Factors}. This produces a
+\cref{Section}{sec:cmult}{Flux Conversion Factors}. This produces a
 calibrated map with units of mJy/beam.
 
 You can supply a parameter file if you wish to use a different value
@@ -3587,16 +3587,16 @@ estimated noise levels are preferable.
 Setting \texttt{noi.box\_size} helps remove `scuffs' or other noise
 artifacts you might see in your error map due to a sub-array (or
 arrays) temporarily jumping to a higher noise state. We recommend a
-value of \texttt{noi.box\_size = -15} (i.e. half a sub-scan). As the
-value tends to -1 (one second) we find some of the source signal being
-down-weighted. Higher than this -15 value and the map-maker becomes
+value of \texttt{noi.box\_size~=~$-$15} (i.e. half a sub-scan). As the
+value tends to $-$1 (one second) we find some of the source signal being
+down-weighted. Higher than this $-$15 value and the map-maker becomes
 less sensitive to the higher noise states.
 
 Other parameters you may want to utilise include \texttt{flagfast} and
 \texttt{flagslow}. You may find that setting \texttt{flagfast} to less
-than the default of 1000''/sec will help reduce the effect of any
+than the default of 1000\,arcsec/sec will help reduce the effect of any
 `smearing' of sources (and of noise) in maps, while setting \texttt{flagslow} greater
-than the default of 300''/sec helps to flatten the edges of maps. To
+than the default of 300\,arcsec/sec helps to flatten the edges of maps. To
 determine reasonable values for your dataset you should do \jcmtstate\
 and view the scan speed using \topcat---see
 \cref{Section}{sec:scan}{Displaying scan patterns} for details.
@@ -3668,7 +3668,7 @@ final iteration. This means that the background regions in the map are
 only generated by this single, final iteration.
 
 An alternative to S/N masking is to supply an external mask using the
-\texttt{REF} parameter.  Setting the parameter
+\texttt{REF} parameter. Setting the parameter
 \texttt{ast.zero\_snr\_fwhm} allows you to automate this step for a
 specific case. Here, the map-maker is run once, then the mask
 generated by \texttt{ast.zero\_snr} is smoothed by a Gaussian (of
@@ -3704,7 +3704,8 @@ supplying an external mask. In this example the mask is generated from
 the map produced by an initial run through the map-maker.
 Alternatively maps from other telescopes can be used.
 
-These steps are followed in the example in \cref{Section}{sec:bright_ex}{Extended galactic sources}.
+These steps are followed in the example in
+\cref{Section}{sec:bright_ex}{Extended galactic sources}.
 
 \textbf{(a)} Generate a map covering your region. This may be by simply
 running the map-maker on your data as shown below.
@@ -3949,8 +3950,8 @@ But how can we check if these sources are real?
 \item One option is to split your data into mutually exclusive subsets
   and produce independent maps. Are the highest S/N peaks detected in each of
   them?
-\item A second test is to compare the number of {\em negative} peaks above
-  a given S/N with the number of {\em positive} peaks.
+\item A second test is to compare the number of \emph{negative} peaks above
+  a given S/N with the number of \emph{positive} peaks.
 \end{itemize}
 
 \subsubsection{Example 2 - Advanced pipeline method}
@@ -4079,9 +4080,9 @@ removed in doing so.
 \\ \\
 \textbf{(a) Running the map-maker}\\
 We run the map-maker using \texttt{dimmconfig\_bright\_extended.lis};
-we have also specified a couple of overrides on the command line --
-\texttt{maptol}=0.04 is slightly more stringent than default and
-\texttt{ast.zero\_snrlo = 3} allows the 5\,$\sigma$ mask set by the
+we have also specified a couple of overrides on the command
+line---\texttt{maptol}~=~0.04 is slightly more stringent than default and
+\texttt{ast.zero\_snrlo~=~3} allows the 5\,$\sigma$ mask set by the
 configuration file to grow out to an S/N of 3\,$\sigma$; however, it
 will only expand to include adjacent pixels.
 
@@ -4259,7 +4260,7 @@ interested in running locally.
 \item The QL runs quality assurance checks on the data as it comes in.
 For science data it calculates the noise between 2\,Hz and 10\,Hz,
 along with the NEP and effective NEP, for each 30-second scan. These
-values undergo quality assurance checks to ensure SCUBA-2 is within
+values undergo quality-assurance checks to ensure SCUBA-2 is within
 an acceptable operating range.
 \item The summit pipeline is designed to provide a quick map of the
 data, it does this by running fewer iterations and chunking the data
@@ -5059,7 +5060,7 @@ Analysis of the SCUBA-2 secondary calibrators has allowed calculation
 of the transmission relationships for the SCUBA-2 450\,$\mu$m and
 850\,$\mu$m pass-bands to be determined. Full details of the analysis
 and on-sky calibration methods of SCUBA-2 can be found in Dempsey et
-al.\ (2012)~\cite{dempsey12}\cite{dempsey-spie}.
+al.\ (2013)~\cite{dempsey12}\cite{dempsey-spie}.
 
 Archibald et al. (2002)\,\cite{archibald} describes how the Caltech
 Submillimeter Observatory (CSO) 225\,GHz opacity, $\tau_{225}$,
