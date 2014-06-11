@@ -2780,6 +2780,61 @@ Note that the recipe will also take account of the pixel size when
 applying \fcfa.
 
 
+\subsection{\xlabel{crop}Cropping your map}
+\label{sec:crop}
+
+The nature of the scan patterns results in SCUBA-2 maps significantly
+larger than the requested size. The high noise towards the outer edges
+is a consequence of the scanning pattern. Although this excess data is
+down-weighted during reduction by the map-maker, you may wish to remove
+it before either combining maps (see
+\cref{Section}{sec:coadd}{Co-adding multiple maps}) or publishing your
+map.
+
+You can crop your map to the map-size set in the data header or
+to any requested size of box or circle using the \picard\ recipe
+\param{CROP\_JCMT\_IMAGES}. The centre of the cropping area will
+always be the centre of your map.
+\begin{myquote}
+\begin{verbatim}
+% picard -recpars mypar.lis CROP_JCMT_IMAGES map_cal.sdf
+\end{verbatim}
+\end{myquote}
+The example above includes a parameter file specifying the radius of
+the circle to be extracted (in arcsecs).  The format for the parameter
+file is shown below.
+\begin{center}
+\begin{myquote}
+\begin{verbatim}
+[CROP_JCMT_IMAGES]
+MAP_RADIUS = 1800.0
+\end{verbatim}
+\end{myquote}
+\end{center}
+
+If this parameter file is omitted it will default to a box of sides
+equal to the map size in the header (as requested in the MSB). The
+output from \drrecipe{CROP\_JCMT\_IMAGES} is a file with the suffix
+\texttt{\_crop}. Full details of this recipe can be found in the
+\htmladdnormallink{\textsc{Picard}
+website}{http://www.oracdr.org/oracdr/PICARD}\latex{\footnote{http://www.oracdr.org/oracdr/PICARD}}.
+
+\begin{latexonly}
+\begin{center}
+\begin{fmpage}{0.95\linewidth}
+\vspace{0.1cm}
+TIP: The default crop shape will be a square. Avoid losing good data
+by specifying a circle using the parameter file.
+\end{fmpage}
+\end{center}
+\end{latexonly}
+
+\begin{htmlonly}
+\textbf{TIP: The default crop shape will be a square. Avoid losing
+good data by specifying a circle using the parameter file.\\*\\*}
+\end{htmlonly}
+
+
 \subsection{\xlabel{coadd}Co-adding multiple maps}
 \label{sec:coadd}
 
@@ -2833,7 +2888,7 @@ and is the method followed in this example.
 \begin{fmpage}{0.95\linewidth}
 \vspace{0.1cm}
 
-TIP: The list of file can be the output from {\tt cat}. Note the back quotes in the example.
+TIP: The list of file can be the output from \texttt{cat}. Note the back quotes in the example.
 \newline{\texttt{\% picard MOSAIC\_JCMT\_IMAGES \`{}cat myfiles.txt\`{}}}.
 \vspace{0.1cm}
 \end{fmpage}
@@ -2871,111 +2926,214 @@ REGISTER_Y  = DD:MM:SS.S
 \end{myquote}
 \end{center}
 
-\subsection{\xlabel{noise}Calculating the noise}
 
-These steps apply to the output from the map-maker---either as a
-result of running it manually or using the reduced files downloaded
-from the \htmladdnormallink{JCMT Science
-Archive.}{http://www3.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/jcmt/} One of
-the first checks you can do is to open your map in \gaia\ and check
-the flatness of the background. If it passes visual inspection you
-will want to know what noise level you have reached.
-\\ \\
-If you have not already cropped your map you should do so. The data at
-the edges of the map are considerably noisier due to reduced exposure
-time, so to get an accurate RMS you will need to remove these noisy
-edges---see \cref{Section}{sec:crop}{Cropping your map}.
+\subsection{\xlabel{noise}Sensitivity}
 
-Once cropped, the noise can then be read from the statistics of the
-file. The \Kappa\ command \stats\ may be used for this:
+\subsection{Getting the noise}
+\label{sec:checkrms}
+
+You can use the \picard\ recipe SCUBA2\_CHECK\_RMS get the noise. This
+recipe estimates the RMS from both the map and the NEP and writes out
+the results in a log file called \texttt{log.checkrms}. The parameters written
+to this file are listed in \cref{Appendix}{app:checkrmsparams}{SCUBA2_CHECK_RMS}.
 \begin{myquote}
 \begin{verbatim}
-% stats comp=err order=true 850map_cal_crop
+% picard SCUBA2_CHECK_RMS map.sdf
 \end{verbatim}
 \end{myquote}
-The \param{comp=err} string specifies that the error component of the
-file should be read, while \param{order=true} gives you the median.
-\textbf{The `Pixel mean' and `Pixel median' values are then the mean
-and median RMS for your science map in Jy.}
-
-\textbf{Note:} If you do not use the \param{comp=err} option, the `Standard
-deviation' value will give you a similar result; however, it will be
-slightly higher due to contamination from any sources in your map.
-\\ \\
-\textbf{Visualising the error map}\\
-You can plot the noise or error component of your map using the
-\textsc{Kappa} command \histogram. This allows you to visualise the
-distribution with more ease. Again the \param{comp=err} option is
-used.
+If you have not yet applied an FCF this recipe will apply the
+appropriate default FCF before estimating the noise.
+\\*\\*
+\textbf{Note:} SCUBA2\_CHECK\_RMS can only be run on single
+observations. To get the map noise from a co-add you will have to
+perform the steps below.
+\\*\\*
+\textbf{The steps}\\*
+After applying any necessary FCF, SCUBA2\_CHECK\_RMS simply executes
+the following steps to get the map noise:
+\\*\\*
+(1) Crops the map to remove the noisy edges
 \begin{myquote}
 \begin{verbatim}
-% histogram 850_map_cal_crop comp=err numbin=200 style="color=white"
+% picard CROP_JCMT_IMAGES map_cal.sdf
 \end{verbatim}
 \end{myquote}
-The output is shown in the left-hand panel of \cref{Figure}{fig:bfnoi}{the
-graphics below}.
 
-\myfigduo{sc21_noihist}{sc21_crl2688_err}{}{width=0.47\linewidth}{fig:bfnoi}{3mm}{
-   Error map viewed in two ways}{
-   The error map of the cropped \makemap\ output viewed in two different ways.
-   \textbf{(left)} Histogram of the noise component created using the
-   \textsc{Kappa} command \task{histogram}. \textbf{(right)} Opened with \gaia.
-}
+(2) Runs the \Kappa\ command \histat\ to extract the median value from
+the error component.
+{\begin{myquote}
+\begin{verbatim}
+% histat comp=err map_cal_crop
+\end{verbatim}
+\end{myquote}
 
-It is also useful to view the error map itself to check its
-uniformity. To do this you will need to copy out the error component
-of your map into a new file; this can be done with the \textsc{Kappa} command
-\ndfcopy.
+\begin{latexonly}
+\begin{center}
+\begin{fmpage}{0.95\linewidth}
+\vspace{0.1cm}
+TIP: Use the error component to avoid contamination of the noise
+distribution from bright sources.
+
+\vspace{0.1cm}
+\end{fmpage}
+\end{center}
+\end{latexonly}
+
+\begin{htmlonly}
+\textbf{TIP: Use the error component to avoid contamination of the noise distribution from bright sources.}
+\end{htmlonly}
+
+
+\begin{figure}[b!]
+\begin{center}
+\includegraphics[height=6.5cm]{sc21_noihist}
+\caption[The error map visualised in two ways.]{The error map viewed with \textsc{Kappa}:histogram.}
+\label{fig:noihisto}
+\end{center}
+\end{figure}
+
+\subsection{Map statistics}
+The \Kappa\ commands \histat\ and \stats\ are very similar and both return a range of statistics describing any NDF. In addition to the main data array they can be passed the error (comp=err), variance (comp=var) and quality (comp=qua) arrays (if available).
+
+The reported statistics include the pixel maximum and minimum, standard deviation, number of pixels used and omitted, along with pixel mode, mean and median.
 \begin{myquote}
 \begin{verbatim}
-% ndfcopy 850_map_cal_crop comp=err 850_map_cal_crop_noi
+% stats comp=err map_cal_crop
 \end{verbatim}
 \end{myquote}
-The error file (\texttt{850\_map\_cal\_crop\_noi}) can then be viewed
-with \gaia---see the right-hand panel of \cref{Figure}{fig:bfnoi}{the
-figure above}.
+
+\textbf{Note:} the Standard deviation of the data array will give a similar result to the mean/median of the error array except with additional contamination from sources.
+
+
+\subsection{Viewing the noise histogram}
+You can view a histogram of the error component with the \textsc{Kappa} command \histogram. Again  \param{comp=err} must be specified.
+
+\begin{myquote}
+\begin{verbatim}
+% histogram map_cal_crop comp=err numbin=200  style="color=white"
+\end{verbatim}
+\end{myquote}
+The output is shown in the \cref{Figure}{fig:noihisto}{the figure above}. For more information on the options for \histogram\ see \kappasun.
+
+\begin{figure}[b!]
+\begin{center}
+\includegraphics[width=\linewidth]{sc21_noigaia6}
+\caption[The error map viewed with \gaia.]{The error component displayed with \gaia. After clicking the Error button you will have to rescale your map.}
+\label{fig:noigaia}
+\end{center}
+\end{figure}
+
+
+\subsection{Examining the error map in \gaia}
+It is also useful to view the error map itself. Open your reduced map in \gaia, then select the `Error' button on the `Select NDF in container file' window---see \cref{Figure}{fig:noigaia}{the figure below}. You will need to adjust the scaling to view it properly.
+
+To assess the noise in \gaia\ go to the toolbar on the main page and click on Image-Analysis$>$Image regions. Next select the region shape you would like to check and draw it on your map by clicking and dragging the mouse. Then click the 'Stats selected' button in the `Image regions' window to get a report of the statistics.
+
+\begin{latexonly}
+\begin{center}
+\begin{fmpage}{0.95\linewidth}
+\vspace{0.1cm}
+TIP: You can write out the error component of your map into a new file using the \textsc{Kappa} command \ndfcopy. \% ndfcopy map comp=err map\_err
+\end{fmpage}
+\end{center}
+\end{latexonly}
+
+\begin{htmlonly}
+\textbf{TIP: You can write out the error component of your map into a new file using the \textsc{Kappa} command \ndfcopy. E.g. \% ndfcopy map comp=err map\_err.}
+\end{htmlonly}
+
+\subsection{\xlabel{regridding}Regridding your Data}
+\label{sec:regrid}
+To change the pixel size use the \Kappa\ command \compave. The following example increases the pixel size from 4\,arcsec to 8\,arcsec by using a compress factor of 2.
+\begin{myquote}
+\begin{verbatim}
+% compave map map_regrid 2
+\end{verbatim}
+\end{myquote}
+
+\begin{latexonly}
+\begin{center}
+\begin{fmpage}{0.95\linewidth}
+\vspace{0.1cm}
+TIP: Remember you can use ndftrace if you are unsure of the pixel size.
+\end{fmpage}
+\end{center}
+\end{latexonly}
+
+\begin{htmlonly}
+\textbf{TIP: Remember you can use ndftrace if you are unsure of the pixel size.}
+\end{htmlonly}
+
+%they find that smaller pixels produce higher peak values (due to the smaller pixels producing less smoothing that larger pixels), and also converge faster (due to each pixel needing to be consistent with fewer bolometers). The average noise per pixel is higher for smaller pixels (as expected), and this means that the SNR level used for masking needs to be adjusted to get the same  mask produced using larger pixels.
 
 \subsection{\xlabel{maskshow}Displaying masks}
 \label{sec:maskshow}
 
 Both \texttt{dimmconfig\_bright\_compact.lis} and
 \texttt{dimmconfig\_bright\_extended.lis} configuration files use
-\texttt{AST} model masking by default and you may find it advantageous
-to experiment with different levels and types of masking in your
-reduction. When you do so it is useful to be able to display, and thus
-monitor, the extent of the masked region used by the map-maker. For
-more information on adjusting the making levels or applying masking to
-other models see \cref{Section}{sec:tweak}{Tailoring your Reduction}.
+masking. You can see where any masks were applied by viewing the Quality array in \gaia.
 
-You can see what masks are associated with your map using the \Kappa\
-\showqual\ command.
+First open your map in \gaia. Select the top level NDF from list in
+the pop-up window then click the \texttt{Quality} button. You will need to
+rescale the map to bring out the masks--see figure \ref{fig:qualdisp}.
+
+Each value in the Quality component of an NDF contains 8 "on/off"
+flags used to indicate a specific binary property of the pixel. The
+first three of these flags indicate whether a pixel is inside or outside a
+specific mask (1=AST, 2=FLT or 3=COM).
+
+There are four potential values for the common combination of
+\texttt{AST} and \texttt{FLT} masks:
+\\*\\*
+0 = pixel is inside both FLT and AST mask (i.e. is a source pixel)\\
+1 = pixel is inside AST mask but not FLT mask\\
+2 = pixel is inside FLT mask but not AST mask\\
+3 = pixel is inside neither mask (i.e. is a background pixel)
+\\*\\*
+The maximum quality value increases from 3 to 7 if COM masking is included.
+
+You can see which bit is used for each mask with \showqual.
 \begin{myquote}
 \begin{verbatim}
-% showqual 850_map
+% showqual map count=yes
 \end{verbatim}
 \end{myquote}
-The mask can be viewed by opening the map in \gaia\ and selecting the
-'QUALITY' component of the first NDF in the pop-up window.
 
-If you would like to plot the mask over your map you will need to copy
-out the `QUALITY' component of the data using \texttt{ndfcopy}.
+As an example, you can set bad all pixel outside the FLT mask by doing:
 \begin{myquote}
 \begin{verbatim}
-% ndfcopy comp=qua 850_map 850_map_mask
+% setbb map 2
 \end{verbatim}
 \end{myquote}
-You can then open your map in \gaia\ and contour the mask NDF on top.
-As the levels in the mask file are either 0 or 1, selecting a contour
-level anywhere in between (e.g. 0.5) will show the mask outline---see
+\vspace{0.5cm}
+
+\textbf{Contouring a mask over your map}\\*
+If you would like to plot a mask over your map you will need to copy
+out the `QUALITY' component of the data to a separate file using \texttt{ndfcopy}.
+\begin{myquote}
+\begin{verbatim}
+% ndfcopy comp=qua map map_mask
+\end{verbatim}
+\end{myquote}
+Then open your map in \gaia\ and contour the mask NDF on top. See
 \cref{Figure}{fig:maskdisp}{the figure below}.
 
-\myfig{sc21_dispmask3}{[b!]}{width=0.9\hsize}{fig:maskdisp}{
-   Contouring the AST mask on a map with \gaia}{
+For more information on the use of masks by \makemap\ and the
+parameters that affect them see \cref{Section}{sec:tweak}{Tailoring
+your Reduction}.
+
+\myfig{sc21_qualitygaia}{[t!]}{width=0.9\hsize}{fig:qualdisp}{}{
+   Using \gaia\ to display the mask applied by the map-maker. Select the
+   QUALITY components of your map.
+}
+
+\myfig{sc21_dispmask3}{[b!]}{width=0.95\hsize}{fig:maskdisp}{}{
    Using \gaia\ to display your map with the \texttt{AST} mask used by
    the map-maker contoured on top.
 }
 
-\subsection{\xlabel{match_filter}Point-source extraction---Applying a matched filter}
+
+\subsection{\xlabel{match_filter}Point-source extraction: the matched filter}
 \label{sec:mf}
 
 This effectively fits a single Gaussian point spread function (PSF), centered over
@@ -3010,6 +3168,8 @@ a 15-arcsec Gaussian.
 SMOOTH_FWHM = 15
 \end{verbatim}
 \end{myquote}
+\vspace{0.4cm}
+
 This is a fairly common technique used throughout the extra-galactic
 sub-millimetre community to identify potential sources. A full
 description of the matched filter principle is given in
