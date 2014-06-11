@@ -753,6 +753,48 @@
     \markboth{\stardocname}{\stardocname}
   \end{latexonly}
 % ? End of Latex document table of contents
+
+% -----------------------------------------------------------------------------
+
+%  Glossary
+%  ========
+\newpage
+\begin{latexonly}
+\addcontentsline{toc}{section}{Acronyms}
+
+%  Heading for glossary if used.
+   \vspace{10mm}
+   \begin{center}
+      {\Large\textbf{Acronyms}}
+   \end{center}
+% ? End of heading for glossary.
+
+\setlength{\extrarowheight}{3pt}
+\begin{table}[h!]
+\begin{tabular}{ll}
+\textbf{CADC}   & Canadian Astronomy Data Centre\\
+\textbf{CSO}    & Caltech Submillimetre Observatory\\
+\textbf{DIMM}   & Dynamic Iterative Map-Maker\\
+\textbf{FCF}    & Flux Conversion Factor\\
+\textbf{FITS}   & Flexible Image Transport System\\
+\textbf{FWHM}   & Full-Width at Half-Maximum\\
+\textbf{GAIA}   & Graphical Astronomy and Image Analysis Tool\\
+\textbf{JCMT}   & James Clerk Maxwell Telescope\\
+\textbf{NDF}    & Extensible N-Dimensional Data Format\\
+\textbf{NEFD}   & Noise Equivalent Flux Density\\
+\textbf{PSF}    & Point Spread Function\\
+\textbf{SCUBA-2}& Submillimetre Common User Bolometer Array-2\\
+\textbf{SMURF}  & Sub-Millimetre User Reduction Facility\\
+\textbf{SNR}    & Signal-to-Noise ratio\\
+\textbf{SQUID}  & Superconducting QUantum Interference Device\\
+\textbf{SUN}    & Starlink User Note\\
+\textbf{TES}    & Transition Edge Sensor\\
+\textbf{WVM}    & Water Vapour radioMeter\\
+\end{tabular}
+\end{table}
+
+\end{latexonly}
+
 % -----------------------------------------------------------------------------
 
 \cleardoublepage
@@ -5150,49 +5192,6 @@ into an NDF with the following \convert\ and \Kappa\ commands respectively:
 In this example the file downloaded from the Herschel Science Archive
 is named \texttt{herschelmap.fits}. In the final conversion step this
 is renamed to \texttt{herschelmap\_data.sdf}.
-
-\section{\xlabel{acronyms}List of Acronyms}
-
-\begin{description}
-
-\item[CSO]\quad Caltech Submillimetre Observatory
-
-\item[DIMM]\quad Dynamic Iterative Map-Maker
-
-\item[FCF]\quad Flux Conversion Factor
-
-\item[FWHM]\quad Full-Width at Half-Maximum
-
-\item[GAIA]\quad Graphical Astronomy and Image Analysis Tool
-
-\item[JCMT]\quad James Clerk Maxwell Telescope
-
-\item[KAPPA]\quad Kernel APplication Package
-
-\item[MSB]\quad Minimum  Schedulable Block
-
-\item[NEFD]\quad Noise Equivalent Flux Density
-
-\item[NEP]\quad Noise Equivalent Power
-
-\item[PSF]\quad Point Spread Function
-
-\item[S2SRO]\quad SCUBA-2 Shared Risk Observing
-
-\item[SCUBA]\quad Submillimetre Common User Bolometer Array
-
-\item[SCUBA-2]\quad Submillimetre Common User Bolometer Array-2
-
-\item[SMURF]\quad Sub-Millimetre User Reduction Facility
-
-\item[SNR]\quad Signal-to-Noise ratio
-
-\item[TES]\quad Transition Edge Sensor
-
-\item[WVM]\quad Water Vapour radioMeter
-
-
-\end{description}
 
 \section{\xlabel{par_full}Configuration Parameters: dimmconfig.lis}
 \label{app:par_full}
