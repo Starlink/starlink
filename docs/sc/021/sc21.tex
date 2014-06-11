@@ -2805,6 +2805,7 @@ best method see \xref{SUN/139}{sun139}{}.
 
 An example parameter file like the one below chooses \task{makemos}
 using a 3-$\sigma$ clipping threshold.
+
 \begin{myquote}
 \begin{verbatim}
 [MOSAIC_JCMT_IMAGES]
@@ -2821,56 +2822,54 @@ position of that source can be given and the recipe
 fits a profile to the source and shifts the map accordingly so they
 are all aligned.
 
-\textbf{Note:} If you wish to give \picard\ an input list file you should
-use the \texttt{cat} command with back quotes like so:
-\begin{myquote}
-\begin{verbatim}
-% picard MOSAIC_JCMT_IMAGES `cat listoffiles.txt`
-\end{verbatim}
-\end{myquote}
-
-
 Currently there is no advantage in terms of data quality to reducing
+\texttt{\`{}cat listoffiles.txt`}
 all observations simultaneously or separately. However, the latter
 does allow the option of assessing the individual maps before co-adding
 and is the method followed in this example.
 
-\subsection{\xlabel{crop}Cropping your map}
-\label{sec:crop}
+\begin{latexonly}
+\begin{center}
+\begin{fmpage}{0.95\linewidth}
+\vspace{0.1cm}
 
-The nature of the scan patterns results in SCUBA-2 maps significantly
-larger than the requested size. The high noise towards the outer edges
-is a consequence of the scanning operation (i.e. the telescope moving
-slowly as it reverses direction and reduced integration time) and
-should not be included in your final map.
+TIP: The list of file can be the output from {\tt cat}. Note the back quotes in the example.
+\newline{\texttt{\% picard MOSAIC\_JCMT\_IMAGES \`{}cat myfiles.txt\`{}}}.
+\vspace{0.1cm}
+\end{fmpage}
+\end{center}
+\end{latexonly}
 
-You can crop your map to the map size specified in the data header or
-to any requested size of box or circle using the \picard\ command
-\xref{\param{CROP\_JCMT\_IMAGES}}{sun265}{CROP_JCMT_IMAGES}. The centre
-of the cropping area will always be the centre of your map.
+\begin{htmlonly}
+\textbf{TIP: Use the error component to avoid contamination of the
+noise distribution from bright sources.\\*\\*}
+\end{htmlonly}
+
+\subsection{Registering maps}
+
+You can register a series of SCUBA-2 maps to a common reference
+position using the \picard\ recipe \param{SCUBA2\_REGISTER\_IMAGES}.
+This is only possible if a there is a common, known source that is
+present in \textit{all} of the input maps. This should be done before
+combining your maps.
 \begin{myquote}
 \begin{verbatim}
-% picard -recpars mypar.lis CROP_JCMT_IMAGES 850map_cal.sdf
+% picard -recpars myparams.ini SCUBA2_REGISTER_IMAGES `cat listoffiles.txt`
 \end{verbatim}
 \end{myquote}
-The example above includes a parameter file specifying the radius of
-the circle to be extracted (in arcsecs). The format for the parameter
-file is shown below.
+
+Here the parameter file contains the position of the reference source
+as in the example below. See \picardsun\ for more details.
+\begin{center}
 \begin{myquote}
 \begin{verbatim}
-[CROP_JCMT_IMAGES]
-MAP_RADIUS = 1800.0
+[SCUBA2_REGISTER_IMAGES]
+REGISTER_IMAGES = 1
+REGISTER_X  = HH:MM:SS.S
+REGISTER_Y  = DD:MM:SS.S
 \end{verbatim}
 \end{myquote}
-If this parameter file is omitted it will default to a box of sides
-equal to the map size in the header (as requested in the MSB). Be
-aware that the circular nature of the scan patterns means that good
-data will be lost if you chose a square or rectangular map.
-
-The output from \drrecipe{CROP\_JCMT\_IMAGES} is a file with the suffix
-\texttt{\_crop}. Full details of this recipe can be found in the
-\htmladdnormallink{\textsc{Picard} manual}{http://www.oracdr.org/oracdr/PICARD}
-\latex{\footnote{\texttt{http://www.oracdr.org/oracdr/PICARD}}}.
+\end{center}
 
 \subsection{\xlabel{noise}Calculating the noise}
 
