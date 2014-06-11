@@ -2761,13 +2761,14 @@ section. Remember to apply the pixel size squared factor if using
 \subsubsection{Applying the FCF}
 
 You can apply the FCF using the \picard\ recipe
-CALIBRATE\_SCUBA2\_DATA. By default this will multiply your map by
+\xref{\drrecipe{SCUBA2\_CHECK\_CAL}}{sun265}{CALIBRATE\_SCUBA2\_DATA}.
+By default this will multiply your map by
 1000$\times$\fcfb\ from the start of
 \cref{Section}{sec:cmult}{Flux Conversion Factors}. This produces a
 calibrated map with units of mJy/beam.
 
 You can supply a parameter file if you wish to use a different value
-for the FCF or use \fcfa\. The recipe will write out the calibrated
+for the FCF or use \fcfa. The recipe will write out the calibrated
 file with an \texttt{\_cal} suffix and will change the units in the
 map header.
 
@@ -2793,8 +2794,8 @@ map.
 
 You can crop your map to the map-size set in the data header or
 to any requested size of box or circle using the \picard\ recipe
-\param{CROP\_JCMT\_IMAGES}. The centre of the cropping area will
-always be the centre of your map.
+\xref{\drrecipe{SCUBA2\_CHECK\_CAL}}{sun265}{CROP\_JCMT\_IMAGES}.
+The centre of the cropping area will always be the centre of your map.
 \begin{myquote}
 \begin{verbatim}
 % picard -recpars mypar.lis CROP_JCMT_IMAGES map_cal.sdf
@@ -2852,11 +2853,11 @@ This creates a single output file based on the name of the last file
 in the list, and with a suffix \texttt{\_mos}.
 
 There are a number of options associated with
-\param{MOSAIC\_JCMT\_IMAGES} (see the \textsc{Picard} manual for a full
+\drrecipe{MOSAIC\_JCMT\_IMAGES} (see the \textsc{Picard} manual for a full
 description). However, the main one is choosing between \wcsmosaic\
 (default) and the \ccdpack\ option \makemos\ for the combination
 method. For more information on \task{makemos} and advice on choosing the
-best method see \xref{SUN/139}{sun139}{}.
+best method see \xref{\textbf{SUN/139}}{sun139}{}.
 
 An example parameter file like the one below chooses \task{makemos}
 using a 3-$\sigma$ clipping threshold.
@@ -2903,7 +2904,8 @@ noise distribution from bright sources.\\*\\*}
 \subsection{Registering maps}
 
 You can register a series of SCUBA-2 maps to a common reference
-position using the \picard\ recipe \param{SCUBA2\_REGISTER\_IMAGES}.
+position using the \picard\ recipe
+\xref{\drrecipe{SCUBA2\_CHECK\_CAL}}{sun265}{SCUBA2\_REGISTER\_IMAGES}.
 This is only possible if a there is a common, known source that is
 present in \textit{all} of the input maps. This should be done before
 combining your maps.
@@ -2959,11 +2961,11 @@ the following steps to get the map noise:
 \end{verbatim}
 \end{myquote}
 
-(2) Runs the \Kappa\ command \histat\ to extract the median value from
+(2) Runs the \Kappa\ command \stats\ to extract the median value from
 the error component.
 {\begin{myquote}
 \begin{verbatim}
-% histat comp=err map_cal_crop
+% stats map_cal_crop comp=err order
 \end{verbatim}
 \end{myquote}
 
@@ -2980,71 +2982,106 @@ distribution from bright sources.
 \end{latexonly}
 
 \begin{htmlonly}
-\textbf{TIP: Use the error component to avoid contamination of the noise distribution from bright sources.}
+\textbf{TIP: Use the error component to avoid contamination of the noise
+distribution from bright sources.}
 \end{htmlonly}
 
 
 \begin{figure}[b!]
 \begin{center}
 \includegraphics[height=6.5cm]{sc21_noihist}
-\caption[The error map visualised in two ways.]{The error map viewed with \textsc{Kappa}:histogram.}
+\caption[The error map visualised in two ways.]{
+  The error map viewed with \textsc{Kappa}:histogram.
+}
 \label{fig:noihisto}
 \end{center}
 \end{figure}
 
 \subsection{Map statistics}
-The \Kappa\ commands \histat\ and \stats\ are very similar and both return a range of statistics describing any NDF. In addition to the main data array they can be passed the error (comp=err), variance (comp=var) and quality (comp=qua) arrays (if available).
 
-The reported statistics include the pixel maximum and minimum, standard deviation, number of pixels used and omitted, along with pixel mode, mean and median.
+The \Kappa\ commands \histat\ and \stats\ are very similar and both
+return a range of statistics describing any NDF. In addition to the
+main data array they can be passed the error (\texttt{comp=err}), variance
+(\texttt{comp=var}) and quality (\texttt{comp=qua}) arrays (if available).
+
+The reported statistics include the pixel maximum and minimum,
+standard deviation, number of pixels used and omitted, along with
+pixel mode, mean and median.
 \begin{myquote}
 \begin{verbatim}
 % stats comp=err map_cal_crop
 \end{verbatim}
 \end{myquote}
 
-\textbf{Note:} the Standard deviation of the data array will give a similar result to the mean/median of the error array except with additional contamination from sources.
+\textbf{Note:} the standard deviation of the data array will give a
+similar result to the mean/median of the error array except with
+additional contamination from sources.
 
 
 \subsection{Viewing the noise histogram}
-You can view a histogram of the error component with the \textsc{Kappa} command \histogram. Again  \param{comp=err} must be specified.
+
+You can view a histogram of the error component with the
+\textsc{Kappa} command \histogram. Again \param{comp=err} must be
+specified.
 
 \begin{myquote}
 \begin{verbatim}
-% histogram map_cal_crop comp=err numbin=200  style="color=white"
+% histogram map_cal_crop comp=err numbin=200 style="color=white"
 \end{verbatim}
 \end{myquote}
-The output is shown in the \cref{Figure}{fig:noihisto}{the figure above}. For more information on the options for \histogram\ see \kappasun.
+The output is shown in the \cref{Figure}{fig:noihisto}{the figure
+above}. For more information on the options for \histogram\ see
+\kappasun.
 
 \begin{figure}[b!]
 \begin{center}
 \includegraphics[width=\linewidth]{sc21_noigaia6}
-\caption[The error map viewed with \gaia.]{The error component displayed with \gaia. After clicking the Error button you will have to rescale your map.}
+\caption[The error map viewed with \gaia.]{
+   The error component displayed with \gaia. After clicking the
+   \texttt{Error} button you will have to rescale your map.
+}
 \label{fig:noigaia}
 \end{center}
 \end{figure}
 
 
-\subsection{Examining the error map in \gaia}
-It is also useful to view the error map itself. Open your reduced map in \gaia, then select the `Error' button on the `Select NDF in container file' window---see \cref{Figure}{fig:noigaia}{the figure below}. You will need to adjust the scaling to view it properly.
+\subsection{Examining the error map in GAIA}
 
-To assess the noise in \gaia\ go to the toolbar on the main page and click on Image-Analysis$>$Image regions. Next select the region shape you would like to check and draw it on your map by clicking and dragging the mouse. Then click the 'Stats selected' button in the `Image regions' window to get a report of the statistics.
+It is also useful to view the error map itself. Open your reduced map
+in \gaia, then select the \texttt{Error} button on the \texttt{Select NDF in
+container file} window---see \cref{Figure}{fig:noigaia}{the figure
+below}. You will need to adjust the scaling to view the error map properly.
+
+To assess the noise in \gaia\ go to the toolbar on the main page and
+click on Image-Analysis$\Rightarrow$Image regions. Next select the region shape
+you would like to check and draw it on your map by clicking and
+dragging the mouse. Then click the \texttt{Stats selected} button in the
+\texttt{Image regions} window to get a report of the statistics.
 
 \begin{latexonly}
 \begin{center}
 \begin{fmpage}{0.95\linewidth}
 \vspace{0.1cm}
-TIP: You can write out the error component of your map into a new file using the \textsc{Kappa} command \ndfcopy. \% ndfcopy map comp=err map\_err
+
+TIP: You can write out the error component of your map into a new file
+using the \textsc{Kappa} command \ndfcopy. \newline
+\texttt{         \% ndfcopy map comp=err map\_err}
 \end{fmpage}
 \end{center}
 \end{latexonly}
 
 \begin{htmlonly}
-\textbf{TIP: You can write out the error component of your map into a new file using the \textsc{Kappa} command \ndfcopy. E.g. \% ndfcopy map comp=err map\_err.}
+\textbf{TIP: You can write out the error component of your map into a new file
+using the \textsc{Kappa} command \ndfcopy.  For example
+\texttt{\% ndfcopy map comp=err map\_err}.}
 \end{htmlonly}
 
 \subsection{\xlabel{regridding}Regridding your Data}
 \label{sec:regrid}
-To change the pixel size use the \Kappa\ command \compave. The following example increases the pixel size from 4\,arcsec to 8\,arcsec by using a compress factor of 2.
+
+To change the pixel size use the \Kappa\ command \compave. The following example
+increases the pixel size from 4\,arcsec to 8\,arcsec by using a
+compression factor of 2.
 \begin{myquote}
 \begin{verbatim}
 % compave map map_regrid 2
@@ -3055,13 +3092,13 @@ To change the pixel size use the \Kappa\ command \compave. The following example
 \begin{center}
 \begin{fmpage}{0.95\linewidth}
 \vspace{0.1cm}
-TIP: Remember you can use ndftrace if you are unsure of the pixel size.
+TIP: Remember you can use \ndftrace\ if you are unsure of the pixel size.
 \end{fmpage}
 \end{center}
 \end{latexonly}
 
 \begin{htmlonly}
-\textbf{TIP: Remember you can use ndftrace if you are unsure of the pixel size.}
+\textbf{TIP: Remember you can use \ndftrace\ if you are unsure of the pixel size.}
 \end{htmlonly}
 
 %they find that smaller pixels produce higher peak values (due to the smaller pixels producing less smoothing that larger pixels), and also converge faster (due to each pixel needing to be consistent with fewer bolometers). The average noise per pixel is higher for smaller pixels (as expected), and this means that the SNR level used for masking needs to be adjusted to get the same  mask produced using larger pixels.
@@ -3077,29 +3114,29 @@ First open your map in \gaia. Select the top level NDF from list in
 the pop-up window then click the \texttt{Quality} button. You will need to
 rescale the map to bring out the masks--see figure \ref{fig:qualdisp}.
 
-Each value in the Quality component of an NDF contains 8 "on/off"
+Each value in the Quality component of an NDF contains eight ``on/off''
 flags used to indicate a specific binary property of the pixel. The
 first three of these flags indicate whether a pixel is inside or outside a
-specific mask (1=AST, 2=FLT or 3=COM).
+specific mask (1=\texttt{AST}, 2=\texttt{FLT} or 3=\texttt{COM}).
 
 There are four potential values for the common combination of
 \texttt{AST} and \texttt{FLT} masks:
 \\*\\*
-0 = pixel is inside both FLT and AST mask (i.e. is a source pixel)\\
-1 = pixel is inside AST mask but not FLT mask\\
-2 = pixel is inside FLT mask but not AST mask\\
+0 = pixel is inside both \texttt{FLT} and \texttt{AST} mask (i.e. is a source pixel)\\
+1 = pixel is inside \texttt{AST} mask but not \texttt{FLT} mask\\
+2 = pixel is inside \texttt{FLT} mask but not \texttt{AST} mask\\
 3 = pixel is inside neither mask (i.e. is a background pixel)
 \\*\\*
-The maximum quality value increases from 3 to 7 if COM masking is included.
+The maximum quality value increases from 3 to 7 if \texttt{COM} masking is included.
 
 You can see which bit is used for each mask with \showqual.
 \begin{myquote}
 \begin{verbatim}
-% showqual map count=yes
+% showqual map count
 \end{verbatim}
 \end{myquote}
 
-As an example, you can set bad all pixel outside the FLT mask by doing:
+As an example, you can set bad all pixel outside the \texttt{FLT} mask by doing:
 \begin{myquote}
 \begin{verbatim}
 % setbb map 2
@@ -3109,7 +3146,7 @@ As an example, you can set bad all pixel outside the FLT mask by doing:
 
 \textbf{Contouring a mask over your map}\\*
 If you would like to plot a mask over your map you will need to copy
-out the `QUALITY' component of the data to a separate file using \texttt{ndfcopy}.
+out the QUALITY component of the data to a separate file using \texttt{ndfcopy}.
 \begin{myquote}
 \begin{verbatim}
 % ndfcopy comp=qua map map_mask
@@ -3203,12 +3240,12 @@ There are also tools that allow you to inspect the configuration
 parameters in more detail. One of these is the \smurf\ command
 \configmeld. This task requires a visual-differences tool to
 be installed on your machine; those currently recognised are
-\htmladdnormallink{meld}{http://meldmerge.org/}\latex{\footnote{\texttt{http://meldmerge.org/}}},
-\htmladdnormallink{opendiff}{http://developer.apple.com/},
-\htmladdnormallink{diffmerge}{http://www.sourcegear.com/diffmerge},
-\htmladdnormallink{kdiff3}{http://kdiff3.sourceforge.net},
-\htmladdnormallink{tkdiff}{http://sourceforge.net/projects/tkdiff},
-\htmladdnormallink{diffuse}{http://diffuse.sourceforge.net},
+\htmladdnormallink{\texttt{meld}}{http://meldmerge.org/}\latex{\footnote{\texttt{http://meldmerge.org/}}},
+\htmladdnormallink{\texttt{opendiff}}{http://developer.apple.com/},
+\htmladdnormallink{\texttt{diffmerge}}{http://www.sourcegear.com/diffmerge},
+\htmladdnormallink{\texttt{kdiff3}}{http://kdiff3.sourceforge.net},
+\htmladdnormallink{\texttt{tkdiff}}{http://sourceforge.net/projects/tkdiff},
+\htmladdnormallink{\texttt{diffuse}}{http://diffuse.sourceforge.net},
 and are searched for in that order. It will compare the
 configuration parameters for two reduced maps or configuration files
 (which can be mixed and matched). The follow example illustrates two
