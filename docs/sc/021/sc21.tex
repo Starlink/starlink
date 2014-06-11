@@ -3881,6 +3881,7 @@ a different dataset, e.g. a
 \clearpage
 \section{\xlabel{pipeline}The SCUBA-2 Pipeline}
 \label{sec:pipe}
+
 \subsection{\xlabel{pl_overview}Pipeline overview}
 
 SCUBA-2 data reduction pipelines have been developed based on the
@@ -3888,8 +3889,7 @@ existing \oracdr\ pipeline (Cavanagh et al., 2008\cite{oracdr}) used
 for ACSIS. There are three distinct pipelines currently utilised by
 SCUBA-2: two of these, the quick-look (QL) and summit pipelines, are
 run in real time at the JCMT during data acquisition; the third, the science
-pipeline, offers a comprehensive reduction which users will be
-interested in running locally.
+pipeline, offers a comprehensive reduction, which users can run locally.
 
 \begin{itemize}
 \item The QL runs quality assurance checks on the data as it comes in.
@@ -3913,110 +3913,59 @@ while the pipeline software comes as part of the \starlink\ suite.
 
 
 \subsection{\xlabel{science_pl}The Science Pipeline}
+
 The science pipeline will automate many of the steps discussed in
 \cref{Section}{sec:maps}{Reducing your data}:
 \vspace{-0.3cm}
 \begin{itemize}\itemsep-0.3em
 \item Run the iterative map-maker.
 \item Apply the FCF to calibrate to mJy/beam.
-\item co-add multiple observations of the same object.
-\item Apply the matched-filter if the blank-field configuration file
-has been requested.
+\item Co-add multiple observations of the same object.
+\item Apply the matched-filter (blank-field configuration file only)
+\item Run a source finding algorithm.
 \end{itemize}
-
-\subsection{\xlabel{running_pl}Running the Science Pipeline}
-\label{sec:runpl}
-\begin{minipage}[t]{0.05\linewidth}
-\textbf{(1)}
-\end{minipage}
-\begin{minipage}[t]{0.95\linewidth}
-The first step is to initialise the pipeline software. This is simply done by:
-\begin{myquote}
-\begin{verbatim}
-% oracdr_scuba2_850 -cwd
-
-\end{verbatim}
-\end{myquote}
-\end{minipage}
-
-\begin{minipage}[t]{0.05\linewidth}
-\textbf{(2)}
-\end{minipage}
-\begin{minipage}[t]{0.95\linewidth}
-Next there are a few environment variables that must be defined to
-ensure the data is read from and written to the right places. Many are
-set automatically when the pipeline is initialised but others must be
-set manually. Details of the optional variables are given in
-\pipelinesun\ but the three mandatory ones are:
-\begin{itemize}\itemsep-0.1em
-\item \param{STARLINK\_DIR}: Location of your Starlink installation.
-\item \param{ORAC\_DATA\_IN}: The location where the data should be read from.
-If you are supplying a text file listing the raw data this should be the
-location of that file.
-\item \param{ORAC\_DATA\_OUT}: The location where the data products should be
-written. Also used as the location for a user-specified configuration file.\\
-\end{itemize}
-\end{minipage}
-
-\begin{minipage}[t]{0.05\linewidth}
-\textbf{(3)}
-\end{minipage}
-\begin{minipage}[t]{0.95\linewidth}
-You can find out which recipe has been assigned to your raw data via
-the \texttt{RECIPE} parameter in the FITS header in any of your raw
-files. This is the recipe which will selected automatically by the
-pipeline for the reduction. For example:
-\begin{myquote}
-\begin{verbatim}
-% fitsval s8a20120725_00045_0003.sdf RECIPE
-\end{verbatim}
-\end{myquote}
-
-If you wish to supply a modified configuration file (in the examples
-below called \texttt{myconfigfile.lis}) you should create a parameter
-file (in the examples below called \texttt{mypars.ini}) which follows
-the \picard\ format. However, instead of a \picard\ command name, you
-insert the reduction recipe name assigned to your data and the new
-configuration filename as the \texttt{MAKEMAP\_CONFIG} option. For
-example, \texttt{mypars.ini} contains the following:
-
-\begin{myquote}
-\begin{verbatim}
-[REDUCE_SCAN]
-MAKEMAP_CONFIG = myconfigfile.lis
-
-\end{verbatim}
-\end{myquote}
-
-\end{minipage}
-
-\begin{minipage}[t]{0.05\linewidth}
-\textbf{(4)}
-\end{minipage}
-\begin{minipage}[t]{0.95\linewidth}
-Now you are ready to run the pipeline command, this example we use the
-\texttt{-recpars} option to specify parameter file from which call an
-external parameter file to call our modified configuration file:
-\begin{myquote}
-\begin{verbatim}
-% oracdr -loop file -files inputlist.txt -log xf -recpars mypars.ini
-\end{verbatim}
-\end{myquote}
-\end{minipage}
 
 \subsection{\xlabel{pl_output}Pipeline recipes}
 \label{sec:recipes}
 
-Outlined below are the four primary \oracdr\ recipes observers are
-likely to require.  The first three cover reducing science maps using
-\texttt{makemap} and the specialised configuration files discussed in
-\cref{Section}{sec:config}{Specialised configuration files}. The last
-recipe, ASSESS\_DATA\_NOISE, is a diagnostic routine rather than a
-reduction one. A complete description of all these recipes can be
-found in \pipelinesun.
+When MSBs are created, the PI can select a pipeline recipe to assign
+to the data. When the data is run through the science pipeline this
+recipe is used by default. This recipe can overridden on the command
+line---see \cref{Section}{sec:parameterfile}{Changing the defaults}.
 
+Described below are the five main \oracdr\ science recipes.
+
+\subsection{\xlabel{extsources}REDUCE\_SCAN}
+\vspace{-0.3cm}
+\textbullet\ Configuration file: \texttt{dimmconfig.lis}
+
+This recipe uses the default configuration file for \makemap, unless
+the sources is identified as a calibrator. After all observations have
+been processed the data is co-added and calibrated using the default
+FCF.  The noise and NEFD properties for the co-add are calculated and
+written to log files (log.noise and log.nefd respectively). Finally,
+the \cupid\ task \findclumps\ is run using the fellwalker algorithm to
+create a source catalogue.
+
+For calibrators, dimmconfig\_bright\_compact.lis is used and FCFs are
+derived from the map.
+
+
+\subsubsection{\xlabel{extsources}REDUCE\_SCAN\_CHECKRMS}
+\vspace{-0.3cm}
+\textbullet\  Configuration file = \texttt{dimmconfig.lis}
+
+This recipe is the same as REDUCE\_SCAN, but includes extra
+performance estimations determined by SCUBA2\_CHECK\_RMS (see
+\cref{Section}{sec:checkrms}{Getting the noise}). These extra metrics
+are written to a log file log.checkrms. The advantage of running
+SCUBA2\_CHECK\_RMS in the pipeline rather than as a standalone
+\picard\ recipe is that is able to calculate results for co-added
+files.
 
 \subsubsection{\xlabel{extsources}REDUCE\_SCAN\_EXTENDED\_SOURCES}
+\vspace{-0.3cm}
+\textbullet\  Configuration file = \texttt{dimmconfig\_bright\_extended.lis}
 
 This is the recipe for processing extended sources, with the
 \texttt{dimmconfig\_bright\_extended.lis} configuration file called by
@@ -4027,6 +3976,8 @@ catalogue (with file extension \texttt{.FIT}) which can be read as a
 local catalogue into \gaia.
 
 \subsubsection{\xlabel{faint}REDUCE\_SCAN\_FAINT\_POINT\_SOURCES}
+\vspace{-0.3cm}
+\textbullet\  Configuration file = \texttt{dimmconfig\_blank\_field.lis}
 
 This is the recipe for processing maps containing faint compact
 sources. This time the configuration file called by \texttt{makemap}
@@ -4039,6 +3990,8 @@ as a FITS catalogue (with file extension \texttt{.FIT}) which can be
 read as a local catalogue into \gaia.
 
 \subsubsection{\xlabel{faintjk}FAINT\_POINT\_SOURCES\_JACKKNIFE}
+\vspace{-0.3cm}
+\textbullet\  Configuration file = \texttt{dimmconfig\_blank\_field.lis}
 
 This recipe uses a jack-knife method to remove residual low-spatial
 frequency noise and create an optimal matched-filtered output map. The
@@ -4053,23 +4006,119 @@ are calibrated in mJy/beam using a corrected FCF. See
 \cref{Section}{sec:jk}{Example 2 - Advanced pipeline method} for a
 more-detailed description of this recipe and the files produced.
 
-\subsubsection{\xlabel{assessnoise}ASSESS\_DATA\_NOISE}
+\section{Changing the defaults}
+\label{sec:parameterfile}
+\subsection{Changing the pipeline recipe}
+You can override the recipe set in the header by listing any different
+one on the command line when starting \oracdr. For example
+\begin{myquote}
+\begin{verbatim}
+% oracdr -file mylist -loop file -log x REDUCE_SCAN_CHECKRMS
+\end{verbatim}
+\end{myquote}
 
-This recipe is designed to provide a simple assessment of the noise
-properties of your data. It calculates the noise for either the first
-on-sky data file (default) or for the entire time stream. The results
-are passed through the same quality-assurance checks as performed by
-the quick-look pipeline and a log files is written out (of the form
-log.scinoise850). This log file reports the noise or weighted NEP and
-number of bolometers. The formatting is designed to allow easy
-plotting of any of these parameters vs time or sub-scan using \topcat\
-for each subarray. The recipe also writes out other files ---
-\texttt{log.bolonoise}, \texttt{index.noise} and \texttt{index.nep}.
-From these files it will be possible to determine which files failed
-the QA tests, and you may wish to exclude from the input list to the
-map-maker.
+You can find out which recipe is set in the data header via the FITS
+header \texttt{RECIPE} parameter in any of your raw files.  For
+example both of these options will return the same result:
+\begin{myquote}
+\begin{verbatim}
+% fitsval s8a20120725_00045_0003.sdf RECIPE
+% fitslist s8a20120725_00045_0003.sdf | grep RECIPE
+\end{verbatim}
+\end{myquote}
 
-\subsection{\xlabel{pl_output}Pipeline output}
+\subsection{Changing the configuration file}
+
+Although each recipe calls one of the standard configuration files the
+user can specify their own. You will need to create a recipe parameter
+file. This file will contain set the parameter MAKEMAP\_CONFIG to be
+your new configuration file. This must be preceded by the recipe name
+used in the reduction.
+
+For example, to run the pipeline with REDUCE\_SCAN\_CHECKRMS but your
+own configuration file (\texttt{myconfig.lis}), the recipe parameter file
+(named \texttt{mypars.ini}) will look like this:
+\begin{center}
+\vspace{0.2cm}
+\begin{myquote}
+\begin{verbatim}
+[REDUCE_SCAN_CHECKRMS]
+MAKEMAP_CONFIG = myconfig.lis
+\end{verbatim}
+\end{myquote}
+\vspace{0.4cm}
+\end{center}
+Then run the pipeline calling the parameter file via the -recpars option.
+\begin{myquote}
+\begin{verbatim}
+% oracdr -file mylist -loop file -log x -recpars=myparams.ini REDUCE_SCAN_CHECKRMS
+\end{verbatim}
+\end{myquote}
+
+
+\section{\xlabel{running_pl}Running the Science Pipeline}
+\label{sec:plsteps}
+
+\begin{minipage}[t]{0.15\linewidth}
+\textbf{Step 1:}
+\end{minipage}
+\begin{minipage}[t]{0.85\linewidth}
+\textbf{Initialise ORAC-DR} \\This is simply done by:
+\begin{myquote}
+\begin{verbatim}
+% oracdr_scuba2_850 -cwd
+\end{verbatim}
+\end{myquote}
+\end{minipage}
+
+\begin{minipage}[t]{0.15\linewidth}
+\textbf{Step 2:}
+\end{minipage}
+\begin{minipage}[t]{0.85\linewidth}
+\textbf{Set environment variables}. \\These ensure the data is read
+from and written to the right places. Many are set automatically when
+the pipeline is initialised but others must be set manually. Details
+of the optional variables are given in \pipelinesun\ but the three
+main ones are:
+\begin{itemize}\itemsep-0.1em
+\item \param{STARLINK\_DIR}: Location of your Starlink installation.
+\item \param{ORAC\_DATA\_IN}: The location where the data should be read from.
+If you are supplying a text file listing the raw data this should be the
+location of that file.
+\item \param{ORAC\_DATA\_OUT}: The location where the data products should be
+written. Also used as the location for a user-specified configuration file.\\
+\end{itemize}
+\end{minipage}
+
+\begin{minipage}[t]{0.15\linewidth}
+\textbf{Step 3:}
+\end{minipage}
+\begin{minipage}[t]{0.85\linewidth}
+\textbf{(Optional) Create your personalised configuration file and/or parameter file.} \\
+See \cref{Section}{sec:parameterfile}{Changing the defaults} for
+details. In this example we check the RECIPE parameter and find the
+recipe REDUCE\_SCAN is assigned to our data. We are happy with the
+steps in this recipe but want to supply a new configuration file. To
+do so we create a parameter file called \texttt{mypars.ini}.\\*
+
+\end{minipage}
+
+
+\begin{minipage}[t]{0.15\linewidth}
+\textbf{Step 4:}
+\end{minipage}
+\begin{minipage}[t]{0.85\linewidth}
+\textbf{Run the pipeline.} \\Run the pipeline using the
+\texttt{-recpars} option to specify a parameter file if required.
+\begin{myquote}
+\begin{verbatim}
+% oracdr -loop file -files inputlist.txt -log xf -recpars mypars.ini
+\end{verbatim}
+\end{myquote}
+\end{minipage}
+
+
+\section{\xlabel{pl_output}Pipeline output}
 
 The pipeline will produce a group file for each object being
 processed. If the pipeline is given data from multiple nights, all
@@ -4099,10 +4148,6 @@ are made available to PIs and co-Is through the CADC interface
 To access proprietary data you will need to have your CADC username
 registered by the JAC and thereby associated with the project code.
 
-When searching the JCMT Science Archive, be sure to select the correct
-search option from the `JSA Queries' tab. Here you can select public
-versus proprietary, raw versus reduced, and SCUBA-2 versus ACSIS data.
-
 An important search option to be aware of is `Group Type', where your
 options are Simple, Night, Project and Public. Simple (which becomes
 `obs' on the result page) is an individual observation; night means
@@ -4110,12 +4155,9 @@ the group file from the pipeline (these may or may not include more
 than one observation; the `Group Members' value will tell you), the
 project option is generated if an entire project has been run through
 the pipeline and identical sources across the project are co-added
-into master group files.  However, project processing has yet to be
-implemented.
-
+into master group files.
 
 \clearpage
-
 
 \begin{thebibliography}{}
 \addcontentsline{toc}{section}{References}
