@@ -1375,7 +1375,7 @@ plus noise. A list of the modelled components can be seen in
 reduction.} This file instructs the map-maker on the pre-processing
 steps, which components to iteratively model, the parameters to use
 when doing so, and finally the stopping (or convergence) criteria.
-There is a single `master' configuration
+There is a single `master' configuration 
 file called \texttt{dimmconfig.lis}. A copy of this file is available in
 \cref{Appendix}{app:dimm}{an appendix}.
 
@@ -4247,6 +4247,7 @@ SCUBA-2 Data Reduction document SC2/ANA/S210/005
 \newpage
 \appendix
 
+\newpage
 \section{\xlabel{app_clean}Cleaning the Raw Data}
 \label{app:clean}
 
@@ -4351,316 +4352,7 @@ default configuration files like so:
 \end{myquote}
 Or you can create your own customised configuration file. All the
 pre-processing options that may be specified are listed and described
-in \texttt{dimmconfig.lis}---see \cref{Appendix}{app:par_full}{here}.
-
-\newpage
-\section{\xlabel{special}Specialised Configuration Files}
-\label{app:special}
-
-\subsection{dimmconfig\_bright\_extended.lis}
-\begin{myquote}
-\begin{verbatim}
-#  Name:
-#     dimmconfig_bright_extended.lis
-
-#  Purpose:
-#     A MAKEMAP configuration suitable for bright extended sources .
-
-#  Description:
-#     This file provides values for parameters used by the SMURF:MAKEMAP
-#     command to control the details of the map-making algorithm. To
-#     use it, assign it to the CONFIG parameter on the command line when
-#     running MAKEMAP. For instance:
-#
-#     % makemap config=^/star/share/smurf/dimmconfig_bright_compact.lis
-#
-#     (substitute the path to your Starlink installation in place of
-#     "/star").
-#
-#     For bright extended regions we turn on AST zero-masking based on a map
-#     pixel S/N threshold of 5-sigma. This prevents ringing around bright
-#     sources, but will completely flatten the map in low-S/N regions.
-
-#  Notes:
-#     - This file inherits the parameter values defined in file
-#     /star/share/smurf/dimmconfig.lis.
-#     - For a full list of all available parameters, and their purposes,
-#     see the file $SMURF_DIR/smurf_makemap.def. All available parameters
-#     are also documented in SUN/258, appendix "Configuration Parameters".
-#     - A single parameter can be given different values to use when
-#     processing 450 or 850 um data. This is done by including the
-#     parameter twice, prefixing the parameter name with "450." and "850."
-
-#  Authors:
-#     HP: Harriet Parsons (JAC, Hawaii)
-#     DSB: David Berry (JAC, Hawaii)
-
-#  History:
-#     12-FEB-2013 (HP):
-#        General tidy.
-#     14-FEB-2013 (DSB):
-#        Use a standard prologue format. Re-instated comments describing
-#        rationale for each value.
-#-
-
-#  Inherit the values defined in the parent dimmconfig file
-   ^$STARLINK_DIR/share/smurf/dimmconfig.lis
-
-   numiter=-40
-   flt.filt_edge_largescale=600
-   ast.zero_snr = 5
-\end{verbatim}
-\end{myquote}
-
-\subsection{dimmconfig\_bright\_compact.lis}
-\begin{myquote}
-\begin{verbatim}
-#  Name:
-#     dimmconfig_bright_compact.lis
-
-#  Purpose:
-#     A MAKEMAP configuration suitable for bright isolated compact sources .
-
-#  Description:
-#     This file provides values for parameters used by the SMURF:MAKEMAP
-#     command to control the details of the map-making algorithm. To
-#     use it, assign it to the CONFIG parameter on the command line when
-#     running MAKEMAP. For instance:
-#
-#     % makemap config=^/star/share/smurf/dimmconfig_bright_compact.lis
-#
-#     (substitute the path to your Starlink installation in place of
-#     "/star").
-#
-#     The strategy provided by this configuration is aimed at short scans
-#     of calibrators (which may be quite bright). We constrain the map
-#     using ast.zero_circle=(0.01666), which sets all pixels beyond 60
-#     arcsec to zero until the last iteration.  A word of warning: if
-#     the source is near the edge of the map (or has an extent large than
-#     the size of this mask!) this configuration may give odd results due
-#     to the value of ast.zero_lowhits!  If you suspect a problem, compare
-#     the location of the source with the zero-masked pixels (see QUALITY
-#     component of the resulting map). If the mask overlaps with the source,
-#     try modifying the radius.
-
-#  Notes:
-#     - This file inherits the parameter values defined in hidden file
-#     /star/share/smurf/.dimmconfig_bright.lis (note the dot at the start
-#     of the file name).
-#     - For a full list of all available parameters, and their purposes,
-#     see the file $SMURF_DIR/smurf_makemap.def. All available parameters
-#     are also documented in SUN/258, appendix "Configuration Parameters".
-#     - A single parameter can be given different values to use when
-#     processing 450 or 850 um data. This is done by including the
-#     parameter twice, prefixing the parameter name with "450." and "850."
-
-#  Authors:
-#     HP: Harriet Parsons (JAC, Hawaii)
-#     DSB: David Berry (JAC, Hawaii)
-
-#  History:
-#     12-FEB-2013 (HP):
-#        General tidy.
-#     12-FEB-2013 (DSB):
-#        Use a standard prologue format. Re-instated comments describing
-#        rationale for each value.
-#-
-#  Inherit the values defined in the parent dimmconfig file
-   ^$STARLINK_DIR/share/smurf/.dimmconfig_bright.lis
-
-   numiter=-40
-
-#  Per array common-mode should be fine here since we are dealing with
-#  a compact source. It seems to make things more stable.
-   com.perarray = 1
-
-#  We can get away with harsher filtering since the boundary conditions are
-#  quite tight
-   flt.filt_edge_largescale=200
-
-#  Use boundary constraints since the source is assumed to be isolated
-   ast.zero_circle = (0.0166666666)
-
-#  Mask the data when forming th FLT model in order to exclude the
-#  source. This only happends on the first two iterations. This usually
-#  speeds up convergence.
-   flt.zero_circle = (0.0166666666)
-\end{verbatim}
-\end{myquote}
-
-\subsection{dimmconfig\_blank\_field.lis}
-\begin{myquote}
-\begin{verbatim}
-#  Name:
-#     dimmconfig_bright_compact.lis
-
-#  Purpose:
-#     A MAKEMAP configuration suitable for deep scans of blank fields.
-
-#  Description:
-#     This file provides values for parameters used by the SMURF:MAKEMAP
-#     command to control the details of the map-making algorithm. To
-#     use it, assign it to the CONFIG parameter on the command line when
-#     running MAKEMAP. For instance:
-#
-#     % makemap config=^/star/share/smurf/dimmconfig_blank_field.lis
-#
-#     (substitute the path to your Starlink installation in place of
-#     "/star").
-#
-#     This config is aimed primarily at reducing blank fields -- extremely
-#     deep observations for detecting the individual point sources that
-#     produce the cosmic infrared background.
-#
-#     Since there are no bright objects, a single high-pass filter
-#     is applied at the start, and no other iterative filtering is
-#     performed. A harsher high-pass filter is applied than in the
-#     default configuration since no appreciable large-scale structure
-#     is expected.
-
-#  Notes:
-#     - This file inherits the parameter values defined in file
-#     /star/share/smurf/dimmconfig.lis.
-#     - For a full list of all available parameters, and their purposes,
-#     see the file $SMURF_DIR/smurf_makemap.def. All available parameters
-#     are also documented in SUN/258, appendix "Configuration Parameters".
-#     - A single parameter can be given different values to use when
-#     processing 450 or 850 um data. This is done by including the
-#     parameter twice, prefixing the parameter name with "450." and "850."
-
-#  Authors:
-#     HP: Harriet Parsons (JAC, Hawaii)
-#     DSB: David Berry (JAC, Hawaii)
-
-#  History:
-#     12-FEB-2013 (HP):
-#        General tidy.
-#     14-FEB-2013 (DSB):
-#        Use a standard prologue format. Re-instated comments describing
-#        rationale for each value.
-#-
-
-#  Inherit the values defined in the parent dimmconfig file
-   ^$STARLINK_DIR/share/smurf/dimmconfig.lis
-
-   numiter = 4
-
-#  No FLT model is needed since we are filtering out low frequencies as
-#  part of the initial cleaning process.
-   modelorder = (com,ext,ast,noi)
-
-#  Use time-domain de-spiker first because we are only doing a single
-#  FFT-based high-pass filter before the iterations start.
-   spikethresh = 10
-
-#  Heavier high-pass filtering. Note that the default padding/apodization
-#  that will be used is the number of samples that corresponds to the
-#  period of the knee frequency in the high-pass filter (i.e. 200*(1/freq) )
-   filt_edge_largescale = 200
-
-#  Large-scale structure is not an issue so treat each subarray
-#  independently for common-mode removal
-   com.perarray = 1
-\end{verbatim}
-\end{myquote}
-
-
-\subsection{dimmconfig\_bright.lis}
-
-This file is included as although it is not used in its own right it
-form the basis (on top of \texttt{dimmconfig.lis} for both
-\texttt{dimmconfig\_bright\_compact.lis} and
-\texttt{dimmconfig\_bright\_extended.lis}
-\begin{myquote}
-\begin{verbatim}
-^$STARLINK_DIR/share/smurf/dimmconfig.lis
-
-# *** Specialized config for bright sources ***
-#
-# Maps of bright sources, regardless of their physical extent,
-# generally require less aggressive rejection of bad data due to the
-# presence of strong astronomical signals (which may accidentally be
-# identified as steps, throw-off the common-mode bolometer rejection,
-# contaminate noise estimates etc.). They also generally require a
-# larger number of iterations to maximize the sensitivty to large
-# dynamic signal ranges in the map.
-#
-# ***********************************************************
-
-numiter = 20
-
-# Much weaker bolometer noise clip
-noisecliphigh = 10.0
-
-# Less aggressive DC step finder to avoid problems with bright sources
-dcthresh = 100
-
-# Less aggressive bolo flagging. Also, handle bolos in entire
-# chunks. Even if we get chunked common-mode flagging to work much
-# better, these maps of bright point sources may cause problems.
-
-com.corr_tol = 7
-com.gain_tol = 7
-com.gain_abstol = 5
-#com.gain_box = 600000
-\end{verbatim}
-\end{myquote}
-
-\newpage
-\section{\xlabel{adam}MAKEMAP ADAM Parameters}
-\label{app:adam}
-
-\begin{minipage}[t]{0.2\linewidth}
-IN
-\end{minipage}
-\begin{minipage}[t]{0.8\linewidth}A list of on eor more SCUBA-2 time
-series files.  This can be specified directly as a comma-separated
-list with wild cards or via a text file.
-\end{minipage}
-
-\begin{minipage}[t]{0.2\linewidth}
-OUT
-\end{minipage}
-\begin{minipage}[t]{0.8\linewidth}The output 2\textsc{d} science map.
-\end{minipage}
-
-\begin{minipage}[t]{0.2\linewidth}
-CONFIG
-\end{minipage}
-\begin{minipage}[t]{0.8\linewidth}This supplies the configuration
-parameters to be used by the iterative map-maker (when method=iterate).
-\end{minipage}
-
-\begin{minipage}[t]{0.2\linewidth}
-REF
-\end{minipage}
-\begin{minipage}[t]{0.8\linewidth}Optional: specifies an existing map
-to which the new map should be aligned.
-\end{minipage}
-
-\begin{minipage}[t]{0.2\linewidth}
-PIXSIZE
-\end{minipage}
-\begin{minipage}[t]{0.8\linewidth}The pixel dimensions of the output
-map.  The default values are 2\,arcsec for 450\,$\mu$m and 4\,arcsec
-for 850\,$\mu$m.
-\end{minipage}
-
-\begin{minipage}[t]{0.2\linewidth}
-MAXMEM
-\end{minipage}
-\begin{minipage}[t]{0.8\linewidth}Optional: maximum memory available
-for map-making.  Can be used to limit the amount used or to force
-chunking.
-\end{minipage}
-
-\begin{minipage}[t]{0.2\linewidth}
-MSG\_FILTER
-\end{minipage}
-\begin{minipage}[t]{0.8\linewidth}Optional: controls how much
-information is displayed on screen. Set to \texttt{verb} or
-\texttt{debug} for more information or \texttt{quiet} for less.
-\end{minipage}
+in \texttt{dimmconfig.lis}---see \cref{Appendix}{app:dimm}{here}.
 
 
 \newpage
@@ -4720,9 +4412,7 @@ A_\mathrm{pix}}
 where $S_\mathrm{tot}$ is the total flux density of the calibrator,
 $P_\mathrm{int}$ is the integrated sum of the source in the map (in
 pW) and $A_\mathrm{pix}$ is the pixel area in arcsec$^2$, producing an
-FCF in Jy/arcsec$^2$/pW. This \fcfa\ is the number to
-multiply your map by when you wish to have surface-brightness units,
-and to carry out aperture photometry.
+FCF in Jy/arcsec$^2$/pW.
 
 \item{\textbf{\fcfb}}
 
@@ -4736,12 +4426,7 @@ producing an FCF in units of Jy/beam/pW.
 The measured peak signal here is derived from the Gaussian fit of
 \beamfit. The peak value is susceptible to pointing and focus errors,
 and we have found this number to be somewhat unreliable, particularly
-at 450\,$\mu$m. \fcfb\ is the number to multiply your
-map by when you wish to measure absolute peak flux densities of
-discrete unresolved point sources. The peak value in the map is then
-the total flux density of the point source. You should not integrate
-over the source after calibrating in this fashion, as this will give
-an overestimate of the flux density.
+at 450$\mu$m.
 
 
 \subsection{\xlabel{extinction}Extinction correction}
@@ -4780,88 +4465,51 @@ override these values by setting \param{ext.taurelation.filtname} in
 your map-maker config files to the two coefficients `($a$,$b$)' that you
 want to use (where \texttt{filtname} is the name of the filter). The
 defaults are listed in \texttt{\$SMURF\_DIR/smurf\_extinction.def}.
-It is worth noting that if an
-individual science map and corresponding calibrator observation has
-already been reduced with the old factors (and your source and
-calibrator are at about the same airmass and if the tau did not change
-appreciably), any errors in extinction correction should cancel out in
-the calibration.
+%It is worth noting that if an individual science map and corresponding calibrator observation has already been reduced with the old factors (and your source and calibrator are at about the same airmass and if the tau did not change appreciably), any errors in extinction correction should cancel out in the calibration.
 
 \newpage
-\section{\xlabel{fcfsred}FCFs by Reduction Date}
-\label{app:fcfs}
+\section{\xlabel{calcrms}SCUBA2\_CHECK\_RMS}
+\label{app:checkrmsparams}
 
-Ongoing development of the SCUBA-2 analysis has resulted in on-going
-changes to the tau relationship and the FCFs. Depending on when your
-data was reduced will need to apply different calibration values.
-\\
+\begin{latexonly}
 \begin{table}[h!]
 \begin{center}
-\begin{tabular}{|l|c|c|c|c|}
- \hline
- \multicolumn{1}{|c|}{Date} &
- \multicolumn{2}{c|}{FCF - 450$\mu$m} &
-\multicolumn{2}{c|}{FCF - 850$\mu$m} \\
-\cline{2-5}
-& Jy/pW/beam &Jy/pW/arcsec$^2$ & Jy/pW/beam &Jy/pW/arcsec$^2$ \\
- \hline
-until January 2012 &383 & 4.9&1080 &5.0 \\
-January 2012 - July 2012&606&6.06 &556 &2.42 \\
-July 2012 onwards&491 &4.71 &537 &2.34 \\
+\begin{tabular}{|p{2.5cm}|p{12cm}|}
+\hline
+\textbf{Parameter} & \textbf{Description}\\
+\hline
+    UT & UT date including day fraction\\
+    Source & object name, upper case with spaces removed\\
+    Obs & observation number\\
+    FILTER & filter (wavelength)\\
+    telapsed & elapsed time of observation in seconds\\
+    texp & mean exposure time, derived from EXP\_TIME NDF component (sec)\\
+    trans & mean line-of-sight transmission\\
+    nep\_av & mean NEP for current observation (W/sqrt(Hz))\\
+    nep\_av\_err & uncertainty in nep\_av (W/sqrt(Hz))\\
+    rms\_nep & RMS derived from nefd\_nep (mJy/beam)\\
+    nefd\_nep & NEFD derived from nep\_av and scaled elapsed time (mJy sqrt(sec))\\
+    rms\_map & RMS noise in map, obtained from median of error component (mJy/beam)\\
+    nefd\_map & NEFD derived from combination of variance and exposure time images (mJy sqrt(sec))\\
+    rms\_itc & RMS noise estimated by SCUBA-2 integration time calculator (ITC) (mJy/beam) *\\
+    nefd\_itc & NEFD derived from rms\_itc and scaled elapsed time (mJy sqrt(sec)) *\\
+    itc\_obstype & observation type used by the ITC to derived RMS\\
+    rms\_ratio & ratio of rms\_map to rms\_itc\\
+    El & mean elevation in degrees\\
+    CSO & mean zenith optical depth at 225 GHz, derived from WVM\\
+    Tau & mean zenith optical depth at the current wavelength (given by FILTER above)\\
+    Radius & radius in arcsec of image used in analysis\\
+    pixscale & pixel scale in arcsec\\
+    f & ITC f parameter\\
+    project & project ID\\
 \hline
 \end{tabular}
 \end{center}
 \end{table}
-\vspace{-2mm}
-\begin{table}[h!]
-\begin{center}
-\begin{tabular}{|l|c|c|}
- \hline
- \multicolumn{1}{|c}{Date} & \multicolumn{2}{|c|}{Tau Relation} \\ \cline{2-3}
-                           & 450$\mu$m & 850$\mu$m \\ \hline
-until January 2012 & 32 $\times$ ($\tau_{225}$ - 0.02) & 5.2 $\times$ ($\tau_{225}$ - 0.013) \\
-January 2012 - July 2012 & 26 $\times$ ($\tau_{225}$- 0.01923) & 4.6 $\times$ ($\tau_{225}$ - 0.00435) \\
-July 2012 onwards & 26 $\times$ ($\tau_{225}$ - 0.01196) & 4.6 $\times$ ($\tau_{225}$ - 0.00435) \\
-\hline
-\end{tabular}
-\end{center}
-\end{table}
-
-\vspace{-5mm}
-\begin{itemize}
-\item Peak FCF (Jy/pW/beam) -- multiply your map by this when you wish
-to measure absolute peak fluxes of discrete sources.
-\item Arcsec FCF (Jy/pW/arcsec$^2$)---multiply your map by this if
-you wish to use the calibrated map to do aperture photometry.
-\end{itemize}
-You can find out when your data was reduced and hence what tau
-relation was applied by using the \Kappa\ command \hislist.
-\vspace{-2mm}
-\begin{myquote}
-\begin{verbatim}
-% hislist file.sdf | grep EXT.TAURELATION
-      , EXT.TAURELATION.450=(26.0,-0.012),
-      EXT.TAURELATION.850=(4.6,-0.0043), EXT.TAUSRC=auto, FAKESCALE=1,
-\end{verbatim}
-\end{myquote}
-
-\newpage
-\section{\xlabel{cog}Aperture Photometry Curve of Growth}
-\label{app:cog}
-
-The SCUBA-2 beam has a broad error beam. As the size of the annulus
-changes, the contribution from the error beam scales according to the
-curve-of-growth---see \cref{Figure}{fig:cog}{the figure below}. To correct for an
-aperture size differing from 60-arcsec diameter you should read off the
-appropriate scaling factor for your FCF from the graph below.
-
-\myfig{sc21_curveofgrowth}{[h!]}{width=\linewidth,height=7.5cm}{fig:cog}{
-  Aperture photometry curve of growth}{
-  Aperture photometry curve of growth normalised for a 60-arcsec
-  aperture at 450$\mu$m \textbf{(left)} and 850$\mu$m
-  \textbf{(right)}. Figure taken from Dempsey et al. (2013).
-}
-
+\end{latexonly}
+Some values (the Noise Equivalent Power values) need to be calculated
+from the raw data. Recall the NEP corresponds to the noise in the raw
+data and is a combination of instrument and atmospheric noise.
 
 \newpage
 \section{\xlabel{matchedfilter}SCUBA-2 Matched Filter}
@@ -4874,8 +4522,8 @@ no large-scale noise in the map, the filtered signal map would be
 calculated as follows:
 
 \begin{equation}
-{\cal{M}} = \frac{[M(x,y)/\sigma^2(x,y)] \otimes P(x,y)}
-{[1/\sigma^2(x,y)] \otimes [P^2(x,y)]},
+  {\cal{M}} = \frac{[M(x,y)/\sigma^2(x,y)] \otimes P(x,y)}
+  {[1/\sigma^2(x,y)] \otimes [P^2(x,y)]},
 \end{equation}
 
 where $M(x,y)$ and $\sigma(x,y)$ are the signal and RMS
@@ -4901,12 +4549,22 @@ effective shape of a point-source in this background-subtracted map.
 
 Before running \textsc{Picard}, a simple parameters file called \texttt{smooth.ini}
 may be created.
+\begin{latexonly}
+%\begin{figure}[ht!]
+\begin{center}
+\begin{fmpage}{0.8\linewidth}
+\vspace{0.2cm}
 \begin{myquote}
 \begin{verbatim}
 [SCUBA2_MATCHED_FILTER]
 SMOOTH_FWHM = 15
 \end{verbatim}
 \end{myquote}
+\vspace{0.4cm}
+\end{fmpage}
+\end{center}
+%\end{figure}
+\end{latexonly}
 %
 where \texttt{SMOOTH\_FWHM = 15} indicates that the background should
 be estimated by first smoothing the map and PSF with a 15~arcsec FWHM
@@ -4927,41 +4585,582 @@ at half-maximum (FWHM) Gaussian shapes assumed at 450$\mu$m and
 850$\mu$m, respectively (an explicit PSF can also be supplied using
 the \param{PSF\_MATCHFILTER} recipe parameter).
 
-\newpage
-\section{\xlabel{convert}Converting a Herschel map to NDF}
-\label{app:convert}
 
-You can convert data taken from the
-{Herschel Science Archive}{http://herschel.esac.esa.int/Science\_Archive.shtml}
-into an NDF with the following \convert\ and \Kappa\ commands respectively:
+
+\newpage
+\section{\xlabel{fcfsred}FCFs by Reduction Date}
+\label{app:fcfs}
+
+Ongoing development of the SCUBA-2 analysis has resulted in on-going
+changes to the tau relationship and the FCFs. Depending on when your
+data was reduced will need to apply different calibration values.
+\\
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{|l|c|c|c|c|}
+ \hline
+ \multicolumn{1}{|c|}{Date} &
+ \multicolumn{2}{c|}{FCF - 450$\mu$m} &
+ \multicolumn{2}{c|}{FCF - 850$\mu$m} \\
+\cline{2-5}
+& Jy/pW/beam &Jy/pW/arcsec$^2$ & Jy/pW/beam &Jy/pW/arcsec$^2$ \\
+ \hline
+until January 2012 &383  & 4.9&1080 &5.0 \\
+January 2012 - July 2012&606&6.06 &556 &2.42 \\
+July 2012 onwards&491 &4.71 &537 &2.34 \\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+\vspace{-2mm}
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{|l|c|c|}
+ \hline
+ \multicolumn{1}{|c}{Date} & \multicolumn{2}{|c|}{Tau Relation}  \\ \cline{2-3}
+                           & 450$\mu$m  & 850$\mu$m \\ \hline
+until January 2012       & 32 $\times$ ($\tau_{225}$ - 0.02)    & 5.2 $\times$ ($\tau_{225}$ - 0.013)  \\
+January 2012 - July 2012 & 26 $\times$ ($\tau_{225}$- 0.01923)  & 4.6 $\times$ ($\tau_{225}$ - 0.00435)  \\
+July 2012 onwards        & 26 $\times$ ($\tau_{225}$ - 0.01196) & 4.6 $\times$ ($\tau_{225}$ - 0.00435)  \\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+\vspace{-5mm}
+\begin{itemize}
+\item Peak FCF (Jy/pW/beam)---multiply your map by this when you wish
+to measure absolute peak fluxes of discrete sources.
+\item Arcsec FCF (Jy/pW/arcsec$^2$)---multiply your map by this if
+you wish to use the calibrated map to do aperture photometry.
+\end{itemize}
+You can find out when your data was reduced and hence what tau
+relation was applied by using the \Kappa\ command \hislist.
+\vspace{-2mm}
+\begin{myquote}
+\begin{verbatim}
+%  hislist file.sdf | grep EXT.TAURELATION
+      , EXT.TAURELATION.450=(26.0,-0.012),
+      EXT.TAURELATION.850=(4.6,-0.0043), EXT.TAUSRC=auto, FAKESCALE=1,
+\end{verbatim}
+\end{myquote}
+
+\newpage
+\section{\xlabel{cog}Aperture Photometry Curve of Growth}
+\label{app:cog}
+
+The SCUBA-2 beam has a broad error beam. As the size of the annulus
+changes, the contribution from the error beam scales according to the
+curve-of-growth---see \cref{Figure}{fig:cog}{the figure below}. To correct for an
+aperture size differing from 60-arcsec diameter you should read off the
+appropriate scaling factor for your FCF from the graph below.
+
+\myfig{sc21_curveofgrowth}{[h!]}{width=\linewidth,height=7.5cm}{fig:cog}{
+  Aperture photometry curve of growth}{
+  Aperture photometry curve of growth normalised for a 60-arcsec
+  aperture at 450$\mu$m \textbf{(left)} and 850$\mu$m
+  \textbf{(right)}. Figure taken from Dempsey et al. (2013).
+}
+
+\newpage
+\section{\xlabel{defconfig}Default dimmconfig.lis}
+\label{app:dimm}
+
+\begin{latexonly}
+\renewcommand*\arraystretch{0.85}
+\begin{table*}
+\begin{center}
+\begin{footnotesize}
+\begin{tabular}{|p{2.2cm}|p{1.1cm}|p{11.4cm}|}
+\hline
+Parameter & Value & Description \\
+\hline
+\multicolumn{3}{|l|}{\textbf{General}}\\
+\hline
+numiter       & $-$5 & Number of iterations. A negative number = max iterations
+                       if using $\chi^2$ and/or map stopping criteria\\
+maptol        & 0.05 & Threshold change in the map between consecutive    iterations.\\
+chitol        & undef& \\
+varmapmethod  &    1 & Estimate variance map by sample variance of data that
+                       land in each pixel\\
+
+exportndf     &    0 & Do not export any models\\
+itermap       &    0 & Do not export itermaps\\
+bolomap       &    0 & Do not export bolometer maps\\
+shortmap      &    0 & Do not export short maps\\
+
+\hline
+\multicolumn{3}{|l|}{\textbf{Pre-Processing}}\\
+\hline
+downsampscale & $-$1 & Down-sample to save memory and time. Negative value = its
+                       magnitude will be multiplied by the PIXSIZE for the
+                       requested map.\\
+maxlen        &    0 & Maximum length (secs) for concatenated data. 0 = attempt
+                       to concatenate entire chunks\\
+order         &    1 & Subtract a baseline polynomial of this order\\
+doclean       &    1 & vvvv\\
+exportclean          & 0 & Do not export clean model\\
+badfrac       & 0.05 & Fraction of samples to be bad to flag entire bolometer
+                       as dead\\
+flagslow      &   30 & Flag data taken while telescope was moving so slowly
+                       that sources sit in $1/f$ noise\\
+flagfast      & 1000 & Flag data taken the telescope was moving too fast causing 
+                       source smearing\\
+filt\_edgelow &    0 & \\
+spikethresh   &    0 & \\
+spikebox      &   50 & \\
+filt\_edgelow &    0 & \\
+pcathresh     &    0 & PCA cleaning is the threshold above which components
+                       will be removed from the bolometer time-series.\\
+pcalen        &    0 & vvvvv.\\
+dcthresh      & 25.0 & S/N threshold to detect DC step\\
+dcfitbox      &   30 & Box size over which to fit data with a straight
+                       line on either side of a potential DC jump\\
+dcmaxsteps    &   10 & The maximum number of steps that can be corrected
+                       in each minute of good data.\\
+dclimcorr     &    0 & If more than DCLIMCORR bolometer have a step at
+                       a given time, then all bolometers are corrected for
+                       a step at that time, using lower thresholds.\\
+dcsmooth      &   50 & The width of the median filter used to smooth a
+                       bolometer data stream prior to finding DC jump\\
+                       realization of noise\\
+noisecliphigh &  4.0 & Clip bolometers based on their noise. This step
+                       will remove any bolometers noisier than noisecliphigh
+                       standard deviations above the median.\\
+noisecliplow   &   0 & Do not clip amy bolometers with low noise.\\
+noisecliprecom &   0 & \\
+whiten         &   0 & \\
+compreprocess  &   0 & \\
+\hline
+\multicolumn{3}{|l|}{\textbf{Preprocess: fakemaps}}\\
+\hline
+fakemap&undef  & Diagnostic tool to explore the effects of the map-making process on known sources.  \\
+fakescale& 1 & Control the use of the supplied fake map.  \\
+\hline
+\multicolumn{3}{|l|}{\textbf{Iterative}}\\
+\hline
+com.perarray     &      0 & \\
+com.niter        &      1 & The number of n-sigma clipping iterations (1 = no clipping)\\
+com.nsigma       &      3 & The number of standard deviations at which the 3\,$\sigma$
+                          clipping algorithm clips\\
+com.noflag       &      0 & If set, disable flagging of bad bolos using common-mode.\\
+com.corr\_tol    &      5 & Number of sigma away from mean correlation coefficient tolerance\\
+com.corr\_abstol &      5 & Number of sigma away from mean correlation coefficient tolerance\\
+com.gain\_tol    &      5 & Number of sigma away from mean gain coefficient tolerance\\
+com.gain\_abstol &      3 & Absolute factor away from mean gain coefficient tolerance\\
+com.gain\_box    &$-$30.0 & The number of time slices (or seconds if negative) in a box\\
+com.gain\_fgood  &   0.25 & \\
+com.gain\_rat    &      4 & \\
+
+com.zero\_mask   &      0 & Provides a better estimate of COM by excluding samples 
+                            that fall within fixed regions on the sky specified by an 
+                            external mask.\\
+com.zero\_circle &  undef & \\
+com.zero\_lowhits&      0 & Improves common-mode estimation by excluding sources in 
+                            regions containing many data samples. \\
+com.zero\_snr    &      0 & \\
+com.zero\_snrlo  &      0 & \\
+com.zero\_union  &      1 & \\
+com.zero\_freeze &      0 & \\
+
+\hline
+noi.calcfirst    &      0 &\\
+noi.box\_size    &      0 & \\
+\hline
+
+flt.notfirst     &      0 & \\
+450.flt.filt\_edge$-$ & \multirow{2}{*}{600} & \multirow{4}{*}{{\Huge$\rbrace$}
+                         \begin{minipage}{10.3cm}Apply a frequency filter to the
+                         FLT model. The value is given in arcsecs which the
+                         map-maker converts to frequency.\end{minipage} }\\
+                         \_largescale& & \\
+850.flt.filt\_edge$-$ & \multirow{2}{*}{300} & \\
+largescale& & \\
+
+flt.zero\_mask   &      0 & \\
+flt.zero\_circle &  undef & \\
+flt.zero\_lohits &      0 & \\
+flt.zero\_snr    &      0 & \\
+flt.zero\_snrlo  &      0 & \\
+flt.zero\_niter  &      2 & \\
+flt.zero\_union  &      1 & \\
+flt.zero\_freeze &      0 & \\
+
+\hline
+ext.tausrc       &   auto & Options = auto, wvmraw, csotau, filtertau\\
+ext.taumethod    & adaptive & Options = adaptive, full, quick\\
+ext.csotau       &  undef & \\
+ext.filtertau    &  undef & \\
+
+\hline
+ast.mapspike     &     10 & Throw away spikes in the AST map greater than
+                            $n$-$\sigma$. Not on the first iteration\\
+ast.zero\_mask   &      0 & Reduces spurious large scale structure in the final
+                            map within fixed regions specified by an external 
+                            mask. \\
+ast.zero\_circle &  undef & Provides a better estimate of COM by excluding 
+                            samples that fall within fixed regions on the sky 
+                            specified by an external mask. \\
+ast.zero\_lohits &      0 & Reduces spurious large-scale structure in the final 
+                            map in regions containing few data samples. \\
+ast.zero\_snr    &      0 & Reduces spurious large scale structure in the final
+                            map within regions of low signal-to-noise.\\
+ast.zero\_snrlo  &      0 & Can help to remove bowls around sources by increasing
+                            the size of the SNR mask without introducing noise.\\
+ast.zero\_snr\_fwhm &   0 & Can help to remove bowls around sources. \\
+ast.zero\_snr\_low & $-$1.1 & Can help to remove bowls around sources.\\
+ast.zero\_union  &      1 & Controls how multiple AST masks are combined.\\
+ast.zero\_freeze  &     0 & Prevent the AST mask from changing after a given 
+                            number of iterations. This can help convergence.\\
+
+\hline
+\end{tabular}
+\label{tab:dimmdef}
+\caption{\small The variables listed in \texttt{dimmconfig.lis} and their
+default values. For a fuller description of each, as well as other
+options, see the comments in makemap.def.}
+\end{footnotesize}
+\end{center}
+\end{table*}
+\renewcommand*\arraystretch{1.0}
+\end{latexonly}
+
+
+
+% Needed because latex2html seems unable to handle multirow
+\begin{htmlonly}
+\begin{table*}
+\begin{center}
+\begin{footnotesize}
+\begin{tabular}{|p{2.2cm}|p{1.1cm}|p{11.4cm}|}
+\hline
+Parameter & Value & Description \\
+\hline
+\multicolumn{3}{|l|}{\textbf{General}}\\
+\hline
+numiter       &   -5 & Number of iterations. A negative number = max iterations
+                       if using $\chi^2$ and/or map stopping criteria\\
+chitol        & 1e-3 & Threshold change in reduced $\chi^2$ in subsequent
+                       iterations.\\
+varmapmethod  &    1 & Estimate variance map by sample variance of data that
+                       land in each pixel\\
+maxlen        &    0 & Maximum length (secs) for concatenated data. 0 = attempt
+                       to concatenate entire chunks\\
+exportndf     &    0 & Do not export any models\\
+downsampscale &   -1 & Down-sample to save memory and time. Negative value = its
+                       magnitude will be multiplied by the PIXSIZE for the
+                       requested map.\\
+\hline
+\multicolumn{3}{|l|}{\textbf{Pre-Processing}}\\
+\hline
+order         &    1  & Subtract a baseline polynomial of this order\\
+apod          & undef & Use default apodisation based on filter frequency\\
+badfrac       &  0.05 & Fraction of samples to be bad to flag entire bolometer
+                        as dead\\
+flagslow      &    30 & Flag data taken while telescope was moving so slowly
+                        that sources sit in $1/f$ noise\\
+450.flagfast  &  1000 & Flag data taken the telescope was moving too fast
+                        causing source smearing\\
+850.flagfast  &  1000 & Flag data taken the telescope was moving too fast
+                        causing source smearing\\
+pcathresh     &     0 & PCA cleaning is the threshold above which components
+                        will be removed from the bolometer time-series.\\
+dcthresh      &  25.0 & S/N threshold to detect DC step\\
+dcfitbox      &    30 & Box size over which to fit data with a straight
+                        line on either side of a potential DC jump\\
+dcmaxsteps    &    10 & The maximum number of steps that can be corrected
+                        in each minute of good data.\\
+dclimcorr     &     0 & If more than DCLIMCORR bolometer have a step at
+                        a given time, then all bolometers are corrected for
+                        a step at that time, using lower thresholds.\\
+dcsmooth      &    50 & The width of the median filter used to smooth a
+                        bolometer data stream prior to finding DC jump\\
+fillgaps      &     1 & Fill vicinity of spikes/DC steps with constrained
+                        realization of noise\\
+noisecliphigh &   4.0 & Clip bolometers based on their noise. This step
+                        will remove any bolometers noisier than noisecliphigh
+                        standard deviations above the median.\\
+\hline
+\multicolumn{3}{|l|}{\textbf{Iterative}}\\
+\hline
+com.oldalg       &    0 & Set this flag to a non-zero value to use the old COM
+                          algorithm. Not recommended.\\
+com.niter        &    1 & The number of n-sigma clipping iterations (1 = no clipping)\\
+com.nsigma       &    3 & The number of standard deviations at which the 3\,$\sigma$
+                           clipping algorithm clips\\
+com.noflag       &    0 & If set, disable flagging of bad bolos using common-mode.\\
+com.corr\_tol    &    5 & Number of sigma away from mean correlation coefficient tolerance\\
+com.gain\_tol    &    5 & Number of sigma away from mean gain coefficient tolerance\\
+com.gain\_abstol &    3 & Absolute factor away from mean gain coefficient tolerance\\
+com.gain\_box  &$-$30.0 & The number of time slices (or seconds if negative)
+                          in a box\\
+\hline
+noi.fillgaps     &    1 & Additional despiking/step finding after each iteration within NOI calculation\\
+noi.dcfitbox     &    0 & Turn DC step finding on or off. 0 = off\\
+\hline
+flt.apod         &undef & Use default apodisation based on filter frequency\\
+450.flt.filt\_edge_largescale & 300 & Apply a frequency filter to the
+                         FLT model. The value is given in arcsecs which the
+                         map-maker converts to frequency.\\
+850.flt.filt\_edge_largescale & 600 & Apply a frequency filter to the
+                         FLT model. The value is given in arcsecs which the
+                         map-maker converts to frequency.\\
+flt.zero\_niter  &    2 & Apply FLT mask for only the first n=2 iterations\\
+\hline
+ext.tausrc       & auto & Options = auto, wvmraw, csotau, filtertau\\
+ext.taumethod    & adaptive & Options = adaptive, full, quick\\
+\hline
+ast.mapspike     &   10 & Throw away spikes in the AST map greater than
+                          this number of $\sigma$. Not on the first iteration\\
+\hline
+\end{tabular}
+\label{tab:dimmdef}
+\caption{\small The active variables from \texttt{dimmconfig.lis} and their
+default values. For a fuller description of each, as well as other
+options, see the comments in the file itself. This can be found in
+\cref{Appendix}{app:dimm}{this appendix}.}
+\end{footnotesize}
+\end{center}
+\end{table*}
+\end{htmlonly}
+
+
 
 \begin{myquote}
 \begin{verbatim}
-% fits2ndf herschelmap.fits herschelmap.sdf
-% ndfcopy in=herschelmap.sdf.more.fits_ext_1 out=herschelmap_data.sdf
+########################
+#   General Iterative  #
+########################
+
+numiter = -5
+maptol = 0.05
+
+modelorder = (com,gai,ext,flt,ast,noi)
+exportndf = 0
+
+itermap = 0
+bolomap = 0
+shortmap = 0
+
+chitol = <undef>
+varmapmethod = 1
+
+########################
+#   Preprocessing      #
+########################
+
+downsampscale = -1
+
+maxlen = 0
+doclean = 1
+
+exportclean = 0
+
+
+order = 1
+badfrac = 0.05
+compreprocess = 0
+pcathresh = 0
+pcalen = 0
+
+dcthresh = 25.0
+dcfitbox = 30
+dcmaxsteps = 10
+dclimcorr = 0
+dcsmooth = 50
+
+spikethresh = 0
+spikebox = 50
+
+whiten = 0
+
+noisecliphigh = 4.0
+noisecliplow = 0
+noiseclipprecom = 0
+
+flagslow = 30
+flagfast = 1000
+
+filt_edgelow = 0
+
+########################
+# Preprocess: fakemaps #
+########################
+
+fakemap = <undef>
+fakescale = 1
+
+########################
+# Iterative: com model #
+########################
+
+com.perarray = 0
+
+com.noflag = 0
+com.corr_tol = 5
+com.corr_abstol = 0.2
+com.gain_tol = 5
+com.gain_abstol = 3
+com.gain_box = -30.0
+com.gain_fgood = 0.25
+com.gain_rat = 4
+
+com.zero_mask = 0
+com.zero_circle = <undef>
+com.zero_lowhits = 0
+com.zero_snr = 0
+com.zero_snrlo = 0
+com.zero_union = 1
+com.zero_freeze = 0
+
+########################
+# Iterative: noi model #
+########################
+
+noi.calcfirst = 0
+noi.box_size = 0
+
+########################
+# Iterative: flt model #
+########################
+
+450.flt.filt_edge_largescale=600
+850.flt.filt_edge_largescale=300
+
+flt.notfirst = 0
+
+flt.zero_mask = 0
+flt.zero_circle = <undef>
+flt.zero_lowhits = 0
+flt.zero_snr = 0
+flt.zero_snrlo = 0
+flt.zero_niter = 2
+flt.zero_union = 1
+flt.zero_freeze = 0
+
+########################
+# Iterative: ext model #
+########################
+
+ext.tausrc    = auto
+ext.taumethod = adaptive
+
+ext.csotau = <undef>
+ext.filtertau = <undef>
+
+########################
+# Iterative: ast model #
+########################
+
+ast.mapspike = 10
+
+ast.zero_mask = 0
+ast.zero_circle = <undef>
+ast.zero_lowhits = 0
+ast.zero_snr = 0
+ast.zero_snrlo = 0
+ast.zero_snr_fwhm = 0
+ast.zero_snr_low = -1.1
+ast.zero_union = 1
+ast.zero_freeze = 0
+
 \end{verbatim}
 \end{myquote}
-In this example the file downloaded from the Herschel Science Archive
-is named \texttt{herschelmap.fits}. In the final conversion step this
-is renamed to \texttt{herschelmap\_data.sdf}.
 
-\section{\xlabel{par_full}Configuration Parameters: dimmconfig.lis}
-\label{app:par_full}
 
-The following pages describe selected configuration parameters.
 
-\begin{itemize}
-\item The ``SMURF Usage'' section of each description lists the SMURF
-commands that accept the parameter. This does not mean that all the
-listed commands actually \emph{use} the parameter - it just means that
-any commands \emph{not} in the list will report an error if the parameter
-is supplied.
-\item The default value for each parameter is shown in square brackets at
-the end of the description. This is the default value used by the
-\texttt{dimmconfig.lis} configuration file. Other configuration
-files may override this default.
-\end{itemize}
+\section{\xlabel{special}Specialised Configuration Files}
+\label{app:special}
+
+\subsection{dimmconfig\_bright\_extended.lis}
+\begin{myquote}
+\begin{verbatim}
+^$STARLINK_DIR/share/smurf/dimmconfig_bright.lis
+   numiter=-40
+   flt.filt_edge_largescale=600
+   ast.zero_snr = 5
+
+\end{verbatim}
+\end{myquote}
+
+\subsection{dimmconfig\_bright\_compact.lis}
+\begin{myquote}
+\begin{verbatim}
+^$STARLINK_DIR/share/smurf/dimmconfig_bright.lis
+   numiter=-40
+
+#  Per array common-mode should be fine here since we are dealing with
+#  a compact source. It seems to make things more stable.
+   com.perarray = 1
+
+#  We can get away with harsher filtering since the boundary conditions are
+#  quite tight
+   flt.filt_edge_largescale=200
+
+#  Use boundary constraints since the source is assumed to be isolated
+   ast.zero_circle = (0.0166666666)
+
+#  Mask the data when forming th FLT model in order to exclude the
+#  source. This only happends on the first two iterations. This usually
+#  speeds up convergence.
+   flt.zero_circle = (0.0166666666)
+
+\end{verbatim}
+\end{myquote}
+
+\subsection{dimmconfig\_blank\_field.lis}
+\begin{myquote}
+\begin{verbatim}
+   ^$STARLINK_DIR/share/smurf/dimmconfig.lis
+
+   numiter = 4
+
+#  No FLT model is needed since we are filtering out low frequencies as
+#  part of the initial cleaning process.
+   modelorder = (com,ext,ast,noi)
+
+#  Use time-domain de-spiker first because we are only doing a single
+#  FFT-based high-pass filter before the iterations start.
+   spikethresh = 10
+
+#  Heavier high-pass filtering. Note that the default padding/apodization
+#  that will be used is the number of samples that corresponds to the
+#  period of the knee frequency in the high-pass filter (i.e. 200*(1/freq) )
+   filt_edge_largescale = 200
+
+#  Large-scale structure is not an issue so treat each subarray
+#  independently for common-mode removal
+   com.perarray = 1
+
+\end{verbatim}
+\end{myquote}
+
+
+\subsection{dimmconfig\_bright.lis}
+
+This file is included as although it is not used in its own right it
+form the basis (on top of \texttt{dimmconfig.lis} for both
+\texttt{dimmconfig\_bright\_compact.lis} and
+\texttt{dimmconfig\_bright\_extended.lis}
+\begin{myquote}
+\begin{verbatim}
+   ^$STARLINK_DIR/share/smurf/dimmconfig.lis
+
+   numiter = 20
+
+#  Much weaker bolometer noise clip
+   noisecliphigh = 10.0
+
+#  Less aggressive DC step finder to avoid problems with bright sources
+   dcthresh = 100
+
+#  Less aggressive bolo flagging.
+   com.corr_tol = 7
+   com.gain_tol = 7
+   com.gain_abstol = 5
+\end{verbatim}
+\end{myquote}
+
 
 \end{document}
-
 
