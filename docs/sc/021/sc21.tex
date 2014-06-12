@@ -191,6 +191,8 @@
 % Environment for indenting and using a small font.
 \newenvironment{myquote}{\begin{quote}\begin{small}}{\end{small}\end{quote}}
 
+\definecolor{gray}{RGB}{200,200,200}
+
 % Shortcuts
 % ---------
 
@@ -2073,51 +2075,79 @@ This chapter describes how to run the map-maker and what to look out
 for during processing. We also discuss reducing your data using the
 \oracdr\ science pipeline and why you might want to chose this option.
 
-
-\subsection{\xlabel{manual}Running the map-maker}
-
-In the following example we produce a map of CRL2688, one of SCUBA-2's
-secondary calibrators. As discussed in \cref{Section}{sec:dimm}{The
+As discussed in \cref{Section}{sec:dimm}{The
 Dynamic Iterative Map-Maker}, all of the settings for the map-maker
-are stored in configuration files. In this example we will just use
-the default configuration file, \texttt{dimmconfig.lis}. For an
+are stored in configuration files. In this chapter we use
+the default configuration file, \texttt{dimmconfig.lis} to reduce CRL2688,
+one of SCUBA-2's secondary calibrators. For an
 overview of the specialised configuration files available see
 \cref{Section}{sec:config}{this section}.
 
-As an input to the map-maker, any of the standard \smurf\
-configuration files can be called directly from the Starlink path
-with \texttt{\^\,\$STARLINK\_DIR/share/smurf/dimmconfig*.lis}.
-Alternatively, a local copy can be made and called with
-\texttt{\^\,dimmconfig*.lis}. Details of how to edit any of the
-parameters can be found in \cref{Section}{sec:tweak}{Tweaking the
+\subsection{\xlabel{running_dimm}Running the iterative map-maker}
+\label{sec:running}
+
+When running the map-maker, you can call any of the provided
+configuration files directly from the Starlink path (e.g.
+\texttt{\^\$STARLINK\_DIR/share/smurf/dimmconfig.lis}). Alternatively,
+a local copy can be made and edited. Advice on which parameters to
+edit can be found in \cref{Section}{sec:tweak}{Tweaking the
 configuration file}.
 
-A number of ADAM parameters are used by \makemap\ of which the
-most important are: in, out, config, pixsize, ref, maxmem and
-msg\_filter. Some of these appear in the example below but see
-\cref{Appendix}{app:adam}{MAKEMAP ADAM Parameters} for the descriptions. A
-complete list of all ADAM parameters can be found in \smurfsun.
+\begin{latexonly}
+\begin{center}
+\begin{fmpage}{0.95\linewidth}
+\vspace{0.1cm}
+TIP: An up-caret (\,\^\,) is required any time you are reading in
+a  text file in \starlink. For the map-maker this includes the
+configuration file and a list of your input files (e.g. \texttt{in=\^\,myrawfiles.txt}).
+\end{fmpage}
+\end{center}
+\end{latexonly}
 
-\textbf{Note:} An up-caret (\,\^\,) is required any time you are reading in
-a text file in \starlink. For the map-maker this includes the
-configuration file and reading in a list of files as the input (e.g.
-\texttt{in=\^\,rawfilelist.txt}).
+\begin{htmlonly}
+\textbf{TIP: An up-caret (\,\^\,) is required any time you are reading in
+a  text file in \starlink. For the map-maker this includes the
+configuration file and a list of your input files (e.g. \texttt{in=\^\,myrawfiles.txt}).\\*\\*}
+\end{htmlonly}
 
-The example uses \textbf{the
-default pixel sizes which are 2\,arcsec for 450\,$\mu$m and 4\,arcsec for
-850\,$\mu$m}. This can be overwritten by adding \texttt{pixsize=}$x$ to the
+The default pixel sizes are:
+
+2\,arcsec at 450$\mu$m\\
+4\,arcsec at 850$\mu$m
+
+These can be changed by adding the \texttt{pixsize=}$x$ to the
 command string\footnote{The default sizes are defined as one quarter
 of the Airy disk rounded up to the nearest half arcsecond.}, where $x$
 is your desired pixel size in arcseconds. We advise that you do not
 increase the pixel size at this stage as it will compromise model
 fitting---instead regrid your map as a post-processing step.
 
-Note that \texttt{method = iterate} has not been specified when
-calling the map-maker as this this the default option.
+%Other ADAM parameter available with \makemap\ include ref, maxmem and
+%msg\_filter. Some of these appear in the example below but see
+%\cref{Appendix}{app:adam}{MAKEMAP ADAM Parameters} for descriptions. A
+%complete list of all ADAM parameters can be found in \smurfsun.
+
+\begin{latexonly}
+\begin{center}
+\begin{fmpage}{0.95\linewidth}
+\vspace{0.1cm}
+TIP: Map-maker not finding your raw files from a path? Check you have
+double quotes around your `in' option and are not using *sdf---use
+either *.sdf or just *.
+\end{fmpage}
+\end{center}
+\end{latexonly}
+
+\begin{htmlonly}
+\textbf{TIP: Map-maker not finding your raw files from a path? Check
+you have double quotes around your `in' option and are not using
+*sdf---use either *.sdf or just *.\\*\\*}
+\end{htmlonly}
+
 
 \begin{myquote}
 \begin{verbatim}
-% makemap in='/jcmtdata/raw/scuba2/s8*/20120720/00030/*.sdf' out=850_crl2688\
+% makemap in="/jcmtdata/raw/scuba2/s8*/20120720/00030/*.sdf" out=850_crl2688 \
   config=^$STARLINK_DIR/share/smurf/dimmconfig.lis
 
 
@@ -2219,33 +2249,46 @@ smf_iteratemap: ****** Solution CONVERGED
 Total samples available from all chunks: 18273302 (3067.53 bolos)
 \end{verbatim}
 \end{myquote}
-\vspace{-10mm}
-\begin{center}
-\latex{\line(1,0){155}}
-\end{center}
+%\vspace{-10mm}
+%\begin{center}
+%\latex{\line(1,0){155}}
+%\end{center}
+\begin{htmlonly}
+\myfig{sc21_crl2688}{[t!]}{width=0.7\linewidth}{fig:itermap}{
+  CRL2688 produced with \makemap}{
+  Map of CRL2688 produced with the \smurf\ task \makemap\ using the 
+  iterative algorithm with default parameters.
+}
+\end{htmlonly}
 
 \subsection{\xlabel{look_for}What to look out for}
 %\flushbottom
 
 Once the map-maker has completed you can open your output map using
 \gaia---see \cref{Figure}{fig:itermap}{the figure below}. The excerpt
-above shows the output written to the terminal as you run the map-maker. There
-are a number of clues in this output that indicate the status of the
+in \cref{Section}{sec:running}{Running the iterative map-maker} shows
+the output written to the terminal as you run the map-maker. There are
+a number of clues in this output that indicate the status of the
 reduction.
-
+\begin{latexonly}
+\myfig{sc21_crl2688}{[t!]}{width=0.7\linewidth}{fig:itermap}{
+  CRL2688 produced with \makemap}{
+  Map of CRL2688 produced with the \smurf\ task \makemap\ using the
+  iterative algorithm with default parameters.
+}
+\end{latexonly}
 
 \textbf{The number of input files}\\
 The first to note is the number of input files; it is worth checking
 this matches your expected number. Also summarised are the source
 name, UT date and scan number.
-\\ \\
+\\*\\*
 \textbf{Map dimensions}\\
 Next the basic dimensions of the data being processed are listed near
 the start of the first iteration. The example above has 4\,arcsec
 pixels---the default at 850$\mu$m.
-\\ \\
-\textbf{Chunking}\\
-\label{box:chunk}
+\\*\\*
+\textbf{Chunking}\label{box:chunk}\\
 The map-maker then determines if the raw data should be split and
 processed in more than one chunk. In this map the data is reduced in
 one continuous piece: \param{Continuous chunk 1 / 1}. Chunking is
@@ -2257,68 +2300,34 @@ on Page~\pageref{page:text}.
 \begin{htmlonly}
 below.
 \end{htmlonly}
-\\
 
 % The minipages used for the dvi version give latex2html problems.
 \begin{htmlonly}
 \htmladdimg{sc21_data_chunking.png}
-\\ \\
 \end{htmlonly}
 
-\myfig{sc21_crl2688}{[t!]}{width=0.7\linewidth}{fig:itermap}{
-  CRL2688 produced with \makemap}{
-  Map of CRL2688 produced with the \smurf\ task \makemap\ using the
-  iterative algorithm with default parameters.
-}
-
 \textbf{Quality statistics}\\
-Next come the QUALITY flagging statistics. At the beginning, the main
-purpose is to indicate how many bolometers are being used. In the
+At the beginning of the reduction, the main purpose of QUALITY
+flagging is to indicate how many bolometers are being used. In the
 example above you can see that from a total of 5120 bolometers, 1842
 were turned off during data acquisition (\texttt{BADDA}). In addition,
-136 bolometers exceeded the acceptable noise threshold
-(\texttt{NOISE}), while tiny fractions of the data were flagged
-because the telescope was moving too slowly (\texttt{STAT}) or the
-sample are adjacent to a step that was removed (\texttt{DCJUMP}).
-
-The total number of bad bolometers (\texttt{BADBOL}) is 1984.
-Accounting for these, and the small numbers of additionally flagged
-samples, 3128.22 effective bolometers are available after initial
-cleaning\footnote{The fractional number is due to time-slices being
-removed during cleaning. The number of bolometers is then
-reconstructed from the number of remaining time-slices}.
-
-
-After each subsequent iteration a new `Quality' report is produced,
-indicating how the flags have changed. An important flag that appears
-in the `Quality' report following the first iteration is \texttt{COM}:
-the DIMM rejects bolometers (or portions of their time series) if they
-differ significantly from the common-mode (average) of the remaining
-bolometers.
-
-You may note that compared with the initial report, the total number of samples
-with good `Quality' (\texttt{Total samples available for map}) has
-dropped from 18634826 to 18273302 (about a 2 per cent decrease) as
-additional samples were flagged in each iteration.
-
+136 bolometers
 
 \begin{latexonly}
-\begin{center}
-\begin{fmpage}{0.92\linewidth}
+\colorbox{gray}{
 \label{page:text}
-\begin{minipage}[t!]{0.025\linewidth}
 \hspace{0.1cm}
-\end{minipage}
-\begin{minipage}[t!]{0.93\linewidth}
+\begin{minipage}[t]{0.93\linewidth}
 \vspace{0.2cm}
+
 \textbf{Data Chunking}\\
 Chunking occurs when there is insufficient computer memory available
 for the map-maker or when there is a gap in the time-series data (e.g.
 from a missing sub-scan). In these cases, the map-maker divides up the
-time-series and reduces each sub-portion independently, producing a
-separate map for each, before finally co-adding all the maps at the
-end. Ideally you want your data reduced in a single chunk, however
-this can be unfeasible for large maps.
+time-series data and reduces each sub-portion independently, before
+re-combining all the outputs at a later stage. Ideally you want your
+data reduced in a single chunk, however this can be unfeasible for
+large maps.
 \vspace{0.2cm}\\
 The more data the map-maker processes at once, the better chance it
 has of determining the difference between sky signal and background
@@ -2335,52 +2344,75 @@ passes. Fewer passes than this however and the map-maker become less
 effective.
 \vspace{0.2cm}
 \end{minipage}
-\begin{minipage}[t!]{0.025\linewidth}
 \hspace{0.1cm}
-\end{minipage}
-\end{fmpage}
-\end{center}
-\end{latexonly}
+}
+\newline\newline
+exceeded the acceptable noise threshold (\texttt{NOISE}), while tiny
+fractions of the data were flagged because the telescope was moving
+too slowly (\texttt{STAT}) or the sample are adjacent to a step that
+was removed (\texttt{DCJUMP}).
+
+The total number of bad bolometers (\texttt{BADBOL}) is 1984.
+Accounting for these, and the small numbers of additionally flagged
+samples, 3128.22 effective bolometers are available after initial
+cleaning\footnote{The fractional number is due to time-slices being
+removed during cleaning. The number of bolometers is then
+reconstructed from the number of remaining time-slices}.
+
+After each subsequent iteration a new `Quality' report is produced,
+indicating how the flags have changed. An important flag that appears
+in the `Quality' report following the first iteration is \texttt{COM}:
+the DIMM rejects bolometers (or portions of their time series) if they
+differ significantly from the common-mode (average) of the remaining
+bolometers.
+
+You may note that compared with the initial report, the total number of samples
+with good `Quality' (\texttt{Total samples available for map}) has
+dropped from 18634826 to 18273302 (about a 2 per cent decrease) as
+additional samples were flagged in each iteration.
+
 
 Be aware that some large reductions may take many iterations to reach
 convergence and you may find significantly fewer bolometers remaining
 resulting in higher noise than expected.
-\\ \\
+\end{latexonly}
+\\*
+\begin{htmlonly}
+\htmladdimg{sc21_data_chunking.png}
+\end{htmlonly}
+
 \textbf{Convergence}\\
-What about the convergence parameter? As discussed in
-\cref{Section}{sec:converge}{Convergence} there are two noise based
-convergence criteria that can be set---\texttt{maptol} and \texttt{chitol}.
+The convergence criteria \texttt{maptol} is updated for each
+iteration. The convergence can be checked from the line reporting\\*
+\hspace*{0.5cm} \texttt{smf\_iteratemap: *** NORMALIZED MAP CHANGE:
+0.10559 (mean) 2.81081 (max)}
 
-Both are reported during processing but only one will be used to determine
-if convergence has been achieved.
-\\
-Convergence based on \texttt{maptol} can be checked from the line
-reporting\\
-\hspace{5mm}\texttt{smf\_iteratemap: *** NORMALIZED MAP
-CHANGE: 0.10559 (mean) 2.81081 (max)}.\\
-In the line above the number to look out for is the mean value. This
-will have to drop below your required \texttt{maptol} for successful
-convergence.
-
-\texttt{chitol} convergence can be monitored by the
-\texttt{CHISQUARED} value---the RMS of the residual (time series with
-the various model components removed) for all of the samples with good
-`Quality', normalised by the measured white noise levels. This can be
-seen in the line below.\\
-\hspace{0.5cm}\texttt{smf\_iteratemap: *** CHISQUARED = 0.872127100064999}
-
+The number to look out for is the mean value. This will have to drop
+below your required \texttt{maptol} for convergence to be achieved.
 
 The default configuration file used in this example executes a maximum
-of 5 iterations, but stops sooner if the change in \texttt{CHISQUARED}
-is less then 0.001 (i.e. \texttt{numiter=-5}). In this example it
-stops after 5 iterations: \\
-\texttt{smf\_iteratemap: *** Completed in 5 iterations}.
+of five iterations, but stops sooner if the change in \texttt{maptol}
+drops below 0.05 (i.e. \texttt{numiter=$-$5}). In this example it
+stops after five iterations:
 
-
-\textbf{Note:} you can interrupt the processing at any stage with a
+\begin{latexonly}
+\begin{center}
+\begin{fmpage}{0.95\linewidth}
+\vspace{0.1cm}
+TIP: You can interrupt the processing at any stage with a
 single \texttt{Ctrl-C}. The map-maker will complete the iteration then write
-out a final science map. If you enter \texttt{Ctrl-C} a second time it will
+out a final science map. Entering \texttt{Ctrl-C} twice will
 kill the process immediately.
+\end{fmpage}
+\end{center}
+\end{latexonly}
+
+\begin{htmlonly}
+\textbf{TIP: You can interrupt the processing at any stage with a
+single \texttt{Ctrl-C}. The map-maker will complete the iteration then write
+out a final science map. Entering \texttt{Ctrl-C} twice  will
+kill the process immediately.\\*\\*}
+\end{htmlonly}
 
 \subsection{\xlabel{sciencepl}Using the science pipeline}
 
@@ -2390,15 +2422,16 @@ the pipeline. You can feed the pipeline observations of multiple
 sources rather than feed in a single source at a time. The pipeline
 will recognise the different sources and make a separate map for each,
 whereas the map-maker would make a single large map that would include
-all your sources (no matter how widely spaced!). Another useful
-feature is that the pipeline will generate a log files to record
+all your sources (no matter how widely spaced!).
+
+Another useful feature is that the pipeline will generate a log files to record
 various useful quantities. The standard log files from reducing
 science data are:
-\\*
+
 \begin{itemize}
-\item log.noise---noise in the map for each observation and the co-add
+\item \texttt{log.noise}---noise in the map for each observation and the co-add
 (calculated from median of error component)
-\item log.nefd---NEFD calculated for each observation and for the co-added map(s)
+\item \texttt{log.nefd}---NEFD calculated for each observation and for the co-added map(s)
 \end{itemize}
 The pipeline will produce calibrated maps; by default these are
 calibrated using the standard FCFs, although users can specify their
@@ -2418,16 +2451,9 @@ the filename in question is given.
 \end{verbatim}
 \end{myquote}
 
-You should be aware that you can supply the JAC with a tailored
-configuration file or more complicated data-reduction script that you
-would like to be associated with your project. The project can be
-re-reduced using this tailored recipe and data products reduced to
-your specification will be made available at CADC. This is
-particularly useful for very large survey-scale projects.
-
-For a more in-depth discussion on running the pipeline and a discussion
+\textbf{For a more in-depth discussion on running the pipeline and a discussion
 of the various outputs see \cref{Section}{sec:pipe}{The SCUBA-2
-Pipeline} or \pipelinesun.
+Pipeline} or \pipelinesun.}
 \clearpage
 
 \section{\xlabel{maps}Post-processing Reduction Steps}
