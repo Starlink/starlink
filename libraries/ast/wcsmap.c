@@ -81,12 +81,12 @@ f     The WcsMap class does not define any new routines beyond those
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -215,6 +215,8 @@ f     The WcsMap class does not define any new routines beyond those
 *        size is very small. The longitude at the pole is indeterminate,
 *        but whatever random numerical value is returned by atan2 is
 *        no less useful (and no more useful) than a fixed value of zero.
+*     12-JUN-2014 (DSB):
+*        Added XPH projection.
 *class--
 */
 
@@ -702,6 +704,7 @@ static PrjData PrjInfo[] = {
    { AST__NCP,  2, 4, "AIPS north celestial pole", "-NCP",  NULL,   NULL, 0.0 },
    { AST__GLS,  0, 4, "sinusoidal", "-GLS",  astSFLfwd, astSFLrev, 0.0 },
    { AST__HPX,  2, 4, "HEALPix", "-HPX",  astHPXfwd, astHPXrev, 0.0 },
+   { AST__XPH,  0, 4, "polar HEALPix", "-XPH",  astXPHfwd, astXPHrev, AST__DPIBY2 },
    { AST__TPN,  WCSLIB_MXPAR, WCSLIB_MXPAR, "gnomonic polynomial", "-TPN",  astTPNfwd, astTPNrev, AST__DPIBY2 },
    { AST__WCSBAD, 0, 4, "<null>",   "    ",  NULL,   NULL, 0.0 } };
 

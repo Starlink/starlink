@@ -19372,7 +19372,8 @@ whose meaning is defined or extended by FITS-WCS paper II.
 
 \fitskey{CTYPE\emph{ia}}{All coordinate systems and projection types
 listed in paper II are supported (note, ``CUBEFACE'' axes are treated as
-unknown linear axes). In addition, "-HPX" (HEALPix) is supported.}{Determined by the System attribute
+unknown linear axes). In addition, "-HPX" (HEALPix) and "-XPH" (polar
+HEALPix) are supported.}{Determined by the System attribute
 of the SkyFrame and the WcsType attribute of the
 WcsMap within the FrameSet.}
 
@@ -22937,12 +22938,10 @@ hull) enclosing a specified set of pixel values within a supplied array.
 
 \end{enumerate}
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V8.0.0}
+\subsection{Changes Introduced in V8.0.0}
 
-The following describes the most significant changes which have
-occurred in the AST library between versions V7.3.4 and V8.0.0 (the
-current version):
+The following describes the most significant changes which
+occurred in the AST library between versions V7.3.4 and V8.0.0:
 
 \begin{enumerate}
 
@@ -22955,6 +22954,19 @@ least squares fitting of N-dimensional polynomials.
 \item Use of the IAU SOFA library has been replaced by ERFA library, which is
 a re-badged copy of SOFA distributed under a less restrictive license. A
 copy of ERFA is included within AST.
+
+\end{enumerate}
+
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V8.0.1}
+
+The following describes the most significant changes which have
+occurred in the AST library between versions V8.0.0 and V8.0.1 (the
+current version):
+
+\begin{enumerate}
+
+\item Supported added for FITS XPH (polar HEALPIX) projection.
 
 \end{enumerate}
 

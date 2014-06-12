@@ -46,6 +46,7 @@
 *     -  Added prototypes for TPN projection functions (defined in file
 *        tpn.c).
 *     -  Added prototypes for HPX projection functions.
+*     -  Added prototypes for XPH projection functions.
 *===========================================================================*/
 
 #ifndef WCSLIB_PROJ_INCLUDED
@@ -161,6 +162,9 @@ struct AstPrjPrm {
    int astHPXset(struct AstPrjPrm *);
    int astHPXfwd(const double, const double, struct AstPrjPrm *, double *, double *);
    int astHPXrev(const double, const double, struct AstPrjPrm *, double *, double *);
+   int astXPHset(struct AstPrjPrm *);
+   int astXPHfwd(const double, const double, struct AstPrjPrm *, double *, double *);
+   int astXPHrev(const double, const double, struct AstPrjPrm *, double *, double *);
 
    int astTPNset(struct AstPrjPrm *);
    int astTPNfwd(const double, const double, struct AstPrjPrm *, double *, double *);

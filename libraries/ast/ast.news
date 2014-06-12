@@ -1,6 +1,6 @@
 AST Library
 -----------
-   A new release (V8.0.0) of the Starlink AST (astrometry) library is
+   A new release (V8.0.1) of the Starlink AST (astrometry) library is
 now available.
 
    AST provides a comprehensive range of facilities for attaching
@@ -16,6 +16,11 @@ environment-independent.
 Main Changes in this Version
 ----------------------------
 
+- The FITS XPH projection is now supported.
+
+Main Changes in V8.0.0
+----------------------
+
 - AST is now distributed under the Lesser GPL licence.
 
 - Least squares fitting of N-dimensional polynomials is now done using
@@ -27,7 +32,7 @@ a re-badged copy of SOFA distributed under a less restrictive license. A
 copy of ERFA is included within AST.
 
 Main Changes in V7.3.4
-----------------------------
+----------------------
 
 - By default, the simplification of Polygons no longer checks that the
 edges are not bent by the simplification. A new attribute, SimpVertices,

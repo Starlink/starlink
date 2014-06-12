@@ -58,7 +58,8 @@
 *     -  Use dynamic rather than static memory for the parameter arrays in
 *        the AstPrjPrm structure.Override astGetObjSize. This is to
 *        reduce the in-memory size of a WcsMap.
-*     -  Healpix projection added.
+*     -  HPX and XPH projections included from a more recent version of WCSLIB,
+*        and modified to use scalar instead of vector positions
 *     -  The expressions for xc in astHPXrev and phic in astHPXfwd have
 *        been conditioned differently to the WCSLIB code in order to improve
 *        accuracy of the floor function for arguments very slightly below an
@@ -107,6 +108,7 @@
 *      astCSCset astCSCfwd astCSCrev   CSC: COBE quadrilateralized spherical cube
 *      astQSCset astQSCfwd astQSCrev   QSC: quadrilateralized spherical cube
 *      astHPXset astHPXfwd astHPXrev   HPX: HEALPix projection
+*      astXPHset astXPHfwd astXPHrev   XPH: HEALPix polar, aka "butterfly"
 *
 *
 *   Driver routines; astPRJset(), astPRJfwd() & astPRJrev()
@@ -288,11 +290,11 @@
    avoid name clashes with other software systems (e.g. SkyCat) which
    defines them.
 
-int  npcode = 26;
-char pcodes[26][4] =
+int  npcode = 28;
+char pcodes[28][4] =
       {"AZP", "SZP", "TAN", "STG", "SIN", "ARC", "ZPN", "ZEA", "AIR", "CYP",
        "CEA", "CAR", "MER", "COP", "COE", "COD", "COO", "SFL", "PAR", "MOL",
-       "AIT", "BON", "PCO", "TSC", "CSC", "QSC", "HPX"};
+       "AIT", "BON", "PCO", "TSC", "CSC", "QSC", "HPX", "XPH"};
 */
 
 const int WCS__AZP = 101;
@@ -322,6 +324,7 @@ const int WCS__TSC = 701;
 const int WCS__CSC = 702;
 const int WCS__QSC = 703;
 const int WCS__HPX = 801;
+const int WCS__XPH = 802;
 
 /* Map error number to error message for each function. */
 const char *astPRJset_errmsg[] = {
@@ -406,6 +409,8 @@ struct AstPrjPrm *prj;
       astQSCset(prj);
    } else if (strcmp(pcode, "HPX") == 0) {
       astHPXset(prj);
+   } else if (strcmp(pcode, "XPH") == 0) {
+      astXPHset(prj);
    } else {
       /* Unrecognized projection code. */
       return 1;
@@ -4604,3 +4609,231 @@ double *phi, *theta;
 
    return 0;
 }
+
+/*============================================================================
+*   XPH: HEALPix polar, aka "butterfly" projection.
+*
+*   Given and/or returned:
+*      prj->r0      Reset to 180/pi if 0.
+*      prj->phi0    Reset to 0.0 if undefined.
+*      prj->theta0  Reset to 0.0 if undefined.
+*
+*   Returned:
+*      prj->flag     XPH
+*      prj->code    "XPH"
+*      prj->w[0]    r0*(pi/180)/sqrt(2)
+*      prj->w[1]    (180/pi)/r0/sqrt(2)
+*      prj->w[2]    2/3
+*      prj->w[3]    tol (= 1e-4)
+*      prj->w[4]    sqrt(2/3)*(180/pi)
+*      prj->w[5]    90 - tol*sqrt(2/3)*(180/pi)
+*      prj->w[6]    sqrt(3/2)*(pi/180)
+*      prj->astPRJfwd Pointer to astXPHfwd().
+*      prj->astPRJrev Pointer to astXPHrev().
+*===========================================================================*/
+
+int astXPHset(prj)
+
+struct AstPrjPrm *prj;
+
+{
+  strcpy(prj->code, "XPH");
+  prj->flag = WCS__XPH;
+
+  if (prj->r0 == 0.0) {
+    prj->r0 = R2D;
+    prj->w[0] = 1.0;
+    prj->w[1] = 1.0;
+  } else {
+    prj->w[0] = prj->r0*D2R;
+    prj->w[1] = R2D/prj->r0;
+  }
+
+  prj->w[0] /= sqrt(2.0);
+  prj->w[1] /= sqrt(2.0);
+  prj->w[2]  = 2.0/3.0;
+  prj->w[3]  = 1e-4;
+  prj->w[4]  = sqrt(prj->w[2])*R2D;
+  prj->w[5]  = 90.0 - prj->w[3]*prj->w[4];
+  prj->w[6]  = sqrt(1.5)*D2R;
+
+  prj->astPRJfwd = astXPHfwd;
+  prj->astPRJrev = astXPHrev;
+
+  return 0;
+}
+
+/*--------------------------------------------------------------------------*/
+
+int astXPHfwd(phi, theta, prj, x, y)
+
+const double phi, theta;
+struct AstPrjPrm *prj;
+double *x, *y;
+
+{
+  double abssin, chi, eta, psi, sigma, sinthe, xi;
+
+  if (prj->flag != WCS__XPH) {
+    if (astXPHset(prj)) return 1;
+  }
+
+  /* Do phi dependence. */
+  chi = phi;
+  if (180.0 <= fabs(chi)) {
+    chi = fmod(chi, 360.0);
+    if (chi < -180.0) {
+      chi += 360.0;
+    } else if (180.0 <= chi) {
+      chi -= 360.0;
+    }
+  }
+
+  /* phi is also recomputed from chi to avoid rounding problems. */
+  chi += 180.0;
+  psi = fmod(chi, 90.0);
+
+  /* y is used to hold phi (rounded). */
+  *x = psi;
+  *y = chi - 180.0;
+
+  /* Do theta dependence. */
+  sinthe = astSind(theta);
+  abssin = fabs(sinthe);
+
+  if (abssin <= prj->w[2]) {
+    /* Equatorial regime. */
+    xi  = *x;
+    eta = 67.5 * sinthe;
+
+  } else {
+    /* Polar regime. */
+    if (theta < prj->w[5]) {
+      sigma = sqrt(3.0*(1.0 - abssin));
+    } else {
+      sigma = (90.0 - theta)*prj->w[6];
+    }
+
+    xi  = 45.0 + (*x - 45.0)*sigma;
+    eta = 45.0 * (2.0 - sigma);
+    if (theta < 0.0) eta = -eta;
+  }
+
+  xi  -= 45.0;
+  eta -= 90.0;
+
+  /* Recall that y holds phi. */
+  if (*y < -90.0) {
+    *x = prj->w[0]*(-xi + eta);
+    *y = prj->w[0]*(-xi - eta);
+
+  } else if (*y <  0.0) {
+    *x = prj->w[0]*(+xi + eta);
+    *y = prj->w[0]*(-xi + eta);
+
+  } else if (*y < 90.0) {
+    *x = prj->w[0]*( xi - eta);
+    *y = prj->w[0]*( xi + eta);
+
+  } else {
+    *x = prj->w[0]*(-xi - eta);
+    *y = prj->w[0]*( xi - eta);
+  }
+
+  return 0;
+
+}
+
+/*--------------------------------------------------------------------------*/
+
+int astXPHrev(x, y, prj, phi, theta)
+
+const double x, y;
+struct AstPrjPrm *prj;
+double *phi, *theta;
+
+{
+  double abseta, eta, eta1, sigma, xi, xi1, xr, yr;
+  const double tol = 1.0e-12;
+
+  if (prj->flag != WCS__XPH) {
+     if (astXPHset(prj)) return 1;
+  }
+
+
+  xr = x*prj->w[1];
+  yr = y*prj->w[1];
+  if (xr <= 0.0 && 0.0 < yr) {
+    xi1  = -xr - yr;
+    eta1 =  xr - yr;
+    *phi = -180.0;
+  } else if (xr < 0.0 && yr <= 0.0) {
+    xi1  =  xr - yr;
+    eta1 =  xr + yr;
+    *phi = -90.0;
+  } else if (0.0 <= xr && yr < 0.0) {
+    xi1  =  xr + yr;
+    eta1 = -xr + yr;
+    *phi = 0.0;
+  } else {
+    xi1  = -xr + yr;
+    eta1 = -xr - yr;
+    *phi = 90.0;
+  }
+
+  xi  = xi1  + 45.0;
+  eta = eta1 + 90.0;
+  abseta = fabs(eta);
+
+  if (abseta <= 90.0) {
+    if (abseta <= 45.0) {
+      /* Equatorial regime. */
+      *phi  += xi;
+      *theta = astASind(eta/67.5);
+
+      /* Bounds checking. */
+      if (45.0+tol < fabs(xi1)) return 2;
+
+    } else {
+      /* Polar regime. */
+      sigma = (90.0 - abseta) / 45.0;
+
+      /* Ensure an exact result for points on the boundary. */
+      if (xr == 0.0) {
+        if (yr <= 0.0) {
+          *phi = 0.0;
+        } else {
+          *phi = 180.0;
+        }
+      } else if (yr == 0.0) {
+        if (xr < 0.0) {
+          *phi = -90.0;
+        } else {
+          *phi =  90.0;
+        }
+      } else {
+        *phi += 45.0 + xi1/sigma;
+      }
+
+      if (sigma < prj->w[3]) {
+        *theta = 90.0 - sigma*prj->w[4];
+      } else {
+        *theta = astASind(1.0 - sigma*sigma/3.0);
+      }
+      if (eta < 0.0) *theta = -(*theta);
+
+      /* Bounds checking. */
+      if (eta < -45.0 && eta+90.0+tol < fabs(xi1)) return 2;
+    }
+
+  } else {
+    /* Beyond latitude range. */
+    *phi   = 0.0;
+    *theta = 0.0;
+    return 2;
+  }
+
+  return 0;
+}
+
+

@@ -200,6 +200,8 @@
 *           An integer identifier for the FITS TSC projection
 *        AST__HPX
 *           An integer identifier for the FITS HPX projection.
+*        AST__XPH
+*           An integer identifier for the FITS XPH projection.
 *        AST__TPN
 *           An integer identifier for a "TAN with correction terms" projection.
 *        AST__WCSBAD
@@ -235,12 +237,12 @@
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -340,7 +342,8 @@
 #define AST__GLS 28
 #define AST__TPN 29
 #define AST__HPX 30
-#define AST__WCSBAD 31   /* A bad projection type */
+#define AST__XPH 31
+#define AST__WCSBAD 32   /* A bad projection type */
 
 /* Define a dummy __attribute__ macro for use on non-GNU compilers. */
 #ifndef __GNUC__
