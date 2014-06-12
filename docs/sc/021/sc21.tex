@@ -521,52 +521,32 @@
 
 \subsection{\xlabel{using_guide}This Cookbook}
 
-The Submillimetre Common User Bolometer Array-2 (SCUBA-2) is a
-10,000-pixel bolometer camera for the 15-m James Clerk Maxwell
-Telescope (JCMT). It has two arrays operating simultaneously to map
-the sky in the atmospheric windows of 450 and 850$\mu$m.
 
 This guide is designed to instruct SCUBA-2 users on the best ways to
-reduce and visualise their data using \starlink\ packages,
-\smurf\ \cite{smurf}, \Kappa\ \cite{kappa}, \gaia\ \cite{gaia}, \oracdr\ \cite{oracdr} and \picard\
-\cite{picard}. This guide is {\em not} aimed at users of the
+reduce and visualise their data using \starlink\ packages:
+\smurf \cite{smurf}, \Kappa \cite{kappa}, \gaia \cite{gaia} and \picard
+\cite{picard}.
+
+This guide is not aimed at users of the
 polarimeter (POL-2) or Fourier transform spectrometer (FTS-2). If you
 have shared risk data (SRO) you should refer to the
 \xref{SMURF SRO
 Cookbook.}{sc19}{}\latex{\footnote{\texttt{http://www.starlink.ac.uk/docs/sc19.htx/sc19.html}}}
 
-A brief description of the instrument and the observing modes is given
-in \cref{Section}{sec:s2}{an Overview}. Details on data acquisition and
-instructions for examining raw data are given in
-\cref{Section}{sec:raw}{Raw SCUBA-2 data}.
-\cref{Section}{sec:dimm}{This page} introduces the Dynamic Iterative Map-Maker
-(DIMM); it offers an in-depth description of the map-making
-process and introduces the configuration files necessary to run the
-reduction. \cref{Section}{sec:maps}{Reducing your Data} covers running
-the map-maker and what to look out for, while
-\cref{Section}{sec:postprocess}{Post-processing Reduction Steps}
-outlines the main post-processing steps you may wish to apply to your
-science map, this includes applying the flux conversion
-factor (FCF), co-adding multiple maps and estimating the noise.
-\cref{Section}{sec:tweak}{Tweaking the configuration file}
-discusses your options for adjusting the configuration
-parameters when running the map-maker; this gives you added control
-and flexibility over the map-making routine. Two worked examples
-covering different science case are shown in
-\cref{Section}{sec:eg}{Examples}---a
-\htmlref{blank cosmology field}{sec:cosmology}
-\begin{latexonly}
-(\S\ref{sec:cosmology})
-\end{latexonly}
-and a \htmlref{galactic field}{sec:bright_ex}
-\begin{latexonly}
-(\S\ref{sec:bright_ex})
-\end{latexonly}
-with bright, extended emission.
-\cref{Section}{sec:pipe}{SCUBA-2 Pipeline} introduces the science
-pipeline and data retrieval from the
-\htmladdnormallink{JCMT Science Archive}{http://www3.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/jcmt/}
 
+This guide covers the following:
+\begin{itemize}
+\itemsep0em
+\item \cref{Chapter}{sec:intro}{Chapter 1} -- Computer resources you'll need before getting started.
+\item \cref{Chapter}{sec:s2}{Chapter 2} -- A description of SCUBA-2 and its observing modes.
+\item \cref{Chapter}{sec:raw}{Chapter 3}  -- Data acquisition and instructions for examining raw data.
+\item \cref{Chapter}{sec:dimm}{Chapter 4}  -- An introduction to the Dynamic Iterative Map-Maker and a description of the available configuration files.
+\item \cref{Chapter}{sec:maps}{Chapter 5}  -- Procedures for reducing your data using the map-maker.
+\item \cref{Chapter}{sec:postprocess}{Chapter 6}  -- Post-processing reduction steps such as applying the FCF, co-adding multiple maps and estimating the noise.
+\item \cref{Chapter}{sec:tweak}{Chapter 7}  -- Options for tailoring the configuration parameters to improve your final map.
+\item \cref{Chapter}{sec:eg}{Chapter 8}  -- Two worked examples covering a \htmlref{blank cosmology field}{sec:cosmology} and a \htmlref{galactic field}{sec:bright_ex}.
+\item \cref{Chapter}{sec:pipe}{Chapter 9}  -- Instructions for using the ORAC-DR pipeline to reduce your data along with details on data retrieved from the JSA.
+\end{itemize}
 
 \subsection{\xlabel{computing}Before you start: Computing resources}
 
@@ -574,16 +554,32 @@ Before reducing SCUBA-2 data using the Dynamic Iterative Map-Maker, we
 recommend you confirm your resources are sufficient for your type of
 map.
 
+We recommend the following:\\
+\begin{table}[h!]
+\centering
+\begin{tabular}{ll}
+\hline
+\textbf{Reduction type} &\textbf{Memory} \\
+\hline
+Large maps (\textsc{pong})& 96 GB\\
+Small maps (\textsc{daisy})&32 - 64 GB\\
+850\,$\mu$m data only&32 - 64 GB\\
+Blank fields&32 - 64 GB\\
+\hline
+\end{tabular}
+\end{table}
+
+\textbf{Why these recommendations?}\\*
 For large-area maps it is important to process a full observation in a
 single chunk---see the text box on
 \latexhtml{Page~\pageref{page:text}}{\htmlref{What to look
-for}{box:chunk}} for a
-discussion of the effects of chunking. For normal map-maker parameters
-this implies that a machine of 96\,GB should be acceptable. It is
+for}{box:chunk}} for an explanation of chunking. For large maps, using normal
+map-maker parameters a machine of 96\,GB is acceptable. It is
 important that the memory is as fast as can be afforded as RAM speed
 has a direct linear effect on processing time given that the
-time-series data are continually being funneled through the CPU. For
-blank field surveys, data that only use 850 microns, or smaller
+time-series data are continually being funnelled through the CPU.
+
+For blank field surveys, data that only use 850\,$\mu$m, or smaller
 regions of the sky you can usefully run the map-maker with less memory
 and 32 to 64\,GB is reasonable depending on the specifics of your data
 set. SMURF is multi-threaded so multiple cores do help although above
@@ -595,41 +591,51 @@ environment variable to restrict each map-maker to half the available
 cores.
 
 
-\subsection{\xlabel{software}Before you start: Software}
+\subsection{\xlabel{software}Before you start: software}
 
-This manual utilises software from the \starlink\ package;
-\smurf\ \cite{smurf}, \Kappa\ \cite{kappa}, \gaia\ \cite{gaia}, \oracdr\ \cite{oracdr} and
-\picard\ \cite{picard}. Starlink software must be installed on your system, and Starlink aliases
-and environment variables must be defined before attempting any
-reduction of SCUBA-2 data detailed here.
+This manual utilises software from the \starlink\ packages: \smurf\
+\cite{smurf}, \Kappa\ \cite{kappa}, \gaia\ \cite{gaia}, \oracdr\
+\cite{oracdr} and \picard\ \cite{picard}. Starlink software must be
+installed on your system, and Starlink aliases and environment
+variables must be defined before attempting to reduce any SCUBA-2
+data.
 
-The Sub-Millimetre User Reduction Facility, or \textsc{Smurf}, contains the
-Dynamic Iterative Map-Maker (DIMM) that will process raw SCUBA-2 data
-into images (see \smurfsun). \textsc{Kappa} meanwhile is an application
-package comprising general purpose commands for manipulating and
-visualising NDF data (see \kappasun). Before starting any data
-reduction you will want to initiate both \textsc{Smurf} and \textsc{Kappa}.
+
+\subsubsection{KAPPA and SMURF for data processing}
+
+The Sub-Millimetre User Reduction Facility, or \textsc{Smurf},
+contains the Dynamic Iterative Map-Maker (DIMM) that will process raw
+SCUBA-2 data into images (see \smurfsun). \textsc{Kappa} meanwhile is
+an application package comprising general purpose commands for
+manipulating and visualising NDF data (see \kappasun). Before starting
+any data reduction you will want to initiate both \textsc{Smurf} and
+\textsc{Kappa}.
+
 \begin{myquote}
 \begin{verbatim}
 % smurf
-
-        SMURF commands are now available -- (Version 1.5.0)
-
-        Type smurfhelp for help on SMURF commands.
-        Type 'showme sun258' to browse the hypertext documentation.
-        Type 'showme sc21' to view the SCUBA-2 map-making cookbook.
-
 % kappa
-
-     KAPPA commands are now available -- (Version 2.0-9)
-
-     Type kaphelp for help on KAPPA commands.
-     Type 'showme sun95' to browse the hypertext documentation.
-
-     See the 'Release Notes' section of SUN/95 for details of the
-     changes made for this release.
 \end{verbatim}
 \end{myquote}
+
+You can access the help information by typing smurfhelp or kaphelp respectively in a terminal.
+
+\begin{latexonly}
+\begin{center}
+\begin{fmpage}{0.95\linewidth}
+\vspace{0.1cm}
+TIP: The .sdf extension on filenames is not required when running Starlink commands.
+\end{fmpage}
+\end{center}
+\end{latexonly}
+
+\begin{htmlonly}
+\textbf{TIP: The .sdf extension on filenames is not required when running Starlink commands.\\*\\*}
+\end{htmlonly}
+\vspace{0.5cm}
+
+\subsection{GAIA for viewing your map}
+
 Image visualisation can be done with \gaia\ (see \gaiasun). \gaia\ is an
 image and data-cube display and analysis tool which incorporates tools such
 as source detection, 3\textsc{d} visualisation, photometry and the ability
@@ -640,15 +646,22 @@ to query and overlay on-line or local catalogues.
 \end{verbatim}
 \end{myquote}
 
+\subsubsection{ORAC-DR for running the pipeline}
+
 The \oracdr\ Data Reduction Pipeline \cite{oracdr} (hereafter just
 \textsc{Orac-dr}) is an automated reduction pipeline. \textsc{Orac-dr} uses
 \smurf\ and \Kappa\ (along with other Starlink tools) to perform an automated
 reduction of the raw data following pre-defined recipes to produce
-calibrated maps. \textsc{Picard} uses a similar pipeline system for
+calibrated maps.
+
+\subsubsection{PICARD for post-reduction processing}
+
+\textsc{Picard} uses a similar pipeline system as \oracdr\ for
 post-processing analysis of reduced data. \textsc{Picard}
-documentation can be found at \htmladdnormallinkfoot{the \textsc{Orac-dr} web
-page}{http://www.oracdr.org/oracdr/PICARD}, or at \picardsun. All
-\textsc{Picard} recipes follow the same structure and are run like so:
+documentation can be found at \htmladdnormallinkfoot{the
+\textsc{Orac-dr} web page}{http://www.oracdr.org/oracdr/PICARD}, or at
+\picardsun. All \textsc{Picard} recipes follow the same structure and
+are run like so.
 \begin{myquote}
 \begin{verbatim}
 % picard -recpars <recipe_params_file> RECIPE <input_files>
@@ -661,22 +674,55 @@ files to be run, which must be int the current directory, or a
 directory defined by \param{ORAC\_DATA\_OUT}. A number of \textsc{Picard}
 recipes will be demonstrated in \cref{Section}{sec:maps}{Reducing your data}.
 
-\textbf{Note:} The \textsc{Picard} recipes require all input files to have
-the \texttt{.sdf} extension included; this is not the case for the
-Starlink packages \textsc{Kappa} and \textsc{Smurf}.
+
+\begin{latexonly}
+\begin{center}
+\begin{fmpage}{0.95\linewidth}
+\vspace{0.1cm}
+TIP: The .sdf extension on filenames is required by \textsc{Picard}.
+\end{fmpage}
+\end{center}
+\end{latexonly}
+
+\begin{htmlonly}
+\textbf{TIP: The .sdf extension on filenames is required by PICARD.\\*\\*}
+\end{htmlonly}
+
+
+\begin{latexonly}
+\begin{center}
+\begin{fmpage}{0.95\linewidth}
+\vspace{0.1cm}
+TIP: If the environment variable \param{ORAC\_DATA\_OUT} is defined, any files
+created by \textsc{Picard} will be written in that location. Check there if new
+files are expected but do not appear in the current directory.
+\end{fmpage}
+\end{center}
+\end{latexonly}
+
+\begin{htmlonly}
+\textbf{TIP: If the environment variable ORAC\_DATA\_OUT is defined,
+any files created by PICARD will be written in that location. Check
+there if new files are expected but do not appear in the current
+directory.\\*\\*}
+\end{htmlonly}
 
 \subsection{\xlabel{options}Processing Options}
 
-There are two approaches to processing your data: either performing
-each step by hand or by using an automated pipeline. The pipeline
-approach works well if your project is suited to using one of the
+You have two options for processing your data:
+\\*\\*
+(1) Performing each step manually.\\*
+(2) Running the automated pipeline (\textsc{Orac-dr}).
+\\*\\*
+The pipeline approach works well if your project is suited to using one of the
 standard recipes, and if you have a lot of data to process. Performing
-each step by hand allows more fine-grained control of certain
+each step by hand allows more fine-tuned control of certain
 processing and analysis steps, and is especially useful for refining
-the parameters used by the map-maker. Of course, once the optimal
+the parameters used by the map-maker. However, once the optimal
 parameters have been determined, it is possible to pass them to the
-pipeline and let it process all of your data automatically. Sections~4
-and 5 discuss the manual approach; to use the science pipeline, skip
+pipeline. \cref{Section}{sec:dimm}{The map-maker explained}
+and \cref{Section}{sec:maps}{Reducing your data} discuss the manual approach;
+to use the science pipeline, skip
 straight to \cref{Section}{sec:pipe}{SCUBA-2 Pipeline}.
 
 While you have the option of running the pipeline yourself, the JCMT
@@ -694,6 +740,11 @@ at CADC.
 \subsection{\xlabel{scuba2}The instrument}
 \label{sec:s2}
 
+The Submillimetre Common User Bolometer Array-2 (SCUBA-2) is a
+10,000-pixel bolometer camera. It has two arrays operating simultaneously to map
+the sky in the atmospheric windows of 450 and 850$\mu$m.
+\\*\\*
+\textbf{How it works}\\*
 The SCUBA-2 bolometers are integrated arrays of superconducting
 transition edge sensors (TESs) with a characteristic transition
 temperature, $T_c$. In addition, each TES is ringed with a resistive
@@ -714,15 +765,16 @@ chain of superconducting quantum interference devices (SQUIDs). This
 induces a feedback current which is proportional to the current
 flowing through the TES, and it is this feedback current that is
 recorded during data acquisition.
-
+\\*\\*
+\textbf{Setups}\\*
 Before science data can be taken the system must be optimised. These
 `setups' are performed after slewing to the azimuth of the source,
 where the SQUID, TES and heater biases are set to pre-determined
 nominal values, in order to position the bolometers in the middle of
 the transition range.
-
-This is followed by a 10-second noise observation carried out while
-the shutter is still closed. The shutter then opens onto the sky, and
+\\*\\*
+\textbf{Flat-field}\\*
+ The shutter then opens onto the sky, and
 as it does so the gradual increase in sky power hitting the array is
 compensated for by a decrease in the resistive heater power via a
 servo loop designed to keep the TES output constant. This acts to keep
@@ -775,8 +827,41 @@ choice depends on the size of the area you wish to map, where you
 would like your integration time concentrated and the degree of
 extended emission you wish to recover
 
-In contrast to SCUBA which observed an area of sky while
-simultaneously chopping, SCUBA-2 removes atmospheric noise in the data
+\begin{minipage}[t]{0.15\linewidth}
+\textbf{PONG}
+\end{minipage}
+\begin{minipage}[t]{0.85\linewidth}\textsc{pong} maps are the scan
+strategy for covering large areas. The default options allow for three
+sizes---900\,arcsec, 1800\,arcsec and 3600\,arcsec. A single \textsc{pong} map is
+a square of these dimensions and the telescope fills in the square by
+bouncing off the edge of the area. To ensure an even sky background it
+is recommended a minimum of three, but preferably more than five,
+\textsc{pong} maps are included in a single observation with a
+rotation introduced between each one. In this way a circular pattern
+is built up, (see the right-hand panel of \cref{Figure}{fig:scan}{graphic below}),
+with a diameter equal to your requested map size.
+\vspace{0.2cm}\\
+To recover large-scale extended structure you are advised to use
+larger \textsc{pong} maps which scan at a higher rate. This option is
+in preference to tiling multiple smaller maps. Ultimately it is the
+size of the SCUBA-2 field-of-view that determines the sensitivity to
+large-scale structure.
+\end{minipage}
+\\ \\ \\
+\begin{minipage}[t]{0.15\linewidth}
+\textbf{DAISY}
+\end{minipage}
+\begin{minipage}[t]{0.85\linewidth}
+\textsc{daisy} maps are the option for point-like or compact sources
+($<$3~arcmin) by maximising the exposure time on the centre of the
+image. The telescope moves at a constant velocity in a `spirograph'
+pattern that has the advantage of keeping the source on the array
+throughout the observation. This is shown in the top panel of
+\cref{Figure}{fig:scan}{the figure below}.
+\end{minipage}
+\vspace{1.5cm}\\
+\textbf{Why these patterns?}\\*
+SCUBA-2 removes atmospheric noise in the data
 processing stage (Holland et al. 2013) \cite{s2main}. The power spectrum
 of data taken by SCUBA-2 has a $1/f$ noise curve at lower frequencies. To
 ensure astronomical signals are far away from this $1/f$ noise, fast
@@ -788,51 +873,16 @@ scan pattern must pass across each region of the map from different
 directions and at different times. The scan patterns themselves, along
 with the associated parameters (velocity and scan-spacing), have been
 designed and optimised to meet both these criteria.
-\\ \\
-\begin{minipage}[t]{0.12\linewidth}
-\textbf{PONG}
-\end{minipage}
-\begin{minipage}[t]{0.85\linewidth}\textsc{pong} maps are the scan
-strategy for covering large areas. The default options allow for 3
-sizes---900\,arcsec, 1800\,arcsec and 3600\,arcsec. A single \textsc{pong} map is
-a square of these dimensions and the telescope fills in the square by
-bouncing off the edge of the area. To ensure an even sky background it
-is recommended a minimum of 3, but preferably more than 5,
-\textsc{pong} maps are included in a single observation with a
-rotation introduced between each one. In this way a circular pattern
-is built up, (see the right-hand panel of \cref{Figure}{fig:scan}{graphic below}),
-with a diameter equal to your requested map size.
-\vspace{0.2cm}\\
-To recover large-scale extended structure you are advised to use
-larger \textsc{pong} maps which scan at a higher rate. This option is
-in preference to tiling multiple smaller maps.
-\end{minipage}
-\\ \\ \\
-\begin{minipage}[t]{0.12\linewidth}
-\textbf{DAISY}
-\end{minipage}
-\begin{minipage}[t]{0.85\linewidth}
-\textsc{daisy} maps are the option for point-like or compact sources
-($<$3~arcmin) by maximising the exposure time on the centre of the
-image. The telescope moves at a constant velocity in a `spirograph'
-pattern that has the advantage of keeping the source on the array
-throughout the observation. This is shown in the top panel of
-\cref{Figure}{fig:scan}{the figure below}.
-\end{minipage}
 
-\myfig{sc21_wayne_scan}{[b!]}{width=0.9\linewidth}{fig:scan}{
+\myfig{sc21_wayne_scan}{[t!]}{width=0.98\linewidth}{fig:scan}{
   Illustration of the SCUBA-2 observing patterns}{
-  Telescope track in offsets of azimuth and elevation for the SCUBA-2
-  observing patterns. \textbf{Top Left}: A single rotation of the
-  \textsc{daisy} pattern; \textbf{Top Right}: Multiple rotations of
-  the \textsc{daisy} pattern for a typical map based on a 180-arcsec
-  demanded diameter; \textbf{Bottom Left}: A single \textsc{pong}
-  pattern; \textbf{Bottom Right}: Multiple rotations of the
-  \textsc{pong} pattern for a typical map based on an 1800-arcsec
-  demanded map size. The scan pattern for your observation can be
-  visualised like this with \topcat\ using the output from \jcmtstate.
-  See \cref{Section}{sec:exam}{Examining raw data} for more details.
-  Figure taken from Holland et al. (2013).}
+  From left: telescope track over a single rotation of the pattern;
+  telescope track after multiple rotations of the pattern; resulting
+  exposure time map. The scan pattern for your observation can be
+  visualised in this way with \topcat\ using the output from
+  \jcmtstate.  See \cref{Section}{sec:exam}{Examining raw data} for
+  more details.  Figure modified from Holland et al. (2013).
+}
 
 \clearpage
 
@@ -1181,7 +1231,7 @@ See the \xref{\textsc{Gaia} manual}{sun214}{} for full
 details.\latex{\footnote{\texttt{http://docs.jach.hawaii.edu/star/sun214.htx/sun214.html}}}
 
 \clearpage
-\subsection{\xlabel{regrid_map}Regridding data into a map}
+\section{\xlabel{regrid_map}Regridding data into a map}
 \label{sec:regrid}
 
 Any raw time-series data can be quickly regridded into sky frame
@@ -1198,17 +1248,31 @@ required.
 The output map here is called \texttt{crl2688\_sky.sdf} and is shown
 in \cref{Figure}{fig:regrid}{the figure below}.
 The pixel scale is left at the default values of 2\,arcsec on a side at
-450\,$\mu$m and 4\,arcsec at 850\,$\mu$m (although this can be changed
+450$\mu$m and 4\,arcsec at 850$\mu$m (although this can be changed
 using the \texttt{pixsize=}$x$ option on the command-line, where $x$ is in
 arcsec).
 
 \myfig{sc21_crl2688_regrid}{[b!]}{width=0.65\linewidth}{fig:regrid}{
-  The regridded map of CRL2688 displayed with \gaia}{
+  The regridded map of CRL2688 displayed with \gaia.}{
   The regridded map of CRL2688 with the s8a sub-array displayed with \gaia.
 }
 
+\begin{latexonly}
+\begin{center}
+\begin{fmpage}{0.95\linewidth}
+\vspace{0.1cm}
+TIP: If you do not include method=rebin, the map-maker will will default to method=iterate.
+\end{fmpage}
+\end{center}
+\end{latexonly}
 
-\subsection{\xlabel{clean}Notes on cleaning your data}
+\begin{htmlonly}
+\textbf{TIP: If you do not include method=rebin, the map-maker will
+default to method=iterate.\\*\\*}
+\end{htmlonly}
+
+
+\section{\xlabel{clean}Notes on cleaning your data}
 \label{sec:clean}
 
 Cleaning raw data is an essential first step towards making a quality
