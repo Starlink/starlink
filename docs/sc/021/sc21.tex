@@ -967,18 +967,6 @@ instructions given in \cref{Section}{sec:cmult}{Applying the FCF and
 determining fluxes}.
 
 
-\subsection{\xlabel{examine}Examining raw data}
-\label{sec:exam}
-
-In this section a number of procedures are described for visualising
-and assessing raw data files. These steps are not a necessary part of
-the data reduction process and do not concern the iterative map-maker.
-However, there are reasons you may wish to examine your raw data in
-greater depth. The most likely motivation is an unusual result from the
-map-maker, this could be higher than anticipated noise, patterns in
-the data or inconsistent noise across multiple tiles. This section
-will help you get to the bottom of any issues concerning raw data.
-
 \subsubsection{\xlabel{concat}Concatenate \& apply a flat-field}
 \label{sec:concat}
 
@@ -986,12 +974,12 @@ Since SCUBA-2 data for a given sub-array are broken into multiple
 30-second scans by the data acquisition (DA) system, it is useful to
 concatenate the data into a single file. The \smurf\ task \concat\ can
 be used for this operation. The example below combines all of the
-files associated with observation 45 for the s8a array into a single
-file called \texttt{s8a20120725\_00045\_con}.
+files associated with Observation 8 for the s8a array into a single
+file called \texttt{s8a20120725\_0008\_con}.
 
 \begin{myquote}
 \begin{verbatim}
-% sc2concat 's8a20120725_00045*.sdf' s8a20120725_00045_con
+% sc2concat 's8a20120725_0008*.sdf' s8a20120725_0008_con
 \end{verbatim}
 \end{myquote}
 \task{sc2concat} will automatically filter out any dark or flat-field
@@ -1011,48 +999,78 @@ The flat-field can also be applied manually using the \flatfield\ command.
 \end{verbatim}
 \end{myquote}
 Here, the output will be a flat-fielded version of each science scan
-in observation number 8; the file names will be the original input
+in Observation 8; the file names will be the original input
 names with \_flat appended to them.
 
 As a rule of thumb, you should apply the flat-field to your data
-before examining it. \textbf{You do not need to apply the flat-field
-prior to reducing your data with the map-maker as it will be applied
-internally.}
+before examining it.
 
 
-\subsubsection{\xlabel{header}Headers and file structure}
+\begin{latexonly}
+\begin{center}
+\begin{fmpage}{0.95\linewidth}
+\vspace{0.1cm}
+TIP: You do not need to apply the flat-field prior to reducing your
+data with the map-maker.
+\end{fmpage}
+\end{center}
+\end{latexonly}
+
+\begin{htmlonly}
+\textbf{TIP: You do not need to apply the flat-field
+prior to reducing your data with the map-maker.\\*\\*}
+\end{htmlonly}
+
+
+\subsection{\xlabel{header}Headers and file structure}
 \label{sec:fitsheader}
 
 There are two \Kappa\ tasks which are extremely useful for examining
 your data: \fitslist\ and \ndftrace, which can be used to view the
 FITS headers and dimensions of the data.
-\\ \\
+\vspace{5mm}
+
+\begin{center}
 \begin{minipage}[t]{0.12\linewidth}
 \textbf{fitslist}
 \end{minipage}
-\begin{minipage}[t]{0.85\linewidth}This lists the FITS header information
+\begin{minipage}[t]{0.75\linewidth}This lists the FITS header information
 for any file (raw or reduced). This extensive list includes dates \& times,
 source name, scan type, pattern and velocity, size of the map, exposure
 time, start and end elevation, opacity and the temperature of the
 instrument. An example is given below:
 \begin{myquote}
 \begin{verbatim}
-% fitslist s8a20120720_00030_0003.sdf
+% fitslist s8a20120720_00030_000\*.sdf | grep SEQ_TYPE
 \end{verbatim}
 \end{myquote}
 If you already know the name of the parameter you want to view you can
-either pipe the \task{fitslist} output to grep or use the \fitsval\ command
-instead, e.g. \texttt{\% fitsval file.sdf TAU225ST}.\\
+use the \fitsval\ command instead, e.g.\\
+\begin{myquote}
+\begin{verbatim}
+% fitsval file.sdf TAU225ST
+\end{verbatim}
+\end{myquote}
 \end{minipage}
+\newline
 
+
+\begin{minipage}[t]{0.1\linewidth} \end{minipage}
 \begin{minipage}[t]{0.12\linewidth}
 \textbf{ndftrace}
 \end{minipage}
-\begin{minipage}[t]{0.85\linewidth}
+\begin{minipage}[t]{0.75\linewidth}
 \task{ndftrace} displays the attributes of the data structure. This will tell
-you the units of the data, pixel bounds, dimensions and axis assignations.\\
+you the units of the data, pixel bounds, dimensions and axis assignations.
+\begin{myquote}
+\begin{verbatim}
+% ndftrace file.sdf fullframe
+\end{verbatim}
+\end{myquote}
 \end{minipage}
-\\ \\
+\vspace{4mm}
+\end{center}
+
 Full details of these commands can be found in the \xref{\textsc{Kappa} manual}{sun95}{}.
 
 \begin{latexonly}
@@ -1060,7 +1078,7 @@ Full details of these commands can be found in the \xref{\textsc{Kappa} manual}{
 \begin{center}
 \begin{fmpage}{0.95\linewidth}
 \vspace{0.2cm}
-\textbf{ Topcat Example}
+\textbf{Topcat Example}
 
 \vspace{0.5cm}
 
@@ -1074,7 +1092,7 @@ Full details of these commands can be found in the \xref{\textsc{Kappa} manual}{
 \end{minipage}
 \hspace{0.3cm}
 \begin{minipage}[c]{0.32\linewidth}
-Load the file into \topcat\ with this command.
+Load the tst file generated by \texttt{jcmtstate2cat} into \topcat.
 \end{minipage}
 
 \vspace{0.5cm}
@@ -1086,7 +1104,7 @@ Load the file into \topcat\ with this command.
 \end{minipage}
 \hspace{0.3cm}
 \begin{minipage}[c]{0.32\linewidth}
-Once the file has loaded into \topcat, select the scatter plot option
+In \topcat\ select the scatter plot option
 from the menu bar across the top of the window.
 \end{minipage}
 
@@ -1099,7 +1117,7 @@ from the menu bar across the top of the window.
 \end{minipage}
 \hspace{0.3cm}
 \begin{minipage}[c]{0.32\linewidth}
-When the scatter plot has loaded, you should adjust the $X$-axis and
+With the scatter plot displayed you can adjust the $X$-axis and
 $Y$-axis values to DRA and DDEC respectively to display the scan pattern.
 If you are interested in seeing how any of the variables change over time,
 select the the $X$ Axis to be either Id or RTS\_NUM.
@@ -1203,7 +1221,8 @@ different time slices in the main window.
   The main window in the left shows a map of bolometer values at a fixed
   sample in time. You may have to zoom in multiple times by clicking the
   `Z' icon. On the right-hand side, the `Display image sections of a cube'
-  dialogue enables you to navigate the time axis.}
+  dialogue enables you to navigate the time axis.
+}
 
 A third window will appear when you click on a bolometer---the
 `Spectral plot'. This shows an automatically scaled plot of the raw
@@ -1231,7 +1250,7 @@ See the \xref{\textsc{Gaia} manual}{sun214}{} for full
 details.\latex{\footnote{\texttt{http://docs.jach.hawaii.edu/star/sun214.htx/sun214.html}}}
 
 \clearpage
-\section{\xlabel{regrid_map}Regridding data into a map}
+\subsection{\xlabel{regrid_map}Regridding data into a map}
 \label{sec:regrid}
 
 Any raw time-series data can be quickly regridded into sky frame
@@ -1272,7 +1291,7 @@ default to method=iterate.\\*\\*}
 \end{htmlonly}
 
 
-\section{\xlabel{clean}Notes on cleaning your data}
+\subsection{\xlabel{clean}Notes on cleaning your data}
 \label{sec:clean}
 
 Cleaning raw data is an essential first step towards making a quality
@@ -1311,19 +1330,19 @@ ignored and the on-sky performance of the array is calculated.
 \end{verbatim}
 \end{myquote}
 It will prompt for a configuration file to describe the cleaning
-steps---recommended is the supplied \texttt{dimmconfig\_calcnoise.lis}.
+steps---the default is the supplied \texttt{dimmconfig\_calcnoise.lis}.
 Two noise measurements are reported in the terminal: the
 `Effective noise' and the `Effective NEP'.
 
 An output file is created for each sub-array with the NEP map stored
 in the \texttt{.MORE.SMURF.NEP} extension.
 
-If you have a bright source in the field this will contaminate the
-signal which in turn will lead to an overestimate of the noise. In
-this case you should examine the \texttt{NOI} model from the map-maker
-instead---see \cref{Section}{sec:models}{The Individual Models} for a
-description and \cref{Section}{sec:export}{Exporting individual
-models} for details on how to examine it.
+If you have a bright source in the field this will
+contaminate the signal. In this case you should examine the
+\texttt{NOI} model from the map-maker instead---see
+\cref{Section}{sec:models}{The Individual Models} for a description
+and \cref{Section}{sec:export}{Exporting individual models} for
+details on how to examine it.
 
 \clearpage
 \section{\xlabel{dimm}The Dynamic Iterative Map-Maker}
