@@ -2456,28 +2456,16 @@ of the various outputs see \cref{Section}{sec:pipe}{The SCUBA-2
 Pipeline} or \pipelinesun.}
 \clearpage
 
-\section{\xlabel{maps}Post-processing Reduction Steps}
+
+\section{\xlabel{postprocess}Post-processing Reduction Steps}
 \label{sec:postprocess}
 
-This chapter describes the steps you are likely to want to take after
-the map-maker has produced a science map. These include calibrating
-your data by applying an FCF, dealing with multiple maps, checking the
-noise levels and cropping your map.
-\\*\\*
-The software used for these post-processing steps are \Kappa\ and
-\picard. \picard\ is specially designed to operate on the map-maker
-products (and hence also on pipeline products) and a number of tailored
-recipes exist to make these steps easier to perform. We recommend you
-consult the \picard\ manual (see \picardsun) for a full list of
-available recipes. General \picard\ options can be accessed by typing
-\texttt{picard -h} in a terminal.
-
-\subsection{\xlabel{apply_fcf}Flux Conversion Factors (FCFs)}
+\subsection{\xlabel{apply_fcf}Flux Conversion Factors(FCFs)}
 \label{sec:cmult}
 
 When your data comes out of the map-maker it is in units of picowatts
 (pW). A flux conversion factor, or FCF, needs to be applied to scale
-your data from units of pW to janskys. For more information on calibrating
+your data from units of pW to janskys (Jy). For more information on calibrating
 SCUBA-2 data see Dempsey et al. (2013) \cite{dempsey12}.
 \\*\\*
 Below are our default FCFs. Note that the \fcfb\ will be applied
@@ -2540,9 +2528,7 @@ source. (If your source is point-like, the peak value in the map is
 the total flux density). Applying \fcfb\ will result in a map with
 units of Jy/beam. For point-like or compact sources smaller than the
 beam (with a Gaussian profile), this peak value will be the flux
-density of your source. Note that the pipeline
-(\cref{Section}{sec:pipe}{SCUBA-2 Pipeline}) reports FCFs in units of
-mJy/beam.
+density of your source.
 
 \subsubsection{Determining your own FCF}
 
@@ -2552,7 +2538,8 @@ nearest calibrator to the standard FCF. You can use this FCF to scale
 the the standard value accordingly. You should chose the calibrator
 nearest in time to your science observations, unless the weather has
 changed significantly.
-\vspace{1mm}\\
+
+\vspace{1mm}
 \begin{minipage}[t]{0.05\linewidth}
 \texttt{(1)}
 \end{minipage}
@@ -2604,7 +2591,7 @@ section. Remember to apply the pixel size squared factor if using
 \subsubsection{Applying the FCF}
 
 You can apply the FCF using the \picard\ recipe
-\xref{\drrecipe{SCUBA2\_CHECK\_CAL}}{sun265}{CALIBRATE\_SCUBA2\_DATA}.
+\xref{\drrecipe{CALIBRATE\_SCUBA2\_DATA}}{sun265}{CALIBRATE\_SCUBA2\_DATA}.
 By default this will multiply your map by
 1000$\times$\fcfb\ from the start of
 \cref{Section}{sec:cmult}{Flux Conversion Factors}. This produces a
@@ -2637,7 +2624,7 @@ map.
 
 You can crop your map to the map-size set in the data header or
 to any requested size of box or circle using the \picard\ recipe
-\xref{\drrecipe{SCUBA2\_CHECK\_CAL}}{sun265}{CROP\_JCMT\_IMAGES}.
+\xref{\drrecipe{CROP\_JCMT\_IMAGES}}{sun265}{CROP\_JCMT\_IMAGES}.
 The centre of the cropping area will always be the centre of your map.
 \begin{myquote}
 \begin{verbatim}
@@ -2713,19 +2700,11 @@ MAKEMOS_METHOD = sigmas
 MAKEMOS_SIGMAS = 3
 \end{verbatim}
 \end{myquote}
-Another option available (either independently or within this recipe)
-is to register the images. This can be used when there is a common,
-known source that is present in \emph{all} of the input maps. The
-position of that source can be given and the recipe
-\xref{\drrecipe{SCUBA2\_REGISTER\_IMAGES}}{sun265}{SCUBA2_REGISTER_IMAGES}
-fits a profile to the source and shifts the map accordingly so they
-are all aligned.
 
 Currently there is no advantage in terms of data quality to reducing
-\texttt{\`{}cat listoffiles.txt`}
+\texttt{\`{}cat listoffiles.txt\`{}}
 all observations simultaneously or separately. However, the latter
-does allow the option of assessing the individual maps before co-adding
-and is the method followed in this example.
+does allow the option of assessing the individual maps before co-adding.
 
 \begin{latexonly}
 \begin{center}
@@ -2748,7 +2727,7 @@ noise distribution from bright sources.\\*\\*}
 
 You can register a series of SCUBA-2 maps to a common reference
 position using the \picard\ recipe
-\xref{\drrecipe{SCUBA2\_CHECK\_CAL}}{sun265}{SCUBA2\_REGISTER\_IMAGES}.
+\xref{\drrecipe{SCUBA2\_REGISTER\_IMAGES}}{sun265}{SCUBA2\_REGISTER\_IMAGES}.
 This is only possible if a there is a common, known source that is
 present in \textit{all} of the input maps. This should be done before
 combining your maps.
@@ -2774,7 +2753,7 @@ REGISTER_Y  = DD:MM:SS.S
 
 \subsection{\xlabel{noise}Sensitivity}
 
-\subsection{Getting the noise}
+\subsubsection{Getting the noise}
 \label{sec:checkrms}
 
 You can use the \picard\ recipe SCUBA2\_CHECK\_RMS get the noise. This
@@ -2840,7 +2819,7 @@ distribution from bright sources.}
 \end{center}
 \end{figure}
 
-\subsection{Map statistics}
+\subsubsection{Map statistics}
 
 The \Kappa\ commands \histat\ and \stats\ are very similar and both
 return a range of statistics describing any NDF. In addition to the
@@ -2861,7 +2840,7 @@ similar result to the mean/median of the error array except with
 additional contamination from sources.
 
 
-\subsection{Viewing the noise histogram}
+\subsubsection{Viewing the noise histogram}
 
 You can view a histogram of the error component with the
 \textsc{Kappa} command \histogram. Again \param{comp=err} must be
@@ -2888,7 +2867,7 @@ above}. For more information on the options for \histogram\ see
 \end{figure}
 
 
-\subsection{Examining the error map in GAIA}
+\subsubsection{Examining the error map with GAIA}
 
 It is also useful to view the error map itself. Open your reduced map
 in \gaia, then select the \texttt{Error} button on the \texttt{Select NDF in
@@ -2925,6 +2904,7 @@ using the \textsc{Kappa} command \ndfcopy.  For example
 To change the pixel size use the \Kappa\ command \compave. The following example
 increases the pixel size from 4\,arcsec to 8\,arcsec by using a
 compression factor of 2.
+
 \begin{myquote}
 \begin{verbatim}
 % compave map map_regrid 2
@@ -2957,7 +2937,7 @@ First open your map in \gaia. Select the top level NDF from list in
 the pop-up window then click the \texttt{Quality} button. You will need to
 rescale the map to bring out the masks--see figure \ref{fig:qualdisp}.
 
-Each value in the Quality component of an NDF contains eight ``on/off''
+Each value in the QUALITY component of an NDF contains eight ``on/off''
 flags used to indicate a specific binary property of the pixel. The
 first three of these flags indicate whether a pixel is inside or outside a
 specific mask (1=\texttt{AST}, 2=\texttt{FLT} or 3=\texttt{COM}).
@@ -2980,12 +2960,13 @@ You can see which bit is used for each mask with \showqual.
 \end{myquote}
 
 As an example, you can set bad all pixel outside the \texttt{FLT} mask by doing:
+
 \begin{myquote}
 \begin{verbatim}
 % setbb map 2
 \end{verbatim}
 \end{myquote}
-\vspace{0.5cm}
+\vspace{0.3cm}
 
 \textbf{Contouring a mask over your map}\\*
 If you would like to plot a mask over your map you will need to copy
@@ -3056,7 +3037,66 @@ description of the matched filter principle is given in
 \cref{Appendix}{app:mf}{SCUBA-2 Matched Filter}, while the \textsc{Picard}
 manual gives full details of all the available parameters.
 
-%cupid - findclumps
+\subsection{\xlabel{clumps}Clump finding}
+\label{sec:clumps}
+\label{sec:clumpfind}
+The \cupid\ application \findclumps\ can be used to generate a clump
+catalogue. It identifies clumps of emission in 1, 2 or 3D NDFs. The
+user can select from the clump finding algorithms FellWalker,
+Gaussclumps, ClumpFind or Reinhold and must supply a configuration
+file specific to each method. See the \xref{\textsc{Cupid}
+manual}{sun255}{} for descriptions of the various algorithms.
+
+The result is returned as a catalogue in a text file and as a NDF
+pixel mask showing the clump boundaries.
+
+\begin{myquote}
+\begin{verbatim}
+% findclumps in=S2map.sdf out=clumpmap.sdf outcat=clumps.FIT logfile=clumps.log \
+  config=^config.dat method=fellwalker rms=25 shape=polygon
+\end{verbatim}
+\end{myquote}
+
+The shape option allows \findclumps\ to create an STC-S description
+(polygonal or elliptical) for each clump. These are added as extra
+columns to the output catalogue.
+\\*\\*
+\begin{minipage}[t]{0.12\linewidth}
+\textbf{Polygon}
+\end{minipage}
+\begin{minipage}[t]{0.85\linewidth}
+Each polygon will have, at most, 15 vertices. For two-dimensional data
+the polygon is a fit to the clump's outer boundary (the region
+containing all good data values). For three-dimensional data the
+spatial footprint of each clump is determined by rejecting the least
+significant 10\% of spatial pixels, where "significance" is measured
+by the number of spectral channels that contribute to the spatial
+pixel. The polygon is then a fit to the outer boundary of the
+remaining spatial pixels.
+
+\end{minipage}
+
+\begin{minipage}[t]{0.12\linewidth}
+\textbf{Ellipse}
+\end{minipage}
+\begin{minipage}[t]{0.85\linewidth}
+All data values in the clump are projected onto the spatial plane and
+"size" of the collapsed clump at four different position angles---all
+separated by 45$^\circ$---is found. The ellipse that generates the
+same sizes at the four position angles is then found and used as the
+clump shape.
+\end{minipage}
+
+\myfig{sc21_plotstcshapes}{[h!]}{width=0.99\linewidth}{fig:stcshapes}{
+  Overlaying a clump catalogue in \gaia.}{
+  STC shapes displayed over the input map with \gaia. To overlay your clumps
+  in this way open you map with \gaia. Under the \texttt{Image-Analysis}
+  menu select \texttt{Positions...} followed by \texttt{Import CUPID
+  catalogue...} In the pop-up window select the \texttt{.FIT} file 
+  generated by \findclumps\ and  ensure the \texttt{STC shape} box is 
+  checked before importing.
+}
+
 
 \subsection{\xlabel{provenance}Map provenance \& configuration parameters}
 \label{sec:prov}
@@ -3066,6 +3106,7 @@ into it and what configuration parameters were used with the
 map-maker. There are a number of useful \Kappa\ commands to help you
 with this:
 
+\textbf{Map provenance}\\
 \provshow\ will list all the NDFs that were used in the creation of
 your map, while \hislist\ will show a truncated list of input files
 but will list every configuration parameter used by the map-maker.
