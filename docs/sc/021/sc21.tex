@@ -739,6 +739,7 @@ at CADC.
 
 \clearpage
 \section{\xlabel{scuba2_overview}SCUBA-2 Overview}
+
 \subsection{\xlabel{scuba2}The instrument}
 \label{sec:s2}
 
@@ -2461,7 +2462,7 @@ Pipeline} or \pipelinesun.}
 \section{\xlabel{postprocess}Post-processing Reduction Steps}
 \label{sec:postprocess}
 
-\subsection{\xlabel{apply_fcf}Flux Conversion Factors(FCFs)}
+\subsection{\xlabel{apply_fcf}Flux Conversion Factors (FCFs)}
 \label{sec:cmult}
 
 When your data comes out of the map-maker it is in units of picowatts
@@ -3165,6 +3166,8 @@ differ from the the values given in \texttt{dimmconfig.lis}.
 \section{\xlabel{tweak}Tailoring your Reduction}
 \label{sec:tweak}
 
+
+\subsection{Adding and amending parameters}
 The default configuration file \texttt{dimmconfig.lis} contains all of
 the parameters the most users would wish to play with.
 
@@ -3937,8 +3940,8 @@ in this case to a 900-arcsec radius circle. The output file will be named
 \textbf{Step 5: Making a S/N map}
 \vspace{0.2cm}\\
 Finally, we need to find sources. The filtered map contains a
-VARIANCE component, so it is easy to produce an S/N map using the
-\textsc{Kappa} task \task{makesnr}:
+VARIANCE component, so it is easy to produce a S/N map using the
+\textsc{Kappa} task \makesnr:
 \begin{myquote}
 \begin{verbatim}
 % makesnr cosmo2_mos_mf_crop cosmo2_mos_mf_crop_snr
@@ -4252,7 +4255,7 @@ sources. This time the configuration file called by \makemap\
 is \texttt{dimmconfig\_blank\_field.lis}. The resulting map is further
 processed with a matched filter to give the first output map. Then the
 S/N is taken to enhance point sources, this
-signal-to-noise map is written out as a second output file. This
+S/N map is written out as a second output file. This
 recipe also performs a source finder routine; the results are written
 as a FITS catalogue (with file extension \texttt{.FIT}) which can be
 read as a local catalogue into \gaia.
@@ -4543,7 +4546,7 @@ are mostly seeing sky noise variations that are seen with roughly the
 same amplitude by all bolometers.
 
 Another common feature, if the scans are particularly long and/or fast
-(e.g. 1~degree across), is strong periodic signals that are correlated
+(e.g. 1\,degree across), is strong periodic signals that are correlated
 with the scan pattern. See \cref{Section}{sec:scan}{Displaying scan
 patterns}---in particular
 you will want to plot \texttt{az} and \texttt{el} (the absolute
@@ -4634,7 +4637,7 @@ sensitivity, and while not discussed here, is also produced by the
 calibrators, the FCFs and NEFDs have been calculated as follows:
 
 \begin{enumerate}
-\item{The \textsc{Picard} recipe \drrecipe{SCUBA2\_CHECK\_CAL} takes the reduced
+\item{The \textsc{Picard} recipe \drrecipe{SCUBA2\_FCFNEFD} takes the reduced
 map, crops it, and runs background removal. Surface-fitting
 parameters are changeable in the \textsc{Picard} parameter file.}
 \item{It then runs the \Kappa\ \beamfit\ task on the specified point
