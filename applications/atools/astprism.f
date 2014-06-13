@@ -23,7 +23,7 @@
 *     This application creates a new Prism and optionally initialises
 *     its attributes.
 *
-*     A Prism is a Region which represents an extrusion of an existing Region
+*     A Prism is a Region that represents an extrusion of an existing Region
 *     into one or more orthogonal dimensions (specified by another Region).
 *     If the Region to be extruded has N axes, and the Region defining the
 *     extrusion has M axes, then the resulting Prism will have (M+N) axes.
