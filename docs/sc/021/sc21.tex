@@ -1671,7 +1671,7 @@ increasingly slowly. As a result, in some circumstances, the map-maker
 will fail to stop iterating due to low frequency ripples coming and
 going between iterations.
 \vspace{3mm}\\
-\texttt{maptol} = 0.05 is the default. Be aware that
+\texttt{maptol}~=~0.05 is the default. Be aware that
 setting \texttt{maptol} to lower than 0.05 will dramatically increase
 the length of time to produce the final map and possibly never achieve
 convergence. [RECOMMENDED]
@@ -1680,7 +1680,7 @@ convergence. [RECOMMENDED]
 
 The best way of checking the progress of convergence while running the
 map-maker is to use the \param{itermap} option and setting
-\param{itermap = 1} (see \cref{Section}{sec:tweak}{Tweaking the
+\param{itermap~=~1} (see \cref{Section}{sec:tweak}{Tweaking the
 Configuration File}).
 
 \begin{figure}
@@ -1824,7 +1824,7 @@ more conservative cuts to remove noisy/problematic bolometers. Only 4
 (positive) iterations are requested as there is no signal to confuse
 to models.
 
-The option \texttt{com.perarray}=1 requires the \texttt{COM} model to
+The option \texttt{com.perarray}~=~1 requires the \texttt{COM} model to
 be fit to each sub-array independently. This improves the overall fit
 but with the loss of any structure on scales larger than a single
 sub-array---not an issue for blank fields.
@@ -1899,9 +1899,9 @@ however this is not applied by the map-maker.
 \hline
 \multicolumn{2}{|l|}{\texttt{dimmconfig\_blank\_field.lis}}\\
 \hline
-\texttt{numiter = 4}&\texttt{filt\_edge\_largescale~=~200}\\
-\texttt{spikethresh = 10}&\texttt{modelorder = (com,ext,ast,noi)}\\
-\texttt{com.perarray = 1}&\\
+\texttt{numiter~=~4}&\texttt{filt\_edge\_largescale~=~200}\\
+\texttt{spikethresh~=~10}&\texttt{modelorder = (com,ext,ast,noi)}\\
+\texttt{com.perarray~=~1}&\\
 \hline
 \end{tabular}
 \end{table}
@@ -1997,16 +1997,16 @@ difference is the improvement in the bowling around strong sources.
 \hline
 \multicolumn{2}{|l|}{\texttt{dimmconfig\_bright\_extended.lis}}\\
 \hline
-\texttt{numiter = -40}&\texttt{flt.filt\_edge\_largescale = 480}\\
-\texttt{ast.zero\_snr = 3}&\texttt{ast.zero\_snrlo = 2}\\
-\texttt{ast.skip = 5}&\texttt{flt.zero\_snr = 5}\\
-\texttt{flt.zero\_snrlo = 3}& \\
+\texttt{numiter~=~-40}&\texttt{flt.filt\_edge\_largescale~=~480}\\
+\texttt{ast.zero\_snr~=~3}&\texttt{ast.zero\_snrlo~=~2}\\
+\texttt{ast.skip~=~5}&\texttt{flt.zero\_snr~=~5}\\
+\texttt{flt.zero\_snrlo~=~3}& \\
 \hline
 \multicolumn{2}{|l|}{\texttt{dimmconfig\_bright.lis}}\\
 \hline
-\texttt{noisecliphigh = 10.0} & \texttt{dcthresh = 100}\\
-\texttt{com.corr\_tol = 7}& \texttt{com.gain\_tol = 7}\\
-\texttt{com.gain\_abstol = 5}& \\
+\texttt{noisecliphigh~=~10.0} & \texttt{dcthresh~=~100}\\
+\texttt{com.corr\_tol~=~7}& \texttt{com.gain\_tol~=~7}\\
+\texttt{com.gain\_abstol~=~5}& \\
 \hline
 \end{tabular}
 \end{table}
@@ -2040,16 +2040,16 @@ difference is the improvement in the bowling around strong sources.
 \hline
 \multicolumn{2}{|l|}{\texttt{dimmconfig\_bright\_extended.lis}}\\
 \hline
-\texttt{numiter = -40}&\texttt{flt.filt\_edge\_largescale = 480}\\
-\texttt{ast.zero\_snr = 3}&\texttt{ast.zero\_snrlo = 2}\\
-\texttt{ast.skip = 5}&\texttt{flt.zero\_snr = 5}\\
-\texttt{flt.zero\_snrlo = 3}& \\
+\texttt{numiter~=~-40}&\texttt{flt.filt\_edge\_largescale~=~480}\\
+\texttt{ast.zero\_snr~=~3}&\texttt{ast.zero\_snrlo~=~2}\\
+\texttt{ast.skip~=~5}&\texttt{flt.zero\_snr~=~5}\\
+\texttt{flt.zero\_snrlo~=~3}& \\
 \hline
 \multicolumn{2}{|l|}{\texttt{dimmconfig\_bright.lis}}\\
 \hline
-\texttt{noisecliphigh = 10.0} & \texttt{dcthresh = 100}\\
-\texttt{com.corr\_tol = 7}& \texttt{com.gain\_tol = 7}\\
-\texttt{com.gain\_abstol = 5}& \\
+\texttt{noisecliphigh~=~10.0} & \texttt{dcthresh~=~100}\\
+\texttt{com.corr\_tol~=~7}& \texttt{com.gain\_tol~=~7}\\
+\texttt{com.gain\_abstol~=~5}& \\
 \hline
 \end{tabular}
 \end{table}
@@ -2943,7 +2943,7 @@ masking. You can see where any masks were applied by viewing the Quality array i
 
 First open your map in \gaia. Select the top level NDF from list in
 the pop-up window then click the \gaiathing{Quality} button. You will need to
-rescale the map to bring out the masks--see figure \ref{fig:qualdisp}.
+rescale the map to bring out the masks--see \cref{Figure}{fig:qualdisp}{below}.
 
 Each value in the QUALITY component of an NDF contains eight ``on/off''
 flags used to indicate a specific binary property of the pixel. The
@@ -3173,7 +3173,7 @@ differ from the the values given in \texttt{dimmconfig.lis}.
 \label{sec:tweak}
 
 
-\subsection{Adding and amending parameters}
+\subsection{ Adding and amending parameters}
 The default configuration file \texttt{dimmconfig.lis} contains all of
 the parameters the most users would wish to play with.
 
@@ -3380,8 +3380,8 @@ applied to the data:
 
 The filtering options set in \texttt{dimmconfig.lis} are:
 
-\texttt{450.flt.filt\_edge\_largescale = 600} \\
-\texttt{850.flt.filt\_edge\_largescale = 300}.
+\texttt{450.flt.filt\_edge\_largescale~=~600} \\
+\texttt{850.flt.filt\_edge\_largescale~=~300}.
 
 To make your life easier, these parameters allow you to specify the
 filter limits in terms of spatial scale in arcsecs---in this case
@@ -3392,7 +3392,7 @@ a frequency 2\,Hz.
 
 Choosing a high-pass filter is especially important for the recovery
 of extended emission. The \texttt{dimmconfig\_bright\_extended.lis}
-recipe sets \texttt{flt.filt\_edge\_largescale = 480} (i.e. both 450
+recipe sets \texttt{flt.filt\_edge\_largescale~=~480} (i.e. both 450
 and 850\,$\mu$m). Be aware that increasing filtering scales decreases
 the flatness of your background. A compromise must be made between
 extended structure and the flatness of your map. See
@@ -3426,7 +3426,7 @@ any scales larger than the area covered by a single sub-array. It is
 therefore not recommended if you have very large-scale extended
 structure.
 
-To initialise this option set \texttt{com.perarray = 1}.
+To initialise this option set \texttt{com.perarray~=~1}.
 
 
 \subsection{\xlabel{noibox}Flagging bad data}
@@ -3484,8 +3484,8 @@ of the low frequency background subtracted from the residuals on each
 iteration. This can help prevent ringing in the final map. S/N based
 \texttt{FLT} masking cannot be used on the first iteration and
 \texttt{FLT} masking should be used sparingly to aid convergence (it
-is limited to the first 2 iterations by default by
-\texttt{flt.zero\_niter = 2}).
+is limited to the first two iterations by default by
+\texttt{flt.zero\_niter~=~2}).
 
 \texttt{COM} masking is used to omit very bright sources from the
 estimate of the common-mode signal, this can prevent sources being
@@ -3526,7 +3526,7 @@ An alternative to setting \texttt{ast.zero\_snrlo} is to smooth the
 S/N mask by setting the parameter \texttt{ast.zero\_snr\_fwhm}.
 
 Remember for all \texttt{AST} masking to include
-\texttt{ast.zero\_notlast = 1} so that mask is not applied on the
+\texttt{ast.zero\_notlast~=~1} so that mask is not applied on the
 final iteration. This means that the background regions in the map are
 only generated by this single, final iteration.
 
@@ -3909,7 +3909,7 @@ We create a simple parameter file called \texttt{smooth.ini}:
 SMOOTH_FWHM = 15
 \end{verbatim}
 \end{myquote}
-where \texttt{SMOOTH\_FWHM = 15} indicates that the background should be
+where \texttt{SMOOTH\_FWHM~=~15} indicates that the background should be
 estimated by first smoothing the map and PSF with a 15-arcsec FWHM
 Gaussian. Next, the recipe is executed as follows:
 %
@@ -4654,8 +4654,8 @@ given aperture (30-arcsec radius default) is calculated using
 Mars, CRL~618, CRL~2688 and HL~Tau are already known to
 \picard. To derive an FCF for other sources of known flux densities,
 the fluxes can be added to the parameter file with the source name
-(in upper case, spaces removed): \texttt{FLUX\_450.MYSRC = 0.050}
-and \texttt{FLUX\_850.MYSRC = 0.005} (where the values are in Jy),
+(in upper case, spaces removed): \texttt{FLUX\_450.MYSRC~=~0.050}
+and \texttt{FLUX\_850.MYSRC~=~0.005} (where the values are in Jy),
 for example.}
 
 \item {Three alternative FCF values are calculated, two of which are
@@ -4829,7 +4829,7 @@ SMOOTH_FWHM = 15
 %\end{figure}
 \end{latexonly}
 %
-where \texttt{SMOOTH\_FWHM = 15} indicates that the background should
+where \texttt{SMOOTH\_FWHM~=~15} indicates that the background should
 be estimated by first smoothing the map and PSF with a 15~arcsec FWHM
 Gaussian. The recipe is then executed as follows:
 %
