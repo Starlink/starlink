@@ -3166,24 +3166,25 @@ differ from the the values given in \texttt{dimmconfig.lis}.
 \label{sec:tweak}
 
 The default configuration file \texttt{dimmconfig.lis} contains all of
-the parameters the majority if users would wish to adjust. Any
-configuration file can be edited by copying it to a local directory
-beforehand. The first line of each specialised configuration file is a
-path to the recipe from which it is derived. These paths all lead to
+the parameters the most users would wish to play with.
+
+\textbf{You can create your own personalised configuration file from
+scratch or copy one of the provided ones to your local directory and
+edit it.}
+
+The first line of each specialised configuration file is always a path
+to the recipe from which it is derived. These paths all lead to
 recipes in the \starlink\ tree which cannot be edited. If you are
 creating your own file from scratch, make sure to include this
 reference to an existing configuration file on the first line.
+Remember any parameters appearing your configuration file
+automatically override their values in the default file (see
+\cref{Figure}{fig:configtree}{this figure}.
 
-All the parameters in \texttt{dimmconfig.lis} can be adjusted by
-simply adding them to your specialised file. Any parameters appearing
-in the specialised file automatically override those in the default.
-If a parameter is in use in the default that you wish to disable, you
-should specify it as \texttt{<undef>} in your specialised file.
-
-You can also amend your configuration file by specifying new
-parameters directly on the command line. They are appended to the
-configuration filename as a comma separated list as shown in the
-example below. Be sure to include all the necessary quotation marks.
+You can also add or amend parameters by listing them directly on the
+command line. They are appended to the configuration filename as a
+comma separated list as shown in the example below. Be sure to include
+all the necessary quotation marks.
 
 \begin{myquote}
 \begin{verbatim}
@@ -3192,14 +3193,36 @@ config='"^dimmconfig.lis,numiter=20,exportndf=(flt,noi),itermap=1"'
 \end{verbatim}
 \end{myquote}
 
+\textbf{What parameters can be changed?}\\*
+
+Any of the parameters listed in \texttt{dimmconfig.lis} can be
+changed. For comprehensive list of the parameters in
+\texttt{dimmconfig.lis} see \cref{Appendix}{app:dimm}{an appendix}.
+
 The map-maker uses other parameters beyond those described in the
 configuration files. These can be found in the default makemap file,
-smurf\_makemap.def. This file can be found in your \smurf\ path or
-online at the \starlink\
-\htmladdnormallink{github
+smurf\_makemap.def. This file lives in your \$SMURF\_DIR directory or
+online at the \starlink\ \htmladdnormallink{github
 repository}{https://github.com/Starlink/starlink/blob/master/applications/smurf/defaults/smurf\_makemap.def}
 \latex{\footnote{\texttt{https://github.com/Starlink/starlink/blob/master/applications/smurf/defaults/smurf\_makemap.def}}}.
-We do not advise users to alter any of these default parameters.
+We do not advise users to alter any of these default parameters
+however.
+
+\begin{latexonly}
+\begin{center}
+\begin{fmpage}{0.95\linewidth}
+\vspace{0.1cm}
+TIP: If you wish to disable an active parameter in the default file,
+set it as \texttt{<undef>} in your personalised file.
+\end{fmpage}
+\end{center}
+\end{latexonly}
+
+\begin{htmlonly}
+\textbf{TIP: If you wish to disable an active parameter in the default
+file, set it as \texttt{<undef>} in your personalised file.}
+\end{htmlonly}
+
 
 \textbf{Note:} any parameter can be made wavelength dependent by
 adding the prefix \texttt{450.} or \texttt{850.}, e.g.
@@ -3209,15 +3232,11 @@ adding the prefix \texttt{450.} or \texttt{850.}, e.g.
 values (no prefix) take priority over qualified values.
 
 \subsection{\xlabel{inter}Writing out models \& intermediate maps}
-\textbf{exportmodel}\\
-This parameter has been introduced in
-\cref{Section}{sec:export}{Exporting individual models} and
-allowed you to see the model that was fit for each component
-specified by the \texttt{modelorder} parameter.
 
-{\bf itermap}\\
-Setting the parameter \texttt{itermap=1} writes out a map after each
-iteration. Setting \texttt{itermap=2} adds the QUALITY component.
+
+\subsubsection{itermap}
+Setting the parameter \texttt{itermap~=~1} writes out an astronomical map after each
+iteration. Setting \texttt{itermap~=~2} adds the QUALITY component.
 These can be visually inspected with
 
 \begin{myquote}
@@ -3324,6 +3343,13 @@ command \stackframes. This cube can then be viewed as a
 `movie' with \gaia, using the animation option to loop through the
 itermaps. See \cref{Figure}{fig:stack}{the box above} for instructions.
 
+\subsection{exportmodel}
+
+This parameter has been discussed in
+\cref{Section}{sec:export}{Exporting individual models} and allowed
+you to see the model that was fit for each component specified by the
+\texttt{modelorder} parameter.
+
 \subsection{\xlabel{filt}Adjusting the filtering}
 \label{sec:filt}
 
@@ -3332,7 +3358,7 @@ filtering options. By default the low-pass filter is applied once
 during the pre-processing stage and is turned off for the iterative
 steps. The high-pass filter is only specified during the iterative
 steps and its selected value is crucial for maps containing extended
-emission.  All the parameters dealing with the \texttt{FLT} model can
+emission. All the parameters dealing with the \texttt{FLT} model can
 be found in \cref{Appendix}{app:par_full}{Configuration Parameters: dimmconfig.lis}.
 
 The maximum spatial scale of structure that can be recovered by the
@@ -3356,13 +3382,10 @@ at 850\,$\mu$m, recovering scales of 300\,arcsec at a scan speed of
 a frequency 2\,Hz.
 
 Choosing a high-pass filter is especially important for the recovery
-of extended emission where you will likely wish to specify larger
-spatial scales for \texttt{flt.filt\_edge\_largescale} than specified
-by the default file. Indeed the
-\texttt{dimmconfig\_bright\_extended.lis} recipe changes the
-850\,$\mu$m value to \texttt{850.flt.filt\_edge\_largescale = 600}. Be
-aware that increasing these scales simultaneously decreases the
-flatness of your background. A compromise must be made between
+of extended emission. The \texttt{dimmconfig\_bright\_extended.lis}
+recipe sets \texttt{flt.filt\_edge\_largescale = 480} (i.e. both 450
+and 850\,$\mu$m). Be aware that increasing filtering scales decreases
+the flatness of your background. A compromise must be made between
 extended structure and the flatness of your map. See
 \cref{Figure}{fig:fltcompare}{the figure below} for an illustration of
 the effect of \texttt{flt.filt\_edge\_largescale} on your map.
@@ -3409,10 +3432,10 @@ used giving a single variance for each bolometer. This variance is
 used to weight the data for subsequent iterations, hence more finely
 estimated noise levels are preferable.
 
-Setting \texttt{noi.box\_size} helps remove `scuffs' or other noise
-artifacts you might see in your error map due to a sub-array (or
-arrays) temporarily jumping to a higher noise state. We recommend a
-value of \texttt{noi.box\_size~=~$-$15} (i.e. half a sub-scan). As the
+The parameter \texttt{noi.box\_size} helps remove `scuffs' or other
+noise artifacts you might see in your error map due to a sub-array (or
+arrays) temporarily jumping to a higher noise state. The default file
+has \texttt{noi.box\_size~=~$-$15} (i.e. half a sub-scan). As the
 value tends to $-$1 (one second) we find some of the source signal being
 down-weighted. Higher than this $-$15 value and the map-maker becomes
 less sensitive to the higher noise states.
@@ -3420,14 +3443,20 @@ less sensitive to the higher noise states.
 Other parameters you may want to utilise include \texttt{flagfast} and
 \texttt{flagslow}. You may find that setting \texttt{flagfast} to less
 than the default of 1000\,arcsec/sec will help reduce the effect of any
-`smearing' of sources (and of noise) in maps, while setting \texttt{flagslow} greater
-than the default of 300\,arcsec/sec helps to flatten the edges of maps. To
-determine reasonable values for your dataset you should do \jcmtstate\
-and view the scan speed using \topcat---see
-\cref{Section}{sec:scan}{Displaying scan patterns} for details.
+`smearing' of sources (and of noise) in maps, while setting
+\texttt{flagslow} greater than the default of 300\,arcsec/sec helps to
+flatten the edges of maps. To determine reasonable values for your
+ dataset you should do \jcmtstate\ and view the scan speed using
+\topcat---see \cref{Section}{sec:scan}{Displaying scan patterns} for
+details.
 
 \subsection{\xlabel{mask}Masking options}
 \label{sec:mask}
+
+ast.skip doesn't subtract the ast model for the first X iterations.
+The map can then do FLT masking on. It starts from scratch with each
+iteration and gets a good map from FLT masking.
+
 
 The \texttt{AST}, \texttt{FLT} and \texttt{COM} models each have a
 number of common masking options. The main ones are
@@ -3515,6 +3544,12 @@ For example, if you find an S/N mask allow bright regions to develop
 towards the edges of your map, you can force these to zero by using
 the intersection of the S/N mask with a `low-hits' mask.
 
+There are a number of options
+available which build on the default recipe. The simplest is to set
+the configuration parameter \texttt{ast.zero\_snrlo} which allows the
+mask to grow organically as the \texttt{AST} model evolves.
+
+
 \subsection{\xlabel{maskbe}Supplying an external mask}
 \label{sec:maskbe}
 
@@ -3532,7 +3567,7 @@ Alternatively maps from other telescopes can be used.
 These steps are followed in the example in
 \cref{Section}{sec:bright_ex}{Extended galactic sources}.
 
-\textbf{(a)} Generate a map covering your region. This may be by simply
+\textbf{(1)} Generate a map covering your region. This may be by simply
 running the map-maker on your data as shown below.
 \begin{myquote}
 \begin{verbatim}
@@ -3545,13 +3580,13 @@ different telescope, e.g. a map downloaded from the Herschel Science
 Archive. For instructions on converting from fits format to NDF see
 \cref{Appendix}{app:convert}{Converting a Herschel map to NDF}.
 \\*\\*
-\textbf{(b)} Make a signal-to-noise map using the \Kappa\ command \makesnr.
+\textbf{(2)} Make a signal-to-noise map using the \Kappa\ command \makesnr.
 \begin{myquote}
 \begin{verbatim}
 % makesnr 850map 850map_snr
 \end{verbatim}
 \end{myquote}
-\textbf{(c)} This S/N map is thresholded to set everything below 3$\sigma$ to 0 and
+\textbf{(3)} This S/N map is thresholded to set everything below 3$\sigma$ to 0 and
 everything above to 1.
 \begin{myquote}
 \begin{verbatim}
@@ -3564,7 +3599,7 @@ In the step above you can set everything below 3$\sigma$ to
 Instead the following 2 steps are performed to smooth the edges of the
 mask.
 \\*\\*
-\textbf{(d)} The thresholded map is smoothed with a Gaussian filter
+\textbf{(4)} The thresholded map is smoothed with a Gaussian filter
 of FWHM of 5 pixels (=\,20\,arcsec). Then it is again thresholded, this time
 keeping everything above 5\,\% of the 0 level as the mask and setting
 the rest to \texttt{bad}.
@@ -3591,7 +3626,8 @@ ref=850map_mask_zm
 
 Traditionally, the map-maker divides a non-contiguous sequence of time
 series data into chunks. It processes each chuck independently
-before co-adding them as a final step in the the reduction.
+before co-adding them as a final step in the the reduction---see
+\cref{Figure}{fig:skyloop}{figure below}.
 
 This means for each chunk the map-maker has to start from scratch
 determining the \texttt{AST} model and the benefit of long integration
@@ -3632,7 +3668,7 @@ if you run out of temporary storage space.
 % setenv STAR_TEMP .
 \end{verbatim}
 \end{myquote}
- \texttt{skyloop} is then called in the same way as \makemap, with
+\texttt{skyloop} is then called in the same way as \makemap, with
  a configuration file specified on the command line.
 \begin{myquote}
 \begin{verbatim}
@@ -3652,9 +3688,9 @@ LOGFILE=skyloop.log ILEVEL=ATASK GLEVEL=debug
 I have blobs in my map that look like thumbprints. & Try including
 \texttt{dimmconfig\_fix\_blobs.lis} parameters:
 \begin{itemize}[noitemsep]
-  \item \param{flt.filt\_order~=~4} to set a 4th-order Butterworth filter for 
+  \item \param{flt.filt\_order~=~4} to set a 4th-order Butterworth filter for
   the \texttt{FLT} model.
-  \item \param{flt.ring\_box1~=~0.5} uses a filter to identify and flag 
+  \item \param{flt.ring\_box1~=~0.5} uses a filter to identify and flag
   time-samples that are ringing after the \texttt{FLT} model. This only starts
   after the \param{ast.skip} iterations (in bright\_extended) have completed.
   \item \param{com.sig\_limit~=~2.5} flags time slices where the
@@ -3720,9 +3756,9 @@ preventing convergence.\\
 I have blobs in my map that look like thumbprints. & Try including
 \texttt{dimmconfig\_fix\_blobs.lis} parameters:
 \begin{itemize}
-  \item \param{flt.filt\_order~=~4} to set a 4th-order Butterworth filter for 
+  \item \param{flt.filt\_order~=~4} to set a 4th-order Butterworth filter for
   the \texttt{FLT} model.
-  \item \param{flt.ring\_box1~=~0.5} uses a filter to identify and flag 
+  \item \param{flt.ring\_box1~=~0.5} uses a filter to identify and flag
   time-samples that are ringing after the \texttt{FLT} model. This only starts
   after the \param{ast.skip} iterations (in bright\_extended) have completed.
   \item \param{com.sig\_limit~=~2.5} flags time slices where the
