@@ -237,6 +237,10 @@
 % ADAM parameters
 \newcommand{\param}[1]{\texttt{#1}}
 
+% GAIA menu functions and buttons.  Would like a bold texttt to mimic
+% their appearance in GAIA, but the founts are not in regular LaTeX.
+\newcommand{\gaiathing}[1]{\textbf{#1}}
+
 % SMURF tasks
 \newcommand{\calcnoise}{\xref{\task{calcnoise}}{sun258}{CALCNOISE}}
 \newcommand{\clean}{\xref{\task{sc2clean}}{sun258}{SC2CLEAN}}
@@ -1211,39 +1215,41 @@ initiated simply typing \texttt{gaia} into a terminal.
 \end{myquote}
 
 Loading a file in \textsc{Gaia} produces two windows (see
-\cref{Figure}{fig:gaia_main}{upper graphic}). The main window shows a map of bolometer
-values at a given point in time. The time slice displayed may be
-changed by scrolling through the time axis. This is done in the second
-window entitled `Display image sections of a cube'. The `Index of
-plane' slider towards the top of this window may be moved to display
-different time slices in the main window.
+\cref{Figure}{fig:gaia_main}{upper graphic}). The main window shows a
+map of bolometer values at a given point in time. The time slice
+displayed may be changed by scrolling through the time axis. This is
+done in the second window entitled \gaiathing{Display image sections of
+a cube}. The \gaiathing{Index of plane} slider towards the top of this
+window may be moved to display different time slices in the main
+window.
 
 \myfig{sc21_gaia1}{[b]}{width=\linewidth}{fig:gaia_main}{
   Raw data displayed in the main \gaia\ window}{
   Initial \gaia\ windows displayed upon loading a data cube.
   The main window in the left shows a map of bolometer values at a fixed
   sample in time. You may have to zoom in multiple times by clicking the
-  `Z' icon. On the right-hand side, the `Display image sections of a cube'
+  \gaiathing{Z} icon. On the right-hand side, the
+  \gaiathing{Display image sections of a cube}
   dialogue enables you to navigate the time axis.
 }
 
 A third window will appear when you click on a bolometer---the
-`Spectral plot'. This shows an automatically scaled plot of the raw
+\gaiathing{Spectral plot}. This shows an automatically scaled plot of the raw
 time stream of data for that given bolometer. It will be overridden
 when you click on a different bolometer.
 
 \myfig{sc21_gaia2}{[t]}{width=0.8\linewidth}{fig:gaia_spec}{
   \gaia\ spectral plot window}{
-  The `Spectral plot' window displays the time-varying signal. This window
+  The \gaiathing{Spectral plot} window displays the time-varying signal. This window
   appears automatically when a bolometer is clicked in the main window.
   The vertical red line indicates the time slice that is currently selected
-  in the `Display image sections of a cube' dialogue---this can be dragged
-  across the spectrum to scroll through the time-slices.
+  in the \gaiathing{Display image sections of a cube} dialogue---this can be
+  dragged across the spectrum to scroll through the time-slices.
 }
 
 A second way to scroll through the time axis is to click and drag the
-vertical red bar on the `Spectral plot' window. As you do so, the array
-shown in the main window will automatically update.
+vertical red bar on the \gaiathing{Spectral plot} window. As you do
+so, the array shown in the main window will automatically update.
 
 To highlight small variations between bolometers it is likely you will
 need to change the auto cut and (depending on your preference) the
@@ -2872,15 +2878,15 @@ above}. For more information on the options for \histogram\ see
 \subsubsection{Examining the error map with GAIA}
 
 It is also useful to view the error map itself. Open your reduced map
-in \gaia, then select the \texttt{Error} button on the \texttt{Select NDF in
+in \gaia, then select the \gaiathing{Error} button on the \gaiathing{Select NDF in
 container file} window---see \cref{Figure}{fig:noigaia}{the figure
 below}. You will need to adjust the scaling to view the error map properly.
 
 To assess the noise in \gaia\ go to the toolbar on the main page and
-click on Image-Analysis$\Rightarrow$Image regions. Next select the region shape
-you would like to check and draw it on your map by clicking and
-dragging the mouse. Then click the \texttt{Stats selected} button in the
-\texttt{Image regions} window to get a report of the statistics.
+click on \gaiathing{Image-Analysis$\Rightarrow$Image} regions. Next select
+the region shape you would like to check and draw it on your map by clicking
+and dragging the mouse. Then click the \gaiathing{Stats selected} button in the
+\gaiathing{Image regions} window to get a report of the statistics.
 
 \begin{latexonly}
 \begin{center}
@@ -2936,7 +2942,7 @@ Both \texttt{dimmconfig\_bright\_compact.lis} and
 masking. You can see where any masks were applied by viewing the Quality array in \gaia.
 
 First open your map in \gaia. Select the top level NDF from list in
-the pop-up window then click the \texttt{Quality} button. You will need to
+the pop-up window then click the \gaiathing{Quality} button. You will need to
 rescale the map to bring out the masks--see figure \ref{fig:qualdisp}.
 
 Each value in the QUALITY component of an NDF contains eight ``on/off''
@@ -3092,10 +3098,10 @@ clump shape.
 \myfig{sc21_plotstcshapes}{[h!]}{width=0.99\linewidth}{fig:stcshapes}{
   Overlaying a clump catalogue in \gaia.}{
   STC shapes displayed over the input map with \gaia. To overlay your clumps
-  in this way open you map with \gaia. Under the \texttt{Image-Analysis}
-  menu select \texttt{Positions...} followed by \texttt{Import CUPID
+  in this way open you map with \gaia. Under the \gaiathing{Image-Analysis}
+  menu select \gaiathing{Positions...} followed by \gaiathing{Import CUPID
   catalogue...} In the pop-up window select the \texttt{.FIT} file
-  generated by \findclumps\ and  ensure the \texttt{STC shape} box is
+  generated by \findclumps\ and ensure the \gaiathing{STC shape} box is
   checked before importing.
 }
 
@@ -3293,11 +3299,11 @@ Stack the individual itermaps into a single cube.
 The output map map\_itermaps can be opened with \gaia. The data used
 in this example is the Galactic map reduced in
 \cref{Section}{sec:bright_ex}{dimmconfig\_bright\_extended.lis}. The
-Spectral plot window shows the value for a single pixel and the 3
-chunks are easily identified. You can select the `Animation' tab in
-the `Display image sections' window and click `Start' to loop through
-the itermaps for each iteration. the `movie' will appear in the main
-\gaia\ window.
+Spectral plot window shows the value for a single pixel and the three
+chunks are easily identified. You can select the \gaiathing{Animation} tab
+in the \gaiathing{Display image sections} window and click
+\gaiathing{Start} to loop through the itermaps for each iteration.  The
+`movie' will appear in the main \gaia\ window.
 \end{minipage}
 
 \vspace{0.7cm}
