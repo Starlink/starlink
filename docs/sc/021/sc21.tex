@@ -9,6 +9,7 @@
 % ? End of specify used packages
 \usepackage{longtable}
 \usepackage{color}
+\usepackage{enumitem}
 \pagestyle{myheadings}
 
 % -----------------------------------------------------------------------------
@@ -3120,15 +3121,17 @@ this:
 \end{verbatim}
 \end{myquote}
 
-There are also tools that allow you to inspect the configuration
-parameters in more detail. One of these is the \smurf\ command
-\configmeld. This task requires a visual-differences tool to
-be installed on your machine; those currently recognised are
+\textbf{Map-maker parameters}\\
+The task \configmeld\ will identify what configuration parameters were
+used by the map-maker when your data were reduced. \configmeld\
+requires a visual-differences tool to be installed on your machine;
+those currently recognised are
+
 \htmladdnormallink{\texttt{meld}}{http://meldmerge.org/}\latex{\footnote{\texttt{http://meldmerge.org/}}},
 \htmladdnormallink{\texttt{opendiff}}{http://developer.apple.com/},
 \htmladdnormallink{\texttt{diffmerge}}{http://www.sourcegear.com/diffmerge},
 \htmladdnormallink{\texttt{kdiff3}}{http://kdiff3.sourceforge.net},
-\htmladdnormallink{\texttt{tkdiff}}{http://sourceforge.net/projects/tkdiff},
+\htmladdnormallink{\texttt{tkdiff}}{http://sourceforge.net/projects/tkdiff}, and
 \htmladdnormallink{\texttt{diffuse}}{http://diffuse.sourceforge.net},
 and are searched for in that order. It will compare the
 configuration parameters for two reduced maps or configuration files
@@ -3599,9 +3602,9 @@ extended structure is not recovered.
 
 This new \skyloop\ command runs \makemap\ multiple times
 performing just a single iteration on each occasion. It starts by
-performing a single iteration of \texttt{makemap} from which a final
+performing a single iteration of \makemap\ from which a final
 co-added map is generated. This map is then supplied as an initial
-estimate of the sky for the next loop through \texttt{makemap}. On
+estimate of the sky for the next loop through \makemap. On
 this next iteration, the initial sky estimate is subtracted from the
 cleaned time-series data and the \texttt{COM}, \texttt{GAI},
 \texttt{FLT}, \texttt{EXT} models are subtracted. This produces a new
@@ -3609,17 +3612,27 @@ model of the sky (from the current iteration) to which the sky
 estimate (from the previous iteration) is then added. In this way the
 signal from all of the chunks is built up over the iterations and is
 all included in the final map estimate when convergence is reached.
+See \cref{Figure}{fig:skyloop}{the diagram below}.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.55\linewidth]{sc21_skyloop}
+  \caption{\small Illustration of the skyloop approach
+  to map-making compared to the standard map-maker.
+}
+\label{fig:skyloop}
+\end{figure}
 
 Be aware that \texttt{skyloop} uses a lot of disk space. Setting
 environment variable \texttt{STAR\_TEMP} to a suitable location
-before you start will prevent \texttt{skyloop} from crashing
+before you start will prevent \skyloop\ from crashing
 if you run out of temporary storage space.
 \begin{myquote}
 \begin{verbatim}
 % setenv STAR_TEMP .
 \end{verbatim}
 \end{myquote}
- \texttt{skyloop} is then called in the same way as \texttt{makemap}, with
+ \texttt{skyloop} is then called in the same way as \makemap, with
  a configuration file specified on the command line.
 \begin{myquote}
 \begin{verbatim}
@@ -3627,6 +3640,144 @@ if you run out of temporary storage space.
 LOGFILE=skyloop.log ILEVEL=ATASK GLEVEL=debug
 \end{verbatim}
 \end{myquote}
+
+\subsection{Troubleshooting}
+\begin{latexonly}
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{|p{5cm}|p{10.5cm}|}
+\hline
+\textbf{PROBLEM} & \textbf{POSSIBLE SOLUTION}\\
+\hline
+I have blobs in my map that look like thumbprints. & Try including
+\texttt{dimmconfig\_fix\_blobs.lis} parameters:
+\begin{itemize}[noitemsep]
+  \item \param{flt.filt\_order~=~4} to set a 4th-order Butterworth filter for 
+  the \texttt{FLT} model.
+  \item \param{flt.ring\_box1~=~0.5} uses a filter to identify and flag 
+  time-samples that are ringing after the \texttt{FLT} model. This only starts
+  after the \param{ast.skip} iterations (in bright\_extended) have completed.
+  \item \param{com.sig\_limit~=~2.5} flags time slices where the
+  \texttt{COM} model is very different from the average for each
+  subarray. Should only be used when \param{flt.filt\_order} is set. If
+  set too stringently it can throw out a lot of data so modify with
+  caution. An extremely conservative value would be 5.
+\end{itemize}
+In addition, check you are not using \param{flt.notfirst~=~1} as this
+can make blobs worse.\\
+\hline
+I want to recover more extended structure. & There is a trade off
+between extended emission and noise in your map. If you are willing to
+accept more low frequency noise you can increase the filter scale with
+\param{flt.filt\_edge\_largescale}. The default is 480\,arcsec but you
+could try 600\,arcsec. To cosmetically reduce the increased background
+noise you can set \param{flt.filt\_edge\_largescale\_last~=~200}. This
+sets the background filtering to 200\,arcsec for the final iteration
+only, though you can go as low as you want with it. \\
+\hline
+I want a flatter background.  & Try \param{com.perarray~=~1}, although
+be aware this will lose structure on scales larger than a subarray. In
+conjunction with \param{com.perarray~=~1} you can also use the
+\param{ast.skip~=~8} parameter. This makes a map without subtracting an
+\param{AST} model for the first eight iterations. If you are chasing
+extended emission see the point above. \newline
+
+For a cosmetic improvement in the background, set
+\param{flt.filt\_edge\_largescale\_last} to a small value to get harsh
+filtering on your final iteration.\\
+\hline
+I have linear striations in my map making my background look
+scratchy.& Try setting \param{com.corr\_abstol~=~0.8} [default=0.2].
+This rejects more bolometers with deviant common-mode signals.
+However, as more bolometers are removed there are less data available
+for you final map resulting in higher noise.\\
+\hline
+My map will not converge.& Try including \texttt{dimmconfig\_fix\_convergence.lis}
+parameters:
+\begin{itemize}[noitemsep]
+\item \param{com.freeze\_flags~=~10}
+\item \param{ast.zero\_freeze~=~10}
+\item \param{flt.zero\_freeze~=~10}
+\item \param{com.zero\_freeze~=~10}
+\end{itemize}
+Each of the these freeze parameters stop the masks growing after ten
+iterations. By this stage the masks have essentially reached their
+maximum scale but a few edge pixels oscillate in and out of the masks
+preventing convergence.\\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+\end{latexonly}
+
+\begin{htmlonly}
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+\textbf{PROBLEM} & \textbf{POSSIBLE SOLUTION}\\
+\hline
+I have blobs in my map that look like thumbprints. & Try including
+\texttt{dimmconfig\_fix\_blobs.lis} parameters:
+\begin{itemize}
+  \item \param{flt.filt\_order~=~4} to set a 4th-order Butterworth filter for 
+  the \texttt{FLT} model.
+  \item \param{flt.ring\_box1~=~0.5} uses a filter to identify and flag 
+  time-samples that are ringing after the \texttt{FLT} model. This only starts
+  after the \param{ast.skip} iterations (in bright\_extended) have completed.
+  \item \param{com.sig\_limit~=~2.5} flags time slices where the
+  \texttt{COM} model is very different from the average for each
+  subarray. Should only be used when \param{flt.filt\_order} is set. If
+  set too stringently it can throw out a lot of data so modify with
+  caution. An extremely conservative value would be 5.
+\end{itemize}
+In addition, check you are not using \param{flt.notfirst~=~1} as this
+can make blobs worse.\\
+\hline
+I want to recover more extended structure. & There is a trade off
+between extended emission and noise in your map. If you are willing to
+accept more low frequency noise you can increase the filter scale with
+\param{flt.filt\_edge\_largescale}. The default is 480\,arcsec but you
+could try 600\,arcsec. To cosmetically reduce the increased background
+noise you can set \param{flt.filt\_edge\_largescale\_last~=~200}. This
+sets the background filtering to 200\,arcsec for the final iteration
+only, though you can go as low as you want with it. \\
+\hline
+I want a flatter background.  & Try \param{com.perarray~=~1}, although
+be aware this will lose structure on scales larger than a subarray. In
+conjunction with \param{com.perarray~=~1} you can also use the
+\param{ast.skip~=~8} parameter. This makes a map without subtracting an
+\param{AST} model for the first eight iterations. If you are chasing
+extended emission see the point above. \newline
+
+For a cosmetic improvement in the background, set
+\param{flt.filt\_edge\_largescale\_last} to a small value to get harsh
+filtering on your final iteration.\\
+\hline
+I have linear striations in my map making my background look
+scratchy.& Try setting \param{com.corr\_abstol~=~0.8} [default=0.2].
+This rejects more bolometers with deviant common-mode signals.
+However, as more bolometers are removed there are less data available
+for you final map resulting in higher noise.\\
+\hline
+My map will not converge.& Try including \texttt{dimmconfig\_fix\_convergence.lis}
+parameters:
+\begin{itemize}
+\item \param{com.freeze\_flags~=~10}
+\item \param{ast.zero\_freeze~=~10}
+\item \param{flt.zero\_freeze~=~10}
+\item \param{com.zero\_freeze~=~10}
+\end{itemize}
+Each of the these freeze parameters stop the masks growing after ten
+iterations. By this stage the masks have essentially reached their
+maximum scale but a few edge pixels oscillate in and out of the masks
+preventing convergence.\\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+\end{htmlonly}
+
 
 \clearpage
 \section{\xlabel{Examples}Examples of Different Reductions}
