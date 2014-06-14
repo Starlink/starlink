@@ -2072,7 +2072,7 @@ spurious emission in your final map.
 
 The point to dimmconfig\_bright\_extended.lis so the parameters are in
 addition to those listed above. These files are discussed in more
-detail in chapter \ref{sec:tweak}.
+detail in \cref{Section}{sec:tweak}{Tailoring your Reduction}.
 
 \clearpage
 
@@ -2851,8 +2851,8 @@ specified.
 % histogram map_cal_crop comp=err numbin=200 style="color=white"
 \end{verbatim}
 \end{myquote}
-The output is shown in the \cref{Figure}{fig:noihisto}{the figure
-above}. For more information on the options for \histogram\ see
+The output is shown in the \cref{Figure}{fig:noihisto}{this plot}.
+For more information on the options for \histogram\ see
 \kappasun.
 
 \begin{figure}[b!]
@@ -2871,8 +2871,8 @@ above}. For more information on the options for \histogram\ see
 
 It is also useful to view the error map itself. Open your reduced map
 in \gaia, then select the \gaiathing{Error} button on the \gaiathing{Select NDF in
-container file} window---see \cref{Figure}{fig:noigaia}{the figure
-below}. You will need to adjust the scaling to view the error map properly.
+container file} window---see \cref{Figure}{fig:noigaia}{this figure}. You
+will need to adjust the scaling to view the error map properly.
 
 To assess the noise in \gaia\ go to the toolbar on the main page and
 click on \gaiathing{Image-Analysis$\Rightarrow$Image} regions. Next select
@@ -3180,7 +3180,7 @@ creating your own file from scratch, make sure to include this
 reference to an existing configuration file on the first line.
 Remember any parameters appearing your configuration file
 automatically override their values in the default file (see
-\cref{Figure}{fig:configtree}{this figure}.
+\cref{Figure}{fig:configtree}{this figure}).
 
 You can also add or amend parameters by listing them directly on the
 command line. They are appended to the configuration filename as a
@@ -3360,7 +3360,7 @@ during the pre-processing stage and is turned off for the iterative
 steps. The high-pass filter is only specified during the iterative
 steps and its selected value is crucial for maps containing extended
 emission. All the parameters dealing with the \texttt{FLT} model can
-be found in \cref{Appendix}{app:par_full}{Configuration Parameters: dimmconfig.lis}.
+be found in \cref{Appendix}{app:dimm}{Configuration Parameters: dimmconfig.lis}.
 
 The maximum spatial scale of structure that can be recovered by the
 map-maker is determined by the scanning speed and frequency cut
@@ -3500,7 +3500,7 @@ coordinates if this is not appropriate.
 samples in a pixel. For the \texttt{AST} model this means that
 spurious regions of emission at the edges of the map where exposure
 time is low are not included in the source mask. See the documentation
-in \cref{Appendix}{app:par_full}{Configuration Parameters:
+in \cref{Appendix}{app:dimm}{Configuration Parameters:
 dimmconfig.lis} for more information on each.
 
 Finally there is signal-to-noise based masking as utilised by
@@ -3627,8 +3627,7 @@ ref=850map_mask_zm
 
 Traditionally, the map-maker divides a non-contiguous sequence of time
 series data into chunks. It processes each chuck independently
-before co-adding them as a final step in the the reduction---see
-\cref{Figure}{fig:skyloop}{figure below}.
+before co-adding them as a final step in the the reduction.
 
 This means for each chunk the map-maker has to start from scratch
 determining the \texttt{AST} model and the benefit of long integration
@@ -3947,7 +3946,7 @@ VARIANCE component, so it is easy to produce a S/N map using the
 \end{myquote}
 
 The resulting map, \texttt{cosmo2\_mos\_mf\_snr}, is shown in
-\cref{Figure}{fig:snrmask}{signal-to-noise image}. Compared with the
+\cref{Figure}{fig:snrmask}{the signal-to-noise image}. Compared with the
 matched filter map the
 edges no longer appear as noisy because they have been down-weighted
 by the larger noise values where there were less data.
@@ -4049,7 +4048,7 @@ include more of the emission beyond the 3\,$\sigma$ edge.
 % thresh 850map_mask_sm 850map_mask_zm thrlo=0.02 newlo=bad thrhi=0.02 newhi=1
 \end{verbatim}
 \end{myquote}
-The final mask is shown in the right-panel of \cref{Figure}{fig:mask}{this figure},
+The final mask is shown in the right-panel of \cref{Figure}{fig:mask}{the figure below},
 note how it encompasses more emission and has softer edges than the
 first threshold map. \\
 
