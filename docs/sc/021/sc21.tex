@@ -2273,7 +2273,7 @@ Total samples available from all chunks: 18273302 (3067.53 bolos)
 %\flushbottom
 
 Once the map-maker has completed you can open your output map using
-\gaia---see \cref{Figure}{fig:itermap}{the figure below}. The excerpt
+\gaia---see \cref{Figure}{fig:itermap}{this example}. The excerpt
 in \cref{Section}{sec:running}{Running the iterative map-maker} shows
 the output written to the terminal as you run the map-maker. There are
 a number of clues in this output that indicate the status of the
@@ -2285,7 +2285,7 @@ reduction.
   iterative algorithm with default parameters.
 }
 \end{latexonly}
-
+\\*\\*
 \textbf{The number of input files}\\
 The first to note is the number of input files; it is worth checking
 this matches your expected number. Also summarised are the source
@@ -2302,24 +2302,14 @@ processed in more than one chunk. In this map the data is reduced in
 one continuous piece: \param{Continuous chunk 1 / 1}. Chunking is
 where the map-maker processes sub-sections of the time-series data
 independently and should be avoided if possible---see the text box
-\begin{latexonly}
-on Page~\pageref{page:text}.
-\end{latexonly}
-\begin{htmlonly}
 below.
-\end{htmlonly}
+\html{\newline}
 
 % The minipages used for the dvi version give latex2html problems.
 \begin{htmlonly}
 \htmladdimg{sc21_data_chunking.png}
+\newline\newline
 \end{htmlonly}
-
-\textbf{Quality statistics}\\
-At the beginning of the reduction, the main purpose of QUALITY
-flagging is to indicate how many bolometers are being used. In the
-example above you can see that from a total of 5120 bolometers, 1842
-were turned off during data acquisition (\texttt{BADDA}). In addition,
-136 bolometers
 
 \begin{latexonly}
 \colorbox{gray}{
@@ -2345,7 +2335,7 @@ observation.
 \vspace{0.2cm}\\
 For \textsc{pong} maps chunking is a bigger concern, with the
 maximum number of chunks that can be tolerated dependent on the number
-of map rotations. For example, a 40-minute \textsc{pong} map with 8
+of map rotations. For example, a 40-minute \textsc{pong} map with eight
 rotations may get divided into three or four chunks. Although not
 ideal, this will mean that each point is still covered by two or three
 passes. Fewer passes than this however and the map-maker become less
@@ -2354,7 +2344,15 @@ effective.
 \end{minipage}
 \hspace{0.1cm}
 }
-\newline\newline
+\end{latexonly}
+\latex{\newline\newline}
+
+\textbf{Quality statistics}\\
+At the beginning of the reduction, the main purpose of QUALITY
+flagging is to indicate how many bolometers are being used. In the
+example above you can see that from a total of 5120 bolometers, 1842
+were turned off during data acquisition (\texttt{BADDA}). In addition,
+136 bolometers
 exceeded the acceptable noise threshold (\texttt{NOISE}), while tiny
 fractions of the data were flagged because the telescope was moving
 too slowly (\texttt{STAT}) or the sample are adjacent to a step that
@@ -2379,15 +2377,9 @@ with good `Quality' (\texttt{Total samples available for map}) has
 dropped from 18634826 to 18273302 (about a 2 per cent decrease) as
 additional samples were flagged in each iteration.
 
-
 Be aware that some large reductions may take many iterations to reach
 convergence and you may find significantly fewer bolometers remaining
 resulting in higher noise than expected.
-\end{latexonly}
-\\*
-\begin{htmlonly}
-\htmladdimg{sc21_data_chunking.png}
-\end{htmlonly}
 
 \textbf{Convergence}\\
 The convergence criteria \texttt{maptol} is updated for each
@@ -2400,7 +2392,7 @@ below your required \texttt{maptol} for convergence to be achieved.
 
 The default configuration file used in this example executes a maximum
 of five iterations, but stops sooner if the change in \texttt{maptol}
-drops below 0.05 (i.e. \texttt{numiter=$-$5}). In this example it
+drops below 0.05 (i.e. \texttt{numiter~=$-$5}). In this example it
 stops after five iterations:
 
 \begin{latexonly}
