@@ -1946,7 +1946,7 @@ default file to 100 to avoid problems associated with bright sources.
 \hline
 \multicolumn{2}{|l|}{\texttt{dimmconfig\_bright\_compact.lis}}\\
 \hline
-\texttt{numiter~=~$-$40}&\texttt{flt.filt\_edge\_largescale~=~200}\\
+\texttt{numiter~=$-$40}&\texttt{flt.filt\_edge\_largescale~=~200}\\
 \texttt{com.perarray~=~1}&\texttt{flt.zero\_circle~=~(0.016666)}\\
  \texttt{ast.zero\_circle~=~(0.0166666666)}&\\
 \hline
@@ -2467,12 +2467,13 @@ When your data comes out of the map-maker it is in units of picowatts
 (pW). A flux conversion factor, or FCF, needs to be applied to scale
 your data from units of pW to janskys (Jy). For more information on calibrating
 SCUBA-2 data see Dempsey et al. (2013) \cite{dempsey12}.
-\\*\\*
+\newline
+
 Below are our default FCFs. Note that the \fcfb\ will be applied
 by the pipeline when reducing your data with \oracdr.
 
-\vspace{0.5cm}
-\renewcommand*\arraystretch{1.2}
+\latex{\vspace{0.5cm}}
+\latex{\renewcommand*\arraystretch{1.2}}
 \begin{table}[h!]
 \centering
 \begin{tabular}{|c|c|c|c|}
@@ -2489,8 +2490,8 @@ by the pipeline when reducing your data with \oracdr.
 \hline
 \end{tabular}
 \end{table}
-\renewcommand*\arraystretch{1.0}
-\vspace{0.5cm}
+\latex{\renewcommand*\arraystretch{1.0}}
+\latex{\vspace{0.5cm}}
 
 \textbf{IMPORTANT NOTES:
   \newline
@@ -2966,7 +2967,7 @@ As an example, you can set bad all pixel outside the \texttt{FLT} mask by doing:
 % setbb map 2
 \end{verbatim}
 \end{myquote}
-\vspace{0.3cm}
+\latex{\vspace{0.3cm}}
 
 \textbf{Contouring a mask over your map}\\*
 If you would like to plot a mask over your map you will need to copy
@@ -3436,7 +3437,7 @@ estimated noise levels are preferable.
 The parameter \texttt{noi.box\_size} helps remove `scuffs' or other
 noise artifacts you might see in your error map due to a sub-array (or
 arrays) temporarily jumping to a higher noise state. The default file
-has \texttt{noi.box\_size~=~$-$15} (i.e. half a sub-scan). As the
+has \texttt{noi.box\_size~=$-$15} (i.e. half a sub-scan). As the
 value tends to $-$1 (one second) we find some of the source signal being
 down-weighted. Higher than this $-$15 value and the map-maker becomes
 less sensitive to the higher noise states.
