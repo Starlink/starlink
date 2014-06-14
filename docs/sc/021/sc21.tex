@@ -3652,14 +3652,12 @@ signal from all of the chunks is built up over the iterations and is
 all included in the final map estimate when convergence is reached.
 See \cref{Figure}{fig:skyloop}{the diagram below}.
 
-\begin{figure}[h!]
-\centering
-\includegraphics[width=0.55\linewidth]{sc21_skyloop}
-  \caption{\small Illustration of the skyloop approach
-  to map-making compared to the standard map-maker.
+
+\myfig{sc21_skyloop}{[h!]}{width=0.55\linewidth}{fig:skyloop}{
+  Illustration of the \task{skyloop} approach}{
+  \small Illustration of the \task{skyloop} approach
+  to map-making compared with the standard map-maker.
 }
-\label{fig:skyloop}
-\end{figure}
 
 Be aware that \texttt{skyloop} uses a lot of disk space. Setting
 environment variable \texttt{STAR\_TEMP} to a suitable location
