@@ -640,7 +640,7 @@ TIP: The .sdf extension on filenames is not required when running Starlink comma
 \end{htmlonly}
 \vspace{0.5cm}
 
-\subsection{GAIA for viewing your map}
+\subsubsection{GAIA for viewing your map}
 
 Image visualisation can be done with \gaia\ (see \gaiasun). \textsc{Gaia} is an
 image and data-cube display and analysis tool which incorporates tools such
@@ -743,9 +743,9 @@ at CADC.
 
 \clearpage
 \section{\xlabel{scuba2_overview}SCUBA-2 Overview}
-
-\subsection{\xlabel{scuba2}The instrument}
 \label{sec:s2}
+\subsection{\xlabel{scuba2}The instrument}
+
 
 The Submillimetre Common User Bolometer Array-2 (SCUBA-2) is a
 10,000-pixel bolometer camera. It has two arrays operating simultaneously to map
@@ -974,7 +974,7 @@ instructions given in \cref{Section}{sec:cmult}{Applying the FCF and
 determining fluxes}.
 
 
-\subsubsection{\xlabel{concat}Concatenate \& apply a flat-field}
+\subsection{\xlabel{concat}Concatenate \& apply a flat-field}
 \label{sec:concat}
 
 Since SCUBA-2 data for a given sub-array are broken into multiple
@@ -1141,7 +1141,7 @@ select the the $X$ Axis to be either Id or RTS\_NUM.
 \end{latexonly}
 
 
-\subsubsection{\xlabel{scan_pat}Displaying scan patterns}
+\subsection{\xlabel{scan_pat}Displaying scan patterns}
 \label{sec:scan}
 
 The movement of the telescope throughout a scan (as well as other
@@ -1201,7 +1201,7 @@ likely to still be useful. This is especially true for \textsc{daisy}
 maps where the high exposure-time central region is usually
 unaffected.
 
-\subsubsection{\xlabel{display_cube}Displaying time-series data}
+\subsection{\xlabel{display_cube}Displaying time-series data}
 \label{sec:gaiacube}
 
 Use the \starlink\ application \textsc{Gaia} to visualise the bolometer
@@ -1810,7 +1810,7 @@ The tables following each description list the parameters set for each
 recipe. A verbatim copy of these files can be found in
 \cref{Appendix}{app:special}{Specialised Configuration Files}.
 
-\subsection{dimmconfig\_blank\_field.lis}
+\subsubsection{dimmconfig\_blank\_field.lis}
 \begin{latexonly}
 This configuration is tuned for blank field surveys for which the goal
 is to detect extremely low signal-to-noise point sources.
@@ -1916,7 +1916,7 @@ however this is not applied by the map-maker.
 \end{htmlonly}
 
 
-\subsection{dimmconfig\_bright\_compact.lis}
+\subsubsection{dimmconfig\_bright\_compact.lis}
 
 This configuration is aimed at reducing maps of bright, compact
 sources that are isolated at the centre of the map (i.e. calibrators). It references
@@ -2724,7 +2724,7 @@ TIP: The list of file can be the output from \texttt{cat}. Note the back quotes 
 noise distribution from bright sources.\\*\\*}
 \end{htmlonly}
 
-\subsection{Registering maps}
+\subsubsection{Registering maps}
 
 You can register a series of SCUBA-2 maps to a common reference
 position using the \picard\ recipe
@@ -3353,7 +3353,7 @@ This parameter has been discussed in
 you to see the model that was fit for each component specified by the
 \texttt{modelorder} parameter.
 
-\subsection{\xlabel{filt}Adjusting the filtering}
+\subsection{\xlabel{filt}Large-scale filtering}
 \label{sec:filt}
 
 Some of the most important parameters to experiment with are the
@@ -4193,7 +4193,7 @@ The science pipeline will automate many of the steps discussed in
 \item Run a source-finding algorithm.
 \end{itemize}
 
-\subsection{\xlabel{pl_output}Pipeline recipes}
+\subsubsection{\xlabel{pl_output}Pipeline recipes}
 \label{sec:recipes}
 
 When MSBs are created, the PI can select a pipeline recipe to assign
@@ -4203,7 +4203,7 @@ line---see \cref{Section}{sec:parameterfile}{Changing the defaults}.
 
 Described below are the five main \oracdr\ science recipes.
 
-\subsection{\xlabel{extsources}REDUCE\_SCAN}
+\subsubsection{\xlabel{extsources}REDUCE\_SCAN}
 \vspace{-0.3cm}
 \textbullet\ Configuration file: \texttt{dimmconfig.lis}
 
@@ -4274,9 +4274,9 @@ are calibrated in mJy/beam using a corrected FCF. See
 \cref{Section}{sec:jk}{Example 2 - Advanced pipeline method} for a
 more-detailed description of this recipe and the files produced.
 
-\section{Changing the defaults}
+\subsection{Changing the defaults}
 \label{sec:parameterfile}
-\subsection{Changing the pipeline recipe}
+\subsubsection{Changing the pipeline recipe}
 You can override the recipe set in the header by listing any different
 one on the command line when starting \oracdr. For example
 \begin{myquote}
@@ -4295,7 +4295,7 @@ example both of these options will return the same result:
 \end{verbatim}
 \end{myquote}
 
-\subsection{Changing the configuration file}
+\subsubsection{Changing the configuration file}
 
 Although each recipe calls one of the standard configuration files the
 user can specify their own. You will need to create a recipe parameter
@@ -4405,7 +4405,7 @@ observation is being processed.
 Additionally, PNG images are made of the reduced files at a variety of
 resolutions.
 
-\subsubsection{\xlabel{cadc}Getting your data from CADC}
+\subsection{\xlabel{cadc}Getting your data from CADC}
 
 The JCMT Science Archive is hosted by The Canadian Astronomy Data
 Centre (CADC). Both raw data and data processed by the science pipeline
@@ -4500,7 +4500,8 @@ SCUBA-2 Data Reduction document SC2/ANA/S210/005
 
 \newpage
 \appendix
-\section{\xlabel{app_clean}Cleaning the Raw Data}
+\section[Appendices]{Appendix}
+\subsection{\xlabel{app_clean}Cleaning the Raw Data}
 \label{app:clean}
 
 You can use the \smurf\ task \clean\ to help inspect time-series.
@@ -4608,10 +4609,10 @@ in \texttt{dimmconfig.lis}---see \cref{Appendix}{app:dimm}{here}.
 
 
 \newpage
-\section{\xlabel{calib}SCUBA-2 Data Calibration}
+\subsection{\xlabel{calib}SCUBA-2 Data Calibration}
 \label{app:cal}
 
-\subsection{\xlabel{fcf}Flux conversion factors (FCF)}
+\subsubsection{\xlabel{fcf}Flux conversion factors (FCF)}
 \label{app:fcf}
 
 Primary and secondary calibrator observations have been reduced using
@@ -4681,7 +4682,7 @@ and we have found this number to be somewhat unreliable, particularly
 at 450$\mu$m.
 
 
-\subsection{\xlabel{extinction}Extinction correction}
+\subsubsection{\xlabel{extinction}Extinction correction}
 
 Analysis of the SCUBA-2 secondary calibrators has allowed calculation
 of the transmission relationships for the SCUBA-2 450\,$\mu$m and
@@ -4720,7 +4721,7 @@ defaults are listed in \texttt{\$SMURF\_DIR/smurf\_extinction.def}.
 %It is worth noting that if an individual science map and corresponding calibrator observation has already been reduced with the old factors (and your source and calibrator are at about the same airmass and if the tau did not change appreciably), any errors in extinction correction should cancel out in the calibration.
 
 \newpage
-\section{\xlabel{calcrms}SCUBA2\_CHECK\_RMS}
+\subsection{\xlabel{calcrms}SCUBA2\_CHECK\_RMS}
 \label{app:checkrmsparams}
 
 \begin{latexonly}
@@ -4764,7 +4765,7 @@ from the raw data. Recall the NEP corresponds to the noise in the raw
 data and is a combination of instrument and atmospheric noise.
 
 \newpage
-\section{\xlabel{matchedfilter}SCUBA-2 Matched Filter}
+\subsection{\xlabel{matchedfilter}SCUBA-2 Matched Filter}
 \label{app:mf}
 
 In order to optimally find sources that are the size of the telescope
@@ -4840,7 +4841,7 @@ the \param{PSF\_MATCHFILTER} recipe parameter).
 
 
 \newpage
-\section{\xlabel{fcfsred}FCFs by Reduction Date}
+\subsection{\xlabel{fcfsred}FCFs by Reduction Date}
 \label{app:fcfs}
 
 Ongoing development of the SCUBA-2 analysis has resulted in on-going
@@ -4898,7 +4899,7 @@ relation was applied by using the \Kappa\ command \hislist.
 \end{myquote}
 
 \newpage
-\section{\xlabel{cog}Aperture Photometry Curve of Growth}
+\subsection{\xlabel{cog}Aperture Photometry Curve of Growth}
 \label{app:cog}
 
 The SCUBA-2 beam has a broad error beam. As the size of the annulus
@@ -4915,7 +4916,7 @@ appropriate scaling factor for your FCF from the graph below.
 }
 
 \newpage
-\section{\xlabel{defconfig}Default dimmconfig.lis}
+\subsection{\xlabel{defconfig}Default dimmconfig.lis}
 \label{app:dimm}
 \raggedbottom
 
@@ -5515,10 +5516,10 @@ ast.zero_freeze = 0
 
 
 
-\section{\xlabel{special}Specialised Configuration Files}
+\subsection{\xlabel{special}Specialised Configuration Files}
 \label{app:special}
 
-\subsection{dimmconfig\_bright\_extended.lis}
+\subsubsection{dimmconfig\_bright\_extended.lis}
 \begin{myquote}
 \begin{verbatim}
 ^$STARLINK_DIR/share/smurf/dimmconfig_bright.lis
@@ -5529,7 +5530,7 @@ ast.zero_freeze = 0
 \end{verbatim}
 \end{myquote}
 
-\subsection{dimmconfig\_bright\_compact.lis}
+\subsubsection{dimmconfig\_bright\_compact.lis}
 \begin{myquote}
 \begin{verbatim}
 ^$STARLINK_DIR/share/smurf/dimmconfig_bright.lis
@@ -5554,7 +5555,7 @@ ast.zero_freeze = 0
 \end{verbatim}
 \end{myquote}
 
-\subsection{dimmconfig\_blank\_field.lis}
+\subsubsection{dimmconfig\_blank\_field.lis}
 \begin{myquote}
 \begin{verbatim}
    ^$STARLINK_DIR/share/smurf/dimmconfig.lis
@@ -5582,7 +5583,7 @@ ast.zero_freeze = 0
 \end{myquote}
 
 
-\subsection{dimmconfig\_bright.lis}
+\subsubsection{dimmconfig\_bright.lis}
 
 This file is included as although it is not used in its own right it
 form the basis (on top of \texttt{dimmconfig.lis} for both
