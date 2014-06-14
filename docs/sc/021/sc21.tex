@@ -1780,13 +1780,6 @@ been successfully accounted for by the other model components.
 
 \subsection{\xlabel{config}Specialised configuration files}
 \label{sec:config}
-%\hrule
-%\vspace{0.2cm}
-\myfig{sc21_dimmcongitree}{t}{width=\linewidth}{fig:configtree}{
-  Hierarchy of the the configuration files}{
-  Hierarchy of the configuration files.
-}
-
 The default configuration file \texttt{dimmconfig.lis} is intended to
 provide a reasonably good map for all types of observations. However,
 compromises have been made to reach that balance.
@@ -1804,6 +1797,13 @@ any identical ones in \texttt{dimmconfig\_bright.lis} which in turn
 override the values in \texttt{dimmconfig.lis}. the hierarchical
 structure means the parameters at the top of the tree (or first
 encountered) override any other instance of them.
+
+%\hrule
+%\vspace{0.2cm}
+\myfig{sc21_dimmcongitree}{t}{width=\linewidth}{fig:configtree}{
+  Hierarchy of the configuration files}{
+  Hierarchy of the configuration files.
+}
 
 Below is a description of each of the specialised configuration files.
 The tables following each description list the parameters set for each
