@@ -2986,7 +2986,7 @@ your Reduction}.
 
 \myfig{sc21_qualitygaia}{[t!]}{width=0.9\hsize}{fig:qualdisp}{}{
    Using \gaia\ to display the mask applied by the map-maker. Select the
-   QUALITY components of your map.
+   QUALITY component of your map.
 }
 
 \myfig{sc21_dispmask3}{[b!]}{width=0.95\hsize}{fig:maskdisp}{}{
@@ -4190,7 +4190,7 @@ The science pipeline will automate many of the steps discussed in
 \item Apply the FCF to calibrate to mJy/beam.
 \item Co-add multiple observations of the same object.
 \item Apply the matched-filter (blank-field configuration file only)
-\item Run a source finding algorithm.
+\item Run a source-finding algorithm.
 \end{itemize}
 
 \subsection{\xlabel{pl_output}Pipeline recipes}
@@ -4525,11 +4525,11 @@ summarised in \cref{Table}{tab:dimmdef}{this table}.
 Here \texttt{\$FILES} can just be a single file from a subarray, or a
 subset, e.g. \texttt{s8a20110417\_00051\_0003.sdf} (the first file
 containing science data), \texttt{s8a20110417\_00051\_000"[1234]"}
-(file 1 is a noise observation with shutter closed that gets ignored,
-file 2 is a flatfield observation that will be used to override the
-flatfield stored in the subsequent files 3 and 4 which are
+(File 1 is a noise observation with shutter closed that gets ignored,
+File 2 is a flatfield observation that will be used to override the
+flatfield stored in the subsequent Files 3 and 4 which are
 concatenated together, the \texttt{.sdf} is optional),
-\texttt{s8a20110417\_00051\_000\textbackslash?} (files 1 through 9),
+\texttt{s8a20110417\_00051\_000\textbackslash?} (Files 1 through 9),
 \texttt{s8a20110417\_00051\_\textbackslash*} (the whole observation).
 
 If you inspect the resulting \texttt{clean.sdf} in \gaia\
