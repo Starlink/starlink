@@ -267,6 +267,7 @@
 \newcommand{\ndftrace}{\xref{\task{ndftrace}}{sun95}{NDFTRACE}}
 \newcommand{\provshow}{\xref{\task{provshow}}{sun95}{PROVSHOW}}
 \newcommand{\showqual}{\xref{\task{showqual}}{sun95}{SHOWQUAL}}
+\newcommand{\setvar}{\xref{\task{setvar}}{sun95}{SETVAR}}
 \newcommand{\stats}{\xref{\task{stats}}{sun95}{STATS}}
 \newcommand{\sub}{\xref{\task{sub}}{sun95}{SUB}}
 \newcommand{\wcsmosaic}{\xref{\task{wcsmosaic}}{sun95}{WCSMOSAIC}}
@@ -280,6 +281,7 @@
 
 % Misc
 \newcommand{\autophotom}{\xref{\task{autophotom}}{sun45}{AUTOPHOTOM}}
+\newcommand{\fitstondf}{\xref{\task{fits2ndf}}{sun55}{FITS2NDF}}
 
 % Documents
 \newcommand{\gaiasun}{\xref{\textbf{SUN/214}}{sun214}{}}
@@ -4914,6 +4916,51 @@ appropriate scaling factor for your FCF from the graph below.
   aperture at 450$\mu$m \textbf{(left)} and 850$\mu$m
   \textbf{(right)}. Figure taken from Dempsey et al. (2013).
 }
+
+\newpage
+\subsection{\xlabel{fits}Convert format from FITS to NDF}
+\label{app:fits}
+
+It is often useful to utilise data from other wavelengths or
+instruments (either for a comparison or for an external mask). In the
+following example, the FITS file called \texttt{file.fits} is
+converted to NDF format as \texttt{file.sdf} using the \starlink\
+package \convert. Note that the \texttt{.sdf} file extension NDF may
+be omitted to save typing.
+
+\begin{myquote}
+\begin{verbatim}
+% convert
+% fits2ndf file.fits file.sdf
+\end{verbatim}
+\end{myquote}
+
+Unless your FITS file is from a recognised source, \fitstondf\ puts the
+various FITS extensions into NDF extensions called FITS\_EXT\_$<n>$,
+where $n$ counts from one for the first FITS extension. These are
+located in the top-level MORE component of the NDF. If one of these is
+the array you want---it should be an NDF too---it will be easier to
+handle if you copy out of the NDF extension to its own NDF.
+
+\begin{myquote}
+\begin{verbatim}
+% ndfcopy in=file.more.fits_ext_1 out=file_data
+\end{verbatim}
+\end{myquote}
+
+If there is a variance array stored in another extension that you want
+to attach to your new NDF, a command like the following will do that.
+
+\begin{myquote}
+\begin{verbatim}
+% setvar ndf=file_data from=file.more.fits_ext_2
+\end{verbatim}
+\end{myquote}
+
+\task{fits2ndf} does offer a way of mapping FITS extensions to familiar NDF
+array components DATA, VARIANCE, and QUALITY through the \param{EXTABLE} file,
+avoiding the \ndfcopy\ and possible \setvar\ steps.
+
 
 \newpage
 \subsection{\xlabel{defconfig}Default dimmconfig.lis}
