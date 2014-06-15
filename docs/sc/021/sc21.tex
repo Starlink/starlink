@@ -2616,11 +2616,11 @@ map.
 
 You can crop your map to the map-size set in the data header or
 to any requested size of box or circle using the \picard\ recipe
-\xref{\drrecipe{CROP\_JCMT\_IMAGES}}{sun265}{CROP\_JCMT\_IMAGES}.
+\xref{\drrecipe{CROP\_SCUBA2\_IMAGES}}{sun265}{CROP\_SCUBA2\_IMAGES}.
 The centre of the cropping area will always be the centre of your map.
 \begin{myquote}
 \begin{verbatim}
-% picard -recpars mypar.lis CROP_JCMT_IMAGES map_cal.sdf
+% picard -recpars mypar.lis CROP_SCUBA2_IMAGES map_cal.sdf
 \end{verbatim}
 \end{myquote}
 The example above includes a parameter file specifying the radius of
@@ -2629,7 +2629,7 @@ file is shown below.
 \begin{center}
 \begin{myquote}
 \begin{verbatim}
-[CROP_JCMT_IMAGES]
+[CROP_SCUBA2_IMAGES]
 MAP_RADIUS = 1800.0
 \end{verbatim}
 \end{myquote}
@@ -2637,7 +2637,7 @@ MAP_RADIUS = 1800.0
 
 If this parameter file is omitted it will default to a box of sides
 equal to the map size in the header (as requested in the MSB). The
-output from \drrecipe{CROP\_JCMT\_IMAGES} is a file with the suffix
+output from \drrecipe{CROP\_SCUBA2\_IMAGES} is a file with the suffix
 \texttt{\_crop}. Full details of this recipe can be found in the
 \htmladdnormallink{\textsc{Picard}
 website}{http://www.oracdr.org/oracdr/PICARD}\latex{\footnote{http://www.oracdr.org/oracdr/PICARD}}.
