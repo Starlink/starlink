@@ -2750,10 +2750,12 @@ REGISTER_Y  = DD:MM:SS.S
 \subsubsection{Getting the noise}
 \label{sec:checkrms}
 
-You can use the \picard\ recipe SCUBA2\_CHECK\_RMS get the noise. This
-recipe estimates the RMS from both the map and the NEP and writes out
-the results in a log file called \texttt{log.checkrms}. The parameters written
-to this file are listed in \cref{Appendix}{app:checkrmsparams}{SCUBA2_CHECK_RMS}.
+You can use the \picard\ recipe \drrecipe{SCUBA2\_CHECK\_RMS} get the
+noise. This recipe estimates the RMS from both the map and the NEP and
+writes out the results in a log file called \texttt{log.checkrms}. The
+parameters written to this file are listed in
+\cref{Appendix}{app:checkrmsparams}{SCUBA2_CHECK_RMS}.
+
 \begin{myquote}
 \begin{verbatim}
 % picard SCUBA2_CHECK_RMS map.sdf
@@ -2762,12 +2764,12 @@ to this file are listed in \cref{Appendix}{app:checkrmsparams}{SCUBA2_CHECK_RMS}
 If you have not yet applied an FCF this recipe will apply the
 appropriate default FCF before estimating the noise.
 \\*\\*
-\textbf{Note:} SCUBA2\_CHECK\_RMS can only be run on single
+\textbf{Note:} \drrecipe{SCUBA2\_CHECK\_RMS} can only be run on single
 observations. To get the map noise from a co-add you will have to
 perform the steps below.
 \\*\\*
 \textbf{The steps}\\*
-After applying any necessary FCF, SCUBA2\_CHECK\_RMS simply executes
+After applying any necessary FCF, \drrecipe{SCUBA2\_CHECK\_RMS} simply executes
 the following steps to get the map noise:
 \\*\\*
 (1) Crops the map to remove the noisy edges
@@ -2823,7 +2825,6 @@ pixel mode, mean and median.
 similar result to the mean/median of the error array except with
 additional contamination from sources.
 
-
 \subsubsection{Viewing the noise histogram}
 
 You can view a histogram of the error component with the
@@ -2860,11 +2861,12 @@ in \gaia, then select the \gaiathing{Error} button on the \gaiathing{Select NDF 
 container file} window---see \cref{Figure}{fig:noigaia}{the figure
 below}. You will need to adjust the scaling to view the error map properly.
 
-To assess the noise in \gaia\ go to the toolbar on the main page and
-click on \gaiathing{Image-Analysis$\Rightarrow$Image} regions. Next select
-the region shape you would like to check and draw it on your map by clicking
-and dragging the mouse. Then click the \gaiathing{Stats selected} button in the
-\gaiathing{Image regions} window to get a report of the statistics.
+To assess the noise using \gaia, go to the toolbar on the main window
+and click on \linebreak[4]\gaiathing{Image-Analysis$\Rightarrow$Image
+regions}. Next select the region shape you would like to check and
+draw it on your map by clicking and dragging the mouse. Then click the
+\gaiathing{Stats selected} button in the \gaiathing{Image regions}
+window to get a report of the statistics.
 
 \begin{latexonly}
 \begin{center}
@@ -2879,15 +2881,15 @@ using the \textsc{Kappa} command \ndfcopy. For example, \texttt{\% ndfcopy map c
 
 \begin{htmlonly}
 \textbf{TIP: You can write out the error component of your map into a new file
-using the \textsc{Kappa} command \ndfcopy.  For example
-\texttt{\% ndfcopy map comp=err map\_err}.}
+using the \textsc{Kappa} command \ndfcopy. For example, \texttt{\% ndfcopy map comp=err map\_err}.}
+\vspace{4mm}
 \end{htmlonly}
 
 \begin{latexonly}
 \myfig{sc21_noigaia6}{[h!]}{width=\linewidth}{fig:noigaia}{
   The error map viewed with \gaia}{
   The error component displayed with \gaia. After clicking the
-  \texttt{Error} button you will have to rescale your map.
+  \gaiathing{Error} button you will have to rescale your map.
 }
 \end{latexonly}
 
@@ -2895,7 +2897,7 @@ using the \textsc{Kappa} command \ndfcopy.  For example
 \myfig{sc21_noigaia6}{[b!]}{width=\linewidth}{fig:noigaia}{
   The error map viewed with \gaia}{
   The error component displayed with \gaia. After clicking the
-  \texttt{Error} button you will have to rescale your map.
+  \gaiathing{Error} button you will have to rescale your map.
 }
 \end{htmlonly}
 
@@ -3043,12 +3045,14 @@ manual gives full details of all the available parameters.
 \subsection{\xlabel{clumps}Clump finding}
 \label{sec:clumps}
 \label{sec:clumpfind}
+
 The \cupid\ application \findclumps\ can be used to generate a clump
-catalogue. It identifies clumps of emission in 1, 2 or 3D NDFs. The
-user can select from the clump finding algorithms FellWalker,
-Gaussclumps, ClumpFind or Reinhold and must supply a configuration
-file specific to each method. See the \xref{\textsc{Cupid}
-manual}{sun255}{} for descriptions of the various algorithms.
+catalogue. It identifies clumps of emission in one-, two- or
+three-dimensional NDFs. The user can select from the clump finding
+algorithms FellWalker, Gaussclumps, ClumpFind or Reinhold and must
+supply a configuration file specific to each method. See the
+\xref{\textsc{Cupid} manual}{sun255}{} for descriptions of the various
+algorithms.
 
 The result is returned as a catalogue in a text file and as a NDF
 pixel mask showing the clump boundaries.
@@ -3128,7 +3132,6 @@ The task \configmeld\ will identify what configuration parameters were
 used by the map-maker when your data were reduced. \task{configmeld}
 requires a visual-differences tool to be installed on your machine;
 those currently recognised are
-
 \htmladdnormallink{\texttt{meld}}{http://meldmerge.org/}\latex{\footnote{\texttt{http://meldmerge.org/}}},
 \htmladdnormallink{\texttt{opendiff}}{http://developer.apple.com/},
 \htmladdnormallink{\texttt{diffmerge}}{http://www.sourcegear.com/diffmerge},
