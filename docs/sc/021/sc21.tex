@@ -535,13 +535,6 @@ reduce and visualise their data using \starlink\ packages:
 \smurf \cite{smurf}, \Kappa \cite{kappa}, \gaia \cite{gaia} and \picard
 \cite{picard}.
 
-This guide is not aimed at users of the
-polarimeter (POL-2) or Fourier transform spectrometer (FTS-2). If you
-have shared risk data (SRO) you should refer to the
-\xref{SMURF SRO
-Cookbook.}{sc19}{}\latex{\footnote{\texttt{http://www.starlink.ac.uk/docs/sc19.htx/sc19.html}}}
-
-
 This guide covers the following:
 \begin{itemize}
 \itemsep0em
@@ -669,7 +662,7 @@ post-processing analysis of reduced data. \textsc{Picard}
 documentation can be found at \htmladdnormallinkfoot{the
 \textsc{Orac-dr} web page}{http://www.oracdr.org/oracdr/PICARD}, or at
 \picardsun. All \textsc{Picard} recipes follow the same structure and
-are run like so.
+are run like so:
 \begin{myquote}
 \begin{verbatim}
 % picard -recpars <recipe_params_file> RECIPE <input_files>
@@ -889,7 +882,7 @@ designed and optimised to meet both these criteria.
   telescope track after multiple rotations of the pattern; resulting
   exposure time map. The scan pattern for your observation can be
   visualised in this way with \topcat\ using the output from
-  \jcmtstate.  See \cref{Section}{sec:exam}{Examining raw data} for
+  \jcmtstate.  See \cref{Section}{sec:scan}{Displaying scan patterns} for
   more details.  Figure modified from Holland et al. (2013).
 }
 
@@ -1542,6 +1535,7 @@ explanation of each model is given in \cref{Section}{sec:models}{The individual 
 \end{minipage}
 \begin{minipage}[t]{0.88\linewidth}
 \centering\textbf{DESCRIPTION}
+\vspace{6pt}
 \end{minipage}
 \hrule
 %\vspace{0.1cm}
@@ -1656,8 +1650,8 @@ above, indicates that no more than this number of iterations should be
 performed, \emph{but} that it may stop at fewer if convergence
 (according to the noise criteria below) has been achieved.
 \\*\\*
-\textbf{Options 2: Convergence parameter}\\*
-The convergence criteria is set by the \textbf{maptol} parameter.
+\textbf{Option 2: Convergence parameter}\\*
+The convergence criteria is set by the \texttt{maptol} parameter.
 
 When running the map-maker, \texttt{maptol} gives the average
 normalised change in the value of map pixels
@@ -1665,23 +1659,18 @@ between subsequent iterations. Convergence is reached when the change
 is less than the parameter \texttt{maptol}. It has units of the noise
 in the map, thus \texttt{maptol}$=$0.05 means a change of
 $<$0.05\,$\sigma$. This option has the advantage of directly assessing
-the noise in the resulting map rather than the time-series.
+the noise in the resulting map.
 
 Typically the normalized change in pixel values between iterations
 drops rapidly to begin with and then flattens out, decreasing
-increasingly slowly. As a result, in some circumstances, the map-maker
-will fail to stop iterating due to low frequency ripples coming and
-going between iterations.
-\vspace{3mm}\\
-\texttt{maptol}~=~0.05 is the default. Be aware that
-setting \texttt{maptol} to lower than 0.05 will dramatically increase
-the length of time to produce the final map and possibly never achieve
-convergence. [RECOMMENDED]
+increasingly slowly.  Be aware that setting \texttt{maptol} to much
+lower than 0.05 will dramatically increase the length of time to
+produce the final map and possibly never achieve convergence.
 \vspace{2mm}
 
 
 The best way of checking the progress of convergence while running the
-map-maker is to use the \param{itermap} option and setting
+map-maker is to use the \param{itermap} option by setting the parameter
 \param{itermap~=~1} (see \cref{Section}{sec:tweak}{Tweaking the
 Configuration File}).
 
@@ -2272,7 +2261,7 @@ Total samples available from all chunks: 18273302 (3067.53 bolos)
 \end{htmlonly}
 
 \subsection{\xlabel{look_for}What to look out for}
-%\flushbottom
+\flushbottom
 
 Once the map-maker has completed you can open your output map using
 \gaia---see \cref{Figure}{fig:itermap}{this example}. The excerpt
@@ -2287,7 +2276,7 @@ reduction.
   iterative algorithm with default parameters.
 }
 \end{latexonly}
-\\*\\*
+\newline\newline
 \textbf{The number of input files}\\
 The first to note is the number of input files; it is worth checking
 this matches your expected number. Also summarised are the source
@@ -2346,8 +2335,8 @@ effective.
 \end{minipage}
 \hspace{0.1cm}
 }
+\newline\newline\newline
 \end{latexonly}
-\latex{\newline\newline}
 
 \textbf{Quality statistics}\\
 At the beginning of the reduction, the main purpose of QUALITY
@@ -2714,16 +2703,18 @@ does allow the option of assessing the individual maps before co-adding.
 \begin{fmpage}{0.95\linewidth}
 \vspace{0.1cm}
 
-TIP: The list of file can be the output from \texttt{cat}. Note the back quotes in the example.
-\newline{\texttt{\% picard MOSAIC\_JCMT\_IMAGES \`{}cat myfiles.txt\`{}}}.
+TIP: The list of file can be the output from \texttt{cat}. Note the back quotes in
+the following example.
+\newline\texttt{\% picard MOSAIC\_JCMT\_IMAGES \`{}cat myfiles.txt\`{}}.
 \vspace{0.1cm}
 \end{fmpage}
 \end{center}
 \end{latexonly}
 
 \begin{htmlonly}
-\textbf{TIP: Use the error component to avoid contamination of the
-noise distribution from bright sources.\\*\\*}
+\textbf{TIP: The list of files can be the output from \texttt{cat}. Note the
+back quotes in the following example.
+\texttt{\% picard MOSAIC\_JCMT\_IMAGES \`{}cat myfiles.txt\`{}}}.
 \end{htmlonly}
 
 \subsubsection{Registering maps}
@@ -2788,7 +2779,7 @@ the following steps to get the map noise:
 
 (2) Runs the \Kappa\ command \stats\ to extract the median value from
 the error component.
-{\begin{myquote}
+\begin{myquote}
 \begin{verbatim}
 % stats map_cal_crop comp=err order
 \end{verbatim}
@@ -2963,7 +2954,6 @@ You can see which bit is used for each mask with \showqual.
 \end{myquote}
 
 As an example, you can set bad all pixel outside the \texttt{FLT} mask by doing:
-
 \begin{myquote}
 \begin{verbatim}
 % setbb map 2
@@ -3092,7 +3082,7 @@ same sizes at the four position angles is then found and used as the
 clump shape.
 \end{minipage}
 
-\myfig{sc21_plotstcshapes}{[h!]}{width=0.99\linewidth}{fig:stcshapes}{
+\myfig{sc21_plotstcshapes}{[b!]}{width=0.99\linewidth}{fig:stcshapes}{
   Overlaying a clump catalogue in \gaia.}{
   STC shapes displayed over the input map with \gaia. To overlay your clumps
   in this way open you map with \textsc{Gaia}. Under the \gaiathing{Image-Analysis}
@@ -3164,6 +3154,7 @@ differ from the the values given in \texttt{dimmconfig.lis}.
 % configecho name=! config=^dimmconfig.lis ndf=850map.sdf
 \end{verbatim}
 \end{myquote}
+
 
 \clearpage
 \section{\xlabel{tweak}Tailoring your Reduction}
@@ -3240,7 +3231,7 @@ values (no prefix) take priority over qualified values.
 \subsection{\xlabel{inter}Writing out models \& intermediate maps}
 
 
-\textbf{itermap}\\
+\textbf{itermaps}\\
 Setting the parameter \texttt{itermap~=~1} writes out an astronomical map after each
 iteration. Setting \texttt{itermap~=~2} adds the QUALITY component.
 These can be visually inspected with
@@ -3257,7 +3248,7 @@ they have completed.
 
 \textbf{shortmaps}\\
 If the parameter \texttt{shortmaps} is non-zero, a map is made from
-every group of adjacent timeslices (specified by the parameter).
+every group of adjacent timeslices (as specified by the parameter).
 These are stored as an NDF extension and can be viewed \gaia.
 
 \begin{latexonly}
@@ -3363,8 +3354,7 @@ filtering options. By default the low-pass filter is applied once
 during the pre-processing stage and is turned off for the iterative
 steps. The high-pass filter is only specified during the iterative
 steps and its selected value is crucial for maps containing extended
-emission. All the parameters dealing with the \texttt{FLT} model can
-be found in \cref{Appendix}{app:dimm}{Configuration Parameters: dimmconfig.lis}.
+emission.
 
 The maximum spatial scale of structure that can be recovered by the
 map-maker is determined by the scanning speed and frequency cut
@@ -3384,7 +3374,7 @@ filter limits in terms of spatial scale in arcsecs---in this case
 300\,arcsec at 850\,$\mu$m and 600\,arcsec at 450\,$\mu$m. For example
 at 850\,$\mu$m, recovering scales of 300\,arcsec at a scan speed of
 600\,arcsec/sec (default for a 1 degree \textsc{pong}) corresponds to
-a frequency 2\,Hz.
+a frequency of 2\,Hz.
 
 Choosing a high-pass filter is especially important for the recovery
 of extended emission. The \texttt{dimmconfig\_bright\_extended.lis}
@@ -3408,6 +3398,7 @@ out the speed at which your data were taken from the
   \textbf{(Right)} Map made with \texttt{850.flt.filt\_edge\_largescale~=~1000}.
   All other configuration parameters remain the same.
 }
+
 
 \subsection{\xlabel{fitcom}Fitting COM for each sub-array}
 \label{sec:fitcom}
@@ -3452,16 +3443,12 @@ than the default of 1000\,arcsec/sec will help reduce the effect of any
 \texttt{flagslow} greater than the default of 300\,arcsec/sec helps to
 flatten the edges of maps. To determine reasonable values for your
  dataset you should do \jcmtstate\ and view the scan speed using
-\topcat---see \cref{Section}{sec:scan}{Displaying scan patterns} for
+\topcat. See \cref{Section}{sec:scan}{Displaying scan patterns} for
 details.
+
 
 \subsection{\xlabel{mask}Masking options}
 \label{sec:mask}
-
-ast.skip doesn't subtract the ast model for the first X iterations.
-The map can then do FLT masking on. It starts from scratch with each
-iteration and gets a good map from FLT masking.
-
 
 The \texttt{AST}, \texttt{FLT} and \texttt{COM} models each have a
 number of masking options. The ones common to each model are:
@@ -3487,6 +3474,7 @@ in question.
 \texttt{AST} masking is always used where emission is expected. The map is constrained to zero at all points outside the masked region and the \texttt{AST} model is estimated based only on data inside the
 mask.
 
+\textbf{FLT mask}\\
 \texttt{FLT} masking is used to omit bright sources from the estimate
 of the low frequency background subtracted from the residuals on each
 iteration. This can help prevent ringing in the final map. S/N based
@@ -3562,7 +3550,7 @@ These steps are followed in the example in
 \begin{minipage}[t]{0.1\linewidth}
 \textbf{Step 1}
 \end{minipage}
-\begin{minipage}[t]{0.9\linewidth}Generate a map covering your region. This 
+\begin{minipage}[t]{0.9\linewidth}Generate a map covering your region. This
 may be by simply running the map-maker on your data as shown below.
 \begin{myquote}
 \begin{verbatim}
@@ -3733,9 +3721,7 @@ be aware this will lose structure on scales larger than a subarray. In
 conjunction with \param{com.perarray~=~1} you can also use the
 \param{ast.skip~=~8} parameter. This makes a map without subtracting an
 \param{AST} model for the first eight iterations. If you are chasing
-extended emission see the point above. \newline
-
-For a cosmetic improvement in the background, set
+extended emission see the point above. For a more uniform background set
 \param{flt.filt\_edge\_largescale\_last} to a small value to get harsh
 filtering on your final iteration.\\
 \hline
@@ -3753,10 +3739,8 @@ parameters:
 \item \param{flt.zero\_freeze~=~10}
 \item \param{com.zero\_freeze~=~10}
 \end{itemize}
-Each of the these freeze parameters stop the masks growing after ten
-iterations. By this stage the masks have essentially reached their
-maximum scale but a few edge pixels oscillate in and out of the masks
-preventing convergence.\\
+These freeze parameters stop the masks growing after ten
+iterations.\\
 \hline
 \end{tabular}
 \end{center}
@@ -3801,9 +3785,7 @@ be aware this will lose structure on scales larger than a subarray. In
 conjunction with \param{com.perarray~=~1} you can also use the
 \param{ast.skip~=~8} parameter. This makes a map without subtracting an
 \param{AST} model for the first eight iterations. If you are chasing
-extended emission see the point above. \newline
-
-For a cosmetic improvement in the background, set
+extended emission see the point above. For a more uniform background, set
 \param{flt.filt\_edge\_largescale\_last} to a small value to get harsh
 filtering on your final iteration.\\
 \hline
@@ -3821,10 +3803,7 @@ parameters:
 \item \param{flt.zero\_freeze~=~10}
 \item \param{com.zero\_freeze~=~10}
 \end{itemize}
-Each of the these freeze parameters stop the masks growing after ten
-iterations. By this stage the masks have essentially reached their
-maximum scale but a few edge pixels oscillate in and out of the masks
-preventing convergence.\\
+These parameters stop the masks growing after ten iterations. \\
 \hline
 \end{tabular}
 \end{center}
