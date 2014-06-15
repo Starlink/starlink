@@ -2803,16 +2803,6 @@ distribution from bright sources.}
 \end{htmlonly}
 
 
-\begin{figure}[b!]
-\begin{center}
-\includegraphics[height=6.5cm]{sc21_noihist}
-\caption[The error map visualised in two ways.]{
-  The error map viewed with \textsc{Kappa}:histogram.
-}
-\label{fig:noihisto}
-\end{center}
-\end{figure}
-
 \subsubsection{Map statistics}
 
 The \Kappa\ commands \histat\ and \stats\ are very similar and both
@@ -2845,28 +2835,30 @@ specified.
 % histogram map_cal_crop comp=err numbin=200 style="color=white"
 \end{verbatim}
 \end{myquote}
-The output is shown in the \cref{Figure}{fig:noihisto}{this plot}.
+The output is shown in the \cref{Figure}{fig:noihisto}{the plot below}.
 For more information on the options for \histogram\ see
 \kappasun.
 
-\begin{figure}[b!]
-\begin{center}
-\includegraphics[width=\linewidth]{sc21_noigaia6}
-\caption[The error map viewed with \gaia.]{
-   The error component displayed with \gaia. After clicking the
-   \texttt{Error} button you will have to rescale your map.
+\begin{latexonly}
+\myfig{sc21_noihist}{[h!]}{height=7.5cm}{fig:noihisto}{
+  The error component viewed with \textsc{Kappa} command \task{histogram}.}{
+  The error component viewed with \textsc{Kappa} command \task{histogram}.
 }
-\label{fig:noigaia}
-\end{center}
-\end{figure}
+\end{latexonly}
 
+\begin{htmlonly}
+\myfig{sc21_noihist}{[b!]}{height=10cm}{fig:noihisto}{
+  The error component viewed with \textsc{Kappa} command \task{histogram}.}{
+  The error component viewed with \textsc{Kappa} command \task{histogram}.
+}
+\end{htmlonly}
 
 \subsubsection{Examining the error map with GAIA}
 
 It is also useful to view the error map itself. Open your reduced map
 in \gaia, then select the \gaiathing{Error} button on the \gaiathing{Select NDF in
-container file} window---see \cref{Figure}{fig:noigaia}{this figure}. You
-will need to adjust the scaling to view the error map properly.
+container file} window---see \cref{Figure}{fig:noigaia}{the figure
+below}. You will need to adjust the scaling to view the error map properly.
 
 To assess the noise in \gaia\ go to the toolbar on the main page and
 click on \gaiathing{Image-Analysis$\Rightarrow$Image} regions. Next select
@@ -2880,8 +2872,7 @@ and dragging the mouse. Then click the \gaiathing{Stats selected} button in the
 \vspace{0.1cm}
 
 TIP: You can write out the error component of your map into a new file
-using the \textsc{Kappa} command \ndfcopy. \newline
-\texttt{         \% ndfcopy map comp=err map\_err}
+using the \textsc{Kappa} command \ndfcopy. For example, \texttt{\% ndfcopy map comp=err map\_err}
 \end{fmpage}
 \end{center}
 \end{latexonly}
@@ -2891,6 +2882,23 @@ using the \textsc{Kappa} command \ndfcopy. \newline
 using the \textsc{Kappa} command \ndfcopy.  For example
 \texttt{\% ndfcopy map comp=err map\_err}.}
 \end{htmlonly}
+
+\begin{latexonly}
+\myfig{sc21_noigaia6}{[h!]}{width=\linewidth}{fig:noigaia}{
+  The error map viewed with \gaia}{
+  The error component displayed with \gaia. After clicking the
+  \texttt{Error} button you will have to rescale your map.
+}
+\end{latexonly}
+
+\begin{htmlonly}
+\myfig{sc21_noigaia6}{[b!]}{width=\linewidth}{fig:noigaia}{
+  The error map viewed with \gaia}{
+  The error component displayed with \gaia. After clicking the
+  \texttt{Error} button you will have to rescale your map.
+}
+\end{htmlonly}
+
 
 \subsection{\xlabel{regridding}Regridding your Data}
 \label{sec:regriddata}
@@ -2930,6 +2938,12 @@ masking. You can see where any masks were applied by viewing the Quality array i
 First open your map in \gaia. Select the top level NDF from list in
 the pop-up window then click the \gaiathing{Quality} button. You will need to
 rescale the map to bring out the masks--see \cref{Figure}{fig:qualdisp}{below}.
+
+\myfig{sc21_qualitygaia}{[t!]}{width=0.9\hsize}{fig:qualdisp}{
+   Display of the mask made by the map-maker}{
+   Using \gaia\ to display the mask applied by the map-maker. Select the
+   QUALITY component of your map.
+}
 
 Each value in the QUALITY component of an NDF contains eight ``on/off''
 flags used to indicate a specific binary property of the pixel. The
@@ -2976,13 +2990,7 @@ For more information on the use of masks by \makemap\ and the
 parameters that affect them see \cref{Section}{sec:tweak}{Tailoring
 your Reduction}.
 
-\myfig{sc21_qualitygaia}{[t!]}{width=0.9\hsize}{fig:qualdisp}{
-   Display of the mask made by the map-maker}{
-   Using \gaia\ to display the mask applied by the map-maker. Select the
-   QUALITY component of your map.
-}
-
-\myfig{sc21_dispmask3}{[b!]}{width=0.95\hsize}{fig:maskdisp}{
+\myfig{sc21_dispmask3}{[hb!]}{width=0.95\hsize}{fig:maskdisp}{
    Contours of an \texttt{AST} mask overlaid on a map}{
    Using \gaia\ to display your map with the \texttt{AST} mask used by
    the map-maker contoured on top.
@@ -3024,7 +3032,7 @@ a 15-arcsec Gaussian.
 SMOOTH_FWHM = 15
 \end{verbatim}
 \end{myquote}
-\vspace{0.4cm}
+\latex{\vspace{4mm}}
 
 This is a fairly common technique used throughout the extra-galactic
 sub-millimetre community to identify potential sources. A full
@@ -3082,7 +3090,7 @@ same sizes at the four position angles is then found and used as the
 clump shape.
 \end{minipage}
 
-\myfig{sc21_plotstcshapes}{[b!]}{width=0.99\linewidth}{fig:stcshapes}{
+\myfig{sc21_plotstcshapes}{[ht!]}{width=0.99\linewidth}{fig:stcshapes}{
   Overlaying a clump catalogue in \gaia.}{
   STC shapes displayed over the input map with \gaia. To overlay your clumps
   in this way open you map with \textsc{Gaia}. Under the \gaiathing{Image-Analysis}
