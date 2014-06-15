@@ -6,10 +6,10 @@
 \usepackage{array}
 \usepackage{fancyhdr}
 \usepackage{multirow}
-% ? End of specify used packages
 \usepackage{longtable}
 \usepackage{color}
 \usepackage{enumitem}
+% ? End of specify used packages
 \pagestyle{myheadings}
 
 % -----------------------------------------------------------------------------
@@ -188,11 +188,15 @@
 \newsavebox{\fmbox}
 \newenvironment{fmpage}[1]{\begin{lrbox}{\fmbox}\begin{minipage}{#1}}{\end{minipage}\end{lrbox}\fbox{\usebox{\fmbox}}}
 
+\definecolor{gray}{RGB}{200,200,200}
+\definecolor{MidnightBlue}{rgb}{0.1, 0.1, 0.44}
+
 % A new environment for quoting verbatim
 % Environment for indenting and using a small font.
-\newenvironment{myquote}{\begin{quote}\begin{small}}{\end{small}\end{quote}}
-
-\definecolor{gray}{RGB}{200,200,200}
+\newenvironment{myquote}{
+   \color{MidnightBlue}\begin{quote}\begin{small}}{
+   \end{small}\end{quote}
+}
 
 % Shortcuts
 % ---------
@@ -352,6 +356,17 @@
 % reference.
 \newcommand{\cref}[3]{\latexhtml{#1~\ref{#2}}{\htmlref{#3}{#2}}}
 
+% LaTex2HTML has problem with coloured text swapping it from the
+% myquote context to the main text.
+
+\begin{htmlonly}
+   \renewenvironment{myquote}{
+      \begin{quote}\begin{small}}{
+      \end{small}\end{quote}
+   }
+\end{htmlonly}
+
+
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page
@@ -484,7 +499,6 @@
 \newpage
 \begin{latexonly}
 \addcontentsline{toc}{section}{Acronyms}
-
 % ? Heading for glossary if used.
    \vspace{10mm}
    \begin{center}
@@ -1493,11 +1507,11 @@ map-maker during the iterative stage is indicated by the
 are modular however so their order may be changed. The default model
 order in \texttt{dimmconfig.lis} is given below.
 
-\begin{myquote}
+\begin{quote}
 \begin{verbatim}
 modelorder = (com,gai,ext,flt,ast,noi)
 \end{verbatim}
-\end{myquote}
+\end{quote}
 
 The only recipe not following this model order is the one tailored for
 blank field maps which does not include a \texttt{FLT} model in the
@@ -1638,11 +1652,11 @@ Specifying the number of iterations in the configuration file is done via
 the \texttt{numiter} parameter. In \texttt{dimmconfig.lis}, this is given
 by:
 \vspace{-0.1cm}
-\begin{myquote}
+\begin{quote}
 \begin{verbatim}
 numiter = -5
 \end{verbatim}
-\end{myquote}
+\end{quote}
 \vspace{-0.1cm}
 A positive value for \texttt{numiter} means that the requested number
 of iterations will be executed. A negative value, as in the example
@@ -1710,11 +1724,11 @@ written out. However, this can be changed by setting
 \texttt{exportndf} in the configuration file to the list of models
 that you wish to view.
 \vspace{0cm}
-\begin{myquote}
+\begin{quote}
 \begin{verbatim}
 exportndf = (com,gai,ast,flt,res,noi,qua)
 \end{verbatim}
-\end{myquote}
+\end{quote}
 
 In addition to the models listed in \cref{Section}{sec:models}{The
 individual models}, you request \texttt{RES} in order to export the
@@ -2627,12 +2641,12 @@ The example above includes a parameter file specifying the radius of
 the circle to be extracted (in arcsecs).  The format for the parameter
 file is shown below.
 \begin{center}
-\begin{myquote}
+\begin{quote}
 \begin{verbatim}
 [CROP_SCUBA2_IMAGES]
 MAP_RADIUS = 1800.0
 \end{verbatim}
-\end{myquote}
+\end{quote}
 \end{center}
 
 If this parameter file is omitted it will default to a box of sides
@@ -2684,14 +2698,14 @@ best method see \xref{\textbf{SUN/139}}{sun139}{}.
 An example parameter file like the one below chooses \task{makemos}
 using a 3-$\sigma$ clipping threshold.
 
-\begin{myquote}
+\begin{quote}
 \begin{verbatim}
 [MOSAIC_JCMT_IMAGES]
 MOSAIC_TASK = makemos
 MAKEMOS_METHOD = sigmas
 MAKEMOS_SIGMAS = 3
 \end{verbatim}
-\end{myquote}
+\end{quote}
 
 Currently there is no advantage in terms of data quality to reducing
 \texttt{\`{}cat listoffiles.txt\`{}}
@@ -2734,14 +2748,14 @@ combining your maps.
 Here the parameter file contains the position of the reference source
 as in the example below. See \picardsun\ for more details.
 \begin{center}
-\begin{myquote}
+\begin{quote}
 \begin{verbatim}
 [SCUBA2_REGISTER_IMAGES]
 REGISTER_IMAGES = 1
 REGISTER_X  = HH:MM:SS.S
 REGISTER_Y  = DD:MM:SS.S
 \end{verbatim}
-\end{myquote}
+\end{quote}
 \end{center}
 
 
@@ -3028,12 +3042,12 @@ nearby sources, each ends up contributing flux to both peaks.
 As in the example parameter file below we have requested the
 background should be estimated by first smoothing the map and PSF with
 a 15-arcsec Gaussian.
-\begin{myquote}
+\begin{quote}
 \begin{verbatim}
 [SCUBA2_MATCHED_FILTER]
 SMOOTH_FWHM = 15
 \end{verbatim}
-\end{myquote}
+\end{quote}
 \latex{\vspace{4mm}}
 
 This is a fairly common technique used throughout the extra-galactic
@@ -3911,12 +3925,12 @@ In order to optimally find sources that are the size of the telescope
 beam, we apply the matched filter recipe --
 \xref{\drrecipe{SCUBA2\_MATCHED\_FILTER}}{sun265}{SCUBA2_MATCHED_FILTER}.
 We create a simple parameter file called \texttt{smooth.ini}:
-\begin{myquote}
+\begin{quote}
 \begin{verbatim}
 [SCUBA2_MATCHED_FILTER]
 SMOOTH_FWHM = 15
 \end{verbatim}
-\end{myquote}
+\end{quote}
 where \texttt{SMOOTH\_FWHM~=~15} indicates that the background should be
 estimated by first smoothing the map and PSF with a 15-arcsec FWHM
 Gaussian. Next, the recipe is executed as follows:
@@ -4093,7 +4107,7 @@ format---note how it is based on
 \texttt{dimmconfig\_bright\_extended.lis}. It has decreased the
 convergence parameter to \texttt{MAPTOL}=0.03 but increased the number
 of iterations to compensate as 40 is unlikely to be sufficient.
-\begin{myquote}
+\begin{quote}
 \begin{verbatim}
 ^$STARLINK_DIR/share/smurf/dimmconfig_bright_extended.lis
 numiter = -100
@@ -4102,7 +4116,7 @@ maptol = 0.03
 ast.zero_mask=1
 ast.zero_snr = 0
 \end{verbatim}
-\end{myquote}
+\end{quote}
 
 \textbf{Step 4: Cropping the map}
 \vspace{0.2cm}\\
@@ -4122,12 +4136,12 @@ at the exposure-time image with \gaia.
 \cref{Figure}{fig:exptime}{The exposure-time image} shows a sharp drop
 off at a radius of 30\,arcmin. We can thus specify a parameter file like so:
 \begin{center}
-\begin{myquote}
+\begin{quote}
 \begin{verbatim}
 [CROP_JCMT_IMAGES]
 MAP_RADIUS = 1800
 \end{verbatim}
-\end{myquote}
+\end{quote}
 \end{center}
 
 \begin{myquote}
@@ -4324,12 +4338,12 @@ For example, to run the pipeline with \drrecipe{REDUCE\_SCAN\_CHECKRMS} but your
 own configuration file (\texttt{myconfig.lis}), the recipe parameter file
 (named \texttt{mypars.ini}) will look like this:
 \vspace{0.2cm}
-\begin{myquote}
+\begin{quote}
 \begin{verbatim}
 [REDUCE_SCAN_CHECKRMS]
 MAKEMAP_CONFIG = myconfig.lis
 \end{verbatim}
-\end{myquote}
+\end{quote}
 \vspace{0.4cm}
 Then run the pipeline calling the parameter file via the
 \texttt{-recpars} option.
@@ -4824,12 +4838,12 @@ may be created.
 \begin{center}
 \begin{fmpage}{0.8\linewidth}
 \vspace{0.2cm}
-\begin{myquote}
+\begin{quote}
 \begin{verbatim}
 [SCUBA2_MATCHED_FILTER]
 SMOOTH_FWHM = 15
 \end{verbatim}
-\end{myquote}
+\end{quote}
 \vspace{0.4cm}
 \end{fmpage}
 \end{center}
@@ -5440,7 +5454,7 @@ options, see the comments in \texttt{smurf\_makemap.def} or
 \label{app:special}
 
 \subsubsection{dimmconfig\_bright\_extended.lis}
-\begin{myquote}
+\begin{quote}
 \begin{verbatim}
 ^$STARLINK_DIR/share/smurf/dimmconfig_bright.lis
    numiter=-40
@@ -5448,10 +5462,10 @@ options, see the comments in \texttt{smurf\_makemap.def} or
    ast.zero_snr = 5
 
 \end{verbatim}
-\end{myquote}
+\end{quote}
 
 \subsubsection{dimmconfig\_bright\_compact.lis}
-\begin{myquote}
+\begin{quote}
 \begin{verbatim}
 ^$STARLINK_DIR/share/smurf/dimmconfig_bright.lis
    numiter=-40
@@ -5473,10 +5487,10 @@ options, see the comments in \texttt{smurf\_makemap.def} or
    flt.zero_circle = (0.0166666666)
 
 \end{verbatim}
-\end{myquote}
+\end{quote}
 
 \subsubsection{dimmconfig\_blank\_field.lis}
-\begin{myquote}
+\begin{quote}
 \begin{verbatim}
    ^$STARLINK_DIR/share/smurf/dimmconfig.lis
 
@@ -5500,7 +5514,7 @@ options, see the comments in \texttt{smurf\_makemap.def} or
    com.perarray = 1
 
 \end{verbatim}
-\end{myquote}
+\end{quote}
 
 
 \subsubsection{dimmconfig\_bright.lis}
@@ -5509,7 +5523,7 @@ This file is included as although it is not used in its own right it
 form the basis (on top of \texttt{dimmconfig.lis} for both
 \texttt{dimmconfig\_bright\_compact.lis} and
 \texttt{dimmconfig\_bright\_extended.lis}
-\begin{myquote}
+\begin{quote}
 \begin{verbatim}
    ^$STARLINK_DIR/share/smurf/dimmconfig.lis
 
@@ -5526,7 +5540,7 @@ form the basis (on top of \texttt{dimmconfig.lis} for both
    com.gain_tol = 7
    com.gain_abstol = 5
 \end{verbatim}
-\end{myquote}
+\end{quote}
 
 
 \end{document}
