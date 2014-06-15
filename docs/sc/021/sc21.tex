@@ -3464,15 +3464,27 @@ iteration and gets a good map from FLT masking.
 
 
 The \texttt{AST}, \texttt{FLT} and \texttt{COM} models each have a
-number of common masking options. The main ones are
-\texttt{xxx.zero\_circle}, \texttt{xxx.zero\_lowhits},
-\texttt{xxx.zero\_snr} and \texttt{xxx.zero\_snrlo}. Masking comes
-with different restrictions and sensitivities depending on the model
-in question.
+number of masking options. The ones common to each model are:
+\begin{latexonly}
+\begin{table}[h!]
+\begin{tabular}{p{3.5cm}p{10.5cm}}
+\texttt{xxx.zero\_circle}& Defines a circular mask of a specified radius. Used for compact sources.\\
+\texttt{xxx.zero\_lowhits}& Defines a mask by the number of data samples  in a pixel. This means that
+spurious regions of emission at the edges of the map where exposure
+time is low are not included in the mask.\\
+\texttt{xxx.zero\_snr}& Creates a mask after each iteration based on the S/N in each pixel.\\
+\texttt{xxx.zero\_snrlo}& Allows the mask created by xxx.zero\_snr to expand down to a specified S/N.\\
+\texttt{xxx.zero\_union}& Controls how the masks are combined. e.g. if two masks are defined, one from lowhits and one from the signal-to-noise.\\
+\texttt{xxx.zero\_freeze}& Prevents the masking from changing after a specified number of iterations.\\
+\end{tabular}
+\end{table}
+\end{latexonly}
 
-\texttt{AST} masking is the option we recommend. On each iteration the
-map is constrained to zero at all points outside the masked region and
-the \texttt{AST} model is estimated based only on data inside the
+ Masking comes with different restrictions and sensitivities depending on the model
+in question.
+\\\\
+\textbf{AST mask}\\
+\texttt{AST} masking is always used where emission is expected. The map is constrained to zero at all points outside the masked region and the \texttt{AST} model is estimated based only on data inside the
 mask.
 
 \texttt{FLT} masking is used to omit bright sources from the estimate
@@ -3480,52 +3492,25 @@ of the low frequency background subtracted from the residuals on each
 iteration. This can help prevent ringing in the final map. S/N based
 \texttt{FLT} masking cannot be used on the first iteration and
 \texttt{FLT} masking should be used sparingly to aid convergence (it
-is limited to the first two iterations by default by
+is limited to the first two iterations by default with
 \texttt{flt.zero\_niter~=~2}).
 
+\textbf{COM mask}\\
 \texttt{COM} masking is used to omit very bright sources from the
 estimate of the common-mode signal, this can prevent sources being
 rejected due to their dissimilarity to the common-mode. S/N based
 \texttt{COM} masking cannot be used on the first iteration and the
 mask should always be small.
+\\\\
+\textbf{Signal-to-noise based masking}\\
+Signal-to-noise based masking is used for both the \texttt{AST} and \texttt{FLT} models for extended emission. The recipe \texttt{dimmconfig\_bright\_extended.lis} sets \texttt{ast.zero\_snr} to 5 and \texttt{ast.zero\_snr} to 3. Setting \texttt{ast.zero\_snr} too low can cause noise spikes to be interpreted as signal so  \texttt{ast.zero\_snrlo} is used which allows the mask to only grow it it includes pixels with the specified  S/N. This typically improves the resulting map so is worth experimenting with. Note that \texttt{AST} masking is not applied on the final iteration to allow data outside the mask to remain in the final map.
 
-For the rest of this section we will concentrate on \texttt{AST}
-masking only. \texttt{ast.zero\_circle} defines a circle is defined to
-mask out the source, with everything outside this circle being
-constrained to zero. This is utilised in
-\texttt{dimmconfig\_bright\_compact.lis} by the \texttt{AST} model as
-the source is expected to be very compact with a flat background. The
-default size of this circle is 60\,arcsec, but this can adjusted by
-altering \texttt{ast.zero\_circle}. The position of this circle
-defaults to the centre of the map. You can specify alternative
-coordinates if this is not appropriate.
-
-\texttt{ast.zero\_lowhits} allows masking based on the number of data
-samples in a pixel. For the \texttt{AST} model this means that
-spurious regions of emission at the edges of the map where exposure
-time is low are not included in the source mask. See the documentation
-in \cref{Appendix}{app:dimm}{Configuration Parameters:
-dimmconfig.lis} for more information on each.
-
-Finally there is signal-to-noise based masking as utilised by
-\texttt{dimmconfig\_bright\_extended.lis}. It uses the parameter
-\texttt{ast.zero\_snr} to define a mask based on the S/N. The default
-is 5, meaning that pixels below an S/N of 5\,$\sigma$ will be set to
-zero. This is dynamic with the S/N mask being re-determined after each
-iteration. Setting \texttt{ast.zero\_snr} too low can cause noise
-spikes to be interpreted as signal. Instead, \texttt{ast.zero\_snrlo}
-can be set which allows the mask to grow to include pixels with an S/N
-down to \texttt{ast.zero\_snrlo}. This typically improves the
-resulting map so is well worth experimenting with.
-
-An alternative to setting \texttt{ast.zero\_snrlo} is to smooth the
-S/N mask by setting the parameter \texttt{ast.zero\_snr\_fwhm}.
-
-Remember for all \texttt{AST} masking to include
-\texttt{ast.zero\_notlast~=~1} so that mask is not applied on the
-final iteration. This means that the background regions in the map are
-only generated by this single, final iteration.
-
+The bright-extended recipe also sets \texttt{ast.skip} to 5. This
+means the \texttt{AST} model is not determined at all for the first
+five iterations. This used in conjunction with \texttt{FLT} masking
+which is done in these \texttt{AST}-free iterations.
+\\\\
+\textbf{External masking}\\
 An alternative to S/N masking is to supply an external mask using the
 \texttt{REF} parameter. Setting the parameter
 \texttt{ast.zero\_snr\_fwhm} allows you to automate this step for a
@@ -3534,35 +3519,37 @@ generated by \texttt{ast.zero\_snr} is smoothed by a Gaussian (of
 `FWHM' arcsecs) and the map-maker is re-run with this smoothed mask
 supplied as an external mask. You can supply your own external mask
 however by following the instructions in the next section.
-
-Multiple masks are combined according to the \texttt{ast.zero\_union}
-parameter (there are also corresponding \texttt{FLT} and \texttt{COM}
-ones). If this parameter is true (i.e. non-zero) then the two masks
+\\\\
+\textbf{Combining masks}\\
+Multiple masks are combined according to the \texttt{xxx.zero\_union}
+parameter. If this parameter is true (i.e. non-zero) then the two masks
 will be combined to act as one large mask (the union of the individual
 masks). Hence a pixel will be flagged/masked if it falls within either
 mask (rather than being required to fall in both). The alternative is
 a false (i.e. zero) value; this means that only pixels that fall into
-both masks independently will be flagged/masked. Here, only the
+both masks independently will be flagged/masked. In this case only the
 intersection of the masks is considered the final masked area.
 
 For example, if you find an S/N mask allow bright regions to develop
 towards the edges of your map, you can force these to zero by using
-the intersection of the S/N mask with a `low-hits' mask.
-
-There are a number of options
-available which build on the default recipe. The simplest is to set
-the configuration parameter \texttt{ast.zero\_snrlo} which allows the
-mask to grow organically as the \texttt{AST} model evolves.
+the intersection of the S/N mask with a lowhits mask.
+\\\\
+\textbf{Freezing masks}\\
+The \texttt{ast.zero\_snr} parameters stop the masks from growing
+(or changing) indefinitely. After the first few iterations the mask
+have essentially reached their maximum scale but a few edge pixels
+oscillate in and out of the masks. This results in a significant enough
+change in the \texttt{maptol} that convergence is never achieved. The
+final maps however are essentially identical.
 
 
 \subsection{\xlabel{maskbe}Supplying an external mask}
 \label{sec:maskbe}
 
-As an S/N mask is redetermined after each iteration it varies as the
-map varies which can sometimes cause convergence problems. The mask
+As an S/N mask is redetermined after each iteration it changes with the map
+ which can sometimes cause convergence problems. The mask
 will also depend on the amount of data going into the map and the
-pixel size. An externally supplied mask is fixed and tells the
-map-maker where you expect the emission to be.
+pixel size. A fixed externally supplied mask  can get around these problems.
 
 The sequence below is a summary of the procedure for generating and
 supplying an external mask. In this example the mask is generated from
@@ -3572,8 +3559,11 @@ Alternatively maps from other telescopes can be used.
 These steps are followed in the example in
 \cref{Section}{sec:bright_ex}{Extended galactic sources}.
 
-\textbf{(1)} Generate a map covering your region. This may be by simply
-running the map-maker on your data as shown below.
+\begin{minipage}[t]{0.1\linewidth}
+\textbf{Step 1}
+\end{minipage}
+\begin{minipage}[t]{0.9\linewidth}Generate a map covering your region. This 
+may be by simply running the map-maker on your data as shown below.
 \begin{myquote}
 \begin{verbatim}
 % makemap in='s8*.sdf' out=850map method=iterate \
@@ -3582,17 +3572,28 @@ config='"^dimmconfig_bright_extended.lis"'
 \end{myquote}
 The alternative is to access a map from a different dataset or even a
 different telescope, e.g. a map downloaded from the Herschel Science
-Archive. For instructions on converting from fits format to NDF see
-\cref{Appendix}{app:convert}{Converting a Herschel map to NDF}.
-\\*\\*
-\textbf{(2)} Make a signal-to-noise map using the \Kappa\ command \makesnr.
+Archive. For instructions on converting from FITS to NDF see
+\cref{Appendix}{app:fits}{Convert format from  FITS to NDF}.\\
+\end{minipage}
+
+\begin{minipage}[t]{0.1\linewidth}
+\textbf{Step 2}
+\end{minipage}
+\begin{minipage}[t]{0.9\linewidth}Make a signal-to-noise map using the \Kappa\ command
+\makesnr.
 \begin{myquote}
 \begin{verbatim}
 % makesnr 850map 850map_snr
 \end{verbatim}
 \end{myquote}
-\textbf{(3)} This S/N map is thresholded to set everything below 3$\sigma$ to 0 and
-everything above to 1.
+\end{minipage}
+
+
+\begin{minipage}[t]{0.1\linewidth}
+\textbf{Step 3}
+\end{minipage}
+\begin{minipage}[t]{0.9\linewidth}This S/N map is thresholded to set everything below
+3$\sigma$ to 0 and everything above to 1.
 \begin{myquote}
 \begin{verbatim}
 % thresh 850map_snr 850map_mask thrlo=3 newlo=0 thrhi=3 newhi=1
@@ -3602,36 +3603,50 @@ In the step above you can set everything below 3$\sigma$ to
 \texttt{bad} and use this as your mask. However this generates a hard
 3$\sigma$ cut-off to your map which is unrealistic for the real data.
 Instead the following 2 steps are performed to smooth the edges of the
-mask.
-\\*\\*
-\textbf{(4)} The thresholded map is smoothed with a Gaussian filter
+mask.\\
+\end{minipage}
+
+
+\begin{minipage}[t]{0.1\linewidth}
+\textbf{Step 4}
+\end{minipage}
+\begin{minipage}[t]{0.9\linewidth}The thresholded map is smoothed with a Gaussian filter
 of FWHM of 5 pixels (=\,20\,arcsec). Then it is again thresholded, this time
 keeping everything above 5\,\% of the 0 level as the mask and setting
 the rest to \texttt{bad}.
 \begin{myquote}
 \begin{verbatim}
 % gausmooth 850map_mask 850map_mask_sm fwhm=5
-% thresh 850map_mask_sm 850map_mask_zm thrlo=0.05 newlo=bad thrhi=0.05 newhi=1
+% thresh 850map_mask_sm 850map_mask_zm thrlo=0.05 newlo=bad \
+  thrhi=0.05 newhi=1
 \end{verbatim}
 \end{myquote}
-Finally the map is re-made with this mask supplied as an external
+\end{minipage}
+
+
+\begin{minipage}[t]{0.1\linewidth}
+\textbf{Step 5}
+\end{minipage}
+\begin{minipage}[t]{0.9\linewidth}Finally the map is re-made with this mask supplied as an external
 file. Notice that the extra parameters required to pick up this external
 mask are being appended to the configuration file on the command line
 rather than editing the file itself.
 \begin{myquote}
 \begin{verbatim}
 % makemap in='s8*.sdf' out=850map_zm method=iterate \
-config='"^dimmconfig_bright_extended.lis,ast.zero_mask=1,ast.zero_snr=0"' \
-ref=850map_mask_zm
+  config='"^dimmconfig_bright_extended.lis,ast.zero_mask=1,\
+  ast.zero_snr=0"' ref=850map_mask_zm
 \end{verbatim}
 \end{myquote}
+\end{minipage}
 
 \subsection{\xlabel{skyloop}Skyloop}
 \label{sec:skyloop}
 
 Traditionally, the map-maker divides a non-contiguous sequence of time
 series data into chunks. It processes each chuck independently
-before co-adding them as a final step in the the reduction.
+before co-adding them as a final step in the the reduction---see
+\cref{Figure}{fig:skyloop}{the figure below}.
 
 This means for each chunk the map-maker has to start from scratch
 determining the \texttt{AST} model and the benefit of long integration
