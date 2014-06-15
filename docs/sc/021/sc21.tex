@@ -3401,6 +3401,16 @@ out the speed at which your data were taken from the
 \texttt{SCAN\_VEL} parameter in the FITS header (see
 \cref{Section}{sec:fitsheader}{Headers and file structure}).
 
+\textbf{Flattening the background}\\*
+The is an option to reduce the noise in your background introduced by
+setting a high value for the large-scale filter. The parameter
+\param{FLT.FILT\_EDGE\_LARGESCALE\_LAST} filters the regions outside
+your \texttt{AST} mask on a shorter scale for the last iteration only,
+thereby producing a much flatter background.
+
+Note that the variances stored in the final map are from the penultimate
+iteration to avoid having artificially reduced values.
+
 
 \myfigduo{sc21_brex_19}{sc21_brex_18}{}{width=0.46\linewidth}{fig:fltcompare}{7mm}{
   Illustrating the effects of high-pass filtering}{
