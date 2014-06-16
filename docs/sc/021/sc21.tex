@@ -687,7 +687,7 @@ relevant recipe parameters, \param{RECIPE} is the name of the recipe
 to be run (note the caps) and \param{<input\_files>} is a list of
 files to be run, which must be int the current directory, or a
 directory defined by \param{ORAC\_DATA\_OUT}. A number of \textsc{Picard}
-recipes will be demonstrated in \cref{Section}{sec:maps}{Reducing your data}.
+recipes will be demonstrated in \cref{Chapter}{sec:maps}{Reducing your data}.
 
 
 \begin{latexonly}
@@ -735,8 +735,8 @@ each step by hand allows more fine-tuned control of certain
 processing and analysis steps, and is especially useful for refining
 the parameters used by the map-maker. However, once the optimal
 parameters have been determined, it is possible to pass them to the
-pipeline. \cref{Section}{sec:dimm}{The map-maker explained}
-and \cref{Section}{sec:maps}{Reducing your data} discuss the manual approach;
+pipeline. \cref{Chapter}{sec:dimm}{The map-maker explained}
+and \cref{Chapter}{sec:maps}{Reducing your data} discuss the manual approach;
 to use the science pipeline, skip
 straight to \cref{Section}{sec:pipe}{SCUBA-2 Pipeline}.
 
@@ -744,7 +744,7 @@ While you have the option of running the pipeline yourself, the JCMT
 will also produce pipeline reduced files for each observation and
 group of repeat observations for each night. These are reduced using
 the \oracdr\ pipeline with the recipe specified in the MSB.
-\cref{Section}{sec:pipe}{SCUBA-2 Pipeline} gives instruction on
+\cref{Chapter}{sec:pipe}{SCUBA-2 Pipeline} gives instruction on
 retrieving reduced data from the
 \htmladdnormallink{JCMT Science Archive}{http://www3.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/jcmt/}
 at CADC.
@@ -905,14 +905,14 @@ designed and optimised to meet both these criteria.
 \section{\xlabel{data_files}Handling raw SCUBA-2 data}
 \label{sec:raw}
 
-This section describes a number of procedures visualising
+This chapter describes a number of procedures visualising
 and assessing the quality of raw data files.  These steps need not be part of
 your data reduction process and do not concern the iterative map-maker.
 
 However, there are reasons you may wish to examine your raw data in
 greater depth. The most likely motivation is unusual result from the
 map-maker such as higher than expected noise, artifacts in your map or
-inconsistent noise across multiple tiles.  This section will help you
+inconsistent noise across multiple tiles.  This chapter will help you
 get to the bottom of many of these issues.
 
 \subsection{Data acquisition explained}
@@ -1372,12 +1372,12 @@ performs all pre-processing steps to clean the data, followed by
 iteratively solving for multiple signal components and regridding to
 produce a final science map.
 
-This section describes how the map-maker produces a science images
+This chapter describes how the map-maker produces a science images
 from raw SCUBA-2 data. It is essential reading to gain an
 understanding of what has happened to produce your reduced image,
 especially if you wish to modify the default map-maker parameters.
 \color{red} If you prefer to jump straight in to the data reduction go
-to \cref{Section}{sec:maps}{Reducing your data}.\color{black}
+to \cref{Chapter}{sec:maps}{Reducing your data}.\color{black}
 
 
 \subsection{\xlabel{dimm_theory}How it works}
@@ -1754,7 +1754,7 @@ filename (such as \texttt{s8a20120720\_00030\_0003\_con\_com.sdf},
 \texttt{s8a20120720\_00030\_0003\_con\_flt.sdf},
 \texttt{s8a20120720\_00030\_0003\_con\_res.sdf})\footnote{The filename shows
 sub-scan 3 of Observation 30 since this is the first science file that
-is encountered (see \cref{Section}{sec:raw}{Raw SCUBA-2 Data}).} The variance
+is encountered (see \cref{Chapter}{sec:raw}{Raw SCUBA-2 Data}).} The variance
 and quality for the data are stored as the VARIANCE and QUALITY
 components within the residual file NDF.
 
@@ -1988,7 +1988,7 @@ signal ranges in the map.
 
 Recovering both faint extended structure and bright sources in the
 same field poses an extra challenge. Strategies for this are explored
-in \cref{Section}{sec:tweak}{Tailoring your reduction}.
+in \cref{Chapter}{sec:tweak}{Tailoring your reduction}.
 
 \cref{Figure}{fig:becompare}{The images below} shows a comparison between
 maps reduced with the default configuration file and using
@@ -2031,7 +2031,7 @@ signal ranges in the map.
 
 Recovering both faint extended structure and bright sources in the
 same field poses an extra challenge. Strategies for this are explored
-in \cref{Section}{sec:tweak}{Tailoring your reduction}.
+in \cref{Chapter}{sec:tweak}{Tailoring your reduction}.
 
 \cref{Figure}{fig:becompare}{The images below} shows a comparison between
 maps reduced with the default configuration file and using
@@ -2077,7 +2077,7 @@ spurious emission in your final map.
 
 The point to \texttt{dimmconfig\_bright\_extended.lis} so the parameters are in
 addition to those listed above. These files are discussed in more
-detail in \cref{Section}{sec:tweak}{Tailoring your Reduction}.
+detail in \cref{Chapter}{sec:tweak}{Tailoring your Reduction}.
 
 \clearpage
 
@@ -2088,7 +2088,7 @@ This chapter describes how to run the map-maker and what to look out
 for during processing. We also discuss reducing your data using the
 \oracdr\ science pipeline and why you might want to chose this option.
 
-As discussed in \cref{Section}{sec:dimm}{The
+As discussed in \cref{Chapter}{sec:dimm}{The
 Dynamic Iterative Map-Maker}, all of the settings for the map-maker
 are stored in configuration files. In this chapter we use
 the default configuration file, \texttt{dimmconfig.lis} to reduce CRL~2688,
@@ -2457,7 +2457,7 @@ the filename in question is given.
 \end{myquote}
 
 \textbf{For a more in-depth discussion on running the pipeline and a discussion
-of the various outputs see \cref{Section}{sec:pipe}{The SCUBA-2
+of the various outputs see \cref{Chapter}{sec:pipe}{The SCUBA-2
 Pipeline} or \pipelinesun.}
 \clearpage
 
@@ -3003,7 +3003,7 @@ Then open your map in \gaia\ and contour the mask NDF on top. See
 \cref{Figure}{fig:maskdisp}{the figure below}.
 
 For more information on the use of masks by \makemap\ and the
-parameters that affect them see \cref{Section}{sec:tweak}{Tailoring
+parameters that affect them see \cref{Chapter}{sec:tweak}{Tailoring
 your Reduction}.
 
 \myfig{sc21_dispmask3}{[hb!]}{width=0.95\hsize}{fig:maskdisp}{
@@ -4214,7 +4214,7 @@ while the pipeline software comes as part of the \starlink\ suite.
 \subsection{\xlabel{science_pl}The Science Pipeline}
 
 The science pipeline will automate many of the steps discussed in
-\cref{Section}{sec:maps}{Reducing your data}:
+\cref{Chapter}{sec:maps}{Reducing your data}:
 \vspace{-0.3cm}
 \begin{itemize}\itemsep-0.3em
 \item Run the iterative map-maker.
