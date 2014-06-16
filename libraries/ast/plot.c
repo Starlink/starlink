@@ -209,12 +209,12 @@ f     - Title: The Plot title drawn using AST_GRID
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -707,6 +707,10 @@ f     - Title: The Plot title drawn using AST_GRID
 *        Speed up plotting of CmpRegion boundaries by splitting the
 *        CmpRegion up into a set of disjoint Regions, and plotting each
 *        one separately.
+*     16-JUN-2014 (DSB):
+*        - Prevent seg fault in PlotLabels caused by accessing
+*        uninitialised "atext" field stored within purged labels.
+*        - Choose a label with non-negative priority as the fall-back root label.
 *class--
 */
 
@@ -23297,6 +23301,7 @@ static void PlotLabels( AstPlot *this, int esc, AstFrame *frame, int axis,
    int nz;                /* Number of trailing zeros in this label */
    int nzmax;             /* Max. number of trailing zeros */
    int odd;               /* DO we have a strange axis? */
+   int off;               /* Offset from central label */
    int olap;              /* Any overlap found? */
    int prio;              /* Current priority */
    int root;              /* Index of unabbreviated label */
@@ -23440,18 +23445,30 @@ static void PlotLabels( AstPlot *this, int esc, AstFrame *frame, int axis,
 
             }
          }
+      }
 
 /* Initialise the abbreviated text to be the same as the full text. */
-         ll->atext = ll->text;
-      }
+      ll->atext = ll->text;
    }
 
 /* If all the labels overlapped labels on a previous axis, arbitrarily
-   use the middle label as the root label (this should never happen but
-   is included to avoid segmentation violations occurring in error
-   conditions such as the txExt function being buggy and cuasing spurious
-   overlaps). */
-   if( root == -1 ) root = nlab/2;
+   use the label with non-genative priority that is closest to the middle
+   as the root label (this should never happen but is included to avoid
+   segmentation violations occurring in error conditions such as the
+   txExt function being buggy and cuasing spurious overlaps). */
+   if( root == -1 ) {
+      for( off = 0; off < (nlab-1)/2; off++ ) {
+         root = nlab/2 + off;
+         if( list[ root ].priority >= 0 ) break;
+         root = nlab/2 - off;
+         if( list[ root ].priority >= 0 ) break;
+      }
+      if( root == -1 ) {
+         astError( AST__PLFMT, "%s(%s): Cannot produce labels for axis %d.",
+                   status, method, class, axis + 1 );
+         root = nlab/2;
+      }
+   }
 
 /* Assign a priority higher than any other priority to the root label. */
    list[ root ].priority = nzmax + 1;
