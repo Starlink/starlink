@@ -541,7 +541,7 @@
 \section{\xlabel{introduction}Introduction}
 \label{sec:intro}
 
-\subsection{\xlabel{using_guide}This Cookbook}
+\subsection{\xlabel{using_guide}This cookbook}
 
 
 This guide is designed to instruct SCUBA-2 users on the best ways to
@@ -563,7 +563,7 @@ This guide covers the following:
 \item \cref{Chapter}{sec:pipe}{Chapter 9}  -- Instructions for using the ORAC-DR pipeline to reduce your data along with details on data retrieved from the JSA.
 \end{itemize}
 
-\subsection{\xlabel{computing}Before you start: Computing resources}
+\subsection{\xlabel{computing}Before you start: computing resources}
 
 Before reducing SCUBA-2 data using the Dynamic Iterative Map-Maker, we
 recommend you confirm your resources are sufficient for your type of
@@ -722,7 +722,7 @@ there if new files are expected but do not appear in the current
 directory.\\*\\*}
 \end{htmlonly}
 
-\subsection{\xlabel{options}Processing Options}
+\subsection{\xlabel{options}Processing options}
 
 You have two options for processing your data:
 \\*\\*
@@ -735,16 +735,16 @@ each step by hand allows more fine-tuned control of certain
 processing and analysis steps, and is especially useful for refining
 the parameters used by the map-maker. However, once the optimal
 parameters have been determined, it is possible to pass them to the
-pipeline. \cref{Chapter}{sec:dimm}{The map-maker explained}
-and \cref{Chapter}{sec:maps}{Reducing your data} discuss the manual approach;
+pipeline. \cref{Chapter}{sec:dimm}{The Dynamic Iterative Map-maker Explained}
+and \cref{Chapter}{sec:maps}{Reducing Your Data} discuss the manual approach;
 to use the science pipeline, skip
-straight to \cref{Section}{sec:pipe}{SCUBA-2 Pipeline}.
+straight to \cref{Section}{sec:pipe}{The SCUBA-2 Pipeline}.
 
 While you have the option of running the pipeline yourself, the JCMT
 will also produce pipeline reduced files for each observation and
 group of repeat observations for each night. These are reduced using
 the \oracdr\ pipeline with the recipe specified in the MSB.
-\cref{Chapter}{sec:pipe}{SCUBA-2 Pipeline} gives instruction on
+\cref{Chapter}{sec:pipe}{The SCUBA-2 Pipeline} gives instruction on
 retrieving reduced data from the
 \htmladdnormallink{JCMT Science Archive}{http://www3.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/jcmt/}
 at CADC.
@@ -902,7 +902,7 @@ designed and optimised to meet both these criteria.
 
 \clearpage
 
-\section{\xlabel{data_files}Handling raw SCUBA-2 data}
+\section{\xlabel{data_files}Handling Raw SCUBA-2 Data}
 \label{sec:raw}
 
 This chapter describes a number of procedures visualising
@@ -979,8 +979,8 @@ by applying the flat-field solution. This step is performed internally
 The second step is to scale the data by the flux conversion factor
 (FCF) to give units of janskys. Unless you are running the
 \textsc{Orac-dr} pipeline, this must be done manually with the
-instructions given in \cref{Section}{sec:cmult}{Applying the FCF and
-determining fluxes}.
+instructions given in \cref{Section}{sec:cmult}{Flux conversion
+factors}.
 
 
 \subsection{\xlabel{concat}Concatenate \& apply a flat-field}
@@ -1315,7 +1315,7 @@ default to method=iterate.\\*\\*}
 Cleaning raw data is an essential first step towards making a quality
 final map. The map-maker performs all of these cleaning steps during
 the pre-processing stage. The commands for manually cleaning your data
-are given in \cref{Appendix}{app:clean}{Cleaning the Raw Data}.
+are given in \cref{Appendix}{app:clean}{Cleaning the raw data}.
 
 % Split to avoid paragraph break mid-sentence.
 \begin{htmlonly}
@@ -1358,7 +1358,7 @@ in the \texttt{.MORE.SMURF.NEP} extension.
 If you have a bright source in the field this will
 contaminate the signal. In this case you should examine the
 \texttt{NOI} model from the map-maker instead---see
-\cref{Section}{sec:models}{The Individual Models} for a description
+\cref{Section}{sec:models}{The individual models} for a description
 and \cref{Section}{sec:export}{Exporting individual models} for
 details on how to examine it.
 
@@ -1377,7 +1377,7 @@ from raw SCUBA-2 data. It is essential reading to gain an
 understanding of what has happened to produce your reduced image,
 especially if you wish to modify the default map-maker parameters.
 \color{red} If you prefer to jump straight in to the data reduction go
-to \cref{Chapter}{sec:maps}{Reducing your data}.\color{black}
+to \cref{Chapter}{sec:maps}{Reducing Your Data}.\color{black}
 
 
 \subsection{\xlabel{dimm_theory}How it works}
@@ -1388,7 +1388,7 @@ models and then subtracts all the sources of signal in order of
 decreasing magnitude, ultimately leaving just the astronomical signal
 plus noise. A list of the modelled components can be seen in
 \cref{Table}{tab:mods}{tabulated} and a description found in
-\cref{Section}{sec:models}{The Individual Models}.
+\cref{Section}{sec:models}{The individual models}.
 
 \textbf{The map-maker requires a configuration file to accompany each
 reduction.} This file instructs the map-maker on the pre-processing
@@ -1406,7 +1406,7 @@ large molecular clouds. A
 description of these specialised configuration files can be found
 \cref{in Section}{sec:config}{here}.
 
-\subsection{The Reduction Step-by-Step}
+\subsection{The reduction step-by-step}
 
 \textbf{This description applies to the default configuration file -
 \texttt{dimmconfig.lis}.}\\*\\* \cref{Figure}{fig:dimm}{The graphic
@@ -1686,7 +1686,7 @@ produce the final map and possibly never achieve convergence.
 The best way of checking the progress of convergence while running the
 map-maker is to use the \param{itermap} option by setting the parameter
 \param{itermap~=~1} (see \cref{Section}{sec:tweak}{Tweaking the
-Configuration File}).
+configuration file}).
 
 \begin{figure}
 \begin{center}
@@ -1754,8 +1754,8 @@ filename (such as \texttt{s8a20120720\_00030\_0003\_con\_com.sdf},
 \texttt{s8a20120720\_00030\_0003\_con\_flt.sdf},
 \texttt{s8a20120720\_00030\_0003\_con\_res.sdf})\footnote{The filename shows
 sub-scan 3 of Observation 30 since this is the first science file that
-is encountered (see \cref{Chapter}{sec:raw}{Raw SCUBA-2 Data}).} The variance
-and quality for the data are stored as the VARIANCE and QUALITY
+is encountered (see \cref{Chapter}{sec:raw}{Handling Raw SCUBA-2 Data}).}
+The variance and quality for the data are stored as the VARIANCE and QUALITY
 components within the residual file NDF.
 
 \begin{latexonly}
@@ -1813,7 +1813,7 @@ encountered) override any other instance of them.
 Below is a description of each of the specialised configuration files.
 The tables following each description list the parameters set for each
 recipe. A verbatim copy of these files can be found in
-\cref{Appendix}{app:special}{Specialised Configuration Files}.
+\cref{Appendix}{app:special}{Specialised configuration files}.
 
 \subsubsection{dimmconfig\_blank\_field.lis}
 \begin{latexonly}
@@ -1988,7 +1988,7 @@ signal ranges in the map.
 
 Recovering both faint extended structure and bright sources in the
 same field poses an extra challenge. Strategies for this are explored
-in \cref{Chapter}{sec:tweak}{Tailoring your reduction}.
+in \cref{Chapter}{sec:tweak}{Tailoring your Reduction}.
 
 \cref{Figure}{fig:becompare}{The images below} shows a comparison between
 maps reduced with the default configuration file and using
@@ -2031,7 +2031,7 @@ signal ranges in the map.
 
 Recovering both faint extended structure and bright sources in the
 same field poses an extra challenge. Strategies for this are explored
-in \cref{Chapter}{sec:tweak}{Tailoring your reduction}.
+in \cref{Chapter}{sec:tweak}{Tailoring your Reduction}.
 
 \cref{Figure}{fig:becompare}{The images below} shows a comparison between
 maps reduced with the default configuration file and using
@@ -2081,7 +2081,7 @@ detail in \cref{Chapter}{sec:tweak}{Tailoring your Reduction}.
 
 \clearpage
 
-\section{\xlabel{maps}Reducing your Data}
+\section{\xlabel{maps}Reducing Your Data}
 \label{sec:maps}
 
 This chapter describes how to run the map-maker and what to look out
@@ -2465,7 +2465,7 @@ Pipeline} or \pipelinesun.}
 \section{\xlabel{postprocess}Post-processing Reduction Steps}
 \label{sec:postprocess}
 
-\subsection{\xlabel{apply_fcf}Flux Conversion Factors (FCFs)}
+\subsection{\xlabel{apply_fcf}Flux conversion factors}
 \label{sec:cmult}
 
 When your data comes out of the map-maker it is in units of picowatts
@@ -2503,7 +2503,7 @@ by the pipeline when reducing your data with \oracdr.
   (1) The standard FCF to be applied depends on
   the reduction date for your data. For data that have been
   \emph{reduced prior} to July 2012 you should see
-  \cref{Appendix}{app:fcfs}{FCFs by Reduction Date} for alternative FCFs.
+  \cref{Appendix}{app:fcfs}{FCFs by reduction date} for alternative FCFs.
   \newline
   (2) Due to a glitch in the WVM, data reduced between 2012 Sept. 19,
   and 2013 Jan. 18 must be re-reduced using the latest version of
@@ -2600,7 +2600,7 @@ You can apply the FCF using the \picard\ recipe
 \xref{\drrecipe{CALIBRATE\_SCUBA2\_DATA}}{sun265}{CALIBRATE\_SCUBA2\_DATA}.
 By default this will multiply your map by
 1000$\times$\fcfb\ from the start of
-\cref{Section}{sec:cmult}{Flux Conversion Factors}. This produces a
+\cref{Section}{sec:cmult}{Flux conversion factors}. This produces a
 calibrated map with units of mJy/beam.
 
 You can supply a parameter file if you wish to use a different value
@@ -2916,7 +2916,7 @@ using the \textsc{Kappa} command \ndfcopy. For example, \texttt{\% ndfcopy map c
 \end{htmlonly}
 
 
-\subsection{\xlabel{regridding}Regridding your Data}
+\subsection{\xlabel{regridding}Regridding your data}
 \label{sec:regriddata}
 
 To change the pixel size use the \Kappa\ command \compave. The following example
@@ -3053,7 +3053,7 @@ SMOOTH_FWHM = 15
 This is a fairly common technique used throughout the extra-galactic
 sub-millimetre community to identify potential sources. A full
 description of the matched filter principle is given in
-\cref{Appendix}{app:mf}{SCUBA-2 Matched Filter}, while the \textsc{Picard}
+\cref{Appendix}{app:mf}{SCUBA-2 matched filter}, while the \textsc{Picard}
 manual gives full details of all the available parameters.
 
 \subsection{\xlabel{clumps}Clump finding}
@@ -3186,7 +3186,7 @@ differ from the the values given in \texttt{dimmconfig.lis}.
 \label{sec:tweak}
 
 
-\subsection{ Adding and amending parameters}
+\subsection{Adding and amending parameters}
 The default configuration file \texttt{dimmconfig.lis} contains all of
 the parameters the most users would wish to play with.
 
@@ -3311,7 +3311,7 @@ Stack the individual itermaps into a single cube.
 \begin{minipage}[c]{0.29\linewidth}
 The output map map\_itermaps can be opened with \gaia. The data used
 in this example is the Galactic map reduced in
-\cref{Section}{sec:bright_ex}{dimmconfig\_bright\_extended.lis}. The
+\cref{Section}{sec:bright_ex}{\textttt{dimmconfig\_bright\_extended.lis}}. The
 Spectral plot window shows the value for a single pixel and the three
 chunks are easily identified. You can select the \gaiathing{Animation} tab
 in the \gaiathing{Display image sections} window and click
@@ -3596,7 +3596,7 @@ config='"^dimmconfig_bright_extended.lis"'
 The alternative is to access a map from a different dataset or even a
 different telescope, e.g. a map downloaded from the Herschel Science
 Archive. For instructions on converting from FITS to NDF see
-\cref{Appendix}{app:fits}{Convert format from  FITS to NDF}.\\
+\cref{Appendix}{app:fits}{Convert format from FITS to NDF}.\\
 \end{minipage}
 
 \begin{minipage}[t]{0.1\linewidth}
@@ -4214,7 +4214,7 @@ while the pipeline software comes as part of the \starlink\ suite.
 \subsection{\xlabel{science_pl}The Science Pipeline}
 
 The science pipeline will automate many of the steps discussed in
-\cref{Chapter}{sec:maps}{Reducing your data}:
+\cref{Chapter}{sec:maps}{Reducing Your Data}:
 \vspace{-0.3cm}
 \begin{itemize}\itemsep-0.3em
 \item Run the iterative map-maker.
@@ -4234,7 +4234,7 @@ line---see \cref{Section}{sec:parameterfile}{Changing the defaults}.
 
 Described below are the five main \oracdr\ science recipes.
 
-\subsubsection{\xlabel{extsources}REDUCE\_SCAN}
+\subsubsection{\xlabel{extsources}\drrecipe{REDUCE\_SCAN}}
 \vspace{-0.3cm}
 \textbullet\ Configuration file: \texttt{dimmconfig.lis}
 
@@ -4250,7 +4250,7 @@ For calibrators, \texttt{dimmconfig\_bright\_compact.lis} is used and
 FCFs are derived from the map.
 
 
-\subsubsection{\xlabel{extsources}REDUCE\_SCAN\_CHECKRMS}
+\subsubsection{\xlabel{extsources}\drrecipe{REDUCE\_SCAN\_CHECKRMS}}
 \vspace{-0.3cm}
 \textbullet\  Configuration file = \texttt{dimmconfig.lis}
 
@@ -4262,7 +4262,7 @@ are written to a log file log.checkrms. The advantage of running
 \picard\ recipe is that is able to calculate results for co-added
 files.
 
-\subsubsection{\xlabel{extsources}REDUCE\_SCAN\_EXTENDED\_SOURCES}
+\subsubsection{\xlabel{extsources}\drrecipe{REDUCE\_SCAN\_EXTENDED\_SOURCES}}
 \vspace{-0.3cm}
 \textbullet\  Configuration file = \texttt{dimmconfig\_bright\_extended.lis}
 
@@ -4274,7 +4274,7 @@ performs a source finder routine; the results are written as a FITS
 catalogue (with file extension \texttt{.FIT}) which can be read as a
 local catalogue into \gaia.
 
-\subsubsection{\xlabel{faint}REDUCE\_SCAN\_FAINT\_POINT\_SOURCES}
+\subsubsection{\xlabel{faint}\drrecipe{REDUCE\_SCAN\_FAINT\_POINT\_SOURCES}}
 \vspace{-0.3cm}
 \textbullet\  Configuration file = \texttt{dimmconfig\_blank\_field.lis}
 
@@ -4288,7 +4288,7 @@ recipe also performs a source finder routine; the results are written
 as a FITS catalogue (with file extension \texttt{.FIT}) which can be
 read as a local catalogue into \gaia.
 
-\subsubsection{\xlabel{faintjk}FAINT\_POINT\_SOURCES\_JACKKNIFE}
+\subsubsection{\xlabel{faintjk}\drrecipe{FAINT\_POINT\_SOURCES\_JACKKNIFE}}
 \vspace{-0.3cm}
 \textbullet\  Configuration file = \texttt{dimmconfig\_blank\_field.lis}
 
@@ -4532,7 +4532,7 @@ SCUBA-2 Data Reduction document SC2/ANA/S210/005
 \newpage
 \appendix
 \section[Appendices]{Appendix}
-\subsection{\xlabel{app_clean}Cleaning the Raw Data}
+\subsection{\xlabel{app_clean}Cleaning the raw data}
 \label{app:clean}
 
 You can use the \smurf\ task \clean\ to help inspect time-series.
@@ -4640,7 +4640,7 @@ in \texttt{dimmconfig.lis}---see \cref{Appendix}{app:dimm}{here}.
 
 
 \newpage
-\subsection{\xlabel{calib}SCUBA-2 Data Calibration}
+\subsection{\xlabel{calib}SCUBA-2 data calibration}
 \label{app:cal}
 
 \subsubsection{\xlabel{fcf}Flux conversion factors (FCF)}
@@ -4796,7 +4796,7 @@ from the raw data. Recall the NEP corresponds to the noise in the raw
 data and is a combination of instrument and atmospheric noise.
 
 \newpage
-\subsection{\xlabel{matchedfilter}SCUBA-2 Matched Filter}
+\subsection{\xlabel{matchedfilter}SCUBA-2 matched filter}
 \label{app:mf}
 
 In order to optimally find sources that are the size of the telescope
@@ -4872,7 +4872,7 @@ the \param{PSF\_MATCHFILTER} recipe parameter).
 
 
 \newpage
-\subsection{\xlabel{fcfsred}FCFs by Reduction Date}
+\subsection{\xlabel{fcfsred}FCFs by reduction date}
 \label{app:fcfs}
 
 Ongoing development of the SCUBA-2 analysis has resulted in on-going
@@ -4930,7 +4930,7 @@ relation was applied by using the \Kappa\ command \hislist.
 \end{myquote}
 
 \newpage
-\subsection{\xlabel{cog}Aperture Photometry Curve of Growth}
+\subsection{\xlabel{cog}Aperture-photometry curve of growth}
 \label{app:cog}
 
 The SCUBA-2 beam has a broad error beam. As the size of the annulus
@@ -5450,10 +5450,10 @@ options, see the comments in \texttt{smurf\_makemap.def} or
 
 
 \newpage
-\subsection{\xlabel{special}Specialised Configuration Files}
+\subsection{\xlabel{special}Specialised configuration files}
 \label{app:special}
 
-\subsubsection{dimmconfig\_bright\_extended.lis}
+\subsubsection{\texttt{dimmconfig\_bright\_extended.lis}}
 \begin{quote}
 \begin{verbatim}
 ^$STARLINK_DIR/share/smurf/dimmconfig_bright.lis
@@ -5464,7 +5464,7 @@ options, see the comments in \texttt{smurf\_makemap.def} or
 \end{verbatim}
 \end{quote}
 
-\subsubsection{dimmconfig\_bright\_compact.lis}
+\subsubsection{\texttt{dimmconfig\_bright\_compact.lis}}
 \begin{quote}
 \begin{verbatim}
 ^$STARLINK_DIR/share/smurf/dimmconfig_bright.lis
@@ -5489,7 +5489,7 @@ options, see the comments in \texttt{smurf\_makemap.def} or
 \end{verbatim}
 \end{quote}
 
-\subsubsection{dimmconfig\_blank\_field.lis}
+\subsubsection{\texttt{dimmconfig\_blank\_field.lis}}
 \begin{quote}
 \begin{verbatim}
    ^$STARLINK_DIR/share/smurf/dimmconfig.lis
@@ -5517,7 +5517,7 @@ options, see the comments in \texttt{smurf\_makemap.def} or
 \end{quote}
 
 
-\subsubsection{dimmconfig\_bright.lis}
+\subsubsection{\texttt{dimmconfig\_bright.lis}}
 
 This file is included as although it is not used in its own right it
 form the basis (on top of \texttt{dimmconfig.lis} for both
