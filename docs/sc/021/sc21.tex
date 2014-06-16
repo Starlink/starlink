@@ -2589,7 +2589,7 @@ Again determine the FCF using \drrecipe{SCUBA2\_CHECK\_CAL}.
 \texttt{(5)}
 \end{minipage}
 \begin{minipage}[t]{0.95\linewidth}
-Apply this FCF to your reduced science data using \cmult-- see next
+Apply this FCF to your reduced science data using \cmult---see the next
 section. Remember to apply the pixel size squared factor if using
 \fcfa.
 \end{minipage}
@@ -3332,8 +3332,8 @@ in the \gaiathing{Display image sections} window and click
 \hspace{0.3cm}
 \begin{minipage}[c]{0.29\linewidth}
 These windows show the itermaps map at 1, 10, and 30 iterations. A
-specific iteration can be selected using the `Index of plane' slider
-on the `Display image sections' window.
+specific iteration can be selected using the \gaiathing{Index of plane}
+slider on the \gaiathing{Display image sections} window.
 \vspace{0.2cm}
 \end{minipage}
 \end{fmpage}
@@ -3526,7 +3526,16 @@ rejected due to their dissimilarity to the common-mode. S/N based
 mask should always be small.
 \\\\
 \textbf{Signal-to-noise based masking}\\
-Signal-to-noise based masking is used for both the \texttt{AST} and \texttt{FLT} models for extended emission. The recipe \texttt{dimmconfig\_bright\_extended.lis} sets \texttt{ast.zero\_snr} to 5 and \texttt{ast.zero\_snr} to 3. Setting \texttt{ast.zero\_snr} too low can cause noise spikes to be interpreted as signal so  \texttt{ast.zero\_snrlo} is used which allows the mask to only grow it it includes pixels with the specified  S/N. This typically improves the resulting map so is worth experimenting with. Note that \texttt{AST} masking is not applied on the final iteration to allow data outside the mask to remain in the final map.
+Signal-to-noise based masking is used for both the \texttt{AST} and
+\texttt{FLT} models for extended emission. The recipe
+\texttt{dimmconfig\_bright\_extended.lis} sets \texttt{ast.zero\_snr}
+to 5 and \texttt{ast.zero\_snr} to 3. Setting \texttt{ast.zero\_snr}
+too low can cause noise spikes to be interpreted as signal so
+\texttt{ast.zero\_snrlo} is used which allows the mask to only grow it
+it includes pixels with the specified S/N. This typically improves the
+resulting map so is worth experimenting with. Note that \texttt{AST}
+masking is not applied on the final iteration to allow data outside
+the mask to remain in the final map.
 
 The bright-extended recipe also sets \texttt{ast.skip} to 5. This
 means the \texttt{AST} model is not determined at all for the first
@@ -4301,9 +4310,9 @@ effective PSF map. A jack-knife map is generated from two halves of
 the dataset and the maps are `whitened' by the removal of the residual
 1/\emph{f} noise. The whitened signal map is processed with the
 matched filter using the whitened PSF map as the PSF input. The data
-are calibrated in mJy/beam using a corrected FCF. See
-\cref{Section}{sec:jk}{Example 2 - Advanced pipeline method} for a
-more-detailed description of this recipe and the files produced.
+are calibrated in mJy/beam using a corrected FCF.
+% See \cref{Section}{sec:jk}{Example 2 - Advanced pipeline method} for a
+% more-detailed description of this recipe and the files produced.
 
 \subsection{Changing the defaults}
 \label{sec:parameterfile}
