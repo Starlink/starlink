@@ -8,6 +8,7 @@
 \usepackage{multirow}
 \usepackage{longtable}
 \usepackage{color}
+\usepackage{titlesec}
 \usepackage{enumitem}
 % ? End of specify used packages
 \pagestyle{myheadings}
@@ -190,6 +191,8 @@
 
 \definecolor{gray}{RGB}{200,200,200}
 \definecolor{MidnightBlue}{rgb}{0.1, 0.1, 0.44}
+\definecolor{bblue}{RGB}{172,207,230}
+\definecolor{bblue2}{RGB}{213,236,252}
 
 % A new environment for quoting verbatim
 % Environment for indenting and using a small font.
@@ -197,6 +200,25 @@
    \color{MidnightBlue}\begin{quote}\begin{small}}{
    \end{small}\end{quote}
 }
+
+%\renewcommand{\familydefault}{\sfdefault}
+
+\newcommand{\colorsection}[1]{%
+  \colorbox{bblue}{\parbox{\dimexpr\textwidth-2\fboxsep}{\vspace{0.02cm}\hspace{0.01cm}\thesubsection\vspace{0.01cm}\hspace{0.5cm} #1}}}
+
+\titleformat{name=\subsection}[block]
+  {\rmfamily\Large\bfseries}
+  {}
+  {0pt}
+  {\colorsection}
+\titlespacing*{\subsection}{0pt}{20pt}{\baselineskip}
+
+\titleformat{\section}[display]
+    {\normalfont\huge\bfseries}
+    {}
+    {0pt}
+    {\thesection\hspace{0.8cm}}
+\titlespacing*{\section}{0pt}{0pt}{20pt}
 
 % Shortcuts
 % ---------
