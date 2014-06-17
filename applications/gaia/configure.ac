@@ -24,14 +24,14 @@ dnl    Option `per-package-dirs' means that executables and help files
 dnl    are installed in package-specific directories.
 STAR_DEFAULTS([per-package-dirs])
 
-dnl    Need to build an atask, depends on much the same as a full monolith.
-STAR_MONOLITHS
-
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_CC
 AC_PROG_CXX
 AC_PROG_FC
 LT_INIT
+
+dnl    Need to build an atask, depends on much the same as a full monolith.
+STAR_MONOLITHS
 
 dnl    We have a C++ main function, but we call Fortran.  This defines
 dnl    the cpp macro of the same name, which will do any 
