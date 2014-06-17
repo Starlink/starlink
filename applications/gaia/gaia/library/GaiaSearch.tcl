@@ -486,12 +486,16 @@ itcl::class gaia::GaiaSearch {
       #  equinox values can be misused in the default Skycat behaviour
       #  (where all catalogues are assumed to be in J2000) stop that.
       #  Note use restore_equinox_ to recover after the search/query is
-      #  finished.
+      #  finished. Also the search radius is not going to work if the
+      #  catalogue and image have different systems, so disable it.
       set oldequinox_ {}
       if { $astref_ != 0 } {
          $searchopts_ set_equinox {}
          set oldequinox_ [$w_.cat setequinox J2000]
+         set qopts [$searchopts_ get_image_center_radius [$w_.cat iswcs]]
+         catch {$searchopts_ set_pos_radius [list [lindex $qopts 0] [lindex $qopts 1] {} {}]} msg
       }
+
       if { $astref_ == 0 } {
 
          #  Use the equinox, Skycat fashion. Can be realized too quickly
@@ -502,6 +506,7 @@ itcl::class gaia::GaiaSearch {
                lassign [$image_ wcscenter] ra dec equinox
             }
          }
+
          switch -glob $equinox {
             B* {
                set att "System=FK4,Equinox=$equinox"
@@ -517,6 +522,7 @@ itcl::class gaia::GaiaSearch {
                }
             }
          }
+
          set astref_ [gaiautils::astskyframeset $att]
       }
 
