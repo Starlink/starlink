@@ -2343,6 +2343,24 @@ below.
 \newline\newline
 \end{htmlonly}
 
+\textbf{Quality statistics}\\
+At the beginning of the reduction, the main purpose of QUALITY
+flagging is to indicate how many bolometers are being used. In the
+example above you can see that from a total of 5120 bolometers, 1842
+were turned off during data acquisition (\texttt{BADDA}). In addition,
+136 bolometers
+exceeded the acceptable noise threshold (\texttt{NOISE}), while tiny
+fractions of the data were flagged because the telescope was moving
+too slowly (\texttt{STAT}) or the sample are adjacent to a step that
+was removed (\texttt{DCJUMP}).
+
+The total number of bad bolometers (\texttt{BADBOL}) is 1984.
+Accounting for these, and the small numbers of additionally flagged
+samples, 3128.22 effective bolometers are available after initial
+cleaning\footnote{The fractional number is due to time-slices being
+removed during cleaning. The number of bolometers is then
+reconstructed from the number of remaining time-slices}.
+
 \begin{latexonly}
 \colorbox{gray}{
 \label{page:text}
@@ -2376,26 +2394,8 @@ effective.
 \end{minipage}
 \hspace{0.1cm}
 }
-\newline\newline\newline
+\newline\newline
 \end{latexonly}
-
-\textbf{Quality statistics}\\
-At the beginning of the reduction, the main purpose of QUALITY
-flagging is to indicate how many bolometers are being used. In the
-example above you can see that from a total of 5120 bolometers, 1842
-were turned off during data acquisition (\texttt{BADDA}). In addition,
-136 bolometers
-exceeded the acceptable noise threshold (\texttt{NOISE}), while tiny
-fractions of the data were flagged because the telescope was moving
-too slowly (\texttt{STAT}) or the sample are adjacent to a step that
-was removed (\texttt{DCJUMP}).
-
-The total number of bad bolometers (\texttt{BADBOL}) is 1984.
-Accounting for these, and the small numbers of additionally flagged
-samples, 3128.22 effective bolometers are available after initial
-cleaning\footnote{The fractional number is due to time-slices being
-removed during cleaning. The number of bolometers is then
-reconstructed from the number of remaining time-slices}.
 
 After each subsequent iteration a new `Quality' report is produced,
 indicating how the flags have changed. An important flag that appears
