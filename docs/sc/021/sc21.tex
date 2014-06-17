@@ -556,13 +556,19 @@
 
 %  This is for chapter-like headings.  It must come after the tables of
 %  contents and figures to avoid these having a zero chapter number
-%  appearing.
-\titleformat{\section}[display]
-    {\normalfont\huge\bfseries}
-    {}
-    {0pt}
-    {Chapter \thesection:\hspace{0.8cm}}
-    \titlespacing*{\section}{0pt}{0pt}{20pt}
+%  appearing.  The comments before the \begin{latexonly} and
+%  \begin{latexonly} environment must be retained for the definitions
+%  to persist outside this block.  See MUD/152, p38.
+%  Despite the latexonly environment, this causes the HTML some grief
+%  and creates < section headings.
+%\begin{latexonly}
+  \titleformat{\section}[display]
+     {\normalfont\huge\bfseries}
+      {}
+     {0pt}
+     {Chapter \thesection\newline}
+     \titlespacing*{\section}{0pt}{0pt}{20pt}
+%\end{latexonly}
 
 
 \section{\xlabel{introduction}Introduction}
