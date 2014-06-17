@@ -3901,15 +3901,15 @@ It is likely that any sources in the map will be at best, only a few
 standard deviations brighter than the noise in the map (caused by a
 combination of instrumental noise and source confusion).
 
-The recommended reduction method for maps like these follow two main
+\subsubsection{Example 1 -- The simple reduction}
+The basic reduction method for maps like these follow two main
 steps---running the data through the map-maker using the
 \texttt{dimmconfig\_blank\_field.lis} recipe (see
 \cref{Section}{sec:config}{Specialised configuration files}). Then
 applying the \picard\ \drrecipe{SCUBA2\_MATCHED\_FILTER} recipe (see
 \cref{Section}{sec:mf}{Point-source extraction}).
 \\ \\
-\textbf{Step 1: Running the map-maker}
-\vspace{0.2cm}\\
+\textbf{(a) Run the map-maker}\\
 In this example the raw data is stored locally in a directory called
 \texttt{data}. We have three observations (\#13, \#18, \#21) of the field
 which we will reduced independently.
@@ -3928,8 +3928,7 @@ config=^$STARLINK_DIR/share/smurf/dimmconfig_blank_field.lis
 \end{verbatim}
 \end{myquote}
 
-\textbf{Step 2: Combining the maps}
-\vspace{0.2cm}\\
+\textbf{(b) Combine the maps}\\
 These three maps are then combined using the \textsc{Picard} recipe
 \xref{\drrecipe{MOSAIC\_JCMT\_IMAGES}}{sun265}{MOSAIC_JCMT_IMAGES}. In
 this case we accept the default of \wcsmosaic\ mosaicking and
@@ -3948,25 +3947,24 @@ in the \texttt{MORE.SMURF.EXP\_TIME} extension).
 \\
 
 \myfigduo{sc21_850cosmo_bf}{sc21_850cosmo_mf_crop}{}{width=0.48\linewidth}{fig:cosmomap}{2mm}{
-  Cosmology example: initial reduction and matched filter maps}{
+  Cosmology field with the matched filter applied}{
   Reduced \textsc{pong} maps of cosmology field A1835. \textbf{Left:}
   Map reduced with \texttt{dimmconfig\_blank\_field.lis}.
   \textbf{Right:} Map on the left after the matched filter has been
   applied and it has been cropped.
 }
 
-\textbf{Step 3: Applying the matched filter}
-\vspace{0.2cm}\\
+\textbf{(c) Apply the matched filter}\\
 In order to optimally find sources that are the size of the telescope
 beam, we apply the matched filter recipe --
 \xref{\drrecipe{SCUBA2\_MATCHED\_FILTER}}{sun265}{SCUBA2_MATCHED_FILTER}.
 We create a simple parameter file called \texttt{smooth.ini}:
-\begin{quote}
+\begin{myquote}
 \begin{verbatim}
 [SCUBA2_MATCHED_FILTER]
 SMOOTH_FWHM = 15
 \end{verbatim}
-\end{quote}
+\end{myquote}
 where \texttt{SMOOTH\_FWHM~=~15} indicates that the background should be
 estimated by first smoothing the map and PSF with a 15-arcsec FWHM
 Gaussian. Next, the recipe is executed as follows:
@@ -3983,8 +3981,7 @@ right-hand panel of \cref{Figure}{fig:cosmomap}{figure above}. You can immediate
 see the contrast to the left-hand panel which is the output from the
 map-maker. A number of signal peaks now emerge as possible sources.
 \\ \\
-\textbf{Step 4: Cropping the map}
-\vspace{0.2cm}\\
+\textbf{(d) Crop the map}\\
 Next we shall crop the map to remove the noisy edges,
 in this case to a 900-arcsec radius circle. The output file will be named
 \texttt{cosmo2\_mos\_mf\_crop.sdf}.
@@ -3996,13 +3993,12 @@ in this case to a 900-arcsec radius circle. The output file will be named
 \end{myquote}
 
 \myfig{sc21_850cosmo_mf_crop_snr}{}{width=0.6\linewidth}{fig:snrmask}{
-  Cosmology example: signal-to-noise map}{
+  S/N map of a cosmology field}{
   Signal-to-noise map made the \Kappa\ command \makesnr.
   The map has been scaled from 0 to $+$3.
 }
 
-\textbf{Step 5: Making a S/N map}
-\vspace{0.2cm}\\
+\textbf{(e) Make an S/N map}\\
 Finally, we need to find sources. The filtered map contains a
 VARIANCE component, so it is easy to produce a S/N map using the
 \textsc{Kappa} task \makesnr:
@@ -4018,8 +4014,7 @@ matched filter map the
 edges no longer appear as noisy because they have been down-weighted
 by the larger noise values where there were less data.
 \\ \\
-\textbf{Step 6: Identifying sources}
-\vspace{0.2cm}\\
+\textbf{(f) Identify sources}\\
 The basic procedure for identifying sources would be to locate peaks
 above some threshold S/N. The S/N image above shows peaks that are
 likely to be real sources. For a start, a source appears where
@@ -4035,12 +4030,124 @@ But how can we check if these sources are real?
   a given S/N with the number of \emph{positive} peaks.
 \end{itemize}
 
-\textbf{Note:} A \picard\ recipe dealing specifically with blank field
-maps is under development. Follow the
-\htmladdnormallink{\textit{Pipelines and Archives
-blog}}{http://pipelinesandarchives.blogspot.com/}
-\latex{\footnote{http://pipelinesandarchives.blogspot.com/}} for all
-the latest updates and releases.
+\subsubsection{Example 2 -- Advanced pipeline method}
+\label{sec:jk}
+
+Although this method is considerably simpler to execute, the products
+have undergone more advanced processing than the manual method just
+given. The pipeline is particularly recommended for this recipe due to
+its extra analysis steps.
+
+\textbf{(a) Create input file}\\
+Create an file with the names of all the files you wish to process (e.g.
+\texttt{myfiles.lis})
+\\ \\
+\textbf{(b) Run the pipeline}\\
+The pipeline must first be initiated for the wavelength you are
+working on. In the case below this is 850\,$\mu$m. Note that the date
+does not \emph{have} to be specified when initialising the pipeline.
+The pipeline is run using the
+\xref{\drrecipe{FAINT\_POINT\_SOURCES\_JACKKNIFE}}{sun265}{FAINT_POINT_SOURCES_JACKKNIFE}
+recipe; this uses \texttt{dimmconfig\_blank\_field.lis} as the
+configuration file. If you wish to provide an alternative file you
+will need to put the name of the new configuration file in a recipe
+parameter file.  See \cref{Section}{sec:runpl}{The SCUBA-2 Pipeline}
+for details.
+\begin{myquote}
+\begin{verbatim}
+% oracdr_scuba2_850 -cwd YYYYMMDD
+% oracdr -loop file -files myfiles.lis -nodisplay \
+-log sf FAINT_POINT_SOURCES_JACKKNIFE
+\end{verbatim}
+\end{myquote}
+
+
+The pipeline will write out a large number of files with the following
+suffices.
+
+\begin{minipage}[t]{0.3\linewidth}
+\texttt{sYYYYMMDD*\_fmos}
+\texttt{sYYYYMMDD*\_mappsf}\\\\
+\texttt{gsYYYYMMD*\_wmos}
+\texttt{gsYYYYMMD*\_whiten}
+\texttt{gsYYYYMMD*\_cal}
+\texttt{gsYYYYMMD*\_mf}
+\end{minipage}
+\begin{minipage}[t]{0.7\linewidth}
+The map for each observation\\
+The map for each observation with an artificial\\point source added at the map centre\\
+The co-add of all the \texttt{\_fmos} files\\
+The whitened version of \texttt{\_wmos}\\
+The calibrated version of \texttt{\_whiten}\\
+The matched-filtered version of \texttt{\_cal}\\
+\end{minipage}
+
+\drrecipe{FAINT\_POINT\_SOURCES\_JACKKNIFE} is a recipe designed to
+process blank field/extra-galactic data. The recipe uses a jack-knife
+method to remove low-spatial frequency noise and generate a matched
+filter output map.
+
+The recipe processes each observation twice, a standard reduction
+first, then a re-run with a fake point source added to the time
+series. This produces a co-added signal map (\_wmos) and a
+coadded PSF map (\texttt{\_mappsf}).
+
+After the map-maker has completed, the recipe will call
+\xref{\drrecipe{SCUBA2\_JACKKNIFE}}{sun265}{SCUBA2_JACKKNIFE}. This
+routine divides the observations into two groups (odd and even) which
+are co-added and then subtracted to create a jack-knife map. This map
+contains only noise with no contribution from astronomical signal. The
+angular power spectrum of this map is then used to estimate and remove
+the residual 1/\emph{f} noise from the signal map and the PSF map;
+this is the whitening step. The whitened jack-knife map is run through
+\xref{\drrecipe{SCUBA2\_MATCHED\_FILTER}}{sun265}{SCUBA2_MATCHED_FILTER}
+using the whitened PSF map as the PSF input. It is this matched filter
+map which will be of most interest to users.
+
+See \pipelinesun\ for more information on
+\drrecipe{FAINT\_POINT\_SOURCES\_JACKKNIFE} and all other pipeline
+recipes.
+\\ \\
+\textbf{(c) Optional: Re-run \drrecipe{SCUBA2\_JACKKNIFE}}\\
+
+You may wish to run the \drrecipe{SCUBA2\_JACKKNIFE} step again
+independently from the pipeline. If your final map does not look as
+expected you might first examine the individual mosaics from the
+pipeline (\texttt{\_fmos}), one of these observations might show visible
+artefacts that you wish to exclude from the co-add. The size of the
+region in the jack-knife image which is used to do the whitening step
+is determined automatically, but the method may fail if the box is too
+small.
+
+If you decide to re-run this step you first co-add all the
+\texttt{\_mappsf} files to create a coadded PSF using the \picard\ recipe
+\xref{\drrecipe{MOSAIC\_JCMT\_IMAGES}}{sun265}{MOSAIC_JCMT_IMAGES}.
+\begin{myquote}
+\begin{verbatim}
+% picard MOSAIC\_JCMT\_IMAGES *_mappsf
+\end{verbatim}
+\end{myquote}
+Next create a parameter file (\texttt{recpars.lis}) for the jack-knife
+recipe (\drrecipe{SCUBA2\_JACKKNIFE}) containing the following lines.
+\begin{myquote}
+\begin{verbatim}
+[SCUBA2_JACKKNIFE]
+PSF_MATCHFILTER = <name_of_above_coadded_PSF>.sdf
+\end{verbatim}
+\end{myquote}
+Another option for this parameter file is \param{WHITEN\_BOX} to set the
+size of the region used to calculate the angular power spectrum.
+Finally run \drrecipe{SCUBA2\_JACKKNIFE}.
+\begin{myquote}
+\begin{verbatim}
+% picard -log sf -nodisplay -recpars recpars.lis SCUBA2_JACKKNIFE *fmos.sdf
+\end{verbatim}
+\end{myquote}
+This will create files beginning with \texttt{pgYYYMMDD}$\ldots$ that
+should have the same suffices as above: \texttt{\_wmos},
+\texttt{\_whiten}, \texttt{\_cal}, and \texttt{\_mf}.
+
+
 
 \subsection{\xlabel{Galactic}Extended galactic sources}
 \label{sec:bright_ex}
@@ -4061,7 +4168,7 @@ line---\texttt{maptol}~=~0.04 is slightly more stringent than default and
 3.5\,$\sigma$ to zero.
 
 In this example we give the map-maker a file containing a list of the
-input files (filelist.txt) and
+input files (\texttt{filelist.txt}) and
 \texttt{dimmconfig\_bright\_extended.lis} is in the local directory.
 
 \begin{myquote}
@@ -4141,7 +4248,7 @@ config=^mydimmconfig.lis ref=850map_mask_zm
 The configuration file, \texttt{mydimmconfig.lis}, has the following
 format---note how it is based on
 \texttt{dimmconfig\_bright\_extended.lis}. It has decreased the
-convergence parameter to \texttt{MAPTOL}=0.03 but increased the number
+convergence parameter to \param{MAPTOL}=0.03 but increased the number
 of iterations to compensate as 40 is unlikely to be sufficient.
 \begin{quote}
 \begin{verbatim}
@@ -4170,7 +4277,8 @@ at the exposure-time image with \gaia.
 }
 
 \cref{Figure}{fig:exptime}{The exposure-time image} shows a sharp drop
-off at a radius of 30\,arcmin. We can thus specify a parameter file like so:
+off at a radius of 30\,arcmin. We can thus specify a parameter file
+like below.
 \begin{center}
 \begin{quote}
 \begin{verbatim}
@@ -4185,8 +4293,8 @@ MAP_RADIUS = 1800
 % picard CROP_JCMT_IMAGES 850galactic.sdf
 \end{verbatim}
 \end{myquote}
-The final cropped map is shown in \cref{Figure}{fig:crop_map}{this plot}. Compared
-with the first map out of the map-maker
+The final cropped map is shown in \cref{Figure}{fig:crop_map}{this plot}.
+Compared with the first map out of the map-maker
 (\cref{Figure}{fig:galmakemap}{first map}),
 slightly more of the faint extended emission is apparent.
 
@@ -4338,8 +4446,8 @@ the dataset and the maps are `whitened' by the removal of the residual
 1/\emph{f} noise. The whitened signal map is processed with the
 matched filter using the whitened PSF map as the PSF input. The data
 are calibrated in mJy/beam using a corrected FCF.
-% See \cref{Section}{sec:jk}{Example 2 - Advanced pipeline method} for a
-% more-detailed description of this recipe and the files produced.
+See \cref{Section}{sec:jk}{Example 2 -- Advanced pipeline method} for a
+more-detailed description of this recipe and the files produced.
 
 \subsection{Changing the defaults}
 \label{sec:parameterfile}
@@ -4364,11 +4472,11 @@ example both of these options will return the same result:
 
 \subsubsection{Changing the configuration file}
 
-Although each recipe calls one of the standard configuration files the
-user can specify their own. You will need to create a recipe parameter
+Although each recipe calls one of the standard configuration files
+you can specify your own. You will need to create a recipe parameter
 file. This file will contain set the parameter \param{MAKEMAP\_CONFIG} to be
-your new configuration file. This must be preceded by the recipe name
-used in the reduction.
+your new configuration file. The first line must be the name of the
+recipe used in the reduction.
 
 For example, to run the pipeline with \drrecipe{REDUCE\_SCAN\_CHECKRMS} but your
 own configuration file (\texttt{myconfig.lis}), the recipe parameter file
@@ -4397,7 +4505,7 @@ Then run the pipeline calling the parameter file via the
 \textbf{Step 1:}
 \end{minipage}
 \begin{minipage}[t]{0.85\linewidth}
-\textbf{Initialise ORAC-DR} \\This is simply done by:
+\textbf{Initialise ORAC-DR} \\This is done by:
 \begin{myquote}
 \begin{verbatim}
 % oracdr_scuba2_850 -cwd
