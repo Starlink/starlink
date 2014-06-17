@@ -187,15 +187,17 @@
 \newcommand{\ie}{{\it i.e.}}
 
 \newsavebox{\fmbox}
+
+%  For the TIP boxes.
 \newenvironment{fmpage}[1]{\begin{lrbox}{\fmbox}\begin{minipage}{#1}}{\end{minipage}\end{lrbox}\fbox{\usebox{\fmbox}}}
 
+%  Define additional colours.
 \definecolor{gray}{RGB}{200,200,200}
 \definecolor{MidnightBlue}{rgb}{0.1, 0.1, 0.44}
 \definecolor{bblue}{RGB}{172,207,230}
-\definecolor{bblue2}{RGB}{213,236,252}
 
-% A new environment for quoting verbatim
-% Environment for indenting and using a small font.
+%  A new environment for quoting verbatim
+%  Environment for indenting and using a small font.
 \newenvironment{myquote}{
    \color{MidnightBlue}\begin{quote}\begin{small}}{
    \end{small}\end{quote}
@@ -203,6 +205,7 @@
 
 %\renewcommand{\familydefault}{\sfdefault}
 
+%  This is for coloured banners in section titles.
 \newcommand{\colorsection}[1]{%
   \colorbox{bblue}{\parbox{\dimexpr\textwidth-2\fboxsep}{\vspace{0.02cm}\hspace{0.01cm}\thesubsection\vspace{0.01cm}\hspace{0.5cm} #1}}}
 
@@ -213,12 +216,6 @@
   {\colorsection}
 \titlespacing*{\subsection}{0pt}{20pt}{\baselineskip}
 
-\titleformat{\section}[display]
-    {\normalfont\huge\bfseries}
-    {}
-    {0pt}
-    {\thesection\hspace{0.8cm}}
-\titlespacing*{\section}{0pt}{0pt}{20pt}
 
 % Shortcuts
 % ---------
@@ -556,6 +553,17 @@
 \cleardoublepage
 \renewcommand{\thepage}{\arabic{page}}
 \setcounter{page}{1}
+
+%  This is for chapter-like headings.  It must come after the tables of
+%  contents and figures to avoid these having a zero chapter number
+%  appearing.
+\titleformat{\section}[display]
+    {\normalfont\huge\bfseries}
+    {}
+    {0pt}
+    {Chapter \thesection:\hspace{0.8cm}}
+    \titlespacing*{\section}{0pt}{0pt}{20pt}
+
 
 \section{\xlabel{introduction}Introduction}
 \label{sec:intro}
