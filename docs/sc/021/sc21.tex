@@ -2014,10 +2014,9 @@ default file to 100 to avoid problems associated with bright sources.
   \texttt{dimmconfig\_bright\_extended.lis}.
 }
 
-This configuration is for reducing maps of bright extended sources,
-and references \texttt{dimmconfig\_bright.lis}.  The S/N threshold for DC steps
-is relaxed from \texttt{25} in the default file to \texttt{100} to
-avoid problems associated with bright sources. Here
+This configuration is for reducing maps that do not fall into the other two
+categories. The emission is usually extended to some degree and contains some
+bright regions. Here
 \texttt{ast.zero\_snr} is used to constrain the \texttt{AST} model to
 zero wherever the S/N is lower than 5$\sigma$.  Everywhere the signal
 is below this threshold, the map is set to zero for all but the final
@@ -2045,12 +2044,6 @@ difference is the improvement in the bowling around strong sources.
 \texttt{ast.zero\_snr~=~3}&\texttt{ast.zero\_snrlo~=~2}\\
 \texttt{ast.skip~=~5}&\texttt{flt.zero\_snr~=~5}\\
 \texttt{flt.zero\_snrlo~=~3}& \\
-\hline
-\multicolumn{2}{|l|}{\texttt{dimmconfig\_bright.lis}}\\
-\hline
-\texttt{noisecliphigh~=~10.0} & \texttt{dcthresh~=~100}\\
-\texttt{com.corr\_tol~=~7}& \texttt{com.gain\_tol~=~7}\\
-\texttt{com.gain\_abstol~=~5}& \\
 \hline
 \end{tabular}
 \end{table}
@@ -2088,12 +2081,6 @@ difference is the improvement in the bowling around strong sources.
 \texttt{ast.zero\_snr~=~3}&\texttt{ast.zero\_snrlo~=~2}\\
 \texttt{ast.skip~=~5}&\texttt{flt.zero\_snr~=~5}\\
 \texttt{flt.zero\_snrlo~=~3}& \\
-\hline
-\multicolumn{2}{|l|}{\texttt{dimmconfig\_bright.lis}}\\
-\hline
-\texttt{noisecliphigh~=~10.0} & \texttt{dcthresh~=~100}\\
-\texttt{com.corr\_tol~=~7}& \texttt{com.gain\_tol~=~7}\\
-\texttt{com.gain\_abstol~=~5}& \\
 \hline
 \end{tabular}
 \end{table}
@@ -5612,10 +5599,15 @@ options, see the comments in \texttt{smurf\_makemap.def} or
 \subsubsection{\texttt{dimmconfig\_bright\_extended.lis}}
 \begin{quote}
 \begin{verbatim}
-^$STARLINK_DIR/share/smurf/dimmconfig_bright.lis
+^$STARLINK_DIR/share/smurf/dimmconfig.lis
    numiter=-40
-   flt.filt_edge_largescale=600
-   ast.zero_snr = 5
+   flt.filt_edge_largescale=480
+   ast.zero_snr=3
+   ast.zero_snrlo=2
+
+   ast.skip=5
+   flt.zero_snr=5
+   flt.zero_snrlo=3
 
 \end{verbatim}
 \end{quote}
