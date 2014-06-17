@@ -1799,15 +1799,13 @@ the maps for each sub-array. This is first suffixed by \texttt{con},
 indicating that several data files may have been concatenated
 together. The three-letter code for each model is then appended to the
 filename (such as \texttt{s8a20120720\_00030\_0003\_con\_com.sdf},
-\begin{latexonly}
-\linebreak          % \latex causes a paragraph break.
-\end{latexonly}
-\texttt{s8a20120720\_00030\_0003\_con\_flt.sdf},
-\texttt{s8a20120720\_00030\_0003\_con\_res.sdf})\footnote{The filename shows
-sub-scan 3 of Observation 30 since this is the first science file that
-is encountered (see \cref{Chapter}{sec:raw}{Handling Raw SCUBA-2 Data}).}
-The variance and quality for the data are stored as the VARIANCE and QUALITY
-components within the residual file NDF.
+\begin{latexonly} \linebreak % \latex causes a paragraph break.
+\end{latexonly} \texttt{s8a20120720\_00030\_0003\_con\_flt.sdf},
+\texttt{s8a20120720\_00030\_0003\_con\_res.sdf})\footnote{The filename
+shows sub-scan 3 of Observation 30 since this is the first science
+file that is encountered (see \cref{Chapter}{sec:raw}{Handling Raw
+SCUBA-2 Data}).~} The variance and quality for the data are stored as
+the VARIANCE and QUALITY components within the residual file NDF.
 
 \begin{latexonly}
 \begin{center}
@@ -1859,6 +1857,7 @@ encountered) override any other instance of them.
   Hierarchy of the configuration files}{
   Hierarchy of the configuration files.
 }
+\html{\vspace{3mm}}
 
 Below is a description of each of the specialised configuration files.
 The tables following each description list the parameters set for each
@@ -2986,7 +2985,7 @@ Both \texttt{dimmconfig\_bright\_compact.lis} and
 \texttt{dimmconfig\_bright\_extended.lis} configuration files use
 masking. You can see where any masks were applied by viewing the Quality array in \gaia.
 
-First open your map in \gaia. Select the top level NDF from list in
+First open your map in \textsc{Gaia}. Select the top level NDF from list in
 the pop-up window then click the \gaiathing{Quality} button. You will need to
 rescale the map to bring out the masks--see \cref{Figure}{fig:qualdisp}{below}.
 
@@ -4057,7 +4056,7 @@ The pipeline is run using the
 recipe; this uses \texttt{dimmconfig\_blank\_field.lis} as the
 configuration file. If you wish to provide an alternative file you
 will need to put the name of the new configuration file in a recipe
-parameter file.  See \cref{Section}{sec:runpl}{The SCUBA-2 Pipeline}
+parameter file.  See \cref{Section}{sec:pipe}{The SCUBA-2 Pipeline}
 for details.
 \begin{myquote}
 \begin{verbatim}
