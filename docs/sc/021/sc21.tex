@@ -695,6 +695,13 @@ The \oracdr\ Data Reduction Pipeline \cite{oracdr} (hereafter just
 \smurf\ and \Kappa\ (along with other Starlink tools) to perform an automated
 reduction of the raw data following pre-defined recipes to produce
 calibrated maps.
+\begin{myquote}
+\begin{verbatim}
+% oracdr_acsis
+\end{verbatim}
+\end{myquote}
+See instructions for running the pipeline in
+\cref{Chapter}{sec:pipe}{The SCUBA-2 Pipeline}.
 
 \subsubsection{PICARD for post-reduction processing}
 
@@ -712,8 +719,9 @@ are run like so:
 where \param{<recipe\_param\_file>} is a text file containing the
 relevant recipe parameters, \param{RECIPE} is the name of the recipe
 to be run (note the caps) and \param{<input\_files>} is a list of
-files to be run, which must be int the current directory, or a
-directory defined by \param{ORAC\_DATA\_OUT}. A number of \textsc{Picard}
+files to be run, which must be in the current directory, or a
+directory defined by the environment variable \param{ORAC\_DATA\_OUT}. A
+number of \textsc{Picard}
 recipes will be demonstrated in \cref{Chapter}{sec:maps}{Reducing your data}.
 
 
@@ -737,7 +745,7 @@ TIP: The .sdf extension on filenames is required by \textsc{Picard}.
 \vspace{0.1cm}
 TIP: If the environment variable \param{ORAC\_DATA\_OUT} is defined, any files
 created by \textsc{Picard} will be written in that location. Check there if new
-files are expected but do not appear in the current directory.
+files are expected but do not appear in your working directory.
 \end{fmpage}
 \end{center}
 \end{latexonly}
@@ -745,7 +753,7 @@ files are expected but do not appear in the current directory.
 \begin{htmlonly}
 \textbf{TIP: If the environment variable ORAC\_DATA\_OUT is defined,
 any files created by PICARD will be written in that location. Check
-there if new files are expected but do not appear in the current
+there if new files are expected but do not appear in your working
 directory.\\*\\*}
 \end{htmlonly}
 
@@ -756,9 +764,8 @@ You have two options for processing your data:
 (1) Performing each step manually.\\*
 (2) Running the automated pipeline (\textsc{Orac-dr}).
 \\*\\*
-The pipeline approach works well if your project is suited to using one of the
-standard recipes, and if you have a lot of data to process. Performing
-each step by hand allows more fine-tuned control of certain
+The pipeline approach works well if you have a lot of data to process.
+Performing nneach step by hand allows more fine-tuned control of certain
 processing and analysis steps, and is especially useful for refining
 the parameters used by the map-maker. However, once the optimal
 parameters have been determined, it is possible to pass them to the
@@ -767,8 +774,7 @@ and \cref{Chapter}{sec:maps}{Reducing Your Data} discuss the manual approach;
 to use the science pipeline, skip
 straight to \cref{Section}{sec:pipe}{The SCUBA-2 Pipeline}.
 
-While you have the option of running the pipeline yourself, the JCMT
-will also produce pipeline reduced files for each observation and
+The JCMT will produce pipeline reduced files for each observation and
 group of repeat observations for each night. These are reduced using
 the \oracdr\ pipeline with the recipe specified in the MSB.
 \cref{Chapter}{sec:pipe}{The SCUBA-2 Pipeline} gives instruction on
