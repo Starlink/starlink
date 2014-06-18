@@ -77,6 +77,7 @@ smf_is_wvm_usable( const smfHead * hdr, int *status ) {
 
   /* Initially just have a static list in the source code */
   const int badwvm[] = {
+    20120912,
     20130119,
     20130120,
     20130223,
