@@ -40,12 +40,27 @@
 #     14-FEB-2013 (DSB):
 #        Use a standard prologue format. Re-instated comments describing
 #        rationale for each value.
+#     5-JUN-2014 (DSB):
+#        - Use 5 initial no-AST iteration to determine a reasonable map
+#        that can then be used a the basis for FLT-masking when the AST
+#        model is re-introduced. Should help with convergence, and reduce
+#        bowling. (DSB)
+#        - Define the AST mask at SNR=3 instead of SNR=5 (HP)
+#        - Extend the mask defined at SNR=3 down to SNR=2. This has the
+#        side effect of smoothing the perimeter of the mask and removing
+#        isolated pixels. (DSB)
+#        - Reduce the filter scale from 600 to 480 (HP)
 #-
 
 #  Inherit the values defined in the parent dimmconfig file
    ^$STARLINK_DIR/share/smurf/dimmconfig.lis
 
    numiter=-40
-   flt.filt_edge_largescale=600
-   ast.zero_snr = 5
+   flt.filt_edge_largescale=480
+   ast.zero_snr = 3
+   ast.zero_snrlo = 2
+
+   ast.skip = 5
+   flt.zero_snr = 5
+   flt.zero_snrlo = 3
 

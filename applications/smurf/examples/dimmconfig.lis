@@ -48,6 +48,11 @@
 #        in the defaults files (smurf_makemap.def, etc)
 #     12-FEB-2013 (DSB):
 #        Added this prologue.
+#     5-JUN-2014 (DSB):
+#        - Add noi.box_size=-15 and noi.box_type=1 in order to allow for
+#        variations in the noise level of each bolometer with time.
+#        - Add hitslimit=0.01 to assign bad values to map pixels that
+#        receive very few hits.
 #-
 
 
@@ -67,6 +72,8 @@ shortmap = 0
 
 chitol = <undef>
 varmapmethod = 1
+
+hitslimit = 0.01
 
 ########################
 #   Preprocessing      #
@@ -140,7 +147,8 @@ com.zero_freeze = 0
 ########################
 
 noi.calcfirst = 0
-noi.box_size = 0
+noi.box_size = -15
+noi.box_type = 1
 
 ########################
 # Iterative: flt model #
