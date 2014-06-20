@@ -2942,6 +2942,13 @@ pixel mode, mean and median.
 similar result to the mean/median of the error array except with
 additional contamination from sources.
 
+\begin{latexonly}
+\myfig{sc21_noihist}{[b!]}{height=7.5cm}{fig:noihisto}{
+  The error component viewed with \textsc{Kappa} command \task{histogram}.}{
+  The error component viewed with \textsc{Kappa} command \task{histogram}.
+}
+\end{latexonly}
+
 \subsubsection{Viewing the noise histogram}
 
 You can view a histogram of the error component with the
@@ -2956,13 +2963,6 @@ specified.
 The output is shown in the \cref{Figure}{fig:noihisto}{the plot below}.
 For more information on the options for \histogram\ see
 \kappasun.
-
-\begin{latexonly}
-\myfig{sc21_noihist}{[h!]}{height=7.5cm}{fig:noihisto}{
-  The error component viewed with \textsc{Kappa} command \task{histogram}.}{
-  The error component viewed with \textsc{Kappa} command \task{histogram}.
-}
-\end{latexonly}
 
 \begin{htmlonly}
 \myfig{sc21_noihist}{[b!]}{height=10cm}{fig:noihisto}{
@@ -4341,7 +4341,7 @@ We can now crop the map to remove the noisy edges using the \picard\ recipe
 \drrecipe{CROP\_JCMT\_IMAGES}. To determine what to trim we can look
 at the exposure-time image with \gaia.
 
-\myfig{sc21_gal_exptime}{[th!]}{width=0.7\linewidth}{fig:exptime}{
+\myfig{sc21_gal_exptime}{[b!]}{width=0.7\linewidth}{fig:exptime}{
   Galactic example: exposure time map}{
   The exposure-time image of the science map from \cref{Figure}{fig:galmakemap}{
   our example map}. You can right-click and drag the mouse
@@ -4388,7 +4388,7 @@ file} for details. Another option is to supply an external mask from
 a different dataset, e.g. a
 \htmladdnormallink{Herschel}{http://herschel.esac.esa.int/} map.
 
-\myfig{sc21_gal12_crop}{[t!]}{width=0.8\hsize}{fig:crop_map}{
+\myfig{sc21_gal12_crop}{[t!]}{width=0.75\hsize}{fig:crop_map}{
   Galactic example: cropped final map}{
   The final cropped, reduced map from the map-maker run with
   an external mask supplied.
