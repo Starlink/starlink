@@ -22,7 +22,7 @@
 \newcommand{\stardoccopyright} {Copyright \copyright\ 2014 Science and Technology Facilities Council}
 \newcommand{\stardocnumber}    {21.2}
 \newcommand{\stardocauthors}   {H.\ S.\ Thomas, M.\ J.\ Currie}
-\newcommand{\stardocdate}      {11 June 2014}
+\newcommand{\stardocdate}      {19 June 2014}
 \newcommand{\stardoctitle}     {The SCUBA-2 Data Reduction Cookbook}
 \newcommand{\stardocversion}   {1.3}
 \newcommand{\stardocmanual}    {\ }
@@ -1914,9 +1914,9 @@ your observation. A few specialised configuration files are supplied with
 
 The specialised files are all based on \texttt{dimmconfig.lis}. This
 is illustrated by \cref{Figure}{fig:configtree}{figure below} where
-the parameters in \texttt{dimmconfig\_bright\_extended.lis} override
-any identical ones in \texttt{dimmconfig\_bright.lis} which in turn
-override the values in \texttt{dimmconfig.lis}. the hierarchical
+the parameters in \texttt{dimmconfig\_bright\_compact.lis} override
+any identical ones in the hidden file \texttt{dimmconfig\_bright.lis} which in turn
+override the values in \texttt{dimmconfig.lis}. The hierarchical
 structure means the parameters at the top of the tree (or first
 encountered) override any other instance of them.
 
@@ -4337,7 +4337,7 @@ ast.zero_snr = 0
 
 \textbf{Step 4: Cropping the map}
 \vspace{0.2cm}\\
-We can now crop the map to remove the noisy edges using the \picard\ recipe
+We now crop the map to remove the noisy edges using the \picard\ recipe
 \drrecipe{CROP\_JCMT\_IMAGES}. To determine what to trim we can look
 at the exposure-time image with \gaia.
 
@@ -4570,7 +4570,7 @@ own configuration file (\texttt{myconfig.lis}), the recipe parameter file
 MAKEMAP_CONFIG = myconfig.lis
 \end{verbatim}
 \end{quote}
-\vspace{0.4cm}
+
 Then run the pipeline calling the parameter file via the
 \texttt{-recpars} option.
 \begin{myquote}
@@ -4618,12 +4618,22 @@ written. Also used as the location for a user-specified configuration file.\\
 \textbf{Step 3:}
 \end{minipage}
 \begin{minipage}[t]{0.85\linewidth}
-\textbf{(Optional) Create your personalised configuration file and/or parameter file.} \\
+\textbf{(Optional) Create a personalised configuration file and/or parameter file.} \\
 See \cref{Section}{sec:parameterfile}{Changing the defaults} for
-details. In this example we check the \param{RECIPE} parameter and find the
-recipe \drrecipe{REDUCE\_SCAN} is assigned to our data. We are happy with the
-steps in this recipe but want to supply a new configuration file. To
-do so we create a parameter file called \texttt{mypars.ini}.\\*
+details. In this example we find the recipe \drrecipe{REDUCE\_SCAN}
+assigned to our data. We are happy with the steps in this recipe but
+want to supply a new configuration file and a different set of
+clump-finding parameters. To do so we create a parameter file called
+\texttt{mypars.ini} which contains the following text.
+
+\begin{quote}
+\begin{verbatim}
+[REDUCE_SCAN]
+MAKEMAP_CONFIG = mynewconfig.lis
+FINDCLUMPS_CFG = myfellwalkerparams.lis
+
+\end{verbatim}
+\end{quote}
 
 \end{minipage}
 
