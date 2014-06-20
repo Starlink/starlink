@@ -4121,7 +4121,7 @@ The pipeline must first be initiated for the wavelength you are
 working on. In the case below this is 850\,$\mu$m. Note that the date
 does not \emph{have} to be specified when initialising the pipeline.
 The pipeline is run using the
-\xref{\drrecipe{FAINT\_POINT\_SOURCES\_JACKKNIFE}}{sun264}{REDUCE_SCAN_FAINT_POINT_SOURCES_JACKKNIFE}
+\xref{\drrecipe{REDUCE\_SCAN\_FAINT\_POINT\_SOURCES\_JACKKNIFE}}{sun264}{REDUCE_SCAN_FAINT_POINT_SOURCES_JACKKNIFE}
 recipe; this uses \texttt{dimmconfig\_blank\_field.lis} as the
 configuration file. If you wish to provide an alternative file you
 will need to put the name of the new configuration file in a recipe
@@ -4156,7 +4156,7 @@ The calibrated version of \texttt{\_whiten}\\
 The matched-filtered version of \texttt{\_cal}\\
 \end{minipage}
 
-\drrecipe{FAINT\_POINT\_SOURCES\_JACKKNIFE} is a recipe designed to
+\drrecipe{REDUCE\_SCAN\_FAINT\_POINT\_SOURCES\_JACKKNIFE} is a recipe designed to
 process blank field/extra-galactic data. The recipe uses a jack-knife
 method to remove low-spatial frequency noise and generate a matched
 filter output map.
@@ -4179,7 +4179,7 @@ using the whitened PSF map as the PSF input. It is this matched filter
 map which will be of most interest to users.
 
 See \pipelinesun\ for more information on
-\drrecipe{FAINT\_POINT\_SOURCES\_JACKKNIFE} and all other pipeline
+\drrecipe{REDUCE\_SCAN\_FAINT\_POINT\_SOURCES\_JACKKNIFE} and all other pipeline
 recipes.
 \\ \\
 \textbf{(c) Optional: Re-run \drrecipe{SCUBA2\_JACKKNIFE}}\\
@@ -4513,7 +4513,7 @@ as a FITS catalogue (with file extension \texttt{.FIT}) which can be
 read as a local catalogue into \gaia.
 \end{itemize}
 
-\subsubsection{\xlabel{faintjk}\drrecipe{FAINT\_POINT\_SOURCES\_JACKKNIFE}}
+\subsubsection{\xlabel{faintjk}\drrecipe{REDUCE\_SCAN\_FAINT\_POINT\_SOURCES\_JACKKNIFE}}
 \begin{itemize}
 \item Configuration file = \texttt{dimmconfig\_blank\_field.lis}
 
