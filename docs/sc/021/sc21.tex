@@ -4449,12 +4449,16 @@ When MSBs are created, the PI can select a pipeline recipe to assign
 to the data. When the data is run through the science pipeline this
 recipe is used by default. This recipe can overridden on the command
 line---see \cref{Section}{sec:parameterfile}{Changing the defaults}.
-
+\begin{latexonly}
 Described below are the five main \oracdr\ science recipes.
+\end{latexonly}
+\begin{htmlonly}
+Described next are the five main \oracdr\ science recipes.
+\end{htmlonly}
 
 \subsubsection{\xlabel{extsources}\drrecipe{REDUCE\_SCAN}}
-\vspace{-0.3cm}
-\textbullet\ Configuration file: \texttt{dimmconfig.lis}
+\begin{itemize}
+\item  Configuration file: \texttt{dimmconfig.lis}
 
 This recipe uses the default configuration file for \makemap, unless
 the sources is identified as a calibrator. After all observations have
@@ -4466,11 +4470,11 @@ FellWalker algorithm to create a source catalogue.
 
 For calibrators, \texttt{dimmconfig\_bright\_compact.lis} is used and
 FCFs are derived from the map.
-
+\end{itemize}
 
 \subsubsection{\xlabel{extsources}\drrecipe{REDUCE\_SCAN\_CHECKRMS}}
-\vspace{-0.3cm}
-\textbullet\  Configuration file = \texttt{dimmconfig.lis}
+\begin{itemize}
+\item  Configuration file = \texttt{dimmconfig.lis}
 
 This recipe is the same as \drrecipe{REDUCE\_SCAN}, but includes extra
 performance estimations determined by \drrecipe{SCUBA2\_CHECK\_RMS} (see
@@ -4479,10 +4483,11 @@ are written to a log file log.checkrms. The advantage of running
 \drrecipe{SCUBA2\_CHECK\_RMS} in the pipeline rather than as a standalone
 \picard\ recipe is that is able to calculate results for co-added
 files.
+\end{itemize}
 
 \subsubsection{\xlabel{extsources}\drrecipe{REDUCE\_SCAN\_EXTENDED\_SOURCES}}
-\vspace{-0.3cm}
-\textbullet\  Configuration file = \texttt{dimmconfig\_bright\_extended.lis}
+\begin{itemize}
+\item  Configuration file = \texttt{dimmconfig\_bright\_extended.lis}
 
 This is the recipe for processing extended sources, with the
 \texttt{dimmconfig\_bright\_extended.lis} configuration file called by
@@ -4491,10 +4496,11 @@ map is calibrated in units of mJy/arcsec$^2$. This recipe also
 performs a source finder routine; the results are written as a FITS
 catalogue (with file extension \texttt{.FIT}) which can be read as a
 local catalogue into \gaia.
+\end{itemize}
 
 \subsubsection{\xlabel{faint}\drrecipe{REDUCE\_SCAN\_FAINT\_POINT\_SOURCES}}
-\vspace{-0.3cm}
-\textbullet\  Configuration file = \texttt{dimmconfig\_blank\_field.lis}
+\begin{itemize}
+\item  Configuration file = \texttt{dimmconfig\_blank\_field.lis}
 
 This is the recipe for processing maps containing faint compact
 sources. This time the configuration file called by \makemap\
@@ -4505,10 +4511,11 @@ S/N map is written out as a second output file. This
 recipe also performs a source finder routine; the results are written
 as a FITS catalogue (with file extension \texttt{.FIT}) which can be
 read as a local catalogue into \gaia.
+\end{itemize}
 
 \subsubsection{\xlabel{faintjk}\drrecipe{FAINT\_POINT\_SOURCES\_JACKKNIFE}}
-\vspace{-0.3cm}
-\textbullet\  Configuration file = \texttt{dimmconfig\_blank\_field.lis}
+\begin{itemize}
+\item Configuration file = \texttt{dimmconfig\_blank\_field.lis}
 
 This recipe uses a jack-knife method to remove residual low-spatial
 frequency noise and create an optimal matched-filtered output map. The
@@ -4522,6 +4529,7 @@ matched filter using the whitened PSF map as the PSF input. The data
 are calibrated in mJy/beam using a corrected FCF.
 See \cref{Section}{sec:jk}{Example 2 -- Advanced pipeline method} for a
 more-detailed description of this recipe and the files produced.
+\end{itemize}
 
 \subsection{Changing the defaults}
 \label{sec:parameterfile}
