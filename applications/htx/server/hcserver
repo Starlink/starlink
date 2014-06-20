@@ -42,7 +42,7 @@ HTX_PATH='/star/docs:/star/help'
 #
 #        if you do not specify HTX_PATH explicitly above.
 #
-      HTX_TYPES='Postscript=ps:DVI=dvi:Text=lis:Text=txt:Latex=tex:Runoff=rno'
+      HTX_TYPES='PDF=pdf:Postscript=ps:DVI=dvi:Text=lis:Text=txt:Latex=tex:Runoff=rno'
 #     HTX_TYPES='Postscript=ps:Text=txt'
 #        Edit and un-comment the line above to contain a colon-separated list
 #        of file type specifications to use when searching for hard-copy files.
@@ -57,7 +57,7 @@ HTX_PATH='/star/docs:/star/help'
 #        found will be selected as the default. The default value used for
 #        HTX_TYPES is:
 #
-#           "Postscript=ps:Text=txt"
+#           "PDF=pdf:Postscript=ps:Text=txt"
 #
 #        if you do not specify it explicitly above.
 #
@@ -139,7 +139,7 @@ HTX_PATH='/star/docs:/star/help'
       HTX_PATH="${HTX_PATH:-/web/star/docs:/web/star/help}"
 
 #  Supply a default value for HTX_TYPES if necessary.
-      HTX_TYPES="${HTX_TYPES:-Postscript=ps:Text=txt:Dvi=dvi}"
+      HTX_TYPES="${HTX_TYPES:-PDF=pdf:Postscript=ps:Text=txt:Dvi=dvi}"
 
 #  If no support person has been specified and this script is running on the
 #  Starlink WWW server at RAL, then provide a suitable default.
@@ -319,7 +319,7 @@ ${results}
 <I>
 Note that some documents may contain graphics and images which cannot be
 included in certain formats. If you require these parts of the document, then
-<B>Postscript</B> is the recommended format to use.
+<B>PDF</B> is the recommended format to use.
 </I>
 <HR>
 2. If you would like a compressed copy of the file, please select the
