@@ -1,5 +1,6 @@
-\documentstyle{article}
+\documentclass{article}
 \pagestyle{myheadings}
+\usepackage{graphicx}
 
 %------------------------------------------------------------------------------
 \newcommand{\stardoccategory}  {Starlink User Note}
@@ -142,7 +143,7 @@ a galaxy on an IKON image display device.
       FORTRAN STOP
       $
 \end{verbatim}
-The image produced looks similar to that shown in Figure 1, appended.
+The image produced looks similar to that shown in Figure \ref{fig:plot}, appended.
 {\bf NOTE}{\it The figure page will be blank if the {\tt .DVI} file for this
 document was not translated using the DVIPS translator for PostScript
 printers.}
@@ -198,10 +199,9 @@ The image included in this document was produced using the following:
 \end{verbatim}
 
 \begin{figure}
-\begin{picture}(160,230)
-\put(-15,260){\special{include sun52.ps}}
-\end{picture}
+\includegraphics[width=\textwidth]{sun52-figure}
 \caption{RGASP Plot using the test data.}
+\label{fig:plot}
 \end{figure}
 
 \end{document}
