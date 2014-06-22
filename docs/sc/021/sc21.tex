@@ -539,6 +539,7 @@
 \textbf{FWHM}   & Full-Width at Half-Maximum\\
 \textbf{GAIA}   & Graphical Astronomy and Image Analysis Tool\\
 \textbf{JCMT}   & James Clerk Maxwell Telescope\\
+\textbf{MSB}    & Minimum Schedulable Block\\
 \textbf{NDF}    & Extensible N-Dimensional Data Format\\
 \textbf{NEFD}   & Noise Equivalent Flux Density\\
 \textbf{PSF}    & Point Spread Function\\
@@ -599,7 +600,7 @@ This guide covers the following topics.
 \item \cref{Chapter}{sec:postprocess}{Chapter 6}  -- Post-processing reduction steps such as applying the FCF, co-adding multiple maps and estimating the noise.
 \item \cref{Chapter}{sec:tweak}{Chapter 7}  -- Options for tailoring the configuration parameters to improve your final map.
 \item \cref{Chapter}{sec:eg}{Chapter 8}  -- Two worked examples covering a \htmlref{blank cosmology field}{sec:cosmology} and a \htmlref{galactic field}{sec:bright_ex}.
-\item \cref{Chapter}{sec:pipe}{Chapter 9}  -- Instructions for using the ORAC-DR pipeline to reduce your data along with details on data retrieved from the JSA.
+\item \cref{Chapter}{sec:pipe}{Chapter 9}  -- Instructions for using the \oracdr\ pipeline to reduce your data along with details on data retrieved from the JSA.
 \end{itemize}
 
 \subsection{\xlabel{computing}Before you start: computing resources}
@@ -628,16 +629,16 @@ For large-area maps it is important to process a full observation in a
 single chunk. See the text box on
 \latexhtml{Page~\pageref{page:text}}{\htmlref{What to look
 for}{box:chunk}} for an explanation of chunking. For large maps, using normal
-map-maker parameters a machine of 96\,GB is acceptable. It is
-important that the memory is as fast as can be afforded as RAM speed
+map-maker parameters a machine having 96\,GB is acceptable. It is
+important that the memory is as fast as can be afforded, as RAM speed
 has a direct linear effect on processing time given that the
 time-series data are continually being funnelled through the CPU.
 
-For blank field surveys, data that only use 850\,$\mu$m, or smaller
+For blank-field surveys, data that only use 850\,$\mu$m, or smaller
 regions of the sky you can usefully run the map-maker with less memory
 and 32 to 64\,GB is reasonable depending on the specifics of your data
 set. SMURF is multi-threaded so multiple cores do help although above
-8 cores the price/performance gains tend to drop off.
+eight cores the price/performance gains tend to drop off.
 
 If you have a very large machine (128\,GB and 24 cores) you can to run
 two instances of the map-maker in parallel. Use the \envvar{SMURF\_THREADS}
@@ -658,9 +659,9 @@ data.
 \subsubsection{KAPPA and SMURF for data processing}
 
 The Sub-Millimetre User Reduction Facility, or \textsc{Smurf},
-contains the Dynamic Iterative Map-Maker that will process raw
+contains the Dynamic Iterative Map-Maker, which will process raw
 SCUBA-2 data into images (see \smurfsun). \textsc{Kappa} meanwhile is
-an application package comprising general purpose commands for
+an application package comprising general-purpose commands mostly for
 manipulating and visualising NDF data (see \kappasun). Before starting
 any data reduction you will want to initiate both \textsc{Smurf} and
 \textsc{Kappa}.
@@ -672,7 +673,17 @@ any data reduction you will want to initiate both \textsc{Smurf} and
 \end{verbatim}
 \end{myquote}
 
-You can access the help information by typing smurfhelp or kaphelp respectively in a terminal.
+You can access the help information by typing \texttt{smurfhelp} or
+\texttt{kaphelp} respectively in a terminal, or by using the
+\task{showme} facility to access the hypertext documentation.
+
+\begin{myquote}
+\begin{verbatim}
+% showme sun258
+% showme sun95
+\end{verbatim}
+\end{myquote}
+
 
 \begin{latexonly}
 \begin{center}
@@ -691,8 +702,8 @@ TIP: The .sdf extension on filenames is not required when running Starlink comma
 \subsubsection{GAIA for viewing your map}
 
 Image visualisation can be done with \gaia\ (see \gaiasun). \textsc{Gaia} is an
-image and data-cube display and analysis tool which incorporates tools such
-as source detection, 3\textsc{d} visualisation, photometry and the ability
+image and data-cube display and analysis tool, which incorporates facilities such
+as source detection, three-dimensional visualisation, photometry and the ability
 to query and overlay on-line or local catalogues.
 \begin{myquote}
 \begin{verbatim}
@@ -773,11 +784,11 @@ directory.\\*\\*}
 
 You have two options for processing your data:
 \\*\\*
-(1) Performing each step manually.\\*
-(2) Running the automated pipeline (\textsc{Orac-dr}).
+(1) performing each step manually and\\*
+(2) running the automated pipeline (\textsc{Orac-dr}).
 \\*\\*
 The pipeline approach works well if you have a lot of data to process.
-Performing nneach step by hand allows more fine-tuned control of certain
+Performing each step by hand allows more fine-tuned control of certain
 processing and analysis steps, and is especially useful for refining
 the parameters used by the map-maker. However, once the optimal
 parameters have been determined, it is possible to pass them to the
@@ -853,7 +864,7 @@ measure of its responsivity. The flat field solution is then the
 inverse linear gradient of the current as a function of heater power.
 
 At this point bolometers with responsivities above or below a
-threshold limit are rejected, along with bolometers which display a
+threshold limit are rejected, along with bolometers that display a
 non-linear response or have a poor S/N. A second flat-field is
 performed at the end of an observation so bolometers whose
 responsivity has changed over the course of the observation can be
@@ -882,17 +893,17 @@ For full details of the array setup and operation see Holland et al.
 \label{sec:mmodes}
 
 Two observing modes are offered for SCUBA-2---\textsc{daisy} and
-\textsc{pong}. As much of the work SCUBA-2 will be doing involves
+\textsc{pong}. As much of the work \mbox{SCUBA-2} will be doing involves
 large area mapping, both observing modes are scan patterns. Your
 choice depends on the size of the area you wish to map, where you
 would like your integration time concentrated and the degree of
-extended emission you wish to recover
+extended emission you wish to recover.
 
 \begin{minipage}[t]{0.15\linewidth}
 \textbf{PONG}
 \end{minipage}
-\begin{minipage}[t]{0.85\linewidth}\textsc{pong} maps are the scan
-strategy for covering large areas. The default options allow for three
+\begin{minipage}[t]{0.85\linewidth}A \textsc{pong} map is the scan
+strategy for covering a large area. The default options allow for three
 sizes---900\,arcsec, 1800\,arcsec and 3600\,arcsec. A single \textsc{pong} map is
 a square of these dimensions and the telescope fills in the square by
 bouncing off the edge of the area. To ensure an even sky background it
@@ -922,8 +933,8 @@ throughout the observation. This is shown in the top panel of
 \end{minipage}
 \latex{\vspace{1.5cm}}\\
 \textbf{Why these patterns?}\\*
-SCUBA-2 removes atmospheric noise in the data
-processing stage (Holland et al. 2013) \cite{s2main}. The power spectrum
+SCUBA-2 removes atmospheric noise in the data-processing
+stage (Holland et al. 2013) \cite{s2main}. The power spectrum
 of data taken by SCUBA-2 has a $1/f$ noise curve at lower frequencies. To
 ensure astronomical signals are far away from this $1/f$ noise, fast
 scanning speeds are required.
@@ -956,7 +967,7 @@ your data reduction process and do not concern the iterative map-maker.
 
 However, there are reasons you may wish to examine your raw data in
 greater depth. The most likely motivation is unusual result from the
-map-maker such as higher than expected noise, artefacts in your map or
+map-maker such as higher than expected noise, artefacts in your map, or
 inconsistent noise across multiple tiles.  This chapter will help you
 get to the bottom of many of these issues.
 
@@ -969,21 +980,21 @@ A normal science observation will follow the following sequence.
 \item Flat-field
 \end{enumerate}
 \vspace{-2mm}
-The \param{SEQ\_TYPE} parameter in the FITS header may be used to
+The \param{SEQ\_TYPE} keyword in the FITS header may be used to
 identify the nature of each scan (see
 \cref{Section}{sec:fitsheader}{Headers and file structure}).
 When you access raw from the \htmladdnormallink{Science Archive}{http://www3.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/jcmt/}
 \begin{latexonly}
-\footnote{\texttt{http://www3.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/jcmt/}}
+\hspace{-0.5em}\footnote{\url{http://www3.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/jcmt/}}
 \end{latexonly}
 you will get \emph{all} of the files listed above. Later when you
 reduce your data using the map-maker you will include \emph{all} of
-the files (noise + flat-fields + science).
+the files (flat-fields + science).
 
 Shown below is a list of the raw files for a single sub-array (in this
 case s8a) for a short calibration observation. The first file is the
 short, dark noise; the second and last scans are the fast flat-field
-observations which occur after the shutter opens to the sky at the
+observations, which occur after the shutter opens to the sky at the
 start of the observation and closes at the end (note the identical
 file size); all of the scans in between are science.
 
@@ -1004,7 +1015,7 @@ file size); all of the scans in between are science.
 The SCUBA-2 data
 acquisition (DA) system writes out a data file every 30 seconds; each
 of which contains 22\,MB of data. The only exception is the final science
-scan which will usually be smaller (6.8\,MB in the example below), typically
+scan which will usually be smaller (6.8\,MB in the example above), typically
 requiring less than 30 seconds of data to complete the observation.
 
 \textbf{Note:} All of these files are written out eight times, once for each of
@@ -1036,21 +1047,21 @@ Since SCUBA-2 data for a given sub-array are broken into multiple
 concatenate the data into a single file. The \smurf\ task \concat\ can
 be used for this operation. The example below combines all of the
 files associated with Observation 8 for the s8a array into a single
-file called \texttt{s8a20120725\_0008\_con}.
+file called \file{s8a20120725\_0008\_con}.
 
 \begin{myquote}
 \begin{verbatim}
-% sc2concat 's8a20120725_0008*.sdf' s8a20120725_0008_con
+% sc2concat s8a20120725_0008\*.sdf s8a20120725_0008_con
 \end{verbatim}
 \end{myquote}
 \task{sc2concat} will automatically filter out any dark or flat-field
 observations, so that the concatenated file contains only the science
 data. Be careful when concatenating a very long observation since the
-output file may be too large to reasonably handle. Fifteen minute
+output file may be too large to reasonably handle. Fifteen-minute
 chunks (30 files) should be sufficient.
 
 \task{sc2concat} applies the flat-field by default (although it can be
-disabled using the `noflat' option on the command-line).
+disabled using the \param{noflat} option on the command-line).
 
 The flat-field can also be applied manually using the \flatfield\ command.
 
@@ -1098,7 +1109,7 @@ FITS headers and dimensions of the data.
 \begin{minipage}[t]{0.75\linewidth}This lists the FITS header information
 for any file (raw or reduced). This extensive list includes dates \& times,
 source name, scan type, pattern and velocity, size of the map, exposure
-time, start and end elevation, opacity and the temperature of the
+time, start and end elevation, opacity, and the temperature of the
 instrument. An example is given below:
 \begin{myquote}
 \begin{verbatim}
@@ -1122,7 +1133,8 @@ use the \fitsval\ command instead, e.g.\\
 \end{minipage}
 \begin{minipage}[t]{0.75\linewidth}
 \task{ndftrace} displays the attributes of the data structure. This will tell
-you the units of the data, pixel bounds, dimensions and axis assignations.
+you the units of the data, pixel bounds, dimensions, world coordinate
+bounds and attributes, and axis assignations.
 \begin{myquote}
 \begin{verbatim}
 % ndftrace file.sdf fullframe
@@ -1260,10 +1272,10 @@ Due to extreme accelerations at ``turn-around'' points of a scan
 pattern (especially for \textsc{pong}s), the telescope finds it hard
 to follow the proscribed scan patterns at high elevations. To mitigate
 this we try to avoid observing any sources above 70$^\circ$ elevation.
-If the \fitslist\ parameters \param{ELSTART} and \param{ELEND}
+If the \fitslist\ keywords \param{ELSTART} and \param{ELEND}
 indicate that your map was taken at high elevation you may consider
 checking the success of the scan pattern. If you find your observation
-has failed to follow the demanded scan pattern don't worry, the data is
+has failed to follow the demanded scan pattern don't worry, the data are
 likely to still be useful. This is especially true for \textsc{daisy}
 maps where the high exposure-time central region is usually
 unaffected.
@@ -1357,7 +1369,8 @@ arcsec).
 \begin{center}
 \begin{fmpage}{0.95\linewidth}
 \vspace{0.1cm}
-TIP: If you do not include method=rebin, the map-maker will will default to method=iterate.
+TIP: If you do not include \param{method=rebin}, the map-maker will will
+default to \param{method=iterate}.
 \end{fmpage}
 \end{center}
 \end{latexonly}
@@ -1463,7 +1476,9 @@ configuration files have been developed which are tailored to
 different science goals, be they detecting faint galaxies or mapping
 large molecular clouds. A
 description of these specialised configuration files can be found
-\cref{in Section}{sec:config}{here}.
+\cref{in Section}{sec:config}{here} with listings
+\cref{in Appendix}{app:special}{this appendix}.
+
 
 \subsection{The reduction step-by-step}
 
@@ -1479,18 +1494,18 @@ stage where the different models are subtracted and the convergence checked.
 \begin{minipage}[t]{0.95\linewidth}
 \textbf{1. Initial cleaning and downsampling}\\
 The first task of the map-maker is to down-sample the data. The
-raw time-series data is re-sampled at a rate that matches the
+raw time-series data are re-sampled at a rate that matches the
 requested pixel size, the equivalent to applying a low-pass filter.
 Down-sampling saves time and memory usage when running the map-maker.
-The raw data is then concatenated and has the flat-field (from the
+The raw data are then concatenated and have the flat-field (from the
 bracketing fast flat scans) applied to calibrate the bolometers. A
 number of cleaning steps are then run: a polynomial baseline is
-subtracted from each bolometer; spikes and dc steps are removed; any
-resulting gaps in the time-series are filled in.
+subtracted from each bolometer; spikes and DC steps are removed; and
+any resulting gaps in the time-series are filled in.
 \\*\\*
 \textbf{2. Iterative steps}\\
 Next comes the iterative stage. First to be modelled
-and removed are \texttt{COM} and \texttt{GAI} which work together to
+and removed are \texttt{COM} and \texttt{GAI}, which work together to
 calculate the average signal template of all the bolometers, and then
 fit/remove the templates from each bolometer. The next model
 (\texttt{EXT}) applies a multiplicative extinction correction to the
@@ -1513,8 +1528,8 @@ subsequent iterations.
 \textbf{3. Checking convergence}\\
 At this stage convergence is checked against the parameters detailed
 in the configuration file. Convergence is achieved either when the
-requested number of iterations has been completed or when the
-noise-based convergence criteria specified in the configuration file
+requested number of iterations has been completed, or when the
+noise-based convergence criterion specified in the configuration file
 is reached. If more iterations are required or (in the latter case)
 the residual noise has not converged then \texttt{GAI}, \texttt{EXT},
 \texttt{FLT} and \texttt{COM} models are all undone and the
@@ -1625,7 +1640,7 @@ line. \\
 \texttt{EXT} applies the extinction
 correction. This is a time-varying scaling factor that is derived from
 the JCMT water-vapour radiometer. As it deals with 30-second chunks of
-data this accounts for varying conditions over a long observation. For
+data, this accounts for varying conditions over a long observation. For
 more details see \cref{Appendix}{app:cal}{SCUBA-2 data calibration}. \\
 
 
@@ -1787,10 +1802,10 @@ A positive value for \texttt{numiter} means that the requested number
 of iterations will be executed. A negative value, as in the example
 above, indicates that no more than this number of iterations should be
 performed, \emph{but} that it may stop at fewer if convergence
-(according to the noise criteria below) has been achieved.
+(according to the noise criterion below) has been achieved.
 \\*\\*
 \textbf{Option 2: Convergence parameter}\\*
-The convergence criteria is set by the \texttt{maptol} parameter.
+The convergence criterion is set by the \texttt{maptol} parameter.
 
 When running the map-maker, \texttt{maptol} gives the average
 normalised change in the value of map pixels
@@ -1877,7 +1892,7 @@ filename (such as \file{s8a20120720\_00030\_0003\_con\_com.sdf},
 \begin{latexonly} \linebreak % \latex causes a paragraph break.
 \end{latexonly} \file{s8a20120720\_00030\_0003\_con\_flt.sdf},
 \file{s8a20120720\_00030\_0003\_con\_res.sdf})\footnote{The filename
- shows sub-scan 3 of Observation 30 since this is the first science
+shows the third sub-scan of Observation 30 since this is the first science
 file that is encountered (see \cref{Chapter}{sec:raw}{Handling Raw
 SCUBA-2 Data}).~} The variance and quality for the data are stored as
 the VARIANCE and QUALITY components within the residual file NDF.
@@ -2062,9 +2077,9 @@ failed to complete in full.
 \texttt{com.perarray} is set to 1 indicating that a \texttt{COM} model
 should be fit separately for each sub-array. This is not advised for
 extended sources as signal on scales larger than a single sub-array is
-lost but is fine for a compact central source. Likewise, the filtering
-is tighter. The S/N threshold for DC steps is relaxed from 25 in the
-default file to 100 to avoid problems associated with bright sources.
+lost, but is fine for a compact central source. Likewise, the filtering
+is tighter. The S/N threshold for DC steps (\param{dcthresh}) is relaxed from
+25 in the default file to 100 to avoid problems associated with bright sources.
 
 % The tildes around the equal sign are to ensure HTML table field is
 % not wrapped after the parameter name.
