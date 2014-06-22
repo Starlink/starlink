@@ -1791,7 +1791,7 @@ criterion specified in the configuration file is reached.
 \\*\\*
 \textbf{Option 1: Fixed number of iterations}\\*
 Specifying the number of iterations in the configuration file is done via
-the \texttt{numiter} parameter. This is shown below for \file{dimmconfig.lis}.
+the \param{numiter} parameter. This is shown below for \file{dimmconfig.lis}.
 \vspace{-0.1cm}
 \begin{quote}
 \begin{verbatim}
@@ -1799,7 +1799,7 @@ numiter = -5
 \end{verbatim}
 \end{quote}
 \vspace{-0.1cm}
-A positive value for \texttt{numiter} means that the requested number
+A positive value for \param{numiter} means that the requested number
 of iterations will be executed. A negative value, as in the example
 above, indicates that no more than this number of iterations should be
 performed, \emph{but} that it may stop at fewer if convergence
@@ -1999,9 +1999,9 @@ however this is not applied by the map-maker.
 \hline
 \multicolumn{2}{|l|}{\file{dimmconfig\_blank\_field.lis}}\\
 \hline
-\texttt{numiter~=~4}&\texttt{flt\_edge\_largescale~=~200}\\
-\texttt{spikethresh~=~10}&\texttt{model order~=~(com,ext,ast,noi)}\\
-\texttt{com.perarray~=~1}&\\
+\param{numiter~=~4}&\param{flt\_edge\_largescale~=~200}\\
+\param{spikethresh~=~10}&\param{model order~=~(com,ext,ast,noi)}\\
+\param{com.perarray~=~1}&\\
 \hline
 \end{tabular}
 \end{table}
@@ -2020,7 +2020,7 @@ more conservative cuts to remove noisy/problematic bolometers. Only 4
 (positive) iterations are requested as there is no signal to confuse
 to models.
 
-The option \texttt{com.perarray}=1 requires the \model{COM} model to
+The option \param{com.perarray}=1 requires the \model{COM} model to
 be fit to each sub-array independently. This improves the overall fit
 but with the loss of any structure on scales larger than a single
 sub-array---not an issue for blank fields.
@@ -2044,9 +2044,9 @@ however this is not applied by the map-maker.
 \hline
 \multicolumn{2}{|l|}{\file{dimmconfig\_blank\_field.lis}}\\
 \hline
-\texttt{numiter~=~4}&\texttt{filt\_edge\_largescale~=~200}\\
-\texttt{spikethresh~=~10}&\texttt{modelorder = (com,ext,ast,noi)}\\
-\texttt{com.perarray~=~1}&\\
+\param{numiter~=~4}&\param{filt\_edge\_largescale~=~200}\\
+\param{spikethresh~=~10}&\param{modelorder = (com,ext,ast,noi)}\\
+\param{com.perarray~=~1}&\\
 \hline
 \end{tabular}
 \end{table}
@@ -2068,14 +2068,14 @@ sources that are isolated at the centre of the map (i.e. calibrators). It refere
 \file{dimmconfig\_bright.lis}, and thus the parameters from both `bright'
 recipes override the default values in \file{dimmconfig.lis}.
 
-The addition of \texttt{ast.zero\_circle} and
-\texttt{ast.zero\_notlast} parameters are used to constrain the map to
+The addition of \param{ast.zero\_circle} and
+\param{ast.zero\_notlast} parameters are used to constrain the map to
 zero beyond a radius of 1\,arcmin for all but the final iteration.
 This strategy helps with map convergence significantly, and can
 provide good maps of bright sources, even in cases where scan patterns
 failed to complete in full.
 
-\texttt{com.perarray} is set to 1 indicating that a \model{COM} model
+\param{com.perarray} is set to 1 indicating that a \model{COM} model
 should be fit separately for each sub-array. This is not advised for
 extended sources as signal on scales larger than a single sub-array is
 lost, but is fine for a compact central source. Likewise, the filtering
@@ -2091,15 +2091,15 @@ is tighter. The S/N threshold for DC steps (\param{dcthresh}) is relaxed from
 \hline
 \multicolumn{2}{|l|}{\file{dimmconfig\_bright\_compact.lis}}\\
 \hline
-\texttt{numiter = -40}&\texttt{flt.filt\_edge\_largescale~=~200}\\
-\texttt{com.perarray~=~1}&\texttt{flt.zero\_circle~=~(0.016666)}\\
- \texttt{ast.zero\_circle~=~(0.0166666666)}&\\
+\param{numiter = -40}&\param{flt.filt\_edge\_largescale~=~200}\\
+\param{com.perarray~=~1}&\param{flt.zero\_circle~=~(0.016666)}\\
+ \param{ast.zero\_circle~=~(0.0166666666)}&\\
 \hline
-\multicolumn{2}{|l|}{\texttt{dimmconfig\_bright.lis}}\\
+\multicolumn{2}{|l|}{\param{dimmconfig\_bright.lis}}\\
 \hline
-\texttt{noisecliphigh~=~10.0} & \texttt{dcthresh~=~100}\\
-\texttt{com.corr\_tol~=~7}& \texttt{com.gain\_tol~=~7}\\
-\texttt{com.gain\_abstol~=~5}& \\
+\param{noisecliphigh~=~10.0} & \param{dcthresh~=~100}\\
+\param{com.corr\_tol~=~7}& \param{com.gain\_tol~=~7}\\
+\param{com.gain\_abstol~=~5}& \\
 \hline
 \end{tabular}
 \end{table}
@@ -2118,10 +2118,10 @@ is tighter. The S/N threshold for DC steps (\param{dcthresh}) is relaxed from
 This configuration is for reducing maps that do not fall into the other two
 categories. The emission is usually extended to some degree and contains some
 bright regions. Here
-\texttt{ast.zero\_snr} is used to constrain the \model{AST} model to
+\param{ast.zero\_snr} is used to constrain the \model{AST} model to
 zero wherever the S/N is lower than 5$\sigma$.  Everywhere the signal
 is below this threshold, the map is set to zero for all but the final
-iteration. \texttt{numiter} has been raised to \texttt{-40}, as more
+iteration. \param{numiter} has been raised to \texttt{-40}, as more
 iterations are required to maximise the sensitivity to large dynamic
 signal ranges in the map.
 
@@ -2141,10 +2141,10 @@ difference is the improvement in the bowling around strong sources.
 \hline
 \multicolumn{2}{|l|}{\file{dimmconfig\_bright\_extended.lis}}\\
 \hline
-\texttt{numiter~=~-40}&\texttt{flt.filt\_edge\_largescale~=~480}\\
-\texttt{ast.zero\_snr~=~3}&\texttt{ast.zero\_snrlo~=~2}\\
-\texttt{ast.skip~=~5}&\texttt{flt.zero\_snr~=~5}\\
-\texttt{flt.zero\_snrlo~=~3}& \\
+\param{numiter~=~-40}&\param{flt.filt\_edge\_largescale~=~480}\\
+\param{ast.zero\_snr~=~3}&\param{ast.zero\_snrlo~=~2}\\
+\param{ast.skip~=~5}&\param{flt.zero\_snr~=~5}\\
+\param{flt.zero\_snrlo~=~3}& \\
 \hline
 \end{tabular}
 \end{table}
@@ -2155,10 +2155,10 @@ This configuration is for reducing maps of bright extended sources,
 and references \file{dimmconfig\_bright.lis}.  The S/N threshold for DC steps
 is relaxed from \texttt{25} in the default file to \texttt{100} to
 avoid problems associated with bright sources. Here
-\texttt{ast.zero\_snr} is used to constrain the \model{AST} model to
+\param{ast.zero\_snr} is used to constrain the \model{AST} model to
 zero wherever the S/N is lower than 5$\sigma$.  Everywhere the signal
 is below this threshold, the map is set to zero for all but the final
-iteration. \texttt{numiter} has been raised to \texttt{-40}, as more
+iteration. \param{numiter} has been raised to \texttt{-40}, as more
 iterations are required to maximise the sensitivity to large dynamic
 signal ranges in the map.
 
@@ -2178,10 +2178,10 @@ difference is the improvement in the bowling around strong sources.
 \hline
 \multicolumn{2}{|l|}{\file{dimmconfig\_bright\_extended.lis}}\\
 \hline
-\texttt{numiter~=~-40}&\texttt{flt.filt\_edge\_largescale~=~480}\\
-\texttt{ast.zero\_snr~=~3}&\texttt{ast.zero\_snrlo~=~2}\\
-\texttt{ast.skip~=~5}&\texttt{flt.zero\_snr~=~5}\\
-\texttt{flt.zero\_snrlo~=~3}& \\
+\param{numiter~=~-40}&\param{flt.filt\_edge\_largescale~=~480}\\
+\param{ast.zero\_snr~=~3}&\param{ast.zero\_snrlo~=~2}\\
+\param{ast.skip~=~5}&\param{flt.zero\_snr~=~5}\\
+\param{flt.zero\_snrlo~=~3}& \\
 \hline
 \end{tabular}
 \end{table}
@@ -2514,17 +2514,17 @@ convergence and you may find significantly fewer bolometers remaining
 resulting in higher noise than expected.
 
 \textbf{Convergence}\\
-The convergence criteria \texttt{maptol} is updated for each
+The convergence criteria \param{maptol} is updated for each
 iteration. The convergence can be checked from the line reporting\\*
 \hspace*{0.5cm} \texttt{smf\_iteratemap: *** NORMALIZED MAP CHANGE:
 0.10559 (mean) 2.81081 (max)}
 
 The number to look out for is the mean value. This will have to drop
-below your required \texttt{maptol} for convergence to be achieved.
+below your required \param{maptol} for convergence to be achieved.
 
 The default configuration file used in this example executes a maximum
-of five iterations, but stops sooner if the change in \texttt{maptol}
-drops below 0.05 (i.e. \texttt{numiter~=$-$5}). In this example it
+of five iterations, but stops sooner if the change in \param{maptol}
+drops below 0.05 (i.e. \param{numiter~=$-$5}). In this example it
 stops after five iterations:
 
 \begin{latexonly}
@@ -2948,8 +2948,8 @@ distribution from bright sources.}
 
 The \Kappa\ commands \histat\ and \stats\ are very similar and both
 return a range of statistics describing any NDF. In addition to the
-main data array they can be passed the error (\texttt{comp=err}), variance
-(\texttt{comp=var}) and quality (\texttt{comp=qua}) arrays (if available).
+main data array they can be passed the error (\param{comp=err}), variance
+(\param{comp=var}) and quality (\param{comp=qua}) arrays (if available).
 
 The reported statistics include the pixel maximum and minimum,
 standard deviation, number of pixels used and omitted, along with
@@ -3295,7 +3295,7 @@ This is very versatile and will display the name and value of one or
 all configuration parameters either from a configuration file or from
 the history of an NDF.
 
-The first example below will return the value of \texttt{numiter} from
+The first example below will return the value of \param{numiter} from
 the map \file{850map.sdf}. The second example will display the values of all
 the parameters in \file{850map.sdf} and will prefix them with a `+' if they
 differ from the the values given in \file{dimmconfig.lis}.
@@ -3361,21 +3361,21 @@ repository}{https://github.com/Starlink/starlink/blob/master/applications/smurf/
 \begin{fmpage}{0.95\linewidth}
 \vspace{0.1cm}
 TIP: If you wish to disable an active parameter in the default file,
-set it as \texttt{<undef>} in your personalised file.
+set it as \param{<undef>} in your personalised file.
 \end{fmpage}
 \end{center}
 \end{latexonly}
 
 \begin{htmlonly}
 \textbf{TIP: If you wish to disable an active parameter in the default
-file, set it as \texttt{<undef>} in your personalised file.}
+file, set it as \param{<undef>} in your personalised file.}
 \end{htmlonly}
 
 
 \textbf{Note:} any parameter can be made wavelength dependent by
-adding the prefix \texttt{450.} or \texttt{850.}, e.g.
-\texttt{flt\_edge\_largescale} applies to both 450\,$\mu$m and
-850\,$\mu$m whilst \texttt{450.flt\_edge\_largescale} applies to
+adding the prefix \param{450.} or \param{850.}, e.g.
+\param{flt\_edge\_largescale} applies to both 450\,$\mu$m and
+850\,$\mu$m whilst \param{450.flt\_edge\_largescale} applies to
 450\,$\mu$m only. Be aware that if both are specified, unqualified
 values (no prefix) take priority over qualified values.
 
@@ -3383,8 +3383,8 @@ values (no prefix) take priority over qualified values.
 
 
 \textbf{itermaps}\\
-Setting the parameter \texttt{itermap~=~1} writes out an astronomical map after each
-iteration. Setting \texttt{itermap~=~2} adds the QUALITY component.
+Setting the parameter \param{itermap~=~1} writes out an astronomical map after each
+iteration. Setting \param{itermap~=~2} adds the QUALITY component.
 These can be visually inspected with
 
 \begin{myquote}
@@ -3394,11 +3394,11 @@ These can be visually inspected with
 \end{myquote}
 to help determine an appropriate number of iterations. This is useful
 when a fixed number of iterations have been requested (i.e. a positive
-value for \texttt{numiter}) and the map solution diverges before
+value for \param{numiter}) and the map solution diverges before
 they have completed.
 
 \textbf{shortmaps}\\
-If the parameter \texttt{shortmaps} is non-zero, a map is made from
+If the parameter \param{shortmaps} is non-zero, a map is made from
 every group of adjacent timeslices (as specified by the parameter).
 These are stored as an NDF extension and can be viewed \gaia.
 
@@ -3495,7 +3495,7 @@ itermaps. See \cref{Figure}{fig:stack}{the box above} for instructions.
 This parameter has been discussed in
 \cref{Section}{sec:export}{Exporting individual models} and allowed
 you to see the model that was fit for each component specified by the
-\texttt{modelorder} parameter.
+\param{modelorder} parameter.
 
 \subsection{\xlabel{filt}Large-scale filtering}
 \label{sec:filt}
@@ -3517,8 +3517,8 @@ applied to the data:
 
 The filtering options set in \file{dimmconfig.lis} are:
 
-\texttt{450.flt.filt\_edge\_largescale~=~600} \\
-\texttt{850.flt.filt\_edge\_largescale~=~300}.
+\param{450.flt.filt\_edge\_largescale~=~600} \\
+\param{850.flt.filt\_edge\_largescale~=~300}.
 
 To make your life easier, these parameters allow you to specify the
 filter limits in terms of spatial scale in arcsecs---in this case
@@ -3529,12 +3529,12 @@ a frequency of 2\,Hz.
 
 Choosing a high-pass filter is especially important for the recovery
 of extended emission. The \file{dimmconfig\_bright\_extended.lis}
-recipe sets \texttt{flt.filt\_edge\_largescale~=~480} (i.e. both 450
+recipe sets \param{flt.filt\_edge\_largescale~=~480} (i.e. both 450
 and 850\,$\mu$m). Be aware that increasing filtering scales decreases
 the flatness of your background. A compromise must be made between
 extended structure and the flatness of your map. See
 \cref{Figure}{fig:fltcompare}{the figure below} for an illustration of
-the effect of \texttt{flt.filt\_edge\_largescale} on your map.
+the effect of \param{flt.filt\_edge\_largescale} on your map.
 
 The scanning speeds are fixed for a given observing mode; you can find
 out the speed at which your data were taken from the
@@ -3555,8 +3555,8 @@ iteration to avoid having artificially reduced values.
 \myfigduo{sc21_brex_19}{sc21_brex_18}{}{width=0.46\linewidth}{fig:fltcompare}{7mm}{
   Illustrating the effects of high-pass filtering}{
   Highlighting the effects of high-pass filtering on your map.
-  \textbf{(Left)} Map made with \texttt{850.flt.filt\_edge\_largescale~=~300}.
-  \textbf{(Right)} Map made with \texttt{850.flt.filt\_edge\_largescale~=~1000}.
+  \textbf{(Left)} Map made with \param{850.flt.filt\_edge\_largescale~=~300}.
+  \textbf{(Right)} Map made with \param{850.flt.filt\_edge\_largescale~=~1000}.
   All other configuration parameters remain the same.
 }
 
@@ -3574,14 +3574,14 @@ any scales larger than the area covered by a single sub-array. It is
 therefore not recommended if you have very large-scale extended
 structure.
 
-To initialise this option set \texttt{com.perarray~=~1}.
+To initialise this option set \param{com.perarray~=~1}.
 
 
 \subsection{\xlabel{noibox}Flagging bad data}
 \label{sec:noibox}
 
 It is possible to down-weight data that have higher noise by setting
-the parameter \texttt{noi.box\_size}. If this is set (i.e. non-zero)
+the parameter \param{noi.box\_size}. If this is set (i.e. non-zero)
 then the length of time over which the noise is determined can be
 specified in time samples (positive values) or seconds (negative
 values). By default this is set to zero and the whole time stream is
@@ -3589,19 +3589,19 @@ used giving a single variance for each bolometer. This variance is
 used to weight the data for subsequent iterations, hence more finely
 estimated noise levels are preferable.
 
-The parameter \texttt{noi.box\_size} helps remove `scuffs' or other
+The parameter \param{noi.box\_size} helps remove `scuffs' or other
 noise artefacts you might see in your error map due to a sub-array (or
 arrays) temporarily jumping to a higher noise state. The default file
-has \texttt{noi.box\_size~=$-$15} (i.e. half a sub-scan). As the
+has \param{noi.box\_size~=$-$15} (i.e. half a sub-scan). As the
 value tends to $-$1 (one second) we find some of the source signal being
 down-weighted. Higher than this $-$15 value and the map-maker becomes
 less sensitive to the higher noise states.
 
-Other parameters you may want to utilise include \texttt{flagfast} and
-\texttt{flagslow}. You may find that setting \texttt{flagfast} to less
+Other parameters you may want to utilise include \param{flagfast} and
+\param{flagslow}. You may find that setting \param{flagfast} to less
 than the default of 1000\,arcsec/sec will help reduce the effect of any
 `smearing' of sources (and of noise) in maps, while setting
-\texttt{flagslow} greater than the default of 300\,arcsec/sec helps to
+\param{flagslow} greater than the default of 300\,arcsec/sec helps to
 flatten the edges of maps. To determine reasonable values for your
  dataset you should do \jcmtstate\ and view the scan speed using
 \topcat. See \cref{Section}{sec:scan}{Displaying scan patterns} for
@@ -3616,14 +3616,22 @@ number of masking options. The ones common to each model are:
 \begin{latexonly}
 \begin{table}[h!]
 \begin{tabular}{p{3.5cm}p{10.5cm}}
-\texttt{xxx.zero\_circle}& Defines a circular mask of a specified radius. Used for compact sources.\\
-\texttt{xxx.zero\_lowhits}& Defines a mask by the number of data samples  in a pixel. This means that
-spurious regions of emission at the edges of the map where exposure
-time is low are not included in the mask.\\
-\texttt{xxx.zero\_snr}& Creates a mask after each iteration based on the S/N in each pixel.\\
-\texttt{xxx.zero\_snrlo}& Allows the mask created by xxx.zero\_snr to expand down to a specified S/N.\\
-\texttt{xxx.zero\_union}& Controls how the masks are combined. e.g. if two masks are defined, one from lowhits and one from the signal-to-noise.\\
-\texttt{xxx.zero\_freeze}& Prevents the masking from changing after a specified number of iterations.\\
+\param{xxx.zero\_circle}  & Defines a circular mask of a specified radius.
+                            Used for compact sources.\\
+\param{xxx.zero\_lowhits} & Defines a mask by the number of data samples
+                            in a pixel. This means that spurious
+			    regions of emission at the edges of the
+			    map where exposure time is low are not
+			    included in the mask.\\
+\param{xxx.zero\_snr}     & Creates a mask after each iteration based on
+                            the S/N in each pixel.\\
+\param{xxx.zero\_snrlo}   & Allows the mask created by \param{xxx.zero\_snr}
+                            to expand down to a specified S/N.\\
+\param{xxx.zero\_union}   & Controls how the masks are combined. e.g. if two
+                            masks are defined, one from lowhits and one from
+                            the signal-to-noise.\\
+\param{xxx.zero\_freeze}  & Prevents the masking from changing after a
+                            specified number of iterations.\\
 \end{tabular}
 \end{table}
 \end{latexonly}
@@ -3642,7 +3650,7 @@ iteration. This can help prevent ringing in the final map. S/N based
 \model{FLT} masking cannot be used on the first iteration and
 \model{FLT} masking should be used sparingly to aid convergence (it
 is limited to the first two iterations by default with
-\texttt{flt.zero\_niter~=~2}).
+\param{flt.zero\_niter~=~2}).
 
 \textbf{COM mask}\\
 \model{COM} masking is used to omit very bright sources from the
@@ -3654,32 +3662,32 @@ mask should always be small.
 \textbf{Signal-to-noise based masking}\\
 Signal-to-noise based masking is used for both the \model{AST} and
 \model{FLT} models for extended emission. The recipe
-\file{dimmconfig\_bright\_extended.lis} sets \texttt{ast.zero\_snr}
-to 5 and \texttt{ast.zero\_snr} to 3. Setting \texttt{ast.zero\_snr}
+\file{dimmconfig\_bright\_extended.lis} sets \param{ast.zero\_snr}
+to 5 and \param{ast.zero\_snr} to 3. Setting \param{ast.zero\_snr}
 too low can cause noise spikes to be interpreted as signal so
-\texttt{ast.zero\_snrlo} is used which allows the mask to only grow it
+\param{ast.zero\_snrlo} is used which allows the mask to only grow it
 it includes pixels with the specified S/N. This typically improves the
 resulting map so is worth experimenting with. Note that \model{AST}
 masking is not applied on the final iteration to allow data outside
 the mask to remain in the final map.
 
-The bright-extended recipe also sets \texttt{ast.skip} to 5. This
+The bright-extended recipe also sets \param{ast.skip} to 5. This
 means the \model{AST} model is not determined at all for the first
 five iterations. This used in conjunction with \model{FLT} masking
 which is performed in these \model{AST}-free iterations.
 \\\\
 \textbf{External masking}\\
 An alternative to S/N masking is to supply an external mask using the
-\texttt{REF} parameter. Setting the parameter
-\texttt{ast.zero\_snr\_fwhm} allows you to automate this step for a
+\param{REF} parameter. Setting the parameter
+\param{ast.zero\_snr\_fwhm} allows you to automate this step for a
 specific case. Here, the map-maker is run once, then the mask
-generated by \texttt{ast.zero\_snr} is smoothed by a Gaussian (of
+generated by \param{ast.zero\_snr} is smoothed by a Gaussian (of
 `FWHM' arcsecs) and the map-maker is re-run with this smoothed mask
 supplied as an external mask. You can supply your own external mask
 however by following the instructions in the next section.
 \\\\
 \textbf{Combining masks}\\
-Multiple masks are combined according to the \texttt{xxx.zero\_union}
+Multiple masks are combined according to the \param{xxx.zero\_union}
 parameter. If this parameter is true (i.e. non-zero) then the two masks
 will be combined to act as one large mask (the union of the individual
 masks). Hence a pixel will be flagged/masked if it falls within either
@@ -3693,11 +3701,11 @@ towards the edges of your map, you can force these to zero by using
 the intersection of the S/N mask with a lowhits mask.
 \\\\
 \textbf{Freezing masks}\\
-The \texttt{ast.zero\_snr} parameters stop the masks from growing
+The \param{ast.zero\_snr} parameters stop the masks from growing
 (or changing) indefinitely. After the first few iterations the mask
 have essentially reached their maximum scale but a few edge pixels
 oscillate in and out of the masks. This results in a significant enough
-change in the \texttt{maptol} that convergence is never achieved. The
+change in the \param{maptol} that convergence is never achieved. The
 final maps however are essentially identical.
 
 
@@ -4061,7 +4069,7 @@ We create a simple parameter file called \file{smooth.ini}:
 SMOOTH_FWHM = 15
 \end{verbatim}
 \end{myquote}
-where \texttt{SMOOTH\_FWHM~=~15} indicates that the background should be
+where \param{SMOOTH\_FWHM~=~15} indicates that the background should be
 estimated by first smoothing the map and PSF with a 15-arcsec FWHM
 Gaussian. Next, the recipe is executed as follows:
 %
@@ -4259,8 +4267,8 @@ removed in doing so.
 \vspace{0.2cm}\\
 We run the map-maker using \file{dimmconfig\_bright\_extended.lis};
 we have also specified a couple of overrides on the command
-line---\texttt{maptol}~=~0.04 is slightly more stringent than default and
-\texttt{ast.zero\_snr}~=~3.5 constrains emission everything below
+line---\param{maptol}~=~0.04 is slightly more stringent than default and
+\param{ast.zero\_snr}~=~3.5 constrains emission everything below
 3.5\,$\sigma$ to zero.
 
 In this example we give the map-maker a file containing a list of the
@@ -4844,7 +4852,7 @@ up in azimuth, because the instrument is on a Nasmyth platform and
 therefore does not move in elevation.
 
 Part of the reason the signals look the same is because they have been
-flatfielded. You can turn off flatfielding using the \texttt{noflat}
+flatfielded. You can turn off flatfielding using the \param{noflat}
 option to \task{sc2clean}, and you should then see that all of the detector
 amplitudes vary.
 
@@ -4865,7 +4873,7 @@ detected, particularly in the 850\,$\mu$m arrays in early 2011.
 
 Another variation on this is to accentuate the residual low-frequency
 noise by low-pass filtering the result. This can again be accomplished
-by simply adding a filter command in the \texttt{config} parameter,
+by simply adding a filter command in the \param{config} parameter,
 which in this case low-pass filters with a cutoff at 10\,Hz:
 
 \begin{myquote}
@@ -4878,7 +4886,7 @@ config='"^$STARLINK_DIR/share/smurf/dimmconfig.lis,compreprocess=1,filt_edgelow=
 Finally, in some cases you might just want to fit and remove
 polynomial baselines from the bolometers (by default only the mean is
 removed). This example will remove a line, but you can increase the
-value of \texttt{order} to remove higher-order polynomials
+value of \param{order} to remove higher-order polynomials
 
 \begin{myquote}
 \begin{verbatim}
@@ -4935,8 +4943,8 @@ given aperture (30-arcsec radius default) is calculated using
 Mars, CRL~618, CRL~2688 and HL~Tau are already known to
 \picard. To derive an FCF for other sources of known flux densities,
 the fluxes can be added to the parameter file with the source name
-(in upper case, spaces removed): \texttt{FLUX\_450.MYSRC~=~0.050}
-and \texttt{FLUX\_850.MYSRC~=~0.005} (where the values are in Jy),
+(in upper case, spaces removed): \param{FLUX\_450.MYSRC~=~0.050}
+and \param{FLUX\_850.MYSRC~=~0.005} (where the values are in Jy),
 for example.}
 
 \item {Three alternative FCF values are calculated, two of which are
@@ -5007,7 +5015,7 @@ The extinction correction parameters that scale from $\tau_{225}$ to
 the relevant filter have been added to the map-maker code. You can
 override these values by setting \param{ext.taurelation.filtname} in
 your map-maker config files to the two coefficients `($a$,$b$)' that you
-want to use (where \texttt{filtname} is the name of the filter). The
+want to use (where \param{filtname} is the name of the filter). The
 defaults are listed in \file{\$SMURF\_DIR/smurf\_extinction.def}.
 %It is worth noting that if an individual science map and corresponding calibrator observation has already been reduced with the old factors (and your source and calibrator are at about the same airmass and if the tau did not change appreciably), any errors in extinction correction should cancel out in the calibration.
 
@@ -5100,7 +5108,7 @@ SMOOTH_FWHM = 15
 \end{verbatim}
 \end{quote}
 %
-where \texttt{SMOOTH\_FWHM~=~15} indicates that the background should
+where \param{SMOOTH\_FWHM~=~15} indicates that the background should
 be estimated by first smoothing the map and PSF with a 15~arcsec FWHM
 Gaussian. The recipe is then executed as follows:
 %
