@@ -2562,7 +2562,7 @@ science data are:
 
 \begin{itemize}
 \item \file{log.noise}---noise in the map for each observation and the co-add
-(calculated from median of error component)
+(calculated from median of error array)
 \item \file{log.nefd}---NEFD calculated for each observation and for the co-added map(s)
 \end{itemize}
 The pipeline will produce calibrated maps; by default these are
@@ -2919,7 +2919,7 @@ the following steps to get the map noise.
 \end{myquote}
 
 (2) Runs the \Kappa\ command \stats\ to extract the median value from
-the error component.
+the error array.
 \begin{myquote}
 \begin{verbatim}
 % stats map_cal_crop comp=err order
@@ -2930,7 +2930,7 @@ the error component.
 \begin{center}
 \begin{fmpage}{0.95\linewidth}
 \vspace{0.1cm}
-TIP: Use the error component to avoid contamination of the noise
+TIP: Use the error array to avoid contamination of the noise
 distribution from bright sources.
 
 \vspace{0.1cm}
@@ -2939,7 +2939,7 @@ distribution from bright sources.
 \end{latexonly}
 
 \begin{htmlonly}
-\textbf{TIP: Use the error component to avoid contamination of the noise
+\textbf{TIP: Use the error array to avoid contamination of the noise
 distribution from bright sources.}
 \end{htmlonly}
 
@@ -2966,14 +2966,14 @@ additional contamination from sources.
 
 \begin{latexonly}
 \myfig{sc21_noihist}{[b!]}{height=7.5cm}{fig:noihisto}{
-  The error component viewed with \textsc{Kappa} command \task{histogram}.}{
-  The error component viewed with \textsc{Kappa} command \task{histogram}.
+  The error array viewed with \textsc{Kappa} command \task{histogram}.}{
+  The error array viewed with \textsc{Kappa} command \task{histogram}.
 }
 \end{latexonly}
 
 \subsubsection{Viewing the noise histogram}
 
-You can view a histogram of the error component with the
+You can view a histogram of the error array with the
 \textsc{Kappa} command \histogram. Again \param{comp=err} must be
 specified.
 
@@ -2988,8 +2988,8 @@ For more information on the options for \histogram\ see
 
 \begin{htmlonly}
 \myfig{sc21_noihist}{[b!]}{height=10cm}{fig:noihisto}{
-  The error component viewed with \textsc{Kappa} command \task{histogram}.}{
-  The error component viewed with \textsc{Kappa} command \task{histogram}.
+  The error array viewed with \textsc{Kappa} command \task{histogram}.}{
+  The error array viewed with \textsc{Kappa} command \task{histogram}.
 }
 \end{htmlonly}
 
@@ -3012,14 +3012,14 @@ window to get a report of the statistics in the selected region.
 \begin{fmpage}{0.95\linewidth}
 \vspace{0.1cm}
 
-TIP: You can write out the error component of your map into a new file
+TIP: You can write out the error array of your map into a new file
 using the \textsc{Kappa} command \ndfcopy. For example, \texttt{\% ndfcopy map comp=err map\_err}
 \end{fmpage}
 \end{center}
 \end{latexonly}
 
 \begin{htmlonly}
-\textbf{TIP: You can write out the error component of your map into a new file
+\textbf{TIP: You can write out the error array of your map into a new file
 using the \textsc{Kappa} command \ndfcopy. For example, \texttt{\% ndfcopy map comp=err map\_err}.}
 \vspace{4mm}
 \end{htmlonly}
@@ -3027,7 +3027,7 @@ using the \textsc{Kappa} command \ndfcopy. For example, \texttt{\% ndfcopy map c
 \begin{latexonly}
 \myfig{sc21_noigaia6}{[h!]}{width=\linewidth}{fig:noigaia}{
   The error map viewed with \gaia}{
-  The error component displayed with \gaia. After clicking the
+  The error array displayed with \gaia. After clicking the
   \gaiathing{Error} button you will have to rescale your map.
 }
 \end{latexonly}
@@ -3035,7 +3035,7 @@ using the \textsc{Kappa} command \ndfcopy. For example, \texttt{\% ndfcopy map c
 \begin{htmlonly}
 \myfig{sc21_noigaia6}{[b!]}{width=\linewidth}{fig:noigaia}{
   The error map viewed with \gaia}{
-  The error component displayed with \gaia. After clicking the
+  The error array displayed with \gaia. After clicking the
   \gaiathing{Error} button you will have to rescale your map.
 }
 \end{htmlonly}
@@ -5041,7 +5041,7 @@ defaults are listed in \file{\$SMURF\_DIR/smurf\_extinction.def}.
     nep\_av\_err & uncertainty in nep\_av (W/sqrt(Hz))\\
     rms\_nep & RMS derived from nefd\_nep (mJy/beam)\\
     nefd\_nep & NEFD derived from nep\_av and scaled elapsed time (mJy sqrt(sec))\\
-    rms\_map & RMS noise in map, obtained from median of error component (mJy/beam)\\
+    rms\_map & RMS noise in map, obtained from median of error array (mJy/beam)\\
     nefd\_map & NEFD derived from combination of variance and exposure time images (mJy sqrt(sec))\\
     rms\_itc & RMS noise estimated by SCUBA-2 integration time calculator (ITC) (mJy/beam) *\\
     nefd\_itc & NEFD derived from rms\_itc and scaled elapsed time (mJy sqrt(sec)) *\\
