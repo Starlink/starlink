@@ -3265,10 +3265,21 @@ in your supplied configuration file. These commands are executed like
 this:
 \begin{myquote}
 \begin{verbatim}
-% provshow 850map.sdf
-% hislist 850map.sdf
+% provshow 850map
+% hislist 850map
 \end{verbatim}
 \end{myquote}
+
+The output of \task{provshow} can be very long.  If you merely want to
+know what were the original file, the ones with no parents, select
+the root ancestors.
+
+\begin{myquote}
+\begin{verbatim}
+% provshow 850map show=roots
+\end{verbatim}
+\end{myquote}
+
 
 \textbf{Map-maker parameters}\\
 The task \configmeld\ will identify what configuration parameters were
