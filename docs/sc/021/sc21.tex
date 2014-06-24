@@ -2199,7 +2199,7 @@ difference is the improvement in the bowling around strong sources.
 Two trouble-shooting configuration files are available to supplement
 \file{dimmconfig\_bright\_extended}:
 
-\file{dimmconfig\_fix\_convergence} to help your map converge\\*
+\file{dimmconfig\_fix\_convergence} to help your map converge, and\\*
 \file{dimmconfig\_fix\_blobs} to remove large blooms or blobs of
 spurious emission in your final map.
 
@@ -2728,7 +2728,7 @@ section. Remember to apply the pixel size squared factor if using
 You can apply the FCF using the \picard\ recipe
 \xref{\drrecipe{CALIBRATE\_SCUBA2\_DATA}}{sun265}{CALIBRATE\_SCUBA2\_DATA}.
 By default this will multiply your map by
-1000$\times$\fcfb\ obtained from the start of
+1000$\times$\fcfb, obtained from the start of
 \cref{Section}{sec:cmult}{Flux conversion factors}. This produces a
 calibrated map with units of mJy/beam.
 
@@ -2873,7 +2873,7 @@ combining your maps.
 \end{verbatim}
 \end{myquote}
 
-Here the parameter file contains the position of the reference source
+Here the parameter file contains the equatorial position of the reference source
 as in the example below. See \picardsun\ for more details.
 \begin{center}
 \begin{quote}
@@ -2907,7 +2907,7 @@ parameters written to this file are listed in
 % picard SCUBA2_CHECK_RMS map.sdf
 \end{verbatim}
 \end{myquote}
-If you have not yet applied an FCF this recipe will apply the
+If you have not yet applied an FCF, this recipe will apply the
 appropriate default FCF before estimating the noise.
 \\*\\*
 \textbf{Note:} \drrecipe{SCUBA2\_CHECK\_RMS} can only be run on single
@@ -3138,9 +3138,7 @@ Then open your map in \gaia\ and contour the mask NDF on top.
 Select \gaiathing{Contouring...} from the \gaiathing{Image-Analysis}
 menu, and supply the name of the mask NDF either by entering its name in
 the \gaiathing{Other image:} box, or selecting with
-\gaiathing{Choose file...} file browser.
-
-See
+\gaiathing{Choose file...} file browser. See
 \cref{Figure}{fig:maskdisp}{the figure below}.
 
 For more information on the use of masks by \makemap\ and the
