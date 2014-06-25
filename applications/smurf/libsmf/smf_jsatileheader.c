@@ -14,7 +14,8 @@
 
 *  Invocation:
 *     AstFitsChan *smf_jsatileheader( int itile, smfJSATiling *skytiling,
-*                                     int local_origin, int *move, int *status )
+*                                     int local_origin, int usexph, int *move,
+*                                     int *status )
 
 *  Arguments:
 *     itile = int (Given)
@@ -28,11 +29,17 @@
 *        projection parameters PVi_1 and PVi_2 that causes the origin of
 *        grid coordinates to be moved to the centre of the tile. If zero,
 *        the origin of pixel coordinates will be at RA=0, Dec=0.
+*     usexph = int (Given)
+*        If zero, the tile is projected into pixel space using the standard
+*        HPX projection. If greater than zero, it is projected using an
+*        XPH projection centred on the north pole. If less than zero, it is
+*        projected using an XPH projection centred on the south pole.
 *     move = int * (Returned)
 *        Pointer to an int which is returned non-zero if the tile is in
-*        the bottom left part of the bottom left tile (the one that is
-*        truncated by RA=12 hours). Such tiles are moved up to the top
-*        right corner of the all-sky grid in pixel coords. May be NULL.
+*        the bottom left part of the bottom left HPX tile (the one that
+*        is truncated by RA=12 hours). Such tiles should be moved up to
+*        the top right corner of the all-sky grid in pixel coords. May
+*        be NULL. Returned equal to zero if "usexph" is non-zero.
 *     status = int * (Given)
 *        Pointer to the inherited status variable.
 
@@ -97,6 +104,8 @@
 *        - Ensure the returned FITS header include the telescope position
 *        (keywords "OBSGEO-X/Y/Z").
 *        - Added argument "move".
+*     12-JUN-2014 (DSB):
+*        Added argument "usexph".
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -140,10 +149,11 @@
 /* Prototypes for private functions. */
 static AstFitsChan *smfMakeFC( int nx, int ny, int n, int p, double crpix1,
                                double crpix2, double crval1, double crval2,
-                               int *status );
+                               int usexph, int *status );
 
 AstFitsChan *smf_jsatileheader( int itile, smfJSATiling *skytiling,
-                                int local_origin, int *move, int *status ){
+                                int local_origin, int usexph, int *move,
+                                int *status ){
 
 /* Local Variables: */
    AstFitsChan *fc = NULL;
@@ -172,11 +182,22 @@ AstFitsChan *smf_jsatileheader( int itile, smfJSATiling *skytiling,
 /* If the tile index is -1, produce a header for the whole sky (one
    pixel per tile). */
    if( itile == -1 ) {
-      ng = 5*skytiling->ntpf;
+
+      if( usexph > 0 ) {
+         ng = 4*skytiling->ntpf;
+         dec_ref = AST__DPIBY2;
+      } else if( usexph < 0 ) {
+         ng = 4*skytiling->ntpf;
+         dec_ref = -AST__DPIBY2;
+      } else {
+         ng = 5*skytiling->ntpf;
+         dec_ref = 0.0;
+      }
+
       gx_ref = gy_ref = 0.5*( ng + 1);
-      ra_ref = dec_ref = 0.0;
+      ra_ref = 0.0;
       fc = smfMakeFC( ng, ng, skytiling->ntpf, 1, gx_ref, gy_ref, ra_ref,
-                      dec_ref, status );
+                      dec_ref, usexph, status );
 
 /* Otherwise, get the number of pixels along one edge of a facet. */
    } else {
@@ -184,21 +205,43 @@ AstFitsChan *smf_jsatileheader( int itile, smfJSATiling *skytiling,
 
 /* Convert the supplied tile index into a pair of X and Y offsets that
    give the gaps along the X and Y axes, in tiles, between the bottom left
-   tile in the projection plane and the required tile. This function
+   tile in the HPX projection plane and the required tile. This function
    includes a check that the tile number is valid. */
       smf_jsatilei2xy( itile, skytiling, &xt, &yt, &fi, status );
       if( *status != SAI__OK ) return fc;
 
-/* Note the RA at the reference point. This is 0 hours except for tiles
-   within facet six. */
-      if( fi != 6 ) {
+/* Choose the sky and pixel coords at the reference point. First deal with
+   XPH projections. The entire XPH projection plane is spanned by four
+   facets along each edge.*/
+      if( usexph ) {
+
+/* The reference point is the north or south pole. */
          ra_ref = 0.0;
+         dec_ref = ( usexph > 0 ) ? AST__DPIBY2 : -AST__DPIBY2;
+
+/* Convert the (x,y) offsets of the tile within the HPX all-sky grid to
+   the corresponding offsets in the XPH all-sky grid. */
+         smf_jsatilexyconv( skytiling, usexph, xt, yt, &xt, &yt, status );
 
 /* Get the grid coordinates (within the grid frame of the current tile),
-   of the projection reference point. The entire projection plane is spanned
-   by five facets along each edge. */
-         gx_ref = 0.5*( 5.0*m + 1.0) - xt*skytiling->ppt;
-         gy_ref = 0.5*( 5.0*m + 1.0) - yt*skytiling->ppt;
+   of the projection reference point. The entire XPH projection plane is
+   spanned by four facets along each edge. */
+         gx_ref = 0.5*( 4.0*m + 1.0 ) - xt*skytiling->ppt;
+         gy_ref = 0.5*( 4.0*m + 1.0 ) - yt*skytiling->ppt;
+
+/* Now deal with HPX projections. */
+      } else {
+
+/* Note the RA at the reference point. This is 0 hours except for tiles
+   within facet six. */
+         if( fi != 6 ) {
+            ra_ref = 0.0;
+
+/* Get the grid coordinates (within the grid frame of the current tile),
+   of the projection reference point. The entire HPX projection plane is
+   spanned by five facets along each edge. */
+            gx_ref = 0.5*( 5.0*m + 1.0) - xt*skytiling->ppt;
+            gy_ref = 0.5*( 5.0*m + 1.0) - yt*skytiling->ppt;
 
 /* The seventh facet (i.e bottom right, fi==6) in the projection plane is a
    problem because it is split by the ra = 12hours line into two halfs.
@@ -206,26 +249,27 @@ AstFitsChan *smf_jsatileheader( int itile, smfJSATiling *skytiling,
    this facet, the resulting RA an Dec values will be AST__BAD. To avoid
    this, we use (ra,dec)=(12h,0) as the reference point for the seventh
    facet. Note the RA at the reference point. */
-      } else {
-         ra_ref = AST__DPI;
+         } else {
+            ra_ref = AST__DPI;
 
 /* Get the grid coordinates (within the grid frame of the current tile),
    of the projection reference point (which is at the centre of the first
    facet in this case). */
-         gx_ref = 0.5*( m + 1.0) - xt*skytiling->ppt;
-         gy_ref = 0.5*( m + 1.0) - yt*skytiling->ppt;
+            gx_ref = 0.5*( m + 1.0) - xt*skytiling->ppt;
+            gy_ref = 0.5*( m + 1.0) - yt*skytiling->ppt;
 
 /* Indicate if the tile is in the lower left section (the section that
    needs to be moved up to the top right in pixel coords). */
-         if( move )  *move = yt < skytiling->ntpf - 1 && xt < skytiling->ntpf - 1 - yt;
-      }
+            if( move )  *move = yt < skytiling->ntpf - 1 && xt < skytiling->ntpf - 1 - yt;
+         }
 
 /* The Declination at the reference point is zero for all tiles. */
-      dec_ref = 0.0;
+         dec_ref = 0.0;
+      }
 
 /* Put the basic header into a FitsChan. */
-      fc = smfMakeFC( 1, 1, skytiling->ntpf, skytiling->ppt, gx_ref, gy_ref, ra_ref,
-                      dec_ref, status );
+      fc = smfMakeFC( 1, 1, skytiling->ntpf, skytiling->ppt, gx_ref, gy_ref,
+                      ra_ref, dec_ref, usexph, status );
 
 /* If we want a local pixel origin... */
       if( local_origin ) {
@@ -249,7 +293,7 @@ AstFitsChan *smf_jsatileheader( int itile, smfJSATiling *skytiling,
    CRVAL as the (RA,Dec) at the centre of the tile. Create a FitsCHan
    holding the header. */
          fc = smfMakeFC( 1, 1, skytiling->ntpf, skytiling->ppt, gx_cen, gy_cen,
-                         ra_cen, dec_cen, status );
+                         ra_cen, dec_cen, usexph, status );
 
 /* Set PVi_0 to a non-zero value in the header to indicate that the CRPIX
    grid coords correspond to the CRVAL sky coords, and not to the projection
@@ -279,7 +323,7 @@ AstFitsChan *smf_jsatileheader( int itile, smfJSATiling *skytiling,
 
 static AstFitsChan *smfMakeFC( int nx, int ny, int n, int p, double crpix1,
                                double crpix2, double crval1, double crval2,
-                               int *status ) {
+                               int usexph, int *status ) {
 /*
 *  Name:
 *     smfMakeFC
@@ -296,7 +340,7 @@ static AstFitsChan *smfMakeFC( int nx, int ny, int n, int p, double crpix1,
 *  Invocation:
 *     AstFitsChan *smfMakeFC( int nx, int ny, int n, int p, double crpix1,
 *                             double crpix2, double crval1, double crval2,
-*                             int *status )
+*                             int usexph, int *status )
 
 *  Arguments:
 *     nx = int (Given)
@@ -315,6 +359,8 @@ static AstFitsChan *smfMakeFC( int nx, int ny, int n, int p, double crpix1,
 *        Value for CRVAL1 header.
 *     crval2 = double (Given)
 *        Value for CRVAL2 header.
+*     usexph = int (Given)
+*        If non-zero use "XPH" projection. Otherwise, use "HPX".
 *     status = int * (Given)
 *        Pointer to the inherited status variable.
 
@@ -359,10 +405,10 @@ static AstFitsChan *smfMakeFC( int nx, int ny, int n, int p, double crpix1,
    sprintf( card, "NAXIS2  = %d", p*ny );
    astPutFits( fc, card, 1 );
 
-   sprintf( card, "CTYPE1  = 'RA---HPX'" );
+   sprintf( card, "CTYPE1  = 'RA---%s'", usexph ? "XPH" : "HPX" );
    astPutFits( fc, card, 1 );
 
-   sprintf( card, "CTYPE2  = 'DEC--HPX'" );
+   sprintf( card, "CTYPE2  = 'DEC--%s'", usexph ? "XPH" : "HPX" );
    astPutFits( fc, card, 1 );
 
    sprintf( card, "CRVAL1  = %.15g", crval1*AST__DR2D );
@@ -383,17 +429,19 @@ static AstFitsChan *smfMakeFC( int nx, int ny, int n, int p, double crpix1,
    sprintf( card, "CDELT2  = %.15g", 90.0/(sqrtf(2.0)*m) );
    astPutFits( fc, card, 1 );
 
-   sprintf( card, "PC1_1   = 0.7071068" );
-   astPutFits( fc, card, 1 );
+   if( !usexph ) {
+      sprintf( card, "PC1_1   = 0.7071068" );
+      astPutFits( fc, card, 1 );
 
-   sprintf( card, "PC1_2   = 0.7071068" );
-   astPutFits( fc, card, 1 );
+      sprintf( card, "PC1_2   = 0.7071068" );
+      astPutFits( fc, card, 1 );
 
-   sprintf( card, "PC2_1   = -0.7071068" );
-   astPutFits( fc, card, 1 );
+      sprintf( card, "PC2_1   = -0.7071068" );
+      astPutFits( fc, card, 1 );
 
-   sprintf( card, "PC2_2   = 0.7071068" );
-   astPutFits( fc, card, 1 );
+      sprintf( card, "PC2_2   = 0.7071068" );
+      astPutFits( fc, card, 1 );
+   }
 
    sprintf( card, "RADESYS = 'ICRS'" );
    astPutFits( fc, card, 1 );

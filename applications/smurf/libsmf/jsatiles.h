@@ -36,11 +36,11 @@ void         smf_jsadicer( int indf, const char *base, int trim,
                            smf_inst_t instrument, size_t *ntile, Grp *grp,
                            int *status );
 void         smf_jsatile( int itile, smfJSATiling *jsatiling,
-                          int local_origin, AstFitsChan **fc,
+                          int local_origin, int usexph, AstFitsChan **fc,
                           AstFrameSet **fs, AstRegion **region, int lbnd[2],
                           int ubnd[2], int *status );
 AstFitsChan *smf_jsatileheader( int itile, smfJSATiling *jsatiling,
-                                int local_origin, int *move, int *status );
+                                int local_origin, int usexph, int *move, int *status );
 void         smf_jsatilei2xy( int itile, smfJSATiling *jsatiling, int *xt,
                               int *yt, int *fi, int *status );
 int *        smf_jsatiles_region( AstRegion *region, smfJSATiling *tiling,
@@ -49,6 +49,8 @@ int *        smf_jsatiles_data( ThrWorkForce *wf, Grp *igrp, size_t size,
                                 smfJSATiling *tiling, int *ntile, int *status );
 int          smf_jsatilexy2i( int xt, int yt, smfJSATiling *jsatiling,
                               int *status );
+void         smf_jsatilexyconv( smfJSATiling *skytiling, int usexph, int xt_hpx,
+                                int yt_hpx, int *xt_out, int *yt_out, int *status );
 void         smf_jsatiling( smf_inst_t instrument, smfJSATiling *jsatiling,
                             int *status );
 

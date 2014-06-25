@@ -123,6 +123,12 @@
 *     UBND( 2 ) = _INTEGER (Write)
 *        An output parameter to which are written the upper pixel bounds
 *        of the NDF containing the co-added data for the tile.
+*     USEXPH = _INTEGER (Read)
+*        Determines the sort of projection to use. A value of zero causes
+*        the standard JSA HPX projection to be used. A positive value 
+*        causes an XPH projection centred on the north pole to be used.
+*        A negative value causes an XPH projection centred on the south
+*        pole to be used. [0]
 
 *  Related Applications:
 *     SMURF: MAKECUBE, MAKEMAP, TILELIST.
@@ -148,9 +154,11 @@
 *        to display, not for passing on to future calculations.
 *     7-NOV-2013 (DSB):
 *        Use smf_jsainstrument to get the instrument and tiling parameters.
+*     17-JUN-2014 (DSB):
+*        Added parameter USEXPH.
 
 *  Copyright:
-*     Copyright (C) 2011-2013 Science and Technology Facilities Council.
+*     Copyright (C) 2011-2014 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -207,50 +215,55 @@ F77_SUBROUTINE(ast_isaregion)( INTEGER(THIS), INTEGER(STATUS) );
 void smurf_jsatileinfo( int *status ) {
 
 /* Local Variables */
-   AstRegion *region;
+   AstCmpRegion *overlap;
    AstFitsChan *fc;
    AstFrameSet *fs;
+   AstObject *obj;
+   AstRegion *region;
+   AstRegion *target;
    HDSLoc *cloc = NULL;
    HDSLoc *xloc = NULL;
    char *jcmt_tiles;
    char *tilendf = NULL;
    char text[ 200 ];
-   int axes[ 2 ];
    double dec[ 9 ];
    double dist;
+   double dlbnd[ 2 ];
+   double dubnd[ 2 ];
    double gx[ 9 ];
    double gy[ 9 ];
    double maxdist;
-   double norm_radec[2]; /* array to pass to astNorm */
+   double norm_radec[2];
    double point1[ 2 ];
    double point2[ 2 ];
    double ra[ 9 ];
+   int *ipntr;
+   int axes[ 2 ];
    int create;
    int dirlen;
    int el;
    int exists;
+   int flag;
    int i;
-   int j;
    int indf1;
    int indf2;
    int indf3;
    int itile;
+   int iv;
+   int j;
+   int jtile;
    int lbnd[ 2 ];
-   int tlbnd[ 2 ];
-   int tubnd[ 2 ];
    int local_origin;
    int nc;
    int place;
+   int tlbnd[ 2 ];
+   int tubnd[ 2 ];
    int ubnd[ 2 ];
-   double dlbnd[ 2 ];
-   double dubnd[ 2 ];
+   int usexph;
+   int xt;
+   int yt;
    smfJSATiling skytiling;
    void *pntr;
-   int *ipntr;
-   AstCmpRegion *overlap;
-   AstRegion *target;
-   AstObject *obj;
-   int flag;
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -269,6 +282,9 @@ void smurf_jsatileinfo( int *status ) {
 /* Abort if an error has occurred. */
    if( *status != SAI__OK ) goto L999;
 
+/* Decide what sort of projection (HPX or XPH) to use. */
+   parGet0i( "USEXPH", &usexph, status );
+
 /* If required, create an all-sky NDF in which each pixel covers the area
    of a single tile, and holds the integer tile index. The NDF has an
    initial size of 1x1 pixels, but is expanded later to the required size. */
@@ -283,7 +299,8 @@ void smurf_jsatileinfo( int *status ) {
 /* Otherwise, create a FrameSet describing the whole sky in which each
    pixel corresponds to a single tile. */
    } else {
-      smf_jsatile( -1, &skytiling, 0, NULL, &fs, NULL, lbnd, ubnd, status );
+      smf_jsatile( -1, &skytiling, 0, usexph, NULL, &fs, NULL, lbnd, ubnd,
+                   status );
 
 /* Change the bounds of the output NDF. */
       ndfSbnd( 2, lbnd, ubnd, indf3, status );
@@ -292,15 +309,47 @@ void smurf_jsatileinfo( int *status ) {
       ndfPtwcs( fs, indf3, status );
 
 /* Map the data array. */
-      ndfMap( indf3, "Data", "_INTEGER", "WRITE", (void **) &ipntr, &el,
+      ndfMap( indf3, "Data", "_INTEGER", "WRITE/BAD", (void **) &ipntr, &el,
               status );
 
+/* Create all-sky map using XPH projection. */
+      if( usexph ) {
+
+/* Loop round every tile index. */
+         for( jtile = 0; jtile < skytiling.ntiles; jtile++ ) {
+
+/* Get the zero-based (x,y) indices of the tile within an HPX projection. */
+            smf_jsatilei2xy( jtile, &skytiling, &xt, &yt, NULL, status );
+
+/* Convert these HPX indices to the corresponding indices within the
+   required XPH projection. */
+            smf_jsatilexyconv( &skytiling, usexph, xt, yt, &xt, &yt, status );
+
+/* Get the vector index of the correspsonding element of the all-sky NDF. */
+            iv = xt + 4*skytiling.ntpf*yt;
+
+/* Report an error if this element has already been assigned a tile
+   index. Otherwise, store the tile index. */
+            if( ipntr[ iv ] == VAL__BADI ) {
+               ipntr[ iv ] = jtile;
+            } else if( *status == SAI__OK ) {
+               *status = SAI__ERROR;
+               errRepf( "", "All-sky XPH projection assigns multiple "
+                        "tiles to pixel (%d,%d).", status, xt, yt );
+               break;
+            }
+         }
+
+/* Create all-sky map using HPX projection. */
+      } else {
+
 /* Loop round every row and column */
-      for( j = 0; j < ubnd[ 1 ] - lbnd[ 1 ] + 1; j++ ) {
-         for( i = 0; i < ubnd[ 0 ] - lbnd[ 0 ] + 1; i++ ) {
+         for( j = 0; j < ubnd[ 1 ] - lbnd[ 1 ] + 1; j++ ) {
+            for( i = 0; i < ubnd[ 0 ] - lbnd[ 0 ] + 1; i++ ) {
 
 /* Store the tile index at this pixel. */
-            *(ipntr++) = smf_jsatilexy2i( i, j, &skytiling, status );
+               *(ipntr++) = smf_jsatilexy2i( i, j, &skytiling, status );
+            }
          }
       }
 
@@ -339,8 +388,8 @@ void smurf_jsatileinfo( int *status ) {
 
 /* Get the FITS header, FrameSet and Region defining the tile, and the tile
    bounds in pixel indices. */
-   smf_jsatile( itile, &skytiling, local_origin, &fc, &fs, &region, lbnd,
-                ubnd, status );
+   smf_jsatile( itile, &skytiling, local_origin, usexph, &fc, &fs, &region,
+                lbnd, ubnd, status );
 
 /* Write the FITS headers out to a file, annulling the error if the
    header is not required. */

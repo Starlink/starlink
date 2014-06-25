@@ -169,7 +169,7 @@ int *smf_jsatiles_data( ThrWorkForce *wf, Grp *igrp, size_t size,
    corresponds to a single tile. The current Frame is ICRS (RA,Dec) and
    the base Frame is grid coords in which each grid pixel corresponds to
    a single tile. Then invert it so that the current Frame is GRID. */
-         smf_jsatile( -1, tiling, 0, NULL, &fs, NULL, lbnd, ubnd, status );
+         smf_jsatile( -1, tiling, 0, 0, NULL, &fs, NULL, lbnd, ubnd, status );
          astInvert( fs );
 
 /* Unlock the FrameSet pointer so that it can be locked by the worker

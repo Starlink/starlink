@@ -2950,6 +2950,16 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter usexph {
+                type _INTEGER
+                access READ
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                prompt {Projection (0=HPX 1=Northern XPH -1=Southern XPH)"}
+                default 0
+                helpkey *
+            }
+
         }
 
         action jsatilelist {

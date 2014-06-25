@@ -162,7 +162,7 @@ int *smf_jsatiles_region( AstRegion *region, smfJSATiling *skytiling,
    corresponds to a single tile. The current Frame is ICRS (RA,Dec) and
    the base Frame is grid coords in which each grid pixel corresponds to
    a single tile. */
-   smf_jsatile( -1, skytiling, 0, NULL, &fs, NULL, lbnd, ubnd, status );
+   smf_jsatile( -1, skytiling, 0, 0, NULL, &fs, NULL, lbnd, ubnd, status );
 
 /* Map the Region using the FrameSet obtained above so that the new Region
    describes offsets in tiles from the lower left tile. */
@@ -226,7 +226,7 @@ int *smf_jsatiles_region( AstRegion *region, smfJSATiling *skytiling,
       if( value == -1 ) {
 
 /* Get a Region covering the tile. */
-         smf_jsatile( itile, skytiling, 0, NULL, NULL, &tregion, lbnd, ubnd,
+         smf_jsatile( itile, skytiling, 0, 0, NULL, NULL, &tregion, lbnd, ubnd,
                       status );
 
 /* See if this Region overlaps the user supplied region. Set the value of

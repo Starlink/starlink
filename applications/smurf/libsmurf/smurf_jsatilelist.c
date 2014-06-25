@@ -253,7 +253,7 @@ void smurf_jsatilelist( int *status ) {
                          status );
 
 /* Create a frame in which to define the region - we arbitrarily use tile 1. */
-      smf_jsatile( 1, &tiling, 0, NULL, &fs, NULL, lbnd, ubnd, status );
+      smf_jsatile( 1, &tiling, 0, 0, NULL, &fs, NULL, lbnd, ubnd, status );
 
 /* Create the region. */
       region = (AstRegion *) astPolygon( fs, nvert_ra, MAXVERT, vertex_data, NULL, " " );

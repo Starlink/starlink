@@ -14,8 +14,8 @@
 
 *  Invocation:
 *     void smf_jsatile( int itile, smfJSATiling *skytiling, int local_origin,
-*                       AstFitsChan **fc, AstFrameSet **fs, AstRegion **region,
-*                       int lbnd[2], int ubnd[2], int *status )
+*                       int usexph, AstFitsChan **fc, AstFrameSet **fs,
+*                       AstRegion **region, int lbnd[2], int ubnd[2], int *status )
 
 *  Arguments:
 *     itile = int (Given)
@@ -31,6 +31,13 @@
 *        projection parameters PVi_1 and PVi_2 that causes the origin of
 *        grid coordinates to be moved to the centre of the tile. If zero,
 *        the origin of pixel coordinates will be at RA=0, Dec=0.
+*     usexph = int (Given)
+*        If zero, the tile is projected into pixel space using the standard
+*        HPX projection. If greater than zero, it is projected using an
+*        XPH projection centred on the north pole. If less than zero, it is
+*        projected using an XPH projection centred on the south pole. The
+*        choice of projection changes all the returned values, except for
+*        "region".
 *     fc = AstFitsChan ** (Returned)
 *        Address at which to return a pointer to a FitsChan containing
 *        the FITS headers for the tile. May be NULL.
@@ -78,12 +85,14 @@
 *        reference point, and so their pixel bounds need to be
 *        corrected to refer to the NDF pixel origin at RA=0h.
 *     10-JUN-2014 (DSB):
-*        Correct choice of which tiles to move from bottom left to top 
+*        Correct choice of which tiles to move from bottom left to top
 *        right of the all sky pixel grid.
+*     12-JUN-2014 (DSB):
+*        Added argument "usexph".
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2011,2013 Science & Technology Facilities Council.
+*     Copyright (C) 2011,2013-2014 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -119,7 +128,7 @@
 /* Local constants */
 #define DELTA 0.05          /* Pixel offset to avoid edges */
 
-void smf_jsatile( int itile, smfJSATiling *skytiling, int local_origin,
+void smf_jsatile( int itile, smfJSATiling *skytiling, int local_origin, int usexph,
                   AstFitsChan **fc, AstFrameSet **fs, AstRegion **region,
                   int lbnd[2], int ubnd[2], int *status ) {
 
@@ -153,7 +162,7 @@ void smf_jsatile( int itile, smfJSATiling *skytiling, int local_origin,
 
 /* Get a FitsChan holding the FITS headers defining the tile WCS and
    extent. */
-   lfc = smf_jsatileheader( itile, skytiling, local_origin, &move, status );
+   lfc = smf_jsatileheader( itile, skytiling, local_origin, usexph, &move, status );
 
 /* Store the upper bounds of the tile in GRID coords (later changed to
    PIXEL coords). */
@@ -187,6 +196,20 @@ void smf_jsatile( int itile, smfJSATiling *skytiling, int local_origin,
                     "(programming error).", status );
          }
       }
+
+/* Set the Digits attributes of the SkyFrame in order to get 2 decimal
+   places in formatted RA seconds fields, and 1 decimal place in
+   formatted DEC arc-seconds fields. */
+      astSetI( lfs, "Digits(1)", 8 );
+      astSetI( lfs, "Digits(2)", 8 );
+
+/* Find the sky coords at the centre of the tile and use as the sky
+   reference position. */
+      point1[ 0 ] = ( ubnd[ 0 ] + 1.0 )/2.0;
+      point1[ 1 ] = ( ubnd[ 1 ] + 1.0 )/2.0;
+      astTran2( lfs, 1, point1, point1 + 1, 1, point2, point2 + 1 );
+      astSetD( lfs, "SkyRef(1)", point2[ 0 ] );
+      astSetD( lfs, "SkyRef(2)", point2[ 1 ] );
 
 /* If required, create a Region (a Box) describing the tile in GRID coords.
    GRID coords are described by the base Frame in the FrameSet. Reduce the
