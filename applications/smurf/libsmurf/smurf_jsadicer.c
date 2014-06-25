@@ -61,6 +61,12 @@
 *        each output NDF being cropped to the bounds of the supplied NDF. A
 *        value of two or more results in each output NDF being cropped to
 *        remove any blank borders. [2]
+*     USEXPH = _INTEGER (Read)
+*        Determines the projection used by the output NDFs. A value of zero
+*        causes the standard JSA equatorial HPX projection to be used. A
+*        positive value causes an XPH (polar HEALPix) projection centred on
+*        the north pole to be used. A negative value causes an XPH projection
+*        centred on the south pole to be used. [0]
 
 *  Authors:
 *     DSB: David Berry (JAC, Hawaii)
@@ -72,6 +78,8 @@
 *     30-JAN-2014 (DSB):
 *        Changed TRIM to allow output NDFs to be trimmed of any bad
 *        borders.
+*     25-JUN-2014 (DSB):
+*        Added parameter USEXPH.
 
 *  Copyright:
 *     Copyright (C) 2013-2014 Science and Technology Facilities Council.
@@ -138,6 +146,7 @@ void smurf_jsadicer( int *status ) {
    char basename[ 255 ];
    int indf;
    int trim;
+   int usexph;
    size_t ntile;
    size_t size;
    smfJSATiling tiling;
@@ -166,6 +175,9 @@ void smurf_jsadicer( int *status ) {
 /* See how the output NDFs are to be trimmed. */
    parGet0i( "TRIM", &trim, status );
 
+/* Decide what sort of projection (HPX or XPH) to use. */
+   parGet0i( "USEXPH", &usexph, status );
+
 /* Get a FitsChan holding the contents of the FITS extension from the
    input NDF. Annul the error if the NDF has no FITS extension. */
    if( *status == SAI__OK ) {
@@ -187,7 +199,7 @@ void smurf_jsadicer( int *status ) {
    ogrp = grpNew( "", status );
 
 /* Dice the map into output NDFs. */
-   smf_jsadicer( indf, basename, trim, tiling.instrument, &ntile,
+   smf_jsadicer( indf, basename, trim, tiling.instrument, usexph, &ntile,
                  ogrp, status );
 
 /* Write out the list of output NDF names, annulling the error if a null

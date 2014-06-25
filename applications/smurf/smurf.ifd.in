@@ -2783,6 +2783,15 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter usexph {
+                type _INTEGER
+                access READ
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                prompt {Output projection}
+                default 0
+                helpkey *
+            }
         }
 
         action jsatileinfo {

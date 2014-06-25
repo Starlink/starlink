@@ -33,8 +33,8 @@ void         smf_jsainstrument( const char *param, AstFitsChan *fc,
                                 smf_inst_t def, smfJSATiling *tiling,
                                 int *status );
 void         smf_jsadicer( int indf, const char *base, int trim,
-                           smf_inst_t instrument, size_t *ntile, Grp *grp,
-                           int *status );
+                           smf_inst_t instrument, int usexph, size_t *ntile,
+                           Grp *grp, int *status );
 void         smf_jsatile( int itile, smfJSATiling *jsatiling,
                           int local_origin, int usexph, AstFitsChan **fc,
                           AstFrameSet **fs, AstRegion **region, int lbnd[2],
