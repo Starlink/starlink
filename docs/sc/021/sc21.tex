@@ -2248,18 +2248,32 @@ difference is the improvement in the bowling around strong sources.
 }
 \end{htmlonly}
 
-\subsubsection{Problem solving configuration files}
+\subsection{\xlabel{problem}Problem solving configuration files}
+\label{sec:problem}
 
-Two trouble-shooting configuration files are available to supplement
-\file{dimmconfig\_bright\_extended}:
+Two trouble-shooting configuration files are available to supplement your
+configuration file.
+\begin{itemize}[noitemsep]
+\item \file{dimmconfig\_fix\_convergence} to help your map converge.
+\item \file{dimmconfig\_fix\_blobs} to remove large blooms or blobs of spurious
+emission in your map.
+\end{itemize}
+By default these recipes do not point to any existing configuration file. To use
+these recipes in addition to  \file{dimmconfig\_bright\_extended.lis} you should
+create a parameter file containing the following lines.
+\begin{quote}
+\begin{verbatim}
+^/star/share/smurf/dimmconfig_bright_extended.lis
+^/star/share/smurf/dimmconfig_fix_blobs.lis
+\end{verbatim}
+\end{quote}
+This reads a complete set of configuration parameter from the
+\file{dimmconfig\_bright\_extended.lis} file, and then assigns new values for just
+those parameters defined in \file{dimmconfig\_fix\_blobs.lis}. These values override
+the values specified in \file{dimmconfig\_bright\_extended.lis}.
 
-\file{dimmconfig\_fix\_convergence} to help your map converge, and\\*
-\file{dimmconfig\_fix\_blobs} to remove large blooms or blobs of
-spurious emission in your final map.
-
-The point to \file{dimmconfig\_bright\_extended.lis} is so the parameters
-are in addition to those listed above. These files are discussed in more
-detail in \cref{Chapter}{sec:tweak}{Tailoring Your Reduction}.
+The parameters in these recipes are discussed further
+\cref{Chapter}{sec:tweak}{Tailoring Your Reduction}.
 
 \clearpage
 
