@@ -803,6 +803,35 @@ there if new files are expected but do not appear in your working
 directory.\\*\\*}
 \end{htmlonly}
 
+\subsubsection{\xlabel{help}How to get help}
+
+\begin{table}[h!]
+\begin{tabular}{p{2.3cm}|p{7.3cm}|p{5cm}}
+\textbf{Help\newline command} & \textbf{Description} & \textbf{Usage}\\
+\hline
+\task{showme} & If you know the name of the Starlink document you want to view
+                use \task{showme}. When run, it launches a new webpage or tab
+                displaying the hypertext version of the document. &
+                \texttt{\% showme sun95}\\
+\hline
+\task{findme} & \task{findme} searches Starlink documents for a keyword. When
+                run, it launches a new webpage or tab listing the results. &
+                \texttt{\% findme kappa}\\
+\hline
+\task{docfind} & \task{docfind} searches the internal list files for keywords. It then
+                 searches the document titles. The result is displayed using the
+                 Unix \task{more} command. & \texttt{\% docfind kappa}\\
+\hline
+Run routines with prompts & You can run any routine with the option
+                            \texttt{prompt} after the command. This will
+                            prompt for every parameter available. If you
+                            then want a further description of any parameter
+                            type  \texttt{?} at the relevant prompt. &
+                            \texttt{\% makemap prompt \newline\ \% REF - Ref. NDF /!/$>$ ?}\\
+\hline
+\end{tabular}
+\end{table}
+
 \subsection{\xlabel{options}Processing options}
 
 You have two options for processing your data:
