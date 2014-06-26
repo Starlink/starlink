@@ -927,16 +927,14 @@ For full details of the array setup and operation see Holland et al.
 
 \begin{figure}[t!]
 \begin{center}
-\includegraphics[width=0.4\linewidth]{sc21_450array}
-\hspace{1cm}
-\includegraphics[width=0.4\linewidth]{sc21_850array}
+\includegraphics[width=0.8\linewidth]{sc21_arrays}
 \label{fig:arrays}
 \caption[The physical layout of the arrays at each wavelength]{
-  \small The layout of the arrays at 450$\mu$m (left) and
-  850$\mu$m (right). The labels denote the name assigned to each
+  \small The layout of the arrays at 850$\mu$m (left) and
+  450$\mu$m (right). The labels denote the name assigned to each
   sub-array. Raw data files are generated separately for each sub-array
-  and must be co-added. This figure was made my running \wcsmosaic\ on
-  raw files from each sub-array.
+  and must be co-added. This figure was made by running
+ \wcsmosaic\ on a raw sub-scan from each sub-array.
 }
 \end{center}
 \end{figure}
@@ -945,16 +943,16 @@ For full details of the array setup and operation see Holland et al.
 \label{sec:mmodes}
 
 Two observing modes are offered for SCUBA-2---\textsc{daisy} and
-\textsc{pong}. As much of the work \mbox{SCUBA-2} will be doing involves
+\textsc{pong}. As the bulk of \mbox{SCUBA-2} observing involves
 large area mapping, both observing modes are scan patterns. Your
 choice depends on the size of the area you wish to map, where you
 would like your integration time concentrated and the degree of
 extended emission you wish to recover.
-
-\begin{minipage}[t]{0.15\linewidth}
+\newline\newline
+\begin{minipage}[t]{0.12\linewidth}
 \textbf{PONG}
 \end{minipage}
-\begin{minipage}[t]{0.85\linewidth}A \textsc{pong} map is the scan
+\begin{minipage}[t]{0.87\linewidth}A \textsc{pong} map is the scan
 strategy for covering a large area. The default options allow for three
 sizes---900\,arcsec, 1800\,arcsec and 3600\,arcsec. A single \textsc{pong} map is
 a square of these dimensions and the telescope fills in the square by
@@ -972,10 +970,10 @@ size of the SCUBA-2 field-of-view that determines the sensitivity to
 large-scale structure.
 \end{minipage}
 \latex{\\ \\ \\}
-\begin{minipage}[t]{0.15\linewidth}
+\begin{minipage}[t]{0.12\linewidth}
 \textbf{DAISY}
 \end{minipage}
-\begin{minipage}[t]{0.85\linewidth}
+\begin{minipage}[t]{0.87\linewidth}
 \textsc{daisy} maps are the option for point-like or compact sources
 ($<$3~arcmin) by maximising the exposure time on the centre of the
 image. The telescope moves at a constant velocity in a `spirograph'
@@ -983,7 +981,7 @@ pattern that has the advantage of keeping the source on the array
 throughout the observation. This is shown in the top panel of
 \cref{Figure}{fig:scan}{the figure below}.
 \end{minipage}
-\latex{\vspace{1.5cm}}\\
+\latex{\vspace{1cm}}\\
 \textbf{Why these patterns?}\\*
 SCUBA-2 removes atmospheric noise in the data-processing
 stage (Holland et al. 2013) \cite{s2main}. The power spectrum
@@ -1156,13 +1154,11 @@ prior to reducing your data with the map-maker.\\*\\*}
 There are two \Kappa\ tasks which are extremely useful for examining
 your data: \fitslist\ and \ndftrace, which can be used to view the
 FITS headers and dimensions of the data.
-\vspace{5mm}
-
-\begin{center}
-\begin{minipage}[t]{0.12\linewidth}
+\newline\newline
+\begin{minipage}[t]{0.15\linewidth}
 \textbf{fitslist}
 \end{minipage}
-\begin{minipage}[t]{0.75\linewidth}This lists the FITS header information
+\begin{minipage}[t]{0.85\linewidth}This lists the FITS header information
 for any file (raw or reduced). This extensive list includes dates \& times,
 source name, scan type, pattern and velocity, size of the map, exposure
 time, start and end elevation, opacity, and the temperature of the
@@ -1180,14 +1176,11 @@ use the \fitsval\ command instead, e.g.\\
 \end{verbatim}
 \end{myquote}
 \end{minipage}
-\newline
-
-
-\begin{minipage}[t]{0.1\linewidth} \end{minipage}
-\begin{minipage}[t]{0.12\linewidth}
+\newline\newline
+\begin{minipage}[t]{0.15\linewidth}
 \textbf{ndftrace}
 \end{minipage}
-\begin{minipage}[t]{0.75\linewidth}
+\begin{minipage}[t]{0.85\linewidth}
 \task{ndftrace} displays the attributes of the data structure. This will tell
 you the units of the data, pixel bounds, dimensions, world coordinate
 bounds and attributes, and axis assignations.
@@ -1197,9 +1190,7 @@ bounds and attributes, and axis assignations.
 \end{verbatim}
 \end{myquote}
 \end{minipage}
-\vspace{4mm}
-\end{center}
-
+\newline\newline
 Full details of these commands can be found in the \xref{\textsc{Kappa} manual}{sun95}{}.
 
 \begin{latexonly}
@@ -1999,7 +1990,7 @@ encountered) override any other instance of them.
 
 %\hrule
 %\vspace{0.2cm}
-\myfig{sc21_dimmcongitree}{t}{width=\linewidth}{fig:configtree}{
+\myfig{sc21_dimmcongitree}{[t]}{width=\linewidth}{fig:configtree}{
   Hierarchy of the configuration files}{
   Hierarchy of the configuration files.
 }
@@ -3487,7 +3478,7 @@ to help determine an appropriate number of iterations. This is useful
 when a fixed number of iterations have been requested (i.e. a positive
 value for \param{numiter}) and the map solution diverges before
 they have completed.
-
+\newline\newline
 \textbf{shortmaps}\\
 If the parameter \param{shortmaps} is non-zero, a map is made from
 every group of adjacent timeslices (as specified by the parameter).
@@ -3581,7 +3572,7 @@ conveniently by stacking them into a single cube using the \smurf\
 command \stackframes. This cube can then be viewed as a
 `movie' with \gaia, using the animation option to loop through the
 itermaps. See \cref{Figure}{fig:stack}{the box above} for instructions.
-
+\newline\newline
 \textbf{exportmodel}\\
 This parameter has been discussed in
 \cref{Section}{sec:export}{Exporting individual models} and allowed
@@ -3924,10 +3915,9 @@ model of the sky (from the current iteration) to which the sky
 estimate (from the previous iteration) is then added. In this way the
 signal from all of the chunks is built up over the iterations and is
 all included in the final map estimate when convergence is reached.
-See \cref{Figure}{fig:skyloop}{the diagram below}.
 
 
-\myfig{sc21_skyloop}{[h!]}{width=0.55\linewidth}{fig:skyloop}{
+\myfig{sc21_skyloop}{[b!]}{width=0.55\linewidth}{fig:skyloop}{
   Illustration of the \task{skyloop} approach}{
   Illustration of the \task{skyloop} approach
   to map-making compared with the standard map-maker.
@@ -4478,9 +4468,10 @@ ast.zero_snr = 0
 \vspace{0.2cm}\\
 We now crop the map to remove the noisy edges using the \picard\ recipe
 \drrecipe{CROP\_JCMT\_IMAGES}. To determine what to trim we can look
-at the exposure-time image with \gaia.
+at the exposure-time image with \gaia.  See
+\cref{Figure}{fig:exptime}{the exposure time image}.
 
-\myfig{sc21_gal_exptime}{[b!]}{width=0.7\linewidth}{fig:exptime}{
+\myfig{sc21_gal_exptime}{[h!]}{width=0.7\linewidth}{fig:exptime}{
   Galactic example: exposure time map}{
   The exposure-time image of the science map from \cref{Figure}{fig:galmakemap}{
   our example map}. You can right-click and drag the mouse
@@ -4527,7 +4518,7 @@ file} for details. Another option is to supply an external mask from
 a different dataset, e.g. a
 \htmladdnormallink{Herschel}{http://herschel.esac.esa.int/} map.
 
-\myfig{sc21_gal12_crop}{[t!]}{width=0.75\hsize}{fig:crop_map}{
+\myfig{sc21_gal12_crop}{[b!]}{width=0.65\hsize}{fig:crop_map}{
   Galactic example: cropped final map}{
   The final cropped, reduced map from the map-maker run with
   an external mask supplied.
@@ -4725,10 +4716,10 @@ Then run the pipeline calling the parameter file via the
 \subsection{\xlabel{running_pl}Running the Science Pipeline}
 \label{sec:plsteps}
 
-\begin{minipage}[t]{0.15\linewidth}
+\begin{minipage}[t]{0.12\linewidth}
 \textbf{Step 1:}
 \end{minipage}
-\begin{minipage}[t]{0.85\linewidth}
+\begin{minipage}[t]{0.87\linewidth}
 \textbf{Initialise ORAC-DR} \\This is done by:
 \begin{myquote}
 \begin{verbatim}
@@ -4737,11 +4728,11 @@ Then run the pipeline calling the parameter file via the
 \end{myquote}
 \end{minipage}
 
-\begin{minipage}[t]{0.15\linewidth}
+\begin{minipage}[t]{0.12\linewidth}
 \textbf{Step 2:}
 \end{minipage}
-\begin{minipage}[t]{0.85\linewidth}
 \textbf{Set environment variables}. \\These ensure the data are read
+\begin{minipage}[t]{0.87\linewidth}
 from and written to the right places. Many are set automatically when
 the pipeline is initialised but others must be set manually. Details
 of the optional variables are given in \pipelinesun\ but the three
@@ -4756,11 +4747,11 @@ written. Also used as the location for a user-specified configuration file.\\
 \end{itemize}
 \end{minipage}
 
-\begin{minipage}[t]{0.15\linewidth}
+\begin{minipage}[t]{0.12\linewidth}
 \textbf{Step 3:}
 \end{minipage}
-\begin{minipage}[t]{0.85\linewidth}
 \textbf{(Optional) Create a personalised configuration file and/or parameter file.} \\
+\begin{minipage}[t]{0.87\linewidth}
 See \cref{Section}{sec:parameterfile}{Changing the defaults} for
 details. In this example we find the recipe \drrecipe{REDUCE\_SCAN}
 assigned to our data. We are happy with the steps in this recipe but
@@ -4780,11 +4771,11 @@ FINDCLUMPS_CFG = myfellwalkerparams.lis
 \end{minipage}
 
 
-\begin{minipage}[t]{0.15\linewidth}
+\begin{minipage}[t]{0.12\linewidth}
 \textbf{Step 4:}
 \end{minipage}
-\begin{minipage}[t]{0.85\linewidth}
 \textbf{Run the pipeline.} \\Run the pipeline using the
+\begin{minipage}[t]{0.87\linewidth}
 \texttt{-recpars} option to specify a parameter file if required.
 \begin{myquote}
 \begin{verbatim}
