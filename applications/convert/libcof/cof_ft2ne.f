@@ -38,7 +38,7 @@
 *  Copyright:
 *     Copyright (C) 1997 Central Laboratory of the Research Councils.
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2008, 2009, 2011, 2012 Science & Technology
+*     Copyright (C) 2008, 2009, 2011, 2012, 2014 Science & Technology
 *     Facilities Council.
 *     All Rights Reserved.
 
@@ -86,6 +86,11 @@
 *        error if the extension holds WCS values.
 *     2012 April 30 (MJC):
 *        Add 64-bit integer.
+*     2014 June 25 (MJC):
+*        Corrected the handling of primitive objects not at the top
+*        level of the MORE structure by not creating a locator for the
+*        primitive and only passing the parent structure's locator to
+*        COF_T2HDS.
 *     {enter_further_changes_here}
 
 *-
@@ -123,6 +128,7 @@
       INTEGER END( MAXWRD )      ! End columns of words (not used)
       CHARACTER * ( ( MAXWRD+1 ) * DAT__SZNAM ) EXPATH ! Extension path
       CHARACTER * ( DAT__SZTYP ) EXTYPE ! Extension data type
+      INTEGER FINAL              ! Deepest level in the component path
       LOGICAL GOMORE             ! Look for the top MORE component?
       INTEGER INDICE( MAXWRD - 2 ) ! Indices of the structure's cell
       INTEGER LEVEL              ! Extension level
@@ -223,7 +229,7 @@
 
 *  Deal with a primitive extension.  This can only be written if there
 *  is no existing component of the same name.
-      IF ( PRIMEX ) THEN
+      IF ( PRIMEX .AND. NWORD .EQ. ELEVEL ) THEN
          IF ( .NOT. THERE ) THEN
 
 *  Obtain a locator to the NDF, thence the NDF extension container.
@@ -260,8 +266,9 @@
       END IF
 
 *  Create sub-structures of the extension.
+      FINAL = NWORD - 2
       IF ( NWORD .GT. ELEVEL ) THEN
-         DO LEVEL = ELEVEL - 1, NWORD - 2
+         DO LEVEL = ELEVEL - 1, FINAL
 
 *  Extract the structure's name, number of dimensions and their values,
 *  dimensions, and indices to a structure element.
@@ -273,16 +280,18 @@
 
             IF ( .NOT. THERE ) THEN
 
-               IF ( LEVEL .EQ. NWORD - 2 ) THEN
+               IF ( LEVEL .EQ. FINAL ) THEN
 
 *  Make the structure using the data type.  When it is the last
 *  structure in the path, it is the component to which EXTYPE refers.
-                  IF ( NDIM .EQ. 0 ) THEN
-                     CALL DAT_NEW( SXLOC( LEVEL - 1 ), NAME, EXTYPE,
-     :                             0, 0, STATUS )
-                  ELSE
-                     CALL DAT_NEW( SXLOC( LEVEL - 1 ), NAME, EXTYPE,
-     :                             NDIM, DIMS, STATUS )
+                  IF ( .NOT. PRIMEX ) THEN
+                     IF ( NDIM .EQ. 0 ) THEN
+                        CALL DAT_NEW( SXLOC( LEVEL - 1 ), NAME, EXTYPE,
+     :                                0, 0, STATUS )
+                     ELSE
+                        CALL DAT_NEW( SXLOC( LEVEL - 1 ), NAME, EXTYPE,
+     :                                NDIM, DIMS, STATUS )
+                     END IF
                   END IF
 
 *  NDF2FITS via COF_H2BIN only creates binary tables when the structure
@@ -308,29 +317,35 @@
 
             END IF
 
-*  Obtain the locator to the structure.
-            IF ( NDIM .EQ. 0 ) THEN
-               CALL DAT_FIND( SXLOC( LEVEL - 1 ), NAME,
-     :                        SXLOC( LEVEL ), STATUS )
-            ELSE
+*  Obtain the locator to the structure or primtive object.
+            IF ( .NOT. ( PRIMEX .AND. LEVEL .EQ. FINAL ) ) THEN
+               IF ( NDIM .EQ. 0 ) THEN
+                  CALL DAT_FIND( SXLOC( LEVEL - 1 ), NAME,
+     :                           SXLOC( LEVEL ), STATUS )
+               ELSE
 
 *  Obtain the locator to the cell of the structure array via the
 *  structure locator.
-               CALL DAT_FIND( SXLOC( LEVEL - 1 ), NAME, SALOC, STATUS )
-               CALL DAT_CELL( SALOC, NDIM, INDICE, SXLOC( LEVEL ),
-     :                        STATUS )
-               CALL DAT_ANNUL( SALOC, STATUS )
+                  CALL DAT_FIND( SXLOC( LEVEL - 1 ), NAME, SALOC,
+     :                          STATUS )
+                  CALL DAT_CELL( SALOC, NDIM, INDICE, SXLOC( LEVEL ),
+     :                           STATUS )
+                  CALL DAT_ANNUL( SALOC, STATUS )
+               END IF
             END IF
-
          END DO
       END IF
 
-*  At this point the structure is accessed via locator SXLOC( NWORD-2 )
-*  Call a routine to propagate the table into the structure.
-      CALL COF_T2HDS( FUNIT, SXLOC( NWORD - 2 ), STATUS )
+*  At this point the structure is accessed via locator SXLOC( FINAL )
+*  unless it is a primitive object, whereupon the structure to
+*  contain that is one level higher and SXLOC( FINAL ) is undefined.
+*  Call a routine to propagate the table or primitive component
+*  into the structure.
+      IF ( PRIMEX ) FINAL = FINAL - 1
+      CALL COF_T2HDS( FUNIT, SXLOC( FINAL ), STATUS )
 
 *  Annul all the locators.
-      DO LEVEL = ELEVEL - 2, NWORD - 2
+      DO LEVEL = ELEVEL - 2, FINAL
          CALL DAT_ANNUL( SXLOC( LEVEL ), STATUS )
       END DO
 
