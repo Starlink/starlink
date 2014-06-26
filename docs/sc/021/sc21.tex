@@ -5101,6 +5101,26 @@ defaults are listed in \file{\$SMURF\_DIR/smurf\_extinction.def}.
 \newpage
 \subsection{\xlabel{calcrms}SCUBA2\_CHECK\_RMS}
 \label{app:checkrmsparams}
+The \picard\ recipe \drrecipe{SCUBA2\_CHECK\_RMS} estimates the RMS and
+NEFD for a given observation via two methods to compare with values from 
+the SCUBA-2 integration time calculator (ITC). 
+
+The average NEP is calculated from the QL pipeline log file (\file{log.nep}) 
+corresponding to the date and wavelength. The FCF (either from the file
+or the standard value) and mean transmission over the observation is used
+to convert this to a zenith NEFD (NEFD\_NEP). The elapsed time is used to
+convert that to an RMS noise (RMS\_NEP).
+
+The input images are cropped to the given size (as specified in the FITS
+headers or via the MAP\_HEIGHT and MAP\_WIDTH recipe parameters) before the
+mean exposure time is derived, along with the mean/median noise and NEFD
+(RMS\_MAP and NEFD\_MAP).
+
+The RMS corresponding to the observation type is calculated from the
+SCUBA-2 ITC (RMS\_ITC); the time is used to convert that to a corresponding
+NEFD (NEFD\_ITC).
+
+The parameters written out to \file{log.checkrms} are listed below.
 
 \begin{latexonly}
 \begin{table}[h!]
