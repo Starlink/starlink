@@ -3,7 +3,7 @@
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ sc21_selected_params.tex
 
 sc21.htx_tar: sc21.htx_tar.extras sc21_selected_params.tex \
-sc21_450array.png sc21_850array.png sc21_850cosmo_bf.png \
+sc21_arrays.png sc21_850cosmo_bf.png \
 sc21_850cosmo_mf_crop.png sc21_850cosmo_mf_crop_snr.png \
 sc21_brex_18.png sc21_brex_19.png \
 sc21_cosmo1-bf.png sc21_cosmo1-def.png \
