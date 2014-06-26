@@ -4112,7 +4112,7 @@ steps---running the data through the map-maker using the
 applying the \picard\ \drrecipe{SCUBA2\_MATCHED\_FILTER} recipe (see
 \cref{Section}{sec:mf}{Point-source extraction}).
 \\ \\
-\textbf{(a) Run the map-maker}\\
+\textbf{Step 1: Run the map-maker}\\
 In this example the raw data are stored locally in a directory called
 \file{data}. We have three observations (\#13, \#18, \#21) of the field
 which we will reduced independently.
@@ -4131,7 +4131,7 @@ config=^$STARLINK_DIR/share/smurf/dimmconfig_blank_field.lis
 \end{verbatim}
 \end{myquote}
 
-\textbf{(b) Combine the maps}\\
+\textbf{Step 2: Combine the maps}\\
 These three maps are then combined using the \textsc{Picard} recipe
 \xref{\drrecipe{MOSAIC\_JCMT\_IMAGES}}{sun265}{MOSAIC_JCMT_IMAGES}. In
 this case we accept the default of \wcsmosaic\ mosaicking and
@@ -4142,8 +4142,9 @@ file.
 % picard MOSAIC_JCMT_IMAGES cosmo*.sdf
 \end{verbatim}
 \end{myquote}
-The output map, \file{cosmo2\_mos.sdf}, is shown in the left-hand
-panel of \cref{Figure}{fig:cosmomap}{the figure below}. The advantage of using the
+The output map, \file{cosmo3\_mos.sdf} (named for the last input file
+appended by \_mos), is shown in the left-hand panel of
+\cref{Figure}{fig:cosmomap}{the figure below}. The advantage of using the
 \textsc{Picard} recipe over standalone \Kappa\ commands is that the exposure
 time is also propagated correctly to the output mosaic (it is stored
 in the \texttt{MORE.SMURF.EXP\_TIME} extension).
@@ -4179,29 +4180,29 @@ Gaussian. Next, the recipe is executed as follows:
 \end{myquote}
 %
 The output of this operation is a smoothed image called
-\file{cosmo2\_mos\_mf.sdf} and a cropped version is shown in the
+\file{cosmo3\_mos\_mf.sdf} and a cropped version is shown in the
 right-hand panel of \cref{Figure}{fig:cosmomap}{figure above}. You can immediately
 see the contrast to the left-hand panel which is the output from the
 map-maker. A number of signal peaks now emerge as possible sources.
 \\ \\
-\textbf{(d) Crop the map}\\
+\textbf{Step 4: Crop the map}\\
 Next we shall crop the map to remove the noisy edges,
 in this case to a 900-arcsec radius circle. The output file will be named
 \file{cosmo2\_mos\_mf\_crop.sdf}.
 \begin{myquote}
 \begin{verbatim}
-% picard CROP_JCMT_IMAGES cosmo2_mos_mf.sdf
+% picard CROP_JCMT_IMAGES cosmo3_mos_mf.sdf
 
 \end{verbatim}
 \end{myquote}
 
 \myfig{sc21_850cosmo_mf_crop_snr}{}{width=0.6\linewidth}{fig:snrmask}{
   S/N map of a cosmology field}{
-  Signal-to-noise map made the \Kappa\ command \makesnr.
+  Signal-to-noise map made using the \Kappa\ command \makesnr.
   The map has been scaled from 0 to $+$3.
 }
 
-\textbf{(e) Make an S/N map}\\
+\textbf{Step 5: Make an S/N map}\\
 Finally, we need to find sources. The filtered map contains a
 VARIANCE component, so it is easy to produce a S/N map using the
 \textsc{Kappa} task \makesnr:
@@ -4217,7 +4218,7 @@ matched filter map the
 edges no longer appear as noisy because they have been down-weighted
 by the larger noise values where there were less data.
 \\ \\
-\textbf{(f) Identify sources}\\
+\textbf{Step 6: Identify sources}\\
 The basic procedure for identifying sources would be to locate peaks
 above some threshold S/N. The S/N image above shows peaks that are
 likely to be real sources. For a start, a source appears where
@@ -4241,11 +4242,11 @@ have undergone more advanced processing than the manual method just
 given. The pipeline is particularly recommended for this recipe due to
 its extra analysis steps.
 
-\textbf{(a) Create input file}\\
+\textbf{Step 1: Create input file}\\
 Create an file with the names of all the files you wish to process (e.g.
 \file{myfiles.lis})
 \\ \\
-\textbf{(b) Run the pipeline}\\
+\textbf{Step 2: Run the pipeline}\\
 The pipeline must first be initiated for the wavelength you are
 working on. In the case below this is 850\,$\mu$m. Note that the date
 does not \emph{have} to be specified when initialising the pipeline.
@@ -4285,7 +4286,7 @@ The calibrated version of \file{\_whiten}\\
 The matched-filtered version of \file{\_cal}\\
 \end{minipage}
 
-\drrecipe{REDUCE\_SCAN\_FAINT\_POINT\_SOURCES\_JACKKNIFE} is a recipe designed to
+\drrecipe{FAINT\_POINT\_SOURCES\_JACKKNIFE} is a recipe designed to
 process blank field/extra-galactic data. The recipe uses a
 \htmladdnormallink{jack-knife}{http://en.wikipedia.org/wiki/Jackknife_resampling}
 method to remove low-spatial frequency noise and generate a matched
@@ -4295,6 +4296,21 @@ The recipe processes each observation twice, a standard reduction
 first, then a re-run with a fake point source added to the time
 series. This produces a co-added signal map (\file{\_wmos}) and a
 coadded PSF map (\file{\_mappsf}).
+
+\begin{latexonly}
+\begin{center}
+\begin{fmpage}{0.95\linewidth}
+\vspace{0.1cm}
+TIP: The recipe name \drrecipe{FAINT\_POINT\_SOURCES\_JACKKNIFE} can be used
+interchangably with  \drrecipe{REDUCE\_SCAN\_FAINT\_POINT\_SOURCES\_JACKKNIFE}.
+\end{fmpage}
+\end{center}
+\end{latexonly}
+
+\begin{htmlonly}
+\textbf{TIP: The recipe names \drrecipe{FAINT\_POINT\_SOURCES\_JACKKNIFE} can be
+used interchangably with  \drrecipe{REDUCE\_SCAN\_FAINT\_POINT\_SOURCES\_JACKKNIFE}.}
+\end{htmlonly}
 
 After the map-maker has completed, the recipe will call
 \xref{\drrecipe{SCUBA2\_JACKKNIFE}}{sun265}{SCUBA2_JACKKNIFE}. This
@@ -4312,7 +4328,7 @@ See \pipelinesun\ for more information on
 \drrecipe{REDUCE\_SCAN\_FAINT\_POINT\_SOURCES\_JACKKNIFE} and all other pipeline
 recipes.
 \\ \\
-\textbf{(c) Optional: Re-run \drrecipe{SCUBA2\_JACKKNIFE}}\\
+\textbf{Step 3: (Optional) Re-run \drrecipe{SCUBA2\_JACKKNIFE}}\\
 You may wish to run the \drrecipe{SCUBA2\_JACKKNIFE} step again
 independently from the pipeline. If your final map does not look as
 expected you might first examine the individual mosaics from the
@@ -4380,6 +4396,7 @@ input files (\file{filelist.txt}) and
 config='"^dimmconfig_bright_extended.lis,maptol=0.04,ast.zero_snr=3.5"'
 \end{verbatim}
 \end{myquote}
+The resulting map is shown in \cref{Figure}{fig:galmakemap}{the figure below}.
 
 \myfig{sc21_gal_11}{[t!]}{width=0.6\linewidth}{fig:galmakemap}{
   Galactic example: initial reduction using \file{dimmconfig\_bright\_extended.lis}}{
@@ -4480,9 +4497,8 @@ at the exposure-time image with \gaia.  See
   colour scale has been chosen to illustrate the morphology.
 }
 
-\cref{Figure}{fig:exptime}{The exposure-time image} shows a sharp drop
-off at a radius of 30\,arcmin. We can thus specify a parameter file
-like below.
+The exposure-time map shows a sharp drop off at a radius of 30\,arcmin.
+We can thus specify a parameter file like below.
 \begin{center}
 \begin{quote}
 \begin{verbatim}
@@ -4507,16 +4523,12 @@ account for both faint extended structure and very bright sources in
 the same map. You may find some degree of bowling remains around the
 brightest sources.
 
-A patchy looking background is a result of the more relaxed high pass
-filtering and is an inevitable consequence of recovering extended
-emission. To remove that is to also remove extended emission as they
-are essentially indistinguishable.
-
 There are areas you may wish to experiment with. One is to adjust the
-filtering---see \cref{Section}{sec:tweak}{Tweaking the configuration
-file} for details. Another option is to supply an external mask from
+filtering. Another option is to supply an external mask from
 a different dataset, e.g. a
 \htmladdnormallink{Herschel}{http://herschel.esac.esa.int/} map.
+See \cref{Chapter}{sec:tweak}{Tailoring Your Reduction} for further
+discussion.
 
 \myfig{sc21_gal12_crop}{[b!]}{width=0.65\hsize}{fig:crop_map}{
   Galactic example: cropped final map}{
@@ -4578,7 +4590,7 @@ The science pipeline will automate many of the steps discussed in
 
 When MSBs are created, the PI can select a pipeline recipe to assign
 to the data. When the data is run through the science pipeline this
-recipe is used by default. This recipe can overridden on the command
+recipe is then called by default. This can overridden on the command
 line---see \cref{Section}{sec:parameterfile}{Changing the defaults}.
 \begin{latexonly}
 Described below are the five main \oracdr\ science recipes.
