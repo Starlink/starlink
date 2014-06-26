@@ -4617,24 +4617,22 @@ FCFs are derived from the map.
 
 \subsubsection{\xlabel{extsources}\drrecipe{REDUCE\_SCAN\_CHECKRMS}}
 \begin{itemize}
-\item  Configuration file = \file{dimmconfig.lis}
-
+\item  Configuration file: \file{dimmconfig.lis}
+\newline\newline
 This recipe is the same as \drrecipe{REDUCE\_SCAN}, but includes extra
 performance estimations determined by \drrecipe{SCUBA2\_CHECK\_RMS} (see
 \cref{Section}{sec:checkrms}{Getting the noise}). These extra metrics
-are written to a log file \file{log.checkrms}. The advantage of running
-\drrecipe{SCUBA2\_CHECK\_RMS} in the pipeline rather than as a standalone
-\picard\ recipe is that is able to calculate results for co-added
-files.
+are written to a log file \file{log.checkrms}. Running \drrecipe{SCUBA2\_CHECK\_RMS}
+in the pipeline, rather than as a standalone \picard\ recipe, allows it
+to calculate results for co-added maps.
 \end{itemize}
 
 \subsubsection{\xlabel{extsources}\drrecipe{REDUCE\_SCAN\_EXTENDED\_SOURCES}}
 \begin{itemize}
-\item  Configuration file = \file{dimmconfig\_bright\_extended.lis}
-
-This is the recipe for processing extended sources, with the
-\file{dimmconfig\_bright\_extended.lis} configuration file called by
-\makemap. Multiple observations are co-added and the output
+\item  Configuration file: \file{dimmconfig\_bright\_extended.lis}
+\newline\newline
+This is the recipe for processing extended sources. Multiple observations
+are co-added and the output
 map is calibrated in units of mJy/arcsec$^2$. This recipe also
 performs a source-finder routine; the results are written as a FITS
 catalogue (with file extension \file{.FIT}) which can be read as a
@@ -4643,29 +4641,29 @@ local catalogue into \gaia.
 
 \subsubsection{\xlabel{faint}\drrecipe{REDUCE\_SCAN\_FAINT\_POINT\_SOURCES}}
 \begin{itemize}
-\item  Configuration file = \file{dimmconfig\_blank\_field.lis}
-
+\item  Configuration file: \file{dimmconfig\_blank\_field.lis}
+\newline\newline
 This is the recipe for processing maps containing faint compact
 sources. This time the configuration file called by \makemap\
-is \file{dimmconfig\_blank\_field.lis}. The resulting map is further
-processed with a matched filter to give the first output map. Then the
-S/N is taken to enhance point sources.  This
-S/N map is written out as a second output file. This
-recipe also performs a source finder routine; the results are written
+is \file{dimmconfig\_blank\_field.lis} and the map calibrated in mJy/beam.
+The output map is further processed with a matched filter, then the
+S/N is taken to enhance point sources.  A map is written out at each step.
+This recipe also performs a source finder routine; the results are written
 as a FITS catalogue (with file extension \file{.FIT}) which can be
 read as a local catalogue into \gaia.
 \end{itemize}
 
-\subsubsection{\xlabel{faintjk}\drrecipe{REDUCE\_SCAN\_FAINT\_POINT\_SOURCES\_JACKKNIFE}}
+\subsubsection{\xlabel{faintjk}\drrecipe{FAINT\_POINT\_SOURCES\_JACKKNIFE}}
 \begin{itemize}
-\item Configuration file = \file{dimmconfig\_blank\_field.lis}
-
+\item Configuration file: \file{dimmconfig\_blank\_field.lis}
+\newline\newline
 This recipe uses a
 \htmladdnormallink{jack-knife}{http://en.wikipedia.org/wiki/Jackknife_resampling}
 method to remove residual low-spatial
 frequency noise and create an optimal matched-filtered output map. The
 map-maker is run twice, first as a standard reduction using
-\file{dimmconfig\_blank\_field.lis}, and the second time with a fake
+\file{dimmconfig\_blank\_field.lis} (and calibrated in mJy/beam), and the
+second time with a fake
 source added to the time series. This creates a signal map and an
 effective PSF map. A jack-knife map is generated from two halves of
 the dataset and the maps are `whitened' by the removal of the residual
@@ -4701,13 +4699,13 @@ example both of these options will return the same result:
 
 Although each recipe calls one of the standard configuration files
 you can specify your own. You will need to create a recipe parameter
-file. This file will contain set the parameter \param{MAKEMAP\_CONFIG} to be
+file. This file will set the parameter \param{MAKEMAP\_CONFIG} to be
 your new configuration file. The first line must be the name of the
 recipe used in the reduction.
 
-For example, to run the pipeline with \drrecipe{REDUCE\_SCAN\_CHECKRMS} but your
-own configuration file (\file{myconfig.lis}), the recipe parameter file
-(named \file{mypars.ini}) will look like this:
+For example, to run the pipeline with \drrecipe{REDUCE\_SCAN\_CHECKRMS} with a
+configuration file called \file{myconfig.lis}, the recipe parameter file
+(\file{mypars.ini}) will look like this.
 \vspace{0.2cm}
 \begin{quote}
 \begin{verbatim}
@@ -4720,7 +4718,7 @@ Then run the pipeline calling the parameter file via the
 \texttt{-recpars} option.
 \begin{myquote}
 \begin{verbatim}
-% oracdr -file mylist -loop file -log x -recpars=myparams.ini REDUCE_SCAN_CHECKRMS
+% oracdr -file mylist -loop file -log xf -recpars myparams.ini REDUCE_SCAN_CHECKRMS
 \end{verbatim}
 \end{myquote}
 
@@ -4743,8 +4741,8 @@ Then run the pipeline calling the parameter file via the
 \begin{minipage}[t]{0.12\linewidth}
 \textbf{Step 2:}
 \end{minipage}
-\textbf{Set environment variables}. \\These ensure the data are read
 \begin{minipage}[t]{0.87\linewidth}
+\textbf{Set environment variables} \\These ensure the data are read
 from and written to the right places. Many are set automatically when
 the pipeline is initialised but others must be set manually. Details
 of the optional variables are given in \pipelinesun\ but the three
@@ -4762,8 +4760,8 @@ written. Also used as the location for a user-specified configuration file.\\
 \begin{minipage}[t]{0.12\linewidth}
 \textbf{Step 3:}
 \end{minipage}
-\textbf{(Optional) Create a personalised configuration file and/or parameter file.} \\
 \begin{minipage}[t]{0.87\linewidth}
+\textbf{(Optional) Create a personalised configuration file and/or parameter file} \\
 See \cref{Section}{sec:parameterfile}{Changing the defaults} for
 details. In this example we find the recipe \drrecipe{REDUCE\_SCAN}
 assigned to our data. We are happy with the steps in this recipe but
@@ -4786,12 +4784,12 @@ FINDCLUMPS_CFG = myfellwalkerparams.lis
 \begin{minipage}[t]{0.12\linewidth}
 \textbf{Step 4:}
 \end{minipage}
-\textbf{Run the pipeline.} \\Run the pipeline using the
 \begin{minipage}[t]{0.87\linewidth}
+\textbf{Run the pipeline} \\Run the pipeline using the
 \texttt{-recpars} option to specify a parameter file if required.
 \begin{myquote}
 \begin{verbatim}
-% oracdr -loop file -files inputlist.txt -log xf -recpars mypars.ini
+% oracdr -files inputlist.txt -loop file  -log xf -recpars mypars.ini
 \end{verbatim}
 \end{myquote}
 \end{minipage}
@@ -4807,9 +4805,9 @@ weighting.
 The final maps in your output directory will have the suffix
 \file{\_reduced}. Maps will be made for individual observations,
 which will start with an \file{s} (e.g.
-\file{s20120720\_00030\_850\_reduced.sdf}). Group maps, which may contain
+\file{s20140620\_00030\_850\_reduced.sdf}). Group maps, which may contain
 co-added observations from a single night, are also produced which
-have the prefix \file{gs} (e.g. \file{gs20120720\_30\_850\_reduced.sdf}).
+have the prefix \file{gs} (e.g. \file{gs20140620\_30\_850\_reduced.sdf}).
 
 \textbf{Note:} A group file is \emph{always} created, even if only a single
 observation is being processed.
