@@ -119,6 +119,9 @@
 *     30-JAN-2014 (DSB):
 *        Changed TRIM to allow output NDFs to be trimmed of any bad
 *        borders.
+*     26-JUN-2014 (DSB):
+*        Support input NDFs that straddle a discontinuity in the HPX
+*        projection.
 *-
 '''
 
@@ -129,6 +132,10 @@ from starutil import NDG
 from starutil import Parameter
 from starutil import ParSys
 from starutil import msg_out
+
+#  Transitional latitude (in deg.s) between polar and equatorial regions
+#  of HPX projection.
+HPX_TRANS = 41.8103
 
 #  Assume for the moment that we will not be retaining temporary files.
 retain = 0
@@ -235,9 +242,62 @@ try:
    invoke( "$SMURF_DIR/jsatilelist in={0} instrument={1} quiet".format(inndf,instrument) )
    tiles = starutil.get_task_par( "TILES", "jsatilelist" )
 
-#  Create a file holding the FITS-WCS header for the first tile.
+#  JSADICER requires the input array to be gridded on the JSA all-sky
+#  pixel grid. This is normally an HPX projection, but if the supplied
+#  NDF straddles a discontinuity in the HPX projection then we need to
+#  use an XPH (polar HEALPix) projection instead. So now we see if this
+#  is the case. Initially, assume that we can use a normal HPX projection.
+   usexph = 0
+
+#  Now loop round all the tiles touched by the supplied NDF.
+   igore_first = -1
+   for tile in tiles:
+
+#  Get the RA and Dec at the centre of the tile, and convert to degrees.
+      invoke( "$SMURF_DIR/jsatileinfo itile={0} instrument={1} quiet".format(tile,instrument) )
+      racen = math.degrees(float(starutil.get_task_par( "RACEN", "jsatileinfo" )))
+      deccen = math.degrees(float(starutil.get_task_par( "DECCEN", "jsatileinfo" )))
+
+#  Ensure the RA is in the range 0 - 360.
+      if racen < 0.0:
+         racen += 360.0
+
+#  The HPX projection is made up of four "gores", each of which spans
+#  90 degrees in RA. Find the zero-based integer index of the gore
+#  containing the current tile.
+      igore = int( racen / 90.0 )
+
+#  Discontinuities only affect tiles in the polar regions of the HPX
+#  projection, so pass on if the Dec is below the value defining the
+#  boundary between polar and equatorial regions. First deal with
+#  northern polar tiles.
+      if deccen > HPX_TRANS:
+
+#  If this is the first polar tile, just record its gore index.
+         if igore_first == -1:
+            igore_first = igore
+
+#  Otherwise, if the current polar tile is in a different gore to the first
+#  polar tile, the NDF straddles a northern HPX discontinuity, so use an
+#  XPH projection centred on the north pole.
+         elif igore != igore_first:
+            usexph = 1
+            break
+
+#  Now do the same for southern polar tiles. Set usexph to -1 to indicate
+#  a southern XPH projection should be used.
+      elif deccen < -HPX_TRANS:
+         if igore_first == -1:
+            igore_first = igore
+         elif igore != igore_first:
+            usexph = -1
+            break;
+
+#  Create a file holding the FITS-WCS header for the first tile, using
+#  an HPX or XPH projection as determined above.
    head = "{0}/header".format(NDG.tempdir)
-   invoke( "$SMURF_DIR/jsatileinfo itile={0} instrument={1} header={2} quiet".format(tiles[0],instrument,head) )
+   invoke( "$SMURF_DIR/jsatileinfo itile={0} instrument={1} header={2} "
+           "usexph={3} quiet".format(tiles[0],instrument,head,usexph) )
 
 #  Get the lower pixel index bounds of the first tile.
    lx = int( starutil.get_task_par( "LBND(1)", "jsatileinfo" ) )
@@ -277,7 +337,7 @@ try:
       width = 0.8*pixsize_tile/pixsize_in
 
 #  Create an intermediate NDF by resampling the supplied NDF onto the pixel
-#  grid of the firts tile. Do 2D and 3D separately.
+#  grid of the first tile. Do 2D and 3D separately.
    jsa_montage = NDG(1)
    invoke( "$KAPPA_DIR/wcsalign in={0} out={1} ref={2} lbnd=! method={3} "
            "params=\[0,{4}\]".format(inndf,jsa_montage,ref,method,width) )
@@ -289,7 +349,7 @@ try:
 #  Remove temporary files.
    cleanup()
 
-#  If an StarUtilError of any kind occurred, display the message but hide the
+#  If a StarUtilError of any kind occurred, display the message but hide the
 #  python traceback. To see the trace back, uncomment "raise" instead.
 except starutil.StarUtilError as err:
 #  raise

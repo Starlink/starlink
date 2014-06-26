@@ -125,10 +125,6 @@
 #include "libsmf/smf.h"
 #include "libsmf/jsatiles.h"
 
-/* Transitional latitude (in deg.s) between polar and equatorial regions
-   of HPX projection. */
-#define HPX_TRANS 41.8103
-
 void smf_getrefwcs( const char *param, Grp *igrp, AstFrameSet **specwcs,
                     AstFrameSet **spacewcs, int *isjsa, int *status ){
 
@@ -281,7 +277,7 @@ void smf_getrefwcs( const char *param, Grp *igrp, AstFrameSet **specwcs,
 
 /* If the circle centre is above the northern transitional latitude, we
    need to use the XPH projection centred on the north pole. */
-                        if( centre[ 1 ] > AST__DD2R*HPX_TRANS ) {
+                        if( centre[ 1 ] > AST__DD2R*SMF__HPX_TRANS ) {
                            msgOutif( MSG__VERB, "", "The Map will be created "
                                      "using an XPH projection centred on the "
                                      "north pole.", status );
@@ -290,7 +286,7 @@ void smf_getrefwcs( const char *param, Grp *igrp, AstFrameSet **specwcs,
 
 /* If the circle centre is below the southern transitional latitude, we
    need to use the XPH projection centred on the south pole. */
-                        } else if( centre[ 1 ] < -AST__DD2R*HPX_TRANS ) {
+                        } else if( centre[ 1 ] < -AST__DD2R*SMF__HPX_TRANS ) {
                            msgOutif( MSG__VERB, "", "The Map will be created "
                                      "using an XPH projection centred on the "
                                      "south pole.", status );

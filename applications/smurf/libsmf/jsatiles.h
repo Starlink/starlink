@@ -1,5 +1,9 @@
 #include "star/thr.h"
 
+/* Transitional latitude (in deg.s) between polar and equatorial regions
+   of HPX projection. */
+#define SMF__HPX_TRANS 41.8103
+
 /* JCMT instruments */
 
 typedef enum {
