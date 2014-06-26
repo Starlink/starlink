@@ -1054,7 +1054,11 @@ file size); all of the scans in between are science.
 \begin{myquote}
 \begin{verbatim}
 % ls -lh /jcmtdata/raw/scuba2/s8a/20131227/00034
-
+\end{verbatim}
+\end{myquote}
+\vspace{-1cm}
+\begin{quote}
+\begin{verbatim}
 -rw-r--r-- 1 jcmtarch jcmt 8.0M Dec 27 03:00 s8a20131227_00034_0001.sdf
 -rw-r--r-- 1 jcmtarch jcmt  22M Dec 27 03:00 s8a20131227_00034_0002.sdf
 -rw-r--r-- 1 jcmtarch jcmt  22M Dec 27 03:01 s8a20131227_00034_0003.sdf
@@ -1063,7 +1067,7 @@ file size); all of the scans in between are science.
 -rw-r--r-- 1 jcmtarch jcmt 6.8M Dec 27 03:02 s8a20131227_00034_0006.sdf
 -rw-r--r-- 1 jcmtarch jcmt 8.0M Dec 27 03:03 s8a20131227_00034_0007.sdf
 \end{verbatim}
-\end{myquote}
+\end{quote}
 The SCUBA-2 data
 acquisition (DA) system writes out a data file every 30 seconds; each
 of which contains 22\,MB of data. The only exception is the final science
@@ -4149,17 +4153,17 @@ in the \texttt{MORE.SMURF.EXP\_TIME} extension).
   applied and it has been cropped.
 }
 
-\textbf{(c) Apply the matched filter}\\
+\textbf{Step 3: Apply the matched filter}\\
 In order to optimally find sources that are the size of the telescope
-beam, we apply the matched filter recipe --
+beam, we apply the matched filter recipe, namely
 \xref{\drrecipe{SCUBA2\_MATCHED\_FILTER}}{sun265}{SCUBA2_MATCHED_FILTER}.
 We create a simple parameter file called \file{smooth.ini}:
-\begin{myquote}
+\begin{quote}
 \begin{verbatim}
 [SCUBA2_MATCHED_FILTER]
 SMOOTH_FWHM = 15
 \end{verbatim}
-\end{myquote}
+\end{quote}
 where \param{SMOOTH\_FWHM~=~15} indicates that the background should be
 estimated by first smoothing the map and PSF with a 15-arcsec FWHM
 Gaussian. Next, the recipe is executed as follows:
@@ -4324,12 +4328,12 @@ If you decide to re-run this step you first co-add all the
 \end{myquote}
 Next create a parameter file (\file{recpars.lis}) for the jack-knife
 recipe (\drrecipe{SCUBA2\_JACKKNIFE}) containing the following lines.
-\begin{myquote}
+\begin{quote}
 \begin{verbatim}
 [SCUBA2_JACKKNIFE]
 PSF_MATCHFILTER = <name_of_above_coadded_PSF>.sdf
 \end{verbatim}
-\end{myquote}
+\end{quote}
 Another option for this parameter file is \param{WHITEN\_BOX} to set the
 size of the region used to calculate the angular power spectrum.
 Finally run \drrecipe{SCUBA2\_JACKKNIFE}.
@@ -5296,10 +5300,15 @@ relation was applied by using the \Kappa\ command \hislist.
 \begin{myquote}
 \begin{verbatim}
 %  hislist file | grep EXT.TAURELATION
-      , EXT.TAURELATION.450=(26.0,-0.012),
-      EXT.TAURELATION.850=(4.6,-0.0043), EXT.TAUSRC=auto, FAKESCALE=1,
 \end{verbatim}
 \end{myquote}
+This will return something like the following,
+\begin{quote}
+\begin{verbatim}
+      EXT.TAURELATION.450=(26.0,-0.012),
+      EXT.TAURELATION.850=(4.6,-0.0043), EXT.TAUSRC=auto, FAKESCALE=1,
+\end{verbatim}
+\end{quote}
 
 \newpage
 \subsection{\xlabel{cog}Aperture-photometry curve of growth}
