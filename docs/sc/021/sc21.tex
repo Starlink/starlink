@@ -611,9 +611,8 @@ This guide covers the following topics.
 
 \subsection{\xlabel{computing}Before you start: computing resources}
 
-Before reducing SCUBA-2 data using the Dynamic Iterative Map-Maker, we
-recommend you confirm your resources are sufficient for your type of
-map.
+Before reducing SCUBA-2 data using the Dynamic Iterative Map-Maker you should
+ confirm you have sufficient computing resources for your type of map.
 
 We recommend the following.\\
 \begin{table}[h!]
@@ -1378,8 +1377,8 @@ A second way to scroll through the time axis is to click and drag the
 vertical red bar on the \gaiathing{Spectral plot} window. As you do
 so, the array shown in the main window will automatically update.
 
-To highlight small variations between bolometers it is likely you will
-need to change the auto cut and (depending on your preference) the
+To highlight small variations between bolometers you will need to change
+the auto cut and (depending on your preference) the
 colour scheme---both are controlled by buttons on the sidebar.
 
 See the \xref{\textsc{Gaia} manual}{sun214}{} for full
@@ -1534,7 +1533,8 @@ description of these specialised configuration files can be found
 below} shows the flow chart of the map-making process
 for \file{dimmconfig.lis}. It is divided into two sections: the
 pre-processing stage where the data are cleaned, then the iterative
-stage where the different models are subtracted and the convergence checked.
+stage where the different models are subtracted, a sky map created
+and the convergence checked.
 
 
 \begin{center}
@@ -1573,7 +1573,7 @@ establish weights for the data as they are placed into the map in
 subsequent iterations.
 \\*\\*
 \textbf{3. Checking convergence}\\
-At this stage convergence is checked against the parameters detailed
+Convergence is checked against the parameters detailed
 in the configuration file. Convergence is achieved either when the
 requested number of iterations has been completed, or when the
 noise-based convergence criterion specified in the configuration file
@@ -2491,7 +2491,7 @@ pixels---the default at 850$\mu$m.
 \\*\\*
 \textbf{Chunking}\label{box:chunk}\\
 The map-maker then determines if the raw data should be split and
-processed in more than one chunk. In this map the data is reduced in
+processed in more than one chunk. In this map the data are reduced in
 one continuous piece: \param{Continuous chunk 1 / 1}. Chunking is
 where the map-maker processes sub-sections of the time-series data
 independently and should be avoided if possible---see the text box
@@ -2711,7 +2711,7 @@ growth (see \cref{Appendix}{app:cog}{this appendix}). This graph gives
 the ratio of aperture flux to total flux for a range of aperture diameters.
 
 \fcfa\ is determined using 1-arcsec pixels. For different pixel sizes
-you will also need to apply a factor of pixelsize squared.
+you will also need to multiply by the pixelsize squared.
 
 \subsubsection{Peak flux}
 
@@ -2810,7 +2810,7 @@ applying \fcfa.
 
 The nature of the scan patterns results in SCUBA-2 maps significantly
 larger than the requested size. The high noise towards the outer edges
-is a consequence of the scanning pattern. Although this excess data is
+is a consequence of the scanning pattern. Although this excess data are
 down-weighted during reduction by the map-maker, you may wish to remove
 it before either combining maps (see
 \cref{Section}{sec:coadd}{Co-adding multiple maps}) or publishing your
@@ -2867,7 +2867,8 @@ You may have multiple maps of the same source which you would like to
 co-add. \picard\ has a recipe called
 \xref{\drrecipe{MOSAIC\_JCMT\_IMAGES}}{sun265}{MOSAIC_JCMT_IMAGES}
 that co-adds maps while correctly dealing with the exposure time and
-weights NDF extensions.
+weights NDF extensions. The images are combined using inverse-variance
+weighting and the output variance is derived from the input variances.
 \begin{myquote}
 \begin{verbatim}
 % picard -recpars mypar.lis MOSAIC_JCMT_IMAGES 850map*_cal_crop.sdf
@@ -2883,8 +2884,8 @@ description). However, the main one is choosing between \wcsmosaic\
 method. For more information on \task{makemos} and advice on choosing the
 best method see \xref{\textbf{SUN/139}}{sun139}{}.
 
-An example parameter file like the one below chooses \task{makemos}
-using a 3-$\sigma$ clipping threshold.
+The example parameter file below chooses \task{makemos} using a 3-$\sigma$
+clipping threshold.
 
 \begin{quote}
 \begin{verbatim}
@@ -2904,17 +2905,17 @@ does allow the option of assessing the individual maps before co-adding.
 \begin{fmpage}{0.95\linewidth}
 \vspace{0.1cm}
 
-TIP: The list of files can be the output from \texttt{cat}. Note the back quotes in
-the following example.
-\newline\texttt{\% picard MOSAIC\_JCMT\_IMAGES \`{}cat myfiles.txt\`{}}.
+TIP: The list of files can be the output from \texttt{cat}. Remember to include
+the back quotes.
+\newline For example, \texttt{\% picard MOSAIC\_JCMT\_IMAGES \`{}cat myfiles.txt\`{}}.
 \vspace{0.1cm}
 \end{fmpage}
 \end{center}
 \end{latexonly}
 
 \begin{htmlonly}
-\textbf{TIP: The list of files can be the output from \file{cat}. Note the
-back quotes in the following example.
+\textbf{TIP: The list of files can be the output from \file{cat}. Remember to
+include the back quotes. For example,
 \texttt{\% picard MOSAIC\_JCMT\_IMAGES \`{}cat myfiles.txt\`{}}}.
 \end{htmlonly}
 
@@ -3405,7 +3406,7 @@ scratch or copy one of the provided ones to your local directory and
 edit it.}
 
 The first line of each specialised configuration file is always a path
-to the recipe from which it is derived. These paths all lead to
+to the recipe upon which it is built. These paths all lead to
 recipes in the \starlink\ tree which cannot be edited. If you are
 creating your own file from scratch, make sure to include this
 reference to an existing configuration file on the first line.
@@ -3548,7 +3549,7 @@ slider on the \gaiathing{Display image sections} window.
 \end{center}
 \caption[View maps for each iteration]{
   \small Example using the \smurf\ command \stackframes\ and
-  \gaia\ to view the `itermaps' map for each iteration.
+  \gaia\ to view the `itermap' for each iteration.
 }
 \label{fig:stack}
 \end{figure}
@@ -3567,7 +3568,7 @@ Figure: Example using the \textsc{Smurf} command \task{stackframes} and
 \end{verbatim}
 \end{myquote}
 
-\textbf{Note:} You can view the shortmaps and itermaps more
+You can view the shortmaps and itermaps more
 conveniently by stacking them into a single cube using the \smurf\
 command \stackframes. This cube can then be viewed as a
 `movie' with \gaia, using the animation option to loop through the
@@ -3696,7 +3697,7 @@ details.
 
 The \model{AST}, \model{FLT} and \model{COM} models each have a
 number of masking options. The ones common to each model are listed
-below.  Replace the \param{xxx} with the desired model name.
+below.  Replace the \param{xxx} with the relevant model name.
 \begin{latexonly}
 \begin{table}[h!]
 \begin{tabular}{p{3.5cm}p{10.5cm}}
@@ -3932,7 +3933,7 @@ if you run out of temporary storage space.
 % setenv STAR_TEMP .
 \end{verbatim}
 \end{myquote}
-\task{skyloop} is then called in the same way as \makemap, with
+\task{skyloop} can then called in the same way as \makemap, with
  a configuration file specified on the command line.
 \begin{myquote}
 \begin{verbatim}
@@ -4589,7 +4590,7 @@ The science pipeline will automate many of the steps discussed in
 \label{sec:recipes}
 
 When MSBs are created, the PI can select a pipeline recipe to assign
-to the data. When the data is run through the science pipeline this
+to the data. When the data are run through the science pipeline this
 recipe is then called by default. This can overridden on the command
 line---see \cref{Section}{sec:parameterfile}{Changing the defaults}.
 \begin{latexonly}
@@ -4602,12 +4603,12 @@ Described next are the five main \oracdr\ science recipes.
 \subsubsection{\xlabel{extsources}\drrecipe{REDUCE\_SCAN}}
 \begin{itemize}
 \item  Configuration file: \file{dimmconfig.lis}
-
+\newline\newline
 This recipe uses the default configuration file for \makemap, unless
 the sources is identified as a calibrator. After all observations have
-been processed the data is co-added and calibrated using the default
-FCF.  The noise and NEFD properties for the co-add are calculated and
-written to log files (\file{log.noise} and \file{log.nefd}
+been processed the data are co-added and calibrated in mJy/beam using the
+default FCF. The noise and NEFD properties for the co-add are calculated
+and written to log files (\file{log.noise} and \file{log.nefd}
 respectively). Finally, the \cupid\ task \findclumps\ is run using the
 FellWalker algorithm to create a source catalogue.
 
@@ -4935,7 +4936,7 @@ summarised in \cref{Table}{tab:dimmdef}{this table}.
 \end{verbatim}
 \end{myquote}
 
-Here \file{\$FILES} can just be a single file from a subarray, or a
+Here \file{\$FILES} can just be a single file from a sub-array, or a
 subset, e.g. \file{s8a20110417\_00051\_0003.sdf} (the first file
 containing science data), \file{s8a20110417\_00051\_000"[1234]"}
 (File 1 is a noise observation with shutter closed that gets ignored,
@@ -5136,10 +5137,10 @@ defaults are listed in \file{\$SMURF\_DIR/smurf\_extinction.def}.
 \subsection{\xlabel{calcrms}SCUBA2\_CHECK\_RMS}
 \label{app:checkrmsparams}
 The \picard\ recipe \drrecipe{SCUBA2\_CHECK\_RMS} estimates the RMS and
-NEFD for a given observation via two methods to compare with values from 
-the SCUBA-2 integration time calculator (ITC). 
+NEFD for a given observation via two methods to compare with values from
+the SCUBA-2 integration time calculator (ITC).
 
-The average NEP is calculated from the QL pipeline log file (\file{log.nep}) 
+The average NEP is calculated from the QL pipeline log file (\file{log.nep})
 corresponding to the date and wavelength. The FCF (either from the file
 or the standard value) and mean transmission over the observation is used
 to convert this to a zenith NEFD (NEFD\_NEP). The elapsed time is used to
@@ -5192,9 +5193,7 @@ The parameters written out to \file{log.checkrms} are listed below.
 \end{center}
 \end{table}
 \end{latexonly}
-Some values (the Noise Equivalent Power values) need to be calculated
-from the raw data. Recall the NEP corresponds to the noise in the raw
-data and is a combination of instrument and atmospheric noise.
+
 
 \newpage
 \subsection{\xlabel{matchedfilter}SCUBA-2 matched filter}
@@ -5494,7 +5493,7 @@ Parameter & Value & Description \\
 \multicolumn{3}{|l|}{\textbf{Iterative}}\\
 \hline
 \param{com.perarray}     &      0 & If non-zero, calculate a separate common-mode
-                                    signal for each subarray \\
+                                    signal for each sub-array \\
 \param{com.niter}        &      1 & The number of $n$-sigma clipping iterations
                                     (1 = no clipping) \\
 \param{com.nsigma}       &      3 & The number of standard deviations at which the
@@ -5727,7 +5726,7 @@ Parameter & Value & Description \\
 \multicolumn{3}{|l|}{\textbf{Iterative}}\\
 \hline
 \param{com.perarray}     &      0 & If non-zero, calculate a separate common-mode
-                                    signal for each subarray \\
+                                    signal for each sub-array \\
 \param{com.niter}        &      1 & The number of $n$-sigma clipping iterations
                                     (1 = no clipping) \\
 \param{com.nsigma}       &      3 & The number of standard deviations at which
@@ -5919,7 +5918,7 @@ options, see the comments in \file{smurf\_makemap.def} or
 #  period of the knee frequency in the high-pass filter (i.e. 200*(1/freq) )
    filt_edge_largescale = 200
 
-#  Large-scale structure is not an issue so treat each subarray
+#  Large-scale structure is not an issue so treat each sub-array
 #  independently for common-mode removal
    com.perarray = 1
 
