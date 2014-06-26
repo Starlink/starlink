@@ -162,6 +162,7 @@ void smf_jsadicer( int indf, const char *base, int trim, smf_inst_t instrument,
    char jsatile_comment[45];
    char type[ NDF__SZTYP + 1 ];
    const char *dom = NULL;
+   const char *keyword;
    const char *latsys = NULL;
    const char *lonsys = NULL;
    double *pd;
@@ -628,7 +629,7 @@ void smf_jsadicer( int indf, const char *base, int trim, smf_inst_t instrument,
 /* If the last card is "END", remove it. */
             } else {
                astSetI( fc, "Card", astGetI( fc, "NCARD" ) );
-               const char *keyword = astGetC( fc, "CardName" );
+               keyword = astGetC( fc, "CardName" );
                if( keyword && !strcmp( keyword, "END" ) ) astDelFits( fc );
             }
 
