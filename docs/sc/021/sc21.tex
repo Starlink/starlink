@@ -22,7 +22,7 @@
 \newcommand{\stardoccopyright} {Copyright \copyright\ 2014 Science and Technology Facilities Council}
 \newcommand{\stardocnumber}    {21.2}
 \newcommand{\stardocauthors}   {H.\ S.\ Thomas, M.\ J.\ Currie}
-\newcommand{\stardocdate}      {19 June 2014}
+\newcommand{\stardocdate}      {26 June 2014}
 \newcommand{\stardoctitle}     {The SCUBA-2 Data Reduction Cookbook}
 \newcommand{\stardocversion}   {1.3}
 \newcommand{\stardocmanual}    {\ }
@@ -680,14 +680,8 @@ any data reduction you will want to initiate both \textsc{Smurf} and
 
 You can access the help information by typing \texttt{smurfhelp} or
 \texttt{kaphelp} respectively in a terminal, or by using the
-\task{showme} facility to access the hypertext documentation.
-
-\begin{myquote}
-\begin{verbatim}
-% showme sun258
-% showme sun95
-\end{verbatim}
-\end{myquote}
+\task{showme} facility to access the hypertext documentation. See
+\cref{Section}{sec:help}{How to get help} for more information.
 
 
 \begin{latexonly}
@@ -805,7 +799,7 @@ directory.\\*\\*}
 \newpage
 
 \subsubsection{\xlabel{help}How to get help}
-
+\label{sec:help}
 \begin{table}[h!]
 \begin{tabular}{p{2.3cm}|p{7.3cm}|p{5cm}}
 \textbf{Help\newline command} & \textbf{Description} & \textbf{Usage}\\
@@ -1027,7 +1021,7 @@ A normal science observation will follow the following sequence.
 \vspace{-2mm}
 \begin{enumerate}\itemsep-0.2em
 \item Flat-field
-\item Multiple science scans
+\item Science scans
 \item Flat-field
 \end{enumerate}
 \vspace{-2mm}
@@ -1038,16 +1032,16 @@ When you access raw from the \htmladdnormallink{Science Archive}{http://www3.cad
 \begin{latexonly}
 \hspace{-0.5em}\footnote{\url{http://www3.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/jcmt/}}
 \end{latexonly}
-you will get \emph{all} of the files listed above. Later when you
-reduce your data using the map-maker you will include \emph{all} of
-the files (flat-fields + science).
+you will get all of the files listed above. Later when you
+reduce your data using the map-maker you must include all
+the science files \emph{and} the first flat-field.
+The final flat-field is not currently used.
 
 Shown below is a list of the raw files for a single sub-array (in this
-case s8a) for a short calibration observation. The first file is the
-short, dark noise; the second and last scans are the fast flat-field
-observations, which occur after the shutter opens to the sky at the
-start of the observation and closes at the end (note the identical
-file size); all of the scans in between are science.
+case s8a) for a short calibration observation. The first and last scans
+are the flat-field observations,which occur after the shutter opens to
+the sky at the start of the observation and closes at the end (note the
+identical file size); all of the scans in between are science.
 
 
 \begin{myquote}
@@ -1456,12 +1450,7 @@ The on-sky performance of the array can be assessed using the \smurf\
 command \calcnoise. Rather than give an absolute measure, \task{calcnoise}
 should be used as an indicator of array performance and stability.
 \task{calcnoise} cleans the data then calculates the
-white noise on the array (between 2 and 10\,Hz by default). If the
-dark noise scans are given as input, this will track the array
-sensitivity independent of sky conditions. If you provide the whole
-observation (as in the example below) then the dark files will be
-ignored and the on-sky performance of the array is calculated.
-
+white noise on the array (between 2 and 10\,Hz by default).
 \begin{myquote}
 \begin{verbatim}
 % calcnoise s8a20110720_00030\*.sdf s8a_noise power=!
