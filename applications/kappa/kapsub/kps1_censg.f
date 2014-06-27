@@ -24,7 +24,7 @@
 *  Description:
 *     This routine finds the accurate centroids of a set of image
 *     features identified interatively by the user, either with a cursor
-*     or through an envinoment parameter. It can also estimate the error
+*     or through an environment parameter. It can also estimate the error
 *     on these positions, and display the results to a log file and the
 *     screen.
 *
@@ -130,7 +130,7 @@
 *     Copyright (C) 1999-2001, 2004 Central Laboratory of the Research
 *     Councils. Copyright (C) 2006 Particle Physics & Astronomy
 *     Research Council.
-*     Copyright (C) 2012 Science & Technology Facilities Council.
+*     Copyright (C) 2012, 2013 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
