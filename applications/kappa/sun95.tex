@@ -59217,7 +59217,7 @@ The following new applications have been added:
 The following applications have been modified:
 
 \begin{description}
-   \item [\htmlref{ARDGEN}{ARDGEN}]\mbox{}
+   \item [\htmlref{ARDPLOT}{ARDPLOT}]\mbox{}
       \begin{itemize}
         \item Can now display the outline of a Region even if no picture has
          been displayed previously on the graphics device. The size of
@@ -59240,6 +59240,13 @@ The following applications have been modified:
 	elliptical FWHMs.
         \item The output parameters now store the statistics of every
         fitted beam, not just those of the primary beam.
+      \end{itemize}
+   \item [\htmlref{CENTROID}{CENTROID}]\mbox{}
+      \begin{itemize}
+        \item The centroid's formatted co-ordinates, such as right
+        ascension and declination, are now normalised into the usual
+        ranges.  This aplies both to the reported positions and the
+        output parameters.
       \end{itemize}
    \item [\htmlref{COPYBAD}{COPYBAD}]\mbox{}
       \begin{itemize}
@@ -59304,6 +59311,11 @@ The following applications have been modified:
       \begin{itemize}
         \item It is now possible to copy all quality information from one
         NDF to another using a new parameter called LIKE.
+      \end{itemize}
+   \item [\htmlref{WCSALIGN}{WCSALIGN}]\mbox{}
+      \begin{itemize}
+        \item The Gaussian kernel may now be applied in resampling mode as
+        well as rebinning mode.
       \end{itemize}
 \end{description}
 

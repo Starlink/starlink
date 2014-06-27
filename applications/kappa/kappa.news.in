@@ -36,6 +36,13 @@ The following new applications have been added:
       -  The output parameters now store the statistics of every
       fitted beam, not just those of the primary beam.
 
+   o  CENTROID
+
+      -  The centroid's formatted co-ordinates, such as right
+      ascension and declination, are now normalised into the usual
+      ranges.  This aplies both to the reported positions and the
+      output parameters.
+
    o  COPYBAD
 
       -  Now writes the number of good and bad pixels in the output NDF
@@ -98,6 +105,11 @@ The following new applications have been added:
 
       -  It is now possible to copy all quality information from one
       NDF to another using a new parameter called LIKE.
+
+   o  WCSALIGN
+
+      -  The Gaussian kernel may now be applied in resampling mode as
+      well as rebinning mode.
 
 1 KAPPA_Version_2.0
 
