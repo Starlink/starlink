@@ -815,7 +815,8 @@ are described here:
 \begin{enumerate}
 \item {\bf{Minimum Software Dependencies.}}
 The AST library depends on no other other software\footnote{It comes with
-bundled copies of the ERFA and Starlink PAL libraries which are built
+bundled copies of the ERFA and
+\xref{Starlink PAL libraries}{sun268}{} which are built
 at the same time as the other AST internal libraries. Alternatively, external
 PAL and ERFA libraries may be used by specifying the ``{\tt
 --with-external\_pal}'' option when configuring AST}.
@@ -22632,7 +22633,7 @@ occurred in the AST library between versions V6.0-1 and V7.0.0:
 \begin{enumerate}
 
 \item Fundamental positional astronomy calculations are now performed
-using the IAU SOFA library where possible, and the Starlink PAL library
+using the IAU SOFA library where possible, and the Starlink PAL library \xref{SUN/268}{sun268}{}
 otherwise (the PAL library contains a subset of the Fortran Starlink SLALIB
 library re-written in C). Copies of these libraries are bundled with AST
 and so do not need to be obtained or built separately, although external
