@@ -123,6 +123,9 @@ void CGEN_FUNCTION(cupidFWJoin)( CGEN_TYPE *array, int nel, int ndim,
 *        Use MERS for message filtering.
 *     5-OCT-2010 (DSB):
 *        Major re-write of the algorithm.
+*     30-JUN-2014 (DSB):
+*        Changed default for MinDip form 3*RMS to 2*RMS. This value seems
+*        to do better at recovering artificial Gaussians.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -152,7 +155,7 @@ void CGEN_FUNCTION(cupidFWJoin)( CGEN_TYPE *array, int nel, int ndim,
 
 /* Get the minimum dip between two adjoining peaks necessary for the two
    peaks to be considered distinct. */
-   mindip = cupidConfigRMS( config, "MINDIP", rms, 3.0*rms, status );
+   mindip = cupidConfigRMS( config, "MINDIP", rms, 2.0*rms, status );
 
 /* Return without action if merging of clumps is not required. */
    if( mindip <= 0.0 ) return;

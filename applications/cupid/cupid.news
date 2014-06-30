@@ -8,6 +8,10 @@
 
 Changes introduced at V2.1
 
+   - The default value for the FellWalker.MinDip parameter has changed
+   from "3*RMS" to "2*RMS".
+   - The default value for the FellWalker.MinHeight parameter has changed
+   from "Noise+MinDip" to "Noise".
    - The MAKECLUMPS command now has a new boolean parameter called PRECAT
    that specifies the clump data that should be used to create the output
    catalogue. If PRECAT is FALSE (the default), the catalogue is created

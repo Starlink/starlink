@@ -153,6 +153,10 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *     20-NOV-2013 (DSB):
 *        Supplied config KeyMap now holds the method parameters directly,
 *        rather than holding them in a sub-KeyMap.
+*     30-JUN-2014 (DSB):
+*        Changed default for MinDip from 3*RMS to 2*RMS, and default for
+*        MinHeight from "Noise+MinDip" to "Noise". These values seem to
+*        do better at recovering artificial Gaussians.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -280,10 +284,10 @@ HDSLoc *cupidFellWalker( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 
 /* Get the minimum dip between two adjoining peaks necessary for the two
    peaks to be considered distinct. */
-      mindip = cupidConfigRMS( config, "MINDIP", rms, 3.0*rms, status );
+      mindip = cupidConfigRMS( config, "MINDIP", rms, 2.0*rms, status );
 
 /* Get the lowest allowed clump peak value. */
-      minhgt = cupidConfigRMS( config, "MINHEIGHT", rms, mindip + noise, status );
+      minhgt = cupidConfigRMS( config, "MINHEIGHT", rms, noise, status );
 
 /* See if clumps are allowed to touch an edge of the data array. */
       allow_edge = cupidConfigI( config, "ALLOWEDGE", 1, status );

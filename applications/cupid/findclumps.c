@@ -803,13 +803,13 @@ void findclumps( int *status ) {
 *        than this value, then the peaks are considered to be part of the
 *        same clump. The value can be supplied either as an absolute data
 *        value, or as a mutliple of the RMS noise using the syntax "[x]*RMS",
-*        where "[x]" is a numerical value (e.g. "3.2*RMS"). [3.0*RMS]
+*        where "[x]" is a numerical value (e.g. "3.2*RMS"). [2.0*RMS]
 *     FellWalker.MinHeight:
 *        If the peak value in a clump is less than
 *        this value then the clump is not included in the returned list of
 *        clumps. The value can be supplied either as an absolute data
 *        value, or as a mutliple of the RMS noise using the syntax "[x]*RMS",
-*        where "[x]" is a numerical value (e.g. "3.2*RMS"). [MinDip+Noise]
+*        where "[x]" is a numerical value (e.g. "3.2*RMS"). [Noise]
 *     FellWalker.MinPix:
 *        The lowest number of pixel which a clump can
 *        contain. If a candidate clump has fewer than this number of pixels,
