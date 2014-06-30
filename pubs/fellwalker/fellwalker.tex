@@ -502,15 +502,56 @@ the source code for the CUPID package is open-source and is available on github 
 
 \section{Comparing FellWalker and CLUMPFIND}
 
-Include some references to earlier investigations?
-\citep[e.g.][]{2010Watson,2013Urquhart}
+\cite{2010Watson} made a detailed comparison of the performance of several
+different clump finding algorithms, including FellWalker and CLUMPFIND.
+This concluded that, under the conditions used in the study, FellWalker
+is less likely than CLUMPFIND to split up large clumps, and is less
+likely to create false clump detections. An independent illustration of
+this result is presented in Fig.~\ref{fig:comp1}, which shows a field of
+artificial Gaussian clumps, with the resulting clump assignment arrays
+produced by FellWalker and CLUMPFIND. The input data image is an array of
+500 x 500 pixels containing 200 circular clumps distributed randomly
+across the image\footnote{Except none are allowed to touch an edge of the
+image}. Each clump has a Gaussian profile with a Full Width at Half
+Maximum of 15 pixels. The clump peak values are distributed uniformly
+between 30 and 100, and Gaussian noise of standard deviation 15 is added
+to the image. Both FellWalker and CLUMPFIND are run with the default
+parameter values supplied by CUPID (\emph{FellWalker.MinDip}=3.RMS,
+\emph{FellWalker.MaxJump}=4, \emph{ClumpFind.DeltaT}=2.RMS,
+\emph{ClumpFind.TLow}=2.RMS).
 
-May want to consider \citep{2012PASA...29..301W} which uses
-DUCHAMP \citep[][\ascl{1201.011}]{2012MNRAS.421.3242W}.
+\begin{figure}
+\includegraphics[width=\columnwidth]{comp1}
+\caption{Top: field of artificial Gaussian clumps. Lower left: the clump
+assignment array produced by FellWalker. Lower right: the clump assignment
+array produced by CLUMPFIND. Each colour indicates a different clump. }
+\label{fig:comp1}
+\end{figure}
 
-\subsection{Simulated Data}
+It can be seen that the two algorithm have different problems; CLUMPFIND
+is splitting each real clump into several parts, but FellWalker is
+possibly failing to detect some of clumps that are visible by eye. FellWalker
+detects 133 clumps\footnote{Since some of the 200 real sources will, by
+chance, overlay each other very closely, we cannot expect all 200 clumps
+to be detected.} and CLUMPFIND detects 1239.
 
-\subsection{Real Sub-millimetre Data}
+This tendency for CLUMPFIND to split sources seems to be worse for low
+signal-to-noise data. If we create a second field of artificial data with
+a lower RMS noise level (3 instead of 15), the clump assignment arrays
+shown in Fig.~\ref{fig:comp2} are created. CLUMPFIND is still tending to
+fragment the edges of clumps into many tiny detections, but the bulk of
+the interior of each clump is now left unfragmented.
+
+\begin{figure}
+\includegraphics[width=\columnwidth]{comp2}
+\caption{The effect of reducing the noise level in the artificial data
+by a factor of 5.}
+\label{fig:comp2}
+\end{figure}
+
+
+
+
 
 
 \section{Acknowledgements}

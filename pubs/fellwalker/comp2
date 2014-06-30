@@ -1,0 +1,59 @@
+#!/bin/tcsh
+
+#  Generates a PDF called "comp2.pdf" holding 3 images:
+#  1 - a field of artificial Gaussiam clumps:
+#  2 - the clump assignment arrays produced by FellWalker.
+#  3 - the clump assignment arrays produced by ClumpFind
+
+setenv STAR_SEED 4
+
+set rms = 3
+set fwhm = 15
+
+$CUPID_DIR/makeclumps angle=\[0,0\] beamfwhm=0 deconv=no \
+   fwhm1=\[$fwhm,0\] fwhm2=\[$fwhm,0\] lbnd=\[1,1\] ubnd=\[500,500\] \
+   model=comp2_model nclump=200 out=comp2_truth \
+   outcat=comp2_truth.fit pardist=uniform peak=\[65.0,35.0\] rms=$rms trunc=0.1
+
+$CUPID_DIR/findclumps in=comp2_truth deconv=no method=fellwalker \
+   out=comp2_fw outcat=comp2_fw.fit rms=$rms config=def
+set nclumps_fw = `$KAPPA_DIR/parget nclumps findclumps`
+
+#  Use the IDL-emulation mode for ClumpFind to get Williams-like results
+#  rather than CUPID-like results.
+echo "ClumpFind.IDLAlg = 1" > conf
+echo "ClumpFind.FwhmBeam = 0" >> conf
+echo "ClumpFind.MaxBad = 1.0" >> conf
+echo "ClumpFind.MinPix = 20" >> conf
+echo "ClumpFind.VeloRes = 0" >> conf
+echo "ClumpFind.AllowEdge = 1" >> conf
+
+$CUPID_DIR/findclumps in=comp2_truth deconv=no method=clumpfind \
+   out=comp2_cf_idl outcat=comp2_cf_idl.fit rms=$rms config=def
+set nclumps_cf = `$KAPPA_DIR/parget nclumps findclumps`
+
+$KAPPA_DIR/gdset /acps
+$KAPPA_DIR/gdclear
+$KAPPA_DIR/lutable mapping=linear coltab=external lut=$KAPPA_DIR/cold_lut
+$KAPPA_DIR/picdef mode=a xpic=1 ypic=2 prefix=a nooutline
+
+$KAPPA_DIR/picsel a2
+$KAPPA_DIR/display comp2_truth mode=perc percentiles=\[2,98\] badcol=black noaxes border reset
+
+$KAPPA_DIR/picsel a1
+$KAPPA_DIR/picdef current mode=a xpic=2 ypic=1 prefix=b nooutline
+$KAPPA_DIR/lutable mapping=linear coltab=colour
+$KAPPA_DIR/picsel b1
+$KAPPA_DIR/display comp2_fw mode=scale accept
+$KAPPA_DIR/picsel b2
+$KAPPA_DIR/display comp2_cf_idl mode=scale accept
+
+ps2pdf pgplot.ps
+pdfcrop pgplot.pdf comp2.pdf
+
+
+
+
+
+
+

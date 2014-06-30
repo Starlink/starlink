@@ -106,3 +106,6 @@ rm aa spikes.sdf sp15.sdf sp25.sdf noise.sdf tot.sdf mask.sdf peak2.sdf \
    walka.sdf walk326.sdf walk367.sdf walkb.sdf fred.sdf lut lutndf.sdf \
    idata*sdf rawmask.sdf
 
+# Make other figures
+./comp1
+./comp2
