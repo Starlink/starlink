@@ -111,7 +111,6 @@ examples/dimmconfig_moon.lis \
 examples/dimmconfig_pointing.lis \
 examples/dimmconfig_pointing_fts.lis \
 examples/dimmconfig_veryshort_planet.lis \
-examples/dimmconfig_jsa_generic.lis \
 examples/dimmconfig_fix_blobs.lis \
 examples/dimmconfig_fix_convergence.lis \
 examples/resist.cfg \
