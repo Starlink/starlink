@@ -206,6 +206,7 @@ GAIA3D_COMPILER_TESTS
 # VTK is always available, but keep this option to use another version.
 AM_OPTIONS_VTK
 AM_PATH_VTK([5.0.0])
+LDFLAGS_DEFAULT="$LDFLAGS_DEFAULT $LDFLAGS"
 AC_DEFINE([HAVE_VTK],[1],[Have suitable VTK libraries and headers])
 
 #--------------------------------------------------------------------

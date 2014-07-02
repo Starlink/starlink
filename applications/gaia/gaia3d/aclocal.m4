@@ -179,8 +179,8 @@ dnl  Adds the --with-vtk=path option to the configure options
 dnl
 AC_DEFUN([AM_OPTIONS_VTK], [
 AC_ARG_WITH([vtk], [AC_HELP_STRING([--with-vtk],
-            [The prefix where VTK is installed (default is /usr)])],
-            [with_vtk=$withval], [with_vtk="/usr"])
+            [The prefix where VTK is installed (default is $STARCONF_DEFAULT_PREFIX)])],
+            [with_vtk=$withval], [with_vtk="$STARCONF_DEFAULT_PREFIX"])
 ])
 
 
@@ -195,7 +195,7 @@ dnl do we want to check for VTK ?
 if test "$with_vtk" = "yes"; then
 
 dnl in case user wrote --with-vtk=yes
-   with_vtk="/usr"
+   with_vtk="$STARCONF_DEFAULT_PREFIX"
 fi
 
 if test "$with_vtk" != "no"; then
@@ -239,7 +239,7 @@ if test "$with_vtk" != "no"; then
 
          dnl check if the installed VTK is greater or not
          AC_LANG_PUSH([C++])
-         AC_COMPILE_IFELSE([AC_LANG_PROGRAM([#include <vtk/vtkVersion.h>], [
+         AC_COMPILE_IFELSE([AC_LANG_PROGRAM([#include <vtkVersion.h>], [
             printf("VTK version is: %d.%d.%d", VTK_MAJOR_VERSION, VTK_MINOR_VERSION, VTK_BUILD_VERSION);
             #if VTK_MAJOR_VERSION < $maj
             #error Installed VTK is too old !
