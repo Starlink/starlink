@@ -172,6 +172,9 @@
 *        loads of compiler warnings. AST has no concept of "const" objects.
 *        - Fast-mode re-written to avoid assuming that the map Y axis is
 *        parallel to north.
+*     2014-07-7 (DSB):
+*        Ensure Epoch in returned SKyFrame is set from the data rather
+*        than any supplied spatial reference FrameSet.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -499,6 +502,11 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
           astSetD( oskyframe, "SkyRef(1)", skyref[ 0 ] );
           astSetD( oskyframe, "SkyRef(2)", skyref[ 1 ] );
           if( *moving ) astSet( oskyframe, "SkyRefIs=Origin" );
+
+          /* Ensure the Epoch attribute in the map is set to the date of
+             the first data in the map, rather than the date in supplied
+             reference WCS. */
+          astSetD( oskyframe, "Epoch", astGetD( junksky, "Epoch" ) );
         }
 
         if ( *outframeset == NULL && oskyframe != NULL && (*status == SAI__OK)){

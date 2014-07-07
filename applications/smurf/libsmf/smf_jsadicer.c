@@ -91,6 +91,8 @@
 *     25-JUN-2014 (DSB):
 *        Added argument "usexph"m to allow the output projection to be
 *        chosen.
+*     7-JUL-2014 (DSB):
+*        Ensure the output NDFs inherited the Epoch value of the input NDF.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -416,6 +418,9 @@ void smf_jsadicer( int indf, const char *base, int trim, smf_inst_t instrument,
             tile_map = (AstMapping *) astCmpMap( tile_map, specmap, 0, " " );
             tile_frm = (AstFrame *) astCmpFrame( tile_frm, specfrm, " " );
          }
+
+/* Ensure the Epoch is inherited form the input NDF. */
+         astSetD( tile_frm, "Epoch", astGetD( iwcs, "Epoch" ) );
 
 /* Currently tile axis 1 is RA, axis 2 is Dec and axis 3 (if present) is
    spectral. Append a PermMap that re-orders these tile WCS axes to match
