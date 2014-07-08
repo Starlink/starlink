@@ -109,3 +109,4 @@ rm aa spikes.sdf sp15.sdf sp25.sdf noise.sdf tot.sdf mask.sdf peak2.sdf \
 # Make other figures
 ./comp1
 ./comp2
+./comp4

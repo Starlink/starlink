@@ -1,0 +1,96 @@
+#!/bin/tcsh
+
+setenv STAR_SEED 4
+set fwhm = 15
+
+echo "# rms deltat nc gain sum sum_target true_data mask" > cf.asc
+echo "# rms maxjump mindip nc gain sum sum_target true_data mask" > fw.asc
+
+
+$CUPID_DIR/makeclumps angle=\[0,0\] beamfwhm=0 deconv=no \
+      fwhm1=\[$fwhm,0\] fwhm2=\[$fwhm,0\] lbnd=\[1,1\] ubnd=\[100,100\] \
+      model=model nclump=1 out=junk \
+      outcat=comp4_truth.fit pardist=uniform peak=\[30,0\] \
+      rms=1 trunc=0.1
+
+#  Do each noise level
+foreach rms (2 4 6 8 10 12 14 16)
+
+#  Get the expected daat sum of a true source above 2*RMS.
+   set cut = `$KAPPA_DIR/calc "'2*pa'" pa=$rms`
+   $KAPPA_DIR/thresh model out=junk thrlo=$cut newlo=bad thrhi=1E20 newhi=bad
+   $KAPPA_DIR/stats junk quiet
+   set sum_target = `$KAPPA_DIR/parget total stats`
+
+#  Since both fellwalker and clumpfind ignore eventhing below 2*RMS, select
+#  the peak value distribution so that our 200 sources are above this level.
+   set pmean = `$KAPPA_DIR/calc "'(100.0+2*pa)/2.0'" pa=$rms`
+   set pwidth = `$KAPPA_DIR/calc "'(100.0-2*pa)/2.0'" pa=$rms`
+
+#  Create the true data.
+   set truedata = "true_$rms"
+   $CUPID_DIR/makeclumps angle=\[0,0\] beamfwhm=0 deconv=no \
+      fwhm1=\[$fwhm,0\] fwhm2=\[$fwhm,0\] lbnd=\[1,1\] ubnd=\[500,500\] \
+      model=comp4_model nclump=200 out=$truedata \
+      outcat=comp4_truth.fit pardist=uniform peak=\[30,0\] \
+      rms=$rms trunc=0.1
+
+#  Do each clumpfind contour interval.
+   foreach deltat (1 1.5 2 2.5 3 3.5 4 4.5 5 5.5 6 6.5 7 7.5 8.0)
+      set pv = `echo $deltat | sed -s 's/\./p/'`
+
+#  Run clumpfind in IDL emulation mode.
+      set cf_mask = "comp4_cf_${rms}_${pv}"
+      $CUPID_DIR/findclumps in=$truedata deconv=no method=clumpfind \
+                            out=$cf_mask outcat=comp4_cf.fit rms=$rms \
+                            config="'^idl_conf,DeltaT=$deltat*RMS'"
+
+      set text = `stilts tpipe in=comp4_cf.fit cmd='keepcols SUM;stats median' | grep -P "\| \d+\.\d+ \|" | grep -o -P "\d+\.\d+"`
+
+#  Get the number of sources detected and write to a file.
+      set nc = `$KAPPA_DIR/parget nclumps findclumps`
+      set gain = `$KAPPA_DIR/calc "pa/pb" pa=$text pb=$sum_target`
+      echo "$rms $deltat $nc $gain $text $sum_target $truedata $cf_mask" >> cf.asc
+   end
+
+#  Do each FellWalker MaxJump value
+   foreach maxjump (0 2 4 6 8 10 12 14)
+
+#  Do each FellWalker MinDip value
+      foreach mindip (0 1 2 3 4 5)
+         set pv = `echo $mindip | sed -s 's/\./p/'`
+
+#  Run FellWalker
+         set fw_mask = "comp4_fw_${rms}_${maxjump}_${pv}"
+         $CUPID_DIR/findclumps in=$truedata deconv=no method=fellwalker \
+                               out=$fw_mask outcat=comp4_fw.fit rms=$rms \
+                               config="'MaxJump=$maxjump,MinDip=$mindip*RMS'"
+
+         set text = `stilts tpipe in=comp4_fw.fit cmd='keepcols SUM;stats median' | grep -P "\| \d+\.\d+ \|" | grep -o -P "\d+\.\d+"`
+
+#  Get the number of sources detected and write to a file.
+         set nc = `$KAPPA_DIR/parget nclumps findclumps`
+         set gain = `$KAPPA_DIR/calc "pa/pb" pa=$text pb=$sum_target`
+         echo "$rms $maxjump $mindip $nc $gain $text $sum_target $truedata $fw_mask" >> fw.asc
+      end
+   end
+end
+
+
+#  Create a 2D plot in which the Y axis is ClumpFInd gain (i.e. the median
+#  clump data sum found by ClumpFind, normalised to the expected clump data
+#  sum), and the X axis is DeltaT. Colour each spot to indicate the RMS.
+#  Space the Y axis logarithmically.
+stilts plot2d in=cf.asc xdata=deltat ydata=gain ifmt=ascii out=comp4_cf.pdf \
+       auxdata=rms ylog=true ylo=0.05 yhi=5
+
+#  For each mindip value, create a 2D plot in which the Y axis is FellWalker
+#  gain (i.e. the median clump data sum found by FellWalker, normalised to
+#  the expected clump data sum), and the X axis is MaxJUmp. Colour each spot
+#  to indicate the RMS. Space the Y axis logarithmically.
+foreach mindip (0 1 2 3 4 5)
+   stilts plot2d in=fw.asc xdata=maxjump ydata=gain ifmt=ascii out=comp4_fw_${mindip}.pdf \
+       auxdata=rms ylog=true ylo=0.05 yhi=5 subset="mindip==$mindip"
+end
+
+rm comp4_*sdf true_*sdf

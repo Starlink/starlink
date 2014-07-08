@@ -203,6 +203,15 @@ or peak in data-value. The following description of the algorithm uses
 this fell-walking metaphor at frequent intervals.
 
 \begin{figure}
+\includegraphics[width=\columnwidth]{wasdale}
+\caption{Wastwater and the Wasdale Fells, including Great Gable
+(centre-left) and snow-covered Scafell Pike, the highest point in England,
+just visible under cloud. Copyright: Nick Thorne,
+www.lakedistrict.gov.uk/learning/freephotos\# }
+\label{fig:wasdale}
+\end{figure}
+
+\begin{figure}
 \includegraphics[width=\columnwidth]{fellwalking}
 \caption{In 2-dimensions, peaks in data value are often reminiscent of the
 fells of northern England. The FellWalker algorithm performs many walks
@@ -250,6 +259,7 @@ The following sections give more detailed descriptions of each of these
 phases in the FellWalker algorithm.
 
 \subsection{Identifying Raw Clumps}
+\label{sec:raw}
 An array of integer values is first allocated, which is the same shape
 and size as the supplied data array. This ``clump assignment array''
 (CAA) is used to record the integer identifier of the clump, if any, to
@@ -389,6 +399,7 @@ is repeated to see if any of the merged clumps should themselves be
 merged. This process repeats until no further clumps can be merged.
 
 \subsection{Cleaning Clump Outlines}
+\label{sec:cleaning}
 
 Once neighbouring clumps separated by shallow valleys have been merged,
 there is an option to smooth the boundaries between adjacent clumps to
@@ -549,10 +560,142 @@ by a factor of 5.}
 \label{fig:comp2}
 \end{figure}
 
+If either algorithm splits clumps into several parts, not only will it
+produce too many clumps, but the total data sum in each clump will on
+average be too low. A useful tool for measuring the performance of these
+algorithms is therefore the distribution of the measured total data sum
+in each clump compared to the expected distribution, based on knowledge
+of the clumps in the artificial data. In order to simplify such a
+comparison, all the artificial clumps can be made identical (\emph{i.e.}
+have the same peak amplitude and size), so that they all have the same
+total data sum. In this case, the distribution of measured total data
+sums should be peaked at the expected value, but will always have a tail
+of higher-valued clumps due to the random positioning of clumps causing
+some clumps to overlay each other. However an optimal clump-finding
+algorithm should not produce any significant tail of lower-valued clumps.
+
+The next sections describes the results of many such comparisons,
+performed with a range of different signal-to-noise ratios, and with
+different clump-finding parameter values.
+
+\subsection{The Artificial Data}
+The input data for each test was a two-dimensional image of 500x500
+pixels containing 200 randomly positioned Gaussian clumps, all with the
+same peak value of 30 (arbitrary units) and the same FWHM of 5 pixels.
+Gaussian noise was then added, with a different noise level for each of
+the eight successive set of tests. The eight noise levels used were
+spread evenly between 2 and 16.
+
+\subsection{The Clump-finding Parameters}
+For each of the eight different noise levels, the data was analysed
+multiple times by both FellWalker and CLUMPFIND, using different values
+for the main clump-finding parameters in each case. For CLUMPFIND, the
+DeltaT parameter (the gap between contour levels) was varied from eight
+times the noise level down to one times the noise level. For FellWalker,
+the MaxJump parameter (the minimum spatial separation between distinct
+peaks) was varied between 2 and 14 pixels. In addition, the MinDip
+parameter (the smallest dip in height allowed between distinct peaks) was
+varied between 0 and 5 times the noise level.
+
+The other main parameter common to both algorithms is the threshold
+``sea-level'' below which all pixel values are ignored. This was fixed at
+two times the noise level for all tests of both algorithms.
+
+The default implementation of CLUMPFIND provided by the Starlink CUPID
+package follows the description of the algorithm contained in
+\cite{1994Williams}. The IDL version of CLUMPFIND distributed by Williams
+includes some enhancements to the published algorithm. These are also
+available in the CUPID version, but are disabled by default. They have,
+however been enabled for the purposes of the current comparison, using
+the following extra CUPID parameter settings:
+
+\smallskip
+\begin{tabular}{c c c}
+ClumpFind.IDLAlg & = & 1 \\
+ClumpFind.FwhmBeam & = & 0 \\
+ClumpFind.MaxBad & = & 1.0 \\
+ClumpFind.MinPix & = & 20 \\
+ClumpFind.VeloRes & = & 0 \\
+ClumpFind.AllowEdge & = & 1 \\
+\end{tabular}
+\smallskip
+
+\subsection{Measuring Performance}
+In each test, the artificial data consists of a collection of identical
+clumps. So the initial expectation is that a reliable clump-finding
+algorithm should produce a set of measured clumps that all have the same
+total data sum, and that this total data sum should be the same as that
+of the artificial clumps. However, this will not be the case in practice
+for two different reasons:
+
+\begin{enumerate}
+
+\item Because of the random position of clumps, some clumps will have
+spatial overlap to a greater or lesser extent. If the overlap is small,
+then a good clump-finding algorithm should be able to resolve them. But
+for larger overlaps, and larger noise levels, it becomes progressively
+more difficult to resolve overlapping clumps. In the limiting case of
+exactly co-incident clumps, it is clearly impossible for any algorithm
+to resolve them. For this reason, we expect too see a tail of high-valued
+clumps, although it is difficult to quantify the expected size of this
+tail.
+
+\item Each algorithm ignores pixel values below a threshold of two times the
+noise level. This means that tests performed at higher noise levels will
+set the threshold higher and so will detect clumps with smaller total
+data sums.
+
+\end{enumerate}
+
+Whilst it is difficult to quantify the effects of the first of these two
+issues, the second one can be taken into account by thresholding an
+artificial clump at the two sigma threshold before finding its data sum.
+So at each noise level the sum of the data values in an artificial clump
+is found, excluding pixel below the two sigma threshold. This value is
+then used as the expected value for the total data sum in the clumps
+measured at the same noise level. To simplify this comparison, the ratio
+of the measured clump data sum to the expected clump data sum is used
+below as a measure of the performance of each algorithm. This is referred
+to as the ``gain'' in the following figures.
+
+\subsection{CLUMPFIND Results}
+
+\begin{figure}
+\includegraphics[width=\columnwidth]{comp4_cf}
+\caption{The ratio of measured to expected data sum in clumps identified
+using CLUMPFIND, as a function of the DelatT parameter value (the gap
+between CLUMPFIND contour levels). The DeltaT values are multiples of the
+noise level. The colours indicate the noise level, as shown in the colour
+baron the right of hte figure.}
+\label{fig:cf_results}
+\end{figure}
 
 
 
 
+
+
+\section{Possible Enhancements to FellWalker}
+Future work on the FellWalker algorithm is planned to address two small
+problems with the current implementation:
+
+\begin{itemize}
+\item The cleaning process described in section~\ref{sec:cleaning} can
+sometimes cause clumps to be split into two or more discontiguous parts.
+This can occur for ``dog-bone'' shaped clumps that have a narrow
+steep-sided central ridge that widens out at the two ends. In such cases,
+the cleaning process can sometimes erode pixels from the central ridge
+causing a gap to appear between the two wider end regions.
+
+\item As described in section~\ref{sec:raw}, when a walk reaches a local
+maximum, an attempt is made to find a higher pixel value within a small
+box centred on the local maximum, and if found, the walk continues from this
+higher pixel. However, no check is made that the higher pixel is on the
+same ``island''\footnote{i.e. a contiguous group of
+pixels that are all higer than the threshold level.} as the local
+maximum. Thus it is possible that walks could jump from one island to
+another, and so merge clumps together that are in fact distinct.
+\end{itemize}
 
 \section{Acknowledgements}
 

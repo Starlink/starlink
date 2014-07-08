@@ -1,0 +1,14 @@
+#  Config that causes findclumps to emulate the IDL version of ClumpFind
+#  rather than the version described in the clumpfind paper.
+ClumpFind.IDLAlg = 1
+ClumpFind.FwhmBeam = 0
+ClumpFind.MaxBad = 1.0
+ClumpFind.MinPix = 20
+ClumpFind.VeloRes = 0
+ClumpFind.AllowEdge = 1
+
+
+
+
+
+
