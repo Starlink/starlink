@@ -398,39 +398,44 @@ static int ConfigureMark( Tcl_Interp *interp, Tk_Canvas canvas,
 
     /* Need to translate the type string into an internal marker type */
 
-    length = strlen(markPtr->type);
-    if ((markPtr->type[0] == 'd') &&
-        (strncmp(markPtr->type, "dot", length) == 0)) {
+    if ( markPtr->type == NULL ) {
+        /*  No type, so use a default */
         markPtr->shape = DOT;
     }
-    else if ((markPtr->type[0] == 'c') &&
-               (strncmp(markPtr->type, "circle", length) == 0)) {
-        markPtr->shape = CIRCLE;
-    }
-    else if ((markPtr->type[0] == 's')) {
-        markPtr->shape = SQUARE;
-    }
-    else if ((markPtr->type[0] == 'd') && (length > 1) &&
-               (strncmp(markPtr->type, "diamond", length) == 0)) {
-        markPtr->shape = DIAMOND;
-    }
-    else if ((markPtr->type[0] == 'p')) {
-        markPtr->shape = PLUS;
-    }
-    else if ((markPtr->type[0] == 'c') && (length > 1) &&
-             (strncmp(markPtr->type, "cross", length) == 0)) {
-        markPtr->shape = CROSS;
-    }
-    else if ((markPtr->type[0] == 't') ) {
-        markPtr->shape = TRIANGLE;
-    }
     else {
-        Tcl_AppendResult(interp, "bad marker type \"", markPtr->type,
-                         "\": should be dot, circle, square, diamond, plus, cross, or triangle",
-                         (char *)NULL);
-        return TCL_ERROR;
+        length = strlen(markPtr->type);
+        if ((markPtr->type[0] == 'd') &&
+            (strncmp(markPtr->type, "dot", length) == 0)) {
+            markPtr->shape = DOT;
+        }
+        else if ((markPtr->type[0] == 'c') &&
+                 (strncmp(markPtr->type, "circle", length) == 0)) {
+            markPtr->shape = CIRCLE;
+        }
+        else if ((markPtr->type[0] == 's')) {
+            markPtr->shape = SQUARE;
+        }
+        else if ((markPtr->type[0] == 'd') && (length > 1) &&
+               (strncmp(markPtr->type, "diamond", length) == 0)) {
+            markPtr->shape = DIAMOND;
+        }
+        else if ((markPtr->type[0] == 'p')) {
+            markPtr->shape = PLUS;
+        }
+        else if ((markPtr->type[0] == 'c') && (length > 1) &&
+                 (strncmp(markPtr->type, "cross", length) == 0)) {
+            markPtr->shape = CROSS;
+        }
+        else if ((markPtr->type[0] == 't') ) {
+            markPtr->shape = TRIANGLE;
+        }
+        else {
+            Tcl_AppendResult(interp, "bad marker type \"", markPtr->type,
+                             "\": should be dot, circle, square, diamond, plus, cross, or triangle",
+                             (char *)NULL);
+            return TCL_ERROR;
+        }
     }
-
     ComputeMarkBbox(canvas, markPtr);
     return TCL_OK;
 }
