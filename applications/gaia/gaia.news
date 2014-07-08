@@ -34,6 +34,10 @@
     the figures were offset or scaled to the wrong size. This problem
     has been fixed.
 
+    Restoring graphics that included marker types (produced by the positions
+    and 3D toolboxes) previously failed, causing GAIA to crash. This has been
+    fixed. 
+
     Version 4.4-4
     =============
 
