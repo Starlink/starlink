@@ -247,7 +247,7 @@ try:
 #  NDF straddles a discontinuity in the HPX projection then we need to
 #  use an XPH (polar HEALPix) projection instead. So now we see if this
 #  is the case. Initially, assume that we can use a normal HPX projection.
-   usexph = 0
+   usexph = "None"
 
 #  Now loop round all the tiles touched by the supplied NDF.
    igore_first = -1
@@ -281,16 +281,16 @@ try:
 #  polar tile, the NDF straddles a northern HPX discontinuity, so use an
 #  XPH projection centred on the north pole.
          elif igore != igore_first:
-            usexph = 1
+            usexph = "North"
             break
 
-#  Now do the same for southern polar tiles. Set usexph to -1 to indicate
+#  Now do the same for southern polar tiles. Set usexph to indicate
 #  a southern XPH projection should be used.
       elif deccen < -HPX_TRANS:
          if igore_first == -1:
             igore_first = igore
          elif igore != igore_first:
-            usexph = -1
+            usexph = "South"
             break;
 
 #  Create a file holding the FITS-WCS header for the first tile, using

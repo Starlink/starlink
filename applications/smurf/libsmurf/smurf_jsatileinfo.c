@@ -123,12 +123,13 @@
 *     UBND( 2 ) = _INTEGER (Write)
 *        An output parameter to which are written the upper pixel bounds
 *        of the NDF containing the co-added data for the tile.
-*     USEXPH = _INTEGER (Read)
-*        Determines the sort of projection to use. A value of zero causes
-*        the standard JSA HPX projection to be used. A positive value 
-*        causes an XPH projection centred on the north pole to be used.
-*        A negative value causes an XPH projection centred on the south
-*        pole to be used. [0]
+*     USEXPH = LITERAL (Read)
+*        Determines the projection used by the output NDFs. The allowed
+*        values are "North", "South" or "None". A value of "None" causes
+*        the standard JSA equatorial HPX projection to be used. The other
+*        two values cause an XPH (polar HEALPix) projection centred on
+*        the north or south pole to be used. A null (!) value causes "NONE"
+*        to be used. ["None"]
 
 *  Related Applications:
 *     SMURF: MAKECUBE, MAKEMAP, TILELIST.
@@ -156,6 +157,9 @@
 *        Use smf_jsainstrument to get the instrument and tiling parameters.
 *     17-JUN-2014 (DSB):
 *        Added parameter USEXPH.
+*     8-JUL-2014 (DSB):
+*        Change USEXPH to accept "North", "South" or "None" instead of 1,
+*        -1 and 0.
 
 *  Copyright:
 *     Copyright (C) 2011-2014 Science and Technology Facilities Council.
@@ -283,7 +287,14 @@ void smurf_jsatileinfo( int *status ) {
    if( *status != SAI__OK ) goto L999;
 
 /* Decide what sort of projection (HPX or XPH) to use. */
-   parGet0i( "USEXPH", &usexph, status );
+   parChoic( "USEXPH", "NONE", "NORTH,SOUTH", 1, text, sizeof(text), status );
+   if( !strcmp( text, "NORTH" ) ) {
+      usexph = 1;
+   } else if( !strcmp( text, "SOUTH" ) ) {
+      usexph = -1;
+   } else {
+      usexph = 0;
+   }
 
 /* If required, create an all-sky NDF in which each pixel covers the area
    of a single tile, and holds the integer tile index. The NDF has an

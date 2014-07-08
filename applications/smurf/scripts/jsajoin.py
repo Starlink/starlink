@@ -387,7 +387,7 @@ try:
          xph_tile_list = []
          for used_tile in used_tiles:
             invoke( "$SMURF_DIR/jsadicer in={0} instrument={1} "
-                    "out={2}/dice usexph=1".
+                    "out={2}/dice usexph=north".
                     format(used_tile,instrument,NDG.tempdir) )
             tilenum = starutil.get_fits_header( used_tile, "TILENUM", True )
             tt = "{0}/dice_{1}".format(NDG.tempdir,tilenum )
@@ -415,7 +415,7 @@ try:
             xph_tile_list = []
             for used_tile in used_tiles:
                invoke( "$SMURF_DIR/jsadicer in={0} instrument={1} "
-                       "out={2}/dice usexph=-1 ".
+                       "out={2}/dice usexph=south".
                        format(used_tile,instrument,NDG.tempdir) )
                tilenum = starutil.get_fits_header( used_tile, "TILENUM", True )
                tt = "{0}/dice_{1}".format(NDG.tempdir,tilenum )

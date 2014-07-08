@@ -2784,12 +2784,12 @@ package @PACKAGE@ {
             }
 
             parameter usexph {
-                type _INTEGER
+                type LITERAL
                 access READ
                 vpath DEFAULT
                 ppath CURRENT DEFAULT
-                prompt {Output projection}
-                default 0
+                prompt {XPH projection pole - north or south}
+                default "None"
                 helpkey *
             }
         }
@@ -2960,12 +2960,12 @@ package @PACKAGE@ {
             }
 
             parameter usexph {
-                type _INTEGER
+                type LITERAL
                 access READ
                 vpath DEFAULT
                 ppath CURRENT DEFAULT
-                prompt {Projection (0=HPX 1=Northern XPH -1=Southern XPH)"}
-                default 0
+                prompt {XPH projection pole - north or south}
+                default "None"
                 helpkey *
             }
 

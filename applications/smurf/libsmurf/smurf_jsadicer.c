@@ -61,12 +61,13 @@
 *        each output NDF being cropped to the bounds of the supplied NDF. A
 *        value of two or more results in each output NDF being cropped to
 *        remove any blank borders. [2]
-*     USEXPH = _INTEGER (Read)
-*        Determines the projection used by the output NDFs. A value of zero
-*        causes the standard JSA equatorial HPX projection to be used. A
-*        positive value causes an XPH (polar HEALPix) projection centred on
-*        the north pole to be used. A negative value causes an XPH projection
-*        centred on the south pole to be used. [0]
+*     USEXPH = LITERAL (Read)
+*        Determines the projection used by the output NDFs. The allowed
+*        values are "North", "South" or "None". A value of "None" causes
+*        the standard JSA equatorial HPX projection to be used. The other
+*        two values cause an XPH (polar HEALPix) projection centred on
+*        the north or south pole to be used. A null (!) value causes "NONE"
+*        to be used. ["None"]
 
 *  Authors:
 *     DSB: David Berry (JAC, Hawaii)
@@ -80,6 +81,9 @@
 *        borders.
 *     25-JUN-2014 (DSB):
 *        Added parameter USEXPH.
+*     8-JUL-2014 (DSB):
+*        Change USEXPH to accept "North", "South" or "None" instead of 1,
+*        -1 and 0.
 
 *  Copyright:
 *     Copyright (C) 2013-2014 Science and Technology Facilities Council.
@@ -144,6 +148,7 @@ void smurf_jsadicer( int *status ) {
    Grp *ogrp = NULL;
    char *pname;
    char basename[ 255 ];
+   char text[ 255 ];
    int indf;
    int trim;
    int usexph;
@@ -176,7 +181,14 @@ void smurf_jsadicer( int *status ) {
    parGet0i( "TRIM", &trim, status );
 
 /* Decide what sort of projection (HPX or XPH) to use. */
-   parGet0i( "USEXPH", &usexph, status );
+   parChoic( "USEXPH", "NONE", "NORTH,SOUTH", 1, text, sizeof(text), status );
+   if( !strcmp( text, "NORTH" ) ) {
+      usexph = 1;
+   } else if( !strcmp( text, "SOUTH" ) ) {
+      usexph = -1;
+   } else {
+      usexph = 0;
+   }
 
 /* Get a FitsChan holding the contents of the FITS extension from the
    input NDF. Annul the error if the NDF has no FITS extension. */
