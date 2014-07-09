@@ -643,6 +643,8 @@ applications/pisa/pisa.sh
 applications/pisa/pisa_mon4
 applications/pisa/pisahelp
 
+applications/polmap/polmap
+
 applications/polpack/Polka.tcl
 applications/polpack/polpack.csh
 applications/polpack/polpack.icl
@@ -1111,6 +1113,7 @@ libraries/kaplibs/kpg/kpg1_dcli.f
 libraries/kaplibs/kpg/kpg1_div.f
 libraries/kaplibs/kpg/kpg1_dwso.f
 libraries/kaplibs/kpg/kpg1_elnm.f
+libraries/kaplibs/kpg/kpg1_env0.f
 libraries/kaplibs/kpg/kpg1_expo.f
 libraries/kaplibs/kpg/kpg1_ffr.f
 libraries/kaplibs/kpg/kpg1_fftf.f
@@ -1476,6 +1479,9 @@ libraries/thr/thr_routines.tex
 libraries/thr/thr_routines_sorted.tex
 libraries/trn/trn_test
 
+pubs/fellwalker/fellwalker.out
+pubs/fellwalker/fellwalker.spl
+
 # PDF versions of documentation.
 
 applications/astrom/sun5.pdf
@@ -1517,6 +1523,7 @@ applications/obsolete/jcmtdr/docs/sun132/sun132.pdf
 applications/period/sun167.pdf
 applications/photom/sun45.pdf
 applications/pisa/sun109.pdf
+applications/polmap/sun204.pdf
 applications/polpack/sun223.pdf
 applications/pongo/sun137/sun137.pdf
 applications/psmerge/sun164.pdf
@@ -1639,7 +1646,7 @@ libraries/cat/sun181.pdf
 libraries/chr/sun40.pdf
 libraries/cnf/sun209.pdf
 libraries/ctg/sun262.pdf
-/libraries/cvg/sun268.pdf
+libraries/cvg/sun268.pdf
 libraries/ems/ssn4.pdf
 libraries/fio/sun143.pdf
 libraries/gks/sun83.pdf
@@ -1680,5 +1687,7 @@ libraries/sla/sun67.pdf
 libraries/snx/sun90.pdf
 libraries/thr/sun266.pdf
 libraries/trn/sun61.pdf
+
+pubs/fellwalker/fellwalker.pdf
 
 thirdparty/heasarc/cfitsio/sun227.pdf
