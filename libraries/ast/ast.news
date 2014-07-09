@@ -17,6 +17,8 @@ Main Changes in this Version
 ----------------------------
 
 - The FITS XPH projection is now supported.
+- The order of WCS axes within new FITS-WCS headers created by astWrite
+  can now be controlled using a new attribute called FitsAxisOrder.
 
 Main Changes in V8.0.0
 ----------------------

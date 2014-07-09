@@ -1,5 +1,5 @@
       SUBROUTINE COF_FPWCS( FUNIT, INDF, ENCOD, NATIVE, USEAXS,
-     :                      ALWTAB, STATUS )
+     :                      ALWTAB, AXORD, STATUS )
 *+
 *  Name:
 *     COF_FPWCS
@@ -13,7 +13,7 @@
 
 *  Invocation:
 *     CALL COF_FPWCS( FUNIT, INDF, ENCOD, NATIVE, USEAXS, ALWTAB,
-*                     STATUS )
+*                     AXORD, STATUS )
 
 *  Description:
 *     The AST FrameSet (see SUN/210) describing the co-ordinate systems
@@ -54,6 +54,9 @@
 *     ALWTAB = LOGICAL (Given)
 *        If TRUE, then WCS co-ordinates in tabular form may be written
 *        using the TAB algorithm as defined in FITS WCS Paper III.
+*     AXORD = CHARACTER * ( * ) (Given)
+*        The string defining the ordering of WCS in the FITS file. See
+*        the AST FitsAxisOrder attribute.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -124,6 +127,8 @@
 *        Restructured slightly to ensure any junk WCS-related keywords
 *        that are present in the header on entry are deleted on exit, even
 *        if the NDF contains no WCS.
+*     9-JUL-2014 (DSB):
+*        Added argument AXORD.
 *     {enter_further_changes_here}
 
 *-
@@ -142,6 +147,7 @@
       LOGICAL NATIVE
       CHARACTER*( * ) USEAXS
       LOGICAL ALWTAB
+      CHARACTER * ( * ) AXORD
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -202,6 +208,9 @@
 *  created by the AST_WRITE method. The value used is a "magic value"
 *  that is used to identify tables created by AST.
       IF ( ALWTAB ) CALL AST_SETI( FC, 'TABOK', ASTVER, STATUS )
+
+*  Indicate the order required for the WCS axes in the FITS header.
+      CALL AST_SETC( FC, 'FITSAXISORDER', AXORD, STATUS )
 
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999

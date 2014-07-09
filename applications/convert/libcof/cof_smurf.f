@@ -1,7 +1,7 @@
       SUBROUTINE COF_SMURF( SNAME, LOC, FUNIT, NDF, FILNAM, NOARR,
      :                      ARRNAM, BITPIX, BLOCKF, ORIGIN, PROFIT,
      :                      DUPLEX, PROEXT, PROHIS, SUMS, ENCOD,
-     :                      NATIVE, USEAXS, ALWTAB, STATUS )
+     :                      NATIVE, USEAXS, ALWTAB, AXORD, STATUS )
 *+
 *  Name:
 *     COF_SMURF
@@ -15,7 +15,8 @@
 *  Invocation:
 *     CALL COF_SMURF( SNAME, LOC, FUNIT, NDF, FILNAM, NOARR, ARRNAM,
 *                     BITPIX, BLOCKF, ORIGIN, PROFIT, DUPLEX, PROEXT,
-*                     PROHIS, ENCOD, NATIVE, USEAXS, ALWTAB, STATUS )
+*                     PROHIS, ENCOD, NATIVE, USEAXS, ALWTAB, AXORD,
+*                     STATUS )
 
 *  Description:
 *     This routine converts contents of a SMURF extension to FITS.  Each
@@ -116,6 +117,9 @@
 *     ALWTAB = LOGICAL (Given)
 *        If TRUE, then WCS co-ordinates in tabular form may be written
 *        using the TAB algorithm as defined in FITS WCS Paper III.
+*     AXORD = CHARACTER * ( * ) (Given)
+*        The string defining the ordering of WCS in the FITS file. See
+*        the AST FitsAxisOrder attribute.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -161,6 +165,8 @@
 *     2013 November 15 (MJC):
 *        Add ALWTAB argument and pass it to other routines now using
 *        it.
+*     9-JUL-2014 (DSB):
+*        Added argument AXORD.
 *     {enter_further_changes_here}
 
 *-
@@ -193,6 +199,7 @@
       LOGICAL NATIVE
       CHARACTER * ( * ) USEAXS
       LOGICAL ALWTAB
+      CHARACTER * ( * ) AXORD
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -303,7 +310,7 @@
             CALL COF_NEX2F( NAME, FUNIT, NDF, NDFE, FILNAM, 1,
      :                      ARRNAM, BITPIX, BLOCKF, ORIGIN, PROFIT,
      :                      DUPLEX, PROHIS, SUMS, ENCOD, NATIVE,
-     :                      USEAXS, ALWTAB, STATUS )
+     :                      USEAXS, ALWTAB, AXORD, STATUS )
 
 *  Process extensions.
 *  ===================

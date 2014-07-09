@@ -1,7 +1,7 @@
       SUBROUTINE COF_NDF2F( NDF, FILNAM, NOARR, ARRNAM, BITPIX, BLOCKF,
      :                      ORIGIN, PROFIT, DUPLEX, PROEXT, PROHIS,
      :                      PROVEN, SUMS, ENCOD, NATIVE, FOPEN, FCLOSE,
-     :                      USEAXS, ALWTAB, STATUS )
+     :                      USEAXS, ALWTAB, AXORD, STATUS )
 *+
 *  Name:
 *     COF_NDF2F
@@ -15,7 +15,8 @@
 *  Invocation:
 *     CALL COF_NDF2F( NDF, FILNAM, NOARR, ARRNAM, BITPIX, BLOCKF,
 *                     ORIGIN, PROFIT, DUPLEX, PROEXT, PROHIS, PROVEN,
-*                     SUMS, ENCOD, NATIVE, USEAXS, ALWTAB, STATUS )
+*                     SUMS, ENCOD, NATIVE, USEAXS, ALWTAB, AXORD,
+*                     STATUS )
 
 *  Description:
 *     This routine converts an NDF into a FITS file.  It uses as much
@@ -122,6 +123,9 @@
 *     ALWTAB = LOGICAL (Given)
 *        If TRUE,then WCS co-ordinates in tabular form may be written
 *        using the TAB algorithm as defined in FITS WCS Paper III.
+*     AXORD = CHARACTER * ( * ) (Given)
+*        The string defining the ordering of WCS in the FITS file. See
+*        the AST FitsAxisOrder attribute.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -394,6 +398,8 @@
 *        it.
 *     19-NOV-2013 (DSB):
 *        Re-structured to use CVG provenance writing routines.
+*     9-JUL-2014 (DSB):
+*        Added argument AXORD.
 *     {enter_further_changes_here}
 
 *-
@@ -429,6 +435,7 @@
       LOGICAL FCLOSE
       CHARACTER * ( * ) USEAXS
       LOGICAL ALWTAB
+      CHARACTER * ( * ) AXORD
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -761,7 +768,7 @@
 *  when requested to do so.
          CALL COF_WHEAD( NDF, NDF, ARRNAM( ICOMP ), FUNIT, BPOUT,
      :                   PROPEX, ORIGIN, ENCOD, NATIVE, MULTIN, ' ',
-     :                   USEAXS, ALWTAB, STATUS )
+     :                   USEAXS, ALWTAB, AXORD, STATUS )
          IF ( STATUS .NE. SAI__OK ) GOTO 999
 
 *  Determine whether or not there are history records in the NDF.
@@ -1314,7 +1321,7 @@
      :                               NOARR, ARRNAM, BITPIX, BLOCKF,
      :                               ORIGIN, PROFIT, DUPLEX, PROEXT,
      :                               PROHIS, SUMS, ENCOD, NATIVE,
-     :                               USEAXS, ALWTAB, STATUS )
+     :                               USEAXS, ALWTAB, AXORD, STATUS )
                   END IF
 
 *  Write integrity-check headers.

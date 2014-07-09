@@ -123,6 +123,7 @@ f     encodings), then write operations using AST_WRITE will
 *     - Clean: Remove cards used whilst reading even if an error occurs?
 *     - DefB1950: Use FK4 B1950 as default equatorial coordinates?
 *     - Encoding: System for encoding Objects as FITS headers
+*     - FitsAxisOrder: Sets the order of WCS axes within new FITS-WCS headers
 *     - FitsDigits: Digits of precision for floating-point FITS values
 *     - Iwc: Add a Frame describing Intermediate World Coords?
 *     - Ncard: Number of FITS header cards in a FitsChan
@@ -186,12 +187,12 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -1105,6 +1106,9 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 *        - Allow default options for newly created FitsChans to be
 *        specified by the FITSCHAN_OPTIONS environment variable.
 *        - Ensure the used CarLin value is not changed by a trailing frequency axis.
+*     9-JUL-2014 (DSB):
+*        Added attribute FitsAxisOrder, which allows an order to be
+*        specified for WCS axis within FITS headers generated using astWrite.
 *class--
 */
 
@@ -1616,6 +1620,10 @@ static void ClearFitsDigits( AstFitsChan *, int * );
 static int GetFitsDigits( AstFitsChan *, int * );
 static int TestFitsDigits( AstFitsChan *, int * );
 static void SetFitsDigits( AstFitsChan *, int, int * );
+static void ClearFitsAxisOrder( AstFitsChan *, int * );
+static const char *GetFitsAxisOrder( AstFitsChan *, int * );
+static int TestFitsAxisOrder( AstFitsChan *, int * );
+static void SetFitsAxisOrder( AstFitsChan *, const char *, int * );
 static void ClearDefB1950( AstFitsChan *, int * );
 static int GetDefB1950( AstFitsChan *, int * );
 static int TestDefB1950( AstFitsChan *, int * );
@@ -1728,6 +1736,7 @@ static int FindKeyCard( AstFitsChan *, const char *, const char *, const char *,
 static int FindLonLatSpecAxes( FitsStore *, char, int *, int *, int *, const char *, const char *, int * );
 static int FindString( int, const char *[], const char *, const char *, const char *, const char *, int * );
 static int FitOK( int, double *, double *, double, int * );
+static int FitsAxisOrder( AstFitsChan *this, int nwcs, AstFrame *wcsfrm, int *perm, int *status );
 static int FitsEof( AstFitsChan *, int * );
 static int FitsFromStore( AstFitsChan *, FitsStore *, int, double *, AstFrameSet *, const char *, const char *, int * );
 static int FitsGetCom( AstFitsChan *, const char *, char **, int * );
@@ -1848,8 +1857,8 @@ static void SetItem( double ****, int, int, char, double, int * );
 static void SetItemC( char *****, int, int, char, const char *, int * );
 static void SetSourceFile( AstChannel *, const char *, int * );
 static void SetValue( AstFitsChan *, const char *, void *, int, const char *, int * );
-static void Shpc1( double, double, int, double *, double *, int * );
 static void ShowFits( AstFitsChan *, int * );
+static void Shpc1( double, double, int, double *, double *, int * );
 static void SinkWrap( void (*)( const char * ), const char *, int * );
 static void SkyPole( AstWcsMap *, AstMapping *, int, int, int *, char, FitsStore *, const char *, const char *, int * );
 static void TableSource( AstFitsChan *, void (*)( AstFitsChan *, const char *, int, int, int * ), int * );
@@ -2496,22 +2505,28 @@ static int AddVersion( AstFitsChan *this, AstFrameSet *fs, int ipix, int iwcs,
    defined. Return if not. Note, we can handle non-invertable Mappings if
    we are allowed to use the -TAB algorithm. */
    mapping = astGetMapping( fset, AST__BASE, AST__CURRENT );
+   wcsfrm = astGetFrame( fset, AST__CURRENT );
    if( !astGetTranInverse( mapping ) && astGetTabOK( this ) <= 0 ) {
       mapping = astAnnul( mapping );
+      wcsfrm = astAnnul( wcsfrm );
       fset = astAnnul( fset );
       return ret;
    }
 
 /* We now need to choose the "FITS WCS axis" (i.e. the number that is included
-   in FITS keywords such as CRVAL2) for each axis of the output Frame. For
-   each WCS axis, we use the index of the pixel axis which is most closely
-   aligned with it. Allocate memory to store these indices, and then fill
-   the memory. */
+   in FITS keywords such as CRVAL2) for each axis of the output Frame.
+   Allocate memory to store these indices. */
    nwcs= astGetNout( mapping );
    wperm = astMalloc( sizeof(int)*(size_t) nwcs );
-   if( ! WorldAxes( this, mapping, dim, wperm, status ) ) {
+
+/* Attempt to use the FitsAxisOrder attribute to determine the order. If
+   this is set to "<auto>", then for each WCS axis, we use the index of
+   the pixel axis which is most closely aligned with it. */
+   if( !FitsAxisOrder( this, nwcs, wcsfrm, wperm, status ) &&
+       !WorldAxes( this, mapping, dim, wperm, status ) ) {
       wperm = astFree( wperm );
       mapping = astAnnul( mapping );
+      wcsfrm = astAnnul( wcsfrm );
       fset = astAnnul( fset );
       return ret;
    }
@@ -2526,7 +2541,6 @@ static int AddVersion( AstFitsChan *this, AstFrameSet *fs, int ipix, int iwcs,
 /* Get the original reference point from the FitsChan and convert it into
    the require WCS Frame. This is used as the default reference point (some
    algorithms may choose to ignore this default reference point ). */
-   wcsfrm = astGetFrame( fset, AST__CURRENT );
    crvals = ReadCrval( this, wcsfrm, s, method, class, status );
 
 /* For each class of FITS conventions (celestial, spectral, others),
@@ -4529,78 +4543,81 @@ static AstMapping *CelestialAxes( AstFitsChan *this, AstFrameSet *fs, double *di
             astInvert( ret );
 
 /* The spherical rotation involved in converting WCS to IWC can result in
-   in appropriate numbering of the FITS axes. For instance, a LONPOLE
+   inappropriate numbering of the FITS axes. For instance, a LONPOLE
    value of 90 degrees causes the IWC axes to be transposed. For this
    reason we re-asses the FITS axis numbers assigned to the celestial
    axes in order to make the IWC axes as close as possible to the pixel
-   axes with the same number. To do this, we need the Mapping from pixel
-   to IWC, which is formed by concatenating the pixel->WCS Mapping with the
-   WCS->IWC Mapping. */
-            tmap0 = (AstMapping *) astCmpMap( map, ret, 1, "", status );
+   axes with the same number (but only if the axis order is being
+   determined automatically). To do this, we need the Mapping from
+   pixel to IWC, which is formed by concatenating the pixel->WCS
+   Mapping with the WCS->IWC Mapping. */
+            if( astChrMatch( astGetFitsAxisOrder( this ), "<auto>" ) ) {
+               tmap0 = (AstMapping *) astCmpMap( map, ret, 1, "", status );
 
 /* Find the outputs of this Mapping which should be associated with each
    input. */
-            tperm = astMalloc( sizeof(int)*(size_t) nwcs );
-            if( ! WorldAxes( this, tmap0, dim, tperm, status ) ) {
-               ret = astAnnul( ret );
-            }
+               tperm = astMalloc( sizeof(int)*(size_t) nwcs );
+               if( ! WorldAxes( this, tmap0, dim, tperm, status ) ) {
+                  ret = astAnnul( ret );
+               }
 
 /* If the index associated with the celestial axes appear to have been
    swapped... */
-            if( ret && astOK && fits_ilon == tperm[ ilat ] &&
-                         fits_ilat == tperm[ ilon ] ) {
+               if( ret && astOK && fits_ilon == tperm[ ilat ] &&
+                            fits_ilat == tperm[ ilon ] ) {
 
 /* Swap the fits axis indices associated with each WCS axis to match. */
-               wperm[ ilon ] = fits_ilat;
-               wperm[ ilat ] = fits_ilon;
+                  wperm[ ilon ] = fits_ilat;
+                  wperm[ ilat ] = fits_ilon;
 
 /* Swap the stored CRVAL value for the longitude and latitude axis. */
-               val = GetItem( &(store->crval), fits_ilat, 0, s, NULL, method, class, status );
-               SetItem( &(store->crval), fits_ilat, 0, s,
-                        GetItem( &(store->crval), fits_ilon, 0, s, NULL,
-                        method, class, status ), status );
-               SetItem( &(store->crval), fits_ilon, 0, s, val, status );
+                  val = GetItem( &(store->crval), fits_ilat, 0, s, NULL, method, class, status );
+                  SetItem( &(store->crval), fits_ilat, 0, s,
+                           GetItem( &(store->crval), fits_ilon, 0, s, NULL,
+                           method, class, status ), status );
+                  SetItem( &(store->crval), fits_ilon, 0, s, val, status );
 
 /* Swap the stored CTYPE value for the longitude and latitude axis. */
-               cval = GetItemC( &(store->ctype), fits_ilat, 0, s, NULL, method, class, status );
-               if( cval ) {
-                  temp = astStore( NULL, (void *) cval, strlen( cval ) + 1 );
-                  cval = GetItemC( &(store->ctype), fits_ilon, 0, s, NULL, method, class, status );
+                  cval = GetItemC( &(store->ctype), fits_ilat, 0, s, NULL, method, class, status );
                   if( cval ) {
-                     SetItemC( &(store->ctype), fits_ilat, 0, s, cval, status );
-                     SetItemC( &(store->ctype), fits_ilon, 0, s, temp, status );
+                     temp = astStore( NULL, (void *) cval, strlen( cval ) + 1 );
+                     cval = GetItemC( &(store->ctype), fits_ilon, 0, s, NULL, method, class, status );
+                     if( cval ) {
+                        SetItemC( &(store->ctype), fits_ilat, 0, s, cval, status );
+                        SetItemC( &(store->ctype), fits_ilon, 0, s, temp, status );
+                     }
+                     temp = astFree( temp );
                   }
-                  temp = astFree( temp );
-               }
 
 /* Swap the stored CNAME value for the longitude and latitude axis. */
-               cval = GetItemC( &(store->cname), fits_ilat, 0, s, NULL, method, class, status );
-               if( cval ) {
-                  temp = astStore( NULL, (void *) cval, strlen( cval ) + 1 );
-                  cval = GetItemC( &(store->cname), fits_ilon, 0, s, NULL, method, class, status );
+                  cval = GetItemC( &(store->cname), fits_ilat, 0, s, NULL, method, class, status );
                   if( cval ) {
-                     SetItemC( &(store->cname), fits_ilat, 0, s, cval, status );
-                     SetItemC( &(store->cname), fits_ilon, 0, s, temp, status );
+                     temp = astStore( NULL, (void *) cval, strlen( cval ) + 1 );
+                     cval = GetItemC( &(store->cname), fits_ilon, 0, s, NULL, method, class, status );
+                     if( cval ) {
+                        SetItemC( &(store->cname), fits_ilat, 0, s, cval, status );
+                        SetItemC( &(store->cname), fits_ilon, 0, s, temp, status );
+                     }
+                     temp = astFree( temp );
                   }
-                  temp = astFree( temp );
-               }
 
 /* Swap the projection parameters asociated with the longitude and latitude
    axes. */
-               maxm = GetMaxJM( &(store->pv), s, status );
-               for( m = 0; m <= maxm; m++ ){
-                  val = GetItem( &(store->pv), fits_ilat, m, s, NULL, method, class, status );
-                  SetItem( &(store->pv), fits_ilat, m, s,
-                           GetItem( &(store->pv), fits_ilon, m, s, NULL,
-                           method, class, status ), status );
-                  SetItem( &(store->pv), fits_ilon, m, s, val, status );
+                  maxm = GetMaxJM( &(store->pv), s, status );
+                  for( m = 0; m <= maxm; m++ ){
+                     val = GetItem( &(store->pv), fits_ilat, m, s, NULL, method, class, status );
+                     SetItem( &(store->pv), fits_ilat, m, s,
+                              GetItem( &(store->pv), fits_ilon, m, s, NULL,
+                              method, class, status ), status );
+                     SetItem( &(store->pv), fits_ilon, m, s, val, status );
+                  }
                }
-            }
 
 /* Release resources. */
+               tperm = astFree( tperm );
+               tmap0 = astAnnul( tmap0 );
+            }
             map2b = astAnnul( map2b );
-            tperm = astFree( tperm );
-            tmap0 = astAnnul( tmap0 );
          }
 
 /* Release resources. */
@@ -6380,6 +6397,11 @@ static void ClearAttrib( AstObject *this_object, const char *attrib, int *status
    } else if ( !strcmp( attrib, "cdmatrix" ) ) {
       astClearCDMatrix( this );
 
+/* FitsAxisOrder. */
+/* ----------- */
+   } else if ( !strcmp( attrib, "fitsaxisorder" ) ) {
+      astClearFitsAxisOrder( this );
+
 /* FitsDigits. */
 /* ----------- */
    } else if ( !strcmp( attrib, "fitsdigits" ) ) {
@@ -7407,7 +7429,7 @@ static void CreateKeyword( AstFitsChan *this, const char *name,
       found = astMapGet0I( this->keyseq, keyword, &seq );
    } else {
       found = 0;
-      this->keyseq = astKeyMap( "", status );
+      this->keyseq = astKeyMap( " ", status );
    }
 
 /* If the keyword was not found in the list, create a new list entry
@@ -10142,6 +10164,144 @@ static int FitOK( int n, double *act, double *est, double tol, int *status ) {
    return ret;
 }
 
+static int FitsAxisOrder( AstFitsChan *this, int nwcs, AstFrame *wcsfrm,
+                          int *perm, int *status ){
+/*
+*  Name:
+*     FitsAxisOrder
+
+*  Purpose:
+*     Return the order of WCS axes specified by attribute FitsAxisOrder.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "fitschan.h"
+*     int FitsAxisOrder( AstFitsChan *this, int nwcs, AstFrame *wcsfrm,
+*                        int *perm, int *status )
+
+*  Class Membership:
+*     FitsChan member function.
+
+*  Description:
+*     This function returns an array indicating the order of the WCS axes
+*     within the output FITS header, as specified by the FitsAxisOrder
+*     attribute.
+
+*  Parameters:
+*     this
+*        Pointer to the FitsChan.
+*     nwcs
+*        The number of axes in "wcsfrm".
+*     wcsfrm
+*        The Frame containing the output WCS axes.
+*     perm
+*        Pointer to an array of "nwcs" integers. On exit, element "k"
+*        of this array holds the zero-based index of the FITS-WCS axis
+*        (i.e. one less than the value of "i" in the keyword names
+*        "CTYPEi", "CRVALi", etc) that describes the k'th axis in "wcsfrm".
+*        In other words, "perm[ast_index] = fits_index". The order is
+*        determined by the FitsAxisOrder attribute. If this attribute is
+*        "<copy>" or "<auto>", then "perm[k]=k" for all k on exit (i.e.
+*        a unit mapping between axes in "wcsfrm" and the FITS header).
+*     status
+*        Pointer to the inherited status variable.
+
+*  Returned Value:
+*     Returns zero if the FitsAxisOrder attribute is "<auto">, and
+*     non-zero otherwise. This is a flag indicating if the returned
+*     values in "perm" can be used s they are.
+
+*/
+
+/* Local Variables: */
+   AstKeyMap *km;    /* KeyMap holding axis indices keyed by axis symbols */
+   char **words;     /* Pointer to array of words from FitsAxisOrder */
+   char attr_name[15];/* Attribute name */
+   const char *attr; /* Pointer to a string holding the FitsAxisOrder value */
+   int i;            /* Loop count */
+   int j;            /* Zero-based axis index */
+   int k;            /* Zero-based axis index */
+   int nword;        /* Number of words in FitsAxisOrder */
+   int result;       /* Retrned value */
+
+/* Check the inherited status. */
+   if( !astOK ) return 0;
+
+/* Initialise the returned array to a unit mapping from Frame axis to
+   FITS axis. */
+   for( i = 0; i < nwcs; i++ ) perm[ i ] = i;
+
+/* Get the FitsAxisOrder attribute value, and set the returned value to
+   indicate if it is "<auto>". */
+   attr = astGetFitsAxisOrder( this );
+   result = !astChrMatch( attr, "<auto>" );
+
+/* Return immediately if it is "<auto>" or "<copy>". */
+   if( result && !astChrMatch( attr, "<copy>" ) ) {
+
+/* Create a KeyMap in which each key is the Symbol for an axis and the
+   associated value is the zero based index of the axis within "wcsfrm". */
+      km = astKeyMap( "KeyCase=0", status );
+      for( i = 0; i < nwcs; i++ ){
+         sprintf( attr_name, "Symbol(%d)", i + 1 );
+         astMapPut0I( km, astGetC( wcsfrm, attr_name ), i, NULL );
+      }
+
+/* Split the FitsAxisOrder value into a collection of space-separated words. */
+      words = astChrSplit( attr, &nword );
+
+/* Loop round them all. */
+      k = 0;
+      for( i = 0; i < nword; i++ ) {
+
+/* Get the zero based index within "wcsfrm" of the axis that has a Symbol
+   equal to the current word from FitsAxisOrder. */
+         if( astMapGet0I( km, words[ i ], &j ) ) {
+
+/* If this "wcsfrm" axis has already been used, report an error. */
+            if( j < 0 ) {
+               if( astOK ) astError( AST__ATTIN, "astWrite(fitschan): "
+                           "attribute FitsAxisOrder (%s) refers to axis "
+                           "%s more than once.", status, attr, words[ i ] );
+
+/* Otherwise, set the corresponding element of the returned array, and
+   ensure this axis cannot be used again by assigning it an index of -1
+   in the KeyMap. */
+            } else {
+               perm[ j ] = k++;
+               astMapPut0I( km, words[ i ], -1, NULL );
+            }
+         }
+
+/* Free the memory holding the copy of the word. */
+         words[ i ] = astFree( words[ i ] );
+      }
+
+/* Report an error if any wcsfrm axes were not included in FitsAxisOrder. */
+      if( astOK ) {
+         for( i = 0; i < nwcs; i++ ){
+            sprintf( attr_name, "Symbol(%d)", i + 1 );
+            if( astMapGet0I( km, astGetC( wcsfrm, attr_name ), &j ) ) {
+               if( j >= 0 ) {
+                  astError( AST__ATTIN, "astWrite(fitschan): attribute FitsAxisOrder "
+                      "(%s) does not specify a position for WCS axis '%s'.",
+                      status, attr, astGetC( wcsfrm, attr_name ) );
+                  break;
+               }
+            }
+         }
+      }
+
+/* Free resources. */
+      words = astFree( words );
+      km = astAnnul( km );
+   }
+
+   return result;
+}
+
 static int FitsFromStore( AstFitsChan *this, FitsStore *store, int encoding,
                           double *dim, AstFrameSet *fs, const char *method,
                           const char *class, int *status ){
@@ -10355,7 +10515,7 @@ static FitsStore *FitsToStore( AstFitsChan *this, int encoding,
       ret->axref = NULL;
       ret->naxis = 0;
       ret->timesys = NULL;
-      ret->tables = astKeyMap( "", status );
+      ret->tables = astKeyMap( " ", status );
       ret->skyref = NULL;
       ret->skyrefp = NULL;
       ret->skyrefis = NULL;
@@ -11064,7 +11224,7 @@ static FitsStore *FsetToStore( AstFitsChan *this, AstFrameSet *fset, int naxis,
       ret->axref = NULL;
       ret->naxis = naxis;
       ret->timesys = NULL;
-      ret->tables = astKeyMap( "", status );
+      ret->tables = astKeyMap( " ", status );
       ret->skyref = NULL;
       ret->skyrefp = NULL;
       ret->skyrefis = NULL;
@@ -15910,6 +16070,11 @@ const char *GetAttrib( AstObject *this_object, const char *attrib, int *status )
          result = getattrib_buff;
       }
 
+/* FitsAxisOrder. */
+/* -------------- */
+   } else if ( !strcmp( attrib, "fitsaxisorder" ) ) {
+      result = astGetFitsAxisOrder( this );
+
 /* FitsDigits. */
 /* ----------- */
    } else if ( !strcmp( attrib, "fitsdigits" ) ) {
@@ -17395,6 +17560,10 @@ void astInitFitsChanVtab_(  AstFitsChanVtab *vtab, const char *name, int *status
    vtab->TestFitsDigits = TestFitsDigits;
    vtab->SetFitsDigits = SetFitsDigits;
    vtab->GetFitsDigits = GetFitsDigits;
+   vtab->ClearFitsAxisOrder = ClearFitsAxisOrder;
+   vtab->TestFitsAxisOrder = TestFitsAxisOrder;
+   vtab->SetFitsAxisOrder = SetFitsAxisOrder;
+   vtab->GetFitsAxisOrder = GetFitsAxisOrder;
    vtab->ClearDefB1950 = ClearDefB1950;
    vtab->TestDefB1950 = TestDefB1950;
    vtab->SetDefB1950 = SetDefB1950;
@@ -21964,7 +22133,7 @@ static void NewCard( AstFitsChan *this, const char *name, int type,
 
 /* Ensure that a KeyMap exists to hold the keywords currently in the
    FitsChan. */
-      if( !this->keywords ) this->keywords = astKeyMap( "", status );
+      if( !this->keywords ) this->keywords = astKeyMap( " ", status );
 
 /* Add the keyword name to the KeyMap. The value associated with the
    KeyMap entry is not used and is set arbitrarily to zero. */
@@ -25611,6 +25780,7 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
    int ival;                     /* Integer attribute value */
    int len;                      /* Length of setting string */
    int nc;                       /* Number of characters read by astSscanf */
+   int offset;                   /* Offset of attribute string */
    int warn;                     /* Offset of Warnings string */
 
 /* Check the global error status. */
@@ -25677,6 +25847,14 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
         ( 1 == astSscanf( setting, "fitsdigits= %d %n", &ival, &nc ) )
         && ( nc >= len ) ) {
       astSetFitsDigits( this, ival );
+
+/* FitsAxisOrder. */
+/* -------------- */
+   } else if ( nc = 0,
+               ( 0 == astSscanf( setting, "fitsaxisorder=%n%*[^\n]%n",
+                                 &offset, &nc ) )
+               && ( nc >= len ) ) {
+      astSetFitsAxisOrder( this, setting + offset );
 
 /* CDMatrix */
 /* -------- */
@@ -31639,6 +31817,11 @@ static int TestAttrib( AstObject *this_object, const char *attrib, int *status )
 /* --------- */
    } else if ( !strcmp( attrib, "encoding" ) ) {
       result = astTestEncoding( this );
+
+/* FitsAxisOrder. */
+/* -------------- */
+   } else if ( !strcmp( attrib, "fitsaxisorder" ) ) {
+      result = astTestFitsAxisOrder( this );
 
 /* FitsDigits. */
 /* ----------- */
@@ -40019,6 +40202,58 @@ astMAKE_CLEAR(FitsChan,Clean,clean,-1)
 astMAKE_SET(FitsChan,Clean,int,clean,( value ? 1 : 0 ))
 astMAKE_TEST(FitsChan,Clean,( this->clean != -1 ))
 
+/*
+*att++
+*  Name:
+*     FitsAxisOrder
+
+*  Purpose:
+*     Frame title.
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     String.
+
+*  Description:
+*     This attribute specifies the order for the WCS axes in any new
+*     FITS-WCS headers created using the
+c     astWrite
+f     AST_WRITE
+*     method.
+*
+*     The value of the FitsAxisOrder attribute can be either "<auto>"
+*     (the default value), "<copy>" or a space-separated list of axis
+*     symbols:
+*
+*     "<auto>": causes the WCS axis order to be chosen automatically so that
+*     the i'th WCS axis in the new FITS header is the WCS axis which is
+*     more nearly parallel to the i'th pixel axis.
+*
+*     "<copy>": causes the WCS axis order to be set so that the i'th WCS
+*     axis in the new FITS header is the i'th WCS axis in the current
+*     Frame of the FrameSet being written out to the header.
+*
+*     "Sym1 Sym2...": the space-separated list is seached in turn for
+*     the Symbol attribute of each axis in the current Frame of the
+*     FrameSet. The order in which these Symbols occur within the
+*     space-separated list defines the order of the WCS axes in the
+*     new FITS header. An error is reported if Symbol for a current
+*     Frame axis is not present in the supplied list. However, no error
+*     is reported if the list contains extra words that do not correspond
+*     to the Symbol of any current Frame axis.
+
+*  Applicability:
+*     FitsChan
+*        All FitsChans have this attribute.
+*att--
+*/
+astMAKE_CLEAR(FitsChan,FitsAxisOrder,fitsaxisorder,astFree( this->fitsaxisorder ))
+astMAKE_GET(FitsChan,FitsAxisOrder,const char *,NULL,(this->fitsaxisorder ? this->fitsaxisorder : "<auto>" ))
+astMAKE_SET(FitsChan,FitsAxisOrder,const char *,fitsaxisorder,astStore( this->fitsaxisorder, value, strlen( value ) + (size_t) 1 ))
+astMAKE_TEST(FitsChan,FitsAxisOrder,( this->fitsaxisorder != NULL ))
+
 /* FitsDigits. */
 /* =========== */
 
@@ -40651,6 +40886,13 @@ static void Dump( AstObject *this_object, AstChannel *channel, int *status ) {
    } else {
       astWriteString( channel, "Encod", set, 1, UNKNOWN_STRING, "Encoding system" );
    }
+
+/* FitsAxisOrder. */
+/* -------------- */
+   set = TestFitsAxisOrder( this, status );
+   sval = set ? GetFitsAxisOrder( this, status ) : astGetFitsAxisOrder( this );
+   astWriteString( channel, "FAxOrd", set, 1, sval,
+                      "Order of WCS axes in new FITS headers" );
 
 /* FitsDigits. */
 /* ----------- */
@@ -41529,6 +41771,7 @@ AstFitsChan *astInitFitsChan_( void *mem, size_t size, int init,
       new->iwc = -1;
       new->clean = -1;
       new->fitsdigits = DBL_DIG;
+      new->fitsaxisorder = NULL;
       new->encoding = UNKNOWN_ENCODING;
       new->warnings = NULL;
       new->tables = NULL;
@@ -41717,6 +41960,10 @@ AstFitsChan *astLoadFitsChan_( void *mem, size_t size,
       }
       if ( TestEncoding( new, status ) ) SetEncoding( new, new->encoding, status );
       text = astFree( text );
+
+/* FitsAxisOrder. */
+/* -------------- */
+      new->fitsaxisorder = astReadString( channel, "faxord", NULL );
 
 /* FitsDigits. */
 /* ----------- */

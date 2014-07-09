@@ -67,12 +67,12 @@
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -180,6 +180,7 @@ typedef struct AstFitsChan {
    int iwc;         /* Include an IWC Frame? */
    int clean;       /* Remove used cards even if an error occurs? */
    int fitsdigits;  /* No. of decmial places in formatted floating point keyword values */
+   char *fitsaxisorder; /* Pointer to a string defining WCS axis order */
    char *warnings;  /* Pointer to a string containing warning conditions */
    void *card;      /* Pointer to next FitsCard to be read */
    void *head;      /* Pointer to first FitsCard in the circular linked list */
@@ -268,6 +269,11 @@ typedef struct AstFitsChanVtab {
    int (* TestFitsDigits)( AstFitsChan *, int * );
    void (* SetFitsDigits)( AstFitsChan *, int, int * );
    void (* ClearFitsDigits)( AstFitsChan *, int * );
+
+   const char *(* GetFitsAxisOrder)( AstFitsChan *, int * );
+   int (* TestFitsAxisOrder)( AstFitsChan *, int * );
+   void (* SetFitsAxisOrder)( AstFitsChan *, const char *, int * );
+   void (* ClearFitsAxisOrder)( AstFitsChan *, int * );
 
    int (* GetDefB1950)( AstFitsChan *, int * );
    int (* TestDefB1950)( AstFitsChan *, int * );
@@ -522,6 +528,11 @@ void astInitFitsChanGlobals_( AstFitsChanGlobals * );
    int astTestFitsDigits_( AstFitsChan *, int * );
    void astSetFitsDigits_( AstFitsChan *, int, int * );
    void astClearFitsDigits_( AstFitsChan *, int * );
+
+   const char *astGetFitsAxisOrder_( AstFitsChan *, int * );
+   int astTestFitsAxisOrder_( AstFitsChan *, int * );
+   void astSetFitsAxisOrder_( AstFitsChan *, const char *, int * );
+   void astClearFitsAxisOrder_( AstFitsChan *, int * );
 
    const char *astGetAllWarnings_( AstFitsChan *, int * );
 
@@ -795,6 +806,15 @@ astINVOKE(V,astGetFitsDigits_(astCheckFitsChan(this),STATUS_PTR))
 astINVOKE(V,astSetFitsDigits_(astCheckFitsChan(this),fitsdigits,STATUS_PTR))
 #define astTestFitsDigits(this) \
 astINVOKE(V,astTestFitsDigits_(astCheckFitsChan(this),STATUS_PTR))
+
+#define astClearFitsAxisOrder(this) \
+astINVOKE(V,astClearFitsAxisOrder_(astCheckFitsChan(this),STATUS_PTR))
+#define astGetFitsAxisOrder(this) \
+astINVOKE(V,astGetFitsAxisOrder_(astCheckFitsChan(this),STATUS_PTR))
+#define astSetFitsAxisOrder(this,fitsaxisorder) \
+astINVOKE(V,astSetFitsAxisOrder_(astCheckFitsChan(this),fitsaxisorder,STATUS_PTR))
+#define astTestFitsAxisOrder(this) \
+astINVOKE(V,astTestFitsAxisOrder_(astCheckFitsChan(this),STATUS_PTR))
 
 #define astClearWarnings(this) \
 astINVOKE(V,astClearWarnings_(astCheckFitsChan(this),STATUS_PTR))

@@ -1,6 +1,6 @@
       SUBROUTINE COF_WHEAD( NDFI, NDFFAI, COMP, FUNIT, BITPIX, PROPEX,
      :                      ORIGIN, ENCOD, NATIVE, MULTI, EXTNAM,
-     :                      USEAXS, ALWTAB, STATUS )
+     :                      USEAXS, ALWTAB, AXORD, STATUS )
 *+
 *  Name:
 *     COF_WHEAD
@@ -14,7 +14,7 @@
 *  Invocation:
 *     CALL COF_WHEAD( NDFI, NDFFAI, COMP, FUNIT, BITPIX, PROPEX,
 *                     ORIGIN, ENCOD, NATIVE, MULTI, EXTNAM, USEAXS,
-*                     ALWTAB, STATUS )
+*                     ALWTAB, AXORD, STATUS )
 
 *  Description:
 *     This routine creates the header section of the primary array or
@@ -87,6 +87,9 @@
 *     ALWTAB = LOGICAL (Given)
 *        If TRUE, then WCS co-ordinates in tabular form may be written
 *        using the TAB algorithm as defined in FITS WCS Paper III.
+*     AXORD = CHARACTER * ( * ) (Given)
+*        The string defining the ordering of WCS in the FITS file. See
+*        the AST FitsAxisOrder attribute.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -277,6 +280,8 @@
 *     2013 November 15 (MJC):
 *        Add ALWTAB argument and pass it to other routines now using
 *        it.
+*     9-JUL-2014 (DSB):
+*        Added argument AXORD.
 *     {enter_further_changes_here}
 
 *-
@@ -305,6 +310,7 @@
       CHARACTER * ( * ) EXTNAM
       CHARACTER * ( * ) USEAXS
       LOGICAL ALWTAB
+      CHARACTER * ( * ) AXORD
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -918,7 +924,7 @@
 *  Write out the NDF WCS information.
 *  ==================================
       CALL COF_FPWCS( FUNIT, NDFI, ENCOD, NATIVE, USEAXS, ALWTAB,
-     :                STATUS )
+     :                AXORD, STATUS )
 
   999 CONTINUE
 

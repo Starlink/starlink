@@ -46,19 +46,32 @@
 *  ADAM Parameters:
 *     ALLOWTAB = _LOGICAL (Read)
 *        If TRUE, tables of world co-ordinates may be written using
-*        the TAB algorithm as defined in the FITS-WCS Paper III.  
-*        Examples where such a table might be present in the WCS include 
+*        the TAB algorithm as defined in the FITS-WCS Paper III.
+*        Examples where such a table might be present in the WCS include
 *        wavelengths of pre-scrunched spectra, and the presence of
 *        distortions that prevent co-ordinates being defined by
-*        analytical expressions.  Since many FITS readers are yet to 
+*        analytical expressions.  Since many FITS readers are yet to
 *        support the TAB algorithm, which uses a FITS binary-table
 *        extension to store the co-ordinates, this parameter permits
 *        this facility to be disabled.  [TRUE]
+*     AXISORDER = LITERAL (Read)
+*        Specifies the order of WCS axes within the output FITS header.
+*        It can be either null (!), "COPY" or a space separated list
+*        of axis symbols (case insensitive). If it is null, the order is
+*        determined automatically so that the i'th WCS axis is the WCS
+*        axis that is most nearly parallel to the i'th pixel axis. If it
+*        is "COPY", the i'th WCS axis in the FITS header is the i'th WCS
+*        axis in the NDFs current WCS Frame. Otherwise, the string must
+*        be a space-spearated list of axis symbols that gives the order
+*        for the WCS axes. An error is reported if the list does not
+*        contain any of the axis symbols present in the current WCS
+*        Frame, but no error is report if the list also contains other
+*        symbols. [!]
 *     BITPIX = GROUP (Read)
 *        The FITS bits-per-pixel (BITPIX) value for each conversion.
 *        This specifies the data type of the output FITS file.
 *        Permitted values are: 8 for unsigned byte, 16 for signed word,
-*        32 for integer, 64 for 64-bit integer, -32 for real, -64 for 
+*        32 for integer, 64 for 64-bit integer, -32 for real, -64 for
 *        double precision.  There are three other special values.
 *
 *        -- BITPIX=0 will cause the output file to have the data type
@@ -727,6 +740,8 @@
 *        for the former (as also used in FITS2NDF).
 *     2013 November 15 (MJC):
 *        Add Parameter ALLOWTAB.
+*     9-JUL-2014 (DSB):
+*        Added parameter AXISORDER.
 *     {enter_further_changes_here}
 
 *-
@@ -748,6 +763,7 @@
 
 *  External References:
       LOGICAL CHR_INSET          ! Os string one of a set?
+      LOGICAL CHR_SIMLR          ! Case-blind string comparison
       CHARACTER * ( 2 ) CHR_NTH  ! Ordinal abbreviation
 
 *  Local Constants:
@@ -767,6 +783,7 @@
                                  ! array components
       LOGICAL AVALID             ! Is supplied COMP an allowed
                                  ! permutation?
+      CHARACTER*255 AXORD        ! String specifying WCS axis order
       INTEGER BITPIX             ! BITPIX code
       INTEGER BPGRP              ! Group identifier of BITPIXs
       CHARACTER*3 CBP            ! Character form of a BITPIX value
@@ -1266,6 +1283,17 @@
 *  Is the TAB algorithm to be used?
       CALL PAR_GET0L( 'ALLOWTAB', ALWTAB, STATUS )
 
+*  Get the WCS axis order, and convert to teh form expected for the AST
+*  FitsAxisOrder attribute.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+      CALL PAR_GET0C( 'AXISORDER', AXORD, STATUS )
+      IF( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+         AXORD = '<auto>'
+      ELSE IF( CHR_SIMLR( AXORD, 'copy' ) ) THEN
+         AXORD = '<copy>'
+      END IF
+
 *  Process each file.
 *  ==================
       MERGE = .FALSE.
@@ -1559,7 +1587,8 @@
                CALL COF_NDF2F( NDF, FILNAM, NAPRES, ARRPRE, BITPIX,
      :                         BLOCKF, ORIGIN, PROFIT, DUPLEX, PROEXT,
      :                         PROHIS, PROVEX, CHECKS, ENCOD, NATIVE,
-     :                         FOPEN, FCLOSE, USEAXS, ALWTAB, STATUS )
+     :                         FOPEN, FCLOSE, USEAXS, ALWTAB,
+     :                         AXORD, STATUS )
 
 *  There are no arrays to transfer to the FITS file for the .HEADER
 *  NDF.
@@ -1575,14 +1604,16 @@
                CALL COF_NDF2F( NDF, FILNAM, 1, 'HEADER', -32, BLOCKF,
      :                         ORIGIN, PROFIT, DUPLEX, PROEXT, PROHIS,
      :                         PROVEX, CHECKS, ENCOD, NATIVE, FOPEN,
-     :                         FCLOSE, USEAXS, ALWTAB, STATUS )
+     :                         FCLOSE, USEAXS, ALWTAB,
+     :                         AXORD, STATUS )
             ELSE
 
 *  Convert the NDF to the FITS file.
                CALL COF_NDF2F( NDF, FILNAM, NAPRES, ARRPRE, BITPIX,
      :                         BLOCKF, ORIGIN, PROFIT, DUPLEX, PROEXT,
      :                         PROHIS, PROVEX, CHECKS, ENCOD, NATIVE,
-     :                         FOPEN, FCLOSE, USEAXS, ALWTAB, STATUS )
+     :                         FOPEN, FCLOSE, USEAXS, ALWTAB,
+     :                         AXORD, STATUS )
             END IF
 
 *  Tidy the NDF.

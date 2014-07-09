@@ -51,6 +51,15 @@ interface NDF2FITS
       helpkey     '*'
    endparameter
 
+   parameter      AXISORDER      # WCS axis order in FITS header
+      type        'LITERAL'
+      prompt      'The order for the WCS axes in the FITS file'
+      vpath       'DEFAULT'
+      ppath       'CURRENT,DEFAULT'
+      default     !
+      helpkey     '*'
+   endparameter
+
    parameter      BITPIX         # No. of bits per pixel
       position    4
       type        'LITERAL'
