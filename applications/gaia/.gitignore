@@ -8,3 +8,18 @@ gaiavo_tcl
 *.ASC
 #  Want this directory to be checked.
 !gaia.htx
+
+/demodata.tar
+/gaia/gaia_tcl
+/gaia/gaia_wish
+/gaia/library/tclIndex
+/gaia/pkgIndex.tcl
+/gaia3d/library/tclIndex
+/gaia3d/pkgIndex.tcl
+/scripts/gaia.sh
+/scripts/tabbedgaia.sh
+/tasks/gai1_ardsp.f
+/tasks/gaiaMon
+/tasks/rtd1_gbndx.f
+/tasks/rtd1_statx.f
+/sun214.pdf

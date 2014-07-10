@@ -1,0 +1,17 @@
+/defaults/params.tex
+/defaults/make_pardocs
+/libsmf/make_h
+/libsmf/smf.h
+/libsmf/smf_average_data.c
+/libsmf/smf_boxcar1.c
+/libsmf/smf_downsamp1.c
+/libsmf/smf_sigmaclip.c
+/libsmf/smf_sort.c
+/libsmf/smf_stats1.c
+/libsmf/smf_templateFit1.c
+/libsmf/smf_tophat1.c
+/libsmf/smf_weightstats1.c
+/libsmurf/smurfmon.tex
+/smurf.csh
+/smurf.icl
+/smurf.sh

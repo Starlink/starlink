@@ -9,13 +9,12 @@ libtool
 make.log
 make.log.err
 starconf.status
-sun227.aux
-sun227.dvi
-sun227.htx
-sun227.htx_tar
-sun227.log
-sun227.ps
-sun227.toc
+/sun227.aux
+/sun227.htx
+/sun227.htx_tar
+/sun227.log
+/sun227.toc
+/sun227.pdf
 componentinfo.dtd
 config.guess
 config.sub
@@ -23,4 +22,3 @@ ltmain.sh
 missing
 install-sh
 cfitsio_link
-

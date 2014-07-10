@@ -1,0 +1,17 @@
+/test_access
+/test_alloc
+/test_chdir
+/test_cuserid
+/test_getcwd
+/test_getenv
+/test_getpid
+/test_getuid
+/test_putenv
+/test_rand
+/test_remove
+/test_stat
+/test_term
+/test_time
+/test_uname
+/test_wordexp
+/sun121.pdf
