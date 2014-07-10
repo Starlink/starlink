@@ -17,16 +17,16 @@
 {Copyright \copyright\ 2014 Science and Technology Research Council}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {55.30}
+\newcommand{\stardocnumber}    {55.31}
 \newcommand{\stardocauthors}   {Malcolm J. Currie\\
                                 G.J.Privett\\
                                 A.J.Chipperfield\\
                                 D.S.Berry\\
                                 A.C.Davenhall}
-\newcommand{\stardocdate}      {2013 November 15}
+\newcommand{\stardocdate}      {2014 July 9}
 \newcommand{\stardoctitle}     {CONVERT\\
                                 A Format-conversion Package}
-\newcommand{\stardocversion}   {Version 1.7}
+\newcommand{\stardocversion}   {Version 1.8}
 \newcommand{\stardocmanual}    {User's Manual}
 \newcommand{\stardocabstract}  {
 The \CONVERT\ package contains utilities for converting data files
@@ -4291,6 +4291,22 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          this facility to be disabled.  \texttt{[TRUE]}
       }
       \sstsubsection{
+         AXISORDER = LITERAL (Read)
+      }{
+         Specifies the order of WCS axes within the output FITS header.
+         It can be either null (\texttt{!}), \texttt{"Copy"} or a
+         space-separated list of axis symbols (case insensitive). If it
+         is null, the order is determined automatically so that the $i$th
+         WCS axis is the WCS axis that is most nearly parallel to the
+         $i$th pixel axis. If it is \texttt{"Copy"}, the $i$th WCS axis in
+         the FITS header is the $i$th WCS axis in the NDF's current WCS
+         Frame. Otherwise, the string must be a space-separated list of
+         axis symbols that gives the order for the WCS axes. An error is
+         reported if the list does not contain any of the axis symbols
+         present in the current WCS Frame, but no error is reported if the
+         list also contains other symbols.  \texttt{[!]}
+      }
+      \sstsubsection{
          BITPIX = LITERAL (Read)
       }{
          The FITS bits-per-pixel (BITPIX) value for each conversion.
@@ -7640,5 +7656,14 @@ algorithm.
 \htmlref{SPECX2NDF}{SPECX2NDF} has a new SYSTEM parameter that
 specifies the NDF's co-ordinate system.
 
+\subsection{Release Notes -- V1.8}
+
+NDF2FITS has a new literal parameter called AXISORDER to specify the
+order of WCS axes in the output FITS header.  This is introduced so
+that the generated FITS file may be interpeted correctly by those FITS
+readers that assume certain axis orders. For example some expect
+equatorial co-ordinates to be ordered right ascension then
+declination, whereas the FITS standard lets you permute WCS axes in
+any order.
 
 \end{document}

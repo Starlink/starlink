@@ -1,3 +1,13 @@
+1 CONVERT_Version_1.8
+
+   NDF2FITS has a new literal parameter called AXISORDER to
+   specify the order of WCS axes in the output FITS header.  This
+   is introduced so that the generated FITS file may be interpeted
+   correctly by those FITS readers that assume certain axis
+   orders. For example some expect equatorial co-ordinates to be
+   ordered right ascension then declination, whereas the FITS
+   standard lets you permute WCS axes in any order.
+
 1 CONVERT_Version_1.7
 
   Support for 64-bit integers is now available in ASCII2NDF, DA2NDF,

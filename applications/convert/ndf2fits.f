@@ -56,17 +56,17 @@
 *        this facility to be disabled.  [TRUE]
 *     AXISORDER = LITERAL (Read)
 *        Specifies the order of WCS axes within the output FITS header.
-*        It can be either null (!), "COPY" or a space separated list
+*        It can be either null (!), "Copy" or a space-separated list
 *        of axis symbols (case insensitive). If it is null, the order is
-*        determined automatically so that the i'th WCS axis is the WCS
-*        axis that is most nearly parallel to the i'th pixel axis. If it
-*        is "COPY", the i'th WCS axis in the FITS header is the i'th WCS
-*        axis in the NDFs current WCS Frame. Otherwise, the string must
-*        be a space-spearated list of axis symbols that gives the order
+*        determined automatically so that the ith WCS axis is the WCS
+*        axis that is most nearly parallel to the ith pixel axis. If it
+*        is "Copy", the ith WCS axis in the FITS header is the ith WCS
+*        axis in the NDF's current WCS Frame. Otherwise, the string must
+*        be a space-separated list of axis symbols that gives the order
 *        for the WCS axes. An error is reported if the list does not
 *        contain any of the axis symbols present in the current WCS
-*        Frame, but no error is report if the list also contains other
-*        symbols. [!]
+*        Frame, but no error is reported if the list also contains other
+*        symbols.  [!]
 *     BITPIX = GROUP (Read)
 *        The FITS bits-per-pixel (BITPIX) value for each conversion.
 *        This specifies the data type of the output FITS file.
@@ -741,7 +741,7 @@
 *     2013 November 15 (MJC):
 *        Add Parameter ALLOWTAB.
 *     9-JUL-2014 (DSB):
-*        Added parameter AXISORDER.
+*        Added Parameter AXISORDER.
 *     {enter_further_changes_here}
 
 *-
