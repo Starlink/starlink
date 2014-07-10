@@ -341,7 +341,7 @@
 *  contain that is one level higher and SXLOC( FINAL ) is undefined.
 *  Call a routine to propagate the table or primitive component
 *  into the structure.
-      IF ( PRIMEX ) FINAL = FINAL - 1
+      IF ( PRIMEX ) FINAL = MAX( 1, FINAL - 1 )
       CALL COF_T2HDS( FUNIT, SXLOC( FINAL ), STATUS )
 
 *  Annul all the locators.
