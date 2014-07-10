@@ -2,6 +2,7 @@
 
 setenv STAR_SEED 4
 set fwhm = 15
+set peak_value = 100
 
 echo "# rms deltat nc gain sum sum_target true_data mask" > cf.asc
 echo "# rms maxjump mindip nc gain sum sum_target true_data mask" > fw.asc
@@ -10,7 +11,7 @@ echo "# rms maxjump mindip nc gain sum sum_target true_data mask" > fw.asc
 $CUPID_DIR/makeclumps angle=\[0,0\] beamfwhm=0 deconv=no \
       fwhm1=\[$fwhm,0\] fwhm2=\[$fwhm,0\] lbnd=\[1,1\] ubnd=\[100,100\] \
       model=model nclump=1 out=junk \
-      outcat=comp4_truth.fit pardist=uniform peak=\[30,0\] \
+      outcat=comp4_truth.fit pardist=uniform peak=\[$peak_value,0\] \
       rms=1 trunc=0.1
 
 #  Do each noise level
@@ -32,11 +33,11 @@ foreach rms (2 4 6 8 10 12 14 16)
    $CUPID_DIR/makeclumps angle=\[0,0\] beamfwhm=0 deconv=no \
       fwhm1=\[$fwhm,0\] fwhm2=\[$fwhm,0\] lbnd=\[1,1\] ubnd=\[500,500\] \
       model=comp4_model nclump=200 out=$truedata \
-      outcat=comp4_truth.fit pardist=uniform peak=\[30,0\] \
+      outcat=comp4_truth.fit pardist=uniform peak=\[$peak_value,0\] \
       rms=$rms trunc=0.1
 
 #  Do each clumpfind contour interval.
-   foreach deltat (1 1.5 2 2.5 3 3.5 4 4.5 5 5.5 6 6.5 7 7.5 8.0)
+   foreach deltat (1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20)
       set pv = `echo $deltat | sed -s 's/\./p/'`
 
 #  Run clumpfind in IDL emulation mode.
@@ -82,7 +83,8 @@ end
 #  sum), and the X axis is DeltaT. Colour each spot to indicate the RMS.
 #  Space the Y axis logarithmically.
 stilts plot2d in=cf.asc xdata=deltat ydata=gain ifmt=ascii out=comp4_cf.pdf \
-       auxdata=rms ylog=true ylo=0.05 yhi=5
+       auxdata=rms ylog=true ylo=0.02 yhi=3 ylabel=Gain xlabel=DeltaT
+
 
 #  For each mindip value, create a 2D plot in which the Y axis is FellWalker
 #  gain (i.e. the median clump data sum found by FellWalker, normalised to
@@ -90,7 +92,8 @@ stilts plot2d in=cf.asc xdata=deltat ydata=gain ifmt=ascii out=comp4_cf.pdf \
 #  to indicate the RMS. Space the Y axis logarithmically.
 foreach mindip (0 1 2 3 4 5)
    stilts plot2d in=fw.asc xdata=maxjump ydata=gain ifmt=ascii out=comp4_fw_${mindip}.pdf \
-       auxdata=rms ylog=true ylo=0.05 yhi=5 subset="mindip==$mindip"
+       auxdata=rms ylog=true ylo=0.02 yhi=3 subset="mindip==$mindip" ylabel=Gain \
+       xlabel="MaxJump (MinDip=$mindip)"
 end
 
 rm comp4_*sdf true_*sdf

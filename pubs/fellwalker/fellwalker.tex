@@ -38,9 +38,11 @@
 %% use the graphics package for simple commands
 %% \usepackage{graphics}
 %% or use the graphicx package for more complicated commands
-\usepackage{graphicx}
 %% or use the epsfig package if you prefer to use the old commands
 %% \usepackage{epsfig}
+
+\usepackage{graphicx}
+\usepackage[labelformat=empty]{subfig}
 
 %% The amssymb package provides various useful mathematical symbols
 \usepackage{amssymb}
@@ -205,9 +207,9 @@ this fell-walking metaphor at frequent intervals.
 \begin{figure}
 \includegraphics[width=\columnwidth]{wasdale}
 \caption{Wastwater and the Wasdale Fells, including Great Gable
-(centre-left) and snow-covered Scafell Pike, the highest point in England,
-just visible under cloud. Copyright: Nick Thorne,
-www.lakedistrict.gov.uk/learning/freephotos\# }
+(centre-left) and snow-covered Scafell Pike, the highest point in England
+at 978 metres above sea level, just visible under cloud. Copyright: Nick
+Thorne, www.lakedistrict.gov.uk/learning/freephotos\# }
 \label{fig:wasdale}
 \end{figure}
 
@@ -581,16 +583,16 @@ different clump-finding parameter values.
 \subsection{The Artificial Data}
 The input data for each test was a two-dimensional image of 500x500
 pixels containing 200 randomly positioned Gaussian clumps, all with the
-same peak value of 30 (arbitrary units) and the same FWHM of 5 pixels.
+same peak value of 100 (arbitrary units) and the same FWHM of 15 pixels.
 Gaussian noise was then added, with a different noise level for each of
-the eight successive set of tests. The eight noise levels used were
+eight successive set of tests. The eight noise levels used were
 spread evenly between 2 and 16.
 
 \subsection{The Clump-finding Parameters}
 For each of the eight different noise levels, the data was analysed
 multiple times by both FellWalker and CLUMPFIND, using different values
 for the main clump-finding parameters in each case. For CLUMPFIND, the
-DeltaT parameter (the gap between contour levels) was varied from eight
+DeltaT parameter (the gap between contour levels) was varied from twenty
 times the noise level down to one times the noise level. For FellWalker,
 the MaxJump parameter (the minimum spatial separation between distinct
 peaks) was varied between 2 and 14 pixels. In addition, the MinDip
@@ -636,7 +638,7 @@ then a good clump-finding algorithm should be able to resolve them. But
 for larger overlaps, and larger noise levels, it becomes progressively
 more difficult to resolve overlapping clumps. In the limiting case of
 exactly co-incident clumps, it is clearly impossible for any algorithm
-to resolve them. For this reason, we expect too see a tail of high-valued
+to resolve them. For this reason, we expect to see a tail of high-valued
 clumps, although it is difficult to quantify the expected size of this
 tail.
 
@@ -648,17 +650,34 @@ data sums.
 \end{enumerate}
 
 Whilst it is difficult to quantify the effects of the first of these two
-issues, the second one can be taken into account by thresholding an
-artificial clump at the two sigma threshold before finding its data sum.
-So at each noise level the sum of the data values in an artificial clump
-is found, excluding pixel below the two sigma threshold. This value is
-then used as the expected value for the total data sum in the clumps
-measured at the same noise level. To simplify this comparison, the ratio
-of the measured clump data sum to the expected clump data sum is used
-below as a measure of the performance of each algorithm. This is referred
-to as the ``gain'' in the following figures.
+issues, its impact can be reduced by comparing the expected clump data
+sum with the median of the measured clump data sums rather than the mean.
+This will reduce the influence of the tail of high-valued clump data sums.
+
+The second issue can be taken into account by thresholding a single artificial
+clump at the two sigma threshold before finding its data sum. So at each
+noise level the sum of the data values in an artificial clump is found,
+excluding pixel below the two sigma threshold. This value is then used as
+the expected value for the total data sum in the clumps measured at the
+same noise level. To simplify this comparison, the ratio of the median of
+the measured clump data sums to the expected clump data sum is used below
+as a measure of the performance of each algorithm. This is referred to as
+the ``gain'' in the following figures.
 
 \subsection{CLUMPFIND Results}
+Fig.~\ref{fig:cf_results} shows the ratio of median clump data sum, as
+measured by CLUMPFIND, to expected clump data sum at various values of
+the DeltaT parameter and for various noise levels. Ideally , we would
+hope for a gain of unity (\emph{i.e.} the median measured clump data sum
+equalling the expected clump data sum). It can be seen that such a
+condition is typically achieved at a DeltaT value around 10 times the
+noise level, but that the relationship between DeltaT, Gain and RMS is
+quite unpredictable.
+
+At the DeltaT value of 2.0 recommended by \cite{1994Williams}, all noise
+levels produce clumps which are well under the expected total data sum,
+supporting the finding of \cite{2010Watson} that CLUMPFIND tends to
+fragment clumps.
 
 \begin{figure}
 \includegraphics[width=\columnwidth]{comp4_cf}
@@ -666,14 +685,52 @@ to as the ``gain'' in the following figures.
 using CLUMPFIND, as a function of the DelatT parameter value (the gap
 between CLUMPFIND contour levels). The DeltaT values are multiples of the
 noise level. The colours indicate the noise level, as shown in the colour
-baron the right of hte figure.}
+bar on the right of the figure.}
 \label{fig:cf_results}
 \end{figure}
 
 
+\subsection{FellWalker Results}
+Fig.~\ref{fig:fw_results} shows the ratio of median clump data sum, as
+measured by FellWalker, to expected clump data sum at various values of
+the MaxJump and MinDip parameters and for the same noise levels shown in
+Fig.~\ref{fig:cf_results}. It can be seen that in these tests, FellWalker
+produces clumps with data sums that are much more consistent and closer
+to the expected data sum than CLUMPFIND.
 
+It can be seen that at small MaxJump and small MinDip, FellWalker splits
+clumps into small fragments. The small MaxJump value causes noise spikes
+to be interpreted as peaks, and the small MinDip value then prevents these
+``peaks'' from being merged. At the other extreme, large MaxJump values
+allow the walk process to jump between real peaks, thus merging them
+together into clumps that are larger than expected. This effect is worse
+at larger MinDip values.
 
+But between these extremes, values of MaxJump between 4 and 10, and MinDip
+between 0 and 4 times the noise level produce predictable gain values that
+are close to the expected value of unity, meaning that the median clump data
+sum is close to the value expected on the basis of the known properties
+of the artificial clumps.
 
+\begin{figure}
+\centering
+\subfloat[][]{\includegraphics[trim=0 0 25mm 0,clip,height=0.5\columnwidth]{comp4_fw_0}}
+\hspace*{10pt}
+\subfloat[][]{\includegraphics[trim=20mm 0 25mm 0,clip,height=0.5\columnwidth]{comp4_fw_1}}\\
+\subfloat[][]{\includegraphics[trim=0 0 25mm 0,clip,height=0.5\columnwidth]{comp4_fw_2}}
+\hspace*{10pt}
+\subfloat[][]{\includegraphics[trim=20mm 0 25mm 0,clip,height=0.5\columnwidth]{comp4_fw_3}}\\
+\subfloat[][]{\includegraphics[trim=0 0 25mm 0,clip,height=0.5\columnwidth]{comp4_fw_4}}
+\hspace*{10pt}
+\subfloat[][]{\includegraphics[trim=20mm 0 25mm 0,clip,height=0.5\columnwidth]{comp4_fw_5}}
+\caption{The ratio of measured to expected data sum in clumps identified
+using FellWalker, as a function of the MaxJump parameter value (the
+minimum spatial distance between distinct peaks, in pixels), and the
+MinDip parameter value (the minimum dip between distinct peaks, as a
+multiple of the noise level). The colours indicate the noise level, as
+shown in Fig.~\ref{fig:cf_results}.}
+\label{fig:fw_results}
+\end{figure}
 
 \section{Possible Enhancements to FellWalker}
 Future work on the FellWalker algorithm is planned to address two small
@@ -681,7 +738,7 @@ problems with the current implementation:
 
 \begin{itemize}
 \item The cleaning process described in section~\ref{sec:cleaning} can
-sometimes cause clumps to be split into two or more discontiguous parts.
+sometimes cause clumps to be split into two or more dis-contiguous parts.
 This can occur for ``dog-bone'' shaped clumps that have a narrow
 steep-sided central ridge that widens out at the two ends. In such cases,
 the cleaning process can sometimes erode pixels from the central ridge
@@ -692,7 +749,7 @@ maximum, an attempt is made to find a higher pixel value within a small
 box centred on the local maximum, and if found, the walk continues from this
 higher pixel. However, no check is made that the higher pixel is on the
 same ``island''\footnote{i.e. a contiguous group of
-pixels that are all higer than the threshold level.} as the local
+pixels that are all higher than the threshold level.} as the local
 maximum. Thus it is possible that walks could jump from one island to
 another, and so merge clumps together that are in fact distinct.
 \end{itemize}
