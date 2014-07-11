@@ -213,14 +213,24 @@ Thorne, www.lakedistrict.gov.uk/learning/freephotos\# }
 \label{fig:wasdale}
 \end{figure}
 
+An implementation of the FellWalker algorithm is included in the Starlink
+CUPID package \citep[][\ascl{1311.007}]{CupidAdass,SUN255}, together with
+implementations of other clump-finding algorithms such as Gaussclumps
+\citep[][\ascl{1406.018}]{1990ApJ...356..513S} and CLUMPFIND. In common
+with the rest of the Starlink software
+\citep[][\ascl{1110.012}]{StarlinkAdass}, the source code for the CUPID
+package is open-source and is available on
+\htmladdnormallinkfoot{Github}{https://github.com/Starlink}.
+
 \begin{figure}
 \includegraphics[width=\columnwidth]{fellwalking}
 \caption{In 2-dimensions, peaks in data value are often reminiscent of the
-fells of northern England. The FellWalker algorithm performs many walks
-starting at various low-land pixels, and for each one follows a line of steepest ascent
-until a significant summit is reached. All walks that terminate at the
-same peak are assigned to the same clump, indicated by different colours
-in the above figure.}
+fells of northern England such as those in Fig.~\ref{fig:wasdale}. The
+FellWalker algorithm performs many walks starting at various low-land
+pixels, and for each one follows a line of steepest ascent until a
+significant summit is reached. All walks that terminate at the same peak
+are assigned to the same clump, indicated by different colours in the
+above figure.}
 \label{fig:fellwalking}
 \end{figure}
 
@@ -486,9 +496,10 @@ the clump on that axis is given by:
 \[ size = \sqrt{ \frac{ \sum d_{i}.x_{i}^{2} }{ \sum d_{i} } -
 \left( \frac{\sum d_{i}.x_{i} }{\sum d_{i}}  \right)^2 } \]
 
-where $d_{i}$ is the data value of pixel $i$, and $x_{i}$ is the axis
-value of pixel $i$. For a clump with a Gaussian profile, this
-``size'' value is equal to the standard deviation of the Gaussian.
+where $d_{i}$ is the data value of pixel $i$ minus the background value,
+and $x_{i}$ is the axis value of pixel $i$. For a clump with a Gaussian
+profile, this ``size'' value is equal to the standard deviation of the
+Gaussian.
 
 For observational data, the clumps will be blurred by the telescope beam.
 FellWalker includes an option to remove this blurring if the beam size of
@@ -505,16 +516,6 @@ clump volume should be unchanged by the instrumental blurring:
 
 
 
-
-\section{\label{sec:cupid}CUPID - an Implementation of FellWalker}
-The Starlink CUPID package \citep[][\ascl{1311.007}]{CupidAdass,SUN255} provides
-implementations of various clump-finding algorithms, including FellWalker,
-Gaussclumps \citep[][\ascl{1406.018}]{1990ApJ...356..513S},
-and CLUMPFIND. One of the aims of the CUPID package is to make it easy to compare
-clump-finding algorithms by ensuring that the results are written out in a common format.
-In common with the rest of the Starlink software \citep[][\ascl{1110.012}]{StarlinkAdass},
-the source code for the CUPID package is open-source and is available on
-\htmladdnormallinkfoot{Github}{https://github.com/Starlink}.
 
 \section{Comparing FellWalker and CLUMPFIND}
 
@@ -675,7 +676,8 @@ hope for a gain of unity (\emph{i.e.} the median measured clump data sum
 equalling the expected clump data sum). It can be seen that such a
 condition is typically achieved at a DeltaT value around 10 times the
 noise level, but that the relationship between DeltaT, Gain and RMS is
-quite unpredictable.
+quite unpredictable. This supports the findings of \cite{2009Pineda},
+who found that CLUMPFIND results were very sensitive to the value of DeltaT.
 
 At the DeltaT value of 2.0 recommended by \cite{1994Williams}, all noise
 levels produce clumps which are well under the expected total data sum,
@@ -691,7 +693,6 @@ noise level. The colours indicate the noise level, as shown in the colour
 bar on the right of the figure.}
 \label{fig:cf_results}
 \end{figure}
-
 
 \subsection{FellWalker Results}
 Fig.~\ref{fig:fw_results} shows the ratio of median clump data sum, as
@@ -735,7 +736,7 @@ shown in Fig.~\ref{fig:cf_results}.}
 \label{fig:fw_results}
 \end{figure}
 
-\section{Possible Enhancements to FellWalker}
+\section{Future Enhancements to FellWalker}
 Future work on the FellWalker algorithm is planned to address two small
 problems with the current implementation:
 
