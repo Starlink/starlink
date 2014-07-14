@@ -175,14 +175,15 @@ Starlink
 \section{Introduction}
 \label{sec:intro}
 
-The CLUMPFIND algorithm \citep[][\ascl{1107.014}]{1994Williams} has been widely used for
-decomposing 2- and 3-dimensional data into disjoint clumps of emission,
-each associated with a single significant peak. It is based upon an
-analysis of a set of evenly spaced contours derived from the data array
-and has two main parameters - the lowest contour level, below which
-data is ignored, and the interval between contours. However it has been
-noted by \cite{2009Pineda} that the decomposition produced by CLUMPFIND
-can be very sensitive to the specific value used for the contour interval,
+The CLUMPFIND algorithm \citep[][\ascl{1107.014}]{1994Williams} has been
+widely used for decomposing 2- and 3-dimensional data into disjoint
+clumps of emission, each associated with a single significant peak. It is
+based upon an analysis of a set of evenly spaced contours derived from
+the data array and has two main parameters - the lowest contour level,
+below which data is ignored, and the interval between contours. However
+it has been noted (\emph{e.g.} by \cite{2009Pineda} and
+\cite{2014Christie}) that the decomposition produced by CLUMPFIND can be
+very sensitive to the specific value used for the contour interval,
 particularly for 3-dimensional data and crowded fields. The choice of an
 optimal contour interval is a compromise - real peaks may be missed if
 the interval is too large, but noise spikes may be interpreted as real
@@ -522,20 +523,23 @@ clump volume should be unchanged by the instrumental blurring:
 \section{Comparing FellWalker and CLUMPFIND}
 
 \cite{2010Watson} made a detailed comparison of the performance of several
-different clump finding algorithms, including FellWalker and CLUMPFIND.
+different 2-dimensional clump finding algorithms, including FellWalker and CLUMPFIND.
 This concluded that, under the conditions used in the study, FellWalker
 is less likely than CLUMPFIND to split up large clumps, and is less
-likely to create false clump detections. An independent illustration of
-this result is presented in Fig.~\ref{fig:comp1}, which shows a field of
-artificial Gaussian clumps, with the resulting clump assignment arrays
-produced by FellWalker and CLUMPFIND. The input data image is an array of
-500 x 500 pixels containing 200 circular clumps distributed randomly
-across the image\footnote{Except none are allowed to touch an edge of the
-image}. Each clump has a Gaussian profile with a Full Width at Half
-Maximum of 15 pixels. The clump peak values are distributed uniformly
-between 30 and 100, and Gaussian noise of standard deviation 15 is added
-to the image. Both FellWalker and CLUMPFIND are run with the default
-parameter values supplied by CUPID (\emph{FellWalker.MinDip}=3.RMS,
+likely to create false clump detections. A similar conclusion was reached
+by \cite{2014Christie} for 3-dimensional data.
+
+An independent illustration of this for 2-dimensional data is presented in
+Fig.~\ref{fig:comp1}, which shows a field of artificial Gaussian clumps,
+with the resulting clump assignment arrays produced by FellWalker and
+CLUMPFIND. The input data image is an array of 500 x 500 pixels
+containing 200 circular clumps distributed randomly across the
+image\footnote{Except none are allowed to touch an edge of the image}.
+Each clump has a Gaussian profile with a Full Width at Half Maximum of 15
+pixels. The clump peak values are distributed uniformly between 30 and
+100, and Gaussian noise of standard deviation 15 is added to the image.
+Both FellWalker and CLUMPFIND are run with the default parameter values
+supplied by CUPID (\emph{FellWalker.MinDip}=3.RMS,
 \emph{FellWalker.MaxJump}=4, \emph{ClumpFind.DeltaT}=2.RMS,
 \emph{ClumpFind.TLow}=2.RMS).
 
