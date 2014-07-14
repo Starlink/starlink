@@ -293,7 +293,7 @@ in the CAA are skipped since they have either already been assigned to a
 clump (if the CAA value is positive) or have been flagged as unusable (if
 the CAA value is negative). A single walk consists of stepping from pixel
 to pixel until a pixel is reached which is already known to be part of a
-clump, or a significant isolated peak is encountered. The vector indicies of
+clump, or a significant isolated peak is encountered. The vector indices of
 the pixels visited along a walk are recorded in a temporary array so that
 they  can be identified later.
 
@@ -303,7 +303,9 @@ gradient\footnote{This gradient takes into account the fact that the
 centres of the corner pixels are further away from the box centre than
 are the centres of the mid-side pixels.}. Thus 2 neighbours are checked if
 the data is 1-dimensional data, 8 are checked if the data is 2-dimensional
-and 26 are checked if the data is 3-dimensional.
+and 26 are checked if the data is 3-dimensional. The gradient is
+evaluated in pixel coordinates, without regard to the physical units
+associated with each axis.
 
 If the highest gradient found above is greater than zero - that is, if
 there is an upward route out of the current pixel - the walk steps to the
@@ -438,10 +440,10 @@ Various criteria are available to select unusable clumps and exclude them
 from the final data products. These include:
 
 \begin{itemize}
-\item Clumps that touch an edge of the supplied data array may be excluded.
-\item Clumps that touch areas of missing (\emph{i.e.} blank) pixels may be excluded.
-\item Clumps that have a peak value less than a given limit may be excluded.
-\item Clumps that contain fewer than a given number of pixels may be excluded.
+\item Clumps that touch an edge of the supplied data array.
+\item Clumps that touch areas of missing (\emph{i.e.} blank) pixels.
+\item Clumps that have a peak value less than a given limit.
+\item Clumps that contain fewer than a given number of pixels.
 \end{itemize}
 
 The number of clumps rejected for each of these reasons is reported.
