@@ -1696,7 +1696,7 @@ atmospheric emission varies significantly over the timescales of a
 typical observation, further swamping any contribution from the
 source. Fortunately, the emission from the sky is correlated over the
 SCUBA-2 field of view, which enables simple sky removal techniques to
-be used effectively\cite{archibald,sc2ana002}.
+be used effectively\cite{archibald,dempsey,sc2ana002}.
 
 \begin{figure}[htb]
   \begin{center}
@@ -2402,7 +2402,7 @@ times a point on the sky is observed) for different mapping strategies
 or the impact of non-working bolometers. Several different scanning
 models are supported: boustrophedon (conventional back-and-forth
 raster scan), two variations of `pong' (or box-scan) with either
-sharp or gentle turnarounds and a lissajous pattern. [REF TO ANA SCAN DOC]
+sharp or gentle turnarounds and a lissajous pattern \cite{kackley}.
 
 \subsection{\xlabel{simuse}Simulator workflow\label{se:simuse}}
 
@@ -2492,7 +2492,7 @@ simulate data for, the names of the atmosphere model and astronomical
 source files and the zenith opacity (at 225 GHz). The zenith opacty is
 converted to a value at the appropriate wavelength using the empirical
 relations derived for SCUBA by Archibald et al. (2002). Similar
-relations for SCUBA-2 will be derived.
+relations for SCUBA-2 are available from Dempsey et al.\ (2013).
 
 Data for all subarrays (at the specified wavelength) may be generated
 in a single run. The size of the output files is governed by the
@@ -2533,6 +2533,16 @@ pipeline rather than \SMURF, as their analysis involves multiple
 steps. POINTING observations are equivalent to short science
 observations and should be processed in the same way.
 
+\section{Citing SMURF}
+
+If you use SMURF in your work please use the following references:
+
+For the continuum map-maker: Chapin et al., 2013, MNRAS, 430, 2545
+
+For the heterodyne components see Jenness et al., Astronomy \& Computing, in preparation.
+
+The general SMURF reference should be to use the Astrophysics Source Code Library entry of \texttt{ascl:1310.007}.
+
 \section{Acknowledgments}
 
 The authors are grateful for the documentation written by Maria Kelly
@@ -2566,8 +2576,11 @@ Buckle~J.~V., et~al., 2009, MNRAS, 399, 1026
 %Analysis Tool},
 %\xref{Starlink User Note 214}{sun214}{}
 
+\bibitem{dempsey}
+Dempsey~J.~T., et al., 2013, MNRAS, 430, 2534
+
 \bibitem{scuba2}
-Holland~W.~S., et~al., 2006, Proc. SPIE, 6275, 45
+Holland~W.~S., et~al., 2013, MNRAS, 430, 2513
 
 \bibitem{jenness}
 Jenness~T., et~al., 2002, MNRAS, 336, 14
@@ -2576,6 +2589,9 @@ Jenness~T., et~al., 2002, MNRAS, 336, 14
 Jenness~T., Gibb,~A., 2007, \textit{Data Acquisition/Data Reduction
   Pipeline Interface Control Document}, SCUBA-2 Data Reduction
 document SC2/SOF/IC210/01
+
+\bibitem{kackley}
+Kackley~R., et al., 2010, Proc.\ SPIE, 7740, 77401Z
 
 \bibitem{dream}
 Le~Poole~R.~S., van~Someren~Greve~H.~W., 1998, Proc. SPIE, 3357, 638
