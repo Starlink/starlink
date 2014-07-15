@@ -216,7 +216,7 @@ Thorne, www.lakedistrict.gov.uk/learning/freephotos\# }
 
 An implementation of the FellWalker algorithm is included in the Starlink
 CUPID package \citep[][\ascl{1311.007}]{CupidAdass,SUN255}, together with
-implementations of other clump-finding algorithms such as Gaussclumps
+implementations of other clump-finding algorithms such as GaussClumps
 \citep[][\ascl{1406.018}]{1990ApJ...356..513S} and CLUMPFIND. In common
 with the rest of the Starlink software
 \citep[][\ascl{1110.012}]{StarlinkAdass}, the source code for the CUPID
@@ -742,6 +742,82 @@ shown in Fig.~\ref{fig:cf_results}.}
 \label{fig:fw_results}
 \end{figure}
 
+\subsection{Comparisons Using Three-Dimensional Data}
+
+The above comparison of FellWalker and CLUMPFIND was done using
+2-dimensional data. This section presents results of a similar test using
+3-dimensional data. Each test data cube has dimensions of 200x200x200
+pixels, and contains 600 artificial Gaussian clumps each with a width
+(FWHM) of 10 pixels and identical peak value of 100. In all other
+respects, the 3-dimensional tests were done in exactly the same way and
+with the same parameter ranges as the 2-dimensional tests.
+Fig.~\ref{fig:true_6} shows a volume rendering of the artificial data
+cube with noise level of 6.0
+
+\begin{figure}
+\includegraphics[width=\columnwidth]{true_6}
+\caption{A volume-rendering of a typical artificial data cube used to
+compare the performance of CLUMPFIND and FellWalker on 3-dimensional data.}
+\label{fig:true_6}
+\end{figure}
+
+Fig.~\ref{fig:cf_results_3d} again shows the ratio of median clump data
+sum, as measured by CLUMPFIND, to expected clump data sum at the same set
+of DeltaT and noise levels as used in the 2-dimensional tests.
+
+\begin{figure}
+\includegraphics[width=\columnwidth]{comp4_cf_3d}
+\caption{The ratio of measured to expected data sum in 3-dimensional clumps
+identified using CLUMPFIND, as a function of the DelatT parameter value.
+The DeltaT values are multiples of the noise level. The colours indicate
+the noise level, as shown in the colour
+bar on the right of the figure.}
+\label{fig:cf_results_3d}
+\end{figure}
+
+Fig.~\ref{fig:fw_results_3d} shows the ratio of median clump data sum, as
+measured by FellWalker, to expected clump data sum at the same set of
+MaxJump values, MinDip values and noise levels used for the 2-dimensional
+tests.
+
+\begin{figure}
+\centering
+\subfloat[][]{\includegraphics[trim=0 0 25mm 0,clip,height=0.5\columnwidth]{comp4_fw_3d_0}}
+\hspace*{10pt}
+\subfloat[][]{\includegraphics[trim=20mm 0 25mm 0,clip,height=0.5\columnwidth]{comp4_fw_3d_1}}\\
+\subfloat[][]{\includegraphics[trim=0 0 25mm 0,clip,height=0.5\columnwidth]{comp4_fw_3d_2}}
+\hspace*{10pt}
+\subfloat[][]{\includegraphics[trim=20mm 0 25mm 0,clip,height=0.5\columnwidth]{comp4_fw_3d_3}}\\
+\subfloat[][]{\includegraphics[trim=0 0 25mm 0,clip,height=0.5\columnwidth]{comp4_fw_3d_4}}
+\hspace*{10pt}
+\subfloat[][]{\includegraphics[trim=20mm 0 25mm 0,clip,height=0.5\columnwidth]{comp4_fw_3d_5}}
+\caption{The ratio of measured to expected data sum in 3-dimensional clumps identified
+using FellWalker, as a function of the MaxJump and MinDip parameter value.
+The colours indicate the noise level, as shown in
+Fig.~\ref{fig:cf_results_3d}.}
+\label{fig:fw_results_3d}
+\end{figure}
+
+It can be seen that these plots are very similar to the earlier plots
+showing the corresponding results for 2-dimensional data. Again,
+CLUMPFIND results are very sensitive to DeltaT and are quite
+unpredictable, with the recommended DeltaT value (2$*$RMS) splitting
+clumps into pieces with smaller than expected data sums. FellWalker is
+less sensitive to parameter settings and is more reliable at reproducing
+the expected clump data sum.
+
+The main difference is that FellWalker results are more sensitive to the
+value of MaxJump in the 3-dimensional case. The best results are obtained
+for MinDip between 1.0 and 3.0 and MaxJump less than 8. The default
+values supplied by CUPID are 2.0 for MinDip and 4 for MaxJump.
+
+\subsection{Execution Times}
+For both 2-dimensional and 3-dimensional data, FellWalker is between 1 and
+2 orders of magnitude faster than the CUPID implementation of CLUMPFIND,
+which is itself about an order of magnitude faster than the IDL
+implementation of CLUMPFIND. Currently, CUPID uses single-threaded
+implementations of all clump-finding algorithms.
+
 \section{Future Enhancements to FellWalker}
 Future work on the FellWalker algorithm is planned to address two small
 problems with the current implementation:
@@ -767,8 +843,8 @@ another, and so merge clumps together that are in fact distinct.
 \section{Acknowledgements}
 
 I would like to thank Tim Jenness and Frossie Economou for encouraging
-the development of the CUPID package and the FellWalker algorithm, and
-for providing helpful comments on this paper.
+and promoting the development of the CUPID package and the FellWalker
+algorithm, and for providing helpful comments on this paper.
 
 The Starlink software is currently maintained by the Joint Astronomy
 Centre, Hawaii with support from the UK Science and Technology
