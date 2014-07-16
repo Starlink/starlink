@@ -117,13 +117,17 @@ error can not determine PI
 
 #include "sofam.h"
 
-/* And some from slamac.h that SOFA does not define */
+/* And some from slamac.h that SOFA did not always define */
 
 /* 180/pi:  radians to degrees */
+#ifndef DR2D
 #define DR2D 57.295779513082320876798154814105170332405472466564
+#endif
 
 /* pi/12:  hours to radians */
+#ifndef DH2R
 #define DH2R 0.26179938779914943653855361527329190701643078328126
+#endif
 
 /* Tidy up to prevent leakage of SLA symbols */
 #undef DPI
