@@ -67,6 +67,15 @@
 *        <chunk> and <where> are described above (under "OUT") and <it>
 *        is the iteration number.
 *
+*        MAP - If non-zero, a 2D map containing the binned time-stream data
+*        for all bolometers is created at each iteration, for each required
+*        model and set of residuals. These are placed in 2D NDFs with
+*        names in the following format: "<where>_<chunk>_map_<it>", where
+*        <chunk> and <where> are described above (under "OUT") and <it>
+*        is the iteration number. If the MAP value is positive, the map will
+*        contain data for just the subarray specified by "ARRAY".If MAP is
+*        negative, the map will contain data for all available subarrays.
+*
 *        MODELS - Indicates the models that are to be written out. It
 *        should be a comma separated list of model names (e.g. COM, FLT,
 *        AST, RES, etc) contained within parentheses, or a single model
@@ -143,9 +152,11 @@
 *  History:
 *     25-JAN-2013 (DSB):
 *        Original version.
+*     17-JUL-2014 (DSB):
+*        Added option to create diagnostic maps from each model.
 
 *  Copyright:
-*     Copyright (C) 2013 Science and Technology Facilities Council.
+*     Copyright (C) 2013-2014 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -207,6 +218,7 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
    int irow;
    int isub;
    int ivals[ 2 ];
+   int map;
    int mask;
    int new;
    int nmodel;
@@ -250,6 +262,9 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
 /* See if a full cube containing data for all bolometers is required at
    each iteration. */
       astMapGet0I( kmap, "CUBE", &cube );
+
+/* See if a 2D map of each model is required at each iteration. */
+      astMapGet0I( kmap, "MAP", &map );
 
 /* See if NDFs are to include Quality arrays. */
       astMapGet0I( kmap, "QUAL", &addqual );
@@ -422,7 +437,7 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
                   sprintf( root, "bef_%d", chunk );
                   smf_diag( wf, mloc, &ibolo, irow, power, time, isub,
                             dat, type, NULL, 1, root, 0, mingood, cube,
-                            addqual, status );
+                            map, addqual, status );
                }
 
 /* If this function has been called immediately after estimating the new
@@ -432,14 +447,14 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
                sprintf( root, "mod_%d", chunk );
                smf_diag( wf, mloc, &ibolo, irow, power, time, isub,
                          dat, type, allmodel ? allmodel[ 0 ] : NULL,
-                         0, root, mask, mingood, cube, addqual, status );
+                         0, root, mask, mingood, cube, map, addqual, status );
                if( res_after && type != SMF__RES ) {
                   msgOutf( "", "Diagnostics: Dumping residuals after subtraction of %s",
                            status, modname );
                   sprintf( root, "aft_%d", chunk );
                   smf_diag( wf, mloc, &ibolo, irow, power, time, isub,
                             dat, type, NULL, 1, root, 0, mingood, cube,
-                            addqual, status );
+                            map, addqual, status );
                }
 
 /* Any other "where" value is currently an error. */

@@ -686,6 +686,24 @@ diag.bolo = WMEAN
 diag.cube = 0
 
 #-----------------------------------------------------------------
+#  Name: 	diag.map
+#  Type: 	int
+#  Default: 	0
+#  Purpose: 	Qualifies the required dignostic information.
+#  Description: If non-zero, a 2D map containing the binned time-stream
+#               data for all bolometers is created at each iteration, for
+#               each required model and set of residuals. These are placed
+#               in 2D NDFs with names in the following format:
+#               "<where>_<chunk>_map_<it>", where <chunk> and <where> are
+#               described above (under "OUT") and <it> is the iteration
+#               number. If the "diag.map" value is positive, the map will
+#               contain data for just the subarray specified by "diag.array".
+#               If "diag.map" is negative, the map will contain data for all
+#               available subarrays. Only used if a value is supplied for
+#               "diag.out".
+diag.map = 0
+
+#-----------------------------------------------------------------
 #  Name: 	diag.mask
 #  Type: 	int
 #  Default: 	0

@@ -17,7 +17,7 @@
 *               int power, int time, int isub, smfDIMMData *dat,
 *               smf_modeltype type, smfArray *model, int res,
 *               const char *root, int mask, double mingood, int cube,
-*               int addqual, int *status )
+*               int map, int addqual, int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -67,6 +67,12 @@
 *        Is a full cube containing time ordered data for all bolometers
 *        required? If so, it will be stored in an NDF with name
 *        "<root>_cube_<irow>".
+*     map = int (Given)
+*        Is a 2D map containing the binned time-stream data for all
+*        bolometers required? If so, it will be stored in an NDF with name
+*        "<root>_map_<irow>". If "map" is positive, the map will contain
+*        data for just the subarray specified by "isub".If "map" is
+*        negative, the map will contain data for all available subarrays.
 *     addqual = int (Given)
 *        If non-zero, the output NDFs will include a quality array.
 *     status = int* (Given and Returned)
@@ -152,7 +158,7 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
                int power, int time, int isub, smfDIMMData *dat,
                smf_modeltype type, smfArray *model, int res,
                const char *root, int mask, double mingood, int cube,
-               int addqual, int *status ){
+               int map, int addqual, int *status ){
 
 /* Local Variables: */
    AstCmpFrame *totfrm;
@@ -170,23 +176,33 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
    dim_t fdims[2];
    dim_t itime;
    dim_t jbolo;
+   dim_t ndata;
    dim_t nbolo;
    dim_t nbolor;
-   dim_t ndata;
    dim_t ngood;
    dim_t ntslice;
    double *buffer;
    double *ip;
+   double *ipv;
    double *oldcom;
    double *oldres = NULL;
    double *pd;
    double *var;
+   double *wf_map;
+   double *wf_mapwgt;
+   double *wf_mapwgtsq;
+   double *wf_mapvar;
+   double scalevar;
    int *index;
+   int *wf_hitsmap;
    int bolostep;
    int el;
    int fax;
    int i;
    int iax;
+   int idx;
+   int idxhi;
+   int idxlo;
    int indf;
    int iw;
    int lbnd[ 2 ];
@@ -195,27 +211,28 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
    int ndim;
    int nw;
    int place;
+   int rebinflags;
    int sorted;
    int timestep;
    int ubnd[ 2 ];
    int usebolo;
    size_t bstride;
-   size_t tstride;
    size_t bstrider;
-   size_t tstrider;
    size_t nmap;
+   size_t tstride;
+   size_t tstrider;
    smfArray *array;
    smfData *data = NULL;
    smfData *data_tmp;
    smfData *pow;
+   smfData *sidequal;
    smf_qual_t *oldcomq;
-   smf_qual_t *pqr;
    smf_qual_t *pq;
+   smf_qual_t *pqr;
+   smf_qual_t *qbuffer = NULL;
    smf_qual_t *qua = NULL;
    smf_qual_t *qual;
-   smf_qual_t *qbuffer = NULL;
    smf_qual_t qval;
-   smfData *sidequal;
 
 /* Check inherited status. */
    if( *status != SAI__OK ) return;
@@ -736,6 +753,89 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
 /* Annul the NDF identifier. */
       ndfAnnul( &indf, status );
 
+   }
+
+/* If required, create a 2D map containing the binned data from all
+   bolometers. */
+   if( map && data->ndims == 3 && (data->pntr)[0] ) {
+
+/* Get the name of the NDF to hold the map. */
+      name = NULL;
+      nc = 0;
+      name = astAppendString( name, &nc, root );
+      name = astAppendString( name, &nc, "_map_" );
+      sprintf( attr, "%d", irow );
+      name = astAppendString( name, &nc, attr );
+
+/* Create it and map the Data and Variance components. */
+      ndfPlace( loc, name, &place, status );
+      ndfNew( "_DOUBLE", 2, dat->lbnd_out, dat->ubnd_out, &place, &indf,
+              status );
+      ndfMap( indf, "DATA", "_DOUBLE", "WRITE", (void **) &ip, &el,
+              status );
+      ndfMap( indf, "VARIANCE", "_DOUBLE", "WRITE", (void **) &ipv, &el,
+              status );
+
+/* If we are dumping the AST model, just copy the existing map. */
+      if( !array && *status == SAI__OK ) {
+         memcpy( ip, dat->map, dat->msize*sizeof( *dat->map ) );
+         memcpy( ipv, dat->mapvar, dat->msize*sizeof( *dat->mapvar ) );
+
+/* Otherwise, bin the time-stream data to form the map. */
+      } else {
+
+/* Get the indices of the first and last subarray to include in the map. */
+         if( map > 0 ) {
+            idxlo = isub;
+            idxhi = isub;
+         } else {
+            idxlo = 0;
+            idxhi = array->ndat - 1;
+         }
+
+/* Allocate memory for multithreaded maps. */
+         wf_map = astMalloc( nw*dat->msize*sizeof( *wf_map ) );
+         wf_mapwgt = astMalloc( nw*dat->msize*sizeof( *wf_mapwgt ) );
+         wf_mapwgtsq = astMalloc( nw*dat->msize*sizeof( *wf_mapwgtsq ) );
+         wf_mapvar = astMalloc( nw*dat->msize*sizeof( *wf_mapvar ) );
+         wf_hitsmap = astMalloc( nw*dat->msize*sizeof( *wf_hitsmap ) );
+
+/* Loop over subarray. */
+         for( idx = idxlo; idx <= idxhi; idx++ ) {
+
+/* initialise rebin flags. */
+            rebinflags = 0;
+
+/* First call to rebin clears the arrays */
+            if( idx == idxlo ) rebinflags = rebinflags | AST__REBININIT;
+
+/* Final call to rebin re-normalizes */
+            if( idx == idxhi ) rebinflags = rebinflags | AST__REBINEND;
+
+/* Rebin the residual + astronomical signal into a map */
+            smf_rebinmap1( wf, array->sdata[ idx ], NULL,
+                           dat->lut[0]->sdata[idx]->pntr[0], 0, 0, 0,
+                           NULL, 0, SMF__Q_GOOD, 1, rebinflags,
+                           wf_map, wf_mapwgt, wf_mapwgtsq, wf_hitsmap,
+                           wf_mapvar, dat->msize, &scalevar, status );
+          }
+
+/* Copy the data and variance arrays to the NDF. */
+         if( *status == SAI__OK ) {
+            memcpy( ip, wf_map, dat->msize*sizeof( *wf_map ) );
+            memcpy( ipv, wf_mapvar, dat->msize*sizeof( *wf_mapvar ) );
+         }
+
+/* Free memory. */
+         wf_map = astFree( wf_map );
+         wf_mapwgt = astFree( wf_mapwgt );
+         wf_mapwgtsq = astFree( wf_mapwgtsq );
+         wf_mapvar = astFree( wf_mapvar );
+         wf_hitsmap = astFree( wf_hitsmap );
+      }
+
+/* Annul the NDF identifier. */
+      ndfAnnul( &indf, status );
    }
 
 /* Free the array holding the AST model and re-instate the original RES

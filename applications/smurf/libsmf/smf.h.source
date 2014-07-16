@@ -962,7 +962,7 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
                int power, int time, int isub, smfDIMMData *dat,
                smf_modeltype type, smfArray *model, int res,
                const char *root, int mask, double mingood, int cube,
-               int addqual, int *status );
+               int map, int addqual, int *status );
 
 void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
                       int chunk, AstKeyMap *keymap, smfArray **allmodel,
