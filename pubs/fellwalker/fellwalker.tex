@@ -213,7 +213,7 @@ this fell-walking metaphor at frequent intervals.
 \caption{Wastwater and the Wasdale Fells, including Great Gable
 (centre-left) and snow-covered Scafell Pike, the highest point in England
 at 978 metres above sea level, just visible under cloud. Copyright: Nick
-Thorne, www.lakedistrict.gov.uk/learning/freephotos\# }
+Thorne, \url{http://www.lakedistrict.gov.uk/learning/freephotos\#} }
 \label{fig:wasdale}
 \end{figure}
 
@@ -256,7 +256,7 @@ neighbouring pixel of higher value, until a pixel is found which is
 higher than any of its immediate neighbours. When this happens, a search
 for a higher pixel is made over a larger neighbourhood. If such a pixel
 is found the walk jumps the gap and continues from this higher pixel. If no
-higher pixel is found it is assumed that a new summit has been reached -
+higher pixel is found it is assumed that a new summit has been reached ---
 a new clump identifier is issued and all pixels visited on the walk are
 assigned to the new clump. If at any point a walk encounters a pixel
 which has already been assigned to a clump, then all pixels so far
@@ -290,11 +290,11 @@ than zero. An initial pass is made through the supplied data array to
 identify pixels which have a data value above a user-specified threshold
 value. Such pixels are assigned a value of zero in the CAA indicating
 that the pixel is usable but has not yet been assigned to a clump, and
-all other pixels are assigned a value of -1 indicating that they are
+all other pixels are assigned a value of $-1$ indicating that they are
 unusable and should never be assigned to a clump.
 
 This initial CAA is then searched for any isolated individual pixels
-above the threshold. Such pixels are set to -1 in the CAA, indicating
+above the threshold. Such pixels are set to $-1$ in the CAA, indicating
 they should be ignored.
 
 The main loop is then entered, which considers each pixel in turn as the
@@ -317,13 +317,13 @@ and 26 are checked if the data is 3-dimensional. The gradient is
 evaluated in pixel coordinates, without regard to the physical units
 associated with each axis.
 
-If the highest gradient found above is greater than zero - that is, if
-there is an upward route out of the current pixel - the walk steps to the
+If the highest gradient found above is greater than zero --- that is, if
+there is an upward route out of the current pixel --- the walk steps to the
 selected neighbouring pixel. If this new pixel has already been assigned
 to a clump (\emph{i.e.} if the CAA holds a positive value at the new
 pixel), then the new walk has joined an older walk and so will eventually
 end up at the same peak as the older walk. In this case, the existing
-positive CAA value of the new pixel (\emph{i.e.} the clump index assigned
+positive CAA value of the new pixel (\emph{i.e.}, the clump index assigned
 to the older walk) is copied into the CAA for all pixels visited so far
 on the new walk, and a new walk from the next starting pixel is
 initiated.
@@ -346,7 +346,7 @@ highest pixel found in the box.
 
 \begin{figure}
 \includegraphics[width=\columnwidth]{sim}
-\caption{A 50x50 array of artificial data used to illustrate the
+\caption{A $50\times50$ array of artificial data used to illustrate the
 FellWalker algorithm below.}
 \label{fig:sim}
 \end{figure}
@@ -361,8 +361,8 @@ pixels trace the first walk that reached the left-hand peak. The blue pixels
 trace a later walk to the same peak that was terminated when it met the first
 walk. The green and blue pixels are all assigned to the same clump. These
 walks follow the steepest line of ascent. Note the gap in the green line
-near its start at the lowest contour - this is where a jump was made from
-a noise spike to the highest value in a 9x9 box of neighbouring pixels.}
+near its start at the lowest contour --- this is where a jump was made from
+a noise spike to the highest value in a $9\times9$ box of neighbouring pixels.}
 
 \label{fig:walks}
 \end{figure}
@@ -394,8 +394,8 @@ pixels.}
 
 The number of significant peaks found by the above process is determined
 primarily by the maximum distance a walk can jump when searching for a
-higher neighbouring pixel value. This parameter - known as \emph{MaxJump}
-- defaults to 4 pixels. Using a larger value results in more local peaks
+higher neighbouring pixel value. This parameter --- known as \emph{MaxJump}
+--- defaults to 4 pixels. Using a larger value results in more local peaks
 being interpreted as noise spikes rather than significant peaks, with a
 corresponding reduction in the number of significant peaks found. Thus at
 this point, peaks are discriminated simply on the basis of their spatial
@@ -541,7 +541,7 @@ by \cite{2014Christie} for 3-dimensional data.
 An independent illustration of this for 2-dimensional data is presented in
 Fig.~\ref{fig:comp1}, which shows a field of artificial Gaussian clumps,
 with the resulting clump assignment arrays produced by FellWalker and
-CLUMPFIND. The input data image is an array of 500 x 500 pixels
+CLUMPFIND. The input data image is an array of $500\times500$ pixels
 containing 200 circular clumps distributed randomly across the
 image\footnote{Except none are allowed to touch an edge of the image}.
 Each clump has a Gaussian profile with a Full Width at Half Maximum of 15
@@ -600,7 +600,7 @@ performed with a range of different signal-to-noise ratios, and with
 different clump-finding parameter values.
 
 \subsection{The Artificial Data}
-The input data for each test was a two-dimensional image of 500x500
+The input data for each test was a two-dimensional image of $500\times500$
 pixels containing 200 randomly positioned Gaussian clumps, all with the
 same peak value of 100 (arbitrary units) and the same FWHM of 15 pixels.
 Gaussian noise was then added, with a different noise level for each of
@@ -755,7 +755,7 @@ shown in Fig.~\ref{fig:cf_results}.}
 
 The above comparison of FellWalker and CLUMPFIND was done using
 2-dimensional data. This section presents results of a similar test using
-3-dimensional data. Each test data cube has dimensions of 200x200x200
+3-dimensional data. Each test data cube has dimensions of $200\times200\times200$
 pixels, and contains 600 artificial Gaussian clumps each with a width
 (FWHM) of 10 pixels and identical peak value of 100. In all other
 respects, the 3-dimensional tests were done in exactly the same way and
