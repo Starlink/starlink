@@ -127,7 +127,6 @@
 
 \begin{abstract}
 %% Text of abstract
-
 This paper describes the FellWalker algorithm, which segments a 1-, 2- or
 3-dimensional array of data values into a set of disjoint clumps of
 emission, each containing a single significant peak. Pixels below a
@@ -137,7 +136,10 @@ the CLUMPFIND algorithm. However, unlike CLUMPFIND, which segments the
 array on the basis of a set of evenly-spaced contours and thus uses only
 a small fraction of the available data  values, the FellWalker algorithm
 is based on a gradient-tracing scheme which uses all available data values.
-
+Comparisons of CLUMPFIND and FellWalker using a crowded field of
+artificial Gaussian clumps, all of equal peak value and width, suggest
+that the results produced by FellWalker are less dependent on specific
+parameter settings than are those of CLUMPFIND.
 \end{abstract}
 
 \begin{keyword}
@@ -181,13 +183,14 @@ clumps of emission, each associated with a single significant peak. It is
 based upon an analysis of a set of evenly spaced contours derived from
 the data array and has two main parameters - the lowest contour level,
 below which data is ignored, and the interval between contours. However
-it has been noted (\emph{e.g.} by \cite{2009Pineda} and
-\cite{2014Christie}) that the decomposition produced by CLUMPFIND can be
-very sensitive to the specific value used for the contour interval,
-particularly for 3-dimensional data and crowded fields. The choice of an
-optimal contour interval is a compromise - real peaks may be missed if
-the interval is too large, but noise spikes may be interpreted as real
-peaks if the interval is too small.
+it has often been noted (\emph{e.g.} \cite{2014Christie},
+\cite{2009Kainulainen}, \cite{2009Pineda}, \cite{2008Smith}, \cite{2007Elia},
+\cite{2003Brunt}) that the decomposition produced by CLUMPFIND can be very
+sensitive to the specific value used for the contour interval, particularly
+for 3-dimensional data and crowded fields. The choice of an optimal contour
+interval is a compromise - real peaks may be missed if the interval is too
+large, but noise spikes may be interpreted as real peaks if the interval is
+too small.
 
 The FellWalker algorithm attempts to circumvent these issues by avoiding
 the use of contours altogether. Only a small fraction of the available
