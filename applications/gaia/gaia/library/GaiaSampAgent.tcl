@@ -48,6 +48,9 @@
 
 #-
 
+#  So we can decode encoded characters in the URL.
+package require ncgi
+
 itcl::class gaia::GaiaSampAgent {
 
    destructor {
@@ -255,14 +258,14 @@ itcl::class gaia::GaiaSampAgent {
    #  protocol (in either its correct RFC1738 "file://host/..." or its
    #  incorrect but common "file:..." form) then the corresponding
    #  local filename is returned.  Otherwise an empty string is returned.
+   #  Remember to decode any encoded characters (+, space etc.).
    private proc get_file_ {url} {
       if {[regsub ^file://(localhost|[info host]|)/ $url "" fname]} {
-         return /$fname
+         return [::ncgi::decode "/${fname}"]
       } elseif {[regsub ^file: $url "" fname]} {
-         return $fname
-      } else {
-         return ""
+         return [::ncgi::decode $fname]
       }
+      return {}
    }
 
    #  Provides a suitable value for the "symbol_id" column in a TST table.
