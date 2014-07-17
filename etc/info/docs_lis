@@ -89,6 +89,7 @@ SSN                           STARLINK SYSTEM NOTES                          SSN
 075.01  2000-07-26 ACD   32   Writing Catalogue and Image servers for GAIA and CURSA
 076.01  2001-05-24 ACD   17   CATREMOTE - a tool for querying remote catalogues
 077.01  2001-08-16 ajc   14   ADAM - The control subsystem
+078.01  2005-04-11 nxg   ??   The Starlink Build System
 
 SUG                            STARLINK USER GUIDE                           SUG
 .10     1997-10-17 MDL   24   Starlink User's Guide
