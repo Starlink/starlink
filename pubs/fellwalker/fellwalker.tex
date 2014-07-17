@@ -530,7 +530,7 @@ clump volume should be unchanged by the instrumental blurring:
 
 
 \section{Comparing FellWalker and CLUMPFIND}
-
+\label{sec:compare}
 \cite{2010Watson} made a detailed comparison of the performance of several
 different 2-dimensional clump finding algorithms, including FellWalker and CLUMPFIND.
 This concluded that, under the conditions used in the study, FellWalker
@@ -626,20 +626,11 @@ The default implementation of CLUMPFIND provided by the Starlink CUPID
 package follows the description of the algorithm contained in
 \cite{1994Williams}. The IDL version of CLUMPFIND distributed by Williams
 includes some enhancements to the published algorithm. These are also
-available in the CUPID version, but are disabled by default. They have,
-however been enabled for the purposes of the current comparison, using
-the following extra CUPID parameter settings:
+available in the CUPID version, but are disabled by default. They were,
+however, enabled for the purposes of the current comparison.
 
-\smallskip
-\begin{tabular}{c c c}
-ClumpFind.IDLAlg & = & 1 \\
-ClumpFind.FwhmBeam & = & 0 \\
-ClumpFind.MaxBad & = & 1.0 \\
-ClumpFind.MinPix & = & 20 \\
-ClumpFind.VeloRes & = & 0 \\
-ClumpFind.AllowEdge & = & 1 \\
-\end{tabular}
-\smallskip
+Full lists of parameters used for these tests are given in
+appendix~\ref{app:configs}.
 
 \subsection{Measuring Performance}
 In each test, the artificial data consists of a collection of identical
@@ -862,10 +853,66 @@ Facilities Council.
 
 %% The Appendices part is started with the command \appendix;
 %% appendix sections are then done as normal sections
-%% \appendix
+\appendix
 
-%% \section{}
-%% \label{}
+\section{Configuration Parameter Values}
+\label{app:configs}
+The following two sections shows the CUPID commands that were
+used to perform the 2-dimensional tests described in section
+section~\ref{sec:compare}. Also shown are the contents of the text files
+that specify the values used for the additional configuration parameters
+required by CUPID. See the CUPID documentation \citep{SUN255} for
+descriptions of these commands and parameters. In both cases,
+\texttt{data.sdf} is the data file containing the artificial clumps,
+\texttt{mask.sdf} is the generated clump pixel mask and \texttt{cat.fit}
+is the generate clump catalogue. For each specific test, different
+numerical values were assigned to the variables \texttt{\$rms},
+\texttt{\$maxjump}, \texttt{\$mindip} and \texttt{\$deltat}, as described
+in section~\ref{sec:compare}.
+\subsection{FellWalker}
+{\small
+\begin{verbatim}
+  % findclumps in=data.sdf deconv=no method=fellwalker \
+               out=mask.sdf outcat=cat.fit rms=$rms \
+               config="'^fw.conf,MaxJump=$maxjump, \
+                        MinDip=$mindip*RMS'" \
+               wcspar=no backoff=yes perspectrum=no
+
+  % cat fw.conf
+     FellWalker.AllowEdge=1
+     FellWalker.CleanIter=1
+     FellWalker.FlatSlope=1*RMS
+     FellWalker.FwhmBeam=0
+     FellWalker.MaxBad=0.05
+     FellWalker.MinHeight=2*RMS
+     FellWalker.MinPix=16
+     FellWalker.Noise=2*RMS
+     FellWalker.VeloRes=0
+\end{verbatim}
+}
+\subsection{ClumpFind}
+{\small
+\begin{verbatim}
+  % findclumps in=data.sdf deconv=no method=clumpfind \
+               out=mask.sdf outcat=cat.fit rms=$rms \
+               config="'^cf.conf,DeltaT=$deltat*RMS'" \
+               wcspar=no backoff=yes perspectrum=no
+
+  % cat cf.conf
+     ClumpFind.Allowedge=1
+     ClumpFind.Fwhmbeam=0
+     ClumpFind.Idlalg=1
+     ClumpFind.Maxbad=1.0
+     ClumpFind.Minpix=16
+     ClumpFind.Naxis=2
+     ClumpFind.Tlow=2*RMS
+     ClumpFind.VeloRes=0
+\end{verbatim}
+}
+For the 3-dimensional tests, the value used for \texttt{ClumpFind.Naxis}
+was changed from 2 to 3.
+
+
 
 %% References
 %%

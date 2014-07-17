@@ -7,6 +7,27 @@ set peak_value = 100
 echo "# rms deltat nc gain sum sum_target true_data mask" > cf.asc
 echo "# rms maxjump mindip nc gain sum sum_target true_data mask" > fw.asc
 
+#  Create the clumpfind config.
+echo "ClumpFind.Allowedge=1" > cf.conf
+echo "ClumpFind.Fwhmbeam=0" >> cf.conf
+echo "ClumpFind.Idlalg=1" >> cf.conf
+echo "ClumpFind.Maxbad=1.0" >> cf.conf
+echo "ClumpFind.Minpix=16" >> cf.conf
+echo "ClumpFind.Naxis=2" >> cf.conf
+echo "ClumpFind.Tlow=2*RMS" >> cf.conf
+echo "ClumpFind.VeloRes=0" >> cf.conf
+
+#  Create the fellWalker config.
+echo "FellWalker.AllowEdge=1" > fw.conf
+echo "FellWalker.CleanIter=1" >> fw.conf
+echo "FellWalker.FlatSlope=1*RMS" >> fw.conf
+echo "FellWalker.FwhmBeam=0" >> fw.conf
+echo "FellWalker.MaxBad=0.05" >> fw.conf
+echo "FellWalker.MinHeight=2*RMS" >> fw.conf
+echo "FellWalker.MinPix=16" >> fw.conf
+echo "FellWalker.Noise=2*RMS" >> fw.conf
+echo "FellWalker.VeloRes=0" >> fw.conf
+
 
 $CUPID_DIR/makeclumps angle=\[0,0\] beamfwhm=0 deconv=no \
       fwhm1=\[$fwhm,0\] fwhm2=\[$fwhm,0\] lbnd=\[1,1\] ubnd=\[100,100\] \
@@ -44,7 +65,8 @@ foreach rms (2 4 6 8 10 12 14 16)
       set cf_mask = "comp4_cf_${rms}_${pv}"
       $CUPID_DIR/findclumps in=$truedata deconv=no method=clumpfind \
                             out=$cf_mask outcat=comp4_cf.fit rms=$rms \
-                            config="'^idl_conf,DeltaT=$deltat*RMS'"
+                            config="'^cf.conf,DeltaT=$deltat*RMS'" \
+                            backoff=yes wcspar=no perspectrum=no
 
       set text = `stilts tpipe in=comp4_cf.fit cmd='keepcols SUM;stats median' | grep -P "\| \d+\.\d+ \|" | grep -o -P "\d+\.\d+"`
 
@@ -65,7 +87,8 @@ foreach rms (2 4 6 8 10 12 14 16)
          set fw_mask = "comp4_fw_${rms}_${maxjump}_${pv}"
          $CUPID_DIR/findclumps in=$truedata deconv=no method=fellwalker \
                                out=$fw_mask outcat=comp4_fw.fit rms=$rms \
-                               config="'MaxJump=$maxjump,MinDip=$mindip*RMS'"
+                               backoff=yes wcspar=no perspectrum=no \
+                               config="'^fw.conf,MaxJump=$maxjump,MinDip=$mindip*RMS'"
 
          set text = `stilts tpipe in=comp4_fw.fit cmd='keepcols SUM;stats median' | grep -P "\| \d+\.\d+ \|" | grep -o -P "\d+\.\d+"`
 
