@@ -15,7 +15,7 @@ $CUPID_DIR/makeclumps angle=\[0,0\] beamfwhm=0 deconv=no \
       rms=1 trunc=0.1
 
 #  Do each noise level
-foreach rms (6)
+foreach rms (2 4 6 8 10 12 14 16)
 
 #  Get the expected daat sum of a true source above 2*RMS.
    set cut = `$KAPPA_DIR/calc "'2*pa'" pa=$rms`
@@ -31,23 +31,21 @@ foreach rms (6)
 #  Create the true data.
    set truedata = "true_$rms"
    $CUPID_DIR/makeclumps angle=\[0,0\] beamfwhm=0 deconv=no \
-      fwhm1=\[$fwhm,0\] fwhm2=\[$fwhm,0\] lbnd=\[1,1\] ubnd=\[5000,5000\] \
-      model=comp4_model nclump=20000 out=$truedata \
+      fwhm1=\[$fwhm,0\] fwhm2=\[$fwhm,0\] lbnd=\[1,1\] ubnd=\[500,500\] \
+      model=comp4_model nclump=200 out=$truedata \
       outcat=comp4_truth.fit pardist=uniform peak=\[$peak_value,0\] \
       rms=$rms trunc=0.1
 
 #  Do each clumpfind contour interval.
-   foreach deltat (2)
+   foreach deltat (1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20)
       set pv = `echo $deltat | sed -s 's/\./p/'`
 
 #  Run clumpfind in IDL emulation mode.
       set cf_mask = "comp4_cf_${rms}_${pv}"
-      echo "CLUMPFIND starting"
-      time $CUPID_DIR/findclumps in=$truedata deconv=no method=clumpfind \
+      $CUPID_DIR/findclumps in=$truedata deconv=no method=clumpfind \
                             out=$cf_mask outcat=comp4_cf.fit rms=$rms \
                             config="'^idl_conf,DeltaT=$deltat*RMS'"
 
-      echo "CLUMPFIND ended"
       set text = `stilts tpipe in=comp4_cf.fit cmd='keepcols SUM;stats median' | grep -P "\| \d+\.\d+ \|" | grep -o -P "\d+\.\d+"`
 
 #  Get the number of sources detected and write to a file.
@@ -57,20 +55,18 @@ foreach rms (6)
    end
 
 #  Do each FellWalker MaxJump value
-   foreach maxjump (4)
+   foreach maxjump (0 2 4 6 8 10 12 14)
 
 #  Do each FellWalker MinDip value
-      foreach mindip (2)
+      foreach mindip (0 1 2 3 4 5)
          set pv = `echo $mindip | sed -s 's/\./p/'`
 
 #  Run FellWalker
          set fw_mask = "comp4_fw_${rms}_${maxjump}_${pv}"
-         echo "FellWalker starting"
-         time $CUPID_DIR/findclumps in=$truedata deconv=no method=fellwalker \
+         $CUPID_DIR/findclumps in=$truedata deconv=no method=fellwalker \
                                out=$fw_mask outcat=comp4_fw.fit rms=$rms \
                                config="'MaxJump=$maxjump,MinDip=$mindip*RMS'"
 
-         echo "FellWalker ended"
          set text = `stilts tpipe in=comp4_fw.fit cmd='keepcols SUM;stats median' | grep -P "\| \d+\.\d+ \|" | grep -o -P "\d+\.\d+"`
 
 #  Get the number of sources detected and write to a file.
@@ -82,3 +78,22 @@ foreach rms (6)
 end
 
 
+#  Create a 2D plot in which the Y axis is ClumpFInd gain (i.e. the median
+#  clump data sum found by ClumpFind, normalised to the expected clump data
+#  sum), and the X axis is DeltaT. Colour each spot to indicate the RMS.
+#  Space the Y axis logarithmically.
+stilts plot2d in=cf.asc xdata=deltat ydata=gain ifmt=ascii out=comp4_cf.pdf \
+       auxdata=rms ylog=true ylo=0.02 yhi=3 ylabel=Gain xlabel=DeltaT
+
+
+#  For each mindip value, create a 2D plot in which the Y axis is FellWalker
+#  gain (i.e. the median clump data sum found by FellWalker, normalised to
+#  the expected clump data sum), and the X axis is MaxJUmp. Colour each spot
+#  to indicate the RMS. Space the Y axis logarithmically.
+foreach mindip (0 1 2 3 4 5)
+   stilts plot2d in=fw.asc xdata=maxjump ydata=gain ifmt=ascii out=comp4_fw_${mindip}.pdf \
+       auxdata=rms ylog=true ylo=0.02 yhi=3 subset="mindip==$mindip" ylabel=Gain \
+       xlabel="MaxJump (MinDip=$mindip)"
+end
+
+rm comp4_*sdf true_*sdf
