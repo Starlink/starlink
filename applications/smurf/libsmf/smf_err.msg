@@ -25,5 +25,6 @@ NOSCI      <No science data found>
 TELSTAT    <Telescope is stationary>
 BADFIT     <Fit failed>
 RCPPOS     <Inconsistent RECEPPOS detectors posisitions>
+MEMCHK     <Memory check passed OK but no map created>
 
 .END

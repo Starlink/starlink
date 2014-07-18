@@ -470,8 +470,10 @@
 *        parameter values (i.e. values to be used on the last iteration
 *        only) are used.
 *     2014-6-11 (DSB):
-*        If chunking causes the last chunk to contain very few time slices, 
+*        If chunking causes the last chunk to contain very few time slices,
 *        reduce the max chunk size so that all chunks have more equal sizes.
+*     2014-7-18 (DSB):
+*        Added config parameter memcheck.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -679,6 +681,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   dim_t maxfile;                /* Longest file length in time samples*/
   int maxiter=0;                /* Maximum number of iterations */
   double maxlen=0;              /* Max length in seconds of cont. chunk */
+  int memcheck=0;               /* Are we just doing a memory check? */
   size_t memneeded;             /* Memory required for map-maker */
   smfArray ***model=NULL;       /* Array of pointers smfArrays for ea. model */
   char *modelname=NULL;         /* Name of current model component */
@@ -941,6 +944,10 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
       /* Flag for exporting data right after ckeaning */
       astMapGet0I( keymap, "EXPORTCLEAN", &exportclean );
+
+      /* Flag indicating that the memory should be checked but no map
+         should be created */
+      astMapGet0I( keymap, "MEMCHECK", &memcheck );
 
       /* Method to use for calculating the variance map */
       astMapGet0I( keymap, "VARMAPMETHOD", &varmapmethod );
@@ -1284,10 +1291,11 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                        nmodels, msize, keymap, maxdimm, maxfile,
                        &memneeded, status );
 
-    if( *status == SMF__NOMEM ) {
       /* If we need too much memory, generate a warning message and then try
-         to re-group the files using smaller contchunks */
-
+         to re-group the files using smaller contchunks. But only do this
+         if this invocation of makemap is intended to make a map and not
+         just simply test the available memory. */
+    if( *status == SMF__NOMEM && !memcheck ) {
       errAnnul( status );
       msgOutf( " ", FUNC_NAME ": *** WARNING ***\n  %zu continuous samples "
                "(%lg s, including padding) require %zu MiB > %zu MiB",
@@ -1378,6 +1386,16 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
     msgOutf( "", FUNC_NAME ": map-making requires %zu MiB "
              "(map=%zu MiB model calc=%zu MiB)", status,
              (mapmem+memneeded)/SMF__MIB, mapmem/SMF__MIB, memneeded/SMF__MIB );
+  }
+
+  /* If we are just checking the available memory, and not actually
+     creating a map, we can now exit. We do this by reporting an error so
+     that the output map will be deleted etc. */
+  if( memcheck && *status == SAI__OK ) {
+    *status = SMF__MEMCHK;
+    errRep( "", FUNC_NAME ": memory is sufficient to avoid chunking, but "
+            "no map will be created since config parameter memcheck is set",
+            status );
   }
 
   if( *status == SAI__OK ) {
