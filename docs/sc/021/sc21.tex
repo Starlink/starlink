@@ -1,6 +1,7 @@
-\documentclass[11pt,oneside]{starlink}
+\documentclass[11pt,oneside,chapters]{starlink}
 
 
+\title{SC/21}
 \stardoccategory {Starlink Cookbook}
 \stardocinitials {SC}
 \stardoccopyright{Copyright \copyright\ 2014 Science and Technology Facilities Council}
@@ -25,14 +26,7 @@
 \startitlepic{\includegraphics[width=0.7\textwidth]{sc21_s2logo}}
 
 \begin{document}
-\renewcommand{\thepage}{\roman{page}}
-\setcounter{page}{1}
-
-\begin{titlepage}
-\startitlepage
-\end{titlepage}
-\setcounter{page}{1}
-\scstart
+\scfrontmatter
 
 % Acronyms section
 \Acronyms
@@ -3966,8 +3960,10 @@ SCUBA-2 Data Reduction document SC2/ANA/S210/005
 
 \newpage
 \appendix
-\chapter[Appendices]{Appendix}
-\section{\xlabel{app_clean}Cleaning the raw data}
+%\renewcommand{\thesection}{\Alph{section}}%
+
+%\chapter[Appendices]{Appendix}
+\chapter{\xlabel{app_clean}Cleaning the raw data}
 \label{app:clean}
 
 You can use the \smurf\ task \clean\ to help inspect time-series.
@@ -4065,10 +4061,10 @@ in \file{dimmconfig.lis}---see \cref{Appendix}{app:dimm}{here}.
 
 
 \newpage
-\section{\xlabel{calib}SCUBA-2 data calibration}
+\chapter{\xlabel{calib}SCUBA-2 data calibration}
 \label{app:cal}
 
-\subsection{\xlabel{fcf}Flux conversion factors (FCF)}
+\section{\xlabel{fcf}Flux conversion factors (FCF)}
 \label{app:fcf}
 
 Primary and secondary calibrator observations have been reduced using
@@ -4135,7 +4131,7 @@ and we have found this number to be somewhat unreliable, particularly
 at 450$\mu$m.
 
 
-\subsection{\xlabel{extinction}Extinction correction}
+\section{\xlabel{extinction}Extinction correction}
 
 Analysis of the SCUBA-2 secondary calibrators has allowed calculation
 of the transmission relationships for the SCUBA-2 450\,$\mu$m and
@@ -4174,7 +4170,7 @@ defaults are listed in \file{\$SMURF\_DIR/smurf\_extinction.def}.
 %It is worth noting that if an individual science map and corresponding calibrator observation has already been reduced with the old factors (and your source and calibrator are at about the same airmass and if the tau did not change appreciably), any errors in extinction correction should cancel out in the calibration.
 
 \newpage
-\section{\xlabel{calcrms}SCUBA2\_CHECK\_RMS}
+\chapter{\xlabel{calcrms}\drrecipe{SCUBA2\_CHECK\_RMS}}
 \label{app:checkrmsparams}
 The \picard\ recipe \drrecipe{SCUBA2\_CHECK\_RMS} estimates the RMS and
 NEFD for a given observation via two methods to compare with values from
@@ -4236,7 +4232,7 @@ The parameters written out to \file{log.checkrms} are listed below.
 
 
 \newpage
-\section{\xlabel{matchedfilter}SCUBA-2 matched filter}
+\chapter{\xlabel{matchedfilter}SCUBA-2 matched filter}
 \label{app:mf}
 
 In order to optimally find sources that are the size of the telescope
@@ -4300,7 +4296,7 @@ the \param{PSF\_MATCHFILTER} recipe parameter).
 
 
 \newpage
-\section{\xlabel{fcfsred}FCFs by reduction date}
+\chapter{\xlabel{fcfsred}FCFs by reduction date}
 \label{app:fcfs}
 
 Ongoing development of the SCUBA-2 analysis has resulted in ongoing
@@ -4361,7 +4357,7 @@ This will return something like the following,
 \end{quote}
 
 \newpage
-\section{\xlabel{cog}Aperture-photometry curve of growth}
+\chapter{\xlabel{cog}Aperture-photometry curve of growth}
 \label{app:cog}
 
 The SCUBA-2 beam has a broad error beam. As the size of the annulus
@@ -4378,7 +4374,7 @@ appropriate scaling factor for your FCF from the graph below.
 }
 
 \newpage
-\section{\xlabel{fits}Convert format from FITS to NDF}
+\chapter{\xlabel{fits}Convert format from FITS to NDF}
 \label{app:fits}
 
 It is often useful to utilise data from other wavelengths or
@@ -4417,7 +4413,7 @@ avoiding the \ndfcopy\ and possible \setvar\ steps.
 
 
 \newpage
-\section{\xlabel{defconfig}Default dimmconfig.lis}
+\chapter{\xlabel{defconfig}Default dimmconfig.lis}
 \label{app:dimm}
 \raggedbottom
 
@@ -4430,8 +4426,7 @@ avoiding the \ndfcopy\ and possible \setvar\ steps.
 their default values. For a fuller description of each, as well as
 other options, see the comments in \file{smurf\_makemap.def}, or the
 \textit{Configuration Parameters} appendix of \textbf{SUN/258}.}
-
-\hline{}
+\hline
 Parameter & Value & Description \\ \hline
 \endhead
 
@@ -4675,10 +4670,10 @@ Parameter & Value & Description \\
 
 
 
-\section{\xlabel{special}Specialised configuration files}
+\chapter{\xlabel{special}Specialised configuration files}
 \label{app:special}
 
-\subsection{\file{dimmconfig\_bright\_extended.lis}}
+\section{\file{dimmconfig\_bright\_extended.lis}}
 \begin{quote}
 \begin{verbatim}
 ^$STARLINK_DIR/share/smurf/dimmconfig.lis
@@ -4694,7 +4689,7 @@ Parameter & Value & Description \\
 \end{verbatim}
 \end{quote}
 
-\subsection{\file{dimmconfig\_bright\_compact.lis}}
+\section{\file{dimmconfig\_bright\_compact.lis}}
 \begin{terminalv}
 
 ^$STARLINK_DIR/share/smurf/dimmconfig_bright.lis
@@ -4719,7 +4714,7 @@ Parameter & Value & Description \\
 \end{terminalv}
 
 
-\subsection{\file{dimmconfig\_blank\_field.lis}}
+\section{\file{dimmconfig\_blank\_field.lis}}
 \begin{terminalv}
    ^$STARLINK_DIR/share/smurf/dimmconfig.lis
 
@@ -4746,7 +4741,7 @@ Parameter & Value & Description \\
 
 
 
-\subsection{\file{dimmconfig\_bright.lis}}
+\section{\file{dimmconfig\_bright.lis}}
 
 This file is included as although it is not used in its own right it
 form the basis (on top of \file{dimmconfig.lis} for both
