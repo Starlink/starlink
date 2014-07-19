@@ -1,5 +1,20 @@
 
+%This needs to occur before the TocAt commands?
+\ConfigureToc{sstrefsection}{}{}{}{}
 
+% Configure toc.
+\ifwithchapters
+   \typeout{...WithChapters starlinkxhtml.cfg...}
+   \CutAt{chapter,chapter}
+
+   \TocAt{chapter,section,subsection,sstrefsection}
+\else
+   \typeout{...WithoutChapters stalrinkxhtml.cfg...}
+   \CutAt{section,chapter}
+   \TocAt{section,subsection,sstrefsection}
+\fi
+   \CutAt{appendix,appendix}
+   \CutAt{sstrefsection,section}
 %% Sort out the front matter for the main thing.
 
 \renewcommand{\scfrontmatter}{%
@@ -10,7 +25,11 @@
 \end{titlepage}
 
 \Abstract{}
-\tableofcontents[section,subsection]
+\ifwithchapters
+\tableofcontents[chapter,section,subsection,appendix]
+\else
+\tableofcontents[section,subsection,appendix]
+\fi
 }
 
 
@@ -101,7 +120,8 @@
 
 % Fix some weirdness in symbols
 \renewcommand{\^}{\HCode{^}}
-\renewcommand\${\HCode{$}}%$
+\renewcommand\${\HCode{$}}%$ %$ is to fix syntax highlighting.
+%xs\renewcommand{\_}{\texttt{\_}}
 
 \renewenvironment{center}{}{}
 
@@ -109,8 +129,8 @@
 
 
 \renewcommand{\Abstract}{
-    \if@withchapters
-        \chapter*{Abstract}
+    \ifwithchapters
+        \chapter*{}
         \typeout{....AbstractChapter...}
         \else
         \typeout{....No chapters....}
@@ -122,11 +142,11 @@
 
 
 \renewcommand{\Acronyms}{
-  \if@withchapters
+  \ifwithchapters
      \chapter*{}
   \fi
     \section*{Acronyms}
-\addcontentsline{toc}{section}{Acronyms}
+\addcontentsline{toc}{chapter}{\protect\numberline{}Acronyms}
 }
 
 \renewenvironment{edlong}{\begin{description}}{\end{description}}
@@ -221,3 +241,8 @@
 
 
 
+% Css for toc
+\Css{.sectionToc{padding-left:5\%}}
+\Css{.subsectionToc{padding-left:10\%}}
+\Css{.subsubsectionToc{padding-left:15\%}}
+\Css{.chapterHead,.appendixHead{line-height:150\%}}

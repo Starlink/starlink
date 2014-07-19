@@ -1,16 +1,19 @@
 % Latex2E class for writing starlink reports
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{starlink}
+\RequirePackage[T1]{fontenc} 
+\RequirePackage[utf8]{inputenc}
 
-\newif\if@withchapters
-\@withchaptersfalse
 
-\DeclareOption{chapters}{\@withchapterstrue}
+\newif\ifwithchapters
+\withchaptersfalse
+
+\DeclareOption{chapters}{\withchapterstrue}
 
 \ProcessOptions\relax
 
 
-\if@withchapters
+\ifwithchapters
    \LoadClassWithOptions{report}
    \typeout{........Report!...........}
 \else
@@ -18,6 +21,8 @@
    \typeout{..........Article!..........}
 \fi
 
+
+\RequirePackage{mathpazo}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -221,8 +226,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%% Starlink xref command
 
-\newcommand{\xref}[3]{#1}
-
+%\newcommand{\xref}[3]{#1}
+\newcommand{\xref}[3]{\href{http://starlink.jach.hawaii.edu/cgi-bin/htxserver/#2.htx/#2.html?xref_#3}{#1}}
 
 
 
@@ -245,3 +250,12 @@
 \RequirePackage{starstyle}
 
 \RequirePackage{sst}
+
+
+\newcommand{\checkfor}[1]{%
+  \ifcsname#1\endcsname%
+    ... command '#1' exists ...%
+  \else%
+    ... command '#1' does not exist ...%
+  \fi%
+}

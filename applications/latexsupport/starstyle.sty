@@ -12,13 +12,13 @@
 \newcommand{\scpushright}[1]{\hfill #1}
 
 
-
+\DeclareGraphicsExtensions{.pdf,.png,.jpg,.jpeg}
 
 
 
 % %...reference and link commands
 \newcommand{\cref}[3]{#1~\ref{#2}}
-\newcommand{\xlabel}[1]{\label{xref\_#1}}
+\newcommand{\xlabel}[1]{\label{\protect{xref_#1}}}
 \newcommand{\latexhtml}[3]{#1}
 \renewcommand{\htmladdnormallink}[2]{\href{#2}{#1}\footnote{\url{#2}}}
 
@@ -35,7 +35,8 @@
 \clearpage
 \begingroup \catcode`\_=12 \tableofcontents \endgroup
 \clearpage
-\listoffigures{}
+\begingroup \catcode`\_=12 \listoffigures \endgroup
+
 \clearpage
 \renewcommand{\thepage}{\arabic{page}}
 \setcounter{page}{1}
@@ -149,7 +150,7 @@
 
 
 \newcommand{\Abstract}{%
-    \if@withchapters
+    \ifwithchapters
         \chapter*{}
     \fi
     \section*{Abstract}
@@ -165,7 +166,7 @@
 
 
 \newcommand{\Acronyms}{%
-  \if@withchapters
+  \ifwithchapters
   \chapter*{}
   \fi
   \section*{Acronyms}
@@ -196,7 +197,7 @@
 \fi
 
 %... Chapter headings
-\if@withchapters
+\ifwithchapters
   \titleformat{name=\chapter}[display]%
   {\normalfont\huge\bfseries\thispagestyle{plain}}{%
     \chaptertitlename\ \thechapter}{0pt}{}
@@ -242,7 +243,7 @@
 \renewcommand{\headrulewidth}{0.0pt}
 
 
-\if@withchapters
+\ifwithchapters
 \renewcommand{\chaptermark}[1]{
   \markboth{#1}{}}
 \else
@@ -267,7 +268,7 @@
 \lhead{\thepage}
 \renewcommand{\headrulewidth}{0.0pt}
 
-\if@withchapters
+\ifwithchapters
 \renewcommand{\chaptermark}[1]{
   \markboth{#1}{}}
 \else
@@ -279,7 +280,7 @@
 \renewcommand{\headrulewidth}{0pt}%
 \renewcommand{\footrulewidth}{0pt}%
 
-\if@withchapters
+\ifwithchapters
 \renewcommand{\chaptermark}[1]{\markboth{{#1}}{}}%
 \else
 \renewcommand{\sectionmark}[1]{\markboth{{#1}}{}}%
@@ -314,14 +315,14 @@
 
 \setlength{\LTcapwidth}{\textwidth}
 \newenvironment{sllongtable}[2]{%
-\begin{longtable}{#1}\caption{#2}}
+\begin{longtable}{#1}\caption{#2}\\}
 {\end{longtable}}
 
 
 \setlist[enumerate,1]{label=(\arabic*)}
 
 
-\renewcommand{\thesection}{\arabic{section}}
+%\renewcommand{\thesection}{\arabic{chapter.section}}
 
 
 
@@ -345,5 +346,5 @@
 
 
 
-
+%problems with _ in labels (e.g. in xrefs)
 \renewcommand{\_}{\string_}
