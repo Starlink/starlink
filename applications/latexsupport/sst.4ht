@@ -1,0 +1,173 @@
+
+
+%%% sstrefsection New section command for sst routines
+
+%\renewcounter{sstrefsection}
+\NewSection\sstrefsection {\thesstrefsection}
+ \Configure{sstrefsection}
+    {\HCode{<div class="sstrefsection">}}
+    {\HCode{</div>}}
+    {\HCode{<header class="sstreftitle">}\HCode{<h3
+ class="sstsectitle">}}{\HCode{</h3>}}
+
+\ConfigureToc{sstrefsection}{}{}{}{}
+
+
+
+%%% sstsectitle[2]: Formatting of the title: Name of command and short
+%%% description.
+
+%\NewConfigure{sstsectitle}{4}
+%\renewcommand{\sstsectitle}[2]{\a:sstsectitle #1 \b:sstsectitle \c:sstsectitle #2 \d:sstsectitle}
+%\Configure{sstsectitle}{\ifvmode \ShowPar\fi \HCode{<h3
+%class="sstsectitle">}}{\Tg</h3>}{\Tg<p class="subtitle">}{\Tg</p>}
+
+
+%%% sstroutine[3]
+
+\renewcommand{\sstroutine}[3]{
+        \ssttitle{#1}{#2}
+\addcontentsline{toc}{subsection}{ \protect\numberline{}#1 --- #2}
+\label{\RemoveSpaces{#1}}
+\begin{description}
+#3
+\end{description}
+}
+
+\renewcommand{\ssttitle}[2]{
+        \sstrefsection{#1}
+        \sstsubtitle{#2}}
+
+
+
+\NewConfigure{sstsubtitle}{2}
+\newcommand{\sstsubtitle}[1]{
+        \a:sstsubtitle #1 \b:sstsubtitle}
+\Configure{sstsubtitle}{\Tg<p class="subtitle">}{\Tg</p> \Tg</h3> \Tg</header>}
+
+%% Basic SST option.
+
+
+%%% refs (environemnt)
+
+%%% sstdescription[1]
+
+
+
+
+\NewConfigure{sstdescription}{4}
+\renewcommand\sstdescription[1]{\a:sstdescription Description:
+  \b:sstdescription \c:sstdescription {\par #1 } \d:sstdescription}
+
+\Configure{sstdescription}{\EndP\HCode{<dl class="sst">}}{\Tg</dl>}{\Tg<dd class="sst">}{\Tg</dd>}
+
+
+%%% sstusage [1]
+
+\NewConfigure{sstusage}{4}
+\renewcommand\sstusage[1]{\a:sstusage Usage: \b:sstusage \c:sstusage #1 \d:sstusage}
+\Configure{sstusage}{\Tg<dl class="sst">}{\Tg</dl>}{\Tg<dd
+class="sstusage">}{\Tg</dd>}
+
+%%% sstparameters [1]
+\NewConfigure{sstparameters}{4}
+%\renewcommand\sstparameters[1]{\HCode{<dl class="sst">Parameters:</dl>}\HCode{<dd class="sst">} #1 \HCode{</dd>}}
+\renewcommand\sstparameters[1]{\a:sstparameters Parameters: \b:sstparameters \c:sstparameters #1 \d:sstparameters}
+\Configure{sstparameters}{\Tg<dl class="sst">}{\Tg</dl>}{}{}
+
+
+
+%%% sstsubsection [2]
+\NewConfigure{sstsubsection}{4}
+\renewcommand\sstsubsection[2]{\a:sstsubsection #1 \b:sstsubsection \c:sstsubsection #2 \d:sstsubsection}
+\Configure{sstsubsection}{\Tg<dl class="sstsub">}{\Tg</dl>}{\Tg<dd
+  class="sstsub">}{\Tg</dd>}
+
+
+%%% sstnotes [1]
+\NewConfigure{sstnotes}{4}
+\renewcommand\sstnotes[1]{\a:sstnotes Notes: \b:sstnotes \c:sstnotes #1 \d:sstnotes}
+\Configure{sstnotes}{\Tg<dl class="sst">}{\Tg</dl>}{\Tg<dd
+  class="sst">}{\Tg</dd>}
+
+
+%%% sstdiylist [2]
+
+\NewConfigure{sstdiylist}{4}
+\renewcommand\sstdiylist[2]{\a:sstdiylist #1: \b:sstdiylist \c:sstdiylist #2 \d:sstdiylist}
+\Configure{sstdiylist}{\Tg<dl class="sst">}{\Tg</dl>}{\Tg<dd class="sst">}{\Tg</dd>}
+
+
+%%% sstimplementationstatus[1]
+
+\NewConfigure{sstimplementationstatus}{4}
+\renewcommand\sstimplementationstatus[1]{\a:sstimplementationstatus Implementation Status: \b:sstimplementationstatus \c:sstimplementationstatus #1 \d:sstimplementationstatus}
+\Configure{sstimplementationstatus}{\Tg<dl class="sst">}{\Tg</dl>}{\Tg<dd class="sst">}{\Tg</dd>}
+
+
+%%% sstbugs [1]
+
+
+\NewConfigure{sstbugs}{4}
+\renewcommand\sstbugs[1]{\a:sstbugs Bugs: \b:sstbugs \c:sstbugs #1 \d:sstbugs}
+\Configure{sstbugs}{\Tg<dl class="sst">}{\Tg</dl>}{\Tg<dd class="sst">}{\Tg</dd>}
+
+
+
+%%% sstydiytopic [2]
+\NewConfigure{sstdiytopic}{4}
+\renewcommand\sstdiytopic[2]{\a:sstdiytopic #1: \b:sstdiytopic \c:sstdiytopic #2 \d:sstdiytopic}
+\Configure{sstdiytopic}{\Tg<dl class="sst">}{\Tg</dl>}{\Tg<dd class="sst">}{\Tg</dd>}
+
+
+%%% sstitemlist [1]
+\NewConfigure{sstitemlist}{2}
+\renewcommand{\sstitemlist}[1]{\a:sstitemlist #1 \b:sstitemlist}
+\Configure{sstitemlist}{\Tg<ul class="sstitemlist">}{\Tg</li>\Tg</ul>}
+
+
+
+%%% sstexamplesubsection [2]
+\NewConfigure{sstexamplesubsection}{4}
+\renewcommand\sstexamplesubsection[2]{\a:sstexamplesubsection #1: \b:sstexamplesubsection \c:sstexamplesubsection #2 \d:sstexamplesubsection}
+\Configure{sstexamplesubsection}{\EndP\HCode{<dl class="sstexamplesubsection">}}{\Tg</dl>}{\Tg<dd class="sst">}{\Tg</dd>}
+
+
+
+%%% sstexamples [1]
+
+\NewConfigure{sstexamples}{4}
+\renewcommand\sstexamples[1]{\a:sstexamples Examples: \b:sstexamples \c:sstexamples #1 \d:sstexamples}
+\Configure{sstexamples}{\EndP\HCode{<dl class="sst">}}{\Tg</dl>}{\Tg<dd class="sst">}{\Tg</dd>}
+
+
+
+%%% sstitem
+\NewConfigure{sstitem}{1}
+\renewcommand{\sstitem}{\a:sstitem}
+\Configure{sstitem}{\Tg<li >}
+
+
+
+%%% sstattributetype [1]
+\NewConfigure{sstattributetype}{4}
+\renewcommand\sstattributetype[1]{\a:sstattributetype Type: \b:sstattributetype \c:sstattributetype #1 \d:sstattributetype}
+\Configure{sstattributetype}{\Tg<dl class="sst">}{\Tg</dl>}{\Tg<dd class="sst">}{\Tg</dd>}
+
+
+
+
+%% CSS
+\Css{header{font-size:1.5em;border-bottom: 5px solid \#aaa;}}
+\Css{h3.sstsectitle{text-align:center;}}
+\Css{p.subtitle{text-align:center}}
+\Css{dl.sst{font-weight:bold}}
+\Css{dd.sstusage,dl.sstexamplesubsection{font-family: "Droid Sans Mono",monospace; white-space: nowrap;
+     font-size: 85\%;line-space:85\%}}
+
+\Css{dl.sstsub{font-weight:bold;}}
+
+
+
+
+
