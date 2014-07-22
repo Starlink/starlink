@@ -52,7 +52,7 @@ c     - astMapSplit: Split a Mapping up into parallel component Mappings
 c     - astQuadApprox: Calculate a quadratic approximation to a 2D Mapping
 c     - astRate: Calculate the rate of change of a Mapping output
 c     - astRebin<X>: Rebin a region of a data grid
-f     - astRebinSeq<X>: Rebin a region of a sequence of data grids
+c     - astRebinSeq<X>: Rebin a region of a sequence of data grids
 c     - astResample<X>: Resample a region of a data grid
 c     - astRemoveRegions: Remove any Regions from a Mapping
 c     - astSimplify: Simplify a Mapping
