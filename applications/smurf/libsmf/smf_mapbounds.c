@@ -168,7 +168,7 @@
 *        masking does not know where the source is, and assumes it is at
 *        (RA,Dec) = (0,0).
 *     2014-03-31 (DSB):
-*        - Remove const qualifier from spacerefwcs since it generates 
+*        - Remove const qualifier from spacerefwcs since it generates
 *        loads of compiler warnings. AST has no concept of "const" objects.
 *        - Fast-mode re-written to avoid assuming that the map Y axis is
 *        parallel to north.
@@ -648,15 +648,17 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
           fubnd[ 1 ] = VAL__MIND;
           for( j = 0; j < 4; j++ ) textreme[ j ] = (dim_t) VAL__BADI;
 
-          p1 = ac1list;
-          p2 = ac2list;
-          for( j = 0; j < maxloop; j++,p1++,p2++ ) {
-             if( *p1 != VAL__BADD && *p2 != VAL__BADD ){
+          if( *status == SAI__OK ) {
+             p1 = ac1list;
+             p2 = ac2list;
+             for( j = 0; j < maxloop; j++,p1++,p2++ ) {
+                if( *p1 != VAL__BADD && *p2 != VAL__BADD ){
 
-                if ( *p1 < flbnd[0] ) { flbnd[0] = *p1; textreme[0] = j; }
-                if ( *p2 < flbnd[1] ) { flbnd[1] = *p2; textreme[1] = j; }
-                if ( *p1 > fubnd[0] ) { fubnd[0] = *p1; textreme[2] = j; }
-                if ( *p2 > fubnd[1] ) { fubnd[1] = *p2; textreme[3] = j; }
+                   if ( *p1 < flbnd[0] ) { flbnd[0] = *p1; textreme[0] = j; }
+                   if ( *p2 < flbnd[1] ) { flbnd[1] = *p2; textreme[1] = j; }
+                   if ( *p1 > fubnd[0] ) { fubnd[0] = *p1; textreme[2] = j; }
+                   if ( *p2 > fubnd[1] ) { fubnd[1] = *p2; textreme[3] = j; }
+                }
              }
           }
 
