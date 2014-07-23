@@ -41,6 +41,7 @@
 
 */
 
+#include "mers.h"
 #include "star/ndg.h"
 #include "fitsio.h"
 
