@@ -102,6 +102,7 @@
 #include <fcntl.h>
 #include <sys/termios.h>
 #include <string.h>
+#include <unistd.h>
 #include "f77.h"
 
 F77_INTEGER_FUNCTION(rdkbd2)( CHARACTER(string), CHARACTER(pbuf),
