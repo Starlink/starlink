@@ -12021,25 +12021,25 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
       } \
    } \
 \
-/* Check that the lower and upper bounds of the input grid are \
-   consistent. Report an error if any pair is not. */ \
-   if ( astOK ) { \
-      for ( idim = 0; idim < ndim_in; idim++ ) { \
-         if ( lbnd_in[ idim ] > ubnd_in[ idim ] ) { \
-            astError( AST__GBDIN, "astRebinSeq"#X"(%s): Lower bound of " \
-                      "input grid (%d) exceeds corresponding upper bound " \
-                      "(%d).", status, astGetClass( this ), \
-                      lbnd_in[ idim ], ubnd_in[ idim ] ); \
-            astError( AST__GBDIN, "Error in input dimension %d.", status, \
-                      idim + 1 ); \
-            break; \
-         } \
-      } \
-   } \
-\
 /* If no input data was supplied, jump to the normalisation section. */ \
    simple = NULL; \
    if( in ) { \
+\
+/* Check that the lower and upper bounds of the input grid are \
+   consistent. Report an error if any pair is not. */ \
+      if ( astOK ) { \
+         for ( idim = 0; idim < ndim_in; idim++ ) { \
+            if ( lbnd_in[ idim ] > ubnd_in[ idim ] ) { \
+              astError( AST__GBDIN, "astRebinSeq"#X"(%s): Lower bound of " \
+                        "input grid (%d) exceeds corresponding upper bound " \
+                        "(%d).", status, astGetClass( this ), \
+                        lbnd_in[ idim ], ubnd_in[ idim ] ); \
+              astError( AST__GBDIN, "Error in input dimension %d.", status, \
+                        idim + 1 ); \
+              break; \
+            } \
+         } \
+      } \
 \
 /* Ensure any supplied "in_var" pointer is ignored if no input variances are \
    needed. */ \
