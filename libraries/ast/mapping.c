@@ -11994,19 +11994,6 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
    nin = astGetNin( this ); \
    nout = astGetNout( this ); \
 \
-/* If OK, check that the number of input grid dimensions matches the \
-   number required by the Mapping and is at least 1. Report an error \
-   if necessary. */ \
-   if ( astOK && ( ( ndim_in != nin ) || ( ndim_in < 1 ) ) ) { \
-      astError( AST__NGDIN, "astRebinSeq"#X"(%s): Bad number of input grid " \
-                "dimensions (%d).", status, astGetClass( this ), ndim_in ); \
-      if ( ndim_in != nin ) { \
-         astError( AST__NGDIN, "The %s given requires %d coordinate value%s " \
-                   "to specify an input position.", status, \
-                   astGetClass( this ), nin, ( nin == 1 ) ? "" : "s" ); \
-      } \
-   } \
-\
 /* If OK, also check that the number of output grid dimensions matches \
    the number required by the Mapping and is at least 1. Report an \
    error if necessary. */ \
@@ -12024,6 +12011,19 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
 /* If no input data was supplied, jump to the normalisation section. */ \
    simple = NULL; \
    if( in ) { \
+\
+/* If OK, check that the number of input grid dimensions matches the \
+   number required by the Mapping and is at least 1. Report an error \
+   if necessary. */ \
+      if ( astOK && ( ( ndim_in != nin ) || ( ndim_in < 1 ) ) ) { \
+         astError( AST__NGDIN, "astRebinSeq"#X"(%s): Bad number of input grid " \
+                   "dimensions (%d).", status, astGetClass( this ), ndim_in ); \
+         if ( ndim_in != nin ) { \
+            astError( AST__NGDIN, "The %s given requires %d coordinate value%s " \
+                      "to specify an input position.", status, \
+                      astGetClass( this ), nin, ( nin == 1 ) ? "" : "s" ); \
+         } \
+      } \
 \
 /* Check that the lower and upper bounds of the input grid are \
    consistent. Report an error if any pair is not. */ \
