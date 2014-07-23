@@ -40,7 +40,7 @@ F_ROUTINES = dummy.f
 ENTRY_PREFIX=
 
 getdlname = grep 'dlname=' convert_idl.la | sed -e 's:dlname=::' -e s:\'::g
-getshortdlname = grep 'library_names=' convert_idl.la | sed -e s:\'::g | awk '{print $$3}'
+getshortdlname = grep '^library_names=' convert_idl.la | sed -e s:\'::g | tr " " "\n" | tail -1
 
 edit = sed \
         -e 's,@libdir\@,$(libdir),g' \
