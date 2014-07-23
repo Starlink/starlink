@@ -1852,20 +1852,30 @@ maxlen = 0
 #  Name: 	memcheck
 #  Type: 	integer
 #  Default: 	0
-#  Purpose: 	Allows memory to be checked without creating a map.
-#  Description: If non-zero, makemap aborts with an error status immediately
-#               after checking that there is sufficient memory available to
-#               make the map. Thus no map is ever created if memcheck is
-#               non-zero. It is intended just as a check that a map could
-#               be created using a specified amount of memory. The specific
-#               error status indicates whether the memory was or was not
-#               sufficient to avoid chunking. If the map could be created
-#               without chunking then the error status will be SMF__MEMCHK.
-#               If the map could not be created without chunking then the
-#               error status will be SMF__NOMEM. Note, SMF__NOMEM is reported
-#               only if chunking is caused by lack of memory. SMF__MEMCHK
-#               is reported if chunking is caused by the supplied data being
-#               discontiguous.
+#  Purpose: 	Indicates what should happen if chunking is detected.
+#  Description: This parameter indicates what should happen if the
+#               available memory is too low to process the supplied
+#               time-series data without splitting it into chunks. It can
+#               take any of the following values:
+#
+#               0 - A warning is issued but makemap then continues to
+#               produce a map from the chunked data.
+#
+#               1 - An error is reported with status SMF__NOMEM and no
+#               map is created. The output map is created as normal if
+#               the available memory is sufficient to avoid chunking.
+#
+#               2 - An error is reported with status SMF__NOMEM and
+#               no map is created. In addition, an error is also reported
+#               with status SMF__MEMCHK and no output map is created if the
+#               available memory is sufficient to avoid chunking. Thus if
+#               memcheck is 2, no map is ever created. This is intended as
+#               a means to check whether chunking would or would not be used
+#               if makemap was to be used subsequently to create a map.
+#
+#               Note, in either case the SMF__NOMEM error is reported only
+#               if chunking is caused by lack of memory, not if it is caused
+#               by the supplied data being discontiguous.
 memcheck=0
 
 #-----------------------------------------------------------------

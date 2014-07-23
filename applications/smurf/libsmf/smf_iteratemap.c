@@ -948,6 +948,11 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
       /* Flag indicating that the memory should be checked but no map
          should be created */
       astMapGet0I( keymap, "MEMCHECK", &memcheck );
+      if( ( memcheck < 0 || memcheck > 2 ) && *status == SAI__OK ) {
+         *status = SAI__ERROR;
+         errRepf( "", "Bad value %d supplied for config parameter "
+                  "'memcheck' - must be 0, 1 or 2.", status, memcheck );
+      }
 
       /* Method to use for calculating the variance map */
       astMapGet0I( keymap, "VARMAPMETHOD", &varmapmethod );
@@ -1292,10 +1297,8 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                        &memneeded, status );
 
       /* If we need too much memory, generate a warning message and then try
-         to re-group the files using smaller contchunks. But only do this
-         if this invocation of makemap is intended to make a map and not
-         just simply test the available memory. */
-    if( *status == SMF__NOMEM && !memcheck ) {
+         to re-group the files using smaller contchunks. */
+    if( *status == SMF__NOMEM && memcheck == 0 ) {
       errAnnul( status );
       msgOutf( " ", FUNC_NAME ": *** WARNING ***\n  %zu continuous samples "
                "(%lg s, including padding) require %zu MiB > %zu MiB",
@@ -1391,11 +1394,11 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   /* If we are just checking the available memory, and not actually
      creating a map, we can now exit. We do this by reporting an error so
      that the output map will be deleted etc. */
-  if( memcheck && *status == SAI__OK ) {
+  if( memcheck == 2 && *status == SAI__OK ) {
     *status = SMF__MEMCHK;
     errRep( "", FUNC_NAME ": memory is sufficient to avoid chunking, but "
-            "no map will be created since config parameter memcheck is set",
-            status );
+            "no map will be created since config parameter memcheck is "
+            "set to 2", status );
   }
 
   if( *status == SAI__OK ) {
