@@ -3,7 +3,8 @@
 #include "mers.h"
 #include "sae_par.h"
 
-AstFrameSet *atlFrameSetSplit( AstFrameSet *fset, const char *domain, int *status ){
+AstFrameSet *atlFrameSetSplit( AstFrameSet *fset, const char *domain_list,
+                               int *status ){
 /*
 *+
 *  Name:
@@ -35,7 +36,11 @@ AstFrameSet *atlFrameSetSplit( AstFrameSet *fset, const char *domain, int *statu
 *     fset
 *        The FrameSet to be split.
 *     domain
-*        The Domain value for the required current Frame axes.
+*        The Domain value for the required current Frame axes. This can
+*        be a space-separated list of Domains, in which case each Domain
+*        will be used in turn until one is found which allows the
+*        supplied FrameSet to be split succesfully (any remaining Domain
+*        values will be ignored).
 *     status
 *        The global status.
 
@@ -74,6 +79,8 @@ AstFrameSet *atlFrameSetSplit( AstFrameSet *fset, const char *domain, int *statu
 *     10-APR-2014 (DSB):
 *        The index of the base Frame in the returned FrameSet is not necessarily the
 *        same as in the supplied FrameSet.
+*     24-JUL-2014 (DSB):
+*        Allow a space-separated list of Domains to be supplied.
 *     {enter_further_changes_here}
 *-
 */
@@ -90,6 +97,8 @@ AstFrameSet *atlFrameSetSplit( AstFrameSet *fset, const char *domain, int *statu
    AstMapping *bcmap;
    AstMapping *fmap;
    AstMapping *oldmap;
+   char *domain;
+   char **domains;
    char attrib[20];
    const char *axis_domain;
    int *baxes;
@@ -98,12 +107,14 @@ AstFrameSet *atlFrameSetSplit( AstFrameSet *fset, const char *domain, int *statu
    int i;
    int ibase;
    int icurr;
+   int idom;
    int iframe;
    int nax;
    int nb_in;
    int nb_out;
    int nc_in;
    int nc_out;
+   int ndom;
    int nframe;
 
 /* Initialise returned values. */
@@ -130,7 +141,14 @@ AstFrameSet *atlFrameSetSplit( AstFrameSet *fset, const char *domain, int *statu
    to create the returned FrameSet. */
    caxes = astMalloc( nc_in*sizeof( *caxes ) );
    baxes = astMalloc( nb_in*sizeof( *baxes ) );
-   if( *status == SAI__OK ) {
+
+/* Extract all words from the supplied list of Domains. */
+   domains = astChrSplit( domain_list, &ndom );
+
+/* Loop round each supplied Domain until one is found which allows the
+   supplied FrameSet to be split. */
+   for( idom = 0; !result && idom < ndom && *status == SAI__OK; idom++ ) {
+      domain = domains[ idom ];
 
 /* Check each axis of the current Frame of the supplied FrameSet. If its
    Domain matches the required Domain, add its index to the above array. */
@@ -219,6 +237,12 @@ AstFrameSet *atlFrameSetSplit( AstFrameSet *fset, const char *domain, int *statu
 /* Free resources. */
    caxes = astFree( caxes );
    baxes = astFree( baxes );
+   if( domains ) {
+      for( idom = 0; idom < ndom; idom++ ) {
+         domains[ idom ] = astFree( domains[ idom ] );
+      }
+      domains = astFree( domains );
+   }
 
 /* Export the result from the current AST context so the pointer is not
    annulled by the following call to astEnd. */
