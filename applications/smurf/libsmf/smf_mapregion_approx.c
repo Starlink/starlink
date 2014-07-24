@@ -41,6 +41,9 @@
 *  History:
 *     12-JUN-2014 (DSB):
 *        Original version.
+*     24-JUL-2014 (DSB):
+*        If the FITS headers that give the map size are not available,
+*        use reasonable defaults rather than reporting an error.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -101,13 +104,6 @@ AstRegion *smf_mapregion_approx( Grp *igrp, int index, int *status ){
 /* Open the requested file. */
    smf_open_file( NULL, igrp, index, "READ", SMF__NOCREATE_DATA, &data, status );
 
-/* Abort if it is not a scan */
-   if( data->hdr->obsmode != SMF__OBS_SCAN && *status == SAI__OK ) {
-      *status = SAI__ERROR;
-      errRep(" ", "Can not call smf_mapregion_approx with non-scan observation"
-             " (possible programming error)", status);
-   }
-
 /* Check that the data is 3-dimensional. */
    if( data->ndims != 3 && *status == SAI__OK ) {
       smf_smfFile_msg( data->file, "FILE", 1, "<unknown>" );
@@ -116,14 +112,21 @@ AstRegion *smf_mapregion_approx( Grp *igrp, int index, int *status ){
       errRepf( "", "^FILE data has ^ND dimensions, should be 3.", status );
    }
 
-/* Get the required values from the FITS header. */
-   mapwdth = 0.0;
-   maphght = 0.0;
+/* Set defaults for the required FITS headers. */
+   if( data->hdr->instrument == INST__SCUBA2 ) {
+      mapwdth = 3600.0;
+      maphght = 3600.0;
+   } else {
+      mapwdth = 600.0;
+      maphght = 600.0;
+   }
    mapx = 0.0;
    mapy = 0.0;
    basec1 = VAL__BADD;
    basec2 = VAL__BADD;
    tracksys[ 0 ] = 0;
+
+/* Get the values from the required FITS header. */
    smf_getfitsd( data->hdr, "MAP_WDTH", &mapwdth, status );
    smf_getfitsd( data->hdr, "MAP_HGHT", &maphght, status );
    smf_getfitsd( data->hdr, "MAP_X", &mapx, status );
