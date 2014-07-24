@@ -529,164 +529,166 @@ void smf_jsadicer( int indf, const char *base, int trim, smf_inst_t instrument,
          bbox[ 5 ] = -INT_MAX;
 
 /* Loop round all pixels in the section. */
-         if( !strcmp( type, "_REAL" ) ) {
-            pf = (float *) ipd;
-            for( iz = lbnd_tile[ 2 ]; iz <= ubnd_tile[ 2 ]; iz++ ) {
-               for( iy = lbnd_tile[ 1 ]; iy <= ubnd_tile[ 1 ]; iy++ ) {
-                  for( ix = lbnd_tile[ 0 ]; ix <= ubnd_tile[ 0 ]; ix++ ) {
-                     if( *(pf++) != VAL__BADR ) {
-                        if( ix < bbox[ 0 ] ) bbox[ 0 ] = ix;
-                        if( iy < bbox[ 1 ] ) bbox[ 1 ] = iy;
-                        if( iz < bbox[ 2 ] ) bbox[ 2 ] = iz;
-                        if( ix > bbox[ 3 ] ) bbox[ 3 ] = ix;
-                        if( iy > bbox[ 4 ] ) bbox[ 4 ] = iy;
-                        if( iz > bbox[ 5 ] ) bbox[ 5 ] = iz;
+         if( *status == SAI__OK ) {
+            if( !strcmp( type, "_REAL" ) ) {
+               pf = (float *) ipd;
+               for( iz = lbnd_tile[ 2 ]; iz <= ubnd_tile[ 2 ]; iz++ ) {
+                  for( iy = lbnd_tile[ 1 ]; iy <= ubnd_tile[ 1 ]; iy++ ) {
+                     for( ix = lbnd_tile[ 0 ]; ix <= ubnd_tile[ 0 ]; ix++ ) {
+                        if( *(pf++) != VAL__BADR ) {
+                           if( ix < bbox[ 0 ] ) bbox[ 0 ] = ix;
+                           if( iy < bbox[ 1 ] ) bbox[ 1 ] = iy;
+                           if( iz < bbox[ 2 ] ) bbox[ 2 ] = iz;
+                           if( ix > bbox[ 3 ] ) bbox[ 3 ] = ix;
+                           if( iy > bbox[ 4 ] ) bbox[ 4 ] = iy;
+                           if( iz > bbox[ 5 ] ) bbox[ 5 ] = iz;
+                        }
+                     }
+                  }
+               }
+            } else {
+               pd = (double *) ipd;
+               for( iz = lbnd_tile[ 2 ]; iz <= ubnd_tile[ 2 ]; iz++ ) {
+                  for( iy = lbnd_tile[ 1 ]; iy <= ubnd_tile[ 1 ]; iy++ ) {
+                     for( ix = lbnd_tile[ 0 ]; ix <= ubnd_tile[ 0 ]; ix++ ) {
+                        if( *(pd++) != VAL__BADD ) {
+                           if( ix < bbox[ 0 ] ) bbox[ 0 ] = ix;
+                           if( iy < bbox[ 1 ] ) bbox[ 1 ] = iy;
+                           if( iz < bbox[ 2 ] ) bbox[ 2 ] = iz;
+                           if( ix > bbox[ 3 ] ) bbox[ 3 ] = ix;
+                           if( iy > bbox[ 4 ] ) bbox[ 4 ] = iy;
+                           if( iz > bbox[ 5 ] ) bbox[ 5 ] = iz;
+                        }
                      }
                   }
                }
             }
-         } else {
-            pd = (double *) ipd;
-            for( iz = lbnd_tile[ 2 ]; iz <= ubnd_tile[ 2 ]; iz++ ) {
-               for( iy = lbnd_tile[ 1 ]; iy <= ubnd_tile[ 1 ]; iy++ ) {
-                  for( ix = lbnd_tile[ 0 ]; ix <= ubnd_tile[ 0 ]; ix++ ) {
-                     if( *(pd++) != VAL__BADD ) {
-                        if( ix < bbox[ 0 ] ) bbox[ 0 ] = ix;
-                        if( iy < bbox[ 1 ] ) bbox[ 1 ] = iy;
-                        if( iz < bbox[ 2 ] ) bbox[ 2 ] = iz;
-                        if( ix > bbox[ 3 ] ) bbox[ 3 ] = ix;
-                        if( iy > bbox[ 4 ] ) bbox[ 4 ] = iy;
-                        if( iz > bbox[ 5 ] ) bbox[ 5 ] = iz;
-                     }
-                  }
-               }
-            }
-         }
 
 /* Skip empty tiles. */
-         if( bbox[ 0 ] != INT_MAX ) {
-            msgOutf( "", "   tile %d", status, tile_index );
+            if( bbox[ 0 ] != INT_MAX ) {
+               msgOutf( "", "   tile %d", status, tile_index );
 
 /* If required, trim the bounds to the edges of the bounding box. */
-            if( trim >= 2 ) {
-               olbnd[ 0 ] = bbox[ 0 ];
-               olbnd[ 1 ] = bbox[ 1 ];
-               olbnd[ 2 ] = bbox[ 2 ];
-               oubnd[ 0 ] = bbox[ 3 ];
-               oubnd[ 1 ] = bbox[ 4 ];
-               oubnd[ 2 ] = bbox[ 5 ];
-            } else {
-               olbnd[ 0 ] = lbnd_tile[ 0 ];
-               olbnd[ 1 ] = lbnd_tile[ 1 ];
-               olbnd[ 2 ] = lbnd_tile[ 2 ];
-               oubnd[ 0 ] = ubnd_tile[ 0 ];
-               oubnd[ 1 ] = ubnd_tile[ 1 ];
-               oubnd[ 2 ] = ubnd_tile[ 2 ];
-            }
+               if( trim >= 2 ) {
+                  olbnd[ 0 ] = bbox[ 0 ];
+                  olbnd[ 1 ] = bbox[ 1 ];
+                  olbnd[ 2 ] = bbox[ 2 ];
+                  oubnd[ 0 ] = bbox[ 3 ];
+                  oubnd[ 1 ] = bbox[ 4 ];
+                  oubnd[ 2 ] = bbox[ 5 ];
+               } else {
+                  olbnd[ 0 ] = lbnd_tile[ 0 ];
+                  olbnd[ 1 ] = lbnd_tile[ 1 ];
+                  olbnd[ 2 ] = lbnd_tile[ 2 ];
+                  oubnd[ 0 ] = ubnd_tile[ 0 ];
+                  oubnd[ 1 ] = ubnd_tile[ 1 ];
+                  oubnd[ 2 ] = ubnd_tile[ 2 ];
+               }
 
 /* Modify these pixel bounds so that they refer to the output NDF. */
-            lbnd_in[ 0 ] = olbnd[ 0 ] - 0.5;
-            lbnd_in[ 1 ] = olbnd[ 1 ] - 0.5;
-            lbnd_in[ 2 ] = olbnd[ 2 ] - 0.5;
-            ubnd_in[ 0 ] = oubnd[ 0 ] - 0.5;
-            ubnd_in[ 1 ] = oubnd[ 1 ] - 0.5;
-            ubnd_in[ 2 ] = oubnd[ 2 ] - 0.5;
+               lbnd_in[ 0 ] = olbnd[ 0 ] - 0.5;
+               lbnd_in[ 1 ] = olbnd[ 1 ] - 0.5;
+               lbnd_in[ 2 ] = olbnd[ 2 ] - 0.5;
+               ubnd_in[ 0 ] = oubnd[ 0 ] - 0.5;
+               ubnd_in[ 1 ] = oubnd[ 1 ] - 0.5;
+               ubnd_in[ 2 ] = oubnd[ 2 ] - 0.5;
 
-            astMapBox( p2pmap, lbnd_in, ubnd_in, 1, 1, lbnd_out + 0,
-                       ubnd_out + 0, NULL, NULL );
-            astMapBox( p2pmap, lbnd_in, ubnd_in, 1, 2, lbnd_out + 1,
-                       ubnd_out + 1, NULL, NULL );
-            if( ndim == 3 ) astMapBox( p2pmap, lbnd_in, ubnd_in, 1, 3,
-                                       lbnd_out + 2, ubnd_out + 2, NULL,
-                                       NULL );
+               astMapBox( p2pmap, lbnd_in, ubnd_in, 1, 1, lbnd_out + 0,
+                          ubnd_out + 0, NULL, NULL );
+               astMapBox( p2pmap, lbnd_in, ubnd_in, 1, 2, lbnd_out + 1,
+                          ubnd_out + 1, NULL, NULL );
+               if( ndim == 3 ) astMapBox( p2pmap, lbnd_in, ubnd_in, 1, 3,
+                                          lbnd_out + 2, ubnd_out + 2, NULL,
+                                          NULL );
 
-            olbnd[ 0 ] = floor( lbnd_out[ 0 ] ) + 1;
-            olbnd[ 1 ] = floor( lbnd_out[ 1 ] ) + 1;
-            olbnd[ 2 ] = floor( lbnd_out[ 2 ] ) + 1;
-            oubnd[ 0 ] = floor( ubnd_out[ 0 ] ) + 1;
-            oubnd[ 1 ] = floor( ubnd_out[ 1 ] ) + 1;
-            oubnd[ 2 ] = floor( ubnd_out[ 2 ] ) + 1;
+               olbnd[ 0 ] = floor( lbnd_out[ 0 ] ) + 1;
+               olbnd[ 1 ] = floor( lbnd_out[ 1 ] ) + 1;
+               olbnd[ 2 ] = floor( lbnd_out[ 2 ] ) + 1;
+               oubnd[ 0 ] = floor( ubnd_out[ 0 ] ) + 1;
+               oubnd[ 1 ] = floor( ubnd_out[ 1 ] ) + 1;
+               oubnd[ 2 ] = floor( ubnd_out[ 2 ] ) + 1;
 
 /* Get the full path to the output NDF for the current tile, and create an
    NDF placeholder for it. */
-            sprintf( path, "%.*s_%d", nbase, base, tile_index );
-            ndfPlace( NULL, path, &place, status );
+               sprintf( path, "%.*s_%d", nbase, base, tile_index );
+               ndfPlace( NULL, path, &place, status );
 
 /* Create a new output NDF by copying the meta-data from the input NDF
    section. */
-            ndfScopy( indfs, "Units", &place, &indfo, status );
+               ndfScopy( indfs, "Units", &place, &indfo, status );
 
 /* Set the pixel bounds of the output NDF to the values found above and copy
    the input data for the current tile into it. */
-            smf1_jsadicer( indfo, olbnd, oubnd, tile_map, tile_frm, p2pmap,
-                           ipd, ipv, ipq, status );
+               smf1_jsadicer( indfo, olbnd, oubnd, tile_map, tile_frm, p2pmap,
+                              ipd, ipv, ipq, status );
 
 /* Add the name of this output NDF to the group holding the names of the
    output NDFs that have actually been created. */
-            if( grp ) grpPut1( grp, path, 0, status );
+               if( grp ) grpPut1( grp, path, 0, status );
 
 /* Add a TILENUM header to the output FITS extension. */
-            kpgGtfts( indfo, &fc, status );
-            if( *status == KPG__NOFTS ) {
-               errAnnul( status );
-               fc = astFitsChan( NULL, NULL, " " );
+               kpgGtfts( indfo, &fc, status );
+               if( *status == KPG__NOFTS ) {
+                  errAnnul( status );
+                  fc = astFitsChan( NULL, NULL, " " );
 
 /* If the last card is "END", remove it. */
-            } else {
-               astSetI( fc, "Card", astGetI( fc, "NCARD" ) );
-               keyword = astGetC( fc, "CardName" );
-               if( keyword && !strcmp( keyword, "END" ) ) astDelFits( fc );
-            }
+               } else {
+                  astSetI( fc, "Card", astGetI( fc, "NCARD" ) );
+                  keyword = astGetC( fc, "CardName" );
+                  if( keyword && !strcmp( keyword, "END" ) ) astDelFits( fc );
+               }
 
-            one_snprintf(jsatile_comment, 45, "JSA all-sky tile index (Nside=%i)",
-                         status, tiling.ntpf);
-            atlPtfti( fc, "TILENUM", tile_index, jsatile_comment, status );
-            kpgPtfts( indfo, fc, status );
-            fc = astAnnul( fc );
+               one_snprintf(jsatile_comment, 45, "JSA all-sky tile index (Nside=%i)",
+                            status, tiling.ntpf);
+               atlPtfti( fc, "TILENUM", tile_index, jsatile_comment, status );
+               kpgPtfts( indfo, fc, status );
+               fc = astAnnul( fc );
 
 /* Now store an STC-S polygon that describes the shortest boundary
    enclosing the good data in the output NDF, and store it as an NDF extension. */
-            kpgPutOutline( indfo, 0.5, 1, status );
+               kpgPutOutline( indfo, 0.5, 1, status );
 
 /* We now reshape any extension NDFs contained within the output NDF to
    have the same spatial bounds as the main NDF (but only for extension
    NDFs that originally have the same spatial bounds as the supplied NDF).
    Get a group containing paths to all extension NDFs in the output NDF. */
-            ndgMoreg( indfo, &grpt, &size, status );
+               ndgMoreg( indfo, &grpt, &size, status );
 
 /* Loop round each output extension NDF. */
-            for( iext = 1; iext <= size && *status == SAI__OK; iext++ ) {
-               ndgNdfas( grpt, iext, "Update", &indfx, status );
+               for( iext = 1; iext <= size && *status == SAI__OK; iext++ ) {
+                  ndgNdfas( grpt, iext, "Update", &indfx, status );
 
 /* Get its bounds. */
-               ndfBound( indfx, NDF__MXDIM, lbndx, ubndx, &ndimx, status );
+                  ndfBound( indfx, NDF__MXDIM, lbndx, ubndx, &ndimx, status );
 
 /* See if this extension NDF has the same bounds on the spatial axes as
    the supplied NDF. */
-               if( ndimx > 1 && lbndx[ lonax ] == lbnd[ lonax ] &&
-                                lbndx[ latax ] == lbnd[ latax ] &&
-                                ubndx[ lonax ] == ubnd[ lonax ] &&
-                                ubndx[ latax ] == ubnd[ latax ] ) {
+                  if( ndimx > 1 && lbndx[ lonax ] == lbnd[ lonax ] &&
+                                   lbndx[ latax ] == lbnd[ latax ] &&
+                                   ubndx[ lonax ] == ubnd[ lonax ] &&
+                                   ubndx[ latax ] == ubnd[ latax ] ) {
 
 /* If so, change the bounds of the output extension NDF so that they are
    the same as the main NDF on the spatial axes, and map the original
    contents of the NDF onto the new pixel grid. */
-                  smf1_jsadicer( indfx, olbnd, oubnd, tile_map, tile_frm, p2pmap,
-                                 NULL, NULL, NULL, status );
-               }
+                     smf1_jsadicer( indfx, olbnd, oubnd, tile_map, tile_frm, p2pmap,
+                                    NULL, NULL, NULL, status );
+                  }
 
 /* Annul the extension NDF identifier. */
-               ndfAnnul( &indfx, status );
-            }
+                  ndfAnnul( &indfx, status );
+               }
 
 /* Free resources associated with the current tile. */
-            grpDelet( &grpt, status );
-            ndfAnnul( &indfo, status );
+               grpDelet( &grpt, status );
+               ndfAnnul( &indfo, status );
 
 /* Issue warnings about empty tiles. */
-         } else {
-            msgOutiff( MSG__VERB, "", "   tile %d is empty and so will not be "
-                       "created", status, tile_index );
+            } else {
+               msgOutiff( MSG__VERB, "", "   tile %d is empty and so will not be "
+                          "created", status, tile_index );
+            }
          }
 
 /* Free the section of the input NDF. */
