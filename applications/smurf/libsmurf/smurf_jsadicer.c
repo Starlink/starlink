@@ -181,7 +181,7 @@ void smurf_jsadicer( int *status ) {
    parGet0i( "TRIM", &trim, status );
 
 /* Decide what sort of projection (HPX or XPH) to use. */
-   parChoic( "USEXPH", "NONE", "NORTH,SOUTH", 1, text, sizeof(text), status );
+   parChoic( "USEXPH", "NONE", "NONE,NORTH,SOUTH", 1, text, sizeof(text), status );
    if( !strcmp( text, "NORTH" ) ) {
       usexph = 1;
    } else if( !strcmp( text, "SOUTH" ) ) {
