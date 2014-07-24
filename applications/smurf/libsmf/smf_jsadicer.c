@@ -93,6 +93,9 @@
 *        chosen.
 *     7-JUL-2014 (DSB):
 *        Ensure the output NDFs inherited the Epoch value of the input NDF.
+*     24-JUL-2014 (DSB):
+*        DSBSPECTRUM spectral axes are now handled, in addition to
+*        SPECTRUM axes.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -403,7 +406,7 @@ void smf_jsadicer( int indf, const char *base, int trim, smf_inst_t instrument,
    the input NDF, and add it in parallel with the above tile mapping. */
          if( ndim == 3 ) {
             astSetI( iwcs, "Base", ipixel );
-            tfs = atlFrameSetSplit( iwcs, "SPECTRUM", status );
+            tfs = atlFrameSetSplit( iwcs, "DSBSPECTRUM SPECTRUM", status );
             astSetI( iwcs, "Base", igrid );
             if( tfs ) {
                specmap = astGetMapping( tfs, AST__BASE, AST__CURRENT );
