@@ -1,14 +1,15 @@
 % Latex2E class for writing starlink reports
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{starlink}
-\RequirePackage[T1]{fontenc} 
-\RequirePackage[utf8]{inputenc}
-
 
 \newif\ifwithchapters
 \withchaptersfalse
 
+\newif\iftwoside
+\twosidefalse
+
 \DeclareOption{chapters}{\withchapterstrue}
+\DeclareOption{twoside}{\twosidetrue}
 
 \ProcessOptions\relax
 
@@ -20,6 +21,15 @@
    \LoadClassWithOptions{article}
    \typeout{..........Article!..........}
 \fi
+
+
+% Font types and encoding.
+\RequirePackage[T1]{fontenc}
+\RequirePackage[utf8]{inputenc}
+
+% microtype For improved pdf typography (must come after loading class)
+\RequirePackage{microtype}
+
 
 
 \RequirePackage{mathpazo}
@@ -98,8 +108,7 @@
 \newcommand{\starproject}[1]{\def\@starproject{#1}}
 
 \newcommand{\stardocsource}[1]{\def\@stardocsource{#1}}
-
-
+\newcommand{\stardocname}[1]{\def\@stardocname{#1}}
 
 % Defaults for current data?
 \starinstitute{}%Joint Astronomy Centre}
@@ -116,6 +125,9 @@
 \stardocmanual{}
 \stardocabstract{}
 \stardocauthors{}
+\startitlepic{}
+\stardocname{}
+
 
 % provide the... versions of these commands so you don't need to use @
 % in latex.
@@ -138,7 +150,8 @@
 
 
 %  Ensure the title is available at a command\thetitle
-%\newcommand{\thetitle}{\@title}
+\newcommand{\thetitle}{\@stardoctitle}
+\title{\@stardoctitle}
 \newcommand{\thedate}{\@date}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -258,4 +271,6 @@
   \else%
     ... command '#1' does not exist ...%
   \fi%
-}
+  }
+
+  \newcommand{\slhyperref}[4]{#2\ref{#4}#3}

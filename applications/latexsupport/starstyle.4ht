@@ -1,4 +1,7 @@
 
+    \usepackage{microtype}
+    \DisableLigatures{encoding = *, family = * }
+
 %This needs to occur before the TocAt commands?
 \ConfigureToc{sstrefsection}{}{}{}{}
 
@@ -26,9 +29,9 @@
 
 \Abstract{}
 \ifwithchapters
-\tableofcontents[chapter,section,subsection,appendix]
+\tableofcontents[chapter,section,subsection,subsubsection,appendix]
 \else
-\tableofcontents[section,subsection,appendix]
+\tableofcontents[section,subsection,subsubsection,appendix]
 \fi
 }
 
@@ -85,7 +88,7 @@
 %\renewenvironment{htmlonly}{}{}
 
 %\renewcommand{\htmladdimg}[1]{\includegraphics{#1}}
-
+\renewcommand{\latexhtml}[2]{#2}
 
 \ConfigureEnv{sltextbox}{\ifvmode\ShowPar\fi\HCode{<div class="sltextbox">}}{\Tg</div>}{}{}
 
@@ -119,11 +122,11 @@
 %\renewcommand{\titlespacing}[4]{}
 
 % Fix some weirdness in symbols
-\renewcommand{\^}{\HCode{^}}
+%\renewcommand{\^}{\HCode{^}}
 \renewcommand\${\HCode{$}}%$ %$ is to fix syntax highlighting.
 %xs\renewcommand{\_}{\texttt{\_}}
 
-\renewenvironment{center}{}{}
+\renewenvironment{center}{\Tg<div class="center">}{\Tg</div>}
 
 %\renewcommand{\Copyright}{}
 
@@ -242,7 +245,21 @@
 
 
 % Css for toc
-\Css{.sectionToc{padding-left:5\%}}
-\Css{.subsectionToc{padding-left:10\%}}
-\Css{.subsubsectionToc{padding-left:15\%}}
+\Css{.sectionToc{}}
+\Css{.subsectionToc{padding-left:1em;display:inline-block;}}
+\Css{.subsubsectionToc{padding-left:4em;font-size:80\%}}
 \Css{.chapterHead,.appendixHead{line-height:150\%}}
+
+\ifwithchapters
+\Css{.chapterToc{}}
+\Css{.sectionToc{padding-left:1em}}
+\Css{.subsectionToc{padding-left:2em;display:inline-block;}}
+\Css{.subsubsectionToc{}}
+\fi
+
+
+
+
+
+
+

@@ -21,11 +21,11 @@
 \newcommand{\xlabel}[1]{\label{\protect{xref_#1}}}
 \newcommand{\latexhtml}[3]{#1}
 \renewcommand{\htmladdnormallink}[2]{\href{#2}{#1}\footnote{\url{#2}}}
+\renewcommand{\html}[1]{}
 
 
 
-
-\newcommand{\scfrontmatter}{
+\newcommand*{\scfrontmatter}{
 \renewcommand{\thepage}{\roman{page}}
 \setcounter{page}{1}
 \begin{titlepage}%
@@ -255,8 +255,17 @@
 % the page number and no rules. 
 \fancypagestyle{plain}{%
 \fancyhf{}%
+
+\iftwoside
 \fancyhead[RE,LO]{\thepage}%
-\fancyhead[LE,RO]{\slshape \thestardocinitials{}/\thestardocnumber{}\nouppercase{---\leftmark}}%
+\fancyhead[LE,RO]{\slshape
+  \thestardocinitials{}/\thestardocnumber{}\nouppercase{---\leftmark}}%
+\else
+\fancyhead[LO]{\thepage}
+\fancyhead[RO]{\slshape
+\thestardocinitials{}/\thestardocnumber{}\nouppercase{---\leftmark}}%
+\fi
+
 \renewcommand{\headrulewidth}{0pt}%
 \renewcommand{\footrulewidth}{0pt}%
 }
@@ -264,8 +273,15 @@
 % ensure correct chaptermakr is used when in pagestyle plain
 \pagestyle{plain}
 \fancyhf{}
-\rhead{\slshape \thestardocinitials{}/\thestardocnumber{} \nouppercase{---\leftmark}}
-\lhead{\thepage}
+
+\iftwoside
+\fancyhead[LE,RO]{\slshape \thestardocinitials{}/\thestardocnumber{} \nouppercase{---\leftmark}}
+\fancyhead[RE,LO]{\thepage}
+\else
+\lhead{\slshape \thestardocinitials{}/\thestardocnumber{} \nouppercase{---\leftmark}}
+\rhead{\thepage}
+\fi
+
 \renewcommand{\headrulewidth}{0.0pt}
 
 \ifwithchapters
@@ -336,8 +352,8 @@
 \providecommand{\ndfcomp}[1]{\texttt{#1}}    % NDF component
 
 
-
-
+%hyperref command in sun95 renewed
+\newcommand{\sthyperref}[4]{#2\ref{\protect{#4}}#3}
 
 \newcommand{\menuitem}[2]{\item[\protect{\hyperref[#1]{#1}}] #2}
 \newcommand{\classitem}[1]{\item [\protect{\hyperref[#1]{#1}}]}

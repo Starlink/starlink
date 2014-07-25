@@ -17,11 +17,11 @@
 
 %...  Formatting the title for sstrefsection
 \titleformat{name=\sstrefsection}%
-{\normalfont\Large\bfseries\centering}{}{0pt}{\rule{\textwidth}{0.5mm}}[\rule{\textwidth}{0.5mm}]
+{\normalfont\Large\bfseries\centering}{}{0pt}{}
 \titlespacing*{\sstrefsection}{0pt}{3.5ex plus 1ex minus .2ex}{2.3ex plus .2ex}
 
 %...  Command to turn name and short description into single variable for title.
-\newcommand{\sstsectitle}[2]{{\centering #1}\newline{\normalfont\Large #2}}
+\newcommand{\sstsectitle}[2]{\strut \vphantom{#1}#1\newline \ignorespaces#2\strut}
 
 % ..  Command to completely remove section from contents so it can be added in manually at the correct section.
 \newcommand{\nocontentsline}[3]{}
@@ -29,11 +29,13 @@
 
 
 \newcommand{\ssttitle}[2]{
-  \tocless\sstrefsection{\sstsectitle{#1}{#2}}
+  \tocless\sstrefsection{\centering\rule{\textwidth}{0.5mm}\\%
+%\sstsectitle{#1}{#2}
+#1\\#2\\\rule{\textwidth}{0.5mm}}
     \addcontentsline{toc}{subsection}{\protect\numberline{}\RemoveSpaces{#1}}}
 %...  Basic command for producing the routine
 \newcommand{\sstroutine}[3]{
-  
+  \clearpage
   % Create the section.
   \ssttitle{#1}{#2}
 
@@ -42,7 +44,11 @@
 
   %..  change the mark on the left hand side to include the name of the chapter.
   \markright{\textit{\RemoveSpaces{#1}}}
+  \iftwoside
   \fancyhead[RE,LO]{\thepage\hspace{1cm}\rightmark}
+  \else
+  \lhead{\thepage\hspace{1cm}\rightmark}
+  \fi
 
   %..  Nest all the material within a description
   \begin{description}[style=nextline]
@@ -50,7 +56,7 @@
   \end{description}
 
   % End the page
-  \clearpage
+  \newpage
 }
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -77,44 +83,77 @@
 \newlength{\sstexampleslength}
 \newlength{\sstexampleswidth}
 
+\newcommand{\sstdiytopic}[2]{\item[#1:]
+\begin{description}[style=nextline]\item[]\end{description} #2}
+
 \newcommand{\sstdescription}[1]{\item[Description:] #1 }
-\newcommand\vitem[1][]{\SaveVerb[%
-    aftersave={\item[\textnormal{\UseVerb[#1]{vsave}}]}]{vsave}}
+%\newcommand\vitem[1][]{\SaveVerb[%
+%    aftersave={\item[\textnormal{\UseVerb[#1]{vsave}}]}]{vsave}}
 
 \newcommand{\sstusage}[1]{\item[Usage:]{\raggedright \tt #1}}%\item[Usage:] \begin{Verbatim} #1 \end{Verbatim}}
 \newcommand{\sstparameters}[1]{\item[Parameters:]
 \begin{description}[style=nextline]\item[] #1 \end{description}}
 \newcommand{\sstsubsection}[2]{\item[{#1}] #2}
-\newcommand{\sstnotes}[1]{\item[Notes:] #1}
+\newcommand{\sstnotes}[1]{\sstdiytopic{Notes}{#1}}
 \newcommand{\sstdiylist}[2]{\item[#1] #2}
 \newcommand{\sstimplementationstatus}[1]{\item[Implementation Status:]
   #1}
 \newcommand{\sstbugs}[1]{\item[Bugs:] #1}
-\newcommand{\sstdiytopic}[2]{\item[#1:]
-\mbox{} #2}
 
 %  Format a list of items while in paragraph mode.
 \newcommand{\sstitemlist}[1]{
+  \mbox{}\vspace{-1\baselineskip}
   \begin{itemize}
      #1
   \end{itemize}
 }
-\newcommand{\sstexamplesubsection}[2]{\sloppy
-\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \vspace{1.0ex}
-\\ #2 }
+\newcommand{\sstexamplesubsection}[2]{
+\item[\texttt{#1}] %\mbox{}\\% \vspace{1.0ex}
+#2 }
 
 \newcommand{\sstexamples}[1]{
-   \item[Examples:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
+   \item[Examples:]
+   \begin{description}[style=nextline]
+     \item[]
       #1
    \end{description}
 }
 %  Define the format of an item.
-\newcommand{\sstitem}{\item}
+\newcommand{\sstitem}{\item\mbox{}}
 
 %  Format the attribute data type section.
-\providecommand{\sstattributetype}[1]{\item[Type:]#1}
+\providecommand{\sstattributetype}[1]{}%\item[Type:]#1}
 
+%\newcommand{\sstattribute}[3]{\sstroutine{#1}{#2}{#3}}
+\newcommand{\sstattribute}[3]{
+  % Create the section.
+  %\ssttitle{#1}{#2}
+  \subsubsection[#1]{\centering \rule{\textwidth}{0.5mm}\\\Large\ignorespaces#1
+    \\#2\\\rule{\textwidth}{0.5mm}}
+  % Set the first parameter as the label; need to remove spaces first.
+  \label{\RemoveSpaces{#1}}
+
+  %..  change the mark on the left hand side to include the name of the section.
+  \markright{\textit{\RemoveSpaces{#1}}}
+  \iftwoside
+  \fancyhead[RE,LO]{\thepage\hspace{1cm}\rightmark}
+  \else
+  \lhead{\thepage\hspace{1cm}\rightmark}
+  \fi
+  %..  Nest all the material within a description
+  \begin{description}[style=nextline]
+    #3
+  \end{description}%
+  %\rule{\textwidth}{0.5mm}\\
+  % End the page
+  %\clearpage
+}
 
 \renewcommand{\wedge}{\mbox{\textasciicircum}}
+
+\newcommand{\ssthitemlist}[1]{\mbox{}\begin{itemize}#1\end{itemize}}
+\newcommand{\sstapplicability}[1]{\sstdiytopic{Applicability}{#1}}
+\newcommand{\sstresparameters}[1]{\sstdiytopic{Res Paramaters}{#1}}
+\newcommand{\sstarguments}[1]{\sstdiytopic{Arguments}{#1}}
+
+%\renewcommand{\backslash}{\textbackslash}
