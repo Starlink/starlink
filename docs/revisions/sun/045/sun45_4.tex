@@ -1,0 +1,905 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {45.4}
+\newcommand{\stardocauthors}   {Nicholas Eaton}
+\newcommand{\stardocdate}      {19 March 1992}
+\newcommand{\stardoctitle}     {PHOTOM --- An aperture photometry routine}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+  \setlength{\parskip}{0mm}
+  \tableofcontents
+  \setlength{\parskip}{\medskipamount}
+  \markright{\stardocname}
+%------------------------------------------------------------------------------
+
+
+\section{INTRODUCTION}
+
+PHOTOM is an ADAM task for performing aperture photometry. It has two
+basic modes of operation; using an interactive display to specify the
+positions for the measurements, or obtaining those positions from a file.
+The aperture is circular or elliptical and the size and shape can be
+varied interactively on the display, or by entering values from the
+keyboard or parameter system. The background sky level can be sampled
+interactively by manual positioning of the aperture, or automatically
+from an annulus surrounding the object.
+
+
+\section{RUNNING PHOTOM}
+
+PHOTOM accepts data files in NDF format (~SGP/38~).
+If the measurements are to be made in interactive mode, the data must
+be first displayed using a suitable routine, which writes to the AGI
+graphics database. All of the display routines in KAPPA are suitable
+for use with PHOTOM. PHOTOM then uses the database to position the
+aperture on the display. For reference PHOTOM uses the last 'DATA'
+picture in the database to establish its coordinate system; see SUN/48
+for more details on the graphics database.
+
+To run PHOTOM from within the ADAM command language give the task name
+thus :-
+\begin{quote}
+\begin{verbatim}
+     ICL> PHOTOM
+\end{verbatim}
+\end{quote}
+
+The task can also be run from DCL with the following command
+\begin{quote}
+\begin{verbatim}
+     $ ADAMSTART
+     $ PHOTOM
+\end{verbatim}
+\end{quote}
+
+The first requested parameter is the name of the file containing the
+data object. This data object remains with the task until PHOTOM is
+quitted. If another data object needs to be measured then PHOTOM has
+to be re-run.
+
+The routine creates some temporary disk work space. An error will occur
+if there is not enough room on the disk to accommodate this.
+
+
+\section{RUNNING PHOTOM INTERACTIVELY}
+
+If an interactive menu option (~I~-~interactive shape or M~-~interactive
+measurement~) is selected then the name of the display device to be used
+is requested the first time one of these options is chosen.
+PHOTOM is mainly intended to be run interactively on an image display
+with an overlay plane. On such a device the image will be displayed on
+the base plane and PHOTOM will be run on the overlay. The use of an
+overlay plane gives the greatest flexibility to the program, since
+regions of the overlay can be erased without affecting the image.
+Also PHOTOM can be called several times without having to erase the
+underlying image. Of course if a different data set is to be measured,
+then this has to be displayed first.
+
+It is possible to run PHOTOM interactively on a standard graphics terminal
+e.g.~Tektronix. Clearly displaying the image as a greyscale on such a
+terminal is not possible, but KAPPA has a number of contouring routines
+that can be used instead. After running the contouring package PHOTOM is
+started as normal. When the graphics device is requested by PHOTOM, the
+same name as used for the contour plot should be given.
+
+The disadvantage of using graphics terminals is that the screen erasing
+is inhibited to ensure that parts of the image do not get erased, and thus
+apertures drawn by PHOTOM become permanent parts of the picture. This will
+also occur if an image display is used and the base plane, and not the
+overlay, is selected for PHOTOM.
+
+On an image display the interaction is controlled by the tracker ball or
+mouse. The cursor position is under the control of the mouse movement and
+the mouse buttons select the operation to be performed, as indicated by
+the menu boxes on the screen.
+On a graphics terminal these functions will normally be controlled
+from the keyboard. For example the arrow keys may move the cursor. The
+button selections are usually under the control of the numeric keys above
+the QWERTY keyboard. The three boxes shown on the display need responses
+of 1, 2 and 0 reading from left to right, i.e. the function RETURN TO
+KEYBOARD is selected by pressing key 0 and the operation in the left hand
+box is selected by pressing key 1. Other keys on the keyboard may
+also return one or more of these values e.g. the QWERTY keys normally
+return 0.
+
+
+\section{RUNNING PHOTOM IN BATCH}
+
+If there are a large number of objects to be measured non-interactively
+then it may be preferable to run the job in batch. This can be done
+either with a DCL command procedure or an ICL command procedure.
+The DCL command procedure contains the command to run the program and
+the entries required by the prompts. It will be necessary to run the
+program interactively first to verify the order of the prompts.
+\begin{quote}
+\begin{verbatim}
+     $ ADAMSTART
+     $ PHOTOM
+     FRAME.SDF
+     N
+     5.0
+     0.0
+     0.0
+     F
+     POSITIONS.DAT
+     E
+\end{verbatim}
+\end{quote}
+In this example the image data is assumed to be in a file FRAME.SDF in
+the default directory. The size and shape of the aperture is set using
+the non-interactive command (~N~) and the command (~F~) instructs the
+program to take the initial positions from the file POSITIONS.DAT. The
+(~E~) command ends the program. All other parameters are taken as the
+run-time defaults.
+
+
+\section{MENU OPTIONS}
+
+PHOTOM is a menu driven application. It is a single executable image so
+the user has to exit from the routine to perform any other tasks. The
+menu has been designed around single character entries, which hopefully
+have easily remembered mnemonics. Many of the options have counterparts
+in the ADAM parameter system, and so can be controlled outside the task
+by the environment. The options are selected by inputting a single
+letter corresponding to the chosen operation at the COMMAND prompt.
+The first letter entered is the one used by the program; any
+other letters following this on the same command line are ignored.
+For instance 'M', 'Measure' and 'magic' all initiate the interactive
+measurements. The menu options are as follows:-
+
+\subsection{A --- Annulus}
+
+This is a toggle switch which alters the way in which the background
+level is measured. There are two methods available. The first is
+interactive, and uses an aperture identical in size and shape to the
+object aperture. The aperture is positioned manually to select the
+region of sky to measure. The message 'Interactive aperture in use'
+will signify that this has been chosen.
+
+The alternative is to use an aperture which is a concentric annulus
+around the object aperture. The size of the aperture is specified by
+the INNER and OUTER parameters. In this mode the sky is measured
+automatically every time a measurement is made. The message
+'Concentric aperture in use' signifies this choice.
+
+When starting PHOTOM one of these modes will be chosen as the default.
+This choice is controlled by the CONCEN parameter in the interface file.
+If the positions of the objects is entered by a file of positions
+(~command F~), then the background is automatically taken with the
+concentric annulus, whatever the default value of CONCEN.
+
+When using the interactive aperture, several sky areas can be sampled
+to improve the estimate of the sky. The sky estimates in each aperture
+are simply summed, and the mean of these is used when the object is
+measured.
+
+\subsection{C --- Centroid}
+
+This is a toggle switch which alters whether the object is centered in
+the aperture before doing the measurement. The centroiding algorithm is
+the same as the one used by KAPPA. The degree of centroiding is
+controlled by the parameters SEARCH, POSITIVE, MAXSHIFT, MAXITER and
+TOLER. These cannot be changed from within the program, and if
+alternative values are required they should be specified at runtime
+using the keyword facility, or the SET command (~see section 4~)
+
+The choice of mode is indicated by the messages 'Centroiding in stellar
+aperture', or 'No centroiding'. When starting PHOTOM one of these modes
+will be chosen as the default. This choice is controlled by the CENTRO
+parameter in the interface file.
+
+Unless the field under investigation is very crowded, or there are other
+special conditions, it is probably best to leave the centroiding option
+on all the time. This is more important if the measurements are being
+made in non-interactive mode (~command F~); unless the user is certain
+that the positions supplied are as required.
+
+\subsection{E --- Exit}
+
+This command terminates the current PHOTOM session.
+
+\subsection{F --- File of positions}
+
+This command causes the measurements to be done automatically. A file
+containing the positions is requested via the parameter system, and the
+photometry is performed with the current setup of aperture parameters.
+
+The name of the file containing the positions is requested through the
+POSFILE parameter. If the file cannot be found or is not in a suitable
+format the user is returned to the command level. 
+
+The file of positions should specify an index number and the x and y
+positions in pixel coordinates. For every x and y pair in the file an
+aperture measurement is made, sampling the sky with the concentric
+annulus, whose size is specified by the current values of the INNER and
+OUTER parameters. Centroiding in the object aperture is, or is not done,
+depending on the current value of the CENTRO parameter, which is selected
+with command C. When the input file is exhausted the user is returned
+to the command level.
+
+Results of the measurements are shown on the terminal as well as output
+to a file pointed to by the RESFILE parameter. Results are identified by
+the index number associated with the x and y position in the input file.
+
+A previous results file can be used as the input file of positions. Just
+typing the name without a version number in response to the file name will
+result in an error, since the program has opened a new results file which
+is trying to be read. To get round this give the explicit version number
+of the results file to be used, or use version number -1 to get the
+previous file of results.
+
+The format of the input and the results files are given in appendix A.
+
+\subsection{H --- Help}
+
+This displays a brief line of help for each command. For more extensive
+help refer to this manual.
+
+\subsection{I --- Interactive shape}
+
+This allows the size and shape of the cursor to be adjusted interactively
+on the screen to best suit the needs of the particular frame. If the name
+of the display device has not already been requested, it will be now.
+PHOTOM usually works in an overlay plane of the image displays, so that
+selected areas can be erased without affecting the underlying image.
+
+The size and shape of the aperture is governed by three parameters, defining
+an ellipse. The semi-major axis and eccentricity are as usually defined for
+an ellipse. An eccentricity of 0 gives a circular aperture with a radius
+equal to the semi-major axis. The orientation of the ellipse is given in
+degrees and specifies the orientation of the semi-major axis of the ellipse
+anti-clockwise with respect to the vertical axis of the screen. If the
+data is displayed in the normal sense then the orientation corresponds to
+a position angle.
+
+The selection of the parameter values is controlled by two buttons on the
+trackerball/mouse. The boxes on the screen are representative of the
+buttons on the mouse. Pressing the first button changes the value of the
+particular parameter named on the screen. The current value of that
+parameter is also shown. The parameters have a limited number of preset
+values which can be cycled through by repeated presses of the first
+button. If none of the set-up parameter values is suitable, then the
+values can be entered from the keyboard using the non-interactive shape
+command N. The second button on the mouse selects which of the parameters
+SEMI-MAJOR, ECCENTRICITY or ORIENTATION is to be under the control of the
+first button. Repeated presses of the second button will cycle the names.
+Pressing the second button does not change the parameter values, so it
+can be used to check the current values of the parameters (~this can also
+be done from the keyboard with the V command~). The third button returns
+the control to the keyboard. Control will remain with the mouse until this
+button is pressed. The third button really corresponds to the
+break key, and so on ARGS trackerballs is the fourth (~red~) button.
+
+When a parameter value is changed, the aperture displayed at the cursor
+position is updated to reflect this. The aperture is also redisplayed
+whenever the second key is pressed. As this does not change any of the
+parameter values, then moving the cursor and pressing the second button
+can be used to verify the shape of the cursor is suitable at different
+parts of the frame.
+
+The initial values of the three parameters, shown on the display, are
+chosen to reflect the current values. The semi-major axis is set at the
+current value, and the available choices enables the size to be doubled
+or halved. The possible values of the eccentricity and orientation are
+limited, in this interactive selection, to a number of preset values.
+The value initially displayed is taken to be the member of the preset
+table which is closest to, but lower than, the current value of that
+parameter.
+
+\subsection{M --- Measure}
+
+This performs interactive measurements of objects individually selected
+from the displayed frame. The size and shape of the cursor should be
+set-up in advance using the I or N commands.
+
+If the name of the display device has not already been requested, it will
+be now. PHOTOM usually works in an overlay plane of the image displays, so
+that selected areas can be erased without affecting the underlying image.
+
+There are two basic methods depending on the choice of whether the
+background is sampled from an annulus around the object aperture, or from
+a separately chosen area of sky (~see command A~). The two can be
+distinguished at this stage from the on-screen display. In the case of
+the automatic sky measurement the two outer boxes labelled STAR and
+RETURN~TO~KEYBOARD are annotated, with the middle box empty. In the case
+of the manual sky measurement the middle box is labelled with SKY.
+
+To perform the measurements with the automatic sampling of the sky, the
+cursor is positioned over the chosen object and the first button is
+pressed. On the screen an aperture is displayed where the measurement
+was made. If centroiding is being done, (~command C~) then the displayed
+aperture may not be centered on the cursor position. The results of the
+measurement are printed on the terminal screen and recorded in the
+results file. Measurements can be continued until the RETURN~TO~KEYBOARD
+button is pressed.
+
+When using manual selection of the background the second button comes into
+play. Pressing this button records the sky estimate in an aperture
+identical in size and shape to the object aperture, at the position
+specified by the cursor. On the screen an aperture is displayed at that
+position. No centroiding is done in this aperture, even if the centroiding
+option is on. When the measurement of the object is made by pressing the
+first button, the most recent value of the sky is used. This means that
+the sky has to be sampled BEFORE the measurement of the object. If the
+background needs to be sampled in several places around an object, to
+minimise the noise or take account of a sloping background, then the
+SKY button can be pressed a number of times in order to get the mean
+of the sky measurements. The calculation of the mean is only cleared when
+the STAR button is pressed, so if a mistake has been made in estimating
+the mean of the skies then a measurement has to be made with the STAR
+button, and a note made that the measurement was in error, before going
+back to the estimation of the sky. Control stays with the mouse until
+the RETURN~TO~KEYBOARD button is pressed.
+
+The results of the measurements are displayed on the terminal and sent
+to a file named pointed to by the RESFILE parameter.
+
+\subsection{N --- Non-interactive shape}
+
+The size and shape of the aperture can be specified from the keyboard
+by entering values for the semi-major axis, the eccentricity and the
+orientation of the ellipse defining the aperture.
+
+An eccentricity of 0.0 gives a circular aperture with a radius equal to
+the semi-major axis. The orientation of the ellipse is given in degrees
+and specifies the orientation of the semi-major axis of the ellipse
+anti-clockwise with respect to the vertical axis of the pixel array. If the
+array is considered in the normal sense, with the first pixel in the bottom
+left corner, then the orientation corresponds to a position angle.
+
+
+\subsection{O --- Options}
+
+This allows the user to change the values of some of the parameters
+specified in the interface file from the keyboard.
+
+The INNER and OUTER parameters define the size of the annulus to be
+used in the automatic sampling of the sky. The annulus has the same
+elliptical shape as the object aperture, but is larger by the factors
+given by INNER and OUTER. These two parameters are given in terms of
+multiplicative factors of the semi-major axis of the object aperture.
+Thus an INNER radius of 1 means that the sky annulus starts where the
+object aperture ends. The annulus thus grows and shrinks with changes
+to the object aperture.
+
+The PADU parameter defines the number of photons for each interval of
+the data. Multiplying the data value in each pixel by PADU gives the
+number of photons recorded (~after correcting for BIASLE~). If this
+parameter is unknown then leave it at 1.
+
+The SKYMAG parameter specifies the magnitude to be given to the sky
+when calculating the magnitude of the object. The magnitude of the
+object is calculated from
+$mag = SKYMAG - 2.5 \log_{10} ( signal )$
+where signal is the brightness of the object minus sky in photons.
+
+The BIASLE parameter gives the level in data units of any offset in
+the bias level per pixel. This is needed if there is any non-photon
+source of background, and proper photon statistics are required. If
+this parameter is unknown then leave it at 0.
+
+The SATURE parameter is a user supplied value giving a saturation
+level for the image in data units. If there are any pixels in the
+object aperture with values greater than the saturation level then
+this is indicated by an error code 'S' in the final column of the
+output table. The object magnitude is calculated with the saturated
+pixel {\bf included} in the result.
+
+\subsection{P --- Photon statistics}
+
+This is used to choose between the different ways in which the errors
+are calculated. There are three possible choices selected by the integers
+1 to 3 which have the following bindings :-
+\begin{tabbing}
+xxx\= \kill
+1 \> Errors from photon statistics. \\
+2 \> Errors from variations in the sky aperture. \\
+3 \> Errors from data variance. \\
+\end{tabbing}
+The first works out the errors from photon statistics in the sky and
+signal apertures. This requires the user to know and set-up the
+parameters PADU and BIASLE which convert the data values to numbers of
+photons. The message 'Errors from photon statistics' will signify that
+this has been chosen.
+
+The second method of calculating the errors is from the measured
+variance in the sky aperture. This method assumes that the measured
+variance is due to photon statistics and scales the measurement in
+the object aperture accordingly. This method still requires the
+parameter PADU to be known, but does not need the BIASLE parameter to
+be known. The message 'Errors from sky variance' will signify that
+this has been chosen. If neither the PADU or BIASLE parameters are
+known, then it is best to use this method to indicate the reliability
+of the measurements, but not to take the quoted error values as
+absolute since this method will be wrong by a factor $\sqrt{PADU}$,
+where $PADU$ is the unknown conversion factor.
+
+The third method of calculating the errors is from the data variance
+component of the NDF. This method of calculating the errors also
+requires the parameter PADU to be known. The message 'Errors from
+data variance' will signify that this has been chosen. A variance
+component may not always be present in the NDF along with the data
+array, and if this is the case then PHOTOM will issue the warning
+'Data does not have a variance component' if this method is selected. 
+
+Appendix B gives a full discussion of the calculation of the errors
+assuming photon statistics.
+
+\subsection{S --- Sky}
+
+This is used to choose between the different methods of estimating the
+background level in the sky aperture. There are four possible choices
+selected by the integers 1 to 4 which have the following bindings :-
+\begin{tabbing}
+xxx\= \kill
+1 \> Simple mean. \\
+2 \> Mean with 2 sigma rejection. \\
+3 \> Mode. \\
+4 \> User supplied value.
+\end{tabbing}
+The simple mean uses all the values in the sky aperture for its estimate
+except for those that have the `magic' bad values. The mean with 2 sigma
+rejection excludes all those points which are more than 2 standard
+deviations from the mean. Because one or more wayward outliers can
+affect the size of the standard deviation, the mean and standard deviation
+are recalculated after each stage of clipping up to a maximum of three
+times.
+The mode is superficially calculated from the empirical relation
+$mode = 3 * median - 2 * mean$, but because this can be fooled by
+excessive skewness in the histogram there are rejection and averaging
+schemes in the algorithm to ensure stability. The final option is to
+supply a value for the sky value which is used as a constant value for
+subsequent measurements. This value is used until either a new value is
+chosen or one of the other methods of estimation is selected. The sky
+variance is also requested so that if the errors are calculated from the
+sky variance (~command~P~) then a realisitic error can be assigend. Both
+the sky value and variance should be given in data units.
+
+When using a concentric background aperture it is recommended that the
+mode or mean with $2\sigma$ rejection is used as these offer protection
+against contamination from other objects in the sky aperture.
+
+\subsection{V --- Values}
+
+This summarises the current settings of the significant parameters on
+the terminal.
+
+
+\section{DEFAULTED PARAMETERS}
+
+A number of parameters defined in the interface file cannot be changed
+within the program. They will normally take the default values given in
+the interface file, but if required they can be changed before running
+the program. A number of these may be of use to some users and they are
+described below.
+
+\subsection{RESFILE}
+
+This specifies the name of the results file which makes a permanent record
+of the measurements.
+
+\subsection{Centroiding}
+
+There are a number of parameters that control the centroiding algorithm.
+SEARCH defines the size of the search box to be used in locating the
+centroid in pixels. MXITER defines the maximum number of iteration steps.
+MAXSHIFT gives the maximum allowable shift in pixels between the initial,
+rough, position and the calculated centroid. TOLER defines the position
+accuracy in pixels that will terminate the centroiding iterations.
+
+\subsection{ETIME}
+
+This parameter gives the path to an HDS element in the image data file
+that contains the exposure time of the frame. If a valid real number is
+found in this structure then this is used to scale the results compared
+to an exposure time of 1.
+$mag = SKYMAG - 2.5 \log_{10} ( signal / exp\_time )$
+This affects the output values for the measured signal in the object and
+the resultant magnitude, but it does not change the reported value for
+the sky in each pixel, or the error in the magnitude.
+If this parameter is not specified or the structure does not contain a
+valid number then an exposure time of 1 is used.
+If the component containing the exposure time is several layers down in
+the HDS file then the pathname should specify the names of each of the
+levels separated by fullstops, for example MORE.EXP\_TIME indicates that
+the exposure time will be found in a component EXP\_TIME which is a
+primitive component of the structure MORE.
+
+\subsection{USEMASK}
+
+This parameter is a logical flag which indicates whether a mask is to be
+used when estimating the background. The purpose of the mask is to block
+out contaminating objects from the background aperture. In this way bright
+stars can be excluded from the estimation of the sky, which would
+otherwise introduce contamination. Note that the sky estimators that
+perform clipping of the pixel histogram, the mode and the mean with
+$2\sigma$ rejection, also exclude contaminating pixels, but using the mask
+along with the mean estimator allows this to be done in a controlled way.
+
+If the USEMASK flag is true then a file containing a list of positions is
+requested (~MASKFILE~). The format of the file is the same as for inputting
+a list of positions to measure (~command~F~), namely an index number
+followed by an x and y position. The given coordinates define the
+centres of circles and any pixel with its centre within a circle will be
+excluded from the sky estimation. The radius of the masking circle is
+another requested parameter (~MASKRAD~) that can be changed by the user.
+
+The mask only affects pixels in the background aperture, it does not
+exclude any pixels from the measurement aperture. This means that
+identical lists can be used to create the mask and to provide a source
+for measurement. The output from an automatic object finding package
+could be used in this way.
+
+\section{ALTERING PARAMETERS}
+
+When PHOTOM is started, the initial selection of most of the parameters
+is taken from the previous run of the routine. The parameter values are
+stored in the GLOBAL.SDF or PHOTOM.SDF file in the ADAM\_USER directory
+at the end of a run. The current values can be examined using the TRACE
+facility. To clear these values, and to revert to the start-up defaults
+the GLOBAL.SDF and PHOTOM.SDF files have to be deleted. A new empty
+GLOBAL.SDF file has to then be created by giving the ADAMSTART command.
+If the file is not present when PHOTOM is run then an HDS error 'File
+not found' will be given at the end of the run. This means that the
+current parameter values have not been stored.
+
+The starting values of the parameters can also be specified within the
+ADAM command language. The keyword facility allows the parameters to be
+given on the command line (~see AED/3, the Interface Module Reference
+Manual~). The keywords have the same name as the parameters; for example
+the search box for the centroiding can be changed using the command
+\begin{quote}
+\begin{verbatim}
+     ICL> PHOTOM SEARCH=5
+\end{verbatim}
+\end{quote}
+The parameter can also be changed with the SET command.
+\begin{quote}
+\begin{verbatim}
+     ICL> SEND PHOTOM_DIR:PHOTOM SET SEARCH 5
+     ICL> PHOTOM
+\end{verbatim}
+\end{quote}
+
+From DCL the keywords can be included on the command line.
+\begin{quote}
+\begin{verbatim}
+     $ PHOTOM SEARCH=5
+\end{verbatim}
+\end{quote}
+
+\section{ACKNOWLEGEMENTS}
+
+Thanks go to Nial Tanvir for his helpful comments on the sky background
+estimation section in Appendix~C, and a number of people for suggestions
+for improvements to PHOTOM.
+
+
+\appendix
+\newpage
+\section{FORMAT OF ASSOCIATED FILES}
+
+At present the file containing the positions of objects
+to be measured, given by the POSFILE parameter (~command F~), is read in in
+free format. In future this file will be accessed with a SCAR descriptor
+file. The first three columns of the input file have to contain an
+index number (~INTEGER~), and the x and y positions (~REAL~) in that order.
+The index number is passed to the output to assist in identification of the
+objects.
+
+The output on the screen contains column headers to indicate the content of
+each column of the results. These column headers do not appear in the
+output file given by the RESFILE parameter in order that this file can be
+accessed by the SCAR database routines. A file DSCFPHOTOM.DAT in the
+PHOTOM\_DIR directory can be copied to supply the descriptor information
+required by SCAR. Note that SCAR cannot access catalogues with names
+containing more than five letters, and since PHOTOM contains six letters
+the results file and DSCFPHOTOM.DAT will have to be changed to shorter
+names, for example PHOT.DAT and DSCFPHOT.DAT, to work with SCAR.
+
+There are eleven columns in the output file containing the following
+information :-
+
+\begin{tabbing}
+xxxxxxxx \= xxxxxxxxxx \= \kill
+Column \> Name  \> Description \\
+ 1 \> INDEX \> Index number of star.\\
+ 2 \> XPOS \> X position of centre of aperture in pixels.\\
+ 3 \> YPOS \> Y position of centre of aperture in pixels.\\
+ 4 \> MAG \> Magnitude of star.\\
+ 5 \> MAGERR \> Error in magnitude.\\
+ 6 \> SKY \> Sky value in photons per pixel.\\
+ 7 \> SIGNAL \> Total number of photons in aperture due to star.\\
+ 8 \> CODE \> Error code flag.\\
+ 9 \> SEMIM \> Semi-major axis of aperture.\\
+ 10 \> ECCEN \> Eccentricity of aperture.\\
+ 11 \> ANGLE \> Orientation of aperture in degrees.\\
+\end{tabbing}
+
+The magnitude (~MAG~) is calculated from
+$mag = SKYMAG - 2.5 \log_{10} ( signal )$.
+
+The error in the magnitude (~MAGERR~) is estimated using one of the
+methods expounded in appendix B.
+
+The error CODE can take on three possible values
+\begin{tabbing}
+xxxx\=\kill
+B \> One or more pixels in the object aperture is bad.\\
+S \> One or more pixels in the object aperture is above the saturation level.\\
+E \> The object aperture intersects the edge of the data array.\\
+\end{tabbing}
+
+If a bad pixel occurs in the object aperture then the pixel is not
+included in the calculation of the object signal. The bad pixel is not
+replaced by an estimate. If a saturated pixel occurs in the object
+aperture then it is included in the calculation of the object signal. 
+If the aperture intersects the edge of the data array, the object signal
+is calculated for the reduced area of the aperture.
+
+Only one of these code letters is displayed, even if more than one of the
+conditions has occurred. The codes are in a increasing hierarchy 'B', 'S',
+'E', such that 'S' overrides 'B', and 'E' overrides 'S'.
+
+\newpage
+\section{CALCULATION OF THE ERRORS}
+
+The errors are calculated in one of three ways, as discussed in the section
+on command P. The first method assumes true photon statistics and the
+error is calculated from the following definitions :-\\
+
+Number of pixels in object aperture  $= a_o$\\
+Number of pixels in sky aperture     $= a_s$\\
+Sum of data in object aperture       $= D_o$\\
+Sum of data in sky aperture          $= D_s$\\
+Offset in one pixel                  $= BIASLE$\\
+Number of photons per data unit      $= PADU$\\
+
+The contribution of the sky in the object aperture can now be calculated\\
+
+Number of photons in object aperture $= P_o = PADU * ( D_o - a_o * BIASLE )$\\
+Number of photons in sky aperture    $= P_s = PADU * ( D_s - a_s * BIASLE )$\\
+Number of photons in object aperture due to sky
+$= P_{so} = PADU * ( D_s - a_s * BIASLE ) * ( a_o / a_s )$\\
+
+The signal due to the object is the difference of the total number of
+photons in the object aperture minus the number due to the sky\\
+
+Object signal $= S_o = P_o - P_{so} = PADU * ( D_o - D_s * ( a_o / a_s ) )$\\
+
+The error on the object signal is the quadratic sum of the errors on the
+individual measurements. Using $\varepsilon$ to signify the error
+\[\varepsilon( S_o )^2 \sim \varepsilon( D_o )^2 + \varepsilon( D_s )^2 *
+( a_o / a_s )^2\]
+Assuming the errors are solely from photon statistics then the error on
+the signal is
+\[\varepsilon( S_o )^2 = \varepsilon( P_o )^2 + \varepsilon( P_s )^2 *
+( a_o / a_s )^2\]
+
+The error from photon counting is the square root of the number of photons
+$\varepsilon( P_o ) = \sqrt{ P_o }$ and $\varepsilon( P_s ) = \sqrt{ P_s }$
+
+Therefore
+\begin{equation}\underline{
+\varepsilon( S_o )^2 = P_o + P_s * ( a_o^2 / a_s^2 ) 
+                      = PADU * ( D_o + D_s *( a_o^2 / a_s^2 ) -
+                        BIASLE * a_o ( 1 + a_o / a_s ) )}\end{equation}
+
+\newpage
+The second method of calculating the errors assumes that the variance in
+the sky aperture corresponds to the photon noise. This allows the photon
+errors to be calculated without knowing BIASLE. One additional definition
+has to be given\\
+
+Standard deviation in sky aperture per pixel in data units $=\sigma_s$\\
+
+If the photon error $\sqrt{P_s}$ is equated to the standard deviation
+$PADU * \sigma_s$ then the total number of photons in the sky aperture is
+given by
+\[P_s = a_s * PADU^2 * \sigma_s^2\]
+
+The offset in the sky aperture can now be calculated
+\[BIASLE = ( D_s / a_s ) - ( PADU * \sigma_s^2 )\]
+
+Substituting this into the calculation of the error gives
+\[\varepsilon( S_o )^2 = PADU * ( D_o - D_s * ( a_o / a_s ) +
+                         PADU * \sigma_s^2 * a_o * ( 1 + a_o / a_s ) )\]
+
+or
+\begin{equation}\underline{
+\varepsilon( S_o )^2 = S_o + PADU^2 * \sigma_s^2 * a_o * ( 1 + a_o / a_s ) )
+}\end{equation}
+
+The third method of calculating the errors sums the data variances from
+the variance component of the NDF. Two additional definitions
+have to be given\\
+
+Sum of variance in object aperture       $= V_o$\\
+Sum of variance in sky aperture          $= V_s$\\
+
+The error is then calculated from
+\begin{equation}\underline{
+\varepsilon( S_o )^2 = PADU^2 * ( V_o + V_s * ( a_o / a_s )^2 )
+}\end{equation}
+
+The magnitude error is calculated from differentiating the magnitude equation
+\[m=-2.5\log_{10}S_o\]
+
+thus
+\[\underline{dm=\frac{-2.5}{\ln10}*\frac{\varepsilon(S_o)}{S_o}}\]
+
+\newpage
+\section{TECHNIQUES OF APERTURE PHOTOMETRY}
+
+In principle aperture photometry of digitised data is a straightforward
+procedure. Put down a computer generated aperture over the grid of data
+and add up the counts within the aperture. In astronomical applications the
+usual purpose of aperture photometry is to measure the brightness of an
+object without including possible contributions from contaminating sources
+such as bias levels, sky, defects or other stars and galaxies.
+Some if not all of these contaminants will always be present in a finite
+sized aperture and so this `background' has to be accounted for.
+If it were possible the best place to estimate this background would be
+behind the object, i.e. in the object aperture with the object not there.
+As this is usually not possible to achieve, except for the case of moving
+objects or supernovae, the usual method is to estimate the background
+from other regions close to the object.
+
+Estimating the contribution in this background is not always straightforward.
+In the simplest case the histogram of pixel values in the background will
+have an approximately gaussian distribution, due to random fluctuations,
+and the best estimator is a simple mean.
+It is however common for real astronomical situations to be less
+straightforward than this.
+Other contributors are likely to be present, such as non-random noise,
+bad pixels, cosmic rays, and the presence of other objects in the background.
+Even when the possible contaminating objects are very faint compared to the
+object to be measured the histogram of pixel values can be sufficiently
+skewed to result in the mean giving an estimate of the sky too poor for high
+precision photometry.
+In this case it is usual to use some sort of clipping ( or filtering ) to
+remove the effects of such contamination.
+
+There are conflicting interests at work here. On the one hand it is
+desirable to use a large background aperture to get good statistics, but
+on the other hand this increases the probability of introducing extra
+contamination or of sampling areas which are uncharacterisitic of the
+background near the object.
+
+Of course if there is contamination in the background aperture then there
+will almost certainly be some present in the object aperture. The effects
+of this on the measurement depend on the density of objects and the ratio
+of the sizes of the object and sky apertures. If the sky aperture is
+larger than the object aperture and the objects are randomly distributed,
+then there is a greater chance of having more contaminating objects in the
+sky aperture than in the object aperture.
+If the density of objects is large then the proportion in each aperture will
+be similar, but when the number of objects is small then the chances of
+the larger aperture being disproportionately endowed will increase. This
+is best seen by considering the limiting case of one contaminating object
+and its most probable location. In astronomical situations the smaller
+populations tend to be the brighter objects and thus have an even greater
+effect on the results.
+
+An ideal filter would therefore include the many faint objects which
+inhabit each aperture equally, but exclude the rare bright objects, which
+are more likely to occur in the larger aperture. Unfortunately in reality
+the spectra of densities and brightnesses are continuous and a clean
+rejection scheme is difficult to construct.
+
+The best scheme would seem to be to take many independent samples
+using the same sized aperture as for the object. A new population is made
+from the mean sky value in each aperture, and the peak of the histogram of
+values, here called the mode, is used as the sky value. The mode is a
+maximum likelihood estimator and this scheme ensures that the most likely
+sky value averaged over the aperture size is used.
+The problem in this case
+is to get sufficient independent samples close to the object aperture and
+therefore individual pixel values are usually used to construct the
+sample population.
+
+What these arguments are leading to is that there is no unique answer to
+the question which is the best estimate for the sky; it depends on the
+circumstances.
+PHOTOM offers a choice of three estimators, a simple mean, a mean with
+$2\sigma$ clipping and the mode.
+When running jobs non-interactively it is best to use one of the estimators
+that performs clipping; either the mode or the mean with $2\sigma$ rejection.
+In the presence of positive contamination the mode will, in general,
+provide the most rejection, the 2 sigma clipping the next and the mean
+will provide no rejection. If the user suspects that one of the
+estimators may be giving wrong results then they should try one of the
+others.
+
+\subsection{PHOTOPT - examining PHOTOM's performance}
+
+PHOTOPT is an auxiliary package to examine the performance of the various
+sky estimators used by PHOTOM. As indicated in the last section the
+best choice of estimator depends on the circumstances.
+The idea behind PHOTOPT is to put down an aperture on a random piece of sky,
+estimate the background from a concentric aperture using one of the sky
+estimators offered by PHOTOM, and subtract this estimated sky from the
+flux in the central aperture. If the sky estimator correctly estimates
+the sky then the difference of the two will be zero. Since an automatic
+procedure cannot be certain of selecting a representative piece of sky,
+the procedure is repeated a number of times to increase the statistics.
+
+PHOTOPT selects regularly spaced points within an image, puts down an
+aperture at each of the points and calculates the difference between
+the central aperture and the sky estimate from the surrounding annulus.
+Each of the three sky estimators offered by PHOTOM are tried in turn on
+the same set of points so that a comparison can be made between the three
+methods. The output is in the form of two graphs for each estimator. The
+first shows the difference between the central aperture and the sky
+estimator for each of the samples. The sample number forms the x-axis
+and the difference (~object - sky~) given in photons per pixel forms
+the y-axis. The second plot shows a histogram of the differences for
+the samples. The differences are binned into suitable intervals and form
+the x-axis of the histogram, with the y-axis giving the number of samples
+in each difference bin.
+
+PHOTOPT has a number of parameters in common with PHOTOM; the aperture
+shape parameters, SEMIM, ECCEN and ANGLE, the scaling factors PADU and
+SATURE and the background annulus size INNER and OUTER. The two
+parameters unique to PHOTOPT are NP, the number of points to sample, up
+to a maximum of 100, and the RANGE, which defines the bounds of the
+data value used in the plot. The number of points sampled may not exactly
+equal the number requested as the program automatically positions the
+points to be on a rectangular grid which evenly covers the whole data array.
+The program also ensures that the density of points does not result in
+the central apertures overlapping.
+
+PHOTOPT can be run from DCL or ICL. From ICL use :
+\begin{quote}
+\begin{verbatim}
+     ICL> PHOTOPT
+\end{verbatim}
+\end{quote}
+From DCL use (assuming ADAMSTART has been executed) :
+\begin{quote}
+\begin{verbatim}
+     $ PHOTOPT
+\end{verbatim}
+\end{quote}
+
+\end{document}

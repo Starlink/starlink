@@ -1,0 +1,441 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {56.8}
+\newcommand{\stardocauthors}   {P T Wallace}
+\newcommand{\stardocdate}      {24 June 1992}
+\newcommand{\stardoctitle}     {COCO --- Conversion of Celestial Coordinates}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+\newcommand{\radec}  {$[\alpha,\delta\,]$}
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+%  \setlength{\parskip}{0mm}
+%  \tableofcontents
+%  \setlength{\parskip}{\medskipamount}
+%  \markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\section{Introduction}
+
+The COCO program converts star coordinates from one system to
+another. Both the improved IAU system, post-1976, and the old pre-1976
+system are supported.
+COCO can perform transformations between the following
+coordinate systems:
+\begin{itemize}
+\item mean \radec, old system, with E-terms (loosely FK4)
+\item mean \radec, old system, no E-terms (some radio positions)
+\item mean \radec, new system (loosely FK5)
+\item geocentric apparent \radec, new system
+\item ecliptic coordinates $[\lambda,\beta\,]$, new system (mean of date)
+\item galactic coordinates $[l^{II},b^{II}]$, IAU 1958 system
+\end{itemize}
+The input/output arrangements of COCO are flexible, to allow
+a variety of operating styles -- interactive, input from a file,
+report to a file, batch, {\it etc}.
+Also, in addition to the report which is produced, the results of the
+conversions are also available in a raw form, to a fixed resolution
+and free from extraneous formatting; this file is intended
+to be read easily by other programs.
+
+COCO offers control over report resolution, and has a simple online help
+facility.
+All input is free-format, and defaults are provided where this
+is meaningful.
+
+In order to comply with the IAU 1976 recommendations, all
+position data published from 1984 on should be given in
+the new system, using equinox J2000.0.
+However, for years to come, positions will frequently be given in
+the old system, using equinox B1950.0.
+Discriminating astronomers and astrophysicists are best
+advised to give both B1950 and J2000
+positions for sources mentioned in their publications; the
+conversion can be done using COCO.
+
+\section{Operating Instructions}
+To run COCO interactively, on either VAX/VMS platforms or
+the Sun SPARCstation and DECstation Unix-based platforms, simply type:
+\begin{verbatim}
+      COCO
+\end{verbatim}
+The program then accepts commands and outputs appropriate replies.
+
+\goodbreak
+The primary commands are as follows:
+\begin{verbatim}
+   Command                     Function
+
+     I p    specify input coordinate system (p defined below)
+     O p    specify output coordinate system (       "       )
+  <coords>  perform conversion  (or = to repeat last coordinates)
+     E      exit
+\end{verbatim}
+where the parameter {\tt p}, specifying the coordinate system, is
+as follows:
+\begin{verbatim}
+     4 [eq] [ep]     equatorial, FK4
+     B [eq] [ep]     like FK4 but without E-terms
+     5 [eq] [ep]     equatorial, FK5
+     A  ep           equatorial, geocentric apparent
+     E  ep           ecliptic
+     G [ep]          galactic
+
+     eq = equinox, e.g. 1950 (optional B or J prefix)
+     ep = epoch, e.g. 1984.53 or 1983 2 26.4
+\end{verbatim}
+Coordinates type 4 and B default to equinox B1950. Coordinates type 5 default 
+to equinox J2000. In all three of these coordinate systems the epoch defaults 
+to the equinox. For coordinate type G the epoch defaults to B1950.
+
+The following commands are also available:
+\begin{verbatim}
+   Command                     Function
+
+     F         specify RA mode: x = H for hours, D for degrees
+     S         display current settings
+     ?         show format of <coords>
+     /<file>   switch to secondary input file <file>
+     H         list the commands
+     R x       select report resolution:  x = H, M or L
+                                        (high,medium,low)
+\end{verbatim}
+
+Input is free-format, with spaces separating the fields (comma is
+also acceptable as a field separator within coordinates).
+Both upper and lower case letters are acceptable.
+Blank lines can be input freely, and a comment can be appended to
+any line by preceding it with an asterisk.
+
+The $\alpha$ format command, F, selects either hours or degrees as
+the units for $\alpha$, affecting both the input formats which are
+accepted and the format of the outputs.  The command ``F~D"
+selects degrees as the $\alpha$ unit, limits the input formats
+to a single number in degrees for both $\alpha$ and $\delta$, and
+causes the output formats to be a single number in degrees
+for both $\alpha$ and $\delta$.  The command ``F~H" switches to the
+hours format, enabling a variety of sexagesimal input
+formats as well as plain hours and degrees, and causing
+the output formats to be h,m,s,d,$'$,$''$.
+
+On startup, COCO is set to input FK4~B1950 and output
+FK5~J2000, with $\alpha$ in hours and medium report resolution.
+
+In a typical COCO run, the first step would be to specify the
+input and output coordinate systems by means of the I and O
+commands, and then to enter the coordinates to be
+transformed.
+For example, suppose that we wish to convert
+a QSO position measured from a plate taken in mid-1976 and
+using reference stars from the B1950.0 SAO catalogue to coordinates
+in the new J2000.0 system.
+The following commands could be used:
+\begin{verbatim}
+  I 4 1950 1976.5        * input system is FK4 B1950; epoch is 1976.5
+  O 5                    * output system is FK5 J2000
+  12 43 25.3 +32 15 29   * measured 1950 position; no proper motion
+\end{verbatim}
+
+Some additional operating modes are described in a later section.
+
+Notes:
+\begin{enumerate}
+\item The results output by COCO are believed to be of more
+than adequate accuracy for all practical purposes at
+present and are far more precise than any
+available star coordinates.
+Geocentric apparent place
+is the least accurate form,
+and is limited (in the worst case) to about 0.3~milliarcsec
+by the model for Earth velocity and position that is
+used.
+The more straightforward conversions are, as
+implementations of the accepted algorithms, several
+orders of magnitude better than this figure.
+It should
+be noted, however, that there is a lingering debate
+about the precise formulation of the conversion between
+FK4 data and the new FK5 system. COCO uses the algorithm
+published in the 1985 Astronomical Almanac.
+The differences are far too small to pose problems for non-specialists.
+\item The three report resolutions provided are referred
+to simply as L (low), M (medium),
+and H (high).
+At resolutions ``L" and ``M", all the
+figures output are trustworthy.
+Resolution ``H" is provided
+mainly to allow comparison with other predictions and to
+decrease rounding errors where differences are taken.
+\item COCO is for use only with sources well outside the solar
+system.
+Where appropriate, stellar parallax and aberration
+are allowed for, but the corrections for gravitational
+deflection assume that the source is distant.
+In particular, COCO is not suitable for predicting apparent places
+for the Sun.
+\item COCO is not intended for the conversion of catalogue data,
+and reports positions only; updated proper motions {\it etc.}\
+are not reported.
+Full conversion of catalogue data is best done by writing
+{\it ad hoc}\, programs, using the subprograms in the SLALIB
+library (see SUN/67).
+\item COCO accepts both commands and data from up to two
+sources, called the {\it primary}\, and {\it secondary}\ input files.
+To switch to a secondary input file called STARS.DAT, for
+example, would require the command /STARS.DAT.
+(The switch command itself is available only from the primary input file.) 
+When an E command, or end of file, is detected during input from
+a secondary file, control reverts to the primary file.
+The same secondary input file may be processed several times in
+one COCO run, as in the example of producing the apparent places of
+a fixed list of stars for a series of dates -- the secondary file
+could be the list of stars and the primary file a series of pairs of
+commands, each pair specifying a new epoch and then switching again
+to the secondary file to process all the stars anew.
+\end{enumerate}
+
+\section{Input Formats}
+
+The input and output coordinate systems require, variously,
+{\it equinoxes}\, and {\it epochs}. The timescale is TDB, which
+for most uses of COCO can be regarded as the same as UTC.
+
+Equinoxes are Besselian or Julian epochs.
+They can be preceded by a B or J as appropriate; in default,
+epochs before 1984.0 are assumed to be Besselian, while epochs
+1984.0 and after are assumed to be Julian (the distinction is
+usually unimportant in this context). 
+Valid examples are B1950.0, J2000, 1975.
+
+Epochs may either be expressed as Besselian or Julian epochs,
+or as year,month,day in the Gregorian calendar.
+Valid examples are J1984.3296 and 1985~2~13.2439.
+Calendar dates have to have valid years and months, but a days
+value outside the
+conventional range is permissible ({\it e.g.}~1992~12~32)
+
+In the mean \radec\ systems, the equinox defines the coordinate
+system while the epoch defines the date of observation.
+In the two cases where the reference frame is inertial -- FK5
+and galactic -- the epoch is required merely to allow the proper
+motion to be calculated.
+
+Each input coordinate system has its own data format, as follows.
+
+\subsection{The three sorts of Mean RA,Dec}
+
+For $\alpha$ in hours the following formats are accepted:
+\begin{verbatim}
+        RA     Dec        PM       Px    RV
+       h m s  d ' "  [s/y  "/y     ["   [km/s]]]
+ or    h m s  d '
+ or    h m    d '
+ or    h      d
+\end{verbatim}
+
+The first two, four, five, or six numeric fields, representing
+$\alpha$ and $\delta$,
+are mandatory. The seventh, eighth, ninth and tenth, representing proper motion,
+parallax and radial velocity, are optional, with the proviso
+that both proper motions are required if present at all.
+The \radec\ fields are permitted to exceed the conventional ranges; this is
+to remain consistent with many existing tabulations (for example
+$\alpha$~24~00~01.063 would be accepted and correctly interpreted).
+The scope for data validation is correspondingly limited.
+
+Note that the proper motions are per year rather than per
+century, and that the east-west proper motion
+is in seconds of $\alpha$ rather than, for instance, arc seconds on
+the sky.
+Data from catalogues which express proper motions
+in other ways (many do) will have to be transformed before
+they can be used by COCO.
+
+In the case of FK4 coordinates (with or without E-terms), omitting
+proper motions is interpreted as meaning that the proper motions
+are assumed negligible in an inertial frame.
+If a star has zero proper motion in the FK4 system, then zeroes must
+be entered explicitly; such a star will have a real proper motion of
+up to 0.5~arcsec per century (just as distant sources, galaxies
+for example, have a fictitious proper motion in the FK4 system).
+In addition, because the FK4 system is rotating relative to an
+inertial frame, if the proper motions are omitted it is important to
+specify the epoch at which the position was correct.
+
+In the case of FK5 coordinates, omission of proper motions
+simply implies zero proper motion (FK5 is presumed not to
+be rotating).
+
+The parallax and radial velocity both default to zero.
+
+For $\alpha$ in degrees (selected by the command ``F~D"), the
+following format is accepted:
+\begin{verbatim}
+        RA     Dec
+        d       d
+\end{verbatim}
+
+Both numbers are required.
+
+\subsection{Geocentric Apparent}
+
+For $\alpha$ in hours the following formats are accepted:
+\begin{verbatim}
+        RA     Dec
+       h m s  d ' "
+ or    h m s  d '
+ or    h m    d '
+\end{verbatim}
+
+Four, five, or six numbers are required.
+
+For $\alpha$ in degrees (selected by the command ``F~D"), the
+following format is accepted:
+\begin{verbatim}
+        RA     Dec
+        d       d
+\end{verbatim}
+
+Both numbers are required.
+
+\subsection{Ecliptic}
+
+\begin{verbatim} 
+       lambda  beta
+          d      d
+\end{verbatim}
+
+Both numbers are required.
+
+\subsection{Galactic}
+
+\begin{verbatim}
+       L2   B2
+        d    d
+\end{verbatim}
+
+Both numbers are required.
+
+\section{Further Operating Modes}
+
+The VMS DCL command procedure and Unix C-shell script which
+invoke COCO
+both have optional parameters which
+allow the sources and destinations of the main input and
+output streams to be defined:
+\begin{verbatim}
+      COCO   [input]  [report]  [output]
+\end{verbatim}
+
+In the case of interactive operation, both input and report
+are assigned to the terminal.
+The output file includes only the results, in a fixed format and
+without extraneous formatting; it is intended to be
+easy to read in other programs.
+
+The combination of parameters presented causes COCO's
+input/output streams to be assigned one of several configurations
+which are intended to produce sensible results in a variety
+of modes of use, both interactive and batch.
+More direct control of COCO may be desirable on occasion.
+
+Under VMS, it is permissible to invoke the COCO executable program
+by first assigning the logical names \verb|FOR0nn| to the required
+files:
+\begin{verbatim}
+     FOR011      output     raw output for redirection
+     FOR012      output     echo of input
+     FOR013      output     report (including error warnings)
+     FOR015      input      commands and data
+     FOR016      output     prompts
+     FOR017      output     error warnings
+\end{verbatim}
+
+(In addition, I/O unit 14 is used internally to read secondary
+files.)
+
+As an example, suppose that we wish to run COCO in batch on a VMS
+system, with
+the commands included in the batch command procedure itself,
+with no output file, and with the results to appear in the
+printed log.
+This could be accomplished by submitting the following command procedure:
+\begin{verbatim}
+      $  ASSIGN/USER_MODE NL:         FOR011  ! raw output
+      $  ASSIGN/USER_MODE SYS_$OUTPUT FOR012  ! echo of input
+      $  ASSIGN/USER_MODE SYS_$OUTPUT FOR013  ! report
+      $  ASSIGN/USER_MODE SYS_$INPUT  FOR015  ! commands
+      $  ASSIGN/USER_MODE SYS_$OUTPUT FOR016  ! prompts
+      $  ASSIGN/USER_MODE NL:         FOR017  ! errors
+      $  RUN COCO_DIR:COCO
+
+      I 5      * input J2000 FK5
+      O 4      * output B1950 FK4
+
+      *  Source position
+      14 39 36.087 -60 50 07.14   -0.49486 +0.6960   0.752 -22.2
+
+      E
+\end{verbatim}
+
+On the Unix platforms, the COCO executable may be invoked by means of
+the following shell command:
+
+\begin{verbatim}
+      coco.x terml output echo report input prompts errors
+\end{verbatim}
+
+The seven command-line parameters, all of which must be present,
+are, respectively, the string identifying the terminal (perhaps
+obtained by using the command \verb|set terml = `tty`|) and the
+six filenames.
+
+\section{Acknowledgments}
+
+The author is pleased to acknowledge the help of the staff of Her Majesty's
+Nautical Almanac Office at the Royal Greenwich
+Observatory -- in particular Catherine~Hohenkerk,
+Bernard~Yallop and Brian~Emerson -- in developing the algorithms used by
+COCO, and in supplying test data and checking results.
+Thanks are also due to No\"{e}l~Argue of Cambridge, Andrew~Lyne of Jodrell~Bank,
+and Dick~Manchester of CSIRO~Radiophysics in
+Sydney for testing a pre-release version of COCO.
+
+\end{document}

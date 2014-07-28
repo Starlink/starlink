@@ -1,0 +1,4518 @@
+\documentstyle{article}
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {5.13}
+\newcommand{\stardocauthors}   {P T Wallace}
+\newcommand{\stardocdate}      {6th December 1993}
+\newcommand{\stardoctitle}     {ASTROM --- Basic astrometry program}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+\setlength{\parskip}{0mm}
+%\tableofcontents
+\setlength{\parskip}{\medskipamount}
+\markright{\stardocname}
+
+%------------------------------------------------------------------------------
+
+\newcommand{\radec}     {$[\alpha,\delta\,]$}
+\newcommand{\xy}        {$[x,y\,]$}
+\newcommand{\xieta}     {$[\xi,\eta\,]$}
+
+%------------------------------------------------------------------------------
+
+\section{Introduction}
+ASTROM is a simple plate reduction utility, designed to allow the
+non-specialist user to get good results with a minimum of trouble and
+esoteric knowledge.  The user supplies a text file containing
+information about the
+exposure and the positions of reference and unknown stars;  ASTROM
+performs the various coordinate transformation and fitting operations
+required, displays a synopsis report on the command terminal, and
+prepares a detailed report for later printing.
+
+\section{Operating Instructions}
+ASTROM is run by means of the following command (DCL on VAX/VMS,
+C-shell on Unix, MS-DOS on PC):
+\begin{quote}
+ \verb|astrom| [{\it input}] [{\it report}]
+\end{quote}
+where the input file {\it input}\, defaults to \verb|astrom.dat| and
+the report file {\it report}\, defaults to \verb|astrom.lis|.  A
+parameter can be defaulted either by leaving it out or
+by using a pair of double-quotes.
+
+The synopsis report, which normally appears on the command terminal,
+should be monitored and any reference stars with large
+residuals noted.  The input file can then be edited as
+necessary and the job rerun.  Finally, the report file (which
+contains Fortran printer format codes) can
+be printed in the normal way.  An example report file is
+reproduced in Appendix~B.
+
+\section{The Input File}
+The input file is an ordinary text file and is
+terminated either by end-of-file or by a record
+beginning $'${\tt E}$\,'$.  
+Uppercase and lowercase are both acceptable throughout
+the file and may be mixed
+freely;  leading spaces are ignored.  A comment, beginning
+$'${\tt *}$\,'$, can be appended to any record.
+Completely blank records (and any
+beginning with $'${\tt *}$\,'$) are ignored and can be used to improve
+layout and provide commentary.
+
+Most of the records consist of (or contain) various numbers of
+numeric fields, separated by spaces (or commas).
+In many
+instances it is simply the number of fields present which enables
+ASTROM to determine which sort of record has been read.
+Free-format number decoding is used throughout;  spaces can
+be freely inserted between fields, and many other freedoms
+are permitted (see the documentation for the SLALIB
+routines DFLTIN and DBJIN, in SUN/67).
+
+Each file typically specifies
+a single plate reduction;  however, multiple
+{\it sequences}\, of records,
+each specifying a complete
+and separate plate reduction, can be used,
+each sequence being separated from the next
+by a record beginning
+$'${\tt /}$\,'$.  This feature is used by the CHART utility
+(see SUN/32), which is a convenient way of generating
+ASTROM input without having to copy out star catalogue
+entries by hand.
+
+\goodbreak
+The overall layout of each sequence is as follows:
+
+\begin{center}
+\begin{tabular}{|l|c|l|}
+\hline
+group & records & mandatory? \\
+\hline
+results equinox  &   1           & no \\
+telescope type   &   1           & no \\
+plate data       &   1           & yes \\
+observation data &   1-3         & no \\
+reference stars  &  2-3 per star & at least 2 stars \\
+unknown stars    &  1-2 per star & no \\
+\hline
+\end{tabular}
+\end{center}
+
+Several sorts of record involve celestial positions.  Although
+ASTROM can be made to work internally in {\it observed}\,
+coordinates ({\it i.e.}\ as affected by refraction {\it etc.}),
+all input data and reports are in terms of various sorts of
+{\it mean}\, \radec.  In any particular instance, the mean coordinate
+system is specified by quoting an {\it equinox}.  An
+{\it epoch}\, is also required, for the calculation of
+proper motion;  in the case of catalogue stars
+this is frequently the same as the equinox.
+
+Both the old pre~IAU~1976 (loosely FK4) system and the
+new post~IAU~1976 (loosely FK5) system are supported, and
+data in the two systems can be mixed freely.  ASTROM
+follows the established convention of using the equinox to
+distinguish between the two systems.  If the equinox is
+prefixed by $'${\tt B}$\,'$ (which stands for
+{\it Besselian}) then the position
+is an old FK4 one;  if a prefix of $'${\tt J}$\,'$ is used (standing for
+{\it Julian}), the position is a new FK5 one.  If no prefix is used,
+pre 1984.0 equinoxes indicate the old FK4 system, and equinoxes
+of 1984.0 or later indicate the new FK5 system.  The $'${\tt B}$\,'$
+or $'${\tt J}$\,'$
+prefix may also be used with epochs although the distinction is
+unlikely to be significant.  The two most common equinoxes are
+B1950 and J2000.  All FK4 positions include E-terms of aberration,
+consistent with published catalogues.
+
+When using the old system ({\it e.g.}\ B1950)
+to specify the position of an object whose
+proper motion is presumed to be
+negligible, it is necessary to specify an epoch (as well as
+the equinox).  This is because the old system is not
+an inertial frame; failure to recognize galactic rotation
+at the time the system was first established means that the
+FK4 frame is rotating, and that even extragalactic
+objects have fictitious proper motions which need to be taken
+into account in precise work.  ASTROM accepts an optional
+format of reference star data for such cases, where the
+proper motions are omitted and an epoch is mandatory.
+
+Appendix~A contains a detailed specification of the syntax of
+the ASTROM input file, together with a comprehensive example.
+As an introduction, we will look at a simple but typical example
+of such a file:
+
+\begin{quote}
+\begin{small}
+\begin{tabular}{|l|}
+\hline
+\\
+\verb|B1950                                     * Results in FK4| \\
+\verb|SCHM                                      * Schmidt geometry| \\
+\verb|19 04 00.0  -65 00 00  B1950.0  1974.5    * Plate centre, and epoch| \\
+\verb|18 56 39.426  -63 25 13.23  -0.0002  -0.036  B1950.0  * Ref 1| \\
+\verb|44.791   85.643| \\
+\verb|19 11 53.909  -63 17 57.57   0.0058  -0.044  1950.0   * Ref 2| \\
+\verb|-46.266   92.337| \\
+\verb|19 01 13.606  -63 49 14.84   0.0020  -0.026  1950.0   * Ref 3| \\
+\verb|17.246   64.945| \\
+\verb|19 08 29.088  -63 57 42.79   0.0016   0.018  1950.0   * Ref 4| \\
+\verb|-25.314   57.456| \\
+\verb|19 02 10.088  -63 29 16.73   0.0012  -0.019  1950.0   * Ref 5| \\
+\verb|11.890   82.766| \\
+\verb|-5.103    58.868                      *  Candidate| \\
+\verb|19 09 46.2  -63 51 27  J2000.0        *  Radio pos| \\
+\verb|END| \\
+\\
+\hline
+\end{tabular}
+\end{small}
+\end{quote}
+
+\goodbreak
+Taking each record (or group of records) in turn:
+
+\begin{quote}
+\begin{tabular}{|l|}
+\hline
+\verb|B1950                                     * Results in FK4| \\
+\hline
+\end{tabular}
+\end{quote}
+This is the {\bf results equinox} record.
+It specifies the mean equator and equinox for the coordinate
+system of the report.
+If this record is omitted, the results will be in J2000.
+
+\goodbreak
+\begin{quote}
+\begin{tabular}{|l|}
+\hline
+\verb|SCHM                                      * Schmidt geometry| \\
+\hline
+\end{tabular}
+\end{quote}
+This is the {\bf telescope type} record, which
+describes the projection geometry.
+The telescope type is given by the first four characters of the
+record;  there are currently six options.
+$'${\tt SCHM}$\,'$, as used here, is for Schmidt telescopes.
+$'${\tt ASTR}$\,'$ selects the tangent plane or {\it gnomonic}\,
+projection, produced by conventional astrographic telescopes
+(and by pinhole cameras).
+Then there are three special AAT options: $'${\tt AAT2}$\,'$
+and $'${\tt AAT3}$\,'$ for
+the Prime Focus doublet and triplet correctors, and $'${\tt AAT8}$\,'$ for
+the {\it f}/8 Ritchey-Chretien focus (using the vacuum plateholder).
+The option $'${\tt JKT8}$\,'$ models the field distortion
+of the JKT ({\it f}/8 Harmer-Wynne focus).
+Finally, the option $'${\tt GENE}$\,'$ specifies generalized
+pincushion/barrel distortion, the magnitude of which is given
+by a single numeric parameter $q$ following the telescope
+type string; further details are given in Section~4.
+
+\goodbreak
+\begin{quote}
+\begin{tabular}{|l|}
+\hline
+\verb|19 04 00.0  -65 00 00  B1950.0  1974.5    * Plate centre, and epoch| 
+\\
+\hline
+\end{tabular}
+\end{quote}
+This is the mandatory {\bf plate data} record, specifying the point on
+the sky corresponding to the pole of the projection
+geometry (which is usually, but not
+necessarily\footnote{JKT {\it f}/8 plates, for example, are
+mounted eccentrically.  The plate data record must specify the
+celestial coordinates of the optical axis, preferably to
+within a millimetre or so.  Section~7 gives details of how the
+plate centre (and the radial distortion) can be determined
+automatically.}, at the geometrical centre of the plate)
+and the date on which the exposure occurred.
+The \radec\ is expressed
+as h~m~s~$^\circ$~$'$~$''$.  The hours, minutes, degrees and
+arcminutes fields must all be integers.  The sign of the $\delta$
+precedes the degrees.  The \radec\ must be followed
+by an equinox.
+The epoch specifies when the picture
+was taken, needed for the proper motion calculation.
+The epoch can be omitted if more precise information is to be supplied
+later via the optional observation data records.
+
+\goodbreak
+\begin{quote}
+\begin{tabular}{|l|}
+\hline
+\verb|18 56 39.426  -63 25 13.23  -0.0002  -0.036  B1950.0  * Ref 1| \\
+\verb|44.791   85.643| \\
+\hline
+\end{tabular}
+\end{quote}
+This is the first of several record pairs describing the
+{\bf reference stars}.  At least two such pairs are needed in
+order to run ASTROM, and three if both sorts of linear fit are to
+be done.  At least 10 stars are required if fitting of the
+radial distortion and/or plate centre is to be attempted.  A typical
+number for an ordinary linear fit would be about a dozen stars;
+a thorough job covering a large area of a plate and with
+automatic determination of the radial distortion and plate centre
+selected would require perhaps 50.
+The current limit is 1000.
+The first record contains \radec, proper
+motions in seconds per year and arcseconds per year
+respectively ({\it n.b.}\ not centuries as in some
+catalogues), and equinox, followed optionally by
+epoch and/or parallax.  If the epoch is omitted (as in the above example),
+it is assumed to be the same as the equinox.  Parallax, which is
+in arcseconds, defaults to zero.  For reference
+stars whose positions are given in the old
+FK4 system, and whose proper motions are presumed to be zero in an
+inertial sense, an alternative format is available,
+with the proper motions omitted and the epoch mandatory:
+\begin{quote}
+\begin{tabular}{|l|}
+\hline
+\verb|18 56 39.422  -63 25 14.00  B1950.0  1971.3           * Ref 1| \\
+\hline
+\end{tabular}
+\end{quote}
+(Because the FK4 system is not inertial, using the
+format described earlier and simply putting zero for the
+proper motions would {\bf not} give the same effect.)  The
+first 10 characters of any comment
+are picked up and appear on the reports as `name'.
+The second record of the reference star pair is the
+measured \xy.  For the 4-coefficient model to
+work properly, $x$ and $y$ must be in the same units.
+The reports will look best if the units are millimetres or
+thereabouts and the offsets from zero are reasonably small.
+Orientation and handedness are immaterial; x=east and y=north
+is the recommended convention as it matches the run of $\alpha$ and
+$\delta$.
+
+\goodbreak
+\begin{quote}
+\begin{tabular}{|l|}
+\hline
+\verb|-5.103    58.868                      *  Candidate| \\
+\verb|19 09 46.2  -63 51 27  J2000.0        *  Radio pos| \\
+\hline
+\end{tabular}
+\end{quote}
+These two records both specify {\it unknown stars}.  The
+first is \xy, from which \radec\ will be determined.
+The second is \radec\ and equinox, from which
+\xy\ will be determined.
+It is not necessary to include any
+unknown star records at all, if the intention is
+simply to determine a plate scale or to check
+a set of plate measurements.
+
+The above example gives a position for the first unknown
+star of `\verb|19 05 01.794 -63 56 16.70|'.  The equinox was
+specified in the results equinox record, and the epoch in
+the plate data record.  One way to express this
+information in a publication might be as follows:
+
+\begin{center}
+19~05~01.79~~-63~56~16.7~~B1950~~epoch~1974.5
+\end{center}
+
+The example does not include the
+optional {\bf observation data} and {\bf colour}
+records, which enable ASTROM to
+reconstruct the precise appearance of the field rather
+than allowing various predictable rotations and
+distortions to be absorbed into the fit.  Also omitted from
+the example are requests to include the radial distortion
+and plate centre in the fit.  Details of
+these refinements are given in Sections~6 and~7.
+
+\section{Method}
+For each input sequence, up to three astrometric solutions are
+reported. The first is a four coefficient linear model (zero
+points, scale and orientation),
+requiring at least two reference stars.  The second, computed
+in addition to the 4-coefficient model if there are at least
+three reference stars, is a six coefficient linear model (zero
+points, scales in $x$ and $y$, orientation and 
+nonperpendicularity).  The third solution, which is performed on
+request and providing at least 10 reference stars have been
+supplied, has 7-9 coefficients and includes in the model the radial
+distortion coefficient and/or the plate centre,
+along with the six linear terms.
+
+The 4-coefficient model
+is useful (1)~for rough and ready astrometry, {\it e.g.}\ from a
+print using a ruler or graph paper, and (2)~for identifying
+an erroneous reference star, the higher order fits
+tending to disguise the error.  On most occasions, the 6-coefficient
+solution will be the most useful.
+
+Internally, the modelling is done in idealized ``plate
+coordinates'', and the various \radec\ and
+\xy\ data input to or output from ASTROM are converted
+to and from this internal standard as required.
+The conversion
+from \radec\ to plate coordinates consists of the following steps:
+\begin{enumerate}
+ \item Appropriate operations to transform the supplied
+       \radec\ into either observed coordinates (if the
+       optional observation data have been provided) or
+       mean coordinates at the plate epoch (if not).
+ \item Conventional gnomonic projection, using the given
+       plate centre \radec, to obtain tangential coordinates
+       \xieta.
+ \item A small adjustment to allow for departures from
+       tangent-plane geometry.
+\end{enumerate}
+The distortion model in step 3 is the usual ``cubic'' one, where
+the vector from the plate centre to the star image is
+lengthened by an amount
+proportional to the cube of the length of this vector.
+The adjustment is carried out by multiplying each of
+$\xi$ and $\eta$ by the factor $(1 + q (\xi^{2}+\eta^{2}))$,
+the coefficient $q$ depending on the telescope type specified.  The
+values for each telescope type are given in the following table:
+
+\goodbreak
+\begin{center}
+\begin{tabular}{|c|l|c|}
+\hline
+{\it telescope type} & {\it description} & $q$ \\
+\hline
+$'${\tt ASTR}$\,'$ & astrograph & zero \\
+$'${\tt SCHM}$\,'$ & Schmidt & $-1/3$ \\
+$'${\tt AAT2}$\,'$ & AAT PF doublet & +147.1 \\
+$'${\tt AAT3}$\,'$ & AAT PF triplet & +178.6 \\
+$'${\tt AAT8}$\,'$ & AAT $f/8$ & +21.2 \\
+$'${\tt JKT8}$\,'$ & JKT $f/8$ & +14.7 \\
+$'${\tt GENE}$\,'$ & general & specified \\
+\hline
+\end{tabular}
+\end{center}
+
+\goodbreak
+Notes:
+\begin{itemize}
+ \item Positive $q$ values correspond to pincushion distortion,
+       negative to barrel distortion.
+ \item In the case of telescope type $'${\tt GENE}$\,'$
+       (generalized pincushion/barrel distortion), $q$ is specified
+       directly as a numeric parameter, and therefore can be used for
+       any telescope or camera which is adequately described by
+       the distortion model.
+ \item The difference between the Schmidt and tangent-plane
+       projections is conventionally assumed to be that between $r$
+       and $\tan r$; ASTROM's $q = -1/3$ is equivalent to
+       making the approximation $\tan r \simeq r + r^3/3$.
+ \item The coefficient $q$ can, optionally, be determined automatically.
+\end{itemize}
+
+For the 4- and 6-coefficient linear models, the fitting process
+consists of finding a set of coefficients which transform
+the measured reference star \xy\ data into plate coordinates
+which approximate those calculated from the \radec\ data.
+For the 7-9 coefficient solutions, revised estimates of
+the plate centre \radec\ and/or radial distortion
+coefficient $q$ are made as well.
+
+The models relate the following three types of coordinate:
+\begin{itemize}
+ \item The {\it estimated}\, coordinates $[x_{e},y_{e}]$, derived
+       from the reference star \radec\
+       by gnomonic projection and the application of radial
+       distortion, using the current estimates of the plate centre
+       and radial distortion coefficient.
+ \item The {\it measured}\, coordinates $[x_{m},y_{m}]$, as supplied.
+ \item The {\it predicted}\, coordinates $[x_{p},y_{p}]$, derived by the
+       application of the current linear model to the measured coordinates.
+\end{itemize}
+
+Two varieties of {\bf 4-coefficient linear model} are tried, one
+the mirror-image of the other.  The {\it standard}\, model is:
+\begin{eqnarray*}
+x_{e} & \simeq & a_{1} + a_{2} x_{m} + a_{3} y_{m} \\
+y_{e} & \simeq & b_{1} - a_{3} x_{m} + a_{2} y_{m}
+\end{eqnarray*}
+The {\it laterally inverted}\, model is:
+\begin{eqnarray*}
+x_{e} & \simeq & a_{1} + a_{2} x_{m} + a_{3} y_{m} \\
+y_{e} & \simeq & b_{1} + a_{3} x_{m} - a_{2} y_{m}
+\end{eqnarray*}
+The one delivering the smallest RMS error is selected.  If only
+two reference stars have been supplied, the standard model is
+used.
+
+The {\bf 6-coefficient linear model} is as follows:
+\begin{eqnarray*}
+x_{e} & \simeq & a_{1} + a_{2} x_{m} + a_{3} y_{m} \\
+y_{e} & \simeq & b_{1} + b_{2} x_{m} + b_{3} y_{m}
+\end{eqnarray*}
+
+Instead of the coefficients $a_{n},b_{n}$ being found
+directly, the fits are, in fact, implemented in terms of
+corrections
+$\Delta a_{n},\Delta b_{n}$ to assumed approximate values of
+$a_{n},b_{n}$.  For example, the 6-coefficient model is fitted as:
+\begin{eqnarray*}
+x_{e} - x_{p} & \simeq & \Delta a_{1}
+          + \Delta a_{2} x_{m} + \Delta a_{3} y_{m} \\
+y_{e} - y_{p} &\simeq & \Delta b_{1}
+          + \Delta b_{2} x_{m} + \Delta b_{3} y_{m}
+\end{eqnarray*}
+
+When determining the {\bf plate centre}, the following extra non-linear
+terms are added to the basic 6-coefficient linear model:
+\begin{eqnarray*}
+x_{e} - x_{p} & \simeq & \cdots + p_{1} (x_{p}^{2} + q (3 x_{p}^{2} + y_{p}^{2}))
+                    + p_{2} (x_{p}y_{p} + q (2 x_{p}y_{p})) \\
+y_{e} - y_{p} & \simeq & \cdots + p_{1} (x_{p}y_{p} + q (2 x_{p}y_{p}))
+                    + p_{2} (y_{p}^{2} + q (x_{p}^{2} + 3 y_{p}^{2}))
+\end{eqnarray*}
+
+The coefficients $p_{1}$ and $p_{2}$ estimate the offset between
+the pole of projection and the current $[x_{p},y_{p}]$ origin.  This
+offset is used to improve the plate centre \radec\ (and
+to correct the zero point $[a_{1},b_{1}]$) prior to recomputing
+$[x_{p},y_{p}]$ for each reference star.
+
+When determining the {\bf radial distortion coefficient}, the
+following extra
+terms are added:
+\begin{eqnarray*}
+x_{e} - x_{p} & \simeq & \cdots - \Delta q (x_{p}^{2} + y_{p}^{2}) x_{p} \\
+y_{e} - y_{p} & \simeq & \cdots - \Delta q (x_{p}^{2} + y_{p}^{2}) y_{p}
+\end{eqnarray*}
+
+The $\Delta q$ obtained from the fit
+is added to the current $q$ to provide a better estimate.
+
+The above expressions are similar to those derived by Murray in sections
+8.3.1{\it ff}\, of {\it Vectorial Astrometry}\, (Adam~Hilger, 1983).  The
+main difference is that in ASTROM the centres of the gnomonic projection
+and cubic distortion are assumed to be coincident.
+
+All three types of solution are found by the iterative application of a
+least-squares
+algorithm based on {\it singular value decomposition}\, of the {\it design
+matrix}.  (See sections 2.9 and 14.3 of {\it Numerical Recipes},
+Press {\it et al.}, Cambridge University Press, 1986.)
+This algorithm gives identical results to the traditional
+{\it normal equations}\,
+approach, but copes better with the ill-conditioned character of the
+7-9 coefficient model.
+The fit minimizes $\Sigma ((x_{e}-x_{p})^{2}+(y_{e}-y_{p})^{2})$.
+Each reference star thus produces two rows of design matrix -- one for
+$x$ and one for $y$.
+
+In the case of the 4- and 6-coefficient linear models, a single iteration
+is, in principle, all that is needed, whatever the starting values for
+the coefficients.  However, a second iteration is performed in order to
+minimize rounding errors.
+
+The 7-9 coefficient models are highly nonlinear, with adjustments
+of plate centre and -- especially -- radial distortion producing
+large changes in the scales and zero points which depend on the
+distribution of reference stars.  To ensure convergence, given
+reasonable starting values for the plate centre and radial
+distortion coefficient, the following strategy is used:
+\begin{itemize}
+ \item ASTROM insists that at least 10 reference stars be available
+       if a non-linear fit is to be attempted.
+ \item A fixed and ample number of iterations is used -- currently 20.
+ \item Iterations which fit the plate centre and/or the distortion
+       alternate with ones containing the six linear terms alone.
+       The final iteration is the linear model.
+ \item Where fitting of both the plate centre and the distortion
+       has been requested, for the first few iterations only one
+       or other of these is included in the fit, in alternation.
+       Once reliable estimates of each have been obtained the full
+       model is fitted at once.
+\end{itemize}
+
+\section{Limitations}
+ASTROM aims to deliver results better than 1~arcsec from typical
+Schmidt plate measurements, and better than 0.1~arcsec from
+carefully measured
+JKT and AAT plates {\it etc}.  Astrometric specialists will, nonetheless,
+be aware of a number of shortcomings, including the following:
+\begin{itemize}
+ \item The fit is limited to a 6-coefficient linear model plus
+       cubic distortion and plate tilt.  Colour effects -- arising for example
+       from chromatic aberrations in the camera optics -- are not allowed
+       for, no magnitude or image shape terms are included in the model,
+       and the refraction cannot be adjusted automatically.
+ \item The zonal distortions of the reference catalogues are neglected.
+ \item There is no provision for the simultaneous fitting of
+       more than one plate.  This prevents an extended area being
+       modelled via overlapping plates, and the determination
+       of proper motion and parallax from plates
+       taken at different epochs.
+ \item Only rudimentary error information is produced.
+\end{itemize}
+Despite these limitations, which stem mainly from the need for
+simplicity of use, the accuracy of the result tends in practice
+to be dominated by the quality of the input data rather
+than by ASTROM itself.
+
+\section{Reduction in Observed Place}
+Normally, the ASTROM reduction is carried out
+(internally) using {\it mean}\, places for the
+epoch of the plate --
+positions corrected for precession, but not for
+nutation, aberration, deflection, and refraction, the effects of
+which are simply absorbed into the fit.  This approach
+keeps the input file simple, and delivers perfectly
+adequate results for most practical purposes.
+However, there are some occasions on which a more precise reduction
+may be worthwhile.
+
+Although the nutation, aberration
+and deflection are always relatively innocuous -- the nutation produces a
+small and harmless rotation, the aberration varies very slowly
+across the sky, and the deflection is tiny except close to the
+Sun -- the effects of atmospheric refraction can be quite
+important.  As far as ASTROM is concerned, the refraction has
+two aspects:
+\begin{itemize}
+ \item {\it Differential refraction}\, causes the picture to be
+       distorted.  The distortion is in the form of a non-linear scale
+       reduction in the vertical direction, the reduction being
+       larger near the bottom;  this cannot be fully corrected by
+       ASTROM's linear model.
+ \item {\it Atmospheric dispersion}, important for detectors of
+       wide spectral coverage, causes the images
+       of stars of different colour to appear shifted vertically
+       from their nominal positions.
+\end{itemize}
+Both these effects can be eliminated if the
+optional time, observatory, meteorological and colour
+records are included in the input file.  The advantages
+of bothering to do this are as follows:
+\begin{itemize}
+ \item A more accurate result.  The improvement is likely to be
+       modest in most instances, but may be significant for low
+       elevations and wide fields.
+ \item More nearly equal scales will be reported in x and y,
+       and will be constant all over the sky.  Apart from
+       providing additional reassurance that the fit is good,
+       accurate knowledge of the scales is clearly vital
+       if the optical parameters of the
+       telescope are being measured for later use in
+       predictions for guide stars or fibre feeds {\it etc}.
+ \item The effects of colour may be important and can
+       at least be quantified.
+\end{itemize}
+The optional records all begin with an explicit identifier, of
+which only the first character (T, O, M or C) is significant.
+They must immediately follow the plate data record, but
+can be in any order.   Here is an example:
+\begin{quote}
+\begin{tabular}{|l|}
+\hline
+\verb|Time 1984 01 20  16 00| \\
+\verb|Obs 149 04.0  -31 16.6  1164| \\
+\verb|Met 288 899| \\
+\verb|Col 600| \\
+\hline
+\end{tabular}
+\end{quote}
+If the time, observatory and meteorological records are all
+omitted, any colour records
+subsequently encountered will be ignored.  In the absence
+of full information, ASTROM makes plausible guesses
+to make good the deficiencies.
+If insufficient information for the
+observed place predictions is available, warnings are issued and
+the astrometry is done using mean place.
+If any of the three observation data records appears twice,
+the new information supplants the old, and no error is
+reported.
+
+The TIME record can either specify the UT date and time
+or, optionally, the local sidereal time, for mid-exposure.
+If the time record specifies
+a UT, and an epoch is specified on the plate data record,
+the latter is ignored.
+If the ST option is used, the epoch on the plate data
+record must be specified (and should be accurate to a day
+or two if the annual aberration and solar deflection are
+to be correctly computed).  In the absence of a
+UT, it is reasonable to guess that the exposure occurred
+near upper culmination, which simply requires the ST to
+be set equal to the plate centre $\alpha$.  For example,
+to perform an observed place reduction on a plate
+of a field at $\alpha=19^{h}13^{m}$, the following
+TIME record might be used:
+\begin{quote}
+\begin{tabular}{|l|}
+\hline
+\verb|Time 19 13   * Estimated LST| \\
+\hline
+\end{tabular}
+\end{quote}
+The OBSERVATORY record can either specify one of the
+observatory identifiers recognized by the SLALIB routine
+OBS (see SUN/67):
+\begin{quote}
+\begin{tabular}{|l|}
+\hline
+\verb|Obs AAT| \\
+\hline
+\end{tabular}
+\end{quote}
+or the observatory position can be given
+explicitly as in the example given earlier.
+If the TIME record specifies sidereal time, the observatory
+longitude may optionally be omitted.
+The height (metres
+above sea level) is of limited importance unless the
+meteorological record is absent, in which case the height
+is used to estimate the pressure.
+
+The METEOROLOGICAL record specifies the temperature and pressure
+at the telescope, in $^\circ$K and mB respectively.  The
+temperature defaults to $278^\circ$K; the default pressure
+is computed from the observatory height.
+
+COLOUR records can appear anywhere after the time,
+observatory and meteorological records, except between a
+pair of reference star records.  Here is an example:
+\begin{quote}
+\begin{tabular}{|l|}
+\hline
+\verb|Colour 550| \\
+\hline
+\end{tabular}
+\end{quote}
+The effective
+wavelength specified by such a record applies to all
+stars from that point onwards.
+Should two colour records
+follow consecutively, the second supplants the first, and
+no error is reported.
+Prior to the first colour record,
+a default of 500nm is assumed.
+Appendix~C contains rough
+estimates
+of the effective wavelength for sources of different
+colour temperature and detectors of different passband.
+For the photographic case, the following
+table (compiled with the help of D.\,Malin) suggests effective
+wavelengths for some common combinations of emulsion, filter and
+star colour;  the {\it blue}\, and {\it red}\, columns refer
+to very blue and very
+red (thermal) sources respectively (the effects may, of
+course, be more extreme for emission-line objects and other
+non-blackbody sources).  For a star of spectral type G0, the
+effective wavelength will lie about halfway between the
+{\it blue}\, and {\it red}\, figures.
+
+\begin{center}
+\begin{tabular}{|c|c|c||c|c|}
+\hline
+{\it band} & {\it emulsion} & {\it filter} & {\it blue} & {\it red} \\
+\hline \hline
+U & O & UG\,1 & 365 & 365 \\
+  & J &       &     &     \\
+\hline
+B & IIa\,O & GG\,385 & 410 & 420 \\
+  &        & GG\,395 &     &     \\
+\cline{2-5}
+  & IIa\,J & GG\,385 & 410 & 480 \\
+  &        & GG\,395 &     &     \\
+\hline
+V & IIa\,D & GG\,495 & 550 & 600 \\
+\hline
+R & IIIa\,F & RG\,610 & 675 & 675 \\
+  & 103a\,E & RG\,630 &     &     \\
+\cline{3-5}
+  & 098-04 & GG\,495 & 600 & 675 \\
+\hline
+I & IV-N & GG\,695 & 800 & 800 \\
+\hline
+\end{tabular}
+\end{center}
+
+It must again be pointed out that there may be other important
+colour effects, apart from atmospheric dispersion, notably where
+refracting optics have been used.  There is no attempt in ASTROM
+to model such phenomena.
+
+\section{Fitting Plate Centre and Radial Distortion}
+Given a sufficient number of reference stars, measured to high
+accuracy and evenly distributed over the whole plate, it is
+possible to supplement the normal 4- and 6-coefficient linear
+solutions with one in which the plate centre and/or the radial
+distortion are determined automatically.
+
+The option of fitting the plate centre ({\it i.e.}\ the \radec\ of
+the centre of projection, which {\it a priori}\, may well not be known
+to adequate accuracy) is selected simply by beginning the
+plate centre
+record with the tilde character $'$\verb|~|$\,'$ (meaning ``approximately''):
+
+\goodbreak
+\begin{quote}
+\begin{tabular}{|l|}
+\hline
+\verb|~ 12 53 00.0  -42 00 00  B1950.0  1974.5  * Approx plate centre| \\
+\hline
+\end{tabular}
+\end{quote}
+Even though the plate centre is to be adjusted, it is advisable to start
+off with the best available estimate.  The difference between this
+and the actual centre of the projection pattern is what textbooks
+refer to as {\it tilt}.  Determination of the tilt is most secure where
+the radial distortion is pronounced.  Schmidt astrometry is relatively
+insensitive to tilt, and attempting to fit the plate centre may be
+unwise unless the reference stars are numerous and well-distributed.
+
+A further option (intended for investigating the properties of
+previously unmodelled telescopes rather than for routine use), is to
+fit the radial distortion
+coefficient.  This is selected by prefixing the telescope type
+record with the tilde character $'$\verb|~|$\,'$:
+\goodbreak
+\begin{quote}
+\begin{tabular}{|l|}
+\hline
+\verb|~ AAT3                * Guess| \\
+\hline
+\end{tabular}
+\end{quote}
+Tilt and distortion may be fitted simultaneously.
+Neither adjustment will be attempted unless at least 10
+reference stars are supplied.  If the fit proves to be
+unacceptably ill-conditioned, or if
+the adjustments are unrealistically large, the fit is rejected.
+
+Though no check is made, it is clearly unwise to request that the
+tilt and distortion be included in the model if the reduction is
+not taking place in {\it observed}\, coordinates (see the previous
+section).
+
+\section{Parallax}
+As described in Section~3, reference star celestial positions
+may be expressed in either of two formats.  The most usual format includes
+proper motions and has an optional epoch which defaults to that
+of the equinox.  The other common format, used for reference stars whose
+proper motions are assumed to be zero in an inertial frame,
+has no proper motions and must have an epoch as well as an equinox.
+
+The first format ({\it i.e.}\ with proper motions) has the
+supplementary option of allowing the annual parallax to be specified,
+following or instead of the epoch.  Here are two fictitious
+reference star \radec\ records each of which includes parallax:
+
+\goodbreak
+\begin{quote}
+\begin{tabular}{|l|}
+\hline
+\verb|14 39 36.087  -60 50 07.14  -0.49486 +0.6960  J2000.0  0.752 * Ref 1| \\
+\verb|09 16 19.03 -10 52 23.2 -0.0401 -0.006 B1950.0 1978.9 0.032 * Ref 2| \\
+\hline
+\end{tabular}
+\end{quote}
+
+In the case where the parallax is
+supplied without an epoch, which of the two is meant is deduced from
+the size of the number given.
+
+In the case where an epoch is supplied as well as well as a parallax,
+it is assumed that the parallax has yet to be applied.  In other words,
+the option to have the parallax removed from a reference
+star at the given catalogue epoch and then put back in for
+the epoch of the plate is {\bf not} provided.  The parallax is
+only taken into account (except for second-order effects on
+the proper motion) when a reduction in observed place
+has been requested (by supplying observatory, time and
+refraction information -- see Section~6).  Note that no
+provision is made to specify the radial velocity of a
+reference star.  This would only matter in cases where the
+plate epoch was very distant from the reference star epoch
+and where both radial velocity and parallax were large.
+
+No provision exists in ASTROM for specifying the parallax (or proper motion)
+of the unknown stars.
+
+\pagebreak
+{\bf APPENDIX A -- The Input File} \\
+\vspace{3mm}
+
+This appendix gives a more formal and complete specification of
+the input file than is given in the main text, and concludes
+with a more comprehensive example.
+\vspace{3mm}
+
+{\bf INPUT FILE}:
+
+\begin{quote}
+ SEQUENCE \\
+ $'$\verb|/|$\,'$ \\
+ SEQUENCE \\
+ $'$\verb|/|$\,'$ \\
+ $\vdots$ \\
+ SEQUENCE \\
+ $'$\verb|END|$\,'$ \\
+ Blank records are ignored.
+ Any record may end in a comment, which begins with an asterisk.
+ Where records contain numbers these are free-format,
+ decoded by the DBJIN and DFLTIN routines
+ in SLALIB (see SUN/67), separated
+ by spaces or a single comma.
+ Lowercase and uppercase can be freely mixed.
+ Any number of sequences is permitted.
+\end{quote}
+
+\goodbreak
+{\bf SEQUENCE}:
+
+\begin{quote}
+ RESULTS EQUINOX RECORD, optional \\
+ TELESCOPE TYPE RECORD, optional \\
+ PLATE DATA RECORD \\
+ OBSERVATION DATA, 0-3 records \\
+ REFERENCE STARS, 2-3 per star for 2-1000 stars \\
+ UNKNOWN STARS, 1-2 per star for any number of stars
+\end{quote}
+
+\goodbreak
+{\bf OBSERVATION DATA}:
+
+\begin{quote}
+ TIME RECORD \\
+ OBSERVATORY RECORD \\
+ METEOROLOGICAL RECORD \\
+ (Any order; any selection; repeats harmless.)
+\end{quote}
+
+\goodbreak
+{\bf REFERENCE STAR}:
+
+\begin{quote}
+ COLOUR RECORD (optional; repeats harmless) \\
+ REFERENCE STAR RA,DEC RECORD \\
+ REFERENCE STAR X,Y RECORD \\
+ A colour record applies to all subsequent stars,
+ both reference and unknown.
+\end{quote}
+
+\goodbreak
+{\bf UNKNOWN STAR}
+
+\begin{quote}
+ COLOUR RECORD (optional; repeats harmless) \\
+ {\it and/or:} \\
+ UNKNOWN STAR X,Y RECORD \\
+ {\it or:} \\
+ UNKNOWN STAR RA,DEC RECORD
+\end{quote}
+
+\goodbreak
+{\bf RESULTS EQUINOX RECORD}:
+
+\begin{quote}
+ EQUINOX \\
+ In the absence of this record, J2000.0 is used.
+\end{quote}
+
+\goodbreak
+{\bf TELESCOPE TYPE RECORD}:
+
+\begin{quote}
+ [APPROX] PROJECTION \\
+ In the absence of this record, $'$\verb|SCHM|$\,'$ is assumed.
+\end{quote}
+
+\goodbreak
+{\bf PLATE DATA RECORD}:
+
+\begin{quote}
+ [APPROX] RA DEC EQUINOX [EPOCH] \\
+ The position specified is that of the plate centre.
+ The epoch is optional only if the information is supplied
+ later in a time record (see next item).
+\end{quote}
+
+\goodbreak
+{\bf TIME RECORD}:
+
+\begin{quote}
+ {\it Either:} \\
+ $'$\verb|T...|$\,'$ UT \\
+ {\it or:} \\
+ $'$\verb|T...|$\,'$ ST \\
+ The first of these forms allows the epoch to be omitted from
+ the plate data record.
+\end{quote}
+
+\goodbreak
+{\bf OBSERVATORY RECORD}:
+
+\begin{quote}
+ {\it Either:} \\
+ $'$\verb|O...|$\,'$ STATION \\
+ {\it or:} \\
+ $'$\verb|O...|$\,'$ [LONGITUDE] LATITUDE [HEIGHT] \\
+ The longitude may be omitted only if the sidereal
+ time has been or will be specified via a time record.
+ The height defaults to an estimate based on the air pressure.
+\end{quote}
+
+\goodbreak
+{\bf METEOROLOGICAL RECORD}:
+
+\begin{quote}
+ $'$\verb|M...|$\,'$ TEMPERATURE [PRESSURE] \\
+ The temperature defaults to $278^\circ$K.
+ The pressure defaults to an estimate based on the height.
+\end{quote}
+
+\goodbreak
+{\bf COLOUR RECORD}:
+
+\begin{quote}
+ $'$\verb|C...|$\,'$ WAVELENGTH \\
+ A wavelength, once specified, applies to all stars from then on.
+ The starting default is 500~nm.
+\end{quote}
+
+\goodbreak
+{\bf REFERENCE STAR RA,DEC RECORD}:
+
+\begin{quote}
+ {\it Either:} \\
+ RA DEC PMR PMD EQUINOX [EPOCH] [PARALLAX] [NAME] \\
+ {\it or:} \\
+ RA DEC EQUINOX EPOCH [NAME] \\
+ The second format implies inertially zero proper motion.
+\end{quote}
+
+\goodbreak
+{\bf REFERENCE STAR X,Y RECORD}:
+
+\begin{quote}
+ X Y
+\end{quote}
+
+\goodbreak
+{\bf UNKNOWN STAR X,Y RECORD}:
+
+\begin{quote}
+ X Y [NAME]
+\end{quote}
+
+\goodbreak
+{\bf UNKNOWN STAR RA,DEC RECORD}:
+
+\begin{quote}
+ RA DEC EQUINOX [NAME]
+\end{quote}
+
+\goodbreak
+{\bf EQUINOX}:
+
+\begin{quote}
+The epoch of the equator and equinox of a mean \radec\
+coordinate system.  A Besselian epoch implies the pre~IAU~1976
+system (as used in the FK4 catalogue) and a Julian epoch implies
+the post~IAU~1976 system (as used in the FK5 catalogue).
+\end{quote}
+
+\goodbreak
+{\bf APPROX}:
+
+\begin{quote}
+ $'$\verb|~|$\,'$ (tilde) \\
+At the start of the telescope type and plate data
+records, this specifies that the radial
+distortion and plate centre, respectively, are to be fitted.
+\end{quote}
+
+\goodbreak
+{\bf PROJECTION}:
+
+\begin{quote}
+ $'$\verb|ASTR...|$\,'$ = astrograph \\
+ {\it or} \\
+ $'$\verb|SCHM...|$\,'$ = Schmidt (default) \\
+ {\it or} \\
+ $'$\verb|AAT2...|$\,'$ = AAT prime focus doublet \\
+ {\it or} \\
+ $'$\verb|AAT3...|$\,'$ = AAT prime focus triplet \\
+ {\it or} \\
+ $'$\verb|AAT8...|$\,'$ = AAT $f/8$ with vacuum plateholder \\
+ {\it or} \\
+ $'$\verb|JKT8...|$\,'$ = JKT $f/8$ Harmer-Wynne \\
+ {\it or} \\
+ $'$\verb|GENE...|$\,'$ DISTORTION = generalized pincushion/barrel distortion
+\end{quote}
+
+\goodbreak
+{\bf DISTORTION}:
+
+\begin{quote}
+A number, the parameter $q$ in the pincushion/barrel
+distortion expression
+$\mbox{\boldmath $r'$}=(1+q\mid\mbox{\boldmath $r$}\mid^2)\mbox{\boldmath $r$}$,
+where \mbox{\boldmath $r'$} is the radial vector to the star image
+from the intersection of the optical axis and the plate,
+and \mbox{\boldmath $r$} is the same vector but assuming tangent-plane
+geometry.
+The vectors are in units of one focal length.
+\end{quote}
+
+\goodbreak
+{\bf EPOCH}:
+
+\begin{quote}
+A Besselian or Julian epoch:  a single number resembling
+years AD,
+optionally preceded by $'${\tt B}$\,'$ (for
+{\it Besselian}) or $'${\tt J}$\,'$ (for {\it Julian}).  In the
+absence of a prefix, epochs before 1984.0 are assumed to
+be in the Besselian timescale, and epochs from 1984.0 onwards
+are assumed to be in the Julian timescale.
+\end{quote}
+
+\goodbreak
+{\bf RA DEC}:
+
+\begin{quote}
+A mean \radec\, expressed as six numbers: hours,
+minutes, seconds, degrees, arcminutes, arcseconds.
+The seconds and arcseconds can be given to any reasonable
+precision;  the others must be integers.
+All the numbers except the degrees
+must be positive; southern $\delta$ is indicated by
+minus degrees (even if zero).
+\end{quote}
+
+\goodbreak
+{\bf UT}:
+
+\begin{quote}
+The UT epoch of observation expressed as
+six numbers: years AD, month, day, hours, minutes.
+All but the minutes must be integers.
+The year, month and day must form a valid date
+in the Gregorian calendar.
+\end{quote}
+
+\goodbreak
+{\bf ST}:
+
+\begin{quote}
+The local (apparent) sidereal time of observation expressed as
+two numbers: hours, minutes.
+The hours must be an integer.
+\end{quote}
+
+\goodbreak
+{\bf STATION}
+
+\begin{quote}
+ A character string specifying one of the observatories
+ supported by the OBS routine in SLALIB (see SUN/67).
+\end{quote}
+
+\goodbreak
+{\bf LONGITUDE}
+
+\begin{quote}
+ The east longitude, expressed as two numbers: degrees (which
+ must be an integer) and arcminutes.  West longitudes may
+ be indicated
+ either by minus degrees (even if zero) or by east
+ longitude $> 180^\circ$.
+\end{quote}
+
+\goodbreak
+{\bf LATITUDE}
+
+\begin{quote}
+ The (geodetic) latitude, expressed as two numbers: degrees (which
+ must be an integer) and arcminutes.  South latitude is indicated
+ by minus degrees (even if zero).
+\end{quote}
+
+\goodbreak
+{\bf HEIGHT}
+
+\begin{quote}
+ A single number, the height above sea level in metres.
+\end{quote}
+
+\goodbreak
+{\bf TEMPERATURE}
+
+\begin{quote}
+ A single number, the ambient temperature in $^\circ$K.
+\end{quote}
+
+\goodbreak
+{\bf PRESSURE}
+
+\begin{quote}
+ A single number, the pressure in mB.
+\end{quote}
+
+\goodbreak
+{\bf WAVELENGTH}
+
+\begin{quote}
+ A single number, the effective wavelength in nm.
+\end{quote}
+
+\goodbreak
+{\bf PMR PMD}
+
+\begin{quote}
+ Two numbers, the proper motions in seconds and arcseconds
+ per year respectively.
+\end{quote}
+
+\goodbreak
+{\bf PARALLAX}
+
+\begin{quote}
+ A single number, the annual parallax in arcseconds.
+\end{quote}
+
+\goodbreak
+{\bf NAME}
+
+\begin{quote}
+ The name field, which is always optional,
+ is simply the first 10 characters of
+ the comment, excluding the $'$\verb|*|$\,'$ and any leading spaces.
+\end{quote}
+
+\goodbreak
+{\bf X Y}
+
+\begin{quote}
+ Two numbers, the Cartesian coordinates on the plate;
+ the units of $x$ and $y$ should preferably be the same and in the
+ $\mu$m to m range ({\it e.g.}\ mm), and the zero points
+ should not be too far from the region of measurement.
+\end{quote}
+
+
+The example input file which appears on the next page
+includes two sequences.
+The first is for a typical
+run using measurements from a Schmidt plate, while the second
+is for precise reduction, in observed place, of AAT~$f/8$ measurements,
+including automatic determination of the radial distortion and
+plate centre.
+For brevity, neither sequence includes as many reference stars as
+would normally be advisable.
+
+\pagebreak
+\begin{center}
+\begin{small}
+\begin{tabular}{|l|}
+\hline
+\verb|B1950                                     * Results in FK4| \\
+\verb|SCHM                                      * Schmidt geometry| \\
+\verb|19 04 00.0  -65 00 00  B1950.0  1974.5    * Plate centre, and epoch| \\
+\verb|18 56 39.426  -63 25 13.23  -0.0002  -0.036  B1950.0  * Ref 1| \\
+\verb|44.791   85.643| \\
+\\
+\verb|19 11 53.909  -63 17 57.57   0.0058  -0.044  1950.0   * Ref 2| \\
+\verb|-46.266   92.337| \\
+\\
+\verb|19 01 13.606  -63 49 14.84   0.0020  -0.026  1950.0   * Ref 3| \\
+\verb|17.246   64.945| \\
+\\
+\verb|19 08 29.088  -63 57 42.79   0.0016   0.018  1950.0   * Ref 4| \\
+\verb|-25.314   57.456| \\
+\\
+\verb|19 02 10.088  -63 29 16.73   0.0012  -0.019  1950.0   * Ref 5| \\
+\verb|11.890   82.766| \\
+\\
+\verb|-5.103    58.868                      *  Candidate| \\
+\verb|19 09 46.2  -63 51 27  J2000.0        *  Radio pos| \\
+\\
+\verb|/                                     *  End of first sequence| \\
+\\
+\verb|* AAT plate 2266 (f/8 RC)  NGC 3114| \\
+\verb|~ AAT8    * To be fitted| \\
+\verb|~ 10 01 00.0 -59 53 01 B1950   * To be fitted| \\
+\verb|Time 1984 01 20  16 00| \\
+\verb|Obs AAT| \\
+\verb|Met 288 899| \\
+\verb|Colour 450    *  Default colour for reference stars| \\
+\verb|10 01 21.203 -59 52 14.05 B1950 J1984.1| \\
+\verb|9.0353 18.4211 *130| \\
+\verb|10 00 16.401 -59 52 52.16 B1950 J1984.1| \\
+\verb|1.7304 17.9282 *70| \\
+\verb|10 00 18.516 -59 53 10.20 B1950 J1984.1| \\
+\verb|1.9669 17.6566 *73| \\
+\verb|10 00 19.620 -59 49 01.62 B1950 J1984.1| \\
+\verb|2.1223 21.3760 *74| \\
+\verb|10 00 20.525 -59 52 01.09 B1950 J1984.1| \\
+\verb|2.2025 18.6888 *75| \\
+\verb|10 00 21.416 -59 51 30.27 B1950 J1984.1| \\
+\verb|2.3067 19.1501 *76| \\
+\verb|10 00 22.896 -59 53 49.60 B1950 J1984.1| \\
+\verb|2.4544 17.0626 *80| \\
+\verb|10 01 26.159 -59 50 38.50 B1950 J1984.1| \\
+\verb|9.6143 19.8435 *134| \\
+\verb|10 01 28.328 -59 51 16.86 B1950 J1984.1| \\
+\verb|9.8509 19.2653 *138| \\
+\verb|10 01 54.446 -59 54 39.28 B1950 J1984.1| \\
+\verb|12.7495 16.1963 *156| \\
+\verb|10 01 54.523 -59 50 01.72 B1950 J1984.1| \\
+\verb|12.8193 20.3493 *157| \\
+\verb|10 01 57.438 -59 51 26.29 B1950 J1984.1| \\
+\verb|13.1292 19.0793 *161| \\
+\verb|10 00 12.385 -60 08 08.51 B1950 J1984.1| \\
+\verb|1.1637 4.2188 *65| \\
+\verb|C 500| \\
+\verb|5.8265 12.7252 *104 red| \\
+\verb|C 400| \\
+\verb|5.8265 12.7252 *104 blue| \\
+\\
+\verb|END| \\
+\hline
+\end{tabular}
+\end{small}
+\end{center}
+
+\pagebreak
+{\bf APPENDIX B -- Example Report}
+
+\vspace{5mm}
+Here is an example of the report produced by ASTROM.  It is the
+result of a run using the specimen input file presented in Section~3.
+The first part of the report lists the raw data.  The second part gives
+the results of the 4-coefficient solution.  The third part (next
+page) gives the results of the 6-coefficient solution.  The
+fourth part gives the predictions for the unknown stars.
+
+\vspace{20mm}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% LaTeX source generated by TEXLP program %
+%        P.T.Wallace     Starlink         %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{tiny}
+
+\noindent
+\begin{picture}(159.90, 52.00)( -2.60, -4.00)
+\put( -0.65, -2.50){\framebox(158.60, 48.00){}}
+\put(0.16,42){$\ast$}
+\put(2.76,42){$\ast$}
+\put(5.36,42){$\ast$}
+\put(7.96,42){$\ast$}
+\put(10.56,42){$\ast$}
+\put(13.16,42){$\ast$}
+\put(15.76,42){$\ast$}
+\put(18.36,42){$\ast$}
+\put(20.96,42){$\ast$}
+\put(23.56,42){$\ast$}
+\put(26.16,42){$\ast$}
+\put(28.76,42){$\ast$}
+\put(31.36,42){$\ast$}
+\put(0.16,40){$\ast$}
+\put(3.70,40){A}
+\put(6.55,40){S}
+\put(8.94,40){T}
+\put(11.50,40){R}
+\put(14.08,40){O}
+\put(16.51,40){M}
+\put(19.40,40){E}
+\put(21.94,40){T}
+\put(24.50,40){R}
+\put(27.07,40){Y}
+\put(31.36,40){$\ast$}
+\put(0.16,38){$\ast$}
+\put(2.76,38){$\ast$}
+\put(5.36,38){$\ast$}
+\put(7.96,38){$\ast$}
+\put(10.56,38){$\ast$}
+\put(13.16,38){$\ast$}
+\put(15.76,38){$\ast$}
+\put(18.36,38){$\ast$}
+\put(20.96,38){$\ast$}
+\put(23.56,38){$\ast$}
+\put(26.16,38){$\ast$}
+\put(28.76,38){$\ast$}
+\put(31.36,38){$\ast$}
+\put(-0.10,30){E}
+\put(1.33,30){q}
+\put(2.61,30){u}
+\put(4.19,30){i}
+\put(5.20,30){n}
+\put(6.60,30){o}
+\put(7.83,30){x}
+\put(10.57,30){f}
+\put(11.80,30){o}
+\put(13.22,30){r}
+\put(15.31,30){m}
+\put(17.03,30){e}
+\put(18.28,30){a}
+\put(19.50,30){n}
+\put(22.23,30){c}
+\put(23.50,30){o}
+\put(24.80,30){o}
+\put(26.22,30){r}
+\put(27.31,30){d}
+\put(28.89,30){i}
+\put(29.90,30){n}
+\put(31.28,30){a}
+\put(32.75,30){t}
+\put(33.93,30){e}
+\put(35.31,30){s}
+\put(37.80,30){o}
+\put(39.17,30){f}
+\put(41.82,30){r}
+\put(43.03,30){e}
+\put(44.41,30){s}
+\put(45.51,30){u}
+\put(47.12,30){l}
+\put(48.35,30){t}
+\put(49.61,30){s}
+\put(51.06,30){:}
+\put(54.47,30){B}
+\put(56.02,30){1}
+\put(57.32,30){9}
+\put(58.62,30){5}
+\put(59.92,30){0}
+\put(61.48,30){.}
+\put(62.52,30){0}
+\put(-0.06,26){P}
+\put(1.52,26){r}
+\put(2.70,26){o}
+\put(4.25,26){j}
+\put(5.33,26){e}
+\put(6.63,26){c}
+\put(8.05,26){t}
+\put(9.39,26){i}
+\put(10.50,26){o}
+\put(11.70,26){n}
+\put(14.36,26){g}
+\put(15.73,26){e}
+\put(17,26){o}
+\put(17.91,26){m}
+\put(19.63,26){e}
+\put(21.05,26){t}
+\put(22.32,26){r}
+\put(23.47,26){y}
+\put(25.06,26){:}
+\put(28.65,26){S}
+\put(30.03,26){c}
+\put(31.20,26){h}
+\put(32.21,26){m}
+\put(34.09,26){i}
+\put(35.11,26){d}
+\put(36.65,26){t}
+\put(-0.06,22){P}
+\put(1.63,22){l}
+\put(2.68,22){a}
+\put(4.15,22){t}
+\put(5.33,22){e}
+\put(7.93,22){c}
+\put(9.23,22){e}
+\put(10.40,22){n}
+\put(11.95,22){t}
+\put(13.22,22){r}
+\put(14.43,22){e}
+\put(15.96,22){:}
+\put(19.62,22){1}
+\put(20.92,22){9}
+\put(23.52,22){0}
+\put(24.82,22){4}
+\put(27.42,22){0}
+\put(28.72,22){0}
+\put(30.28,22){.}
+\put(31.32,22){0}
+\put(36.37,22){$-$}
+\put(37.82,22){6}
+\put(39.12,22){5}
+\put(41.72,22){0}
+\put(43.02,22){0}
+\put(45.62,22){0}
+\put(46.92,22){0}
+\put(54.50,22){E}
+\put(55.93,22){q}
+\put(57.21,22){u}
+\put(58.79,22){i}
+\put(59.80,22){n}
+\put(61.20,22){o}
+\put(62.43,22){x}
+\put(64.87,22){B}
+\put(66.42,22){1}
+\put(67.72,22){9}
+\put(69.02,22){5}
+\put(70.32,22){0}
+\put(71.88,22){.}
+\put(72.92,22){0}
+\put(80.50,22){E}
+\put(81.93,22){p}
+\put(83.30,22){o}
+\put(84.63,22){c}
+\put(85.80,22){h}
+\put(88.27,22){B}
+\put(89.82,22){1}
+\put(91.12,22){9}
+\put(92.42,22){7}
+\put(93.72,22){4}
+\put(95.28,22){.}
+\put(96.32,22){5}
+\put(97.62,22){0}
+\put(98.92,22){0}
+\put(-0.19,16){R}
+\put(1.43,16){e}
+\put(2.77,16){f}
+\put(4.03,16){e}
+\put(5.42,16){r}
+\put(6.63,16){e}
+\put(7.80,16){n}
+\put(9.23,16){c}
+\put(10.53,16){e}
+\put(13.21,16){s}
+\put(14.55,16){t}
+\put(15.68,16){a}
+\put(17.12,16){r}
+\put(18.41,16){s}
+\put(19.86,16){:}
+\put(19.50,12){n}
+\put(38.80,12){R}
+\put(40.10,12){A}
+\put(57.04,12){D}
+\put(58.63,12){e}
+\put(59.93,12){c}
+\put(72.83,12){p}
+\put(73.81,12){m}
+\put(75.20,12){R}
+\put(81.93,12){p}
+\put(82.91,12){m}
+\put(84.34,12){D}
+\put(89.60,12){E}
+\put(91.03,12){q}
+\put(92.31,12){u}
+\put(93.89,12){i}
+\put(94.90,12){n}
+\put(96.30,12){o}
+\put(97.53,12){x}
+\put(102.60,12){E}
+\put(104.03,12){p}
+\put(105.40,12){o}
+\put(106.73,12){c}
+\put(107.90,12){h}
+\put(117.03,12){p}
+\put(118.33,12){x}
+\put(131.08,12){X}
+\put(132.31,12){m}
+\put(134.03,12){e}
+\put(135.28,12){a}
+\put(136.71,12){s}
+\put(147.97,12){Y}
+\put(149.21,12){m}
+\put(150.93,12){e}
+\put(152.18,12){a}
+\put(153.61,12){s}
+\put(-0.19,8){R}
+\put(1.43,8){e}
+\put(2.77,8){f}
+\put(5.32,8){1}
+\put(19.62,8){1}
+\put(32.62,8){1}
+\put(33.92,8){8}
+\put(36.52,8){5}
+\put(37.82,8){6}
+\put(40.42,8){3}
+\put(41.72,8){9}
+\put(43.28,8){.}
+\put(44.32,8){4}
+\put(45.62,8){2}
+\put(46.92,8){6}
+\put(50.67,8){$-$}
+\put(52.12,8){6}
+\put(53.42,8){3}
+\put(56.02,8){2}
+\put(57.32,8){5}
+\put(59.92,8){1}
+\put(61.22,8){3}
+\put(62.78,8){.}
+\put(63.82,8){2}
+\put(65.12,8){3}
+\put(68.87,8){$-$}
+\put(70.32,8){0}
+\put(71.88,8){.}
+\put(72.92,8){0}
+\put(74.22,8){0}
+\put(75.52,8){0}
+\put(76.82,8){2}
+\put(79.27,8){$-$}
+\put(80.72,8){0}
+\put(82.28,8){.}
+\put(83.32,8){0}
+\put(84.62,8){3}
+\put(85.92,8){6}
+\put(89.57,8){B}
+\put(91.12,8){1}
+\put(92.42,8){9}
+\put(93.72,8){5}
+\put(95.02,8){0}
+\put(96.58,8){.}
+\put(97.62,8){0}
+\put(101.27,8){B}
+\put(102.82,8){1}
+\put(104.12,8){9}
+\put(105.42,8){5}
+\put(106.72,8){0}
+\put(108.28,8){.}
+\put(109.32,8){0}
+\put(110.62,8){0}
+\put(111.92,8){0}
+\put(115.82,8){0}
+\put(117.38,8){.}
+\put(118.42,8){0}
+\put(119.72,8){0}
+\put(121.02,8){0}
+\put(129.80,8){$+$}
+\put(131.42,8){4}
+\put(132.72,8){4}
+\put(134.28,8){.}
+\put(135.32,8){7}
+\put(136.62,8){9}
+\put(137.92,8){1}
+\put(146.70,8){$+$}
+\put(148.32,8){8}
+\put(149.62,8){5}
+\put(151.18,8){.}
+\put(152.22,8){6}
+\put(153.52,8){4}
+\put(154.82,8){3}
+\put(-0.19,6){R}
+\put(1.43,6){e}
+\put(2.77,6){f}
+\put(5.32,6){2}
+\put(19.62,6){2}
+\put(32.62,6){1}
+\put(33.92,6){9}
+\put(36.52,6){1}
+\put(37.82,6){1}
+\put(40.42,6){5}
+\put(41.72,6){3}
+\put(43.28,6){.}
+\put(44.32,6){9}
+\put(45.62,6){0}
+\put(46.92,6){9}
+\put(50.67,6){$-$}
+\put(52.12,6){6}
+\put(53.42,6){3}
+\put(56.02,6){1}
+\put(57.32,6){7}
+\put(59.92,6){5}
+\put(61.22,6){7}
+\put(62.78,6){.}
+\put(63.82,6){5}
+\put(65.12,6){7}
+\put(68.70,6){$+$}
+\put(70.32,6){0}
+\put(71.88,6){.}
+\put(72.92,6){0}
+\put(74.22,6){0}
+\put(75.52,6){5}
+\put(76.82,6){8}
+\put(79.27,6){$-$}
+\put(80.72,6){0}
+\put(82.28,6){.}
+\put(83.32,6){0}
+\put(84.62,6){4}
+\put(85.92,6){4}
+\put(89.57,6){B}
+\put(91.12,6){1}
+\put(92.42,6){9}
+\put(93.72,6){5}
+\put(95.02,6){0}
+\put(96.58,6){.}
+\put(97.62,6){0}
+\put(101.27,6){B}
+\put(102.82,6){1}
+\put(104.12,6){9}
+\put(105.42,6){5}
+\put(106.72,6){0}
+\put(108.28,6){.}
+\put(109.32,6){0}
+\put(110.62,6){0}
+\put(111.92,6){0}
+\put(115.82,6){0}
+\put(117.38,6){.}
+\put(118.42,6){0}
+\put(119.72,6){0}
+\put(121.02,6){0}
+\put(129.97,6){$-$}
+\put(131.42,6){4}
+\put(132.72,6){6}
+\put(134.28,6){.}
+\put(135.32,6){2}
+\put(136.62,6){6}
+\put(137.92,6){6}
+\put(146.70,6){$+$}
+\put(148.32,6){9}
+\put(149.62,6){2}
+\put(151.18,6){.}
+\put(152.22,6){3}
+\put(153.52,6){3}
+\put(154.82,6){7}
+\put(-0.19,4){R}
+\put(1.43,4){e}
+\put(2.77,4){f}
+\put(5.32,4){3}
+\put(19.62,4){3}
+\put(32.62,4){1}
+\put(33.92,4){9}
+\put(36.52,4){0}
+\put(37.82,4){1}
+\put(40.42,4){1}
+\put(41.72,4){3}
+\put(43.28,4){.}
+\put(44.32,4){6}
+\put(45.62,4){0}
+\put(46.92,4){6}
+\put(50.67,4){$-$}
+\put(52.12,4){6}
+\put(53.42,4){3}
+\put(56.02,4){4}
+\put(57.32,4){9}
+\put(59.92,4){1}
+\put(61.22,4){4}
+\put(62.78,4){.}
+\put(63.82,4){8}
+\put(65.12,4){4}
+\put(68.70,4){$+$}
+\put(70.32,4){0}
+\put(71.88,4){.}
+\put(72.92,4){0}
+\put(74.22,4){0}
+\put(75.52,4){2}
+\put(76.82,4){0}
+\put(79.27,4){$-$}
+\put(80.72,4){0}
+\put(82.28,4){.}
+\put(83.32,4){0}
+\put(84.62,4){2}
+\put(85.92,4){6}
+\put(89.57,4){B}
+\put(91.12,4){1}
+\put(92.42,4){9}
+\put(93.72,4){5}
+\put(95.02,4){0}
+\put(96.58,4){.}
+\put(97.62,4){0}
+\put(101.27,4){B}
+\put(102.82,4){1}
+\put(104.12,4){9}
+\put(105.42,4){5}
+\put(106.72,4){0}
+\put(108.28,4){.}
+\put(109.32,4){0}
+\put(110.62,4){0}
+\put(111.92,4){0}
+\put(115.82,4){0}
+\put(117.38,4){.}
+\put(118.42,4){0}
+\put(119.72,4){0}
+\put(121.02,4){0}
+\put(129.80,4){$+$}
+\put(131.42,4){1}
+\put(132.72,4){7}
+\put(134.28,4){.}
+\put(135.32,4){2}
+\put(136.62,4){4}
+\put(137.92,4){6}
+\put(146.70,4){$+$}
+\put(148.32,4){6}
+\put(149.62,4){4}
+\put(151.18,4){.}
+\put(152.22,4){9}
+\put(153.52,4){4}
+\put(154.82,4){5}
+\put(-0.19,2){R}
+\put(1.43,2){e}
+\put(2.77,2){f}
+\put(5.32,2){4}
+\put(19.62,2){4}
+\put(32.62,2){1}
+\put(33.92,2){9}
+\put(36.52,2){0}
+\put(37.82,2){8}
+\put(40.42,2){2}
+\put(41.72,2){9}
+\put(43.28,2){.}
+\put(44.32,2){0}
+\put(45.62,2){8}
+\put(46.92,2){8}
+\put(50.67,2){$-$}
+\put(52.12,2){6}
+\put(53.42,2){3}
+\put(56.02,2){5}
+\put(57.32,2){7}
+\put(59.92,2){4}
+\put(61.22,2){2}
+\put(62.78,2){.}
+\put(63.82,2){7}
+\put(65.12,2){9}
+\put(68.70,2){$+$}
+\put(70.32,2){0}
+\put(71.88,2){.}
+\put(72.92,2){0}
+\put(74.22,2){0}
+\put(75.52,2){1}
+\put(76.82,2){6}
+\put(79.10,2){$+$}
+\put(80.72,2){0}
+\put(82.28,2){.}
+\put(83.32,2){0}
+\put(84.62,2){1}
+\put(85.92,2){8}
+\put(89.57,2){B}
+\put(91.12,2){1}
+\put(92.42,2){9}
+\put(93.72,2){5}
+\put(95.02,2){0}
+\put(96.58,2){.}
+\put(97.62,2){0}
+\put(101.27,2){B}
+\put(102.82,2){1}
+\put(104.12,2){9}
+\put(105.42,2){5}
+\put(106.72,2){0}
+\put(108.28,2){.}
+\put(109.32,2){0}
+\put(110.62,2){0}
+\put(111.92,2){0}
+\put(115.82,2){0}
+\put(117.38,2){.}
+\put(118.42,2){0}
+\put(119.72,2){0}
+\put(121.02,2){0}
+\put(129.97,2){$-$}
+\put(131.42,2){2}
+\put(132.72,2){5}
+\put(134.28,2){.}
+\put(135.32,2){3}
+\put(136.62,2){1}
+\put(137.92,2){4}
+\put(146.70,2){$+$}
+\put(148.32,2){5}
+\put(149.62,2){7}
+\put(151.18,2){.}
+\put(152.22,2){4}
+\put(153.52,2){5}
+\put(154.82,2){6}
+\put(-0.19,0){R}
+\put(1.43,0){e}
+\put(2.77,0){f}
+\put(5.32,0){5}
+\put(19.62,0){5}
+\put(32.62,0){1}
+\put(33.92,0){9}
+\put(36.52,0){0}
+\put(37.82,0){2}
+\put(40.42,0){1}
+\put(41.72,0){0}
+\put(43.28,0){.}
+\put(44.32,0){0}
+\put(45.62,0){8}
+\put(46.92,0){8}
+\put(50.67,0){$-$}
+\put(52.12,0){6}
+\put(53.42,0){3}
+\put(56.02,0){2}
+\put(57.32,0){9}
+\put(59.92,0){1}
+\put(61.22,0){6}
+\put(62.78,0){.}
+\put(63.82,0){7}
+\put(65.12,0){3}
+\put(68.70,0){$+$}
+\put(70.32,0){0}
+\put(71.88,0){.}
+\put(72.92,0){0}
+\put(74.22,0){0}
+\put(75.52,0){1}
+\put(76.82,0){2}
+\put(79.27,0){$-$}
+\put(80.72,0){0}
+\put(82.28,0){.}
+\put(83.32,0){0}
+\put(84.62,0){1}
+\put(85.92,0){9}
+\put(89.57,0){B}
+\put(91.12,0){1}
+\put(92.42,0){9}
+\put(93.72,0){5}
+\put(95.02,0){0}
+\put(96.58,0){.}
+\put(97.62,0){0}
+\put(101.27,0){B}
+\put(102.82,0){1}
+\put(104.12,0){9}
+\put(105.42,0){5}
+\put(106.72,0){0}
+\put(108.28,0){.}
+\put(109.32,0){0}
+\put(110.62,0){0}
+\put(111.92,0){0}
+\put(115.82,0){0}
+\put(117.38,0){.}
+\put(118.42,0){0}
+\put(119.72,0){0}
+\put(121.02,0){0}
+\put(129.80,0){$+$}
+\put(131.42,0){1}
+\put(132.72,0){1}
+\put(134.28,0){.}
+\put(135.32,0){8}
+\put(136.62,0){9}
+\put(137.92,0){0}
+\put(146.70,0){$+$}
+\put(148.32,0){8}
+\put(149.62,0){2}
+\put(151.18,0){.}
+\put(152.22,0){7}
+\put(153.52,0){6}
+\put(154.82,0){6}
+\end{picture}
+
+\noindent
+\begin{picture}(159.90, 68.00)( -2.60, -4.00)
+\put( -0.65, -2.50){\framebox(158.60, 64.00){}}
+\put(-0.06,58){P}
+\put(1.63,58){l}
+\put(2.68,58){a}
+\put(4.15,58){t}
+\put(5.33,58){e}
+\put(8.01,58){s}
+\put(9.20,58){o}
+\put(10.72,58){l}
+\put(11.71,58){u}
+\put(13.25,58){t}
+\put(14.59,58){i}
+\put(15.70,58){o}
+\put(16.90,58){n}
+\put(18.56,58){:}
+\put(20.92,58){4}
+\put(22.07,58){$-$}
+\put(23.53,58){c}
+\put(24.80,58){o}
+\put(26.13,58){e}
+\put(27.47,58){f}
+\put(28.77,58){f}
+\put(30.19,58){i}
+\put(31.33,58){c}
+\put(32.79,58){i}
+\put(33.93,58){e}
+\put(35.10,58){n}
+\put(36.65,58){t}
+\put(-0.03,56){$-$}
+\put(1.27,56){$-$}
+\put(2.57,56){$-$}
+\put(3.87,56){$-$}
+\put(5.17,56){$-$}
+\put(6.47,56){$-$}
+\put(7.77,56){$-$}
+\put(9.07,56){$-$}
+\put(10.37,56){$-$}
+\put(11.67,56){$-$}
+\put(12.97,56){$-$}
+\put(14.27,56){$-$}
+\put(15.57,56){$-$}
+\put(16.87,56){$-$}
+\put(18.17,56){$-$}
+\put(19.47,56){$-$}
+\put(20.77,56){$-$}
+\put(22.07,56){$-$}
+\put(23.37,56){$-$}
+\put(24.67,56){$-$}
+\put(25.97,56){$-$}
+\put(27.27,56){$-$}
+\put(28.57,56){$-$}
+\put(29.87,56){$-$}
+\put(31.17,56){$-$}
+\put(32.47,56){$-$}
+\put(33.77,56){$-$}
+\put(35.07,56){$-$}
+\put(36.37,56){$-$}
+\put(4.98,52){X}
+\put(6.79,52){,}
+\put(7.57,52){Y}
+\put(10.28,52){=}
+\put(13.13,52){e}
+\put(14.33,52){x}
+\put(15.63,52){p}
+\put(17.03,52){e}
+\put(18.33,52){c}
+\put(19.75,52){t}
+\put(20.93,52){e}
+\put(22.11,52){d}
+\put(24.73,52){p}
+\put(26.32,52){l}
+\put(27.38,52){a}
+\put(28.85,52){t}
+\put(30.03,52){e}
+\put(32.63,52){c}
+\put(33.90,52){o}
+\put(35.20,52){o}
+\put(36.62,52){r}
+\put(37.71,52){d}
+\put(39.29,52){i}
+\put(40.30,52){n}
+\put(41.68,52){a}
+\put(43.15,52){t}
+\put(44.33,52){e}
+\put(45.71,52){s}
+\put(48.26,52){(}
+\put(49.62,52){r}
+\put(50.78,52){a}
+\put(52.01,52){d}
+\put(53.59,52){i}
+\put(54.68,52){a}
+\put(55.90,52){n}
+\put(57.41,52){s}
+\put(58.76,52){)}
+\put(4.98,48){X}
+\put(7.68,48){=}
+\put(11.50,48){$+$}
+\put(13.12,48){0}
+\put(14.68,48){.}
+\put(15.72,48){2}
+\put(17.02,48){3}
+\put(18.32,48){2}
+\put(19.62,48){8}
+\put(20.92,48){0}
+\put(22.22,48){7}
+\put(23.52,48){2}
+\put(24.60,48){E}
+\put(25.97,48){$-$}
+\put(27.42,48){0}
+\put(28.72,48){3}
+\put(66.07,48){Y}
+\put(68.78,48){=}
+\put(72.77,48){$-$}
+\put(74.22,48){0}
+\put(75.78,48){.}
+\put(76.82,48){7}
+\put(78.12,48){3}
+\put(79.42,48){9}
+\put(80.72,48){2}
+\put(82.02,48){2}
+\put(83.32,48){8}
+\put(84.62,48){5}
+\put(85.70,48){E}
+\put(87.07,48){$-$}
+\put(88.52,48){0}
+\put(89.82,48){3}
+\put(11.67,46){$-$}
+\put(13.12,46){0}
+\put(14.68,46){.}
+\put(15.72,46){3}
+\put(17.02,46){2}
+\put(18.32,46){7}
+\put(19.62,46){4}
+\put(20.92,46){5}
+\put(22.22,46){4}
+\put(23.52,46){7}
+\put(24.60,46){E}
+\put(25.97,46){$-$}
+\put(27.42,46){0}
+\put(28.72,46){3}
+\put(31.36,46){$\ast$}
+\put(33.58,46){X}
+\put(34.81,46){m}
+\put(36.53,46){e}
+\put(37.78,46){a}
+\put(39.21,46){s}
+\put(72.77,46){$-$}
+\put(74.22,46){0}
+\put(75.78,46){.}
+\put(76.82,46){5}
+\put(78.12,46){5}
+\put(79.42,46){4}
+\put(80.72,46){3}
+\put(82.02,46){9}
+\put(83.32,46){3}
+\put(84.62,46){9}
+\put(85.70,46){E}
+\put(87.07,46){$-$}
+\put(88.52,46){0}
+\put(89.82,46){6}
+\put(92.46,46){$\ast$}
+\put(94.68,46){X}
+\put(95.91,46){m}
+\put(97.63,46){e}
+\put(98.88,46){a}
+\put(100.31,46){s}
+\put(11.67,44){$-$}
+\put(13.12,44){0}
+\put(14.68,44){.}
+\put(15.72,44){5}
+\put(17.02,44){5}
+\put(18.32,44){4}
+\put(19.62,44){3}
+\put(20.92,44){9}
+\put(22.22,44){3}
+\put(23.52,44){9}
+\put(24.60,44){E}
+\put(25.97,44){$-$}
+\put(27.42,44){0}
+\put(28.72,44){6}
+\put(31.36,44){$\ast$}
+\put(33.57,44){Y}
+\put(34.81,44){m}
+\put(36.53,44){e}
+\put(37.78,44){a}
+\put(39.21,44){s}
+\put(72.60,44){$+$}
+\put(74.22,44){0}
+\put(75.78,44){.}
+\put(76.82,44){3}
+\put(78.12,44){2}
+\put(79.42,44){7}
+\put(80.72,44){4}
+\put(82.02,44){5}
+\put(83.32,44){4}
+\put(84.62,44){7}
+\put(85.70,44){E}
+\put(87.07,44){$-$}
+\put(88.52,44){0}
+\put(89.82,44){3}
+\put(92.46,44){$\ast$}
+\put(94.67,44){Y}
+\put(95.91,44){m}
+\put(97.63,44){e}
+\put(98.88,44){a}
+\put(100.31,44){s}
+\put(-0.22,38){X}
+\put(1.01,38){m}
+\put(2.73,38){e}
+\put(3.98,38){a}
+\put(5.41,38){s}
+\put(7.68,38){=}
+\put(11.50,38){$+$}
+\put(13.12,38){0}
+\put(14.68,38){.}
+\put(15.72,38){7}
+\put(17.02,38){0}
+\put(18.32,38){7}
+\put(19.62,38){1}
+\put(20.92,38){3}
+\put(22.22,38){6}
+\put(23.52,38){0}
+\put(60.87,38){Y}
+\put(62.11,38){m}
+\put(63.83,38){e}
+\put(65.08,38){a}
+\put(66.51,38){s}
+\put(68.78,38){=}
+\put(73.90,38){$+$}
+\put(75.52,38){2}
+\put(77.08,38){.}
+\put(78.12,38){2}
+\put(79.42,38){5}
+\put(80.72,38){8}
+\put(82.02,38){6}
+\put(83.32,38){9}
+\put(84.62,38){6}
+\put(12.97,36){$-$}
+\put(14.42,36){3}
+\put(15.72,36){0}
+\put(17.02,36){5}
+\put(18.32,36){3}
+\put(19.88,36){.}
+\put(20.92,36){8}
+\put(22.22,36){4}
+\put(23.52,36){9}
+\put(31.36,36){$\ast$}
+\put(33.58,36){X}
+\put(74.07,36){$-$}
+\put(75.52,36){5}
+\put(77.08,36){.}
+\put(78.12,36){1}
+\put(79.42,36){7}
+\put(80.72,36){0}
+\put(82.02,36){2}
+\put(83.32,36){8}
+\put(84.62,36){9}
+\put(92.46,36){$\ast$}
+\put(94.68,36){X}
+\put(12.97,34){$-$}
+\put(14.42,34){5}
+\put(15.98,34){.}
+\put(17.02,34){1}
+\put(18.32,34){7}
+\put(19.62,34){0}
+\put(20.92,34){2}
+\put(22.22,34){8}
+\put(23.52,34){9}
+\put(31.36,34){$\ast$}
+\put(33.57,34){Y}
+\put(73.90,34){$+$}
+\put(75.52,34){3}
+\put(76.82,34){0}
+\put(78.12,34){5}
+\put(79.42,34){3}
+\put(80.98,34){.}
+\put(82.02,34){8}
+\put(83.32,34){4}
+\put(84.62,34){9}
+\put(92.46,34){$\ast$}
+\put(94.67,34){Y}
+\put(6.43,28){P}
+\put(8.13,28){l}
+\put(9.18,28){a}
+\put(10.65,28){t}
+\put(11.83,28){e}
+\put(14.51,28){s}
+\put(15.73,28){c}
+\put(16.98,28){a}
+\put(18.52,28){l}
+\put(19.63,28){e}
+\put(22.26,28){(}
+\put(23.69,28){i}
+\put(24.70,28){n}
+\put(27.01,28){m}
+\put(28.73,28){e}
+\put(29.98,28){a}
+\put(31.41,28){s}
+\put(32.51,28){u}
+\put(34.02,28){r}
+\put(35.39,28){i}
+\put(36.40,28){n}
+\put(37.76,28){g}
+\put(40.31,28){u}
+\put(41.60,28){n}
+\put(43.19,28){i}
+\put(44.45,28){t}
+\put(45.71,28){s}
+\put(47.06,28){)}
+\put(48.46,28){:}
+\put(63.82,28){6}
+\put(65.12,28){7}
+\put(66.68,28){.}
+\put(67.72,28){5}
+\put(69.02,28){4}
+\put(70.32,28){2}
+\put(72.88,28){a}
+\put(74.32,28){r}
+\put(75.53,28){c}
+\put(76.91,28){s}
+\put(78.13,28){e}
+\put(79.43,28){c}
+\put(33.58,26){O}
+\put(35.32,26){r}
+\put(36.69,26){i}
+\put(37.83,26){e}
+\put(39,26){n}
+\put(40.55,26){t}
+\put(41.68,26){a}
+\put(43.15,26){t}
+\put(44.49,26){i}
+\put(45.60,26){o}
+\put(46.80,26){n}
+\put(48.46,26){:}
+\put(63.50,26){$+$}
+\put(65.12,26){0}
+\put(66.68,26){.}
+\put(67.72,26){0}
+\put(69.02,26){9}
+\put(70.32,26){7}
+\put(72.81,26){d}
+\put(74.23,26){e}
+\put(75.46,26){g}
+\put(78.08,26){a}
+\put(79.30,26){n}
+\put(80.61,26){d}
+\put(83.53,26){l}
+\put(84.58,26){a}
+\put(86.05,26){t}
+\put(87.23,26){e}
+\put(88.62,26){r}
+\put(89.78,26){a}
+\put(91.32,26){l}
+\put(92.63,26){l}
+\put(93.67,26){y}
+\put(96.49,26){i}
+\put(97.50,26){n}
+\put(98.83,26){v}
+\put(100.23,26){e}
+\put(101.62,26){r}
+\put(102.95,26){t}
+\put(104.13,26){e}
+\put(105.31,26){d}
+\put(-0.19,20){R}
+\put(1.43,20){e}
+\put(2.77,20){f}
+\put(4.03,20){e}
+\put(5.42,20){r}
+\put(6.63,20){e}
+\put(7.80,20){n}
+\put(9.23,20){c}
+\put(10.53,20){e}
+\put(13.21,20){s}
+\put(14.55,20){t}
+\put(15.68,20){a}
+\put(17.12,20){r}
+\put(18.41,20){s}
+\put(19.86,20){:}
+\put(36.01,18){M}
+\put(37.83,18){e}
+\put(39.08,18){a}
+\put(40.30,18){n}
+\put(42.70,18){R}
+\put(44,18){A}
+\put(45.79,18){,}
+\put(46.64,18){D}
+\put(48.23,18){e}
+\put(49.53,18){c}
+\put(62.30,18){E}
+\put(63.73,18){q}
+\put(65.01,18){u}
+\put(66.59,18){i}
+\put(67.60,18){n}
+\put(69,18){o}
+\put(70.23,18){x}
+\put(72.67,18){B}
+\put(74.22,18){1}
+\put(75.52,18){9}
+\put(76.82,18){5}
+\put(78.12,18){0}
+\put(79.68,18){.}
+\put(80.72,18){0}
+\put(89.60,18){E}
+\put(91.03,18){p}
+\put(92.40,18){o}
+\put(93.73,18){c}
+\put(94.90,18){h}
+\put(97.37,18){B}
+\put(98.92,18){1}
+\put(100.22,18){9}
+\put(101.52,18){7}
+\put(102.82,18){4}
+\put(104.38,18){.}
+\put(105.42,18){5}
+\put(106.72,18){0}
+\put(108.02,18){0}
+\put(123.30,18){R}
+\put(124.93,18){e}
+\put(126.31,18){s}
+\put(127.69,18){i}
+\put(128.71,18){d}
+\put(130.01,18){u}
+\put(131.38,18){a}
+\put(132.93,18){l}
+\put(134.11,18){s}
+\put(136.66,18){(}
+\put(137.88,18){a}
+\put(139.32,18){r}
+\put(140.53,18){c}
+\put(141.91,18){s}
+\put(143.13,18){e}
+\put(144.43,18){c}
+\put(145.86,18){)}
+\put(19.50,16){n}
+\put(46.93,16){c}
+\put(48.18,16){a}
+\put(49.65,16){t}
+\put(50.78,16){a}
+\put(52.32,16){l}
+\put(53.40,16){o}
+\put(54.66,16){g}
+\put(55.91,16){u}
+\put(57.33,16){e}
+\put(85.93,16){c}
+\put(87.18,16){a}
+\put(88.72,16){l}
+\put(89.83,16){c}
+\put(91.01,16){u}
+\put(92.63,16){l}
+\put(93.68,16){a}
+\put(95.15,16){t}
+\put(96.33,16){e}
+\put(97.51,16){d}
+\put(120.91,16){d}
+\put(121.98,16){X}
+\put(133.91,16){d}
+\put(134.97,16){Y}
+\put(146.91,16){d}
+\put(148,16){R}
+\put(-0.19,12){R}
+\put(1.43,12){e}
+\put(2.77,12){f}
+\put(5.32,12){1}
+\put(19.62,12){1}
+\put(36.52,12){1}
+\put(37.82,12){8}
+\put(40.42,12){5}
+\put(41.72,12){6}
+\put(44.32,12){3}
+\put(45.62,12){9}
+\put(47.18,12){.}
+\put(48.22,12){4}
+\put(49.52,12){2}
+\put(50.82,12){1}
+\put(54.57,12){$-$}
+\put(56.02,12){6}
+\put(57.32,12){3}
+\put(59.92,12){2}
+\put(61.22,12){5}
+\put(63.82,12){1}
+\put(65.12,12){4}
+\put(66.68,12){.}
+\put(67.72,12){1}
+\put(69.02,12){1}
+\put(75.52,12){1}
+\put(76.82,12){8}
+\put(79.42,12){5}
+\put(80.72,12){6}
+\put(83.32,12){3}
+\put(84.62,12){9}
+\put(86.18,12){.}
+\put(87.22,12){4}
+\put(88.52,12){6}
+\put(89.82,12){8}
+\put(93.57,12){$-$}
+\put(95.02,12){6}
+\put(96.32,12){3}
+\put(98.92,12){2}
+\put(100.22,12){5}
+\put(102.82,12){1}
+\put(104.12,12){4}
+\put(105.68,12){.}
+\put(106.72,12){2}
+\put(108.02,12){7}
+\put(116.80,12){$+$}
+\put(118.42,12){0}
+\put(119.98,12){.}
+\put(121.02,12){3}
+\put(122.32,12){1}
+\put(123.62,12){9}
+\put(129.97,12){$-$}
+\put(131.42,12){0}
+\put(132.98,12){.}
+\put(134.02,12){1}
+\put(135.32,12){4}
+\put(136.62,12){5}
+\put(144.42,12){0}
+\put(145.98,12){.}
+\put(147.02,12){3}
+\put(148.32,12){5}
+\put(149.62,12){0}
+\put(-0.19,10){R}
+\put(1.43,10){e}
+\put(2.77,10){f}
+\put(5.32,10){2}
+\put(19.62,10){2}
+\put(36.52,10){1}
+\put(37.82,10){9}
+\put(40.42,10){1}
+\put(41.72,10){1}
+\put(44.32,10){5}
+\put(45.62,10){4}
+\put(47.18,10){.}
+\put(48.22,10){0}
+\put(49.52,10){5}
+\put(50.82,10){1}
+\put(54.57,10){$-$}
+\put(56.02,10){6}
+\put(57.32,10){3}
+\put(59.92,10){1}
+\put(61.22,10){7}
+\put(63.82,10){5}
+\put(65.12,10){8}
+\put(66.68,10){.}
+\put(67.72,10){6}
+\put(69.02,10){5}
+\put(75.52,10){1}
+\put(76.82,10){9}
+\put(79.42,10){1}
+\put(80.72,10){1}
+\put(83.32,10){5}
+\put(84.62,10){4}
+\put(86.18,10){.}
+\put(87.22,10){0}
+\put(88.52,10){8}
+\put(89.82,10){2}
+\put(93.57,10){$-$}
+\put(95.02,10){6}
+\put(96.32,10){3}
+\put(98.92,10){1}
+\put(100.22,10){7}
+\put(102.82,10){5}
+\put(104.12,10){8}
+\put(105.68,10){.}
+\put(106.72,10){0}
+\put(108.02,10){0}
+\put(116.80,10){$+$}
+\put(118.42,10){0}
+\put(119.98,10){.}
+\put(121.02,10){2}
+\put(122.32,10){2}
+\put(123.62,10){6}
+\put(129.80,10){$+$}
+\put(131.42,10){0}
+\put(132.98,10){.}
+\put(134.02,10){6}
+\put(135.32,10){3}
+\put(136.62,10){8}
+\put(144.42,10){0}
+\put(145.98,10){.}
+\put(147.02,10){6}
+\put(148.32,10){7}
+\put(149.62,10){7}
+\put(-0.19,8){R}
+\put(1.43,8){e}
+\put(2.77,8){f}
+\put(5.32,8){3}
+\put(19.62,8){3}
+\put(36.52,8){1}
+\put(37.82,8){9}
+\put(40.42,8){0}
+\put(41.72,8){1}
+\put(44.32,8){1}
+\put(45.62,8){3}
+\put(47.18,8){.}
+\put(48.22,8){6}
+\put(49.52,8){5}
+\put(50.82,8){5}
+\put(54.57,8){$-$}
+\put(56.02,8){6}
+\put(57.32,8){3}
+\put(59.92,8){4}
+\put(61.22,8){9}
+\put(63.82,8){1}
+\put(65.12,8){5}
+\put(66.68,8){.}
+\put(67.72,8){4}
+\put(69.02,8){8}
+\put(75.52,8){1}
+\put(76.82,8){9}
+\put(79.42,8){0}
+\put(80.72,8){1}
+\put(83.32,8){1}
+\put(84.62,8){3}
+\put(86.18,8){.}
+\put(87.22,8){5}
+\put(88.52,8){8}
+\put(89.82,8){0}
+\put(93.57,8){$-$}
+\put(95.02,8){6}
+\put(96.32,8){3}
+\put(98.92,8){4}
+\put(100.22,8){9}
+\put(102.82,8){1}
+\put(104.12,8){5}
+\put(105.68,8){.}
+\put(106.72,8){8}
+\put(108.02,8){8}
+\put(116.97,8){$-$}
+\put(118.42,8){0}
+\put(119.98,8){.}
+\put(121.02,8){4}
+\put(122.32,8){8}
+\put(123.62,8){9}
+\put(129.97,8){$-$}
+\put(131.42,8){0}
+\put(132.98,8){.}
+\put(134.02,8){4}
+\put(135.32,8){0}
+\put(136.62,8){7}
+\put(144.42,8){0}
+\put(145.98,8){.}
+\put(147.02,8){6}
+\put(148.32,8){3}
+\put(149.62,8){6}
+\put(-0.19,6){R}
+\put(1.43,6){e}
+\put(2.77,6){f}
+\put(5.32,6){4}
+\put(19.62,6){4}
+\put(36.52,6){1}
+\put(37.82,6){9}
+\put(40.42,6){0}
+\put(41.72,6){8}
+\put(44.32,6){2}
+\put(45.62,6){9}
+\put(47.18,6){.}
+\put(48.22,6){1}
+\put(49.52,6){2}
+\put(50.82,6){7}
+\put(54.57,6){$-$}
+\put(56.02,6){6}
+\put(57.32,6){3}
+\put(59.92,6){5}
+\put(61.22,6){7}
+\put(63.82,6){4}
+\put(65.12,6){2}
+\put(66.68,6){.}
+\put(67.72,6){3}
+\put(69.02,6){5}
+\put(75.52,6){1}
+\put(76.82,6){9}
+\put(79.42,6){0}
+\put(80.72,6){8}
+\put(83.32,6){2}
+\put(84.62,6){9}
+\put(86.18,6){.}
+\put(87.22,6){0}
+\put(88.52,6){1}
+\put(89.82,6){6}
+\put(93.57,6){$-$}
+\put(95.02,6){6}
+\put(96.32,6){3}
+\put(98.92,6){5}
+\put(100.22,6){7}
+\put(102.82,6){4}
+\put(104.12,6){2}
+\put(105.68,6){.}
+\put(106.72,6){7}
+\put(108.02,6){2}
+\put(116.97,6){$-$}
+\put(118.42,6){0}
+\put(119.98,6){.}
+\put(121.02,6){7}
+\put(122.32,6){3}
+\put(123.62,6){8}
+\put(129.97,6){$-$}
+\put(131.42,6){0}
+\put(132.98,6){.}
+\put(134.02,6){3}
+\put(135.32,6){6}
+\put(136.62,6){5}
+\put(144.42,6){0}
+\put(145.98,6){.}
+\put(147.02,6){8}
+\put(148.32,6){2}
+\put(149.62,6){4}
+\put(-0.19,4){R}
+\put(1.43,4){e}
+\put(2.77,4){f}
+\put(5.32,4){5}
+\put(19.62,4){5}
+\put(36.52,4){1}
+\put(37.82,4){9}
+\put(40.42,4){0}
+\put(41.72,4){2}
+\put(44.32,4){1}
+\put(45.62,4){0}
+\put(47.18,4){.}
+\put(48.22,4){1}
+\put(49.52,4){1}
+\put(50.82,4){7}
+\put(54.57,4){$-$}
+\put(56.02,4){6}
+\put(57.32,4){3}
+\put(59.92,4){2}
+\put(61.22,4){9}
+\put(63.82,4){1}
+\put(65.12,4){7}
+\put(66.68,4){.}
+\put(67.72,4){2}
+\put(69.02,4){0}
+\put(75.52,4){1}
+\put(76.82,4){9}
+\put(79.42,4){0}
+\put(80.72,4){2}
+\put(83.32,4){1}
+\put(84.62,4){0}
+\put(86.18,4){.}
+\put(87.22,4){2}
+\put(88.52,4){2}
+\put(89.82,4){0}
+\put(93.57,4){$-$}
+\put(95.02,4){6}
+\put(96.32,4){3}
+\put(98.92,4){2}
+\put(100.22,4){9}
+\put(102.82,4){1}
+\put(104.12,4){6}
+\put(105.68,4){.}
+\put(106.72,4){9}
+\put(108.02,4){2}
+\put(116.80,4){$+$}
+\put(118.42,4){0}
+\put(119.98,4){.}
+\put(121.02,4){6}
+\put(122.32,4){8}
+\put(123.62,4){2}
+\put(129.80,4){$+$}
+\put(131.42,4){0}
+\put(132.98,4){.}
+\put(134.02,4){2}
+\put(135.32,4){8}
+\put(136.62,4){0}
+\put(144.42,4){0}
+\put(145.98,4){.}
+\put(147.02,4){7}
+\put(148.32,4){3}
+\put(149.62,4){8}
+\put(105.10,0){R}
+\put(106.21,0){M}
+\put(107.95,0){S}
+\put(110.86,0){:}
+\put(118.42,0){0}
+\put(119.98,0){.}
+\put(121.02,0){5}
+\put(122.32,0){3}
+\put(123.62,0){0}
+\put(131.42,0){0}
+\put(132.98,0){.}
+\put(134.02,0){4}
+\put(135.32,0){0}
+\put(136.62,0){1}
+\put(144.42,0){0}
+\put(145.98,0){.}
+\put(147.02,0){6}
+\put(148.32,0){6}
+\put(149.62,0){5}
+\end{picture}
+
+\noindent
+\begin{picture}(159.90, 74.00)( -2.60, -4.00)
+\put( -0.65, -2.50){\framebox(158.60, 70.00){}}
+\put(-0.06,64){P}
+\put(1.63,64){l}
+\put(2.68,64){a}
+\put(4.15,64){t}
+\put(5.33,64){e}
+\put(8.01,64){s}
+\put(9.20,64){o}
+\put(10.72,64){l}
+\put(11.71,64){u}
+\put(13.25,64){t}
+\put(14.59,64){i}
+\put(15.70,64){o}
+\put(16.90,64){n}
+\put(18.56,64){:}
+\put(20.92,64){6}
+\put(22.07,64){$-$}
+\put(23.53,64){c}
+\put(24.80,64){o}
+\put(26.13,64){e}
+\put(27.47,64){f}
+\put(28.77,64){f}
+\put(30.19,64){i}
+\put(31.33,64){c}
+\put(32.79,64){i}
+\put(33.93,64){e}
+\put(35.10,64){n}
+\put(36.65,64){t}
+\put(-0.03,62){$-$}
+\put(1.27,62){$-$}
+\put(2.57,62){$-$}
+\put(3.87,62){$-$}
+\put(5.17,62){$-$}
+\put(6.47,62){$-$}
+\put(7.77,62){$-$}
+\put(9.07,62){$-$}
+\put(10.37,62){$-$}
+\put(11.67,62){$-$}
+\put(12.97,62){$-$}
+\put(14.27,62){$-$}
+\put(15.57,62){$-$}
+\put(16.87,62){$-$}
+\put(18.17,62){$-$}
+\put(19.47,62){$-$}
+\put(20.77,62){$-$}
+\put(22.07,62){$-$}
+\put(23.37,62){$-$}
+\put(24.67,62){$-$}
+\put(25.97,62){$-$}
+\put(27.27,62){$-$}
+\put(28.57,62){$-$}
+\put(29.87,62){$-$}
+\put(31.17,62){$-$}
+\put(32.47,62){$-$}
+\put(33.77,62){$-$}
+\put(35.07,62){$-$}
+\put(36.37,62){$-$}
+\put(4.98,58){X}
+\put(6.79,58){,}
+\put(7.57,58){Y}
+\put(10.28,58){=}
+\put(13.13,58){e}
+\put(14.33,58){x}
+\put(15.63,58){p}
+\put(17.03,58){e}
+\put(18.33,58){c}
+\put(19.75,58){t}
+\put(20.93,58){e}
+\put(22.11,58){d}
+\put(24.73,58){p}
+\put(26.32,58){l}
+\put(27.38,58){a}
+\put(28.85,58){t}
+\put(30.03,58){e}
+\put(32.63,58){c}
+\put(33.90,58){o}
+\put(35.20,58){o}
+\put(36.62,58){r}
+\put(37.71,58){d}
+\put(39.29,58){i}
+\put(40.30,58){n}
+\put(41.68,58){a}
+\put(43.15,58){t}
+\put(44.33,58){e}
+\put(45.71,58){s}
+\put(48.26,58){(}
+\put(49.62,58){r}
+\put(50.78,58){a}
+\put(52.01,58){d}
+\put(53.59,58){i}
+\put(54.68,58){a}
+\put(55.90,58){n}
+\put(57.41,58){s}
+\put(58.76,58){)}
+\put(4.98,54){X}
+\put(7.68,54){=}
+\put(11.50,54){$+$}
+\put(13.12,54){0}
+\put(14.68,54){.}
+\put(15.72,54){2}
+\put(17.02,54){4}
+\put(18.32,54){5}
+\put(19.62,54){7}
+\put(20.92,54){7}
+\put(22.22,54){6}
+\put(23.52,54){1}
+\put(24.60,54){E}
+\put(25.97,54){$-$}
+\put(27.42,54){0}
+\put(28.72,54){3}
+\put(66.07,54){Y}
+\put(68.78,54){=}
+\put(72.77,54){$-$}
+\put(74.22,54){0}
+\put(75.78,54){.}
+\put(76.82,54){7}
+\put(78.12,54){2}
+\put(79.42,54){9}
+\put(80.72,54){6}
+\put(82.02,54){7}
+\put(83.32,54){7}
+\put(84.62,54){8}
+\put(85.70,54){E}
+\put(87.07,54){$-$}
+\put(88.52,54){0}
+\put(89.82,54){3}
+\put(11.67,52){$-$}
+\put(13.12,52){0}
+\put(14.68,52){.}
+\put(15.72,52){3}
+\put(17.02,52){2}
+\put(18.32,52){7}
+\put(19.62,52){4}
+\put(20.92,52){7}
+\put(22.22,52){4}
+\put(23.52,52){2}
+\put(24.60,52){E}
+\put(25.97,52){$-$}
+\put(27.42,52){0}
+\put(28.72,52){3}
+\put(31.36,52){$\ast$}
+\put(33.58,52){X}
+\put(34.81,52){m}
+\put(36.53,52){e}
+\put(37.78,52){a}
+\put(39.21,52){s}
+\put(72.77,52){$-$}
+\put(74.22,52){0}
+\put(75.78,52){.}
+\put(76.82,52){5}
+\put(78.12,52){2}
+\put(79.42,52){5}
+\put(80.72,52){3}
+\put(82.02,52){0}
+\put(83.32,52){8}
+\put(84.62,52){8}
+\put(85.70,52){E}
+\put(87.07,52){$-$}
+\put(88.52,52){0}
+\put(89.82,52){6}
+\put(92.46,52){$\ast$}
+\put(94.68,52){X}
+\put(95.91,52){m}
+\put(97.63,52){e}
+\put(98.88,52){a}
+\put(100.31,52){s}
+\put(11.67,50){$-$}
+\put(13.12,50){0}
+\put(14.68,50){.}
+\put(15.72,50){7}
+\put(17.02,50){2}
+\put(18.32,50){3}
+\put(19.62,50){5}
+\put(20.92,50){1}
+\put(22.22,50){6}
+\put(23.52,50){2}
+\put(24.60,50){E}
+\put(25.97,50){$-$}
+\put(27.42,50){0}
+\put(28.72,50){6}
+\put(31.36,50){$\ast$}
+\put(33.57,50){Y}
+\put(34.81,50){m}
+\put(36.53,50){e}
+\put(37.78,50){a}
+\put(39.21,50){s}
+\put(72.60,50){$+$}
+\put(74.22,50){0}
+\put(75.78,50){.}
+\put(76.82,50){3}
+\put(78.12,50){2}
+\put(79.42,50){7}
+\put(80.72,50){3}
+\put(82.02,50){2}
+\put(83.32,50){9}
+\put(84.62,50){9}
+\put(85.70,50){E}
+\put(87.07,50){$-$}
+\put(88.52,50){0}
+\put(89.82,50){3}
+\put(92.46,50){$\ast$}
+\put(94.67,50){Y}
+\put(95.91,50){m}
+\put(97.63,50){e}
+\put(98.88,50){a}
+\put(100.31,50){s}
+\put(-0.22,44){X}
+\put(1.01,44){m}
+\put(2.73,44){e}
+\put(3.98,44){a}
+\put(5.41,44){s}
+\put(7.68,44){=}
+\put(11.50,44){$+$}
+\put(13.12,44){0}
+\put(14.68,44){.}
+\put(15.72,44){7}
+\put(17.02,44){4}
+\put(18.32,44){5}
+\put(19.62,44){5}
+\put(20.92,44){9}
+\put(22.22,44){2}
+\put(23.52,44){8}
+\put(60.87,44){Y}
+\put(62.11,44){m}
+\put(63.83,44){e}
+\put(65.08,44){a}
+\put(66.51,44){s}
+\put(68.78,44){=}
+\put(73.90,44){$+$}
+\put(75.52,44){2}
+\put(77.08,44){.}
+\put(78.12,44){2}
+\put(79.42,44){3}
+\put(80.72,44){0}
+\put(82.02,44){3}
+\put(83.32,44){7}
+\put(84.62,44){9}
+\put(12.97,42){$-$}
+\put(14.42,42){3}
+\put(15.72,42){0}
+\put(17.02,42){5}
+\put(18.32,42){3}
+\put(19.88,42){.}
+\put(20.92,42){6}
+\put(22.22,42){6}
+\put(23.52,42){5}
+\put(31.36,42){$\ast$}
+\put(33.58,42){X}
+\put(74.07,42){$-$}
+\put(75.52,42){4}
+\put(77.08,42){.}
+\put(78.12,42){9}
+\put(79.42,42){0}
+\put(80.72,42){0}
+\put(82.02,42){6}
+\put(83.32,42){1}
+\put(84.62,42){4}
+\put(92.46,42){$\ast$}
+\put(94.68,42){X}
+\put(12.97,40){$-$}
+\put(14.42,40){6}
+\put(15.98,40){.}
+\put(17.02,40){7}
+\put(18.32,40){4}
+\put(19.62,40){9}
+\put(20.92,40){6}
+\put(22.22,40){9}
+\put(23.52,40){4}
+\put(31.36,40){$\ast$}
+\put(33.57,40){Y}
+\put(73.90,40){$+$}
+\put(75.52,40){3}
+\put(76.82,40){0}
+\put(78.12,40){5}
+\put(79.42,40){5}
+\put(80.98,40){.}
+\put(82.02,40){0}
+\put(83.32,40){1}
+\put(84.62,40){1}
+\put(92.46,40){$\ast$}
+\put(94.67,40){Y}
+\put(5.13,34){P}
+\put(6.82,34){l}
+\put(7.88,34){a}
+\put(9.35,34){t}
+\put(10.53,34){e}
+\put(13.21,34){s}
+\put(14.43,34){c}
+\put(15.68,34){a}
+\put(17.22,34){l}
+\put(18.33,34){e}
+\put(19.71,34){s}
+\put(22.26,34){(}
+\put(23.69,34){i}
+\put(24.70,34){n}
+\put(27.01,34){m}
+\put(28.73,34){e}
+\put(29.98,34){a}
+\put(31.41,34){s}
+\put(32.51,34){u}
+\put(34.02,34){r}
+\put(35.39,34){i}
+\put(36.40,34){n}
+\put(37.76,34){g}
+\put(40.31,34){u}
+\put(41.60,34){n}
+\put(43.19,34){i}
+\put(44.45,34){t}
+\put(45.71,34){s}
+\put(47.06,34){)}
+\put(48.46,34){:}
+\put(56.98,34){X}
+\put(63.82,34){6}
+\put(65.12,34){7}
+\put(66.68,34){.}
+\put(67.72,34){5}
+\put(69.02,34){4}
+\put(70.32,34){6}
+\put(72.88,34){a}
+\put(74.32,34){r}
+\put(75.53,34){c}
+\put(76.91,34){s}
+\put(78.13,34){e}
+\put(79.43,34){c}
+\put(56.97,32){Y}
+\put(63.82,32){6}
+\put(65.12,32){7}
+\put(66.68,32){.}
+\put(67.72,32){5}
+\put(69.02,32){1}
+\put(70.32,32){7}
+\put(72.88,32){a}
+\put(74.32,32){r}
+\put(75.53,32){c}
+\put(76.91,32){s}
+\put(78.13,32){e}
+\put(79.43,32){c}
+\put(53.01,30){m}
+\put(54.73,30){e}
+\put(55.98,30){a}
+\put(57.20,30){n}
+\put(63.82,30){6}
+\put(65.12,30){7}
+\put(66.68,30){.}
+\put(67.72,30){5}
+\put(69.02,30){3}
+\put(70.32,30){2}
+\put(72.88,30){a}
+\put(74.32,30){r}
+\put(75.53,30){c}
+\put(76.91,30){s}
+\put(78.13,30){e}
+\put(79.43,30){c}
+\put(23.24,28){N}
+\put(24.80,28){o}
+\put(26,28){n}
+\put(27.33,28){p}
+\put(28.73,28){e}
+\put(30.12,28){r}
+\put(31.23,28){p}
+\put(32.63,28){e}
+\put(33.80,28){n}
+\put(35.11,28){d}
+\put(36.69,28){i}
+\put(37.83,28){c}
+\put(39.01,28){u}
+\put(40.62,28){l}
+\put(41.68,28){a}
+\put(43.12,28){r}
+\put(44.49,28){i}
+\put(45.75,28){t}
+\put(46.86,28){y}
+\put(48.46,28){:}
+\put(63.50,28){$+$}
+\put(65.12,28){0}
+\put(66.68,28){.}
+\put(67.72,28){0}
+\put(69.02,28){3}
+\put(70.32,28){5}
+\put(72.81,28){d}
+\put(74.23,28){e}
+\put(75.46,28){g}
+\put(33.58,26){O}
+\put(35.32,26){r}
+\put(36.69,26){i}
+\put(37.83,26){e}
+\put(39,26){n}
+\put(40.55,26){t}
+\put(41.68,26){a}
+\put(43.15,26){t}
+\put(44.49,26){i}
+\put(45.60,26){o}
+\put(46.80,26){n}
+\put(48.46,26){:}
+\put(63.50,26){$+$}
+\put(65.12,26){0}
+\put(66.68,26){.}
+\put(67.72,26){1}
+\put(69.02,26){0}
+\put(70.32,26){9}
+\put(72.81,26){d}
+\put(74.23,26){e}
+\put(75.46,26){g}
+\put(78.08,26){a}
+\put(79.30,26){n}
+\put(80.61,26){d}
+\put(83.53,26){l}
+\put(84.58,26){a}
+\put(86.05,26){t}
+\put(87.23,26){e}
+\put(88.62,26){r}
+\put(89.78,26){a}
+\put(91.32,26){l}
+\put(92.63,26){l}
+\put(93.67,26){y}
+\put(96.49,26){i}
+\put(97.50,26){n}
+\put(98.83,26){v}
+\put(100.23,26){e}
+\put(101.62,26){r}
+\put(102.95,26){t}
+\put(104.13,26){e}
+\put(105.31,26){d}
+\put(-0.19,20){R}
+\put(1.43,20){e}
+\put(2.77,20){f}
+\put(4.03,20){e}
+\put(5.42,20){r}
+\put(6.63,20){e}
+\put(7.80,20){n}
+\put(9.23,20){c}
+\put(10.53,20){e}
+\put(13.21,20){s}
+\put(14.55,20){t}
+\put(15.68,20){a}
+\put(17.12,20){r}
+\put(18.41,20){s}
+\put(19.86,20){:}
+\put(36.01,18){M}
+\put(37.83,18){e}
+\put(39.08,18){a}
+\put(40.30,18){n}
+\put(42.70,18){R}
+\put(44,18){A}
+\put(45.79,18){,}
+\put(46.64,18){D}
+\put(48.23,18){e}
+\put(49.53,18){c}
+\put(62.30,18){E}
+\put(63.73,18){q}
+\put(65.01,18){u}
+\put(66.59,18){i}
+\put(67.60,18){n}
+\put(69,18){o}
+\put(70.23,18){x}
+\put(72.67,18){B}
+\put(74.22,18){1}
+\put(75.52,18){9}
+\put(76.82,18){5}
+\put(78.12,18){0}
+\put(79.68,18){.}
+\put(80.72,18){0}
+\put(89.60,18){E}
+\put(91.03,18){p}
+\put(92.40,18){o}
+\put(93.73,18){c}
+\put(94.90,18){h}
+\put(97.37,18){B}
+\put(98.92,18){1}
+\put(100.22,18){9}
+\put(101.52,18){7}
+\put(102.82,18){4}
+\put(104.38,18){.}
+\put(105.42,18){5}
+\put(106.72,18){0}
+\put(108.02,18){0}
+\put(123.30,18){R}
+\put(124.93,18){e}
+\put(126.31,18){s}
+\put(127.69,18){i}
+\put(128.71,18){d}
+\put(130.01,18){u}
+\put(131.38,18){a}
+\put(132.93,18){l}
+\put(134.11,18){s}
+\put(136.66,18){(}
+\put(137.88,18){a}
+\put(139.32,18){r}
+\put(140.53,18){c}
+\put(141.91,18){s}
+\put(143.13,18){e}
+\put(144.43,18){c}
+\put(145.86,18){)}
+\put(19.50,16){n}
+\put(46.93,16){c}
+\put(48.18,16){a}
+\put(49.65,16){t}
+\put(50.78,16){a}
+\put(52.32,16){l}
+\put(53.40,16){o}
+\put(54.66,16){g}
+\put(55.91,16){u}
+\put(57.33,16){e}
+\put(85.93,16){c}
+\put(87.18,16){a}
+\put(88.72,16){l}
+\put(89.83,16){c}
+\put(91.01,16){u}
+\put(92.63,16){l}
+\put(93.68,16){a}
+\put(95.15,16){t}
+\put(96.33,16){e}
+\put(97.51,16){d}
+\put(120.91,16){d}
+\put(121.98,16){X}
+\put(133.91,16){d}
+\put(134.97,16){Y}
+\put(146.91,16){d}
+\put(148,16){R}
+\put(-0.19,12){R}
+\put(1.43,12){e}
+\put(2.77,12){f}
+\put(5.32,12){1}
+\put(19.62,12){1}
+\put(36.52,12){1}
+\put(37.82,12){8}
+\put(40.42,12){5}
+\put(41.72,12){6}
+\put(44.32,12){3}
+\put(45.62,12){9}
+\put(47.18,12){.}
+\put(48.22,12){4}
+\put(49.52,12){2}
+\put(50.82,12){1}
+\put(54.57,12){$-$}
+\put(56.02,12){6}
+\put(57.32,12){3}
+\put(59.92,12){2}
+\put(61.22,12){5}
+\put(63.82,12){1}
+\put(65.12,12){4}
+\put(66.68,12){.}
+\put(67.72,12){1}
+\put(69.02,12){1}
+\put(75.52,12){1}
+\put(76.82,12){8}
+\put(79.42,12){5}
+\put(80.72,12){6}
+\put(83.32,12){3}
+\put(84.62,12){9}
+\put(86.18,12){.}
+\put(87.22,12){3}
+\put(88.52,12){9}
+\put(89.82,12){5}
+\put(93.57,12){$-$}
+\put(95.02,12){6}
+\put(96.32,12){3}
+\put(98.92,12){2}
+\put(100.22,12){5}
+\put(102.82,12){1}
+\put(104.12,12){4}
+\put(105.68,12){.}
+\put(106.72,12){2}
+\put(108.02,12){2}
+\put(116.97,12){$-$}
+\put(118.42,12){0}
+\put(119.98,12){.}
+\put(121.02,12){1}
+\put(122.32,12){7}
+\put(123.62,12){4}
+\put(129.97,12){$-$}
+\put(131.42,12){0}
+\put(132.98,12){.}
+\put(134.02,12){1}
+\put(135.32,12){1}
+\put(136.62,12){2}
+\put(144.42,12){0}
+\put(145.98,12){.}
+\put(147.02,12){2}
+\put(148.32,12){0}
+\put(149.62,12){7}
+\put(-0.19,10){R}
+\put(1.43,10){e}
+\put(2.77,10){f}
+\put(5.32,10){2}
+\put(19.62,10){2}
+\put(36.52,10){1}
+\put(37.82,10){9}
+\put(40.42,10){1}
+\put(41.72,10){1}
+\put(44.32,10){5}
+\put(45.62,10){4}
+\put(47.18,10){.}
+\put(48.22,10){0}
+\put(49.52,10){5}
+\put(50.82,10){1}
+\put(54.57,10){$-$}
+\put(56.02,10){6}
+\put(57.32,10){3}
+\put(59.92,10){1}
+\put(61.22,10){7}
+\put(63.82,10){5}
+\put(65.12,10){8}
+\put(66.68,10){.}
+\put(67.72,10){6}
+\put(69.02,10){5}
+\put(75.52,10){1}
+\put(76.82,10){9}
+\put(79.42,10){1}
+\put(80.72,10){1}
+\put(83.32,10){5}
+\put(84.62,10){4}
+\put(86.18,10){.}
+\put(87.22,10){0}
+\put(88.52,10){3}
+\put(89.82,10){1}
+\put(93.57,10){$-$}
+\put(95.02,10){6}
+\put(96.32,10){3}
+\put(98.92,10){1}
+\put(100.22,10){7}
+\put(102.82,10){5}
+\put(104.12,10){8}
+\put(105.68,10){.}
+\put(106.72,10){7}
+\put(108.02,10){0}
+\put(116.97,10){$-$}
+\put(118.42,10){0}
+\put(119.98,10){.}
+\put(121.02,10){1}
+\put(122.32,10){3}
+\put(123.62,10){4}
+\put(129.97,10){$-$}
+\put(131.42,10){0}
+\put(132.98,10){.}
+\put(134.02,10){0}
+\put(135.32,10){4}
+\put(136.62,10){7}
+\put(144.42,10){0}
+\put(145.98,10){.}
+\put(147.02,10){1}
+\put(148.32,10){4}
+\put(149.62,10){2}
+\put(-0.19,8){R}
+\put(1.43,8){e}
+\put(2.77,8){f}
+\put(5.32,8){3}
+\put(19.62,8){3}
+\put(36.52,8){1}
+\put(37.82,8){9}
+\put(40.42,8){0}
+\put(41.72,8){1}
+\put(44.32,8){1}
+\put(45.62,8){3}
+\put(47.18,8){.}
+\put(48.22,8){6}
+\put(49.52,8){5}
+\put(50.82,8){5}
+\put(54.57,8){$-$}
+\put(56.02,8){6}
+\put(57.32,8){3}
+\put(59.92,8){4}
+\put(61.22,8){9}
+\put(63.82,8){1}
+\put(65.12,8){5}
+\put(66.68,8){.}
+\put(67.72,8){4}
+\put(69.02,8){8}
+\put(75.52,8){1}
+\put(76.82,8){9}
+\put(79.42,8){0}
+\put(80.72,8){1}
+\put(83.32,8){1}
+\put(84.62,8){3}
+\put(86.18,8){.}
+\put(87.22,8){6}
+\put(88.52,8){3}
+\put(89.82,8){3}
+\put(93.57,8){$-$}
+\put(95.02,8){6}
+\put(96.32,8){3}
+\put(98.92,8){4}
+\put(100.22,8){9}
+\put(102.82,8){1}
+\put(104.12,8){5}
+\put(105.68,8){.}
+\put(106.72,8){4}
+\put(108.02,8){8}
+\put(116.97,8){$-$}
+\put(118.42,8){0}
+\put(119.98,8){.}
+\put(121.02,8){1}
+\put(122.32,8){4}
+\put(123.62,8){9}
+\put(129.97,8){$-$}
+\put(131.42,8){0}
+\put(132.98,8){.}
+\put(134.02,8){0}
+\put(135.32,8){0}
+\put(136.62,8){6}
+\put(144.42,8){0}
+\put(145.98,8){.}
+\put(147.02,8){1}
+\put(148.32,8){4}
+\put(149.62,8){9}
+\put(-0.19,6){R}
+\put(1.43,6){e}
+\put(2.77,6){f}
+\put(5.32,6){4}
+\put(19.62,6){4}
+\put(36.52,6){1}
+\put(37.82,6){9}
+\put(40.42,6){0}
+\put(41.72,6){8}
+\put(44.32,6){2}
+\put(45.62,6){9}
+\put(47.18,6){.}
+\put(48.22,6){1}
+\put(49.52,6){2}
+\put(50.82,6){7}
+\put(54.57,6){$-$}
+\put(56.02,6){6}
+\put(57.32,6){3}
+\put(59.92,6){5}
+\put(61.22,6){7}
+\put(63.82,6){4}
+\put(65.12,6){2}
+\put(66.68,6){.}
+\put(67.72,6){3}
+\put(69.02,6){5}
+\put(75.52,6){1}
+\put(76.82,6){9}
+\put(79.42,6){0}
+\put(80.72,6){8}
+\put(83.32,6){2}
+\put(84.62,6){9}
+\put(86.18,6){.}
+\put(87.22,6){1}
+\put(88.52,6){3}
+\put(89.82,6){2}
+\put(93.57,6){$-$}
+\put(95.02,6){6}
+\put(96.32,6){3}
+\put(98.92,6){5}
+\put(100.22,6){7}
+\put(102.82,6){4}
+\put(104.12,6){2}
+\put(105.68,6){.}
+\put(106.72,6){3}
+\put(108.02,6){7}
+\put(116.80,6){$+$}
+\put(118.42,6){0}
+\put(119.98,6){.}
+\put(121.02,6){0}
+\put(122.32,6){3}
+\put(123.62,6){4}
+\put(129.97,6){$-$}
+\put(131.42,6){0}
+\put(132.98,6){.}
+\put(134.02,6){0}
+\put(135.32,6){2}
+\put(136.62,6){6}
+\put(144.42,6){0}
+\put(145.98,6){.}
+\put(147.02,6){0}
+\put(148.32,6){4}
+\put(149.62,6){3}
+\put(-0.19,4){R}
+\put(1.43,4){e}
+\put(2.77,4){f}
+\put(5.32,4){5}
+\put(19.62,4){5}
+\put(36.52,4){1}
+\put(37.82,4){9}
+\put(40.42,4){0}
+\put(41.72,4){2}
+\put(44.32,4){1}
+\put(45.62,4){0}
+\put(47.18,4){.}
+\put(48.22,4){1}
+\put(49.52,4){1}
+\put(50.82,4){7}
+\put(54.57,4){$-$}
+\put(56.02,4){6}
+\put(57.32,4){3}
+\put(59.92,4){2}
+\put(61.22,4){9}
+\put(63.82,4){1}
+\put(65.12,4){7}
+\put(66.68,4){.}
+\put(67.72,4){2}
+\put(69.02,4){0}
+\put(75.52,4){1}
+\put(76.82,4){9}
+\put(79.42,4){0}
+\put(80.72,4){2}
+\put(83.32,4){1}
+\put(84.62,4){0}
+\put(86.18,4){.}
+\put(87.22,4){1}
+\put(88.52,4){8}
+\put(89.82,4){1}
+\put(93.57,4){$-$}
+\put(95.02,4){6}
+\put(96.32,4){3}
+\put(98.92,4){2}
+\put(100.22,4){9}
+\put(102.82,4){1}
+\put(104.12,4){7}
+\put(105.68,4){.}
+\put(106.72,4){0}
+\put(108.02,4){1}
+\put(116.80,4){$+$}
+\put(118.42,4){0}
+\put(119.98,4){.}
+\put(121.02,4){4}
+\put(122.32,4){2}
+\put(123.62,4){2}
+\put(129.80,4){$+$}
+\put(131.42,4){0}
+\put(132.98,4){.}
+\put(134.02,4){1}
+\put(135.32,4){9}
+\put(136.62,4){1}
+\put(144.42,4){0}
+\put(145.98,4){.}
+\put(147.02,4){4}
+\put(148.32,4){6}
+\put(149.62,4){3}
+\put(105.10,0){R}
+\put(106.21,0){M}
+\put(107.95,0){S}
+\put(110.86,0){:}
+\put(118.42,0){0}
+\put(119.98,0){.}
+\put(121.02,0){2}
+\put(122.32,0){2}
+\put(123.62,0){4}
+\put(131.42,0){0}
+\put(132.98,0){.}
+\put(134.02,0){1}
+\put(135.32,0){0}
+\put(136.62,0){2}
+\put(144.42,0){0}
+\put(145.98,0){.}
+\put(147.02,0){2}
+\put(148.32,0){4}
+\put(149.62,0){6}
+\end{picture}
+
+\noindent
+\begin{picture}(159.90, 22.00)( -2.60, -4.00)
+\put( -0.65, -2.50){\framebox(158.60, 18.00){}}
+\put(-0.21,12){U}
+\put(1.30,12){n}
+\put(2.63,12){k}
+\put(3.90,12){n}
+\put(5.30,12){o}
+\put(6.33,12){w}
+\put(7.80,12){n}
+\put(10.61,12){s}
+\put(11.95,12){t}
+\put(13.08,12){a}
+\put(14.52,12){r}
+\put(15.81,12){s}
+\put(17.26,12){:}
+\put(23.27,12){B}
+\put(24.82,12){1}
+\put(26.12,12){9}
+\put(27.42,12){5}
+\put(28.72,12){0}
+\put(30.28,12){.}
+\put(31.32,12){0}
+\put(33.51,12){m}
+\put(35.23,12){e}
+\put(36.48,12){a}
+\put(37.70,12){n}
+\put(40.33,12){p}
+\put(41.92,12){l}
+\put(42.98,12){a}
+\put(44.33,12){c}
+\put(45.63,12){e}
+\put(47.01,12){s}
+\put(49.57,12){f}
+\put(50.80,12){o}
+\put(52.22,12){r}
+\put(54.73,12){e}
+\put(55.93,12){p}
+\put(57.30,12){o}
+\put(58.63,12){c}
+\put(59.80,12){h}
+\put(62.27,12){B}
+\put(63.82,12){1}
+\put(65.12,12){9}
+\put(66.42,12){7}
+\put(67.72,12){4}
+\put(69.28,12){.}
+\put(70.32,12){5}
+\put(71.62,12){0}
+\put(72.92,12){0}
+\put(15.96,8){:}
+\put(36.52,8){4}
+\put(37.67,8){$-$}
+\put(39.13,8){c}
+\put(40.40,8){o}
+\put(41.73,8){e}
+\put(43.07,8){f}
+\put(44.37,8){f}
+\put(45.79,8){i}
+\put(46.93,8){c}
+\put(48.39,8){i}
+\put(49.53,8){e}
+\put(50.70,8){n}
+\put(52.25,8){t}
+\put(54.31,8){m}
+\put(56,8){o}
+\put(57.21,8){d}
+\put(58.63,8){e}
+\put(60.12,8){l}
+\put(80.96,8){:}
+\put(102.82,8){6}
+\put(103.97,8){$-$}
+\put(105.43,8){c}
+\put(106.70,8){o}
+\put(108.03,8){e}
+\put(109.37,8){f}
+\put(110.67,8){f}
+\put(112.09,8){i}
+\put(113.23,8){c}
+\put(114.69,8){i}
+\put(115.83,8){e}
+\put(117,8){n}
+\put(118.55,8){t}
+\put(120.61,8){m}
+\put(122.30,8){o}
+\put(123.51,8){d}
+\put(124.93,8){e}
+\put(126.42,8){l}
+\put(148.56,8){:}
+\put(15.96,6){:}
+\put(20.58,6){X}
+\put(21.81,6){m}
+\put(23.53,6){e}
+\put(24.78,6){a}
+\put(26.21,6){s}
+\put(32.27,6){Y}
+\put(33.51,6){m}
+\put(35.23,6){e}
+\put(36.48,6){a}
+\put(37.91,6){s}
+\put(51.80,6){R}
+\put(53.10,6){A}
+\put(70.04,6){D}
+\put(71.63,6){e}
+\put(72.93,6){c}
+\put(80.96,6){:}
+\put(85.58,6){X}
+\put(86.81,6){m}
+\put(88.53,6){e}
+\put(89.78,6){a}
+\put(91.21,6){s}
+\put(97.27,6){Y}
+\put(98.51,6){m}
+\put(100.23,6){e}
+\put(101.48,6){a}
+\put(102.91,6){s}
+\put(116.80,6){R}
+\put(118.10,6){A}
+\put(136.34,6){D}
+\put(137.93,6){e}
+\put(139.23,6){c}
+\put(148.56,6){:}
+\put(15.96,4){:}
+\put(80.96,4){:}
+\put(148.56,4){:}
+\put(-0.13,2){C}
+\put(1.38,2){a}
+\put(2.60,2){n}
+\put(3.91,2){d}
+\put(5.49,2){i}
+\put(6.51,2){d}
+\put(7.88,2){a}
+\put(9.35,2){t}
+\put(10.53,2){e}
+\put(15.96,2){:}
+\put(20.77,2){$-$}
+\put(22.22,2){5}
+\put(23.78,2){.}
+\put(24.82,2){1}
+\put(26.12,2){0}
+\put(27.42,2){3}
+\put(31,2){$+$}
+\put(32.62,2){5}
+\put(33.92,2){8}
+\put(35.48,2){.}
+\put(36.52,2){8}
+\put(37.82,2){6}
+\put(39.12,2){8}
+\put(41.57,2){$-$}
+\put(42.78,2){$>$}
+\put(45.62,2){1}
+\put(46.92,2){9}
+\put(49.52,2){0}
+\put(50.82,2){5}
+\put(53.42,2){0}
+\put(54.72,2){1}
+\put(56.28,2){.}
+\put(57.32,2){6}
+\put(58.62,2){9}
+\put(59.92,2){7}
+\put(63.67,2){$-$}
+\put(65.12,2){6}
+\put(66.42,2){3}
+\put(69.02,2){5}
+\put(70.32,2){6}
+\put(72.92,2){1}
+\put(74.22,2){7}
+\put(75.78,2){.}
+\put(76.82,2){1}
+\put(78.12,2){3}
+\put(80.96,2){:}
+\put(85.77,2){$-$}
+\put(87.22,2){5}
+\put(88.78,2){.}
+\put(89.82,2){1}
+\put(91.12,2){0}
+\put(92.42,2){3}
+\put(96,2){$+$}
+\put(97.62,2){5}
+\put(98.92,2){8}
+\put(100.48,2){.}
+\put(101.52,2){8}
+\put(102.82,2){6}
+\put(104.12,2){8}
+\put(106.57,2){$-$}
+\put(107.78,2){$>$}
+\put(110.62,2){1}
+\put(111.92,2){9}
+\put(114.52,2){0}
+\put(115.82,2){5}
+\put(118.42,2){0}
+\put(119.72,2){1}
+\put(121.28,2){.}
+\put(122.32,2){7}
+\put(123.62,2){9}
+\put(124.92,2){4}
+\put(126.22,2){2}
+\put(129.97,2){$-$}
+\put(131.42,2){6}
+\put(132.72,2){3}
+\put(135.32,2){5}
+\put(136.62,2){6}
+\put(139.22,2){1}
+\put(140.52,2){6}
+\put(142.08,2){.}
+\put(143.12,2){7}
+\put(144.42,2){0}
+\put(145.72,2){2}
+\put(148.56,2){:}
+\put(-0.19,0){R}
+\put(1.38,0){a}
+\put(2.61,0){d}
+\put(4.19,0){i}
+\put(5.30,0){o}
+\put(7.83,0){p}
+\put(9.20,0){o}
+\put(10.61,0){s}
+\put(15.96,0){:}
+\put(20.77,0){$-$}
+\put(22.22,0){5}
+\put(23.78,0){.}
+\put(24.82,0){1}
+\put(26.12,0){2}
+\put(27.42,0){0}
+\put(31,0){$+$}
+\put(32.62,0){5}
+\put(33.92,0){8}
+\put(35.48,0){.}
+\put(36.52,0){8}
+\put(37.82,0){6}
+\put(39.12,0){2}
+\put(41.48,0){$<$}
+\put(42.87,0){$-$}
+\put(45.62,0){1}
+\put(46.92,0){9}
+\put(49.52,0){0}
+\put(50.82,0){5}
+\put(53.42,0){0}
+\put(54.72,0){1}
+\put(56.28,0){.}
+\put(57.32,0){8}
+\put(58.62,0){7}
+\put(59.92,0){4}
+\put(63.67,0){$-$}
+\put(65.12,0){6}
+\put(66.42,0){3}
+\put(69.02,0){5}
+\put(70.32,0){6}
+\put(72.92,0){1}
+\put(74.22,0){7}
+\put(75.78,0){.}
+\put(76.82,0){5}
+\put(78.12,0){4}
+\put(80.96,0){:}
+\put(85.77,0){$-$}
+\put(87.22,0){5}
+\put(88.78,0){.}
+\put(89.82,0){1}
+\put(91.12,0){1}
+\put(92.42,0){1}
+\put(96,0){$+$}
+\put(97.62,0){5}
+\put(98.92,0){8}
+\put(100.48,0){.}
+\put(101.52,0){8}
+\put(102.82,0){5}
+\put(104.12,0){6}
+\put(106.48,0){$<$}
+\put(107.87,0){$-$}
+\put(110.62,0){1}
+\put(111.92,0){9}
+\put(114.52,0){0}
+\put(115.82,0){5}
+\put(118.42,0){0}
+\put(119.72,0){1}
+\put(121.28,0){.}
+\put(122.32,0){8}
+\put(123.62,0){7}
+\put(124.92,0){4}
+\put(126.22,0){1}
+\put(129.97,0){$-$}
+\put(131.42,0){6}
+\put(132.72,0){3}
+\put(135.32,0){5}
+\put(136.62,0){6}
+\put(139.22,0){1}
+\put(140.52,0){7}
+\put(142.08,0){.}
+\put(143.12,0){5}
+\put(144.42,0){3}
+\put(145.72,0){9}
+\put(148.56,0){:}
+\end{picture}
+ 
+\end{tiny}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\vspace{20mm}
+
+The residuals \verb|dX| and \verb|dY| are, loosely, in
+{\it standard coordinates}; except at the poles,
+positive \verb|dX| means
+that the measured position of the image lies to the east of the
+expected position, and positive \verb|dY| means that the measured position
+lies to the north of the expected position.
+
+If a 7-9 coefficient fit is requested, and providing there are at
+least ten reference stars, an extra section of report precedes the
+unknowns.  If the fit is successful, the two solutions used to process
+the unknown stars are the 6 and 7-9 coefficient ones, and the
+4-coefficient model is not used.
+
+\pagebreak
+{\bf APPENDIX C -- Effective Wavelengths}
+\vspace{5mm}
+
+Most ASTROM reductions work in mean \radec\ of date, absorbing
+various small rotations and distortions of the field into the
+fit.  This normally delivers results of adequate accuracy.
+However, for slightly improved accuracy, especially at low
+elevations and with wide fields, ASTROM can optionally be supplied with
+additional information (an accurate date and time,
+observatory location, {\it etc.}) to enable reduction in
+{\it observed}\, place.  The further possibility is then
+available of correcting for atmospheric dispersion, by
+supplying effective colours for the reference and unknown stars;
+this can sometimes be important.
+
+The following tables estimate the effective wavelength for different
+spectral types and detector/filter passbands.  The figures given are the
+median wavelength of the appropriate blackbody spectrum within the
+specified band, and are thus only a very rough guide.  Some detectors
+peak strongly; some filters leak outside their nominal
+passband; both may roll off gradually at the edges of the passband;
+some stellar spectra have pronounced absorption or emission
+features.
+
+The tables cover blue cutoffs from 320~nm and red cutoffs up to 800~nm,
+in steps of 20~nm and with a minimum passband of 100~nm, for 13
+colour temperatures.  B$-$V and U$-$V colours and
+the nearest main-sequence spectral types are also given, as listed
+in Table~99 of {\it Astrophysical Quantities}.
+
+For any given exposure, only one line in the tables will be
+needed, corresponding to the spectral response of the detector plus
+filter used.  The appropriate effective wavelength for any star in
+the exposure can then be found by looking in the appropriate
+column.
+
+\clearpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% LaTeX source generated by program EWLLTX %
+%  P.T.Wallace   Starlink   17 March 1989  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{tiny}
+
+\noindent
+\begin{center}
+\begin{tabular}{|c|c
+@{\hspace{2ex}}c
+@{\hspace{2ex}}c
+@{\hspace{2ex}}c
+@{\hspace{2ex}}c
+@{\hspace{2ex}}c
+@{\hspace{2ex}}c
+@{\hspace{2ex}}c
+@{\hspace{2ex}}c
+@{\hspace{2ex}}c
+@{\hspace{2ex}}c
+@{\hspace{2ex}}c
+@{\hspace{2ex}}c|l}
+\cline{1-14}
+Band
+&  3000
+&  3800
+&  4500
+&  5400
+&  6000
+&  6700
+&  7600
+&  9000
+& 11100
+& 15400
+& 23000
+& 38000
+& 70000
+& T$_c$ ($^\circ$K) \\
+\cline{1-14}
+320-420 & 392 & 386 & 382 & 377 & 375 & 373 & 371 & 368 & 365 & 362 & 360 & 359 & 358 & \\
+320-440 & 408 & 400 & 395 & 389 & 386 & 383 & 380 & 377 & 373 & 369 & 366 & 364 & 363 & \\
+320-460 & 424 & 415 & 408 & 401 & 397 & 394 & 390 & 385 & 381 & 375 & 372 & 369 & 367 & \\
+320-480 & 440 & 430 & 422 & 413 & 408 & 404 & 399 & 393 & 387 & 381 & 377 & 373 & 371 & \\
+320-500 & 456 & 444 & 435 & 424 & 419 & 413 & 407 & 401 & 394 & 387 & 381 & 377 & 375 & \\
+320-520 & 472 & 458 & 448 & 436 & 429 & 423 & 416 & 408 & 400 & 391 & 385 & 381 & 378 & \\
+320-540 & 488 & 472 & 460 & 447 & 439 & 432 & 424 & 415 & 406 & 396 & 389 & 384 & 381 & \\
+320-560 & 503 & 486 & 473 & 457 & 449 & 441 & 432 & 421 & 411 & 400 & 392 & 387 & 384 & \\
+320-580 & 519 & 500 & 485 & 468 & 458 & 449 & 439 & 428 & 416 & 404 & 395 & 389 & 386 & \\
+320-600 & 534 & 513 & 497 & 478 & 468 & 457 & 446 & 434 & 421 & 408 & 398 & 392 & 388 & \\
+320-620 & 549 & 527 & 508 & 488 & 476 & 465 & 453 & 439 & 426 & 411 & 401 & 394 & 390 & \\
+320-640 & 563 & 540 & 520 & 498 & 485 & 473 & 459 & 444 & 430 & 414 & 403 & 396 & 391 & \\
+320-660 & 578 & 552 & 531 & 507 & 493 & 480 & 466 & 449 & 434 & 417 & 405 & 397 & 393 & \\
+320-680 & 592 & 565 & 542 & 516 & 501 & 487 & 472 & 454 & 437 & 419 & 407 & 399 & 394 & \\
+320-700 & 607 & 577 & 552 & 525 & 509 & 493 & 477 & 459 & 441 & 422 & 409 & 400 & 395 & \\
+320-720 & 620 & 589 & 563 & 533 & 516 & 500 & 482 & 463 & 444 & 424 & 410 & 402 & 396 & \\
+320-740 & 634 & 601 & 573 & 541 & 523 & 506 & 488 & 467 & 447 & 426 & 412 & 403 & 397 & \\
+320-760 & 648 & 612 & 582 & 549 & 530 & 512 & 492 & 470 & 450 & 428 & 413 & 404 & 398 & \\
+320-780 & 661 & 623 & 592 & 557 & 537 & 517 & 497 & 474 & 452 & 430 & 414 & 405 & 399 & \\
+320-800 & 674 & 634 & 601 & 564 & 543 & 522 & 501 & 799 & 799 & 799 & 799 & 799 & 799 & \\
+340-440 & 410 & 404 & 400 & 396 & 394 & 392 & 390 & 387 & 385 & 382 & 380 & 379 & 378 & \\
+340-460 & 426 & 418 & 413 & 407 & 405 & 402 & 399 & 396 & 393 & 389 & 387 & 385 & 383 & \\
+340-480 & 441 & 432 & 426 & 419 & 415 & 412 & 408 & 404 & 400 & 396 & 392 & 390 & 388 & \\
+340-500 & 457 & 446 & 438 & 430 & 426 & 421 & 417 & 412 & 407 & 401 & 397 & 394 & 393 & \\
+340-520 & 473 & 460 & 451 & 441 & 436 & 431 & 426 & 419 & 413 & 407 & 402 & 398 & 396 & \\
+340-540 & 488 & 474 & 464 & 452 & 446 & 440 & 434 & 427 & 420 & 412 & 406 & 402 & 400 & \\
+340-560 & 504 & 488 & 476 & 463 & 456 & 449 & 442 & 433 & 425 & 416 & 410 & 405 & 403 & \\
+340-580 & 519 & 502 & 488 & 473 & 465 & 457 & 449 & 440 & 431 & 421 & 413 & 408 & 406 & \\
+340-600 & 534 & 515 & 500 & 483 & 474 & 465 & 456 & 446 & 436 & 425 & 417 & 411 & 408 & \\
+340-620 & 549 & 528 & 511 & 493 & 483 & 473 & 463 & 452 & 440 & 428 & 419 & 414 & 410 & \\
+340-640 & 564 & 541 & 523 & 503 & 492 & 481 & 470 & 457 & 445 & 432 & 422 & 416 & 412 & \\
+340-660 & 578 & 554 & 534 & 512 & 500 & 488 & 476 & 462 & 449 & 435 & 425 & 418 & 414 & \\
+340-680 & 593 & 566 & 545 & 521 & 508 & 495 & 482 & 467 & 453 & 438 & 427 & 420 & 416 & \\
+340-700 & 607 & 578 & 555 & 530 & 516 & 502 & 488 & 472 & 456 & 440 & 429 & 421 & 417 & \\
+340-720 & 621 & 590 & 565 & 538 & 523 & 508 & 493 & 476 & 460 & 443 & 431 & 423 & 418 & \\
+340-740 & 634 & 602 & 575 & 546 & 530 & 515 & 498 & 480 & 463 & 445 & 433 & 424 & 420 & \\
+340-760 & 648 & 613 & 585 & 554 & 537 & 520 & 503 & 484 & 466 & 447 & 434 & 426 & 421 & \\
+340-780 & 661 & 624 & 595 & 562 & 544 & 526 & 508 & 488 & 469 & 449 & 436 & 427 & 422 & \\
+340-800 & 674 & 635 & 603 & 569 & 550 & 531 & 512 & 799 & 799 & 799 & 799 & 799 & 799 & \\
+360-460 & 428 & 422 & 418 & 415 & 413 & 411 & 409 & 407 & 405 & 402 & 401 & 399 & 399 & \\
+360-480 & 443 & 436 & 431 & 426 & 423 & 421 & 418 & 415 & 412 & 409 & 407 & 405 & 404 & \\
+360-500 & 459 & 450 & 443 & 437 & 434 & 430 & 427 & 423 & 420 & 416 & 413 & 410 & 409 & \\
+360-520 & 474 & 463 & 456 & 448 & 444 & 440 & 436 & 431 & 427 & 422 & 418 & 415 & 414 & \\
+360-540 & 490 & 477 & 468 & 459 & 454 & 449 & 444 & 438 & 433 & 427 & 423 & 419 & 418 & \\
+360-560 & 505 & 491 & 480 & 469 & 463 & 458 & 452 & 445 & 439 & 432 & 427 & 423 & 421 & \\
+360-580 & 520 & 504 & 492 & 479 & 473 & 466 & 460 & 452 & 445 & 437 & 431 & 427 & 424 & \\
+360-600 & 535 & 517 & 504 & 489 & 482 & 475 & 467 & 458 & 450 & 441 & 435 & 430 & 427 & \\
+360-620 & 550 & 530 & 515 & 499 & 491 & 482 & 474 & 464 & 455 & 445 & 438 & 433 & 430 & \\
+360-640 & 564 & 543 & 526 & 509 & 499 & 490 & 481 & 470 & 460 & 449 & 441 & 436 & 432 & \\
+360-660 & 579 & 555 & 537 & 518 & 508 & 497 & 487 & 476 & 464 & 452 & 444 & 438 & 434 & \\
+360-680 & 593 & 568 & 548 & 527 & 516 & 505 & 493 & 481 & 469 & 456 & 446 & 440 & 436 & \\
+360-700 & 607 & 580 & 558 & 536 & 523 & 511 & 499 & 486 & 472 & 459 & 449 & 442 & 438 & \\
+360-720 & 621 & 592 & 569 & 544 & 531 & 518 & 505 & 490 & 476 & 461 & 451 & 444 & 440 & \\
+360-740 & 635 & 603 & 579 & 552 & 538 & 524 & 510 & 494 & 480 & 464 & 453 & 446 & 441 & \\
+360-760 & 648 & 615 & 588 & 560 & 545 & 530 & 515 & 499 & 483 & 466 & 455 & 447 & 443 & \\
+360-780 & 662 & 626 & 598 & 568 & 551 & 536 & 520 & 502 & 486 & 468 & 456 & 448 & 444 & \\
+360-800 & 674 & 636 & 607 & 575 & 558 & 541 & 524 & 799 & 799 & 799 & 799 & 799 & 799 & \\
+380-480 & 446 & 441 & 437 & 434 & 432 & 430 & 428 & 427 & 425 & 423 & 421 & 420 & 419 & \\
+380-500 & 461 & 454 & 449 & 444 & 442 & 440 & 437 & 435 & 432 & 429 & 427 & 426 & 425 & \\
+380-520 & 476 & 467 & 461 & 455 & 452 & 449 & 446 & 443 & 440 & 436 & 433 & 431 & 430 & \\
+380-540 & 491 & 481 & 473 & 466 & 462 & 458 & 455 & 450 & 446 & 442 & 438 & 436 & 435 & \\
+380-560 & 506 & 494 & 485 & 476 & 472 & 467 & 463 & 458 & 453 & 447 & 443 & 440 & 439 & \\
+380-580 & 521 & 507 & 497 & 486 & 481 & 476 & 471 & 465 & 459 & 452 & 448 & 444 & 443 & \\
+380-600 & 536 & 520 & 508 & 496 & 490 & 484 & 478 & 471 & 465 & 457 & 452 & 448 & 446 & \\
+380-620 & 551 & 533 & 520 & 506 & 499 & 492 & 485 & 477 & 470 & 462 & 456 & 452 & 449 & \\
+380-640 & 565 & 545 & 531 & 516 & 508 & 500 & 492 & 483 & 475 & 466 & 459 & 455 & 452 & \\
+380-660 & 580 & 558 & 542 & 525 & 516 & 507 & 499 & 489 & 480 & 470 & 462 & 457 & 454 & \\
+380-680 & 594 & 570 & 552 & 534 & 524 & 515 & 505 & 494 & 484 & 473 & 465 & 460 & 457 & \\
+380-700 & 608 & 582 & 563 & 542 & 532 & 521 & 511 & 499 & 488 & 476 & 468 & 462 & 459 & \\
+380-720 & 622 & 594 & 573 & 551 & 539 & 528 & 517 & 504 & 492 & 480 & 470 & 464 & 461 & \\
+380-740 & 636 & 606 & 583 & 559 & 546 & 534 & 522 & 509 & 496 & 482 & 473 & 466 & 462 & \\
+380-760 & 649 & 617 & 592 & 567 & 553 & 540 & 528 & 513 & 499 & 485 & 475 & 468 & 464 & \\
+380-780 & 662 & 628 & 602 & 575 & 560 & 546 & 533 & 517 & 503 & 488 & 477 & 470 & 465 & \\
+380-800 & 675 & 638 & 611 & 582 & 566 & 552 & 537 & 799 & 799 & 799 & 799 & 799 & 799 & \\
+400-500 & 464 & 459 & 456 & 453 & 451 & 450 & 448 & 446 & 445 & 443 & 441 & 440 & 440 & \\
+400-520 & 479 & 472 & 468 & 463 & 461 & 459 & 457 & 455 & 452 & 450 & 448 & 446 & 445 & \\
+400-540 & 494 & 485 & 479 & 474 & 471 & 468 & 465 & 462 & 459 & 456 & 454 & 452 & 451 & \\
+400-560 & 508 & 498 & 491 & 484 & 480 & 477 & 474 & 470 & 466 & 462 & 459 & 457 & 455 & \\
+400-580 & 523 & 511 & 502 & 494 & 490 & 486 & 482 & 477 & 473 & 468 & 464 & 461 & 460 & \\
+400-600 & 538 & 524 & 514 & 504 & 499 & 494 & 489 & 484 & 479 & 473 & 469 & 466 & 464 & \\
+400-620 & 552 & 536 & 525 & 514 & 508 & 502 & 497 & 490 & 484 & 478 & 473 & 469 & 467 & \\
+400-640 & 567 & 549 & 536 & 523 & 517 & 510 & 504 & 497 & 490 & 482 & 477 & 473 & 471 & \\
+400-660 & 581 & 561 & 547 & 532 & 525 & 518 & 511 & 503 & 495 & 486 & 480 & 476 & 474 & \\
+400-680 & 595 & 573 & 557 & 541 & 533 & 525 & 517 & 508 & 500 & 490 & 484 & 479 & 476 & \\
+400-700 & 609 & 585 & 568 & 550 & 541 & 532 & 523 & 513 & 504 & 494 & 487 & 482 & 479 & \\
+\cline{1-14}
+nm & M5
+& M0
+& K5
+& K0
+& G5
+& G0
+& F5
+& F0
+& A5
+& A0
+& B5
+& B0
+& O5 & \\
+& $+1.61$
+& $+1.39$
+& $+1.11$
+& $+0.84$
+& $+0.70$
+& $+0.57$
+& $+0.45$
+& $+0.30$
+& $+0.16$
+& $0.00$ 
+& $-0.17$
+& $-0.31$
+& $-0.45$ & B$-$V \\
+& $+1.19$
+& $+1.24$
+& $+1.06$
+& $+0.46$
+& $+0.20$
+& $+0.04$
+& $-0.01$
+& $+0.02$
+& $+0.09$
+& $0.00$ 
+& $-0.56$
+& $-1.07$
+& $-1.20$ & U$-$B \\
+\cline{1-14}
+\end{tabular}
+\end{center}
+\clearpage
+
+\noindent
+\begin{center}
+\begin{tabular}{|c|c
+@{\hspace{2ex}}c
+@{\hspace{2ex}}c
+@{\hspace{2ex}}c
+@{\hspace{2ex}}c
+@{\hspace{2ex}}c
+@{\hspace{2ex}}c
+@{\hspace{2ex}}c
+@{\hspace{2ex}}c
+@{\hspace{2ex}}c
+@{\hspace{2ex}}c
+@{\hspace{2ex}}c
+@{\hspace{2ex}}c|l}
+\cline{1-14}
+Band
+&  3000
+&  3800
+&  4500
+&  5400
+&  6000
+&  6700
+&  7600
+&  9000
+& 11100
+& 15400
+& 23000
+& 38000
+& 70000
+& T$_c$ ($^\circ$K) \\
+\cline{1-14}
+400-720 & 623 & 597 & 578 & 558 & 548 & 539 & 529 & 519 & 508 & 497 & 490 & 484 & 481 & \\
+400-740 & 637 & 608 & 588 & 567 & 556 & 545 & 535 & 523 & 512 & 501 & 492 & 486 & 483 & \\
+400-760 & 650 & 620 & 597 & 575 & 563 & 551 & 540 & 528 & 516 & 504 & 495 & 489 & 485 & \\
+400-780 & 663 & 631 & 607 & 582 & 569 & 557 & 545 & 532 & 520 & 506 & 497 & 490 & 487 & \\
+400-800 & 676 & 641 & 615 & 589 & 576 & 563 & 550 & 799 & 799 & 799 & 799 & 799 & 799 & \\
+420-520 & 483 & 478 & 475 & 472 & 470 & 469 & 468 & 466 & 464 & 463 & 461 & 461 & 460 & \\
+420-540 & 497 & 490 & 486 & 482 & 480 & 478 & 476 & 474 & 472 & 470 & 468 & 467 & 466 & \\
+420-560 & 511 & 503 & 498 & 492 & 490 & 487 & 485 & 482 & 479 & 476 & 474 & 472 & 471 & \\
+420-580 & 526 & 516 & 509 & 502 & 499 & 496 & 493 & 490 & 486 & 482 & 480 & 478 & 476 & \\
+420-600 & 540 & 528 & 520 & 512 & 508 & 505 & 501 & 497 & 493 & 488 & 485 & 482 & 481 & \\
+420-620 & 555 & 541 & 531 & 522 & 517 & 513 & 508 & 503 & 499 & 493 & 489 & 487 & 485 & \\
+420-640 & 569 & 553 & 542 & 531 & 526 & 521 & 516 & 510 & 504 & 498 & 494 & 491 & 489 & \\
+420-660 & 583 & 565 & 553 & 541 & 534 & 529 & 523 & 516 & 510 & 503 & 498 & 494 & 492 & \\
+420-680 & 597 & 577 & 563 & 550 & 543 & 536 & 529 & 522 & 515 & 507 & 502 & 498 & 495 & \\
+420-700 & 611 & 589 & 573 & 558 & 550 & 543 & 536 & 528 & 520 & 511 & 505 & 501 & 498 & \\
+420-720 & 624 & 601 & 584 & 567 & 558 & 550 & 542 & 533 & 524 & 515 & 508 & 504 & 501 & \\
+420-740 & 638 & 612 & 593 & 575 & 565 & 557 & 548 & 538 & 528 & 518 & 511 & 506 & 503 & \\
+420-760 & 651 & 623 & 603 & 583 & 573 & 563 & 553 & 543 & 532 & 522 & 514 & 509 & 505 & \\
+420-780 & 664 & 634 & 612 & 591 & 579 & 569 & 559 & 547 & 536 & 525 & 516 & 511 & 507 & \\
+420-800 & 677 & 644 & 621 & 598 & 586 & 575 & 563 & 799 & 799 & 799 & 799 & 799 & 799 & \\
+440-540 & 502 & 497 & 494 & 491 & 490 & 489 & 487 & 486 & 484 & 483 & 482 & 481 & 480 & \\
+440-560 & 515 & 509 & 505 & 501 & 499 & 498 & 496 & 494 & 492 & 490 & 488 & 487 & 486 & \\
+440-580 & 529 & 521 & 516 & 511 & 509 & 507 & 504 & 502 & 499 & 497 & 494 & 493 & 492 & \\
+440-600 & 543 & 534 & 527 & 521 & 518 & 515 & 512 & 509 & 506 & 503 & 500 & 498 & 497 & \\
+440-620 & 557 & 546 & 538 & 531 & 527 & 524 & 520 & 516 & 513 & 508 & 505 & 503 & 502 & \\
+440-640 & 571 & 558 & 549 & 540 & 536 & 532 & 528 & 523 & 519 & 514 & 510 & 508 & 506 & \\
+440-660 & 585 & 570 & 559 & 549 & 544 & 540 & 535 & 530 & 524 & 519 & 515 & 512 & 510 & \\
+440-680 & 599 & 582 & 570 & 558 & 553 & 547 & 542 & 536 & 530 & 524 & 519 & 516 & 514 & \\
+440-700 & 613 & 593 & 580 & 567 & 561 & 554 & 548 & 542 & 535 & 528 & 523 & 519 & 517 & \\
+440-720 & 626 & 605 & 590 & 576 & 568 & 561 & 555 & 547 & 540 & 532 & 526 & 522 & 520 & \\
+440-740 & 640 & 616 & 600 & 584 & 576 & 568 & 561 & 552 & 544 & 536 & 530 & 525 & 523 & \\
+440-760 & 653 & 627 & 609 & 592 & 583 & 575 & 566 & 557 & 549 & 539 & 533 & 528 & 525 & \\
+440-780 & 666 & 638 & 619 & 600 & 590 & 581 & 572 & 562 & 553 & 543 & 535 & 530 & 527 & \\
+440-800 & 678 & 648 & 627 & 607 & 596 & 587 & 577 & 799 & 799 & 799 & 799 & 799 & 799 & \\
+460-560 & 520 & 516 & 513 & 511 & 509 & 508 & 507 & 506 & 504 & 503 & 502 & 501 & 501 & \\
+460-580 & 534 & 528 & 524 & 521 & 519 & 517 & 516 & 514 & 512 & 510 & 509 & 508 & 507 & \\
+460-600 & 547 & 540 & 535 & 530 & 528 & 526 & 524 & 522 & 519 & 517 & 515 & 513 & 513 & \\
+460-620 & 561 & 552 & 546 & 540 & 537 & 535 & 532 & 529 & 526 & 523 & 521 & 519 & 518 & \\
+460-640 & 575 & 564 & 556 & 549 & 546 & 543 & 540 & 536 & 533 & 529 & 526 & 524 & 523 & \\
+460-660 & 588 & 575 & 567 & 559 & 555 & 551 & 547 & 543 & 539 & 534 & 531 & 529 & 527 & \\
+460-680 & 602 & 587 & 577 & 568 & 563 & 559 & 554 & 549 & 545 & 539 & 536 & 533 & 531 & \\
+460-700 & 616 & 599 & 587 & 576 & 571 & 566 & 561 & 555 & 550 & 544 & 540 & 537 & 535 & \\
+460-720 & 629 & 610 & 597 & 585 & 579 & 573 & 567 & 561 & 555 & 549 & 544 & 540 & 538 & \\
+460-740 & 642 & 621 & 607 & 593 & 586 & 580 & 574 & 567 & 560 & 553 & 547 & 544 & 541 & \\
+460-760 & 655 & 632 & 616 & 601 & 594 & 587 & 580 & 572 & 565 & 557 & 551 & 547 & 544 & \\
+460-780 & 668 & 643 & 626 & 609 & 601 & 593 & 585 & 577 & 569 & 560 & 554 & 550 & 547 & \\
+460-800 & 681 & 653 & 634 & 616 & 607 & 599 & 591 & 799 & 799 & 799 & 799 & 799 & 799 & \\
+480-580 & 539 & 535 & 533 & 530 & 529 & 528 & 527 & 526 & 524 & 523 & 522 & 521 & 521 & \\
+480-600 & 552 & 547 & 543 & 540 & 538 & 537 & 535 & 534 & 532 & 530 & 529 & 528 & 527 & \\
+480-620 & 566 & 558 & 554 & 550 & 547 & 546 & 544 & 541 & 539 & 537 & 535 & 534 & 533 & \\
+480-640 & 579 & 570 & 564 & 559 & 556 & 554 & 552 & 549 & 546 & 543 & 541 & 540 & 539 & \\
+480-660 & 592 & 582 & 575 & 568 & 565 & 562 & 559 & 556 & 553 & 549 & 547 & 545 & 544 & \\
+480-680 & 606 & 593 & 585 & 577 & 574 & 570 & 567 & 563 & 559 & 555 & 552 & 549 & 548 & \\
+480-700 & 619 & 604 & 595 & 586 & 582 & 578 & 574 & 569 & 565 & 560 & 556 & 554 & 552 & \\
+480-720 & 632 & 616 & 605 & 595 & 590 & 585 & 580 & 575 & 570 & 565 & 561 & 558 & 556 & \\
+480-740 & 645 & 627 & 615 & 603 & 597 & 592 & 587 & 581 & 575 & 569 & 565 & 562 & 560 & \\
+480-760 & 658 & 638 & 624 & 611 & 605 & 599 & 593 & 587 & 580 & 574 & 569 & 565 & 563 & \\
+480-780 & 671 & 648 & 633 & 619 & 612 & 605 & 599 & 592 & 585 & 578 & 572 & 568 & 566 & \\
+480-800 & 683 & 658 & 642 & 626 & 619 & 612 & 604 & 799 & 799 & 799 & 799 & 799 & 799 & \\
+500-600 & 558 & 554 & 552 & 550 & 549 & 548 & 547 & 546 & 544 & 543 & 542 & 542 & 541 & \\
+500-620 & 571 & 566 & 562 & 559 & 558 & 557 & 555 & 554 & 552 & 550 & 549 & 548 & 548 & \\
+500-640 & 584 & 577 & 573 & 569 & 567 & 565 & 563 & 561 & 559 & 557 & 556 & 554 & 554 & \\
+500-660 & 597 & 588 & 583 & 578 & 576 & 573 & 571 & 569 & 566 & 564 & 562 & 560 & 559 & \\
+500-680 & 610 & 600 & 593 & 587 & 584 & 582 & 579 & 576 & 573 & 570 & 567 & 565 & 564 & \\
+500-700 & 623 & 611 & 603 & 596 & 593 & 589 & 586 & 583 & 579 & 575 & 572 & 570 & 569 & \\
+500-720 & 636 & 622 & 613 & 605 & 601 & 597 & 593 & 589 & 585 & 581 & 577 & 575 & 573 & \\
+500-740 & 649 & 633 & 623 & 613 & 609 & 604 & 600 & 595 & 590 & 585 & 582 & 579 & 577 & \\
+500-760 & 662 & 644 & 632 & 621 & 616 & 611 & 606 & 601 & 596 & 590 & 586 & 583 & 581 & \\
+500-780 & 675 & 655 & 642 & 629 & 623 & 618 & 613 & 606 & 601 & 595 & 590 & 587 & 585 & \\
+500-800 & 687 & 665 & 650 & 637 & 630 & 624 & 618 & 799 & 799 & 799 & 799 & 799 & 799 & \\
+520-620 & 577 & 574 & 571 & 569 & 568 & 567 & 567 & 566 & 565 & 563 & 563 & 562 & 562 & \\
+520-640 & 590 & 585 & 582 & 579 & 578 & 576 & 575 & 574 & 572 & 571 & 570 & 569 & 568 & \\
+520-660 & 603 & 596 & 592 & 588 & 586 & 585 & 583 & 581 & 580 & 578 & 576 & 575 & 574 & \\
+520-680 & 615 & 607 & 602 & 597 & 595 & 593 & 591 & 589 & 586 & 584 & 582 & 581 & 580 & \\
+520-700 & 628 & 618 & 612 & 606 & 604 & 601 & 599 & 596 & 593 & 590 & 588 & 586 & 585 & \\
+520-720 & 641 & 629 & 622 & 615 & 612 & 609 & 606 & 602 & 599 & 596 & 593 & 591 & 590 & \\
+520-740 & 653 & 640 & 631 & 624 & 620 & 616 & 613 & 609 & 605 & 601 & 598 & 596 & 594 & \\
+520-760 & 666 & 651 & 641 & 632 & 628 & 624 & 619 & 615 & 611 & 606 & 603 & 600 & 599 & \\
+520-780 & 679 & 661 & 650 & 640 & 635 & 630 & 626 & 621 & 616 & 611 & 607 & 604 & 602 & \\
+520-800 & 691 & 671 & 659 & 648 & 642 & 637 & 632 & 799 & 799 & 799 & 799 & 799 & 799 & \\
+540-640 & 597 & 593 & 591 & 589 & 588 & 587 & 586 & 586 & 585 & 584 & 583 & 582 & 582 & \\
+540-660 & 609 & 604 & 601 & 599 & 597 & 596 & 595 & 594 & 592 & 591 & 590 & 589 & 589 & \\
+540-680 & 621 & 615 & 611 & 608 & 606 & 605 & 603 & 601 & 600 & 598 & 596 & 595 & 595 & \\
+540-700 & 634 & 626 & 621 & 617 & 615 & 613 & 611 & 609 & 607 & 604 & 603 & 601 & 600 & \\
+540-720 & 646 & 637 & 631 & 626 & 623 & 621 & 618 & 616 & 613 & 610 & 608 & 607 & 606 & \\
+\cline{1-14}
+nm & M5
+& M0
+& K5
+& K0
+& G5
+& G0
+& F5
+& F0
+& A5
+& A0
+& B5
+& B0
+& O5 & \\
+& $+1.61$
+& $+1.39$
+& $+1.11$
+& $+0.84$
+& $+0.70$
+& $+0.57$
+& $+0.45$
+& $+0.30$
+& $+0.16$
+& $0.00$ 
+& $-0.17$
+& $-0.31$
+& $-0.45$ & B$-$V \\
+& $+1.19$
+& $+1.24$
+& $+1.06$
+& $+0.46$
+& $+0.20$
+& $+0.04$
+& $-0.01$
+& $+0.02$
+& $+0.09$
+& $0.00$ 
+& $-0.56$
+& $-1.07$
+& $-1.20$ & U$-$B \\
+\cline{1-14}
+\end{tabular}
+\end{center}
+\clearpage
+
+\noindent
+\begin{center}
+\begin{tabular}{|c|c
+@{\hspace{2ex}}c
+@{\hspace{2ex}}c
+@{\hspace{2ex}}c
+@{\hspace{2ex}}c
+@{\hspace{2ex}}c
+@{\hspace{2ex}}c
+@{\hspace{2ex}}c
+@{\hspace{2ex}}c
+@{\hspace{2ex}}c
+@{\hspace{2ex}}c
+@{\hspace{2ex}}c
+@{\hspace{2ex}}c|l}
+\cline{1-14}
+Band
+&  3000
+&  3800
+&  4500
+&  5400
+&  6000
+&  6700
+&  7600
+&  9000
+& 11100
+& 15400
+& 23000
+& 38000
+& 70000
+& T$_c$ ($^\circ$K) \\
+\cline{1-14}
+540-740 & 659 & 647 & 641 & 634 & 631 & 628 & 626 & 622 & 619 & 616 & 614 & 612 & 611 & \\
+540-760 & 671 & 658 & 650 & 643 & 639 & 636 & 633 & 629 & 625 & 622 & 619 & 617 & 615 & \\
+540-780 & 683 & 669 & 659 & 651 & 647 & 643 & 639 & 635 & 631 & 627 & 623 & 621 & 620 & \\
+540-800 & 695 & 678 & 668 & 658 & 654 & 650 & 645 & 799 & 799 & 799 & 799 & 799 & 799 & \\
+560-660 & 616 & 613 & 611 & 609 & 608 & 607 & 606 & 605 & 605 & 604 & 603 & 602 & 602 & \\
+560-680 & 628 & 623 & 621 & 618 & 617 & 616 & 615 & 614 & 612 & 611 & 610 & 609 & 609 & \\
+560-700 & 640 & 634 & 630 & 627 & 626 & 624 & 623 & 621 & 620 & 618 & 617 & 616 & 615 & \\
+560-720 & 652 & 645 & 640 & 636 & 634 & 632 & 631 & 629 & 627 & 625 & 623 & 622 & 621 & \\
+560-740 & 664 & 655 & 650 & 645 & 643 & 640 & 638 & 636 & 633 & 631 & 629 & 627 & 626 & \\
+560-760 & 677 & 666 & 659 & 654 & 651 & 648 & 645 & 642 & 640 & 637 & 634 & 633 & 632 & \\
+560-780 & 689 & 676 & 669 & 662 & 658 & 655 & 652 & 649 & 646 & 642 & 639 & 638 & 636 & \\
+560-800 & 700 & 686 & 677 & 670 & 666 & 662 & 659 & 799 & 799 & 799 & 799 & 799 & 799 & \\
+580-680 & 635 & 632 & 630 & 629 & 628 & 627 & 626 & 625 & 625 & 624 & 623 & 623 & 622 & \\
+580-700 & 647 & 643 & 640 & 638 & 637 & 636 & 635 & 634 & 632 & 631 & 630 & 630 & 629 & \\
+580-720 & 659 & 653 & 650 & 647 & 645 & 644 & 643 & 641 & 640 & 638 & 637 & 636 & 636 & \\
+580-740 & 671 & 664 & 660 & 656 & 654 & 652 & 651 & 649 & 647 & 645 & 643 & 642 & 642 & \\
+580-760 & 683 & 674 & 669 & 664 & 662 & 660 & 658 & 656 & 654 & 651 & 649 & 648 & 647 & \\
+580-780 & 695 & 685 & 678 & 673 & 670 & 668 & 665 & 663 & 660 & 657 & 655 & 653 & 652 & \\
+580-800 & 706 & 694 & 687 & 681 & 678 & 675 & 672 & 799 & 799 & 799 & 799 & 799 & 799 & \\
+600-700 & 655 & 652 & 650 & 648 & 648 & 647 & 646 & 645 & 645 & 644 & 643 & 643 & 643 & \\
+600-720 & 666 & 662 & 660 & 658 & 657 & 656 & 655 & 654 & 653 & 651 & 651 & 650 & 649 & \\
+600-740 & 678 & 673 & 669 & 667 & 665 & 664 & 663 & 661 & 660 & 658 & 657 & 657 & 656 & \\
+600-760 & 690 & 683 & 679 & 675 & 674 & 672 & 670 & 669 & 667 & 665 & 664 & 663 & 662 & \\
+600-780 & 701 & 693 & 688 & 684 & 682 & 680 & 678 & 676 & 674 & 672 & 670 & 669 & 668 & \\
+600-800 & 712 & 703 & 697 & 692 & 689 & 687 & 685 & 799 & 799 & 799 & 799 & 799 & 799 & \\
+620-720 & 674 & 671 & 670 & 668 & 668 & 667 & 666 & 666 & 665 & 664 & 663 & 663 & 663 & \\
+620-740 & 685 & 682 & 679 & 677 & 676 & 675 & 675 & 674 & 673 & 672 & 671 & 670 & 670 & \\
+620-760 & 697 & 692 & 689 & 686 & 685 & 684 & 683 & 681 & 680 & 679 & 678 & 677 & 676 & \\
+620-780 & 708 & 702 & 698 & 695 & 693 & 692 & 690 & 689 & 687 & 685 & 684 & 683 & 683 & \\
+620-800 & 719 & 712 & 707 & 703 & 701 & 699 & 698 & 799 & 799 & 799 & 799 & 799 & 799 & \\
+640-740 & 694 & 691 & 689 & 688 & 687 & 687 & 686 & 686 & 685 & 684 & 684 & 683 & 683 & \\
+640-760 & 705 & 701 & 699 & 697 & 696 & 695 & 695 & 694 & 693 & 692 & 691 & 690 & 690 & \\
+640-780 & 716 & 711 & 708 & 706 & 705 & 704 & 703 & 701 & 700 & 699 & 698 & 697 & 697 & \\
+640-800 & 727 & 721 & 717 & 714 & 713 & 711 & 710 & 799 & 799 & 799 & 799 & 799 & 799 & \\
+660-760 & 713 & 711 & 709 & 708 & 707 & 707 & 706 & 706 & 705 & 704 & 704 & 703 & 703 & \\
+660-780 & 724 & 721 & 719 & 717 & 716 & 715 & 715 & 714 & 713 & 712 & 711 & 711 & 710 & \\
+660-800 & 735 & 730 & 728 & 725 & 724 & 723 & 722 & 799 & 799 & 799 & 799 & 799 & 799 & \\
+680-780 & 733 & 730 & 729 & 728 & 727 & 727 & 726 & 726 & 725 & 724 & 724 & 724 & 723 & \\
+680-800 & 743 & 740 & 738 & 736 & 736 & 735 & 734 & 799 & 799 & 799 & 799 & 799 & 799 & \\
+700-800 & 752 & 750 & 748 & 747 & 747 & 746 & 746 & 799 & 799 & 799 & 799 & 799 & 799 & \\
+\cline{1-14}
+nm & M5
+& M0
+& K5
+& K0
+& G5
+& G0
+& F5
+& F0
+& A5
+& A0
+& B5
+& B0
+& O5 & \\
+& $+1.61$
+& $+1.39$
+& $+1.11$
+& $+0.84$
+& $+0.70$
+& $+0.57$
+& $+0.45$
+& $+0.30$
+& $+0.16$
+& $0.00$ 
+& $-0.17$
+& $-0.31$
+& $-0.45$ & B$-$V \\
+& $+1.19$
+& $+1.24$
+& $+1.06$
+& $+0.46$
+& $+0.20$
+& $+0.04$
+& $-0.01$
+& $+0.02$
+& $+0.09$
+& $0.00$ 
+& $-0.56$
+& $-1.07$
+& $-1.20$ & U$-$B \\
+\cline{1-14}
+\end{tabular}
+\end{center}
+\clearpage
+\end{tiny}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\pagebreak
+{\bf APPENDIX D -- Error and Warning Messages}
+\vspace{5mm}
+
+Except where otherwise stated, the following messages appear
+on both the command device (typically the terminal) and the
+report device (typically the file to be printed).
+
+\begin{quote}
+\verb|Can't open file| {\it nn}
+\end{quote}
+The above message may appear when ASTROM is started and
+usually means either that the specified data file doesn't exist,
+or that file protection problems prevent the report file from
+being written.
+
+\begin{quote}
+\verb|Please run ASTROM from the correct script!| \\
+\verb|ASTROM improperly invoked!| \\
+\verb|GETARG error!|
+\end{quote}
+These are examples of other messages which appear when ASTROM is
+started and which depend on the particular type of computer
+being used.  They indicate either software errors or some
+other gross error.  Attempting to run the ASTROM
+executable image directly rather than through the correct
+command procedure is one possible cause.
+
+\begin{quote}
+\verb|^^^^^^  POSSIBLE DATA ERROR?  ^^^^^^|
+\end{quote}
+This message is output to the command device only.  It means that
+at least one
+of the fields in the plate centre \radec\ was suspect --
+unexpectedly negative, fractional when it should have been
+integer, or outside the conventional range.
+
+\begin{quote}
+\verb|Observation data were incomplete and will be ignored|
+\end{quote}
+Many of the observation data may be omitted and have sensible
+defaults, but certain combinations of omission make it impossible
+for ASTROM to carry out a reduction in observed place.  When this
+happens, the above message is output and a mean place reduction
+is carried out.
+
+\begin{quote}
+\verb|For the given observation data, the plate centre ZD is|
+{\it xxx.x}\ \verb|degrees!|\\
+\verb|Reduction will be in MEAN place.|
+\end{quote}
+This indicates that the
+zenith distance of the field centre, if the observation data are to
+be believed, is greater than $90^{\circ}$.  The most likely causes
+are an incorrectly specified time or observatory site.
+
+\begin{quote}
+\verb|sla_DS2TP status |{\it n}
+\end{quote}
+The above message
+indicates something badly wrong with the reference star or plate
+centre positions.
+
+\begin{quote}
+\verb|Impossible sla_SVD error!|
+\end{quote}
+If this message appears please ask your Starlink Site Manager
+to contact the Starlink User Support group.
+
+\begin{quote}
+\verb|sla_SVD warning |{\it n}
+\end{quote}
+Certain very rare combinations of (perfectly valid)
+data can provoke the above message.
+If it appears,
+please check the rest of the output to see if it looks
+reasonable.  If you
+prefer, you can almost certainly make the condition disappear
+by changing one of the data values {\it very}\, slightly.
+If the results look suspect, or if changing the
+data fails to eliminate the problem, please
+ask your Starlink Site Manager
+to contact the Starlink User Support group.
+
+\begin{quote}
+\verb|Fit was ill-conditioned!|
+\end{quote}
+This warns that the input data failed to
+define all the fitted parameters adequately.  The cure is to
+use more reference stars or not to fit the plate centre
+and/or the distortion.
+
+\begin{quote}
+\verb|Radial distortion coefficient cannot reliably be determined!|
+\end{quote}
+This message, which appears only on the report device, warns that
+the data were of insufficient quality to allow the distortion
+to be determined.  This can happen, for example, if the
+distortion is very small or if there aren't enough reference stars.
+
+\begin{quote}
+\verb|Plate centre cannot reliably be determined!|
+\end{quote}
+The above message, which appears only on the report device, warns that
+the data were of insufficient quality to allow the plate
+centre to be determined.  This can happen, for example, if the
+radial distortion is very small or if there aren't enough reference stars.
+
+\begin{quote}
+\verb|*************** INVALID DATA ****************|
+\end{quote}
+This indicates that there is something fatally wrong with the
+most recent input record.
+
+\begin{quote}
+\verb|------------ PREMATURE END OF DATA ------------|
+\end{quote}
+This indicates that the input file has ended, or that an
+end-of-sequence record or an end-of-file record has been read at a time
+when more input records are needed before a plate solution can be
+attempted.
+
+\begin{quote}
+\verb|****** PLATE EPOCH WAS NOT SPECIFIED ******|
+\end{quote}
+This happens if no plate epoch is available.  This
+information must be supplied, either as part of the plate data record or
+in a time record.
+
+\begin{quote}
+\verb|****** TOO MANY REFERENCE STARS; MAX |{\it n}\ \verb|******|
+\end{quote}
+ASTROM internal workspace limits have been reached;  reduce the
+number of reference stars.  If you have a legitimate requirement
+for a larger number of reference stars than is currently allowed,
+please ask your Starlink Site Manager to contact the Starlink
+User Support Group.
+
+\begin{quote}
+\verb|------------ FIT |{\it n}\ \verb|ABORTED ------------|
+\end{quote}
+This message always follows one of those described earlier,
+which will indicate the source of the problem.
+
+\begin{quote}
+\verb|---------- UNKNOWNS BUT NO SOLUTION ------------|
+\end{quote}
+An unknown star record has been encountered before the records defining
+a plate solution have been input.  Check the order of records in the
+input file.
+\end{document}

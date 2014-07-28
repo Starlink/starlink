@@ -1,0 +1,1489 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {87.5}
+\newcommand{\stardocauthors}   {P.\,T.\,Wallace \\ A.\,J.\,J.\,Broderick}
+\newcommand{\stardocdate}      {9 May 1994}
+\newcommand{\stardoctitle}     {JPL --- Solar System Ephemeris (v2.0)}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+DRAL / {\sc Rutherford Appleton Laboratory} \hfill \stardocname\\
+{\large Particle Physics \& Astronomy Research Council}\\
+{\large \bf Starlink Project}\\
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+\setlength{\parskip}{0mm}
+\tableofcontents
+\setlength{\parskip}{\medskipamount}
+\markright{\stardocname}
+
+\section{Introduction}
+The Jet Propulsion Laboratory has for many years distributed
+definitive solar system ephemeris tapes,
+containing files of ephemeris data plus Fortran programs to read them.
+The ephemerides come from direct numerical integrations of the equations
+of motion of the large bodies in the solar system, subject to fitting to a
+variety of observations.  For distribution they are expressed in
+terms of Chebyshev polynomials.
+
+The JPL ephemeris distributed by Starlink is the DE200/LE200, the one
+most consistent with the latest IAU resolutions, for the range
+1960 to 2025.
+DE200/LE200 is described in detail
+in Chapter~5 of the {\it Explanatory Supplement to the
+Astronomical Almanac}\/ (ed.\ P.\,K.\,Seidelmann,
+University Science Books, 1992).
+It provides extremely accurate position and velocity data for any of the nine
+planets, the Moon, and the solar system and Earth-Moon barycentres (also
+nutation components) for any given epoch in the range of the ephemeris.
+
+{\bf Users of the old (VMS-only) version
+should note that this new (Unix and VMS) version differs
+in important respects.  Existing applications will need
+to be changed before they can be linked against the new
+library, and existing executable programs are not
+compatible with the new format of ephemeris file.  For further
+details, see Section~6.3.}
+
+\section{Package Contents}
+The Starlink JPL package consists of the following:
+\begin{itemize}
+\item the JPL DE200/LE200 ephemeris
+in a machine-independent text format;
+\item an executable program which builds the operational ephemeris
+for the machine concerned, starting with the machine-independent
+text version supplied by JPL;
+\item the ephemeris as a direct-access binary file, suitable for
+the particular machine concerned;
+\item TESTEPH -- an executable program which tests the built ephemeris for
+accuracy.
+\item a text file containing test data required
+by the TESTEPH program.
+\item an object library which includes three user-callable routines:
+\begin{itemize}
+\item PLEPH -- an easy-to-use subroutine which for a given date
+returns the coordinates of one body or centre with respect to another;
+\item STATE -- a more comprehensive subroutine which returns more
+than one set of coordinates at once;
+\item CONST -- a subroutine for enquiring the constants (masses {\it etc.})
+used in generating the ephemeris.
+\end{itemize}
+\item SHORTEPH -- an executable program which extracts a specified
+subset from the ephemeris (to save space);
+\item JPLPLEPH, JPLSTATE, JPLCONST -- executable programs which demonstrate
+the use of the user-callable routines;
+\item Fortran source code for all of the above programs;
+\item an \verb|mk| script and a \verb|makefile| for building the
+system on Unix platforms;
+\item various \verb|.COM| and \verb|.BAT| files for building the
+system on other platforms;
+\item SOURCE\_JPL -- the original JPL Fortran source, for information.
+\item This document.
+\end{itemize}
+
+\section{A Simple Example}
+It should be noted that the package includes
+no self-contained utility programs which
+interpolate the ephemeris directly, apart from some
+simple examples.  Instead, the
+facility is supplied as a set of subroutines which can be
+called by the user's own application code.
+
+For example, to obtain the position and velocity of
+the Earth, with respect to the Solar System Barycentre,
+at JD~2439105.7117 (TDB):
+\begin{enumerate}
+\item Write a Fortran program which includes the statements:
+\begin{verbatim}
+         DOUBLE PRECISION PV(6)
+         LOGICAL OK
+             :
+         CALL PLEPH( 39105.2117D0, 3, 12, PV, OK )
+\end{verbatim}
+Details of the PLEPH arguments are given in Section~4.1.
+\item Compile and link.
+\begin{tabbing}
+xxxxxxxxxx \= xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx \= \kill
+\> \verb|f77 myprog.f -L/star/lib `jpl_link` -o myprog| \> (Unix) \\ \\
+\> \verb|FORTRAN myprog| \> (VMS) \\
+\> \verb|LINK myprog,JPLDIR:JPL/L|
+\end{tabbing}
+\item Specify the ephemeris file:
+\begin{tabbing}
+xxxxxxxxxx \= xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx \= \kill
+\> \verb|ln /star/etc/jpl/jpleph.dat JPLEPH| \> (Unix) \\ \\
+\> \verb|DEFINE JPLEPH JPLDIR:JPLEPH.DAT| \> (VMS)
+\end{tabbing}
+\item Run the program.
+\end{enumerate}
+(You may wish to remove link files, deassign logical names
+{\it etc.}\ at this point.)
+
+\section{Reading the Ephemeris}
+The fundamental purpose of the package, and the one capability
+of interest to most users, is to look up the position of
+a planet for a given moment in time.
+There is a choice of two routines to accomplish this:
+\begin{itemize}
+\item PLEPH, which is extremely simple to use, and gives
+the coordinates of a single body relative to a specified
+origin.
+\item STATE, which is more flexible, and suitable for
+cases where the coordinates
+of several bodies are required at once.
+\end{itemize}
+The routines are described later, following these
+important {\it caveats}\/:
+\begin{itemize}
+\item Both PLEPH and STATE
+require as their time argument an epoch in a dynamical
+timescale -- what used to be called
+{\it Ephemeris Time}\/ -- rather than the UTC of everyday life,
+and this can be a trap for the unwary.
+PLEPH and STATE accept times in the
+Barycentric Dynamical Time (TDB) timescale, which
+at the time of writing is displaced from UTC by about
+1~minute.  For a given UTC you can get the offset
+to TDB by calling the SLALIB routines sla\_DTT and sla\_RCC
+(Starlink User Note~67).  The offset to Terrestrial Time TT
+returned by sla\_DTT dominates, and in practice the
+call to sla\_RCC can be
+dispensed with.  In fact, the JPL documentation is vague
+about which of these dynamical timescales is the correct
+form to use.  The difference between them
+never exceeds about 1.3~milliseconds.
+\item It is up to the caller to allow for {\it planetary
+aberration}\/ (the effect of light-time).  A
+common example is where the geocentric position of a planet is being
+requested, for a given moment in time.  In such a case the
+following procedure is necessary:
+\begin{enumerate}
+\item Call PLEPH to get the planet's coordinates
+at the time of interest.
+\item Calculate $\sqrt{x^{2}+y^{2}+z^{2}}$,
+the distance to the planet at that time,
+and hence the light-time.
+\item Call PLEPH again for the time of interest minus the
+light-time.
+\item For extra accuracy, iterate from step 2.
+\end{enumerate}
+\end{itemize}
+
+\subsection{The PLEPH Subroutine}
+PLEPH reads and interpolates a single item --
+usually the position and velocity
+of one body relative to another --
+from the JPL ephemeris file on disc.
+The call is:
+\begin{verbatim}
+      CALL PLEPH (TDB, NP, NC, R, OK)
+\end{verbatim}
+with arguments as follows:
+
+Given:
+\begin{tabbing}
+xxxx \= xxxxxxx \= xxxxxxxxxxxxxxxxx \=
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx \kill
+\> \verb|TDB| \> double precision \>
+             \parbox[t]{24em}{The epoch:  the Barycentric
+                              Dynamical Time
+                              (TDB) expressed as a
+                              Modified Julian Date (JD$-2400000.5$)} \\ \\
+\> \verb|NP| \> integer \>
+             \parbox[t]{24em}{The body or reference point whose
+                              coordinates are required
+                              (see the list, below)} \\ \\
+\> \verb|NC| \> integer \>
+             \parbox[t]{24em}{The origin of the coordinate system -- the
+                              same scheme as for \verb|NP|}
+\end{tabbing}
+Returned:
+\begin{tabbing}
+xxxx \= xxxxxxxxx \= xxxxxxxxxxxxxxxxxxx \=
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx \kill
+\> \verb|R(6)| \> double precision \>
+              \parbox[t]{24em}{An array to receive position and
+                               velocity:
+                               $x, y, z, \dot{x}, \dot{y}, \dot{z}$} \\ \\
+\> \verb|OK| \> logical \>
+              \parbox[t]{24em}{Status:  .TRUE. indicates success.
+                               .FALSE. indicates TDB out of range or illegal
+                               \verb|NP|, \verb|NC| value.}
+\end{tabbing}
+The \verb|NP| and \verb|NC| arguments are each as follows:
+\begin{tabbing}
+xxxxxxxxxxxx \= xxxxxxxxxxxxxx \= \kill
+\> 1 \' Mercury  \\
+\> 2 \' Venus    \\
+\> 3 \' Earth    \\
+\> 4 \' Mars     \\
+\> 5 \' Jupiter  \\
+\> 6 \' Saturn   \\
+\> 7 \' Uranus   \\
+\> 8 \' Neptune  \\
+\> 9 \' Pluto    \\
+\> 10 \' Moon     \\
+\> 11 \' Sun      \\
+\> 12 \' SSB      \\
+\> 13 \' EMB
+\end{tabbing}
+In each case, the position and velocity of the point
+specified by \verb|NP| relative to
+the point specified by \verb|NC| are put into \verb|R(1-6)|.
+
+For example, the following call will obtain the position and velocity of the
+Earth relative to the Solar System barycentre at 0 hours TDB on
+30th~April~1986:
+\begin{verbatim}
+      CALL PLEPH ( 46550D0, 3, 12, R, OK )
+\end{verbatim}
+
+PLEPH can return results in either AU and AU/day or km and km/sec.
+The default is AU and AU/day; to select the other units, include the following
+Fortran statements:
+\begin{verbatim}
+      LOGICAL KM
+      COMMON /STCOMM/ KM
+      SAVE STCOMM
+          :
+          :
+      KM=.TRUE.
+\end{verbatim}
+Calls to PLEPH will then return results in km and km/sec.
+
+PLEPH can also be used to read the JPL values for the nutation angles.
+To do this, use \verb|NP|=14 and \verb|NC|=0.  The units in this case are
+radians and radians/day;  with \verb|KM=.TRUE.| the units
+are radians and radians/sec.  ({\it n.b.}\ As a rule,
+the Starlink SLALIB routine sla\_NUTC is a
+more convenient way to calculate the nutation -- see Starlink User
+Note~67.)
+
+\subsection{The STATE Subroutine}
+The basic interpolating routine is STATE, which offers more
+flexibility and in some cases
+greater efficiency than the PLEPH routine just described.
+In particular, STATE allows the coordinates of several bodies to be
+determined at once.
+
+The call is:
+\begin{verbatim}
+      CALL STATE (JD, LIST, PV, NUT, OK)
+\end{verbatim}
+with arguments as follows.
+
+Given:
+\begin{tabbing}
+xxxx \= xxxxxxxxx \= xxxxxxxxxxxxxxx \=
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx \kill
+\> \verb|JD(2)| \> double precision \>
+             \parbox[t]{24em}{An
+         array specifying the
+         instant of time for which the ephemeris lookup is to be
+         done, in the TDB timescale.  The time is the sum
+         \verb|JD(1)+JD(2)|.  A variety of different combinations of the
+         two elements is possible.  The simplest is to put the
+         whole Julian Date into \verb|JD(1)|
+         and to set \verb|JD(2)| to zero.
+         For optimum precision, set \verb|JD(1)| to the Julian Date at
+         the previous 0~hours TDB (so \verb|JD(1)| will be \verb|24xxxxx.5D0|)
+         and \verb|JD(2)| to the fraction of a day from 0~hours to the
+         required time.  Sometimes it may prove convenient to
+         set \verb|JED(1)| to some fixed epoch and
+         to set \verb|JED(2)| to the
+         interval between then and the epoch concerned.} \\ \\
+\> \verb|LIST(12)| \> integer \>
+             \parbox[t]{24em}{An array specifying what
+         interpolation is wanted for each of the bodies (or
+         reference points) on the file:}
+\end{tabbing}
+\begin{tabbing}
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx \= xxxx \= xx \= x \= \kill
+         \> \verb|LIST(I)| \' = \>\> 0: \'\> no lookup for body \verb|I| \\
+                \>    \' = \>\> 1: \'\> position only \\
+                \>    \' = \>\> 2: \'\> position and velocity \\ \\
+         \> where     \' \\ \\
+         \> \verb|I|  \' = \>\> 1: \'\> Mercury \\
+                \>    \' = \>\> 2: \'\> Venus   \\
+                \>    \' = \>\> 3: \'\> Earth-Moon Barycentre \\
+                \>    \' = \>\> 4: \'\> Mars    \\
+                \>    \' = \>\> 5: \'\> Jupiter \\
+                \>    \' = \>\> 6: \'\> Saturn  \\
+                \>    \' = \>\> 7: \'\> Uranus  \\
+                \>    \' = \>\> 8: \'\> Neptune \\
+                \>    \' = \>\> 9: \'\> Pluto   \\
+                \>    \' = \>\> 10: \'\> Moon (geocentric) \\
+                \>    \' = \>\> 11: \'\> Nutations
+\end{tabbing}
+\pagebreak
+Returned:
+\begin{tabbing}
+xxxx \= xxxxxxxxx \= xxxxxxxxxxxxxxx \=
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx \kill
+\> \verb|PV|(6,11) \> double precision \>
+             \parbox[t]{24em}{An
+         array to receive
+         the requested quantities.  The body
+         specified by \verb|LIST(I)| will have its state in the array
+         starting at \verb|PV(1,I)|.  (On any given call, only those
+         elements in \verb|PV| which have been requested are set; the
+         rest of the \verb|PV| array is untouched.)  The order of
+         components starting in \verb|PV(1,I)|
+         is $x, y, z, \dot{x}, \dot{y}, \dot{z}$.
+         The Moon state is always geocentric;
+         the other nine states are either heliocentric or
+         solar-system-barycentric, depending on the setting of
+         \verb|COMMON| flags (see below).} \\ \\
+\> \verb|NUT(4)| \> double precision \>
+             \parbox[t]{24em}{An
+         array to receive the
+         nutations and rates, depending on
+         the setting of \verb|LIST(11)|.
+         The order of quantities in \verb|NUT| is
+         $d\psi, d\epsilon, d\dot{\psi}, d\dot{\epsilon}$.} \\ \\
+\> \verb|OK| \> logical \>
+             \parbox[t]{24em}{Status:  .TRUE. indicates success.}
+\end{tabbing}
+                     
+Other information is given in the labelled \verb|COMMON|
+block \verb|/STCOMM/|:
+\begin{tabbing}
+xxxx \= xxxxxxxxx \= xxxxxxxxxxxxxxx \=
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx \kill
+\> \verb|KM| \> logical \>
+             \parbox[t]{24em}{A flag defining the physical units of the output
+ states. For \verb|KM=.FALSE.| (the default),
+ the units are AU and AU/day; for \verb|KM=.TRUE.| the units are
+ km and km/sec.
+ KM also determines the time unit for the nutation rates; the
+ angle unit is always radians.} \\ \\
+\> \verb|BARY| \> logical \>
+             \parbox[t]{24em}{A flag defining the origin of the results.
+Only the nine planets are affected.  \verb|BARY=.FALSE.| (the default)
+means the coordinates are heliocentric;  setting \verb|BARY=.TRUE.|
+selects the Solar System Barycentre as the origin.} \\ \\
+\> \verb|PVSUN(6)| \> double precision \>
+             \parbox[t]{24em}{A 6-element
+         double precision array containing the
+         barycentric position and velocity of the Sun.}
+\end{tabbing}
+
+\section{Other Facilities}
+
+\subsection{How to Obtain the Constants of the Ephemeris}
+Should it be necessary to examine the constants that were used to generate a
+particular JPL ephemeris --
+planetary masses, conversion factors, range of dates
+covered, {\it etc.}\ -- this can be done by means of the subroutine CONST.
+The call is as follows:
+\begin{verbatim}
+      CALL CONST (NAM, VAL, SSS, N)
+\end{verbatim}
+and returns the following:
+
+\begin{tabbing}
+xxxx \= xxxxxxxxx \= xxxxxxxxxxxxxxx \=
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx \kill
+\> \verb|NAM()| \> character*6 \>
+             \parbox[t]{24em}{An array to receive the names of all
+                              the constants.} \\ \\
+\> \verb|VAL()| \> double precision \>
+              \parbox[t]{24em}{An array to receive the
+                               values of all the constants.} \\ \\
+\> \verb|SSS(3)| \> double precision \>
+              \parbox[t]{24em}{An array to receive the
+                               start and stop epochs (JD) and
+                               the step size.} \\ \\
+\> \verb|N| \> integer \>
+              \parbox[t]{24em}{The number of entries written into
+                               the \verb|NAM|
+                               and \verb|VAL| arrays.}
+\end{tabbing}
+
+The arrays \verb|NAM| and \verb|VAL|
+must have sufficiently large dimensions to accommodate
+all the constants in the ephemeris file.  A value of 400 is
+more than adequate and likely to remain so;  the actual value
+for the present ephemeris is returned as argument \verb|N|.
+
+\subsection{Producing a Short Ephemeris File}
+If disk space is at a premium, the SHORTEPH program
+can be used to extract a subset of the ephemeris file.  Such
+a file can be as short as required, depending on the
+length of the interval of interest.  Access times are unaffected
+because the ephemeris file is direct-access rather than sequential.
+
+To run SHORTEPH under Unix:
+\begin{verbatim}
+      ln /star/etc/jpl/jpleph.dat JPLEPH
+      ln jplephs.dat JPLEPHS
+      /star/etc/jpl/shorteph
+\end{verbatim}
+to produce the short ephemeris file \verb|jplephs.dat|.
+Under VMS, assign the logical name JPLEPH to
+JPLDIR:JPLEPH.DAT and the logical name JPLEPHS to the file to be
+written, and then run JPLDIR:SHORTEPH.
+
+The program prompts for the calendar date limits in the
+(fixed) format \verb|YYYYMMDD,YYYYMMDD|.  A start or end
+date of all zeroes will retain the start or end date
+of the existing ephemeris.
+                                                                        
+\subsection{Testing the Ephemeris}
+The TESTEPH program compares values interpolated from
+the ephemeris with several hundred known correct values read from a file
+of test data.  It reports the number of results that were
+exactly right, how many lay within a fractional
+tolerance (currently set to $10^{-15}$)
+and how many exceeded the tolerance.
+
+The Starlink software-distribution
+procedures automatically run TESTEPH after building the
+direct-access form of the ephemeris, and there is
+normally no need for users to repeat the test.  However, for
+reassurance that the ephemeris is functioning correctly,
+TESTEPH may be run as follows.  Under Unix:
+\begin{verbatim}
+      ln /star/etc/jpl/jpleph.dat JPLEPH
+      ln /star/etc/jpl/testephinput.dat TESTEPHINPUT
+      /star/etc/jpl/testeph
+\end{verbatim}
+Under VMS, assign the logical name
+JPLEPH to JPLDIR:JPLEPH.DAT
+and the logical name TESTEPHINPUT to JPLDIR:TESTEPHINPUT.DAT,
+then run JPLDIR:TESTEPH.
+
+On some platforms
+all the results pass the test, while on others a handful of
+results lie just outside the tolerance:  it depends on
+the floating-point format.
+
+\section{Further Information}
+
+\subsection{Coordinate System}
+The positions and velocities produced by JPL DE200/LE200 ephemeris
+are referred to the J2000 mean equatorial triad (IAU~1976,
+as used for the FK5 star catalogue).
+The 6-vectors have elements $( x, y, z, \dot{x}, \dot{y}, \dot{z} )$
+in a
+right-handed Cartesian coordinate system with the $x$-axis aligned to the first
+point of Aries and the $z$-axis to the north celestial pole.
+
+\subsection{The Fortran Routines}
+The routines supplied are, as far as possible, the
+untouched JPL Fortran source, {\it circa}\/~1990.  However,
+certain changes had to be made, as follows:
+\begin{itemize}
+\item The JPL-supplied PLEPH routine is not used;  a revised form of the
+old Starlink PLEPH is used instead.  The latter was developed
+before JPL distributed its own version, and accepts epochs
+in the form of Modified Julian Dates rather than the full
+Julian Dates required by the JPL
+version (the new Starlink PLEPH accepts both forms).
+\item Some COMMON blocks have been re-ordered to put longer
+items (double precision) before shorter items (integers).
+This avoids data alignment problems reported by some
+compilers.
+\item The 1990 JPL routines used an
+``asterisk dummy argument'' error-handling
+mechanism, forcing applications to violate Starlink
+rules (see Starlink General Paper~16).  A mechanism based on
+a logical status return has been substituted.
+\item In the EPHOPN routine for certain platforms, the record
+size specification units
+has had to be changed from words to bytes.  In addition, in some
+versions the OPEN statement has been changed to avoid the need
+for write permission on the ephemeris file.
+\end{itemize}
+The original 1990 JPL source is included, for information, in the
+Starlink distributions.  On Unix platforms, the source is in
+file \verb|source_jpl.txt| within the tar file
+\verb|/star/jpl/jpl_source.tar|.  Under VMS the source is in
+file JPLDIR:SOURCE\_JPL.TXT.
+
+Since work began on the Starlink release of this software, JPL
+have issued new versions.  These address many of the problems
+encountered during the construction of the Starlink release,
+and in some cases similar changes have been introduced -- for
+example COMMON blocks have been re-ordered, and
+the JPL version of PLEPH now has a logical status
+return.  The Starlink release is believed to be fully
+compatible with the latest JPL product, insofar as it can
+read the same ephemerides and delivers identical results.
+However, there are small differences, such as the calling
+sequence for the STATE subroutine, and the operating
+instructions.
+
+\subsection{Differences with respect to Previous Releases}
+The Starlink release described by this
+document differs in important respects from earlier versions.
+Here is a list of the changes of significance to existing users:
+\begin{itemize}
+\item Earlier releases were for VAX/VMS only; the latest release
+is for several Unix platforms in addition to VMS.
+\item Earlier versions included a tape ephemeris (VAX-only) covering
+1800-2050 and a disc ephemeris covering 1960-2000.  In addition,
+the full 1800-2050 range was available on disc on the central
+STADAT machine. The present
+version includes a disc ephemeris covering 1960-2025, the full range
+available from the tape received from JPL.  A DE200/LE200 tape covering a
+greater range can be requested from JPL if need be, as can
+different ephemerides.
+\item The PLEPH subroutine has an extra argument compared with
+the earlier version (a status flag).  Also, to improve compatibility
+with the JPL-supplied version,
+the epoch can be expressed as a JD rather than an MJD.
+\item The STATE subroutine was formerly called XSTATE, and now has an
+extra argument (a status flag).
+\item The CONST subroutine was formerly called XCONST.
+\item The earlier version opened files by I/O unit number;  the
+new version has names such as JPLEPH (hardwired by JPL).  As a
+consequence, the operating instructions have changed.
+\end{itemize}
+
+\section{Acknowledgements}
+The DE200/LE200 ephemeris was produced jointly by the Jet Propulsion Laboratory,
+the US Naval Observatory and the US Naval Surface Weapons Center.
+The tape used in this release came {\it via}\/ R.\,Harrison
+of Jodrell~Bank.  Earlier versions of this package
+benefited from correspondence with
+C.\,Hohenkerk of RGO and E.\,M.\,Standish of JPL.
+\pagebreak
+\appendix
+\section{Appendix: Example Programs}
+Three example application programs are supplied: JPLPLEPH, JPLSTATE
+and JPLCONST.
+On Unix systems, the source and executables for the
+example programs are in the directory \verb|/star/etc/jpl|.
+Under VMS, the
+source is held in the
+text library JPLDIR:SOURCE.TLB and the executables reside in
+JPLDIR.
+\subsection{Example using PLEPH}
+The executable program JPLPLEPH interpolates the ephemeris for a
+particular (hardwired) epoch, to demonstrate
+the use of the subroutine PLEPH. Under
+Unix, it can be run as follows:
+\begin{verbatim}
+      ln /star/etc/jpl/jpleph.dat JPLEPH
+      /star/etc/jpl/jplpleph
+\end{verbatim}
+Under VMS, assign the logical name JPLEPH to
+the ephemeris file JPLDIR:JPLEPH.DAT
+and run the program JPLDIR:JPLPLEPH.
+
+JPLPLEPH calls the subroutine PLEPH to interpolate from the ephemeris file the
+heliocentric position and velocity of the Earth for the instant
+TDB~=~2451624.5.  It produces the following output (depending
+on machine precision):
+
+\begin{verbatim}
+       -0.9960816789895932E+00
+       -0.1092611522464465E-01
+       -0.4738690663777706E-02
+       -0.7521474026186866E-04
+       -0.1583616804758534E-01
+       -0.6866074103775283E-02
+\end{verbatim}
+The Fortran source of JPLPLEPH follows.
+   
+\begin{verbatim}
+      PROGRAM JPLPLEPH
+*+
+*  - - - - - - - - -
+*   J P L P L E P H
+*  - - - - - - - - -
+*
+*  An example program using the Starlink subroutine PLEPH to
+*  interpolate the JPL planetary ephemeris.  The heliocentric
+*  Earth position and velocity for an instant near the vernal
+*  equinox in 2000AD are determined.
+*
+*  Input is from the binary direct-access form of the JPL ephemeris
+*  (as output by the EPHDSK program).  The file is called JPLEPH.
+*
+*  P.T.Wallace   Starlink   22 April 1994
+*-
+
+      IMPLICIT NONE
+
+*  PLEPH arguments
+      DOUBLE PRECISION TDB
+      INTEGER NP,NC
+      DOUBLE PRECISION PV(6)
+      LOGICAL OK
+
+
+
+*  TDB = Julian Date 2451624.5
+      TDB=51624D0
+
+*  Body is the Earth
+      NP=3
+
+*  Origin is the Sun
+      NC=11
+
+*  Read and interpolate the ephemeris
+      CALL PLEPH(TDB,NP,NC,PV,OK)
+
+*  List the resulting position and velocity
+      IF (OK) WRITE (*,'(6(1X,E24.16/))') PV
+
+      END
+\end{verbatim}
+\
+\subsection{Example using STATE}
+The program JPLSTATE interpolates the ephemeris for a
+particular (hardwired) epoch, to demonstrate
+the use of the subroutine STATE.  Under Unix, it can be run as
+follows:
+\begin{verbatim}
+      ln /star/etc/jpl/jpleph.dat JPLEPH
+      /star/etc/jpl/jplstate
+\end{verbatim}
+Under VMS, assign the logical name JPLEPH to the
+ephemeris file JPLDIR:JPLEPH.DAT
+and run the program JPLDIR:JPLSTATE.
+
+JPLSTATE calls the subroutine STATE to interpolate from the ephemeris file the
+heliocentric position and velocity of the Earth for the instant
+TDB~=~2451624.5. The following output is produced (depending on
+machine precision):
+
+\begin{verbatim}
+       -0.9961121408482240E+00
+       -0.1093240728275330E-01
+       -0.4738623145919944E-02
+       -0.7419740229401869E-04
+       -0.1584284216910741E-01
+       -0.6868683708183170E-02
+\end{verbatim}
+The Fortran source for JPLSTATE follows.
+
+\begin{verbatim}
+      PROGRAM JPLSTATE
+*+
+*  - - - - - - - - -
+*   J P L S T A T E
+*  - - - - - - - - -
+*
+*  Example program using the subroutine STATE, in the JPL Ephemeris
+*  package, to interpolate the planetary ephemeris.  The
+*  heliocentric position and velocity of the Earth-Moon
+*  barycentre for a given epoch near the vernal equinox of
+*  2000AD are determined.
+*
+*  Input is from the binary direct-access form of the JPL ephemeris
+*  (as output by the EPHDSK program).
+*
+*  P.T.Wallace   Starlink   25 April 1994
+*-
+
+      IMPLICIT NONE
+
+*  Julian date for ephemeris interpolation (see STATE source)
+      DOUBLE PRECISION DJ(2)
+
+*  Flags indicating which values are required
+      INTEGER LIST(12)
+
+*  Array to receive ephemeris data (1,2 and 4-11 not used)
+      DOUBLE PRECISION PV(6,11)
+
+*  Array to receive nutation (not used)
+      DOUBLE PRECISION DNUT(4)
+
+      INTEGER I
+      LOGICAL OK
+
+
+
+*  Set up LIST array to interpolate for Earth only
+      DO I=1,12
+         LIST(I)=0
+      END DO
+      LIST(3)=2
+
+*  Put Julian Date 2451624.5 in DJ(1) and DJ(2).
+      DJ(1)=2451624.5D0
+      DJ(2)=0D0
+
+*  Interpolate the ephemeris and print results
+      CALL STATE(DJ,LIST,PV,DNUT,OK)
+      IF (OK) WRITE (*,'(6(1X,E24.16/))') (PV(I,3),I=1,6)
+
+      END
+\end{verbatim}
+
+\subsection{Example using CONST}
+The program JPLCONST demonstrates the use of the CONST subroutine to obtain the
+constants of the ephemeris.  Under Unix, it can be run as follows:
+\begin{verbatim}
+      ln /star/etc/jpl/jpleph.dat JPLEPH
+      /star/etc/jpl/jplconst
+\end{verbatim}
+Under VMS, assign the logical name JPLEPH to
+the ephemeris file JPLDIR:JPLEPH.DAT
+and run the program JPLDIR:JPLCONST.
+
+JPLCONST calls the CONST subroutine and then
+lists all the constants of the ephemeris.  (The listing is too long
+to be included here.)
+See also the Fortran source of the PLEPH subroutine, which shows
+how the data output by CONST can be searched for named constants.
+The Fortran source of JPLCONST follows.
+
+\begin{verbatim}
+      PROGRAM JPLCONST
+*+
+*  - - - - - - - - -
+*   J P L C O N S T
+*  - - - - - - - - -
+*
+*  Example program using the JPL routine CONST.
+*
+*  The program calls CONST, which reads from the JPL Ephemeris
+*  file in binary direct-access form (as output by the program
+*  EPHDSK).
+*
+*  P.T.Wallace   Starlink   18 April 1994
+*-
+
+      IMPLICIT NONE
+
+*  Array for data names
+      CHARACTER*6 NAM(400)
+
+*  Arrays for data values
+      DOUBLE PRECISION VAL(400)
+      DOUBLE PRECISION SS(3)
+
+*  Number of data values and counter
+      INTEGER N,I
+
+
+
+*  Pick up the information
+      CALL CONST(NAM,VAL,SS,N)
+
+* Print the results
+      DO I=1,N
+         WRITE(*,'(1X,I3,4X,A,4X,D20.14)')  I,NAM(I),VAL(I)
+      END DO
+
+      DO I=1,3
+         PRINT *,SS(I)
+      END DO
+
+      END
+\end{verbatim}
+
+\newpage
+\section{Appendix: Documentation Provided by JPL}
+The JPL-supplied
+document ``The JPL Export Planetary Ephemeris'' is reprinted below,
+{\it verbatim}\/ apart from small formatting changes.  Please
+note that some of the instructions are incorrect with respect to the
+Starlink implementation, for example the argument lists of certain
+subroutines.
+
+\vspace{10mm}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                                        %
+%  JPL TeX with small modifications by Starlink for LaTeX compatibility  %
+%                                                                        %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\magnification=1095                                   % Starlink
+%\hsize=6.5truein\vsize=8.9truein                      % Starlink
+%\hoffset=.0truein\voffset=.7truein                    % Starlink
+\parindent=0pt\parskip=8pt
+\baselineskip=11.pt plus.5pt minus.5pt
+\lineskiplimit=1pt\lineskip=1pt
+\font\tt=cmtt10
+\font\csc=cmcsc10
+\font\bld=cmb10
+\newcount\inum
+\def\vp{\vskip\parskip}
+\def\pf{\par\filbreak}
+\def\el{\hfill\break}
+\def\itm#1{\leavevmode\hangindent.75truein\hangafter=1
+\advance\inum by 1
+\hbox to2em{\rm\hfil\number\inum. }#1\vadjust{\kern5pt}\el}
+\def\ul#1{$\underline{\hbox{\sl\strut#1}}$}
+\def\hdg#1{\vskip4pt plus2pt\leavevmode\kern-1em \ul{#1}\par}
+\centerline{\bf The JPL Export Planetary Ephemeris}
+\vskip2pt
+\hdg{Introduction}
+The Jet Propulsion Laboratory is engaged in the production of
+high-precision planetary and lunar ephemerides. Requests
+for the ephemerides are frequently received
+from interested users at institutions throughout the world.
+In an effort to fulfill these requests in as efficient and
+useful a fashion as possible, a machine-independent form of the
+ephemerides and supporting software has been prepared.
+This document describes its use.
+ 
+The purpose of the export package is to provide users a convenient
+means of establishing a file of ephemeris data on direct-access
+mass storage and then, in subsequent programs,
+calling a subroutine to obtain cartesian
+coordinates of planetary position and velocity at any epoch covered
+by the file.
+ 
+Many users have the earlier edition of the export ephemeris
+package. That set was created in 1976, before Fortran~77 was
+the available standard.
+The major differences between the current export package and
+the older version are that (1)~the new software is
+written entirely in standard Fortran~77, requiring no programming changes
+whatever, and (2) the resulting files are written on disk as
+direct-access files, yielding considerably improved read-access time.
+Because of these changes,
+the revised software structure and ephemeris
+file formats described in this document are {\it not\/} compatible
+with the earlier formats and cannot be used with them.
+Anyone wishing to use future versions of the JPL ephemerides
+will have to adapt his software to use the routines described
+herein.
+ 
+Although several users have had immediate success with the export
+package and subsequent application of the ephemerides, the complete
+absence of errors cannot be guaranteed. If you have difficulty
+or discover errors in either the software or ephemeris file,
+we would appreciate your notifying us at once. And any suggestions
+for the improvement of this document are most welcome.
+ 
+\hdg{The Export Tape}
+The standard form of ephemeris-file transmittal is {\sl via\/}
+a magnetic tape having two files. The first file contains
+all necessary software for creating, testing, and using the file
+on the user's computer. The card images are written on tape as a sequence
+of blocked 80-character {\csc ascii} records. There are 24 records
+(1920 bytes)
+per block, unless requested otherwise by the user.
+ 
+The second file on the tape contains the ephemeris information,
+also encoded as a series of 1920-byte {\csc ascii} records.
+It is the function of one of the programs ({\csc ephdsk}) in the software
+set to decode the images on this file and produce the direct-access
+file on mass storage.
+ 
+This decoding of the export file can be
+time-consuming. Because of the frequency of requests for ephemerides
+on certain machines, binary-written tapes that avoid the
+decoding process can be provided for {\csc vax, cdc cyber, modcomp},
+Honeywell, Univac, and IBM System/360 computers.
+The export cover letter will state the type of tape sent to you.
+
+\pagebreak                                          % Starlink
+\hdg{Getting Started}
+Your first task is to extract and compile the thirteen program units
+in file~1 of the magnetic tape. There are three main programs
+({\csc ephdsk, shorteph, testeph}),
+nine subroutines ({\csc const, ctoj, ephopn, interp, jtoc, pleph,
+rci, split, state}), and one block data subprogram ({\csc comdat}).
+The start and end of each are clearly indicated
+by comment cards. All are written in {\csc ansi}-standard Fortran~77
+and should compile without difficulty. When compilation
+is complete you are ready
+to create the direct-access ephemeris file.
+(There is a fourteenth set of cards in the
+software file, intended
+as input to the ephemeris testing program. Its use is described later.)
+ 
+{\bld Note: Some Fortran compilers have extensions or features that do not
+follow ANSI standards. See Table~4 at the end of this document
+for remarks concerning possible incompatibilities.}
+ 
+% \settabs 8 \columns                                    % Starlink
+\hdg{Creating Your File on Mass Storage}
+Link the main program {\csc ephdsk} with the subroutines {\csc ctoj, ephopn,
+jtoc, rci}, and {\csc comdat}. The program expects to read the tape on a
+file having the logical name {\csc ephtap} and will write the output on the
+logical file {\csc jpleph}. (These names are logical names, in that there
+are no terminal periods in the Fortran {\tt OPEN} statements; the user
+may wish to assign them {\sl via} operating system control
+statements to files whose actual names are different.)
+ 
+Position the tape at the start of file~2.
+The density should be set to whatever is indicated
+on the tape reel. The record size you must specify to the
+executive language of your operating system is 80 bytes. The
+block size is 1920 bytes (unless stated otherwise in the export
+cover letter).
+ 
+Run the program.
+You will be prompted for two inputs.
+The first is for a character specifying the format of file~2
+({\tt A} for {\csc ascii} or {\tt B} for Binary). The format of your
+file is stated in the export cover letter.
+ 
+The second prompt is for an optional shortened time span of the
+output ephemeris file. Ephemerides sent by JPL often cover
+60 years or more and may exceed your needs.
+You will be asked for new starting and ending integer
+calendar date limits, in the form
+% Starlink mods
+%\vp
+%\+&{\tt YYYYMMDD{\rm,}YYYYMMDD}\cr
+\begin{verbatim}
+        YYYYMMDD,YYYYMMDD
+\end{verbatim}
+% End of Starlink mods
+ 
+If you wish to retain either the original starting or ending epoch,
+enter a 0 in the desired field. To retain the full span
+of the input file, enter only a {\tt <return>}.
+ 
+On some smaller computers this file-creation
+step can be time-consuming, requiring possibly five minutes or
+more per decade of the ephemeris span. Bear in mind that this
+operation is done only once, after which the export tape
+can be set aside or archived.
+ 
+\hdg{Testing the Ephemeris File}
+When {\csc ephdsk} has completed execution, the direct-access file
+{\csc jpleph} will be ready for use. It is strongly advisable, though
+not mandatory, to test the integrity of the software
+and of the file on mass storage.
+One element of the software file is the main program {\csc testeph}.
+That program should be compiled and linked with the elements
+{\csc const, ephopn, interp, pleph, split, state}, and {\csc
+comdat}.
+ 
+When {\csc testeph} is run, it calls for no keyboard inputs; however,
+it expects a set of input cards to be in the file {\csc testephinput}.
+They are located in file~1 of the export tape following the last
+Fortran deck. They are bounded by the initial and terminal
+comment cards of the form
+% Starlink mods
+% \vp
+% \+&{\tt Test~output~from~JPL~PLANETARY~EPHEMERIS:~DE-xxx~+~LE-xxx}\cr
+% \+&{$\cdots$}\cr
+% \+&{\tt End~of~Test~output~from~JPL~PLANETARY~EPHEMERIS:~DE-xxx~+~LE-xxx}\cr
+\begin{verbatim}
+        Test output from JPL PLANETARY EPHEMERIS: DE-xxx + LE-xxx
+        ...
+        End of Test output from JPL PLANETARY EPHEMERIS: DE-xxx + LE-xxx
+\end{verbatim}
+% End of Starlink mods
+ 
+There are approximately 600 cards in the test deck. The entire deck, {\it
+including the two comment cards}, must be copied to the  logical file
+{\csc testephinput} before {\csc testeph} is run. The program compares
+the names and values of all constants on the file with the
+corresponding quantities produced by the originating software at
+JPL and put in the test deck. It also interpolates the ephemeris
+at various points and compares the results with JPL-supplied values
+in the test deck.
+ 
+Because the values in the test deck are encoded representations of
+double-precision numbers, comparison in some cases will
+not be exact but will match only to within a fractional tolerance.
+That tolerance
+is pre-coded as $10~{-15}$ in the {\csc testeph} variable
+{\tt CFRAC}. Any comparison exceeding this value will be
+printed on the output medium.
+ 
+The interpolation times in the test deck are evenly spaced
+and cover the full range of the {\it original\/} export file sent from JPL.
+If you elected to shorten the ephemeris using the optional calendar
+date inputs described above, {\csc testeph}
+will ignore points lying outside
+the range of your shortened file.
+ 
+\hdg{Using the Ephemeris File}
+When the ephemeris file has been satisfactorily established
+on mass storage it can be accessed by the export software.
+The two subroutines of direct interest to the user are
+(1) {\csc pleph}, which provides interpolated
+cartesian planetary positions and
+velocities, and (2) {\csc const}, which returns the
+names and values of initial conditions and other astronomical
+constants employed in the creation of the ephemeris. The
+names and meanings of the quantities output by {\csc const}
+are given in Table~1.
+ 
+{\csc pleph} is the most convenient subroutine for ephemeris access.
+It supplies the interpolated position and velocity ($x,\>y,\>z,
+\>\dot x,\>\dot y,\>\dot z$)
+of any target reference point with respect to an arbitrary center.
+Both the target and center points can be any of the nine
+planets, the Sun, the Moon, the Earth-Moon barycenter, or the
+solar-system barycenter. It also provides interpolated nutations
+in longitude and obliquity ($\psi,\>\epsilon,\>\dot\psi,
+\>\dot\epsilon$), if requested.
+ 
+{\csc state}, one of the subroutines used by {\csc pleph},
+may be used directly to obtain interpolated ephemeris quantities.
+It differs from {\csc pleph} in that all planets, the Moon, and
+nutations may be requested in a single call; however, its disadvantage
+is that only heliocentric or solar-system-barycentric states are output;
+users must do their own vector addition and scaling if other
+reference points are desired. For simplicity the use of {\csc pleph}
+for the retrieval of ephemeris quantities is recommended.
+ 
+All programs and subroutines are extensively documented in their
+listings; for completeness, the instructions for {\csc pleph}
+and {\csc const} are reproduced in Tables~2 and~3.
+ 
+Any program using {\csc pleph} will need to include
+{\csc pleph, ephopn, interp, split, state}, and {\csc comdat}
+in the linking process. The linking requirements for
+programs using {\csc const} are {\csc const, ephopn}, and
+{\csc comdat}.
+ 
+The output from {\csc pleph \rm and \csc state}
+has default units of {\csc au} and {\csc au}/day. If km and km/sec
+are desired, the user must include the following statements
+in his main program {\it before\/} the first call to {\csc state}
+or {\csc pleph}:
+% Starlink mods
+%\tt
+%\vp
+%\+&LOGICAL KM\cr
+%\+&COMMON/STCOMM/KM\cr
+%\+&$\cdots$\cr
+%\+&KM=.TRUE.\cr
+%
+%\rm
+\begin{verbatim}
+        LOGICAL KM
+        COMMON/STCOMM/KM
+        ...
+        KM=.TRUE.
+\end{verbatim}
+% End of Starlink mods
+The default units for nutations are radians and radians/day. If
+{\tt KM=.TRUE.} as in the above prescription, nutations have units
+of radians and radians/second.
+
+\newpage                                             % Starlink
+\hdg{Ephemeris File Size}
+Intervals spanned by JPL ephemerides are segmented into contiguous
+32-day granules (64-day granules for DE-102),
+each granule being represented by a
+record of coefficients occupying approximately 7200 bytes.
+There are also two
+header records on all files. A 40-year file will occupy about
+3.3~megabytes for all ephemerides except DE-102, for which the
+space required is approximately 1.65~megabytes.
+% \eject                                                    Starlink
+\hdg{Producing a Short Ephemeris}
+Because ephemeris files are direct-access, the actual size of a given
+file residing on disk has no influence on read-access times.
+However, at some institutions mass storage space is at a premium, and
+an abbreviated file may be desirable if only a short span of ephemeris
+epochs is needed. The program {\csc shorteph} will produce a new
+ephemeris containing only those data records needed to include
+a range specified by the user. ({\csc shorteph} is intended to
+extract and copy a portion of a file that is already on mass storage.
+It does not apply to the case of the original reading and
+conversion of the export tape.)
+ 
+To use {\csc shorteph}, first compile and link it with {\csc
+ctoj, ephopn, jtoc, \rm and \csc comdat}. The input ephemeris
+file is expected on logical file {\csc jpleph}; the shortened output file
+will be written into the logical name {\csc jplephs}.
+ 
+You will be asked for new starting and ending integer
+calendar date limits, in the form
+% Starlink mods
+%\vp
+%\+&{\tt YYYYMMDD{\rm,}YYYYMMDD}\cr
+\begin{verbatim}
+        YYYYMMDD,YYYYMMDD
+\end{verbatim}
+% End of Starlink mods
+If you wish to retain either the original starting or ending epoch,
+enter a 0 in the desired field.
+ 
+\hdg{Ephemeris Coordinates}
+If the DE-\# of an ephemeris is less than 200 (except for DE-102),
+its coordinate
+system is with respect to the equator and equinox of 1950.0, as
+defined by the FK4 stellar catalog reference system. If the number
+is 200 or greater, the coordinates are with respect to the mean
+equator and equinox of J2000, coinciding with the origin of the FK5.
+ 
+DE-102, the ``long ephemeris,'' has an origin which is closer
+to the B1950.0 dynamical equinox than to the FK4; however, the
+difference is only about $0.\kern-3pt''4$, negligible for
+most applications.
+ 
+\hdg{Machine Particulars}
+There seems to be no uniform set of Input/Output standards in use by
+the computer industry, particularly with regard to reading
+binary tapes. Some observations and suggestions are given in Table~4 of
+this document.
+ 
+\hdg{Ephemeris Information}
+Technical documentation for JPL ephemerides is given in
+Newhall {\it et al.}~1983, {\it Astron. Astrophys. \bf 125},
+150--167.
+For questions or further information concerning the export
+ephemeris, please contact
+$$\hbox{\vtop{\hbox{E.~Myles Standish, Jr.}%
+\hbox{JPL, 301-150}\hbox{Pasadena, CA\ \ 91109-8099}%
+\kern4pt
+\hbox{(818) 354-3959 (commercial)}%
+\hbox{\phantom{(818)} 792-3959 (FTS)}}\hbox to.7truein{}
+\vtop{\hbox{X~X~(Skip)~Newhall}\hbox{JPL, 238-332}%
+\hbox{Pasadena, CA\ \ 91109-8099}%
+\kern4pt
+\hbox{(818) 354-0000 (commercial)}%
+\hbox{\phantom{(818)} 792-0000 (FTS)}}}$$
+%\bye                                                    Starlink
+
+\newpage                                               % Starlink
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\magnification=1095                                   % Starlink
+%\hsize=6.5truein\vsize=8.9truein                      % Starlink
+%\hoffset=.0truein\voffset=.7truein                    % Starlink
+\parindent=0pt\parskip=8pt
+\baselineskip=11.pt plus.5pt minus.5pt
+\lineskiplimit=1pt\lineskip=1pt
+\font\tt=cmtt10
+\font\csc=cmcsc10
+\newcount\inum
+\def\vp{\vskip\parskip}
+\def\pf{\par\filbreak}
+\def\el{\hfill\break}
+\def\itm#1{\leavevmode\hangindent.75truein\hangafter=1
+\advance\inum by 1
+\hbox to2em{\rm\hfil\number\inum. }#1\vadjust{\kern5pt}\el}
+\def\ul#1{$\underline{\hbox{\sl\strut#1}}$}
+\def\hdg#1{\vskip4pt\leavevmode\kern-1em \ul{#1}\par}
+% \pageno=6                                             % Starlink
+\centerline{\bf Table 2. PLEPH Calling Sequence}
+\vskip8pt
+% Starlink mods
+%{\tt
+%C++++++++++++++++++++++++++\el
+%C\el
+%\phantom{C}~~~~~SUBROUTINE~PLEPH(JD,TARG,CENT,RRD,*)\el
+%C\el
+%C++++++++++++++++++++++++++\el
+%C\el
+%C~~~~~THIS~SUBROUTINE~READS~THE~JPL~PLANETARY~EPHEMERIS\el
+%C~~~~~AND~GIVES~THE~POSITION~AND~VELOCITY~OF~THE~POINT~'TARG'\el
+%C~~~~~WITH~RESPECT~TO~'CENT'.\el
+%C\el
+%C~~~~~CALLING~SEQUENCE~PARAMETERS:\el
+%C\el
+%C~~~~~~~JD~=~D.P.~JULIAN~EPHEMERIS~DATE~AT~WHICH~INTERPOLATION\el
+%C~~~~~~~~~~~~IS~WANTED.\el
+%C\el
+%C~~~~~TARG~=~INTEGER~NUMBER~OF~'TARGET'~POINT.\el
+%C\el
+%C~~~~~CENT~=~INTEGER~NUMBER~OF~CENTER~POINT.\el
+%C\el
+%C~~~~~~~~~~~~THE~NUMBERING~CONVENTION~FOR~'TARG'~AND~'CENT'~IS:\el
+%C\el
+%C~~~~~~~~~~~~~~~~1~=~MERCURY~~~~~~~~~~~8~=~NEPTUNE\el
+%C~~~~~~~~~~~~~~~~2~=~VENUS~~~~~~~~~~~~~9~=~PLUTO\el
+%C~~~~~~~~~~~~~~~~3~=~EARTH~~~~~~~~~~~~10~=~MOON\el
+%C~~~~~~~~~~~~~~~~4~=~MARS~~~~~~~~~~~~~11~=~SUN\el
+%C~~~~~~~~~~~~~~~~5~=~JUPITER~~~~~~~~~~12~=~SOLAR-SYSTEM~BARYCENTER\el
+%C~~~~~~~~~~~~~~~~6~=~SATURN~~~~~~~~~~~13~=~EARTH-MOON~BARYCENTER\el
+%C~~~~~~~~~~~~~~~~7~=~URANUS~~~~~~~~~~~14~=~NUTATIONS~(LONGITUDE~AND~OBLIQ)\el
+%C~~~~~~~~~~~~~~~~~~~~~~~~~~~~15~=~LIBRATIONS,~IF~ON~EPH~FILE\el
+%C\el
+%C~~~~~~~~~~~~~(IF~NUTATIONS~ARE~WANTED,~SET~TARG~=~14.~FOR~LIBRATIONS,\el
+%C~~~~~~~~~~~~~~SET~TARG~=~15.~'CENT'~WILL~BE~IGNORED~ON~EITHER~CALL.)\el
+%C\el
+%C~~~~~~RRD~=~OUTPUT~6-WORD~D.P.~ARRAY~CONTAINING~POSITION~AND~VELOCITY\el
+%C~~~~~~~~~~~~OF~POINT~'TARG'~RELATIVE~TO~'CENT'.~THE~UNITS~ARE~AU~AND\el
+%C~~~~~~~~~~~~AU/DAY.~FOR~LIBRATIONS~THE~UNITS~ARE~RADIANS~AND~RADIANS\el
+%C~~~~~~~~~~~~PER~DAY.~IN~THE~CASE~OF~NUTATIONS~THE~FIRST~FOUR~WORDS~OF\el
+%C~~~~~~~~~~~~RRD~WILL~BE~SET~TO~NUTATIONS~AND~RATES,~HAVING~UNITS~OF\el
+%C~~~~~~~~~~~~RADIANS~AND~RADIANS/DAY.\el
+%C\el
+%C~~~~~~~~~~~~NOTE:~IN~MANY~CASES~THE~USER~WILL~NEED~ONLY~POSITION\el
+%C~~~~~~~~~~~~~~~~~~VALUES~FOR~EPHEMERIDES~OR~NUTATIONS.~FOR\el
+%C~~~~~~~~~~~~~~~~~~POSITION-ONLY~OUTPUT,~THE~INTEGER~VARIABLE~'IPV'\el
+%C~~~~~~~~~~~~~~~~~~IN~THE~COMMON~AREA~/PLECOM/~SHOULD~BE~SET~=~1\el
+%C~~~~~~~~~~~~~~~~~~BEFORE~THE~NEXT~CALL~TO~PLEPH.~(ITS~DEFAULT\el
+%C~~~~~~~~~~~~~~~~~~VALUE~IS~2,~WHICH~RETURNS~BOTH~POSITIONS~AND\el
+%C~~~~~~~~~~~~~~~~~~RATES.)\el
+%C\el
+%C~~~~~~~~*~=~STATEMENT~\#~IN~CASE~OF~ERROR~RETURN~(EPOCH~OUT~OF~RANGE\el
+%C~~~~~~~~~~~~OR~REQUEST~FOR~NUTATIONS~OR~LIBRATIONS~WHEN~NOT~ON~FILE).
+%}
+\begin{verbatim}
+C++++++++++++++++++++++++++
+C
+      SUBROUTINE PLEPH(JD,TARG,CENT,RRD,*)
+C
+C++++++++++++++++++++++++++
+C
+C     THIS SUBROUTINE READS THE JPL PLANETARY EPHEMERIS
+C     AND GIVES THE POSITION AND VELOCITY OF THE POINT 'TARG'
+C     WITH RESPECT TO 'CENT'.
+C
+C     CALLING SEQUENCE PARAMETERS:
+C
+C       JD = D.P. JULIAN EPHEMERIS DATE AT WHICH INTERPOLATION
+C            IS WANTED.
+C
+C     TARG = INTEGER NUMBER OF 'TARGET' POINT.
+C
+C     CENT = INTEGER NUMBER OF CENTER POINT.
+C
+C            THE NUMBERING CONVENTION FOR 'TARG' AND 'CENT' IS:
+C
+C                1 = MERCURY           8 = NEPTUNE
+C                2 = VENUS             9 = PLUTO
+C                3 = EARTH            10 = MOON
+C                4 = MARS             11 = SUN
+C                5 = JUPITER          12 = SOLAR-SYSTEM BARYCENTER
+C                6 = SATURN           13 = EARTH-MOON BARYCENTER
+C                7 = URANUS           14 = NUTATIONS (LONGITUDE AND OBLIQ)
+C                            15 = LIBRATIONS, IF ON EPH FILE
+C
+C             (IF NUTATIONS ARE WANTED, SET TARG = 14. FOR LIBRATIONS,
+C              SET TARG = 15. 'CENT' WILL BE IGNORED ON EITHER CALL.)
+C
+C      RRD = OUTPUT 6-WORD D.P. ARRAY CONTAINING POSITION AND VELOCITY
+C            OF POINT 'TARG' RELATIVE TO 'CENT'. THE UNITS ARE AU AND
+C            AU/DAY. FOR LIBRATIONS THE UNITS ARE RADIANS AND RADIANS
+C            PER DAY. IN THE CASE OF NUTATIONS THE FIRST FOUR WORDS OF
+C            RRD WILL BE SET TO NUTATIONS AND RATES, HAVING UNITS OF
+C            RADIANS AND RADIANS/DAY.
+C
+C            NOTE: IN MANY CASES THE USER WILL NEED ONLY POSITION
+C                  VALUES FOR EPHEMERIDES OR NUTATIONS. FOR
+C                  POSITION-ONLY OUTPUT, THE INTEGER VARIABLE 'IPV'
+C                  IN THE COMMON AREA /PLECOM/ SHOULD BE SET = 1
+C                  BEFORE THE NEXT CALL TO PLEPH. (ITS DEFAULT
+C                  VALUE IS 2, WHICH RETURNS BOTH POSITIONS AND
+C                  RATES.)
+C
+C        * = STATEMENT \# IN CASE OF ERROR RETURN (EPOCH OUT OF RANGE
+C            OR REQUEST FOR NUTATIONS OR LIBRATIONS WHEN NOT ON FILE).
+\end{verbatim}
+% \bye
+% End of Starlink mods
+
+\newpage                                               % Starlink
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\magnification=1095                                   % Starlink
+%\hsize=6.5truein\vsize=8.9truein                      % Starlink
+%\hoffset=.0truein\voffset=.7truein                    % Starlink
+\parindent=0pt\parskip=8pt
+\baselineskip=11.pt plus.5pt minus.5pt
+\lineskiplimit=1pt\lineskip=1pt
+\font\tt=cmtt10
+\font\csc=cmcsc10
+\newcount\inum
+\def\vp{\vskip\parskip}
+\def\pf{\par\filbreak}
+\def\el{\hfill\break}
+\def\itm#1{\leavevmode\hangindent.75truein\hangafter=1
+\advance\inum by 1
+\hbox to2em{\rm\hfil\number\inum. }#1\vadjust{\kern5pt}\el}
+\def\ul#1{$\underline{\hbox{\sl\strut#1}}$}
+\def\hdg#1{\vskip4pt\leavevmode\kern-1em \ul{#1}\par}
+% \pageno=7
+\centerline{\bf Table 3. CONST Calling Sequence}
+\vskip8pt
+% Starlink mods
+%{\tt
+%C+++++++++++++++++++++++++++++\el
+%C\el
+%\phantom{C}~~~~~SUBROUTINE~CONST(NAM,VAL,SSS,N)\el
+%C\el
+%C+++++++++++++++++++++++++++++\el
+%C\el
+%C~~~~~THIS~SUBROUTINE~OBTAINS~THE~CONSTANTS~FROM~THE~EPHEMERIS~FILE\el
+%C\el
+%C~~~~~CALLING~SEQEUNCE~PARAMETERS~(ALL~OUTPUT):\el
+%C\el
+%C~~~~~~~NAM~=~CHARACTER*6~ARRAY~OF~CONSTANT~NAMES\el
+%C\el
+%C~~~~~~~VAL~=~D.P.~ARRAY~OF~VALUES~OF~CONSTANTS\el
+%C\el
+%C~~~~~~~SSS~=~D.P.~JD~START,~JD~STOP,~STEP~OF~EPHEMERIS\el
+%C\el
+%C~~~~~~~~~N~=~INTEGER~NUMBER~OF~ENTRIES~IN~'NAM'~AND~'VAL'~ARRAYS\el
+%C\el
+%C~~~~~THE~ARRAYS~'NAM'~AND~'VAL'~MUST~HAVE~SUFFICIENTLY~LARGE\el
+%C~~~~~DIMESNIONS~TO~ACCOMMODATE~ALL~ENTRIES~ON~THE~FILE.~THE\el
+%C~~~~~VALUE~400~IS~A~SAFE~UPPER~LIMIT~FOR~THIS~DIMENSION.
+%}
+\begin{verbatim}
+C+++++++++++++++++++++++++++++
+C
+      SUBROUTINE CONST(NAM,VAL,SSS,N)
+C
+C+++++++++++++++++++++++++++++
+C
+C     THIS SUBROUTINE OBTAINS THE CONSTANTS FROM THE EPHEMERIS FILE
+C
+C     CALLING SEQEUNCE PARAMETERS (ALL OUTPUT):
+C
+C       NAM = CHARACTER*6 ARRAY OF CONSTANT NAMES
+C
+C       VAL = D.P. ARRAY OF VALUES OF CONSTANTS
+C
+C       SSS = D.P. JD START, JD STOP, STEP OF EPHEMERIS
+C
+C         N = INTEGER NUMBER OF ENTRIES IN 'NAM' AND 'VAL' ARRAYS
+C
+C     THE ARRAYS 'NAM' AND 'VAL' MUST HAVE SUFFICIENTLY LARGE
+C     DIMESNIONS TO ACCOMMODATE ALL ENTRIES ON THE FILE. THE
+C     VALUE 400 IS A SAFE UPPER LIMIT FOR THIS DIMENSION.
+\end{verbatim}
+% \bye
+% End of Starlink mods
+
+\newpage                                               % Starlink
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\magnification=1095                                   % Starlink
+%\hsize=6.5truein\vsize=8.9truein                      % Starlink
+%\hoffset=.0truein\voffset=.7truein                    % Starlink
+\parindent=0pt\parskip=8pt
+\baselineskip=11.pt plus.5pt minus.5pt
+\lineskiplimit=1pt\lineskip=1pt
+\font\tt=cmtt10
+\font\csc=cmcsc10
+\newcount\inum
+\def\vp{\vskip\parskip}
+\def\pf{\par\filbreak}
+\def\el{\hfill\break}
+\def\itm#1{\leavevmode\hangindent.75truein\hangafter=1
+\advance\inum by 1
+\hbox to2em{\rm\hfil\number\inum. }#1\vadjust{\kern5pt}\el}
+\def\ul#1{$\underline{\hbox{\sl\strut#1}}$}
+\def\hdg#1{\vskip4pt\leavevmode\kern-1em \ul{#1}\par}
+% \pageno=8                                             Starlink
+\centerline{\bf Table 4. Comments on Software Use}
+\vskip8pt
+\hdg{File Sizes}
+According to ANSI standard Fortran, the {\tt RECL} parameter in the
+Fortran {\tt OPEN} statement for direct-access
+unformatted files defines the size of each record in 4-byte words.
+The software included in this package follows that standard.
+However, some Fortran compilers (notably those from IBM
+and Language Systems for Macintosh) interpret that parameter as a
+byte count. If that is the case with your system, then you will have
+to make a single change to the subroutine {\csc ephopn}.
+The affected part is self-explanatory and is reproduced here:
+% Starlink mods
+%{\tt
+%\vp
+%\settabs 24 \columns
+%\+&C~~~~~~~THE~FOLLOWING~STATEMENTS~DEFINE~THE~LENGTH~OF~THE~RECORDS\cr
+%\+&C~~~~~~~IN~THE~DIRECT-ACCESS~FILE.~IF~THE~'RECL'~SPECIFICATION~IN\cr
+%\+&C~~~~~~~THE~FORTRAN~COMPILER~ON~YOUR~MACHINE~EXPECTS~THE~LENGTH~TO\cr
+%\+&C~~~~~~~BE~IN~WORDS,~LEAVE~THE~STATEMENTS~AS~THEY~ARE.~IF~THE~LENGTH\cr
+%\+&C~~~~~~~IS~EXPECTED~IN~BYTES,~REMOVE~THE~'C'~FROM~COLUMN~1~IN~THE\cr
+%\+&C~~~~~~~SECOND~STATEMENT.\cr
+%\+&C\cr
+%\+&~~~~~~IRECSZ=IBSZ\cr
+%\+&C~~~~~IRECSZ=IRECSZ*4\cr}
+\begin{verbatim}
+        C       THE FOLLOWING STATEMENTS DEFINE THE LENGTH OF THE RECORDS
+        C       IN THE DIRECT-ACCESS FILE. IF THE 'RECL' SPECIFICATION IN
+        C       THE FORTRAN COMPILER ON YOUR MACHINE EXPECTS THE LENGTH TO
+        C       BE IN WORDS, LEAVE THE STATEMENTS AS THEY ARE. IF THE LENGTH
+        C       IS EXPECTED IN BYTES, REMOVE THE 'C' FROM COLUMN 1 IN THE
+        C       SECOND STATEMENT.
+        C
+              IRECSZ=IBSZ
+        C     IRECSZ=IRECSZ*4
+\end{verbatim}
+% End of Starlink mods
+\hdg{VAX Operation}
+If you wish to read a binary-format tape on a VAX, you will want to
+make a change to the program {\csc ephdsk}. The {\tt OPEN} statement
+for the binary tape is:
+% Starlink mods
+%\vp
+%{\tt
+%\+&C~~~~~~~~~~~~~~~~~~~~~~~~'OPEN'~STATEMENT~FOR~BINARY-FORMAT~TAPE\cr
+%\+&~~~~~~~~OPEN(9,\cr
+%\+&~~~~~*~~~~~~~FILE='EPHTAP',\cr
+%\+&~~~~~*~~~~~~~ACCESS='SEQUENTIAL',\cr
+%\+&~~~~~*~~~~~~~FORM='UNFORMATTED',\cr
+%\+&C~~~~*~~~~~~~RECORDTYPE='VARIABLE',~!~REMOVE~'C'~IN~COL~1~FOR~VAX~I/O\cr
+%\+&~~~~~*~~~~~~~STATUS='OLD')\cr}
+\begin{verbatim}
+   C                        'OPEN' STATEMENT FOR BINARY-FORMAT TAPE
+           OPEN(9,
+        *       FILE='EPHTAP',
+        *       ACCESS='SEQUENTIAL',
+        *       FORM='UNFORMATTED',
+   C    *       RECORDTYPE='VARIABLE', ! REMOVE 'C' IN COL 1 FOR VAX I/O
+        *       STATUS='OLD')
+\end{verbatim}
+% End of Starlink mods
+Remove the {\tt C} as indicated in the listing.
+ 
+The relevant statements used in conjunction with the program are:
+% Starlink mods
+%\vp
+%{\tt
+%\+&\$~ALLOCATE \char123 tape unit\char125 :\cr
+%\+&\$~MOUNT/FOREIGN/DEN=$\cdots$/BLOCKSIZE=8192
+%\char123 tape unit\char125 :\cr
+%\+&\$~DEFINE EPHTAP \char123 tape unit\char125 :\cr}
+%\vp
+%{\tt
+%\+&\$~ALLOCATE \char123 tape unit\char125 :\cr
+%\+&\$~MOUNT/FOREIGN/DEN=$\cdots$/BLOCKSIZE=8192
+%\char123 tape unit\char125 :\cr
+%\+&\$~DEFINE EPHTAP \char123 tape unit\char125 :\cr}
+\begin{verbatim}
+$ ALLOCATE {tape unit}:
+$ MOUNT/FOREIGN/DEN=.../BLOCKSIZE=8192 {tape unit}:
+$ DEFINE EPHTAP {tape unit}:
+\end{verbatim}
+% End of Starlink mods
+where the dots following the {\tt DEN} specification denote the correct
+density for your tape.
+%\bye                                                 Starlink
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{document}

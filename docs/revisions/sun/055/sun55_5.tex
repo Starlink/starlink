@@ -1,0 +1,2910 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {55.5}
+\newcommand{\stardocauthors}   {Malcolm J. Currie}
+\newcommand{\stardocdate}      {1994 March 4}
+\newcommand{\stardoctitle}     {CONVERT --- A Format-conversion Package}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+% SST definitions
+% ---------------
+
+%+
+%  Name:
+%     LAYOUT.TEX
+
+%  Purpose:
+%     Define Latex commands for laying out documentation produced by PROLAT.
+
+%  Language:
+%     Latex
+
+%  Type of Module:
+%     Data file for use by the PROLAT application.
+
+%  Description:
+%     This file defines Latex commands which allow routine documentation
+%     produced by the SST application PROLAT to be processed by Latex. The
+%     contents of this file should be included in the source presented to
+%     Latex in front of any output from PROLAT. By default, this is done
+%     automatically by PROLAT.
+
+%  Notes:
+%     The definitions in this file should be included explicitly in any file
+%     which requires them. The \include directive should not be used, as it
+%     may not then be possible to process the resulting document with Latex
+%     at a later date if changes to this definitions file become necessary.
+
+%  Authors:
+%     RFWS: R.F. Warren-Smith (STARLINK)
+
+%  History:
+%     10-SEP-1990 (RFWS):
+%        Original version.
+%     10-SEP-1990 (RFWS):
+%        Added the implementation status section.
+%     12-SEP-1990 (RFWS):
+%        Added support for the usage section and adjusted various spacings.
+%     {enter_further_changes_here}
+
+%  Bugs:
+%     {note_any_bugs_here}
+
+%-
+
+%  Define length variables.
+\newlength{\sstbannerlength}
+\newlength{\sstcaptionlength}
+
+%  Define a \tt font of the required size.
+\font\ssttt=cmtt10 scaled 1095
+
+%  Define a command to produce a routine header, including its name,
+%  a purpose description and the rest of the routine's documentation.
+\newcommand{\sstroutine}[3]{
+   \goodbreak
+   \rule{\textwidth}{0.5mm}
+   \vspace{-7ex}
+   \newline
+   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
+   \setlength{\sstcaptionlength}{\textwidth}
+   \addtolength{\sstbannerlength}{0.5em}
+   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
+   \addtolength{\sstcaptionlength}{-4.45pt}
+   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
+   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
+   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
+   \begin{description}
+      #3
+   \end{description}
+}
+
+%  Format the description section.
+\newcommand{\sstdescription}[1]{\item[Description:] #1}
+
+%  Format the usage section.
+\newcommand{\sstusage}[1]{\item[Usage:] \mbox{} \\[1.3ex] {\ssttt #1}}
+
+%  Format the invocation section.
+\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
+
+%  Format the arguments section.
+\newcommand{\sstarguments}[1]{
+   \item[Arguments:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the returned value section (for a function).
+\newcommand{\sstreturnedvalue}[1]{
+   \item[Returned Value:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the parameters section (for an application).
+\newcommand{\sstparameters}[1]{
+   \item[Parameters:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the output results parameters section (for an application).
+\newcommand{\sstresparameters}[1]{
+   \item[Results Parameters:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the graphics style parameters section (for an application).
+\newcommand{\sstgraphparameters}[1]{
+   \item[Graphics-style Parameters:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the examples section.
+\newcommand{\sstexamples}[1]{
+   \item[Examples:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Define the format of a subsection in a normal section.
+\newcommand{\sstsubsection}[1]{\item[{#1}] \mbox{} \\}
+
+%  Define the format of a subsection in the examples section.
+\newcommand{\sstexamplesubsection}[1]{\item[{\ssttt #1}] \mbox{} \\}
+
+%  Format the notes section.
+\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
+
+%  Provide a general-purpose format for additional (DIY) sections.
+\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}] \mbox{} \\[1.3ex] #2}
+
+%  Format the implementation status section.
+\newcommand{\sstimplementationstatus}[1]{
+   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
+
+%  Format the bugs section.
+\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
+
+%  Format a list of items while in paragraph mode.
+\newcommand{\sstitemlist}[1]{
+  \mbox{} \\
+  \vspace{-3.5ex}
+  \begin{itemize}
+     #1
+  \end{itemize}
+}
+
+%  Define the format of an item.
+\newcommand{\sstitem}{\item}
+
+%  End of LAYOUT.TEX layout definitions.
+%.
+
+% End of SST definitions
+% ----------------------
+
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+  \setlength{\parskip}{0mm}
+  \tableofcontents
+  \setlength{\parskip}{\medskipamount}
+  \markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\newpage
+\section{Introduction}
+
+If life were simple there would only be one data format, but in reality
+there are numerous formats for storing $n$-dimensional astronomical data
+associated with various software packages.   In Starlink we have not
+been immune to this, having the original INTERIM BDF, HDS IMAGE format,
+and Figaro DSTs to name but three.  However, Starlink is now taking the
+novel approach of supporting different packages sharing a common data
+format---the NDF\footnote{See SUN/33 for an introduction to the NDF.}
+(Extensible $n$-Dimensional-data format)---which most Starlink packages
+are already using and more applications will follow. 
+
+The purpose of {\footnotesize CONVERT} is the interchange of data files
+to and from the NDF.  Thus it enables astronomers to select the best
+applications from a variety of packages, including those originating
+abroad like IRAF. In addition it assists packages that wish to move to
+using the NDF.  {\footnotesize CONVERT} also gives a migration path for
+old, Interim BDF datasets that lurk on many a tape, and that will not be
+readable on UNIX. 
+
+{\footnotesize CONVERT} is available from both VMS and UNIX platforms.
+The supported conversions are currently as follows: 
+
+\begin{center}
+\begin{tabular}{l@{ -- }l}
+\medskip
+{\bf ASCII2NDF} &  Converts a text file to an NDF. \\ \medskip
+{\bf BDF2NDF} &  Converts a Starlink Interim BDF file to an NDF. \\ \medskip
+{\bf DIPSO2NDF} & Converts a DIPSO-format file to an NDF. \\ \medskip
+{\bf DST2NDF} &  Converts a Figaro (Version 2) DST file to an NDF. \\ \medskip
+{\bf GASP2NDF} &  Converts an image in GASP format to an NDF. \\ \medskip
+{\bf IRAF2NDF} &  Converts an IRAF image to an NDF. \\ \medskip
+{\bf IRCAM2NDF} &  Converts an IRCAM data file to a series of NDFs. \\ \medskip
+{\bf NDF2ASCII} &  Converts an NDF to a text file. \\ \medskip
+{\bf NDF2BDF} &  Converts an NDF to a Starlink Interim BDF file. \\ \medskip
+{\bf NDF2DIPSO} &  Converts an NDF to a DIPSO-format file. \\ \medskip
+{\bf NDF2DST} & Converts an NDF to a Figaro (Version 2) DST file. \\ \medskip
+{\bf NDF2GASP} & Converts a two-dimensional NDF into a GASP image. \\ \medskip
+{\bf NDF2IRAF} & Converts an NDF to an IRAF image. \\ \medskip
+{\bf NDF2UNF} &  Converts an NDF to a sequential unformatted file. \\ \medskip
+{\bf UNF2NDF} &  Converts a sequential unformatted file to an NDF. \\
+\end{tabular}
+\end{center}
+In addition there are FITS readers within {\footnotesize KAPPA} (SUN/95)
+which will convert FITS files to NDFs.
+
+The various formats supported by {\footnotesize CONVERT} do not have
+one-to-one correspondence and therefore in general it is not possible to
+apply a forward and reverse conversion and finish with a duplicate of
+the initial data file.  This hysteresis is particularly likely when
+starting with an NDF, since many simpler formats have no way of storing
+certain NDF data items, like variance and axis widths.  However, if you
+are dealing with a simple file containing just a data array and linear
+axis centres, then it should be possible to avoid loss of information. 
+
+{\sl Note---the input data file is not deleted or altered in any way, 
+with the exception of the input BDF in BDF2NDF, which can accumulate an 
+extra `incarnation' of the data array as described in
+Appendix~\ref{ap:full}.}
+
+
+\section{Running CONVERT}
+
+You have a choice of command language from where you may run
+{\footnotesize CONVERT}.  On VMS platforms you can choose either from
+{\footnotesize DCL} or {\footnotesize ICL} (the {\footnotesize ADAM}
+command language), and from the shell on UNIX platforms ({\footnotesize
+ICL} is expected soon).  Under VMS {\footnotesize DCL} is 
+convenient for one-off conversions, and {\footnotesize ICL} is
+recommended for a series of conversions because of its greater
+efficiency, as the applications are part of a monolith that remains
+loaded, and so after you invoke the first {\footnotesize CONVERT}
+application subsequent ones run immediately. 
+
+\subsection{Starting CONVERT from DCL}
+
+To define the commands used by {\footnotesize CONVERT} you must first
+issue the command\footnote{The startup command cannot be {\tt CONVERT}
+since there is a VMS command called {\tt CONVERT}.} 
+
+\small
+\begin{verbatim}
+      $ CONVERTSTART
+\end{verbatim}
+\normalsize 
+Note that the {\tt \$} is the standard VMS prompt which you do not type.
+This executes a procedure to set up symbols for {\footnotesize
+CONVERT}'s command names, and defines some logical names to make help
+information available.  The procedure, like the other setup commands
+below, tells you the current version number and other introductory
+information like this. 
+
+\small
+\begin{verbatim}
+
+      --    Initialised for CONVERT    --
+      --  Version 0.5, 1993 November  --
+
+         Type CONHELP for CONVERT help 
+\end{verbatim}
+\normalsize 
+Then you'll be able to mix {\footnotesize CONVERT} commands with the
+familiar {\footnotesize DCL} ones. 
+
+\subsection{Starting CONVERT from ICL}
+
+To run {\footnotesize CONVERT} from {\footnotesize ICL} you must be
+within the {\footnotesize ADAM} command language.  If you aren't
+already, this requires just one extra command, namely 
+
+\small
+\begin{verbatim}
+     $ ADAM
+\end{verbatim}
+\normalsize
+You will see any messages produced by system and user procedures, followed
+by the {\tt ICL>} prompt, something like the following.
+
+\small
+\begin{verbatim}
+     Interactive Command Language   -   Version 1.5-6
+
+       - Type HELP package_name for help on specific Starlink packages
+       -   or HELP PACKAGES for a list of all Starlink packages
+       - Type HELP [command] for help on ICL and its commands
+
+\end{verbatim}
+\normalsize
+You will then get the {\tt ICL$>$} prompt.
+Again there is a procedure for making the {\footnotesize CONVERT}
+commands known to the command language.
+
+\small
+\begin{verbatim}
+     ICL> CONVERT
+\end{verbatim}
+\normalsize
+As there is no name clash, we can use the package name here, like other
+packages, though {\tt CONVERTSTART} would still be recognised. 
+
+\subsection{Starting CONVERT from the UNIX shell}
+
+The command {\bf convert} defines {\footnotesize CONVERT} commands from
+the UNIX shell.
+
+\small
+\begin{verbatim}
+      % convert
+\end{verbatim}
+\normalsize 
+Note that the {\tt \%} is the UNIX shell's prompt which you do not type.
+Then you'll be able to mix {\footnotesize CONVERT} and UNIX commands.
+
+\subsection{Issuing CONVERT Commands}
+
+Having initialised {\footnotesize CONVERT} you are now ready to issue a
+{\footnotesize CONVERT} command. To run an application you can just give
+its name---you will be prompted for any required {\em parameters}. 
+Alternatively, you may enter parameter values on the command line
+specified by position or by keyword.  If you want to override any
+defaulted parameters, then you specify the parameter's value on the
+command line.  Note that from UNIX the commands are in lowercase, whereas
+from VMS the commands are case-insensitive and are the same for both
+{\footnotesize DCL} and {\footnotesize ICL}.
+
+Most {\footnotesize CONVERT} applications can be run as simply as 
+
+\small
+\begin{verbatim}
+     <application> <in> <out>
+\end{verbatim}
+\normalsize
+where {\tt $<$application$>$} is the application's name, {\tt $<$in$>$}
+is the input file, and {\tt $<$out$>$} is the output
+file following the conversion.  For instance, 
+
+\small
+\begin{verbatim}
+     $ DST2NDF OLD NEW
+\end{verbatim}
+\normalsize
+or
+
+\small
+\begin{verbatim}
+     ICL> DST2NDF OLD NEW
+\end{verbatim}
+\normalsize
+both instruct the application DST2NDF to convert the DST file called
+OLD.DST to the NDF called NEW.SDF.  From UNIX the command would be
+
+\small
+\begin{verbatim}
+     % dst2ndf old new
+\end{verbatim}
+\normalsize
+to convert old.dst to new.sdf.
+
+Under VMS, commands may be abbreviated provided they are unambiguous
+strings with at least four characters and including the {\tt 2}. 
+
+The following example has the same effect as those immediately above,
+only this time you are prompted for the filenames needed by DST2NDF. 
+
+\small
+\begin{verbatim}
+     ICL> DST2NDF
+     IN - Name of Figaro (.DST) file to be converted /' '/ > OLD
+     OUT - Name of output NDF /@F1/ > NEW
+\end{verbatim}
+\normalsize
+The value between the {\tt / /} delimiters is a suggested default.  You
+can choose to accept the suggestion by pressing carriage return. 
+
+The exceptions to the simple usage ({\tt <application> <in> <out>}) are
+ASCII2NDF, where you give the shape of the dataset, either directly or
+from a FITS-like header; UNF2NDF where the same applies, and you also
+must specify the number of data values per record; and IRCAM2NDF where
+you select which observations to convert and give the prefix of the
+names of the output NDFs. See Section~4 of SUN/95 or Section~8 of SG/4
+for details of how to use parameters for controlling these and other
+options.  However, you should be able to get along using intuition
+alone, or, perhaps by consulting the examples in Appendix~\ref{ap:full}.
+
+Currently, one invocation of a {\footnotesize CONVERT} application is
+required for each file conversion. 
+
+You can find full documentation of each application, including its
+usage, parameters, details of the conversion process and examples in
+Appendix~\ref{ap:full}. 
+
+\subsection{Obtaining Help}
+You can see the top-level help for {\footnotesize CONVERT} by entering
+
+\small
+\begin{verbatim}
+     ICL> HELP CONVERT
+\end{verbatim}
+\normalsize
+or from {\footnotesize DCL}\footnote{The behaviour is different for DCL
+and ICL because the DCL command {\tt HELP CONVERT} would display
+information concerning DCL's CONVERT command, and not the CONVERT package.} 
+
+\small
+\begin{verbatim}
+     $ CONHELP
+\end{verbatim}
+\normalsize
+or from the UNIX shell\footnote{There is no help facility akin to that
+in VMS so you must invoke a special application: conhelp.} 
+
+\vspace{-\bigskipamount}
+\small
+\begin{verbatim}
+     % conhelp
+\end{verbatim}
+\normalsize
+
+On VMS, type {\tt ?} to get a list of
+help topics.  On UNIX that will already be visible.\footnote{This
+arises because UNIX conhelp uses the Starlink portable help system
+whereas on VMS systems CONVERT uses VMS help.} 
+
+The help topics are mostly detailed descriptions of the applications,
+{\it e.g.}\ the following command gives help on the application UNF2NDF
+
+\small
+\begin{verbatim}
+     $ HELP UNF2NDF
+\end{verbatim}
+\normalsize
+under VMS and
+
+\small
+\begin{verbatim}
+     % conhelp unf2ndf
+\end{verbatim}
+\normalsize
+does likewise from the UNIX shell; but they also include global
+information on matters such as using parameters. 
+
+If you have commenced running an application you can still access the
+help library whenver you are prompted for a parameter; you enter {\tt ?}.
+Here is an example.
+
+\small
+\begin{verbatim}
+     NOPEREC - Number of data values per output record /512/ > ?
+
+     NDF2UNF
+
+       Parameters
+
+         NOPEREC = _INTEGER (Read)
+            The number of data values per record of the output file.  It
+            should be in the range 1 to 8191, unless the array is double
+            precision, when the upper limit is 4095.  The suggested
+            default is the current value. [The first dimension of the NDF]
+
+     NOPEREC - Number of data values per output record /512/ > 
+\end{verbatim}
+\normalsize
+ 
+\section{Acknowledgements}
+Jo Murray wrote the original versions of the applications that convert
+between DSTs or DIPSO files and NDFs.  Alan Chipperfield produced the
+original STARIN and STAROUT upon which BDF2NDF and NDF2BDF are based.
+Rhys Morris wrote the original versions of IRAF2NDF, NDF2IRAF, GASP2NDF
+and NDF2GASP.
+
+\newpage
+\appendix
+
+\section{Specifications of CONVERT applications}
+\label{ap:full}
+\subsection{Explanatory Notes}
+The specification of parameters has the following format.
+
+\begin{verbatim}
+     name  =  type (access)
+        description
+\end{verbatim}
+This format also includes a {\em Usage\/} entry.  This shows how the
+application is invoked from the command line.   It lists the positional
+parameters in order followed by any prompted keyword parameters using 
+a {\mbox ``KEYWORD=?''} syntax.  Defaulted
+keyword parameters do not appear.  Positional parameters
+that are normally defaulted are indicated by being enclosed in square
+brackets.   Keyword ({\it i.e.}\ not positional) parameters are needed 
+where the number of parameters are large, and usually occur because
+they depend on the value of another parameter.  An example should clarify.
+\bigskip
+
+{\ssttt \hspace*{1.0em}
+        NDF2ASCII IN OUT [COMP] [RECLEN] NOPEREC=?
+}
+\bigskip
+
+IN, OUT, COMP, and RECLEN are all positional
+parameters.  Only IN, and OUT would be prompted if not given
+on the command line. The remaining parameter, NOPEREC, depends on the
+value of another parameter (it is FIXED), and will be prompted for when
+FIXED is {\tt TRUE}. 
+
+There is also an {\em Examples\/} section.  This shows how to run the
+application from the command line.  More often you'll enter the
+command name and just some of the parameters, and be prompted for
+the rest.
+
+The description entry has a notation scheme to indicate 
+normally defaulted parameters, {\it i.e.}\ those for which there will
+be no prompt.
+For such parameters a matching pair of square brackets ({\tt []})
+terminates the description.  The content between the brackets mean
+\begin{description}
+\item[{\tt []}]
+Empty brackets means that the default is created dynamically
+by the application, and may depend on the values of other parameters.
+Therefore, the default cannot be given explicitly.
+\item[{\tt [,]}]
+As above, but there are two default values that are created dynamically.
+\item[{\tt [}{\rm default}{\tt ]}]
+Occasionally, a description of the default is given in normal type.
+\item[{\tt [default]}]
+If the brackets contain a value in teletype-fount, this is the explicit
+default value.
+\end{description}
+
+\small
+\newpage
+
+\sstroutine{
+   ASCII2NDF
+}{
+   Converts a text file to an NDF
+}{
+   \sstdescription{
+      This application converts a text file to an NDF.  Only one of
+      the array components may be created from the input file.
+      Preceding the input data there may be an optional header.  This
+      header may be skipped, or may consist of a simple FITS header.
+      In the former case the shape of the NDF has be to be supplied.
+   }
+   \sstusage{
+      ascii2ndf in out [comp] [skip] shape [type]
+   }
+   \sstparameters{
+      \sstsubsection{
+         COMP = LITERAL (Read)
+      }{
+         The NDF component to be copied.  It may be {\tt "Data"},
+         {\tt "Quality"} or {\tt "Variance"}.  To create a variance or
+         quality array the NDF must already exist. {\tt ["Data"]}
+      }
+      \sstsubsection{
+         FITS = \_LOGICAL (Read)
+      }{
+         If true, the initial records of the formatted file are
+         interpreted as a FITS header (with one card image per record)
+         from which the shape, data type, and axis centres are derived.
+         The last record of the FITS-like header must be terminated by
+         an END keyword; subsequent records in the input file are
+         treated as an array component given by COMP.  {\tt [FALSE]}
+      }
+      \sstsubsection{
+         IN = FILENAME (Read)
+      }{
+         Name of the input text Fortran file.  The file will normally
+         have variable-length records when there is a header, but
+         always fixed-length records when there is no header.  On VMS
+         platforms a default file extension of {\tt ".DAT"} is appended when
+         parameter IN contains no file extension.
+      }
+      \sstsubsection{
+         OUT = NDF (Read and Write)
+      }{
+         Output NDF data structure.  When COMP is not {\tt "Data"} the NDF
+         is modified rather than a new NDF created.
+         It becomes the new current NDF.
+      }
+      \sstsubsection{
+         SHAPE = \_INTEGER (Read)
+      }{
+         The shape of the NDF to be created.  For example, {\tt [40,30,20]}
+         would create 40 columns by 30 lines by 10 bands.  It is only
+         accessed when FITS is {\tt FALSE}.
+      }
+      \sstsubsection{
+         SKIP = INTEGER (Read)
+      }{
+         The number of header records to be skipped at the start of the
+         input file before finding the data array or FITS-like header.
+         {\tt [0]}
+      }
+      \sstsubsection{
+         TYPE = LITERAL (Read)
+      }{
+         The data type of the output NDF.  It must be one of the
+         following HDS types: {\tt "\_BYTE"}, {\tt "\_WORD"}, {\tt "\_REAL"},
+         {\tt "\_INTEGER"}, {\tt "\_DOUBLE"}, {\tt "\_UBYTE"},
+         {\tt "\_UWORD"} corresponding to signed byte,
+         signed word, real, integer, double precision, unsigned byte,
+         and unsigned word.  See SUN/92 for further details.  An
+         unambiguous abbreviation may be given.  TYPE is ignored when
+         COMP = {\tt "Quality"} since the QUALITY component must comprise
+         unsigned bytes (equivalent to TYPE = {\tt "\_UBYTE"}) to be a valid
+         NDF. The suggested default is the current value.  TYPE is only
+         accessed when FITS is {\tt FALSE}.  {\tt ["\_REAL"]}
+       }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         ascii2ndf ngc253.dat ngc253 shape=[100,60]
+      }{
+         This copies a data array from the text file ngc253.dat to the
+         NDF called ngc253.  ngc253.dat does not contain a header
+         section.  The NDF is two-dimensional: 100 elements in $x$ by 60
+         in $y$.  Its data array has type \_REAL.
+      }
+      \sstexamplesubsection{
+         ascii2ndf ngc253q.dat ngc253 q shape=[100,60]
+      }{
+         This copies a quality array from the text file ngc253q.dat to
+         an existing NDF called ngc253 (such as created in the first
+         example).  ngc253q.dat does not contain a header section.  The
+         NDF is two-dimensional: 100 elements in $x$ by 60 in $y$.  Its
+         data array has type \_UBYTE.
+      }
+      \sstexamplesubsection{
+         ascii2ndf ngc253.dat ngc253 fits
+      }{
+         This copies a data array from the text file ngc253.dat
+         to the NDF called ngc253.  ngc253.dat contains a FITS-like
+         header section, which is copied to the FITS extension of the
+         NDF.  The shape of the NDF is controlled by the mandatory FITS
+         keywords NAXIS, AXIS1, \dots, AXIS$n$, and the data type by
+         keywords BITPIX and UNSIGNED.
+      }
+      \sstexamplesubsection{
+         ascii2ndf type="\_uword" in=ngc253.dat out=ngc253 $\backslash$
+      }{
+         This copies a data array from the text file ngc253.dat to the
+         NDF called ngc253.  ngc253.dat does not contain a header
+         section.  The NDF has the current shape and data type is
+         unsigned word.
+      }
+      \sstexamplesubsection{
+         ascii2ndf spectrum ZZ skip=2 shape=200
+      }{
+         This copies a data array from the text file spectrum to
+         the NDF called ZZ.  spectrum contains two header records
+         that are ignored.  The NDF is one-dimensional comprising 200
+         elements of type \_REAL.
+      }
+      \sstexamplesubsection{
+         ascii2ndf spectrum.lis ZZ skip=1 fits
+      }{
+         This copies a data array from the text file spectrum.lis to
+         the NDF called ZZ.  spectrum.lis contains one header record,
+         that is ignored, followed by a FITS-like header section, which
+         is copied to the FITS extension of the NDF.  The shape of the
+         NDF is controlled by the mandatory FITS keywords NAXIS, AXIS1,
+         \dots, AXIS$n$, and the data type by keywords BITPIX and UNSIGNED.
+      }
+   }
+   \sstnotes{
+      The details of the conversion are as follows:
+      \sstitemlist{
+
+         \sstitem
+            the ASCII-file array is written to the NDF array as
+            selected by COMP.  When the NDF is being modified, the shape
+            of the new component must match that of the NDF.
+
+         \sstitem
+            If the input file contains a FITS-like header, and a new
+            NDF is created, {\it i.e.}\ COMP = {\tt "Data"}, the header records are
+            placed within the NDF's FITS extension.  This enables more
+            than one array (input file) to be used to form an NDF.  Note
+            that the data array must be created first to make a valid NDF,
+            and it's the FITS structure associated with that array that is
+            wanted.  Indeed the application prevents you from doing
+            otherwise.
+
+         \sstitem
+            The FITS-like header defines the properties of the NDF as
+            follows:
+            \begin{itemize}
+            \item BITPIX defines the data type: 8 gives \_BYTE, 16 produces
+            \_WORD, 32 makes \_INTEGER, $-$32 gives \_REAL, and $-$64 generates
+            \_DOUBLE.  For the first two, if there is an extra header
+            record with the keyword UNSIGNED and logical value T, these
+            types become \_UBYTE and \_UWORD respectively.  UNSIGNED is
+            non-standard, since unsigned integers would not follow in a
+            proper FITS file.  However, here it is useful to enable
+            unsigned types to be input into an NDF.  UNSIGNED may be
+            created by this application's sister, NDF2ASCII.  BITPIX is
+            ignored for QUALITY data; type \_UBYTE is used.
+            \item NAXIS, and NAXIS$n$ define the shape of the NDF.
+            \item The TITLE, LABEL, and BUNITS are copied to the NDF
+            TITLE, LABEL, and UNITS NDF components respectively.
+            \item The CDELT$n$, CRVAL$n$, CTYPE$n$, and CRTYPE$n$ keywords make
+            linear axis structures within the NDF.  CTYPE$n$ define the
+            axis units, and the axis labels are assigned to CRTYPE$n$ If
+            some are missing, pixel co-ordinates are used for those
+            axes.
+            \item BSCALE and BZERO in a FITS extension are ignored.
+            \item BLANK is not used to indicate which input array values
+            should be assigned to a standard bad value.
+            \item END indicates the last header record unless it
+            terminates a dummy header, and the actual data is in an
+            extension.
+            \end{itemize}
+
+         \sstitem
+            Other data item such as HISTORY, data ORIGIN, and axis
+            widths are not supported, because the text file has a simple
+            structure to enable a diverse set of input files to be
+            converted to NDFs, and to limitations of the standard FITS
+            header.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      CONVERT: NDF2ASCII; KAPPA: TRANDAT; SPECDRE: ASCIN and ASCOUT.
+   }
+}
+
+\newpage
+\sstroutine{
+   BDF2NDF
+}{
+   Converts a Starlink Interim BDF file to an NDF
+}{
+   \sstdescription{
+      This application converts data files from the Bulk Data Frame
+      (BDF) format used by the INTERIM Environment (see SUN/4) to the
+      Starlink standard NDF format (see SUN/33 or SGP/38).  Type
+      conversion may be performed at the same time.
+   }
+   \sstusage{
+      BDF2NDF IN OUT [TYPE] [DESCRIP]
+   }
+   \sstparameters{
+      \sstsubsection{
+         IN = BDF (Read)
+      }{
+         The BDF to be converted to an NDF.  A file extension must not
+         be given since {\tt ".BDF"} is assumed.
+      }
+      \sstsubsection{
+         OUT = NDF (Write)
+      }{
+         The name of NDF converted from the BDF.  It becomes the new
+         current NDF.
+      }
+      \sstsubsection{
+         TYPE = LITERAL (Read)
+      }{
+         The data type of the output NDF.  It must be one of the
+         following HDS types: {\tt "\_BYTE"}, {\tt "\_WORD"},
+         {\tt "\_REAL"}, {\tt "\_INTEGER"}, {\tt "\_DOUBLE"},
+         {\tt "\_UBYTE"}, {\tt "\_UWORD"} corresponding to signed byte,
+         signed word, real, integer, double precision, unsigned byte,
+         and unsigned word.  See SUN/92 for further details.  An
+         unambiguous abbreviation may be given.  {\tt ["\_REAL"]}
+      }
+      \sstsubsection{
+         DESCRIP = \_LOGICAL (Read)
+      }{
+         If true the descriptors in the BDF are reported as they are
+         copied to the FITS extension within the output NDF. {\tt [FALSE]}
+      }
+      \sstsubsection{
+         CONNECT = FILENAME (Write)
+      }{
+         The Interim connection file.  It is deleted when the
+         application terminates.  {\tt [NDF2BDF.TMP]}
+      }
+      \sstsubsection{
+         COMMAND = FILENAME (Write)
+      }{
+         The Interim command file.  It is deleted when the application
+         terminates.  {\tt [USERCOM.TMP]}
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         BDF2NDF OLD NEW
+      }{
+         This converts the BDF called OLD (in file OLD.BDF) to the NDF
+         called NEW (in file NEW.SDF).  NEW's data array will have
+         the \_REAL data type.  Descriptors are copied to the FITS
+         extension but are not reported.
+      }
+      \sstexamplesubsection{
+         BDF2NDF OLD NEW DESCRIP
+      }{
+         This converts the BDF called OLD (in file OLD.BDF) to the NDF
+         called NEW (in file NEW.SDF).  NEW's data array will have
+         the \_REAL data type.  Descriptors are copied to the FITS
+         extension and are reported.
+      }
+      \sstexamplesubsection{
+         BDF2NDF HORSE HORSE TYPE="\_WORD"
+      }{
+         This converts the BDF called HORSE (in file HORSE.BDF) to the
+         NDF also called HORSE (in file HORSE.SDF).  The NDF's data
+         array will contain signed 2-byte integers.  Descriptors are
+         copied to the FITS extension but are not reported.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The conversion rules can be summarised as follow:
+         \begin{itemize}
+            \item the BDF data array is copied to the NDF main data array;
+            by default the output data array has the \_REAL data type.
+            \item The BLANK descriptor is not used to flag pixels in the NDF
+            with the bad value.  Use KAPPA's SETMAGIC to flag another
+            value.
+            \item The BDF descriptors are written to the NDF FITS extension.
+            Long values may be truncated, 65 for characters and 20 for
+            numbers.  The formating adheres to the FITS standard.
+            Descriptors already in the FITS format are copied as is, so
+            La Palma ING-format headers can be propagated.
+            \item If the BDF descriptors contain the FITS keywords CRVAL$n$,
+            CDELT$n$, the appropriate axis structures are generated in
+            the output NDF. In addition should CRTYPE$n$ also be present
+            the labels are added to these structures.
+            \item If the BDF descriptors contain the FITS keywords TITLE or
+            LABEL or BUNITS, the associated character string value is
+            written to the NDF TITLE, LABEL or UNITS component as
+            appropriate.
+            \item HISTORY descriptors are not used to make an HISTORY
+            component in the NDF.
+         \end{itemize}
+
+         \sstitem
+         WARNING: the BDF size may grow when TYPE is specified due to
+         an incarnation being created.  See below and SUN/4 for more
+         details.
+      }
+   }
+   \sstdiytopic{
+      Incarnations
+   }{
+      A BDF contains one or more `incarnations' of the data array.  An
+      incarnation of a data array is simply a copy of that data array
+      stored with a particular data type.  For example, a BDF may
+      contain incarnations of the same data array stored as a REAL
+      array, and an INTEGER array.  This rather strange behaviour is a
+      consequence of the way the INTERIM environment deals with data
+      access.  For example, if an application attempts to map a BDF data
+      array of INTEGER type as a REAL array, type conversion must take
+      place.  Instead of doing this in virtual memory, a second
+      incarnation of the data, this time of type REAL is created and
+      stored in the original file (causing perhaps a doubling of the
+      file size).  This second incarnation of the data array is stored
+      to avoid performing the same type conversion in the future.  (It
+      is perhaps significant that no such scheme has been employed with
+      subsequent data systems.)  One consequence of this behaviour is
+      that a BDF data array may not have a unique type.  BDF2NDF will
+      use the first type it finds as the default.  Specify the
+      TYPE parameter explicitly to ensure that the correct data type is
+      created within the NDF.
+
+      To prevent the BDF growing, just remove write access from the
+      file.
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      CONVERT: NDF2BDF.
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
+
+         \sstitem
+         Note the data array in the NDF is of the primitive form.
+
+         \sstitem
+         Only available on VMS platforms.
+      }
+   }
+   \sstbugs{
+      \sstitemlist{
+
+         \sstitem
+         May give spurious error messages if running under ICL.  This
+         happens if a non-existent BDF is given as the input file.  A
+         subsequent invocation of the application may result in a repeat of
+         the error message although the conversion is carried out
+         correctly.
+      }
+   }
+}
+
+\newpage
+\sstroutine{
+   DIPSO2NDF
+}{
+   Converts a DIPSO-format file to an NDF
+}{
+   \sstdescription{
+      This application creates an NDF from a DIPSO-format file as
+      produced by the DIPSO `WRITE' command.  See SUN/50.  The rules
+      for the conversion are listed in the Notes.
+   }
+   \sstusage{
+      DIPSO2NDF IN OUT
+   }
+   \sstparameters{
+      \sstsubsection{
+         IN = FILENAME (Read)
+      }{
+         Input DIPSO file.  A default file extension of {\tt ".DAT"} is
+         appended when parameter IN contains no file extension.
+      }
+      \sstsubsection{
+         OUT = NDF (Write)
+      }{
+         Output NDF data structure.  A file extension must not be given
+         after the name.  It becomes the new current NDF.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         DIPSO2NDF OLD NEW
+      }{
+         This converts the DIPSO file called OLD to the NDF called NEW
+         (in file NEW.SDF).
+      }
+      \sstexamplesubsection{
+         DIPSO2NDF SPECTRE.DAT SPECTRE
+      }{
+         This converts the DIPSO file SPECTRE.DAT to the NDF called
+         SPECTRE (in file SPECTRE.SDF).
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The DIPSO title is written to the NDF TITLE.
+
+         \sstitem
+         The DIPSO main data array (often call the flux array) is
+         copied to the NDF's data array.  DIPSO records bad values by
+         means of breaks in the data array.  The number and positions of
+         these breaks are stored in the DIPSO file.  This application
+         inserts bad pixels at these break positions.  The number of bad
+         pixels inserted is based on the size of the gap in the wavelength
+         scale.  At least one bad pixel is inserted at every break point.
+
+         \sstitem
+         The $x$-axis array (otherwise known as the wavelength array) is
+         copied to the NDF AXIS(1) centres.  Missing axis centres are
+         generated by linear interpolation between the good $x$-axis values
+         in the DIPSO file.
+
+         \sstitem
+         The data and the axis centres need not be fluxes and
+         wavelengths respectively.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      CONVERT: NDF2DIPSO; DIPSO: commands OREAD and OWRITE.
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
+
+         \sstitem
+         The output NDF has a primitive data array.
+
+         \sstitem
+         The input wavelength and flux data are always of Fortran REAL
+         type, the output data arrays are of HDS type \_REAL.
+
+         \sstitem
+         The application assumes that the bad-pixel padding will not
+         cause the number of elements in the data array to exceed twice
+         the original number.
+
+         \sstitem
+         Only available on VMS platforms.
+      }
+   }
+}
+
+\newpage
+\sstroutine{
+   DST2NDF
+}{
+   Converts a Figaro (Version 2) DST file to an NDF
+}{
+   \sstdescription{
+      This application converts a Figaro Version-2 DST file to a
+      Version-3 file, {\it i.e.}\ to an NDF.  The rules for converting the
+      various components of a DST are listed in the notes.  Since
+      both are hierarchical formats most files can be be converted with
+      little or no information lost.
+   }
+   \sstusage{
+      dst2ndf in out
+   }
+   \sstparameters{
+      \sstsubsection{
+         FORM = LITERAL (Read)
+      }{
+         The storage form of the NDF's data and variance arrays.
+         FORM = {\tt "Simple"} gives the simple form, where the array of data
+         and variance values is located in an ARRAY structure.  Here it
+         can have ancillary data like the origin.  This is the normal
+         form for an NDF.  FORM = {\tt "Primitive"} offers compatibility with
+         earlier formats, such as IMAGE.  In the primitive form the
+         data and variance arrays are primitive components at the top
+         level of the NDF structure, and hence it cannot have
+         ancillary information. {\tt ["Simple"]}
+      }
+      \sstsubsection{
+         IN = Figaro file (Read)
+      }{
+         The file name of the version 2 file.  A file extension must
+         not be given after the name, since {\tt ".dst"} is appended by the
+         application.  The file name is limited to 80 characters.
+      }
+      \sstsubsection{
+         OUT = NDF (Write)
+      }{
+         The file name of the output NDF file.  A file extension must
+         not be given after the name, since {\tt ".sdf"} is appended by the
+         application.  Since the NDF\_ library is not used, a section
+         definition may not be given following the name.  The file
+         name is limited to 80 characters.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         dst2ndf old new
+      }{
+         This converts the Figaro file old.dst to the NDF called new
+         (in file new.sdf).  The NDF has the simple form.
+      }
+      \sstexamplesubsection{
+         dst2ndf horse horse p
+      }{
+         This converts the Figaro file horse.dst to the NDF called
+         horse (in file horse.sdf).  The NDF has the primitive form.
+      }
+   }
+   \sstnotes{
+      The rules for the conversion of the various components are as
+      follows:
+      \vspace{-\parskip}
+      \begin{center}
+      \begin{tabular}{|lcl|p{47mm}|}
+      \hline 
+      \multicolumn{1}{|c}{Figaro file} & & \multicolumn{1}{c}{NDF} &
+      \multicolumn{1}{|c|}{Comments} \\ \hline
+      .Z.DATA   & $\Rightarrow$ & .DATA\_ARRAY.DATA & when FORM = {\tt "SIMPLE"}\\
+      .Z.DATA   & $\Rightarrow$ & .DATA\_ARRAY & when FORM = {\tt "PRIMITIVE"} \\
+      .Z.ERRORS & $\Rightarrow$ & .VARIANCE.DATA & after processing when FORM = {\tt "SIMPLE"} \\
+      .Z.ERRORS & $\Rightarrow$ & .VARIANCE & after processing when FORM = {\tt "PRIMITIVE"} \\
+      .Z.QUALITY & $\Rightarrow$ & .QUALITY.QUALITY & must be BYTE array
+                                  (see Bad-pixel handling below) \\
+      & $\Rightarrow$ & .QUALITY.BADBITS = 255 & \\
+      .Z.LABEL  & $\Rightarrow$ & .LABEL & \\
+      .Z.UNITS  & $\Rightarrow$ & .UNITS & \\
+      .Z.IMAGINARY & $\Rightarrow$ & .DATA\_ARRAY.IMAGINARY\_DATA & \\
+      .Z.MAGFLAG & $\Rightarrow$ & .MORE.FIGARO.MAGFLAG & \\
+      .Z.RANGE  & $\Rightarrow$ & .MORE.FIGARO.RANGE & \\
+      .Z.xxxx   & $\Rightarrow$ & .MORE.FIGARO.Z.xxxx & \\ \hline
+      \end{tabular}
+      \end{center}
+
+      \begin{center}
+      \begin{tabular}{|lcl|p{43mm}|}
+      \hline 
+      \multicolumn{1}{|c}{Figaro file} & & \multicolumn{1}{c}{NDF} &
+      \multicolumn{1}{|c|}{Comments} \\ \hline
+      .X.DATA   & $\Rightarrow$ & .AXIS(1).DATA\_ARRAY & \\ 
+      .X.ERRORS & $\Rightarrow$ & .AXIS(1).VARIANCE & after processing \\
+      .X.WIDTH  & $\Rightarrow$ & .AXIS(1).WIDTH & \\
+      .X.LABEL  & $\Rightarrow$ & .AXIS(1).LABEL & \\
+      .X.UNITS  & $\Rightarrow$ & .AXIS(1).UNITS & \\
+      .X.LOG    & $\Rightarrow$ & .AXIS(1).MORE.FIGARO.LOG & \\
+      .X.xxxx   & $\Rightarrow$ & .AXIS(1).MORE.FIGARO.xxxx & \\
+      & & & (Similarly for .Y .T .U .V or .W structures which are
+             renamed to AXIS(2), \ldots, AXIS(6) in the NDF.) \\
+      & & & \\
+      .OBS.OBJECT & $\Rightarrow$ & .TITLE & \\
+      .OBS.SECZ & $\Rightarrow$ & .MORE.FIGARO.SECZ & \\
+      .OBS.TIME & $\Rightarrow$ & .MORE.FIGARO.TIME & \\
+      .OBS.xxxx & $\Rightarrow$ & .MORE.FIGARO.OBS.xxxx & \\
+      & & & \\
+      .FITS.xxxx& $\Rightarrow$ & .MORE.FITS.xxxx & into value part of
+         the string \\
+      .COMMENTS.xxxx  & $\Rightarrow$ & .MORE.FITS.xxxx & into comment part of
+         the string \\
+      .FITS.xxxx.DATA & $\Rightarrow$ & .MORE.FITS.xxxx & into value part of
+         the string \\
+      .FITS.xxxx.DESCRIPTION & $\Rightarrow$ & .MORE.FITS.xxxx & into comment
+         part of the string \\
+      & & & \\
+      .MORE.xxxx& $\Rightarrow$ & .MORE.xxxx & \\
+      & & & \\
+      .TABLE    & $\Rightarrow$ & .MORE.FIGARO.TABLE & \\
+      .xxxx     & $\Rightarrow$ & .MORE.FIGARO.xxxx & \\ \hline
+      \end{tabular}
+      \end{center}
+
+      Axis arrays with dimensionality greater than one are not
+      supported by the NDF.  Therefore, if the application encounters
+      such an axis array, it processes the array using the following
+      rules, rather than those given above.
+      \begin{center}
+      \begin{tabular}{|lcl|p{51mm}|}
+      \hline 
+      \multicolumn{1}{|c}{Figaro file} & & \multicolumn{1}{c}{NDF} &
+      \multicolumn{1}{|c|}{Comments} \\ \hline
+      .X.DATA   & $\Rightarrow$ & .AXIS(1).MORE.FIGARO.DATA &
+            AXIS(1).DATA\_ARRAY is filled with pixel co-ordinates \\
+      .X.ERRORS & $\Rightarrow$ & .AXIS(1).MORE.FIGARO.VARIANCE & after
+            processing \\
+      .X.WIDTH  & $\Rightarrow$ & .AXIS(1).MORE.FIGARO.WIDTH & \\ \hline
+      \end{tabular}
+      \end{center}
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      CONVERT: NDF2DST.
+   }
+   \sstdiytopic{
+   Bad-pixel handling
+   }{
+   The QUALITY array is only copied if the bad-pixel flag
+   (.Z.FLAGGED) is false or absent.  A simple NDF with the bad-pixel
+   flag set to false (meaning that there are no bad-pixels present)
+   is created when .Z.FLAGGED is absent or false and FORM = {\tt "SIMPLE"}.
+   }
+   \sstimplementationstatus{
+      The maximum number of dimensions is 6.
+   }
+}
+
+\newpage
+\sstroutine{
+   GASP2NDF
+}{
+   Converts an image in GASP format to an NDF
+}{
+   \sstdescription{
+      This application converts a GAlaxy Surface Photometry (GASP)
+      format file into an NDF.
+   }
+   \sstusage{
+      gasp2ndf in out shape=?
+   }
+   \sstparameters{
+      \sstsubsection{
+         IN = LITERAL (Read)
+      }{
+         A character string containing the name of GASP file to convert.
+         The extension should not be given, since {\tt "}.dat{\tt "} is assumed.
+      }
+      \sstsubsection{
+         OUT = NDF (Write)
+      }{
+         The name of the output NDF.
+      }
+      \sstsubsection{
+         SHAPE( 2 ) = \_INTEGER (Read)
+      }{
+         The dimensions of the GASP image (the number of columns
+         followed by the number of rows).  Each dimension must be in the
+         range 1 to 1024.  This parameter is only used if supplied on
+         the command line, or if the header file corresponding to the
+         GASP image does not exist or cannot be opened.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         gasp2ndf m31\_gasp m31
+      }{
+         Convert a GASP file called m31\_gasp.dat into an NDF called m31.
+         The dimensions of the image are taken from the header file
+         m31\_gasp.hdr.
+      }
+      \sstexamplesubsection{
+         gasp2ndf n1068 ngc1068 shape=[256,512]
+      }{
+         Take the pixel values in the GASP file n1068.dat and create
+         the NDF ngc1068 with dimensions 256 columns by 512 rows.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         A GASP image is limited to a maximum of 1024 by 1024 elements.
+         It must be two dimensional.
+
+         \sstitem
+         The GASP image is written to the NDF's data array.  The data
+         array has type \_WORD. No other NDF components are created.
+
+         \sstitem
+         If the header file is corrupted, the user must remove the
+         offending {\tt "}.hdr{\tt "} file or specify the shape of the GASP image on the
+         command line, otherwise the application will continually abort.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      CONVERT: NDF2GASP.
+   }
+   \sstdiytopic{
+      References
+   }{
+      GASP documentation (MUD/66).
+   }
+}
+
+\newpage
+\sstroutine{
+   IRAF2NDF
+}{
+   Converts an IRAF image to an NDF
+}{
+   \sstdescription{
+      This application converts an IRAF image to an NDF.
+      See the Notes for details of the conversion.
+   }
+   \sstusage{
+      iraf2ndf in out
+   }
+   \sstparameters{
+      \sstsubsection{
+         IN = LITERAL (Read)
+      }{
+         The name of the IRAF image.  Note that this excludes the extension.
+      }
+      \sstsubsection{
+         OUT = NDF (Write).
+      }{
+         The name of the NDF to be produced.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         iraf2ndf ell\_galaxy new\_galaxy
+      }{
+         Converts the IRAF image ell\_galaxy (comprising files
+         ell\_galaxy.imh and ell\_galaxy.hdr) to an NDF called new\_galaxy.
+      }
+   }
+   \sstnotes{
+      The rules for the conversion are as follows:
+      \sstitemlist{
+
+         \sstitem
+         The NDF data array is copied from the {\tt "}.pix{\tt "} file.
+
+         \sstitem
+         The title of the IRAF image (object i\_title in the {\tt "}.imh{\tt "}
+         header file) becomes the NDF title.
+
+         \sstitem
+         Lines from the IRAF image header file are transferred to the
+         FITS extension of the NDF, any compulsory FITS keywords that are
+         missing are added.
+
+         \sstitem
+         If there is a FITS extension in the NDF, then the elements up
+         to the first END keyword of this are added to the `user area' of
+         the IRAF header file.
+
+         \sstitem
+         Lines from the HISTORY section of the IRAF image are also
+         extracted and added to the NDF's FITS extension as FITS HISTORY
+         lines.  Two extra HISTORY lines are added to record the original
+         name of the image and the date of the format conversion.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      CONVERT: NDF2IRAF.
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
+
+         \sstitem
+         It is only available on VMS, SunOS, and Ultrix systems.  On
+         Solaris 2.3 systems the version built on SunOS can be used in
+         compatibility mode, but there is no guarantee that this will
+         work for all IRAF images.  At the time of writing there was no
+         working IRAF imfort library available for Alpha/OSF1.
+
+         \sstitem
+         Only handles one-, two-, and three-dimensional IRAF files.
+
+         \sstitem
+         The NDF produced has type \_WORD or \_REAL corresponding to the
+         type of the IRAF image.  (The IRAF imfort FORTRAN subroutine
+         library only supports these data types: signed words and real.)
+         The pixel type of the image can be changed from within IRAF using
+         the {\bf chpixtype} task in the {\bf images} package.
+      }
+   }
+}
+
+\newpage
+\sstroutine{
+   IRCAM2NDF
+}{
+   Converts an IRCAM data file to a series of NDFs
+}{
+   \sstdescription{
+      This applications converts an HDS file in the IRCAM format listed
+      in IRCAM User Note 11 to one or more NDFs.  See the Notes for a
+      detailed list of the rules of the conversion.
+   }
+   \sstusage{
+      ircam2ndf in prefix obs [config]
+   }
+   \sstparameters{
+      \sstsubsection{
+         CONFIG = LITERAL (Read)
+      }{
+         The choice of data array to place in the NDF.  It can have one
+         of the following configuration values:
+            \begin{itemize}
+            \item {\tt "STARE"} --- the image of the object or sky;
+            \item {\tt "CHOP"} --- the chopped image of the sky;
+            \item {\tt "KTCSTARE"} --- the electronic pedestal or bias associated
+                           with the stare image of the object or sky;
+            \item{\tt "KTCCHOP"} --- the electronic pedestal or bias associated
+                           with the chopped image of the sky.
+            \end{itemize}
+         Note that at the time of writing chopping has not been
+         implemented for IRCAM.  For practical purposes CONFIG={\tt "STARE"}
+         should be used.  The suggested default is the current value.
+         {\tt ["STARE"]}
+      }
+      \sstsubsection{
+         FMTCNV = \_LOGICAL (Read)
+      }{
+         This specifies whether or not format conversion may occur.
+         If FMTCNV is false, the data type of the data array in the NDF
+         will be the same as that in the IRCAM file, and there is no
+         scale factor and offset applied.  If FMTCNV is true, whenever
+         the IRCAM observation has non-null scale and offset values,
+         the observation data array will be converted to type \_REAL in
+         the NDF, and the scale and offset applied to the input data
+         values to give the `true' data values.  A null scale factor is
+         1 and a null offset is 0. {\tt [FALSE]}
+      }
+      \sstsubsection{
+         IN = IRCAM (Read)
+      }{
+         The name of the input IRCAM file to convert to NDFs.  The
+         suggested value is the current value.
+      }
+      \sstsubsection{
+         OBS()  = LITERAL (Read)
+      }{
+         A list of the observation numbers to be converted into NDFs.
+         Observations are numbered consecutively from 1 up to the
+         actual number of observations in the IRCAM file.  Single
+         observations or a set of adjacent observations may be
+         specified, {\it e.g.}\ entering {\tt [4,6-9,12,14-16]} will read
+         observations 4,6,7,8,9,12,14,15,16.  (Note that the brackets
+         are required to distinguish this array of characters from a
+         single string including commas.  The brackets are unnecessary
+         when there only one item.)
+
+         If you wish to extract all the observations enter the wildcard
+         {\tt $*$}.  {\tt 5-$*$} will read from 5 to the last observation.  The
+         processing will continue until the last observation is
+         converted.  The suggested value is the current value.
+      }
+      \sstsubsection{
+         PREFIX = LITERAL (Read)
+      }{
+         The prefix of the output NDFs.  The name of an NDF is the
+         prefix followed by the observation number.  The suggested
+         value is the current value.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         ircam2ndf ircam\_27aug89\_1cl rhooph obs=$*$
+      }{
+         This converts the IRCAM data file called ircam\_27aug89\_1cl into
+         a series of NDFs called rhooph1, rhooph2 {\it etc.}\  There is no
+         format conversion applied.
+      }
+      \sstexamplesubsection{
+         ircam2ndf ircam\_27aug89\_1cl rhooph [32,34-36] fmtcnv
+      }{
+         This converts four observations in the IRCAM data file called
+         ircam\_27aug89\_1cl into NDFs called rhooph32, rhooph34,
+         rhooph35, rhooph36.  The scale and offset are applied.
+      }
+      \sstexamplesubsection{
+         ircam2ndf in=ircam\_04nov90\_1c config="KTC" obs=5 prefix=bias
+      }{
+         This converts the fifth observation in the IRCAM data file
+         called ircam\_04nov90\_1c into an NDF called bias5 containing
+         the electronic pedestal in its data array.  There is no format
+         conversion applied.
+      }
+   }
+   \sstnotes{
+      The rules for the conversion of the various components are as
+      follows:
+      \begin{center}
+      \begin{tabular}{|lcl|p{35mm}|}
+      \hline 
+      \multicolumn{1}{|l}{IRCAM file} & & \multicolumn{1}{l}{NDF} &
+      \multicolumn{1}{|c|}{Comments} \\ \hline
+      .OBS.PHASEA.DATA\_ARRAY & $\Rightarrow$ &  .DATA\_ARRAY & 
+          when parameter CONFIG={\tt "STARE"} \\
+      .OBS.PHASEB.DATA\_ARRAY & $\Rightarrow$ &  .DATA\_ARRAY &
+          when parameter CONFIG={\tt "CHOP"} \\
+      .OBS.KTCA.DATA\_ARRAY   & $\Rightarrow$ &  .DATA\_ARRAY &
+          when parameter CONFIG={\tt "KTCSTARE"} \\
+      .OBS.KTCB.DATA\_ARRAY   & $\Rightarrow$ &  .DATA\_ARRAY &
+          when parameter CONFIG={\tt "KTCCHOP"} \\
+      & & & \\
+      .OBS.DATA\_LABEL        & $\Rightarrow$ &  .LABEL & \\
+      .OBS.DATA\_UNITS        & $\Rightarrow$ &  .UNITS & \\
+      .OBS.TITLE              & $\Rightarrow$ &  .TITLE &
+          If .OBS.TITLE is a blank string, OBS.DATA\_OBJECT is copied
+          to the NDF title instead. \\
+      & & & \\
+      .OBS.AXIS1\_LABEL       & $\Rightarrow$ &  .AXIS(1).LABEL & \\
+      .OBS.AXIS2\_LABEL       & $\Rightarrow$ &  .AXIS(2).LABEL & \\
+      .OBS.AXIS1\_UNITS       & $\Rightarrow$ &  .AXIS(1).UNITS & \\
+      .OBS.AXIS2\_UNITS       & $\Rightarrow$ &  .AXIS(2).UNITS & \\
+      \multicolumn{3}{|p{111mm}|}{
+      .GENERAL.INSTRUMENT.PLATE\_SCALE 
+          becomes the increment between the axis centres, with co-ordinate
+          (0.0,0.0) located at the image centre.  The NDF axis units both
+          become {\tt "}arcseconds{\tt "}. } & \\
+      & & & \\
+      .GENERAL               & $\Rightarrow$ &  .MORE.IRCAM.GENERAL & \\
+      .GENERAL.x             & $\Rightarrow$ &  .MORE.IRCAM.GENERAL.x & \\
+      .GENERAL.x.y           & $\Rightarrow$ &  .MORE.IRCAM.GENERAL.x.y & \\
+      & & & \\
+      .OBS.x                 & $\Rightarrow$ &  .MORE.IRCAM.OBS.x &
+          This excludes the components of OBS already listed above and
+          DATA\_BLANK. \\ \hline
+      \end{tabular}
+      \end{center}
+
+      \sstitemlist{
+
+         \sstitem
+         The data types of the IRCAM GENERAL structures have not been
+         propagated to the NDF IRCAM extensions, because it would violate
+         the rules of SGP/38.  In the IRCAM file these all have the same
+         type STRUCTURE.  The new data types are as follows:
+
+      \begin{center}
+      \begin{tabular}{|l|l|}
+      \hline 
+      \multicolumn{1}{|c|}{Extension Name} & \multicolumn{1}{c|}{Data Type} \\ \hline
+      IRCAM.GENERAL & IRCAM\_GENERAL \\
+      IRCAM.GENERAL.INSTRUMENT & IRCAM\_INSTRUM \\
+      IRCAM.GENERAL.ID & IRCAM\_ID \\
+      IRCAM.GENERAL.TELESCOPE & IRCAM\_TELESCOPE \\ \hline
+      \end{tabular}
+      \end{center}
+
+         \sstitem
+         Upon completion the number of observations
+         successfully converted to NDFs is reported.
+      }
+   }
+   \sstdiytopic{
+      Bad-pixel Handling
+   }{
+      Elements of the data array equal to the IRCAM component
+      .OBS.DATA\_BLANK are replaced by the standard bad value.
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
+
+         \sstitem
+         The data array in the NDF is in the primitive form.
+
+         \sstitem
+         The application aborts if the data array chosen by parameter
+         CONFIG does not exist in the observation.
+      }
+   }
+}
+
+\newpage
+\sstroutine{
+   NDF2ASCII
+}{
+   Converts an NDF to a text file
+}{
+   \sstdescription{
+      This application converts an NDF to a Fortran text file.  Only one of
+      the array components may be copied to the output file.  Preceding
+      the data there is an optional header consisting of either the
+      FITS extension with the values of certain keywords replaced by
+      information derived from the NDF, or a minimal FITS header also
+      derived from the NDF.  The output file uses LIST carriagecontrol.
+   }
+   \sstusage{
+      ndf2ascii in out [comp] [reclen] noperec=?
+   }
+   \sstparameters{
+      \sstsubsection{
+         COMP = LITERAL (Read)
+      }{
+         The NDF component to be copied.  It may be {\tt "Data"},
+         {\tt "Quality"} or {\tt "Variance"}. {\tt ["Data"]}
+      }
+      \sstsubsection{
+         FITS = \_LOGICAL (Read)
+      }{
+         If true, any FITS extension is written to start of the output
+         file, unless there is no extension whereupon a minimal FITS
+         header is written to the ASCII file. {\tt [FALSE]}
+      }
+      \sstsubsection{
+         FIXED = \_LOGICAL (Read)
+      }{
+         If true, the output file allocates a fixed number of
+         characters per data value.  The number of characters chosen is
+         the minimum that prevents any loss of precision, and hence is
+         dependent on the data type of the NDF array.  When FIXED is
+         {\tt FALSE}, data values are packed as efficiently as possible within
+         each record. {\tt [FALSE]}
+      }
+      \sstsubsection{
+         IN = NDF (Read)
+      }{
+         Input NDF data structure. The suggested default is the current
+         NDF if one exists, otherwise it is the current value.
+      }
+      \sstsubsection{
+         NOPEREC = \_INTEGER (Read)
+      }{
+         The number of data values per record of the output file, when
+         FIXED is {\tt TRUE}.  It should be positive on UNIX platforms, and
+         in the range 1 to 16383 on VMS.  The suggested default is the
+         current value, or 8 when there is not one.
+      }
+      \sstsubsection{
+         OUT = FILENAME (Write)
+      }{
+         Name of the output formatted Fortran file.  The file will
+         normally have variable-length records when there is a header,
+         but always fixed-length records when there is no header.   On
+         VMS platforms a default file extension of {\tt ".DAT"} is appended
+         when parameter OUT contains no file extension.
+      }
+      \sstsubsection{
+         RECLEN = \_INTEGER (Read)
+      }{
+         The maximum record length in bytes of the output file.  This
+         must be between 32 and 32766 on VMS and greater than 31 on
+         UNIX systems.  The lower limit is further increased to 80 when
+         there is a FITS header to be copied.  It is only used when
+         FIXED is {\tt FALSE} and will default to the current value, or 512
+         if there is no current value.  When FIXED is {\tt TRUE} the
+         application creates data records whose length is the product
+         of the number of bytes per value plus one (for the space),
+         times the number of values per record.  {\tt []}
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         ndf2ascii cluster cluster.dat
+      }{
+         This copies the data array of the NDF called cluster to a text
+         file called cluster.dat.  The maximum recordlength of
+         cluster.dat is 512 bytes, and the data values are packed into
+         these records as efficiently as possible.
+      }
+      \sstexamplesubsection{
+         ndf2ascii cluster cluster.dat v
+      }{
+         This copies the variance of the NDF called cluster to a
+         text file called cluster.dat.  The maximum recordlength of
+         cluster.dat is 512 bytes, and the variance values are packed
+         into these records as efficiently as possible.
+      }
+      \sstexamplesubsection{
+         ndf2ascii cluster cluster.dat fixed noperec=12
+      }{
+         This copies the data array of the NDF called cluster to a
+         text file called cluster.dat.  There are twelve data values
+         per record in cluster.dat.
+      }
+      \sstexamplesubsection{
+         ndf2ascii out=ndf234.dat fits reclen=128 in=@234
+      }{
+         This copies the data array of the NDF called 234 to a
+         text file called ndf234.dat.  The maximum recordlength of
+         ndf234.dat is 128 bytes, and the data values are packed into
+         these records as efficiently as possible.  If there is a FITS
+         extension, it is copied to ndf234.dat with substitution of
+         certain keywords, otherwise a minimal FITS header is produced.
+      }
+   }
+   \sstnotes{
+      The details of the conversion are as follows:
+      \sstitemlist{
+
+         \sstitem
+            the NDF array as selected by COMP is written to the ASCII
+            file in records following an optional header.  When FIXED is
+            {\tt FALSE} all records are padded out to the recordlength.
+
+         \sstitem
+            HISTORY is not propagated.
+
+         \sstitem
+            ORIGIN information is lost.
+
+         \sstitem
+            When a header is to be made, it is composed of FITS-like card
+            images as follows:
+      
+         \sstitemlist{
+
+            \sstitem
+               The number of dimensions of the data array is written
+               to the keyword NAXIS, and the actual dimensions to NAXIS1,
+               NAXIS2 {\it etc.} as appropriate.
+
+            \sstitem
+               If the NDF contains any linear axis structures the
+               information necessary to generate these structures is
+               written to the FITS-like headers. For example, if a linear
+               AXIS(1) structure exists in the input NDF the value of the
+               first data point is stored with the keyword CRVAL1,
+               and the incremental value between successive axis data is
+               stored in keyword CDELT1. If there is an axis label it is
+               written to keyword CRTYPE1, and axis unit is written to CTYPE1.
+               (Similarly for AXIS(2) structures {\it etc.}) FITS does not have
+               a standard method of storing axis widths and variances, so these
+               NDF components will not be propagated to the header.
+               Non-linear axis data arrays cannot be represented by CRVAL$n$
+               and CDELT$n$, and must be ignored.
+
+            \sstitem
+               If the input NDF contains TITLE, LABEL or UNITS components
+               these are stored with the keywords TITLE, LABEL or BUNITS
+               respectively.
+
+            \sstitem
+               If the input NDF contains a FITS extension, the FITS items
+               may be written to the FITS-like header, with the following
+               exceptions:
+               \begin{itemize}
+               \item BITPIX is derived from the type of the NDF data array,
+               and so it is not copied from the NDF FITS extension.
+               \item NAXIS, and NAXIS$n$ are derived from the dimensions of the
+               NDF data array as described above, so these items are not
+               copied from the NDF FITS extension.
+               \item The TITLE, LABEL, and BUNITS descriptors are only copied
+               if no TITLE, LABEL, and UNITS NDF components respectively
+               have already been copied into these headers.
+               \item The CDELT$n$, CRVAL$n$, CTYPE$n$, and CRTYPE$n$ descriptors
+               in the FITS extension are only copied if the input NDF
+               contained no linear axis structures.
+               \item The standard order of the FITS keywords is preserved,
+               thus BITPIX, NAXIS and AXIS$n$ appear immediately after the
+               first card image, which should be SIMPLE.
+               \item BSCALE and BZERO in a FITS extension are copied when
+               BITPIX is positive, {\it i.e.} the array is not floating-point.
+               \end{itemize}
+
+            \sstitem
+               An extra header record with keyword UNSIGNED and logical
+               value T is added when the array data type is one of the HDS
+               unsigned integer types.  This is done because standard FITS
+               does not support unsigned integers, and allows (in conjunction
+               with BITPIX) applications reading the unformatted file to
+               determine the data type of the array.
+
+            \sstitem
+               The last header record card will be the standard FITS END.
+         }
+
+         \sstitem
+            Other extensions are not propagated.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      CONVERT: ASCII2NDF; KAPPA: TRANDAT; SPECDRE: ASCIN and ASCOUT.
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
+
+         \sstitem
+         The value of bad pixels is not written to a FITS-like header
+         record with keyword BLANK.
+      }
+   }
+}
+
+\newpage
+\sstroutine{
+   NDF2BDF
+}{
+   Converts an NDF to a Starlink Interim BDF file
+}{
+   \sstdescription{
+      This application converts an NDF (see SUN/33) to the Bulk Data
+      Frame (BDF) format used by the INTERIM Environment (see SUN/4).
+      Type conversion may be performed at the same time.
+   }
+   \sstusage{
+      NDF2BDF IN OUT [TYPE] [DESCRIP]
+   }
+   \sstparameters{
+      \sstsubsection{
+         IN = NDF (Read)
+      }{
+         The NDF to be converted to a BDF.  The suggested default is
+         the current NDF if one exists, otherwise it is the current
+         value.
+      }
+      \sstsubsection{
+         OUT = BDF (Write)
+      }{
+         The name of BDF converted from the NDF.  No file extension
+         should be given, as the application will automatically give
+         extension {\tt ".BDF"}.
+      }
+      \sstsubsection{
+         TYPE = LITERAL (Read)
+      }{
+         The data type of the output BDF.  It must be one of the
+         following Interim types: {\tt "SB"}, {\tt "SW"}, {\tt "R"},
+         {\tt "SL"}, {\tt "DP"}, {\tt "UB"}, {\tt "UW"} corresponding
+         to signed byte, signed word, real, signed
+         longword, double precision, unsigned byte, unsigned word.
+         See SUN/4 for further details.  The default is the type
+         corresponding to that of the NDF.  {\tt []}
+      }
+      \sstsubsection{
+         DESCRIP = \_LOGICAL (Read)
+      }{
+         If true the keyword and values in a FITS extension are copied
+         to the BDF's descriptors with a number of exceptions listed
+         in the Notes.  {\tt [FALSE]}
+      }
+      \sstsubsection{
+         CONNECT = FILENAME (Write)
+      }{
+         The Interim connection file.  It is deleted when the
+         application terminates.  {\tt [NDF2BDF.TMP]}
+      }
+      \sstsubsection{
+         COMMAND = FILENAME (Write)
+      }{
+         The Interim command file.  It is deleted when the application
+         terminates.  {\tt [USERCOM.TMP]}
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         NDF2BDF NEW OLD
+      }{
+         This converts the NDF called NEW (in file NEW.SDF) to the
+         BDF called OLD (in file OLD.BDF).  OLD's data array will have
+         the same data type as that of NEW.  The FITS header within
+         NEW is converted to descriptors within OLD.
+      }
+      \sstexamplesubsection{
+         NDF2BDF NEW OLD DESCRIP
+      }{
+         This converts the NDF called NEW (in file NEW.SDF) to the
+         BDF called OLD (in file OLD.BDF).  OLD's data array will have
+         the same data type as that of NEW.  The FITS header within
+         NEW is converted to descriptors within OLD, and are reported to 
+         the user.
+      }
+      \sstexamplesubsection{
+         NDF2BDF HORSE HORSE TYPE=R
+      }{
+         This converts the NDF called HORSE (in file HORSE.SDF) to the
+         BDF also called HORSE (in file HORSE.BDF).  The BDF's data
+         array will contain 4-byte floating-point numbers.  The FITS
+         header within NEW is converted to descriptors within the HORSE
+         BDF.
+      }
+   }
+   \sstnotes{
+      The details of the conversion are as follows:
+      \sstitemlist{
+
+         \sstitem
+            the NDF main data array is written to the BDF data array.
+
+         \sstitem
+            QUALITY, and VARIANCE have no counterparts in the BDF, and
+            so cannot be propagated.
+
+         \sstitem
+            HISTORY is not propagated.
+
+         \sstitem
+            UNITS is written to descriptor BUNITS.
+
+         \sstitem
+            The number of dimensions of the data array is written
+            to the BDF descriptor NAXIS, and the actual dimensions to
+            NAXIS1, NAXIS2 {\it etc.}\ as appropriate.
+
+         \sstitem
+            If the NDF contains any linear axis structures the
+            information necessary to generate these structures is
+            written to the BDF descriptors. For example, if a linear
+            AXIS(1) structure exists in the input NDF the value of the
+            first data point is stored in the BDF descriptor CRVAL1,
+            and the incremental value between successive axis data is
+            stored in CDELT1. If there is an axis label it is written to
+            descriptor CRTYPE1, and axis unit is written to CTYPE1.
+            (Similarly for AXIS(2) structures {\it etc.}) FITS does not have a
+            standard method of storing axis widths and variances, so these
+            NDF components will not be propagated.  Non-linear axis data
+            arrays cannot be represented by CRVAL$n$ and CDELT$n$, and must be
+            ignored.
+
+         \sstitem
+            If the input NDF contains TITLE and LABEL components these
+            are stored in the BDF descriptors TITLE and LABEL.
+
+         \sstitem
+            If the input NDF contains a FITS extension, the FITS items
+            may be written to the BDF descriptors, with the following
+            exceptions:
+            \begin{itemize}
+               \item NAXIS, and NAXIS$n$ are derived from the dimensions of
+               the NDF data array as described above, so these items
+               are not copied from the NDF FITS extension.
+               \item The TITLE, LABEL, and BUNITS descriptors are only copied
+               if no TITLE, LABEL, and UNITS NDF components have already
+               been copied into these descriptors.
+               \item The CDELT$n$, CRVAL$n$, CTYPE$n$, and CRTYPE$n$
+               descriptors in the FITS extension are only copied if the
+               input NDF contained no linear axis structures.
+               \item The standard order of the FITS keywords is preserved,
+               thus NAXIS and NAXIS$n$ appear immediately after the second
+               card image, which should be BITPIX.  No FITS comments are
+               written following the values of the above exceptions for
+               compatibility with certain INTERIM applications.
+               FITS-header lines with blank keywords are not copied.
+            \end{itemize}
+
+         \sstitem
+            Other extensions have no BDF counterparts and therefore are
+            not propagated.
+
+         \sstitem
+            All character objects longer than 70 characters are
+            truncated in a BDF descriptor.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      CONVERT: BDF2NDF.
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
+
+         \sstitem
+         Primitive NDFs are created.
+
+         \sstitem
+         The value of bad pixels is not written to the descriptor BLANK.
+
+         \sstitem
+         Only available on VMS platforms.
+      }
+   }
+}
+
+\newpage
+\sstroutine{
+   NDF2DIPSO
+}{
+   Converts an NDF to a DIPSO-format file
+}{
+   \sstdescription{
+      The routine converts a 1-dimensional NDF data file into a
+      DIPSO-format file.  The resultant file can be imported into DIPSO
+      by its READ command.  See SUN/50. The rules for the conversion
+      are listed in the Notes.
+   }
+   \sstusage{
+      NDF2DIPSO IN OUT
+   }
+   \sstparameters{
+      \sstsubsection{
+         IN = NDF (Read)
+      }{
+         Input NDF data structure.  A file extension must not be given
+         after the name.  The suggested default is the current NDF if
+         one exists, otherwise it is the current value.
+      }
+      \sstsubsection{
+         OUT = FILENAME (Write)
+      }{
+         Output DIPSO file.  A default file extension of {\tt ".DAT"}
+         is appended when parameter OUT contains no file extension.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         NDF2DIPSO OLD NEW
+      }{
+         This converts the NDF called OLD (in file OLD.SDF) to the
+         DIPSO file called NEW.DAT.
+      }
+      \sstexamplesubsection{
+         NDF2DIPSO SPECTRE SPECTRE.DAT
+      }{
+         This converts the NDF called SPECTRE (in file SPECTRE.SDF) to
+         the DIPSO file SPECTRE.DAT.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The NDF TITLE object is to the DIPSO file.
+
+         \sstitem
+         The NDF data array becomes the main array in the DIPSO file.
+         Bad pixels found in the NDF result in `breaks' in the DIPSO file.
+
+         \sstitem
+         The axis centres becomes the $x$-axis array in the DIPSO file.
+
+         \sstitem
+         Most NDF components are not supported by the DIPSO format,
+         and therefore anything but the data array, axis centres, and
+         data title will not be copied.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      CONVERT: DIPSO2NDF; DIPSO: commands OREAD and OWRITE.
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
+
+         \sstitem
+         If the NDF data array exceeds the DIPSO limits of 28000
+         elements or 1000 breaks in the data, the application will abort
+         with an appropriate error message.
+
+         \sstitem
+         If the NDF does not have a title, {\tt "Data from NDF"} is written
+         as the DIPSO file's title.
+
+         \sstitem
+         If the NDF does not have an axis, the application will abort
+         with an appropriate error message.
+
+         \sstitem
+         Only available on VMS platforms.
+      }
+   }
+}
+
+\newpage
+\sstroutine{
+   NDF2DST
+}{
+   Converts an NDF to a Figaro (Version 2) DST file
+}{
+   \sstdescription{
+      This application converts an NDF to a Figaro (Version 2) `DST'
+      file.  The rules for converting the various components of a DST
+      are listed in the notes.  Since both are hierarchical formats
+      most files can be be converted with little or no information
+      lost.
+   }
+   \sstusage{
+      ndf2dst in out
+   }
+   \sstparameters{
+      \sstsubsection{
+         IN = NDF (Read)
+      }{
+         Input NDF data structure.  The suggested default is the
+         current NDF if one exists, otherwise it is the current value.
+      }
+      \sstsubsection{
+         OUT = Figaro (Write)
+      }{
+         Output Figaro file name. This excludes the file extension.
+         The file created will be given extension {\tt ".dst"}.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         ndf2dst old new
+      }{
+         This converts the NDF called old (in file old.sdf) to the
+         Figaro file new.dst.
+      }
+      \sstexamplesubsection{
+         ndf2dst spectre spectre
+      }{
+         This converts the NDF called spectre (in file spectre.sdf) to
+         the Figaro file spectre.dst.
+      }
+   }
+   \sstnotes{
+      The rules for the conversion are as follows:
+
+      \begin{center}
+      \begin{tabular}{|lcl|p{56mm}|}
+      \hline 
+      \multicolumn{1}{|c}{NDF} & & Figaro file &
+      \multicolumn{1}{|c|}{Comments} \\ \hline
+      Main data array  & $\Rightarrow$ & .Z.DATA & \\
+      Bad-pixel flag   & $\Rightarrow$ & .Z.FLAGGED & \\
+      Units            & $\Rightarrow$ & .Z.UNITS & \\
+      Label            & $\Rightarrow$ & .Z.LABEL & \\
+      Variance         & $\Rightarrow$ & .Z.ERRORS & after processing \\
+      Quality          & $\Rightarrow$ &  & It is not copied directly
+                         though bad values indicated by QUALITY flags will
+                         be flagged in .Z.DATA in addition to any flagged
+                         values actually in the input main data array.
+                         .Z.FLAGGED is set accordingly. \\
+      Title            & $\Rightarrow$ & .OBS.OBJECT & \\
+      & & & \\
+      AXIS(1) structure & $\Rightarrow$ & .X & \\
+      AXIS(1) Data  & $\Rightarrow$ & .X.DATA & unless there is a DATA
+                          component of AXIS(1).MORE.FIGARO to allow for a 
+                          non-1-dimensional array \\
+      AXIS(1) Variance & $\Rightarrow$ & .X.VARIANCE & unless there is a
+                          VARIANCE component of AXIS(1).MORE.FIGARO to
+                          allow for a non-1-dimensional array \\
+      AXIS(1) Width & $\Rightarrow$ & .X.WIDTH & unless there is a WIDTH
+                          component of AXIS(1).MORE.FIGARO to
+                          allow for a non-1-dimensional array \\
+      AXIS(1) Units & $\Rightarrow$ & .X.UNITS & \\
+      AXIS(1) Label & $\Rightarrow$ & .X.LABEL & \\ \hline
+      \end{tabular}
+      \end{center}
+
+      \begin{center}
+      \begin{tabular}{|lcl|p{56mm}|}
+      \hline 
+      \multicolumn{1}{|c}{NDF} & & Figaro file &
+      \multicolumn{1}{|c|}{Comments} \\ \hline
+      AXIS(1).MORE.FIGARO.xxx & $\Rightarrow$ & .X.xxx & \\
+      & & & Similarly for AXIS(2), \dots, AXIS(6) which are renamed to
+           .Y .T .U .V or .W \\ \hline
+      & & & \\
+      FIGARO extension: & & & \\
+      .MORE.FIGARO.MAGFLAG & $\Rightarrow$ & .Z.MAGFLAG & \\
+      .MORE.FIGARO.RANGE & $\Rightarrow$ & .Z.RANGE & \\
+      .MORE.FIGARO.SECZ & $\Rightarrow$ & .OBS.SECZ & \\
+      .MORE.FIGARO.TIME & $\Rightarrow$ & .OBS.TIME & \\
+      .MORE.FIGARO.xxx & $\Rightarrow$ & .xxx & recursively \\
+      & & & \\
+      FITS extension: & & & \\
+      .MORE.FITS & & & \\
+      Items  & $\Rightarrow$ & .FITS.xxx & \\
+      Comments & $\Rightarrow$ & .COMMENTS.xxx & \\
+      & & & \\
+      Other extensions: & & & \\
+      .MORE.other & $\Rightarrow$ & .MORE.other & \\ \hline
+      \end{tabular}
+      \end{center}
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      CONVERT: DST2NDF.
+   }
+}
+
+\newpage
+\sstroutine{
+   NDF2GASP
+}{
+   Converts a two-dimensional NDF into a GASP image
+}{
+   \sstdescription{
+      This application converts a two-dimensional NDF into the GAlaxy
+      Surface Photometry (GASP) package's format.  See the Notes for the
+      details of the conversion.
+   }
+   \sstusage{
+      ndf2gasp in out [fillbad]
+   }
+   \sstparameters{
+      \sstsubsection{
+         IN = NDF (Read)
+      }{
+         The input NDF data structure. The suggested default is the
+         current NDF if one exists, otherwise it is the current value.
+      }
+      \sstsubsection{
+         FILLBAD = \_INTEGER (Read)
+      }{
+         The value used to replace bad pixels in the NDF's data array
+         before it is copied to the GASP file.  The value must be in the
+         range of signed words (-32768 to 32767).  A null value ({\tt !})
+         means no replacements are to be made.  This parameter is
+         ignored if there are no bad values.  {\tt [!]}
+      }
+      \sstsubsection{
+         OUT = LITERAL (Write)
+      }{
+         The name of the output GASP image.  Two files are produced
+         with the same name but different extensions.  The {\tt "}.dat{\tt "} file
+         contains the data array, and {\tt "}.hdr{\tt "} is the associated header
+         file that specifies the dimensions of the image.  The
+         suggested default is the current value.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         ndf2gasp abell1367 a1367
+      }{
+         Converts an NDF called abell1367 into the GASP image comprising
+         the pixel file a1367.dat and the header file a1367.hdr.  If
+         there are any bad values present they are copied verbatim to
+         the IRAF image.
+      }
+      \sstexamplesubsection{
+         ndf2gasp ngc253 ngc253 fillbad=-1
+      }{
+         Converts the NDF called ngc253 to a GASP image comprising the
+         pixel file ngc253.dat and the header file ngc253.hdr.  Any bad
+         values in the data array are replaced by minus one.
+      }
+   }
+   \sstnotes{
+      The rules for the conversion are as follows:
+      \sstitemlist{
+
+         \sstitem
+         The NDF data array is copied to the {\tt "}.dat{\tt "} file.
+
+         \sstitem
+         The dimensions of the NDF data array is written to the {\tt "}.hdr{\tt "}
+         header file.
+
+         \sstitem
+         All other NDF components are ignored.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      CONVERT: GASP2NDF.
+   }
+   \sstdiytopic{
+      References
+   }{
+      GASP documentation (MUD/66).
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
+
+         \sstitem
+         The GASP image produced has by definition type SIGNED WORD.
+         There is type conversion of the data array to this type.
+
+         \sstitem
+         Bad values may arise due to type conversion.  These too are
+         substituted by the (non-null) value of FILLBAD.
+
+         \sstitem
+         For an NDF with an odd number of columns, the last column from
+         the GASP image is trimmed.
+      }
+   }
+}
+
+\newpage
+\sstroutine{
+   NDF2IRAF
+}{
+   Converts an NDF to an IRAF image
+}{
+   \sstdescription{
+      This application converts an NDF to an IRAF image. 
+      See the Notes for details of the conversion.
+   }
+   \sstusage{
+      ndf2iraf in out [fillbad]
+   }
+   \sstparameters{
+      \sstsubsection{
+         IN = NDF (Read)
+      }{
+         The input NDF data structure.  The suggested default is the
+         current NDF if one exists, otherwise it is the current value.
+      }
+      \sstsubsection{
+         FILLBAD = \_REAL (Read)
+      }{
+         The value used to replace bad pixels in the NDF's data array
+         before it is copied to the IRAF file.  A null value ({\tt !}) means
+         no replacements are to be made.  This parameter is ignored if
+         there are no bad values.  {\tt [!]}
+      }
+      \sstsubsection{
+         OUT = LITERAL (Write)
+      }{
+         The name of the output IRAF image.  Two files are produced
+         with the same name but different extensions. The {\tt "}.pix{\tt "} file
+         contains the data array, and {\tt "}.imh{\tt "} is the associated header
+         file that may contain a copy of the NDF's FITS extension.
+         The suggested default is the current value.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         ndf2iraf abell119 a119
+      }{
+         Converts an NDF called abell119 into the IRAF image comprising
+         the pixel file a119.pix and the header file a119.imh.  If there
+         are any bad values present they are copied verbatim to the IRAF
+         image.
+      }
+      \sstexamplesubsection{
+         ndf2iraf qsospe qsospe fillbad=0
+      }{
+         Converts the NDF called QSOSPE to an IRAF image comprising the
+         pixel file qsospe.imh and the header file qsospe.pix.  Any bad
+         values in the data array are replaced by zero.
+      }
+   }
+   \sstnotes{
+      The rules for the conversion are as follows:
+      \sstitemlist{
+
+         \sstitem
+         The NDF data array is copied to the {\tt "}.pix{\tt "} file.
+
+         \sstitem
+         The NDF title is written to the header object i\_title in
+         the {\tt "}.imh{\tt "} header file. There is a limit of twenty
+         characters.
+
+         \sstitem
+         If there is a FITS extension in the NDF, then the elements up
+         to the first END keyword of this are added to the `user area' of
+         the IRAF header file.
+
+         \sstitem
+         A HISTORY record is added to the IRAF header file indicating
+         that it originated in the named NDF and was converted by
+         NDF2IRAF.
+
+         \sstitem
+         All other NDF components are ignored.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      CONVERT: IRAF2NDF.
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
+
+         \sstitem
+         It is only available on VMS, SunOS, and Ultrix systems.  On
+         Solaris 2.3 systems the version built on SunOS can be used in
+         compatibility mode, but there is no guarantee that this will
+         work for all NDFs.  At the time of writing there was no working
+         IRAF imfort library available for Alpha/OSF1.
+
+         \sstitem
+         Only handles one-, two-, and three-dimensional NDFs.
+
+         \sstitem
+         Of the NDF's array components only the data array may be
+         copied.
+
+         \sstitem
+         The IRAF image produced has type SIGNED WORD or REAL dependent
+         of the type of the NDF's data array.  (The IRAF imfort FORTRAN
+         subroutine library only supports these data types.)  For \_BYTE,
+         \_UBYTE, and \_WORD data arrays the IRAF image will have type
+         SIGNED WORD; for all other data types of the NDF data array a
+         REAL IRAF image is made.  The pixel type of the image can be
+         changed from within IRAF using the {\bf chpixtype} task in the
+         {\bf images} package.
+
+         \sstitem
+         Bad values may arise due to type conversion.  These too are
+         substituted by the (non-null) value of FILLBAD.
+      }
+   }
+}
+
+\newpage
+\sstroutine{
+   NDF2UNF
+}{
+   Converts an NDF to a sequential unformatted file
+}{
+   \sstdescription{
+      This application converts an NDF to a sequential unformatted
+      Fortran file.  Only one of the array components may be copied to
+      the output file.  Preceding the data there is an optional header
+      consisting of either the FITS extension with the values of
+      certain keywords replaced by information derived from the NDF, or
+      a minimal FITS header also derived from the NDF.
+   }
+   \sstusage{
+      ndf2unf in out [comp] [noperec]
+   }
+   \sstparameters{
+      \sstsubsection{
+         COMP = LITERAL (Read)
+      }{
+         The NDF component to be copied.  It may be {\tt "Data"},
+         {\tt "Quality"} or {\tt "Variance"}. {\tt ["Data"]}
+      }
+      \sstsubsection{
+         FITS = \_LOGICAL (Read)
+      }{
+         If true, any FITS extension is written to start of the output
+         file, unless there is no extension whereupon a minimal FITS
+         header is written to the unformatted file. {\tt [FALSE]}
+      }
+      \sstsubsection{
+         IN = NDF (Read)
+      }{
+         Input NDF data structure. The suggested default is the current
+         NDF if one exists, otherwise it is the current value.
+      }
+      \sstsubsection{
+         NOPEREC = \_INTEGER (Read)
+      }{
+         The number of data values per record of the output file.  On
+         VMS systems it should be in the range 1 to $n$, where $n$ is 32764
+         divided by the number of bytes per data value; on UNIX systems
+         it need only be positive.  The suggested default is the
+         the current value. {\tt [}The first dimension of the NDF
+         (or $n$ if this is smaller){\tt ]}
+      }
+      \sstsubsection{
+         OUT = FILENAME (Write)
+      }{
+         Name of the output sequential unformatted file.  The file will
+         but always fixed-length records when there is no header.  On
+         VMS platforms a default file extension of {\tt ".dat"} is appended
+         when parameter OUT contains no file extension.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         ndf2unf cluster cluster.dat
+      }{
+         This copies the data array of the NDF called cluster to an
+         unformatted file called cluster.dat.  The number of data values
+         per record is equal to the size of the first dimension of the
+         NDF.
+      }
+      \sstexamplesubsection{
+         ndf2unf cluster cluster.dat v
+      }{
+         This copies the variance of the NDF called cluster to an
+         unformatted file called cluster.dat.  The number of variance
+         values per record is equal to the size of the first dimension
+         of the NDF.
+      }
+      \sstexamplesubsection{
+         ndf2unf cluster cluster.dat noperec=12
+      }{
+         This copies the data array of the NDF called cluster to an
+         unformatted file called cluster.dat.  There are twelve data
+         values per record in cluster.dat.
+      }
+      \sstexamplesubsection{
+         ndf2unf out=ndf234.dat fits in=@234
+      }{
+         This copies the data array of the NDF called 234 to an
+         unformatted file called ndf234.dat.  The number of data values
+         per record is equal to the size of the first dimension of the
+         NDF.  If there is a FITS extension, it is copied to ndf234.dat
+         with substitution of certain keywords, otherwise a minimal
+         FITS header is produced.
+      }
+   }
+   \sstnotes{
+      The details of the conversion are as follows:
+      \sstitemlist{
+
+         \sstitem
+            the NDF array as selected by COMP is written to the
+            unformatted file in records following an optional header.
+
+         \sstitem
+            HISTORY is not propagated.
+
+         \sstitem
+            ORIGIN information is lost.
+
+         \sstitem
+            When a header is to be made, it is composed of FITS-like card
+            images as follows:
+      
+         \sstitemlist{
+
+            \sstitem
+               The number of dimensions of the data array is written
+               to the keyword NAXIS, and the actual dimensions to NAXIS1,
+               NAXIS2 {\it etc.} as appropriate.
+
+            \sstitem
+               If the NDF contains any linear axis structures the
+               information necessary to generate these structures is
+               written to the FITS-like headers. For example, if a linear
+               AXIS(1) structure exists in the input NDF the value of the
+               first data point is stored with the keyword CRVAL1,
+               and the incremental value between successive axis data is
+               stored in keyword CDELT1. If there is an axis label it is
+               written to keyword CRTYPE1, and axis unit is written to CTYPE1.
+               (Similarly for AXIS(2) structures {\it etc.}) FITS does not have
+               a standard method of storing axis widths and variances, so these
+               NDF components will not be propagated to the header.
+               Non-linear axis data arrays cannot be represented by CRVAL$n$
+               and CDELT$n$, and must be ignored.
+
+            \sstitem
+               If the input NDF contains TITLE, LABEL or UNITS components
+               these are stored with the keywords TITLE, LABEL or BUNITS
+               respectively.
+
+            \sstitem
+               If the input NDF contains a FITS extension, the FITS items
+               may be written to the FITS-like header, with the following
+               exceptions:
+               \begin{itemize}
+               \item BITPIX is derived from the type of the NDF data array,
+               and so it is not copied from the NDF FITS extension.
+               \item NAXIS, and NAXIS$n$ are derived from the dimensions of the
+               NDF data array as described above, so these items are not
+               copied from the NDF FITS extension.
+               \item The TITLE, LABEL, and BUNITS descriptors are only copied
+               if no TITLE, LABEL, and UNITS NDF components respectively
+               have already been copied into these headers.
+               \item The CDELT$n$, CRVAL$n$, CTYPE$n$, and CRTYPE$n$ descriptors
+               in the FITS extension are only copied if the input NDF
+               contained no linear axis structures.
+               \item The standard order of the FITS keywords is preserved,
+               thus BITPIX, NAXIS and NAXIS$n$ appear immediately after the
+               first card image, which should be SIMPLE.
+               \item BSCALE and BZERO in a FITS extension are copied when
+               BITPIX is positive, {\it i.e.} the array is not floating-point.
+               \end{itemize}
+
+            \sstitem
+               An extra header record with keyword UNSIGNED and logical
+               value T is added when the array data type is one of the HDS
+               unsigned integer types.  This is done because standard FITS
+               does not support unsigned integers, and allows (in conjunction
+               with BITPIX) applications reading the unformatted file to
+               determine the data type of the array.
+
+            \sstitem
+               The last header record card will be the standard FITS END.
+         }
+
+         \sstitem
+            Other extensions are not propagated.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      CONVERT: UNF2NDF.
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
+
+         \sstitem
+         The value of bad pixels is not written to a FITS-like header
+         record with keyword BLANK.
+      }
+   }
+}
+
+\newpage
+\sstroutine{
+   UNF2NDF
+}{
+   Converts a sequential unformatted file to an NDF
+}{
+   \sstdescription{
+      This application converts a sequential unformatted Fortran file to
+      an NDF.  Only one of the array components may be created from the
+      input file.  Preceding the input data there may be an optional
+      header.  This header may be skipped, or may consist of a simple
+      FITS header.  In the former case the shape of the NDF has be to
+      be supplied.
+   }
+   \sstusage{
+      unf2ndf in out [comp] noperec [skip] shape [type]
+   }
+   \sstparameters{
+      \sstsubsection{
+         COMP = LITERAL (Read)
+      }{
+         The NDF component to be copied.  It may be {\tt "Data"},
+         {\tt "Quality"} or {\tt "Variance"}.  To create a variance or
+         quality array the NDF must already exist. {\tt ["Data"]}
+      }
+      \sstsubsection{
+         FITS = \_LOGICAL (Read)
+      }{
+         If true, the initial records of the unformatted file are
+         interpreted as a FITS header (with one card image per record)
+         from which the shape, data type, and axis centres are derived.
+         The last record of the FITS-like header must be terminated by
+         an END keyword; subsequent records in the input file are
+         treated as an array component given by COMP.  {\tt [FALSE]}
+      }
+      \sstsubsection{
+         IN = FILENAME (Read)
+      }{
+         Name of the input sequential unformatted Fortran file.  The
+         file will normally have variable-length records when there is
+         a header, but always fixed-length records when there is no
+         header.  On VMS platforms a default file extension of {\tt ".DAT"}
+         is appended when parameter IN contains no file extension.
+      }
+      \sstsubsection{
+         NOPEREC = \_INTEGER (Read)
+      }{
+         The number of data values per record of the input file.
+         On VMS systems it should be in the range 1 to 16383; but need
+         only be positive on UNIX systems.  The suggested default is the
+         size of the first dimension of the array if there is no
+         current value.  A null ({\tt !}) value for NOPEREC causes the size
+         of first dimension to be used.
+      }
+      \sstsubsection{
+         OUT = NDF (Read and Write)
+      }{
+         Output NDF data structure.  When COMP is not {\tt "Data"} the NDF
+         is modified rather than a new NDF created.  It becomes the new
+         current NDF.
+      }
+      \sstsubsection{
+         SHAPE = \_INTEGER (Read)
+      }{
+         The shape of the NDF to be created.  For example, {\tt [40,30,20]}
+         would create 40 columns by 30 lines by 10 bands.  It is only
+         accessed when FITS is {\tt FALSE}.
+      }
+      \sstsubsection{
+         SKIP = INTEGER (Read)
+      }{
+         The number of header records to be skipped at the start of the
+         input file before finding the data array or FITS-like header.
+         {\tt [0]}
+      }
+      \sstsubsection{
+         TYPE = LITERAL (Read)
+      }{
+         The data type of the output NDF.  It must be one of the
+         following HDS types: {\tt "\_BYTE"}, {\tt "\_WORD"}, {\tt "\_REAL"},
+         {\tt "\_INTEGER"}, {\tt "\_DOUBLE"}, {\tt "\_UBYTE"},
+         {\tt "\_UWORD"} corresponding to signed byte,
+         signed word, real, integer, double precision, unsigned byte,
+         and unsigned word.  See SUN/92 for further details.  An
+         unambiguous abbreviation may be given.  TYPE is ignored when
+         COMP = {\tt "Quality"} since the QUALITY component must comprise
+         unsigned bytes (equivalent to TYPE = {\tt "\_UBYTE"}) to be a valid
+         NDF. The suggested default is the current value.  TYPE is only
+         accessed when FITS is {\tt FALSE}. {\tt ["\_REAL"]}
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         unf2ndf ngc253.dat ngc253 shape=[100,60] noperec=8
+      }{
+         This copies a data array from the unformatted file ngc253.DAT
+         to the NDF called ngc253.  ngc253.DAT does not contain a
+         header section.  The NDF is two-dimensional: 100 elements in $x$
+         by 60 in $y$.  Its data array has type \_REAL.  The data records
+         each have 8 values.
+      }
+      \sstexamplesubsection{
+         unf2ndf ngc253q.dat ngc253 q 100 shape=[100,60]
+      }{
+         This copies a quality array from the unformatted file
+         ngc253q.dat to an existing NDF called ngc253 (such as created
+         in the first example).  ngc253q.dat does not contain a header
+         section.  The NDF is two-dimensional: 100 elements in $x$ by 60
+         in $y$.  Its data array has type \_UBYTE.  The data records
+         each have 100 values.
+      }
+      \sstexamplesubsection{
+         unf2ndf ngc253.dat ngc253 fits noperec=!
+      }{
+         This copies a data array from the unformatted file ngc253.dat
+         to the NDF called ngc253.  ngc253.dat contains a FITS-like
+         header section, which is copied to the FITS extension of the
+         NDF.  The shape of the NDF is controlled by the mandatory FITS
+         keywords NAXIS, AXIS1, \ldots, AXIS$n$, and the data type by
+         keywords BITPIX and UNSIGNED.  Each data record has AXIS1
+         values (except perhaps for the last).
+      }
+      \sstexamplesubsection{
+         unf2ndf type='\_uword' in=ngc253.dat out=ngc253 $\backslash$
+      }{
+         This copies a data array from the unformatted file ngc253.dat
+         to the NDF called ngc253.  ngc253.dat does not contain a
+         header section.  The NDF has the current shape and data type
+         is unsigned word.  The current number of values per record is
+         used.
+      }
+      \sstexamplesubsection{
+         unf2ndf spectrum zz skip=2 shape=200 noperec=!
+      }{
+         This copies a data array from the unformatted file spectrum
+         to the NDF called zz.  spectrum contains two header
+         records that are ignored.  The NDF is one-dimensional
+         comprising 200 elements of type \_REAL.  There is one data
+         record containing the whole array.
+      }
+      \sstexamplesubsection{
+         unf2ndf spectrum.lis ZZ skip=1 fits noperec=20
+      }{
+         This copies a data array from the unformatted file spectrum.lis
+         to the NDF called ZZ.  spectrum.lis contains one header
+         record, that is ignored, followed by a FITS-like header
+         section, which is copied to the FITS extension of the NDF.
+         The shape of the NDF is controlled by the mandatory FITS
+         keywords NAXIS, AXIS1, \ldots, AXIS$n$, and the data type by
+         keywords BITPIX and UNSIGNED.  Each data record has AXIS1
+         values (except perhaps for the last).
+      }
+   }
+   \sstnotes{
+      The details of the conversion are as follows:
+      \sstitemlist{
+
+         \sstitem
+            the unformatted-file array is written to the NDF array as
+            selected by COMP.  When the NDF is being modified, the shape
+            of the new component must match that of the NDF.
+
+         \sstitem
+            If the input file contains a FITS-like header, and a new
+            NDF is created, {\it i.e.}\ COMP = {\tt "Data"}, the header
+            records are placed within the NDF's FITS extension.  This enables 
+            more than one array (input file) to be used to form an NDF.  Note
+            that the data array must be created first to make a valid NDF,
+            and it's the FITS structure associated with that array that is
+            wanted.  Indeed the application prevents you from doing
+            otherwise.
+
+         \sstitem
+            The FITS-like header defines the properties of the NDF as
+            follows:
+            \begin{itemize}
+            \item BITPIX defines the data type: 8 gives \_BYTE, 16 produces
+            \_WORD, 32 makes \_INTEGER, $-$32 gives \_REAL, and $-$64 generates
+            \_DOUBLE.  For the first two, if there is an extra header
+            record with the keyword UNSIGNED and logical value T, these
+            types become \_UBYTE and \_UWORD respectively.  UNSIGNED is
+            non-standard, since unsigned integers would not follow in a
+            proper FITS file.  However, here it is useful to enable
+            unsigned types to be input into an NDF.  UNSIGNED may be
+            created by this application's sister, NDF2UNF.  BITPIX is
+            ignored for QUALITY data; type \_UBYTE is used.
+            \item NAXIS, and NAXIS$n$ define the shape of the NDF.
+            \item The TITLE, LABEL, and BUNITS are copied to the NDF
+            TITLE, LABEL, and UNITS NDF components respectively.
+            \item The CDELT$n$, CRVAL$n$, CTYPE$n$, and CRTYPE$n$ keywords make
+            linear axis structures within the NDF.  CTYPE$n$ define the
+            axis units, and the axis labels are assigned to CRTYPE$n$ If
+            some are missing, pixel co-ordinates are used for those
+            axes.
+            \item BSCALE and BZERO in a FITS extension are ignored.
+            \item BLANK is not used to indicate which input array values
+            should be assigned to a standard bad value.
+            \item END indicates the last header record unless it
+            terminates a dummy header, and the actual data is in an
+            extension.
+            \end{itemize}
+
+         \sstitem
+            Other data item such as HISTORY, data ORIGIN, and axis
+            widths are not supported, because the unformatted file has a
+            simple structure to enable a diverse set of input files to be
+            converted to NDFs, and to limitations of the standard FITS
+            header.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      CONVERT: NDF2UNF.
+   }
+}
+
+\newpage
+\normalsize
+\section{Release Notes---V0.5}
+
+This the first release where {\footnotesize CONVERT} is available on
+UNIX platforms.  There are four new commands. 
+
+\subsection{Global changes}
+\begin{itemize}
+  \item  {\footnotesize CONVERT} is available on UNIX platforms
+         SUN/SunOS, SUN/Solaris, DEC/Ultrix, Alpha/OSF1 with the
+         following exceptions:
+
+  \begin{itemize}
+
+     \item BDF2NDF and NDF2BDF are not available because the Interim
+           library is not being ported.
+
+     \item DIPSO2NDF and NDF2DIPSO are not required because UNIX DIPSO
+           processes NDFs.
+
+     \item IRAF2NDF and NDF2IRAF are currently not available under OSF/1
+           and Solaris, because at the time of development there were no
+           IRAF IMFORT libraries available for these platforms.  However,
+           the SunOS versions are provided for use in the compatibility
+           mode of Solaris 2.3.
+  \end{itemize}
+
+  \item  CONHELP runs an application on UNIX platforms and accesses a
+         portable-help library.
+
+  \item  The documentation is revised to reflect the lowercase usage and
+         examples under UNIX.
+
+  \item  Special handling of some pathological datafiles have been made,
+         mostly in BDF2NDF.
+\end{itemize}
+
+\subsection{New applications}
+There are four new applications.
+
+\begin{description}
+   \item [GASP2NDF] -- Converts an image in GASP format to an NDF.
+   \item [IRAF2NDF] -- Converts an IRAF image to an NDF.
+   \item [IRCAM2NDF] -- Converts an IRCAM data file to a series of NDFs.
+   \item [NDF2GASP] -- Converts a two-dimensional NDF into a GASP image.
+\end{description}
+
+\subsection{Extended and corrected applications}
+  
+Here is a summary of the main modifications.
+\begin{itemize}
+  \item NDF2DST propagates axis-variance and width arrays, and the
+        contents of any axis Figaro extension.  If there is only one
+        object in the Figaro extension, it is now copied to the DST.
+
+  \item BDF2NDF now ignores deleted descriptors rather than propagating
+        them to the NDF's FITS extension.
+
+  \item DST2NDF has a FORM parameter to select the NDF storage form of
+        the output NDF.  It defaults to the simple form.  Previously,
+        the quality and bad-pixel values decided.
+
+  \item DST2NDF permits the output NDF to be placed inside an arbitrary
+        HDS structure, rather than just being the sole top-level
+        structure in the HDS container file.
+
+  \item DST2NDF has had a number of bug fixes applied.  In V0.4 it was
+        possible for an axis data array to have the wrong number of
+        elements in certain circumstances; the FLAGGED value could have
+        been set incorrectly when the FITS structure preceeded the .Z
+        structure within the DST file.
+
+  \item DST2NDF and NDF2DST now handle quotes in FITS character values.
+
+  \item NDF2ASCII and NDF2UNF ensure that a SIMPLE card appears first in
+        the FITS header.
+
+  \item NDF2BDF has better handling of rotated axes.  These are restored
+        from the FITS extension, by overwriting the descriptors derived
+        from the NDF AXIS.  (An NDF AXIS does not support rotated axes,
+        so BDF2NDF makes a default axis with pixel co-ordinates.  A
+        subsequent invocation of the old NDF2BDF would lose the original
+        axis information from the destination NDF.  This change prevents
+        that hysteresis.)
+
+  \item NDF2BDF has had a number of bug fixes applied.  It is now not
+        possible to generate erroneous CRTYPE$n$ and CTYPE$n$ values,
+        when the NDF AXIS does not contain LABEL or UNITS.  The
+        application reprompts if an invalid Interim type is given.
+        Lowercase types may now be entered.  An NDF with a FITS
+        extension containing only the mandatory BDF descriptors (NAXIS,
+        NAXIS$n$) will now produce a valid IMAGE BDF, {\it i.e.}\ NAXIS,
+        NAXIS$n$ derived from the NDF's shape are no longer missing from
+        the BDF descriptors.
+
+  \item NDF2DST has improved handling of FITS headers, particularly
+        character strings.  Duplicated keywords are ignored.  HISTORY
+        and COMMENT cards are processed correctly.
+
+  \item NDF2IRAF can now convert one- and three-dimensional NDFs.
+
+  \item NDF2IRAF has a FILLBAD parameter to allow NDF bad values to
+        be replaced.  FILLBAD defaults to null, meaning do not perform
+        bad-value substitution.
+
+  \item NDF2IRAF can produce a signed-word IRAF image.  The output data
+        type depends on the data type of the NDF's data array.
+
+\end{itemize}
+
+\end{document}

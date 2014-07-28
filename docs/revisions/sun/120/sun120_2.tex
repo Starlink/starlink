@@ -1,0 +1,3904 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {120.2}
+\newcommand{\stardocauthors}   {A R Wood}
+\newcommand{\stardocdate}      {18 August 1992}
+\newcommand{\stardoctitle}     {CATPAC --- Catalogue Applications Package}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+\setlength{\parskip}{0mm}
+\tableofcontents
+\setlength{\parskip}{\medskipamount}
+\markright{\stardocname}
+
+\newpage
+\section {Introduction}
+
+CATPAC is the STARLINK Catalogue and Table Package. This document describes the
+CATPAC applications. These  include applications for inputing, processing and
+reporting tabular data including astronomical catalogues. The applications all
+fall into  the following categories:
+
+\begin{itemize}
+\item Reporting catalogues.
+\item Creating catalogues.
+\item Deleting catalogues.
+\item Manipulating information about catalogues.
+\item Manipulating data in catalogues.
+\end{itemize}
+
+Appendix~\ref{ap:summary} lists, in alphabetical order, the commands and 
+their functions.
+
+\section {Catalogue terms and ideas}
+
+\subsection {Parameter and field information}
+
+A catalogue has information that applies to the  whole catalogue. For an
+astronomical catalogue this may well include items such as:
+ 
+\begin{description}
+\begin{description}
+\item [CATTITLE] --- Title of the catalogue.
+\item [IDENTIFIER] --- Name by which the catalogue is known to the system.
+\item [NUMENTS] --- Number of entries in the catalogue.
+\item [AUTHOR] --- Authors name.
+\item [WAVLENGTH] --- Catalogue wavelength keyword for librarian.
+\item [OBJECT] --- Type of objects in catalogue STAR, GALAXY {\em etc}.
+\item [EPOCH] --- Date of position measurements.
+\item [EQUINOX] --- Equinox of coordinates.
+\item [NOTES] --- Notes on the catalogue.
+\end{description}
+\end{description}
+
+Traditionally these information items have been known as {\bf PARAMETERS} of 
+the catalogue. These parameters should not be confused with the {\small ADAM}
+parameter system.
+
+Each parameter requires:
+
+\begin{description}
+\begin{description}
+\item [NAME] --- Name identifying this parameter.
+\item [FORMAT] --- The format/type of the value.
+\item [VALUE] --- Value of the parameter.
+\item [COMMENT] --- Comment.
+\end{description}
+\end{description}
+
+For example:
+\begin{small}
+\begin{verbatim}
+      NAME     FORMAT       VALUE                      COMMENT
+      ----     ------       -----                      -------
+
+     AUTHOR      A16      J. Bloggs          J. Bloggs, F. Smith and R. Brown
+     NUMENTS      I4          3432           Number of entries in the catalogue
+\end{verbatim}
+\end{small}
+
+A catalogue is organised in rows and columns. In an astronomical  catalogue 
+columns are called 
+{\bf FIELDS} and rows are called {\bf ENTRIES}. Each field has information 
+associated with it.
+
+Each field requires :
+ 
+\begin{description}
+\begin{description}
+\item [NAME] --- Field Name. 
+
+The name identifies a particular field (column) in the 
+catalogue and therefore must be unique in this catalogue.
+
+\item [FORMAT] --- Format of the field.
+
+The format indicates how this field should be displayed. The Field Formats
+section of this document give further details of the supported formats.
+
+\item [UNITS] --- Units of the field.
+
+\item [NULL VALUE] --- Null value of the field.
+
+Catalogues sometimes contain objects where a value for a  field is unavailable.
+In these cases the authors may choose to insert a `magic value' or NULL  VALUE
+in its place in the catalogue. Applications can then take appropriate action if
+a null value is encountered. 
+
+\item [COMMENT] --- Comment on the field.
+
+\end{description}
+\end{description}
+
+For example:
+
+\begin{small}
+\begin{verbatim}
+      NAME     FORMAT     UNITS       NULL VALUE              COMMENT
+      ----     ------     -----       ----------              -------
+
+     FLUX       F8.4     JANSKY        999.9999             Flux Density   
+     RADIUS     I4       ARCSEC        9999                 Radius Vector
+\end{verbatim}
+\end{small}
+
+\subsection {Field Formats}
+ 
+The field format determines how the values of that field are to be displayed.
+The report application CATREPORT supports all FORTRAN formats plus all the 
+common sexagesimal formats (SDD MM SS, SDD:MM:SS, DEGREES, HH MM SS 
+{\em etc.})
+
+You may of course chose to write your own applications that allow different 
+field formats. See SUN/119 if you are interested in writing your own
+applications.
+
+\subsection {Restrictions in this implementation of CATPAC}
+
+Personal catalogues are created, manipulated or deleted in your current
+directory. Users are strongly advised to create a single directory in which to
+carry out their catalogue handling work.
+
+The current implementation uses the following parameter names:
+
+\begin{small}
+\begin{verbatim}
+      TITLE
+      MEDIUM
+      ACCESSMODE
+      RECORDSIZE
+      BLOCKSIZE
+      FILENUMBER
+      LOCAL_INDEX
+      GLOBAL_INDEX
+      START_RECORD
+      NRECORDS
+\end{verbatim}
+\end{small}
+
+and the following field names:
+
+\begin{small}
+\begin{verbatim}
+      NUMBER
+      POINTER    
+      CATALOGUE
+\end{verbatim}
+\end{small}
+
+within the system. They should not be used by any application.
+
+\section{Getting started}
+
+\subsection{Quotas}
+
+You may need increased quotas to run {\small ADAM} applications and {\small
+CATPAC} in particular.  See Appendix~\ref{ap:quotas} for details. You can check
+your quotas from {\small DCL} with:
+
+\begin{verbatim}
+      $ SHOW PROCESS/QUOTA
+\end{verbatim}
+
+Note that the {\tt \$} is the standard VMS prompt which you do not type. If any
+additional quotas are required see your computer manager. 
+
+\subsection{ADAM startup}
+
+Before you can run an {\small ADAM} application you must enter:
+
+\begin{verbatim}
+      $ ADAMSTART
+\end{verbatim}
+
+to define some logical names and symbols. You need only do this once per
+terminal session.  Regular {\small CATPAC} users may wish to put this command
+into their {\tt LOGIN.COM}.
+
+\subsection{Running CATPAC}
+
+{\small CATPAC} comes in two forms.  One is a monolith that is activated
+within the {\small ADAM} command language---{\small ICL}.  The other
+comprises individual applications and is run from {\small DCL}.  The
+monolith has the advantage that after the initial pause while it loads,
+all its constituent applications are available immediately.  There is no
+pause while each new application is fired up.  This is fine when you
+wish to run several applications and/or the same application several
+times. However, for single tasks it is more convenient to run from
+{\small DCL}.  You may simply prefer the familiar {\small DCL} to
+{\small ICL}, though {\small DCL} commands, including editing, are
+accessible from {\small ICL} via a {\tt \$} prefix. 
+
+To run {\small CATPAC} from {\small DCL} just enter the command:
+
+\begin{verbatim}
+      $ CATPAC
+\end{verbatim}
+
+This executes a procedure setting up symbols for {\small CATPAC}'s command
+names, and defines some logical names to make help information available. Then
+you'll be able to mix {\small CATPAC} commands with the familiar {\small DCL}
+ones.
+
+To run the {\small CATPAC} monolith is almost the same except you must be
+within the {\small ADAM} command language. This requires just one extra
+command, namely:
+
+\begin{verbatim}
+      $ ICL
+\end{verbatim}
+
+You will see any messages produced by system and user procedures, followed by
+the {\tt ICL>} prompt. Again there is a procedure for making the commands known
+to the command language, and not unexpectedly, it too is:
+
+\begin{verbatim}
+      ICL> CATPAC
+\end{verbatim}
+
+Then you are ready to go.  In either case  you'll see message from CATPAC
+telling you which version is ready for use.
+
+So what applications are now available?  Appendix~\ref{ap:summary} lists
+in alphabetical order the commands and their functions, and
+Appendix~\ref{ap:classified} is a classified list of the same commands. 
+
+\subsection{Issuing Commands}
+
+To run an application you then can just give its name---you will be
+prompted for any required parameters. Alternatively, you may enter
+parameter values on the command line specified by position or by
+keyword.  More on this in Section~\ref{se:param}.
+
+Commands are interpreted in a case-independent way.
+They may be abbreviated provided they are unambiguous strings with
+at least four characters.  Commands shorter than five characters,
+therefore, cannot be shortened. So:
+\begin{verbatim}
+      ICL> CORR
+      ICL> CORRE
+      ICL> CorR
+      ICL> CORRELATE
+\end{verbatim}
+would all run CORRELATE.
+
+Note if other packages are active there may be command-name clashes, Issuing
+such a command will run that command in the package last activated.  You can
+ensure receiving the {\small CATPAC} command by inserting a {\tt CAT\_} prefix
+before the command name.  For example:
+
+\begin{verbatim}
+      $ CAT_CORRELATE
+\end{verbatim}
+
+will execute {\small CAT}'s CORRELATE application.
+
+\begin{quote}
+{\large {\bf Since the {\normalsize{\bf CAT}} commands are the same in both
+{\normalsize{\bf DCL}} and {\normalsize{\bf ICL}}, the {\tt \$} and {\tt ICL>}
+prompts in the examples and description below are interchangeable unless noted
+otherwise.}}
+\end{quote}
+
+\subsection{Obtaining Help}
+
+\subsubsection{Entering the Help System}
+
+An introduction is given in the CATPAC topic via:
+
+\begin{verbatim}
+      ICL> HELP CATPAC
+\end{verbatim}
+
+The behaviour is different for {\small DCL} and {\small ICL} because of a
+restriction imposed by VMS help libraries that is circumvented in {\small ICL}. 
+From {\small ICL} {\tt HELP CATPAC} puts you into the top level of the help
+library. Type {\tt ?} to get a list of  help topics.  These are mostly the
+commands for running applications, but they also include global information on
+matters such as parameters.
+
+\begin{verbatim}
+      ICL> HELP PACKAGES CATPAC
+\end{verbatim}
+
+gives a summary of purpose of the package. (This is part of an index
+of {\small ADAM} packages.)
+
+Whereas from {\small DCL}:
+
+\begin{verbatim}
+      $ HELP CATPAC
+\end{verbatim}
+
+combines the two help items described above.  Note this locates you at the
+second level of the help hierarchy because the highest is {\tt "Help"}, not
+{\tt "CATPAC"}; you'll have to hit a carriage return ({\tt <CR>}) to climb a
+level to see the list of help on commands and general information. 
+
+If you have commenced running an application you can still access the help
+library at prompts for parameters.  It is primarily there to provide
+information about the parameter being prompted. See Section~\ref{se:parhelp}
+for details. 
+
+\subsubsection{Navigating Help Hierarchies}
+
+The help systems may be navigated in the normal ways for a VMS help library,
+except that from {\small ICL} {\tt HELP} does not recognise all the navigation
+commands. For those not familiar with VMS help libraries the topic {\tt
+Using\_help} has details. You can exit from the help by typing {\tt CTRL/Z}
+(that is, pressing the CONTROL and Z keys simultaneously) in response to any
+prompt (except from {\small ICL} where it must be a {\tt subtopic?} or {\tt
+topic?} prompt).  A series of carriage returns has the same effect. 
+
+\subsubsection{Help on CATPAC commands}
+
+Help on an individual {\small CATPAC} application is simply achieved by
+entering {\tt HELP} followed by the command name, for example: 
+
+\begin{verbatim}
+      $ HELP CORRELATE
+\end{verbatim}
+
+will give the description and usage of the CORRELATE command.  There are
+subtopics which contain details of the parameters, including defaults, and
+valid ranges; examples; notes expanding on the description; implementation
+status; and occasionally timing. For example:
+
+\begin{verbatim}
+      ICL> HELP CORR PARAM ALLFLDS
+\end{verbatim}
+
+gives details of parameter {\tt ALLFLDS} in all applications prefixed by {\tt
+CORR}. 
+
+The instruction:
+
+\begin{verbatim}
+      ICL> HELP CLASSIFIED
+\end{verbatim}
+
+displays a list of subject areas as subtopics.  Each subtopic lists and gives
+the function of each {\small CATPAC} application in that classification. There
+is also an alphabetic list which can be obtained directly via the command:
+
+\begin{verbatim}
+      ICL> HELP SUMMARY
+\end{verbatim}
+
+It is expected that the {\small ICL} help system will be improved via
+the fast and more-flexible {\small HELP} package (SUN/124).  More
+documentation, including a cookbook and beginners guide are planned for
+later versions.
+
+\subsubsection{Command clashes}
+
+Note if other packages are active, there may be duplicated commands, {\it
+e.g.}\ GLOBALS is in {\small CATPAC} and {\small KAPPA}.  Help on the most
+recently activated will be given.  From {\small ICL} you can ensure receiving
+the {\small CATPAC} help by inserting a {\tt CAT\_} prefix before the command
+name.  For example:
+
+\begin{verbatim}
+      ICL> HELP CAT_GLOBALS
+\end{verbatim}
+
+will describe {\small CATPAC}'s GLOBALS application.  From {\small DCL}
+go via {\tt \$ HELP CATPAC} then select the GLOBALS topic.
+
+\subsection{Exiting an Application}
+
+In normal circumstances when you've finished using {\small CATPAC} nothing need
+be done from {\small DCL}, but to end an {\small ICL} session, enter the {\tt
+EXIT} command to return to {\small DCL}.
+
+What if you've done something wrong, like entering the wrong value for a
+parameter?  If there are further prompts you can enter the abort code {\tt !!}
+to exit the application.  This is recommended even from {\small DCL} because
+certain files may become corrupted if you use the crude {\tt CTRL/Y}. If,
+however, processing of the data has begun in the application {\tt CNTL/C}
+should be hit.  From {\small ICL} this ought to return you to a prompt, but the
+processing will continue.  Then you can stop the running process via:
+
+\begin{verbatim} 
+      ICL> KILL CATPAC_DIR:CATPAC 
+\end{verbatim} 
+
+{\small CATPAC} will be loaded again once you enter a {\small CATPAC} command.
+If several attempts with {\tt CTRL/C} fail to return you to an {\small ICL}
+prompt then it's time for the heavy artillery---{\tt CTRL/Y}.  Once back to
+{\small DCL} enter {\tt CONTINUE} to return to {\small ICL} where you left off,
+and then kill the process as described above. 
+
+\section{Parameters}
+\label{se:param}
+
+{\small CATPAC} is a command-driven package.  Commands have {\em parameters\/}
+by which you can qualify their behaviour. Parameters are obtained in response
+to prompts or supplied on a command line.
+
+For convenience, the main aspects of the {\small ADAM} parameter system
+as seen by a user of {\small CATPAC} are described below.  Though note
+that most of what follows is applicable to any {\small ADAM}
+application.
+
+\subsection{Defaults}
+\label{se:defaults}
+
+Command-line values are used mostly for those parameters that are normally
+defaulted by the application.   Defaulted parameters enable applications to
+have many options, say for controlling the appearance of some graphical output,
+without making routine operations tedious because of a large number of prompts.
+The values of normally defaulted parameters can be found by obtaining online
+help on a specific parameter.  They are enclosed in square brackets at the end
+of the parameter description.
+
+\begin{verbatim}
+      ICL> HELP CORRELATE PARAM *
+\end{verbatim}
+
+gives details of all parameters in application CORRELATE. Applications show the
+defaults at the end of each  parameter description enclosed in square
+brackets---the same as in Appendix~\ref{ap:full}. If you want to override one
+of these defaults, then you must specify the parameter's value on the command
+line. 
+
+When you are prompted you will usually be given a suggested default value in
+{\tt / /} delimiters.  You can choose to accept the default by pressing
+carriage return.  For example, 5 is the suggested value below:
+
+\begin{verbatim}
+      FREQUENCY - Sample frequency N.  /5/ >
+\end{verbatim}
+Alternatively, enter a different value
+\begin{verbatim}
+      FREQUENCY - Sample frequency N. /5/ > 10
+\end{verbatim}
+to override the default. 
+Some defaults begin with an {\tt @}.
+\begin{verbatim}
+      DATAFILE - Name of file containing the data /@TESTDATA.DAT/ > 
+\end{verbatim}
+
+These are associated with files (ASCII, HDS) and devices (graphics,
+tape). If you want to override the default given, you do not have to
+prefix your value with an {\tt @}, {\it e.g.}
+
+\begin{verbatim}
+      DATAFILE - Name of file containing the data /@TESTDATA.DAT/ > NEWDATA.DAT
+\end{verbatim}
+
+The default value can be edited to save typing by first pressing the {\tt
+<TAB>} key. The editor behaves like the {\small DCL} command-line editor.
+Defaults may change as data are processed by {\small CATPAC}. Often the current
+(last) value of the parameter will be substituted, or a dynamic value is
+suggested depending on the values of other parameters.  Current values of
+CATPAC parameters are stored in the HDS file {\tt ADAM\_USER:CATPAC.SDF}, and
+so they persist between {\small CATPAC} sessions. This file should not be
+deleted unless {\small CATPAC} parameters are to be completely reset. 
+
+\subsection{Globals}
+
+{\small CATPAC} stores a number of global parameters that are used as defaults
+to reduce typing in response to prompts. Global means that they are shared
+between applications.  The most common is the last INPUT catalogue. If you just
+press {\tt <CR>} to the prompt, the global value is unchanged. Only when you
+modify the parameter and the  application completes without error is the global
+value updated, and so becomes the suggested default value for the next prompt
+for an INPUT catalogue name.
+
+All global parameters are stored in HDS file {\tt ADAM\_USER:GLOBAL.SDF}.
+The full list is:
+
+\begin{description}
+\begin{description}
+\item [GLOBAL.INPUT] --- Current input catalogue
+\end{description}
+\end{description}
+
+{\small CATPAC} uses the last INPUT catalogue as the
+suggested default value for the next prompt for an INPUT. 
+
+The values of of all global parameters may be inspected via the
+{\tt GLOBALS} command:
+\begin{verbatim}
+      ICL> GLOBALS
+      The current INPUT catalogue is       : TEST
+\end{verbatim}
+
+\subsection{Strings}
+\label{se:parstring}
+Notice that the apostrophes around strings given in response to prompts
+for a character parameter can be omitted. However, on the command
+line quotes or double quotes are needed if the string contains spaces,
+otherwise the second and subsequent words could be treated as
+separate positional parameters.
+
+Responses to prompts are case insensitive. 
+
+\subsection{Arrays}
+If a parameter requires an array of values, the series
+should be in brackets separated by commas or spaces.  For example:
+\begin{verbatim}
+      FLDNAMES - List of field names > [STARNAME,RA,DEC]
+\end{verbatim}
+would input three values: STARNAME, RA and DEC into the character parameter
+FLDNAMES.  If the application is expecting an exact number of values
+you will be reprompted, either for all the values if you give too many,
+or the remaining values if you supply too few.  There is one exception
+where you can omit the brackets---a fairly common one---and that is in
+response to a prompt for a one-dimensional array as above.
+
+\subsection{Abort and Null}
+
+Responding to a prompt with a null value {\tt !} will not necessarily
+cause the application to abort, but it can force a suitable default to
+be used, where this is the most-sensible action. A further use in CATPAC
+is to terminate the interactive loop in the POLYGON application.
+
+Responding to a prompt with an abort request {\tt !!} will abort the
+application.  This process includes the various tidying operations
+such as the unmapping and closing of files.  Any other method of
+stopping an application prematurely can leave files mapped or corrupted. 
+
+\subsection{Help}
+\label{se:parhelp}
+
+To get help about a parameter enter {\tt ?}.  Usually, this will give
+access to the help-library
+information for that parameter, for example:
+\begin{verbatim}
+      DATAFILE - Name of the ASCII data file.
+ 
+      ASCIITOCAT
+ 
+        Parameters
+ 
+          DATAFILE = _CHAR (Read)
+             Name of the file containing the tabular ascii data.
+ 
+      DATAFILE - Name of the ASCII data file.
+\end{verbatim}
+
+and then immediately reprompt you for the parameter.  There are occasions when
+information about the parameter is insufficient; you may require to examine the
+examples or the description of related parameters.  This can be achieved via
+entering {\tt ??} to the prompt. You can then delve anywhere in the help
+information.  When you exit the help system you're reprompted for the
+parameter.
+
+\subsection{Logical names}
+
+From {\small DCL}, ordinary process logical names may be used as normal.
+However, logical names to be used by applications (including {\small CATPAC})
+from within {\small ICL} must be defined with the /JOB qualifier. Thus if your
+ascii data files are stored in {\tt DISK\$USER1:[CATALOGUES.ASCII]}, with alias
+ASCIIDIR, then:
+
+\begin{verbatim}
+      $ DEFINE/JOB ASCIIDIR DISK$USER1:[CATALOGUES.ASCII]
+\end{verbatim}
+
+will enable you to respond to a prompt thus:
+
+\begin{small}
+\begin{verbatim}
+DATAFILE - Name of file containing the data /@TESTDATA.DAT/ > ASCIIDIR:NEWDATA.DAT
+\end{verbatim}
+\end{small}
+
+Regrettably, at present {\small ICL} cannot change default directories
+for {\small CATPAC}.  The DEFAULT command only applies to {\small ICL}
+and the {\small DCL} process.  Therefore, if you need to access files in
+several directories with the minimum of typing, you should define some
+job logical names as described above.  If you require many then you will
+need your JTQUOTA increased.  See your site manager if you run into
+difficulties.  It is advisable to set default to the directory
+containing your data files before entering {\small ICL}.
+
+\subsection{Specifying Parameter Values on Command Lines}
+\label{se:cmdlindef}
+Parameters may be assigned values on the command line. This is useful
+for running {\small CATPAC} in batch mode and in procedures, and for
+specifying the values of parameters that would otherwise be defaulted. A
+command-line parameter will prevent prompting for that parameter unless
+there is an error with the given value, say giving an alphabetic
+character string for a floating-point value. 
+
+There are two ways in which parameter values may be given on the
+command line: by keyword and by position. The two forms may be
+mixed with care. The parser looks for positional parameters then
+keywords, so you can have some positional values followed by keyword
+values.  See some of the examples presented in Appendix~\ref{ap:full}.
+
+Keywords may appear in any order.
+Here is an example of command-line defaults using keywords: 
+\begin{verbatim}
+      ICL> CATREPORT TEST ALLFLDS=F FLDNAMES=[RA,DEC]
+\end{verbatim}
+
+To obtain a false value for a logical parameter
+you add a {\tt NO} prefix to keyword, for example:
+\begin{verbatim}
+      ICL> CATREPORT NOALLFLDS
+\end{verbatim}
+would be equivalent to {\tt ALLFLDS=F}.
+
+To obtain a true value for a logical parameter use just the keyword, 
+for example:
+\begin{verbatim}
+      ICL> CATREPORT ALLFLDS
+\end{verbatim}
+would be equivalent to {\tt ALLFLDS=T}.
+
+Alternatively, you can specify command-line values by position:
+\begin{verbatim}
+      $ SAMPLE TEST SAMPTEST 5
+\end{verbatim}
+The application samples the catalogue {\tt TEST} at a frequency of 5 creating 
+a new catalogue {\tt SAMPTEST}. Note
+trailing parameters may missed but
+intermediate ones may not.  Some applications have many parameters and
+it would be tedious not only to enter all the intermediate values
+between the ones you want to define, but also to remember them all. The
+position of a parameter can be found in the {\tt Usage} heading
+in Appendix~\ref{ap:full} or the help for the application.
+
+Another consideration is that some parameters do not have defined positions
+because they are normally defaulted. Thus the keyword technique is
+recommended for most parameters.  See Section~\ref{se:custom} if you
+want to abbreviate some command strings to reduce typing.
+
+Sometimes specifying a parameter on the command line induces different
+behaviour, usually to inhibit a loop for procedures, or to eliminate
+unnecessary processing.
+For instance:
+
+\begin{verbatim}
+      $ SAMPLE TEST SAMPTEST 5 REJECT=T OUTREJECT=TESTREJECTS
+\end{verbatim}
+
+will cause a second catalogue to be created {\tt TESTREJECTS} containing
+those entries rejected from the sample.
+
+\subsection{Special Keywords: ACCEPT, PROMPT, RESET}
+\label{se:iclkey}
+
+Another way in which prompts and default values can be controlled is by use of
+the keywords ACCEPT, PROMPT and RESET.
+
+The RESET keyword causes the default value of all parameters (apart from those
+already specified before it on the command line) to be set to the original
+values specified by the application or its interface file.  In other words
+global and current values are ignored.
+
+The PROMPT keyword forces a prompt to appear for every application parameter. 
+This can be useful if you cannot remember the name of a defaulted parameter or
+there would be too much to type on the command line.  However, it may prove
+tedious for certain {\small KAPPA} applications that have tens of parameters,
+most of which you normally never see.  You can abort if it becomes too boring.
+
+The ACCEPT keyword forces the parameter system to accept the {\em suggested}
+default values for every application parameter.  In other words, those
+parameters which would normally be prompted with a value between `/ /'
+delimiters take the value between those delimiters, {\it e.g.}  INPUT we saw in
+Section~\ref{se:defaults} would take the value {\tt TESTDATA.DAT}.  Parameters
+that are normally defaulted behave as normal.  The ACCEPT keyword needs to be
+used with care because not every parameter has a default, and therefore must be
+given on the command line for the application to work properly. For example,
+CATSEARCH must have a value specified for parameter OUTPUT, the name of the
+output catalogue. If we run the application like this:
+
+\begin{verbatim}
+      ICL> CATSEARCH ACCEPT
+\end{verbatim}
+
+it would fail in the sense that it would still have to prompt for a value---it
+does not know where to write the output catalogue. However, if we run CATSEARCH
+like this:
+
+\begin{verbatim}
+      ICL> CATSEARCH OUTPUT=STARS 
+\end{verbatim}
+
+it would generate an output catalogue using default values for all the
+parameters except OUTPUT. Another point to be wary of is that some applications
+have loops, {\it e.g.}\ ASCIITOCAT, POLYGON, and if you use the ACCEPT keyword
+it will only operate the first time the application gets a parameter value. 
+
+\section {Demonstration}
+
+A demonstration of the CATPAC Applications has been included in this release.
+The demonstration is self describing and takes the form of ICL command file.
+To run the demonstration at the ICL prompt type:
+
+\begin{verbatim}
+      ICL> LOAD CATPAC_DIR:CATPACDEMO
+\end{verbatim}
+
+Most of your questions about the CATPAC package will be answered by working 
+through this demonstration.
+
+\section{Custom CATPAC}
+\label{se:custom}
+
+If you don't like {\small CATPAC}'s parameter defaults, or its choice of what
+parameters get prompted and what get defaulted, then you can copy the interface
+file ({\tt CATPAC\_DIR:CATPAC.IFL}) to your work directory and make the
+required modifications, and then recompile it.  Then when you run CATPAC from
+that directory, your version of the interface file is accessed, and not the
+released one.  Of course, once you have done this the documentation in
+Appendix~\ref{ap:full} will no longer be correct.  See Sections~8.3 and 8.4 of
+SG/4 on the meanings and possible values of the fieldnames, and how to
+recompile the interface file.
+
+There is an easier method of tailoring {\small CATPAC} to your  requirements.
+If you frequently use certain commands, especially those with a long list of
+keywords and fixed values, you can define some symbols for the commands so that
+each time you activate {\small ICL} these abbreviations will be available to
+you.  This is achieved via an {\small ICL} {\em login file}. It works in the
+same way as the DCL {\tt LOGIN.COM}.  What you should do is to create a {\tt
+LOGIN.ICL} in a convenient  directory, and put the following definition in your
+DCL {\tt LOGIN.COM} file:
+
+\begin{verbatim}
+      $ DEFINE ICL_LOGIN DISK$USER:[XYZ.ABC]LOGIN.ICL
+\end{verbatim}
+
+where {\tt DISK\$USER:[XYZ.ABC]} needs to be replaced by the actual  directory
+used.  It is possible to have several {\small ICL} login files, each for
+different work in different directories.  Now to abbreviate a command you put a
+DEFSTRING entry into the {\small ICL} login file. For example:
+
+\begin{verbatim}
+      DEFSTRING MYR{EPORT} CATREPORT ALLFLDS=N FLDNAMES=[RA,DEC]
+\end{verbatim}
+defines {\tt MYR} or {\tt MYRE} or {\tt MYREPORT} to run CATREPORT without
+selecting only the RA and DEC fields.
+
+\newpage
+\appendix
+\section{An Alphabetical Summary of CATPAC Commands}
+\label{ap:summary}
+
+\begin{description}
+\item [ADDPARAM]:
+ Adds a parameter to a catalogue.
+\item [ASCIITOCAT]:
+ Create a catalogue from an ascii file.
+\item [CALCFLD]:
+ Calculate a new field.
+\item [CATRENAME]:
+ Rename a catalogue.
+\item [CATREPORT]:
+ Produce a catalogue report.
+\item [CATSEARCH]:
+ Select entries from a catalogue.
+\item [CATSORT]:
+ Sort the entries in a catalogue.
+\item [COPYCAT]:
+ Make a copy of a catalogue.
+\item [CORRELATE]:
+ Non-parametric correlation between two fields.
+\item [DELCAT]:
+ Deletes a catalogue from the system.
+\item [DELPARAM]:
+ Deletes a parameter from a catalogue.
+\item [DELSORT]:
+ Deletes the sort information associated with a catalogue.
+\item [ENTRIES]:
+ Find the number of entries in a catalogue.
+\item [FIELDINFO]:
+ Find specific information about a field in the catalogue.
+\item [FIELDS]:
+ Finds the number and names of fields in a catalogue.
+\item [FK425]:
+ Create a new catalogue in the FK5 coordinate system. (See SLALIB)
+\item [FK45Z]:
+ Create a new catalogue in the FK5 coordinate system. (See SLALIB)
+\item [FK524]:
+ Create a new catalogue in the FK4 coordinate system. (See SLALIB)
+\item [FK54Z]:
+ Create a new catalogue in the FK4 coordinate system. (See SLALIB)
+\item [GLOBALS]:
+ Displays the values of the CATPAC global parameters.
+\item [JOIN]:
+ Join two catalogues.
+\item [LINCOR]:
+ Linear correlation between fields.
+\item [LISTIN]:
+ Create a catalogue from a free format ascii file.
+\item [LITTLEBIG]:
+ Extracts entries with largest or smallest values of a given field.
+\item [MERGE]:
+ Merge two catalogues.
+\item [PARAMINFO]:
+ Find specific information about a parameter in the catalogue.
+\item [PARAMS]:
+ Finds the number and names of parameters in a catalogue.
+\item [POLYGON]:
+ Create a polygon definition for use with WITHIN.
+\item [PROPERM]:
+ Create a new catalogue preforming proper motion corrections (See SLALIB)
+\item [REJECT]:
+ Select rejected entries from a catalogue.
+\item [SAMPLE]:
+ Select every Nth entry from a catalogue.
+\item [SELECTFLDS]:
+ Select fields from a catalogue.
+\item [SORTFLDS]:
+ Get the sort information associated with a catalogue.
+\item [UPDATE]:
+ Update a field in a catalogue.
+\item [UPFIELD]:
+ Update the information associated with a field in a catalogue.
+\item [UPPARAM]:
+ Update the information associated with a parameter in a catalogue.
+\item [WITHIN]:
+ Select entries within a polygon.
+\end{description}
+
+\newpage
+\section{Classified CATPAC commands}
+\label{ap:classified}
+
+{\small CATPAC} applications may be classified in terms of their
+functions as follows:
+
+\begin{description}
+
+\item [Reporting Catalogues] ---
+
+\begin{description}
+
+\item [Reporting Catalogues.]:
+
+\begin {description}
+
+\item [CATREPORT]:
+ Produce a catalogue report.
+
+\end{description}
+\end{description}
+
+\item [Creating Catalogues] ---
+
+\begin{description}
+
+\item [Creating a catalogue from data]:
+
+\begin {description}
+
+\item [ASCIITOCAT]:
+ Create a catalogue from an ASCII file.
+
+\item [LISTIN]:
+ Create a catalogue from a free format ASCII file.
+
+\item [POLYGON]:
+ Create a polygon definition for use with WITHIN.
+
+\end{description}
+
+\item [Creating a catalogue from another catalogue.] :
+
+\begin{description}
+
+\item [CALCFLD]:
+ Create a new catalogue with an extra calculated field.
+
+\item [CATRENAME]:
+ Rename a catalogue.
+
+\item [CATSEARCH]:
+ Select entries from a catalogue.
+
+\item [CATSORT]:
+ Sort the entries in a catalogue.
+
+\item [COPYCAT]:
+ Make a copy of a catalogue.
+
+\item [FK425]:
+ Create a new catalogue in the FK5 coordinate system. (See SLALIB)
+
+\item [FK45Z]:
+ Create a new catalogue in the FK5 coordinate system. (See SLALIB)
+
+\item [FK524]:
+ Create a new catalogue in the FK4 coordinate system. (See SLALIB)
+
+\item [FK54Z]:
+ Create a new catalogue in the FK4 coordinate system. (See SLALIB)
+
+\item [JOIN]:
+ Join two catalogues.
+
+\item [LITTLEBIG]:
+ Extracts entries with largest or smallest values of a given field.
+
+\item [MERGE]:
+ Merge two catalogues.
+
+\item [PROPERM]:
+ Create a new catalogue preforming proper motion corrections (See SLALIB)
+
+\item [REJECT]:
+ Select rejected entries from a catalogue.
+
+\item [SAMPLE]:
+ Select every Nth entry from a catalogue.
+
+\item [SELECTFLDS]:
+ Select fields from a catalogue.
+
+\item [WITHIN]:
+ Select entries within a polygon.
+
+\end{description}
+
+\end{description}
+
+\item [Deleting Catalogues] ---
+
+\begin{description}
+
+\item [Deleting catalogues.]:
+
+\begin {description}
+
+\item [DELCAT]:
+ Deletes a catalogue from the system.
+
+\end{description}
+
+\end{description}
+
+\item [Manipulating information about Catalogues] ---
+
+\begin{description}
+
+\item [Examining the information about the catalogue.]:
+
+\begin {description}
+
+\item [ENTRIES]:
+ Find the number of entries in a catalogue.
+
+\item [FIELDINFO]:
+ Find specific information about a field in the catalogue.
+
+\item [FIELDS]:
+ Finds the number and names of fields in a catalogue.
+
+\item [PARAMINFO]:
+ Find specific information about a parameter in the catalogue.
+
+\item [PARAMS]:
+ Finds the number and names of parameters in a catalogue.
+
+\item [SORTFLDS]:
+ Get the sort information associated with a catalogue.
+
+\end{description}
+
+\item [Changing the information about the catalogue.] :
+
+\begin{description}
+
+\item [ADDPARAM]:
+ Adds a parameter to a catalogue.
+
+\item [DELPARAM]:
+ Deletes a parameter from a catalogue.
+
+\item [DELSORT]:
+ Deletes the sort information associated with a catalogue.
+
+\item [UPFIELD]:
+ Update the information associated with a field in a catalogue.
+
+\item [UPPARAM]:
+ Update the information associated with a parameter in a catalogue.
+
+\end{description}
+
+\end{description}
+
+\item [Manipulating data in a catalogue] ---
+
+\begin{description}
+
+\item [Correlation Analysis.]:
+
+\begin{description}
+
+\item [CORRELATE]:
+ Non-parametric correlation between two fields.
+
+\item [LINCOR]:
+ Linear correlation between fields.
+
+\end{description}
+
+\item [UPDATE]:
+ Update a field in a catalogue.
+
+\end{description}
+
+\item [Inquiries and Status] ---
+
+\begin{description}
+
+\begin{description}
+
+\item [GLOBALS]:
+ Displays the values of the CATPAC global parameters.
+
+\end{description}
+
+\end{description}
+
+\end{description}
+
+\section{Quotas to run CATPAC}
+\label{ap:quotas}
+
+The quotas shown below are the advised quotas for running {\small KAPPA}. In
+all but exceptional cases they should be sufficient for running {\small
+CATPAC}.
+
+\begin{tabular}[c]{lrlr}
+\\
+\hspace{4ex} CPU limit: & Infinite & \hspace{4ex} Direct I/O limit: & 18\\
+\hspace{4ex} Buffered I/O byte count quota: & 20480 & \hspace{4ex} Buffered I/O limit: & 18\\
+\hspace{4ex} Timer queue entry quota: & 9 & \hspace{4ex} Open file quota: & 50\\
+\hspace{4ex} Paging file quota: & 40000 & \hspace{4ex} Subprocess quota: & 10\\
+\hspace{4ex} Default page fault cluster: & 32 & \hspace{4ex} AST limit: & 23\\
+\hspace{4ex} Enqueue quota: & 30 & \hspace{4ex} Shared file limit: & 0\\
+\hspace{4ex} Max detached processes: & 0 & \hspace{4ex} Max active jobs: & 0\\
+\hspace{4ex} JTQUOTA: & 3072 & & \\
+\end{tabular}
+
+\newpage
+\section{Specifications of CATPAC applications}
+\label{ap:full}
+\subsection{Explanatory Notes}
+
+\begin{description}
+
+\item [Layout]
+In this layout the specification of parameters has the following
+format. 
+
+\begin{verbatim}
+     name  =  type (access)
+        description
+\end{verbatim}
+
+This format also includes a {\em Usage} entry this shows how the
+application is invoked from the command line.   It lists the positional
+parameters in order followed by any prompted keyword parameters using 
+a {\mbox ``KEYWORD=?''} syntax.  Defaulted
+keyword parameters do not appear.  Positional parameters
+that are normally defaulted are indicated by being enclosed in square
+brackets.
+
+Some parameters will only be used when another parameter has a certain
+value or mode. These are indicated by the name of the mode in
+parentheses at the end of the parameter description, but before any
+default, {\it e.g.}\ parameter OUTREJECT in SAMPLE is only
+relevant when parameter REJECT is {\tt "TRUE"}.
+
+\end {description}
+
+\newcommand {\mantt}{\tt}
+
+{\mantt \%name} means the value of parameter {\it name}.
+
+The description entry has a notation scheme to indicate 
+normally defaulted parameters, {\it i.e.}\ those for which there will
+be no prompt.
+For such parameters a matching pair of square brackets ({\mantt []})
+terminates the description.  The content between the brackets mean
+
+\begin{description}
+
+\item[{\mantt []}]
+Empty brackets means that the default is created dynamically
+by the application, and may depend on the values of other parameters.
+Therefore, the default cannot be given explicitly.
+
+\item[{\mantt [,]}]
+As above, but there are two default values that are created dynamically.
+
+\item[{\mantt [}{\rm default}{\mantt ]}]
+Occasionally, a description of the default is given in normal type,
+{\it e.g.}\ the size of the plotting region in a graphics application,
+where the exact default values depend on the device chosen. 
+
+\item[{\mantt [default]}]
+If the brackets contain a value in teletype-fount, this is the explicit
+default value.
+
+\end{description}
+
+\subsection{Abbreviations}
+
+Abbreviations  only been used where it was considered necessary to reduce
+the length of the commands. For example  {\small DELETECATALOGUE} becomes
+{\small DELCAT}. The full list of abbreviations used is:
+
+\begin{description}
+\begin{description}
+\item [CAT]: CATALOGUE
+\item [DEL]: DELETE
+\item [FLD]: FIELD
+\item [PARAM]: PARAMETER
+\end{description}
+\end{description}
+
+%+
+%  Name:
+%     LAYOUT.TEX
+
+%  Purpose:
+%     Define Latex commands for laying out documentation produced by PROLAT.
+
+%  Language:
+%     Latex
+
+%  Type of Module:
+%     Data file for use by the PROLAT application.
+
+%  Description:
+%     This file defines Latex commands which allow routine documentation
+%     produced by the SST application PROLAT to be processed by Latex. The
+%     contents of this file should be included in the source presented to
+%     Latex in front of any output from PROLAT. By default, this is done
+%     automatically by PROLAT.
+
+%  Notes:
+%     The definitions in this file should be included explicitly in any file
+%     which requires them. The \include directive should not be used, as it
+%     may not then be possible to process the resulting document with Latex
+%     at a later date if changes to this definitions file become necessary.
+
+%  Authors:
+%     RFWS: R.F. Warren-Smith (STARLINK)
+
+%  History:
+%     10-SEP-1990 (RFWS):
+%        Original version.
+%     10-SEP-1990 (RFWS):
+%        Added the implementation status section.
+%     12-SEP-1990 (RFWS):
+%        Added support for the usage section and adjusted various spacings.
+%     {enter_further_changes_here}
+
+%  Bugs:
+%     {note_any_bugs_here}
+
+%-
+
+%  Define length variables.
+\newlength{\sstbannerlength}
+\newlength{\sstcaptionlength}
+
+%  Define a \tt font of the required size.
+\font\ssttt=cmtt10 scaled 1095
+
+%  Define a command to produce a routine header, including its name,
+%  a purpose description and the rest of the routine's documentation.
+\newcommand{\sstroutine}[3]{
+   \goodbreak
+   \rule{\textwidth}{0.5mm}
+   \vspace{-7ex}
+   \newline
+   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
+   \setlength{\sstcaptionlength}{\textwidth}
+   \addtolength{\sstbannerlength}{0.5em}
+   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
+   \addtolength{\sstcaptionlength}{-4.45pt}
+   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
+   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
+   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
+   \begin{description}
+      #3
+   \end{description}
+}
+
+%  Format the description section.
+\newcommand{\sstdescription}[1]{\item[Description:] #1}
+
+%  Format the usage section.
+\newcommand{\sstusage}[1]{\item[Usage:] \mbox{} \\[1.3ex] {\ssttt #1}}
+
+%  Format the invocation section.
+\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
+
+%  Format the arguments section.
+\newcommand{\sstarguments}[1]{
+   \item[Arguments:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the returned value section (for a function).
+\newcommand{\sstreturnedvalue}[1]{
+   \item[Returned Value:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the parameters section (for an application).
+\newcommand{\sstparameters}[1]{
+   \item[Parameters:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the examples section.
+\newcommand{\sstexamples}[1]{
+   \item[Examples:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Define the format of a subsection in a normal section.
+\newcommand{\sstsubsection}[1]{\item[{#1}] \mbox{} \\}
+
+%  Define the format of a subsection in the examples section.
+\newcommand{\sstexamplesubsection}[1]{\item[{\ssttt #1}] \mbox{} \\}
+
+%  Format the notes section.
+\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
+
+%  Provide a general-purpose format for additional (DIY) sections.
+\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}] \mbox{} \\[1.3ex] #2}
+
+%  Format the implementation status section.
+\newcommand{\sstimplementationstatus}[1]{
+   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
+
+%  Format the bugs section.
+\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
+
+%  Format a list of items while in paragraph mode.
+\newcommand{\sstitemlist}[1]{
+  \mbox{} \\
+  \vspace{-3.5ex}
+  \begin{itemize}
+     #1
+  \end{itemize}
+}
+% ------
+% End of LAYOUT.TEX macros
+% ------
+
+
+\newpage
+
+\begin{small}
+\sstroutine{
+   ADDPARAM
+}{
+   Add a Parameter to a Catalogue
+}{
+   \sstdescription{
+      Add a new parameter to a catalogue. The new parameter requires a
+      name, format, value and comment.
+   }
+   \sstusage{
+      ADDPARAM INPUT NAME FORMAT VALUE COMMENT
+   }
+   \sstparameters{
+      \sstsubsection{
+         INPUT = \_CHAR (Read)
+      }{
+         Name of the catalogue.
+      }
+      \sstsubsection{
+         NAME = \_CHAR (Read)
+      }{
+         Name of the new parameter.
+      }
+      \sstsubsection{
+         FORMAT = \_CHAR (Read)
+      }{
+         Format of the new parameter. A FORTRAN format detailing how the
+         parameter value should be interpreted.
+      }
+      \sstsubsection{
+         VALUE = \_CHAR (Read)
+      }{
+         Value to be associated with the new parameter.
+      }
+      \sstsubsection{
+         COMMENT = \_CHAR (Read)
+      }{
+         Comment to be associated with the new parameter.
+      }
+   }
+   \sstnotes{
+      The value of a parameter is always a character string. The format
+      determines how the value should be interpreted.
+   }
+   \sstdiytopic{
+      Example
+   }{
+      ADDPARAM TEST CLASS I2 25 {\tt '}Catalogue Class{\tt '}
+   }
+   \sstbugs{
+      None known.
+   }
+}
+\sstroutine{
+   ASCIITOCAT
+}{
+   Create a catalogue from an ASCII file
+}{
+   \sstdescription{
+      Create a new catalogue that contains the data from an ASCII file.
+      ASCIITOCAT allows you to put your own data into a catalogue. The
+      data must be tabular. Before running this application you should
+      examine your data and decide which columns/fields in the data
+      are to included in the catalogue. For each of these fields note
+      the start position and the FORTRAN format that should be used to
+      read the data in this field. A wide range of sexagesimal formats are
+      also available. A good idea for finding the correct
+      start positions is to copy the first few entries of the data into
+      a separate file and include a first line containing
+      123456789012.....
+      Have a copy of this handy when you run the application. The
+      application first prompts for the name of the catalogue being
+      created and the name of the file from which the data is to be
+      read. During the next stage the application repeatedly prompts for
+      information about fields. For each field you will be prompted for
+      a field name, format, units, null value, comment and start
+      position. When you have defined all the fields use the ADAM null
+      value ! at the field name prompt to move onto the next stage.
+      During the final stage the application repeatedly prompts for
+      information about catalogue parameters. For each parameter you
+      will be prompted for a paramter name, format, value and comment
+      When you have defined all the parameters use the ADAM null
+      value ! at the parameter name prompt to finish.
+   }
+   \sstusage{
+      ASCIITOCAT INPUT DATAFILE
+   }
+   \sstparameters{
+      \sstsubsection{
+         INPUT = \_CHAR (Read)
+      }{
+         Name of the catalogue to be created.
+      }
+      \sstsubsection{
+         DATAFILE = \_CHAR (Read)
+      }{
+         Name of the file containing the tabular ascii data.
+      }
+      \sstsubsection{
+         FNAME = \_CHAR (Read)
+      }{
+         Name of the next field.
+         [Repeatedly prompted for, terminated with a !]
+      }
+      \sstsubsection{
+         FFORMAT = \_CHAR (Read)
+      }{
+         Format of the field.
+         [Repeatedly prompted for.]
+      }
+      \sstsubsection{
+         FUNIT = \_CHAR (Read)
+      }{
+         Units to be associated with this field.
+         [Repeatedly prompted for.]
+      }
+      \sstsubsection{
+         FNULL = \_CHAR (Read)
+      }{
+         Null value  to be associated with this field.
+         [Repeatedly prompted for.]
+      }
+      \sstsubsection{
+         FCOMMENT = \_CHAR (Read)
+      }{
+         Comment to be associated with this field.
+         [Repeatedly prompted for.]
+      }
+      \sstsubsection{
+         STARTPOS = \_INTEGER (Read)
+      }{
+         Start position, column number, of the data for this field.
+         [Repeatedly prompted for.]
+      }
+      \sstsubsection{
+         PNAME = \_CHAR (Read)
+      }{
+         Name of the next parameter.
+         [Repeatedly prompted for, terminated with a !]
+      }
+      \sstsubsection{
+         PFORMAT = \_CHAR (Read)
+      }{
+         Format of the parameter.
+         [Repeatedly prompted for.]
+      }
+      \sstsubsection{
+         PVALUE = \_CHAR (Read)
+      }{
+         Value to be associated with this parameter.
+         [Repeatedly prompted for.]
+      }
+      \sstsubsection{
+         PCOMMENT = \_CHAR (Read)
+      }{
+         Comment to be associated with this parameter.
+         [Repeatedly prompted for.]
+      }
+   }
+   \sstnotes{
+      This application performs no checking on your field definition.
+      This allows a degree of flexibility when interpreting your data.
+      You may, for example, have a field STARID with format A10
+      starting at position 15 and field STARNUM with format I4 starting
+      at position 21.
+   }
+   \sstdiytopic{
+      Example
+   }{
+      ASCIITOCAT TEST TESTDATA.DAT
+   }
+   \sstbugs{
+      None known.
+   }
+}
+\sstroutine{
+   CALCFLD
+}{
+   Calculate a new field
+}{
+   \sstdescription{
+      Creates a new catalogue which includes an extra field. The value of the
+      new field is calculated for each entry in a catalogue using
+      a user defined CATPAC Parser expression. The new field requires a
+      format, units, nullvalue and comment.
+   }
+   \sstusage{
+      CALCFLD INPUT NAME EXPRESSION FORMAT UNITS NULLVALUE COMMENT
+   }
+   \sstparameters{
+      \sstsubsection{
+         INPUT = \_CHAR (Read)
+      }{
+         Name of the catalogue.
+      }
+      \sstsubsection{
+         NAME = \_CHAR (Read)
+      }{
+         Name of the field to be updated.
+      }
+      \sstsubsection{
+         EXPRESSION = \_CHAR (Read)
+      }{
+         Expression to be evaluated.
+      }
+      \sstsubsection{
+         FORMAT = \_CHAR (Read)
+      }{
+         Format of the updated field.
+      }
+      \sstsubsection{
+         UNITS = \_CHAR (Read)
+      }{
+         Units of the updated field.
+      }
+      \sstsubsection{
+         NULLVALUE = \_CHAR (Read)
+      }{
+         Null value of the updated field.
+      }
+      \sstsubsection{
+         COMMENT = \_CHAR (Read)
+      }{
+         Comment of the updated field.
+      }
+   }
+   \sstdiytopic{
+      Example
+   }{
+      CALCFLD TEST VALUE1 VALUE2$*$2 F6.2 MAG -99.99 {\tt '}Recalibrated Value{\tt '}
+   }
+   \sstbugs{
+      None known.
+   }
+}
+\sstroutine{
+   CATPAC
+}{
+   Top-level ADAM monolith routine for the CATPAC package
+}{
+   \sstdescription{
+      This routine interprets the action name passed to it and calls
+      the appropriate routine to perform the specified action. An error
+      will be reported and STATUS will be set if the action name is not
+      recognised.
+   }
+   \sstbugs{
+      None known.
+   }
+}
+\sstroutine{
+   CATRENAME
+}{
+   Rename a catalogue
+}{
+   \sstdescription{
+      Rename a catalogue to a new name.
+   }
+   \sstusage{
+      CATRENAME INPUT NEWNAME
+   }
+   \sstparameters{
+      \sstsubsection{
+         INPUT = \_CHAR (Read)
+      }{
+         Name of the catalogue.
+      }
+      \sstsubsection{
+         NEWNAME = \_CHAR (Read)
+      }{
+         New name of the catalogue.
+      }
+   }
+   \sstdiytopic{
+      Example
+   }{
+      CATRENAME TEST NEWTEST
+   }
+   \sstbugs{
+      None known.
+   }
+}
+\sstroutine{
+   CATREPORT
+}{
+   Produce a catalogue report
+}{
+   \sstdescription{
+      Produces a catalogue report. A simple report is produced with or
+      without a header, selecting fields or reporting all fields. The report
+      is made either to the screen or to a file ($<$catalogue name$>$.REP),
+   }
+   \sstusage{
+      CATREPORT TEST [HEADER] [SCREEN] [ALLFLDS] [FLDNAMES]
+   }
+   \sstparameters{
+      \sstsubsection{
+         INPUT = \_CHAR (Read)
+      }{
+         Name of the catalogue.
+      }
+      \sstsubsection{
+         HEADER = \_LOGICAL (Read)
+      }{
+         Add header information to the report T/F?
+         [TRUE]
+      }
+      \sstsubsection{
+         SCREEN = \_LOGICAL (Read)
+      }{
+         Output to the screen (or a file) T/F?
+         [TRUE]
+      }
+      \sstsubsection{
+         ALLFLDS = \_LOGICAL (Read)
+      }{
+         All fields to be reported T/F?
+         [TRUE]
+      }
+      \sstsubsection{
+         FLDNAMES = \_CHAR (Read)
+      }{
+         List of field names to be reported
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         REPORT TEST HEADER=F SCREEN=F ALLFLDS=N FLDNAMES=[RA,DEC,VALUE1]
+      }{
+         Produce a report with no header, output to a file and selecting
+         fields.
+      }
+   }
+   \sstnotes{
+      A report to the screen is limited to 80 characters and to file 132
+      characters. Excess fields are ignored and a warning issued.
+      Requested fields that do not appear in the catalogue are ignored.
+   }
+   \sstbugs{
+      None known.
+   }
+}
+\sstroutine{
+   CATSEARCH
+}{
+   Select entries from a catalogue
+}{
+   \sstdescription{
+      Create a new catalogue that contains entries from a catalogue
+      that pass some selection criteria. The criteria should be a legal
+      CATPAC Parser expression.
+   }
+   \sstusage{
+      CATSEARCH INPUT OUTPUT CRITERIA
+   }
+   \sstparameters{
+      \sstsubsection{
+         INPUT = \_CHAR (Read)
+      }{
+         Name of the catalogue.
+      }
+      \sstsubsection{
+         OUTPUT = \_CHAR (Read)
+      }{
+         Name of the catalogue to contain the selected entries.
+      }
+      \sstsubsection{
+         CRITERIA = \_CHAR (Read)
+      }{
+         Logical expression of the selection criteria.
+      }
+   }
+   \sstnotes{
+      REJECT and CATSEARCH complement each other.
+   }
+   \sstdiytopic{
+      Example
+   }{
+      CATSEARCH TEST SEARCHTEST VALUE2.GT.300.AND.VALUE2.LT.500
+   }
+   \sstbugs{
+      None known.
+   }
+}
+\sstroutine{
+   CATSORT
+}{
+   Create a new catalogue that is sorted on given fields
+}{
+   \sstdescription{
+      Create a new catalogue that is sorted on given fields. The functionality
+      of sort is twofold. The first function is to create indexes associated
+      with the catalogue that allow efficient searching and joining. The second
+      function is a by product of the sort and that is to order a catalogue
+      for presentation.
+
+      Consider sorting the data in a telephone directory. For presentation
+      purposes sort the data by field SURNAME (Primary field) if several
+      entries are found with the same surname order these by ordering on the
+      field FIRSTINITIAL (Secondary field) and if entries are found with the
+      same surname and first initial order these by ordering on the field
+      SECONDINITIAL (Tertiary field). This catalogue would now be presented in
+      a useful way. More importantly the system has created an
+      index that allows it to perform an efficient search and join in certain
+      cases. For example, a request for entries where the SURNAME is BROWN and
+      the FIRSTINITIAL is J.
+
+      The order of field names in the SORTFLDS parameter is significant.
+      SORTFLDS(1) must contain the primary field, SORTFLDS(2) and
+      SORTFLDS(3) contain the secondary and tertiary fields.
+      Omitting either the secondary or tertiary position simply indicates
+      that there should be no secondary or tertiary ordering.
+
+      The direction of the sort for each field in given in the corresponding
+      position of the SORTDIR parameter. TRUE for ascending.
+   }
+   \sstusage{
+      CATSORT INPUT OUTPUT SORTFLDS SORTDIR
+   }
+   \sstparameters{
+      \sstsubsection{
+         INPUT = \_CHAR (Read)
+      }{
+         Name of the catalogue.
+      }
+      \sstsubsection{
+         OUTPUT = \_CHAR (Read)
+      }{
+         Name of the new sorted catalogue.
+      }
+      \sstsubsection{
+         SORTFLDS = \_CHAR (Read)
+      }{
+         Names of the Primary, Secondary and Tertiary fields for an index.
+      }
+      \sstsubsection{
+         SORTDIR = \_LOGICAL (Read)
+      }{
+         Direction of sort TRUE for descending FALSE ascending.
+      }
+   }
+   \sstnotes{
+      SORTFLDS and SORTDIR must correspond.
+   }
+   \sstbugs{
+      None known.
+   }
+}
+\sstroutine{
+   COPYCAT
+}{
+   Copy a catalogue
+}{
+   \sstdescription{
+      Copy a catalogue.
+   }
+   \sstusage{
+      COPYCAT INPUT OUTPUT
+   }
+   \sstparameters{
+      \sstsubsection{
+         INPUT = \_CHAR (Read)
+      }{
+         Name of the catalogue.
+      }
+      \sstsubsection{
+         OUTPUT = \_CHAR (Read)
+      }{
+         New catalogue.
+      }
+   }
+   \sstdiytopic{
+      Example
+   }{
+      COPYCAT TEST NEWTEST
+   }
+   \sstbugs{
+      None known.
+   }
+}
+\sstroutine{
+   CORRELATE
+}{
+   Non-parametric correlation  between fields
+}{
+   \sstdescription{
+      Computes the non-parametric correlation coefficients between
+      given numeric fields in a catalogue using Kendall{\tt '}s Tau and
+      Spearman{\tt '}s Rho and writes the results to file
+      $<$catalogue name$>$.LIS. These coefficients measure the strength of
+      any monotonic relation between the two fields. They both take
+      values of $+$1.0 for perfect correlation, -1.0 for perfect
+      anti-correlation and 0.0 for no correlation, though in general
+      the values of the two coefficients are not equal. These
+      coefficients are further discussed in the NAG manual (Chapter
+      G02).
+
+      If a field contains the Null Value for that field the values
+      for that entry are excluded form the correlation. This is a
+      casewise treatment of missing values in the terminology of the
+      NAG manual. This approach has the disadvantage that some good
+      data is discarded, but it ensures that all coefficients are based
+      on the same number of data points.
+   }
+   \sstusage{
+      CORRELATE TEST [ALLFLDS] [FLDNAMES]
+   }
+   \sstparameters{
+      \sstsubsection{
+         INPUT = \_CHAR (Read)
+      }{
+         Name of the catalogue.
+      }
+      \sstsubsection{
+         ALLFLDS = \_LOGICAL (Read)
+      }{
+         All numeric fields to be seleceted T/F?
+         [TRUE]
+      }
+      \sstsubsection{
+         FLDNAMES = \_CHAR (Read)
+      }{
+         List of field names to be correlated.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         CORRELATE TEST ALLFLDS=N FLDNAMES=[VALUE1,VALUE2]
+      }{
+         Selecting the fields to be included in the correlation.
+      }
+   }
+   \sstnotes{
+      If there are more than a few hundred entries in the catalogue
+      the time required to compute the coefficients is not negligible.
+      The time required increases in proportion to the number of entries
+      and the number of fields being correlated.
+   }
+   \sstbugs{
+      None known.
+   }
+}
+\sstroutine{
+   DELCAT
+}{
+   Deletes a catalogue from the system
+}{
+   \sstdescription{
+      Delete a catalogue from the system.
+   }
+   \sstusage{
+      DELCAT INPUT
+   }
+   \sstparameters{
+      \sstsubsection{
+         INPUT = \_CHAR (Read)
+      }{
+         Name of the catalogue.
+      }
+   }
+   \sstnotes{
+      Catalogues not created by the user may be protected and in these
+      cases the Delete Catalogue application will have no effect.
+   }
+   \sstdiytopic{
+      Example
+   }{
+      DELCAT TEST
+   }
+   \sstbugs{
+      None known.
+   }
+}
+\sstroutine{
+   DELPARAM
+}{
+   Delete a Parameter from a Catalogue
+}{
+   \sstdescription{
+      Delete a parameter from a catalogue.
+   }
+   \sstusage{
+      DELPARAM INPUT NAME
+   }
+   \sstparameters{
+      \sstsubsection{
+         INPUT = \_CHAR (Read)
+      }{
+         Name of the catalogue.
+      }
+      \sstsubsection{
+         NAME = \_CHAR (Read)
+      }{
+         Name of the parameter to be deleted.
+      }
+   }
+   \sstdiytopic{
+      Example
+   }{
+      DELPARAM TEST CLASS
+   }
+}
+\sstroutine{
+   DELSORT
+}{
+   Delete the sort information from a catalogue
+}{
+   \sstdescription{
+      Delete the sort information from a catalogue.
+   }
+   \sstusage{
+      DELSORT INPUT
+   }
+   \sstparameters{
+      \sstsubsection{
+         INPUT = \_CHAR (Read)
+      }{
+         Name of the catalogue.
+      }
+   }
+   \sstdiytopic{
+      Example
+   }{
+      DELSORT TEST
+   }
+   \sstbugs{
+      None known.
+   }
+}
+\sstroutine{
+   ENTRIES
+}{
+   Finds the number of entries in a catalogue
+}{
+   \sstdescription{
+      Finds the number of entries in a catalogue.
+   }
+   \sstusage{
+      ENTRIES INPUT
+   }
+   \sstparameters{
+      \sstsubsection{
+         INPUT = \_CHAR (Read)
+      }{
+         Name of the catalogue.
+      }
+   }
+   \sstdiytopic{
+      Example
+   }{
+      ENTRIES TEST
+   }
+   \sstbugs{
+      None known.
+   }
+}
+\sstroutine{
+   FIELDINFO
+}{
+   Find specific information about a field in a catalogue
+}{
+   \sstdescription{
+      Finds the FORMAT, UNITS, NULLVALUE or COMMENT associated with a
+      field in a catalogue. For example find the comment associated
+      with the field VALUE1 in the TEST catalogue.
+   }
+   \sstusage{
+      FIELDINFO INPUT NAME INFREQ
+   }
+   \sstparameters{
+      \sstsubsection{
+         INPUT = \_CHAR (Read)
+      }{
+         Name of the catalogue.
+      }
+      \sstsubsection{
+         NAME = \_CHAR (Read)
+      }{
+         Name of the field whose information is required.
+      }
+      \sstsubsection{
+         INFREQ = \_CHAR (Read)
+      }{
+         Information required. (FORMAT, UNITS, NULLVALUE or COMMENT)
+      }
+   }
+   \sstdiytopic{
+      Example
+   }{
+      FIELDINFO TEST VALUE1 COMMENT
+   }
+   \sstbugs{
+      None known.
+   }
+}
+\sstroutine{
+   FIELDS
+}{
+   Find the number and names of fields in a catalogue
+}{
+   \sstdescription{
+      Find the number of fields and the names of thoses fields
+      in a catalogue.
+   }
+   \sstusage{
+      FIELDS INPUT
+   }
+   \sstparameters{
+      \sstsubsection{
+         INPUT = \_CHAR (Read)
+      }{
+         Name of the catalogue.
+      }
+   }
+   \sstdiytopic{
+      Example
+   }{
+      FIELDS TEST
+   }
+   \sstbugs{
+      None known.
+   }
+}
+\sstroutine{
+   FK425
+}{
+   Convert FK4 coordinates to FK5
+}{
+   \sstdescription{
+      Create a catalogue containing new fields for the Right Ascension,
+      Declination, Parallax, Radial velocity and proper motions after a
+      conversion has been made from the FK4 system coordinates. The
+      new fields are calculated using SLA\_FK425. See SUN 67
+
+      Conversion from Besselian epoch 1950.0 to Julian epoch 2000.0 only
+      is provided. Proper motion corrections can be made using PROPERM.
+
+      Proper motions should be given in sec/yr and arcsecs/yr
+      Parallax should be given in arcseconds.
+      Radial velocity should be given in km/sec ($+$ve if receeding)
+
+      If necessary use UPDATE to convert fields into the appropriate units.
+   }
+   \sstusage{
+      FK425 INPUT OUTPUT RAFK4 DECFK4 RAPMFK4 DECPMFK4 PARLXFK4 RADVELFK4
+      RAFK5
+   \newline
+      DECFK5 RAPMFK5 DECPMFK5 PARLXFK5 RADELFK5
+   }
+   \sstparameters{
+      \sstsubsection{
+         INPUT = \_CHAR (Read)
+      }{
+         Name of the catalogue.
+      }
+      \sstsubsection{
+         OUTPUT = \_CHAR (Read)
+      }{
+         Name of the output catalogue.
+      }
+      \sstsubsection{
+         RAFK4 = \_CHAR (Read)
+      }{
+         Name of the RA field in FK4 system.
+      }
+      \sstsubsection{
+         DECFK4 = \_CHAR (Read)
+      }{
+         Name of the DEC field in FK4 system.
+      }
+      \sstsubsection{
+         RAPMFK4 = \_CHAR (Read)
+      }{
+         Name of the RA proper motion field in FK4 system.
+      }
+      \sstsubsection{
+         DECPMFK4 = \_CHAR (Read)
+      }{
+         Name of the DEC proper motion field in FK4 system.
+      }
+      \sstsubsection{
+         PARLXFK4 = \_CHAR (Read)
+      }{
+         Name of the parallax field in FK4 system.
+      }
+      \sstsubsection{
+         RADVELFK4 = \_CHAR (Read)
+      }{
+         Name of the radial velocity field in FK4 system.
+      }
+      \sstsubsection{
+         RAFK5 = \_CHAR (Read)
+      }{
+         Name of the RA field in FK5 system.
+      }
+      \sstsubsection{
+         DECFK5 = \_CHAR (Read)
+      }{
+         Name of the DEC field in FK5 system.
+      }
+      \sstsubsection{
+         RAPMFK5 = \_CHAR (Read)
+      }{
+         Name of the RA proper motion field in FK5 system.
+      }
+      \sstsubsection{
+         DECPMFK5 = \_CHAR (Read)
+      }{
+         Name of the DEC proper motion field in FK5 system.
+      }
+      \sstsubsection{
+         PARLXFK5 = \_CHAR (Read)
+      }{
+         Name of the parallax field in FK5 system.
+      }
+      \sstsubsection{
+         RADVELFK5 = \_CHAR (Read)
+      }{
+         Name of the radial velocity field in FK5 system.
+      }
+   }
+   \sstnotes{
+      This application creates a new catalogue that contains extra fields for
+      Right Ascension, Declination, Parallax, Radial velocity and proper
+      motions after a conversion to FK5 system.
+      The naming of these new fields can lead to confusion. Traditionally
+      the field names RA and DEC are used for the Right Ascension and
+      Declination fields in the catalogue. It is stongly suggested that the
+      field names of Right Ascension and Declination in the new system (FK5)
+      take the form RAJ, DECJ for RA Julian and DEC Julian. In the same way
+      PARLX would become PARLXJ and RADVEL RADVELJ etc. You may go on to
+      rename the field RA to RAB and DEC to DECB and RAJ to RA and DECJ to DEC
+      using the UPFIELD application but you must also then update the Parallax,
+      Radial velocity and proper motions and the catalogues Equinox parameter.
+
+      Care should also be taken when renaming fields. Renaming RAJ to RA
+      before renaming RA to RAB, in the above example, would result in two
+      fields named RA in the same catalogue.
+   }
+   \sstdiytopic{
+      Example
+   }{
+      FK425 TEST TESTFK5 RA DEC RA\_PM DEC\_PM PARALLAX RAD\_VEL RAJ DECJ
+      PARALLAXJ RADVELJ
+   }
+   \sstbugs{
+      None known.
+   }
+}
+\sstroutine{
+   FK45Z
+}{
+   Convert FK4 coordinates to FK5
+}{
+   \sstdescription{
+      Create a catalogue containing new fields for the Right Ascension
+      and Declination. The new fields are calculated using SLA\_FK45Z.
+      See SUN 67
+
+      Conversion from Besselian epoch 1950.0 to Julian epoch 2000.0 only
+      is provided.
+
+      If necessary use UPDATE to convert fields into the appropriate units.
+   }
+   \sstusage{
+      FK45Z INPUT OUTPUT RAFK4 DECFK4 BEPOCH RAFK5 DECFK5
+   }
+   \sstparameters{
+      \sstsubsection{
+         INPUT = \_CHAR (Read)
+      }{
+         Name of the catalogue.
+      }
+      \sstsubsection{
+         OUTPUT = \_CHAR (Read)
+      }{
+         Name of the output catalogue.
+      }
+      \sstsubsection{
+         RAFK4 = \_CHAR (Read)
+      }{
+         Name of the RA field in FK4 system.
+      }
+      \sstsubsection{
+         DECFK4 = \_CHAR (Read)
+      }{
+         Name of the DEC field in FK4 system.
+      }
+      \sstsubsection{
+         BEBOCH = \_REAL (Read)
+      }{
+         Epoch
+      }
+      \sstsubsection{
+         RAFK5 = \_CHAR (Read)
+      }{
+         Name of the RA field in FK5 system.
+      }
+      \sstsubsection{
+         DECFK5 = \_CHAR (Read)
+      }{
+         Name of the DEC field in FK5 system.
+      }
+   }
+   \sstnotes{
+      This application creates a new catalogue that contains extra fields for
+      Right Ascension, Declination
+      The naming of these new fields can lead to confusion. Traditionally
+      the field names RA and DEC are used for the Right Ascension and
+      Declination fields in the catalogue. It is stongly suggested that the
+      field names of Right Ascension and Declination in the new system (FK5)
+      take the form RAJ, DECJ for RA Julian and DEC Julian. You may go on to
+      rename the field RA to RAB and DEC to DECB and RAJ to RA and DECJ to DEC
+      using the UPFIELD application but you must also then update the Parallax,
+      Radial velocity and proper motions and the catalogues Equinox parameter.
+
+      Care should also be taken when renaming fields. Renaming RAJ to RA
+      before renaming RA to RAB, in the above example, would result in two
+      fields named RA in the same catalogue.
+   }
+   \sstdiytopic{
+      Example
+   }{
+      FK45Z TEST TESTFK5 RA DEC BEPOCH RAJ DECJ
+   }
+   \sstbugs{
+      None known.
+   }
+}
+\sstroutine{
+   FK524
+}{
+   Convert FK5 coordinates to FK4
+}{
+   \sstdescription{
+      Create a catalogue containing new fields for the Right Ascension,
+      Declination, Parallax, Radial velocity and proper motions after a
+      conversion has been made from the FK5 system coordinates. The
+      new fields are calculated using SLA\_FK524. See SUN 67
+
+      Conversion from Julian epoch 2000.0 to Besselian epoch 1950.0 only
+      is provided. Proper motion corrections can be made using PROPERM.
+
+      Proper motions should be given in sec/yr and arcsecs/yr
+      Parallax should be given in arcseconds.
+      Radial velocity should be given in km/sec ($+$ve if receeding)
+
+      If necessary use UPDATE to convert fields into the appropriate units.
+   }
+   \sstusage{
+      FK524 INPUT OUTPUT RAFK5 DECFK5 RAPMFK5 DECPMFK5 PARLXFK5 RADVELFK5
+      \newline
+      RAFK4 DECFK4 RAPMFK4 DECPMFK4 PARLXFK4 RADVELFK4
+   }
+   \sstparameters{
+      \sstsubsection{
+         INPUT = \_CHAR (Read)
+      }{
+         Name of the catalogue.
+      }
+      \sstsubsection{
+         OUTPUT = \_CHAR (Read)
+      }{
+         Name of the output catalogue.
+      }
+      \sstsubsection{
+         RAFK5 = \_CHAR (Read)
+      }{
+         Name of the RA field in FK5 system.
+      }
+      \sstsubsection{
+         DECFK5 = \_CHAR (Read)
+      }{
+         Name of the DEC field in FK5 system.
+      }
+      \sstsubsection{
+         RAPMFK5 = \_CHAR (Read)
+      }{
+         Name of the RA proper motion field in FK5 system.
+      }
+      \sstsubsection{
+         DECPMFK5 = \_CHAR (Read)
+      }{
+         Name of the DEC proper motion field in FK5 system.
+      }
+      \sstsubsection{
+         PARLXFK5 = \_CHAR (Read)
+      }{
+         Name of the parallax field in FK5 system.
+      }
+      \sstsubsection{
+         RADVALFK5 = \_CHAR (Read)
+      }{
+         Name of the radial velocity field in FK5 system.
+      }
+      \sstsubsection{
+         RAFK4 = \_CHAR (Read)
+      }{
+         Name of the RA field in FK4 system.
+      }
+      \sstsubsection{
+         DECFK4 = \_CHAR (Read)
+      }{
+         Name of the DEC field in FK4 system.
+      }
+      \sstsubsection{
+         RAPMFK4 = \_CHAR (Read)
+      }{
+         Name of the RA proper motion field in FK4 system.
+      }
+      \sstsubsection{
+         DECPMFK4 = \_CHAR (Read)
+      }{
+         Name of the DEC proper motion field in FK4 system.
+      }
+      \sstsubsection{
+         PARLXFK4 = \_CHAR (Read)
+      }{
+         Name of the parallax field in FK4 system.
+      }
+      \sstsubsection{
+         RADVALFK4 = \_CHAR (Read)
+      }{
+         Name of the radial velocity field in FK4 system.
+      }
+   }
+   \sstnotes{
+      This application creates a new catalogue that contains extra fields for
+      Right Ascension, Declination, Parallax, Radial velocity and proper
+      motions after a conversion to FK4 system.
+      The naming of these new fields can lead to confusion. Traditionally
+      the field names RA and DEC are used for the Right Ascension and
+      Declination fields in the catalogue. It is stongly suggested that the
+      field names of Right Ascension and Declination in the new system (FK4)
+      take the form RAB, DECB for RA Besselian and DEC Besselian. In the same
+      way PARLX would become PARLXB and RADVEL RADVELB etc. You may go on to
+      rename the field RA to RAJ and DEC to DECJ and RAB to RA and DECB to DEC
+      using the UPFIELD application but you must also then update the Parallax,
+      Radial velocity and proper motions and the catalogues Equinox parameter.
+
+      Care should also be taken when renaming fields. Renaming RAB to RA
+      before renaming RA to RAJ, in the above example, would result in two
+      fields named RA in the same catalogue.
+   }
+   \sstdiytopic{
+      Example
+   }{
+      FK524 TEST TESTFK4 RA DEC RAPM DECPM PARALLAX RAD\_VEL RAB DECB
+      RAPMB
+      \newline
+      DECPMB PARALLAXB RADVELB
+   }
+   \sstbugs{
+      None known.
+   }
+}
+\sstroutine{
+   FK54Z
+}{
+   Convert FK5 coordinates to FK4
+}{
+   \sstdescription{
+      Create a catalogue containing new fields for the Right Ascension
+      and Declination. The new fields are calculated using SLA\_FK54Z.
+      See SUN 67
+
+      Conversion from Julian epoch 2000.0 to Besselian epoch 1950.0 only
+      is provided.
+
+      If necessary use UPDATE to convert fields into the appropriate units.
+   }
+   \sstusage{
+      FK54Z INPUT OUTPUT RAFK5 DECFK5 BEPOCH RAFK4 DECFK4
+   }
+   \sstparameters{
+      \sstsubsection{
+         INPUT = \_CHAR (Read)
+      }{
+         Name of the catalogue.
+      }
+      \sstsubsection{
+         OUTPUT = \_CHAR (Read)
+      }{
+         Name of the output catalogue.
+      }
+      \sstsubsection{
+         RAFK5 = \_CHAR (Read)
+      }{
+         Name of the RA field in FK5 system.
+      }
+      \sstsubsection{
+         DECFK5 = \_CHAR (Read)
+      }{
+         Name of the DEC field in FK5 system.
+      }
+      \sstsubsection{
+         BEBOCH = \_REAL (Read)
+      }{
+         Epoch
+      }
+      \sstsubsection{
+         RAFK4 = \_CHAR (Read)
+      }{
+         Name of the RA field in FK4 system.
+      }
+      \sstsubsection{
+         DECFK4 = \_CHAR (Read)
+      }{
+         Name of the DEC field in FK4 system.
+      }
+   }
+   \sstnotes{
+      This application creates a new catalogue that contains extra fields for
+      Right Ascension, Declination
+      The naming of these new fields can lead to confusion. Traditionally
+      the field names RA and DEC are used for the Right Ascension and
+      Declination fields in the catalogue. It is stongly suggested that the
+      field names of Right Ascension and Declination in the new system (FK5)
+      take the form RAB, DECB for RA Besslian and DEC Besslian. You may go on to
+      rename the field RA to RAJ and DEC to DECJ and RAB to RA and DECB to DEC
+      using the UPFIELD application but you must also then update the Parallax,
+      Radial velocity and proper motions and the catalogues Equinox parameter.
+
+      Care should also be taken when renaming fields. Renaming RAB to RA
+      before renaming RA to RAJ, in the above example, would result in two
+      fields named RA in the same catalogue.
+   }
+   \sstdiytopic{
+      Example
+   }{
+      FK54Z TEST TESTFK4 RA DEC BEPOCH RAB DECB
+   }
+   \sstbugs{
+      None known.
+   }
+}
+\sstroutine{
+   GLOBALS
+}{
+   Displays the values of the CATPAC global parameters
+}{
+   \sstdescription{
+      This procedure lists the meanings and values of the CATPAC global
+      parameters.  If a global parameter does not have a value, the
+      string {\tt "}$<$undefined$>${\tt "} is substituted where the value would have been
+      written.
+   }
+   \sstusage{
+      GLOBALS
+   }
+   \sstbugs{
+      None known.
+   }
+}
+\sstroutine{
+   JOIN
+}{
+   JOIN two catalogues
+}{
+   \sstdescription{
+      Create a new catalogue by joining two catalogues. The effect of the join
+      is as follows. Consider a large catalogue that contains all the fields
+      from the INPUT1 catalogue and all the fields from the INPUT2 catalogue.
+      Into this catalogue put an entry for each combination of entries in
+      catalogues INPUT1 and INPUT2. The resulting catalogue will have N$*$M
+      entries where N is the number of entries in the INPUT1 catalogue and
+      M the number in the INPUT2 catalogue. Now search this catalogue for
+      those entries that satisfy the given expression.
+
+      Another way of looking at join is to say. Take every entry in turn
+      from catalogue INPUT1. Match this entry against every entry in
+      catalogue INPUT2 and if the EXPRESSion is satisfied combine both entries
+      to write to a new catalogue.
+
+      The expression should be a legal CATPAC Parser expression.
+
+      Field names in the expression must be unique so append an {\tt '}\_{\tt '} followed
+      by the first four characters of the catalogue name. 
+      \newline
+      Eg. RA\_IRPS, DEC\_YALE
+      VALUE2\_CAT1.GT.300.AND.VALUE2\_CAT2.LT.500
+   }
+   \sstusage{
+      JOIN INPUT1 INPUT2 OUTPUT EXPRESS
+   }
+   \sstparameters{
+      \sstsubsection{
+         INPUT1 = \_CHAR (Read)
+      }{
+         Name of the first input catalogue.
+      }
+      \sstsubsection{
+         INPUT2 = \_CHAR (Read)
+      }{
+         Name of the second input catalogue.
+      }
+      \sstsubsection{
+         OUTPUT = \_CHAR (Read)
+      }{
+         Name of the catalogue to contain the merged entries.
+      }
+      \sstsubsection{
+         EXPRESS = \_CHAR (Read)
+      }{
+         The join expression.
+      }
+   }
+   \sstdiytopic{
+      Example
+   }{
+      JOIN CAT1 CAT2 JOINCAT VALUE2\_CAT1.GT.300.AND.VALUE2\_CAT2.LT.500
+   }\\{
+      JOIN CAT1 CAT2 JOINCAT GREAT\_CIRCLE(RA\_CAT1,DEC\_CAT1,RA\_CAT2,DEC\_CAT2)
+   }{
+      .LT.CONVERT({\tt "}ARCSEC{\tt "},{\tt "}56{\tt "})
+   }
+   \sstbugs{
+      None known.
+   }
+}
+\sstroutine{
+   LINCOR
+}{
+   Linear correlation between fields
+}{
+   \sstdescription{
+      Computes the Pearson product-moment linear correlation
+      coefficients between the given numeric fields in a catalogue and
+      writes the results to file $<$catalogue name$>$.LIS. The coefficient
+      takes the value of $+$1.0 for perfect correlation, -1.0 for
+      perfect anti-correlation and 0.0 for no correlation. These
+      coefficients are further discussed in the NAG manual (Chapter
+      G02).
+      If a field contains the Null Value for that field the values for
+      that entry are excluded form the correlation. This is a casewise
+      treatment of missing values in the terminology of the NAG manual.
+      This approach has the disadvantage that some good data is
+      discarded, but it ensures that all coefficients are based on the
+      same number of data points.
+   }
+   \sstusage{
+      LINCOR TEST [ALLFLDS] [FLDNAMES]
+   }
+   \sstparameters{
+      \sstsubsection{
+         INPUT = \_CHAR (Read)
+      }{
+         Name of the catalogue.
+      }
+      \sstsubsection{
+         ALLFLDS = \_LOGICAL (Read)
+      }{
+         All numeric fields to be selected T/F?
+         [TRUE]
+      }
+      \sstsubsection{
+         FLDNAMES = \_CHAR (Read)
+      }{
+         List of field names to be correlated.
+         Prompted for only if required.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         LINCOR TEST ALLFLDS=N FLDNAMES=[VALUE1,VALUE2]
+      }{
+         Selecting the fields to be included in the correlation.
+      }
+   }
+   \sstnotes{
+      If there are more than a few hundred entries in the catalogue
+      the time required to compute the coefficients is not negligible.
+      The time required increases in proportion to the number of entries
+      and the number of fields being correlated.
+   }
+   \sstbugs{
+      None known.
+   }
+}
+   \goodbreak
+   \rule{\textwidth}{0.5mm}
+   \vspace{-7ex}
+   \newline
+   \settowidth{\sstbannerlength}{{\Large {\bf LISTIN}}}
+   \setlength{\sstcaptionlength}{\textwidth}
+   \addtolength{\sstbannerlength}{0.5em}
+   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
+   \addtolength{\sstcaptionlength}{-4.45pt}
+   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf LISTIN}}}
+   \parbox[t]{\sstcaptionlength}{\center
+      {\Large    Create a catalogue from a free format ASCII file}}
+   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf LISTIN}}}
+   \begin{description}
+   \sstdescription{
+      Create a new catalogue that contains the data from a free format ASCII
+      file. LISTIN allows you to put your own data into a catalogue. The
+      data must be preceded by two lines of information. The first line
+      should contain the destination field names separated by spaces. The
+      second line should contain the formats to be associated with the fields
+      again separated by spaces. When the field is a character string or in
+      sexagesimal format the length of the field is taken from the format.
+      The full range of CATPAC sexagesimal formats are available including
+      HH MM SS, SDD MM SS, DEGREES, HHMMSS etc.
+      Subsequent lines contain the free format data.
+      Remember that the catalogue will be created with no parameters and
+      dummy values for the UNITs, NULLVALUES, and COMMENTS of the fields.
+      These can be added using applications such as ADDPARAM and UPFIELD
+      A typical file may look like
+   }
+   \end{description}
+
+\begin{verbatim} 
+
+      NAME RA DEC VAL1 VAL2
+       A5 HH MM SS    SDD MM SS      F10.4 F10.3
+       STAR1      12 30 00   +44 30 00  1223.78000  1348.76000
+       STAR2  12 35 00     +43 45 00  1472.16000  1302.45000
+       STAR3  12 00 00   +45 00 00  1624.63000  1234.34000
+         STAR4  12 22 00  +44 40 00  1558.32000  1419.83000
+        STAR5  12 14 00   +43 52 00   0000.00000  1285.77000
+       STAR6  12 06 00   +43 21 00        1498.23000  1379.48000
+       STAR7 12 18 00   +44 08 00   1604.32000  0000.00000
+         STAR8   12 26 00   +43 58 00  1273.72000  1230.54000
+       STAR9       12 02 00   +44 13 00  1508.36000  1267.44000
+
+\end{verbatim}
+\begin{description}
+   \sstusage{
+      LISTIN INPUT DATAFILE
+   }
+   \sstparameters{
+      \sstsubsection{
+         INPUT = \_CHAR (Read)
+      }{
+         Name of the catalogue to be created.
+      }
+      \sstsubsection{
+         DATAFILE = \_CHAR (Read)
+      }{
+         Name of the file containing the ascii data.
+      }
+   }
+   \sstdiytopic{
+      Example
+   }{
+      LISTIN TEST TESTDATA.DAT
+   }
+   \sstbugs{
+      None known.
+   }
+   \end{description}
+\sstroutine{
+   LITTLEBIG
+}{
+   Extract entries with largest or smallest values of a given field
+}{
+   \sstdescription{
+      Create a new catalogue that contains a user selected number of
+      entries. The entries are those with the littlest, or biggest, values
+      in a user selected field. For example create a new catalogue that
+      contains the 3 brightest objects in a catalogue TEST.
+      By using the REJECT option a second catalogue can be
+      created that contains those entries that were not selected.
+   }
+   \sstusage{
+      LITTLEBIG INPUT OUTPUT FIELD NUMSEL BIGGEST [REJECT] [OUTREJECT]
+   }
+   \sstparameters{
+      \sstsubsection{
+         INPUT = \_CHAR (Read)
+      }{
+         Name of the catalogue.
+      }
+      \sstsubsection{
+         OUTPUT = \_CHAR (Read)
+      }{
+         Name of the catalogue to be created.
+      }
+      \sstsubsection{
+         FIELD = \_CHAR (Read)
+      }{
+         Name of the field on which the selection is to be made.
+      }
+      \sstsubsection{
+         NUMSEL = \_INTEGER (Read)
+      }{
+         Number of entries to be selected.
+      }
+      \sstsubsection{
+         BIGGEST = \_LOGICAL (Read)
+      }{
+         {\tt '}T{\tt '} To select the entries with the biggest values in the
+         selected field. {\tt '}F{\tt '} for the entries with the smallest values.
+      }
+      \sstsubsection{
+         REJECT = \_LOGICAL (Read)
+      }{
+         Do you require a rejects catalogue (T/F)?
+         [FALSE]
+      }
+      \sstsubsection{
+         OUTREJECT = \_CHAR (Read)
+      }{
+         Name of the catalogue to contain the rejected entries.
+      }
+   }
+   \sstbugs{
+      None known.
+   }
+}
+\sstroutine{
+   MERGE
+}{
+   Merge two catalogues
+}{
+   \sstdescription{
+      Create a new catalogue by merging two catalogues. If the catalogues were
+      ASCII files merging two catalogue would be the same as appending the
+      two ASCII files to create a new file, providing the data is aligned
+      correctly. To merge two catalogues use the MERGELFDS parameter to select
+      the fields in the first catalogue and the fields in the second catalogue
+      that are to be merged to create fields in the new third catalogue.
+      MERGEFLDS is repeatedly prompted and is terminated with a !.
+      So you may have two
+      catalogues one containing fields DATE, TIME and RESULT and the other DATE,
+      TIME and VALUE. To merge these catalogues associate (DATE, DATE, DATE
+      using MEGERFLDS=[DATE,DATE,DATE]) and (TIME, TIME, TIME using
+      MERGEFLDS=[TIME, TIME, TIME]) and (RESULT, VALUE, READING using
+      MEGERFLDS=[RESULT, VALUE, READING]. Finish with MERGEFLDS=!
+
+      An alternative to entering the merge fields in interactive mode is to
+      use parameter FROMFILE=T to read the merge fields from a file given
+      by the MERGEFILE parameter. The file should contain three fieled names
+      on each line separated by spaces. The file for the above example would
+      be.
+
+      DATE DATE DATE
+      TIME TIME TIME
+      RESULT VALUE READING
+
+      The output catalogue will contain
+      data from every entry in the first catalogue and every entry in the
+      second. The merged fields must be of the same type.
+      The resulting catalogue has fields TIME, DATE and READING.
+      MERGEFLDFS will accept [RESULT, NULL, READING] in which case the field
+      RESULT in the first catalogue has no field to be merged with it in the
+      second catalogue. The null value of the field RESULT will be inserted
+      when data is being read from the second catalogue.
+
+      Each field in the new catalogue requires a format, units, null value and
+      comment. These are taken from the fields in the first catalogue that were
+      used in the merge.
+
+      The new catalogue contains no parameters. Use ADDPARAM
+      to add parameters to the catalogue.
+   }
+   \sstusage{
+      MERGE INPUT1 INPUT2 OUTPUT MERGEFLDS [FROMFILE] [MERGEFILE]
+   }
+   \sstparameters{
+      \sstsubsection{
+         INPUT1 = \_CHAR (Read)
+      }{
+         Name of the first input catalogue.
+      }
+      \sstsubsection{
+         INPUT2 = \_CHAR (Read)
+      }{
+         Name of the second input catalogue.
+      }
+      \sstsubsection{
+         OUTPUT = \_CHAR (Read)
+      }{
+         Name of the catalogue to contain the merged entries.
+      }
+      \sstsubsection{
+         FROMFILE = \_LOGICAL (Read)
+      }{
+         Names of the two fields to be merged and the field to be created.
+         [FALSE]
+      }
+      \sstsubsection{
+         MERGFILE = \_CHAR (Read)
+      }{
+         Name of the file containing the merge fields.
+      }
+      \sstsubsection{
+         MERGFLDS = \_CHAR (Read)
+      }{
+         Names of the two fields to be merged and the field to be created.
+         [Repeatedly prompted for terminate with !]
+      }
+   }
+   \sstnotes{
+      MERGE is an interactive application.
+   }
+   \sstdiytopic{
+      Example
+   }{
+      MERGE TEST1 TEST2 MERTEST FROMFILE=T MERGEFILE=MERGDATA.DAT
+   }
+   \sstbugs{
+      None known.
+   }
+}
+\sstroutine{
+   PARAMINFO
+}{
+   Find specific information about a parameter in a catalogue
+}{
+   \sstdescription{
+      Finds the FORMAT, VALUE or COMMENT associated with a field in a
+      catalogue. For example find the VALUE associated with the
+      parameter AUTHOR in the TEST catalogue.
+   }
+   \sstusage{
+      PARAMINFO TEST AUTHOR VALUE
+   }
+   \sstparameters{
+      \sstsubsection{
+         INPUT = \_CHAR (Read)
+      }{
+         Name of the catalogue.
+      }
+      \sstsubsection{
+         NAME = \_CHAR (Read)
+      }{
+         Name of parameter.
+      }
+      \sstsubsection{
+         INFREQ = \_CHAR (Read)
+      }{
+         Information required.(FORMAT, VALUE or COMMENT)
+      }
+   }
+   \sstbugs{
+      None known.
+   }
+}
+\sstroutine{
+   PARAMS
+}{
+   Find the number and names of parameters in a catalogue
+}{
+   \sstdescription{
+      Find the number of parameters and the names of those parameters in
+      a catalogue.
+   }
+   \sstusage{
+      PARAMS INPUT
+   }
+   \sstparameters{
+      \sstsubsection{
+         INPUT = \_CHAR (Read)
+      }{
+         Name of the catalogue.
+      }
+   }
+   \sstdiytopic{
+      Example
+   }{
+      PARAMS TEST
+   }
+   \sstbugs{
+      None known.
+   }
+}
+\sstroutine{
+   POLYGON
+}{
+   Create a polygon definition for use with WITHIN
+}{
+   \sstdescription{
+       Creates a polygon definition for use by the WITHIN
+       application. WITHIN is an application that searches a
+       catalogue for objects  within a polygon in two dimensional space.
+       The space is defined by two fields in the catalogue. See
+       WITHIN for further details.
+       POLYGON defaults to being an interactive application. The co-ordinates
+       for the corners of the polygon are repeatedly prompted for
+       allowing a many cornered polygon shape to be built up. The
+       polygon need not be closed as the application automatically
+       inserts the last side of the polygon from the current position
+       back to the start position.
+       Using the FROMFILE parameter allows the coordinate values to be read
+       from a file instead of interactively. This can be usefull if a large
+       number of coordinate values are being used. The X-axis value should be
+       given before the Y-axis, The X and Y coordinates should be given on the
+       same line and subsequent coordinate values should be given on subsequent
+       lines.
+
+       For Example
+
+       20   20
+      20    50
+         75   55
+      80   15
+   }
+   \sstusage{
+      POLYGON TESTPOLY
+   }
+   \sstparameters{
+      \sstsubsection{
+         OUTPUT = \_CHAR (Read)
+      }{
+         Name of the catalogue to contain the polygon definition.
+      }
+      \sstsubsection{
+         FROMFILE = \_LOGICAL (Read)
+      }{
+         TRUE if the coordinate values are to be taken from a file.
+         [FALSE]
+      }
+      \sstsubsection{
+         POLYFILE = \_CHAR (Read)
+      }{
+         Name of the file containing the coordinate values.
+      }
+      \sstsubsection{
+         XCOORD = \_REAL (Read)
+      }{
+         X Co-ordinate of polygon corner.
+         [Repeatedly prompted for terminate polygon with !]
+      }
+      \sstsubsection{
+         YCOORD = \_REAL (Read)
+      }{
+         Y Co-ordinate of polygon corner.
+         [Repeatedly prompted for]
+      }
+   }
+   \sstnotes{
+      POLYGON is, by default, an interactive application.
+   }
+   \sstbugs{
+      None known.
+   }
+}
+\sstroutine{
+   PROPERM
+}{
+   Apply proper motion correction to a catalogue
+}{
+   \sstdescription{
+      Create a catalogue containing new fields for the new Right Ascension and
+      Declination after the correction has been made for proper motion.
+      Calculated using SLA\_PM. See SUN 67.
+
+      Proper motions should be given in secs/yr and arcsec/yr.
+      Parallax should be given in arcseconds.
+      Radial velocity should be given in km/sec ($+$ve if receeding)
+
+      If necessary use UPDATE to convert fields into the appropriate units.
+   }
+   \sstusage{
+      PROPERM INPUT OUTPUT RAEP0 DECEP0 RAPM DECPM PARLLAX RADVEL RAEP1
+      DECEP1
+      \newline
+      EP0 EP1
+   }
+   \sstparameters{
+      \sstsubsection{
+         INPUT = \_CHAR (Read)
+      }{
+         Name of the catalogue.
+      }
+      \sstsubsection{
+         OUTPUT = \_CHAR (Read)
+      }{
+         Name of the output catalogue.
+      }
+      \sstsubsection{
+         RAEP0 = \_CHAR (Read)
+      }{
+         Name of the RA field at epoch 0.
+      }
+      \sstsubsection{
+         DECEP0 = \_CHAR (Read)
+      }{
+         Name of the DEC field at epoch 0.
+      }
+      \sstsubsection{
+         RAPM = \_CHAR (Read)
+      }{
+         Name of the RA proper motion field.
+      }
+      \sstsubsection{
+         DECPM = \_CHAR (Read)
+      }{
+         Name of the DEC proper motion field.
+      }
+      \sstsubsection{
+         PARALLAX = \_CHAR (Read)
+      }{
+         Name of the parallax field.
+      }
+      \sstsubsection{
+         RADVEL = \_CHAR (Read)
+      }{
+         Name of the radial velocity field.
+      }
+      \sstsubsection{
+         RAEP1 = \_CHAR (Read)
+      }{
+         Name of the RA field at epoch 1.
+      }
+      \sstsubsection{
+         DECEP1 = \_CHAR (Read)
+      }{
+         Name of the DEC field at epoch 1.
+      }
+      \sstsubsection{
+         EP0 = \_REAL (Read)
+      }{
+         Start Epoch.
+      }
+      \sstsubsection{
+         EP1 = \_REAL (Read)
+      }{
+         End epoch.
+      }
+   }
+   \sstnotes{
+      This application creates a new catalogue that contains extra fields for
+      Right Ascension and Declination after a proper motion correction.
+      The naming of these new fields can lead to confusion. Traditionally
+      the field names RA and DEC are used for the Right Ascension and
+      Declination fields in the catalogue. It is stongly suggested that the
+      field names of Right Ascension and Declination at a new epoch take the
+      form RA1970, DEC1970. You may go on to rename the field RA to RA1950 and
+      DEC to DEC1950 and RA1970 to RA and DEC1970 to DEC using the UPFIELD
+      application but you must also then update the catalogues Epoch parameter
+      to 1970.
+
+      Care should also be taken when renaming fields. Renaming RA1970 to RA
+      before renaming RA to RA1950, in the above example, would result in two
+      fields named RA in the same catalogue.
+   }
+   \sstdiytopic{
+      Example
+   }{
+      PROPERM TEST TEST1970 RA DEC RA\_PM DEC\_PM PARALLAX RAD\_VEL 1950 1970
+      RA1970 DEC1970
+   }
+   \sstbugs{
+      None known.
+   }
+}
+\sstroutine{
+   REJECT
+}{
+   Select rejected entries from a catalogue
+}{
+   \sstdescription{
+      In most cases it is more convenient to SEARCH a catalogue
+      for entries that obey some critera but occasionally it is more
+      convenient to select entries that are REJECTed by the criteria.
+      REJECT does this and creates a new catalogue to contain the
+      rejected entries. The criteria should be a legal CATPAC Parser
+      expression.
+   }
+   \sstusage{
+      REJECT INPUT OUTPUT CRITERIA
+   }
+   \sstparameters{
+      \sstsubsection{
+         INPUT = \_CHAR (Read)
+      }{
+         Name of the catalogue.
+      }
+      \sstsubsection{
+         OUTPUT = \_CHAR (Read)
+      }{
+         Name of the catalogue to contain the rejected entries.
+      }
+      \sstsubsection{
+         CRITERIA = \_CHAR (Read)
+      }{
+         Logical expression of the reject criteria.
+      }
+   }
+   \sstnotes{
+      REJECT and SEARCH complement each other.
+   }
+   \sstdiytopic{
+      Example
+   }{
+      REJECT TEST REJTEST VALUE1.GT.300.AND.VALUE1.LT.500
+   }
+   \sstbugs{
+      None known.
+   }
+}
+\sstroutine{
+   SAMPLE
+}{
+   Select every Nth entry from a catalogue
+}{
+   \sstdescription{
+      Sample a catalogue at frequency N creating a new catalogue to
+      contain the selected entries. By using the REJECT option a second
+      catalogue can be created that contains those entries that were not
+      selected.
+   }
+   \sstusage{
+      SAMPLE INPUT OUTPUT FREQUENCY [REJECT] [OUTREJECT]
+   }
+   \sstparameters{
+      \sstsubsection{
+         INPUT = \_CHAR (Read)
+      }{
+         Name of the catalogue.
+      }
+      \sstsubsection{
+         OUTPUT = \_CHAR (Read)
+      }{
+         Name of the catalogue to contain the sampled entries.
+      }
+      \sstsubsection{
+         FREQUENCY = \_INTEGER (Read)
+      }{
+         Sample frequency N
+      }
+      \sstsubsection{
+         REJECT = \_LOGICAL (Read)
+      }{
+         Do you require a rejects catalogue (T/F)?
+         [FALSE]
+      }
+      \sstsubsection{
+         OUTREJECT = \_CHAR (Read)
+      }{
+         Name of the catalogue to contain the rejected entries.
+      }
+   }
+   \sstdiytopic{
+      Example
+   }{
+      SAMPLE TEST SAMPTEST 20
+   }
+   \sstbugs{
+      None known.
+   }
+}
+\sstroutine{
+   SELECTFLDS
+}{
+   Create a new catalogue containing only selected fields
+}{
+   \sstdescription{
+      Create a new catalogue that contains only selected fields of
+      the input catalogue.
+   }
+   \sstusage{
+      SELECTFLDS INPUT OUTPUT FLDNAMES
+   }
+   \sstparameters{
+      \sstsubsection{
+         INPUT = \_CHAR (Read)
+      }{
+         Name of the catalogue.
+      }
+      \sstsubsection{
+         OUTPUT = \_CHAR (Read)
+      }{
+         Name of the new catalogue.
+      }
+      \sstsubsection{
+         FLDNAMES = \_CHAR (Read)
+      }{
+         List of field names to be included in the new catalogue.
+      }
+   }
+   \sstnotes{
+      Requested fields that do not appear in the catalogue are ignored.
+   }
+   \sstdiytopic{
+      Example
+   }{
+      SELECTFLDS TEST SELTEST [NAME,VALUE1,VALUE2]
+   }
+   \sstbugs{
+      None known.
+   }
+}
+\sstroutine{
+   SORTFLDS
+}{
+   Get the sort information from a catalogue
+}{
+   \sstdescription{
+      Get the sort information from a catalogue. Get the number of indices and
+      the names of the fields and the direction of each sort field associated
+      with each index.
+   }
+   \sstusage{
+      SORTFLDS INPUT
+   }
+   \sstparameters{
+      \sstsubsection{
+         INPUT = \_CHAR (Read)
+      }{
+         Name of the catalogue.
+      }
+   }
+   \sstdiytopic{
+      Example
+   }{
+      SORTFLDS TEST
+   }
+   \sstbugs{
+      None known.
+   }
+}
+\sstroutine{
+   UPDATE
+}{
+   Update a field in a catalogue
+}{
+   \sstdescription{
+      Updates the value of a field for each entry in a catalogue using
+      a user defined CATPAC Parser expression. The format, units, nullvalue
+      and comment for the field can be changed if required.
+   }
+   \sstusage{
+      UPDATE INPUT NAME EXPRESSION [FORMAT] [UNITS] [NULLVALUE] [COMMENT]
+   }
+   \sstparameters{
+      \sstsubsection{
+         INPUT = \_CHAR (Read)
+      }{
+         Name of the catalogue.
+      }
+      \sstsubsection{
+         NAME = \_CHAR (Read)
+      }{
+         Name of the field to be updated.
+      }
+      \sstsubsection{
+         EXPRESSION = \_CHAR (Read)
+      }{
+         Expression to be evaluated.
+      }
+      \sstsubsection{
+         FORMAT = \_CHAR (Read)
+      }{
+         Format of the updated field.
+         [UNCHANGED]
+      }
+      \sstsubsection{
+         UNITS = \_CHAR (Read)
+      }{
+         Units of the updated field.
+         [UNCHANGED]
+      }
+      \sstsubsection{
+         NULLVALUE = \_CHAR (Read)
+      }{
+         Null value of the updated field.
+         [UNCHANGED]
+      }
+      \sstsubsection{
+         COMMENT = \_CHAR (Read)
+      }{
+         Comment of the updated field.
+         [UNCHANGED]
+      }
+   }
+   \sstdiytopic{
+      Example
+   }{
+      UPDATE TEST VALUE1 VALUE2$*$2
+   }
+   \sstbugs{
+      None known.
+   }
+}
+\sstroutine{
+   UPFIELD
+}{
+   Update Field information in a Catalogue
+}{
+   \sstdescription{
+      Update the information associated with a field in a catalogue. The
+      field has a name, format, unit, null value and comment. Any of these
+      can be updated by setting the relevant flag.
+   }
+   \sstusage{
+      UPFIELD INUPT NAME [NAMEFLG] [NEWNAME] [FORMFLG] [FORMAT]
+      [UNITFLG]
+      \newline
+      [UNITS] [NULLFLG] [NULLVAL] [COMFLG] [COMMENT]
+   }
+   \sstparameters{
+      \sstsubsection{
+         INPUT = \_CHAR (Read)
+      }{
+         Name of the catalogue.
+      }
+      \sstsubsection{
+         NAME = \_CHAR (Read)
+      }{
+         Name of the field.
+      }
+      \sstsubsection{
+         NAMEFLG = \_LOGICAL (Read)
+      }{
+         Name flag. Do you want to update the field name T/F?
+         [FALSE]
+      }
+      \sstsubsection{
+         NEWNAME = \_CHAR (Read)
+      }{
+         New name for the field.
+      }
+      \sstsubsection{
+         FORMFLG = \_LOGICAL (Read)
+      }{
+         Format flag. Do you want to update the field format T/F?
+         [FALSE]
+      }
+      \sstsubsection{
+         FORMAT = \_CHAR (Read)
+      }{
+         New format for the format. A FORTRAN format detailing how the
+         field value should be displayed.
+      }
+      \sstsubsection{
+         UNITFLG = \_LOGICAL (Read)
+      }{
+         Unit flag. Do you want to update the field units T/F?
+         [FALSE]
+      }
+      \sstsubsection{
+         UNITS = \_CHAR (Read)
+      }{
+         New units to be associated with the field.
+      }
+      \sstsubsection{
+         NULLFLG = \_LOGICAL (Read)
+      }{
+         Null value flag. Do you want to update the field null value T/F?
+         [FALSE]
+      }
+      \sstsubsection{
+         NULLVAL = \_CHAR (Read)
+      }{
+         New null value to be associated with the field.
+      }
+      \sstsubsection{
+         COMFLG = \_LOGICAL (Read)
+      }{
+         Comment flag. Do you want to update the field comment T/F?
+         [FALSE]
+      }
+      \sstsubsection{
+         COMMENT = \_CHAR (Read)
+      }{
+         New comment to be associated with the field.
+      }
+   }
+   \sstnotes{
+      UPFIELD only updates the field information not the data. Use UPDATE
+      to modify the data in a catalogue.
+   }
+   \sstdiytopic{
+      Example
+   }{
+      UPFIELD TEST VALUE1 COMFLG=T COMMENT={\tt "}Possible error 
+      $+$ or $-$ 2{\tt "}
+   }
+   \sstbugs{
+      None known.
+   }
+}
+\sstroutine{
+   UPPARAM
+}{
+   Update a Parameter in a Catalogue
+}{
+   \sstdescription{
+      Update a parameter in a catalogue. The parameter has a name
+      format, value and comment. Any of these can be updated
+      by setting the relevant flag
+   }
+   \sstusage{
+      UPPARAM INPUT NAME [NAMEFLG] [NEWNAME] [FORMFLG] [FORMAT]
+      [VALFLG] [VALUE]
+      \newline
+      [COMFLG] [COMMENT]
+   }
+   \sstparameters{
+      \sstsubsection{
+         INPUT = \_CHAR (Read)
+      }{
+         Name of the catalogue.
+      }
+      \sstsubsection{
+         NAME = \_CHAR (Read)
+      }{
+         Name of the parameter.
+      }
+      \sstsubsection{
+         NAMEFLG = \_LOGICAL (Read)
+      }{
+         Name flag. Do you want to update the parameter name T/F?
+         [FALSE]
+      }
+      \sstsubsection{
+         NEWNAME = \_CHAR (Read)
+      }{
+         New name for the parameter.
+      }
+      \sstsubsection{
+         FORMFLG = \_LOGICAL (Read)
+      }{
+         Format flag. Do you want to update the parameter format T/F?
+         [FALSE]
+      }
+      \sstsubsection{
+         FORMAT = \_CHAR (Read)
+      }{
+         New format for the parameter. A FORTRAN format detailing how the
+         parameter value should be interpreted.
+      }
+      \sstsubsection{
+         VALFLG = \_LOGICAL (Read)
+      }{
+         Value flag. Do you want to update the parameter value T/F?
+         [FALSE]
+      }
+      \sstsubsection{
+         VALUE = \_CHAR (Read)
+      }{
+         New value to be associated with the parameter.
+      }
+      \sstsubsection{
+         COMFLG = \_LOGICAL (Read)
+      }{
+         Comment flag. Do you want to update the parameter comment T/F?
+         [FALSE]
+      }
+      \sstsubsection{
+         COMMENT = \_CHAR (Read)
+      }{
+         New comment to be associated with the parameter.
+      }
+   }
+   \sstnotes{
+      The value of a parameter is always a character string. The format
+      determines how the value should be interpreted. An error will be
+      reported if the value and format become inconsistent.
+   }
+   \sstdiytopic{
+      Example
+   }{
+      UPPARAM TEST CLASS FORMFLG=T FORMAT=I2
+   }
+   \sstbugs{
+      None known.
+   }
+}
+\sstroutine{
+   WITHIN
+}{
+   Select entries within a polygon
+}{
+   \sstdescription{
+      Create a new catalogue that contains entries from a catalogue that
+      lie within a predefined polygon in 2-dimensional space. (The
+      2-dimensional space is defined by 2 user selected numeric fields
+      in the input catalogue.) Use the POLYGON application to
+      create the polygon definition catalogue. The INSIDE parameter
+      defaults to TRUE but can be set to FALSE to select entries that
+      lie outside the polygon.
+   }
+   \sstusage{
+      WITHIN INPUT OUTPUT XFIELD YFIELD POLYCAT [INSIDE] [REJECT] [OUTREJECT]
+   }
+   \sstparameters{
+      \sstsubsection{
+         INPUT = \_CHAR (Read)
+      }{
+         Name of the catalogue.
+      }
+      \sstsubsection{
+         OUTPUT = \_CHAR (Read)
+      }{
+         Name of the catalogue to contain the selected entries.
+      }
+      \sstsubsection{
+         XFIELD = \_CHAR (Read)
+      }{
+         Name of the field containing the X co-ordinates. XFIELD and
+         YFIELD define the 2-dimensional space.
+      }
+      \sstsubsection{
+         YFIELD = \_CHAR (Read)
+      }{
+         Name of the field containing the Y co-ordinates. XFIELD and
+         YFIELD define the 2-dimensional space.
+      }
+      \sstsubsection{
+         POLYCAT = \_CHAR (Read)
+      }{
+         Name of the catalogue defining the polygon. Created using
+         POLYGON
+      }
+      \sstsubsection{
+         INSIDE = \_LOGICAL (Read)
+      }{
+         Select entries inside the polygon (T/F)?
+         [TRUE]
+      }
+      \sstsubsection{
+         REJECT = \_LOGICAL (Read)
+      }{
+         Do you require a rejects catalogue (T/F)?
+         [FALSE]
+      }
+      \sstsubsection{
+         OUTREJECT = \_CHAR (Read)
+      }{
+         Name of the catalogue to contain the rejected entries.
+      }
+   }
+   \sstnotes{
+      The polygon definition is created using the POLYGON application.
+   }
+   \sstdiytopic{
+      Example
+   }{
+      WITHIN TEST INTEST VALUE1 VALUE2 POLYCAT
+   }
+   \sstbugs{
+      None known.
+   }
+}
+\end{small}
+
+\newpage
+\section{The CATPAC Parser}
+\label{ap:parser}
+
+The CATPAC parser:
+
+\begin{small}
+\begin{verbatim}
+     ? has -3 as its precedence
+     (     -2
+     ,     -1
+     )      0
+     .OR.   1
+     .XOR.  1
+     .AND.  2
+     .NOT.  3
+     <      4
+     {      4
+     =      4
+     }      4
+     >      4
+     #      4
+     .LT.   4
+     .LE.   4
+     .EQ.   4
+     .GE.   4
+     .GT.   4
+     .NE.   4
+     //     6
+     +      7 
+     -      7
+     *      8
+     /      8
+     **     9
+     +      10 when acting as a unary operator
+     -      10 when acting as a unary operator
+\end{verbatim}
+\end{small}
+
+In addition to these operators the function names given below are known to the
+system.  Functions have the same precedence as '(' that is -2.
+
+\begin{small}
+\begin{verbatim}
+     SQRT
+     LOG10
+     LOG
+     EXP
+     SIN
+     COS
+     TAN
+     ASIN
+     ACOS
+     ATAN
+     SINH
+     COSH
+     TANH
+     ABS
+     STRING
+     DIFF
+     GREAT_CIRCLE
+     IRAS_TEMP23
+     IRAS_TEMP12
+     IRAS_TEMP34
+     INT
+     NINT
+     MIN
+     MAX
+     UCASE
+     LCASE
+     CONVERT
+\end{verbatim}
+\end{small}
+
+Abbreviations used:
+
+\begin{small}
+\begin{verbatim}
+     <arop> arithmetic operators  
+
+     <unop> unary operators 
+
+     <chrop> character operator  
+
+     <reop> relational operators  
+
+     <loop> logical operators 
+
+     <sloop> single logical operator
+
+     <loexp> logical expression
+     
+     <arexp> arithmetic expression
+     
+     <chrexp> character expression
+     
+     <loconst> logical constant
+     
+     <numconst> numeric constant
+     
+     <chrconst> character constant
+     
+     <logfname> field name of a logic field 
+     
+     <numfname> field name of a numeric field
+     
+     <chrfname> field name of a character field
+     
+     <logfunction> logical function
+     
+     <numfunction> numeric function
+     
+     <chrfunction> character function
+     
+     <fldname> field name
+
+     <numargs> numeric arguments
+
+     <numarg> numeric argument
+
+     <chrarg> character argument
+
+     <logarg> logical argument
+
+     <unitarg> argument of the CONVERT function specifying how the character
+               argument is to be interpreted.
+
+     <realconst> real constant
+
+     <intconst> integer constant
+
+     <expon> exponent part of an integer or real
+
+     <dpconstant> decimal point constant
+\end{verbatim}
+\end{small}
+
+The definition:
+
+\begin{small}
+\begin{verbatim}
+     <loexp> :=   <arexp><reop><arexp> 
+                | <loexp><loop><loexp>
+                | <chrexp><reop><chrexp>
+                | <sloop><loexp>
+                | <logconst>
+                | <logfname>
+                | <logfunction>
+
+     <arexp> :=   <arexp><arop><arexp>
+                | <numconst>
+                | <numfunction>
+                | <numfname>
+
+     <chrexp> :=  <chrexp><chrop><chrexp>
+                | <chrconst>
+                | <chrfname>
+
+     
+     <loop> :=   .OR.
+               | .XOR.
+               | .AND.
+
+     <relop> :=   .LT.
+                | .LE.
+                | .EQ.
+                | .GE.
+                | .GE.
+                | .NE.
+                | <
+                | {
+                | =
+                | }
+                | >
+                | #
+
+     Note: In character relational expressions "less then" means precedes 
+           in the ASCII collating sequence and "greater than" means follows 
+           in the ASCII collating sequence.
+
+     <unop> :=    +
+                | -
+
+     <arop> :=   +
+               | -
+               | *
+               | /
+               | **
+
+     <chrop> :=  //
+
+     <sloop> := .NOT.
+
+     <chrfname> :=  <fldname> 
+  
+     Note: The field must be of type character
+
+     <logfname> :=  <fldname>
+
+     Note: The field must be of type logical
+
+     <numfname> :=  <fldname>
+
+     Note: The field must be of type real, integer or double
+
+     <numfunction> :=  SQRT(<numarg>)
+                     | LOG10(<numarg>)
+                     | LOG(<numarg>)
+                     | EXP(<numarg>)
+                     | SIN(<numarg>)
+                     | COS(<numarg>)
+                     | TAN(<numarg>)
+                     | ASIN(<numarg>)
+                     | ACOS(<numarg>)
+                     | ATAN(<numarg>)
+                     | SINH(<numarg>)
+                     | COSH(<numarg>)
+                     | TANH(<numarg>)
+                     | ABS(<numarg>)
+                     | DIFF(<numarg>,<numarg>)
+                     | GREAT_CIRCLE(<numarg>,<numarg>,<numarg>,<numarg>)
+                     | IRAS_TEMP23(<numarg>,<numarg>)
+                     | IRAS_TEMP12(<numarg>,<numarg>)
+                     | IRAS_TEMP34(<numarg>,<numarg>)
+                     | INT(<numarg>)
+                     | NINT(<numarg>)
+                     | MIN(<numargs>)
+                     | MAX(<numargs>)
+                     | CONVERT(<unitarg>,<chrconst>)
+
+     <chrfunction> :=  STRING(<chrarg>)
+                     | UCASE(<chrarg>)
+                     | LCASE(<chrarg>)
+
+     <numargs> :=  <numargs>,<numarg>
+                 | <numarg>
+
+     <numarg> :=  <numfname>
+                | <numconst>
+
+     <chrarg> :=  <chrfname>
+                | <chrconst>
+ 
+     <unitarg> :=  "DEGREE"
+                 | "ARCMIN"
+                 | "ARCSEC"     
+                 | "SDD MM SS.S"
+                 | "SDD:MM:SS.S"
+                 | "SDD MM SS"
+                 | "SDD:MM:SS"
+                 | "SDD MM"
+                 | "SDD:MM"
+                 | "MINUTE"
+                 | "SECOND"     
+                 | "HH MM SS.S"
+                 | "HH:MM:SS.S"
+                 | "HH MM SS"
+                 | "HH:MM:SS"
+                 | "HH MM"
+                 | "HH:MM"
+
+     <chrconst> :=  "<chrstring>"
+
+     <chrstring> :=  <chrstring><chrstring>
+                    | <space>
+                    | <alphanumeric>
+
+     <logconst> :=  .TRUE.
+                  | .FALSE.
+
+     <numconst> :=  <realconst>
+                  | <intconst>
+              
+     <realconst> :=  <intconst>
+                   | <dpconst>
+                   | <dpconst>E<expon>
+                   | <dpconst>D<expon>
+
+     <expon> :=  <unop><digits>
+               | <digits>
+
+     <dpconst> :=  <digits>.<digits>
+                 | <digits>.
+                 | .<digits>
+
+     <intconst> :=  <digits>
+                  | <digits>E<digits>
+
+     <fldname> :=  <character><alphanumerics>
+
+     <alphanumerics> :=  <alphanumeric><alphanumerics>
+                       | <alphanumeric>
+
+     <alphanumeric> :=  <character>
+                      | <digit>
+
+     <digits> :=  <digit><digits>
+                | <digit>
+
+     <character> :=    a | b | c | d | e | f | g | h | i | j | k | l 
+                     | m | n | o | p | q | r | s | t | u | v | w | x 
+                     | y | z | A | B | C | D | E | F | G | H | I | J
+                     | K | L | M | N | O | P | Q | R | S | T | U | V 
+                     | W | X | Y | Z |
+   
+     <digit> :=   0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
+\end{verbatim}
+\end{small}
+
+Functions that return more than one result, for example coordinate system
+conversions, do not belong in the parser. A suite of applications exist
+to perform these types of functions.
+
+\section{CATPAC and SCAR}
+
+CATPAC is a replacement for SCAR. Not all applications available in SCAR are
+available in CATPAC yet but in future releases all SCAR application will be 
+included in CATPAC. There are a number of reasons for replacing SCAR with 
+CATPAC
+They include:
+
+\begin{itemize}
+
+\item Improved documentation.
+
+\item Improved online help facilities.
+
+\item STARLINK standard use of ADAM parameters
+
+\item New applications.
+
+\item Improved existing applications.
+
+\end{itemize}
+
+But the most important reason for replacing SCAR is not apparent to the user.
+SCAR is dependent on a database system called ADC and ADC is no longer  being
+supported. CATPAC applications are based on the well documented,  flexible and
+portable CHI routines. See SUN/119 for more details on the benefits of using
+the CHI routines.
+
+\end{document}

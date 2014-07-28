@@ -1,0 +1,1278 @@
+\documentstyle[11pt]{article}
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {19.3}
+\newcommand{\stardocauthors}   {Julian Gold, Nick Fuller, Jim Lewis, Chris Benn}
+\newcommand{\stardocdate}      {15 December 1992}
+\newcommand{\stardoctitle}     {NDPROGS --- n-D image manipulation programs: v3.1}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\newenvironment{cozy}[1]%
+{\begin{list}{}{%
+\settowidth{\labelwidth}{\large\bf #1}%
+\setlength{\labelsep}{5mm}%
+\setlength{\leftmargin}{\labelwidth}\addtolength{\leftmargin}{\labelsep}%
+\setlength{\parsep}{\medskipamount}%
+}}{\end{list}}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+\setlength{\parskip}{0mm}
+\tableofcontents
+\setlength{\parskip}{\medskipamount}
+\markright{\stardocname}
+
+\newpage
+
+\section{Introduction}
+
+This note describes v3.1 of a set of programs which perform basic manipulation 
+and display functions on images with up to six dimensions. The programs have 
+been written at the RGO, primarily for the manipulation of TAURUS spectral line
+data cubes. However they contain no instrument-specific features and can 
+therefore be used in the analysis of other similar data. 
+
+The term `image' as used in this note simply means a regular data array, which 
+might be anything from a 1-D spectrum or profile to a 4-D array consisting
+of several long-slit spectra with polarization vectors. 
+
+The programs have been written in accordance with the methods and conventions 
+of FIGARO (SUN/86). They will accept any FIGARO image, and an image 
+created by them will be recognized by any FIGARO program which can handle the 
+number of dimensions involved. Many of them duplicate the functions of 
+standard FIGARO programs as far as 1-D, 2-D and 3-D images are concerned, but 
+with new features. Further, new releases of FIGARO mean that NDPROGS will also
+accept
+NDF data files. Most of the routines in NDPROGS now handle data quality
+and error arrays as well, thus widening the scope and accessibility of the
+package.
+
+\section{Summary of changes}
+
+\subsection{V3.0}
+
+\begin{itemize}
+\item Introduction of quality and error array handling.
+\item FIG2TAU is superfluous now, and has been removed from the package. 
+TAU2FIG remains, however, in its original form.
+\item PLOTS and SPECTRUM now allow the user to average spectra over polygonal
+regions of a cube. Spectra saved to disk now have more information about the
+extraction saved along with them.
+\item The results structure in MOMENTS has been altered
+in order to provide compatibility with line-fitting routines available 
+elsewhere.
+\item FITSIN and FITSOUT are both redundant due to v3.0 of FIGARO,
+and have been removed from the package.
+\end{itemize}
+
+\subsection{V3.1}
+
+\begin{itemize}
+\item There are five new applications, see section~\ref{sec:new-app}. 
+\item New options have been added to a few of the applications, increasing
+functionality of the package.
+\item Many error messages / warnings / reports are made in a VMS-like format.
+\item Bug Fixes. V3.0 released in April 92 contained a few bugs which have now
+been removed. See the file {\tt BUGS.LIS} for details.
+\end {itemize}
+ 
+\section{How to run the programs}
+
+The n-D programs are accessed through the standard FIGARO startup command. 
+The connection between standard FIGARO, as distributed by Keith Shortridge,
+and compatible programs distributed by Starlink is established through the 
+logical name {\tt FIGARO\_PROG\_N}. This points the FIGARO startup procedure to
+a subdirectory of the {\tt [FIGPACK]} top level directory. To access NDPROGS,
+issue the FIGARO startup command:
+\begin{verbatim}
+   $ FIGARO
+\end{verbatim}
+The startup procedure searches for and runs {\tt FIGARO\_PROG\_N:FIGARO.COM},
+which defines command symbols and sets up the NDPROGS help library. The 
+n-D programs may then be run by issuing their names as if they were commands in 
+standard FIGARO. Help on an individual program may be obtained  by entering:
+\begin{verbatim}
+   $ HELP prog
+\end{verbatim}
+
+\section{Features}
+\label{features}
+
+\subsection{Data array type}
+
+{\tt INTEGER*2} and {\tt REAL} data types are separately catered for. Other 
+types, if they ever occur, will be mapped as {\tt REAL} and converted back
+to their original type after processing. The main advantage of this is that 
+{\tt INTEGER*2 } image data can be mapped, processed, and finally unmapped as 
+{\tt INTEGER*2}, avoiding the considerable delays (for a typical 3-D image) of 
+type conversion during mapping and unmapping. Also, {\tt INTEGER*2} uses 
+half the disk and physical memory space of {\tt REAL} data. The main 
+disadvantage is that any fractional results will be truncated to integers
+during the final unmapping back to {\tt INTEGER*2}. There is also the 
+possibility of integer overflow during computation. The program 
+TYPECON may be used to interconvert {\tt INTEGER*2} and {\tt REAL} images.
+
+The data array type is displayed whenever an image is selected for input,
+along with the presence or absence of magic values, quality arrays and error
+arrays.
+
+\subsection{Magic values, Quality and Error arrays}
+
+If the bad pixel flag [.Z.FLAGGED] has the value 1 (or for NDF's, if the flag
+{\tt .BAD\_PIXEL} is TRUE),
+the image is assumed to 
+contain pixels with the magic value (as defined in SGP/38). Most of the
+routines will also test for the presence of quality and error arrays. There
+are a few points to note here:
+\begin{itemize}
+\item With the current version of FIGARO, it is illegal to have {\em both}
+magic values and quality arrays in the same structure. Although it may be
+a future feature of FIGARO to relax this constraint, the routines will exit
+should they detect such a situation.
+\item A quality array is assumed to be of type BYTE and is always mapped as
+such. 
+\item Quality array handling has been changed slightly in v3.1 to show greater
+compatibility with ASTERIX conventions. It is anticipated that all the
+appropriate routines will be fully compatible in the next release of NDPROGS.
+Until then, bear in mind that NDPROGS will assume a BADBITS mask value of 255
+(see SGP/38). 
+\item An error array is assumed to be of the same type as the data array and is
+always mapped as such.
+\item With the current release of FIGARO, it is not possible to manually
+remove a quality or error array from within an application if that array
+has already been accessed (the facilities to do so require use of DSA
+common block variables). This may be desirable in certain circumstances,
+when pixels in an image have been replaced by new values. 
+It is up to the user to act accordingly, either by setting these errors
+to an appropriate value
+or removing the entire error array with DELOBJ, a standard FIGARO application.
+\item Non-zero elements in quality arrays are interpreted as 
+``this pixel contains bad data.'' The actual value has no significance.
+\end{itemize}
+For a discussion of the
+subroutine structure used to separate these cases, see section~\ref{prog}.
+
+Information about the presence or absence of magic values, quality arrays and
+error arrays is given whenever an image is selected for input. 
+                                                                       
+\subsection{Axis information}
+
+Array coordinates in {\it n} dimensions are input as a single array parameter 
+with {\it n} elements, rather than a sequence of {\it n} separate parameters.
+
+The dimension, range, label, and units of each axis are displayed whenever an 
+image is selected for input. From this the user may verify, where applicable, 
+the sort order of the data array, {\it e.g.} XYZ or ZXY. For example, in 
+spectral line data cube work the sort order is of paramount importance.
+
+\section{Program descriptions}
+
+This section contains a brief statement of the function of each program and a 
+list of its command parameters. Keywords are enclosed in square parentheses. 
+For an introduction to FIGARO command formats, see 
+{\tt FIGARO\_PROG\_S:FIGBASIC.MEM}.
+
+More information on commands is available in the NDPROGS help library.
+\vspace{5mm}
+
+{\large\bf ARITH1 \hfill}
+\begin{description}
+\item[Function]: 
+Arithmetic combination of an image or image subset with a scalar.
+\item[Parameters]: 
+{\bf IMage STart ENd OPer VALue OUTput ERR\_ACT ERR\_VAL [WHole]}
+\end{description}
+\vspace{5mm}
+
+{\large\bf ARITH2 \hfill}
+\begin{description}
+\item[Function]: 
+Arithmetic combination of two images or image subsets.
+\item[Parameters]: 
+{\bf IMage IMAGE1 STart ENd OPer OUTput ERR\_ACT ERR\_VAL [WHole]}
+\end{description}
+\vspace{5mm}
+
+{\large\bf AXFLIP \hfill}
+\begin{description}
+\item[Function]: 
+Reverses an image in one dimension and reverses the relevant axis array. 
+Currently handles 3-D images only; the FIGARO programs IREVX and IREVY may be 
+used on 1-D and 2-D images.
+\item[Parameters]: 
+{\bf IMage AXIS OUTput TUNE}
+\end{description}
+\vspace{5mm}
+
+{\large\bf COLLAPSE \hfill}
+\begin{description}
+\item[Function]: 
+Collapses an n-D image or image subset in one or more dimensions to create an 
+(n-{\it c})-D image, where {\it c} is the number of collapsed dimensions.
+\item[Parameters]: 
+{\bf IMage AXKEY STart ENd OUTput [WHole FLoat]}
+\end{description}
+\vspace{5mm}
+
+{\large\bf DEPICT \hfill}
+\begin{description}
+\item[Function]: 
+Plots a 2-D image or image subset in greyscale or colour on an image display 
+device. Optional overplotting with contours of the same or another 2-D image; 
+optional hardcopy.
+\item[Parameters]: 
+{\bf IMage STart ENd LOw HIgh PLACE MAG LABel IMAGE1 LOW1 HIGH1 LEVELS TABle 
+[WHole AXes RAMP CONTour HArdcopy ERase]}
+\end{description}
+\vspace{5mm}
+
+{\large\bf DUMMY \hfill}
+\begin{description}
+\item[Function]: 
+Creates a new structure containing a data array and axes initialized to
+specified values.
+\item[Parameters]: 
+{\bf OUTput NDIM SIZE AXKEY AXSTart AXENd AXLOG VALue EXTRA VALue
+DTYpe ERRVal QVal [AXes]} 
+\end{description}
+
+{\large\bf HILITE \hfill}
+\begin{description}
+\item[Function]: 
+Plots a 2-D image or image subset with a narrow colour table which moves
+through the data range, so that all pixels with a particular value are 
+illuminated at the same time. Pixels not equal to the currently highlighted
+value are black. This is an effective way of finding the data values associated
+with features of interest.
+\item[Parameters]: 
+{\bf IMage STart ENd LOw HIgh PLACE MAG LABel SHOWS [WHole AXes RAMP DATA
+ERase]}
+\end{description}
+\vspace{5mm}
+
+{\large\bf LOGIC1 \hfill}
+\begin{description}
+\item[Function]: 
+Bitwise logical combination of an {\tt INTEGER*2} image or image subset with a 
+scalar.
+\item[Parameters]: 
+{\bf IMage STart ENd OPer VALue OUTput ERR\_ACT ERR\_VAL [WHole]}
+\end{description}
+\vspace{5mm}
+
+{\large\bf LOGIC2 \hfill}
+\begin{description}
+\item[Function]: 
+Bitwise logical combination of two {\tt INTEGER*2} images.
+\item[Parameters]: 
+{\bf IMage IMAGE1 STart ENd OPer OUTput ERR\_ACT ERR\_VAL [WHole]}
+\end{description}
+\vspace{5mm}
+
+{\large\bf LOOK \hfill}
+\begin{description}
+\item[Function]: 
+Displays the pixel values in a 2-D image or image subset.
+\item[Parameters]: 
+{\bf IMage STAPIX ENDPIX [AGAIN]}
+\end{description}
+\vspace{5mm}
+
+{\large\bf MAGIC \hfill}
+\begin{description}
+\item[Function]: 
+Replaces pixels of an image or image subset which are outside a specified range
+with the magic value. Sets the bad pixel flag.            
+\item[Parameters]: 
+{\bf IMage STart ENd LOw HIgh OUTput [WHole]}
+\end{description}
+\vspace{5mm}
+
+{\large\bf MASK1 \hfill}
+\begin{description}
+\item[Function]: 
+Masking of an image or image subset with a scalar (MAX, MIN, various 
+replacements).
+\item[Parameters]: 
+{\bf IMage STart ENd OPer VALue OUTput ERR\_ACT ERR\_VAL [WHole]}
+\end{description}
+
+{\large\bf MASK2 \hfill}
+\begin{description}
+\item[Function]: 
+Masking of one image or image subset with another (MAX, MIN, various 
+replacements).
+\item[Parameters]: 
+{\bf IMage IMAGE1 STart ENd OPer OUTput ERR\_ACT ERR\_VAL [WHole]}
+\end{description}
+\vspace{5mm}
+
+{\large\bf MOMENTS \hfill}
+\begin{description}
+\item[Function]:
+Computes moments for the emission features in each spectrum of a ZXY-sorted 
+SLDC. Stores its results in a structure comprising both data and errors.
+\item[Parameters]:
+{\bf IMage MASK PEAKS THRESH WIDTH GAP BIN RESULTS [USEMask FINDSEQ]}
+\end{description}
+\vspace{5mm}
+
+{\large\bf MOVIE \hfill}
+\begin{description}
+\item[Function]:
+Fast sequential display of the XY planes of an XYZ-sorted 3-D image.
+\item[Parameters]:
+{\bf IMage STart ENd STEP LOw HIgh PLACE MAG LABel TABle [WHole AXes RAMP 
+ERase]}
+\end{description}
+\vspace{5mm}
+
+{\large\bf PEEK \hfill}
+\begin{description}
+\item[Function]: 
+Displays the values of a specified image pixel and its immediate neighbours.
+\item[Parameters]: 
+{\bf IMage PIXel [AGAIN]}
+\end{description}
+\vspace{5mm}
+
+{\large\bf PLOTS \hfill}
+\begin{description}
+\item[Function]:
+Displays spectra extracted from a ZXY-sorted SLDC. A range of XY coordinates is
+indicated with the cursor on a plot of a 2-D image (derived from an XY plane of
+the SLDC). All the spectra extracted within the range are displayed together on
+a single plot. Optional hardcopy and output of spectra to data structures.
+\item[Parameters]:
+{\bf IMage IMAGE1 SLOw SHIgh STart ENd LOw HIgh TABle SLABel XPIX YPIX MAG BIN
+SPectrum [SCale WHole AXes WRite]}
+\end{description}
+
+{\large\bf SETAXES \hfill}
+\begin{description}
+\item[Function]: 
+Re-calibrates one or more of the axes of an image.
+\item[Parameters]: 
+{\bf IMage OUTput AXKEY AXSTart AXENd AXLOG}
+\end{description}
+\vspace{5mm}
+
+{\large\bf SMOOTH \hfill}
+\begin{description}
+\item[Function]: 
+Smooths an image or image subset in one, two, or three dimensions by 
+convolution with a top hat, Gaussian, or sinc function. V3.1 now also has a 
+Moffat function for 1-D images. Currently handles 1-D, 2-D, and 3-D images only.
+\item[Parameters]: 
+{\bf IMage STart ENd SMOOTH FNDIM BOX WIDTHS OUTput [WHole]}
+\end{description}
+\vspace{5mm}
+
+{\large\bf SPECTRUM \hfill}
+\begin{description}
+\item[Function]:
+Displays individual spectra extracted from a ZXY-sorted SLDC. The XY 
+coordinates of the point of extraction are indicated with the cursor on a 2-D 
+image (derived from an XY plane of the SLDC). The spectra are plotted alongside
+the image; their XY locations are shown with pointer lines. Optional hardcopy
+and output of spectra to data structures.
+\item[Parameters]:
+{\bf IMage IMAGE1 SLOw SHIgh STart ENd LOw HIgh TABle LABel SLABel XPIX YPIX 
+MAG NPLOTS BIN SPectrum [SCale WHole TWOCUR WRite]}
+\end{description}
+\vspace{5mm}
+
+{\large\bf SQUINT \hfill}
+\begin{description}
+\item[Function]: 
+Displays the pixel values in a 2-D image or image subset, using alphanumeric
+characters to give a crude eight-level grey scale.
+\item[Parameters]: 
+{\bf IMage STAPIX ENDPIX [AGAIN]}
+\end{description}
+\vspace{5mm}
+
+{\large\bf STATS \hfill}
+\begin{description}
+\item[Function]: 
+Computes basic statistics of an image or image subset. Optionally checks and
+if necessary corrects the bad pixel flag.
+\item[Parameters]: 
+{\bf IMage STart ENd [WHole CHECK PASS2]}
+\end{description}
+\vspace{5mm}
+
+{\large\bf SUBSET \hfill}
+\begin{description}
+\item[Function]: 
+Creates a subset of an image.
+\item[Parameters]: 
+{\bf IMage STart ENd OUTput}
+\end{description}
+\vspace{5mm}
+
+{\large\bf TAU2FIG \hfill}
+\begin{description}
+\item[Function]:
+Converts a disk file in the old TAURUS format to a 2-D or 3-D FIGARO data 
+structure.
+\item[Parameters]:
+{\bf TAUfile NDIM SIZE OUTput AXKEY AXSTart AXENd AXLOG [FLoat SHort AXes]}
+\end{description}
+
+{\large\bf TRANSFORM \hfill}
+\begin{description}
+\item[Function]: 
+Geometric transformation program for shifting, rotating, and resampling an 
+image. The operations may be performed separately or in combination. New pixel 
+values may be derived from from nearest neighbours or by linear interpolation. 
+Currently handles 2-D and 3-D images only. 
+\item[Parameters]: 
+{\bf IMage SHIFT CENTRE ANGLE RESAMPLE INTERP AXKEY AXSTart AXENd AXLOG OUTput
+[AXes]}
+\end{description}
+\vspace{5mm}
+
+{\large\bf TRANSPOSE \hfill}
+\begin{description}
+\item[Function]: 
+Transposes the dimensions of an image by resequencing the data array and 
+exchanging the relevant axis arrays. This is done to promote maximum efficiency
+in subsequent operations which concentrate on a particular dimension, for 
+example spectral line analysis in a TAURUS data cube. Currently handles 3-D 
+images only; the FIGARO programs ROTATE, IREVX, and IREVY may be 
+used on 2-D images.
+\item[Parameters]: 
+{\bf IMage ORDER OUTput TUNE}
+\end{description}
+\vspace{5mm}
+
+{\large\bf TYPECON \hfill}
+\begin{description}
+\item[Function]: 
+Converts the data (and error) array of an image structure from any type to 
+either {\tt INTEGER*2} or {\tt REAL}. Errors will occur on conversion to 
+{\tt INTEGER*2} if any pixel values are outside the 16 bit signed integer 
+range. The method differs from that of the FIGARO program CONTRACT, which 
+rescales the values to avoid such errors. The programs described in this 
+note can use a CONTRACTed image instead of an {\tt INTEGER*2} image, but 
+there will be a significant delay while the values are scaled back to their 
+original range. 
+\item[Parameters]: 
+{\bf IMage OUTput [SHort FLoat]}
+\end{description}
+\vspace{5mm}
+
+{\large\bf UNMAGIC \hfill}
+\begin{description}
+\item[Function]: 
+Replaces bad pixels in an image or image subset with an appropriate value. New
+pixel values may be derived from the average of adjacent pixels or by linear
+interpolation. Alternatively, all bad pixels may be replaced by the same 
+constant. 
+\item[Parameters]: 
+{\bf IMage STart ENd INTERP MINADJ VALue OUTput [WHole]}
+\end{description}
+\vspace{5mm}
+
+\section{The new applications}
+\label{sec:new-app}
+
+\subsection{ADDND}
+
+ADDND is a program that performs co-adding of images, that is, it will use
+either axis information (if present) or user-specified values to align the
+images on a common set of axes, and then add them pixel-by-pixel. It will
+handle up to 16 images in one execution, and with careful use can be used to
+mosaic images in a basic manner. 
+
+\subsubsection{Scope}
+
+\begin{itemize}
+\item Up to 6 dimensional images.
+\item Magic values, quality arrays and error arrays all handled.
+\item Batch executable.
+\end{itemize}
+
+\subsubsection{Parameters}
+
+\begin{itemize}
+\item {\bf FILES.} This is the name of an ASCII file that contains the names of
+the images to be co-added. It defaults to FILES.DAT.
+\item {\bf OUTPUT.} The name of the resulting co-added image.
+\item {\bf SHIFTS.} If there are no axis arrays present in the images (or the
+user does not wish to use them, then this parameter contains the name of an
+ASCII file that contains the pixel shift in each dimension that should be
+applied to each respective image. The default name for this file is SHIFTS.DAT.
+\item {\bf AVERAGE.} This keyword instructs the program to average the data in
+the images rather than simply adding them.
+\item {\bf USEAXES.} This keyword instructs the program to use axis arrays to
+align the images.
+\item {\bf VERBOSE.} All the new applications have this keyword, it makes the
+program write more information about its progress as it goes along.
+\item {\bf SMALL.} This is a hidden parameter. It allows the user to set the
+value at which a floating-point number should be effectively considered zero.
+The default value is $10^{-7}$.
+\end{itemize}
+
+The rules governing how the images are added are complex. If you need or wish
+to know more, then read the `method' section of the {\tt SOURCE\_COMMENTS} in 
+the HELP library.  
+
+\subsection{DEGAMMA}
+
+This is a program designed to remove statistically irrelevant data, for example 
+cosmic ray events (hence the name). It works by looking for pixels that lie
+more than a prescribed number of standard deviations from the mean pixel value
+in the z-axis. For these pixels, neighbouring values are examined to see if
+they lie within a user-definable tolerance band. If not, they can be replaced
+either with a magic value/bad quality value or a value interpolated from its
+neighbours.
+
+\subsubsection{Scope}
+
+\begin{itemize}
+\item 3D data only, sorted $(z,x,y)$. (This is because VMS pages more
+efficiently in this order.) The cube is comprised of a number of frames of a 2D
+image, and can be built as described later.                                 
+\item Magic values, quality and error arrays all supported.
+\item Subsetting supported.
+\end{itemize}
+
+\subsubsection{Parameters}
+
+\begin{itemize}
+\item {\bf IMAGE.} Name of the image you wish to cleanse.
+\item {\bf OUTPUT.} Name of the resultant image.
+\item {\bf NDEVS.} This specifies the number of standard deviations a pixel can
+differ from its neighbours before we suspect that its value is not kosher.
+\item {\bf TOL.} This specifies the maximum (absolute) difference that we should
+allow a pixel to have from any of its neighbours.
+\item {\bf NNPIX.} This is the number of neighbouring pixels we might expect to
+find with a similar value to the pixel in question. If it is 0, then the
+suspect pixel will be erased regardless. If it's (say) $n$, then the suspect
+pixel will be erased if fewer than $n$ of its neighbours are within the
+specified tolerance band.
+\item {\bf WHOLE.} If this keyword is set, the whole image is to be processed.
+\item  {\bf START.} Start of image subset.
+\item {\bf END.} End of image subset.
+\item {\bf DOEDGE.} Since an edge pixel has fewer neighbours, statistics on it
+are less accurate. If this keyword is set (default), the edge pixels are
+processed anyway.
+\item {\bf FLAGBAD.} If this is set then a pixel that is rejected will either
+be replaced by a magic value or have a $1$ placed in the quality array if it
+exists. Otherwise, the pixel value will be interpolated if possible from its
+neighbours.
+\item {\bf VERBOSE.} (Hidden.)
+\item {\bf POSDEV.} Instructs DEGAMMA to only look for positive deviations from
+the mean.
+\item {\bf XYWEIGHT.} (Hidden.) This can be used to give higher (or lower)
+weighting for pixels in the `$x-y$' plane. 
+\end{itemize}
+
+\subsubsection{Using DEGAMMA}
+
+In simplest terms, DEGAMMA compares three or more frames of an image and if
+there is an event that is in one but not in the other two then it rejects that
+event. In order to get the images into a suitable state, it may be necessary to
+perform some data manipulation:
+\begin{itemize}
+\item Normalise the images. A good procedure would be to use ARITH1 to divide
+each frame by the product of exposure time and the mode pixel value. Care
+should be taken, though as you may accidentally destroy data if you are using
+data types other than FLOAT - it all depends upon what the values are. If in
+doubt, TYPECON each frame to FLOAT.
+\item Run STACK to produce a 3D datacube. Note: since the top or bottom images
+have one fewer neighbour than other images, the algorithm will be slightly less 
+efficient for those planes. Setting the DOEDGE parameter FALSE will exclude 
+these frames from
+being processed, but if you know that one particular image is noisy, make sure
+that it isn't on the top or bottom.  
+wish to clean up is {\em not} on the top or bottom plane of the cube.
+\item Run TRANSPOSE to order the planes $(z,x,y)$.
+\item It may be desirable to get rid of magic values if they appear in your
+cube. Although DEGAMMA handles magic values in a logical way, a saturated pixel
+could accidentally take on the magic value and confuse affairs. In this case,
+run UNMAGIC on your cube. 
+\end{itemize}
+Once your data is in the correct form, run STATS to give you an idea of the
+sort of data values you can expect. This is best done in conjunction with
+running DEPICT on the individual frames so you can look for damaged areas. In
+particular, it is worthwhile noting that if an image is saturated (especially
+easy with SHORT data), DEGAMMA will work less efficiently, as it will find it
+harder to spot spurious pixels. 
+
+Having done all this, you can now run DEGAMMA. Run it with the VERBOSE flag set
+so that you can see what it's up to. Note: large images may have to be split
+into smaller chunks if there are memory restrictions. The first few parameters
+are standard. For DOEDGE, generally type NO! Hopefully, objects of interest
+will be in the centre of the field. Using DOEDGE can result in hundreds of dud
+pixels, especially when you have only 3 or 4 image planes. 
+
+NNPIX is perhaps the most important parameter. It takes a value from $0$ to $6$
+and determines how many pixels surrounding the one currently being tested are
+needed to verify its validity. For example, if NNPIX is $1$, then if $1$ pixel
+above, below or to the side (note: not diagonally) is within a certain
+tolerance band, the pixel is valid. Start off with a value of $1$, but in
+subsequent runs increase up to $6$ (holding other parameters constant.) The
+lower the value generally, the fewer pixels are rejected. How many pixels that
+will be you can gauge from the standard deviation reported in STATS. If it's
+large compared to the mean, there may be several rogue values to remove.
+
+TOL determines if two pixels are to be considered `equal'. For example, if TOL
+is $20$ and two adjacent pixels have values $3452$ an $3460$ then these pixels
+are `equal', whilst if the second pixel has value $3500$ they are not. The
+value you enter for this parameter will depend upon several things, but mostly
+the deviation and data type. For example, with type SHORT, a mean pixel value 
+of $20$, a deviation of $10$, a value of $1-5$ might be appropriate. It should
+generally be less than the deviation, but should be guided by the values of
+pixels {\em within} features rather than global statistics. For example, with
+a star (say) in the center having pixel values ranging from $100$ to $150$ and
+a background value of (about) $10$ then a good value for TOL would be $60$. The
+beauty of DEGAMMA comes from the fact that, even if the background were $50$
+(say), spurious events could still be rejected because of data from the other
+frames.
+
+NDEVS could be useful to vary if you want to preserve a large range of features
+in the image, from very low to very high intensities. The higher this is, the
+more data will be preserved (including potential cosmic rays!).  Initially,
+DEGAMMA scans the cube for pixels whose value is more than NDEVS standard
+deviations away from the mean value (note that the statistics are computed
+locally for each pixel along the $z$ axis). The default value of $2$
+is as good a starting value as any - decreasing may result in the baby going
+out with the bathwater. Increase only (say) if the data type is FLOAT and there
+is a large dynamic range.
+
+POSDEV is a useful parameter. Cosmic rays will {\em only} produce positive
+deviations from the mean, and this keyword allows you to filter out these
+events. Of course, if you're using DEGAMMA for some other kind of filtering,
+you may not want this!
+
+FLAGBAD should be set with care, mainly because although you end up with either
+magic values in the data array and the .Z.FLAGGED variable set, or bad quality
+values if there was a quality array, you don't really gain much information.
+Most of the time you'll be able to replace dud pixels with a value that is
+either interpolated from the surrounding values, or (if there aren't enough
+valued pixels around it) the mean pixel value.
+
+XYWEIGHT is a hidden parameter whose use could best be described as
+`unpredictable.' It's purpose is to say that an adjacent pixel in the 
+image plane is more likely to be `real' data than an adjacent pixel lying above
+or below the image plane. A value of $1.0$ (default) says they are equally
+weighted. As it is increased, the weighting is pushed towards pixels in the
+same plane. If you wish to change its value, a working figure is
+\begin{displaymath}
+1+\frac{1}{NNPIX}.
+\end{displaymath}
+Thus, if the pixel we are looking at  is surrounded by $4$ pixels in the same
+plane, and only $1$ above it, setting XYWEIGHT to $1.25$ will compensate for
+the `missing' pixel, and the test pixel will pass even if NNPIX is $6$. It
+could therefore be useful for correcting pixels on the edges of the cube.
+
+An example may help. In the directory {\tt NDP\_SOURCE:[.DEGAMMA]} there is a
+sample cube called {\tt EXAMPLE.DST}. It has dimensions $3\times 50\times 50$.
+Pixel values range from around $12$ to $20$ in the background with features
+in the range $64$ to $255$.
+There are two suspicious pixels, one at $(24,25)$ and one at $(40,40)$.
+There are two single-pixel stars at $(25,25)$ and $(40,10)$. Running DEGAMMA
+with $NNPIX=6$, $TOL=4$ (other parameters default) then both extraneous pixels
+are rejected. However, running with $NNPIX=1$ only deletes the pixel at
+$(40,40)$ (because the one at $(24,25)$ has one neighbour that is valid.)
+However, setting $NNPIX=6$ and $TOL=1$ results in rejection of many (I made it
+$319$) pixels.
+
+Run DEGAMMA several times, varying the parameters as you see fit. When you're
+happy with a particular run, you can extract the cleansed data using SUBSET.
+
+DEGAMMA is a `hands-on' data filtering package that uses a simple but flexible
+approach to the rejection of spurious pixel values. Programs of
+this nature tend not to please all of the people all of the time, but even 
+with the default parameters, DEGAMMA will please at least some of the people 
+some of the time, which has to be something at least! 
+
+\subsection{SLICE3D}
+
+This program takes a 3D datacube and allows the user to extract any rectangular
+subset from it. It has a simple, interactive graphic interface to allow choice
+of the extraction plane. The extracted subset can then be written to a new
+structure.
+
+\subsubsection{Scope}
+
+\begin{itemize}
+\item 3D images only, folks.
+\item Magic values, error arrays and quality arrays all processed.
+\item Interactive, so no batch execution.
+\end{itemize}
+
+
+\subsubsection{Parameters}
+
+\begin{itemize}
+\item {\bf IMAGE.} Name of the 3D image to be sliced.
+\item {\bf OUTPUT.} Name of the file the slice is written to.
+\item {\bf LOW.} Pixel value that is to be plotted as black.
+\item {\bf HIGH.} Pixel value that is to be plotted as white.
+\item {\bf PLACE.} Where the plot will appear.
+\item {\bf MAG.} Magnification factor.
+\item {\bf TABLE.} Name of colour table to be used.
+\item {\bf SOFTDEV.} Current display device.
+\item {\bf VIEW.} This is the axis the cube is to viewed along.
+\item {\bf ACTION.} After slicing, this parameter determines whether the user
+will quit, slice again, or write the current slice to a file.
+\item {\bf AXES.} Draw axes on plot if TRUE.
+\item {\bf RAMP.} Draw colour ramp on plot if TRUE.
+\item {\bf ERASE.} Erase previous plot if TRUE.
+\item {\bf VERBOSE.}
+\item {\bf WRITE.} Save slice to disk if TRUE.
+\end {itemize}
+
+\subsection{STACK}
+
+This program takes a number of 2 or 3D images and joins them along a prescribed
+common dimension either contiguously or using the axis data if present. The
+result is a 3D stack of 2D images.
+
+\subsubsection{Scope}
+
+\begin{itemize}
+\item 2D and 3D images only.
+\item Magic values, error arrays and quality arrays all processed.
+\item Batch execution supported.
+\end{itemize}
+
+\subsubsection{Parameters}
+
+\begin{itemize}
+\item {\bf FILES.} This is the name of an ASCII file that contains the names of
+the images to be co-added. It defaults to FILES.DAT.
+\item {\bf JOIN.} The number of the axis the images are to be joined along.
+\item {\bf OUTPUT.} The name of the output image.
+\item {\bf PADVAL.} A value to pad images out with should they need to be 
+extended.
+\item {\bf SMALL.} This is a hidden parameter. It allows the user to set the
+value at which a floating-point number should be effectively considered zero.
+The default value is $10^{-7}$.
+\item {\bf USEAXES.} If TRUE, axis information contained in the images will be
+used to align the cubes.
+\item {\bf VERBOSE.}
+\end{itemize}
+
+The rules for manipulating the images are quite involved. Should the user need
+or wish to know more, refer to the comments in the HELP library. 
+
+\subsection{STRETCH}
+
+This program takes a 1D, 2D or 3D image and expands or compresses it to the
+dimensions of a second image (of the same dimensionality). There is a choice of
+interpolation method.
+
+\subsubsection{Scope}
+
+\begin{itemize}
+\item Up to 3 dimensional data. 
+\item Magic values, error and quality arrays supported.
+\item Batch mode execution supported.
+\end {itemize}
+
+\subsubsection{Parameters}
+
+\begin{itemize}
+\item {\bf IMAGE1.} Name of the image to be stretched.
+\item {\bf IMAGE2.} Name of the image whose dimensions define the stretching
+factors.
+\item {\bf INTERP.} Type of interpolation to use (piecewise constant or
+linear).
+\item {\bf OUTPUT.} Name of the output image.
+\item {\bf VERBOSE.}
+\end{itemize}
+
+\section{Scope of programs}
+
+Table~\ref{tab} summarizes the present capability of each program with respect 
+to several criteria. A dash means that the criterion is not relevant.
+`Image subset' indicates whether a subset of the image can be selected for 
+processing. `Magic values' indicates whether bad pixels can be distinguished
+from valid pixels by having a specific value.    
+
+{\small
+\begin{table}[htb]
+\begin{center}                
+\begin{tabular}{|l|c|c|c|c|c|c|c|c|c|} \hline                                  
+Program & No. of & Data  & Image  & Magic  & Batch & Quality & Error \\
+        & dims   & types & subset & values & mode  & Arrays & Arrays\\
+\hline
+ADDND     & 1 -- 6 & I, R & N & Y & Y & Y & Y\\
+ARITH1    & 1 -- 6 & I, R & Y & Y & Y & Y & Y\\
+ARITH2    & 1 -- 6 & I, R & Y & Y & Y & Y & Y\\
+AXFLIP    & 3      & I, R & N & -- & Y & Y & Y\\
+COLLAPSE  & 2 -- 6 & I, R & Y & Y & Y & Y & Y\\
+DEGAMMA   & 3      & I, R & Y & Y & Y & Y & Y\\
+DEPICT    & 2      & I, R & Y & Y & Y & Y & N\\
+DUMMY     & 1 -- 3 & I, R & -- & -- & Y & Y & Y\\
+HILITE    & 2      & I, R & Y & Y & N & Y & N\\
+LOGIC1    & 1 -- 6 & I    & Y & Y & Y & Y & Y\\
+LOGIC2    & 1 -- 6 & I    & Y & Y & Y & Y & Y\\
+LOOK      & 2      & I, R & Y & Y & Y & -- & --\\
+MAGIC     & 1 -- 6 & I, R & Y & Y & Y & Y & --\\
+MASK1     & 1 -- 6 & I, R & Y & Y & Y & Y & Y\\
+MASK2     & 1 -- 6 & I, R & Y & Y & Y & Y & Y\\
+MOMENTS   & 3      & I, R & N & Y & Y & Y & Y\\
+MOVIE     & 3      & I, R & Y & Y & N & Y & N\\
+PEEK      & 1 -- 6 & I, R & N & Y & Y & -- & --\\
+PLOTS     & 3      & I, R & Y & Y & N & Y & --\\
+SETAXES   & 1 -- 6 & --   & -- & -- & Y & -- & --\\
+SLICE3D   & 3      & I, R & -- & Y & N & Y & Y\\
+SMOOTH    & 1 -- 3 & I, R & Y & Y & Y & Y & Y\\
+SPECTRUM  & 3      & I, R & Y & Y & N & Y & --\\
+SQUINT    & 2      & I, R & Y & Y & Y & -- & --\\
+STACK     & 2 -- 3 & I, R & N & Y & Y & Y & Y\\
+STATS     & 1 -- 6 & I, R & Y & Y & Y & Y & Y\\
+STRETCH   & 1 -- 3 & I, R & N & Y & Y & Y & Y\\
+SUBSET    & 1 -- 6 & I, R & -- & Y & Y & Y & Y\\
+TAU2FIG   & 2, 3   & I, R & N & Y & Y & N & N\\
+TRANSFORM & 2, 3   & I, R & Y & Y & Y & Y & Y\\
+TRANSPOSE & 3      & I, R & N & -- & Y & Y & Y\\
+TYPECON   & 1 -- 6 & I, R & -- & Y & Y & -- & --\\
+UNMAGIC   & 1 -- 6 & I, R & Y & Y & Y & Y & --\\
+\hline
+\end{tabular}
+\end{center}
+\caption{Scope of programs.}
+\label{tab}
+\end{table}
+}
+
+\section{Results structures}
+
+\subsection{MOMENTS}
+
+This has been radically changed, not only to simplify the code, but to output
+the statistics in a format suitable for use with spectral line-fitting packages
+available elsewhere. Note that, in the following,
+the {\tt <RESULTS>} field will be the file name for a {\tt .DST} file, or
+{\tt <FILENAME>.MORE} for an NDF file.
+The structure is as follows:
+\begin{verbatim}
+    <RESULTS> 
+        .Z
+          .DATA   [NPAR,NPEAKS,NX,NY] FLOAT
+          .ERRORS [NPAR,NPEAKS,NX,NY] FLOAT
+        .X      
+          .DATA   [NX]                FLOAT
+        .Y     
+          .DATA   [NY]                FLOAT
+\end{verbatim}
+where {\tt NX} is the number of pixels in the $x$ direction, {\tt NY} the
+number in the $y$ direction, {\tt NPEAKS} is the number of peaks sought
+after in the spectrum and {\tt NPAR} is the number of statistics computed 
+At present this is 5 -
+\begin{itemize}
+\item Total flux
+\item Centroid (peak position)
+\item Variance
+\item Skewness
+\item Kurtosis.
+\end{itemize}
+
+\subsection{SPECTRUM \& PLOTS}
+
+The data structures containing the extracted spectra have been expanded.
+They now contain information about the place of extraction and the method.
+The additional information is
+\begin{verbatim}
+   <RESULTS> 
+     .<PROGRAM>
+       .X        INT
+       .Y        INT
+       .BIN      INT
+       .MODE[16] CHAR
+     .
+     .
+     .
+\end{verbatim}
+The {\tt .<PROGRAM>} field is either {\tt PLOTS} or {\tt SPECTRUM}.
+The {\tt .X} and {\tt .Y} fields are the (pixel) co-ordinates of the
+extraction; {\tt .BIN} is the bin size; {\tt .MODE} is (for SPECTRUM) one of
+``RECTANGLE'', ``POLYGON'' or ``PIXEL'', whilst (for PLOTS) is either of
+``RECTANGLE'' or ``POLYGON''. In PLOTS, details of the actual rectangle 
+or polygon are written to a separate data structure, named {\tt
+<file>\_DAT.DST}. This is to avoid swallowing disk space with superfluous data
+since PLOTS will output several spectra per extraction.
+In SPECTRUM, there is only one output file per extraction, and so the extra
+data is written to the structure:
+\begin{verbatim}
+   <RESULTS> 
+     .
+     .
+     .
+    .MASK[NX,NY] BYTE
+   
+\end{verbatim}
+for a polygon, or
+\begin{verbatim}
+   <RESULTS> 
+     .
+     .
+    .WIDTH  INT
+    .HEIGHT INT
+\end{verbatim}
+for a rectangle. The {\tt .MASK} field is an array of $0$'s and $1$'s, where
+$1$ represents a valid pixel and $0$ a pixel to omit in the averaging or
+extraction.
+              
+\section{Documentation}
+
+This document replaces both SUN/19 and SUN/27 in terms of NDPROGS. Refer to
+SUN/86 `FIGARO -- A general data reduction system' for more technical 
+information.
+
+Other documents included with the package are: 
+
+\vspace{2mm}
+\begin{tabular}{ll}
+{\tt disk:[FIGPACK.NDPROGS]RELEASE.LIS} 
+& Release notes. \\
+{\tt disk:[FIGPACK.NDPROGS.DEV.DOCS]TUN1.TEX} 
+& An early treatise on standards for the package. \\
+{\tt disk:[FIGPACK.NDPROGS.DEV.DOCS]BUGS.LIS}
+& Bug reports and fixes.\\
+\end{tabular}
+\vspace{2mm}
+ 
+\section{Standard FIGARO programs}
+
+There are a number of standard FIGARO applications which are also useful in
+n-dimensional data reduction. Some information can be gained by typing
+\begin{verbatim}
+   $ HELP FIGARO.
+\end{verbatim}
+Refer to SUN/86 for more details.
+
+
+\section{Programming notes}
+\label{prog}
+
+This section is for information only and is not intended to be a complete 
+programmer's guide. It is included in order to point out the similarities
+and differences between creating programs in standard FIGARO and in the
+n-D package. In practice, if any of the n-D programs requires correction
+or modification, a request should be sent to the Starlink Librarian.
+
+Guidance on programming in FIGARO is given in {\tt FIGARO\_PROG\_S:FIGPROG.MEM}
+(although this is now somewhat out of date!)
+and in the new FIGARO Programmer's Guide written by Keith Shortridge. 
+SUN/86 also contains an introduction to the subject. Since the n-D package is 
+designed to be compatible with FIGARO, the instructions given in these 
+documents are all relevant, and as Keith puts it, `mostly' true.
+
+(Note: before any program development is undertaken, the programmer should 
+issue the command
+\begin{verbatim}
+   $ FIGDEV.
+\end{verbatim}
+This will set up several important logical variables.)
+
+\subsection{Directory structure}
+
+The directory structure of the n-D package has been altered to simplify the
+building of the executables.
+
+Starting from {\tt disk:[FIGPACK]},
+
+\vspace{2mm}
+\begin{tabular}{ll}                
+{\tt [.NDPROGS]} &  Top of {\tt .NDPROGS} directory tree \\
+{\tt [.NDPROGS.NDPROGS]} & Executable files {\it e.g.} {\tt .DEF,.EXE,.HLB,%
+.INF,.PAR,.TXT} \\
+{\tt [.NDPROGS.DEV]} & Development software.\\ 
+{\tt [.NDPROGS.DEV.SOURCE]} & Top of {\tt .SOURCE} directory tree \\
+{\tt [.NDPROGS.DEV.DOCS]} & Development documentation \\
+{\tt [.NDPROGS.SUBS]} & Subroutine source code \\
+{\tt [.NDPROGS.LIBS]} & Subroutine object library \\
+\end{tabular}
+\vspace{2mm}
+
+Each program has its own directory {\tt [.NDPROGS.DEV.SOURCE.PROGRAM]}, 
+which contain the following files:
+\begin{verbatim}
+PROGRAM.COM   PROGRAM.CON  COMMANDS.DAT  PROGRAM1.FOR  PROGRAM2.GEN.
+\end{verbatim}
+The {\tt .COM} file is a command procedure that will build the executable 
+from scratch. It will {\em not} make the parameter files, though. The 
+parameter information is contained in the {\tt .CON} file, and the {\tt .PAR} 
+and {\tt .INF} files are generated by 
+\begin{verbatim}
+   $ CREPAR PROGRAM.
+\end{verbatim}      
+They should then be moved to the same directory as the executables. To
+build a single executable, move into the appropriate directory and issue
+\begin{verbatim}
+   $ @PROGRAM.
+\end{verbatim}
+The {\tt .GEN} file is a generic template with which to build some of the
+subroutines (see next subsection). The command procedure turns this into 
+a FORTRAN file and compiles it. It then compiles the {\tt .FOR} file, and does 
+the appropriate linking. The executable is moved to the correct directory, and 
+then it, along with the {\tt .OBJ} files, are deleted.
+ 
+The following logical name definitions are issued by 
+{\tt FIGARO\_PROG\_N:FIGARO.COM}:
+                                              
+\begin{verbatim}
+   $ DEFINE NDP_DEV    disk:[FIGPACK.NDPROGS.DEV]
+   $ DEFINE NDP_LIBS   disk:[FIGPACK.NDPROGS.LIBS]
+   $ DEFINE NDP_SOURCE disk:[FIGPACK.NDPROGS.DEV.SOURCE]
+\end{verbatim}
+You can build {\em all} executables from scratch, including the {\tt .PAR}
+and {\tt .INF} files, by the sequence
+\begin{verbatim}
+   $ SET DEF NDP_SOURCE
+   $ @MAKE_NDPROGS.
+\end{verbatim}
+Once NDPROGS is installed, there is a command procedure designed to test
+out the various programs. To run it,
+\begin{verbatim}
+   $ SET DEF NDP_SOURCE
+   $ SET DEF [.TEST]
+   $ @NDP_TEST
+\end{verbatim}
+at which point you should occupy yourself for 20 minutes or so! The end
+results are a displayed picture and a data structure. If everything went
+to plan then the data structure should be full of $0$'s. The operations 
+performed are as follows:
+\begin{itemize}
+\item Create a test image, $256\times 128\times 4$, with a quality array, error
+array and axes.
+\item Flip the first axis.
+\item Transpose the image to $128\times 256\times 4$.
+\item Create a subset of the image $128\times 128\times 4$.
+\item Collapse to $128\times 128$.
+\item Rotate through $90$ degrees about the top right corner.
+\item Convert the images resulting from the last two operations into data
+type SHORT.
+\item Combine the images by logically OR-ing them together.
+\item Subtract a scalar from the image of the previous step.
+\item Stretch the image by non-integer multiples.
+\item Subtract the final image from the supplied test image.
+\item Show a picture.
+\end{itemize}
+Full details of the steps can be seen in the file {\tt NDP\_TEST.COM }.
+
+\subsection{Subroutine generation}
+
+As mentioned in section~\ref{features}, the n-D programs feature support for
+{\tt INTEGER*2} and {\tt REAL} data types and for magic values. These 
+requirements posed two interesting problems for the authors. Firstly, a
+subroutine with an {\tt INTEGER*2} declaration for the data array cannot
+handle {\tt REAL} data, and vice versa. Secondly, it would be most impractical
+to test for the magic value at every pixel in a typical 3-D image (at least 16M
+for TAURUS) if it were known that magic values were absent. Things are also
+complicated by the mutual exclusivity of magic values and quality arrays.
+
+The chosen solution is to use a separate subroutine for each of the  
+possible cases. Since there is no point in writing several largely identical
+pieces of code, a single generic subroutine is provided, from which the  
+variants are generated. More than one such generic subroutine may be present,
+each giving rise to its own set of variants.
+
+The program GENERIC is used for this purpose. This is run automatically
+when the steps issued in the previous subsection are followed. It produces a
+set of FORTRAN subroutines which can the be compiled and linked in the usual
+way. (It is important that the GENERIC subroutines and the pure FORTRAN are not
+mixed. This will lead to "multiply defined symbol" errors.)
+
+GENERIC scans the input file looking for certain tokens which are delimited
+by {\tt <>}. When it finds such a token, it replaces both the {\tt <>}'s and 
+the symbol with a string dependent on the token and values supplied to 
+GENERIC. The usual invocation in the current context is
+\begin{verbatim}
+   $ GENERIC PROGRAM.GEN /TYPES=(R,W)
+\end{verbatim}
+(though sometimes a byte version of a subroutine is needed, in which case
+alter the argument to {\tt /TYPES=(R,W,B)}.
+GENERIC makes a pass for each character inside the {\tt /TYPES} parameter.
+Each time it encounters the token {\tt <T>}, it will substitute {\tt R} or
+{\tt W}. Each time it finds {\tt <TYPE>} it will replace that with either
+{\tt REAL} or {\tt INTEGER*2}. Hence, it can write several versions of the same
+subroutine for different data types. In NDPROGS, it is used to produce the  
+following:
+
+\vspace{2mm}
+\begin{tabular}{ll}
+{\tt prog\_sub\_W}  & for {\tt INTEGER*2}, no magic values, quality and errors
+processed if present\\
+{\tt prog\_sub\_WQ} & for {\tt INTEGER*2} with magic value recognition, errors 
+processed if present\\
+{\tt prog\_sub\_R}  & for {\tt REAL}, no magic values, quality and errors
+processed if present \\
+{\tt prog\_sub\_RQ} & for {\tt REAL} with magic value recognition, errors 
+processed if present \\
+\end{tabular}
+\vspace{2mm}                                             
+
+(Note: the subroutine naming convention has changed - previously {\tt\_I}
+referred to an {\tt INTEGER*2} array.)
+
+Below is a short example of the use of GENERIC:
+
+\begin{verbatim}
+      SUBROUTINE COMB2_AC_<T>
+     &  (OARRAY,ARRAY1,
+     &   DIMS,NDIM,NELM,DIMS1,NDIM1,NELM1,
+     &   STAPIX,ENDPIX,OPER,MAGICVAL)
+C
+      IMPLICIT NONE
+C
+C     Parameters
+C                                                       
+      CHARACTER*(*) OPER
+      INTEGER       DIMS(10),NDIM,NELM,DIMS1(10),NDIM1,NELM1,
+     &              STAPIX(6),ENDPIX(6)
+      <TYPE>
+     &              OARRAY(NELM),ARRAY1(NELM1),MAGICVAL
+C
+                    DO IND1=STAPIX(1),MAX(1,ENDPIX(1))
+                    OOFF1=IND1-1
+                    OOFF=1+OOFF1+OOFF2+OOFF3+OOFF4+OOFF5+OOFF6
+                    I1OFF=1+OOFF1+I1OFF2+I1OFF3+I1OFF4+I1OFF5+I1OFF6
+C
+CQ                  IF(OARRAY(OOFF).GT.MAGICVAL .AND. 
+CQ   &                 ARRAY1(I1OFF).GT.MAGICVAL)THEN
+                      OARRAY(OOFF)=OARRAY(OOFF)+ARRAY1(I1OFF)
+CQ                  ELSE
+CQ                    OARRAY(OOFF)=MAGICVAL
+CQ                  END IF
+C
+                  END DO
+\end{verbatim}
+Above, the `{\tt CQ}' flags indicate lines which are only relevant when magic
+values are known to be present. The remaining code processes each pixel 
+regardless of its value. In the {\tt \_WQ} and {\tt \_RQ} variants of the 
+subroutine the flags would be removed, enabling the magic value test to be 
+performed. It is, alas, still up to the programmer to perform this task!
+
+There is often a problem with data types when we require to convert between
+one type and another within a GENERIC template. For example, suppose our
+code contained the line
+\begin{verbatim}
+      ARRAY(I) = 2
+\end{verbatim}
+which is fine if {\tt ARRAY} is {\tt INTEGER}, {\tt INTEGER*2} or {\tt BYTE},
+but what about {\tt FLOAT}? To get around this, GENERIC has available a set
+of type conversion facilities accessed by having the line
+\begin{verbatim}
+      INCLUDE 'DCV_FUN'
+\end{verbatim}
+directly after the subroutine's local variable declarations. To perform the
+type conversion necessary for the above example , we write the line as
+\begin{verbatim}
+      ARRAY(I) = DCV_ITO<T>(2)
+\end{verbatim}
+whereupon GENERIC will process the {\tt <T>} token as usual, and the compiler
+will process the necessary function calls as standard FORTRAN functions. There
+are functions for converting between all the types GENERIC recognizes. For 
+more information on GENERIC, refer to SUN/7.
+
+\subsection{Quality arrays}
+
+New to some applications in v3.1 is the statement
+\begin{verbatim}
+      INCLUDE 'NDP_SOURCE:NDP_QUALITY_MASK.INC'
+\end{verbatim}
+This is in accordance with SGP/38 and Asterix conventions that different values
+in a quality array can flag different reasons for the pixel being void. The
+include file contains a mask {\tt BADBITS} of type {\tt BYTE} that should be 
+logically-ANDed with the quality value before testing. The file also defines 
+the necessary constants, all prefixed with {\tt Q\_}. These applications set 
+quality values to {\tt Q\_GOOD} or {\tt Q\_BAD} now, rather than $0$ or $1$. 
+Thus a code snippet could look like
+\begin{verbatim}
+      DO I=1,N
+        IF ((QUALITY(I) .AND. BADBITS) .EQ. Q_GOOD) THEN
+          ARRAY(I) = WHATEVER
+        END IF
+      END DO
+\end{verbatim}
+{\em All} NDPROGS applications will use this convention in the next VMS release.
+In the short term, this should not prove a problem, as {\tt BADBITS} is 
+usually set to $11111111_{(2)}$.
+
+\subsection{Compilation and linking}
+
+All compilation and linking is now handled by the {\tt .COM} file in each
+program's directory. Refer to these for more details.
+The FIGARO command procedure {\tt FIG.COM} is used for compilation and 
+linking. 
+
+The logical name {\tt NDP\_SOURCE} must be defined for compilation to succeed, 
+since it is cited in {\tt INCLUDE} statements in the source code. 
+
+If {\tt FIG.COM} has been customized at a particular site, it should reside 
+in the local FIGARO directory. The command is then 
+\begin{verbatim}
+   $ @FIGARO_PROG_L:FIG prog,NDP_LIBS:NDP/LIB opt1 opt2
+\end{verbatim}
+and the {\tt .COM} files should be updated to include this. Otherwise, the 
+{\tt FIG.COM} file lives either in the directory {\tt FIGARO\_DEV:} or 
+{\tt NDP\_DEV:}.
+The parameters {\tt opt1} and {\tt opt2} can be {\tt NOSHARE} or {\tt DEBUG}.
+The {\tt DEBUG} facility is explained in {\tt FIG.COM}. All of the programs 
+can now be linked successfully with the FIGSHR shareable image. This has been
+achieved by removing calls to routines that explicitly manipulate common blocks
+in either DSA or PGPLOT.
+
+\subsection{Image graphics}
+\label{image}
+
+The n-D programs use the Starlink GKS version of PGPLOT for line and image 
+graphics. The calls to PGGRAY that existed in previous releases have been
+replaced by calls to PGPIXL (with suitable pre-processing) in order to link
+the programs with shareable libraries. In v3.1 the problem with some
+workstations when foreground and background plot colours turned out to be the
+same has been eliminated.
+
+\subsection{Other changes}
+
+In this release of NDPROGS we no longer use {\tt .DEF} files to
+construct ``simple'' output structures. The use of the routine
+DSA\_SIMPLE\_OUTPUT greatly simplifies the task of building new files of any 
+type or dimension, containing quality or error arrays as well. Wherever 
+possible, it is recommended that programmers follow this guideline. See the 
+sources for DUMMY or MOMENTS for examples.
+
+\end{document}

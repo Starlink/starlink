@@ -1,0 +1,749 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {88.4}
+\newcommand{\stardocauthors}   {P C T Rees \\
+                                D L Terrett}
+\newcommand{\stardocdate}      {26 May 1992}
+\newcommand{\stardoctitle}     {NCAR --- Graphics Utilities}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+\begin {picture}(160,160)
+\put(0,160){\special{include sun88.ps}}
+\end {picture}
+
+\newpage
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+  \setlength{\parskip}{0mm}
+  \tableofcontents
+  \setlength{\parskip}{\medskipamount}
+  \markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\newpage
+
+\section{Introduction}
+
+The National Center for Atmospheric Research in Boulder, Colorado has, for
+many years, distributed a extensive suite of high level graphics
+utilities.
+When NCAR converted these utilities to run over the ISO standard GKS, Starlink
+was used as a test site.
+Starlink was subsequently given permission to release the NCAR utilities as
+part of the Starlink Software Collection.
+The NCAR utilities offer an alternative high level graphics package to PGPLOT 
+(SUN/15) for use within Starlink applications.
+The NCAR package is arguably more powerful than PGPLOT in functionality and 
+flexibility, but it does require a little more time to master.
+Starlink provides a set of extensions to the NCAR graphics utilities,
+SNX (SUN/90), to make the use of NCAR more accessible to the beginner.
+For lower level work, SGS (SUN/85) or GKS (SUN/83) should be used.
+
+The utilities provided by NCAR are:
+
+\begin{quote}
+\begin{description}
+\item [AUTOGRAPH] ---
+ Draws and annotates curves or families of curves.
+\item [CONRAN] --- 
+ Contours irregularly spaced data labelling the contour lines.
+\item [CONRAQ] --- 
+ Like CONRAN, but faster because it has no labelling capability.
+\item [CONRAS] --- 
+ Like CONRAN, but slower because lines are smoothed and crowded lines are
+ removed.
+\item [CONREC] --- 
+ Contours two dimensional arrays, labelling the contour lines.
+\item [CONRECQCK] --- 
+ Like CONREC, but faster because it has no labelling capability.
+\item [CONRECSUPR] --- 
+ Like CONREC, but slower because lines are smoothed and crowded lines are
+ removed.
+\item [DASHCHAR] --- 
+ Software dashed line package with labelling capability.
+\item [DASHLINE] --- 
+ Like DASHCHAR, but faster because it has no labelling capability.
+\item [DASHSMTH] --- 
+ Like DASHCHAR, but slower because lines are smoothed.
+\item [DASHSUPR] --- 
+ Like DASHCHAR, but slower because lines are smoothed and crowded lines are
+ removed.
+\item [EZMAP] --- 
+ Plots continental and/or national and US state boundaries in one of nine map
+ projections.
+\item [GRIDAL] --- 
+ Package for drawing graph paper, axis, {\em etc.}
+\item [HAFTON] --- 
+ Draws halftone (greyscale) picture from a two dimensional array.
+ ({\em N.B.}\ The GKS cell array function GCA should be used on devices with a
+ true greyscale capability.)
+\item [HSTGRM] --- 
+ Plots histograms.
+\item [ISOSRF] --- 
+ Plots iso-values surfaces (with hidden lines removed) from a three
+ dimensional array.
+\item [ISOSRFHR] --- 
+ Plots iso-values surfaces (with hidden lines removed) from a high resolution
+ three dimensional array.
+\item [PWRITX] --- 
+ Plots high quality software characters.                      
+\item [PWRITY] --- 
+ Plots simple software characters.
+\item [PWRZI] --- 
+ Draws characters in three-space, for use with the ISOSRF utility.
+\item [PWRZS] --- 
+ Draws characters in three-space, for use with the SRFACE utility.
+\item [PWRZT] --- 
+ Draws characters in three-space, for use with the THREED utility.
+\item [SRFACE] --- 
+ Plots a three dimensional display of a surface (with hidden lines removed)
+ from a two dimensional array.
+\item [STRMLN] --- 
+ Plots a representation of a vector flow of any field for which planar vector
+ components are given on a regular rectangular lattice.
+ \footnote{Note: because of portability problems this utility is not available
+ on UNIX.}
+\item [THREED] --- 
+ Provides a three space line drawing capability.
+\item [VELVCT] --- 
+ Draws a two dimensional velocity field by drawing arrows from the data
+ locations.
+\end{description}
+\end{quote}
+
+The NCAR graphics utilities are released exactly as supplied by NCAR except
+that the default behaviour of AUTOGRAPH and HSTGRM has been changed to not
+clear the screen after each plot --- this is more appropriate for an
+interactive environment. 
+
+Because of a name conflict with a Fortran run-time library  routine on UNIX,
+the NCAR routine FLUSH has been removed from the UNIX  release of the NCAR
+library.
+In order to get the same behaviour as a call to FLUSH when using NCAR, 
+the call 
+
+\begin{verbatim}
+       CALL PLOTIT( 0, 0, 2 )
+\end{verbatim}
+
+may be used (see the SPPS description in the NCAR manual).
+
+
+\section{Documentation}
+
+A manual containing extensive descriptions of all the NCAR routines
+is available as a Starlink Miscelaneous User Document (MUD) and can be 
+obtained from your Starlink site manager. 
+
+
+\section{Using the Utilities}
+
+Before calling any of the utilities, GKS must be open and at least one
+workstation open and active. 
+This can be done with the following sequence of GKS calls:
+
+\begin{verbatim}
+      CALL GOPKS( LUERR )
+      CALL GOPWK( IWKID, ICONID, IWTYPE )
+      CALL GACWK( IWKID )
+\end{verbatim}
+
+where LUERR is a Fortran logical unit to which messages resulting from
+GKS internal errors may be written (unit 6 is recommended on all operating
+systems used by Starlink), IWKID is a workstation identifier (any integer you
+care to choose) and IWTYPE and ICONID are the workstation type and connection
+identifier respectively.
+
+At the time of writing, the version of RAL GKS available on VAX/VMS
+is 7.2, whereas the version of RAL GKS available on UNIX is the ISO standard
+version 7.4. 
+There are some minor differences between these two versions of GKS, mostly 
+in the provision of additional arguments for certain routines.
+As a result, the calling sequence of the routine GOPKS on UNIX has an extra
+argument (the value of this argument is not used by RAL GKS
+and it is recommended to be set to -1): {\em e.g.} 
+
+\begin{verbatim}
+      CALL GOPKS( LUERR, -1 )
+\end{verbatim}
+
+A more friendly user interface can be provided if, instead of asking the
+user for a GKS workstation type and connection identifier, a GNS workstation
+name is used ({\em i.e.} as used by SGS).
+A GNS name can be translated to its GKS equivalent by the GNS (SUN/57) call
+
+\begin{verbatim}
+      CALL GNS_TNG( NAME, IWKTYP, ICONID, STATUS )
+\end{verbatim}
+
+where STATUS is the inherited status (returned SAI\_\_OK if the translation is 
+successful). 
+More information on workstation names can be found in SUN/57.
+
+If you wish to do any plotting with SGS routines, SGS\_OPEN must be used to
+open GKS and the workstation.
+SGS makes the entire display surface of a workstation available for plotting,
+which in general means that part of the normalized device co-ordinate unit
+square will not be visible.
+Since the default behaviour of the NCAR utilities is to use the whole of the
+NDC unit square, using them becomes a little more complicated.
+This is discussed further in the section on co-ordinate systems
+({\em i.e.} \S\ref{co-ord_sect}).
+
+When plotting is complete, GKS must be closed down with either:
+
+\begin{verbatim}
+      CALL GDAWK( IWKID )
+      CALL GCLWK( IWKID )
+      CALL GCLKS
+\end{verbatim}
+
+or
+
+\begin{verbatim}
+      CALL SGS_CLOSE
+\end{verbatim}
+
+as appropriate.
+
+
+\section{Co-ordinate Systems} \label{co-ord_sect}
+
+When two graphics packages are used from the same program, one package may
+interfere with the correct operation of the other. 
+When mixing the NCAR
+utilities and SGS, both packages manipulate the GKS transformations and
+so precautions must be taken to avoid interference.
+
+The NCAR documentation refers to ``fractional co-ordinates'' which in
+GKS terms are normalized device co-ordinates (NDC). 
+To plot in NCAR fractional co-ordinates with GKS calls, all that is 
+necessary is to select the GKS normalization transformation 0 using the 
+routine GSELNT. 
+To do locator or stroke input in fractional co-ordinates, the GKS normalization 
+transformation 0 must be made the highest priority using the routine 
+GSVPIP.
+
+With the exception of the utilities that plot three-dimensional objects, a 
+two-dimensional ``user co-ordinate'' system (which may be logarithmic in one or
+both dimensions) is defined. 
+A set of functions is provided by NCAR to convert points between user
+co-ordinates and fractional co-ordinates.
+These functions are:
+
+\begin{quote}
+\begin{description}
+\item [CFUX( X )] ---
+ Returns the X user co-ordinate corresponding to the fractional co-ordinate X.
+\item [CFUY( Y )] ---
+ Returns the Y user co-ordinate corresponding to the fractional co-ordinate Y.
+\item [CUFX( X )] ---
+ Returns the X fractional co-ordinate corresponding to the user co-ordinate X.
+\item [CUFY( Y )] ---
+ Returns the Y fractional co-ordinate corresponding to the user co-ordinate Y.
+\end{description}
+\end{quote}
+
+The use of these functions is illustrated in the example program in Appendix 
+\ref{exam_sect}.
+These functions are only valid while the GKS transformations set up by the NCAR
+utilities are still current.
+When mixing NCAR calls with SGS or GKS calls it may be necessary to save the
+normalization transformation immediately after the NCAR call (using the GKS
+routine GQNT) and restore it before using NCAR again (using the GKS routines 
+GSWN and GSVP).
+Note that calling any SGS zone selection routine will always correctly restore
+the state of SGS.
+
+If you use SGS\_OPEN to open the GKS workstation, the entire NDC unit square
+will not usually be mapped onto the display surface. 
+This is an inescapable consequence of making the whole display surface
+available for plotting and means that the area of NDC (or fractional
+co-ordinates) used by the utilities must be changed from the default.
+The method described here demonstrates how to make the utilities plot in the
+current zone. 
+When the current zone is the base zone, this is equivalent to plotting on the
+whole workstation.
+
+The first step is to inquire the NDC limits of the current zone (SGS always
+uses normalization transformation number 1):
+
+\begin{verbatim}
+      REAL VIEWP( 4 )
+      REAL WIND( 4 )
+
+      CALL GQNT( 1, IERR, WIND, VIEWP )
+\end{verbatim}
+
+The zone limits in NDC are now stored in the array VIEWP. 
+The next step depends on the utility being used (in future releases a more
+uniform mechanism may be provided):
+
+\begin{quote}
+\begin{description}
+\item [AUTOGRAPH] ---
+\begin{verbatim}
+      CALL AGSETP( 'GRAPH.', VIEWP, 4 )
+\end{verbatim}
+
+\item [CONRAN,CONRAS,CONRAQ] ---
+\begin{verbatim}
+      CALL CONOP1( 'SCA=PRI' )
+\end{verbatim}
+
+\item [EZMAP] ---
+\begin{verbatim}
+      CALL MAPPOS( VIEWP( 1 ), VIEWP( 2 ), VIEWP( 3 ), VIEWP( 4 ) )
+\end{verbatim}
+
+\item [HSTGRM] ---
+\begin{verbatim}
+      CALL HSTOPR( 'WIN', VIEWP, 4 )
+\end{verbatim}
+
+\item [THREED] ---
+\begin{verbatim}
+      CALL SET3( VIEWP( 1 ), VIEWP( 2 ), VIEWP( 3 ), VIEWP( 4 ), ...
+\end{verbatim}
+\end{description}
+\end{quote}
+
+The plotting area used by HAFTON, STRMLN and the CONREC family is controlled
+by variables in common blocks (see the individual routine documentation for
+details).
+ISOSRF, ISOSRFHR, SRFACE and VELVCT always use the entire unit
+square.
+
+
+\section{Linking}
+
+All the routines in the NCAR library have standard Fortran six character
+names, so you must beware of your own routines having the same names as these
+library routines.
+If this happens, the linker will not report any error and
+the subsequent aberrant behaviour of your program will not point
+unambiguously to the source of the problem.
+The names of all the routines
+in the library are listed in Appendix \ref{list_sect}.
+
+
+\subsection{Use with the VAX/VMS operating system}
+
+Non-ADAM programs may be linked with the NCAR utilities by
+
+\begin{quote}
+\begin{verbatim}
+$ LINK program, NCAR_DIR:NCAR_LINK/OPT, STAR_LINK/OPT
+\end{verbatim}
+\end{quote}
+
+This command line will also link with SGS, if it is being used.
+
+By default, the DASHCHAR dashed line drawing package is used. 
+If one of the other line drawing packages (DASHLINE, DASHSMTH or DASHSUPR) 
+is required, it must be included in the link command explicitly: {\em e.g.}
+
+\begin{quote}
+\begin{verbatim}
+$ LINK program, NCAR_DIR:DASHSMTH, NCAR_DIR:NCAR_LINK/OPT, STAR_LINK/OPT
+\end{verbatim}
+\end{quote}
+
+will use the DASHSMTH package.
+Similarly, the default version of the CONREC family of contour routines is
+CONREC which can be replaced by CONRECQCK or CONRECSUPR in the same way.
+
+Compiling and linking ADAM applications is discussed in Appendix
+\ref{adam_link}.
+
+
+\subsection{Use with the UNIX operating system}
+
+\begin{sloppypar}
+Assuming all Starlink directories have been added to the environment variables
+{\bf PATH} and {\bf LD\_LIBRARY\_PATH} (see SUN/118), then to link a non-ADAM
+program with NCAR the command line would be
+\end{sloppypar}
+
+\begin {quote}
+\begin {small}
+\begin{verbatim}
+% f77 program.o -L/star/lib `ncar_link` -o program.out
+\end{verbatim}
+\end {small}
+\end {quote}
+
+As described for the VAX/VMS operating system, the DASHCHAR dashed line drawing
+package is used by default.
+If one of the other line drawing packages (DASHLINE, DASHSMTH or DASHSUPR which
+all reside in the directory {\bf /star/lib}) 
+is required, it must be included in the link command explicitly: {\em e.g.}
+
+\begin{quote}
+\begin{verbatim}
+% f77 program.o /star/lib/dashsmth.o -L/star/lib `ncar_link` \
+       -o program.out
+\end{verbatim}
+\end{quote}
+
+will use the DASHSMTH package.
+Similarly, the default version of the CONREC family of contour routines is
+CONREC which can be replaced by CONRECQCK or CONRECSUPR in the same way.
+
+Compiling and linking ADAM applications is discussed in Appendix
+\ref{adam_link}.
+
+
+\section{Demonstration Programs}
+
+A demonstration program exists for each of the NCAR utilities.
+On VAX/VMS these reside in the text library 
+STARDISK:[STARLINK.LIB.NCAR.TESTS]SOURCE.TLB and have the module names
+
+\begin{quote}
+\begin{tabbing}
+TDASHLINxxxxx\=TDASHLINxxxxx\=TDASHLINxxxxx\=TDASHLINxxxxx\=\kill
+TAUTGRPH\>TCNRCQCK\>TCNRCSMT\>TCNRCSPR\>TCONRAN\\
+TCONRAQ\>TCONRAS\>TCONREC\>TDASHCHR\>TDASHLIN\\
+TDASHSPR\>TDSHSMTH\>TEZMAP\>TGRIDAL\>THAFTON\\
+THSTGRM\>TISOSRF\>TISSRFHR\>TPWRITX\>TPWRITY\\
+TPWRZI\>TPWRZS\>TPWRZT\>TSRFACE\>TSTRMLN\\
+TTHREED\>TVELVCT
+\end{tabbing}
+\end{quote}
+
+Each example program may be extracted from the
+library using the command
+
+\begin{quote}
+\begin{verbatim}
+$ LIBRARY/EXTRACT=module_name/OUTPUT=file_name -
+$_     STARDISK:[STARLINK.LIB.NCAR.TESTS]SOURCE/TEXT
+\end{verbatim}
+\end{quote}
+
+which may then be compiled and linked in the usual way.
+Note that some of the example programs require linking with non-default dashed
+line and contour drawing routines in order to link without error --- the NCAR 
+manual gives full details of these dependencies.
+
+\begin{sloppypar}
+On UNIX the example programs reside in the directory {\bf
+/star/\-starlink/\-lib/\-ncar/\-examples}.
+The example module names on UNIX are 
+\end{sloppypar}
+
+\begin{quote}
+\begin{tabbing}
+tdashlinXXXXX\=tdashlinXXXXX\=tdashlinXXXXX\=tdashlinXXXXX\=\kill
+exampl\>tautog\>tcnqck\>tcnsmt\>tcnsup\\
+tconan\>tconaq\>tconas\>tconre\>tdashc\\
+tdashl\>tdashp\>tdashs\>tezmap\>tgrida\\
+thafto\>thstgr\>tisohr\>tisosr\>tpwrtx\\
+tpwry\>tpwrzi\>tpwrzs\>tpwrzt\>tsrfac\\
+tthree\>tvelvc
+\end{tabbing}
+\end{quote}
+
+This directory includes a makefile which can build each or all of the 
+example programs, {\em e.g.}
+
+\begin{quote}
+\begin{verbatim}
+% make -f /star/starlink/lib/ncar/examples/makefile exampl
+\end{verbatim}
+\end{quote}
+
+
+\section{References}
+
+SUN/15 ~~PGPLOT --- Graphics Subroutine Library.\\
+SUN/57 ~~GNS --- Graphics Workstation Name Service.\\
+SUN/83 ~~GKS --- Graphical Kernel Syatem (7.2).\\
+SUN/85 ~~SGS --- Simple Graphics System.\\
+SUN/90 ~~SNX --- Starlink Extensions to the NCAR Graphics Utilities.\\
+SUN/118 ~~Starlink Software on UNIX.\\
+SUN/144 ~~ADAM --- UNIX Version.\\
+
+
+\appendix
+\newpage
+
+
+\section{Example Program} \label{exam_sect}
+
+\small
+\begin{verbatim}
+      PROGRAM EXAMPL
+*+
+*   Simple program to illustrate the use of AUTOGRAPH with SGS:
+*      a set of X,Y points is plotted with AUTOGRAPH and then the mean 
+*      Y value marked with a horizontal line drawn with SGS.
+*+
+
+      INTEGER N
+      PARAMETER( N = 10 )
+
+      CHARACTER * 20 WS
+      INTEGER I, IBASE, ISTAT
+      REAL X( N ), Y( N ), WIND( 4 ), VIEWP( 4 )
+      REAL TOTAL, AMEAN, ANDC, XST, XEN
+
+      DATA X / 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 /
+      DATA Y / 1, 2, 4, 3, 5, 6, 4, 5, 6, 10 /
+
+*  Get the workstation name.
+      WRITE ( *, '( 1X, A )', ERR=999 ) 'Workstation'
+      READ ( *, '( A )', ERR=999 ) WS
+
+*  Open SGS.
+      CALL SGS_OPEN( WS, IBASE, ISTAT )
+      IF ( ISTAT .NE. 0 ) GO TO 999
+
+*  Obtain the viewport limits and set the limits for AUTOGRAPH.
+      CALL GQNT( 1, IERR, WIND, VIEWP )
+      CALL AGSETP( 'GRAPH.', VIEWP, 4 )
+
+*  Draw the graph.
+      CALL EZXY( X, Y, N, 'Autograph example_$' )
+
+*  Find the mean Y value.
+      TOTAL = 0.0
+
+      DO 10 I = 1, N
+         TOTAL = TOTAL + Y( I )
+ 10   CONTINUE
+
+      AMEAN = TOTAL / REAL( N )
+
+*  Convert the end points of thhe line to fractional co-ordinates (i.e. NDC)
+*  before restoring SGS state.
+      ANDC = CUFY( AMEAN )
+      XST = CUFX( 1.0 )
+      XEN = CUFX( 10.0 )
+
+*  Re-establish the SGS zone
+      CALL SGS_SELZ( IBASE, ISTAT )
+
+*  Set the world co-ordinates to match the NDC (i.e. fractional co-ordinates).
+      CALL SGS_SW( VIEWP( 1 ), VIEWP( 2 ), VIEWP( 3 ), VIEWP( 4 ), 
+     :             ISTAT )
+
+*  Draw the line and close SGS.
+      CALL SGS_LINE( XST, ANDC, XEN, ANDC )
+      CALL SGS_CLOSE
+
+ 999  CONTINUE
+
+      END
+\end{verbatim}
+\normalsize
+
+
+\newpage
+
+\section{NCAR Subroutine Names} \label{list_sect}
+
+\scriptsize
+\begin{quote}
+\begin{tabbing}
+AGAXISxxxxxx\=AGAXISxxxxxx\=AGAXISxxxxxx\=AGAXISxxxxxx\=AGAXISxxxxxx\=\kill
+AGAXIS\>AGBACK\>AGBNCH\>AGCHAX\>AGCHCU\>AGCHIL\\
+AGCHNL\>AGCTCS\>AGCTKO\>AGCURV\>AGDASH\>AGDFLT\\
+AGDLCH\>AGDSHN\>AGEXAX\>AGEXUS\>AGEZSU\>AGFPBN\\
+AGFTOL\>AGGETC\>AGGETF\>AGGETI\>AGGETP\>AGGTCH\\
+AGINIT\>AGKURV\>AGLBLS\>AGMAXI\>AGMINI\>AGNUMB\\
+AGPPID\>AGPWRT\>AGQURV\>AGRPCH\>AGRSTR\>AGSAVE\\
+AGSCAN\>AGSETC\>AGSETF\>AGSETI\>AGSETP\>AGSRCH\\
+AGSTCH\>AGSTUP\>AGUTOL\>ANOTAT\>BOUND\>CALCNT\\
+CCHECK\>CFUX\>CFUY\>CFVLD\>CHKCYC\>CHSTR\\
+CLGEN\>CLSET\>CLSGKS\>CMFX\>CMFY\>CMUX\\
+CMUY\>CONBD\>CONBDN\>CONCAL\>CONCLD\>CONCLS\\
+CONCOM\>CONDET\>CONDRW\>CONDSD\>CONECD\>CONGEN\\
+CONINT\>CONLCM\>CONLIN\>CONLOC\>CONLOD\>CONOP1\\
+CONOP2\>CONOP3\>CONOP4\>CONOT2\>CONOUT\>CONPDV\\
+CONPMM\>CONPMS\>CONRAN\>CONRAQ\>CONRAS\>CONREC\\
+CONREO\>CONSLD\>CONSSD\>CONSTP\>CONTLK\>CONTNG\\
+CONTOR\>CONXCH\>CPFX\>CPFY\>CPUX\>CPUY\\
+CTCELL\>CUFX\>CUFY\>CURVE\>CURVE3\>CURVED\\
+DANDR\>DASHBD\>DASHDB\>DASHDC\>DCHECK\>DISPLA\\
+DRAWI\>DRAWPV\>DRAWS\>DRAWT\>DRCNTR\>DRLINE\\
+DRWSTR\>DRWVEC\>E9RIN\>ENCD\>ENTSR\>EPRIN\\
+ERROF\>EXPAND\>EZCNTR\>EZHFTN\>EZISOS\>EZMXY\\
+EZMY\>EZSRFC\>EZSTRM\>EZVEC\>EZXY\>EZY\\
+FDUM\>FENCE3\>FILLIN\>FL2INT\>FLUSH\>FRAME\\
+FRST3\>FRSTC\>FRSTD\>FRSTPT\>FRSTS\>GBYTES\\
+GETHOL\>GETSET\>GETSI\>GETUSV\>GNEWPT\>GRAY
+\end{tabbing}
+
+\vspace {-6mm}
+
+\begin{tabbing}
+AGAXISxxxxxx\=AGAXISxxxxxx\=AGAXISxxxxxx\=AGAXISxxxxxx\=AGAXISxxxxxx\=\kill
+GRID\>GRIDAL\>GRIDL\>GRIDT\>GTDGTS\>GTNUM\\
+GTNUMB\>GTSIGN\>HAFTON\>HALFAX\>HFINIT\>HST1\\
+HSTBKD\>HSTEXP\>HSTGRM\>HSTLST\>HSTMED\>HSTOPC\\
+HSTOPL\>HSTOPR\>HSTSTR\>HTABLE\>I1MACH\>I8SAV\\
+IDICTL\>IDIOT\>INIT3D\>INITZI\>INITZS\>INITZT\\
+INTZI\>INTZS\>INTZT\>ISHIFT\>ISOSRB\>ISOSRF\\
+KFMX\>KFMY\>KFPX\>KFPY\>KMPX\>KMPY\\
+KPMX\>KPMY\>KUMX\>KUMY\>KUPX\>KUPY\\
+KURV1S\>KURV2S\>LABMOD\>LASTD\>LINE\>LINE3\\
+LINE3W\>LINED\>MAPBD\>MAPCEM\>MAPCHI\>MAPDRW\\
+MAPEOS\>MAPFST\>MAPGRD\>MAPGTC\>MAPGTI\>MAPGTL\\
+MAPGTR\>MAPINT\>MAPIO\>MAPIQ\>MAPIT\>MAPLBL\\
+MAPLMB\>MAPLOT\>MAPPOS\>MAPROJ\>MAPRS\>MAPRST\\
+MAPSAV\>MAPSET\>MAPSTC\>MAPSTI\>MAPSTL\>MAPSTR\\
+MAPTRE\>MAPTRN\>MAPTRP\>MAPUSR\>MAPVEC\>MAPVP\\
+MINMAX\>MKMSK\>MMASK\>MXMY\>NERRO\>OPNGKS\\
+PERIM\>PERIM3\>PERIML\>PLOTIT\>POINT\>POINT3\\
+POINTS\>PSYM3\>PWRIT\>PWRITX\>PWRITY\>PWRX\\
+PWRXBD\>PWRY\>PWRYBD\>PWRYGT\>PWRYSO\>PWRZ\\
+PWRZGI\>PWRZGS\>PWRZGT\>PWRZI\>PWRZOI\>PWRZOS\\
+PWRZOT\>PWRZS\>PWRZT\>Q8QST4\>R1MACH\>REORD\\
+RESET\>RETSR\>SBYTES\>SET\>SET3\>SET3D\\
+SETER\>SETI\>SETR\>SETUSV\>SRFABD\>SRFACE\\
+SRFGK\>STCNTR\>STLINE\>STRMLN\>SUPCON\>SUPMAP\\
+THREBD\>TICK3\>TICK4\>TICK43\>TICKS\>TR32\\
+TRN32I\>TRN32S\>TRN32T\>UERRBD\>UTILBD\>VECT3\\
+VECTD\>VECTOR\>VELDAT\>VELVCT\>VELVEC\>WTSTR\\
+XTCH\>ZEROSC\>ZLSET
+\end{tabbing}
+\end{quote}
+\normalsize
+
+
+\newpage
+
+\section{Using NCAR within ADAM Applications} \label{adam_link}
+
+\subsection{Use with the VAX/VMS operating system}
+
+When developing ADAM applications, all logical names and symbols used 
+during compiling and linking are defined by executing the procedures
+
+\begin{quote}
+\begin{verbatim}
+$ ADAMSTART
+$ ADAM_DEV
+\end{verbatim}
+\end{quote}
+
+The application may then be compiled using the FORTRAN command and linked using
+the ALINK and MLINK procedures, {\em e.g.}
+
+\begin{quote}
+\begin{verbatim}
+$ ALINK application,NCAR_DIR:NCAR_LINK_ADAM/OPT
+\end{verbatim}
+\end{quote}
+
+
+\subsection{Use with the UNIX operating system}
+
+\begin{sloppypar}
+Assuming all Starlink directories have been added to the environment variables
+{\bf PATH} and {\bf LD\_LIBRARY\_PATH} (see SUN/118), then to link an ADAM
+application with NCAR the command line would be
+\end{sloppypar}
+
+\begin{quote}
+\begin{verbatim}
+% alink application.o `ncar_link_adam`
+\end{verbatim}
+\end{quote}
+
+SUN/144 gives further details of compiling and linking ADAM applications 
+with the UNIX operating system.
+
+
+\section {Portability}
+
+\subsection {Overview}
+
+This section discusses the portability of NCAR, including the coding 
+standard adopted and a list of those Starlink packages which 
+need to be ported to the target machine before a port of NCAR can proceed.
+
+
+\subsection {Coding and porting prerequisites}
+
+The standard of Fortran used for the coding of NCAR is totally
+compliant with ANSI Fortran 77.
+A small number of operating system-specific routines have also been written
+in ANSI C.
+To use NCAR on any computer system the operating system specific routines
+must be modified to reflect the integer and floating point arithmetic used.
+
+NCAR requires either GKS Vn. 7.2 or GKS Vn. 7.4 to be available.
+
+
+\subsection {Operating system specific routines}
+
+Several NCAR subroutines make use of operating system features which are
+specific to the machine upon which they are implemented.
+The names of these routines and their purpose are as follows:
+
+\begin {quote}
+\begin {description}
+\item [I1MACH] ( I ) 
+\subitem Define INTEGER machine dependent constants.
+\indexspace
+\item [R1MACH] ( I ) 
+\subitem Define REAL machine dependent constants.
+\indexspace
+\item [NCAR.H] \hfill
+\subitem C language versions of the following routines are also available
+and may be used by a particular implementation: IAND, IOR, ISHIFT.
+\footnote{The routines IAND and IOR
+perform logical AND and OR operations between two given INTEGERS. 
+They are  often provided by implementations of Fortran 77 as intrinsic
+functions, but are not featured in the ANSI Standard.
+C language versions are provided for use with Fortran implementations without
+IAND and IOR intrinsic functions.}
+These routines assume a Fortran/C language interface which is defined
+within the C header file NCAR.H.
+NCAR.H will require modification for use on new operating systems.
+\end {description}
+\end {quote}
+
+\end{document}

@@ -1,0 +1,151 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {38.6}
+\newcommand{\stardocauthors}   {P M Allan \& M J Bly}
+\newcommand{\stardocdate}      {20 April 1993}
+\newcommand{\stardoctitle}     {DOCFIND --- Starlink document search}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+%  \setlength{\parskip}{0mm}
+%  \tableofcontents
+%  \setlength{\parskip}{\medskipamount}
+%  \markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\section{Introduction}
+
+One of the recurrent problems with Starlink is that as the volume of software
+grows, so does the number of documents describing it. These include project
+wide documents and documents which are local to other sites. It is often
+extremely difficult to find out which document should be consulted about a
+particular topic.
+
+Starlink maintains a list of currently valid project wide documents called
+`STARLINK DOCUMENTATION' in the file DOCSDIR:DOCS.LIS. This may be printed if
+required. It is maintained at RAL by the Starlink Software Librarian and
+updated at other sites by the Starlink software update process. The current
+date is stated at the beginning of the file so you can see if your site is up
+to date by comparing your site's file with the RAL file.
+
+Program FIND has been developed to help users search this mass of
+documentation. An alternative approach is to consult file DOCSDIR:SUBJECT.LIS.
+This is a Key-Word index to Starlink documentation which does not rely only on
+document titles. Once again, it is maintained up to date at RAL but other sites
+may lag behind. The specified current date will tell all. DOCSDIR:ANALYSIS.LIS
+is also centrally maintained. This is a list of the Starlink documents listed
+by which Software item is the main subject of each document.
+
+\section{Use}
+
+DOCFIND is a procedure that searches the file DOCSDIR:SUBJECT.LIS for a given
+key word and then runs the program FIND to search the file DOCSDIR:DOCS.LIS for
+the same key word in the titles of the Starlink documents. This technique is
+used since not all key words will appear in the titles of the documents.
+
+To invoke DOCFIND simply type:
+\begin{verbatim}
+      $ DOCFIND [word]
+\end{verbatim}
+and answer the prompts. The parameter is optional and will be prompted for if
+not present on the command line. Its value is the character string which is to
+be sought within the subjects file and all the titles of documents in the
+Index. If a null value is entered ({\it i.e.} \verb+<CR>+ only) then the
+subjects file is not searched, but ALL the documents in the index are 
+displayed. In either case, output to the terminal is held up at the end of 
+each page, until \verb+<CR>+ is hit.
+
+Having listed the relevant documents, it then prompts for the name of a
+particular document:
+
+\begin{itemize}
+\item First it prompts for the document's number. If a null response is given,
+the program stops. The generation number may be entered, but will be ignored;
+the latest version will always be found.
+\item If a valid number is found, it asks for the document type (SUN,LGP etc).
+\item If the first character is an L, denoting a `local' document, it asks for
+the relevant site name. The default is RAL, but your site manager may have
+changed this to the abbreviation for your local site.
+\end{itemize}
+
+Assuming that a valid document number has been entered and a copy of it is
+available on-line at this site, that document is displayed at the terminal.
+After each page, the user may carry on to the next page by hitting \verb+<CR>+,
+or stop by typing YES (or Y or T or TRUE). Finally, the user is offered the
+opportunity of having a printed copy of the selected document.
+
+\subsection{Use with \LaTeX files}
+
+Originally, Starlink documentation was written using either the Digital RUNOFF
+program, or the GEROFF program from RAL. Both of the programs are essentially
+just text layout programs and produce a file that can be listed on an
+alphanumeric terminal. More recently, however, most of the documentation has
+been converted to \LaTeX format. This produces a vastly superior hard copy
+product, but has the disadvantage that it is not easy to display on a
+terminal. If a particular document is no longer available in RUNOFF or GEROFF
+format, the DOCFIND program will not be able to find the formatted file to list.
+Instead it will list the \LaTeX source file. This has many control sequences
+that make the listing a bit indigestible, but if you can write documents using
+\LaTeX you should be able to read most of it. It is not intended that you should
+actually read long documents in this way; you should ask your site manager for
+a hard copy version of the document. Where the \LaTeX listing is useful is as a
+memory jogger. Perhaps you have forgotten a particular logical name and you
+know it is in the SUN. The \LaTeX source should be sufficiently legible for you
+to be able to find it.
+
+\section{Notes}
+
+Ideally, each site should obtain copies of all documents from all sites as soon
+as they appear in the standard directories at any site. However, if for any
+reason the one you require is not available, please consult your site manager.
+
+Remember that because a document is not in the Index does not mean that it does
+not exist, nor that there is no copy at your node.
+
+The site manager may well have spare copies of the document sought, so you
+should consult him before asking for a printed copy of what might be a very
+long document. It is even possible that you have filed a copy of it yourself!
+The number of pages in a document is specified in the index after the document
+title. Papers which include diagrams (not stored on-line) are indicated in the
+index by the key `D' in front of the title.
+
+\end{document}

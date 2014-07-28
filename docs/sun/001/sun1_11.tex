@@ -1,0 +1,3661 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+\makeindex
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {1.11}
+\newcommand{\stardocauthors}   {M D Lawden}
+\newcommand{\stardocdate}      {25 September 1991}
+\newcommand{\stardoctitle}     {The Starlink Software Collection}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\LARGE\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+\begin{abstract}
+The Starlink Software Collection is a set of software which is managed and
+distributed by the Starlink Project.
+This paper describes the functions of the individual items in the Collection,
+and provides an overview of the software so that readers can identify the items
+that they need.
+
+The paper begins by considering Software Environments.
+These provide facilities which enable you to use the computer more easily.
+Users are provided with a language with which to control programs and specify
+their parameters.
+Programmers are provided with subroutines to access data and parameter values,
+handle errors, control graphics, and so on.
+
+There are four main sets of applications.
+ADAM Applications run under the ADAM environment and can therefore be used
+together and have compatible data formats.
+Stand-alone Applications are independent applications that run within their
+own environment.
+In general they cannot be used together and may have incompatible data formats.
+INTERIM Applications run under the original Starlink environment which has been
+superseded by ADAM.
+Foreign Applications have been acquired from non-Starlink organisations and are
+distributed and supported from the Starlink sites where they are used.
+They are not distributed or supported from the central node at RAL.
+
+In addition to the major applications, there are programs called Utilities
+which do specific tasks that facilitate the use of Starlink computers.
+Astronomical Utilities perform tasks, such as data copying, format conversion,
+or preparing for an observation, which are closely associated with astronomy.
+General Utilities assist you in using a computer, but have no particular
+connection with astronomy.
+They deal with such things as graphics and programming support.
+
+Finally, there are Subroutine Libraries.
+These are for programmers writing astronomical software.
+They provide facilities such as data management and graphics.
+
+Each item is described in sufficient detail for the reader to decide whether or
+not it is worth investigating further.
+Where several programs are described together, the most important or most widely
+used are described first.
+Most items have a Starlink User Note associated with them that either describes
+how to use the software or points to a user manual for that item.
+
+The level of support provided for different items varies widely.
+Some items are essentially unsupported and you would be unwise to base any
+long term work on them.
+The support level is indicated for each item.
+\end{abstract}
+
+\newpage
+
+\setlength{\parskip}{0mm}
+\tableofcontents
+\setlength{\parskip}{\medskipamount}
+\markright{\stardocname}
+
+\newpage
+
+\section {Introduction}
+
+The {\em Starlink Software Collection} contains a wide variety of items ranging
+from single programs to elaborate and powerful self-contained data reduction
+and analysis systems.
+The items have been collected from many sources and differ enormously
+in their standard of programming and documentation.
+Some items may not be installed at every Starlink site; these make up the
+{\em Option Set}.
+This note gives a broad overview of what software is available, what it does,
+and where it is documented, in order to narrow the field of search for the
+answer to your particular needs.
+If an item you want to use is not installed at your site, ask your Site
+Manager to install it for you.
+
+Nearly every item of Starlink Software is described in a Starlink User Note
+(SUN).
+The level of description ranges from a brief outline, with references to other
+documents, to a complete manual.
+Most SUNs are produced using the \LaTeX\ document preparation system.
+You should get paper copies of them from your Site Manager rather
+than trying to study them on-line or printing your own versions.
+The text of all SUNs is stored in a directory with the logical name DOCSDIR
+and have file names of the form SUNnn, where `nn' is the number of the note.
+Many items have supplementary paper documentation which is indexed in file
+DOCSDIR:MUD.LIS.
+A complete list of all Starlink Notes, including those issued since this note
+was last revised, can be found in file DOCSDIR:DOCS.LIS.
+Also, file DOCSDIR:ANALYSIS.LIS shows in a compact form the notes associated
+with every item, and file DOCSDIR:NEWS.LIS shows the most recent software and
+document releases.
+
+The level of support available varies greatly from item to item.
+Some items, such as ADAM, have high levels of support from within the Project;
+others, such as CHART, have little or no support.
+If you are thinking of using a particular item, please check the current
+support level in file ADMINDIR:SUPPORT.LIS.
+The levels of support at the time of writing are shown in Appendix A, and are
+also shown at the right hand side of the list at the start of every
+subsection, for example by the mark $\surd\surd$ in:
+\begin{description}
+\begin{description}
+\item [MAPLE] --- Mathematical manipulation language (STADAT only) \hfill 
+ $\surd\surd$
+\end{description}
+\end{description}
+You should regard items with a support level indicated by crosses
+(`$\times\times$' or `$\times$') as unreliable (the meanings of the support
+marks are specified in Appendix A).
+You would be unwise to base your work on such items.
+In brief: the more $\surd$'s the better, and avoid items with $\times$'s.
+
+The items are described in groups based on the following classification:
+\begin{itemize}
+\item Software environments.
+\item Applications (ADAM, Stand-alone, INTERIM, Foreign).
+\item Utilities (Astronomical, General).
+\item Subroutine libraries.
+\end{itemize}
+A complete list of items, based on this classification, is given at the end.
+Where several programs are described together in the same section, the most
+important or most widely used are described first.
+
+\newpage
+
+\section {Software Environments}
+
+Many Starlink software items run within some kind of standard framework called
+a `software environment'.
+Several such environments exist; each is an integrated collection of:
+\begin{itemize}
+\item Interfaces (between application programs and, respectively, the user and
+the computer),
+\item Conventions (programming and data storage),
+\item Software tools,
+\end{itemize}
+intended to improve the quality and cost-effectiveness of application programs
+and the productivity of programmers by:
+\begin{itemize}
+\item Providing the {\bf user} with a command language and other facilities
+which will allow him to run application programs, one at a time or as a
+sequence, easily, efficiently, and in a flexible manner matched to his own
+requirements.
+\item Providing the {\bf programmer} with standardised and easy to use
+facilities, covering areas such as the user interface, access to data, graphics,
+error reporting, and so on.
+This saves endless duplication, and means the astronomer gets more application
+software from a given amount of programming effort.
+\item Eliminating dependencies on one specific {\bf computer} type or
+configuration, thereby allowing the application to run on a wide and evolving
+range of computers.
+This is essential to allow astronomers to exploit new generations of
+hardware.
+\end{itemize}
+In practice, a software environment is seen by the programmer mainly as a
+set of subroutine libraries which handle such tasks as obtaining parameters,
+accessing data from mass storage, etc, and is perceived by the user as a
+consistent command language and as a means of storing data in a format which is
+independent of any single application.
+
+Some data reduction systems (AIPS, IRAF, MIDAS, IDL, DIPSO, FIGARO) incorporate
+their own environments.
+Others (ADAM, INTERIM) are general purpose environments.
+
+\rule{\textwidth}{0.5mm}
+\begin{description}
+\begin{description}
+\item [ADAM] --- Standard Starlink software environment \hfill $\surd\surd\surd$
+\item [INTERIM/DSCL/RUNSTAR] --- Interim Starlink software environment \hfill
+ $\times\times$
+\end{description}
+\end{description}
+\rule{\textwidth}{0.5mm}
+
+\begin{description}
+
+\item [ADAM]\index{ADAM} \hfill [SUN/35, 94, 101, 115]; [SG/4]
+
+This is Starlink's preferred software environment.
+It has many aspects which, taken together, provide users with a coordinated
+environment for analysing data and writing programs.
+ADAM software also controls many of the telescopes and instruments at
+observatories.
+
+In the minds of users doing data analysis, ADAM is usually identified with its
+application programs such as KAPPA and ASTERIX.
+However, it is really just the kernel of the system, in other words, the
+subroutine libraries.
+Many of the libraries that are associated with ADAM are also available as
+stand alone libraries, thereby making it easier to take code to non-Starlink
+computers.
+Some of the libraries that are commonly used in ADAM programs are Starlink
+libraries that predate ADAM, while others are commercial packages.
+In fact, it is impossible to have a perfect definition of what is and is not an
+ADAM program.
+The best one seems to be `an ADAM program is one that uses the ADAM parameter
+system to interact with the user'.
+The fact that different groups of users have different ideas of what
+constitutes an ADAM program is not a failing of ADAM; it demonstrates the
+different ways in which it can be used.
+
+As mentioned above, ADAM applications are really distinct from the ADAM kernel.
+However, without application programs, ADAM would only be half a system.
+At present, there are applications that deal with image processing, image
+analysis, spectroscopy, CCD stellar photometry and aperture photometry,
+time series and polarimetry, catalogue access, X-ray data and infrared camera
+data.
+There are also software tools to aid in writing ADAM programs, and data analysis
+tools to browse data files.
+Packages dealing with CCD data reduction and interactive graphics are expected
+to be released shortly, and an IRAS package is under development.
+
+One of ADAM's most important features is that it provides a standard method of
+data storage called NDF (extensible N-dimensional data format).
+NDF files have standard components that all programs recognise, while also
+allowing for any extensions that may become necessary for particular
+applications.
+Use of NDF by ADAM programs means that data files can be exchanged between
+different packages without the need to convert file formats.
+This is very useful as having to change file formats is very annoying and takes
+up extra disk space. NDF is layered on HDS, the hierarchical data system.
+By using HDS (version 4.0 or later), it becomes possible to read and write data
+files on different computer systems (VAX/VMS, Sun Sparcstation or DECstation)
+completely transparently, so no explicit data conversion needs to be done, even
+when moving from one computer to another.
+
+ADAM programs can generally be run either from the command language of the host
+computer (DCL in the case of VMS, one of the shells in the case of Unix) or
+from the ICL\index{ICL} command language.
+ICL is a simple programming language in itself, somewhat along the lines of
+BASIC.
+It can be quite useful for doing simple operations, but is not fast enough for
+any major processing.
+Use of ICL makes it easier to build sequences of operations into ICL procedures.
+It is generally quicker to run ADAM programs from ICL if they are to be run
+several times since the programs only have to be activated once.
+On the other hand, the ability to run ADAM programs from DCL (or the shell on
+Unix systems) is very useful for debugging.
+
+One of the most distinctive features of ADAM programs is the parameter system.
+It provides a method whereby a program can interact with a user or with other
+programs.
+For a single program, a series of write and read statements could sometimes be
+used instead, but for anything more complex, this becomes unacceptable.
+It is particularly difficult to maintain a standard style, and ad hoc fixes to
+problems abound.
+Use of the parameter system provides a consistent user interface, a means of
+storing the value of a parameter between invocations of a program, and the
+facility to pass the values of parameters from one program to another.
+
+From the perspective of a programmer, ADAM provides many subroutine libraries
+that perform common functions.
+They provide such diverse functions as character handling, access to
+hierarchical, relational and simple data, graphics, the parameter system, error
+and message reporting, numerical calculations, etc.
+Some of these libraries are provided purely for use in ADAM programs, whereas
+others, such as the NAG library and graphics libraries, have a much wider use.
+
+Although any subroutine library can be used within an ADAM program, those that
+have been written specifically with this in mind are much easier to use.
+ADAM libraries conform to the Starlink standard on the use of inherited status,
+which greatly reduces the amount of code needed to test for error conditions.
+They also report any error conditions via the error message service.
+This lets the programmer get at the text of any error messages as well as a
+numerical error code, to see if the error can be handled internally or whether
+to send the error report on to the user.
+
+By using the facilites provided in a consistent manner, simple ADAM programs
+can easily be linked together to perform complex operations.
+In particular, programs from packages written to do completely different things
+can process each other's data, thereby avoiding unnecessary duplication of
+software, with the attendant waste of effort, both in writing the program and
+in maintaining it.
+
+Finally it should not be forgotten that ADAM has its origins as a telescope and
+instrument control system.
+The way that ADAM programs are written when used in these circumstances is
+rather different to when they are used for data analysis.
+Use of ADAM for instrument control is not the province of this document.
+However, it is interesting to note that programs written for data acquisition
+tasks are rather like windows programs, which are becoming much more common
+nowadays.
+
+\item [INTERIM/DSCL/RUNSTAR]\index{INTERIM}\index{DSCL}\index{RUNSTAR}
+ \hfill [SUN/4, 74]
+
+INTERIM, with its command languages DSCL and RUNSTAR, comprised the first
+Starlink software environment.
+It creates and accesses data stored in a special format called `Bulk Data
+Frame' (BDF).
+ASPIC was the major collection of applications based on it.
+It is now regarded as obsolete as it has been replaced by ADAM.
+However, it will survive for many years because of the large amount of
+software that was written to use it, though support will be `best efforts'
+only.
+
+\end{description}
+
+\newpage
+
+\section {ADAM Applications}
+
+All these applications run within the ADAM environment.
+They can be used together and use compatible data formats.
+
+\subsection{Image analysis \& photometry}
+
+\rule{\textwidth}{0.5mm}
+\begin{description}
+\begin{description}
+\item [KAPPA] --- Kernel applications \hfill $\surd\surd\surd$
+\item [DAOPHOT] --- Stellar photometry \hfill $\surd\surd$
+\item [PHOTOM] --- Aperture photometry \hfill $\surd\surd$
+\item [PISA] --- Object finding and analysis \hfill $\surd$
+\end{description}
+\end{description}
+\rule{\textwidth}{0.5mm}
+
+\begin{description}
+
+\item [KAPPA]\index{KAPPA} \hfill [SUN/95]
+
+The Kernel Application Package runs under ADAM, using the NDF data format, and
+provides {\em general-purpose applications}.
+It is the backbone of the software reorganisation around the ADAM environment,
+and its applications integrate with other packages such as PHOTOM, PISA, and
+FIGARO.
+It is usable as a monolith from the ADAM command language ICL, or as individual
+applications from DCL.
+
+It handles bad pixels, and processes quality and variance information within
+NDF data files.
+Although oriented to image processing, many applications will work on NDFs of
+arbitrary dimension.
+Its graphics are device independent.
+Currently, KAPPA has about 140 commands and provides the following facilities
+for data processing:
+\begin{itemize}
+\item Generation of NDFs and ASCII tables by up-to-date FITS readers.
+\item Generation of test data, and NDF creation from ASCII files.
+\item Setting NDF components.
+\item Arithmetic, including a powerful application that handles expressions.
+\item Editing pixels and regions, including polygons and circles, and
+ re-flagging bad pixels by value or by median filtering.
+\item Configuration changing: flip, rotate, shift, subset, dimensionality.
+\item Image mosaicing; normalisation of NDF pairs.
+\item Compression and expansion of images.
+\item Filtering: box, Gaussian, and median smoothing; very efficient Fourier
+ transform, maximum-entropy deconvolution.
+\item Surface fitting.
+\item Statistics, including ordered statistics, histogram, pixel-by-pixel
+ statistics over a sequence of images.
+\item Inspection of image values.
+\item Centroiding of features, particularly stars; stellar PSF fitting.
+\item Detail enhancement via histogram equalisation, Laplacian convolution,
+ edge enhancement via a shadow effect, thresholding.
+\end{itemize}
+
+There are also many applications for data visualisation:
+\begin{itemize}
+\item Use of the graphics database, AGI, to pass information about pictures
+ between applications.
+ Facilities for the creation, labelling and selection of pictures, and
+ obtaining world and data co-ordinate information from them.
+\item Image and greyscale plots with a selection of scaling modes and many
+ options such as axes.
+\item Creation, selection, saving and manipulation of colour tables and 
+ palettes (for axes, annotation, coloured markers and borders).
+\item Snapshot of an image display to hardcopy.
+\item Blinking and visibility of image-display planes.
+\item Line graphics: contouring, including overlay; columnar and hidden-line
+ plots of images; histogram; line plots of 1-d arrays, and multiple-line plots
+ of images; slices through an image.
+ There is some control of the appearance of plots.
+\end{itemize}
+
+\item [DAOPHOT]\index{DAOPHOT} \hfill [SUN/42]
+
+A {\em stellar photometry} package written by Peter Stetson at the Dominion
+Astrophysical Observatory, Victoria, B.C., Canada.
+It performs the following tasks:
+\begin{itemize}
+\item Finding objects.
+\item Aperture photometry.
+\item Obtaining the point spread function.
+\item Profile-fitting photometry.
+\end{itemize}
+Profile fitting in crowded regions is performed iteratively, which improves the
+accuracy of the photometry.
+It does not directly use an image display (which aids portability), although
+three additional routines allow results to be displayed on an image device.
+It uses image data in NDF format which is ADAM compatible.
+
+\item [PHOTOM]\index{PHOTOM} \hfill [SUN/45]
+
+Performs aperture photometry.
+It has two basic modes of operation:
+\begin{itemize}
+\item Using an interactive display to specify the positions for the
+ measurements.
+\item Obtaining those positions from a file.
+\end{itemize}
+The aperture is circular or elliptical, and the size and shape can be varied
+interactively on the display, or by entering values from the keyboard or
+parameter system.
+The background sky level can be sampled interactively by manually positioning
+the aperture, or automatically from an annulus surrounding the object.
+
+\item [PISA]\index{PISA} \hfill [SUN/109]
+
+The Position, Intensity and Shape Analysis package locates and parameterises
+objects in an image frame.
+The core of the package is a routine which performs image analysis on a
+2-dimensional data frame.
+It searches for objects having a minimum number of connected pixels above a
+given threshold, and extracts the image parameters (position, intensity, shape)
+for each object.
+The parameters can be determined using thresholding techniques, or an analytical
+stellar profile can be used to fit the objects.
+In crowded regions, deblending of overlapping sources can be performed.
+
+The package derives from the APM IMAGES routine originally written by Mike
+Irwin at the University of Cambridge to analyse output from the Automated
+Photographic Measuring system.
+
+\end{description}
+
+\newpage
+
+\subsection{Spectroscopy}
+
+\rule{\textwidth}{0.5mm}
+\begin{description}
+\begin{description}
+\item [FIGARO] --- General data analysis \hfill
+ $\surd\surd$
+\end{description}
+\end{description}
+\rule{\textwidth}{0.5mm}
+
+\begin{description}
+
+\item [FIGARO]\index{FIGARO} \hfill [SUN/86]
+
+A {\em general data reduction} system written by Keith Shortridge at Caltech
+and the AAO.
+Although many people find it of greatest use in the reduction of
+spectroscopic data, it also has powerful image and data cube manipulation
+facilities and a photometry package.
+In many ways it is a descendant of SPICA, possessing virtually all SPICA's
+reduction facilities, but its different methods of operation and data storage
+offer significant improvements in features and performance.
+Starlink recommends FIGARO as the most complete spectroscopic data reduction
+system in the Collection.
+Examples of its facilities are:
+\begin{itemize}
+\item Analyse absorption lines interactively.
+\item Aperture photometry.
+\item Calibrate B stars.
+\item Calibrate flat fields.
+\item Calibrate using flux calibration standards.
+\item Calibrate wavelengths of spectra.
+\item Correct S-distortion.
+\item Extract spectra from images and images from data cubes, and insert
+ spectra into images and images into data cubes.
+\item Extract spectra from images taken using optical fibres.
+\item Fit Gaussians to lines in a spectrum interactively.
+\item Generate and apply a spectrum of extinction coefficients.
+\item Input, output, and display data.
+\item Look at the contents of data arrays, other than graphically.
+\item Manipulate complex data structures (mainly connected with Fourier
+ transforms).
+\item Manipulate data arrays `by hand'.
+\item Manipulate images and spectra (arithmetic and more complicated).
+\item Process data taken using FIGS (the AAO's Fabry-Perot Infra-Red Grating
+Spectrometer).
+\item Process echelle data --- in particular the UCL echelle in use at the AAO.
+\end{itemize}
+At present, a number of related packages are bundled with FIGARO.
+In future, these may be released as separate items.
+They include:
+\begin{description}
+\item [NDPROGS]\index{NDPROGS} \hfill [SUN/19, 27]
+
+This manipulates and displays images of up to six dimensions.
+Primarily, it is for manipulating TAURUS spectral line data cubes, which are
+3-D images in which two of the dimensions are spatial and the third is spectral.
+However, it contains no instrument-specific features and can therefore be used
+to analyse similar data. 
+
+The term `image' here simply means a regular data array, which might be
+anything from a 1-D spectrum or profile to a 4-D array consisting of several
+long-slit spectra with polarization vectors.
+The upper limit of six dimensions is imposed by the software which interfaces
+with HDS and has no other significance. 
+
+\item [NFIGARO]\index{NFIGARO} \mbox{}
+
+FIGARO is distributed all over the world.
+Arrangements have been made for local modifications and enhancements to be
+installed in a separate directory.
+NFIGARO is the UK national (Starlink) implementation of this arrangement.
+
+\item [TAUCAL]\index{TAUCAL} \mbox{}
+
+This carries out phase calibration of the Taurus instrument on the William
+Herschel Telescope.
+
+The principal advantage of Taurus compared to a slit spectrograph is that
+it is possible to obtain spectra simultaneously at every point covered by the 
+detector by taking a series of images, each with a different value of the
+etalon gap.
+These images are stacked together to form a data cube.
+
+The problem with such a cube is that the transmitted wavelength is not just a
+function of etalon gap, but also of position on the detector.
+Thus, the raw Taurus cube does not have separable spatial and spectral axes,
+as should be the case for a calibrated spectral line cube.
+It is necessary to rebin the cube, applying a shift to each spectrum so
+that all spectra have the same wavelength calibration.
+This shift is referred to as the {\em phase shift}, the magnitude of the phase
+shift as a function of position in the image is referred to as the {\em phase
+map}, and the process of determining the phase map and rebinning the data cube
+is referred to as {\em phase calibration}.
+
+A user manual is available from your Site Manager.
+
+\item [TWODSPEC]\index{TWODSPEC} \hfill [SUN/16]
+
+This reduces and analyses long-slit and optical-fibre array spectra.
+A number of its functions are useful outside the area of spectroscopy.
+The main application areas are:
+\begin{itemize}
+
+\item Line profile analysis --- LONGSLIT analyses calibrated long-slit spectra.
+For example, it can fit Gaussians, either manually or automatically, in batch.
+It can handle data with two spatial dimensions, such as TAURUS data.
+\mbox{FIBDISP} provides further options useful for such data, although it is
+primarily designed for fibre array data.
+An extensive range of options is available, especially for output.
+
+\item Two-dimensional arc calibration.
+
+\item Geometrical distortion correction --- S-distortion and Line curvature.
+
+\item Conversion between FIGARO and IRAF data formats.
+
+\item Display programs.
+\item Removing continua.
+\end{itemize}
+
+\end{description}
+
+\end{description}
+
+\newpage
+
+\subsection{Specific wavelengths}
+
+\rule{\textwidth}{0.5mm}
+\begin{description}
+\begin{description}
+\item [ASTERIX] --- X-ray data analysis \hfill $\surd\surd$
+\end{description}
+\end{description}
+\rule{\textwidth}{0.5mm}
+
+\begin{description}
+
+\item [ASTERIX]\index{ASTERIX} \hfill [SUN/98]
+
+A collection of programs to analyse astronomical data in the X-ray waveband.
+Many of them are general purpose and are capable of analysing any data in the
+correct format.
+It is instrument independent and currently has interfaces to the Exosat and
+Rosat instruments. 
+
+ASTERIX data are stored in HDS files and are therefore compatible with all ADAM
+packages.
+There are basically two different types: binned and event datasets.
+{\em Binned data} (e.g.\ time series, spectra, images) are stored in files whose
+structure is based on the Starlink standard NDF format (SGP/38). 
+Data errors (stored in the form of variances) and quality are catered for.
+{\em Event data} store information about a set of photon `events'.
+Each event will have a set of properties, e.g.\ X position, Y position, time,
+raw pulse height.
+
+The input data is first processed by an instrument interface.
+Event data is then processed and binned, and then the binned data is
+processed.
+Finally, graphical output is generated.
+
+The commands may be classified as follows:
+
+\begin{itemize}
+\item Interface to a particular instrument (EXOSAT, ROSAT, etc).
+\item Event dataset and binned dataset processing.
+\item Data conversion and display.
+\item Mathematical manipulations.
+\item Time series analysis.
+\item Image processing.
+\item Spectral analysis.
+\item Statistical analysis.
+\item Data quality analysis.
+\item HDS editor.
+\item Source searching.
+\item Graphical and textual display.
+\end{itemize}
+
+\end{description}
+
+\newpage
+
+\subsection{Specific instruments}
+
+\rule{\textwidth}{0.5mm}
+\begin{description}
+\begin{description}
+\item [IRCAM] --- UKIRT (Infra-red) \hfill $\times$
+\end{description}
+\end{description}
+\rule{\textwidth}{0.5mm}
+
+\begin{description}
+
+\item [IRCAM]\index{IRCAM} \hfill [SUN/41]
+
+A package to reduce, display, and analyse 2D images from the
+{\em UKIRT infrared camera} (IRCAM).
+Two user interfaces are available: command line and menu.
+The image data reduction facilities available are:
+\begin{itemize}
+\item Mathematical and statistical operations.
+\item Size changing and mosaicing.
+\item Inspection.
+\item Interpolation.
+\item Smoothing.
+\item Feature enhancement.
+\item Bad pixel removal.
+\item Polarimetry.
+\item Median filtering of flat-fields.
+\end{itemize}
+The graphics and image display facilities available are:
+\begin{itemize}
+\item Image display of various types (PLOT, CONTOUR, NSIGMA, RANPLOT).
+\item Display cursor position and value.
+\item Colour control.
+\item Line graphics such as 1D cuts/slices through images and contour maps.
+\item Annotation.
+\end{itemize}
+
+\end{description}
+
+\newpage
+
+\subsection{Polarimetry}
+
+\rule{\textwidth}{0.5mm}
+\begin{description}
+\begin{description}
+\item [TSP] --- Time series and polarimetry analysis \hfill $\surd$
+\end{description}
+\end{description}
+\rule{\textwidth}{0.5mm}
+
+\begin{description}
+
+\item [TSP]\index{TSP} \hfill [SUN/66]
+
+A data reduction package to handle time series and polarimetric data.
+These facilities are missing from most existing data reduction packages which
+are usually oriented towards either spectroscopy or image processing or both.
+Currently TSP can process the following data:
+\begin{itemize}
+\item Spectropolarimetry obtained with the AAO Pockels cell
+ spectropolarimeter in conjunction with either IPCS or CCD detectors.
+\item Time series polarimetry obtained with the Hatfield Polarimeter
+ at either UKIRT or AAT.
+\item Time series polarimetry obtained with the University of Turku
+ UBVRI polarimeter.
+\item Five channel time series photometry obtained with the Hatfield
+ polarimeter at the AAT in its high speed photometry mode.
+\item Time series infrared photometry obtained with the AAO Infrared
+ Photometer Spectrometer (IRPS).
+\item Time series optical photometry obtained using the HSP3 high speed
+photometry package at the AAT.
+\end{itemize}
+
+\end{description}
+
+\newpage
+
+\subsection{Database management}
+
+\rule{\textwidth}{0.5mm}
+\begin{description}
+\begin{description}
+\item [SCAR] --- Catalogue data base system \hfill $\surd$
+\item [CHIAPP] --- Catalogue/table data base system \hfill $\surd\surd$
+\end{description}
+\end{description}
+\rule{\textwidth}{0.5mm}
+
+\begin{description}
+
+\item [SCAR]\index{SCAR} \hfill [SUN/70, 106]
+
+The Starlink Catalogue Access and Reporting system is a relational database
+management system.
+It was designed principally for extracting information from astronomical
+catalogues, but it can be used to process any data stored in relational form.
+A large number of catalogues are available, including the IRAS catalogues.
+For general database requirements, REXEC may be preferable.
+SCAR can perform the following functions:
+\begin{itemize}
+\item Extract data from a catalogue using input criteria.
+\item Manipulate it using various statistical and plotting routines.
+\item Output data from a catalogue.
+\item Put a new catalogue into the database.
+\item Search catalogues and generate reports on what has been found.
+ (You can get information much more quickly from an on-line catalogue than by
+ going to a library and browsing through a book or microfiche.)
+\item Sort, merge, join, and difference catalogues.
+\item Plot sources in a gnomonic (tangent plane) or Aitoff (equal area)
+ projection.
+\item Analyse the fields of a catalogue by scatterplot and histogram.
+\item Calculate new fields.
+\end{itemize}
+A distinctive feature of SCAR, compared to MIDAS, is the use of index files
+which you can create and which contain pointers to rows in one or more
+catalogues.
+This allows a very compact and flexible method of accessing catalogues;
+for example, a very large catalogue may be physically ordered by declination,
+but you can create an index giving access to it ordered by flux.
+Alternatively, you may select a subset of a catalogue and store just the
+pointers to it, not the data.
+Another feature is the use of text files, called description files, to describe
+catalogue contents.
+This allows the aficionado to manually edit the description file to produce very
+complicated output products.
+
+\item [CHIAPP]\index{CHIAPP} \hfill [SUN/120]
+
+This is a set of programs to access and manipulate astronomical catalogues
+using an ADAM command language (such as ICL).
+It is based on the CHI subroutine library.
+The following functions are available:
+\begin{itemize}
+\item Create/delete a catalogue.
+\item Add/delete a catalogue parameter.
+\item Get parameter names and information about a parameter.
+\item Get field names and information about a field.
+\item Get number of entries.
+\end{itemize}
+CHIAPP is being developed as a replacement for SCAR.
+
+\end{description}
+
+\newpage
+
+\subsection{Utilities}
+
+\rule{\textwidth}{0.5mm}
+\begin{description}
+\begin{description}
+\item [CONVERT] --- Data format conversion (DIPSO/FIGARO/BDF to NDF) \hfill 
+ $\surd\surd\surd$
+\item [TRACE] --- HDS data file listing \hfill $\surd\surd\surd$
+\item [SST] --- Simple Software Tools package \hfill $\surd\surd\surd$
+\end{description}
+\end{description}
+\rule{\textwidth}{0.5mm}
+
+\begin{description}
+
+\item [CONVERT]\index{CONVERT} \hfill [SUN/55]
+
+Converts data between the Starlink standard $n$-dimensional-data format
+(NDF), described in SGP/38, and other formats.
+Currently, it can handle three data formats:
+\begin{itemize}
+\item DIPSO.
+\item Figaro version 2.
+\item INTERIM (BDF).
+\end{itemize}
+
+\item [TRACE]\index{TRACE} \hfill [SUN/102]
+
+One of the most popular features of the ADAM environment is the Hierarchical
+Data System (HDS) which enables associated data items to be stored together in
+a single file but in a structured fashion.
+TRACE lists the contents of an HDS data structure on your terminal and,
+optionally, to a file for printing or documentation.
+
+\item [SST]\index{SST} \hfill [SUN/110]
+
+The Simple Software Tools package helps produce software and documentation,
+with particular emphasis on ADAM programming using Fortran~77. 
+
+As its name suggests, SST is intended to perform fairly simple manipulations of
+software, but it aims to tackle some of the commonly encountered problems which
+are not catered for in the more sophisticated commercial software tools (such as
+FORCHECK and VAXset) available on Starlink. 
+In future, SST may also duplicate a few of the simpler facilities which
+commercial products offer in order to avoid the cost (and generally much
+higher overheads, such as disk space) which prevent the commercial products
+being freely available on all Starlink machines. 
+
+The main purpose of the first version is to extract information from subroutine
+`prologues', and to format it to produce various forms of user documentation. 
+A simple source-code and comment statistics tool is also included.
+
+There are five applications:
+\begin{itemize}
+\item Convert `old-Style' ADAM/SSE prologues.
+\item Produce \LaTeX\ documentation.
+\item Produce Help libraries.
+\item Produce STARLSE package definitions.
+\item Produce source-code statistics.
+\end{itemize}
+
+\end{description}
+
+\newpage
+
+\section{Stand-alone Applications}
+
+These are independent applications that often run within their own environment.
+In general they cannot be used together and may have incompatible data formats.
+
+\subsection{Image analysis \& photometry}
+
+\rule{\textwidth}{0.5mm}
+\begin{description}
+\begin{description}
+\item [RGASP] --- Galaxy surface photometry \hfill $\surd$
+\end{description}
+\end{description}
+\rule{\textwidth}{0.5mm}
+
+\begin{description}
+
+\item [RGASP]\index{RGASP} \hfill [SUN/52]
+
+A reduced version of GASP, a {\em Galaxy Surface Photometry} package.
+It accepts raw pixel-data as input, and outputs a set of luminosity profiles and
+shape parameters for each galaxy.
+The design objectives were to:
+\begin{itemize}
+\item Minimise interactive effort.
+\item Use robust algorithms which can accept `don't know' values in the data,
+thereby eliminating the necessity to interpolate in regions where images
+overlap.
+\end{itemize}
+The facilities provided include:
+\begin{itemize}
+\item Calculator.
+\item Data preparation, compression, re-organisation, re-scaling, analysis, and
+ display.
+\item Diagnostics.
+\item File loading, reading, and re-organisation.
+\item Graphics (including colour).
+\item Identification.
+\item Parameter display.
+\item Simulation.
+\item Tape handling, reading and writing.
+\end{itemize}
+\end{description}
+
+\newpage
+
+\subsection{Spectroscopy}
+
+\rule{\textwidth}{0.5mm}
+\begin{description}
+\begin{description}
+\item [DIPSO] --- Spectral analysis and plotting \hfill $\surd$
+\item [APIG] --- Absorption profiles in the interstellar gas \hfill $\surd$
+\end{description}
+\end{description}
+\rule{\textwidth}{0.5mm}
+
+\begin{description}
+
+\item [DIPSO]\index{DIPSO} \hfill [SUN/50]
+
+Historically, this is a simple plotting package incorporating some basic
+astronomical applications.
+If you just want to read in some data, plot them, and measure some equivalent
+widths or fluxes, this can do it without much effort on your part.
+
+To make more complicated things possible, a number of rather rudimentary
+functions and parameters are provided.
+A macro facility allows convenient execution of regularly used sequences of
+commands, and a simple Fortran interface permits `personal' software to be
+integrated.
+User programs can be added to the system and defined as new commands.
+
+The following operations are available:
+\begin{itemize}
+\item Arithmetic.
+\item Emission line fitting.
+\item Equivalent width measurement.
+\item Flux measurement.
+\item Fourier analysis.
+\item Interstellar line analysis.
+\item Model atmospheres.
+\item Nebular continuum modelling.
+\item Polynomial fitting.
+\item Simple statistics.
+\end{itemize}
+
+\item [APIG]\index{APIG} \hfill [SUN/103]
+
+This analyses the interstellar absorption lines detected in the spectra
+of galactic and extragalactic sources.
+When observed with sufficiently high resolution, these lines often show a
+complex structure with multiple components formed in absorbing regions at
+different velocities along the line of sight.
+The main purpose of the program is to determine the column density of absorbers
+along the line of sight from an interactive analysis of the equivalent widths
+and profiles of the observed absorption lines.
+In cases where the line profiles are resolved, the velocity structure of the
+absorbing material is also determined.
+
+It is not a reduction system for astronomical spectra.
+It assumes that the raw spectra have already been reduced to produce wavelength
+calibrated spectra normalised relative to the background continuum, and
+that equivalent widths have been determined.
+
+\end{description}
+
+\newpage
+
+\subsection{Specific wavelengths}
+
+\rule{\textwidth}{0.5mm}
+\begin{description}
+\begin{description}
+\item [SPECX] ---  Mm-wave data analysis \hfill $\surd$
+\item [NOD2] --- Radio astronomy data analysis \hfill $\times$
+\end{description}
+\end{description}
+\rule{\textwidth}{0.5mm}
+
+\begin{description}
+
+\item [SPECX]\index{SPECX} \hfill [SUN/17]
+
+A mm- and sub-mm wavelength data reduction system written
+by Rachael Padman at MRAO.
+Although it can process spectra from many different instruments, it is
+particularly useful for reducing JCMT data.
+Its major features are:
+\begin{itemize}
+\item Process up to eight spectra simultaneously.
+\item Save current status of system after each command is executed.
+\item List and display spectra on a graphics terminal, with hardcopy on many
+printers.
+\item Single and multiple scan arithmetic, scan averaging, etc.
+\item Store and retrieve intermediate spectra in storage registers.
+\item Fit and remove polynomial, harmonic, and Gaussian baselines.
+\item Filter and edit spectra.
+\item Determine important line parameters (peak intensity, width, etc).
+\item Calculate Fourier transforms and power spectra.
+\item Calibrate data.
+\item Assemble a number of reduced individual spectra into a map file, and
+contour any plane or planes of the resulting cube.
+\item Macro-command sequences and indirect command files.
+\end{itemize}
+SPECX uses it's own data format, so it is not possible to access directly
+reduced spectra using other packages.
+However, facilities are provided for importing data from GSD-format data files,
+as produced by the JCMT, for writing out maps and spectra in the file formats
+of FIGARO and KAPPA, and for writing spectra and maps out to Ascii files for
+reading into other packages.
+
+\item [NOD2]\index{NOD2} \hfill [SUN/46]
+
+Manipulates radio single-dish observations.
+It was derived from a subroutine library written at the Max Planck Institut
+f\"{u}r Radioastronomie, Bonn.
+It reduces data from the {\em James Clerk Maxwell Telescope} (JCMT).
+It contains implementations of certain algorithms, essential to the reduction
+of mm-wave single dish observations, which are not available elsewhere.
+These include the `RESTOR' routine, which will reconstruct the equivalent
+single-beam map from data taken in beam-switched mode, and `CONVERT', which
+will create an RA-Dec map from Az-El data.
+The current method for reducing data from the JCMT is thus to use NOD2 for the
+immediate processing required to perform the `instrument-specific' part of the
+data reduction process, and then to convert the resulting maps into an
+appropriate format for analysis by another package (such as IRCAM or FIGARO).
+The following facilities are available:
+\begin{itemize}
+\item Map making.
+\item Calibration.
+\item Extinction correction.
+\item Baseline subtraction.
+\item Correction of bad pixels.
+\item Pointing correction.
+\item Change of weight factor or effective integration time.
+\item Map averaging.
+\item Display and editing.
+\item Post processing.
+\item Image transport and conversion (to HDS/SDF format).
+\end{itemize}
+
+\end{description}
+
+\newpage
+
+\subsection{Specific instruments}
+
+\rule{\textwidth}{0.5mm}
+\begin{description}
+\begin{description}
+\item [IUEDR] --- IUE (Ultra-violet) \hfill $\surd$
+\item [HXIS] --- SMM (X-ray) \hfill $\surd$
+\end{description}
+\end{description}
+\rule{\textwidth}{0.5mm}
+
+\begin{description}
+
+\item [IUEDR]\index{IUEDR} \hfill [SUN/37]; [SG/3]
+
+IUE stands for `International Ultraviolet Explorer'.
+The IUE Data Reduction package processes data from the {\em IUE echelle
+spectrograph}, starting with the raw image and finishing with a fully calibrated
+spectrum.
+The following facilities are provided:
+\begin{itemize}
+\item Tape analysis.
+\item IUE image input.
+\item Spectrum extraction.
+\item Line-by-line spectrum creation.
+\item Spectrum calibration.
+\item Graphical and image display.
+\item IUESIPS extracted spectra input.
+\item Spectrum averaging.
+\item Output products --- spectra which can be read by DIPSO.
+\end{itemize}
+
+\item [HXIS]\index{HXIS} \hfill [SUN/76]
+
+This processes data from the Hard X-ray Imaging Spectrometer (HXIS) carried on
+the Solar Maximum Mission (SMM).
+The following functions are provided:
+\begin{itemize}
+\item Image display and manipulation, time-series plots, rudimentary spectral
+ analysis.
+\item Transfer data between a HIMSEL tape and disk.
+\item Convert a production data tape to a HIMSEL image tape or to a disk image.
+\item Access the HIMSEL tape catalogue.
+\item Concatenate two disk image files.
+\end{itemize}
+
+\end{description}
+
+\newpage
+
+\subsection{Statistics}
+
+\rule{\textwidth}{0.5mm}
+\begin{description}
+\begin{description}
+\item [GENSTAT] --- General statistical analysis \hfill $\surd\surd$
+\item [CLUSTAN] --- Cluster analysis (Restricted to 10 sites) \hfill
+ $\surd\surd$
+\item [ASURV] --- Statistical analysis of data with upper limits \hfill $\surd$
+\end{description}
+\end{description}
+\rule{\textwidth}{0.5mm}
+
+\begin{description}
+
+\item [GENSTAT]\index{GENSTAT} \hfill [SUN/54]
+
+Version 5 of a commercial package for statistical analysis, with all the
+facilities of a general-purpose statistical package, marketed by NAG.
+All the usual analyses are readily available using the standard commands;
+in particular:
+\begin{itemize}
+\item Regression analysis.
+\item Multivariate analysis.
+\item Time series analysis.
+\end{itemize}
+However, it is not just a collection of pre-programmed commands for
+selecting from fixed recipes of available analyses.
+It has a flexible command language in which you can write your own programs to
+cover the occasions when the standard analyses do not give exactly what you
+want, or when you want to develop a new technique.
+
+Extensive documentation is available, including a reference manual, an
+introduction, a reference summary, and a procedure library manual.
+There is also a set of newsletters.
+
+\item [CLUSTAN]\index{CLUSTAN} \hfill [SUN/26]
+
+This is a specialised multivariate cluster analysis package marketed by
+Clustan Ltd of Edinburgh.
+
+A way is needed to summarise, categorise, condense, and represent the large
+amount of astronomical data being produced.
+Multivariate techniques and cluster analysis are appropriate means of
+performing an initial survey of the data in this respect for many applications
+such as star-galaxy discrimination, prediction of spectral type from
+photometry etc.
+CLUSTAN serves these purposes.
+\begin{itemize}
+\item It is a fully integrated package of tried and tested procedures for
+ Cluster analysis and other multivariate statistical methods.
+\item It is an extremely comprehensive tool for solving classification
+ problems.
+\item It operates from within a high-level programming language which uses
+ English words and keywords and so is easy to use.
+\item It has comprehensive on-line help plus syntax checking and error
+ correction.
+\item It can be used interactively, or in batch
+\item You can define your own similarity measures for cluster analysis.
+\item Data used with SCAR are easily accessible.
+\item Input data can be continuous, real or integer, mixed, multi-state
+ attributes, or binary presence/absence values.
+\item There is an in-built graphics capability for plotting dendrograms,
+ cluster diagrams, minimum spanning trees etc.
+\end{itemize}
+
+\item [ASURV]\index{ASURV} \hfill [SUN/13]
+
+A package for statistical analysis of astronomical data with upper
+limits, written by Takashi Isobe and Eric Feigelson of the Department of
+Astronomy, Pennsylvania State University.
+
+Observational astronomers frequently encounter the situation where they
+observe a particular property of a previously defined sample of objects,
+but fail to detect all of the objects.
+The data then contains `upper limits' as well as detections, preventing the
+use of simple and familiar statistical techniques in the analysis.
+However, a variety of other statistical methods exist to deal with these
+problems which are collectively called `survival analysis' or the `analysis
+of lifetime data' from their origin in actuarial and related fields.
+The upper limits are called `censored' data points.
+ASURV is a menu-driven stand-alone computer package designed to assist
+astronomers in using some of these methods.
+
+No statistical procedure can magically recover information that was never
+measured at the telescope.
+However, frequently there is important information implicit in the failure
+to detect some objects which can be partially recovered under reasonable
+assumptions.
+ASURV provides several two-sample tests, correlation tests, and linear
+regressions --- each based on different models of where upper limits truly lie
+--- so that you can judge the importance of the different assumptions.
+
+\end{description}
+
+\newpage
+
+\subsection{Database management}
+
+\rule{\textwidth}{0.5mm}
+\begin{description}
+\begin{description}
+\item [REXEC] --- Relational database management system \hfill $\surd$
+\end{description}
+\end{description}
+\rule{\textwidth}{0.5mm}
+
+\begin{description}
+
+\item [REXEC]\index{REXEC} \hfill [SUN/97]
+
+A relational database management system developed by the Scientific Databases
+Section within the Central Computing Department at RAL.
+It is much smaller and easier to use than SCAR, and is primarily intended as a
+tool to aid the handling and processing of experimental data.
+It offers a convenient way of manipulating structured files in a
+`Fortran-friendly' environment, and avoids the complexity and all-embracing
+commitment of a conventional dbms.
+
+It can be regarded as an extension of the UNIX philosophy of standard tools
+acting on files in a flexible and interchangeable manner.
+Here we have a set of processes stemming from relational algebra which
+interface uniformly to database files.
+It may be regarded as a successor to G-EXEC, and retains its two fundamental
+features: the {\em self-describing file} and the {\em process program}.
+
+It is good for storing and manipulating large datasets, allowing extensive
+mathematical processing of data.
+It is not appropriate for transaction processing.
+
+\end{description}
+
+\newpage
+
+\section{INTERIM Applications}
+
+These run under the original Starlink environment called INTERIM.
+This has now been superseded by ADAM.
+
+\subsection{Specific Instruments}
+
+\rule{\textwidth}{0.5mm}
+\begin{description}
+\begin{description}
+\item [IRAS] --- IRAS (Infra-red) \hfill $\surd\surd$
+\end{description}
+\end{description}
+\rule{\textwidth}{0.5mm}
+
+\begin{description}
+
+\item [IRAS]\index{IRAS}\index{IRASLRS} \hfill [SUN/14, 60, 80, 81, 82, 91]
+
+{\em IRAS} is the Infra-Red Astronomical Satellite, and this is a package to
+process {\em IRAS} data.
+It is meant to be used in conjunction with ASPIC.
+It will:
+\begin{itemize}
+\item Access spectra in the IRAS LRS catalogue.
+\item Combine, compress, and expand images.
+\item Produce contour maps.
+\item Display descriptor items.
+\item Display positions of IRAS sources and AO's on images.
+\item Convert BDF files to FITS format.
+\item Handle AO's, galactic plane maps, and sky plates.
+\end{itemize}
+
+\end{description}
+
+\newpage
+
+\subsection{General purpose}
+
+\rule{\textwidth}{0.5mm}
+\begin{description}
+\begin{description}
+\item [ASPIC] --- General data analysis \hfill $\times$
+\end{description}
+\end{description}
+\rule{\textwidth}{0.5mm}
+
+\begin{description}
+
+\item [ASPIC]\index{ASPIC} \hfill [SUN/23, 24]; [SG/1]
+
+The Astronomical Picture Processing system is a {\em general data reduction}
+system which contains a wide range of functions for image processing, along
+with a number of more specialized astronomical functions.
+The data are stored in BDF format.
+It is based on the INTERIM software environment and is controlled by a command
+language called DSCL.
+A special guide [SG/1] is available which introduces the system to new users.
+The system contains functions for:
+\begin{itemize}
+\item Arithmetic operations.
+\item Astrometry.
+\item Data compression.
+\item Electronography data reduction.
+\item Filtering.
+\item Fourier transforms.
+\item Geometrical transformations.
+\item Image display.
+\item Period analysis.
+\item Photometry.
+\item Polarimetry.
+\end{itemize}
+and many others.
+It can read tapes in FITS, VICAR, IPCS, and PDS formats.
+Apart from the EDRSX component, it is no longer being actively developed
+or supported and is expected to be withdrawn sometime in the future.
+You should, therefore, use newer packages such as FIGARO and KAPPA rather than
+ASPIC.
+
+\end{description}
+
+\newpage
+
+\section{Foreign Applications}
+
+These applications have been acquired from non-Starlink organisations.
+They are not installed on the Project node at RAL and are not supported or
+distributed as part of the normal Starlink Software distribution service.
+Enquires should be directed to the sites specified below.
+\begin{description}
+\begin{description}
+\item [AIPS] --- Jodrell Bank
+\item [IRAF] --- Cardiff
+\item [IDL] --- RAL (Jeff Payne)
+\item [MIDAS] --- St Andrews
+\end{description}
+\end{description}
+
+\subsection{Specific wavelengths}
+
+\rule{\textwidth}{0.5mm}
+\begin{description}
+\begin{description}
+\item [AIPS] --- Radio astronomy data analysis \hfill $\times$
+\end{description}
+\end{description}
+\rule{\textwidth}{0.5mm}
+
+\begin{description}
+
+\item [AIPS]\index{AIPS} \mbox{}
+
+The Astronomical Image Processing System provides radioastronomers with
+a set of tools for calibrating and editing radio-interferometric data,
+constructing images using Fourier synthesis techniques, and displaying and
+analysing these images.
+Its use is widespread in the radio astronomy community.
+It has also been used for IRAS work.
+
+AIPS has a richer set of {\em general} image processing functions than any
+other astronomical software package.
+For example, AIPS can:
+\begin{itemize}
+\item Deconvolve a point-spread function from an image.
+\item Transform one image into the coordinate system of another.
+\item Fourier transform an image into the complementary Fourier domain,
+ allowing you to edit the transformed image and transform it back again
+ (useful for removing stripes from IRAS images).
+\item Enhance various features in an image using gradient filters, or even the
+ Sobel edge enhancement filter.
+\item Display successive planes of a data cube as a continuous movie.
+\item Display a spectral line data set using hue to denote velocity and
+ intensity to denote integral brightness.
+\end{itemize}
+
+\end{description}
+
+\newpage
+
+\subsection{Specific instruments}
+
+\rule{\textwidth}{0.5mm}
+\begin{description}
+\begin{description}
+\item [IRAF] --- HST (multi-wavelength) \hfill $\times$
+\end{description}
+\end{description}
+\rule{\textwidth}{0.5mm}
+
+\begin{description}
+
+\item [IRAF]\index{IRAF} \mbox{}
+
+The Image Reduction and Analysis Facility is a general purpose software system
+for the reduction and analysis of scientific data.
+It was developed by the National Optical Astronomical Observatory (Kitt Peak)
+and has been adopted by the Space Telescope Science Institute in Baltimore as
+the principal data analysis environment for Hubble Space Telescope (HST) data.
+(HST data can also be reduced with KAPPA and FIGARO.)
+It provides a good selection of programs for general image processing and
+graphics applications, plus a large number of programs for reducing and
+analysing optical astronomy data.
+The system has been made as portable and device independent as possible; for
+example, it includes its own programming language.
+Although it runs on a variety of computers, in practice at any one time it runs
+best on one particular type (Suns at present).
+
+It is a very large system which is supported by extensive documentation.
+Every Starlink node should have a copy of the IRAF User Handbook to which
+you can refer for further information.
+You can also make enquiries to the Site Manager at the Cardiff Starlink
+site (CARDIF::OPER) as the Starlink HST SIG programmer works there.
+
+\end{description}
+
+\newpage
+
+\subsection{General purpose}
+
+\rule{\textwidth}{0.5mm}
+\begin{description}
+\begin{description}
+\item [IDL] --- General data analysis (US Commercial package) \hfill 
+ $\surd\surd$
+\item [MIDAS] --- General data analysis (ESO) \hfill $\times$
+\end{description}
+\end{description}
+\rule{\textwidth}{0.5mm}
+
+\begin{description}
+
+\item [IDL]\index{IDL} \mbox{}
+
+A proprietary package, written by Dave Stern of Research Systems Inc,
+Denver, which is available on some Starlink nodes (currently Armagh, Belfast,
+Birmingham, Cambridge, Oxford, QMW, and RAL) and which provides a comprehensive
+set of tools for exploring and manipulating data.
+At its simplest level it can be used as a very powerful arithmetic and
+graphics utility for handling data arrays.
+It provides:
+\begin{itemize}
+\item A programming language.
+\item Easy graphics, image plotting and display.
+\item Mathematical and transcendental functions.
+\item Array and string manipulation.
+\item Input/output.
+\item Type conversion.
+\item Other complex operations.
+\end{itemize}
+It can be used with minimal effort for many applications, or developed into
+more complex procedures as required.
+A procedure library is available.
+
+Until recently it was a line-oriented, command-driven system.
+However, a portable version (with X-windows) to run on Suns, DECstations, and
+VAXstations is now available, providing very fast and versatile graphics and
+image display.
+
+\item [MIDAS]\index{MIDAS} \mbox{}
+
+The Munich Image Data Analysis System was developed by the Image Processing
+Group of the European Southern Observatory (ESO).
+It is a basic image processing environment for reducing and analysing optical
+astronomical data.
+New applications can be added easily, even by non-professional programmers.
+It consists of a monitor which controls the execution of individual tasks, 
+and a large set of image processing applications.
+Since the results of the reduction of astronomical images are usually numbers
+(not other images), a comprehensive and flexible table system forms an
+essential part of MIDAS.
+Its main features are:
+\begin{itemize}
+\item Support of computers with VMS and Unix operating systems.
+\item Device independent interfaces to peripherals by use of special libraries,
+ e.g.\ AGL for graphics, ID for image display, and TW for terminals.
+\item Support of display and hard-copy standards like X11 and PostScript.
+\item Easy and flexible integration of user software, written in standard
+ Fortran and C, into the system.
+\item Full support of data exchange in FITS format.
+\item On-line help, history, and logging facilities.
+\item Flexible command and control language with full flow control and
+ debugging facilities.
+\item Extensive interface libraries in Fortran and C for access to the MIDAS
+ data base.
+\end{itemize}
+MIDAS offers extensive packages in the areas of spectral reduction (including
+data in long slit and echelle formats), CCD observations, crowded field
+photometry, object search and classification, fitting and modeling of data,
+astrometry, and statistical analysis.
+
+\end{description}
+
+\newpage
+
+\section {Astronomical Utilities}
+
+These are programs or packages which carry out some specific task related to
+astronomy, but which do not analyse data directly in order to produce
+astronomical results.
+
+\subsection{Archive access}
+
+\rule{\textwidth}{0.5mm}
+\begin{description}
+\begin{description}
+\item [IUEDEARCH] --- Access IUE archive data \hfill $\surd\surd$
+\item [USSP] --- Access IUE uniform low-dispersion archive (STADAT only)
+ \hfill $\surd\surd$
+\end{description}
+\end{description}
+\rule{\textwidth}{0.5mm}
+
+\begin{description}
+
+\item [IUEDEARCH]\index{IUEDEARCH} \hfill [SUN/58]
+
+The IUE data archive is supported and maintained by members of the UK IUE 
+Project in the Space Science Department at RAL. 
+The archive comprises some 1000 tapes containing about 70000 images, and a
+catalogue giving details of the exposures.
+New images are continually added to the archive and the catalogue is updated
+every month.
+All IUE data are available to the astronomical community about six months after
+the observations were made and they appear in the catalogue a few months before
+release.
+The aim of the system is to provide UK astronomers with quick and painless 
+access to IUE data.
+It enables you to interrogate the catalogue and extract data from the
+archive.
+Two other software items, IUEDR and USSP,  are related specifically to IUE
+data.
+
+\item [USSP]\index{USSP} \hfill [SUN/20]
+
+The usefulness of IUE data has been enhanced by a data archive from which you
+can request any image (subject  to the six-month data retrieval rule).
+Most UK astronomers now reduce their IUE data from photometric images using
+IUEDR.
+However, it is possible to obtain reduced low-resolution spectra on-line.   
+These have been reduced in a fairly homogenous way using the IUE Project's
+Spectral Image Processing System, and have been made available in the form of a
+{\it Uniform Low-Dispersion Archive} (ULDA).  
+This comprises absolutely-calibrated, extracted, low-dispersion spectra 
+corrected for exposure times and with the appropriate ITF correction.
+The {\it ULDA Software Support Package} (USSP) has been installed on the
+Starlink database microVAX (STADAT) to facilitate access to the ULDA.
+It enables you to select any data in the ULDA and transfer them to your own
+computer.
+You can search for various types of image, based on object class, image number,
+camera, aperture, homogeneous ID, sky position, or any combination of these
+attributes.
+\end{description}
+
+\newpage
+
+\subsection{Data copying \& format conversion}
+
+\rule{\textwidth}{0.5mm}
+\begin{description}
+\begin{description}
+\item [STARCON] --- Data format conversion (BDF to HDS) \hfill $\surd\surd\surd$
+\item [EDFITS] --- Copy FITS tapes \hfill $\surd\surd$
+\item [WFC\_SORT] --- Data format conversion (ROSAT-WFC to ASTERIX (HDS))
+ \hfill $\surd\surd$
+\item [FORMCON] --- Data format conversion (IPCS/VICAR to BDF) \hfill
+ $\times\times$
+\end{description}
+\end{description}
+\rule{\textwidth}{0.5mm}
+
+\begin{description}
+
+\item [STARCON]\index{STARCON} \hfill [SUN/96]
+
+Converts data between BDF format and HDS format (i.e.\ between INTERIM and ADAM
+environment formats).
+
+\item [EDFITS]\index{EDFITS} \hfill [SUN/43]
+
+Copies and edits FITS tapes.
+It is designed for original data tapes, so it has a slightly unusual style
+which places a heavy emphasis on making as sure as possible that you
+are not doing anything rash --- such as mounting an input tape with a write 
+ring fitted --- and that you understand the consequences of the commands given.
+It can produce usefully formatted header listings for a variety of flavours of
+FITS tapes.
+
+\item [WFC\_SORT]\index{WFC\_SORT} \hfill [SUN/62]
+
+Produces ASTERIX (HDS) datasets from Wide Field Camera data generated during
+the pointed phase of the Rosat mission.
+A sort program generates the files (e.g.\ time series, images, etc) from
+pre-processed event files supplied on the Rosat WFC Observation Datasets
+(RWODs).
+An exposure program allows the correction of a raw count dataset allowing for
+instrument characteristics.
+In addition, a simple database manager allows an index of RWODs to be
+maintained and searched.
+
+\item [FORMCON]\index{FORMCON} \hfill [SUN/3]
+
+Converts data into BDF format from IPCS and VICAR formats.
+
+\end{description}
+
+\newpage
+
+\subsection{Observation preparation and positional astronomy}
+
+\rule{\textwidth}{0.5mm}
+\begin{description}
+\begin{description}
+\item [COCO] --- Celestial coordinate conversion \hfill $\surd\surd\surd$
+\item [CHART] --- Finding chart and stellar data system \hfill $\times$
+\item [ASTROM] --- Basic astrometry \hfill $\surd\surd\surd$
+\item [RV] --- Calculate radial components of observer's velocity \hfill 
+ $\surd\surd\surd$
+\item [RPS] --- Submit Rosat proposals \hfill $\surd$
+\item [ECHWIND] --- Plan use of UCL echelle spectrograph \hfill $\surd$
+\item [TPOINT] --- Telescope pointing analysis \hfill $\surd\surd\surd$
+\item [APLATE] --- Aperture plate preparation \hfill $\surd$
+\item [AATGS] --- Guide probe predictions for AAT \hfill $\surd\surd\surd$
+\end{description}
+\end{description}
+\rule{\textwidth}{0.5mm}
+
+\begin{description}
+
+\item [COCO]\index{COCO} \hfill [SUN/56]
+
+Converts star coordinates between the following six different coordinate
+systems:
+\begin{itemize}
+\item Mean {\em RA,Dec}, old system, with E-terms (loosely FK4).
+\item Mean {\em RA,Dec}, old system, no E-terms (some radio positions).
+\item Mean {\em RA,Dec}, new system (loosely FK5).
+\item Geocentric apparent {\em RA,Dec}, new system.
+\item Ecliptic {\em longitude,latitude}, new system (mean of date).
+\item Galactic {\em longitude,latitude}, IAU 1958 system.
+\end{itemize}
+
+\item [CHART]\index{CHART} \hfill [SUN/32]
+
+A package for plotting star fields (positions, magnitudes and other
+data) from the CSI79, SAO, AGK3, PERTH70, and the Dixon non-stellar objects
+catalogues.
+You can specify a series of search areas, and can place magnitude or total
+number limits on the search, and chose which source catalogues to include
+or exclude.
+After the search is made, you may list the results at a terminal or on a
+printer.
+Positional information may be precessed to a specified equinox.
+In the case of astrometric data, proper motions may be applied up to a specified
+epoch.
+
+You can plot the results in the form of an overlay or finding chart.
+Extra objects, i.e.\ with positions supplied by you, may be added to the plot at
+this stage.
+The plot may be made on any GKS device, and a number of different plot options
+are available, such as scale and area, an RA and Dec coordinate grid, and
+various forms of error box.
+
+You may also use the results as input to an astrometry program, i.e.\ it can
+be used to select astrometric stars as positional references.
+In this case, you will be asked to supply {\em x,y} positions for the reference
+stars from a measuring machine, and can then convert unknown {\em x,y} positions
+to RA, Dec or vice versa.
+ASTROM performs the actual astrometry, from within CHART if necessary.
+
+\item [ASTROM]\index{ASTROM} \hfill [SUN/5]
+
+A simple plate reduction utility, designed to allow the non-specialist
+user to get good results with a minimum of trouble and esoteric knowledge.
+You supply a text file containing information about the exposure and the
+positions of reference and unknown stars;  ASTROM performs the various
+coordinate transformation and fitting operations required, displays a synopsis
+report on the command terminal, and prepares a detailed report for later
+printing.
+
+\item [RV]\index{RV} \hfill [SUN/78]
+
+Produces a report listing the components, in a given direction, of the
+observer's velocity on a given date.
+This allows an observed radial velocity to be referred to an appropriate
+standard of rest.
+It also computes light time components to the Sun, thus allowing the times of
+phenomena observed from a terrestrial observatory to be referred to a
+heliocentric frame of reference.
+
+\item [RPS]\index{RPS} \hfill [SUN/18]
+
+Generates and submits electronically observing proposals for the UK Rosat
+Pointed Observation Programme. 
+It lets you do the following:
+\begin{itemize}
+\item Create a new Rosat Proposal Form (RPF) by `filling it in' interactively.
+\item Edit an existing RPF, for example to make minor changes to observation
+ details.
+\item Summarise the details of an RPF.
+\item Produce a draft (line-printer) version of the RPF for checking.
+\item Produce a final (laser printer) version of the RPF for submission to the
+ UK Programme.
+\item Produce a version of the RPF that can be transmitted over the network and
+ submit this electronically to the Rosat UK Data Centre (UKDC).
+\item Check when a target will be observable by Rosat and get an estimate of
+ the survey exposure.
+\end{itemize}
+
+\item [ECHWIND]\index{ECHWIND} \hfill [SUN/53]
+
+The UCL Coud\'{e} echelle spectrograph (UCLES) can, on the AAT, record spectra
+of objects as faint as V = 16--17 with a resolving power
+($\lambda/\Delta\lambda$) of 55,000--115,000, depending on the detector used.
+ECHWIND can prepare an observing proposal or an observing run in which UCLES
+will be used.
+It allows you to view interactively that part of the spectrum which will fall
+on the detector for a given central wavelength.
+The positions of individual spectral lines can be marked on the display.
+You can then move the detector window around until it is in the correct
+position.
+At each position the screen displays the minimum, central, and maximum
+wavelengths falling on the detector, as well as the range of order numbers and
+an estimate of the length of the detector in Angstroms.
+The position of the detector can also be marked on the screen so that
+optimal wavelength coverage is achieved when multiple wavelength settings are
+required.
+
+\item [TPOINT]\index{TPOINT} \hfill [SUN/100]
+
+An interactive telescope pointing analysis system of interest to specialists.
+It allows data from pointing tests to be input and fitted to various models.
+The residuals from the fits can be displayed in a variety of graphical formats. 
+If systematic errors are visible, the pointing model can be adjusted by adding
+and removing terms.
+It can deal with data from either equatorial or altazimuth mounts.
+It has been applied to many telescopes, including optical, IR, mm and radio,
+and is in routine use at the AAO, UKST, UKIRT, LPO, and several other
+observatories.
+
+\item [APLATE]\index{APLATE} \hfill [SUN/89]
+
+An Aperture Plate preparation program which computes required hole positions
+for a fibre optics aperture plate for the AAT.
+
+\item [AATGS]\index{AATGS} \hfill [SUN/6]
+
+The AAT Guide Star prediction program calculates guide star positions for the 
+AAT.
+
+\end{description}
+
+\newpage
+
+\section{General Utilities}
+
+These are programs or packages which provide useful facilities to the user
+of a computer, but are not specifically related to astronomy.
+
+\subsection{Document preparation \& search}
+
+\rule{\textwidth}{0.5mm}
+\begin{description}
+\begin{description}
+\item [TEX] --- Document preparation (includes \LaTeX) \hfill $\surd$
+\item [DOCFIND] --- Starlink document search \hfill $\surd$
+\item [GEROFF] --- Document preparation \hfill $\times\times$
+\end{description}
+\end{description}
+\rule{\textwidth}{0.5mm}
+
+\begin{description}
+
+\item [TEX]\index{TEX}\index{LATEX} \hfill [SUN/9, 12, 93]
+
+\TeX\ is a type-setting program for producing high quality text and diagrams.
+\LaTeX\ is a document preparation system based on \TeX\ but is easier to use.
+The final output is usually generated by a laser printer.
+Starlink recommends that documents be prepared using \LaTeX\ with formats based
+on skeletons such as DOCSDIR:SUN.TEX.
+SUN/12 is a cook-book showing how to generate common kinds of format using
+\LaTeX; this is a quick way to learn how to use it.
+SGP/28 gives advice on how to produce documents in a suitable style for
+Starlink.
+The document you are now reading was prepared using \LaTeX.
+
+\item [DOCFIND]\index{DOCFIND} \hfill [SUN/38]
+
+Helps you search the Starlink documentation index for a specified keyword.
+You can ask for any document that is found in the search to be printed out.
+Unfortunately, this program will not print out \LaTeX\ documents in a
+satisfactory form.
+However, stocks of all Starlink Notes and Papers are kept at every Starlink
+site, so you can get a paper copy.
+
+\item [GEROFF]\index{GEROFF} \hfill [SUN/2]
+
+An obsolete text processing program which has been superseded by \LaTeX.
+However, some Starlink documentation is still stored in this form, so it is
+retained in the Collection.
+
+\end{description}
+
+\newpage
+
+\subsection{Graphics}
+
+\rule{\textwidth}{0.5mm}
+\begin{description}
+\begin{description}
+\item [MONGO] --- Interactive plotting \hfill $\surd$
+\item [IKONPAINT] --- Ikon to inkjet hard-copy \hfill $\surd$
+\item [QDP] --- Quick and Dandy Plotter \hfill $\times$
+\item [VSHC] --- Obtain hardcopy from the display of a VAXstation \hfill $\surd$
+\item [HONEY] --- Hardcopy output from the Honeywell camera \hfill
+ $\surd\surd\surd$
+\end{description}
+\end{description}
+\rule{\textwidth}{0.5mm}
+
+\begin{description}
+
+\item [MONGO]\index{MONGO} \hfill [SUN/64]
+
+An interactive program which makes it possible to build up a complicated
+diagram, including graphics, text, axes, and so on, and then to create
+publishable quality output.
+It works on all GKS devices.
+It provides the following functions:
+\begin{itemize}
+\item Selection of graphics device and setup of display area.
+\item Input of numerical (x,y) data.
+\item Construction of (x,y) graphs.
+\item Text placement in five fonts, including Greek.
+\item Assembly and execution of command procedures.
+\item Setting of line weight, line type, text size, etc.
+\item Basic moving and drawing.
+\item Generation of hard copy.
+\end{itemize}
+It is only really suitable for producing publishable quality output.
+It is too slow and expensive in computer resources for use in your data
+reduction system.
+
+\item [IKONPAINT]\index{IKONPAINT} \hfill [SUN/71]
+
+This provides `push-button' colour hard-copy from the Ikon screen to an
+inkjet printer.
+The DEC {\it Companion Colour Printer} (LJ250/LJ252) and the Hewlett-Packard
+{\it Paintjet} are both supported.
+These printers normally take 8$\times$11 inch fan-fold paper, but single
+transparency sheets can be hand-fed.
+
+\item [QDP]\index{QDP} \hfill [SUN/128]
+
+The {\em Quick and Dandy Plotter} program reads ASCII files containing
+various plotting commands and data.
+It then executes the commands and plots the data.
+At this point a prompt appears and you can enter additional commands to:
+\begin{itemize}
+\item Display information about the interactive commands.
+\item Override various defaults.
+\item Override the commands found in the file.
+\item Add/remove labels.
+\item Plot data with various combinations of lines, markers, and error bars.
+\item Change the appearance/style of the plot, e.g.\ converting all text into
+ Roman Font.
+\item Plot the data as a function of a different variable.
+\item Change the number of panels in which the data is plotted.
+\item Define models to calculate the `best fit' parameter values.
+\item Generate hardcopy.
+\end{itemize}
+The interactive commands allow you to tailor the plot to your needs/taste
+and to do some simple analyses of the data.
+Commands can be placed in the file, in an indirect command, and/or in a command
+array created by the calling program.
+For example, if you have a set of commands that you commonly use, you can
+place them in a file and then execute them.
+Programmers can try out commands interactively to find a set that works
+best with the type of data being plotted, and then make these commands the
+default ones.
+
+The software is highly portable and uses PGPLOT.
+
+\item [VSHC]\index{VSHC} \hfill [SSN/65]
+
+Prints on a Canon Laserprinter a picture selected from the screen of a
+VAXstation.
+
+\item [HONEY]\index{HONEY} \hfill [SUN/72]
+
+Uses the Honeywell model 3000 colour graphic recorder system to produce
+publishable quality photographic hardcopy from an IKON image display.
+Full colour and black \& white images can be recorded on positive or negative
+35mm film.
+The Honeywell consists of a built-in high resolution flat-faced monochrome
+video monitor, a red/green/blue colour filter mechanism and a 35mm camera.
+
+Honeywell systems are installed at nine Starlink sites, namely Belfast
+(locally funded), Birmingham, Cambridge, Durham, Leicester, Manchester,
+RAL, ROE and UCL.
+
+\end{description}
+
+\newpage
+
+\subsection{Device handling, data compression, \& examination}
+
+\rule{\textwidth}{0.5mm}
+\begin{description}
+\begin{description}
+\item [TPU] --- Magnetic tape handling \hfill $\surd\surd$
+\item [LZCMP] --- File compression and de-compression \hfill $\surd\surd\surd$
+\item [TAPECOPY] --- Copy magnetic tapes \hfill $\surd\surd\surd$
+\item [CDCOPY] --- CDROM reading \hfill $\surd$
+\item [XDISPLAY] --- Xwindows display setup \hfill $\surd\surd\surd$
+\end{description}
+\end{description}
+\rule{\textwidth}{0.5mm}
+
+\begin{description}
+
+\item [TPU]\index{TPU} \hfill [SUN/68]
+
+Manipulates, examines, and copies magnetic tapes of any format.
+It was designed to give you maximum flexibility and not make any assumptions
+about standard formats or procedures.
+It sees a magnetic tape as a series of files or records of unknown number
+and size.
+It gives you maximum flexibility and does not assume some `normal' or `standard'
+procedure to be followed when processing the tape.
+The need for something like this surfaced when it was found that tapes with some
+physical or logical defect were often impossible to duplicate because the
+appropriate utility would abort as soon as such an error was encountered without
+giving you any say in the matter.
+Hence, the objective of TPU is to give you maximum control over operations,
+especially when tape errors occur.
+
+\item [LZCMP]\index{LZCMP} \hfill [SUN/25]
+
+Makes files smaller using the Lempel-Ziv file compression algorithm.
+Files in compressed form cannot be used in that form but must first be
+`decompressed' into their original form.
+This is done using this same program.
+It is particularly useful for reducing the size of files before transferring
+them over a network.
+Typical size reductions are 30-40\%.
+
+\item [TAPECOPY]\index{TAPECOPY} \hfill [SUN/47]
+
+Duplicates magnetic tapes.
+The contents of the original tape are copied to a disk file which is then
+copied to a new tape to create an exact copy of the original.
+It can therefore copy tapes on a system with only one tape drive.
+It can also copy selected files from one tape to another.
+TPU can also copy tapes, but requires two tape drives.
+
+\item [CDCOPY]\index{CDCOPY} \hfill [SUN/69]
+
+Compact discs are becoming a valuable medium for distributing astronomical data,
+especially for large files such as source catalogues and images, because each
+disc holds up to 600 Mbytes of data.
+The DEC RRD40 readers which have been purchased for most Starlink sites are
+physically capable of reading these discs, but the VMS device driver
+cannot handle the ISO 9660 format which is now in general use.
+There are rumours that DEC may rectify this eventually.
+Until then, this program allows non-DEC CD-ROM discs to be read on VAX/VMS
+systems. 
+It should also handle the earlier {\it High Sierra} and ECMA formats. 
+
+\item [XDISPLAY]\index{XDISPLAY} \hfill [SUN/129]
+
+This provides a simple way for users of VT1x00 series Xwindows terminals to
+set up a path for Xwindows output from programs such as XDVI, and graphics
+packages using the XWINDOWS device.
+It also works when remote logins are made from Vaxstations, SUNs and
+Decstations to VAX machines.
+X-terminals being used for DECwindows sessions do not require XDISPLAY, nor do 
+DECwindows sessions on Vaxstations.
+
+\end{description}
+
+\newpage
+
+\subsection{Mathematical}
+
+\rule{\textwidth}{0.5mm}
+\begin{description}
+\begin{description}
+\item [MAPLE] --- Mathematical manipulation language (STADAT only) \hfill
+ $\surd\surd$
+\end{description}
+\end{description}
+\rule{\textwidth}{0.5mm}
+
+\begin{description}
+
+\item [MAPLE]\index{MAPLE} \hfill [SUN/107]
+
+A commercial package purchased from WATCOM, Waterloo, CANADA.
+It is an interactive system for symbolic algebra computation.
+It can perform hundreds of algebraic functions for use at all mathematical
+levels, and can provide solutions for many types of problems:
+\begin{itemize}
+\item Arithmetic with integers, fractions, and polynomials.
+\item Power series.
+\item Differentiation and integration of functions.
+\item Systems of equations.
+\item Differential equations.
+\item Linear optimization.
+\item Tensor manipulation.
+\item Symbolic and numeric approximation.
+\item Automatic generation of Fortran code and \LaTeX\ source for mathematical
+expressions.
+\end{itemize}
+In addition, plots can be generated to illustrate graphically any function,
+including user-defined functions.
+
+You can extend or redefine the numerous functions by writing programs in
+the built-in Pascal-like language to create specialized functions.
+
+\end{description}
+
+\newpage
+
+\subsection{Operational}
+
+A number of programs exist in the Collection to help Site Managers manage their
+nodes.
+Only two of these are likely to be of interest to normal users.
+These are:
+
+\rule{\textwidth}{0.5mm}
+\begin{description}
+\begin{description}
+\item [NETWORK] --- DECNET utilities \hfill $\surd\surd\surd$
+\item [QUOTAS] --- Other users' disk quotas \hfill $\surd\surd\surd$
+\end{description}
+\end{description}
+\rule{\textwidth}{0.5mm}
+
+\begin{description}
+
+\item [NETWORK]\index{NETWORK} \hfill [SUN/36]
+
+A number of network utilities are available as part of DECNET (MAIL), JANET
+(File transfer, Electronic mail, Remote login) and Coloured Books (PAD,
+TRANSFER, CBS-MAIL, LIST) software.
+In addition, this item provides the following extra DECNET commands:
+\begin{itemize}
+\item NETSHOW
+--- Execute the equivalent of a DCL SHOW command on a remote DECNET node.
+\item SHOWNET
+--- List all the DECNET nodes and their current state, either reachable or
+unreachable.
+\item TALK
+--- Display a message on another user's terminal (guaranteed to cause
+ annoyance or to be lost off the top of an editing screen).
+\end{itemize}
+Information on how to use networks is given in SUN/36.
+
+\item [QUOTAS]\index{QUOTAS} \hfill [SUN/49]
+
+Displays the usage of disk quota on VMS disks.
+It enables you to identify the `disk hogs' on your disks and, perhaps, pay them
+a friendly visit.
+
+\end{description}
+
+\newpage
+
+\subsection{Programming support}
+
+\rule{\textwidth}{0.5mm}
+\begin{description}
+\begin{description}
+\item [SPAG] --- Improve structure of Fortran source code (STADAT only) \hfill
+ $\surd\surd$
+\item [LIBMAINT] --- Library maintenance \hfill $\surd\surd$
+\item [FORCHECK] --- Fortran verifier and programming aid (STADAT only) \hfill
+ $\surd\surd$
+\item [STARLSE] --- Starlink language sensitive editor \hfill $\surd\surd\surd$
+\item [GENERIC] --- Compile generic Fortran routines \hfill $\surd\surd$
+\item [TOOLPACK] --- Fortran Software Tools package \hfill $\surd\surd$
+\item [LIBX] --- Library maintenance \hfill $\surd\surd\surd$
+\end{description}
+\end{description}
+\rule{\textwidth}{0.5mm}
+
+\begin{description}
+
+\item [SPAG]\index{SPAG} \hfill [SUN/63]
+
+SPAG stands for `Spaghetti Unscrambler'.
+It re-orders blocks of Fortran statements in such a way that the structure of
+the code is improved, whilst remaining logically equivalent to the original
+program. 
+The result improves the readability and maintainability of badly-written
+Fortran programs.
+On Starlink, it may be used to convert unstructured Fortran 77 into the
+structured and indented VAX Fortran required by the Starlink Programming
+Standard (SGP/16). 
+It can also be used to update Fortran 66 code.
+It is marketed by Polyhedron Software and is available only on the Starlink
+Database machine, STADAT.
+
+\item [LIBMAINT]\index{LIBMAINT} \hfill [SUN/99]
+
+Simplifies the maintenance of software held as modules in a
+text/object library pair, and of modules in a help library.
+New libraries can be created and modules inserted, extracted, replaced,
+examined, and printed with simple commands.
+It ensures that corresponding modules within a text/object library pair do not
+get out of step with one another, and it can optimise the disk space used by
+libraries.
+
+\item [FORCHECK]\index{FORCHECK} \hfill [SUN/73]
+
+A Fortran verifier and programming aid installed on the Starlink central
+facilities computer (STADAT).
+It checks code for conformance to the ANSI standard X3.9--1978.
+However, it can also deal with non-standard code and by default accepts VAX
+Fortran.
+It:
+\begin{itemize}
+\item Checks inter-module consistency by checking that the number, type, and
+ size of elements in both sub-program argument lists and COMMON blocks are the
+ same throughout a program.
+\item Identifies recursive calls and misuse of arguments.
+\item Identifies `clutter' --- the unused variables, COMMON blocks, INCLUDE
+ files, and code fragments which accumulate in old programs, and which make
+ maintenance such a time-consuming and costly task.
+\item Composes cross-reference charts for constants, variables, COMMONs,
+ INCLUDE files, sub-programs, and I/O.
+\item Produces a `call tree', which shows the calling structure of the program
+ in diagrammatic form.
+\end{itemize}
+Automatically composed documentation of this type is an invaluable addition
+to system documentation.
+As often as not, it is the only reliable source of information about old
+programs.
+
+\item [STARLSE]\index{STARLSE} \hfill [SUN/105]
+
+This is a `Starlink Sensitive' editor based on the \mbox{VAX} Language
+Sensitive Editor \mbox{LSE}.
+It takes advantage of the extensibility of \mbox{LSE} to provide additional
+features which assist you in writing portable Fortran~77 software with a
+standard Starlink style. 
+It is intended mainly for people writing \mbox{ADAM} applications and
+subroutine libraries which are intended for distribution as part of the
+Collection, although it may also be suitable for other software projects. 
+
+If you normally use a standard screen editor (like EDT), you will probably find
+that using an \mbox{LSE}-based editor for the first time will slow you down
+considerably. 
+All those new keys to remember!
+However, once you get used to it, you will start to realise how much time
+you used to spend doing simple things like moving the cursor, formatting
+prologues, indenting lines of code and going to fetch essential
+documentation --- all things which \mbox{STARLSE} can do far more
+efficiently. 
+
+One of the strengths of \mbox{LSE}-based editing is that it allows
+you to pick and choose --- to use the features that you personally find
+time-saving, while still being able to type directly over anything which you
+find too fussy. 
+In this respect, \mbox{STARLSE} can be regarded as a sort of interactive
+`Manual of Style' which provides guidelines on layout and programming
+standards when you need reminding of them, but lets you work unhindered once
+you know what you are doing. 
+
+Perhaps the most important component of \mbox{STARLSE} is a version of the
+Fortran~77 programming language called \mbox{STARLINK\_FORTRAN}, which
+defines the style of programming that the editor supports. 
+This language is used by default for files of type \mbox{.FOR} and
+\mbox{.GEN}. 
+
+The language is based on the Starlink Application Programming Standard
+document SGP/16, and contains only a small number of approved extensions to
+the Fortran~77 standard. 
+It is therefore much simpler and easier to use than the \mbox{VAX}~Fortran
+language which comes with `native' \mbox{LSE} (in fact, nearly 80\% of
+\mbox{VAX}~Fortran consists of extensions to the Fortran~77 standard!). 
+In \mbox{STARLINK\_FORTRAN}, the number of available options and ambiguous
+abbreviations is greatly reduced, and most of the common language constructs
+can be produced simply by typing a short token, like `DO' or `IF', followed
+by \mbox{ctrl-E}. 
+
+The most important features of the language are:
+\begin{itemize}
+\item Templates and Prologues.
+\item Subroutine definitions.
+\item On-line Help.
+\item Alias definitions.
+\item ADAM programming constructs.
+\item Symbolic constants, error codes and Include files.
+\item Enumerated type codes.
+\item Tokens and Menus.
+\end{itemize}
+
+\item [GENERIC]\index{GENERIC} \hfill [SUN/7]
+
+Preprocesses a {\it generic} Fortran subroutine --- one written so as to apply
+to several different data types --- into one routine per data type, and
+concatenates these routines into a file.
+The file is then compiled with the Fortran compiler to produce an
+object module.
+
+\item [TOOLPACK]\index{TOOLPACK} \hfill [SUN/75]
+
+Starlink has purchased Release 2 of Toolpack/1 from NAG for its users.
+It is a suite of software tools designed to support the Fortran programmer.
+In this context, a `software tool' is a utility program to assist in the
+various phases of constructing, analysing, testing, adapting or maintaining
+a body of Fortran software.
+Typically, the input to such a tool is your Fortran software.
+The tool processes this and produces output that may have one or both of the
+following forms:
+\begin{itemize}
+\item A report that gives an analysis of the input program, e.g.\ a summary of
+the types of statements used --- this type of tool is called a static analyser.
+\item A modified version of the input program --- in this case, the tool is
+called a transformer.
+An example is a formatter which improves the appearance of the code.
+\end{itemize}
+In some cases the input may be test data, documentation, or a report generated
+by a previously applied tool.
+Tools that assist directly in preparing documents are usually called
+documentation generation aids.
+These and other tools serving utility functions all have an important role
+to play and so, even if they do not process a program directly, they are
+still regarded as programming aids.
+
+Further examples of the software tools provided include:
+\begin{itemize}
+\item A text editor with Fortran 77 oriented features.
+\item A transforming tool that standardises the declarative part of a Fortran
+program.
+\item An instrumenter that modifies the program by inserting monitoring
+and other control statements.
+The instrumented program is then compiled and executed and data is gathered that
+is used to generate reports.
+Execution of an instrumented program is an example of dynamic analysis.
+\end{itemize}
+If you want to know more about TOOLPACK, read the `Introductory Guide'
+available from your Site Manager.
+
+\item [LIBX]\index{LIBX} \hfill [SUN/8]
+
+Contains two tools for use with libraries.
+The first outputs a list of all modules in a library and is useful for building
+more elaborate utility procedures.
+The second extracts preamble comments from all the modules in a Fortran
+source library.
+
+To some extent they duplicate facilities in LIBMAINT.
+The latter is a very powerful system but, unavoidably, is vulnerable to
+changes in the formats of the reports which the DEC Librarian utility produces.
+The LIBX facilities, though limited in what they do, use only published
+interfaces and should survive new VMS releases; also they are fast.
+
+\end{description}
+
+\newpage
+
+\section {Subroutine Libraries}
+
+The programs described in the previous sections can be used directly to carry
+out some procedure.
+This section describes items which are subroutine libraries, i.e. they are
+provided for people who need to write their own programs in a high-level
+language such as Fortran.
+
+\subsection{Astronomical \& mathematical}
+
+\rule{\textwidth}{0.5mm}
+\begin{description}
+\begin{description}
+\item [NAG] --- Numerical mathematics \& statistics \hfill $\surd\surd$
+\item [SLALIB] --- Mainly positional astronomy \hfill $\surd\surd\surd$
+\item [JPL] --- Solar system ephemeris \hfill $\surd\surd$
+\item [TRANSFORM] --- Coordinate transformation \hfill $\surd\surd\surd$
+\item [MEMSYS] --- Maximum entropy image reconstruction \hfill $\surd\surd$
+\end{description}
+\end{description}
+\rule{\textwidth}{0.5mm}
+
+\begin{description}
+
+\item [NAG]\index{NAG} \hfill [SUN/28, 29]
+
+The Numerical Algorithms Group library is an extensive library of mathematical
+subroutines.
+It is commercial software.
+The current version is Mark 14 for the standard library and Mark 3 for the
+graphics library.
+The double, single, and G\_floating precision versions of the standard library
+are provided, together with the double and single precision versions of the
+graphics library. 
+The on-line help system is also available.
+
+The 906 routines cover a very wide area of numerical and statistical
+mathematics.
+They are extensively documented in a reference manual, guide, and introductory
+book.
+These are available at every Starlink site, and copies of the NAG newsletters
+are kept at RAL.
+
+The standard library organises its routines into the following `chapters':
+{\small
+\begin{itemize}
+\item A02 --- Complex arithmetic.
+\item C02 --- Zeros of polynomials.
+\item C05 --- Roots of one or more transcendental equations.
+\item C06 --- Summation of series.
+\item D01 --- Quadrature
+\item D02 --- Ordinary differential equations.
+\item D03 --- Partial differential equations.
+\item D04 --- Numerical differentiation.
+\item D05 --- Integral equations.
+\item E01 --- Interpolation.
+\item E02 --- Curve and surface fitting.
+\item E04 --- Minimizing or maximizing a function.
+\item F01 --- Matrix operations, including inversion.
+\item F02 --- Eigenvalues and eigenvectors.
+\item F03 --- Determinants.
+\item F04 --- Simultaneous linear equations.
+\item F05 --- Orthogonalisation.
+\item F06 --- Linear algebra support routines.
+\item G01 --- Simple calculations and statistical data.
+\item G02 --- Correlation and regression analysis.
+\item G03 --- Multivariate methods.
+\item G04 --- Analysis of variance.
+\item G05 --- Random number generators.
+\item G07 --- Univariate estimation.
+\item G08 --- Nonparametric statistics.
+\item G11 --- Contingency table analysis.
+\item G13 --- Time series analysis.
+\item H --- Operations research.
+\item M01 --- Sorting.
+\item P01 --- Error trapping.
+\item S --- Approximations of special functions.
+\item X01 --- Mathematical constants.
+\item X02 --- Machine constants.
+\item X03 --- Innerproducts.
+\item X04 --- Input/output utilities.
+\item X05 --- Date and time utilities.
+\end{itemize}
+}
+
+\item [SLALIB]\index{SLALIB} \hfill [SUN/67]
+
+The {\it Subprogram Library A} is a collection of subroutines designed for use
+in certain types of astronomical applications software.
+Most routines are concerned with astronomical position and time, but some have
+wider trigonometrical, numerical, or general applications, and a few are
+essentially miscellaneous.
+They are well supported.
+The main functions provided are:
+\begin{itemize}
+\item String decoding.
+\item Sexagesimal and FK4/5 conversions.
+\item Angles, vectors, and rotation matrices.
+\item Calendars and time.
+\item Precession and nutation.
+\item Proper motion.
+\item Elliptic aberration.
+\item Geocentric, ecliptic, galactic, and supergalactic coordinates.
+\item Apparent and observed place.
+\item Refraction and air mass.
+\item Ephemerides.
+\item Astrometry.
+\item Numerical methods.
+\item Real time.
+\end{itemize}
+
+\item [JPL]\index{JPL} \hfill [SUN/87]
+
+The definitive DE200/LE200 solar system ephemeris package from JPL, comprising
+files of ephemeris data for 1800--2050, plus Fortran programs
+to read and interpolate them.
+Ephemerides are provided for the Sun, Moon, and planets, the Solar System
+Barycentre, and the Earth-Moon Barycentre.
+The ephemeris is described in detail on pages S26-8 of the 1984 Astronomical
+Almanac.
+
+\item [TRANSFORM]\index{TRANSFORM} \hfill [SUN/61]
+
+Enables programs to process information describing the relationships between
+different coordinate systems. 
+It provides a standard, flexible method for manipulating coordinate
+transformations and for transferring information about them between programs.
+It can handle coordinate systems with any number of dimensions and can
+efficiently process large (i.e.\ image-sized) arrays of coordinate data using
+a variety of numerical precisions. 
+No specific support for astronomical coordinate transformations or map
+projections is included at present, but routines for handling these will
+appear in future.
+The current system provides tools for creating a wide variety of coordinate
+transformations, so it should be possible to construct some of the simpler
+astronomical transformations explicitly, if required, on an interim basis. 
+
+Some possible applications include:
+\begin{itemize}
+\item Defining linear and non-linear graphics coordinate systems.
+\item Attaching coordinate systems to datasets (e.g.\ relating image pixels to
+ sky positions).
+\item Describing distortion in images and spectra.
+\item Storing and applying instrumental calibration functions.
+\end{itemize}
+
+It uses HDS to store its information in standard data structures for
+interchange between applications. 
+These data structures may be used therefore as building blocks when
+constructing larger HDS datasets, and also when designing `extensions' to
+the standard Starlink NDF data structure (SGP/38). 
+
+\item [MEMSYS]\index{MEMSYS} \hfill [SUN/117, 118]
+
+Two versions of MEMSYS are available on Starlink: MEMSYS3 and MEMSYS5.
+It is a `quantified maximum entropy image reconstruction package',
+consisting of subroutines callable from Fortran programs.
+It was written by J. Skilling and S. Gull of Maximum Entropy Data 
+Consultants Ltd, and embodies their `Classic' Maximum Entropy 
+algorithm, described in more detail in the MEMSYS3 users manual
+
+The algorithm differs greatly from their previous MEM algorithms, in
+that it is based on a fully Bayesian analysis of the image reconstruction
+problem.
+MEMSYS3 provides the following extra functionality:
+\begin {itemize}
+\item Automatic calculation of the most probable noise level in the input 
+data.
+\item Estimation of errors in the output reconstruction.
+\item Provision for handling negative data values.
+\item Provision for handling limited non-linearities in the data.
+\item Poisson or Gaussian statistics for input data noise.
+\end {itemize}
+
+MEMSYS deals with `data sets' and `images'.
+A {\em data set} holds information corresponding to the available experimental
+data, and an {\em image} holds information corresponding to the `true' image
+from which the data was generated.
+It handles problems where the relationship between data and image can
+described as follows: 
+
+\begin {equation}
+F_{k}=\sum_{j=1}^{M_{k}} (R_{kj}*f_{j})+n_{k}  \label {EQ:DATA}
+\end {equation}
+
+where $F_{k}$ is the $k$th data value, $M_{k}$ is the number of data values,
+$f_{j}$ is the $j$th image value, $R_{kj}$ is the response of sample $F_{k}$ to
+pixel $f_{j}$, and $n_{k}$ is the noise on sample $k$. 
+
+This is a linear relationship between data and image.
+It can also cope with non-linear data, so long as the data $D_{k}$ can be
+expressed as follows:
+
+\begin {equation}
+D_{k} = \Phi(F_{k})
+\end {equation}
+ where $\Phi$ is some known function with known derivative, and $F_{k}$ is 
+linearly dependent on the data. 
+
+The image and data set are described as one dimensional arrays purely for ease 
+of access within the package.
+In fact, they could be of any dimensionality.
+The program calling MEMSYS needs to set up the correspondence between
+N-dimensional coordinates and the one dimensional coordinate used above.
+For instance, for a two dimensional image with coordinates $(pix,lin)$ the
+relationship may be
+
+\begin {equation}
+ j = pix + NPIX*(lin-1)
+\end {equation}
+
+where $NPIX$ is the number of pixels per line of the image.
+
+A common example of the use of MEMSYS is to deconvolve a 2D image given a
+Point Spread Function (PSF).
+In this case the data is linear and the matrix $R_{kj}$ embodies the PSF.
+
+Before you attempt to use MEMSYS you must sign a form (available from your
+Site Manager) accepting certain conditions of use.
+
+\end{description}
+
+\newpage
+
+\subsection{Data management}
+\label{datman}
+
+\rule{\textwidth}{0.5mm}
+\begin{description}
+\begin{description}
+\item [NDF] --- Accessing extensible n-dimensional data format (NDF) objects
+ \hfill $\surd\surd\surd$
+\item [HDS] --- Hierarchical data system \hfill $\surd\surd\surd$
+\item [PRIMDAT] --- Processing primitive numerical data \hfill $\surd\surd\surd$
+\item [ARY] --- Accessing ARRAY data structures \hfill $\surd\surd\surd$
+\item [REF] --- Handling references to HDS objects \hfill $\surd\surd\surd$
+\item [CHI] --- Catalogue handling \hfill $\surd\surd$
+\end{description}
+\end{description}
+\rule{\textwidth}{0.5mm}
+
+\begin{description}
+
+\item [NDF]\index{NDF} \hfill [SUN/33]
+
+`NDF' stands for {\em Extensible N-Dimensional Data Format}. 
+It is the standard Starlink format for storing data which represent
+N-dimensional arrays of numbers, such as spectra, images, etc, and it
+will therefore form the basis of most Starlink spectral and image-processing
+applications. 
+This item is a subroutine library for accessing data stored in this form from
+programs written to run within the Starlink ADAM programming environment.
+For programs which do not require ADAM facilities, a non-ADAM, or
+`stand-alone', version of the library is also available.
+
+The main reason for using NDF data structures as a standard method of
+storing astronomical data on Starlink is to simplify the exchange of data
+between separate applications packages. 
+In principle, this should make it possible for you to process the same data
+using any Starlink package. 
+In practice, previous attempts to define a standard data format for this
+purpose have met with two serious obstacles. 
+First, different software authors have interpreted the meaning of data
+items differently, so that although several software packages might be
+capable of reading the same data files, the different packages actually
+performed incompatible operations on the data. 
+Secondly, many authors have found a pre-defined data format to be
+too restrictive, and have simply chosen not to use it. 
+
+The NDF data structure has, therefore, had to satisfy two apparently
+contradictory requirements: 
+
+\begin{enumerate}
+
+\item Its interpretation should be closely defined, so that different
+(usually geographically separated) programmers can write software which
+processes it in consistent and mutually compatible ways. 
+
+\item It should be very adaptable, so that it can be used to hold data
+associated with a wide variety of software systems whose detailed
+requirements may vary considerably. 
+
+\end{enumerate}
+
+The solution to this problem has been to introduce the concept of {\em
+extensibility}, and to divide the NDF data structure into two parts --- a set
+of {\em standard components\/} and a set of {\em extensions\/} --- each of which
+individually satisfies one of these two requirements. 
+The structure therefore consists of a central `core' of information, whose
+interpretation is well-defined and for which general-purpose software can be
+written with wide applicability, together with an arbitrary number of extensions
+which may be used by specialist software but whose interpretation is not
+otherwise defined. 
+Those who wish to know more of the background to this philosophy can find a 
+detailed discussion in SGP/38.
+
+\item [HDS]\index{HDS} \hfill [SUN/92]
+
+The Hierarchical Data System is a flexible system for storing and retrieving
+data.
+It is the basic data system in the ADAM software environment and in many other
+Starlink software items, and is of great importance to the Starlink project.
+Its most significant features are:
+\begin{itemize}
+\item It manipulates entities called {\em data objects}.
+ These can be scalars or arrays of up to seven dimensions.
+\item A data object has a tree-like shape whose components comprise other
+ objects. The only restriction is that the leaves must be primitive data
+ types.  The degenerate form of an HDS tree is a single scalar or array of a
+ primitive data type.  The non-degenerate form is called a structure and
+ comprises two or more components.
+\item The primitive data types include the usual Fortran numeric, logical, and
+ character types, together with signed and unsigned bytes and words.
+\item Facilities are provided for walking around the trees.  Any branch or
+ sub-branch of a tree can be treated as a data object in its own right.
+\item Data objects are dynamic in the sense that programs can add, modify,
+ or delete components to or from a tree.
+\item Subsets of primitive arrays can be defined and manipulated as separate
+ data objects, and arrays can be mapped as vectors.
+\end{itemize}
+More powerful data systems have been built on top of HDS in order to make
+specific types of data object easier to handle.
+These include ARY, for handling arrays, and NDF, for handling objects in
+the standard Starlink data format.
+
+\item [PRIMDAT]\index{PRIMDAT} \hfill [SUN/39]
+
+A collection of Fortran functions and subroutines providing support for
+`primitive data processing'. 
+They do arithmetic, mathematical operations, type conversion, and
+inter-comparison of any of the primitive numerical data types supported by HDS.
+They provide:
+\begin{itemize}
+\item Processing facilities which are not normally available.
+\item A uniform interface.
+\item Improved portability and efficiency.
+\item Facilities for processing bad data.
+\item Handling of numerical errors.
+\item A set of constants.
+\end{itemize}
+A distinction is drawn between three classes of primitive data, which differ
+in their interpretation and in the algorithms best suited to processing them: 
+\begin{itemize}
+\item {\bf Values} (VAL facility) are scalar data which may take one
+of the Starlink-defined {\em bad values} (sometimes called `magic'
+values), whose presence signifies that the affected datum is undefined. 
+\item {\bf Vectorised arrays} (VEC facility) are 1-dimensional arrays
+of {\em values} (or arrays treated as 1-dimensional) whose elements are
+processed in the way described above. 
+\item {\bf Numbers} (NUM facility) are always interpreted literally
+as scalar numerical quantities (i.e.\ {\em bad} values are not recognised on
+input and are not explicitly generated on output). 
+\end{itemize}
+
+\item [ARY]\index{ARY} \hfill [SUN/11]
+
+This is a set of routines for accessing Starlink ARRAY data structures built
+using HDS.
+Details of these structures and the design philosophy behind them can be
+found in SGP/38, although familiarity with that document is not necessarily 
+required in order to use the routines.
+
+It constitutes an essential sub-component of the NDF system,
+which contains routines for accessing Starlink NDF structures. 
+
+The most likely reason for needing to use these routines directly at
+present is to access ARRAY structures stored in NDF extensions.
+At present, it only supports the `primitive' and `simple' forms of the
+ARRAY data structure. 
+
+The routines can be classified as follows:
+\begin{itemize}
+\item Access existing arrays.
+\item Create and delete arrays.
+\item Create and control identifiers.
+\item Create placeholders.
+\item Copy arrays.
+\item Enquire and set array attributes.
+\item Message system routines.
+\item Miscellaneous.
+\end{itemize}
+
+\item [REF]\index{REF} \hfill [SUN/31]
+
+These routines enable you to store references to HDS data objects in special HDS
+reference objects and allow locators to reference objects to be obtained.
+They will help make your software portable.
+
+The following facilities are available:
+\begin{itemize}
+\item Create a reference object and put a reference in it.
+\item Obtain a locator to an object (possibly via a reference).
+\item Obtain a locator to a referenced object.
+\item Create an empty reference object.
+\item Put a reference into a reference object.
+\item Annul a locator which may have been obtained via a reference.
+\end{itemize}
+
+The two main uses for this package are:
+\begin{itemize}
+\item To maintain a catalogue of HDS objects.
+\item To avoid duplicating a large dataset.
+\end{itemize}
+
+\item [CHI]\index{CHI} \hfill [SUN/119]
+
+The Catalogue Handling Interface is a set of routines for processing catalogues
+and tables.
+
+Until now, programs accessing catalogues (such as those in SCAR) have used ADC
+or ad hoc Fortran routines.
+However, ADC has a number of problems associated with it, and we plan to
+replace it with a commercial database management system.
+We also plan to access some catalogues using HDS and its derivatives.
+Programs written using CHI will not be affected by these changes since they
+will only affect the implementation of CHI and not the interface CHI presents
+to the programmer.
+Also, they will be able to access catalogues based on ADC, HDS, and any
+commercial system used.
+In contrast, SCAR applications can only access ADC-based catalogues. 
+You should therefore use CHI applications rather than the SCAR alternatives.
+
+CHI offers the following functions:
+\begin{itemize}
+\item Create and delete catalogues.
+\item List available catalogues.
+\item Read and write records in a catalogue.
+\item Examine and manipulate catalogue parameters and fields.
+\item Select records in catalogues based on various criteria.
+\item Join or merge two catalogues.
+\end{itemize}
+
+\end{description}
+
+\newpage
+
+\subsection{Graphics}
+
+Several graphics packages are available.
+Starlink recommends GKS for low-level graphics, SGS for simple graphics, and
+PGPLOT or NCAR/SNX for high-level graphics.
+
+\rule{\textwidth}{0.5mm}
+\begin{description}
+\begin{description}
+\item [PGPLOT] --- High-level graphics \hfill $\surd\surd\surd$
+\item [GKS] --- Low-level graphics \hfill $\surd\surd\surd$
+\item [SGS] --- Simple graphics \hfill $\surd\surd\surd$
+\item [NCAR/SNX] --- High-level graphics \hfill $\surd$/$\surd\surd\surd$
+\item [GNS] --- Graphics workstation name service \hfill $\surd\surd\surd$
+\item [AGI] ---  Graphics database \hfill $\surd\surd$
+\item [IDI] --- Image display interface \hfill $\surd\surd$
+\item [GWM] --- X graphics window manager \hfill $\surd\surd\surd$
+\end{description}
+\end{description}
+\rule{\textwidth}{0.5mm}
+
+\begin{description}
+
+\item [PGPLOT]\index{PGPLOT} \hfill [SUN/15]
+
+A high-level graphics package for plotting {\em x,y} plots, functions,
+histograms, bar charts, contour maps, and grey-scale images.
+Complete diagrams can be produced with a minimal number of subroutine calls,
+but control over colour, line-style, character font, etc is available if
+required.
+The package was written by Dr T J Pearson of the Caltech astronomy department
+with astronomical applications in mind and has become a {\it de facto} standard
+for graphics in astronomy world wide.
+
+The package exists in two version: the original version which uses a low
+level graphics package known as GRPCKG, also written at Caltech, and a version
+developed by Starlink, in collaboration with Dr Pearson, which uses GKS.
+The two versions have identical subroutine interfaces, and applications can be
+moved from one version to the other simply by re-linking (if you have used the
+shareable image, you can change by redefining a couple of logical names).
+The GKS version is the one distributed and supported by Starlink.
+
+A programmers manual can be obtained from your Site Manager.
+
+\item [GKS]\index{GKS} \hfill [SUN/83, 113]
+
+The Graphical Kernel System is a low-level graphics library which is an
+international standard.
+The current version is 7.2, and this is the one you should use.
+An old version (6.2) is still used by some Starlink software but will eventually
+be withdrawn.
+
+It has two major advantages over other graphics packages:
+\begin{itemize}                   
+\item It is an international standard and real portability of graphics software
+ is now possible.
+\item No other package provides the ability to write such device independent
+ graphics programs.
+ Only with GKS can you write a program that will run, and produce good pictures,
+ on all devices supported by the implementation, including devices not supported
+ at the time the program was written.
+ Nonetheless, programs can still fully exploit all the facilities offered by the
+ hardware.
+\end{itemize}
+In addition, the Starlink implementation has several advantages of its own:
+\begin{itemize}
+\item A substantial support commitment has been made by the SERC.
+The level of support available will far exceed that provided for software unique
+to Starlink.
+\item The implementation will be in use on several hundred computers, of many
+different types, throughout the UK academic community.
+This means that the software will receive a large amount of testing under a wide
+variety of conditions and will quickly become a highly reliable package.
+\item It contains features which are not all found in any other single package:
+\begin{itemize}
+\item Area fill with several fill styles on {\em all} devices.
+\item Cell array supported on dot matrix printers.
+\item Multiple fonts.
+\item Selective clearing of display surface.
+\end{itemize}
+\end{itemize}
+The advantages of GKS also apply to graphics software, such as SGS, that are
+based on it.
+
+\item [SGS]\index{SGS} \hfill [SUN/85, 113]
+
+The Simple Graphics System provides a friendlier interface to a subset of GKS
+facilities.
+Many of its features are low-level (e.g.\ draw a line), but there are some
+routines of a slightly higher level (drawing arcs, formatted numbers, etc). 
+It does not include routines for high-level operations like drawing annotated
+axes or complete graphs.
+Many plotting programs can be written entirely with SGS or higher-level calls.
+There will, however, be occasions when GKS routines are used as well; usually
+because a specialised feature of GKS is needed.
+
+The basic functions provided are:
+\begin{itemize}
+\item Control of workstations and zones.
+\item Plotting lines, text, and markers.
+\item Control of character attributes.
+\item Graphical input.
+\item GKS inquires.
+\end{itemize}
+
+\item [NCAR/SNX]\index{NCAR}\index{SNX} \hfill [SUN/88, 90]
+
+NCAR is an extensive suite of high-level graphics utilities obtained from the
+National Center for Atmospheric Research in Boulder, Colorado.
+SNX contains some Starlink extensions to NCAR.
+The plots provided are:
+\begin{itemize}
+\item Annotated curves or families of curves.
+\item Contours for one- and two-dimensional data, with labels.
+\item Dashed lines with labels.
+\item Continental, national, and US state boundaries in nine map projections.
+\item Graph paper, axes, etc.
+\item Halftone (greyscale) pictures from two dimensional arrays.
+\item Histograms.
+\item Iso-value surfaces (with hidden lines removed) from three-dimensional
+ arrays.
+\item Software characters.                      
+\item Three-dimensional displays of a surface (with hidden lines removed)
+ from two-dimensional arrays.
+\item Vector flows of fields for which planar vector components are given on
+ regular rectangular lattices.
+\item Lines in three space.
+\item Two-dimensional velocity fields.
+\end{itemize}
+
+\item [GNS]\index{GNS} \hfill [SUN/57]
+
+Almost any program that does graphics requires you to identify a graphics
+device to use.
+When the graphics package used by the program is GKS, graphics devices are
+identified by two integers: a `workstation type' and a `connection identifier'.
+(`Workstation' is GKS terminology for a graphics device of any description.)
+No one can be expected to remember the workstation types of all the devices
+supported by Starlink (more than 60 at present), so this package has been
+provided to translate `friendly' and easy to remember names into their GKS
+equivalents.
+
+Most high level graphics packages, such as SGS and PGPLOT, call GNS to do the
+required name translation when a workstation is opened, so unless you are
+writing programs that open GKS workstations directly (by calling {\tt GOPWK}),
+or need to make specialised device inquiries, you will not need to call
+GNS routines yourself.
+
+It provides three sorts of service --- routines:
+\begin{itemize}
+\item Translate workstation names to their GKS equivalents.
+\item Generate a list of the names and types of available graphics devices.
+\item Answer a variety of enquiries about the properties of a particular
+graphics device; for example, its category (pen plotter, image display,
+etc) or its VMS device name.
+\end{itemize}
+It is used in IDI and AGI, but in both cases its use is internal so its
+presence is not normally apparent to the programmer.
+
+\item [AGI]\index{AGI} \hfill [SUN/48]
+
+A graphics database system.
+It is intended for use within the ADAM environment to store, between
+applications, information about the various plots on a graphics device.
+When called upon, it will record in the database the position and extent of a
+plot.
+These can be recalled later either to overlay one plot with another, or to
+recreate the picture.
+
+Its obvious uses are to align one picture with another, or to obtain cursor
+coordinates from an existing picture.
+But it can be used in other ways as well, e.g.\ to slice up the graphics
+screen into areas for subsequent plotting using more complicated patterns than
+just a regular grid; the areas could be different sizes or overlapping.
+
+\item [IDI]\index{IDI} \hfill [SUN/65]
+
+This is an international standard for displaying astronomical data on an
+image display.
+It is intended for programs that need to manipulate images to a greater extent
+than can be done with GKS and its offspring.
+Thus, it does not supersede GKS, but offers features not available in GKS.
+It is not as good as GKS for producing line plots or character annotation ---
+it does have routines to draw lines and plot text, but these are primitive and
+offer you little control over how the result will appear in terms of character
+size, style of line width, etc.
+
+Its major strength is its ability to perform many types of interaction using the
+mouse.
+Like GKS, it can display an image, move the cursor, and rotate the look-up
+table.
+However, it can also scroll and zoom, blink the memories, and read back a
+representation of the whole display, which can then be used to obtain a
+hardcopy.
+It allows these functions to be programmed in a device independent way, so
+a program can use any device for which IDI has been implemented.
+
+It is not possible, at present, to mix GKS and IDI calls on the same display
+since the two packages use completely different display models.
+However, it is possible to run the packages one after the other.
+For example, IDI could follow GKS and the display could be opened without
+resetting it.
+However, this is an undesirable approach since the results could be
+unpredictable.
+A better solution is to use AGI when its interface to IDI becomes available.
+
+\item [GWM]\index{GWM} \hfill [SUN/130]
+
+These routines help you create graphics windows on an X display that do not
+disappear when a program terminates.
+
+X was designed to support `graphical user interfaces' (GUIs), and there are two
+properties of X that make an X window fundamentally different from a
+traditional graphics device.
+Firstly, windows `belong' to application programs and are deleted when the
+application exits, unlike the picture on an image display which remains there
+until replaced by something else. 
+Secondly, application programs are expected respond to `events' occurring in
+their windows; things like key presses, mouse movements, etc.
+One event type that all applications must handle is the `window expose' event
+which occurs whenever part of a window that was invisible --- because another
+application's window was obscuring it for example --- becomes visible.
+The application is responsible for restoring the contents of the newly exposed
+part of the window, but only an application designed as an X application can do
+this; an application that is using X via a graphics package, such as GKS or IDI,
+but is otherwise a conventional application that knows nothing of X, cannot.
+
+The X graphics window manager\footnote{Not to be confused with the Window
+Manager which allows you to move windows around the screen, iconize them etc.}
+makes a window on an X windows display behave like a traditional graphics
+device by making the lifetime of the window independent of any applications
+program, and by handling window expose events.
+Applications still send plotting commands directly to the window; they don't
+have to go via a `server' process, so there is no adverse impact on
+performance.
+All communication between the window manager and the application is via the X
+server, and the graphics window manager does not have to run on the same 
+machine as the application.
+
+\end{description}
+
+\newpage
+
+\subsection{Other}
+
+\rule{\textwidth}{0.5mm}
+\begin{description}
+\begin{description}
+\item [TAPEIO] --- Magnetic tape handling \hfill $\surd$
+\item [CHR] --- Character handling \hfill $\surd\surd\surd$
+\item [EMS] --- Error message service \hfill $\surd\surd\surd$
+\item [HELP] --- Interactive Help system \hfill $\surd\surd\surd$
+\item [CNF] --- C and Fortran mixed programming \hfill $\surd\surd\surd$
+\end{description}
+\end{description}
+\rule{\textwidth}{0.5mm}
+
+\begin{description}
+
+\item [TAPEIO]\index{TAPEIO} \hfill [SUN/21]
+
+A set of routines to perform physical I/O operations on tapes.
+They are useful for handling non-VAX-standard magnetic tapes, and provide an
+easier interface for Fortran programmers than calling system services directly.
+The following operations are available:
+\begin{itemize}
+\item Assign/deassign an I/O channel to a device.
+\item Set the recording density.
+\item Mount/dismount a tape.
+\item Read/write a physical block and an end-of-file mark.
+\item Skip forward or backward a given number of tape marks or blocks.
+\item Reposition a tape to the BOT marker.
+\item Test for a physical end-of-file or error condition.
+\item Return message text for a status value.
+\item Get information about a tape drive.
+\end{itemize}
+
+\item [CHR]\index{CHR} \hfill [SUN/40]
+
+A set of character handling functions which will assist the production of
+portable programs.
+There are four classes of routine:
+\begin{itemize}
+\item Decode character strings into numbers of various types.
+\item Encode and format numbers of various types into character strings.
+\item Inquire about character strings.
+\item String manipulation.
+\end{itemize}
+
+\item [EMS]\index{EMS} \hfill [SUN/104]
+
+There is a general need for Starlink application programs to provide the
+user with information about:
+
+\begin {itemize}
+\item What they do --- for example, during long operations it is helpful if the
+user is kept informed about what is going on.
+
+\item What results have been obtained --- for example, the notification of  the
+final results from a procedure, or of some intermediate results that would help
+the user respond to further prompts. 
+
+\item What errors have occurred --- for example, errors which lead to the user
+being prompted to provide more sensible input to a program, or fatal
+errors which cause an application to stop.
+\end {itemize}
+
+EMS comprises two subroutine libraries to enable a program to do these jobs.
+They are:
+
+\begin {quote}
+\begin {itemize}
+\item [MSG]\index{MSG} --- Message Reporting System, used for reporting
+non-error information. 
+\item [ERR]\index{ERR} --- Error Reporting System, used for reporting error
+messages.
+\end {itemize}
+\end {quote}
+They can be used as part of the ADAM system, or in stand-alone programs.
+
+\item [HELP]\index{HELP} \hfill [SUN/124]
+
+A set of routines and utilities which allows a program to retrieve named
+items from a hierarchically-arranged library of text.
+Functionally, it is very similar to the VAX/VMS Help system.
+The major differences are that the Starlink Help system:
+\begin{itemize}
+\item Is implemented in a portable way and is not tied to the VAX.
+\item Allows independent creation of multiple libraries which are bound
+together at run-time and appear to the user as a single tree.
+\end{itemize}
+It is written in a free-standing manner and does not call any other Starlink
+packages.
+
+\item [CNF]\index{CNF} \hfill [SGP/5]
+
+This is a facility that lets a programmer mix program segments that are written
+in FORTRAN and C in a portable manner.
+It provides C macros to hide the different ways that computers pass information
+between subprograms and C functions to handle FORTRAN character strings.
+
+\end{description}
+
+\newpage
+
+\subsection{ARGS support}
+
+\rule{\textwidth}{0.5mm}
+\begin{description}
+\begin{description}
+\item [ARGSLIB] --- ARGS manipulation \hfill $\times\times$
+\item [ARGSMAC] --- ARGS programming system \hfill $\times$
+\end{description}
+\end{description}
+\rule{\textwidth}{0.5mm}
+
+The use of the ARGS image display device is being phased out in favour of the
+IKON device.
+However, some old Starlink programs (those in ASPIC for example) still use the
+ARGS and the items described below will be retained until the use of the
+ARGS ceases.
+
+\begin{description}
+
+\item [ARGSLIB]\index{ARGSLIB} \hfill [SUN/10]
+
+Controls the ARGS at a low level.
+
+\item [ARGSMAC]\index{ARGSMAC} \hfill [SSN/12]
+
+A set of tools for writing programs to be executed by the ARGS graphics
+processor.
+\end{description}
+
+\appendix
+\newpage
+
+\section{Software Support Levels}
+
+Support of a software item means:
+\begin{itemize}
+\item Providing up-to-date, accurate and helpful documentation.
+\item Providing a help service to which users can turn if they have problems.
+\item Accepting and responding to bug reports.
+This can either mean making a correction to the software or indicating a better
+way of using it.
+\item Developing the item by providing new or enhanced facilities.
+\end{itemize}
+The hundred or so items in the Collection have widely differing levels of
+support and have reached different stages in their life cycle.
+Some, like ASPIC, are obsolete and unsupported and are likely to be withdrawn.
+Others, like ADAM, are well supported and are being actively developed.
+Some items, like NAG, are commercially supported.
+
+The table on the next page shows the support level at the time of writing for
+each item in the Collection.
+The level often depends on a single person who may leave, thus support levels
+may change.
+Also, many new items are released every year and old items are withdrawn.
+You should, therefore, check the current status of any item in which you are
+interested by looking at file ADMINDIR:SUPPORT.LIS.
+
+The codes for `Level' have the following meaning:
+\begin{center}
+\begin{tabular}{||r|l||}
+\hline
+Level & Meaning \\
+\hline
+\hline
+$\surd\surd\surd$ & Unconditional support, by Starlink staff \\
+                  & at short notice.  Compatibility with other \\
+                  & software will be maintained. \\
+\hline
+$\surd\surd$      & High level of support, but with \\
+                  & reservations based on geographical location, \\
+                  & response time, or control factors. \\
+                  & (This category includes commercial software.) \\
+\hline
+$\surd$           & Best efforts, by a named individual. \\
+\hline
+$\times$          & Little or no support available. \\
+\hline
+$\times\times$    & Obsolescent.\\
+\hline
+\end{tabular}
+\end{center}
+You should regard items with support levels indicated by crosses ($\times$ or
+$\times\times$) as being unreliable, and you should avoid them if possible.
+Items marked with a single tick ($\surd$) are potentially unreliable and
+should be used with discretion.
+
+There is a difference between the support level of a software item and its
+importance.
+It is possible for an item to be important but not supported because of
+the unavailability of key people or due to a lack of resources.
+Obviously, Starlink will do its best to support important items but this may
+not, in fact, be possible.
+Also, remember that support levels can change.
+
+\newpage
+\twocolumn
+\small
+\begin{center}
+\begin{tabular}{||l|r||}
+\hline
+ Item & Level \\
+\hline
+\hline
+AATGS     & $\surd\surd\surd$ \\
+ADAM      & $\surd\surd\surd$ \\
+AGI       & $\surd\surd$ \\
+AIPS      & $\times$ \\
+APIG      & $\surd$ \\
+APLATE    & $\surd$ \\
+ARGSLIB   & $\times\times$ \\
+ARGSMAC   & $\times$\\
+ARY       & $\surd\surd\surd$ \\
+ASPIC     & $\times$ \\
+ASTERIX   & $\surd\surd$ \\
+ASTROM    & $\surd\surd\surd$ \\
+ASURV     & $\surd$ \\
+CDCOPY    & $\surd$ \\
+CHART     & $\times$ \\
+CHI       & $\surd\surd$ \\
+CHIAPP    & $\surd\surd$ \\
+CHR       & $\surd\surd\surd$ \\
+CLUSTAN   & $\surd\surd$ \\
+CNF       & $\surd\surd\surd$ \\
+COCO      & $\surd\surd\surd$ \\
+CONVERT   & $\surd\surd\surd$ \\
+DAOPHOT   & $\surd\surd$ \\
+DIPSO     & $\surd$ \\
+DOCFIND   & $\surd$ \\
+DSCL      & $\times\times$ \\
+ECHWIND   & $\surd$ \\
+EDFITS    & $\surd\surd$ \\
+EMS       & $\surd\surd\surd$ \\
+FIGARO    & $\surd\surd$ \\
+FORCHECK  & $\surd\surd$ \\
+FORMCON   & $\times\times$ \\
+GENERIC   & $\surd\surd$ \\
+GENSTAT   & $\surd\surd$ \\
+GEROFF    & $\times\times$ \\
+GKS       & $\surd\surd\surd$ \\
+GKS6      & $\times\times$ \\
+GNS       & $\surd\surd\surd$ \\
+GWM       & $\surd\surd\surd$ \\
+HDS       & $\surd\surd\surd$ \\
+HELP      & $\surd\surd\surd$ \\
+HONEY     & $\surd\surd\surd$ \\
+HXIS      & $\surd$ \\
+IDI       & $\surd\surd$ \\
+IDL       & $\surd\surd$ \\
+IKONPAINT & $\surd$ \\
+INTERIM   & $\times\times$ \\
+IRAF      & $\times$ \\
+IRAS      & $\surd\surd$ \\
+IRCAM     & $\times$ \\
+IUEDEARCH & $\surd\surd$ \\
+IUEDR     & $\surd$ \\
+\hline
+\end{tabular}
+\end{center}
+
+\newpage
+
+\begin{center}
+\begin{tabular}{||l|r||}
+\hline
+Item & Level \\
+\hline
+\hline
+JPL       & $\surd\surd$ \\
+KAPPA     & $\surd\surd\surd$ \\
+LIBMAINT  & $\surd\surd$ \\
+LIBX      & $\surd\surd\surd$ \\
+LZCMP     & $\surd\surd\surd$ \\
+MAPLE     & $\surd\surd$ \\
+MEMSYS    & $\surd\surd$ \\
+MIDAS     & $\times$ \\
+MONGO     & $\surd$ \\
+NAG       & $\surd\surd$ \\
+NCAR      & $\surd$ \\
+NDF       & $\surd\surd\surd$ \\
+NETWORK   & $\surd\surd\surd$ \\
+NEWSMAINT & $\surd\surd$ \\
+NOCBS     & $\surd\surd\surd$ \\
+NOD2      & $\times$ \\
+PAD\_AUDIT & $\surd\surd\surd$ \\
+PGPLOT    & $\surd\surd\surd$ \\
+PHOTOM    & $\surd\surd$ \\
+PISA      & $\surd$ \\
+PRIMDAT   & $\surd\surd\surd$ \\
+PSSMB     & $\surd$ \\
+QDP       & $\times$ \\
+QUOTAS    & $\surd\surd\surd$ \\
+REF       & $\surd\surd\surd$ \\
+REXEC     & $\surd$ \\
+RGASP     & $\surd$ \\
+RPS       & $\surd$ \\
+RUNSTAR   & $\times\times$ \\
+RV        & $\surd\surd\surd$ \\
+SCAR      & $\surd$ \\
+SGS       & $\surd\surd\surd$ \\
+SLALIB    & $\surd\surd\surd$ \\
+SNX       & $\surd\surd\surd$ \\
+SPAG      & $\surd\surd$ \\
+SPECX     & $\surd$ \\
+SST       & $\surd\surd\surd$ \\
+STARCON   & $\surd\surd\surd$ \\
+STARLSE   & $\surd\surd\surd$ \\
+TAPECOPY  & $\surd\surd\surd$ \\
+TAPEIO    & $\surd$ \\
+TEX       & $\surd$ \\
+TOOLPACK  & $\surd\surd$ \\
+TPOINT    & $\surd\surd\surd$ \\
+TPU       & $\surd\surd$ \\
+TRACE     & $\surd\surd\surd$ \\
+TRANSFORM & $\surd\surd\surd$ \\
+TSP       & $\surd$ \\
+USSP      & $\surd\surd$ \\
+VSHC      & $\surd$ \\
+WFC\_SHORT & $\surd\surd$ \\
+XDISPLAY  & $\surd\surd\surd$ \\
+\hline
+\end{tabular}
+\end{center}
+
+\newpage
+\onecolumn
+\normalsize
+
+\section{Functional Classification}
+
+The next five pages present a functional classification of the items in the
+Collection in a format designed for quick reference.
+A summary of the structure is shown below.
+
+\vspace{5mm}
+
+\small
+
+\begin{quote}
+\begin{description}
+\item [ADAM APPLICATIONS] \mbox{}
+
+\begin{description}
+\item [Image Analysis \& Photometry] \mbox{}
+\item [Spectroscopy] \mbox{}
+\item [Specific Wavelengths] \mbox{}
+\item [Specific Instruments] \mbox{}
+\item [Polarimetry] \mbox{}
+\item [Database Management] \mbox{}
+\item [Utilities] \mbox{}
+\end{description}
+
+\item [STAND-ALONE APPLICATIONS] \mbox{}
+
+\begin{description}
+\item [Image Analysis \& Photometry] \mbox{}
+\item [Spectroscopy] \mbox{}
+\item [Specific Wavelengths] \mbox{}
+\item [Specific Instruments] \mbox{}
+\item [Statistics] \mbox{}
+\item [Database Management] \mbox{}
+\end{description}
+
+\item [INTERIM APPLICATIONS] \mbox{}
+
+\begin{description}
+\item [Specific Instruments] \mbox{}
+\item [General Purpose] \mbox{}
+\end{description}
+
+\item [FOREIGN APPLICATIONS] \mbox{}
+
+\begin{description}
+\item [Specific Wavelengths] \mbox{}
+\item [Specific Instruments] \mbox{}
+\item [General Purpose] \mbox{}
+\end{description}
+
+\item [ASTRONOMICAL UTILITIES] \mbox{}
+
+\begin{description}
+\item [Archive Access] \mbox{}
+\item [Data Copying \& Format Conversion] \mbox{}
+\item [Observation Preparation and Positional Astronomy] \mbox{}
+\end{description}
+
+\item [GENERAL UTILITIES] \mbox{}
+
+\begin{description}
+\item [Document Preparation \& Search] \mbox{}
+\item [Graphics] \mbox{}
+\item [Device Handling, Data Compression \& Examination] \mbox{}
+\item [Mathematical] \mbox{}
+\item [Operational] \mbox{}
+\item [Programming Support] \mbox{}
+\end{description}
+
+\item [SUBROUTINE LIBRARIES] \mbox{}
+
+\begin{description}
+\item [ARGS Support] \mbox{}
+\item [Astronomical \& Mathematical] \mbox{}
+\item [Data Management] \mbox{}
+\item [Graphics] \mbox{}
+\item [Other] \mbox{}
+\end{description}
+
+\end{description}
+\end{quote}
+
+\newpage
+\normalsize
+
+\begin{center}
+{\LARGE\bf THE STARLINK SOFTWARE COLLECTION}
+\end{center}
+
+
+\begin{center}
+{\bf\Large ADAM APPLICATIONS}
+\end{center}
+
+\begin{description}
+
+\item [Image Analysis \& Photometry] \mbox{}
+\begin{description}
+\item [KAPPA] --- Kernel applications
+\item [DAOPHOT] --- Stellar photometry
+\item [PHOTOM] --- Aperture photometry
+\item [PISA] --- Object finding and analysis
+\end{description}
+
+\item [Spectroscopy] \mbox{}
+\begin{description}
+\item [FIGARO] --- General data analysis
+\end{description}
+
+\item [Specific Wavelengths] \mbox{}
+\begin{description}
+\item [ASTERIX] --- X-ray data analysis
+\end{description}
+
+\item [Specific Instruments] \mbox{}
+\begin{description}
+\item [IRCAM] --- UKIRT (Infra-red)
+\end{description}
+
+\item [Polarimetry] \mbox{}
+\begin{description}
+\item [TSP] --- Time series and polarimetry analysis
+\end{description}
+
+\item [Database Management] \mbox{}
+\begin{description}
+\item [SCAR] --- Catalogue data base system
+\item [CHIAPP] --- Catalogue/table data base system
+\end{description}
+
+\item [Utilities] \mbox{}
+\begin{description}
+\item [CONVERT] --- Data format conversion (DIPSO/FIGARO/BDF to NDF)
+\item [TRACE] --- HDS data file listing
+\item [SST] --- Simple Software Tools package
+\end{description}
+
+\end{description}
+
+\newpage
+
+\begin{center}
+{\bf\Large STAND-ALONE APPLICATIONS}
+\end{center}
+
+\begin{description}
+
+\item [Image Analysis \& Photometry] \mbox{}
+\begin{description}
+\item [RGASP] --- Galaxy surface photometry
+\end{description}
+
+\item [Spectroscopy] \mbox{}
+\begin{description}
+\item [DIPSO] --- Spectral analysis and plotting
+\item [APIG] --- Absorption profiles in the interstellar gas
+\end{description}
+
+\item [Specific Wavelengths] \mbox{}
+\begin{description}
+\item [SPECX] ---  Mm-wave data analysis
+\item [NOD2] --- Radio astronomy data analysis
+\end{description}
+
+\item [Specific Instruments] \mbox{}
+\begin{description}
+\item [IUEDR] --- IUE (Ultra-violet)
+\item [HXIS] --- SMM (X-ray)
+\end{description}
+
+\item [Statistics] \mbox{}
+\begin{description}
+\item [GENSTAT] --- General statistical analysis
+\item [CLUSTAN] --- Cluster analysis (Restricted to 10 sites)
+\item [ASURV] --- Statistical analysis of data with upper limits
+\end{description}
+
+\item [Database Management] \mbox{}
+\begin{description}
+\item [REXEC] --- Relational database management system
+\end{description}
+
+\end{description}
+
+\begin{center}
+{\bf\Large INTERIM APPLICATIONS}
+\end{center}
+
+\begin{description}
+
+\item [Specific Instruments] \mbox{}
+\begin{description}
+\item [IRAS] --- IRAS (Infra-red)
+\end{description}
+
+\item [General Purpose] \mbox{}
+\begin{description}
+\item [ASPIC] --- General data analysis
+\end{description}
+
+\end{description}
+
+\begin{center}
+{\bf\Large FOREIGN APPLICATIONS}
+\end{center}
+
+\begin{description}
+
+\item [Specific Wavelengths] \mbox{}
+\begin{description}
+\item [AIPS] --- Radio astronomy data analysis
+\end{description}
+
+\item [Specific Instruments] \mbox{}
+\begin{description}
+\item [IRAF] --- HST (multi-wavelength)
+\end{description}
+
+\item [General Purpose] \mbox{}
+\begin{description}
+\item [IDL] --- General data analysis (US Commercial package)
+\item [MIDAS] --- General data analysis (ESO)
+\end{description}
+
+\end{description}
+
+\newpage
+
+\begin{center}
+{\bf\Large ASTRONOMICAL UTILITIES}
+\end{center}
+
+\vspace{10mm}
+
+\begin{description}
+
+\item [Archive Access] \mbox{}
+\begin{description}
+\item [IUEDEARCH] --- Access IUE archive data
+\item [USSP] --- Access IUE uniform low-dispersion archive (ULDA), (STADAT only)
+\end{description}
+
+\item [Data Copying \& Format Conversion] \mbox{}
+\begin{description}
+\item [STARCON] --- Data format conversion (BDF to HDS)
+\item [EDFITS] --- Copy FITS tapes
+\item [WFC\_SORT] --- Data format conversion (ROSAT-WFC to ASTERIX (HDS))
+\item [FORMCON] --- Data format conversion (IPCS/VICAR to BDF)
+\end{description}
+
+\item [Observation Preparation and Positional Astronomy] \mbox{}
+\begin{description}
+\item [COCO] --- Celestial coordinate conversion
+\item [CHART] --- Finding chart and stellar data system
+\item [ASTROM] --- Basic astrometry
+\item [RV] --- Calculate radial components of observer's velocity
+\item [RPS] --- Submit Rosat proposals
+\item [ECHWIND] --- Plan use of UCL echelle spectrograph
+\item [TPOINT] --- Telescope pointing analysis
+\item [APLATE] --- Aperture plate preparation
+\item [AATGS] --- Guide probe predictions for AAT
+\end{description}
+
+\end{description}
+
+\newpage
+
+\begin{center}
+{\bf\Large GENERAL UTILITIES}
+\end{center}
+
+\vspace{10mm}
+
+\small
+
+\begin{description}
+
+\item [Document Preparation \& Search] \mbox{}
+\begin{description}
+\item [TEX] --- Document preparation (includes \LaTeX)
+\item [DOCFIND] --- Starlink document search
+\item [GEROFF] --- Document preparation
+\end{description}
+
+\item [Graphics] \mbox{}
+\begin{description}
+\item [MONGO] --- Interactive plotting
+\item [IKONPAINT] --- Ikon to inkjet hard-copy
+\item [QDP] --- Quick and Dandy Plotter
+\item [VSHC] --- Obtain hardcopy from the display of a VAXstation
+\item [HONEY] --- Hardcopy output from the Honeywell camera
+\end{description}
+
+\item [Device Handling, Data Compression \& Examination] \mbox{}
+\begin{description}
+\item [TPU] --- Magnetic tape handling
+\item [LZCMP] --- File compression and de-compression
+\item [TAPECOPY] --- Copy magnetic tapes
+\item [CDCOPY] --- CDROM reading
+\item [XDISPLAY] --- Xwindows display setup
+\end{description}
+
+\item [Mathematical] \mbox{}
+\begin{description}
+\item [MAPLE] --- Mathematical manipulation language, (STADAT only)
+\end{description}
+
+\item [Operational] \mbox{}
+\begin{description}
+\item [NETWORK] --- DECNET utilities
+\item [QUOTAS] --- Other users' disk quotas
+\item [NEWSMAINT] --- News maintenance
+\item [NOCBS] --- Error reporting for CBS on satellites
+\item [PAD\_AUDIT] --- PAD auditing
+\item [PSSMB ] --- Postscript print symbiont
+\end{description}
+
+\item [Programming Support] \mbox{}
+\begin{description}
+\item [SPAG] --- Improve structure of Fortran source code, (STADAT only)
+\item [LIBMAINT] --- Library maintenance
+\item [FORCHECK] --- Fortran verifier and programming aid, (STADAT only)
+\item [STARLSE] --- Starlink language sensitive editor
+\item [GENERIC] --- Compile generic Fortran routines
+\item [TOOLPACK] --- Fortran Software Tools package
+\item [LIBX] --- Library maintenance
+\end{description}
+
+\end{description}
+
+\newpage
+
+\begin{center}
+{\bf\Large SUBROUTINE LIBRARIES}
+\end{center}
+\normalsize
+
+\begin{description}
+
+\item [Astronomical \& Mathematical] \mbox{}
+\begin{description}
+\item [NAG] --- Numerical mathematics \& statistics
+\item [SLALIB] --- Mainly positional astronomy
+\item [JPL] --- Solar system ephemeris
+\item [TRANSFORM] --- Coordinate transformation
+\item [MEMSYS] --- Maximum entropy image reconstruction
+\end{description}
+
+\item [Data Management] \mbox{}
+\begin{description}
+\item [NDF] --- Accessing extensible n-dimensional data format (NDF) objects
+\item [HDS] --- Hierarchical data system
+\item [PRIMDAT] --- Processing primitive numerical data
+\item [ARY] --- Accessing ARRAY data structures
+\item [REF] --- Handling references to HDS objects
+\item [CHI] --- Catalogue handling
+\end{description}
+
+\item [Graphics] \mbox{}
+\begin{description}
+\item [PGPLOT] --- High-level graphics
+\item [GKS] --- Low-level graphics
+\item [SGS] --- Simple graphics
+\item [NCAR/SNX] --- High-level graphics
+\item [GNS] --- Graphics workstation name service
+\item [AGI] ---  Graphics database
+\item [IDI] --- Image display interface
+\item [GWM] --- X graphics window manager
+\end{description}
+
+\item [Other] \mbox{}
+\begin{description}
+\item [TAPEIO] --- Magnetic tape handling
+\item [CHR] --- Character handling
+\item [EMS] --- Error message service
+\item [HELP] --- Interactive HELP system
+\item [CNF] --- C and Fortran mixed programming
+\end{description}
+
+\item [ARGS Support] \mbox{}
+\begin{description}
+\item [ARGSLIB] --- ARGS manipulation
+\item [ARGSMAC] --- ARGS programming system
+\end{description}
+\end{description}
+
+\newpage
+
+\include{sun1index}
+
+\end{document}

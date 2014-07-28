@@ -1,0 +1,1140 @@
+
+
+
+SCIENCE AND ENGINEERING RESEARCH COUNCIL                      SUN/91.1
+RUTHERFORD APPLETON LABORATORY
+SPACE & ASTROPHYSICS DIVISION
+
+Starlink Project                                             Issued by
+Starlink User Note 91.1
+
+                                                           B C Stewart
+                                                       29 October 1986
+
+----------------------------------------------------------------------
+
+ IRAS/CRDD - Calibrated Raw Detector Data Analysis System: User Guide
+ --------------------------------------------------------------------
+
+
+
+1  INTRODUCTION
+
+The IRAS instrument data has been  processed  by  the  Jet  Propulsion
+Laboratory  in  California  to produce the IRAS Point and Small Source
+catalogues  and  the  Extended  Emission  and  Additional  Observation
+images.   The  analysis  was  conceived,  and  the processing software
+written, sometime before the IRAS launch.  This was necessary in order
+to  achieve  the  major project goal of a published catalogue one year
+after the end of the mission.
+
+Before IRAS  there  had  been  little  experience  of  the  long  term
+performance  and  stability  of  IR  detectors  in  low  IR background
+conditions.  Further, many earlier surveys at IR and other wavelengths
+have   been   beset   with   problems   of  reliability.   With  these
+considerations in mind, a somewhat conservative approach  was  adopted
+for  the  designs  of  the  IRAS  focal  plane, survey and survey data
+processing.  At the expense of some resolution, the  focal  plane  was
+arranged  so  that a source image crossing it was seen by at least two
+detectors in each of the wavelength bands.  The survey  scans  covered
+any  particular  position  on  the  sky  up to 6 times on timescale of
+hours, weeks and 6 months.  Finally, the processing  treated  each  of
+the  observations separately to ask whether an object had been seen or
+not.  Objects in the point source catalogue were those seen a  minimum
+of  about  6  times  in  at  least  one band.  The performance of this
+analysis approach was examined and tuned in great  detail  by  JPL  to
+attain  high  levels  of  reliability  and  completeness for the Point
+Source Catalogue (see the 'Explanatory Supplement' for details).
+
+The IRAS detectors turned out to  be  much  better  behaved  than  was
+expected  and  the numbers of 'false' detections rather fewer than the
+software design approach  had  anticipated.   Since  the  end  of  the
+mission  it has become clear that the multiple observations of a given
+point on the sky can be 'co-added' to give both the  expected  root  N
+increase in signal to noise with respect to the Point Source Catalogue
+and much better spatial sampling than is  available  in  the  Extended
+
+                                - 1 -
+SUN/91.1                                                        Page 2
+
+
+Emission images.
+
+As one of the three partners in the IRAS project the UK has a complete
+copy  of  the  calibrated raw detector data (CRDD pronounced 'crud' by
+afficionados!).  These data reside at RAL and  the  current  and  past
+members  of the IRAS Post Mission Analysis (IPMAF) team have written a
+set of programs which make possible its  access  and  analysis.   This
+document  is  the user guide to this software.  Astronomers wishing to
+make use of the system should contact either B.Stewart (RLVAD::BCS) or
+P.Richards (RLVAD::PJR) at RAL.
+
+
+
+2  IRAS_FIND
+
+Before embarking on a description of the CRDD system, this section  is
+a reminder of the existence of the other IRAS products; these are:
+
+     1.  The Point Source Catalogue.  (IRPS)
+
+     2.  The Small Structure Catalogue.  (ISSC)
+
+     3.  The Extended Emission Images.  (All 3 HCONs are available  at
+         RAL)
+
+     4.  The Survey Array and CPC Additional Observation (AO)  Images.
+         These  cover  about  4%  of the sky and are catalogued in the
+         IAOD.
+
+For many purposes these may already contain the information you  want.
+In  particular  the AOs cover small regions of sky about their nominal
+targets which may include the object or region you are interested  in.
+AO  data,  if  available, gives the greatest SNR and resolution of the
+IRAS products, in fact the aim of the CRDD system has  been  to  match
+this,  if  possible.   In order to simply check what data is available
+the IRAS_FIND SCAR utility has been written.  This requests a position
+and  search box and looks through the IRPS and ISSC for entries in the
+box and the IAOD for entries which overlap the box.  The following  is
+an example of using IRAS_FIND:
+
+     VAX          USER                      Comments
+    prompt        reply
+
+                return                Press  return  key  to wake the
+                                      system up
+    username:   IRASVIS
+    password:   ?                     This  is  subject to change and
+       :                              the current one can be obtained
+       :                              from  B.Stewart,  J.Gourlay  or
+       :                              P.Richards
+       :
+    directory   VIS1 or VIS2 or VIS3  These     subdirectories    are
+
+                                - 2 -
+SUN/91.1                                                        Page 3
+
+
+                                      available  to  RAL visitors for
+                                      using   the   IRAS   processing
+                                      facilities.
+
+    $           START_CAR             This  sets up the logical names
+                                      required   by   the    STARLINK
+                                      Catalogue  Access and Reporting
+                                      (SCAR) package.
+
+        " Logged in to SCAR 3.1  "
+
+    Scar 3.1>   IRAS_FIND             Scar 3.1>   has   no    special
+                                      significance,  the $ prompt may
+                                      be re-established, if required,
+                                      by typing SET PROMPT.
+
+        " Input source RA in hrsmin (eg 1212.3): type -1 to quit "
+    RA:=        1758.5                Right Ascension(1950) of object
+                                      or centre of region.
+
+        " Input source DEC in degmin (eg 1212.3) "
+    DEC:=       6638.5                Declination(1950)  of object or
+                                      centre of region.
+
+        " Input search box size in arcmins"
+    BOX:=       0.0                   For  a region, this is its full
+                                      extent.  Objects  etc. found by
+                                      the searches are written to the
+                                      screen and to a file:-
+                                          "IRASFIND.DAT"
+                                      The  program  then  prompts for
+                                      another input position.
+
+
+
+3  CRDD SYSTEM SUMMARY
+
+The following gives an outline of the processing required  to  produce
+usable  image  or  flux data from the CRDD.  The detailed way in which
+these programs are used and specific  example  outputs  are  given  in
+later sections.  The system has a MAXIMUM RECOMMENDED IMAGE SIZE which
+our testing suggests is about 3deg.*3deg.
+
+
+
+3.1  CRDD Tapes
+
+The IRAS mission was carried out in 12 hour  pieces  called  Satellite
+Operations Plans (SOP's).  A SOP consisted of a number of survey scans
+and  Additional  Observations  (AOs).   The  raw  detector  data  were
+processed  by  JPL, one SOP at a time, to produce a 6250 bpi CRDD tape
+for each.  The entire mission  covered  603  SOPs,  the  corresponding
+
+                                - 3 -
+SUN/91.1                                                        Page 4
+
+
+tapes being labelled with the SOP number of the data each contains.  A
+single CRDD tape holds the calibrated raw detector data  in  1  second
+segments  with  a  corresponding  pointing  direction of the telescope
+(BORSYT) for each segment.
+
+
+
+3.2  CRDD Image Production
+
+There are 5 steps in producing an image from CRDD data, these are:
+
+     1.  I_POSNTIM.  For the position on the sky of interest the scans
+         which crossed it and the SOPs in which these occur have to be
+         identified.  This function is  carried  out  by  the  program
+         I_POSNTIM (POSitioN to TIMe).  For a given position(s) on the
+         sky this produces a text file (TIMES) containing the SOP no.,
+         scan  identification  and  time  of occurrence of each survey
+         crossing (see Figure 1 for an example output).
+
+     2.  I_CRABEX.   Having  identified  the  survey   crossings   the
+         appropriate  pieces of CRDD data are required to be extracted
+         from the CRDD tapes.  This function is  carried  out  by  the
+         program  I_CRABEX (CRdd And Borsyt EXtraction).  When run the
+         program uses the TIMES file produced by I_POSNTIM  to  prompt
+         the  user  to mount the appropriate tapes on the RAL 6250 bpi
+         tape unit.  It also prompts the user for a  filename  (CRDDF)
+         for each crossing and band.
+
+     3.  I_DESTRIPE.  Before an image can be produced there is a known
+         DC  calibration  problem  which  has  to be 'corrected'.  The
+         problem arises in the following way.  Over most  of  the  sky
+         all  bands  show  a  substantial  DC IR signal arising from a
+         combination of zodiacal,  galactic  and  other(?)  background
+         emissions.  The errors in the DC calibration of the detectors
+         result in varying estimates of this background level.  Images
+         constructed using these differing estimates show 'stripes' at
+         levels which  are  much  greater  than  the  detector  noise.
+         Program I_DESTRIPE uses a 'flat fielding' technique to adjust
+         the detector DC levels to substantially  remove  this  effect
+         and   optionally   remove  a  constant  or  linearly  sloping
+         background.  I_DESTRIPE is required to be run on each of  the
+         CRDDF files.
+
+     4.  I_CRDIMAGE.  Once a CRDDF file has been I_DESTRIPEd the  data
+         samples  for  each detector are binned onto a 2-D image using
+         program I_CRDIMAGE.  The resulting image file is  similar  to
+         the  images  produced  from  the  processing  of  the pointed
+         observations at JPL.
+
+     5.  I_COMBINE.  Finally, the various overlapping image files  for
+         a band are binned into a single image using program COMBINE.
+
+
+                                - 4 -
+SUN/91.1                                                        Page 5
+
+
+3.3  Point Source Fluxes From CRDD.
+
+If the object of interest is known to be a point source (ie less  than
+1  arcmin  in  extent)  its  flux  should  be  estimated using program
+I_COADD.  The I_POSNTIM and I_CRABEX steps outlined above  are  needed
+to  retrieve  the  CRDD  but  instead  of  I_DESTRIPE,  I_CRDIMAGE and
+I_COMBINE the single program I_COADD  is  run.   Point  source  fluxes
+should NOT be estimated from images, see photometry section below.
+
+
+
+3.4  IRAS Wavelength Bands
+
+At this point  it  should  be  emphasised  that  I_CRABEX  produces  a
+separate  file  for each crossing and each band.  This means the steps
+I_DESTRIPE, I_CRDIMAGE, and I_COMBINE have to be repeated  to  produce
+an image for each wavelength of interest.
+
+
+
+4  THE CRDD PROGRAMS IN DETAIL
+
+4.1  I_POSNTIM
+
+This program and the others in the system currently  run  under  DSCL,
+the  following gives the login to IRASVIS at RAL and the prompts given
+by I_POSNTIM.   The  program  writes  some  explanation  of  its  DSCL
+prompts, these are enclosed in quotes.
+
+     VAX          USER                      Comments
+    prompt        reply
+
+                return                Press  return  key  to wake the
+                                      system up
+    username:   IRASVIS
+    password:   ?                     This  is  subject to change and
+       :                              the current one can be obtained
+       :                              from  B.Stewart,  J.Gourlay  or
+       :                              P.Richards
+       :
+    directory   VIS1 or VIS2 or VIS3  These     subdirectories    are
+                                      available  to  RAL visitors for
+                                      using   the   IRAS   processing
+                                      facilities. Note, users wishing
+                                      to  keep data should copy it to
+                                      tape as a subsequent user is at
+                                      liberty  to erase any data s/he
+                                      finds left in these directories
+
+    $           DSCL                  All  processing  is carried out
+                                      using  the  facilities  of  the
+                                      STARLINK  interim  environment.
+
+                                - 5 -
+SUN/91.1                                                        Page 6
+
+
+                                      To get out of DSCL use the STOP
+                                      command.  LOGOUT  also works in
+                                      DSCL.
+
+    DSCL>       I_POSNTIM
+
+        " Input source name - up to 16 characters"
+    NAME:=      NGC6543               Name  of  object  or region for
+                                      which crossings are to be found
+
+        " Input source RA in hrsminsecs (eg 121212.3)"
+    RA:=        175826.8              Right Ascension(1950) of object
+                                      or centre of region.
+
+        " Input source DEC in degminsecs (eg 121212.3)"
+    DEC:=       663827.0              Declination(1950)  of object or
+                                      centre of region.
+
+        " Input source extent in arcmins"
+    EXTENT:=    0.0                   For  a region, this is its full
+                                      extent,   crossings  are  found
+                                      which cover any part of it. The
+                                      value 0.0 is used if the object
+                                      is a point source
+
+        "   Source:-
+                Name            RA          DEC      Extent
+                            hr min sec  deg min sec    min
+          NGC6543           17 58 26.8   66 38 27.0    0.0
+                  to be stored (y/n)?                      "
+    ANS:=       y/n                   If you make a mistake in typing
+                                      any  of  the  source parameters
+                                      the  answer  n  to  this prompt
+                                      allows the source to be reinput
+
+
+        "   Sources stored:-
+                Name            RA          DEC      Extent
+                            hr min sec  deg min sec    min
+          NGC6543           17 58 26.8   66 38 27.0    0.0 "
+
+        "  another source to be input(y/n)?                "
+    ANS:=       y/n                   Answer  y causes the program to
+                                      loop to the
+                                        'Input source name....'
+                                      prompt.
+                                      Answer  n  if  no  more  source
+                                      positions are to be input. This
+                                      gives the following message:-
+
+        " Output is in file times1.lis "
+
+
+                                - 6 -
+SUN/91.1                                                        Page 7
+
+
+                                      TIMES1.LIS  is  a  line printer
+                                      file.  The  text  file input to
+                                      I_CRABEX is TIMES.LIS.
+    DSCL>
+
+Having run I_POSNTIM the next step is to  run  I_CRABEX.   This  is  a
+fairly  long  job and it is recommended that those visiting RAL to use
+the CRDD system plan on staying overnight and use the  evening  to  do
+this part of the job.
+
+
+
+4.2  I_CRABEX
+
+Having generated the TIMES.LIS it is necessary to identify  the  first
+CRDD  tape  which is to be used and mount it on the 6250bpi tape unit.
+The first entry in the TIMES.LIS file (Fig 1) gives the SOP number  of
+this  tape.   Once  the tape has been mounted I_CRABEX may be run, the
+following gives its prompts:
+
+     VAX          USER                      Comments
+    prompt        reply
+
+    DSCL>       ALLOCATE MTB0: tape   Allocate the 6250 bpi tape unit
+    DSCL>       MOUNT/FOREIGN   "
+
+    DSCL>       I_CRABEX
+
+        " GIVE SCAN LENGTH REQUIRED,- SCANLEN -,IN ARCMINS
+    SCANLEN/120/:=                    Default  is  120  arcmin.  Your
+                                      choice  should  be  the size of
+                                      the region you wish to map.
+
+        " NGC6543
+          X-SCAN POSITION :  -8.0 ; SOP 546
+          DO YOU WANT THE DATA FOR THIS ENTRY ?
+          (Y, N OR Q(uit)  )                       "
+    Y
+        " BAND 1 (12 microns) ? (Y/N) "
+    Y
+    OUT1:=      N6543_B1S1            Filename  for  CRDDF  file. The
+                                      convention  I have found useful
+                                      is:-
+                                            name..BnSm
+                                         name.. - Source name
+                                         n      - IRAS band
+                                         m      - scan crossing no.
+                                                  1,2,3..etc.
+                                      crossing no. corresponds exact-
+                                      ly to the order of the scans in
+                                      the TIMES file.
+
+
+                                - 7 -
+SUN/91.1                                                        Page 8
+
+
+        " BAND 2 (25 microns) ? (Y/N) "
+    Y
+    OUT2:=      N6543_B2S1
+        " BAND 3 (60 microns) ? (Y/N)
+    Y
+    OUT3:=      N6543_B3S1
+        " BAND 4 (100 microns) ? (Y/N)
+    Y
+    OUT4:=      N6543_B4S1
+
+
+        " UNLOAD CURRENT TAPE
+          MOUNT PASS TAPE FOR SOP 546
+          THEN PRESS <RETURN>        "
+    <RETURN>                          A  TIMES  file  might typically
+                                      contain 6 crossings on 3 diff-
+                                      erent  tapes  for  each object.
+                                      When all the crossings from the
+                                      current    tape    have    been
+                                      retrieved the program checks if
+                                      another  tape  is to be mounted
+                                      and  requests  it if needed. To
+                                      UNLOAD  THE  CURRENT TAPE press
+                                      RESET on the 6250bpi tape deck,
+                                      followed  by UNLOAD. Remove the
+                                      tape  and  load the next in the
+                                      usual manner.
+
+
+
+4.3  I_DESTRIPE
+
+Each  CRDDF  file  produced  by  I_CRABEX  is  'destriped'  using  the
+following procedure:
+
+     VAX          USER                      Comments
+    prompt        reply
+
+    DSCL>       I_DESTRIPE
+
+        " CRDD file to be destriped "
+    IN:=        N6543_B1S1
+        " Remove background (y/n)?  "
+    REMBAK/N/:Y                       Option to remove  a  background
+                                      from the output image.
+        " Constant(n), Sloping(y) "
+    SLOPE/N/:=Y                       Two types of background removal
+                                      are    available,    either   a
+                                      constant  value  or one sloping
+                                      in the scan direction.
+        " Destriped file  "
+    OUT:=       N6543_B1S1_DS         _DS  is  appended  to  the file
+
+                                - 8 -
+SUN/91.1                                                        Page 9
+
+
+                                      name  to indicate a 'destriped'
+                                      image.
+
+NB:  The process  of  destriping  "flattens"  the  baseline  for  each
+detector to the same level.  Hence any gradual slope in the background
+from detector to detector will be removed from  the  destriped  image.
+The user should be aware of this when examining structure on the scale
+of a few degrees.
+
+
+
+4.4  I_CRDIMAGE
+
+I_CRDIMAGE is used to convert each destriped CRRDF into an image file.
+
+     VAX          USER                      Comments
+    prompt        reply
+
+    DSCL>       I_CRDIMAGE
+        " Name of file containing CRDD data "
+    CRDDF:=     N6543_B1S1_DS         'destriped(_DS)' image.
+
+        " Size of pixels in output image(arc mins) "
+    PIXSIZE/p/:= return               Pixels  are square. The size of
+                                      pixel depends  very much on the
+                                      application. The minimum recom-
+                                      mended  pixel  sizes  for  each
+                                      band are as follows:-
+                                         12 micron  0.25 arcmin
+                                         25    "    0.25   "
+                                         60    "    0.5    "
+                                        100    "    1.0    "
+                                      (N.B.  These  are  the  default
+                                      pixel sizes for each band).
+
+        " Pixel size(arc mins):   p x p "
+
+        " Length of scan to be processed(arcmin) "
+
+    SCANLEN:=   120                   This  has  same  definition  as
+                                      SCANLEN  in  I_CRABEX.  You may
+                                      decide  the  value  chosen when
+                                      running  I_CRABEX  was too big,
+                                      the   answer   to  this  prompt
+                                      allows you to reduce it to save
+                                      computer time.
+
+        " Name of file to contain output image "
+    IMAGE:=     N6543_B1S1_IM         Output image(_IM) file.
+
+
+
+
+                                - 9 -
+SUN/91.1                                                       Page 10
+
+
+5  EASYIMAGE
+
+Even for a 1 degree square region the steps DESTRIPE and CRDIMAGE  may
+have  to  be  repeated  for  9  possible crossings.  The VMS procedure
+EASYIMAGE considerably reduces the tedium of this task.  The  DESTRIPE
+and  CRDIMAGE  parameters  are  prompted  for once and the files to be
+processed are input via a text file  PREP.DAT.   NB:   all  files  are
+processed with the same parameters.
+
+PREP.DAT should contain a list of filenames eg:
+
+        NGC6543_B1S1
+        NGC6543_B1S2
+        NGC6543_B1S3
+        NGC6543_B1S4
+        NGC6543_B1S5
+        NGC6543_B1S6
+
+EASYIMAGE is then run as follows:
+
+     VAX          USER                      Comments
+    prompt        reply
+
+    $           @EASYIMAGE
+
+        " Remove background (Y/N)?  "
+                Y                     Unlike  DSCL the procedure does
+                                      not   print   anything  on  the
+                                      prompt line.
+        " Remove slope in background (Y/N) ?"
+                Y
+        " Size of square pixel in output image (arcmin)? "
+                p                     Pixels  are square. The size of
+                                      pixel depends  very much on the
+                                      application. The minimum recom-
+                                      mended  pixel  sizes  for  each
+                                      band are as follows:-
+                                         12 micron  0.25 arcmin
+                                         25    "    0.25   "
+                                         60    "    0.5    "
+                                        100    "    1.0    "
+                                      (N.B.  These  are  the  default
+                                      pixel sizes for each band).
+
+        " Length of scan (arcmin) ? "
+                120
+        " PROCESSING IMAGE  1  :  NGC6543_B1S1 "
+        " DESTRIPING AND GRIDDING COMPLETED FOR IMAGE 1 "
+        " PROCESSING IMAGE  2  :  NGC6543_B1S2 "
+        " DESTRIPING AND GRIDDING COMPLETED FOR IMAGE 2 "
+           etc. etc.
+
+
+                                - 10 -
+SUN/91.1                                                       Page 11
+
+
+        " ********************************* "
+        " **ALL FILES DESTRIPED & GRIDDED** "
+        " ********************************* "
+
+    $
+
+NB:  This procedure is CPU intensive.  If more than 4 or 5  scans  are
+to  be  processed,  the user is advised to run the job during off-peak
+hours, ie lunch times or after 6.00 pm.
+
+
+
+5.1  I_COMBINE
+
+The image derived from a single scan will be about half a degree  wide
+and  a  little  longer  than  that  required  to  cover  the region of
+interest.  For a typical region of sky there  will  be  2  or  3  half
+overlapping  sets  of  scans (HCONSs).  The program COMBINE is used to
+assemble a complete image  from  these  sub  images.   To  obtain  the
+correct  weights of the images in producing the overall image, all the
+available sub images should be  COMBINE'd  in  a  single  run  of  the
+program   (see   SUN/60,   section  4.1).   However,  it  is  STRONGLY
+RECOMMENDED that images derived from individual HCONs be looked at  to
+check that particular 'features' are indeed there on all crossings and
+are not possible artifacts.  The 12 micron band is particularly  prone
+to these problems and an example is shown in section 8.
+
+     VAX          USER                      Comments
+    prompt        reply
+
+    DSCL>       I_COMBINE
+
+    IMAGE:=     N6543_B1S1_IM         Names  of sub-images from which
+    IMAGE:=     N6543_B1S2_IM         overall     image   is   to  be
+    IMAGE:=     N6543_B1S3_IM         assembled.
+    IMAGE:=     etc. etc.
+    IMAGE:=     return
+
+        " Create the whole image or some other area? "
+    WHOLE/T/:=  return                Use  default  of  producing the
+                                      largest image possible from the
+                                      sub images.
+
+        " Select output pixel size in arcmin,(X,Y)  "
+    SIZE/p,p/:= return                Normally,  use  default  values
+                                      from input images.
+
+        " Processing image 1.......                            :"
+
+    OUTPUT:=    N6543_B1_C_IM         Filename  of  output  image. _C
+                                      indicates a COMBINE'd image.
+
+
+                                - 11 -
+SUN/91.1                                                       Page 12
+
+
+NB:  As with EASYIMAGE, I_COMBINE is CPU intensive and for more than 4
+or 5 images should be run during off-peak hours.
+
+
+
+5.2  I_COADD
+
+For point source photometry it is recommended that program I_COADD  be
+used directly with the CRDDF files.  This program coadds corresponding
+detector samples from the different crossings then subtracts  a  local
+median  signal.  It then estimates the local noise in the coadded data
+stream and searches about the nominal source position for point source
+signals  above  a  given  threshold.  The results of this search and a
+local noise estimate are written to a line printer file.
+
+     VAX          USER                      Comments
+    prompt        reply
+
+    DSCL>       I_COADD
+
+        " FILTER SNR threshold,            SNR  = 1.0
+          FILTER correlation threshold     CORL = 0.7
+          Detector width extension(arcmin) DZ   = 0.0
+          Detector samples noise weighted
+          Detector samples printed
+          Detector samples NOT interpolated to
+          remove fractional sample offsets           "
+
+        " Are defaults to be changed(y/n)?   "
+
+    ANS:=       N                     Defaults   are   used  and  the
+                                      following      prompts      are
+                                      suppressed.
+
+    -----------------------------------------------------------------
+    ANS:=       Y                     The  defaults  have been chosen
+                                      on  the  basis  of  development
+                                      experience. In some cases other
+                                      values may be more appropriate.
+                                      The   following   gives   those
+                                      available.
+
+    SNR/1.0/:=  return                The  SNR  threshold  for  point
+                                      source detection may be changed
+
+    CORL/0.7/:= return                The  threshold for point source
+                                      detection  is  both  on SNR and
+                                      the  correlation  of the signal
+                                      with  a  point  source template
+                                      derived  from  a  bright  known
+                                      point  source. The 0.7 value is
+                                      a very low correlation value.
+
+                                - 12 -
+SUN/91.1                                                       Page 13
+
+
+    DZ/0.0/:=   return                This may be set non-zero  as  a
+                                      diagnostic. In conjunction with
+                                      the  'raw  data  values  to  be
+                                      printed'  option, it allows the
+                                      raw  data  to  be  printed  for
+                                      detectors   which  should  have
+                                      been missed by the source. This
+                                      is  of  value if the source  is
+                                      believed to be extended.
+
+        " Is data interpolation required(y/n)? "
+    ANS:=       n                     A cubic spline interpolation of
+                                      the   raw  data  values  is  an
+                                      option.  This allows the sample
+                                      positions     for     different
+                                      detectors to be made to exactly
+                                      correspond.  In   practise  the
+                                      difference    this   makes   is
+                                      marginal  and visibility of the
+                                      original sample values is lost.
+
+        " Is noise weighting required(y/n)?  "
+    ANS:=       y                     Some of the IRAS detectors are
+                                      intrinsically  more noisy than
+                                      others. The detector weighting
+                                      allows for this.
+
+        " Are raw data values to be printed(y/n)? "
+    ANS:=       y                     This a very useful diagnostic.
+                                      The  individual  detector data
+                                      streams are printed.
+
+        " Is a noise histogram required(y/n)? "
+    ANS:=       n                     This   diagnostic  allows  the
+                                      noise estimation to be checked
+    ________________________________________________________________
+
+        " Name of CRDD file? "
+    CRDDF:=     N6543_B1S1            Name of CRDDF file.
+        " N6543       BAND 1 SOP: 546 UTC1ST: 12345678.123  "
+
+        " Is another CRDD file to be input(y/n)? "
+    ANS:=       n                     N terminates requests for CRDD
+                                      files for this source.
+
+        " Is another source to be processed(y/n)? "
+    ANS:=       n                     N  terminates  program  run. Y
+                                      causes requests for CRDD files
+                                      for another source.
+
+         " Output is in file COADOP.LIS "
+
+
+                                - 13 -
+SUN/91.1                                                       Page 14
+
+
+An example of COADOP.LIS (courtesy R.Clegg of UCL) is shown in Fig 4.
+
+
+
+6  RUN_COADD
+
+This, somewhat crude, VMS procedure allows I_COADD to be  run  with  a
+file CRDD_FILES.DAT containing the prompts to the program.  You should
+only use this if you already have some experience of  running  I_COADD
+in prompt mode.
+
+CRDDFILES.DAT should contain the following:
+
+    N
+    NGC6543_B1S1
+    Y
+    NGC6543_B1S2
+    Y
+    NGC6543_B1S3
+      " and so on for all files, termination is:-"
+    N
+    N
+
+    RUN_COADD is then run as follows:-
+
+     VAX          USER                      Comments
+    prompt        reply
+
+    $           @RUN_COADD
+
+    prompts  will appear on the screen but be answered from the file
+    until the $ prompt reappears.
+
+    $
+
+
+
+
+7  ONLINE HELP
+
+A HELP system  describing  all  the  IRAS  programs,  including  those
+described  in this note, may be invoked by typing IRASHELP in response
+to the VMS prompt.
+
+
+
+8  PHOTOMETRY
+
+The CRDD data values on tape have  to  be  multiplied  by  a  constant
+factor  to  reproduce  the published IRAS calibration, the appropriate
+factor for each band is incorporated in  the  I_CRDIMAGE  and  I_COADD
+programs.   The images from I_CRDIMAGE should give reliable total flux
+
+                                - 14 -
+SUN/91.1                                                       Page 15
+
+
+estimates for sources bigger than 5 arcmins, (eg  by  using  the  flux
+integration  facilities  in  the  IRAS  programs I_CONTOUR or I_PICV -
+SUN's 60 and 80 respectively).  For sources smaller  than  5  arcmins,
+fluxes estimated by integration within the required area are likely to
+be in error by as much as 50%, due to the undersampling  in  the  IRAS
+x-scan  direction  and  to  the effects of missing or noisy detectors.
+For point sources fluxes should be obtained using I_COADD.
+
+
+
+9  EXAMPLES
+
+9.1  Image of Cometary Globule CG22
+
+Figure 2 shows 60 micron maps of cometary globule CG22, the upper  one
+was  derived  from a SKY Plate image and the lower from COMBINE'd CRDD
+data.  The latter clearly shows superior spatial  resolution  and  the
+effect of removing a local, sloping background.
+
+
+
+9.2  Beware of Spurious Features
+
+Users should always examine each HCON individually  before  COMBINEing
+them  together.   This  procedure will help avoid wrongly interpreting
+moving  sources,  glitches  and/or  detector  artifacts  as   infrared
+structure.   The  set  of  12  micron  maps  in  figure 3 show how the
+asymmetric point spread function apparent  on  brighter  sources,  the
+change  in  scan  direction  in  HCON3  and the odd moving or variable
+source can combine into what looks like "interesting structure" to the
+uninitiated.
+
+
+
+9.3  I_COADD of LMCN25
+
+Figure 4 is a COADOP.LIS output for the 12 micron band.  The  first  4
+lines  record  the run parameters used.  The groups of lines beginning
+"OBJECT..." give the crossings.  The next part of the output gives the
+sample   values   for   each   detector   crossing  the  source.   The
+abbreviations are S=SOP, D=Detector, Z=crossing offset relative to the
+detector  edge,  W=Weighting  factor,  -999  signifies  a missing data
+value.  The "fitted background" is a constant value which in this case
+has  been  subtracted  from  the "weighted sum" data values.  The "Raw
+data - fitted background" values should be compared with  the  sum  of
+the "Fitted slope" + "Fitted point source" values.
+
+
+
+
+
+
+
+                                - 15 -
+SUN/91.1                                                       Page 16
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                               FIGURE 1
+
+                                - 16 -
+SUN/91.1                                                       Page 17
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                               FIGURE 2
+
+                                - 17 -
+SUN/91.1                                                       Page 18
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                               FIGURE 3
+
+                                - 18 -
+SUN/91.1                                                       Page 19
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                          FIGURE 4 (part 1)
+
+                                - 19 -
+SUN/91.1                                                       Page 20
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                          FIGURE 4 (part 2)
+
+                                - 20 -

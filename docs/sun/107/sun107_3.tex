@@ -1,0 +1,364 @@
+\documentstyle [11pt] {article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {107.3}
+\newcommand{\stardocauthors}   {A C Charles, M D Lawden}
+\newcommand{\stardocdate}      {15 July 1993}
+\newcommand{\stardoctitle}     {MAPLE --- Mathematical Manipulation Language}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+\begin{quote}{\em 
+
+MAPLE is a commercial software package purchased from WATCOM, Waterloo,
+Ontario, CANADA. It was developed by the Symbolic Computation Group at
+the University of Waterloo. It is licensed to run on the Starlink Central
+Data \& Software Facility (STADAT) and is only installed on this machine.
+To use it, you must first log onto STADAT from your own account on your
+own Starlink machine.
+
+}
+\end{quote}
+
+\section{Introduction}
+
+MAPLE is an interactive system for symbolic algebra computation. It can
+perform hundreds of algebraic functions for use at all mathematical
+levels, and can provide solutions for many types of problems:
+
+\begin{itemize}
+\item Arithmetic with integers, fractions, and polynomials.
+\item Power series.
+\item Differentiation and integration of functions.
+\item Systems of equations.
+\item Differential equations.
+\item Linear optimization.
+\item Tensor manipulation.
+\item Symbolic and numeric approximation.
+\item Automatic generation of Fortran code and \LaTeX\ source for mathematical
+expressions.
+\end{itemize}
+
+In addition, plots can be generated to illustrate graphically any
+function, including user-defined functions.
+
+You can extend or redefine the numerous functions by writing MAPLE
+programs in the built-in Pascal-like language to create specialized
+functions.
+
+\section{Documentation}
+
+There are two on-line help systems. The first can be accessed from VMS by
+typing:
+
+\begin{verbatim}
+    $ HELP MAPLE
+\end{verbatim}
+
+while logged into STADAT. The second (more extensive) system can be
+accessed during a MAPLE session by typing:
+
+\begin{verbatim}
+    > help();
+\end{verbatim}
+
+There is also `An Introduction to Maple' written by David Harper (QMW).
+Copies can be obtained from your Site Manager.
+
+Serious users of MAPLE may also want to look at the two main MAPLE publications
+which are provided with the software. These are:
+
+\begin{itemize}
+\item MAPLE --- First Leaves: A tutorial introduction to Maple; 3rd Edition;
+Bruce W.\ Char, et al; WATCOM.
+\item MAPLE --- Reference Manual; 5th Edition; Bruce W.\ Char, et al; WATCOM.
+\end{itemize}
+
+Copies of these documents are held at RAL but most sites should have a
+copy of `First Leaves'.  Fortunately, the on-line help systems should
+enable you to use MAPLE effectively without needing to look at the
+manuals.
+
+\section{Getting Started}
+
+To use MAPLE, you must log in to STADAT:
+
+\begin{verbatim}
+    $ SET HOST STADAT
+\end{verbatim}
+
+using the appropriate username and password for the users of your site.
+Get into an appropriate directory. Then start up MAPLE by typing:
+
+\begin{verbatim}
+    $ MAPLESTART
+    $ MAPLE
+\end{verbatim}
+
+The program will announce that you are running MAPLEV and present you with
+its prompt symbol:
+
+\begin{verbatim}
+    >
+\end{verbatim}
+
+You can then enter MAPLE commands, read and store files, and define and run
+MAPLE procedures.
+
+If you are using a colour workstation, you can use the DECWindows
+interface to MAPLE.  To start, type: 
+
+\begin{verbatim} 
+      $ XDISPLAY 
+      $ MAPLESTART 
+      $ XMAPLE 
+\end{verbatim}
+
+The two most important things for a beginner to remember are:
+
+\begin{itemize}
+
+\item You {\em must} end every command with a semi-colon (;), otherwise,
+MAPLE will ignore your input. If you forget, enter a semi-colon in
+response to the next `$>$' prompt and MAPLE will then obey your command.
+
+\item You end your session by typing:
+
+\begin{verbatim}
+    > quit
+\end{verbatim}
+
+(you don't need a semi-colon here).
+
+\end{itemize}
+
+The first thing you may wish to do is to browse around the on-line help
+system:
+
+\begin{verbatim}
+    > ?
+\end{verbatim}
+
+or
+
+\begin{verbatim}
+    > help();
+\end{verbatim}
+
+(don't forget that semi-colon, or you'll be complaining that MAPLE
+doesn't work). Of particular interest is the introduction:
+
+\begin{verbatim}
+    > help(intro);
+\end{verbatim}
+
+The MAPLE manuals refer to version 4.2 of the software. You can find out
+the new features of the installed version (5.1) by:
+
+\begin{verbatim}
+    > help(updates,v5);
+\end{verbatim}
+
+You can execute VMS commands from within MAPLE by prefixing them with a
+`!' character. For example,
+
+\begin{verbatim}
+    > !copy maple$demo:taylor1.; *
+\end{verbatim}
+
+will copy one of the demos supplied with MAPLE into your default
+directory.
+
+\section{Examples}
+
+The following example of a MAPLE session should give you some insight
+into the capabilities of the software, and how to use it. You type the
+lines after the `$>$' prompt and the computer replies with the next line.
+The notes after the example explain some of the features you may find
+mysterious at first reading.
+
+\begin{verbatim}
+    > 3+4+5;
+                                   12
+    > e1:=expand(x*(x+1)*(x-1));
+                                   3
+                            e1 := x  - x
+    > factor(");
+                            x (x + 1) (x - 1)
+    > evalf(sqrt(2));
+                            1.414213562
+    > solve(e1=0,x);
+                            0, 1, -1
+    > int(x*exp(x),x);
+                            x exp(x) - exp(x)
+    > help(plot);
+         ... gives information on the plot command
+    > help();
+         ... describes the help command
+    > help(index,library);
+         ... lists the functions in the Maple library
+    > quit
+         ... escapes from Maple
+\end{verbatim}
+
+The second command illustrates the assignment operator `{\tt :=}'. It
+assigns the expression on the right of the operator to the variable ({\tt
+e1}) on the left.
+
+The {\tt (")} symbol refers to the previous expression in the MAPLE
+session. Thus the third command \verb+factor(")+ is equivalent to
+\verb+factor(e1)+. There are also symbols {\tt ("")} and {\tt (""")}
+which refer to the second previous and third previous expressions.
+
+In the fifth command, the symbol `{\tt e1}' refers to the expression
+defined in the second command. The `{\tt int}' function integrates the
+expression `{\tt e1}' with respect to {\tt x}.
+
+Many examples of how to use MAPLE are given in the on-line help text.
+Other examples are stored in files in the {\tt MAPLE\$DEMO} directory.
+
+\section{Functions}
+
+MAPLE has a very large number of functions available. You can find an
+explanation of these functions and examples of their use by typing the
+command:
+
+\begin{verbatim}
+    > help(<function>);
+\end{verbatim}
+
+during a MAPLE session. For example,
+
+\begin{verbatim}
+    > help(int);
+\end{verbatim}
+
+will describe the `{\tt int}' function which performs integration.
+
+Among the most important and commonly used functions are the following:
+
+\begin{description}
+\begin{description}
+
+\item [expand, simplify, normal] --- simplify expressions.
+\item [evalf] --- evaluate an expression using floating point arithmetic.
+\item [solve] --- solve equations.
+\item [int, diff] --- integrate/differentiate expressions.
+\item [series] --- expand functions to Taylor or Laurant series.
+\item [plot] --- plot functions.
+
+\end{description}
+\end{description}
+
+Use \verb+help(<function>)+ to find out about these --- there are lots of
+examples. Other commonly used functions are:
+
+\begin{description}
+\begin{description}
+
+\item [array] --- create an array.
+\item [coeff] --- extract a coefficient of a polynomial.
+\item [collect] --- collect terms in a specified indeterminate.
+\item [convert] --- convert an expression to a different form.
+\item [degree] --- determine the highest degree of a polynomial.
+\item [evalc] --- evaluate in the complex number field.
+\item [ifactor] --- integer factorisation.
+\item [limit] --- calculate function limits.
+\item [map] --- apply a procedure to each operand of an expression.
+\item [op] --- extract operands from an expression.
+\item [product] --- product of a sequence.
+\item [radsimp] --- simplification of an expression containing radicals.
+\item [subs] --- substitute sub-expressions into an expression.
+\item [sum] --- definite and indefinite summation.
+\item [table] --- create a table with initial values.
+\item [type] --- type checking function.
+
+\end{description}
+\end{description}
+
+These are just a sample of the 182 functions in the standard and
+miscellaneous MAPLE function library. In addition, there are a number of
+packages which specialise in particular areas of mathematics. These are:
+
+\begin{description}
+\begin{description}
+
+\item [combinat] --- combinatorial functions.
+\item [difforms] --- differential forms.
+\item [geometry] --- Euclidean geometry.
+\item [grobner] --- Grobner bases.
+\item [group] --- permutation and finitely-presented groups.
+\item [linalg] --- linear algebra.
+\item [np] --- Newman-Penrose formalism.
+\item [numtheory] --- number theory.
+\item [orthopoly] --- orthogonal polynomials.
+\item [powseries] --- formal power series.
+\item [projgeom] --- projective geometry.
+\item [simplex] --- linear optimization.
+\item [stats] --- statistics.
+\item [student] --- student calculus.
+
+\end{description}
+\end{description}
+
+Information on these packages can be obtained from within MAPLE by
+entering:
+
+\begin{verbatim}
+    > help(<package>);
+\end{verbatim}
+
+and information on the functions within a package can be obtained by:
+
+\begin{verbatim}
+    > help(<package>,<topic>);
+\end{verbatim}
+
+Thus, if you were learning calculus you could find help by entering:
+
+\begin{verbatim}
+    > help(student);
+\end{verbatim}
+
+and if you were particularly interested in finding out how to integrate
+by parts, enter:
+
+\begin{verbatim}
+    > help(student,intparts);
+\end{verbatim}
+
+Sounds a great way of doing your Maths homework.
+
+\end{document}

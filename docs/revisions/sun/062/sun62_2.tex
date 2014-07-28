@@ -1,0 +1,778 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {62.2}
+\newcommand{\stardocauthors}   {M Denby}
+\newcommand{\stardocdate}      {3 September 1992}
+\newcommand{\stardoctitle}     {WFCSORT --- Sort ROSAT Wide Field Camera data}
+%------------------------------------------------------------------------------
+
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+\section{Introduction}
+
+The programs described in this document provide the mechanism for
+producing ASTERIX (HDS) datasets from Wide Field Camera data
+collected during the pointed phase of the ROSAT mission. A sort program
+generates ASTERIX datasets ({\em e.g.}~time series, images, etc.) 
+from pre-processed event files supplied as part of
+the Rosat WFC Observation Datasets (RWODs). An exposure program
+corrects these datasets allowing for
+instrument characteristics. In addition a simple database manager
+allows an index of RWODs to be maintained and searched.
+The programs make use of the ADAM and ICL environment and a number of ICL
+procedures have been provided to perform some of the more commonly
+required operations such as extracting background subtracted lightcurves.
+
+
+\section{Getting Started}
+Assuming that WFCSORT is installed at your site, it may be started 
+by executing the command
+
+\begin{verbatim}
+      $ WFCSTART
+\end{verbatim}
+
+The tasks are callable from DCL by simply typing the 
+task name in response to the VMS prompt {\em e.g.}
+
+\begin{verbatim}
+      $ WFCSORT
+\end{verbatim}
+
+Alternatively, in order to make use of the facilities provided by ICL,
+the tasks together with a series of ICL procedures may be
+loaded into the users ICL session. This is achieved by means of the following
+ICL commands
+
+\begin{verbatim}
+      ICL> LOAD WFCDIR:WFCLOAD
+      ICL> SET NOCHECKPARS
+\end{verbatim}
+
+For convenience the user may include the above lines in a default ICL
+login procedure located in SYS\$LOGIN:LOGIN.ICL. In order to be effective
+this procedure should first be defined in the users DCL LOGIN.COM file {\em
+e.g.}
+
+\begin{verbatim}
+      $ DEFINE ICL_LOGIN SYS$LOGIN:LOGIN.ICL
+\end{verbatim}
+
+\section{The ROSAT WFC Observation Dataset (RWOD)}
+ 
+The RWOD is the set of data files distributed to the ROSAT WFC observer. Each
+RWOD contains data from a single pointed phase observation in the form of a
+Backup saveset. The software  described in this document does not require the
+data to be stored in a  predefined directory. After starting ICL the data in an
+RWOD may be recovered to disk as follows:
+
+\begin{verbatim}
+      ICL> DEFAULT location        ! The target directory
+      ICL> WFCDISK MUB0:123456.BCK ! Replace with the tape drive and 
+                                   ! the saveset required
+\end{verbatim}
+
+There are 6 files in the saveset which are essential for the sorting software
+to work. These are:
+
+\begin{verbatim}
+      CAL_WFC_MASTER.SDF  The WFC Master Calibration File
+      <RWOD>.ATT          Aspect file
+      <RWOD>.HKR          Housekeeping rates file
+      <RWOD>.HKC          Housekeeping configuration file
+      <RWOD>.EVE          Pre-processed event file 
+      <RWOD>.POS          Satellite position file
+\end{verbatim}
+
+CAL\_WFC\_MASTER.SDF defines the time history of the 
+WFC calibration for the sorting software. WFCDISK copies the calibration
+file from tape to the location pointed to by the name CAL\_WFC\_MASTER 
+only if it has a more recent creation date than the file already in existence.
+
+$<${\tt RWOD}$>$.ATT is a VMS ISAM file whose records define the pointing
+and rate of change of the pointing over consecutive time intervals.
+
+$<${\tt RWOD}$>$.HKR is a VMS ISAM file whose records contain the instrument
+counters (see Section~\ref{se:wfchk} at 8 secs. resolution.
+
+$<${\tt RWOD}$>$.HKC is a VMS ISAM file whose records define the instrument
+configuration (with a new record generated for each change of configuration).
+
+$<${\tt RWOD}$>$.POS is a VMS ISAM file whose records define the 
+satellite location and instrument pointing at 60 second intervals.
+
+$<${\tt RWOD}$>$.EVE is a VMS direct access file containing a list of event
+parameters ordered in both time and spatial senses. For each event the
+following values are stored:
+
+\begin{itemize}
+\item
+The telemetered coordinates of the event on the surface of the
+detector (in the range 0-511)
+\item
+The linearised coordinates of the event relative to the
+nominal optical axis of the instrument (in the range -2.5 to 2.5 deg and
+to 9 arc sec resolution)
+\item
+The local coordinates of the event relative to the nominal
+pointing direction shown in the file header (in the range -2.5 to 2.5 deg and
+to 6 arc secs resolution)
+\item
+The time tag of the event in seconds relative to the base time shown
+in the file header (BASE\_MJD) to 1/32 sec resolution.
+\end{itemize}
+
+ A summary of the contents of an observation may be obtained by showing 
+the EVE file header records using the WFCDBM program (described in
+Section \ref{se:progs}). Below is an example of the header records from a typical EVE
+file:
+
+\begin{small}
+\begin{verbatim}
+      ROR Sequence #          : B50026    
+      Axis Ra                 :  359.38
+      Axis Dec                :   20.92
+      Roll                    :   -8.50
+      POP_FLAGS               : 00000B03
+      Target                  : MKN335 (Day 46, ROR 150026 offset)      
+      Observer                : WCALIB                                  
+      Instrument              : WFC                                     
+      Base date               : 16-JUL-90  
+      Base MJD                : 48088.8086
+      End MJD                 : 48088.8369
+      Total Events            :    20879
+      File Revision Level     : 5.2 
+
+
+      Slot        Stime            Etime        Durn.  Flt  Fmt  Zm  Win   HT
+             d:hh:mm:ss       d:hh:mm:ss
+
+         1   0:00:02:59       0:00:07:46         288.  UV         z       161
+         2   0:00:08:03       0:00:40:51        1968.  P1         z       161
+\end{verbatim}
+\end{small}
+
+A fixed element of the header defines a number of general observation
+parameters.
+
+The Base MJD is the (nominal) start time of the observation and serves as the
+origin for the event time tags. The Axis centre is the (nominal) observation
+pointing and serves as the origin for the event local coordinate frame. The
+Roll is the angle, in degrees, between Celestial North and the Wide Field
+Camera elevation (defined in a positive clockwise sense when viewing the sky).
+Note that all ROSAT coordinates are for  equinox 2000.0.
+
+The fixed header is followed by information for a variable number of `slots'.
+Each time interval during which events were collected and the instrument
+configuration ({\it e.g.} the filter wheel position, HTs)  remained constant
+defines a slot. For each slot the following information is displayed:
+
+\begin{itemize}
+\item
+The start and end time in units of days, hours, mins, secs after Base MJD.
+\item
+The slot duration in secs.
+\item
+The filter configuration ({\it e.g.} S1A, P1, etc).
+\item
+The telemetry format. Screening at the pre-processing stage rejects data except
+when the telemetry format was in normal or high-speed
+modes. When the telemetry is in normal mode this field is blank,
+otherwise the {\tt Hi} flag is displayed. The dead-time characteristics of 
+the data are different in the two modes, there being a 200 count per second 
+limit in normal mode and a 408 count per second limit in high-speed mode.
+\item
+The Zoom flag. The WFC has an enhanced spatial resolution mode in
+which events from the central quarter of the detector only are
+processed and the linear resolution is doubled. The field is blank
+for non-zoomed data, otherwise the {\tt z} flag is displayed.
+\item
+The Window flag. Events from pre-set regions of the detector may have been
+discarded before insertion in the telemetry
+stream. When the window mode is in operation (denoted by a {\tt w} flag in
+the slot summary) events from a rectangular area of the detector
+have been excluded, leaving events from outside the window unaffected. For
+inverted window mode (denoted by an {\tt i} flag in the summary) the event
+selection is the reverse of the above ({\it i.e.} events have been accepted
+from within the window and rejected from outside).
+\item
+The detector HT voltage setting. Whilst it is not anticipated that this
+will change, it should be noted that the instrument
+characteristics may change with different HT settings.
+\end{itemize}
+
+\section{The WFCSORT Programs}
+\label{se:progs}
+
+The programs involved are:
+\begin{verbatim}
+      WFCDBM          Data Base Manager
+      WFCSORT         Sorts events into images, time series, etc.
+      WFCEXP          Exposure corrects a binned data set
+      WFCPOSX         Gives exposure at a point in the FOV
+      WFCHK           Sorts HK rates to an HDS container
+      WFCSLOTS        Selects a set of filter defined time slots
+      WFCSLMRG        Merges a pair of time slot files
+\end{verbatim}
+
+These programs are described below in terms of the parameters which they require
+from the user. 
+Each program may be started by typing the name in response to the ICL prompt
+together with on-line parameters, if required, in the KEYWORD= format:
+
+\begin{verbatim}
+      ICL>WFCSORT RA=270. DEC=66.6 \
+\end{verbatim}
+
+All programs have context sensitive help (using the VMS help system) which 
+may be obtained by replying with the `?' character to any program prompt.
+
+
+\subsection{WFCDBM}
+Provides update and search facilities for all RWODs held at a particular
+institute.
+
+\subsubsection{Parameters}
+\begin{description}
+\item [CMND]
+A number of commands, specified by the CMND parameter, are available 
+and are specified below:
+\begin{verbatim}
+      (C)reate      Create an empty Index file
+      (U)pdate      Update the index with a new RWOD
+      (S)earch      Search for datasets matching various criteria.
+      (H)ead        Display the header records from an event (EVE) file.
+      (G)roup       Associate a group of slots within an EVE file.
+\end{verbatim}
+\item[EVEF   ]
+The name of the input event file. The default extension for the file is .EVE.
+\item[LISF   ]
+The name of a file to hold listing o/p. The default is SYS\$OUTPUT.
+\item[INDF   ]
+The name the Index file which holds information on all the RWODs
+in the library. If this file does not already exist it should be created 
+using the CREATE option in WFCDBM. Thereafter the index file may be 
+updated and searched.
+\item[SMJD   ]
+The start MJD for a search.
+\item[EMJD   ]
+The end MJD for a search.
+\item[RAL    ]
+The Right ascension lower limit for a search (decimal degs)
+\item[RAH    ]
+The Right ascension upper limit for a search (decimal degs)
+\item[DECL   ]
+The Declination lower limit for a search (decimal degs)
+\item[DECH   ]
+The Declination upper limit for a search (decimal degs)
+\item[PI   ]
+Any unique string which identifies the Principal Investigator
+\item[TARGET   ]
+Any unique string which identifies the target
+\item[SELECT1]
+The search function is performed on a series of selection criteria
+which are entered in response to the repeated SELECTn prompts. The valid 
+requests are
+
+\begin{verbatim}
+      (M)jd      select on an MJD window
+      (R)a       select on an RA window
+      (D)ec      select on a  DEC window
+      (P)i       select on a  Principal Investigator string
+      (T)arget   select on a  Target string
+      (E)xit     combine selection criteria and perform the search
+\end{verbatim}
+
+\item[GROUP  ]
+The sequence number of a group of slots to be associated together. (There
+will be ab many sequence numbers for an observation as there are different
+filter configurations). The slots
+are present in the event file header records and the command groups together
+slots with the same filter at the focus. The slot list is returned in the
+SLOTS parameter. If the number of groups present in the data is exceeded
+by the GROUP command SLOTS is returned as `-999'
+\item[SLOTS  ]
+A text string which specifies which observation slots have been 
+associated. The text string is constructed
+by the GROUP command and may be used to associate slots with the same filter
+without a priori knowledge of the contents of the header records of an
+event file.
+\end{description}
+
+\subsection{WFCSORT}
+
+This task is used to sort pre-processed event files from the RWOD into 
+ASTERIX (HDS) datasets.
+\subsubsection{Parameters}
+\begin{description}
+\item[EVEF]
+The name of the input event file.
+The default extension for the file is .EVE.
+\item[SHOW]
+Requests that a sub-set of the information from the header records of the
+event file is displayed at the user terminal. In a situation where many
+operations are performed on the same event file the user may wish to 
+reply `Y' to the first occurence of the prompt but `N' to all subsequent
+occurences.
+\item[OUTPUT]
+The name of the output dataset. The default extension for the file is 
+.SDF and should NOT be provided by the user.
+\item[DTYPE]
+The type of dataset to be produced by the sort. Valid types are
+
+\begin{verbatim}
+      (I)mage   to create an ASTERIX sky coord image dataset
+      (R)aw     to create a detector coord image
+      (L)in     to create a linearised detector coord image
+      (T)ime    to create a time series dataset
+      (E)vent   to create an event dataset.
+\end{verbatim}
+
+\item[RA]
+The Right Ascension of the sort field centre (decimal degs). By default this
+is set to the axis RA value  given in the header.
+\item[DEC]
+The Declination of the sort field centre (decimal degs). By default this
+is set to the axis DEC value in the header.
+\item[DAZ]
+The half extent of the square field to be sorted (degs), 
+the default value is 3 degrees.
+\item[INR]
+In time series mode INR specifies the inner radius of an annulus
+from which to select events. The radius should be specified in arcminutes
+and may be set to zero in order to select from a circular region.
+\item[OUTR]
+In time series mode OUTR specifies the outer radius of an annulus
+from which to select events. The radius should be specified in arcminutes.
+\item[NXPIX]
+The number of pixels along a side of the image. For the default field half
+extent of 3 degrees NXPIX = 256 
+would give a pixel width of approx 1.4 arcminutes.
+\item[SLOTS]
+A text string which specifies which observation slots to include in
+the sort. (These are the slots which are displayed when SHOW = Y is selected).
+Specify the slots in the format i-j,k,l-m. The slots selected
+should all have the same filter at the focus. If a slot value of `0' is
+selected the selection mode changes and the user is prompted for the 
+filter type via the FILTER parameter.
+\item[START\_T]
+The start time of a selection window which will be combined with
+the slot and discrimination windows. The unit may be either seconds
+from the BASE\_MJD given in the EVE file header or an absolute MJD
+(in the latter case the MJD value should be preceded by an `M').
+The default value is the seconds offset of the start of the first selected slot. 
+It is also possible to input the start and end times from a text file,
+with one time pair per record. In this case the time pairs should be
+specified in MJDs, each preceded by the `M' character and separated by
+a space. When performing background subtraction of two concentric time
+series it is important that the two time series be co-binned and so 
+START\_T should be chosen to be the same for both.
+\item[END\_T ]
+The end time of a selection window which will be combined with
+the slot and discrimination windows. The unit may be either seconds 
+from the BASE\_MJD given in the EVE file header or an absolute MJD (in 
+the latter case the MJD value should be preceded by an `M'). The default 
+value is the seconds offset of the end of the last selected slot. It is also possible
+to input the start and end times from a text file, with one time pair per
+record. In this case the time pairs should be specified in MJDs, each 
+preceded by the `M' character and separated by a space.
+\item[USEF]
+The user may optionally specify the time windows from which events
+will be selected by means of a simple text file.
+\item[SFILE]
+The name of a text file from which the time windows will be read.
+Each record in the file should contain a pair of start and stop MJDs
+separated by a space and with each MJD preceded by the letter `M'.
+\item[NBINS]
+The number of bins into which the time extent of the sort 
+is to be divided. If a value `0' is given the program prompts for the
+time duration for each bin (see TBIN).
+\item[TBIN]
+If NBIN is specified as 0 then TBIN should be set to the required
+time duration of a bin (in seconds).
+\item[FILTER]
+A text string definition of the filter to use. This is selected from
+the second column of the following table
+
+\begin{verbatim}
+      MCF #        Filter        Material
+
+      1             UV           UV CAL
+      2             S2B          Le/Be
+      3             P1           Le/Al
+      4             S1B          Le/C
+      5             OPQ          Le/Al
+      6             S2A          Le/Be
+      7             P2           Sn/Al
+      8             S1A          Le/C/B4C
+ 
+      (MCF = Master Calibration File)
+\end{verbatim}
+
+\item[REJECT]
+Wide Field camera data is sometimes contaminated by background features
+whose exact nature and cause are not well understood. It is
+however possible to improve the quality of badly affected data by 
+choosing to reject data on a series of constraints. Data may
+be excluded from a sort operation by selecting one of the LEVS or VIEW
+options described below. Alternatively the NONE option should be selected 
+to retain all the events.
+\item[LEVS]
+Rejects data when the limited event rate was above a user defined
+threshold user is then prompted for the LEVS threshold to use, a typical
+rate which gives noticeable improvement in a large number of cases is
+50 c/s.
+\item[VIEW]
+Rejects data when the Velocity-View (or ram) angle or the solar
+zenith angle were below certain limits. The limits are set as hidden
+defaults of the program but may be overridden by giving values for
+the VELVIEW and/or SOLZEN parameters on the command line (or using the 
+PROMPT qualifier on the command line).
+\item[ROOT]
+The File root which defines the location of the .HKR file used for
+LEVS discrimination. This defaults to the root of the EVE file. Note that
+the root is also used to derive the name of the .POS file which is
+used by WFCSORT to perform earth occultation screening of the data. 
+Slots in the EVE file are clipped whenever the angle between the 
+instrument viewing direction and the zenith exceeds a preset threshold 
+of 130 degrees.
+\end{description}
+
+\subsection{WFCEXP}
+
+This program takes as input an ASTERIX dataset (time series or image)
+whose data array contains detected events. It creates
+a dataset whose data array contains event flux (c/s) normalised
+to the on-axis response of the instrument. The flux calculation takes
+into account the following instrument dependencies:
+\begin{itemize}
+\item
+Instrument dead time effects (the event rates needed for the 
+calculation are stored in the $<${\tt RWOD}$>$.HKR file which is part
+of the standard observation dataset).
+\item
+Instrument vignetting effects. The Instrument pointing is derived
+from the $<${\tt RWOD}$>$.ATT file. The vignetting at points within the
+field is derived from the filter and detector information 
+stored in the WFC Calibration File (with the logical name 
+CAL\_WFC\_MASTER).
+\item
+Optionally the program may correct the fluxes in a dataset for the 
+degradation of the detector efficiency. The time history of the efficiency
+is stored in the calibration file and is used to determine an interpolated
+value at the epoch appropriate to the dataset. The user is warned if the
+dataset epoch is beyond the end of the current time history in the
+calibration file. In this event the latest value for detector efficiency
+is used.
+\item
+Optionally the program may correct the fluxes in a one dimensional dataset 
+for the fraction of the point response function which fell outside the source 
+centred circle from which events were originally accepted by the WFCSORT
+program.
+\end{itemize}
+\subsubsection{Parameters}
+\begin{description}
+\item[INP]
+The name of an input ASTERIX dataset. The dataset may be either a time series
+or an image.
+\item[OUT]
+The name of an output ASTERIX dataset. The dataset is cloned from the input and 
+then the raw count array is replaced by an exposure corrected 
+count/sec array.
+\item[EFFCOR]
+Selects correction of fluxes for the degradation of detector efficiency.
+\item[PSFCOR]
+Selects correction of fluxes in a one-dimensional dataset for the point
+spread fraction.
+\end{description}
+
+\subsection{WFCPOSX}
+
+This program takes as input an ASTERIX image dataset as produced by WFCSORT
+and reports exposure information for any location within the image.
+The quoted effective exposure is the value by which a raw count derived
+at the location should be divided in order to produce a count rate 
+corrected to the axis of the instrument at the epoch of the data set.
+In addition the program displays the efficiency of the detector for the
+epoch of the data set relative to the launch efficiency. This relative
+efficiency may be used to increase a measured flux to that appropriate 
+to a non-degraded detector. The exposure calculation works in a similar manner
+to that in the WFCEXP program described above.
+\subsubsection{Parameters}
+\begin{description}
+\item[INP]
+The name of an input ASTERIX image dataset.
+\item[RA]
+The right ascension of the point in the FOV at which exposure information
+is required. (decimal degrees).
+\item[DEC]
+The declination of the point in the FOV at which exposure information
+is required. (decimal degrees).
+\end{description}
+
+\subsection{WFCHK}
+\label{se:wfchk}
+
+This program extracts the counters present in a reduced
+housekeeping rates file ($<${\tt RWOD}$>$.HKR) together with the
+pointing information present in an aspect file ($<${\tt RWOD}$>$.ATT) 
+into a series of arrays in an HDS 
+file. (Note that for flexibility this file does not obey
+the ASTERIX standard format. This means that an 
+extension must be given when giving filenames to ASTERIX, 
+e.g. DRAW $<${\tt file}$>$.TEVS $<${\tt device}$>$.)
+
+ The following parameters are stored in the HDS file (in arrays
+of the same names).
+\begin{verbatim}
+      TEVS            Total events output by the detector preamplifiers
+      VEVS            Valid events, i.e. TEVS within pulse height limits
+      LEVS            Limited events, i.e. VEVS within the electronic f.o.v.
+      AEVS            Accepted events, i.e LEVS entered into telemetry queue.
+      FEVS            Final events, i.e. AEVS telemetered to ground
+      RA              Pointing direction RA (degrees)
+      DEC             Pointing direction DEC (degrees)
+\end{verbatim}
+
+The program gives the option of binning directly from an HKR file ({\it i.e.}
+using the file start and end MJDs and intrinsic bin size of 8 secs)  or using
+the bin structure from an existing time series dataset. In this latter mode the
+user may create arrays of background counts aligned with an existing bin
+structure. (BUT note that the binning mechanism is spot sample at the bin
+centre {\it i.e.} summing over the bin duration is not performed.
+
+\subsubsection{Parameters}
+\begin{description}
+\item[USE]
+Requests that the binning information should be extracted from an
+existing time series.
+\item[INPUT]
+If USE is selected the user is prompted for the name of a time series
+dataset.
+\item[HKR]
+The name of an HKR reduced rates file. The .HKR extension is
+optional.
+\item[OUTPUT]
+The name of the created HDS file.
+\end{description}
+
+\subsection{WFCSLOTS}
+
+This program is used to select time slots with the WFC in a particular filter
+configuration. The time slots are written to a text file with each record
+containing one pair of start and end times (MJDs). The file may be merged
+(using the WFCSLMRG program) with a similiar file created from XRT data and in
+this way common time slots, when the two instruments were simultaneously
+collecting data, may be defined and used to control event selection in the
+WFCSORT program.
+
+\subsubsection{Parameters}
+\begin{description}
+\item[EVEF]
+The name of the input event file.
+The default extension for the file is .EVE.
+\item[SHOW]
+Requests that a sub-set of the information from the header records of the
+event file is displayed at the user terminal. In a situation where many
+operations are performed on the same event file the user may wish to 
+reply `Y' to the first occurence of the prompt but `N' to all subsequent
+occurences.
+\item[SLOTS]
+A text string which specifies which observation slots to include in
+the sort. (These are the slots which are displayed when SHOW = Y is selected).
+Specify the slots in the format i-j,k,l-m. The slots selected
+should all have the same filter at the focus. If a slot value of `0' is
+selected the selection mode changes and the user is prompted for the 
+filter type via the FILTER parameter.
+\item[SFILE]
+The name of a text file into which the time windows will be written.
+Each record in the file contains a pair of start and stop MJDs
+separated by a space and with each MJD preceded by the letter `M'.
+\item[FILTER]
+A text string definition of the filter to use. This is selected from
+the second column of the following table
+\begin{verbatim}
+       MCF #        Filter        Material
+
+       1             UV           UV CAL
+       2             S2B          Le/Be
+       3             P1           Le/Al
+       4             S1B          Le/C
+       5             OPQ          Le/Al
+       6             S2A          Le/Be
+       7             P2           Sn/Al
+       8             S1A          Le/C/B4C
+ 
+       (MCF = Master Calibration File)
+\end{verbatim}
+
+\end{description}
+\subsection{WFCSLMRG}
+The program is used to merge time slot files into a single file of common
+time slots. The merged file may then be used to control event selection in 
+the WFCSORT program.
+\subsubsection{Parameters}
+\begin{description}
+\item[SFILE1]
+The name of the first time slot file to merge.
+\item[SFILE2]
+The name of the first time slot file to merge.
+\item[SOFILE]
+The name of the output merged time slot file.
+\end{description}
+
+\subsection{An example}
+ The following example shows how WFCSORT and WFCEXP may be used to
+create and correct a time series from an event file. Parameter prompts and 
+typical user responses are shown.
+
+\begin{small}
+\begin{verbatim}
+      $ WFCSTART                           ! Define necessary VMS symbols etc.
+
+      ICL> LOAD WFCDIR:WFCLOAD
+      ICL> SET NOCHECKPARS                 ! Or do these 2 lines via LOGIN.ICL
+
+      ICL> WFCSORT
+          EVEF - 015079                   ! Select an event file
+          SHOW - Y                        ! Display the header records
+          DTYPE - TIME                    ! Select a time series o/p
+          RA - 123.45                     ! Set the Ra (decimal degs)
+          DEC - 67.89                     ! Set the Dec
+          INRAD - 0                       ! Select a circular region on source
+          OUTRAD - 6                      ! Circle radius = 6 arcmin
+          SLOTS - 0                       ! Select by filter rather than by slots
+          FILTER - P1                     ! Set the filter
+          NBINS - 0                       ! Select by bin size rather than number
+          TBIN - 5.                       ! Set the bin width to 5 secs
+          REJECT - NONE                   ! Don't do event discrimination
+          OUTPUT - TIM_P1                 ! O/p Asterix dataset
+ 
+      ICL> WFCEXP
+          INP - TIM_P1                    ! I/p raw time series
+          OUT - TIM_P1C                   ! O/p corrected time series
+\end{verbatim}
+\end{small}
+
+\section{The ICL procedures}
+
+The WFCLOAD procedure defines a set of ICL procedures which perform
+commonly required series of operations with minimum user interaction.
+The procedures described here are:
+
+\begin{verbatim}
+      WFCDISK         Load data from an RWOD onto disk
+      WFCAUTO         Standard analysis of a series of RWODs
+      WFCIMAGE        Auto imaging of the events from an EVE file
+      WFCLIGHT        Produce a light curve at a point in the current image
+      WFCSPC          Produce a WFC spectrum at a point in the current image
+      WFCSUB          Subtracts two contemporary time series
+\end{verbatim}
+
+The procedures have been written to exploit the NOCHECKPARS switch in ICL
+so that if command line arguments are omitted then they are prompted
+for. 
+The procedures are described below in terms of the command line arguments
+which they require (shown in angle parentheses).
+
+\subsection{WFCDISK $<$SAVESET$>$ $<$TARGET$>$}
+
+The procedure copies the files from a user specified RWOD save set 
+to the users target directory. The SAVESET specifier must include both device
+and file names (eg MUB0:123456.BCK). Each RWOD contains a copy of the
+WFC calibration file and, after recovery to disk, a check is made of the
+creation date of this file. If the file is more recent than the default
+version, referenced by the CAL\_WFC\_MASTER logical, then this default
+version is replaced.
+
+\subsection{WFCAUTO $<$RDIR$>$}
+
+The procedure works through all the RWODs located on a requested directory
+producing hard copy images for each separate filter configuration present
+in each RWOD. RDIR gives the full specification for the directory
+containing the RWOD files.
+
+\subsection{WFCHKR $<$RWOD$>$ $<$OUTF$>$}
+
+The procedure creates an HDS file containing the various WFC instrument
+count rates together with the pointing direction of the instrument.
+The parameters are all binned into an HDS container at the fundamental
+resolution of the housekeeping data (8 secs). The input RWOD, including
+full directory spec., is specified by the RWOD argument. The output 
+container file is specified by the OUTF argument.
+
+\subsection{WFCIMAGE $<$RWOD$>$ $<$FILT$>$ $<$OUTF$>$}
+
+The procedure creates a full field, 256 pixel, image of the
+data specified by the RWOD argument for the filter specified by the
+FILT argument. An ASTERIX image is formed in the file specified
+by the OUTF argument. In addition an exposure corrected image and
+and exposure field are created in files called $<$OUTF$>$\_C 
+and $<$OUTF$>$\_X respectively.
+
+\subsection{WFCLIGHT $<$TBIN$>$ $<$OUTF$>$}
+
+The procedure is intended for interactive use only. It requests the
+location of source and background boxes from the currently displayed
+image and produces a background subtracted, exposure corrected, light
+curve for the source in the file specified by the argument OUTF. The
+bin size in seconds is specified via the TBIN argument.
+
+\subsection{WFCSPC $<$OUTF$>$ $<$MERGE$>$ $<$XTIM$>$}
+The procedure is intended for interactive use only. It requests the
+location of source and background boxes from the currently displayed
+image and produces a background subtracted, exposure corrected, spectral
+dataset for the source in the file specified by the argument OUTF.
+The procedure may optionally arrange to collect data from periods only
+when the WFC and XRT systems were collecting data simultaneously. If
+this option is required the MERGE option should be set to `YES' and
+the XTIM argument should contain the name of a simple text file
+in which each record contains a pair of MJDs between which the XRT
+was collecting data. The MJDs should be separated by a space 
+and each preceded by the letter `M'.
+
+\subsection{WFCSUB $<$SRCF$>$ $<$BKDF$>$ $<$OUTF$>$}
+The procedure subtracts a background light curve, specified by the
+BKGF argument, from a source light curve, specified by the SRCF
+argument. The subtracted light curve is formed in a file specified
+by the OUTF argument. The two input light curves must have been
+exposure corrected. The fluxes are normalised by the areas of the
+two original boxes from which events were sorted, then subtraced.
+
+\end{document}

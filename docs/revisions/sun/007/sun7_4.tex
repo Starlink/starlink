@@ -1,0 +1,1214 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {7.4}
+\newcommand{\stardocauthors}   {S M Beard \\ P M Allan}
+\newcommand{\stardocdate}      {31 March 1993}
+\newcommand{\stardoctitle}     {GENERIC --- A Utility for Compiling Generic
+				\\[2ex] Fortran Subroutines}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+  \setlength{\parskip}{0mm}
+  \tableofcontents
+  \setlength{\parskip}{\medskipamount}
+  \markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\newpage
+\section{Introduction}
+
+GENERIC is a utility which preprocesses a generic Fortran subroutine into
+its different types and concatenates these routines into a file.
+The file can then be compiled with the Fortran compiler to produce an
+object module.
+
+\section{GENERIC Subroutines - an Example}
+
+A generic subroutine is one which has an argument (or arguments)
+which may be one of a number of different Fortran data types.
+
+As an example, consider a subroutine which initialises every
+element in an array to zero. 
+One might want a different version of the routine for initializing
+a double precision array, an integer array and a real array.
+The following subroutines would need to be written:
+
+\begin{verbatim}
+      ZEROD( N, DARR )   Zero every element in a DOUBLE PRECISION array
+      ZEROI( N, IARR )   Zero every element in an INTEGER array
+      ZEROR( N, RARR )   Zero every element in a REAL array
+\end{verbatim}
+
+The integer routine might contain the following code (in a file
+called {\tt zeroi.f} on Unix; ZEROI.FOR on VMS):
+
+\begin{verbatim}
+            SUBROUTINE ZEROI( N, ARRAY )
+      *+
+      *  Name:
+      *     ZEROI
+      *  Purpose:
+      *     Zero all the elements of an INTEGER array
+      *  Invocation :
+      *     CALL ZEROI( N, ARRAY )
+      *  Description :
+      *     This sets all the elements of an INTEGER array to zero
+      *  Arguments:
+      *     N = INTEGER( Given )
+      *        Dimension of array
+      *     ARRAY( N ) = INTEGER( Given and Returned )
+      *        The array to be zeroed
+      *                   "
+      *     (the rest of the standard prologue)
+      *                   "
+      *  Type Definitions:
+            IMPLICIT NONE
+      *  Arguments Given:
+            INTEGER N
+      *  Arguments Given and Returned:
+            INTEGER ARRAY( N )
+      *  Local Variables:
+            INTEGER I                   ! Array index
+      *-
+      
+            DO I = 1, N      
+               ARRAY( I ) = 0
+            END DO
+            END
+\end{verbatim}
+
+The REAL and DOUBLE PRECISION versions of the routine would have to be
+written in a similar way, and this obviously involves a lot of 
+duplication of effort.
+The situation gets even worse if other versions of the routine
+(such as BYTE, INTEGER*2 etc...) are needed.
+Also, it is very difficult and tedious to keep all the versions
+in step if they have to be edited individually when the routines
+are changed.
+
+The GENERIC utility is a labour saving device which enables all the
+various types of routines to be constructed automatically from
+one master routine.
+If any changes become necessary, only this one master routine needs
+to be edited.
+
+To use the GENERIC utility, the routine listed above is replaced by
+the following (in a file called {\tt zero.gen} on Unix; ZERO.GEN on VMS):
+
+\begin{verbatim}
+            SUBROUTINE ZERO<T>( N, ARRAY )
+      *+
+      *  Name:
+      *     ZERO<T>
+      *  Purpose:
+      *     Zero all the elements of a <COMM> array
+      *  Invocation :
+      *     CALL ZERO<T>( N, ARRAY )
+      *  Description :
+      *     This sets all the elements of a <COMM> array to zero
+      *  Argument:
+      *     N = INTEGER( Given )
+      *        Dimension of array
+      *     ARRAY( N ) = <TYPE>( Given and Returned )
+      *        The array to be zeroed
+      *                   "
+      *     (the rest of the standard prologue)
+      *                   "
+      *  Type Definitions:
+            IMPLICIT NONE
+      *  Arguments Given:
+            INTEGER N
+      *  Arguments Given and Returned:
+            <TYPE> ARRAY( N )
+      *  Local Variables:
+            INTEGER I                  ! Array index
+      *-
+      
+            DO I = 1, N
+               ARRAY( I ) = 0<CONST>
+            END DO
+            END
+\end{verbatim}
+
+This is a ``generic routine.''
+Other examples of generic routines include the DAT\_ routines in
+the Hierarchical Data System (SUN/92) and the PAR\_ routines of
+the ADAM parameter system (SUN/94).
+
+The items in angle brackets, $<>$ , are ``tokens'' which the generic
+utility replaces when it converts the routine into one of a given
+type.
+In the above example, the tokens would be replaced
+as follows :-
+
+\begin{verbatim}
+       Token       Double precision    Integer       Real
+                   replacement         replacement   replacement
+
+       <T>         D                   I             R
+       <TYPE>      DOUBLE PRECISION    INTEGER       REAL
+       <COMM>      DOUBLE PRECISION    INTEGER       REAL
+       <CONST>     .0D0                (blank)       .0E0
+\end{verbatim}
+
+The types are generated by issuing the following command from DCL on a VMS
+system :-
+
+\begin{quote}{\tt
+\$ GENERIC ZERO.GEN/TYPES=(D,I,R)
+}
+\end{quote}
+
+or this command on a Unix system :-
+
+\begin{quote}{\tt
+\% generic -t dir zero.gen
+}
+\end{quote}
+
+More details on the use of the GENERIC utility, and a full list of 
+tokens and types, are given in the rest of this document.
+
+\section{Features of the GENERIC Utility}
+
+\subsection{The KERNEL Tokens}
+
+The following tokens are recognised by the GENERIC utility :-
+
+\newlength{\numlen}
+\settowidth{\numlen}{000000000000}
+\settowidth{\labelsep}{000}
+
+\begin{list}{}{\setlength{\labelwidth}{\numlen}\setlength{\leftmargin}{\numlen}
+\addtolength{\leftmargin}{\labelsep}}
+
+\item[\verb+<T>+] To be replaced by a single character representation
+of the specified type.
+
+\item[\verb+<TYPE>+] To be replaced by the string used to declare variables
+of the specified type when they are passed as arguments to
+the subroutine.
+
+\item[\verb+<LTYPE>+] To be replaced by the string used to declare variables
+of the specified type when they are defined as local variables
+in the subroutine.
+
+\item[\verb+<CONST>+] To be replaced by the string appended to numeric constants
+of the specified type.
+
+\item[\verb+<HTYPE>+] To be replaced by the HDS name for the specified type.
+
+\item[\verb+<COMM>+] To be replaced by a comment describing the specified type
+in plain English.
+
+\end{list}
+
+A full table of the translation of these tokens
+for each variable type is given in
+Appendix 1 at the end of this document. 
+
+\subsection{The ASTERIX Tokens}
+
+As well as the kernel tokens, there are an additional set of
+tokens which will be translated if the ASTERIX option is specified
+with the GENERIC command (see below).
+
+These tokens are available to allow GENERIC to process existing
+ASTERIX software (SUN/98) which uses them.
+They are {\em not}\ recommended for use by new software.
+A list of the ASTERIX tokens is given in Appendix 1.
+
+\subsection{The Local CHARACTER Size}
+
+The \verb+<LTYPE>+ token is used for declaring a variable which is local
+to the subroutine in which it is used, whereas \verb+<TYPE>+ is used
+to declare a variable which is passed to the routine as an argument.
+In practice, the translation for both of these tokens is identical
+for all types except CHARACTER.
+
+In the CHARACTER type, a variable passed as an argument is declared
+CHARACTER*(*), but a local variable is declared CHARACTER*\verb+<CHASIZ>+.
+\verb+<CHASIZ>+ is replaced by the ``local character size.''
+If not told otherwise, GENERIC will replace \verb+<CHASIZ>+ by 200,
+making local character variables CHARACTER*200.
+
+It is possible to override this default character size
+if it is unsuitable.
+This can be done using the GENSETDEF command, or by specifying
+a /CHASIZ qualifier to the GENERIC command on a VMS system (see below).
+On a Unix system, you can define the environment variable GENERIC\_CHASIZ or
+you can use the {\bf -c} flag on the {\bf generic} command.
+
+\subsection{The Maximum Record Length}
+ 
+The GENERIC utility assumes it is dealing with Fortran 77
+source code which cannot go beyond column 72.
+If the substitution of a token results in a line becoming longer
+than 72 characters, it will be broken automatically at column 72
+and continued on the next line, using a ``:'' continuation character
+in column 6 of the next line.
+
+The VMS version of GENERIC will issue a warning message if it has to do this.
+Getting this message is not serious, but it warns that, should the
+routine in question fail, the line numbers referred to in a traceback
+will not correspond to line numbers in the original generic routine.
+
+It is recommended that source lines in generic routines be kept
+well below 72 characters in length to prevent this from happening.
+
+{\bf NOTE:}~{\it Comment lines (~{\rm i.e.} those beginning `C', `c', `D', `d' 
+or `*') which are longer than 72 characters are unaltered by GENERIC.
+So are lines of code with an in-line comment (~{\rm i.e.} those containing
+a ``!'' character).}
+
+This algorithm is not perfect and it is possible to fool it with end of line
+comments on long lines or exclamation marks in character strings. However, this
+seems not to have proven a problem in practice.
+
+\section{Using the GENERIC Utility on VMS}
+
+\subsection{The GENERIC Command}
+
+The GENERIC utility is executed by typing the following command:
+
+\begin{quote}{\tt
+\$ GENERIC  <file-spec>[/qualifier[/qualifier...]]
+}
+\end{quote}
+
+\verb+<file-spec>+ is the name of the file containing the generic routine.
+The default type for such a file is ``{\tt .GEN}.''
+The various routines generated are written to a file of type ``{\tt .FOR}'',
+which is then compiled into an object module of type ``{\tt .OBJ}.''
+The {\tt .FOR} file is then deleted (though this may be prevented by using
+the /NOCOMPILE qualifier, below).
+
+Optional qualifiers may be appended to the file-spec.
+These can be classified into two types :-
+
+\paragraph{Compiler qualifiers :}
+Any qualifier for the Fortran compiler may be given
+(e.g. /LIST, /DEBUG, /D\_LINES etc...). (See the VMS Fortran manual,
+or type HELP FORTRAN for more details on these).
+
+\paragraph{Generic qualifiers :}
+In addition, there are certain qualifiers which the
+GENERIC utility itself will recognise. These are:
+
+\begin{description}
+\begin{description}
+\item[/TYPES=(type-list)]
+This specifies the types required. The types should be separated
+by commas and enclosed in parentheses (e.g. /TYPES=(C,D,I,L,R) )
+The following types are possible :-
+\begin{center}
+\begin{tabular}{ll}
+	B  &- Byte \\
+	UB &- Unsigned byte \\
+	C  &- Character \\
+	D  &- Double precision \\
+	I  &- Integer \\
+	L  &- Logical \\
+	R  &- Real \\
+	W  &- Word \\
+	UW &- Unsigned word \\
+\end{tabular}
+\end{center}
+There are also some key words which can be used in the /TYPES qualifier for 
+convenience. These are :-
+\begin{verbatim}
+	/TYPES=ALL		! Generate all types
+	/TYPES=NUMERIC		! Generate all numeric types
+\end{verbatim}
+If the /TYPES qualifier is not specified, then the list of types which
+is currently defined as the default (using GENSETDEF) will be generated.
+If a default list of types has not been specified then all types will be
+generated. 
+
+\item[/CHASIZ=local-character-size]
+This specifies the local character size required.
+This is the size (in bytes) of any CHARACTER variables which are
+declared as local variables (with the \verb+<LTYPE>+ token) in a GENERIC
+routine. 
+
+If the /CHASIZ qualifier is not specified, then the local
+character size which has been defined as the default (using GENSETDEF)
+will be used.
+If a default size has not been specified, then 200 will be used
+(resulting in CHARACTER*200).
+
+\item[/ASTERIX]
+If specified, this qualifier causes GENERIC
+to replace the ASTERIX tokens (listed in Appendix 1),
+as well as the usual (KERNEL) tokens.
+Using this qualifier will slow down the execution of GENERIC,
+because it will need to search for more tokens.
+
+\item[/NOCOMPILE]
+If present, this qualifier specifies that the resultant
+Fortran source file should be kept, and not compiled and deleted.
+
+\end{description}
+\end{description}
+
+\subsection{The GENSETDEF Command}
+
+The command GENSETDEF can be used to set up default parameter values
+for GENERIC to use subsequently.
+The format of this command is as follows :-
+
+\begin{quote}{\tt
+\$ GENSETDEF  <default-types>  <default-local-character-size>
+}
+\end{quote}
+
+If any parameter is not given it will be prompted for,
+and it is usually easier to let GENSETDEF prompt for what it needs.
+
+\verb+<default-types>+ is a string of types, in the same format as given to the
+/TYPES qualifier (but without the parentheses), which GENERIC is to use
+subsequently whenever a /TYPES qualifier is not specified. 
+
+\verb+<default-local-character-size>+ is a default local character size
+to be used subsequently whenever the /CHASIZ qualifier is not
+specified.
+(This will override the 200 initially used as the default.)
+
+All the defaults set up by GENSETDEF will remain for the login
+session, but will disappear on logout.
+
+\subsection{Using GENERIC\_PROG Directly}
+
+The GENERIC utility {\tt GENERIC\_DIR:GENERIC.COM} uses a program called \\
+{\tt GENERIC\_DIR:GENERIC\_PROG.EXE} to produce the Fortran code file.
+For special purposes, this program may be executed on its own.
+(The tables in Appendix 1 were generated using {\tt GENERIC\_PROG}).
+It is executed as a DCL foreign command as follows :-
+
+\begin{verbatim}
+      $ GENERIC_PROG :== $GENERIC_DIR:GENERIC_PROG
+      $ GENERIC_PROG <input> <output> <types>[/qualifier] <chasiz>
+\end{verbatim}
+
+\verb+<input>+ specifies the name of the input file.
+	
+\verb+<output>+ specifies the name of the output file.
+
+\verb+<types>+ specifies the types to be generated (in the same form
+as used in the /TYPES qualifier for GENERIC (but without the 
+parentheses).
+The /ASTERIX qualifier only may be appended to the types string.
+
+\verb+<chasiz>+ specifies the local character size to be used.
+
+If any of the first three parameters are not specified,
+then the GENERIC\_PROG program will prompt for them.
+
+\subsection{Using the GENERIC Utility from LIBMAINT}
+
+LIBMAINT is a procedure for maintaining modules within a text/object
+library pair, and is described in SUN/99.
+The GENERIC utility is designed to integrate easily with LIBMAINT,
+and it is treated by LIBMAINT just like another compiler.
+Generic modules are recognised by having type ``{\tt .GEN}''
+appended to their names.
+Note that specifying ``{\tt .GEN}'' after a module name is compulsory
+in this case in order to tell LIBMAINT that the module is
+generic.
+
+The types which GENERIC is to generate can be defined by using /TYPES
+as a compiler qualifier in LIBMAINT (see SUN/99), or by using GENSETDEF.
+Using GENERIC with LIBMAINT is best illustrated by some examples.
+Suppose the library ABCLIB contains generic modules, such as
+ABC\_GET0.GEN, ABC\_GET1.GEN, ABC\_PUT0.GEN, ABC\_PUT1.GEN etc...
+
+\begin{enumerate}
+
+\item To insert a new generic module, producing C,D,I,L \& R types
+(note the double slash ``//'' and the compulsory ``{\tt .GEN}'') :-
+
+\begin{quote}{\tt
+\$ LIBMAINT ABCLIB \\
+\$ INSERT ABC\_GET0.GEN//TYPES=(C,D,I,L,R)
+}
+\end{quote}
+
+
+\item To recompile all the modules, generating C,D,I,L \& R types for
+the generic ones :-
+
+\begin{quote}{\tt
+\$ LIBMAINT \\
+\$ GENSETDEF "C,D,I,L,R" 200 \\
+\$ OLBCRE ABCLIB
+}
+\end{quote}
+
+\end{enumerate}
+The OBJLIST command in LIBMAINT can be used to verify which types
+have been generated.
+
+\section{Using the GENERIC Utility on Unix}
+
+The GENERIC utility is executed by typing the following command:
+
+\begin{quote}{\tt
+\% generic [-t <types>] [-c <chasiz>] [-s] [-sc <char>] [-a] file1 [file2...]
+}
+\end{quote}
+
+Arguments in square brackets are optional and items in angle brackets are
+descriptive terms for the actual string that would be given. The simplest form
+of the {\tt generic} command is:
+
+\begin{quote}{\tt
+\% generic prog.gen
+}
+\end{quote}
+
+which will produce a file called {\tt prog.f} containing routines for all of
+the supported data types. Note that the Unix version of generic does {\em not}
+compile the Fortran files. All generic input files must have a suffix of
+{\tt .gen}. You can specify multiple input files explicitly or with wild cards.
+All output files have a suffix of {\tt .f}.
+
+The generic command accepts the following flags:
+
+\begin{description}
+\item[-t] This must be followed by a list of the data type to be processed. The
+list should be separated from the {\tt -t} by a space, and should consist of
+one or more of the letters a, b, B, c, d, i, l, n, r, w or W. The letters have
+the following meanings:
+\begin{center}
+\begin{tabular}{ll}
+a & all data types \\
+b & BYTE \\
+B & unsigned BYTE \\
+c & CHARACTER \\
+d & DOUBLE PRECISION \\
+i & INTEGER \\
+l & LOGICAL \\
+n & all numeric types (i.e. everything except CHARACTER and LOGICAL)\\
+r & REAL \\
+w & WORD (i.e. INTEGER*2) \\
+W & unsigned WORD \\
+\end{tabular}
+\end{center}
+
+For example, to generate routines for all of the standard FORTRAN numeric data
+types, type the command:
+
+\begin{quote}{\tt
+\% generic -t dir prog.gen
+}
+\end{quote}
+
+(Using {\tt n} instead of {\tt dir} would generate byte and word versions as
+well.)
+
+\item[-c] This should be followed by a space and then an integer giving the
+value of the local character size required. The default value is 200.
+
+\item[-s] Generate the output in separate files for each data type with the
+single character type specifier appended to the base name of the file. The
+default is to generate one output file for each input file. For example, if the
+input file is {\tt sub1.gen} and the {\tt -t} flag is set to {\tt dir}, then
+specifying the {\tt -s} flag will cause output files called {\tt sub1d.f}, {\tt
+sub1i.f} and {\tt sub1r.f} to be generated. This option is provided as it is
+usual on Unix systems to have all Fortran routines in separate source files.
+
+\item[-sc] This flag allows the user to specify one or more characters that
+will be used to separate the base file name from the appended character when
+generating separate output files for each data type. The {\tt -sc} should be
+followed by a space and then the character(s) to be used as the separator. For
+example, the command:
+
+\begin{quote}{\tt
+\% generic -t dir -sc \_ func2.gen
+}
+\end{quote}
+
+will generate files called {\tt func2\_d.f}, {\tt func2\_i.f} and {\tt
+func2\_r.f}. If the {\tt -sc} flag is given, then the {\tt -s} flag can be
+omitted.
+
+\item[-a] This will cause the ASTERIX tokens to be interpreted as well as the
+standard ones. Its use is deprecated.
+
+\end{description}
+
+It is possible to specify the list of data types to be processed and the local
+character size by setting environment variables {\tt GENERIC\_TYPES} and {\tt
+GENERIC\_CHASIZ}, e.g.
+
+\begin{quote}{\tt
+\% setenv GENERIC\_TYPES cdilr \\
+\% setenv GENERIC\_CHASIZ 300
+}
+\end{quote}
+
+{\bf N.B.} {\em The Unix version of generic does {\bf NOT} compile the
+resulting FORTRAN output files. This must be done separately.}
+
+
+\section{Data Type Conversions -- the DCV Routines}
+
+\subsection{Introduction}
+
+Occasionally, it may be necessary to convert data passed into
+a generic routine in a generic variable into another type.
+A general set of conversion functions is provided to make this
+possible.
+A naming convention is used so that the function
+DCV\_\verb+<T1>TO<T2>+ converts data type \verb+<T1>+ into \verb+<T2>+.
+
+The functions which can be are defined using Fortran statement 
+functions in a file which may be included in a program by;
+
+\begin{quote}{\tt
+INCLUDE 'DCV\_FUN'
+}
+\end{quote}
+
+which should come after any data type definitions, but before
+any DATA initialisation or executable code.
+In the standard prologue of SGP/16, it should go in the
+``Internal references'' section.
+
+Conversions which cannot be defined as statement functions are provided as
+external functions in an object library ({\tt GENERIC\_DIR:DCV.OLB on VMS;
+/star/lib/dcv.a on Unix}). Programs
+requiring these functions should be linked:
+
+\begin{quote}{\tt
+\$ LINK program,GENERIC\_DIR:DCV/LIB
+}
+\end{quote}
+
+on VMS, or compiled with
+
+\begin{quote}{\tt
+\% f77 prog.f -L/star/lib `dcv\_link`
+}
+\end{quote}
+
+on Unix.
+
+The types of these functions can be declared in a program by including;
+
+\begin{quote}{\tt
+INCLUDE 'DCV\_EXT'
+}
+\end{quote}
+
+(in the ``External references'' section of the standard prologue).
+
+{\bf NOTE:}~{\it Statement functions are considerably faster than external 
+functions, so programs which use the common conversions defined in `DCV\_FUN'
+will execute a lot faster.}
+
+Only numeric conversions are supported at present, and
+there are no DCV\_ functions for conversions involving CHARACTER and
+LOGICAL data types.
+A full list of the functions, the conversion performed, and their
+location and restrictions, is given in Appendix 2.
+
+\subsection{An Example of Data Type Conversion}
+
+As an example, a generic subroutine for finding the mean of the data
+contained in an array, where the array is of varying type but the mean is
+always REAL, might look like the following :- 
+
+\begin{verbatim}
+            SUBROUTINE MEAN<T>( N, ARRAY, MEAN )
+      *+
+      *  Name:
+      *     MEAN<T>
+      *  Purpose:
+      *     Calculate the mean value contained in a <COMM> array.
+      *  Invocation :
+      *     CALL MEAN<T>( N, ARRAY, MEAN )
+      *  Description :
+      *     This calculates the mean value of then data contained in the given
+      *     <COMM> array, and returns the value in the REAL variable MEAN.
+      *  Arguments:
+      *     N = INTEGER( Given )
+      *        The dimension of the array.
+      *     ARRAY( N ) = <TYPE>( Given )
+      *        The array containing the data to be averaged.
+      *     MEAN = REAL( Returned )
+      *        The mean of the values contained in the array.
+      *                   "
+      *     (the rest of the standard prologue)
+      *                   "
+      *  Type Definitions:
+            IMPLICIT NONE
+      *  Arguments Given:
+            INTEGER N
+            <TYPE> ARRAY( N )
+      *  Arguments Returned:
+            REAL MEAN
+      *  External References:
+            INCLUDE 'DCV_EXT'          ! Data conversion external functions
+      *  Local Variables:
+            INTEGER I                  ! Array index
+            <LTYPE> SUM                ! Sum of the data in the array
+      *  Internal References:
+            INCLUDE 'DCV_FUN'          ! Data conversion statement functions
+      *-
+      
+      *  Initialise the sum to zero
+            SUM = 0<CONST>
+      
+      *  Accumulate the sum of the contents of the array
+            DO I = 1, N
+              SUM = SUM + ARRAY( N )
+            END DO
+      
+      *  Divide by the dimension of the array to obtain the mean, using
+      *  DCV_<T>TOR to convert from <COMM> into REAL.
+            MEAN = DCV_<T>TOR( SUM ) / REAL( N )
+
+            END
+\end{verbatim}
+
+In the above example, for the INTEGER version of the routine for
+instance, the DCV\_ITOR(~SUM~) statement will be converted to
+REAL(~SUM~) by the statement function in `DCV\_FUN'. 
+
+\subsection{Range Checking}
+
+The DCV\_\verb+<T1>+TO\verb+<T2>+ functions will not check the range of the 
+values given to them, and overflow errors are possible from some conversions
+(e.g. INTEGER to BYTE).
+It is recommended that an application check the range of any value
+given to a DCV function, to ensure it is within the allowed range.
+Global parameters of the form DCV\_\_\verb+<T>+MIN and DCV\_\_\verb+<T>+MAX 
+are available for this purpose, which give the allowed range for type
+\verb+<T>+ ({\it e.g.} -128 to +127 for a BYTE).
+These by may included in a program using;
+
+\begin{quote}{\tt
+INCLUDE 'DCV\_PAR'
+}
+\end{quote}
+
+(in the ``Global parameters'' section of the standard prologue).
+
+An example of the use of these parameters (for instance
+converting an INTEGER to another type could be) :-
+
+\begin{verbatim}
+      *             "
+      *     (standard prologue)
+      *             "
+      *  Global parameters:
+            INCLUDE 'DCV_PAR'          ! DCV global parameters giving allowed ranges
+      *             "
+      *  External References:
+            INCLUDE 'DCV_EXT'          ! DCV external function definitions
+      *             "
+      *  Local Variables:
+            INTEGER IVAL               ! Integer value to be converted
+            <TYPE> VAL                 ! Destination variable of type <COMM>
+                    "
+      *  Internal References:
+            INCLUDE 'DCV_FUN'          ! DCV in-line statement functions
+      *-
+                    "
+                    "
+            IF ( ( IVAL .GE. DCV__<T>MIN ) .AND.
+           :     ( IVAL .LE. DCV__<T>MAX ) ) THEN
+
+      *  Value within range. The conversion is allowed.
+               VAL = DCV_ITO<T>( IVAL )
+
+            ELSE
+      
+      *  Error. Value out of range ...
+               <take appropriate action>
+            END IF
+                    "
+                    "
+\end{verbatim}
+      
+Note that ranges are only provided for numeric data types.
+
+An alternative (and easier) way of preventing numerical overflow from causing
+problems is to use the PRIMDAT routines instead of the DCV ones. The PRIMDAT
+routines will not crash your program if an overflow occurs. See SUN/39 for
+details.
+
+\newpage
+\begin{center}
+{\Large\bf APPENDIX 1}
+
+{\large\bf A FULL TABLE OF TOKEN TRANSLATIONS}
+\end{center}
+
+This appendix gives the translations of all the tokens
+made by GENERIC for each of the data types.
+If a translation is illegal, the result will be ``?''
+(and GENERIC will give a warning message).
+
+To produce the BYTE version of a program, the following substitutions
+are made :-
+%bytekernal
+\begin{tabbing}
+xxxxxx\=xxxxxxxxxxxxx\=xxx\=xxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxx\kill 
+\>{\bf Kernel} tokens (translated by default) :- \\
+\\
+\>TOKEN  \>SUBSTITUTE  \>\>COMMENT \\
+\\
+\>$<$T$>$       \>\>{\tt "B"}       \>{\em Subroutine name extension} \\
+\>$<$TYPE$>$    \>\>{\tt "BYTE"}    \>{\em Argument type definition} \\
+\>$<$LTYPE$>$   \>\>{\tt "BYTE"}    \>{\em Local type definition} \\
+\>$<$CONST$>$   \>\>{\tt " "}       \>{\em String to be appended to constant} \\
+\>$<$HTYPE$>$   \>\>{\tt "\_BYTE"}  \>{\em HDS type} \\
+\>$<$COMM$>$    \>\>{\tt "BYTE"}    \>{\em Comment describing type} \\
+\\
+\>{\bf ASTERIX} tokens (translated when /ASTERIX is specified) :- \\
+%byteasterix
+\\
+\>TOKEN  \>SUBSTITUTE  \>\>COMMENT \\
+\\ 
+\>$<$CONV$>$    \>\>{\tt " "} \>{\em BYTE to REAL conversion} \\
+\>$<$EXT$>$     \>\>{\tt " "} \>{\em BYTE to REAL conversion extension} \\
+\>$<$BRAK$>$    \>\>{\tt " "} \>{\em Brackets for BYTE to REAL conversion} \\
+\>$<$ICONV$>$   \>\>{\tt " "} \>{\em BYTE to INTEGER conversion} \\
+\>$<$IEXT$>$    \>\>{\tt " "} \>{\em BYTE to INTEGER conversion extension} \\
+\>$<$IBRAK$>$   \>\>{\tt " "} \>{\em Brackets for BYTE to INTEGER conversion} \\
+\>$<$REV$>$     \>\>{\tt " "} \>{\em REAL to BYTE conversion} \\
+\>$<$RVBRAK$>$  \>\>{\tt " "} \>{\em Brackets for REAL to BYTE conversion} \\
+\>$<$IREV$>$    \>\>{\tt " "} \>{\em INTEGER to BYTE conversion} \\
+\>$<$IRVBRAK$>$ \>\>{\tt " "} \>{\em Brackets for INTEGER to BYTE conversion} \\                          
+\end{tabbing}
+To produce the UNSIGNED BYTE version of a program, the following
+substitutions are made :-
+%usbytekernal
+\begin{tabbing}
+xxxxxx\=xxxxxxxxxxxxx\=xxx\=xxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxx\kill 
+\>{\bf Kernel} tokens (translated by default) :- \\
+\\ 
+\>TOKEN     \>SUBSTITUTE     \>\>COMMENT \\
+\\
+\>$<$T$>$       \>\>{\tt "UB"}     \>{\em Subroutine name extension} \\
+\>$<$TYPE$>$    \>\>{\tt "BYTE"}   \>{\em Argument type definition} \\
+\>$<$LTYPE$>$   \>\>{\tt "BYTE"}   \>{\em Local type definition} \\
+\>$<$CONST$>$   \>\>{\tt " "}      \>{\em String to be appended to constant}\\
+\>$<$HTYPE$>$   \>\>{\tt "\_UBYTE"}  \>{\em HDS type} \\
+\>$<$COMM$>$    \>\>{\tt "UNSIGNED BYTE"} \>{\em Comment describing type} \\
+\\
+\>{\bf ASTERIX} tokens (translated when /ASTERIX is specified) :-\\
+%usbyteasterix
+xxxxxx\=xxxxxxxxxxxxx\=xxx\=xxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxx\kill 
+\\ 
+\>TOKEN     \>SUBSTITUTE     \>\>COMMENT \\
+\\ 
+\>$<$CONV$>$  \>\>{\tt "REAL("} \>{\em UNSIGNED BYTE to REAL conversion} \\
+\>$<$EXT$>$   \>\>{\tt "ZEXT("} \>{\em UNSIGNED BYTE to REAL conversion 
+extension}\\
+\>$<$BRAK$>$  \>\>{\tt "))"} \>{\em Brackets for UNSIGNED BYTE to REAL 
+conversion}\\
+\>$<$ICONV$>$ \>\>{\tt "INT("}  \>{\em UNSIGNED BYTE to INTEGER conversion} \\
+\>$<$IEXT$>$  \>\>{\tt "ZEXT("} \>{\em UNSIGNED BYTE to INTEGER conversion 
+extension}\\
+\>$<$IBRAK$>$   \>\>{\tt "))"}    \>{\em Brackets for UNSIGNED BYTE to INTEGER 
+conversion}\\
+\>$<$REV$>$     \>\>{\tt "NINT("} \>{\em REAL to UNSIGNED BYTE conversion} \\
+\>$<$RVBRAK$>$  \>\>{\tt ")"}     \>{\em Brackets for REAL to UNSIGNED BYTE 
+conversion} \\
+\>$<$IREV$>$    \>\>{\tt " "} \>{\em INTEGER to UNSIGNED BYTE conversion} \\
+\>$<$IRVBRAK$>$ \>\>{\tt " "} \>{\em Brackets for INTEGER to UNSIGNED BYTE 
+conversion}\\
+\\
+\end{tabbing}
+To produce the CHARACTER version of a program, the following
+substitutions are made :-
+%cHarkernal
+\begin{tabbing}
+xxxxxx\=xxxxxxxxxxxxx\=xxx\=xxxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxx\kill 
+\>{\bf Kernel} tokens (translated by default) :-\\
+\\
+\>TOKEN      \>SUBSTITUTE     \>\> COMMENT \\
+\\
+\>$<$T$>$     \>{\tt "C"}             \>\>{\em Subroutine name extension} \\
+\>$<$TYPE$>$  \>{\tt "CHARACTER*(*)"} \>\>{\em Argument type definition} \\
+\>$<$LTYPE$>$ \>{\tt "CHARACTER*$<$CHASIZ$>$"} \>\>{\em Local type definition (CHASIZ = 200 by default)} \\
+\>$<$CONST$>$ \>{\tt "?"}            \>\>{\em String to be appended to 
+constant} \\
+\>$<$HTYPE$>$ \>{\tt "\_CHAR"}       \>\>{\em HDS type} \\
+\>$<$COMM$>$  \>{\tt "CHARACTER"}    \>\>{\em Comment describing type} \\
+\\
+\>{\bf ASTERIX} tokens (translated when /ASTERIX is specified) :- \\
+%charasterix
+\\
+\>TOKEN      \>SUBSTITUTE     \>\> COMMENT \\
+\\
+\>$<$CONV$>$  \>\>{\tt "?"} \>{\em CHARACTER to REAL conversion}\\
+\>$<$EXT$>$   \>\>{\tt "?"} \>{\em CHARACTER to REAL conversion extension}\\
+\>$<$BRAK$>$  \>\>{\tt "?"} \>{\em Brackets for CHARACTER to REAL conversion}\\
+\>$<$ICONV$>$ \>\>{\tt "?"} \>{\em CHARACTER to INTEGER conversion}\\
+\>$<$IEXT$>$  \>\>{\tt "?"} \>{\em CHARACTER to INTEGER conversion extension}\\
+\>$<$IBRAK$>$ \>\>{\tt "?"} \>{\em Brackets for CHARACTER to INTEGER 
+conversion} \\
+\>$<$REV$>$   \>\>{\tt "?"} \>{\em REAL to CHARACTER conversion} \\
+\>$<$RVBRAK$>$ \>\>{\tt "?"} \>{\em Brackets for REAL to CHARACTER
+conversion}\\
+\>$<$IREV$>$  \>\>{\tt "?"} \>{\em INTEGER to CHARACTER conversion}\\
+\>$<$IRVBRAK$>$ \>\>{\tt "?"} \>{\em Brackets for INTEGER to CHARACTER
+conversion} \\
+\end{tabbing}
+To produce the DOUBLE PRECISION version of a program, the following
+substitutions are made :-
+%dpkernal
+\begin{tabbing}
+xxxxxx\=xxxxxxxxxxxxx\=xxx\=xxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxx\kill 
+\>{\bf Kernel} tokens (translated by default) :-\\
+\\
+\>TOKEN     \>SUBSTITUTE  \>\>COMMENT \\
+\\
+\>$<$T$>$     \>{\tt "D"}               \>\>{\em Subroutine name extension}\\
+\>$<$TYPE$>$  \>{\tt "DOUBLE PRECISION"}\>\>{\em Argument type definition}\\
+\>$<$LTYPE$>$ \>{\tt "DOUBLE PRECISION"}\>\>{\em Local type definition}\\
+\>$<$CONST$>$ \>{\tt ".0D0"}            \>\>{\em String to be appended to 
+constant} \\
+\>$<$HTYPE$>$ \>{\tt "\_DOUBLE"}        \>\>{\em HDS type}\\
+\>$<$COMM$>$  \>{\tt "DOUBLE PRECISION"}\>\>{\em Comment describing type}\\
+\end{tabbing}
+\newpage                 
+\begin{tabbing}
+xxxxxx\=xxxxxxxxxxxxx\=xxx\=xxxxxxxxxxx\=xxxxxxxxxxxxxxxxxx\kill 
+\>{\bf ASTERIX} tokens (translated when /ASTERIX is specified) :-\\
+%dpasterix
+\\
+\>TOKEN  \>SUBSTITUTE  \>\>COMMENT \\
+\\
+\>$<$CONV$>$ \>\>{\tt "SNGL("} \>{\em DOUBLE PRECISION to REAL conversion}\\
+\>$<$EXT$>$  \>\>{\tt " "}     \>{\em DOUBLE PRECISION to REAL conversion
+extension}\\
+\>$<$BRAK$>$ \>\>{\tt ")"}     \>{\em Brackets for DOUBLE PRECISION to
+REAL conversion}\\
+\>$<$ICONV$>$ \>\>{\tt "NINT("} \>{\em DOUBLE PRECISION to INTEGER conversion}\\
+\>$<$IEXT$>$  \>\>{\tt " "}   \>{\em DOUBLE PRECISION to INTEGER conversion
+extension}\\
+\>$<$IBRAK$>$ \>\>{\tt ")"} \>{\em Brackets for DOUBLE PRECISION to INTEGER 
+conversion}\\
+\>$<$REV$>$   \>\>{\tt "DBLE("} \>{\em REAL to DOUBLE PRECISION conversion}\\
+\>$<$RVBRAK$>$ \>\>{\tt ")"}    \>{\em Brackets for REAL to DOUBLE PRECISION 
+conversion}\\
+\>$<$IREV$>$  \>\>{\tt "DBLE("} \>{\em INTEGER to DOUBLE PRECISION
+conversion}\\
+\>$<$IRVBRAK$>$ \>\>{\tt ")"} \>{\em Brackets for INTEGER to DOUBLE
+PRECISION conversion}\\
+\end{tabbing}
+To produce the INTEGER version of a program, the following substitutions
+are made :-
+%intkernal
+\begin{tabbing}
+xxxxxx\=xxxxxxxxxxxxx\=xxx\=xxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxx\kill 
+\>{\bf Kernel} tokens (translated by default) :-\\
+\\
+\>TOKEN  \>SUBSTITUTE   \>\>COMMENT\\
+\\
+\>$<$T$>$     \>\>{\tt "I"}         \>{\em Subroutine name extension}\\
+\>$<$TYPE$>$  \>\>{\tt "INTEGER"}   \>{\em Argument type definition}\\
+\>$<$LTYPE$>$ \>\>{\tt "INTEGER"}   \>{\em Local type definition}\\
+\>$<$CONST$>$ \>\>{\tt " "}         \>{\em String to be appended to constant}\\
+\>$<$HTYPE$>$ \>\>{\tt "\_INTEGER"} \>{\em HDS type}\\
+\>$<$COMM$>$  \>\>{\tt "INTEGER"}   \>{\em Comment describing type}\\
+\\                                 
+\>{\bf ASTERIX} tokens (translated when /ASTERIX is specified) :-\\
+%intasterix
+\\
+\>TOKEN  \>SUBSTITUTE   \>\>COMMENT\\
+\\
+\>$<$CONV$>$     \>\>{\tt "REAL("} \>{\em INTEGER to REAL conversion}\\
+\>$<$EXT$>$      \>\>{\tt " "}   \>{\em INTEGER to REAL conversion extension}\\
+\>$<$BRAK$>$     \>\>{\tt ")"}     \>{\em Brackets for INTEGER to REAL 
+conversion}\\
+\>$<$ICONV$>$    \>\>{\tt " "}     \>{\em INTEGER to INTEGER conversion}\\
+\>$<$IEXT$>$     \>\>{\tt " "}     \>{\em INTEGER to INTEGER conversion 
+extension}\\
+\>$<$IBRAK$>$    \>\>{\tt " "}     \>{\em Brackets for INTEGER to INTEGER 
+conversion}\\
+\>$<$REV$>$      \>\>{\tt "NINT("} \>{\em REAL to INTEGER conversion}\\
+\>$<$RVBRAK$>$   \>\>{\tt ")"}     \>{\em Brackets for REAL to INTEGER 
+conversion}\\
+\>$<$IREV$>$     \>\>{\tt " "}     \>{\em INTEGER to INTEGER conversion}\\
+\>$<$IRVBRAK$>$  \>\>{\tt " "}     \>{\em Brackets for INTEGER to INTEGER
+conversion}\\
+\end{tabbing}
+To produce the LOGICAL version of a program, the following substitutions
+are made :-
+%logkernal
+\begin{tabbing}
+xxxxxx\=xxxxxxxxxxxxx\=xxx\=xxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxx\kill 
+\>{\bf Kernel} tokens (translated by default) :-\\
+\\
+\>TOKEN      \>SUBSTITUTE      \>\>COMMENT \\
+\\
+\>$<$T$>$        \>\>{\tt "L"}         \>{\em Subroutine name extension}\\
+\>$<$TYPE$>$     \>\>{\tt "LOGICAL"}   \>{\em Argument type definition}\\
+\>$<$LTYPE$>$    \>\>{\tt "LOGICAL"}   \>{\em Local type definition}\\
+\>$<$CONST$>$    \>\>{\tt " "}         \>{\em String to be appended to 
+constant}\\
+\>$<$HTYPE$>$    \>\>{\tt "\_LOGICAL"} \>{\em HDS type}\\
+\>$<$COMM$>$     \>\>{\tt "LOGICAL"}   \>{\em Comment describing type}\\ 
+\\                                            
+\>{\bf ASTERIX} tokens (translated when /ASTERIX is specified) :-\\
+%logasterix
+\\
+\>TOKEN      \>SUBSTITUTE      \>\>COMMENT\\
+\\
+\>$<$CONV$>$     \>\>{\tt "?"} \>{\em LOGICAL to REAL conversion}\\
+\>$<$EXT$>$      \>\>{\tt "?"} \>{\em LOGICAL to REAL conversion extension}\\
+\>$<$BRAK$>$     \>\>{\tt "?"} \>{\em Brackets for LOGICAL to REAL conversion}\\
+\>$<$ICONV$>$    \>\>{\tt "?"} \>{\em LOGICAL to INTEGER conversion}\\
+\>$<$IEXT$>$     \>\>{\tt "?"} \>{\em LOGICAL to INTEGER conversion extension}\\
+\>$<$IBRAK$>$    \>\>{\tt "?"} \>{\em Brackets for LOGICAL to INTEGER 
+conversion}\\
+\>$<$REV$>$      \>\>{\tt "?"} \>{\em REAL to LOGICAL conversion}\\
+\>$<$RVBRAK$>$   \>\>{\tt "?"} \>{\em Brackets for REAL to LOGICAL conversion}\\
+\>$<$IREV$>$     \>\>{\tt "?"} \>{\em INTEGER to LOGICAL conversion}\\
+\>$<$IRVBRAK$>$  \>\>{\tt "?"} \>{\em Brackets for INTEGER to LOGICAL 
+conversion}\\
+\end{tabbing}
+To produce the REAL version of a program, the following substitutions
+are made :-
+%realkernal
+\begin{tabbing}
+xxxxxx\=xxxxxxxxxxxxx\=xxx\=xxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxx\kill 
+\>{\bf Kernel} tokens (translated by default) :-\\
+\\
+\>TOKEN      \>SUBSTITUTE      \>\>COMMENT\\
+\\
+\>$<$T$>$     \>\>{\tt "R"}     \>{\em Subroutine name extension}\\
+\>$<$TYPE$>$  \>\>{\tt "REAL"}  \>{\em Argument type definition}\\
+\>$<$LTYPE$>$ \>\>{\tt "REAL"}  \>{\em Local type definition}\\
+\>$<$CONST$>$ \>\>{\tt ".0E0"}  \>{\em String to be appended to constant}\\
+\>$<$HTYPE$>$ \>\>{\tt "\_REAL"} \>{\em HDS type}\\
+\>$<$COMM$>$  \>\>{\tt "REAL"}  \>{\em Comment describing type}\\
+\\
+\>{\bf ASTERIX} tokens (translated when /ASTERIX is specified) :-\\
+%realasterix
+\\
+\>TOKEN      \>SUBSTITUTE      \>\>COMMENT\\
+\\
+\>$<$CONV$>$     \>\>{\tt " "}     \>{\em REAL to REAL conversion}\\
+\>$<$EXT$>$      \>\>{\tt " "}     \>{\em REAL to REAL conversion extension}\\
+\>$<$BRAK$>$     \>\>{\tt " "}  \>{\em Brackets for REAL to REAL conversion}\\
+\>$<$ICONV$>$    \>\>{\tt "NINT("} \>{\em REAL to INTEGER conversion}\\
+\>$<$IEXT$>$     \>\>{\tt " "}  \>{\em REAL to INTEGER conversion extension}\\
+\>$<$IBRAK$>$    \>\>{\tt ")"} \>{\em Brackets for REAL to INTEGER conversion}\\
+\>$<$REV$>$      \>\>{\tt " "}     \>{\em REAL to REAL conversion}\\
+\>$<$RVBRAK$>$   \>\>{\tt " "}   \>{\em Brackets for REAL to REAL conversion}\\
+\>$<$IREV$>$     \>\>{\tt "REAL("} \>{\em INTEGER to REAL conversion}\\
+\>$<$IRVBRAK$>$  \>\>{\tt ")"} \>{\em Brackets for INTEGER to REAL conversion}\\
+\end{tabbing}           
+To produce the WORD version of a program, the following substitutions
+are made :-
+%wordkernal
+\begin{tabbing}
+xxxxxx\=xxxxxxxxxxxxx\=xxx\=xxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxx\kill 
+\>{\bf Kernel} tokens (translated by default) :-\\
+\\
+\>TOKEN      \>SUBSTITUTE     \>\>COMMENT\\
+\\
+\>$<$T$>$     \>\>{\tt "W"}         \>{\em Subroutine name extension}\\
+\>$<$TYPE$>$  \>\>{\tt "INTEGER*2"} \>{\em Argument type definition}\\
+\>$<$LTYPE$>$ \>\>{\tt "INTEGER*2"} \>{\em Local type definition}\\
+\>$<$CONST$>$ \>\>{\tt " "}         \>{\em String to be appended to constant}\\
+\>$<$HTYPE$>$ \>\>{\tt "\_WORD"}    \>{\em HDS type}\\
+\>$<$COMM$>$  \>\>{\tt "WORD"}      \>{\em Comment describing type}\\
+\\                                         
+\>ASTERIX tokens (translated when /ASTERIX is specified) :-\\
+%wordasterix
+\\
+\>TOKEN      \>SUBSTITUTE      \>\>COMMENT\\
+\\
+\>$<$CONV$>$     \>\>{\tt "REAL("} \>{\em WORD to REAL conversion}\\
+\>$<$EXT$>$      \>\>{\tt " "}     \>{\em WORD to REAL conversion extension}\\
+\>$<$BRAK$>$     \>\>{\tt ")"}   \>{\em Brackets for WORD to REAL conversion}\\
+\>$<$ICONV$>$    \>\>{\tt " "}     \>{\em WORD to INTEGER conversion}\\
+\>$<$IEXT$>$     \>\>{\tt " "}   \>{\em WORD to INTEGER conversion extension}\\
+\>$<$IBRAK$>$    \>\>{\tt " "} \>{\em Brackets for WORD to INTEGER conversion}\\
+\>$<$REV$>$      \>\>{\tt "NINT("} \>{\em REAL to WORD conversion}\\
+\>$<$RVBRAK$>$   \>\>{\tt ")"}  \>{\em Brackets for REAL to WORD conversion}\\
+\>$<$IREV$>$     \>\>{\tt " "}     \>{\em INTEGER to WORD conversion}\\
+\>$<$IRVBRAK$>$  \>\>{\tt " "} \>{\em Brackets for INTEGER to WORD conversion}\\
+\end{tabbing}                             
+To produce the UNSIGNED WORD version of a program, the following
+substitutions are made :-
+%uswordkernal
+\begin{tabbing}
+xxxxxx\=xxxxxxxxxxxxx\=xxx\=xxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxx\kill 
+\>{\bf Kernel} tokens (translated by default) :-\\
+\\
+\>TOKEN      \>SUBSTITUTE     \>\>COMMENT\\
+\\
+\>$<$T$>$     \>\>{\tt "UW"}            \>{\em Subroutine name extension}\\
+\>$<$TYPE$>$  \>\>{\tt "INTEGER*2"}     \>{\em Argument type definition}\\
+\>$<$LTYPE$>$ \>\>{\tt "INTEGER*2"}     \>{\em Local type definition}\\
+\>$<$CONST$>$ \>\>{\tt " "}         \>{\em String to be appended to constant}\\
+\>$<$HTYPE$>$ \>\>{\tt "\_UWORD"}       \>{\em HDS type}\\
+\>$<$COMM$>$  \>\>{\tt "UNSIGNED WORD"} \>{\em Comment describing type}\\
+\\              
+\>{\bf ASTERIX} tokens (translated when /ASTERIX is specified) :-\\
+%uswordasterix
+xxxxxx\=xxxxxxxxxxxxx\=xxx\=xxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxx\kill 
+\\
+\>TOKEN      \>SUBSTITUTE      \>\>COMMENT\\
+\\
+\>$<$CONV$>$     \>\>{\tt "REAL("} \>{\em UNSIGNED WORD to REAL conversion}\\
+\>$<$EXT$>$      \>\>{\tt "ZEXT("} \>{\em UNSIGNED WORD to REAL conversion 
+extension}\\
+\>$<$BRAK$>$     \>\>{\tt "))"}    \>{\em Brackets for UNSIGNED WORD to REAL 
+conversion}\\
+\>$<$ICONV$>$    \>\>{\tt " "}     \>{\em UNSIGNED WORD to INTEGER conversion}\\
+\>$<$IEXT$>$     \>\>{\tt "ZEXT("} \>{\em UNSIGNED WORD to INTEGER conversion 
+extension}\\
+\>$<$IBRAK$>$    \>\>{\tt ")"}     \>{\em Brackets for UNSIGNED WORD to INTEGER
+ conversion}\\
+\>$<$REV$>$      \>\>{\tt "NINT("} \>{\em REAL to UNSIGNED WORD conversion}\\
+\>$<$RVBRAK$>$   \>\>{\tt ")"}     \>{\em Brackets for REAL to UNSIGNED WORD 
+conversion}\\
+\>$<$IREV$>$     \>\>{\tt " "}     \>{\em INTEGER to UNSIGNED WORD conversion}\\
+\>$<$IRVBRAK$>$  \>\>{\tt " "}     \>{\em Brackets for INTEGER to UNSIGNED WORD
+ conversion}\\
+\end{tabbing}                             
+\newpage
+\begin{center}
+{\Large\bf APPENDIX 2}
+
+{\large\bf A FULL LIST OF CONVERSION FUNCTIONS}
+\end{center}
+
+This appendix gives the conversion functions which are available using
+the DCV utility, and describes which ones are statement functions and
+which ones are external. 
+
+The following conversions are defined as in-line statement functions in 
+`DCV\_FUN'. (They are either trivial, or are mentioned in the Fortran
+manual as legal conversions) :-
+
+\begin{tabbing}
+xxxx\=xxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\=xxx\kill 
+\>{\bf Function name}   \>{\bf Conversion}\\
+\\
+\>DCV\_BTOB   \>BYTE to BYTE \\
+\>DCV\_UBTOUB \>UNSIGNED BYTE to UNSIGNED BYTE \\
+\>DCV\_UBTOD  \>UNSIGNED BYTE to DOUBLE PRECISION \\
+\>DCV\_DTOD   \>DOUBLE PRECISION to DOUBLE PRECISION \\
+\>DCV\_ITOD   \>INTEGER to DOUBLE PRECISION \\
+\>DCV\_RTOD   \>REAL to DOUBLE PRECISION \\
+\>DCV\_WTOD   \>WORD to DOUBLE PRECISION \\
+\>DCV\_UWTOD  \>UNSIGNED WORD to DOUBLE PRECISION \\
+\>DCV\_UBTOI  \>UNSIGNED BYTE to INTEGER \\
+\>DCV\_DTOI   \>DOUBLE PRECISION to INTEGER \\
+\>DCV\_ITOI   \>INTEGER to INTEGER \\
+\>DCV\_RTOI   \>REAL to INTEGER \\
+\>DCV\_UWTOI  \>UNSIGNED WORD to INTEGER \\
+\>DCV\_UBTOR  \>UNSIGNED BYTE to REAL \\
+\>DCV\_DTOR   \>DOUBLE PRECISION to REAL \\
+\>DCV\_ITOR   \>INTEGER to REAL \\
+\>DCV\_RTOR   \>REAL to REAL \\
+\>DCV\_WTOR   \>WORD to REAL \\
+\>DCV\_UWTOR  \>UNSIGNED WORD to REAL \\
+\>DCV\_UBTOW  \>UNSIGNED BYTE to WORD \\
+\>DCV\_DTOW   \>DOUBLE PRECISION to WORD       \>*** \\
+\>DCV\_RTOW   \>REAL to WORD                   \>*** \\
+\>DCV\_WTOW   \>WORD to WORD \\
+\>DCV\_UBTOUW \>UNSIGNED BYTE to UNSIGNED WORD \\
+\>DCV\_UWTOUW \>UNSIGNED WORD to UNSIGNED WORD \\
+\end{tabbing} 
+Overflow errors are possible from the conversions marked ``***''
+
+\newpage
+
+The following conversions are also defined as in-line statement functions in
+`DCV\_FUN'. However, they are not mentioned in the Fortran manual and should be
+used with caution. Trial and error has shown that the Fortran compliers on all
+Starlink supported systems will make the conversions successfully :-
+
+\begin{tabbing}
+xxxx\=xxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\=xxx\kill 
+\>{\bf Function name}      \>{\bf Conversion}\\
+\\
+\>DCV\_UBTOB \>UNSIGNED BYTE to BYTE          \>*** \\
+\>DCV\_DTOB  \>DOUBLE PRECISION to BYTE       \>*** \\
+\>DCV\_ITOB  \>INTEGER to BYTE                \>*** \\
+\>DCV\_RTOB  \>REAL to BYTE                   \>*** \\
+\>DCV\_WTOB  \>WORD to BYTE                   \>*** \\
+\>DCV\_UWTOB \>UNSIGNED WORD to BYTE          \>*** \\
+\>DCV\_BTOD  \>BYTE to DOUBLE PRECISION \\
+\>DCV\_BTOI  \>BYTE to INTEGER \\
+\>DCV\_WTOI  \>WORD to INTEGER \\
+\>DCV\_BTOR  \>BYTE to REAL \\
+\>DCV\_BTOW  \>BYTE to WORD \\
+\>DCV\_ITOW  \>INTEGER to WORD                \>*** \\
+\end{tabbing}
+Overflow errors are possible from the conversions marked ``***''
+
+The following conversions are defined as external
+functions in the DCV object library :-
+\begin{tabbing}
+xxxx\=xxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\=xxx\kill 
+\>{\bf Function name}     \>{\bf Conversion}\\
+\\
+\>DCV\_BTOUB  \>BYTE to UNSIGNED BYTE \\
+\>DCV\_DTOUB  \>DOUBLE PRECISION to UNSIGNED BYTE \\
+\>DCV\_ITOUB  \>INTEGER to UNSIGNED BYTE \\
+\>DCV\_RTOUB  \>REAL to UNSIGNED BYTE \\
+\>DCV\_WTOUB  \>WORD to UNSIGNED BYTE \\
+\>DCV\_UWTOUB \>UNSIGNED WORD to UNSIGNED BYTE \\
+\>DCV\_BTOUW  \>BYTE to UNSIGNED WORD \\
+\>DCV\_UBTOUW \>UNSIGNED BYTE to UNSIGNED WORD \\
+\>DCV\_DTOUW  \>DOUBLE PRECISION to UNSIGNED WORD \\
+\>DCV\_ITOUW  \>INTEGER to UNSIGNED WORD \\
+\>DCV\_RTOUW  \>REAL to UNSIGNED WORD \\
+\>DCV\_WTOUW  \>WORD to UNSIGNED WORD \\
+\end{tabbing} 
+Overflow errors are possible in ALL these conversions, so range checking is 
+essential.
+
+\end{document}

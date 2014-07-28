@@ -1,0 +1,610 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {167.1}
+\newcommand{\stardocauthors}   {V S Dhillon\\
+                                Royal Greenwich Observatory\\
+                                La Palma}
+\newcommand{\stardocdate}      {18 May 1993}
+\newcommand{\stardoctitle}     {PERIOD --- A Time-Series Analysis Package}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+
+\newcommand{\rf}{\par\noindent\hangindent 15pt{}}
+
+\newenvironment{cozy}[1]%
+{\begin{list}{}{%
+\settowidth{\labelwidth}{\large\bf #1}%
+\setlength{\labelsep}{5mm}%
+\setlength{\leftmargin}{\labelwidth}\addtolength{\leftmargin}{\labelsep}%
+\setlength{\parsep}{\medskipamount}%
+}}{\end{list}}
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+%  \setlength{\parskip}{0mm}
+%  \tableofcontents
+%  \setlength{\parskip}{\medskipamount}
+%  \markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\section{Introduction}
+
+This document describes how to use {\tt PERIOD} (version 3.0), a software
+package designed to search for periodicities in data. It is important to note
+that {\tt PERIOD} will {\em not} run if {\tt QDP/PLT}, the plotting/fitting
+package written by Allyn Tennant and described in SUN 128, is not properly
+installed on the system. 
+
+
+\section{Initializing and Running}
+
+To allow for a substantial amount of data to be processed at one time, {\tt
+PERIOD} uses a number of large data arrays. Therefore, a page file quota of at
+least 27000 (approx.) is required to run  {\tt PERIOD}.
+
+To run {\tt PERIOD}, the package must first be initialized using the command
+\verb@PERIODSTART@. This may be placed in the users
+\verb@SYS$LOGIN:LOGIN.COM@ file if desired. The package can then be run 
+by typing {\tt PERIOD}.
+
+\section{Data Format and Storage}
+\label{slots}
+
+{\tt PERIOD} only accepts ASCII data files as input. The files may contain
+up to a maximum of 10000 rows and 20 columns. It is possible to specify which
+column refers to the $x$-axis, which column refers to the $y$-axis and which 
+column refers to the $y$-axis errors (optional). 
+
+Data is stored and processed within {\tt PERIOD} using a {\em slot} system.
+A data slot is simply an array holding one dataset. The maximum number
+of data slots which can be handled at any one time in {\tt PERIOD} is 40;
+hence {\tt PERIOD} has the capability of analysing a large amount of data
+simultaneously. 
+
+The first command that is usually run in {\tt PERIOD} is {\tt INPUT}
+(see section~\ref{menu}), which loads datasets into data slots:
+
+\begin{verbatim}
+Enter first and last slots for input (0,0 to quit) : 
+\end{verbatim}
+
+In order to load the first slot with a single dataset, one should reply 
+{\tt 1,1} to the above prompt. Similarly, if one wishes to load slots
+4 through to 9 with 6 datasets, one should reply {\tt 4,9} to the above
+prompt. It is important to note that slots {\em can} be overwritten.
+Typing {\tt 0,0} will return the user to the menu. 
+
+Most {\tt PERIOD} commands prompt not only for an input slot, but also for
+an output slot:
+
+\begin{verbatim}
+Enter first and last slots for input  (0,0 to quit) : 
+Enter first and last slots for output (0,0 to quit) : 
+\end{verbatim}
+
+The input should contain the dataset (or datasets) and the output should
+contain the result of the operation on the dataset (or datasets). For example,
+given a set of 5 time-series (which have previously been loaded into slots 1 to
+5 using {\tt INPUT}) which need to be fitted with a sine curve (using the
+command {\tt FIT}, see section~\ref{menu}), one should type {\tt 1,5} in reply
+to the first prompt and {\tt 6,10} in reply to the second. {\tt PERIOD} will
+then fit sine curves to the data files loaded in slots 1 to 5 and put the fits
+in slots 6 to 10. Clearly, the number of output slots must be equal to the
+number of input slots. In addition, if any selected input slot is empty, {\tt
+PERIOD} will abort the operation and return the user to the main menu. It should
+be noted that in order to save on storage space one could have typed {\tt 1,5} 
+in reply to the second prompt and the original data-files would have been 
+overwritten by the resulting sine curves.
+
+\section{Using this Document}
+
+There are two main sections in this document. Section~\ref{menu} should be
+consulted by experienced users who require detailed information on individual
+{\tt PERIOD} commands. Section~\ref{recipe} is intended for inexperienced 
+users who require an introductory recipe detailing the steps one should 
+follow when searching for periodicities in data. 
+
+Please note that {\tt PERIOD} also has an extensive on-line help facility.
+This provides information at a level of detail similar to that found in 
+Section~\ref{menu}. However, it also provides a detailed description of 
+the individual prompts, something which cannot be found in this document.
+
+\section{Menu Options}
+\label{menu}
+
+{\tt PERIOD} is a menu-driven package. On entering {\tt PERIOD}, one is
+confronted with the following menu options, which are described in greater
+detail below.
+
+\begin{verbatim}
+          
+|**************************************************|
+|**| PERIOD  :>  A time-series analysis package |**|
+|**| Version :>  3.0                            |**|
+|**| Date    :>  17-March-1993                  |**|
+|**************************************************|
+|**|
+|**| Acknowledgments would be greatly appreciated.
+|**| Please report bugs, problems or suggestions to:
+|**|
+|**| Author  :>  Vikram Singh Dhillon
+|**| Address :>  Royal Greenwich Observatory, La Palma
+|**| E-mail  :>  (SPAN) 29146::VSD
+        
+ 
+Options.
+--------
+
+INPUT    --  Input data.
+FAKE     --  Create fake data.
+NOISE    --  Add noise to data.
+DETREND  --  Detrend the data.
+WINDOW   --  Set data points to unity.
+OPEN     --  Open a log file.
+CLOSE    --  Close the log file.
+PERIOD   --  Find periodicities.
+FIT      --  Fit sine curve to folded data.
+FOLD     --  Fold data on given period.
+SINE     --  +, -, / or * sine curves.
+PLT      --  Call PLT.
+STATUS   --  Information on stored data.
+OUTPUT   --  Output data.
+HELP     --  On-line help.
+QUIT     --  Quit PERIOD.
+
+PERIOD> 
+
+\end{verbatim}
+
+Any one of these commands can be entered by typing anything from the shortest
+unambiguous string up to the full command name. Therefore, {\tt P} would be
+ambiguous, but {\tt PE} would not.
+
+\subsection*{\tt INPUT}
+
+As described in section~\ref{slots}, this option allows the user to input data
+into {\tt PERIOD}. The routine determines the number of columns in the input
+files and then prompts the user for which columns refer to the $x$-axis,
+$y$-axis and $y$-axis errors (if desired). For example, if the user is
+inputting radial velocity data, the $x$-axis would most probably be HJD's, the
+$y$-axis the heliocentric radial velocities and there would most likely be
+errors associated with each radial velocity value. 
+
+\subsection*{\tt FAKE}
+
+Allows the user to create fake data with which to test or experiment with {\tt
+PERIOD}. Two options are catered for: periodic data or chaotic data. The
+periodic data are calculated using sine functions with parameters specified by
+the user. The chaotic data are created using a simple logistic equation (see,
+for example, Scargle 1990a, 1990b) with parameters specified by the user. 
+
+\subsection*{\tt NOISE}
+
+Using this option, it is possible to add noise to data or randomize data. The
+latter operation is carried out by specifying the {\tt [N]}ew dataset option,
+which will construct an artificial dataset of the same mean value and the same
+standard deviation as the original. Selecting the {\tt [O]}ld dataset allows
+the user to apply noise to data, create errors on the data points, and add
+noise to the data sampling (so that, for instance, an evenly sampled dataset
+becomes unevenly sampled). With most of the noise options, there is the
+possibility of applying either Gaussian noise or Poissonian noise. This routine
+is useful, not only in creating realistic artificial datasets (in conjunction
+with {\tt FAKE}), but also in investigating the effects of noise on a period
+detection. 
+
+\subsection*{\tt DETREND}
+
+This option removes the D.C. bias from data, which if not removed gives rise to
+significant power at 0 Hz. There are two options: If the data show no long term
+trends, it is best to simply subtract the mean and divide by the standard
+deviation (the {\tt [M]} option). This gives a dataset with a mean of zero and
+a standard deviation of one. Otherwise, it is best to subtract a low-order
+polynomial fit to the data (the {\tt [P]} option), since if these are not
+removed, the Fourier transform will put in a lot of power at the frequency of
+the long term variations. 
+
+\subsection*{\tt WINDOW}
+
+One of the main problems with the {\em classical}
+periodogram\footnote{Throughout the {\tt PERIOD} package and this document, the
+terms {\em power spectrum} and {\em periodogram} are used interchangeably,
+although strictly speaking the power spectrum is a theoretical quantity defined
+as an integral over continuous time, of which the periodogram is merely an
+estimate based on a finite amount of discrete data (Scargle 1982).}  (see
+Scargle 1982 for a definition), is {\em spectral leakage}, of which there are
+several forms. Leakage to nearby frequencies (sidelobes) is due to the finite
+total interval over which the data is sampled. Leakage to distant frequencies
+is due to the finite size of the interval between samples. The {\tt WINDOW}
+option sets all the $y$-axis data points to unity. A discrete Fourier transform
+of the resulting data would yield the window function (or spectrum), which
+would show the effects of spectral leakage. 
+
+\subsection*{\tt OPEN}
+
+It is possible to store the fits calculated by {\tt SINE} and {\tt PEAKS} in a
+log file. This option opens a new log file (if it does not already exist), or
+else re-opens an old log file and skips over the existing entries. 
+
+\subsection*{\tt CLOSE}
+
+This option closes the currently open log file. 
+
+\subsection*{\tt PERIOD}
+
+This is where all the work is done. One is confronted with the following 
+sub-menu: 
+
+\begin{verbatim}
+
+
+Options.
+--------
+
+SELECT   --  Select data slots.
+FREQ     --  Set/show frequency search limits.
+CHAOS    --  Chaos theory return map (Yn+i vs Yn).
+CHISQ    --  Chi-squared of sine fit vs frequency.
+CLEAN    --  CLEANed power spectrum.
+FT       --  Discrete Fourier power spectrum.
+MEM      --  Maximum entropy method power spectrum.
+PDM      --  Phase dispersion minimization.
+SCARGLE  --  Lomb-Scargle normalised periodogram.
+STRING   --  String-length vs frequency.
+PEAKS    --  Calculate period from periodogram.
+HELP     --  On-line help.
+QUIT     --  Quit PERIOD_PERIOD.
+
+PERIOD_PERIOD> 
+
+\end{verbatim}
+
+\begin{itemize}
+
+\item {\tt SELECT} -- Selects input and output slots for processing, as
+described in section~\ref{slots}. The input slots should contain the
+time-series, the output slots will contain, for example, the power spectra.
+{\tt SELECT} must be run {\em every} time a periodicity-finding option is run. 
+
+\item {\tt FREQ} -- Sets the frequency search parameters. The user can specify
+the minimum frequency, maximum frequency and frequency interval. Note that the
+maximum number of frequencies is 10000, so the search parameters should be
+selected accordingly. Alternatively, by entering 0's, default values can be
+accepted. Note that the default values are set on entering the {\tt PERIOD}
+package and thus the {\tt FREQ} option need not be run if default frequencies
+are required. The default values are calculated as follows: minimum frequency =
+0 (ie. infinite period), maximum frequency = 1 / (2 $\times$ Smallest Data
+Interval) (ie. Nyquist), frequency interval = 1 / (4 $\times$ Total Time
+Interval). Note that the default values could demand greater than 10000
+frequencies, in which case they will have to be modified by the user. 
+
+\item {\tt CHAOS} -- Creates a return map by plotting Y(n+i) against Y(n),
+where i is the {\em correlation integer} prompted for in the option.
+See Scargle (1990a, 1990b) for a description of the use of return maps. 
+
+\item {\tt CHISQ} -- This is a straight-forward technique where the input data
+is folded on a series of trial periods. At each trial period, the data is
+fitted with a sine curve. The resulting reduced-$\chi^2$ values are plotted as
+a function of trial frequency and the minima in the plot suggest the most
+likely periods. See Horne, Wade and Szkody (1986) for an example of the use of
+this method, which is ideally suited to the study of radial velocity data or
+any other sinusoidal variations. 
+
+\item {\tt CLEAN} -- The {\tt CLEAN} algorithm was originally developed for use
+in aperture synthesis and was later applied to one-dimensional data by Roberts,
+Leh\'{a}r and Dreher (1987). An adapted version of Lehar's code is used here. 
+The algorithm basically deconvolves the spectral window from the dirty spectrum.
+This produces a {\tt CLEAN} spectrum, which is largely free of the many effects
+of spectral leakage. The user is prompted for two parameters -- the loop gain
+and the number of iterations. The loop gain must lie between 0 and 2, typical
+values being between 0.1 and 1. The number of iterations should be large if the
+loop gain is small, typical values lying between 1 and 100. See Roberts,
+Leh\'{a}r and Dreher (1987) for further details. 
+
+\item {\tt FT} -- This option performs a classical discrete Fourier transform
+on the data and sums the mean-square-amplitudes of the result to form a power
+spectrum (see, for example, Deeming 1975). 
+
+\item {\tt MEM} -- Calculates the Maximum Entropy Method (MEM) power spectrum,
+as described by Press {\it et al.} (1986) (see also Fahlman and Ulrych 1982).
+The user is prompted for the order (or number of poles) of the MEM
+approximation, which should be set to a few times the number of sharp spectral
+features that one desires it to fit. With this restricted number of poles, the
+method will smooth the spectrum somewhat, but this is often a desirable
+property. While exact values depend on the application, one might take the
+number of poles as 10 or 20 or 50 for 1000 or 5000 data points. {\tt MEM} can
+produce strange results, especially if the number of poles or data points is
+too large. Data with extremely sharp spectral features may produce split peaks
+even at modest orders, and the peaks may shift with the phase of the sine wave.
+Also, with noisy input data, if too high an order is chosen there will be many
+spurious peaks. The use of this algorithm is often recommended in conjunction
+with more conservative methods in order to help choose the correct model order
+and to avoid being misled by spurious spectral features. The biggest drawback
+of {\tt MEM} is that the data need to be evenly spaced. This is because the
+frequencies are calculated as a function of the sampling interval, which is
+determined from the {\em median} of the $x$-axis data. 
+
+\item {\tt PDM} -- The phase dispersion minimization (PDM) technique is 
+simply an automated version of the classical method of distinguishing
+between possible periods, in which the period producing the least
+observational scatter about the mean light curve (or, for example,
+radial velocity curve) is chosen. This technique (which is described in
+detail by Stellingwerf 1978) is well suited to cases in 
+which only a few observations are available over a limited period of time,
+especially if the light curve is highly non-sinusoidal.
+The data is first folded on a series of trial frequencies. For each trial 
+frequency, the full phase interval (0,1) is divided into a user-specified 
+number of bins. The width of each bin is specified by the user, such that 
+a point need not be picked (if a bin width more narrow than the bin spacing
+is selected) or a point can belong to more than one bin (if a bin width
+wider than the bin spacing is selected). The variance of each of these
+bins (or samples) is then calculated. This gives a measure of the scatter
+around the mean light curve defined by the means of the data in each sample.
+The PDM statistic can then be calculated by dividing the overall variance
+of all the samples by the variance of the original (unbinned) dataset. This 
+process is then repeated for the next trial frequency. Note that windowed data 
+cannot be passed to this option since its variance is zero. If the trial 
+period is 
+not a true period, then the overall sample variance will be approximately equal 
+to the variance of the original dataset (ie. the PDM statistic will be
+approximately equal to 1). If the trial period is a correct period, the PDM
+statistic will reach a local minimum compared with neighbouring periods, 
+hopefully near zero. 
+
+The PDM method also gives an estimate of the {\em significance} 
+of a minimum. This
+is the probability that the value of the PDM statistic is due to random
+fluctuations (it is calculated by determining the area of the F distribution
+above 1/PDM in a two-sided test). The probability approaches unity as the
+PDM statistic approaches unity and should be near zero for the minimum to be
+regarded as reliable. Note that the significance is actually output in 
+{\tt PEAKS} (see below) and not in this option. 
+
+\item {\tt SCARGLE} -- Lomb (1976) and Scargle (1982) developed a novel type of
+periodogram analysis, quite powerful for finding, and testing the significance
+of, weak periodic signals in otherwise random, {\em unevenly sampled} data.
+Horne and Baliunas (1986) have elaborated on the method and Press and Rybicki
+(1989) present a fast implementation of the algorithm, a modified version of
+which is used here. Note that windowed data cannot be passed to this option
+(since it needs to divide by the variance (which is zero) to calculate the
+false alarm probability). Otherwise, this option is simple to use and not only
+produces a periodogram but also gives an estimate of the significance of peaks
+in the periodogram -- the {\em false-alarm probability}. This represents the
+probability that a peak of a given height will occur, {\em assuming that the
+data are pure noise}. Therefore, a peak with probability 0 is definitely not
+noise, while a peak with probability 1 is definitely noise. Note that the
+false-alarm probability is actually output in {\tt PEAKS} (see below) and not
+in this option. 
+
+\item {\tt STRING} -- The string-length method is an intuitively simple method,
+described in detail by Dworetsky (1983) and Friend {\it et al.} (1990). The
+data is folded on a series of trial periods and at each period the sum of the
+lengths of line segments joining successive points (the string-length) is
+calculated. Minima in a plot of string-length versus trial frequency indicate
+possible periods. Note that for sinusoidal data, the string-length should lie
+between 1.4637 (the theoretical minimum) and 3 (the value below which it is
+significant). 
+
+\item {\tt PEAKS} -- This option should be run once a periodogram has been
+obtained. It prompts for a periodogram and the time-series data that was used
+to create it. It then finds the highest peak in the power spectrum (or lowest
+trough if it is a string-length, PDM or reduced-$\chi^2$ plot) between
+user-specified frequencies. The resulting period is calculated, along with a
+crude error determined from the half-width of the peak. This option then goes
+on to refine the period using a parabolic interpolation of the peak and the two
+adjacent points. Finally, a more accurate error is derived using the analytical
+expression given by Horne and Baliunas (1986). In addition, a number of useful
+quantities, such as the false alarm probability, the string length or the PDM
+significance (depending on the input periodogram) are output. The results may 
+be written to a log file. For a useful discussion on the accuracy of period
+determination, see Schwarzenberg-Czerny (1991). 
+
+\item {\tt HELP} -- This command provides on-line help for {\tt PERIOD}. 
+Detailed information about individual commands can be obtained by typing 
+{\tt HELP 'COMMAND'} (eg. {\tt HELP SCARGLE}). 
+
+\item {\tt QUIT} (or {\tt EXIT}) -- This quits the \verb@PERIOD_PERIOD@ 
+sub-menu and returns the user to the main {\tt PERIOD} menu. 
+
+\end{itemize}
+
+Returning to the main {\tt PERIOD} menu:
+
+\subsection*{\tt FIT}
+
+Folds the data on a given period and zero point. This routine then fits the
+data with a sine curve and outputs the fit parameters (which can be written to
+a log file) and the resulting sine curve. 
+
+\subsection*{\tt FOLD}
+
+This routine folds the data on a given period and zero point. Hence, this
+option transforms the data onto a phase scale, where one phase unit is equal to
+one period and phase zero is defined by the zero point. Note that if a value of
+0 is given as the zero point, the data is folded by taking the first data point
+as the zero point. 
+
+This option is useful for checking whether derived periods actually give
+sensible results when applied to the data. In addition to normal folding
+(which one can obtain by responding with a 0 to the number of phase bins
+prompt), the user can phase bin the data, which folds the data and then
+averages all the data points falling into each bin. 
+
+\subsection*{\tt SINE}
+
+Allows the user to add, subtract, multiply or divide a user-specified sine
+curve. This option is useful for removing or adding known periods from data, 
+thus enabling or testing the detection of other periods. 
+
+\subsection*{\tt PLT}
+
+This routine calls {\tt PLT}, the subroutine mode of {\tt QDP} -- the
+plotting/fitting package written by Allyn Tennant; for further details see SUN
+128 or the {\tt QDP/PLT} manual. This option is used to plot any desired data
+slots. One can then manipulate the plot (just as if one were using {\tt QDP})
+and create publication-ready diagrams. In addition, {\tt QDP} contains an
+excellent set of fitting routines which can be used to fit a variety of
+different functions to the data. In order to receive on-line help, simply type
+{\tt HELP} at the {\tt PERIOD-PLT} prompt. To exit {\tt PERIOD-PLT} and return
+to the {\tt PERIOD} menu, type {\tt EXIT}. 
+
+\subsection*{\tt STATUS}
+
+Returns information on the data slots or on the stored fits in the log file.
+This command is useful in order to check which slots contain which datasets
+and also as a means of obtaining some elementary statistics on the stored data. 
+One can also use this option to check the fits stored in the log file without
+having to exit the package and read the log file. 
+
+\subsection*{\tt OUTPUT}
+
+Writes any selected slot to an ASCII file on disk. This is the only way of
+saving data created by {\tt PERIOD}, and should therefore be run before {\tt
+QUIT}ing in order to store, say, a power spectrum. 
+
+\subsection*{\tt HELP}
+
+This command provides on-line help for {\tt PERIOD}. Detailed information about
+individual commands can be obtained by typing {\tt HELP 'COMMAND'} (eg. {\tt
+HELP PERIOD}). 
+
+\subsection*{{\tt QUIT} (or {\tt EXIT})}
+
+This option quits a {\tt PERIOD} session. However, it does provide a last
+chance to stay in the package. This is essential, since any data files created
+using {\tt PERIOD} will be lost on exit from the package {\em unless} one {\tt
+OUTPUT}s the data first. 
+
+\section{A Simple Recipe}
+\label{recipe}
+
+A simple guide designed to introduce inexperienced users to the steps involved 
+in detecting periodicities is outlined below. Detailed descriptions of the
+individual {\tt PERIOD} commands can be found in section~\ref{menu} and in
+the on-line help facility.
+
+\begin{enumerate}
+\item Create an ASCII data file containing the time-series.
+\item Read the data into {\tt PERIOD} using {\tt INPUT}. 
+\item Detrend the data using the {\tt [M]} option in {\tt DETREND} (if the
+data show long term variations, use the {\tt [P]} option instead).
+\item Open a log file for the fits using {\tt OPEN}. 
+\item Enter the \verb@PERIOD_PERIOD@ menu by typing {\tt PERIOD}.
+\item Select the slots which contain the time-series data and specify the output
+slots for the periodograms using {\tt SELECT}.
+\item Set the frequency search limits using {\tt FREQ}. If you have no idea
+what the period is, accept the default values by typing 0 (or alternatively, 
+by not typing {\tt FREQ} in the first place). 
+\item Calculate the Lomb-Scargle periodogram by typing {\tt SCARGLE}.
+\item Now run {\tt PEAKS} on the resulting periodogram, specifying the detrended
+time-series and the frequency range which contains the peak you wish to 
+measure (you may enter 0,0 if you wish to process the entire range). Write 
+the fits to the log file.
+\item Now reselect the time-series slots and different output slots for a new
+periodogram using {\tt SELECT}.
+\item Type {\tt CLEAN} with 3 iterations and a loop gain of 0.5, for example.
+\item Run {\tt PEAKS} on the resulting periodogram and store the fits.
+\item Now quit the \verb@PERIOD_PERIOD@ sub-menu by typing {\tt QUIT}.
+\item Plot the periodograms using {\tt PLT}. Check to see the validity of the
+highest peak selected.
+\item Check the fits in the log file using {\tt STATUS}. In particular, look
+closely at the false alarm probability of the Lomb-Scargle periodogram.
+\item Fold the {\em original} data on the most likely period using {\tt FOLD}.
+\item Plot the folded data using {\tt PLT}. If this looks sensible, the period
+may well be correct. Add labels using the QDP commands {\tt LA X HJD}, {\tt LA
+Y Velocity (km/s)} (for example) and {\tt PLOT}. Make a hardcopy by typing {\tt
+HARDCOPY 2600}. 
+\item Output the periodograms and folded data to an ASCII file on disk using
+{\tt OUTPUT}. 
+\item Exit {\tt PERIOD} by typing {\tt QUIT}. 
+\end{enumerate}
+
+The above description
+is intended only to be a very brief guide. Clearly, a great deal more
+experimentation is required before one can definitely say that a period has
+been detected. For example, one should investigate other large peaks in the
+periodogram, try smaller or larger frequency ranges, or try one of the other
+periodicity-finding options (a useful comparison of a number of different
+options is given by Carbonell, Oliver and Ballester 1992). Other analysis
+techniques should also be attempted, such as subtracting a sine curve from the
+data in order to investigate its effects on the harmonics and enable the
+detection of less-dominant periods. 
+
+\section{Future Improvements}
+
+\begin{itemize}
+\item Port to UNIX and MS-DOS operating systems.
+\item Write a more flexible slot system whereby the selected slots need not
+be contiguous.
+\item Add more sophisticated CHAOS analysis techniques, such as those described
+by Canizzo and Goodings (1988) and Scargle (1990b).
+\item Include more periodicity-finding options, such as AoV 
+(Schwarzenberg-Czerny 1989).
+\end{itemize}
+
+\section{Acknowledgments}
+
+The author gratefully acknowledges the use of subroutines written by Joseph
+Lehar (Cambridge), Keith Horne (STScI) and Tom Marsh (Oxford), as well as those
+written by Press {\it et al.} (1986), Press and Rybicki (1989) and Allyn
+Tennant ({\tt QDP/PLT}, see SUN 128). I thank the bug-finding guinea-pigs
+Martin Still (Sussex), Mark O'Dell (Sussex), Erik Kuulkers (Amsterdam) and 
+Thomas Augusteijn (Amsterdam) for their many useful comments and suggestions. 
+
+\section{References}
+
+\noindent \rf{Canizzo, J. \&\ Goodings, D., 1986. {\em Astrophys. J. Lett.}, {\bf 334}, L31.}
+\rf{Carbonell, M., Oliver, R. \&\ Ballester, J.~L., 1992. {\em Astron. Astrophys.}, {\bf 264}, 350.}
+\rf{Deeming, T.~J., 1975. {\em Astrophys. Space Sci.}, {\bf 36}, 137.}
+\rf{Dworetsky, M.~M., 1983. {\em Mon. Not. R. astr. Soc.}, {\bf 203}, 917.}
+\rf{Fahlman, G.~G. \&\ Ulrych, T.~J., 1982. {\em Mon. Not. R. astr. Soc.}, {\bf 199}, 53.}
+\rf{Friend, M.~T., Martin, J.~S., Smith, R.~C. \&\ Jones, D.~H.~P., 1990. {\em Mon. Not. R. astr. Soc.}, {\bf 246}, 637.}
+\rf{Horne, J.~H. \&\ Baliunas, S.~L., 1986. {\em Astrophys. J.}, {\bf 302}, 757.}
+\rf{Horne, K., Wade, R.~A. \&\ Szkody, P., 1986. {\em Mon. Not. R. astr. Soc.}, {\bf 219}, 791.}
+\rf{Lomb, N.~R., 1976. {\em Astrophys. Space Sci.}, {\bf 39}, 447.}
+\rf{Press, W.~H., Flannery, B.~P., Teukolsky, S.~A. \&\ Vetterling, W.~T., 1986. {\em Numerical Recipes: The Art of Scientific Computing}, Cambridge University Press, New York.}
+\rf{Press, W.~H. \&\ Rybicki, G.~B., 1989. {\em Astrophys. J.}, {\bf 338}, 277.}
+\rf{Roberts, D.~H., L\'{e}har, J. \&\ Dreher, J.~W., 1987. {\em Astron. J.}, {\bf 93}, 968.}
+\rf{Scargle, J.~D., 1982. {\em Astrophys. J.}, {\bf 263}, 835.}
+\rf{Scargle, J.~D., 1990a. {\em Astrophys. J.}, {\bf 359}, 469.}
+\rf{Scargle, J.~D., 1990b. In {\em Errors, Bias \&\ Uncertainties in Astronomy}, Eds. Jaschek, C. \&\ Murtagh, F., Cambridge University Press, Cambridge.}
+\rf{Schwarzenberg-Czerny, A., 1989. {\em Mon. Not. R. astr. Soc.}, {\bf 241}, 153.}
+\rf{Schwarzenberg-Czerny, A., 1991. {\em Mon. Not. R. astr. Soc.}, {\bf 253}, 198.}
+\rf{Stellingwerf, R.~F., 1978. {\em Astrophys. J.}, {\bf 224}, 953.}
+\end{document}

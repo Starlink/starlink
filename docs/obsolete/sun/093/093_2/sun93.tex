@@ -1,0 +1,500 @@
+% An appendix contained in the files sun93-app1.tex and sun93-app2.tex
+% belongs with this document.
+
+\input sun93lay
+\font\smaller=cmr7
+\def\LaTeX {{L\kern -.36em\raise .3ex\hbox {\smaller A}\kern -.15em \TeX}}
+\def\verbatim{\begingroup\setupverbatim\doverbatim}
+\def\doverbatim#1{\def\next##1#1{##1\endgroup}\next}
+
+\nopagenumbers
+\parindent=0in
+\null
+\vskip 15truemm
+\headline={\ifnum\pageno=1
+            \else\it SUN/93.2\hss \rm\folio\fi}
+\line{SCIENCE~AND~ENGINEERING~RESEARCH~COUNCIL \hfil SUN/93.2}
+\line{RUTHERFORD~APPLETON~LABORATORY\hfil}
+\line{{\twelvebf Starlink~Project} \hfil}
+\line{\twelvebf Starlink~User~Note~93.2\hfil}
+\line{\hfil Jo Murray}
+\line{\hfil 19th July 1988}
+
+\medskip
+\hrule depth0.5truemm
+\vskip 2cm
+
+\centerline{\bf\Big{\TeX} --- A superior document preparation system.}
+
+\vskip 1.5cm
+
+\TeX\ is an extremely flexible computer type-setting system designed by 
+Donald Knuth.
+The full capabilities of {\TeX} are described by its creator in
+`The \TeX book' with the help of which the enthusiastic {\TeX} 
+user can produce
+elaborate documents of almost limitless complexity.
+However, unadventurous users can produce ordinary documents with a minimum of
+effort; simple {\it Runoff}{}
+files for example can be edited into {\TeX} format very easily.
+
+In addition to plain {\TeX}, a special version, {\LaTeX}, is available.
+This package was
+devised by Leslie Lamport and  is fully documented by him in
+`{\LaTeX --- Users Guide and Reference manual}'.
+Short descriptions  and instructions for use on Starlink machines are 
+given in SUNs 9 and~13.
+\LaTeX\ is {\it not} simply a collection of \TeX\ macros; for example, although
+many plain {\TeX} commands can be used within {\LaTeX},  others are
+incompatible with, or are made obsolete by \LaTeX.
+
+An introduction to the use of \TeX\  on Starlink machines is give below:
+%\footnote{$^{\bf1}$}{The {\TeX} source for this document is contained in
+%DOCSDIR:SUN93.TEX and can be processed as described in section 2.}
+
+\bigskip
+
+{\bf \big Contents}
+
+\medskip
+ \line{{\bf\big~~{1.} Producing simple {\TeX} files}\hfil 2}
+ \line{~~~~~{\bf{1.1}} Control Sequences\hfil 2}
+ \line{~~~~~{\bf 1.2} Grouping\hfil 2}
+ \line{~~~~~{\bf 1.3} Simple layouts\hfil 3}
+ \line{~~~~~{\bf 1.4} Miscellaneous points\hfil 3}
+\medskip
+\line{~~{\bf\big{2.} Producing output from a {\TeX} file}\hfil 4}
+\line{~~~~~{\bf 2.1} \TeX ing the file\hfil 4}
+\line{~~~~~{\bf 2.2} Processing with an appropriate device driver\hfil 4}
+\line{~~~~~{\bf 2.3} Printing\hfil 5}
+\medskip     
+\line{~~{\bf\big {3.} More advanced \TeX} \hfil 5}
+\line{~~~~~{\bf 3.1} Maths font\hfil 5}
+\line{~~~~~{\bf 3.2} Defining control sequences\hfil 5}
+\medskip
+\line{{\bf\big~~{4.} Summary of useful control sequences}\hfil 6}
+\medskip
+\line{{\bf\big~~{Appendix.} Font selection}\hfil 7}
+
+
+
+\vfil\eject
+\sect { Producing simple {\TeX} files}
+ 
+A file containing only alphabetic text can be made suitable for \TeX ing by 
+the inclusion of a final line:
+\medskip
+\line{{\tt~~~~~~$\backslash$bye\hss}}
+%\verbatim.    \bye.
+On being processed (see section 2), such a file would result in
+justified text in the default size roman font which fits on an A4 page.
+New paragraphs are produced by inserting blank lines, and non breakable blanks
+(such as occur in the word x~ray) are produced via the character 
+`\th$\sim$\th'. 
+Thus a {\it Runoff}{} file might be edited by replacing all the occurrences of
+`.paragraph' with a blank line, and all the {\it Runoff} non breakable blank
+characters `\#' with `\th$\sim$\th'.
+
+%\filbreak
+
+\subsect { Control Sequences}
+
+The string `$\backslash$bye' appended to the end of the above {\TeX} file 
+is an example 
+of a control sequence, this particular one meaning `{\it fill the rest of
+the last page and eject the document'}.
+Such control sequences are prefixed by the {\TeX} control character 
+`$\backslash$'
+ which gives 
+notice that what follows is not part of the document being produced but is 
+rather some instruction to \TeX. 
+For example, the control sequence $\backslash$it tells {\TeX} to 
+switch to italic style 
+and $\backslash$' puts an acute accent over the following character.
+
+Two important points arise when dealing with control sequences.
+Firstly upper and lower case are not equivalent, thus $\backslash$pi and
+$\backslash$Pi are two different control sequences.
+Secondly, {\TeX} recognizes two distinct types of control sequence, viz 
+those which comprise a control word (that is, one or more letters
+such as $\backslash$it or $\backslash$bye) and single control symbols 
+(such as $\backslash$').
+Control words must be terminated with a non-letter such as a blank,
+whereas {\TeX} assumes control symbols are only one character in length.
+
+%\filbreak
+
+\subsect { Grouping}
+
+As described above, the control sequence $\backslash$it changes the 
+character style used by {\TeX} to italic style. 
+The previous font style can be restored by specifically selecting it;
+however the more usual practice is to define a group using curly brackets
+$\{$$\}$ to which the effect of a particular control sequence is limited.
+For example, to highlight a single word in a text the simplest
+way is to enclose the control sequence and word in a group thus:
+\medskip
+\line{{\tt~~~~~~this is a $\{\backslash$bf bold$\}$ word and 
+this is in $\{\backslash$it italics$\}$.\hss}}
+
+Some control sequences require one or more arguments. For example a 
+piece of text can be centred on a line using the control sequence 
+$\backslash$centerline. 
+This control sequence will adopt the next `object' it encounters as 
+its argument and will centre that object  by itself on a line. 
+(In this context an `object' means an indivisible item, perhaps an individual 
+letter, a control sequence or a group.)
+Thus to centre the word `Introduction' on a line it is necessary to
+type;
+\medskip
+\line{{\tt~~~~~~$\backslash$centerline$\{$Introduction$\}$}\hss}
+
+The omission of the curly brackets would result in only the first object,
+the `I' being centred by itself on the line, with the remaining letters on
+a subsequent line.
+
+%\filbreak
+
+\subsect { Simple Layouts}
+
+Should a layout other than single spaced A4 in the default
+font size be required,
+this can be achieved by specifying the necessary instructions either
+at the beginning of the {\TeX} file, or in a separate file, (which has the
+file extension `.TEX').
+In the latter case the layout file is accessed by inserting the line below
+at the beginning of the {\TeX} file:
+\medskip
+\line{{\tt~~~~~~$\backslash$input layout\hss}}
+This is analogous to the use of `.include A4.RNO' in {\it Runoff}, where
+A4.rno is a file containing {\it Runoff} layout instructions.
+
+The first part of the layout file\footnote{$\bf^1$}{This file is
+contained in DOCSDIR:SUN93LAY.TEX} used to generate this document
+contains the lines:
+\medskip
+\tt
+\line{~~~~~~$\backslash$hsize=153truemm   \hfil       \% page width}
+\line{~~~~~~$\backslash$vsize=220 truemm  \hfil      \% page height}
+%\line{$\backslash$magnification=$\backslash$magstep1 \hfil \%   1.2 magnification}
+\line{~~~~~~$\backslash$parskip=14 truept plus 5 truept minus 2 
+truept\hfil\% paragraph skip}
+%\line{~~~~~~$\backslash$special$\{$right=500$\}$  \hfil \% move body of text right 0.5}
+\line{~~~~~~$\backslash$hfuzz=1pt \hfil \% tolerance}
+%\line{$\backslash$font$\backslash$bi=cmbi10\hfil\% font choice}
+\line{~~~~~~$\backslash$baselineskip=13truept plus .2 truept 
+\hfil \% inter-line spacing$\simeq$2.5lines/cm}
+%\line{$\backslash$lineskip=2 truept  \hfil \% minimum interline clearance}
+%\line{$\backslash$parskip=18 truept plus 5 truept minus 2 truept 
+%\hfil \% paragraph skip one line}
+%\line{$\backslash$mathsurround=0pt   \hfil \% }
+
+%\line{$\backslash$outer$\backslash$def$\backslash$newchap\#1$\backslash$par 
+%{ $\backslash$message{\#1} $\backslash$centerline{$\backslash$bf \#1 } 
+%\backslash$bigskip }}
+%\line{$\backslash$outer$\backslash$def$\backslash$newsect\#1$\backslash$par 
+%{$\backslash$vskip 0pt plus .25$\backslash$vsize $\backslash$penalty -250 
+%    $\backslash$vskip 0pt plus -.25$\backslash$vsize 
+%$\backslash$smallskip $\backslash$vskip $\backslash$parskip $\backslash$message{\#1}
+%    $\backslash$leftline {$\backslash$bf \#1} $\backslash$nobreak }
+%$\backslash$outer$\backslash$def$\backslash$subsect\#1$\backslash$par 
+%{ $\backslash$smallskip $\backslash$vskip$\backslash$parskip $\backslash$message{\#1}
+%    $\backslash$leftline { \#1} $\backslash$nobreak }    
+
+\rm
+A complete explanation of this file is beyond the scope of this
+user note.
+Suffice to say here that this file could be edited to produce a different
+page size by altering the arguments of the control sequences in the first two
+lines, larger characters could be specified by changing from $\backslash$magstep1 to
+$\backslash$magstep2, and wider (or narrower) vertical line spacing achieved 
+by increasing
+(or decreasing) the numerical value of the argument in the
+$\backslash$baselineskip control sequence. 
+The \% sign is a signal to {\TeX} to ignore the remainder of the line, 
+thus enabling the inclusion of comments.
+Should you wish to produce the \% sign in a document it is necessary to use the
+control sequence $\backslash$\%.
+
+Also defined in this file are the control sequences $\backslash$sect,
+$\backslash$subsect, and $\backslash$subsubsect; these can be used to 
+replace the {\it Runoff}\ 
+`header--level' commands .hl~1, .hl~2, .hl~3.
+$\backslash$sect$\{$TITLE$\}$  has 
+the effect of centering the
+title (as given in brackets), putting it in bold font and taking a larger than
+usual skip before the next line.
+$\backslash$subsect$\{$TITLE$\}$ and $\backslash$subsubsect$\{$TITLE$\}$ 
+have progressively less dramatic effects.
+These macros will number sections, subsections {\it etc.} automatically --- 
+a facility not present in plain \TeX.
+%\filbreak
+
+\subsect { Miscellaneous Points}
+
+\item{(1)} After a control sequence comprising the {\TeX} control character $\backslash$\ 
+and a control word, the sequence must be terminated by
+a non-letter as mentioned in section 1.1.
+If a blank is used {\TeX} will assume this is functioning as a
+terminator and will not include a blank in the text.
+Should you want a blank the control sequence [$\backslash$\ ] should
+be used, (that is, the {\TeX} control character followed by a blank).
+Alternatively the control word can be enclosed within curly brackets $\{ \}$.
+
+\item{(2)} {\TeX} possesses complicated algorithms for deciding how to break
+lines into paragraphs and pages.
+However to spotlight places where a break between paragraphs or
+sections is more than usually desirable, the  control sequence $\backslash$goodbreak
+can be used.
+Similarly the control sequence $\backslash$nobreak will prevent {\TeX} starting a new
+page at the point of insertion.
+
+\item{(3)} Hyphenation algorithms provided within {\TeX} usually break words in
+a suitable way.
+However in the event of unsatisfactory hyphenation for particular words
+the user can specify the required hyphenation at the start of the {\TeX} 
+file thus:
+\medskip
+\line{{\tt~~~~~~$\backslash$hyphenation$\{$ inter-stellar mag-nesium$\}$\hss}}
+
+
+
+\vfill\eject
+
+\sect { Producing output from a {\TeX} file}
+
+Subsequent to creating a {\TeX} file of type `filename.tex' 
+the output can displayed on a suitable VDU or printed on a Canon 
+laser printer or
+on a Versatec by following the three steps outlined below.
+
+\subsect { `\TeX ing' the file to produce a device independent file}
+
+This is done by typing:
+\medskip
+\line{{\tt~~~~~~\$ TEX filename\hss}}
+{\TeX} will process the file, indicating its progress by
+listing section titles and page numbers on the screen. 
+If {\TeX} encounters any difficulties the user is prompted with a ?
+and the problem line is displayed.
+Various options are available in such an event, the simplest being to
+respond with a $<$cr$>$ which causes {\TeX} to continue, improvising what it
+considers the optimum solution to its dilemma. 
+(A HELP facility and the opportunity to
+correct the {\TeX} file within the {\TeX} process do exist at this point.)
+ 
+Two new files
+are produced, namely a device independent file --- `filename.dvi' which
+contains all the information on layout etc. but makes no assumptions 
+regarding the nature of the eventual output device, and
+also a file, `filename.lis' which contains a variety of information on 
+the {\TeX} processing.
+This latter file includes details of the nature and location of errors;
+therefore in the event of error reports during `\TeX ing' it should be
+examined and the original {\TeX} file suitably corrected and re-\TeX ed.
+
+%\filbreak
+
+\subsect { Processing the file in the way appropriate for the selected device}
+
+The device-independent file must be processed by an appropriate device
+driver in order to generate a file suitable for printing.
+Suitable graphics VDUs can be used to display the output for a `quick look'
+prior to printing.
+For example to preview a file on a Pericom terminal type:
+\medskip
+\line{{\tt~~~~~~\$ DVITOVDU filename} \hss }
+
+At this point the VDU screen will be divided into a `dialogue region' and 
+a `window region'.
+The former comprises  several lines at the top of the screen which are
+reserved for information on the current status of the DVItoVDU program and 
+contain the `command' prompt.
+The remainder of the screen, the window region is used for the representation of
+the page.
+Details are available in the dvitovdu help file which
+can be accessed by typing ? in response to the {\bf{\tt command}} 
+prompt within the DVItoVDU program, and a sample run is shown below;
+\medskip
+\line{{~~~~~~\bf\tt command:} 1\hfil Look at page 1}
+\line{{~~~~~~\bf\tt command:} F\hfil A {\bf F}aithful (but much slower) 
+representation of the page}
+\line{{~~~~~~\bf\tt command:} T\hfil Back to {\bf T}erse mode}
+\line{{~~~~~~\bf\tt command:} v 20cm\hfil Set page length displayed on screen to 20cm} 
+\line{{~~~~~~\bf\tt command:} H 15cm\hfil Set page width displayed on screen to 15cm} 
+\line{{~~~~~~\bf\tt command:} ?\hfil Read the DVItoVDU help file}
+\line{{~~~~~~\bf\tt command:} Q\hfil Quit}
+
+A full description of this facility is given in the 
+{\it `DVItoVDU User's Guide'} which is included in the MUD series 
+(Miscellaneous User Documents) under \LaTeX.
+
+
+Hardcopy can be produced via the Canon laser printer.
+The appropriate device driver is activated by typing:
+\medskip
+\line{~~~~~~{\tt\$ DVICAN filename} \hfil --- this generates 
+a file `filename.DVI-CAN'}
+
+Various qualifiers can be specified at this stage.
+For example you can decide to print only selected pages, or to 
+shift the output to one side of a page (see SUN34).
+
+\subsect { Printing the file on the selected device}
+
+The file is submitted for printing by typing:
+\medskip
+\line{~~~~~~{\tt\$ PRINT/PASSALL/QUEUE=$\{$laser$\}$ filename.DVI-CAN}\hfil}
+
+where the queue names in brackets should be that appropriate for the local
+site, (SYS\_LASER on Starlink sites).
+
+
+\sect { More advanced \TeX}
+
+\nobreak
+\subsect { Maths Font}
+\nobreak
+
+{\TeX} provides a variety of fonts in a large range of sizes.
+Bold and italic fonts have already been mentioned and others listed
+in section~4 are activated in an analogous way.
+The exception is the {\TeX} `maths' font which provides the facilities to
+produce subscripts, superscripts, Greek letters, complicated mathematical 
+formulae {\it etc}.
+Maths font is both selected and terminated by the \$ character.
+Within maths mode, subscripts and superscripts are achieved using 
+the underscore [\_]
+and up-arrow [$\uparrow$] characters respectively.
+In each case the following character or following group is shifted.
+For example the formulae for carbon dioxide and $x$ to the power of 23 could
+be typed:
+\medskip
+\line{{\tt~~~~~~CO\$\_2\$       and    \$x$\uparrow\{23\}$\$ \hss}}
+In the second example, the 23 was defined as a group as otherwise only
+the 2 would have been superscripted, the 3 reverting to normal position.
+ 
+Greek letters are selected within maths font simply by using their names 
+as control sequences. 
+Therefore the Greek letter $\mu$ is produced using the control 
+sequence $\backslash$mu. 
+Capital Greek letters result when the first letter in the control sequence
+is capitalized.
+ 
+{\TeX} has a special mode for displaying mathematical formulae which
+is both initiated and terminated with the characters \$\$.
+This results in the enclosed formula being centred on a new line, with
+various symbols in a larger size than in text mode.
+Equations can be numbered using the control sequence $\backslash$eqno
+followed by an appropriate number.
+This produces a right justified equation number. 
+For example:
+\medskip
+\line{{\tt~~~~~~\$\$ $\backslash$alpha(x)=x$\uparrow$2 $\backslash$eqno(3.1)\$\$
+\hss}}
+
+Note that as this is in maths mode it is unnecessary to surround the
+parts specifying the Greek letter and superscript with further \$ characters.
+
+%\filbreak
+
+\subsect { Defining simple control sequences}
+
+In addition to the many control sequences defined within \TeX, there exists
+the facility to define others for personal use.
+For example in a document which frequently uses the abbreviation for
+micrometre, as an alternative to always typing the string:
+\medskip
+\line{\tt~~~~~~\$$\backslash$mu\$m\hfil}
+the control sequence $\backslash$um can be defined to replace it thus:
+\medskip
+\line{\tt~~~~~~$\backslash$def$\backslash$um$\{\backslash$\$mu\$m$\}$\hfil}
+
+\rm
+A convenient practice is to define all such control sequences in a file
+called `macros.tex' and in any {\TeX} file which requires access to these
+include the following line:
+\medskip
+\line{{\tt~~~~~~$\backslash$input macros
+\hss}}
+
+%\filbreak
+\vfill\eject
+
+\sect { Summary of useful Control Sequences}
+
+\nobreak
+
+Sample arguments are given with those control sequences which
+require them.
+
+\nobreak
+
+\subsect { Layout control sequences}
+
+    
+\line{~~~~~~$\backslash$rm                 \hfil \% select roman font}
+\line{~~~~~~$\backslash$bf                 \hfil \% select {\bf bold} font}
+\line{~~~~~~$\backslash$it                 \hfil \% select {\it italic} font}
+\line{~~~~~~$\backslash$sl                 \hfil \% select {\sl slanted roman} font}
+\line{~~~~~~$\backslash$tt                 \hfil \% select {\tt typewriter-like} typeface}
+\line{~~~~~~$\backslash$hsize=5 truein     \hfil \% defines page width}
+\line{~~~~~~$\backslash$vsize=10 truein    \hfil \% defines page length}
+\line{~~~~~~$\backslash$smallskip          \hfil \% causes a small vertical skip}
+\line{~~~~~~$\backslash$medskip            \hfil \% causes a medium vertical skip}
+\line{~~~~~~$\backslash$bigskip            \hfil \% causes a big vertical skip}
+\line{~~~~~~$\backslash$centerline$\{$ A title$\}$ \hfil \% centres following
+ group}
+
+
+{\bf  Maths Font control sequences}
+\medskip
+
+%{\begindoublecolumns{
+
+ \line{~~~~~~$\backslash$hbar                     \hfil \%  $\hbar$~~~~~~}
+ \line{~~~~~~$\backslash$partial                  \hfil \%  $\partial$~~~~~~}
+ \line{~~~~~~$\backslash$infty                    \hfil \%  $\infty$~~~~~~}
+ \line{~~~~~~$\backslash$prime                    \hfil \%  $\prime$~~~~~~}
+ \line{~~~~~~$\backslash$surd                     \hfil \%  $\surd$~~~~~~}
+ \line{~~~~~~$\backslash$sum                      \hfil \%  $\sum$~~~~~~}
+ \line{~~~~~~$\backslash$int                      \hfil \%  $\int$~~~~~~}
+ \line{~~~~~~$\backslash$odot                     \hfil \%  $\odot$~~~~~~}
+ \line{~~~~~~$\backslash$AA                       \hfil \%  \AA~~~~~~}
+%}}
+
+In addition to the symbols $=,<,>$ (which should be in maths mode)
+the following are available. Most can be negated by prefixing
+with the control sequence $\backslash$not, {\it e.g.} $\backslash$not=.
+
+%{\begindoublecolumns
+
+\line{~~~~~~$\backslash$simeq       \hfil \%  $\simeq$~~~~~~}
+\line{~~~~~~$\backslash$sim         \hfil \%  $\sim$~~~~~~}
+\line{~~~~~~$\backslash$leq         \hfil \%  $\leq$~~~~~~}
+\line{~~~~~~$\backslash$geq         \hfil \%  $\geq$~~~~~~}
+\line{~~~~~~$\backslash$ll          \hfil \%  $\ll$~~~~~~}
+\line{~~~~~~$\backslash$gg          \hfil \%  $\gg$~~~~~~}
+\line{~~~~~~$\backslash$equiv       \hfil \%  $\equiv$~~~~~~}
+\line{~~~~~~$\backslash$propto      \hfil \%  $\propto$~~~~~~}
+     
+%\enddoublecolumns}
+
+A variety of delimiters are available; these can be produced directly if
+a keyboard includes them, otherwise a control sequence must be used.
+The more commonly used are given below.
+Only the left-side delimiter is listed, the right differing
+only by the replacement of the initial l with r. In each case successively bigger
+symbols are achieved by prefixing the appropriate delimiter control
+sequence with the control sequences (in ascending order of size)
+$\backslash$bigl,$\backslash$Bigl,$\backslash$biggl,$\backslash$Biggl. As before r replaces l when dealing with
+right-side delimiters.
+
+
+\line{~~~~~~$\backslash$lbrack                  \hfil\%  $[$~~~~~~}
+\line{~~~~~~$\backslash$lbrace                  \hfil\%  $\{$~~~~~~}
+\line{~~~~~~$\backslash$langle                  \hfil\%  $<$~~~~~~}
+\bye
+
+
+

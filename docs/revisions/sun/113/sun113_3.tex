@@ -1,0 +1,1245 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {113.3}
+\newcommand{\stardocauthors}   {P M Allan\\A J Chipperfield\\D L Terrett}
+\newcommand{\stardocdate}      {19 April 1994}
+\newcommand{\stardoctitle}     {ADAM Graphics Programmer's Guide}
+%------------------------------------------------------------------------------
+
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%+
+%  Name:
+%     LAYOUT.TEX
+
+%  Purpose:
+%     Define Latex commands for laying out documentation produced by PROLAT.
+
+%  Language:
+%     Latex
+
+%  Type of Module:
+%     Data file for use by the PROLAT application.
+
+%  Description:
+%     This file defines Latex commands which allow routine documentation
+%     produced by the SST application PROLAT to be processed by Latex. The
+%     contents of this file should be included in the source presented to
+%     Latex in front of any output from PROLAT. By default, this is done
+%     automatically by PROLAT.
+
+%  Notes:
+%     The definitions in this file should be included explicitly in any file
+%     which requires them. The \include directive should not be used, as it
+%     may not then be possible to process the resulting document with Latex
+%     at a later date if changes to this definitions file become necessary.
+
+%  Authors:
+%     RFWS: R.F. Warren-Smith (STARLINK)
+
+%  History:
+%     10-SEP-1990 (RFWS):
+%        Original version.
+%     10-SEP-1990 (RFWS):
+%        Added the implementation status section.
+%     12-SEP-1990 (RFWS):
+%        Added support for the usage section and adjusted various spacings.
+%     10-DEC-1991 (RFWS):
+%        Refer to font files in lower case for UNIX compatibility.
+%     {enter_further_changes_here}
+
+%  Bugs:
+%     {note_any_bugs_here}
+
+%-
+
+%  Define length variables.
+\newlength{\sstbannerlength}
+\newlength{\sstcaptionlength}
+
+%  Define a \tt font of the required size.
+\font\ssttt=cmtt10 scaled 1095
+
+%  Define a command to produce a routine header, including its name,
+%  a purpose description and the rest of the routine's documentation.
+\newcommand{\sstroutine}[3]{
+   \goodbreak
+   \rule{\textwidth}{0.5mm}
+   \vspace{-7ex}
+   \newline
+   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
+   \setlength{\sstcaptionlength}{\textwidth}
+   \addtolength{\sstbannerlength}{0.5em} 
+   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
+   \addtolength{\sstcaptionlength}{-4.45pt}
+   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
+   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
+   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
+   \begin{description}
+      #3
+   \end{description}
+}
+
+%  Format the description section.
+\newcommand{\sstdescription}[1]{\item[Description:] #1}
+
+%  Format the usage section.
+\newcommand{\sstusage}[1]{\item[Usage:] \mbox{} \\[1.3ex] {\ssttt #1}}
+
+%  Format the invocation section.
+\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
+
+%  Format the arguments section.
+\newcommand{\sstarguments}[1]{
+   \item[Arguments:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the returned value section (for a function).
+\newcommand{\sstreturnedvalue}[1]{
+   \item[Returned Value:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the parameters section (for an application).
+\newcommand{\sstparameters}[1]{
+   \item[Parameters:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the examples section.
+\newcommand{\sstexamples}[1]{
+   \item[Examples:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Define the format of a subsection in a normal section.
+\newcommand{\sstsubsection}[1]{\item[{#1}] \mbox{} \\}
+
+%  Define the format of a subsection in the examples section.
+\newcommand{\sstexamplesubsection}[1]{\item[{\ssttt #1}] \mbox{} \\}
+
+%  Format the notes section.
+\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
+
+%  Provide a general-purpose format for additional (DIY) sections.
+\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}] \mbox{} \\[1.3ex] #2}
+
+%  Format the implementation status section.
+\newcommand{\sstimplementationstatus}[1]{
+   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
+
+%  Format the bugs section.
+\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
+
+%  Format a list of items while in paragraph mode.
+\newcommand{\sstitemlist}[1]{
+  \mbox{} \\
+  \vspace{-3.5ex}
+  \begin{itemize}
+     #1
+  \end{itemize}
+}
+
+%  Define the format of an item.
+\newcommand{\sstitem}{\item}
+
+%  End of LAYOUT.TEX layout definitions.
+%.
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+%  \setlength{\parskip}{0mm}
+%  \tableofcontents
+%  \setlength{\parskip}{\medskipamount}
+%  \markright{\stardocname}
+%------------------------------------------------------------------------------
+
+
+\section{Introduction}
+
+This guide outlines the options available to a programmer writing an ADAM
+applications program who wishes to incorporate graphics into the program and
+describes the routines that handle the necessary interaction with the ADAM 
+parameter system when a graphics device is opened for a GKS based graphics
+package.
+
+Where a suite of graphics programs are being written or where a program is to
+interact with graphics produced by another package (e.g.\ KAPPA), the
+Applications Graphics Interface (AGI---SUN/48) should be used. AGI provides
+facilities for storing and restoring information about pictures such as extent
+and world coordinates. AGI is layered on top of the routines described in
+this document.
+
+\section{Application}
+
+For most ADAM applications, PGPLOT (SUN/15) is the graphics package of choice;
+it provides an easy to use yet powerful interface for plotting 2D axes, contour 
+maps, grey-scale, colour images and many other styles of plot. The NCAR
+package (SUN/88) provides similar facilities and some additional styles of plot
+(e.g.\ stream-line diagrams) and is in general more powerful (for example, NCAR
+can draw an X,Y plot with different scales on the right and left hand axes) but
+is somewhat harder to use. NCAR also contains a 3D drawing package. It
+is possible to combine NCAR graphics with calls to SGS and GKS by using
+the Starlink Extensions to NCAR (SNX---SUN/90) package.
+
+The NAG graphics package can also be used but it is not encouraged for 
+software that is to become part of the Starlink software collection because 
+its availability on all hardware platforms is not guaranteed
+(particulary in its single precision form) and non-Starlink sites may
+not have a licence to use it.
+
+NCAR and the NAG graphics do not have their own mechanisms for opening graphics
+devices and SGS or GKS (see below) must be used to open a device before
+plotting can begin.
+
+For line graphics which requires a style not catered for by PGPLOT or NCAR, the
+Simple Graphics System (SGS) should be used (SUN/85). This package is ``lower
+level'' than PGPLOT or NCAR (there are no facilities for drawing axes for
+example) but it does have excellent facilities for manipulating transformations
+and ``organising'' the display surface. SGS programs are also permitted to make
+direct calls to GKS (with a few documented restrictions) so the full power of
+GKS is available if SGS's facilities are not adequate.
+
+Programming purely with GKS is not advisable because getting even simple things
+done (e.g.\ opening a workstation) can be very long-winded and more easily
+achieved with SGS. Furthermore, achieving device independence is far from
+straight-forward; all the necessary facilities are available but making proper
+use of them requires an in-depth knowledge of GKS. Again, this is better left
+to SGS or higher level packages.
+
+Programs requiring intimate interaction with an image display device should use
+the Image Display Interface (IDI---SUN/65) which is not based on GKS and offers
+access to facilities that are outside the GKS model of a graphics device.
+Currently the only devices supported by IDI are the Ikon image display (on VAXs
+only) and X-windows. The routines for opening and closing an IDI device in an
+ADAM program are described in SUN/65.
+
+
+\subsection{SGS}
+
+All SGS routines may be used in ADAM applications with the exception of the
+following routines, which must {\em never} be called in ADAM programs :
+\begin{itemize}
+\item SGS\_INIT
+\item SGS\_OPEN
+\item SGS\_OPNWK
+\item SGS\_CLOSE
+\end{itemize}
+The functions of {\tt SGS\_INIT}, {\tt SGS\_OPEN} and {\tt SGS\_OPNWK} are 
+performed by the environment routine {\tt SGS\_ASSOC}.
+The environment routines {\tt SGS\_ANNUL} and {\tt SGS\_CANCL} dispose of 
+resources used in SGS programs.  {\tt SGS\_CLOSE} will be called by the 
+environment level SGS de-activation routine {\tt SGS\_DEACT}.
+
+\subsection{PGPLOT}
+
+All PGPLOT routines may be used in ADAM applications with the exception of the
+following routines, which must {\em never} be called in ADAM programs :
+\begin{itemize}
+\item PGBEG
+\item PGBEGIN
+\item PGEND
+\item PGASK
+\end{itemize}
+The functions of {\tt PGBEG} (and the equivalent obsolete routine {\tt 
+PGBEGIN}) are performed by the environment routine {\tt PGP\_ASSOC}. The 
+environment routines {\tt PGP\_ANNUL}, {\tt PGP\_CANCL} and {\tt PGP\_DEACT}
+ all call {\tt PGEND}, but should be used as
+described in section~\ref{pgplot} in order to be compatible with any future
+enhancements to PGPLOT which might separate the action of closing a
+workstation and closing down PGPLOT itself.
+
+{\tt PGASK} controls whether PGPLOT prompts the user for confirmation before 
+clearing
+the screen of a graphics device; if used in an ADAM program PGPLOT will bypass
+the parameter system and attempt to read directly from the users terminal. So
+the ``prompt state'' must never be changed from its default state ({\tt
+'OFF'} in
+ADAM programs). If prompting is required it is up to the application to keep
+track of when {\tt PGPAGE} will clear the screen and issue its own prompt.
+
+\subsection{GKS}
+
+Subroutines in the `environment level' of the ADAM GKS system have names of
+the form GKS\_x whereas true GKS routines have names of the form Gx.
+
+All GKS routines may be used in ADAM applications with the exception of the
+following routines, which must {\em never} be called in ADAM applications:
+
+\begin{itemize}
+\item GOPKS
+\item GOPWK
+\item GCLWK
+\item GCLKS
+\end{itemize}
+
+The functions of {\tt GOPKS} and {\tt GOPWK} are performed by the environment 
+level routine {\tt GKS\_ASSOC}. The function of {\tt GCLWK} is performed by 
+the routines {\tt GKS\_ANNUL} or {\tt GKS\_CANCL}. The function of {\tt GCLKS} 
+is performed by the routine {\tt GKS\_DEACT}.
+
+\section{Environment Level Routines}
+
+As with all other packages in ADAM, the only access to objects outside of
+application programs is via ADAM program parameters. The connection between
+graphics devices and the application program is controlled by means of a few
+environment level routines.
+
+\subsection{SGS routines}
+
+SGS has four environment level subroutines (the SGS `parameter' or SGSPAR 
+routines) which provide the necessary interaction with the outside world.
+They are :
+
+\begin{center}
+\begin{tabular}{||l|l||} \hline
+Subroutine & \multicolumn{1}{c||}{Function} \\ \hline
+SGS\_ASSOC  & Associate a graphics workstation with a parameter and open it.\\
+SGS\_ANNUL  & Close a graphics workstation without cancelling the parameter.\\
+SGS\_CANCL  & Close a graphics workstation and cancel the parameter.\\
+SGS\_DEACT  & De-activate ADAM SGS.\\ \hline
+\end{tabular}
+\end{center}
+
+Here is a skeletal example of a program using SGS :
+\begin{quote}
+\begin{verbatim}
+      SUBROUTINE SGSTEST( STATUS )
+      ..
+      INTEGER STATUS
+      INTEGER ZONE
+
+      ..
+*    Obtain Zone on a graphics workstation
+      CALL SGS_ASSOC( 'DEVICE', 'WRITE', ZONE, STATUS )
+      IF( STATUS .EQ. SAI__OK ) THEN
+
+         ..
+
+*       Perform graphics operations on the zone
+
+         ..
+
+*       Release Zone
+         CALL SGS_ANNUL( ZONE, STATUS )
+      ENDIF
+
+      ..
+
+      CALL SGS_DEACT( STATUS )
+
+\end{verbatim}
+\end{quote}
+
+{\tt SGS\_ASSOC} should be the first SGS routine to be called in the 
+application.
+It obtains (via the parameter system) the name of the graphics workstation 
+to be used, creates an initial SGS zone on the workstation, and returns an
+SGS zone identifier which can be used in subsequent SGS subroutine calls.
+
+The first argument of {\tt SGS\_ASSOC} is an ADAM program parameter. 
+It should be
+defined to be a graphics device parameter in the interface module for the
+application (see the example interface file in section~\ref{ifl}). The value of
+this parameter should be the name of a workstation as defined by GNS (see
+SUN/57).
+
+The second argument is the access mode required. This can be one of :
+\begin{description}
+\item[{\tt 'READ'}] The application is only going to `read' from the workstation
+({\em i.e.}\ perform cursor or similar operations). 
+Screens will not be cleared when vdu workstations are opened.
+\item[{\tt 'WRITE'}] The application is going to `write' on the workstation,
+{\em i.e.}\ actually do some graphics. 
+Workstations are completely initialized when they are opened.
+\item[{\tt 'UPDATE'}] The application will modify the graphics on the 
+workstation.
+Screens will not be cleared when vdu workstations are opened.
+\end{description}
+
+Note that the facility to prevent screen clearing is specific to RAL GKS and
+is not implemented for all workstations.
+
+The third argument is the SGS zone identifier returned to the application.
+
+The fourth argument is the usual status value. It follows the ADAM error
+strategy as described in SUN/104.
+
+When the application has finished using the workstation, it should be closed
+using {\tt SGS\_CANCL} unless it is required to keep the parameter active 
+(to update a global parameter for example), in which case {\tt SGS\_ANNUL} 
+should be used.
+
+When the application has finished using SGS, it should be de-activated by
+calling {\tt SGS\_DEACT}.
+
+\subsection{PGPLOT routines}
+\label{pgplot}
+
+PGPLOT has four environment level subroutines (the PGPLOT `parameter' or PGPPAR 
+routines) which provide the necessary interaction with the outside world.
+They are :
+
+\begin{center}
+\begin{tabular}{||l|l||} \hline
+Subroutine & \multicolumn{1}{c||}{Function} \\ \hline
+PGP\_ASSOC  & Associate a graphics workstation with a parameter and open it.\\
+PGP\_ANNUL  & Close a graphics workstation without cancelling the parameter.\\
+PGP\_CANCL  & Close a graphics workstation and cancel the parameter.\\
+PGP\_DEACT  & De-activate ADAM PGPLOT.\\ \hline
+\end{tabular}
+\end{center}
+
+Here is a skeletal example of a program using PGPLOT :
+\begin{quote}
+\begin{verbatim}
+      SUBROUTINE PGPTEST( STATUS )
+      ..
+      INTEGER STATUS
+      INTEGER UNIT
+
+      ..
+*    Obtain Zone on a graphics workstation
+      CALL PGP_ASSOC( 'DEVICE', 'WRITE', 1, 1, UNIT, STATUS )
+      IF( STATUS .EQ. SAI__OK ) THEN
+
+         ..
+
+*       Perform graphics operations on the device
+
+         ..
+
+*       Release Device
+         CALL PGP_ANNUL( UNIT, STATUS )
+      ENDIF
+
+      ..
+
+      CALL PGP_DEACT( STATUS )
+
+\end{verbatim}
+\end{quote}
+
+Note the close similarity with the SGS skeleton program. {\tt PGP\_ASSOC} 
+should be
+the first PGPLOT routine called in the application. It obtains (via the
+parameter system) the name of the graphics workstation  to be used, opens the
+workstation, and returns a PGPLOT unit number. PGPLOT only supports one
+graphics device open at one time so this unit number is always returned as
+zero\footnote{{\tt PGBEG} has a similar redundant argument so that if, one day,
+PGPLOT is extended to support multiple devices, existing programs would not
+have to be changed.}.
+
+The first, second and last arguments of {\tt PGP\_ASSOC} are the same as the
+corresponding arguments of {\tt SGS\_ASSOC}.
+
+The third and fourth arguments are the number of sub-plots per page in X and Y
+(c.f.\ {\tt PGBEG}).
+
+The fifth argument is the unit identifier returned to the application.
+
+When the application has finished using the workstation, it should be closed
+using {\tt PGP\_CANCL} unless it is required to keep the parameter active 
+(to update a global parameter for example), in which case {\tt PGP\_ANNUL} 
+should be used.
+
+When the application has finished using PGPLOT, it should be de-activated by
+calling {\tt PGP\_DEACT}.
+
+\subsection{GKS routines}
+
+GKS has five environment level subroutines (the GKS `parameter' or GKSPAR
+routines). Four provide the necessary interaction with the outside world
+and one gives access to the GKS internal status.
+They are :
+
+\begin{center}
+\begin{tabular}{||l|l||} \hline
+Subroutine & \multicolumn{1}{c||}{Function} \\ \hline
+GKS\_ASSOC  & Associate a graphics workstation with a parameter and open it.\\
+GKS\_ANNUL  & Close a graphics workstation without cancelling the parameter.\\
+GKS\_CANCL  & Close a graphics workstation and cancel the parameter.\\
+GKS\_DEACT  & De-activate ADAM GKS.\\ 
+GKS\_GSTAT  & Inquire whether GKS has reported an error 
+(see Section \ref{errhnd}). \\ \hline
+\end{tabular}
+\end{center}
+
+Here is a skeletal example of a program using GKS :
+\begin{quote}
+\begin{verbatim}
+      SUBROUTINE GKSTEST( STATUS )
+      ..
+      INTEGER STATUS
+      INTEGER WKID
+
+      ..
+*    Obtain Workstation
+      CALL GKS_ASSOC( 'DEVICE', 'READ', WKID, STATUS )
+      IF( STATUS .EQ. SAI__OK ) THEN
+
+         ..
+
+*    Perform graphics operations on the workstation
+
+         ..
+
+*       Release Workstation
+         CALL GKS_ANNUL( WKID, STATUS )
+      ENDIF
+
+      ..
+
+      CALL GKS_DEACT( STATUS )
+\end{verbatim}
+\end{quote}
+
+Note the close similarity with the SGS skeleton program. {\tt GKS\_ASSOC}
+ should be
+the first GKS routine to be called in the application. It obtains (via the
+parameter system) the name of the graphics workstation to be used, opens it,
+and returns a GKS workstation identifier which can be used in subsequent GKS
+subroutine calls.
+
+The notes in the previous section on the arguments of {\tt SGS\_ASSOC}
+ apply equally
+well to {\tt GKS\_ASSOC} with the exception that the third argument is a GKS
+workstation identifier rather than an SGS zone identifier.
+
+The workstation is closed using {\tt GKS\_ANNUL} or {\tt GKS\_CANCL}
+when the application has finished using it.
+
+When the application has finished using GKS, it should be de-activated by
+calling {\tt GKS\_DEACT}.
+
+\section{Interface Files}
+\label{ifl}
+A simple interface file for the above SGS example would be:
+\begin{quote}
+\begin{verbatim}
+## SGSTEST - Test some SGS, PGPLOT or GKS graphics functions
+
+interface SGSTEST
+
+   parameter      DEVICE
+      ptype       'DEVICE'
+      position    1
+      type        'GRAPHICS'
+      access      'read'
+      vpath       'prompt'
+      help        'Name of workstation to be used'
+      default     xwindows
+   endparameter
+
+endinterface
+\end{verbatim}
+\end{quote}
+
+The same interface file can be used with the PGPTEST and GKSTEST programs if
+the line saying `interface SGSTEST' is replaced by the line `interface
+PGPTEST' or `interface GKSTEST.
+
+\section{Error Handling}
+\label{errhnd}
+The PGPLOT, SGS and GKS parameter routines conform to the Starlink error 
+reporting and inherited status strategy described in SUN/104.
+Error reports will generally be of the form:
+\begin{quote}
+\begin{verbatim}
+ROUTINE_NAME: Text
+\end{verbatim}
+\end{quote}
+but where there routine name is not useful, it will be omitted.
+
+If it is required to test for particular status values, symbolic names should
+be used. They can be defined by including in the application, the statements:
+
+\begin{quote}
+\begin{verbatim}
+INCLUDE 'SAE_PAR'   ! To define SAI__OK etc.
+INCLUDE 'SGS_ERR'   ! To define the SGS__ error values
+\end{verbatim}
+\end{quote}
+
+for SGS program, or the statements:
+
+\begin{quote}
+\begin{verbatim}
+INCLUDE 'SAE_PAR'   ! To define SAI__OK etc.
+INCLUDE 'PGP_ERR'   ! To define the GKS__ error values
+\end{verbatim}
+\end{quote}
+
+for PGPLOT programs\begin{quote}
+
+\begin{verbatim}
+INCLUDE 'SAE_PAR'   ! To define SAI__OK etc.
+INCLUDE 'GKS_ERR'   ! To define the GKS__ error values
+\end{verbatim}
+\end{quote}
+
+for GKS programs. It is of course possible to include PGPLOT, SGS and GKS
+status values in a single program.
+
+The symbolic names are listed in Section \ref{errs}.
+
+A substitute GKS error handling routine is linked with ADAM applications so
+that error messages are reported in conformance with the Starlink error
+reporting strategy, however, GKS stand-alone routines do not operate the
+inherited status strategy. Thus programs which use GKS must be very careful
+about handling error conditions if they are to avoid generating streams
+of unhelpful error messages.
+
+Subroutine {\tt GKS\_GSTAT} has been provided by the environment to help 
+with this problem.
+If this routine is called after every non-environment GKS routine
+(or sequence of routine calls) then the
+net effect is as if the GKS routine(s) did have an inherited status argument.
+
+Note that for stand alone GKS routines which do have a status argument, the
+environment status variable should {\em not} be used. Use a local variable,
+ignore its value and use {\tt GKS\_GSTAT} to get an environment status value 
+for the
+routine. Liberal use of IF .. THEN .. ELSE .. ENDIF structures testing the
+environment status value is recommended to prevent invalid output from GKS and
+a large number of error messages.
+
+Note also that the GKS enquiry routines do not report an error when they fail,
+they just return a status value (this is to allow the GKS error handling
+routine to make enquires about the state of GKS when handling an error without
+fear of triggering another error report and hence being called recursively).
+This means that an application that detects an error from an enquiry routine
+must compose and report a suitable message as well as setting the ADAM status
+
+Example :\nopagebreak
+\begin{quote}
+\begin{verbatim}
+
+      SUBROUTINE GKSTEST(STATUS)
+
+* Test GKS in ADAM.
+* Draw a box and write some text in the box.
+
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'GKS_PAR'
+      INTEGER STATUS
+      INTEGER WKID
+      INTEGER N
+      PARAMETER (N = 5)
+      REAL X(N), Y(N)
+      DATA X/0.0,0.0,1.0,1.0,0.0/,
+     :     Y/0.0,1.0,1.0,0.0,0.0/
+
+* Check STATUS on entry.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+* Open GKS, open and activate workstation.
+      CALL GKS_ASSOC( 'DEVICE', 'WRITE', WKID, STATUS )
+      IF ( STATUS .EQ. SAI__OK ) THEN
+* End of standard opening sequence.
+*---------------------------------------------------------------------
+* Draw a box and write in it.
+*   Polyline.
+         CALL GPL( N, X, Y )
+*   Set text alignment.
+         CALL GSTXAL( GACENT, GACENT )
+*   Set character height.
+         CALL GSCHH( 0.04 )
+*   Text.
+         CALL GTX( 0.5, 0.5, 'Successful test of GKS 7.2' )
+*---------------------------------------------------------------------
+* Check for error in GKS call sequence.
+         CALL GKS_GSTAT( STATUS )
+
+* Cancel parameter and annul the workstation id.
+         CALL GKS_CANCL( 'DEVICE', STATUS )
+      ENDIF
+
+      CALL GKS_DEACT( STATUS )
+      END
+\end{verbatim}
+\end{quote}
+
+
+\section{Compiling and Linking}
+
+The normal ADAM compiling and linking procedures will make all of the SGSPAR,
+PGPPAR and GKSPAR routines and the PGPLOT, SGS and GKS stand alone routines 
+available.
+For example:
+\begin{quote}
+\begin{verbatim}
+$ ADAMSTART
+$ ADAMDEV
+$ ALINK program
+\end{verbatim}
+\end{quote}
+
+\section{ADDITIONAL MATERIAL}
+\begin{itemize}
+\item Starlink Guide 4 : {\it ADAM --- The Starlink Software Environment}
+\item Starlink User Note 15 : {\it PGPLOT --- Graphics Subroutine Library}
+\item Starlink User Note 29 : {\it NAGRAF --- NAG graphics library: Mk 3}
+\item Starlink User Note 48 : {\it AGI --- Applications Graphics Interface}
+\item Starlink User Note 57 : {\it GNS --- Graphics Workstation Name Service}
+\item Starlink User Note 65 : {\it IDI --- Image Display Interface}
+\item Starlink User Note 83 : {\it GKS --- Graphical Kernel System (7.2)}
+\item Starlink User Note 85 : {\it SGS --- Simple Graphics System}
+\item Starlink User Note 88 : {\it NCAR --- Graphics Utilities}
+\item Starlink User Note 90 : {\it SNX --- Starlink extensions to NCAR}
+\item Starlink User Note 104 : {\it MSG and ERR --- Message and Error Reporting
+Systems}
+\end{itemize}
+
+\section{Status Values}
+\label{errs}
+The following status values may be returned by the SGS parameter
+routines.
+
+\begin{tabular}{ll}
+SGS\_\_ILLAC     & Illegal access mode \\
+SGS\_\_TOOZD     & No more available zone descriptors \\
+SGS\_\_UNKPA     & Parameter not found \\
+\end{tabular}
+
+The following status values may be returned by the PGPLOT parameter
+routines.
+
+\begin{tabular}{ll}
+PGP\_\_TOOZD     & No more available unit descriptors \\
+PGP\_\_ILLAC     & Illegal access mode \\
+PGP\_\_UNKPA     & Parameter not found \\
+PGP\_\_ISACT     & Parameter currently active \\
+PGP\_\_ERROR     & An error has been reported from GKS itself \\
+PGP\_\_DVERR     & Workstation name not defined by GNS
+\end{tabular}
+
+The following status values may be returned by the GKS parameter
+routines.
+
+\begin{tabular}{ll}
+GKS\_\_TOOZD     & No more available graphics descriptors \\
+GKS\_\_ILLAC     & Illegal access mode \\
+GKS\_\_UNKPA     & Parameter not associated with workstation \\
+GKS\_\_ISACT     & Parameter currently active \\
+GKS\_\_ERROR     & An error has been reported from GKS itself \\
+GKS\_\_DVERR     & Workstation name not defined by GNS
+\end{tabular}
+\newpage
+
+\section{Routine descriptions}
+
+\begin{small}
+\sstroutine{
+   GKS\_ANNUL
+}{
+   Close a graphics workstation without cancelling the parameter
+}{
+   \sstdescription{
+      De-activate and close the graphics workstation whose Workstation
+      Identifier was obtained using GKS\_ASSOC, and annul the
+      Workstation Identifier. Do not cancel the associated parameter.
+   }
+   \sstinvocation{
+      CALL GKS\_ANNUL( WKID, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         WKID = INTEGER (Given)
+      }{
+         A variable containing the Workstation Identifier.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      On entry, the STATUS variable holds the global status value.
+      If the given value of STATUS is SAI\_\_OK and the routine fails to
+      complete, STATUS will be set to an appropriate error number.
+      If the given value of STATUS is not SAI\_\_OK, then the routine
+      will still attempt to execute and will return with STATUS
+      unchanged.
+   }
+}
+\sstroutine{
+   GKS\_ASSOC
+}{
+   Associate a graphics workstation with a parameter, and open it
+}{
+   \sstdescription{
+      Associate a graphics workstation with the specified Graphics
+      Device Parameter and return a GKS Workstation Identifier to
+      reference it.
+      In GKS terms, the following actions occur --
+         If GKS is not already open, it is opened and, if
+         the workstation associated with the device parameter is
+         not already open, that too is opened and activated.
+   }
+   \sstinvocation{
+      CALL GKS\_ASSOC ( PNAME, MODE, WKID, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PNAME = CHARACTER$*$($*$) (Given)
+      }{
+         Expression specifying the name of a Graphics Device
+         Parameter.
+      }
+      \sstsubsection{
+         MODE = CHARACTER$*$($*$) (Given)
+      }{
+         Expression specifying the access mode -  {\tt '}READ{\tt '}, {\tt '}WRITE{\tt '}
+         or {\tt '}UPDATE{\tt '}, as appropriate.
+      }
+      \sstsubsection{
+         WKID = INTEGER (Returned)
+      }{
+         A Variable to contain the Workstation Identifier.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      The facility whereby update mode does not to clear the
+      workstation is specific to RAL GKS and is not implemented for all
+      workstations.
+   }
+}
+\sstroutine{
+   GKS\_CANCL
+}{
+   Close graphics workstation and cancel the parameter
+}{
+   \sstdescription{
+      De-activate and close the graphics workstation associated with
+      the specified Graphics Device Parameter and cancel the parameter.
+      The workstation must have been opened using GKS\_ASSOC.
+   }
+   \sstinvocation{
+      CALL GKS\_CANCL ( PNAME, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PNAME = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Expression specifying the name of a Graphics Device
+         Parameter.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      On entry, the STATUS variable holds the global status value.
+      If the given value of STATUS is SAI\_\_OK and the routine fails to
+      complete, STATUS will be set to an appropriate error number.
+      If the given value of STATUS is not SAI\_\_OK, then the routine
+      will still attempt to execute and will return with STATUS
+      unchanged.
+   }
+}
+\sstroutine{
+   GKS\_DEACT
+}{
+   De-activate ADAM GKS
+}{
+   \sstdescription{
+      De-activate ADAM GKS after use by an application.
+   }
+   \sstinvocation{
+      CALL GKS\_DEACT ( STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STATUS = INTEGER (Given and returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      On entry, the STATUS variable holds the global status value.
+      If the given value of STATUS is SAI\_\_OK and the routine fails to
+      complete, STATUS will be set to an appropriate error number.
+      If the given value of STATUS is not SAI\_\_OK, then the routine
+      will still attempt to execute and will return with STATUS
+      unchanged.
+   }
+}
+\sstroutine{
+   GKS\_GSTAT
+}{
+   Inquire whether GKS has reported an error
+}{
+   \sstdescription{
+      Check whether a GKS error has been reported since the last time
+      this routine was called. If it has, set STATUS to GKS\_\_ERROR, and
+      cancel the GKS error state.
+   }
+   \sstinvocation{
+      CALL GKS\_GSTAT ( STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STATUS = INTEGER (Given and returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      The global status will be set to GKS\_\_ERROR if GKS has reported
+      an error; otherwise it will be unchanged.  If the given value of
+      STATUS is not SAI\_\_OK, then the routine will return without
+      action.
+   }
+}
+
+\sstroutine{
+   PGP\_ANNUL
+}{
+   Close a graphics workstation without cancelling the parameter
+}{
+   \sstdescription{
+      Close PGPLOT, and annul the unit identifier.
+      Do not cancel the associated parameter.
+   }
+   \sstinvocation{
+      CALL PGP\_ANNUL ( UNIT, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         UNIT = INTEGER (Given and returned)
+      }{
+         A variable containing the PGPLOT unit number
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      On entry, the STATUS variable holds the global status value.
+      If the given value of STATUS is SAI\_\_OK and the routine fails to
+      complete, STATUS will be set to an appropriate error number.
+      If the given value of STATUS is not SAI\_\_OK, then the routine
+      will still attempt to execute and will return with STATUS
+      unchanged.
+   }
+}
+\sstroutine{
+   PGP\_ASSOC
+}{
+   Associate a graphics workstation with a parameter, and open it
+}{
+   \sstdescription{
+      Associate a graphics workstation with the specified Graphics
+      Device Parameter and return an PGP unit identifier
+   }
+   \sstinvocation{
+      CALL PGP\_ASSOC ( PNAME, MODE, NX, NY, UNIT, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PNAME = CHARACTER$*$($*$) (Given)
+      }{
+         Expression specifying the name of a graphics parameter.
+      }
+      \sstsubsection{
+         MODE = CHARACTER$*$($*$) (Given)
+      }{
+         Expression specifying the access mode.
+         If it is {\tt '}READ{\tt '} or {\tt '}UPDATE{\tt '}, a vdu workstation screen
+         will not be cleared when the workstation is opened.
+         If it is {\tt '}WRITE{\tt '}, the screen will be cleared as usual.
+      }
+      \sstsubsection{
+         NX = INTEGER (Given)
+      }{
+         Number of sub-plots in X.
+      }
+      \sstsubsection{
+         NY = INTEGER (Given)
+      }{
+         Number of sub-plots in Y.
+      }
+      \sstsubsection{
+         UNIT = INTEGER (Returned)
+      }{
+         A Variable to contain the unit identifier.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      PGPLOT currently only supports one workstation so the unit is
+      always returned as zero.
+   }
+}
+\sstroutine{
+   PGP\_CANCL
+}{
+   Close a graphics workstation and cancel the parameter
+}{
+   \sstdescription{
+      Close the graphics workstation associated with the specified graphics
+      device parameter and cancel the parameter. The workstation must have
+      been opened using PGP\_ASSOC.
+   }
+   \sstinvocation{
+      CALL PGP\_CANCL ( PNAME, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PNAME = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Expression specifying the name of a Graphics Device
+         Parameter.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      On entry, the STATUS variable holds the global status value.
+      If the given value of STATUS is SAI\_\_OK and the routine fails to
+      complete, STATUS will be set to an appropriate error number.
+      If the given value of STATUS is not SAI\_\_OK, then the routine
+      will still attempt to execute and will return with STATUS
+      unchanged.
+   }
+}
+\sstroutine{
+   PGP\_DEACT
+}{
+   De-activate ADAM PGPLOT
+}{
+   \sstdescription{
+      De-activate ADAM PGPLOT after use by an application.
+   }
+   \sstinvocation{
+      CALL PGP\_DEACT ( STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STATUS = INTEGER (Given and returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      On entry, the STATUS variable holds the global status value.
+      If the given value of STATUS is SAI\_\_OK and the routine fails to
+      complete, STATUS will be set to an appropriate error number.
+      If the given value of STATUS is not SAI\_\_OK, then the routine
+      will still attempt to execute and will return with STATUS
+      unchanged.
+   }
+}
+
+\sstroutine{
+   SGS\_ANNUL
+}{
+   Close a graphics workstation without cancelling the parameter
+}{
+   \sstdescription{
+      De-activate and close the graphics workstation whose base
+      zone (ZONE) was obtained using SGS\_ASSOC, and annul the zone
+      identifier.
+      Do not cancel the associated parameter.
+   }
+   \sstinvocation{
+      CALL SGS\_ANNUL ( ZONE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         ZONE = INTEGER (Given and returned)
+      }{
+         A variable containing the base zone identifier.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      On entry, the STATUS variable holds the global status value.
+      If the given value of STATUS is SAI\_\_OK and the routine fails to
+      complete, STATUS will be set to an appropriate error number.
+      If the given value of STATUS is not SAI\_\_OK, then the routine
+      will still attempt to execute and will return with STATUS
+      unchanged.
+   }
+}
+\sstroutine{
+   SGS\_ASSOC
+}{
+   Associate a graphics workstation with a parameter, and open it
+}{
+   \sstdescription{
+      Associate a graphics workstation with the specified Graphics
+      Device Parameter and return an SGS zone identifier to reference
+      the base zone of the workstation.
+   }
+   \sstinvocation{
+      CALL SGS\_ASSOC ( PNAME, MODE, ZONE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PNAME = CHARACTER$*$($*$) (Given)
+      }{
+         Expression specifying the name of a graphics parameter.
+      }
+      \sstsubsection{
+         MODE = CHARACTER$*$($*$) (Given)
+      }{
+         Expression specifying the access mode.
+         If it is {\tt '}READ{\tt '} or {\tt '}UPDATE{\tt '}, a vdu workstation screen
+         will not be cleared when the workstation is opened.
+         If it is {\tt '}WRITE{\tt '}, the screen will be cleared as usual.
+      }
+      \sstsubsection{
+         ZONE = INTEGER (Returned)
+      }{
+         A Variable to contain the Zone identifier.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      The facility whereby update mode does not to clear the
+      workstation is specific to RAL GKS and is not implemented for all
+      workstations.
+   }
+}
+\sstroutine{
+   SGS\_CANCL
+}{
+   Close a graphics workstation and cancel the parameter
+}{
+   \sstdescription{
+      De-activate and close the graphics workstation associated with
+      the specified graphics device parameter and cancel the parameter.
+      The workstation must have been opened using SGS\_ASSOC.
+   }
+   \sstinvocation{
+      CALL SGS\_CANCL ( PNAME, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PNAME = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Expression specifying the name of a Graphics Device
+         Parameter.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      On entry, the STATUS variable holds the global status value.
+      If the given value of STATUS is SAI\_\_OK and the routine fails to
+      complete, STATUS will be set to an appropriate error number.
+      If the given value of STATUS is not SAI\_\_OK, then the routine
+      will still attempt to execute and will return with STATUS
+      unchanged.
+   }
+}
+\sstroutine{
+   SGS\_DEACT
+}{
+   De-activate ADAM SGS
+}{
+   \sstdescription{
+      De-activate ADAM SGS after use by an application.
+   }
+   \sstinvocation{
+      CALL SGS\_DEACT ( STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STATUS = INTEGER (Given and returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      On entry, the STATUS variable holds the global status value.
+      If the given value of STATUS is SAI\_\_OK and the routine fails to
+      complete, STATUS will be set to an appropriate error number.
+      If the given value of STATUS is not SAI\_\_OK, then the routine
+      will still attempt to execute and will return with STATUS
+      unchanged.
+   }
+}
+\end{small}
+\end{document}
+

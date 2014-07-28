@@ -1,0 +1,173 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory} {Starlink System Note}
+\newcommand{\stardocinitials} {SSN}
+\newcommand{\stardocnumber}   {9.3}
+\newcommand{\stardocauthors}  {M J Bly}
+\newcommand{\stardocdate}     {26 January 1994}
+\newcommand{\stardoctitle}    {Installing the Unix Starlink Software Collection}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+\section{Introduction}
+
+This document is intended for people who have to install the Unix
+Starlink Software Collection (USSC).
+
+\section{Requirements}
+
+The USSC is supported on the system configurations shown in Table
+\ref{tab:cons}. The compilers marked {\tt (*)} are required at run
+time\footnote{N.B. The USSC will not work with Sun Fortran
+v.2.0.1 under SunOS v4.1.x.}.
+
+\begin{table}[h]
+\begin{small}
+\begin{center}
+\begin{tabular}{|l|l|l|l|} \hline
+{\em Hardware} & {\em Unix} & {\em Compilers} & {\em Other} \\ \hline \hline
+DEC Alpha & OSF/1 v1.3  & DEC Fortran, DEC C  & X11/Motif \\ \hline
+Sun Sparc & Solaris 2.2 & Sun Fortran v2.0.1{\tt (*)}, Sun C v2.0.1 & X11/Motif 
+or Openwindows \\ \hline
+DEC Mips  & Ultrix v4.2 & DEC Fortran, DEC C c89 & X11/Motif \\ \hline
+Sun Sparc & SunOS 4.1.2 & Sun Fortran v1.4.1{\tt (*)}, GNU C v2.2.2 & X11/Motif 
+or Openwindows \\ \hline \hline
+\end{tabular}
+\caption{System configurations and requirements for the USSC}
+\label{tab:cons}
+\end{center}
+\end{small}
+\end{table}
+
+In addition, the USSC requires that a user be running the C-shell (or
+an extended variant such as {\tt tcsh}) as the login shell.
+
+The USSC is only supported on the Hardware/Software configurations listed,
+though it may be possible to build it for other combinations.
+
+The USSC is managed by the Starlink Software Librarian. Please report any
+problems you may have with installing the USSC, and any bugs you may
+find, to the Software Librarian who can be contacted by email at {\tt
+ussc@star.rl.ac.uk}.
+
+Updates are made to the USSC regularly, and are available as compressed
+tar files via anonymous ftp. Please contact the Software Librarian if 
+you wish to receive update notes by email.
+
+\newpage
+
+\section{Installation}
+
+You will receive a tape of the USSC, usually an exabyte, containing 
+the entire collection (binaries and source), in a version built for 
+the system requested.
+
+\begin{enumerate}
+
+\item Create a home for the software. For this, you need root access.
+There are three options:
+
+\begin{enumerate}
+
+\item A dedicated local disk partition, which should be mounted onto the
+mount point {\tt /star}, owned by `{\tt star}'.
+
+\item An NFS mounted partition, ``pasted'' into the file system of your
+local machine at mount point {\tt /star}, owned by `{\tt star}'.
+
+\item A local but non-dedicated disk area, owned by `{\tt star}', and
+soft linked into the file system as {\tt /star}. For example, at RAL the
+Starlink software is stored in:
+
+\begin{verbatim}
+      /soft1/star-sun4
+\end{verbatim}
+
+Hence, we have created a soft link from {\tt /star} to {\tt /soft1/star-sun4}
+
+\begin{verbatim}
+      # ln -s /soft1/star-sun4 /star
+\end{verbatim}
+
+\end{enumerate}
+
+\item Install the USSC from the tape. Login as the owner of the {\tt /star}
+partition or directory. This is normally `{\tt star}'. Then move to the {\tt 
+/star} directory and using an appropriate no-rewind tape device, copy the 
+USSC to disk. For example:
+
+\begin{verbatim}
+      % cd /star
+      % tar xf /dev/nrst0
+\end{verbatim}
+
+\item Install NAG (Starlink sites only)\footnote{Some of the USSC
+applications use NAG Fortran routines. NAG Ltd allow Starlink to 
+distribute applications binaries linked with NAG objects to academic
+sites. If you want to build the USSC, you will need a NAG licence.}.
+Create a home for the NAG libraries. This can be in {\tt /star/nag} 
+or a softlink to somewhere else to which user `{\tt star}' has 
+write access. 
+
+\begin{verbatim}
+      % cd /star/nag
+      % tar xf /dev/nrst0
+\end{verbatim}
+
+\item Users wanting to use the USSC should add the command:
+\begin{verbatim}
+      source /star/etc/login
+\end{verbatim}
+to their \verb+~/.login+ file and:
+\begin{verbatim}
+      source /star/etc/cshrc
+\end{verbatim}
+to their \verb+~/.cshrc+ file.
+
+\item Complete and return to the address shown, the RAL-GKS licence form.
+RAL-GKS is free to academic/non-profit organisations.
+
+\end{enumerate}
+
+Since the USSC is large, you may save space by removing the source code 
+and still have a running system. You can also remove applications you 
+do not need. Most of the USSC can be treated this way. For advice on 
+what may or may not be removed safely, please contact the Starlink 
+Software Librarian.
+
+\end{document}

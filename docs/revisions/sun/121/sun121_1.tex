@@ -1,0 +1,2544 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {121.1}
+\newcommand{\stardocauthors}   {P M Allan}
+\newcommand{\stardocdate}      {29 November 1991}
+\newcommand{\stardoctitle}     {PSX \\ [1ex]
+                                POSIX interface routines} 
+\newcommand{\stardocversion}   {Version 0.1}
+\newcommand{\stardocmanual}    {Programmer's Manual}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\renewcommand{\thepage}{\roman{page}}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Huge\bf  \stardoctitle \\ [2.5ex]}
+{\LARGE\bf \stardocversion \\ [4ex]}
+{\Huge\bf  \stardocmanual}
+\end{center}
+\vspace{20mm}
+
+%------------------------------------------------------------------------------
+%  Package Description
+\begin{center}
+{\Large\bf Description}
+\end{center}
+
+PSX is a FORTRAN subroutine library that allows programmers to use the
+functionality provided by the POSIX and X/OPEN libraries. The use of this
+library will enable programmers to make use of operating system facilities in a
+machine independent way.
+
+The library is currently available on VAX/VMS systems, Sun Sparcstations and
+DECstations. 
+
+\markright{\stardocname}
+\newpage
+\markright{\stardocname}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+\null\vspace {5mm}
+\begin {center}
+\rule{80mm}{0.5mm} \\ [1ex]
+{\Large\bf \stardoctitle \\ [2.5ex]
+           \stardocversion} \\ [2ex]
+\rule{80mm}{0.5mm}
+\end{center}
+\vspace{30mm}
+
+\setlength{\parskip}{0mm}
+\tableofcontents
+\setlength{\parskip}{\medskipamount}
+\markright{\stardocname}
+\newpage
+%------------------------------------------------------------------------------
+% Section 1 begins ...
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
+
+\null\vspace {5mm}
+\begin {center}
+\rule{80mm}{0.5mm} \\ [1ex]
+{\Large\bf \stardoctitle \\ [2.5ex]
+           \stardocversion} \\ [2ex]
+\rule{80mm}{0.5mm}
+\end{center}
+\vspace{30mm}
+
+
+\section{Introduction}
+
+\subsection{Warning}
+
+The current version of this software is a preliminary version. It is not yet
+complete and will continue to be developed in the near future. However, this
+first release has been made to provide much needed facilities as soon as
+possible and to whet the appetite of the programmer.
+
+Future modifications to this package should not change any existing routines,
+but will consist of the addition of many new routines.
+
+\subsection{Who should read this document?}
+
+It is frequently the case that a FORTRAN programmer will need to use facilities
+that the operating system of the host computer provides and which pure
+FORTRAN~77 does not.  This document is intended for programmers who need to use
+such facilities, and to do so in a portable way.
+
+\subsection{Overview}
+
+When writing programs that interact with the real world, as opposed to those
+that do some purely mathematical calculation, it is often necessary to make use
+of features of the operating system. A simple example of this is getting the
+current date and time. Most FORTRAN systems provide subroutines to let the
+programmer get this information, but the syntax of these routines differ from
+one computer to another, making the resulting code non portable. An even worse
+case of non portable code is when you have to resort to using VMS system
+services, as these are virtually guaranteed to be non portable. What is
+required is a portable operating system interface, and that is exactly what
+POSIX is. It is a set of routines that let an application program interact with
+the host operating system of the computer in a standard manner. 
+
+POSIX will eventually define a whole set of standards, but the one of interest
+here is that known as IEEE~1003.1-1988. This standard is published by the
+Institute of Electrical and Electronic Engineers (IEEE) and is recognized by
+the American National Standards Institute (ANSI). To quote from the standard
+\cite{psx:std}, `It defines a standard operating system interface and
+environment to support application portability at the source code level.' What
+this means is that if you include a POSIX call in your program, then your
+program will work on any system that is POSIX compliant. Since POSIX has its
+origins in Unix, it is not surprising that several of the many different Unix
+systems are already fully or nearly, POSIX compliant. Significantly, VMS is not
+yet POSIX compliant, but it will be `in a future major release of VMS', to use
+the DEC parlance. 
+
+On account of the Unix origin of POSIX, some of the terminology used in
+describing the routines has a Unix accent. Any confusion caused by this should
+be resolved by the notes for each routine.
+
+\subsection{What exactly {\em is} POSIX?}
+
+If you really mean that, you had better go and read the standard\cite{psx:std}.
+However, to a reasonable approximation, POSIX (1003.1) is just the C run time
+library and indeed the POSIX standard makes reference to the ANSI C standard
+\cite{c:std}. Unfortunately, different computers have somewhat different C
+run time libraries. The point of POSIX is to define a common run time library
+that will be available on all computers. 
+
+\section{The PSX library}
+
+The 1003.1 standard actually defines a C interface to POSIX. This is the obvious
+thing to do since POSIX is derived from the C run time library. However, that
+is not much comfort if you actually want to call the POSIX routines from
+FORTRAN. There is a draft standard (1003.9) that defines how the routines should
+be called from FORTRAN (referred to as the FORTRAN binding), but that is still a
+draft and commercial products based on that standard are unlikely to be
+available for some while. Futhermore, in order to cope with the C concepts that
+are inherent in POSIX, the draft standard for the FORTRAN binding has defined
+things in such a way that it makes using POSIX directly from FORTRAN somewhat
+painful. 
+
+To make life easier for the FORTRAN programmer, a package of routines called
+PSX has been written to which let FORTRAN programs make calls to POSIX
+functions in a manner consistent with other Starlink subroutine libraries. This
+means that FORTRAN programs that need to make use of functions provided by the
+operating system can be written in a portable manner. Another advantage of
+using the PSX routines instead of using raw POSIX (even if we could) is that it
+allows us to use inherited status that is a common feature of Starlink
+subroutine libraries. If a PSX routine detects an error, it sets the STATUS
+argument of the routine to one of the values given in appendix~\ref{include} and
+reports an error via EMS (see SSN/4).
+
+Note that the names of the PSX routines are often longer than the Starlink
+recommendation (SGP/16) of the PSX\_ prefix plus five more characters. This has
+been done so that the name of the PSX routine corresponds directly with 
+the name of the `real' POSIX routine. This creates a potential problem with
+porting the routines to other computers that might not accept names longer than
+six characters. However, the draft standard for the FORTRAN binding to POSIX
+assumes that compilers will accept names up to 31 characters (this is the {\em
+only}\, extension to ANSI standard FORTRAN~77 that it assumes), so this is no
+worse than basing routines directly on the specification of the draft standard.
+
+The PSX routines are just wrap around routines for POSIX routines. For further
+details on these routines, you should consult the relevant standards documents
+\cite{psx:std} and \cite{c:std}. If you do not have copies of these, the
+documentation for the C run time library on your computer may be helpful.
+
+\section{The Level of the Implementation}
+
+So far, not all of the POSIX 1003.1 routines have been provided with a PSX
+equivalent. Indeed this may never be achieved. The purpose of the PSX routines
+is to enable the programmer to use functionality of POSIX, so only those
+routines that are actually thought to be needed will be provided. If you have a
+need for a routine that has not been provided, please mail the author, who will
+do his best to provide the routine. Each routine is fairly simple to write; it
+is only the sheer number of routines that prevents a complete set being
+provided to date.
+
+The POSIX 1003.1 standard refers to the ANSI~C standard for the description of
+some of the routines. These are listed in the POSIX standard under `language
+specific services for the C programming language'. There are no corresponding
+routines in the draft FORTRAN binding. Nevertheless, some of these routines are
+so useful that a PSX implementation of them has been provided. Examples are
+allocating virtual memory (using malloc) and getting the current date and time.
+
+Descriptions of the routines that are currently available in the PSX library
+are given in appendix~\ref{description}. Those routines that have been
+considered for inclusion in the library and have been rejected are listed in
+appendix~\ref{not-implelmented}.
+
+\subsection{Future Extensions}
+
+While the PSX routines are clearly very useful as they stand, they do not
+always present the information in the manner that you may want. An example of
+this is the subroutine PSX\_CTIME, which returns the data and time in a
+particularly perverse format. The temptation to `improve' some routines has
+been resisted to ensure that there is consistency between the PSX routines and
+the corresponding true POSIX or C run-time library routines. However, there is
+clearly a need for routines that pull together some of the PSX routines in a
+more user friendly way and to provide information in a different manner. These
+routines will be provided in a separate package.
+
+\section{X/OPEN}
+
+Another attempt to achieve portable programs is that of the X/OPEN group. The
+X/OPEN portability guide is a similar document to the POSIX standard and is also
+based on the C run time library. The routines defined in the X/OPEN portability
+guide tend to be of a higher level than those in the POSIX standard and where
+appropriate, PSX equivalents for X/OPEN routines will also be provided.
+
+\section{Compiling and Linking}
+\subsection{VMS}
+
+If a FORTRAN program wishes to check for a particular error status returned by
+a PSX routine, then it should contain the line
+
+\begin{quote}{\tt
+INCLUDE 'PSX\_ERR'
+}
+\end{quote}
+
+This will define the symbolic constants listed in appendix~\ref{include}.
+
+To link a program that uses the PSX library, type
+
+\begin{quote}{\tt
+\$ LINK program,STAR\_LINK/OPT
+}
+\end{quote}
+
+The standard STARLINK shareable image library contains the reference to the PSX
+shareable image. If a system does not have the STARLINK shareable image
+library, then the link command is
+
+\begin{quote}{\tt
+\$ LINK program,PSX\_LINK/OPT
+}
+\end{quote}
+
+If it is required to link with the object library, rather than the shareable
+image, then the link command is
+
+\begin{quote}{\tt
+\$ LINK program,PSX\_DIR:PSX/LIB,SYS\$SHARE:VAXCRTL/LIB
+}
+\end{quote}
+
+The reference to the C run time library is necessary as this is not included
+automatically. Although this example refers to the object library version of
+the C run time library, it is perfectly in order to use the shareable image
+version of the C run time library with the object library version of PSX.
+
+\subsection{Sun and DECstation}
+
+If a FORTRAN program wishes to check for a particular error status returned by
+a PSX routine, then it should contain the line
+
+\begin{quote}{\tt
+INCLUDE '/star/include/psx\_err'
+}
+\end{quote}
+
+The use of lower case in the file name is important. This will define the
+symbolic constants listed in appendix~\ref{include}.
+
+To compile and link a program that uses the PSX library, type
+
+\begin{quote}{\tt
+\% f77 program.f -L/star/lib `psxlink` -o program
+}
+\end{quote}
+
+On the Sun, the {\tt -L/star/lib} can usually be omitted, as the library
+directory is included in the environment variable {\tt LD\_LIBRARY\_PATH}.
+
+\section{References}
+\markright{\stardocname}  % Stops the page heading changing to REFERENCES.
+\begin{thebibliography}{9}
+\bibitem{psx:std}IEEE Standard Portable Operating System Interface for Computer
+Environments (IEEE Std 1003.1-1988). Publ, Institute of Electrical and
+Electronic Engineers, Inc.
+\bibitem{c:std}American National Standard for Information Systems --
+Programming Language -- C (ANSI X3.159-1989). Publ, American National Standards
+Institute.
+\bibitem{psx:fortran}Portable Operating System Interface for Computer
+Environments, FORTRAN~77 Bindings (P1003.9~/~Draft 5.0).
+\end{thebibliography}
+
+\appendix
+\markright{\stardocname}  % Stops the page heading changing to REFERENCES.
+
+\newpage
+\section{Examples}
+
+So much for theory, here are some examples of the use of PSX routines. Each
+POSIX routine tends to stand on its own, so the examples are fairly simple.
+
+\subsection{Create a file with name that is specific to a user}
+
+The requirement is to create a file that will be used to hold the output of
+several programs, but this file must be in a directory that is used by several
+people. Clearly the file name must be related to the username. Also it is
+necessary to take into account the difference in the syntax of directory names
+on VMS and Unix systems.
+
+\begin{small}
+\begin{verbatim}
+      PROGRAM NEWFIL
+
+      IMPLICIT NONE
+      INCLUDE 'SAE_PAR'
+      INTEGER STATUS                   ! The global status value
+      CHARACTER * ( 32 ) NAME          ! The name of the current user
+      CHARACTER * ( 80 ) FILNAM        ! The name of the file to be created
+      CHARACTER * ( 15 ) SYSNAME       ! The name of the operating system
+      CHARACTER * ( 1 ) DUMMY1
+      CHARACTER * ( 1 ) DUMMY2
+      CHARACTER * ( 1 ) DUMMY3
+      CHARACTER * ( 1 ) DUMMY4
+
+* Set STATUS since this is is not an ADAM program.
+      STATUS = SAI__OK
+
+* Get the username.
+      CALL PSX_GETENV( 'USER', NAME, STATUS )
+
+* Get the system name.
+      CALL PSX_UNAME( SYSNAME, DUMMY1, DUMMY2, DUMMY3, DUMMY4, STATUS )
+
+* Create the file.
+      IF( STATUS .EQ. SAI__OK ) THEN
+         IF( SYSNAME .EQ. 'VMS' ) THEN
+            FILNAM = 'COMMON_AREA:' // NAME // '.DAT'
+         ELSE
+            FILNAM = '/usr/common/' // NAME // '.DAT'
+         END IF
+         OPEN( UNIT=1, FILE=FILNAM, STATUS='NEW' )
+         CLOSE( UNIT=1 )
+      ELSE
+         PRINT *,'Could not get username'
+      END IF
+
+      END
+\end{verbatim}
+\end{small}      
+      
+Although the PSX routines are designed to be used with other Starlink routines
+in the ADAM environment and use the concept of inherited status, they can just
+as easily be used in a stand alone program like to one above provided that the
+status is set correctly before calling the first routine. This is important
+since the PSX routine will exit immediately if STATUS is not set to the value
+of the symbolic constant SAI\_\_OK.
+
+\subsection{Get some virtual memory}
+
+One of the annoying features of FORTRAN~77 is that all storage space must be
+allocated at compile time, i.e.\ there are no dynamic arrays. Here is an
+example of using PSX routines to dynamically allocate an array.
+
+\begin{small}
+\begin{verbatim}
+      PROGRAM MAIN
+      IMPLICIT NONE
+      INCLUDE 'SAE_PAR'
+      INTEGER STATUS
+
+* Set the STATUS to OK.
+      STATUS = SAI__OK
+
+* Call the subroutine.
+      CALL GETVM( STATUS )
+
+      END
+
+
+      SUBROUTINE GETVM( STATUS )
+      IMPLICIT NONE
+      INCLUDE 'SAE_PAR'
+      INTEGER STATUS, PNTR
+
+* Check global status.
+      IF( STATUS .NE. SAI__OK ) RETURN
+
+* Create a ten element integer array and return a pointer to it.
+      CALL PSX_CALLOC( 10, '_INTEGER', PNTR, STATUS )
+
+* If all is well, operate on the array.
+      IF (STATUS .EQ. SAI__OK) THEN
+         CALL FILL( %VAL(PNTR), 10 )
+         CALL PRNT( %VAL(PNTR), 10 )
+         CALL PSX_FREE( PNTR, STATUS )
+      END IF
+
+      END
+
+
+      SUBROUTINE FILL( ARRAY, N )
+* Put some numbers in the array.
+      INTEGER N, ARRAY( N )
+      INTEGER I
+
+      DO I = 1, N
+         ARRAY( I ) = I
+      END DO
+
+      END
+
+
+      SUBROUTINE PRNT( ARRAY, N )
+* Print the elements of ARRAY.
+      INTEGER N, ARRAY( N )
+      INTEGER I
+
+      DO I = 1, N
+         PRINT *,ARRAY( I )
+      END DO
+
+      END
+\end{verbatim}
+\end{small}
+
+In this case the main program merely sets the value of STATUS and calls the
+subroutine GETVM to do the work. Although this is more typing, it does have the
+advantage that this could be made into an ADAM task simply by deleting the main
+program. GETVM tests that the value of STATUS returned from PSX\_CALLOC is ok,
+but does not print any error message. This is not necessary, as the PSX
+routines all report their own errors via the EMS routines. The reporting of
+error messages may be deferred if required, as described in SUN/104 and SSN/4.
+
+\section{Include Files}
+\label{include}
+
+The symbolic constants that define the error codes returned by PSX routines are
+defined in the file /star/include/psx\_err (Unix) or in a file pointed to by
+the logical name PSX\_ERR (VMS). The meaning of these constants is given below:
+
+\begin{center}
+\begin{tabbing}
+\makebox[10em]{}\=\mbox{}\\
+PSX\_\_INTYP \> Invalid argument TYPE given in call to PSX\_CALLOC \\
+PSX\_\_NOALL \> Null pointer returned by call to malloc \\
+PSX\_\_NOENV \> No translation of an environment variable \\
+PSX\_\_NOTIM \> Could not get current time with time() \\
+\end{tabbing}
+\end{center}
+
+\newpage
+\section{Alphabetical list of routines}
+
+% Command for displaying routines in routine lists:
+% =================================================
+
+\newcommand{\noteroutine}[2]{{\small \bf #1} \nopagebreak \\
+                             \hspace*{3em} {\em #2} \\[1.5ex]}
+
+% List of routines:
+% =================
+
+\noteroutine{
+   PSX\_ASCTIME( TSTRUCT, STRING, STATUS )
+}{
+   Convert a time structure to a character string
+}
+\noteroutine{
+   PSX\_CALLOC( NMEMB, TYPE, PNTR, STATUS )
+}{
+   Allocate space for several objects of specified type
+}
+\noteroutine{
+   PSX\_CTIME( NTICKS, STRING, STATUS )
+}{
+   Convert the calendar time to a character string
+}
+\noteroutine{
+   PSX\_CUSERID( USER, STATUS )
+}{
+   Get the username
+}
+\noteroutine{
+   PSX\_FREE( PNTR, STATUS )
+}{
+   Free virtual memory
+}
+\noteroutine{
+   PSX\_GETEGID( GID, STATUS )
+}{
+   Gets the effective group ID
+}
+\noteroutine{
+   PSX\_GETENV( NAME, TRANS, STATUS )
+}{
+   Translate an environment variable
+}
+\noteroutine{
+   PSX\_GETEUID( UID, STATUS )
+}{
+   Gets the effective user ID
+}
+\noteroutine{
+   PSX\_GETGID( GID, STATUS )
+}{
+   Gets the real group ID
+}
+\noteroutine{
+   PSX\_GETPID( PID, STATUS )
+}{
+   Gets the process ID
+}
+\noteroutine{
+   PSX\_GETPPID( PID, STATUS )
+}{
+   Gets the process ID of the parent process
+}
+\noteroutine{
+   PSX\_GETUID( UID, STATUS )
+}{
+   Gets the real user ID
+}
+\noteroutine{
+   PSX\_ISATTY( FILDSC, ISTTY, STATUS )
+}{
+   Determine if a file is a terminal
+}
+\noteroutine{
+   PSX\_LOCALTIME( NTICKS, SECS, MINS, HOURS, DAY, MONTH, YEAR,\\
+  : WDAY, YDAY, ISDST, TSTRUCT, STATUS )
+}{
+   Convert the value returned by PSX\_TIME to individual values
+}
+\noteroutine{
+   PSX\_MALLOC( SIZE, PNTR, STATUS )
+}{
+   Allocate virtual memory
+}
+\noteroutine{
+   PSX\_RAND( INUM, MAXNUM, FNUM, STATUS )
+}{
+   Generate a random number
+}
+\noteroutine{
+   PSX\_REALLOC( SIZE, PNTR, STATUS )
+}{
+   Change the size of an allocated region of virtual memory
+}
+\noteroutine{
+   PSX\_SRAND( SEED, STATUS )
+}{
+   Set the seed for the random number generator
+}
+\noteroutine{
+   PSX\_TIME( NTICKS, STATUS )
+}{
+   Get the current calendar time
+}
+\noteroutine{
+   PSX\_TTYNAME( FILDSC, TNAME, STATUS )
+}{
+   Get the name of the terminal
+}
+\noteroutine{
+   PSX\_UNAME( SYSNAME, NODENAME, RELEASE, VERSION, MACHINE, STATUS )
+}{
+   Gets information about the host computer system
+}
+
+
+
+\newpage
+\section{Classified list of routines}
+\subsection{Process Environment}
+
+\noteroutine{
+   PSX\_CUSERID( USER, STATUS )
+}{
+   Get the username
+}
+\noteroutine{
+   PSX\_GETEGID( GID, STATUS )
+}{
+   Gets the effective group ID
+}
+\noteroutine{
+   PSX\_GETENV( NAME, TRANS, STATUS )
+}{
+   Translate an environment variable
+}
+\noteroutine{
+   PSX\_GETEUID( UID, STATUS )
+}{
+   Gets the effective user ID
+}
+\noteroutine{
+   PSX\_GETGID( GID, STATUS )
+}{
+   Gets the real group ID
+}
+\noteroutine{
+   PSX\_GETPID( PID, STATUS )
+}{
+   Gets the process ID
+}
+\noteroutine{
+   PSX\_GETPPID( PID, STATUS )
+}{
+   Gets the process ID of the parent process
+}
+\noteroutine{
+   PSX\_GETUID( UID, STATUS )
+}{
+   Gets the real user ID
+}
+\noteroutine{
+   PSX\_ISATTY( FILDSC, ISTTY, STATUS )
+}{
+   Determine if a file is a terminal
+}
+\noteroutine{
+   PSX\_TTYNAME( FILDSC, TNAME, STATUS )
+}{
+   Get the name of the terminal
+}
+\noteroutine{
+   PSX\_UNAME( SYSNAME, NODENAME, RELEASE, VERSION, MACHINE, STATUS )
+}{
+   Gets information about the host computer system
+}
+
+
+\subsection{Language Specific Services for C (FORTRAN versions)}
+\subsubsection{Pseudo-Random Numbers}
+
+\noteroutine{
+   PSX\_RAND( INUM, MAXNUM, FNUM, STATUS )
+}{
+   Generate a random number
+}
+\noteroutine{
+   PSX\_SRAND( SEED, STATUS )
+}{
+   Set the seed for the random number generator
+}
+
+
+\subsubsection{Memory Management}
+
+\noteroutine{
+   PSX\_CALLOC( NMEMB, TYPE, PNTR, STATUS )
+}{
+   Allocate space for several objects of specified type
+}
+\noteroutine{
+   PSX\_FREE( PNTR, STATUS )
+}{
+   Free virtual memory
+}
+\noteroutine{
+   PSX\_MALLOC( SIZE, PNTR, STATUS )
+}{
+   Allocate virtual memory
+}
+\noteroutine{
+   PSX\_REALLOC( SIZE, PNTR, STATUS )
+}{
+   Change the size of an allocated region of virtual memory
+}
+
+\subsubsection{Date and Time}
+
+\noteroutine{
+   PSX\_ASCTIME( TSTRUCT, STRING, STATUS )
+}{
+   Convert a time structure to a character string
+}
+\noteroutine{
+   PSX\_CTIME( NTICKS, STRING, STATUS )
+}{
+   Convert the calendar time to a character string
+}
+\noteroutine{
+   PSX\_LOCALTIME( NTICKS, SECS, MINS, HOURS, DAY, MONTH, YEAR,\\
+  : WDAY, YDAY, ISDST, TSTRUCT, STATUS )
+}{
+   Convert the value returned by PSX\_TIME to individual values
+}
+\noteroutine{
+   PSX\_TIME( NTICKS, STATUS )
+}{
+   Get the current calendar time
+}
+
+
+
+\newpage
+\section{Routine Descriptions}
+\label{description}
+
+%+
+%  Name:
+%     LAYOUT.TEX
+
+%  Purpose:
+%     Define Latex commands for laying out documentation produced by PROLAT.
+
+%  Language:
+%     Latex
+
+%  Type of Module:
+%     Data file for use by the PROLAT application.
+
+%  Description:
+%     This file defines Latex commands which allow routine documentation
+%     produced by the SST application PROLAT to be processed by Latex. The
+%     contents of this file should be included in the source presented to
+%     Latex in front of any output from PROLAT. By default, this is done
+%     automatically by PROLAT.
+
+%  Notes:
+%     The definitions in this file should be included explicitly in any file
+%     which requires them. The \include directive should not be used, as it
+%     may not then be possible to process the resulting document with Latex
+%     at a later date if changes to this definitions file become necessary.
+
+%  Authors:
+%     RFWS: R.F. Warren-Smith (STARLINK)
+
+%  History:
+%     10-SEP-1990 (RFWS):
+%        Original version.
+%     10-SEP-1990 (RFWS):
+%        Added the implementation status section.
+%     12-SEP-1990 (RFWS):
+%        Added support for the usage section and adjusted various spacings.
+%     {enter_further_changes_here}
+
+%  Bugs:
+%     {note_any_bugs_here}
+
+%-
+
+%  Define length variables.
+\newlength{\sstbannerlength}
+\newlength{\sstcaptionlength}
+
+%  Define a \tt font of the required size.
+\font\ssttt=cmtt10 scaled 1095
+
+%  Define a command to produce a routine header, including its name,
+%  a purpose description and the rest of the routine's documentation.
+\newcommand{\sstroutine}[3]{
+   \goodbreak
+   \rule{\textwidth}{0.5mm}
+   \vspace{-7ex}
+   \newline
+   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
+   \setlength{\sstcaptionlength}{\textwidth}
+   \addtolength{\sstbannerlength}{0.5em} 
+   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
+   \addtolength{\sstcaptionlength}{-4.45pt}
+   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
+   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
+   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
+   \begin{description}
+      #3
+   \end{description}
+}
+
+%  Format the description section.
+\newcommand{\sstdescription}[1]{\item[Description:] #1}
+
+%  Format the usage section.
+\newcommand{\sstusage}[1]{\item[Usage:] \mbox{} \\[1.3ex] {\ssttt #1}}
+
+%  Format the invocation section.
+\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
+
+%  Format the arguments section.
+\newcommand{\sstarguments}[1]{
+   \item[Arguments:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the returned value section (for a function).
+\newcommand{\sstreturnedvalue}[1]{
+   \item[Returned Value:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the parameters section (for an application).
+\newcommand{\sstparameters}[1]{
+   \item[Parameters:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the examples section.
+\newcommand{\sstexamples}[1]{
+   \item[Examples:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Define the format of a subsection in a normal section.
+\newcommand{\sstsubsection}[1]{\item[{#1}] \mbox{} \\}
+
+%  Define the format of a subsection in the examples section.
+\newcommand{\sstexamplesubsection}[1]{\item[{\ssttt #1}] \mbox{} \\}
+
+%  Format the notes section.
+\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
+
+%  Provide a general-purpose format for additional (DIY) sections.
+\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}] \mbox{} \\[1.3ex] #2}
+
+%  Format the implementation status section.
+\newcommand{\sstimplementationstatus}[1]{
+   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
+
+%  Format the bugs section.
+\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
+
+%  Format a list of items while in paragraph mode.
+\newcommand{\sstitemlist}[1]{
+  \mbox{} \\
+  \vspace{-3.5ex}
+  \begin{itemize}
+     #1
+  \end{itemize}
+}
+
+%  Define the format of an item.
+\newcommand{\sstitem}{\item}
+
+%  End of LAYOUT.TEX layout definitions.
+%.
+
+\begin{small}
+
+% Routine descriptions:
+% =====================
+
+\sstroutine{
+   PSX\_ASCTIME
+}{
+   Convert a time structure to a character string
+}{
+   \sstdescription{
+      Convert the information in the structure pointed to by TSTRCT to a
+      character string.
+   }
+   \sstinvocation{
+      CALL PSX\_ASCTIME( TSTRCT, STRING, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         TSTRCT = POINTER (Given)
+      }{
+         The pointer to the time structure.
+      }
+      \sstsubsection{
+         STRING = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         The character string representation of the time.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given)
+      }{
+         The global status.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         Print the current time
+      }{
+          CALL PSX\_TIME( NTICKS, STATUS )\\
+          CALL PSX\_LOCALTIME( NTICKS, SEC, MINS, HOUR, DAY, MONTH, YEAR,\\
+         :   WDAY, YDAY, ISDST, TSTRCT, STATUS )\\
+          CALL PSX\_ASCTIME( TSTRCT, STRING, STATUS )\\
+          PRINT $*$,{\tt '}The time is {\tt '},STRING\\
+
+          will print something like\\
+          {\tt "}Wed Apr 17 09:01:04 1991{\tt "} (without the quotes).
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         TSTRCT is declared to be of type POINTER. This is usually
+            represented in FORTRAN as an integer, although any type that
+            uses the same amount of storage would be just as good.
+
+         \sstitem
+         The C string returned by the function localtime contains a new
+            line character. This is removed before being passed back to
+            the calling FORTRAN routine.
+
+         \sstitem
+         The actual argument corresponding to STRING should be at least
+            24 characters long.
+      }
+   }
+   \sstdiytopic{
+      External Routines Used
+   }{
+      cnf:
+         cnf\_exprt
+   }
+   \sstdiytopic{
+      References
+   }{
+      \sstitemlist{
+
+         \sstitem
+         POSIX standard (1988), section 8.1
+
+         \sstitem
+         ANSI C standard (1989), section 4.12.3.1
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1991 Science \& Engineering Research Council
+   }
+}
+\sstroutine{
+   PSX\_CALLOC
+}{
+   Allocate space for several objects of specified type
+}{
+   \sstdescription{
+      The routine allocates an amount of virtual memory specified by
+      NMEMB and TYPE. The number of bytes allocated is equal to the
+      number of bytes required to store a single variable of type TYPE,
+      multiplied by NMEMB. A pointer to the allocated storage is
+      returned in PNTR. This pointer can be passed on to other
+      subroutines using the \%VAL construct. If the storage cannot be
+      allocated, then PNTR is set to zero, STATUS is set to PSX\_\_NOALL
+      and an error is reported.
+   }
+   \sstinvocation{
+      CALL PSX\_CALLOC( NMEMB, TYPE, PNTR, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NMEMB = INTEGER (Given)
+      }{
+         The number of locations of TYPE required
+      }
+      \sstsubsection{
+         TYPE = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The type of each location
+      }
+      \sstsubsection{
+         PNTR = POINTER (Returned)
+      }{
+         A pointer to the allocated storage.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         Generate storage for an array.
+      }{
+         CALL PSX\_CALLOC( 20, {\tt '}\_INTEGER{\tt '}, PNTR, STATUS )\\
+         CALL SUB1( \%VAL(PNTR), 20 )\\
+             ...\\
+         SUBROUTINE SUB1( ARRAY, N )\\
+         INTEGER N\\
+         INTEGER ARRAY( N )\\
+            ...\\
+
+         The call to PSX\_CALLOC allocates storage for a 20 element array
+         of type INTEGER. The pointer to this storage is then passed to
+         subroutine SUB1, where it is accessed as an array of integers.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Storage allocated by PSX\_CALLOC should be returned by a call to
+            PSX\_FREE when it is no longer needed.
+
+         \sstitem
+         PNTR is declared to be of type POINTER. This is usually
+            represented in FORTRAN as an integer, although any type that
+            uses the same amount of storage would be just as good.
+
+         \sstitem
+         If several calls to PSX\_CALLOC are made, the space returned by
+            each call is completely separate from that made by any other
+            call. In particular, the program should not assume that the
+            space returned by successive calls is contiguous.
+
+         \sstitem
+         The allowed values of TYPE are \_INTEGER, \_REAL, \_DOUBLE,
+            \_LOGICAL and \_CHAR.
+
+         \sstitem
+         PSX\_CALLOC differs from the POSIX function calloc in that the
+            size of each member to be allocated is specified by a character
+            string (TYPE) rather than as a numerical value. This has been
+            done to increase the portability of the routine.
+      }
+   }
+   \sstdiytopic{
+      External Routines Used
+   }{
+      cnf:
+         cnf\_impn
+   }
+   \sstdiytopic{
+      References
+   }{
+      \sstitemlist{
+
+         \sstitem
+         POSIX standard (1988), section 8.1
+
+         \sstitem
+         ANSI C standard (1989), section 4.10.3.1
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1991 Science \& Engineering Research Council
+   }
+}
+\sstroutine{
+   PSX\_CTIME
+}{
+   Convert the calendar time to a character string
+}{
+   \sstdescription{
+      Convert the number of ticks since the beginning of the calendar
+      (the value returned by PSX\_TIME) to a character string.
+   }
+   \sstinvocation{
+      CALL PSX\_CTIME( NTICKS, STRING, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NTICKS = INTEGER (Given)
+      }{
+         The number of ticks since the start of the calendar.
+      }
+      \sstsubsection{
+         STRING = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         The character string representation of the time.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given)
+      }{
+         The global status.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         Print the current time
+      }{
+         CALL PSX\_TIME( NTICKS, STATUS )\\
+         CALL PSX\_CTIME( NTICKS, STRING, STATUS )\\
+         PRINT $*$,{\tt '}The time is {\tt '},STRING\\
+
+         will print something like\\
+         {\tt "}Wed Apr 17 09:01:04 1991{\tt "} (without the quotes).
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The C string returned by the POSIX function ctime contains a
+            new line character. This is removed before being passed back
+            to the FORTRAN routine.
+
+         \sstitem
+         The actual argument corresponding to STRING should be at least
+            24 characters long.
+      }
+   }
+   \sstdiytopic{
+      External Routines Used
+   }{
+      cnf:
+         cnf\_exprt
+   }
+   \sstdiytopic{
+      References
+   }{
+      \sstitemlist{
+
+         \sstitem
+         POSIX standard (1988), section 8.1
+
+         \sstitem
+         ANSI C standard (1989), section 4.12.3.2
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1991 Science \& Engineering Research Council
+   }
+}
+\sstroutine{
+   PSX\_CUSERID
+}{
+   Get the username
+}{
+   \sstdescription{
+      This routine will get a username associated with the effective
+      user ID of the current process.
+   }
+   \sstinvocation{
+      CALL PSX\_CUSERID( USER, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NAME = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         The username
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         On a Unix system the translation from effective user ID to
+            username is performed. Since there can be several usernames
+            associated with a user ID, there is no guarantee that the value
+            returned will be unique.
+
+         \sstitem
+         On a pre-POSIX compliant VMS system, this routine will always
+            return the username that you logged in as, even after executing
+            a SET UIC command. This may change when VMS becomes POSIX
+            compliant.
+      }
+   }
+   \sstdiytopic{
+      External Routines Used
+   }{
+      cnf:
+         cnf\_exprt
+   }
+   \sstdiytopic{
+      References
+   }{
+      \sstitemlist{
+
+         \sstitem
+         POSIX standard (1988), section 4.2.4
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1991 Science \& Engineering Research Council
+   }
+}
+\sstroutine{
+   PSX\_FREE
+}{
+   Free virtual memory
+}{
+   \sstdescription{
+      The routine frees the virtual memory pointed to by PNTR that was
+      previously allocated by a call to PSX\_CALLOC or PSX\_MALLOC.
+   }
+   \sstinvocation{
+      CALL PSX\_FREE( PNTR, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PNTR = POINTER (Given and Returned)
+      }{
+         A pointer to the allocated storage.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         PNTR is declared to be of type POINTER. This is usually
+            represented in FORTRAN as an integer, although any type that
+            uses the same amount of storage would be just as good.
+      }
+   }
+   \sstdiytopic{
+      References
+   }{
+      \sstitemlist{
+
+         \sstitem
+         POSIX standard (1988), section 8.1
+
+         \sstitem
+         ANSI C standard (1989), section 4.10.3.2
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1991 Science \& Engineering Research Council
+   }
+}
+\sstroutine{
+   PSX\_GETEGID
+}{
+   Gets the effective group ID
+}{
+   \sstdescription{
+      The routine obtains the effective group identification number of the
+      calling process and returns the value in GID.
+   }
+   \sstinvocation{
+      CALL PSX\_GETEGID( GID, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         GID = INTEGER (Returned)
+      }{
+         The value of the effective group ID.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given)
+      }{
+         The global status.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         CALL PSX\_GETEGID( GID, STATUS )
+      }{
+         This will return the value of the effective group ID.
+         E.g. GID now has a value of 36.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         On a VMS system, PSX\_GETEGID returns the group number of the
+            UIC, e.g. if the UIC is [16,25] then PSX\_GETEGID will return a
+            value of 14. Remember that UIC numbers are written as octal
+            numbers, not decimal.
+      }
+   }
+   \sstdiytopic{
+      References
+   }{
+      \sstitemlist{
+
+         \sstitem
+         POSIX standard (1988), section 4.2.1
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1991 Science \& Engineering Research Council
+   }
+}
+\sstroutine{
+   PSX\_GETENV
+}{
+   Translate an environment variable
+}{
+   \sstdescription{
+      The routine tries to get the translation of the environment
+      variable NAME. If it succeeds, it returns the translation in
+      TRANS. If it fails, it sets STATUS to PSX\_\_NOENV and reports
+      an error.
+   }
+   \sstinvocation{
+      CALL PSX\_GETENV( NAME, TRANS, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NAME = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Name of the environment variable to be translated.
+      }
+      \sstsubsection{
+         TRANS = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         The translation of the environment variable.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         CALL PSX\_GETENV( {\tt '}USER{\tt '}, TRANS, STATUS )
+      }{
+         This will return the value of the environment variable USER,
+         i.e. the username of the current process.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         On VMS, there are four special environment variables.
+\begin{description}
+\item[HOME] The home directory of the user,\\e.g. DISK\$USER1:[PMA]
+\item[PATH] The default place(s) where files are looked for, i.e. the current
+default directory,\\
+            e.g. DISK\$SCRATCH:[PMA.CCD]
+\item[TERM] The type of terminal attached to the process,\\
+            e.g. vt300-80.
+\item[USER] The username,\\
+             e.g. PMA
+\end{description}
+            If the environment variable is not one of these special values,
+            then the system will attempt to translate NAME as a logical
+            name (using all of the normal logical name tables) and finally
+            it will attempt to translate NAME as a DCL symbol.
+         \sstitem
+         On VMS, PATH will translate to a single place, whereas on Unix,
+         it will commonly translate to a series of places.
+      }
+   }
+   \sstdiytopic{
+      External Routines Used
+   }{
+      cnf:
+         cnf\_creim, cnf\_exprt, cnf\_free
+   }
+   \sstdiytopic{
+      References
+   }{
+      \sstitemlist{
+
+         \sstitem
+         POSIX standard (1988), section 4.6.1
+
+         \sstitem
+         ANSI C standard (1989), section 4.10.4.4
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1991 Science \& Engineering Research Council
+   }
+}
+\sstroutine{
+   PSX\_GETEUID
+}{
+   Gets the effective user ID
+}{
+   \sstdescription{
+      The routine obtains the effective user identification number of the
+      calling process and returns the value in UID.
+   }
+   \sstinvocation{
+      CALL PSX\_GETEUID( UID, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         UID = INTEGER (Returned)
+      }{
+         The value of the effective user ID.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given)
+      }{
+         The global status.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         CALL PSX\_GETEUID( UID, STATUS )
+      }{
+         This will return the value of the effective user ID.
+         E.g. UID now has a value of 1.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         On a VMS system, PSX\_GETEUID returns the member number of the
+            UIC, e.g. if the UIC is [16,25] then PSX\_GETEUID will return a
+            value of 21.  Remember that UIC numbers are written as octal
+            numbers, not decimal.
+      }
+   }
+   \sstdiytopic{
+      References
+   }{
+      \sstitemlist{
+
+         \sstitem
+         POSIX standard (1988), section 4.2.1
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1991 Science \& Engineering Research Council
+   }
+}
+\sstroutine{
+   PSX\_GETGID
+}{
+   Gets the real group ID
+}{
+   \sstdescription{
+      The routine obtains the real group identification number of the calling
+      process and returns the value in GID.
+   }
+   \sstinvocation{
+      CALL PSX\_GETGID( GID, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         GID = INTEGER (Returned)
+      }{
+         The value of the real group ID.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given)
+      }{
+         The global status.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         CALL PSX\_GETGID( GID, STATUS )
+      }{
+         This will return the value of the real group ID.
+         E.g. GID now has a value of 36.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         On a VMS system, PSX\_GETGID returns the group number of the
+            UIC, e.g. if the UIC is [16,25] then PSX\_GETGID will return a
+            value of 14. Remember that UIC numbers are written as octal
+            numbers, not decimal.
+      }
+   }
+   \sstdiytopic{
+      References
+   }{
+      \sstitemlist{
+
+         \sstitem
+         POSIX standard (1988), section 4.2.1
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1991 Science \& Engineering Research Council
+   }
+}
+\sstroutine{
+   PSX\_GETPID
+}{
+   Gets the process ID
+}{
+   \sstdescription{
+      The routine obtains the process identification number of the current
+      process and returns the value in PID.
+   }
+   \sstinvocation{
+      CALL PSX\_GETPID( PID, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PID = INTEGER (Returned)
+      }{
+         The value of the process ID.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given)
+      }{
+         The global status.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         CALL PSX\_GETPID( PID, STATUS )
+      }{
+         This will return the value of the process ID.
+         E.g. PID now has a value of 578814174
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If a program that calls this routine is run several times on a VMS
+           system, then the PID returned will be the same each time (assuming that
+           a new subprocess has not been started). When the same program is run
+           several times on a Unix system, a different PID is returned every time.
+      }
+   }
+   \sstdiytopic{
+      References
+   }{
+      \sstitemlist{
+
+         \sstitem
+         POSIX standard (1988), section 4.1.1
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1991 Science \& Engineering Research Council
+   }
+}
+\sstroutine{
+   PSX\_GETPPID
+}{
+   Gets the process ID of the parent process
+}{
+   \sstdescription{
+      The routine obtains the process identification number of the parent
+      process and returns the value in PID.
+   }
+   \sstinvocation{
+      CALL PSX\_GETPPID( PID, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PID = INTEGER (Returned)
+      }{
+         The value of the process ID of the parent process.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given)
+      }{
+         The global status.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         CALL PSX\_GETPPID( PID, STATUS )
+      }{
+         This will return the value of the process ID of the parent process.
+         E.g. PID now has a value of 578814174
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If a program that calls this routine is run several times, then unlike
+           GETPID, it will always return the same process ID as all the processes
+           will have the same parent. However, on a VMS system, the PID that is
+           returned will be zero unless the program is running in a subprocess.
+      }
+   }
+   \sstdiytopic{
+      References
+   }{
+      \sstitemlist{
+
+         \sstitem
+         POSIX standard (1988), section 4.1.1
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1991 Science \& Engineering Research Council
+   }
+}
+\sstroutine{
+   PSX\_GETUID
+}{
+   Gets the real user ID
+}{
+   \sstdescription{
+      The routine obtains the real user identification number of the calling
+      process and returns the value in UID.
+   }
+   \sstinvocation{
+      CALL PSX\_GETUID( UID, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         UID = INTEGER (Returned)
+      }{
+         The value of the real user ID.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given)
+      }{
+         The global status.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         CALL PSX\_GETUID( UID, STATUS )
+      }{
+         This will return the value of the real user ID.
+         E.g. UID now has a value of 1.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         On a VMS system, PSX\_GETUID returns the member number of the
+            UIC, e.g. if the UIC is [16,25] then PSX\_GETUID will return a
+            value of 21.  Remember that UIC numbers are written as octal
+            numbers, not decimal.
+      }
+   }
+   \sstdiytopic{
+      References
+   }{
+      \sstitemlist{
+
+         \sstitem
+         POSIX standard (1988), section 4.2.1
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1991 Science \& Engineering Research Council
+   }
+}
+\sstroutine{
+   PSX\_ISATTY
+}{
+   Determine if a file is a terminal
+}{
+   \sstdescription{
+      Determine if FILDSC is a valid file descriptor associated with a
+      terminal. ISTTY is set to TRUE if the file descriptor is
+      associated with a terminal and FALSE otherwise.
+   }
+   \sstinvocation{
+      CALL PSX\_ISATTY( FILDSC, ISTTY, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         FILDSC = INTEGER (Given)
+      }{
+         The file descriptor, which is just an integer.
+      }
+      \sstsubsection{
+         ISTTY = LOGICAL (Returned)
+      }{
+         Is the file descriptor associated with a terminal?
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given)
+      }{
+         The global status.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         Is the standard input channel a terminal?
+      }{
+         CALL PSX\_ISATTY( 0, ISTTY, STATUS )
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         On Unix the standard file descriptors are 0,1,2, for stdin,
+            stdout and stderr, respectively. On VMS, these map to
+            SYS\$INPUT, SYS\$OUTPUT and SYS\$ERROR
+      }
+   }
+   \sstdiytopic{
+      References
+   }{
+      \sstitemlist{
+
+         \sstitem
+         POSIX standard (1988), section 4.7.2
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1991 Science \& Engineering Research Council
+   }
+}
+\sstroutine{
+   PSX\_LOCALTIME
+}{
+   Convert the value returned by PSX\_TIME to individual values
+}{
+   \sstdescription{
+      Convert the value returned by PSX\_TIME into a set of usable
+      numbers and a pointer to the corresponding C structure.
+   }
+   \sstinvocation{
+       CALL PSX\_LOCALTIME( NTICKS, SECS, MINS, HOURS, DAY, MONTH, YEAR,\\
+      :   WDAY, YDAY, ISDST, TSTRCT, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NTICKS = INTEGER (Given)
+      }{
+         The number of ticks since the start of the calendar.
+      }
+      \sstsubsection{
+         SECS = INTEGER (Returned)
+      }{
+         The number of seconds in the current time.
+      }
+      \sstsubsection{
+         MINS = INTEGER (Returned)
+      }{
+         The number of minutes in the current time.
+      }
+      \sstsubsection{
+         HOURS = INTEGER (Returned)
+      }{
+         The number of hours in the current time.
+      }
+      \sstsubsection{
+         DAY = INTEGER (Returned)
+      }{
+         The number of the day of the month.
+      }
+      \sstsubsection{
+         MONTH = INTEGER (Returned)
+      }{
+         The number of the month in the year.
+      }
+      \sstsubsection{
+         YEAR = INTEGER (Returned)
+      }{
+         The number of the year (last two digits).
+      }
+      \sstsubsection{
+         WDAY = INTEGER (Returned)
+      }{
+         The number of the day in the week.
+      }
+      \sstsubsection{
+         YDAY = INTEGER (Returned)
+      }{
+         The number of the day in the year.
+      }
+      \sstsubsection{
+         ISDST = INTEGER (Returned)
+      }{
+         Daylight savings time flag.
+      }
+      \sstsubsection{
+         TSTRCT = POINTER (Returned)
+      }{
+         A pointer to the C time structure.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The value of MONTH is 0 for January, 1 for February, etc. This
+            is to maintain compatibility with the C run time library.
+
+         \sstitem
+         The value of YDAY is 0 for the first of January, 1 for the
+            second of January, etc. This is to maintain compatibility with
+            the C run time library.
+
+         \sstitem
+         The value of WDAY is 0 for Sunday, 1 for Monday, etc.
+
+         \sstitem
+         The value of ISDST is 1 when daylight saving time is in effect,
+            0 when it is not and -1 when the information is not available.
+
+         \sstitem
+         The pointer TSTRCT points to the C structure that contains the
+            information about the time. This pointer is needed as it may be
+            passed on to other PSX routines.
+
+         \sstitem
+         TSTRCT is declared to be of type POINTER. This is usually
+            represented in FORTRAN as an integer, although any type that
+             uses the same amount of storage would be just as good.
+      }
+   }
+   \sstdiytopic{
+      References
+   }{
+      \sstitemlist{
+
+         \sstitem
+         POSIX standard (1988), section 4.2.1
+
+         \sstitem
+         ANSI C standard (1989), section 4.12.3.4
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1991 Science \& Engineering Research Council
+   }
+}
+\sstroutine{
+   PSX\_MALLOC
+}{
+   Allocate virtual memory
+}{
+   \sstdescription{
+      The routine allocates an amount of virtual memory specified by
+      SIZE. The unit of SIZE is the amount of storage required to store
+      a single character. A pointer to the allocated storage is
+      returned in PNTR. This pointer can be passed on to other
+      subroutines using the \%VAL construct. If the storage cannot be
+      allocated, then PNTR is set to zero, STATUS is set to PSX\_\_NOALL
+      and an error is reported.
+   }
+   \sstinvocation{
+      CALL PSX\_MALLOC( SIZE, PNTR, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         SIZE = INTEGER (Given)
+      }{
+         The amount of virtual memory to be allocated.
+      }
+      \sstsubsection{
+         PNTR = POINTER (Returned)
+      }{
+         A pointer to the allocated storage.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         Allocate 40 bytes and use this as a 10 element integer array.
+      }{
+         CALL PSX\_MALLOC( 40, PNTR, STATUS )\\
+         CALL SUB1( \%VAL(PNTR), 10 )\\
+            ...\\
+         SUBROUTINE SUB1( ARRAY, N )\\
+         INTEGER N\\
+         INTEGER ARRAY( N )\\
+            ...\\
+
+         The call to PSX\_MALLOC allocates forty bytes of storage. The
+         pointer to this storage is then passed to subroutine SUB1,
+         where it is accessed as an array of integers. Note that in
+         this case the program needs to know that an integer variable
+         is stored in four bytes. {\em This is not portable}. In such a case
+         it is better to use PSX\_CALLOC or to use the symbolic
+         constants NUM\_NB$<$T$>$ defined in the file PRM\_PAR to determine
+         the number of bytes per unit of storage. (See SUN/39 for a
+         description of these constants).
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Storage allocated by PSX\_MALLOC should be returned by a call to
+            PSX\_FREE when it is no longer needed.
+
+         \sstitem
+         PNTR is declared to be of type POINTER. This is usually
+            represented in FORTRAN as an integer, although any type that
+            uses the same amount of storage would be just as good.
+
+         \sstitem
+         If several calls to PSX\_MALLOC are made, the space returned by
+            each call is completely separate from that made by any other
+            call. In particular, the program should not assume that the
+            space returned by successive calls is contiguous.
+      }
+   }
+   \sstdiytopic{
+      References
+   }{
+      \sstitemlist{
+
+         \sstitem
+         POSIX standard (1988), section 8.1
+
+         \sstitem
+         ANSI C standard (1989), section 4.10.3.3
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1991 Science \& Engineering Research Council
+   }
+}
+\sstroutine{
+   PSX\_RAND
+}{
+   Generate a random number
+}{
+   \sstdescription{
+      Generate a random number. The number is generated as the integer
+      INUM. The maximum value that this may have is returned as MAXNUM.
+      Also the value of INUM divided by MAXNUM is returned as FNUM.
+   }
+   \sstinvocation{
+      CALL PSX\_RAND( INUM, MAXNUM, FNUM, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         INUM = INTEGER (Returned)
+      }{
+         The random (integer) number.
+      }
+      \sstsubsection{
+         MAXNUM = INTEGER (Returned)
+      }{
+         The maximum value that INUM may have.
+      }
+      \sstsubsection{
+         FNUM = REAL (Returned)
+      }{
+         The value INUM/MAXNUM.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         A seed for the random number generator may be set with
+            PSX\_SRAND.
+
+         \sstitem
+         The sequence of numbers generated by the operating system
+         service that is called by this routine is not always as random
+         as it should be. It is probably better to use a different
+         routine such as one of the NAG routines. This routine is
+         included here for completeness, though.
+      }
+   }
+   \sstdiytopic{
+      References
+   }{
+      \sstitemlist{
+
+         \sstitem
+         POSIX standard (1988), section 8.1
+
+         \sstitem
+         ANSI C standard (1989), section 4.10.2.1
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1991 Science \& Engineering Research Council
+   }
+}
+\sstroutine{
+   PSX\_REALLOC
+}{
+   Change the size of an allocated region of virtual memory
+}{
+   \sstdescription{
+      The routine changes the size of the region of virtual memory
+      pointed to by PNTR. The new size may be larger or smaller than
+      the old size. The contents of the object pointed to by PNTR
+      shall be unchanged up to the lesser of the old and new sizes.
+   }
+   \sstinvocation{
+      CALL PSX\_REALLOC( SIZE, PNTR, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         SIZE = INTEGER (Given)
+      }{
+         The new amount of virtual memory required
+      }
+      \sstsubsection{
+         PNTR = POINTER (Given and Returned)
+      }{
+         A pointer to the allocated storage
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given)
+      }{
+         The global status
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         Allocate 20 bytes of storage, then extend it to 40 bytes.
+      }{
+         CALL PSX\_MALLOC( 20, PNTR, STATUS )\\
+            ...\\
+         CALL PSX\_REALLOC( 40, PNTR, STATUS )\\
+         CALL SUB1( \%VAL(PNTR), 10 )\\
+            ...\\
+         SUBROUTINE SUB1( ARRAY, N )\\
+         INTEGER N\\
+         INTEGER ARRAY( N )\\
+           ...\\
+
+         The call to PSX\_MALLOC allocates twenty bytes of storage. The
+         subsequent call to PSX\_REALLOC extends this area to forty
+         bytes.  The pointer to this storage is then passed to
+         subroutine SUB1, where it is accessed as an array of integers.
+         Note that in this case the program needs to know that an
+         integer variable is stored in four bytes. {\em This is not
+         portable}. In such a case it is better to use the symbolic
+         constants NUM\_NB$<$T$>$ defined in the file PRM\_PAR to determine
+         the number of bytes per unit of storage. (See SUN/39 for a
+         description of these constants).
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Storage allocated by PSX\_REALLOC should be returned by a call
+            to PSX\_FREE when it is no longer needed.
+
+         \sstitem
+         PNTR is declared to be of type POINTER. This is usually
+            represented in FORTRAN as an integer, although any type that
+            uses the same amount of storage would be just as good.
+
+         \sstitem
+         If SIZE is zero, then the space pointed to by PNTR is freed.
+
+         \sstitem
+         If the space that PNTR pointed to has been deallocated by a
+            call to PSX\_FREE (or to PSX\_REALLOC with SIZE = 0), then it is
+            undefined whether the pointer can subsequently be used by
+            PSX\_REALLOC.  Consequently this should not be attempted, even
+            though it will work on some machines.
+      }
+   }
+      \sstdiytopic{
+      References
+   }{
+      \sstitemlist{
+
+         \sstitem
+         POSIX standard (1988), section 8.1
+
+         \sstitem
+         ANSI C standard (1989), section 4.10.3.4
+      }
+   }
+\sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1991 Science \& Engineering Research Council
+   }
+}
+\sstroutine{
+   PSX\_SRAND
+}{
+   Set the seed for the random number generator
+}{
+   \sstdescription{
+      The argument SEED is used to set a new seed for the sequence of
+      random numbers returned by the subroutine PSX\_RAND. If PSX\_SRAND
+      is called with the same value of SEED, then the values returned by
+      subsequent calls to PSX\_RAND will be the same. If PSX\_RAND is
+      called before calling PSX\_SRAND, then the sequence of random
+      number returned by PSX\_RAND will be the same as if PSX\_SRAND had
+      been called with SEED set to one.
+   }
+   \sstinvocation{
+      CALL PSX\_SRAND( SEED, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         SEED = INTEGER (Given)
+      }{
+         The seed for the random number generator.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The range of values allowed for SEED is not specified. It is
+            unlikely that values between 1 and the maximum integral value
+            that PSX\_RAND can return will cause problems.
+      }
+   }
+   \sstdiytopic{
+      References
+   }{
+      \sstitemlist{
+
+         \sstitem
+         POSIX standard (1988), section 8.1
+
+         \sstitem
+         ANSI C standard (1989), section 4.10.2.2
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1991 Science \& Engineering Research Council
+   }
+}
+\sstroutine{
+   PSX\_TIME
+}{
+   Get the current calendar time
+}{
+   \sstdescription{
+      Determine the current calendar time. The encoding of the value is
+      unspecified, but is the number of ticks since some date in the
+      past. If it is not possible to get the value of NTICKS, STATUS is
+      set to PSX\_\_NOTIM and an error is reported.
+   }
+   \sstinvocation{
+      CALL PSX\_TIME( NTICKS, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NTICKS = INTEGER (Returned)
+      }{
+         The current time.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         This routine is not directly useful in itself, but the value
+            returned in NTICKS can be passed to other routines that process
+            it further.
+      }
+   }
+   \sstdiytopic{
+      References
+   }{
+      \sstitemlist{
+
+         \sstitem
+         POSIX standard (1988), section 4.5.1
+
+         \sstitem
+         ANSI C standard (1989), section 4.12.2.4
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1991 Science \& Engineering Research Council
+   }
+}
+\sstroutine{
+   PSX\_TTYNAME
+}{
+   Get the name of the terminal
+}{
+   \sstdescription{
+      Get the name of the terminal attached to the given file descriptor.
+   }
+   \sstinvocation{
+      CALL PSX\_TTYNAME( FILDSC, TNAME, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         FILDSC = INTEGER (Given)
+      }{
+         The file descriptor.
+      }
+      \sstsubsection{
+         TNAME = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         The name of the terminal attached to FILDSC.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given)
+      }{
+         The global status.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         CALL PSX\_TTYNAME( 0, TNAME, STATUS )
+      }{
+         When run on a VAX/VMS system, this will return something like
+         "lta23:" (without the quotes).
+         Note the use of lower case.
+      }
+      \sstexamplesubsection{
+         CALL PSX\_TTYNAME( 0, TNAME, STATUS )
+      }{
+         When run on a unix system, this will return something like
+         "/dev/ttyp2" (without the quotes).
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If a terminal name is not found, then a blank string is
+            returned in TNAME.
+      }
+   }
+   \sstdiytopic{
+      External Routines Used
+   }{
+      cnf:
+         cnf\_exprt
+   }
+   \sstdiytopic{
+      VAX/VMS-specific features used
+   }{
+      \sstitemlist{
+
+         \sstitem
+         When used on a non-POSIX compliant VAX/VMS system, the value
+            of FILDSC is not used directly in finding the name of the
+            terminal. This is because the VMS version of the C run-time
+            library routine, ttyname(), does not accept any arguments.
+            Instead, if FILDSC is 0, 1 or 2, then the string returned in
+            TNAME is that given by calling ttyname, which translates the
+            logical name SYS\$INPUT. If FILDSC has some other value, then a
+            blank string is returned.
+      }
+   }
+   \sstdiytopic{
+      Known Changes Required
+   }{
+      \sstitemlist{
+
+         \sstitem
+          This routine should be modified when VMS becomes POSIX compliant.
+
+      }
+   }
+   \sstdiytopic{
+      References
+   }{
+      \sstitemlist{
+
+         \sstitem
+         POSIX standard (1988), section 4.7.2
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1991 Science \& Engineering Research Council
+   }
+}
+\sstroutine{
+   PSX\_UNAME
+}{
+   Gets information about the host computer system
+}{
+   \sstdescription{
+      The routine inquires about the operating system, the name of the computer
+      and the type of the hardware.
+      If an error is detected then STATUS is set to SAI\_\_ERROR and an error
+      is reported, although this should not happen.
+   }
+   \sstinvocation{
+      CALL PSX\_UNAME( SYSNAME, NODENAME, RELEASE, VERSION, MACHINE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         SYSNAME = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         Name of the operating system.
+      }
+      \sstsubsection{
+         NODENAME = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         Node name of the computer.
+      }
+      \sstsubsection{
+         RELEASE = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         Version of the operating system.
+      }
+      \sstsubsection{
+         VERSION = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         Sub-version of the operating system.
+      }
+      \sstsubsection{
+         MACHINE = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         Name of the hardware of the computer.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         CALL PSX\_UNAME( SYSNAME, NODENAME, RELEASE, VERSION, MACHINE, STATUS )
+      }{
+         When run on a SUN workstation, this will return values
+         something like
+\begin{itemize}
+\item[]                        \makebox[8.5em][l]{SYSNAME =}  SunOS
+\item[]                        \makebox[8.5em][l]{NODENAME =}  rlssp1
+\item[]                        \makebox[8.5em][l]{RELEASE =}   4.1.1
+\item[]                        \makebox[8.5em][l]{VERSION =}   1
+\item[]                        \makebox[8.5em][l]{MACHINE =}   sun4c
+\end{itemize}
+      }
+      \sstexamplesubsection{
+         CALL PSX\_UNAME( SYSNAME, NODENAME, RELEASE, VERSION, MACHINE,STATUS )
+      }{
+         When run on a DECstation, this will return values something like
+\begin{itemize}
+\item[]                        \makebox[8.5em][l]{SYSNAME =} ULTRIX
+\item[]                        \makebox[8.5em][l]{NODENAME =} rlsux1
+\item[]                        \makebox[8.5em][l]{RELEASE =} 4.0
+\item[]                        \makebox[8.5em][l]{VERSION =} 0
+\item[]                        \makebox[8.5em][l]{MACHINE =} RISC
+\end{itemize}
+      }
+      \sstexamplesubsection{
+         CALL PSX\_UNAME( SYSNAME, NODENAME, RELEASE, VERSION, MACHINE, STATUS )
+      }{
+         When run on VAX/VMS, this will return values something like
+\begin{itemize}
+\item[]                        \makebox[8.5em][l]{SYSNAME  =} VMS
+\item[]                        \makebox[8.5em][l]{NODENAME =} RLSVS2
+\item[]                        \makebox[8.5em][l]{RELEASE  =} V5.3
+\item[]                        \makebox[8.5em][l]{VERSION  =} V5.3-1
+\item[]                        \makebox[8.5em][l]{MACHINE  =} VAXstation 2000
+\end{itemize}
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         At present, there is no uname function provided by VMS, so the
+            executable code on VMS is different to that on a Unix system.
+            The information is obtained by a call to the system service GETSYIW.
+            This should change in the future, which may mean that the values
+            returned also change, e.g. SYSNAME might conceivably return VAX/VMS
+            instead of just VMS.
+
+         \sstitem
+         On VMS, the values returned for RELEASE and VERSION are not
+            the character representations of numbers as on other machines.
+            This may or may not change when VMS is POSIX compliant.
+      }
+   }
+   \sstdiytopic{
+      External Routines Used
+   }{
+      cnf:
+         cnf\_copyf, cnf\_exprt
+   }
+   \sstdiytopic{
+      Known Changes Required
+   }{
+      This routine should be modified when VMS becomes POSIX compliant.
+   }
+   \sstdiytopic{
+      References
+   }{
+      \sstitemlist{
+
+         \sstitem
+         POSIX standard (1988), section 4.4.1
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1991 Science \& Engineering Research Council
+   }
+}
+
+\end{small}
+
+\newpage
+\section{Routines that have not been implemented}
+\label{not-implelmented}
+
+This is an alphabetical list of POSIX routines that have been considered for
+implementation as PSX routines and have been rejected as unnecessary. Any
+routine that has not been implemented, yet is not in the following list has
+simply not yet been looked at and may well be done in the future.
+
+If you have a need for any routine that has not been implemented, for whatever
+the reason, then please contact the author of this document, who will endeavour
+to change this.
+
+\noteroutine{GETGROUPS}
+            {Get the supplementary group IDs of the calling process}
+\noteroutine{SETGID}
+            {Sets the real and effective group ID}
+\noteroutine{SETUID}
+            {Sets the real and effective user ID}
+
+
+\newpage
+\section{Notes for System Programmers}
+
+Although the PSX routines appear to the user as FORTRAN subroutines, they are
+actually written in C. The FORTRAN~--~C interface is handled by the macros and
+functions described in SGP/5. The use of these macros makes the source code
+sufficiently portable that it runs on all Starlink supported hardware
+platforms.
+
+Despite the fact that the routines are written in C, all character strings are
+returned as normal FORTRAN strings with trailing blanks.
+
+The PSX routines call the C run time library. Under VAX/VMS they occasionally
+call a system service. This latter feature will be replaced when VMS becomes
+POSIX compliant.
+
+The PSX routines report errors via EMS. While this is a standard feature of
+Starlink subroutine libraries, occasionally it will be necessary not to report
+errors via EMS. For example, if a PSX routine is used within EMS, and that PSX
+routine were to report an error then there is the potential for recursive error
+reports being generated. Also, if the PSX routines were needed on a non
+Starlink system, then EMS would not necessarily be present. To try to take
+account of these situations, the PSX routines actually call the internal
+routine psx1\_rep\_c to report an error. This normally calls err\_rep\_c to
+report an error, but could be re-coded where required.
+
+\section{Notes for System Managers}
+
+\subsection{VMS}
+
+The following logical names should be defined:
+
+\begin{small}
+\begin{tabbing}
+PSX\_DIR \hspace{6em}\= STARDISK:[STARLINK.LIB.PSX]\hspace{2em}\=The directory containing the software\\
+PSX\_ERR \> PSX\_DIR:PSX\_ERR.FOR \> The include file for FORTRAN programs \\
+PSX\_IMAGE \> PSX\_DIR:PSX\_IMAGE \> The shareable image \\
+PSX\_IMAGE\_ADAM \> PSX\_DIR:PSX\_IMAGE\_ADAM \> The ADAM version of the shareable image \\
+PSX\_LINK \> PSX\_DIR:PSX\_LINK \> The linker option file \\
+PSX\_LINK\_ADAM \> PSX\_DIR:PSX\_LINK\_ADAM \> The ADAM version of the linker option file
+\end{tabbing}
+\end{small}
+
+\end{document}

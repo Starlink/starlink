@@ -1,0 +1,2255 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {65.7}
+\newcommand{\stardocauthors}   {Nicholas Eaton}
+\newcommand{\stardocdate}      {4 May 1993}
+\newcommand{\stardoctitle}     {IDI \\[1.0ex]
+                                Image Display Interface\\[2.5ex]
+                                Version 1.6\\[1.0ex]
+                                Programmer's Guide}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+The Image Display Interface (IDI) is an international standard for
+displaying astronomical data on an image display. The specification of
+the interface is given in reference [1]. This guide is an introduction to
+programming with IDI, and describes the details of the current implementation.
+The user should refer to the specification document [1], for details of the
+subroutine calls.
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+\setlength{\parskip}{0mm}
+\tableofcontents
+\setlength{\parskip}{\medskipamount}
+\markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\newpage
+
+\section{Why Use IDI?}
+
+IDI is intended for those users (applications) that need to be able to
+manipulate images on an image display to a greater extent than is
+available with GKS and its offspring (e.g. PGPLOT). GKS allows an image to
+be displayed, its look-up table changed and a cursor to be moved over it.
+The most obvious advantage of IDI over GKS is that it allows the image
+to be scrolled and zoomed. Other differences that users may wish to exploit
+is the ability to blink images and to read back a representation of
+the whole display, which can then be used to obtain a hardcopy of it.
+
+IDI allows these functions to be programmed in a device independent way.
+Once IDI has been implemented for one device then the same program can
+run on the different devices just by supplying the appropriate device name
+to {\bf Open Display}, with the proviso that not all the routines have
+been implemented on all devices.
+
+This does not mean that IDI supercedes GKS. IDI was written to offer
+features not available in GKS. It does not have the sophistication of
+GKS for producing vector (line) plots or character annotation. IDI
+does have routines to draw lines and plot text, but these are primitive
+and offer the user little control over how the result will appear, in
+terms of character sizes, style of line widths etc.
+
+The major strength of IDI is the ability to perform many types of
+interaction using the mouse. This can be programmed to move the cursor,
+or the memories, rotate the look-up table, zoom up and down, blink the
+memories, or perform even more complex tasks by passing control back
+to the calling program.
+
+It should be noted that it is not possible to mix calls from GKS and IDI
+on the same display; the two packages use completely different models
+of the display. An application could, however, use the packages one after
+the other by utilising the Applications Graphics Interface (SUN/48) to
+mediate between them.
+
+
+\section{Summary of IDI calls}
+
+The following list gives all the top-level routines in the interface,
+however not all of them are implemented for each device.
+The first column in the table indicates which routines are available on
+which devices, an "i" indicates that the routine is implemented for an
+Ikon, and an "x" indicates that the routine is implemented for X-windows.
+A blank entry indicates that the routine is not currently implemented
+for any device, and an error status will be returned if such a routine
+is called. The routine arguments are defined in reference [1] and in the
+on-line help.
+
+\begin{tabbing}
+xxxx \= xxxxxxxxxxxxxx \= \kill
+\> \underline{Control}\\ [1.5ex]
+ix \> {\bf IIDOPN} \> ( devnam, dispid, status )\\
+                \> \> {\bf Open Display}\\ [1.5ex]
+ix \> {\bf IIDCLO} \> ( dispid, status )\\
+                \> \> {\bf Close Display}\\ [1.5ex]
+ix \> {\bf IIDRST} \> ( dispid, status )\\
+                \> \> {\bf Reset Display}\\ [1.5ex]
+ix \> {\bf IIDUPD} \> ( dispid, status )\\
+                \> \> {\bf Update Display}\\ [1.5ex]
+ix \> {\bf IIDERR} \> ( status, messag, meslen )\\
+                \> \> {\bf Get Error}\\ [1.5ex]
+\> \underline{Configuration}\\ [1.5ex]
+ix \> {\bf IIDQDV} \> ( dispid, nconf, xsize, ysize, depth, nvlut, nitt, ncurs,
+                        status )\\
+                \> \> {\bf Query Device Characteristics}\\ [1.5ex]
+ix \> {\bf IIDQCI} \> ( dispid, capid, narr, outarr, nout, status )\\
+                \> \> {\bf Query Capabilities Integer}\\ [1.5ex]
+ix \> {\bf IIDQCR} \> ( dispid, capid, narr, outarr, nout, status )\\
+                \> \> {\bf Query Capabilities Real}\\ [1.5ex]
+ix \> {\bf IIDQDC} \> ( dispid, nconf, memtyp, nmemax, modcon, memid, memsix,
+                        memsiy,\\
+                \> \> ~~memdep, ittdep, nmem, status )\\
+                \> \> {\bf Query Defined Configuration}\\ [1.5ex]
+ix \> {\bf IIDSEL} \> ( dispid, nconf, status )\\
+                \> \> {\bf Select Configuration}\\ [1.5ex]
+\> \underline{Memories}\\ [1.5ex]
+ix \> {\bf IIMSMV} \> ( dispid, memid, nmem, lvis, status )\\
+                \> \> {\bf Set Memory Visibility}\\ [1.5ex]
+ix \> {\bf IIZWSC} \> ( dispid, memid, nmem, xoff, yoff, status )\\
+                \> \> {\bf Write Memory Scroll}\\ [1.5ex]
+ix \> {\bf IIZWZM} \> ( dispid, memid, nmem, zoomf, status )\\
+                \> \> {\bf Write Memory Zoom}\\ [1.5ex]
+ix \> {\bf IIZRSZ} \> ( dispid, memid, xoff, yoff, zoomf, status )\\
+                \> \> {\bf Read Memory Scroll and Zoom}\\ [1.5ex]
+ix \> {\bf IIMSLT} \> ( dispid, memid, lutnum, ittnum, status )\\
+                \> \> {\bf Select Memory Look-up Tables}\\ [1.5ex]
+   \> {\bf IIMSDP} \> ( dispid, memid, nmem, lutflg, ittflg, status )\\
+                \> \> {\bf Select Display Path}\\ [1.5ex]
+ix \> {\bf IIMWMY} \> ( dispid, memid, image, npix, depth, pack, xstart, ystart,
+                        status )\\
+                \> \> {\bf Write Memory}\\ [1.5ex]
+ix \> {\bf IIMCMY} \> ( dispid, memid, nmem, back, status )\\
+                \> \> {\bf Clear Memory}\\ [1.5ex]
+ix \> {\bf IIMRMY} \> ( dispid, memid, npix, xstart, ystart, depth, pack, itton,
+                        image, status )\\
+                \> \> {\bf Read Memory}\\ [1.5ex]
+ix \> {\bf IIMSTW} \> ( dispid, memid, direcn, xsize, ysize, depth, xoff, yoff,
+                        status )\\
+                \> \> {\bf Set Transfer Window}\\ [1.5ex]
+\end{tabbing}
+\begin{tabbing}
+xxxx \= xxxxxxxxxxxxxx \= \kill
+\> \underline{Graphics}\\ [1.5ex]
+ix \> {\bf IIGPLY} \> ( dispid, memid, x, y, nxy, color, lstyle, status )\\
+                \> \> {\bf Polyline}\\ [1.5ex]
+ix \> {\bf IIGTXT} \> ( dispid, memid, text, xpos, ypos, tpath, tangle, color,
+                        tsize, status )\\
+                \> \> {\bf Plot Text}\\ [1.5ex]
+\> \underline{Look-up Table}\\ [1.5ex]
+~x \> {\bf IILWIT} \> ( dispid, memid, ittnum, start, nent, itt, status )\\
+                \> \> {\bf Write Intensity Transformation Table}\\ [1.5ex]
+~x \> {\bf IILRIT} \> ( dispid, memid, ittnum, start, nent, itt, status )\\
+                \> \> {\bf Read Intensity Transformation Table}\\ [1.5ex]
+ix \> {\bf IILWLT} \> ( dispid, lutnum, start, nent, vlut, status )\\
+                \> \> {\bf Write Video Look-up Table}\\ [1.5ex]
+ix \> {\bf IILRLT} \> ( dispid, lutnum, start, nent, vlut, status )\\
+                \> \> {\bf Read Video Look-up Table}\\ [1.5ex]
+\> \underline{Zoom and Pan}\\ [1.5ex]
+ix \> {\bf IIZWZP} \> ( dispid, xoff, yoff, zoomf, status )\\
+                \> \> {\bf Write Display Zoom and Pan}\\ [1.5ex]
+ix \> {\bf IIZRZP} \> ( dispid, xoff, yoff, zoomf, status )\\
+                \> \> {\bf Read Display Zoom and Pan}\\ [1.5ex]
+\> \underline{Cursor}\\ [1.5ex]
+ix \> {\bf IICINC} \> ( dispid, memid, numcur, shape, color, xc, yc, status )\\
+                \> \> {\bf Initialize Cursor}\\ [1.5ex]
+ix \> {\bf IICSCV} \> ( dispid, numcur, lvis, status )\\
+                \> \> {\bf Set Cursor Visibility}\\ [1.5ex]
+ix \> {\bf IICRCP} \> ( dispid, inmid, numcur, xc, yc, outmid, status )\\
+                \> \> {\bf Read Cursor Position}\\ [1.5ex]
+ix \> {\bf IICWCP} \> ( dispid, memid, numcur, xc, yc, status )\\
+                \> \> {\bf Write Cursor Position}\\ [1.5ex]
+\> \underline{Region of Interest}\\ [1.5ex]
+ix \> {\bf IIRINR} \> ( dispid, memid, roicol, xmin, ymin, xmax, ymax, roiid,
+                        status )\\
+                \> \> {\bf Initialize Rectangular Region of Interest}\\ [1.5ex]
+ix \> {\bf IIRSRV} \> ( dispid, roiid, lvis, status )\\
+                \> \> {\bf Set Visibility Rectangular Region of Interest}\\
+                      [1.5ex]
+ix \> {\bf IIRRRI} \> ( dispid, inmid, roiid, xmin, ymin, xmax, ymax, outmid,
+                        status )\\
+                \> \> {\bf Read Rectangular Region of Interest}\\ [1.5ex]
+ix \> {\bf IIRWRI} \> ( dispid, memid, roiid, xmin, ymin, xmax, ymax, status )\\
+                \> \> {\bf Write Rectangular Region of Interest}\\
+\> \underline{Interaction}\\ [1.5ex]
+ix \> {\bf IIIENI} \> ( dispid, intty, intid, objty, objid, intop, extrn,
+                        status )\\
+                \> \> {\bf Enable Interaction}\\ [1.5ex]
+ix \> {\bf IIIEIW} \> ( dispid, trigs, status )\\
+                \> \> {\bf Execute Interaction and Wait}\\ [1.5ex]
+ix \> {\bf IIISTI} \> ( dispid, status )\\
+                \> \> {\bf Stop Interactive Input}\\ [1.5ex]
+ix \> {\bf IIIQID} \> ( dispid, intty, intid, messag, meslen, status )\\
+                \> \> {\bf Query Interactor Description}\\ [1.5ex]
+ix \> {\bf IIIGLD} \> ( dispid, locnum, dx. dy, status )\\
+                \> \> {\bf Get Locator Displacement}\\ [1.5ex]
+   \> {\bf IIIGIE} \> ( dispid, evlnum, ival, status )\\
+                \> \> {\bf Get Integer Evaluator}\\ [1.5ex]
+   \> {\bf IIIGRE} \> ( dispid, evlnum, rval, status )\\
+                \> \> {\bf Get Real Evaluator}\\ [1.5ex]
+   \> {\bf IIIGLE} \> ( dispid, evlnum, lval, status )\\
+                \> \> {\bf Get Logical Evaluator}\\ [1.5ex]
+   \> {\bf IIIGSE} \> ( dispid, evlnum, sval, slen, status )\\
+                \> \> {\bf Get String Evaluator}\\ [1.5ex]
+\> \underline{Miscellaneous routines}\\ [1.5ex]
+ix \> {\bf IIDSNP} \> ( dispid, cmode, npix, xstart, ystart, depth, pack, image,
+                        status )\\
+                \> \> {\bf Create Snapshot}\\ [1.5ex]
+i  \> {\bf IIMBLM} \> ( dispid, memid, nmem, blinks, status )\\
+                \> \> {\bf Blink Memories}\\ [1.5ex]
+   \> {\bf IIDSSS} \> ( dispid, memid, xoff, yoff, splitf, splitx, splity,
+                        status )\\
+                \> \> {\bf Set Split Screen}\\ [1.5ex]
+~x \> {\bf IILSBV} \> ( dispid, memid, lvis, status )\\
+                \> \> {\bf Set Intensity Bar Visibility}\\ [1.5ex]
+   \> {\bf IIDIAG} \> ( dispid, outid, status )\\
+                \> \> {\bf Diagnostic Routine}\\ [1.5ex]
+   \> {\bf IIEGEP} \> ( dispid, buflen, buffer, status )\\
+                \> \> {\bf Get Escape Parameter}\\ [1.5ex]
+   \> {\bf IIEPEP} \> ( dispid, buflen, buffer, status )\\
+                \> \> {\bf Put Escape Parameter}\\ [1.5ex]
+\> \underline{Workstation interface}\\ [1.5ex]
+~x \> {\bf IIDENC} \> ( dispid, status )\\
+                \> \> {\bf Enable Configuration}\\ [1.5ex]
+~x \> {\bf IIDAMY} \> ( dispid, xsize, ysize, depth, memtyp, memid, status )\\
+                \> \> {\bf Allocate Memory}\\ [1.5ex]
+~x \> {\bf IIDSTC} \> ( dispid, nconf, status )\\
+                \> \> {\bf Stop Configuration}\\ [1.5ex]
+~x \> {\bf IIDRLC} \> ( dispid, nconf, status )\\
+                \> \> {\bf Release Configuration}\\ [1.5ex]
+\> \underline{Additional routines}\\ [1.5ex]
+ix  \> {\bf IDI\_CLRFG} \> ( iflag )\\
+                \> \> {\bf Set clear flag}\\ [1.5ex]
+ix \> {\bf IDI\_ANNUL} \> ( dispid, status )\\
+                \> \> {\bf Annul display in the ADAM environment}\\ [1.5ex]
+ix \> {\bf IDI\_ASSOC} \> ( pname, acmode, dispid, status )\\
+                \> \> {\bf Associate display in the ADAM environment}\\ [1.5ex]
+ix \> {\bf IDI\_CANCL} \> ( pname, status )\\
+                \> \> {\bf Cancel display parameter in the ADAM environment}\\
+                      [1.5ex]
+\end{tabbing}
+
+\subsection{Control}
+
+\subsubsection{Opening and Closing IDI}
+
+All programs using IDI to perform graphics I/O on a device have to begin and
+end the IDI sections with calls to {\bf Open Display} and {\bf Close Display}.
+If the program is an ADAM task then these two calls have to be replaced by
+appropriate calls to IDI\_ASSOC and IDI\_CANCL or IDI\_ANNUL (see Appendix
+\ref{se:apg} for more details on these functions).
+
+More than one device can be open at a time, each needing separate calls
+to {\bf Open Display} and {\bf Close Display}. The devices are selected
+by the unique identifier returned from {\bf Open Display}, and these
+identifiers should not be tampered with. Device selection is achieved by
+passing the relevant device identifier to subsequent IDI routines.
+
+By default IDI does not reset the display when the device is opened.
+This enables applications using IDI to manipulate pictures drawn by
+other applications. If an application requires the device to be in its
+default state then an explicit call to {\bf Reset Display} is required.
+
+As an example consider an application that is drawing a picture from
+afresh, and therefore wants the device reset at the beginning. If the
+application is an ADAM task IDI is opened using
+\begin{small}
+\begin{verbatim}
+      CALL IDI_ASSOC( 'DEVICE', 'WRITE', ID, STATUS )
+\end{verbatim}
+\end{small}
+where 'DEVICE' is the name of a parameter in the interface file
+through which the name of the device is obtained. The access mode
+is set to 'WRITE' which forces a reset of the device, the other
+possibilities 'READ' and 'UPDATE' leave the device as it was found.
+The third argument is the display identifier which is returned from
+the routine, and is used in subsequent IDI calls to direct operations
+to this device. The status argument is an integer which indicates if
+any problems have occurred.
+
+In a non-ADAM application the same effect is achieved with
+\begin{small}
+\begin{verbatim}
+      CALL IIDOPN( DNAME, ID, STATUS )
+      CALL IIDRST( ID, STATUS )
+\end{verbatim}
+\end{small}
+where DNAME is a string containing the name of the device, corresponding
+to an entry in the file GNS\_IDINAMES. The display identifier returned
+from {\bf Open Display} is passed to {\bf Reset Display} to indicate
+that this is the device to reset.
+
+To enable IDI to operate on a previously drawn display then the context,
+things like look-up table entries and zoom factors, has to be obtained.
+Depending on the capabilities of a device this context is read either
+from the device itself, or from a database file. If the previous state
+cannot be recovered then the display is reset to a default state. The
+routine IDI\_CLRFG (see appendix \ref{se:scf}) should be used to inform IDI
+if it is expected that a complete recovery of the context is not possible.
+Currently this flag only affects the behaviour of the Ikon, the X-driver
+ignores any setting.
+
+\subsubsection{Buffering}
+
+For efficiency IDI can save up its output and send it to the graphics
+device in batches. There may be occasions, therefore, when the device does
+not have the complete picture displayed. To force the program to flush the
+output buffer a call to {\bf Update Display} is required:
+\begin{small}
+\begin{verbatim}
+      CALL IIDUPD( ID, STATUS )
+\end{verbatim}
+\end{small}
+
+Quite often IDI will automatically flush the output buffer, for example
+when the buffer is full, when the program is reading from the display,
+or when using the mouse. The output buffer is also flushed when IDI is closed
+down so that the picture is guaranteed to be complete after a call to
+{\bf Close Display}.
+
+\subsubsection{Error messages}
+
+IDI returns error status values when it cannot complete a requested
+function satisfactorily. These status values can be converted into
+error messages by calling {\bf Get Error}:
+\begin{small}
+\begin{verbatim}
+      CALL IIDERR( STATUS, MESSAG, MESLEN )
+\end{verbatim}
+\end{small}
+The first argument is the integer status value returned from an IDI
+routine, and the string containing the error message is returned in
+the second argument. If the status value is not defined then a blank
+string is returned from this routine.
+
+IDI does not use the usual Starlink concept of inherited status. The
+status value passed to each routine is initialised to IDI\_\_OK (=~0)
+at the beginning of each routine. This puts the onus on the applications
+programmer to provide sufficient status checks to locate the source of
+any problem. If an application is using an
+inherited status scheme it is probably best to pass a local status
+variable to the IDI routines, and if an error occurs copy this to the
+inherited status of the calling routine, or deal with the error in some
+other way.
+
+\subsection{Memories}
+
+IDI uses memories as its drawing board. The memories can be considered to
+be rectangular areas of pixels held internally in the display device.
+The manner in which these memories appear on the screen is also controlled
+by IDI.
+An image is displayed on a device by loading the pixel values into a memory.
+The pixel values are an array of unsigned integers in the range 0 to
+$2^{depth}-1$ where $depth$ is the memory depth (bits per pixel). Any
+values that exceed the maximum are truncated by discarding the most
+significant bits. The memory can be displayed
+at different positions or with different zoom factors, and the colour
+representation of the image can be altered by changing the display path
+(see below).
+
+Images are loaded into a memory using {\bf Write Memory} and they can be
+read back from a memory using {\bf Read Memory}. Images do not have to
+fill the whole memory and the selection of a section of memory to write
+to is achieved using {\bf Set Transfer Window}. A transfer window is a
+rectangular sub-section of memory and the process of writing or reading
+an image employs the transfer window to define which part of the
+memory is to be used. If required the image
+loading can begin in the middle of a row. A memory is cleared by
+filling the memory with a constant value (usually zero) using the
+routine {\bf Clear Memory}.
+
+Writing an image into memory with {\bf Write Memory} does not
+guarantee that the image will appear on the display. Although this
+may happen with some devices it should not be relied upon, and a
+call to {\bf Set Memory Visibility} should be used to ensure
+consistent behaviour.
+
+Suppose an application wants to display an image, having NX and NY
+pixels along each axis, in the bottom left corner of the memory.
+The application has already checked that the memory is big
+enough to accept the image, but the size and shape of the image may
+not match the size and shape of the memory. A transfer window is
+therefore set up to match the size of the image and located at the
+bottom left of the memory.
+\begin{small}
+\begin{verbatim}
+      DIRECN = 0
+      XOFF = 0
+      YOFF = 0
+      CALL IIMSTW( ID, MEMID, DIRECN, NX, NY, DEPTH, XOFF, YOFF, STATUS )
+\end{verbatim}
+\end{small}
+The memory identifier (MEMID) is used to select one memory from those
+available on the current configuration. A list of available memory
+identifiers can be obtained from {\bf Query Defined Configuration}
+as shown below. The load direction (DIRECN=0) indicates that the image
+is to be loaded from bottom to top. In this case the size of the transfer
+window is made to match the size of the image (NX, NY). The X and Y
+offsets (XOFF, YOFF) indicate where the origin of the transfer window
+is with respect to the origin of the memory. The depth
+argument (DEPTH) specifies the expected number of significant bits
+for each pixel in the input data stream (e.g. data in the range 0 to
+255 is stored in eight bits). If this does not exactly match the
+depth of the memory then data truncation or padding will occur.
+
+The image is injected into the pixel memory using {\bf Write Memory}.
+\begin{small}
+\begin{verbatim}
+      XSTART = 0
+      YSTART = 0
+      NPIX = NX * NY
+      CALL IIMWMY( ID, MEMID, PIXDAT, NPIX, DEPTH, PACK,
+     :             XSTART, YSTART, STATUS )
+\end{verbatim}
+\end{small}
+The pixel values are stored in the integer input data array (PIXDAT)
+as a contiguous stream, and the number of pixels to draw is given by
+NPIX. The data depth (DEPTH) and packing factor (PACK) indicate how
+individual pixel values are stored in the integer elements of the
+input array. For instance if the integer word is 32 bits long and
+the pixel values only have 8 significant bits, then it is possible
+to store four pixel values in each integer (DEPTH=8, PACK=4).
+Although this type of packing will save space it will probably not
+improve plotting times, and so there is no advantage in programs
+changing the packing of the data themselves. Of course if the data
+is stored externally in packed form then this feature enables the data
+to be displayed without having to unpack it first. The start position
+(XSTART, YSTART) indicates where, with respect to the origin of the
+transfer window, the first pixel in the data stream is to appear.
+Subsequent pixels are placed to the right of this one until the edge
+of the transfer window is reached when a new row of pixels is started.
+If the size of the transfer window does not match the size of the
+image then the line breaks will not appear in the correct place and
+the image will appear skewed.
+
+The final stage of displaying the image is to make the memory visible.
+This is done with the routine {\bf Set Memory Visibility}.
+\begin{small}
+\begin{verbatim}
+      NMEM = 1
+      VIS = 1
+      CALL IIMSMV( ID, MEMID, NMEM, VIS, STATUS )
+\end{verbatim}
+\end{small}
+This routine takes an array of memory identifiers as its input, so
+that more than one memory can be made visible at once, but this example
+only uses the one memory. The visibility (VIS) is a logical value which
+takes the value TRUE to make the memory visible, and FALSE to make
+the memory invisible. The IDI specification defines these logical
+values to be integers having the value zero (FALSE) and non-zero
+(TRUE).
+
+The display path essentially chooses which intensity transformation
+table and which look-up table (discussed below) will be used to display
+the image. The intensity transformation table and look-up table converts
+the integer values stored in the memory into colours on the screen.
+If more than one of these tables is available then the bindings
+of the tables to the memories can be changed using
+{\bf Select Memory Look-up Tables}.
+
+The position and zoom factor of the memory on the screen can be altered
+using the routines {\bf Write Memory Scroll} and {\bf Write Memory Zoom}.
+These routines are non-interactive and the amount of scroll and zoom
+is set by the input arguments.
+A zoom factor of 0 means no zoom, a zoom factor of 1 means zoom once
+(double the size) etc. Negative zooms may be supported on some
+devices and a zoom factor of -1 means unzoom once (half the size) etc.
+Scroll offsets are given in pixel units with positive values moving
+the image to the right and up. Like {\bf Set Memory Visibility}
+these two routines take a list of memories as their input so that
+more than one memory can be operated on with one call, if required.
+A program can inquire the current scroll and zoom settings with
+{\bf Read Memory Scroll and Zoom}. This routine can be used
+after an interactive operation to inquire what the final values of
+any scroll and zoom are.
+
+Two memories can be blinked (alternately displayed) using the routine
+{\bf Blink Memories}. When this routine is called the blinking begins
+immediately and continues until the right hand mouse button is pressed.
+The speed of the blink is initially set by the input argument to the
+routine, but can be subsequently changed using the left and centre
+mouse buttons. See the section in the Ikon implementation notes for
+more details.
+
+\subsection{Configuration}
+
+The device configuration defines the various capabilities of the device,
+such as the number of memories, their sizes and their depths, the
+number of look-up tables etc. A device may have more than one
+configuration, for example a device with a fixed address space
+may have one configuration having one memory which fills the available
+space and another configuration that has several smaller memories
+allocating the space between them. There are a number of inquiry routines
+that allow the program to find out various parameters of a given
+configuration. The inquiries can be used to find out about configurations
+other than the current one to see if one may be more suitable for the
+program's requirement. {\bf Query Defined Configuration} gives details
+of the requested configuration.
+
+If there is more than one configuration available on a device then the
+routine {\bf Select Configuration} will implement the chosen one.
+
+{\bf Query Device Characteristics} gives details of the basic set up
+of the device, such as the size of the display in pixels, the number
+of configurations available, the number of look-up tables and the number
+of cursors. More detailed inquiries of the capabilities and current
+settings for the device can be obtained with {\bf Query Capabilities
+Integer} and {\bf Query Capabilities Real}.
+Appendix \ref{se:qcn} gives details of the available capabilities. Note that
+some of the capabilities are arrays of numbers and so the array arguments
+should be dimensioned large enough to accommodate the returns, otherwise the
+information returned will be incomplete. A global variable IDI\_\_MAXCP
+has been supplied which can be used to dimension the array and is
+as large as any capability on any implemented device. This is defined
+in the include file IDI\_PAR. Examples of using
+{\bf Query Capabilities Integer} can be found in the test program
+in appendix \ref{se:exp}.
+
+As an example of searching for a suitable configuration consider an
+application that requires a minimum size (MEMINX, MEMINY) for an
+image memory. The first call is to {\bf Query Device Characteristics}
+to establish, amongst other things, the number of configurations
+available which is returned in the second argument.
+\begin{small}
+\begin{verbatim}
+      CALL IIDQDV( ID, NUMCON, DXSIZE, DYSIZE, DDEPTH, NLUT, NITT,
+     :             NCURS, STATUS )
+\end{verbatim}
+\end{small}
+As before the first argument is the display identifier returned from
+{\bf Open Display}. The other arguments return the display size and
+depth, the number of look-up tables, the number of intensity
+transformation tables and the number of cursors.
+
+The application then examines each configuration in turn using
+{\bf Query Defined Configuration} to establish the size of the memories,
+returned in the seventh and eighth arguments.
+\begin{small}
+\begin{verbatim}
+*   Want information on image memories, so memory type = 1
+      MEMTYP = 1
+
+*   Examine each configuration in turn, starting from configuration 0
+      NCONF = 0
+  10  CONTINUE
+      IF ( NCONF .LT. NUMCON ) THEN
+         CALL IIDQDC( ID, NCONF, MEMTYP, IMAXCP, MODCON, MEMIDS,
+     :                MEMSIX, MEMSIY, MEMDEP, ITTDEP, NMEM, STATUS )
+
+*   Examine each memory in turn
+         M = 0
+  20     CONTINUE
+         IF ( M .LT. NMEM ) THEN
+            M = M + 1
+
+*   Check the memory size against the required one
+            IF ( ( MEMSIX( M ) .GE. MEMINX ) .AND.
+     :           ( MEMSIY( M ) .GE. MEMINY ) ) GOTO 30
+            GOTO 20
+         ENDIF
+
+*   Increment the configuration loop counter
+         NCONF = NCONF + 1
+         GOTO 10
+      ENDIF
+
+*   If this point is reached then have not found a suitable memory
+*   so abort the program
+      GOTO 99
+
+*   A suitable memory has been found with configuration number NCONF
+  30  CONTINUE
+\end{verbatim}
+\end{small}
+
+The memory type argument (MEMTYP) is used to indicate which type of memory
+the routine {\bf Query Defined Configuration} will return information on.
+The choices are image memories (1), text memories (2) or graphics
+memories (4).
+
+As with most IDI identifiers the configuration identifiers (NCONF)
+start from zero and go up to one less than the number of configurations
+(NUMCON-1).
+
+The information is returned from {\bf Query Defined Configuration} in
+integer arrays having one entry per memory in the configuration. The
+size of the arrays can be dimensioned using the global variable
+(IDI\_\_MAXCP) since memory lists form part of the capability inquiries.
+The actual number of memories in the configuration is given by the output
+argument (NMEM). Each memory is examined in turn to see if it fulfills
+the size criterion.
+
+The output list of memory identifiers (MEMIDS) contains the values to
+be used to identify a particular memory for subsequent IDI routines,
+in the way that the display identifier selects a particular device.
+The other arguments returned from {\bf Query Defined Configuration}
+are the memory depths, the intensity transformation table depths and
+the configuration mode (MODCON) which indicates if the device is set
+up for monochrome (0), pseudo-colour (1) or true-colour (2) display.
+
+The final stage of the example is to remember which memory was chosen
+and to load the appropriate configuration into the device.
+\begin{small}
+\begin{verbatim}
+*   A suitable memory has been found with configuration number NCONF
+  30  CONTINUE
+
+*   Obtain the memory identifier of the chosen memory
+      MEMID = MEMIDS( M )
+
+*   Select the appropriate configuration
+      CALL IIDSEL( ID, NCONF, STATUS )
+\end{verbatim}
+\end{small}
+
+\subsection{Graphics}
+
+IDI offers two primitive graphics functions to allow for annotation of an
+image. The routine {\bf Polyline} will draw a line connecting a sequence
+of given points. The routine {\bf Plot Text} will draw text, in one of
+up to four sizes, at a given position and at a given angle. Depending on
+the capabilities of a device either of these
+routines may overwrite the pixel values of the given memories, and any
+existing data at these locations will be lost.
+The appearance of the text (font style and size in pixels) can differ
+from device to device, because the IDI specification does not define
+its own fonts and allows implementors to make use of any hardware
+facilities. The call to {\bf Plot Text} is as follows:
+\begin{small}
+\begin{verbatim}
+      CALL IIGTXT( ID, MEMID, STRING, XPOS, YPOS, TPATH, TANGLE,
+     :             COLOR, TSIZE, STATUS )
+\end{verbatim}
+\end{small}
+The text to be drawn is passed in the third argument (STRING). The
+position of the text is given by the next two arguments (XPOS, YPOS)
+which define the offset of the bottom left corner of the first
+character with respect to the memory origin. The text path (TPATH)
+defines if the text is to run horizontally, vertically or back to front,
+and the orientation of the string (TANGLE) turns the string the given
+number of degrees clockwise. Some implementations may only offer the
+default values (0) for both these arguments with the result that the
+text will only appear horizontally running from left to right.
+Depending on the type of memory the colour argument (COLOR) is either
+one of the set of predefined values or is an index into the current
+look-up table. The text size (TSIZE) is defined imprecisely and takes
+one of four values, normal (0), large (1), very large (2) or small (3).
+The values other than the default (0) may not be implemented.
+
+The routine {\bf Create Snapshot} will return a picture of the display
+screen in an integer array. It differs from {\bf Read Memory} in that it
+does not just return the pixel values from one memory, but takes account
+of all memories visible on the screen, and at each pixel location returns
+the value from the memory which is visible at that point. It works on the
+principle of what you see is what you get, and thus the look-up tables
+currently displayed are used to transform the pixel values into a value
+representing the colour. For pseudo-colour devices the displayed colour
+is transformed onto a single scale using the following fractions of each
+primary colour $ 0.30 * Red + 0.59 * Green + 0.11 * Blue $.
+The call to {\bf Create Snapshot} is as follows:
+\begin{small}
+\begin{verbatim}
+      CALL IIDSNP( ID, CMODE, NPIX, XSTART, YSTART, DEPTH, PACK,
+     :             IMDAT, STATUS )
+\end{verbatim}
+\end{small}
+The colour mode (CMODE) is zero for a pseudo-colour or monochrome device.
+The position arguments (XSTART, YSTART) define the start position
+with respect to the origin of the current transfer window.
+The given number of pixels (NPIX) are read out sequentially
+from the current transfer window, with line breaks occurring at the
+right hand edge of the window.
+The data depth (DEPTH) and packing factor (PACK) indicate how
+the pixel values are to be stored in the integer elements of the output
+array (IMDAT).
+
+\subsection{Look-up Table}
+
+A pixel value is converted into a spot of colour on the screen in two
+stages. The pixel value is used as an index into the intensity
+transformation array. This table has one entry for each possible
+pixel value, with the pixel values in the range 0 to $2^{depth}-1$
+where $depth$ is the memory depth (bits per pixel). Each entry in
+this table contains an index into another array, the look-up table,
+which gives the proportion of red, green and blue used to make the
+spot of colour. If the number of entries in the look-up table matches
+the number of entries in the intensity transformation table, then the
+default intensity transformation table contains a linear mapping, which
+means that the pixel values point directly into the look-up table. If the
+tables are of different length, then the default mapping will scale
+linearly between the two.
+
+The default look-up table is a linear grey scale, but this can be changed
+by sending a new look-up table with {\bf Write Video Look-up Table}.
+To preserve device independence the look-up table entries are stored
+in a real array with values ranging from 0.0 to 1.0, where the latter
+indicates the maximum intensity on the device. As an example consider
+changing one of the screen colours to magenta. The look-up table array
+is most conveniently defined as a 2-dimensional real array having 3
+elements in its first dimension and the number of colour entries in the
+second.
+\begin{small}
+\begin{verbatim}
+*   Dimension the array of colours, in this example length = 1
+      REAL VLUT( 3, 1 )
+
+*   Define the number of entries and the red, green and blue intensities
+      NENT = 1
+      VLUT( 1, NENT ) = 1.0
+      VLUT( 2, NENT ) = 0.0
+      VLUT( 3, NENT ) = 1.0
+
+*   Load the colour into the look-up table
+      CALL IILWLT( ID, LUTNUM, START, NENT, VLUT, STATUS )
+\end{verbatim}
+\end{small}
+
+The look-up table number (LUTNUM) defines which of the available
+look-up tables to use. The number of available look-up tables can be
+inquired using {\bf Query Device Characteristics} or {\bf Query
+Capabilities Integer}. The look-up table
+is updated starting at the entry defined by the third argument
+(START), which in this example corresponds to the index of the
+one colour to change, and continues until the given number of
+colours (NENT) has been loaded.
+
+Any memory that uses this look-up table will be updated when the new
+look-up table is sent. The bindings of memories to look-up tables can
+be changed with {\bf Select Memory Look-up Tables}.
+
+The look-up tables can be read back using {\bf Read Video Look-up Table}.
+
+\subsection{Zoom and Pan}
+
+All the memories on the screen can be zoomed and panned together using
+{\bf Write Display Zoom and Pan}. This saves the effort of having to set
+the zoom and scrolls for all the memories individually using {\bf Write
+Memory Scroll} and {\bf Write Memory Zoom}. These display settings can be
+read back using {\bf Read Display Zoom and Pan}.
+A zoom factor of 0 means no zoom, a zoom factor of 1 means zoom once
+(double the size) etc. Negative zooms may be supported on some
+devices and a zoom factor of -1 means unzoom once (half the size) etc.
+Scroll offsets are given in pixel units with positive values moving
+the image to the right and up.
+
+\subsection{Interaction}
+
+The interactions possible with IDI give the user the greatest scope for
+making use of the image display in an interactive application. The
+device which controls the interactions is known as the {\it interactor}
+and corresponds to a mouse or trackerball, or some similar object.
+An interactor such as a mouse or trackerball is considered to have two
+components; the part which controls the two-dimensional movement is
+known as the {\it locator}, and the buttons are known as {\it triggers}.
+
+All interactions are controlled by two basic routines. {\bf Enable
+Interaction} sets up one interaction per call. If more than one
+interaction is required then this routine has to be called again with
+the appropriate arguments. The routine {\bf Execute Interaction and
+Wait} executes all the current interactions and continues until an exit
+trigger is pressed. An exit trigger is one of the interactor buttons that
+is defined in {\bf Enable Interaction} to stop that particular interaction.
+The exit trigger is therefore a stop button which disables the interaction
+and returns control to the program.
+If more than one interaction is defined, for example scrolling and zooming
+the memory, then it is usual to define the same trigger to be the exit
+trigger for all interactions.
+
+It is possible to set up more than one interaction to be simultaneously
+using the same interactor component, for example the locator (mouse)
+could be used to scroll the memory and rotate the look-up table at the
+same time, although the effect would be pretty nauseous.
+
+The interactions are defined by two components, the first defines the
+action to be done, such as move or zoom, and the second defines the object
+that this action is to be done to, such as cursor or memory.
+The interaction cross reference tables (see appendix \ref{se:iin} and
+\ref{se:xin}) show which actions on which objects are possible for a given
+device. Clearly some of the possibilities are meaningless, such as rotate
+display or zoom look-up table, and any attempt to perform such interactions
+will result in an error.
+
+Examples of setting up interactions are shown in the following section on
+regions of interest and in the example program (appendix \ref{se:exp}).
+
+The routine {\bf Stop Interactive Input} will clear out all current
+interactions previously set up with {Enable Interaction}. If more than
+one interactive session is required in a single application, for
+example getting a user to change the shape of a region of interest,
+and then getting the user to move the fixed region of interest around
+the screen, then {\bf Stop Interactive Input} should be called between
+each.
+
+Messages indicating what the user has to do to manage an interaction
+can be constructed from the output of the routine
+{\bf Query Interactor Description}. This will return a string that describes
+how the given interaction is to be performed, such as `move mouse', or
+`press centre button'. This can be output by the program to give
+instructions to the user on how to achieve the particular interaction.
+Examples of the use of this routine can be found in the example
+program in appendix \ref{se:exp}.
+
+More complex interactions than those already offered can be programmed
+using the {\it application specific code} mode. Normally the program control
+would remain inside {\bf Execute Interaction and Wait} until an exit
+trigger is fired. In the {\it application specific} mode the routine
+{\bf Execute Interaction and Wait} returns control to the calling program,
+where other tasks can be performed. The program then calls the routine
+{\bf Execute Interaction and Wait} again, and this loop is repeated until
+an exit trigger is fired. The routine {\bf Get Locator Displacement} can
+be used inside the loop to inquire if the locator has moved,
+and thus control the programmed interaction. A skeleton example of
+such an interaction follows.
+\begin{small}
+\begin{verbatim}
+*   Set up an application specific interaction to read the locator position
+*   Set up the mouse ( interactor type = 0, interactor id = 0 ) to have
+*   no visible effect ( object type = 0, object id = 0 ) on application
+*   specific code ( interactive operation = 0 ). End the interaction by
+*   pressing the right hand button ( exit trigger number = 2 ).
+      INTTY = 0
+      INTID = 0
+      OBJTY = 0
+      OBJID = 0
+      INTOP = 0
+      EXTRN = 2
+      CALL IIIENI( ID, INTTY, INTID, OBJTY, OBJID, INTOP, EXTRN,
+     :             STATUS )
+
+*   Loop ( in a non-FORTRAN77 way ) until the exit trigger is fired
+      DO WHILE ( TRIGS( EXTRN + 1 ) .EQ. 0 )
+
+*   Enable the interaction
+         CALL IIIEIW( ID, TRIGS, STATUS )
+
+*   Inquire the locator displacement
+         CALL IIIGLD( ID, INTID, DX, DY, STATUS )
+
+*   Do some application specific functions
+         ...
+
+      ENDDO
+\end{verbatim}
+\end{small}
+
+Note in the loop test the exit trigger number is incremented because
+the trigger numbers start from zero whereas, by default, the FORTRAN
+array TRIGS has one as its first index. Put another way the exit
+trigger number of two corresponds to the third entry in the TRIGS array.
+The displacements returned from {\bf Get Locator Displacement} give the
+shift in the locator position (in pixels) since the last call to this
+routine, and these can then be used in the application specific section.
+
+The routine {\bf Execute Interaction and Wait} requires one of
+its arguments to be a logical array whose length matches the number of
+triggers on the device. The number of triggers can be obtained via the
+routine {\bf Query Capabilities Integer}, but standard FORTRAN~77 does not
+allow dynamic length arrays to be defined. Thus a general purpose
+application needs to know what is the maximum number of triggers it
+will have to cope with so it can define the array accordingly. A global
+parameter IDI\_\_MAXTR has therefore been supplied which can be used to
+dimension the array, and this is defined in the include file IDI\_PAR.
+The following code segment shows how to define the trigger array in a
+FORTRAN program
+\begin{small}
+\begin{verbatim}
+*  Global Constants:
+      INCLUDE 'IDI_PAR'
+*  Local variables:
+      INTEGER TRIGS( IDI__MAXTR )
+\end{verbatim}
+\end{small}
+
+\subsection{Cursor}
+
+The cursor is usually controlled by the interactor (mouse) but there are
+several routines to give basic cursor control from a program. {\bf Set Cursor
+Visibility} switches the cursor on or off and {\bf Write Cursor Position}
+repositions the cursor on the display. The cursor position can be read
+back using the routine {\bf Read Cursor Position}.
+
+The routine {\bf Initialize Cursor} can be used to change the shape of the
+cursor to one of the predefined shapes. If more than one cursor colour is
+supported then this can also be changed using {\bf Initialize Cursor}.
+
+\subsection{Region of Interest}
+
+A region of interest is a rectangular area on the screen indicated by a
+rubber-band box. In most respects it is similar in action to a cursor,
+but instead of indicating a point it defines an area. The routine
+{\bf Initialize Rectangular Region of Interest} is required to set up a
+region of interest, and this returns an identifier which is used by the
+other routines to access the region. {\bf Set Visibility Rectangular
+Region of Interest} switches the box on or off and {\bf Write Rectangular
+Region of Interest} repositions the box on the display. The position of
+the region can be read back using the routine {\bf Read Rectangular
+Region of Interest}
+
+A region of interest can also be controlled using the interactor (mouse).
+The {\it object identifier} field of {\bf Enable Interaction} should
+contain the relevant ROI identifier returned by {\bf Initialize Rectangular
+Region of Interest}. A region can either be moved using an {\it interactive
+operation}~=~1, or its shape can be changed using an {\it interactive
+operation}~=~7. When moving a region interactively, the size of the area is
+fixed and the interaction moves the box over the display.
+
+When modifying a region of interest interactively, a rubber-band box
+is displayed which has one corner anchored and the other corner under
+the control of the mouse. The active corner is indicated by a small
+crosshair cursor. By moving the active corner the size and shape of the
+box is changed. To allow complete control a trigger is set up which
+switches the active corner to the opposite side. Any region can then be
+defined by first moving the locator to position one corner as required,
+switching the active corner, and then moving the locator again to position
+the opposite corner. This type of operation requires two interactions to be
+set up. The first defines that the mouse is to move the active
+corner of the rubber-band box, the second defines a button which will
+be used to switch the active corner from its current position to the
+opposite corner of the rubber-band box.
+The following code segment shows how this works.
+\begin{small}
+\begin{verbatim}
+*   Set up the mouse ( interactor type = 0, interactor id = 0 ) to
+*   control the ROI ( object type = 4, object id = ROIID ) by modifying
+*   it ( interactive operation = 7 ). End the interaction by pressing
+*   the right hand button ( exit trigger number = 2 ).
+      INTTY = 0
+      INTID = 0
+      OBJTY = 4
+      OBJID = ROIID
+      INTOP = 7
+      EXTRN = 2
+      CALL IIIENI( ID, INTTY, INTID, OBJTY, OBJID, INTOP, EXTRN,
+     :             STATUS )
+
+*   Define the left-hand trigger ( interactor type = 5, interactor id = 0 )
+*   to toggle the ROI active corner ( object type = 4, object id = ROIID )
+*   while modifying it ( interactive operation = 7 ). End the interaction
+*   by pressing the right hand button ( exit trigger number = 2 ).
+      INTTY = 5
+      INTID = 0
+      OBJTY = 4
+      OBJID = ROIID
+      INTOP = 7
+      EXTRN = 2
+      CALL IIIENI( ID, INTTY, INTID, OBJTY, OBJID, INTOP, EXTRN,
+     :             STATUS )
+
+*   Enable the interaction
+      CALL IIIEIW( ID, TRIGS, STATUS )
+
+*   Stop the interaction
+      CALL IIISTI( ID, STATUS )
+\end{verbatim}
+\end{small}
+
+\subsection{Workstation Interface}
+
+When using a workstation as an image display device it is possible to
+dynamically allocate memory. This is useful if, for instance, the
+available memory is not large enough to accommodate an image. Consider
+the earlier example in which the existing configuration was searched
+for a memory of a minimum size (MEMINX, MEMINY). In that case the
+program aborted if a suitable memory could not be found. Using the
+workstation interface a suitably sized memory can be requested. An
+application should first inquire if the workstation interface is
+supported using {\bf Query Capabilities Integer}
+\begin{small}
+\begin{verbatim}
+*   Inquire if the workstation interface is supported
+      NARR = 1
+      CALL IIDQCI( ID, ISDYNC, NARR, YESNO, NVAL, STATUS )
+
+*   Abort if it is not supported
+      IF ( YESNO .EQ. 0 ) GOTO 99
+\end{verbatim}
+\end{small}
+The global parameter ISDYNC defines the capability number used to inquire
+if the dynamic configuration is implemented (see appendix \ref{se:qcn}).
+
+The memory allocation is begun with a call to {\bf Enable Configuration}
+which initialises the process. The memory requirements are passed to
+{\bf Allocate Memory} and then the process is ended with a call to
+{\bf Stop Configuration} which returns a {\it configuration number} to
+be used to access the new memory. The new configuration has to be
+selected with {\bf Select Configuration} before the new memory can
+be used. The following code section shows this in action.
+\begin{small}
+\begin{verbatim}
+*   Begin the configuration process
+      CALL IIDENC( ID, STATUS )
+
+*   Request an image memory (MEMTYP=1) of the required size
+      MEMTYP = 1
+      CALL IIDAMY( ID, MEMINX, MEMINY, DDEPTH, MEMTYP, IMEMID, STATUS )
+
+*   Check that the request has been satisfied
+      IF ( STATUS .NE. IDI__OK ) GOTO 99
+
+*   End the configuration process
+      CALL IIDSTC( ID, ICONF, STATUS )
+
+*   Select this configuration
+      CALL IIDSEL( ID, ICONF, STATUS )
+\end{verbatim}
+\end{small}
+
+\newpage
+\section{Linking with IDI}
+
+\subsection{VAX/VMS Systems}
+
+Before compiling and linking a program containing IDI calls some
+initialisations have to be performed. These are achieved by issuing the
+command
+\begin{small}
+\begin{verbatim}
+      $ IDI_DEV
+\end{verbatim}
+\end{small}
+
+A standalone program is linked with IDI by using
+\begin{small}
+\begin{verbatim}
+      $ LINK <program>,IDI_LINK/OPT
+\end{verbatim}
+\end{small}
+
+For programs in the ADAM environment the link command is
+\begin{small}
+\begin{verbatim}
+      $ ALINK <task>,IDI_LINK_ADAM/OPT
+\end{verbatim}
+\end{small}
+
+See the ADAM programmer's guide to the IDI package (Appendix \ref{se:apg})
+for more details on using IDI in ADAM tasks.
+
+\subsection{Unix Systems}
+
+Any programs requiring the IDI include files have to specify the path
+explicitly. The name should also be given in lower case. For example
+\begin{small}
+\begin{verbatim}
+      INCLUDE '/star/include/idi_par'
+\end{verbatim}
+\end{small}
+
+A standalone program can be linked by specifying `idi\_link` on the
+compiler command line. Thus to compile and link a standalone application
+called `prog' the following could be used
+\begin{small}
+\begin{verbatim}
+      % f77 prog.f -o prog `idi_link`
+\end{verbatim}
+\end{small}
+(note the use of the backward quotes).
+
+For programs in the ADAM environment the compile and link command is
+\begin{small}
+\begin{verbatim}
+      $ alink prog.f `idi_link_adam`
+\end{verbatim}
+\end{small}
+
+\section{Device Names}
+
+The choice of display device used by an IDI program is selected by
+passing the device name to {\bf Open Display} or by defining the name
+through the parameter system if IDI\_ASSOC is used in an ADAM task.
+
+IDI uses the Graphics Name Service (SUN/57) to translate the given
+device names. On VMS acceptable device names can be found in the file
+pointed to by the logical name GNS\_IDINAMES. On UNIX machines these
+names are found in /star/etc/gns\_idinames.
+
+
+\section{Associated Files}
+
+\subsection{Workstation description table}
+
+The workstation description table is kept in a different file for each
+device. For the Ikon the specification is kept in the file
+IDI\_DIR:IKNWDT.DAT. This file is in ASCII
+format and so can be easily inspected, but it should not be changed.
+
+For X-windows on a VMS the specification is kept in a file
+pointed to by the logical name IDI\_XDT in the IDI\_DIR directory.
+Two versions of the file exist, the one with an extension .DCT is
+in ASCII format and so can be easily inspected. An unformatted
+version of this exists in the file with a .DAT extension.
+If an X-window device is added with a different specification
+than the default then a new description file (.DCT) has to be created.
+This file should have a name with a length of six characters. The
+logical name IDI\_XDT is reassigned to this name and the program
+DCTPREP is run to create the unformatted version of the file.
+
+For X-windows on a UNIX machine a default description file is used,
+although setting the environment variables IDI\_DIR and IDI\_XDT to point
+to another file will override this.
+
+\subsection{Workstation state}
+
+When IDI opens a device it attempts to recover the context from a
+previous run. If a device does not have the capability to store the
+complete context internally, an external, file based, system is used.
+
+The state of the Ikon is kept in an unformatted file,
+IDI\_USER:IDI\_COMMS.DAT. The current state of the device is saved in
+this file when the {\bf Close Display} is called, and recovered on the
+next call to {\bf Open Display}. If more than one Ikon is open at a
+time then the state of the devices is saved in the file, and automatically
+recovered when a change in device is called. This file does not have
+useful information for the user.
+
+If this file becomes corrupted for some reason then IDI\_ASSOC may fail
+to open the given device. If this is the case then it might be necessary
+to delete the workstation state file IDI\_USER:IDI\_COMMS.DAT, and start
+again.
+
+\section{Errors}
+
+The IDI routines return a non-zero status value if the routine was
+unable to perform its task properly; a successful operation will return
+a zero value. Note that the standard IDI routines (those beginning with
+the two character prefix II) do not use inherited status and reset the
+value of the status argument to IDI\_\_OK (=~0) at the beginning of each
+routine. Therefore the status value should be frequently checked if the
+application is to trap any errors.
+
+The routine IIDERR can be used to obtain an error message from an
+IDI status value. The FORTRAN error definitions are declared in the
+file IDI\_DIR:IDI\_ERR.FOR. The C error definitions are declared in
+the file IDI\_DIR:IDI\_ERR.HTXT.
+
+\section{References}
+
+1 --- Terrett, D.L., et~al., 1988, An image display interface for
+astronomical image processing, \\
+\hspace*{1.5em} Astron.Astrophys.Suppl.Ser., {\bf 76}, 263-304.
+
+2 --- SUN/48: AGI - Applications Graphics Interface Programmer's Guide.
+
+3 --- SUN/57: GNS - Graphics Workstation Name Service.
+
+4 --- SUN/130: GWM - X Graphics Window Manager.
+
+
+\section{Acknowledgements}
+
+The X-windows IDI driver is largely based on software kindly supplied
+by Paolo Santin of the Trieste Astronomical Observatory.
+
+\newpage
+\appendix
+\section{Query capabilities names}
+\label{se:qcn}
+
+The table gives the types of capabilities that can be determined via calls
+to {\bf Query Capabilities Integer} or {\bf Query Capabilities Real}.
+The first column lists the capability. The second column gives the
+integer code to be used in the call. Alternatively by including the
+FORTRAN file 'IDI\_PAR' in a program the codes can be accessed using
+the mnemonics given in the third column. The final column describes
+the type and size of the return arguments. An entry of n
+signifies a single integer value and an entry of n() implies an
+array of integer values. Values r and r() signify single and multiple
+real values, and l and l() imply single and multiple logical values.
+The logical values are represented by integers with zero meaning 'false'
+and any other value meaning 'true'.
+The global constant IDI\_\_MAXCP can be used to dimension the arrays passed
+to the query routines; this is defined in the file 'IDI\_PAR'.
+
+\begin{tabbing}
+list of memories in currently selected configuration \= integer codexxx \= mnemonicxxx \= \kill
+Capability \> Integer Code \> Mnemonic \> Output array \\
+\\
+implementation level \> 1 \> IIMPLE \> n \\
+\\
+number of available configurations \> 10 \> INCON \> n \\
+selected configuration number \> 11 \> ICONS \> n \\
+physical size of display (x,y) \> 12 \> ISIZED \> n(2) \\
+display depth (number of bits in DAC) \> 13 \> IDISDE \> n \\
+maximum depth of LUTs \> 14 \> ILUTDE \> n \\
+number of LUTs \> 15 \> INLUT \> n \\
+number of ITTs per image memory \> 16 \> INITT \> n \\
+zoom range (min,max) \> 17 \> IZOOMR \> n(2) \\
+number of available VLUT colours \> 18 \> INLUTC \> n \\
+\\
+memory visible \> 20 \> IMEMVI \> l() \\
+list of memories in currently selected configuration \> 21 \> IMEMS \> n() \\
+depth of memories (in bits) \> 22 \> IMEMDE \> n() \\
+list of current LUT bindings \> 23 \> ILUTBI \> n() \\
+list of current display path bindings \> 24 \> IDISBI \> n() \\
+list of current ITT bindings \> 25 \> IITTBI \> n() \\
+\\
+maximum dimension of transfer window in x \> 30 \> ITWMDX \> n() \\
+maximum dimension of transfer window in y \> 31 \> ITWMDY \> n() \\
+transfer window x sizes \> 32 \> ITWSIX \> n() \\
+transfer window y sizes \> 33 \> ITWSIY \> n() \\
+transfer window x offsets \> 34 \> ITWOFX \> n() \\
+transfer window y offsets \> 35 \> ITWOFY \> n() \\
+depth of transfer windows (in bits) \> 36 \> ITWDE \> n() \\
+\\
+number of available device cursors \> 40 \> INCUR \> n \\
+array of cursor shapes \> 41 \> IACUSH \> n() \\
+number of cursor shapes \> 42 \> INCUSH \> n \\
+list of current cursor bindings \> 43 \> ICURBI \> n() \\
+list of current cursor shapes \> 44 \> ICURSH \> n() \\
+list of current cursor colours \> 45 \> ICURCO \> n() \\
+list of current cursor visibilities \> 46 \> ICURVI \> l() \\
+\\
+number of locators \> 50 \> INLOC \> n \\
+number of real evaluators \> 51 \> INREVL \> n \\
+number of integer evaluators \> 52 \> INIEVL \> n \\
+number of logical evaluators (switches) \> 53 \> INLEVL \> n \\
+number of character evaluators \> 54 \> INCEVL \> n \\
+number of triggers \> 55 \> INTRIG \> n \\
+\\
+ROI implemented \> 60 \> ISROI \> l \\
+number of device ROIs \> 61 \> INROI \> n \\
+list of current ROI bindings \> 62 \> IROIBI \> n() \\
+list of current ROI marker colours \> 63 \> IROICO \> n() \\
+list of current ROI visibilities \> 64 \> IROIVI \> l() \\
+\\
+blink implemented \> 70 \> ISBLI \> l \\
+blink period for each memory \> 71 \> RBLIP \> r() \\
+trigger number to increase blink rate \> 77 \> IBLIIT \> n \\
+trigger number to decrease blink rate \> 78 \> IBLIDT \> n \\
+trigger number to stop blink \> 79 \> IBLIST \> n \\
+\\
+split screen implemented \> 80 \> ISSS \> l \\
+split screen x memory offsets \> 81 \> ISSOFX \> n() \\
+split screen y memory offsets \> 82 \> ISSOFY \> n() \\
+split screen (x,y) address \> 83 \> ISSXY \> n(2) \\
+split screen enabled \> 84 \> ISSSON \> l \\
+\\
+intensity bar implemented \> 90 \> ISBAR \> l \\
+intensity bar visible \> 91 \> IBARVI \> l() \\
+\\
+snapshot implemented \> 100 \> ISSNAP \> l \\
+escape function implemented \> 101 \> ISESC \> l \\
+diagnostic routine implemented \> 102 \> ISDIAG \> l \\
+dynamic configuration implemented \> 103 \> ISDYNC \> l \\
+\end{tabbing}
+
+\newpage
+\section{Setting the CLEAR flag}
+\label{se:scf}
+
+Currently this flag only affects the behaviour of the Ikon, the X-driver
+ignores any setting.
+
+By default IDI attempts to recover the context of a previous run when
+opening a device, however, if the previous application used a graphics
+package other than IDI then the context recovery may not be valid, or
+the recovery may fail and the device be automatically reset.
+This could have some unpredictable or undesirable results.
+
+A routine (IDI\_CLRFG) has been supplied which can get over this problem.
+It should be called before IDI is opened with IIDOPN or IDI\_ASSOC.
+A value of 0 supplied to this routine will result in the normal default
+operation. A value of 1 supplied to the routine will prevent IDI
+attempting to obtain the full context from a previous run.
+Instead as much of the context as possible will be obtained from the device.
+Some of the context may be irrecoverable and this will take default settings.
+
+If the flag is set to 1 then the saving of the context
+at closedown is also suppressed. If the context is required to be saved at
+the end then the flag has to be reset to zero.
+
+This routine does not have to be used if the previous application used
+IDI to produce a picture. Not calling the routine is equivalent to calling
+it with a value of 0. The main purpose of the routine is to allow a device
+to be opened with IDI, when previously drawn on with a different graphics
+package, without having the device reset due to failure to recover the
+context, or having an invalid context from an old IDI application picked
+up by default.
+
+\vspace{10mm}
+\parbox{160mm}{
+
+\rule{160mm}{0.5mm}
+
+\hspace*{10mm}\parbox{140mm}{
+{\bf IDI\_CLRFG} \\
+Set the clear flag.}
+
+\rule{160mm}{0.1mm}
+
+\hspace*{10mm}\parbox{140mm}{
+The clear flag controls the source of the device context. If the flag~=~0
+(the default) then full context recovery is expected. If the flag~=~1 then
+as much of the context as possible is obtained from the device. This
+value also suppresses the saving of the context at closedown.}
+
+\rule{160mm}{0.1mm}
+
+\hspace*{10mm}\parbox{140mm}{
+CALL IDI\_CLRFG~(~IFLAG~)}
+
+\hspace*{10mm}\parbox{140mm}{
+IFLAG = INTEGER \hspace{10mm} (~given~)}
+
+\hspace*{30mm}\parbox{120mm}{
+IFLAG~=~0 - Attempt full context recovery and save the context
+at closedown. \\
+IFLAG~=~1 - Obtain context from device, and do not save context
+at closedown.}
+
+\rule{160mm}{0.5mm}
+}
+
+\newpage
+\section{ADAM Programmer's Guide to the IDI package}
+\label{se:apg}
+
+\subsection{Introduction}
+
+This section describes the use of the Image Display Interface (IDI) in
+ADAM application programs. It is expected that the reader is familiar with
+programming for ADAM and with IDI.
+
+The image display interface (IDI) is fully described in the specification
+document [1], and the details of the Starlink implementation are given in
+the preceding sections. This section will therefore only deal with issues
+relating to the use of IDI in ADAM application programs.
+
+All IDI routines may be used in ADAM applications with the exception of
+the following routines, which must {\bf never} be called in ADAM programs
+
+\hspace*{20mm}\begin{minipage}{140mm}
+
+\noindent
+IIDOPN - {\bf Open Display}
+
+\noindent
+IIDCLO - {\bf Close Display}
+
+\end{minipage}
+
+The function of IIDOPN is performed by the environment routine IDI\_ASSOC.
+The function of IIDCLO is performed by the environment routine IDI\_CANCL,
+or IDI\_ANNUL.
+
+Note that these routines, unlike the core IDI routines, use the principle
+of inherited status. The routine IDI\_ASSOC will only execute if the
+status is equal to zero on entry. The routines IDI\_ANNUL and IDI\_CANCL
+will execute if the status is non-zero on entry, so that devices can be
+closed in the event of unrelated errors, and will return the error
+status unchanged.
+
+\subsection{The IDI Parameter Routines}
+
+As with all other packages in the Software Environment, the only access to
+objects outside of application programs is via Program Parameters. IDI has
+three subroutines (the IDI parameter routines) that provide the
+necessary interaction with the outside world. They are:
+
+\begin{center}
+\begin{tabular}{|l|l|} \hline
+Subroutine & Function \\ \hline
+IDI\_ASSOC & Associate an IDI device with a parameter \\
+IDI\_ANNUL & Release an IDI device \\
+IDI\_CANCL & Release an IDI device and cancel the parameter \\ \hline
+\end{tabular}
+\end{center}
+
+Here is a skeletal example of a program using IDI
+\begin{small}
+\begin{verbatim}
+      SUBROUTINE IDI_TEST ( STATUS )
+
+      INCLUDE 'IDI_ERR'
+      INTEGER ID, STATUS
+
+*   Open a display device for IDI and reset it
+      CALL IDI_ASSOC( 'DEVICE', 'WRITE', ID, STATUS )
+      IF ( STATUS .EQ. IDI__OK ) THEN
+
+*   Perform IDI functions on this display
+         ...
+
+*   Release device
+         CALL IDI_ANNUL( ID, STATUS )
+      ENDIF
+\end{verbatim}
+\end{small}
+
+IDI\_ASSOC should be the first IDI routine to be called in the application.
+It obtains the name of the graphics device to be used (via the parameter
+system) and opens this device for subsequent IDI operations.
+
+The first argument of IDI\_ASSOC is a Program Parameter (which should be
+defined to be a device parameter in the Interface Module for the
+application).
+
+The second argument is the access mode required. This can be one of
+
+\hspace*{20mm}\begin{minipage}{140mm}
+
+\noindent
+'READ' The application is only going to 'read' from the device, (i.e.
+perform cursor or similar operations), without altering the display
+appearance. The display is not cleared or reset when the device is
+opened.
+
+'WRITE' The application is going to 'write' on the device creating
+a new screen display. The display is cleared and reset when it
+is opened.
+
+'UPDATE' The application will modify the device, taking the existing
+display and changing it. The display is not cleared or reset when the
+device is opened.
+
+\end{minipage}
+
+The third argument is the display identifier returned to the application.
+This must be passed to all subsequent IDI routines which are to be used
+on this device.
+
+The fourth argument is the usual status value.
+
+When the application has finished using the device, the display is closed
+and the identifier annulled using the IDI\_ANNUL, or IDI\_CANCL routines.
+
+\subsection{Interface File}
+
+A simple interface file for the above example would be:
+
+\begin{small}
+\begin{verbatim}
+interface IDI_TEST
+   parameter DEVICE
+      position 1
+      ptype  'DEVICE'
+      keyword 'DEVICE'
+      access 'READ'
+      vpath 'PROMPT'
+      default IKON
+      prompt 'Display device '
+   endparameter
+endinterface
+\end{verbatim}
+\end{small}
+
+\subsection{Reference Section}
+
+The description of each of the application level subroutines in the package
+now follows
+
+\vspace{10mm}
+\parbox{160mm}{
+
+\rule{160mm}{0.5mm}
+
+\hspace*{10mm}\parbox{140mm}{
+{\bf IDI\_ANNUL} \\
+Annul IDI display identifier and close the device.}
+
+\rule{160mm}{0.1mm}
+
+\hspace*{10mm}\parbox{140mm}{
+The device associated with the display identifier is closed and the
+identifier is annulled. No further IDI routines can be called with this
+display identifier.}
+
+\rule{160mm}{0.1mm}
+
+\hspace*{10mm}\parbox{140mm}{
+CALL IDI\_ANNUL~(~DISPID, STATUS~)}
+
+\hspace*{10mm}\parbox{140mm}{
+DISPID = INTEGER \hspace{10mm} (~given~)}
+
+\hspace*{30mm}\parbox{120mm}{
+A variable containing the display identifier.}
+
+\hspace*{10mm}\parbox{140mm}{
+STATUS = INTEGER}
+
+\hspace*{30mm}\parbox{120mm}{
+Variable to contain the status. This routine is executed regardless of the
+given value of status. If its input value is not IDI\_\_OK then it is left
+unchanged by this routine, even if it fails to complete. It its input value
+is IDI\_\_OK and this routine fails, then the value is changed to an
+appropriate error number.}
+
+\rule{160mm}{0.5mm}
+}
+
+\parbox{160mm}{
+
+\rule{160mm}{0.5mm}
+
+\hspace*{10mm}\parbox{140mm}{
+{\bf IDI\_ASSOC} \\
+Open a graphics device and return a display identifier.}
+
+\rule{160mm}{0.1mm}
+
+\hspace*{10mm}\parbox{140mm}{
+Associate a graphics device with the specified parameter and return a
+display identifier to reference this device.}
+
+\rule{160mm}{0.1mm}
+
+\hspace*{10mm}\parbox{140mm}{
+CALL IDI\_ASSOC~(~PNAME, ACMODE, DISPID, STATUS~)}
+
+\hspace*{10mm}\parbox{140mm}{
+PNAME = CHARACTER~*~(~*~) \hspace{10mm} (~given~)}
+
+\hspace*{30mm}\parbox{120mm}{
+String specifying the name of the device parameter.}
+
+\hspace*{10mm}\parbox{140mm}{
+ACMODE = CHARACTER~*~(~*~) \hspace{10mm} (~given~)}
+
+\hspace*{30mm}\parbox{120mm}{
+String specifying the access mode: 'READ', 'WRITE' or 'UPDATE' as
+appropriate.}
+
+\hspace*{10mm}\parbox{140mm}{
+DISPID = INTEGER \hspace{10mm} (~returned~)}
+
+\hspace*{30mm}\parbox{120mm}{
+A variable containing the display identifier.}
+
+\hspace*{10mm}\parbox{140mm}{
+STATUS = INTEGER}
+
+\hspace*{30mm}\parbox{120mm}{
+Variable to contain the status. If this variable is not IDI\_\_OK on input,
+then the routine will return without action. If this routine fails to
+complete, this variable will be set to an appropriate error number.}
+
+\rule{160mm}{0.5mm}
+}
+
+\parbox{160mm}{
+
+\rule{160mm}{0.5mm}
+
+\hspace*{10mm}\parbox{140mm}{
+{\bf IDI\_CANCL} \\
+Close an IDI display and break the parameter association.}
+
+\rule{160mm}{0.1mm}
+
+\hspace*{10mm}\parbox{140mm}{
+The device associated with the parameter is closed and the association
+between the graphics device and the specified device parameter is broken.}
+
+\rule{160mm}{0.1mm}
+
+\hspace*{10mm}\parbox{140mm}{
+CALL IDI\_CANCL~(~PNAME, STATUS~)}
+
+\hspace*{10mm}\parbox{140mm}{
+PNAME = CHARACTER~*~(~*~) \hspace{10mm} (~given~)}
+
+\hspace*{30mm}\parbox{120mm}{
+String specifying the name of the device parameter which has previously
+been associated with a device using IDI\_ASSOC.}
+
+\hspace*{10mm}\parbox{140mm}{
+STATUS = INTEGER}
+
+\hspace*{30mm}\parbox{120mm}{
+Variable to contain the status. This routine is executed regardless of the
+given value of status. If its input value is not IDI\_\_OK then it is left
+unchanged by this routine, even if it fails to complete. If its input value
+is IDI\_\_OK and this routine fails, then the value is changed to an
+appropriate error number.}
+
+\rule{160mm}{0.5mm}
+}
+
+
+\newpage
+\section{Example Program}
+\label{se:exp}
+
+This example program will read in a data file and display it in the
+middle of the screen. A cursor will be displayed which can be
+moved about the screen with the mouse, and the image can be zoomed
+and unzoomed using the left hand and centre mouse buttons. The
+interaction is terminated by pressing the right hand mouse button, and
+the cursor position relative to the memory origin is output.
+
+The source for this example program can be found in the file
+IDI\_DIR:IDI\_TEST.FOR, and the interface file is found in
+IDI\_DIR:IDI\_TEST.IFL.
+The input data file should contain integers between 0 and 255.
+
+\begin{small}
+\begin{verbatim}
+      SUBROUTINE IDI_TEST ( STATUS )
+*+
+*  Name:
+*     IDI_TEST
+*  Purpose:
+*     TEST IDI
+*  Language:
+*     FORTRAN
+*  Type of Module:
+*     ADAM A-task
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+*  Authors:
+*     NE: Nick Eaton  (Durham University)
+*  History:
+*     May 1989 (NE):
+*        Original version
+*     March 1991 (NE):
+*        Update to use NDFs and work with X-windows interface
+*-
+*  Type definitions:
+      IMPLICIT NONE              ! No implicit typing
+*  Global Constants:
+      INCLUDE 'IDI_ERR'          ! IDI error codes
+      INCLUDE 'IDI_PAR'          ! IDI global constants
+*  Status:
+      INTEGER STATUS             ! Global status
+*  Local variables:
+      CHARACTER * 64 TEXT
+      INTEGER TRIGS( IDI__MAXTR )
+      INTEGER DEPTH, DIRECN, DSIZE(2), EXTRN, ID, INDF, INTID, INTOP,
+     :        INTTY, IPIN, LBND(2), LTEXT, MEMID, NARR, NCHAR, NDATA,
+     :        NDIM, NEL, NUMCUR, NVAL, NX, NY, OBJID, OBJTY, OUTMID,
+     :        PACK, UBND(2), XC, XOFF, XSTART, YC, YOFF, YSTART
+*.
+
+*   Check inherited global status.
+      IF ( STATUS .NE. IDI__OK ) GOTO 99
+
+*   Get the picture to plot. Should be 2-dimensional.
+      CALL NDF_BEGIN
+      CALL NDF_ASSOC( 'IN', 'READ', INDF, STATUS )
+      CALL NDF_MAP( INDF, 'DATA', '_INTEGER', 'READ', IPIN, NEL, STATUS)
+      CALL NDF_BOUND( INDF, 2, LBND, UBND, NDIM, STATUS )
+      IF ( ( STATUS .NE. IDI__OK ) .OR. ( NDIM .GT. 2 ) ) GOTO 99
+
+*   Calculate image size
+      NX = UBND( 1 ) - LBND( 1 ) + 1
+      NY = UBND( 2 ) - LBND( 2 ) + 1
+      NDATA = NX * NY
+
+*   Open IDI for a device obtained through the parameter system
+*   Force a reset by using 'WRITE' mode
+      CALL IDI_ASSOC( 'DEVICE', 'WRITE', ID, STATUS )
+      IF ( STATUS .NE. IDI__OK ) GOTO 99
+
+*   Inquire the physical size of the display using Query Capabilities
+*   Integer code 12 ( ISIZED ) returns the screen size in pixels
+      NARR = 2
+      CALL IIDQCI( ID, ISIZED, NARR, DSIZE, NVAL, STATUS )
+
+*   Check the image size against the display size
+      IF ( ( NX .GT. DSIZE( 1 ) ) .OR. ( NY .GT. DSIZE( 2 ) ) ) GOTO 99
+
+*   Inquire the depth of the first (default) memory using Query Capabilities
+*   Integer code 22 ( IMEMDE ) returns the memory depth
+      NARR = 1
+      CALL IIDQCI( ID, IMEMDE, NARR, DEPTH, NVAL, STATUS )
+
+*   Set up the transfer window to be the same size as the input image
+*   and to be centered in the middle of the screen; XOFF, YOFF define
+*   the position of the lower left corner of the transfer window. Plot
+*   the image in the base memory ( 0 ) and loading from bottom to top ( 0 )
+      MEMID = 0
+      DIRECN = 0
+      XOFF = MAX( 0, ( DSIZE( 1 ) - NX ) / 2 )
+      YOFF = MAX( 0, ( DSIZE( 2 ) - NY ) / 2 )
+      CALL IIMSTW( ID, MEMID, DIRECN, NX, NY, DEPTH, XOFF, YOFF,
+     :             STATUS )
+
+*   Write the image to the screen starting at position 0, 0 in the
+*   transfer window. The data is taken from the lowest byte of each
+*   integer word in the data array ( defined by PACK = 1, DEPTH = 8 ).
+      PACK = 1
+      XSTART = 0
+      YSTART = 0
+      CALL IIMWMY( ID, MEMID, %VAL( IPIN ), NDATA, DEPTH, PACK,
+     :             XSTART, YSTART, STATUS )
+
+*   Abort if an error has occurred
+      IF ( STATUS .NE. IDI__OK ) THEN
+
+*   Obtain a meaningful IDI error message
+         CALL IIDERR( STATUS, TEXT, NCHAR )
+
+*   Output this message
+         CALL ERR_REP( 'IDI_WMY', TEXT, STATUS )
+         GOTO 99
+      ENDIF
+
+*   Display the memory by setting its visibility to .TRUE.
+      CALL IIMSMV( ID, MEMID, 1, 1, STATUS )
+
+*   Set up interactions to move the cursor and zoom the memory
+*   Set up the mouse ( interactor type = 0, interactor id = 0 ) to
+*   control the cursor ( object type = 1, object id = 0 ) by moving
+*   it ( interactive operation = 1 ). End the interaction by pressing
+*   the right hand button ( exit trigger number = 2 ).
+      INTTY = 0
+      INTID = 0
+      OBJTY = 1
+      OBJID = 0
+      INTOP = 1
+      EXTRN = 2
+      CALL IIIENI( ID, INTTY, INTID, OBJTY, OBJID, INTOP, EXTRN,
+     :             STATUS )
+
+*   Inquire the interactive operation and instruct the user
+      CALL IIIQID( ID, INTTY, INTID, TEXT, LTEXT, STATUS )
+      TEXT( LTEXT + 1 : ) = ' to control cursor'
+      CALL MSG_OUT( ' ', TEXT, STATUS )
+
+*   Set up the left hand button ( interactor type = 5, interactor id = 0 )
+*   to control the memory ( object type = 5, object id = 0 ) by increasing
+*   the zoom ( interactive operation = 3 ). End the interaction by pressing
+*   the right hand button ( exit trigger number = 2 ).
+      INTTY = 5
+      INTID = 0
+      OBJTY = 5
+      OBJID = MEMID
+      INTOP = 3
+      EXTRN = 2
+      CALL IIIENI( ID, INTTY, INTID, OBJTY, OBJID, INTOP, EXTRN,
+     :             STATUS )
+
+*   Inquire the interactive operation and instruct the user
+      CALL IIIQID( ID, INTTY, INTID, TEXT, LTEXT, STATUS )
+      TEXT( LTEXT + 1 : ) = ' to increase zoom'
+      CALL MSG_OUT( ' ', TEXT, STATUS )
+
+*   Set up the centre button ( interactor type = 5, interactor id = 1 )
+*   to control the memory ( object type = 5, object id = 0 ) by decreasing
+*   the zoom ( interactive operation = 4 ). End the interaction by pressing
+*   the right hand button ( exit trigger number = 2 ).
+      INTTY = 5
+      INTID = 1
+      OBJTY = 5
+      OBJID = MEMID
+      INTOP = 4
+      EXTRN = 2
+      CALL IIIENI( ID, INTTY, INTID, OBJTY, OBJID, INTOP, EXTRN,
+     :             STATUS )
+
+*   Inquire the interactive operation and instruct the user
+      CALL IIIQID( ID, INTTY, INTID, TEXT, LTEXT, STATUS )
+      TEXT( LTEXT + 1 : ) = ' to decrease zoom'
+      CALL MSG_OUT( ' ', TEXT, STATUS )
+
+*   Inquire the exit trigger operation and instruct the user
+      CALL IIIQID( ID, INTTY, EXTRN, TEXT, LTEXT, STATUS )
+      TEXT( LTEXT + 1 : ) = ' to exit'
+      CALL MSG_OUT( ' ', TEXT, STATUS )
+
+*   Move the cursor to the middle of the screen. A memory id = -1 sets
+*   the cursor position relative to the screen origin.
+      XC = DSIZE( 1 ) / 2
+      YC = DSIZE( 2 ) / 2
+      NUMCUR = 0
+      CALL IICINC( ID, -1, NUMCUR, 1, 2, XC, YC, STATUS )
+
+*   Display the cursor by setting its visibility to .TRUE.
+      CALL IICSCV( ID, NUMCUR, 1, STATUS )
+
+*   Execute the interactions.
+      CALL IIIEIW( ID, TRIGS, STATUS )
+
+*   Read the cursor position relative to the memory origin.
+      CALL IICRCP( ID, MEMID, NUMCUR, XC, YC, OUTMID, STATUS )
+
+*   Output the cursor position.
+      CALL MSG_SETI( 'XC', XC )
+      CALL MSG_SETI( 'YC', YC )
+      CALL MSG_OUT( ' ', 'Cursor position is ^XC , ^YC', STATUS )
+
+*   Undisplay the cursor by setting its visibility to .FALSE.
+      CALL IICSCV( ID, NUMCUR, 0, STATUS )
+
+  99  CONTINUE
+
+*   Close down IDI using the parameter system
+      CALL IDI_CANCL( 'DEVICE', STATUS )
+
+*   Close the data file
+      CALL NDF_END( STATUS )
+
+      END
+\end{verbatim}
+\end{small}
+
+\newpage
+\begin{small}
+\begin{verbatim}
+interface IDI_TEST
+   parameter IN
+      position 1
+      type 'NDF'
+      keyword 'IN'
+      access 'READ'
+      vpath 'PROMPT'
+      prompt 'NDF file containing image '
+   endparameter
+   parameter DEVICE
+      position 2
+      ptype  'DEVICE'
+      keyword 'DEVICE'
+      access 'READ'
+      vpath 'PROMPT'
+      default XWINDOWS
+      prompt 'Display device '
+   endparameter
+endinterface
+\end{verbatim}
+\end{small}
+      
+\newpage
+\section{IKON implementation notes}
+\label{se:iin}
+
+\subsection{Memories}
+
+The Ikon has two memories, a base plane (0), and an overlay plane (1),
+which both fill the frame buffer (1024~x~1024 pixels).
+They can be written to separately, but they cannot be scrolled or zoomed
+independently. Zooming an individual memory will thus have the same
+effect as zooming the display. Scrolling an individual memory will have
+the same effect as panning the display. The order of the memories cannot
+be changed, meaning that the overlay plane will always appear in front of
+the base memory. The overlay plane is a special type of memory which is
+transparent if the pixel values are zero. This means that the base memory
+shows through where the overlay memory is blank.
+
+\subsection{Writing to the memories}
+
+The Ikon memories have a maximum depth of 8 bits (1 byte), however, the
+input to the image display routines {\bf Write Memory}, {\bf Read Memory}
+has to be in integer format. The arguments {\it packing factor} and
+{\it data depth} control how the data to be displayed is packed into a
+single integer word. Three {\it packing factor}s of 1, 2 and 4
+are offered in the current implementation. For a packing factor of 1 the
+least significant byte from the integer word is used. For a packing factor
+of 2 the first and third bytes are used, where the first byte is the
+least significant byte. For a packing factor of 4 all 4 bytes of the
+integer word are used. Packing the data in this way will not improve
+the efficiency of the display routines, but will obviously result in
+savings in disc storage space.
+{\it Data depth} can take any value. A {\it data depth} less than 8 will
+result in additional overheads. A {\it data depth} greater than 8 will
+not have any effect since the data is truncated to correspond to the
+depth of the Ikon memories.
+
+\subsection{Zoom}
+
+The Ikon allows zooming by factors of up to 16 times. The zoom factors
+go from 0 to 15, where 0 is no zoom. Zoom factors less than 0, giving
+smaller pictures by reduced sampling, is not supported.
+
+\subsection{Look-up tables}
+
+The Ikon has two look up tables (LUT), which can be changed independently.
+Use the routine {\bf Select Memory Look up Tables} to alter which LUT is
+bound to which memory. On reset memory~0 is bound to LUT~0 and memory~1
+is bound to LUT~1. Note that the Ikon does not have an intensity
+transformation table (ITT) and so the ITT number in {\bf Select Memory
+Look up Tables} should be always zero.
+
+\subsection{Interactions}
+
+The Ikon mouse has two {\it interactor types} associated with it; it is a
+{\it locator} (identifier 0) with three {\it triggers} (identifiers 0, 1, 2),
+corresponding to the left, centre and right-hand buttons.
+
+At present only a few of all the possible interactions have been implemented.
+A non-zero error status will be returned from {\bf Execute Interaction and
+Wait} if the interaction has not been implemented.
+The table shows the implemented functions with a cross (~+~).
+
+\begin{small}
+\begin{center}
+\begin{tabular}{|p{11em}||p{3.0em}||p{3.5em}||p{2.5em}|
+                |p{3.5em}||p{3.5em}||p{3.7em}||p{3.5em}|}
+\hline
+\multicolumn{8}{|c|}{Ikon Interaction Cross Reference} \\ \hline \hline
+Description & No effect & Cursor & ITT & VLUT & ROI & Memory & Display \\
+\hline
+Application specific code & + & . & . & . & . & . & . \\
+Move object               & + & + & . & . & + & + & + \\
+Rotate object             & + & . & . & + & . & . & . \\
+Increase zoom             & + & . & . & . & . & + & + \\
+Reduce zoom               & + & . & . & . & . & + & + \\
+Set zoom to normal        & + & . & . & . & . & + & + \\
+Blink object              & + & . & . & . & . & + & . \\
+Modify object             & + & . & . & . & + & . & . \\
+\hline
+\end{tabular}
+\end{center}
+\end{small}
+
+When rotating the look-up table the action is controlled by the left
+and right movement of the mouse. The rotation is unlimited in either
+direction unless a cursor or region of interest is also displayed, in
+which case the rotation stops at the limits of those objects.
+
+The colour of a rubber-band box defined in {\bf Initialize Rectangular
+Region of Interest} has to be taken from the memory look-up table. The
+independent colours defined in the IDI specification are not available
+unless they form part of the current look-up table. The box is drawn
+by inverting the colour onto the screen, except for the cross defining
+the active corner which is a permanent colour.
+
+\subsection{Blinking}
+
+There are two methods of achieving blinking with IDI.
+The routine {\bf Blink Memories} will continuously blink the memories in
+the input list. The display period of each memory is initially set to the
+values supplied to the routine, but the rate can be changed under control
+of the Ikon mouse. The left hand mouse button increases the blink rate and
+the centre button decreases the rate. The right hand button stops the
+blinking and returns control to the calling program.
+The binding of these buttons is implementation dependent, and the IDI
+specification does not have the facility to output a message describing the
+bindings, in the way that {\bf Query Interactor Description} can be used
+with normal interactions. To overcome this three new integer capabilities
+have been defined that describe the bindings of the triggers used by
+{\bf Blink Memories}. These capabilities are:-
+\newpage
+\begin{tabbing}
+list of memories in currently selected configuration \= integer codexxx \= mnemonicxxx \= \kill
+Capability \> Integer Code \> Mnemonic \> Output array \\
+\\
+trigger number to increase blink rate \> 77 \> IBLIIT \> n \\
+trigger number to decrease blink rate \> 78 \> IBLIDT \> n \\
+trigger number to stop blink \> 79 \> IBLIST \> n \\
+\end{tabbing}
+An entry under the column 'Output array' of n means that the value is an
+arbitrary integer. A negative value for one of these capabilities signifies
+that the function is not implemented. The following code segment shows how
+a message can be output indicating the button to press to increase the
+blink rate.
+
+\begin{small}
+\begin{verbatim}
+*   Inquire the trigger number to increase the blink rate
+      CALL IIDQCI( ID, 77, 1, NTRIG, NVAL, STATUS )
+
+*   If the returned value is valid get a description of the trigger
+      IF ( NTRIG .GE. 0 ) THEN
+         CALL IIIQID( ID, 5, NTRIG, TEXT, LTEXT, STATUS )
+         TEXT( LTEXT + 1 : ) = ' to increase blink rate'
+         CALL MSG_OUT( ' ', TEXT, STATUS )
+      ENDIF
+\end{verbatim}
+\end{small}
+
+The other way of blinking the memories is by setting up an interaction.
+Each memory is bound to a different
+mouse button using the {\it object type} and {\it object identifier}
+fields in {\bf Enable Interaction}. A memory will be displayed
+when the appropriate button is pressed. Alternating button presses will
+produce blinking under control of the user.
+
+\subsection{Text}
+
+Text is output using one of four preset text sizes as discussed in the
+specification [1]. The text colour is taken from the current look-up
+table. Text orientation can only be achieved in eight directions, 45
+degrees apart, although the routine will accept any angle and round
+it up or down to the closest supported angle. The text path parameter
+is only supported for text going left to right.
+
+\subsection{Deficiencies}
+
+\begin{itemize}
+\item
+It is not possible to display a fixed cursor and scroll and zoom the
+memory under it. This has not been implemented because the Ikon only
+allows memory scrolls in steps of 16 pixels, so only every 16th pixel
+in the x-direction would appear beneath the fixed cursor. To achieve
+a similar effect set up an interaction to move the cursor and zoom
+the memory. The zoom will bring the cursor to near the middle of the
+screen. This type of interaction is used in the example program.
+\end{itemize}
+
+\newpage
+\section{X-WINDOWS implementation notes}
+\label{se:xin}
+
+\subsection{GWM interface}
+
+IDI uses the Graphics Window Manager [4] to look after the creation
+and management of the display window. When IDI opens (IIDOPN or IDI\_ASSOC)
+it first looks for an existing GWM window with the given name, and if
+it finds one it attaches to that, otherwise it creates a new window with
+the default characteristics. The window pixmap, which is used by GWM to
+store the picture, is then read by IDI and stored in an internal memory.
+The purpose of this is to enable existing displays to be manipulated by
+IDI, for example a picture drawn with GKS can be scrolled using IDI.
+In an ADAM application 'READ' or 'UPDATE' mode should be used in
+IDI\_ASSOC if an existing display is to be manipulated.
+
+If an application wants to start with a clean sheet then the display
+should be reset. In an ADAM application this is done by specifying
+'WRITE' mode in IDI\_ASSOC. In a non-ADAM application the routine
+{\bf Reset Display} should be called immediately after {\bf Open
+Display}.
+
+\subsection{Memories}
+
+When an X-window device is opened one memory is made available
+(identifier 0) which corresponds to the window pixmap. The size of the
+memory is equal to the size of the pixmap, which can be different to
+the size of the window.
+
+\subsection{Overlays}
+
+If a GWM window contains an overlay plane then this can be accessed as
+if it were a separate memory (identifier 1). The overlay memory depth
+is only one bit but it can be accessed like any other image memory.
+It can be written to with {\bf Write Memory}, {\bf Polyline} or
+{\bf Plot Text}. It can be scrolled and zoomed separately to the base
+memory. It has a separate look-up table (identifier 1) to the base
+plane. Although the memory is only one bit deep the overlay LUT has as
+many entries as the base LUT, however every entry contains the same
+overlay colour. If the overlay colour is to be changed then the new
+colour should be sent to all the pens in the overlay LUT.
+
+\subsection{Writing to the memories}
+
+Most workstations running IDI will have an 8 bit display, but the
+full 8 bit capability of the device is not normally available. The
+X-windows driver will reserve a number of pens for its exclusive use
+and GWM will not normally allocate all the available pens to one
+window. The look-up table length is adjusted by IDI to match the
+number of pens allocated to the GWM window. The default intensity
+transformation table is adjusted, so that data values going from 0 to
+255, map linearly onto the look-up table going from 0 to the allocated
+length. For instance, if the look-up table contains 64 entries then a data
+value of 0 will be assigned to pen 0 and a data value of 255 will be assigned
+to pen 63, with intermediate values scaled appropriately.
+The number of pens allocated to the window can be inquired using
+{\bf Query Capabilities Integer} with capability number 18 (INLUTC),
+or can be inquired from GWM using GWM\_GETCI [4].
+
+The input to the image display routines {\bf Write Memory}, {\bf Read Memory}
+is an array of integers, and the arguments {\it packing factor} and
+{\it data depth} control how the data to be displayed is packed into a
+single integer word.
+
+\subsection{Zoom}
+
+The X driver does not support hardware zooming and so the zooming has
+been implemented in software. The current implementation allows zooming
+by factors of up to 32 times. The zoom factors go from -31 to 31, with
+0 as no zoom. Negative zooming (zoom factors less than 0) is not
+currently supported for {\it interactive operations}.
+
+\subsection{Look-up tables}
+
+Each window has one look up table (LUT) and one intensity transformation
+table (ITT) per memory. The intensity transformation table is used to
+translate pixel numbers into entries in the look up table.
+
+\subsection{Interactions}
+
+The X-windows interface supports two {\it interactor types}; {\it locators}
+and {\it triggers}. Two types of {\it locator} are supported: the mouse
+{\it interactor identifier}~=~0 and the keyboard arrows
+{\it interactor identifier}~=~1. The action of the keyboard arrows can be
+speeded up by simultaneously depressing the SHIFT key. When using the keyboard
+as an interactor the window focus has to be shifted to the display window
+by clicking in the window or on the title bar.
+
+The number of available triggers can be inquired using capability code
+55 (INTRIG) in {\bf Query Capabilities Integer}.
+Triggers can be either the mouse buttons (identifiers 0, 1, 2), or keys on
+the keyboard (identifiers 3 to 54). The table lists the current set
+of triggers and the corresponding identifiers.
+
+\begin{small}
+\begin{center}
+\begin{tabular}{|r|p{9em}||r|p{9em}||r|p{9em}|}
+\hline
+Id & Trigger & Id & Trigger & Id & Trigger \\
+\hline
+0 & Mouse button left   & 20 &  G key & 40 & 0 key \\
+1 & Mouse button centre & 21 &  H key & 41 & 1 key \\
+2 & Mouse button right  & 22 &  I key & 42 & 2 key \\
+3 & Up arrow            & 23 &  J key & 43 & 3 key \\
+4 & Up arrow shifted    & 24 &  K key & 44 & 4 key \\
+5 & Left arrow          & 25 &  L key & 45 & 5 key \\
+6 & Left arrow shifted  & 26 &  M key & 46 & 6 key \\
+7 & Right arrow         & 27 &  N key & 47 & 7 key \\
+8 & Right arrow shifted & 28 &  O key & 48 & 8 key \\
+9 & Down arrow          & 29 &  P key & 49 & 9 key \\
+10 & Down arrow shifted  & 30 & Q key & 50 & Period key \\
+11 & Keypad PF4          & 31 & R key & 51 & Plus key \\
+12 & Space bar           & 32 & S key & 52 & Minus key \\
+13 & Return key          & 33 & T key & 53 & Shift key left \\
+14 & A key               & 34 & U key & 54 & Shift key right \\
+15 & B key               & 35 & V key & & \\
+16 & C key               & 36 & W key & & \\
+17 & D key               & 37 & X key & & \\
+18 & E key               & 38 & Y key & & \\
+19 & F key               & 39 & Z key & & \\
+\hline
+\end{tabular}
+\end{center}
+\end{small}
+
+A user can be informed of the appropriate trigger by obtaining a description
+from the routine {\bf Query Interactor Description}.
+
+At present only a few of all the possible interactions have been implemented.
+A non-zero error status will be returned from {\bf Execute Interaction and
+Wait} if the interaction has not been implemented.
+The table shows the implemented interactions with a cross (~+~).
+
+\begin{small}
+\begin{center}
+\begin{tabular}{|p{11em}||p{3.0em}||p{3.5em}||p{2.5em}|
+                |p{3.5em}||p{3.5em}||p{3.7em}||p{3.5em}|}
+\hline
+\multicolumn{8}{|c|}{X-windows Interaction Cross Reference} \\ \hline \hline
+Description & No effect & Cursor & ITT & VLUT & ROI & Memory & Display \\
+\hline
+Application specific code & + & . & . & . & . & . & . \\
+Move object               & + & + & . & . & + & + & + \\
+Rotate object             & + & . & . & + & . & . & . \\
+Increase zoom             & + & . & . & . & . & + & + \\
+Reduce zoom               & + & . & . & . & . & + & + \\
+Set zoom to normal        & + & . & . & . & . & + & + \\
+Blink object              & + & . & . & . & . & . & . \\
+Modify object             & + & . & . & . & + & . & . \\
+\hline
+\end{tabular}
+\end{center}
+\end{small}
+
+Scrolling a memory or the display with the mouse begins as soon as the
+hardware pointer enters the display window, and the memory moves as
+if it were attached to the hardware pointer, however scrolling does
+not happen if the mouse is moved too quickly. 
+
+With the X-windows interface it is possible to display a fixed cursor
+and to scroll and zoom the memory under it, although the default hardware
+cursor should not be used in this case. A fixed crosshair cursor or region
+of interest is made visible at the required position, and an interaction
+to scroll the memory is set up. The example program can easily be converted
+to perform this operation. To do this replace the cursor scroll interaction
+with a memory scroll interaction. Thus
+\begin{small}
+\begin{verbatim}
+      INTTY = 0
+      INTID = 0
+      OBJTY = 1
+      OBJID = 0
+      INTOP = 1
+      EXTRN = 2
+      CALL IIIENI( ID, INTTY, INTID, OBJTY, OBJID, INTOP, EXTRN,
+     :             STATUS )
+\end{verbatim}
+\end{small}
+becomes
+\begin{small}
+\begin{verbatim}
+      INTTY = 0
+      INTID = 0
+      OBJTY = 5
+      OBJID = MEMID
+      INTOP = 1
+      EXTRN = 2
+      CALL IIIENI( ID, INTTY, INTID, OBJTY, OBJID, INTOP, EXTRN,
+     :             STATUS )
+\end{verbatim}
+\end{small}
+
+When rotating the look-up table the action is controlled by the left
+and right movement of the mouse, or with the left and right keyboard
+arrows.
+
+\subsection{Cursors}
+
+The default cursor ({\it cursor shape}~=~0) is the hardware pointer. When
+it is activated, and in the display window, it is shown by an open cross.
+
+The cross hair cursor ({\it cursor shape}~=~1), cross cursor ({\it cursor
+shape}~=~2) and regions of interest (ROI) are drawn onto the screen using
+an exclusive OR (XOR).
+When using the mouse to control the movement of one of these cursors the
+hardware pointer has to be brought close to the centre of the crosshairs.
+When close enough the crosshair cursor becomes attached to the hardware
+pointer and will remain attached as long as the mouse is moved slowly.
+If the mouse is jerked quickly the hardware pointer and crosshair
+will part. When using a region of interest the hardware pointer has
+to be brought close to the active corner.
+
+\subsection{Text}
+
+Text is drawn with one of the preset device fonts. The text sizes small,
+normal and large are distinct, but the very large text size is the same
+as the large size. Only the default text path and text orientation are
+supported.
+
+\subsection{Deficiencies}
+
+\begin{itemize}
+\item
+Cursors or regions of interest drawn with the XOR function may sometimes
+be hard to see if many of the allocated pens used to draw an image contain
+similar colours. Installing a more varied look-up table should make the
+cursors more visible.
+
+\item
+When scrolling a memory, text or polylines drawn by the current application
+will not be refreshed if that part of the memory is scrolled out of the
+window and then scrolled back, unless the window is completely refreshed by,
+for example, zooming.
+\end{itemize}
+
+\end{document}
+

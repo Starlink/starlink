@@ -1,0 +1,2704 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {109.5}
+\newcommand{\stardocauthors}   {Peter W. Draper and Nicholas Eaton}
+\newcommand{\stardocdate}      {24 September 1992}
+\newcommand{\stardoctitle}     {\Huge{PISA} \\ [2.5ex]
+                      \huge{Position Intensity and Shape Analysis}}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%
+% Include a PISAPLOT picture to show what the packages is about.
+% The postscript file SUN109.PS is an encapsulated output from
+% PISAPLOT which is produced with the following commands
+%
+% PISAFIND pisa_dir:frame(80:210,115:260) reset accept
+%
+% PISAPLOT device=pscript_p pltitl="\fr Objects located by PISAFIND" -
+%          abslab="\fr X position (pixels)" -
+%          ordlab="\fr Y position (pixels)" thick=2 annoscale=2.5.
+%
+% it will be necessary to scale the output in some fashion to a
+% width of around 5 inches. This may be performed using an AGI picture.
+%
+
+\setlength{\unitlength}{1in}
+\begin{center}
+\begin {picture}(5,5)
+\put(0,5.0){\special{include sun109.ps}}
+\end {picture}
+\end{center}
+
+\newpage
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+\setlength{\parskip}{0mm}
+\tableofcontents
+\setlength{\parskip}{\medskipamount}
+\markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\newpage
+\section{Introduction}
+
+The acronym PISA stands for Position, Intensity and Shape Analysis, and
+is the group name for a package of routines that deal with the location
+and parameterisation of objects on an image frame.
+
+The core of this package is the routine PISAFIND which performs image
+analysis on a 2-dimensional data frame. The program searches the data
+array for objects that have a minimum number of connected pixels above a
+given threshold and extracts the image parameters (position, intensity,
+shape) for each object. The image parameters can be determined using
+thresholding techniques or an analytical stellar profile can be used to
+fit the objects. In crowded regions deblending of overlapping sources
+can be performed.
+
+PISAFIND is based on the APM IMAGES routine. The algorithms are the same
+as in IMAGES but the interface has been adapted to Starlink, so that for
+instance the input data is now expected to be an NDF (see [1] which also
+describes other features of the Starlink Software Environment). The APM
+object finding and analysis package IMAGES
+was originally written by Mike Irwin at the University of Cambridge to
+analyse output from the Automated Photographic Measuring system. The
+background to the APM image analysis package is given in [2].
+
+In addition to it's object detection capability PISA can also perform
+simple object classification. The classification is performed by the
+simple thresholding of an additionally generated `peakedness' measure,
+or by the multivariate analysis of a set of intensity corrected
+variables.
+
+\section{Classified listing of routines}
+
+The package routines (other than PISAFIND) are:
+\begin{description}
+
+\item [PISAPLOT] plots the results of PISAFIND as a series of ellipses
+on a graphics device, it allows the ellipses to be overlaid onto
+displayed images.
+
+\item [PISAFIT] fits the PISA analytic stellar profile to a list of
+objects.
+
+\item [PISAGEN] generates analytic objects and places them in an NDF
+data array.
+
+\item [PISAPEAK] modifies the PISAFIND parameterisations so as to
+produce variables which are nearly intensity independent. The variables
+are further modified so that they have values in proportion to those of
+an equivalent stellar profile.
+
+\item [PISAKNN] performs non-parametric (distribution free)
+multivariate discriminant analysis on the results from PISAPEAK.
+
+\item [PISACUT] is a utility routine for separating any file
+into two given a threshold value for a particular variable.
+
+\item [PISAMATCH] is a utility program for matching indices between
+files. It included primarily to match classification indices 
+against the PISAFIND parameterisations.
+
+\item [PISA2SCAR] (VMS only) converts any of the PISA datasets to a
+format which can be used by SCAR [5] or CATPAC [8] applications.
+
+\item [PISAGREY] (UNIX only) plots an NDF data array as a greyscale.
+\end{description}
+
+\section{Running the PISA software}
+
+PISA is available as part of the Starlink Software Collection on VMS and
+UNIX platforms.
+
+On VMS machines PISA can be run as either an ADAM monolith or as a
+series of DCL Atasks. The PISA monolith is run from the ADAM command
+language ICL. To get  into ICL type
+\begin{verbatim}
+     $ ADAMSTART
+     $ ICL
+\end{verbatim}
+You can obtain help on the package at this stage by typing
+\begin{verbatim}
+     ICL> HELP PISA
+\end{verbatim}
+To start up the PISA package type
+\begin{verbatim}
+     ICL> PISA
+\end{verbatim}
+Individual PISA routines can then be run by typing their names at the
+command level, for example
+\begin{verbatim}
+     ICL> PISAFIND
+\end{verbatim}
+starts the image analysis program.
+
+Program execution can be halted at a prompt by returning the abort
+command (!!).
+
+To initiate the package from DCL type PISA (after ADAMSTART). The PISA
+routines can then be run by typing the command names. Help on PISA
+applications can be accessed either by typing PISAHELP or HELP taskname.
+
+On UNIX machines PISA is available only from the C-shell, the package is
+initialised by the command
+\begin{verbatim}
+     % pisa
+\end{verbatim}
+
+after the Starlink login has been \verb+source'd+. At the time of
+writing on-line help is not available. Under UNIX the application
+PISA2SCAR is not available and an additional application PISAGREY is
+provided. PISAGREY is a very basic greyscale display routine.
+
+In general the way that PISA works under UNIX is the same as under VMS.
+The more obvious differences are due to the operating system --- file
+specifications etc. Less obvious differences are mostly due to the way
+that the C-shell tries to interpret special characters given on the
+command line, some of which may be required by the parameter system. In
+these cases (such as quoted strings \verb+""+, and vector braces
+\verb+[]+) the characters must be protected from interpretation by the
+use of the escape character \verb+\+ or by use of single quotes.
+
+\section{Object detection and parameterisation -- PISAFIND}
+
+PISAFIND performs image analysis on a 2-dimensional data frame. It has
+two basic modes of operation. The first is isophotal analysis in
+which pixels with data values above a given threshold are examined for
+connectivity and combined into objects. This type of analysis should be
+used on images that contain a heterogeneous collection of objects such
+as a mixture of stars and galaxies.
+
+The second mode of operation is profile fitting in which an analytical
+stellar profile is fitted to the objects found by a preliminary
+isophotal analysis. This latter option should only be used in situations
+where all the images on a data frame have the same shape, such as in a
+star cluster. This type of analysis is also performed by the DAOPHOT
+[3] package which specializes in analysing crowded stellar fields.
+The determination of the best fit model parameters is performed by 
+PISAFIT.
+
+In crowded regions deblending of overlapping sources can be performed.
+The isophotal analysis does this by examining each object at a number of
+higher isophotes to see if the object splits into more than one
+component. The profile fitting does this by modelling the data with the
+analytic profiles and seeing if the fit can be improved by decreasing or
+increasing the number of objects, as well as altering their position and
+brightness. In both cases the intensity of the combined image is
+partitioned between the components to ensure conservation of flux.
+
+If the objects have extensive wings to their intensity profiles then the
+simple isophotal analysis can underestimate the total intensity in an
+object; two options for estimating the total intensity are available.
+The first uses a circular aperture of specified radius within which the
+user knows the total light to be contained. The second uses an automatic
+curve of growth analysis in which the intensity within elliptical
+apertures of increasing size is measured until a maximum is reached.
+This is similar to a Kron-style analysis.
+
+For the profile fitting case the intensity of an object is obtained by
+integrating under the analytic profile using the relevant parameters
+(the actual functions are described in appendix \ref{funcparms}). The
+analytic profile is made up of three components. The core of the profile
+is a Gaussian but below a given level an exponential function
+takes over. The two functions are under-pinned by a Lorentzian function
+which is summed over all regions. If the results of the analysis are to
+be compared to other frames then the magnitudes from the profile fitting
+have to be related to total magnitudes by analysing at least one object
+on the frame by both methods. The rest of the measurements can then be
+suitably scaled to give total magnitudes.
+
+It is always a good idea to run the isophotal analysis on a frame before
+running any of the other options to check that there are no
+peculiarities, and in the case of deblending to check that the objects
+do not fragment too much. If the data is significantly oversampled (the
+point-spread function covers many pixels) then the data should be binned
+into a smaller array. There will be no significant loss of accuracy, but
+a great improvement in execution time.
+
+A full list of the PISAFIND parameters is given in appendix
+\ref{fulldescriptions} which should be consulted before running the
+application.
+
+\subsection{Pre-processing of the image}
+
+PISAFIND expects there to be no background variation in the image array.
+Any such variations should be removed in advance with a suitable
+application, such as SURFIT in KAPPA [6]. The frame should also be
+clean of any defects and bad pixels.
+
+\subsection{Restriction on input data}
+Currently PISAFIND works with INTEGER data in the range 0 to 32766. An
+array of real data in this range will be accepted by the routine but the
+following message will appear:
+\begin{quote}
+\begin{verbatim}
+     Input NDF is of type _REAL - this application can only process at
+     _WORD precision; significance may be lost 
+\end{verbatim}
+\end{quote}
+If the array contains data outside this range the program will abort
+with the following message:
+\begin{quote}
+\begin{verbatim}
+     ! The input NDF contains "bad" pixels or values outside the range of 
+       _WORD, these cannot be correctly handled by this application. 
+\end{verbatim}
+\end{quote}
+
+A previous restriction on the size of the input data has been removed,
+however, other limitations still apply. The maximum length of the {\em
+first} dimension of any input data is 10240 pixels. Objects cannot
+fragment into more than 200 pieces.
+
+\subsection{Format of the results files}
+The results of the parameterisation analysis are written into two
+files. 
+
+The first file name is defined by the RESULTS parameter. There are
+eleven columns in the output file containing the following information
+:-
+
+\begin{center}
+\begin{tabbing}
+xxxxx \= xxxxxxxx \= xxxxxxxxxxxxx \= \kill
+\> Column \> Name  \> Description \\
+\> 1 \> INDEX \> Index number of object.\\
+\> 2 \> XPOS \> X position of object in pixels.\\
+\> 3 \> YPOS \> Y position of object in pixels.\\
+\> 4 \> INTENSITY \> Integrated intensity of object.\\
+\> 5 \> NPIX \> Number of pixels above threshold.\\
+\> 6 \> PEAK \> Peak intensity of object in one pixel.\\
+\> 7 \> ELLIPT \> Ellipticity of object.\\
+\> 8 \> ANGLE \> Orientation of object, anti-clockwise from y-axis.\\
+\> 9 \> SXX \> Second moment of data in x.\\
+\> 10 \> SYY \> Second moment of data in y.\\
+\> 11 \> SXY \> Cross moment of data in x and y.\\
+\end{tabbing}
+\end{center}
+
+The results of areal thresholding analysis are written to the second
+file whose  name is defined by the SIZES parameter.  There are nine
+columns in the output file, the last seven contain the number of pixels
+within the intensity thresholds : -
+\begin{center}
+\begin{math}
+     I_{i} = I_{t} + 2^{(i+2)},\; i=2,8
+\end{math}
+\end{center}
+where $I_{t}$ is the threshold intensity and $I_{i}$ is the object
+intensity above the threshold :-
+
+\begin{center}
+\begin{tabbing}
+xxxxx\=xxxxxxxx \= xxxxxxxxxxxxx \= \kill
+\>Column \> Name  \> Description \\
+\> 1 \> INDEX \> Index number of object.\\
+\> 2 \> A1 \> Number of object pixels within threshold.\\
+\> 3 \> A2 \> Number of object pixels within i=2 threshold.\\
+\> 4 \> A3 \> Number of object pixels within i=3 threshold.\\
+\> 5 \> A4 \> Number of object pixels within i=4 threshold.\\
+\> 6 \> A5 \> Number of object pixels within i=5 threshold.\\
+\> 7 \> A6 \> Number of object pixels within i=6 threshold.\\
+\> 8 \> A7 \> Number of object pixels within i=7 threshold.\\
+\> 9 \> A8 \> Number of object pixels within i=8 threshold.\\
+\end{tabbing}
+\end{center}
+
+The RESULTS output of PISAFIND can be used as input to the aperture
+photometry program PHOTOM [4]. This could be exploited to automate the
+photometry of standard stars on CCD frames.
+
+\section{Visual inspection -- PISAPLOT}
+
+PISAPLOT plots the results of the PISAFIND analysis as a series of
+ellipses which reflect the size and shape of the objects as defined by
+their RESULTS parameters. The ellipses can be annotated with their index
+number to provide a cross-reference to the object list. The plot may be
+overlaid on an existing image for a direct comparison of the results.
+
+The program uses AGI [7] the graphics database so that suitable tasks,
+such as the KAPPA [6] routine CURSOR, can be used to get positional
+information. PISAPLOT has many parameters which control such things as
+the line thickness, line colour, the upper and lower bounds of the plot
+axis, so that the output can be modified for presentation and comparison
+purposes.
+
+Perhaps the most likely use of PISAPLOT is to overlay a results file
+over a previously displayed image. This is achieved using the OVERLAY
+parameter
+\begin{verbatim}
+     # PISAPLOT OVERLAY
+\end{verbatim}
+
+If the plotting device has an overlay plane then the present contents of
+it may be cleared using the CLEAR parameter
+\begin{verbatim}
+     # PISAPLOT OVERLAY CLEAR
+\end{verbatim}
+
+The colours of the plotted ellipses are controlled using the PALNUM
+parameter. If the graphics device allows colour then different pen
+numbers may be used for successive plots using the OVERLAY option. So for
+instance a group of objects separated from the main results by some
+criterion (being stellar) may be plotted in one colour and the others in
+another colour. The pen colours are set by PGPLOT and are:
+\begin{center}
+\begin{tabular}{|c|c|}
+\hline
+Pen Number & Colour \\
+\hline
+\hline
+0 & background colour \\
+1 & foreground colour \\
+2 & red \\
+3 & green \\
+4 & blue \\
+5 & cyan \\
+6 & magenta \\
+7 & yellow \\
+8 & orange \\
+\hline
+\end{tabular}
+\end{center}
+and so on up to pen 16.
+
+After PISAPLOT has been run these colours can be superceded by using the
+KAPPA palette facilities PALDEF and PALENTRY, but note that any
+subsequent runs of PISAPLOT will reinstate the PGPLOT default colours so
+using the KAPPA facilities should be delayed until all different sets of
+objects have been displayed. The KAPPA palette pen numbers correspond to
+PALNUM values (hence the parameter name).
+
+
+\section{Determining a profile model -- PISAFIT}
+PISAFIT fits the radially symmetric mixed Gaussian - Exponential - 
+Lorentzian function (appendix \ref{funcparms}) as used by PISAFIND in
+its profile fitting mode. It fits objects whose {\em accurate} positions
+are given in a formatted list. The objects should be stars which are
+well separated on the frame and which are not saturated. The list of
+positions may contain the usual PISA format of identifier (an integer)
+followed by the X and Y positions, or may just contain the X and Y
+positions as returned by the KAPPA [6] CENTROID routine.
+
+The PISA profile fitting function is described by three separate
+parameters; the gaussian sigma (GSIGM); the cross over point (CROSS), as
+a fraction of the peak intensity, from the gaussian core to an
+exponential wing; and the fractional mix (COMIX) of a lorentzian to
+these two functions at each point. The  parameters resultant from the
+functional fit are stored in the  ADAM\_USER:GLOBAL file as the objects
+PISA\_GSIGM, PISA\_CROSS and PISA\_COMIX. These will be accessed
+automatically by PISAFIND, PISAGEN  and PISAPEAK.
+
+The fit produced by this routine is displayed on a graphics device,
+together with the residuals (derived from the variance of data
+contributing to each point), so that the quality of fit can be assessed.
+Extra data displayed with a different point type is shown beyond the
+fitting radius. After the plot and fitting statistics are shown the user
+is prompted as to their satisfaction with the displayed fit and can
+re-do the fit out to a specified radius. This cycle is repeated until
+the user indicates satisfaction with the fit. Experience shows that the
+first fit is rarely the best.
+
+The values of the three fit parameters can be controlled, within certain
+limitations, by the user. Three different forms of parameter value
+bounding are available.  Type APM sets up the bounds so that a
+minimisation as performed by the original APM version of this routine is
+done. Type USER allows the user to directly specify the ranges within
+which the fitting parameters can vary.  Type NONE freely allows the
+minimisation routine to fit the function with the only restriction that
+the values are greater than zero. The user can also specify that the fit
+is done using a weighted scheme, this uses the shown residuals.
+
+PISAFIT uses the graphics database AGI [7], so plots can be made within
+predefined pictures on the chosen graphics device and values can read
+directly using a suitable cursor program. AGI pictures can be defined by
+the program PICDEF in KAPPA [6].
+
+\section{Model data generation --- PISAGEN \& ADDNOISE}
+
+PISAGEN generates model data using the PISA profile fitting function
+(appendix \ref{funcparms}). The objects are formed using the positions
+and integrated intensities output by PISAFIND in its profile
+fitting mode (or any other data of the same form for the first four
+columns):- 
+\begin{itemize}
+\item Object number
+\item X position
+\item Y position
+\item Integrated intensity.
+\end{itemize}
+Extra parameters not available in the other PISA routines allow  PISAGEN
+output objects to be elliptical. The image output from PISAGEN can have
+noise added of either gaussian form or of a pseudo-poissonian type. The
+noise levels are recorded in the variance component of the output NDF.
+The resultant model image can then be subtracted from the original data
+and the difference frame may be inspected, for missed objects, the
+goodness of the profile fit etc.
+
+PISAGEN can also perform the generation of model data for test purposes,
+the program accepts integrated intensities and can generate very
+accurate model objects by integrating the flux within each pixel. It is
+also possible to generate mixed frame data, i.e. data with objects of
+differing model parameters (and ellipticities). This is done by running
+PISAGEN multiply with the different parameters (with a zero background,
+except for one frame) and then combining the frames by addition. Noise
+can be added to this `mixed' frame (which could for instance mimic a
+frame of stars and elliptical objects with extended wings (galaxies!
+although not $R^{1/4}$ ones)) by an ancillary program ADDNOISE, which is
+available with the PISA package. 
+
+\section{Using the PISA parameters - PISAPEAK, PISAKNN \& PISA2SCAR}
+
+Other packages exist which can be used to investigate and analyse the
+PISAFIND parameterisations. With sufficient effort they may also be used
+to classify objects or investigate the natural clustering of objects in
+parameter space, with the aim of classification in mind. Such  packages
+are Starlink Catalogue and Access and Reporting -- SCAR [5] and its
+successor CATPAC [8] (which are at present only available on VMS
+machines). Another package which could be used is CLUSTAN .
+Use, at least as far as getting the data into the other packages, is
+given below.
+
+\subsection{Simple use of PISA data in SCAR}
+
+Any of the PISA output files (from PISAFIND and PISAPEAK) can be
+converted for use by SCAR [5] and the CATPAC [8] package, this is
+performed by the
+\begin{verbatim}
+     # PISA2SCAR
+\end{verbatim}
+routine. SCAR and CATPAC may now be used to perform catalogue manipulations
+--- operations such as, correlations, thresholding, variable transformation,
+segmentation etc.
+
+What now follows is a very simple description of the use that can be made of
+PISAFIND output data to separate objects on the basis of criteria which are
+hopefully selecting definite stellar objects. The basic assumptions
+are that stellar objects have a constant total intensity to peak intensity
+ratio (a reasonable model given the scaling nature of star shapes) and that
+stars (on a good frame) are not likely to be greatly elliptical. 
+
+Plotting the total intensity to peak intensity ratio against ellipticity,
+it can usually be seen that a cluster of objects exist which have small
+ellipticity. It is then possible to select out objects which are more
+peaked within specified bounds, than other objects in the frame and
+which are not very elliptical. These should contain most of the stars on
+the frame. The other objects must be comprised of all sorts, i.e.
+galaxies, undeblended stars, defects and saturated stars. Other methods
+must be used to separate these object types, large galaxies can
+obviously be separated either by hand, or by say using the pixel areas,
+which will be considerably greater than stars. Very elliptical objects
+are most probably defects, etc. Hopefully, using fairly straight-forward
+reasoning it is possible to extract sets of objects. This sort of
+analysis can probably be aided by using the PISAPEAK (see later)
+parameters, which have already been converted to more stellar related
+values.
+
+\subsection{Getting the PISA output files into CLUSTAN}
+
+It is possible to get PISA format data into CLUSTAN and do analyses
+based on the `natural' clustering of the RESULTS. This use is not as
+simple as that possible using SCAR and the PISA applications, and also has
+the disadvantage that the results are highly dependent on the similarity
+(distance in the parameter space) measure. The clustering which is found
+is more often than not due to the measure rather than the physical
+attributes of the objects. In runs of CLUSTAN on the test NDF FRAME in
+PISA\_DIR it seems to select strongly by angle and the sign of the cross
+moment (SXY), and very weakly in others (ellipticity for one) which one
+might expect to bear more relevance to the real `clustering'. This
+problem probably requires careful selection of the variables to use and
+may well require the production of new hybrid variables (things like
+intensity/peak) as performed by PISAPEAK.
+
+An description of the entry of PISA data into CLUSTAN is given below and an
+analysis using this may be attempted, however, NO significance  should be
+ascribed to the results. If you really want to use this method there is no
+substitute to a proper understanding.
+
+A file called CLUSTAN.DAT is found in PISA\_DIR, take a copy of it. It
+shows how to get data into CLUSTAN, to run it in `batch' mode simply
+change the file names to those of your PISAFIND data files and type.
+\begin{verbatim}
+     $ CLUSTAN CLUSTAN
+\end{verbatim}
+to capture the output, submit a batch job. 
+
+\subsection{Object classification}
+
+It should, in principle, be possible to classify objects using the
+PISAFIND parameterisations of a {\em single} frame, but, this will only
+be possible provided that the apparent morphology of subject objects
+allow it (faint noise-limited objects are unlikely to be distinguishable
+from stars, and you shouldn't be too disappointed when they are not). 
+
+However, given a set of distinguishable objects a classification can be
+performed. Before such a task can be undertaken it is first necessary to
+remove the intensity dependency of the parameters. This allows the
+`shape' for a class of objects to remain reasonably constant. The
+quality `shape', in this context, really refers to a multivariate
+function. Usually the only objects on any single frame which have a
+constant shape are the stars. So the approach adopted in PISA is to
+`normalize' the PISAFIND parameterisations so that they are referenced
+to an ideal star. This is the first stage of classification using PISA.
+
+\subsection{Transforming PISA parameters to intensity invariant form}
+
+PISAPEAK transforms the PISAFIND RESULTS parameterisations so that the
+variables are intensity invariant, assuming a stellar profile. The
+output from PISAPEAK is intended for use in star-galaxy separation,
+either by applying direct cuts in variable values (PISACUT) or by
+discrimination analysis routines such as PISAKNN. A fit to stars on a
+frame can be performed by PISAFIT, which should be used prior to
+PISAPEAK. The output from PISAPEAK is a list of four parameters:
+\begin{itemize}
+\item A `peakedness' measure.
+\item The total intensity to peak intensity ratio, normalised to the
+analytical function.
+\item The unmodified ellipticity.
+\item The absolute value of the intensity weighted cross moment (SXY).
+\end{itemize}
+
+The peakedness measure is the ratio of the semi-major axis of the
+detected object (at the detection threshold) to the radius of the
+analytic function which has the same peak value (averaged with the
+central 9 pixels). Thus it specifies how more extended the object is
+than a star with the same peak value. This should select strongly
+between galaxies and stars. Indeed very good separation can be performed
+by using cuts of this value.
+
+The model profile is used to scale the object peakedness and intensity
+peak ratio to values around one. This only works well if the PISA
+profiling function is a good fit to the stars on your frame. If it is
+not a good fit or you cannot determine the model parameters then
+inaccurate values can be used, the only criterion being that the GSIGM
+value is about the FWHM seeing of your data (this is important for
+resampling the peak of the object). The results file will now contain
+values `normalised' to this `imaginary' object. The stars will still
+form a group of objects with similar values, although they may not be as
+tightly clustered as with a good fit.
+
+\subsection {Distribution free classification}
+
+PISAKNN use the results of PISAPEAK to discriminate objects into two
+classes. PISAKNN uses KNN (k nearest neighbours) distribution-free
+multivariate discrimination to classify objects into two classes. The
+classes are seeded by supplying two files which contain the indices of
+objects typical to the class in question ($>5$, approximately equal
+numbers of each). Each object then propagates its class to the other
+objects on the basis of which class of the 2*k nearest neighbours (in
+the parameter space of the PISAPEAK results) of each of the unclassified
+objects is most common. This procedure is iterated until all objects are
+assigned and have a stable class or until a maximum number of iterations
+is exceeded. The results of the discrimination are written to two output
+files, one for each class.
+
+KNN relies on good seed statistics as propagation is essentially linear
+(but remember that this is in a multivariate sense). If the seed
+subjects do not reasonably span the whole of the object parameter space
+improper incursion can occur, leading to misclassification. The
+classification in boundary areas between the objects will depend on the
+size of the nearest neighbour count, larger values will help the
+investigation of the `fuzzy' areas. If a very small value is chosen then
+this will act almost as a thresholding (but of all the parameters not
+just one).
+
+KNN has the advantage over classical discriminant analysis in that it
+does not relies on the classes of objects having multinomial
+distributions. The assumption of the normality of the objects
+contributing to each class relies all classes having a random spread
+across a particular part of parameter space. It is unlikely that this
+requirement can be met for small galaxy populations, although this may
+work well for large statistical samples.
+
+The ellipticity is included in the analysis, however, this may not
+always help selection. If some smallish round galaxies are present using
+this variable will increase the weight of selecting them as stars. In
+this case it may be profitable to switch off the ellipticity. 
+Ellipticity can be used for other purposes, say if you want a complete
+sample of stars, all stars will have ellipticities below a given
+threshold and can be selected thus. Further refinement can then be
+applied to the list by thresholding in peakedness to remove objects with
+large wings. 
+
+\section{List manipulation utilities --- PISACUT \& PISAMATCH}
+PISACUT separates a file of variables into two. The separation is
+performed by thresholding the values in a single column. The routine
+works on any formatted data files, applying a threshold to one of the
+variables. File entries with the selected variable value above or below
+the threshold are written out to separate files. It is intended for use
+in separating any PISA package results files.
+
+PISAMATCH matches the first column of values (the object indices) of two
+input files. When a match is located between the indices the complete
+entry in the second file is copied to the output file. The routine is
+primarily intended for matching the indices output from PISACUT or
+PISAKNN to those of the original PISAFIND data file, thus the new
+classes can have their properties analysed, or can be displayed using
+PISAPLOT.
+
+\section{Examples of running the PISA software}
+
+This section shows examples of how the PISA package may be used. Most
+applications have more capabilities than are shown here. Refer to the
+appendix with the complete descriptions if the sort of task which you
+want to perform is not shown here.
+
+The examples as shown are intended to be `platform independent'. No
+items specific to running PISA from the C-shell, DCL or ICL are shown.
+All the application parameters are identical; the main differences are
+due to special character interpretation. In DCL the continuation
+character is \verb+`-'+ in ICL \verb+`~'+ and in the C-shell \verb+`\'+.
+No continuation character is shown in the examples. When using the
+C-shell double quotes around \verb+""+ strings will be stripped as will
+vector braces \verb+[]+, so it is necessary to protect them by using the
+escape character or by using single quotes around the complete
+parameter value i.e. use 
+\verb+'"a parameter string"'+ or \verb+\"a parameter string\"+ not
+\verb+"a parameter string"+, and
+\verb+'[1,2,3,4]'+  or \verb+\[1,2,3,4\]+ not \verb+[1,2,3,4]+
+
+\subsection{Isophotal analysis with deblending}
+
+This example performs isophotal analysis with deblending of overlapped
+images on a frame containing a mixture of stars and galaxies.
+The results are then plotted on a hardcopy device.
+\begin{verbatim}
+     # PISAFIND 
+     IN - NDF containing input image > PISA_DIR:FRAME 
+       Analysing whole image 
+     MINPIX - Minimum pixel size for images (typically 4-16) > 6 
+     METHOD - Intensity analysis ( 0=Isophotal, 1=Total, 2=Profile ) > 0 
+       Estimated background level =   492.2 
+       Background standard deviation =     7.4 
+     BACKGROUND - Background (global sky) value /492.17/ > 
+     THRESH - Threshold for analysis (data units) > 11.5 
+  
+       Total number of positive images = 141 
+       The results have been written to PISAFIND.DAT 
+           and PISASIZE.DAT 
+  
+     # PISAPLOT 
+     RESULTS - File of PISAFIND parameterised data /@PISAFIND/ > 
+     DEVICE - Name of graphics device > POSTSCRIPT_P
+\end{verbatim}
+
+\subsection{Plotting overlaid ellipses}
+Using PISAPLOT to overlay ellipses is achieved using the OVERLAY and
+CLEAR parameters. The image over which the plot is to be overlaid should
+have been displayed using the KAPPA DISPLAY or a routine which uses AGI
+to store its graphics information (such as PISAGREY).
+\begin{verbatim}
+     # DISPLAY IN=PISA_DIR:FRAME MODE=PER PERCENTILES=[1,99] DEVICE=XW
+     # PISAPLOT RESULTS=PISAFIND.DAT OVERLAY DEVICE=XW
+\end{verbatim}
+
+If a device with a suitable overlay is used then the overlay plane may
+be erased prior to the plotting of the ellipses using the CLEAR
+parameter.
+\begin{verbatim}
+     # PISAPLOT RESULTS=PISAFIND.DAT OVERLAY CLEAR DEVICE=IKONOV
+\end{verbatim}
+
+The colour of the ellipses is controlled using the PALNUM parameter. So
+for instance if one had two lists of results which are separated into
+stars and galaxies for instance (or one could have PISAFIND results
+files separated by intensity, ellipticity etc.)
+\begin{verbatim}
+     # PISAPLOT RESULTS=STARS.DAT OVERLAY PALNUM=3
+     # PISAPLOT RESULTS=GALAXIES.DAT OVERLAY PALNUM=4
+\end{verbatim}
+This sequence of commands would result in the data in file
+\verb+STARS.DAT+ being overlaid and coloured green. The data in file
+\verb+GALAXIES.DAT+ would also be overlaid on the same image and
+coloured blue. The colours of these could then be altered using the
+KAPPA palette facilities for pens \verb+3+ and \verb+4+.
+
+\subsection{Performing profile fitting analyses}
+
+To perform a profile fit a list of the accurate positions of good well
+separated stars are required. One way to get such a list is too use the
+KAPPA CENTROID routine to select objects from a displayed image.
+\begin{verbatim}
+     # CENTROID COOUT=STARS.ACC MODE=CURSOR MARK
+\end{verbatim}
+The output file \verb+STARS.ACC+ is of a format suitable for input to
+PISAFIT. Running PISAFIT allows the determination of the best fit to the
+stars.
+\begin{verbatim}
+     # PISAFIT
+     IN - NDF containing input image /@PISA_DIR:FRAME/ >
+      Analysing whole image
+      Estimated background level =   492.2
+      Background standard deviation =     7.4
+     BACKGROUND - Background (global sky) value /492.2/ > 
+     POSITIONS - File containing star positions / / > STARS.ACC
+     MINMODE - Minimisation bounds mode /'APM'/ >
+     RADIUS - Limiting Radius > 10
+      Number of points in curve fit = 28
+
+      May be having problems with the minimisation, check plot.
+      RMS of fit                 = 2.0545775E-02
+      Gaussian Sigma      (GSIGM)=  2.17
+      % Cross Over        (CROSS)= 30
+      Mixture Coefficient (COMIX)= 0.087
+     AGAIN - Do fit again /TRUE/ > f
+
+\end{verbatim}
+The parameters controlling other various options are detailed in the
+routine description appendix. Usually the default options (as shown) are
+all that are necessary.
+
+PISAFIT writes the model parameterisations into the ADAM\_USER:GLOBAL
+file. These values are then automatically picked up by any other PISA
+application which requires them. So for instance running PISAFIND in its
+profile fitting mode is straight-forward after running PISAFIT.
+\begin{verbatim}
+     # PISAFIND
+     IN - NDF containing input image /@PISA_DIR:FRAME/ >
+      Analysing whole image
+     MINPIX - Minimum pixel size for images (typically 4-16) / / > 4
+     METHOD - Intensity analysis ( 0=Isophotal, 1=Total, 2=Profile ) /0/ > 2
+     GSIGM - Gaussian sigma (pixels) /2.17146/ >
+     CROSS - Crossover point % of peak /30/ >
+     COMIX - Mixture coefficient /8.7035753E-02/ >
+     UPLIM - Upper intensity limit to use in analysis (saturation) /32767/ >
+     IFULL - Do you want full surface modelling /FALSE/ >
+      Estimated background level =   492.2
+      Background standard deviation =     7.4
+     BACKGROUND - Background (global sky) value /492.17/ >
+     THRESH - Threshold for analysis (data units) /20/ >
+
+      Total number of positive images = 119
+      The results have been written to PISAFIND.DAT
+          and PISASIZE.DAT
+\end{verbatim}
+
+\subsection{Fancy plots}
+
+PISAPLOT allows the use of PGPLOT text escape sequences (see [9] for a
+complete list of the characters supported). It also has parameters
+controlling the size of the annotations, the presence of annotations,
+the number of tick mark and the thickness of the lines. So for instance
+the plot on the front page of this document was produced using the
+commands.
+\begin{verbatim}
+     # PISAFIND PISA_DIR:FRAME(80:210,115:260) RESET ACCEPT
+     # PISAPLOT DEVICE=PSCRIPT_P PLTITL="\fr Objects located by PISAFIND" 
+                ABSLAB="\fr X position (pixels)" 
+                ORDLAB="\fr Y position (pixels)" THICK=2 ANNOSCALE=2.5
+\end{verbatim}
+
+Hence the labels were written using a Roman font.
+
+\subsection{Simple object classification}
+
+PISA contains routines which when used co-operatively can separate objects
+into lists of stars and `other' objects. If the objects have been located using
+PISAFIND and a suitable profile fit has been made using PISAFIT, then using
+PISAPEAK produces a set of `intensity invariant' measures. Basically what we're
+looking for here are some transformations of the original PISAFIND RESULTS
+measurements which are not different simply because the objects are of
+different apparent brightnesses. The transformations choosen try to have the
+same values for a star of any brightness. Try the following sequence of
+commands.
+
+\begin{verbatim}
+     # PISAPEAK IN=PISA_DIR:FRAME FINDDATA=PISAFIND.DAT RESULTS=PISAPEAK.DAT
+     # PISACUT INPUT=PISAPEAK.DAT COLUMN=2 THRESH=0.85 LOWER=STARS.INDICES
+               HIGHER=GALS.INDICES 
+     # PISAMATCH ONE=STARS.INDICES TWO=PISAFIND.DAT OUT=STARS.DAT 
+     # PISAMATCH ONE=GALS1.INDICES TWO=PISAFIND.DAT OUT=GALS.DAT
+\end{verbatim}
+
+This example transforms the PISAFIND RESULTS file using a model stellar profile
+fit, writting the results to PISAPEAK.DAT. PISACUT is then used to separate the
+PISAPEAK results, thresholding the data using a cut of 0.85
+\footnote{The value 0.85 is decided basically by trial and error. Ideally
+objects with peakedness measure less than 1 would always be stars, however,
+the actual value depends strongly on the quality of the profile fit.}
+in the peakedness measure (this strongly selects for stars). The indices of the
+objects in file \verb+STARS.INDICES+ and \verb+GALS.INDICES+ are then matched
+against those of the original PISAFIND RESULTS file, giving two files which
+contain the PISAFIND RESULTS for the separated objects. 
+
+\subsection{Comprehensive example}
+
+A more comprehensive example of PISA usage can be found in the either
+the PISA\_DIR directory on VMS or in /star/bin/pisa directory on UNIX.
+On VMS it is given in two forms a DCL command file PISA\_DEMO.COM and an
+ICL procedure file PISA\_DEMO.ICL. To run the DCL variant just type
+@PISA\_DIR:PISA\_DEMO `device'. To run the ICL variant type (after
+getting into ICL) LOAD PISA\_DIR:PISA\_DEMO, followed by  PISA\_DEMO
+`device'. On UNIX \verb+pisa_demo+ is defined as a command so just run it as
+any of the applications.
+
+
+\section{Acknowledgements}
+
+Thanks go to Mike Irwin and Steve Maddox for explaining some of the
+secrets of the APM IMAGES package, and to Malcolm Currie for supplying
+the original version of PISAPLOT.
+
+\section{References}
+
+1 --- SG/4: ADAM - The Starlink Software Environment.
+
+2 --- Irwin, M.J., 1985, Automatic analysis of crowded fields, \\
+\hspace*{2.0em} Mon.Not.R.astr.Soc., {\bf 214}, 575-604.
+
+3 --- SUN/42: DAOPHOT - Stellar Photometry Package.
+
+4 --- SUN/45: PHOTOM - An aperture photometry routine.
+
+5 --- SUN/70: SCAR - Starlink Catalogue Access and Reporting.
+
+6 --- SUN/95: KAPPA - Kernel Application Package.
+
+7 --- SUN/48: AGI - Applications Graphics Interface Programmers Guide.
+
+8 --- SUN/120: CATPAC - Catalogue Applications Package.
+
+9 --- MUD: PGPLOT Graphics Subroutine Library.
+
+\newpage
+\appendix
+\section{Full routine descriptions}
+\label{fulldescriptions}
+
+%  Define length variables.
+\newlength{\sstbannerlength}
+\newlength{\sstcaptionlength}
+
+%  Define a \tt font of the required size.
+\font\ssttt=cmtt10 scaled 1095
+
+%  Define a command to produce a routine header, including its name,
+%  a purpose description and the rest of the routine's documentation.
+\newcommand{\sstroutine}[3]{
+   \goodbreak
+   \rule{\textwidth}{0.5mm}
+   \vspace{-7ex}
+   \newline
+   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
+   \setlength{\sstcaptionlength}{\textwidth}
+   \addtolength{\sstbannerlength}{0.5em}
+   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
+   \addtolength{\sstcaptionlength}{-4.45pt}
+   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
+   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
+   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
+   \begin{description}
+      #3
+   \end{description}
+}
+
+%  Format the description section.
+\newcommand{\sstdescription}[1]{\item[Description:] #1}
+
+%  Format the usage section.
+\newcommand{\sstusage}[1]{\item[Usage:] \mbox{} \\[1.3ex] {\ssttt #1}}
+
+%  Format the invocation section.
+\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
+
+%  Format the arguments section.
+\newcommand{\sstarguments}[1]{
+   \item[Arguments:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the returned value section (for a function).
+\newcommand{\sstreturnedvalue}[1]{
+   \item[Returned Value:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the parameters section (for an application).
+\newcommand{\sstparameters}[1]{
+   \item[Parameters:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the examples section.
+\newcommand{\sstexamples}[1]{
+   \item[Examples:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Define the format of a subsection in a normal section.
+\newcommand{\sstsubsection}[1]{\item[{#1}] \mbox{} \\}
+
+%  Define the format of a subsection in the examples section.
+\newcommand{\sstexamplesubsection}[1]{\item[{\ssttt #1}] \mbox{} \\}
+
+%  Format the notes section.
+\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
+
+%  Provide a general-purpose format for additional (DIY) sections.
+\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}] \mbox{} \\[1.3ex] #2}
+
+%  Format the implementation status section.
+\newcommand{\sstimplementationstatus}[1]{
+   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
+
+%  Format the bugs section.
+\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
+
+%  Format a list of items while in paragraph mode.
+\newcommand{\sstitemlist}[1]{
+  \mbox{} \\
+  \vspace{-3.5ex}
+  \begin{itemize}
+     #1
+  \end{itemize}
+}
+
+%  Define the format of an item.
+\newcommand{\sstitem}{\item}
+
+%  End of LAYOUT.TEX layout definitions.
+%.
+\begin{small}
+
+\sstroutine{
+   ADDNOISE
+}{
+   Adds noise to model data
+}{
+   \sstdescription{
+      ADDNOISE, adds noise to model data. The noise can be either
+      poissonian or gaussian. If gaussian a constant noise level,
+      described by a given standard deviation, is introduced. If
+      poissonian the data is scaled by a factor to change data values
+      into counts. The counts are then used as estimates of the mean
+      value in that pixel and noise is added on this basis. Note that
+      the poissonian noise is pseudo gaussian and so the count levels in
+      the frame need to be greater than 10.
+   }
+   \sstusage{
+      ADDNOISE IN NOISE OUT 
+        \newline\hspace*{1.5em}
+        $\left\{ {\begin{tabular}{l}
+                                      ADU=? \\
+                                      SIGMA=? \\
+                  \end{tabular} }
+        \right.$
+        \newline\hspace*{1.9em}
+        \makebox[0mm][c]{\small noise}
+   }
+   \sstparameters{
+      \sstsubsection{
+         IN = NDF (Read)
+      }{
+         The input NDF containing the data to which noise needs to be
+         added.
+      }
+      \sstsubsection{
+         NOISE = LITERAL (Read)
+      }{
+         The noise type to introduce into the data. Either Gaussian or
+         Poissonian, which may be abbreviated to G and P. [P]
+      }
+      \sstsubsection{
+         ADU = REAL (Read)
+      }{
+         The scaling factor to convert the data values in the input NDF
+         to counts for which poisson statistics are assumed valid.
+         [1.0]
+      }
+      \sstsubsection{
+         SIGMA = REAL (Read)
+      }{
+         The standard deviation of the gaussian noise. [1.0]
+      }
+      \sstsubsection{
+         OUT = NDF (Write)
+      }{
+         The output NDF to contain the data with noise added.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         ADDNOISE IN=MODEL NOISE=G SIGMA=20 OUT=MODEL\_WITH\_NOISE
+      }{
+         This adds gaussian noise to the input NDF model. The noise has
+         a standard deviation of 20 units.
+      }
+      \sstexamplesubsection{
+         ADDNOISE IN=MODEL NOISE=P ADU=10 OUT=MODEL\_WITH\_NOISE
+      }{
+         This adds poissonian noise to the input NDF model. The data
+         values are scaled by a factor of 10 before the noise is
+         calculated.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   PISA2SCAR
+}{
+   Converts PISA formatted data files to SCAR/CHI format
+}{
+   \sstdescription{
+      PISA2SCAR converts PISAFIND and PISAPEAK results files to SCAR
+      format. The output catalogues can be used either by SCAR or by
+      the CATPAC catalogue manipulation applications. Note that the
+      output catalogues have a DSCFxxxxx file associated with them this
+      should not be deleted as this invalidates the catalogue.
+   }
+   \sstusage{
+      PISA2SCAR DATATYPE DATA SCARCAT
+   }
+   \sstparameters{
+      \sstsubsection{
+         DATATYPE = LITERAL (Read)
+      }{
+         The type of PISA data. Either FIND, SIZE or PEAK. FIND
+         indicates that the input data is a results file produced by
+         PISAFIND (RESULTS parameter) and that it contains the main
+         object parameterisations (ie.  position, total intensity, peak
+         intensity etc. ). SIZE indicates that the input file is a
+         results file from PISAFIND, but which contains the pixel sums
+         within different intensity thresholds (from the SIZES
+         parameter). Finally PEAK indicates that the input is a results
+         file from the PISAPEAK routine. [FIND]
+      }
+      \sstsubsection{
+         DATA = FILENAME (Read)
+      }{
+         Name of the file containing the PISA results to be modified to
+         SCAR format. 
+
+         [PISAFIND.DAT]
+      }
+      \sstsubsection{
+         SCARCAT = FILENAME (Write)
+      }{
+         Name of the catalogue to contain the SCAR formatted data. Note
+         that a file DSCFfilename is also produced, this should not be
+         deleted. [FIND.DAT]
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         PISA2SCAR FIND PISAFIND.DAT SCARFIND
+      }{
+         This example converts the results file containing the object
+         parameterisations from PISAFIND to SCAR format. It writes the
+         results to the file SCARFIND and DSCFSCARFIND.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         VMS specific. Only supplied on VMS.
+      }
+   }
+   \sstdiytopic{
+      Output\_fields
+   }{
+      The catalogue output from PISA2SCAR has an associated file
+      DSCFfilename, this contains a description of what the catalogue
+      contains and what the catalogue field names are. Briefly they are:
+      \begin{description}
+         \item [DATATYPE = FIND]~~~
+           \begin{description}
+            \item INDEX XPOS YPOS INTENSITY NPIX PEAK ELLIPT ANGLE SXX SYY SXY
+           \end{description}
+         \item [DATATYPE = SIZE] ~~~
+           \begin{description}
+            \item INDEX A1 A2 A3 A4 A5 A6 A7 A8
+           \end{description}
+         \item [DATATYPE = PEAK] ~~~
+           \begin{description}
+            \item INDEX RRATIO IRATIO ELLIP ABSSXY
+           \end{description}
+      \end{description}
+   }
+}
+\newpage
+\sstroutine{
+   PISACUT
+}{
+   PISACUT separates a formatted file into two parts
+}{
+   \sstdescription{
+      This routine works on any formatted data files, applying a
+      threshold to one of the variables. The variable is specified by a
+      column number. File entries with variable value above and below
+      the threshold are written out to separate files.
+   }
+   \sstusage{
+      PISACUT INPUT COLUMN THRESH LOWER HIGHER
+   }
+   \sstparameters{
+      \sstsubsection{
+         INPUT = FILENAME (Read)
+      }{
+         Name of a file containing the data to be separated by applying
+         a threshold value to the variable in the specified column.
+      }
+      \sstsubsection{
+         COLUMN = \_INTEGER (Read)
+      }{
+         The column which contains the data which is to be thresholded.
+         [1]
+      }
+      \sstsubsection{
+         THRESH = \_REAL (Read)
+      }{
+         The threshold value for variable in the given column. Entries
+         with this variable value above the threshold will be entered
+         to file HIGHER. Entries with a value less than or equal to
+         this variable value will be entered into file LOWER. [0.0]
+      }
+      \sstsubsection{
+         LOWER = FILENAME (Write)
+      }{
+         Name of a file to contain the entries with selected variable
+         value less than equal to the threshold.
+      }
+      \sstsubsection{
+         HIGHER = FILENAME (Write)
+      }{
+         Name of a file to contain the entries with selected variable
+         value greater than the threshold.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         \parbox{143mm}{PISACUT INPUT=PISAPEAK.DAT COLUMN=2 THRESH=1.5
+                        LOWER=STARS HIGHER=GALS }
+         }{
+            This separates the results from a run of the PISAPEAK program,
+            whose results are stored in file PISAPEAK.DAT, into two
+            different files STARS and GALS. The variable selected is the
+            one found in column 2 (the object peakedness). Entries,
+            in file PISAPEAK, with the variable value in column 2 greater
+            than 1.5 are written into file GALS, those with selected
+            variable value less than equal to 1.5 are written to file
+            STARS.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   PISAFIND
+}{
+   Locate and parameterise objects on an image frame
+}{
+   \sstdescription{
+      PISAFIND performs image analysis on a 2-dimensional data frame.
+      The program searches the data array for objects that have a
+      minimum number of connected pixels above a given threshold and
+      extracts the image parameters (position, intensity, shape) for
+      each object. The image parameters can be determined using
+      thresholding techniques or an analytical stellar profile can be
+      used to fit the objects. In crowded regions deblending of
+      overlapping sources can be performed.
+
+      It is important the frame supplied to the program is clean of all
+      defects and has a flat background. The data values should be in
+      the range 0 to 32766.
+   }
+   \sstparameters{
+      \sstsubsection{
+         BACKGROUND = \_REAL (Read)
+      }{
+         The actual background value to be used. The intensities used in
+         any analysis are background subtracted using this value.
+         [Dynamic]
+      }
+      \sstsubsection{
+         COMIX = \_REAL (Read)
+      }{
+         The mixture coefficient, as a fraction of the Gaussian peak,
+         of a Lorentzian function use to model the wings of the stellar
+         profile. At each point in the analytical profile the Lorentzian
+         function is added to the Gaussian/exponential core scaled by
+         the mixture coefficient. The profile is used to fit the data
+         and the intensity is obtained by integrating under the
+         profile. [Global]
+      }
+      \sstsubsection{
+         CROSS = \_REAL (Read)
+      }{
+         The crossover point, as a percentage of the Gaussian peak,
+         where an exponential fall-off in the analytical stellar profile
+         takes over from the Gaussian core. The exponential function is
+         joined on smoothly to the Gaussian. The profile is used to fit
+         the data and the intensity is obtained by integrating under the
+         profile. [Global]
+      }
+      \sstsubsection{
+         DEBLEND = \_LOGICAL (Read)
+      }{
+         Separate overlapping images or not.
+
+         If this is true then all objects which are connected at the
+         threshold level are examined to see if they comprise more than
+         one object at a higher level. If this is so the signal in the
+         object is apportioned between the components and the parameters
+         calculated accordingly.
+
+         If this is false the image parameters are calculated for those
+         objects which are connected at the threshold level. [TRUE]
+      }
+      \sstsubsection{
+         GSIGM = \_REAL (Read)
+      }{
+         The standard deviation, in pixels, of the Gaussian core of the
+         analytical stellar profile. The profile is used to fit the data
+         and the intensity is obtained by integrating under the
+         profile. [Dynamic]
+      }
+      \sstsubsection{
+         IBREF = \_LOGICAL (Read)
+      }{
+         Perform background refinement or not if full surface modelling
+         has been requested.
+
+         If this is true then during the full surface modelling
+         procedure the background is allowed to vary, over a blend of
+         objects, in addition to the object{\tt '}s position and intensity, to
+         best fit the data.
+
+         If this is false then the background is held constant during
+         the full surface modelling procedure. [FALSE]
+      }
+      \sstsubsection{
+         ICIRC = \_LOGICAL (Read)
+      }{
+         The total intensity is to be estimated from a circular aperture
+         of fixed size, or from an asymptotic curve of growth analysis.
+
+         If this is true a fixed sized circular aperture is used. If
+         this is false the total intensity is estimated from the curve
+         of growth using elliptical apertures that match the shape of
+         the objects. [FALSE]
+      }
+      \sstsubsection{
+         IFULL = \_LOGICAL (Read)
+      }{
+         Perform full surface modelling or not when analysing profile
+         intensities.
+
+         If this is true the program examines a difference map of the
+         raw data minus the fitted profiles to see if any other objects
+         are present. The fitting procedure is repeated until a stable
+         solution is reached. This option is very time consuming.
+
+         If this is false the program uses the images found from an
+         isophotal analysis as a basis for the profile fitting, and does
+         not examine the difference map for additional objects. Some
+         objects may be merged together if they are too close, or if the
+         fit is better in a least squares sense. [FALSE]
+      }
+      \sstsubsection{
+         IMNEG = \_LOGICAL (Read)
+      }{
+         Search for negative going images or not.
+
+         If this is true then negative going images (those below the
+         background level) will be searched for, as well as the usual
+         positive going images. The same threshold and minimum
+         connectivity is used for both directions. If the negative going
+         images are assumed to be due to random fluctuations in the
+         background then the number of negative images will indicate the
+         proportion of false detections that may be present amongst the
+         positive going images. Only isophotal analysis is applied to
+         the negative images. Negative going images are indicated in the
+         results file with minus signs in the first field.
+
+         If this is false then only positive going images are sought.
+         [FALSE]
+      }
+      \sstsubsection{
+         IN = NDF (Read)
+      }{
+         An NDF data structure containing the 2-dimensional image on
+         which the image analysis will be performed.
+      }
+      \sstsubsection{
+         ISMOO = \_LOGICAL (Read)
+      }{
+         Smooth the data before searching for objects with the isophotal
+         analysis or not.
+
+         If this is true then the data is smoothed with a 3 x 3 Hanning
+         filter before the isophotal analysis is performed. This is
+         useful if the deblending is fragmenting the data too much. The
+         object parameters are calculated using the unsmoothed data.
+
+         If this is false the raw data is used for the object searches.
+         [FALSE]
+      }
+      \sstsubsection{
+         METHOD = \_INTEGER (Read)
+      }{
+         The type of intensity analysis to be performed on the objects.
+         This is an integer code which can be one of the following
+         choices :-
+         \begin{description}
+
+         \item[0 ---] Isophotal intensities. The intensity above the threshold
+               is summed for each object.
+         \item[1 ---] Total intensities. For each object the total intensity is
+               estimated. This is done by one of two methods: A circular
+               aperture of fixed size is specified and the intensity is
+               summed within it. Otherwise the program automatically
+               estimates the total light within an object using an
+               asymptotic curve of growth analysis with elliptical
+               apertures that match the shape of the object.
+         \item[2 ---] Profile intensities. This uses an analytical stellar
+               profile to fit the individual objects. All pixels above
+               the threshold are used in the fit. The fit is made in the
+               least-squares sense and the intensity is obtained from
+               the integrated profile.
+        \end{description}
+      }
+      \sstsubsection{
+         MINPIX = \_INTEGER (Read)
+      }{
+         Minimum number of connected pixels an object needs to have to
+         qualify for further analysis. Only those pixels with data
+         values above the specified threshold are considered.
+      }
+      \sstsubsection{
+         PRALL = \_LOGICAL (Read)
+      }{
+         Analyse the whole array or select a subset of the data.
+
+         If this is true the whole data array is analysed. If this is
+         false the pixel coordinates defining a subset of the data to be
+         analysed is requested. [TRUE]
+      }
+      \sstsubsection{
+         RCIRC = \_REAL (Read)
+      }{
+         The radius in pixels of the circular aperture to be used for
+         the total intensity analysis.
+      }
+      \sstsubsection{
+         RESULTS = FILENAME (Write)
+      }{
+         The name of the file to receive the results of the analysis.
+         [PISAFIND.DAT]
+      }
+      \sstsubsection{
+         SIZES = FILENAME (Write)
+      }{
+         The name of the file to receive the areal sum results.
+         Note that -1. indicates that no measurement has been made
+         either because the object is part of a blend, or because the
+         profiling analysis has been requested. [PISASIZE.DAT]
+      }
+      \sstsubsection{
+         THRESH = \_REAL (Read)
+      }{
+         The threshold above which a pixel is considered as a potential
+         member of a larger object. An object has to contain a minimum
+         number of connected pixels above this threshold to be accepted.
+         The threshold is defined in data units above the background
+         level.
+      }
+      \sstsubsection{
+         UPLIM = \_INTEGER (Read)
+      }{
+         The upper limit, in data units, for a pixel to be included in
+         the profile fitting procedure. If the stellar profiles are
+         saturated then this can be used to constrain the profile
+         fitting to the unsaturated pixels. [Dynamic]
+      }
+      \sstsubsection{
+         XPIXS = \_INTEGER (Read)
+      }{
+         Initial and final pixel coordinates of the subset of the data
+         array to be analysed. [Dynamic]
+      }
+      \sstsubsection{
+         YPIXS = \_INTEGER (Read)
+      }{
+         Initial and final pixel coordinates of the subset of the data
+         array to be analysed. [Dynamic]
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         PISAFIND ARP199
+      }{
+         Performs image analysis on the 2-dimensional NDF data structure
+         ARP199.
+      }
+      \sstexamplesubsection{
+         PISAFIND PRALL=F
+      }{
+         Requests that a sub-section of the input data array is
+         analysed.
+      }
+      \sstexamplesubsection{
+         PISAFIND ISMOO=T
+      }{
+         Smooths the data with a Hanning filter before searching for
+         objects with the isophotal analysis.9
+      }
+   }
+\newpage
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The data input to PISAFIND can be any size (within system
+         limits), however, the length of the first dimension is restricted
+         to less than 10241 pixels.
+
+         \sstitem
+         The output in the RESULTS file contains the following
+         information:
+\begin{tabbing}
+xxxxx \= xxxxxxxx \= xxxxxxxxxxxxx \= \kill
+\> Column \> Name  \> Description \\
+\> 1 \> INDEX \> Index number of object.\\
+\> 2 \> XPOS \> X position of object in pixels.\\
+\> 3 \> YPOS \> Y position of object in pixels.\\
+\> 4 \> INTENSITY \> Integrated intensity of object.\\
+\> 5 \> NPIX \> Number of pixels above threshold.\\
+\> 6 \> PEAK \> Peak intensity of object in one pixel.\\
+\> 7 \> ELLIPT \> Ellipticity of object.\\
+\> 8 \> ANGLE \> Orientation of object, anti-clockwise from y-axis.\\
+\> 9 \> SXX \> Second moment of data in x.\\
+\> 10 \> SYY \> Second moment of data in y.\\
+\> 11 \> SXY \> Cross moment of data in x and y.\\
+\end{tabbing}
+
+         \sstitem
+         The output in the RESULTS file contains the following
+         information:
+\begin{tabbing}
+xxxxx\=xxxxxxxx \= xxxxxxxxxxxxx \= \kill
+\>Column \> Name  \> Description \\
+\> 1 \> INDEX \> Index number of object.\\
+\> 2 \> A1 \> Number of object pixels within threshold.\\
+\> 3 \> A2 \> Number of object pixels within i=2 threshold.\\
+\> 4 \> A3 \> Number of object pixels within i=3 threshold.\\
+\> 5 \> A4 \> Number of object pixels within i=4 threshold.\\
+\> 6 \> A5 \> Number of object pixels within i=5 threshold.\\
+\> 7 \> A6 \> Number of object pixels within i=6 threshold.\\
+\> 8 \> A7 \> Number of object pixels within i=7 threshold.\\
+\> 9 \> A8 \> Number of object pixels within i=8 threshold.\\
+\end{tabbing}
+
+      The SIZES thresholds are determined by the equation. \\
+      \begin{math}
+         I_{i} = I_{t} + 2^{(i+2)},\; i=2,8
+      \end{math} \\
+      where $I_{t}$ is the threshold intensity.
+
+      }
+   }
+}
+\newpage
+\sstroutine{
+   PISAFIT
+}{
+   Fits a mixed Gaussian - Exponential - Lorentzian profile to
+   STELLAR images
+}{
+   \sstdescription{
+      PISAFIT fits a radially symmetric mixed Gaussian - Exponential -
+      Lorentzian function to STELLAR type objects. The function is
+      described by three separate parameters, the gaussian sigma, the
+      cross over point, as a fraction of the peak intensity, from the
+      gaussian core to an exponential wing and the fractional mix of a
+      lorentzian to these two functions at each point. The parameters
+      describing the resultant functional fit are stored in the GLOBAL
+      file and can be subsequently accessed by PISAFIND if the profile
+      fitting option is chosen, or by PISAGEN for generating a model
+      data frame of the detected objects. The fit produced by this
+      routine is displayed on a graphics device, together with the
+      residuals (derived from the variance of data contributing to
+      each point), so that the quality of fit can be assessed. The
+      user is prompted as to their satisfaction with the displayed fit,
+      and can re-do the fit, out to a specified radius. This cycle can
+      repeat until the user indicates that he is satisfied with the
+      fit. Experience shows that the first fit is rarely the best.
+
+      The fit parameters can be controlled, within certain limitations,
+      by the user. Three different forms of minimisation parameter
+      bounding are available. Type APM sets up the bounds so that a
+      minimisation as used in the original APM specification of this
+      routine can be performed. Type USER allows the user to directly
+      specify the ranges within which the fitting parameters can vary,
+      and type NONE freely allows the minimisation routine to fit the
+      function with the only restriction that the values are greater
+      than zero. Finally the user can specify that the fit is done
+      using a weighted scheme, using the shown residuals.
+   }
+   \sstusage{
+      PISAFIT IN POSITIONS [DEVICE] [LINEW] [MINMODE]
+         AGAIN=? RADIUS=?
+   }
+   \sstparameters{
+      \sstsubsection{
+         AGAIN = \_LOGICAL (Read)
+      }{
+         Controls whether another refinement of the fit takes place or
+         not. [TRUE]
+      }
+      \sstsubsection{
+         BACKGROUND = \_REAL (Read)
+      }{
+         The background (sky) value. Used across whole frame. [Dynamic]
+      }
+      \sstsubsection{
+         COMIX = \_REAL (Write)
+      }{
+         The value found for the mixture ratio between the lorentzian
+         and the other functions, on exit from the program.
+      }
+      \sstsubsection{
+         COMIXRANGE = \_REAL (Read)
+      }{
+         The range of values between which COMIX is allowed to vary
+         during the minimisation. Only used if MINMODE = USER. [0,1]
+      }
+      \sstsubsection{
+         CROSS = \_REAL (Write)
+      }{
+         The value found for the percentage cross over point, from the
+         gaussian core to the exponential wings, on exit from the
+         program.
+      }
+      \sstsubsection{
+         CROSSRANGE = \_REAL (Read)
+      }{
+         The range of values between which CROSS is allowed to vary
+         during the minimisation. Only used if MINMODE = USER. [0,100]
+      }
+      \sstsubsection{
+         DEVICE = DEVICE (Read)
+      }{
+         A character string specifying a valid device name.
+      }
+      \sstsubsection{
+         GSIGM = \_REAL (Write)
+      }{
+         The value found for the gaussian sigma on exit from the
+         program.
+      }
+      \sstsubsection{
+         GSIGMRANGE = \_REAL (Read)
+      }{
+         The range of values between which GSIGM is allowed to vary
+         during the minimisation. Only used if MINMODE = USER.
+         [0.5,5,5]
+      }
+      \sstsubsection{
+         IN = NDF (Read)
+      }{
+         The Input NDF containing the objects to be fitted.
+      }
+      \sstsubsection{
+         LINEW = \_INTEGER (Read)
+      }{
+         The relative width of the lines plotted ( greater than equal
+         to 1 ). [1]
+      }
+      \sstsubsection{
+         MINMODE = LITERAL (Read)
+      }{
+         String defining which type of bounds are to be applied to the
+         minimisation parameters. The allowed returns are any string
+         beginning with the characters {\tt '}A{\tt '},{\tt '}U{\tt '} or {\tt '}N{\tt '}. These represent
+         {\tt '}A{\tt '}PM (default) {\tt '}U{\tt '}SER or {\tt '}N{\tt '}ONE. If return is APM then the
+         bounds for the minimisation are as in the original APM version
+         of this routine (0.5 to 5.5 for GSIGM, 0.0 to 1.0 for CROSS
+         and 0.0 to approximately 0.12 for COMIX). If the return
+         selects USER then the user will be prompted for the limitations
+         to be applied during the minimisation. If the returns selects
+         NONE then the parameters will be allowed to vary to any value
+         greater than 0.0. [APM]
+      }
+      \sstsubsection{
+         POSITIONS = FILENAME (Read)
+      }{
+         Ascii file containing the positions of the objects to be
+         fitted. The file may be of the type produced by PISAFIND or
+         just of list of either
+         \begin{description}
+            \item Object-number  X-position  Y-position etc.,
+         \end{description}
+         or
+         \begin{description}
+            \item X-position  Y-position.
+         \end{description}
+         [PISAFIND.DAT]
+      }
+      \sstsubsection{
+         PRALL = \_LOGICAL (Read)
+      }{
+         Analyse the whole array ( to derive the background value )
+         or select a subset of the data.
+
+         If this is true the whole data array is analysed. If this is
+         false the pixel coordinates defining a subset of the data to be
+         analysed are requested. [TRUE]
+      }
+      \sstsubsection{
+         RADIUS = \_REAL (Read)
+      }{
+         The radius out to which the fit will be attempted. This should
+         be at least a few stellar radii. [10.0]
+      }
+      \sstsubsection{
+         WEIGHTED = \_LOGICAL
+      }{
+         Set to true if a weighted fit is to be attempted. The weighting
+         is based on the distribution of errors of values contributing
+         to a bin in the mean profile. Note that under certain
+         conditions weighting can seem to bias fit unfairly to the
+         central bins (usually seen as a very poor fit to the outer
+         values). If this situation occurs then an unweighted fit is
+         the best option. [TRUE]
+      }
+      \sstsubsection{
+         XPIXS = \_INTEGER (Read)
+      }{
+         Initial and final pixel coordinates of the subset of the data
+         array to be analysed. [Dynamic]
+      }
+      \sstsubsection{
+         YPIXS = \_INTEGER (Read)
+      }{
+         Initial and final pixel coordinates of the subset of the data
+         array to be analysed. [Dynamic]
+      }
+   }
+\newpage
+   \sstexamples{
+      \sstexamplesubsection{
+         \parbox{143mm}{PISAFIT FRAME FRAME.STARS\_ACC CANON\_PORTRAIT 3
+                        NONE AGAIN=F RADIUS=15}
+      }{
+         Performs the radial fit on the stars contained in the list
+         FRAME.STARS\_ACC. It directs the graphical output to a laser
+         printer whose lines are printed at three times normal density.
+         The bounds on the minimisation are freed to be any value
+         greater than 0. The interactive, recursive, fitting loop is
+         disabled by setting AGAIN=F and the fit is done out to a
+         radius of 15 pixels.
+      }
+      \sstexamplesubsection{
+         PISAFIT FRAME FRAME.STARS\_ACC
+      }{
+         Performs the production of the radial profile. Enters into an
+         interactive session allowing the user to modify the radius of
+         the data used in the fit.
+      }
+   }
+   \sstnotes{
+      The potential quality of the fit is very dependent on the objects
+      chosen to produce the radial profile. The best results should be
+      obtained from a range of unsaturated, well separated objects. The
+      list of objects used for the fit can be passed directly from
+      PISAFIND or by a list of object x,y positions produced by the
+      user, say by using the KAPPA routine CENTROID. Note that any
+      input lists of the latter type should be of the form
+      object\_number, X\_position, Y\_position in the first
+      three columns or X\_position, Y\_position ) only. This means
+      that output from many KAPPA routines will require editing.
+   }
+   \sstdiytopic{
+      Timing
+   }{
+      The timing for the initial processing (i.e. radial profile
+      production) is proportional to the number of objects given.
+      The latter processing (the fitting loop) is dependent only on
+      the number of points in the fit .
+   }
+   \sstdiytopic{
+      Functional Forms
+   }{
+      The basic functional forms of the fitting equations are described in
+      appendix \ref{funcparms}.
+
+   }
+   \sstimplementationstatus{
+      The present status of the program has 4 main drawbacks.
+      \begin{itemize}
+
+       \item The data must lie within the range of signed word reasonably
+       approximated by integers.
+
+       \item There is no bad pixel handling.
+
+       \item The input arrays cannot be any larger than 10240 pixels in
+       any axis.
+
+       \item A maximum of 1000 input objects is allowed.
+      \end{itemize}
+   }
+}
+\newpage
+\sstroutine{
+   PISAGEN
+}{
+   PISAGEN generates a frame of model objects
+}{
+   \sstdescription{
+      PISAGEN generates objects using the PISA profile model function.
+      Input data are a list which should have been generated by
+      PISAFIND in the profiling mode, or be of the same general form,
+      for at least the first four columns (i.e. index, X position,
+      Y position and integrated intensity).  An optional input frame
+      can be given, this is used to determine the size of the output
+      frame. If this is not given then the input list is scanned to
+      generate a suitable default size for the output frame. The
+      output objects from PISAGEN can have the flux within each pixel
+      integrated to give a improved estimate of the actual flux.
+
+      The PISA profiling function model parameters can be read from
+      GLOBAL parameters as set up by the program PISAFIT. Additional
+      parameters allow the output stars to be elliptical. The model may
+      be generated on a background value and can be saturated. Noise
+      can be added to the data to simulate real data for test purposes.
+   }
+   \sstusage{
+      PISAGEN INPUT POSITIONS OUTPUT GSIGM CROSS COMIX NOISE
+        \newline\hspace*{1.5em}
+        $\left\{ {\begin{tabular}{l}
+                                      ADU=? \\
+                                      SIGMA=? \\
+                  \end{tabular} }
+        \right.$
+        \newline\hspace*{1.9em}
+        \makebox[0mm][c]{\small method}
+   }
+   \sstparameters{
+      \sstsubsection{
+         ADU = REAL (Read)
+      }{
+         The scaling factor to convert the data output values into
+         counts for which poisson statistics are required.  This is the
+         analogue to data units conversion factor for unmodified CCD
+         frames. [1.0]
+      }
+      \sstsubsection{
+         ANGLE = \_REAL (Read)
+      }{
+         The positional angle of the major axis of the stellar ellipses
+         measured in degrees anti-clockwise from the y-axis
+         (ie. as per PISAFIND). [0.0]
+      }
+      \sstsubsection{
+         BACKGROUND = \_REAL (Read)
+      }{
+         The background value for the output frame. [0.0]
+      }
+      \sstsubsection{
+         COMIX = \_REAL (Read)
+      }{
+         The mixture coefficient, as a fraction, which defines how the
+         Lorentzian function, at each point in the analytical profile
+         is added to the Gaussian or Exponential. [Global]
+      }
+      \sstsubsection{
+         CROSS = \_REAL (Read)
+      }{
+         The crossover point, as a percentage of the Gaussian peak,
+         where an exponential fall-off in the analytical stellar
+         profile takes over from the Gaussian core. The exponential
+         function is joined on smoothly to the Gaussian. [Global]
+      }
+      \sstsubsection{
+         ELLIP = \_REAL (Read)
+      }{
+         The ellipticity of the output objects. [0.0]
+      }
+      \sstsubsection{
+         GSIGM = \_REAL (Read)
+      }{
+         The standard deviation, in pixels, of the Gaussian core of the
+         analytical stellar profile. [Global]
+      }
+      \sstsubsection{
+         INPUT = NDF (Read)
+      }{
+         An NDF containing a data array which is the same size as the
+         required output data array.
+      }
+      \sstsubsection{
+         NOISE = LITERAL (Read)
+      }{
+         The noise contribution to be added to output data. Can be
+         Poisson, Gaussian or None. [NONE]
+      }
+      \sstsubsection{
+         NSIGMA = \_REAL (Read)
+      }{
+         The number of gaussian sigma to generate the output objects
+         to. [10.0]
+      }
+      \sstsubsection{
+         OUTPUT = NDF (Write)
+      }{
+         The output NDF to contain the model objects.
+      }
+      \sstsubsection{
+         POSITIONS =  FILENAME (Read)
+      }{
+         Input list of star positions and intensities (see
+         description). [PISAFIND.DAT]
+      }
+      \sstsubsection{
+         SAT = \_REAL (Read)
+      }{
+         The saturation value for output stars. [32767]
+      }
+      \sstsubsection{
+         SCALE = \_INTEGER (Read)
+      }{
+         if scale is greater than one then each output object pixel
+         value is determined by the integration of the function values
+         at scale$*$scale equidistant parts within the pixel. This
+         simulates an integration of the flux within each pixel. Using
+         this option increases the accuracy of the output pixel
+         intensities, this may be important in areas with large
+         intensity gradients. [Dynamic]
+      }
+      \sstsubsection{
+         SIGMA = REAL (Read)
+      }{
+         The standard deviation of the Gaussian noise contribution.
+         [1.0]
+      }
+      \sstsubsection{
+         TITLE = LITERAL (Read)
+      }{
+         Title for the output frame. [Output from PISAGEN]
+      }
+      \sstsubsection{
+         XHIGH = \_INTEGER (Read)
+      }{
+         If an input frame is not given then this value defines the
+         upper limit of the output data array X-axis. [Dynamic]
+      }
+      \sstsubsection{
+         XLOW = \_INTEGER (Read)
+      }{
+         If an input frame is not given then this value defines the
+         origin of the output data array X-axis. [Dynamic]
+      }
+      \sstsubsection{
+         YHIGH = \_INTEGER (Read)
+      }{
+         If an input frame is not given then this value defines the
+         upper limit of the output data array Y-axis. [Dynamic]
+      }
+      \sstsubsection{
+         YLOW = \_INTEGER (Read)
+      }{
+         If an input frame is not given then this value defines the
+         origin of the output data array Y-axis. [Dynamic]
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         \parbox{143mm}{PISAGEN INPUT=FRAME POSITIONS=FRAME.STARS\_ACC
+                        OUTPUT=STARS \\ BACKGROUND=100.0 SAT=32767
+                        NOISE=NONE $\backslash$}
+      }{
+         Generates an output NDF STARS of the same size as FRAME. The
+         objects are placed at the positions defined in
+         FRAME.STARS\_ACC. The model parameterisations are those stored
+         in the adam\_user:GLOBAL.SDF file, with the names PISA\_GSIGM,
+         PISA\_CROSS and PISA\_COMIX, these values were probably
+         generated by PISAFIT.
+      }
+   }
+   \sstimplementationstatus{
+      As in all PISA applications this program will not handle
+      bad pixels.
+   }
+}
+\newpage
+\sstroutine{
+   PISAGREY
+}{
+   Plots an NDF as a greyscale
+}{
+   \sstdescription{
+      This routine displays a greyscale representation of the data
+      component of an NDF.
+   }
+   \sstparameters{
+      \sstsubsection{
+         ABSLAB  =  LITERAL (Read)
+      }{
+         Label for the plot abscissa, may include PGPLOT escape
+         sequences.  This parameter is only used when the axes option
+         is selected. [X]
+      }
+      \sstsubsection{
+         AXES = \_LOGICAL (Read)
+      }{
+         True if annotated axes are to be drawn around the displayed
+         image. This parameter is ignored in the overlay mode, since
+         there is no guarantee that the axes would lie entirely
+         within the current picture. [TRUE]
+      }
+      \sstsubsection{
+         DEVICE = DEVICE (Read)
+      }{
+         The name of the graphics device on which to plot the map
+         of images found. If the overlay mode is required it is
+         recommended that the image be displayed in KAPPA on an
+         image display{\tt '}s base plane, then run this application using
+         the device{\tt '}s overlay plane. [Current graphics device]
+      }
+      \sstsubsection{
+         MAJTIC( 2 ) = \_REAL (Read)
+      }{
+         The parameter controlling the numbers of major tick marks for
+         the x and y axes.  A negative value for an axis makes the
+         graphics package decide an appropriate value.  This parameter
+         is only used when the axes option is selected. [-1.,-1.]
+      }
+      \sstsubsection{
+         MINTIC( 2 ) = \_INTEGER (Read)
+      }{
+         The number of minor tick marks between each major tick mark
+         for the x and y axes.  A negative value forces the graphics
+         package to compute appropriate values.   This parameter is
+         only used when the axes option is selected. [-1.,-1.]
+      }
+      \sstsubsection{
+         ORDLAB  =  LITERAL (Read)
+      }{
+         Label for the plot ordinate, may include PGPLOT escape
+         sequences.  This parameter is only used when the axes option
+         is selected. [Y]
+      }
+      \sstsubsection{
+         OUTTIC = \_LOGICAL (Read)
+      }{
+         True if the axis tick marks are to appear on the outside of
+         the axes instead of inside.   This parameter is only used
+         when the axes option is selected. [TRUE]
+      }
+      \sstsubsection{
+         PLTITL = CHAR (Read)
+      }{
+         The title of the plot, may include PGPLOT escape sequences.
+         Up to about 40 characters can be accommodated.  This parameter
+         is only used when axes option is selected. [PISAGREY]
+      }
+      \sstsubsection{
+         XPIXS = \_REAL (Read)
+      }{
+         Initial and final pixel coordinates of plot in x-direction.
+      }
+      \sstsubsection{
+         YPIXS = \_REAL (Read)
+      }{
+         Initial and final pixel coordinates of plot in y-direction.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         UNIX specific. Only supplied on UNIX machines
+      }
+   }
+}
+\newpage
+\sstroutine{
+   PISAKNN
+}{
+   PISAKNN use the results of PISAPEAK to discriminate objects
+   into two classes
+}{
+   \sstdescription{
+      PISAKNN uses KNN (k nearest neighbours) distribution-free
+      multivariate discrimination to classify objects into two classes.
+      The classes are seeded by supplying two files which contain the
+      indices of objects typical to the class in question ($>$5,
+      approximately equal numbers of each). Each object then propagates
+      its class to the other objects on the basis of which class of the
+      2$*$k nearest neighbours (in the parameter space of the PISAPEAK
+      results) of each of the unclassified objects is most common. This
+      procedure is iterated until all objects are assigned and have a
+      stable class or until a maximum number of iterations is exceeded.
+      The results of the discrimination are written into two output
+      files, one for each class.
+   }
+   \sstusage{
+      PISAKNN PEAKDATA SEED1 SEED2 K CLASS1 CLASS2 NITER
+   }
+   \sstparameters{
+      \sstsubsection{
+         CLASS1 = FILENAME (Write)
+      }{
+         Name of a file to contain the indices of the objects selected
+         for membership of class 1. [CLASS1.DAT]
+      }
+      \sstsubsection{
+         CLASS2 = FILENAME (Write)
+      }{
+         Name of a file to contain the indices of the objects selected
+         for membership of class 2. [CLASS2.DAT]
+      }
+      \sstsubsection{
+         ELLIP = \_LOGICAL (Read)
+      }{
+         If `true{\tt '} then the ellipticities are used in the analysis. If
+         `false{\tt '} then they are excluded. Using ellipticities may
+         increase the weighting of some (small) round galaxies as
+         stars. [TRUE]
+      }
+      \sstsubsection{
+         K = \_INTEGER (Read)
+      }{
+         The number of nearest neighbours about the current values
+         which are to be used in classifying an object. The class
+         used is the most frequently encountered in this range of
+         objects. If classes 1 and 2 are equally frequent then the
+         object classification is not changed. [1]
+      }
+      \sstsubsection{
+         NITER = \_INTEGER (Read)
+      }{
+         The maximum number of iterations allowed to classify and
+         reclassify objects. [10]
+      }
+      \sstsubsection{
+         PEAKDATA = FILENAME (Read)
+      }{
+         Name of a file containing the results of the PISAPEAK
+         parameter transformation. This file must contain at least
+         five columns which have the values:
+         \begin{itemize}
+         \item object index
+         \item radius ratio
+         \item intensity-peak ratio
+         \item ellipticity
+         \item absolute value of intensity weighted cross moment
+         \end{itemize}
+         in that order. [PISAPEAK.DAT]
+      }
+      \sstsubsection{
+         SEED1 = FILENAME (Read)
+      }{
+         Name of a file containing the indices of the objects to seed
+         class1. The file can contain any number of columns but must
+         have the object indices in column one. [SEED1.DAT]
+      }
+      \sstsubsection{
+         SEED2 = FILENAME (Read)
+      }{
+         Name of a file containing the indices of the objects to seed
+         class2. The file can contain any number of columns but must
+         have the object indices in column one. [SEED2.DAT]
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         PISAKNN PISAPEAK S1 S2 3 C1 C2 5
+      }{
+         This performs a KNN analysis on file PISAPEAK, using the
+         indices in files S1 and S2 as seeds for classes 1 and 2
+         respectively. The new classifications are assigned using the
+         nearest 6 neighbours (2K). The maximum number of iterations
+         allowed is 5. After the maximum number of iterations is
+         exceeded or the classifications become stable the indices of
+         the class 1 objects are written to file C1 and class 2 to C2.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The seed objects are always returned in their initial classes.
+
+         \sstitem
+         The maximum number of objects allowed in any input file is
+            10000
+      }
+   }
+}
+\newpage
+\sstroutine{
+   PISAMATCH
+}{
+   Matches the indices in one file against those in a second file
+}{
+   \sstdescription{
+      This routine matches the first column of values (the object
+      indices) of the two input files. When a match is located between
+      the indices the complete entry in the second file is copied to the
+      output file. It is intended primarily to match a list of object
+      indices (such as those produced by PISAKNN or possibly a PISACUT
+      list of PISAPEAK results).
+   }
+   \sstusage{
+      PISAMATCH ONE TWO OUT
+   }
+   \sstparameters{
+      \sstsubsection{
+         ONE = FILENAME (Read)
+      }{
+         Name of the file containing the indices to match to those of
+         file TWO.
+      }
+      \sstsubsection{
+         TWO = FILENAME (Read)
+      }{
+         Name of the file containing the entries whose indices are to be
+         matched to those of file ONE. Entries with a matched index will
+         be written to file OUT.
+      }
+      \sstsubsection{
+         OUT = FILENAME (Write)
+      }{
+         Name of a file to contain the entries from file TWO which have
+         the same indices as those specified in file ONE.
+         [PISAMATCH.DAT]
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         PISAMATCH CLASS1 PISAFIND STARS
+      }{
+         This matches the indices in file CLASS1 to those of file
+         PISAFIND. The PISAFIND entries with indices found in file
+         CLASS1 are written to file STARS.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The maximum number of entries allowed in file ONE is 10000. No
+         restriction applies to file TWO.
+
+         \sstitem
+         The indices in both files must be in the first column.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   PISAPEAK
+}{
+   PISAPEAK transforms the PISAFIND parameterisations so that the
+   variables are intensity invariant
+}{
+   \sstdescription{
+      PISAPEAK reads in the object parameterisations file produced by
+      PISAFIND. Using the PISA profiling function it then transforms
+      certain of the variables into values which are intensity
+      invariant for a radial stellar profile. Two of the output
+      variables may have values of around 1.0 for objects which are
+      well represented by the given PISA profiling parameters. The
+      variables produced are the ratio of the semi-major axis of the
+      object fit to the radius of an object whose peak intensity is the
+      same, but whose size is determined by the PISA profiling function
+      (a peakedness measure). The ratio of the integrated intensity to
+      the peak intensity and the model object ratio. The ellipticity
+      (unmodified) and the absolute value of the intensity weighted
+      cross moment (ABS(SXY)).
+
+      The output from PISAPEAK can be used in star-galaxy separation,
+      either by applying direct cuts in variable values or by
+      discrimination analysis routines such as PISAKNN.
+   }
+   \sstusage{
+      PISAPEAK IN FINDDATA RESULTS GSIGM CROSS COMIX BACKGROUND THRESH
+   }
+   \sstparameters{
+      \sstsubsection{
+         BACKGROUND = \_REAL (Read)
+      }{
+         The frame background value (sky) as used by PISAFIND. [Global]
+      }
+      \sstsubsection{
+         COMIX = \_REAL (Read)
+      }{
+         The mixture coefficient, as a fraction of the Gaussian peak,
+         of a Lorentzian function used to model the wings of the stellar
+         profile. At each point in the analytical profile the Lorentzian
+         function is added to the Gaussian/exponential core scaled by
+         the mixture coefficient. [Global]
+      }
+      \sstsubsection{
+         CROSS = \_REAL (Read)
+      }{
+         The crossover point, as a percentage of the Gaussian peak,
+         where an exponential fall-off in the analytical stellar profile
+         takes over from the Gaussian core. The exponential function is
+         joined on smoothly to the Gaussian. [Global]
+      }
+      \sstsubsection{
+         FINDDATA = FILENAME (Read)
+      }{
+         Name of the file containing the PISAFIND parameterisations.
+         [PISAFIND.DAT]
+      }
+      \sstsubsection{
+         GSIGM = \_REAL (Read)
+      }{
+         The standard deviation, in pixels, of the Gaussian core of the
+         analytical stellar profile. [Global]
+      }
+      \sstsubsection{
+         IN = NDF (Read)
+      }{
+         The NDF containing the objects which have been parameterised by
+         PISAFIND.
+      }
+      \sstsubsection{
+         RESULTS = FILENAME (Write)
+      }{
+         Name of a file to contain the PISAPEAK results. [PISAPEAK.DAT]
+      }
+      \sstsubsection{
+         THRESH = \_REAL (Read)
+      }{
+         The detection threshold as used by PISAFIND. [Global]
+      }
+   }
+\newpage
+   \sstexamples{
+      \sstexamplesubsection{
+         \parbox{143mm}{PISAPEAK IN=FRAME FINDDATA=PISAFIND.DAT
+          RESULTS=PISAPEAK.DAT \\ BACKGROUND=255 THRESH=12 $\backslash$ }
+      }{
+         This example shows PISAPEAK using the objects found in NDF
+         FRAME with parameters stored in file PISAFIND.DAT. The results
+         are stored in file PISAPEAK.DAT. Note that the model parameters
+         GSIGM CROSS and COMIX are defaulted to those which have been
+         stored in GLOBAL. These values were probably written by the
+         routine PISAFIT which uses a list of stars to fit the PISA
+         profiling function. The background value and threshold are
+         those used by PISAFIND when detecting and parameterising the
+         objects.
+      }
+      \sstexamplesubsection{
+         \parbox{143mm}{PISAPEAK IN=FRAME FINDDATA=PISAFIND.DAT
+                        RESULTS=PISAPEAK.DAT GSIGM=2.0 \\ CROSS=20 COMIX=0.25
+                        BACKGROUND=adam\_user:pisa.pisafind.background \\
+                        THRESH=adam\_user:pisa.pisafind.thresh }
+      }{
+         This example shows PISAPEAK using the objects found in NDF
+         FRAME with parameters stored in file PISAFIND.DAT. The results
+         are stored in file PISAPEAK.DAT.  The background value and
+         threshold are those used by PISAFIND in its last run.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The model profile is used to scale the object values to those
+         around unity. This only works well if the PISA profiling function
+         is a good fit to the stars on your frame. If it is not a good fit
+         or you cannot determine the model parameters then inaccurate
+         values can be used, the only criterion being that the GSIGM value
+         is about the FWHM seeing of your data. The results file will now
+         contain values {\tt '}normalised{\tt '} to this {\tt '}imaginary{\tt '} object. The stars
+         will still form a group of objects with similar values, although
+         they will not be as tightly clustered as with a good fit.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   PISAPLOT
+}{
+   Plots an ellipse map of the objects found by PISAFIND
+}{
+   \sstdescription{
+      This application shows the positions, shapes and sizes of the
+      objects located by PISAFIND via a plot of ellipses, one per
+      object. Optional annotation of the ellipses provide
+      cross-referencing with the object list. The plot may be overlaid
+      on an existing image for a direct comparison. In this case the
+      plot appears within the last DATA picture in the graphics
+      database, otherwise it is situated within the current picture.
+
+      Control of the plot allows labelled axes whose extent may be
+      defined and the selection of the colour of the ellipses
+   }
+   \sstparameters{
+      \sstsubsection{
+         ABSLAB  =  LITERAL (Read)
+      }{
+         Label for the plot abscissa, may include PGPLOT escape
+         sequences.  This parameter is only used when the axes option
+         is selected. [X]
+      }
+      \sstsubsection{
+         ANNOTA = \_LOGICAL (Read)
+      }{
+         If true the ellipses are annotated with the object
+         identification number to the top right. [TRUE]
+      }
+      \sstsubsection{
+         ANNOSCALE = REAL (Read)
+      }{
+         The scale height of the annotations. This value is a multiple
+         of the normal text height. [1.0]
+      }
+      \sstsubsection{
+         AXES = \_LOGICAL (Read)
+      }{
+         True if annotated axes are to be drawn around the displayed
+         image. This parameter is ignored in the overlay mode, since
+         there is no guarantee that the axes would lie entirely
+         within the current picture. [TRUE]
+      }
+      \sstsubsection{
+         CLEAR = \_LOGICAL (Read)
+      }{
+         True if the device is to be cleared first when in overlay mode.
+         Useful if displaying different classes of objects successively.
+         This flag acts as a switch retaining its last value. [FALSE]
+      }
+      \sstsubsection{
+         DEFAXES = \_LOGICAL (Read)
+      }{
+         If set true then prompting for the axis bounds will occur,
+         otherwise the program generated defaults will be used. [FALSE]
+      }
+      \sstsubsection{
+         DEVICE = DEVICE (Read)
+      }{
+         The name of the graphics device on which to plot the map
+         of images found. If the overlay mode is required it is
+         recommended that the image be displayed in KAPPA on an
+         image display{\tt '}s base plane, then run this application using
+         the device{\tt '}s overlay plane. [Current graphics device]
+      }
+      \sstsubsection{
+         MAJTIC( 2 ) = \_REAL (Read)
+      }{
+         The parameter controlling the numbers of major tick marks for
+         the x and y axes.  A negative value for an axis makes the
+         graphics package decide an appropriate value.  This parameter
+         is only used when the axes option is selected. [-1.,-1.]
+      }
+      \sstsubsection{
+         MINTIC( 2 ) = \_INTEGER (Read)
+      }{
+         The number of minor tick marks between each major tick mark
+         for the x and y axes.  A negative value forces the graphics
+         package to compute appropriate values.   This parameter is
+         only used when the axes option is selected. [-1.,-1.]
+      }
+      \sstsubsection{
+         ORDLAB  =  LITERAL (Read)
+      }{
+         Label for the plot ordinate, may include PGPLOT escape
+         sequences.  This parameter is only used when the axes option
+         is selected. [Y]
+      }
+      \sstsubsection{
+         OUTTIC = \_LOGICAL (Read)
+      }{
+         True if the axis tick marks are to appear on the outside of
+         the axes instead of inside.   This parameter is only used
+         when the axes option is selected. [TRUE]
+      }
+      \sstsubsection{
+         OVERLAY = \_LOGICAL (Read)
+      }{
+         True if the plot is to be overlaid on the last DATA picture
+         in the graphics database.  This is used to compare a displayed
+         2-d image with the objects detected. This flag acts as a switch
+         retaining its last value. [FALSE]
+      }
+      \sstsubsection{
+         PALNUM = \_INTEGER (Read)
+      }{
+         PISAPLOT allows the user to specify which pen number to use
+         when plotting. Thus different classifications of objects can
+         be identified on the same plot using different colours. The
+         colours associated with these pens are the default PGPLOT
+         pens (see the PGPLOT manual for a complete description).
+         These are:
+         \begin{description}
+          \item [0] background colour
+          \item [1] foreground colour
+          \item [2] red
+          \item [3] green
+          \item [4] blue
+          \item [5] cyan
+          \item [6] magenta
+          \item [7] yellow
+          \item [8] orange
+         \end{description}
+         and so on up to pen 16 (up to the number available on the
+         current graphics device). After PISAPLOT has been run these
+         colours can be superceded by using the KAPPA palette
+         facilities PALDEF and PALENTRY, but note that any subsequent
+         runs of PISAPLOT will reinstate the PGPLOT default colours so
+         using the KAPPA facilities should be delayed until all object
+         classifications have been displayed. The KAPPA palette pen
+         numbers correspond to PALNUM values (hence the parameter name).
+         [3]
+      }
+      \sstsubsection{
+         PLTITL = CHAR (Read)
+      }{
+         The title of the plot, may include PGPLOT escape sequences.
+         Up to about 40 characters can be accommodated.  This parameter
+         is only used when axes option is selected. [Images Detected]
+      }
+      \sstsubsection{
+         RESULTS = FILENAME (Read)
+      }{
+         The ASCII file produced by the PISAFIND application containing
+         the parameterised data for the various objects it detected.
+         [PISAFIND.DAT]
+      }
+      \sstsubsection{
+         THICK = \_REAL (Read)
+      }{
+         The thickness of the lines in the plot, where 1.0 is the
+         normal thickness. It should be between 0.5 and 5. This
+         feature is only available on some devices. This parameter is
+         only used when axes option is selected. [1.0]
+      }
+      \sstsubsection{
+         XPIXS = \_REAL (Read)
+      }{
+         Initial and final pixel coordinates of plot in x-direction.
+         [Dynamic]
+      }
+      \sstsubsection{
+         YPIXS = \_REAL (Read)
+      }{
+         Initial and final pixel coordinates of plot in y-direction.
+         [Dynamic]
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         PISAPLOT OVERLAY
+      }{
+         Using the overlay parameter allows ellipses to be plotted over
+         a previously displayed image.
+      }
+      \sstexamplesubsection{
+         PISAPLOT OVERLAY CLEAR
+      }{
+         Including the clear parameters clears a plot before overlaying.
+         This is useful when displaying the overlaid ellipses in an
+         overlay.
+      }
+      \sstexamplesubsection{
+         PISAPLOT RESULTS=STARS.DAT PALNUM=3 OVERLAY
+      }{
+         Using this combination of parameters would use a green pen to
+         plot the ellipse overlaying them on the displayed picture.
+         Using sequences of this example with difference results files
+         and palnums would result in a display which had different
+         colours for each results file displayed over the current
+         picture.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The following pictures are stored in the graphics database: a
+         FRAME encompassing annotated axes and the plot itself, provided
+         the overlay option is not selected; a DATA picture for the plot
+         itself.  The latter uses the standard Starlink co-ordinate
+         system.
+      }
+   }
+}
+\end{small}
+
+\newpage
+\section{The PISA profiling function}
+\label{funcparms}
+The PISA profiling function is made up of three functions, a Gaussian, an
+exponential and a Lorentzian. Inside a radius $R_{c}$ fixed proportions of 
+the Gaussian and Lorentzian functions are used, outside of $R_{c}$ the 
+exponential replaces the Gaussian and is added to the continuing
+Lorentzian. The exponential is joined smoothly to the Gaussian. Inside of
+$R_{c}$ the function takes the form:-
+
+\large
+\begin{displaymath}
+\begin{array}{c}
+ 1\\
+ \overline{\pi\sigma^{2}(1+(\frac{\tau}{2\ln(\frac{1}{\tau})}))}
+\end{array}
+    \left( \begin{array}{c} Q \\
+    \overline{(1+\frac{r^{2}}{\sigma^{2}\ln(2)} )}\\
+    \end{array}
+      \begin{array}[b]{c}
+         + (1-Q)\exp(\frac{-r^{2}}{\sigma^{2}})\\
+      \end{array} \right) \\
+\end{displaymath}
+\normalsize
+and outside of $R_{c}$ it takes the form:-
+
+\large
+\begin{displaymath}
+\begin{array}{c}
+ 1\\
+ \overline{\pi\sigma^{2}(1+(\frac{\tau}{2\ln(\frac{1}{\tau})}))}
+\end{array}
+    \left( \begin{array}{c} Q \\
+    \overline{(1+\frac{r^{2}}{\sigma^{2}\ln(2)} )}\\
+    \end{array}
+      \begin{array}{cc}
+         +\underline{(1-Q)\exp(\frac{-2r}{\sigma}\sqrt{\ln(\frac{1}{\tau}}))}\\
+          \tau\\
+      \end{array} \right) \\
+\end{displaymath}
+\normalsize
+
+where:-
+
+$\tau=$ the fraction of the peak intensity at which to change from the
+gaussian to an exponential function (CROSS/100),
+
+$\sigma=$ the gaussian function sigma (GSIGM),
+
+$Q=$ the fraction of the lorentzian function to add to the gaussian or
+exponential function at each point (COMIX).
+
+The radius at which the exponential replaces the gaussian is:-
+
+\begin{displaymath}
+R_{c}=\sigma\sqrt{\ln(\frac{1}{\tau})}
+\end{displaymath}
+
+The actual function is that which when multiplied by the {\bf
+integrated} intensity gives the intensity at the given radius. Basically the 
+functional forms from which the above equations are derived are:-
+
+Gaussian - $\exp(\frac{-r^{2}}{\sigma^{2}})$
+
+Lorentzian - $1/(1+\frac{r^{2}}{\sigma^{2}})$
+
+Exponential - $\exp(-(\frac{r-R_{c}}{\sigma}))$.
+
+\section{Limitations}
+
+The PISA package has various in-built limitations (buffer sizes etc.), This
+section details them; if they cause real problems then contact the supporter of
+this package.
+
+\begin{itemize}
+   \item PISAFIND
+   \begin{itemize}
+      \item The number of fragments per image (i.e. connected pixel groups)
+            is limited to 200. Hence blends of objects cannot fragment into
+            more than 200 pieces.
+      \item The number of pixels per image allowed during surface modelling
+            is 10000. 
+      \item The length of the first side of input image cannot be more than
+            10240 pixels.
+      \item The input data is processed using an HDS type of \_WORD so the input
+            data range must lie within the bounds -32768 to +32767,
+            although PISAFIND itself only processes positive data up to
+            the value 32766. This limitation is fundamental.
+      \item There are no other known restrictions. Input NDFs are now accessed
+            via file mapping. There is no restriction on the number of detected
+            objects.
+    \end{itemize}
+    \item PISAFIT
+    \begin{itemize}
+       \item As in PISAFIND the length of first side of the input image
+             has to be less than 10240 pixels.
+       \item The input data is processed using an HDS type of \_WORD so the input
+             data range must lie within the bounds -32768 to +32767.
+    \end{itemize}
+    \item PISAMATCH
+    \begin{itemize}
+       \item The maximum number of input records is 10000.
+    \end{itemize}
+    \item PISAKNN
+    \begin{itemize}
+       \item The maximum number of input records is 10000.
+    \end{itemize}
+\end{itemize}
+
+\section{Changes this release: 2.1-0}
+
+PISA has only undergone minor changes this release, the main ones are.
+\begin{itemize}
+\item Code fixes etc. mostly due to UNIX port. VMS PISA is now using the
+same code as UNIX pisa.
+
+\item PISA now processes simple NDFs (i.e. ones with origins in their
+data\_array components, or NDFs given with section specifications).
+
+\item The documentation and help have been updated. Including
+modifications describing the UNIX pisa release.
+
+\item PISAPLOT has been converted to use PGPLOT graphics, this is in
+line with the UNIX version.
+
+\item PISA has been upgraded to CHI version 1.1, this re-enables use of
+the PISA monolith.
+\end{itemize}
+
+\end{document}

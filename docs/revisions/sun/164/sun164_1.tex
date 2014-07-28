@@ -1,0 +1,152 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {164.1}
+\newcommand{\stardocauthors}   {D L Terrett}
+\newcommand{\stardocdate}      {25 March 1993}
+\newcommand{\stardoctitle}     {PSMERGE - Encapsulated PostScript Handling
+Utility}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+%  \setlength{\parskip}{0mm}
+%  \tableofcontents
+%  \setlength{\parskip}{\medskipamount}
+%  \markright{\stardocname}
+%------------------------------------------------------------------------------
+
+An Encapsulated PostScript File (EPSF) is a PostScript file structured so that
+it can be incorporated or included into another PostScript file (so that for
+example a diagram created with a graphics application can be inserted into a
+text document created with a word processor).
+
+{\tt psmerge} is a utility program for merging one or more Encapsulated
+PostScript Files into a single PostScript file. The input files can be
+individually rotated, scaled and shifted. The output file can either be
+Encapsulated PostScript or ``normal'' PostScript suitable for sending to a
+printer. This allows:
+\begin{itemize}
+\item Pictures created by different applications to be overlayed.
+\item Multiple pictures to be pasted onto a single page.
+\item Pictures scaled before insertion into a \TeX document.
+\end{itemize}
+
+{\tt psmerge} always writes its output to the standard output channel ({\tt
+SYS\$OUTPUT} on  VMS). On UNIX systems this can be piped to a file or even
+straight to a printer queue; e.g.
+\begin{quote}\tt
+psmerge picture.ps > printme.ps
+\end{quote}
+On VMS the {\tt /OUTPUT} qualifier can be used to direct the output to a file;
+e.g.
+\begin{quote}\tt
+PSMERGE/OUTPUT=PRINTME.PS PICTURE.PS
+\end{quote}
+On VMS the {\tt PSMERGE} command runs a command procedure so the {\tt /OUTPUT}
+qualifier must come immediately after the command and before any arguments or
+command options. Also, DCL command procedure are restricted to a
+maximum of 8 parameters, this  means that if you want to supply more than 8
+command parameters you must enclose the entire list in quotes ({\tt "}) so that
+they appear as a single argument to the command procedure.
+
+The examples above simply convert an EPS file to a normal PostScript file, the
+only difference being that the normal PostScript file shifts the picture origin
+to the bottom left corner of the printable area on the printer. This is useful
+because if an EPS file is printed without conversion, the picture origin will be
+at the bottom left corner of the paper and on most printers this means that the
+bottom and left edges will lie outside the printable area and will be invisible.
+
+The principle use of {\tt psmerge} is to combine more than one EPS File into a
+single picture. For example:
+\begin{quote}\tt
+psmerge pic1.ps pic2.ps > printme.ps
+\end{quote}
+will overlay the two pictures with their origins at the same place on the
+paper. For line graphics and text the order of the files doesn't make any
+difference but if either picture contains filled areas or grey scale images it
+does. Filled areas and grey scales are opaque and will obliterate anything
+already plotted in the same region of the page. Therefore, for example, to
+overlay a contour map on a grey scale image, the file containing the contour
+map must appear after the one containing the image.
+
+Pictures can be scaled, translated (shifted) and rotated. For example:
+\begin{quote}\tt
+psmerge -s0.5x0.5 -t72x144 -r10 pic1.ps > printme.ps
+\end{quote}
+will shrink the picture to half its normal size, move the origin 1 inch to the
+right and 2 inches upwards and rotate it 10 degrees anti-clockwise. The
+transformations are applied in the order that they appear on the command line
+and are cumulative, so that, for example, {\tt -r45 -r45} is equivalent to {\tt
+-r90} but {\tt -t72x72 -s2x2} does not have the same effect as {\tt -s2x2
+-t72x72}. Translations are in units of 1/72 of an inch\footnote{1/72 of an
+inch is sometimes referred to as a PostScript point and is the default unit for
+PostScript commands.} and rotations are in degrees anti-clockwise.
+
+After each EPS file is processed the scaling factors are reset to unity and the
+translation and rotations reset to zero. The following example takes two A4
+landscape pictures and pastes them one above the other on a single A4 page in
+portrait orientation:
+\begin{quote}\tt
+psmerge -s0.707x0.707 -r90 -t550x396 pic1.ps \verb+\+\\
+\hspace*{1cm}-s0.707x0.707 -r90 -t550x0 pic2.ps > printme.ps
+\end{quote}
+
+If {\tt -e} appears on the command line anywhere, the output file will be
+another EPS file rather than normal PostScript. This allows files to be
+processed by psmerge more than once (in a pipeline on UNIX) using the special
+file name {\tt -} (hyphen) which means ``use the standard input as the input
+file''. Therefore, the same effect as the previous example can be achieved with
+the following command:
+\begin{quote}\tt
+psmerge -e -t0x560 pic1.ps pic2.ps | \verb+\+\\
+\hspace*{1cm}psmerge -s0.707x0.707 -r90 -t550x0 - > printme.ps
+\end{quote}
+Instead of scaling each picture and positioning it on the page independently,
+the two pictures are combined into one and then this single picture rotated and
+scaled.
+
+On VMS the operation has to be performed in two steps with the output from
+the first stored in a temporary file:
+\begin{quote}\tt
+psmerge/output=temp.ps  -e -t0x560 pic1.ps pic2.ps \\
+psmerge/output=printme.ps -s0.707x0.707 -r90 -t550x0 temp.ps
+\end{quote}
+\end{document}

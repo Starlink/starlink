@@ -1,0 +1,167 @@
+\input SUN93LAY
+
+\pageno=7
+\nopagenumbers
+\parindent=0in
+\headline={\ifnum\pageno=1
+            \else\it SUN/93.2\hss \rm\folio\fi}
+
+{\bf Appendix. Font Selection}
+
+Variations of font type can be achieved with the control
+sequences $\backslash$rm,$\backslash$it,$\backslash$sl,$\backslash$tt {\it etc$\ldotp$} 
+Similar commands can be defined using the $\backslash$font command to access 
+any available fonts. For example  a command $\backslash$inch
+to select the `CMINCH' font (Computer Modern INCH high letters) can be defined thus:
+\smallskip
+\tt
+\settabs\+\indent&slashfont=CMB10spacescaled 1000&                          \cr
+
+\+&$\backslash$font$\backslash$inch=CMINCH &\% inch high letters\cr
+\rm
+\noindent Subsequent use of the control sequence $\backslash$inch
+is identical to the use of $\backslash$rm, $\backslash$it {\it etc.}
+
+
+In addition to its normal size, each font is provided at a range of
+magnifications in a geometric progression. 
+Specifically, each font is available at magnifications of 1, 1.2, 
+1.2$\times$1.2, {\it etc.} Altogether in the current Starlink version
+of {\TeX}, magnifications of 1, 1.2, 1.44, 1.728, 2.074, 2.488, 
+2.986, 3.583 and 4.3 are available.
+(The first five of these numbers correspond to $\backslash$magstep0, 
+$\backslash$magstep1, $\backslash$magstep2, $\backslash$magstep3,
+$\backslash$magstep4 and $\backslash$magstep5 respectively.
+Additionally there is an intermediate size between 1 and 1.2, 
+$\sqrt{1.2}=1.095$ --- equivalent to $\backslash$magstephalf.)
+
+Magnified fonts can be selected using a `scaling factor' which is 
+1000$\times$the required magnification.
+For example, various sizes of the font `cmb10' can be accessed by
+defining the control sequences $\backslash$fzero, $\backslash$fhalf, 
+$\backslash$fone, $\backslash$ftwo as follows:	
+\smallskip
+\tt
+\settabs\+\indent&slashfont=CMB10spacescaled 1000&                          \cr
+
+\+&$\backslash$font$\backslash$fzero=CMB10  
+&\%  unscaled cmb10\cr
+\+&$\backslash$font$\backslash$fhalf=CMB10 scaled 1095 &\% 1.095$\times$normal size 
+(equivalent to $\backslash$magstephalf)\cr
+\+&$\backslash$font$\backslash$fone=CMB10 scaled 1200 &\% 1.2$\times$normal size 
+(equivalent to $\backslash$magstep1)\cr
+\+&$\backslash$font$\backslash$ftwo=CMB10 scaled 1440 &\% 1.44$\times$normal size
+(equivalent to $\backslash$magstep2)\cr
+\rm
+%Thus you can produce a sentence like this
+
+\TeX\ has a large but limited capacity for fonts. For example, this appendix 
+could not be generated in a single \TeX\ run.
+Additionally there is  a limit to the number of fonts the
+CANON laser printer can have on a page. 
+However these restrictions will only inconvenience
+those who require more than about thirty fonts in a document.
+
+The fonts available in the current Starlink version of \TeX\ are shown below,
+and the maximum scaling factor (MSF) at which each is available is indicated.
+It can be assumed those sizes smaller than the maximum are present, thus 
+an entry of 4300
+indicates that a font is available at scaling factors 1000, 1095, 
+1200, 1440, 1728, 2074, 2488, 2986, 3583 and 4300.
+Attempts to use a non-existent font-size will not cause errors during {\TeX}ing
+but will be reported at the stage when  device-dependent output is 
+being generated.
+\bigskip
+
+
+\settabs\+\indent&ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz&
+CMSSI101234567 &1440~~\cr\medskip
+\+&{\bf Font appearance}&{\bf Font name}&{\bf MSF}\cr
+\bigskip
+
+%\font\joa=CIRCLE10 scaled\magstep0
+%\font\job=CIRCLEW10 scaled\magstep0
+\font\joc=CMB10 scaled\magstep0
+\font\jod=CMBSY10 scaled\magstep0
+\font\joe=CMBX10 scaled\magstep0
+\font\jof=CMBX12 scaled\magstep0
+\font\jog=CMBX5 scaled\magstep0
+\font\joh=CMBX6 scaled\magstep0
+\font\joi=CMBX7 scaled\magstep0
+\font\joj=CMBX8 scaled\magstep0
+\font\jok=CMBX9 scaled\magstep0
+\font\jol=CMBXSL10 scaled\magstep0
+\font\jom=CMBXTI10 scaled\magstep0
+\font\jon=CMCSC10 scaled\magstep0
+\font\joo=CMDUNH10 scaled\magstep0
+\font\jop=CMEX10 scaled\magstep0
+\font\joq=CMFF10 scaled\magstep0
+%%%%%%%\font\jor=CMFI10 scaled\magstep0
+\font\jos=CMFIB8 scaled\magstep0
+\font\jot=CMINCH scaled\magstep0
+%\font\jou=CMIT10 scaled\magstep0   % originally cmitt10
+\font\jov=CMMI10 scaled\magstep0
+\font\jow=CMMI12 scaled\magstep0
+\font\jox=CMMI5 scaled\magstep0
+\font\joy=CMMI6 scaled\magstep0
+\font\joz=CMMI7 scaled\magstep0
+\font\joaa=CMMI8 scaled\magstep0
+\font\jobb=CMMI9 scaled\magstep0
+\font\jocc=CMMIB10 scaled\magstep0
+\font\jodd=CMR10 scaled\magstep0
+\font\joee=CMR12 scaled\magstep0
+\font\joff=CMR17 scaled\magstep0
+\font\jogg=CMR5 scaled\magstep0
+\font\johh=CMR6 scaled\magstep0
+\font\joii=CMR7 scaled\magstep0
+\font\jojj=CMR8 scaled\magstep0
+\font\jokk=CMR9 scaled\magstep0
+%\font\jokka=CMSA10 scaled\magstep0  % EXTRA ?
+\font\joll=CMSL10 scaled\magstep0
+\font\jomm=CMSL12 scaled\magstep0
+
+%\+&{\joa ABCDEFGHIJKLMNOPQRSTUVWXYZ}& {  CIRCLE10 }& 1440\cr\medskip
+%\+&{\job ABCDEFGHIJKLMNOPQRSTUVWXYZ}& {  CIRCLEW10 }& 1440\cr\medskip
+\+&{\joc ABCDEFGHIJKLMNOPQRSTUVWXYZ}& {  CMB10 }& 1440\cr\medskip
+\+&{\jod ABCDEFGHIJKLMNOPQRSTUVWXYZ}& {  CMBSY10 }& 1440\cr\medskip
+\+&{\joe ABCDEFGHIJKLMNOPQRSTUVWXYZ}& {  CMBX10 }& 2986\cr\medskip
+\+&{\jof ABCDEFGHIJKLMNOPQRSTUVWXYZ}& {  CMBX12 }& 1440\cr\medskip
+\+&{\jog ABCDEFGHIJKLMNOPQRSTUVWXYZ}& {  CMBX5 }& 2986\cr\medskip
+\+&{\joh ABCDEFGHIJKLMNOPQRSTUVWXYZ}& {  CMBX6 }& 1440\cr\medskip
+\+&{\joi ABCDEFGHIJKLMNOPQRSTUVWXYZ}& {  CMBX7 }& 2986\cr\medskip
+
+\vfill\eject
+\+&{\bf Font appearance}&{\bf Font name}&{\bf MSF}\cr
+\bigskip
+
+\+&{\joj ABCDEFGHIJKLMNOPQRSTUVWXYZ}& {  CMBX8 }& 1440\cr\medskip
+\+&{\jok ABCDEFGHIJKLMNOPQRSTUVWXYZ}& {  CMBX9 }& 1440\cr\medskip
+\+&{\jol ABCDEFGHIJKLMNOPQRSTUVWXYZ}& {  CMBXSL10 }& 1440\cr\medskip
+\+&{\jom ABCDEFGHIJKLMNOPQRSTUVWXYZ}& {  CMBXTI10 }& 1440\cr\medskip
+\+&{\jon ABCDEFGHIJKLMNOPQRSTUVWXYZ}& {  CMCSC10 }& 1728\cr\medskip
+\+&{\joo ABCDEFGHIJKLMNOPQRSTUVWXYZ}& {  CMDUNH10 }& 1440\cr\medskip
+\+&{\jop ABCDEFGHIJKLMNOPQRSTUVWXYZ}& {  CMEX10 }& 1728\cr\medskip
+\+&{\joq ABCDEFGHIJKLMNOPQRSTUVWXYZ}& {  CMFF10 }& 1440\cr\medskip
+%\+&{\jor ABCDEFGHIJKLMNOPQRSTUVWXYZ}& {  CMFI10 }& 1440\cr\medskip
+\+&{\jos ABCDEFGHIJKLMNOPQRSTUVWXYZ}& {  CMFIB8 }& 1440\cr\medskip
+\+&{\jot ABC  }& {  CMINCH }& 1440\cr\medskip
+%\+&{\jou ABCDEFGHIJKLMNOPQRSTUVWXYZ}& {  CMIT10 }&1440\cr\medskip %?
+\+&{\jov ABCDEFGHIJKLMNOPQRSTUVWXYZ}& {  CMMI10 }& 2986\cr\medskip
+\+&{\jow ABCDEFGHIJKLMNOPQRSTUVWXYZ}& {  CMMI12 }& 1440\cr\medskip
+\+&{\jox ABCDEFGHIJKLMNOPQRSTUVWXYZ}& {  CMMI5 }& 2986\cr\medskip
+\+&{\joy ABCDEFGHIJKLMNOPQRSTUVWXYZ}& {  CMMI6 }& 1440\cr\medskip
+\+&{\joz ABCDEFGHIJKLMNOPQRSTUVWXYZ}& {  CMMI7 }& 2986\cr\medskip
+\+&{\joaa ABCDEFGHIJKLMNOPQRSTUVWXYZ}& {  CMMI8 }& 4300\cr\medskip
+\+&{\jobb ABCDEFGHIJKLMNOPQRSTUVWXYZ}& {  CMMI9 }& 1440\cr\medskip
+\+&{\jocc ABCDEFGHIJKLMNOPQRSTUVWXYZ}& {  CMMIB10 }& 1440\cr\medskip
+\+&{\jodd ABCDEFGHIJKLMNOPQRSTUVWXYZ}& {  CMR10 }& 2986\cr\medskip
+\+&{\joee ABCDEFGHIJKLMNOPQRSTUVWXYZ}& {  CMR12 }& 1440\cr\medskip
+\+&{\joff ABCDEFGHIJKLMNOPQRSTUVWXYZ}& {  CMR17 }& 1440\cr\medskip
+\+&{\jogg ABCDEFGHIJKLMNOPQRSTUVWXYZ}& {  CMR5 }& 2986\cr\medskip
+\+&{\johh ABCDEFGHIJKLMNOPQRSTUVWXYZ}& {  CMR6 }& 1440\cr\medskip
+\+&{\joii ABCDEFGHIJKLMNOPQRSTUVWXYZ}& {  CMR7 }& 2986\cr\medskip
+\+&{\jojj ABCDEFGHIJKLMNOPQRSTUVWXYZ}& {  CMR8 }& 1440\cr\medskip
+\+&{\jokk ABCDEFGHIJKLMNOPQRSTUVWXYZ}& {  CMR9 }& 1440\cr\medskip
+\+&{\joll ABCDEFGHIJKLMNOPQRSTUVWXYZ}& {  CMSL10 }& 2986\cr\medskip
+\+&{\jomm ABCDEFGHIJKLMNOPQRSTUVWXYZ}& {  CMSL12 }& 1440\cr\medskip
+\bye

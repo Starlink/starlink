@@ -1,0 +1,3287 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {40.4}
+\newcommand{\stardocauthors}   {A C Charles\\P C T Rees}
+\newcommand{\stardocdate}      {31 March 1994}
+\newcommand{\stardoctitle}     {CHR \\ [1ex]
+                                Character Handling Routines}
+\newcommand{\stardocversion}   {Version 2.0}
+\newcommand{\stardocmanual}    {Programmer's Manual}
+
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+\renewcommand{\thepage}{\roman{page}}
+
+%+
+%  Name:
+%     LAYOUT.TEX
+
+%  Purpose:
+%     Define Latex commands for laying out documentation produced by PROLAT.
+
+%  Language:
+%     Latex
+
+%  Type of Module:
+%     Data file for use by the PROLAT application.
+
+%  Description:
+%     This file defines Latex commands which allow routine documentation
+%     produced by the SST application PROLAT to be processed by Latex. The
+%     contents of this file should be included in the source presented to
+%     Latex in front of any output from PROLAT. By default, this is done
+%     automatically by PROLAT.
+
+%  Notes:
+%     The definitions in this file should be included explicitly in any file
+%     which requires them. The \include directive should not be used, as it
+%     may not then be possible to process the resulting document with Latex
+%     at a later date if changes to this definitions file become necessary.
+
+%  Authors:
+%     RFWS: R.F. Warren-Smith (STARLINK)
+
+%  History:
+%     10-SEP-1990 (RFWS):
+%        Original version.
+%     10-SEP-1990 (RFWS):
+%        Added the implementation status section.
+%     12-SEP-1990 (RFWS):
+%        Added support for the usage section and adjusted various spacings.
+%     {enter_further_changes_here}
+
+%  Bugs:
+%     {note_any_bugs_here}
+
+%-
+
+%  Define length variables.
+\newlength{\sstbannerlength}
+\newlength{\sstcaptionlength}
+
+%  Define a \tt font of the required size.
+\font\ssttt=cmtt10 scaled 1095
+
+%  Define a command to produce a routine header, including its name,
+%  a purpose description and the rest of the routine's documentation.
+\newcommand{\sstroutine}[3]{
+   \goodbreak
+   \rule{\textwidth}{0.5mm}
+   \vspace{-7ex}
+   \newline
+   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
+   \setlength{\sstcaptionlength}{\textwidth}
+   \addtolength{\sstbannerlength}{0.5em}
+   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
+   \addtolength{\sstcaptionlength}{-4.45pt}
+   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
+   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
+   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
+   \begin{description}
+      #3
+   \end{description}
+}
+
+%  Format the description section.
+\newcommand{\sstdescription}[1]{\item[Description:] #1}
+
+%  Format the usage section.
+\newcommand{\sstusage}[1]{\item[Usage:] \mbox{} \\[1.3ex] {\ssttt #1}}
+
+%  Format the invocation section.
+\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
+
+%  Format the arguments section.
+\newcommand{\sstarguments}[1]{
+   \item[Arguments:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the returned value section (for a function).
+\newcommand{\sstreturnedvalue}[1]{
+   \item[Returned Value:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the parameters section (for an application).
+\newcommand{\sstparameters}[1]{
+   \item[Parameters:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the examples section.
+\newcommand{\sstexamples}[1]{
+   \item[Examples:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Define the format of a subsection in a normal section.
+\newcommand{\sstsubsection}[1]{\item[{#1}] \mbox{} \\}
+
+%  Define the format of a subsection in the examples section.
+\newcommand{\sstexamplesubsection}[1]{\item[{\ssttt #1}] \mbox{} \\}
+
+%  Format the notes section.
+\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
+
+%  Provide a general-purpose format for additional (DIY) sections.
+\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}] \mbox{} \\[1.3ex] #2}
+
+%  Format the implementation status section.
+\newcommand{\sstimplementationstatus}[1]{
+   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
+
+%  Format the bugs section.
+\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
+
+%  Format a list of items while in paragraph mode.
+\newcommand{\sstitemlist}[1]{
+  \mbox{} \\
+  \vspace{-3.5ex}
+  \begin{itemize}
+     #1
+  \end{itemize}
+}
+
+%  Define the format of an item.
+\newcommand{\sstitem}{\item}
+
+%  End of LAYOUT.TEX layout definitions.
+%.
+
+%------------------------------------------------------------------------------
+
+\begin{document}
+
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Huge\bf  \stardoctitle \\ [2.5ex]}
+{\LARGE\bf \stardocversion \\ [4ex]}
+{\Huge\bf  \stardocmanual}
+\end{center}
+\vspace{20mm}
+
+%------------------------------------------------------------------------------
+%  Package Description
+\begin{center}
+{\Large\bf Description}
+\end{center}
+
+This document describes the Character Handling Routine library, CHR, 
+and its use.
+The CHR library augments the limited character handling facilities
+provided by the Fortran 77 standard.
+It offers a range of character handling facilities: from formatting
+Fortran data types into text strings and the reverse, to higher level
+functions such as wild card matching, string sorting, paragraph
+reformatting and justification. 
+The library may be used simply for building text strings for interactive
+applications or as a basis for more complex text processing applications.
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+
+\newpage
+\markright{\stardocname}
+\null\vspace {5mm}
+\begin {center}
+\rule{80mm}{0.5mm} \\ [1ex]
+{\Large\bf \stardoctitle \\ [2.5ex]
+           \stardocversion} \\ [2ex]
+\rule{80mm}{0.5mm}
+\end{center}
+\vspace{30mm}
+
+\setlength{\parskip}{0mm}
+\tableofcontents
+\setlength{\parskip}{\medskipamount}
+
+%------------------------------------------------------------------------------
+%  Introduction page
+\newpage
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
+
+\null\vspace {5mm}
+\begin {center}
+\rule{80mm}{0.5mm} \\ [1ex]
+{\Large\bf \stardoctitle \\ [2.5ex]
+           \stardocversion} \\ [2ex]
+\rule{80mm}{0.5mm}
+\end{center}
+\vspace{30mm}
+
+\section {Introduction}
+
+The Fortran 77 standard provides a data type for the storage of
+character strings (the type {\tt CHARACTER}), an operator specific to 
+character data (the {\tt //} operator for string concatenation), and 
+eight intrinsic functions specifically for handling {\tt CHARACTER} typed
+variables ({\tt CHAR}, {\tt ICHAR}, {\tt INDEX}, {\tt LEN}, {\tt LGE}, 
+{\tt LGT}, {\tt LLE}, {\tt LLT}). 
+Facilities to write and read Fortran data types to and from
+character strings (using internal files and the {\tt WRITE} and {\tt READ} 
+statements respectively) are also provided by the Fortran 77 standard.
+Although these features of the Fortran language are of considerable utility
+when handling character variables in Fortran programs, they constitute only the
+basic tools for the more extensive processing of textual data sometimes 
+required in applications.
+
+The CHR library augments the limited character handling facilities
+provided by the Fortran 77 standard.
+It offers a range of character handling facilities: from formatting
+Fortran data types into text strings and the reverse, to higher level
+functions such as wild card matching, string sorting, paragraph
+reformatting and justification. 
+The library may be used simply for building text strings for interactive
+applications or as a basis for more complex text processing applications.
+
+The functions performed by the CHR library may be categorised as follows:
+
+\begin{itemize}
+\item change case
+\item compare strings
+\item decode Fortran data types 
+\item edit strings
+\item encode Fortran data types 
+\item enquire
+\item facilitate portability
+\item search strings
+\end{itemize}
+
+A classified list of of these routines is given in Appendix \ref{class_sect}.
+
+
+\section {Error Handling} \label{err_sect}
+
+None of the CHR routines report error messages; {\em i.e.}\ they do not 
+use the Starlink Error Reporting System, ERR (see SUN/104).
+However, some routines do use the inherited status conventions (SUN/104)
+to indicate success or failure.
+Those CHR routines which do not have a status argument handle any errors
+internally and have a specified behaviour on error.
+Those CHR routines which do have a status argument fall into two categories:
+those which obey the full inherited status conventions and return without 
+action if given a status value other than SAI\_\_OK, and those which ignore 
+the given status and just return a status value on exit.
+The following routines obey the full inherited status conventions:
+
+\begin {itemize}
+\item CHR\_BTOI
+\item CHR\_CTOD
+\item CHR\_CTOI
+\item CHR\_CTOL
+\item CHR\_CTOR
+\item CHR\_FIWE
+\item CHR\_FIWS
+\item CHR\_HTOI
+\item CHR\_OTOI
+\end {itemize}
+
+The routines CHR\_COPY, CHR\_DCWRD and CHR\_TRCHR all just return a status
+set to a value not equal to SAI\_\_OK on error.
+
+The symbolic names of the error values used by CHR are given in Appendix
+\ref{incl_sect}.
+
+
+\section {Compiling and Linking} \label{compile_sect}
+
+\subsection {Use with the VAX/VMS operating system}
+
+Two include files are available for use with the Character Handling Routines.
+These files have the logical names SAE\_PAR and CHR\_ERR.
+SAE\_PAR is included to define the global constants SAI\_\_OK, SAI\_\_ERROR 
+and other global constants.
+CHR\_ERR is included to define the CHR error values.
+The logical names required for the use of the CHR library are
+defined by executing the procedure CHR\_DEV, {\em e.g.}\
+
+\begin {quote}
+\begin{verbatim}
+$ CHR_DEV
+\end{verbatim}
+\end {quote}
+
+To link the CHR library with non-ADAM software, the linker input specifier
+
+\begin {quote}
+\begin{verbatim}
+CHR_LINK/OPT
+\end{verbatim}
+\end {quote}
+
+is used. 
+For example, a typical link operation would be
+
+\begin {quote}
+\begin{verbatim}
+$ LINK PROGRAM, CHR_LINK/OPT
+\end{verbatim}
+\end {quote}
+
+All the logical names required during the compilation of ADAM software 
+using CHR are defined by the ADAM development start-up procedures, {\em e.g.}
+
+\begin {quote}
+\begin{verbatim}
+$ ADAMSTART
+$ ADAM_DEV
+\end{verbatim}
+\end {quote}
+
+ADAM applications will automatically be linked with the CHR library when
+using the ADAM link procedure.
+
+
+\subsection {Use with the UNIX operating system}
+
+The two include files available for use with the Character Handling Routines 
+are named {\bf sae\_par} and {\bf chr\_err} on UNIX
+machines, and reside in the directory {\bf /star/include}.
+When including these files within Fortran code, the full path name is required,
+{\em e.g.}
+
+\begin{verbatim}
+*  Global Constants:
+      INCLUDE '/star/include/sae_par'
+\end{verbatim}
+
+\begin {sloppypar}
+To link a program with the Character Handling Routines on UNIX machines 
+the command line is
+\end {sloppypar}
+
+\begin {quote}
+\begin{verbatim}
+% f77 program.o -L/star/lib `chr_link` -o program.out
+\end{verbatim}
+\end {quote}
+
+\section{Efficiency Considerations}
+
+Several routines provided by CHR have implications for the efficiency of
+applications which make heavy use of them.
+These routines when used judiciously present no efficiency problem, but
+when they are used indiscriminantly they can have a marked effect on 
+execution times.
+
+\begin {description}
+\item [CHR\_CTOx] These routines make use of the Fortran internal {\tt READ}
+statements which can have an impact upon execution times when used heavily.
+Within an application it is only absolutely necessary to perform this type
+conversion once, when it is needed.
+If both representations are needed within an application, store both.
+\item [CHR\_LEN] Checking the used length of a given {\tt CHARACTER} 
+argument within every subroutine can have a significant impact upon execution
+times and should be avoided.
+For character strings which are not modified, CHR\_LEN need only be called
+once.
+The used length of the string may then be passed as an additional subroutine
+argument, {\em e.g.}\
+
+\begin {small}
+\begin{verbatim}
+      STRLEN = CHR_LEN( STRING )
+      CALL SUBN( STRING, STRLEN, STATUS )
+\end{verbatim}
+\end {small}
+
+or the substring that represents the filled part of the string may be passed
+to the subroutine, {\em e.g.}\
+
+\begin {small}
+\begin{verbatim}
+      STRLEN = CHR_LEN( STRING )
+      CALL SUBN( STRING( 1 : STRLEN ), STATUS )
+\end{verbatim}
+\end {small}
+
+\item [CHR\_xTOC] These routines make use of the Fortran internal {\tt WRITE}
+statements which can have an impact upon execution times when used heavily.
+Within an application it is only absolutely necessary to perform this type
+conversion once, when it is needed.
+If both representations are needed within an application, store both.
+\end {description}
+
+
+\newpage
+\appendix
+\section {Include Files} \label{incl_sect}
+
+There are two include files used by the Character Handling Routines
+to define global constants during compilation. 
+These files have the logical names SAE\_PAR and CHR\_ERR.
+The contents of each of these include files are given below.
+
+\begin {description}
+\item [CHR\_ERR] Defines the Character Handling Routine errors.
+\subitem {\bf CHR\_\_EOSNT} -- End of sentence.
+\subitem {\bf CHR\_\_WNOTF} -- Word not found.
+\indexspace
+\item [SAE\_PAR] Defines the global constants SAI\_\_OK and SAI\_\_ERROR.
+\subitem {\bf SAI\_\_ERROR} -- Error encountered.
+\subitem {\bf SAI\_\_OK} -- No error.
+\subitem {\bf SAI\_\_WARN} -- Warning.
+\end {description}
+
+\section {Classified List of Routines}\label{class_sect}
+
+The classifications are in alphabetical order as follows:
+
+\begin{description}
+\item[Change case] --
+    Change the case of a character string.
+\item[Compare strings] --
+    Compare two character strings.
+\item[Decode Fortran data types] --
+    Convert a character string into a Fortran data type and return its
+    value.
+\item[Editing strings] -- 
+    Edit character strings by replacing, adding or removing defined 
+    substrings.
+\item[Encode Fortran data types] --
+    Convert a Fortran data type into a character string representation of
+    its value.
+\item[Enquire] --
+    Return information about a character string.
+\item[Facilitate portability] --
+    Tools for assisting portability, especially to or from non-ASCII
+    environments.
+\item[Search strings] --
+    Search a character string.
+\end{description}
+
+
+\subsection {Change case}
+
+\begin {description}
+\item [CHR\_LCASE] -- Convert a string to lower case.
+\item [CHR\_LOWER] -- Return the lower case equivalent of a character.
+\item [CHR\_UCASE] -- Convert a string to upper case.
+\item [CHR\_UPPER] -- Return the upper-case equivalent of a character.
+\end {description}
+
+
+\subsection {Compare strings}
+
+\begin {description}
+\item [CHR\_ABBRV] -- Return whether two strings are equal apart from case,
+permitting  abbreviation.
+\item [CHR\_SCOMP] -- Compare two character strings using the ASCII character
+set.
+\item [CHR\_SIMLR] -- Return whether two strings are equal, apart from case.
+\item [CHR\_WILD] -- Return whether a string matches a wild-card pattern.
+\end {description}
+
+
+\subsection {Decode Fortran data types}
+
+\begin {description}
+\item [CHR\_BTOI] -- Read an INTEGER value from a binary string.
+\item [CHR\_CTOC] -- Write a CHARACTER string into another string.
+\item [CHR\_CTOD] -- Read a DOUBLE PRECISION value from a string.
+\item [CHR\_CTOI] -- Read an INTEGER value from a string.
+\item [CHR\_CTOL] -- Read a LOGICAL value from a string.
+\item [CHR\_CTOR] -- Read a REAL value from a string.
+\item [CHR\_HTOI] -- Read an INTEGER value from a hexadecimal string.
+\item [CHR\_OTOI] -- Read an integer from an octal string.
+\end {description}
+
+
+\subsection {Edit strings}
+
+\begin {description}
+\item [CHR\_APPND] -- Copy one string into another, ignoring trailing blanks.
+\item [CHR\_CLEAN] -- Remove all unprintable characters from a string.
+\item [CHR\_COPY] -- Copy one string into another, checking for truncation.
+\item [CHR\_DCWRD] -- Split a string into its component words.
+\item [CHR\_FILL] -- Fill a string with a given character.
+\item [CHR\_LDBLK] -- Remove any leading blanks from a string.
+\item [CHR\_LINBR] -- Break a line of text into a sequence of shorter lines.
+\item [CHR\_PFORM] -- Reformat a paragraph to a new width.
+\item [CHR\_PREFX] -- Prefix a string with a substring.
+\item [CHR\_RJUST] -- Right-justify a string.
+\item [CHR\_RMBLK] -- Remove all blanks from a string.
+\item [CHR\_RMCHR] -- Remove all specified characters from a string.
+\item [CHR\_SORT] -- Sort an array of character strings into alphabetical order.
+\item [CHR\_SWAP] -- Swap two single-character variables.
+\item [CHR\_TERM] -- Terminate a string by padding out with blanks.
+\item [CHR\_TRCHR] -- Translate the specified characters in a string.
+\item [CHR\_TRUNC] -- Truncate a string at a given delimiter.
+\end {description}
+
+
+\subsection {Encode Fortran data types}
+
+\begin{description}
+\item [CHR\_DTOAN] -- Write a DOUBLE PRECISION value into a string as
+hr/deg:min:sec.
+\item [CHR\_DTOC] -- Write a DOUBLE PRECISION value into a string.
+\item [CHR\_ITOB] -- Write an INTEGER value as a binary string.
+\item [CHR\_ITOC] -- Write an INTEGER value as a decimal string.
+\item [CHR\_ITOH] -- Write an INTEGER value as a hexadecimal string.
+\item [CHR\_ITOO] -- Write an INTEGER value as an octal string.
+\item [CHR\_LTOC] -- Write a LOGICAL value into a string.
+\item [CHR\_PUTC] -- Put a CHARACTER string into another at a given position. 
+\item [CHR\_PUTD] -- Put a DOUBLE PRECISION value into a string at a given position. 
+\item [CHR\_PUTI] -- Put an INTEGER value into a string at a given position. 
+\item [CHR\_PUTL] -- Put a LOGICAL value into a string at a given position. 
+\item [CHR\_PUTR] -- Put a REAL value into a string at a given position.
+\item [CHR\_RTOAN] -- Write a REAL value into a string as hr/deg:min:sec.
+\item [CHR\_RTOC] -- Write a REAL value into a string.
+\end {description}
+
+
+\subsection {Enquire}
+
+\begin{description}
+\item [CHR\_NTH] -- Return the two-character abbreviation for a specified
+integer.
+\item [CHR\_INSET] -- Return whether a string is a member of a given set.
+\item [CHR\_ISALF] -- Return whether a character is alphabetic.
+\item [CHR\_ISALM] -- Return whether a character is alphanumeric.
+\item [CHR\_ISDIG] -- Return whether a character is a digit.
+\item [CHR\_ISNAM] -- Return whether a string is a valid name.
+\item [CHR\_LEN] -- Return the length of a string, ignoring trailing blanks.
+\end{description}
+
+
+\subsection{Facilitate Portability}
+
+\begin{description}
+\item [CHR\_ACHR] -- Return the character for a given ASCII value.
+\item [CHR\_ATOK] -- Return the character for a given ASCII character token.
+\item [CHR\_ATOM] -- Translate a string from ASCII to the machine's character
+set.
+\item [CHR\_ETOM] -- Translate a string from EBCDIC to machine's character set.
+\item [CHR\_IACHR] -- Return the ASCII value for a given character.
+\item [CHR\_MTOA] -- Translate a string from machine's character set to ASCII.
+\item [CHR\_MTOE] -- Translate a string from machine's character set to EBCDIC.
+\end{description}
+
+
+\subsection{Search strings}
+
+\begin {description}
+\item [CHR\_DELIM] -- Locate a substring using a given delimiter character.
+\item [CHR\_FANDL] -- Find the first and last non-blank characters in a string.
+\item [CHR\_FIND] -- Find the next occurrence of a given substring within a string.
+\item [CHR\_FIWE] -- Find the next end-of-word within a string.
+\item [CHR\_FIWS] -- Find the start of the next word within a string.
+\item [CHR\_SKCHR] -- Skip over all specified characters in a string.
+\item [CHR\_TOCHR] -- Skip to the next specified character in a string.
+\end {description}
+
+
+\newpage
+\section{Routine Descriptions}
+
+\sstroutine{
+   CHR\_ABBRV
+}{
+   Return whether two strings are equal apart from case,
+   permitting abbreviations
+}{
+   \sstdescription{
+      Returns a logical result indicating whether two strings
+      are the same, apart from case. In assessing this, the first
+      string is allowed to be an abbreviation of the second string,
+      as long as it contains a specified minimum number of characters.
+   }
+   \sstinvocation{
+      RESULT = CHR\_ABBRV( STR1, STR2, NCHAR )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STR1 = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The first string, which may be an abbreviation.
+      }
+      \sstsubsection{
+         STR2 = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The second string.
+      }
+      \sstsubsection{
+         NCHAR = INTEGER (Given)
+      }{
+         The minimum number of characters to which the first string may
+         be abbreviated (a smaller number will be accepted if there are
+         actually fewer than NCHAR characters in STR2).
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         CHR\_ABBRV = LOGICAL
+      }{
+         Whether the two strings match after allowing for case and
+         abbreviation of the first string to no less than NCHAR
+         characters.
+      }
+   }
+}
+\sstroutine{
+   CHR\_ACHR
+}{
+   Return the character for a given ASCII value
+}{
+   \sstdescription{
+      The given ASCII value is converted to a single returned character
+      in the machine{\tt '}s character set. If no such character
+      exists within the machine{\tt '}s character set, the character code 0
+      (the ASCII NUL character) is returned.
+   }
+   \sstinvocation{
+      RESULT = CHR\_ACHR( ASCII )
+   }
+   \sstarguments{
+      \sstsubsection{
+         ASCII = INTEGER (Given)
+      }{
+         The position of the character within the ASCII character set.
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         CHR\_ACHR = CHARACTER $*$ 1
+      }{
+         A character value within the machine{\tt '}s character set.
+      }
+   }
+}
+\sstroutine{
+   CHR\_APPND
+}{
+   Copy one string into another, ignoring trailing blanks
+}{
+   \sstdescription{
+      The string STR1 (or as much of it as there is room for) is
+      copied into the part of STR2 beginning at position IPOSN$+$1.
+      IPOSN is updated to indicate the final length of STR2 after
+      this operation. Trailing blanks in STR1 are ignored.
+   }
+   \sstinvocation{
+      CALL CHR\_APPND( STR1, STR2, IPOSN )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STR1 = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The string to be copied.
+      }
+      \sstsubsection{
+         STR2 = CHARACTER $*$ ( $*$ ) (Given and Returned)
+      }{
+         The string to be updated.
+      }
+      \sstsubsection{
+         IPOSN = INTEGER (Given and Returned)
+      }{
+         The position in STR2 at which STR1 is to be appended. This
+         value is returned updated to be the position of the last
+         non-blank character in STR2 after the copy.
+      }
+   }
+}
+\sstroutine{
+   CHR\_ATOK
+}{
+   Return the character for a given ASCII character token
+}{
+   \sstdescription{
+      The given ASCII character token is converted to a single returned
+      character in the machine{\tt '}s character set.  All
+      non-printable ASCII characters are represented by their equivalent
+      token strings. If no such ASCII character exists, the character
+      code 0 (the ASCII NUL character) is returned. The routine is intended
+      for the portable initialisation of unprintable characters.
+   }
+   \sstinvocation{
+      RESULT = CHR\_ATOK( TOKEN )
+   }
+   \sstarguments{
+      \sstsubsection{
+         TOKEN = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         A printable character string representing the character to
+         be returned, e.g., {\tt '}BEL{\tt '}, {\tt '}BS{\tt '}, etc.
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         CHR\_ATOK = CHARACTER $*$ 1
+      }{
+         The character code within the ASCII character set.
+      }
+   }
+}
+\sstroutine{
+   CHR\_ATOM
+}{
+   Translate a string from ASCII to the machine{\tt '}s character set
+}{
+   \sstdescription{
+      The string STR1, which has been written on a machine which uses
+      the ASCII character set and subsequently read on another
+      machine is returned in STR2 translated into the correct
+      character set for that machine.
+   }
+   \sstinvocation{
+      CALL CHR\_ATOM( STR1, STR2 )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STR1 = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The character string written on a machine with an ASCII
+         character set and read on a machine which may not use
+         ASCII.
+      }
+      \sstsubsection{
+         STR2 = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         The character string translated into the machine{\tt '}s character
+         set. If STR2 is shorter than STR1, the translated string will
+         be truncated; if STR2 is longer than STR1, STR2 will be padded
+         with blanks beyond the translated string.
+      }
+   }
+}
+\sstroutine{
+   CHR\_BTOI
+}{
+   Read an INTEGER value from a binary string
+}{
+   \sstdescription{
+      The given binary string is decoded into an INTEGER value.
+   }
+   \sstinvocation{
+      CALL CHR\_BTOI( STRING, IVALUE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STRING = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         String to be decoded, e.g. `10101100{\tt '}.
+      }
+      \sstsubsection{
+         IVALUE = INTEGER (Returned)
+      }{
+         Value decoded from the given string.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The status value. If this value is not SAI\_\_OK on input, the
+         routine returns without action. If the routine fails to
+         complete successfully, STATUS is returned set to SAI\_\_ERROR.
+      }
+   }
+   \sstdiytopic{
+      Note
+   }{
+      This subroutine assumes a 32-bit, twos-complement representation
+      of an INTEGER.
+   }
+}
+\sstroutine{
+   CHR\_CLEAN
+}{
+   Remove all unprintable characters from a string
+}{
+   \sstdescription{
+      Replace all unprintable characters in the given string with blanks.
+   }
+   \sstinvocation{
+      CALL CHR\_CLEAN( STRING )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STRING = CHARACTER $*$ ( $*$ ) (Given and Returned)
+      }{
+         String to be cleaned.
+      }
+   }
+}
+\sstroutine{
+   CHR\_COPY
+}{
+   Copy one string to another, checking for truncation
+}{
+   \sstdescription{
+      This routine copies one character string to another, checking
+      for truncation caused by the returned string being too short to
+      accommodate the entire given string. As much of the given string
+      as possible is copied to the returned string, ignoring any
+      trailing blanks. If truncation is found, it is indicated by the
+      returned status.
+      Optionally, the last character of the returned string may also
+      be set to {\tt '}\#{\tt '} if truncation occurs.
+   }
+   \sstinvocation{
+      CALL CHR\_COPY( STR1, TRUNC, STR2, LSTAT )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STR1 = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The given string.
+      }
+      \sstsubsection{
+         TRUNC = LOGICAL (Given)
+      }{
+         A logical flag indicating the action to be taken if
+         truncation occurs: if TRUNC is .TRUE., a {\tt '}\#{\tt '} will be
+         written into the last element of the returned string on
+         truncation; if TRUNC is .FALSE., no {\tt '}\#{\tt '} is written to the
+         returned string.
+      }
+      \sstsubsection{
+         STR2 = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         The returned string. This will contain the given string,
+         possibly truncated.
+      }
+      \sstsubsection{
+         LSTAT = INTEGER (Returned)
+      }{
+         The status: 0 for success, 1 if truncation occurs.
+      }
+   }
+}
+\sstroutine{
+   CHR\_CTOC
+}{
+   Write a CHARACTER string into another string
+}{
+   \sstdescription{
+      Write the given character string into the returned character string.
+      If the given string is longer than the returned string, the given
+      string is truncated. If the returned string is longer than the
+      given character variable, the remainder of the returned string
+      is padded with blanks.
+   }
+   \sstinvocation{
+      CALL CHR\_CTOC( STR1, STR2, NCHAR )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STR1 = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The value to be written.
+      }
+      \sstsubsection{
+         STR2 = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         The character string into which the value is to be written.
+      }
+      \sstsubsection{
+         NCHAR = INTEGER (Returned)
+      }{
+         The resulting length of the character string, ignoring
+         trailing blanks.
+      }
+   }
+}
+\sstroutine{
+   CHR\_CTOD
+}{
+   Read a DOUBLE PRECISION value from a string
+}{
+   \sstdescription{
+      Read a DOUBLE PRECISION value from the given character string.
+   }
+   \sstinvocation{
+      CALL CHR\_CTOD( STRING, DVALUE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STRING = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The string from which a DOUBLE PRECISION value is to be read.
+      }
+      \sstsubsection{
+         DVALUE = DOUBLE PRECISION (Returned)
+      }{
+         The resulting DOUBLE PRECISION value.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The status value: if this value is not SAI\_\_OK on input,
+         the routine returns without action; if the routine does
+         not complete successfully, STATUS is returned set to
+         SAI\_\_ERROR.
+      }
+   }
+}
+\sstroutine{
+   CHR\_CTOI
+}{
+   Read an INTEGER value from a string
+}{
+   \sstdescription{
+      Read an INTEGER value from the given character string.
+   }
+   \sstinvocation{
+      CALL CHR\_CTOI( STRING, IVALUE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STRING = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The string from which an INTEGER value is to be read.
+      }
+      \sstsubsection{
+         IVALUE = INTEGER (Returned)
+      }{
+         The resulting INTEGER value.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The status value. If this value is not SAI\_\_OK on input,
+         the routine returns without action; if the routine does
+         not complete successfully, STATUS is returned set to
+         SAI\_\_ERROR.
+      }
+   }
+}
+\sstroutine{
+   CHR\_CTOL
+}{
+   Read a LOGICAL value from a string
+}{
+   \sstdescription{
+      The given string is decoded as a logical value. TRUE, T, YES,
+      Y and FALSE, F, NO, N are recognised, regardless of case. Other
+      strings result in STATUS being set to SAI\_\_ERROR.
+   }
+   \sstinvocation{
+      CALL CHR\_CTOL( STRING, LVALUE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STRING = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The string from which a LOGICAL value is to be read.
+      }
+      \sstsubsection{
+         LVALUE = LOGICAL (Returned)
+      }{
+         The resulting LOGICAL value.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The status value: if this value is not SAI\_\_OK on input,
+         the routine returns without action; if the routine does
+         not complete successfully, STATUS is returned set to
+         SAI\_\_ERROR.
+      }
+   }
+}
+\sstroutine{
+   CHR\_CTOR
+}{
+   Read a REAL value from a string
+}{
+   \sstdescription{
+      Read a REAL value from the given character string.
+   }
+   \sstinvocation{
+      CALL CHR\_CTOR( STRING, RVALUE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STRING = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The string from which a REAL value is to be read.
+      }
+      \sstsubsection{
+         RVALUE = REAL (Returned)
+      }{
+         The resulting REAL value.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The status value: if this value is not SAI\_\_OK on input,
+         the routine returns without action; if the routine does
+         not complete successfully, STATUS is returned set to
+         SAI\_\_ERROR.
+      }
+   }
+}
+\sstroutine{
+   CHR\_DCWRD
+}{
+   Split a string into its component words
+}{
+   \sstdescription{
+      All the words in the given character string are detected and
+      returned as individual elements of a character array. In this
+      context, a word is defined as a continuous string of non-blank
+      characters. Hence words must be separated from each other by
+      one or more blanks.
+   }
+   \sstinvocation{
+      CALL CHR\_DCWRD( STRING, MXWRD, NWRD, START, STOP, WORDS, LSTAT )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STRING = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The string to be split into its constituent words.
+      }
+      \sstsubsection{
+         MXWRD = INTEGER (Given)
+      }{
+         The maximum number of words that can be extracted from the
+         given string: if there are more than MXWRD words in the
+         string, only the first MXWRD will be returned.
+      }
+      \sstsubsection{
+         NWRD = INTEGER (Returned)
+      }{
+         The number of words located in the string.
+      }
+      \sstsubsection{
+         START( MXWRD ) = INTEGER (Returned)
+      }{
+         The Ith element contains the position of the first element
+         of the Ith word in the given string.
+      }
+      \sstsubsection{
+         STOP( MXWRD ) = INTEGER (Returned)
+      }{
+         The Ith element contains the position of the last element of
+         the Ith word in the given string.
+      }
+      \sstsubsection{
+         WORDS( MXWRD ) = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         The Ith element contains the Ith word located in the given
+         string.
+      }
+      \sstsubsection{
+         LSTAT = INTEGER (Returned)
+      }{
+         The local status. This is a return status only: the routine
+         is not affected by the value on input. It has the following
+         values: SAI\_\_OK for successful completion, SAI\_\_ERROR if the
+         number of words exceeds MXWRD.
+      }
+   }
+}
+\sstroutine{
+   CHR\_DELIM
+}{
+   Locate a substring using a given delimiter character
+}{
+   \sstdescription{
+      The given character string is examined to see if it contains a
+      substring delimited by the character, DELIM. The indices of the
+      first and last characters of the substring are returned as
+      INDEX1 and INDEX2 respectively. If no occurrence of the specified
+      delimiter is found, or if the only occurrence is the last
+      character of the string, then the indices are returned pointing
+      to the whole of the input string. If only one occurrence of the
+      delimiter is found and it is not the last character in the string,
+      INDEX1 will point to this position and INDEX2 will point to the
+      last character in the string. If there are more than two
+      of the occurrences of the delimiter character, INDEX1 will point
+      to the first occurrence and INDEX2 to the last occurrence.
+   }
+   \sstinvocation{
+      CALL CHR\_DELIM( STRING, DELIM, INDEX1, INDEX2 )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STRING = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The character string to be searched.
+      }
+      \sstsubsection{
+         DELIM = CHARACTER $*$ 1 (Given)
+      }{
+         The substring delimiting character.
+      }
+      \sstsubsection{
+         INDEX1 = INTEGER (Returned)
+      }{
+         The position of the first occurrence of the delimiter, or the
+         first character in the string.
+      }
+      \sstsubsection{
+         INDEX2 = INTEGER (Returned)
+      }{
+         The position of the last occurrence of the delimiter, or the
+         last character in the string.
+      }
+   }
+}
+\sstroutine{
+   CHR\_DTOAN
+}{
+   Write a DOUBLE PRECISION value into a string as hr/deg:min:sec
+}{
+   \sstdescription{
+      Format a DOUBLE PRECISION value as hours/degrees:minutes:seconds
+      and write it into a character string. This routine is for writing
+      angular measures into a character string in a format suitable
+      for presentation to an astronomer.
+
+      If the absolute value of the number to be written exceeds
+      a predefined maximum a conversion is not attempted, but the
+      number is written as a real number in Fortran `exponential{\tt '}
+      format and a couple of question marks are appended to its
+      end. This prevents silly results when very large numbers
+      are input. The variable UNITS controls the maximum permitted
+      value for the conversion to be carried out.
+
+      The value is written into the part of the string beginning
+      at position IPOSN$+$1 and IPOSN is returned updated to the
+      position of the end of the encoded angle in STRING.
+   }
+   \sstinvocation{
+      CALL CHR\_DTOAN( DVALUE, UNITS, STRING, IPOSN )
+   }
+   \sstarguments{
+      \sstsubsection{
+         DVALUE = DOUBLE PRECISION (Given)
+      }{
+         The value to be encoded into the string. This value should
+         represent an angular measure.
+      }
+      \sstsubsection{
+         UNITS = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         This string controls the maximum value which will be formatted
+         as hr/deg:min:sec: if UNITS = {\tt '}HOURS{\tt '}, the maximum permitted
+         value is 24.0; if UNITS = {\tt '}DEGREES{\tt '}, the  maximum permitted is
+         360.0. In all other cases the maximum is 1000.0.
+      }
+      \sstsubsection{
+         STRING = CHARACTER $*$ ( $*$ ) (Given and Returned)
+      }{
+         The string into which DVALUE is written.
+      }
+      \sstsubsection{
+         IPOSN = INTEGER (Given and Returned)
+      }{
+         Given as the last element in STRING before the beginning of the
+         encoded angle. Returned as the element in STRING corresponding
+         to the end of the encoded angle.
+      }
+   }
+}
+\sstroutine{
+   CHR\_DTOC
+}{
+   Encode a DOUBLE PRECISION value as a string
+}{
+   \sstdescription{
+      Encode a DOUBLE PRECISION value as a character string, using as
+      concise a format as possible, and return the number of characters
+      used. In the event of an error, {\tt '}$*${\tt '}s are written to the string.
+   }
+   \sstinvocation{
+      CALL CHR\_DTOC( DVALUE, STRING, NCHAR )
+   }
+   \sstarguments{
+      \sstsubsection{
+         DVALUE = DOUBLE PRECISION (Given)
+      }{
+         The value to be encoded.
+      }
+      \sstsubsection{
+         STRING = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         The string into which the value is to be encoded.
+      }
+      \sstsubsection{
+         NCHAR = INTEGER (Returned)
+      }{
+         The field width used in encoding the value.
+      }
+   }
+}
+\sstroutine{
+   CHR\_EQUAL
+}{
+   Return whether two strings are equal
+}{
+   \sstdescription{
+      Determine whether the two given strings are the same, with case
+      distinction. Their lengths must be identical after removing
+      trailing blanks.
+   }
+   \sstinvocation{
+      RESULT = CHR\_EQUAL( STR1, STR2 )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STR1 = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The first string.
+      }
+      \sstsubsection{
+         STR2 = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The second string.
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         CHR\_EQUAL = LOGICAL
+      }{
+         Returned as .TRUE. if the two given strings are the same,
+         otherwise .FALSE.
+      }
+   }
+   \sstnotes{
+      This routine is OBSOLETE.  It exists for historical reasons.
+      Its function is better performed by a Fortran relational expression.
+   }
+}
+\sstroutine{
+   CHR\_ETOM
+}{
+   Translate a string from EBCDIC to the machine{\tt '}s character set
+}{
+   \sstdescription{
+      The string STR1, which has been written on a machine which uses
+      the EBCDIC character set and subsequently read on a machine which
+      may not use the EBCDIC character set to represent characters in
+      Fortran, is returned in STR2 translated into the correct
+      character set for the host machine.
+   }
+   \sstinvocation{
+      CALL CHR\_ETOM( STR1, STR2 )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STR1 = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The character string written on a machine with an EBCDIC
+         character set and read on a machine which may not use
+         EBCDIC to represent characters in Fortran.
+      }
+      \sstsubsection{
+         STR2 = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         The translated EBCDIC character string. If STR2 is shorter
+         than STR1, the translated string will be truncated; if
+         STR2 is longer than STR1, STR2 will be padded with blanks
+         beyond the translated string.
+      }
+   }
+   \sstdiytopic{
+      Note
+   }{
+      This subroutine has been implemented for machines which use
+      the ASCII character set.
+   }
+}
+\sstroutine{
+   CHR\_FANDL
+}{
+   Find the first and last non-blank characters in a string
+}{
+   \sstdescription{
+      Find the indices of the first and last non-blank characters in
+      the given string. If the string is all blank, the first index
+      is returned set to the end of the string and the last index is
+      returned set to zero, i.e. INDEX1 is greater than INDEX2.
+      If the string has no length, i.e. it is a substring with the first
+      index greater than the second, both indices are returned set to
+      zero.
+   }
+   \sstinvocation{
+      CALL CHR\_FANDL( STRING, INDEX1, INDEX2 )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STRING = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The character string.
+      }
+      \sstsubsection{
+         INDEX1 = INTEGER (Returned)
+      }{
+         The position of first non-blank character.
+      }
+      \sstsubsection{
+         INDEX2 = INTEGER (Returned)
+      }{
+         The position of last non-blank character.
+      }
+   }
+}
+\sstroutine{
+   CHR\_FILL
+}{
+   Fill a string with a given character
+}{
+   \sstdescription{
+      The given character string is filled with the specified character.
+   }
+   \sstinvocation{
+      CALL CHR\_FILL( CVALUE, STRING )
+   }
+   \sstarguments{
+      \sstsubsection{
+         CVALUE = CHARACTER (Given)
+      }{
+         The character specified to fill the string.
+      }
+      \sstsubsection{
+         STRING = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         The string to be filled.
+      }
+   }
+}
+\sstroutine{
+   CHR\_FIND
+}{
+   Find the next occurrence of given substring within a string
+}{
+   \sstdescription{
+      Increments a pointer to a character position within the given
+      string and checks if the following sequence of characters matches
+      the specified substring, ignoring differences in case. The search
+      may be performed either forwards or backwards. If a match is found,
+      the position of the substring is returned. If no match exists,
+      the pointer is set to one more than the length of the string
+      if the search is forwards, zero if the search is backwards.
+   }
+   \sstinvocation{
+      CALL CHR\_FIND( STRING, SUBSTR, FORWD, IPOSN )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STRING = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The string to be searched.
+      }
+      \sstsubsection{
+         SUBSTR = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The substring to be searched for, ignoring case.
+      }
+      \sstsubsection{
+         FORWD = LOGICAL (Given)
+      }{
+         The search direction: if .TRUE., proceed through the string
+         in a forward direction, otherwise work backwards.
+      }
+      \sstsubsection{
+         IPOSN = INTEGER (Given and Returned)
+      }{
+         The starting position for the search. If the initial value of
+         IPOSN does not point at a character within the string, the
+         routine returns without action.
+      }
+   }
+}
+\sstroutine{
+   CHR\_FIWE
+}{
+   Find the next end-of-word within a string
+}{
+   \sstdescription{
+      Find the next end-of-word, signified by the following character
+      being a word delimiter (SPACE, TAB or COMMA). Note that the
+      start of the next word is not found before looking for the
+      next word delimiter so it is possible for IPOSN to remain
+      unchanged and indeed to point to a word delimiter rather than a
+      true end of a word. This routine is expected to be used in
+      conjunction with CHR\_FIWS.
+   }
+   \sstinvocation{
+      CALL CHR\_FIWE (STRING, IPOSN, STATUS)
+   }
+   \sstarguments{
+      \sstsubsection{
+         STRING = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The string to be searched.
+      }
+      \sstsubsection{
+         IPOSN = INTEGER (Given and Returned)
+      }{
+         The given value is the character position within the string
+         at which searching is to start. If IPOSN is less than 1, the
+         search starts at position 1. The returned value is the
+         character position preceding the next word delimiter. If
+         IPOSN already points to a character preceding a delimiter,
+         it is returned unchanged. If no delimiter is found, IPOSN is
+         returned pointing to the end of the string, and STATUS is
+         returned set.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The status value: if this value is not SAI\_\_OK on entry,
+         the routine returns without action; if the next word delimiter
+         is not found before the end of the string, STATUS is returned
+         set to CHR\_\_EOSNT.
+         Note: The CHR\_\_EOSNT symbolic constant is defined in the CHR\_ERR
+         include file.
+      }
+   }
+}
+\sstroutine{
+   CHR\_FIWS
+}{
+   Find the start of the next word within a string
+}{
+   \sstdescription{
+      Find the start of the next word, signified by the character not
+      being a word delimiter, i.e. SPACE, TAB, or COMMA. Note that the
+      end of the current word is not found before looking for the start
+      of the next. This routine is expected to be used in conjunction
+      with CHR\_FIWE.
+   }
+   \sstinvocation{
+      CALL CHR\_FIWS( STRING, IPOSN, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STRING = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The string to be searched.
+      }
+      \sstsubsection{
+         IPOSN = INTEGER (Given and Returned)
+      }{
+         The given value is the character position within the string
+         at which searching is to start. If IPOSN is less than 1, the
+         search starts at position 1. The returned value is the
+         character position at which the next word starts. If IPOSN
+         already points to a character within a word, it is returned
+         unchanged. If no word is found, IPOSN is returned pointing to
+         the end of the string, and STATUS is returned set.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The status value: if this value is not SAI\_\_OK on entry,
+         the routine returns without action; if no word is found, STATUS
+         is returned set to CHR\_\_WNOTF.
+         Note: The CHR\_\_WNOTF symbolic constant is defined in the CHR\_ERR
+         include file.
+      }
+   }
+}
+\sstroutine{
+   CHR\_HTOI
+}{
+   Read an INTEGER value from a hexadecimal string
+}{
+   \sstdescription{
+      The given hexadecimal string is decoded into an INTEGER value.
+   }
+   \sstinvocation{
+      CALL CHR\_HTOI( STRING, IVALUE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STRING = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         String to be decoded.
+      }
+      \sstsubsection{
+         IVALUE = INTEGER (Returned)
+      }{
+         Value decoded from the given string.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The status value. If this value is not SAI\_\_OK on input,
+         the routine returns without action. If the routine fails
+         to complete successfully, STATUS is returned set to
+         SAI\_\_ERROR.
+      }
+   }
+   \sstdiytopic{
+      Note
+   }{
+      This subroutine assumes a 32-bit, twos-compliment representation
+      of an INTEGER.
+   }
+}
+\sstroutine{
+   CHR\_IACHR
+}{
+   Return the ASCII value for the given character
+}{
+   \sstdescription{
+      The given character, encoded using the machine{\tt '}s character set,
+      is converted to an integer indicating its position in the ASCII
+      character set. If no such character exists, zero is returned.
+   }
+   \sstinvocation{
+      RESULT = CHR\_IACHR( CVALUE )
+   }
+   \sstarguments{
+      \sstsubsection{
+         CVALUE = CHARACTER $*$ 1 (Given)
+      }{
+         The character to be converted to its position within the
+         ASCII character set.
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         CHR\_IACHR = INTEGER
+      }{
+         An integer position within the ASCII character set.
+      }
+   }
+}
+\sstroutine{
+   CHR\_INDEX
+}{
+   Return the index of a substring in a string
+}{
+   \sstdescription{
+      Find the position of a substring within a given string. If no
+      substring is found, the value zero is returned.
+   }
+   \sstinvocation{
+      RESULT = CHR\_INDEX( STRING, SUBSTR )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STRING = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The string to be searched.
+      }
+      \sstsubsection{
+         SUBSTR = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The substring to be used in the search.
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         CHR\_INDEX = INTEGER
+      }{
+         The position of SUBSTR within STRING.
+      }
+   }
+   \sstnotes{
+      This routine is OBSOLETE.  It exists for historical reasons.
+      Its function is identical to the Fortran intrinsic function INDEX.
+      It is recommended that the INDEX intrinsic function be called
+      directly.
+   }
+}
+\sstroutine{
+   CHR\_INSET
+}{
+   Return whether a string is a member of a given set
+}{
+   \sstdescription{
+      The character string is compared with each of the values
+      given in the given set.
+      The strings in the set can be any length and can differ
+      in length throughout the set. Each value is separated by a
+      comma. Upper and lowercase are treated as being equivalent and
+      trailing blanks are ignored.
+   }
+   \sstinvocation{
+      RESULT = CHR\_INSET( SET, STRING )
+   }
+   \sstarguments{
+      \sstsubsection{
+         SET = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The set of character values. It takes the form
+         {\tt '}string1,string2,.......,stringN{\tt '} where each of the
+         substring values from string1 to stringN can be of different
+         lengths.
+      }
+      \sstsubsection{
+         STRING = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The character string to be checked for membership of the set.
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         CHR\_INSET = LOGICAL
+      }{
+         Returns .TRUE. if the character string is a member of the
+         given set, returns .FALSE. otherwise.
+      }
+   }
+}
+\sstroutine{
+   CHR\_ISALF
+}{
+   Return whether a character is alphabetic
+}{
+   \sstdescription{
+      The given character is tested for being alphabetic, i.e. A - Z
+      or a - z.
+   }
+   \sstinvocation{
+      RESULT = CHR\_ISALF( CVALUE )
+   }
+   \sstarguments{
+      \sstsubsection{
+         CVALUE = CHARACTER (Given)
+      }{
+         The character to be tested.
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         CHR\_ISALF = LOGICAL
+      }{
+         Returns .TRUE. if the given character is alphabetic,
+         returns .FALSE. otherwise.
+      }
+   }
+}
+\sstroutine{
+   CHR\_ISALM
+}{
+   Return whether a character is alphanumeric
+}{
+   \sstdescription{
+      Determine whether a character is alphanumeric, i.e. A - Z,
+      a - z, 0 - 9 or \_. Note that this routine treats the underscore
+      character as an alphanumeric character.
+   }
+   \sstinvocation{
+      RESULT = CHR\_ISALM( CVALUE )
+   }
+   \sstarguments{
+      \sstsubsection{
+         CVALUE = CHARACTER (Given)
+      }{
+         The character to be tested.
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         CHR\_ISALM = LOGICAL
+      }{
+         Returns .TRUE. if the given character is alphanumeric,
+         returns .FALSE. otherwise.
+      }
+   }
+}
+\sstroutine{
+   CHR\_ISDIG
+}{
+   Return whether a character is a digit
+}{
+   \sstdescription{
+      Determine whether the given character is a digit, i.e. 0 - 9.
+   }
+   \sstinvocation{
+      RESULT = CHR\_ISDIG( CVALUE )
+   }
+   \sstarguments{
+      \sstsubsection{
+         CVALUE = CHARACTER (Given)
+      }{
+         The character to be tested.
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         CHR\_ISDIG = LOGICAL
+      }{
+         Returns .TRUE. if the given character is a digit, returns
+         .FALSE. otherwise.
+      }
+   }
+}
+\sstroutine{
+   CHR\_ISNAM
+}{
+   Return whether a string is a valid name
+}{
+   \sstdescription{
+      Determine whether the given string is a valid name: i.e.
+      whether it starts with an alphabetic character and continues
+      with alphanumeric or underscore characters.
+   }
+   \sstinvocation{
+      RESULT = CHR\_ISNAM( STRING )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STRING = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The string to be tested.
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         CHR\_ISNAM = LOGICAL
+      }{
+         Returns .TRUE. if the given string is a valid name, returns
+         .FALSE. otherwise.
+      }
+   }
+}
+\sstroutine{
+   CHR\_ITOB
+}{
+   Write an INTEGER value into a binary string
+}{
+   \sstdescription{
+      Encode an INTEGER value into a binary string. The result is
+      right-justified in the returned string. In the event of an error,
+      {\tt '}$*${\tt '}s are written to the string.
+   }
+   \sstinvocation{
+      CALL CHR\_ITOB( IVALUE, STRING, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IVALUE = INTEGER (Given)
+      }{
+         Value to be encoded.
+      }
+      \sstsubsection{
+         STRING = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         Binary string encoded from the given value.
+      }
+   }
+   \sstdiytopic{
+      Note
+   }{
+      This subroutine assumes a 32-bit, twos-complement representation
+      of an INTEGER.
+   }
+}
+\sstroutine{
+   CHR\_ITOC
+}{
+   Encode an INTEGER value as a string
+}{
+   \sstdescription{
+      Encode an integer value as a (decimal) character string, using as
+      concise a format as possible, and return the number of characters
+      used. In the event of an error, {\tt '}$*${\tt '}s will be written into to the
+      string.
+   }
+   \sstinvocation{
+      CALL CHR\_ITOC( IVALUE, STRING, NCHAR )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IVALUE = INTEGER (Given)
+      }{
+         The value to be encoded.
+      }
+      \sstsubsection{
+         STRING = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         The string into which the integer value is encoded.
+      }
+      \sstsubsection{
+         NCHAR = INTEGER (Returned)
+      }{
+         The field width used in encoding the value.
+      }
+   }
+}
+\sstroutine{
+   CHR\_ITOH
+}{
+   Write a hexadecimal string from an INTEGER value
+}{
+   \sstdescription{
+      Encode an INTEGER value into a hexadecimal string using the
+      machine{\tt '}s character set. The result is right-justified in the
+      returned string. In the event of an error, {\tt '}$*${\tt '}s are written to
+      the string.
+   }
+   \sstinvocation{
+      CALL CHR\_ITOH( IVALUE, STRING, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IVALUE = INTEGER (Given)
+      }{
+         Value to be encoded.
+      }
+      \sstsubsection{
+         STRING = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         Hexadecimal string encoded from the given value.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The status value. If this value is not SAI\_\_OK on input, the
+         routine returns without action. If the routine fails to
+         complete successfully, STATUS is returned set to SAI\_\_ERROR.
+      }
+   }
+   \sstdiytopic{
+      Note
+   }{
+      This subroutine assumes a 32-bit, twos-complement representation
+      of an INTEGER.
+   }
+}
+\sstroutine{
+   CHR\_ITOO
+}{
+   Write an octal string from an INTEGER value
+}{
+   \sstdescription{
+      Encode an INTEGER value into an octal string using the host
+      machine{\tt '}s character set. The result is right-justified in the
+      returned string. In the event of an error, {\tt '}$*${\tt '}s are written to
+      the string.
+   }
+   \sstinvocation{
+      CALL CHR\_ITOO( IVALUE, STRING, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IVALUE = INTEGER (Given)
+      }{
+         Value to be encoded.
+      }
+      \sstsubsection{
+         STRING = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         Octal string encoded from the given value.
+      }
+   }
+   \sstdiytopic{
+      Note
+   }{
+      This subroutine assumes a 32-bit, twos complement representation
+      of an INTEGER.
+   }
+}
+\sstroutine{
+   CHR\_LCASE
+}{
+   Convert a string to lowercase
+}{
+   \sstdescription{
+      The characters in the string are all converted to lowercase
+      in situ.
+   }
+   \sstinvocation{
+      CALL CHR\_LCASE( STRING )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STRING = CHARACTER $*$ ( $*$ ) (Given and Returned)
+      }{
+         The string to be converted to lowercase.
+      }
+   }
+}
+\sstroutine{
+   CHR\_LDBLK
+}{
+   Remove any leading blanks from a string
+}{
+   \sstdescription{
+      Remove any leading blanks from the character string.
+      The remaining characters are moved to the left to eliminate the
+      resulting empty space, and the end of the string is filled with
+      blanks.
+   }
+   \sstinvocation{
+      CALL CHR\_LDBLK( STRING )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STRING = CHARACTER $*$ ( $*$ ) (Given and Returned)
+      }{
+         The string from which the leading blanks are to be removed.
+      }
+   }
+}
+\sstroutine{
+   CHR\_LEN
+}{
+   Return the length of a string, ignoring trailing blanks
+}{
+   \sstdescription{
+      Find length of string, ignoring trailing blanks.
+   }
+   \sstinvocation{
+      RESULT = CHR\_LEN( STRING )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STRING = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The string whose length is to be determined.
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         CHR\_LEN = INTEGER
+      }{
+         Returns the used length of the string.
+      }
+   }
+}
+\sstroutine{
+   CHR\_LINBR
+}{
+   Break a line of text into a sequence of shorter lines
+}{
+   \sstdescription{
+      Break a long line of text into a sequence of shorter lines,
+      making the breaks between words at spaces if possible.
+      The maximum length of an output line is determined by
+      the size of the character variable supplied to contain it.
+      This routine should be called repeatedly to generate successive
+      output lines from a single long input line.  Initially, the
+      context argument IPOSN should be set to zero; it will be updated
+      after each call, ready to generate the next output line. A value
+      of zero is returned for IPOSN when there are no more output
+      lines. Any unprintable characters (e.g. tabs) are treated as if
+      they were blanks for the purpose of identifying line-breaks.
+   }
+   \sstinvocation{
+      CALL CHR\_LINBR( STR1, IPOSN, STR2 )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STR1 = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The line of text to be broken into shorter lines. Leading
+         blanks are ignored.
+      }
+      \sstsubsection{
+         IPOSN = INTEGER (Given and Returned)
+      }{
+         On entry, this argument specifies the character position in
+         STR1 from which to start generating the next returned line.
+         If a value less than 1 is given, then 1 will be used.
+
+         On exit, this argument is set to one more than the position
+         in STR1 of the last non-blank character which appears in the
+         returned line STR2 (i.e. the position at which generation of the
+         next returned line should begin). If STR2 is blank because there
+         are no more characters to process, then IPOSN is returned set
+         to zero.
+      }
+      \sstsubsection{
+         STR2 = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         The returned line, left justified. The length of this argument
+         determines the maximum length of the returned line.
+      }
+   }
+}
+\sstroutine{
+   CHR\_LOWER
+}{
+   Return the lowercase equivalent of a character
+}{
+   \sstdescription{
+      If the given character is uppercase, the lowercase equivalent
+      is returned, otherwise the character will be returned unchanged.
+   }
+   \sstinvocation{
+      RESULT = CHR\_LOWER( CVALUE )
+   }
+   \sstarguments{
+      \sstsubsection{
+         CVALUE = CHARACTER $*$ 1 (Given)
+      }{
+         The character to be converted.
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         CHR\_LOWER = CHARACTER $*$ 1 (Returned)
+      }{
+         Lowercase equivalent of the given character, if the given
+         character is an uppercase letter; otherwise the character
+         is returned unchanged.
+      }
+   }
+}
+\sstroutine{
+   CHR\_LTOC
+}{
+   Encode a LOGICAL value as a string
+}{
+   \sstdescription{
+      Encode the given LOGICAL value as one of the character strings
+      {\tt '}TRUE{\tt '} or {\tt '}FALSE{\tt '}.
+   }
+   \sstinvocation{
+      CALL CHR\_LTOC( LVALUE, STRING, NCHAR )
+   }
+   \sstarguments{
+      \sstsubsection{
+         LVALUE = LOGICAL (Given)
+      }{
+         The value to be encoded.
+      }
+      \sstsubsection{
+         STRING = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         The string into which the value is to be encoded.
+      }
+      \sstsubsection{
+         NCHAR = INTEGER (Returned)
+      }{
+         The field width used in encoding the value.
+      }
+   }
+}
+\sstroutine{
+   CHR\_MOVE
+}{
+   Move one string into another
+}{
+   \sstdescription{
+      The string STR1, or as much of it as there is room for, is
+      copied into STR2 beginning at position 1.
+   }
+   \sstinvocation{
+      CALL CHR\_MOVE( STR1, STR2 )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STR1 = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The given string.
+      }
+      \sstsubsection{
+         STR2 = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         The returned string.
+      }
+   }
+   \sstnotes{
+      This routine is OBSOLETE.  It exists for historical reasons.
+      Its function is identical to a Fortran assignment statement.
+      It is recommended that an assignment statement be used instead
+      of CHR\_MOVE.
+   }
+}
+\sstroutine{
+   CHR\_MTOA
+}{
+   Translate a string from the machine{\tt '}s characters set to ASCII
+}{
+   \sstdescription{
+      The string STR1, encoded in the host machine{\tt '}s character set, is
+      returned in STR2 translated into a form which can be written and
+      subsequently read correctly by a machine which uses the ASCII
+      character set.
+   }
+   \sstinvocation{
+      CALL CHR\_MTOA( STR1, STR2 )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STR1 = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         A string represented by the host machine{\tt '}s character set.
+      }
+      \sstsubsection{
+         STR2 = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         A string represented by the ASCII character set.
+         If STR2 is shorter than STR1, the translated string will be
+         truncated; if STR2 is longer than STR1, STR2 will be padded
+         with blanks beyond the translated string.
+      }
+   }
+}
+\sstroutine{
+   CHR\_MTOE
+}{
+   Translate a string from the machine{\tt '}s character set to EBCDIC
+}{
+   \sstdescription{
+      The string STR1, which is a Fortran 77 CHARACTER string, is
+      returned in STR2 translated into a form which can be written and
+      subsequently read correctly by a machine which uses the EBCDIC
+      character set.
+
+      Any characters which are not represented in the
+      EBCDIC character set are translated to EBCDIC SPACE. Non-printable
+      characters are translated where possible.
+   }
+   \sstinvocation{
+      CALL CHR\_MTOE( STR1, STR2 )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STR1 = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The Fortran 77 character string.
+      }
+      \sstsubsection{
+         STR2 = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         A character string which may be written and subsequently read
+         correctly by a machine which uses the EBCDIC character set
+         to represent characters in Fortran. If STR2 is shorter than
+         STR1, the translated string will be truncated; if STR2 is
+         longer than STR1, STR2 will be padded with blanks beyond the
+         translated string.
+      }
+   }
+   \sstdiytopic{
+      System-specific
+   }{
+      This subroutine has been implemented for machines which use
+      the ASCII character set.
+   }
+}
+\sstroutine{
+   CHR\_NTH
+}{
+   Return the two-character ordinal abbreviation for a specified integer
+}{
+   \sstdescription{
+      Return the two character ordinal abbreviation (i.e. st, nd, rd, th)
+      appropriate for the given integer value.
+   }
+   \sstinvocation{
+      RESULT = CHR\_NTH( IVALUE )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IVALUE = INTEGER (Given)
+      }{
+         The integer for which the abbreviation is required.
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         CHR\_NTH = CHARACTER $*$ 2
+      }{
+         The appropriate two character abbreviation for the given
+         integer value.
+      }
+   }
+}
+\sstroutine{
+   CHR\_OTOI
+}{
+   Read an INTEGER value from an octal string
+}{
+   \sstdescription{
+      The given octal string is decoded into an INTEGER value.
+   }
+   \sstinvocation{
+      CALL CHR\_OTOI( STRING, IVALUE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STRING = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         String to be decoded.
+      }
+      \sstsubsection{
+         IVALUE = INTEGER (Returned)
+      }{
+         Value decoded from the given string.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The status value. If this value is not SAI\_\_OK on input, the
+         routine returns without action. If the routine fails to
+         complete successfully, STATUS is returned set to SAI\_\_ERROR.
+      }
+   }
+   \sstdiytopic{
+      Note
+   }{
+      This subroutine assumes a 32-bit, twos-complement representation
+      of an INTEGER.
+   }
+}
+\sstroutine{
+   CHR\_PFORM
+}{
+   Reformat a paragraph to a new width
+}{
+   \sstdescription{
+      This subroutine is called repeatedly to reformat the given
+      paragraph to a new width (given by the declared length of the
+      returned character variable). The output may be optionally
+      justified to the right margin (i.e. the end of the returned
+      character variable). This routine should be called repeatedly
+      to generate successive returned lines from the given paragraph
+      array. Initially, the context argument IPOSN should be set to zero;
+      it will be updated after each call, ready to generate the next
+      output line. A value of zero is returned for IPOSN when there are
+      no more lines to return. Any unprintable characters (e.g. tabs)
+      are treated as if they were spaces for the purpose of generating
+      line-breaks.
+   }
+   \sstinvocation{
+      CALL CHR\_PFORM( MXPAR, PARRAY, JUSTFY, IPOSN, STRING )
+   }
+   \sstarguments{
+      \sstsubsection{
+         MXPAR = INTEGER (Given)
+      }{
+         The maximum length of the given paragraph array, PARRAY.
+      }
+      \sstsubsection{
+         PARRAY( MXPAR ) = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The character array which contains the paragraph text to be
+         reformatted, one line per array element. Leading blanks are
+         ignored. A line-break is interpreted as the start of a new
+         word.
+      }
+      \sstsubsection{
+         JUSTFY = LOGICAL (Given)
+      }{
+         The right justification flag: if this is given as .TRUE.,
+         the text is returned right justified; otherwise the text is
+         returned with a ragged right margin.
+      }
+      \sstsubsection{
+         IPOSN = INTEGER (Given and Returned)
+      }{
+         On entry, this argument specifies the character position in
+         PARRAY from which to start generating the next returned line.
+         It is given as the number of characters from the start of the
+         first character in the first element in PARRAY. If a value less
+         than 1 is used, then 1 will be used.
+
+         On exit, this argument is set to one more than the character
+         offset of the start of PARRAY of the last non-blank character
+         which appears in the returned line STRING (i.e. the position
+         at which the generation of the next output line should start).
+         If STRING is blank because there are no more characters to
+         process, then IPOSN is returned set to zero.
+      }
+      \sstsubsection{
+         STRING = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         The returned line of text in the paragraph, left justified. The
+         length of this argument defines the maximum length of the
+         returned paragraph line.
+      }
+   }
+}
+\sstroutine{
+   CHR\_PREFX
+}{
+   Prefix a string with a substring
+}{
+   \sstdescription{
+      The substring STR1 is prefixed to the string STR2, moving the
+      string STR2 along to make room. The given string in STR2 may be
+      truncated by adding the prefix. The final length of the string
+      STR2, ignoring trailing blanks, is returned in LEN2.
+   }
+   \sstinvocation{
+      CALL CHR\_PREFX( STR1, STR2, LEN2 )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STR1 = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The prefix string.
+      }
+      \sstsubsection{
+         STR2 = CHARACTER $*$ ( $*$ ) (Given and Returned)
+      }{
+         The string to be prefixed.
+      }
+      \sstsubsection{
+         LEN2 = INTEGER (Returned)
+      }{
+         The resultant length of the string STR2, ignoring trailing
+         blanks.
+      }
+   }
+}
+\sstroutine{
+   CHR\_PUTC
+}{
+   Put a CHARACTER string into another at a given position
+}{
+   \sstdescription{
+      The string STR1 (or as much of it as there is room for) is
+      copied into the part of STR2 beginning at position IPOSN$+$1.
+      IPOSN is updated to indicate the end position of the copy of
+      STR1 within STR2 after this operation. If no copying is
+      done, IPOSN is returned unchanged. The sizes of STR1 and
+      STR2 are based on the declared Fortran 77 size given by the
+      intrinsic function LEN.
+   }
+   \sstinvocation{
+      CALL CHR\_PUTC( STR1, STR2, IPOSN )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STR1 = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The string to be copied.
+      }
+      \sstsubsection{
+         STR2 = CHARACTER $*$ ( $*$ ) (Given and Returned)
+      }{
+         The string into which STR1 is to be copied.
+      }
+      \sstsubsection{
+         IPOSN = INTEGER (Given and Returned)
+      }{
+         The position pointer within STR2.
+      }
+   }
+}
+\sstroutine{
+   CHR\_PUTD
+}{
+   Put a DOUBLE PRECISION value into a string at a given position
+}{
+   \sstdescription{
+      The DOUBLE PRECISION value is encoded into a concise string
+      which is then copied into the given string beginning at
+      position IPOSN$+$1. IPOSN is returned updated to indicate the
+      end position of the encoded number within STRING. This is a
+      combination of CHR\_DTOC and CHR\_PUTC.
+   }
+   \sstinvocation{
+      CALL CHR\_PUTD( DVALUE, STRING, IPOSN )
+   }
+   \sstarguments{
+      \sstsubsection{
+         DVALUE = DOUBLE PRECISION (Given)
+      }{
+         The value to be encoded into the string.
+      }
+      \sstsubsection{
+         STRING = CHARACTER $*$ ( $*$ ) (Given and Returned)
+      }{
+         The string into which DVALUE is to be copied.
+      }
+      \sstsubsection{
+         IPOSN = INTEGER (Given and Returned)
+      }{
+         The position pointer within STRING.
+      }
+   }
+}
+\sstroutine{
+   CHR\_PUTI
+}{
+   Put an INTEGER value into a string at a given position
+}{
+   \sstdescription{
+      The INTEGER value is encoded into a concise string which is
+      then copied into the given string beginning at position IPOSN$+$1.
+      IPOSN is returned updated to indicate the end position of the
+      encoded number within STRING. This is a combination of CHR\_ITOC
+      and CHR\_PUTC.
+   }
+   \sstinvocation{
+      CALL CHR\_PUTI( IVALUE, STRING, IPOSN )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IVALUE = INTEGER (Given)
+      }{
+         The value to be encoded into the string.
+      }
+      \sstsubsection{
+         STRING = CHARACTER $*$ ( $*$ ) (Given and Returned)
+      }{
+         The string into which IVALUE is to be copied.
+      }
+      \sstsubsection{
+         IPOSN = INTEGER (Given and Returned)
+      }{
+         The position pointer within STRING.
+      }
+   }
+}
+\sstroutine{
+   CHR\_PUTL
+}{
+   Put a LOGICAL value into a string at a given position
+}{
+   \sstdescription{
+      The LOGICAL value is encoded into {\tt '}T{\tt '} or {\tt '}F{\tt '} which is then
+      copied into the given string beginning at position IPOSN$+$1.
+      IPOSN is is returned updated to indicate the end position
+      of the encoded logical value within STRING.
+   }
+   \sstinvocation{
+      CALL CHR\_PUTL( LVALUE, STRING, IPOSN )
+   }
+   \sstarguments{
+      \sstsubsection{
+         LVALUE = LOGICAL (Given)
+      }{
+         The LOGICAL value to be encoded into the string.
+      }
+      \sstsubsection{
+         STRING = CHARACTER $*$ ( $*$ ) (Given and Returned)
+      }{
+         The string into which LVALUE is to be copied.
+      }
+      \sstsubsection{
+         IPOSN = INTEGER (Given and Returned)
+      }{
+         The position pointer within STRING.
+      }
+   }
+}
+\sstroutine{
+   CHR\_PUTR
+}{
+   Put a REAL value into a string at a given position
+}{
+   \sstdescription{
+      The REAL value is encoded into a concise string which is then
+      copied into the given string beginning at position IPOSN$+$1.
+      IPOSN is returned updated to indicate the end position of the
+      encoded number within STRING. This is a combination of CHR\_RTOC
+      and CHR\_PUTC.
+   }
+   \sstinvocation{
+      CALL CHR\_PUTR( RVALUE, STRING, IPOSN )
+   }
+   \sstarguments{
+      \sstsubsection{
+         RVALUE = REAL (Given)
+      }{
+         The value to be encoded into the string.
+      }
+      \sstsubsection{
+         STRING = CHARACTER $*$ ( $*$ ) (Given and Returned)
+      }{
+         The string into which DVALUE is to be copied.
+      }
+      \sstsubsection{
+         IPOSN = INTEGER (Given and Returned)
+      }{
+         The position pointer within STRING.
+      }
+   }
+}
+\sstroutine{
+   CHR\_RJUST
+}{
+   Right-justify a string
+}{
+   \sstdescription{
+      The given string is right-justified by filling out the spaces
+      between words with additional blank space. The right margin is
+      taken as the declared length of the given string. Unprintable
+      characters are interpreted as blanks.
+   }
+   \sstinvocation{
+      CALL CHR\_RJUST( STRING )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STRING = CHARACTER $*$ ( $*$ ) (Given and Returned)
+      }{
+         The string to be right-justified and returned.
+      }
+   }
+}
+\sstroutine{
+   CHR\_RMBLK
+}{
+   Remove all blanks from a string
+}{
+   \sstdescription{
+      All leading and embedded blanks in the string are removed.
+      The remaining characters are moved to the left to eliminate the
+      resulting empty space, and the end of the string is filled with
+      blanks.
+   }
+   \sstinvocation{
+      CALL CHR\_RMBLK( STRING )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STRING = CHARACTER $*$ ( $*$ ) (Given and Returned)
+      }{
+         The string from which all leading and embedded blanks are
+         removed.
+      }
+   }
+}
+\sstroutine{
+   CHR\_RMCHR
+}{
+   Remove all specified characters from a string
+}{
+   \sstdescription{
+      Remove a specified set of characters from a string in situ.
+      The remaining characters are moved to the left to eliminate
+      the resulting empty space, and the end of the string is filled
+      with blanks.
+   }
+   \sstinvocation{
+      CALL CHR\_RMCHR( CHARS, STRING )
+   }
+   \sstarguments{
+      \sstsubsection{
+         CHARS = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         A string specifying all the characters which are to be removed.
+      }
+      \sstsubsection{
+         STRING = CHARACTER $*$ ( $*$ ) (Given and Returned)
+      }{
+         The string from which the characters are removed.
+      }
+   }
+}
+\sstroutine{
+   CHR\_RTOAN
+}{
+   Write a REAL value into a string as hr/deg:min:sec
+}{
+   \sstdescription{
+      Format a REAL value as hours/degrees:minutes:seconds and write
+      it into a character string. This routine is for writing
+      angular measures into a character string in a format suitable
+      for presentation to an astronomer.
+
+      If the absolute value of the number to be written exceeds
+      a predefined maximum a conversion is not attempted, but the
+      number is written as a real number in Fortran {\tt '}exponential{\tt '}
+      format and a couple of question marks are appended to its
+      end. This prevents silly results when very large numbers
+      are input. The variable UNITS controls the maximum permitted
+      value for the conversion to be carried out.
+
+      The value is written into the part of the string beginning
+      at position IPOSN$+$1 and IPOSN is returned updated to the
+      position of the end of the encoded angle in STRING.
+   }
+   \sstinvocation{
+      CALL CHR\_RTOAN( RVALUE, UNITS, STRING, IPOSN )
+   }
+   \sstarguments{
+      \sstsubsection{
+         RVALUE = REAL (Given)
+      }{
+         The value to be encoded into the string. This value should
+         represent an angular measure.
+      }
+      \sstsubsection{
+         UNITS = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         This string controls the maximum value which will be formatted
+         as hr/deg:min:sec: if UNITS = {\tt '}HOURS{\tt '}, the maximum permitted
+         value is 24.0; if UNITS = {\tt '}DEGREES{\tt '}, the  maximum permitted is
+         360.0. In all other cases the maximum is 1000.0.
+      }
+      \sstsubsection{
+         STRING = CHARACTER $*$ ( $*$ ) (Given and Returned)
+      }{
+         The string into which RVALUE is written.
+      }
+      \sstsubsection{
+         IPOSN = INTEGER (Given and Returned)
+      }{
+         Given as the last element in STRING before the beginning of the
+         encoded angle. Returned as the element in STRING corresponding
+         to the end of the encoded angle.
+      }
+   }
+}
+\sstroutine{
+   CHR\_RTOC
+}{
+   Encode a REAL value as a string
+}{
+   \sstdescription{
+      Encode a REAL value as a character string, using as concise a
+      format as possible, and return the number of characters used.
+      In the event of an error, {\tt '}$*${\tt '}s are written to the string.
+   }
+   \sstinvocation{
+      CALL CHR\_RTOC( RVALUE, STRING, NCHAR )
+   }
+   \sstarguments{
+      \sstsubsection{
+         RVALUE = REAL (Given)
+      }{
+         The value to be encoded.
+      }
+      \sstsubsection{
+         STRING = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         The string into which the value is to be encoded.
+      }
+      \sstsubsection{
+         NCHAR = INTEGER (Returned)
+      }{
+         The field width used in encoding the value.
+      }
+   }
+}
+\sstroutine{
+   CHR\_SCOMP
+}{
+   Compare two character strings using the ASCII character set
+}{
+   \sstdescription{
+      The first string is compared with the second using the ASCII
+      character set, giving precedence to the left hand side of the
+      string. If the first string is less than or equal to the second,
+      the value .TRUE. is returned; otherwise the value .FALSE. is
+      returned.
+   }
+   \sstinvocation{
+      RESULT = CHR\_SCOMP( STR1, STR2 )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STR1 = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The first character string.
+      }
+      \sstsubsection{
+         STR2 = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The second character string.
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         CHR\_SCOMP = LOGICAL
+      }{
+         Whether the first character string is less than or equal to
+         the second, using the ASCII character set.
+      }
+   }
+}
+\sstroutine{
+   CHR\_SIMLR
+}{
+   Return whether two strings are equal, apart from case
+}{
+   \sstdescription{
+      Determine whether two strings are the same, ignoring
+      distinctions between upper and lowercase letters.
+      Their lengths must be identical after removing trailing blanks.
+   }
+   \sstinvocation{
+      RESULT = CHR\_SIMLR( STR1, STR2 )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STR1 = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The first string.
+      }
+      \sstsubsection{
+         STR2 = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The second string.
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         CHR\_SIMLR = LOGICAL
+      }{
+         Returned as .TRUE. if the two strings are the same
+         ignoring case distinctions; otherwise .FALSE.
+      }
+   }
+}
+\sstroutine{
+   CHR\_SIZE
+}{
+   Return the declared size of a string
+}{
+   \sstdescription{
+      Give the declared size of a Fortran 77 character string variable,
+      including trailing blanks.
+   }
+   \sstinvocation{
+      RESULT = CHR\_SIZE( STRING )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STRING = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The character string of whose length is determined.
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         CHR\_SIZE = INTEGER
+      }{
+         Returns the declared size of the string.
+      }
+   }
+   \sstnotes{
+      This routine is OBSOLETE.  It exists for historical reasons.
+      Its function is identical to the Fortran 77 intrinsic function
+      LEN. It is recommended that the intrinsic function LEN be called
+      directly.
+   }
+}
+\sstroutine{
+   CHR\_SKCHR
+}{
+   Skip over all specified characters in a string
+}{
+   \sstdescription{
+      Increment a character pointer, IPOSN, either forward or
+      backward through a string, until the character pointed to
+      is not one of a specified set of characters. The direction of
+      the search is given by the argument FORWD. If no such
+      character position exists (i.e all remaining characters in the
+      string are members of the specified set), the pointer is returned
+      set to one more than the length of the string if the search is
+      in the forward direction, or zero if the search is in the reverse
+      direction. If the initial value of IPOSN does not point at one of
+      the characters in the string, then the routine will return without
+      action.
+   }
+   \sstinvocation{
+      CALL CHR\_SKCHR( CHARS, STRING, FORWD, IPOSN )
+   }
+   \sstarguments{
+      \sstsubsection{
+         CHARS = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         A string consisting of the set of characters to be skipped.
+      }
+      \sstsubsection{
+         STRING = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The string to be searched.
+      }
+      \sstsubsection{
+         FORWD = LOGICAL (Given)
+      }{
+         The search direction: if .TRUE. then proceed through the string
+         in a forward direction, otherwise work backwards through the
+         string.
+      }
+      \sstsubsection{
+         IPOSN = INTEGER (Given and Returned)
+      }{
+         The character pointer.
+      }
+   }
+}
+\sstroutine{
+   CHR\_SORT
+}{
+   Sort an array of character variables into alphabetical order
+}{
+   \sstdescription{
+      Sort an array of character variables into alphabetical order
+      using the collating sequence provided by the routine CHR\_SCOMP.
+      After the sort, a search is made to remove any values which
+      occur more than once. The total number of unique values is
+      returned.
+   }
+   \sstinvocation{
+      CALL CHR\_SORT( CHR\_SCOMP, MXARY, ARRAY, NSORT )
+   }
+   \sstarguments{
+      \sstsubsection{
+         CHR\_SCOMP = LOGICAL FUNCTION (Given)
+      }{
+         An external function which compares two character strings
+         and returns whether the first string is less than the second.
+      }
+      \sstsubsection{
+         MXARY = INTEGER (Given)
+      }{
+         The number of character values to sort.
+      }
+      \sstsubsection{
+         ARRAY( MXARY ) = CHARACTER $*$ ( $*$ ) (Given and Returned)
+      }{
+         The array of character values to be sorted.
+      }
+      \sstsubsection{
+         NSORT = INTEGER (Returned)
+      }{
+         The number of unique character values returned.
+      }
+   }
+   \sstnotes{
+      To use this subroutine it is necessary to declare the function
+      CHR\_SCOMP, or its equivalent, to be EXTERNAL in the calling
+      routine.
+   }
+}
+\sstroutine{
+   CHR\_SWAP
+}{
+   Swap two single-character variables
+}{
+   \sstdescription{
+      Exchange the values of two single-character variables.
+   }
+   \sstinvocation{
+      CALL CHR\_SWAP( CHAR1, CHAR2 )
+   }
+   \sstarguments{
+      \sstsubsection{
+         CHAR1 = CHARACTER $*$ 1 (Given and Returned)
+      }{
+         The first character.
+      }
+      \sstsubsection{
+         CHAR2 = CHARACTER $*$ 1 (Given and Returned)
+      }{
+         The second character.
+      }
+   }
+}
+\sstroutine{
+   CHR\_TERM
+}{
+   Terminate a string by padding out with blanks
+}{
+   \sstdescription{
+      The given string, STRING, is terminated to a length of LENGTH
+      characters by filling the remainder of its declared length
+      with blanks.
+   }
+   \sstinvocation{
+      CALL CHR\_TERM( LENGTH, STRING )
+   }
+   \sstarguments{
+      \sstsubsection{
+         LENGTH = INTEGER (Given)
+      }{
+         The required length for the string: it must be positive
+         and not greater than the declared length of the string.
+      }
+      \sstsubsection{
+         STRING = CHARACTER $*$ ( $*$ ) (Given and Returned)
+      }{
+         The string to be terminated.
+      }
+   }
+}
+\sstroutine{
+   CHR\_TOCHR
+}{
+   Skip to the next specified character in a string
+}{
+   \sstdescription{
+      Increment a character pointer, IPOSN, either forward or
+      backward through a string, until the character pointed to
+      is one of a specified set of characters. The direction of
+      the search is given by the argument FORWD. If no such
+      character position exists (i.e. none of the remaining
+      characters in the string are members of the specified set),
+      the pointer is returned set to one more than the length of
+      the string if the search is in the forward direction, or
+      zero if the search is in the reverse direction. If the initial
+      value of IPOSN does not point at one of the characters in the
+      string, then the routine will return without action.
+   }
+   \sstinvocation{
+      CALL CHR\_TOCHR( CHARS, STRING, FORWD, IPOSN )
+   }
+   \sstarguments{
+      \sstsubsection{
+         CHARS = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         A string consisting of the set of characters to be searched
+         for.
+      }
+      \sstsubsection{
+         STRING = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The string to be searched.
+      }
+      \sstsubsection{
+         FORWD = LOGICAL (Given)
+      }{
+         The search direction: if .TRUE. then proceed through the string
+         in a forward direction, otherwise work backwards through the
+         string.
+      }
+      \sstsubsection{
+         IPOSN = INTEGER (Given and Returned)
+      }{
+         The character pointer.
+      }
+   }
+}
+\sstroutine{
+   CHR\_TRCHR
+}{
+   Translate the specified characters in a string
+}{
+   \sstdescription{
+      Translate a specified set of characters within a string. The
+      character translation is controlled by the translation table
+      given by the character strings FROM and TO. Any characters
+      not appearing in the translation table are left unchanged.
+      If the status is set on entry, no action is taken. If the
+      strings FROM and TO are unequal in length, STATUS is returned
+      set to SAI\_\_ERROR.
+   }
+   \sstinvocation{
+      CALL CHR\_TRCHR( FROM, TO, STRING, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         FROM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         A string specifying the characters to be translated.
+      }
+      \sstsubsection{
+         TO = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         A string specifying the translation values for each of the
+         characters in the FROM argument. The lengths of the FROM and
+         TO arguments must be the same.
+      }
+      \sstsubsection{
+         STRING = CHARACTER $*$ ( $*$ ) (Given and Returned)
+      }{
+         The string to be translated. Any character matching one of the
+         characters specified in the FROM argument is converted to the
+         corresponding character specified in the TO argument. All
+         other characters are left unchanged.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status: returned set to SAI\_\_ERROR if FROM and TO
+         have unequal lengths.
+      }
+   }
+}
+\sstroutine{
+   CHR\_TRUNC
+}{
+   Truncate a string at a given delimiter
+}{
+   \sstdescription{
+      The given string is truncated at the first occurrence of the
+      given delimiter character. The delimiter character and all
+      subsequent characters are replaced by blanks. If no delimiter
+      character is found in the string, no truncation takes place.
+      This routine is effectively a combination of INDEX and CHR\_TERM.
+   }
+   \sstinvocation{
+      CALL CHR\_TRUNC( DELIM, STRING )
+   }
+   \sstarguments{
+      \sstsubsection{
+         DELIM = CHARACTER $*$ 1 (Given)
+      }{
+         The truncation delimiter character.
+      }
+      \sstsubsection{
+         STRING = CHARACTER $*$ ( $*$ ) (Given and Returned)
+      }{
+         The string to be truncated. All characters from, and
+         including, the first occurrence of DELIM will be
+         replaced with blanks.
+      }
+   }
+}
+\sstroutine{
+   CHR\_UCASE
+}{
+   Convert a string to uppercase
+}{
+   \sstdescription{
+      The characters in the string are all converted to uppercase
+      in situ.
+   }
+   \sstinvocation{
+      CALL CHR\_UCASE( STRING )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STRING = CHARACTER $*$ ( $*$ ) (Given and Returned)
+      }{
+         The string to be converted to uppercase.
+      }
+   }
+}
+\sstroutine{
+   CHR\_UPPER
+}{
+   Return uppercase equivalent of a character
+}{
+   \sstdescription{
+      If the given character is lowercase, the uppercase equivalent
+      is returned, otherwise the character will be returned unchanged.
+   }
+   \sstinvocation{
+      RESULT = CHR\_UPPER( CVALUE )
+   }
+   \sstarguments{
+      \sstsubsection{
+         CVALUE = CHARACTER $*$ 1 (Given)
+      }{
+         The character to be converted.
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         CHR\_UPPER = CHARACTER $*$ 1
+      }{
+         Uppercase equivalent of the given character, if the given
+         character is a lowercase letter; otherwise the character is
+         returned unchanged.
+      }
+   }
+}
+\sstroutine{
+   CHR\_WILD
+}{
+   Return whether a string matches a wild-card pattern
+}{
+   \sstdescription{
+      A candidate string is matched with a another character
+      string containing a pattern of characters and wild-card
+      characters.  The wild-cards used are:
+
+         \% a single character wild-card;
+         $*$ an arbitrary length string wild-card, including zero length.
+
+      There is also a literal escape character {\tt '}$\backslash${\tt '} for use when the
+      characters {\tt '}$*${\tt '} and {\tt '}\%{\tt '} are to be interpreted literally within
+      the wild-card pattern.
+   }
+   \sstinvocation{
+      RESULT = CHR\_WILD( STRING, WILDS, MATCH )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STRING = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The candidate string to be matched.
+      }
+      \sstsubsection{
+         WILDS = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The wild-card pattern to be used in the match.
+      }
+      \sstsubsection{
+         MATCH = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         The wild-card match: this string must be the same length as
+         STRING. All characters matched individually are returned as
+         blanks in MATCH, and all characters matched by wild-cards are
+         returned assigned to the particular wild-cards they matched.
+         If the length of MATCH is less than that of STRING, then
+         CHR\_WILD returns the value .FALSE.
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         CHR\_WILD = LOGICAL
+      }{
+         Whether the two strings match after expanding the wild-card
+         pattern.
+      }
+   }
+}
+
+\newpage
+\section {Changes and New Features in Version 2.0}
+
+\subsection {Obsolete routines}
+
+Several routines exist in CHR purely for historical reasons.
+These routines are obsolete and are only provided by the CHR library because
+existing Starlink code may depend upon them.
+They should not be used in any new software.
+
+\begin{description}
+\item [CHR\_EQUAL] -- Return whether two strings are equal.
+\item [CHR\_INDEX] -- Return the index of a substring within a string.
+\item [CHR\_MOVE] -- Move one string into another.
+\item [CHR\_SIZE] -- Return the declared length of a string.
+\end {description}
+
+
+\subsection {Changes in behaviour of existing routines}
+
+\begin{description}
+\item [CHR\_DTOC] -- The former algorithm has been replaced -- this may result
+in the returned string being different from that returned from the previous
+version.
+\item [CHR\_RTOC] -- The former algorithm has been replaced -- this may result
+in the returned string being different from that returned from the previous
+version.
+\end {description}
+
+
+\subsection {New routines}
+
+\begin{description}
+\item [CHR\_ABBRV] -- Return whether two strings are equal apart from case,
+permitting abbreviation.
+\item [CHR\_ACHR] -- Return the character for a given ASCII value.
+\item [CHR\_ATOK] -- Return the character for a given ASCII character token.
+\item [CHR\_ATOM] -- Translate a string from ASCII to machine's characters set.
+\item [CHR\_BTOI] -- Read an INTEGER value from a binary string.
+\item [CHR\_DTOAN] -- Write a DOUBLE PRECISION value into a string as
+hr/deg:min:sec.
+\item [CHR\_FIND] -- Find the next occurrence of a given substring within a
+string.
+\item [CHR\_IACHR] -- Return the ASCII value for a given character.
+\item [CHR\_ITOB] -- Encode an INTEGER value as a binary string.
+\item [CHR\_ITOH] -- Encode an INTEGER value as a hexadecimal string.
+\item [CHR\_ITOO] -- Encode an INTEGER value as an octal string.
+\item [CHR\_LINBR] -- Break a line of text into a sequence of shorter lines.
+\item [CHR\_MTOA] -- Translate a string from machine's characters set to ASCII.
+\item [CHR\_NTH] -- Return the two-character abbreviation for a specified
+integer.
+\item [CHR\_PFORM] -- Reformat a paragraph to a new width.
+\item [CHR\_PREFX] -- Prefix a string with a substring.
+\item [CHR\_RJUST] -- Right-justify a string.
+\item [CHR\_RMCHR] -- Remove all specified characters from a string.
+\item [CHR\_SCOMP] -- Compare two character strings using the ASCII character
+set.
+\item [CHR\_SKCHR] -- Skip over all specified characters in a string.
+\item [CHR\_SORT] -- Sort an array of character strings into alphabetical order.
+\item [CHR\_TOCHR] -- Skip to the next specified character in a string.
+\item [CHR\_TRCHR] -- Translate the specified characters in a string.
+\item [CHR\_WILD] -- Return whether a string matches a wild-card pattern.
+\end {description}
+
+
+\subsection {Other changes}
+
+\begin{description}
+\item [CHR\_DIR:LOGICAL.COM] This file has been renamed CHR\_DIR:CHR\_DEV.COM.
+\item [CHR\_DIR:CHRLINK.OPT] This file has been renamed CHR\_DIR:CHR\_LINK.OPT.
+\end {description}
+
+\section {Portability}
+
+\subsection {Overview}
+
+This section discusses the portability of CHR, including the coding 
+standard adopted for CHR and a list of those routines which 
+may need to be modified when porting CHR to a new target machine.
+
+
+\subsection {Coding and porting prerequisites}
+
+The standard of Fortran used for the coding of CHR is fundamentally
+Fortran 77, using the Starlink Fortran coding conventions described in SGP/16.
+Several common extensions to the Fortran 77 standard are used in source 
+code for CHR, they are as follows:
+
+\begin {itemize}
+\item End-of-line comments using the ``!'' symbol;
+\item Symbolic subprogram names may be longer than six characters (but are 
+always shorter than ten characters);
+\item Symbolic subprogram names include the ``\_'' symbol;
+\item Symbolic constant names may be longer than six characters (but are always
+shorter than eleven characters);
+\item Symbolic constant names may include the ``\_'' symbol;
+\item The full ASCII character set is assumed in character constants.
+\end {itemize}
+
+The CHR library currently has no dependence upon any other package.
+To use CHR on any computer system porting effort is required only for those 
+CHR routines which have operating system dependencies: these routines are
+listed in the following section.
+
+
+\subsection {Operating system specific routines}
+
+Several CHR routines make use of features specific to the operating system or 
+language implementation.
+The names of these routines and their purpose are as follows:
+
+\begin {quote}
+\begin{description}
+\item [CHR\_ACHR] -- Return the character for a given ASCII value.
+\item [CHR\_ATOK] -- Return the character for a given ASCII character token.
+\item [CHR\_ATOM] -- Translate a string from ASCII to machine's character set.
+\item [CHR\_BTOI] -- Read an INTEGER value from a binary string.
+\item [CHR\_HTOI] -- Read an INTEGER value from a hexadecimal string.
+\item [CHR\_IACHR] -- Return the ASCII value for a given character.
+\item [CHR\_ITOB] -- Encode an INTEGER value as a binary string.
+\item [CHR\_ITOH] -- Encode an INTEGER value as a hexadecimal string.
+\item [CHR\_ITOO] -- Encode an INTEGER value as an octal string.
+\item [CHR\_LOWER] -- Return the lower case equivalent of a character.
+\item [CHR\_MTOA] -- Translate a string from machine's character set to ASCII.
+\item [CHR\_OTOI] -- Read an integer from an octal string.
+\item [CHR\_UPPER] -- Return the upper-case equivalent of a character.
+\end {description}
+\end {quote}
+
+These routines may have to be rewritten specifically for each new 
+operating system and Fortran implementation.
+
+
+\end{document}

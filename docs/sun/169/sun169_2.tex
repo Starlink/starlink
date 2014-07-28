@@ -1,0 +1,157 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {169.2}
+\newcommand{\stardocauthors}   {Martin Bly}
+\newcommand{\stardocdate}      {15 October 1993}
+\newcommand{\stardoctitle}     {PINE --- Electronic mail interface}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+%  \setlength{\parskip}{0mm}
+%  \tableofcontents
+%  \setlength{\parskip}{\medskipamount}
+%  \markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\section{Introduction}
+
+The PINE mailer is an easy-to-use electronic mail interface for Unix
+platforms. It originates from the University of Washington Office of
+Computing and Communications, and was written by Mike Siebel, Mark
+Crispin and Laurence Lundblade.
+
+Starlink has provided PINE `as-is' to be used as part of the 
+Base Set of applications for new users, and for users moving between
+sites. It should be installed at all Starlink sites.
+
+\section{Features of PINE}
+
+PINE has many features, including:
+
+\begin{itemize}
+
+\item A mail index with message summary including the message status,
+sender, size, date and subject.
+
+\item Processing and viewing of mail using {\tt forward}, {\tt reply},
+{\tt save}, {\tt print}, {\tt export}, {\tt delete}, address capture,
+and search.
+
+\item Address book for storing complex addresses, personal nicknames
+and distribution lists.
+
+\item Multiple folders and folder management for filing messages.
+
+\item Message composer with editor (PICO) and spelling checker.
+
+\item Comprehensive online screen and context sensitive help.
+
+\end{itemize}
+
+PINE is available for a large range of machines. The version provided by
+Starlink has been built on Sun/SunOS 4.1.2, Sun/Solaris 2.2, Dec Alpha OSF/1
+1.2 and DEC/Ultrix v4.2. The current Pine version is Pine 3.87.
+
+\section{Using PINE}
+
+PINE is started by typing:
+
+\begin{verbatim}
+      % pine
+\end{verbatim}
+
+to your login shell. If you are invoking PINE for the first time you
+will see some administrative messages, and then the main PINE menu. The
+main menu looks like the display shown below.
+
+You may find PINE objects to the type of terminal it thinks you are
+using. If your terminal type is `unknown' or `network', reset it to 
+{\tt vt100} or something else in the {\tt /etc/termcap} list. This is
+achieved in the C--Shell thus: {\tt \% setenv TERM vt100}.
+
+\begin{small}
+\begin{center}
+\begin{verbatim}
+  PINE 3.87   MAIN MENU                             Folder: INBOX  0 Messages
+
+
+       ?     HELP               -  Get help using Pine
+
+       C     COMPOSE MESSAGE    -  Compose and send a message
+
+       I     FOLDER INDEX       -  View messages in current folder
+
+       L     FOLDER LIST        -  Select a folder to view
+
+       A     ADDRESS BOOK       -  Update address book
+
+       S     SETUP              -  Configure or update Pine
+
+       Q     QUIT               -  Exit the Pine program
+
+
+
+
+   Copyright 1989-1993.  PINE is a trademark of the University of Washington.
+                    [Folder "INBOX" opened with 0 messages]
+? Help                     P PrevCmd                  R RelNotes
+O OTHER CMDS L [ListFldrs] N NextCmd                  K KBLock
+\end{verbatim}
+
+Figure 1. The PINE 3.87 main menu.
+
+\end{center}
+\end{small}
+
+This is a quote direct from the PINE brochure: {\em ``It is intended that
+PINE can be learned by exploration rather than reading manuals.''}
+
+PINE {\em is} a very user-friendly application, and I was able to start
+emailing colleagues after a very short time. I encourage you to do just
+that and explore the world of Unix email. Happy emailing!
+
+More detailed information about how PINE works can be found in the
+document: ``{\em PINE Technical Notes version 3.85, September 1993}\/''. This
+has been distributed as MUD/141 in the Starlink Miscellaneous User
+Documents series.
+
+\end{document}

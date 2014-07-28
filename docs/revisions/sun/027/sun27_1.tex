@@ -1,0 +1,4009 @@
+\documentstyle[11pt]{article}
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {27.1}
+\newcommand{\stardocauthor}    {P N Daly}
+\newcommand{\stardoccoauthor}  {S M Beard}
+\newcommand{\stardocdate}      {27 October, 1992}
+\newcommand{\stardoctitle}     {CGS4DR --- v1.6--0 User's Guide}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+\newcommand{\tick}{$\surd$}
+\newcommand{\cross}{$\times$}
+\newcommand{\opt}{{\sf option}}
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthor\footnote{{\em Present Address:} 
+ {\sf Joint Astronomy Centre, 660 N A`oh\={o}k\={u} Place, University Park,
+  Hilo HI 96720, USA.}}, \stardoccoauthor\footnote{{\em Present Address:} 
+ {\sf Royal Observatory Edinburgh, Blackford Hill, Edinburgh EH9 3HJ, 
+  Scotland, UK.}} \\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+  \setlength{\parskip}{0mm}
+  \tableofcontents
+  \setlength{\parskip}{\medskipamount}
+%------------------------------------------------------------------------------
+
+\newpage
+\section{Introduction}
+\label{introduction}
+
+The fourth generation {\sl Cooled Grating Spectrometer}, CGS4, is designed to 
+operate on UKIRT in the 1--5 $\mu$m region of the electromagnetic spectrum at 
+resolutions in the range $\lambda$/$\Delta\lambda$ $\sim$ 300--40000
+(see ref. [\ref{Mountain}]). To reduce background noise, it is maintained on 
+the telescope in vacuum and at cryogenic temperatures. It achieved first light 
+on UKIRT at 19:50 HST on 4 February 1991 and the instrument, having a dark 
+current of $\sim$ 2--3 $e^{-}$ $s^{-1}$ and a read noise of $\sim$ 54 $e^{-}$ 
+per integration, is around 16000 times more sensitive than previous detectors. 
+On any given photometric night, an observer can expect to acquire and reduce 
+$\sim$ 100 Mb of high quality data with CGS4.
+
+A schematic overview of the interaction between the CGS4 system and all external
+entities is shown in Figure 1\footnote{See Appendix A on 
+page~\pageref{figures} for details on how to obtain the figures to accompany 
+this document.}. To an observer, the instrument appears as two black boxes; the
+{\em data acquisition} system and the {\em data reduction} system. Both are 
+under the direct control of the observer and can be manipulated to deal with 
+a wide variety of astronomical configurations. The data is, therefore, both 
+acquired {\em and reduced in real-time} at the telescope. Figure 2 
+shows the interaction between the acquisition and 
+reduction systems.
+
+This document describes the CGS4 data reduction system commonly called CGS4DR
+(see ref. [\ref{Puxley_1}]).
+The system has two modes; online and offline. The online system runs at the 
+telescope whereas the offline system typically runs at an observer's home 
+institution ({\em e.g.} a {\sl Starlink} node). In practice, there is very
+little difference between the two that the end user needs to know about
+but, {\em caveat emptor}, if your nodename begins with the 
+letters IRT and is {\em not} part of the UKIRT cluster, the system may 
+behave rather oddly. To install CGS4DR, system managers should refer to 
+SSN/14.
+
+The software has been carefully designed and tested under the Figaro (see ref.
+[\ref{Shortridge}]) and ADAM ({see ref. [\ref{Hartley}]) environments and the
+tasks and their interactions are shown in Figure 3. 
+The data files produced by CGS4DR are readable by standard 
+Figaro applications (although not all may handle the quality and error arrays 
+correctly). CGS4DR is one of only two items in the {\sl Starlink} software 
+collection that use the screen management system, SMS, by default\footnote{The 
+other is IRCAM\_RED but users prefer
+the command line system, IRCAM\_CLRED. CGS4DR has {\em no} command line
+equivalent apart from a facility for graphics (see  \S
+\ref{display_modes_and_the_p4_plotting_task} and
+\S \ref{hardcopy_printing_made_simple}).}. 
+It also utilises three types of ADAM task\footnote{A, D and I (formerly CD)
+tasks although the distinction is being phased out.} running in four (or more)
+subprocesses and will severely test any version of ADAM that purports to be 
+fully implemented under the Unix environment. For these reason, it will not 
+(at the time of writing) run on any Unix box but it will run on a SUN
+when the SUN {\em acts purely as an X-terminal}. SSN/14 gives details of 
+how to set up a SUN workstation to run CGS4DR.
+
+For best results, CGS4DR should be run on a single user VAXstation having
+at least 24 Mb of main memory and a colour monitor running {\em Motif}. It
+can, of course, run on a simple VT-compatible terminal and display to any 
+{\sl Starlink} supported graphics device if a VAXstation is not available. 
+As yet, it does not run in batch mode and cannot reduce {\sl Starlink} NDF 
+files so do not set the logical name FIGARO\_FORMATS.
+
+There is a current software worklist containing known bugs (or features!) that 
+are to be eliminated. The status of such bugs can be reviewed by
+examining the UKIRT VAXnotes conference hosted at ROE:
+
+\begin{verbatim}
+  $ NOTES
+  Notes>  ADD   ENTRY  RESTAR::UKIRT
+  Notes>  OPEN  UKIRT
+  Notes>  SEARCH  *.*  "CGS4 Data Reduction"
+  .
+  .
+  .
+  Notes>  EXIT
+\end{verbatim}
+
+If you think you have discovered a bug, please refer to this conference
+(and \S \ref{common_problems_and_mistakes}) as we may already know about it
+and have fixed it. If it is a genuine new bug, it should be reported via the
+usual channels ({\em i.e.} by e-mail to {\sf RLVAD::STAR} and see \S 
+\ref{is_further_help_available}).
+
+Finally, a cautionary note to previous users of the system either at UKIRT or
+those who had a {\em pirate} (sic) copy of the software. The menus described 
+herein may differ significantly from those you are used to. 
+In earlier releases of the system, the menus remained virtually the same as 
+when they were delivered {\em i.e.} they were `algorithm-driven'. Experience 
+with CGS4DR has led to a re-design of the menus to be more observer or 
+`data-driven' in their layout. This might cause some confusion when the 
+new system is first initialised but users should quickly become familiar with 
+the better arrangement of menu items.
+
+\subsection{What Can It Do?}
+\label{what_can_it_do}
+
+First, it can reduce spectrographic data in an automatic way.
+That's what it is designed to do. No system, however, at its first release 
+will do everything every user will ever want so some post processing may be 
+required in certain circumstances. The aim is to produce publishable quality 
+spectra {\em at the telescope} via an automated reduction paradigm. 
+
+Briefly, CGS4DR can do the following:
+
+\begin{itemize}
+\item Allows a wide variety of data reduction configurations.
+\item Interlaces oversampled data frames.
+\item Reduce known {\sf BIAS}, {\sf DARK}, {\sf FLAT}, {\sf ARC}, {\sf OBJECT} and {\sf SKY} frames.
+\item Wavelength calibrate via suitable {\sf ARC} lines.
+\item Flux calibrate via a suitable {\sf STANDARD}.
+\item Remove the {\sf SKY}, residual sky OH-lines ($\lambda <$ 2.3 $\mu$m) 
+  and thermal emission ($\lambda \geq$ 2.3 $\mu$m) from data. 
+\item Add data into groups for improved signal-to-noise.
+\item Extract and de-ripple a spectrum.
+\item Maintains an index of reduced observations.
+\item Maintains, if required, an archive of observations.
+\item Plot data in a variety of ways.
+\end{itemize}
+
+The basic concept of the system is based upon {\em re-scheduling} to read a 
+{\em data reduction queue}. In online mode, the {\em data acquisition} 
+system returns data to the VAX and writes commands into the data reduction 
+queue whereas in offline mode the user enters commands, manually as 
+appropriate, for the system to pick up. 
+
+\subsection{What It Cannot Do}
+\label{what_it_cannot_do}
+
+Optimal extraction has not yet been fully implemented and neither has automated 
+derippling (see \S \ref{deripple_spectrum}). CGS4DR does not do {\em automated}
+line fitting, wavelength calibration, spectropolarimetry or flux calibration 
+and it cannot handle data cubes although there are manual options in some 
+cases. The impossible we do today but miracles take a little longer or so the 
+saying goes.  
+
+\subsection{Some Basic Definitions}
+\label{some_basic_definitions}
+
+Preliminary reduction of array data is common to both spectroscopy and 
+photometry and techniques describing the removal of instrumental effects 
+are noted elsewhere (see ref. [\ref{Daly}]). Before starting to use CGS4DR, 
+however, you should be familiar with the reduction of spectrographic data 
+(see refs. [\ref{Puxley_1}], [\ref{Puxley_2}] and \S 
+\ref{the_reduction_of_astronomical_spectra}). 
+It would also be advantageous to be familiar with Figaro (see refs. 
+[\ref{Shortridge}], [\ref{Bailey_1}], [\ref{Bailey_2}]). The CGS4DR software 
+knows about the following observation types:
+
+\begin{itemize}
+\item {\sf BIAS} --- A short blank observation.
+\item {\sf DARK} --- Blank observation with the same on-chip exposure time as 
+ an observation.
+\item {\sf FLAT} --- Observation of black-body source in calibration unit, 
+ the sky or the illuminated dome.
+\item {\sf OBJECT} --- Observation of an astronomical object.
+\item {\sf SKY} --- Observation to subtract from an {\sf OBJECT} frame to 
+ perform first order sky subtraction. 
+\item {\sf ARC} --- Uncalibrated observation of the arc lamp or sky for 
+ OH-lines.
+\item {\sf CALIBR} --- An {\sf ARC} observation converted into a wavelength 
+ calibrated frame.
+\item {\sf STANDARD} --- A standard star observation divided by a model 
+ black-body.
+\end{itemize}
+
+In a common data reduction sequence the following operations would be carried
+out (the more familiar items of which are shown in Figure 4):
+
+\begin{enumerate}
+\item Apply a bad pixel mask.
+\item Subtract a {\sf BIAS} frame.
+\item Linearise the signal.
+\item Subtract a {\sf DARK} frame.
+\item Divide by a {\sf FLAT} field.
+\item Interlace integrations taken at different detector positions.
+\item Calibrate X axis into wavelength.
+\item Co-add observations and subtract {\sf SKY} frames.
+\item Divide by a {\sf STANDARD} source.
+\end{enumerate}
+
+These steps are configurable under SMS control to allow for a wide variety
+of astronomical configurations. When observations are reduced they are 
+recorded in an index file of the form {\sf CGS4\_yymmdd.INDEX}, where 
+{\sf yyddmm} is the UT date on which the observations were made, in the 
+directory {\sf CGS4\_INDEX}. The system will try to replace the string 
+{\sf yymmdd} with an appropriate date whenever possible based upon universal 
+time. The contents of the index file may also be manipulated.
+
+\subsection{Files Used by the System}
+\label{files_used_by_the_system}
+
+When the data acquisition system obtains a raw data frame from the
+control system, it writes it to an {\em integration} file whose name is of the 
+form {\sf Iyymmdd\_oooo\_iiii} where {\sf yymmdd} is the UT date (as above),
+{\sf oooo} the observation number and {\sf iiii} the integration 
+number. Integration files are, therefore, frames taken at a single 
+detector position of current size 58 $\times$ 62 elements and are written to 
+the directory {\sf IDIR}. If a single integration is reduced, 
+the result is written to a {\em reduced integration} file whose name is of the 
+form {\sf RIyymmdd\_oooo\_iiii}, written to the directory {\sf RIDIR}.
+
+In CGS4, however, the spectrum may be oversampled by combining several 
+integrations at different detector positions. A description of the instrument 
+configuration during an observation is held in an observation file whose 
+name is of the form {\sf Oyymmdd\_oooo}, held in the directory {\sf ODIR}. 
+This information is combined with the data held in the integration files to 
+produce a {\em reduced observation} of size 58*{\em n} $\times$ 62 elements 
+where {\em n} is the oversampling factor. This reduced observation, whose 
+name is of the form {\sf ROyymmdd\_oooo}, is held in the directory {\sf RODIR}. 
+The reduced observation file contains the reduced data for a single observation.
+
+When observing astronomical objects, individual observations may be of 
+{\sf OBJECT} or {\sf SKY}. Any number of {\sf OBJECT} and {\sf SKY} 
+observations relating to one particular astronomical object may be 
+combined together into a {\em reduced group} whose name is of the 
+form {\sf RGyymmdd\_gggg}, where {\sf gggg} is a unique group number
+(which is the first observation in the group as defined by the data 
+acquisition system), held in the directory {\sf RGDIR}. These reduced group 
+files contain sky-subtracted data. These files may be further manipulated by
+the automatic data reduction sequence to provide enhanced sky-subtraction
+for point sources (see \S \ref{further_sky_subtraction_options}) and to
+ratio by a standard star (see \S \ref{ratioing_by_a_standard_source}). 
+Depending upon the options selected the prefixes {\sf \_TEMP}, {\sf \_PFTEMP}
+and {\sf \_DBS} may be appended to the reduced group filenames\footnote{{\em 
+E.g.,} A group called {\sf RG920530\_17} which is divided by
+a standard will produce a group called {\sf RG920530\_17\_DBS} and so on.}. 
+The system will clear up any temporary files when the reduction is complete.
+
+The data reduction system uses two other types of file.
+Wavelength calibrated arcs are held in files 
+of type {\sf CAyymmdd\_oooo} in the {\sf RODIR} directory.
+Standard star observations are held in {\em standard} files whose names
+are of the form {\sf STyymmdd\_gggg}, held in the {\sf RGDIR} directory.
+
+Note that the files contained in IDIR and ODIR {\em are never over-written}
+whereas the files in RIDIR, RODIR and RGDIR may be over-written by re-reducing
+the data. 
+
+As a general rule, files specified as input or output parameters of SMS actions
+do not have to be specified in full, just the filename will do, unless
+the SMS parameter field contains the string 
+{\sf directory:filename\_\_\_\_}.
+
+\newpage
+\markright{\stardocname}
+\section{The Reduction of Astronomical Spectra}
+\label{the_reduction_of_astronomical_spectra}
+
+This section is intended as a general introduction for reducing astronomical
+spectra with particular emphasis on array collected data. The reduction
+of non-astronomical images ({\sf BIAS}, {\sf DARK} and {\sf FLAT}) are dealt 
+with separately from spectrographic information.
+
+\subsection{General Techniques for Array Instruments}
+\label{general_techniques_for_array_instruments}
+
+\subsubsection{Eliminating Data with Bad Pixel Masks}
+\label{eliminating_data_with_bad_pixel_masks}
+
+A bad pixel mask is a data frame that indicates which pixels on the 
+detector array are {\sf good} and which {\sf bad}.
+It may be used to mask off faulty detectors.
+Normally the mask contains {\sf 0} to indicate {\sf good}, and {\sf 1} to 
+indicate {\sf bad}. It should be the same size as the area of the data 
+array read by the data acquisition system {\em i.e.}
+58 $\times$ 62 pixels if the full detector array area is read as at the present
+time. Bad pixel masks are held in the {\sf CGS4\_MASKS} directory.
+
+Besides flagging faulty detectors, a bad pixel mask can also be used
+for masking off un-illuminated areas at the edge of the detector array.
+
+A bad pixel mask can be created by the software using one of three methods:
+
+\begin{enumerate}
+ \item By setting all the data values lying outside a given range to {\sf bad}.
+ Some sample data are plotted as a histogram, and the required range is 
+ selected using a cursor. This is called `thresholding'.
+ \item By setting all the pixels outside a given window on the detector 
+ array to bad.
+ \item By thresholding an error array.
+\end{enumerate}
+
+For the first and second method, two masks are created and may be combined
+together\footnote{In fact, masks generated by any method may be combined 
+together.}. The third method assumes a suitable window mask has already been
+created. The data reduction system can change masks by responding to a 
+{\sf DRMASK $<${\em maskname}$>$ } command entered into the data reduction
+queue or using the SMS menus. There is also an option to specify no mask at all.
+
+Bad pixel masks can be any size or shape. When a mask is created, it
+assumes the same size and shape as the data from which it was created.
+The size and shape of the mask created by windowing can also be
+specified. Of course, allowing masks to be any size means there is a
+chance that the wrong type of mask may be specified when reducing some
+data. The data reduction system will check the bad pixel mask against
+each integration being reduced to ensure it is the right size (and will
+report if it is not).
+
+CGS4DR is shipped with several bad pixel masks specific to the current CGS4
+array:
+
+\begin{description}
+\item[{\sf FPA61}] --- Masks the known dead, hot and variable pixels.
+\item[{\sf FPA61\_LC}] --- To be used with long focal length camera observations
+ when the whole array is illuminated.
+\item[{\sf FPA61\_75}] --- To be used with short focal length camera
+ observations and the 75 or 150 lines per millimetre gratings.
+\end{description}
+
+For the echelle, it is better to make your own windows as the illuminated area
+is a strong function of the grating angle.
+
+\subsubsection{Reducing a BIAS}
+\label{reducing_a_bias}
+
+To reduce a {\sf BIAS}, CGS4DR reads the raw data from store in IDIR and 
+FITS header information from store in ODIR, applies a bad pixel mask, writes 
+the reduced data parameters into the INDEX file and stores the reduced 
+{\sf BIAS} in RODIR. This is shown schematically in Figure 5.
+
+Note that {\sf BIAS} frames are {\em not} subtracted when data is taken in
+NDR (non-destructive read) mode (even if {\sf subtract\_bias\_frame} in the
+{\sf set\_reduction\_sequence} menu is set to {\sf YES}).
+
+\subsubsection{Linearising the Data}
+\label{linearising_the_data}
+
+After {\sf BIAS} subtraction, the signal from the detector array may be 
+corrected for non-linearity by modifying it with a suitable polynomial of the
+form:
+
+\begin{equation}
+  S({\em x}) = A{\em x} + B{\em x}^{2} + C{\em x}^{3} + D{\em x}^{4} + E{\em x}^{5}
+\label{equation_1}
+\end{equation}
+
+where {\em x} is the measured signal and S({\em x}) is proportional to the
+light intensity falling on the detector. These coefficients may determined 
+manually by examining {\sf FLAT} fields taken at different exposure times as
+the software does not contain any automated way of doing this. Such 
+coefficients are specified in ASCII text in a linearization file:
+
+\begin{verbatim}
+! +
+! CGS4_MASKS:FPA61_LINEAR.DAT
+! Linearization coefficients determined on 23-Jan-1991 by A CGS4 User
+! Order given is A, B, C, D, E vertically.
+! -
+0.9980
+0.0176
+-0.0037
+6.46E-5
+0.0000
+\end{verbatim}
+
+Note that this means that {\em all} pixels are calibrated with the {\em same}
+polynomial. The file type must be {\sf .DAT} and it is stored in the
+directory {\sf CGS4\_MASKS} {\em i.e.} the above file would be 
+{\sf CGS4\_MASKS:FPA61\_LINEAR.DAT}. Note that, although every effort has been 
+made to avoid arithmetic errors during linearization, floating point overflows 
+can occur if the coefficients are set to ridiculous values. The higher order 
+terms, in particular, should be $<<$ 1.00 to avoid such problems.
+
+For the FPA61 array used in CGS4, no measurable non-linearity has been
+found to within 98\% of full well ($\sim$ 63,000 DN) and so this facility
+is normally turned off by setting the value to {\sf \#}.
+
+\subsubsection{Reducing a DARK}
+\label{reducing_a_dark}
+
+To reduce a {\sf DARK}, CGS4DR reads the raw data from store in IDIR and FITS 
+header information from store in ODIR, applies a bad pixel mask, optionally 
+subtracts a reduced {\sf BIAS} frame if in stare mode, linearises the data 
+(if required) and writes the reduced data parameters into the INDEX file and 
+stores the reduced {\sf DARK} in RODIR.  This is shown schematically in 
+Figure 6.
+
+Note that {\sf DARK} frames are {\em not} normally subtracted when the data
+is reduced as {\sf OBJECT --- SKY} pairs.
+
+\subsubsection{Reducing a FLAT}
+\label{reducing_a_flat}
+
+To reduce a {\sf FLAT}, CGS4DR reads the raw data from store in IDIR and 
+FITS header information from store in ODIR, applies a bad pixel mask, 
+optionally subtracts a reduced {\sf BIAS} frame, linearises the data (if 
+required), optionally subtracts a reduced {\sf DARK} (with the  same on-chip 
+exposure time), normalises the data (if required) and writes the reduced 
+data parameters into the INDEX file and stores the reduced {\sf FLAT} in RODIR. 
+This is shown schematically in Figure 7.
+
+For normalisation a 1-D spectrum is extracted from within the window defined
+by the bad pixel mask and a polynomial is fitted to that spectrum. The order
+of the polynomial is defined by the user and the polynomial is grown along the
+slit to fill the array. Finally, the original flat field is divided by the
+polynomial frame to produce a normalised flat field. Normalisation also 
+removes the spectrum of the black body calibration source used to generate
+the flat field.
+
+An alternative method of normalising the data using a smoothing box is also
+available.
+
+For spectral configurations, the flat field algorithm pre-supposes that the
+illumination from the black body source is uniform along the slit. 
+This does mean that if a very accurate photometric comparison of spectra 
+at different points along the slit is required, the flat field will need to be 
+checked for variations in illumination and refined to remove this variability
+(see ref. [\ref{Ramsay}]).
+
+It has also been discovered that at some wavelengths, the CVF acts
+like a Fabry-Perot and produces diagonal stripes in observations which the
+present flat fielding algorithm cannot remove (because flat fields are 
+not currently oversampled). To remove these stripes one needs to take an
+{\sf OBJECT} observation of the black body source at the same oversampling 
+factor and normalise this particular observation (to create a pseudo- flat 
+field). Then divide your real observation by this pseudo- flat field using 
+Figaro. There is some discussion of techniques for removing CVF ripple in the 
+VAXnotes conference.
+
+Finally, if the black body has not been allowed to warm up sufficiently,
+or the detector array temperature varies, or the detector is allowed to
+saturate (resulting in ghost images etc), the spectrum generated may be
+too noisy. Observers should pay due care and attention to acquiring the
+data.
+
+\subsubsection{How Does CGS4DR Search for a Calibration Frame?}
+\label{how_does_cgs4dr_search_for_a_calibration_frame}
+
+The files of type {\sf BIAS}, {\sf DARK}, {\sf FLAT}, {\sf CALIBR} and 
+{\sf STANDARD} are generically termed {\em calibration} frames\footnote{In 
+this document, I have tried to use the lowercase {\em calibrate} or {\em
+calibration} to refer to the technique or a generic frame and the uppercase
+{\sf CALIBR} to refer to a specific wavelength calibration observation.}.
+When such frames are required by the software to reduce another observation,
+a search is made on the index file of already reduced observations according
+to the settings within the {\sf file\_selection} menu (see \S 
+\ref{file_selection}). 
+
+Normally, the user lets the software decide which calibration frames to use.
+In general, it is true to say that the nearest observation in time 
+that matches the instrument configuration of the observed object is selected 
+and such frames are memory mapped to prevent unnecessary processing thus 
+speeding up the reduction considerably. 
+
+If a specific observation is chosen, the software will use that observation
+{\em irrespective} of any criteria mis-match. In {\sf verbose} mode the
+software will report any mis-matched criteria to the user but otherwise
+the user may be unaware that the frame is unsuitable. Indeed, if a user wants
+to know why certain calibration frames are being rejected, setting 
+{\sf verbose} output to {\sf on} (from {\sf control\_flags} in the 
+{\sf setup} menu) is the only way of obtaining such information.
+
+\begin{table}
+\begin{center}
+\caption{\bf Calibration Frame Matching Criteria}
+\vglue 0.6cm
+\begin{tabular}{|l|c|c|c|c|c|}
+\hline
+\ \ & \ \ & \ \ & \ \ & \ \ & \ \ \\
+{\em Criteria} & {\bf BIAS} & {\bf DARK} & {\bf FLAT} & {\bf CALIBR} & {\bf STANDARD} \\
+\ \ & \ \ & \ \ & \ \ & \ \ & \ \ \\
+\hline
+\ \ & \ \ & \ \ & \ \ & \ \ & \ \ \\
+Detector size               & \tick   & \tick   & \tick   & \cross  & \tick  \\
+Detector columns            & \cross  & \cross  & \cross  & \tick   & \cross \\
+On-chip Exposure Time       & \cross  & \tick   & \cross  & \cross  & \cross \\
+Observation mode (NDR)      & \cross  & \tick   & \cross  & \cross  & \cross \\
+Oversampling parameters     & \cross  & \cross  & \cross  & \tick   & \tick  \\
+Grating name                & \cross  & \cross  & \tick   & \cross  & \tick  \\
+Grating wavelength          & \cross  & \cross  & \tick   & \cross  & \tick  \\
+Slit name                   & \cross  & \cross  & \tick   & \cross  & \cross \\
+Configuration index         & \cross  & \cross  & \cross  & \tick   & \cross \\
+\ \ & \ \ & \ \ & \ \ & \ \ & \ \ \\
+\hline
+\end{tabular}
+\vglue 0.3cm
+{\em Key:} \cross = not checked; \tick = {\em must} match.
+\end{center}
+\end{table}
+
+There are two types of calibration frame checking within CGS4DR: 
+{\em compulsory} checks are hard-wired into the code and consist of basic 
+integrity checks such as detector size and so forth whereas 
+{\em optional} checks are defined only for oversampled frames and are 
+specified by the {\sf flat\_match}, {\sf calib\_match} and 
+{\sf standard\_match} parameters in the task interface file. In both cases, 
+these criteria are {\em not} configurable by the end user but are, for 
+completeness, shown in Table 1.
+
+These matches are performed by evaluating and equating various FITS items
+pertinent to each observation. Note that the configuration index in Table 1 
+is a time-stamp referring to when the grating was last moved and as such 
+provides the strictest criteria. 
+
+\subsection{Reducing Astronomical Spectra}
+\label{reducing_astronomical_spectra}
+
+\subsubsection{Reducing an OBJECT, SKY or ARC}
+\label{reducing_an_object_sky_or_arc}
+
+To reduce an {\sf OBJECT}, {\sf SKY} or {\sf ARC}, CGS4DR reads the raw data 
+from store in IDIR and FITS header information from store in ODIR, applies a 
+bad pixel mask, optionally subtracts a reduced {\sf BIAS} frame, linearises 
+the data (if required), optionally subtracts a reduced {\sf DARK}, optionally 
+divides by a flat field and wavelength calibrates the data (if required),
+and writes the reduced data parameters into the INDEX file and stores the 
+reduced {\sf OBJECT}, {\sf SKY} or {\sf ARC} in RODIR. 
+This is shown schematically in Figure 8.
+
+\subsubsection{Wavelength Calibration}
+\label{wavelength_calibration}
+
+Wavelength calibration can take two forms within CGS4DR {\em i.e. viz.,}
+estimated or calibrated. The estimated method generates a rough scale from
+the grating wavelength and dispersion and is usually accurate to better
+than 20\% of the resolution. The X axis label will be set to 
+{\sf `estimated wavelength'} in microns.
+
+If the wavelength calibration option is set to {\sf calibrated}, CGS4DR 
+searches the index file for a suitable {\sf CALIBR} frame of the form 
+{\sf CAyymmdd\_oooo} and having the same instrument configuration and 
+oversampling factor as the observation to be calibrated and uses that. 
+Note that when such a {\sf CALIBR} observation is used, the X axis is 
+simply copied over and no attempt is made to re-bin the data. This means that 
+if anything {\em other than a straight line fit} is used in the Figaro ARC 
+function (see below), the data will end up with an X axis whose values are 
+not equally spaced. 
+
+Wavelength calibration (by either method) takes place when the reduced 
+observation file is created and {\em before} any integrations are reduced so
+if you change your mind about wavelength calibration and the RO file already
+exists, you will have to delete it before new instructions take effect.
+
+A {\sf CALIBR} frame is created by observing a wavelength calibration
+source such as a lamp or the sky (OH-lines) and this is normally called an 
+{\sf ARC} frame. This data is reduced in the usual way (and may be wavelength 
+calibrated!). CGS4 has Argon, Xenon and Krypton lamps for this purpose and the
+{\em in-vacuum} wavelengths for most infra-red emission lines from these lamps 
+are included with the software (as indeed are the OH lines). They are recorded 
+in Angstroms but may be converted to microns by the calibrate procedure 
+described below.
+
+Then, the user either enters the {\sf wavelength\_calibrate} menu in 
+{\sf manual\_operations} or loads the Figaro monolith separately. For
+the latter, the user needs to run the calibrate procedure (on another 
+terminal or in another window) like so:
+
+\begin{verbatim}
+   $  FIGARO_SYS
+   .
+   .
+   .
+   ICL>  CALIBRATE
+\end{verbatim}
+
+These procedures come shipped with CGS4DR and run the Figaro ARC function to
+wavelength calibrate the observation; you will need to identify and fit the
+ARC lines (see refs. [\ref{Shortridge}], [\ref{Bailey_2}]). Some CGS4 specific
+arc line lists are available in the directory {\sf CGS4\_ARCLINES}. To use these
+lists, when the Figaro ARC function prompts for the parameter {\sf ARctype},
+you should respond with {\em e.g.} {\sf CGS4\_ARCLINES:CGS4\_ARGON}.
+
+After this procedure, the frame needs to be filed as a {\sf CALIBR} frame
+and this is done with {\sf file\_observation} in the {\sf reduce} menu.
+The X axis label and units may be altered by the user but defaults to those 
+contained in the original frame.
+
+Observations such as {\sf BIAS}, {\sf DARK}, {\sf FLAT}, {\sf OBJECT} or 
+{\sf SKY} may be used for wavelength calibration but once filed as a
+{\sf CALIBR} frame it cannot be used for any other purpose. You can
+restore a {\sf CALIBR} frame to its former identity using 
+{\sf restore\_calibration} in the {\sf unfile\_observation} menu.
+
+\subsubsection{Sky Subtraction}
+\label{sky_subtraction}
+
+CGS4 can take data in several modes the two most common of which are CHOP and 
+STARE. For CHOP mode sky subtraction, phase A -- B is calculated within the
+acquisition electronics and groups are formed as a sum of objects. If chopping
+and nodding are enabled then {\sf OBJ -- SKY} pairs are formed as for stare 
+mode.
+
+For STARE mode sky subtraction, observations of {\sf OBJECT} and {\sf SKY} 
+frames are combined into {\sf OBJ -- SKY} pairs before being added into 
+reduced group files. The {\sf OBJECT} frames are added to the group and 
+{\sf SKY} frames are subtracted from the group (so for proper reduction, there 
+must be an equal number of {\sf OBJECT} and {\sf SKY} frames).
+The frame may be weighted by a sky weighting factor (but this is normally set 
+to 1.000) and observations may be weighted according to their variances (by
+$\sigma^{-2}$, see ref. [\ref{Bevington}]). For the time being, the
+error propagation parameter, {\sf ERRORS}, should be set to {\sf FROM\_OBS} 
+rather than {\sf FROM\_INT}.
+
+{\sf FROM\_INT} propagates errors when the observations are added into groups 
+according to the familiar variance rule (see ref. [\ref{Bevington}]):
+
+\begin{equation}
+\sigma^{2}_{group} = \sum_{i=1}^{n} \sigma^{2}_{obs(i)}
+\label{equation_2}
+\end{equation}
+
+The errors in each observation, obs(i), were estimated from the standard error
+in the signal from integration to integration. These are generally poorly 
+determined. The alternative strategy is to ignore the errors within the
+observations themselves and propagate errors from the standard error, S, in the
+signal from observation to observation ({\em i.e.} {\sf FROM\_OBS}) according 
+to the formulae:
+
+\begin{equation}
+\sigma^{2} = \frac{\sum x^{2} - \frac{1}{N}(\sum x )^{2}}{(N-1)}
+\label{equation_3}
+\end{equation}
+
+\begin{equation}
+S^{2} = \frac{\sigma^{2}}{N}
+\label{equation_4}
+\end{equation}
+
+At the present time, if {\sf add\_in\_pairs} is set to {\sf TRUE}, you 
+{\em must} set the error propagation parameter, {\sf ERRORS}, to 
+{\sf FROM\_OBS}.
+
+Note that when images are combined into reduced groups, a running average is
+maintained\footnote{There are hooks built in for first and second observations
+so that a sensible  mean and variance are generated.} broadly according to the 
+formula:
+
+\begin{equation}
+D_{group} = \frac{n*D_{group} + (D_{object} - D_{sky})}{n+1}
+\label{equation_5}
+\end{equation}
+
+where $D_{item}$ is the data value for group, object and sky and {\em n} is the 
+number of coadds. Some observers have noted that coadding many sky subtracted 
+frames into reduced groups ({\em i.e.} $ n > 50 $) slows the data reduction 
+down by a significant factor and have attributed this to re-averaging the 
+whole stack. That is incorrect; the probable cause of the slow down is the
+many FITS items and CGS4DR specific structures that must be included in the
+reduced group as part of the reduction. Extending such structures is,
+unfortunately, a costly process.
+
+\subsubsection{Rationing by a Standard Star}
+\label{ratioing_by_a_standard_source}
+
+Any spectra observed at the Earth's surface will differ from true 
+due to atmospheric effects, particularly wavelength dependent transmission,
+noticeable in the infra-red due to gases such as $H_{2}O$ and $CO_{2}$.
+The correction of these effects is to compare the source with another
+having a well-behaved and understood spectral shape {\em i.e. viz.,}  a
+standard source. 
+
+In general, the flux density from an astronomical source, $S_{*}(\lambda)$, 
+and the flux density of a standard, $S_{st}(\lambda)$, will both suffer 
+attenuation and diminution by atmospheric transmission, T($\lambda$), and 
+the instrumental response, I($\lambda$). The measured signals for each 
+type of source will be proportional to the products of the three terms 
+(loosely, STI). Early type (A) stars are known to approximate very well 
+to black body sources\footnote{Actually, infra-red astronomers 
+consider {\em all} standard stars as black bodies irrespective of 
+stellar type!} and so, for a star of known spectral type and 
+luminosity class, the spectrum can be re-created using:
+
+\begin{equation}
+  Spectrum = \frac{S_{*}(\lambda) T(\lambda) I(\lambda)}{S_{st}(\lambda) T(\lambda) I(\lambda)} \times B_{T_{eff}}(\lambda)
+\label{equation_6}
+\end{equation}
+
+where $B_{T_{eff}}(\lambda)$ is the black body density flux of the standard 
+at some effective temperature, $T_{eff}$. This term must be proportional to 
+the product of $S_{st}(\lambda)$ and some term which is dependent only upon 
+the arbitrary brightness, $k(\lambda)$, of the `ratio-ing' source {\em i.e.} 
+the spectral standard. Thus:
+
+\begin{equation}
+  Spectrum \approx k(\lambda) S_{*}(\lambda) 
+\label{equation_7}
+\end{equation}
+
+It can be seen that dividing by a standard star in this way removes 
+atmospheric absorption features from the spectrum. This depends upon the 
+path length through which both source and standard are measured. To remain 
+true both must be observed at, or close to, the same airmass. 
+
+Equation \ref{equation_6} contains the key:
+standard stars are observed in exactly the same way as other astronomical
+objects. They are sky subtracted into reduced group files, although a reduced 
+observation can be filed as a standard if desired. 
+Converting an observation to a standard involves CGS4DR extracting a 1-D
+spectrum, generating a normalised (model) black body, dividing the spectrum by
+this model black body and growing the result along the slit. It is filed in 
+the INDEX file as a frame beginning with ST and stored in RGDIR. 
+
+When the time comes to ratio a source, CGS4DR will select a standard based
+upon pre-determined criteria (see \S 
+\ref{how_does_cgs4dr_search_for_a_calibration_frame}) and
+divide the observation to be calibrated by it and, hence, re-create the 
+spectrum. The output file has the label {\sf \_DBS} appended to it and
+is simply the ratio of the DN/exp in the source divided by the DN/exp in the 
+standard {\em i.e.} no account is taken of exposure times. 
+
+\subsubsection{Flux Calibration}
+\label{flux_calibration}
+
+The technique most frequently used to flux calibrate a spectrum is to
+re-use the standard source which has a known brightness quoted relative
+to Vega ($\alpha$ Lyrae is defined to have zero magnitude at every
+wavelength). The flux density, $F_{\lambda}$, of a star at magnitude {\em m} 
+can thus be described (see refs. [\ref{Puxley_2}], [\ref{Mountain_2}]):
+
+\begin{equation}
+ F_{\lambda}({\em m}) = F_{\lambda}(\alpha Lyrae) \times 10^{-0.4{\em m}}
+\label{equation_8}
+\end{equation}
+
+The software uses the values of flux densities for $\alpha$ Lyrae that are 
+listed in Table 2 (see ref. [\ref{IRTF}]).
+
+When the flux standard is also the ratio-ing source, $k(\lambda)$ in equation
+\ref{equation_7} is known and we immediately obtain a flux calibrated spectrum. 
+If the flux and spectral standards are not the same then one must determine 
+the relative brightness of the two stars by flux calibrating the spectral 
+standard.
+
+\begin{table}
+\begin{center}
+\caption{\bf Flux Densities for $\alpha$ Lyrae}
+\vglue 0.6cm
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+\ \ & \ \ & \ \ & \ \ & \ \ & \ \  \\
+Band & $\lambda$  & $f_{\lambda}^{*}$         & $f_{\lambda}$            & $f_{\lambda}$ & $f_{\lambda}$  \\ 
+\ \  & $(\mu m)$  & $(W m^{-2} {\mu m}^{-1})$ & $(W m^{-2} {Hz}^{-1})$ & $(mJy)$         & $(ergs \ s^{-1} cm^{-2} {\mu m}^{-1})$  \\
+\ \ & \ \ & \ \ & \ \ & \ \ & \ \  \\
+\hline
+\ \ & \ \ & \ \ & \ \ & \ \ & \ \  \\
+$V$  &  0.5556  &  3.44 $\times$ $10^{-8}$  & 3.54 $\times$ $10^{-23}$ & 3.54 $\times$ $10^{6}$ & 3.44 $\times$ $10^{-5}$ \\
+$J$  &  1.2500  &  3.07 $\times$ $10^{-9}$  & 1.60 $\times$ $10^{-23}$ & 1.60 $\times$ $10^{6}$ & 3.07 $\times$ $10^{-6}$ \\
+$H$  &  1.6500  &  1.12 $\times$ $10^{-9}$  & 1.02 $\times$ $10^{-23}$ & 1.02 $\times$ $10^{6}$ & 1.12 $\times$ $10^{-6}$ \\
+$K$  &  2.2000  &  4.07 $\times$ $10^{-10}$ & 6.57 $\times$ $10^{-24}$ & 6.57 $\times$ $10^{5}$ & 4.07 $\times$ $10^{-7}$ \\
+$L$  &  3.4500  &  7.30 $\times$ $10^{-11}$ & 2.90 $\times$ $10^{-24}$ & 2.90 $\times$ $10^{5}$ & 7.30 $\times$ $10^{-8}$ \\
+$L'$ &  3.8000  &  5.24 $\times$ $10^{-11}$ & 2.52 $\times$ $10^{-24}$ & 2.52 $\times$ $10^{5}$ & 5.24 $\times$ $10^{-8}$ \\
+$M$  &  4.8000  &  2.12 $\times$ $10^{-11}$ & 1.63 $\times$ $10^{-24}$ & 1.63 $\times$ $10^{5}$ & 2.12 $\times$ $10^{-8}$ \\
+\    &  7.8000  &  3.22 $\times$ $10^{-12}$ & 6.53 $\times$ $10^{-25}$ & 6.53 $\times$ $10^{4}$ & 3.22 $\times$ $10^{-9}$ \\
+\    &  8.7000  &  2.10 $\times$ $10^{-12}$ & 5.30 $\times$ $10^{-25}$ & 5.30 $\times$ $10^{4}$ & 2.10 $\times$ $10^{-9}$ \\
+\    &  9.8000  &  1.32 $\times$ $10^{-12}$ & 4.23 $\times$ $10^{-25}$ & 4.23 $\times$ $10^{4}$ & 1.32 $\times$ $10^{-9}$ \\
+$N$  &  10.100  &  1.17 $\times$ $10^{-12}$ & 3.98 $\times$ $10^{-25}$ & 3.98 $\times$ $10^{4}$ & 1.17 $\times$ $10^{-9}$ \\
+\    &  10.300  &  1.09 $\times$ $10^{-12}$ & 3.85 $\times$ $10^{-25}$ & 3.85 $\times$ $10^{4}$ & 1.09 $\times$ $10^{-9}$ \\
+\    &  11.600  &  6.81 $\times$ $10^{-13}$ & 3.05 $\times$ $10^{-25}$ & 3.05 $\times$ $10^{4}$ & 6.81 $\times$ $10^{-10}$ \\
+\    &  12.500  &  5.07 $\times$ $10^{-13}$ & 2.64 $\times$ $10^{-25}$ & 2.64 $\times$ $10^{4}$ & 5.07 $\times$ $10^{-10}$ \\
+$Q$  &  20.000  &  7.80 $\times$ $10^{-14}$ & 1.04 $\times$ $10^{-25}$ & 1.04 $\times$ $10^{4}$ & 7.80 $\times$ $10^{-11}$ \\
+\ \ & \ \ & \ \ & \ \ & \ \ & \ \  \\
+\hline
+\end{tabular}
+\vglue 0.3cm
+{\em Conversion via: }
+$\mid f_{\lambda}^{*} \mid$ \ \ ($W \ m^{-2} \ {\mu m}^{-1}$) $=$ 
+$\frac{\mid f_{\lambda}^{*} \mid \lambda^{2}}{c}$ \ \ ($W \ m^{-2} \ {Hz}^{-1}$) $=$
+
+$\frac{\mid f_{\lambda}^{*} \mid \lambda^{2}}{c}$ $\times$ $10^{29}$  \ \ ($mJy$) $=$
+$\mid f_{\lambda}^{*} \mid$ $\times$ $10^{3}$ \ \ ($ergs \ s^{-1} \ cm^{-2} \ {\mu m}^{-1}$)
+
+\vglue 0.1cm
+
+where c = speed of light in microns / second.
+
+\vglue 0.3cm
+{\em Note: } Only bands $J$, $H$, $K$, $L$, $L'$ and $M$ apply to CGS4. 
+\end{center}
+\end{table}
+
+\subsubsection{Automatic Line Fitting}
+\label{automatic_line_fitting}
+
+An automatic line fitting facility is included in the data reduction 
+software but the primary purpose of this facility is to perform
+engineering tests on arc lamps to determine the peak height and line 
+centre in many spectra. Such information furnishes the optimum focus 
+position and reveals if there is any shift in the line position on the 
+detector array.
+
+To enable automatic line fitting, the {\sf automatic\_line\_fit} item in 
+the {\sf set\_reduction\_sequence} menu should be set to {\sf YES}.
+The data acquisition system may be used to set up sequences of 
+engineering observations for the above tests ({\em e.g.} a focus scan).
+
+{\em N. B.} Users should be warned that they try this facility on astronomical
+data at their own risk: the Figaro EMLT function is called and this has proved
+to be extremely sensitive to input parameters. Bad parameter values have
+been known to crash the system!
+
+\newpage
+\markright{\stardocname}
+\section{A Walk Through the Menus}
+\label{a_walk_through_the_menus}
+
+When using the system for the first time, it is worth browsing through
+the SMS screens to discover what is available. Positioning the cursor on 
+any item and pressing {\sf ?} will produce some on-line help information (but
+see \S \ref{sms_help_interface}).
+In some cases, pressing {\sf ?} again will produce more information.
+CTRL/R refreshes the SMS screen without incurring any action and should be
+used from time to time (particularly after some print options).
+
+This section describes the major items on the SMS screen\footnote{In this 
+section, some menus are split across pages which is rather unfortunate but 
+\LaTeX\ provides few facilities for pagebreaking within the {\em verbatim} 
+environment. I have tried the {\em tabular} environment but without much 
+success there either. I could have used the {\em newpage} command prior to 
+displaying a menu but that would have resulted in a large amount of 
+white-space and a document of unbearable length. This guide is long enough 
+as it is!}.
+Note that CGS4DR comes shipped with a private version of SMS. It is hoped that
+this version will become the {\sl Starlink} default soon. It has the 
+interesting property of allowing recall, both backwards and forwards, of
+the scrolling region of the SMS screen. To do this, use the period (.) 
+on the auxiliary keypad to get to 
+the {\sf ICL$>$} prompt and {\em whilst this prompt remains on screen} use 
+{\sf CTRL/P} for a previous line and {\sf CTRL/N} for the next line to be 
+displayed in the scroll region. Note that this is an excellent way of 
+recalling error messages if you feel you have discovered a bug.
+
+In the following sections, I have used `bracket notation' to indicate a 
+default value. These are the values that are highlighted in reverse video
+on the SMS terminal screen. Such values can, of course, change. The values here
+indicate the more general elements of data reduction and may not reflect
+your own reduction sequence.
+
+\subsection{Starting the Software}
+\label{starting_the_software}
+
+To start the CGS4DR software, in full, from the command line the user types
+something like:
+
+\begin{verbatim}
+  $ CGS4DR OFFLINE sys$scratch:[username.utdate] xwindows
+\end{verbatim}
+
+where {\sc sys\$scratch:[username.utdate]} is the location of the top level 
+data directory\footnote{{\em E.g.,} I hold my data for the night of 30th May, 
+1992 in the directory DISK\$UKIRT\_TMP:[PND.19920530].} within which there 
+should be sub-directories called IDIR, ODIR, RIDIR, RODIR and RGDIR (see \S 
+\ref{files_used_by_the_system}.) although the system will search the logical 
+name path CGS4\_SEARCH in an attempt to find a specified file. The software 
+will prompt for most parameters not present during the startup sequence and 
+will assume you are running in {\sf offline} mode if the DECnet nodename of 
+the host does not begin with IRT. {\sf xwindows} is the name of a suitable 
+graphics device. Any {\sl Starlink} supported graphics device is valid. 
+On X devices, such as VAXstations, the default GWM window size may be too 
+small, so it is better to create the window\footnote{Refer to \S 
+\ref{ghastly_colour_tables} about the number of colour table entries.} 
+independently before invoking CGS4DR:
+
+\begin{verbatim}
+  $ XMAKE xwindows -title "CGS4 Data Reduction" -geometry 1024x768 -col 240
+  $ CGS4DR OFFLINE sys$scratch:[username.utdate] xwindows
+\end{verbatim}
+
+Note that the CGS4DR software tasks have specific names necessary for
+inter-process communication to operate effectively. This places a restriction
+upon the system inasmuch as two users within the same group {\em cannot 
+concurrently run the system on the same CPU}. Although this sounds like an 
+ADAM restriction it is actually a VMS one. The reported error will be the same 
+as described in \S \ref{preloaded_tasks}. You can check which group you belong 
+to by reading the primary key of the {\sf user identifier} field 
+reported by the command:
+
+\begin{verbatim}
+   $ SHOW PROCESS
+\end{verbatim}
+
+Once the software has been started successfully the SMS screen should appear so:
+
+\begin{verbatim} 
++ SMS CGS4 Data Reduction System V1.6-0------+
+|setup           reduce          engineer    |
++--------------------------------------------+
+
+
+_______________________________________________________________________________
+
+               WELCOME TO THE CGS4 DATA REDUCTION SYSTEM V1.6-0
+
+                     Please wait while the system loads
+
+
+
+
+Loading CGS4_EXE:CRED4 into CRED4
+Loading CGS4_EXE:RED4 into RED4
+Loading CGS4_EXE:ENG4 into ENG4
+Loading CGS4_EXE:P4 into P4
+Enter the `setup'   menu to set data reduction parameters
+Enter the `reduce'  menu to start automatic data reduction
+_______________________________________________________________________________
+
+Use ENTER to select or PF1 to return to previous menu.      (Do not press PF4!)
+\end{verbatim}
+
+{\bf setup} contains items for setting up the data reduction system.
+This menu should be entered before using the system,
+to define how the data are to be reduced and the sort of displays 
+required.
+
+{\bf reduce} contains the main data reduction menu. Entering this menu
+will start the automatic data reduction system if the parameter
+{\sf pause\_on\_entry} is set to {\sf FALSE}. This parameter is set in the
+{\sf control\_flags} sub-menu of {\sf setup}. By default, this parameter
+is {\sf TRUE} so that automatic data reduction will not begin until the 
+user tells the system when to start by toggling 
+{\sf pause\_continue\_reduction}.
+
+{\bf engineer} contains some specialised data analysis and test 
+functions. It was originally produced for the engineering tests in 
+the lab, but may contain functions which are useful for data analysis.
+
+\subsubsection{Display Modes and the P4 Plotting Task}
+\label{display_modes_and_the_p4_plotting_task}
+
+During the data reduction sequence, observations may be displayed in up 
+to four different ways, and groups in up to two different ways.
+The appearance of these plots may be set by parameters in the
+various {\sf set\_{\em item}\_display\_{\em x}} menus within the 
+{\sf setup} menu.
+
+Data may also be plotted manually by selecting {\sf plot\_{\em items}}
+(where {\em items} refers to options {\sf image}, {\sf graph}, {\sf surface},
+{\sf histogram}, {\sf overgraph} and {\sf oversurface})
+in the graphics and reduce menus. The display surface is divided into seven 
+ports:
+
+\begin{description}
+\item[0] - The whole display area
+\item[1] - The top left quarter
+\item[2] - The top right quarter
+\item[3] - The bottom left quarter
+\item[4] - The bottom right quarter
+\item[5] - The top half
+\item[6] - The bottom half
+\end{description}
+
+The following types of plot are possible:
+
+\begin{description}
+\item[{\sf IMAGE}] - A grey-scale or colour image. A selection of colour 
+  tables are available in the directory, {\sf CGS4\_COLOUR\_TABLES}. Note 
+  that on colour workstations only the first {\em n} colour table entries 
+  will be written (where {\em n} is the number of available colour cells 
+  for plotting) so the display may look rather odd (see \S 
+  \ref{ghastly_colour_tables}).
+\item[{\sf SURFACE}] - A plot showing many rows, aligned to look like a 
+  surface.
+\item[{\sf HISTOGRAM}] - A histogram showing the frequencies of pixels against 
+  data value. Odd and even columns may be plotted separately.
+\item[{\sf GRAPH}] - A 1-D graph showing a cut through the data along the 
+  {\sf HORIZONTAL} or {\sf VERTICAL}. Several rows or columns may be 
+  included in the extraction and they are averaged before display.
+\item[{\sf OVERGRAPH}] - The same as a GRAPH, but to the same scale and 
+  overlayed on top of an existing GRAPH. Any number of OVERGRAPHs may be 
+  added to a GRAPH. Different colours may be used for each OVERGRAPH.
+\item[{\sf OVERSURFACE}] - The same as a SURFACE, but to the same scale as an 
+  existing SURFACE in that port. The display is {\em not} overlayed on the 
+  existing SURFACE, which is first erased.
+\end{description}
+
+The CGS4 plotting task, P4, may be used on its own, and is a useful utility
+to display data recorded in Figaro format. The task may be loaded and used 
+separately by typing:
+
+\begin{verbatim}
+      $ CGS4DR_GRAPHICS
+\end{verbatim}
+
+This facility has a reasonably comprehensive help menu available on-line
+and there are some example commands shown in \S 
+\ref{hardcopy_printing_made_simple}.
+
+\subsection{The SETUP Menu}
+\label{the_setup_menu}
+\begin{verbatim}
++ Setup menu -----------------------------------------------------+
+|set_reduction_sequence           set_plot_device                 |
+|file_selection                   set_current_integration_display |
+|ff_normalisation_parameters      set_observation_display_1       |
+|wavelength_calib_parameters      set_observation_display_2       |
+|sky_subtraction_parameters       set_observation_display_3       |
+|automatic_line_fit_parameters    set_observation_display_4       |
+|define_linearisation_file        set_group_display_1             |
+|bad_pixel_masks                  set_group_display_2             |
+|save_configuration               logical_names                   |
+|recall_configuration             control_flags                   |
++-----------------------------------------------------------------+
+\end{verbatim}
+
+Most of the menus in {\sf setup} are used to define the
+parameters relating to particular steps in this reduction sequence
+or the display of data during reduction to the end user.
+
+\subsubsection{set\_reduction\_sequence}
+\label{set_reduction_sequence}
+\begin{verbatim}
++ Set reduction sequence -------------------------+
+|Subtract_bias_frame              [YES]  NO   ASK |
+|Subtract_dark_frame               YES  [NO]  ASK |
+|Display_each_integration          YES  [NO]  ASK |
+|Coadd_each_integration           [YES]  NO   ASK |
+|Display_coadded_observation_1    [YES]  NO   ASK |
+|Display_coadded_observation_2    [YES]  NO   ASK |
+|Display_coadded_observation_3     YES  [NO]  ASK |
+|Display_coadded_observation_4     YES  [NO]  ASK |
+|Archive_each_observation          YES  [NO]  ASK |
+|File_each_observation            [YES]  NO   ASK |
+|Normalise_each_flat_field        [YES]  NO   ASK |
+|Divide_by_flat_field             [YES]  NO   ASK |
+|Wavelength_calibrate             [YES]  NO   ASK |
+|Add_observations_into_groups     [YES]  NO   ASK |
+|Divide_by_standard_source        [YES]  NO   ASK |
+|Display_coadded_group_1          [YES]  NO   ASK |
+|Display_coadded_group_2          [YES]  NO   ASK |
+|Automatic_line_fit                YES  [NO]  ASK |
++-------------------------------------------------+
+\end{verbatim}
+
+{\bf set\_reduction\_sequence} is used to define which steps in the 
+data reduction sequence are to be carried out. For each item there are 
+three choices, the current choice being highlighted in reverse video on 
+the SMS screen:
+
+\begin{description}
+\item[{\sf YES}] means `execute that option every time without prompting'.
+  For example, you may wish all your data frames to be dark-subtracted
+  automatically, and would therefore set {\sf subtract\_dark\_frame} to 
+  {\sf YES}.
+\item[{\sf NO}] means `do not carry out that data reduction step at all'.
+  For example, if you prefer not to have any of the data wavelength 
+  calibrated, you would set {\sf wavelength\_calibrate} to {\sf NO}.
+\item[{\sf ASK}] means `prompt the user when the data reduction needs to 
+  perform that action'. For example, when reducing integrations one at a 
+  time you may wish to examine the quality of each integration before 
+  deciding whether to add it to the current observation. In this case you 
+  would set {\sf display\_each\_integration} to {\sf YES} and 
+  {\sf coadd\_each\_integration} to {\sf ASK}.
+\end{description}
+
+{\sf subtract\_bias\_frame} enables bias subtraction 
+(see \S \ref{reducing_a_bias}).
+
+{\sf subtract\_dark\_frame} enables dark subtraction 
+(see \S \ref{reducing_a_dark}).
+
+{\sf display\_each\_integration} displays integrations as they are being reduced.
+This only applies when reducing integrations into {\em reduced integrations} 
+and does not display individual integrations as they are being reduced into 
+{\em reduced observations.} Hence, it is primarily an engineering function. 
+The display is tailored with {\sf set\_current\_integration\_display} 
+(see \S \ref{set_current_integration_display}).
+
+{\sf coadd\_each\_integration} enables the addition of {\em reduced integrations}
+into a {\em reduced observation} file. This only applies when reducing 
+integrations into {\em reduced integrations} and allows the user to omit some 
+integrations from the reduced observation file. Hence, it is primarily an 
+engineering function. When reducing an {\em observation} all the integrations 
+are automatically included in the reduced observation file.
+
+{\sf display\_coadded\_observation\_{\em x}} (where {\em x} is an integer from 
+1--4) displays {\em reduced observations} as they are being reduced in up to 
+four ways (see \S \ref{set_observation_display_x}).
+
+{\sf archive\_each\_observation} enables the archiving of reduced observations
+into a file called {\sf CGS4.DAT} in the directory {\sf CGS4\_ARCHIVE}. The 
+archiving facility is now obsolete so this facility may be removed in the 
+future. It should remain set to {\sf NO}.
+
+{\sf file\_each\_observation} enables the filing of {\em reduced observations} 
+into the index file. A reduced observation can be re-filed at any time by 
+using the {\sf something\_else} in the {\sf file\_observation} menu (see 
+\S \ref{file_observation}).
+
+{\sf normalise\_each\_flat\_field} enables the normalisation of flat-field frames
+(see \S \ref{reducing_a_flat}, \S \ref{ff_normalisation_parameters} and 
+\S \ref{forgetting_to_normalize_a_flat_field}).
+
+{\sf divide\_by\_flat\_field} enables the automated division of 
+{\em integrations} by a flat field during the reduction sequence (see \S 
+\ref{how_does_cgs4dr_search_for_a_calibration_frame} and
+\S \ref{forgetting_to_normalize_a_flat_field}).
+
+{\sf wavelength\_calibrate} enables the automated wavelength calibration of
+{\em reduced observations} during the reduction sequence (see \S
+\ref{how_does_cgs4dr_search_for_a_calibration_frame}, 
+\S \ref{wavelength_calibration} and \S \ref{wavelength_calib_parameters}).
+
+{\sf add\_observations\_into\_groups} enables the addition of {\em reduced 
+observations} of either an {\sf OBJECT} or a {\sf SKY} into a {\em reduced 
+group} file (see \S \ref{sky_subtraction} and \S 
+\ref{sky_subtraction_parameters}).
+
+{\sf divide\_by\_standard\_source} enables the automated division of {\em
+reduced groups} by a standard source during the reduction sequence (see \S 
+\ref{how_does_cgs4dr_search_for_a_calibration_frame}, \S 
+\ref{ratioing_by_a_standard_source} and \S
+\ref{files_used_by_the_system}).
+
+{\sf display\_coadded\_group\_{\em x}} (where {\em x} is an integer from 1--2)
+displays {\em reduced groups} as they are being reduced in up to two ways 
+(see \S \ref{set_group_display_x}).
+
+{\sf automatic\_line\_fit} enables line fitting for engineering purposes
+and should {\em not} be used for astronomical images (see \S 
+\ref{automatic_line_fitting}).
+
+\subsubsection{file\_selection}
+\label{file_selection}
+\begin{verbatim}
++ Specify calibration file search-------------------------------------+
+|Bias_search_mode                 FORWARDS BACKWARDS [BOTH] SPECIFIED |
+|Specified_bias                   ROyymmdd_oooo                       |
+|Dark_search_mode                 FORWARDS BACKWARDS [BOTH] SPECIFIED |
+|Specified_dark                   ROyymmdd_oooo                       |
+|Flat_search_mode                 FORWARDS BACKWARDS [BOTH] SPECIFIED |
+|Specified_flat                   ROyymmdd_oooo                       |
+|Calibration_search_mode          FORWARDS BACKWARDS [BOTH] SPECIFIED |
+|Specified_calibration            CAyymmdd_oooo                       |
+|Standard_search_mode             FORWARDS BACKWARDS [BOTH] SPECIFIED |
+|Specified_standard               STyymmdd_oooo                       |
++---------------------------------------------------------------------+
+\end{verbatim}
+
+{\bf file\_selection} is used to specify how already reduced {\sf BIAS}, 
+{\sf DARK}, {\sf FLAT}, {\sf CALIBR} and {\sf STANDARD} images are to 
+be searched for when reducing astronomical data.
+
+This menu allows great flexibility in selecting images for data and
+astronomical reduction as it allows searches for suitably reduced
+data in the forwards or backwards directions (in the index file) or
+both (in which case it selects the nearest frame in time that matches
+all other selection criteria). During re-reduction, however, this can lead 
+to the situation whereby a group is reduced with one {\sf FLAT} (for example)
+for the early frames and another {\sf FLAT} for the later frames. In such
+situations, the user might like to specify particular calibration frames using
+the {\sf specified\_$<${\em type}$>$} option.
+
+It is also true that if {\sf subtract\_bias\_frame} is set to {\sf YES} and
+you decide to change the bad pixel mask without re-reducing the bias, the data
+will be reduced with the original bad pixel mask specified in the bias frame 
+header. 
+
+Note that during reduction, the system may sometimes prompt for a {\sf BIAS}, 
+{\sf DARK} and so on (particularly if you run the software down and back up 
+again). In such circumstances, one can either enter a specific observation or 
+just press {\sf RETURN} --- in which case the software will go and find a 
+suitable calibration image. 
+
+\subsubsection{ff\_normalisation\_parameters} 
+\label{ff_normalisation_parameters}
+\begin{verbatim}
++ FF normalisation parameters ----------------------------------------+
+|Normalisation_method             [POLYFIT] SMOOTH                    |
+|Polynomial_order                 1 2 [3] 4 5 6 7                     |
+|Smooth_box_size                  1 3 [5] 7 9 11 13 15 17 21 23 25 27 |
++---------------------------------------------------------------------+
+\end{verbatim}
+
+{\bf ff\_normalisation\_parameters} specifies how flat field
+frames are to be normalised.
+This menu is only relevant when {\sf normalise\_each\_flat\_field} is set 
+to {\sf YES} or {\sf ASK} in the data reduction sequence.
+The most common option is to fit a (third order) polynomial along the 
+dispersion direction and divide by that. The smoothing option uses a box 
+to smooth the data and divides by that.
+
+\subsubsection{wavelength\_calib\_parameters} 
+\label{wavelength_calib_parameters} 
+\begin{verbatim}
++ Wavelength calibration parameters ---------------------+
+|Calibration_method               [ESTIMATED] CALIBRATED |
++--------------------------------------------------------+
+\end{verbatim}
+
+{\bf wavelength\_calib\_parameters} specifies how the 
+data are to be calibrated into wavelength. There are just two options
+which are described in \S \ref{wavelength_calibration}.
+This menu is only relevant when {\sf wavelength\_calibrate} 
+is set to {\sf YES} or {\sf ASK} in the data reduction sequence.
+
+\subsubsection{sky\_subtraction\_parameters} 
+\label{sky_subtraction_parameters} 
+\begin{verbatim}
++ Sky subtraction parameters menu ---------------------------+
+|Normal_sky_subtraction_options                              |
+|Further_sky_subtraction_options                             |
++------------------------------------------------------------+
+\end{verbatim}
+
+{\bf sky\_subtraction\_parameters} specifies how observations are to be 
+combined together into groups, and how the sky background is to be 
+subtracted while doing this. 
+As can be seen, this menu is further sub-divided into options offering normal
+sky subtraction and enhanced sky subtraction for point sources.
+
+\begin{verbatim}
++ Normal sky subtraction parameters --------------------------------------+
+|Add_in_pairs               [TRUE]  FALSE                                 |
+|Variance_weighting          TRUE  [FALSE]                                |
+|Error_propagation          FROM_INT [FROM_OBS]                           |
+|Sky_weighting_factor       1.0000000000                                  |
+|Group_display_frequency    [EVERY_TIME] ODD_TIMES EVEN_TIMES AT_END_ONLY |
++-------------------------------------------------------------------------+
+\end{verbatim}
+{\bf normal\_sky\_subtraction\_options} \label{normal_sky_subtraction_options}
+specifies how sky subtraction is to be carried out for all observations. 
+This menu is only relevant when {\sf add\_observations\_into\_groups} is set 
+to {\sf YES} or {\sf ASK} in the data reduction sequence.
+
+{\sf add\_in\_pairs} determines whether {\sf OBJECT} and {\sf SKY} 
+observations are to be added to their parent group file individually or 
+combined into {\sf OBJ -- SKY} pairs.
+
+{\sf variance\_weighting} determines whether observations are to be 
+weighted according to their variance.
+
+{\sf error\_propagation} determines where the error estimate in the 
+group file is to come from.
+The error estimates already present in the observation files may be
+combined, by selecting {\sf FROM\_INT}, or new errors may be estimated when 
+the observations are co-added, by selecting {\sf FROM\_OBS} (see \S 
+\ref{sky_subtraction}).  {\em Warning: Until further notice the
+{\sf FROM\_INT} option should NOT be used!}
+
+{\sf sky\_weighting\_factor} is a weighting factor to be applied to all 
+{\sf SKY} observations. Values other than 1.0 allow {\sf SKY} and {\sf OBJECT}
+observations to have different exposure times.
+
+{\sf group\_display\_frequency} controls how often a group file is 
+displayed as it built up.
+
+\begin{verbatim}
++ Point source options -------------------------------------------+
+|Polyfit                        [NONE] OBJ-SKY REDUCED_GRP OBJECT |
+|Degree                                  1                        |
+|Nreject                                 0                        |
+|Weight                         [TRUE] FALSE                      |
+|First_Sky_area_ystart                  20                        |
+|First_Sky_area_yend                    25                        |
+|Second_Sky_area_ystart                 35                        |
+|Second_Sky_area_yend                   40                        |
+|Third_Sky_area_ystart                  -1                        |
+|Third_Sky_area_yend                    -1                        |
+|Fourth_Sky_area_ystart                 -1                        |
+|Fourth_Sky_area_yend                   -1                        |
++-----------------------------------------------------------------+
+\end{verbatim}
+{\bf further\_sky\_subtraction\_options} \label{further_sky_subtraction_options}
+enables sky subtraction options for point sources. 
+This menu offers an implementation of the Figaro routine POLYSKY in
+an automated way. 
+
+{\sf polyfit} selects the mode for enhanced sky subtraction. {\sf NONE}
+turns the option off, {\sf OBJ -- SKY} will polysky the {\sf OBJ -- SKY} pair
+{\em before} adding that pair into a reduced group, {\sf reduced\_grp}
+applies the algorithm to the reduced group alone whereas {\sf OBJECT}
+will polysky single reduced object files to remove residual OH.
+
+{\sf degree} is the degree of the polynomial required for the fit. A
+low degree should be used ($<$ 3).
+
+{\sf nreject} is  the number of points to reject from the fitting routine.
+If the data is correctly reduced with a suitable bad pixel mask this should
+be zero. If it is non-zero, it will reject {\em n} points furthest
+from the mean.
+
+{\sf weight} is a logical weighting factor used to weight the polynomial
+during fitting. If TRUE (recommended) the points are weighted according to 
+$\sigma^{-2}$ whereas if FALSE all good points are used for the fit. 
+Note that there is
+a discrepancy between the way in which this routine and it's Figaro equivalent
+works: if weight is TRUE both routines use the error array to obtain a better
+polynomial but {\em neither} alters the error array. Rather the errors
+are propagated without alteration since one is assumed to be subtracting 
+a small quantity. If weight is FALSE, Figaro will delete the error array
+whereas CGS4DR will not. It, too, is propagated without alteration.
+
+{\sf first\_sky\_area\_ystart} is the start if the first sky region to obtain
+data to fit a polynomial to. If any other four sky areas has a negative
+value, that area is omitted from the fit.
+
+{\sf first\_sky\_area\_yend} is the end if the first sky region. Data is
+extracted from the region enclosed by start and end.  Up to four regions
+can be selected from within a frame. The other sky areas operate in an
+analogous fashion to the first.
+
+\subsubsection{automatic\_line\_fit\_parameters} 
+\label{automatic_line_fit_parameters}
+\begin{verbatim}
++ Automatic line fit parameters -------------------------------------+
+|Rows_to_average                 [1] 3 5 7 9 11 13 15 17 19 21 23 25 |
+|Central_row1                     10                                 |
+|Central_row2                     40                                 |
+|Xstart                           1.00000000                         |
+|Xend                             62.0000000                         |
++--------------------------------------------------------------------+
+\end{verbatim}
+
+{\bf automatic\_line\_fit\_parameters} specifies the 
+region of the spectrum to be searched when automatically locating and 
+fitting an emission line.
+This menu is primarily used for engineering purposes, to generate focus
+curves  and so on (see \S \ref{automatic_line_fitting}), and should not be 
+used by the offline user. It is included here for completeness and is only 
+relevant when {\sf automatic\_line\_fit} is set to {\sf YES} or {\sf ASK} in the 
+data reduction sequence.
+
+{\sf rows\_to\_average} specifies the number of rows which are to be
+averaged together before line fitting.
+Normally this is 1, but more than 1 row may be averaged to improve the 
+signal to noise at the expense of positional accuracy.
+
+{\sf central\_row1} specifies the first row to be extracted (or the 
+central row if {\sf rows\_to\_average} is greater than 1).
+
+{\sf central\_row2} specifies the second row to be extracted (or the 
+central row if {\sf rows\_to\_average} is greater than 1).
+
+{\sf xstart} specifies the left hand X value of the X range containing 
+the line.
+This will be column number on the detector if the data has not been 
+wavelength calibrated, or wavelength if it has.
+
+{\sf xend} specifies the right hand X value of the X range containing 
+the line.
+This will be column number on the detector if the data has not been 
+wavelength calibrated, or wavelength if it has.
+
+\subsubsection{define\_linearisation\_file} 
+\label{define_linearisation_file} 
+\begin{verbatim}
++ Specify linearisation coeffs file (# for none) --+
+|Name_of_lin_coeffs_file          #                |
++--------------------------------------------------+
+\end{verbatim}
+
+{\bf define\_linearisation\_file} is used to specify the name of a
+file containing linearization correction coefficients.
+
+{\sf name\_of\_lin\_coeffs\_file} is the name of a suitable list
+of coefficients contained in the specified file (see \S \ref{linearising_the_data}).
+
+\subsubsection{bad\_pixel\_masks} 
+\label{bad_pixel_masks} 
+\begin{verbatim}
++ Bad pixel mask functions ------+
+|define_bad_pixel_mask           |
+|list_masks                      |
+|create_bad_pixel_mask           |
+|edit_bad_pixel_mask             |
+|combine_bad_pixel_masks         |
+|apply_mask                      |
+|extract_mask                    |
++--------------------------------+
+\end{verbatim}
+
+{\bf bad\_pixel\_masks} offers a wide range of options and is described in \S 
+\ref{the_bad_pixel_masks_menu}.
+
+\subsubsection{save\_configuration} 
+\label{save_configuration} 
+\begin{verbatim}
++ Save current configuration -------------------------+
+|Configuration_file              CRED4_PARAMETERS     |
+|Print_configuration             TRUE [FALSE]         |
++-----------------------------------------------------+
+\end{verbatim}
+
+{\bf save\_configuration} allows all the data reduction parameters to 
+be saved to a text file and printed as well, if required.
+It is recommended that the parameters be saved frequently, to 
+guard against corruption.
+Saving useful sets of parameters to files allows these to be recalled and 
+used automatically by specifying the DR command {\sf DRCONFIG filename}.
+
+\subsubsection{recall\_configuration} 
+\label{recall_configuration} 
+\begin{verbatim}
++ Recall a configuration --------------------------+
+|Configuration_file              CRED4_PARAMETERS  |
++--------------------------------------------------+
+\end{verbatim}
+
+{\bf recall\_configuration} recalls a set of parameters which have been 
+saved the named file.
+
+\subsubsection{set\_plot\_device}
+\label{set_plot_device}
+\begin{verbatim}
++ Open a new plot device ---+
+|set_soft_device            |
+|set_hard_device            |
++---------------------------+
+\end{verbatim}
+
+{\bf set\_plot\_device} provides two options to change either the softcopy
+or hardcopy device being used.
+
+\begin{verbatim}
++ Open a new SOFT plot device -----------------------+
+|Plot_device              Name_of_GKS_plot_device    |
+|Colour_table             Colour_table_name_only____ |
++----------------------------------------------------+
+\end{verbatim}
+
+{\bf set\_soft\_device} resets the soft copy device and loads a colour table.
+Any PGPLOT supported graphics device may be used. If you do not know what 
+colour table to use, try {\sf DEFAULT} or {\sf GREY}.
+
+\begin{verbatim}
++ Open a new HARD plot device -----------------------+
+|Plot_device              Name_of_GKS_plot_device    |
+|Colour_table             Colour_table_name_only____ |
++----------------------------------------------------+
+\end{verbatim}
+
+{\bf set\_hard\_device} resets the hard copy device and loads a colour table.
+Any PGPLOT supported graphics device may be used. If you do not know what 
+colour table to use, try {\sf DEFAULT} or {\sf GREY}.
+
+When invoking this item for the first time, the CGS4DR system will report
+that is is {\sf Loading CGS4\_EXE:P4 into xxxxP4}. This is normal and loads
+a cached version of the plotting task for hardcopy.
+
+\subsubsection{set\_current\_integration\_display}
+\label{set_current_integration_display}
+\begin{verbatim}
++ Set current integration display  -----------------------------------------+
+|Display_type                     IMAGE SURFACE GRAPH OVERGRAPH [HISTOGRAM] |
+|Display_port                     0 [1] 2 3 4 5 6                           |
+|Data_array                       [DATA]  ERRORS  QUALITY                   |
+|Show_error_bars                   TRUE  [FALSE]                            |
+|Display_whole_area               [TRUE]  FALSE                             |
+|__Xstart_if_not_whole                     1                                |
+|__Xend_if_not_whole                      62                                |
+|__Ystart_if_not_whole                     1                                |
+|__Yend_if_not_whole                      58                                |
+|Autoscale                        [TRUE]  FALSE                             |
+|__Low_if_not_autoscale           0                                         |
+|__High_if_not_autoscale          1000                                      |
+|Direction_of_cut                 [HORIZONTAL] VERTICAL                     |
+|Start_of_cut_summation                   20                                |
+|End_of_cut_summation                     40                                |
+|Number_of_bins_(histogram_only)          50                                |
++---------------------------------------------------------------------------+
+\end{verbatim}
+
+{\bf set\_current\_integration\_display} corresponds with the menu item 
+{\sf display\_each\_integration} in the {\sf set\_reduction\_sequence} menu. 
+If {\sf display\_each\_integration} is set to {\sf YES} and the data
+is reduced by integration rather than observation, the current integration
+(held in RIDIR) is displayed before it is added to the reduced observation
+file according to the options set above. These are:
+
+{\sf display\_type} is the type of display required: an {\sf IMAGE} plot,
+a {\sf SURFACE} plot, {\sf 1-D GRAPH} plot, overlayed graph plot ({\sf 
+OVERGRAPH}), or {\sf HISTOGRAM} (see \S 
+\ref{display_modes_and_the_p4_plotting_task}).
+
+{\sf display\_port} is the position of the plot on the display surface:
+0 -- whole screen, 1 -- top left quarter, 2 -- top right quarter,
+3 -- bottom left quarter, 4 -- bottom right quarter, 5 -- top half, 6 
+-- bottom half.
+
+{\sf data\_array} is the data array to be plotted. Normally set to {\sf 
+DATA}, but allows the error or data quality to be displayed instead.
+
+{\sf show\_error\_bars} --- Should error bars be shown on a GRAPH or 
+SURFACE plot ?
+
+{\sf display\_whole\_area} --- Should the whole array be displayed ?
+
+{\sf \_\_xstart\_if\_not\_whole} is the smallest X value to be displayed,
+if {\sf display\_whole\_area} is {\sf FALSE}.
+
+{\sf \_\_xend\_if\_not\_whole} is the largest X value to be displayed, 
+if {\sf display\_whole\_area} is {\sf FALSE}.
+
+{\sf \_\_ystart\_if\_not\_whole} is the smallest Y value to be displayed,
+if {\sf display\_whole\_area} is {\sf FALSE}.
+
+{\sf \_\_yend\_if\_not\_whole} is the largest Y value to be displayed,
+if {\sf display\_whole\_area} is {\sf FALSE}.
+
+{\sf autoscale} --- Should the display be scaled between the maximum and 
+minimum data values ?
+
+{\sf \_\_low\_if\_not\_autoscale} is the minimum data value to scale the plot,
+if {\sf autoscale} is {\sf FALSE}.
+
+{\sf \_\_high\_if\_not\_autoscale} is the maximum data value to scale the plot,
+if {\sf autoscale} is {\sf FALSE}.
+
+{\sf direction\_of\_cut} applies to a GRAPH plot only and determines if the 
+cut is made along the {\sf HORIZONTAL} ({\em i.e.} the X-direction; cf. Figaro
+EXTRACT) or along the {\sf VERTICAL} ({\em i.e.} the Y-direction; cf. Figaro 
+YSTRACT). 
+
+{\sf start\_of\_cut\_summation} is the lowest row (cut = {\sf HORIZONTAL}) 
+or column (cut = {\sf VERTICAL}) to be extracted for the display.
+
+{\sf end\_of\_cut\_summation} is the highest row (cut = {\sf HORIZONTAL}) 
+or column (cut = {\sf VERTICAL}) to be extracted for the display.
+
+{\sf number\_of\_bins\_(histogram\_only)} is the number of bins into which 
+the data are to be divided for a {\sf HISTOGRAM} plot. The default smoothing
+is zero.
+
+A full description of the types of display possible is given in 
+\S \ref{display_modes_and_the_p4_plotting_task}.
+
+\subsubsection{set\_observation\_display\_{\em x}}
+\label{set_observation_display_x}
+
+{\bf set\_observation\_display\_{\em x}}, where {\em x} is an integer from 
+1 -- 4, corresponds to the menu item 
+{\sf display\_coadded\_observation\_{\em x}} in 
+{\sf set\_reduction\_sequence} and tailors the display of 
+observations during the reduction sequence. The menu items are identical to 
+those in \S \ref{set_current_integration_display}.
+
+\subsubsection{set\_group\_display\_{\em x}}
+\label{set_group_display_x}
+
+{\bf set\_group\_display\_{\em x}}, where {\em x} is an integer from 1 -- 2,
+corresponds to the menu item {\sf display\_coadded\_group\_{\em x}} in 
+{\sf set\_reduction\_sequence} and tailors the display of groups
+during the reduction sequence. The menu items are identical to those in 
+\S \ref{set_current_integration_display}.
+
+\subsubsection{logical\_names}
+\label{logical_names}
+\begin{verbatim}
++ Define or re-define logical names ------------------------------+
+|Logical_name                     Logical_name_to_be_defined___   |
+|Equivalence_name                 Equivalence_name_____________   |
+|Table                            PROCESS [JOB] GROUP SYSTEM      |
+|Mode                             [DEFINE] DEASSIGN AFFIX         |
++-----------------------------------------------------------------+
+\end{verbatim}
+
+{\bf logical\_names} allows the user to manipulate logical name tables to
+facilitate the reduction of data on different nights. Any logical name can
+be defined or re-defined (if suitable privileges are enabled).
+
+{\sf logical\_name} is the logical name to be defined.
+
+{\sf equivalence\_name} is the translation of the desired logical name.
+
+{\sf table} is the logical name table to hold the definition. ADAM tasks
+require the JOB table as a minimum (since they run as subprocesses).
+Specifying GROUP or SYSTEM requires GRPNAM or SYSNAM privileges 
+(or equivalents).
+
+{\sf mode} is the way on which the logical name should be defined. {\sf DEFINE}
+means `define the logical name over-writing any current definition',
+{\sf DEASSIGN} means de-assign the logical name for all equivalence names and
+{\sf AFFIX} means add this definition at the {\em top} of a search path (if one
+exists thereby preserving the other definitions) or define the logical
+name if no other match is found. As an example, one might wish to display a
+previous nights reduced group data, so this item could be used to {\sf AFFIX} a
+definition of {\sf RGDIR} to point to a different directory as well as the 
+current one (see also \S \ref{redefining_logical_names}).
+
+\subsubsection{control\_flags}
+\label{control_flags}
+\begin{verbatim}
++ Data reduction control flags --------------------+
+|Pause_on_entry                     [TRUE]  FALSE  |
+|Pause_on_error                     [TRUE]  FALSE  |
+|X_axis_options                     BCNTS          |
+|Y_axis_options                     BCNTS          |
+|Verbose_output                      TRUE  [FALSE] |
++--------------------------------------------------+
+\end{verbatim}
+
+{\bf control\_flags} is a menu which contains flags to control this
+particular data reduction session.
+
+The appearance of the axis labels in the plots may be altered, and the 
+system can be switched into {\sf verbose mode}, so that a running 
+commentary of the data reduction is given on the screen.
+Verbose mode is useful for beginners, for investigating why calibration 
+observations could or could not be found, and for debugging the software.
+
+There is also an optional {\sf pause\_on\_entry} logical switch which, 
+if {\sf TRUE}, will not start the data reduction system automatically even if 
+the {\sf reduce} menu is entered. This option is provided for users who want 
+to browse through the menus without doing anything at all (or the sticky 
+fingered!). To restart the automatic data reduction either reset the 
+{\sf pause\_on\_entry} flag to {\sf FALSE} or use the 
+{\sf pause\_continue\_reduction} toggle within the {\sf reduce} menu 
+in the usual way.
+
+{\sf pause\_on\_error}  should remain {\sf TRUE} unless you wish
+to leave the data reduction system to run unattended and do not wish to stop 
+when an error occurs (an unusual and risky thing to do).
+
+{\sf x\_axis\_options} and {\sf y\_axis\_options} are global flags that
+control the appearance of graphical output and the code letters are those
+used by the PGPLOT routine PGBOX (see ref. [\ref{Pearson}]). Briefly B and C
+draw the surrounding box, N writes numeric labels under the frame in X and
+to the left of the frame in Y, T draws major tick marks and S draws minor 
+tick marks. A further option, I, places tick marks around the outside of a plot.
+More information is available using the {\sf ?} key after placing the SMS 
+cursor over any item. If hardcopy output has been enabled, these options are
+propagated to the hardcopy output task.
+
+\subsection{The REDUCE Menu}
+\label{the_reduce_menu}
+\begin{verbatim}
++ Data reduction menu ------------------------------------------------------+
+|list_queue               pause_continue_reduction  plot_image              |
+|enter_obs_range          file_observation          plot_graph              |
+|cancel_obs_range         unfile_observation        plot_overgraph          |
+|cancel_all_qentries      clear_port                plot_histogram          |
+|list_index               print_hardcopy            plot_surface            |
+|setup                    manual_operations         graphics                |
++---------------------------------------------------------------------------+
+\end{verbatim}
+
+\subsubsection{list\_queue}
+\label{list_queue}
+
+{\bf list\_queue} will list the current contents of the data reduction 
+queue. The next command to be obeyed is at the {\em top} of this queue.
+
+\subsubsection{enter\_obs\_range}
+\label{enter_obs_range}
+\begin{verbatim}
++ Queue range of observations --------------+
+|Observation_root         Oyymmdd_          |
+|First_observation        1                 |
+|Last_observation         1                 |
+|Command                  REDUCE END [BOTH] |
+|Queue_position           HEAD [TAIL]       |
++-------------------------------------------+
+\end{verbatim}
+
+{\bf enter\_obs\_range} is intended to be used to enter pairs of
+{\sf REDUCE Oyymmdd\_{\em x}} and {\sf END Oyymmdd\_{\em x}} 
+commands into the data reduction queue where {\em x} is the 
+{\sf first\_observation} to the {\sf last\_observation}. The facility is far 
+more general than that, however, as it will deal with integration files 
+and can enter either a {\sf REDUCE} command or an {\sf END} command or both
+into the queue. To specify a single observation (or integration) 
+the {\sf first\_observation} and {\sf last\_observation} must be the same.
+
+For observations, {\sf command} should be set to {\sf BOTH} for normal 
+reduction or {\sf END} to file (or re-file) an observation in the index file.
+
+For integrations, {\sf observation\_root} should include the observation
+number ({\em e.g.} {\sf I920530\_5\_}) and {\sf first\_observation} and
+{\sf last\_observation} should be the integration numbers you want to
+reduce. Note that, in this case, {\sf command} {\em must} be set to 
+{\sf REDUCE} only!
+
+There is a kludge in the way that commands are entered into the head
+and tail of the queue. Commands entered at the TAIL are usually OK but those
+entered at the HEAD have `fudged' time-stamps which the index file uses to
+sort the queue out into an executable order. What it really comes down to
+is this: if you enter a command at the HEAD of the queue and then enter 
+{\em another} command at the HEAD of the queue, the second (and subsequent)
+queue commands are placed at the bottom of the HEAD! In normal practice,
+this should not cause many problems but if you rely on frames being queued
+manually at the HEAD of the queue, you may encounter some unusual problems.
+It is usual practice to add commands to the TAIL of the queue. You should
+always check the queue before resuming reduction.
+
+\subsubsection{cancel\_obs\_range}
+\label{cancel_obs_range}
+\begin{verbatim}
++ Cancel range of observations -------------+
+|Observation_root         Oyymmdd_          |
+|First_observation        1                 |
+|Last_observation         1                 |
+|Command                  REDUCE END [BOTH] |
++-------------------------------------------+
+\end{verbatim}
+
+{\bf cancel\_obs\_range} reverses the effect of an 
+{\sf enter\_obs\_range} by removing a whole range of commands from the 
+queue. It is equivalent to several {\sf cancel\_observation} commands
+but can also remove just {\sf REDUCE} commands, {\sf END} commands or
+both and will handle integration files. A single observation or integration
+may be cancelled by setting {\sf first\_observation} and {\sf last\_observation}
+to the same value.
+
+\subsubsection{cancel\_all\_qentries}
+\label{cancel_all_qentries}
+
+{\bf cancel\_all\_qentries} is a toggle switch which enables the user to
+cancel {\em all} commands in the data reduction queue with a single
+keystroke. Care should obviously be used with this option as there is no 
+prompt to confirm your action; the software just deletes the queue contents.
+
+\subsubsection{list\_index}
+\label{list_index}
+\begin{verbatim}
++ List observation index file -------------------------------+
+|Index_file_name                     CGS4_yymmdd.INDEX       |
+|Output_format                       [1] 2                   |
+|Output_destination                  [SCREEN] FILE PRINTER   |
+|Output_file_name                    CGS4_yymmdd_INDEX.LIS   |
++------------------------------------------------------------+
+\end{verbatim}
+
+{\bf list\_index} lists or prints the contents of a specified index 
+file, and may be used to keep track of the observations which have been 
+reduced.
+
+{\sf index\_file\_name} specifies the index file to be listed.
+
+{\sf output\_format} displays the information in one of two ways. Both
+output the observation name, quality, type and (unique) time. Method 1 adds
+information on the exposure time, grating, slit, CVF and filter whereas method 
+2 adds information on the mode, group number, row, column and oversampling 
+factor, CVFindex value and airmass. Both methods use CGS4 filenames for object 
+lists; a list of astronomical names can be obtained from the menu item 
+{\sf cgs4list}.
+
+{\sf output\_destination} allows the output to be listed to the screen,
+a file or a printer. 
+
+{\sf output\_file\_name} defines the name of the output file if  {\sf FILE}
+is chosen for {\sf Output\_destination}.
+
+\subsubsection{setup}
+\label{setup}
+
+{\bf setup} gives access to the {\sf setup} menu, described 
+earlier (see \S \ref{the_setup_menu}). Some parameters, such as the data 
+reduction sequence and the various displays, may be changed while data 
+reduction is in progress and the new parameters will take effect when 
+the reduction of the next observation starts. Other parameters may not be
+changed whilst data reduction is in progress and generate the message
+{\sf `entry to this parameter list not permitted'}. Such items can be
+modified if the data reduction is in the {\sf `PAUSED'} or {\sf `STOPPED'}
+state.
+
+\subsubsection{pause\_continue\_reduction}
+\label{pause_continue_reduction}
+
+{\bf pause\_continue\_reduction} is a toggle so that if the data reduction 
+is running, this item may be used to pause it. Usually the reduction will wait 
+until the next convenient point to pause. If the data reduction is 
+paused either because {\sf pause\_continue\_reduction} has been selected, 
+or because an error has occurred, this item will restart it.
+ 
+\subsubsection{file\_observation}
+\label{file_observation}
+\begin{verbatim}
++ File named observation ... -----------------+
+|standard                                     |
+|calibration                                  |
+|something_else                               |
++---------------------------------------------+
+\end{verbatim}
+
+{\bf file\_observation} is used to enter the details of an observation 
+into the observation index file. There are three options:
+
+\begin{verbatim}
++ ... as a STANDARD ------------------------------------+
+|Observation_or_group               RG/ROyymmdd_gggg    |
+|Effective_temperature              #                   |
+|Reference_wavelength               #                   |
+|Start_row                          1                   |
+|End_row                            58                  |
+|Pixel_operation                    [AND]  OR           |
+|Mend_bad_pixels                     YES  [NO]          |
++-------------------------------------------------------+
+\end{verbatim}
+
+Filing as a {\sf STANDARD} converts an RG or RO file to an ST file in RGDIR.
+The standard is recorded in the INDEX file and is created by dividing 
+by a normalised black body (see \S \ref{ratioing_by_a_standard_source}).
+
+{\sf effective\_temperature} is set according to the spectral type of the
+standard (see ref. [\ref{Allen}]) which for G stars is around 5000 K.
+It is used to generate a black body spectrum at this temperature.
+
+{\sf reference\_wavelength} is the wavelength at which the black body is
+normalised. It is usually set to the central wavelength of your spectrum
+(in microns) but can be anywhere in the range 1.0 -- 10.0 $\mu$m. 
+
+{\sf pixel\_operation} and {\sf mend\_bad\_pixels} specifies how bad pixels
+are to be dealt with. Extracting a 1-D spectrum can produce unreliable
+results if a bad pixel occurs within the extracted region. These options
+allow the data to be interpolated across such regions but it is only
+recommended when a small number of rows are used.
+
+At the first invocation of this item, both {\sf effective\_temperature}
+and {\sf reference\_wavelength} are be set to unknown values ({\sf \#}).
+Subsequent calls to this filing routine will produce the last value recorded.
+
+\begin{verbatim}
++ ... as a CALIBRATION ----------------------------+
+|Observation                        Oyymmdd_oooo   |
+|Change_label                       [YES] NO       |
+|New_label                          Wavelength     |
+|New_units                          \gmm           |
++--------------------------------------------------+
+\end{verbatim}
+
+Filing as a {\sf CALIBR} converts the given file to a CA file in RODIR.
+The calibration is recorded in the INDEX file by converting the type to 
+{\sf CALIBR} and cannot be used for any other purpose. The user may change 
+the axis label and units but the defaults, as shown above, are 
+{\sf Wavelength} and {\sf $\mu$m} (written in PGPLOT notation although 
+just ASCII test will do). 
+
+\begin{verbatim}
++ ... as a BIAS DARK FLAT OBJECT SKY or ARC --------------+
+|Observation                              Oyymmdd_oooo    |
++---------------------------------------------------------+
+\end{verbatim}
+
+Filing as {\sf SOMETHING\_ELSE} will enter the name of a {\sf BIAS}, 
+{\sf DARK}, {\sf FLAT}, {\sf ARC} or {\sf OBJECT} frame into the index 
+file (depending on the observation type) but this is usually done 
+automatically. Rather, this facility may be used to reverse the effect of 
+an {\sf unfile\_observation}.
+
+\subsubsection{unfile\_observation}
+\label{unfile_observation}
+\begin{verbatim}
++ Unfile named observation ...  -----+
+|set_index_quality_bad               |
+|restore_calibration                 |
++------------------------------------+
+\end{verbatim}
+
+{\bf unfile\_observation} allows files to be manipulated within the index file.
+
+\begin{verbatim}
++ ... by setting a bad quality in the index file ---+
+|Observation_or_group          RG/ROyymmdd_gggg     |
++---------------------------------------------------+
+\end{verbatim}
+
+{\bf set\_index\_quality\_bad} sets a flag in the index file indicating that 
+the observation is {\sf bad} and should not be used. It is used to indicate to
+the data reduction system that there are some calibration frames that the
+user thinks are not suitable and, hence, forces the DR software to ignore them.
+
+\begin{verbatim}
++ ... by restoring an observation from calibration -----+
+|Observation_file         Oyymmdd_oooo                  |
++-------------------------------------------------------+
+\end{verbatim}
+
+{\bf restore\_calibration} converts an observation which has been used 
+for wavelength calibration back to normal by restoring the type field from
+{\sf CALIBR} to its previous value in the index file.
+
+\subsubsection{clear\_port}
+\begin{verbatim}
++ Clear a display port --------------------+
+|Display_port             [0] 1 2 3 4 5 6  |
++------------------------------------------+
+\end{verbatim}
+
+{\bf clear\_port} clears the specified display port.
+
+\subsubsection{print\_hardcopy}
+\begin{verbatim}
++ Print to a hardcopy device ------------------------------------+
+|Print_command   PRINT/DELETE/NONOTIFY                           |
+|Graphics_file   Name_of_graphics_file_______                    |
+|Queue_name      Name_of_print_queue_________                    |
++----------------------------------------------------------------+
+\end{verbatim}
+
+{\bf print\_hardcopy} prints a specified file on the specified queue 
+according to the given command. This is a general hardcopy printing 
+facility to be used to print files created by using the HARD option within 
+the {\sf plot\_{\em something}} menus.
+
+{\sf print\_command} is the print command to use to print the file. It 
+may contain any qualifiers {\em except} {\sf /QUEUE={\em queue\_name}} 
+as this is dealt with separately. 
+
+{\sf Graphics\_file} is the name of the output file to be printed ({\em e.g.}
+{\sf GKS\_72.PS} for PostScript etc).
+
+{\sf queue\_name} is the name of the output queue where the file will be 
+spooled to. 
+
+Note that for PostScript, Canon and LN03 output, the system will set suitable
+defaults so that the end user should not need to edit the parameter options.
+The queue name may be modified by your system manager to suit your site.
+
+\subsubsection{manual\_operations}
+\label{manual_operations}
+
+{\bf manual\_operations} offers a wide range of options and is described in \S 
+\ref{the_manual_operations_menu}.
+
+\subsubsection{plot\_image}
+\label{plot_image}
+\begin{verbatim}
++ Display data as an IMAGE --------------------------------------+
+|Data                             Name_of_data_structure________ |
+|Display_port                     [0] 1 2 3 4 5 6                |
+|Data_array                       [DATA] ERRORS QUALITY          |
+|Soft_or_hard_copy                [SOFT] HARD                    |
+|Display_whole_area               [TRUE] FALSE                   |
+|__Xstart_if_not_whole            1                              |
+|__Xend_if_not_whole              62                             |
+|__Ystart_if_not_whole            1                              |
+|__Yend_if_not_whole              58                             |
+|Autoscale                        [TRUE] FALSE                   |
+|__Low_if_not_autoscale           0.0                            |
+|__High_if_not_autoscale          1000.0                         |
++----------------------------------------------------------------+
+\end{verbatim}
+
+{\bf plot\_image} performs an image display of the given data structure.
+
+{\sf data} is the name of the DSA data structure to be plotted. Normally,
+this is a reduced observation or group but may be a specific structure
+within a DSA file. 
+
+{\sf soft\_or\_hard\_copy} is a switch that changes between softcopy
+and hardcopy devices. If no hardcopy device has been specified the
+CGS4DR reports that fact to the user and chooses softcopy instead. 
+Hardcopy can be printed off using the {\sf print\_hardcopy} option.
+For further information on this option see \S 
+\ref{hardcopy_printing_made_simple}.
+
+The other menu items are the same as those described
+in \S \ref{set_current_integration_display}.
+
+\subsubsection{plot\_graph}
+\label{plot_graph}
+\begin{verbatim}
++ Display data as a GRAPH ---------------------------------------+
+|Data                             Name_of_data_structure________ |
+|Display_port                     [0] 1 2 3 4 5 6                |
+|Data_array                       [DATA] ERRORS QUALITY          |
+|Show_error_bars                  [TRUE] FALSE                   |
+|Direction_of_cut                 [HORIZONTAL] VERTICAL          |
+|Start_of_cut_summation           20                             |
+|End_of_cut_summation             40                             |
+|Soft_or_hard_copy                [SOFT] HARD                    |
+|Display_whole_area               [TRUE] FALSE                   |
+|__Xstart_if_not_whole            1                              |
+|__Xend_if_not_whole              62                             |
+|__Ystart_if_not_whole            1                              |
+|__Yend_if_not_whole              58                             |
+|Autoscale                        [TRUE] FALSE                   |
+|__Low_if_not_autoscale           0.0                            |
+|__High_if_not_autoscale          1000.0                         |
++----------------------------------------------------------------+
+\end{verbatim}
+
+{\bf plot\_graph} performs a graphical display of the given data structure.
+
+{\sf data} is the name of the DSA data structure to be plotted. Normally,
+this is a reduced observation or group but may be a specific structure
+within a DSA file. The other menu items are the same as those described
+in \S \ref{set_current_integration_display} and \S \ref{plot_image}.
+
+Note that the direction of the cut generates either a {\em spectrum} 
+{\em i.e.} a cut in the {\sf HORIZONTAL} along the X direction or a
+{\em profile} {\em i.e } a cut in the {\sf VERTICAL} along the Y direction. 
+In either case a start and end must be given to the number of rows or columns 
+to include in the extraction. For a cut in X, {\em rows} {\sf start} to 
+{\sf end} are extracted and summed whereas for a cut in the Y direction, 
+{\em columns} {\sf start} to {\sf end} are extracted and summed to make the 
+graph. Before the display is complete the cut is averaged by dividing by the
+number of rows or columns. 
+
+The abscissa is usually labelled with `A/D numbers' or `A/D numbers per 
+exposure' whereas the ordinate is labelled with `Detector columns' or
+`Detector rows'. If the data has a wavelength scale, the ordinate label
+will change to `Wavelength (microns)'.
+
+\subsubsection{plot\_overgraph}
+\label{plot_overgraph}
+\begin{verbatim}
++ Overlay data to scale of existing GRAPH ----------------------------+
+|Data                      Name_of_data_structure___________          |
+|Display_port              [0] 1 2 3 4 5 6                            |
+|Colour                    BLACK WHITE [RED] ORANGE YELLOW GREEN BLUE |
+|Data_array                [DATA] ERRORS QUALITY                      |
+|Show_error_bars           [TRUE] FALSE                               |
+|Direction_of_cut          [HORIZONTAL] VERTICAL                      |
+|Start_of_cut_summation    20                                         |
+|End_of_cut_summation      40                                         |
+|Soft_or_hard_copy         [SOFT]  HARD                               |
++---------------------------------------------------------------------+
+\end{verbatim}
+
+{\bf plot\_overgraph} overlays a plot of a specified data frame on
+the same scale as the last graph plotted. The items shown are the same 
+as those on the {\sf plot\_graph} menu except for:
+
+{\sf colour} the colour of the overlay {\sf GRAPH} plot.
+
+\subsubsection{plot\_histogram}
+\label{plot_histogram}
+\begin{verbatim}
++ Display data as a HISTOGRAM ----------------------------------------+
+|Data                             Name_of_data_structure__________    |
+|Display_port                     [0] 1 2 3 4 5 6                     |
+|Data_array                       [DATA] ERRORS QUALITY               |
+|Number_of_bins                   50                                  |
+|Columns                          ODD EVEN [BOTH]                     |
+|Smooth_size                      [0] 3 5 7 9 11 13 15 17 19 21 23 25 |
+|Soft_or_hard_copy                [SOFT] HARD                         |
+|Display_whole_area               [TRUE] FALSE                        |
+|__Xstart_if_not_whole            1                                   |
+|__Xend_if_not_whole              62                                  |
+|__Ystart_if_not_whole            1                                   |
+|__Yend_if_not_whole              58                                  |
+|Autoscale                        [TRUE] FALSE                        |
+|__Low_if_not_autoscale           0.0                                 |
+|__High_if_not_autoscale          1000.0                              |
++---------------------------------------------------------------------+
+\end{verbatim}
+
+{\bf plot\_histogram} performs a histogram display of the given data 
+structure. 
+
+{\sf data} is the name of the DSA data structure to be plotted. Normally,
+this is a reduced observation or group but may be a specific structure
+within a DSA file. The other menu items are the same as those described
+in \S \ref{set_current_integration_display} and \S \ref{plot_image}.
+
+\subsubsection{plot\_surface}
+\label{plot_surface}
+\begin{verbatim}
++ Display data as a SURFACE -------------------------------------+
+|Data                             Name_of_data_structure________ |
+|Display_port                     [0] 1 2 3 4 5 6                |
+|Data_array                       [DATA]  ERRORS  QUALITY        |
+|Show_error_bars                   TRUE  [FALSE]                 |
+|Soft_or_hard_copy                [SOFT]  HARD                   |
+|Display_whole_area               [TRUE]  FALSE                  |
+|__Xstart_if_not_whole            1                              |
+|__Xend_if_not_whole              62                             |
+|__Ystart_if_not_whole            1                              |
+|__Yend_if_not_whole              58                             |
+|Autoscale                        [TRUE]  FALSE                  |
+|__Low_if_not_autoscale           0.0                            |
+|__High_if_not_autoscale          1000.0                         |
++----------------------------------------------------------------+
+\end{verbatim}
+
+{\bf plot\_surface} performs a surface display of the given data structure.
+
+{\sf data} is the name of the DSA data structure to be plotted. Normally,
+this is a reduced observation or group but may be a specific structure
+within a DSA file. The other menu items are the same as those described
+in \S \ref{set_current_integration_display} and \S \ref{plot_image}.
+
+\subsubsection{graphics}
+\label{graphics}
+
+{\bf graphics} gives access to the {\sf graphics} menu (see \S 
+\ref{the_graphics_menu}).
+
+\subsection{The ENGINEER Menu}
+\label{the_engineer_menu}
+\begin{verbatim}
++ Engineering menu ----------------------------------------------------+
+|enter_integration       add_integration        enter_end_observation  |
+|cancel_integration      subtract_integration   cancel_end_observation |
+|create_observation      log_comment            observing_efficiency   |
+|graphics                arithmetic             bad_pixel_masks        |
+|software_tests                                                        |
++----------------------------------------------------------------------+
+\end{verbatim}
+
+The engineering menu is, {\em ipso facto}, provided for engineering 
+purposes but the end user may find several useful functions and utilities
+contained therein. A log file can be opened when entering this menu if the 
+ICL parameter {\sf log\_file\_level} is greater than zero (you can set this
+from the {\sf ICL$>$} prompt). By default, no log file is opened unless 
+the user ID is CGS4ENG or you attempt to use the {\sf two\_column\_line\_fit}
+or {\sf two\_row\_line\_fit} options.
+
+\subsubsection{enter\_integration}
+\label{enter_integration}
+\begin{verbatim}
++ Enter integration to reduction queue -----+
+|Integration_file         Iyymmdd_oooo_iiii |
+|Queue_position           HEAD [TAIL]       |
++-------------------------------------------+
+\end{verbatim}
+
+{\bf enter\_integration} enters a command onto the data reduction queue
+of the form {\sf reduce Iyymmdd\_oooo\_iiii} requesting that a specified 
+integration be reduced. The command may be placed at the {\sf HEAD} or
+{\sf TAIL} of the queue. This item is only used if it is necessary to examine 
+each integration within an observation individually ({\em i.e.} 
+for engineering purposes).
+
+\subsubsection{cancel\_integration}
+\label{cancel_integration}
+\begin{verbatim}
++ Remove integration from reduction queue -----+
+|Integration_file         Iyymmdd_oooo_iiii    |
++----------------------------------------------+
+\end{verbatim}
+
+{\bf cancel\_integration} removes a {\sf REDUCE Iyymmdd\_oooo\_iiii} command
+from the data reduction queue. The command could have been entered manually 
+or by the data acquisition system.
+
+\subsubsection{create\_observation}
+\begin{verbatim}
++ Create reduced observation file -----------------------------+
+|Observation_file         Oyymmdd_oooo                         |
+|Wavelength_calibrate     [YES] NO ASK                         |
+|Calibration_method       [ESTIMATED] CALIBRATED               |
+|Calibration_search_mode  FORWARDS BACKWARDS [BOTH] SPECIFIED  |
+|Specified_calibration    Name_of_calibration_observation__    |
++--------------------------------------------------------------+
+\end{verbatim}
+
+{\bf create\_observation} is used to create a new, blank, observation 
+file. A new observation file should be created before re-reducing 
+a set of integrations belonging to it. If a new observation file is 
+not created, then the system will detect 
+that these integrations have already been added to the observation, and 
+will not add them again even when they are re-reduced.
+
+{\sf wavelength\_calibrate}  and {\sf calibration\_method} fix the
+wavelength scale in the new reduced observation file.
+
+{\sf calibration\_method} is the search path via which calibration frames
+should be chosen.
+
+{\sf specified\_calibration} only need be specified if 
+{\sf calibration\_method} is set to {\sf SPECIFIED}.
+
+\subsubsection{graphics}
+\label{graphics_2}
+
+{\bf graphics} provides a wide variety of options and is described in \S 
+\ref{the_graphics_menu}.
+
+\subsubsection{software\_tests}
+\label{software_tests}
+
+{\bf software\_tests} provides a variety of options and is described in \S 
+\ref{the_software_tests_menu}.
+
+\subsubsection{add\_integration}
+\begin{verbatim}
++ Add integration to observation ------------+
+|Integration_file         Iyymmdd_oooo_iiii  |
++--------------------------------------------+
+\end{verbatim}
+
+{\bf add\_integration} adds an integration to its parent observation.
+
+\subsubsection{subtract\_integration}
+\begin{verbatim}
++ Subtract integration from observation -----+
+|Integration_file         Iyymmdd_oooo_iiii  |
++--------------------------------------------+
+\end{verbatim}
+
+{\bf subtract\_integration} removes a specified integration from its
+parent observation.
+
+\subsubsection{log\_comment}
+\label{log_comment}
+\begin{verbatim}
++ Write comment to log file --------------------------------------------+
+|Comment                       Comment_to_write_into_log_file___        |
++-----------------------------------------------------------------------+
+\end{verbatim}
+
+{\bf log\_comment} writes a comment to the engineering log file. An error
+will be reported if no log file is open.
+
+\subsubsection{arithmetic}
+\label{arithmetic}
+
+{\bf arithmetic} provides a limited variety of options and is described in \S 
+\ref{arithmetic_1}.
+
+\subsubsection{enter\_end\_observation}
+\label{enter_end_observation}
+\begin{verbatim}
++ Enter "end of observation" into queue ----+
+|Observation_file         Oyymmdd_oooo      |
+|Queue_position           HEAD [TAIL]       |
++-------------------------------------------+
+\end{verbatim}
+
+{\bf enter\_end\_observation} enters a command into the data reduction 
+queue of the form {\sf END Oyymmdd\_oooo} indicating that a specified 
+observation has been completed. There are two common uses for this command:
+\begin{enumerate}
+\item After a series of {\sf enter\_integration} commands, to indicate 
+that the last integration has been reduced.
+\item When reducing a group, when an observation has been 
+reduced successfully and you would like to add it to the group
+or file it.
+\end{enumerate}
+
+\subsubsection{cancel\_end\_observation}
+\label{cancel_end_observation}
+\begin{verbatim}
++ Remove "end of observation" from queue ----+
+|Observation_file         Oyymmdd_oooo       |
++--------------------------------------------+
+\end{verbatim}
+
+{\bf cancel\_end\_observation} removes a {\sf END Oyymmdd\_oooo} command,
+entered either manually or by the data acquisition system, from the data 
+reduction queue.
+
+\subsubsection{observing\_efficiency}
+\begin{verbatim}
++ Determine observing efficiency ----------+
+|Observation_file         ROyymmdd_oooo    |
++------------------------------------------+
+\end{verbatim}
+
+{\bf observing\_efficiency} determines the observing efficiency for a 
+given data set.
+The figure quoted is the percentage of the time elapsed while obtaining
+the data which was actually spent integrating on the source but it has been
+known to report the wrong result.
+
+\subsubsection{bad\_pixel\_masks}
+\label{bpm}
+
+{\bf bad\_pixel\_masks} provides a wide variety of options and is described 
+in \S \ref{the_bad_pixel_masks_menu}.
+
+\subsection{The MANUAL\_OPERATIONS Menu}
+\label{the_manual_operations_menu}
+\begin{verbatim}
++ Manual operations menu --------------------------------------------------+
+|reduce_group             cgs4list                 extract_spectrum        |
+|wavelength_calibrate     flux_calibrate           deripple_spectrum       |
+|subtract_pair            divide_by_standard       examine_structure       |
+|subtract_observation     model_black_body         extracted_area_line_fit |
+|add_observation          mend_bad_pixels          two_row_line_fit        |
+|clean_observation        bad_pixel_masks          two_column_line_fit     |
+|normalise_observation    arithmetic               enter_end_group         |
+|graphics                 -                        cancel_end_group        |
++--------------------------------------------------------------------------+
+\end{verbatim}
+
+Manual operations provides a wide variety of functions which can be applied
+to specified observations, integrations or groups. Rather obviously, input 
+files are named {\sf observation\_file} or similar and output files are labelled
+{\sf output\_observation} or similar within the menus {\em i.e.} most
+items are self-explanatory. As a general rule, files in {\sf manual\_operations}
+do not have to be specified in full, just the filename will do, unless
+the SMS parameter field contains the string 
+{\sf directory:filename\_\_\_\_}.
+
+\subsubsection{reduce\_group}
+\label{reduce_group}
+\begin{verbatim}
++ reduce or re-reduce a group ------------------------------------------+
+|Group_file                               RGyymmdd_gggg                 |
+|Start_observation                        1                             |
+|End_observation                          1                             |
+|Configuration                            [CURRENT] SPECIFIED NEWMASK   |
+|Spec_config_or_mask                      Name_of_config_or_mask_only__ |
+|Reset_after_config                       YES [NO]                      |
++-----------------------------------------------------------------------+
+\end{verbatim}
+
+{\bf reduce\_group} allows a user to enter commands to reduce an entire group
+all in one go.  If the group has not been reduced before, only the 
+{\sf group\_file} and {\sf start\_observation} and {\sf end\_observation} 
+parameters need to be specified as the rest are ignored. 
+
+{\sf group\_file} is the name of the group to reduce.
+
+{\sf start\_observation} is the beginning observation which is normally the
+same start number as the group number unless the user wishes to exclude
+certain files at the start of the reduction.
+
+{\sf end\_observation} is the final observation to be included in the
+group. Any observation with a different FITS GRPNUM  will be ignored.
+
+{\sf configuration}  is used when re-reducing data. The current configuration
+is the default but the user can select a pre-determined configuration to be
+restored or just a new bad pixel mask to re-reduce the data with.
+
+{\sf spec\_config\_or\_mask} is a specified  configuration or bad pixel mask
+with which to re-reduce the data.
+
+{\sf reset\_after\_config} allows the user the option of saving the current
+configuration before setting a new one and then restoring the current
+configuration after the re-reduction has taken place.
+Note that for re-reduction, the original reduced group or first reduced
+observation is scanned to obtain a {\sf BIAS}, {\sf DARK} and {\sf FLAT} 
+and these are re-reduced along with the group commands. Users should examine the data
+reduction queue after selecting this option to make sure the reduction 
+commands are sensible.
+
+\subsubsection{wavelength\_calibrate}
+\label{wavelength_calibrate}
+\begin{verbatim}
++ Wavelength calibrate a reduced observation -------+
+|Observation           ROyymmd_oooo___              |
+|Ystart                20                           |
+|Yend                  40                           |
+|Soft_or_hard_copy     SOFT HARD [BOTH]             |
++---------------------------------------------------+
+\end{verbatim}
+
+{\bf wavelength\_calibrate} calibrates a given reduced observation using the
+Figaro ARC function (see \S \ref{wavelength_calibration}). The input file
+{\em must be} a reduced observation and a spectrum is extracted from
+this frame.
+
+{\sf ystart} is the start row to begin the extraction.
+
+{\sf yend} is the end row to finish the extraction.
+
+{\sf soft\_or\_hard\_copy} defines to the figaro monolith whether or
+not soft or hard copy output (or both) has been selected. The softcopy
+device would, normally, be the same device as used by the CGS4DR P4 plotting
+task and is used to identify lines using the cursor. The hardcopy option
+(which should {\em not} be used alone) allows hardcopy of the line fits
+to be generated.
+
+Note that CGS4 specific ARC lists are held in the CGS4\_ARCLINES:*.ARC
+files and, if these lists are required, the Figaro ARC function {\sf ARctype}
+parameter response must be specified as {\em e.g.} 
+{\sf CGS4\_ARCLINES:CGS4\_ARGON}. These lines are listed in Angstroms but
+the procedure will prompt for (optional) conversion to microns.
+
+To complete this action you will need to press the {\sf SPACE BAR}. This
+causes a screen refresh and will be automated in the future.
+
+\subsubsection{subtract\_pair}
+\begin{verbatim}
++ Subtract OBJECT/SKY pair from group ----+
+|Object_observation          Oyymmdd_oooo |
+|Sky_observation             Oyymmdd_oooo |
++-----------------------------------------+
+\end{verbatim}
+
+{\bf subtract\_pair} removes a pair of {\sf OBJECT} and {\sf SKY}
+observations from their parent group. The {\sf SKY} observation is subtracted 
+from the {\sf OBJECT} observation, and the result is subtracted from the group.
+
+\subsubsection{subtract\_observation}
+\begin{verbatim}
++ Subtract observation from group -----+
+|Observation_file         Oyymmdd_oooo |
++--------------------------------------+
+\end{verbatim}
+
+{\bf subtract\_observation} removes a specified {\sf OBJECT} or {\sf SKY} 
+observation from its parent group.
+
+\subsubsection{add\_observation}
+\begin{verbatim}
++ Add observation to group --------------------+
+|Observation_file         Oyymmdd_oooo         |
+|Add_in_pairs             [TRUE]  FALSE        |
+|Variance_weighting        TRUE  [FALSE]       |
+|Error_propagation        FROM_INT [FROM_OBS]  |
+|Sky_weighting_factor     1.000000000          |
++----------------------------------------------+
+\end{verbatim}
+
+{\bf add\_observation} adds an individual {\sf OBJECT} or {\sf SKY} observation
+to its parent group. Parameters in this menu are described in \S 
+\ref{normal_sky_subtraction_options}.
+
+\subsubsection{clean\_observation}
+\begin{verbatim}
++ Clean a named observation --------------+
+|Observation_file         ROyymmdd_oooo   |
+|min_signal_to_noise      100.0000000     |
+|min_data_value           100.0000000     |
++-----------------------------------------+
+\end{verbatim}
+
+{\bf clean\_observation} sets to {\sf bad} the data quality of any pixels
+in a data frame whose signal or signal-to-noise ratio falls below a
+specified threshold.
+
+{\sf min\_signal\_to\_noise} is the minimum S/N valid within the cleaned
+observation.
+
+{\sf min\_data\_value} is the minimum valid data value in the cleaned frame.
+
+\subsubsection{normalise\_observation}
+\begin{verbatim}
++ Normalise a named observation ---------------------------------------+
+|Input_observation_file   ROyymmdd_oooo                                |
+|Output_observation_file  ROyymmdd_oooo                                |
+|Normalisation_method     [POLYFIT] SMOOTH                             |
+|Polynomial_order         1 2 [3] 4 5 6 7                              |
+|Smooth_box_size          1 3 [5] 7 9 11 13 15 17 19 21 23 25 27 29 31 |
++----------------------------------------------------------------------+
+\end{verbatim}
+
+{\bf normalise\_observation} normalises an observation as if it were a 
+flat field.
+
+These parameters and the methods of normalisation are described in
+\S \ref{ff_normalisation_parameters}.
+
+\subsubsection{graphics}
+
+{\bf graphics} is a menu of graphical functions.
+These are described in \S \ref{the_graphics_menu}.
+
+\subsubsection{cgs4list}
+\label{cgs4list}
+\begin{verbatim}
++ List observations from ODIR files ----------------------------+
+|Filenames                                  ODIR:Oyymmdd_*.DST  |
+|Output_file_name                           CGS4LIST_yymmdd.LIS |
+|Full_132_col_listing                       YES [NO]            |
++---------------------------------------------------------------+
+\end{verbatim}
+
+{\bf cgs4list} interrogates observation FITS headers (stored in ODIR) to
+display objects by (astronomical) name and so forth. If the wild card 
+is selected the image will take some time to run as it first scans {\em all}
+the data before writing in the selected format. This option will load the
+Figaro monolith.
+
+\subsubsection{flux\_calibrate}
+\label{flux_calibrate}
+\begin{verbatim}
++ Flux calibrate a STANDARD divided spectrum -----------------------------+
+|Image                            Name_of_input_image____________         |
+|Reference_flux_or_magnitude      0.0                                     |
+|Ref_flux_or_mag_band             Flux [J] H K L L' M N                   |
+|Input_flux_units                 [mag] W/m2/um W/m2/Hz ergs/s/cm2/um mJy |
+|Output_flux_units                [W/m2/um] W/m2/Hz ergs/s/cm2/um mJy     |
+|Display_port                     [0] 1 2 3 4 5 6                         |
++-------------------------------------------------------------------------+
+\end{verbatim}
+
+{\bf flux\_calibrate} allows a reduced group or observation to be flux
+calibrated using either a known flux or a magnitude in a standard 
+band. The input image is assumed to have been divided by a standard 
+star first and the output file created may be calibrated in a choice 
+of four output units. The output filename is the same as the input
+image name with the characters `\_FC' appended.
+
+Note that this option takes the exposure times of both source and standard
+into account to produce a completely flux calibrated spectrum on output.
+
+\subsubsection{divide\_by\_standard}
+\label{divide_by_standard}
+\begin{verbatim}
++ Divide group by suitable standard -----------------------------------+
+|Observation_or_group             RG/ROyymmdd_gggg                     |
+|Output_file                      Directory:Filename_______            |
+|Standard_search_mode             FORWARDS BACKWARDS [BOTH] SPECIFIED  |
+|Specified_standard               Name_of_standard_group_________      |
++----------------------------------------------------------------------+
+\end{verbatim}
+
+{\bf divide\_by\_standard} allows a reduced observation or group to be divided
+by a standard star frame. The standard may be specified by the user or searched 
+for by the system. 
+
+\subsubsection{model\_black\_body}
+\begin{verbatim}
++ Generate model black-body spectrum -----------------------------+
+|Template_file                    Name_of_template_file__________ |
+|Effective_temperature            5000                            |
+|Reference_wavelength             2.0                             |
+|Reference_flux                   1.0                             |
+|Output_file                      Directory:Filename________      |
++-----------------------------------------------------------------+
+\end{verbatim}
+
+{\bf model\_black\_body} creates a model black body spectrum at a
+specific {\sf reference\_wavelength} and with a given 
+{\sf effective\_temperature} and {\sf reference\_flux}.
+
+{\sf template\_file} is the name of a structure containing a 1-D spectrum
+to provide a wavelength grid (in microns). {\sf template\_file} is located
+via the CGS4\_SEARCH path.
+
+{\sf output\_file} is the file to hold the model black body spectrum and is
+created in the current default directory.
+
+\subsubsection{mend\_bad\_pixels}
+\begin{verbatim}
++ Mend bad pixels by interpolation ----------------------------+
+|Input_file                       Directory:Filename__________ |
+|Output_file                      Directory:Filename__________ |
++--------------------------------------------------------------+
+\end{verbatim}
+
+{\bf mend\_bad\_pixels} replaces bad pixels with interpolated values.
+
+\subsubsection{bad\_pixel\_masks}
+
+{\bf bad\_pixel\_masks} is the bad pixel masks menu described 
+in \S \ref{the_bad_pixel_masks_menu}.
+
+\subsubsection{arithmetic}
+\label{arithmetic_1}
+\begin{verbatim}
++ General arithmetic functions -----------+
+|add                  subtract            |
+|multiply             divide              |
+|and                  or                  |
+|eor                  not                 |
++-----------------------------------------+
+\end{verbatim}
+
+{\bf arithmetic} A menu of simple arithmetic functions for combining 
+data frames. Unfortunately there are no functions for applying arithmetic 
+constants, but Figaro can be used for this.
+
+The {\sf add}, {\sf subtract}, {\sf multiply} and {\sf divide} menus
+all require input and output specified with directories and all have 
+the same generic form:
+
+\begin{verbatim}
++ Add two images with RED4 -------------------------------+
+|Image1                       Directory:Filename_________ |
+|Image2                       Directory:Filename_________ |
+|Output                       Directory:Filename_________ |
+|Treatment_of_errors          NONE [GAUSSIAN]             |
++---------------------------------------------------------+
+\end{verbatim}
+
+The {\sf and}, {\sf or}, {\sf eor} and {\sf not} menus
+all have the same generic form:
+
+\begin{verbatim}
++ AND two images with RED4 -------------------------------------+
+|Image1                       Name_of_first_input_file_only____ |
+|Image2                       Name_of_second_input_file_only___ |
+|Output                       Name_of_output_file_only_________ |
++---------------------------------------------------------------+
+\end{verbatim}
+
+Note that any two images can be logically combined; they do not have to
+be bad pixel masks.
+
+\subsubsection{extract\_spectrum}
+\begin{verbatim}
++ Extract a spectrum from an image ----------------------------------+
+|Image                                 Directory:Filename__________  |
+|Ystart                                1                             |
+|Yend                                  58                            |
+|Spectrum                              Directory:Filename__________  |
+|Display_port                          0 1 2 3 4 [5] 6               |
++--------------------------------------------------------------------+
+\end{verbatim}
+
+{\bf extract\_spectrum} extracts a 1-D spectrum from 2-D data. It is the 
+same as the Figaro EXTRACT function, but handles errors and plots the
+extracted spectrum for potential de-rippling. This is a general, simple
+extraction algorithm and, therefore, requires a directory specification 
+for input and output.
+
+{\sf image} is the input image {\em e.g.} a reduced observation or group.
+
+{\sf ystart} is the start to begin the extraction.
+
+{\sf yend} is the end  to finish the extraction.
+
+{\sf spectrum} is the filename to store the output spectrum.
+
+{\sf display\_port} is the port within which the spectrum will be displayed.
+
+\subsubsection{deripple\_spectrum}
+\label{deripple_spectrum}
+\begin{verbatim}
++ De-ripple a  spectrum ------------------------------------------+
+|Spectrum                    Directory:Filename________________   |
+|Xstart                      0.75                                 |
+|Xend                        63.25                                |
+|More_points                 YES [NO]                             |
+|Treatment_of_errors         NONE [GAUSSIAN]                      |
+|Display_port                0 1 2 3 4 5 [6]                      |
++-----------------------------------------------------------------+
+\end{verbatim}
+
+{\bf deripple\_spectrum} removes the ripple profile so often seen on
+oversampled array collected data\footnote{The ripple appears as a saw-tooth 
+pattern superposed upon the spectrum and is due to the combined 
+effects of atmospheric variations, wind-bounce, shifting the detector for 
+oversampling and the CVF which has a slightly different response at the 
+different detector positions.}. It is the same as the Figaro routine 
+{\sf IRFLAT} and requires the user to identify (one or more) flat portions 
+of the input spectrum to 
+generate the ripple profile. This menu generates a flat field ripple file 
+called {\em spectrum}\_IRFF and a de-rippled spectrum called 
+{\em spectrum}\_DERIP. 
+
+{\sf spectrum} is the 1-D spectrum to be de-rippled and must include a
+directory specification.
+
+{\sf xstart} and {\sf xend} identify the limits of the first flat region
+within the spectrum from which a ripple profile can be generated. The
+units are those contained in the spectrum (be they detector columns or
+microns). 
+
+{\sf more\_points} allows further flat regions to be selected as required.
+If {\sf YES}, the user is prompted for further {\sf xstart} and {\sf xend}
+values.
+
+{\sf treatment\_of\_errors} allows the error array to be determined when
+the flat field division takes place.
+
+{\sf display\_port} is the port in which to display the de-rippled spectrum
+which will have the same units on each axis as the input spectrum.
+
+\subsubsection{examine\_structure}
+\begin{verbatim}
++ Examine the contents of data structure -----------------------------+
+|Data                                 Name_of_data_structure_________ |
++---------------------------------------------------------------------+
+\end{verbatim}
+
+{\bf examine\_structure} examines the contents of a data structure
+using the Figaro EXAM function. The CGS4\_SEARCH path is used.
+
+For example to examine the data, error and quality arrays of the frame 
+{\sf RG920530\_7}, you would specify {\sf RG920530\_7.Z...} whereas to 
+examine the FITS structure of the same file, you would specify 
+{\sf RG920530\_7.FITS...} and so on.
+
+\subsubsection{extracted\_area\_line\_fit}
+\begin{verbatim}
++ Extract spectrum and fit emission line ------------------+
+|Data                     Name_of_data_structure__________ |
+|Spectrum                 Directory:Filename______________ |
+|Xstart                   1                                |
+|Xend                     61                               |
+|Ystart                   1                                |
+|Yend                     57                               |
++----------------------------------------------------------+
+\end{verbatim}
+
+{\bf extracted\_area\_line\_fit} extracts a 1-D spectrum from
+a 2-D data frame using the Figaro EXTRACT function.
+The Figaro EMLT function is then used to search for emission lines
+in the spectrum and report the results to the screen. Since this
+facility has not been used for a long time, users should be wary
+as the Figaro EMLT function is extremely sensitive to input parameters.
+
+{\sf data} is the specified image.
+
+{\sf spectrum} is the name of the file where the spectrum will be stored.
+
+{\sf xstart} and {\sf xend} are the start and end columns to extract.
+
+{\sf ystart} and {\sf yend} are the start and end rows to extract.
+
+\subsubsection{two\_row\_line\_fit}
+\begin{verbatim}
++ Line fit in 2 rows to find slit angle ----------------------+
+|Data                     Name_of_data_structure__________    |
+|Row1                     20                                  |
+|Row2                     40                                  |
+|Rows_to_average          [1] 3 5 7 9 11 13 15 17 19 21 23 25 |
+|Xstart                   1                                   |
+|Xend                     61                                  |
++-------------------------------------------------------------+
+\end{verbatim}
+
+{\bf two\_row\_line\_fit} is used for focus scans.
+It is best applied to a calibration arc spectrum.
+Two 1-D spectra are extracted from two specified rows in a 2-D data
+frame (using the Figaro EXTRACT function). 
+The spectra are searched for emission lines using the Figaro EMLT
+function. 
+The parameters of the brightest line within a specified column (or 
+wavelength) range are determined. The shift of the line between the two 
+specified columns is used to determine the angle of the spectrum on the 
+detector.
+This slit angle, together with the parameters of the line in the second 
+row, are written to the engineering log file (see \S \ref{automatic_line_fitting}).
+
+{\sf data} is the specified image.
+
+{\sf row1} and {\sf row2} are the rows which are used to extract the spectrum.
+
+{\sf rows\_to\_average} is the number of rows which are included in the
+extract centred on {\sf row1} and {\sf row2}.
+
+{\sf xstart} and {\sf xend} are the start and end columns to extract.
+
+\subsubsection{two\_column\_line\_fit}
+\begin{verbatim}
++ Line fit in 2 columns to find slit alignment ------------------+
+|Data                        Name_of_data_structure__________    |
+|Column1                     5                                   |
+|Column2                     55                                  |
+|Cols_to_average             [1] 3 5 7 9 11 13 15 17 19 21 23 25 |
+|Ystart                      1                                   |
+|Yend                        61                                  |
++----------------------------------------------------------------+
+\end{verbatim}
+
+{\bf two\_column\_line\_fit} is used in engineering tests
+to determine the alignment of the dispersion direction on the detector.
+Two 1-D {\sf spectra} are extracted from two 
+specified columns in a 2-D data frame (using the Figaro YSTRACT function).
+The {\sf spectra} are searched for {\sf emission lines} using the Figaro EMLT 
+function.
+The parameters of the brightest line within a specified row 
+range are determined. The shift of the line between the two 
+specified rows is used to determine the direction of dispersion on the 
+detector.
+This angle, together with the parameters of the line in the second 
+row, are written to the engineering log file (see \S \ref{automatic_line_fitting}).
+
+{\sf data} is the specified image.
+
+{\sf column1} and {\sf column2} are the columns which are used to extract the 
+spectrum.
+
+{\sf cols\_to\_average} is the number of columns which are included in the
+extract centred on {\sf column1} and {\sf column2}.
+
+{\sf ystart} and {\sf yend} are the start and end rows to extract.
+
+\subsubsection{enter\_end\_group}
+\label{enter_end_group}
+\begin{verbatim}
++ Enter "end of group" into queue -----------+
+|Group_file               RGyymmdd_gggg      |
+|Queue_position           HEAD [TAIL]        |
++--------------------------------------------+
+\end{verbatim}
+
+{\bf enter\_end\_group} enters a command of the form 
+{\sf ENDGROUP RGyymmdd\_gggg} into the data reduction queue so that
+the software knows when a group is formally finished and may perform certain
+housekeeping functions. This item is not particularly useful when groups 
+are not divided by a standard automatically upon completion.
+
+\subsubsection{cancel\_end\_group}
+\label{cancel_end_group}
+\begin{verbatim}
++ Cancel "end of group" from queue -----------+
+|Group_file                RGyymmdd_gggg      |
++---------------------------------------------+
+\end{verbatim}
+
+{\bf cancel\_end\_group} removes a command of the form 
+{\sf ENDGROUP RGyymmdd\_gggg} from the data reduction queue.
+
+\subsection{The GRAPHICS Menu}
+\label{the_graphics_menu}
+\begin{verbatim}
++ Graphics menu -----------------------------------------------------------+
+|graphics_setup           cursor_pixel             cursor_area             |
+|print_hardcopy           clear_port               -                       |
+|plot_image               plot_graph               plot_surface            |
+|plot_histogram           plot_overgraph           plot_oversurface        |
++--------------------------------------------------------------------------+
+\end{verbatim}
+
+\subsubsection{graphics\_setup}
+\label{graphics_setup}
+\begin{verbatim}
++ Graphics setup menu ------------------------------------------------------+
+|set_plot_device              list_devices             identify_plot        |
+|set_colour_table             list_colour_tables       convert_colour_table |
+|set_char_height              graphics_flags                                |
++---------------------------------------------------------------------------+
+\end{verbatim}
+
+{\bf graphics\_setup} allows various parameters associated with the plotting
+task to be modified. The defaults should be adequate but some users may 
+find other options useful.
+
+\begin{verbatim}
++ Open a new plot device ---+
+|set_soft_device            |
+|set_hard_device            |
++---------------------------+
+\end{verbatim}
+
+{\bf set\_plot\_device} provides two options to change either the softcopy
+or hardcopy device being used. Both are documented in \S \ref{set_plot_device}.
+
+\begin{verbatim}
++ Set new colour table ---------------------------------+
+|Colour_table              Colour_table_file_name_only  |
++-------------------------------------------------------+
+\end{verbatim}
+
+{\bf set\_colour\_table} changes the colour table to that input by the
+user. This applies to both soft and hard copy devices (if the latter is
+loaded).
+
+\begin{verbatim}
++ Set the height of character strings ---------+
+|height                                    1.0 |
++----------------------------------------------+
+\end{verbatim}
+
+{\bf set\_char\_height} allows the character font to be scaled. It is
+of little use in offline mode and is primarily intended for engineering
+purposes at the summit. The default should be adequate but other values
+should lie in the range 1.0 $<$ height $<$ 2.0 depending upon which viewport
+is to be used for display. This applies to both soft and hard copy devices
+(if the latter is enabled).
+
+{\bf list\_devices} lists the currently available graphics devices.
+
+{\bf list\_colour\_tables} lists the available colour tables.
+
+\begin{verbatim}
++ Set graphics flags for X and Y axes -----+
+|X_axis_options                     BCNTS  |
+|Y_axis_options                     BCNTS  |
++------------------------------------------+
+\end{verbatim}
+
+{\bf graphics\_flags} reproduces the X and Y axis options from the
+{\sf control\_flags} sub-menu (see \S \ref{control_flags}) and allows 
+a wide range of axis labels and types for display (see 
+\S \ref{display_modes_and_the_p4_plotting_task}).
+This applies to both soft and hard copy devices
+(if the latter is enabled).
+
+{\bf identify\_plot} writes the date and username at the bottom right 
+corner of the current (soft) plot. This action is automatically invoked for
+hardcopy output.
+
+\begin{verbatim}
++ Converts HDS table to CGS4 ------------------------------------+
+|INPUT_table                    INPUT_colour_table_full_spec____ |
+|CGS4_table                     CGS4_colour_table_file_name_only |
++----------------------------------------------------------------+
+\end{verbatim}
+
+{\bf convert\_colour\_table} converts a colour table from IRCAM format to 
+CGS4 format. A KAPPA format colour table can also be converted, but these 
+also need to be multiplied by 255.0 with the Figaro ICMULT function. 
+
+\subsubsection{print\_hardcopy}
+\begin{verbatim}
++ Print to a hardcopy device ------------------------------------+
+|Print_command   PRINT/DELETE/NONOTIFY                           |
+|Graphics_file   Name_of_graphics_file_______                    |
+|Queue_name      Name_of_print_queue_________                    |
++----------------------------------------------------------------+
+\end{verbatim}
+
+{\bf print\_hardcopy} prints a specified file on the specified queue 
+according to the given command. This is a general hardcopy printing 
+facility to be used to print files created by using the HARD option within 
+the {\sf plot\_{\em something}} menus.
+
+{\sf print\_command} is the print command to use to print the file. It 
+may contain any qualifiers {\em except} {\sf /QUEUE={\em queue\_name}} 
+as this is dealt with separately. 
+
+{\sf Graphics\_file} is the name of the output file to be printed ({\em e.g.}
+{\sf GKS\_72.PS} for PostScript etc).
+
+{\sf queue\_name} is the name of the output queue where the file will be 
+spooled to. 
+
+Note that for PostScript, Canon and LN03 output, the system will set suitable
+defaults so that the end user should not need to edit the parameter options.
+The queue name may be modified by your system manager to suit your site.
+
+\subsubsection{plot\_image}
+
+{\bf plot\_image} is described in \S \ref{plot_image}.
+
+\subsubsection{plot\_histogram}
+
+{\bf plot\_hitsogram} is described in \S \ref{plot_histogram}.
+
+\subsubsection{cursor\_pixel}
+\begin{verbatim}
++ Examine pixel(s) with cursor-- ----------+
+|Display_port             [0] 1 2 3 4 5 6  |
++------------------------------------------+
+\end{verbatim}
+
+{\bf cursor\_pixel} is used when a data frame has been displayed with 
+an IMAGE or GRAPH plot. In this case, this item allows points on that plot 
+to be identified with a cursor, and the data, error and quality values at 
+that point reported to the scrolling region of the control screen.
+
+\subsubsection{clear\_port}
+\begin{verbatim}
++ Clear a display port --------------------+
+|Display_port             [0] 1 2 3 4 5 6  |
++------------------------------------------+
+\end{verbatim}
+
+{\bf clear\_port} clears the specified display port. This applies to
+soft devices only.
+
+\subsubsection{plot\_graph}
+
+{\bf plot\_graph} is described in \S \ref{plot_graph}.
+
+\subsubsection{plot\_overgraph}
+
+{\bf plot\_overgraph} is described in \S \ref{plot_overgraph}.
+
+\subsubsection{cursor\_area}
+\begin{verbatim}
++ Examine area with cursor ---------------------------------+
+|Data                     Name_of_data_structure_________   |
+|Display_port             [0] 1 2 3 4 5 6                   |
++-----------------------------------------------------------+
+\end{verbatim}
+
+{\bf cursor\_area} is used when a data frame has been displayed with an 
+IMAGE plot. In this case, this item allows an area on that plot to be defined.
+The minimum, maximum, mean and standard deviation of the data within 
+that area are determined using the Figaro ISTAT function and reported to
+the scrolling region of the SMS screen.
+
+\subsubsection{hardcopy\_inkjet}
+\begin{verbatim}
++ Dump VAXstation window to inkjet ------------------------------+
+|Queue_name                      SYS_INKJET                      |
++----------------------------------------------------------------+
+\end{verbatim}
+
+{\bf hardcopy\_inkjet} may be used to produce a hardcopy of 
+the current VWS graphics window to an ink-jet printer. This item
+requires the IKONPAINT software to be installed (see ref. [\ref{Page}]).
+This item may be modified by a system manager to reflect the queue at your
+site so the menu item may not appear exactly the same as above.
+If your site does not have such a hardcopy device this menu item might
+not be present. If this menu item is present, the appearance of the
+top level graphics menu will be altered from that shown in 
+\S \ref{the_graphics_menu}.
+
+It should be used with great care and patience, as the underlying 
+software is very difficult to use from SMS. Follow the instructions 
+at your site. 
+
+\subsubsection{plot\_surface}
+
+{\bf plot\_surface} is described in \S \ref{plot_surface}.
+
+\subsubsection{plot\_oversurface}
+\begin{verbatim}
++ Overlay data to scale of existing SURFACE ----------------+
+|Data                      Name_of_data_structure________   |
+|Display_port              [0] 1 2 3 4 5 6                  |
+|Data_array                [DATA] ERRORS QUALITY            |
+|Soft_or_hard_copy         [SOFT]  HARD                     |
++-----------------------------------------------------------+
+\end{verbatim}
+
+{\bf plot\_oversurface} overlays a plot of a specified data frame but
+clears the viewport first. It is of limited value and some users have
+reported problems. The items shown are the same as those on the 
+{\sf plot\_surface} menu.
+
+\subsection{The BAD\_PIXEL\_MASKS Menu}
+\label{the_bad_pixel_masks_menu}
+\begin{verbatim}
++ Bad pixel mask functions ------+
+|define_bad_pixel_mask           |
+|list_masks                      |
+|create_bad_pixel_mask           |
+|edit_bad_pixel_mask             |
+|combine_bad_pixel_masks         |
+|apply_mask                      |
+|extract_mask                    |
++--------------------------------+
+\end{verbatim}
+
+{\bf bad\_pixel\_masks} contains menus used to create and manipulate
+bad pixel masks, and to define the current mask to be used. 
+
+\subsubsection{define\_bad\_pixel\_mask}
+\begin{verbatim}
++ Use an existing bad pixel mask (# for none) --+
+|Name_of_existing_mask            #             |
++-----------------------------------------------+
+\end{verbatim}
+
+{\bf define\_bad\_pixel\_mask} is used the define the name of the bad 
+pixel mask to be used during data reduction. The use of a bad pixel mask 
+is not specified in the {\sf set\_reduction\_sequence} menu, and is 
+turned on and off by specifying either {\sf \#} (no mask) or a file name 
+in this menu.
+
+All masks are assumed to be in the CGS4\_MASKS directory.
+
+\subsubsection{list\_masks}
+
+{\bf list\_masks} lists the available bad pixel masks.
+
+\subsubsection{create\_bad\_pixel\_mask}
+\begin{verbatim}
++ Create a new bad pixel mask ---+
+|__by_thresholding_data_frame    |
+|__by_defining_a_window          |
+|__from_an_error_array           |
++--------------------------------+
+\end{verbatim}
+
+{\bf create\_bad\_pixel\_mask} creates a new bad pixel mask, either by 
+examining an existing data frame with a threshold, by defining an 
+illumination window on the detector, or by thresholding an error array.
+
+Bad pixels masks generated by any method may be combined together.
+
+\begin{verbatim}
++ Create mask by thresholding ------------------------------------+
+|Display_port                    [0] 1 2 3 4 5 6                  |
+|Example_data                    Name_of_input_data_structure____ |
+|Autoscale_histogram             [TRUE] FALSE                     |
+|__Low_if_not_autoscale          0.0000000                        |
+|__High_if_not_autoscale         1000.0000                        |
+|Name_of_new_mask                Name_of_new_bad_pixel_mask______ |
++-----------------------------------------------------------------+
+\end{verbatim}
+{\bf \_\_by\_thresholding\_data\_frame} requires the following parameters:
+
+{\sf display\_port} is the port to which the data will be plotted.
+A cursor is used to mark values in the displayed histogram above and below
+which pixels will be flagged as bad.
+
+{\sf example\_data} is the input array to be used to as a default
+from which to create a new mask.
+
+{\sf autoscale\_histogram} tells the plotting task whether or not
+to autoscale the histogram of data values obtained from the input
+array.
+
+{\sf \_\_low\_if\_not\_autoscale} and {\sf \_\_high\_if\_not\_autoscale}
+are the limits for data display if autoscaling is not enabled.
+
+{\sf name\_of\_new\_mask} is the filename to be given to the new mask
+in the {\sf CGS4\_MASKS} directory.
+
+\begin{verbatim}
++ Create a window mask -------------------------------------------+
+|Name_of_new_mask                Name_of_new_bad_pixel_mask______ |
+|Window_xmin                     1                                |
+|Window_xmax                     62                               |
+|Window_ymin                     1                                |
+|Window_ymax                     58                               |
+|Number_of_columns               62                               |
+|Number_of_rows                  58                               |
++-----------------------------------------------------------------+
+\end{verbatim}
+{\bf \_\_by\_defining\_a\_window} requires the following parameters:
+
+{\sf name\_of\_new\_mask} is the filename to be given to the new mask
+in the {\sf CGS4\_MASKS} directory.
+
+{\sf window\_xmin} is the left hand column limit.
+
+{\sf window\_xmax} is the right hand column limit.
+
+{\sf window\_ymin} is the bottom row limit.
+
+{\sf window\_ymax} is the top row limit.
+
+{\sf number\_of\_columns} is the number of columns to be included in the
+window. This is not required at present but may be useful when 
+256 $\times$ 256 arrays are commissioned into the instrument.
+
+{\sf number\_of\_rows} is the number of rows to be included in the window.
+
+\begin{verbatim}
++ Create mask from error array -----------------------------------+
+|Input_data                      Name_of_input_data_structure____ |
+|Name_of_new_mask                Name_of_new_bad_pixel_mask______ |
+|Name_of_window_mask             Name_of_input_window_mask______  |
+|Set_new_mask                     TRUE  [FALSE]                   |
+|Display_port                    [0] 1 2 3 4 5 6                  |
+|Autoscale_histogram             [TRUE]  FALSE                    |
+|__Low_if_not_autoscale          0.0000000                        |
+|__High_if_not_autoscale         1000.0000                        |
++-----------------------------------------------------------------+
+\end{verbatim}
+{\bf \_\_from\_an\_error\_array} requires the following parameters:
+
+The parameters (and cursor action) are similar to the 
+{\sf \_\_by\_thresholding\_data\_frame} parameters with the following 
+exceptions:
+
+{\sf input\_data} is the input array.
+
+{\sf name\_of\_window\_mask} is the name of an input window mask to combine
+with the mask from the error array.
+
+{\sf set\_new\_mask} is an option to set the new mask as the default
+for data reduction once it has been created.
+
+\subsubsection{edit\_bad\_pixel\_mask}
+\begin{verbatim}
++ Edit an existing bad pixel mask ----------------------------------+
+|Display_port                     [0] 1 2 3 4 5 6                   |
+|Example_data                     Name_of_comparison_data_structure |
+|Name_of_existing_mask            #                                 |
++-------------------------------------------------------------------+
+\end{verbatim}
+
+{\bf edit\_bad\_pixel\_mask} allows an existing bad pixel mask to be 
+edited, while referring to a data frame. 
+
+{\sf display\_port} is the port to which graphics are plotted.
+
+{\sf example\_data} is the reference data with which a mask is compared.
+
+{\sf name\_of\_existing\_mask} is the name of the current bad pixel mask 
+(if set).
+
+\subsubsection{combine\_bad\_pixel\_masks}
+\begin{verbatim}
++ Combine bad pixel masks -------+
+|or               and            |
+|eor              not            |
++--------------------------------+
+\end{verbatim}
+
+{\bf combine\_bad\_pixel\_masks} allows two bad pixel masks to be 
+combined together with a logical operation to make a third. This menu
+is a sub-menu of {\sf arithmetic} and is described in \S \ref{arithmetic_1}.
+Note that if you wish to create a bad pixel mask which is a combination of
+two masks generated separately with all the bad pixels from both you should
+combine the masks with the logical {\sf OR} operation.
+
+\subsubsection{apply\_mask}
+\begin{verbatim}
++ Apply bad pixel mask to data -------------------------------+
+|Name_of_existing_mask            #                           |
+|Data_to_apply_mask_to            Name_of_data_structure_____ |
+|Overwrite_existing_quality       [YES] NO                    |
++-------------------------------------------------------------+
+\end{verbatim}
+
+{\bf apply\_mask} is a utility for writing a new data quality array
+into a data frame from a bad pixel mask. {\em This is a fudge which should 
+not normally be used!}
+
+{\sf name\_of\_existing\_mask} is the name of the current bad pixel mask.
+
+{\sf data\_to\_apply\_mask\_to} is the name of the data structure whose quality
+array is to be altered.
+
+{\sf overwrite\_existing\_quality} is the switch that applies the mask
+if it is set to {\sf YES}.
+
+\subsubsection{extract\_mask}
+\begin{verbatim}
++ Extract bad pixel mask from data ---------------------------------+
+|Data_to_extract_mask_from        Name_of_input_data_structure_____ |
+|Name_of_new_mask                 Name_of_new_bad_pixel_mask______  |
++-------------------------------------------------------------------+
+\end{verbatim}
+
+{\bf extract\_mask} is a utility for creating a new bad pixel mask
+from the data quality array of a data frame.
+
+{\sf data\_to\_extract\_mask\_from} is the input data array.
+
+{\sf name\_of\_new\_mask} is the name of the new bad pixel mask to be written.
+
+\subsection{The SOFTWARE\_TESTS Menu}
+\label{the_software_tests_menu}
+\begin{verbatim}
++ Simple software engineering integrity checks -----+
+|task_status              task_reset                |
+|calib_search             poke_or_peek_FITS         |
+|list_noticeboard                                   |
++---------------------------------------------------+
+\end{verbatim}
+
+\subsubsection{task\_status}
+\begin{verbatim}
++ Check the status of a CGS4 Data Reduction task ---+
+|Task_name                [All] CRED4 ENG4 P4 RED4  |
++---------------------------------------------------+
+\end{verbatim}
+
+{\bf task\_status} provides a display of either a single task status or the
+status of all tasks. It is useful for determining which version of the 
+system you are running.
+
+\subsubsection{calib\_search}
+\begin{verbatim}
++ Check which calibration frame would be used for reduction ----+
+|Obs_or_grp               RG/ROyymmdd_gggg                      |
+|Calib_type               [All] BIAS DARK FLAT STANDARD CALIBR  |
+|Index_file_name          CGS4_yymmdd.INDEX                     |
+|Mode                     [BOTH] FORWARDS BACKWARDS SPECIFIED   |
+|Specified_observation    ST/CA/ROyymmdd_oooo                   |
++---------------------------------------------------------------+
+\end{verbatim}
+
+{\bf calib\_search} is a trivial search test for a suitable {\sf BIAS}, 
+{\sf DARK}, {\sf FLAT} and so on and is not required by the end user. 
+It is not properly documented and should not be used!
+
+\subsubsection{list\_noticeboard}
+
+{\bf list\_noticeboard} enables a listing of the current contents of the
+noticeboard to be written to the screen.
+
+{\sf task\_name} is the name of the specified task requiring a status check.
+
+\subsubsection{task\_reset}
+\begin{verbatim}
++ Reset a CGS4 Data Reduction task -----------------+
+|Task_name                [All] CRED4 ENG4 P4 RED4  |
++---------------------------------------------------+
+\end{verbatim}
+
+{\bf task\_reset} resets any specified task. For RED4 and ENG4 this 
+re-initialises the task and forces memory mapped data to be flushed. For all
+specified tasks the error status is annulled.
+
+{\sf task\_name} is the name of the specified task requiring a reset.
+
+\subsubsection{poke\_or\_peek\_FITS}
+\begin{verbatim}
++ Poke or peek a FITS item -------------------------+
+|Input_file               Directory:Filename_______ |
+|Fits_item                Name_of_FITS_item________ |
+|Mode                     [READ] WRITE              |
++---------------------------------------------------+
+\end{verbatim}
+
+{\bf poke\_or\_peek\_FITS} allows the user to look at and (potentially) modify
+the FITS header of any observation. Users should {\em not} modify data without
+good cause!
+
+{\sf input\_file} is the file to be poked or peeked.
+
+{\sf fits\_item} is the FITS item. 
+
+{\sf mode} is the access mode; READ implies a peek {\em i.e.} readonly whereas
+WRITE implies a poke {\em i.e.} re-write the FITS item.
+
+\subsection{Utilities}
+\label{utilities}
+
+This section documents some utility routines that users may find helpful when
+running CGS4DR.
+
+\subsubsection{A Detached X-terminal}
+\label{a_detached_xterminal}
+
+During the course of a CGS4DR session, the user may require access to
+DCL. This is available via the {\sf \$} or {\sf SPAWN} commands within
+ICL but they are relatively cumbersome to use. As an alternative, 
+{\em available only on X windows devices}, the user can created a detached 
+terminal window:
+
+\begin{verbatim}
+  ICL> XTERMINAL
+\end{verbatim}
+
+The {\sf ICL$>$} prompt is obtained by  pressing the period key on the
+auxiliary keypad. A new window (DECterm) will be created. That alone is 
+useful but if the user activates this new window (in {\em Motif} jargon gives
+it {\em input focus}) and types:
+
+\begin{verbatim}
+  $ @CGS4DR_COM:CGS4DR_XTERMINAL
+\end{verbatim}
+
+The new (detached) process will be linked into the CGS4DR job tree and
+logical names such as {\sf RGDIR} will automatically be defined.
+
+\subsubsection{Deleting Logical Names}
+
+A user may delete all CGS4 logical names by typing:
+
+\begin{verbatim}
+  $ CGS4DR_DEL
+\end{verbatim}
+
+\subsubsection{Remote Observing}
+
+Users who remote observe can create a parallel suite of directories
+called {\sf R\_RGDIR}, {\sf R\_RODIR} and so on using the command:
+
+\begin{verbatim}
+  $ CGS4DR_REMDIR  yyyymmdd
+\end{verbatim}
+
+You must supply the correct UT date. This defines a suite of new logical
+names of the form {\sf R\_IDIR}, {\sf R\_ODIR}, {\sf R\_RIDIR}, 
+{\sf R\_RODIR} and {\sf R\_RGDIR} which point to the
+UKIRT data directories. Copying reduced group from the summit, for
+example, to a local directory would require the command:
+
+\begin{verbatim}
+  $ COPY/LOG R_RGDIR:*.DST RGDIR:*.DST
+\end{verbatim}
+
+\subsubsection{Re-defining Logical Names}
+\label{redefining_logical_names}
+
+The easiest way for a user to re-define logical names is to use the
+{\sf logical\_names} menu item within {\sf setup}. It can be done
+from the command line, however, using:
+
+\begin{verbatim}
+  $ CGS4DR_LOGNAM RGDIR CGS4_DATA_ROOT:[19920530] JOB AFFIX
+\end{verbatim}
+
+Here the {\sf RGDIR} logical name would have the above definition
+affixed to its search path at the top. This is useful for reducing
+a previous (or other) nights data when running CGS4DR. The procedure
+will try to resolve concealed devices wherever possible.
+
+An alternative is the CGS4DR\_CD command which can be used from within 
+the detached X-terminal window or from the {\sf ICL$>$} prompt and renames 
+all CGS4DR directory logical names in one go:
+
+\begin{verbatim}
+  $ CGS4DR_CD CGS4_DATA_ROOT:[19920530] TOP
+\end{verbatim}
+
+The above command adds the data directory at the {\sf TOP} of the search path
+and preserves any other definitions. {\sf TOP} can be replaced by {\sf BOTTOM}
+to add the new definition at the bottom of the search path or {\sf NONE} 
+(the default if left blank) which re-defines all logical names and does
+{\em not} preserve any previous definition ({\em i.e.} the old definitions
+will disappear).
+
+\newpage
+\markright{\stardocname}
+\section{Some Common Problems \& Mistakes}
+\label{common_problems_and_mistakes}
+
+Invariably, when learning a new system, things may  go wrong. Below are 
+details of some common mistakes and problems encountered using CGS4DR and
+how to correct them.
+
+\subsection{Old Noticeboard Files}
+\label{old_noticeboard_files}
+
+The CGS4DR system uses a file called CRED4\_NOTICEBOARD.NBD located in the 
+directory CGS4\_CONFIG to read and set parameters within the internal 
+noticeboard upon startup. This way, it remembers your previous settings for 
+data reduction sequences and parameters. Unfortunately, the noticeboard is 
+{\em not} dynamically extendable so that if new items are introduced, the 
+noticeboard file becomes obsolete. The error reported in this instance 
+(usually during startup) is:
+
+\begin{verbatim}
+  %NBS-E-ITEMNOTFOUND, item does not exist
+  ADAMERR        %NBS, item does not exist
+\end{verbatim}
+
+The solution is to run down the software, delete the current noticeboard and
+let the system copy a new one to your directory from it's system configuration.
+If, for some odd reason, the system cannot do this you can re-create your
+own noticeboard file using the following:
+
+\begin{verbatim}
+  $  DEFINE/JOB  CGS4_CONFIG  SYS$DISK:[]
+  $  ICL
+  ICL>  LOADW  CGS4DR_ROOT:[EXE]CRED4.EXE  CRED4
+  ICL>  OBEYW  CRED4  OPEN_NB  PROMPT
+  .
+  . (answer all the questions as appropriate)
+  .
+  ICL>  OBEYW  CRED4  CLOSE_NB
+  ICL>  KILLW  CRED4
+  ICL>  EXIT
+  $  CGS4DR
+\end{verbatim}
+
+Failure to define the CGS4\_CONFIG logical name will result in the error:
+
+\begin{verbatim}
+  %NBS-E-CANTOPEN, can't open noticeboard definition file
+  ADAMERR,   %NBS, can't open noticeboard definition file
+\end{verbatim}
+
+You should be able to define a /JOB logical whilst still within ICL.
+Note that should you need to re-create the noticeboard file in this
+way, there will be {\em a lot of prompts} to answer as everything within
+the noticeboard must be reset.
+
+\subsection{Old Configuration Files}
+\label{old_configuration_files}
+
+A corollary to the above problem is that noticeboard parameters saved to
+files in a previous release are not readable by new versions of the software 
+if the noticeboard has been extended and new items added. For example, if you 
+saved a configuration to a file called {\sf MYCONFIG} using an earlier release
+of the software, the present system will report the following error
+if you try to restore that configuration:
+
+\begin{verbatim}
+  !! File corruption detected before miscellaneous and sky subtraction
+  !  parameters.
+  !  Error reading configuration file
+  !    - FOR$_ENDDURREAD, end-of-file during read
+  !  Error reading configuration file
+  ADAMERR   %SAI, Error
+\end{verbatim}
+
+The file is unlikely to be genuinely corrupt so you can get around the problem 
+by saving a new configuration and then editing {\sf MYFILE.CRED4} to reflect 
+new items (or a new order of old items) that appeared in the new configuration 
+file. 
+
+\subsection{Pre-Loaded Tasks}
+\label{preloaded_tasks}
+
+CGS4DR runs as four sub-processes with task and process names of {\sf CRED4} 
+(control), {\sf RED4} (reduction), {\sf ENG4} (engineering) and {\sf P4} 
+(plotting). During startup, CGS4DR may inform you that a task is already 
+loaded:
+
+\begin{verbatim}
+  WARNING - the RED4 is already loaded !
+  Please check that there is no-one else running the system.
+  Do you wish to kill this task ? /N/ 
+\end{verbatim}
+
+Check to see if another user is using CGS4DR and negotiate a time when
+you will  be allowed to run the software (as two users cannot concurrently
+run the system at the present time). If these pre-loaded tasks are my
+own, personally speaking, I have always found it better to CTRL/Y out of 
+the startup (you may need to do it several times) and manually remove the 
+offending task(s) before re-loading CGS4DR:
+
+\begin{verbatim}
+  $ KILLTASK  RED4
+  .
+  . (kill other tasks as required)
+  .
+  $ CGS4DR
+\end{verbatim}
+
+It is possible to leave the {\sf RED4} and {\sf P4} tasks running and just
+reset them or open a new plot device but the {\sf CRED4} and {\sf ENG4}
+tasks should never be re-used.
+
+\subsection{Can I Run the Software Twice?}
+\label{can_I_run_the_software_twice}
+
+If you're {\em capable}, you {\em can} so the question should be {\em may} you
+run the software more than once concurrently and the answer is between you
+and your system manager with the caveat that you {\em cannot} concurrently
+run the software from the same username or group on the same CPU (see \S 
+\ref{starting_the_software}). By inference, this means that you could run 
+the software from the same username or group on different CPUs and therein 
+lies the disagreement with your system administrator.
+
+If you do login to another machine and run up the software under the same 
+username you will notice an odd effect: entering a command into the data 
+reduction queue with {\em both} reduction systems in the {\sf RUNNING} state 
+means that the faster CPU will read the queue first and attempt to 
+reduce the data you specify. The faster CPU may be the other machine rather 
+than the one you entered the command from and that machine may have a 
+different data reduction configuration. The data will not, therefore, be 
+reduced to your liking. The reason for this is that the CGS4DR queue is 
+a file called {\sf CGS4\_PENDING.DAT} located in your default login 
+directory (SYS\$LOGIN). Both (or, indeed, more than two) versions of the 
+system will try to read the same file, hence the problem.
+To avoid it, you will need to specify a {\em unique} queue to each 
+reduction system running under your username and this can be done by 
+running up the software and {\em before starting any reduction} typing 
+the following command:
+
+\begin{verbatim}
+  ICL> SETQUEUE CGS4_DATA:CGS4_PENDING.DAT
+\end{verbatim}
+
+The logical name CGS4\_DATA points to the top level of your (CGS4) data 
+directory and, therefore, should be unique. If it is not, you can specify
+{\em any} directory and file as the parameter to the {\sf SETQUEUE} procedure. 
+
+\subsection{Incorrect Plot Device}
+\label{incorrect_plot_device}
+
+Typing mistakes are a common occurrence at altitude and result in devices
+being incorrectly specified. Even at sea-level, a user may specify a 
+device that a site does not have. Both result in the following error:
+
+\begin{verbatim}
+  P4_OPEN: Unable to open specified device
+  ADAMERR  %DTASK, Action complete - text in value string
+\end{verbatim}
+
+To recover from this either run the software down and back up specifying
+the correct device, or enter the {\sf graphics} menu and set the correct plot
+device. If all else fails, the manual commands are ({\em e.g} for the device
+called {\sf xwindows}):
+
+\begin{verbatim}
+  ICL> OBEYW P4 CLOSE
+  ICL> OBEYW P4 OPEN xwindows
+\end{verbatim}
+
+If you specify a device that appears to be correct but cannot be opened 
+by the particular hardware configuration you are using ({\em e.g.} opening
+VWS from an X-terminal or vice-versa), the error reported is:
+
+\begin{verbatim}
+  !! GPOWK: Specified workstation cannot be opened
+  !    PGPLOT error -1 while opening device VWS
+  P4_OPEN: Unable to open specified device
+  ADAMERR  %DTASK, Action complete - text in value string
+\end{verbatim}
+
+The corrective action is the same; re-specify the correct device to the
+plotting task.
+
+\subsection{Ghastly Colour Tables}
+\label{ghastly_colour_tables}
+
+So, you have fired up your brand new, super go-faster X-workstation and, to
+your utter amazement, CGS4DR works! You plot something and the plotting
+task reproduces it's lunch all over your display. What is that? It's a
+bad colour table most likely, so what can be done? Well, in time, it'll
+be corrected to plot in a kosher fashion but for the time being that sort of
+jiggery-pokery is a bit too clever by half. The problem is that
+CGS4DR can only use a certain number of colour cells and it doesn't know
+how many you have used up. The default for X devices is to use
+64 so that it reads only the first 64 entries in your favourite colour
+table and writes them to the colour cells. That's why your display looks like
+vomit. As I say, in time CGS4DR will read the number of colour cells and
+scale the colour table appropriately (but, maybe, not in your lifetime).
+
+There is a way around it\footnote{There is more than one way to swing a cat; the other solution to
+this problem is to create some new colour tables which have a sensible dynamic
+range in the first 64 entries. To do this use {\sf CRELUT} in {\sf KAPPA} (see 
+SUN/95) and then use {\sf convert\_colour\_table} in the {\sf graphics\_setup}
+menu (see \S \ref{graphics_setup}). But you're not going to go to all that 
+trouble, are you?}; you can allocate more colour cells to the Xwindow
+if you create a window prior to running up CGS4DR as detailed in \S 
+\ref{starting_the_software}.
+The option to add to the call to {\sf xmake} is {\sf --col 240} which creates
+a window with 240 colour cells. If {\sf xmake} cannot allocate that many 
+colour cells it returns the message:
+
+\begin{verbatim}
+  GWM 3    % Unable to allocate colour cells
+\end{verbatim}
+
+Try to create a window with fewer colour cells. 
+Be warned, various X-windows applications use up colour 
+cells and some do not give them back when finished!
+
+\subsection{Unable to Plot Data}
+\label{unable_to_plot_data}
+
+When plotting data using {\sf plot\_{\em items}} the software checks to
+see if you have specified a directory. If not, it will prefix the 
+input DSA (data) name by the logical path CGS4\_SEARCH. Note that this is a
+{\em path} and, therefore, looks through many directories searching for
+the required file\footnote{If you're curious as to where it looks, type
+{\sf \$ SHOW LOGICAL CGS4\_SEARCH}.}.  The last such directory is specified 
+by the logical name CGS4\_TEMPLATES which invariably points to 
+CGS4DR\_ROOT:[DATA.TEMPLATES] and therein lies my point. If you enter 
+a file that does not exist the reported error is:
+
+\begin{verbatim}
+  Error attempting to open input file
+  CGS4DR_ROOT:[DATA.TEMPLATES]RG920929_74.DST;1. File not found (DAT__FILNF).
+  !! Error searching for file CGS4DR_ROOT:[DATA.TEMPLATES]RG920929_74.DST;1 -
+  !     RMS-E-FNF, file not found.
+  !  HDS_OPEN: Error opening HDS container file.
+  Error while opening DSA and data structure
+  ADAMERR   %NONAME, Message number 00000005
+\end{verbatim}
+
+This has confused some users as the software appears to be searching a 
+templates directory for a reduced group file! It does but that particular
+RG file does not yet exist and it reports the file failure on the last 
+directory searched. If this happens to you, go back and check that you
+have specified the correct file.
+
+\subsection{Hardcopy Printing Made Simple}
+\label{hardcopy_printing_made_simple}
+
+A vexing question to users of CGS4DR used to be `how do I easily make a 
+hardcopy'? Not any more as the menus now include a switch for changing between
+hard and soft plots. There are, therefore, two ways to obtain hardcopy as
+described below.
+
+\subsubsection{Hardcopies from Menus}
+
+Upon starting CGS4DR, you should enter the {\sf setup}  menu and select
+{\sf set\_plot\_device}. Then enter the {\sf set\_hard\_device} option
+and enter both a graphics device and a colour table (if in doubt about
+a colour table enter {\sf GREY}). The first time this is executed, the system
+will respond with a message like:
+
+\begin{verbatim}
+  Loading CGS4_EXE:P4 into xxxxP4
+\end{verbatim}
+
+where the {\sf xxxx} is a hexadecimal number based upon your process identifier.
+This is the common way of loading ADAM tasks as cached. If the task loads
+successfully, an ICL semi-global logical variable, {\sf OPEN\_HARDCOPY}, is set 
+to {\sf TRUE}. It is this variable that the software uses to select hard or
+soft copy along with the SMS parameter switch in the plot menus.
+
+To make a hardcopy plot, enter any plotting menu option and set
+{\sf Soft\_or\_hard\_copy}  to {\sf HARD}. If you have not set a hardcopy
+device the system will respond with:
+
+\begin{verbatim}
+  There is no hardcopy device open!
+
+  Please set a hardcopy device using SET_HARD_DEVICE
+  which is a menu item of SET_PLOT_DEVICE within either
+  the SETUP or GRAPHICS_SETUP menus
+\end{verbatim}
+
+In this case, the system will automatically default to softcopy.
+
+After a hardcopy has been successfully created, the software does not 
+automatically close the device. Rather it keeps it open for further plotting
+until either the hardcopy device is changed (thereby implicitly closing
+the previous device) or the user enters a {\sf print\_hardcopy} menu
+whereupon the device is closed and the file spooled to the appropriate
+printer. In this way, graphs and overgraphs may be built up on the same 
+page (and so on). Cached tasks are automatically terminated upon exit from ICL.
+
+Some parameters of the soft and hard copy tasks may be displayed using
+\begin{verbatim}
+  ICL>  GET_PLOT_LIMITS       ! Get some softcopy current defaults
+  ICL>  GET_HARD_LIMITS       ! Get some hardcopy current defaults
+\end{verbatim}
+
+\subsubsection{Loading P4 from Another Terminal}
+
+To load a separate version of the plotting task as cached and make hardcopies 
+with that the user should login to another terminal\footnote{You could use
+the detached X-terminal created in \S \ref{a_detached_xterminal}.} and use:
+
+\begin{verbatim}
+  $  CGS4DR_GRAPHICS
+\end{verbatim}
+
+This will load the P4 plotting task into a user-specific process and allows
+hardcopy to be created. There is an on-line help facility available by typing:
+
+\begin{verbatim}
+  ICL>  HELP P4
+\end{verbatim}
+
+To plot an image and a graph, for example, on a colour PostScript printer some 
+commands might be:
+
+\begin{verbatim}
+  ICL>  SET_DEVICE   POSTSCRIPT_L        ! Open colour PostScript device
+  ICL>  SET_CGS4_CT  HEAT                ! Set the `heat' colour table
+  ICL>  OPEN                             ! Open the device
+  ICL>  LUT                              ! Load the colour table
+  ICL>  IMAGE  DATA=RGDIR:RG920530_7     ! Plot_image
+  ICL>  SET_ERRORS   TRUE                ! Plot error bars
+  ICL>  SET_SLICE_START 20               ! Start of slice
+  ICL>  SET_SLICE_END   40               ! End of slice
+  ICL>  SET_CUT X                        ! Cut direction (X=HORIZONTAL)
+  ICL>  GRAPH  DATA=RODIR:RO920530_5     ! Plot_graph with errors
+  ICL>  CLOSE                            ! Close the device for plotting
+  ICL>  $PRINT/QUEUE=SYS$POSTSCRIPT/DELETE GKS_72.PS
+  ICL>  OPEN                             ! Re-open the device
+  ICL>  LUT                              ! Re-load the colour table
+\end{verbatim}
+
+Note that the data must be specified in full {\em i.e.} including the
+directory as the P4 task loaded in this way is a completely general facility.
+The current plotting limits can be displayed with:
+
+\begin{verbatim}
+  ICL>  GET_PLOT_LIMITS
+\end{verbatim}
+
+\subsection{Forgetting to Normalize a Flat Field}
+\label{forgetting_to_normalize_a_flat_field}
+
+So you forget to normalise your flat field. No big deal, the software carries
+on unabashed but, when it comes to divide by that flat field, it correctly
+reports the following:
+
+\begin{verbatim}
+  ****** WARNING: This FLAT has NOT been normalised. ******
+\end{verbatim}
+
+Aha, you think, I'll put the flat field at the head of the queue and turn on
+normalisation. Off goes CGS4DR and duly re-reduces your flat. Then it tries to
+reduce another object and when it divides by the flat field it reports the
+{\em same} error as above. Why? The reason is that CGS4DR memory maps 
+commonly used files like {\sf BIAS}, {\sf DARK}, {\sf FLAT} and 
+{\sf CALIBR} observations so 
+that it doesn't have to open, map and close them every time. A jolly good 
+thing, too, or the reduction would slow down considerably. CGS4DR, therefore, 
+knows that it has your flat memory mapped but does not know that you have
+re-reduced it. Hence, the error when it tries to use it as it's 
+using the same data as before {\em i.e.} the original un-normalised flat field. 
+The trick is to reset the reduction task so that when it next requires the 
+flat field, it {\em has} to re-map it as then it will pick up the correct one. 
+To do this, type:
+
+\begin{verbatim}
+  ICL>  OBEYW  RED4  RESET
+\end{verbatim}
+
+Or, use the {\sf task\_reset} option in the {\sf software\_tests} menu. Note that
+CGS4DR will not let you continue to reduce a group  which is using both
+an un-normalised and a normalised flat field. It will report a `flat field
+ratio' problem so, in this situation, you should re-reduce the group again.
+There is a menu item in {\sf manual\_operations} called {\sf reduce\_group}
+to help you do this.
+
+\subsection{SMS Help Interface}
+\label{sms_help_interface}
+
+You're merrily running along in CGS4DR when you decide you want to investigate
+an option further. Let's not bother with the user's guide as no-one ever
+reads them, do they? Why not try the known SMS help system available by
+simply positioning the cursor over an item and pressing {\sf ?}. You try it
+and get:
+
+\begin{verbatim}
+  %SYSTEM-F-ACCVIO, access violation, reason mask=01, virtual address=2D2D2D2D,
+  PC=002A23F0, PSL=03C00000
+  %TRACE-F-TRACEBACK, symbolic stack dump follows
+  module name      routine name            line          rel PC      abs PC
+                                                        002A23F0    002A23F0
+  HELPSYS_BRIEFGE  HELPSYS_BRIEFGET         172         <number>    <number>
+  SMS_BRIEFHELP    SMS_BRIEFHELP            488         <number>    <number>
+  SMS_DOHELP       SMS_DOHELP               337         <number>    <number>
+  .
+  .
+  .
+  SMS_ADAM         SMS_ADAM                  49         <number>    <number>
+  $ 
+\end{verbatim}
+
+I know, horrible isn't it? There appears to be a problem
+with the SMS image and it's interaction with the HELP system.
+There is no elegant solution on offer except to say that the problem is
+intermittent. If it does occur, you have no choice but to exit CGS4DR and
+reload the system.
+
+\subsection{The Ultimate Solution to All Problems}
+\label{the_ultimate_solution_to_all_problems}
+
+Invariably, you will meet a situation not described in this manual, so what
+do you do? First, report it. One can't improve software without feedback from
+the user community. Second, you can decide whether the error is fatal
+or recoverable simply by running the system down and back up again.
+
+There are several reported instances of CGS4DR reporting messages like:
+
+\begin{enumerate}
+\item {\sf `unable to reduce observation'} with no further text. 
+\item {\sf `failed to find observation CGS4\_MASKS:FPA61\_LC'} which is the
+      bad pixel mask you have been using for the last several hundred
+      observations.
+\item {\sf `failed to find observation template CGS4\_TEMPLATES:OBSRED'} 
+      which the system has been using without a problem up to now.
+\item {\sf `error copying INT\_FITS to OBSRED.COADDS.COADDED\_INTS'} around
+      observation number 231 (when the reduction proceeds thus far without
+      trouble).
+\end{enumerate}
+
+These are known problems but with puzzling causes. Some result from new error 
+reporting strategies introduced after CGS4DR was written. There are a lot of 
+instances of this problem in the code so it will take some time to cure 
+completely. Others indicate that quotas are being exhausted but there is
+little to go on as to which quota to increase.
+
+For most of these problems, reloading the reduction task is a suitable cure:
+
+\begin{verbatim}
+  ICL>  KILLW  RED4
+  ICL>  LOADW  CGS4_EXE:RED4.EXE  RED4
+\end{verbatim}
+
+If this does not work, the ultimate solution to all problems is to run the 
+software down and back up again. In some instances a logout is also useful; 
+always try this trick.
+
+\subsection{Is Further Help Available?}
+\label{is_further_help_available}
+
+Of course it is, in many forms. If you are running CGS4DR from an X-terminal
+and the system manager has also installed the X-windows \LaTeX\ previewer,
+you can run up the user's guide in a window and have it available on-line
+throughout your session:
+
+\begin{verbatim}
+  $  XDVI  CGS4_DOCS:CGS4DR
+\end{verbatim}
+
+If you do find a bug, please report it via the standard
+{\sl Starlink} bug reporting mechanism by detailing the bug as well as you
+can and sending the note by e-mail to {\sf RLVAD::STAR}.
+
+If you are UK based, help on astronomical matters and using the data reduction
+system (along with the status of known features and bugs) may be obtained from 
+Phil Puxley ({\sf REVAD::PJP}). For US users (including visitors to UKIRT)
+please contact the CGS4 chief support scientist, Gillian Wright 
+({\sf JACH::GSW}).
+
+For software related questions, mail Phil Daly ({\sf JACH::PND}) in the first
+instance and copy such e-mail to Alan Bridger ({\sf JACH::AB}), Gillian
+Wright ({\sf JACH::GSW}) and Phil Puxley ({\sf REVAD::PJP}). Don't forget
+to scan through the VAXnotes conference from time to time!
+
+\newpage
+\markright{\stardocname}
+\section{Acknowledgements}
+\label{acknowledgements}
+
+The following have contributed to the CGS4 Data Reduction System 
+(in alphabetical order): Jeremy Bailey, Steven Beard, Phil Blanco, Alan 
+Bridger, Bob Carswell, Alan Chipperfield, Phil Daly, Tom Geballe, 
+Graeme Harkness, Kevin Krisciunas, John Lightfoot, William Lupton, Chris Mayer, 
+Dave Mills, Matt Mountain, Alan Pickup, Phil Puxley, Suzanne Ramsay, 
+Keith Shortridge, Dave Terrett and Gillian Wright.
+
+There are, {\em sans aucun doute}, others whom we have neglected to mention. 
+Our thanks to them all.
+
+\newpage
+\markright{\stardocname}
+\section{References and Further Reading}
+\begin{enumerate}
+\item C. M. Mountain, D. J. Robertson, T. J. Lee and R. Wade,
+     {\em `An Advanced Cooled Grating Spectrometer for UKIRT'},
+     in Instrumentation in Astronomy VII, ed. David L. Crawford
+     (Proc. SPIE {\bf 1235}, 1990) p. 25--33.              \label{Mountain} 
+\item P. J. Puxley, S. M. Beard and S. K. Ramsay,
+     {\em `Reduction of Data from the UKIRT Common-User Long Slit 
+      1--5 $\mu$m Spectrometer (CGS4)'}, 
+      Proceedings of the ESO/ST-ECF 4th Data Analysis Workshop,
+      Garching (May 1992)                                  \label{Puxley_1}
+\item K. I. Shortridge, 
+     {\em `FIGARO --- General Data Reduction and Analysis'},
+     Starlink MUD, RAL (June 1991).                        \label{Shortridge} 
+\item M. D. Lawden and K. F. Hartley, 
+     {\em `ADAM --- The Starlink Software Environment'},
+     Starlink Guide 4.2, RAL (August 1992).                \label{Hartley} 
+\item P. N. Daly,
+     {\em `BVRI Photometry of Cluster Galaxies in Klemola 27'},
+     MSc Thesis, University of Wales (1986).               \label{Daly}
+\item P. J. Puxley, 
+     {\em `Vigorous Star Formation in Galactic Nuclei'},
+     PhD Thesis, University of Edinburgh (1988).           \label{Puxley_2} 
+\item J. A. Bailey, 
+     {\em `Reducing IR Spectroscopy Data using Figaro'},
+     UKIRT Observer Note 8, Joint Astronomy Centre (1990). \label{Bailey_1} 
+\item J. A. Bailey,  
+     {\em `CGS4 Data Reduction using Figaro'},
+     UKIRT Observer Note 9, Joint Astronomy Centre (1991). \label{Bailey_2} 
+\item S. K. Ramsay and P. R. Blanco,
+     {\em `Suggestions for flat fielding CGS 4'},
+      CGS4 Project Note CGS4/SOFT/061.1/12--90, 
+      Royal Observatory Edinburgh (December, 1990).        \label{Ramsay}
+\item P. R. Bevington, 
+     {\em `Data Reduction and Error Analysis for the Physical Sciences'},
+      ISBN 0--07--005135--6, McGraw Hill Inc., NY (1969).  \label{Bevington} 
+\item C. M. Mountain, S. K. Leggett, M. J. Selby, 
+      D. E. Blackwell and A. D. Petford, 
+     {\em `Measurement of the Absolute Flux from Vega at 4.92 $\mu$m'},
+     Astronomy \& Astrophysics {\bf 151}, Number 2, p339--402 
+     (October, 1985).                                      \label{Mountain_2}
+\item IRTF Photometry Handbook (February 1986)             \label{IRTF}
+\item T. J. Pearson,
+     {\em `PGPLOT Graphics Subroutine Library'},
+      California Institute of Technology (June 1989)       \label{Pearson}
+\item C. W. Allen,
+     {\em `Astrophysical Quantities'}, ISBN 0--485--11150--0, 
+      Athlone Press, University of London (1976)           \label{Allen}
+\item C. G. Page and G. R. Mellor,
+     {\em `IKONPAINT --- Ikon and GWM window to Inkjet Hard-copy'},
+      Starlink User Note 71, RAL (April 1992).             \label{Page}
+\item T. De Marco,
+     {\em `Structured Analysis and System Specification'},
+      ISBN 0--13--854380--1,
+      Prentice Hall Inc., Englewood Cliffs, NJ, (1979)     \label{Demarco}
+\item E. Yourdon,
+     {\em `Techniques of Program Structure and Design'},
+      ISBN 0--13--901702--X,
+      Prentice Hall Inc., Englewood Cliffs, (1975)         \label{Yourdon}
+\end{enumerate}
+
+\appendix
+\newpage
+\markright{\stardocname}
+\section{Yourdon-DeMarco Data Flow Diagrams for CGS4DR}
+\label{figures}
+
+To accompany this user guide, there are eight diagrams generated using
+IDE's {\sl Software Through Pictures} package. These diagrams use
+Yourdon-DeMarco notation (see refs. [\ref{Demarco}],[\ref{Yourdon}].) 
+and are held in {\sl StP} PostScript format. It has not been possible to
+incorporate these diagrams into the text of this \LaTeX\ document but they
+can be printed off separately. The print command depends on the type of
+printer and queue (for PostScript) at your site: either it has a generic
+name such as SYS\$POSTSCRIPT or is has a specific name such as LN03R. The
+commands in both these cases might be something like:
+
+\begin{verbatim}
+  $ PRINT/NOTIFY/QUEUE=SYS$POSTSCRIPT CGS4_DOCS:SUN27_FIG1.PS
+\end{verbatim}
+
+or
+
+\begin{verbatim}
+  $ PRINT/NOTIFY/QUEUE=LN03R/PARAMETER=(DATA=POSTSCRIPT) -
+    CGS4_DOCS:SUN27_FIG1.PS
+\end{verbatim}
+
+The figure captions are included in the figures but are reproduced here for
+completeness:
+
+\begin{description}
+\item[Figure 1:] CGS4 \& External Entities
+\item[Figure 2:] CGS4 DA \& DR Interaction
+\item[Figure 3:] Data Reduction Software Tasks
+\item[Figure 4:] Common Reduction Sequence
+\item[Figure 5:] Reducing a BIAS
+\item[Figure 6:] Reducing a DARK
+\item[Figure 7:] Reducing a FLAT
+\item[Figure 8:] Reducing an OBJECT
+\end{description}
+
+\end{document}

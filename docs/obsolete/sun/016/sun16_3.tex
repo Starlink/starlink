@@ -1,0 +1,3699 @@
+\documentstyle{article}
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {16.3}
+\newcommand{\stardocauthors}   {T N Wilkins \& D J Axon}
+\newcommand{\stardocdate}      {14 March 1991}
+\newcommand{\stardoctitle}     {TWODSPEC --- Some Additions To Figaro}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+\newcommand{\igref}[2]{{\item{#1} {\it\ #2}}}
+\newcommand{
+\jref}[5]{
+ \item[#5] { #1}. \mbox{{\it#2}}, \mbox{{\bf#3}},
+\mbox{{ #4.}}  } 
+\newcommand{\cref}[4]{
+     {\item{#4} { #1}. {\it#2},{ #3.} }}
+%------------------------------------------------------------------------------
+
+\begin{document}
+\setcounter{secnumdepth}{5}
+\setcounter{tocdepth}{5}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+\setlength{\parskip}{0mm}
+\tableofcontents
+\setlength{\parskip}{\medskipamount}
+\markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\section{Introduction}
+
+TWODSPEC is a package of programs for the reduction and analysis of
+long-slit and optical fibre array spectra, implemented within the FIGARO
+package (Shortridge 1988).
+If you wish to use TWODSPEC you should read the FIGARO documentation
+(and the ICL documentation if you wish to work from ICL).
+However, a number of the functions will be found useful outside the area
+of spectroscopy.
+
+LONGSLIT is a program for the analysis of calibrated long-slit spectra.
+It has, among other things, the capability to fit Gaussians, either
+manually or automatically---in batch.
+It can, however, handle data with two spatial dimensions, such as
+obtained using TAURUS.
+The program FIBDISP provides further options useful for such data,
+although this is primarily designed for fibre array data.
+An extensive range of options is available, especially in terms of
+output.
+ARC2D is a two-dimensional arc calibration program.
+COMB and ARCSDI are for the correction of data for S-distortion and line
+curvature respectively.
+A number of miscellaneous programs are also included, including programs
+to convert between FIGARO and IRAF data formats, and to display data.
+Any comments on these programs or documentation should be addressed to
+T. N. Wilkins (CAVAD::TNW or TNW@UK.AC.CAM.AST-STAR) or D. J. Axon
+(MAVAD::DJA or DJA@UK.AC.MAN.AST.STAR).
+Note that these programs are designed to do as much as possible for the
+user, to assist quick reduction and analysis of data---LONGSLIT can fit
+multiple Gaussians to line profiles in batch for example, and will
+decide how many components to fit.
+More information on the aims behind the package are given in Wilkins
+1988.
+\vspace*{3mm}
+\rule{\textwidth}{0.5mm}
+\begin{center}
+{\large\bf Users of this software are requested to acknowledge the
+authors of the software in any publications resulting from its use.}
+\end{center}
+\rule{\textwidth}{0.5mm}
+\vspace*{3mm}
+
+\subsection{Accessing These Programs}
+
+These routines are accessed from DCL FIGARO, as with ``normal'' FIGARO
+commands or from ICL (Bailey 1989, Chipperfield 1989, Lawden 1989).
+The latter is based on the method used to create the ADAM monolith
+version of FIGARO.
+When this is started logical names are set up in the job logical name
+table to control plotting of hardcopy output.
+These are taken from a file TWODSPEC\_GRAPH.COM, and private copies (to
+change the default print queues for example) can be kept in the users
+FIGARO\_PROG\_U.
+\begin{quote}\begin{verbatim}
+$ ADAMSTART
+$ ICL
+
+Interactive Command Language   -   Version 1.5-3
+
+  - Type HELP package_name for help on specific Starlink packages
+  -   or HELP PACKAGES for a list of all Starlink packages
+ Command ASTERIX redefined
+  - Type HELP [command] for help on ICL and its commands
+
+ICL> TWODSPEC
+Creating DCL subprocess
+
+ ---------- Initialised for TWODSPEC ---------
+
+        Version: February 15th, 1991
+
+ICL> LONGSLIT
+Loading FIGARO_PROG_N:TWODSPEC into 2225TWODSPEC
+IM - (IMage) Name of image for input /'2064SCR'/ >
+\end{verbatim}\end{quote}
+for example.
+It is quicker to access these programs from ICL, at least as regards
+entering and leaving the programs.
+The same limitations apply as with the ADAM version of FIGARO (see
+Shortridge 1989).
+Note that the programs IRAF2HDS, HDS2IRAF and BATCH are not available
+from ICL (BATCH is not a FIGARO program, and IRAF2HDS and HDS2IRAF both
+require special linking).
+Beware that batch queue CPU limits are effectively reduced by running
+from ICL.
+
+To use from DCL, the you would enter FIGARO as normal, and then type the
+name of the command, e.g.
+\begin{quote}\begin{verbatim}
+$ FIGARO
+  
+  F I G A R O      Version 2.4  (31st Oct 1988)
+  
+  Some help may be obtained by typing HELP FIGARO
+  
+$ LONGSLIT ....
+This version of LONGSLIT is from $1$DRB3:[FIGPACK.TWODSPEC.TWODSPEC]
+(IMage) Name of image for input [2063] - 
+\end{verbatim}\end{quote}
+The examples in this document are for the DCL version, and the prompting
+and parameter names will be different for the ICL version---the
+parameter names are be the most abbreviated form allowed for the DCL
+version, given in upper case in the listings below.
+
+\subsection{Graphics}
+
+As with FIGARO (from version 2.4), the programs use GNS to translate the
+graphics device names, so the same user variables are used as for
+FIGARO.
+Thus the FIGARO commands SOFT and HARD can be used to set the devices
+for LONGSLIT etc.
+Checking is carried out by SOFT and HARD, but if for any reason
+(e.g.\ the device is set to IKON1\_VT and somebody else is using the
+Ikon) the programs described here fail to open a device when running
+interactively (except for greyscale), the user is prompted for a new
+device name.
+
+Plot files are automatically sent to the plotter, being printed
+PRINT/PASSALL/DELETE/NOTIFY (this is performed using SYS\$SNDJBCW for
+those who like to know such things!).
+
+Note that, for the cursor to work properly on the ARGS or IKON (other
+than when used on greyscale or profile array plots in FIBDISP) the
+device must be of the type IKON1\_VT, ARGS1\_VT etc.
+
+All programs will correctly handle any connection identifier as regards
+printing files, not just 0.
+It is possible, for example to use the following set of commands:
+\begin{quote}\begin{verbatim}
+$ HARD "1200,2" FORCE
+$ DEFINE GKS_1200_2 MYPLOT.LIS
+$ LONGSLIT .....  !Produce hardcopy plots.
+\end{verbatim}\end{quote}
+ and get a file produced and printed called MYPLOT.LIS.
+This may be of use if you have two programs working in one directory
+producing plot files (e.g.\ one in batch), confusion will be avoided
+(although there are unlikely to be problems even if they do have the
+same name, since the programs check the full file name soon after
+opening the file, including version number).
+
+Some programs also use a greyscale display, prompted for as required.
+
+For hardcopy devices the line width and font are set to give higher
+quality plots.
+
+\subsection{Note on Menus}
+
+Many of the programs use menus to find out what the user requires next.
+When a menu-type prompt is given, the answer may be abbreviated, as long
+as a unique match is achieved (in many cases the most abbreviated form
+is given in brackets).
+Some menus also allow numbers or additional strings to follow (or even
+replace) the menu options themselves.
+
+The menu parser can accept the command ``\%$n$'' to alter the prompting
+style.
+At present $n$ can be from 0 (no menu, just menu name) to 3 (full menu,
+abbreviations given in square brackets).
+This will then apply to future calls of the menu routine (note that the
+parameter menus (e.g.\ ARC\_OPTS) are dealt with separately to most of
+the menus, and only support option 2.
+Options 0 and 1 are for experienced users, especially if they are
+working with slow terminal lines (or slow computers!).
+The formats are as below:
+\newcounter{menus}
+% LATEX doesn't seem able to handle a counter of 0, so 1st item has to
+% explicitly give the header!
+\begin{list}{Option \arabic{menus}:}{\usecounter{menus}}
+\setcounter{menus}{0}
+\item[Option 0]
+\hspace*{150 mm}
+\begin{quote}\begin{verbatim}
+Manual Mode -
+\end{verbatim}\end{quote}
+\item\samepage
+\hspace*{150 mm}
+\begin{quote}\begin{verbatim}
+Last,Next,Scan,Trim,Window,Check,Exit
+Manual Mode -
+\end{verbatim}\end{quote}
+\item (default)
+\hspace*{150 mm}
+\begin{quote}\begin{verbatim}
+
+=========< M a n u a l   M o d e >=========
+ 
+[name]   : Line name to go to that line
+Last     : Move back to previous Line
+Next     : Move on to next line in list
+Scan     : Scan a series of xsects
+Trim     : LIMIT the range of X-sects
+Window   : Scan and average data in windows
+Check    : Check previous fits (20 to a screen)
+Exit     : Return to main menu
+Manual Mode -
+\end{verbatim}\end{quote}
+\item
+\hspace*{150 mm}
+\begin{quote}\begin{verbatim}
+
+=========< M a n u a l   M o d e >=========
+ 
+[name]      : Line name to go to that line
+LAST    [L] : Move back to previous Line
+NEXT    [N] : Move on to next line in list
+SCAN    [S] : Scan a series of xsects
+TRIM    [T] : LIMIT the range of X-sects
+WINDOW  [W] : Scan and average data in windows
+CHECK   [C] : Check previous fits (20 to a screen)
+EXIT    [E] : Return to main menu
+Manual Mode -
+\end{verbatim}\end{quote}
+\end{list}
+For options 1 and 2 the minimum abbreviation is given in upper case.
+
+The option is also provided here to spawn to a subprocess, useful if you
+receive mail when running LONGSLIT for example:
+\begin{quote}\begin{verbatim}
+Window Menu [FIT] - %$
+$ MAIL
+...
+$ LOGOUT
+Window Menu [FIT] -
+\end{verbatim}\end{quote}
+The command ``??'' will output help on the menu.
+
+\subsection{The Defaults File}
+\label{deffile}
+
+This file (at present called TWODSPEC\_DEFAULTS.DST) is used to allow
+the behaviour of programs to be varied.
+The elements have the following meanings:
+\begin{description}
+\item[FIT\_HANDLER]
+If this has the value 1 then a condition handler is used during the
+fitting (this is in addition to the FIGARO default handler).
+\item[OPT\_STEP]
+This controls the size of jump between iterations in the fitting.
+The value multiplies the default.
+\item[TOLS]
+These are the values copied to the TOLS array in the results structure
+when a new results structure is created.
+Where appropriate the values will be multiplied by the dispersion.
+\item[USEPEAK]
+If this is 1 then the single component fitting will default to taking
+the peak as the centre, for guessing.
+\item[VACUUM]
+This is set to 1 to indicate wavelengths are values in vacuum.
+\item[AX1\_LOG]
+If this is 1 it indicates that the first axis has a log scale (by
+default).
+\item[AX1\_UNITS]
+The default units for the first axis.
+\end{description}
+The file is kept in FIGARO\_PROG\_N, but may be copied to another
+directory to allow private versions.
+The values may be set using the program ALTDEF (see
+section~\ref{altdef}).
+
+\section{Line Profile Analysis}
+\subsection{Introduction}
+
+In order to parameterise a long-slit spectrum, it is often
+convenient to fit a function to the spectral lines.
+The most commonly used function is a Gaussian, defined as:
+\[
+     f(x) = H e^{-((x-x_{0})^{2}/2\sigma^{2})}
+\]
+where $\sigma$ is the standard deviation of the line, $x_{0}$ is its
+centre, and $H$ is its height.
+If the gas consists of a number of discrete clumps, moving at the same
+velocity, then a series of Gaussians would normally accurately represent
+the line profile (although the instrumental profile may alter this).
+
+In many cases it is evident that more than one
+Gaussian is required, whereas some profiles are asymmetrical, but not
+necessarily of more than one component.
+For the latter the skew Gaussian (Frazer and Suzuki 1969) is useful:
+\[
+     f(x) = H e^{-(\ln 2(\ln (1+2s(x-x_{0})/w)/s)^{2})}
+\]
+where $s$ is positive or negative, depending on the direction of the
+skew.
+$w$ is the width.
+As $s$ tends to zero, this tends to a symmetrical Gaussian.
+Fitting a skew Gaussian is also useful when two components are present,
+but one is too weak to allow a double Gaussian to be fitted.
+This function also represents the line profiles found in many Seyfert
+galaxies (see for example the profiles shown by Whittle 1985).
+
+The Cauchy function may also be used:
+\[
+     f(x) = \frac{H}{1+[2(x-x_{0})/w]^{2}}
+\]
+The instrumental line profiles from a Fabry-Perot interferometer are
+approximate Cauchy functions.
+The precise form (Bland 1986) is:
+\[
+A(x,y,z) =
+[1+(2N/\pi )^{2}\sin^{2}((2\pi \mu l(z)\cos Q)/\lambda )]^{-1}
+\]
+where $N$ is the finess of the etalon, $\mu$ the refractive index of
+air, $l(z)$ the etalon spacing, $Q$ the angle to the optical axis, and
+$\lambda$ the wavelength of the light concerned.
+
+Frazer and Suzuki (1969) give a function which varies smoothly between a
+Gaussian and a Cauchy function:
+\begin{equation}
+     f(x) = \frac{H}{(1+[2^{a^{2}}-1][2(x-x_{0})/w]^{2})}
+\label{eq.varcauchy}
+\end{equation}
+where as $a$ tends to 0, this function tends to a Gaussian, and for
+$a=1$, it is a Cauchy function.
+
+The fitting consists of optimising the values of the free parameters,
+that is $H$, $x_{0}$, etc.
+Normally one would also allow the fitting routines to vary the base
+level.
+
+The programs LONGSLIT and FIBDISP can fit Gaussians (single or
+multiple), skew Gaussians and Cauchy functions (actually the function of
+equation \ref{eq.varcauchy}) to line profiles and LONGSLIT can also
+carry out shape analysis to produce the Whittle (1982, 1985) and Heckman
+(Heckman {\it et al.} 1981) asymmetry parameters (the latter is also
+evaluated at heights other than 20\%)---these are described below.
+From the fitting (not the shape analysis), velocity plots may be
+produced by the programs, as can plots of line width and line flux (not
+FIBDISP), for each line against cross-section (greyscale in FIBDISP).
+It is also possible to output greyscale or contour velocity plots.
+LONGSLIT is designed to operate in batch as much as possible.
+
+\subsection{LONGSLIT}
+\label{sec.long}
+
+LONGSLIT is designed primarily for the analysis of long-slit spectra,
+although this is mainly a matter of the display options available---the
+fitting routines, for example, can cope with three-dimensional data.
+
+The basic method of operation of LONGSLIT is as follows:
+
+\newcounter{longcntr}
+\begin{list}{(\roman{longcntr})}{\usecounter{longcntr}}
+\item Locate lines.
+This is done by extracting part (or all) of the image and displaying
+it.
+The user is then required to mark to either side of the lines with a
+cursor and to identify the lines so located.
+Alternatively CLONE (see section~\ref{long.id}) may be used.
+A great advantage with CLONE here is that, since the data
+is calibrated, for a lot of data the tram positions will be the same.
+This makes CLONING in batch very useful, since only one spectrum
+need be calibrated before submitting a job to calibrate the rest and
+then perform Gaussian fitting.
+This part is the same as for ARC2D (see section~\ref{sc.arc2d}).
+\item Choose the fit type.
+The type of fit to be performed is entered into the array .RES.CONTROL
+(see appendix~\ref{ap.res} for a description of the results structure),
+for the relevant line and cross-section.
+This defaults to a single Gaussian with a base.
+\item Perform the fit.
+The fit type is read from .RES.CONTROL, the fit is performed, and the
+results are stored in .RES.DATA.
+\item Output results.
+This can be in the form of plots, tables, or a file for input into the
+statistics program EXTATIC, also running in FIGARO\@.
+EXTATIC is derived from a program by W. Sparks, but has been extensively
+re-written.
+This permits more detailed statistical analysis of the results than is
+possible using LONGSLIT alone.
+\end{list}
+
+The fact that LONGSLIT uses its own structure in the data file
+(the .RES structure, see appendix~\ref{ap.res}), means that the different stages above
+can easily be carried out at separate times, without needing to stay in
+the program between them.
+
+There are two principle modes of operation for line fitting:
+
+\begin{description}
+
+\item[AUTO mode] In this the fits, blocking etc.\ are defined
+beforehand, and then performed without any further reference to the
+user (except for interactive multiple fits).
+This can be carried out in batch, thus saving time at the terminal.
+
+\item[MANUAL mode] In this the user can choose the blocking and fit
+type for each line as the fits are made, or the fit types may be
+defined in manual mode, but actually performed in AUTO mode, in batch
+for example.
+It is also possible to combine any range of cross-sections for a fit.
+Any previous fits may be displayed (this is the default), and it is
+possible to scan though the data, either individual cross-sections or
+with whole window's being averaged up for each plot.
+
+\end{description}
+
+If you are unfamiliar with LONGSLIT you should first read
+sections~\ref{long.id}, \ref{long.mb} and \ref{long.out}.
+If you get stuck try looking at section~\ref{long.main}.
+
+\subsubsection{Line Identification}
+\label{long.id}
+
+Since ARC2D and ARCSDI have much in common with LONGSLIT as regards
+line selection, we will only describe this part once, noting the
+differences when they occur.
+
+\begin{quote}\begin{verbatim}
+$ LONGSLIT 
+This version of LONGSLIT is from $1$DRB3:[FIGPACK.TWODSPEC.TWODSPEC]
+(IMage) Name of image for input [1052-5VIG] -
+------------------------------------------------------------------
+1052-5VIG        (ipcs)
+  .OBS           (struct)
+    .RUN         (short) 5
+\end{verbatim}\end{quote}
+LONGSLIT then outputs various information on the file.
+\begin{quote}\begin{verbatim}
+    .DATA[2040,171]  (float) 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+------------------------------------------------------------------
+
+ 
+=========< A r c _ O p t s >=========
+ 
+New      : Set up line identifications from scratch
+Repeat   : Use existing line identifications
+Clone    : Use line identifications from another file
+Fit option [REPEAT] - NEW
+\end{verbatim}\end{quote}
+The options here are:
+\begin{description}
+\item[NEW] Used on a file LONGSLIT has not been used on before, a
+.RES structure is created and the user is asked to locate and identify
+the lines.
+\item[CLONE] As NEW, but used where line identifications are to be
+copied from another file.
+\item[REPEAT] Used when a .RES structure already exists, that is if
+LONGSLIT (or ARC2D) has already been run on the file.
+\end{description}
+NEW mode is needed to set up line identifications.
+\begin{quote}\begin{verbatim}
+(MAXLines) Maximum number of lines to allow room for [10] -
+\end{verbatim}\end{quote}
+This only affects the size of the arrays to be used, so you are not
+committed to 10 lines! You cannot, however, later have more than the
+number set here.
+\begin{quote}\begin{verbatim}
+(MAXGauss) Maximum number of Gaussians to allow room for [5] -
+\end{verbatim}\end{quote}
+Similarly this only sets the maximum allowed number of components in a
+fit.
+Note that this is the only ``hard'' limit to the number of components to
+be fitted when guesses are made for multiple component fits.
+A look at the data should allow a sensible value to be selected, five is
+a reasonable value (data rarely needs more components than this).
+\begin{quote}\begin{verbatim}
+(YStart) analysis lower limit [160] -
+(YEnd) analysis upper limit [200] -
+\end{verbatim}\end{quote}
+A one-dimensional spectrum is extracted from the two-dimensional
+spectrum, and used for line selection.
+For LONGSLIT it is probably best to include all the data as here (the
+example data has 171 cross-sections), but for ARC2D and ARCSDI a central
+portion should be chosen (e.g.\ cross-sections 70--80 for a total of 171
+cross-sections).
+\begin{quote}\begin{verbatim}
+ 
+=========< D i s p l a y   M e n u >=========
+ 
+Auto     : Automatic segmentation
+Manual   : Manual segmentation
+Verify   : Verify auto segments
+Full     : Display all the data
+Exit     : Exit this option
+Display Menu [AUTO] - MANUAL
+\end{verbatim}\end{quote}
+For this discussion {\em segments} are sections of the spectrum which
+are displayed here rather than plotting the whole spectrum.
+The default width is 150 channels---where a default is applicable.
+Segments will normally be useful as this mode gives higher resolution
+for more precise location of the lines.
+{\em MANUAL} mode is best in LONGSLIT, whereas in ARC2D and ARCSDI {\em
+AUTO} mode is best.
+If you have already isolated the section of the spectrum containing the
+line (when only one line is present), then {\em FULL} mode may be used.
+\begin{quote}\begin{verbatim}
+ 
+=========< M a n u a l   S e m e n t a t i o n >=========
+ 
+Span       : Enter a segment width
+Keyboard   : Enter segments from keyboard
+Cursor     : Use cursor to define segments
+Exit       : Abandon this operation
+Manual Segmentation [CURSOR] -
+\end{verbatim}\end{quote}
+At this stage the segments to be used for locating the lines are
+defined using a cursor.
+These are found by marking either side of the region containing the
+line.
+We call these delimiters {\em trams}.
+\begin{quote}\begin{verbatim}
+Locate Line :   1
+2nd tram line
+Locate Line :   2
+2nd tram line
+Locate Line :   3
+2nd tram line
+Locate Line :   4
+2nd tram line
+Locate Line :   5
+number of segments   4
+ C U R R E N T   S E G M E N T S
+ ------------------------------
+ 
+   SEG no        LEFT           RIGHT
+     1           6550.1          6601.9
+     2           6529.0          6569.9
+     3           6538.9          6586.4
+     4           6703.8          6744.7
+ 
+=========< V e r i f i c a t i o n   M e n u >=========
+ 
+Accept    : Use current segments
+Change    : Change the segment width
+Display   : Display current segments
+Manual    : Go into manual mode
+Exit      : Abandon segmentation
+Verification Menu [ACCEPT] -
+
+=========< L i n e   S e l e c t i o n >=========
+
+Auto     : Automatic selection
+Manual   : Manual selection
+Line Selection [MANUAL] -
+\end{verbatim}\end{quote} 
+We will select the {\it MANUAL} more of operation.
+At this stage the actual lines are located by marking to either side
+with a cursor.
+Be sure to include some base to either side, so that the optimisation
+routines can determine the base level precisely.
+\begin{quote}\begin{verbatim}
+ 
+=========< T r a m   L i n e   S e t   U p >=========
+ 
+Locate lines by marking either side of line
+E :to end selection
+F :to scroll to next segment (END if no segments)
+B :to scroll to previous segment (END if no segments)
+I :to ignore the line (2nd tram only)
+W :to display whole spectrum
+C :to change the scale of the display
+Any other key to include the line
+ 
+Locate Line :   1
+2nd tram line
+Locate Line :   2
+2nd tram line
+ 
+=========< T r a m   L i n e   S e t   U p >=========
+ 
+Locate lines by marking either side of line
+E :to end selection
+F :to scroll to next segment (END if no segments)
+B :to scroll to previous segment (END if no segments)
+I :to ignore the line (2nd tram only)
+W :to display whole spectrum
+C :to change the scale of the display
+Any other key to include the line
+ 
+Locate Line :   3
+\end{verbatim}\end{quote}
+If the key ``C'' is pressed, this causes the program to prompt for a new
+maximum Y value for the display.
+This is used to select weak lines, where the default display is such
+that they are small on the display, due to the presence nearby of much
+stronger line(s).
+\begin{quote}\begin{verbatim}
+Enter new value for ymax -  5000
+ 
+=========< T r a m   L i n e   S e t   U p >=========
+ 
+Locate lines by marking either side of line
+E :to end selection
+F :to scroll to next segment (END if no segments)
+B :to scroll to previous segment (END if no segments)
+I :to ignore the line (2nd tram only)
+W :to display whole spectrum
+C :to change the scale of the display
+Any other key to include the line
+ 
+Locate Line :   3
+2nd tram line
+Locate Line :   4
+\end{verbatim}\end{quote}
+The remaining lines are located.
+\begin{quote}\begin{verbatim} 
+ 
+=========< T r a m   L i n e   S e t   U p >=========
+ 
+Locate lines by marking either side of line
+E :to end selection
+F :to scroll to next segment (END if no segments)
+B :to scroll to previous segment (END if no segments)
+I :to ignore the line (2nd tram only)
+W :to display whole spectrum
+C :to change the scale of the display
+Any other key to include the line
+ 
+Locate Line :   6
+OK? [YES]
+   5 Lines located
+
+\end{verbatim}\end{quote}
+Alternatively we could have used an automatic line-finding algorithm, by
+selecting {\it AUTO} at the {\it Line Selection} menu.
+this uses a routine adapted from SPICA, the predecessor to FIGARO.
+The automatic line finding algorithm checks for a
+minimum acceptable height for a line and for the values of the data
+dropping off to either side. It then finds the centroids and checks
+that the possible lines are above a minimum width. A check is also made
+for the line's being sufficiently above the noise, and for not being a
+side-peak to another line.
+
+The lines have now been located, LONGSLIT and ARC2D now need to know the
+identifications of these lines.
+Line lists are provided and users may create their owns lists.
+Alternatively the ``ID'' option in the ``Identification Menu'' can be
+used, in which a wavelength and name are used as given.
+Since ARCSDI only aims to straighten the lines, you would leave ARCSDI
+here.
+\begin{quote}\begin{verbatim}
+ 
+=========< L i n e   L i s t   M e n u >=========
+ 
+Emission     : Emission lines
+Absorption   : Absorption lines
+Neon         : Neon arc
+Cuar         : Copper-argon arc
+Helium       : Helium arc
+Iron         : Iron arc
+SKy          : Sky lines
+STored       : User supplied list in file
+Limit        : Limit wavelength range of lines to consider
+Ok           : All tables read in
+Line List Menu - e
+ 
+ Emission line list.
+ Current version August 1990
+  78 lines read from EMISSION
+\end{verbatim}\end{quote}
+The user can create his/her own file for use here.
+No responsibility is accepted for the wavelengths of the lines in the
+lists supplied.
+The format is as below, and the files can be created using an editor.
+The header consists of a number (as many as you want) of lines with an
+asterix in the first column, the only thing that is done with
+these is that they are written to the terminal (without the asterix).
+The contents of the first line without an asterix in the first column
+are ignored, and then all remaining lines are taken as data lines.
+The data lines have the wavelength followed by the name (read
+free-format), the array for the names is character*10 line\_name(number
+of line slots).
+These files can be placed in the default directory (the program will
+search there first, so they can have the same names as those supplied).
+The first few lines of the emission line list supplied are given here:
+\begin{quote}\begin{verbatim}
+* Emission line list.
+* Current version August 1990
+
+ 3726.1600 [OII]
+ 3728.9100 [OII]
+ 4101.0000 HDELTA
+ 4276.8300 [FeII]
+ 4287.4000 [FeII]
+ 4319.6200 [FeII]
+\end{verbatim}\end{quote}
+It is possible to specify the FIGARO .ARC files, as alternatives, but if
+there is a file included with TWODSPEC with the same name, excluding the
+extension, then the extension must be given (note that most of these do
+not include line names, so these will be left blank).
+When you have read in all the required line lists, you reply ``ok'' to
+the above menu.
+\begin{quote}\begin{verbatim}
+
+L I N E   I D E N T I F I C A T I O N
+-------------------------------------
+Identify line number  1
+\end{verbatim}\end{quote}
+The line with some of the surrounding spectrum is displayed so the user
+can, it is hoped, recognise the line!
+If the displayed width is not satisfactory, it can be changed using the
+WIDTH option of the menu shown below.
+A default response is given which is the value of the X array at the
+peak in intensity within the line boundaries.
+If, however, you already have two or more lines identified, the default
+will be interpolated or extrapolated from these (again using the
+positions of the maximum intensities within the line boundaries).
+It is possible to leave lines unidentified, although at present the only
+way to get back to the menu is by identifying at least one more
+line---you can edit the line list, but you then don't have the advantage
+of the interpolation to help guessing (the fitting of the dispersion
+relationship in ARC2D can be used to help line identification).
+You can keep looping around the line list, identifying the lines in any
+order.
+\begin{quote}\begin{verbatim}
+ 
+=========< I d e n t i f i c a t i o n   M e n u >=========
+ 
+[number]               : Line wavelength
+Width         [number] : Redraw with different width
+Next                   : Go to next line
+Display                : Start/stop displaying tables of wavelengths
+Id [wavelength] [name] : Give line ID/wavelength (just taken as given)
+Quit                   : Exit leaving lines unidentified
+Identification Menu [ 6548.4] -
+6548.1001 [NII]6548 ok? [YES]
+Identify line number  2
+ 
+=========< I d e n t i f i c a t i o n   M e n u >=========
+ 
+[number]               : Line wavelength
+Width         [number] : Redraw with different width
+Next                   : Go to next line
+Display                : Start/stop displaying tables of wavelengths
+Id [wavelength] [name] : Give line ID/wavelength (just taken as given)
+Quit                   : Exit leaving lines unidentified
+Identification Menu [ 6563.1] -
+6562.8169 HALPHA ok? [YES]
+\end{verbatim}\end{quote}
+When the program has 2 or more lines displayed, it will give a guess to
+remaining lines.
+The ``fit'' is a Chebyshev polynomial, then converted to a ``normal''
+polynomial (a warning is given if the line is outside the limits of the
+Chebyshev polynomial).
+The ``interpolated'' wavelength is obtained by using spline
+interpolation (up to 3rd order).
+The wavelength required here is the {\em REST} wavelength of the line.
+\begin{quote}\begin{verbatim}
+Identify line number  3
+Warning, line outside Cheby limits
+Fit (order=1) : 6583.45
+Interpolated : 6583.45
+ 
+=========< I d e n t i f i c a t i o n   M e n u >=========
+ 
+[number]               : Line wavelength
+Width         [number] : Redraw with different width
+Next                   : Go to next line
+Display                : Start/stop displaying tables of wavelengths
+Id [wavelength] [name] : Give line ID/wavelength (just taken as given)
+Quit                   : Exit leaving lines unidentified
+Identification Menu [ 6583.4463] -
+6583.6001 [NII]6584 ok? [YES]
+Identify line number  4
+Warning, line outside Cheby limits
+Fit (order=2) : 6721.03
+Interpolated : 6719.23
+ 
+=========< I d e n t i f i c a t i o n   M e n u >=========
+ 
+[number]               : Line wavelength
+Width         [number] : Redraw with different width
+Next                   : Go to next line
+Display                : Start/stop displaying tables of wavelengths
+Id [wavelength] [name] : Give line ID/wavelength (just taken as given)
+Quit                   : Exit leaving lines unidentified
+Identification Menu [ 6719.23] -
+6716.4702 [SII]6717 ok? [YES]
+Identify line number  5
+Warning, line outside Cheby limits
+Fit (order=3) : 6730.11
+Interpolated : 6730.57
+ 
+=========< I d e n t i f i c a t i o n   M e n u >=========
+ 
+[number]               : Line wavelength
+Width         [number] : Redraw with different width
+Next                   : Go to next line
+Display                : Start/stop displaying tables of wavelengths
+Id [wavelength] [name] : Give line ID/wavelength (just taken as given)
+Quit                   : Exit leaving lines unidentified
+Identification Menu [ 6730.5752] -
+6730.8501 [SII]6731 ok? [YES]
+ 
+ C U R R E N T   L I N E   L I S T
+ _________________________________
+line No     identification      wavelength
+   1           [NII]6548          6548.1001
+   2           HALPHA             6562.8169
+   3           [NII]6584          6583.6001
+   4           [SII]6717          6716.4702
+   5           [SII]6731          6730.8501
+Edit line list? [NO]
+\end{verbatim}\end{quote}
+Errors can be corrected using this edit option.
+The user now reaches the {\it Main Menu}:
+
+\begin{quote}\begin{verbatim}
+Current value of iteration is   1
+ 
+=========< M a i n   m e n u >=========
+ 
+ADd      : Add more lines
+It       : Change iteration
+AUto     : fixed window & fits type menu (use DEFINE first)
+Manual   : interactive setup of window & fits
+Define   : Define fits for AUTO
+Look     : Look at values of data cube
+Tols     : Apply tolerances
+Output   : Create output plots, etc.
+Exit     : Leave program
+Main menu [MANUAL] -
+\end{verbatim}\end{quote}
+
+Once you have located and identified lines in one file, this information
+may be {\em CLONED} to another file.
+A powerful feature of ARC2D and LONGSLIT
+is the ability to {\em CLONE} a set of line locations from another
+file, rather than, or in addition to (but preceding), the normal line
+selection. For this, the two arcs are plotted one above the other
+and, from three points marked by the user on each
+arc, the locations of the lines are interpolated for the new arc. The
+wavelengths and identifications are then also copied over. This means
+that if two spectra of the same wavelength range are to be used,
+without co-adding, then the whole process of line identification can be
+circumvented. If the spectra are very similar, then the information can
+be copied straight over, even in batch mode.
+The parts of the images to be extracted for the plots are prompted for.
+
+\subsubsection{MAIN MENU}
+\label{long.main}
+
+This controls the interactive use of LONGSLIT, apart from the initial
+line identification.
+
+The options are:
+\begin{description}
+\item[ADD] Add more lines
+\item[IT] Change iteration.
+This allows reduction of iteration, in order to allow previous fits to
+be over-ridden (they can also be over-ridden in MANUAL mode fitting). 
+\item[AUTO] In this mode one defines fits beforehand, and then goes
+though the lines and cross-sections in order performing the fits.
+This is the mode of fitting in batch, and ideally should not be carried
+out interactively.
+\item[MANUAL] In this mode one does the fits in whatever order is
+preferred.
+This can also be used for checking fits performed in batch mode.
+The line selected is indicated above the menu.
+Initially this is line one in the list.
+If you answer ``YES'' (the default) to ``Do all the fits when they are
+defined?'' then fits will be performed as you define them, otherwise
+they will only be defined, and execution is left to AUTO mode.
+MANUAL mode is also driven by a menu:\\
+\begin{description}
+\item[LAST] Move back to previous line in line list.
+\item[NEXT] Move on to next line in line list.
+\item[SCAN] Scan a series of xsects.
+This scans one cross-section at a time.
+\item[TRIM] Limit the range of cross-sections.
+This is useful for altering the block start/end in window mode (see
+below)
+\item[WINDOW] Scan and average data in windows.
+This is the main fitting mode for interactive use in LONGSLIT. 
+\item[CHECK] This displays 20 profile plots at a time.
+At present this will start at the current line, cross-section one, and
+scan through.
+When a screen is full, the user is asked whether he/she wants to see the
+next plots.
+This is designed for a quick look, before more detailed checking and
+re-fitting, if that is required.
+It is also useful to provide a convenient record of the line profiles to
+refer to, in which case the hardcopy option should be used. Note that
+if the ``quick plot'' option here (which gives plots of similar quality
+to softcopy plots) is not used the plots files can be {\em very} large.
+\item[Line name] to go to that line.
+By stating the line name, or any unique abbreviation, the line will be
+set to that selected.
+\item[EXIT] Return to main menu
+\end{description}
+\item[DEFINE] Define fits for AUTO mode, for batch or interactive use.
+This defines fits, either for all the lines at a time, or for each line
+separately.
+To define fits differently within a line, use MANUAL mode as described
+above.
+\item[LOOK] Look at values of data cube.
+This just lists the values in the results array.
+\item[TOLS] Apply tolerances.
+This will reject fits which have, for example, too great a width.
+\item[OUTPUT] These options are the main ways of producing output
+from the program.
+Selection of this puts the user into the ``OUTPUT MENU'', with the
+following options:\\
+\begin{description}
+\item[HARDCOPY] Produce plots of profile fits.
+The line profile is displayed, together with the fit.
+It is possible to preview the fits first in softcopy (unless all fits
+are being plotted, using the option ``plot whole cube'').
+If the option ``plot whole cube?'' is not being used, then the X-axis of
+the plots can be in km\,s$^{-1}$ or {\AA}ngstroms, otherwise they are in
+{\AA}ngstroms.
+\item[TABLE] Print table of profile parameters
+\item[SHAPE] Analyse the shape of the lines.
+This will give plots and tables of the Whittle and Heckman asymmetry
+parameters.
+The profiles must have been fitted with Gaussians etc., and the same
+blocking is used here as for fitting.
+\item[PLOT] Plot rotation curves.
+Also width v. cross-section and flux v. cross-section plots can be made.
+All these can be made in softcopy or hardcopy.
+Also a plot of average velocities v. cross-section will be plotted, if
+the plot is in hardcopy, and there is more than one line.
+\item[STATIC] Write results as EXTATIC FIGARO image.
+EXTATIC is a statistics program.
+\item[PRINT] Print rotation curves
+\item[RATIO] Evaluate line ratios
+\item[GREY] Produce greyscale plot of data.
+This is for one line at a time, using the wavelength limits for the line
+from the initial line location.
+A velocity scale is plotted on the X-axis.
+\item[CONTOUR] This is similar to the GREY option, but uses contours
+rather than a greyscale image.
+\item[FULL] This produces a table suitable for input to a FORTRAN
+program, including the information from both PRINT and PLOT.
+\item[EXIT] Exit and accept current setting of the options.
+When any selected plots etc.\ have been carried out, the user is
+returned to the main menu.
+\end{description}
+The output options (except GREY and RATIO) can be given in the command
+line as keywords.
+An example of the use of the OUTPUT option is given in
+section~\ref{long.out}.
+\item[EXIT] Leave program
+\end{description}
+
+\subsubsection{Use of LONGSLIT in Batch Mode}
+
+Since fitting Gaussians takes a fair time it is desirable to use
+LONGSLIT in batch mode wherever possible.
+To do so the lines must first be located as described in
+section~\ref{long.id}.
+The desired fit type must then be defined, by selecting the DEFINE
+option at the main menu, or alternatively the parameter FIT\_TYPE can be
+used (in which case the model can be set in batch).
+To fit a data set using skew Gaussians in batch, a command file
+containing the line
+\begin{quote}\begin{verbatim}
+$ LONGSLIT RUN1 REPEAT 1 386 5 0 FIT_MODEL=SK
+\end{verbatim}\end{quote}
+might be used.
+
+We will assume however that the fit model is to be defined
+interactively, in which case the user is then asked if the same
+model is to be used for all lines (if there is more than one line
+present), and to give the required model(s).
+In the following example all lines are to be fitted with double
+Gaussians (``untied'' means that the two Gaussians are independent of
+each other).
+
+\begin{quote}\begin{verbatim}
+ 
+=========< M a i n   m e n u >=========
+ 
+ADd      : Add more lines
+It       : Change iteration
+AUto     : fixed window & fits type menu (use DEFINE first)
+Manual   : interactive setup of window & fits
+Define   : Define fits for AUTO
+Look     : Look at values of data cube
+Tols     : Apply tolerances
+Output   : Create output plots, etc.
+Exit     : Leave program
+Main menu [MANUAL] - DEFINE
+Use same fit model for all lines? [YES] YES
+ 
+=========< F i t _ M o d e l >=========
+ 
+No    : Don't fit this xsect
+Ga    : Fit a Gaussian without base
+Bg    : Fit a Gaussian with base
+Sk    : Fit a Skew Gaussian
+Ca    : Fit a Cauchy function
+TS    : Fit two tied Gaussians, fixed separation
+TW    : Fit two tied Gaussians, fixed width ratio
+TH    : Fit two tied Gaussians, fixed height ratio
+Ut    : Fit two untied Gaussians
+Mg    : Fit a multiple Gaussian
+(FIT_MODEL) Model of fit to perform [BG] - UT
+\end{verbatim}\end{quote}
+Normally you would fit lines with the same model along all of
+the slit length, but in the following case line 2 is to be fitted with a
+double Gaussian (unconstrained) for the first 90 cross-sections, and a
+skew Gaussian for the rest.
+The default fit type is a Gaussian with a base.
+
+DEFINE can be used if you want to fit a whole line with a given type of
+fit e.g.\ a skew Gaussian.
+The ADD option puts you back into the line selection as above, but
+without the option of automatic line location.
+The option is given to edit the line list again.
+\begin{quote}\begin{verbatim}
+Do all the fits when they are defined? [YES] NO
+\end{verbatim}\end{quote}
+Answer ``NO'', otherwise fits will be performed as soon as they are
+defined
+\begin{quote}\begin{verbatim}
+[NII]6548 (line No 1)
+ 
+=========< M a n u a l   M o d e >=========
+ 
+[name]   : Line name to go to that line
+Last     : Move back to previous Line
+Next     : Move on to next line in list
+Scan     : Scan a series of xsects
+Trim     : LIMIT the range of X-sects
+Window   : Scan and average data in windows
+Check    : Check previous fits (20 to a screen)
+Exit     : Return to main menu
+Manual Mode - NEXT
+HALPHA (line No 2)
+ 
+=========< M a n u a l   M o d e >=========
+ 
+[name]   : Line name to go to that line
+Last     : Move back to previous Line
+Next     : Move on to next line in list
+Scan     : Scan a series of xsects
+Trim     : LIMIT the range of X-sects
+Window   : Scan and average data in windows
+Check    : Check previous fits (20 to a screen)
+Exit     : Return to main menu
+Manual Mode - WINDOW
+(YBlock) Analysis x-sect width [5] - 90
+Number of blocks = 2
+Enter starting cross-section number [1] -
+ Window number = 1 (xsects 1 to 90)
+\end{verbatim}\end{quote}
+The line is displayed.
+
+If a previous fit has been made on the same data, this is displayed
+at this stage (but this can be suppressed).
+\begin{quote}\begin{verbatim}
+No previous fit
+ 
+=========< W i n d o w   M e n u >=========
+ 
+Fit      : Fit this window as it stands
+Next     : Display next WINDOW
+Last     : Display previous window
+SEe      : Look at individual elements of window
+Change   : Change window width
+Exit     : Return to Manual Mode menu
+SCan     : Scan through windows
+Old      : Start/stop plotting old fits
+Delete   : Delete fits in this range
+Hard     : Produce hardcopy of data with fit
+Guess    : Alter details of guessing
+Window Menu [FIT] -
+Test for bimodality [NO]
+ 
+=========< F i t _ M o d e l >=========
+ 
+No    : Don't fit this xsect
+Ga    : Fit a Gaussian without base
+Bg    : Fit a Gaussian with base
+Sk    : Fit a Skew Gaussian
+Ca    : Fit a Cauchy function
+TS    : Fit two tied Gaussians, fixed separation
+TW    : Fit two tied Gaussians, fixed width ratio
+TH    : Fit two tied Gaussians, fixed height ratio
+Ut    : Fit two untied Gaussians
+Mg    : Fit a multiple Gaussian
+(FIT_MODEL) Model of fit to perform [TS] - U
+ 
+=========< W i n d o w   M e n u >=========
+ 
+Fit      : Fit this window as it stands
+Next     : Display next WINDOW
+Last     : Display previous window
+SEe      : Look at individual elements of window
+Change   : Change window width
+Exit     : Return to Manual Mode menu
+SCan     : Scan through windows
+Old      : Start/stop plotting old fits
+Delete   : Delete fits in this range
+Hard     : Produce hardcopy of data with fit
+Guess    : Alter details of guessing
+Window Menu [FIT] - NEXT
+ : Window number = 2[ xsects 91 to 171 ]
+\end{verbatim}\end{quote}
+The line is displayed.
+\begin{quote}\begin{verbatim}
+No previous fit
+Test for bimodality [NO]
+ 
+=========< F i t _ M o d e l >=========
+ 
+No    : Don't fit this xsect
+Ga    : Fit a Gaussian without base
+Bg    : Fit a Gaussian with base
+Sk    : Fit a Skew Gaussian
+Ca    : Fit a Cauchy function
+TS    : Fit two tied Gaussians, fixed separation
+TW    : Fit two tied Gaussians, fixed width ratio
+TH    : Fit two tied Gaussians, fixed height ratio
+Ut    : Fit two untied Gaussians
+Mg    : Fit a multiple Gaussian
+(FIT_MODEL) Model of fit to perform [TS] - SK
+\end{verbatim}\end{quote}
+Just reply with ``EXIT'' from now on to leave the program.
+\begin{quote}\begin{verbatim}
+ 
+=========< W i n d o w   M e n u >=========
+ 
+Fit      : Fit this window as it stands
+Next     : Display next WINDOW
+Last     : Display previous window
+SEe      : Look at individual elements of window
+Change   : Change window width
+Exit     : Return to Manual Mode menu
+SCan     : Scan through windows
+Old      : Start/stop plotting old fits
+Delete   : Delete fits in this range
+Hard     : Produce hardcopy of data with fit
+Guess    : Alter details of guessing
+Window Menu [FIT] - EXIT
+HALPHA (line No 2)
+
+=========< M a n u a l   M o d e >=========
+ 
+[name]   : Line name to go to that line
+Last     : Move back to previous Line
+Next     : Move on to next line in list
+Scan     : Scan a series of xsects
+Trim     : LIMIT the range of X-sects
+Window   : Scan and average data in windows
+Check    : Check previous fits (20 to a screen)
+Exit     : Return to main menu
+Manual Mode - EXIT
+ Fits defined =    2
+Current value of iteration is   1
+ 
+=========< M a i n   m e n u >=========
+
+ADd      : Add more lines
+It       : Change iteration
+AUto     : fixed window & fits type menu (use DEFINE first)
+Manual   : interactive setup of window & fits
+Define   : Define fits for AUTO
+Look     : Look at values of data cube
+Tols     : Apply tolerances
+Output   : Create output plots, etc.
+Exit     : Leave program
+Main menu [MANUAL] - EXIT
+\end{verbatim}\end{quote}
+
+You have now left the program
+
+ The setting up of lines in ARCSDI is similar to the above, except that
+the program is exited after the ``OK?'' question above (before line
+identification).
+
+ The program should then be submitted as a batch job, the following
+command line will fit cross-sections 1 to 180 blocking together in
+blocks of 2.
+REPEAT indicates that the lines are already identified---as above---the
+0 is iteration, this may be used later, but should be set to zero.
+Always use REPEAT mode when you have already identified one or more
+lines.
+\begin{quote}\begin{verbatim}
+$ LONGSLIT T4 REPEAT 1 180 2 0
+\end{verbatim}\end{quote}
+The following is a complete command file to run longslit in batch,
+in this case REPEAT is abbreviated to R.
+\begin{quote}\begin{verbatim}
+$ FIGARO
+$ SET DEFAULT SCRATCH:[TNW]
+$ LONGSLIT T4 R 1 180 2 0
+$ EXIT
+\end{verbatim}\end{quote}
+To run any FIGARO function in batch, it will probably be found
+convenient to use the program BATCH, in (see section~\ref{batch}).
+
+\paragraph{Fitting Multiple Components in Batch}
+\label{long.mb}
+
+If LONGSLIT, when in batch mode, comes across a fit defined as multiple,
+it will attempt to fit it with as many lines as it thinks are needed!
+It uses the tolerance settings for minimum and maximum width, and
+minimum height.
+These are used for the guesses and the final answers, and will probably
+need some tweaking.
+Also it will of course still need checking afterwards.
+It may well have more than one attempt at fitting. This checking is
+easily carried out using the CHECK option in MANUAL mode---it
+is best to use this to produce hardcopy plots which can be kept beside
+the terminal while you go through checking (you may find 20\% of the
+profiles need re-fitting, but this will depend upon the line profiles,
+as well as the values of the tolerances). You may also need to
+investigate cross-sections for which no fit is given---this may be
+because there is no emission at that point, or the fit may have failed
+for some reason, even with strong emission (it may guess too many
+components for example, and then crash in the fitting).
+Note that LONGSLIT outputs to the batch log file the reason why the next
+component was not accepted when it searches for components. The log file
+will also contain details of any re-fitting.
+Thus if the fits are not acceptable after the first attempt at using
+this, the user can inspect the log file and alter the tolerances
+accordingly.
+Because of this information the batch log file can get quite large (the
+log file can be made smaller if the keyword PRFITS is set to false, but
+there is then no information about the fitting).
+
+The keyword AIC determines whether Akaike's information criterion
+(Akaike 1973) is used during batch multiple fitting to decide how many
+components to fit.
+This is true by default.
+The guesses are made in the same way, whether or not this is true,
+except that the widths are allowed to be a little larger---in both cases
+the guesses to the widths are allowed to the value in the tolerances
+array, to allow for errors in guessing (the fits are only accepted if
+they are actually within the tolerances), this  ratio is larger if AIC
+is true.
+The value of the criterion is then calculated, and the best value is
+selected after progressively removing components to the fit.
+Thus if the guessing produces three components, the program will also
+``see what happens'' with two components, one component and just a base.
+This is fairly heavy on cpu usage (it can take several hours cpu), and
+the batch log file is even larger than if AIC is false (unless PRFITS is
+false).
+The criterion is
+\[
+C = M \times \ln S + 2 \times N
+\]
+where $C$ is Akaike's information criterion, $M$ is the number of data
+points, $S$ is the weighted sum of squares, and $N$ is the number of fit
+parameters.
+The fit with the lowest value of $C$ is used.
+For fitting the tolerances should be as close as possible to the
+expected values of the parameters.
+
+The user is {\em strongly} encouraged to learn to use this option, since
+it can give considerable time savings.
+
+If the keyword BOUNDS is specified then the fits will be bounded on
+widths as in the TOLS array, all other parameters will be bounded
+within the window.
+
+N.B. To refit a cube which has already been fitted, but the values
+changed, e.g.\ flux-calibrated, use the keyword COPY, which will use
+scaled existing values as first guesses, repeating all the fits in the
+``cube''.
+If used with CLONE, it enables similar spectra to be easily fitted. 
+
+\paragraph{Tolerances in Batch}
+
+Tolerances can be applied in batch.
+The values must be set up beforehand, the tolerances to be used are
+selected by number (as when using normally).
+The parameter TOLS is used, set it to 15 or 51 for example to apply
+tolerances on height and signal to noise---the program merely searches
+for the number in the string, so Z1Z5 would also work!! The numbers are:
+\newcounter{tolcntr}
+\begin{list}{\bf\arabic{tolcntr} ---}{\usecounter{tolcntr}}
+\item Test tolerances on line height
+\item Test tolerances on line center
+\item Test tolerances on line width
+\item Test tolerances on line errors
+\item Test tolerances on line signal to noise
+\item Test tolerances on line shape
+\item Test tolerances on line separations
+\end{list}
+
+When tolerances are used like this, the current values of the tolerances
+are used-there is no facility in LONGSLIT to change their values in
+batch (although the FIGARO function LET can be used). This facility is
+also available in ARC2D, ARCSDI and COMB (although not all the
+tolerances are meaningful).
+
+The user may wish to refit weaker areas with a larger blocking, and the
+use of tolerances allows such fits to be rejected to allow this.
+The user would then run LONGSLIT again to perform the fits at the new
+blocking, and this process may be repeated several times, gradually
+increasing the blocking.
+
+\paragraph{Other Facilities in Batch Mode}
+
+The output options are also available in batch (see
+sections~\ref{long.out} and~\ref{long.fit}).
+Cloning is available in batch, but only if no shift is required (i.e.
+the lines can be copied straight over).
+
+\subsubsection{Fitting Gaussians etc. Interactively}
+
+The main method of fitting these is the WINDOW option of MANUAL mode.
+First select MANUAL at the main menu.
+\begin{quote}\begin{verbatim}
+ 
+=========< M a i n   m e n u >=========
+ 
+ADd      : Add more lines
+It       : Change iteration
+AUto     : fixed window & fits type menu (use DEFINE first)
+Manual   : interactive setup of window & fits
+Define   : Define fits for AUTO
+Look     : Look at values of data cube
+Tols     : Apply tolerances
+Output   : Create output plots, etc.
+Exit     : Leave program
+Main menu [MANUAL] - MANUAL
+\end{verbatim}\end{quote}
+Respond that you do wish to perform fits now, and select the WINDOW
+option. Give the required blocking (number of cross-sections added
+together) and the starting cross-section.
+\begin{quote}\begin{verbatim}
+Do all the fits when they are defined? [YES] YES
+[NII]6548 (line No 1)
+ 
+=========< M a n u a l   M o d e >=========
+ 
+[name]   : Line name to go to that line
+Last     : Move back to previous Line
+Next     : Move on to next line in list
+Scan     : Scan a series of xsects
+Trim     : LIMIT the range of X-sects
+Window   : Scan and average data in windows
+Check    : Check previous fits (20 to a screen)
+Exit     : Return to main menu
+Manual Mode - WINDOW
+(YBlock) Analysis x-sect width [5] - 90
+Number of blocks = 2
+Enter starting cross-section number [1] -110
+ Window number = 11 (xsects 101 to 110)
+\end{verbatim}\end{quote}
+The line is displayed.
+This then puts you into WINDOW menu. Select FIT and then select the fit
+type required.
+MG allows the user to set the guesses required for
+optimisation, and to constrain the fits if required. TG allows the
+ratio of the heights or widths, or the separation of the lines, to be
+fixed. The other fit types are entirely automatic. Note that the
+``Cauchy'' function is actually a function which varies smoothly
+between a true Cauchy function and a Gaussian
+(equation~\ref{eq.varcauchy}).
+\begin{quote}\begin{verbatim}
+No previous fit
+ 
+=========< W i n d o w   M e n u >=========
+ 
+Fit      : Fit this window as it stands
+Next     : Display next WINDOW
+Last     : Display previous window
+SEe      : Look at individual elements of window
+Change   : Change window width
+Exit     : Return to Manual Mode menu
+SCan     : Scan through windows
+Old      : Start/stop plotting old fits
+Delete   : Delete fits in this range
+Hard     : Produce hardcopy of data with fit
+Guess    : Alter details of guessing
+Window Menu [FIT] -
+Test for bimodality [NO]
+ 
+=========< F i t _ M o d e l >=========
+ 
+No    : Don't fit this xsect
+Ga    : Fit a Gaussian without base
+Bg    : Fit a Gaussian with base
+Sk    : Fit a Skew Gaussian
+Ca    : Fit a Cauchy function
+TS    : Fit two tied Gaussians, fixed separation
+TW    : Fit two tied Gaussians, fixed width ratio
+TH    : Fit two tied Gaussians, fixed height ratio
+Ut    : Fit two untied Gaussians
+Mg    : Fit a multiple Gaussian
+(FIT_MODEL) Model of fit to perform [TS] - MG
+\end{verbatim}\end{quote}
+We choose MG for this example. The program plots the line profile with
+the current guesses (either taken from a previous fit or ``guessed''
+from scratch).
+\begin{quote}\begin{verbatim}
+HALPHA (line = 2)
+Previous fit
+Single emission    Gaussian with base
+successful
+Will fit a multiple Gaussian
+Number of gaussians in previous fit = 2
+Guesses:-
+Component     Centre        fwhm       Height    Base
+   1       6564.599       0.8904        255.1        2.934
+   2       6561.983        1.485        23.98
+ 
+=========< A l t e r   c o m p o n e n t s >=========
+ 
+Up   F : Up (F=factor)
+Do   F : Down
+Ri   F : Move centre right
+Le   F : Move centre left
+Wi   F : Wider
+Na   F : Narrower
+Pl     : Plot-to replot
+St     : To stop
+CH   N : To change to line number N
+CU     : To set values with cursor
+BU   F : Base up
+BD   F : Base down
+Alter components -
+\end{verbatim}\end{quote}
+The user is free to alter the parameters and to add or delete
+components. When satisfactory, the parameters are optimised. Type ``S''
+to get to the ``higher'' menu for this section (also required to delete
+or add components), and then select ``FIT''. Except for CH, CU, P and S
+the options in the menu can be followed by a number, to multiply its
+action. This number should start as the 3rd character, e.g.
+\begin{quote}\begin{verbatim}
+Alter components - L 0.6
+\end{verbatim}\end{quote}
+or
+\begin{quote}\begin{verbatim}
+Alter components - BD5
+\end{verbatim}\end{quote}
+(if the command requires 2 letters, then no space need be left between
+it and the number).
+\begin{quote}\begin{verbatim}
+> - S
+
+=========< M u l t i p l e   F i t   O p t i o n s >=========
+ 
+Add      : Introduce new Gaussian and change parameters
+List     : List parameters of all Gaussians
+Change   : Change parameters of selected Gaussian
+Delete   : Delete a Gaussian
+Fit      : Optimize the Gaussian fit
+Exit     : Abandon fitting of this profile
+Multiple Fit Options [CHANGE] - FIT
+ 
+=========< B o u n d s   M e n u >=========
+ 
+None       : No Bounds (unconstrained)
+Equal      : All L_bounds/U_bounds same
+Positive   : all bounds >= 0
+General    : Supply all bounds
+Fix        : Fix parameters
+Window     : Bound inside current window
+Lock       : Lock order of centres of components
+Bounds Menu [NONE] -
+\end{verbatim}\end{quote}
+The default of no bounds is selected.
+\begin{quote}\begin{verbatim}
+Fitting 2 Gaussians
+Final values & errors :-
+Component     Centre        fwhm       Height    Base
+   1       6564.625       0.9160        251.3        23.05
+          6.6107502E-03   1.4509E-02    3.816       0.6862
+   2       6562.003        1.781        65.55
+          3.7648823E-02   7.1038E-02    2.682
+ 
+=========< F i t   O k >=========
+ 
+Store    : Store the fit in the cube
+Repeat   : Repeat fit
+Quit     : Abandon this fit
+Fit Ok [STORE] - STORE
+redraw current data? [NO]
+\end{verbatim}\end{quote}
+
+\subsubsection{Background Models}
+
+The default model is a flat background, which is quite sufficient for
+many objects such as many emission nebulae where there is not a strongly
+varying background.
+For some objects, however, this will not be sufficient, and allowance
+must be made for a varying background (e.g.\ a stellar continuum).
+LONGSLIT provides three solutions to this problem
+\newcounter{backopts}
+\begin{list}{\bf\arabic{backopts} ---}{\usecounter{backopts}}
+\item
+Fit a Chebyshev polynomial to the base immediately before fitting the
+line profile.
+The polynomial it fitted to the whole of the spectrum, except for those
+parts within the boundaries of the identified lines.
+The order for the polynomial is stored in the results block, and this is
+used to re-create the fit as required (e.g.\ for profile plots).
+Although this cuts down on storage requirements, it does mean that if
+you identify any further lines, these will cause the program to make
+incorrect assumptions.
+For this the blocking is, of course the same as for the profile
+fitting.
+The order can be varied as required for different lines.
+If this option is used, it is essential that the spectrum is not trimmed
+(subsetted) too close to the line.
+\item
+Use a cubic spline to interpolate the values in the range of fitting.
+As with the Chebyshev polynomial the blocking is as for the fit, and the
+areas within the line boundaries are not used to constrain the splines.
+\item
+Use Chebyshev polynomials, but perform their fitting using FITCONT.
+LONGSLIT can then pick up the coefficients (from a special coefficient
+structure), and use them to obtain the base.
+Since the blocking to be used by LONGSLIT is not known at this stage (by
+FITCONT at least), the fits are to single cross-sections, and the
+results are added when required.
+The areas to be excluded from the fitting are marked with a cursor (this
+is more versatile than when the fitting is performed by LONGSLIT).
+\end{list}
+To select a model other than a flat base, use the DEFINE option in the
+main menu, in which case you will be asked for the background model, or
+use the FLAGS option in the WINDOW menu, which puts you into another
+menu in which the base model can be changed.
+Note that once set up, the model remains in force for fitting until the
+user leaves the program.
+
+If you select option (i) above at the window menu, LONGSLIT gets you to
+decide upon the order to fit at that time---various plots are available
+to help.
+If you select this from DEFINE, then you be asked to decide upon the
+order before the first fit, unless you have already given it the order
+(in WINDOW for example).
+For this reason, this option cannot yet be used in batch mode.
+
+\subsubsection{Producing Output Plots, Tables etc.}
+\label{long.out}
+
+When all the desired fits have been done (or
+earlier to get a check on them), you should used the standard FIGARO
+function HARD to set the hardcopy device (like SOFT for a softcopy
+device), for example
+\begin{quote}\begin{verbatim}
+$ HARD CANON
+\end{verbatim}\end{quote}
+
+Then enter the program and at the main menu select ``OUTPUT''. Then
+enter the options required e.g.\
+\begin{quote}\begin{verbatim}
+......
+......
+Output   : Create output plots, etc.
+Exit     : Leave program
+Main menu [MANUAL] - OUTPUT
+C U R R E N T   O U T P U T   S E T I N G S
+ 
+Hardcopy = F
+Table    = F
+Shape    = F
+Plot     = F
+Static   = F
+Print    = F
+Ratio    = F
+Grey     = F
+Contour  = F
+Full     = F
+ 
+=========< O u t p u t   O p t i o n s >=========
+ 
+Hardcopy   : Produce hardcopy plots of profile fits
+Table      : Print table of profile parameters
+SHape      : Analyse the shape of the lines
+PLot       : Plot rotation curves
+STatic     : Write results as input file for EXTATIC
+PRint      : Print rotation curves
+Ratio      : Output line ratios (with plots)
+Grey       : Greyscale plot of velocity
+Contour    : Contour plot of velocity
+Full       : Large table
+Exit       : Exit menu
+Output Options - PLOT
+\end{verbatim}\end{quote}
+The selection of options here is to ``toggle'' the option on or off,
+so entering an option once will select it, twice will cancel the
+selection. The options are performed when this menu is left.
+\begin{quote}\begin{verbatim}
+Output Options [PLOT] - TABLE
+C U R R E N T   O U T P U T   S E T I N G S
+ 
+Hardcopy = F
+Table    = F
+Shape    = F
+Plot     = F
+Static   = F
+Print    = F
+Ratio    = F
+Grey     = F
+Contour  = F
+Full     = F
+ 
+=========< O u t p u t   O p t i o n s >=========
+ 
+Hardcopy   : Produce hardcopy plots of profile fits
+Table      : Print table of profile parameters
+SHape      : Analyse the shape of the lines
+PLot       : Plot rotation curves
+STatic     : Write results as input file for EXTATIC
+PRint      : Print rotation curves
+Ratio      : Output line ratios (with plots)
+Grey       : Greyscale plot of velocity
+Contour    : Contour plot of velocity
+Full       : Large table
+Exit       : Exit menu
+Output Options [TABLE] - PLOT
+C U R R E N T   O U T P U T   S E T I N G S
+ 
+Hardcopy = F
+Table    = T
+Shape    = F
+Plot     = T
+Static   = F
+Print    = F
+Grey     = F
+Contour  = F
+Full     = F
+ 
+=========< O u t p u t   O p t i o n s >=========
+ 
+Hardcopy   : Produce hardcopy plots of profile fits
+Table      : Print table of profile parameters
+SHape      : Analyse the shape of the lines
+PLot       : Plot rotation curves
+STatic     : Write results as input file for EXTATIC
+PRint      : Print rotation curves
+Ratio      : Output line ratios (with plots)
+Grey       : Greyscale plot of velocity
+Contour    : Contour plot of velocity
+Full       : Large table
+Exit       : Exit menu
+Output Options [PLOT] - PRINT
+C U R R E N T   O U T P U T   S E T I N G S
+ 
+Hardcopy = F
+Table    = T
+Shape    = F
+Plot     = T
+Static   = F
+Print    = T
+Ratio    = F
+Grey     = F
+Contour  = F
+Full     = F
+ 
+=========< O u t p u t   O p t i o n s >=========
+ 
+Hardcopy   : Produce hardcopy plots of profile fits
+Table      : Print table of profile parameters
+SHape      : Analyse the shape of the lines
+PLot       : Plot rotation curves
+STatic     : Write results as input file for EXTATIC
+PRint      : Print rotation curves
+Ratio      : Output line ratios (with plots)
+Grey       : Greyscale plot of velocity
+Contour    : Contour plot of velocity
+Full       : Large table
+Exit       : Exit menu
+Output Options [PRINT] - EXIT
+Show velocities rather than wavelength [YES]
+Evaluate correction for Earth motion etc. [YES]
+ DEC -6 48 0
+ RA 5 33 56.8
+Day of observation? [339] -
+ Date:- 339/1/1984
+ UT 17 51 13
+ Observatory position 149 3 57.91 -31 16 37.34
+\end{verbatim}\end{quote}
+
+If the program cannot find information on the observatory, then it will
+ask.
+The reply can be the position, or an observatory name (type
+``help'') for help.
+Likewise the position of the object, date of observation etc. will be
+prompted for if required.
+Note that it is satisfactory to give the date as (for example) the 60th
+day of the year, giving the month as 1, rather than giving the true
+month, if this is preferred.
+
+The velocity may be corrected to heliocentric, local standard of rest,
+galactic, or local group.
+This uses the STARLINK SLA library (Wallace 1990) and is based on the
+STARLINK program RV (Wallace 1987).
+
+\begin{quote}\begin{verbatim}
+Is longitude ok, taking longitude as +ve west [YES] n
+ V_HEL=-4.16896E+00 V_LSR= 1.40857E+01
+ V_GAL= 1.33324E+02 V_LGROUP= 1.38917E+02
+ 
+=========< V e l o c i t y   C o r r e c t i o n >=========
+ 
+Hel     : Suns ref frame
+Lsr     : Local standard of rest
+GAl     : Galaxy ref frame
+GRoup   : Local galactic group ref frame
+Other   : Other - enter from terminal
+Velocity Correction [LSR] -
+OK? [YES]
+Show fits which had NAG errors [NO]
+Printing fits
+Indicate presence of failed fits [NO]
+ 
+=========< F l u x   M a r k i n g >=========
+ 
+No           : Don't mark points according to flux
+Continuous   : Mark using a continuous scale
+Three        : Mark by grading into 3 divisions
+Flux Marking [CONTINUOUS] -
+Plot in softcopy? [NO]
+Plotting Velocities
+Line number  1
+Line number  2
+Line number  3
+Plotting average velocities
+Plot flux v. xsect? [YES] n
+Plot width v. xsect? [YES] n
+Job 123 entered on queue SYS_LASER
+Print of velocities
+\end{verbatim}\end{quote}
+Unless NOFIT was specified (in which case the user would miss out
+the main menu entirely), the user is now returned to the main menu.
+
+The option to mark the points can either put the markers so that the
+most intense 3rd of the points have a filled circle, the next 3rd an
+open one, and the remainder are not marked, or the area can be
+proportional to the logarithm of the flux.
+The latter is recommended.
+
+Note that if NOLABEL is given in the command line the titles will be
+omitted for many of the output plots.
+
+\subsubsection{The Keyword FIT}
+\label{long.fit}
+
+This will cause the program to run though the fitting part of the
+program, by default it is true, so may be ignored. It is, however,
+possible to specify NOFIT in a command line, to run LONGSLIT in batch
+without performing fits (or just to skip the middle part of the program
+when running interactively) e.g.\ 
+\begin{quote}\begin{verbatim}
+$ FIGARO
+$ SET DEFAULT SCRATCH:[TNW]
+$ LONGSLIT T1 REPEAT TABLE NOFIT
+$ EXIT
+\end{verbatim}\end{quote}
+This will produce a table of the fit results.
+It may be used for other output options (except RATIO), e.g.\ 
+\begin{quote}\begin{verbatim}
+$ LONGSLIT T1 REPEAT PRINT TABLE PLOT HARDCOPY NOFIT VCORR=10
+\end{verbatim}\end{quote}
+
+  In batch correction may be made for the Earth's motion by using the
+parameter VCORR as above, this will be subtracted from the radial
+velocities calculated.
+
+\subsubsection{TRANSFER Option}
+
+The OL option in select fit type is for use with the TRANSFER option to
+transfer fits between different lines. For this to work the fits must
+be defined using the DEFINE option, before fitting in AUTO mode,
+preferably in batch. The fits are copied so that one line becomes a
+copy of another as regards fit type, blocking, etc., but of course the
+fits are optimised on the data for the current line. If the fits are
+not re-defined, then other modes will not work for that line (except
+COPY). TRANSFER does NOT override masking as COPY does, and is selected
+by specifying TRANSFER as a keyword in the command line. N.B. The
+definition of the fits serves to tell LONGSLIT which line to get the
+fits from, not the type of fit, and fits defined ``normally'' will not
+be fitted if the keyword TRANSFER is given.
+If this option is used, all the cross-sections of a line should be so
+defined.
+
+\subsubsection{INHERIT Option}
+
+This is an option to do any fitting in batch, provided the program has
+a fit to one block, and the data is fairly continuous. Value $-1$ to
+inherit from previous block, +1 to inherit from next.
+The fit to this block used as the guess for the next fit.
+Likewise INHERIT {\em must} be given on the command line.
+
+\subsubsection{Summary of Parameters}
+
+\begin{description}
+\item[IMage] (char) Name of image for input, This is the data and should
+be a FIGARO format data file.
+This should also have a .X axis array which contains the wavelengths of
+the lines. For the identification files supplied with the program the
+units should be {\AA}ngstroms. However, if the user supplies his/her own
+files, this need not apply, although some plots may have the wrong
+labels.
+\item[ARC\_OPTS] (char) Fit option\\
+NEW    (N) Set up a new analysis\\
+REPEAT (R) Iterate on  previous analysis\\
+CLONE  (C) CLONE an analysis from another file
+\item[YStart] (int) Analysis lower limit
+\item[YEnd] (int) Analysis upper limit
+\item[YBlock] (int) Analysis cross-section width
+\item[ITeration] (int) New value of iteration
+\item[MAXLines] (int) Maximum number of lines to allow room for
+\item[CLfile] (char) Name of image for {\em CLONING} from
+\item[OUtable] (char) Name for EXTATIC file
+\item[VCorr] (real) Correction to apply to radial velocities
+\item[TOls] (char) For use in batch only
+\item[INherit] (int) Number to control inheritance of  previous fits\\
+If zero no inheritance of fits\\
+If one then inherited from next block\\
+If minus one then inherited from previous block
+\item[DEvice] (char) Device to use for plotting (greyscale)
+\item[FITRat] (real) Ratio of widths, heights, or separation, for
+double fits
+\item[CAlrat] (int) Ratio of number of iteration to default
+\item[WHite] (float) Level to plot as white (greyscale option)
+\item[BLack] (float) Level to plot as black (greyscale option)
+\item[MAXGauss] (int) Maximum number of Gaussians that can be fitted
+to a profile.
+\item[TStart] (int) Analysis lower limit
+\item[TEnd] (int) Analysis upper limit
+\item[TBlock] (int) Analysis width in T direction
+\item[FIT\_MODEL] (char) Model for fitting
+\item[PLOTLim] (float) Limits of plot (world coordinates).
+This is to allow velocity plots to be forced to all have the same scale,
+making comparison easier.
+\item[HArdcopy] (key) Produce hardcopy plots of fits from cube
+\item[TAble] (key) Produce table of fits from cube
+\item[PLOT] (key) Produce plots of rotation curves
+\item[PRInt] (key) Produce print out of rotation curves
+\item[SHape] (key) Carry out shape analysis
+\item[KEEP\_ITT] (key) Keep iteration files. These files contain
+details of the fitting process. If a fit succeeds the file is always
+deleted, if it crashed it is always kept, this keyword controls
+whether it is deleted if a NAG error occurs.
+\item[FIT] (key) Perform fitting
+\item[COPY] (key) Copy previous fits This will repeat all the fits
+previously made, which is likely to be of use if data is co-added after
+one file has been analysed. Also, when used with CLONE the entire .RES
+structure is copied without any change. For the new fits the previous
+fits (suitably scaled) are used as first guesses.
+\item[TRansfer] (key) Copy previous fits from other lines
+\item[ABsorption] (key) Allow fitting of absorption lines.
+This allows absorption fits to be defined---once defined they can be
+fitted whatever the value of this.
+\item[BOunds] (key) Perform bounded fits to lines (in batch).
+This only bounds the widths.
+\item[LAbel] (key) Put labels on plots.
+This is true by default, but it may be preferable if plots are to be
+used in a paper to not have labels.
+\item[CONtour] (key) Produce contour plots
+\item[GRey] (key) Produce greyscale plots
+\item[LOG] (key) Use log scale for greyscale and contour plots
+\item[AIC] (key) Use Akaike's information criterion for batch
+multiple fitting (to decide how many components to fit).
+\item[WEIghts] (key) Use weighted fitting (default is true).
+\item[PRFits] (key) Print out details of fitting.
+This is true by default, but if you wish to avoid large log files set it
+to false.
+\item[FULL] (key) Print out full details of fits in table.
+This provides the information in a form which is easier to read into a
+FORTRAN program, and includes the information given in PRINT and TABLE.
+\end{description}
+The options HARDCOPY, TABLE, PLOT, PRINT, SHAPE and FULL are the same
+as for the OUTPUT MENU, except that in batch mode HARDCOPY and SHAPE
+will work on all line profiles/blockings which have a successful fit.
+If OUTABLE is given in the command line, the STATIC option is
+selected.
+CONTOUR and GREYSCALE work on all the lines in batch mode.
+
+Note that the use of TSTART and TEND is with 3-dimensional data files.
+At present LONGSLIT only partially supports these, but some of the same
+code is used as in CUBEIN and FIBDISP.
+
+The keyword PRFITS is true by default but the user may set it to false
+to avoid large log files when running in batch.
+
+
+\subsection{FIBDISP---Analyise 3-d Data (spectral)}
+
+This performs a similar function to LONGSLIT, but is optimised for
+three-dimensional data arrays.
+In interactive use a greyscale softcopy device such as an IKON is used,
+and profiles are selected using a cursor.
+Alternatively an
+array of profiles may be displayed using line graphics. If run in batch
+mode the whole data block may be fitted with Gaussians etc. The same
+fitting options are available as for LONGSLIT (see
+section~\ref{sec.long}). The file should already have a results
+structure (unlike LONGSLIT, FIBDISP does not create one), this can be
+created by FIB2CUBE, CUBEIN or LONGSLIT.
+
+FIBDISP can handle arrays in which the pixels correspond to a
+rectangular or hexagonal grid on the sky.
+
+On entry to the program the user is prompted for the name of the data
+cube and then enters the {\em main menu}.
+
+\subsubsection{Main Menu}
+
+The options in the main menu are as follows:
+\begin{description}
+\item[RESULTS] Display a plane of the results block.
+The plane is accessed by name, and this is one of only two places in the
+whole of TWODSPEC that cares about the case of the answer given by the
+user (the other is MODPARAMS).
+For example, if you wanted to display the centre of the first component,
+you would enter ``Centre\_1''.
+\item[DATA] Display a plane of the data
+\item[PROFILE] Examine line profiles.
+The profiles are selected using a cursor.
+If more than one is selected they are added together. Gaussians  etc.\
+may be fitted to the profile, and the results stored.
+The fitting is similar to that of LONGSLIT.
+Hard-copy plots of the profile may also be made.
+\item[XCUT] Take a cut through the data in the X direction, and
+display on a greyscale device.
+The position is marked with a cursor, and the nearest pixels are chosen
+(i.e. no interpolation).
+\item[YCUT] Take a cut through the data in the Y direction, and
+display on a greyscale device.
+Similar to XCUT.
+\item[XOUT] Output to file X direction cut through data.
+This is like XCUT, but the output is to a file, rather than an image
+display.
+\item[YOUT] Output to file Y direction cut through data.
+Similar to YOUT.
+\item[IT] Reduce iteration
+\item[CHECK] Display an array of line profiles---this can be in soft
+or hard-copy
+\item[TOTAL] Display the summed intensity through the image
+\item[LIMIT] Limit X and Y range for display.
+This acts as a toggle, so if you have limited plots and select this
+option again, you will return to full range.
+\item[TOLS] Apply/set tolerances
+\item[LOOK] Look at values in results cube
+\item[DELETE] Delete fits from results cube
+\item[DEFINE] Define fits for batch mode. The fits are defined and
+stored in the control array.
+\item[OUTPUT] This allows the user to list all the fits onto the
+line printer, or to produce hardcopy plots of all the fits.
+\item[EXIT] Leave the program
+\item[CUBAN] Cuban-style display/motion.
+This is better than CHECK for large data-sets (such as from TAURUS).
+An array of profiles is plotted, with a small greyscale representation
+of the total intensity in the top right-hand corner---the centre of the
+array plot is marked on this with a cross.
+The user has the following options (decided by cursor keys):
+\begin{description}
+\item[A] Add profiles to fit (end with F)
+\item[C] Centre here
+\item[D] Down
+\item[E] Exit
+\item[F] Make fit to point
+\item[H] Make hardcopy of current plot
+\item[J] Jump to new area (using greyscale plot)
+\item[L] Left
+\item[P] Indicate position
+\item[R] Right
+\item[S] Set scaling for profile plots
+\item[U] Up
+\item[X] Erase fit
+\item[?] Help
+\end{description}
+\end{description}
+Note that the following options require the use of a greyscale display:
+RESULTS; DATA; XCUT; YCUT and TOTAL, although PGPLOT is capable of
+producing a simulated greyscale on line graphics devices, if the array
+is rectangular.
+
+\subsubsection{Summary of Parameters}
+
+\begin{description}
+\item[CUbe] (file) Cube for display
+\item[YStart] (int) analysis lower limit
+\item[YEnd] (int) analysis upper limit
+\item[YBlock] (int) Enter analysis x-sect width
+\item[TStart] (int) analysis lower limit
+\item[TEnd] (int) analysis upper limit
+\item[TBlock] (int) Enter analysis blocking width in 3rd dimension
+\item[DEvice] (char) Device for display
+\item[ITeration] (short) New value of iteration
+\item[OUTABLE] (file) Name for EXTATIC file
+\item[VCorr] (float) Correction to apply to radial velocities
+\item[TOls] (char) For use in batch only
+\item[FITRat] (real) Ratio of widths, heights, or separation, for
+double fits
+\item[CAlrat] (int) Ratio of number of iteration to default
+\item[OUTPut] file: Name for output file
+\item[FIT\_MODEL] (char) Model for fitting
+\item[LOw] (float) Minimum value for display
+\item[HIgh] (float) Maximum value for display
+\item[ABsorption] (key) Allow fitting of absorption lines
+\item[BOunds] (key) Perform bounded fits to lines (in batch)
+\item[HArdcopy] (key) Produce hardcopy plots of fits from cube
+\item[TAble] (key) Produce table of fits from cube
+\item[PRInt] (key) Produce print out of radial velocities
+\item[SHape] (key) Carry out shape analysis
+\item[KEEP\_ITT] (key) Keep iteration files
+\item[FIT] (key) Perform fitting
+\item[AIC] (key) Use Akaike's information criterion for batch
+multiple fitting (to decide how many components to fit).
+\item[WEIghts] (key) Use weighted fitting (default is true).
+This only applies if the file contains an error array.
+\item[PRFits] (key) Print out details of fitting.
+When fitting large data-sets in batch this would normally be set to
+false, otherwise a very large log file will be created.
+\end{description}
+SHAPE is not yet implemented.
+
+\section{ARC2D---Wavelength Calibration}
+\label{sc.arc2d}
+\subsection{Introduction}
+
+Once the data has been corrected for distortions or has been
+``cleaned'', it must be converted to a linear (calibrated) scale in
+wavelength, or at least the relationship must be defined.
+In practice it is much easier to handle a re-binned file. 
+
+The ``traditional'' way of doing this is to take one or more spectra
+of an arc lamp (which has lines of known wavelength), using the same
+spectrometer arrangement, fairly close in time to the exposures of the
+objects. This spectrum will contain information on the wavelengths
+corresponding to different channels. The user will then indicate the
+locations of the lines in some way to a program, and then this program
+will find the centroid of each line at each cross-section, or group of
+cross-sections---a {\em block}). These positions are then used to obtain
+the relationships of the channel number to wavelength, by fitting
+polynomials to the line positions and wavelengths. The coefficients of
+these are then used for the re-binning onto a linear scale.
+
+This reduction method has several disadvantages:
+\begin{itemize}
+\item The process of finding centroids is often less accurate than
+fitting Gaussians, since is is more prone to errors due to poor signal
+to noise, or a strong base (especially if this is not constant).
+\item Finding centroids provides no information on the likely error
+in the centre. Ideally the strongest lines should be given the highest
+weights. Conventional programs use unweighted polynomial fitting.
+\item In treating each cross-section or block separately, the fact that
+the line centres will vary smoothly (for ``normal'' data) across the
+image is ignored. This can give rise to steps in what should be smooth
+lines, for the re-binned image. If the data from successive
+cross-sections in blocked together then, even if all the centres lie on
+a smooth curve, steps will occur in the calibrated data.
+\end{itemize}
+
+ARC2D is a two-dimensional arc calibration program. It makes use of a
+calibration arc as above, but Gaussians are fitted to the arc-lines in
+order to locate them with maximum precision, as well as to give
+information on errors. The continuity of the arc lines is taken into
+account. Rather than locating the line centres immediately prior to
+fitting the polynomials (to determine the dispersion relationship)
+whilst travelling up the spectrum, ARC2D finds all the line centres,
+and the fit to any cross-section can be checked, and poor lines
+rejected. Then all the polynomials can be fitted and, if satisfactory,
+written to the output file. Conventional programs require the order of
+the polynomial and the arc lines to be used to be guessed, before any
+fits are made (or at best when only one cross-section or block has been
+fitted)!
+
+The line identification part of ARC2D is the same as for LONGSLIT (see
+section~\ref{long.id}).
+
+The line positions ARC2D has at this stage are approximate since they
+are only lower and upper limits in channels for the optimisation.
+
+The lines are then accurately located (automatically) at each
+cross-section by fitting Gaussians to them, assuming a Gaussian can
+successfully be fitted. For this the data from successive
+cross-sections can be blocked together, to improve the signal to noise
+ratio. In our case we typically co-add ten successive cross-sections.
+This fitting is a least squares optimisation, including a flat base,
+and is the same as used for LONGSLIT. 
+
+ARC2D creates a file for use with ISCRUNCH.
+Weighted fitting may be used for the
+polynomials to determine the dispersion relation. In addition
+polynomials may be fitted to the relation of line centre to
+cross-section for each line, and the polynomial values from this
+fitting used instead of the Gaussian centres, to give a smooth
+variation of the dispersion relation across the spectrum.
+
+  To use ARC2D you should do the following:-
+\newcounter{cntr}
+\begin{list}{(\roman{cntr})}{\usecounter{cntr}}
+\item Set up tram arrays---to to tell the program where the lines are
+and to identify them
+\item Fit Gaussians to lines (usually in batch mode).
+\item Apply continuity correction (this is not essential).
+\item Fit polynomials to define the correction to be applied to
+``scrunch'' the data (you automatically end up here unless you answer
+``YES'' to leave program now...).
+\item If you are satisfied with the fits, create a calibration file and
+use it as input to ISCRUNCH.
+\end{list}
+
+Parts (i) and (ii) above are as for LONGSLIT, except that only AUTO
+mode is available for (ii) and the program will follow any curvature
+of the lines during fitting.
+
+With ARC2D it may be found useful to copy the .RES.ARC array across
+from one file to another (this is not done in CLONE, unless COPY is
+specified).
+This may be done by:
+\begin{quote}\begin{verbatim}
+$ LET FILE2.RES.ARC = FILE1.RES.ARC
+\end{verbatim}\end{quote}
+to copy it from file1 to file2.
+
+In the main menu LOOK, TOLS,EXIT and ADD are the same as in LONGSLIT,
+and GAUS is similar to the AUTO option in LONGSLIT. POLY and DISP are
+described in the next two sections. SOFT and HARD produce plots of use
+in determining which lines to include in the fitting. These are of line
+centre against cross-section, line width against centre and error on
+centre v. height.
+
+\subsection{Continuity Correction}
+\label{arc2d.continuity}
+
+In order to avoid ``steps'' in the scrunched data, it is advisable to
+use this option.
+Select the POLY option in the main menu:
+\begin{quote}\begin{verbatim}
+ 
+=========< M a i n   M e n u >=========
+ 
+Look   : Look at values of data cube
+Gaus   : Fit Gaussians to line profiles
+Soft   : Produce soft-copy plots of diagnostics
+Hard   : Produce hard-copy plots of diagnostics
+Tols   : Apply tolerances
+Disp   : Evaluate dispersion relation
+Add    : Add more lines
+Poly   : Fit polynomials in X-Sect direction
+Exit   : Leave the program
+Main Menu [EXIT] - POLY
+keep fits with nag errors for poly fitting? [NO]
+Weight fits? [YES]
+Performing weighted fit
+\end{verbatim}\end{quote}
+A plot of the sum of the squares of the residuals against order is
+displayed.
+\begin{quote}\begin{verbatim}
+Go onto next plot? [YES]
+ S E E K   M E N U
+\end{verbatim}\end{quote}
+The residuals are plotted against cross-section. When these appear to
+be due to noise only, answer ``NO'' to leave the loop, and reply with
+the order required. A plot of the fit over the centres is given, and
+similar plots are displayed (two to a page) for the remaining lines,
+but can be suppressed.
+\begin{quote}\begin{verbatim}
+Y for next plot;N to stop [YES]
+Y for next plot;N to stop [YES]
+Y for next plot;N to stop [YES] NO
+(ORder) order for polynomial fitting [3] -
+Order returned =   3
+Further plotting may be suppressed by typing ``N''
+Go onto next plot? [YES]
+Performing weighted fit
+Go onto next plot? [YES]
+Performing weighted fit
+Go onto next plot? [YES]
+Performing weighted fit
+Go onto next plot? [YES] NO
+Performing weighted fit
+Produce hardcopies of line centre & residual plots [NO]
+ 
+=========< C o n t i n u i t y   F i t s >=========
+ 
+Accept   : Accept fits
+Retry    : Try again
+Quit     : Give up
+Continuity Fits [ACCEPT] -
+\end{verbatim}\end{quote}
+The results are now stored and the user returned to the main menu.
+
+\subsection{Evaluating the Dispersion Relation}
+
+Select the DISP option at the main menu:
+\begin{quote}\begin{verbatim}
+ 
+=========< M a i n   M e n u >=========
+ 
+Look   : Look at values of data cube
+Soft   : Produce soft-copy plots of diagnostics
+Hard   : Produce hard-copy plots of diagnostics
+Tols   : Apply tolerances
+Exit   : Leave the program
+Disp   : Evaluate dispersion relation
+Gaus   : Fit Gaussians to line profiles
+Add    : Add more lines
+Poly   : Fit polynomials in X-Sect direction
+Main Menu [EXIT] - DISP
+
+=========< S e t   F i t   P a r a m e t e r s >=========
+
+Norder     : Set fit order(def= 3)
+Weight     : Set weights OFF
+Continue   : Use current settings
+DIsplay    : Turn displays ON
+Table      : Stop displaying polynomial tables etc.
+Plot       : Produce plot of arc
+DAta       : Stop using continuity corrected data
+Set Fit Parameters [CONTINUE] -
+\end{verbatim}\end{quote}
+The ``DISPLAYS'' here are diagnostics plots, such as of the variation
+of dispersion with channel number, to assist the user in deciding
+whether a fit is satisfactory.
+The plot option is a plot of a 1-dimensional spectrum extracted from
+the central region of the arc, with the lines used identified with their
+wavelengths.
+If you are not using continuity-corrected data, you have the additional
+option to include fits with NAG errors (this may be satisfactory,
+depending upon the cause of the error, you should examine the log file
+before using such fits).
+\begin{quote}\begin{verbatim}
+Enter number of x-sect for 1st fits [85] -
+ 
+ ARCFIT :   Order = 3,  cross-section 85
+ 
+Coefficients of fit are -
+
+  8.27062E-16 -3.97077E-12  3.86509E-09
+  4.17852E-06  0.00000E+00  0.00000E+00
+
+Start wavelength = 4827.310,     End wavelength = 5152.441
+Central wavelength = 4989.621,   Mean dispersion (per channel) = 0.1601613
+
+          Line    Wavelength    Calculated   Discrepancy
+                                Wavelength
+
+        133.35       4847.81       4847.81          0.00
+        396.13       4889.04       4889.06         -0.02
+\end{verbatim}\end{quote}
+A list of line wavelengths with fitted wavelengths is written to
+the terminal. If there are any lines not used in the fit, these are
+still output (after those which are used), so that, if required,
+estimates of the wavelengths of unidentified lines can be obtained.
+\begin{quote}\begin{verbatim}
+       1646.52       5090.50       5090.51         -0.01
+       1971.84       5141.78       5141.78          0.00
+
+Chi-squared(ang**2) = 1.1019063E-04
+ 
+
+=========< F i t   O p t i o n s >=========
+
+Accept   : Accept fit
+Return   : Return to reset fit parameters
+Edit     : Edit arc line list
+Quit     : Leave this part of program
+Fit Options [RETURN] -
+\end{verbatim}\end{quote}
+The fits should be checked at several positions across the data and,
+when satisfactory, the tables etc.\ should be suppressed, and the
+results written to a file.
+\begin{quote}\begin{verbatim}
+
+=========< S e t   F i t   P a r a m e t e r s >=========
+
+Norder     : Set fit order(def= 3)
+Weight     : Set weights OFF
+Continue   : Use current settings
+DIsplay    : Turn displays ON
+Table      : Stop displaying polynomial tables e.t.c
+Plot       : Produce plot of arc
+DAta       : Stop using continuity corrected data
+Set Fit Parameters [CONTINUE] - TABLE
+
+=========< S e t   F i t   P a r a m e t e r s >=========
+
+Norder     : Set fit order(def= 3)
+Weight     : Set weights OFF
+Continue   : Use current settings
+DIsplay    : Turn displays ON
+Table      : Stop displaying polynomial tables e.t.c
+Plot       : Produce plot of arc
+DAta       : Stop using continuity corrected data
+Set Fit Parameters [CONTINUE] -
+Enter number of x-sect for 1st fits [85] -
+
+=========< F i t   O p t i o n s >=========
+
+Accept   : Accept fit
+Return   : Return to reset fit parameters
+Edit     : Edit arc line list
+Quit     : Leave this part of program
+Fit Options Menu [RETURN] - ACCEPT
+\end{verbatim}\end{quote}
+If ``continuity corrected'' data is used, then each cross-section is
+treated separately, otherwise each block is treated as one fit.
+\begin{quote}\begin{verbatim}
+Minimum start wavelength = 4824.331, maximum end wavelength = 5153.783
+Copy any coefficients from one line to another? [NO]
+Fits OK? [YES]
+ 
+Summary of Image Arc Fit Results -
+-----------------------------------
+ 
+Image dimensions  2040 by   171
+Number of rows that could not be fitted =     0
+Maximum chi-Squared error =       0.00
+Maximum degree polynomial used =   3
+ 
+Fit results written to file DISK$USER3:[SCRATCH.TNW]EXAMPLE.IAR;1
+ 
+ 
+=========< M a i n   M e n u >=========
+ 
+Look   : Look at values of data cube
+Gaus   : Fit Gaussians to line profiles
+Soft   : Produce soft-copy plots of diagnostics
+Hard   : Produce hard-copy plots of diagnostics
+Tols   : Apply tolerances
+Disp   : Evaluate dispersion relation
+Add    : Add more lines
+Poly   : Fit polynomials in X-Sect direction
+Exit   : Leave the program
+Main Menu [EXIT] -
+\end{verbatim}\end{quote}
+
+\subsection{Summary of Parameters}
+
+\begin{description}
+\item[IMage] (file) Name of image for input. This should be a file
+containing an arc spectrum.
+\item[ARC\_OPTS] (char) Enter arc fit option\\
+NEW    (N) set up a new wavelength calibration\\
+REPEAT (R) Iterate on previous calibration.\\
+CLONE  (C) CLone a previous calibration.
+\item[YStart] (int) analysis lower limit The data between the
+limits ystart and yend is extracted and the resultant spectrum is used
+to locate the lines.
+\item[YEnd] (int) analysis upper limit. The data between the
+limits ystart and yend is extracted and the resultant spectrum is used
+to locate the lines.
+\item[YBlock] (int) Enter analysis x-sect width Each window is
+of this width (except perhaps the final one).
+\item[ITeration] (short) New value of iteration
+\item[ORder] (int) order for polynomial fitting This is for the
+continuity correction of the data. Ideally the arc should have been
+pre-processed with ARCSDI, so a low order e.g.\ 2 should be used.
+\item[MAXLines] (int) Maximum number of lines to allow room for.
+This must be greater than or equal to the number of lines fitted, so
+room should be allowed in case any more are to be added later.
+\item[CLfile] (file) Name of image for cloning from. This should
+be a file containing an arc spectrum.
+\item[TOls] (char) For use in batch only
+\item[KEEP\_ITT] (key) keep iteration files
+\item[PRFits] (key) Print out details of fitting
+\end{description}
+
+\section{COMB and ARCSDI-Correction for Geometrical Distortions}
+
+\subsection{COMB---Correction for S-Distortion}
+
+This program takes a long-slit spectrum with one or more continua, and
+creates a file which allows it to apply a correction to further files,
+such that the continua are made straight.
+This performs a similar function to the FIGARO function SDIST, but is
+more automatic (it may be run completely in batch if required). 
+
+Since the philosophy of all the software we have written is to be as
+automatic as possible, COMB will automatically find the ``teeth'' of
+the comb, and can be run completely in batch, if so required. This
+enables quicker processing of data, since in practice the order
+required for the Chebyshev polynomials is
+found to be 3 for all combs on which the program has been run. It is
+probably best, however, to initially locate the teeth interactively
+(for setting the values in the tram arrays, which define the edges of
+the line at the centre of the data), since some experimentation may be
+required. The operation of COMB is as follows:
+\newcounter{combcntr}
+\begin{list}{(\roman{combcntr})}{\usecounter{combcntr}}
+\item
+Locate `teeth'. A cut is taken from the data, along the slit direction,
+from the central 20 channels of the data.
+The algorithm looks for
+the highest point in this data, and searches outwards to find other
+teeth, whether a new ``tooth'' is accepted depends upon the value of the
+parameter LEVEL, which is the minimum acceptable ratio of an new
+tooth's height to that of one already accepted. If too many or too few teeth are found, a
+different value of LEVEL may be used, or the teeth may be selected
+manually. To confirm the correct location of teeth, these are output to
+the user (or batch log file), at the start of the program. Thus a check
+of the teeth locations may also be made if they are located in batch.
+\item
+The program then follows the ``teeth'' along the image (in the
+channel direction), finding the line centres by fitting Gaussians, or
+alternatively by finding centroids. Finding centroids is quicker than
+fitting Gaussians, and may be more suitable for some data. Fitting
+Gaussians is often more accurate, and gives estimates of the errors.
+For this the program will co-add a number of channels (say 20) to
+obtain a higher signal to noise (and reduce the time taken to find the
+centres).
+The teeth are located in the centre of the data (in the channel
+direction), and followed out from there in both directions (they are
+likely to be strongest in the centre).
+Since the variation along the image may be considerable, the tram
+positions (the Y values of the range used for fitting) must be updated
+using the centre from the last fit, before being used.
+This enables the program to follow the continua.
+\item
+The points so obtained are fitted with Chebyshev polynomials
+(for each tooth). If the parameter ORDER, the order of the polynomial to be fitted is
+specified in the command line, then it is taken as that. Otherwise the
+program plots the residuals for each order until told to stop, and then
+prompts for the order.
+In batch mode the program will exit at this stage unless ORDER is given
+in the command line.
+This is similar to the {\em continuity correction} part of ARC2D (see
+section~\ref{arc2d.continuity}).
+\item
+The Chebyshev polynomials are then evaluated at each channel for
+each ``tooth'', within the limits used for fitting the polynomials, and
+the points outside these limits are evaluated using (local) cubic
+splines (Akima 1972). When a value for the cross-section position of
+each ``tooth'' has been obtained, these are used for interpolating
+(again using cubic splines), the values of the data at the positions at
+the current channels corresponding to each cross-section at the
+reference position (the central channel). The correction is such that
+the data is lined up with this reference channel.
+\end{list}
+
+COMB outputs plots of the locations of the teeth at the start (i.e.\ at
+the central channel) and a few other points along the data, and also
+outputs a plot of the positions of all the points on the teeth found by
+the Gaussian fitting, enabling a check to be made as to whether the
+results seem reasonable.
+Plots of the polynomial fits to the teeth and of the residuals on these
+fits (typically up to about 0.2 cross-sections) are also output. If
+running interactively these are in soft-copy, otherwise in hard-copy.
+To apply the correction, use OLD mode, the correction file (i.e. the
+file with the polynomial coefficients) is COMB.GMC.
+
+This is a program to correct data for S-distortion by moving data in
+the cross-section direction to line it up for a {\em comb} of continua
+spectra. This correction is then applied to the data itself. A comb
+dekker is used to produce about ten continuum spectra across an image
+(this is done at the telescope). This image is then used by the
+program:- The program locates the teeth and follows them along the
+image (in the channel direction), finding the line centres by fitting
+Gaussians. The points so obtained are fitted with Chebyshev polynomials
+(for each tooth). The intermediate positions are interpolated from
+these, which are then used to evaluate the required movement for each
+data point. The coefficients are written to a file which may then be
+read by the program to apply correction to the actual data. 
+
+Alternatively, if QUICK is specified, centroids are used rather than
+the fitting of Gaussians.
+Since fitting Gaussians is generally quite fast, this is only really
+likely to be needed when the profiles are significantly different from
+Gaussian.
+
+\subsubsection{Summary of Parameters}
+\begin{description}
+\item[IMage] (file) Name of image for input. This should be a file
+containing continua spectra.
+\item[ARC\_OPTS] (char) Enter arc fit option\\
+NEW    (N) set up a new wavelength calibration\\
+REPEAT (R) Iterate on previous calibration\\
+CLONE  (C) CLone a previous calibration
+OLD    (O) Correct using previous results
+\item[OUtput] (file) Name of output file. File to contain
+corrected data.
+\item[XStart] (int) analysis lower limit. The data between the
+limits xstart and xend is extracted and the resultant spectrum is used
+to locate the lines.
+\item[XEnd] (int) analysis upper limit. The data between the
+limits xstart and xend is extracted and the resultant spectrum is used
+to locate the lines.
+\item[XBlock] (int) Enter averaging width in channels. Each
+window is of this width (except perhaps the final one).
+\item[ITeration] (short) New value of iteration
+\item[LEvel] (float) Level of edge of tooth
+\item[ORder] (int) order for polynomial fitting This is for the
+continuity correction of the data.
+\item[MAXLines] (int) Maximum number of lines to allow room for
+This must be greater than or equal to the number of lines fitted, so
+room should be allowed in case any more are to be added later.
+\item[CLfile] (file) Name of image for cloning from. This should
+be a file containing an comb spectrum.
+\item[TOls] (char) For use in batch only
+\item[KEEP\_ITT] (key) keep iteration files?
+\item[QUick] (key) Centroid rather than fit Gaussians?
+\item[PRFits] (key) Print out details of fitting
+\item[PLOtcorr] (key) Plot correction?
+\end{description}
+
+\subsubsection{Main Menu}
+
+\begin{description}
+\item[LOOK] Look at values of data cube
+\item[SOFT] Produces soft copy plots of diagnostics
+\item[HARD] Produces hard copy plots of diagnostics
+\item[TOLS] Apply tolerances
+\item[POLY] Fit polynomials to results
+\item[CENTRES] Find line centres-takes a long time.
+This is similar to the GAUS option of ARC2D.
+\item[ADD] Add more lines
+\item[EXIT] Exit program
+\end{description}
+
+\subsection{ARCSDI---Correction for Line Curvature}
+
+This corrects data for line curvature, using an arc spectrum.
+The function is the same as for comb, but it works in the perpendicular
+direction (again this is for long-slit spectra).
+
+The aim is to give ARC2D a spectrum with fairly straight arc lines, so
+it can ``block'' more cross-sections together to obtain a higher signal
+to noise.
+The operation is similar to parts (i) to (iii) of ARC2D, except that
+ARCSDI does not need to know the line identifications.
+To apply the correction, use OLD mode, the correction file (i.e. the
+file with the polynomial coefficients) is ARCSDI.GMC.
+The main menu is the same as for COMB.
+
+The arc lines are located using much of the same code as in ARC2D
+described below, including the fitting of Gaussians. The reason for
+doing preliminary correction of this nature, rather than using ARC2D
+straight away, is that for data which is fairly noisy, it is desirable
+to give ARC2D as many cross-sections at a time for the fitting. It is
+intended that ARCSDI be used with a long exposure from a {\em chimney
+arc}. Another problem overcome by this is that of vignetting which
+occurs in the comparison arc optics of the RGO spectrograph at the
+AAT\@. `Chimney' arcs are reflected off the dome, and do not suffer
+from this problem (the same optical path is used as for the
+observations). It is often an advantage to use an arc from another
+wavelength range, if this has more suitable lines, or if they are
+better distributed along the spectrum.
+
+Once the lines are located, they are treated in much the same way as
+the positions of continua in COMB. Chebyshev polynomials are fitted to
+these and the results used to determine the required shifts.
+
+\subsubsection{Summary of Parameters}
+\begin{description}
+\item[IMage] (file) Name of image for input. This should be a file
+containing an arc spectrum.
+\item[ARC\_OPTS] (char) Enter arc fit option\\
+NEW    (N) set up a new wavelength calibration\\
+REPEAT (R) Iterate on previous calibration\\
+CLONE  (C) CLone a previous calibration
+OLD    (O) Correct using previous results
+\item[OUtput] (file) Name of output file
+File to contain corrected data.
+\item[YStart] (int) analysis lower limit
+The data between the limits ystart and yend is extracted
+and the resultant spectrum is used to locate the lines.
+\item[YEnd] (int) analysis upper limit
+The data between the limits ystart and yend is extracted
+and the resultant spectrum is used to locate the lines.
+\item[YBlock] (int) Enter analysis x-sect width
+Each window is of this width (except perhaps the final one).
+\item[ITeration] (short) New value of iteration
+\item[ORder] (int) order for polynomial fitting
+This is for the continuity correction of the data. Ideally the
+arc should have been pre-processed with ARCSDI, so a low
+order e.g.\ 2 should be used.
+\item[MAXLines] (int) Maximum number of lines to allow room for
+This must be greater than or equal to the number of lines
+fitted, so room should be allowed in case any more are
+to be added later.
+\item[CLfile] (file) Name of image for cloning from
+This should be a file containing an arc spectrum.
+\item[TOls] (char) For use in batch only
+\item[KEEP\_ITT] (key) keep iteration files
+\item[PRFits] (key) Print out details of fitting
+\item[PLOtcorr] (key) Plot correction?
+This is used with the OLD option.
+\end{description}
+
+\section{Display Programs}
+
+\subsection{ISCAN---Plot Spectra Extracted From an Image}
+
+This produces plots of 1-d spectra which it extracts from a long-slit
+spectrum (i.e. it acts as if it were a wrap-up of the FIGARO functions
+EXTRACT and SPLOT).
+To use ISCAN just set the hard or softcopy device using HARD or SOFT,
+then type ISCAN, and answer the questions. To use in batch follow the
+instructions given by the program BATCH.
+
+\subsubsection{Summary of Parameters}
+
+\begin{description}
+\item[IMage] (file) Name of image for input
+\item[XStart] (float) display lower limit
+\item[XEnd] (float) display upper limit
+\item[YStart] (int) display lower limit
+\item[YEnd] (int) display upper limit
+\item[YBlock] (int) Enter display x-sect width
+\item[SCan] (key) Scan through data
+\item[HArd] (key) use hard graphics device for display
+\end{description}
+
+\subsection{HIMAGE---Greyscale Display}
+
+This uses GKS to plot a greyscale image of an image (in the FIGARO
+sense). It can plot on a GKS greyscale device such as an IKON or a CANON
+laser printer.
+The plot can include a key. Unfortunately this
+program takes a fair time to scale the image, so will ``sit there''
+for a minute or so before anything appears on the screen (this does, of
+course, depend upon the image size). The parameters are as follows:
+\begin{description}
+\item[IMage] (file) Name of image to be displayed 
+\item[YStart] (int) First Y value to be displayed 
+\item[YEnd] (Int) Last Y value to be displayed 
+\item[XStart] (int) First X value to be displayed 
+\item[XEnd] (int) Last X value to be displayed 
+\item[Low] (int) Minimum count level for display 
+\item[High] (int) Maximum count level for display 
+\item[PLOTdev] The device to plot on (translated using GNS, so
+should be IKON1 etc.). Note that files produced by PLOTDEV=CANON are
+typically around 1600 blocks.
+\item[ASPect] This is the aspect ratio (X/Y) of the plot (excluding
+any key). The default is set to the value which gives square pixels.
+\item[SHRINK] This gives a wide margin to the plot.
+\item[LOG] (key) Display using logarithmic scaling 
+\item[KEY] This plots a key giving the data values corresponding to
+given greyscale values.
+\end{description}
+
+\subsection{CSCAN---Plot Array of Line Profiles from Data ``Cube''}
+
+This produces as array of line profiles from a 3-d data array, where
+the first dimension corresponds to wavelength. The data is scaled using
+the maximum and minimum intensities in the whole data cube, rather than
+of the individual profiles.
+
+\subsubsection{Summary of Parameters}
+
+\begin{description}
+\item[CUBE] (file) Name of CUBE for input
+\item[YStart] (float) display lower limit
+\item[YEnd] (float) display upper limit
+\item[TStart] (int) display lower limit
+\item[TEnd] (int) display upper limit
+\item[HArd] (key) use hard graphics device for display
+\end{description}
+As regards the parameters, Y is the first spatial dimension and T the
+second.
+
+\section{Removing Continua}
+\subsection{FITCONT---Fit Polynomial to Continuum}
+
+The optimisation in LONGSLIT allows for a flat base.
+Although this is generally satisfactory, for some data the base varies
+significantly.
+The user then has various options: the base can be subtracted from the
+using CSUB (which subtracts a polynomial fit to the base from the
+data); the data can be divided by the base; or the base can be left as
+it is, but a polynomial fit can be subtracted during the actual fitting.
+The latter option has the advantage that any plots of line profile etc.
+will still show the base as in the original data.
+This option is available by the use of the routine FITCONT, or totally
+within LONGSLIT.
+In general it is better to use the version in LONGSLIT, but this will
+not always cope with ``difficult'' data sets, so FITCONT may be
+required.
+The main difference here which allows FITCONT to deal with these cases
+is that it allows the weighting to be set using a cursor (in LONGSLIT it
+is done simply by excluding the areas within line boundaries, which is
+less versatile).
+This is similar to CSUB in fitting a Chebyshev polynomial to the base.
+However the data itself is not altered.
+When LONGSLIT fits a line it can subtract this base.
+Alternatively the base may be interpolated over the line using cubic
+splines (FITCONT is not needed for this).
+
+\subsubsection{Summary of Parameters}
+
+\begin{description}
+\item[IMage] The file with the data in
+\item[XSect] The cross-section to use for the first fit
+\end{description}
+
+
+\subsection{CSUB---Subtract Continuum}
+
+This is similar in function to FITCONT, except that is performs the
+continuum subtraction itself.
+
+\subsection{CADD---Add Back Continuum Previously Subtracted}
+
+This add back a continuum previously subtracted using CSUB, making use
+of the information CSUB stores in the data file.
+
+\section{Getting 3-D Data into the Correct Form for FIBDISP/LONGSLIT}
+
+These programs were designed for use with a fibre array on the
+Manchester Echelle Spectrometer.
+The fibres effectively make it a multi-slit spectrometer, with the
+fibres gathered into three (for example) rows at the input to the
+spectrometer.
+The first task is to extract the data from the individual fibres, the
+data is then wavelength calibrated and combined into a three-dimensional
+array, simulating the relative positions of the input ends to the
+fibres.
+FIBSEP extracts the data from the individual fibres into what looks like a
+long-slit spectrum for each row of fibres (at their output end).
+ARC2D can then be used for the wavelength calibration, and FIB2CUBE will
+re-arrange them into the format required for FIBDISP (FIB2CUBE also
+created the results structure).
+
+\subsection{FIBSEP---Extract Data from Individual Fibres}
+
+This separates out the individual fibres from a 2-d spectrum. It is
+assumed that the data had previously been corrected for S-distortion.
+This first produces a greyscale plot of the data (on an Ikon for
+example), and then the user is asked to mark two fibres and the limits
+(in X) that the program is to consider.
+If there is more than one ``slit'', then each must be dealt with by
+separate runs of the program.
+The method is to find the centres of the fibres by fitting Gaussians,
+and to divide the data half-way between these points. Since the
+separation of the fibres may vary slightly, the user is recommended
+to use CSUB on the data first. This method is fairly crude and the user
+may well wish to improve upon it, but if all that is required is radial
+velocities this should be adequate.
+
+\subsubsection{Summary of Parameters}
+
+\begin{description}
+\item[IMage] (file) Name of image to be displayed 
+\item[OUTput] (file) Name of image to create
+\item[FILE] (char) Name of file for positions of fibres
+\item[YStart] (int) First Y value to be displayed 
+\item[YEnd] (int) Last Y value to be displayed 
+\item[XStart] (int) First X value to be displayed 
+\item[XEnd] (int) Last X value to be displayed 
+\item[Low] (int) Minimum count level for display 
+\item[High] (int) Maximum count level for display 
+\item[DEVICE] (char) Plotting device. Should be an ARGS or IKON.
+\item[NFIB] (int) Approximate number of fibres expected
+\item[LOG] (key) Display using logarithmic scaling 
+\item[OLD] (key) Use previous results to extract data
+\end{description}
+
+\subsection{FIB2CUBE---Convert Fibre Data to ``Cube''}
+
+This converts calibrated long-slit spectra from a fibre array into a
+3-d data cube for use by FIBDISP.
+Data from separate slits should be in different files, prompted for as
+IMAGE1, IMAGE2, etc.
+CUBE is the output file.
+FILE is a file listing the X, Y positions of each fibre in the output
+array (default type .DAT), probably produced by ENCODE.
+Note that, although CSCAN can produce plots from a file produced by
+FIB2CUBE for types ``HEX'' and ``RECT'', these are only correct for type
+``RECT''.
+FIB2CUBE create files with all the structures required by FIBDISP.
+The emission line is delimited using the same code as used in LONGSLIT.
+The code only allows for one spectral line per file.
+\begin{description}
+\item[IMAGE1] (file) Input image 1
+\item[IMAGE2] (file) Input image 2
+\item[IMAGE3] (file) Input image 3
+\item[IMAGE4] (file) Input image 4
+\item[IMAGE5] (file) Input image 5
+\item[CUBE] (file) Output data cube
+\item[FILE] (char) Name of file with coordinates for output cube This
+file must contain the two spatial dimensions of the output cube followed
+by the number of input images in the
+first record. After that the X, Y coordinates of the input spectra (a
+cross-section at a time, starting at 1) in the output cube.
+After that the contents of the X displacement array (if any).
+Comments lines start with an exclamation mark.
+\item[MAXGAUSS] (int) Maximum number of Gaussians that can be fitted
+to a profile.
+\end{description}
+
+\subsection{CUBEIN---Prepare to Analyse a Data ``Cube''}
+
+This performs the same function as the NEW mode of LONGSLIT (see
+section~\ref{long.id}), but deals with a three--dimensional data frame.
+It adds a .RES structure and
+allows the user to identify the line(s). The data may then be analysed
+using FIBDISP. This is an alternative to FIB2CUBE if the user already
+has their data in a ``cube'' form. Most of the functions of CUBEIN can
+be performed by LONGSLIT.
+
+\subsubsection{Note on Use of These Programs for Large Data Sets}
+
+When using CUBEIN or LONGSLIT to create a .RES structure for a file
+resulting from an instrument such as TAURUS the following points should
+be born in mind to avoid hitting system limits:
+\newcounter{warnings}
+\begin{list}{(\roman{warnings})}{\usecounter{warnings}}
+\item The data array is always mapped with data type real.
+\item A .RES.DATA array is created, or type real, with the dimensions of
+(6$\times$(number of Gaussians allowed for) + 10) $\times$ (number of
+lines) $\times$ (dimensions of data excluding wavelength dimension).
+This can be quite large!
+\end{list}
+
+\subsubsection{Summary of Parameters}
+
+\begin{description}
+\item[CUBE] (file) Cube for display
+\item[MAXLines] (int) Maximum number of lines to allow room for
+\item[MAXGauss] (int) Maximum number of Gaussians to allow room for
+\item[YStart] (int) Analysis lower limit
+\item[YEnd] (int) Analysis upper limit
+\item[TStart] (int) Analysis lower limit
+\item[TEnd] (int) Analysis upper limit
+\end{description}
+
+\section{IRAF--FIGARO file conversion}
+
+The FIGARO functions HDS2IRAF and IRAF2HDS allow conversion between
+the two formats. Both of these access the .FITS, and not the .OBS
+structure (except for the object name), within the FIGARO file, so it
+may be a good idea to rename any .OBS structure (or elements from it) to
+.FITS before using HDS2IRAF. Both of these are linked using the
+non-shareable versions of most of the libraries (IRAF has it's own
+versions of C run time library routines which gives rise to problems
+when used with HDS, which is written in C). For access to the IRAF
+format files the IRAF library IMFORT is used, which at present only
+supports OIF format (the default).
+Access to FIGARO files is via the DSA library.
+
+Note that IRAF does not support an axis array, but instead uses a
+starting point and increment in the same manner as FITS.
+These programs will convert between the two, but a non-linear FIGARO
+axis cannot be converted to IRAF format.
+
+\subsection{IRAF2HDS}
+
+This converts an IRAF file to a FIGARO format file.
+
+\subsubsection{Parameters}
+
+\begin{description}
+\item[FILE] Name of input IRAF format file
+\item[OUTPUT] Name of output HDS file
+\end{description}
+
+\subsection{HDS2IRAF}
+
+This converts a FIGARO format file to an IRAF format file.
+
+\subsubsection{Parameters}
+
+\begin{description}
+\item[IMAGE] Name of input file
+\item[OUTfile] Name of output IRAF format file
+\end{description}
+
+\section{Miscellaneous Programs}
+
+\subsection{CUBE2LONG---Extract a Spectrum from a Spectral ``Cube''}
+
+This extracts a long-slit-type spectrum from a 3-d data array, which
+has the dimension corresponding to wavelength last. The values are
+obtained using local cubic spline interpolation. The program requires
+a position (xpoint, ypoint) on the ``slit'', and an angle. It will then
+produce a cut through the data, following this ``slit'' until it reaches
+the edge of the data in each direction from the given point. Variation
+of the parameter PIXLEN eases comparison of (for example) TAURUS data
+with long-slit data. Cubic spline interpolation is used to obtain the
+data values.
+
+\subsubsection{Summary of Parameters}
+
+\begin{description}
+\item[CUBE] (file) Name of cube for input.
+\item[OUTput] (file) This is the name of the resulting image.
+\item[YPOINT] (int) Y point on slit
+\item[XPOINT] (int) X point on slit
+\item[ANGLE] (float) pa of slit
+\item[PIXLEN] (float) Pixel length
+\end{description}
+
+\subsection{VIG---Correct For Vignetting}
+
+This fits a Chebyshev polynomials to templates taken from both
+directions across an image, and divides the image by the product of the
+polynomials, normalising so that the data in the centre in unchanged.
+A file is produced containing the coefficients of this polynomial so that
+other data files can have the correction applied.
+
+\subsection{BATCH---Creating Batch Command Files}
+\label{batch}
+
+This program does not actually run in FIGARO, but produces command
+files to run FIGARO routines in batch. These may be for the DCL or ICL
+version of FIGARO. It is currently located in FIGARO\_PROG\_N, and is
+run as a normal program. It will prompt for the name of the command file
+to create (default type .COM or .ICL as relevant), and then enters
+command level, where the terminal input is copied to the output file. If
+this is run it will give a list of the parameters of the function to
+remind the user of the order/parameters required. The option is given to
+edit the file before submission. BATCH creates a command file, and will
+submit it if required. It will set the default directory to the
+directory the file is created in. 
+
+Note that, as with DCL, a dash may be used to continue a command on
+another line. For compatability with ICL a ``\~{ }'' may also be used.
+If a FIGARO command is recognised, then a list of parameters is output
+(keywords in square brackets).
+Anything entered after that will go onto the end of the current command
+line, until a blank string is entered. BATCH takes care of continuation
+lines in the output file.
+
+N.B. This program will exit when the word ``EXIT'' is entered in full,
+if you wish to enter ``EXIT'' as a command, but not to leave the program
+(e.g.\ for a DCL subroutine), then enter ``EXI'' or precede it with a
+tab. BATCH also recognises the following commands as commands to itself,
+and they are not written to the command file:
+\begin{description}
+\item[EXIT] Exit, retaining the command file.
+\item[QUIT] Exit, deleting the command file.
+\item[HELP] Output elementary help information.
+\item[LIST] List FIGARO commands with their parameters.
+\item[DCL] Create a spawned subprocess to perform a DCL command.
+\end{description}
+
+It is possible to create your own private versions of the input files,
+so as to include your own software (the versions supplied include
+the``standard'' FIGARO functions plus those of TWODSPEC).
+For more details see appendix~\ref{append.install}.
+
+\subsection{IDIMS---List Files with Dimensions and Object Names}
+
+This will list the dimensions and object names of a list of files
+satisfying the template given in the parameter FILES. This may include
+(and usually will) wildcard symbols (e.g.\ ``*''), but shouldn't include
+the file extension. For example to list the files SEP22000*.DST:
+\begin{verbatim}
+$ IDIMS SCRATCH:[TNW.RAQ]SEP22000*
+This version of IDIMS is from $1$DRB2:[TNW.FIGARO.TWODSPEC.TWODSPEC]
+  $1$DRB0:[TNW.RAQ]SEP220002[576,386]  H1-36
+  $1$DRB0:[TNW.RAQ]SEP220003[576,386]  ARC
+  $1$DRB0:[TNW.RAQ]SEP220004[576,386]  H1-36
+  $1$DRB0:[TNW.RAQ]SEP220005[576,386]  H1-36 PA0
+  $1$DRB0:[TNW.RAQ]SEP220006[576,386]  HE2-390
+  $1$DRB0:[TNW.RAQ]SEP220007[576,386]  HE2-390 PA 90
+\end{verbatim}
+
+\subsection{ALTDEF---Edit HDS file}
+\label{altdef}
+
+This is an interactive program for editting an HDS file, and it has one
+parameter, INFILE, the name of the file to work on.
+
+At present it is only possible to alter the values of elements (it is
+not possible to add elements for example).
+To drop to a lower level just specify the name of that level (this can
+be abbreviated).
+On reaching an array or scaler element, you have the option to set its
+value(s).
+The example shows how to set the element OPT\_STEP to 0.9.
+\begin{quote}\begin{verbatim}
+$ ALTDEF 
+(INFILE) Input file [ ] - TWODSPEC_DEFAULTS
+ 
+=========< E d i t   M e n u >=========
+ 
+Fit_handler
+Opt_step
+Tols
+Usepeak
+Vacuum
+AX1_Log
+AX1_Units
+Exit
+Edit Menu - OPT_STEP
+DEFAULTS.OPT_STEP FLOAT 1
+\end{verbatim}\end{quote}
+(the data type and current value of the element is displayed)
+\begin{quote}\begin{verbatim}
+ 
+=========< A l t e r   E l e m e n t >=========
+ 
+Set     : Set value
+Range   : Set range (if array)
+Exit    : Exit
+Alter Element - SET
+Value [0] - 0.9
+ 
+=========< A l t e r   E l e m e n t >=========
+ 
+Set     : Set value
+Range   : Set range (if array)
+Exit    : Exit
+Alter Element - EXIT
+ 
+=========< E d i t   M e n u >=========
+ 
+Fit_handler
+Opt_step
+Tols
+Usepeak
+Vacuum
+AX1_Log
+AX1_Units
+Exit
+Edit Menu - EXIT
+\end{verbatim}\end{quote}
+This was primarily designed for altering the defaults file (see
+section~\ref{deffile}), but is not tied to any particular structure.
+
+\subsection{MODPARAMS--Modify Parameter Names Array}
+
+This program alters the parameter names array in the results structure
+used by LONGSLIT etc.
+The file name is given by the parameter IMAGE and the string given by
+parameter OLDPAR is changed to that given by NEWPAR.
+This allows data files to be altered to support extra parameters,
+assuming that one of the existing parameters can be sacrificed (this
+parameter should not have been used).
+Note that the cases of the values given for OLDPAR and NEWPAR are
+significant, and they will need to be quoted if lowercase characters are
+present.
+
+\subsection{TAU2HDS-Read TAURUS Format file}
+
+This provides an alternative to the NDPROGS program TAU2FIG.
+
+\subsubsection{Summary of Parameters}
+
+\begin{description}
+\item[TAUfile] TAURUS format data file to be converted
+\item[NDims] Dimensionality of data set (2 or 3)
+\item[DIMensions] Data dimensions
+\item[INForm] The format of the input data (I2 or R)
+INFORM specifies the format of the input data set.
+Most TAURUS raw 3d data is Integer*2 (16 bits/pixel - I2).
+2d images are  either REAL (32 bits/pixel, floating point - R) or
+Integer*2.
+In the 2d case the output will always be REAL*4 but in the 3d case the
+output will have the same format as the input.
+\item[OUTfile] The name for the Output Data Structure
+\end{description}
+
+\section{Changes Since Previous Releases}
+
+A number of bugs have been fixed since previous releases, and there have
+been a large number of minor changes.
+The following significant changes to the features of the package have occurred:
+
+\subsection{Changes Since First Release}
+\newcounter{changecntr}
+\begin{list}{(\roman{changecntr})}{\usecounter{changecntr}}
+\item
+The menus are handled differently, in that the list of options is
+formatted when required (and the user has a choice on how this is done).
+
+\item
+The results array is now accessed by the {\em name} of the parameters,
+which is converted to the position using information in the data file.
+This means that code can be much more general.
+This should not affect users, except that it simplifies the code and
+should improve reliability.
+
+\item
+The fit model can now be altered in batch by LONGSLIT.
+
+\item
+ARC2D stores the continuity correction results in a slightly different
+place.
+Continuity correction must therefore be repeated for use in the ``DISP''
+section of ARC2D.
+
+\item
+If the user exits during setting up segments in LONGSLIT or ARC2D
+(e.g.\ typing ``E'' when setting the segments up with a cursor, having
+selected no segments, and then exiting fro the segment part of the
+program), it is now not assumed that the user wants to use the full
+range of the spectrum, but the program loops around to the start again,
+and the user can select another template etc.
+
+\item
+The parameter AIC in LONGSLIT and FIBDISP is now true by default.
+
+\item
+CLONE mode checks to make sure that only lines in range for the current
+data are copied.
+
+\item
+Character mapping is handled in a more portable manner (this should not
+affect the user).
+
+\item
+PGPLOT is now used for graphics instead of NCAR.
+Most calls to SGS and GKS directly have also been removed.
+There are still direct calls to GNS in the opening routines, and HIMAGE
+still uses SGS and GKS rather than PGPLOT.
+PGPLOT is more suitable for astronomical applications than NCAR, but
+only allows one graphics device can be open at a time.
+
+\item
+The keyword PRFITS is now available for the Gaussian fitting programs.
+This allows the suppression of most of the information in the log file-a
+summary is still given, but detailed fit information is not.
+
+\item
+The line identification part of LONGSLIT and ARC2D has changed.
+If the user has ``private'' line identifications, it is no longer
+necessary to put them into a file before using them.
+The two separate methods of line identification previously available
+have been combined.
+Line lists can have a slightly different format, although the old format
+can still be used (comments can be included in the header, and the
+number of lines need not be given).
+
+\item
+In addition various routines have had minor changes and more of the code
+is common between the programs (this follows from accessing the results
+array by name).
+This should improve reliability.
+This also means that data can be {\em blocked} in FIBDISP as in
+LONGSLIT.
+
+\item
+The results structures used by LONGSLIT etc. and FIBDISP are now more
+alike, and that for FIBDISP is now called .RES.
+Most of the changes have been to the version for FIBDISP.
+A common structure definition file is now used---in fact if you give
+LONGSLIT a three-dimensional file to work on it will create a structure
+with everything FIBDISP needs.
+
+\item
+The name of LONGSLIT can no longer be abbreviated---this was a somewhat
+odd idea anyway.
+
+\item
+Some bugs in virtual memory handling have been fixed.
+
+\item
+Two exclamation marks in answer to a menu prompt will abort the program
+in virtually all cases (this was partially implemented in the previous
+release). e.g.
+\begin{quote}\begin{verbatim}
+.....
+Hard     : Produce hardcopy of data with fit
+Guess    : Alter details of guessing
+Window Menu [FIT] - !!
+Abort requested
+[NII]6548 (line No 1)
+Current value of iteration is   1
+Aborting
+$
+\end{verbatim}\end{quote}
+As above there may be some further output before the program aborts, and
+it is still possible that you will be asked a question or two, but the
+program will still normally abort.
+This does not apply to the ADAM version.
+
+\item
+In general the programs are more likely to abort in the event of an
+error (especially if virtual memory is not released properly, which was
+normally ignored before).
+
+\item
+The program BATCH can now write ICL files, so that the ADAM version of
+FIGARO can be used.
+
+\subsection{Changes since Previous Release}
+
+\item
+The parameter PLOTSIZE has been removed, since this is not easy to
+implement in PGPLOT.
+
+\item
+The check that the device given as the softcopy device (using SOFT for
+example) actually was softcopy has been removed.
+
+\item
+The fitting of the Chebyshev polynomials to the background can be
+carried out in LONGSLIT, previously this required FITCONT.
+Alternatively a cubic spline can be used for the background. This
+applies to all fit models.
+
+\item
+COMB can now handle the case where you just have one ``tooth'' (e.g. a
+stellar spectrum).
+Bugs in this have been fixed, so it should be okay now.
+
+\item
+Hardcopy output has been improved, and dotted lines are output to the
+Canon laser printer (this involves a work-around to a deficiency in
+GKS).
+
+\item
+A file TWODSPEC\_DEFAULTS is used as an additional way of varying the
+behaviour of LONGSLIT etc.
+
+\item
+There are two new programs, ALTDEF and MODPARAMS.
+
+\item
+The limit of 50 to the number of lines LONGSLIT and the similar programs
+could handle has been removed.
+
+\item
+If lines are deleted in the editor after the line identification part of
+LONGSLIT etc., the fits are moved to the new correct positions, and are
+not lost.
+
+\item
+By default iteration files are not created.
+Other changes in the optimisation routines also mean that the fitting is
+now faster, and more under the control of the user.
+
+\item
+A number of parameter names have changed, as have some of the allowed
+abbreviations.
+
+\item
+There is an increased use of menus for prompting.
+
+\item
+The ADAM version of TWODSPEC is now set up on a system-wide basis, and
+uses a command procedure executed from ICL to set up the required
+logical names.
+
+\item
+The format of the line list files has changed (see
+section~\ref{long.id}).
+The FIGARO arc line list files can be used if desired.
+
+\end{list}
+
+\section{Bugs/Limitations}
+
+BATCH does not handle long (over 80 character) comment lines properly.
+
+Sometimes odd behavior has occurred with large data frames (such as from
+TAURUS), this seems to be due to something odd in VMS.
+
+% We don't want to number the references as a section
+
+\section*{References}
+\addcontentsline{toc}{section}{References}
+\begin{description}
+\cref{Akaike, H., 1973}{in 2nd int. Symp. Information Theory}
+{P.267, Eds. Petrov, B. N. \& Csaki, K., Akademai Kiado, Budapest}{} 
+\igref{Bailey, J., 1989}{ICL --- The New ADAM Command Language}
+\igref{Bland, J., 1986}{Ph. D. Thesis, Univ. of Sussex}
+\igref{Chipperfield, A. J., 1989}{SUN/35.2, ICL --- Interactive Command
+Language: An Introduction}
+\jref{Frazer, R. D. B. \& Suzuki, E., 1969}{Anal. Chem.}{41}{37}{}
+\jref{Heckman, T. M., Miley, G. K., van Breugel, W. J. M. \& Butcher,
+H. R., 1981}{Astrophys. J.}{247}{403}{} 
+\igref{Lawden, M. D., 1989}{SG/4.1 ADAM --- The Starlink Software
+Environment}
+\igref{Shortridge, K., 1988}{FIGARO 2.4}
+\igref{Shortridge, K., 1989}{Running FIGARO Under ADAM and ICL}
+\igref{Wallace, P. T., 1987}
+{SUN/78.4 RV --- Radial Components of Observer's Velocity}
+\igref{Wallace, P. T., 1990}{SUN/67.14 SLALIB --- a Library of
+Subprograms}
+\igref{Whittle, M., 1982}{Ph. D. Thesis, Univ. of Cambridge}
+\jref{Whittle, M., 1985}{Mon. Not. R. Ast. Soc.}{213}{1}{}
+\igref{Wilkins, T. N., 1988}{Ph. D. Thesis, Univ. of Manchester}
+\end{description}
+
+\appendix
+
+\section{Note on Installing These Programs}
+\label{append.install}
+
+To run these additions to FIGARO, the .EXE, .PAR and .INF files should
+be in a ``FIGARO directory'' (see below), as should the file FIGARO.COM
+(for the latter the default directory is unsuitable, unless it also has
+a logical name of the FIGARO\_PROG\_U... type).
+For the purposes of this discussion a ``FIGARO directory'' is one which
+programs will search for files-the same as used by other FIGARO
+routines.
+ARC2D and LONGSLIT also require .IDS files supplied may be used, or
+private versions prepared using an editor.
+The format of these files is given in section~\ref{long.id}.
+The .IDS files may be in a ``FIGARO directory''.
+To run BATCH one requires BATCH.EXE, BATCH.DAT, NOBATCH.DAT and
+BATCH\$QUEUE.DAT. BATCH.DAT contains a list of FIGARO commands with
+parameters (continued on more than one line by putting a ``-'' in the
+first column of the second and any successive lines).
+Each line of this file must start with the command name (in upper case),
+followed by a comma.
+The format of the remainder of the line is not important to the program
+BATCH, but the format used is to list the parameters, with keywords in
+square brackets.
+Any local programs can be added to this if required (although too many
+could overflow the work arrays).
+A program BCON is supplied to create this file using the connection
+files as input (this means that functions without connection files need
+to be added manually, and if a function is not suitable for batch use it
+will have to be removed).
+The version of BATCH.DAT included includes the NDPROGS programs as well
+as the ``system'' FIGARO and TWODSPEC.
+If FIGARO or NDPROGS is updated, BCON should be run on the connection
+files.
+NOBATCH.DAT contains a list of commands unsuitable for batch use.
+Both BATCH.DAT and NOBATCH.DAT require to be updated with a new version
+of FIGARO.
+BATCH\$QUEUE.DAT is simply a list of available batch queues, and should
+be edited accordingly.
+
+The printing of hardcopy plot files requires the logical names as
+follows to be set up:
+\begin{quote}\begin{verbatim}
+$ DEFINE GKS_(workstation type)_QUEUE (queue name)
+\end{verbatim}\end{quote}
+ Where (workstation type) is the GKS workstation type (a number) e.g.\
+for the printronix 1200.
+(queue name) is the name of the queue on which the file should be
+printed, e.g.\
+SYS\_PRINTRONIX. So for the printronix the following should be used
+(with the correct GKS):
+\begin{quote}\begin{verbatim}
+$ DEFINE GKS_1200_QUEUE SYS_PRINTRONIX
+\end{verbatim}\end{quote}
+ This will have to done for each workstation type, twice where a device
+can be addressed by 2 numbers, e.g.\ 1200 and 1201.
+Note that the FIGARO.COM supplied assumes the printer queue for canon
+laser printer files to be SYS\_LASER.
+If there is more than one similar laser printer on a site, it will
+probably be found convenient to set up commands to alter this logical
+name to point to the required printers.
+Alternatively printing may be suppressed by removing these logical
+names.
+
+For use with the ADAM version the logical names have to be in the job
+(or system) logical name table, not the process.
+This is done in the file ADAM\_TWODSPEC.COM included with the package.
+This file is executed when the command TWODSPEC is given.
+The logical names set up by this may well not be applicable to a
+particular site, so correct definitions should be given in either
+FIGARO\_PROG\_L:TWODSPEC\_GRAPH.COM or
+FIGARO\_PROG\_U:TWODSPEC\_GRAPH.COM.
+This file might be as follows:
+\begin{quote}\begin{verbatim}
+$!
+$! Definitions for plotting of hardcopy output (GKS 7)
+$! (see documentation)
+$!
+$ define/nolog/job gks_1200_queue rgo_printronix
+$ define/nolog/job gks_1201_queue rgo_printronix
+$ define/nolog/job gks_2600_queue obs_laser
+$ define/nolog/job gks_2601_queue obs_laser
+$ define/nolog/job gks_1000_queue zeta
+$ define/nolog/job gks_1001_queue zeta
+\end{verbatim}\end{quote}
+
+This is all done in FIGARO.COM. These routines use the user variables
+`SOFT' and `HARD' for graphics device names (the same as FIGARO),
+this makes them fully compatible with the GKS version of FIGARO.
+These are accessed in the routines OPENHARD and OPENSOFT.
+
+The programs are linked with the FGRSHR sharable image, which applies
+to FIGARO versions {\em later} than 2.4. This is because of a bug in
+the earlier version of DSA\_GET\_RANGE, the use of the DSA FITS
+routines, and the large number of parameters used by LONGSLIT.
+Problems may be found using FIBDISP if the file was created by an
+earlier version of FIB2CUBE, although versions from the first release of
+TWODSPEC will be okay.
+
+These programs are implemented using DSA, so should require little
+alteration to work with future versions of FIGARO. There are some
+routines, however, which make direct calls to DTA, and would need
+re-coding if DTA were withdrawn at any time.
+
+To run from ICL the command
+\begin{quote}\begin{verbatim}
+DEFSTRING TWODSPEC LOAD FIGARO_PROG_N:TWODSPEC.PRC
+\end{verbatim}\end{quote}
+(with the relevant directory substituted if TWODSPEC is not installed in
+FIGARO\_PROG\_N) should be executed, preferably in an ICL startup file.
+
+The libraries required are SOURCE, TNWLIBS, OPTLIB, FIBRE, CHARLIB and
+GRAPHLIB.
+
+In addition to the libraries specific to this package, use is made of
+the following FIGARO libraries: DSA, DTA, FIG, GEN, ICH, PAR, the
+following STARLINK libraries: CHR, SLA, HDS (only via DTA), SGS (HIMAGE
+only), GNS, the graphics library PGPLOT (STARLINK version), the
+following DEC libraries: LIB\$, SYS\$, and the following non-DEC
+proprietary software: NAG, GKS.
+The order of linking with the libraries is as follows (where
+{\tt (directory)} is the directory containing the libraries):
+
+\begin{quote}\begin{verbatim}
+! Options file for linking with the libraries used for LONGSLIT etc.
+! which are specific to LONGSLIT, etc.
+!  T.N.Wilkins 5/12/88
+(directory):source/library
+(directory):fibre/library
+(directory):tnwlibs/library
+(directory):optlib/library
+(directory):tnwlibs/library
+(directory):graphlib/library
+(directory):charlib/library
+\end{verbatim}\end{quote}
+The logical names LIB\_MISC, LIB\_MAIN and LIB\_OPT are required for
+compilation of many routines. These should point to the text libraries
+CHARLIB, TNWLIBS and OPTLIB respectively.
+
+The package has been set up such that in order to compile and link it,
+the only file which needs to be manually altered is
+[.TWODSPEC.LIB]SETUP\_LOGICALS.COM. The command procedure
+[.TWODSPEC.DEV]MAKE.COM will then create the whole package.
+The sub-directories of the top level directory contain the following:
+\begin{description}
+\item[ADAM] Files required only for the ADAM monolith version of
+TWODSPEC.
+These are copies of those used for the ADAM monolith version of FIGARO.
+\item[DEV] Files concerned with creating the run-time files, also
+the source for the parameter files.
+\item[FIGLIB] Private versions of FIGARO libraries. These are just
+more up-to-date versions than included with the currently released
+version of FIGARO, and will not be needed when the next version of
+FIGARO is released.
+\item[LIB] Source code and object libraries.
+\item[TEST] Files to test the setup of the package.
+\item[TWODSPEC] Run-time files.
+\item[UPDATE] Used for scratch files during linking etc.
+\end{description}
+
+\section{The Contents of the Results Structure}
+\label{ap.res}
+
+COMB, ARCSDI, ARC2D and LONGSLIT create a .RES structure in which to
+store their results.
+This enables repeat fits etc.\ to be performed easily, as well as making
+it unnecessary to do all the fits at one time.
+Most of this structure is mapped and its arrays thus accessed directly
+from the programs.
+Data is mapped by the address of the first element of an array in the
+file's being obtained by the program.
+FORTRAN passes all arguments to subroutines and functions by giving
+their address, although for character data this is the address of the
+descriptor, which includes the address of the data.
+Therefore, if this address is passed to the subroutine or function---its
+value not address---then the called routine will treat the data as a
+normal array.
+For character data a descriptor must be constructed and passed by
+address.
+In the interests of portability it is better to use an array in common
+to pass the address, the element of the array at that address is passed
+(even though that is outside the bounds of the array). For character
+strings the string must be passed as string(start:end). The arrays are
+in common so that they can be referenced with the same offset from
+different subroutines.
+The same principle can be used to obtain virtual memory
+(there are VAX library routines to obtain the addresses of virtual
+memory and to `free' such memory when it is finished with).
+
+Since COMB performs fitting of continua rather than lines, the structure
+for COMB is different to that for the other programs in that the arrays
+are dimensioned in channels where other programs would dimension them in
+cross-sections.
+
+ The elements of the structure are in table \ref{tb.res}:-
+\begin{table}
+\begin{quote}\begin{verbatim}
+.RES    Struct
+  .DATA[40,10,171,1]  Float 4121 1 5 6548.9 6.305 10.01 13.25 0.5995
+                                       .... 0 0 0 0 0 0 0 0 0 0 0 0 0
+  .PARAMS[400]   Char    Status    1st_Xsect Nxsects   Centre_1  Width_1
+  .MASK[10,171,1]  Short   12 12 10 12 12 1 1 1 1 1 12 12 10 12 12 1 1 1
+                                      .... 1 12 12 12 12 12 1 1 1 1 1
+  .CONTROL[10,171,1]  Short 121 121 121 121 121 121 121 121 121 121 121
+                                     .... 121 121 121 121 121 121 121
+  .ITERATION     Short   12
+  .REST_WAVE[10]  Float  6548.1 6562.8 6583.6 6717 6731.3 0 0 0 0 0
+  .IDS[100]      Char    [NII]6548 HALPHA    [NII]6584 [SII]6717 [SII]6731
+  .TRAML[10]     Float   6542.5 6555.5 6577.8 6709.3 6724.7 0 0 0 0 0
+  .TRAMR[10]     Float   6552.8 6569.7 6589.0 6723.6 6737.2 0 0 0 0 0
+  .ARC[10]       Short   0 0 0 0 0 0 0 0 0 0
+  .TOLS[13]      Float   0.01323 1 1 0.02646 2.500 0.1323 4 10000 20 4
+                                           .... 4 2.000E-3 2.000E-3 3
+  .TEMPLATE      Struct
+    .DATA_ARRAY[576]  Float 1497.5 1444.1 1338.9 1260.7 1202.5 1171.9
+                                 .... 1032.6 953.3 956.9 1007.5 969.7
+    .AXIS[1]       Struct
+      .DATA_ARRAY[576]  Float 6513 6513.2 6513.4 6513.6 6513.8 6514.0
+                                     .... 6621.7 6621.9 6622.1 6622.3
+ \end{verbatim}\end{quote}
+\caption[a]{The results structure}
+\label{tb.res}
+\end{table}
+ The .TRAML and .TRAMR arrays store the line positions, that is
+the limits considered for optimisation (assumed at
+the centre by ARC2D, the .IDS array store their identifications and
+the .REST\_WAVE their wavelengths. The .ARC array is used by ARC2D to
+decide which lines are to be used in the evaluation of the relationship
+between channel number and wavelength. If the element of .ARC
+is 0 then the line is included under all circumstances, if it is 1 then
+it is included for non-`continuity corrected' data only, otherwise it is
+not included for any. A value of 4 indicates that no fits are present,
+while 10 and 11 are the values if the user manually deletes a line which
+previously had the value 0 or 1 respectively. If arc is 10 or 11 the fits
+can be `undeleted'.
+
+The TEMPLATE structure keeps a record of the one-dimensional spectrum
+used for line identification.
+Since the axis array is also kept, it is possible to CLONE from such an
+array, even if the main data array has been scrunched.
+
+The .DATA array is used to store the results of the Gaussian fitting,
+and is also used by ARC2D to store the results for the continuity
+correction. The .PARAMS structure acts as an index to this (used by the
+program to determine where to store results).
+The .CONTROL array gives the fit type to be performed (in the same form
+as the fit status element of the .RESULTS structure).
+In the
+above example, 171 is the number of cross-sections in the image and 10
+is the maximum number of lines allowed for in the structure (this can
+be up to 50). Originally the block number was stored, but this gives an
+ambiguous way of determining where the block starts and ends. Therefore
+the starting cross-section of the fit is now stored (it is possible to
+change the blocking and only alter a small number of fits).
+
+The fit is performed on data extracted from ``nwindow'' cross-sections 
+starting at ``first cross-section''.
+
+\begin{table}[ht]
+\small
+\begin{center}
+\begin{tabular}{|l|l|l|l|} \hline
+\multicolumn{1}{|c|}{\em Thousands} &
+\multicolumn{1}{c|}{\em Hundreds} &
+\multicolumn{1}{c|}{\em Tens} &
+\multicolumn{1}{c|}{\em Units} \\ \hline
+0 - No fit & 0 - No fit & 0 - Not used & 0 - No base \\ \cline{2-3}
+1 - Success & 1 - Single emission & 1 - Gaussian without base
+ & 1 - Flat base \\
+2 - Nag error & 2 - Single absorption & 2 - Gaussian with base
+ & 2 - Cubic spline \\
+3 - Crash & & 3 - Skew Gaussian & 3 - Chebyshev fit \\
+4 - Failed tolerances & & 4 - Cauchy function & 4 - Chebyshev fit \\ 
+\cline{2-3}
+ & 3 - Double emission & 5 - Fixed separation & 5 - Not used \\
+ & 4 - Double absorption & 6 - Fixed width ratio & 6 - Not used \\
+ & & 7 - Fixed height ratio & 7 - Not used \\
+ & & 8 - Independent Gaussians & \\
+ & & 9 - Not used & 8 - Not used \\ \cline{2-3}
+ & 5 - Multiple emission & N - Number of Gaussians & 9 - Not used \\
+ & 6 - Multiple absorption & & \\ \cline{1-3}
+0 - No fit & 7 - Centroid & & \\
+1 - Success & & & \\
+4 - Failed Tolerances & & & \\ \cline{1-3}
+5 - Not used & 8 - Not used & & \\
+6 - Not used & 9 - Not used & & \\
+7 - Not used & & & \\
+8 - Not used & & & \\
+9 - Not used & & & \\ \hline
+\end{tabular}
+\caption[a]{The meaning of the fit status element}
+\label{tb.fitstatus}
+\end{center}
+
+For background model 3 the polynomial is fitted immediately before the
+line profile fitting is carried out.
+For background model 4 the polynomial is evaluated using coefficients
+previously stored in the data file and subtracted before fitting.
+\end{table}
+
+The first element for each fit of this array (i.e.\ DATA(1,y,x)), the
+fit status contains information as to the type of fit performed and as
+to the success or otherwise of the fit (see table~\ref{tb.fitstatus}).
+
+Only LONGSLIT and FIBDISP are able to fit multiple Gaussians, so ARC2D,
+COMB, and ARCSDI use a smaller results structure.
+
+The last element in this direction is the density scale factor, used for
+scaling previous fits for use as first guesses to another fit.
+
+The elements of the .RES.CONTROL array are the same as the fit
+status element of the .RES.RESULTS array, except that they do not
+include information on the success of the fit.
+This array is used to set which type of fit is to be performed.
+
+The .MASK array and .ITERATION are used in conjunction to prevent
+accidental refitting of data.
+Note that a check is made to prevent a fit's being accidently
+overwritten by a simpler fit.
+The order of increasing complexity is:- single Gaussian, skew
+Gaussian, Cauchy function, double Gaussian, multiple Gaussian.
+Both this type of checking and the checking using .MASK and .ITERATION
+can be overridden in MANUAL mode.
+
+The .TOLS array provides a way of retaining the values for tolerances
+between successive work on the same file, and also (using the FIGARO
+function LET, or the CLONE COPY option in LONGSLIT), provides a way of
+transferring these from one file to another.
+This retention enables tolerances to be applied in batch, since it is
+much simpler to specify which tolerances to apply, rather than to list
+all the values to use.
+It is also used during multiple fitting in batch to determine the number
+of components to fit.
+
+\begin{table}
+\begin{quote}\begin{verbatim}
+ 
+.RES   Results
+  .DATA[43,1,15,15]  Float -1.701E+38 -1.701E+38 -1.701E+38
+                                           .... -1.701E+38 -1.701E+38
+  .PARAMS[430]   Char    Status    X_PositionY_PositionPts_in_FitBlockXs
+  .MASK[1,15,15]  Short  1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+                                     .... 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+  .CONTROL[1,15,15]  Short 531 531 531 531 531 531 531 531 531 531 531
+                                     .... 531 531 531 531 531 531 531
+  .ITERATION     Short   0
+  .REST_WAVE[1]  Float   5006.8
+  .TRAML[1]      Float   5004.1
+  .TRAMR[1]      Float   5008.3
+  .ARC[1]        Short   0
+  .TOLS[13]      Float   4.004E-3 1 1 8.008E-3 0.3203 0.04004 5 1000 20
+                                        .... 20 5 2.000E-3 2.000E-3 3
+  .TEMPLATE      Struct
+    .DATA_ARRAY[206]  Float 1497.5 1444.1 1338.9 1260.7 1202.5 1171.9
+                                 .... 1032.6 953.3 956.9 1007.5 969.7
+    .AXIS[1]       Struct
+      .DATA_ARRAY[206]  Float   5002.5 5002.6 5002.6 5002.6 5002.7 5002.7
+                                     .... 5010.6 5010.7 5010.7 5010.7
+  .XDISP[15]     Float   3.500 3 2.500 2 1.500 1 0.5000 0 0.5000 1
+                                         .... 1 1.500 2 2.500 3 3.500
+  .TOTAL_INTENSITY[15,15]  Float 19752.5 20252.4 16187.5 18789.1
+                                           .... -1.701E+38 -1.701E+38
+  .ORDER[6]      Char    SORT
+  .VARIANT[10]   Char    HEX
+ 
+\end{verbatim}\end{quote}
+\caption[a]{The results structure for 3--dimensional data}
+\label{tb.fib}
+\end{table}
+
+The .RES structure for three--dimensional data arrays
+(Table~\ref{tb.fib}) used by FIBDISP is similar to the above, but has
+some extra elements.
+The VARIANT element gives the form of the relationship between the array
+elements of the main data array, and their actual positions.
+For type=``HEX'' there is a .XDISP array: XDISP[IY] defines the
+displacement in the X direction of the .Z.DATA[IX,IY], relative to the
+value given by X.DATA[IX] (that is the element of the data of axis
+number one).
+ORDER (at present always ``SORT'') indicates whether the data is
+arranged with the first or the last array index varying over wavelength.
+SORT corresponds to the first axis being wavelength.
+
+\end{document}

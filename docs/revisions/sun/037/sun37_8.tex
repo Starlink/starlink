@@ -1,0 +1,302 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {37.8}
+\newcommand{\stardocauthors}   {Jack Giddings, Paul Rees \& Dave Mills}
+\newcommand{\stardocdate}      {6 October 1993}
+\newcommand{\stardoctitle}     {IUEDR --- IUE Data Reduction package (3.0)}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+\setlength{\parskip}{0mm}
+\tableofcontents
+\setlength{\parskip}{\medskipamount}
+\markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\newpage
+\section {Introduction}
+
+IUEDR is a program that provides facilities for the reduction of IUE
+data. It addresses the problem of working from the IUE Guest Observer
+Tape through to a calibrated spectrum that can be used in scientific
+analysis. In this respect, it aims to be a ``complete'' system for IUE
+data reduction.
+
+\section {Summary of Facilities}
+
+Here is a brief summary of what can be done using IUEDR. It should
+help you to decide whether it can help with your IUE work.
+
+\begin {itemize}
+
+\item TAPE ANALYSIS --- The contents of IUE tapes can be examined
+interactively to find what images are present, and so to plan the data
+reduction.
+
+\item READING IUE IMAGES --- RAW, GPHOT and PHOT images can be read
+from IUE tapes (or disk files in  GO format) into IUEDR files stored
+on disk. These files are provided with default calibrations.
+
+\item SPECTRUM EXTRACTION --- This uses techniques that are an
+enhancement of those present in the TRAK program (Giddings, 1982).
+Spectra taken using either resolution mode (HIRES or LORES) can be
+extracted from GPHOT or PHOT images (the latter being the more recent
+style photometric images that retain geometric distortion). It is
+possible to correct photometric LORES images obtained with the SWP
+camera for defects in the original ITF calibration. 
+
+\item LBLS --- Create a line-by-line-spectrum, corresponding to the
+IUESIPS product.
+
+\item SPECTRUM CALIBRATION --- Fully calibrated spectra can be
+produced. This includes various forms of wavelength corrections,
+absolute flux calibration, and echelle ripple correction for HIRES
+spectra. There is also a semi-empirical correction for the HIRES
+(order-overlap) background problem. 
+
+\item GRAPHICAL DISPLAY --- Graphical display facilities are provided
+to aid spectrum extraction and calibration operations. Any GKS
+workstation type can be used (see SUN/83 for details of GKS on 
+Starlink).
+
+\item IMAGE DISPLAY --- The image can be displayed on any available
+GKS workstation which has colour image display capability. Various
+cursor operations can be performed including the marking of bad
+pixels, image modification and feature identification.
+
+\item READING IUESIPS EXTRACTED SPECTRA --- Extracted spectra from
+IUESIPS \#1 and \#2, both at low and high resolution (MELO and MEHI)
+can also be read from tape (or disk files in GO format).
+
+\item SPECTRUM AVERAGING --- It is possible to combine the spectra
+from groups of echelle orders (HIRES) or from different apertures
+(LORES) by mapping and averaging them onto an evenly spaced wavelength
+grid.
+
+\item OUTPUT PRODUCTS --- Both individual extracted spectra
+(orders/apertures) and combined spectra can be output to files which
+may be read by DIPSO (SUN/50). The format of DIPSO type SP0 files has
+changed to use the STARLINK NDF facilities. This allows the use of all
+standard STARLINK packages to  analyse the output products. Files can
+also be created in the same format as the TRAK program.
+
+\end {itemize}
+
+The user interface takes the form of a ``dialogue'' consisting of 
+prompts supplied by the program to ask for the information it needs
+and  commands typed  at the terminal. Batch mode operation is also
+provided via the use of ICL command procedures.
+
+\section {Getting Started}
+
+\subsection{VMS machines}
+
+In order to use IUEDR your {\tt LOGIN.COM} file, which is executed each time
+you login to the VAX, should contain the following lines:
+
+\begin{verbatim}
+      $ @SSC:LOGIN       ! Make Starlink Software available
+      $ IUEDRSTART       ! Make IUEDR available}
+\end{verbatim}
+
+The lines must begin with a ``\$'' character when they are in a
+``{\tt .COM}'' file. The first line is mandatory if you wish to use Starlink
+Software. The IUEDRSTART command defines a number of Symbols and
+Logical Names that are needed to run IUEDR.
+
+The next thing is to determine whether you have enough ``Page File
+Quota''. This determines the maximum size of program you are allowed
+to run. IUEDR is quite large, and you will need a Quota of around
+30000 pages. You can find out your current quotas using the DCL
+command:
+
+\begin{verbatim}
+      $ SHOW PROCESS/ALL
+\end{verbatim}
+
+If you do not have enough Page File Quota, see your Site Manager about
+an increase.
+
+You are now ready to start the interactive command interpreter (ICL). 
+Type:
+
+\begin{verbatim}
+      $ ICL
+\end{verbatim}
+
+The `\verb+ICL>+' prompt will appear. The final step is to load the IUEDR
+package:
+
+\begin{verbatim}
+      ICL> LOAD IUEDR_DIR:IUEDR3
+\end{verbatim}
+
+Once these preliminaries are out of the way, all the IUEDR commands
+are available, as well as all the facilities of ICL and any other ADAM
+packages you have loaded.
+
+IUEDR will not actually start until you use one its commands. Then it
+will begin by printing some information and then prompt for any
+command parameters
+
+To remove the IUEDR package you can type  KILL IUEDR at the ICL
+prompt,  or simply EXIT to leave ICL completely.
+
+\subsection{UNIX machines}
+
+The ICL command interpreter is not yet available for UNIX machines.
+When it becomes available the method of starting IUEDR will be very
+similar to that decribed above for VMS machines.
+
+Currently however, you setup for IUEDR use by typing:
+
+\begin{verbatim}
+      % iuedrstart
+\end{verbatim}
+at the system shell prompt {\tt \%}.
+
+This sets up all the IUEDR commands and any necessary environment
+variables. The IUEDR command may then by used in two ways:
+
+\begin{itemize}
+\item {Type the command at the shell prompt}
+\item {Type {\tt iuedr} at the shell prompt}
+\end{itemize}
+
+The first mechanism is only useful when you want to use a single IUEDR
+command ({\em e.g.} LISTIUE).
+
+The second mechanism runs the IUEDR monolith program which consists of
+a simple loop which accepts IUEDR commands until EXIT is typed.
+
+\section {Documentation} 
+
+Documentation is stored in a mixture of text and \LaTeX\ files. The
+\LaTeX\ files are STARLINK documents and your site manager should be
+able to provide paper copies.
+
+The text files may be found in {\tt IUEDR\_DOC:} ({\tt \$IUEDR\_DOC}
+on UNIX machines).
+
+The primary document that you should read is the IUEDR User Guide
+which provides an introduction to IUEDR, along with much practical
+advice. A printed copy of this should be available at your Site. If it
+isn't, or if you are a remote user, it can be printed by:
+
+\begin{verbatim}
+      $ PRINT IUEDR_DOC:GUIDE.DOC
+\end{verbatim}
+
+NB: the User Guide applies to version 1.1. Since the User Guide is
+rather LARGE, please don't print personal copies unless it is really
+necessary. You are also strongly  advised to consult the release
+notes, in particular {\tt IUEDR\_DOC:VER20.DOC} and {\tt VER30.DOC},
+for details of changes and extensions made  in later versions of
+IUEDR, {\em e.g.}
+
+\begin{verbatim}
+      $ PRINT IUEDR\_DOC:VER12.DOC
+\end{verbatim}
+
+or, to view the text at the terminal,
+
+\begin{verbatim}
+      $ TYPE IUEDR\_DOC:VER12.DOC
+\end{verbatim}
+
+The USER GUIDE describes other IUEDR documents including
+
+\begin {itemize}
+
+\item IUEDR REFERENCE MANUAL (SG/3)--- A formal description of each
+command and its parameters can be found in Starlink Guide 3 (SG/3).
+Your site manager should be able to provide a copy.
+
+\item IUEDR PROBLEMS --- A list of the main problems (deficiencies)
+associated with existing IUEDR facilities. The problems are described
+in file {\tt IUEDR\_DOC:PROBLEMS.DOC}
+
+\item IUEDR VERSIONS --- A chronological list of changes made to IUEDR
+and its documentation. The different versions are described in the
+following files:
+
+\begin {itemize}
+\item {\tt IUEDR\_DOC:VER10.DOC} --- Changes made between pre-release and 1.0
+\item {\tt IUEDR\_DOC:VER11.DOC} --- Changes made between 1.0 and 1.1
+\item {\tt IUEDR\_DOC:VER12.DOC} --- Changes made between 1.1 and 1.2
+\item {\tt IUEDR\_DOC:VER13.DOC} --- Changes made between 1.2 and 1.3
+\item {\tt IUEDR\_DOC:VER14.DOC} --- Changes made between 1.3 and 1.4
+\item {\tt IUEDR\_DOC:VER20.DOC} --- Changes made between 1.4 and 2.0
+\item {\tt IUEDR\_DOC:VER30.DOC} --- Changes made between 2.0 and 3.0
+\end {itemize}
+
+The files {\tt VER12.DOC} and {\tt VER13.DOC} contain information about new
+features which  are NOT described in the User Guide, but the Manual
+and HELP are updated.
+
+\end {itemize}
+
+\section {Support}
+
+IUEDR was written at UCL by Dr Jack Giddings, however Dave Mills at
+UCL is now  responsible for supporting IUEDR.  The available
+documentation should provide sufficient information for you to  use
+IUEDR effectively. However, if you find something difficult to
+understand,  please ask for help. There are many experienced users at
+UCL, and if Dave cannot answer your enquiry himself, he can consult
+with people with  considerable experience at UCL.
+
+If the program appears to produce incorrect results, then it is worth
+reading  through the IUEDR documentation carefully before reporting a
+``bug''. However, if the program fails (crashes), then this should be
+reported immediately. Your report should include the names of any
+files that you were using at the time of the error, and the log file
+produced during the session ({\tt SESSION.LIS}). Keep the  data and
+the log file  somewhere safe and give their whereabouts in the error
+report. Then they can be inspected remotely over the Network if
+necessary. It is very helpful in tracing programming errors to have as
+much information to hand as possible, and you are urged to give as
+full an account of the error as you can. 
+
+The preferred mechanism for correspondence is the EMAIL system.
+Telephone enquiries can be very hard to understand, and are often
+difficult to arrange at UCL. Please send enquiries and bug reports to
+UK.AC.UCL.STAR::IUEDR. Your enquiry could help to provide improved
+documentation which would benefit other Starlink users.
+
+\end {document}
+

@@ -1,0 +1,4067 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {9.4}
+\newcommand{\stardocauthors}   {Vassilis Laspias}
+\newcommand{\stardocdate}      {29 November 1993}
+\newcommand{\stardoctitle}     {\LaTeX\ --- A Document Preparation System}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+
+\newcommand{\BibTeX}{{\rm B\kern-0.05em{\sc i\kern-0.025em b}\kern-0.08em
+    T\kern-0.1667em\lower0.7ex\hbox{E}\kern-0.125emX}}
+\newcommand\bs{\char '134 }  % A backslash character for \tt font
+\newcommand{\GloTeX}{{\rm G\kern-0.05em{\sc l\kern-0.025em o}\kern-0.08em
+    T\kern-0.1667em\lower0.7ex\hbox{E}\kern-0.125emX}}
+\newcommand{\IdxTeX}{{\rm I\kern-0.05em{\sc d\kern-0.025em x}\kern-0.08em
+    T\kern-0.1667em\lower0.7ex\hbox{E}\kern-0.125emX}}
+\newcommand{\TeXPS}{{\TeX\kern-.1667em\raise-.5ex\hbox{P}\kern-.125emS}}
+\def\PS{{\sc Post\-Script}}
+\font\tenlogo=logo10
+\def\MF{{\tenlogo META}\-{\tenlogo FONT}}
+\def\indexindent{\par\hangindent 50pt\hspace*{40pt}}
+\def\tilde{\char126\relax}
+\def\endverb{\par\endgroup}
+\def\begverb#1{\begingroup\def\par{\leavevmode\endgraf}
+\catcode`\\=12\catcode`\{=12
+\catcode`\}=12\catcode`\$=12\catcode`\&=12
+\catcode`\#=12\catcode`\%=12\catcode`\~=12
+\catcode`\_=12\catcode`\^=12\obeyspaces\obeylines\tt
+\parindent=0pt\catcode#1=0}
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+\begin{center}
+{\Large Description}
+\end{center}
+ 
+This is primarily a guide to the \LaTeX\ facilities available on
+Starlink, NOT the use of \LaTeX\ commands and environments within
+documents.
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+
+\setlength{\parskip}{2mm}
+\tableofcontents
+\setlength{\parskip}{\medskipamount}
+\markright{\stardocname}
+
+%------------------------------------------------------------------------------
+
+\begin{center}
+{\Large Conventions}
+\end{center}
+
+Throughout this document, the following conventions are used:
+
+\begin{itemize}
+
+\item VAX/VMS and UNIX are treated identically, except where one of them
+is explicitly stated.
+
+\item {\tt \$} is the prompt for VAX/VMS.
+
+\item {\tt \#} is the prompt for UNIX.
+
+\item Examples are given only for VAX/VMS, but apply to both operating
+systems.
+
+\item Examples are given for UNIX only if the command is different than
+that for VAX/VMS.
+
+\item {\tt csh}, or equivalent, is assumed for the UNIX shell.
+
+\end{itemize}
+
+%------------------------------------------------------------
+% main part of doc starts here
+%------------------------------------------------------------
+
+\newpage
+
+\section{Introduction}
+\label{se:intro}
+
+\LaTeX\ is a sophisticated system for laying out documents of many types 
+using powerful `macro' commands. The style of the printed page may be 
+controlled using the commands within the text of the document --- these commands
+being interpreted by a powerful `typesetting' program to lay out the page.
+Further processing then allows the page to be printed or displayed on a large
+variety of devices. 
+
+\LaTeX\ was developed by Leslie Lamport. Its commands and structures are based
+upon the computer typesetting program called \TeX\, developed by Donald Knuth.
+For further details of using the commands and structures offered by \TeX\ and 
+\LaTeX , refer to the following books and documents:
+
+\begin{itemize}
+\item ``{\em \LaTeX\ A Document Preparation System --- User's Guide and 
+ Reference Manual\/}''~by Leslie Lamport. (Addison-Wesley)
+\item ``{\em The \TeX book\/}''~by Donald Knuth. (Addison-Wesley)
+\item SUN/12 : ``{\em \LaTeX\ Cook-Book''\/}~by Mike Lawden.
+\item SUN/93 : ``{\em \TeX\ --- A Superior document preparation system\/}''~
+ by Jo Murray.
+\item ETR 7/91 : ``{\em The \LaTeX\ Cookbook\/}''~by F Teagle.
+\end{itemize}
+
+All of the above should be available at your site.
+For using \LaTeX\, the most useful are SUN/12
+and the books by Teagle book and Lamport.
+
+If you intend to use \LaTeX\ to write Starlink documentation (such as SUNs), 
+please read the following paper:
+\begin{itemize}
+\item SGP/28 : ``{\em Starlink Documentation Production\/}''~by Mike Lawden.
+\end{itemize}
+
+This note is concerned with the options available for processing \LaTeX\
+(and \TeX) source files, not with the guts of \LaTeX .
+
+
+The only problem in using \LaTeX\  involves the files that
+\LaTeX\ reads.  The file whose name you type with \mbox{\tt LATEX}
+command is called the {\em root file}.  In addition to reading the root
+file, \LaTeX\ also reads the files specified by \hbox{\verb|\input|}
+and \hbox{\verb|\include|} commands.  
+\LaTeX\ must know not only the names of these files but also in what
+directories they are situated.  It will have no problem finding the correct
+files if you follow two simple rules:
+\begin{enumerate}
+ \item Run \LaTeX\ from the directory containing the root file.
+ \item Keep all files specified by \hbox{\verb|\input|} and 
+      \hbox{\verb|\include|} commands in the same directory as the root
+       file.
+\end{enumerate}
+If you follow these rules, you will never have to type a  directory
+specification when using \LaTeX.
+
+You should never break the first rule, otherwise \LaTeX\ will have
+trouble finding auxiliary files.  (To run \LaTeX\ on someone else's
+file, copy the file to your directory.) You can break the second
+rule, by specifying a file from another directory in an
+\hbox{\verb|\input|} or \hbox{\verb|\include|} command.
+
+For example, 
+\begin{enumerate}
+\item On VAX/VMS, to include the file \mbox{\tt hisfile.tex} 
+from XYZ's directory \hbox{\verb|[xyz.foo.bar]|} on VAX/VMS, you can type
+\begin{verbatim}
+      \input{[xyz.foo.bar]hisfile}
+\end{verbatim}
+but you cannot \hbox{\verb|\include|} a file from someone else's directory
+because \LaTeX\ will try to write an auxiliary file into that directory.
+
+\item On UNIX, to include the file \mbox{\tt hisfile.tex} from 
+\hbox{\verb|\home\xyz\foo\bar|} you have to type
+\begin{verbatim}
+      \input{\home\xyz\foo\bar\hisfile}
+\end{verbatim}
+ 
+\end{enumerate}
+
+For people who do not like to obey rules, here is exactly how \LaTeX\ finds its
+files.  The root file is found by the operating system according to its usual
+rules. The root auxiliary file is read and written in the directory from which
+\LaTeX\ is run, all other auxiliary files are written in the directory in which
+the corresponding input file was found. All file names specified in the \LaTeX\
+input, including the names of document-style (\mbox{\tt .sty}) files specified
+by the \hbox{\verb|\documentstyle|} command, are interpreted relative to the
+directory from which \LaTeX\ is run.  If \LaTeX\ does not find a file starting
+in this directory, it looks in the system directory defined to contain them. 
+You can change the directories in which \LaTeX\ looks for its input files by
+re-defining the appropriate logical names on VAX/VMS, and environment 
+variables on UNIX. 
+
+For example, on VAX/VMS putting the command
+\begin{verbatim} 
+      $ DEFINE TEX_INPUTS [ME.TEX],F$LOGICAL("TEX_INPUTS")
+\end{verbatim}
+in your \mbox{\tt LOGIN.COM} file causes \LaTeX\ to look for files
+first in the current directory, then in the directory \mbox{\tt [ME.tex]},
+and then in the system directory.  You might want to do this if
+you have your own personal document-style files in \mbox{\tt [ME.tex]}.
+
+Similarly, on Unix putting the following line in your {\tt .cshrc} or {\tt
+.login}
+\begin{verbatim}
+ setenv TEXINPUTS /home/vl/tex:${TEXINPUTS}
+\end{verbatim}
+will have the same effect.
+
+
+
+\section{\LaTeX\ Processing --- How it works}
+\label{se:works}
+
+The processing of \LaTeX\ source is a two stage process. Firstly, the
+typesetting program is used to convert a source file to a DeVice Independent
+(DVI) form. Then a translator is used to convert the DVI form to a format that
+allows a particular display or print device to display or print the result.
+
+Note that a page file quota (PGFLQUO) of greater than 4000 pages 
+is required in order to run the \LaTeX\ processor, on VAX/VMS.
+
+The process may be demonstrated by following an example.
+
+\subsection{A VAX/VMS Example}
+\label{se:example}
+A good example of \LaTeX\ source comes with the installation.
+Copy this to your current directory:
+\begin{verbatim}
+      $ copy tex_docs:sample.tex *.*
+\end{verbatim}
+the \LaTeX\ processor to convert the source 
+\mbox{\tt .tex} file to the device independent \mbox{\tt .dvi} file:
+\begin{verbatim}
+      $ latex sample
+\end{verbatim}
+Note that the file extension is omitted. This is assumed to be \mbox{\tt .tex} 
+unless you give the extension explicitly. 
+
+Output will appear on your terminal telling you what is going on. When this is
+finished a file \mbox{\tt sample.dvi} will be present in your directory.
+
+The file DVI file needs to be processed for printing. Most sites have a Canon
+Laser printer operating in native Canon mode. Some sites have a Canon printer
+operating in \PS\ mode. The processing of a DVI file is different
+depending on which mode your printer uses.
+
+
+To process the \mbox{\tt .dvi} file for printing on a Canon laser printer in
+native mode, the DVICAN processor must be used:
+\begin{verbatim}
+      $ dvican sample
+\end{verbatim}
+For \PS\ mode, the DVIPS processor is used:
+\begin{verbatim}
+      $ dvips sample
+\end{verbatim}
+Again, note that the file extension is omitted. The translator will assume an
+extension of \mbox{\tt .dvi} unless you give it explicitly. More output will
+appear on your terminal, telling you what is happening. 
+
+When the processing is complete, either a file \mbox{\tt sample.dvi-can} will 
+be present in your directory if you used DVICAN, or a file 
+\mbox{\tt sample.dvi-ps} will be present if you used dvips.
+
+All that is needed now is to print the file:
+\begin{verbatim}
+      $ print/passall/nofeed/notify/queue=sys_laser/delete sample.dvi-can
+\end{verbatim}
+for a \mbox{\tt .dvi-can} file, or:
+\begin{verbatim}
+      $ print/notify/queue=sys_ps/delete/form=post sample.dvi-ps
+\end{verbatim}
+for a \mbox{\tt .dvi-ps} file.
+
+On VAX/VMS note the {\tt /delete} qualifier. This will delete the \mbox{\tt
+.dvi-can} or  \mbox{\tt .dvi-ps} file after printing. This is a useful  trick
+since print files from the DVI translators are often very large.
+
+After the document has been printed, you will find that there are several files
+in your directory with the name \mbox{\tt sample.nnn}. These are as follows:
+\begin{itemize}
+\item {\tt sample.tex} - The \LaTeX\ source file.
+\item {\tt sample.dvi} - The device independent file.
+\item {\tt sample.lis} - A log (transcript) of the \LaTeX\ run.
+\item {\tt sample.aux} - Cross reference information.
+\end{itemize}
+All of these but the \mbox{\tt .tex} file may be deleted, as they are generated 
+each time the \LaTeX\ processor is run. On VAX/VMS, regular use of the DCL
+command \mbox{\tt PURGE} is recommended if you are making many \LaTeX\ runs.
+
+Files with other extensions may also be generated, depending upon what
+instructions are contained in the source file. These may also be deleted, but 
+keeping them often makes future \LaTeX\ runs easier, since the information they
+contain is used by the \LaTeX\ processor. For example, the \mbox{\tt .toc} 
+file is a Table Of Contents. Several passes through the \LaTeX\ processor may 
+be required to get the page numbering and references correct. Preserving the 
+{\tt .toc} file gets around the problem.
+
+\subsection{A Summary of \LaTeX\ Environments}
+\label{se:environments}
+
+\LaTeX\ has a construct called an {\em environment}, which is typed
+\begin{quote}
+{\tt $\backslash$begin\{{\sl name}\}} \ldots {\tt $\backslash$end\{{\sl name}\}}
+\end{quote}
+where {\em name} denotes the name of the environment.  Placing text within an
+environment directs \LaTeX\ to change the way it formats that text.  For
+example, text between \hbox{\verb|\begin{center}|} and
+\hbox{\verb|\end{center}|} is centered.   Environments include:
+\begin{itemize}
+\item
+{\tt document} ~for the main body of the document;
+\item
+{\tt itemize, enumerate, description} ~for producing lists of items;
+\item
+{\tt array, tabbing, tabular} ~for creating tables of numbers and text;
+\item
+{\tt math} ~for producing mathematical and special symbols;
+\item
+{\tt eqnarray, equation} ~for producing annotated equations;
+\item
+{\tt abstract, titlepage} ~for making abstracts and do-it-yourself 
+title pages;
+\item
+{\tt quotation, quote, verse, verbatim} ~for producing displayed
+paragraphs as quotations, as verses or as typed;
+\item
+{\tt picture} for making simple pictures;
+\item
+{\tt table, figure} ~for creating annotated table and figure captions,
+situating them;
+\item
+{\tt bibliography} ~for making bibliography and reference lists.
+\end{itemize}
+You may define your own environments or redefine existing ones.\medskip\\
+There are facilities for producing:y
+
+
+\begin{itemize}
+\item
+different fonts (American for `founts'), accents;
+\item
+labelled and annotated chapters, sections, subsections, paragraphs;
+\item
+cross-references to sections, tables, figures, references, page numbers;
+\item
+an index, a glossary;
+\item
+tables of contents, figures and tables;
+\item
+footnotes, marginal notes and running headings;
+\item
+your own commands and environments;
+\item
+changes of type size;
+\end{itemize}
+and many others. 
+
+The use of these environments is described in detail in 
+Lamport's book. SUN/12 and Teagle's book 
+give numerous useful examples of the results that can be obtained from the 
+various \LaTeX\ environment commands. 
+
+\subsection{\LaTeX\ Processing Options on VAX/VMS}
+\label{se:latexopts}
+
+The \LaTeX\ processor can be used in a simple manner, just as it comes. There
+are however several command--line options that may be specified, to make the
+\LaTeX\ processor do interesting optional things.
+
+Note in passing that the \LaTeX\ processor is just the \TeX\
+processor, invoked by a different command, causing the \LaTeX\ specific
+commands to be recognised as well as \TeX\ commands.
+
+The following options are provided:
+\begin{itemize}
+
+\item  {\bf   /BATCH :} Run \TeX\ in batch mode sending no output to the
+terminal and ending with a fatal error if input is necessary. The default 
+is /NOBATCH. This option suppresses all but the initial ``{\em This is \TeX\,
+Version 3.141 on VAX/VMS ...}\/'' message.
+
+\item  {\bf   /CONTINUE :} Indicates that \TeX\ is to continue execution after
+the editor is invoked with an `E' response at an error prompt. The default is 
+/NOCONTINUE.
+
+\item  {\bf   /DIAGNOSTICS :} Indicates that an LSE Diagnostics file be
+written. A file name can be specified using /DIAGNOSTICS=fn. The default is 
+/NODIAGNOSTICS.
+
+\item  {\bf   /DVI\_FILE :} Indicate the name of the DVI file to write.
+The default is to use the name of the \TeX\ job for the DVI file name. 
+This qualifier is negatable ({\em i.e.} /NODVI\_FILE). Negating this qualifier 
+is useful for processing large documents where tables-of-contents and 
+reference labels mean that the file must be processed several times. Only at 
+the last pass need a DVI file be produced.
+
+\item  {\bf   /EDITOR :} Indicate the name of the editor to be used at the `E'
+response. The options are:
+\begin{itemize}
+\item Callable\_EDT
+\item Callable\_TPU
+\item Callable\_LSE
+\item Callable\_TECO
+\item The name of a command to be run in a subprocess which will 
+take three arguments:
+\begin{enumerate}
+\item The name of the file to edit.
+\item The line number with the error.
+\item The column number of the error.
+\end{enumerate}
+\end{itemize}
+If the value given with /EDITOR ends in a colon, \TeX\ will assume that it's 
+a logical name and attempt to translate it. The default is /EDITOR=TEX\_EDIT:. 
+This qualifier is negatable.
+
+\item  {\bf   /EIGHT\_BIT :} Indicates that characters with values in the 
+numerical range 160..254 may be output as those values, rather than conversion 
+to the form \verb+^^a0..^^fe+. If {\bf all} terminals at a site support such 
+characters, then it is safe to build a pre-loaded format file with this 
+qualifier on the TEX/INIT command. Since the character codes are stored in the 
+format file, this qualifier has no effect on production versions of \TeX.
+
+\item  {\bf   /FORMAT :} Indicate the name of a format to pre-load when
+running. The default varies depending on the specific verb used. This is how
+\LaTeX\ processing is invoked when the \TeX\ processor starts --- the verb
+{\tt LATEX} is defined as \mbox{\tt TEX/FORMAT=LPLAIN}.
+This qualifier is negatable.
+
+\item  {\bf   /INIT  :} Run Ini\TeX\ rather than \TeX. The default is /NOINIT. 
+The INITEX symbol is set to TEX/INIT/NOFORMAT.
+
+\item  {\bf   /JOBNAME\_SYMBOL :} Indicate the name of a DCL symbol to which
+the \TeX\ jobname is to be written. The default is 
+/JOBNAME\_SYMBOL=TEX\_JOBNAME. This qualifier is negatable. Negation causes 
+the symbol to not be written.
+
+\item  {\bf   /LOG\_FILE :} Indicate the name of the log file (transcript of 
+the run) to write. The default is to use the name of the \TeX\ job for the 
+log file name, and the extension .lis. If you specify just a name, the
+extension defaults to .lis. This qualifier is negatable.
+
+\item  {\bf   /TEXFONTS,   /TEXFORMATS,     /TEXINPUTS :}  
+These qualifiers are not intended to be used by the end-user; they specify the 
+names of the format and pool files, and input files respectively. They are 
+provided to allow sites to customize these values without recompiling \TeX.
+
+\end{itemize}
+
+\subsection{\LaTeX\ Errors}
+\label{se:latexerrs}
+
+If \LaTeX\ encounters an error it is reported, the problem line is displayed,
+and you are prompted with a `{\tt ?}'.  Various options are available in such
+an event, the simplest being to respond with a {\tt $<$cr$>$} which causes
+\LaTeX\ to continue, improvising what it considers the optimum solution to its
+dilemma.  (A HELP facility within the \LaTeX\ process does exist at this
+point.) You can edit your file to correct the error by typing \mbox{\tt E}.
+This will  stop temporarily the execution of \LaTeX\ and bring you into your
+favourite  editor at the point where the error was reported, but only if you
+have defined the logical name TEX\_EDIT to be your favourite editor (see
+Section \ref{se:latexopts}). Note that when you leave the editor a new file has
+been created, but \LaTeX\ still uses the initial version of your file where the
+error has not been corrected. 
+
+The opportunity to correct the \LaTeX\ file within the \LaTeX\
+process does exist at this point. If the logical name TEX\_EDIT or
+the parameter /EDITOR have not been defined, \LaTeX\ will respond with a message
+indicating the filename and the line where the error has occurred and stop. In
+this case you can correct the error by editing the file. In all cases, after
+the error has been corrected, it is necessary to re-activate \LaTeX\ to process
+your file.
+
+If you are fed up of answering repeated prompts, perhaps because of some
+serious error, type \mbox{\tt Q}, and this will put \LaTeX\ into
+{\em batch mode.} Then examination of the \mbox{\tt .lis} file will give the 
+unexpurgated details.
+
+However, don't panic---a long series of errors can be generated by just
+one mistake. Often all you have done is to omit a `{\tt \$}' or a brace, or
+not matched a \hbox{\verb|\begin{}|} with an \hbox{\verb|\end{}|}, or tried
+to use a special character as an ordinary printing symbol, or \TeX\
+itself has been unable to find a suitable break point for a line 
+(``Underfull hbox \ldots'' or ``Overfull hbox \ldots'') or a page 
+(``Underfull vbox \ldots'' or ``Overfull vbox \ldots'').  
+
+The \LaTeX\ manual gives information on
+interpreting error and warning messages, and how to fix or circumvent them.
+Do not correct errors one at a time---go through the whole file, or as much 
+as possible in the case of catastrophic errors; only then modify your
+source file and try again.
+
+If you want to stop \LaTeX\ in the middle of its execution, perhaps
+because it is printing a seemingly unending string of uninformative
+error messages, type {\em Control-C\/} (press $C$ while holding down
+the key labeled {\em CTRL\/}).  This will make \LaTeX\ stop as if it
+had encountered an ordinary error, and you can return to DCL command
+level by typing \mbox{\tt X}, as described in the manual.  If typing {\em
+Control-C\/} doesn't work, typing {\em Control-Y\/} will get you
+immediately to DCL command level.
+
+\subsection{Spelling}
+\subsubsection{Spelling on VAX/VMS}
+\label{se:vaxspell}
+
+To use the \mbox{\tt spell} utility for finding spelling errors in a
+\LaTeX\ input file named \mbox{\tt myfile.tex}, type the following
+command:
+\begin{verbatim}
+      $ spell myfile
+\end{verbatim}
+
+For details on how to use the \mbox{\tt spell} utility, see LUN/26 (PRO), or 
+consult your local documentation index {\tt LDOCSDIR:ANALYSIS.LIS} for local 
+documentation.
+
+\subsubsection{Spelling on UNIX}
+\label{se:unixspell}
+To use the spell utility for finding spelling errors in a
+\LaTeX\ input file named \mbox{\tt myfile.tex}, type the following
+command:
+\begin{verbatim}
+      # ispell myfile.tex
+\end{verbatim}
+
+For details on how to use the \mbox{\tt ispell} utility, read the manual pages.
+(i.e. {\tt sman ispell}). 
+
+\section{DVI File Translators}
+\label{se:dvi}
+
+\LaTeX\ produces files which are DeVice Independent --- the DVI files. To get a
+viewable or printable version, you must use a DVI translator program, sometimes
+called a previewer, which can interpret the DVI code for the device you
+require. 
+
+There are a variety of DVI translators available:
+\begin{itemize}
+\item XDVI --- previewer for Xwindows terminals, and workstations running X11
+or DECwindows.
+%\item DVIDIS --- previewer for Vaxstations running VWS.
+\item DVI2VDU --- previewer for Pericom, Graphon and some VT terminals.
+\item DVICAN --- translator for Canon LBP-8II and LBP-8III Laser printers.
+\item DVICA2 --- translator for Canon LBP-8A2 laser printer (not available on
+Solaris 2.x and OSF/1).
+\item DVIPS --- translator for \PS\ devices.
+\item DVIPSA4 --- translator for \PS\ devices (available only on VAX/VMS).
+\item DVIPRI --- translator for line printer devices (available only on
+VAX/VMS).
+\end{itemize}
+
+Laser printer paper is expensive, and using one of the DVI translators for a
+laser printer while laying out a document is a waste. If you have access to
+Xwindows terminals, Vaxstations, SUNs, DECstations or Pericom and Graphon
+graphics terminal, you should try using the DVI previewers. Much time and
+effort can be saved, as well as the odd forest.
+
+\subsection{XDVI}
+\label{se:dvixdvi}
+
+The \verb+xdvi+ translator will work on Vaxstations, DECstations and Alpha
+workstations running DECwindows, Motif or X11, VT1x00 series Xwindows terminals
+and SUNs running X11.  
+
+On the VT1x00 series terminals, you can use \verb+xdvi+ provided that \verb+xdvi+ knows where
+to send the Xwindows output. A DECwindows session will know this, but a normal
+terminal session must be told. The DCL command 
+\begin{verbatim}
+                               tcpip
+$ set display/create/transport=decnet/node=<nodename>
+                               lat 
+\end{verbatim}
+is used for this, 
+but you have to know various things about the specific X-terminal to use it,
+(i.e. the nodename for the type of transport you use).
+
+On UNIX, the
+equivalent command will be 
+\begin{verbatim} 
+# setenv DISPLAY <workstation_name>:0 
+\end{verbatim}
+
+
+The procedure XDISPLAY will do the necessary {\tt set/display} automatically
+by interrogating your terminal and access method. {\em You must use a terminal
+session accessing the VAX, SUN or DECstation host via LAT, TCP/IP or DECnet,
+not a session through the  VT1x00 host port.}
+
+To use XDISPLAY, type:
+\begin{verbatim}
+      $ xdisplay 
+\end{verbatim}
+and you will get a message similar to:
+\begin{verbatim}
+      The X client is MAVAD
+      The X server is a remote X terminal connected via LAT.
+\end{verbatim}
+You only need to set a DISPLAY once per session.
+
+For {\tt xdisplay} to work properly you need to authorize the remote
+workstation to open a window on the local workstation. To do this:
+\begin{itemize}
+\item If the local workstation is a VAX/VMS workstation, pull down the option
+menu from the session manager and select security. Add the remote workstation's
+name (or TCP/IP number), the preferred transport and the remote username (or an
+asterisk) to the list of authorized workstations.
+\item if the local workstation is a UNIX workstation then type
+\begin{verbatim}
+	# xhost +<workstation_name>
+\end{verbatim}
+where \verb+<workstation_name>+ is the full name or valid alias or TCP/IP
+address of the remote workstation. The following commands are equivalent:
+\begin{verbatim}
+	# xhost +axp1.ast.man.ac.uk
+	# xhost +axp1
+	# xhost +130.88.9.41
+\end{verbatim}
+\end{itemize}
+
+\subsection{Command Syntax}
+The command:
+\begin{verbatim}
+      $ xdvi <filename>
+\end{verbatim}
+will create a window on the default X-windows display and display the first 
+page of {\tt <filename>.dvi}.
+
+This program has the capability of showing the file shrunken by various
+(integer) factors, and also has a ``magnifying glass'' which allows one
+to see a small part of the unshrunk image momentarily.
+
+Before displaying any page or part thereof, \verb+xdvi+ checks to see if the
+DVI file  has changed since the last time it was displayed. If this is the
+case, \verb+xdvi+  will re-initialize itself for the new DVI file. For this
+reason, exposing parts  of the \verb+xdvi+ window while \TeX\ is running should
+be avoided. This feature  allows you to preview many versions of the same file
+while running \verb+xdvi+ only  once.
+
+\subsubsection{Options}
+\label{se:dvixdvioptions}
+In addition to specifying the DVI file (with or without the {\tt .dvi}),
+\verb+xdvi+ supports the following command line options.
+If the option begins with a ``{\tt+}'' instead of a ``{\tt-}'',
+the option is restored to its default value.  By default, these options can
+be set via the resource names given in parentheses in the description of
+each option
+\begin{list}%
+{}%
+{\settowidth{\labelwidth}{\tt-icongeometry {\em geometry}}
+\settowidth{\labelsep}{aaaa}
+\settowidth{\rightmargin}{aaa}
+\addtolength{\labelwidth}{\labelsep}
+\setlength{\leftmargin}{\labelwidth}}
+%
+\item[\tt+ \em page]
+Specifies the first page to show.  If {\tt+} is given without a
+number, the last page is assumed; the first page is the default.
+
+\item[\tt -altfont \em font]
+({\tt .altFont})
+Declares a default font to use when the font in the DVI file cannot be found.
+This is useful, for example, with \PS\ fonts.
+
+\item[\tt-background \em colour]
+Same as {\tt-bg}.
+
+\item[\tt-bd \em colour]
+({\tt .borderColor})
+Determines the colour of the window border.
+
+\item[\tt-bg \em colour]
+({\tt .background})
+Determines the colour of the background.
+
+\item[\tt-bordercolor \em colour]
+Same as {\tt-bd}.
+
+\item[\tt-borderwidth \em width]
+Same as {\tt-bw}.
+
+\item[\tt-bw \em width]
+({\tt .borderWidth})
+Specifies the width of the border of the window.
+
+\item[\tt-copy]
+({\tt .copy})
+Always use the {\tt copy} operation when writing characters to the display.
+This option may be necessary for correct operation on a colour display, but
+overstrike characters will be incorrect.
+
+\item[\tt-cr \em colour]
+({\tt .cursorColor})
+Determines the colour of the cursor.  The default is the colour of the page
+border.
+
+\item[\tt-density \em density]
+({\tt .densityPercent})
+Determines the density to be used when shrinking bitmaps for fonts.
+A higher value produces a lighter font.  The default value is 40.
+
+\item[\tt-display \em host::display.screen]
+Specifies the host,display and screen to be used for displaying the DVI file.
+The display must be specified in the form {\tt host::display.screen}.
+The default is normally obtained on VAX/VMS from the logical name 
+``{\tt DECW\$DISPLAY}'', or on UNIX by the environment variable \verb+DISPLAY+.
+
+
+\item[\tt-fg \em colour]
+({\tt .foreground})
+Determines the colour of the text (foreground).
+
+\item[\tt-foreground \em colour]
+Same as {\tt-fg}.
+
+\item[\tt-gamma \em gamma] ({\tt .gamma}) Controls the interpolation of colours
+in the greyscale anti-aliasing colour palette. The default value is 1.0. For
+0$<$ 1, the fonts will be lighter (more like the background), and for {\tt
+gamma} $>$ 1, the fonts will be darker (more like the foreground). Negative
+values behave the same way, but use a slightly different algorithm.
+
+\item[\tt-geometry \em geometry]
+({\tt *geometry})
+Specifies the initial geometry of the window.
+
+\item[\tt-hl \em colour]
+({\tt .highlight})
+Determines the colour of the page border. The default is the foreground colour.
+
+\item[\tt-hush]
+({\tt .Hush})
+Causes \verb+xdvi+ to suppress all suppressible warnings.
+
+\item[\tt-hushchars]
+({\tt .hushLostChars})
+Causes \verb+xdvi+ to suppress warnings about references to characters which are not
+defined in the font.
+
+\item[\tt-hushspecials]
+({\tt .hushSpecials})
+Causes \verb+xdvi+ to suppress warnings about  \hbox{\verb|\special|} strings which
+cannot process.
+
+\item[\tt-icongeometry \em geometry]
+({\tt .iconGeometry})
+Specifies the initial position for the icon.
+
+\item[\tt-iconic]
+({\tt .iconic})
+Specifies the \verb+xdvi+ window to start into the iconic state. The default is to
+start with the window open.
+
+\item[\tt-keep]
+({\tt .keepPosition)}
+Sets a flag to indicate that \verb+xdvi+ should not move to the home position when
+moving to a new page. (See also {\tt `k'} in section \ref{se:dvixdvikeys}.)
+
+\item[\tt-l]
+({\tt .listFonts})
+Causes the names of the fonts used to be listed.
+
+\item[\tt-margins \em dimensions]
+({\tt .Margin})
+Specifies the size of both the top and side margins.  This
+should be a decimal number optionally followed by ``cm'' (e.g. 1.5 or 3cm)
+giving the measurements in inches or centimetres, respectively. \verb+xdvi+ determines
+the ``home'' position of the page within the window as follows.  If the entire
+page fits in the window, then the margin settings are ignored.  If, even
+after removing the margins from the left, right, top, and bottom, the page
+still cannot fit in the window, then the page is put in the window such that
+the top and left margins are hidden, and presumably the upper left-hand corner
+of the text on the page will be in the upper left-hand corner of the window.
+Otherwise, the text is centered in the window.  See also `{\tt M}' under
+section \ref{se:dvixdvikeys}.
+
+
+\item[\tt-mgs{[{\em n}] \em size}]
+({\tt .magnifierSize[{\em n}]})
+Where $n=1,2,3,4,5$.
+Specifies the size of the window to be used for the ``magnifying glass''
+for Button {\em n}.  See section \ref{se:dvixdvimouse}.  Defaults are 200,
+350, 600, 900, and 1200.
+
+\item[\tt-mgs \em size]
+Same as {\tt -mgs1}.
+
+\item[\tt-nogrey]
+({\tt .grey})
+Turns off the use of greyscale anti-aliasing when printing shrunken bitmaps.
+(In this case the logic of the corresponding resource is the reverse: {\tt
+-nogrey} corresponds to grey:off, {\tt +nogrey} to grey:on). See also under
+{\tt `G'} in section \ref{se:dvixdvikeys}.
+
+\item[\tt-offsets \em dimensions]
+({\tt .Offset})
+Specifies the size of both horizontal and vertical offsets of the output on the
+page. This should be a decimal number optionally followed by ``cm'' (e.g. 1.5
+or 3cm) giving the measurements in inches or centimetres, respectively. The
+default page orientation is always one inch over and down from the top-left
+page corner.
+
+\item[\tt-p \em pixels]
+({\tt .pixelsPerInch})
+Defines the size of the fonts to use, in pixels per inch.  The
+default value is 300.
+
+\item[\tt-paper \em papertype]
+({\tt .paper})
+Specifies the size of the printed page.  This may be of the form
+$W\times H$ (or $W\times H${\tt cm}), where $W$ is the width in
+inches (or cm) and $H$ is the height in inches (or cm), respectively.
+There are also synonyms which may be used:  us ($8.5\times 11$), usr ($11\times
+8.5$),
+legal ($8.5\times 14$), foolscap ($13.5\times 17$), as well as the ISO sizes 
+A1-A7,
+B1-B7, C1-C7, A1R-A7R (A1-A7 rotated), etc.  The default size is
+$21\times 29.7$cm (A4 size).
+
+\item[\tt-rv]
+({\tt .reverseVideo})
+Causes the page to be displayed with white characters on a
+black background, instead of vice versa.
+
+\item[\tt-s \em shrink]
+({\tt .shrinkFactor})
+Defines the initial shrink factor.  The default value is 3.
+
+\item[\tt-sidemargin \em dimensions]
+({\tt .sideMargin})
+Specifies the side margin (see {\tt -margin}).
+
+\item[\tt-thorough]
+({\tt .thorough})
+\verb+xdvi+ will usually try to ensure that overstrike characters (e.g.
+\verb+\notin+) are printed correctly.  On monochrome displays, this is always
+possible with one logical operation, either {\tt AND} or {\tt OR}.  On
+colour displays, however, this may take two operations, one to set the
+appropriate bits and one to clear other bits.  If this is the case, then
+by default \verb+xdvi+ will instead use the {\tt copy} operation,
+which does not handle overstriking correctly.  The ``{\tt thorough}'' option
+chooses the slower but more correct choice.  See also {\tt-copy}.
+
+\item[\tt-topmargin \em dimension]
+({\tt .topMargin})
+Specifies the top and bottom margins (see {\tt-margins}).
+
+\item[\tt-version]
+Pint information on the version of \verb+xdvi+.
+
+\item[\tt-xoffset \em dimensions]
+({\tt .xOffset})
+Specifies the size of the horizontal offset of the output on the page (see
+{\tt-offsets}.
+
+\item[\tt-yoffset \em dimensions]
+({\tt .yOffset})
+Specifies the size of the vertical   offset of the output on the page (see
+{\tt-offsets}).
+
+\end{list}
+
+
+\subsubsection{Keystrokes}
+\label{se:dvixdvikeys}
+
+\verb+xdvi+ recognizes the following keystrokes when typed in its window.
+Each may optionally be preceded by a (positive or negative) number, whose
+interpretation will depend on the particular keystroke. Note that the
+keystrokes are case sensitive.
+
+
+\begin{list}%
+{}%
+{\settowidth{\labelwidth}{\em Control \tt L}
+\settowidth{\labelsep}{aaaa}
+\settowidth{\rightmargin}{aaa}
+\addtolength{\labelwidth}{\labelsep}
+\setlength{\leftmargin}{\labelwidth}}
+%
+\item[\tt q]
+Quits the program.  {\em Control \tt C}, {\em Control \tt D} and  {\em Control
+\tt Z} will do this, 
+too.
+
+\item[\tt n]
+Moves to the next page (or to the {\em n}th next page if a number is given).
+Synonyms are `{\tt f}', Space, Return, Line Feed and $<$Next Screen$>$.
+
+\item[\tt p]
+Moves to the previous page (or back n pages).  Synonyms are
+`{\tt b}', {\em Control \tt H}, Delete and $<$Prev Page$>$.
+
+\item[\tt g]
+Moves to the page with the given number.  Initially, the first page is assumed
+to be page number 1, but this can be changed with the `{\tt P}' keystroke. 
+If no page number is given, then it goes to the last page.
+
+\item[\tt P]
+``This is page number n.''  This can be used to make the `{\tt g}'
+keystroke refer to actual page numbers instead of absolute page numbers.
+
+\item[\tt {\em Control} L]
+Re-displays the current page.
+
+\item[\tt \symbol{94}]
+Move to the ``home'' position of the page.  This is normally the upper
+left-hand corner of the page, depending on the margins as described in
+the \-margins option, above.
+
+\item[\tt u]
+Moves up two thirds of a window-full. The $<$Up Arrow$>$ key is a synonym for
+this keystroke.                       
+
+\item[\tt d] Moves down two thirds of a window-full. The $<$Down Arrow$>$ key
+is a synonym for this keystroke.                       
+
+\item[\tt l] Moves left two thirds of a window-full. The $<$Left Arrow$>$ key
+is a synonym for this keystroke.                       
+
+\item[\tt r] Moves right two thirds of a window-full. The $<$Right Arrow$>$ key
+is a synonym for this keystroke.                       
+
+\item[\tt c]
+Moves the page so that the point currently beneath the cursor is moved to
+the middle of the window.  It also warps the cursor to the same place.
+
+\item[\tt M]
+Sets the margins so that the point currently under the cursor is the upper
+left-hand corner of the text in the page. Not that this command itself does not
+move the image at all. for details on how the margins are used see the
+{\tt-margins} option in section \ref{se:dvixdvioptions}.
+
+\item[\tt s]
+Changes the shrink factor to the given number.  If no number is given, the
+smallest factor that makes the entire page fit in the window will be used.
+(Margins are ignored in this computation.)
+
+\item[\tt S]
+Sets the density factor to be used when shrinking bitmaps.  This should
+be a number between 0 and 100; higher numbers produce lighter characters.
+
+\item[\tt R]
+Forces the dvi file to be reread.  This allows you to preview many versions
+of the same file while running \verb+xdvi+ only once.
+
+\item[\tt k]
+Normally when \verb+xdvi+ switches pages it moves to the home position as well.
+The `{\tt k}' keystroke toggles a `keep-position' flag which, when set, will
+keep the same position when moving between pages.  Also `{\tt 0k}' and `{\tt
+1k}' clear and set this flag, respectively. See also the {\tt-keep} option in
+section \ref{se:dvixdvioptions}.
+
+\item[\tt G]
+The key toggles the use of greyscale anti-aliasing for displaying shrunken
+bitmaps. In addition the key sequence `{\tt 0G}' and `{\tt 1G}' clear and set
+this flag respectively. See also the {\tt-nogrey} option in section
+\ref{se:dvixdvioptions}. 
+\end{list}
+
+
+\subsubsection{Mouse Actions}
+\label{se:dvixdvimouse}
+If the shrink factor is set to any number other than one, then clicking
+any mouse button will pop up a ``magnifying glass'' which shows the unshrunk
+image in the vicinity of the mouse click.  This sub-window disappears when
+the mouse button is released.  Different mouse buttons produce different sized
+windows, as indicated by the {\tt -mgs} option, in section
+\ref{se:dvixdvioptions}.  Moving the cursor
+while holding the button down will move the magnifying glass.
+
+Also, the scroll-bars (if present) behave in the Xwindows standard way:  pushing
+Button 2 in a scroll-bar moves the top or left edge of the scroll-bar to that
+point and optionally drags it; pushing Button 1 moves the image up or right by
+an amount equal to the distance from the button press to the upper left-hand
+corner of the window; pushing Button 3 moves the image down or left by the same
+amount. Note that this is different than the way DECwindows normally defines
+the actions of the mouse buttons in scroll-bars.
+
+
+\subsubsection{Logical Name}
+\label{se:dvixdvilognames}
+
+Some logical names can be defined to override the values defined when
+\verb+xdvi+ was compiled.
+
+\begin{itemize}
+
+
+
+\item Unless the {\tt-display} option is used on the command line, \verb+xdvi+
+uses the logical name \\ ``{\tt DECW\$DISPLAY}'' on VAX/VMS, or the environment
+variable \verb+DISPLAY+ on UNIX, to specify which bit map display terminal to
+use.  This logical name may be defined with the {\tt SET DISPLAY} command.
+
+\item The logical name ``\verb+XDVIFONTS+'' determines the directory path(s)
+searched for fonts in the following manner.  For compatibility with some
+versions of \TeX, you may also use the logical name ``\verb+TEXFONTS+'' in
+place of ``\verb+XDVIFONTS+''. \verb+xdvi+ also recognizes the
+``\verb+PKFONTS+'' logical name, which is checked after ``\verb+XDVIFONTS+''
+but before ``\verb+TEXFONTS+''.
+
+
+\item The logical name ``\verb+XDVISIZES+'' must be set to indicate which
+sizes of fonts are available.  It should consists of a list of numbers
+separated by slashes.  If the list begins with a slash, the system
+default sizes are used, as well.  Sizes are expressed in dots per
+inch; decimals may be used for ``pxl'' files: for example, a 300 dots
+per inch file magnified by half a step comes out to 1643 dots per five
+inches, which should be encoded as 328.6.  The current default set of
+sizes is 300,328.6,360,432,518.4,622,746.4.  \verb+xdvi+ will also try the actual
+size of the font before trying any of the given sizes.
+
+
+\item Virtual fonts are supported, although \verb+xdvi+ does not have any built-in
+fonts to which they can refer.  The search path for .VF files can be specified
+with the ``\verb+XDVIVFS+'' logical name in a similar manner to that for the
+``\verb+XDVIFONTS+'' logical name.  \verb+xdvi+ will also check the ``\verb+VFFONTS+'' logical name
+if the ``\verb+XDVIFONTS+'' logical name is not defined.  Virtual fonts are searched
+for immediately after looking for the font as a normal font in the exact size
+specified.
+
+\end{itemize}
+
+\subsubsection{Resource Names}
+
+   All of the command line options may be set via the resource names given in
+   the descriptions of the options.  This may be used to define a
+   specific set of options as the default each time you run \verb+xdvi+.  To make use
+   of this feature \begin{itemize}
+\item on VAX/VMS, create a file named {\tt DECW\$XDEFAULTS.DAT} in the same
+directory as the rest of your {\tt DECW*.DAT} files
+\item on UNIX, create a file {\tt .Xdefaults} in your top level directory.
+\end{itemize}
+  Include in this file the resource names
+   and arguments of each of the options you wish to specify.  For example:
+\begin{verbatim}
+   XDvi.copy: off
+   XDvi.thorough: on
+   XDvi.shrinkFactor: 2
+   XDvi.Margin: 0.95
+   XDvi*geometry: 1015x750+3+25
+\end{verbatim}
+   When \verb+xdvi+ is invoked, it would behave as if it had been invoked with the
+   following command:
+\begin{verbatim}
+   $ xdvi +copy -thorough -s 2 -margins 0.95 -geometry 1015x750+3+25 dvifile
+\end{verbatim}
+   Specifying options on the command line will override any options specified
+   via resource names in the  file.
+
+
+
+
+
+
+
+
+\subsection{DVI2VDU}
+\label{se:dvi2vdu}
+
+
+{\tt dvi2vdu} is an interactive program; you can enter commands to
+select a particular page for display, look at the overall format of the entire
+page and then request a smaller region for closer examination.
+The manner in which the page is displayed can be varied from a full,
+accurate representation to a terse, fast display for when fine details are
+unimportant.
+
+To look at \hbox{\verb|filename.dvi|}, just type
+\begin{verbatim}
+        $ dvi2vdu/vdu=vt200          filename on a VT220 terminal
+        $ dvi2vdu/vdu=mg100          filename on a PERICOM MG100 terminal
+        $ dvi2vdu/vdu=graphpack      filename on a PERICOM GRAPHPAC terminal
+\end{verbatim}
+
+Some command options may be necessary if {\tt dvi2vdu} is to work properly.
+In particular, the {\tt-v} option must correctly describe the type of VDU
+you are using.
+
+\subsubsection{Command options.}
+
+{\tt dvi2vdu} command has a number of options, each of which
+must be followed by a value.
+If the same option appears more than once then the last value will be used.
+Each option is followed by a value of a certain type:
+
+\begin{list}%
+{}%
+{\settowidth{\labelwidth}{\em string}
+\settowidth{\labelsep}{aaaa}
+\settowidth{\rightmargin}{aaa}
+\addtolength{\labelwidth}{\labelsep}
+\setlength{\leftmargin}{\labelwidth}}
+
+\item[\em string]
+ is a string of alphanumeric characters,
+
+\item[\em number]
+ is a positive integer, 
+
+\item[\em file]
+ is a file or directory, and
+\item[\em dimension]
+is a positive integer or real number followed by a
+two-letter unit: {\tt in}, {\tt cm}, {\tt mm},  {\tt pc}, {\tt pt} or {\tt px}.
+(Most of these should be familiar from \TeX.  {\tt dvi2vdu} provides an
+additional unit, {\tt px}, which stands for ``paper pixels''.
+These two-letter sequences can later be used as commands to
+change the units of dimensions.)
+\end{list}
+
+The following options are recognized:
+\begin{list}
+{}
+{\settowidth{\labelwidth}{\tt-v {\em string}}
+\settowidth{\labelsep}{aaaa}
+\settowidth{\rightmargin}{aaa}
+\addtolength{\labelwidth}{\labelsep}
+\setlength{\leftmargin}{\labelwidth}}
+
+\item[\tt -v \em string]
+This option explicitly tells {\tt dvi2vdu} what type of VDU you are using. The value
+of the {\tt TERM} environment variable is used if {\tt-v} is not given. For
+example, if you're using a Tektronix 4010 terminal and {\tt TERM} does not
+equal {\tt tek4010} then you'll need to type 
+\begin{verbatim}
+        $ dvi2vdu -v tek4010 filename
+\end{verbatim}
+{\tt dvi2vdu} will accept the  {\em string\/}
+values in table \ref{table:dvi2vduvalues} in either upper or lower case.
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{ll}
+
+AED483&    (AED 512 with 512 by 483 screen)\\
+AED512&    (AED 512 with 512 by 512 screen)\\
+ANSI&      (any ANSI compatible VDU; synonym = VT100)\\
+REGIS&     (any ReGIS compatible VDU; synonyms = GIGI, VK100,
+                                                   VT125, VT240)\\
+VIS240&    (VISUAL 240; synonym = VIS241)\\
+VIS500&    (VISUAL 500)\\
+VIS550&    (VISUAL 550)\\
+VT100132&  (any VT100 compatible VDU in 132 column mode)\\
+VT220&     (VT220 using down-loaded chunky graphics)\\
+VT640&     (VT100 with Retro-Graphics)\\
+MG100&     (Pericom MG100)\\
+MG200&     (Pericom MG200)\\
+GRAPHPACK&     (Pericom GRAPHPACK)\\
+\end{tabular}
+\caption{Values accepted by {\tt dvi2vdu}}
+\label{table:dvi2vduvalues}
+\end{center}
+\end{table}
+It is assumed your terminal has been set up to obey XON/XOFF flow control.
+This is the normal setting for terminals connected to a VAX so don't worry
+about it unless problems occur while {\tt dvi2vdu} is displaying a page.
+
+Some VDUs require special settings for {\tt dvi2vdu} to work properly:
+
+\begin{itemize}
+
+\item The VIS500 and VIS550 terminals have function keys which control how
+information on the screen is to be displayed.  {\tt dvi2vdu}
+assumes graphic images and alphanumeric text can be seen at the
+same time.  
+Both terminal types should also have the Scale Factor set at 3:4.
+
+\item The REGIS VDUs use ANSI escape sequences to update the dialogue region,
+and the VIS550 VDU is assumed to be emulating a VT100.
+Change the appropriate SET-UP value if your screen becomes full of junk.
+
+\item If you want to select VT100132 you have to switch to
+132 column mode yourself.
+The VT220 VDU will, however, automatically switch to 132 columns
+(and then to 80 columns when you quit).
+\end{itemize}
+
+
+\item[\tt-r \em number]
+
+{\tt dvi2vdu} treats the imaginary sheet of paper on which a DVI page will appear as
+a two-dimensional array of tiny dots called paper pixels. {\em number} is a
+positive integer that defines the number of paper pixels per inch (horizontally
+{\em and} vertically).  This value should match the resolution of the device
+that will be used to print your document.
+
+\item[\tt -x \em dimension]
+\item[\tt -y \em dimension]
+
+These two options define the width and height of the paper upon which your
+document will eventually be printed.
+Note that their default values specify A4 paper
+(8.3in wide and 11.7in high).
+Every time you select a page, {\tt dvi2vdu} uses these values
+to check that all the printed material will fit on the paper.
+
+
+\item[\tt -m \em number]
+
+This option allows you to replace the magnification used
+in the DVI file with some other value;
+{\em number} is a positive integer 1000 $\times$ the desired magnification.
+The given value should be chosen carefully so that the new font sizes
+still correspond to existing \verb+PK+ files.
+
+Unless you know exactly what you are doing you should avoid changing
+the DVI magnification,
+especially if your \TeX\ source file uses  \hbox{\verb|\magnification|}
+ {\em and} true
+dimensions.
+You should only supply a replacement magnification if you intend to
+print the DVI file with the same override.
+             
+
+\item[\tt -f \em file]
+
+{\tt dvi2vdu} gets all its font information from \verb+PK+ files.
+These files should be kept within the directory specified by this option.
+
+\item[\tt -d \em file]
+\TeX\ gets all its font information from \verb+TFM+ files.  For each \verb+TFM+ file there
+are usually a number of corresponding \verb+PK+ files, each of which
+contains the character shapes for a font at a particular size.
+Although \TeX\ allows you to scale a font to virtually any size,
+it is obviously impossible to provide an infinite number of \verb+PK+ files.
+That is why it is best to
+stick to the pre-defined \hbox{\verb|\magstep|}
+values when scaling fonts---you're
+much more likely to stay within the range of existing \verb+PK+ files.
+
+{\tt dvi2vdu} will warn you if your document attempts to use a
+non-existent \verb+PK+ file.
+Rather than abort, it will load the \verb+PK+ file specified after {\tt-d} and continue
+so you can look for more errors.
+Paragraphs using this dummy font are likely to have ragged right margins.
+
+The quickest way to check your DVI file for missing fonts is to type
+the {\tt-S} command.  The resulting display will indicate any \verb+PK+ files that do
+not exist.  You should not attempt to print a DVI file using such fonts.
+
+\item[\tt-h \em file]
+
+The {\tt ?} command reads the help file specified by this option.
+The default help file contains a brief summary of all the commands.
+\end{list}
+
+
+\subsubsection{The Dialogue Region.}
+
+If your command line is correct and if the {\tt -v} value matches the type of
+terminal you're actually using, then {\tt dvi2vdu} will clear the screen
+and display
+\begin{verbatim}
+Total pages=n   DVI page=0   TeX page=[0]   Next=>   Terse
+Window at (h,v) wwd by wht
+      Page at (minh,minv) pwd by pht   IN
+
+Command:
+\end{verbatim}
+These lines represent the ``dialogue region''; the rest of the screen is
+called the ``window region'' and should be blank at this stage.
+
+
+The top two lines show status information.  The first status line shows:
+\begin{itemize}
+\item {\tt n}, the total number of pages in the DVI file.
+
+\item The current DVI page and its corresponding \TeX\ page counters.
+   Particular pages can be selected by their position in the DVI
+   file (1 to n) or by the value of their \TeX\ counters.
+
+\item The direction in which the {\tt N} command will select consecutive pages;
+initially {\tt $>$}.  The {\tt $>$} and {\tt $<$} commands allow you to move
+forwards or backwards through the DVI file.
+
+\item The current display mode; initially {\tt Terse}.
+   The {\tt T}, {\tt B} and {\tt F} commands allow you to switch between 
+{\tt Terse}, {\tt Box} and
+   {\tt Full} display modes.
+\end{itemize}
+
+The second status line shows:
+
+\begin{itemize} \item The current location and size of the window. {\tt h} and
+{\tt v} are horizontal and vertical coordinates that define the current paper
+position of the top left corner of the window region. The following section has
+details on the coordinate scheme used by {\tt dvi2vdu}.  The {\tt W} command allows
+you to move the window to an absolute position; the {\tt U}, {\tt D}, {\tt L}
+and {\tt R} commands allow relative positioning. {\tt wwd} and {\tt wht}
+represent the current width and height of the window region; their values are
+changed by the {\tt H} and {\tt V} commands. The initial window size depends on
+the {\tt -r} value and the size and resolution of your VDU screen.
+
+\item The location and size of the ``page rectangle''. {\tt minh}, {\tt minv},
+{\tt maxh} and {\tt maxv} define the smallest rectangle containing all the
+rules and characters in the current page. ({\tt minh,minv}) is the top left
+corner of this rectangle; it is {\tt pwd} units wide and {\tt pht} units high.
+
+\item The current units; initially inches.
+   All numbers shown in this line are dimensions in terms of these units.
+   The two letters shown at the end of the line correspond to the commands
+   that allow you to switch between inches (IN),
+   centimetres (CM), millimetres (MM), points (PT), picas (PC)
+   and pixels (PX).
+   Pixel values are shown as integral numbers and represent exact dimensions;
+   all other values are shown as real numbers rounded to one decimal place.
+
+\end{itemize}
+Until a page is selected, most of the status values are
+meaningless and set to zero.
+
+The third line is initially blank.  {\tt dvi2vdu} displays messages of various
+kinds in this line.  Some of these messages appear only briefly but may convey
+helpful information.
+Others are more important and indicate some sort of problem, such as
+an invalid command or a page that won't fit on the paper;
+in these cases {\tt dvi2vdu} will prompt you to hit the $<$RETURN$>$ key
+before continuing.
+
+The last line in the dialogue region is for entering commands.  The first
+thing you normally want to do is choose a particular page for display.
+For example, typing `{\tt 1}' will select the first page in the DVI file.
+Many commands can be entered in the one command line.  Hit $<$RETURN$>$ to
+execute the command(s).
+
+\subsubsection{The Window Region.}
+
+The number of paper pixels per inch is given by the {\tt -r} option.
+A pixel can be either black (corresponding to a tiny blob of ink) or white
+(no ink).
+A typical DVI page contains characters from one or more fonts, and
+perhaps a few rules.
+A rule is simply a rectangular region of black pixels, usually in the shape of
+a thin horizontal or vertical line.
+A character is usually a more complicated pattern of black and white pixels.
+Every character and rule has a
+paper position ---or ``reference point''--- defined
+by a pair of pixel values ({\tt h,v})
+where {\tt h} is the horizontal coordinate and $v$ is the vertical coordinate.
+{\tt dvi2vdu} uses a coordinate scheme in which the
+position ({\tt 0,0}) is a pixel one inch in from the top and left edges of
+the paper.  Vertical coordinates increase down the paper,
+horizontal coordinates increase to the right. 
+
+The window region is used to view the current DVI page.
+{\tt dvi2vdu} treats this region of the VDU screen as a two-dimensional array
+of dots called ``screen pixels'' (to distinguish them
+from the paper pixels described above).
+A screen pixel is the smallest possible area on a VDU screen that
+can be drawn or erased; the greater the number of screen pixels in a given area,
+the higher the resolution of the VDU.
+
+The initial size of the window region depends on the VDU; the width and height
+are set so that each paper pixel corresponds to exactly one screen pixel.
+The most accurate representation of a page will occur at these values of Table
+\ref{table:windowsize} since
+neither horizontal nor vertical scaling is necessary:
+\begin{table}[htb]
+\begin{center}
+\begin{tabular}{lc}
+VDU&initial window size \\
+\hline
+AED483&             512 by 442\\
+AED512&             512 by 471\\
+ANSI&                80 by 20\\
+REGIS&              768 by 400\\
+VIS240&             800 by 500\\
+VIS500, VIS550&    1024 by 688\\
+VT100132&           132 by 20\\
+VT220&              132 by 100\\
+VT640&             1024 by 650\\
+MG100&             1024 by 650\\
+MG200&             1024 by 650\\
+GRAPHPACK&         1024 by 650\\
+\end{tabular}
+\caption{Initial window sizes}
+\label{table:windowsize}
+\end{center}
+\end{table}
+
+Use the {\tt H} command to change the width (the Horizontal size), and the
+and {\tt V} command to change the height (the Vertical size).
+Try to avoid weird aspect ratios: `{\tt H0.1 V100}' is a perfectly legal
+command string, but produces a very distorted display!
+The higher the resolution of the VDU,
+the greater the accuracy of such scaled displays.
+The command string `{\tt HV}' will restore the window size to the above unscaled
+dimensions.
+
+Note the very low resolution of the ANSI and VT100132 VDUs.
+Since the individual dots making up their screens cannot be turned on and off,
+{\tt dvi2vdu} has to define a screen pixel to be an entire character position.
+An ANSI screen typically consists of 24 lines of 80 characters,
+therefore the initial window region is 80 pixels wide and 20 pixels high
+(the top 4 lines are used for the dialogue region).
+At more useful window sizes the resulting displays will be extremely crude.
+Nevertheless, a variety of formatting errors can still be detected on such
+terminals---just don't try proofreading your document!
+
+The size and location of the window region are automatically set
+every time a page is selected.
+{\tt dvi2vdu} tries to show as much of the
+paper (and presumably the page) as possible, but without too much distortion.
+After comparing the shape of the paper with the shape of your
+VDU's {\em initial} window region, and depending on the location of the
+page, {\tt dvi2vdu} may show the entire paper,
+or the top or bottom half, or the left or right half.
+If any part of the page is off the paper then the entire paper {\em and} the
+entire page will be shown.
+Since most paper sizes have portrait dimensions (width $<$ height), and most
+VDU screens have landscape dimensions (width $>$ height), {\tt dvi2vdu} will
+normally show the top half of a sheet of paper containing the selected page.
+
+
+\subsubsection{The Commands.}
+
+In response to the `{\tt Command:}' prompt you can enter one or more of the
+following commands in upper or lower case.  Multiple commands are
+processed in the order given but the window region is only updated,
+if necessary, at the end.  For example,
+if you type `{\tt NFD}' then {\tt dvi2vdu} will get the Next page, switch to
+Full display mode, move the window Down, and only then display the page.
+If an illegal command is detected, any further commands are ignored.
+Most commands consist of only one or two characters; some can be followed by
+parameters.  Spaces before and after commands and parameters are optional.
+
+
+
+
+
+
+
+\paragraph{Miscellaneous}
+\begin{list}%
+{}%
+{\settowidth{\labelwidth}{\tt S}
+\settowidth{\labelsep}{aaaa}
+\settowidth{\rightmargin}{aaa}
+\addtolength{\labelwidth}{\labelsep}
+\setlength{\leftmargin}{\labelwidth}}
+
+
+\item[\tt ?]Display brief help on the available commands.
+\item[\tt S]
+Show the option values being used, as well as statistics about the number of
+fonts, characters and rules used on the current page.
+You'll also be warned about any PXL files that don't exist.
+\item[\tt Q]
+Quit from {{\tt dvi2vdu}}\null.
+({\em Control-C} will return you to the `Command:' level and 
+{\em Control-Z} will suspend {\tt dvi2vdu}.)
+\end{list}
+
+\paragraph{Selecting a Page}
+
+\begin{list}%
+{}%
+{\settowidth{\labelwidth}{\tt $i_0$.$i_1$. $\cdots$ .$i_9$}
+\settowidth{\labelsep}{aaaa}
+\settowidth{\rightmargin}{aaa}
+\addtolength{\labelwidth}{\labelsep}
+\setlength{\leftmargin}{\labelwidth}}
+
+\item[$i$]Select the $i$th DVI page.  $i$ must be a positive integer from
+1 to $n$ where $n$ is the total number of pages in the DVI file.
+
+\item[$i_0$.$i_1$. $\cdots$ .$i_9$]
+Select the DVI page whose \TeX\ page counters match the given specification.
+$i_0$ to $i_9$ are integers separated by periods.  Any number of these
+integers may be absent and trailing periods may be omitted.
+An absent integer will match any value in the corresponding counter.
+If more than one DVI page matches, the lowest will be chosen.
+E.g., [ ] is equivalent to [.........] and will select the first DVI page,
+even though the request matches every possible page.
+
+\TeX\ stores the values of \hbox{\verb|\count0|},\hbox{\verb|\count1|},...,
+\hbox{\verb|\count9|} in each DVI page. Plain \TeX\ only uses
+\hbox{\verb|\count0|} to control page numbering; the remaining counters are set
+to zero. Some macro packages may use the other counters for section or chapter
+numbering; e.g., [2.5] might mean ``select page~2 from chapter~5''. When
+showing the current \TeX\ page in the top status line, {{\tt dvi2vdu}} always shows
+the value of \hbox{\verb|\count0|}, but trailing counters with zero values are
+not shown. Note that plain \TeX\ uses negative values in  \hbox{\verb|\count0|}
+to indicate page numbers in roman numerals (such as in a preface). In most
+documents, the $i$th DVI page will be the same as \TeX\ page [$i$].
+
+
+\item[\tt N]
+Select the Next DVI page according to the current direction ($>$ or $<$).
+Before any page has been requested,
+N will select the first DVI page if the current direction is $>$, or
+the last DVI page if the current direction is $<$.
+
+\item[$>$]
+Future {\tt N} commands will now select DVI pages in ascending order.
+If $i$ is the current DVI page,
+an {\tt N} command will get page $i+1$ (unless $i$ is the last DVI page).
+
+\item[$<$]
+Future N commands will now select DVI pages in descending order.
+If $i$ is the current DVI page,
+an N command will get page $i-1$ (unless $i$ is 1).
+\end{list}
+
+\paragraph{Changing The Way a Page is Displayed}
+
+The \verb+T+, \verb+B+ and \verb+F+ commands provide three different ways of displaying a
+page.  The choice of display mode depends on the capabilities of your VDU
+and the level of detail you wish to see.
+Whatever the display mode, the window region
+is always updated in the following manner:
+Visible paper edges are drawn first, followed by visible rules.
+Visible characters are then shown on a font by font basis; those fonts
+with the least number of characters on the page are drawn first.
+
+While the window region is being updated, {{\tt dvi2vdu}} will check to see if
+you've typed something at the keyboard.
+You can hit the RETURN key to abort the display,
+or you can change the display mode by hitting the \verb+T+, \verb+B+ or \verb+F+ keys
+(without hitting RETURN).  There might be a slight delay between the time
+you hit a key and the time something actually happens.
+
+\begin{list}%
+{}%
+{\settowidth{\labelwidth}{\tt T}
+\settowidth{\labelsep}{aaaa}
+\settowidth{\rightmargin}{aaa}
+\addtolength{\labelwidth}{\labelsep}
+\setlength{\leftmargin}{\labelwidth}}
+
+\item[\tt T]
+Display a Terse representation of characters.
+On high resolution VDUs the \TeX\ text fonts should be quite readable;
+characters will be in
+approximately the right position and may even be about the right size.
+The display on low resolution VDUs can be a bit confusing; characters get
+overwritten if they are too close together.  Don't worry too much
+if you suddenly see many more spelling mistakes than usual!
+Note that the text fonts will all look alike.
+The only way to distinguish between different fonts is to note the
+order in which characters are displayed (the less used fonts are drawn first).
+Most VDUs assume all characters come from a \TeX\ text font and then attempt
+to map them into similar-looking ASCII characters.
+Characters from non-text fonts, such as math symbols, will usually appear
+incorrect.
+
+\item[\tt B]
+Display Box outlines of the smallest rectangles containing all
+black pixels in characters.
+The reference point of a \TeX\ character is usually located near
+the bottom left corner of one of these boxes.
+Box mode is intermediate in speed between Terse and Full modes;
+it is a quick and accurate way of checking
+the alignment of entries in a table, for example.
+
+\item[\tt F]
+Display a Full representation of all pixels in characters.
+This display is the most accurate but may take some time;
+hit RETURN or switch to Terse or Box mode if you get bored.
+The fact that the display mode can be changed {\em while the window is
+being updated\/} can be very useful.
+A good compromise between speed and accuracy is
+to start off in Full mode so that math symbols and any other special
+characters are displayed correctly, and to switch to Terse mode (by hitting T)
+when the bulk of the text begins.
+\end{list}
+
+\paragraph{Changing the Units of Dimensions}
+
+All the numbers in the second line of the dialogue region are dimensions in
+terms of the units shown at the end of the line.
+The parameters following some commands are also dimensions in terms of
+these units.
+Unlike the dimensions in \TeX, you don't explicitly type the units when you
+need to specify a dimension after a {\tt dvi2vdu} command---simply
+enter an integer value or real value.
+This value is rounded up internally to the nearest paper pixel based on the
+current units and the conversion factors shown below.
+For example, `CM H5 V3.4' will change the units to centimetres and set the
+window size to be 5cm wide and 3.4cm high.
+
+\begin{itemize}
+\item{\tt IN}
+Dimensions are assumed to be in terms of inches
+({\tt -r} defines the number of paper pixels per inch).
+
+\item{\tt CM}
+Dimensions are assumed to be in terms of centimetres
+(2.54cm $=$ 1in).
+
+\item{\tt MM}
+Dimensions are assumed to be in terms of millimetres
+(10mm $=$ 1cm).
+
+\item{\tt PC}
+Dimensions are assumed to be in terms of picas
+(1pc $=$ 12pt).
+
+\item{\tt PT}
+Dimensions are assumed to be in terms of points
+(72.27pt $=$ 1in).
+
+\item{\tt PX}
+Dimensions are assumed to be in terms of paper pixels.
+\end{itemize}
+
+\paragraph{Moving the Window}
+
+
+The window region can be moved to any position over the current page.
+You will be told if the window moves entirely outside the page rectangle
+defined by $minh$, $minv$, $maxh$ and $maxv$.  If this does happen, movement
+is restricted to {\em just outside\/} the edges to make it easier to get back
+over the page using only the \verb+U+, \verb+D+, \verb+L+ and \verb+R+ commands.
+Note that the location of the window is automatically set every time a
+page is selected.  This position will normally be
+the top left corner of the paper; i.e., $(-1,-1)$ in inches.
+The parameters $h$ and $v$ are dimensions ranging from $-480$ inches to
+$+480$ inches (for those of you \TeX ing billboards).
+\begin{list}%
+{}%
+{\settowidth{\labelwidth}{\tt W $h$,$v$}
+\settowidth{\labelsep}{aaaa}
+\settowidth{\rightmargin}{aaa}
+\addtolength{\labelwidth}{\labelsep}
+\setlength{\leftmargin}{\labelwidth}}
+
+\item[\tt W $h$,$v$]
+Move the Window region's top left corner to the given paper position.
+$h$ is the horizontal coordinate, $v$ is the vertical coordinate.
+If $h$ and $v$ are absent then the window is moved to $(minh{,}minv)$,
+the top left corner of the page rectangle.
+
+\item[\tt U $v$]
+Move the window Up $v$ units.
+If $v$ is absent then move up an amount equal to the window's current height.
+
+\item[\tt D $v$]
+Move the window Down $v$ units.
+If $v$ is absent then move down an amount equal to the window's current height.
+
+\item[\tt L $h$]
+Move the window Left $h$ units.
+If $h$ is absent then move left an amount equal to the window's current width.
+
+\item[\tt R $h$]
+Move the window Right $h$ units.
+If $h$ is absent then move right an amount equal to the window's current width.
+\end{list}
+
+\paragraph{Changing the Size of the Window}
+
+
+The \verb+H+ and \verb+V+ commands are used to change the
+width and height of the window region.
+It is up to you to maintain a sensible aspect ratio.
+The location of the window will not change unless the page becomes invisible.
+Note that the width and height of the window are automatically set every time a
+page is selected; the values chosen will depend on the paper dimensions.
+The parameters $wd$ and $ht$ are dimensions ranging from 1 pixel to 480 inches.
+
+\begin{list}%
+{}%
+{\settowidth{\labelwidth}{\tt H $wd$}
+\settowidth{\labelsep}{aaaa}
+\settowidth{\rightmargin}{aaa}
+\addtolength{\labelwidth}{\labelsep}
+\setlength{\leftmargin}{\labelwidth}}
+
+\item [\tt H $wd$]
+Set the Horizontal size of the window to the given width.
+If $wd$ is absent then set window width to its initial, unscaled value.
+
+\item[\tt V $ht$]
+Set the Vertical size of the window to the given height.
+If $ht$ is absent then set window height to its initial, unscaled value.
+\end{list}
+
+
+\subsection{DVICAN \& DVICA2 }
+\label{se:dvidvican}
+
+Because there are two types of Canon printers in use within Starlink, two 
+Canon Printer translators are provided. There is the additional complication
+that some Canon printers may be operating in \PS\ mode. 
+
+If your site has one printer operating in \PS\ mode, the \verb+dvican+ and
+\verb+dvica2+
+translators will be disabled. If you type:
+\begin{verbatim}
+      $ dvican <filename>
+\end{verbatim}
+or
+\begin{verbatim}
+      $ dvica2 <filename>
+\end{verbatim}
+you will get a message similar to:
+\begin{verbatim}
+      dvican has been withdrawn. Please use dvips 
+\end{verbatim}
+
+For sites with a Canon printer operating in Native mode, the correct \verb+dvican+
+translator will be enabled as \verb+dvican+, whichever model is in use. 
+
+If your site has both types of Canon printer, two types of translators will be
+available. \verb+dvican+ will be for later versions of the Canon  printers,
+\verb+dvica2+ will be for the early version. Both take the same arguments. {\bf
+NOTE:} {\em \verb+dvica2+ is not available on Solaris 2.x and OSF/1.}
+
+\subsubsection{Options}
+\label{se:dvidvicanoptions}
+
+The \verb+dvican+ and \verb+dvica2+ commands take a number of qualifiers consisting 
+of a hyphen followed by a single letter optionally followed by a parameter. 
+For example
+\begin{verbatim}
+      $ dvican <filename> -o3
+\end{verbatim}
+or 
+\begin{verbatim}
+      $ dvica2 <filename> -o3
+\end{verbatim}
+will process page 3 of the document only.
+Note that you must not put any spaces between the qualifier and its
+parameters.
+The syntax of qualifiers means that it is impossible to process a file whose
+name begins with a hyphen.
+
+The following qualifiers are recognized:
+
+\begin{list}{}{\settowidth{\labelwidth}{\tt-f\em filename}
+\setlength{\leftmargin}{\labelwidth}
+\addtolength{\labelwidth}{\labelsep}}
+
+\item[\tt-b] Process pages in reverse order; this can be useful on the A2 model
+printers which stack their pages face up and therefore in the reverse of
+the order in which they were printed.
+
+\item[\tt-c\#]  Print {\tt\#} copies of each page; a photocopier is cheaper so
+this qualifier shouldn't really be needed.
+
+\item[\tt-f\it filename] Specify an alternative font substitution file.
+
+\item[\tt-h] Select landscape mode.
+
+\item[\tt-l] If any errors occur the messages are written to a file with
+the extension {\tt .dvi-err} as well as to the terminal. {\tt-l} suppresses
+the writing of this log file.
+
+\item[\tt-m\#] Reset magnification to {\tt\#}. For values greater than 25
+{\tt\#} is taken to be a \TeX\ magnification; the default is 1500 (not 1000
+because the Canon is a 300dpi printer) and must correspond to one of the
+standard \TeX\ magnifications. Values less than 25 are equivalent to the
+corresponding \TeX\ \verb+\magstep+ magnification ($-1$ equals
+\verb+\magstepahalf+).
+
+\item[\tt-o\#] Process page {\tt\#} only.
+
+\item[\tt-o\#$_1$:\#$_2$] Process pages {\tt\#$_1$} to {\tt\#$_2$}. {\tt-o}
+can be used more than once on the same command to process discontiguous
+ranges of pages.
+
+\item[\tt-o\#$_1$:\#$_2$:\#$_3$] Print every {\tt\#$_3$}th page from 
+{\tt\#$_1$} to
+{\tt\#$_2$}. This is most commonly used with {\tt\#$_3$} equal to 2 when
+the output is going to be used for double sided photocopying, once to produce
+the odd numbered pages and once to produce the even numbered pages.
+
+\item[\tt-q] Suppress the progress messages normally printed on the terminal.
+
+\item[\tt-r]  Select full paint mode. This is required
+when including graphics
+files (see below) or for very complicated pages. A page that is too complicated
+will cause the printer to halt with error 21 (24 on the A2). On the A2 model, 
+using full
+paint mode leaves very little space for down-loading fonts and it is advisable
+only to process the pages that need it in full paint mode and process the
+rest of the document in normal paint mode.
+
+
+\item[\tt-t]  Select manual paper feed (for printing 
+transparencies). Consult
+an expert before feeding anything but ordinary paper into the printer to
+be sure that you are using suitable material.
+
+
+\item[\tt-x\#\it unit] Set the left margin to {\tt\#} (which can be both
+a real number and negative); {\it unit} is one of:
+
+\begin{tabular}{ll}
+bp &big point (1in = 72bp)\\
+cc &cicero (1cc = 12dd)\\
+cm &centimeter (1in = 2.54cm)\\
+dd &didot point (1157dd = 1238pt)\\
+in &inch\\
+mm &millimeter\\
+pc &pica (1pc = 12pt)\\
+pt &point (72.27pt = 1in)\\
+sp &scaled point (65536sp = 1pt)\\
+\end{tabular}
+
+The default margin is 1in.
+
+\item[\tt-y\#\it unit] Set top margin. The default is 1in.
+\end{list}
+
+\subsubsection{Font Substitution}
+
+
+If a font cannot be found at the required magnification, \verb+dvican+ and \verb+dvica2+ 
+will by default
+attempt to use the closest magnification that it can find. However it is also
+possible to substitute another font or magnification under the control of a font
+substitution file.  (See section \ref{se:fontsub}.)
+
+\subsubsection{Temporary Files}
+
+The Canon laser printer requires that all the characters in a font are down-%
+loaded at one time; characters cannot be added to a font later. Until the
+entire DVI file has been processed \verb+dvican+ does not know which characters are
+needed in each font so it writes the type-setting information to a
+temporary file which is appended to the font down-loading instructions once the
+end of the DVI file has been reached. The temporary file is called {\tt
+CAnnnnnnn.}, where {\tt nnnnnnn} is derived from the process id. and is normally
+deleted when \verb+dvican+ exits. If however \verb+dvican+ does not exit normally the
+temporary file must be deleted manually. 
+
+\subsection{DVIPS}
+\label{se:dvidvips}
+
+
+The {\tt dvips} program has a number of features that set it apart from other
+\PS\ drivers for \TeX.  This rather long section describes the advantages
+of using {\tt dvips}, and may be skipped if you are just interested in learning
+how to use the program.
+
+The {\tt dvips} driver generates excellent, standard \PS, that can be
+included in other documents as figures or printed through a variety of
+spoolers.  The generated \PS\ requires very little printer memory,
+so very complex documents with a lot of fonts can easily be printed even
+on \PS\ printers without much memory, such as the original Apple
+LaserWriter.  The \PS\ output is also compact, requiring less disk
+space to store and making it feasible as a transfer format.
+
+Even those documents that are too complex to print in their entirety
+on a particular printer
+can be printed, since {\tt dvips} will automatically split such documents
+into pieces, reclaiming the printer memory between each piece.
+
+The {\tt dvips} program supports graphics in a natural way, allowing \PS\
+graphics to be included and automatically scaled and positioned in a variety
+of ways.
+
+Printers with resolutions other than 300 dpi are also supported, even if they
+have a different resolution in the horizontal and vertical directions.
+High resolution output is supported for typesetters, including an option
+that compresses the bitmapped fonts so that typesetter virtual memory is
+not exhausted.  This option also significantly reduces the size of the
+\PS\ file and decoding in the printer is very fast.
+
+Missing fonts can be automatically generated if \MF\ exists on the system,
+or fonts can be converted from {\tt gf} to {\tt pk} format on demand.
+If a font cannot be generated, a scaled version of the same font at a
+different size can be used instead, although {\tt dvips} will complain
+loudly about the poor \ae sthetics of the resulting output.
+
+One of the most important features is the support of virtual fonts, which
+add an entirely new level of flexibility to \TeX.  Virtual fonts are used to
+give {\tt dvips} its excellent \PS\ font support, handling all the font
+remapping in a natural, portable, elegant, and extensible way.  The {\tt dvips}
+driver even comes with its own {\tt afm2tfm} program that creates the necessary
+virtual fonts and \TeX\ font metric files automatically from the Adobe
+font metric files.
+
+For more information on \verb+dvips+ and \PS\ read SUN/176.
+
+
+\subsubsection{Command Line Options} 
+\label{dvipsoptions}
+
+The {\tt dvips} driver has a plethora of command line options.  Reading
+through this section will give a good idea of the capabilities of the
+driver.
+
+Many of the parameterless options listed here can be turned off by immediately
+suffixing the option with a zero (0); for instance, to turn off page reversal
+if it is turned on by default, use {\tt -r0}.  The options that can be turned
+off in this way are {\tt a}, {\tt f}, {\tt k}, {\tt i}, {\tt m}, {\tt q}, {\tt
+r},
+{\tt s}, {\tt E}, {\tt F}, {\tt K}, {\tt M}, {\tt N}, {\tt U}, and {\tt Z}.
+
+This is a handy summary of the options; it is printed out when you run
+{\tt dvips} with no arguments.
+{\vskip0pt\parskip=0pt\begverb{`\\}
+     Usage: dvips [options] filename[.dvi]
+ a*  Conserve memory, not time      y # Multiply by dvi magnification
+ b # Page copies, for posters e.g.  A   Print only odd (TeX) pages
+ c # Uncollated copies              B   Print only even (TeX) pages
+ d # Debugging                      C # Collated copies
+ e # Maxdrift value                 D # Resolution
+ f*  Run as filter                  E*  Try to create EPSF
+ h f Add header file                F*  Send control-D at end
+ i*  Separate file per section      K*  Pull comments from inclusions
+ k*  Print crop marks               M*  Don't make fonts
+ l # Last page                      N*  No structured comments
+ m*  Manual feed                    O c Set/change paper offset
+ n # Maximum number of pages        P s Load config.$s
+ o f Output file                    R   Run securely
+ p # First page                     S # Max section size in pages
+ q*  Run quietly                    T c Specify desired page size
+ r*  Reverse order of pages         U*  Disable string param trick
+ s*  Enclose output in save/restore X # Horizontal resolution
+ t s Paper format                   Y # Vertical resolution
+ x # Override dvi magnification     Z*  Compress bitmap fonts
+     # = number   f = file   s = string  * = suffix, `0' to turn off
+     c = comma-separated dimension pair (e.g., 3.2in,-32.1cm)
+\endverb}
+
+\begin{list}%
+{}%
+{\settowidth{\labelwidth}{\tt -P \em printername}
+\settowidth{\labelsep}{aaaa}
+\settowidth{\rightmargin}{aaa}
+\addtolength{\labelwidth}{\labelsep}
+\setlength{\leftmargin}{\labelwidth}}
+%
+
+\item [\tt -a]  Conserve memory by making three passes over the {\tt dvi} file
+instead of two and only loading those characters actually used.
+Generally only useful on machines with a very limited amount of
+memory.
+
+\item [\tt -b \em num] Generate {\it num} copies of each page, but duplicating the
+page body rather than using the {\tt\#numcopies} option.  This can be
+useful in conjunction with a header file setting {\tt\char92bop-hook}
+to do colour separations or other neat tricks.
+
+\item [\tt -c \em num] Generate {\it num} copies of every page, by using
+\PS 's {\tt \#copies} feature.
+Default is 1. (For collated copies, see the {\tt -C} option below.)
+
+\item [\tt -d \em num]  Set the debug flags.  This is intended only for emergencies
+or for unusual fact-finding expeditions; it will work only if
+{\tt dvips} has been compiled with the {\tt DEBUG} option.
+For what the values of {\it num} can be see section \ref{diagnostics}.
+Use a value of $-1$ for maximum output.
+
+\item [\tt -e \em num]
+Make sure that each character is placed at most this many pixels from its
+`true' resolution-independent
+position on the page. The default value of this parameter
+is resolution dependent (it is the number
+of entries in the list [100, 200, 300, 400, 500, 600, 800, 1000, 1200, 1600,
+2000, 2400, 2800, 3200, $\ldots\,$] that are less than or equal to the
+resolution in dots per inch). Allowing individual
+characters to `drift' from their correctly rounded positions
+by a few pixels, while regaining the true position at the beginning of
+each new word, improves the spacing of letters in words.
+
+\item [\tt -f] Run as a filter.
+Read the {\tt dvi} file from standard input and write the \PS\ to
+standard output.  The standard input must be seekable, so it cannot
+be a pipe.  If you must use a pipe, write a shell script that copies
+the pipe output to a temporary file and then points {\tt dvips} at this file.
+This option also disables the automatic reading of the {\tt PRINTER}
+environment variable, and turns off the automatic sending of control D
+if it was turned on with the {\tt -F} option or in the configuration file;
+use {\tt -F} after this option if you want both.
+
+\item [\tt -h \em name]
+Prepend file {\it name}
+as an additional header file. (However, if the name is simply `{\tt -}',
+suppress all header files from the output.)  This header file
+gets added to the \PS\ {\tt userdict}.
+
+\item [\tt -i] Make each section be a separate file.  Under certain circumstances,
+{\tt dvips} will split the document up into `sections' to be processed
+independently; this is most often done for memory reasons.  Using this
+option tells {\tt dvips} to place each section into a separate file; the
+new file names are created replacing the suffix of the supplied output
+file name by a three-digit sequence number.
+This option is most often used in
+conjunction with the {\tt -S} option which sets the maximum section length
+in pages.  For instance, some phototypesetters cannot print more than
+ten or so consecutive pages before running out of steam; these options
+can be used to automatically split a book into ten-page sections, each
+to its own file.
+
+\item [\tt -k]  Print crop marks.  This option increases the paper size
+(which should be specified, either with a paper size special or
+with the {\tt -T} option) by a half inch in each dimension.  It
+translates each page by a quarter inch and draws cross-style
+crop marks.  It is mostly useful with typesetters that can set
+the page size automatically.
+
+\item [\tt -l \em num]
+The last page printed will be the first one numbered {\it num.}
+Default is the last page in the document.  If the {\it num} is
+prefixed by an equals sign, then it (and any argument to the
+{\tt -p} option) is treated as a sequence number, rather than
+a value to compare with {\tt \char92 count0} values.  Thus,
+using {\tt -l =9} will end with the ninth page of the document,
+no matter what the pages are actually numbered.
+
+\item [\tt -m]  Specify manual feed for printer.
+
+\item [\tt -n \em num]
+At most {\it num} pages will be printed. Default is 100000.
+
+\item [\tt -o \em name]  The output will be sent to file {\it name.}
+If no file name is given, the default name is {\tt {\it file}.dvi-ps} where
+the {\tt dvi} file was called {\tt {\it file}.dvi};
+if this option isn't given, any default in the configuration file is used.
+If the first character of the supplied output file name is an
+exclamation mark, then
+the remainder will be used as an argument to {\tt popen}; thus, specifying
+{\tt !lpr} as the output file will automatically queue the file for printing.
+This option also disables the automatic reading of the {\tt PRINTER}
+environment variable, and turns off the automatic sending of control D
+if it was turned on with the {\tt -F} option or in the configuration file;
+use {\tt -F} after this option if you want both.
+
+\item [\tt -p \em num]
+The first page printed will be the first one numbered {\it num.}
+Default is the first page in the document.  If the {\it num} is
+prefixed by an equals sign, then it (and any argument to the {\tt -l}
+option) is treated as a sequence number, rather than a value to
+compare with {\tt \char92 count0} values.  Thus, using {\tt -p =3}
+will start with the third page of the document, no matter what the
+pages are actually numbered.  Another form of page selection is
+available by using {\tt -pp} followed by a comma-separated list of
+pages or page-ranges, where the page ranges are colon-separated pairs
+of numbers.  Thus, you can print pages 3--10, 21, and 73--92 with the
+option {\tt -pp 3:10,21,73:92}.
+
+\item [\tt -q] Run in quiet mode.
+Don't chatter about pages converted, etc,  report nothing but errors to
+standard error.
+
+\item [\tt -r]
+Stack pages in reverse order.  Normally, page 1 will be printed first.
+
+\item [\tt -s]
+Causes the entire global output to be enclosed in a save/restore pair.
+This causes the file to not be truly conformant, and is thus not recommended,
+but is useful if you are driving the printer directly and don't care too
+much about the portability of the output.
+
+\item [\tt -t \em papertype] 
+This sets the paper type to {\it papertype}.  The {\it papertype} should
+be defined in one of the configuration files, along with the appropriate
+code to select it.  See the documentation for {\tt @} in the configuration
+file option descriptions.  You can also specify
+{\tt -t landscape}, which rotates a document by 90 degrees.
+To rotate a document whose size is not letter, you can use the 
+{\tt -t} option twice, once for the page size, and once for {\tt landscape}.
+The upper left corner of each page in
+the {\tt dvi} file is placed one inch from the left and one inch from the top.
+Use of this option is highly dependent on the configuration file.
+Note that executing the {\tt letter} or {\tt a4} or other \PS\
+operators cause the document to be nonconforming and can cause it not
+to print on certain printers, so the default paper size should not
+execute such an operator if at all possible.
+
+\item [\tt -x \em num]
+Set the magnification ratio to {\it num}/1000. Overrides the magnification
+specified in the {\tt dvi} file.  Must be between 10 and 100000.  It is
+recommended that you use standard magstep values (1095, 1200, 1440, 1728,
+2074, 2488, 2986, and so on) to help reduce the total number of {\tt PK}
+files generated.
+
+\item [\tt -A]
+This option prints only the odd pages.  This option uses the \TeX\
+page numbering rather than the sequence page numbers.
+
+\item [\tt -B]
+This option prints only the even pages.  This option uses the \TeX\
+page numbering rather than the sequence page numbers.
+
+\item [\tt -C \em num]
+Create {\it num}
+copies, but collated (by replicating the data in the \PS\ file).
+Slower than the {\tt -c} option, but easier on the hands, and faster than
+resubmitting the same \PS\ file multiple times.
+
+\item [\tt -D \em num]
+Set the resolution in dpi (dots per inch) to {\it num.}
+This affects the choice of bitmap fonts that are loaded and also the positioning
+of letters in resident \PS\ fonts. Must be between 10 and 10000.
+This affects both the horizontal and vertical resolution.  If a high resolution
+(something greater than 400 dpi, say) is selected, the {\tt -Z} flag should
+probably also be used.
+
+\item [\tt -E]
+Makes {\tt dvips} attempt to generate an EPSF file with a tight bounding
+box.  This only works on one-page files, and it only looks at marks made
+by characters and rules, not by any included graphics.  In addition, it
+gets the glyph metrics from the {\tt tfm} file, so characters that
+lie outside their enclosing {\tt tfm} box may confuse it.  In addition,
+the bounding box might be a bit too loose if the character glyph has
+significant left or right side bearings.  Nonetheless, this option works
+well for creating small EPSF files for equations or tables or the like.
+(Note, of course, that {\tt dvips} output is resolution dependent and
+thus does not make very good EPSF files, especially if the images are
+to be scaled; use these EPSF files with a great deal of care.)
+
+\item [\tt -F]
+Causes Control-D (ASCII code 4) to be appended as the very last character
+of the \PS\ file.  This is useful when {\tt dvips}
+is driving the printer directly instead of working through a spooler,
+as is common on extremely small systems.  Otherwise, it is not recommended.
+
+\item [\tt -K]
+This option causes comments in included \PS\ graphics, font files,
+and headers to be removed.  This is sometimes necessary to get around bugs
+in spoolers or \PS\ post-processing programs.  Specifically, the
+{\tt \%\%Page} comments, when left in, often cause difficulties.
+Use of this flag can cause some included graphics to fail, since the
+\PS\ header macros from some software packages read portions of
+the input stream line by line, searching for a particular comment.
+This option has been turned on by default because \PS\ previewers
+and spoolers still have problems with the structuring conventions.
+
+\item [\tt -M]
+Turns off the automatic font generation facility.  If any fonts are
+missing, commands to generate the fonts are appended to the file
+{\tt missfont.log} in the current directory; this file can then be
+executed and deleted to create the missing fonts.
+
+\item [\tt -N]
+Turns off structured comments; this might be necessary on some systems
+that try to interpret \PS\ comments in weird ways, or on some
+\PS\ printers.  Old versions of TranScript in particular cannot
+handle modern Encapsulated \PS .
+
+\item [\tt -O \em offset]
+Move the origin by a certain amount.  The {\it offset} is a comma-separated
+pair of dimensions, such as {\tt .1in,-.3cm} (in the same syntax used in
+the {\tt papersize} special).   The origin of the page is shifted from the
+default position (of one inch down, one inch to the right from the upper
+left corner of the paper) by this amount.
+
+\item [\tt -P \em printername]
+Sets up the output for the appropriate printer.  This is implemented
+by reading in {\tt config.{\it printername}}, which can then set the output pipe
+(as in, {\tt o !lpr -Pprintername}) as well as the font paths and any other
+defaults for that printer only.  It is recommended that all standard
+defaults go in the one master {\tt config.ps}
+file and only things that vary
+printer to printer go in the {\tt config.{\it printername}}
+files.  Note that {\tt config.ps}
+is read before {\tt config.{\it printername}}.
+In addition, another file called {\tt \tilde/.dvipsrc}
+is searched for immediately after {\tt config.ps};
+this file is intended for user defaults.  If no {\tt -P} command is
+given, the environment variable {\tt PRINTER} is checked.  If that
+variable exists, and a corresponding configuration
+file exists, that configuration file is read in.
+
+\item [\tt -S \em num]
+Set the maximum number of pages in each `section'.  This option is most
+commonly used with the {\tt -i} option; see that documentation above for more
+information.
+
+\item [\tt -T \em offset]
+Set the paper size to the given pair of dimensions.  This option takes
+its arguments in the same style as {\tt -O}.  It overrides any paper
+size special in the {\tt dvi} file.
+
+\item [\tt -U]
+Disable a \PS\ virtual memory saving optimization that stores the
+character metric information in the same string that is used to store
+the bitmap information.  This is only necessary when driving the Xerox
+4045 \PS\ interpreter.  It is caused by a bug in that interpreter
+that results in `garbage' on the bottom of each character.  Not
+recommended unless you must drive this printer.
+
+\item [\tt -X \em num]
+Set the horizontal resolution in dots per inch to {\it num.}
+
+\item [\tt -Y \em num]
+Set the vertical resolution in dots per inch to {\it num.}
+
+\item [\tt -Z]
+Causes bitmapped fonts to be compressed before they are downloaded,
+thereby reducing the size of the \PS\ font-downloading information.
+Especially useful at high resolutions or when very large fonts are
+used.  Will slow down printing somewhat, especially on early 68000-based
+\PS\ printers.
+\end{list}
+
+
+
+
+\subsubsection{environment Variables} 
+\label{envvar}
+
+
+The {\tt dvips} program reads a certain set of environment variables to
+configure its operation.  The path variables are read after all
+configuration files are read, so they override values in the configuration
+files.  (The {\tt TEXCONFIG} variable, of course, is read before the
+configuration files.)  The rest are read as needed.
+
+\begin{list}%
+{}%
+{\settowidth{\labelwidth}{\tt DVIPSHEADERS}
+\settowidth{\labelsep}{aaaa}
+\settowidth{\rightmargin}{aaa}
+\addtolength{\labelwidth}{\labelsep}
+\setlength{\leftmargin}{\labelwidth}}
+%
+
+\item [\tt HOME]{\rm no default}
+  This environment variable is automatically set by the shell and is
+used to replace any occurrences of {\tt \tilde} in a path.
+
+\item [\tt MAKETEXPK]{MakeTeXPK \%n \%d \%b \%m}
+This environment variable sets the command to be executed to create
+a missing font.  A \%n is replaced by the base name of the font to
+be created (such as {\tt cmr10}); a \%d is replaced by the resultant
+horizontal resolution of the font; a \%b is replaced by the
+horizontal resolution at which {\tt dvips} is currently generating
+output, and any \%m is replaced by a string that \MF\ can use as
+the right hand side of an assignment to {\tt mag} to create the
+desired font at the proper resolution.  If a mode for \MF\ is set in
+a configuration file, that is automatically appended to the command
+before execution.  Note that these substitutions are different than
+the ones performed on PK paths.
+
+\item [\tt DVIPSHEADERS]{/star/TeX-3.1415/tex/ps:.}
+  This environment variable determines where to search for header
+files such as {\tt tex.pro}, font files, arguments to the
+{\tt -h} option, and such files.
+
+\item [\tt PRINTER]{\rm no default}
+  This environment variable is read to determine which default printer
+configuration file to read in.  Note that it is the responsibility of
+the configuration file to send output to the proper print queue, if such
+functionality is desired.
+
+\item [\tt TEXFONTS]{/star/TeX-3.1415/tex/fonts/tfm:/star/local/tex/fonts/tfm/:.}
+  This is where {\tt tfm} files are searched for.  A {\tt tfm} file only
+needs to be loaded if the font is a resident (\PS ) font or if
+for some reason no {\tt pk} file could be found.
+
+\item [\tt TEXPKS]{/star/TeX-3.1415/tex/fonts/pk/pk300:/star/local/tex/fonts/pk}
+This environment variable is a path on which to search for {\tt pk} fonts.
+Certain substitutions are performed if a percent sign is found anywhere
+in the path.  See the description of the {\tt P} configuration file
+option for more information.
+
+\item [\tt TEXINPUTS]{/star/TeX-3.1415/tex/inputs:.}
+  This environment variable is used to find \PS\ figures when they
+are included.
+
+\item [\tt TEXCONFIG]{/star/TeX-3.1415/tex/ps:.}
+  This environment variable sets the directories to search for configuration
+files, including the system-wide one.  Using this single environment variable
+and the appropriate configuration files, it is possible to set up the program
+for any environment.  (The other path environment variables can thus be
+redundant.)
+
+\item [\tt  VFFONTS]{/star/TeX-3.1415/tex/fonts/vf}
+  This environment variable sets where {\tt dvips} looks for virtual fonts.
+A correct virtual font path is essential if \PS\ fonts are to be
+used.
+\end{list}
+
+
+\subsection{DVIPRI}
+\label{se:dvipri}
+
+The output from DVIPRI isn't nice, but you will be
+amazed how relatively good it is --- it is actually usable. \verb+dvipri+ can be very
+useful in the early stages of debugging \TeX\ input, because you do not need
+any special equipment to run it and lineprinter output is less expensive than
+laser printer output. The output file can also be inspected with any editor,
+but for this you need a 132-column wide terminal. Also because VDUs cannot show
+overstruck characters, these appear incorrectly on the next line. The main
+fault with the output is that it does not fit on A4 size paper, and it is very
+extravagant in vertical space.  {\bf NOTE:}{\em \verb+dvipri+ is only available
+on VAX/VMS.}
+
+The \verb+dvipri+ command takes a number of qualifiers:
+\begin{list}%
+{}%
+{\settowidth{\labelwidth}{\tt-f\em filename}
+\settowidth{\labelsep}{aaaa}
+\settowidth{\rightmargin}{aaa}
+\addtolength{\labelwidth}{\labelsep}
+\setlength{\leftmargin}{\labelwidth}}
+
+
+\item[\tt /b] Generates output more suitable for viewing on a terminal.
+Essentially, this means that overstruck characters get omitted. This is not use
+unless your terminal supports 132 characters wide.
+
+\item[\tt /c] Stop after this many pages. The default is $\pm 10^6$ and so
+normally \verb+dvipri+ will print all pages.
+
+\item[\tt  /d filename]   Take font from this directory, instead of the default
+which is {\tt TEX\_FONTS:}.
+
+\item[\tt /f] Start printing at the first page whose {\tt count0} parameter is
+greater than or equal to the specified number.
+
+\item[\tt /i number] Generates output directly on a terminal. The number is
+optional. If is specified, say {\tt N}, then \verb+dvipri+ will pause every {\tt N}
+lines and type the message `print return to continue'. If {\tt N=0}, \verb+dvipri+
+does not pause. If {\tt N} is not given, it defaults to 20.
+
+\item[\tt /m number] Magnify by number/100. Some magnification is needed
+because most \TeX\ characters are narrower than lineprinter characters. If it
+is not specified it defaults to 100\%.                                  
+
+\item[\tt /p] Send output to the named file instead of the default. The default
+output filename is [current directory][DVI file name]\verb+.dvi-pri+. But note that
+when this qualifier is used VMS sometimes alters the name ({\em e.g.}~{\tt /p
+horse} generates the output file {\tt horse.dat} instead of {\tt horse}.
+
+\item[\tt /q] Suppress information messages.
+
+\item[\tt /r] Suppress form feeds; instead \verb+dvipri+ prints a string like
+\begin{quote}\tt ----- PAGE n ----- \end{quote} 
+
+\item[\tt /s] Suppress blank line in the printed output. Normally, output is
+double--spaced to allow space for superscripts and subscripts.
+
+\item[\tt /x number] Horizontal magnification. If it
+is not specified it defaults to 100\%.                                   
+
+\item[\tt /y number] Vertical magnification. If it
+is not specified it defaults to 100\%.                                   
+
+\end{list}
+
+\section{Printing}
+\label{se:printing}
+
+If you have used a DVI translator that produces printable output, a file will
+have been created that can be printed on a suitable printer. Note that in the
+following sections, the queue names are the default queue names that Starlink
+assigns for the devices. If your site has more than one suitable printer,
+other queue names may need to be substituted.
+
+\subsection{Printing Files on Canon Laser Printers}
+
+These are produced by \verb+dvican+ and are intended for Canon Laser Printers. 
+They are printed thus:
+\begin{verbatim}
+      $ print/passall/nofeed/notify/queue=sys_laser/delete <filename>.dvi-can
+\end{verbatim}
+Output will be sent to the \mbox{\tt SYS\_LASER} queue.                  
+                            
+
+\subsection{Printing Files on \PS\ Printers}
+
+These are produced by dvips and are intended for printers operating 
+in \PS\ Mode. They are printed thus:
+\begin{verbatim}
+      $ print/notify/queue=sys_ps/form=post/delete <filename>.dvi-ps
+\end{verbatim}
+Output will be sent to the \mbox{\tt SYS\_PS} queue.   
+                                                
+
+
+\subsection{Printing Files on Line Printers}
+
+These are produced by \verb+dvipri+ for line printers, and are printed thus:
+\begin{verbatim} 
+      $ print/notify/delete <filename>.dvi-pri 
+\end{verbatim}
+Output will be sent to the system default print queue. 
+                                               
+
+
+\subsection{Short Cut}
+
+{\bf NOTE :}~This facility may have been locally over-ridden and will not
+therefore behave as described here. See the later {\bf NOTE}~in this section. 
+
+To save typing, there is a short cut for printing the \mbox{\tt .dvi-nnn} files
+resulting from DVI processing. The system-defined symbol \mbox{\tt prcn} 
+executes a command procedure which will print the appropriate file:
+\begin{verbatim}
+      $ prcn sample
+\end{verbatim}
+
+\mbox{\tt prcn} will check first if a file \mbox{\tt sample.dvi-can} exists in 
+your current directory and submit it to the \mbox{\tt SYS\_LASER} queue. 
+{\em Once printed, \mbox{\tt sample.dvi-can} will be deleted.}
+
+If a file \mbox{\tt sample.dvi-can} cannot be found, \mbox{\tt prcn} will 
+prompt you for another extension. Here you can reply .lis in which case 
+\mbox{\tt prcn} will submit the \mbox{\tt sample.lis} file to the  \mbox{\tt
+SYS\_PRINTRONIX} queue. This is useful when you want hard copy  details of the
+nature and location of errors, and warning messages, statistics and  names of
+files accessed by \TeX\ and \LaTeX\ when processing the document.  This
+procedure will save you from the usual mistake of printing the  \mbox{\tt .dvi}
+file. {\em The file you name will NOT be deleted.}
+
+When the document has been printed, you should delete
+\mbox{\tt sample.dvi} by typing:
+\begin{verbatim}
+      $ DELETE sample.dvi;*
+\end{verbatim}
+
+{\bf NOTE:}~Some sites have more than one laser printer, or use \PS\
+printers. In either case locally different definitions of \mbox{\tt prcn} may
+exist to direct print output at certain printers. For example, at RLVAD, the 
+\mbox{\tt prcn} symbol is defined as:
+\begin{verbatim}
+      prcn == "print/queue=sys_ps/form=post/delete"
+\end{verbatim}
+in order to send the print file to the \PS\ printer. This bypasses the
+\mbox{\tt prcn} command procedure.
+
+You should check the definition of the \mbox{\tt prcn} symbol  before you use 
+it. You may also want to redefine \mbox{\tt prcn} yourself.
+
+\section{Graphics in \LaTeX\ Documents}
+\label{se:graphics}
+
+One major deficiency of the \TeX\ system is that it does not contain any
+facilities for combining text and graphics in the same document. \LaTeX\ has
+its `picture' environment which can draw simple diagrams but is limited
+in scope and tedious to use for anything but the simplest picture. However,
+the \TeX\ {\tt\verb+\special+} command allows device dependent commands
+to be inserted in the DVI file where they can be interpreted by the program
+that converts the DVI file to the commands that drive a specific printer.
+
+\verb+dvican+ and dvips understand a set of commands that allow files
+containing Canon graphics (\verb+dvican+) or \PS\ (dvips) to be inserted 
+into a \TeX\ or \LaTeX\
+document. Suitable graphics files can be generated by GKS.
+
+Although similar possibilities for inserting graphics exist for other printer 
+devices the exact mechanism is likely to be different so this technique should 
+be used with discretion.  
+
+For example, it would be quite inappropriate to use such techniques in a 
+document that is to be sent to a non-Starlink site, but for a one-off such as 
+a scientific paper that will never be revised once it is published it is more 
+convenient and flexible than pasting up the document with scissors and glue. 
+
+If a document containing a diagram is to revised in the future the program and 
+data that produced the graphics (not the graphics file) must be regarded as a 
+part of the document source and stored with the same care as the \TeX\ file 
+itself. Since generating a copy of the document becomes much more complicated 
+than merely running \TeX\ or \LaTeX\ followed by \verb+dvican+ or dvips it is wise to 
+include complete instructions on how to generate a copy in comments in the 
+\TeX\ source.
+
+\subsection{The \LaTeX\ Source}
+
+The drivers expect the \hbox{\verb|\special|} command to look like one of the
+following: 
+\begin{verbatim} 
+\special{overlay <filename>}      %absolute positioning 
+\special{include <filename>}      %relative positioning
+\special{insert <filename>}       %relative positioning 
+\end{verbatim} 
+In each case \hbox{\verb|<filename>|} refers to a file containing the picture
+or \PS\ code. The {\tt overlay} case will map the file onto the page starting
+at the top left corner of the printable region, or precisely the coordinates
+which the \PS\ code specifies. when the {\tt include} and {\tt insert} cases,
+which are synonymous, are used the driver places the upper-left corner of the
+bounding box at the current point. Files generated by GKS have the graphics
+origin at the top left corner of the picture.
+
+The {\tt\verb+\special+} command is not interpreted by \TeX\ in any way, but
+is simply copied into the DVI file. So it is up to
+you to ensure that an appropriate sized blank space appears in the document. 
+
+When using \LaTeX, the correct space and positioning is most easily achieved
+by making the {\tt\verb+\special+} command the argument of a {\tt\verb+\put+} 
+command in a {\tt picture} environment of the same size as the picture. For
+example, a picture 10cm by 7cm stored in a file called {\tt mypic.dat} could
+be inserted with the following commands:
+\begin{verbatim}
+      \setlength{\unitlength}{1cm}
+      \begin{picture}(10,7)
+      \put(0,7){\special{include mypic.dat}}
+      \end{picture}
+\end{verbatim} 
+
+Such a picture would often be part of a {\tt figure} environment so that
+it can float to a convenient place in the document.
+
+To achieve the same result with plain \TeX\, refer to page~228 of the
+{\TeX}book. the command
+           
+\begin{verbatim}
+      \special{overlay <filename>}
+\end{verbatim}
+inserts the picture with the graphics origin at the top left corner of the
+page and \TeX\ does not influence the position of the picture (other than
+on which page it appears).
+
+
+The {\tt include} works best with files which contain bit map graphics data.
+The files may include other printer commands, as long as they do not disturb
+the environment which the driver assumes; for example, the files should 
+{\bf not}
+contain commands to eject pages, alter downloaded fonts, change margins or
+other such global matters unless the purpose is to deliberately interfere
+with driver assumptions. You must determine bounding boxes using software which
+originally produced the {\tt include} file, and insert spacing in the \TeX\
+input to take this into account. For example:
+\begin{verbatim}
+ \makebox[1.90in][l]{\vrule width 0in height 0.74in depth 0in}
+ \raisebox{0.74in}{\rule{0.003in}{0.003in}}
+ \special{include sign.dig}
+\end{verbatim}
+This example inserts a file ``{\tt sign.dig}'' (perhaps a digitized handwritten
+signature) at the top left corner of a box 1.90 inches wide and 0.74 inches
+high, which will appear to \LaTeX\ as an \verb+\hbox+ of those dimensions. The
+\verb+\rule+ is mandatory; this tiny dot (which will be indistinguishable on
+the printer) tricks \TeX\ into emitting DVI output to move the printer to the
+current output position.
+
+A useful feature under UNIX is the ability to specify any shell command instead
+of a file name. In this case the driver, instead of copying the contents of a
+named file, copies the standard output of the shell command to the output. To
+activate this feature, you simply begin the shell command with an exclamation
+mark ({\tt !}). For example,
+\begin{verbatim}
+ \special{include !uncompress < sign.dig.Z}
+\end{verbatim}
+This example says that the driver is to fork a shell, which runs the {\tt
+uncompress} utility with the file {\tt sign.dig.Z} as standard input. The
+driver uses the standard output of the command as the file contents to insert in
+the output.
+
+
+
+
+DVI file pages which contain \verb+\special+ commands must be processed with
+the {\tt -r} qualifier when processed with \verb+dvican+ because the printer must be
+in  full paint mode to process vector commands.
+
+\subsection{The Graphics files}
+
+The graphics files for the Canon are created by using the GKS workstation  type
+2610 (landscape) or 2611 (portrait); and for \PS\ with 2706 (portrait) or 
+2607 (landscape). Apart from the format of the files, these workstations differ
+from the normal Canon and \PS\ workstations in that  (a) each new frame
+generates a separate file and (b) the files cannot be plotted directly on the
+printer; only by processing them with \verb+dvican+ or dvips. 
+
+It is the responsibility of the program that generates the picture to ensure
+that it matches the gap left for it in the text.
+GKS sets the graphics origin to the top left corner of the workstation viewport
+so the most obvious way to do this is to set the workstation viewport to
+the required size; the position of the viewport on the display surface is
+irrelevant. 
+However, with some high level graphics packages, setting the
+workstation viewport may interfere with the working of the package and the
+following alternatives are suggested:
+\begin{description}
+\item[SGS ---] Use {\tt SGS\_ZSIZE} with a position specification of {\tt TL}.
+\item[AUTOGRAPH ---] Use {\tt SGS\_ZSIZE} followed by {\tt SNX\_AGWV}.
+\item[PGPLOT ---] Use PGPAPER.
+\end{description}
+
+
+\section{Carrying On --- More About \LaTeX}
+\label{se:carryon}
+
+
+
+\subsection{Document Styles}
+\label{se:dstyle}
+\LaTeX\ provides a number of standard document styles:
+{\tt article, book, letter, report} and \mbox{\tt slides}. 
+(The \mbox{\tt article} style is for short reports, and is the standard style
+for Starlink documents.)  
+Additionally, there are qualifying options, {\em e.g.} size of the type, 
+whether one or two-column formatting of the text is required.
+There are Starlink styles for producing the standard documentation, {\em e.g.} 
+SUN's, and a user guide, something like that produced for MIDAS. These are
+based on the \mbox{\tt article} style and shell documents are stored in
+\verb+DOCSDIR+ as \verb+sun.tex+, \verb+sgp.tex+, \verb+ssn.tex+ and \verb+sg.tex+.
+
+There are four document-style options available  that are not described in the
+manual: the \mbox{\tt proc} style option for making camera-ready copy for
+conference proceedings, the \mbox{\tt bezier} option for drawing curves, the
+\mbox{\tt ifthen} option for implementing {\bf if-then-else} and {\bf while-do}
+control structures, and the \mbox{\tt ralhead} option for making headed
+letters.  They are described below. 
+
+\subsubsection{The \mbox{\tt proc} Style Option}
+\label{se:procsty}
+
+The \mbox{\tt proc} option is used with the \mbox{\tt article} document
+style.  It produces two-column output for conference
+proceedings.  The command \hbox{\verb|\copyrightspace|} makes the blank
+space at the bottom of the first column of the first page, where the
+proceedings editor will insert a copyright notice.  This command works
+by producing a blank footnote, so it is placed in the text of the first
+column.  It must go after any \hbox{\verb|\footnote|} command that
+generates a footnote in that column.
+
+\LaTeX\ automatically numbers the output pages.  It is a good idea 
+to identify the paper on each page of output.  Placing the command
+\begin{verbatim}
+      \markright{Jones---Foo}
+\end{verbatim}
+in the preamble (before the \hbox{\verb|\begin{document}|} command)
+prints ``Jones---Foo'' at the bottom of each page.  
+
+\subsubsection{The \mbox{\tt bezier} Style Option}
+\label{se:beziersty}
+
+This option defines a single command, \hbox{\verb|\bezier|}, that draws
+a curved line in a \mbox{\tt picture} environment.  Let $P_{i}$ be the point
+with coordinates $(x_{i},y_{i})$, for $i=1$, 2, and 3.  The command
+\begin{itemize} \tt
+\item[]
+\verb|\bezier{|$n$\verb|}(|$x_{1}$,$y_{1}$)($x_{2}$,$y_{2}$)($x_{3}$,$y_{3}$)
+\end{itemize}
+draws $n$ points on the quadratic Bezier spline determined by the three
+points $P_{1}$, $P_{2}$, and $P_{3}$.  The locus of points on this
+spline is a parabolic arc from $P_{1}$ to $P_{3}$ having the line
+$P_{1}P_{2}$ tangent to it at $P_{1}$ and the line $P_{2}P_{3}$ tangent
+to it at $P_{3}$.  Note that $P_{2}$ is {\em not\/} on this arc unless
+$P_{1}$, $P_{2}$, and $P_{3}$ are colinear, in which case the arc is a
+straight line.  Bezier splines are useful because it's easy to join two
+of them together smoothly by giving them the same tangent line where
+they meet.
+
+It takes roughly 75 points per inch to form a solid line, depending
+upon the line thickness.  See Section~C.13.3 of the manual for commands
+to specify line thickness in a \mbox{\tt picture} environment.  This command
+is {\em very\/} slow, and \TeX\ has enough memory to hold only about
+1000 points plus a page of text.  (Remember that \TeX\ keeps the
+current page plus all as yet unprinted figures in memory.) So, the
+\verb|bezier| command should be used for only a small number of small
+curves.
+
+\subsubsection{The \mbox{\tt ifthen} Style Option}
+\label{se:ifthensty}
+
+This option provides two programming language features that are useful
+only for people who already know how to program.  It defines the
+two commands
+\begin{itemize} 
+\item[]
+\verb|\ifthenelse{|{\em test\/}\verb|}{|{\em then clause\/}\verb|}{|%
+{\em else clause\/}\verb|}|\\
+\verb|\whiledo{|{\em test\/}\verb|}{|{\em do clause\/}\verb|}|
+\end{itemize}
+that implement the following two Pascal language structures
+\begin{itemize}
+\item[]
+\begin{tabbing}
+{\bf if} {\em test\/} \= {\bf then} \= {\em then clause\/} \\
+ \> {\bf else} \> {\em else clause\/} \\[2pt]
+{\bf while} {\em test\/} {\bf do} {\em do clause\/}
+\end{tabbing}
+\end{itemize}
+The {\em then\/}, {\em else\/}, and {\em do\/} clauses
+are ordinary \LaTeX\ input; {\em test\/} is one of the following:
+\begin{itemize}
+ \item A relationship between two numbers formed with \mbox{\tt <}, \mbox{\tt
+>}, or \mbox{\tt =}; for example, \hbox{\verb|\value{page}>3|}. 
+\item \verb|\equal{|{\em string1\/}\verb|}{|%
+{\em string2\/}\verb|}|, which evaluates to {\em true\/} if {\em
+string1\/} and {\em string2\/} are the same strings of characters after
+all commands have been replaced by their definitions.  (Upper- and
+lowercase letters are unequal.)
+ \item A logical combination of the above two kinds of tests
+    using the operators \hbox{\verb|\or|}, \hbox{\verb|\and|},
+    and \hbox{\verb|\not|} and the parentheses \hbox{\verb|\(|}
+    and \hbox{\verb|\)|}---for example:
+\begin{verbatim}
+      \not \( \value{section} = 1  \and  \equal{Jones}{\myname} \)
+\end{verbatim}
+\end{itemize}
+These commands, together with \hbox{\verb|\renewcommand|} and the
+commands of Section~C.7.4 of Lamport's book for manipulating counters, open 
+up a whole new world of \LaTeX ing.
+
+\subsubsection{Letters} \label{se:letters}
+
+The \mbox{\tt letters} document style, described in the manual, should be used
+for generating personal letters.  For generating letters on simulated RAL headed
+notepaper, use the \mbox{\tt ralhead} style option. This option defines two
+extra commands: \hbox{\verb|\extension|} for adding your telephone extension to
+the RAL switchboard number, and the \hbox{\verb|\directline|} command for
+adding a direct-line phone number. 
+
+
+\subsection{\BibTeX}
+\label{se:bibtex}
+Often you will require citations or references to other sources of
+information. You can produce the list of references directly with
+\LaTeX.  Alternatively,
+a separate programme called \BibTeX\ can produce the bibliography from
+databases of sources. 
+The databases have extension \mbox{\tt .bib}. Unfortunately, we
+currently have no special tool to speed the creation of a database, but it
+could be provided if demand warranted.
+There is a bibliography style to give you a choice, {\em e.g.} whether
+to order the citations alphabetically or in the order they appear in the 
+main body of the text. Only the the standard styles are available.
+
+There are three stages in using the bibliography databases.
+\begin{enumerate}
+\item
+First run \LaTeX\ on your input text file as described in
+Section~\ref{se:example}.
+\item
+Then run \BibTeX\ by typing
+\begin{verbatim}
+      $ bibtex filename
+\end{verbatim}
+where \mbox{\tt filename} is the name of your \LaTeX\ input
+file.
+\BibTeX\ reads the auxiliary file produced by \LaTeX\ 
+(\mbox{\tt filename.aux}) from \mbox{\tt filename.tex}, in addition to the
+databases.
+\BibTeX\ creates a file called \mbox{\tt filename.bbl} containing \LaTeX\
+commands to produce the list of references.
+\item
+Finally re-run \LaTeX\ as stage 1. \LaTeX\ reads \mbox{\tt filename.bbl}
+to actually produce the list references at the end of your document.
+\end{enumerate}
+
+\BibTeX\ should be run from the directory containing
+\mbox{\tt filename.tex} (which should be the same directory from which
+\LaTeX\ was run on that file).
+
+If the \mbox{\tt .bib} file is not in the same directory as the \LaTeX\ input
+file---for example, if you are using someone else's \mbox{\tt .bib}
+file---then you must include a directory as part of the file name specified
+by the \hbox{\verb|\bibliography|} command. For example, the \LaTeX\ command
+\begin{verbatim}
+      \bibliography{[xyz.bibfiles]photom
+\end{verbatim}
+specifies the file \mbox{\tt photometry.bib} kept by XYZ in his 
+\mbox{\tt [.BIBFILES]} directory.
+
+There is no formal provision for sharing bibliographic-database information.
+Suggestions for forming one or more common \mbox{\tt .bib} files
+are welcome.
+
+See Appendix B of the \LaTeX\ manual for full details on \BibTeX\ and
+how to format a database.
+
+\subsection{\IdxTeX}
+\label{se:idxtex}
+
+The \IdxTeX\ program is used to automate the generation of an Index in a
+\LaTeX\ document.  
+
+\subsubsection{Index Processing}
+
+To make an Index using \LaTeX, the writer includes the 
+\verb~\makeindex~ command
+in the preamble of the document.  This causes an auxiliary 
+file (with file type {\tt .idx}) to be generated.  For every 
+\verb~\index~ command in the document, a
+\verb~\indexentry~ command is written to 
+the auxiliary file, containing the text supplied in the \verb~\index~ command
+and the page number of the page on which the \verb~\index~ command occurred. 
+
+
+While this procedure is capable of generating an effective, high-quality Index,
+a substantial amount of work is required to convert the auxiliary {\tt .idx}
+file into the appropriate set of commands.  
+
+\IdxTeX\ uses the {\tt .idx} auxiliary file to generate a new file with file
+type {\tt .ind} which contains all of the necessary commands to create an
+attractive, two-column index.  This {\tt .ind} file may then be included in the
+document at the appropriate place to generate the Index. 
+
+
+\subsubsection{Building an Index}
+                             
+
+\begin{itemize}
+
+
+
+\item Include the \verb~\makeindex~ command in the preamble area of the
+document source file (i.e., between the \verb~\documentstyle~ and
+\verb~\begin{document}~ commands).  Also, include the appropriate \verb~\index~
+commands (as described below) in the source file.
+
+\item Use \LaTeX\ to generate an initial form of the document.  \LaTeX\ will
+generate an auxiliary file which has the same filename as the main document
+file and a filetype of .idx.
+
+
+\item Use \IdxTeX\ to generate the formatted index file.
+
+\item Insert the command \verb+\input{file.ind}+ into your document source file
+just before the \verb~\end{document}~ command. 
+
+\item Finally, run the document through \LaTeX\ twice (to make sure that the
+Table of Contents includes the page reference for the Index).  Your document is
+now complete, including a formatted Index. 
+
+\end{itemize}
+
+\subsubsection{Command Syntax}
+
+\begin{verbatim}
+
+        $ idxtex   file  [/toc={ ARTICLE | REPORT }]
+
+\end{verbatim}
+
+where ``file'' is the filename of the .idx 
+file.  \IdxTeX\ generates a file with the same filename as the .idx file and a
+filetype of .ind. 
+
+The \verb+/toc+ qualifier is optional.  If you
+specify it, you must specify either the value \verb+article+ or the value
+\verb+report+.  The \verb+/toc+ qualifier is used to add an entry into the Table of
+Contents for the Index.  The standard document styles ({\em article\/} and
+{\em report\/}) do not automatically make a Table of Contents entry for the 
+Index.  If you want the Index to be listed in the Table of Contents, you 
+{\bf must} use the \verb+/toc+ qualifier.  The value \verb+article+ should be used
+with documents which use the {\em article\/} document style or one of its 
+derivatives.  The value \verb+report+ should be used with documents which use
+the {\em report\/} or {\em book\/} document styles. 
+
+A number of document styles have been developed which automatically include
+a Table of Contents entry for the Index\footnote{Examples of these styles 
+include the Monsanto {\em pamphlet}, {\em manual}, and {\em memo\/} styles.}.
+You {\bf should not} use the \verb+/toc+ qualifier with one of these document styles.
+If you do, the Index will be listed in the Table of Contents twice.
+
+
+\subsubsection{Special Features}
+
+The \IdxTeX\ program attempts to perform all of the operations needed to 
+generate an Index.  Of course, the quality of the
+Index is a function of the amount of effort you put into your writing --- the
+program can only generate index entries for items you tell it to index for you.
+But if you do a good job of generating index entries, \IdxTeX\ should do a good
+job formatting them for you.
+
+
+\paragraph{Index  Generation} 
+The .ind file generated by \IdxTeX\ contains all of the commands
+necessary to generate the index.  
+
+The file contains a 
+\verb~\begin{theindex}~ command.  This
+sets up the Index environment according to your current \verb~\documentstyle~.
+For example, in the {\tt article\/} document style, the index is an
+unnumbered subsection.  In the {\tt report\/} document style, the index is
+an unnumbered chapter.
+
+The last line in the file is a \verb~\end{theindex}~ command.  This command
+ends the Index environment.  Between these lines are found all of the commands
+needed to generate the Index.
+
+\paragraph{Alphabetical Index}  The index is generated in an alphabetized,
+two-column format by major index entry.  Special characters such as
+``\verb~\~'' don't participate in the alphabetization, so a term like
+\verb~\begin~ is indexed under ``B'', not under ``\verb~\~''.
+
+For clarity, the group of index entries which begin with one letter of the
+alphabet are set off from the index entries beginning with the next letter of
+the alphabet with vertical spacing and a heading.  
+
+\paragraph{Index Levels} 
+Items are inserted into the Index by using the \verb~\index~ command.  For 
+example, to index the term ``entry'', enter \verb~\index{Entry}~
+at the appropriate place in the text of your document.  The information entered
+as the argument to \verb~\index~ will appear as 
+specified (special visual effects are discussed below).  The page number on
+which the \verb~\index~ command appeared will be displayed. 
+
+This approach generates a simple Index.  That is, all terms are on the same
+footing.  It is often convenient, however, to have terms appear as subindices
+under an index term.  For example, if you were discussing ``Commands'', you
+might wish to have separate index entries for ``Add Command'' and ``Change
+Command''.  However, in addition, you should create an index entry for 
+``Commands'' and place ``Add'' and ``Change'' as subindices under it.  This 
+technique generates an index which is more helpful for the person looking for
+information.
+
+\IdxTeX\ actually supports three such levels of indexing --- a main index item,
+a subindex item, and a subsubindex item.  In analogy to the indexing 
+capabilities of the RUNOFF program, the 
+``\verb~>~'' symbol is used to separate
+the index term from the subindex term and the subindex term from the subsubindex
+term in the \verb~\index~ command.  
+
+For example,
+\begin{verbatim}
+
+        \index{Top Level Item>SubItem>SubSubItem}
+
+\end{verbatim}
+generates such three-level deep
+index entry in the index.  
+There are two important points to note here.
+
+\begin{itemize}
+\item First, each \verb~\index~ command generates a single page number reference
+in the index.  The page number is associated with the lowest level of the index
+specified.  Therefore, in this example, the page number is associated with the
+``SubSubItem'' entry, not any of the higher entries.  If you want page numbers
+at all levels, you must use several \verb~\index~ commands.
+
+All subitems are displayed in alphabetical order below their top-level item.
+All subsubitems are displayed in alphabetical order below their second-level
+item.
+
+\item Second, the ``\verb~>~'' symbol used to separate items of different
+levels is normally a math symbol.  As such, it is possible that you will want
+to index a math expression which contains it.  This is okay, because \IdxTeX\
+is sensitive to the use of {\tt \$} as a command to enter or leave math mode
+and will not consider ``\verb~>~'' a level separator unless it is {\bf not\/}
+in math mode.
+
+\end{itemize}
+
+While \IdxTeX\ allows you to be pretty wordy in your index terms (there is a
+practical limit of about 110 characters for the text contained in an
+\verb+\index+ command), your index will be most effective if you select short
+and concise index terms.   
+
+\paragraph{Item   highlighting} 
+Sometimes it is desirable to make a word or phrase (or even an entire index
+entry) stand out in the Index.  This is referred to as Item Highlighting, and
+is an effective technique to make the Index more useful, if not overdone.
+
+Use the normal \LaTeX\ commands to generate the desired highlighting.  For 
+example, if the following commands may appear in the document.
+\begin{verbatim}
+
+        \index{Highlighting>A {\bf boldface} entry}
+        \index{Highlighting>An {\em italic\/} entry}
+
+\end{verbatim}
+The result will be 
+\begin{itemize}
+\item{Highlighting}
+\subitem{A {\bf boldface} entry, \mbox{\rm 6}}
+\subitem{An {\em italic\/} entry, \mbox{\rm 6}}
+\end{itemize}
+From the standpoint of \IdxTeX, the item, subitem, and subsubitem are processed
+as different text elements.  Therefore, if you wish to highlight more than one
+level of the index, you must handle each one independently.  That is,
+\begin{verbatim}
+\index{{\bf One}>{\it Two}>{\tt Three}}
+\end{verbatim}
+will produce
+\begin{itemize}
+\item{{\bf One}, \mbox{\rm 6}} 
+\subitem{{\it Two}, \mbox{\rm 6}} 
+\subitem{{\tt Three}, \mbox{\rm 6}} 
+\end{itemize}
+
+\paragraph{Page Number highlighting}  Sometimes, when you are indexing the same
+term in many places in a document, you may wish to help the reader decide which
+is the primary  reference and which are secondary references.  One way of doing
+this is to provide visual highlighting of important page numbers.
+
+\IdxTeX\ provides a mechanism to cause a page number of a reference to be
+printed in {\bf boldface}, {\em italics}, or \underline{underlined}.  There
+are three special characters recognized by \IdxTeX\  when they appear as the
+first character of an \verb~\index~ command argument.
+
+\begin{itemize}
+\item The \verb~^~ command\index{\verb~\index~ Command>Use of \verb~^~} is 
+used to make the page number reference appear in {\bf boldface}. 
+\item The \verb!~! command\index{\verb~\index~ Command>Use of \verb!~!} is 
+used to make the page number reference appear in {\em italics}.
+\item The {\tt\_} command\index{\verb~\index~ Command>Use of {\tt\_}} is used to
+make the page number reference appear \underline{underlined}. 
+\end{itemize}
+
+For example, if the following \verb~index~ commands appear,
+\begin{verbatim}
+        \index{^page Numbers>boldface}
+        \index{~Page Numbers>italics}
+        \index{_Page Numbers>underlined}
+\end{verbatim}
+the result will be
+\begin{itemize}
+\item{Page Numbers}
+\subitem{boldface, \mbox{\bf 6}}
+\subitem{italics, \mbox{\em 6}}
+\subitem{underlined, \mbox{\rm\underline{6}}}
+\end{itemize}
+
+These special characters must appear as the first character of an \verb~\index~
+command argument.  If they appear after a ``\verb~>~'' (i.e., as the first
+character of a subindex entry or a subsubindex entry), they will not work. In
+fact, they will cause a \LaTeX\ error!
+
+\paragraph{Special   \LaTeX   Commands}
+Occasionally, it is desirable to include \LaTeX\
+commands in the index entry to create special effects or because
+the command itself is being referenced.  
+
+The trick is that \IdxTeX\ tries to alphabetize your entries correctly.  This
+means that it must figure out how to alphabetize \LaTeX\ commands, whose 
+displayed images are different than the character strings which generate them.
+
+The following rules attempt to indicate how \IdxTeX\ treats \LaTeX\ commands
+when it finds them.
+
+\begin{itemize}
+\item Accents are ignored when figuring out how to spell a term.  This means,
+for example, that ``\verb+se\~{n}or+'' is treated as if it were spelled 
+``\verb+senor+''.
+
+\item Text contained in ``\verb~\verb~'' or ``\verb~\verb*~'' commands is
+spelled as if the command were not present.  For example, the index entry
+``\verb~\verb+\Pi+~'' is treated as if it was spelled ``\verb~\Pi~''.
+
+\item Commands which affect font size or type style are ignored when figuring
+out how something is spelled.  For example, ``\verb~\sc term~'' is treated as if
+it were spelled ``\verb~term~''.  Note, however, that this applies only to
+spelling. The term will be displayed as you want it.
+
+\item Case is ignored in spelling considerations.  Terms like ``large'' and
+``Large'' are treated as identical.  Only one reference (with two page numbers)
+will appear --- the first form seen will be used.
+
+\item \IdxTeX\ ignores the grouping commands ``\{'', ``\}'', and ``\$'' when
+placing a term in alphabetical order.  On the other hand, the sequences which
+generate explicit characters (i.e., ``\verb+\{+'', ``\verb+\}+'', and 
+``\verb+\$+'') are handled as if they were the characters themselves --- the
+``\verb+\+'' is ignored for spelling. For example, the term ``\verb~{\bf The \{
+Command}~'' will be alphabetized as if it was spelled ``\verb~The { Command~''.
+
+\item All ``\verb~\~'' characters are ignored.  The term ``\verb~\begin~'' will
+be located in the Index as if it began with the ``b'', not the ``\verb~\~''. 
+
+\end{itemize}
+
+
+\subsubsection{Page Ranges}
+
+\IdxTeX\ supports two types of page ranges --- implicit and
+explicit. 
+
+An implicit page range is one which is discovered during index processing.  For
+example, if it turns out that a particular item is indexed on three consecutive
+pages, then this is an implicit range. 
+
+An explicit page range is one in which you specifically indicate that an item
+being referenced is discussed on a particular page and succeeding pages. 
+
+\paragraph{Implicit Page Ranges}
+
+Suppose \index{#Page Ranges>Implicit} that you index the term ``Command'' a
+number of times within your document and it turns out (when you use \LaTeX\ to
+format it) that the references occur on pages 10, 15, 16, 17, 20, and 21.
+\IdxTeX\ will recognize that there are two implicit page ranges here and will
+display the reference in the index as
+\begin{quote}
+\qquad Command, 10, 15--17, 20--21
+\end{quote}
+This processing occurs automatically --- you need not do anything special to
+get it to occur (except, of course, insert the \verb+\index+ commands where
+they are needed).
+
+In some document styles, chapter-oriented page numbering is used.  From the
+standpoint of \IdxTeX, a chapter oriented page number is any page number which
+consists of a string (which is usually numeric) followed by one or more dashes,
+followed by a page number.  For example, \verb+2--6+ and \verb+Ref--12+ are
+typical chapter oriented page numbers.
+
+Since the \IdxTeX\ program parses and recognizes page numbers in this format
+as well as simple numeric page numbers, it is able to correctly build ranges
+for chapter oriented documents.  For example, if references to ``Command''
+occurred on pages 2--6, 3--7, 3--8, 3--9, and 4--10, then \IdxTeX\ would
+build an index entry of the form
+\begin{quote}
+\qquad Command, 2--6, 3--7 to 3--9, 4--10
+\end{quote}
+
+ If
+one or more of the page number references in a range has a highlight, the range
+is broken up into sub-ranges, so that each sub-range has the same visual
+highlight.  For example, if references to ``Noise'' occurred on pages 20 through
+26, with the references on pages 22 and 23 flagged as underlined and the 
+references on pages 24 and 25 flagged as boldface, then \IdxTeX\ would generate
+an index entry of the form
+\begin{quote}
+\qquad Noise, 20--21, \underline{22--23}, {\bf 24--25}, 26
+\end{quote}
+
+\paragraph{Explicit Page Ranges}
+
+Another form of page range occurs when a single
+reference indicates that a particular topic is covered on a particular page
+and following pages.  In this kind of reference, only one index item is
+needed --- for the first page referenced.  By convention, the letters ``{\sf
+ff}''
+follow that page reference to mean ``and following''.
+
+To specify this type of reference, use the {\tt \#}
+symbol as the first
+character in the index entry (just as if it were a special type of page 
+highlight).  For example, the reference 
+\begin{verbatim}
+      \index{#Page Ranges>Explicit}+
+\end{verbatim}
+will produce 
+\begin{itemize}
+\item{Page Ranges, \mbox{\rm 8\sf ff}}
+\subitem{Explicit, \mbox{\rm 9\sf ff}}
+\end{itemize}
+
+There are two special features of this notation.
+\begin{itemize}
+\item Explicit page ranges take precedence over implicit page ranges.  That is,
+if an explicit range entry occurs within an implicit range, then the whole
+implicit range is condensed into a single explicit reference.  For example,
+if the reference to ``Command'' was made on pages 20 through 25 and the 
+reference on page 23 was explicit, then the output would have the form
+\begin{quote}
+\qquad Command, 20{\sf ff}
+\end{quote}
+rather than
+\begin{quote}
+\qquad Command, 20--22, 23{\sf ff}, 24--25
+\end{quote}
+\item Explicit page ranges take precedence over all page highlighting.  If
+\begin{verbatim}
+    \index{~Command}\index{#Command}
+\end{verbatim}
+occurs, for example, then the italic reference is ignored.
+\end{itemize}
+
+\subsubsection{Cross References}
+
+It\index{#Cross References} is not uncommon in an index to want to reference a
+term in a variety of different ways, so that people will be easily able to find
+the reference they need.  This is often a lot of work, however, because you
+don't normally want to repeat a big list of \verb+\index+ commands for every 
+place where a term is referenced.  Instead, a great deal of effort can be saved
+if you can index the term thoroughly once, and then {\em cross reference\/} it
+in all its synonyms.
+
+For example, suppose you are describing the syntax of a command.  You index
+the various forms of the command under the term ``Syntax''.  However, you also
+want to place an alternate entry in the index under ``Command Syntax'' in case
+people look there first.  Obviously, you'd rather not repeat all of your
+index commands twice to get a complete set of references.  Instead, you'd like
+to {\bf refer} the reader who looks up ``Command Syntax'' to try ``Syntax''
+for the information.
+
+The special symbol ``\verb+&+''is used to indicate the beginning of a cross
+reference, which is used  instead of the page reference in the entry.  In our
+example, entering \verb+\index{Command Syntax&Syntax}+ produces 
+\begin{itemize} 
+\item{Command Syntax, {\em see} }
+\indexindent{\ $\bullet$ {\rm Syntax}} 
+\end{itemize} 
+You can combine cross references with page references. 
+For example, 
+\begin{verbatim} 
+\index{Combining References} 
+\index{Combining References&Cross References} 
+\end{verbatim} 
+contains a page reference and a
+cross reference, as follows 
+\begin{itemize} 
+\item{Combining References, \mbox{\rm 10}; {\em see also} }
+\indexindent{\ $\bullet$ {\rm Cross References}}
+\end{itemize} 
+For convenience, the notation \verb+\index{aaa&bbb>ccc>ddd}+
+generates a cross reference to \verb+bbb+, \verb+ccc+, \verb+ddd+, so you can
+use the same syntax in your cross references as you do in your index terms
+themselves.  Note that the text following the ``\verb+&+'' must obey all of the
+rules associated with index entries in general.
+
+You can include as many cross references as you like.  For example, the
+sequence
+\begin{verbatim}
+    \index{aaa&bbb} 
+    \index{aaa&ccc}  
+     \index{aaa&ddd}
+\end{verbatim}
+is perfectly acceptable, and it will generate the following in the index 
+\begin{quote}
+\hspace*{10pt}aaa, {\em see} \\
+\hspace*{40pt}$\bullet$ bbb \\
+\hspace*{40pt}$\bullet$ ccc \\
+\hspace*{40pt}$\bullet$ ddd
+\end{quote}
+
+Also note that a cross-reference entry does not, in itself, contain any
+page number information.  Therefore, the index entries containing cross
+referencing may appear anywhere.  For example, you could build a basic index
+in your document, then add all the appropriate cross reference entries later,
+all in one place in your text.  Note, however, that cross references in index
+entries are treated like simple text --- \IdxTeX\ does not check to make sure
+that a cross reference entry actually exists.  So be careful when creating them,
+to avoid misleading your reader.
+
+\subsubsection{Master Index Processing}
+
+A Master Index 
+is a document in a set of documents which contains a complete
+index of all terms indexed in {\bf any} of the other volumes of the document
+set.  \IdxTeX\ provides support for the automatic generation of a Master
+Index.
+
+
+\paragraph{Prepare the   Individual Indices}
+The first step is to run all of the other documents in the document set 
+through \LaTeX, so that all of the {\tt .idx} files are generated.  These
+files are used by \IdxTeX\ to format the Master Index.
+
+\paragraph{Build the {\tt .mdx} File}
+\IdxTeX\ must be made aware of which {\tt .idx} files to use to build the
+Master Index.  In addition, it is important to define a {\em label\/} which
+is associated with each volume in the Master Index, so that the reader can
+figure out which volume to look to to find the reference.
+
+Both of these requirements are handled by a new auxiliary file which has the
+extension {\tt \verb+.mdx+}.
+The format of this file is quite simple.  For each volume which you wish to
+be included in the Master Index, insert a line in the {\tt \verb+.mdx+} file of the
+form
+\begin{verbatim}
+    \usefile{label}{idx-file}
+\end{verbatim}
+Here, ``{\em label\/}'' is the label which you wish to be associated with
+the volume in the Master Index and ``{\em idx-file\/}'' is the file 
+specification of the associated {\tt .idx} file which contains the relevant
+information.
+
+For example, suppose you have a document set containing four documents ---
+a User's Guide, a Reference Manual, an Operations Manual, and an Installation
+Guide.  You wish to build an Introduction document which contains a Master
+Index of the document set.  In this case, you might build an {\tt \verb+.mdx+} file
+named {\tt intro.mdx} which contains the following lines
+\begin{verbatim}
+    \usefile{User}{user_guide}
+    \usefile{Ref}{ref_manual}
+    \usefile{Operator}{op_manual}
+    \usefile{Install}{install}
+\end{verbatim}
+This example assumes that the {\tt .idx} file for the User's Guide is
+{\tt user\_guide.idx}, etc.  
+
+\paragraph{Run \IdxTeX}
+  Next, process the {\tt \verb+.mdx+} file with
+\IdxTeX.
+\begin{verbatim}
+    $ idxtex intro /master
+\end{verbatim}
+The \verb+/master+  qualifier indicates that \IdxTeX\ is to prepare a Master Index.
+In this case, the filename parameter of the
+\IdxTeX\ command is the specification of the {\tt .mdx} file.  
+
+\IdxTeX\ will read the specified {\tt .mdx} file and will read and process
+each of the {\tt .idx} files specified in it.  It will generate a master
+index output file which has the same name as the {\tt .mdx} file, but with
+the {\tt .mnd} filetype.  In this example, \IdxTeX\ will generate the file
+{\tt intro.mnd}.
+
+\paragraph{Build the   Master Index} 
+ The final step in building the Master Index is
+to include a \verb+\input+ command to incorporate the {\tt .MND} file into the
+final volume and to run \LaTeX\ on it, just as in the normal index case.
+
+In our example, include the command
+\begin{verbatim}
+    \input{intro.mnd}
+\end{verbatim}
+in the file {\tt intro.tex} and process this file using \LaTeX\ as usual.
+
+The result will be a Master Index, which contains all of the index information
+contained in the volume set, formatted so that users will easily be able to
+find it.  In particular, if a term is referenced in more than one volume of
+the volume set, its references for each volume are clearly separated from each
+other to make it clearer which volumes are associated with which page 
+references.
+
+
+
+
+
+\subsection{\GloTeX}
+\label{se:glotex}
+
+The \GloTeX\ program is used to automate the generation of a Glossary in a
+\LaTeX\ document. 
+It also helps you maintain a database of definitions for inclusion in 
+glossaries.  It supports the use of multiple definition files in a single 
+document, so you can keep definitions for different terms in different places.
+For example, if you are writing about an application program, you might want
+to have one glossary of computer terms and another which describes the
+vocabulary appropriate to that application.
+
+\subsubsection{Command Syntax}
+
+The \GloTeX\ program is run as a foreign DCL command.
+
+The \GloTeX\ program is run using a command line of the form
+
+\begin{verbatim}
+    $ glotex  file [/style={article | report | special}] 
+                                          [/glossary=(def1[,def2[,...]])]
+\end{verbatim}
+
+The ``{\tt file}'' parameter 
+is required.  It is the name of the {\tt .glo} file
+which is \GloTeX 's input file.  If you don't specify an input file, \GloTeX\
+will prompt you for one.  You need not specify the {\tt .glo} file type.  The
+default file specification for the input file is file type {\tt .glo} in your
+current default directory.
+
+\GloTeX\ prints a list of all those labels which are present in your input file,
+but for which it can't find any definition.  This report is output both on your
+terminal and to a Glossary Log File ({\tt .glg} file).
+
+You can use this feature to make a list of terms needing definition.
+
+\begin{itemize}
+\item The {\tt /style} qualifier 
+is optional.  It describes how you wish \GloTeX\ to
+format the glossary it builds.  There are three possibilities: 
+
+\begin{itemize}
+
+\item The {\tt article} keyword is used if your document uses the 
+standard \LaTeX\ {\tt article} document style or any other section oriented
+style.  If you specify this keyword, then the glossary is built as a regular,
+numbered section in your document, and it will appear in your Table of
+Contents, {\tt .toc} file, automatically.
+
+\item  The {\tt report} keyword is used if your document uses the 
+standard \LaTeX\ {\tt report} or {\tt book} document styles or any other
+chapter oriented style.  If you specify this keyword, then the glossary is built
+as an unnumbered chapter in your document, and it will appear in your Table of
+Contents automatically.
+
+\item  The {\tt special} keyword is used if your document uses any of
+the Monsanto CR\&DS document styles ({\tt pamphlet}, {\tt manual}, or 
+{\tt memo}).   The {\tt special} keyword tells \GloTeX\ not to include
+commands in its output file to redefine the commands that format the glossary
+appropriately, since these document styles have defines these commands.
+
+In section-oriented Monsanto CR\&DS document styles, the glossary is formatted
+as a numbered section.  In the chapter-oriented {\tt manual} document style, the
+glossary is an unnumbered chapter, with page numbers of the form 
+``\mbox{Glossary--nn}''.
+
+\end{itemize}
+If you do not include the {\tt /style} qualifier, {\tt special} is assumed.
+
+
+\item The {\tt /glossary} qualifier is used to specify the list of Glossary
+Definition Files which \GloTeX\ will search to find the definitions you wish to
+include. You may include as many files as you wish --- \GloTeX\ will search
+them in the order you specify.  For each file, \GloTeX\ will look for a file
+with the file type {\tt .gdf} in your current default directory, unless you
+override the defaults. 
+
+The {\tt /glossary} qualifier is optional.  However, you must use it unless
+you are using a Monsanto CR\&DS document style, because there is no other way
+for \GloTeX\ to know where your definitions are to be found.\footnote{If you use
+a Monsanto CR\&DS document style, special commands are available to allow you to
+build the glossary definition file specifications into your document. They are
+described later.} 
+\end{itemize}    
+
+\subsubsection{Building a Glossary --- Step by Step}
+
+To automate the generation of a Glossary, here is what you do: 
+
+\begin{itemize}
+
+\item \LaTeX\ creates a list of those terms to be included in the Glossary in a
+file named (in this example) {\tt myfile.glo}. This file is not created
+automatically.  If you want one, you must include the \verb+\makeglossary+
+command in your document. 
+
+The \verb+\makeglossary+ command must be placed in the preamble of your source 
+file --- that is, between the \verb+\documentstyle+ command and the
+\verb+\begin{document}+ command.
+
+ 
+
+\item When you come across a word or phrase in your document which you would
+like to define in the Glossary, insert a \verb+\glossary+ command in your
+source file. The format of this command is  \begin{verbatim} \glossary{label}
+\end{verbatim} where ``label'' is an identifier you assign to this word or
+phrase.  This identifier is used to locate the definition in a Glossary
+Definition File which you wish to be included.  That is, if ``label'' matches
+the identifier belonging to a definition in the database, then that definition
+will be included in the Glossary.
+
+
+\item If the definitions you wish to include are not already in a Glossary
+Definition File, create the appropriate file.  See section \ref{glodeffile}
+for more information.
+
+\item Run \LaTeX\ on your document.  This
+will generate a file {\tt myfile.glo} which contains the collected information
+from the \verb+\glossary+ commands which you placed in your document. 
+
+
+                                                                           
+
+\item Run \GloTeX\ on the {\tt .glo} file, specifying the name of one or more
+Glossary Definition Files from which definitions are to be drawn.  \GloTeX\ will
+produce a file which has the same filename as you \LaTeX\ file, but with the
+file type {\tt .gls}. and contains the glossary information. 
+In our example, we will make several assumptions.  
+\begin{enumerate}
+\item Lets assume that your document {\tt myfile.tex} uses the standard \LaTeX\
+{\tt article} document style. 
+\item Lets also assume that you are using definitions from three sources ---
+a local glossary of application specific terms, a public glossary of 
+biological terms, and a public glossary of computer terms.  The biological
+glossary is assumed to be located in the {\tt genlocdoc:} area, while the
+computer glossary is located in the {\tt crl\_documentation:} area.
+\end{enumerate}
+
+Then, the command line
+\begin{verbatim}
+     $ glotex myfile /style=article -
+     $_    /glossary=(myglos,genlocdoc:biodefs,-
+     $_              crl_documentation:edpdefs)
+\end{verbatim}
+will process the {\tt myfile.glo} file, using the three specified Glossary
+Definition Files, and produce the file {\tt myfile.gls}, formatted appropriately
+for the standard \LaTeX\ {\tt article} document style.
+
+\item Add the command
+\begin{verbatim}
+     \input{myfile.gls}
+\end{verbatim}
+to include the {\tt .gls} file in your document at the appropriate place.  
+
+\item Now you are ready to generate the final document.  To do this, run
+\LaTeX\ on the document twice.  The first time you run \LaTeX, the Glossary
+will be included in your document and a reference will be made to include a
+Table of Contents entry for it.  The second time you run \LaTeX, the Table of
+Contents will be updated to include an entry for the Glossary. 
+\end{itemize}
+
+
+
+\subsubsection{Glossary Definition Files}
+\label{glodeffile}
+
+A Glossary Definition File is a text file which contains one or more
+definitions of words or phrases (an ``entry'') in a special, defined format. 
+The default file type for these files is {\tt .gdf}. 
+
+An entry in the file begins with ``{\tt @entry}'' in lower case as the first
+characters on a new line, and has three parts (two of which are arguments to
+the {tt @entry} command.
+
+The format of an entry in a {\tt .gdf} file is
+\begin{verbatim}
+     @entry{label, item} definition
+     definition (continued...)
+\end{verbatim}
+
+The {\tt @entry} command takes two arguments the {\tt label} and the {\tt
+item}
+strings.
+
+\begin{itemize}
+\item The {\tt label\/} is an identifier used to associate a particular
+definition with a particular \verb+\glossary+ command from the document.  
+
+The label is a {\bf case sensitive} string.  If the label of an entry in the
+{\tt .gdf} file matches a label specified in a \verb+\glossary+ command exactly
+(character for character, including any whitespace characters), then the
+term will be included in the Glossary.
+
+\item The {\tt item\/} is the word or phrase being defined by the entry.
+Visually, the item appears on the left-hand portion of the page, separated from
+the definition.
+
+  The item string is optional --- if it is
+not specified, then the label string will be used as the item string as well.
+\end{itemize}
+
+Glossary entries are formatted in an {\tt infomap} environment,  a special
+variation of the {\tt description} environment.\footnote{If you specify
+\verb+/style=article+ or \verb+/style=report+ in your command line, \GloTeX\ will
+automatically include in its output file the commands needed to define this new
+environment.}  In an {\tt infomap} environment, the item is placed in a
+\verb+\parbox+.  If the item is too long for the space allotted it, it will be
+typeset in multiple lines.  You can often help this process along by careful
+inclusion of \verb+\\+ commands in the item to control where the lines are
+split. 
+
+The default formatting in an item is {\bf boldface}.  Other possibilities are
+available, however.  In this document, for example, the item ``glo File'' was
+entered as ``\verb+{\tt glo} File+''.  Notice that the term appears in the
+correct alphabetical order, in spite of the presence of the special formatting
+characters.
+
+The {\tt definition} is the body of the glossary entry.  It 
+consists of as much normal \LaTeX\ source as you wish --- multiple paragraphs,
+lists, etc., are all supported.  
+
+
+
+
+The {\tt definition} may begin on the {\tt @entry} line, although that is not
+required.  All text is considered as {\tt definition}, beginning with the first
+character after the closing brace of the {\tt @entry} command up to the
+next {\tt @entry} command or the end of the file.
+
+\subsubsection{\LaTeX\ Extensions Which Support Glossaries}
+
+Standard \LaTeX\ document styles define the \verb+\makeglossary+ and
+\verb+\glossary+ commands described above.  
+
+If you use one of the CR\&DS document styles ({\tt pamphlet}, {\tt manual}, or
+{\tt memo}), then additional commands are defined which make glossary generation
+even nicer.
+
+
+The ``{\tt theglossary}'' environment is
+the context for a glossary.  That is, a glossary begins with the
+\verb+\begin{theglossary}+ command and ends with the \verb+\end{theglossary}+
+command.  Each CR\&DS document style defines this environment so that the
+formatting of the Glossary is appropriate to the document.  When you specify
+{\tt /style=article} or {\tt /style=report}, \GloTeX\ includes in the 
+{\tt .gls} file the necessary commands to define this environment for you.
+
+
+The \verb+\glossaryfile+ command is used
+to specify one or more {\tt .gdf} files to be used to locate definitions.
+The format of the command is
+\begin{verbatim}
+     \glossaryfile{filelist}
+\end{verbatim}
+where {\tt filelist} is either a single file specification or a list of file
+specifications, separated by commas.
+
+You may specify more than one \verb+\glossaryfile+ command if you wish.  The
+{\tt .gdf} files you specify are searched in the following order:
+\begin{enumerate}
+\item Any {\tt .gdf} files specified on the command line using the {\tt 
+/glossary} qualifier are searched in the order specified.
+\item Any {\tt .gdf} files specified in the first \verb+\glossaryfile+ command
+in the source document are searched in the order specified.
+\item Addition {\tt .gdf} files are searched in order as specified by additional
+\verb+\glossaryfile+ commands.
+\end{enumerate}
+
+The \verb+\insertglossary+ command is
+used to place a glossary at a particular place in the document.  It is
+equivalent to issuing the \verb+\input{myfile.gls}+ command, where {\tt myfile}
+is the name of the source document.
+
+
+
+\subsection{\protect\SLiTeX}
+\label{se:slitex}
+\SLiTeX\ is a version of \LaTeX\ used to produce monochrome or colour
+slides, or transparencies. Colour is obtained by producing a set of
+black-and-white outputs, one for each colour required. These
+{\em colour layers\/} are copied onto a special sheet that produces
+a transparency of the appropriate colour, and overlaying the
+sheets produces the coloured effect.
+
+The input into \SLiTeX\ consists of a {\em root file\/} and a separate
+{\em slide file\/} both with extension \mbox{\tt .tex}. 
+The root file contains a \hbox{\verb|\documentstyle{slides}|}
+command, instructions about the colours required, the name of
+the slide file, and some commentary.
+(There are no other local styles or options available so far.)
+The slide file contains the text to appear in the slides within
+a series of \mbox{\tt slide} environments.  The \mbox{\tt slide} environment
+specifies the colour of the text.
+
+To run \SLiTeX\ type:
+\begin{verbatim}
+      $ slitex root_file
+\end{verbatim}
+Then proceed with stage 2 of {\em Running the Sample File\/}
+to obtain the printed slides.
+The output produced by \SLiTeX\ is larger than produced by the
+corresponding \LaTeX\ fonts, and it is in a sans-serif typeface.
+
+See Appendix A of the \LaTeX\ manual for full details.
+
+Refer to Section~\ref{se:intro} if you want slide
+files or \hbox{\verb|\input|} files to be in a different directory from
+your root file.
+
+\subsection{Fonts}
+\label{se:fonts}
+Almost all the symbols available in our fonts can be generated by
+ordinary \LaTeX\ commands.  However, there are type sizes not
+obtainable by \LaTeX's size-changing commands with the ordinary
+document styles.  Consult a local \TeX\ expert to find the
+\TeX\ name for such a font.
+
+Tables~\ref{tab:styles} and \ref{tab:fonts} allow you
+to determine if the font for a type style at a particular
+size is pre-loaded, loaded on demand, or unavailable.
+\begin{table}[htb]
+\centering
+\begin{tabular}{l|r|r|r|}
+\multicolumn{1}{l}{size} & 
+\multicolumn{1}{c}{default (10pt)} &
+        \multicolumn{1}{c}{11pt option}  &
+        \multicolumn{1}{c}{12pt option}\\
+\cline{2-4}
+\verb|\tiny|       & 5pt  & 6pt & 6pt\\
+\cline{2-4}
+\verb|\scriptsize| & 7pt  & 8pt & 8pt\\
+\cline{2-4}
+\verb|\footnotesize| & 8pt & 9pt & 10pt\\
+\cline{2-4}
+\verb|\small|      & 9pt  & 10pt & 11pt\\
+\cline{2-4}
+\verb|\normalsize| & 10pt & 11pt & 12pt \\
+\cline{2-4}
+\verb|\large|      & 12pt & 12pt & 14pt \\
+\cline{2-4}
+\verb|\Large|      & 14pt & 14pt & 17pt \\
+\cline{2-4}
+\verb|\LARGE|      & 17pt & 17pt & 20pt\\
+\cline{2-4}
+\verb|\huge|       & 20pt & 20pt & 25pt\\
+\cline{2-4}
+\verb|\Huge|       & 25pt & 25pt & 25pt\\
+\cline{2-4}
+\end{tabular}
+\caption{Type sizes for \LaTeX\ size-changing commands.}\label{tab:styles}
+\end{table}
+
+\begin{table}[htb]
+\centering
+\begin{tabular}{l|c|c|c|c|c|c|}
+\multicolumn{1}{l}{}& 
+\multicolumn{1}{c}{\tt \bs it} &
+\multicolumn{1}{c}{\tt \bs bf} &
+\multicolumn{1}{c}{\tt \bs sl} &
+\multicolumn{1}{c}{\tt \bs sf} &
+\multicolumn{1}{c}{\tt \bs sc} &
+\multicolumn{1}{c}{\tt \bs tt} \\
+\cline{2-7}
+5pt  & D & D & X & X & X & X \\
+\cline{2-7}
+6pt  & X & D & X & X & X & X \\
+\cline{2-7}
+7pt  & P & D & X & X & X & X \\
+\cline{2-7}
+8pt  & P & D & D & D & D & D \\
+\cline{2-7}
+9pt  & P & P & D & D & D & P \\
+\cline{2-7}
+10pt & P & P & P & P & D & P \\
+\cline{2-7}
+11pt & P & P & P & P & D & P \\
+\cline{2-7}
+12pt & P & P & P & P & D & P \\
+\cline{2-7}
+14pt & D & P & D & D & D & D \\
+\cline{2-7}
+17pt & D & P & D & D & D & D \\
+\cline{2-7}
+20pt & D & D & D & D & D & D \\
+\cline{2-7}
+25pt & X & D & X & X & X & X \\
+\cline{2-7}
+\end{tabular}
+\caption{Font classes: P = pre-loaded, D = loaded on demand, 
+         X = unavailable.}\label{tab:fonts}
+\end{table}
+Table~\ref{tab:styles} tells you what size of type is used for each
+\LaTeX\ type-size command in the various document-style options.  For
+example, with the \mbox{\tt 12pt} option, the \hbox{\verb|\large|}
+declaration causes \LaTeX\ to use 14-pt type.  Table~\ref{tab:fonts}
+tells, for every type size, to which class of fonts each type style
+belongs.  For example, in 14-pt type, \verb|\bf| uses a pre-loaded
+font and the other five type-style commands use load-on-demand fonts.
+Roman (\verb|\rm|) and math italic (\verb|\mit|) fonts are all
+pre-loaded; the \hbox{\verb|\em|} declaration uses either italic
+(\verb|\it|) or roman.
+
+
+
+\subsubsection{Font Substitution}
+\label{se:fontsub}
+
+If a font cannot be found at the required magnification, the DVI translators will by default
+attempt to use the closest magnification that they can find.
+However it is also possible to substitute another font or magnification under 
+the control of a font substitution file. 
+
+If the current DVI file is {\tt foo.dvi}, the files {\tt foo.sub},
+{\tt texfonts.sub}, and {\tt TEX\_INPUTS:texfonts.sub} will be tried in that
+order.
+The first two will be found on the current directory, and the last is the
+system default.
+This gives the option of document-specific, user-specific, and system-specific
+substitutions.
+
+Font substitution lines have the form:
+\begin{verbatim}
+      % comment
+      oldname.oldmag  ->      subname.submag  % comment
+      oldname oldmag  ->      subname submag  % comment
+      oldname         ->      subname         % comment
+\end{verbatim}
+Examples are:
+\begin{verbatim}
+      % These provide replacements for some LaTeX invisible fonts:
+      icmr10.1500     ->      cmr10.1500      % comment
+      icmr10 1500     ->      cmr10 1500      % comment
+      icmssb8         ->      cmssb8          % comment
+\end{verbatim}
+The first two forms request substitution of a particular font and
+magnification.
+The third form substitutes an entire font family; the closest available
+magnification to the required one will be used.
+Any dots in the non-comment portion will be converted to spaces, and
+therefore, cannot be part of a name field.
+
+The first matching substitution will be selected, so magnification-specific
+substitutions should be given first, before family substitutions.
+
+Comments are introduced by percent and continue to end-of-line,
+just as for \TeX. One whitespace character is equivalent to any amount of 
+whitespace. Whitespace and comments are optional.
+                                     
+
+\subsection{Special Versions}
+\label{se:special}
+
+Several foreign-language and other special versions of \LaTeX\
+are available. Your system manager should be able to 
+tell you if any foreign language version of \LaTeX\ is available on 
+your system. In the case where you need a foreign language or special version 
+of \LaTeX\ you can contact V. Laspias (MAVAD::VL) who should be able to tell 
+you if a version can be created, provided there is sufficient demand.
+
+\subsection{Running \mbox{\tt lablst.tex} and \mbox{\tt idx.tex}}
+\label{se:lablstidx}
+You can obtain a list of the cross-referencing keys, the pages and sections
+that appear in your document. To do this type:
+\begin{verbatim}
+      $ latex tex_inputs:lablst
+\end{verbatim}
+and you will be prompted for the name of your input file, which should be
+typed without an extension, and for the name of the main document style
+({\em e.g.} \mbox{\tt article}), used by that file, excluding options. 
+If you have your own document style you will need a 10-pt version, though
+it could be just a copy of your 12pt. \mbox{\tt lablst} first creates a file
+of \LaTeX\ commands to produce the list of keys within a file called
+\mbox{\tt lablst.lab} in your current directory.  Then it uses this file to
+produce a \mbox{\tt lablst.dvi} which can be processed as in Section
+\ref{se:example} to produce a typeset listing. 
+
+The index entries on an \mbox{\tt .idx} file are printed by running \LaTeX\
+on the file \mbox{\tt idx.tex}, which is done by typing
+\begin{verbatim}
+      $ latex tex_inputs.idx
+\end{verbatim}
+\LaTeX\ will ask for the name of the \mbox{\tt .idx} file, which is typed
+without an extension.
+
+
+\subsection{Miscellaneous}
+\label{se:misc}
+
+\section{Acknowledgements}
+
+Three old SUNs have been withdrawn and their contents merged with this
+document. They are:
+\begin{itemize}
+\item SUN/22 ``Hindlegs --- Lineprinter output from \TeX\ files''
+\item SUN/34 ``\TeX\ DVI file translators''
+\item SUN/77 ``DVIview --- DVI file previewers''
+\end{itemize}
+
+Thanks are due to Dave~Terrett, Alan~Lotts, Mike~Lawden, Martin Bly and 
+Malcolm Curry authors of the above documents, from which sections of this
+User Note are formed.
+
+\section{Trademarks}
+\begin{itemize}
+\item \TeX\ and \MF\ are Trademarks of the American Mathematical Society,
+\item \PS\ and TranScript are trademarks of Adobe Systems, Inc.,
+\item UNIX is a trademark of Bell Laboratories,
+\item SUN is a trademark of Sun Microsystems Ltd,
+\item VAX/VMS, DECstation and VAXstation are trademarks of Digital Equipment 
+Corporation.
+\end{itemize}
+
+
+\begin{thebibliography}{99}
+\addcontentsline{toc}{section}{References}
+
+\bibitem{latexbook} Leslie Lamport {\em \LaTeX\ A Document Preparation System
+--- User's Guide and  Reference Manual\/} Addison-Wesley Publishing Company,
+ISBN~0-202-15790-X 
+\bibitem{texbook} Donald Knuth {\em The \TeX book\/} Addison-Wesley Publishing
+Company, ISBN~0-201-13448-9
+\bibitem{sun12} M. Lawden {\em \LaTeX\ Cook-Book''\/} Starlink User Note 12,
+Starlink Project. 
+\bibitem{sun93} J. Murray {\em \TeX\ --- A Superior document preparation 
+system\/}, Starlink User Note 93, Starling Project. 
+\bibitem{sun176} V. Laspias {\em DVIPS: A \TeX\ driver\/}, Starlink User Note
+176, Starlink Project.
+\bibitem{etr791} F Teagle {\em The \LaTeX\ Cookbook\/} 
+\bibitem{sgp28} M. Lawden  {\em Starlink Documentation Production\/} Starlink
+General Paper 28, Starlink Project.
+\end{thebibliography}
+
+\end{document}
+
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXxx
+
+
+\subsection{DVIDIS --- Vaxstations with VWS}
+\label{se:dvidis}
+
+The command:
+\begin{verbatim}
+      $ DVIDIS <filename>
+\end{verbatim}
+will create a special, nearly full screen window on the VAXstation, read the
+beginning of {\tt <filename>.dvi} and display the top of the first page in 
+the window. The program then waits for further commands to be entered via the
+keyboard of the VAXstation.
+
+\subsubsection{Commands}
+
+While executing, DVIDIS will accept commands from both the keypad and the
+normal keyboard.
+Most of the keypad commands are simple key hits while
+the keyboard commands are single character followed by a {\tt<RETURN>}.
+The Find key causes the command window to appear, overlaying part of the
+special window displaying the output.
+This window also notes all commands
+used and other information such as the physical page selected as
+different parts of the file are displayed.
+
+The full command set and key identities can be viewed by hitting the VAXstation
+{\tt<HELP>} key but the following will give a guide to the commands available.
+
+\subsubsection{Keypad Commands}
+
+\begin{list}%
+{}%
+{\settowidth{\labelwidth}{\bf Select Prev Screen x}
+\settowidth{\labelsep}{aaaa}
+\settowidth{\rightmargin}{aaaaaaaaaa}
+\addtolength{\labelwidth}{\labelsep}
+\addtolength{\labelwidth}{\labelsep}
+\setlength{\leftmargin}{\labelwidth}}
+%
+\item [{\bf Help}] Open command window and show Help.
+This is the VAXstation help key, not the editing keypad help key
+\item [{\bf Find}] Show command window
+\item [{\bf Remove}] Hide command window
+\item [{\bf Next Screen}] move on to next screen ({\em not} next \TeX\ page)
+\item [{\bf Prev Screen}] move back to previous screen ({\em not} previous 
+ \TeX\ page)
+\item [{\bf Select}] followed by {\tt\verb@{+-}@} {\it nnn}{\tt<RETURN>}
+will jump forward or back {\it nnn} pages.
+\item [{\bf Select Next Screen}] (i.e. Select key then Next Screen key) jump
+ to next \TeX\ page
+\item [{\bf Select Prev Screen}] jump to previous \TeX\ page
+\item [others] Various keypad keys are defined to enable look Left, Right, Up,
+Down, Paper Top and Paper Bottom
+\end{list}
+
+\subsubsection{Keyboard Commands}
+
+Although grouped together here (and in the help display), all these are
+single character commands which should be followed by {\tt<RETURN>}
+
+\begin{list}%
+{}%
+{\settowidth{\labelwidth}{\tt eq {\em control} Z}
+\settowidth{\labelsep}{aaaa}
+\addtolength{\labelwidth}{\labelsep}
+\setlength{\leftmargin}{\labelwidth}}
+%
+\item[{\tt h}]  displays help information
+\item[{\tt lrup LRUP}] look left, right, up down -- upper case for larger steps
+\item[{\tt v\symbol{94}}] page bottom or top (at current horizontal position)
+\item[{\tt np}]  next or previous page (not screen)
+\item[{\tt bct}]  page bottom left, centre or top left
+\item[{\tt io}]  Zoom in or out by one zoom step
+\item[{\tt 1Ww}]  Set to no zoom, zoom out three steps, zoom in two steps
+\item[{\tt eq {\em control} Z}] exit from DVIDIS
+\end{list}
+
+\subsubsection{Options}
+
+Various qualifiers are available as DVIDIS is started. They cannot be
+changed while the programme is executing. 
+All options are of the form {\tt-l}
+where {\tt l} is any single letter, with the single exception of 
+{\tt-verbose} (for historical reasons).
+Some are followed -- after a space -- by one or a pair of
+numeric arguments; the {\tt-s} command must be followed by a paper size
+specification.
+
+For example:
+\begin{verbatim}
+      $ DVIDIS -w -p 2 4 <filename> 
+\end{verbatim}
+means {\sl display pages 2 to 4 of }{\tt <filename>.dvi}{\sl\/ in 
+{\bf wide} mode.}
+
+The following qualifiers are recognized:
+
+\begin{list}%
+{}%
+{\settowidth{\labelwidth}{\tt-verbose a}
+\settowidth{\labelsep}{aaaa}
+\settowidth{\rightmargin}{aaa}
+\addtolength{\labelwidth}{\labelsep}
+\setlength{\leftmargin}{\labelwidth}}
+%
+\item[\tt-c]  The fonts that DVIDIS uses are meant for a 300 dpi printer.
+A VAXstation display has about 75 dpi.
+As a result, if you display the glyphs from these fonts at a 1-1 pixel-to-pixel
+mapping, they are about 4 times as large as they would be on the page, and only
+about 1/9 of the page is visible at a time.
+Normally, DVIDIS compresses all fonts by a 2-to-1 factor.
+The fonts are still readable, but you can now get most of the width of a page --
+all with any reasonable margins and over half the height on the screen. 
+Specifying {\tt-c} turns off this compression; it's useful mainly for
+looking at the glyphs, not the text. 
+\item[\tt-w] Specifies a 4-to-1 glyph compression factor.
+This allows you to see how a whole page looks, but unfortunately it's rather
+hard to read the resulting text.
+\item[\tt-m]
+Tells DVIDIS to try to use smaller fonts, rather than compressing
+larger ones.
+This only works if you actually {\it have} the small fonts on your system.
+When it works, it improves the appearance of individual
+characters, although it often makes lines come out with slightly
+different lengths than they should.
+{\tt-m} is especially useful in conjunction with {\tt-w}.
+{\tt-m} in conjunction with {\tt-c} is meaningless.
+\item[\tt-s ss] Set the paper size.
+This determines what size paper the program assumes you are printing on.
+The default is {\bf letter}, which is 8.5 x 11 inches -- this is not quite A4.
+The argument is the name of a paper size; type DVIDIS {\tt-s ?} for a list
+of possible values.
+
+The paper size controls where DVIDIS places a visible gray border,
+and when it tells you that characters have run off the page. 
+It always displays the characters, however.
+
+Paper size {\bf huge} is meant for special purposes; using it will make
+many of the commands you can type to DVIDIS while it is running work
+in strange ways.
+You should generally avoid using size huge.
+
+\item[\tt-verbose]
+Makes the program talkative.
+This is mainly useful for debugging, but since it displays all the font files
+it opens, successfully or not, it can be used to determine which files are
+needed.
+The needed files can be created if they don't already exist.
+They can also be put on your workstation's local disk to improve performance.
+
+\end{list}
+
+The rest of the options are rarely used:
+
+\begin{list}%
+{}%
+{\settowidth{\labelwidth}{\tt-verbose a}
+\settowidth{\labelsep}{aaaa}
+\settowidth{\rightmargin}{aaa}
+\addtolength{\labelwidth}{\labelsep}
+\setlength{\leftmargin}{\labelwidth}}
+%
+
+\item[{\tt-v \#}] vertical margin.
+The argument {\tt\#} is the margin, in milli-inches.
+Default is 1000 milli-inches, which is the same default used by many common
+DVI printing programs.
+If you find a lot of {\sl off-screen glyph}\/ errors, and you have the paper
+size set correctly, try changing these parameters.
+(Besides 1000, the second most common value expected is 0 for both margins.)
+
+Note that the default corresponds to the current TeX standard.
+If you find you have to use some other value to make your output look
+right, some other piece of software you are running is obsolete.
+
+\item[\tt-h \#] Set the horizontal margin.
+The default is 1000 milli-inches.
+
+
+\item[\tt-p \#$_1$ \#$_2$] Limits the display to pages {\tt\#$_1$} to
+ {\tt\#$_2$} inclusive.
+You can only specify one page range at a time, but you can specify multiple
+{\tt-p} options, each specifying a page range.
+When you specify page ranges, DVIDIS will only {\sl see}\/ pages within the
+ranges given.
+Nothing you can do while the program is running will let you display any page
+not within any page range -- DVIDIS will simply skip past the pages.
+
+\item[\tt-d] Debug.  Generates a lot of output that's useful only to developers.
+\end{list}
+
+\subsubsection{Restrictions}
+
+If the original \TeX\ run specified a magnification other than 1000, the
+spacing will be incorrect.
+The only current work--around is to re-run \TeX\ without the magnification.
+
+Graphics cannot be included using \verb+\special+.
+
+For corrections to be viewed, a new .dvi file must be generated.
+
+\subsubsection{Hints}
+
+DVIDIS constructs a complete page whenever it enters a \TeX\/ page.
+This makes moves about a page fast but does involve a delay on page start.
+There may be no response for several seconds after the display window has
+been completed.
+It also stores font characters in memory as it uses them and so becomes
+faster as more of the document is examined.
+
+It is normally very useful to have an editing window available while previewing.
+This is most easily achieved by creating a second window before starting
+DVIDIS.
+The VAXstation CYCLE key can then be used to move between the editing
+window and the DVIDIS command window.
+However, to get back to the normal DVIDIS display, leave the mouse cursor in
+an area of the DVIDIS special window which is not overlayed by the editing
+window and simply use the mouse button to pop it to the front.
+
+When leaving the editing window, remember that you need to CYCLE back to the
+DVIDIS command window before entering any DVIDIS commands -- simply popping
+the DVIDIS display window is not sufficient !
+
+

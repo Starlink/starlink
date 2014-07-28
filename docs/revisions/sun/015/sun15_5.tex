@@ -1,0 +1,800 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {15.5}
+\newcommand{\stardocauthors}   {D L Terrett}
+\newcommand{\stardocdate}      {23 September 1993}
+\newcommand{\stardoctitle}     {PGPLOT --- Graphics Subroutine Library}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+%  \setlength{\parskip}{0mm}
+%  \tableofcontents
+%  \setlength{\parskip}{\medskipamount}
+%  \markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\section{Introduction}
+
+PGPLOT is a high level graphics package for plotting X {\em versus} Y plots,
+functions, histograms, bar charts, contour maps and grey-scale images. Complete
+diagrams can be produced with a minimal number of subroutine calls, but control
+over colour, lines-style, character font, etc.\ is available if required. The
+package was written (by Dr T J Pearson of the Caltech astronomy department)
+with astronomical applications in mind and has become a {\it de facto} standard
+for graphics in astronomy world wide.
+
+The package exists in two version: the original version which uses a low
+level graphics package known as GRPCKG which was also written at Caltech,
+and a version developed by Starlink, in collaboration with Dr Pearson, which
+uses GKS. The two versions have identical subroutine interfaces and
+applications can be moved from one version to the other simply by re-linking.
+It is the GKS version that is distributed and supported by Starlink.
+
+The current release is based on PGPLOT Version 4.9G.
+
+The main source of information on using PGPLOT is the PGPLOT manual obtainable
+from your site manager or the Starlink software librarian, which describes the
+original GRPCKG version. The majority of the manual applies equally to both
+versions but when using the GKS version the following sections should be
+ignored and the information in this note used instead:
+\begin{itemize}
+\item Section 1.3 --- Linking with PGPLOT
+\item Section 1.4 --- Graphics Devices
+\item Section 2.11 --- Compiling and Running the Program
+\item Appendix C --- Installation Instructions
+\item Appendix D --- Supported Devices
+\item Appendix E --- Writing a Device Handler
+\end{itemize}
+
+\section{Using the GKS version}
+
+There are two ways in which the GKS version of PGPLOT can be used:
+     
+\begin{enumerate}
+\item As a self contained graphics package where {\em all} graphics, including
+opening and closing the workstation, is done with PGPLOT. Programs written in
+this way can be run with other implementations of PGPLOT. Such programs
+are linked with the command:
+\begin{quote}\tt
+\% f77 {\em prog}.f -L/star/lib `pgplot\_link`
+\end{quote}
+on UNIX, or:
+\begin{quote}\tt
+\$ LINK {\em prog},PGPLOT\_DIR:PGPLOT\_LINK/OPT
+\end{quote}
+on VMS.
+
+\item To plot a picture in the current viewport of an already open GKS
+workstation (see section~\ref{viewport}). VMS Programs using PGPLOT in this 
+way must
+be linked with the PGPLOT object module library ({\tt PGPLOT\_DIR:GRPCKG/LIB})
+and the following:
+\begin{quote}\tt
+GNS\_DIR:GNS/LIB, PSX\_DIR:PSX\_LINK/OPT, -\\
+CNF\_DIR:CNF\_LINK/OPT, GKS\_DIR:GKSLINK/OPT 
+\end{quote}
+\end{enumerate}
+
+\section{PGPLOT on Starlink}
+
+On Starlink systems, PGPLOT programs will use the GKS version of the library by
+default but the GRPCKG version may also have been installed, either because it
+supports some graphics device that the GKS version does not, or because it is
+needed by software which contains calls to obsolete GRPCKG routines. On VMS the
+version being used both when linking and running a program depends on the
+definition of the logical names GRPSHR or PGPLOT\_IMAGE depending on exactly how
+the program was linked. For the GKS version the definitions
+will be:
+\begin{quote}\tt
+"GRPSHR" = "PGPLOT\_DIR:GRPSHR.EXE"\\
+"PGPLOT\_IMAGE" = "PGPLOT\_DIR:GRPSHR.EXE"
+\end{quote}
+To use the GRPCKG version the logical name must be re-defined to point the
+directory containing the GRPCKG library (ask your system manager if you
+don't know where this is).
+
+\section{Graphics Devices}\label{GraphicsDevices}
+
+Any graphics device supported by GKS can be used with PGPLOT and device
+names are translated using the graphics name service described in SUN/57
+section 2. Device names containing a `{\tt /}' character (such as UNIX file
+names) must be surrounded by quote (`{\tt"}') characters.
+
+If a question mark is typed in response to the prompt from {\tt PGBEG}, a
+list of those workstation names defined on your system will be listed on the
+terminal. 
+
+On some hard copy devices the output from a PGPLOT program is a file and
+some further action (such as printing the file) is required to produce a plot.
+If you are unfamiliar with a particular device, consult SUN/83.
+
+If one of the metafile workstations is selected (not available on VMS), 
+the metafile can be tailored
+for a particular real workstation type by appending {\tt /TARGET={\em 
+workstation}} to the device specification. The default target is the
+monochrome A4 Postscript workstation. The resulting metafile can be played
+back on any workstation but will be tailored with respect to such things as
+resolution, number of colour indices, etc. for the selected target.
+
+The device name syntax described in the PGPLOT manual is also
+supported; when using this form of device name, the device type is specified
+using a GNS workstation name.
+
+The PGPLOT cursor routines cannot be implemented on devices which do not have a
+keyboard. For all such devices Starlink has implemented a GKS workstation which
+combines the graphics device with a VT style terminal and these
+workstations should be used instead. The relevant devices and the workstation
+types of the combination workstations are listed in Table~\ref{vt-dev}.
+\begin{table}
+\caption{GKS workstation types}\label{vt-dev}
+\[\begin{tabular}{|l|c|c|} \hline
+&display only &display $+$ terminal \\
+\hline
+Ikon & 3200 & 3202 \\
+Ikon Overlay & 3201 & 3203 \\
+ARGS & 160 & 162 \\
+ARGS Overlay & 161 &  163 \\
+\hline \end{tabular}\]
+\end{table}
+
+\section{Using PGPLOT with ADAM}
+
+To link an ADAM program with PGPLOT add:
+\begin{quote}\tt
+	`pgplot\_link\_adam`
+\end{quote}
+on UNIX  or:
+\begin{quote}\tt
+	PGPLOT\_DIR:PGPLOT\_LINK\_ADAM/OPT 
+\end{quote}
+on VMS to the {\tt alink} command.
+
+{\tt PGBEG} (or {\tt PGBEG}) should not be called with a '?' as the device
+name as this causes it to prompt the user for a device name
+bypassing the ADAM message system.
+
+The {\tt PGPAGE} (or {\tt PGPAPER}) routines does not behave as expected
+when called from an ADAM task. {\tt PGPAGE} does not detect that
+the task is an interactive job and so clears the screen without
+prompting on the terminal
+
+\section{Plotting in the current viewport}\label{viewport}
+
+PGPLOT can be used to plot a picture in the current viewport on an already open
+GKS workstation. When used in this way, the second argument to {\tt PGBEG}
+(normally the workstation name) is a GKS workstation identifier (encoded as a
+character string). PGPLOT then behaves as if the region of the display surface
+defined by the current viewport is a complete workstation. When {\tt PGEND} is
+called the workstation is not closed but the state of GKS is restored to what
+it was at the time that {\tt PGBEG} was called. 
+
+PGPLOT assumes that it has exclusive control over the GKS and so the only
+graphics calls allowed between {\tt PGBEG} and {\tt PGEND} are PGPLOT
+routines and GKS inquiry routines. 
+
+The following simple example is a subroutine that uses PGPLOT to draw an X, Y
+plot in an SGS zone.
+\begin{small}
+\begin{verbatim}
+            SUBROUTINE XYPLOT (IZONE, X, Y, N, XLO, XHI, YLO, YHI, ISTAT)    
+      *++                                                                    
+      *                                                                      
+      *   XYPLOT   Draw X,Y plot in an SGS zone                              
+      *                                                                      
+      *   Description:                                                       
+      *                                                                      
+      *      Uses PGPLOT to draw an X,Y plot of the real arrays X & Y in the 
+      *      region of the display surface defined be the specified SGS zone 
+      *                                                                      
+      *   Input arguments:                                                   
+      *                                                                      
+      *      IZONE    INTEGER         SGS zone identifier                    
+      *      X        REAL(N)         X values of data points                
+      *      Y        REAL(N)         Y   "    "    "    "                   
+      *      N        INTEGER         Number of data points                  
+      *      XLO      REAL            Lower X axis limit                     
+      *      XHI      REAL            Higher X  "    "                       
+      *      YLO      REAL            Lower Y  "     "                       
+      *      YHI      REAL            Higher Y  "    "                       
+      *                                                                      
+      *   Output arguments:                                                  
+      *                                                                      
+      *      ISTAT    INTEGER         SGS status                             
+      *                                                                      
+      *   Side effects:                                                      
+      *                                                                      
+      *      The specified SGS zone is selected.                             
+      *++                                                                    
+            IMPLICIT NONE                                                    
+            INTEGER  IZONE, N, ISTAT                                         
+            REAL     X(N), Y(N), XLO, XHI, YLO, YHI                          
+                                                                             
+            CHARACTER*10 WKID                                                
+            INTEGER IWKID                                                    
+                                                                             
+                                                                             
+      *  Select the specified SGS zone                                       
+            CALL SGS_SELZ(IZONE, ISTAT)                                      
+            IF (ISTAT.EQ.0) THEN                                             
+                                                                             
+      *     Inquire the GKS workstation identifier of the current zone       
+               CALL SGS_ICURW(IWKID)                                         
+                                                                             
+      *     Encode workstation id as a character string                      
+               WRITE(UNIT=WKID, FMT='(I10)') IWKID                           
+                                                                             
+      *     Open PGPLOT                                                      
+               CALL PGBEG(0, WKID, 1, 1)                                     
+                                                                             
+      *     Define axis limits                                               
+               CALL PGENV(XLO, XHI, YLO, YHI, 0, 0)                          
+                                                                             
+      *     Plot the data                                                    
+               CALL PGPT(N, X, Y, 2)                                         
+                                                                             
+      *     Close down PGPLOT                                                
+               CALL PGEND                                                    
+            END IF                                                           
+            END                                                              
+\end{verbatim}                                                         
+\end{small}
+
+Because other plotting packages may have plotted on the same physical device,
+there are some restrictions when using PGPLOT in this way:
+
+\begin{itemize}
+\item {\tt PGSIZE} cannot be used.
+
+\item {\tt PGPAGE} will never clear the screen. If the display surface has
+been divided into sub-pictures {\tt PGPAGE} will move to the next sub-picture
+in the usual way.
+
+\item On devices with fixed colour tables, the default PGPLOT colour table
+will not be set up by {\tt PGBEG} unless the display surface is empty.
+
+\end{itemize}
+
+\section{Example Programs}
+
+The directory {\tt /star/starlink/lib/pgplot/examples} ({\tt 
+[STARLINK.LIB.PGPLOT.EXAMPLES]} on VMS) contains the source of a number 
+of example programs which demonstrate most of the features of PGPLOT. 
+On UNIX they can be run with the command:
+\begin{quote}\tt
+/star/bin/examples/pgplot/pgdemo{\em n}
+\end{quote}
+where {\em n} is between 1 and 9 provided that they have been installed.
+(They may not have been in order to save disk space).
+
+On VMS they can be run
+with the command:
+\begin{quote}\tt
+\$ RUN STARDISK:[STARLINK.LIB.PGPLOT.EXAMPLES]PGDEMO{\em n}
+\end{quote}
+
+\section{Other Differences}
+In general the two versions produce identical results when run on the same
+device but the following differences should be noted:
+\begin{itemize}
+\item The GKS version of {\tt PGPAGE} cannot be used to make the display surface
+larger than the default size provided by {\tt PGBEG}.
+\item The GKS version of {\tt PGBEG} clears the display surface immediately
+instead of waiting until the first vector is plotted.
+\end{itemize}
+
+\section{Support}
+
+PGPLOT is Starlink supported software and bugs should be reported through the
+usual channels and not by contacting Dr Pearson directly. Problems with the GKS
+specific code will be dealt with by Starlink but all changes to the code which
+is common to the two versions of PGPLOT must be made in collaboration with Dr
+Pearson.
+
+The mixing of calls to PGPLOT and GKS routines is not supported except as
+described in section~\ref{viewport}, and neither
+version supports the calling of GRPCKG routines directly. Existing programs
+that call GRPCKG should be re-written to call the equivalent PGPLOT routines.
+
+\section{Restrictions}
+
+The current version contains the following bugs and restrictions. They will
+be removed in a future release.
+\begin{itemize}
+
+\item On VMS The metafile workstation cannot be used. 
+
+\item {\tt PGBOX} (and {\tt PGENV}): If the axis range is small compared with 
+the absolute values of the endpoints, an integer overflow can occur.
+
+\item {\tt PGBOX} (and {\tt PGENV}): Logarithmic axes are not labelled 
+very well when they span only one or two decades; only the decade markers 
+are labelled.
+
+\item The environment variable {\tt PLOT\_IDENT} puts the user name on only 
+the last page; it should put it on all pages.
+
+\end{itemize}
+
+\section{New Features}
+The following new features are introduced with this release:
+
+\begin{itemize}
+\item New routines
+
+The following new routines have been introduced with since the PGPLOT manual
+was last revised:
+
+\[\begin{tabular}{llllll}
+PGARRO &PGCIRC &PGERRB &PGPIXL &PGPNTS &PGQAH \\
+PGQCS &PGQPOS &PGQVSZ &PGSAH &PGSAVE &PGSCRN \\
+PGUNSA &PGVECT &PGWEDG
+\end{tabular}\]
+
+A new manual describing the new routines will be available
+in due course; descriptions for the new routines from Appendix A
+of the new manual are attached.
+
+\item The background and foreground colours (colour indexes 0 and 1) can
+be set by defining the environment variables {\tt PGPLOT\_BACKGROUND} and
+{\tt PGPLOT\_FOREGROUND} (logical names on VMS) to be one of the colour names
+accepted by {\tt PGSCRN}.
+
+\item On workstations with high quality thick lines (such as PostScript), 
+thick lines are drawn by the workstation which reduces the size of plot files.
+
+\item On monochrome workstations, lines and characters are always drawn with
+either color index 1 or 0. Provided that the colours of colour index 1 are 
+not changed from the defaults this
+avoids having lines and characters ``dithered'' to simulate grey levels
+and being almost invisible on laser printers.
+
+\item Using {\tt /APPEND} when opening a workstation that does not support
+being opened without clearing the display surface no longer generates an
+error message.
+
+\item The following bugs have been fixed:
+\begin{itemize}
+\item {\tt PGQCOL} now returns the correct value for the minimum available
+colour when {\tt /APPEND} is used when opening the workstation.
+
+\item Device names containing a {\tt /} can now be specified.
+
+\end{itemize}
+\item Old PGPLOT programs may use subroutine names longer than six characters. These
+names have been replaced by name that conform to the Fortran 77 standard but the
+old names are still available. It is advisable to change the names as
+given in the following table.
+
+\[\begin{tabular}{|l|l||l|l|}\hline
+New Name &Old Name& New Name &Old Name \\\hline\hline
+PGPAGE &PGPAPER &PGPT &PGPOINT \\
+PGBEG  &PGBEGIN &PGPTXT &PGPTEXT \\
+PGCURS &PGCURSE &PGSVP &PGVPORT \\
+PGLAB  &PGLABEL &PGVSIZ &PGVSIZE \\
+PGMTXT &PGMTEXT &PGVSTD &PGVSTAND \\
+PGNCUR &PGNCURSE &PGSWIN &PGWINDOW \\
+PGPAP  &PGPAPER & & \\\hline
+\end{tabular}\]
+
+\end{itemize}
+\newpage
+\begin{small}
+\begin{verbatim}
+PGARRO -- draw an arrow
+
+      SUBROUTINE PGARRO (X1, Y1, X2, Y2)
+      REAL X1, Y1, X2, Y2
+
+Draw an arrow from the point with world-coordinates (X1,Y1) to
+(X2,Y2). The size of the arrowhead at (X2,Y2) is determined by
+the current character size set by routine PGSCH. The default size
+is 1/40th of the smaller of the width or height of the view surface.
+The appearance of the arrowhead (shape and solid or open) is
+controlled by routine PGSAH.
+
+Arguments:
+ X1, Y1 (input)  : world coordinates of the tail of the arrow.
+ X2, Y2 (input)  : world coordinates of the head of the arrow.
+
+
+PGCIRC -- draw a filled or outline circle
+
+      SUBROUTINE PGCIRC (XCENT, YCENT, RADIUS)
+      REAL XCENT, YCENT, RADIUS
+
+Draw a circle. The action of this routine depends
+on the setting of the Fill-Area Style attribute. If Fill-Area Style
+is SOLID (the default), the interior of the circle is solid-filled
+using the current Color Index. If Fill-Area Style is HOLLOW, the
+outline of the circle is drawn using the current line attributes
+(color index, line-style, and line-width).
+
+Arguments:
+ XCENT  (input)  : world x-coordinate of the center of the circle.
+ YCENT  (input)  : world y-coordinate of the center of the circle.
+ RADIUS (input)  : radius of circle (world coordinates).
+
+
+PGERRB -- horizontal error bar
+
+      SUBROUTINE PGERRB (DIR, N, X, Y, E, T)
+      INTEGER DIR, N
+      REAL X(*), Y(*), E(*)
+      REAL T
+ 
+Plot error bars in the direction specified by DIR.
+This routine draws an error bar only; to mark the data point at
+the start of the error bar, an additional call to PGPT is required.
+ 
+Arguments:
+ DIR    (input)  : direction to plot the error bar relative to
+                   the data point.  DIR is 1 for +X; 2 for +Y;
+                   3 for -X; and 4 for -Y;
+ N      (input)  : number of error bars to plot.
+ X      (input)  : world x-coordinates of the data.
+ Y      (input)  : world y-coordinates of the data.
+ E      (input)  : value of error bar distance to be added to the
+                   data position in world coordinates.
+ T      (input)  : length of terminals to be drawn at the ends
+                   of the error bar, as a multiple of the default
+                   length; if T = 0.0, no terminals will be drawn.
+ 
+Note: the dimension of arrays X, Y, and E must be greater
+than or equal to N. If N is 1, X, Y, and E may be scalar
+variables, or expressions.
+
+ 
+PGPIXL -- draw pixels
+
+      SUBROUTINE PGPIXL (IA, IDIM, JDIM, I1, I2, J1, J2, 
+     1                   X1, X2, Y1, Y2)
+      INTEGER IDIM, JDIM, I1, I2, J1, J2
+      INTEGER IA(IDIM,JDIM)
+      REAL    X1, X2, Y1, Y2
+
+Draw lots of solid-filled (tiny) rectangles alligned with the
+coordinate axes. Best performance is achieved when output is
+directed to a pixel-oriented device and the rectangles coincide
+with the pixels on the device. In other cases, pixel output is
+emulated.
+
+The subsection of the array IA defined by indices (I1:I2, J1:J2)
+is mapped onto world-coordinate rectangle defined by X1, X2, Y1
+and Y2. This rectangle is divided int (I2 - I1 + 1) * (J2 - J1 + 1)
+small rectangles. Each of these small rectangles is solid-filled
+with the color index specified by the corresponding element of 
+IA.
+
+On most devices, the output region is "opaque", i.e., it obscures
+all graphical elements previously drawn in the region. But on
+devices that do not have erase capability, the background shade
+is "transparent" and allows previously-drawn graphics to show
+through.
+
+Arguments:
+ IA     (input)  : the array to be plotted.
+ IDIM   (input)  : the first dimension of array A.
+ JDIM   (input)  : the second dimension of array A.
+ I1, I2 (input)  : the inclusive range of the first index
+                   (I) to be plotted.
+ J1, J2 (input)  : the inclusive range of the second
+                   index (J) to be plotted.
+ X1, Y1 (input)  : world coordinates of one corner of the output
+                   region
+ X2, Y2 (input)  : world coordinates of the opposite corner of the
+                   output region
+
+
+PGPNTS -- draw one or more graph markers
+
+      SUBROUTINE PGPNTS (N, X, Y, SYMBOL, NS)
+      INTEGER N, NS
+      REAL X(*), Y(*)
+      INTEGER SYMBOL(*)
+ 
+Draw Graph Markers. Unlike PGPT, this routine can draw a different
+symbol at each point. The markers
+are drawn using the current values of attributes color-index,
+line-width, and character-height (character-font applies if the symbol
+number is >31).  If the point to be marked lies outside the window,
+no marker is drawn.  The "pen position" is changed to
+(XPTS(N),YPTS(N)) in world coordinates (if N > 0).
+ 
+Arguments:
+ N      (input)  : number of points to mark.
+ X      (input)  : world x-coordinate of the points.
+ Y      (input)  : world y-coordinate of the points.
+ SYMBOL (input)  : code number of the symbol to be plotted at each
+                   point (see PGPT).
+ NS     (input)  : number of values in the SYMBOL array.  If NS <= N,
+                   then the first NS points are drawn using the value
+                   of SYMBOL(I) at (X(I), Y(I)) and SYMBOL(1) for all
+                   the values of (X(I), Y(I)) where I > NS.
+ 
+Note: the dimension of arrays X and Y must be greater than or equal
+to N and the dimension of the array SYMBOL must be greater than or
+equal to NS.  If N is 1, X and Y may be scalars (constants or
+variables).  If NS is 1, then SYMBOL may be a scalar.  If N is
+less than 1, nothing is drawn.
+
+
+PGQAH -- inquire arrow-head style
+
+      SUBROUTINE PGQAH (FS, ANGLE, VENT)
+      INTEGER  FS
+      REAL ANGLE, VENT
+
+Query the style to be used for arrowheads drawn with routine PGARRO.
+
+Argument:
+ FS     (output) : FS = 1 => filled; FS = 2 => outline.
+ ANGLE  (output) : the acute angle of the arrow point, in degrees.
+ VENT   (output) : the fraction of the triangular arrow-head that
+                   is cut away from the back.
+
+
+PGQCS -- Inquire character height in a variety of units.
+
+      SUBROUTINE PGQCS(UNITS, XCH, YCH)
+      INTEGER UNITS
+      REAL XCH, YCH
+
+Return the current PGPLOT character height in a variety of units.
+This routine provides facilities that are not available via PGQCH.
+Use PGQCS if the character height is required in units other than
+those used in PGSCH.
+
+Arguments:
+ UNITS  (input)  : Used to specify the units of the output value:
+                   UNITS = 0 : normalized device coordinates
+                   UNITS = 1 : inches
+                   UNITS = 2 : millimeters
+                   UNITS = 3 : pixels
+                   Other values give an error message, and are
+                   treated as 0.
+ XCH    (output) : The character height for vertically written text.
+ YCH    (output) : The character height for horizontally written text.
+                   NB. XCH=YCH if UNITS=1 or UNITS=2.
+
+
+PGQPOS -- return current pen position
+
+      SUBROUTINE PGQPOS (X, Y)
+      REAL X, Y
+ 
+Primitive routine to return the "pen" position in world
+coordinates (X,Y).
+ 
+Arguments:
+ X      (output)  : world x-coordinate of the previous pen position.
+ Y      (output)  : world y-coordinate of the previous pen position.
+
+
+Module: PGQVSZ -- Find the window defined by the full view surface
+
+      SUBROUTINE PGQVSZ (UNITS, X1, X2, Y1, Y2)
+      INTEGER UNITS
+      REAL X1, X2, Y1, Y2
+
+Return the window, in a variety of units, defined by the full
+device view surface (0 -> 1 in normalized device coordinates).
+
+Input:
+  UNITS    0,1,2,3 for output in normalized device coords,
+           inches, mm, or absolute device units (dots)
+Output
+  X1,X2    X window
+  Y1,Y2    Y window
+
+
+PGSAH -- set arrow-head style
+
+      SUBROUTINE PGSAH (FS, ANGLE, VENT)
+      INTEGER  FS
+      REAL ANGLE, VENT
+
+Set the style to be used for arrowheads drawn with routine PGARRO.
+
+Argument:
+ FS     (input)  : FS = 1 => filled; FS = 2 => outline.
+                   Other values are treated as 2. Default 1.
+ ANGLE  (input)  : the acute angle of the arrow point, in degrees;
+                   angles in the range 20.0 to 90.0 give reasonable
+                   results. Default 45.0.
+ VENT   (input)  : the fraction of the triangular arrow-head that
+                   is cut away from the back. 0.0 gives a triangular
+                   wedge arrow-head; 1.0 gives an open >. Values 0.3
+
+
+PGSAVE -- save PGPLOT attributes
+
+      SUBROUTINE PGSAVE
+
+This routine saves the current PGPLOT attributes in a private storage
+area. They can be restored by calling PGUNSA (unsave). Attributes
+saved are: character font, character height, color index, fill-area
+style, line style, line width, pen position, arrow-head style.
+Color representation is not saved.
+
+Calls to PGSAVE and PGUNSA should always be paired. Up to 20 copies
+of the attributes may be saved. PGUNSA always retrieves the last-saved
+values (first-in first-out stack).
+
+Arguments: none
+
+
+PGSCRN -- set color representation by name
+
+      SUBROUTINE PGSCRN(CI, NAME, IER)
+      INTEGER CI
+      CHARACTER*(*) NAME
+      INTEGER IER
+
+Set color representation: i.e., define the color to be
+associated with a color index.  Ignored for devices which do not
+support variable color or intensity.  This is an alternative to
+routine PGSCR. The color representation is defined by name instead
+of (R,G,B) components.
+
+Color names are defined in an external file which is read the first
+time that PGSCRN is called. The name of the external file is
+found as follows:
+1. if environment variable (logical name) PGPLOT_RGB is defined,
+   its value is used as the file name;
+2. otherwise, if environment variable PGPLOT_DIR is defined, a
+   file "rgb.txt" in the directory named by this environment
+   variable is used;
+3. otherwise, file "rgb.txt" in the current directory is used.
+
+If all of these fail to find a file, an error is reported and
+the routine does nothing.
+
+Each line of the file
+defines one color, with four blank- or tab-separated fields per
+line. The first three fields are the R, G, B components, which
+are integers in the range 0 (zero intensity) to 255 (maximum
+intensity). The fourth field is the color name. The color name
+may include embedded blanks. Example:
+
+255   0   0 red
+255 105 180 hot pink
+255 255 255 white
+  0   0   0 black
+
+Arguments:
+ CI     (input)  : the color index to be defined, in the range 0-max.
+                   If the color index greater than the device
+                   maximum is specified, the call is ignored. Color
+                   index 0 applies to the background color.
+ NAME   (input)  : the name of the color to be associated with
+                   this color index. This name must be in the
+                   external file. The names are not case-sensitive.
+                   If the color is not listed in the file, the
+                   color representation is not changed.
+ IER    (output) : returns 0 if the routine was successful, 1
+                   if an error occurred (either the external file
+                   could not be read, or the requested color was
+                   not defined in the file).
+
+
+PGUNSA -- restore PGPLOT attributes
+
+      ENTRY PGUNSA
+
+This routine restores the PGPLOT attributes saved in the last call to
+PGSAVE. See PGSAVE.
+
+Arguments: none
+
+
+PGVECT -- vector map of a 2D data array, with blanking
+
+      SUBROUTINE PGVECT (A, B, IDIM, JDIM, I1, I2, J1, J2, C, NC, TR,
+     1                   BLANK)
+      INTEGER IDIM, JDIM, I1, I2, J1, J2, NC
+      REAL    A(IDIM,JDIM), B(IDIM, JDIM), TR(6), BLANK, C
+
+Draw a vector map of two arrays.  This routine is the similar to
+PGCONB as that array elements that have the "magic value" defined by
+the argument BLANK are ignored, making gaps in the vector map.  The
+routine may be useful for data measured on most but not all of the
+points of a grid. Vectors are displayed as arrows; the style of the
+arrowhead can be set with routine PGSAH, and the the size of the
+arrowhead is determined by the current character size, set by PGSCH.
+
+Arguments:
+ A      (input)  : horizontal component data array.
+ B      (input)  : vertical component data array.
+ IDIM   (input)  : first dimension of A and B.
+ JDIM   (input)  : second dimension of A and B.
+ I1,I2  (input)  : range of first index to be mapped (inclusive).
+ J1,J2  (input)  : range of second index to be mapped (inclusive).
+ C      (input)  : scale factor for vector lengths, if 0.0, C will be
+                   set so that the longest vector is equal to the
+                   smaller of TR(2)+TR(3) and TR(5)+TR(6).
+ NC     (input)  : vector positioning code.
+                   <0 vector head positioned on coordinates
+                   >0 vector base positioned on coordinates
+                   =0 vector centered on the coordinates
+ TR     (input)  : array defining a transformation between the I,J
+                   grid of the array and the world coordinates. The
+                   world coordinates of the array point A(I,J) are
+                   given by:
+                     X = TR(1) + TR(2)*I + TR(3)*J
+                     Y = TR(4) + TR(5)*I + TR(6)*J
+                   Usually TR(3) and TR(5) are zero - unless the
+                   coordinate transformation involves a rotation
+                   or shear.
+ BLANK   (input) : elements of arrays A or B that are exactly equal to
+                   this value are ignored (blanked).
+
+
+PGWEDG -- Anotate a gray-scale plot with a wedge.
+
+      SUBROUTINE PGWEDG(SIDE, DISP, WIDTH, FG, BG, LABEL)
+      CHARACTER *(*) SIDE,LABEL
+      REAL DISP, WIDTH, FG, BG
+
+Plot an anotated grey-scale wedge parallel to a given axis of the
+the current viewport.
+
+Arguments:
+ SIDE   (input)  : The first character must be one of the characters
+                   'B', 'L', 'T', or 'R' signifying the Bottom, Left,
+                   Top, or Right edge of the viewport.
+ DISP   (input)  : the displacement of the wedge from the specified
+                   edge of the viewport, measured outwards from the
+                   viewport in units of the character height. Use a
+                   negative value to write inside the viewport, a
+                   positive value to write outside.
+ WIDTH  (input)  : The total width of the wedge including anotation,
+                   in units of the character height.
+ FG     (input)  : The value which is to appear with shade
+                   1 ("foreground"). Use the values of FG and BG
+                   that were sent to PGGRAY.
+ BG     (input)  : the value which is to appear with shade
+                   0 ("background").
+ LABEL  (input)  : Optional units label. If no label is required
+                   use ' '.
+\end{verbatim}
+\end{small}
+\end{document}

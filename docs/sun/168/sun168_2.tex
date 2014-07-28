@@ -1,0 +1,436 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {168.2}
+\newcommand{\stardocauthors}   {Clive G. Page\\University of Leicester}
+\newcommand{\stardocdate}      {2nd November 1993}
+\newcommand{\stardoctitle}     {JED --- the Text Editor}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+%  \setlength{\parskip}{0mm}
+%  \tableofcontents
+%  \setlength{\parskip}{\medskipamount}
+%  \markright{\stardocname}
+%------------------------------------------------------------------------------
+\section{What is JED?}
+
+JED is a text-editor which provides a reasonably good emulation of EDT on
+Unix systems, together with a few extra facilities such as cut-and-paste
+of rectangular regions, unlimited undo, horizontal scroll, and display of
+two or more windows. The author of JED, John Davis of Harvard University,
+permits it to be used freely on non-commercial systems provided his {\tt
+copyright} file is included in each distribution.
+
+Most people who are used to EDT on VAXes seem to be able to use JED without
+much difficulty, but a few differences are worth noting:-
+
+\begin{itemize}
+
+\item JED only emulates the keypad-and-screen mode of EDT: various GOLD--key
+sequences have been defined (as described below) to make other functions
+available.
+
+\item To exit from JED use {\tt GOLD E} (because as usual with Unix
+control/Z just suspends the process).  Alternatively use {\tt GOLD Q}
+(for quit), or press the DO key and enter either {\tt exit} or {\tt
+quit}.  These all do the same thing.  If any buffer has been modified JED
+asks you whether to re-write it to disc.
+
+\item The HELP key just shows a keypad diagram together with a brief
+listing of the additional GOLD--key assignments.
+
+\item The FILL function ({\tt GOLD 8}) fills the current paragraph and does
+{\em not} require a mark to be set.  See below for further details.
+
+\item The function to enter special characters, SPECINS or {\tt GOLD 3},
+is slightly simpler than with EDT: it prompts for the decimal value of
+the ASCII character required.
+
+\end{itemize}
+
+\subsection{New features in version 0.93}
+
+The most visible change is that marked sections are now show in inverse
+video, as in EDT.  Word-wrapping is improved and cut-and-paste operations
+are easier as the text is put in a visible buffer called {\em cut\_buf}.
+The new sequence {\tt GOLD K} moves all lines containing a specified
+string to another buffer. Two new command-line switches ({\tt -f and -t})
+have been added.
+
+\section{Additional GOLD-key sequences}
+
+\begin{center}
+\begin{tabular}{|ll|}
+\hline
+Key-seq. & Effect \\
+\hline
+{\tt GOLD A} & ASCII codes of the next 10 characters are shown\\
+{\tt GOLD B} & Buffer/window options... (see section 3.4) \\
+{\tt GOLD C} & Centres current line using the {\tt WRAP} value \\
+{\tt GOLD D} & Date inserted at current position (and date/time shown in minibuffer)\\
+{\tt GOLD E} & Exits - if any buffers modified asks whether to update disc file \\
+{\tt GOLD F} & Finds string at start of line (prompts for string) \\
+{\tt GOLD G} & Global search and replace (prompts for both strings) \\
+{\tt GOLD I} & Inserts file at current position (prompts for name) \\
+{\tt GOLD K} & Prompts for string: moves lines containing this to another
+buffer \\
+{\tt GOLD L} & Goes to specified line-number (prompts for number) \\
+{\tt GOLD M} & Mode settings displayed and can be altered (see section 3.6) \\
+{\tt GOLD N} & Narrows (centres) current paragraph (see section 3.7) \\
+{\tt GOLD O} & Occurrences of string listed with line-numbers (prompts for string)\\
+{\tt GOLD Q} & Quits -- same as exit. \\
+{\tt GOLD R} & Rectangular cut/paste options... (see section 3.8) \\
+{\tt GOLD S} & Spawns command to operating system (some restrictions) \\ 
+{\tt GOLD T} & Toggles terminal width 80/132 columns, adjusts {\tt WRAP} value\\
+{\tt GOLD U} & Undo - restores buffer state undoing preceding changes one by one\\
+{\tt GOLD W} & Writes current buffer to file (prompts for name) \\
+{\tt GOLD X} & Exchanges position of mark and current position \\
+{\tt GOLD} {\em space}   & Shows current position and mode settings \\
+{\tt GOLD $\downarrow$}  & Selects the next window as the active one\\
+{\tt GOLD $\uparrow$  }  & Expands current window by one line \\
+{\tt GOLD $\rightarrow$} & Scrolls screen right by half its width \\
+{\tt GOLD $\leftarrow$ } & Scrolls screen back to the left by half its width \\
+{\tt GOLD GOLD}          & Toggles keypad application/numeric modes.\\
+\hline
+\end{tabular}
+\end{center}
+
+\section{Special Features}
+
+\subsection{Command-line Switches}
+
+\begin{tabular}{ll}
+{\tt -f} & sets Fortran mode: tabs stops set at columns 7,10,13... \\
+{\tt -g} {\em n} & go to line number {\em n} \\
+{\tt -n} & ignore the {\tt .jedrc} file (to get default rather than 
+customized settings) \\
+{\tt -s} {\em string} & search for string \\
+{\tt -t} & sets TAB to 0 so tabs show as {\verb+^I+}\\
+{\tt -2} & split window \\
+\end{tabular}
+
+Note that the {\tt -f} and {\tt -t} switches must be given after the file
+name.
+
+For example to load file {\tt prog.f} into one window with the cursor at
+line number 123, and then load {\tt prog.lis} into the second window
+positioned at the first occurrence of the string {\em myfunc} you could
+use:
+\begin{verbatim}
+      % jed prog.f -g 123 -2 prog.lis -s myfunc
+\end{verbatim}
+
+\subsection{Back-up and Auto-save files}
+
+If a new file is created with the same name as one that already exists
+(for example when exiting), JED will rename the original file by
+appending a $\sim$ to its name so that the original contents are
+preserved. In addition, while editing is in progress JED saves the
+contents of each buffer in a disc file after every 300 changes (which may
+be every 300 keystrokes if you are simply entering text). These auto-save
+files, which have names of the form {\tt
+\#}{\em filename}{\tt \#}, are deleted when JED exits
+normally, but may be useful in the event of a crash.
+
+\subsection{Status Line}
+
+The status line, shown in inverse video beneath each window, shows some
+status flags, the JED version number, the file or buffer name, the
+current line-number, the total line count.  The status flags start as a
+set of hyphens: the meaning of other symbols that may appear there is as
+follows:
+
+\begin{tabular}{cl}
+{\tt **}   & this buffer has been modified \\
+{\tt \%\%} & this buffer is read-only \\
+{\tt m}    & a mark has been set \\
+{\tt d}    & disc file has been updated since the buffer was created \\
+{\tt +}    & the undo facility is enabled for this buffer. \\
+\end{tabular}
+
+\subsection{Using Multiple Buffers and Windows}
+
+JED can handle two or more windows at once, and display in them either
+different parts of the same file or two or more different files.  You
+can, of course, cut and paste from one window to another. The {\tt
+GOLD B} key prompts for a number of options.
+
+\begin{center}
+\begin{tabular}{|ll|}
+\hline
+Key-sequence & Buffer/window action \\
+\hline
+{\tt GOLD B 2} & Splits current window into two.\\
+{\tt GOLD B 1} & Restores single window (the current one).\\
+{\tt GOLD B G} & Gets a file into the current buffer (prompts for name).\\
+{\tt GOLD B L} & Lists all existing buffers.\\
+{\tt GOLD B S} & Selects a buffer by name (prompts for it).\\
+\hline
+\end{tabular}
+\end{center}
+
+{\tt GOLD} down-arrow selects the next window in turn as the active one,
+while {\tt GOLD} up-arrow expands the current window by one line.
+
+\subsection{Undo}
+
+A powerful undo facility is provided using {\tt GOLD U} (also mapped to
+the UNDO key on a Sparcstation and F14 on a VT terminal).  JED keeps
+track of buffer modifications and undoes the changes one by one when you
+press the UNDO key.  This can be used to reverse complex changes such as
+{\em fill} or {\em sort}.
+
+\subsection{Modes and Customizing}
+
+A few variables exist to control editing modes. These are set by default
+to give the closest emulation of EDT, but may be changed either using the
+{\tt GOLD M} options or by providing your own {\tt .jedrc} customisation
+file (see below).
+
+{\tt WRAP\_INDENTS} is 0 by default.  If set to 1, when the RETURN
+key is pressed the new line will be indented the the same point as the
+previous one.  This can be useful when entering Fortran or C source-code.
+
+{\tt CASE\_SEARCH} is 0 by default, giving case-insensitive searches.  
+If set to 1 all searches become case-sensitive.
+
+{\tt TAB} determines how tab characters in the text are displayed on
+the screen. If {\tt TAB} is non-zero then it appears as if there are tab
+stops every {\tt TAB} columns across.  Otherwise each tab character is
+shown as {\verb+^I+}.  The default TAB value is 8, which corresponds to the
+way most VT terminals are set up, except if the {\tt -t} switch is used.
+
+{\tt WRAP} specifies the right-hand margin for text entry, filling, and
+centring text. When you enter text which crosses the {\tt WRAP} boundary
+and press the space bar the excess words are moved to the following line.
+The default {\tt WRAP} value is 75.  To avoid the temporary disappearance
+of text when you are typing continuously it is advisable to choose a
+value slightly smaller than the physical screen width. The {\tt WRAP}
+value is adjusted when the screen-width is changed using {\tt GOLD T}.
+
+These initial defaults may be changed by providing a file called {\tt
+.jedrc} which, if put in your {\em home} directory, will affect all JED
+sessions.  The format of the assignments should be noted: a space is
+required before the equals sign but not after it. Comments may be entered
+after a semi-colon.  For example:
+
+\begin{verbatim}
+      ; an example .jedrc file for a Fortran programmer
+      72 =WRAP    ; show Fortran statement margin violation by wrapping
+      0 =TAB      ; show any actual tab characters as ^I
+      1 =WRAP_INDENT  ; auto-indent mode is set
+\end{verbatim}
+
+The tab characters in a file may be converted to the appropriate set of
+spaces using the current value of {\tt TAB} by selecting a range of text,
+pressing the DO key, and then entering the {\tt untab} command.
+
+\subsection{Paragraph Fill and Centre}
+
+Text formatting operations work differently from those in EDT. The FILL
+command ({\tt GOLD 8}) fills the current paragraph, and does {\em not}
+use the selected range.  A paragraph is defined as any set of lines
+ending with a blank line (or a line starting with either {\tt \%} or 
+\verb+\+ to assist in filling Latex files). If the
+first line of the paragraph was inset from the left-hand margin the whole
+paragraph is indented by the same amount.  The {\tt WRAP} value defines
+the maximum line-length.
+
+To centre the current line use {\tt GOLD C}, while ({\tt GOLD N}) centres
+the current paragraph, with margins set by the indentation of the first
+line.  In both cases the centre is half the {\tt WRAP} value.
+
+\subsection{File-name Completion}
+
+Whenever JED prompts for a file-name you can enter a partial name and
+press the TAB key to get JED to complete it.  If the name is not unique
+then press the space-bar at least twice to cycle among them.
+
+\subsection{Editing Wide Files and Binary Files}
+
+JED imposes no intrinsic limit on the length of lines it can handle, but
+it is always awkward to edit lines wider than the screen. If your
+terminal can manage 132-column mode then you can use {\tt GOLD T} to
+toggle the width. The value of the {\tt WRAP} variable is automatically
+incremented/decremented by 52 when you do this. Another option is to use
+{\tt GOLD} right-arrow to scroll the screen sideways in chunks of half a
+screen-width.  Not surprisingly the {\tt GOLD} left-arrow reverses this.
+
+It is also possible to use JED to examine or modify binary files.  Note
+that the {\tt GOLD A} sequence lists the decimal ASCII codes of the next
+10 characters.  If, however, you plan to modify a binary file it is
+sensible to set the {\tt ADD\_NEWLINE} variable to zero before starting,
+otherwise it will add a line-feed character to the last line of the file
+(if it does not already have one).
+
+\subsection{Special Characters}
+
+The SPECINS key ({\tt GOLD 3}) may be used to enter non-standard characters: it
+prompts for the decimal code.  Alternatively to enter control codes first
+press the F14 key (marked ESCAPE on many VT terminals) and then the
+required control key.  This even works for control/C and control/Z and
+may be used within a search string.
+
+\subsection{Rectangular Column Cut/Paste}
+
+First define the rectangle by pressing SELECT (or the key-pad dot key) at
+one corner and move the cursor to the opposite corner.  Then {\tt GOLD R
+C} will copy the rectangle to a buffer, or {\tt GOLD R D} delete it, i.e.
+move it to a buffer.  A subsequent {\tt GOLD R I} will insert the saved
+rectangle at the current point.  Other options are {\tt GOLD R B} to
+blank rectangle (overwrite with spaces), or {\tt GOLD R S}
+to shift text over by inserting a blank rectangle of the size specified.
+
+\subsection{Sorting Lines}
+
+JED can sort a series of lines into ascending order using the ASCII
+collating sequence.  First select the rectangle containing the sort keys
+(press SELECT at one corner and move to the other corner), then press the
+DO key and at the prompt enter the {\tt sort} command. Sorting is done by
+interpreted code and is rather slow for regions of more than a few
+hundred lines.
+
+\section{SUN Keyboard Support}
+
+The original Sparcstation keyboard (type-4) has no separate arrow keys,
+so that F9 through F12 have been mapped to act as up, down, left, and
+right-arrows, respectively.  The new type-5 (PC-style) keyboard available
+for the Sparc Classic provides a full set of arrow keys and a separate
+application keypad.  The GOLD key is the one at the top left of the
+key-pad in both cases, though called {\tt Num-lock} on the type-5
+keyboard. Unfortunately there is still one key missing on the right-most
+strip, as the one marked {\tt +} covers the space occupied by both {\tt
+-} and {\tt ,} on the VT keypad. This {\tt +} key supports the
+delete-character function.  The delete-word function is supported on the
+type 5 keyboard by the {\tt scroll-lock} key at the top.  Other useful
+equivalences are noted below.
+
+\begin{center}
+\begin{tabular}{|l|l|l|}
+\hline
+Key/function & Sparc-key \\
+\hline
+DO & Copy \\
+SELCT & Open \\
+REMOVE & Cut \\
+INS HERE & Paste \\
+FIND & Find \\
+UNDO & Undo \\
+HELP & Help \\
+Search/replace & f6 \\
+Toggle 80/132 cols & f7 \\
+\hline
+\end{tabular}
+\end{center}
+
+If the keypad of your terminal does not behave correctly, it may not have
+the right key-mapping set up for it.
+
+\section{Installation}
+
+The instructions below assume that the JED executable will be put in
+{\tt /usr/local/bin} with the supporting files in {/usr/local/lib/jed}. If
+this is not so, modify them accordingly.
+
+(1) Move the {\tt jed093.tar} file to {\tt /usr/local/lib} and un-tar it: it will
+extract to a sub-directory called {\tt jed093}.
+
+(2) The package comes with a executables for SunOs, Solaris, Ultrix, and
+OSF1, these are called e.g. {\tt jed.solaris}.  Copy and rename the
+appropriate one to {\tt /usr/local/bin}.
+
+(3) Rename your old jed sub-directory (if any) to something else, and rename
+the new {\tt jed093} sub-directory to {\tt /usr/local/lib/jed}.
+
+(4) If the jed support files are indeed in this directory then the
+environment variable {\tt JED\_LIBRARY} is no longer needed, else set it
+to point to the sub-directory that you have used.
+
+(5) Copy the user-note file {\tt sun168.tex} to the documentation directory.
+
+If you need to re-build the package for any reason, then a makefile is
+provided which can be used as follows.  The procedure for Solaris is more
+messy and explained in file AAA.solaris provided in the package.
+
+\begin{tabular}{ll}
+OSF/1: & {\tt make -f makefile.unx} \\
+Ultrix: & {\tt make -f makefile.unx} \\
+SunOs:   & {\tt make -f makefile.unx CC=gcc} \\
+Irix:    & {\tt make -f makefile.unx CCFLAGS="-DPOSIX"} \\
+\end{tabular}
+
+Note: if users have existing files called {\tt .jedrc} they may be
+incompatible with this version and should be deleted or renamed.
+
+\section{Software Support}
+
+The kernel is written in C and implements a Forth-like language called
+S-lang in which most higher-level features of the EDT emulation are
+programmed.  Reports of problems (or suggestions for enhancements) may be
+sent to {\tt cgp@star.le.ac.uk} or {\tt LTVAD::CGP}.  These will, where
+appropriate, be passed on to the author, who has already fixed several 
+problems and provided many enhancements.
+
+As indicated by the current version number (0.93-2B), the author is still
+actively developing the code.  Future versions are likely to be available
+by anonymous ftp, but anyone collecting a new version of JED directly
+should note that the Starlink-specific S-lang code provided here will
+probably not work, as from version 0.94 onwards S-lang will use 
+infix rather than postfix notation. 
+
+The author's copyright notice is reproduced here.
+\begin{quote}
+\copyright 1992 by John E. Davis  ({\tt davis@amy.tch.harvard.edu})
+
+Permission to use, copy, modify, and distribute this software and its
+documentation for any non-commercial purpose and without fee is hereby
+granted, provided that the above copyright notice appear in all copies
+and that both that copyright notice and this permission notice appear in
+supporting documentation.
+
+This file is provided AS IS with no warranties of any kind.  The author
+shall have no liability with respect to the infringement of copyrights,
+trade secrets or any patents by this file or any part thereof.  In no
+event will the author be liable for any lost revenue or profits or other
+special, indirect and consequential damages. 
+\end{quote}
+\end{document}

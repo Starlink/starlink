@@ -1,0 +1,140 @@
+\documentstyle{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {59.3}
+\newcommand{\stardocauthors}   {M D Lawden}
+\newcommand{\stardocdate}      {7 June 1989}
+\newcommand{\stardoctitle}     {Starlink Software Reorganisation}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+\newpage
+\setcounter{page}{7}
+
+{\scriptsize
+\begin{table}
+\begin{center}
+\begin{tabular}{||l||c|c|c|c|c||c||} \hline
+{\bf Item} & {\bf LIBDIR} & {\bf STARDIR} & {\bf SYSTEMDIR} &  {\bf UTILITYDIR}
+ & {\bf PACKDIR} & {\bf Associated} \\
+\hline
+\hline
+ADC       & X &   &   &   &   &   \\
+AGI       & X &   &   &   &   &   \\
+ARGSLIB   & X &   &   &   &   &   \\
+ARGSMAC   & X &   &   &   &   &   \\
+DIAGRAM   & X &   &   &   &   &   \\
+FINGS     & X &   &   &   &   &   \\
+GENERIC   & X &   &   & X &   &   \\
+GKS6      & X &   &   &   &   &   \\
+HDS       & X &   &   &   &   &   \\
+HIGR      & X &   &   &   &   &   \\
+JPL       & X &   &   &   &   &   \\
+NCAR      & X &   &   &   &   &   \\
+PGPLOT    & X &   &   &   &   &   \\
+SGS       & X &   &   &   &   &   \\
+SGS6      & X &   &   &   &   &   \\
+SLALIB    & X &   &   &   &   &   \\
+SNX       & X &   &   &   &   &   \\
+TAPEIO    & X &   &   &   &   &   \\
+TRANSFORM & X &   &   &   &   &   \\
+\hline
+FIND      &   & X &   &   &   &   \\
+FORMCON   &   & X &   &   &   &   \\
+INTERIM   &   & X &   &   &   &   \\
+RUNSTAR   &   & X &   &   &   &   \\
+\hline
+GEROFF    &   &   & X & X &   &   \\
+IDDRIVER  &   &   & X &   &   &   \\
+NETWORK   &   &   & X &   &   &   \\
+RASTSYMB  &   &   & X &   &   &   \\
+UAFPROBE  &   &   & X &   &   &   \\
+\hline
+AATGS     &   &   &   & X &   &   \\
+APLATE    &   &   &   & X &   &   \\
+ASTROM    &   &   &   & X &   &   \\
+CHART     &   &   &   & X &   &   \\
+COCO      &   &   &   & X &   &   \\
+EDFITS    &   &   &   & X &   &   \\
+HINDLEGS  &   &   &   & X &   &   \\
+IUEDEARCH &   &   &   & X &   &   \\
+LIBMAINT  &   &   &   & X &   &   \\
+LIBX      &   &   &   & X &   &   \\
+LZCMP     &   &   &   & X &   &   \\
+NEWSMAINT &   &   &   & X &   &   \\
+OPWRIT    &   &   &   & X &   &   \\
+PATT      &   &   &   & X &   &   \\
+RPS       &   &   &   & X &   &   \\
+RV        &   &   &   & X &   &   \\
+SPECHAR   &   &   &   & X &   &   \\
+TAPECOPY  &   &   &   & X &   &   \\
+TPU       &   &   &   & X &   &   \\
+UKIRTHELP &   &   &   & X &   &   \\
+\hline
+ADAMAPP   &   &   &   &   & X &   \\
+DIPSO     &   &   &   &   & X &   \\
+IRAS      &   &   &   &   & X &   \\
+IUEDR     &   &   &   &   & X &   \\
+KAPPA     &   &   &   &   & X &   \\
+MONGO     &   &   &   &   & X &   \\
+REXEC     &   &   &   &   & X &   \\
+\hline
+\hline
+ADAM      &   &   &   &   &   & X \\
+ASPIC     &   &   &   &   &   & X \\
+ASTERIX   &   &   &   &   &   & X \\
+DAOPHOT   &   &   &   &   &   & X \\
+DSCL      &   &   &   &   &   & X \\
+FIGARO    &   &   &   &   &   & X \\
+GASP      &   &   &   &   &   & X \\
+GKS       &   &   &   &   &   & X \\
+HAGGIS    &   &   &   &   &   & X \\
+HXIS      &   &   &   &   &   & X \\
+IRCAM     &   &   &   &   &   & X \\
+NAG       &   &   &   &   &   & X \\
+NOD2      &   &   &   &   &   & X \\
+PHOTOM    &   &   &   &   &   & X \\
+PRIMDAT   &   &   &   &   &   & X \\
+SCAR      &   &   &   &   &   & X \\
+SPAG      &   &   &   &   &   & X \\
+SPECX     &   &   &   &   &   & X \\
+TEX       &   &   &   &   &   & X \\
+TPOINT    &   &   &   &   &   & X \\
+\hline
+\end {tabular}
+\caption {Old organisation of the Starlink Software Collection}
+\end{center}
+\end{table}}
+
+\end{document}

@@ -1,0 +1,1117 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {98.5}
+\newcommand{\stardocauthors}   {R D Saxton}
+\newcommand{\stardocdate}      {31 October 1991}
+\newcommand{\stardoctitle}     {ASTERIX --- X-ray Data Processing System}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+Dept of Physics, University of Leicester\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+\setlength{\parskip}{0mm}
+\tableofcontents
+\setlength{\parskip}{\medskipamount}
+\markright{\stardocname}
+
+\newpage
+
+\section{Introduction }
+
+This document is aimed at the beginner to the ASTERIX data analysis system. It
+is intended to supplement the ASTERIX help facility by explaining some of the
+general concepts which a user will encounter. It does not discuss the details
+of any application, this information may be found from the on-line  help system
+or from the Starlink miscellaneous user document `ASTHELP.HLP --- An ASTERIX
+Help Guide'
+
+ASTERIX is a collection of applications written to analyse astronomical data in
+the X-ray waveband. Many of these applications are however general  purpose and
+are capable of analysing any data which is received in the correct format. The
+package has been designed to be instrument independent and currently has
+interfaces to the Exosat and ROSAT instruments. 
+
+\section{Getting started }
+
+The applications run under the ADAM environment which in turn uses the ICL
+command language. To load the necessary definitions for running ASTERIX
+type the following:
+\begin{verbatim}
+    $ ASTSTART     - loads VMS/DCL definitions 
+    $ ICL          - starts ICL
+    ICL> ASTERIX   - loads ASTERIX definitions into ICL
+\end{verbatim}             
+Now simply type the name of an application:       
+\begin{verbatim}
+    ICL> INTERP
+\end{verbatim}
+
+\section{Running an application }
+
+The recommended way of running ASTERIX programs is to enter the ICL command
+language as described above and execute commands from there. However it is
+possible to execute most ASTERIX commands from DCL in an identical manner.  The
+advantages of running under ICL are that applications invoke much more quickly,
+and that commands which invoke ICL procedures to perform composite tasks are
+available. However there is an initial delay whilst the system is loaded, so
+that when only one or two simple commands are to be issued, it may be quicker
+to stick with DCL.
+
+In either case, the ADAM parameter system is used to pass parameters in and out
+of applications. Further information about ADAM and ICL can be found in
+Starlink document SG/4: `ADAM --- The Starlink Software Environment'.
+
+\subsection{Running under ICL }
+
+The simplest method of running an application interactively is to just
+type the application name:
+\begin{verbatim}
+    ICL> BINSUBSET
+\end{verbatim}
+ADAM will then prompt the user for values which it needs and will take default
+values for other parameters. To force ALL parameters to be prompted for, type:
+\begin{verbatim}
+    ICL> BINSUBSET PROMPT
+\end{verbatim}
+To save having to respond to prompts, parameter values may be entered on the 
+command line. Either by position:
+\begin{verbatim}
+    ICL> BINSUBSET Input_filename Output_filename
+\end{verbatim}
+or by keyword:
+\begin{verbatim}
+    ICL> BINSUBSET INP=Input_filename OUT=Output_filename
+\end{verbatim}
+The position and keyword associated with each parameter is specified in the
+help entry for each application. It is best to specify the value of
+each (non-defaulted) parameter on the
+command line when an application is run in batch.
+
+Many parameters suggest default values along with the prompt, and
+responding with $<$RETURN$>$ will cause these values to be accepted.
+To force the application to accept all such defaults automatically
+type:
+\begin{verbatim}
+    ICL> BINSUBSET ACCEPT      or     ICL> BINSUBSET \
+\end{verbatim}
+(If no defaults have been set by the system, the application will abort.)
+This may also be used in conjunction with parameters,  e.g.:
+\begin{verbatim}
+    ICL> BINSUBSET NXBIN=30 
+\end{verbatim}
+will result in NXBIN being set to 30 and defaults being taken for all
+the other parameters.
+
+\subsection{Running under DCL }
+
+Commands may be executed from DCL with an identical format to the ICL commands
+described above. This is useful if you want to perform a quick  set of commands
+or if the monolith is out of action. Note, however,  that not all commands are
+available under DCL and in particular commands invoking ICL procedures, and all
+Exosat commands must be executed from ICL.
+
+\subsection{Replying to prompts }
+
+When answering a prompt the user may reply with the following special
+characters:
+
+\begin{itemize}
+\item To get help information on a parameter, type:  `?'.
+\item To abort an application while being prompted, type:  `!!'.
+\item For certain parameters a reply of  `!' (null response) has 
+a special meaning; this should be detailed in the help where it applies.
+\item Where a default response is offered as part of the prompt line this can
+be edited using the normal DCL command line editor by first pressing
+the `TAB' key.
+\item Applications running under DCL can be aborted by typing `$<$CNTRL$>$ C'.
+Unfortunately this will not work within ICL, and wherever possible one
+should abort an application by entering `!!' at a prompt as this provides a 
+clean exit back to ICL. In desperate circumstances one can use `$<$CNTRL$>$ Y',
+but this will also abort ICL.
+\end{itemize}
+
+\subsection{User input }
+
+Numerical data may be input in any form and will be translated by the parameter
+system into the format required, e.g.\ a double precision number may be input 
+as an integer or vice-versa. Character data may be input directly, it only
+requires quotes if being entered on the command line and only then if it
+contains spaces.
+
+Ranges should be input using the following format:
+\begin{verbatim}
+    Numeric ranges use a colon          > 53.6:107.8
+    For more than one range use a space > 53.6:107.8 120.5:156.0 
+    Two dimensional ranges use a comma  > 53.6:107.8,54.9:83.0
+    The combination looks like          > 53.6:107.8 120.5:156.0,54.9:83.0
+\end{verbatim}
+The convention used in ASTERIX is that lower bounds are inclusive and upper 
+bounds (except where a default full range is offered) are exclusive.
+Note that these ranges are character strings and the above comment about
+quotes therefore applies.
+
+Filenames should be entered WITHOUT the extension otherwise they will not be
+accepted.
+
+\section{Help system }
+
+The ASTERIX HELP system is invoked by typing ASTHELP. Information is
+grouped by topic, with a system of unique first characters for easy access.
+You are advised to consult the `Getting\_started' section if using ASTERIX
+for the first time.
+
+Help on a specific application may be obtained directly by typing:
+\begin{verbatim}
+    ASTHELP application_name
+\end{verbatim}
+This may be done from the DCL or ICL prompt. Each application entry has a 
+brief description followed by more details of the parameters required, the
+method or algorithm used, examples of use, and any other relevant information.
+Note that shortform and macro (ICL procedure) commands are distinguished in 
+the HELP text by suffixes {\bf  } $+$ and $*$ respectively. These suffixes 
+are not typed when invoking the commands. 
+
+For hardcopy help, the output from ASTHELP may be piped to a text file by using
+the following syntax: 
+\begin{verbatim}
+    ASTHELP > text_filename  
+\end{verbatim}
+or 
+\begin{verbatim}
+    ASTHELP > text_filename  application_name
+\end{verbatim}
+This writes the resulting help entry into a text file which
+may subsequently be printed.
+
+The first time ASTHELP is accessed in an ICL session it will take a while
+starting as the system has to spawn a DCL subprocess. Subsequent HELP
+enquiries will start immediately.
+
+\section{Datafiles }
+
+ASTERIX data is stored in HDS files. There are basically two different types:
+binned and event datasets. These are described in detail in ASTERIX document
+PROG\_002. The structure of any HDS file can be easily inspected using the HDS
+screen editor HSE. 
+
+ADAM assumes a default file extension of .SDF --- this is therefore used for 
+all ASTERIX HDS files.
+
+\subsection{Binned datasets }
+
+Binned data (e.g. time series, spectra, images) are stored in files whose
+structure is based on the Starlink standard `NDF' format described in Starlink
+document SGP/38. Data errors (stored in the form of variances)  and quality are
+catered for, and header information is stored in a special ASTERIX structure,
+and is most easily inspected using the HEADER  application. In  general,
+applications will treat errors as being independent  and Gaussian, and will
+ignore (or warn the user about) bad quality data.
+
+\subsection{Event datasets }
+
+These files store information pertaining to a set of photon `events'. Each 
+event will have a set of properties  e.g. X position, Y position, time, raw
+pulse height. These properties are stored in a set of arrays of equal length
+(-- number of events), each of which resides inside  a named LIST-type
+structure inside the file. This allows all information from a photon counting
+instrument to be  retained, whilst binning almost invariably results in some
+loss of information.
+
+\section{ASTERIX Overview }
+
+The basic structure of the ASTERIX system is shown in Figure \ref{fig:str}.
+Instrument interface routines can generally produce data in either binned or
+event formats, leading to two different paths through the system. Most
+analysis applications are designed to operate on binned data.
+
+\begin{figure}
+\begin{verbatim}
+    -----------                -----------              -----------
+   |  EXOSAT   |              |   ROSAT   |            |   Other   |
+   | interface |              | interface |            | instrument|
+    -----------                -----------              -----------
+         |                          |                        |
+         +--------------------------+------------------------+ 
+                                    |
+         +--------------------------+
+         |        Event dataset     |     
+    -----------                     |
+   |   Event   |                    |
+   | processing|                    |
+   | routines  |                    |
+    -----------                     |
+         |                          |
+    -----------                     |      Binned dataset
+   |   Event   |                    |
+   |  binning  |                    |
+    -----------                     |    
+         |                          |
+    ------------                    |
+   | Instrument |                   |
+   | corrections|                   |
+    ------------                    |
+         |                          |                    
+         +--------------------------+
+                                    |      Binned dataset
+                               ----------
+                              |  Kernel  | e.g. Time analysis,spectral
+                              | analysis |      fitting,image processing
+                              | routines |      routines.
+                               ----------          
+                                    |
+                               -----------
+                              | Graphical |
+                              |  output   |
+                               -----------
+\end{verbatim}
+\caption{Basic Structure of ASTERIX System}
+\label{fig:str}
+\end{figure}
+
+\section{ASTERIX Applications   }
+
+A list of available applications is appended to this document. A regularly 
+updated list can be accessed from ASTHELP, which also contains detailed 
+information about each program.
+
+\section{Graphics }
+
+ASTERIX contains graphics facilities based on the PGPLOT package.  Full
+details are provided in the help system, in particular you are advised
+to look at the subsection `Getting\_started' in the GRAPHICS topic of
+ASTHELP. 
+
+To display an ASTERIX binned dataset type:  
+\begin{verbatim}
+    ICL>  DRAW  filename  devicename
+\end{verbatim}
+To find out which devices are available type: 
+\begin{verbatim}
+    ICL>  DEVICES 
+\end{verbatim}
+This should produce a list of graphics devices which can be used
+on your system. If it doesn't then either the GKS/GNS graphics system
+or ASTERIX has not been installed properly --- contact the system manager.
+
+In addition to the DRAW command ASTERIX contains a separate image
+processing package, which can only be used from ICL. It gives the 
+ability to interactively display an image and manipulate it using
+cursor commands. Type `ASTHELP K' for an overview of the image
+processing system.
+
+\section{Documentation }
+
+A list of ASTERIX documents may be obtained by typing:
+\begin{verbatim}
+    $ DOCS
+\end{verbatim}
+There are two classes of document; the user documentation called USERnnn
+and documentation for programmers, PROG\_nnn. Some of the latter may
+be useful for general users although it is primarily intended for people
+developing software for ASTERIX.
+
+\section{ICL system commands }
+
+The ADAM user guide, SG/4, includes a description of the facilities
+of ICL and gives further references.
+A few useful commands are listed below.
+
+To show your default directory when in ICL type:
+\begin{verbatim}
+    ICL> DEFAULT
+\end{verbatim}
+To change your default directory type:
+\begin{verbatim}
+    ICL> DEFAULT  new_directory_name
+\end{verbatim}
+To list the entire contents of an HDS file type:
+\begin{verbatim}
+    ICL> TRACE  filename
+\end{verbatim}
+To escape to DCL temporarily (by starting a DCL subprocess) type:
+\begin{verbatim}
+    ICL> SPAWN 
+\end{verbatim}
+and return to ICL with a DCL logout.
+
+To invoke a single DCL command preface the command with a `\$':
+\begin{verbatim}
+    ICL> $Command       e.g. $DIRECTORY
+\end{verbatim}
+
+\section{Influence of the environment }
+
+As mentioned above, ASTERIX runs under the ADAM environment. ADAM stores
+the values of parameters (input values) used in each application in its own HDS 
+file and passes them between applications using another HDS file called 
+GLOBAL.SDF . These files are stored in a directory which is pointed to by
+the logical 'ADAMUSER'. ASTERIX frequently uses global values as 
+defaults when a parameter is prompted for in an application, to save the user
+unnecessary typing. A listing of currently defined global values may be
+obtained by typing GLOBAL from the ICL prompt. 
+
+The programs in ASTERIX have been divided into several separate sections 
+of executable code known as `shared image monoliths'.
+When a command is entered in ICL, it checks to see if the monolith containing
+that program has already been loaded. If it hasn't, then the monolith is 
+loaded, which can take several seconds. Once the monolith is in, however,
+all the programs contained in it are instantly available for execution.
+
+\section{Relationship to other Starlink software }
+
+Since ASTERIX binned datasets conform to the Starlink standard, such data can 
+also be analysed using any Starlink software which also conforms.
+Conversely ASTERIX may be used to analyse suitable standard format data
+produced by other packages. Several different packages can be loaded
+simultaneously with the ICL/ADAM environment, and their applications
+used in conjunction. However one has to be careful in crossing between
+packages, since different packages support different subsets of the
+full data standard specified in SGP38. For example, ASTERIX suports data
+QUALITY but not, at present, magic values; whilst the reverse is true for
+some other software. At present, ASTERIX supports a larger subset of the 
+standard than any other major package, so that one can expect only partial
+support of ASTERIX components when using `foreign' software.
+
+\section{Troubleshooting \& Bug reporting}
+
+This section describes ways of overcoming problems which may be encountered.
+\begin{itemize}
+\item If in response to typing `ICL' you get the message `HDS variable
+   file not found', it probably means that the logical SYS\$SCRATCH 
+   has been set to a strange location. Reset it to a more reasonable 
+   scratch location.
+\item Similarly, if an application tells you that it is having problems 
+   mapping an array (it may do this very indirectly) then check the
+   space available on the device pointed to by AST\_SCRATCH. In general
+   it is not a good idea to assign AST\_SCRATCH to a device with quotas
+   set up. 
+
+\item If a task won't start in ICL and a message along the lines of `DCL 
+   subprocess not started' comes up. It may be that the logical name 
+   job table is full. The solution is to ask your system manager to 
+   increase the job table byte quota in your UAF. Another possible 
+   explanation is that you have exceeded your subprocess quota. It 
+   is recommended that the subprocess quota should be set to ten. 
+   Advice on this and other quotas is available from 
+   ADAM\_DOCS:ARN012.RNO.
+
+\item The message `HDS file not found' is a rather common error message 
+   which could mean almost anything. If it occurs on exiting from a
+   task then it could mean that the GLOBAL.SDF file in ADAM\_USER which
+   stores global parameters has become corrupted. The solution is to
+   delete this file and re-issue the command ADAMSTART.
+
+\item ASTERIX makes extensive use of the virtual mapping facility
+   provided in VMS. This can lead to quotas of various sorts being
+   exceeded. ADAM/ICL often produces a message along the lines of
+   `Quota exceeded' without actually saying which quota it means. 
+   Initially, try setting your process quotas to those given by the
+   ADAM\_DOCS:ARN012.RNO document. If the error persists then a 
+   good bet is to ask your system manager to increase 
+   the sysgen parameter VIRTUALPAGECNT. Unfortunately this is a
+   non-dynamic parameter and so requires a system reboot to take
+   effect. A value of 60000 is the absolute maximum you will need;
+   don't bother trying to increase it beyond this value.
+
+   The system quota problem often causes the message:
+     `ADAM\_ERR: lib\$\% error activating image !AS'.
+
+   One possible system parameter which may cause this is PROCSECTCNT. 
+   Most systems can get away with having this set at 32 or 64 but
+   The Cambridge X-ray machine (XMV) has recently had to up this 
+   parameter to 96 to avoid this problem.
+
+\item If an application which should be working, refuses to do anything
+   except display an `ADAMERR' message then try exiting ICL and then
+   going back into it.  It is anticipated that future releases will
+   have a more tidy way of dealing with this.
+
+\end{itemize}
+
+Please report any bugs to either Richard Saxton (LTVAD::RDS)
+or Bob Vallance (BHVAD::RJV).
+
+\section{Writing an ASTERIX application }
+
+The document AST\_DOCS:PROG\_012.LIS gives a detailed description of how to
+write an Asterix application.
+This section gives a brief overview.
+
+Initially you should start up Asterix in development mode by:
+\begin{verbatim}
+    $ ASTSTART DEV
+\end{verbatim}
+An example Asterix application is given in AST\_DOCS:TEMPLATE.FOR.
+This simply finds the average (or sum) of up to 20 datafiles.
+It is probably best to use this as a starting point for writing a
+brand new application . There is a good basic guide for writing ADAM
+programs available in SG/4.
+
+There are many useful subroutines for Asterix 
+development in the library ASTLIB. For instance most of the components
+of the Asterix datafile are easily accessible by using the BDA routines.
+Dynamic memory can be easily obtained by using the DYN routines. The
+contents of ASTLIB can be accessed with the development aid DOCLIB,
+invoked from DCL by the command `DOCLIB'. Subroutines in this library
+are grouped into categories defined by prefix, a list of which 
+is available in AST\_DOCS:PREFIX.LIS
+
+\subsection{The interface file }
+
+Each ADAM application must have an interface file. This is used to describe
+the parameters used in an application. An example for the MEANDAT program
+can be seen in AST\_DOCS:TEMPLATE.IFL
+ 
+\subsection{Linking an application }
+
+After the application has been compiled, link it with the following command.
+\begin{verbatim}
+    $ ALINK <appname>,ASTOPT/OPT
+\end{verbatim}
+
+\section{Writing an ICL procedure }
+
+ICL procedures are actually fairly simple to write --- but very hard to
+debug. A description of the ICL programming language is available
+in ICLDIR:ICL.TEX.
+
+Two sample procedures can be seen in AST\_DOCS:TEMPLATE.ICL. The first,
+XRTBCKBOX, is an example of a procedure interacting with the image
+processing routines to obtain information to control sorting of raw
+XRT data. The second, XRTMSPEC, shows how to use the output file from 
+PSS to generate spectra from all the sources in an XRT field.
+
+\newpage
+
+\appendix
+
+\section{Example session }
+
+In this example, raw EXOSAT data is sorted into a source spectrum and a
+background spectrum, a background subtracted spectrum is produced and a
+spectral fit performed. Commentary is prefaced by asterisks, and some
+program output has been omitted for brevity.
+
+\begin{quote}\small
+\begin{verbatim}
+$ ADAMSTART                             * Start ADAM
+  ADAM version 1.6 available
+$ ASTSTART                              * Start ASTERIX
+$ SET DEF DISK$SCRATCH:[RDS]
+$ ICL                                   * Start ICL
+
+Interactive Command Language   -   Version 1.5
+
+  - Type HELP package_name for help on specific Starlink packages
+  -   or HELP PACKAGES for a list of all Starlink packages
+  - Type HELP [command] for help on ICL and its commands
+
+ Help key ASTERIX redefined
+
+loading ASTERIX command definitions........
+
+Loading IGLU version 2.0
+----------------------------------------------------------------------
+
+ ASTERIX Version 1.0            - type ASTHELP for more information
+                                - type ASTERIX to redefine commands
+
+ICL> SHOWEXO                                 * List the available data
+SHOWEXO version 1.0-2
+LIST - List file for output /'lp.lis'/ > ?
+Name of the text file used to log the results
+LIST - List file for output /'lp.lis'/ > 
+RAWDIR - Raw data directory /'DISK$SCRATCH:[RDS]'/ > DISK$SCRATCH:[DEMO.ME]
+ 111 files on this directory.
+EXPT - Experiment (MEA, MEX, GSPC, K, L) /'MEA'/ > 
+DTYPE - Data type of files /'E4'/ > E5
+ Observation 1      DISK$SCRATCH:[DEMO.ME]MEDATA_M001.E5;1
+ Observation 2      DISK$SCRATCH:[DEMO.ME]MEDATA_M002.E5;1
+ Observation 3      DISK$SCRATCH:[DEMO.ME]MEDATA_M003.E5;1
+ Observation 4      DISK$SCRATCH:[DEMO.ME]MEDATA_M004.E5;1
+4 observation(s) of E5 data with experiment code MEA
+Output is on LP.LIS
+
+ICL> TYP LP.LIS                       * View the resulting file
+Creating DCL subprocess
+ SHOWEXO version 1.0-2  run on directory DISK$SCRATCH:[DEMO.ME]
+ Expt-code MEA      Data-type E5  Layer Argon 
+OBS DAY   START    STOP   EXPOS     R.A.    DEC      TARGET  Track OFF DETECTOR
+ DATA REC.SHAPE    TDWELL --PHA-- RECS STA- 
+SEQ     hh:mm:ss hh:mm:ss ~secs hh:mm:ss hh:mm:ss                  SET abcdefgh
+ TYPE T1 PH ID T2    secs   range       TUS  OBS OBS
+  1 243 07:32:22 07:40:06   472                   ---slew---  sssss oo 11011111
+ E5    1  64 2  1   1.000   4  67  708 Ar    1    
+  2 243 07:40:14 07:41:42    96  17:30: - 33:01:  RAPID BURST ggggg oo 11011111
+ E5    1  64 2  1   1.000   4  67  144 Ar    2    
+  3 243 07:41:50 07:45:42   240                   ---slew---  sssss oo 11011111
+ E5    1  64 2  1   1.000   4  67  360 Ar    3    
+  4 243 07:46:46 11:46:46 14216  17:02: - 36:22:  GX-349+2    gTTTT oo 11011111
+ E5    1  64 2  1   1.000   4  6721324 Ar    4    
+
+ICL> EXOMESORT                        * Sort observations 1 and 3 to
+                                      * produce a spectrum from the 
+                                      * slew data.
+EXOMESORT Version 1.0-2
+RAWDIR - Raw data directory /'DISK$SCRATCH:[RDS]'/ > DISK$SCRATCH:[DEMO.ME]
+EXPT - Experiment (MEA / MEX / GSPC) /'MEA'/ > 
+DTYPE - Data type of files to sort /'E5'/ > 
+OBSLIST - Observations wanted /'  1:  4'/ > 1 3
+
+Base epoch chosen as follows (all times in seconds are relative to this):
+RECORD    SHF-KEY      SCLOCK    REF-TIME      MJD                 DATE
+    2   178788742     2207376  -683147264    46308.31416   1985-Aug-31 07:32:23
+
+ OBSERVATION  DATA-STARTS   DATA-ENDS RECORDS   ATTITUDE    SAT_STAT
+      1            -1.156     469.844     708    Slewing
+      3           566.844     805.844     360    Slewing
+
+    On TARGET  -45261.39   -1940.435
+
+     1) Time: -1.156128 - 805.8439  (seconds)
+     2) PHA channel: 4 - 67   (channel no.)
+
+RANGES - Which range(s) do you wish to change (Time=1,Pha=2) /'1'/ > !
+                                       * Accept the ranges shown
+ Ident chan.    1       2
+ Detectors      ABD     EFGH
+ Offsets        Source  Source
+
+Mode: coalligned
+
+NIDBINS - How many detector ID channels in the output file /1/ > 
+ICHNS1 - Enter detector Ident chans. wanted in output channel 1 > 1:2
+ Input IDENT                    1   2
+ Mapped to output               1   1
+
+     DATA AXES
+ -----------------
+  1) Time
+  2) Energy
+
+BIN_AXES - Axes required in data array /'1'/ > 2
+ENBIN - Width of bins in the energy axis (channels) /1/ > 
+There will be 64 bins, each of 1 raw PHA channel(s) , starting from 4
+OUT - Binned dataset Filename /@DET4T/ > SLEW
+Sorting records    1 to   708 of file DISK$SCRATCH:[DEMO.ME]MEDATA_M001.E
+Sorting records    1 to   360 of file DISK$SCRATCH:[DEMO.ME]MEDATA_M003.E
+Normalising to counts/sec
+EXOMESORT complete
+
+ICL> EXOMESORT                          * Produce a source spectrum
+EXOMESORT Version 1.0-2
+RAWDIR - Raw data directory /'DISK$SCRATCH:[RDS]'/ > DISK$scratch:[DEMO.ME ]
+EXPT - Experiment (MEA / MEX / GSPC) /'MEA'/ > 
+DTYPE - Data type of files to sort /'E5'/ > 
+OBSLIST - Observations wanted /'  1:  4'/ > 4
+
+Base epoch chosen as follows (all times in seconds are relative to this):
+RECORD    SHF-KEY      SCLOCK    REF-TIME      MJD                 DATE
+  110   178789606     2207808  -668991488    46308.32416   1985-Aug-31 07:46:47
+
+ OBSERVATION  DATA-STARTS   DATA-ENDS RECORDS   ATTITUDE    SAT_STAT
+      4            -1.156   14405.844   21324    On TARGET
+
+    On TARGET  2474.604   215951.7
+
+     1) Time: 1474.604 - 14405.84  (seconds)
+     2) PHA channel: 4 - 67   (channel no.)
+
+RANGES - Which range(s) do you wish to change (Time=1,Pha=2) /'1'/ > 
+TSTART - Minimum value of Time in seconds /1474.604/ > 2474.604
+TSTOP - Maximum value of Time in seconds /14405.84/ > 
+                                  * Select times when the detector
+                                  * was monitoring the target
+ Ident chan.    1       2
+ Detectors      ABD     EFGH
+ Offsets        Source  Source
+
+Mode: coalligned
+
+NIDBINS - How many detector ID channels in the output file /1/ > 
+ICHNS1 - Enter detector Ident chans. wanted in output channel 1 > 1:2
+ Input IDENT                    1   2
+ Mapped to output               1   1
+
+     DATA AXES
+ -----------------
+  1) Time
+  2) Energy
+
+BIN_AXES - Axes required in data array /'2'/ > 
+ENBIN - Width of bins in the energy axis (channels) /1/ > 
+There will be 64 bins, each of 1 raw PHA channel(s) , starting from 4
+OUT - Binned dataset Filename /@SLEW/ > SOURCE
+Sorting records 3664 to 21324 of file DISK$SCRATCH:[DEMO.ME]MEDATA_M004.E
+Normalising to counts/sec
+EXOMESORT complete
+
+ICL> EXOSUBPH                         * Subtract the slew spectrum 
+                                      * from the source spectrum.
+EXOSUBPH Version 1.0-2
+Options are SLEW,2SLEW,NOD,2NOD,SELECT
+OPTION - Which subtraction option do you want /'NOD'/ > SLEW
+option chosen :  SLEW
+ For this option the following data files are needed
+
+   File 1 : Source/pointing data
+   File 2 : Background/slew data in the same
+            configuration as the source
+
+   ACTION: background data subtracted from source data
+
+INP1 - Input dataset name 1 /@COMFULL/ > ?
+Enter the name without the .SDF extension 
+INP1 - Input dataset name 1 /@COMFULL/ > SOURCE
+INP2 - Input dataset name 2 /@VC2/ > SLEW
+OUT - Output dataset name /@VCSUB/ > SRCSUB
+
+ICL> EXORESP                     * Write detector response matrix 
+                                 * into the datafile
+EXORESP Version 1.0-2
+INP - Input dataset name /@SRCSUB/ > 
+Calculating the response matrix for detector 1
+Calculating the response matrix for detector 2
+Calculating the response matrix for detector 4
+Calculating the response matrix for detector 5
+Calculating the response matrix for detector 6
+Calculating the response matrix for detector 7
+Calculating the response matrix for detector 8
+
+ICL> DRAW SRCSUB VWS             * Plot the subtracted spectrum
+DRAW Version 1.0-7
+Dataset: DISK$<SCRATCH>:[RDS]SRCSUB
+
+ICL> SMODEL SMOD3                * Define the spectral model to be
+SMODEL Version 1.0-1             * fitted to the data
+Input model file :- DISK$SCRATCH:[RDS]SMOD3.SDF;1
+
+A composite model can be synthesised using + - * ( ) and
+any of the following primitive models:
+
+   AG     galactic interstellar absorption             multiplicative
+   AB     intrinsic absorption                         multiplicative
+   BR     thermal bremsstrahlung (cosmic)              additive      
+   PL     power law                                    additive      
+   BB     black body                                   additive      
+   WN     Wien                                         additive      
+   BH     hydrogen bremsstrahlung                      additive      
+   BP     pseudo-bremsstrahlung                        additive      
+   PC     cutoff power law                             additive      
+   CS     Chapline-Stevens Comptonised brems.          additive      
+   ST     Sunyaev-Titarchuk Comptonisation             additive      
+   RZ     Raymond-Smith plasma (metals combined)       additive      
+   LG     Gaussian line                                additive      
+   LL     Lorentzian line                              additive      
+
+SPEC - Model specification > (BR+BB)*AG
+
+                       COMPONENT  1
+                      **************
+Name: thermal bremsstrahlung (cosmic)          Keyword: BR     [additive]
+  PARAMETER  1 - em10                       (1e60cm**-3/(10kpc)**2)         
+                 value,min,max =   1.0000       1.00000E-04    10.000    
+
+                      * etc...
+
+
+ICL> SFIT SRCSUB                       * Fit the model to the data
+SFIT Version 1.0-1
+Dataset :-
+    File:  DISK$SCRATCH:[RDS]SRCSUB.SDF;1
+Instrument response found
+Input model file :- DISK$SCRATCH:[RDS]SMOD3.SDF;1
+                                       * Model is picked up automatically
+Initial chisq & chi-red :  5721.4       96.973    
+
+it,chi-red,lambda,slope :   1        95.783          0      8.169    
+it,chi-red,lambda,slope :   2        89.244         -1      12.60    
+it,chi-red,lambda,slope :   3        84.625          0      290.5    
+
+                        * etc...
+
++++ Minimum found +++
+
+Calculating approximate parameter errors
+
+
+       Parameter                  Value      Approx error (1 sigma)
+----------------------------------------------------------------------
+BR     em10                       9.4541       0.10477    
+       temperature                3.7092       9.53175E-02
+BB     norm                      5.75460E-02   1.31136E-03
+       temperature                1.6606       6.08231E-03
+AG     hydrogen column density    9.4290       0.13274    
+
+Chi-squared =   777.4       with 59 degrees of freedom
+
+** Error estimates entered in model spec. **
+
+OP - Output results? > Y                  * Send results to the printer
+
+\end{verbatim}
+\end{quote}
+
+\newpage
+
+\section{Command List }
+
+This is a list of commands available in ASTERIX. These are loosely
+grouped by their function. Shortform and macro commands are shown
+with suffixes of a cross and an asterix respectively. 
+For full details on each command type  `ASTHELP Command'.
+
+\small
+\begin{verbatim}
+ 1) Instrument Interfaces
+    ~~~~~~~~~~~~~~~~~~~~~
+   a) EXOSAT commands:
+
+ EXOLESORT         Sort Exosat LE raw data files into ASTERIX datasets.
+ EXOMESORT         Sort Exosat ME raw data files into ASTERIX datasets.
+ EXORESP           Write EXOSAT ME responce matrix into a dataset.
+ EXOSUBPH          Subtract background for ME data.
+ READEXO           Read Exosat FOT's onto disc.
+ SCANEXO           Scan an Exosat tape and produces a summary.
+ SHOWEXO           Produce a summary of observations on a disc directory.
+ BOXEXOLE*         Draw a box on an Exosat LE image and sort the data within this region.
+ BCKBOXEXOLE*      Draw a source and background box on an Exosat LE image and
+                   sort the data within these regions.
+ TIMEXOLE*         Plot a time series select a time window and sort LE data
+                   between these values.
+ TIMEXOME*         Same for the ME.
+
+   b) ROSAT WFC commands:
+
+ S2ADDOWNER        Add ownership flag to an S2 catalogue, using WFC sky division.
+ S2ADDPFLAG        Add a processing flag to an S2 catalogue.
+ S2CATLIST         List contents of an S2 format catalogue.
+ S2CATMERGE        Merge two S2 format catalogues to create a third.
+ S2FILTMERGE       Merge source search results from each filter into an S2 catalogue.
+ S2GIDECODE        Unpack cross-reference data from an S2 catalogue into
+                   SCAR global index.
+ S2GIENCODE        Pack a SCAR global index into an S2 catalogue.
+ WFCBACK           Produce background subtracted image given raw image.
+ WFCSPEC           Produce a WFC spectral file.
+
+   c) ROSAT XRT commands:
+
+ XRTDISK           Read XRT FITS disk files
+ PREPXRT           Reformat the output from XRTDISK 
+ XSORT             Sort raw XRT data.
+ XRTORB            Reformat an XRT orbit file
+ XRTSUB            Subtract XRT files.
+ XRTCORR           Correct XRT files.
+ XRTRESP           Write XRT response into file.
+
+
+ 2) Event Processing Commands - these all work on EVENT datasets.
+    ~~~~~~~~~~~~~~~~~~~~~~~~~
+ EVBIN             Create a binned dataset from an event dataset.
+ EVCSUBSET         Extract a circular or annular region from an event dataset.
+                   Output is an event dataset.
+ (EVLIST           Display the DATA_ARRAY component of all lists in an event dataset.)
+ EVMERGE           Merge two or more event datasets.
+ EVSUBSET          Linearly extract a subset from an event dataset.
+ EVCSUBSET         Produce a circular subset.
+ EVSIM             Generate simulated event dataset.
+ EVPOLAR           Bin an event dataset into a polar binned dataset.
+
+
+ 3) Binned Dataset Commands
+    ~~~~~~~~~~~~~~~~~~~~~~~
+ AXFLIP            Reverse directions of any or all of dataset's axes.
+ AXORDER           Re-order axes of a dataset.
+ AXSHOW            Display axes.
+ BINMERGE          Merge up to ten datasets.
+ BINSUBSET         Subset a binned dataset.
+ ENMAP             Produce an energy map for plotting.
+ INTERP            Reconstitute bad pixels by spline interpolation.
+ MEANDAT           Find the mean of several datafiles.
+ POLYFIT           Fit 1-d polynomial(s) to a dataset.
+ PROJECT           Project data along one axis.
+ RATIO             Give the ratio of two bands on any axis in an n-d array.
+ REBIN             Rebin a binned dataset.
+ SETRANGES         Set ranges to be used by a subsequent program.
+ SIGNIF            Change an input dataset to its weighted significance.
+ SCATTERGRAM       Produce scatter plot of one array versus another.
+ SMOOTH            Smooth an n-d datafile with a user-selectable mask.
+ SYSERR            Add a constant percentage to the variance of each point.
+ VALIDATE          Basic validation of binned dataset.
+
+
+ 4) Conversion Commands
+    ~~~~~~~~~~~~~~~~~~~
+ ASTCONV           Convert between old & new ASTERIX binned datasets.
+ AST2XSP           Convert Asterix spectral files into XSPEC format.
+ ASTQDP            Allow an Asterix file to be used within QDP.
+ (EVBIN            Create a binned dataset from an event dataset.)
+ EXPORT            Output one or more datasets to ascii file.
+ IMPORT            Read an ascii text file into an ASTERIX binned dataset.
+ TEXT2HDS          Convert columns in a text file into HDS arrays.
+
+
+ 5) Display Commands
+    ~~~~~~~~~~~~~~~~
+ BINLIST           Display a 1D binned dataset.
+ EVLIST            Display the DATA_ARRAY component of all lists in an event dataset.
+ HEADER            Display header & processing information in a dataset.
+ HISTORY           Display history of a dataset.
+
+
+ 6) Math Commands
+    ~~~~~~~~~~~~~
+ ARITHMETIC        Perform basic arithmetic (+,-,/,*) on two data objects.
+ ADD+              Invoke ARITHMETIC in + mode.
+ SUBTRACT+         Invoke ARITHMETIC in - mode.
+ MULTIPLY+         Invoke ARITHMETIC in * mode.
+ DIVIDE+           Invoke ARITHMETIC in / mode.
+ OPERATE           Perform operations e.g. LOG10  on a dataset.
+
+
+ 7) Time Series Analysis Commands
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ ACF               Auto-corralation program.
+ BARYCORR          Barycentric correction.
+ CROSSCOR          Cross correlates two 1D series.
+ CROSSPEC          Compute the cross spectrum of two 1D datasets.
+ DIFDAT            Difference adjacent data points in an array.
+ DYNAMICAL         Find power spectrum of successive segments of a time series.
+ FOLDAOV           Period search ANOVA folding routine
+ FOLDBIN           Fold a time-series into phase bins at a given period.
+ FOLDLOTS          Epoch folding, period search algorithm.
+ LOMBSCAR          Lomb-Scargle power spectral routine
+ PHASE             Convert a time-series into a phase series.
+ POWER             Find the power spectrum of a full unweighted 1D dataset.
+ SINFIT            Find a periodogram of irregularly spaced 1D data.
+ STREAMLINE        Strips bad quality data out of a file.
+ TIMSIM            Simulate a time series.
+ VARTEST           Test a time series for variability.
+
+
+ 8) Image Processing Commands 
+    ~~~~~~~~~~~~~~~~~~~~~~~~~
+    a) interactive
+
+ ISTART            Start up image processing system.
+ INEW              Load new image.
+ ICLOSE            Close down image processing system.
+ IDISPLAY          Display current image.
+ IREDISPLAY+       Redisplay current image.
+ IBOX              Define rectangular section of image.
+ IWHOLE            Select whole image.
+ IZOOM*            Zoom in on section of image.
+ IUNZOOM*          Redisplay whole image.
+ ISCALE            Rescale image.
+ ICONTOUR          Contour current image.
+ IGRID             Put grid over image in specified coords.
+ ICOLOUR           Change colour table.
+ IBLUR             Smooth an image.
+ IBLURG+           Smooth with a gaussian.
+ IBLURB+           Smooth with a box filter.
+ IPLOT             Display current 1D plot.
+ IREPLOT+          Redisplay current 1D plot.
+ ILIMITS           Change axis limits on 1D plot.
+ ISTYLE            Set plotting style of 1D plot.
+ ITITLE            Change title of current image or plot.
+ IZONES            Change zones on display surface.
+ ICLEAR            Clear current plotting zone.
+ IHARD             Does hard copy of current plot.
+ ISTATS            Give basic statistics on pre-selected region of image.
+ IBOXSTATS*        Select region and give statistics.
+ ICIRCSTATS*       Get flux from a circular region.
+ ICENTROID         Find the centroid in a given region.
+ ICURRENT          Display the current position, image ...
+ IPOSIT            Set the current position.
+ ISURFACE          Displays an image as a 3-d surface.
+ ISEP              Calculate the separation between two positions.
+ IMARK             Mark sources on image.
+ INOISE            Add gaussian noise to image.
+ IREMOVE           Remove sources from an image.
+ IZAP              Remove individual pixels from image.
+ IPATCH            Patch bad quality pixels in image.
+ IPEEK             Take a peek at selected bit of image.
+ IPEEKV+           Look at variances.
+ IPEEKQ+           Look at quality.
+ IPGDEF            Change basic graphics properties.
+ IHIST             Histogram pixels inside current box.
+ IPEAKS            Find peaks in an image.
+ IRADIAL           Produce radial plot.
+ IPSF              Put PSF profile on 1D plot.
+ IAZIMUTH          Produce azimuthal distribution.
+ ISLICE            Take a 1-d slice from an image.
+ IPREVIOUS         Go back to previous image.
+ ISAVE             Save current image to file.
+ ISAVE1D           Save current 1D data to file.
+
+    b) non-interactive
+
+ IMOSAIC           Merge several non-congruent images.
+ IPOLAR            Produce a polar surface brightness profile of an image.
+ IDTODMS*          Convert decimal degrees to dd:mm:ss.
+ IDMSTOD*          Convert dd:mm:ss to decimal degrees.
+ IDTOHMS*          Convert decimal degrees to hh:mm:ss.
+ IHMSTOD*          Convert hh:mm:ss to decimal degrees.
+
+
+ 9) Parameter Commands
+    ~~~~~~~~~~~~~~~~~~
+ GLOBAL            Display the current values of all global parameters.
+
+
+ 10) Spectral analysis commands
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~
+ FREEZE            Freeze parameter(s) in spectral model.
+ IGNORE+           Allow spectral channels to be excluded from fitting.
+ RESTORE+          Reinstate spectral channels for fitting.
+ SDATA             Define datasets to be fitted.
+ SERROR            Evaluate confidence region for spectral model parameters.
+ SFIT              Fit spectral model to one or more datasets.
+ SFLUX             Evaluate flux from defined model over energy band.
+ SMODEL            Allow user definition of muti-component spectral model.
+ SPLOT             Plot data, fits and residuals.
+ THAW              Free spectral model parameter (after FREEZEing).
+
+
+ 11) Statistical analysis commands
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ BINSUM            Integrate a dataset - use for cumulative distributions.
+ COMPARE           Compare two datafiles or a file and a model.
+ FREQUENCY         Produce a histogram of values in a data array.
+ KSTAT             Calculate the Kendall K statistic for a 1-d dataset.
+ STATISTIX         Find mean, standard deviation etc.. of a data array.
+
+
+ 12) Quality processing commands
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ IGNORE+           Invoke QUALITY in IGNORE mode: sets temporary bad quality bit.
+                   (Only availible in ICL.)
+ QUALITY           General quality manipulation application.
+ RESTORE+          Invoke QUALITY in RESTORE mode: clears temporary bad quality bit.
+                   (Only availible in ICL.)
+ SETQUAL+          Invoke QUALITY in SET mode: sets quality to specified value.
+                   (Only availible in ICL.)
+ MAGIC             Set magic values.
+ CQUALITY          Perform quality manipulation on a circular region.
+ CRESTORE          Set quality good in a circular region.
+ CIGNORE           Set quality bad in a circular region.
+
+
+ 13) HDS editor commands
+     ~~~~~~~~~~~~~~~~~~~
+ HCOPY             Recursively copy an HDS object.
+ HCREATE           Create an HDS object in a file.
+ HDELETE           Delete an HDS object.
+ HDIR              Display the components of an HDS file or structure.
+ HDISPLAY          Display the contents of an HDS primitive.
+ HFILL             Fill a primitive object with one value.
+ HMODIFY           Change the value(s) in an existing object.
+ HREAD             Read from an ASCII (or binary) file to an HDS object.
+ HRENAME           Rename an HDS object.
+ HRESET            Set values in HDS primitive to `undefined'.
+ HRESHAPE          Alter size of dimensions in an HDS primitive array.
+ HRETYPE           Change type of a structured object.
+ HSE               Interactive HDS screen editor - see HSEHELP.
+ HTAB              Simultaneously display several HDS primitive vectors.
+ HWRITE            Write an HDS primitive to an ASCII (or binary) file.
+
+
+ 14) Source Searching Commands
+     ~~~~~~~~~~~~~~~~~~~~~~~~~
+ CREPSF            Create a PSF file.
+ PSS               Search a binned dataset for sources.
+ PSSPAR+           Invoke PSS in parameterise mode.
+ SS_ANOT+          Anotate an image given source search results.
+ SSCARIN           Export source search results to binary SCAR catalogue.
+ SSDUMP            Dump source search results to an ascii file.
+ SSMERGE           Merge two or more source results together.
+ SSZAP             Set quality bad around sources found by PSS.
+ BSUB              Background subtraction program.
+ XPSSCORR          Exposure corrects XRT source fluxes produced by PSS.
+
+ 15) GRAFIX display commands
+     ~~~~~~~~~~~~~~~~~~~~~~~
+ DEVICES           Show the available graphics display devices.
+ DOPEN+            Open device (variant of DEVICES).
+ DCLOSE+           Close device (variant of DEVICES).
+
+ DRAW              Display specified (or current) dataset.
+ QDRAW+            Draw quick and simple plot (variant of DRAW).
+ RDRAW+            Plot raw data only (variant of DRAW).
+
+ MULTI             Create multi graph dataset from binned datasets.
+ AMULTI+           Add another binned dataset to a multi-graph dataset.
+ DMULTI+           Remove a dataset from a multi-graph dataset (variants of MULTI).
+ DESIGN            Display specified plots within a multi graph dataset.
+ LAYOUT            Specify number of plots in x & y in multi graph dataset.
+
+ POSIT             Specify position of plot in NDC or cm.
+ XLOG+             Set x-axis logarithmic (variant of AXES).
+ YLOG+             Set y-axis logarithmic (variant of AXES).
+ XYLOG+            Set both axes logarithmic (variant of AXES).
+ AXES              Set plotting attributes for axes.
+ XAXIS+            Set attributes for x-axis (variant of AXES).
+ YAXIS+            Set attributes for y-axis (variant of AXES).
+
+ LABEL             Set labels on plot.
+ XLABEL+           Set x-label (variant of LABELS).
+ YLABEL+           Set y-label (variant of LABELS).
+ LEGEND            Add, delete or modify legend lines.
+ ALEGEND+          Add a legend line (variant of LEGEND).
+ DLEGEND+          Delete a legend line (variant of LEGEND).
+ ANOTATE           Place text in graph (binned dataset) at specified posn.
+
+ POLYLINE          Draw 1D image as polyline.
+ MARKER            Draw 1D dataset with specified PGPLOT marker.
+ STEPLINE          Draw 1D dataset as histogram.
+ ERRORS            Draw error boxes of specified shape on 1D dataset.
+
+ PIXEL             Draw 2D image as pixels.
+ CONTOUR           Draw 2D dataset as contours.
+ THREED            Draw 2D dataset as quasi 3D plot.
+
+ COLTAB            Manipulate colour table for 2D plot.
+ COLBAR+           Cause colour bar to be put on 2D plot.
+ GREYSCALE+        Set colour table to greyscale.
+ SKYGRID           Put coordinate grid on 2D plot.
+
+ CURSOR            Put interactive cursor on screen.
+ SHAPES            Put a shape onto a displayed image.
+ ZOOM*             Interactively set plot limits.
+
+ PGDEF             Set global PGPLOT default attributes.
+\end{verbatim}
+\normalsize
+\end{document}

@@ -1,0 +1,3943 @@
+\documentstyle{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {61.2}
+\newcommand{\stardocauthors}   {R.F. Warren-Smith}
+\newcommand{\stardocdate}      {21st August 1989}
+\newcommand{\stardoctitle}     {TRANSFORM --- Coordinate Transformation 
+                                Facility}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+
+%   General definitions for use throughout the document.
+\newcommand{\name}[1]{\mbox{#1}}
+\newcommand{\fortvar}[1]{\mbox{\em #1}}
+\newcommand{\numcir}[1]{\mbox{\hspace{3ex}$\bigcirc$\hspace{-1.7ex}{\small #1}}}
+\renewcommand{\_}{{\tt\char'137}}
+
+%   This defines "example" headings keeps count of them.
+\newcounter{examplecounter}
+\newcommand{\example}[1]{\addtocounter{examplecounter}{1}
+                         \paragraph{\bf Example \theexamplecounter. #1}}
+\newcommand{\exampledone}[0]{\begin{center} \rule{6em}{0.2mm} \end{center}}
+
+%   These are used in the Appendix on "Classifying Transformations".
+\newcommand{\pdiff}[2]{\frac{\partial y_{#1}}{\partial x_{#2}}}
+\newcommand{\req}[0]{$\bullet$}
+\newcommand{\imp}[0]{$\circ$}
+\newcommand{\pro}[0]{$\times$}
+\newcommand{\irr}[0]{$-$}
+
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+\begin{center}
+{\large\bf Programmer's Guide and Reference Manual: Version 0.9}
+\end{center}
+
+\setlength{\parskip}{0mm}
+\tableofcontents
+\setlength{\parskip}{\medskipamount}
+\markright{\stardocname}
+
+
+\section{INTRODUCTION}
+
+This document describes version 0.9 of the \name{TRANSFORM} coordinate
+transformation facility and shows how it may be used in application programs
+operating within the Starlink \name{ADAM} environment (SUN/94). 
+It is assumed that the reader is familiar with this environment and with the
+Starlink Hierarchical Data System \name{HDS} (SUN/92). 
+
+The main text of this document provides a guide for programmers who have not 
+used the \name{TRANSFORM} facility before.
+It contains an introduction to the overall capabilities of the software and
+the basic concepts involved, followed by a tutorial-style description of all
+the main features with examples of their use. 
+
+The Appendices at the end of the document contain further reference material
+which will mainly be of value to more experienced users.
+In particular, Appendix~\ref{appendix:routines} gives a description of all 
+the user-callable routines provided.
+
+
+\subsection{What is the \name{TRANSFORM} Facility?}
+
+The \name{TRANSFORM} facility is a library of subroutines which may be used
+by application programs to process information describing the relationships
+between different coordinate systems. 
+
+It provides a standard, flexible method for manipulating coordinate
+transformations and for transferring information about them between
+applications. 
+It can handle coordinate systems with any number of dimensions and can
+efficiently process large ({\em i.e.}\ image-sized) arrays of coordinate
+data using a variety of numerical precisions. 
+No specific support for astronomical coordinate transformations or map
+projections is included at present, but routines for handling these will
+appear in future.
+The current system provides tools for creating a wide variety of coordinate
+transformations, so it should be possible to construct some of the simpler
+astronomical transformations explicitly, if required, on an interim basis. 
+
+Some possible applications of \name{TRANSFORM} routines include:
+
+\begin{itemize}
+\item Defining linear and non-linear graphics coordinate systems;
+\item Attaching coordinate systems to datasets ({\em e.g.}\ relating image
+pixels to sky positions); 
+\item Describing distortion in images and spectra;
+\item Storing and applying instrumental calibration functions.
+\end{itemize}
+
+Note that the \name{TRANSFORM} facility uses the Hierarchical Data System
+\name{(HDS)} to store its information in standard data structures for
+interchange between applications. 
+These data structures may therefore be used as building blocks when
+constructing larger \name{HDS} datasets and also when designing
+``extensions'' to the standard Starlink \name{NDF} data structure (see
+SGP/38). 
+
+
+\section{BASIC CONCEPTS AND TERMINOLOGY}
+
+
+\subsection{Transformations}
+
+The \name{TRANSFORM} facility stores the information which it requires for
+conversion between different coordinate systems in \name{HDS} structures
+called {\em transformations}. 
+They have an \name{HDS} type of \name{TRN\_TRANSFORM}\footnote{
+Full internal details of all the \name{HDS} structures used by the
+\name{TRANSFORM} facility are given in Appendix~\ref{appendix:structures}.} 
+and the purpose of each of these structures is to describe the relationship
+which exists between two different coordinate systems. 
+The two systems in question are termed the {\em input} and {\em output}
+coordinate systems and the \name{HDS} transformation structure serves to
+``link'' them together as a pair. 
+In this role, the transformation may be regarded simply as a ``black box'',
+thus: 
+
+\begin{quote}
+\begin{center}
+\setlength{\unitlength}{1mm}
+\thicklines
+\begin{picture}(60, 30)(-30,-15)
+\put(-15,-5){\framebox(30,10){\bf Transformation}}
+\put(-15,0){\line(-1,0){10}}
+\put(-25,0){\circle*{1.5}}
+\put(-37.5,0){\oval(25,25)}
+\put(-37.5,0){\makebox(0,0){\shortstack{{\bf Input}\\{\bf Coordinate}\\{\bf
+System}\\$(x_1,x_2,\ldots x_m)$}}}
+\put(15,0){\line(1,0){10}}
+\put(25,0){\circle*{1.5}}
+\put(37.5,0){\oval(25,25)}
+\put(37.5,0){\makebox(0,0){\shortstack{{\bf Output}\\{\bf Coordinate}\\{\bf
+System}\\$(y_1,y_2,\ldots y_n)$}}}
+\end{picture}
+\end{center}
+\end{quote}
+
+Positions (or {\em points}) in each coordinate system will be specified by
+appropriate sets of {\em coordinates}, and the purpose of the transformation
+is to define an ``association'' between corresponding points in each system.
+Thus, given the coordinates of a point in one system, the coordinates of the
+associated point in the other system may be derived by using the information
+stored in the transformation structure. 
+
+\paragraph{Transformation variables.}
+The inter-conversion of coordinates in this way between two different
+2-dimensional systems ({\em e.g.}\ between {\em Equatorial} and {\em
+Galactic} sky coordinates) is a familiar concept. 
+In general, however, there is no need for the two coordinate systems to be
+2-dimensional, nor even for both of them to have the same dimensionality. 
+To cater for this general case, each transformation has a set of {\em input}
+and {\em output} {\em variables} associated with it. 
+They are represented here by \mbox{$(x_1,\ldots x_m)$} and
+\mbox{$(y_1,\ldots y_n)$} respectively, where the numbers of input and
+output variables ($m$ and $n$) may be any positive integer -- not
+necessarily equal. 
+These variables are akin to the ``dummy arguments'' used in Fortran
+subroutines and are the means by which coordinate values are passed to and
+from the transformation; they may be visualised as a set of input and output
+ports attached to it, as follows: 
+
+\begin{displaymath}
+\begin{array}{c}
+\mbox{Forward } \longrightarrow \\
+
+m \mbox{ input values }
+\left\{ \begin{array}{c} x_1 \\ x_2 \\ \vdots \\ x_m \end{array} \right\}
+
+\begin{array}{c}\mbox{
+\setlength{\unitlength}{1mm}
+\thicklines
+\begin{picture}(40, 10)(-20,-5)
+\put(-15,-5){\framebox(30,10){\bf Transformation}}
+\multiput(-15,-2.5)(0,2.5){3}{\line(-1,0){3}}
+\multiput(-18,-2.5)(0,2.5){3}{\circle*{1}}
+\multiput(15,-2)(0,4){2}{\line(1,0){3}}
+\multiput(18,-2)(0,4){2}{\circle*{1}}
+\end{picture}
+} \end{array}
+
+\left\{ \begin{array}{c} y_1 \\ y_2 \\ \vdots \\ y_n \end{array} \right\}
+n \mbox{ output values}
+
+\\ \longleftarrow \mbox{ Inverse}
+\end{array}
+\end{displaymath}
+
+Any coordinate values supplied to the ports ({\em i.e.}\ variables) at
+either end of the transformation may be converted into a corresponding set
+of ``transformed'' coordinates (using the information within the
+transformation), to be delivered through the ports ({\em i.e.}\ variables)
+at the opposite end. 
+
+As with subroutine arguments, the names assigned to the input/output
+variables have no absolute significance outside the transformation itself,
+and coordinate values must be supplied in the correct order (typically
+within a data array, for instance) in order to ``match up'' with the
+appropriate transformation variables. 
+In practice, of course, when describing a transformation, it is convenient
+to retain meaningful names for its variables; these may then be referred to
+using the usual notation as \mbox{$(\alpha,\delta)$} or \mbox{$(x,y,z)$}, 
+etc., so that the expected order is clear. 
+
+
+\subsection{Mappings}
+
+The most important part of any transformation is a pair of ``numerical
+recipes'' which provide a description of the precise numerical steps which
+must be carried out in order to perform coordinate conversion in each
+direction. 
+These ``recipes'' are termed the {\em forward} and {\em inverse}
+{\em mappings}.\footnote{ 
+Note that the term {\em mapping} is used here with its usual mathematical 
+meaning, whereas the (mathematically synonymous) term {\em transformation} 
+is reserved to represent a more complex structure which may contain both a 
+forward and inverse mapping, as well as possible ancillary information.
+The two terms should not be confused.}
+It will frequently be possible to define both of these, so that coordinate
+conversion may be performed in either direction. 
+However, this may not always be possible (or desirable), so a transformation
+may also exist even if only one of its two possible mappings is defined. 
+In this case, coordinate conversion will only be possible in one direction. 
+
+As will be seen later, it is often convenient to extract the mappings from
+a transformation and to process them as separate entities. 
+
+
+\paragraph{Notation.}
+A general transformation with $m$ input variables and $n$ output variables,
+in which both the forward and inverse mappings are defined, is denoted here
+by \mbox{[$m \leftrightarrow n$]}. 
+The double-ended arrow `$\leftrightarrow$' indicates that coordinate
+conversion is possible in either direction. 
+Similarly, the notation \mbox{[$m \rightarrow n$]} and \mbox{[$m \leftarrow
+n$]} is used to represent transformations where only the forward or inverse
+mapping (respectively) is defined, so that coordinate conversion can be
+performed only in the direction indicated. 
+This notation may also be used to describe individual transformations by
+including a list of their input and output variables.
+Thus, a transformation which relates a {\em Cartesian} coordinate system to
+a {\em Polar} system might be denoted by \mbox{[$(x,y) \leftrightarrow
+(r,\theta)$]}. 
+
+To distinguish {\em transformations} from {\em mappings}, the notation for 
+the latter uses braces `\{\ldots\}' rather than square brackets, so that a
+mapping which describes how to convert a set of $m$ input values into a set
+of $n$ output values would be denoted by \mbox{\{$m \rightarrow n$\}}. 
+In this case, the arrow may only point to the right because a single
+mapping, once separated from its parent transformation, can only perform
+coordinate conversion in one direction. 
+This is always regarded as its ``forward'' direction. 
+
+
+\subsection{Transformation Functions}
+
+In principle, the value of each of a transformation's output variables may
+depend on the values supplied to {\bf all} of its input variables. 
+Consequently, a general transformation's forward mapping may only be
+specified in full by giving a complete set of {\em transformation functions}
+which define the precise form of this dependence for each of the output 
+variables.
+The same consideration also applies to the inverse mapping. 
+Thus, in general, a transformation's two mappings may be decomposed into a
+set of $n$ {\em forward transformation functions} (denoted \mbox{$F_1,\ldots
+F_n$}) and a set of $m$ {\em inverse transformation functions} (denoted
+\mbox{$I_1,\ldots I_m$}) which act upon the input and output variables, as
+follows: 
+
+\begin{equation}
+\begin{array}{cc}
+\mbox{Forward }
+\left\{
+\begin{array}{ccc}
+y_1 & = & F_1(x_1, x_2,\ldots x_m)\\
+y_2 & = & F_2(x_1, x_2,\ldots x_m)\\
+\vdots & & \vdots\\
+y_n & = & F_n(x_1, x_2,\ldots x_m)
+\end{array}
+\right.
+&
+\mbox{Inverse }
+\left\{
+\begin{array}{ccc}
+x_1 & = & I_1(y_1, y_2,\ldots y_n)\\
+x_2 & = & I_2(y_1, y_2,\ldots y_n)\\
+\vdots & & \vdots\\
+x_m & = & I_m(y_1, y_2,\ldots y_n)
+\end{array}
+\right.
+\end{array}
+\label{equation:transformationfunctions}
+\end{equation}
+
+\example{Drawing graphs.}
+A simple illustration of mappings, transformation functions and the notation
+used to describe them may be taken from the \mbox{[$2 \leftrightarrow 2$]}
+transformation commonly used to relate ``data'' coordinates $(x_d,y_d)$ to
+``graph paper'' coordinates $(x_p,y_p)$ when drawing a graph. 
+If the graph is linear, then the transformation's two mappings might
+typically be defined by the following transformation functions: 
+
+\begin{equation}
+\begin{array}{cc}
+\mbox{Forward mapping } \left\{
+\begin{array}{lll}
+x_p & = & S_x(x_d-x_0) \\
+y_p & = & S_y(y_d-y_0)
+\end{array} \right.
+&
+\mbox{Inverse mapping } \left\{
+\begin{array}{lll}
+x_d & = & (x_p/S_x)+x_0 \\
+y_d & = & (y_p/S_y)+y_0
+\end{array} \right.
+\end{array}
+\end{equation}
+
+where \mbox{$x_0$} and \mbox{$y_0$} are zero points on the two axes, and
+\mbox{$S_x$} and \mbox{$S_y$} are scale factors. 
+In this example, \mbox{($x_d,y_d$)} have been treated as input variables,
+while \mbox{($x_p,y_p$)} are output variables. 
+This particular choice is arbitrary, although a convention would have to be
+adopted before writing software which used such a transformation. 
+
+Using the notation outlined above, this simple transformation would be
+denoted by:
+\begin{quote}
+\begin{center}
+\mbox{[$(x_d,y_d) \leftrightarrow (x_p,y_p)$]}
+\end{center}
+\end{quote}
+{\em i.e.}\ with the input variables appearing on the left. 
+The forward mapping would then be denoted by:
+\begin{quote}
+\begin{center}
+\mbox{\{$(x_d,y_d) \rightarrow (x_p,y_p)$\}}
+\end{center}
+\end{quote}
+and the inverse mapping by:
+\begin{quote}
+\begin{center}
+\mbox{\{$(x_p,y_p) \rightarrow (x_d,y_d)$\}}
+\end{center}
+\end{quote}
+\exampledone
+
+
+\section{SIMPLE USE OF TRANSFORM ROUTINES}
+
+
+\subsection{Formulating a Transformation}
+
+The first stage in creating a transformation is to formulate a description 
+of it in a form which may be used in a program.
+In future, there may be a number of ways of formulating such a description 
+and of creating a corresponding transformation from it.
+At present, however, only one method is supported, based on the explicit use
+of transformation functions.
+
+For instance, suppose you wished to create the \mbox{[$(x,y) \leftrightarrow
+(r,\theta)$]} transformation relating a two-dimensional {\em Cartesian}
+coordinate system \mbox{$(x,y)$} to a {\em Polar} system
+\mbox{$(r,\theta)$}. 
+In this case, the transformation's two mappings might be defined in terms of
+the following transformation functions: 
+
+\begin{equation}
+\begin{array}{cc}
+\mbox{Forward } \left\{
+\begin{array}{lll}
+r & = & \sqrt{x^2+y^2} \\
+\theta & = & \tan^{-1} \left( {y/x} \right)
+\end{array}
+\right.
+&
+\mbox{Inverse } \left\{
+\begin{array}{lll}
+x & = & r \cos( \theta ) \\
+y & = & r \sin( \theta )
+\end{array}
+\right.
+\end{array}
+\label{equation:polar}
+\end{equation}
+
+This description of the transformation could now be used in a program by
+converting it directly into character data, as follows: 
+
+\example{Formulating a Cartesian-to-Polar transformation.}
+\begin{quote}
+\begin{tabbing} % Not clear why this is needed, since tabs are not used,
+                % but the leading spaces get lost otherwise.
+
+\verb#*  Define the number of input and output variables.    #\\
+\verb#      INTEGER NVIN, NVOUT                              #\\
+\verb#      PARAMETER ( NVIN = 2, NVOUT = 2 )                #\\
+\verb#                                                       #\\
+\verb#*  Declare arrays for the forward and inverse transformation functions.#\\
+\verb#      CHARACTER * 25  FOR( NVOUT ), INV( NVIN )        #\numcir{1}\\
+\verb#                                                       #\\
+\verb#*  Assign the forward transformation functions.        #\\
+\verb#      FOR( 1 ) = 'r = sqrt( x * x + y * y )'           #\numcir{2}\numcir{3}\\
+\verb#      FOR( 2 ) = 'theta = atan2( y, x )'               #\\
+\verb#                                                       #\\
+\verb#*  Assign the inverse transformation functions.        #\\
+\verb#      INV( 1 ) = 'x = r * cos( theta )'                #\\
+\verb#      INV( 2 ) = 'y = r * sin( theta )'                #
+
+\end{tabbing}
+\end{quote}
+
+Programming notes:
+
+\begin{enumerate}
+
+\item  The transformation functions are assigned to the elements of two
+character arrays \fortvar{FOR} and \fortvar{INV}, the number of elements in
+each array being determined by the number of output and input variables,
+\fortvar{NVOUT} and \fortvar{NVIN} respectively. 
+
+\item The formulae of Equation~\ref{equation:polar} have been converted into
+character data for storage in these arrays by using Fortran arithmetic
+operators and intrinsic functions (see Appendix~\ref{appendix:syntax} for a
+full description of the syntax of transformation functions, which closely
+resembles that of Fortran~77 assignment statements). 
+
+\item The names `\verb#x#', `\verb#y#', `\verb#r#' and `\verb#theta#' have
+been used to represent the transformation's input and output variables. 
+Names such as these may be chosen freely (see
+Appendix~\ref{appendix:syntax}) and are defined implicitly when they appear
+on the left hand side of a transformation function. 
+
+\end{enumerate}
+\exampledone
+
+\paragraph{Unspecified mappings.}
+In the above example, both the forward and inverse mappings were defined. 
+If only one of these were required, however, then the other could be left
+unspecified. 
+This is done simply by omitting the right hand sides (and `$=$' signs) from
+the transformation functions which define it. 
+Thus, if the inverse transformation functions had been specified as:
+
+\begin{verbatim}
+      INV( 1 ) = 'x'
+      INV( 2 ) = 'y'
+\end{verbatim}
+
+then the inverse mapping would not be defined.
+Note that the left hand sides of the transformation functions must still
+appear, however, because they define the names of the transformation's input
+variables. 
+
+
+\subsection{Creating a Transformation}
+
+\label{section:simple:creating}
+
+The transformation functions formulated above may be used to create an
+\name{HDS} transformation structure by calling the routine \name{TRN\_NEW}
+(create new transformation), as follows: 
+
+\begin{verbatim}
+      CALL TRN_NEW( NVIN, NVOUT, FOR, INV, PREC, COMM, ELOC, NAME, LOCTR, STATUS )
+\end{verbatim}
+
+where:
+
+\begin{itemize}
+
+\item \fortvar{NVIN} and \fortvar{NVOUT} are the numbers of input and output
+variables; 
+
+\item \fortvar{FOR} and \fortvar{INV} are the two character arrays
+containing the forward and inverse transformation functions; 
+
+\item \fortvar{PREC} is a character expression specifying the arithmetic
+precision with which the transformation functions will be evaluated; 
+
+\item \fortvar{COMM} is a comment to be stored with the transformation; 
+
+\item \fortvar{ELOC} is a locator to an existing \name{HDS} structure; 
+
+\item \fortvar{NAME} is the \name{HDS} name of the new structure component 
+to be created;
+
+\item \fortvar{LOCTR} returns a locator to the newly created transformation 
+structure;
+
+\item \fortvar{STATUS} is an inherited error status variable.
+
+\end{itemize}
+
+\example{Creating a Cartesian-to-Polar transformation.}
+The following arrangement might be used to create a transformation called
+\name{MYTRAN} from the \fortvar{FOR} and \fortvar{INV} arrays defined
+earlier: 
+
+\begin{quote}
+\begin{tabbing} % Not clear why this is needed, since tabs are not used,
+                % but the leading spaces get lost otherwise.
+
+\verb#*  Declare variables.                                  #\\
+\verb#      INCLUDE 'SAE_PAR'                                #\\
+\verb#      INCLUDE 'TRN_PAR'                                #\numcir{1}\\
+\verb#      CHARACTER PREC * ( TRN__SZPRC ), COMM * 80       #\\
+\verb#      CHARACTER * ( DAT__SZLOC ) ELOC, LOCTR           #\\
+\verb#                                                       #\\
+\verb#*  Get a locator ELOC to an existing HDS structure.    #\\
+\verb#      <a call to DAT_ASSOC or DAT_FIND, for instance>  #\\
+\verb#                                                       #\\
+\verb#*  Specify the arithmetic precision and make a comment.#\\
+\verb#      PREC = '_REAL:'                                  #\numcir{2}\\
+\verb#      COMM = '2-d Cartesian (x,y) --> 2-d Polar (r,theta)'#\numcir{3}\\
+\verb#                                                       #\\
+\verb#*  Create the transformation.                          #\\
+\verb#      CALL TRN_NEW( NVIN, NVOUT, FOR, INV, PREC, COMM, #\numcir{4}\numcir{5}\\
+\verb#     :              ELOC, 'MYTRAN', LOCTR, STATUS )    #
+
+\end{tabbing}
+\end{quote}
+
+Programming notes:
+
+\begin{enumerate}
+
+\item The symbolic constant \name{TRN\_\_SZPRC} is defined in the include
+file \name{TRN\_PAR}. 
+It is used to declare the length of the character variable \fortvar{PREC}
+which will contain a precision specification. 
+
+\item \fortvar{PREC} specifies the type of arithmetic to be used when the
+transformation functions are evaluated and has been assigned the value
+`\verb#_REAL:#', which is recommended for general use.
+This indicates that single precision ({\em real}) arithmetic should normally
+be used but that the precision may be increased if {\em double precision}
+data are being processed. 
+This is discussed further in Section~\ref{section:advanced:precision}. 
+
+\item The `\verb#-->#' (or `\verb#<--#') character sequence may be used in
+comment strings to indicate the direction of the forward mapping. 
+If the transformation is subsequently {\em inverted}
+(Section~\ref{section:additional:inverting}), then the `\verb#-->#' and
+`\verb#<--#' symbols will be interchanged so that the comment remains valid.
+Comments may be of any length.
+
+\item \name{TRN\_NEW} will check the transformation functions for correct
+syntax and consistent use of variable names before the transformation is
+created.
+However, no check is performed to determine whether the forward and inverse
+transformation functions actually define a pair of complementary mappings. 
+It is the caller's responsibility to ensure that this is so.
+
+\item On successful exit from \name{TRN\_NEW}, the \fortvar{LOCTR} argument
+returns an \name{HDS} locator associated with the newly created
+transformation. 
+
+\end{enumerate}
+\exampledone
+
+
+\subsection{Temporary Transformations}
+
+\label{section:simple:temporary}
+
+The \name{TRN\_NEW} routine may also be used to create a temporary
+transformation.
+This can be very convenient for internal use by an application because it
+avoids the need for an existing \name{HDS} structure to contain it. 
+To create such a transformation, the \fortvar{ELOC} argument to
+\name{TRN\_NEW} should be replaced by a blank string (the \fortvar{NAME}
+argument will then be ignored and may also be blank). 
+Thus, if \name{TRN\_NEW} were invoked by:
+
+\begin{verbatim}
+      CALL TRN_NEW( NVIN, NVOUT, FOR, INV, PREC, COMM, ' ', ' ', LOCTR, STATUS )
+\end{verbatim}
+
+then the locator \fortvar{LOCTR} would subsequently be associated with a
+temporary transformation ({\em i.e.}\ a temporary \name{HDS} structure of
+type \name{TRN\_TRANSFORM}). 
+
+
+\subsection{Compilation}
+
+The transformation structures created by \name{TRN\_NEW} hold information in
+a form which can be easily manipulated by \name{HDS}. 
+However, this form of storage is not efficient if the transformation is to
+be used, perhaps repeatedly, to process large arrays of data. 
+Therefore, before a transformation can be used to transform coordinate data,
+its mapping information must first be {\em compiled} using \name{TRN\_COMP}
+(compile transformation), thus:
+
+\begin{verbatim}
+      CALL TRN_COMP( LOCTR, FORWD, ID, STATUS )
+\end{verbatim}
+
+The \name{TRN\_COMP} routine accepts a locator \fortvar{LOCTR} associated
+with a transformation and checks the information within it.
+It then compiles one of the transformation's mappings into a different form
+which is stored internally by the \name{TRANSFORM} facility. 
+This internal representation is called a {\em compiled mapping} and may
+subsequently be used (for instance) to convert coordinate data from one
+coordinate system to another. 
+The logical argument \fortvar{FORWD} is used to specify which mapping is 
+required -- the forward mapping is compiled if this argument is
+\name{.TRUE.}\ and the inverse mapping is compiled if it is \name{.FALSE.}.
+An error will be reported if the requested mapping has not been defined. 
+
+Any number of transformations may be compiled by repeatedly calling
+\name{TRN\_COMP}.
+To distinguish the resulting compiled mappings, a unique {\em integer}
+identifier is issued for each via the \fortvar{ID} argument, and these
+identifiers are subsequently used to pass the mappings to other routines. 
+
+It is important to appreciate that a {\em compiled mapping} is a
+``uni-directional'' object and can only perform coordinate conversion in a
+single direction, whereas a {\em transformation} (which may contain up to
+two mappings) is potentially ``bi-directional''. 
+Thus, if an \mbox{[$m \leftrightarrow n$]} transformation is compiled in the
+forward direction (with the \fortvar{FORWD} argument of \name{TRN\_COMP} set
+to \name{.TRUE.}), then a \mbox{\{$m \rightarrow n$\}} mapping will result. 
+Conversely, compilation in the inverse direction would yield a \mbox{\{$n
+\rightarrow m$\}} mapping. 
+Note that in this latter case the numbers of input and output variables will
+have been interchanged by the compilation process. 
+
+
+\subsection{Inquiry Routines}
+
+An application may determine the number of input and output variables
+used by a transformation by calling \name{TRN\_GTNV} (get numbers of
+variables), thus:
+
+\begin{verbatim}
+      CALL TRN_GTNV( LOCTR, NVIN, NVOUT, STATUS )
+\end{verbatim}
+
+The information is returned via the \fortvar{NVIN} and \fortvar{NVOUT}
+arguments. 
+Since \name{TRN\_GTNV} first checks that the locator \fortvar{LOCTR} is
+associated with a valid transformation, this also provides a convenient way
+of validating a transformation. 
+
+A similar routine \name{TRN\_GTNVC} (get numbers of compiled variables) is
+provided for use with compiled mappings: 
+
+\begin{verbatim}
+      CALL TRN_GTNVC( ID, NVIN, NVOUT, STATUS )
+\end{verbatim}
+
+In this case, the mapping is specified by its {\em integer} identifier
+\fortvar{ID}. 
+
+
+\subsection{Transforming 1-Dimensional Coordinate Data}
+
+\label{section:simple:1ddata}
+
+A number of routines are provided for applying compiled mappings to arrays
+of coordinate data ({\em i.e.}\ lists of coordinates).
+They are distinguished according to the number of variables used by the
+mapping, by the way the data are stored in the arrays and by the type ({\em
+i.e.}\ numerical precision) of the data being transformed. 
+The common and relatively simple cases of 1- and 2-dimensional data are
+discussed here and in the following Section. 
+Section~\ref{section:additional:generaldata} describes the use of more
+general mappings. 
+
+The simplest situation arises when the input and output data points are both
+1-dimensional, so that a \mbox{\{$1 \rightarrow 1$\}} mapping is to be
+applied. 
+Routines with names of the form \name{TRN\_TR1x} are provided for this
+purpose, where x is either {\bf I}, {\bf R} or {\bf D} according to whether
+the data are specified by {\em integer}, {\em real} or {\em double
+precision} values respectively. 
+Thus, to apply a compiled \mbox{\{$1 \rightarrow 1$\}} mapping to a set of
+1-dimensional data points specified by a list of {\em real} coordinates, the
+following statement might be used: 
+
+\begin{verbatim}
+      CALL TRN_TR1R( BAD, NX, XIN, ID, XOUT, STATUS )
+\end{verbatim}
+
+where:
+
+\begin{itemize}
+
+\item \fortvar{BAD} is a logical value specifying whether the input
+coordinates may contain {\em bad} values (see
+Section~\ref{section:additional:badvalues}); 
+
+\item \fortvar{NX} specifies the number of data points to be transformed;
+
+\item \fortvar{XIN} is a 1-dimensional array containing the coordinates of
+the input data points; 
+
+\item \fortvar{ID} is an identifier associated with the compiled \mbox{\{$1
+\rightarrow 1$\}} mapping to be applied; 
+
+\item \fortvar{XOUT} is a 1-dimensional array to receive the (transformed)
+coordinates of the output data points; 
+
+\item \fortvar{STATUS} is an inherited error status variable.
+
+\end{itemize}
+
+\example{Plotting a graph of a user-specified function.}
+In the following, \name{TRN\_TR1R} is used to generate data for a graph. 
+The function to be plotted is specified by the user via an expression
+obtained through the \name{ADAM} parameter system. 
+For instance, if the user entered:
+
+\begin{verbatim}
+      X*EXP(-4.4*X)
+\end{verbatim}
+
+then a graph of the function \mbox{$y=xe^{-4.4x}$} would be plotted over the 
+range \mbox{$0\le x\le 1$}.
+
+\begin{quote}
+\begin{tabbing} % Not clear why this is needed, since tabs are not used,
+                % but the leading spaces get lost otherwise.
+
+\verb#*  Declare variables.                                  #\\
+\verb#      INCLUDE 'SAE_PAR'                                #\\
+\verb#      INTEGER NPTS                                     #\\
+\verb#      PARAMETER ( NPTS = 1000 )                        #\\
+\verb#      INTEGER STATUS, ID, IPOINT                       #\\
+\verb#      REAL X( NPTS ), Y( NPTS )                        #\\
+\verb#      CHARACTER EXPRS * 80, FOR( 1 ) * 82, INV( 1 ) * 1#\\
+\verb#      CHARACTER * ( DAT__SZLOC ) LOCTR                 #\\
+\verb#                                                       #\\
+\verb#*  Obtain an expression and formulate the transformation functions.#\\
+\verb#      CALL PAR_GET0C( 'EXPRESSION', EXPRS, STATUS )    #\numcir{1}\\
+\verb#      FOR( 1 ) = 'Y=' // EXPRS                         #\\
+\verb#      INV( 1 ) = 'X'                                   #\\
+\verb#                                                       #\\
+\verb#*  Create a temporary transformation and compile it.   #\\
+\verb#      CALL TRN_NEW( 1, 1, FOR, INV, '_REAL:',          #\numcir{2}\\
+\verb#                    'X --> f( X )', ' ', ' ', LOCTR, STATUS )#\\
+\verb#      CALL TRN_COMP( LOCTR, .TRUE., ID, STATUS )       #\\
+\verb#                                                       #\\
+\verb#*  Set up the X values, then transform to yield the Y values.#\\
+\verb#      DO 1 IPOINT = 1, NPTS                            #\\
+\verb#         X( IPOINT ) = REAL( IPOINT - 1 ) / REAL( NPTS - 1 )#\\
+\verb#    1 CONTINUE                                         #\\
+\verb#      CALL TRN_TR1R( .FALSE., NPTS, X, ID, Y, STATUS ) #\numcir{3}\\
+\verb#                                                       #\\
+\verb#*  Plot the graph and clean up.                        #\\
+\verb#      CALL GPL( NPTS, X, Y )                           #\numcir{4}\\
+\verb#      CALL DAT_ANNUL( LOCTR, STATUS )                  #\numcir{5}\\
+\verb#      CALL TRN_ANNUL( ID, STATUS )                     #
+
+\end{tabbing}
+\end{quote}
+
+Programming notes:
+
+\begin{enumerate}
+
+\item An expression is obtained via the parameter system and used to
+formulate suitable transformation functions.
+Only the forward mapping is specified.
+
+\item A temporary transformation is created (\name{TRN\_NEW}) and is then
+compiled (\name{TRN\_COMP}). 
+
+\item After generating the \fortvar{X} values, \name{TRN\_TR1R} is called to
+apply the compiled mapping, thereby generating the corresponding \fortvar{Y}
+values. 
+The \fortvar{BAD} argument is set to \name{.FALSE.} since there are no {\em
+bad} input coordinates. 
+
+\item A graph is plotted using the \name{GKS} polyline routine \name{GPL}.
+It is assumed that a suitable coordinate system has been established. 
+
+\item Finally, cleaning up is performed by annulling the temporary
+transformation (\name{DAT\_ANNUL}) and the compiled mapping
+(\name{TRN\_ANNUL} -- described later in
+Section~\ref{section:simple:cleanup}). 
+
+\end{enumerate}
+\exampledone
+
+
+\subsection{Transforming 2-Dimensional Coordinate Data}
+
+\label{section:simple:2ddata}
+
+Transformations which inter-relate 2-dimensional coordinate systems are
+common in graphical and image-processing applications, so a set of routines
+is provided for applying the associated \mbox{\{$2 \rightarrow 2$\}}
+mappings to coordinate data. 
+These routines have names of the form \name{TRN\_TR2x}, where x is either
+{\bf I}, {\bf R} or {\bf D} according to whether the data are specified by
+{\em integer}, {\em real} or {\em double precision} values respectively. 
+Thus, to apply a compiled \mbox{\{$2 \rightarrow 2$\}} mapping to a set of
+2-dimensional data points specified by two lists of {\em real} coordinates
+$X_{IN}$ and $Y_{IN}$, the following statement might be used: 
+
+\begin{verbatim}
+      CALL TRN_TR2R( BAD, NXY, XIN, YIN, ID, XOUT, YOUT, STATUS )
+\end{verbatim}
+
+where:
+
+\begin{itemize}
+
+\item \fortvar{BAD} is a logical value specifying whether the input 
+coordinates may contain {\em bad} values (see 
+Section~\ref{section:additional:badvalues});
+
+\item \fortvar{NXY} specifies the number of data points to be transformed;
+
+\item \fortvar{XIN} and \fortvar{YIN} are 1-dimensional arrays containing
+the $X_{IN}$ and $Y_{IN}$ coordinates of the input data points;
+
+\item \fortvar{ID} is an identifier associated with the compiled 
+\mbox{\{$2 \rightarrow 2$\}} mapping to be applied;
+
+\item \fortvar{XOUT} and \fortvar{YOUT} are 1-dimensional arrays to receive
+the (transformed) $X_{OUT}$ and $Y_{OUT}$ coordinates of the output data
+points; 
+
+\item \fortvar{STATUS} is an inherited error status variable.
+
+\end{itemize}
+
+\example{Transforming a cursor position.}
+The following shows \name{TRN\_TR2R} being used to transform 2-dimensional
+coordinate data obtained by reading a cursor. 
+It is assumed that the identifier \fortvar{ID} is associated with a compiled
+\mbox{\{$2 \rightarrow 2$\}} mapping which has been established to convert
+cursor coordinates into ``user'' coordinates: 
+
+\begin{quote}
+\begin{tabbing} % Not clear why this is needed, since tabs are not used,
+                % but the leading spaces get lost otherwise.
+
+\verb#*  Declare variables.                                  #\\
+\verb#      INTEGER STATUS, N, ID                            #\\
+\verb#      REAL XCUR( 1 ), YCUR( 1 ), XUSER( 1 ), YUSER( 1 )#\\
+\verb#                                                       #\\
+\verb#*  Set up cursor choice device.                        #\\
+\verb#      CALL SGS_SELCH( 0 )                              #\\
+\verb#      CALL SGS_DEFCH( '.' )                            #\\
+\verb#                                                       #\\
+\verb#*  Loop to read cursor positions.                      #\\
+\verb#      DO WHILE ( STATUS .EQ. SAI__OK )                 #\\
+\verb#         CALL SGS_REQCU( XCUR( 1 ), YCUR( 1 ), N )     #\numcir{1}\\
+\verb#         IF( N .NE. 0 ) GO TO 1                        #\\
+\verb#                                                       #\\
+\verb#*  Transform the cursor coordinates.                   #\\
+\verb#         CALL TRN_TR2R( .FALSE., 1, XCUR, YCUR, ID,    #\numcir{2}\\
+\verb#     :                  XUSER, YUSER, STATUS )         #\\
+\verb#                                                       #\\
+\verb#*  Display the position in user coordinates.           #\\
+\verb#         CALL MSG_SETR( 'X', XUSER( 1 ) )              #\\
+\verb#         CALL MSG_SETR( 'Y', YUSER( 1 ) )              #\\
+\verb#         CALL MSG_OUT( ' ', 'X = ^X ; Y = ^Y', STATUS )#\numcir{3}\\
+\verb#      ENDDO                                            #\\
+\verb#    1 CONTINUE                                         #\\
+
+\end{tabbing}
+\end{quote}
+
+Programming notes:
+
+\begin{enumerate}
+
+\item The \name{SGS} cursor position is read repeatedly until the user
+terminates interaction (by pressing the keyboard `.' key in this case). 
+
+\item \name{TRN\_TR2R} is used to transform each cursor position in turn
+into ``user'' coordinates. 
+Only a single data point is transformed here, but in a non-interactive
+application it would be more efficient to transform a whole set of data
+points in a single call to this routine. 
+
+\item The transformed positions are displayed in ``user'' coordinates.
+
+\end{enumerate}
+\exampledone
+
+
+\subsection{Clearing Up and Closing Down}
+
+\label{section:simple:cleanup}
+
+When a compiled mapping is no longer required, the resources associated with
+it should be released. 
+This is done by calling \name{TRN\_ANNUL} (annul compiled mapping), thus:
+
+\begin{verbatim}
+      CALL TRN_ANNUL( ID, STATUS )
+\end{verbatim}
+
+This causes the compiled mapping to be deleted and the \fortvar{ID} value
+to be reset to \name{TRN\_\_NOID}.\footnote{ 
+The symbolic constant \name{TRN\_\_NOID} is defined in the include file 
+\name{TRN\_PAR}.
+It is provided as a ``null'' value, which is guaranteed never to be used as
+a compiled mapping identifier. 
+It may be used, when necessary, to indicate that an identifier is not
+currently associated with a compiled mapping.} 
+Finally, before an application finishes, the statement: 
+
+\begin{verbatim}
+      CALL TRN_CLOSE( STATUS )
+\end{verbatim}
+
+should be executed.
+Calling \name{TRN\_CLOSE} will first annul any compiled mappings which are
+still active and will then close the \name{TRANSFORM} facility down,
+recovering any resources associated with it. 
+
+Both of these cleaning up routines will attempt to execute regardless of the
+value of their \fortvar{STATUS} argument. 
+
+
+\section{ADDITIONAL FEATURES}
+
+
+\subsection{Transforming General Coordinate Data}
+
+\label{section:additional:generaldata}
+
+As well as providing routines for applying compiled mappings to 1- and
+2-dimensional data (Sections~\ref{section:simple:1ddata} \&
+\ref{section:simple:2ddata}), the \name{TRANSFORM} facility also has a set
+of routines for applying more general mappings. 
+These are appropriate, for instance, when the number of input or output data
+coordinates is greater than 2 (or when these numbers are unequal) or when
+the number of coordinates is not known in advance. 
+In such cases, all the input and output coordinates must each reside in
+single data arrays. 
+
+These general routines have names of the form \name{TRN\_TRNx}, where x is
+either {\bf I}, {\bf R} or {\bf D} according to whether the data are
+specified by {\em integer}, {\em real} or {\em double precision} values
+respectively. 
+Thus, to transform a general set of data points specified by an array of
+{\em real} coordinates, the routine \name{TRN\_TRNR} would be used, thus:
+
+\begin{verbatim}
+      CALL TRN_TRNR( BAD, ND1, NCIN, NDAT, DATA, ID, NR1, NCOUT, RESULT, STATUS )
+\end{verbatim}
+
+where:
+
+\begin{itemize}
+
+\item \fortvar{BAD} is a logical value specifying whether the input 
+coordinates may contain {\em bad} values (see 
+Section~\ref{section:additional:badvalues});
+
+\item \fortvar{ND1} specifies the first dimension of the \fortvar{DATA} 
+array;
+
+\item \fortvar{NCIN} specifies the number of coordinates per input data
+point; 
+
+\item \fortvar{NDAT} specifies the number of data points to be transformed;
+
+\item \fortvar{DATA} is a 2-dimensional array containing a list of
+coordinates for the input data points; 
+
+\item \fortvar{ID} is an identifier associated with the compiled 
+\mbox{\{$NCIN \rightarrow NCOUT$\}} mapping to be applied;
+
+\item \fortvar{NR1} specifies the first dimension of the \fortvar{RESULT} 
+array;
+
+\item \fortvar{NCOUT} specifies the number of coordinates per output data 
+point;
+
+\item \fortvar{RESULT} is a 2-dimensional array to receive a list of 
+(transformed) coordinates for the output data points; 
+
+\item \fortvar{STATUS} is an inherited error status variable.
+
+\end{itemize}
+
+\example{Mapping 3-dimensional coordinates into 2 dimensions.}
+In the following, a set of data points representing a 3-dimensional object
+is converted into a related set of 2-dimensional points using
+\name{TRN\_TRNR}. 
+The resulting points are then plotted using \name{GKS}. 
+With a suitable choice of mapping, such an arrangement might be used to
+generate perspective pictures of 3-dimensional objects: 
+
+\begin{quote}
+\begin{tabbing} % Not clear why this is needed, since tabs are not used,
+                % but the leading spaces get lost otherwise.
+
+\verb#*  Define dimensions of the DATA and RESULT arrays.    #\\
+\verb#      PARAMETER ( MAXPTS = 5000, MAXDIM = 3 )          #\\
+\verb#                                                       #\\
+\verb#*  Declare variables and arrays.                       #\\
+\verb#      INTEGER IPOINT, STATUS, ID                       #\\
+\verb#      REAL X, Y, Z, DATA( MAXPTS, MAXDIM ), RESULT( MAXPTS, MAXDIM )#\\
+\verb#                                                       #\\
+\verb#*  Generate 3-d coordinates of helix.                  #\\
+\verb#      DO 1 IPOINT = 1, 3601                            #\\
+\verb#         THETA = REAL( IPOINT - 1 ) * 2.0 * 3.14159 / 360.0#\\
+\verb#         X = COS( THETA )                              #\numcir{1}\\
+\verb#         Y = SIN( THETA )                              #\\
+\verb#         Z = REAL( IPOINT - 1 ) / 360.0                #\\
+\verb#                                                       #\\
+\verb#*  Enter coordinates into the DATA array.              #\\
+\verb#         DATA( IPOINT, 1 ) = X                         #\numcir{2}\\
+\verb#         DATA( IPOINT, 2 ) = Y                         #\\
+\verb#         DATA( IPOINT, 3 ) = Z                         #\\
+\verb#    1 CONTINUE                                         #\\
+\verb#                                                       #\\
+\verb#*  Transform the data points.                          #\\
+\verb#      CALL TRN_TRNR( .FALSE., MAXPTS, 3, 3601, DATA, ID, MAXPTS, 2,#\\
+\verb#     :               RESULT, STATUS )                  #\numcir{3}\\
+\verb#                                                       #\\
+\verb#*  Plot the resulting 2-dimensional data points.       #\\
+\verb#      CALL GPL( 3601, RESULT( 1, 1 ), RESULT( 1, 2 ) ) #\numcir{4}
+
+\end{tabbing}
+\end{quote}
+
+Programming notes:
+
+\begin{enumerate}
+
+\item The coordinates of a set of 3-dimensional data points are generated.
+
+\item The coordinates are stored so that \fortvar{DATA( I, J )} contains the
+\fortvar{J'th} coordinate of data point \fortvar{I}. 
+These coordinates need not fill the entire array.
+
+\item \name{TRN\_TRNR} is called to apply the compiled mapping.
+The size of the input and output coordinate arrays are specified, together
+with the numbers of coordinates associated with each input and output data
+point. 
+An error will result if the compiled mapping does not have the appropriate
+numbers of input and output variables. 
+
+\item The 2-dimensional output data points are plotted.
+Their coordinates are stored in the \fortvar{RESULT} array in a similar
+manner to those in the \fortvar{DATA} array. 
+As before, these coordinates need not entirely fill the \fortvar{RESULT}
+array. 
+
+\end{enumerate}
+\exampledone
+
+
+\subsection{Handling of {\em Bad} Coordinate Values}
+
+\label{section:additional:badvalues}
+
+During the process of transforming coordinate data, numerical errors (such
+as division by zero or overflow) will inevitably occur from time to time. 
+There is no need to include specific protection against this when a
+transformation is formulated, however, because such errors will
+automatically be trapped and converted into one of the standard Starlink
+{\em bad} values.\footnote{ 
+The Starlink {\em bad} values are symbolic constants with names of the form
+\name{VAL\_\_BADx}, where x is either {\bf D}, {\bf R}, {\bf I}, {\bf W},
+{\bf UW}, {\bf B} or {\bf UB} according to the data type in question. 
+These constants are defined in the include file \name{PRM\_PAR} (see SGP/38
+\& SUN/39 for further information).} 
+
+This form of error trapping is performed by all the routines which apply
+compiled mappings to coordinate data. 
+The resulting ``{\em bad} coordinates'' will, where necessary, be propagated
+through each stage in the evaluation of a compiled mapping, so that all the
+results which have been affected by numerical errors can later be
+identified. 
+No error report is currently made (or \fortvar{STATUS} value set) if a
+numerical error of this nature occurs. 
+
+All the routines which apply compiled mappings to coordinate data can also
+recognise {\em bad} coordinate values supplied as input, and will propagate
+these if required. 
+Frequently, however, there will not be any {\em bad} coordinates in the
+input data stream and it may be possible to save appreciable amounts of
+processing time by disabling recognition of these values (thereby
+eliminating unnecessary checking), especially when large arrays are being
+processed. 
+Each relevant routine therefore carries a {\em logical} argument called
+\fortvar{BAD}, which specifies whether recognition of {\em bad} input data
+is required (execution will generally be faster if \fortvar{BAD} is
+\name{.FALSE.}). 
+Note that this argument only affects recognition of {\em bad} data in the
+{\bf input} stream, while numerical errors which occur during the
+computation are always converted into {\em bad} values and correctly
+propagated to the output. 
+
+
+\subsection{Concatenating Transformations}
+
+\label{section:additional:concatenate}
+
+It is common to find that the relationship between two coordinate systems is
+most easily expressed in terms of several transformations applied in
+succession. 
+For instance, the transformation between positions on the sky and the pixel
+coordinates of a \name{CCD} image might be divided into two stages; the
+first representing the effect of imaging the sky into the focal plane of the
+telescope, and the second taking account of the position, size and
+orientation of the detector in the focal plane. 
+The \name{TRANSFORM} facility makes explicit provision for cases such as
+this by allowing transformations to be {\em concatenated}. 
+
+\begin{figure}
+\begin{center}
+
+\begin{tabular}{c}
+
+$\begin{array}{c}
+
+\left\{ \begin{array}{c} x_1 \\ x_2 \end{array} \right\}
+
+\begin{array}{c}
+
+\mbox{Forward} \longrightarrow \\
+
+\mbox{
+\setlength{\unitlength}{1mm}
+\thicklines
+\begin{picture}(40, 15)(-20,-6.5)
+\put(-15,-5){\framebox(30,10){\begin{tabular}{c}{\bf Transformation}\\
+                                                {\bf 1}
+                              \end{tabular}}}
+\multiput(-15,-2)(0,4){2}{\line(-1,0){3}}
+\multiput(-18,-2)(0,4){2}{\circle*{1}}
+\multiput(15,-2.5)(0,2.5){3}{\line(1,0){3}}
+\multiput(18,-2.5)(0,2.5){3}{\circle*{1}}
+\end{picture}
+}\\
+
+\longleftarrow \mbox{Inverse}
+
+\end{array}
+
+
+\left\{ \begin{array}{c} y_1 \leftrightarrow X_1 \\
+                         y_2 \leftrightarrow X_2 \\
+                         y_3 \leftrightarrow X_3 \end{array} \right\}
+
+\begin{array}{c}
+
+\mbox{Forward} \longrightarrow \\
+
+\mbox{
+\setlength{\unitlength}{1mm}
+\thicklines
+\begin{picture}(40, 15)(-20,-6.5)
+\put(-15,-5){\framebox(30,10){\begin{tabular}{c}{\bf Transformation}\\
+                                                {\bf 2}
+                              \end{tabular}}}
+\multiput(-15,-2.5)(0,2.5){3}{\line(-1,0){3}}
+\multiput(-18,-2.5)(0,2.5){3}{\circle*{1}}
+\multiput(15,0)(0,0){1}{\line(1,0){3}}
+\multiput(18,0)(0,0){1}{\circle*{1}}
+\end{picture}
+}\\
+
+\longleftarrow \mbox{Inverse}
+
+\end{array}
+
+\left\{ \begin{array}{c} Y_1 \end{array} \right\}
+
+\end{array}$
+
+\\
+\setlength{\unitlength}{1mm}
+\begin{picture}(22,20)(-11,-10)
+\put(0,0){\oval(22,5)}
+\put(0,0){\makebox(0,0){\em Concatenate}}
+\put(0,2.5){\line(0,1){5}}
+\put(0,-2.5){\vector(0,-1){5}}
+\end{picture}
+\\
+
+$\begin{array}{c}
+
+\mbox{Forward} \longrightarrow \\
+
+\left\{ \begin{array}{c} x_1 \\ x_2 \end{array} \right\}
+
+\begin{array}{c}
+\mbox{
+\setlength{\unitlength}{1mm}
+\thicklines
+\begin{picture}(80, 25)(-40,-10)
+\put(-35,-9.5){\framebox(70,22){}}
+\put(0,9.5){\makebox(0,0){\bf New Transformation}}
+\thinlines
+\put(-32.5,-5){\dashbox{1.25}(30,10){\begin{tabular}{c}{Transformation}\\
+                                                       {1}
+                                     \end{tabular}}}
+\multiput(-37.5,-2)(0,4){2}{\line(1,0){5}}
+\multiput(-37.5,-2)(0,4){2}{\circle*{1}}
+\multiput(-2.5,-2.5)(0,2.5){3}{\line(1,0){2.5}}
+\multiput(0,-2.5)(0,2.5){3}{\circle*{1}}
+\multiput(0,-2.5)(0,2.5){3}{\line(1,0){2.5}}
+\put(2.5,-5){\dashbox{1.25}(30,10){\begin{tabular}{c}{Transformation}\\
+                                                     {2}
+                                   \end{tabular}}}
+\multiput(32.5,0)(0,0){1}{\line(1,0){5}}
+\multiput(37.5,0)(0,0){1}{\circle*{1}}
+\end{picture}
+}\\
+
+\longleftarrow \mbox{Inverse}
+
+\end{array}
+
+\left\{ \begin{array}{c} Y_1 \end{array} \right\}
+
+\end{array}$
+
+\end{tabular}
+
+\caption{Concatenating two transformations.}
+\label{figure:concatenate}
+
+\end{center}
+\end{figure}
+
+A rather general case of concatenation is illustrated in
+Figure~\ref{figure:concatenate}.
+In this example, {\em Transformation 1} relates two input variables
+\mbox{$(x_1,x_2)$} to three ``intermediate'' variables
+\mbox{$(y_1,y_2,y_3)$}, which are also the input variables
+\mbox{$(X_1,X_2,X_3)$} of {\em Transformation 2}. 
+This transformation, in turn, has a single final output variable
+\mbox{$(Y_1)$}. 
+The concatenation process involves eliminating the three intermediate
+variables and storing the two transformation definitions together in a
+single new transformation. 
+This new transformation then has two input variables \mbox{$(x_1,x_2)$} and
+a single output variable \mbox{$(Y_1)$}. 
+Using the `.' symbol to represent concatenation, this entire process may be 
+summarised as:
+\begin{quote}
+\begin{center}
+$[2 \leftrightarrow 3].[3 \leftrightarrow 1] = [2 \leftrightarrow 1]$
+\end{center}
+\end{quote}
+or, in general:
+\begin{quote}
+\begin{center}
+$[i \leftrightarrow j].[j \leftrightarrow k] = [i \leftrightarrow k]$
+\end{center}
+\end{quote}
+Note that the number of output variables from the first transformation must
+be equal to the number of input variables to the second transformation. 
+For obvious reasons, also, it is not permitted to concatenate a
+transformation in which only the forward mapping is defined with another in
+which only the inverse mapping is defined ({\em e.g.}\ \mbox{[$i \rightarrow
+j$]} could not be concatenated with \mbox{[$j \leftarrow k$]}). 
+
+The result of concatenating two transformations is itself a transformation,
+so the process may be repeated indefinitely, making it possible for a whole
+sequence of transformations to be joined together and processed as a single
+unit. 
+Once transformations have been combined in this way, however, they cannot
+later be separated. 
+
+\paragraph{Performing concatenation.}
+Concatenation of a pair of transformations is performed by the routine
+\name{TRN\_JOIN} (concatenate transformations), as follows:
+
+\begin{verbatim}
+      CALL TRN_JOIN( LOCTR1, LOCTR2, ELOC, NAME, LOCNEW, STATUS )
+\end{verbatim}
+
+where:
+
+\begin{itemize}
+
+\item \fortvar{LOCTR1} and \fortvar{LOCTR2} are locators to two existing
+transformations; 
+
+\item \fortvar{ELOC} is a locator to an existing \name{HDS} structure;
+
+\item \fortvar{NAME} is the \name{HDS} name of the new structure component 
+to be created;
+
+\item \fortvar{LOCNEW} returns a locator to the newly created transformation 
+structure;
+
+\item \fortvar{STATUS} is an inherited error status variable.
+
+\end{itemize}
+
+As with the \name{TRN\_NEW} routine
+(Section~\ref{section:simple:temporary}), a temporary transformation may
+also be produced by leaving the \fortvar{ELOC} argument (and optionally the
+\fortvar{NAME} argument) blank when \name{TRN\_JOIN} is invoked. 
+
+
+\subsection{Prefixing and Appending Transformations}
+
+\label{section:additional:prefix}
+
+In addition to producing new transformations by concatenating existing ones,
+it is also possible to modify an existing transformation by {\em prefixing}
+or {\em appending} another one to it. 
+For example, to prefix one transformation to another, \name{TRN\_PRFX}
+(prefix transformation) would be used, thus: 
+
+\begin{verbatim}
+      CALL TRN_PRFX( LOCTR1, LOCTR2, STATUS )
+\end{verbatim}
+
+In this case, the two transformations with locators \fortvar{LOCTR1} and
+\fortvar{LOCTR2} are concatenated (as above), but the resultant
+transformation replaces the second one, so that the first transformation is,
+in effect, prefixed to it. 
+The first transformation itself is not altered.
+
+The routine \name{TRN\_APND} (append transformation) behaves in a similar
+way, except that it appends the second transformation to the first. In this
+case the second transformation remains unchanged. 
+
+\example{Adjusting an astrometric calibration.}
+Suppose \fortvar{LOCTRS} is a locator to a transformation which relates the
+pixel coordinates \mbox{$(x,y)$} of a \name{CCD} image to positions on the
+sky \mbox{$(\alpha,\delta)$}. 
+If the size of this image is altered during data reduction, then its pixel
+coordinates will change and the astrometric calibration will need adjustment
+to take account of this. 
+
+If the $x$ and $y$ pixel coordinates are reduced by (say) 19 and 25 units,
+then a transformation inter-relating the old and new pixel coordinates could
+be formulated as follows: 
+
+\begin{equation}
+\begin{array}{cc}
+
+\mbox{Forward } \left\{
+\begin{array}{lll}
+x_{old} & = & x_{new} + 19 \\
+y_{old} & = & y_{new} + 25
+\end{array}
+\right.
+&
+\mbox{Inverse } \left\{
+\begin{array}{lll}
+x_{new} & = x_{old} - 19 \\
+y_{new} & = y_{old} - 25
+\end{array}
+\right.
+
+\end{array}
+\end{equation}
+
+and then created.
+This transformation (with locator \fortvar{LOCTRA}, say) represents the
+necessary adjustment which should be applied as a prefix to the original
+transformation, thus: 
+
+\begin{verbatim}
+      CALL TRN_PRFX( LOCTRA, LOCTRS, STATUS )
+\end{verbatim}
+
+The modified transformation (\fortvar{LOCTRS}\/) will then correctly relate
+the image's {\bf new} pixel coordinates to positions on the sky, the
+necessary adjustment having been achieved through the following
+concatenation process: 
+
+\begin{quote}
+\begin{center}
+$[(x_{new},y_{new}) \leftrightarrow (x_{old},y_{old})].[(x_{old},y_{old}) 
+\leftrightarrow (\alpha,\delta)] = [(x_{new},y_{new}) \leftrightarrow 
+(\alpha,\delta)]$
+\end{center}
+\end{quote}
+
+Note that it is not necessary to know anything about the nature of the
+original \mbox{[$(x_{old},y_{old}) \leftrightarrow (\alpha,\delta)$]}
+transformation in order to apply such a correction. 
+\exampledone
+
+
+\subsection{Inverting Transformations}
+
+\label{section:additional:inverting}
+
+{\em Inversion} of a transformation is a straightforward process involving
+the inter-change of the forward and inverse mappings (the numbers of input
+and output variables will also be inter-changed).
+It is performed by \name{TRN\_INV} (invert transformation), thus:
+
+\begin{verbatim}
+      CALL TRN_INV( LOCTR, STATUS )
+\end{verbatim}
+
+where \fortvar{LOCTR} is a locator to the transformation to be inverted.
+After such a call, compiling the transformation in the {\bf forward}
+direction will yield the same compiled mapping as would have been obtained
+by compiling in the {\bf inverse} direction prior to calling
+\name{TRN\_INV}. 
+
+The main use for \name{TRN\_INV} is in adapting transformations which have
+been created or supplied the ``wrong way round'' for some purpose ({\em
+e.g.}\ concatenation with another transformation). 
+
+
+\subsection{Formatting Transformation Functions}
+
+\label{section:additional:formatting}
+
+To simplify the process of formatting transformation functions, a set of
+routines is provided which allows numerical or textual values to be inserted
+into ``template'' character strings. 
+These routines largely eliminate the need to use \name{Fortran} \name{WRITE}
+statements to construct transformation functions containing numerical
+values. 
+
+The routines have names of the form \name{TRN\_STOK[x]}, where x is either
+{\bf I}, {\bf R} or {\bf D} according to whether the type of value to be
+inserted is {\em integer}, {\em real} or {\em double precision} 
+respectively.
+The routine \name{TRN\_STOK} ({\em i.e.}\ with x omitted altogether) is used
+for making textual (rather than numerical) insertions but otherwise
+functions in the same way. 
+These routines rely on the concept of a {\em token},\footnote{
+Tokens take the same form as the variable names used in transformation
+functions -- {\em i.e.}\ they may contain only alpha-numeric characters
+(including underscore) and must begin with an alphabetic character. 
+Tokens may be of any length and may use mixed case (token substitution is 
+not case-sensitive) but embedded blanks are not allowed.} 
+which is placed in a character string at the point where an insertion is to
+be made and which is subsequently replaced by the value to be inserted. 
+For example, if the character variable \fortvar{TEXT} had the value: 
+
+\begin{verbatim}
+      'magnitude = - 2.5 * log10( count ) + zero_point'
+\end{verbatim}
+
+then \name{TRN\_STOKR} (substitute a {\em real} token value) could be used
+to substitute a numerical value for the `\verb#zero_point#' token, as
+follows: 
+
+\begin{verbatim}
+      CALL TRN_STOKR( 'zero_point', 17.7, TEXT, NSUBS, STATUS )
+\end{verbatim}
+
+This causes all occurrences of the `\verb#zero_point#' token  to be replaced
+with the formatted {\em real} number `\verb#17.7#', while \fortvar{NSUBS}
+returns the number of substitutions made (in this case there will only be 
+one).
+The value of \fortvar{TEXT} then becomes: 
+
+\begin{verbatim}
+      'magnitude = - 2.5 * log10( count ) + 17.7'
+\end{verbatim}
+
+Note that the \name{TRN\_STOKx} routines will respect the syntax of
+transformation functions, so that negative numerical values will be enclosed
+in parentheses before a substitution is made. 
+For instance, if the call to \name{TRN\_STOKR} had been:
+
+\begin{verbatim}
+      CALL TRN_STOKR( 'zero_point', -17.7, TEXT, NSUBS, STATUS )
+\end{verbatim}
+
+then the `\verb#zero_point#' token would be replaced by `\verb#(-17.7)#' to
+prevent the illegal expression \mbox{`\ldots {\tt + -17.7}'} from being
+produced. 
+The need for two extra characters to accommodate these parentheses must be
+remembered when declaring the size of character strings. 
+
+\example{A ``packaged'' transformation.}
+The following illustrates the use of \name{TRN\_STOKR} in a subroutine to
+``package up'' the creation of a simple \mbox{[$1 \leftrightarrow 1$]}
+transformation which contains several adjustable numerical parameters.
+The same principles can be followed to write routines for creating a variety
+of specialised transformations. 
+
+\begin{quote}
+\begin{tabbing} % Not clear why this is needed, since tabs are not used,
+                % but the leading spaces get lost otherwise.
+
+\verb#      SUBROUTINE LINEAR( SCALE, ZERO, ELOC, NAME, LOCTR, STATUS )#\\
+\verb#                                                       #\\
+\verb#*  Declare variables.                                  #\\
+\verb#      INCLUDE 'SAE_PAR'                                #\\
+\verb#      INTEGER STATUS, NSUBS                            #\\
+\verb#      REAL SCALE, ZERO, INVSCL                         #\\
+\verb#      CHARACTER * ( * ) ELOC, NAME, LOCTR              #\\
+\verb#      CHARACTER FOR( 1 ) * 80, INV( 1 ) * 80           #\\
+\verb#                                                       #\\
+\verb#*  Check STATUS.                                       #\\
+\verb#      IF ( STATUS .NE. SAI__OK ) RETURN                #\\
+\verb#                                                       #\\
+\verb#*  Formulate the forward transformation function.      #\\
+\verb#      FOR( 1 ) = 'out = ( in - zero ) * scale'         #\numcir{1}\\
+\verb#      CALL TRN_STOKR( 'zero', ZERO, FOR( 1 ), NSUBS, STATUS )#\\
+\verb#      CALL TRN_STOKR( 'scale', SCALE, FOR( 1 ), NSUBS, STATUS )#\\
+\verb#                                                       #\\
+\verb#*  If possible, formulate the inverse transformation function.#\\
+\verb#      IF( SCALE .NE. 0.0 ) THEN                        #\\
+\verb#         INVSCL = 1.0 / SCALE                          #\\
+\verb#         INV( 1 ) = 'in = ( out * inv_scale ) + zero'  #\numcir{2}\\
+\verb#         CALL TRN_STOKR( 'zero', ZERO, INV( 1 ), NSUBS, STATUS )#\\
+\verb#         CALL TRN_STOKR( 'inv_scale', INVSCL, INV( 1 ), NSUBS, STATUS )#\\
+\verb#                                                       #\\
+\verb#*  Inverse is undefined...                             #\\
+\verb#      ELSE                                             #\\
+\verb#         INV( 1 ) = 'in'                               #\numcir{3}\\
+\verb#      ENDIF                                            #\\
+\verb#                                                       #\\
+\verb#*  Create the transformation.                          #\\
+\verb#      CALL TRN_NEW( 1, 1, FOR, INV, '_REAL:',          #\numcir{4}\\
+\verb#     :              'Shift and linear scaling: in --> out',#\\
+\verb#     :              ELOC, NAME, LOCTR, STATUS )        #\\
+\verb#                                                       #\\
+\verb#      END                                              #
+
+\end{tabbing}
+\end{quote}
+
+Programming notes:
+
+\begin{enumerate}
+
+\item The forward transformation function is assigned and the numerical
+parameters \fortvar{SCALE} and \fortvar{ZERO} are substituted into it. 
+
+\item If possible, the inverse transformation function is defined similarly.
+Note that the reciprocal of \fortvar{SCALE} is taken so that multiplication
+may be used in preference to the less efficient division operation. 
+
+\item If \fortvar{SCALE} is zero, then the inverse mapping cannot be defined
+so the inverse transformation function is assigned a value to indicate this.
+
+\item The transformation is created.
+
+\end{enumerate}
+\exampledone
+
+\paragraph{Token delimiters.}
+Tokens should normally be delimited from surrounding text (such as variable
+names) by non-alphanumeric characters, otherwise they will not be 
+recognised.
+The syntax of transformation functions ensures that this will normally be 
+so, but, when this is not possible, enclosing angle brackets `$<$\ldots $>$'
+may also be used as token delimiters. 
+In this case the brackets will be replaced as if they were part of the token
+itself. 
+By this means, values may be substituted to form part of a variable name if 
+required.
+
+\example{Substituting values into variable names.}
+This simple example formulates a set of transformation functions to multiply
+each ordinate of a 3-dimensional coordinate system \mbox{$(X_1,X_2,X_3)$} by
+2.0 to yield the coordinates \mbox{$(Y_1,Y_2,Y_3)$}: 
+
+\begin{verbatim}
+      INTEGER I, NSUBS, STATUS
+      CHARACTER FOR( 3 ) * 30
+
+      DO 1 I = 1, 3
+         FOR( I ) = 'Y<I> = X<I> * 2.0'
+         CALL TRN_STOKI( 'I', I, FOR( I ), NSUBS, STATUS )
+    1 CONTINUE
+\end{verbatim}
+\exampledone
+
+\paragraph{Recursive substitution.}
+The routine \name{TRN\_STOK}, which allows text to be substituted in place
+of a token, admits some more sophisticated possibilities, including the
+insertion of text which itself contains tokens (perhaps including further
+instances of the original token). 
+Although the substitution performed by a single call to \name{TRN\_STOK} 
+will not be affected by the presence of tokens within the substituted text 
+({\em i.e.}\ the substitution is not recursive), the routine may nevertheless 
+be invoked repeatedly to perform recursive substitution if required.
+This capability can be used to construct more complex expressions which have
+a suitable recursively defined form. 
+
+\example{Constructing a polynomial expression.}
+The following constructs an expression representing a polynomial in $X$ with
+an arbitrary number of numerical coefficients: 
+
+\begin{quote}
+\begin{tabbing} % Not clear why this is needed, since tabs are not used,
+                % but the leading spaces get lost otherwise.
+
+\verb#*  Declare variables.                                  #\\
+\verb#      INTEGER NCOEFF, STATUS, I, NSUBS                 #\\
+\verb#      REAL COEFF( NCOEFF )                             #\\
+\verb#      CHARACTER * ( * ) EXPRS                          #\\
+\verb#                                                       #\\
+\verb#*  Initialise the expression.                          #\\
+\verb#      EXPRS = '<next_term><coeff>'                     #\numcir{1}\\
+\verb#                                                       #\\
+\verb#*  Substitute each coefficient value.                  #\\
+\verb#      DO 1 I = 1, NCOEFF                               #\\
+\verb#         CALL TRN_STOKR( 'coeff', COEFF( I ), EXPRS,   #\numcir{2}\\
+\verb#     :                   NSUBS, STATUS )               #\\
+\verb#                                                       #\\
+\verb#*  Expand the token representing the next term.        #\\
+\verb#         IF( I .NE. NCOEFF ) THEN                      #\\
+\verb#            CALL TRN_STOK( 'next_term',                #\numcir{3}\\
+\verb#     :                     '(<next_term><coeff>)*X+',  #\\
+\verb#     :                     EXPRS, NSUBS, STATUS )      #\\
+\verb#                                                       #\\
+\verb#*  Eliminate the final '<next_term>' token.            #\\
+\verb#         ELSE                                          #\\
+\verb#            CALL TRN_STOK( 'next_term', ' ',           #\numcir{4}\\
+\verb#     :                     EXPRS, NSUBS, STATUS )      #\\
+\verb#         ENDIF                                         #\\
+\verb#   1  CONTINUE                                         #\\
+
+\end{tabbing}
+\end{quote}
+
+Programming notes:
+
+\begin{enumerate}
+
+\item The character variable \fortvar{EXPRS}, which is to contain the 
+expression, is initialised to the value `\verb#<next_term><coeff>#'. 
+
+\item The `\verb#<coeff>#' token is substituted with a coefficient
+value (say 0.1) to give `\verb#<next_term>0.1#'.
+
+\item The `\verb#<next_term>#' token is expanded to give
+`\verb#(<next_term><coeff>)*X+0.1#'. 
+The process is then repeated to replace the `\verb#<next_term><coeff>#'
+part of this expression using the value of the next coefficient.
+
+\item After the last coefficient value has been substituted the remaining
+`\verb#<next_term>#' token is eliminated by replacing it with a blank
+string. 
+
+\end{enumerate}
+
+The effect of this algorithm with (say) the 5 polynomial coefficients 0.1,
+0.12, 1.06, $-$4.4 \& 1E$-$7, would be to produce the following expression:
+
+\begin{verbatim}
+      '((((1E-7)*X+(-4.4))*X+1.06)*X+0.12)*X+0.1'
+\end{verbatim}
+
+which casts the polynomial into a form for efficient evaluation using
+Horner's method. 
+\exampledone
+
+
+\section{MORE ADVANCED TOPICS}
+
+
+\subsection{Classifying Transformations}
+
+\label{section:advanced:classification}
+
+As well as holding mapping information describing how to convert from one
+coordinate system to another, a transformation may also carry information
+about the character of its mappings. 
+When plotting a graph, for instance, it may be important to know whether the
+mapping being used is linear, because a more complex (and costly) algorithm
+may be required if it is not. 
+Indeed, in many circumstances, the absence of a vital property such as
+linearity could actually make it impossible for an application to proceed,
+in which case it must issue an appropriate error message and abort. 
+
+There are a number of mapping characteristics, in addition to linearity,
+which can influence or simplify the coding of applications in this way.
+However, it is often difficult to determine by indirect means (such as
+transforming test points) whether the necessary special properties are
+present. 
+Provision has therefore been made for handling this type of information
+explicitly. 
+
+\paragraph{Classification properties.}
+Usually, information about any special characteristics which are present is
+directly available only to the application which creates a transformation. 
+Consequently, this application should be responsible for declaring that such
+properties are present, so that other applications may subsequently enquire
+about them. 
+This process is termed {\em classification} and the {\em basic classification
+properties} which may be declared are indicated in
+Table~\ref{table:classification}, where each is briefly described. 
+These properties are defined more precisely (and mathematically) in
+Appendix~\ref{appendix:classification}. 
+
+\begin{table}
+\begin{center}
+
+\begin{tabular}{|l|l|l|}
+\hline
+{\em Property} & {\em Brief Description} & {\em Symbolic Constant} 
+\\ \hline
+LINEAR & Preserves straight lines. & TRN\_\_LIN \\
+INDEPENDENT & Preserves the independence of the axes. & TRN\_\_INDEP \\
+DIAGONAL & Preserves the axes themselves. & TRN\_\_DIAG \\
+ISOTROPIC & Preserves angles and shapes ({\em e.g.}\ circles). & TRN\_\_ISOT \\
+POSITIVE\_DET & A component of reflection is absent. & TRN\_\_POSDT \\
+NEGATIVE\_DET & A component of reflection is present. & TRN\_\_NEGDT \\
+CONSTANT\_DET & The area (or volume) scale factor is constant. & TRN\_\_CONDT \\
+UNIT\_DET & Areas (or volumes) are preserved. & TRN\_\_UNIDT \\
+\hline
+\end{tabular}
+
+\caption{The basic classification properties which may be declared for a
+transformation and the symbolic constants associated with each. 
+The constants are defined in the include file \name{TRN\_PAR}.}
+
+\label{table:classification}
+
+\end{center}
+\end{table}
+
+In most situations, a transformations's mappings are not adequately
+described by any one of the basic properties alone, but require a {\em
+composite} classification comprising a set of several of these properties. 
+For instance, the combination:
+
+\begin{quote}
+\begin{center}
+
+\name{LINEAR} {\em and} \name{ISOTROPIC} {\em and} \name{POSITIVE\_DET} {\em 
+and} \name{UNIT\_DET}
+
+\end{center}
+\end{quote}
+
+would indicate that a mapping represents a rigid rotation about an axis (or a
+point in two dimensions). 
+Facts such as this may not be obvious without some thought, however, so
+those classifications which apply to a number of the most common types of
+mapping are set out in Table~\ref{table:composite} in
+Appendix~\ref{appendix:classification}. 
+
+Classification information is conveniently processed in the form of a
+1-dimensional {\em logical classification array}, each of whose elements
+indicates the presence or absence of one particular property. 
+Each basic property therefore has an {\em integer} symbolic constant
+associated with it (see Table~\ref{table:classification}) which identifies
+the array element to be used (the precise mechanism is illustrated below). 
+Not all possible combinations of the basic properties are permitted (see
+Appendix~\ref{appendix:classification}) but the number of different
+classifications possible is nevertheless still quite large. 
+
+\paragraph{Inserting classification information.}
+It is important to appreciate that classifying a transformation is not
+mandatory, but merely assists other applications in making effective
+use of it.
+The desirability of classification therefore depends largely on the type of
+applications which are likely to process the transformation. 
+For instance, a comprehensive general-purpose application, which might be
+used in conjunction with a wide range of other software, would probably take
+care to classify a transformation fully, whereas a simpler application,
+perhaps designed for personal use, might not. 
+However, a declaration of linearity, if it applies, is generally
+recommended. 
+
+When a transformation is first created using \name{TRN\_NEW} it has no
+classification information associated with it, so this information has to be
+inserted explicitly. 
+This is done by calling \name{TRN\_PTCL} (put classification), as follows: 
+
+\example{Inserting classification information.}
+
+\begin{quote}
+\begin{tabbing} 
+
+\verb#*  Declare variables.                                  #\\
+\verb#      INCLUDE 'TRN_PAR'                                #\\
+\verb#      LOGICAL CLASS( TRN__MXCLS )                      #\numcir{1}\\
+\verb#                                                       #\\
+\verb#*  Create a (temporary) transformation.                #\\
+\verb#      CALL TRN_NEW( NVIN, NVOUT, FOR, INV, PREC,       #\numcir{2}\\
+\verb#     :              ' ', ' ', LOCTR, STATUS )          #\\
+\verb#                                                       #\\
+\verb#*  Set up the logical classification array.            #\\
+\verb#      DO 1 I = 1, TRN__MXCLS                           #\numcir{3}\\
+\verb#         CLASS( I ) = .FALSE.                          #\\
+\verb#    1 CONTINUE                                         #\\
+\verb#      CLASS( TRN__LIN ) = .TRUE.                       #\numcir{4}\\
+\verb#      CLASS( TRN__DIAG ) = .TRUE.                      #\\
+\verb#      CLASS( TRN__ISOT ) = .TRUE.                      #\\
+\verb#      CLASS( TRN__POSDT ) = .TRUE.                     #\\
+\verb#                                                       #\\
+\verb#*  Enter the classification information.               #\\
+\verb#      CALL TRN_PTCL( CLASS, LOCTR, STATUS )            #\numcir{5}
+
+\end{tabbing}
+\end{quote} 
+
+Programming notes: 
+
+\begin{enumerate} 
+
+\item A 1-dimensional {\em logical} array \fortvar{CLASS} is declared with
+\fortvar{TRN\_\_MXCLS} elements (this symbolic constant specifies the number
+of basic classification properties currently recognised and is defined in
+the include file \name{TRN\_PAR}). 
+
+\item A transformation is created.
+At this point it does not contain any classification information. 
+
+\item All elements of the \fortvar{CLASS} array are explicitly initialised
+to \name{.FALSE.} -- this precaution is recommended so that the number of
+basic classification properties may be increased in future without adversely
+affecting existing software. 
+
+\item The required array elements are set to \name{.TRUE.} -- in this
+example the classification describes a simple linear magnification about a
+point with a positive magnification factor (see Table~\ref{table:composite}
+in Appendix~\ref{appendix:classification}). 
+Symbolic constants (also defined in the include file \name{TRN\_PAR}) are
+used to identify the array elements concerned. 
+
+\item The classification information is entered into the transformation by
+calling \name{TRN\_PTCL}. 
+
+\end{enumerate}
+\exampledone 
+
+\paragraph{Retrieving classification information.}
+The routine \name{TRN\_GTCL} (get classification) is provided for retrieving
+classification information from a transformation so that applications may
+enquire about the properties which have been declared.
+Unless the context dictates otherwise, all applications which import
+transformations should make such an enquiry and should not assume that a
+transformation has any special property unless its classification
+information indicates that this is so. 
+
+\example{Retrieving classification information.} 
+
+\begin{quote} \begin{tabbing} 
+
+\verb#*  Declare variables.                                  #\\
+\verb#      INCLUDE 'TRN_PAR'                                #\\
+\verb#      LOGICAL CLASS( TRN__MXCLS ), OK                  #\numcir{1}\\
+\verb#                                                       #\\
+\verb#*  Get the classification information.                 #\\
+\verb#      CALL TRN_GTCL( LOCTR, .TRUE., CLASS, STATUS )    #\numcir{2}\\
+\verb#                                                       #\\
+\verb#*  Test for the required properties.                   #\\
+\verb#      OK = CLASS( TRN__LIN ) .AND.                     #\numcir{3}\\
+\verb#     :     CLASS( TRN__ISOT )                          # 
+
+\end{tabbing}
+\end{quote} 
+
+Programming notes:
+
+\begin{enumerate} 
+
+\item A {\em logical} array \fortvar{CLASS} is declared with
+\fortvar{TRN\_\_MXCLS} elements. 
+
+\item \name{TRN\_GTCL} is called to retrieve classification information from
+a transformation, returning it in the \fortvar{CLASS} array.
+The second ({\em logical}) argument to \name{TRN\_GTCL} is set \name{.TRUE.}
+in this example, which indicates that information is required about the
+forward mapping (as opposed to the inverse mapping). 
+An error would result if this mapping were not defined.
+
+\item The appropriate elements of the \name{CLASS} array are tested to
+determine whether the mapping has the required property.
+In this case, \name{OK} is set \name{.TRUE.} if the forward mapping is
+\name{LINEAR} and \name{ISOTROPIC}. 
+In two dimensions this would ensure that it preserves straight lines, angles
+and shapes ({e.g.}\ circles). 
+
+\end{enumerate}
+\exampledone 
+
+The routine \name{TRN\_GTCLC} (get compiled classification) is also provided
+to retrieve classification information from compiled mappings
+(Appendix~\ref{appendix:routines}). 
+
+\paragraph{Automatic classification processing.}
+The \name{TRANSFORM} software provides for a certain amount of automatic
+processing to take place whenever an exchange of classification information
+occurs. 
+The simplest form which this takes is {\em validation}, which will detect
+errors such as an attempt to declare an inconsistent set of classification
+properties. 
+In addition, the software is capable of ``filling in'' any properties which
+are missing but which can be deduced from the others supplied. 
+Some instances where properties can be deduced in this way are indicated by
+the open circles in Table~\ref{table:composite} -- it would not be
+necessary to specify these items explicitly, as \name{TRANSFORM} routines
+would supply them automatically. 
+
+Automatic processing also takes place whenever transformations are
+{\em concatenated}, {\em prefixed} or {\em appended}
+(Sections~\ref{section:additional:concatenate} \& 
+\ref{section:additional:prefix}). 
+In this case, the classification information available from each of the
+contributing transformations is combined to deduce the set of
+properties which apply to the result. 
+Note, however, that only those properties which {\bf necessarily} follow can
+be deduced in this way.
+For instance, it would be possible for the non-linearities in two mappings
+to cancel when their transformations are concatenated, giving an overall
+linear result. 
+However, since this is not the case in general, it could not be deduced
+automatically. 
+If the automatic classification processing provided should prove inadequate
+(for instance, the application may have some additional information
+available to it), then a new classification may be derived explicitly and
+``re-declared'' by calling \name{TRN\_PTCL}, which will replace any
+pre-existing classification information. 
+
+
+\subsection{Arithmetic Precision} 
+
+\label{section:advanced:precision}
+
+When a transformation is created, a {\em precision specification} is
+associated with it ({\em i.e.\ via} the \fortvar{PREC} argument to
+\name{TRN\_NEW} -- Section~\ref{section:simple:creating}) and this
+subsequently determines the type of arithmetic ({\em integer}, {\em real} or
+{\em double precision}) which will be used to evaluate the transformation
+functions. 
+The correct choice of this specification is important if the desired
+behaviour is to be achieved.
+Two considerations normally apply: 
+
+\begin{enumerate} 
+
+\item {\bf The type of calculation being performed.}
+For instance, {\em integer} arithmetic might be required if effects due to
+rounding were being exploited, whereas transformation functions representing
+a 2-dimensional rotation would probably need to use {\em real} arithmetic,
+even if the coordinate data were to be stored as integers. 
+Some functions may also require {\em double precision} arithmetic to reduce
+internal rounding errors. 
+
+\item {\bf The type of data being transformed.}
+It would clearly be inappropriate to use {\em real} arithmetic on {\em
+double precision} data but, conversely, it would be inefficient to use a
+higher precision than was necessary to preserve the accuracy of {\em real}
+data. 
+
+\end{enumerate} 
+
+It can be seen that an appropriate arithmetic precision cannot necessarily
+be selected solely on the basis of the type of calculation to be performed,
+because the type of coordinate data to be processed may also be relevant.
+Unfortunately, this latter information may not be available to the
+application which creates the transformation.
+Furthermore, whenever transformations are concatenated
+(Section~\ref{section:additional:concatenate}), each must be able to
+accommodate data passed to it by neighbouring transformations although it
+may not have any advance knowledge of the type of arithmetic its neighbours
+will be using. 
+
+To accommodate these possibilities without unnecessary loss of data
+precision, transformations are allowed some flexibility in adapting their
+internal arithmetic to the external data being processed.
+This is controlled by the precision specification, which is a character
+string taking one of the following six values:
+
+\begin{quote}
+\begin{center}
+\begin{tabular}{cc} 
+
+Fixed precisions $\left\{ \mbox{
+\begin{tabular}{l}
+`{\tt \_INTEGER}'\\
+`{\tt \_REAL}'\\
+`{\tt \_DOUBLE}'
+\end{tabular} } \right.$
+& Elastic precisions $\left\{ \mbox{
+\begin{tabular}{l}
+`{\tt \_INTEGER:}'\\
+`{\tt \_REAL:}'\\
+`{\tt \_DOUBLE:}'
+\end{tabular} } \right.$ 
+
+\end{tabular}
+\end{center}
+\end{quote} 
+
+{\bf Fixed precisions} specify the type of arithmetic to be used explicitly.
+In this case, the data used in the calculation (both incoming coordinates
+and explicit numerical constants in the transformation functions) are first
+converted to the specified numerical type ({\em integer}, {\em real} or {\em
+double precision}) and the transformation functions are then evaluated using
+the appropriate type of arithmetic. 
+
+{\em N.B.\ It is currently assumed that the data types of all the input and
+output coordinates are the same and all the transformation functions are
+therefore evaluated using the same type of arithmetic.
+This may change in future to allow coordinates to have mixed data types. 
+The present arrangement is designed so that changes to existing applications
+and datasets will not generally be necessary.} 
+
+{\bf Elastic precisions} are similar, except that some subsequent
+adjustment is also allowed.
+In this case, the precision specification indicates the {\bf minimum}
+precision of the arithmetic to be used, but this may be increased if the
+data type warrants it. 
+Thus, a precision specification of \mbox{`{\tt \_REAL:}'} would request that
+{\em real} arithmetic be used unless {\em double precision} data were being
+processed (in which case {\em double precision} arithmetic would be used 
+instead). 
+In general, the type of arithmetic used is related to the precision
+specification and the type of data being processed as follows:
+
+\begin{quote}
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\cline{2-4}
+\multicolumn{1}{c}{} & \multicolumn{3}{|c|}{\em Elastic Precision
+Specification}\\
+\hline
+{\em Data Type} & `\verb#_INTEGER:#' & `\verb#_REAL:#' & `\verb#_DOUBLE:#' \\
+\hline
+\name{\_INTEGER} & {\em integer} & {\em real} & {\em double precision} \\
+\name{\_REAL} & {\em real} & {\em real} & {\em double precision} \\
+\name{\_DOUBLE} & {\em double precision} & {\em double precision} & {\em
+double precision}\\
+\hline 
+\end{tabular}
+\end{center}
+\end{quote} 
+
+Once the arithmetic precision has been decided, the transformation functions
+are evaluated in the same way as for a fixed precision ({\em i.e.}\ by
+converting all incoming data and constants to the appropriate data type and
+then performing the arithmetic). 
+
+When several transformations have been concatenated, the type of arithmetic
+to be used is determined individually for each stage in the overall
+transformation (data type conversion being performed automatically between
+each stage as necessary). 
+If an elastic precision (which is sensitive to the input data type) has been
+specified, then the input data type is taken to correspond with the type of
+arithmetic used in the previous mapping to be evaluated (or the input data
+type itself if appropriate).
+This arrangement avoids any unnecessary loss of data precision regardless of
+the order in which transformations are concatenated. 
+
+
+\section{COMPILING AND LINKING}
+
+The files required for compiling and linking applications which use the
+\name{TRANSFORM} facility reside in a directory with the logical name
+\name{TRANSFORM\_DIR}. 
+Files and routines from the \name{PRIMDAT} facility (SUN/39) are also
+required. 
+Logical names used by both of these facilities must first be defined by
+executing the \name{DCL} commands: 
+
+\begin{verbatim}
+      $ @PRIMDAT_DIR:START
+      $ @TRANSFORM_DIR:START
+\end{verbatim}
+
+Applications which contain Fortran \name{INCLUDE} statements associated with 
+the \name{TRANSFORM} facility may then be compiled. 
+
+Applications should be linked using the link options files \name{TRN\_LINK}
+and \name{PRM\_LINK}. 
+For instance, to link an application called \name{PROG}, the \name{ADAM}
+command: 
+
+\begin{verbatim}
+      $ ALINK PROG,TRN_LINK/OPT,PRM_LINK/OPT
+\end{verbatim}
+
+should be used.
+Note that the \name{TRANSFORM} facility cannot currently be used outside the
+\name{ADAM} programming environment. 
+
+
+\appendix
+
+
+\newpage
+\section{TRANSFORMATION FUNCTIONS}
+
+\label{appendix:syntax}
+
+This Appendix describes the form and syntax of transformation functions and
+the way in which they are used to define transformations. 
+
+
+\subsection{General Form}
+
+A transformation is defined by specifying two ordered sets of transformation
+functions which define its forward and inverse mappings. 
+These functions are stored as character data (typically in the elements of
+two \name{CHARACTER} arrays) and have the general form: 
+
+\begin{quote}
+$<$variable$>$ [= $<$expression$>$]
+\end{quote}
+
+where \mbox{$<$variable$>$} is a valid {\em variable} name and
+\mbox{$<$expression$>$} is an arithmetic {\em expression}. 
+Transformation functions therefore resemble Fortran~77 assignment
+statements, except that the contents of the square brackets \mbox{[...]} may
+be omitted in appropriate circumstances (see below). 
+
+\paragraph{Variables and data coordinates.}
+Variables are used in transformation functions to represent the coordinates
+of data points which will be transformed.
+Their names may be chosen freely to make the definition as comprehensible as
+possible; they may be of any length and may contain any alphanumeric
+character (including underscore) although they must start with an alphabetic
+character. 
+
+A variable becomes defined when it appears on the left hand side of a
+transformation function and the name of each variable must appear on the
+left hand side of one (and only one) such function. 
+Variables which appear on the left hand side of {\bf forward} transformation
+functions are termed {\bf output} variables, while those appearing on the
+left hand side of {\bf inverse} transformation functions are termed {\bf
+input} variables. 
+
+Variables act only as ``dummy arguments'' and their names have no
+significance outside the transformation being defined. 
+The correspondence between variables and the coordinates of external data
+points is established by the order in which the variables are defined. 
+In the following, for instance, the first coordinate of an input data point
+would correspond with the variable `\verb#ALPHA#' and the second coordinate
+with `\verb#OMEGA#', while the two coordinates of an output data point would
+correspond with the variables `\verb#p#' and `\verb#q#' respectively: 
+
+\begin{quote}
+\begin{center}
+\begin{tabular}{cc}
+
+\mbox{Forward } $\left\{ \mbox{
+\begin{tabular}{l}
+`{\tt p = ALPHA + 2}' \\
+`{\tt q = 44 - 2 * OMEGA}' \\
+\end{tabular}
+}\right.$
+&
+\mbox{Inverse } $\left\{ \mbox{
+\begin{tabular}{l}
+`{\tt ALPHA = p - 2}' \\
+`{\tt OMEGA = ( 44 - q ) / 2}'
+\end{tabular}
+}\right.$
+
+\end{tabular}
+\end{center}
+\end{quote}
+
+Note that expressions appearing on the right hand side of {\bf forward}
+transformation functions may only refer to {\bf input} variables, while
+those appearing on the right hand side of {\bf inverse} transformation
+functions may only refer to {\bf output} variables. 
+
+\paragraph{Unspecified mappings.}
+Either (although not both) of a transformation's mappings may be left
+unspecified by omitting the right hand sides (and `$=$' signs) from all the
+relevant transformation functions. 
+Thus, the transformation given by:
+
+\begin{quote}
+\begin{center}
+\begin{tabular}{cc}
+
+\mbox{Forward } $\left\{ \mbox{
+\begin{tabular}{l}
+`{\tt p = ALPHA + 2}' \\
+`{\tt q = 44 - 2 * OMEGA}' \\
+\end{tabular}
+}\right.$
+&
+\mbox{Inverse } $\left\{ \mbox{
+\begin{tabular}{l}
+`{\tt ALPHA}' \\
+`{\tt OMEGA}'
+\end{tabular}
+}\right.$
+
+\end{tabular}
+\end{center}
+\end{quote}
+
+has only the forward mapping defined (the remainder of the inverse functions
+serves simply to define the names of the input variables). 
+To define only the {\bf inverse} mapping, the right hand sides of all the
+{\bf forward} transformation functions would be omitted instead. 
+
+
+\subsection{Expression Syntax}
+The right hand sides of transformation functions closely follow the syntax
+of Fortran~77 arithmetic expressions. 
+The main differences (in addition to the less restrictive naming rules for
+variables) are:
+
+\begin{itemize}
+
+\item Transformation functions may be written in upper, lower or mixed case 
+and there there is no limit on their length;
+
+\item Only the generic form of intrinsic functions is available, but some
+additional built-in functions are provided;
+
+\item The data types of variables and constants are interpreted differently
+(see below and Section~\ref{section:advanced:precision}).
+
+\end{itemize}
+
+The following describes particular features of the expression syntax in more
+detail. 
+
+\paragraph{Constants.}
+Numerical constants may be written using any of the standard Fortran~77
+forms ({\em integer}, {\em real} or {\em double precision}). 
+For positive constants, a preceding $+$ sign is optional.
+Thus, all the following are valid constants: 
+
+\begin{quote}
+\begin{center}
+\begin{tabular}{ccccccc}
+
+0 & $-$1 & 57 & $+$666 & 1.0 & $+$3. & 0.5438 \\
+.303 & $-$.5 & 1.234d6 & $-$4.6e$-$3 & 9E4 & $+$.44D$+$19 & 3e0\\
+
+\end{tabular}
+\end{center}
+\end{quote}
+
+The special constant `$<$\verb#BAD#$>$' may also be used and represents a
+{\em bad} ({\em i.e.}\ undefined) value; any expression containing it
+evaluates to the standard Starlink {\em bad} value for the data type being
+transformed. 
+
+At present there is no distinction between the data types of constants, so
+the form in which they are written does not matter and their interpretation
+depends only on the type of arithmetic in use when the expression is
+evaluated. 
+This, in turn, may depend on the type of data being transformed
+(Section~\ref{section:advanced:precision}) so constant values are converted
+automatically to the data type required. 
+For instance, a constant written as `\mbox{\tt 2.1}' might be interpreted as
+{\em integer}~(2), {\em real}~(2.1E0), or {\em double precision}~(2.1D0)
+according to the type of arithmetic being used. 
+
+{\em N.B. Handling of data types may change in future to allow implicit type
+conversion and ``mixed mode'' arithmetic. 
+To avoid possible problems, floating-point to integer conversion of
+constants should currently be avoided if the constant has a fractional part.
+In practice such cases are rare.}
+
+\paragraph{Arithmetic operations.}
+The standard arithmetic operators $+$, $-$, $*$, $/$ and $**$ are available
+and their use is identical to Fortran~77, thus: 
+
+\begin{quote}
+\begin{center}
+\begin{tabular}{lcl}
+
+`{\tt Q + 3.0}' & \ldots & add 3.0 to Q\\
+`{\tt -6.7 - DATA}' & \dots & subtract \name{DATA} from $-$6.7\\
+`{\tt INPUT * 14}' & \ldots & multiply \name{INPUT} by 14 \\
+`{\tt 4 / V2}' & \ldots & divide 4 by \name{V2}\\
+`{\tt NUMBER ** INDEX}' & \ldots & raise \name{NUMBER} to the power 
+\name{INDEX}
+
+\end{tabular}
+\end{center}
+\end{quote}
+
+The normal rules of operator precedence apply.
+Matching pairs of parentheses may also be used (and are recommended) to
+explicitly define the order of expression evaluation; they may be nested
+arbitrarily deeply. 
+Note that the precision with which arithmetic is performed is not determined
+until an expression is actually evaluated
+(Section~\ref{section:advanced:precision}).\footnote{ 
+Expressions such as `X$**$2.0' and `X$**$2' cannot currently be
+distinguished, whereas in Fortran they are different and the latter will
+evaluate more efficiently. 
+Consequently (unless {\em integer} arithmetic is being used) the
+exponentiation operator `$**$' is an inefficient way of squaring a
+number and the equivalent expression `X$*$X' is preferred. 
+This deficiency will be removed in future.}
+
+
+\subsection{Built-in Functions}
+
+\paragraph{Standard functions.}
+A set of standard built-in functions is available and corresponds closely
+with the Fortran~77 set of intrinsic functions
+(Table~\ref{table:standardbuiltins}). 
+Function invocations take the same form as in Fortran and may be nested
+arbitrarily deeply. 
+
+These built-in functions are all {\em generic} and will adapt to the type of
+arithmetic being used. 
+Some, however, do not support {\em integer} arithmetic and a {\em bad} value
+will be returned if this is in use (see Table~\ref{table:standardbuiltins}). 
+There are no data type conversion functions at present.
+
+\begin{table}
+\begin{center}
+\begin{tabular}{|l|c|l|} \hline
+{\em Function} & 
+\begin{tabular}{c}{\em Number of}\\{\em arguments} \end{tabular} &
+{\em Description }\\
+\hline \hline
+SQRT & 1 & square root: $\sqrt{\mbox{arg}}$ \\
+LOG & 1 & natural logarithm: $\ln (\mbox{arg})$ \\
+LOG10 & 1 & common logarithm: $\log _{10}(\mbox{arg})$ \\
+EXP & 1 & exponential: $\exp (\mbox{arg})$ \\
+ABS & 1 & absolute (positive) value: $\left| \mbox{arg} \right|$ \\
+NINT & 1 & nearest integer value to \mbox{arg} \\
+MAX & 2 or more & maximum of arguments \\
+MIN & 2 or more & minimum of arguments \\
+DIM & 2 & Fortran DIM (positive difference) function \\
+MOD & 2 & Fortran MOD (remainder) function \\
+SIGN & 2 & Fortran SIGN (transfer of sign) function \\
+SIN* & 1 & sine function: $\sin (\mbox{arg})$ \\
+COS* & 1 & cosine function: $\cos (\mbox{arg})$ \\
+TAN* & 1 & tangent function: $\tan (\mbox{arg})$ \\
+ASIN* & 1 & inverse sine function: $\sin ^{-1}(\mbox{arg})$ \\
+ACOS* & 1 & inverse cosine function: $\cos ^{-1}(\mbox{arg})$ \\
+ATAN* & 1 & inverse tangent function: $\tan ^{-1}(\mbox{arg})$ \\
+ATAN2* & 2 & Fortran ATAN2 (inverse tangent) function \\
+SINH* & 1 & hyperbolic sine function: $\sinh (\mbox{arg})$ \\
+COSH* & 1 & hyperbolic cosine function: $\cosh (\mbox{arg})$ \\
+TANH* & 1 & hyperbolic tangent function: $\tanh (\mbox{arg})$ \\ \hline
+\multicolumn{1}{|r}{} &
+\multicolumn{2}{l|}{\footnotesize *Function does not support {\em integer}
+arithmetic.}\\
+\hline
+\end{tabular}
+
+\end{center}
+\caption{The standard built-in functions.  The angular arguments/results of
+all trigonometric functions are in radians.} 
+\label{table:standardbuiltins} 
+\end{table}
+
+\paragraph{Additional functions.}
+Some additional built-in functions, which do not match the standard
+Fortran~77 set, are also defined.
+At present these simply comprise the \name{VAX}~Fortran extensions to this
+set (Table~\ref{table:additionalbuiltins}). 
+They are also generic but do not support {\em integer} arithmetic.
+
+\begin{table}
+\begin{center}
+\begin{tabular}{|l|c|l|} \hline
+{\em Function} &
+\begin{tabular}{c} {\em Number of}\\{\em arguments} \end{tabular} &
+{\em Description }\\
+\hline \hline
+SIND & 1 & sine function: $\sin (\mbox{arg})$ \\
+COSD & 1 & cosine function: $\cos (\mbox{arg})$ \\
+TAND & 1 & tangent function: $\tan (\mbox{arg})$ \\
+ASIND & 1 & inverse sine function: $\sin ^{-1}(\mbox{arg})$ \\
+ACOSD & 1 & inverse cosine function: $\cos ^{-1}(\mbox{arg})$ \\
+ATAND & 1 & inverse tangent function: $\tan ^{-1}(\mbox{arg})$ \\
+ATAN2D & 2 & VAX Fortran ATAN2D (inverse tangent) function \\
+\hline
+\end{tabular}
+\end{center}
+\caption{Additional built-in functions; angular arguments/results are in
+degrees. 
+None of these functions supports {\em integer} arithmetic.}
+\label{table:additionalbuiltins} 
+\end{table}
+
+
+\newpage
+\section{CLASSIFICATION PROPERTIES}
+
+\label{appendix:classification}
+
+This Appendix describes the classification properties which may be declared
+and associated with a transformation
+(Section~\ref{section:advanced:classification} shows how this is done and
+how the information may subsequently be retrieved). 
+In order to be precise, the definitions given here are necessarily
+mathematical.
+Readers who require simpler and more specific information about how to
+classify a particular transformation may find Table~\ref{table:composite}
+helpful. 
+
+
+\subsection{General}
+
+Many of the properties described here depend on the nature of a {\em
+Jacobian matrix} associated with a transformation; there are potentially two
+of these matrices, corresponding with the forward and inverse mappings. 
+Using the notation of Equation~\ref{equation:transformationfunctions}, the
+Jacobian matrix ${\bf J}_F$ associated with the forward mapping is the
+\mbox{$n \times m$} matrix of partial derivatives: 
+
+\begin{equation}
+{\bf J}_F = \left[ \begin{array}{cccc}
+\pdiff{1}{1} & \pdiff{1}{2} & \cdots & \pdiff{1}{m} \\
+             &              &        &              \\
+\pdiff{2}{1} & \pdiff{2}{2} & \cdots & \pdiff{2}{m} \\
+\vdots       & \vdots       &        & \vdots       \\
+\pdiff{n}{1} & \pdiff{n}{2} & \cdots & \pdiff{n}{m}
+\end{array} \right]
+\end{equation}
+
+while that associated with the inverse mapping ${\bf J}_I$ is the equivalent
+\mbox{$m \times n$} matrix obtained by inter-changing input and output
+variables ($x$ and $y$) throughout. 
+
+The significance of these matrices can be seen by considering a simple
+linear mapping in two dimensions.
+Such a mapping is capable of representing a combination of a shift of
+origin, magnification, rotation, reflection and shearing deformation: 
+
+\begin{equation}
+\begin{array}{lll}
+y_1 & = & a x_1 + b x_2 + c \\
+y_2 & = & d x_1 + e x_2 + f
+\end{array}
+\end{equation}
+
+It may be re-written as the matrix equation: 
+
+\begin{equation}
+\begin{array}{cc}
+\left[ \begin{array}{c} y_1 \\ y_2 \end{array} \right]
+= {\bf J} \times \left[ \begin{array}{c} x_1 \\ x_2 \end{array} \right]
++ \left[ \begin{array}{c} c \\ f \end{array} \right]
+&
+\mbox{where }
+{\bf J} = \left[ \begin{array}{cc} a & b \\ d & e \end{array} \right]
+\end{array}
+\end{equation}
+
+The Jacobian matrix ${\bf J}$ therefore contains the coefficients which
+define this mapping and determine its character, apart from a shift of
+origin. 
+In particular, the determinant of ${\bf J}$ (\mbox{$\det{\bf J}=ae-bd$}) is
+the signed ``area scale factor'' which the mapping introduces ({\em i.e.}\
+the area of the parallelogram produced when the mapping acts on a unit
+square). 
+In more than two dimensions, $\det{\bf J}$ would be the equivalent ``volume
+scale factor''. 
+
+If the mapping is not linear, then the Jacobian matrix will vary from point to
+point. 
+Nevertheless, it may still be regarded as a local linear approximation to
+the true mapping (apart from re-location of the origin) and \mbox{$\det {\bf
+J}$} can still be interpreted as the {\bf local} area (or volume) scale
+factor, which may now change from point to point. 
+
+\paragraph{Changing dimensionality.}
+For transformations with an equal number of input and output variables
+(\mbox{$m=n$}), the Jacobian matrices ${\bf J}_F$ and ${\bf J}_I$ associated
+with the forward and inverse mappings (if specified) will both be square. 
+If the transformation functions are correctly formulated, then these two
+matrices will be mutually inverse and will satisfy: 
+
+\begin{equation}
+{\bf J}_F {\bf J}_I = {\bf J}_I {\bf J}_F = {\bf I}
+\end{equation}
+
+where ${\bf I}$ is an identity matrix.
+Their determinants will also be related by:
+
+\begin{equation}
+\det{{\bf J}_I} = \frac{1}{\det{{\bf J}_F}}
+\end{equation}
+
+As a consequence of this (and the definitions of the basic classification
+properties given below) any property which applies to one of a
+transformation's two mappings will necessarily apply to the complementary
+mapping also. 
+
+If the transformation affects a change of dimensionality, however, so that
+\mbox{$m \ne n$}, then it is possible that certain properties may only apply
+to one of its two mappings. 
+It is still acceptable to associate such properties with the transformation,
+however, because the \name{TRANSFORM} software will take account of the
+number of input/output variables, and will omit properties which it knows
+cannot apply when information about a particular mapping is requested. 
+In general, therefore, a classification property may be declared for a
+transformation if \underline{\bf either} of its mappings has that property. 
+
+
+\subsection{Basic Properties}
+
+The basic classification properties are defined as follows:
+
+\begin{description}
+
+\item[{\bf LINEAR:}] A mapping has this property if all its output variables
+are related to its input variables by linear arithmetic expressions. 
+Such a mapping will preserve straight lines. 
+In two dimensions, examples of \name{LINEAR} mappings include shifts of
+origin, rotations, reflections, magnifications and shearing deformations. 
+
+\begin{itemize}
+\item In general, a mapping is \name{LINEAR} if all its first derivatives
+are constant ({\em i.e.}\ do not change from point to point). 
+\end{itemize}
+
+\item[{\bf INDEPENDENT:}] A mapping has this property if a change in each
+input variable causes a corresponding change in only a single distinct
+output variable. 
+Such a mapping will preserve the independence of the coordinate axes.
+A simple example in two dimensions would be the interchange of the two axes.
+
+\begin{itemize}
+\item In general, a mapping is \name{INDEPENDENT} if there is at most one
+element in each row and column of its Jacobian matrix which is not
+identically zero. 
+\end{itemize}
+
+\item[{\bf DIAGONAL:}] A mapping has this property if each output variable
+depends only on the {\bf corresponding} input variable, so that the
+coordinate axes are preserved. 
+There are many examples of such mappings in two dimensions, including those
+normally used for scaling linear (and logarithmic) graphs. 
+Note that a \name{DIAGONAL} mapping is more strongly constrained than an
+\name{INDEPENDENT} mapping (above) in which the coordinate axes may be
+interchanged.
+A \name{DIAGONAL} mapping is necessarily always \name{INDEPENDENT}.
+
+\begin{itemize}
+\item In general, a mapping is \name{DIAGONAL} if its Jacobian matrix is
+square and diagonal ({\em i.e.}\ all its off-diagonal terms are identically
+zero). 
+If the Jacobian matrix is not square, then the mapping is \name{DIAGONAL} if
+$\pdiff{i}{j}$ is identically zero for all \mbox{$i \ne j$}. 
+\end{itemize}
+
+\item[{\bf ISOTROPIC:}] A mapping has this property if it locally preserves
+shapes and the angles between lines. 
+Such a mapping may apply a local scale factor to the distances between
+neighbouring points, but this factor will not depend on the orientation
+of the line between the two points, although it may vary from point to
+point. 
+In two dimensions, an \name{ISOTROPIC} mapping will convert a circle at any
+point into another circle (but possibly of a different size and in a
+different place), whereas a non-\name{ISOTROPIC} mapping would produce an
+ellipse. 
+If the mapping is also \name{LINEAR} (see above) then circles of
+any size will behave in this way, whereas with a non-\name{LINEAR}
+mapping this may only be true for circles of infinitely small size. 
+Isotropy is an important property of {\em conformal} map projections. 
+
+\begin{itemize}
+\item In general, a mapping is \name{ISOTROPIC} if it introduces a distance
+scale factor between neighbouring points which does not depend on the
+relative orientation of the points. 
+This will be true if its Jacobian matrix ${\bf J}$ satisfies: 
+
+\begin{equation}
+{\bf \tilde{J}} {\bf J} = \lambda {\bf I }
+\end{equation}
+
+where ${\bf \tilde{J}}$ denotes the transpose of ${\bf J}$, $\lambda$ is a
+constant and ${\bf I}$ is an identity matrix. 
+A mapping cannot have this property if the number of output variables is
+less than the number of input variables. 
+A mapping with only one input and one output variable is necessarily always
+\name{ISOTROPIC}. 
+
+\end{itemize}
+
+\item[{\bf POSITIVE\_DET:}] A mapping has this property if the determinant
+of its Jacobian matrix is greater than zero at all points. 
+In two dimensions, such a mapping can locally represent rotations,
+magnifications and shearing deformations and can globally represent
+``rubber-sheet'' distortions, but it will lack any component of reflection. 
+A string of text subjected to such a mapping would remain legible (although
+possibly highly distorted) and would not be converted into a mirror image of
+itself. 
+
+\begin{itemize}
+\item This property can only apply to mappings with an equal number of input
+and output variables. 
+\end{itemize}
+
+\item[{\bf NEGATIVE\_DET:}] A mapping has this property if the determinant
+of its Jacobian matrix is less than zero at all points. 
+In two dimensions, such a mapping will locally include a component of
+reflection (possibly also combined with rotation, magnification and shearing
+deformation) and can globally represent ``rubber-sheet'' distortion
+combined with a reflection.
+A string of text subjected to such a mapping would be converted into a
+mirror image of itself (in addition to any other distortion present). 
+
+\begin{itemize}
+\item This property can only apply to mappings with an equal number of input
+and output variables. 
+\end{itemize}
+
+{\em N.B.} A mapping may not have both the \name{POSITIVE\_DET} and
+\name{NEGATIVE\_DET} properties simultaneously. 
+It is also possible that neither of these properties may apply if the
+determinant is positive at some points and negative at others. 
+
+\item[{\bf CONSTANT\_DET:}] A mapping has this property if its area (or 
+volume) scale factor has the same value at all points. 
+If the mapping has an equal number of input and output variables, then this
+will be true if the determinant of its Jacobian matrix has the same value at
+all points. 
+Mappings which are \name{LINEAR} (see above) necessarily have the
+\name{CONSTANT\_DET} property, but it can also apply to non-\name{LINEAR}
+mappings and is an important property of {\em equal area} map projections.
+
+\begin{itemize}
+\item A mapping cannot have this property if the number of output variables
+is less than the number of input variables. 
+\end{itemize}
+
+\item[{UNIT\_DET:}]  A mapping has this property if the absolute value of
+its area (or volume) scale factor is unity (and it has the same sign) at all
+points. 
+If the mapping has an equal number of input and output variables, then this
+will be true if the determinant of its Jacobian matrix has an absolute value
+of unity (and the same sign) at all points. 
+This is a stronger constraint than the \name{CONSTANT\_DET} property (above)
+and a mapping with the \name{UNIT\_DET} property necessarily has the
+\name{CONSTANT\_DET} property also. 
+In addition, one of the two properties \name{POSITIVE\_DET} or
+\name{NEGATIVE\_DET} will apply. 
+
+\begin{itemize}
+\item A mapping cannot have this property if the number of output variables
+is less than the number of input variables. 
+\end{itemize}
+
+\end{description}
+
+
+\subsection{Composite Properties}
+
+Many important mapping properties are {\em composite}; {\em i.e.}\ they
+depend on the presence of several of the basic properties above in
+combination. 
+Table~\ref{table:composite} lists the more important of these and the
+following notes augment the information in this Table.
+The presence of a possible shift of origin is disregarded throughout: 
+
+\begin{table}
+\begin{center}
+
+\begin{tabular}{|l|c|c|c|c|c|c|c|c|c|}
+\cline{2-10}
+\multicolumn{1}{c}{} & \multicolumn{9}{|c|}{\em Type of Mapping} \\
+\hline
+{\em Basic Property}
+              & A    & B    & C    & D    & E    & F    & G    & H    & I    \\
+\hline
+LINEAR        & \req & \req & \req & \req & \pro & \req & \req & \irr & \irr \\
+INDEPENDENT   & \imp & \irr & \imp & \imp & \imp & \req & \imp & \irr & \irr \\
+DIAGONAL      & \req & \irr & \req & \req & \req & \pro & \req & \irr & \irr \\
+ISOTROPIC     & \req & \req & \req & \irr & \irr & \req & \req & \req & \irr \\
+POSITIVE\_DET & \req & \req & \req & ?    & ?    & ?    & ?    & \req & \req \\
+NEGATIVE\_DET & \pro & \pro & \pro & ?    & ?    & ?    & ?    & \pro & \pro \\
+CONSTANT\_DET & \imp & \imp & \imp & \imp & \irr & \imp & \imp & \irr & \req \\
+UNIT\_DET     & \req & \req & \irr & \irr & \irr & \req & \req & \irr & \irr \\
+\hline
+\end{tabular}
+
+\begin{footnotesize}
+
+Key:\\
+\mbox{
+\begin{tabular}[t]{rc@{ -- }l}
+Mapping types: & A & Shift of origin \\
+               & B & Rotation about an axis \\
+               & C & Magnification about a point \\
+               & D & Graphical scaling (linear) \\
+               & E &  Graphical scaling (non-linear) \\
+               & F & Interchange of axes \\
+               & G & Axis reversal \\
+               & H & Conformal map projection \\
+               & I & Equal area map projection \\
+\end{tabular}
+\begin{tabular}[t]{rc@{ -- }l}
+Symbols: & \req & Required \\
+         & \imp & Implied \\
+         & \pro & Prohibited \\
+         & \irr & Irrelevant \\
+         & ?    & See note in text \\
+\end{tabular}
+}
+
+\end{footnotesize}
+
+\end{center}
+
+\caption{Common types of mapping with their composite classification
+properties.} 
+
+\label{table:composite}
+
+\end{table}
+
+\begin{description}
+
+\item[{\bf A -- Shift of origin.}] The mapping implements a simple shift of
+coordinate origin, the nature of which must be determined by transforming a
+test point. 
+
+\item[{\bf B -- Rotation about an axis.}] The mapping represents a
+simple rotation about an axis (a point in two dimensions) without
+associated magnification or distortion.
+If the \name{DIAGONAL} property also applies, then the amount of rotation
+will be zero, so the mapping reduces to a shift of origin (see A above). 
+
+\item[{\bf C -- Magnification about a point.}] The mapping applies a
+simple positive magnification (zoom) factor about a point without any
+associated rotation or other form of distortion. 
+If the magnification factor is negative, then a component of reflection will
+be introduced if the number of input/output variables is odd.
+In this case the \name{POSITIVE\_DET} property should be replaced by 
+\name{NEGATIVE\_DET}.
+
+\item[{\bf D -- Graphical scaling (linear).}] This type of mapping is
+commonly used to scale the axes of a graph, with different scale factors
+being applied to each axis. 
+Either \name{POSITIVE\_DET} or \name{NEGATIVE\_DET} will also apply depending
+on the sign of the scale factors in use and whether they result in a mirror
+image. 
+\name{POSITIVE\_DET} will apply if the number of negative scale factors is
+even and \name{NEGATIVE\_DET} will apply if this number is odd. 
+
+\item[{\bf E -- Graphical scaling (non-linear).}] This type of mapping is
+commonly used to non-linearly scale the axes of graphs (to produce a
+log-log plot for instance).
+Since the non-linear functions used are normally monotonic, either the
+\name{POSITIVE\_DET} or \name{NEGATIVE\_DET} property will usually apply,
+depending on the sign of the scaling functions' derivatives along each axis.
+\name{POSITIVE\_DET} will apply if the number of negative derivatives is
+even and \name{NEGATIVE\_DET} will apply if this number is odd. 
+
+\item[{\bf F -- Interchange of axes.}] The mapping simply interchanges
+coordinate values. 
+The \name{POSITIVE\_DET} property will apply if the resulting axis
+permutation is {\em cyclic}, while \name{NEGATIVE\_DET} will apply if the
+permutation is {\em non-cyclic}. 
+
+\item[{\bf G -- Axis reversal.}] The mapping reverses one or more of the
+axes ({\em i.e.}\ changes the sign of the coordinates with or without the
+addition of a constant). 
+The \name{POSITIVE\_DET} property will apply if the number of axes reversed
+is even, while \name{NEGATIVE\_DET} will apply if this number is odd. 
+
+\item[{\bf H -- Conformal map projection.}] The mapping implements a
+conformal map projection which locally preserves shapes and angles but may
+introduce a scale factor which varies from point to point. 
+
+\item[{\bf I -- Equal area map projection.}] The mapping implements an
+equal area map projection in which the area scale factor does not vary from
+point to point, although shapes and the angles between lines may be
+distorted. 
+
+\end{description}
+
+
+\newpage
+\section{HDS STRUCTURES}
+
+\label{appendix:structures}
+
+This Appendix describes the \name{HDS} structures used by the
+\name{TRANSFORM} facility.\footnote{
+The data structures described here may be subject to change in future.
+However, apart from minor changes in the way data precision is handled, the
+current structures will continue to be supported by future versions of
+user-level \name{TRANSFORM} routines. 
+}
+There are three of these, distinguished by their HDS type: 
+
+\begin{description}
+
+\item[{\bf TYPE = \name{TRN\_TRANSFORM}}] structures are used to hold data
+defining a complete (possibly multi-stage) {\em transformation} and are
+handled directly by user-level \name{TRANSFORM} routines. 
+
+\item[{\bf TYPE = \name{TRN\_MODULE}}] structures are used to hold {\em
+transformation module} information which represents a simple 1-stage
+transformation without associated classification information. 
+These structures are not handled directly by user-level \name{TRANSFORM} 
+routines. 
+
+\item[{\bf TYPE = \name{TRN\_CLASS}}] structures are used to hold
+{\em classification} information about the properties of a transformation. 
+These structures are also not handled directly by the user-level
+\name{TRANSFORM} routines. 
+
+\end{description}
+
+The following Sections describe these structures in detail.
+
+
+\subsection{The \name{TRN\_TRANSFORM} Structure}
+
+An \name{HDS} structure of type \name{TRN\_TRANSFORM} contains the complete
+specification of a (possibly multi-stage) transformation with its associated
+classification information.
+It is defined as follows: 
+
+\begin{quote}
+\begin{center}
+
+\begin{tabular}{|llc|c|}
+\hline
+\multicolumn{4}{|c|}{\raisebox{0ex}[3.5ex][1.5ex]{\bf Components of a
+\name{TRN\_TRANSFORM} Structure}} \\ 
+\hline
+\hline
+{\em Component Name} & {\em \name{HDS} Type} & {\em Typical Value} & {\em
+Optional?} \\ 
+\hline
+TRN\_VERSION & \_REAL & 0.9 & no \\
+FORWARD & \_CHAR & `\verb#DEFINED#' & no \\
+INVERSE & \_CHAR & `\verb#UNDEFINED#' & no \\
+MODULE\_ARRAY() & TRN\_MODULE & $<$array of structures$>$ & no \\
+CLASSIFICATION & TRN\_CLASS & $<$structure$>$ & yes \\
+\hline
+\end{tabular}
+
+\end{center}
+\end{quote}
+
+The structure components have the following meanings and restrictions:
+
+\begin{description}
+
+\item[{\bf \name{TRN\_VERSION}}] is a mandatory scalar \name{\_REAL} component
+containing the version number of the \name{TRANSFORM} software which created
+or last modified the \name{TRN\_TRANSFORM} structure or any of its
+components. 
+This information allows programs linked with old versions of
+\name{TRANSFORM} software to detect if they are processing data structures
+created by more recent versions, with which they may not be compatible. 
+
+\item[{\bf \name{FORWARD}}] is a mandatory scalar \name{\_CHAR} component which
+must contain one of the two values `\verb#DEFINED#' or `\verb#UNDEFINED#' (case
+insensitive). 
+It specifies whether the transformation's {\bf forward} mapping is defined
+or undefined. 
+
+\item[{\bf \name{INVERSE}}] is a mandatory scalar \name{\_CHAR} component which
+must contain one of the two values `\verb#DEFINED#' or `\verb#UNDEFINED#' (case
+insensitive). 
+It specifies whether the transformation's {\bf inverse} mapping is defined
+or undefined.
+It is not permitted for both the \name{FORWARD} and \name{INVERSE} 
+components to have the value `\verb#UNDEFINED#'.
+
+\item[{\bf \name{MODULE\_ARRAY()}}] is a mandatory 1-dimensional array of
+structures of type \name{TRN\_MODULE}.
+It holds a sequence of transformation modules which are to be used in
+succession to define the overall transformation.
+If the \name{FORWARD} component has the value `\verb#DEFINED#', then all the
+modules in this array must have their {\bf forward} mappings defined.
+Similarly, if the \name{INVERSE} component has the value `\verb#DEFINED#', then
+all the modules must have their {\bf inverse} mappings defined.
+Adjacent modules in this array must have matching numbers of output and input
+variables. 
+The number of input variables for the transformation as a whole is
+determined by the number of input variables for the first module in this
+array, while the number of output variables is determined by the number of
+output variables for the final module. 
+
+\item[{\bf \name{CLASSIFICATION}}] is an optional scalar structure component
+of type \name{TRN\_CLASS}.  If present, it holds the classification
+information for the entire transformation.  If absent, a default set of
+classification properties applies, which corresponds to all elements of the
+transformation's logical classification array being set to \name{.FALSE.}.
+
+\end{description}
+
+
+\subsection{The \name{TRN\_MODULE} Structure}
+
+A structure of type \name{TRN\_MODULE} contains transformation module
+information, which represents the simplest form of 1-stage transformation
+without associated classification information. 
+More complex transformations may be built up by joining several of these
+modules together, as is done in the \name{MODULE\_ARRAY} component of a
+\name{TRN\_TRANSFORM} structure. 
+The \name{TRN\_MODULE} structure is defined as follows: 
+
+\begin{quote}
+\begin{center}
+
+\begin{tabular}{|llc|c|}
+\hline
+\multicolumn{4}{|c|}{\raisebox{0ex}[3.5ex][1.5ex]{\bf Components of a
+\name{TRN\_MODULE} Structure}} \\ 
+\hline
+\hline
+{\em Component Name} & {\em \name{HDS} Type} & {\em Typical Value} & {\em
+Optional?} \\ \hline
+NVAR\_IN & \_INTEGER & 2 & no \\
+NVAR\_OUT & \_INTEGER & 2 & no \\
+COMMENT & \_CHAR &         `\verb#2-d Cartesian --> 2-d Polar#' & yes \\
+PRECISION & \_CHAR &       `\verb#_REAL:#' & no \\
+FORWARD\_FUNC() & \_CHAR & `\verb#R=SQRT(X*X+Y*Y)#',`\verb#THETA=A...#' & no \\
+INVERSE\_FUNC() & \_CHAR & `\verb#X=R*COS(THETA)#',`\verb#Y=R*SIN(...#' & no \\
+\hline
+\end{tabular}
+
+\end{center}
+\end{quote}
+
+The structure components have the following meanings and restrictions:
+
+\begin{description}
+
+\item[{\bf \name{NVAR\_IN}}] is a mandatory scalar \name{\_INTEGER}
+component with a positive value specifying the number of {\bf input}
+variables for the transformation which the module describes. 
+
+\item[{\bf \name{NVAR\_OUT}}] is a mandatory scalar \name{\_INTEGER}
+component with a positive value specifying the number of {\bf output}
+variables for the transformation which the module describes. 
+
+\item[{\bf \name{COMMENT}}] is an optional scalar \name{\_CHAR} component of
+arbitrary length which contains a comment associated with the transformation
+module.
+This comment should describe (in English) the type of transformation the
+module performs.
+The contents of the \name{COMMENT} component are only intended to be
+human-readable and should not be machine-processed, except that the special
+three-character sequences `\verb#-->#' and `\verb#<--#' (if present) may be
+automatically interchanged to reflect the effect of inverting the
+transformation module. 
+
+\item[{\bf \name{PRECISION}}] is a mandatory scalar \name{\_CHAR} component
+of arbitrary length which contains a valid precision specification for the 
+transformation module, according to the syntax described in
+Section~\ref{section:advanced:precision}. 
+
+\item[{\bf \name{FORWARD\_FUNC()}}] is a mandatory 1-dimensional
+\name{\_CHAR} array, with elements of arbitrary length, containing
+transformation functions which define the {\bf forward} mapping (according
+to the syntax in Appendix~\ref{appendix:syntax}). 
+The number of array elements must match the value stored in the \name{NVAR\_OUT}
+component.
+
+\item[{\bf \name{INVERSE\_FUNC()}}] is a mandatory 1-dimensional
+\name{\_CHAR} array, with elements of arbitrary length, containing
+transformation functions which define the {\bf inverse} mapping 
+(according to the syntax in Appendix~\ref{appendix:syntax}). 
+The number of array elements must match the value stored in the
+\name{NVAR\_IN} component. 
+
+\end{description}
+
+
+\subsection{The \name{TRN\_CLASS} Structure}
+
+A structure of type \name{TRN\_CLASS} contains information specifying the
+set of classification properties associated with a transformation. 
+These properties are described in Appendix~\ref{appendix:classification}.
+The \name{TRN\_CLASS} structure is defined as follows:
+
+\begin{quote}
+\begin{center}
+
+\begin{tabular}{|llc|c|}
+\hline
+\multicolumn{4}{|c|}{\raisebox{0ex}[3.5ex][1.5ex]{\bf Components of a
+\name{TRN\_CLASS} Structure}} \\ 
+\hline
+\hline
+{\em Component Name} & {\em \name{HDS} Type} & {\em Typical Value} & {\em
+Optional?} \\ \hline
+LINEAR & \_LOGICAL & TRUE & yes \\
+INDEPENDENT & \_LOGICAL & TRUE & yes \\
+DIAGONAL & \_LOGICAL & TRUE & yes \\
+ISOTROPIC & \_LOGICAL & FALSE & yes \\
+POSITIVE\_DET & \_LOGICAL & TRUE & yes \\
+NEGATIVE\_DET & \_LOGICAL & FALSE & yes \\
+CONSTANT\_DET & \_LOGICAL & TRUE & yes \\
+UNIT\_DET & \_LOGICAL & FALSE & yes \\
+\hline
+\end{tabular}
+
+\end{center}
+\end{quote}
+
+All the structure components are scalar \name{\_LOGICAL} objects, whose
+presence is optional. 
+Their names correspond with the classification properties described in
+Appendix~\ref{appendix:classification} and their logical values indicate
+whether the transformation has the associated property. If any component is
+absent, its value defaults to \name{.FALSE.} 
+
+
+\newpage
+\section{ROUTINE DESCRIPTIONS}
+
+\label{appendix:routines}
+
+\subsection{Routine List}
+
+The following is a complete list of user-level \name{TRANSFORM} routines
+with a brief description of their purpose.
+Full specifications are given in the next Section.
+
+\begin{tabbing}
+MMMMMMMMMMMMMMMMMMMMMMMMMMMM\=\kill
+{\bf TRN\_ANNUL}{\em ( ID; STATUS )}
+\> --- Annul compiled mapping\\[1.6ex]
+{\bf TRN\_APND}{\em ( LOCTR1, LOCTR2; STATUS )}
+\> --- Append transformation\\[1.6ex]
+{\bf TRN\_CLOSE}{\em ( STATUS )}
+\> --- Close the \name{TRANSFORM} facility\\[1.6ex]
+{\bf TRN\_COMP}{\em ( LOCTR, FORWD; ID, STATUS )}
+\> --- Compile transformation\\[1.6ex]
+{\bf TRN\_GTCL}{\em ( LOCTR, FORWD; CLASS, STATUS )}
+\> --- Get classification\\[1.6ex]
+{\bf TRN\_GTCLC}{\em ( ID; CLASS, STATUS )}
+\> --- Get compiled classification\\[1.6ex]
+{\bf TRN\_GTNV}{\em ( LOCTR; NVIN, NVOUT, STATUS )}
+\> --- Get numbers of variables\\[1.6ex]
+{\bf TRN\_GTNVC}{\em ( ID; NVIN, NVOUT, STATUS )}
+\> --- Get numbers of compiled variables\\[1.6ex]
+{\bf TRN\_INV}{\em ( LOCTR, STATUS )}
+\> --- Invert transformation\\[1.6ex]
+{\bf TRN\_JOIN}{\em ( LOCTR1, LOCTR2, ELOC, NAME; LOCTR, STATUS )}\\
+\> --- Concatenate transformations\\[1.6ex]
+{\bf TRN\_NEW}{\em ( NVIN, NVOUT, FOR, INV, PREC, COMM, ELOC, NAME; LOCTR, 
+STATUS )}\\
+\> --- Create new transformation\\[1.6ex]
+{\bf TRN\_PRFX}{\em ( LOCTR1, LOCTR2; STATUS )}
+\> --- Prefix transformation\\[1.6ex]
+{\bf TRN\_PTCL}{\em ( CLASS, LOCTR; STATUS )}
+\> --- Put classification\\[1.6ex]
+{\bf TRN\_STOK[x]}{\em ( TOKEN, VALUE; TEXT, NSUBS, STATUS )}\\
+\> --- Substitute token\\[1.6ex]
+{\bf TRN\_TR1x}{\em ( BAD, NX, XIN, ID; XOUT, STATUS )}
+\> --- Transform 1-dimensional data\\[1.6ex]
+{\bf TRN\_TR2x}{\em ( BAD, NXY, XIN, YIN, ID; XOUT, YOUT, STATUS )}\\
+\> --- Transform 2-dimensional data\\[1.6ex]
+{\bf TRN\_TRNx}{\em ( BAD, ND1, NCIN, NDAT, DATA, ID, NR1, NCOUT; RESULT,
+STATUS )}\\
+\> --- Transform general data
+\end{tabbing}
+
+
+\subsection{Full Routine Specifications}
+
+\vbox{
+This Section gives full specifications for the user-level \name{TRANSFORM}
+routines.
+The following notation is used to specify the types of routine arguments:
+
+\begin{quote}
+\begin{center}
+\begin{tabular}{ccp{32em}}
+{\bf Notation} & : & {\bf Fortran type} \\
+\hline
+{\bf L} & : & \name{LOGICAL}\\
+{\bf I} & : & \name{INTEGER}\\
+{\bf R} & : & \name{REAL}\\
+{\bf C} & : & CHARACTER$*$($*$)\\
+{\bf ?} & : & Unspecified, dependent on the data type being processed.\\
+{\bf ()} & : & A 1-dimensional array of one of the above types.\\
+{\bf (,)} & : & A 2-dimensional array of one of the above types.\\
+{\bf L$_{CLS}$} & : & A 1-dimensional \name{LOGICAL} array, with 
+                  \name{TRN\_\_MXCLS}\footnotemark\ elements, to
+                  contain classification information.\\
+{\bf C$_{PRC}$} & : & A \name{CHARACTER} argument to contain a precision
+                  specification of maximum length 
+                  \name{TRN\_\_SZPRC}.\addtocounter{footnote}{-1}\footnotemark\\
+{\bf C$_{LOC}$} & : & A \name{CHARACTER$*$(DAT\_\_SZLOC)\footnotemark} argument
+                  containing an \name{HDS} locator.  In some routines where
+                  this is an input argument, a blank string (of any length)
+                  may be substituted to specify different routine behaviour;
+                  the individual routine descriptions give details.\\ 
+{\bf C$_{NAM}$} & : & A \name{CHARACTER} argument specifying an \name{HDS} name
+                  string of maximum length
+                  \name{DAT\_\_SZNAM}.\addtocounter{footnote}{-1}\footnotemark\\
+\hline
+\end{tabular}
+\end{center}
+\end{quote}
+}
+
+\addtocounter{footnote}{-1}
+\footnotetext{The symbolic constants \name{TRN\_\_MXCLS} and
+              \name{TRN\_\_SZPRC} are defined in the include file
+              \name{TRN\_PAR}.} 
+\addtocounter{footnote}{1}
+\footnotetext{The symbolic constants \name{DAT\_\_SZLOC} and
+              \name{DAT\_\_SZNAM} are defined by \name{HDS}.}
+
+%-------------------------------------------------------------------------------
+% Commands for laying out routine specifications...
+
+\newcommand{\routine}[3]
+{
+  \vbox
+  {
+    \rule{\textwidth}{0.3mm}\\
+    {\Large {\bf #1} \hfill #2 \hfill {\bf #1}}\\
+    \setlength{\oldspacing}{\topsep}
+    \setlength{\topsep}{0.3ex}
+    \begin{description}
+      #3
+    \end{description}
+    \setlength{\topsep}{\oldspacing}
+  }
+}
+
+\newcommand{\action}[1]
+{\item[ACTION]: #1}
+
+\newcommand{\call}[1]
+{\item[CALL]: \hspace{0.4em}{\tt #1}}
+
+\newlength{\oldspacing}
+
+\newcommand{\args}[2]
+{
+  \vbox
+  {
+    \setlength{\oldspacing}{\topsep}
+    \setlength{\topsep}{0.3ex}
+    \begin{description}
+    \item[#1]:\\[1.5ex]
+      \begin{tabular}{p{5em}p{6em}p{29em}}
+        #2
+      \end{tabular}
+    \end{description}
+    \setlength{\topsep}{\oldspacing}
+  }
+} 
+
+\newcommand{\spec}[3]
+{
+  {\em {#1}} & {\bf \mbox{#2}} & {#3}
+}
+
+\newcommand{\notes}[1]
+{
+  \vbox
+  {
+    \setlength{\oldspacing}{\topsep}
+    \setlength{\topsep}{0.3ex}
+    \begin{description}
+      \item[NOTES]:
+          #1
+    \end{description}
+    \setlength{\topsep}{\oldspacing}
+  }
+}
+
+%   End of command definitions.
+%-------------------------------------------------------------------------------
+
+\routine{TRN\_ANNUL}{Annul compiled mapping}
+{
+  \action{Annul the compiled mapping associated with the identifier
+          supplied.
+          Resources associated with the compiled mapping are released and
+          the identifier is reset to \name{TRN\_\_NOID}.}
+
+  \call{CALL TRN\_ANNUL( ID, STATUS )} 
+}
+\args{INPUT/OUTPUT ARGUMENTS}
+{
+  \spec{ID}{I}{Compiled mapping identifier to be annulled.} 
+}
+\args{STATUS ARGUMENT}
+{
+  \spec{STATUS}{I}{Inherited error status.}
+}
+\notes
+{
+  \begin{enumerate}
+  \item The symbolic constant \name{TRN\_\_NOID} is defined in the include
+        file \name{TRN\_PAR}.
+  \item This routine attempts to execute even if \fortvar{STATUS} is set on
+        entry, although no error report will be made if it subsequently
+        fails under these circumstances.
+  \end{enumerate}
+}
+
+\routine{TRN\_APND}{Append transformation}
+{
+  \action{Concatenate two transformations; the first transformation is
+          altered by appending the second one to it.
+          The second transformation is not altered.}
+
+  \call{CALL TRN\_APND( LOCTR1, LOCTR2, STATUS )}
+}
+\args{INPUT ARGUMENTS}
+{
+  \spec{LOCTR1}{C$_{LOC}$}{Locator to the first transformation (to be
+                           altered).}\\ 
+  \spec{LOCTR2}{C$_{LOC}$}{Locator to the second transformation (to be
+                           appended).} 
+}
+\args{STATUS ARGUMENT}
+{
+  \spec{STATUS}{I}{Inherited error status.}
+}
+\notes
+{
+  Before two transformations may be concatenated, the following conditions
+  must apply: 
+
+  \begin{enumerate}
+  \item The number of output variables from the first transformation must
+        match the number of input variables to the second transformation.
+  \item The transformations must have at least one mapping (forward or
+        inverse) in common. 
+  \end{enumerate}
+}
+
+\routine{TRN\_CLOSE}{Close the \name{TRANSFORM} facility}
+{
+  \action{Close the \name{TRANSFORM} facility down, annulling all compiled
+          mappings and releasing all resources.
+          No action is taken if the facility is already closed.}
+
+  \call{CALL TRN\_CLOSE( STATUS )}
+}
+\args{STATUS ARGUMENT}
+{
+  \spec{STATUS}{I}{Inherited error status.}
+}
+\notes
+{
+  This routine attempts to execute even if the \fortvar{STATUS} value is set
+  on entry, although no error report will be made if it subsequently fails
+  under these circumstances.
+} 
+
+\routine{TRN\_COMP}{Compile transformation}
+{
+  \action{Compile a transformation and return an identifier for the
+          resulting compiled mapping.} 
+
+  \call{CALL TRN\_COMP( LOCTR, FORWD, ID, STATUS )}
+}
+\args{INPUT ARGUMENTS}
+{
+  \spec{LOCTR}{C$_{LOC}$}{Locator to the transformation.}\\
+  \spec{FORWD}{L}{Specifies which mapping is to be compiled; \name{.TRUE.}
+                  for forward, \name{.FALSE.} for inverse.}
+}
+\args{OUTPUT ARGUMENT}
+{
+  \spec{ID}{I}{Identifier for the compiled mapping.}
+}
+\args{STATUS ARGUMENT}
+{
+  \spec{STATUS}{I}{Inherited error status.}
+}
+
+\routine{TRN\_GTCL}{Get classification}
+{
+  \action{Obtain an array of {\em logical} classification values from a
+          transformation. 
+          The classification information is fully validated before it is
+          returned.}
+
+  \call{CALL TRN\_GTCL( LOCTR, FORWD, CLASS, STATUS )}
+}
+\args{INPUT ARGUMENT}
+{
+  \spec{LOCTR}{C$_{LOC}$}{Locator to the transformation.}\\
+  \spec{FORWD}{L}{Specifies which mapping the information is required for;
+                  \name{.TRUE.} for forward, \name{.FALSE.} for inverse.}
+}
+\args{OUTPUT ARGUMENT}
+{
+  \spec{CLASS}{L$_{CLS}$}{Classification array.}
+}
+\args{STATUS ARGUMENT}
+{
+  \spec{STATUS}{I}{Inherited error status.}
+}
+
+\routine{TRN\_GTCLC}{Get compiled classification}
+{
+  \action{Obtain an array of {\em logical} classification values from a
+          compiled mapping.} 
+
+  \call{CALL TRN\_GTCLC( ID, CLASS, STATUS )}
+}
+\args{INPUT ARGUMENT}
+{
+  \spec{ID}{I}{Identifier for the compiled mapping.}
+}
+\args{OUTPUT ARGUMENT}
+{
+  \spec{CLASS}{L$_{CLS}$}{Classification array.}
+}
+\args{STATUS ARGUMENT}
+{
+  \spec{STATUS}{I}{Inherited error status.}
+}
+
+\routine{TRN\_GTNV}{Get numbers of variables}
+{
+  \action{Obtain the numbers of input and output variables for a
+          transformation.} 
+
+  \call{CALL TRN\_GTNV( LOCTR, NVIN, NVOUT, STATUS )}
+}
+\args{INPUT ARGUMENT}
+{
+  \spec{LOCTR}{C$_{LOC}$}{Locator to the transformation.}
+}
+\args{OUTPUT ARGUMENTS}
+{
+  \spec{NVIN}{I}{Number of input variables.}\\
+  \spec{NVOUT}{I}{Number of output variables.}
+}
+\args{STATUS ARGUMENT}
+{
+  \spec{STATUS}{I}{Inherited error status.}
+}
+
+\routine{TRN\_GTNVC}{Get numbers of compiled variables}
+{
+  \action{Obtain the numbers of input and output variables for a compiled
+          mapping.}
+
+  \call{CALL TRN\_GTNVC( ID, NVIN, NVOUT, STATUS )}
+}
+\args{INPUT ARGUMENT}
+{
+  \spec{ID}{I}{Identifier for the compiled mapping.}
+}
+\args{OUTPUT ARGUMENTS}
+{
+  \spec{NVIN}{I}{Number of input variables.}\\
+  \spec{NVOUT}{I}{Number of output variables.}
+}
+\args{STATUS ARGUMENT}
+{
+  \spec{STATUS}{I}{Inherited error status.}
+}
+
+\routine{TRN\_INV}{Invert transformation}
+{
+  \action{Invert a transformation.  This interchanges the definitions of the
+          forward and inverse mappings.}
+
+  \call{CALL TRN\_INV( LOCTR, STATUS )}
+}
+\args{INPUT ARGUMENT}
+{
+  \spec{LOCTR}{C$_{LOC}$}{Locator to the transformation to be inverted.} 
+}
+\args{STATUS ARGUMENT}
+{
+  \spec{STATUS}{I}{Inherited error status.}
+}
+
+\routine{TRN\_JOIN}{Concatenate transformations}
+{
+  \action{Concatenate two transformations to produce a combined
+          transformation which is stored as a new component in an existing 
+          \name{HDS} structure.
+          The combined transformation may also be assigned to a temporary
+          \name{HDS} object if required.} 
+
+  \call{CALL TRN\_JOIN( LOCTR1, LOCTR2, ELOC, NAME, LOCTR, STATUS )}
+}
+\args{INPUT ARGUMENTS}
+{
+  \spec{LOCTR1}{C$_{LOC}$}{Locator to the first transformation.}\\ 
+  \spec{LOCTR2}{C$_{LOC}$}{Locator to the second transformation.}\\ 
+  \spec{ELOC}{C$_{LOC}$}{Locator to an enclosing structure to contain
+                         the new object.}\\
+  \spec{NAME}{C$_{NAM}$}{\name{HDS} name of the new structure component to 
+                         be created.}
+}
+\args{OUTPUT ARGUMENT}
+{
+  \spec{LOCTR}{C$_{LOC}$}{Locator to the newly created transformation.}
+}
+\args{STATUS ARGUMENT}
+{
+  \spec{STATUS}{I}{Inherited error status.}
+}
+
+\notes{\\
+
+  \begin{enumerate}
+  \item If the enclosing structure locator \fortvar{ELOC} is supplied as a
+        blank string, then a temporary transformation will be created.
+        The \fortvar{NAME} argument is then not used and may also be blank. 
+  \item Before two transformations may be concatenated, the following
+        conditions must apply: 
+
+        \begin{enumerate}
+        \item The number of output variables from the first transformation
+              must match the number of input variables to the second
+              transformation. 
+        \item The transformations must have at least one mapping (forward or
+              inverse) in common. 
+        \end{enumerate}
+  \end{enumerate}
+}
+
+\routine{TRN\_NEW}{Create new transformation}
+{
+  \action{Create a new transformation and return a locator to it.
+          The transformation is stored as a new component in an existing HDS
+          structure, or may be assigned to a temporary object if required.}
+
+  \call{CALL TRN\_NEW( NVIN, NVOUT, FOR, INV, PREC, COMM, ELOC, NAME, LOCTR,
+                       STATUS )} 
+}
+\args{INPUT ARGUMENTS}
+{
+  \spec{NVIN}{I}{Number of input variables.}\\
+  \spec{NVOUT}{I}{Number of output variables.}\\
+  \spec{FOR}{C({\small NVOUT})}{Array of forward transformation functions.}\\ 
+  \spec{INV}{C({\small NVIN})}{Array of inverse transformation functions.}\\ 
+  \spec{PREC}{C$_{PRC}$}{Precision specification.}\\ 
+  \spec{COMM}{C}{Comment string.}\\
+  \spec{ELOC}{C$_{LOC}$}{Locator to an enclosing structure to contain the
+                         new object.}\\ 
+  \spec{NAME}{C$_{NAM}$}{\name{HDS} name of the new structure component.}
+}
+\args{OUTPUT ARGUMENT}
+{
+  \spec{LOCTR}{C$_{LOC}$}{Locator to the newly created transformation.}
+}
+\args{STATUS ARGUMENT}
+{
+  \spec{STATUS}{I}{Inherited error status.}
+}
+\notes{
+  \begin{enumerate}
+  \item The transformation functions will be fully validated before use.
+  \item If the enclosing structure locator \fortvar{ELOC} is supplied as a
+        blank string, then a temporary transformation will be created.
+        The \fortvar{NAME} argument is then not used and may also be blank. 
+  \end{enumerate}
+}
+
+\routine{TRN\_PRFX}{Prefix transformation}
+{
+  \action{Concatenate two transformations; the second transformation is
+          altered by prefixing the first one to it.
+          The first transformation is not altered.}
+
+  \call{CALL TRN\_PRFX( LOCTR1, LOCTR2, STATUS )}
+}
+\args{INPUT ARGUMENTS}
+{
+  \spec{LOCTR1}{C$_{LOC}$}{Locator to the first transformation (to be
+                           prefixed).}\\ 
+  \spec{LOCTR2}{C$_{LOC}$}{Locator to the second transformation (to be
+                           altered).} 
+}
+\args{STATUS ARGUMENT}
+{
+  \spec{STATUS}{I}{Inherited error status.}
+}
+\notes
+{
+  Before two transformations may be concatenated, the following conditions
+  must apply: 
+
+  \begin{enumerate}
+  \item The number of output variables from the first transformation must
+        match the number of input variables to the second transformation.
+  \item The transformations must have at least one mapping (forward or
+        inverse) in common. 
+  \end{enumerate}
+}
+
+\routine{TRN\_PTCL}{Put classification}
+{
+  \action{Enter classification information into a transformation.
+          The information is supplied as an array of {\em logical} values
+          and is validated before use.
+          If the transformation already contains such information, it is
+          over-written by this routine.} 
+
+  \call{CALL TRN\_PTCL( CLASS, LOCTR, STATUS )}
+}
+\args{INPUT ARGUMENTS}
+{
+  \spec{CLASS}{L$_{CLS}$}{Array containing the classification information.}\\
+  \spec{LOCTR}{C$_{LOC}$}{Locator to the transformation.}
+}
+\args{STATUS ARGUMENT}
+{
+  \spec{STATUS}{I}{Inherited error status.}
+}
+
+\routine{TRN\_STOK[x]}{Substitute token}
+{
+  \action{Substitute a value for a token in a text string.
+          The \fortvar{VALUE} supplied is formatted as a character string
+          (if necessary) and used to replace all valid occurrences of the
+          \fortvar{TOKEN} sub-string in the \fortvar{TEXT} supplied.
+          The substitution is not recursive.} 
+
+  \call{CALL TRN\_STOK[x]( TOKEN, VALUE, TEXT, NSUBS, STATUS )}
+}
+\args{INPUT ARGUMENTS}
+{
+  \spec{TOKEN}{C}{The token string.}\\
+  \spec{VALUE}{?}{The value to substitute.}
+}
+\args{INPUT/OUTPUT ARGUMENT}
+{
+  \spec{TEXT}{C}{The text to be processed.}
+}
+\args{OUTPUT ARGUMENT}
+{
+ \spec{NSUBS}{I}{Number of substitutions made.}
+}
+\args{STATUS ARGUMENT}
+{
+  \spec{STATUS}{I}{Inherited error status.}
+}
+\notes
+{
+  \begin{enumerate}
+  \item There is a routine for each standard type x.
+        Replace x by {\bf I} ({\em integer}), {\bf R} ({\em real}) or {\bf
+        D} ({\em double precision}).
+        Omit x altogether if a character string is being supplied for the 
+        \fortvar{VALUE} argument.
+  \item When \fortvar{VALUE} is a numerical quantity, the token replacement
+        will be enclosed in parentheses if it is negative.
+  \item To be replaced, a token sub-string within \fortvar{TEXT} must be
+        correctly delimited ({\em i.e.}\ surrounded by non-alphanumeric
+        characters).
+        It may also be enclosed in angle brackets ({\em e.g.}\
+        \name{$<$a\_token$>$}), in which case the brackets will be regarded
+        as part of the token and will also be replaced. 
+  \item To be valid, a token must begin with an alphabetic character and
+        contain only alphanumeric characters (including underscore).
+        It may be of any length.
+        No embedded blanks are allowed. 
+  \end{enumerate}
+}
+
+\routine{TRN\_TR1x}{Transform 1-dimensional data}
+{
+  \action{Apply a compiled \mbox{\{$1 \rightarrow 1$\}} mapping to a set of 
+          1-dimensional data points specified by an array of $X_{IN}$
+          coordinates.} 
+
+  \call{CALL TRN\_TR1x( BAD, NX, XIN, ID, XOUT, STATUS )}
+}
+\args{INPUT ARGUMENTS}
+{
+  \spec{BAD}{L}{Whether the input coordinates may be {\em bad}.}\\
+  \spec{NX}{I}{The number of data points to transform.}\\
+  \spec{XIN}{?({\small NX})}{Array of input $X_{IN}$ coordinates.}\\
+  \spec{ID}{I}{Identifier for the compiled \mbox{\{$1 \rightarrow 1$\}}
+               mapping to be applied.} 
+}
+\args{OUTPUT ARGUMENT}
+{
+  \spec{XOUT}{?({\small NX})}{Array to receive the transformed $X_{OUT}$
+                              coordinates.}
+}
+\args{STATUS ARGUMENT}
+{
+  \spec{STATUS}{I}{Inherited error status.}
+}
+\notes
+{
+  \begin{enumerate}
+  \item There is a routine for each standard numerical data type x.
+        Replace x by {\bf I} ({\em integer}), {\bf R} ({\em real}) or {\bf
+        D} ({\em double precision}). 
+  \item The number of input and output variables for the compiled
+        mapping must both be equal to 1. 
+  \end{enumerate}
+}
+
+\routine{TRN\_TR2x}{Transform 2-dimensional data}
+{
+  \action{Apply a compiled \mbox{\{$2 \rightarrow 2$\}} mapping to a set of
+          2-dimensional data points specified by separate arrays of $X_{IN}$
+          and $Y_{IN}$ coordinates.} 
+
+  \call{CALL TRN\_TR2x( BAD, NXY, XIN, YIN, ID, XOUT, YOUT, STATUS )}
+}
+\args{INPUT ARGUMENTS}
+{
+  \spec{BAD}{L}{Whether the input coordinates may be {\em bad}.}\\
+  \spec{NXY}{I}{The number of data points to transform.}\\
+  \spec{XIN}{?({\small NXY})}{Array of input $X_{IN}$ coordinates.}\\
+  \spec{YIN}{?({\small NXY})}{Array of input $Y_{IN}$ coordinates.}\\
+  \spec{ID}{I}{Identifier for the compiled \mbox{\{$2 \rightarrow 2$\}}
+               mapping to be applied.} 
+}
+\args{OUTPUT ARGUMENTS}
+{
+  \spec{XOUT}{?({\small NXY})}{Array to receive the transformed $X_{OUT}$
+                               coordinates.}\\ 
+  \spec{YOUT}{?({\small NXY})}{Array to receive the transformed $Y_{OUT}$
+                               coordinates.} 
+}
+\args{STATUS ARGUMENT}
+{
+  \spec{STATUS}{I}{Inherited error status.}
+}
+\notes
+{
+  \begin{enumerate}
+  \item There is a routine for each standard numerical data type x.
+        Replace x by {\bf I} ({\em integer}), {\bf R} ({\em real}) or {\bf
+        D} ({\em double precision}). 
+  \item The number of input and output variables for the compiled
+        mapping must both be equal to 2.
+  \end{enumerate}
+}
+
+\routine{TRN\_TRNx}{Transform general data}
+{
+  \action{Apply a general compiled mapping (with an arbitrary number of
+          input/output variables) to a set of data points.} 
+
+  \call{CALL TRN\_TRNx( BAD, ND1, NCIN, NDAT, DATA, ID, NR1, NCOUT, RESULT,
+                        STATUS )} 
+}
+\args{INPUT ARGUMENTS}
+{
+  \spec{BAD}{L}{Whether the input coordinates may be {\em bad}.}\\
+  \spec{ND1}{I}{First dimension of the \fortvar{DATA} array (as declared
+                in the calling routine).}\\
+  \spec{NCIN}{I}{Number of coordinates for each input data point.}\\
+  \spec{NDAT}{I}{Number of data points to transform.}\\
+  \spec{DATA}{?({\small ND1,NCIN})}{Array of coordinates for the input data
+                                    points; they need not fill the entire
+                                    array.}\\ 
+  \spec{ID}{I}{Identifier for the compiled \mbox{\{$NCIN \rightarrow 
+               NCOUT$\}} mapping to be applied.}\\
+  \spec{NR1}{I}{First dimension of the \fortvar{RESULT} array (as declared
+                in the calling routine).}\\
+  \spec{NCOUT}{I}{Number of coordinates for each output data point.}
+}
+\args{OUTPUT ARGUMENT}
+{
+  \spec{RESULT}{?({\small NR1,NCOUT})}{Array to receive the (transformed)
+                                       coordinates of the output data
+                                       points.} 
+}
+\args{STATUS ARGUMENT}
+{
+  \spec{STATUS}{I}{Inherited error status.}
+}
+\notes{
+
+  \begin{enumerate}
+  \item There is a routine for each standard numerical data type x.
+        Replace x by {\bf I} ({\em integer}), {\bf R} ({\em real}) or {\bf
+        D} ({\em double precision}). 
+  \item \fortvar{ND1} and \fortvar{NR1} must both be at least equal to the
+        number of data points \fortvar{NDAT}.
+  \item \fortvar{DATA(I,J)} should contain the value of the \fortvar{J'th}
+        coordinate for the \fortvar{I'th} input data point.
+        Coordinate values are returned in the \fortvar{RESULT} array in the
+        same order. 
+  \item The values of \fortvar{NCIN} and \fortvar{NCOUT} must match the
+        numbers of input and output variables for the compiled
+        mapping being applied. 
+  \end{enumerate}
+}
+
+
+\newpage
+\section {ERROR HANDLING}
+
+\label{appendix:error}
+
+
+\subsection{ The \fortvar{STATUS} Argument and Error Reporting}
+
+All \name{TRANSFORM} routines carry a final {\em integer} \fortvar{STATUS}
+argument and adhere to the \name{ADAM} inherited error handling strategy. 
+Unless otherwise indicated, a routine which finds that \fortvar{STATUS} is
+not set to \name{SAI\_\_OK}\footnote{
+\name{SAI\_\_OK} is a symbolic constant defined in the include file 
+\name{SAE\_PAR}.
+}
+on entry will assume an error has occurred in a previous routine and will
+return immediately without action and without accessing other arguments
+(which may not be defined under error conditions). 
+The value of the \fortvar{STATUS} argument will not be changed.
+This behaviour usually allows tests of the \fortvar{STATUS} value to be
+deferred until after several routine calls have been made. 
+
+If a \name{TRANSFORM} routine is called with \fortvar{STATUS} set to 
+\name{SAI\_\_OK}, then it will attempt to execute.
+If it subsequently encounters an error, it will first perform any ``cleaning
+up'' which is possible and will then exit with its \fortvar{STATUS} argument
+set to one of the error codes described in the next Section.
+When a \fortvar{STATUS} value is set by a \name{TRANSFORM} routine, an
+associated error report will always be made by calling the \name{ERR}
+routine \name{ERR\_REP}. 
+The report will normally contain additional information about the
+circumstances of the error. 
+Transmission of the report to the user will be deferred by the \name{ERR}
+facility pending action by the caller of the \name{TRANSFORM} routine
+(such as a call to \name{ERR\_FLUSH} to output the error, or
+\name{ERR\_ANNUL} to ignore it).
+The documentation for the \name{ERR} facility should be consulted for
+further details. 
+
+\paragraph{Exceptions to the rule.}
+The routines \name{TRN\_ANNUL} and \name{TRN\_CLOSE} are exceptions to the 
+above rules.
+Both of these perform ``cleaning up'' operations and will therefore attempt
+to execute regardless of the \fortvar{STATUS} value set on entry. 
+If either of these routines fail, they will only set a new \fortvar{STATUS}
+value and make an error report if the value of \fortvar{STATUS} was
+\name{SAI\_\_OK} on entry. 
+If \fortvar{STATUS} was not set to \name{SAI\_\_OK} when they were called,
+then these two routines will assume that a previous error has occurred and
+will fail ``silently'' so that the initial \fortvar{STATUS} value and error
+report are preserved. 
+
+
+\subsection{Error Codes}
+
+The value returned via the \fortvar{STATUS} argument of \name{TRANSFORM}
+routines under error conditions may be: 
+
+\begin{itemize}
+
+\item Any of the error codes returned by \name{HDS} routines.
+
+\item Any of the error codes described below.
+
+\end{itemize}
+
+If it is necessary to test for specific error conditions, then symbolic
+names (defined by Fortran \name{PARAMETER} statements) should be used to
+identify the associated error codes. 
+Symbolic names for the \name{TRANSFORM} error codes are defined in the
+include file \name{TRN\_ERR} and may be incorporated into an application
+with the statement: 
+
+\begin{verbatim}
+      INCLUDE 'TRN_ERR'
+\end{verbatim}
+
+The following list gives the names of these error codes, the associated
+error messages and an explanation of each error condition: 
+
+\begin{description}
+
+\item {\bf TRN\_\_CLSIN, classification information invalid}\\
+The classification information associated with a transformation is invalid.
+This may be because conflicting classification properties are being 
+specified ({\em e.g.}\ \name{POSITIVE\_DET} and \name{NEGATIVE\_DET}) or
+because a property is being specified in circumstances where it cannot be
+adequately defined (because the numbers of input and output variables
+are unequal, for instance). 
+
+\item {\bf TRN\_\_CMPER, compilation error}\\
+An error has been detected during compilation of the right hand side of a
+transformation function. 
+The associated error report will give further diagnostic information.
+
+\item {\bf TRN\_\_CMTOF, compiled mapping table overflow}\\
+The maximum number of simultaneously active compiled mappings has
+been exceeded.
+This error should not be encountered because the permitted number of
+compiled mappings is very large. 
+
+\item {\bf TRN\_\_CONIN, constant syntax invalid}\\
+The right hand side of a transformation function contains a numerical
+constant whose syntax is invalid. 
+
+\item {\bf TRN\_\_DELIN, delimiting comma invalid}\\
+The right hand side of a transformation function contains an invalid comma
+(commas are only used to separate the arguments of built-in functions). 
+
+\item {\bf TRN\_\_DIMIN, dimensions invalid}\\
+An \name{HDS} object has inappropriate dimensions for its purpose. 
+
+\item {\bf TRN\_\_DSTIN, definition status invalid}\\
+The \name{FORWARD} or \name{INVERSE} component of an \name{HDS}
+transformation structure contains an invalid value.
+Only the values \name{`DEFINED'} and \name{`UNDEFINED'} (case insensitive)
+are allowed. 
+
+\item {\bf TRN\_\_DUVAR, duplicate variable name}\\
+A variable name is defined ({\em i.e.}\ appears on the left hand side of a
+transformation function) more than once. 
+
+\item {\bf TRN\_\_EXPUD, expression undefined}\\
+The expression on the right hand side of a transformation function is
+missing. 
+
+\item {\bf TRN\_\_ICDIR, incompatible transformation directions}\\
+An attempt to concatenate two transformations has failed because only the 
+forward mapping was defined within one of them and only the inverse mapping 
+was defined within the other.
+
+\item {\bf TRN\_\_MAPUD, mapping undefined}\\
+The mapping requested from a transformation (either forward or inverse) has
+not been defined. 
+
+\item {\bf TRN\_\_MIDIN, compiled mapping identifier invalid}\\
+A compiled mapping identifier is not valid ({\em i.e.}\ it is not currently
+associated with a compiled mapping). 
+
+\item {\bf TRN\_\_MIOPA, missing or invalid operand}\\
+During compilation of the right hand side of a transformation function, an
+operand ({\em i.e.}\ a constant, variable or expression) was expected but was
+not found. 
+
+\item {\bf TRN\_\_MIOPR, missing or invalid operator}\\
+During compilation of the right hand side of a transformation function, an
+operator (or delimiter) was expected but was not found. 
+
+\item {\bf TRN\_\_MISVN, missing variable name}\\
+The variable name is missing from the left hand side of a transformation
+function. 
+
+\item {\bf TRN\_\_MLPAR, missing left parenthesis}\\
+The right hand side of a transformation function has a left parenthesis
+missing. 
+
+\item {\bf TRN\_\_MRPAR, missing right parenthesis}\\
+The right hand side of a transformation function has a right parenthesis
+missing. 
+
+\item {\bf TRN\_\_NDCMM, number of data coordinates mis-matched}\\
+The number of input or output coordinates specified for a set of data points
+does not match the corresponding number of variables associated with the
+compiled mapping being used to transform the points.
+
+\item {\bf TRN\_\_NMVMM, number of module variables mis-matched}\\
+Two adjacent transformation modules in the \name{MODULE\_ARRAY} component of
+an \name{HDS} transformation structure are mis-matched because the number of
+output variables from one module is not equal to the number of input
+variables for the one which follows. 
+
+\item {\bf TRN\_\_NTVMM, number of transformation variables mis-matched}\\
+The number of output variables from the first of two transformations being
+concatenated is not equal to the number of input variables to the second
+transformation. 
+
+\item {\bf TRN\_\_NVRIN, number of variables invalid}\\
+The number of variables specified in the \name{NVAR\_IN} or \name{NVAR\_OUT}
+component of an \name{HDS} transformation module (\name{TRN\_MODULE})
+structure is invalid ({\em i.e.}\ it is not positive). 
+
+\item {\bf TRN\_\_OPCIN, operation code invalid}\\
+An invalid internal arithmetic operation code has been encountered while
+evaluating a transformation function which is part of a compiled mapping.
+This is a serious error indicating internal inconsistency within the
+\name{TRANSFORM} software. 
+It should be reported immediately. 
+
+\item {\bf TRN\_\_PRCIN, precision invalid}\\
+An invalid precision specification has been supplied when creating a new
+transformation. 
+
+\item {\bf TRN\_\_TOKIN, token name invalid}\\
+An attempt to substitute a value for a token in a character string has failed
+because an invalid token name has been specified.
+
+\item {\bf TRN\_\_TRNUD, transformation undefined}\\
+A set of transformation functions is incomplete or is otherwise insufficient
+to fully define a transformation. 
+
+\item {\bf TRN\_\_TRUNC, character string truncated}\\
+A character string has been truncated because the \name{CHARACTER} variable
+supplied is not of sufficient length to accommodate it. 
+
+\item {\bf TRN\_\_TYPIN, type invalid}\\
+An \name{HDS} object has a type inappropriate for its purpose.
+
+\item {\bf TRN\_\_VARIN, variable name invalid}\\
+A variable used in a transformation function has an invalid name.
+
+\item {\bf TRN\_\_VARUD, variable name undefined}\\
+A variable used on the right hand side of a transformation function is
+undefined because it does not appear on the left hand side of one of the
+transformation functions which define the complementary mapping. 
+
+\item {\bf TRN\_\_VERMM, software version mis-match}\\
+The version number of the \name{TRANSFORM} software used to create or last
+modify an \name{HDS} transformation structure exceeds the version number of
+the software with which the current application is linked. 
+
+\item {\bf TRN\_\_WRNFA, wrong number of function arguments}\\
+An invalid number of arguments has been supplied for a built-in function
+invoked from the right hand side of a transformation function. 
+
+\end{description}
+
+\end{document}

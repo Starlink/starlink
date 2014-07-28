@@ -1,0 +1,605 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {144.5}
+\newcommand{\stardocauthors}   {A J Chipperfield}
+\newcommand{\stardocdate}      {18 February 1994}
+\newcommand{\stardoctitle}     {ADAM --- Unix Version}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+
+%  Package Description
+\begin{center}
+{\Large\bf Description}
+\end{center}
+
+This document describes the use of ADAM on Unix and points to some 
+differences between the Unix and VMS systems.
+
+It is assumed that the reader is familiar with the concepts of ADAM 
+programming and that the Starlink software is installed in the standard way.
+
+%------------------------------------------------------------------------------
+%\vspace{2cm}
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+  \setlength{\parskip}{0mm}
+  \tableofcontents
+  \setlength{\parskip}{\medskipamount}
+  \markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\newpage
+\section{Introduction}
+\label{intro}
+ADAM analysis application programs (A-tasks) or instrumentation application
+programs (I-tasks) may be developed and run on the supported Unix platforms. 
+Single A-tasks may also be combined into A-task monoliths for efficiency.
+
+Usually only minor changes to code  are required to port ADAM tasks from VMS
+to Unix and the ported code will continue to work for VMS.
+As far as possible, programs will behave the same under Unix as they did with
+VMS.
+
+A list of differences and deficiencies is given in Appendix~\ref{diffs}.
+
+For details of the concepts of ADAM programming, see Starlink Guide 4, 
+"ADAM -- The Starlink Software Environment" for A-tasks and Starlink User Note
+134, "ADAM -- Guide to Writing Instrumentation Tasks" for I-tasks.
+
+\section{Setting Up}
+To prepare for basic use of ADAM under Unix it is simply necessary to create 
+the directory {\bf adam} in the directory specified by the environment 
+variable {\bf HOME}. 
+ADAM programs may then be run. 
+There is no equivalent of the {\bf ADAMSTART}
+command of VMS ADAM.
+
+\section{Compiling and Linking}
+\subsection{Include Files}
+\label{incs}
+All public include files, such as {\bf {\em pkg}\_par} and
+{\bf {\em pkg}\_err} files, will be found in {\bf /star/include}.
+The filenames are in lower case but they should be specified in the program 
+in the standard Starlink way. That is, for example:
+\begin{quote} \begin{verbatim}
+INCLUDE 'SAE_PAR'
+INCLUDE 'PAR_ERR'
+\end{verbatim} \end{quote}
+Links are then set up to the public include files in /star/include using the
+appropriate {\em pkg}\_dev script. (SAE\_PAR is defined by {\bf star\_dev}.)
+
+{\em Note that {\bf sae\_par} on Unix does not include {\bf par\_par} or 
+{\bf dat\_par} therefore they must be added to any code where they are 
+required.}
+
+To compile and link ADAM programs, it is necessary to add {\bf /star/bin} to 
+your PATH environment variable. This is done if you have `sourced'
+{\bf /star/etc/login} to set up for Starlink software generally. 
+There is no equivalent to the {\bf ADAM\_DEV} command of VMS ADAM.
+
+\subsection{The alink and ilink Scripts}
+\label{link_scripts}
+Two shell scripts are provided to link ADAM tasks.
+{\bf alink} is used to link A-tasks and A-task monoliths, and {\bf ilink} to 
+link I-tasks.
+The executable images produced for A-tasks and monoliths may be run either
+from ICL or directly from the shell. 
+
+The following description uses {\bf alink} in examples; {\bf ilink} is used in
+the same way.
+
+To link an ADAM program, ensure that {\bf /star/bin} is added to your 
+environment variable PATH, then type:
+\begin{quote} 
+\verb!% alink! [\verb!-xdbx!] {\em file} [{\em arguments}]
+\end{quote}
+Where:
+\begin{description}
+\item[\verb!-xdbx!] optional (but must be the first argument if used), 
+overcomes some problems with debugging ADAM tasks, notably with {\bf xdbx} 
+and {\bf ups} on SunOS, by supplying dummy source files for required ADAM 
+system routines. It also has the effect of inserting a \verb!-g! option into 
+the argument list. For more details, see Appendix \ref{link_det}.
+\item[{\em file}] specifies a filename of the form 
+{\em path}/{\em name}{\bf .f} or {\em path}/{\em name}{\bf .o} or 
+{\em path}/{\em name}. The {\em path}/ component is optional but
+{\em name} must be the name of the program's main subroutine and will
+be the name of the executable file produced in the current working directory.
+If the filename ends in {\bf .f}, the specified file will be compiled; if it
+ends neither in {\bf .f} nor {\bf .o}, {\bf .o} is appended.
+
+Note that after a {\bf .f} file has been compiled, on some platforms the 
+{\bf .o} file will be retained in the current working directory so that 
+subsequent {\bf alink}s with an unchanged {\bf .f} file may specify the name
+with no extension ( or {\bf .o}).
+\item[{\em arguments}] optional, is any additional arguments (library 
+specifications, compiler options {\em etc.}) legal for the Fortran 
+compiler.
+The list of Starlink libraries automatically included in the link is given in 
+Appendix~\ref{libs}; the method of including other Starlink libraries in ADAM
+programs will be specified in the relevant Starlink User Note.
+
+In most cases it will be:
+\begin{quote}
+\verb!% alink! {\em file} \verb!`!{\em pkg}\verb!_link_adam`!
+\end{quote}
+where {\em pkg} is the specific software item name {\em e.g.} {\bf ndf}.
+\end{description}
+
+Appendix~\ref{link_det} gives details of the command used within 
+{\bf alink/ilink} to compile and/or link the tasks. 
+This may assist users who wish to alter the standard behaviour.
+
+\subsection{Interface Files}
+Generally, the only things which will need changing in interface files are
+file and device names. Case is significant on Unix and obviously the format of 
+filenames is different.
+
+Interface files may be compiled by the {\bf compifl} program which is available
+in {\bf /star/bin}. Compiled interface files ({\bf .ifc}s) must be produced
+on the platform on which they are to be used.
+
+\subsection{Monoliths}
+\label{monoliths}
+The top-level routine for Unix A-task monoliths differs slightly from the 
+old-style VMS monoliths but the new style may be used for monoliths to be run 
+from ICL on Unix or VMS, or from the Unix shell.
+
+New-style monoliths are linked using {\bf alink}.
+
+The top-level routine will be of the form:
+\begin{small}
+\begin{verbatim}
+          SUBROUTINE TEST( STATUS )
+          INCLUDE 'SAE_PAR'
+          INCLUDE 'PAR_PAR'
+
+          INTEGER STATUS
+
+          CHARACTER*(PAR__SZNAM) NAME
+
+          IF (STATUS.NE.SAI__OK) RETURN
+
+*       Get the action name
+          CALL TASK_GET_NAME( NAME, STATUS )
+
+*       Call the appropriate action routine
+          IF (NAME.EQ.'TEST1') THEN
+            CALL TEST1(STATUS)
+          ELSE IF (NAME.EQ.'TEST2') THEN
+            CALL TEST2(STATUS)
+          ELSE IF (NAME.EQ.'TEST3') THEN
+            CALL TEST3(STATUS)
+          END IF
+          END
+\end{verbatim}
+\end{small}
+
+To run such a monolith from a Unix shell, link the required action name to the
+monolith, then execute the linkname (possibly via an alias). For example:
+
+\begin{quote} \begin{verbatim}
+% ln -s $KAPPA_DIR/kappa add
+% add
+\end{verbatim} \end{quote}
+
+Separate interface files are required for each action run from the shell --
+a monolithic interface file is required for monoliths run from ICL.
+
+\section{Help Files}
+\label{hlp}
+The Starlink portable help system is used to provide help if ? or ?? is typed 
+in response to a parameter prompt.
+Instructions for creating help libraries and navigating through them may be 
+found in SUN/124.
+
+Interface file entries specifying help libraries may be given as standard
+pathnames {\em e.g.}
+\begin{quote} 
+\begin{verbatim}
+helplib /star/help/kappa/kappa.shl
+\end{verbatim}
+or
+\begin{verbatim}
+help %/star/help/kappa/kappa ADD Parameters IN1
+\end{verbatim} 
+\end{quote}
+Note that the file extension {\bf .shl} is optional.
+
+The system will also accept environment variables and \verb!~! in the help 
+library name, {\em e.g.}
+\begin{quote} 
+\verb!$KAPPA_DIR/kappahelp.shl ! or \verb! $KAPPA_HELP ! or
+\verb! ~/help/myprog!
+\end{quote}
+
+As an interim measure, so that the same interface file entry will work with
+both Unix and VMS, the VMS form:
+\begin{quote} 
+\verb!KAPPA_DIR:kappahelp.shl ! or \verb! KAPPA_HELP:!
+\end{quote}
+will be accepted.
+
+If the VMS form is used, the environment variable name will be forced to upper
+case, and the filename to lower case for interpretation. 
+Unix-style specifications will be interpreted as given.
+
+\section{Use of Environment Variables}
+\label{envars}
+For more complex operations, the following environment variables may be used:
+\begin{description}
+\item[HOME] Is expected to specify the user's home directory
+\item[ADAM\_USER] If the user does not wish to use directory {\bf \$HOME/adam}
+to hold the program's parameter file and the global parameter file,
+{\bf ADAM\_USER} must be set to define the desired directory.
+Whichever directory is used, it must exist but the files will be created if 
+necessary.
+The global parameter file is named GLOBAL.sdf.
+\item[ADAM\_IFL] Specifies a search path of directories in which the system is 
+to look for interface files. 
+If the variable is undefined, or the search is unsuccessful, the directory in
+which the executable was found is assumed.
+A file with the same name as the executable and with extension {\bf .ifc} or 
+{\bf .ifl} (lower case) is sought.
+As with the VMS system, {\bf .ifc} will be used in preference to {\bf .ifl}.
+\item[PATH] In addition to its use by the system to find the required
+executable file, the environment variable {\bf PATH} is used by the parameter
+system to find the pathname of the file being executed if it was invoked by 
+simply typing its name (not its pathname).
+This is needed to discover the directory in which to look for the interface 
+file if the ADAM\_IFL search is unsuccessful.
+This process means that the use of links may cause confusion -- the name and
+directory of the link will be used.
+\item[HDS\_SHELL] The interpretation of names given as values for parameters
+accessed via PAR or DAT routines will be handled by HDS.
+The environment variable HDS\_SHELL (see SUN/92) will be effective.
+If it is not set when the application starts, interpretation with SHELL=2
+({\bf tcsh} or failing that {\bf csh} or failing that {\bf sh}) is selected 
+-- thus environment variables and `\verb!~!' are usually expanded.
+Note that parameter system syntax will usually prevent the use of more general 
+shell expressions as names.
+\item[ICL Environment Variables] See Appendix \ref{iclvars} for details of the
+environment variables used by ICL.
+\end{description}
+
+\newpage
+\appendix
+\section{Example Session}
+The following session shows the process of compiling, linking and running an
+example program, derived from SUN/101, on the Sun.
+
+\begin{quote} \begin{verbatim}
+% source /star/etc/login
+% mkdir ~/adam
+%
+% ls
+repdim2.f       repdim2.ifl     example.sdf
+%
+% cat repdim2.f
+*   Program to report the dimensions of an NDF.
+*   The CHR package is used to produce a nice output message.
+*   See SUN/101, section 11.
+
+      SUBROUTINE REPDIM2 (STATUS)                                
+      IMPLICIT NONE
+      INCLUDE 'SAE_PAR'                                       
+      INTEGER DIM(10), I, NCHAR, NDF1, NDIM, STATUS
+      CHARACTER*100 STRING
+
+*   Check inherited global status.
+      IF (STATUS.NE.SAI__OK) RETURN
+
+*   Begin an NDF context.    
+      CALL NDF_BEGIN                                          
+                                                              
+*   Get the name of the input NDF file and associate an NDF 
+*   identifier with it.
+      CALL NDF_ASSOC ('INPUT', 'READ', NDF1, STATUS)
+                                                              
+*   Enquire the dimension sizes of the NDF.
+      CALL NDF_DIM (NDF1, 10, DIM, NDIM, STATUS)
+
+*   Set the token 'NDIM' with the value NDIM.
+      CALL MSG_SETI ('NDIM', NDIM)
+
+*   Report the message.
+      CALL MSG_OUT (' ', 'No. of dimensions is ^NDIM', STATUS) 
+
+*   Report the dimensions.
+      NCHAR = 0
+      CALL CHR_PUTC ('Array dimensions are ', STRING, NCHAR)
+      DO  I = 1, NDIM
+*      Add a `x' between the dimensions if there are more than one.
+         IF (I.GT.1) CALL CHR_PUTC (' x ', STRING, NCHAR)
+*      Add the next dimension to the string.
+         CALL CHR_PUTI (DIM(I), STRING, NCHAR)
+      ENDDO
+      CALL MSG_OUT ('  ', STRING(1:NCHAR), STATUS) 
+
+*   End the NDF context.                                       
+      CALL NDF_END (STATUS)                                  
+      END                 
+%
+% cat repdim2.ifl
+interface REPDIM2
+   parameter      INPUT
+      position    1 
+      prompt      'Input NDF structure'
+      default     example
+      association '->global.ndf'
+   endparameter
+endinterface
+%
+% star_dev
+% alink repdim2.f `ndf_link_adam`
+f77 -g -c repdim2.f
+repdim2.f:
+        repdim2:
+dtask_applic.f:
+        dtask_applic:
+%
+% repdim2
+INPUT - Input NDF structure /@EXAMPLE/ >
+No. of dimensions is 1
+Array dimensions are 856
+%
+% ls ~/adam
+repdim2.sdf     GLOBAL.sdf
+%  
+% compifl repdim2
+!! COMPIFL: Successful completion
+%
+% ls
+example.sdf   repdim2.f     repdim2.ifl
+repdim2       repdim2.ifc   repdim2.o
+%
+
+\end{verbatim} \end{quote}
+Note that whether or not the file repdim2.o is retained depends upon the
+compiler used.
+
+\newpage
+\section{Link Script Details}
+\label{link_det}
+The link scripts firstly have to create a subroutine, DTASK\_APPLIC, which is
+which is called by the ADAM fixed part and in turn calls the user's top-level
+routine.
+The difference between {\bf alink} and {\bf ilink} is just that the template
+DTASK\_APPLIC for {\bf alink} contains a call to close down the parameter
+system after each invocation of the task.
+
+During installation, the actual compile/link command within {\bf alink/ilink} 
+is edited depending upon the platform. The template command is:
+\begin{quote} \begin{verbatim}
+F77 $FFLAGS -o $PROGNAME \
+$XDBX \
+/star/lib/dtask_main.o \
+dtask_applic.f \
+-Bstatic \
+$ARGS \
+-L/star/lib \
+-lhdspar_adam \
+-lpar_adam \
+`dtask_link_adam` \
+-Bdynamic
+\end{verbatim} \end{quote}
+Notes:
+\begin{itemize}
+\item F77 is replaced by whatever the FC environment variable is when 
+{\bf alink/ilink} is installed.
+\item Environment variable FFLAGS may be used to specify any options which
+must be included at the start of the command line.
+\item \verb!$XDBX! is set to \verb!-g! if the {bf -xdbx} argument is given.
+\item The \verb%-Bstatic% and \verb%-Bdynamic% options are retained, removed or
+modified, depending upon the platform, during installation to ensure static 
+linking of the Starlink libraries but not the system libraries.
+\item \verb%$PROGNAME% is the basename of the first argument of 
+{\bf alink/ilink} with any {\bf .f} or {\bf .o} suffix removed.
+\item \verb%$ARGS% is the first argument of {\bf alink/ilink}, with {\bf .o}
+appended if the extension was not {\bf .f} or {\bf .o}, followed by the 
+remaining arguments unchanged.
+\item To speed up the link, {\em pkg}\_link\_adam scripts are only used
+selectively. 
+{\bf dtask\_link\_adam} refers to dtask, task and err libraries directly then
+invokes {\bf subpar\_link\_adam} which references the necessary
+libraries directly, apart from hds, hlp and psx whose link\_adam scripts are
+invoked.
+\item Other adjustments are made during installation if the system is not being
+installed in /star. In particular, a -L option is added to include the newly
+installed libraries before those in /star/lib.
+\end{itemize}
+The {\bf -xdbx} argument is provided to overcome some awkward problems which
+can arise when debugging ADAM applications. Usually it is sufficient to
+include \verb!-g! in the arguments of {\bf alink/ilink} but sometimes, notably 
+when using {\bf xdbx} and {\bf ups} on SunOS, the debuggers do not behave
+sensibly if required source files are missing so the \verb!-xdbx! argument
+should be used instead.
+The effects of the argument are:
+\begin{itemize}
+\item A dummy source file for {\bf dtask\_main}, the main routine of every ADAM
+task, is created in the working directory. 
+The file contains an explanatory message to the user and the name of the 
+user's top-level subroutine (which may be helpful in selecting a breakpoint).
+\item The source file of DTASK\_APPLIC is not deleted from the working 
+directory.
+\item {\verb!-g!} is inserted in the compile/link command.
+\end{itemize}
+\newpage
+\section{Available Libraries}
+\label{libs}
+\subsection*{ADAM System Libraries}
+\begin{verse}
+HDSPAR (DAT\_ASSOC {\em etc.}). This library is named DATPAR in the VMS
+release \\
+SUBPAR \\
+PARSECON \\
+STRING \\
+LEX \\
+DTASK \\
+TASK \\
+MISC (Miscellaneous routines required for Unix until further developments) \\
+ADAM \\
+MESSYS \\
+MSP 
+\end{verse}
+
+\subsection*{Starlink Libraries Searched Automatically}
+The following separate Starlink libraries will be searched automatically by
+the ADAM link. The libraries used for ADAM may differ from the standalone
+versions (see relevant documents for details).
+
+\begin{verse}
+PAR \\
+ERR/MSG/EMS \\
+HDS \\
+CHR \\
+PSX \\
+HLP
+\end{verse}
+
+\subsection*{Libraries Not Searched Automatically}
+\label{nolibs}
+The following libraries, which are searched automatically by {\bf alink} on
+VMS, must be included as optional arguments on Unix.
+
+\begin{verse}
+AGI \\
+ARY \\
+CNF \\
+GKS (includes GKSPAR) \\
+GNS \\
+IDI \\
+NDF \\
+SGS (includes SGSPAR) \\
+PGPLOT (includes PGPPAR) \\
+\end{verse}
+
+\section{ICL for Unix}
+\label{icl}
+\subsection{ICL Startup}
+ICL is started from a Unix shell by a command of the form:
+\begin{quote} 
+\verb!% icl! [{\em ICL\_options}\/] [{\em command\_filenames...}]
+\end{quote}
+Where:
+\begin{description}
+\item[{\em ICL\_options}] (optional) have not yet been fully developed 
+and should not be used without advice. ICL options start
+with `--' and must appear before any command-file names.
+\item[{\em command\_filenames...}] (optional) are the names of any files 
+containing ICL commands which are to be obeyed by ICL before the ICL prompt 
+appears.
+They are loaded {\em after} any ICL login files (see Section \ref{iclvars}).
+A file extension of \verb!.icl! is assumed if no extension is specified. 
+All filenames must appear after any ICL options.
+\end{description}
+Example:
+\begin{quote} \begin{verbatim}
+% icl -io test_io comfile1 comfile2
+\end{verbatim} \end{quote}
+which would set the value of the ICL option \verb!-io! to \verb!test_io!
+and the ICL command files \verb!comfile1.icl! and \verb!comfile2.icl! would be 
+automatically loaded into ICL before the ICL prompt was output.
+
+\subsection{ICL Environment Variables}
+\label{iclvars}
+ICL's operation can be controlled by several (optional) environment
+variables. The variables are:
+\begin{description}
+\item[ICL\_LOGIN\_SYS, ICL\_LOGIN\_LOCAL and ICL\_LOGIN\_USER]
+If set, these environment variables specify ICL command files to be obeyed, 
+in the above order, by ICL before the ICL prompt appears.
+A default file extension of {\bf .icl} is assumed. For example:
+\begin{quote} \begin{verbatim}
+% setenv ICL_LOGIN ~/myprocs
+\end{verbatim} \end{quote}
+will cause file \verb!myprocs.icl! in the user's home directory to be loaded
+as ICL starts up.
+\item[EDITOR] If set, this will override the ICL default editor (vi). 
+For example:
+\begin{quote} \begin{verbatim}
+% setenv EDITOR tpu
+\end{verbatim} \end{quote}
+\item[ICL\_HELPFILE] If set, this will override 
+\verb!/star/help/icl/iclhelpfile! as the default ICL helpfile.
+\end{description}
+
+\section{Summary of Differences and Deficiencies}
+\label{diffs}
+\begin{itemize}
+\item There is no {\bf ADAMSTART} command. Directory {\bf \$HOME/adam} must be
+created explicitly unless environment variable {\bf ADAM\_USER} is used to point
+elsewhere. The global parameter file {\bf GLOBAL.sdf} will be created 
+automatically if required.
+\item {\bf DAT\_PAR} must be INCLUDEd explicitly in any code which requires 
+the symbolic constants for HDS. Similarly {\bf PAR\_PAR} for the PAR constants.
+(see Section \ref{incs}).
+\item Some libraries ({\em e.g.}\ NDF) which are automatically included by 
+{\bf alink} on VMS are not included on Unix (see Appendix \ref{libs}).
+\item Compiled interface files ({\bf .ifc}s) will only work for the platform
+type on which they were created.
+\item Monolith top-level routines must be written in the new style for use on
+Unix. Monoliths are linked using {\bf alink}.
+\item ICL shareable monoliths will not be available on Unix.
+\item Editing of prompt suggested values, using the TAB key, is
+not available.
+\item When running tasks directly from a shell, the normal Unix rules for the 
+use of metacharacters on the command line will apply.
+Characters to be particularly wary of are `\verb%"%', `\verb%\%' and 
+`\verb%$%'.
+\item ADAM tasks will usually default to interpreting environment variables
+and `\verb!~!' in filenames used with HDS. This is not necessarily true of 
+names used with other ADAM facilities such as FIO and may be overridden by 
+user or programmer action for HDS filenames.
+\end{itemize}
+
+\section{Document Changes}
+This document has been updated to reflect:
+\begin{itemize}
+\item The availability of ICL for Unix. (Appendix \ref{icl}.)
+\item The use of HDS to handle expansion of filename for PAR and DAT.
+(Section \ref{envars} and Appendix \ref{diffs}.)
+\item The {\bf -xdbx} argument for {\bf alink/ilink}.
+(Section \ref{link_scripts} and Appendix \ref{link_det}.)
+\end{itemize}
+\end{document}
+                                         

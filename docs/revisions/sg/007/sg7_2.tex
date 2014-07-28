@@ -1,0 +1,779 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink Guide}
+\newcommand{\stardocinitials}  {SG}
+\newcommand{\stardocnumber}    {7.2}
+\newcommand{\stardocauthors}   {R W Tweedy}
+\newcommand{\stardocdate}      {9 March 1992}
+\newcommand{\stardoctitle}     {IUE Analysis --- A Tutorial}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\newcommand{\numcir}[1]{\mbox{\hspace{3ex}$\bigcirc$\hspace{-1.7ex}{\small #1}}}
+\newcommand{\lsk}{\raisebox{-0.4ex}{\rm *}}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+\setlength{\parskip}{0mm}
+\tableofcontents
+\setlength{\parskip}{\medskipamount}
+\markright{\stardocname}
+
+\newpage
+
+\section{Introduction}
+
+The techniques for analysing IUE data have evolved over the fourteen 
+years of the satellite's existence, and are consequently well-developed. 
+However, it remains difficult for someone new to the area to become familiar
+with the procedures. This document is designed for someone acquiring their
+first IUE tape, and gives a step-by-step guide from mounting the tape to 
+doing simple analysis of the extracted spectrum. 
+
+\section{The IUE satellite}
+
+The {\it International Ultraviolet Explorer}\, satellite (IUE) was launched in
+January 1978 as a result of a three-agency collaboration between SERC, ESA,
+and NASA. It was put into a 24-hour elliptical orbit so that while it is 
+permanently accessible to the Goddard Space Flight Center, it can also be
+operated for eight hours a day by the Vilspa ground-station at Villafranca 
+del Castillo, near Madrid. This is the ESA shift; the remaining 16 hours are
+divided into two shifts, US1 and US2, with the latter spanning the period 
+characterised by a high particle background. 
+
+IUE observes in the range 1150-2000{\AA}, covered by the Short Wavelength Prime
+camera (SWP), and between 1900 and 3200{\AA}, which involves the Long 
+Wavelength Prime and Redundant cameras (LWP and LWR). (The SWR has a faulty 
+readout section, so consequently has never been used since the initial 
+commissioning period). Two types of spectrograph exist: one uses a single 
+spherical grating, producing low dispersion spectra with a resolution of
+$\sim$6{\AA}; the other involves an echelle grating as well, providing about 
+60 spectral orders, and a resolution $\sim$0.1{\AA}. Only the low-dispersion 
+grating provides flux calibration because at the short-wavelength 
+end the orders from the echelle spectrum begin to overlap, so that the 
+background cannot be properly defined. 
+
+During an observation, the spectrum appears as an image on the target of the 
+television cameras. There is a limit to the amount of charge that can be 
+accumulated there without saturation occurring, which means that the optimum
+signal-to-noise is about 20. This is quite difficult to 
+achieve, largely because of the varying sensitivity of the cameras at different
+wavelengths, and figures of around 10 are more typical. Consequently, even 
+in high-dispersion only the centroid and equivalent width of a 
+narrow absorption line can be used reliably, unless several datasets are 
+used and carefully co-added. 
+
+Full details of the IUE satellite just after launch are given in 
+Boggess, A. et al., 1978, {\it Nature}, {\bf 275}, 372, with the subsequent
+series of papers giving an overview of the science that can be achieved with 
+it. There are frequent symposia reviewing recent research, including 
+{\em `Exploring the Universe with the IUE satellite'}, ed.\ Y.Kondo,
+publ.\ D.Reidel, 1987, and {\em `Evolution in Astrophysics: IUE Astronomy in
+the era of new space missions'}, ed.\ E.J.Rolfe, ESA SP-310.
+
+\section{Reading the tape and displaying an image}
+
+A tape from a single observation contains four files. The first contains the 
+raw data, and is of little practical use, but the second contains the 
+photometrically calibrated spectrum (the PHOT file), which is used with the
+Starlink IUE data-reduction package IUEDR (the {\it Starlink Guide no.3}
+gives a complete description of the commands available). The third and fourth 
+are the extracted data using the standard NASA program IUESIPS for both 
+high and low dispersion, irrespective of whether both modes were used in the
+observation. Although this represents a quick way to look at the data, it is
+scientifically unusable in high-dispersion. In low-dispersion it is usually 
+preferable to do the extraction in a more controlled way, and thus account
+for odd features (such as cosmic ray hits, or broad emission lines). 
+
+\subsection{Reading the tape headers}
+
+The tape should be mounted in the normal way, both on the device itself and 
+within VMS. Various logicals need to be set up, so this should be done using
+\begin{verbatim}
+    $ IUEDRSTART
+\end{verbatim}
+which then gives some brief information. Entering IUEDR can then be done
+\begin{verbatim}
+    $ IUEDR
+\end{verbatim}
+which, after a ``welcome'' message, gives a `$>$' prompt. There is a moderately
+useful HELP facility, if rather slow. Each time IUEDR is run, a SESSION.LIS
+file is created which records all the input from the keyboard and output from 
+the terminal. The command for reading the header is
+LISTIUE, but unless its default parameters are changed this 
+will give just the initial ten lines of the first file. The most useful
+approach is to read all the headers, which can be done using 
+\begin{verbatim}
+    > LISTIUE ?
+\end{verbatim}
+--- the question mark may be used with all commands in IUEDR to request all the 
+prompts. Typical responses might be 
+\begin{quote}
+\begin{verbatim}
+? DRIVE(TAPE)=MSA0
+? FILE=1                    *** i.e. the first file to be read.
+? NLINE(10)=-1              *** all lines to be listed.
+? SKIPNEXT(F)=<CR>          *** don't skip next file.
+? NFILE(1)=-1               *** all files to be listed.
+\end{verbatim}
+\end{quote}
+--- the ``--1'' response is unique to this command. Much of what is produced is
+rubbish, and once LISTIUE has completed it is probably best
+to {\tt QUIT} from IUEDR and delete large sections from the 
+SESSION.LIS file before sending to a printer. While the first ten lines are
+the most useful, important information is included at the tail of the IUESIPS
+files, which is why it is necessary to extract the full header information. 
+
+\subsection{Reading the data}
+
+Re-entering IUEDR, data may be extracted from the tape by using READIUE. 
+Since this package is about ten years old, there are some prompts that 
+would not be necessary in a more automated system, and responses are 
+often not obvious. An example of running it is shown below. 
+\begin{quote}
+\begin{verbatim}  
+> readiue ?
+? DRIVE(msa0)=mua1     
+? FILE=3
+  Tape is positioned at the start of file 3
+? NLINE(10)=<CR>            *** typical header shown below; 10 lines.
+                           895 895 7681536   1 2 013038776   +101     1  C
+    9152*   2*IUESOC  *   *   *20,400*      *   *  * * * * * *     *  2  C
+  SWP 38776, LT-5, 340 MIN EXPO, HI DISP, LARGE APERTURE              3  C
+                                                                      4  C
+                                                                      5  C
+                                                                      6  C
+  OBSERVER: CHENG    ID: PNMWF    12 MAY 1990 DAY 132                 7  C
+                                                                      8  C
+                                                                      9  C
+  90132142546* 10  * 218 *OPS2PR12*142042 FES CTS 98 1 0 2560      * 10  C
+  VICAR Image is 768 records,  each consisting 1536 bytes
+  This is either a PHOT or a GPHOT Image
+? TYPE=phot
+ Assumed to be PHOT Image.
+? DATASET=lt5              *** i.e. the name for the output files.
+? CAMERA=swp               *** or LWP or LWR
+? IMAGE=38776              *** the number of the image
+? RESOLUTION=hires         *** or lores
+? APERTURES=lap            *** or sap for small aperture, or bap for both
+? EXPOSURES=20400          *** exposure time in seconds; line 2 of header
+? YEAR=1990
+? MONTH=5
+? DAY=12
+? OBJECT="LT-5 : 340 mins" *** title for the output files. 
+? THDA=7.83                *** temperature of the camera faceplate
+? NGEOM(5)=<CR>            *** number of Chebyshev polynomial co-efficients
+ No Absolute Calibration.
+ No Spectrum Template Data.
+ Reading Image from Tape.
+ Calibrating Geometry.
+ Writing lt5.UEC (Calibration File).
+ Writing lt5.UED (Image File).
+ Writing lt5.UEQ (Image Quality File).
+\end{verbatim}
+\end{quote}
+Most of the tapes will include PHOT files, but prior to about 1981, geometric
+corrections were applied at the same time as the photometric ones.
+Consequently, GPHOT files appear instead, which require a different procedure. 
+The program will ask for {\tt ITFMAX} which is obtainable by using the 
+header information, combined with information in the HELP facility: type
+``?'' at the {\tt ITFMAX} prompt. It has been found that correcting for 
+the geometric distortions in the image is best done separately, which
+is why the Chebyshev polynomial co-efficients are required. There is rarely
+any need to change from the default. The {\tt THDA} parameter needs to be
+obtained from the IUESIPS output header information. Two values are given, 
+one derived from reseau motion, the other from spectrum motion; it is 
+believed that the former gives the more accurate result where there is a
+difference. 
+
+At present the only image display devices that can be used are the IKONs. 
+The next release of IUEDR should include Vax workstations amongst a number
+of other improvements, but it is completely uncertain when this will appear. 
+It is quite possible that there will be no modifications until the whole
+package is overhauled. There are two reasons why this is expected: the 
+graphics packages are still Fortran-based, and thus agonisingly slow compared
+to, say, ASTERIX or Q; and the basic techniques of IUE data-reduction are 
+being transformed for the creation of the final archive. 
+
+For low-resolution data there are two extra prompts: `{\tt ? ITF}' requires
+the answer `2' for SWP spectra, and `1' or `2' for those from the LWP or LWR.
+`{\tt ? BADITF}' should almost always be answered `YES'; this 
+counter-intuitive reply requests that bad data points will be quality-flagged.
+
+Displaying the image uses {\tt DRIMAGE}, or {\tt DRI} for short. 
+\begin{quote}
+\begin{verbatim}
+ > dri ?
+ ? DATASET(lt5)=<CR>
+ ? DEVICE=ikon
+ ? FLAG(T)=<CR>
+ ? XP=!              *** exclamation marks are used to request the
+ ? YP=!                  default if graphics are being used. 
+ ? ZL=!              *** limits on the intensity displayed. The default 
+                         is about 0 to 10000. 
+\end{verbatim}
+\end{quote}
+Changing the limits can be done using {\tt CULIM}, and then once the image
+has been re-displayed {\tt CURSOR} will allow wavelengths and other information
+to be read directly. 
+\begin{quote}
+\begin{verbatim}
+ > culim
+ > dri
+ > cursor
+  S(PIXEL)    L(PIXEL)     Inten.(FN)   R(PIXEL)     Wave(A)      Order
+  279.89      264.732      2146.        -3.3937      1528.42      90
+  275.23      272.225      1896.        -1.32646     1545.71      89
+  200.673     183.81       1922.        -3.15636     1540.92      89
+\end{verbatim}
+\end{quote}
+Within all but those with the shortest exposures, there will be defects
+in the image that need to be quality-flagged, and which cannot be done
+automatically. This mostly involves cosmic-ray hits, which are usually 
+distinguished from, say, emission lines by affecting far fewer pixels ---
+as well as often occupying the inter-order region. A typical emission line
+is the geocoronal Lyman $\alpha$ at 1215{\AA}, visible in orders 113 and 114, 
+which significantly contaminates all large-aperture spectra. 
+The other main problem that is found occasionally is the 
+result of a telemetry error when the spectrum was read down from the 
+satellite, so that a strip of data may be missing. Quality-flagging may be done 
+using the command {\tt EDIMAGE}, or {\tt EDIM}, and using the mouse. It will 
+be necessary to expand the image to a size that makes it easy to distinguish
+individual pixels --- usually $200\times 200$ is a good compromise between
+compactness and usability. Occasionally an image will be strewn with cosmic-ray
+hits, and unfortunately there is no substitute for going through the image 
+systematically. In this case, rather than using {\tt DRI}, {\tt CULIM},
+and {\tt EDIM}, it is probably simpler to ignore the {\tt CULIM} stage and
+use the {\tt XL} and {\tt YL} options in {\tt DRI}. {\tt EDIM} works by 
+changing the quality of all pixels within a box defined by the user using
+cursor hits at opposite corners of the box required. The middle button of 
+the mouse marks the pixels ``bad'', whereas the left marks them ``good'' ---
+which can thus be used to rectify mistakes. The third button exits from 
+{\tt EDIM}. 
+
+Pixels defined ``bad'' in this way will be coloured yellow. Other colours may
+be present on the image: red signifies overexposed pixels, and blue those 
+that fall outside the intensity range for plotting. There will also be a
+grid of green pixels, which identify those that are affected by reseau marks.
+These are a set of points within the camera on IUE which provide a reference
+frame against which geometrical distortions in the camera target are measured. 
+If an archival image is used from before 1981, and the {\tt PHOT} option 
+was incorrectly selected instead of {\tt GPHOT}, these green pixels will 
+fail to cover the reseau marks. It will then be necessary to re-run 
+{\tt READIUE}. 
+
+\section{Extracting a low-resolution spectrum}
+
+\subsection{Point sources}
+
+Extracting a low-resolution spectrum for a point-source is quite simple, 
+since there is just a single order, 
+and nothing more need be done than just typing the
+command {\tt TRAK}. As well as extracting the spectrum, it does a background
+subtraction from the surrounding region of the image. Ideally, the output
+pixel size should be changed from the default, but rather than going through
+the full array of parameters it can be done on a single line: {\tt TRAK
+GSAMP=0.707} --- the default is 1.414. There is a fair amount of output 
+to the terminal, most of which is unnecessary. The resultant spectrum will 
+be both flux and wavelength calibrated, with maximum signal-to-noise of
+$\sim20$ and resolution of 6\AA. 
+
+Plotting the spectrum may be done with {\tt PLFLUX}, which will work 
+unless the axes have been changed while using {\tt PLSCAN} (see below),
+in which case `{\tt PLFLUX ?}' is essential so that the plotting 
+limits can be changed to something sensible. However, a more useful 
+procedure is to output it to DIPSO using {\tt OUTSPEC ?} --- 
+hitting the defaults
+except with `{\tt ? OUTFILE}', which should probably be something less opaque
+than the original image number. Essential details of DIPSO will be given
+below. 
+
+CAUTION: never hit $<$CTRL$>$-C, $<$CTRL$>$-Y, or $<$CTRL$>$-Z, which will 
+cause the loss of the data being analysed. To quit the program, 
+type {\tt QUIT} or {\tt Q}. 
+
+\subsection{Extended sources}
+
+With extended sources and those without continua, such as high-excitation 
+planetary nebulae, the extraction is more complicated, but the responses
+to the prompts are straightforward. An example of the responses is given below.
+\begin{quote}
+\begin{verbatim}
+> trak ?
+? DATASET(lt5)=<CR>
+? GSAMP(1.414)=0.707
+? CUTWV(T)=<CR>         *** this provides the standard wavelength limits
+? CENTM(F)=<CR>         *** these parameters control the centroiding, and
+? CENSH(F)=<CR>             rarely need to be altered. 
+? CENSV(F)=<CR>
+? CENIT(1)=<CR>
+? CENAV(30.)=<CR>
+? CENSD(4.)=<CR>
+? BKGIT(1)=<CR>         *** these three control the background procedure.
+? BKGAV(30.)=<CR>
+? BKGSD(2.)=<CR>
+? EXTENDED(F)=T   
+? CONTINUUM(T)=F 
+? AUTOSLIT(T)=<CR>      *** default source and background channels requested
+\end{verbatim}
+\end{quote}
+\subsection{Unusual extractions}
+
+Occasionally a non-standard extraction is necessary. For example, two spectra 
+may have been taken side-by-side in the same aperture and on the same image. 
+This is done in order to reduce the overheads during the observing, which arise
+from the time 
+required to read down an image and prepare for the next one. Another reason may 
+be that cosmic ray hits may affect a critical part of the spectrum, but there
+is enough remaining that is usable. In both cases the {\tt AUTOSLIT} parameter
+needs to be set to false, since the automatic extraction slit --- which is 
+defined by the camera, resolution and aperture, as well as whether the source 
+is extended and has a continuum --- is no longer appropriate. 
+
+If the object is well centred in the aperture, it will be located at the
+position expected from the dispersion constants of the spectrograph. For
+a point-source in low-dispersion it is not necessary to check this, but for
+unusual extractions it is vital. This is done by using {\tt CGSHIFT} on a 
+cut across the spectrum, provided by {\tt SCAN} and plotted using {\tt PLSCAN}.
+{\tt CGSHIFT} requires the location of the centroid of the spectrum by hand, 
+which thus defines the zero-line. 
+
+Three parameters follow once {\tt AUTOSLIT} is set to {\tt F}, 
+whose values determine the new extraction. In each case
+a pair of numbers is required unless one is the symmetric pair of the other, 
+in which case only one is needed. {\tt GSLIT} defines the limit of the spectrum
+channel, so {\tt GSLIT=5} is the equivalent of {\tt GSLIT=-5,5}, but
+{\tt GSLIT=0,5} would be an asymmetric extraction.
+{\tt BSLIT} sets the half-width of 
+each background channel, so setting one of them to 0 enables only one to be
+used, which is useful for the two spectra within the same aperture. {\tt BDIST}
+specifies the distance of each background channel from the centre.
+
+The flux calibration from this new extraction is not necessarily correct
+and should be checked, where possible, by comparing with the spectrum 
+obtained with the default parameters. Multiplying the new fluxes by a 
+constant may suffice to provide sensible values. 
+
+\section{Analysing the spectrum with DIPSO}
+
+The Starlink User Note SUN/50 is an excellent description of DIPSO, 
+and also provides a tutorial for first-time users. Much of the information 
+is also contained in an on-line HELP facility. However, brief details are 
+given here in order that basic measurements may be made. 
+
+The package is entered simply by typing 
+\begin{verbatim}
+    $ DIPSO
+\end{verbatim}
+which gives a brief ``welcome'' and, like IUEDR, changes the prompt to `$>$'. 
+Spectra produced by {\tt OUTMEAN} within IUEDR can be read in using 
+{\tt SP0RD}, where the 0 represents the format selected within {\tt OUTMEAN}. 
+It is useful to push the data onto the stack so that it can easily be
+reclaimed if several have been read in, or if various manipulations, like
+flattening the continuum or smoothing, have been performed. A typical start
+to the session might be 
+\begin{quote}
+\begin{verbatim}
+> sp0rd ngc7293_neb96
+> push                           
+> sp0rd ngc7293_neb10, push   *** several commands may be used on one line
+> sl                          *** ``sl'' = Stack List
+      I    N     X1         X2              TITLE
+      1   611   1150.      1969.     SWP 6157: 96 arcsec from CS
+      2   639   1150.      1969.     SWP 42072: 10 arcsec from CS
+\end{verbatim}
+\end{quote}
+The command line {\tt DEV MG100, PM 2} then selects the plotting and plots
+up the second stack entry. Had the number 2 not been added, the data in the
+current arrays --- usually the last dataset accessed --- would be plotted 
+instead. Measuring X and/or Y values may be done using {\tt XV}, {\tt YV},
+or {\tt XYV}, using the graphics cursor. Exitting from either of these routines
+can be done by hitting the cursor twice at the same point. 
+
+Crude measurements of the flux and equivalent widths may be performed using 
+{\tt FLUX} and {\tt EW} respectively. In each case, a linear continuum is 
+defined between the two cursor hits delineating the range over which the 
+measurement is made. However, a more sophisticated method is to flatten 
+the continuum, by fitting a polynomial to it and then dividing it out. 
+This uses {\tt CREGS}, {\tt PF}, and {\tt ADIV}, and if {\tt EW} is used 
+immediately afterwards, an error estimate is given. A more detailed discussion
+is beyond the scope of this document. 
+
+Saving the stack data can be done with {\tt SAVE <filename>}. It can be 
+restored in a new session with the command {\tt RESTORE <filename>}. 
+
+CAUTION: as with IUEDR, $<$CTRL$>$-Y and $<$CTRL$>$-Z should never be used
+since all of the data analysed in the current session will be lost.
+Only in desperate
+circumstances should $<$CTRL$>$-C be hit, which will cause the stack to be 
+saved in CRASH.STK, but the current arrays will be lost. 
+
+\section{Calibrating spectra}
+
+Low-resolution spectra are both flux- and wavelength-calibrated. However, while 
+the standard calibration provided by IUEDR is adequate for many purposes, 
+there are problems. In all but the shortest exposures, there will be an 
+emission line at 1215.7{\AA} from geocoronal Lyman $\alpha$, but in some 
+spectra it may appear anything up to 8\AA\ either side of this wavelength. 
+Given that the emission is extended, this cannot be due to a velocity shift
+artificially induced by the object not being correctly centred in the aperture. 
+One solution is to apply a single wavelength shift to the whole spectrum, 
+although the correct procedure may not be so simple. The reason is that the 
+calibration lamp on IUE has few emission lines visible in low-resolution mode
+shortward of 1480{\AA}, and none below 1380{\AA} --- so the 8{\AA} error may be 
+because of a failure to correctly extrapolate the wavelength scale towards
+1200{\AA}. Applying the constant shift may be done in DIPSO by using
+{\tt XV} to ascertain its value, followed by {\tt XADD} or {\tt XSUB}. 
+
+The flux calibration provided by IUEDR takes into account the temperature
+dependence (with the THDA parameter) and the gradual loss of sensitivity 
+over time (using the date given in {\tt READIUE}). However, it has recently
+been found that there are errors $\sim 20$\% compared to model continua of
+white dwarfs, so that a further wavelength-dependent correction needs to be 
+applied (Finley, D.S., Basri, G., Bowyer, S., 1990, {\it Astrophys. J.,} 
+{\bf 359}, 483). These have been provided for all three fully-operative 
+cameras (SWP, LWP and LWR), and are available in the directory SG7DIR. 
+To use on a given low-resolution dataset which has already been pushed onto 
+the stack, place the correction spectrum in the current arrays (either by 
+reading the file from the directory or using {\tt POP}), and then use {\tt
+ADIV}. 
+
+\section{Lines found in low-resolution spectra}
+
+There are only a few lines that are strong enough to be detected in 
+low-resolution data. They are summarised in Table 1, with laboratory 
+wavelengths used. For high-resolution data, it is best to use a more detailed 
+line-list, such as Howarth, I.D. and Phillips, A.P., 1986, {\it Mon. Not. R. 
+astr. Soc.}, {\bf 222}, 809, or Morton, D.C., and Smith, W.H., 1973, 
+{\it Astrophys. J. Suppl.}, {\bf 26}, 333, although while both are valuable 
+sources of information, neither are in any sense complete. The information on 
+AGNs is taken from Francis, P.J. et al., 1991, {\it Astrophys. J.,}, {\bf 373}, 
+465. 
+
+
+\begin{center}
+\begin{tabular}{lll}
+\multicolumn{3}{c}{\bf Table 1} \\ 
+\multicolumn{3}{c}{Lines found in low-resolution IUE spectra.} \\ \hline
+Wavelength & Ion & Comments \\ \hline
+1216   & H I & Geocoronal emission + everything else! \\
+1241   & N V & Doublet at 1238.8 and 1242.8. Phot, C/S, PC, AGN. \\
+1260   & Si II & I/S \\
+1300   & Si III & Sextuplet. Phot. \\
+1335   & C II  & Interstellar lines at 1334.5 and 1335.7. \\
+1371   & O V   & Phot, PC \\
+1399   & Si IV & Doublet at 1393.8 and 1402.8. Phot, C/S, AGN. \\
+1549   & C IV & Doublet at 1548.2, 1550.7. Phot, C/S, AGN, PN, PC. \\
+1640   & He II & Balmer $\alpha$. Phot, AGN, PN, PC.  \\
+1663   & O III] & PN, AGN.\\
+1718   & N IV & PN, PC. \\
+1750   & N III] & PN. \\
+1858   & Al III & AGN. \\
+1908   & C III] & PN, AGN. \\ 
+2326   & C II]  & PN, AGN. \\
+2423  & [Ne IV] & PN, AGN. \\
+2798  & Mg II & I/S, PN, AGN. \\
+\multicolumn{2}{c}{Fe II blends in AGNs:} & \\
+Start & Finish & \\
+1610 & 2210 & \\
+2210 & 2730 & \\
+2960 & 4040 & \\ \hline
+\end{tabular}
+\end{center}
+{\bf Notes on typical occurrence:} 
+\begin{itemize}
+\item Phot =  Photospheres of hot stars, e.g.\ white dwarfs. 
+\item C/S = circumstellar material around hot stars.
+\item I/S = interstellar medium. 
+\item PN = planetary nebulae (emission lines). 
+\item PC = P Cygni profiles in PNs.
+\item AGN = Active Galactic Nuclei (emission lines). 
+\end{itemize}
+
+
+\section{Extracting high-resolution data}
+
+Spectra from the IUE echelle are complicated not only because of the number
+of orders ($\sim 60$ instead of 1), but because at the short-wavelength end
+the wings of these orders overlap. Consequently, there is no absolute flux
+calibration, and providing an approximate one is something of a black art. 
+
+{\tt TRAK} is generally able to find the centroid of a low-dispersion 
+spectrum without difficulty, but without guidance in high-dispersion the 
+performance is unreliable. Consequently, it is necessary to {\tt SCAN} the
+spectrum, and use {\tt CGSHIFT} to locate the peaks of one of the 
+orders. It is best to do this at the short-wavelength end, and {\tt CULIM}
+should probably be used with {\tt PLSCAN} to expand the plot to a useful scale. 
+One flaw with {\tt CGSHIFT} is that the shift used subsequently by {\tt TRAK}
+is the last one obtained: it does not take an average obtained from several 
+orders. Consequently, the best approach is to click the cursor on several 
+orders and find the one that is most representative. 
+
+To account for the order overlap, a first-order correction needs to be applied. 
+The usual assumption is that the background region is contaminated by 
+contributions from the two adjacent orders. At $\sim$ 1400{\AA} the value of 
+this halation correction, HALC, is zero, which is included within the default
+parameters of IUEDR --- it is not necessary to change this. 
+It rises linearly toward shorter wavelengths, and so needs to 
+be defined at one other point. 
+This is possible whenever the Lyman $\alpha$ trough at 1215{\AA} 
+is fully saturated, so that at the centre the flux is zero. Therefore, the
+correct value of HALC at, say, 1200{\AA} (the default), is the one which 
+lifts this feature to the zero flux level. It varies according to the 
+individual image from about 0.1 to 0.3, but for B stars the average is 
+around 0.12, for O stars it is about 0.15, and for white dwarfs about 0.20:
+these are useful as initial values, but it will be necessary to iterate 
+manually to find the optimum.
+
+Consequently, {\tt TRAK} should initially be used only on the orders 
+containing the Lyman $\alpha$ feature, combined with the two adjacent ones, 
+until a satisfactory value of HALC is obtained. It is essential that this
+is done, otherwise the equivalent width measurements out to 1400{\AA} will
+be worthless. A typical start to this cycle is given below. 
+\begin{quote}
+\begin{verbatim}
+ > scan ?
+ ? DATASET(lt5)=<CR> 
+ ? SCANDIST(0.)=<CR> 
+ ? SCANAV(5.)=<CR> 
+ ? ORDERS=125,66   *** the SWP orders are from 66 to 125. 
+  Scan grid (-255.7,349.3, 0.5), offset 0.0, half-width 5.0
+  Includes echelle orders (66,125).
+ > pls             *** all orders from 66 to 125 displayed
+ > culim           *** this was used to locate the peaks at the short 
+ > pls                 wavelength end. 
+ > cgs
+  (nearest_order, R, W) = (108,-1.51,1279.367)
+  Relative geometric shift (-1.18, 0.94)      *** these are the relevant 
+  Absolute geometric shift (-1.18, 0.94)          figures
+  (nearest_order, R, W) = (106, -0.99,1303.489)
+  Relative geometric shift ( -0.78, 0.62)
+  Absolute geometric shift ( -0.78, 0.62)
+  (nearest_order, R, W) = (105,-1.83,1315.894)
+  Relative geometric shift (-1.42,1.14)
+  Absolute geometric shift (-1.42,1.14)
+  (nearest_order, R, W) = (108,-1.51,1279.367)
+  Relative geometric shift (-1.18, 0.94)   *** this is the most typical 
+  Absolute geometric shift (-1.18, 0.94)       value. A better exposed 
+  Last Shift Retained.                         image would have a smaller   
+                                               range of shifts.
+ > setd halc=0.21                          *** sets the halation correction
+                                               to the default value of 0.21
+ > trak ?
+ ? DATASET(lt5)=<CR> 
+ ? GSAMP(1.414)=0.707
+ ? CUTWV(T)=<CR> 
+ ? CENTM(F)=<CR> 
+ ? CENSH(F)=<CR> 
+ ? CENSV(F)=<CR> 
+ ? CENIT(1)=<CR> 
+ ? CENAV(30.)=<CR> 
+ ? CENSD(4.)=<CR> 
+ ? BKGIT(1)=<CR> 
+ ? BKGAV(30.)=<CR> 
+ ? BKGSD(2.)=<CR> 
+ ? EXTENDED(F)=<CR> 
+ ? AUTOSLIT(T)=<CR> 
+ ? ORDER=115   *** the 4 orders 115 to 112 include Lyman Alpha (113 and 114)
+ ? NORDER(0)=4     plus the two adjacent orders. Going from 115 to 112
+                   provides the correct wavelength sequence. 
+  Will extract echelle orders (115,112).
+  Sample width  0.71 pixels ( 0.50 that of IUESIPS#1).
+  Background folding FWHM 30.0 pixels, evaluated 2 times,
+  with pixels outside 2.0 s.d. rejected.
+  Will base initial templates on dispersion constants.
+  Centroid folding FWHM 30.0 pixels, evaluated 2 times,
+  with signal above 4.0 s.d. used for tracking.
+  Point source Object.
+  Slit determined automatically.
+
+  Echelle Order 115
+  Channels:  Object (-2.6,2.6),  Backgrounds (-3.6,-2.6),(2.6,3.6).
+  Wavelength grid (1193.007,1205.005, 0.022) based on cutoff limits.
+                                Background                  Object
+                              Left       Right         Net       Shift
+  Good pixels used             361         368        2212        2212
+  Bad pixels used                0           0          13          13
+  Pixels not used               16          16           0           0
+  Rejected pixels                9          16           0           0
+  Mean value                 697.6       635.4      1554.6       0.260
+  RMS variation                0.2         0.2      1442.2       0.065
+  Evaluations                    4           4           2           2
+  :
+  :
+  :
+  Echelle Order 112
+  Channels:  Object (-2.7,2.7),  Backgrounds (-3.8,-2.8),(2.8,3.8).
+  Wavelength grid (1224.492,1237.506, 0.022) based on cutoff limits.
+                                Background                  Object
+                              Left       Right         Net       Shift
+  Good pixels used             386         376        2419        2419
+  Bad pixels used                0           0          24          24
+  Pixels not used               16          20           0           0
+  Rejected pixels               16          18           0           0
+  Mean value                 710.1       844.0      2659.5       0.079
+  RMS variation                0.2         0.2      2572.2       0.081
+  Evaluations                    4           4           2           2
+  Changing ORDER and NORDER parameters.
+  Spectrum Extraction Completed.
+\end{verbatim}
+\end{quote}
+The extracted orders, if saved (either be typing {\tt SAVE} or by quitting
+the program) will appear on a .UES file. It will appear order-by-order, and it 
+is generally more useful to amalgamate them into a single spectrum. First of 
+all, however, it is necessary to correct the data for a ripple that originates 
+in the echelle grating itself. This is done by using the eponymous routine 
+{\tt BARKER}, which is fully automatic (see Barker, P.K., 1984, {\it Astron. 
+J.}, {\bf 89}, 899). The only parameter is {\tt ORDERS}, which should be 
+answered in reverse fashion, such as {\tt 115, 112}, or {\tt 125, 66}. 
+
+Converting the individual orders on a single scale involves the
+routine {\tt MAP}, which takes into account the common-wavelength region of
+adjacent orders (for example, the geocoronal Lyman $\alpha$ feature appears in
+both order 113 and 114, which can be seen on any image). 
+\begin{quote}
+\begin{verbatim}
+ > map ?
+ ? DATASET(lt5)=<CR>          
+ ? RM(T)=<CR>               *** i.e. that a new mean spectrum is created
+  New Spectrum.                 rather than one averaged with the old. 
+ ? ORDERS(115,112)=<CR>
+  Orders in the range (112,115) can be used.
+ ? ML=1193, 1237            *** wavelength limits. 
+ ? MSAMP( 0.0218142)=0.04   *** the bin size. 0.04A is the best for all 
+                                wavelengths, as the default is only
+                                appropriate for the first order selected. 
+  Wavelength grid is (1193.000,1237.000, 0.040).
+ ? FILLGAP(F)=<CR>
+ ? COVERGAP(F)=<CR>
+  Gaps are not filled.
+  Using order 112
+  Using order 113
+  Using order 114
+  Using order 115
+\end{verbatim}
+\end{quote}
+The output spectrum can then be examined using {\tt PLMEAN}, or {\tt PLM} for
+short. If the zero line passes through the base of the Lyman $\alpha$ trough, 
+then the value of HALC is acceptable; otherwise it will have to be increased
+if the spectrum needs to be lifted, or lowered otherwise. If HALC does need 
+to be altered, then the {\tt SETD}, {\tt TRAK}, {\tt BARKER}, and {\tt MAP}
+commands will have to be repeated until a satisfactory value is found. 
+Occasionally, the Lyman $\alpha$ is not saturated, which is obvious since the
+profile is not flat at the base; a default value will have to be assumed. This
+is not satisfactory, but is the best that can be done. 
+
+Once HALC has been found, {\tt TRAK} can be run on the whole spectrum. 
+Thus, {\tt ORDERS} should be set to 125 and {\tt NORDER} to 60, although if
+120 and 52 are used little useful information will be lost. It will tend
+to take about half-an-hour to run, but needs no interaction.
+BEWARE: do not leave the session so that you are automatically logged 
+out after the terminal has been inactive for half-an-hour, since the 
+{\tt TRAK}ked spectrum will be lost. 
+
+As before, {\tt BARKER} and {\tt MAP} should be run on the {\tt TRAK}ked 
+spectrum. Although this full spectrum can be examined in IUEDR, it is much 
+more convenient to output it to DIPSO using {\tt OUTMEAN}.
+\begin{quote}
+\begin{verbatim}
+ > outmean ?
+ ? DATASET=lt5
+  Reading lt5.UEC (Calibration File).
+  Reading lt5.UEM (Mapped Spectrum File).
+ ? OUTFILE(swp38776M.DAT)=lt5          *** name of the output file
+ ? SPECTYPE(0)=<CR>                    *** can be read into DIPSO using
+                                           > sp0rd <filename>
+  Writing Binary SPECTRUM File (lt5).         
+\end{verbatim}
+\end{quote}
+
+\section{Examining a full IUE spectrum with DIPSO}
+
+There is no single command within DIPSO for displaying a full IUE 
+high-resolution spectrum on one page of output, but a procedure has been 
+written to do this. However, it is necessary to normalise the spectrum, 
+since the scale plotted is from 0 to 1 only. A typical command sequence 
+might be:
+\begin{quote}
+\begin{verbatim}
+> sp0rd lt5         *** DO NOT ``push'' data onto stack!
+> dev mg100         
+> xr 1200 1400      *** for a hot star, this interval encompasses the peak 
+                        of the spectrum. 
+> pm                *** plots data located in current arrays, i.e. what has
+                        just been read in. Suppose the maximum is 6.5...
+> ydiv 7            *** resets scale so maximum is less than 1
+> push 
+> @sg7dir:page *** plots out whole spectrum as 8 100A strips on a
+                        single sheet of A4. The graphics device has been
+                        set to CANP within the procedure itself. 
+> q                 *** quit session
+$ print/que=sys_laser canon.dat
+                    *** the plot file is not automatically queued. 
+\end{verbatim}
+\end{quote}
+Once in DIPSO, line centroids and equivalent widths may be computed 
+easily, but the details are beyond the scope of this document. 
+
+\section{The IUE log and de-archiving images}
+
+There is a log of all the IUE observations that is produced periodically, and 
+an online version is kept on the STADAT node. Examining this is done by 
+logging onto the captive account on this machine, username IUE, and using the 
+{\tt IUELOG option}, following the instructions given. In addition to
+the usual information (like co-ordinates, object name, exposure time etc.)
+each spectrum is assigned a class between 01 and 99, so it is possible to 
+obtain a subset of the IUE log for one particular class of objects. The 
+option {\tt CLASSKEY} will provide the code used. 
+
+Two methods exist for examining spectra in the archive. Low-resolution data 
+are available on-line, also on STADAT, but it is necessary to use the LEI 
+account. The command needed is QUEST, which is described fully in 
+SUN/20. It is often necessary to analyse the original images, though, 
+and this is unavoidable for high-resolution data. For this, {\tt IUEDEARCH}
+should be used, described in SUN/58. 
+
+\section{Future developments}
+
+The method of obtaining spectra from images is currently being overhauled, so 
+that the whole archive can be re-processed. The new developments have recently 
+been reviewed in the {\em `Evolution in Astrophysics'} proceedings (see above),
+and are likely to result in an increase in the signal-to-noise ratio of $\sim 
+50$\%. However, it is unlikely that the results of this will be generally 
+available for a couple of years. 
+
+\section*{Acknowledgements.}
+
+I would like to thank Dave Finley, of the University of California at
+Berkeley, for making the low-resolution correction spectra generally 
+available on {\it Starlink}. 
+
+\end{document}

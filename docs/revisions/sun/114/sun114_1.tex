@@ -1,0 +1,3837 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {114.1}
+\newcommand{\stardocauthors}   {Malcolm J. Currie}
+\newcommand{\stardocdate}      {1993 July 8}
+\newcommand{\stardoctitle}     {PAR \\ [1ex]
+                                Interface to the ADAM \\
+                                Parameter System}
+\newcommand{\stardocversion}   {Version 2.0}
+\newcommand{\stardocmanual}    {Programmer's Manual}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\renewcommand{\thepage}{\roman{page}}
+
+% Command for displaying routines in routine lists
+\newcommand{\noteroutine}[2]{{\small \bf #1} \nopagebreak \\ \hspace*{3em}
+                             {\parbox{113mm}{\em #2}} \\[1.5ex]}
+
+%+
+%  Name:
+%     LAYOUT.TEX
+
+%  Purpose:
+%     Define Latex commands for laying out documentation produced by PROLAT.
+
+%  Language:
+%     Latex
+
+%  Type of Module:
+%     Data file for use by the PROLAT application.
+
+%  Description:
+%     This file defines Latex commands which allow routine documentation
+%     produced by the SST application PROLAT to be processed by Latex. The
+%     contents of this file should be included in the source presented to
+%     Latex in front of any output from PROLAT. By default, this is done
+%     automatically by PROLAT.
+
+%  Notes:
+%     The definitions in this file should be included explicitly in any file
+%     which requires them. The \include directive should not be used, as it
+%     may not then be possible to process the resulting document with Latex
+%     at a later date if changes to this definitions file become necessary.
+
+%  Authors:
+%     RFWS: R.F. Warren-Smith (STARLINK)
+
+%  History:
+%     10-SEP-1990 (RFWS):
+%        Original version.
+%     10-SEP-1990 (RFWS):
+%        Added the implementation status section.
+%     12-SEP-1990 (RFWS):
+%        Added support for the usage section and adjusted various spacings.
+%     {enter_further_changes_here}
+
+%  Bugs:
+%     {note_any_bugs_here}
+
+%-
+
+%  Define length variables.
+\newlength{\sstbannerlength}
+\newlength{\sstcaptionlength}
+
+%  Define a \tt font of the required size.
+\font\ssttt=CMTT10 scaled 1095
+
+%  Define a command to produce a routine header, including its name,
+%  a purpose description and the rest of the routine's documentation.
+\newcommand{\sstroutine}[3]{
+   \goodbreak
+   \rule{\textwidth}{0.5mm}
+   \vspace{-7ex}
+   \newline
+   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
+   \setlength{\sstcaptionlength}{\textwidth}
+   \addtolength{\sstbannerlength}{0.5em}
+   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
+   \addtolength{\sstcaptionlength}{-4.45pt}
+   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
+   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
+   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
+   \begin{description}
+      #3
+   \end{description}
+}
+
+%  Format the description section.
+\newcommand{\sstdescription}[1]{\item[Description:] #1}
+
+%  Format the usage section.
+\newcommand{\sstusage}[1]{\item[Usage:] \mbox{} \\[1.3ex] {\ssttt #1}}
+
+%  Format the invocation section.
+\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
+
+%  Format the arguments section.
+\newcommand{\sstarguments}[1]{
+   \item[Arguments:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the returned value section (for a function).
+\newcommand{\sstreturnedvalue}[1]{
+   \item[Returned Value:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the parameters section (for an application).
+\newcommand{\sstparameters}[1]{
+   \item[Parameters:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the examples section.
+\newcommand{\sstexamples}[1]{
+   \item[Examples:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Define the format of a subsection in a normal section.
+\newcommand{\sstsubsection}[1]{\item[{#1}] \mbox{} \\}
+
+%  Define the format of a subsection in the examples section.
+\newcommand{\sstexamplesubsection}[1]{\item[{\ssttt #1}] \mbox{} \\}
+
+%  Format the notes section.
+\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
+
+%  Provide a general-purpose format for additional (DIY) sections.
+\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}] \mbox{} \\[1.3ex] #2}
+
+%  Format the implementation status section.
+\newcommand{\sstimplementationstatus}[1]{
+   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
+
+%  Format the bugs section.
+\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
+
+%  Format a list of items while in paragraph mode.
+\newcommand{\sstitemlist}[1]{
+  \mbox{} \\
+  \vspace{-3.5ex}
+  \begin{itemize}
+     #1
+  \end{itemize}
+}
+
+%  Define the format of an item.
+\newcommand{\sstitem}{\item}
+
+%  End of LAYOUT.TEX layout definitions.
+%.
+
+\begin{document}
+
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Huge\bf  \stardoctitle \\ [2.5ex]}
+{\LARGE\bf \stardocversion \\ [4ex]}
+{\Huge\bf  \stardocmanual}
+\end{center}
+\vspace{20mm}
+
+%------------------------------------------------------------------------------
+%  Package Description
+\begin{center}
+{\Large\bf Description}
+\end{center}
+
+PAR is a library of subroutines that provides convenient mechanisms for
+applications to exchange information with the outside world, through
+input-output channels called {\em parameters\/}.  Parameters enable a
+user to control an application's behaviour.  PAR supports numeric,
+character, and logical {\em parameters}, and is currently implemented
+only on top of the {\footnotesize ADAM} parameter system. 
+
+The PAR library permits parameter values to be obtained, without or with
+a variety of constraints.  Results may be put into parameters to
+be passed onto other applications.  Other facilities include setting a prompt
+string, and suggested defaults.  
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+\newpage
+\markright{\stardocname}
+\null\vspace {5mm}
+\begin {center}
+\rule{80mm}{0.5mm} \\ [1ex]
+{\Large\bf \stardoctitle \\ [2.5ex]
+           \stardocversion} \\ [2ex]
+\rule{80mm}{0.5mm}
+\end{center}
+\null\vspace {20mm}
+
+\setlength{\parskip}{0mm}
+\tableofcontents
+\setlength{\parskip}{\medskipamount}
+
+%------------------------------------------------------------------------------
+%  Introduction page
+\newpage
+\markright{\stardocname}
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
+
+\null\vspace {2mm}
+\begin {center}
+\rule{80mm}{0.5mm} \\ [1ex]
+{\Large\bf \stardoctitle \\ [2.5ex]
+           \stardocversion} \\ [2ex]
+\rule{80mm}{0.5mm}
+\end{center}
+\vspace{15mm}
+
+\section{Introduction}
+
+Consider an application that subtracts four from every element of an
+array.  This has a limited use---just one invocation.  However, it would
+be more general and far more useful if we could subtract an arbitrary
+value from an arbitrary array.  These arbitrary values are called {\em
+parameters\/} and through them we may qualify the behaviour of an
+application.  In a sense they are like input-output channels, though
+instead of using logical-unit numbers they have memorable names. 
+
+PAR is a library of subroutines that makes it easier to import and
+export numeric, character, and logical parameters between applications
+and the outside world.  In a contouring application, for example, these
+three types of parameters might be used to find the contour heights, the
+title for the graph, and whether or not the contours are to be
+annotated. Currently, PAR is only available for {\footnotesize ADAM}
+applications.  However, this does mean that an application using PAR
+will be able to take advantage of features in the {\footnotesize ADAM}
+parameter system, such as a variety of defaulting mechanisms, a special
+null value, online help, and automatic type conversion.  These make the
+application easier to use, more powerful, and more flexible. 
+
+PAR enables parameter values to be obtained, with or without
+constraints.  Supported constraints are: 
+\begin{itemize}
+\item even, and odd integers;
+\item within or beyond a range of values; and
+\item selection from a menu of options,
+whose contents may be abbreviated. 
+\end{itemize}
+There are facilities for setting the prompt string, suggested-default
+values, and minimum and maximum permitted values. There is a routine
+that lets an application obtain new values repeatedly through the same
+parameter.  Results may be put into parameters to be used in procedures
+and/or passed on to other applications.  Finally, PAR can inquire the
+{\em state\/} of a parameter.
+
+This document explains what a parameter is and the states it may reside
+in; it describes the usage of the PAR library with examples, progressing
+from the basic routines to the more sophisticated ones; and gives the
+linking procedures.  There is a reference section containing full
+details of each subroutine, and classified lists of the routines. 
+
+As a consequence of PAR only being implemented using the {\footnotesize
+ADAM} parameter system (SUBPAR), the programmer must also write an {\it
+interface file} for each application.  This controls the behaviour of
+the parameter, for example, whether it is defaulted or prompted for,
+where a suggested default should be obtained from, what is the default
+value, and where help is found.  SUN/115---the {\it Interface Module
+Reference Manual\/}---describes the syntax and facilities of interface
+files, and is required reading for those using PAR.  Note that the 
+examples in this document assume the {\footnotesize ADAM} implementation.
+
+\section{What is a Parameter?}
+
+From the programmer's point of view, a PAR parameter is a communication
+channel between an application and the outside world.  In a traditional
+application you would probably use Fortran input-output statements to
+prompt the user, or read from a text file for the additional data needed
+by your programme.  The concept of a PAR parameter is similar to this,
+but instead of passing the information through a logical-unit number,
+PAR uses a named communication channel.  This has advantages over normal
+methods.  A name is more memorable both to the user and to the
+programmer, especially if it describes the parameter's function.  PAR
+also allows more sophisticated ways of controlling the behaviour of an
+application than the traditional Fortran I/O, and performs data-type
+conversion automatically.
+
+\section{Parameter States} \label{se:states} 
+
+A parameter has a number of states.  Initially, a parameter has no
+value, and is said to be in the {\em ground\/} state.  When the
+parameter has been given a value, the parameter moves to the {\em
+active\/} state.  A parameter acquires a value in the first instance by
+looking for one supplied on the command line.  Failing that, the
+parameter system will attempt to get a value, for example by prompting
+or adopting a fixed or dynamic default.  If an application obtains a
+value from a parameter already in the active state, the existing value
+for that parameter is returned.  To obtain a further value the
+application must first {\em cancel\/} the parameter and move it to the
+{\em cancelled\/} state.  When the application next gets a value for
+that parameter (within the same invocation), the parameter returns to
+the active state.  When an application completes the parameter returns
+to the ground state. PAR also permits users of your application to enter
+a null value for a parameter (a {\tt !} in the {\footnotesize ADAM}
+parameter system).  This puts the parameter into the {\em null\/} state,
+and can be used to select a special value or control the application in
+a special way. 
+
+\section{Error Handling}
+\label{se:error}
+
+Like other Starlink subroutine libraries, PAR adheres throughout to the
+error-handling strategy described in SUN/104.  Subroutines have an
+integer final argument called STATUS that is an inherited status, and
+will return without action unless the status is set to the value
+SAI\_\_OK when they are invoked.  (SAI\_\_OK is a symbolic constant
+defined in the include file SAE\_PAR.)  This strategy greatly simplifies
+the coding since you can make a series of subroutine calls without
+having to check STATUS after each call; if an error occurs the
+subsequent routines do nothing. \footnote{PAR\_CANCL and PAR\_UNSET are
+exceptions to this behaviour.  Since they are freeing resources they
+attempt to work regardless of the inherited status.}  Where necessary,
+PAR makes error reports through the ERR\_ routines in the manner
+described in SUN/104, and therefore sets STATUS to a value other than
+SAI\_\_OK. 
+
+
+\section{Basic Routines}
+
+\subsection{Getting a Parameter's Value}
+
+The way an application obtains a value from a parameter is to {\it
+get\/} the value.  In simple terms, a get operation is the equivalent of
+a Fortran read, though it can do much more.  In this example,
+
+\begin{verbatim}
+          CALL PAR_GET0L( 'FLAG', VALUE, STATUS )
+\end{verbatim}
+
+gets a logical value from the parameter FLAG and stores it in the
+logical variable VALUE.  The data type is logical because of the L
+suffix in the routine's name.  If VALUE were a character variable, you
+would use a similar routine, but this time with a C suffix as shown below.
+
+\begin{verbatim}
+          CALL PAR_GET0C( 'STRING', VALUE, STATUS )
+\end{verbatim} 
+
+There are similar routines for the other primitive data types, each with
+an appropriate suffix: D for double precision, I for integer and R for
+real.  By convention where a routine has variants for different data
+types it has an ``x'' suffix, so in this case the routines are known
+collectively as PAR\_GET0x.  Note that there are no routines for
+obtaining byte and word values.  These must be obtained using the
+integer version of the routine.  The variable STATUS is the inherited
+status value adhering to the rules in SUN/104, and summarised in
+Section~\ref{se:error}.  The 0 in the routine name indicates that the
+routine passes a scalar (zero dimensions).  Likewise a routine with a 1
+in its name passes a vector, and with an N it passes an $n$-dimensional
+array. 
+
+There is a maximum length for the parameter name (set by {\footnotesize
+ADAM}) of fifteen characters, but this is quite adequate except
+perhaps for lexicographers.
+
+The actual value of the parameter supplied to the application at run
+time need not necessarily have the same data type as you have requested
+in your application. The parameter system will handle conversions
+between the type of the value and the type required by the
+application.  So you only need to concern yourself with what your
+application requires. 
+
+What does the user see?  This will depend on the implementation, but
+suppose the user is prompted for a value.  If you had in your code 
+
+\begin{verbatim}
+          CALL PAR_GET0R( 'THRESHOLD', THRESH, STATUS )
+\end{verbatim}
+
+The user might see
+
+\begin{verbatim}
+    THRESHOLD - Give the intensity threshold >
+\end{verbatim}
+
+with the parameter name first, followed by a prompt string briefly
+describing the function of the parameter.  (In the {\footnotesize ADAM}
+implementation this string is usually defined within the interface file,
+but there is a PAR routine for setting it within the application
+itself.)  Suppose the user enters 32768 in response to the above prompt.
+The next time the user ran the application there could be a suggested
+default of the last-used value like this, 
+
+\begin{verbatim}
+    THRESHOLD - Give the intensity threshold /32768/ >
+\end{verbatim}
+
+which could be accepted merely by pressing the return key.
+
+In the {\footnotesize ADAM} implementation the PAR\_GET calls will
+(re-)prompt whenever the user gives too many values or an invalid value.
+Invalid values include supplying a character string where a number is
+required, and being outside the interface file {\em range\/} or
+{\em in\/} constraints.
+
+\subsection{Getting an Array of Values}
+
+In addition to obtaining a scalar value, there are routines for getting
+arrays of values.  At this point it is appropriate to say a few words
+about the shape of a parameter.  A parameter's shape may be scalar,
+vector, or $n$-dimensional.  When you get values from a parameter, the
+parameter acquires the shape of the values supplied by the user.
+Therefore, you could use the same parameter to obtain a scalar and a
+cube.  How much is the user restricted by the parameter shape?  When
+getting an array the application specifies the maximum number of
+dimensions and the maximum sizes along each dimension; the values
+supplied must not exceed these maxima, but there may be fewer.  Now we
+return to the descriptions of the basic PAR\_ routines. 
+
+Here is an example to get a vector of real values.
+
+\begin{verbatim}
+          REAL VALUES( 4 )
+
+              :       :       :
+
+          CALL PAR_GET1R( 'HEIGHTS', 4, VALUES, ACTVAL, STATUS )
+\end{verbatim}
+
+It enables all or part of a four-element array to be obtained and
+stored in the real variable VALUES.  ACTVAL is the actual number of
+values obtained from parameter HEIGHTS.  Again there are versions of
+this routine for the different data types listed earlier. 
+
+In the above example the user might enter
+
+\begin{verbatim}
+          [1,2.5D0,3.456]
+\end{verbatim}
+
+where the brackets indicate an array and the commas
+separate the values.\footnote{In the ADAM implementation the user can
+omit the brackets in response to a prompt.}  For this input, ACTVAL 
+becomes 3.  
+
+A parameter's values may be stored as an $n$-dimensional array.
+The following example shows a 3-dimensional mask of integers
+being obtained from parameter MASK and being stored in an array called
+VALUES.  MAXD gives the maximum dimensions of the array.  The array 
+itself must be large enough to hold the values.  ACTD receives the
+actual dimensions of the array as specified by the user.
+
+\begin{verbatim}
+          INTEGER VALUES( 3, 2, 2 )
+
+              :       :       :
+
+          MAXD( 1 ) = 3
+          MAXD( 2 ) = 2
+          MAXD( 3 ) = 2
+          CALL PAR_GETNI( 'MASK', 3, MAXD, VALUES, ACTD, STATUS )
+\end{verbatim}
+
+This routine is unlikely to be in common usage because of the
+impracticality of the user of your application entering more than the
+smallest $n$-dimensional arrays of parameters, and having to know the
+parameter's shape.  To illustrate the former point, in the above
+example the user might enter 
+\begin{verbatim}
+          [[[1,2,3],[4,5,6]],[[7,8,9],[10,11,12]]]
+\end{verbatim}
+
+where the nested brackets delimit the dimensions, and the commas
+separate the values within a dimension.  Thus there are three values
+along the first dimension; each of these triples is bracketed in pairs
+along the second dimension; and this is repeated for each element along
+the third dimension, within the outermost brackets.  In other words the
+first dimension increases fastest, followed by the second, and so
+on---the Fortran order.  Thus, in the example, VALUES(3,1,2) is 9. 
+
+Usually, it will suffice to get a vector of values disregarding
+the dimensionality of the parameter.
+
+\begin{verbatim}
+          REAL VALUES( 12 )
+
+              :       :       :
+
+          CALL PAR_GETVR( 'MASK', 12, VALUES, ACTVAL, STATUS )
+\end{verbatim}
+
+This has the same arguments as PAR\_GET1x we saw above, though the actual
+number of array dimensions of the parameter need not be one.
+
+There may be occasions when you want an exact number of values. 
+Below, we obtain two character variables from parameter 'CONSTELLATION'.
+When too few values are supplied to the parameter, PAR\_EXACx
+prompts for the remainder of the values.
+
+\begin{verbatim}
+          CHARACTER * ( 3 ) CONSTE( 2 )
+
+              :       :       :
+
+          CALL PAR_EXACC( 'CONSTELLATION', 2, CONSTE, STATUS )
+\end{verbatim}
+
+An example of what the user sees is given in Section~\ref{se:avl}.
+
+\subsection{Putting a Parameter's Value}
+
+The opposite to {\em get\/} is {\em put}.  Using traditional Fortran
+input-output, the equivalent of putting a value is to write the value to
+a file.  In addition to getting parameter values, PAR can also put
+values into parameters.  Suppose we have an application that computes
+statistical parameters for a data array.  We should like to store these
+statistics in parameters, so that they may be passed to a later
+application.  Thus we could have a number of puts---one per statistic.
+Here we just put the standard deviation value in the parameter SIGMA. 
+
+\begin{verbatim}
+          CALL PAR_PUT0D( 'SIGMA', STDDEV, STATUS )
+\end{verbatim}
+
+The value is written to a {\em parameter file\/} associated with the
+application.  This file contains not only any values you have put there,
+but also the last-used values of all the parameters of that
+application.\footnote{A parameter file is implementation specific,
+however it is expected to be part of any implementation.  In the ADAM
+parameter system the parameter file is an HDS file named after the
+application and located in the ADAM\_USER directory. So for an application
+called STATISTICS, the above parameter value could be `read' by a
+parameter in a different application by the user giving the HDS object
+name with an {\tt @} prefix, namely {\tt @ADAM\_USER:STATISTICS.SIGMA}
+for VMS and {\tt @\$ADAM\_USER/statistics.SIGMA} for UNIX.} 
+
+If we had the values corresponding to the quartiles and median of a
+data array we could use a routine that handles a 1-dimensional array.
+\begin{verbatim}
+          DOUBLE PRECISION QRTILE( 3 )
+
+              :       :       :
+
+          CALL PAR_PUT1D( 'QUARTILES', 3, QRTILE, STATUS )
+\end{verbatim}
+
+When you put an array, the subroutine arguments specify both the
+dimensionality and size of that array, and the size of an `object' into
+which the array is to be put.\footnote{In the ADAM implementation this
+is usually a component of the parameter file---in this case an object of
+the required size will be created.  However, if indirection to a named
+HDS file is used the shape specified in the PAR routine must match the
+object's shape.} 
+
+Analogous to the PAR\_GETNx and PAR\_GETVx routines for getting arrays
+of values, there are equivalent generic routines, PAR\_PUTNx and
+PAR\_PUTVx, for putting values in parameters.  Using PAR\_PUTNx in one
+application and accessing the array via PAR\_GETNx without prompting is
+the most likely way to handle $n$-dimensional arrays of parameter
+values. 
+
+See SUN/115 Appendix~C for details of the specifications needed within
+the interface file to deal with scalar and array output parameters. 
+
+\subsection{Cancelling a Parameter}
+
+Cancelling a parameter means that values associated with it are lost.
+It is most-commonly used for processing in a loop. 
+
+If we have a loop in which we wish to get new values for a parameter and
+do some calculations in each iteration, we must cancel any parameters
+obtained in the loop, otherwise the first value will be used repeatedly,
+since the parameter is in the active state.
+
+Here is an illustration.  ITER calculations are performed, using
+the value of parameter REJECT.
+
+\begin{verbatim}
+          DO I = 1, ITER
+             CALL PAR_GET0D( 'REJECT', ABC, STATUS )
+
+                 < perform calculation involving variable ABC >
+
+             CALL PAR_CANCL( 'REJECT', STATUS )
+          END DO
+\end{verbatim}
+
+\subsection{Setting the Dynamic Prompt}
+
+In the ADAM implementation, the prompt a user of an application sees
+usually originates from the interface file, and hence is fixed. 
+However, it is possible to create a prompt string dynamically from
+within the application. For example, 
+
+\begin{verbatim}
+          CALL PAR_PROMT( 'OK', 'The file '// NAME( :NC ) /
+         :                / ' is to be erased. OK ?', STATUS )
+\end{verbatim}
+
+will change the prompt string for parameter OK, so that the named
+file given by the variable NAME, may be substituted at run time. 
+
+\subsection{Setting the Dynamic Default}
+
+When the parameter system prompts for a parameter, there is usually a
+suggested default given between {\tt / /} delimiters, so that the user
+can just press {\tt <CR>} to use the suggestion, or edit the suggestion.
+The suggested value can originate from a number of places.  This
+includes from within an application, by setting a {\em dynamic\/}
+default. 
+
+In the following example the dynamic default for the scalar parameter
+SHADE depends on the value of variable COLOUR.  If COLOUR is one, the
+dynamic default for parameter SHADE will be $-$1.0, and 0.0 otherwise. 
+
+\begin{verbatim}
+    *  Set the default shading (parameter SHADE) depending on the colour.
+          IF ( COLOUR .EQ. 1 ) THEN
+             CALL PAR_DEF0R( 'SHADE', -1.0, STATUS )
+          ELSE
+             CALL PAR_DEF0R( 'SHADE', 0.0, STATUS )
+          END IF
+
+    *  Obtain the shading.
+          CALL PAR_GET0R( 'SHADE', SHADE, STATUS )
+\end{verbatim}
+
+
+Note that in {\footnotesize ADAM} applications the {\em ppath\/} in the
+interface file must begin {\tt DYNAMIC} to ensure that the user of your
+application will be prompted with the dynamic default (see SUN/115).
+
+The {\footnotesize ADAM} parameter system also allows the dynamic 
+default to be used as the parameter value without prompting, through 
+the interface file {\em vpath\/} (see SUN/115).
+
+
+There are also routines that set the dynamic default for a vector
+parameter (PAR\_DEF1x) and an array parameter (PAR\_DEFNx).   Again
+there are versions of this routine for the different data types listed
+earlier. 
+
+\subsection{Setting Lower and Upper Limits} 
+
+It is a common requirement to restrict a parameter's value to a specific
+range, or to be above some lower limit or less than some upper limit. 
+For example, the order of a polynomial would have to be positive, but
+less than some maximum value that the polynomial-fitting software can
+handle.  Whilst this can be done using the {\em range\/} field in the
+interface file, PAR offers dynamic control through two
+routines---PAR\_MAXx to set the maximum value, and PAR\_MINx to set the
+minimum value for the parameter.  Note that there are no logical-type
+versions of these routines. 
+
+Here is an example of setting the minimum value.
+
+\begin{verbatim}
+    *  The number of histogram bins must be positive.
+          CALL PAR_MINI( 'NBINS', 1, STATUS )
+          CALL PAR_GET0I( 'NBINS', NBINS, STATUS )
+\end{verbatim}
+
+We can set an upper limit too.
+\begin{verbatim}
+    *  The number of histogram bins must be in the range 10 to 1000
+    *  inclusive.
+          CALL PAR_MINI( 'NBINS', 10, STATUS )
+          CALL PAR_MAXI( 'NBINS', 1000, STATUS )
+          CALL PAR_GET0I( 'NBINS', NBINS, STATUS )
+\end{verbatim}
+
+If the user gives a value outside the legitimate range, an error report
+appears, and the user is prompted for an acceptable value. In the case
+of character parameters, the parameter's value follows the minimum value
+and precedes the maximum value in the ASCII collating list. \footnote{In
+the ADAM implementation the dynamic minimum and maximum must lie within
+the limits set by the range field in the interface file.  If not,
+the get routine returns with an error status.  The allowed values reside
+in the intersection set of the two ranges.  Users can also specify MIN
+or MAX for a parameter value to assign the minimum or maximum value to
+that parameter.} 
+
+If the minimum value is greater than the maximum at the time you
+get a parameter value, this instructs PAR not to permit values between
+the minimum and maximum.  So the maximum is always the value immediately
+below the range to be excluded, and the minimum is the value immediately
+above.  In case that is not clear here is an illustration.
+
+\begin{verbatim}
+    *  Choose an integer excluding -1, 0, 1, and 2.
+          CALL PAR_MINI( 'IVALUE', 3, STATUS )
+          CALL PAR_MAXI( 'IVALUE', -2, STATUS )
+          CALL PAR_GET0I( 'IVALUE', NUMBER, STATUS )
+\end{verbatim}
+
+\subsection{Cancelling Dynamic Values}
+
+\subsubsection{Range}
+
+Having set a minimum or a maximum value, you can alter its value by a
+further call to PAR\_MINx or PAR\_MAXx.  Like a parameter itself, these
+control values remain in effect until the end of an application, or
+until they are cancelled.  Therefore, should you no longer want either 
+or both of the maximum and minimum limits, you must cancel them with
+PAR\_UNSET.  This routine's second argument is a comma-separated list
+which selects the values to reset.
+
+In the following example parameter NX is obtained twice, first using a
+range, and then with no maximum limit and a different minimum.
+
+\begin{verbatim}
+    *  Get the integer value between 1 and 360.
+          CALL PAR_MINI( 'NX', 1, STATUS )
+          CALL PAR_MAXI( 'NX', 360, STATUS )
+          CALL PAR_GET0I( 'NX', NX, STATUS )
+
+    *  Cancel the parameter, as a minimum or maximum value cannot be set
+    *  when the parameter is active, and because we want to obtain 
+    *  another value.
+          CALL PAR_CANCL( 'NX', STATUS )
+
+    *  Set a new minimum value.
+          CALL PAR_MINI( 'NX', NX, STATUS )
+
+    *  Cancel the maximum value.
+          CALL PAR_UNSET( 'NX', 'MAX', STATUS )
+
+    *  Obtain a new value, with a new minimum and no maximum.
+          CALL PAR_GET0I( 'NX', NX2, STATUS )
+\end{verbatim}
+
+See Appendix~\ref{ap:ref} for details of the options for the second
+argument. 
+
+\subsubsection{Dynamic Defaults}
+
+PAR\_UNSET need not be called to change the value of a default; a call
+to one of the PAR\_DEF routines will suffice.  However, if you wish to
+no longer have a dynamic default for parameter NX say, you will need to
+make the following call. 
+
+\begin{verbatim}
+          CALL PAR_UNSET( 'NX', 'DEFAULT', STATUS )
+\end{verbatim}
+
+\subsection{Inquiring the State of a Parameter}
+
+PAR provides a routine for inquiring the state of a parameter.
+One practical use for this is to determine whether a parameter is 
+specified on the command line or not, and hence to affect the behaviour
+of the application.  For example, you have an application that loops for
+efficient and easy interactive use, but in a procedure or batch mode you
+want the application to process just one set of data.
+
+\begin{verbatim}
+          INCLUDE 'PAR_PAR'        ! PAR constants
+          INTEGER STATE
+
+              :       :       :
+
+          CALL PAR_STATE( 'INIT', STATE, STATUS )
+
+          LOOP = .TRUE.
+          DO WHILE ( LOOP .AND. STATUS .EQ. SAI__OK )
+             CALL PAR_GET0R( 'INIT', START, STATUS )
+
+                 < perform calculation >
+
+             LOOP = STATE .NE. PAR__ACTIVE
+             IF ( LOOP ) CALL PAR_CANCL( 'INIT', STATUS )
+          END DO
+\end{verbatim}
+
+INIT is a parameter required for each calculation.  It is obtained
+within a code loop.  If INIT is specified on the command-line, INIT is
+in the active state before the call to PAR\_GET0R.  So a logical
+expression involving the state decides whether there is but one cycle
+around the loop or many.  The include file PAR\_PAR contains the
+definitions of each of the states returned by PAR\_STATE. The next
+section describes how we might end the loop in the interactive case. 
+
+\section{Abort and Null}
+
+There are two special status values that can be returned by the parameter
+system when getting parameter values.  They are PAR\_\_ABORT and
+PAR\_\_NULL, and are defined in the include file PAR\_ERR.
+
+\subsection{Abort}
+
+PAR\_\_ABORT is returned if a user enters {\tt !!} in response to a
+prompt.  In this event you should ensure that your application exits
+immediately.  In practice this means that a) the user is not be prompted
+for any further parameters, though you do not have to check for an abort
+status after every PAR\_GET call---the inherited status will look after
+that---and b) the application exits cleanly, freeing any resources used. 
+There must be a status check before any of the parameter values are
+used, in case they have not been obtained successfully.
+
+For example
+\begin{verbatim}
+          INCLUDE 'PAR_ERR'       ! PAR error constants
+
+              :       :       :
+
+          CALL PAR_GET0I( 'STEP', NSTEP, STATUS )
+          CALL PAR_GET1R( 'HEIGHTS', 50, HEITS, NUMHTS, STATUS )
+          CALL PAR_GET0L( 'COLOUR', COLOUR, STATUS )
+          IF ( STATUS .EQ. PAR__ABORT ) THEN
+             < perform any tidying operations >
+             GOTO 999
+          END IF
+
+             < perform calculations >
+
+      999 CONTINUE
+          END
+
+\end{verbatim}
+performs three parameter get calls, before testing for an
+abort; if an abort status is found, the routine exits.  The status check
+against PAR\_\_ABORT is unusual, and it is included to illustrate the
+symbolic constant.  In normal circumstances you would test whether
+STATUS and SAI\_\_OK were not equal, since it checks whether any error
+has occurred. 
+
+\subsection{Null}
+
+PAR\_\_NULL indicates that no value is available, and may be interpreted
+according to circumstances.  This normally occurs when a user assigns a
+value of {\tt !} to a parameter. 
+
+Null can be used in a variety of circumstances.  These include to 
+end a loop, to indicate that an optional file is not required, and to
+force a default value to be used. 
+
+Here is an example of handling null as a valid value for a parameter.
+
+\begin{verbatim}
+          CALL ERR_MARK
+          CALL PAR_GET0R( 'WEIGHT', WEIGHT, STATUS )
+          IF ( STATUS .EQ. PAR__NULL ) THEN
+             WEIGHT = 1.0
+             CALL ERR_ANNUL( STATUS )
+          END IF
+          CALL ERR_RLSE
+\end{verbatim}
+
+When the PAR\_GET0R returns with the null status, the variable WEIGHT is
+set to 1.0.  This particular instance has limited value, but the
+constant could be dynamic, depending on the values of other parameters
+or data read from files.  The call to ERR\_ANNUL restores STATUS to
+SAI\_\_OK, and also removes an error message that would otherwise be
+reported later (usually when the application completes).  Since we do
+not want to lose any earlier error reports, ERR\_MARK and ERR\_RLSE
+bracket this fragment of code to set up and release an error context. 
+See SUN/104 for further details. 
+
+Here null ends a loop, say to plot an histogram with different numbers
+of bins.
+\begin{verbatim}
+      100 CONTINUE
+          CALL ERR_MARK
+          CALL PAR_GET0I( 'NBINS', NBIN, STATUS )
+          IF ( STATUS .EQ. PAR__NULL ) THEN
+             CALL ERR_ANNUL( STATUS )
+             CALL ERR_RLSE
+             GOTO 200
+          END IF
+          CALL ERR_RLSE
+
+              < Perform calculations >
+
+          GOTO 100
+          
+    *   Come here at the end of the calculations.
+      200 CONTINUE 
+      
+\end{verbatim}
+
+\section{Extended Routines}
+\label{se:extended}
+
+In addition to the basic routines there are some packaged facilities for
+common sequences of calls.  Most deal with dynamic control of acceptable
+values when getting the parameter.  Some are needed because the {\em
+in\/} choices and {\em range\/} limits imposed by the {\footnotesize
+ADAM} interface module are static, and therefore cannot be adjusted
+depending on the values of other parameters or data.  Note that in the
+extended routines that follow, all call a PAR\_GET$n$x routine which
+first checks that each supplied value satisfies these interface-file
+constraints, and prompts for a new value if it does not.  Only after
+these tests are made will each value be compared with the constraints in
+the extended routines.  Therefore, you are recommended not to use the in
+and range fields for parameters obtained using the extended routines. 
+
+Here is an example of handling your own constraints to illustrate why it
+is more convenient to use the packaged routines, where applicable, and
+also to demonstrate how you might write your own extended routine should
+you need one. It is a little contrived, since the PAR library already
+provides the most-common combinations. 
+
+Here we obtain from parameter NAME an integer that is not exactly
+divisible by 3, set the dynamic default to 1, and interpret null to
+mean set the value to 3.  See SUN/104 for details of the MSG\_ calls. 
+
+\begin{verbatim}
+          LOGICAL NOTOK
+          INTEGER VALUE
+
+              :       :       :
+
+    *  Set the dynamic default.
+          CALL PAR_DEF0I( 'NAME', 1, STATUS )
+
+    *  Start a new error context.
+          CALL ERR_MARK
+
+    *  Loop to obtain the value of the parameter.
+    *  ==========================================
+
+    *  Initialise NOTOK to start off the loop and indicate that a 
+    *  satisfactory value has yet to be obtained.
+          NOTOK = .TRUE.
+
+      100 CONTINUE
+
+    *  The loop will keep going as long as a suitable value has not be read
+    *  and there is no error.
+             IF ( .NOT. NOTOK .OR. ( STATUS .NE. SAI__OK ) ) GOTO 120
+
+    *  Get a value from the parameter.
+             CALL PAR_GET0I( 'NAME', VALUE, STATUS )
+
+    *  Check for an error before using the value.
+             IF ( STATUS .EQ. SAI__OK ) THEN
+
+    *  Test the value against the constraints.  Here it is just to see
+    *  if the value is divisible by 3.  You can replace this expression
+    *  with more complicated constraints.
+                NOTOK = MOD( VALUE, 3 ) .EQ. 0
+
+    *  The value is not within the constraints, so report as an error,
+    *  including full information using tokens.  You would substitute a 
+    *  routine name for fac_xxxxx.
+                IF ( NOTOK ) THEN
+                   STATUS = SAI__ERROR
+                   CALL MSG_SETC( 'PARAM, 'NAME' )
+                   CALL MSG_SETI( 'VALUE', VALUE )
+
+                   CALL ERR_REP( 'fac_xxxxx_OUTR',
+         :           '^VALUE is not permitted for ^PARAM.  Please give '/
+         :           /'an integer not exactly divisible by 3.', STATUS )
+
+    *  The error is flushed so the user can see it immediately.
+                   CALL ERR_FLUSH( STATUS )
+
+    *  Cancel the parameter to enable a retry to get a value satisfying
+    *  the constraint.
+                   CALL PAR_CANCL( 'NAME', STATUS )
+                END IF
+
+    *  Use the default value following an error.
+             ELSE
+
+    *  Annul a null error to prevent an error report about null appearing.
+    *  Create a message informing the user of what has happened.
+                IF ( STATUS .EQ. PAR__NULL ) THEN
+                   CALL ERR_ANNUL( STATUS )
+
+    *  Inform the user what has happened.  You would substitute a 
+    *  routine name for fac_xxxxx.
+                   CALL MSG_SETC( 'PARAM', 'NAME' )
+                   CALL MSG_OUT( 'fac_xxxxx_DEFA',
+         :           'A value of 3 has been adopted '/
+         :           /'for parameter ^PARAM.', STATUS )
+                END IF
+
+    *  Set the returned value to the special case.
+                VALUE = 3
+
+    *  Terminate the loop.
+                NOTOK = .FALSE.
+             END IF
+
+    *  Go to the head of the loop.
+             GOTO 100
+
+    *  Come here when the loop has been exited.  This includes when
+    *  an error status was returned by the PAR_GET0I routine.
+      120 CONTINUE
+
+    *  Release the new error context.
+          CALL ERR_RLSE
+\end{verbatim}
+
+To set another constraint you have to modify the logical expression
+for variable NOTOK, and revise the ERR\_REP error report, possibly
+with more tokens.  Suppose variables VMIN and VMAX define a range
+of permitted values, which is inclusive when VMAX is the larger of
+the two and exclusive when VMAX is less than VMIN.  The constraint
+expression could modified to the following.
+
+\begin{verbatim}
+    *  Check that the value is within the specified include or exclude
+    *  range, and not divisible by 3.
+            IF ( VMIN .GT. VMAX ) THEN
+               NOTOK = ( ( VALUE .LT. VMIN ) .AND. ( VALUE .GT. VMAX ) )
+     :                 .OR. ( MOD( VALUE, 3 ) .EQ. 0 )
+            ELSE
+               NOTOK = ( VALUE .LT. VMIN ) .OR. ( VALUE .GT. VMAX ) .OR.
+     :                 ( MOD( VALUE, 3 ) .NE. 0 )
+            END IF
+\end{verbatim}
+
+and the error report would look something like this
+
+\begin{verbatim}
+    *  The value is not within the constraints, so report as an error,
+    *  including full information using tokens. 
+                IF ( NOTOK ) THEN
+                   STATUS = PAR__ERROR
+                   CALL MSG_SETC( 'PARAM', 'NAME' )
+                   CALL MSG_SETI( 'VALUE', VALUE )
+                   CALL MSG_SETI( 'MIN', VMIN )
+                   CALL MSG_SETI( 'MAX', VMAX )
+                   IF ( VMIN .GT. VMAX ) THEN
+                      CALL MSG_SETC( 'XCLD', 'outside' )
+                   ELSE
+                      CALL MSG_SETC( 'XCLD', 'in' )
+                   END IF
+
+                   CALL ERR_REP( 'fac_xxxxx_OUTR',
+     :               '^VALUE is not permitted for ^PARAM.  Please give '/
+     :               /'an integer ^XCLD the range ^MIN to ^MAX, and not '/
+     :               /'exactly divisible by 3.', STATUS )
+\end{verbatim}
+
+In practice you would probably define a logical variable outside the loop
+to indicate whether the range was inclusive or exclusive.\footnote{In
+the ADAM implementation users of your application may wish to take 
+advantage of the MAX/MIN facility.  If this is so you will need to add
+calls to PAR\_MAXI and PAR\_MINI in the previous example.}
+
+Having looked `behind the scenes', we can now look at what the PAR\_ extended
+routines offer.
+
+\subsection{Scalar Values between Limits}
+\label{se:range}
+
+A parameter value may be forced to lie within a range using a call to
+the generic routine PAR\_GDR0x.  The name is derived from {\em G\/}et
+with a {\em D\/}efault and {\em R\/}ange.  For example, 
+
+\begin{verbatim}
+          CALL PAR_GDR0R( 'SCALE', 1.0, 0.0, 2.0, .FALSE., SCAFAC, STATUS )
+\end{verbatim}
+
+gets the value for the real parameter SCALE using a dynamic default of
+1.0, stores the value in the variable SCAFAC, and ensures that the value
+lies in the range 0.0--2.0.  If a supplied value is out of this range,
+PAR\_GDR0R reports the acceptable limits and prompts the user for
+another value. (This applies to all the routines with constraints
+described in Section~\ref{se:extended}.)  Thus the user would see
+something like the following. 
+
+\begin{verbatim}
+    SCALE - Scale factor /1.0/ > 3.5
+    !! SUBPAR: 3.5 is greater than the MAXIMUM value 2.
+    SCALE - Scale factor /1.0/ >
+\end{verbatim}
+
+The fifth argument (NULL) will normally be false.  When it is true, it
+instructs the PAR routine to return the dynamic-default value whenever a
+null value is supplied, and then to annul the error status. So it should
+only be set to true when the dynamic default will {\em always\/} give
+reasonable behaviour in the application.  In the above case if NULL
+were made .TRUE., and the user entered the null symbol, the dialogue
+would be as follows.
+
+\begin{verbatim}
+    SCALE - Scale factor /1.0/ > !
+    !! A value of 1 has been adopted for parameter SCALE.
+\end{verbatim}
+
+For all but the last example in Section~\ref{se:extended}, the null flag
+is set to .FALSE., and will not be mentioned again until then.
+
+Swapping the limits lets you exclude values in the range.  Therefore, 
+
+\begin{verbatim}
+          CALL PAR_GDR0R( 'SCALE', 1.0, 2.0, 0.0, .FALSE., SCAFAC, STATUS )
+\end{verbatim}
+
+would permit a value of 3.5, unlike before, as well as 0.0 and 2.0. 
+However, 1.5 would not now be acceptable. 
+
+\begin{verbatim}
+    SCALE - Scale factor > 1.5
+    !! SUBPAR: 1.5 is in the excluded MIN/MAX range between 0 and 2.
+    SCALE - Scale factor >
+\end{verbatim} 
+
+Notice that the suggested default has disappeared.\footnote{This assumes
+that the ppath in the ADAM interface file starts with {\tt 'DYNAMIC'}.} 
+This occurred because 1.0 violates the range constraint, and it is a
+feature of the PAR\_ extended routines.  If you do not want a dynamic
+default, set the dynamic-default argument to a value that violates the
+constraints.  The range-exclusion feature is present in all the PAR\_
+extended routines that have a range constraint. 
+
+Not surprisingly, there are only versions of the range-constraint
+routines for integer, real, or double-precision parameters.   These have
+the usual I, R, and D suffices respectively.  The range limits have the
+same data type as the value.
+
+\subsection{Arrays of Values between Limits}
+\label{se:avl}
+
+There are similar generic routines for obtaining an array of values
+between limits.  The first permits up to a given number of values to be
+obtained.  We modify the example from the previous section to illustrate
+this routine. 
+
+\begin{verbatim}
+          REAL SCAFAC( 10 )
+ 
+              :       :       :
+
+          CALL PAR_GDRVR( 'SCALE', 10, 0.0, 2.0, .FALSE., SCAFAC,
+         :                NVAL, STATUS )
+\end{verbatim}
+
+This time up to ten values may be obtained from parameter SCALE, and
+stored in the array SCAFAC.  All the values must lie in the range
+0.0--2.0.  Since the number of values is not fixed, there is no
+dynamic-default argument.  PAR\_DEF1x can be called prior to PAR\_GDRVx,
+if desired. 
+
+If you want an exact number of values, there is a routine to do this
+for you.  For example, suppose that you want red, green, and blue
+intensities to define a colour, then the following code would obtain
+exactly three normalised intensities---one for each colour---between
+zero and one.
+
+\begin{verbatim}
+    *  Get an RGB colour.  The default is yellow.
+          DEFAUL( 1 ) = 1.0
+          DEFAUL( 2 ) = 1.0
+          DEFAUL( 3 ) = 0.0
+          CALL PAR_GDR1R( 'RGB', 3, DEFAUL, 0.0, 1.0, .FALSE., RGB, STATUS )
+\end{verbatim}
+
+The default must be an array.  Should you not want a dynamic default in
+this case, just set the first element of DEFAUL to be negative or
+greater than one. 
+
+From the user's perspective, instructions will be given if additional
+values are required.
+
+\begin{verbatim}
+    RGB - Red, green, and blue intensities /[1.0,1.0,0.0]/ > 1.0,0,0,0.5
+    !! Too many values have been entered for parameter RGB.
+    !! 3 more values are still needed.
+    RGB - Red, green, and blue intensities /[1.0,1.0,0.0]/ > 1.0,0.0
+    !! 1 more value is still needed.
+    RGB - Red, green, and blue intensities /[1.0,1.0,0.0]/ > 1.0,0.0,0.0
+    !! SUBPAR: No more than 3 elements are allowed for parameter RGB.
+    RGB - Red, green, and blue intensities /[1.0,1.0,0.0]/ > 0.0
+\end{verbatim} 
+
+First the user gives too many values, and is told how many to give.
+Next too few are supplied, so PAR\_GDR1R asks for another.  Again
+the user is not paying attention and gives the whole RGB value instead
+of just the outstanding blue intensity.  Finally, the user gives the
+last value, yielding an RGB of 1.0,0.0,0.0 or the colour red.
+
+Another variation of the theme is when you want to have an exact number
+of values, and each value is constrained to its own range.  
+For instance, suppose that you wanted to obtain the
+two-dimensional co-ordinates of a point within a rectangle, whose bounds
+are known.  The following code could obtain the required values, where
+LBND and UBND define the lower and upper co-ordinates of the rectangle.
+
+\begin{verbatim}
+          DOUBLE PRECISION DEFAUL( 2 ), POS( 2 )
+          DOUBLE PRECISION LBND( 2 ), UBND( 2 )
+
+              :       :       :
+
+    *  Set the limits of the area in which the point must lie.
+          LBND( 1 ) = 0.0D0
+          UBND( 1 ) = 50.0D0
+          LBND( 2 ) = -20.0D0
+          UBND( 2 ) = 10.0D0
+
+    *  Get the co-ordinates of the point within the rectangle.  There
+    *  is no dynamic default because the default violates the range
+    *  constraint.
+          DEFAUL( 1 ) = -1.0D0
+          CALL PAR_GRM1D( 'POSITION', 2, DEFAUL, LBND, UBND, 
+         :                .FALSE., POS, STATUS )
+\end{verbatim}
+
+PAR\_GRM1x will inform the user of any value(s) that violate a range,
+and prompts for new values.  The name is derived from {\em G\/}et with
+{\em R\/}anges for {\em M\/}ultiple dimensions.\footnote{In restrospect
+the name probably should have been PAR\_GDM1x for {\em G\/}et with
+{\em D\/}efaults and {\em M\/}ultiple ranges, but the existing name is
+already in use in applications.} 
+
+If you want to constrain each value of an array to its own range, but do
+not require an exact number of values, there is even a PAR routine to do
+that.  PAR\_GRMVx returns up to some maximum number of values of values,
+each within a defined range.  In the following example an application
+needs integer compression factors (COMPRS) along each of NDIM
+dimensions.  These must be positive and no greater than the size of the
+array along each dimension, and are set by the CMPMIN and CMPMAX arrays.
+ACTVAL returns the actual number values obtained from parameter
+COMPRESS, and in this example, it is used to set no compression for the
+higher dimensions. 
+
+\begin{verbatim}
+    *  Set the acceptable range of values from no compression to compress
+    *  to a single element in a dimension.
+          DO I = 1, NDIM
+             CMPMIN( I ) = 1
+             CMPMAX( I ) = DIMS( I )
+          END DO
+
+    *  Get the compression factors.
+          CALL PAR_GRMVI( 'COMPRESS', NDIM, CMPMIN, CMPMAX, COMPRS, ACTVAL,
+         :                STATUS )
+
+    *  Should less values be supplied than the number of dimensions, do
+    *  not compress the higher dimensions.
+          IF ( ACTVAL .LT. NDIM ) THEN
+             DO I = ACTVAL + 1, NDIM
+                COMPRS( I ) = 1
+             END DO
+          END IF
+\end{verbatim}
+
+\subsection{Parity Constraint}
+
+There are occasions when you need an odd or even integer.  For example,
+the size of a smoothing kernel must be odd.  PAR provides two routines
+with these functions.  Thus,
+
+\begin{verbatim}
+          CALL PAR_GODD( 'BOX', 5, 3, 11, .FALSE., BOXSIZ, STATUS )
+\end{verbatim}
+
+obtains an odd integer between 3 and 11 from parameter BOX, and stores
+it in variable BOXSIZ.  The dynamic default is 5.  Similarly,
+
+\begin{verbatim}
+          CALL PAR_GEVEN( 'OFFSET', 2, -2, 10, .FALSE., OFFS, STATUS )
+\end{verbatim}
+gets a even value in the range $-$2 to 10 from parameter OFFSET, with a
+dynamic default of 2.  Zero counts as an even number, and so it would be
+acceptable here.
+
+\subsection{Menu Constraint}
+
+A common requirement is to select an option from a menu.  PAR\_CHOIC
+offers this functionality.   You provide a list of options separated by
+commas.  When the user selects a choice not in this menu, an error
+report appears that lists the available options, and the user is
+prompted. \footnote{Remember that in the ADAM implementation the PAR\_GET0C
+call made by PAR\_CHOIC will first test the obtained value against the
+range or in fields in the interface file.  If the supplied value is
+unacceptable, the user will be prompted by PAR\_GET0C.  Only once these
+constraints are passed will the value be tested against the menu.}  
+PAR\_CHOIC permits the user of your application to use an unambiguous
+abbreviation.  However, the unshortened value is returned.  The value is
+also in uppercase, though the list of options need not be so. 
+
+\begin{verbatim}
+          CHARACTER * 10 FUNCT, OPTDEF
+          CHARACTER * 72 OPLIST
+
+              :       :       :
+
+          OPLIST = 'Exit,Device,Histogram,List,Peep,'/
+         :         /'Region,Save,Slice,Statistics,Value'
+          OPTDEF = 'Region'
+          CALL PAR_CHOIC( 'OPTION', OPTDEF, OPLIST, .FALSE., FUNCT, STATUS )
+\end{verbatim}
+
+So in the above example there are ten options available for parameter
+OPTION.  The dynamic default is 'Region'.  If you assign the second
+argument with a value not in the main list, such as a blank string, it
+instructs PAR\_CHOIC not to set a dynamic default. Note that
+PAR\_CHOIC only returns character values. 
+
+This is what the user might see for the above example.
+\begin{verbatim}
+    OPTION - Inspection option /'Region'/ > View
+    !! The choice View is not in the menu.  The options are
+    !     Exit,Device,Histogram,List,Peep,Region,Save,Slice,Statistics,Value.
+    !! Invalid selection for parameter OPTION.
+    OPTION - Inspection option /'Region'/ > S
+    !! The choice S is ambiguous.  The options are
+    !     Exit,Device,Histogram,List,Peep,Region,Save,Slice,Statistics,Value.
+    !! Invalid selection for parameter OPTION.
+    OPTION - Inspection option /'Region'/ > lust
+    Selected the nearest match "LIST" for parameter OPTION.
+\end{verbatim}
+
+The first value is unacceptable as it is not in the menu.  The second is
+ambiguous because there are several options beginning with an ess. Had
+the user entered {\tt sl} say, the abbreviation would have selected a
+value of 'SLICE'. The final value appears not to be in the list of
+choices, but PAR\_CHOIC allows the user one typing mistake, and so the
+user actually selects option 'LIST'. 
+
+There is a similar routine---PAR\_CHOIV---to get a vector of character
+values from a menu.
+
+\subsection{Combined Constraints}
+
+Should you wish to combine the constraints of a numeric value within a
+range, and a list of options, there are PAR routines to do it for you.
+Here is an illustration to show how this might be profitably used.  The
+application from which the following extract is taken wants to replace
+certain array values with a constant; this can either be a numeric value
+or set to the bad-pixel value. 
+
+\begin{verbatim}
+          CHARACTER * ( VAL__SZR ) CNEWLO, THLDEF
+
+              :       :       :
+
+    *  Get the replacement value.
+          THLDEF = '0.0'
+          CALL PAR_MIX0R( 'NEWLO', THLDEF, VAL__MINR, VAL__MAXR,
+         :                'Bad', .FALSE., CNEWLO, STATUS )
+
+          IF ( STATUS .EQ. SAI__OK ) THEN
+
+    *  It may be the bad-pixel value.
+             IF ( CNEWLO .EQ. 'BAD' ) THEN
+                NEWLO = VAL__BADR
+             ELSE
+
+    *  Convert the output numeric string to its numeric value.
+                CALL CHR_CTOR( CNEWLO, NEWLO, STATUS )
+             END IF
+          END IF
+\end{verbatim}
+
+This obtains from parameter NEWLO a value which is either 'BAD' or a
+real value.  The value is returned in varaible CNEWLO.  VAL\_\_MINR and
+VAL\_\_MAXR are the minimum and maximum values, and VAL\_\_BADR is the
+bad value, for the real data type, and VAL\_\_SZR is the maximum number
+of characters needed to store a real value; all symbolic constants are
+defined in the PRM\_PAR include file (SUN/39).  The dynamic default is
+'0.0'. Remember that the dynamic default and returned value are
+strings.  Therefore, you must first test the returned value for being any
+of the items on the menu, before converting it to a number.  Since the
+returned value may be undefined following an error, it is prudent to
+check the status before using the value. 
+
+Should the user give an unacceptable value, PAR\_MIX0x informs the user
+of the error and lists the available options, and then invites the user
+to supply another value. 
+
+Here is a more subtle example.  This only has numbers in the menu, but
+it is advantageous when only certain numeric values are acceptable.
+\begin{verbatim}
+    *  Get the plate number.
+          CALL PAR_MIX0I( 'PLATE', ' ', 101, 1500, '5,11,23,47,49',
+         :                .FALSE., CPLATE, STATUS )
+          IF ( STATUS .EQ. SAI__OK ) 
+         :  CALL CHR_CTOI( CPLATE, PLATNO, STATUS )
+\end{verbatim}
+
+Here PAR\_MIX0I obtains an `integer' that is either 5, 11, 23, 47, 49,
+or in the range 101--1500, and returns it in the {\em character\/}
+variable CPLATE.  CHR\_CTOI converts the string into a true integer
+value, PLATNO.  Since the second argument of PAR\_MIX0I is a blank
+string, there is no dynamic default.  To produce a suggested default,
+the second argument would have to be one of the menu options, or satisfy
+the range constraint (when converted to an integer). If we had swapped
+the range limits, PAR\_MIX0I would allow all values not in the range
+102--1499. 
+
+\subsection{Logical Value}
+
+PAR\_GTD0L obtains a scalar logical value, with a dynamic default
+defined, and has the capability of handling a null status.  Thus the
+following obtains a value from the parameter SWITCH and stores it in the
+variable called POWER.  The dynamic default is .TRUE..
+
+\begin{verbatim}
+           NULL = .FALSE.
+           CALL PAR_GTD0L( 'SWITCH', .TRUE., NULL, POWER, STATUS )
+\end{verbatim}
+
+The third argument is the same as we met in Section~\ref{se:range}. If
+we reverse the polarity of NULL, PAR\_GTD0L will assign the dynamic
+default to POWER whenever the parameter is in the null state, and
+returns with STATUS set to SAI\_\_OK.  To reiterate NULL=.TRUE. should
+only be used when the dynamic default will {\em always\/} give
+reasonable behaviour in the application.  This is highly likely for a
+logical value. 
+
+\section{Other Types of Parameters}
+
+Besides the numeric, character, and logical parameters we have seen so
+far, there is another class of parameter to which some of the PAR
+routines may be applied.  In {\footnotesize ADAM}, these are parameters
+that specify the name of an HDS or Fortran data file, a magnetic-tape or
+graphics device.
+
+The values are obtained from such parameters by calling special routines
+within the particular subroutine library that connect to the
+{\footnotesize ADAM} parameter system.  The routines are usually called
+{\it fac}\_ASSOC, where {\it fac\/} is the facility name of the package,
+{\it e.g.}\ NDF\_ASSOC accesses an NDF whose name is found via a
+parameter, and SGS\_ASSOC obtains the name of an SGS graphics device.
+There are also {\it fac}\_CANCL routines that free other resources
+opened by the corresponding {\it fac}\_ASSOC routine, and therefore you
+should not use PAR\_CANCL to cancel parameters obtained by using an {\it
+fac}\_ASSOC routine. However, it is possible and quite legitimate to
+call PAR\_PROMT to set a prompt string for this class of parameter, or
+to call PAR\_DEF0C to set the dynamic default, or to find the state of a
+parameter using PAR\_STATE. 
+
+\section{Compilation and Linking}
+
+\subsection{VMS}
+
+PAR is presently only available to {\footnotesize ADAM} programmers. 
+Only the normal ADAM startup commands need be issued to access routines
+in the PAR library.  These are
+
+\begin{verbatim}
+     $ ADAMSTART
+     $ ADAMDEV
+     $ PAR_DEV
+\end{verbatim}
+
+and they will ensure that all necessary definitions are made for
+compilation and linking. 
+
+PAR is distributed as a shareable image, and it is included in the
+{\footnotesize ADAM} ALINK command.  So to link an {\footnotesize ADAM}
+A-task called PROG you just enter
+
+\begin{verbatim}
+     $ FORTRAN PROG
+     $ ALINK PROG
+\end{verbatim}
+
+\subsection{UNIX}
+
+To compile and link a UNIX {\footnotesize ADAM} application called prog
+with the PAR library, you should use the following command. 
+
+\begin{verbatim}
+    alink prog.f
+\end{verbatim}
+
+\section{Acknowledgements}
+
+Dennis Kelly and Alan Chipperfield wrote the original simple PAR library
+and the {\footnotesize ADAM} parameter system.  Some of the extended
+routines are partly based on AIF routines written by Dave Baines and
+Steven Beard at ROE.  Thanks to Alan Chipperfield for explaining the
+workings of the {\footnotesize ADAM} parameter system to the author, and
+for a critical reading of this document.  Rodney Warren-Smith also
+suggested many improvements. 
+
+\newpage
+\appendix
+\small
+
+\section{Alphabetical List of Routines}
+The argument lists of the following routines, together with on-line 
+help information, are available within the Starlink language-sensitive
+editor STARLSE (SUN/105).
+
+\noteroutine{PAR\_CANCL( PARAM, STATUS )}
+            {Cancel a parameter}
+\noteroutine{PAR\_CHOIC( PARAM, DEFAUL, OPTS, NULL, VALUE, STATUS )}
+            {Obtain from a parameter a character value selected from a menu
+             of options}
+\noteroutine{PAR\_CHOIV( PARAM, MAXVAL, OPTS, VALUES, ACTVAL, STATUS )}
+            {Obtain from a parameter a list of character values selected from
+            a menu of options}
+\noteroutine{PAR\_DEF0x( PARAM, VALUE, STATUS )}
+            {Set a scalar dynamic default parameter value}
+\noteroutine{PAR\_DEF1x( PARAM, NVAL VALUES, STATUS )}
+            {Set a vector of values as the dynamic default for a parameter}
+\noteroutine{PAR\_DEFNx( PARAM, NDIM, MAXD, VALUES, ACTD, STATUS )}
+            {Set an array of values as the dynamic default for a parameter}
+\noteroutine{PAR\_EXACx( PARAM, NVALS, VALUES, STATUS )}
+            {Obtain an exact number of values from a parameter}
+\noteroutine{PAR\_GDR0x( PARAM, DEFAUL, VMIN, VMAX, NULL, VALUE, STATUS )}
+            {Obtain a scalar value within a given range from a parameter}
+\noteroutine{PAR\_GDR1x( PARAM, NVALS, DEFAUL, VMIN, VMAX, NULL, VALUES,
+             STATUS )}
+            {Obtain an exact number of values within a given range from a parameter}
+\noteroutine{PAR\_GDRVx( PARAM, MAXVAL, VMIN, VMAX, VALUES, ACTVAL, STATUS )}
+            {Obtain a vector of values within a given range from a parameter}
+\noteroutine{PAR\_GET0x( PARAM, VALUE, STATUS )}
+            {Obtain a scalar value from a parameter}
+\noteroutine{PAR\_GET1x( PARAM, MAXVAL, VALUES, ACTVAL, STATUS )}
+            {Obtain a vector of values from a parameter}
+\noteroutine{PAR\_GETNx( PARAM, NDIM, MAXD, VALUES, ACTD, STATUS )}
+            {Obtain an array parameter value}
+\noteroutine{PAR\_GETVx( PARAM, MAXVAL, VALUES, ACTVAL, STATUS )}
+            {Obtain a vector of values from a parameter regardless of its shape}
+\noteroutine{PAR\_GEVEN( PARAM, DEFAUL, VMIN, VMAX, NULL, VALUE, STATUS )}
+            {Obtain an even integer value from a parameter}
+\noteroutine{PAR\_GODD( PARAM, DEFAUL, VMIN, VMAX, NULL, VALUE, STATUS )}
+            {Obtain an odd integer value from a parameter}
+\noteroutine{PAR\_GRM1x( PARAM, NVALS, DEFAUL, VMIN, VMAX, NULL, VALUES,
+             STATUS )}
+            {Obtain from a parameter an exact number of values each within a
+             given range}
+\noteroutine{PAR\_GRMVx( PARAM, MAXVAL, VMIN, VMAX, VALUES, ACTVAL,
+             STATUS )}
+            {Obtain from a parameter a vector of values each within a given
+             range}
+\noteroutine{PAR\_GTD0L( PARAM, DEFAUL, NULL, VALUE, STATUS )}
+            {Obtain a logical value from a parameter with a dynamic default}
+\noteroutine{PAR\_MAXx( PARAM, VALUE, STATUS )}
+            {Set a maximum value for a parameter}
+\noteroutine{PAR\_MINx( PARAM, VALUE, STATUS )}
+            {Set a minimum value for a parameter}
+\noteroutine{PAR\_MIX0x( PARAM, DEFAUL, VMIN, VMAX, OPTS, NULL, VALUE,
+             STATUS~)}
+            {Obtain from a parameter a character value either from a menu of
+             options or as a numeric value within a given range}
+\newlength{\mixvindent}
+\settowidth{\mixvindent}{\small \bf PAR\_MIXVx(}
+\noteroutine{PAR\_MIXVx( PARAM, MAXVAL, VMIN, VMAX, OPTS, VALUES, ACTVAL,
+             \\\hspace*{\mixvindent} STATUS~)}
+            {Obtain from a parameter, character values either selected from a
+             menu of options or as numeric values within a given range}
+\noteroutine{PAR\_PROMT( PARAM, PROMPT, STATUS )}
+            {Set a new prompt string for a parameter}
+\noteroutine{PAR\_PUT0x( PARAM, VALUE, STATUS )}
+            {Put a scalar value into a parameter}
+\noteroutine{PAR\_PUT1x( PARAM, NVAL, VALUES, STATUS )}
+            {Put a vector of values into a parameter}
+\noteroutine{PAR\_PUTNx( PARAM, NDIM, MAXD, VALUES, ACTD, STATUS )}
+            {Put an array of values into a parameter}
+\noteroutine{PAR\_PUTVx( PARAM, NVAL, VALUES, STATUS )}
+            {Put an array of values into a parameter as if the parameter were a vector}
+\noteroutine{PAR\_STATE( PARAM, STATE, STATUS )}
+            {Inquire the state of a parameter}
+\noteroutine{PAR\_UNSET( PARAM, WHICH, STATUS )}
+            {Cancel various parameter control values.}
+
+\section{Classified List of Routines}
+
+\subsection{Getting Values from a Parameter without Constraints}
+
+\noteroutine{PAR\_GET0x( PARAM, VALUE, STATUS )}
+            {Obtain a scalar value from a parameter}
+\noteroutine{PAR\_GET1x( PARAM, MAXVAL, VALUES, ACTVAL, STATUS )}
+            {Obtain a vector of values from a parameter}
+\noteroutine{PAR\_GETNx( PARAM, NDIM, MAXD, VALUES, ACTD, STATUS )}
+            {Obtain an array parameter value}
+\noteroutine{PAR\_GETVx( PARAM, MAXVAL, VALUES, ACTVAL, STATUS )}
+            {Obtain a vector of values from a parameter regardless of its shape}
+
+\subsection{Getting Parameter Values from a Menu}
+
+\noteroutine{PAR\_CHOIC( PARAM, DEFAUL, OPTS, NULL, VALUE, STATUS )}
+            {Obtain from a parameter a character value selected from a menu
+             of options}
+\noteroutine{PAR\_CHOIV( PARAM, MAXVAL, OPTS, VALUES, ACTVAL, STATUS )}
+            {Obtain from a parameter a list of character values selected from
+            a menu of options}
+\noteroutine{PAR\_MIX0x( PARAM, DEFAUL, VMIN, VMAX, OPTS, NULL, VALUE,
+             STATUS~)}
+            {Obtain from a parameter a character value either from a menu of
+             options or as a numeric value within a given range}
+\noteroutine{PAR\_MIXVx( PARAM, MAXVAL, VMIN, VMAX, OPTS, VALUES, ACTVAL,
+             \\\hspace*{\mixvindent} STATUS~)}
+            {Obtain from a parameter, character values either selected from a
+             menu of options or as numeric values within a given range}
+
+\subsection{Getting Values within Ranges}
+
+\noteroutine{PAR\_GDR0x( PARAM, DEFAUL, VMIN, VMAX, NULL, VALUE, STATUS )}
+            {Obtain a scalar value within a given range from a parameter}
+\noteroutine{PAR\_GDR1x( PARAM, NVALS, DEFAUL, VMIN, VMAX, NULL, VALUES,
+             STATUS )}
+            {Obtain an exact number of values within a given range from a parameter}
+\noteroutine{PAR\_GDRVx( PARAM, MAXVAL, VMIN, VMAX, VALUES, ACTVAL, STATUS )}
+            {Obtain a vector of values within a given range from a parameter}
+\noteroutine{PAR\_GEVEN( PARAM, DEFAUL, VMIN, VMAX, NULL, VALUE, STATUS )}
+            {Obtain an even integer value from a parameter}
+\noteroutine{PAR\_GODD( PARAM, DEFAUL, VMIN, VMAX, NULL, VALUE, STATUS )}
+            {Obtain an odd integer value from a parameter}
+\noteroutine{PAR\_GRM1x( PARAM, NVALS, DEFAUL, VMIN, VMAX, NULL, VALUES,
+             STATUS )}
+            {Obtain from a parameter an exact number of values each within a
+             given range}
+\noteroutine{PAR\_GRMVx( PARAM, MAXVAL, VMIN, VMAX, VALUES, ACTVAL,
+             STATUS )}
+            {Obtain from a parameter a vector of values each within a given
+             range}
+\noteroutine{PAR\_MIX0x( PARAM, DEFAUL, VMIN, VMAX, OPTS, NULL, VALUE,
+             STATUS~)}
+            {Obtain from a parameter a character value either from a menu of
+             options or as a numeric value within a given range}
+\noteroutine{PAR\_MIXVx( PARAM, MAXVAL, VMIN, VMAX, OPTS, VALUES, ACTVAL,
+             \\\hspace*{\mixvindent} STATUS~)}
+            {Obtain from a parameter, character values either selected from a
+             menu of options or as numeric values within a given range}
+
+
+\subsection{Putting Values into Parameters}
+
+\noteroutine{PAR\_PUT0x( PARAM, VALUE, STATUS )}
+            {Put a scalar value into a parameter}
+\noteroutine{PAR\_PUT1x( PARAM, NVAL, VALUES, STATUS )}
+            {Put a vector of values into a parameter}
+\noteroutine{PAR\_PUTNx( PARAM, NDIM, MAXD, VALUES, ACTD, STATUS )}
+            {Put an array of values into a parameter}
+\noteroutine{PAR\_PUTVx( PARAM, NVAL, VALUES, STATUS )}
+            {Put an array of values into a parameter as if the parameter were a vector}
+
+\subsection{Miscellaneous}
+
+\noteroutine{PAR\_CANCL( PARAM, STATUS )}
+            {Cancel a parameter}
+\noteroutine{PAR\_GTD0L( PARAM, DEFAUL, NULL, VALUE, STATUS )}
+            {Obtain a logical value from a parameter with a dynamic default}
+\noteroutine{PAR\_MAXx( PARAM, VALUE, STATUS )}
+            {Set a maximum value for a parameter}
+\noteroutine{PAR\_MINx( PARAM, VALUE, STATUS )}
+            {Set a minimum value for a parameter}
+\noteroutine{PAR\_PROMT( PARAM, PROMPT, STATUS )}
+            {Set a new prompt string for a parameter}
+\noteroutine{PAR\_UNSET( PARAM, WHICH, STATUS )}
+            {Cancel various parameter control values.}
+
+\subsection{Inquiry Routines}
+
+\noteroutine{PAR\_STATE( PARAM, STATE, STATUS )}
+            {Inquire the state of a parameter}
+
+\section{Error Codes}
+
+If a PAR routine completes its task successfully, it will return with
+status SAI\_\_OK.  If it detects an error condition, PAR defines the
+following error codes.
+
+\begin{center}
+\begin{tabular}{|ll|}
+\hline
+Symbolic name & Meaning \\ \hline
+PAR\_\_ACINV & Invalid access mode for the parameter \\
+PAR\_\_AMBIG & Ambiguous option list \\
+PAR\_\_ERROR & Some undefined error \\
+PAR\_\_NULL & Null parameter value \\ \hline
+\end{tabular}
+\end{center}
+
+\newpage
+\section{Correspondence between PAR and SUBPAR States}
+
+PAR and SUBPAR states do not have a one-to-one correspondence.  Each
+SUBPAR state is equated to the appropriate generic PAR states.  The
+former version of PAR\_STATE routine returned SUBPAR states, rather than
+the PAR states as happens now.  Existing applications which compare the
+returned state with any of SUBPAR\_\_GROUND, SUBPAR\_\_ACTIVE,
+SUBPAR\_\_CANCEL, and SUBPAR\_\_NULL (defined in SUBPAR\_PAR) will
+continue to function, since the PAR equivalents have the same numerical
+values. 
+
+\begin{table}[h]
+\caption{The PAR states.}
+\begin{center}
+\begin{tabular}{|l|l|l|}
+\hline
+PAR Symbolic name & Meaning & SUBPAR states \\ \hline
+PAR\_\_GROUND & The parameter has never had a value.    & SUBPAR\_\_GROUND \\
+              &                                         & SUBPAR\_\_EOL \\
+              &                                         & SUBPAR\_\_RESET \\
+              &                                         & SUBPAR\_\_ACCEPT \\
+              &                                         & SUBPAR\_\_RESACC \\
+              &                                         & SUBPAR\_\_FPROMPT \\
+              &                                         & SUBPAR\_\_RESPROM \\
+              &                                         & SUBPAR\_\_ACCPR \\
+              &                                         & SUBPAR\_\_RESACCPR \\
+PAR\_\_ACTIVE & The parameter has a value.              & SUBPAR\_\_ACTIVE \\
+              &                                         & SUBPAR\_\_MAX \\
+              &                                         & SUBPAR\_\_MIN \\
+PAR\_\_CANCEL & The parameter value has been cancelled. & SUBPAR\_\_CANCEL \\
+PAR\_\_NULLST & The parameter is null.                  & SUBPAR\_\_NULL \\ \hline
+\end{tabular}
+\end{center}
+\end{table}
+
+\newpage
+\section{Reference Manual}
+\label{ap:ref}
+
+\sstroutine{
+   PAR\_CANCL
+}{
+   Cancels a parameter
+}{
+   \sstdescription{
+      The named parameter is cancelled. A subsequent attempt to get a value
+      for the parameter will result in a new value being obtained by the
+      underlying parameter system.
+   }
+   \sstinvocation{
+      CALL PAR\_CANCL( PARAM, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER$*$($*$) (Given)
+      }{
+         The name of the parameter to be cancelled.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      The routine attempts to execute regardless of the value of
+      STATUS.  If the import value is not SAI\_\_OK, then it is left
+      unchanged, even if the routine fails to complete.  If the STATUS
+      is SAI\_\_OK on entry and the routine fails to complete, STATUS
+      will be set to an appropriate error number, and there will one or
+      more additional error reports.
+   }
+}
+
+\sstroutine{
+   PAR\_CHOIC
+}{
+   Obtains from a parameter a character value selected from a menu
+   of options
+}{
+   \sstdescription{
+      This routine obtains a scalar character value from a parameter.
+      The value must be one of a supplied list of acceptable values,
+      and can be an abbreviation provided it is unambiguous.  A dynamic
+      default may be suggested.
+   }
+   \sstinvocation{
+      CALL PAR\_CHOIC( PARAM, DEFAUL, OPTS, NULL, VALUE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The name of the parameter.
+      }
+      \sstsubsection{
+         DEFAUL = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The suggested default value for the parameter.  No default
+         will be suggested when DEFAUL is not one of the options defined
+         by OPTS.  A status of PAR\_\_AMBIG is returned if the default is
+         ambiguous, {\it i.e.}\ an abbreviation of more than one of the
+         options.
+      }
+      \sstsubsection{
+         OPTS = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The list of acceptable options for the value obtained from the
+         parameter.  Items should be separated by commas.  The list is
+         case-insensitive.
+      }
+      \sstsubsection{
+         NULL = LOGICAL (Given)
+      }{
+         NULL controls the behaviour of this routine when the parameter
+         is in the null state.  If NULL is .FALSE., this routine
+         returns with STATUS=PAR\_\_NULL.  If NULL is .TRUE., the
+         returned VALUE takes the value of DEFAUL, a message informs
+         the user of the value used for the parameter, and this routine
+         returns with STATUS=SAI\_\_OK.  This feature is intended for
+         convenient handling of null values.  NULL should only be set
+         to .TRUE. when the value of DEFAUL will always give a
+         reasonable value for the parameter.
+      }
+      \sstsubsection{
+         VALUE = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         The selected option from the list.  It is in uppercase and
+         in full, even if an abbreviation has been given for the actual
+         parameter.  If STATUS is returned not equal to SAI\_\_OK, VALUE
+         takes the value of DEFAUL.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      The search for a match of the obtained character value with an
+      item in the menu adheres to the following rules.
+      \begin{itemize}
+         \item All comparisons are performed in uppercase.  Leading blanks
+         are ignored.
+         \item A match is found when the value equals the full name of an
+         option.  This enables an option to be the prefix of another
+         item without it being regarded as ambiguous.  For example,
+         {\tt "}10,100,200{\tt "} would be an acceptable list of options.
+         \item If there is no exact match, an abbreviation is acceptable.
+         A comparison is made of the value with each option for the
+         number of characters in the value.  The option that best fits
+         the value is declared a match, subject to two provisos.
+         Firstly, there must be no more than one character different
+         between the value and the start of the option.  (This allows
+         for a mistyped character.)  Secondly, there must be only one
+         best-fitting option.  Whenever these criteria are not
+         satisfied, the user is told of the error, and is presented
+         with the list of options, before being prompted for a new
+         value.
+         \end{itemize}
+   }
+}
+
+\sstroutine{
+   PAR\_CHOIV
+}{
+   Obtains from a parameter a list of character values selected from
+   a menu of options
+}{
+   \sstdescription{
+      This routine obtains a vector of character values from a
+      parameter.  Each value must be one of a supplied list of
+      acceptable values, and can be an abbreviation provided it is
+      unambiguous.
+   }
+   \sstinvocation{
+      CALL PAR\_CHOIV( PARAM, MAXVAL, OPTS, VALUES, ACTVAL, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The name of the parameter.
+      }
+      \sstsubsection{
+         MAXVAL = INTEGER (Given)
+      }{
+         The maximum number of values required.  A PAR\_\_ERROR status is
+         returned when the number of values requested is less than one.
+      }
+      \sstsubsection{
+         OPTS = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The list of acceptable options for the values obtained from the
+         parameter.  Items should be separated by commas.  The list is
+         case-insensitive.
+      }
+      \sstsubsection{
+         VALUES( MAXVAL ) = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         The selected options from the list in the order supplied to the
+         parameter.  They are in uppercase and in full, even if an
+         abbreviation has been given for the actual parameter.
+      }
+      \sstsubsection{
+         ACTVAL = INTEGER (Returned)
+      }{
+         The actual number of values obtained.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      The search for a match of each obtained character value with an
+      item in the menu adheres to the following rules.
+      \begin{itemize}
+      \item  All comparisons are performed in uppercase.  Leading blanks
+         are ignored.
+      \item  A match is found when the value equals the full name of an
+         option.  This enables an option to be the prefix of another
+         item without it being regarded as ambiguous.  For example,
+         {\tt "}10,100,200{\tt "} would be an acceptable list of options.
+      \item  If there is no exact match, an abbreviation is acceptable.
+         A comparison is made of the value with each option for the
+         number of characters in the value.  The option that best fits
+         the value is declared a match, subject to two provisos.
+         Firstly, there must be no more than one character different
+         between the value and the start of the option.  (This allows
+         for a mistyped character.)  Secondly, there must be only one
+         best-fitting option.  Whenever these criteria are not
+         satisfied, the user is told of the error, and is presented
+         with the list of options, before being prompted for a new
+         value.
+         \end{itemize}
+   }
+}
+
+\sstroutine{
+   PAR\_DEF0x
+}{
+   Sets a scalar dynamic default parameter value
+}{
+   \sstdescription{
+      This routine sets a scalar as the dynamic default value for a
+      parameter. The dynamic default may be used as the parameter value
+      by means of appropriate specifications in the interface file.
+
+      If the declared parameter type differs from the type of the
+      value supplied, then conversion is performed.
+   }
+   \sstinvocation{
+      CALL PAR\_DEF0x( PARAM, VALUE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The name of the parameter.
+      }
+      \sstsubsection{
+         VALUE = ? (Given)
+      }{
+         The dynamic default value for the parameter.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for each of the data types character,
+         double precision, integer, logical, and real: replace {\tt "x"} in the
+         routine name by C, D, I, L, or R respectively as appropriate.  The
+         VALUE argument must have the corresponding data type.
+      }
+   }
+}
+
+\sstroutine{
+   PAR\_DEF1x
+}{
+   Sets a vector of values as the dynamic default for a parameter
+}{
+   \sstdescription{
+      This routine sets a 1-dimensional array of values as the dynamic
+      default for a parameter. The dynamic default may be used as the
+      parameter value by means of appropriate specifications in the
+      interface file.
+
+      If the declared parameter type differs from the type of the
+      array supplied, then conversion is performed.
+   }
+   \sstinvocation{
+      CALL PAR\_DEF1x( PARAM, NVAL, VALUES, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The name of a parameter of primitive type.
+      }
+      \sstsubsection{
+         NVAL = INTEGER (Given)
+      }{
+         The number of default values.
+      }
+      \sstsubsection{
+         VALUES( NVAL ) = ? (Given)
+      }{
+         The array to contain the default values.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for each of the data types character,
+         double precision, integer, logical, and real: replace {\tt "x"} in the
+         routine name by C, D, I, L, or R respectively as appropriate.  The
+         VALUES argument must have the corresponding data type.
+      }
+   }
+}
+
+\sstroutine{
+   PAR\_DEFNx
+}{
+   Sets an array of values as the dynamic default for a parameter
+}{
+   \sstdescription{
+      This routine sets an array of values as the dynamic default for
+      a parameter. The dynamic default may be used as the parameter
+      value by means of appropriate specifications in the interface
+      file.
+
+      If the declared parameter type differs from the type of the
+      array supplied, then conversion is performed.
+   }
+   \sstinvocation{
+      CALL PAR\_DEFNx( PARAM, NDIM, MAXD, VALUES, ACTD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER$*$($*$) (Given)
+      }{
+         The name of the parameter.
+      }
+      \sstsubsection{
+         NDIM = INTEGER (Given)
+      }{
+         The number of dimensions of the values array.
+      }
+      \sstsubsection{
+         MAXD( NDIM ) = INTEGER (Given)
+      }{
+         The dimensions of the values' array.
+      }
+      \sstsubsection{
+         VALUES( $*$ ) = ? (Given)
+      }{
+         The default values, given in Fortran order.
+      }
+      \sstsubsection{
+         ACTD( NDIM ) = INTEGER (Given)
+      }{
+         The dimensions of the dynamic default object to be created.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for each of the data types character,
+         double precision, integer, logical, and real: replace {\tt "x"} in the
+         routine name by C, D, I, L, or R respectively as appropriate.  The
+         VALUES argument must have the corresponding data type.
+
+         \sstitem
+         The current implementation of the underlying parameter system,
+         SUBPAR, creates an $n$-dimensional HDS object, containing the
+         specified values. The ACTD argument gives the dimensions of
+         the object to be created.  If the dynamic default is used as the
+         suggested value in a prompt, the name of this object, rather than
+         its contents, is offered.
+      }
+   }
+}
+
+\sstroutine{
+   PAR\_EXACx
+}{
+   Obtains an exact number of values from a parameter
+}{
+   \sstdescription{
+      This routine obtains an exact number of values from a parameter
+      and stores them in a vector.  If the number of values obtained
+      is less than that requested, a further get or gets will occur
+      for the remaining values until the exact number required is
+      obtained (or an error occurs).  The routine reports how many
+      additional values are required prior to these further reads.
+      Should too many values be entered an error results and a further
+      read is attempted.
+   }
+   \sstinvocation{
+      CALL PAR\_EXACx( PARAM, NVALS, VALUES, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The name of the parameter.
+      }
+      \sstsubsection{
+         NVALS = INTEGER (Given)
+      }{
+         The number of values needed.  Values will be requested until
+         exactly this number of values (no more and no less) has been
+         obtained.
+      }
+      \sstsubsection{
+         VALUES( NVALS ) = ? (Returned)
+      }{
+         The values obtained from the parameter system.  They will only
+         be valid if STATUS is not set to an error value.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for each of the data types character,
+         double precision, integer, logical, and real: replace {\tt "x"} in the
+         routine name by C, D, I, L, or R respectively as appropriate.  The
+         VALUES argument must have the corresponding data type.
+
+         \sstitem
+         If more than one attempt is made is to obtain the values, the
+         current value of the parameter will be only that read at the
+         last get, and not the full array of values.
+
+         \sstitem
+         A PAR\_\_ERROR status is returned when the number of values
+         requested is not positive.
+      }
+   }
+}
+
+\sstroutine{
+   PAR\_GDR0x
+}{
+   Obtains a scalar value within a given range from a parameter
+}{
+   \sstdescription{
+      This routine obtains from a parameter a scalar value that lies
+      within a supplied range of acceptable values.  A dynamic default
+      may be defined.
+   }
+   \sstinvocation{
+      CALL PAR\_GDR0x( PARAM, DEFAUL, VMIN, VMAX, NULL, VALUE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The name of the parameter.
+      }
+      \sstsubsection{
+         DEFAUL = ? (Given)
+      }{
+         The suggested-default value for the parameter.  No default
+         will be suggested when DEFAUL is not within the range of
+         acceptable values defined by VMIN and VMAX.
+      }
+      \sstsubsection{
+         VMIN = ? (Given)
+      }{
+         The value immediately above a range wherein the obtained
+         value cannot lie.  Thus if VMAX is greater than VMIN, VMIN
+         is the minimum allowed for the obtained value.  However,
+         should VMAX be less than VMIN, all values are acceptable
+         except those between VMAX and VMIN exclusive.
+      }
+      \sstsubsection{
+         VMAX = ? (Given)
+      }{
+         The value immediately below a range wherein the obtained
+         value cannot lie.  Thus if VMAX is greater than VMIN, VMAX
+         is the maximum allowed for the obtained value.  However,
+         should VMAX be less than VMIN, all values are acceptable
+         except those between VMAX and VMIN exclusive.
+      }
+      \sstsubsection{
+         NULL = LOGICAL (Given)
+      }{
+         NULL controls the behaviour of this routine when the parameter
+         is in the null state.  If NULL is .FALSE., this routine
+         returns with STATUS=PAR\_\_NULL.  If NULL is .TRUE., the
+         returned VALUE takes the value of DEFAUL, a message informs
+         the user of the value used for the parameter, and this routine
+         returns with STATUS=SAI\_\_OK.  This feature is intended for
+         convenient handling of null values.  NULL should only be set
+         to .TRUE. when the value of DEFAUL will always give a
+         reasonable value for the parameter.
+      }
+      \sstsubsection{
+         VALUE  = ? (Returned)
+      }{
+         The value associated with the parameter.  If STATUS is returned
+         not equal to SAI\_\_OK, VALUE takes the value of DEFAUL.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for each of the data types double precision,
+         integer, and real: replace {\tt "x"} in the routine name by
+         D, I, or R respectively as appropriate.  The DEFAUL, VMIN,
+         VMAX, and VALUE arguments all must have the corresponding
+         data type.
+
+         \sstitem
+         If the value violates the constraint, the user is informed of
+         the constraint and prompted for another value.
+      }
+   }
+}
+
+\sstroutine{
+   PAR\_GDR1x
+}{
+   Obtains an exact number of values within a given range from a
+   parameter
+}{
+   \sstdescription{
+      This routine obtains an exact number of values from a parameter.
+      all of which must be within a supplied range of acceptable
+      values.  Dynamic defaults may be defined.
+   }
+   \sstinvocation{
+      CALL PAR\_GDR1x( PARAM, NVALS, DEFAUL, VMIN, VMAX, NULL, VALUES,
+                      STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The name of the parameter.
+      }
+      \sstsubsection{
+         NVALS = INTEGER (Given)
+      }{
+         The number of values needed.  Values will be requested until
+         exactly this number (no more and no less) has been obtained.
+      }
+      \sstsubsection{
+         DEFAUL( NVALS ) = ? (Given)
+      }{
+         The suggested-default values for the parameter.  No default
+         will be suggested when any of the DEFAUL elements is not
+         within the range of acceptable values defined by VMIN and
+         VMAX.
+      }
+      \sstsubsection{
+         VMIN = ? (Given)
+      }{
+         The value immediately above a range wherein the obtained
+         values cannot lie.  Thus if VMAX is greater than VMIN, VMIN
+         is the minimum allowed for the obtained values.  However,
+         should VMAX be less than VMIN, all values are acceptable
+         except those between VMAX and VMIN exclusive.
+      }
+      \sstsubsection{
+         VMAX = ? (Given)
+      }{
+         The value immediately below a range wherein the obtained
+         values cannot lie.  Thus if VMAX is greater than VMIN, VMAX
+         is the maximum allowed for the obtained values.  However,
+         should VMAX be less than VMIN, all values are acceptable
+         except those between VMAX and VMIN exclusive.
+      }
+      \sstsubsection{
+         NULL = LOGICAL (Given)
+      }{
+         NULL controls the behaviour of this routine when the parameter
+         is in the null state.  If NULL is .FALSE., this routine
+         returns with STATUS=PAR\_\_NULL.  If NULL is .TRUE., the
+         returned VALUE takes the value of DEFAUL, a message informs
+         the user of the value used for the parameter, and this routine
+         returns with STATUS=SAI\_\_OK.  This feature is intended for
+         convenient handling of null values.  NULL should only be set
+         to .TRUE. when the value of DEFAUL will always give reasonable
+         values for the parameter.
+      }
+      \sstsubsection{
+         VALUES( NVALS ) = ? (Returned)
+      }{
+         The values associated with the parameter.  If STATUS is
+         returned not equal to SAI\_\_OK, VALUE takes the values of
+         DEFAUL.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for each of the data types double precision,
+         integer, and real: replace {\tt "x"} in the routine name by
+         D, I, or R respectively as appropriate.  The DEFAUL, VMIN, VMAX,
+         and VALUES arguments all must have the corresponding data type.
+
+         \sstitem
+         If any of the values violates the constraint, the user is
+         informed of the constraint and prompted for another vector of
+         values.  This is not achieved through the MIN/MAX system.
+      }
+   }
+}
+
+\sstroutine{
+   PAR\_GDRVx
+}{
+   Obtains a vector of values within a given range from a parameter
+}{
+   \sstdescription{
+      This routine obtains up to a given number of values from a
+      parameter.  All the values must be within a supplied range of
+      acceptable values.
+   }
+   \sstinvocation{
+      CALL PAR\_GDRVx( PARAM, MAXVAL, VMIN, VMAX, VALUES, ACTVAL,
+                      STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The name of the parameter.
+      }
+      \sstsubsection{
+         MAXVAL = INTEGER (Given)
+      }{
+         The maximum number of values required.  A PAR\_\_ERROR status is
+         returned when the number of values requested is less than one.
+      }
+      \sstsubsection{
+         VMIN = ? (Given)
+      }{
+         The value immediately above a range wherein the obtained
+         values cannot lie.  Thus if VMAX is greater than VMIN, VMIN
+         is the minimum allowed for the obtained values.  However,
+         should VMAX be less than VMIN, all values are acceptable
+         except those between VMAX and VMIN exclusive.
+      }
+      \sstsubsection{
+         VMAX = ? (Given)
+      }{
+         The value immediately below a range wherein the obtained
+         values cannot lie.  Thus if VMAX is greater than VMIN, VMAX
+         is the maximum allowed for the obtained values.  However,
+         should VMAX be less than VMIN, all values are acceptable
+         except those between VMAX and VMIN exclusive.
+      }
+      \sstsubsection{
+         VALUES( MAXVAL ) = ? (Returned)
+      }{
+         The values associated with the parameter.  They will only be
+         valid if STATUS is not set to an error value.
+      }
+      \sstsubsection{
+         ACTVAL = INTEGER (Returned)
+      }{
+         The actual number of values obtained.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for each of the data types double precision,
+         integer, and real: replace {\tt "x"} in the routine name by D, I, or R
+         respectively as appropriate.  The VMIN, VMAX, and VALUES arguments
+         all must have the corresponding data type.
+
+         \sstitem
+         Should too many values be read, the parameter system will
+         repeat the get in order to obtain a permitted number of values.
+
+         \sstitem
+         If any of the values violates the constraint, the user is
+         informed of the constraint and prompted for another vector of
+         values.  This is not achieved through the MIN/MAX system.
+      }
+   }
+}
+
+\sstroutine{
+   PAR\_GET0x
+}{
+   Obtains a scalar value from a parameter
+}{
+   \sstdescription{
+      This routine obtains a scalar value from a parameter.  If it is
+      necessary, the value is converted to the required type.
+   }
+   \sstinvocation{
+      CALL PAR\_GET0x( PARAM, VALUE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The parameter name.
+      }
+      \sstsubsection{
+         VALUE = ? (Returned)
+      }{
+         The parameter value.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for each of the data types character,
+         double precision, integer, logical, and real: replace {\tt "x"} in the
+         routine name by C, D, I, L, or R respectively as appropriate.  The
+         VALUE argument must have the corresponding data type.
+
+         \sstitem
+         Note that a scalar (0-dimensional) parameter is different from
+         a vector (1-dimensional) parameter containing a single value.
+      }
+   }
+}
+
+\sstroutine{
+   PAR\_GET1x
+}{
+   Obtains a vector of values from a parameter
+}{
+   \sstdescription{
+      This routine obtains a vector of values from a parameter. If it is
+      necessary, the values are converted to the required type.
+   }
+   \sstinvocation{
+      CALL PAR\_GET1x( PARAM, MAXVAL, VALUES, ACTVAL, STATUS )
+   }
+   \newpage
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The parameter name.
+      }
+      \sstsubsection{
+         MAXVAL = INTEGER (Given)
+      }{
+         The maximum number of values that can be obtained.
+      }
+      \sstsubsection{
+         VALUES( MAXVAL ) = ? (Returned)
+      }{
+         The array to receive the values associated with the parameter.
+      }
+      \sstsubsection{
+         ACTVAL = INTEGER (Returned)
+      }{
+         The actual number of values obtained.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for each of the data types character,
+         double precision, integer, logical, and real: replace {\tt "x"} in the
+         routine name by C, D, I, L, or R respectively as appropriate.  The
+         VALUES argument must have the corresponding data type.
+
+         \sstitem
+         Note that this routine will accept a scalar value, returning
+         a single-element vector.
+      }
+   }
+}
+
+\sstroutine{
+   PAR\_GETNx
+}{
+   Obtains an array parameter value
+}{
+   \sstdescription{
+      This routine obtains an $n$-dimensional array of values from a
+      parameter.  If necessary, the values are converted to the
+      required type.
+   }
+   \sstinvocation{
+      CALL PAR\_GETNx( PARAM, NDIM, MAXD, VALUES, ACTD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The parameter name.
+      }
+      \sstsubsection{
+         NDIM = INTEGER (Given)
+      }{
+         The number of dimensions of the values array.
+         This must match the number of dimensions of the parameter.
+      }
+      \sstsubsection{
+         MAXD( NDIM ) = INTEGER (Given)
+      }{
+         Array specifying the maximum dimensions of the array to be
+         read. These may not be smaller than the dimensions of the
+         actual parameter nor greater than the dimensions of the VALUES
+         array.
+      }
+      \sstsubsection{
+         VALUES( $*$ ) = ? (Returned)
+      }{
+         The values obtained from the parameter.  These are in Fortran
+         order.
+      }
+      \sstsubsection{
+         ACTD( NDIM ) = INTEGER (Returned)
+      }{
+         The actual dimensions of the array.  Unused dimensions are set
+         to 1.
+      }
+      \sstsubsection{
+         STATUS = INTEGER
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for each of the data types character,
+         double precision, integer, logical, and real: replace {\tt "x"} in the
+         routine name by C, D, I, L, or R respectively as appropriate.  The
+         VALUES argument must have the corresponding data type.
+
+         \sstitem
+         Note that this routine will accept a scalar value, returning
+         a single-element array with the specified number of dimensions.
+      }
+   }
+}
+
+\sstroutine{
+   PAR\_GETVx
+}{
+   Obtains a vector of values from a parameter regardless of the
+   its shape
+}{
+   \sstdescription{
+      This routine obtains an array of values from a parameter
+      as if the parameter were vectorized ({\it i.e.}\ regardless of its
+      dimensionality).  If necessary, the values are converted to the
+      required type.
+   }
+   \sstinvocation{
+      CALL PAR\_GETVx( PARAM, MAXVAL, VALUES, ACTVAL, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The parameter name.
+      }
+      \sstsubsection{
+         MAXVAL = INTEGER (Given)
+      }{
+         The maximum number of values that can be held in the values
+         array.
+      }
+      \sstsubsection{
+         VALUES( MAXVAL ) = ? (Returned)
+      }{
+         Array to receive the values associated with the object.
+      }
+      \sstsubsection{
+         ACTVAL = INTEGER (Returned)
+      }{
+         The actual number of values obtained.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for each of the data types character,
+         double precision, integer, logical, and real: replace {\tt "x"} in the
+         routine name by C, D, I, L, or R respectively as appropriate.  The
+         VALUES argument must have the corresponding data type.
+
+         \sstitem
+         Note that this routine will accept a scalar value, returning
+         a single-element vector.
+      }
+   }
+}
+
+\sstroutine{
+   PAR\_GEVEN
+}{
+   Obtains an even integer value from a parameter
+}{
+   \sstdescription{
+      This routine obtains a scalar integer value from a parameter.
+      This value must be even and within a supplied range of acceptable
+      values.  A dynamic default may be defined.
+   }
+   \sstinvocation{
+      CALL PAR\_GEVEN( PARAM, DEFAUL, VMIN, VMAX, NULL, VALUE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The name of the parameter.
+      }
+      \sstsubsection{
+         DEFAUL = INTEGER (Given)
+      }{
+         The suggested-default value for the parameter.  No default
+         will be suggested when DEFAUL is not within the range of
+         acceptable values defined by VMIN and VMAX, or DEFAUL is odd.
+      }
+      \sstsubsection{
+         VMIN = INTEGER (Given)
+      }{
+         The value immediately above a range wherein the obtained
+         value cannot lie.  Thus if VMAX is greater than VMIN, VMIN
+         is the minimum allowed for the obtained value.  However,
+         should VMAX be less than VMIN, all values are acceptable
+         except those between VMAX and VMIN exclusive.
+      }
+      \sstsubsection{
+         VMAX = INTEGER (Given)
+      }{
+         The value immediately below a range wherein the obtained
+         value cannot lie.  Thus if VMAX is greater than VMIN, VMAX
+         is the maximum allowed for the obtained value.  However,
+         should VMAX be less than VMIN, all values are acceptable
+         except those between VMAX and VMIN exclusive.
+      }
+      \sstsubsection{
+         NULL = LOGICAL (Given)
+      }{
+         NULL controls the behaviour of this routine when the parameter
+         is in the null state.  If NULL is .FALSE., this routine
+         returns with STATUS=PAR\_\_NULL.  If NULL is .TRUE., the
+         returned VALUE takes the value of DEFAUL, a message informs
+         the user of the value used for the parameter, and this routine
+         returns with STATUS=SAI\_\_OK.  This feature is intended for
+         convenient handling of null values.  NULL should only be set
+         to .TRUE. when the value of DEFAUL will always give a
+         reasonable value for the parameter.
+      }
+      \sstsubsection{
+         VALUE  = INTEGER (Returned)
+      }{
+         The value associated with the parameter.  If STATUS is returned
+         not equal to SAI\_\_OK, VALUE takes the value of DEFAUL.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Zero is deemed to be even.
+
+         \sstitem
+         If the value violates the constraint, the user is informed of
+         the constraint and prompted for another value.
+      }
+   }
+}
+
+\sstroutine{
+   PAR\_GODD
+}{
+   Obtains an odd integer value from a parameter
+}{
+   \sstdescription{
+      This routine obtains a scalar integer value from a parameter.
+      This value must be odd and within a supplied range of acceptable
+      values.  A dynamic default may be defined.
+   }
+   \sstinvocation{
+      CALL PAR\_GODD( PARAM, DEFAUL, VMIN, VMAX, NULL, VALUE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The name of the parameter.
+      }
+      \sstsubsection{
+         DEFAUL = INTEGER (Given)
+      }{
+         The suggested-default value for the parameter.  No default
+         will be suggested when DEFAUL is not within the range of
+         acceptable values defined by VMIN and VMAX, or DEFAUL is odd.
+      }
+      \sstsubsection{
+         VMIN = INTEGER (Given)
+      }{
+         The value immediately above a range wherein the obtained
+         value cannot lie.  Thus if VMAX is greater than VMIN, VMIN
+         is the minimum allowed for the obtained value.  However,
+         should VMAX be less than VMIN, all values are acceptable
+         except those between VMAX and VMIN exclusive.
+      }
+      \sstsubsection{
+         VMAX = INTEGER (Given)
+      }{
+         The value immediately below a range wherein the obtained
+         value cannot lie.  Thus if VMAX is greater than VMIN, VMAX
+         is the maximum allowed for the obtained value.  However,
+         should VMAX be less than VMIN, all values are acceptable
+         except those between VMAX and VMIN exclusive.
+      }
+      \sstsubsection{
+         NULL = LOGICAL (Given)
+      }{
+         NULL controls the behaviour of this routine when the parameter
+         is in the null state.  If NULL is .FALSE., this routine
+         returns with STATUS=PAR\_\_NULL.  If NULL is .TRUE., the
+         returned VALUE takes the value of DEFAUL, a message informs
+         the user of the value used for the parameter, and this routine
+         returns with STATUS=SAI\_\_OK.  This feature is intended for
+         convenient handling of null values.  NULL should only be set
+         to .TRUE. when the value of DEFAUL will always give a
+         reasonable value for the parameter.
+      }
+      \sstsubsection{
+         VALUE  = INTEGER (Returned)
+      }{
+         The value associated with the parameter.  If STATUS is returned
+         not equal to SAI\_\_OK, VALUE takes the value of DEFAUL.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Zero is deemed to be even.
+
+         \sstitem
+         If the value violates the constraint, the user is informed of
+         the constraint and prompted for another value.
+      }
+   }
+}
+
+\sstroutine{
+   PAR\_GRM1x
+}{
+   Obtains from a parameter an exact number of values each within a
+   given range
+}{
+   \sstdescription{
+      This routine obtains an exact number of values from a parameter.
+      Each value must be within its own range of acceptable values
+      supplied to the routine.  Dynamic defaults may be defined.
+
+      This routine is particularly useful for obtaining co-ordinate
+      information, where each co-ordinate has different bounds, and
+      a series of calls to PAR\_GDR0x would not permit an arbitrary
+      number of dimensions.
+   }
+   \sstinvocation{
+      CALL PAR\_GRM1x( PARAM, NVALS, DEFAUL, VMIN, VMAX, NULL, VALUES,
+                      STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The name of the parameter.
+      }
+      \sstsubsection{
+         NVALS = INTEGER (Given)
+      }{
+         The number of values needed.  Values will be requested until
+         exactly this number (no more and no less) has been obtained.
+      }
+      \sstsubsection{
+         DEFAUL( NVALS ) = ? (Given)
+      }{
+         The suggested-default values for the parameter.  No default
+         will be suggested when any of the DEFAUL elements is not
+         within the range of acceptable values defined by VMIN and
+         VMAX for that value.
+      }
+      \sstsubsection{
+         VMIN( NVALS ) = ? (Given)
+      }{
+         The values immediately above a range wherein each obtained
+         value cannot lie.  Thus if VMAX is greater than VMIN, VMIN
+         is the minimum allowed for the corresponding obtained value.
+         However, should VMAX be less than VMIN, all values are
+         acceptable except those between VMAX and VMIN exclusive.
+      }
+      \sstsubsection{
+         VMAX( NVALS ) = ? (Given)
+      }{
+         The values immediately below a range wherein each obtained
+         value cannot lie.  Thus if VMAX is greater than VMIN, VMAX
+         is the maximum allowed for the corresponding obtained value.
+         However, should VMAX be less than VMIN, all values are
+         acceptable except those between VMAX and VMIN exclusive.
+      }
+      \sstsubsection{
+         NULL = LOGICAL (Given)
+      }{
+         NULL controls the behaviour of this routine when the parameter
+         is in the null state.  If NULL is .FALSE., this routine
+         returns with STATUS=PAR\_\_NULL.  If NULL is .TRUE., the
+         returned VALUE takes the value of DEFAUL, a message informs
+         the user of the value used for the parameter, and this routine
+         returns with STATUS=SAI\_\_OK.  This feature is intended for
+         convenient handling of null values.  NULL should only be set
+         to .TRUE. when the value of DEFAUL will always give reasonable
+         values for the parameter.
+      }
+      \sstsubsection{
+         VALUES( NVALS ) = ? (Returned)
+      }{
+         The values associated with the parameter.  If STATUS is
+         returned not equal to SAI\_\_OK, VALUE takes the values of
+         DEFAUL.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for each of the data types double precision,
+         integer, and real: replace {\tt "x"} in the routine name by D, I, or R
+         respectively as appropriate.  The DEFAUL, VMIN, VMAX, and VALUES
+         arguments must have the corresponding data type.
+
+         \sstitem
+         If any of the values violates the constraints, the user is
+         informed of the constraints and prompted for another vector of
+         values.  This is not achieved through the MIN/MAX system.
+      }
+   }
+}
+
+\sstroutine{
+   PAR\_GRMVx
+}{
+   Obtains from a parameter a vector of values each within a given
+   range
+}{
+   \sstdescription{
+      This routine obtains from a parameter up to a given number of
+      values.  Each value must be within its own range of acceptable
+      values supplied to the routine.
+
+      This routine is particularly useful for obtaining values that
+      apply to $n$-dimensional array where each value is constrained by
+      the size or bounds of the array, and where the number of values
+      need not equal $n$.  For example, the size of a smoothing kernel
+      could be defined by one value that applies to all dimensions, or
+      as individual sizes along each dimension.
+   }
+   \sstinvocation{
+      CALL PAR\_GRMVx( PARAM, MAXVAL, VMIN, VMAX, VALUES, ACTVAL,
+                      STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The name of the parameter.
+      }
+      \sstsubsection{
+         MAXVAL = INTEGER (Given)
+      }{
+         The maximum number of values required.  A PAR\_\_ERROR status is
+         returned when the number of values requested is less than one.
+      }
+      \sstsubsection{
+         VMIN( MAXVAL ) = ? (Given)
+      }{
+        The values immediately above a range wherein each obtained
+         value cannot lie.  Thus if VMAX is greater than VMIN, VMIN
+         is the minimum allowed for the corresponding obtained value.
+         However, should VMAX be less than VMIN, all values are
+         acceptable except those between VMAX and VMIN exclusive.
+      }
+      \sstsubsection{
+         VMAX( MAXVAL ) = ? (Given)
+      }{
+         The values immediately below a range wherein each obtained
+         value cannot lie.  Thus if VMAX is greater than VMIN, VMAX
+         is the maximum allowed for the corresponding obtained value.
+         However, should VMAX be less than VMIN, all values are
+         acceptable except those between VMAX and VMIN exclusive.
+      }
+      \sstsubsection{
+         VALUES( MAXVAL ) = ? (Returned)
+      }{
+         The values associated with the parameter.  They will only be
+         valid if STATUS is not set to an error value.
+      }
+      \sstsubsection{
+         ACTVAL = INTEGER (Returned)
+      }{
+         The actual number of values obtained.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for each of the data types double precision,
+         integer, and real: replace {\tt "x"} in the routine name by D, I, or R
+         respectively as appropriate.  The VMIN, VMAX, and VALUES
+         arguments must have the corresponding data type.
+
+         \sstitem
+         Should too many values be obtained, the parameter system will
+         repeat the get in order to obtain a permitted number of values.
+
+         \sstitem
+         If any of the values violates the constraints, the user is
+         informed of the constraints and prompted for another vector of
+         values.  This is not achieved through the MIN/MAX system.
+      }
+   }
+}
+
+\sstroutine{
+   PAR\_GTD0L
+}{
+   Obtains a logical value from a parameter with a dynamic
+   default
+}{
+   \sstdescription{
+      This routine obtains a scalar logical value from a parameter.
+      A dynamic default is defined.
+   }
+   \sstinvocation{
+      CALL PAR\_GTD0L( PARAM, DEFAUL, NULL, VALUE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The name of the parameter.
+      }
+      \sstsubsection{
+         DEFAUL = LOGICAL (Given)
+      }{
+         The suggested default value for the parameter.
+      }
+      \sstsubsection{
+         NULL = LOGICAL (Given)
+      }{
+         NULL controls the behaviour of this routine when the parameter
+         is in the null state.  If NULL is .FALSE., this routine
+         returns with STATUS=PAR\_\_NULL.  If NULL is .TRUE., the
+         returned VALUE takes the value of DEFAUL, a message informs
+         the user of the value used for the parameter, and this routine
+         returns with STATUS=SAI\_\_OK.  This feature is intended for
+         convenient handling of null values.  NULL should only be set
+         to .TRUE. when the value of DEFAUL will always give a
+         reasonable value for the parameter.
+      }
+      \sstsubsection{
+         VALUE  = LOGICAL (Returned)
+      }{
+         The value associated with the parameter.  It will only be
+         valid if STATUS is not set to an error value.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+
+\sstroutine{
+   PAR\_MAXx
+}{
+   Sets a maximum value for a parameter
+}{
+   \sstdescription{
+      This routine sets a maximum value for the specified parameter.
+      The value will be used as an upper limit for any value
+      subsequently obtained for the parameter.
+
+      If the routine fails, any existing maximum value will be unset.
+   }
+   \sstinvocation{
+      CALL PAR\_MAXx( PARAM, VALUE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER$*$($*$) (Given)
+      }{
+         The parameter name.
+      }
+      \sstsubsection{
+         VALUE = ? (Given)
+      }{
+         The value to be set as the maximum.  It must not be outside
+         any RANGE specified for the parameter in the interface file.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for each of the data types character,
+         integer, real, and double precision: replace {\tt "x"} in the routine
+         name by C, I, R, or D respectively as appropriate.  The VALUE
+         argument must have the corresponding data type.  If the parameter
+         has a different type, the maximum value will be converted to the
+         type of the parameter which must be character, double precision,
+         integer, or real.
+
+         \sstitem
+         If a minimum value has been set (using PAR\_MINx) that is
+         greater than the maximum at the time the parameter value is
+         obtained, only values between the limits will not be permitted.
+
+         \sstitem
+         The maximum value set by this routine overrides any upper
+         RANGE value which may have been specified in the interface file.
+         The specified value must not be outside any RANGE values.  The
+         maximum value may also be selected as the parameter value---again
+         in preference to any upper RANGE value---by specifying MAX as the
+         parameter value on the command line or in response to a prompt.
+      }
+   }
+}
+
+\sstroutine{
+   PAR\_MINx
+}{
+   Sets a minimum value for a parameter
+}{
+   \sstdescription{
+      This routine sets a minimum value for the specified parameter.
+      The value will be used as a lower limit for any value
+      subsequently obtained for the parameter.
+
+      If the routine fails, any existing minimum value will be unset.
+   }
+   \sstinvocation{
+      CALL PAR\_MINx( PARAM, VALUE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The parameter name.
+      }
+      \sstsubsection{
+         VALUE = ? (Given)
+      }{
+         The value to be set as the minimum. It must not be outside
+         any RANGE specified for the parameter in the interface file.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for each of the data types character,
+         integer, real, and double precision: replace {\tt "x"} in the routine
+         name by C, I, R, or D respectively as appropriate.  The VALUE
+         argument must have the corresponding data type.  If the parameter
+         has a different type, the minimum value will be converted to the
+         type of the parameter which must be character, double precision,
+         integer, or real.
+
+         \sstitem
+         If a maximum value has been set (using PAR\_MAXx) that is less
+         than the minimum at the time the parameter value is obtained,
+         only values between the limits will not be permitted.
+
+         \sstitem
+         The minimum value set by this routine overrides any lower
+          RANGE value which may have been specified in the interface file.
+         The specified value must not be outside any RANGE values.  The
+         minimum value may also be selected as the parameter value---again
+         in preference to any lower RANGE value---by specifying MIN as the
+         parameter value on the command line or in response to a prompt.
+      }
+   }
+}
+
+\sstroutine{
+   PAR\_MIX0x
+}{
+   Obtains from a parameter a character value from either a menu of
+   options or within a numeric range
+}{
+   \sstdescription{
+      This routine obtains a scalar character value from a parameter.
+      The value must be either:
+      \begin{itemize}
+         \item one of a supplied list of acceptable values, with
+            unambiguous abbreviations accepted; or
+
+         \item a numeric character string equivalent to a number, and the
+            number must lie within a supplied range of acceptable
+            values.
+      \end{itemize}
+
+      A dynamic default may be suggested.
+   }
+   \sstinvocation{
+      CALL PAR\_MIX0x( PARAM, DEFAUL, VMIN, VMAX, OPTS, NULL, VALUE,
+                      STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The name of the parameter.
+      }
+      \sstsubsection{
+         DEFAUL = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The suggested-default value for the parameter.  No default
+         will be suggested when DEFAUL is not numeric within the range
+         of acceptable values defined by VMIN and VMAX, and not one of
+         the options defined by OPTS.  A status of PAR\_\_AMBIG is
+         returned if the default is ambiguous, {\it i.e.}\ an abbreviation of
+         more than one of the options.
+      }
+      \sstsubsection{
+         VMIN = ? (Given)
+      }{
+        The value immediately above a range wherein the obtained
+         numeric value cannot lie.  Thus if VMAX is greater than VMIN,
+         VMIN is the minimum numeric value allowed for the obtained
+         value.  However, should VMAX be less than VMIN, all numeric
+         values are acceptable except those between VMAX and VMIN
+         exclusive.
+      }
+      \sstsubsection{
+         VMAX = ? (Given)
+      }{
+         The value immediately below a range wherein the obtained
+         numeric value cannot lie.  Thus if VMAX is greater than VMIN,
+         VMAX is the maximum numeric value allowed for the obtained
+         value.  However, should VMAX be less than VMIN, all numeric
+         values are acceptable except those between VMAX and VMIN
+         exclusive.
+      }
+      \sstsubsection{
+         OPTS = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The list of acceptable options for the value obtained from the
+         parameter.  Items should be separated by commas.  The list is
+         case-insensitive.
+      }
+      \sstsubsection{
+         NULL = LOGICAL (Given)
+      }{
+         NULL controls the behaviour of this routine when the parameter
+         is in the null state.  If NULL is .FALSE., this routine
+         returns with STATUS=PAR\_\_NULL.  If NULL is .TRUE., the
+         returned VALUE takes the value of DEFAUL, a message informs
+         the user of the value used for the parameter, and this routine
+         returns with STATUS=SAI\_\_OK.  This feature is intended for
+         convenient handling of null values.  NULL should only be set
+         to .TRUE. when the value of DEFAUL will always give a
+         reasonable value for the parameter.
+      }
+      \sstsubsection{
+         VALUE = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         The selected option from the list or the character form of the
+         numeric value.  The former is in uppercase and in full, even
+         if an abbreviation has been given for the actual parameter.
+         If STATUS is returned not equal to SAI\_\_OK, VALUE takes the
+         value of DEFAUL.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for each of the data types double precision,
+         integer, and real: replace {\tt "x"} in the routine name by D, I, or R
+         respectively as appropriate.  The VMIN and VMAX arguments must
+         have the corresponding data type.
+
+         \sstitem
+         There are two stages to identify or validate the character
+         value obtained from the parameter.
+
+      In the first the value is converted to the data type specified by
+      the {\tt "x"} in the routine name.  If this is successful, the derived
+      numeric value is compared with the range of acceptable values
+      defined by VMIN and VMAX.  A value satisfying these constraints
+      is returned in VALUE and the routine exits.
+
+      The second stage searches for a match of the character value with
+      an item in the menu.  This step adheres to the following rules.
+         \begin{itemize}
+         \item  The value is converted to the data type specified by the
+         {\tt "x"} in the routine name.  If this is successful, the numeric
+         value is compared with the range of acceptable values defined
+         by VMIN and VMAX.  A value satisfying these constraints is
+         returned and the matching process terminates.
+         \item  All comparisons are performed in uppercase.  Leading blanks
+         are ignored.
+         \item  A match is found when the value equals the full name of an
+         option.  This enables an option to be the prefix of another
+         item without it being regarded as ambiguous.  For example,
+         {\tt "}10,100,200{\tt "} would be an acceptable list of options.
+         \item  If there is no exact match, an abbreviation is acceptable.
+         A comparison is made of the value with each option for the
+         number of characters in the value.  The option that best fits
+         the value is declared a match, subject to two provisos.
+         Firstly, there must be no more than one character different
+         between the value and the start of the option.  (This allows
+         for a mistyped character.)  Secondly, there must be only one
+         best-fitting option.  Whenever these criteria are not
+         satisfied, the user is told of the error, and is presented
+         with the list of options, before being prompted for a new
+         value.  This is not achieved through the MIN/MAX system.
+         \end{itemize}
+      }
+   }
+}
+
+\sstroutine{
+   PAR\_MIXVx
+}{
+   Obtains from a parameter character values from either a menu of
+   options or within a numeric range
+}{
+   \sstdescription{
+      This routine obtains a vector of character values from a
+      parameter.  Each value must be either:
+         \begin{itemize}
+
+         \item one of a supplied list of acceptable values, with
+            unambiguous abbreviations accepted; or
+
+         \item  a numeric character string equivalent to a number, and the
+            number must lie within a supplied range of acceptable
+            values.
+         \end{itemize}
+   }
+   \sstinvocation{
+      CALL PAR\_MIXVx( PARAM, MAXVAL, VMIN, VMAX, OPTS, VALUES, ACTVAL,
+                      STATUS )
+   }
+   \newpage
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The name of the parameter.
+      }
+      \sstsubsection{
+         MAXVAL = INTEGER (Given)
+      }{
+         The maximum number of values required.  A PAR\_\_ERROR status is
+         returned when the number of values requested is less than one.
+      }
+      \sstsubsection{
+         VMIN = ? (Given)
+      }{
+         The value immediately above a range wherein the obtained
+         numeric values cannot lie.  Thus if VMAX is greater than VMIN,
+         VMIN is the minimum numeric value allowed for the obtained
+         values.  However, should VMAX be less than VMIN, all numeric
+         values are acceptable except those between VMAX and VMIN
+         exclusive.
+      }
+      \sstsubsection{
+         VMAX = ? (Given)
+      }{
+         The value immediately below a range wherein the obtained
+         numeric values cannot lie.  Thus if VMAX is greater than VMIN,
+         VMAX is the maximum numeric value allowed for the obtained
+         values.  However, should VMAX be less than VMIN, all numeric
+         values are acceptable except those between VMAX and VMIN
+         exclusive.
+      }
+      \sstsubsection{
+         OPTS = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The list of acceptable options for each value obtained from the
+         parameter.  Items should be separated by commas.  The list is
+         case-insensitive.
+      }
+      \sstsubsection{
+         VALUES( MAXVAL ) = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         The selected values that are either options from the list or
+         the character form of numeric values that satisfy the range
+         constraint.  The former values are in uppercase and in full,
+         even if an abbreviation has been given for the actual
+         parameter.  Note that all values must satisfy the constraints.
+         The values will only be valid if STATUS is not set to an error
+         value.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for each of the data types double precision,
+         integer, and real: replace {\tt "x"} in the routine name by D, I, or R
+         respectively as appropriate.  The VMIN and VMAX arguments must
+         have the corresponding data type.
+
+         \sstitem
+         There are two stages to identify or validate each character
+         value obtained from the parameter.
+
+      In the first the value is converted to the data type specified by
+      the {\tt "x"} in the routine name.  If this is successful, the derived
+      numeric value is compared with the range of acceptable values
+      defined by VMIN and VMAX.  A value satisfying these constraints
+      is returned in the VALUES.
+
+      The second stage searches for a match of the character value with
+      an item in the menu.  This step adheres to the following rules.
+         \begin{itemize}
+         \item  The value is converted to the data type specified by the
+         {\tt "x"} in the routine name.  If this is successful, the numeric
+         value is compared with the range of acceptable values defined
+         by VMIN and VMAX.  A value satisfying these constraints is
+         returned and the matching process terminates.
+         \item  All comparisons are performed in uppercase.  Leading blanks
+         are ignored.
+         \item  A match is found when the value equals the full name of an
+         option.  This enables an option to be the prefix of another
+         item without it being regarded as ambiguous.  For example,
+         {\tt "}10,100,200{\tt "} would be an acceptable list of options.
+         \item  If there is no exact match, an abbreviation is acceptable.
+         A comparison is made of the value with each option for the
+         number of characters in the value.  The option that best fits
+         the value is declared a match, subject to two provisos.
+         Firstly, there must be no more than one character different
+         between the value and the start of the option.  (This allows
+         for a mistyped character.)  Secondly, there must be only one
+         best-fitting option.  Whenever these criteria are not
+         satisfied, the user is told of the error, and is presented
+         with the list of options, before being prompted for a new
+         values.  This is not achieved through the MIN/MAX system.
+         \end{itemize}
+
+      This routine exits when all the values satisfy the criteria.
+      }
+   }
+}
+
+\sstroutine{
+   PAR\_PROMT
+}{
+   Sets a new prompt string for a parameter
+}{
+   \sstdescription{
+      Replace the prompt string for the indicated parameter by the
+      given string.
+   }
+   \sstinvocation{
+      CALL PAR\_PROMT( PARAM, PROMPT, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The parameter name.
+      }
+      \sstsubsection{
+         PROMPT = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The new prompt string.
+      }
+      \sstsubsection{
+         STATUS = INTEGER
+      }{
+         The global status.
+      }
+   }
+}
+
+\sstroutine{
+   PAR\_PUT0x
+}{
+   Puts a scalar value into a parameter
+}{
+   \sstdescription{
+      This routine puts a scalar value into a parameter.  If necessary,
+      the specified value is converted to the type of the parameter.
+   }
+   \sstinvocation{
+      CALL PAR\_PUT0x( PARAM, VALUE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The parameter name.
+      }
+      \sstsubsection{
+         VALUE = ? (Given)
+      }{
+         The value to be put into the parameter.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for each of the data types character,
+         double precision, integer, logical, and real: replace {\tt "x"} in the
+         routine name by C, D, I, L, or R respectively as appropriate.  The
+         VALUE argument must have the corresponding data type.
+
+         \sstitem
+         A scalar (0-dimensional) parameter is different from a vector
+         (1-dimensional) parameter containing a single value.
+
+         \sstitem
+         In order to obtain a storage object for the parameter, the
+         current implementation of the underlying ADAM parameter system
+         will proceed in the same way as it does for input parameters.
+         This can result in users being prompted for `a value'. This
+         behaviour, and how to avoid it, is discussed further in the
+         Interface Module Reference Manual (SUN/115).
+
+         \sstitem
+         Limit checks for IN, RANGE, MIN/MAX are not applied.
+      }
+   }
+}
+
+\sstroutine{
+   PAR\_PUT1x
+}{
+   Puts a vector of values into a parameter
+}{
+   \sstdescription{
+      This routine puts a 1-dimensional array of values into a
+      parameter.  If necessary, the specified array is converted to
+      the type of the parameter.
+   }
+   \sstinvocation{
+      CALL PAR\_PUT1x( PARAM, NVAL, VALUES, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The parameter name.
+      }
+      \sstsubsection{
+         NVAL = INTEGER (Given)
+      }{
+         The number of values that are to be put into the parameter.
+      }
+      \sstsubsection{
+         VALUES( NVAL ) = ? (Given)
+      }{
+         The array of values to be put into the parameter.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for each of the data types character,
+         double precision, integer, logical, and real: replace {\tt "x"} in the
+         routine name by C, D, I, L, or R respectively as appropriate.  The
+         VALUES argument must have the corresponding data type.
+
+         \sstitem
+         A scalar (0-dimensional) parameter is different from a vector
+         (1-dimensional) parameter containing a single value.
+
+         \sstitem
+         In order to obtain a storage object for the parameter, the
+         current implementation of the underlying ADAM parameter system
+         will proceed in the same way as it does for input parameters.
+         This can result in users being prompted for `a value'. This
+         behaviour, and how to avoid it, is discussed further in the
+         Interface Module Reference Manual (SUN/115).
+
+         \sstitem
+         Limit checks for IN, RANGE, MIN/MAX are not applied.
+      }
+   }
+}
+
+\sstroutine{
+   PAR\_PUTNx
+}{
+   Puts an array of values into a parameter
+}{
+   \sstdescription{
+      This routine puts an $n$-dimensional array of values into a
+      parameter.  If necessary, the specified array is converted to
+      the type of the parameter.
+   }
+   \sstinvocation{
+      CALL PAR\_PUTNx ( PARAM, NDIM, MAXD, VALUES, ACTD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The parameter name.
+      }
+      \sstsubsection{
+         NDIM = INTEGER (Given)
+      }{
+         The number of dimensions of the values array.  This must match
+         the number of dimensions of the object.
+      }
+      \sstsubsection{
+         MAXD( NDIM ) = INTEGER (Given)
+      }{
+         The array specifying the dimensions of the array to be put.
+         These may not be greater than the actual dimensions of the
+         parameter nor those of the VALUES array.
+      }
+      \sstsubsection{
+         VALUES( $*$ ) = ? (Given)
+      }{
+         The array of values to be put into the parameter.  These must
+         be in Fortran order.
+      }
+      \sstsubsection{
+         ACTD( NDIM ) = INTEGER (Returned)
+      }{
+         The actual dimensions of the parameter.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for each of the data types character,
+         double precision, integer, logical, and real: replace {\tt "x"} in the
+         routine name by C, D, I, L, or R respectively as appropriate.  The
+         VALUES argument must have the corresponding data type.
+
+         \sstitem
+         In order to obtain a storage object for the parameter, the
+         current implementation of the underlying ADAM parameter system
+         will proceed in the same way as it does for input parameters.
+         This can result in users being prompted for `a value'. This
+         behaviour, and how to avoid it, is discussed further in the
+         Interface Module Reference Manual (SUN/115).
+
+         \sstitem
+         Limit checks for IN, RANGE, MIN/MAX are not applied.
+      }
+   }
+}
+
+\sstroutine{
+   PAR\_PUTVx
+}{
+   Puts an array of values into a parameter as if the parameter were
+   a vector
+}{
+   \sstdescription{
+      This routine puts a 1-dimensional array of primitive values into
+      a parameter as it if the parameter were vectorized ({\it i.e.}\
+      regardless of its actual dimensionality).  If necessary, the
+      specified array is converted to the type of the parameter.
+   }
+   \sstinvocation{
+      CALL PAR\_PUTVx( PARAM, NVAL, VALUES, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The parameter name.
+      }
+      \sstsubsection{
+         NVAL = INTEGER (Given)
+      }{
+         The number of values that are to be put into the parameter.
+         It must match the actual parameter's size.
+      }
+      \sstsubsection{
+         VALUES( NVAL ) = ? (Given)
+      }{
+         The values to be put into the parameter.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for each of the data types character,
+         double precision, integer, logical, and real: replace {\tt "x"} in the
+         routine name by C, D, I, L, or R respectively as appropriate.  The
+         VALUES argument must have the corresponding data type.
+
+         \sstitem
+         In order to obtain a storage object for the parameter, the
+         current implementation of the underlying ADAM parameter system
+         will proceed in the same way as it does for input parameters.
+         This can result in users being prompted for `a value'. This
+         behaviour, and how to avoid it, is discussed further in the
+         Interface Module Reference Manual (SUN/115).
+
+         \sstitem
+         Limit checks for IN, RANGE, MIN/MAX are not applied.
+      }
+   }
+}
+
+\sstroutine{
+   PAR\_STATE
+}{
+   Inquires the state of a parameter
+}{
+   \sstdescription{
+      This routine returns the current state of the indicated parameter.
+      The states are GROUND, ACTIVE, CANCELLED and ANNULLED.
+   }
+   \sstinvocation{
+      CALL PAR\_STATE( PARAM, STATE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The parameter name.
+      }
+      \sstsubsection{
+         STATE = INTEGER (Returned)
+      }{
+         The current state value of the parameter.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      The symbolic names for these state values are as follows.
+      PAR\_\_GROUND is the ground state, PAR\_\_ACTIVE is the active
+      state, PAR\_\_CANCEL is the cancelled state, and PAR\_\_NULLST is
+      the null state.  These are defined in the Fortran INCLUDE file
+      'PAR\_PAR'.
+   }
+}
+
+\sstroutine{
+   PAR\_UNSET
+}{
+   Cancels various parameter control values.
+}{
+   \sstdescription{
+      This routine cancels one or more control values of a parameter.
+      These are currently the parameter's dynamic default value (set by
+      PAR\_DEFnx or DAT\_DEF), its minimum value (set by PAR\_MINx), its
+      maximum value (set by PAR\_MAXx), or its prompt string (set by
+      PAR\_PROMT).
+
+      The routine will operate regardless of the given STATUS value and will
+      not report or set STATUS if the specified values have not been set or
+      are already cancelled.
+   }
+   \sstinvocation{
+      CALL PAR\_UNSET( PARAM, WHICH, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER$*$($*$) (Given)
+      }{
+         The name of the parameter.
+      }
+      \sstsubsection{
+         WHICH = CHARACTER$*$($*$) (Given)
+      }{
+         A comma-separated list of the control values to be cancelled,
+         selected from the following options:
+      \begin{itemize}
+            \item 'DEFAULT' to cancel the dynamic default,
+            \item 'MAXIMUM' to cancel the maximum value, and
+            \item 'MINIMUM' to cancel the minimum value.
+      \end{itemize}
+      Unambiguous abbreviations are permitted.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Unused)
+      }{
+         The global status.  The routine is executed regardless of the
+         import value of STATUS.  If the import value is not SAI\_\_OK,
+         then it is left unchanged, even if the routine fails to
+         complete.  If the import value is SAI\_\_OK on entry and the
+         routine fails to complete, STATUS will be set to an
+         appropriate value.
+      }
+   }
+}
+
+\end{document}

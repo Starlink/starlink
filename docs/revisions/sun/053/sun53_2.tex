@@ -1,0 +1,579 @@
+\documentstyle{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {53.2}
+\newcommand{\stardocauthors}   {William Lupton}
+\newcommand{\stardocdate}      {22nd December 1989}
+\newcommand{\stardoctitle}     {ECHWIND --- UCL Echelle Spectrograph \\
+				Observation Planning Program}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\newcommand{\coude}{coud\'{e}}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+\setlength{\parskip}{0mm}
+\tableofcontents
+\setlength{\parskip}{\medskipamount}
+\markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\begin{quote}
+{\small\em The ECHWIND program which is described in this document was formerly
+known as MANUAL. MANUAL is completely superceded by ECHWIND, which in addition
+offers many new facilities.}
+\end{quote}
+
+\section{Introduction}
+
+ECHWIND is an ADAM A-task which was originally written to assist in the
+planning of observations with the UCL \coude\ echelle spectrograph (UCLES). It
+can be run at your home institution, when preparing an observing proposal, or
+before or during an observing run. Much of the dependence on UCLES has now been
+removed and it should be a useful tool for use with other similar echelle
+spectrographs of similar design. For further details on using it with
+spectrographs other than UCLES, see the description of the spectrograph model
+package in section~\ref{The Spectrograph Model}.   
+
+The program allows the user to view interactively that part of the spectrum
+which will fall on the detector for a given central wavelength. This is
+achieved by drawing a complete echellogram on the ARGS or IKON along with a box
+representing the exact size and shape of the detector. The positions of
+individual spectral lines can also be marked on the display. The user can then
+move the detector window around using the trackerball / mouse (henceforth
+referred to as the mouse) or else by explicitly specifying the desired central
+wavelength. At each position the screen displays the minimum, central and
+maximum wavelengths and order numbers falling on the detector as well as an
+estimate of the length of the detector in Angstroms.  The position of the box
+can be marked on the screen so as to ease preparation of observations where
+multiple overlapping wavelength ranges are required, and facilities are
+available for saving the current detector position in a text file or in a form
+suitable for later use by either the AAT or WHT echelle spectrograph data
+acquisition systems. For further details, see the detailed description of how
+to run the program in section~\ref{Detailed Description}.
+
+\section{Getting Going}
+
+Before running the program, you must type @SSC:LOGIN to define Starlink
+commands (many people do this in their LOGIN.COM files) and ECHWINDSTART to
+define the ECHWIND DCL command. To run the program, type ECHWIND at the DCL
+prompt.
+
+If you don't explicitly specify an image display device, ECHWIND will use
+the same one that was used the last time that it was run. It will only prompt
+for it if this is the first time that the program has been run from this
+username. If you wish to change the image display device you must use the DEV
+keyword, as in
+\begin{quote}
+\$ ECHWIND DEV=IKON2
+\end{quote}
+
+IKON will always use the default IKON and ARGS will always use the default
+ARGS. If your site has more than one of a particular type of image display, use
+a name of the form IKONn or ARGSn.
+
+You can specify the echelle and detector to use as the first and second
+positional parameters respectively, or you can let the program prompt you for
+them. The echellogram is now drawn on the image display and you are free to
+move the detector using the mouse. As you move it, the minimum, central and
+maximum wavelengths and order numbers are re-calculated and displayed.
+
+Various menu options are available for zooming, saving configurations, marking
+detector boxes, positioning to specified wavelengths and so on. To obtain the
+menu, press any mouse button other than the left-most one. Now use the mouse to
+highlight your choice and then press any mouse button. The menu will disappear
+and whatever is necessary will happen --- this may involve having to respond to
+a prompt.
+
+Several keywords can be specified on the command line, but in nearly all cases
+the same effect can be achieved via one of the menu options. Nevertheless, it
+can be useful to set initial central wavelengths, zoom factors, line lists etc.
+The following table lists the commonly used keywords.
+
+\begin{tabular}{lp{115mm}}
+KEYWORD=value	& Description \\ \hline
+ANGWAVE=angwave	& Specify slit rotation angle or wavelength at which orders are
+		to be aligned with the detector \\
+DEV=device	& Specify image display device \\
+FORM=format	& Specify format of saved configurations \\
+LINES=file	& Specify file containing spectral lines to be displayed on the 
+		echellogram \\
+WAVE=wavelength	& Specify central wavelength \\
+ZOOM=factor	& Specify zoom factor
+\end{tabular}
+
+To exit from the program, select the EXIT menu option.
+
+For full details of all parameters, keywords and menu options, see the detailed
+description of how to run the program in section~\ref{Detailed Description}.
+
+\section{Detailed Description}
+\label{Detailed Description}
+
+This section contains a detailed description of all of the facilities offered
+by ECHWIND. You can use command-line keywords to control things such as which
+image display device to use and to specify the initial echelle, detector and
+central wavelength. Subsequently you can use the mouse and keyboard to alter
+most of these parameters.
+
+\subsection{Selecting the Image Display}
+
+ECHWIND uses an early version of IDI (Image Display Interface) which supports
+both the ARGS and the IKON. Except for the first time that you ever run the
+program from a given username, when you will be prompted, you can only alter
+the image display device by using the DEV keyword to specify it on the command
+line. The same device will continue to be used until again overridden in the
+same manner.
+\begin{quote}
+\$ ECHWIND DEV=ARGS1
+\end{quote}
+
+Specifying ARGS or IKON will use logical names ARGS\_DEFAULT or IKON\_DEFAULT.
+If your site has more than one of a given type of image display, ARGSn or IKONn
+will use logical names IDI\_ARGS\_n or IDI\_IKON\_n. If you specify something
+illegal then logical name IDI\_DEFAULT will be used. Your system manager will
+have ensured that all of these logical names have sensible values.
+
+\subsection{Selecting the Echelle Grating}
+
+You can specify the name of the echelle grating as the first positional
+parameter or by using the ECH keyword. If you don't do so, you will be prompted
+for it.
+\begin{quote}
+\$ ECHWIND 31 \\
+\$ ECHWIND ECH=79
+\end{quote}
+
+Although ``31'' and ``79'' are supported as always, there is actually support
+for names of the form ``instrument/echelle/camera'' and ``31'' really means
+``UCLES/31/LONG''. A spectrograph parameter file is read on startup and this
+defines the available and default instruments, echelles and cameras (so in fact
+``31'' means ``UCLES/31/LONG'' only if the default instrument is UCLES and
+the default UCLES camera is LONG). It is easy to support spectrographs such as
+the Utrecht Echelle Spectrograph (UES) which have the same basic design as
+UCLES but which have, for example, different collimator or camera focal
+lengths, or different echelle gratings. For further details, see the
+description of the spectrograph model package in section~\ref{The Spectrograph
+Model}.
+
+You can change the echelle grating from within the program by selecting the
+``New ECHELLE'' menu option. This simply switches between the 31 lines/mm and
+the 79 lines/mm gratings and will always revert to the default instrument and
+camera.
+
+\subsection{Selecting the Detector}
+
+You can specify the detector name as the second positional parameter or by
+using the DET keyword. If you don't do so, you will be prompted for it.
+\begin{quote}
+\$ ECHWIND 31 THOMSON \\
+\$ ECHWIND DET=THOMSON
+\end{quote}
+
+The only information pertaining to the detector that is actually needed is its
+size and for unsupported detectors you can specify the size in mm in the form
+``x,y'' (the quotes are needed if specifying it on the command line) rather
+than giving the name.
+
+The prompt for the detector name includes the list of supported detectors
+(provided that it is not too long). Your system manager can set up a
+system-wide list and in addition you can use the DETLIST keyword to specify
+your own private list, as in
+\begin{quote}
+\$ ECHWIND DETLIST=MYLIST DET=MYDET
+\end{quote}
+The list is read from a text file with a default file extension of .DAT ---
+MYLIST.DAT in the above example. The file format is very simple: each line
+consists of the detector name in single quotes (like a Fortran CHARACTER
+constant) followed by the detector X and Y sizes in mm. The items are separated
+with spaces, tabs or commas. For example, this is the default system-wide
+detector list.
+\begin{verbatim}
+    'IPCS'          33.9,18.6
+    'THOMSON'       19.0,19.0
+    'RCA'           15.4,9.6
+    'GEC'           12.7,8.5
+\end{verbatim}
+If a detector name appears both in the system-wide list and in your
+user-supplied list then your definition of it is used rather than the
+system-wide one.
+
+You can change the detector from within the program by selecting the ``New
+DETECTOR'' menu option. You will then be prompted for a new detector name.
+
+\subsection{Selecting a Line List}
+
+Often you will be interested in specific spectral lines or wavelength ranges.
+You can prepare a text file containing a list of wavelengths and text strings
+with which to label those wavelengths and can use the LINES keyword on the
+command line to give it to the program. The lines will be plotted in the
+correct positions on the echellogram, in white where they appear within the
+free spectral range and in grey where they do not. Each line has the specified
+text string plotted near to it. By default this file has an extension of .DAT
+so
+\begin{quote}
+\$ ECHWIND LINES=MYLINES
+\end{quote}
+will read the file MYLINES.DAT. The file format is very simple: each line
+consists of the wavelength in Angstroms followed by the associated text in
+single quotes (like a Fortran CHARACTER constant), as in
+\begin{verbatim}
+    6562.80 'A'
+    4861.32 'B'
+    4340.46 'C'
+    4101.73 'D'
+\end{verbatim}
+
+You can select a new line list from within the program by selecting the ``New
+LINES'' menu option. This prompts you for a new line list.
+
+\subsection{Selecting a Central Wavelength}
+
+By default the detector will initially be placed at the origin of the
+dispersion and cross dispersion axes (about 4120 Angstroms for UCLES). If you
+wish to override this you can do so using the WAVE keyword, as in
+\begin{quote}
+\$ ECHWIND WAVE=8000
+\end{quote}
+which will initially place the centre of the detector at 8000 Angstroms.
+
+You can select a new central wavelength from within the program by selecting
+the ``New WAVELENGTH'' menu option. This prompts you for a new central
+wavelength.
+
+\subsection{Selecting a Zoom Factor}
+
+By default the echellogram will initially be displayed with a zoom factor of 1
+(which displays an area of $100 \times 100$ mm). If you wish to override this
+you can do so using the ZOOM keyword, as in
+\begin{quote}
+\$ ECHWIND ZOOM=3
+\end{quote}
+
+You can zoom, unzoom and pan from within the program. Select one of the ``x
+1.3'', ``x 2.0'' and ``x 3.0'' menu options to zoom in; select one of the ``x
+0.77'', ``x 0.5'' and ``x 0.3'' menu options to zoom out. The detector is
+always placed at the centre of the display after zooming. Thus the ``CENTRE''
+menu option is simply a pan operation (it does what ``x 1.0'' would do).
+
+\subsection{Selecting a Camera Rotation Angle}
+
+It is common observing practice with UCLES (and presumably will also be with
+UES) to align the detector with the orders. This has the dual advantages that
+it makes it easy to extract orders without having to track them, and that you
+may get an extra complete order to fit on to the detector. You can use the
+ANGWAVE keyword to specify the wavelength in Angstroms at which you plan to
+align the orders with the detector, and the display of the orders will be
+rotated accordingly.
+\begin{quote}
+\$ ECHWIND ANGWAVE=6000
+\end{quote}
+
+Alternatively, if you specify a value that is less than or equal to 1000, it is
+assumed that you are providing a value in degrees for the slit angle offset.
+This offset is automatically added to the slit angle by the UCLES (and
+presumably the UES) instrument control software and compensates for the
+detector rotation so as to give vertical slit images at the centre of the
+detector. It is calculated by the UCLES setup routines and, once calculated, is
+normally left unaltered for the entire observing run. It only makes sense to
+supply negative values for this offset since positive values will always rotate
+the slit image in the wrong direction. Provided that a sensible value is given,
+the corresponding wavelength at which the orders will be aligned with the
+detector is reported. Conversely, when a wavelength is given, the corresponding
+slit angle offset as reported. {\em Note that there is currently a problem here
+and the reported slit angle offsets do not correspond to actual behaviour.
+Consequently, until the problem is resolved you should specify only
+wavelengths for the ANGWAVE parameter.}
+
+You can select a new camera rotation angle from within the program by selecting
+the ``New ANGLE'' menu option. This prompts you for a new rotation
+angle or corresponding wavelength.
+
+\subsection{Saving Configurations}
+
+ECHWIND supports the saving of spectrograph configurations in files for later
+reference or use by the spectrograph control software. It supports three
+different file formats but a given run of the program can only write a file of
+a single format. The three formats are
+
+\begin{tabular}{ll}
+AAT	& AAT UCLES control file \\
+WHT	& WHT UES default list \\
+TEXT	& ASCII text file
+\end{tabular}
+
+and you control the file format by using the FORM keyword, as in
+\begin{quote}
+\$ ECHWIND FORM=AAT
+\end{quote}
+
+The FORM keyword behaves like the DEV keyword in that you are only ever
+prompted for it the first time that you use the program from a given username.
+On subsequent runs, unless explicitly overridden, it will retain its previous
+value. Of course, AAT users will usually use FORM=AAT and WHT users will
+usually use FORM=WHT.
+
+To save the current spectrograph configuration (or detector position, however
+you like to think of it), select the ``SAVE'' menu option. This will mark the
+current position of the detector in green (like ``Mark BOX'') and will issue an
+appropriate prompt for the file name. AAT control files (which are HDS files
+with a default file extension of .SDF) and WHT default lists (which are ASCII
+files with a default file extension of .DFL) are created for each SAVE
+operation. Text files (which are ASCII files with a default file extension of
+.TXT) are created only for the first SAVE operation and are appended to for
+subsequent operations.
+
+Enough information is written to allow the spectrograph control software to
+set the spectrograph hardware into the saved configuration. The AAT control
+file is an HDS file and using TRACE on it gives output like
+\begin{verbatim}
+    CONFIG          INSTRUMENT              <structure>
+       _CHAR*80        ECHELLE                 '79'
+       _CHAR*80        ECH_ENABLE              '79'
+       _REAL           ECH_THETA               1.391196
+       _REAL           ECH_GAMMA               -1.163817
+       _REAL           SLIT_ANGLE              -7.185203
+       _REAL           PRISM_POS               61.30878
+       _CHAR*80        COLLIMATOR              'WIDE'
+    CONFIG          MISC                    <structure>
+       _REAL           WAVE_CEN                5999.962
+       _INTEGER        ORDER_CEN               38
+\end{verbatim}
+
+The WHT default lists are of the form
+\begin{verbatim}
+    default list : test
+    hardware list : ues
+
+    ues.echelle       79
+    ues.central_wave  5999.962
+    ues.central_order 38
+    ues.disp_offset   1.5605927E-02
+    ues.xdisp_offset  3.0708313E-04
+\end{verbatim}
+where {\tt disp\_offset} and {\tt xdisp\_offset} are the offsets in mm
+necessary to get from the centre of the order nearest to the detector centre to
+the detector centre.
+
+The text file is of the form
+\begin{verbatim}
+    echelle  wavelength  order  dispoff  xdispoff
+    -------  ----------  -----  -------  --------
+
+        79     5999.96     38     0.02      0.00
+\end{verbatim}
+
+\subsection{Marking Detector Positions}
+
+You can select the ``Mark BOX'' menu option to mark the current position of the
+detector in green (``SAVE'' does an implicit ``Mark BOX'' as well). Selecting
+``Delete BOX'' will delete the most recently marked box. Selecting ``Clear
+BOXES'' will delete all boxes.
+
+\subsection{Doing Nothing}
+
+If you have selected the menu but then decide that you made a mistake in so
+doing, you can move the mouse so that no option is highlit and then press a
+mouse button to return without taking any action.
+
+\subsection{Suppressing Image Display Reset}
+
+By default the image display is reset each time that the program starts up.
+Occasionally this causes problems with the IKON. If this happens, try using the
+NOERASE keyword, as in
+\begin{quote}
+\$ ECHWIND NOERASE
+\end{quote}
+
+\subsection{Exiting}
+
+To exit from the program, select the ``EXIT'' menu option.
+
+\section{The Spectrograph Model}
+\label{The Spectrograph Model}
+
+ECHWIND uses the ECH package of routines to predict the behaviour of the
+spectrograph. Use of this package, most of which dates back to the period at
+which UCLES was being designed, is documented in SSN/3. It is easy to use
+different values for some of the spectrograph parameters, thus allowing
+spectrographs other than UCLES to be modelled. Such spectrographs must be
+similar in design to UCLES but can differ in
+\begin{itemize}
+\item collimator focal length (which is in fact irrelevant to the model package)
+\item cross dispersing prism apex angle
+\item echelle ruling frequency
+\item echelle blaze angle
+\item camera focal length
+\end{itemize}
+
+It is not capable of dealing with spectrographs which differ in any more major
+ways from UCLES, although it could be extended to do so should the need arise.
+
+At startup, ECHWIND reads a spectrograph parameter file which defines the list
+of available spectrographs. By default this file is accessed using the logical
+name ECHWIND\_SPECTROGRAPHS, but this can be overridden using the SPECLIST
+keyword, as in
+\begin{quote}
+\$ ECHWIND SPECLIST=MYSPECS
+\end{quote}
+
+The default version of this file is
+\begin{verbatim}
+    !+ SPECTROGRAPHS.DAT
+    !
+    !  Function:
+    !    Define parameters for spectrographs whose behaviour can be
+    !    modelled using the UCLES model library.
+    !
+    !  History:
+    !    22-Dec-89 - WFL - Original version
+
+    INSTRUMENT UCLES
+       FCOL 6000.0
+       ANGLE 54.1
+       ECHELLE 31
+          D 31.6046
+          M0 138
+          WAVE0 4119.68
+          THETAB 64.6
+       ECHELLE 79
+          D 79.0115
+          M0 55
+          WAVE0 4097.99
+          THETAB 63.55
+       CAMERA LONG
+          FCAM 700.0
+       CAMERA SHORT
+          FCAM 450.0
+
+    INSTRUMENT UES
+       FCOL 1800.0
+       ANGLE 54.1
+       ECHELLE 31
+          D 31.6046
+          M0 138
+          WAVE0 4119.68
+          THETAB 64.6
+       CAMERA LONG
+          FCAM 700.0
+\end{verbatim}
+\begin{itemize}
+\item Everything from a ``!'' onwards in a line is ignored (so lines beginning
+with ``!'' are comment lines).
+\item The file is regarded as being a set of ``keyword value'' pairs.
+\item INSTRUMENT declares and names a new current instrument. The following
+items are assumed to pertain to the current instrument. \\
+\begin{tabular}{ll}
+FCOL	& Collimator focal length (mm) \\
+ANGLE	& Prism apex angle (degrees) \\
+ECHELLE	& Echelle grating \\
+CAMERA	& Camera
+\end{tabular}
+\item ECHELLE declares and names a new current echelle. This echelle is
+associated with the current instrument. The following items are assumed to
+pertain to the current echelle. \\
+\begin{tabular}{ll}
+D	& Number of lines/mm \\
+M0	& Order number closest to field centre \\
+WAVE0	& Central wavelength of this order (Angstroms) \\
+THETAB	& Blaze angle (degrees)
+\end{tabular}
+\item CAMERA declares and names a new current camera. This camera is associated
+with the current instrument. The following item is assumed to pertain to the
+current camera. \\
+\begin{tabular}{ll}
+FCAM	& Camera focal length (mm)
+\end{tabular}
+\end{itemize}
+
+Any omitted values will default to the corresponding values for the previously
+defined instrument, echelle or camera, or, if there is no such value available,
+to the corresponding values for UCLES.
+
+ECHWIND allows use of the syntax ``instrument/echelle/camera'' in response to
+the prompt for the echelle name. The user response is split up into tokens and
+then the first token is checked against the list of defined instruments. If it
+matches one of them, attention switches to the next token. If it doesn't, the
+first instrument defined in the spectrograph parameter file is assumed (UCLES
+in the above example) and the same token is regarded as a candidate echelle
+name. The list of defined echelles for the current instrument is searched in
+exactly the same way, as is the list of defined cameras. Attention only moves
+to the next token if a match is found to the current token. If, after all this,
+any unmatched tokens remain, an error is reported and the first instrument / 
+echelle / camera combination defined in the spectrograph parameter file is
+assumed (UCLES/31/LONG in the above example). To use the UES, which has only a
+single defined echelle and camera, it would be sufficient to respond ``UES''.
+
+\section{Installation}
+
+This section is only relevant to system managers and includes a checklist for
+installation of ECHWIND. Note that no abnormal quotas should be required in
+order to run ECHWIND.
+
+Two classes of release are available: the ``source only'' release occupies
+about 1100 disc blocks and the ``source plus executable'' release occupies
+about 1600 disc blocks. If you have the source only release, you must build the
+object libraries and executable image by doing
+\begin{verbatim}
+    $ @SSC:LOGIN
+    $ ADAMSTART
+    $ ADAMDEV
+    $ @ECHWIND_COMPILE
+    $ @ECHWIND_LINK
+\end{verbatim}
+from within the directory into which you have put the release. There may also
+be other circumstances where it is convenient to be able to re-build the
+executable image from its source files.
+
+The following is a checklist of things that must be done in order to install
+ECHWIND.
+\begin{itemize}
+\item Place all supplied ECHWIND files in a directory somewhere.
+\item If you have the source only release, build the executable image as
+described above.
+\item Edit LSTARDISK:[STARLOCAL]LOGIN.COM so that the symbol ECHWINDSTART will
+execute ECHWIND.COM from that directory.
+\item Edit ECHWIND.COM to define the appropriate image display device names for
+your site.
+\item Edit DETECTORS.DAT to define the appropriate detector names for your
+site.
+\item Edit SPECTROGRAPHS.DAT to define the appropriate spectrograph parameters
+for your site.
+\end{itemize}
+
+\end{document}

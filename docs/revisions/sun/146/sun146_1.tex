@@ -1,0 +1,219 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {146.1}
+\newcommand{\stardocauthors}   {Julian Osborne}
+\newcommand{\stardocdate}      {3 April 1992}
+\newcommand{\stardoctitle}     {OBSERVE --- Check Star Observability}    
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+%  \setlength{\parskip}{0mm}
+%  \tableofcontents
+%  \setlength{\parskip}{\medskipamount}
+%  \markright{\stardocname}
+%------------------------------------------------------------------------------
+
+
+\section{Introduction}
+
+The programme OBSERVE is designed to allow you to get a quick overview of the 
+observability of a star through the year from the geographical location 
+selected. You will be prompted for the RA \& Dec of the star, the observatory
+(you can also specify arbitrary locations), and the year. On the selected GKS 
+graphics device a plot will be drawn that tells you, for all dates of the year,
+the star rising \& setting times and the times that it is 30$^{\circ}$ above
+the  horizon, the times of astronomical twilight, the phase and rising and
+setting  times of the Moon as well as its distance from the star in question.
+
+The algorithms used in calculating these times, positions and phases come from 
+the book {\em `Practical Astronomy with your calculator'}  by P. Duffett-Smith 
+(3$^{\rm rd}$ ed. CUP 1988), and are used with permission. These algorithms are 
+not designed for high precision calculations, a fact which is to some extent 
+conveyed by the programme output. Nevertheless, I have verified that the 
+routines are good for their purpose.
+
+As mentioned above, all standard Starlink graphics devices are supported.
+However, the graphical output created by OBSERVE is  sufficiently complicated
+and the device drivers have sufficiently different effects that plotting to a
+laser printer is almost certainly the best option. If a GKS device such as {\tt
+CANL} is chosen, then the following command will print the output file:
+
+\begin{verbatim}
+$ PRINT/PASSALL/QUEUE=SYS_LASER CANON.DAT
+\end{verbatim}
+
+The programme OBSERVE was originally created by Manfred Gottwald, then of the 
+EXOSAT Observatory. I have increased the quantity of information displayed 
+and increased the list of standard observatories, and now take responsibility 
+for this software.
+
+\section{Description of the Output}
+
+OBSERVE draws one screen of graphics per star. This consists of a header, a 
+large plot, and some lines of text explanation. The plot is formatted with 
+date through the year shown horizontally and time through the day  shown
+vertically. The  left-hand scale shows UT and the right-hand scale shows local
+time with midnight at the centre. Figure \ref{fig:sum} shows a summary of the
+symbols used on a plot.
+
+\subsection{The start and end of the night}
+
+Wavy horizontal solid lines show the start and end of the  astronomical night.
+Symbol {\sf X}  shows the start of the night ({\em i.e.}~the end of
+day-to-night astronomical  twilight), and  symbol {\sf V} shows the end of the
+night ({\em i.e.}~the  start of night-to-day astronomical twilight). For
+extreme  northerly and southerly geographical locations these lines merge to
+become a closed shape as there is no astronomical night during polar summer.
+
+\subsection{The rising and setting of the star}
+
+Straight diagonal solid lines marked with symbols  show the times of star
+rising ($\uparrow$) and setting ($\downarrow$). Parallel lines show the times
+at  which the star rises above ($\circ$) and sets below ($\bullet$)
+30$^{\circ}$ elevation, a typical minimum elevation for useful observing.
+
+\subsection{The Moon}
+
+The remaining lines in the plot refer to the Moon. The great-circle 
+distance of the Moon 
+from the star is shown (in hours) by a dashed sinewave in the top half of
+the plot. Read the distance off the right-hand scale
+and multiply by 15 to get the distance in degrees. 
+
+The rising and setting  of the Moon is shown by vertical solid lines of
+variable width. A line is  plotted for every other day, it starts at the time
+of Moonrise and ends at  the time of Moonset. The width of the Moon lines are
+related to the phase of  the Moon for that date. The thickest lines are plotted
+when the Moon is  75\%-100\% illuminated, thinner lines are plotted for
+50\%-75\% and 25\%-50\% illumination. No line is plotted when the fractional
+illumination is less than  25\%.
+
+\subsection{How to look at the plot}
+
+The region of visibility of the star typically falls halfway down the plot
+(between the wavy lines), and is bounded on left and right by diagonal lines
+with empty and filled  circles superimposed. Depending on the nature of the
+observation planned, you may then need  to look for  dates and/or times clear
+of the vertical Moon lines.
+
+\begin{figure}\caption{Summary of OBSERVE Plot Symbols}
+\label{fig:sum}
+\begin{center}
+\begin{tabular}{|c|l|}
+\hline
+\large
+---{\sf X}--- & start of astronomical night \\
+---{\sf V}--- & end of astronomical night \\
+---$\uparrow$--- & star rises \\
+---$\downarrow$--- & star sets \\
+---$\circ$--- & star rises above 30$^o$ elevation\\
+---$\bullet$--- & star falls below 30$^o$ elevation\\
+- - - - & great circle Moon-star distance \\
+\rule{0.1mm}{4mm} & 25\%--50\% illuminated Moon above horizon\\
+\rule{0.3mm}{4mm} & 50\%--75\% illuminated Moon above horizon\\
+\rule{0.5mm}{4mm} & 75\%--100\% illuminated Moon above horizon\\
+\hline
+\end{tabular}
+\end{center}
+\end{figure}
+
+\newpage
+\section{An Example}
+
+Suppose that you want to check when the bright star Mira can be observed  from
+La Palma.  You should enter the command {\tt OBSERVE} and respond to the
+questions as  shown:
+
+\begin{small}
+\begin{verbatim}
+      $ observe                                                            
+      OBSERVE 1.2                                                          
+      * Enter observatory                                                  
+      1 - Calar Alto/Spain         2 - ESO (La Silla)                      
+      3 - La Palma                 4 - Hawaii (Mauna Kea)                  
+      5 - AAT                      6 - SAAO                                
+      7 - MSSSO                    8 - Kit Peak                            
+      9 - McDonald/Texas          10 - Haute-Provence                      
+      0 - Other        -----> 3                                            
+      enter star name > Mira                                               
+      enter star RA (hh mm ss.s) > 02 16 48.                               
+      enter star DEC (sdd mm ss.s) > -03 12 0                              
+      enter year of observation > 1992                                     
+      Graphics device/type (? to see list): ?                              
+      PGPLOT v4.9D Copyright 1990 California Institute of Technology   
+      MFILE_OUTPUT      TEK_4010          TEK_4014          7800       
+      MG100             GRAPHON           ZETA_8            ZETA_8L    
+      PRINTRONIX_F      PRINTRONIX_S      CANL              CANP       
+      CANON1_L          CANON1_P          CANON2_L          CANON2_P   
+      CANON_LTEX        CANON_PTEX        PS_P              PS_L       
+      PS_PTEX           PS_LTEX           LJ250_P           LJ250_L    
+      IKON              IKON_OVERLAY      IKON_VT           IKON_OVERLAY_V 
+      X                 X2                X3                X4             
+      Graphics device/type (? to see list):                                
+      canl                                                                 
+                                                                           
+       Visibility graph plotted                                            
+                                                                           
+      Change:  Source, Observatory & Source, Quit (S/O/Q)? > q             
+                                                                           
+      $ print/passall/queue=sys_laser canon.dat                           
+\end{verbatim}                                                            
+\end{small}
+
+From the description of the graph in section 2, you can see in this example 
+that Mira is  observable between mid July and the end of February from La
+Palma.  The longest observations  are possible between approximately October 10
+and late November, because  between these dates daylight does not intrude when
+the star is above 30$^{\circ}$ elevation. Good dates for getting a long
+observation would be late October and late November, because the Moon is  close
+to new and is maximally distant from your star. For example, around  October 26
+1992 Mira would be visible from La Palma between 19:50 UT and 06:00 UT. The
+plot shows that UT is the same as local time at La Palma.
+
+A hardcopy print of the plot produced by the example is appended.
+
+% To get the hardcopy for appending to this SUN, follow the example contained
+% herein, allowing for use of either Canon or PostScript printers. Print
+% the result, and you have a copy of the last page of this sun. Neither a
+% PostScript or Canon data file for the image are stored on-line.
+
+\end{document}

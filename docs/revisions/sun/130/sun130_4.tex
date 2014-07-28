@@ -1,0 +1,1527 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {130.4}
+\newcommand{\stardocauthors}   {David Terrett\\Nicholas Eaton}
+\newcommand{\stardocdate}      {6 April 1992}
+\newcommand{\stardoctitle}     {GWM --- X Graphics Window Manager}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+%  \setlength{\parskip}{0mm}
+%  \tableofcontents
+%  \setlength{\parskip}{\medskipamount}
+%  \markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\begin{quote}
+This note describes how to create graphics windows on an X display that do not
+disappear when a program terminates.
+\end{quote}
+\section{Introduction}
+
+X was designed to support ``graphics user interfaces'' (GUIs) and there are two
+properties of X that make an X window fundamentally different from a
+traditional graphics device.
+Firstly, windows ``belong'' to applications programs and are deleted when the
+application exits unlike the picture on an image display which remains there
+until replaced by something else. 
+
+Secondly, applications
+programs are expected respond to ``events'' occurring in their windows;
+things like key presses, mouse movements, etc. One event type that all
+applications must handle is the ``window expose'' event which occurs whenever
+part of a window that was invisible---because another application's window was
+obscuring it for example---becomes visible. The application is responsible for
+restoring the contents of the newly exposed part of the window but only an
+application designed as an X application can do this; an application that is
+using X via a graphics package such as GKS or IDI but is otherwise a
+conventional application that knows nothing of X, cannot.
+
+The X graphics window manager\footnote{not to be confused with the Window
+Manager which allows you to move windows around the screen, iconize them etc.}
+makes a window on an X windows display behave like a
+traditional graphics device by making the lifetime of the window independent
+of any applications program and by handling window expose events. Applications
+still send plotting commands directly to the window; they don't have to go via
+a ``server'' process, so there is no adverse impact on performance. All
+communication between the window manager and the application is via the X
+server and the graphics window manager does not have to run on the same 
+machine as the application.
+Indeed the manager and applications can even be running on different operating
+systems. 
+
+\begin{quote}\em
+The commands described below work on both VMS and UNIX and the format of the
+command qualifiers follow the normal conventions for X windows applications.
+\end{quote}
+\section{Creating a window} 
+
+The simplest way to create a window (in terms of understanding what is
+happening) is to use the {\tt xmake} command and specify the properties that
+you want the window to have. There are other, more convenient, ways to create
+windows but they are easier to explain after describing the {\tt xmake} command.
+\begin{quote}\tt
+xmake {\em name} {\em options}
+\end{quote}
+creates a window with the name {\em name}. Case matters in window names so {\tt
+mywindow}, {\tt MYWINDOW} and {\tt MyWindow} are all different, therefore, on 
+VMS, the window name should be enclosed in quote characters to preserve its
+case.\footnote{{\tt xmake} is written in C and so its command arguments get
+converted to {\em lower} case if not protected by quotes}
+
+The following options, which can be abbreviated, are recognized:
+\begin{description}
+
+\item[\tt -background {\em colour}] The background colour of the window; {\em
+colour} is the name of a colour recognized by X windows. Examples:
+\begin{quote}\tt
+xmake test -background black\\
+xmake test -background yellow
+\end{quote}
+The default is {\tt Black}.
+
+\item[\tt -bg {\em colours}] The same as {\tt -background}.
+
+\item[\tt -borderwidth] Specifies the width of the window border in
+pixels. The
+border width is ignored by many window managers but the value specified
+is used to calculate the window position so should match the actual
+border width used by the window manager. The default is 10 which is what
+the Motif and DECwindows window managers use. 
+
+If the window appears to
+be incorrectly position when a geometry specification of {\tt -geometry
+-0-0} is used then changing the border width may correct the problem.
+
+\item[\tt -colours {\em number}] The number of colour table entries to be
+allocated to the window; {\em number} should be an integer greater than or
+equal to 2. 
+
+On a server with a writable colour table, the requested number of colour table
+entries are reserved for the exclusive use of the window and the command fails
+if this number are not free. On a server with a fixed colour table, entries can
+be shared between windows and any number up to the maximum supported by the
+server can be requested. 
+
+Examples:
+\begin{quote}\tt
+xmake test -colours 2\\
+xmake test -col 127
+\end{quote}
+The default depends on the properties of the X server.
+
+\item[\tt -fg {\em colours}] The same as {\tt -foreground}.
+
+\item[\tt -foreground {\em colour}] The foreground colour of the window; {\em
+colour} is the name of a colour or RGB specification in X windows format.
+Case does not matter but colour names cannot be abbreviated. 
+Examples:
+\begin{quote}\tt
+xmake test -foreground white\\
+xmake test -foreground SpringGreen\\
+xmake test -foreground \#FF00FF
+\end{quote}
+The default is {\tt White}.
+
+\item[\tt -geometry {\em specification}] The size and position of the window;
+{\em specification} is a window geometry specification of the form:
+\begin{quote}\tt
+{\em width}x{\em height}+/-{\em xorigin}+/-{\em yorigin}
+\end{quote}
+({\tt x} is the letter ``x'' and {\tt +/-} is either a plus sign or a
+minus sign.)
+All dimensions are in pixels and the origin is the position of the top left hand
+corner of the window relative to the top left hand corner of the screen
+if the origin specification is a positive number, or the position of the
+bottom right corner of the window relative to the bottom right of the
+screen if it is negative. All
+the components of the geometry specification are optional. Examples:
+\begin{quote}\tt
+xmake test -geometry 780x512\\
+xmake test -geom 600x400+300+300\\
+xmake test -geom +512+368
+\end{quote}
+To position the window in the bottom right corner of the screen:
+\begin{quote}\tt
+xmake test -geom -0-0
+\end{quote}
+To position the window in the top right corner:
+\begin{quote}\tt
+xmake test -geom -0+0
+\end{quote}
+The default is {\tt 780x512} (this leaves it up to the window manager to
+decide where to place the window). 
+
+\item[\tt -iconic] Create the window as an icon.
+
+\item[\tt -interactive] Allows the window size to be set interactively. When
+the window appears on the screen its size can be modified before the window
+creation is completed and the window size fixed. Resize the window with the
+facilities provided by the window manager that you are using (e.g. DECwindows,
+Motif etc.) and then click the mouse on the
+interior of the window to indicate that the desired size has been set.
+
+This option is ignored in {\tt -iconic} is specified.
+
+\item[\tt -nointeractive] The opposite of {\tt -interactive}. This is
+the default.
+
+\item[\tt -nooverlay] Do not allocate an overlay plane. This option
+would be required if a default overlay colour had been set using the ``X
+Defaults'' file (see below) but a window without an overlay plane was
+required.
+
+\item[\tt -ovcolour {\em colour}]
+Set the colour of the overlay plane. If not specified the overlay plane is set
+to the foreground colour. Example:
+\begin{quote}\tt
+xmake test -ovcolour Green
+\end{quote}
+
+\item[\tt -overlay] Allocate an overlay plane\footnote{At the time this 
+document was 
+written no Starlink software makes use of an overlay plane}.
+There is no default for this option. The default is not to
+allocate an overlay plane. Note that overlay planes effectively consume half
+the available colours on the X server so an overlay should be specified only
+when required.
+
+\item[\tt -title {\em title}] The window title that is displayed in the
+window's title bar;
+{\em title} is a character string. If it contains spaces or other
+special characters it must be enclosed in quotes ({\tt "} on VMS, {\tt '} on
+UNIX). Example:
+\begin{quote}\tt
+xmake test -title Test\_Window
+\end{quote}
+The default title is ``{\tt GWM Window - {\em window name}}''
+
+\end{description}
+
+There are defaults for all these options but they are not necessarily
+appropriate. You can provide your own defaults by putting
+them in your ``X defaults'' file ({\tt SYS\$LOGIN:DECW\$XDEFAULTS.DAT} on VMS, 
+{\tt\verb+~+/.Xdefaults} on UNIX) and to have different defaults for different
+window names. Note that the X defaults file is only read once, when you first
+open the connection to the X server, and so if you edit it you may have to 
+terminate your X session and start again before any changes take effect.
+
+Rather than attempting to explain in detail what is a powerful but quite
+complicated system here is an example that shows how to control the properties
+of GWM windows. Suppose your X defaults file contains the following:
+\begin{tabbing}
+\tt Gwm.mono*colours:\quad\=\tt 2\\
+\tt Gwm*colours:\>\tt 128
+\end{tabbing}
+then a window created with the name ``mono'' will have 2 colours allocated to
+it and windows with any other names will have 128 colours allocated.
+
+When a graphics package creates a window for you this is the only mechanism
+available for specifying the properties of the window. For example, GKS will
+create a window if it doesn't already exist and each of the four available
+workstation types of X windows can be assigned different properties as follows:
+\begin{tabbing}
+\tt Gwm.GKS\_3800*interactive:\quad\=\tt 512x780\kill
+\tt Gwm*foreground:\>\tt Black\\
+\tt Gwm*background:\>\tt White\\
+\tt Gwm.GKS\_3800*colours:\>\tt 2\\
+\tt Gwm.GKS\_3800*geometry:\>\tt 512x380\\
+\tt Gwm.GKS\_3801*colours:\>\tt 8\\
+\tt Gwm.GKS\_3801*geometry:\>\tt 780x512\\
+\tt Gwm.GKS\_3802*colours:\>\tt 128\\
+\tt Gwm.GKS\_3802*geometry:\>\tt 780x512\\
+\tt Gwm.GKS\_3803*colours:\>\tt 128\\
+\tt Gwm.GKS\_3803*interactive:\>\tt True\\
+\end{tabbing}
+This defines workstation type 3800 as being a small window with only two
+colours, suitable for black and white line plots, 3801 is a bit bigger and has
+8 colours suitable for colour line plots, 3802 is the same size but with more
+colours for image display applications and 3803 is the same but the window size
+is set interactively.
+
+A complete list of the resources used and their default values are show in 
+Table~\ref{resources}.
+\begin{table}\label{resources}\caption{GWM X resources}\tt
+\[\begin{tabular}{|l|l|}\hline
+\rm Resource name &\rm Default\\ \hline
+background &Black\\
+borderWidth &10\\
+colours & 0\\
+foreground &White\\
+geometry &780x512\\
+overlay &False\\
+overlayColour &\\
+iconic &False\\
+interactive &False\\
+title &\\\hline 
+\end{tabular}\]
+\end{table}
+
+\section{Using windows}
+
+Programs that use GWM (usually via a graphics package such as GKS or IDI) will
+normally create a new window as required. However, to plot into an existing
+window you need to know how the graphics package generates the window name. For
+example, GKS  uses a window with the name {\tt GKS\_{\em nnnn}} where {\em
+nnnn} is the workstation type (the connection identifier is ignored) or
+whatever that name translates to if treated as a logical name (VMS) or an
+environment variable (UNIX).
+
+Consult the documentation for the graphics package in question for full
+details.
+
+\section{Resizing windows}
+Once a window has been created, any resizing does not alter the size of the
+plotting area seen by applications programs; all that happens is either part of
+the plotting area becomes invisible or a blank border appears around the
+plotting area.
+
+You should avoid resizing a window while an application is attached (i.e.
+plotting into) the window as the application may not be able to handle the
+resulting change in the picture position correctly.
+
+\section{Deleting windows}
+Windows are deleted from the display with the command:
+\begin{quote}\tt
+xdestroy {\em name}
+\end{quote}
+where {\em name} is the window name. There are no command options.
+
+You should not delete windows by deleting or killing the window manager 
+process as this leaves a ``phantom'' window name on the X server. Trying to
+create another window with the same name will fail. Phantom windows can be
+removed with the {\tt xdestroy} command but some X library errors will be
+reported.
+
+Resetting the X server will also delete all windows and all window manager
+processes will exit. On VMS the manager process(es) are deleted when an X
+server session is terminated. However if they were created by a simple login
+session (by using a LAT X-terminal for example) they will not be deleted on
+logout and explicit {\tt xdestroy} commands will be necessary.
+
+\section{The FORTRAN interface}
+
+This section describes the subroutines that can be called from a FORTRAN
+program to interface with the Graphics Window Manager. All these routines
+use the {\em inherited status strategy} which means that if the {\tt STATUS}
+argument is not set to the value {\tt SAI\_\_OK} on entry the routine will
+exit without performing any action. If an error occurs during the execution
+of a routine the {\tt STATUS} will be set and an error will be reported
+using the error message service (EMS).
+
+\subsection{Summary of GWM calls}
+
+\newenvironment{routinelist}{\begin{list}{}{\setlength{\leftmargin}{2cm}
+                             \setlength{\parsep}{\smallskipamount}}}{\end{list}}
+\newcommand{\routine}[1]{\item\hspace{-1cm}#1\\}
+
+\begin{routinelist}
+\routine{GWM\_CLOSE( STATUS )}
+   Close the X client-server connection.
+\routine{GWM\_CRWIN( WNAME, STATUS )}
+   Create a GWM window.
+\routine{GWM\_DSWIN( WNAME, STATUS )}
+   Destroy a GWM window.
+\routine{GWM\_EXIST( WNAME, EXISTS, STATUS )}
+   Inquire if a GWM window of the given name exists.
+\routine{GWM\_GETCI( WNAME, IDIM, INDEXS, NCOLS, STATUS )}
+   Inquire the number of colours and colour indices.
+\routine{GWM\_OPEN( DISPLY, USEDEF, STATUS )}
+   Establish the X client server connection.
+\routine{GWM\_WSETC( OPTION, VALUE, STATUS )}
+   Set a character string window option.
+\routine{GWM\_WSETI( OPTION, VALUE, STATUS )}
+   Set an integer window option.
+\routine{GWM\_WSETL( OPTION, VALUE, STATUS )}
+   Set a logical window option.
+\end{routinelist}
+
+\subsection{Making the X connection}
+The first thing to do when using the FORTRAN interface is to call
+the routine {\bf GWM\_OPEN} which establishes the connection between
+the client and the server. In this context the client is the cpu running
+the program and the server is the cpu displaying the image (X allows
+these cpu's to be different). The first argument passed to {\bf GWM\_OPEN}
+defines this connection, however most applications need not worry about
+the details of the connection and can use the default (the option of
+specifying the connection path is included for completeness). The default
+connection is established with the following call
+\begin{verbatim}
+      CALL GWM_OPEN( ' ', .TRUE., STATUS )
+\end{verbatim}
+where the second argument is set to true to indicate that the default
+connection is to be used.
+
+The connection is ended with a call to {\bf GWM\_CLOSE}. These two routines
+({\bf GWM\_OPEN} and {\bf GWM\_CLOSE}) should bracket all other routines
+called from this interface.
+
+As well as establishing the X connection {\bf GWM\_OPEN} also sets up
+an error handler to deal with any non-fatal X errors. Once this has been
+set up any such errors are reported using EMS. When {\bf GWM\_CLOSE} is
+called the previously active error handler is re-established.
+
+\subsection{Creating a GWM window}
+The routine {\bf GWM\_CRWIN} is used to create a GWM window on the
+server. The following example shows how a window with the name 'XWINDOWS'
+is created (remember GWM window names are case sensitive).
+\begin{verbatim}
+      CALL GWM_CRWIN( 'XWINDOWS', STATUS )
+\end{verbatim}
+On its own this call will create a window with the default characteristics
+of shape, colour etc. To select different characteristics calls to the
+routines {\bf GWM\_WSETx} are made before the call to {\bf GWM\_CRWIN}.
+
+Each required window characteristic is selected with a separate call to
+one of the {\bf GWM\_WSETx} routines, where 'x' represents the type of
+the characteristic, 'I' for integer, 'L' for logical and 'C' for character
+string. The following table lists the characteristics and their types.
+
+\begin{center}
+\begin{tabular}{|l|l|}   \hline
+Characteristic & Type \\ \hline
+BACKGROUND     & C    \\
+BORDERWIDTH    & I    \\
+COLOURS        & I    \\
+FOREGROUND     & C    \\
+HEIGHT         & I    \\
+ICONIC         & L    \\
+INTERACTIVE    & L    \\
+NOINTERACTIVE  & L    \\
+NOOVERLAY      & L    \\
+OVCOLOUR       & C    \\
+OVERLAY        & L    \\
+TITLE          & C    \\ 
+WIDTH          & I    \\
+XORIGIN        & I    \\
+XSIGN          & I    \\
+YORIGIN        & I    \\
+YSIGN          & I    \\ \hline
+\end{tabular}
+\end{center}
+
+Most of these characteristics are directly comparable to the options
+of the {\bf xmake} command. The only major difference is the {\bf -geometry}
+option which here is split into its four components WIDTH, HEIGHT, XORIGIN
+and YORIGIN. The XSIGN and YSIGN characteristic is used to override the sign of
+XORIGIN and YORIGIN values; setting XSIGN or YSIGN
+to any value forces the corresponding origin value to have the same
+sign. This is only required when setting one of the
+origin characteristics to -0 in order to position the window at the
+bottom or right hand side of the screen.
+
+The following example shows the use of most the options to create a window.
+
+\begin{small}
+\begin{verbatim}
+      *   Set up the size and position of the window
+            CALL GWM_WSETI( 'WIDTH', 256, STATUS )
+            CALL GWM_WSETI( 'HEIGHT', 192, STATUS )
+            CALL GWM_WSETI( 'XORIGIN', 200, STATUS )
+            CALL GWM_WSETI( 'YORIGIN', 0, STATUS )
+            CALL GWM_WSETI( 'YSIGN', -1, STATUS)
+
+      *   Allocate 128 colours to this window
+            CALL GWM_WSETI( 'COLOURS', 128, STATUS )
+
+      *   Define the foreground and background colours
+            CALL GWM_WSETC( 'FOREGROUND', 'White', STATUS )
+            CALL GWM_WSETC( 'BACKGROUND', 'DarkSlateGrey', STATUS )
+
+      *   Give the window a title
+            CALL GWM_WSETC( 'TITLE', 'Small_Window', STATUS )
+
+      *   Create the GWM window
+            CALL GWM_CRWIN( 'XWINDOWS', STATUS )
+\end{verbatim}
+\end{small}
+
+When defining a logical characteristic, such as the INTERACTIVE option,
+passing a true value in {\bf GWM\_WSETL} will activate the option,
+whereas passing a false value is equivalent to accepting the default.
+
+Once the window has been created all the options are reset to their
+default values. If a second window is to be created all the necessary
+characteristics have to be re-defined before the next call to
+{\bf GWM\_CRWIN}.
+
+A GWM window will remain on the server after the program which created
+it has terminated unless it is explicitly deleted using {\bf GWM\_DSWIN}.
+
+\subsection{Inquiries}
+The routine {\bf GWM\_EXIST} can be used to inquire if a GWM window of
+a given name exists on the server. A logical argument is returned with
+a value of true signifying that the window exists on the server, and
+a value of false indicating that it does not.
+
+The routine {\bf GWM\_GETCI} returns the number of colours and the list
+of colour indices (pen numbers) allocated to a GWM window. The colour
+indices are returned in an array dimensioned by the application. If the
+array is not large enough to contain all the allocated colour indices
+then the array is filled up to its maximum size and the remaining indices
+are not returned. The argument specifying the number of colours does
+however return the actual number of colours allocated, and not the number
+of colours returned in the array. Consider making the inquiry for
+the window created in the previous example:
+
+\begin{small}
+\begin{verbatim}
+      *   Define the array to receive the colour indices
+            INTEGER IDIM
+            PARAMETER ( IDIM = 64 )
+            INTEGER INDEXS( IDIM ), NCOLS
+
+      *   Inquire the colour indices of the GWM window
+            CALL GWM_GETCI( 'XWINDOWS', IDIM, INDEXS, NCOLS, STATUS )
+\end{verbatim}
+\end{small}
+
+In this case the number of colours returned (NCOLS) will be 128, but
+only the first 64 colour indices will be returned in the INDEXS array.
+
+\subsection{Linking programs with GWM}
+\subsubsection{On VMS}
+Before compiling and linking a program containing GWM calls some
+initialisation has to be performed. This is achieved by issuing
+the command
+\begin{verbatim}
+      $ GWM_DEV
+\end{verbatim}
+
+A stand-alone program is linked with GWM by using
+\begin{verbatim}
+      $ LINK <program>,GWM_LINK/OPT,EMS_LINK/OPT
+\end{verbatim}
+
+For programs in the ADAM environment the link command is
+\begin{verbatim}
+      $ ALINK <task>,GWM_LINK_ADAM/OPT,EMG_LINK_ADAM/OPT
+\end{verbatim}
+
+\subsubsection{On UNIX} 
+Stand alone programs are linked with GWM by including
+{\tt `gwm\_link`} on the {\tt f77} command line.
+
+Adam programs are linked with GMW by including {\tt `gwm\_link\_adam`} on the
+{\tt alink} command line.
+
+\newpage
+\subsection{Subroutine Specifications}
+
+%  Define length variables.
+\newlength{\sstbannerlength}
+\newlength{\sstcaptionlength}
+
+%  Define a command to produce a routine header, including its name,
+%  a purpose description and the rest of the routine's documentation.
+\newcommand{\sstroutine}[3]{
+   \goodbreak
+   \rule{\textwidth}{0.5mm}
+   \vspace{-7ex}
+   \newline
+   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
+   \setlength{\sstcaptionlength}{\textwidth}
+   \addtolength{\sstbannerlength}{0.5em}
+   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
+   \addtolength{\sstcaptionlength}{-4.45pt}
+   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
+   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
+   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
+   \begin{description}
+      #3
+   \end{description}
+}
+
+%  Format the description section.
+\newcommand{\sstdescription}[1]{\item[Description:] #1}
+
+%  Format the invocation section.
+\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
+
+%  Format the arguments section.
+\newcommand{\sstarguments}[1]{
+   \item[Arguments:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Define the format of a subsection in a normal section.
+\newcommand{\sstsubsection}[1]{\item[{#1}] \mbox{} \\}
+
+\begin{small}
+\sstroutine{
+   GWM\_CLOSE
+}{
+   Close the X client-server connection
+}{
+   \sstdescription{
+      Close the X client-server connection established by GWM\_OPEN.
+      The standard error handler is restored.
+   }
+   \sstinvocation{
+      CALL GWM\_CLOSE( STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   GWM\_CRWIN
+}{
+   Create a GWM window
+}{
+   \sstdescription{
+      Create a GWM window. A window with the given name is created on
+      the current X display. The window is created with the default
+      characteristics unless they have been set using the GWM\_WSETx
+      routines. After the window has been created any set characteristics
+      are reset to their default values.
+   }
+   \sstinvocation{
+      CALL GWM\_CRWIN( WNAME, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         WNAME = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The window name.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   GWM\_DSWIN
+}{
+   Destroy a GWM window
+}{
+   \sstdescription{
+      Destroy a GWM window. The GWM window having the given name on
+      the current X display is destroyed.
+   }
+   \sstinvocation{
+      CALL GWM\_DSWIN( WNAME, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         WNAME = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The window name.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   GWM\_EXIST
+}{
+   Inquire if a GWM window of the given name exists
+}{
+   \sstdescription{
+      Inquire if a GWM window of the given name exists. The current X
+      display is searched for a GWM window with the given name. The
+      result of the search is returned in the EXISTS argument.
+   }
+   \sstinvocation{
+      CALL GWM\_EXIST( WNAME, EXISTS, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         WNAME = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The window name.
+      }
+      \sstsubsection{
+         EXISTS = LOGICAL (Returned)
+      }{
+         True if a GWM window of the given name exists, otherwise false.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   GWM\_GETCI
+}{
+   Inquire the number of colours and the colour indices
+}{
+   \sstdescription{
+      Inquire the number of colours and the colour indices allocated
+      to the given window.
+   }
+   \sstinvocation{
+      CALL GWM\_GETCI( WNAME, IDIM, INDEXS, NCOLS, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         WNAME = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The window name.
+      }
+      \sstsubsection{
+         IDIM = INTEGER (Given)
+      }{
+         The declared size of the INDEXS array.
+      }
+      \sstsubsection{
+         INDEXS = INTEGER(IDIM) (Returned)
+      }{
+         Array containing the colour indices allocated to the window.
+         If the number of allocated colours (NCOLS) is greater than
+         the array size (IDIM) only the first IDIM indices are returned.
+      }
+      \sstsubsection{
+         NCOLS = INTEGER (Returned)
+      }{
+         The number of colours allocated to the window.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   GWM\_OPEN
+}{
+   Establish the X client-server connection
+}{
+   \sstdescription{
+      Establish the X client-server connection. The display name
+      specifies the node on which the server is running. Most
+      applications will use the default device in which case the
+      logical argument USEDEF should be set to true and the display
+      name is ignored. An error handler is established which reports
+      errors via EMS. This routine has to be called before any of
+      the other GWM FORTRAN interface routines. The connection is
+      terminated by the routine GWM\_CLOSE.
+   }
+   \sstinvocation{
+      CALL GWM\_OPEN( DISPLY, USEDEF, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         DISPLY = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Display name specifying the network node name and display
+         number of the workstation. The format of the name will be
+         {\tt "}hostname:number$<$.screen$>${\tt "} if the transport mechanism is
+         TCP/IP or {\tt "}hostname::number$<$.screen$>${\tt "} if the transport
+         mechanism is DECNET. The {\tt "}hostname{\tt "} is the name of the
+         host machine to which the display is physically connected.
+         The {\tt "}number{\tt "} is the number of the server on the host machine.
+         A single CPU can have one or more servers which are usually
+         numbered starting with zero. On a multiple-screen workstation
+         the optional {\tt "}screen{\tt "} number indicates the screen to use.
+         Examples are {\tt "}cpu:0{\tt "}, {\tt "}cpu::0{\tt "}, {\tt "}cpu:0.1{\tt "} or {\tt "}cpu::0.1{\tt "}.
+         If USEDEF is true the display name is ignored.
+      }
+      \sstsubsection{
+         USEDEF = LOGICAL (Given)
+      }{
+         If true use the default display, otherwise use the display
+         specified by the DISPLY argument.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   GWM\_WSETC
+}{
+   Set a character string window option
+}{
+   \sstdescription{
+      The window options are used to control the characteristics of
+      the GWM window and to override the default values. These must
+      be set before the window is created with GWM\_CRWIN. The
+      {\tt '}TITLE{\tt '} option is an example of an character string option.
+   }
+   \sstinvocation{
+      CALL GWM\_WSETC( OPTION, VALUE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         OPTION = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The option name.
+      }
+      \sstsubsection{
+         VALUE = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The option value.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   GWM\_WSETI
+}{
+   Set an integer window option
+}{
+   \sstdescription{
+      The window options are used to control the characteristics of
+      the GWM window and to override the default values. These must
+      be set before the window is created with GWM\_CRWIN. The
+      {\tt '}COLOURS{\tt '} option is an example of an integer option.
+   }
+   \sstinvocation{
+      CALL GWM\_WSETI( OPTION, VALUE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         OPTION = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The option name.
+      }
+      \sstsubsection{
+         VALUE = INTEGER (Given)
+      }{
+         The option value.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   GWM\_WSETL
+}{
+   Set a logical window option
+}{
+   \sstdescription{
+      The window options are used to control the characteristics of
+      the GWM window and to override the default values. These must
+      be set before the window is created with GWM\_CRWIN. A logical
+      option has two values, true or false. A true value means select
+      the option, a false value is equivalent to accepting the default.
+      The {\tt '}INTERACTIVE{\tt '} option is an example of a logical option.
+   }
+   \sstinvocation{
+      CALL GWM\_WSETL( OPTION, VALUE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         OPTION = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The option name.
+      }
+      \sstsubsection{
+         VALUE = LOGICAL (Given)
+      }{
+         The option value, true or false.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\end{small}
+\newpage
+\section{Graphics Driver Interface}
+
+This section describes the routines that are used by low level graphics 
+software to interact with GWM windows. A working knowledge of Xlib
+programmming is assumed.
+\begin{quote}\em
+The routines described here are for the use of ``system'' software only
+and all this information in this section is subject to change without
+notice. Therefore before making any use of it you should consult the Starlink
+project staff at RAL.
+\end{quote}
+These return a status value rather than reporting errors; symbolic names
+for the status values can be found in {\tt gwm\_err.h}. Note that these are
+{\em not} EMS error codes.
+
+\subsection{Anatomy of a Window}
+A GWM window consists of the following components:
+\begin{itemize}
+\item A window
+\item A pixmap for saving the contents of the window
+\item On an X display with a writable colour table, a set of allocated
+colour cells.
+\item Optionally, an allocated bit plane for use as an overlay plane
+(only supported on pseudo colour displays).
+\end{itemize}
+Various items of information are stored as properties of the window so
+that any applications which knows the id of the window can read and
+write them. The {\tt GWM\_Set{\em Xxxx}} and {\tt GWM\_Get{\em Xxxx}}
+routines can be used to access them. The properties are:
+\begin{description}
+
+\item[\tt GWM\_background] The background colour of the window (a character 
+string) 
+
+\item[\tt GWM\_colour\_table] An array of integers that lists the colour
+cells allocated to the window. The first element of the array 
+defines the background colour.
+
+\item[\tt GWM\_foreground] The foreground colour of the window (a character 
+string) 
+
+\item[\tt GWM\_name] The window name (a character string). This enables a
+window id to be translated into a GWM window name.
+
+\item[\tt GWM\_ov\_mask] A bit mask that which plane is the overlay plane.
+The mask has a 1 in every bit position that should be used when writing
+to the window and a 0 in the bit position corresponding to the overlay
+plane. A window with no overlay plane has a mask of all 1s.
+
+\item[\tt GWM\_pixmap] The id of the pixmap.
+
+\item[\tt GWM\_x\_offset GMW\_y\_offset] The position of the top left corner
+of the pixmap relative to the top left corner of the window. Used by the
+refresh process when copying the pixmap to the window and allows the
+contents of the window to be scrolled.
+
+\item[\tt GWM\_x\_ov\_offset GWM\_y\_ov\_offset] As above but for the overlay
+plane.
+
+\end{description}
+
+\subsection{Drawing in the Window}
+
+Everything drawn in the window must also be drawn in the pixmap so that
+the window is refreshed properly. The easiest way to do this is to draw
+into the pixmap first and then add the x and y offsets to all the
+absolute coordinates and then draw into the window. The graphics
+context must have its plane mask set to the value of the overlay mask
+property (so as to avoid altering the overlay plane) and the foreground
+set to one of the numbers in the colour table array. If the drawing
+operation results in anything being drawn with the background colour
+then the background should also be set to one of the numbers in the
+colour table array, usually the first.
+
+If the drawing operation involves a large amount of data it may be more
+efficient to only draw into the pixmap and then copy the pixmap to the
+window with {\tt XCopyArea}. The destination position should be the x
+and y offset values and again, the overlay plane must be protected by
+the plane mask in the gc.
+
+\subsection{Drawing in the Overlay Plane}
+Drawing in the overlay plane is just the same as drawing into the window
+except that the plane mask must be set to the complement of the overlay
+mask
+property and the foreground and background colours must be all 1s and
+all 0s respectively\footnote{Of course in actual fact only the bit that
+corresponds to the overlay plane matters since the rest are masked by
+the plane mask but all 1s and all 0s is the easiest value to use}. The
+overlay offset values must be added to the coordinates when drawing into
+the window.
+
+\subsection{The Colour Table}
+
+On a display with a writeable colour table, the colour table property is a list
+of the colour cells allocated to the refresh process and must not be
+altered.
+
+On a display with a fixed colour table the colour table property will
+list all possible pixel values---since the colour cells can't be changed
+they can be used by all windows---and the colour table can be used to
+map ``virtual'' pixel values to the real pixel values used to write to
+the window and may be altered. For example, GKS uses the colour table to 
+map colour indices onto pixel values.
+
+If a window has an overlay plane, the colour of the overlay plane is set
+by setting the colour cells that correspond to values listed in the
+colour tables ORed with the bit position of the overlay plane (ie. the
+complement of the plane mask).
+
+\subsection{Scrolling}
+Scrolling of the window and overlay planes is achieved by setting the
+values of the offset and overlay offset properties. The refresh process
+is notified of the changes and updates the destination positions it uses
+when copying the pixmap. However, it does not update the window when the
+property values change so the application that changes the offsets must
+copy the window contents to the new position itself.
+
+\subsection{Examples}
+
+Some example programs that illustrate how to perform various operations on a
+GWM window can be found in:
+\begin{quote}
+{\tt GWM\_DIR:GWM\_TESTS.TLB} (on VMS)
+\end{quote}
+or
+\begin{quote}
+{\tt /star/starlink/lib/gwm/gwm\_tests.a} (on UNIX)
+\end{quote}
+
+\newpage
+\subsection{Subroutine Specifications}
+
+\begin{small}
+\sstroutine{
+   GWM\_CreateWindow
+}{
+   Create a window
+}{
+   \sstdescription{
+      A GWM window is created according to the specification in the
+      argument list and the display id of the X connection and the name
+      of the window returned.
+   }
+   \sstinvocation{
+      status = GWM\_CreateWindow( argc, argv, \&display, \&name);
+   }
+   \sstarguments{
+      \sstsubsection{
+         argc = int (given)
+      }{
+         Count of number of arguments
+      }
+      \sstsubsection{
+         argv = $*$char[] (given)
+      }{
+         xmake arguments
+      }
+      \sstsubsection{
+         display = $*$Display (returned)
+      }{
+         display id
+      }
+      \sstsubsection{
+         name = char[] (returned)
+      }{
+         window name
+      }
+   }
+}
+\sstroutine{
+   GWM\_DestroyWindow
+}{
+   Destroy a window
+}{
+   \sstdescription{
+      The X display is searched for the named window and if found, the
+      window name property is removed from the root window and the window
+      and its associated pixmap destroyed.
+   }
+   \sstinvocation{
+      status = GWM\_DestroyWindow( display, name);
+   }
+   \sstarguments{
+      \sstsubsection{
+         display = $*$Display (given)
+      }{
+         Display id
+      }
+      \sstsubsection{
+         name = char[] (given)
+      }{
+         Window name
+      }
+   }
+}
+\sstroutine{
+   GWM\_FindWindow
+}{
+   Find a window
+}{
+   \sstdescription{
+      The X server is searched for a GWM window with the specified name
+      and the id of the window returned.
+   }
+   \sstinvocation{
+      status = GWM\_FindWindow( display, name, \&win);
+   }
+   \sstarguments{
+      \sstsubsection{
+         display = $*$Display (given)
+      }{
+         Display id
+      }
+      \sstsubsection{
+         name = char[] (given)
+      }{
+         Window name
+      }
+      \sstsubsection{
+         win = Window (returned)
+      }{
+         Window id
+      }
+   }
+}
+\sstroutine{
+   GWM\_GetBgCol
+}{
+   Get background colour
+}{
+   \sstdescription{
+      The value of the GWM\_background property is fetched from the window.
+   }
+   \sstinvocation{
+      status = GWM\_GetBgCol(display, win\_id, \&bg);
+   }
+   \sstarguments{
+      \sstsubsection{
+         display = $*$Display (given)
+      }{
+         Display id
+      }
+      \sstsubsection{
+         win\_id = Window (given)
+      }{
+         Window id
+      }
+      \sstsubsection{
+         bg = char$*$ (returned)
+      }{
+         Pointer to background colour specification
+      }
+   }
+}
+\sstroutine{
+   GWM\_GetColTable
+}{
+   Get window{\tt '}s colour table
+}{
+   \sstdescription{
+      The GWM\_colour\_table property is fetched from the window and
+      pointer to it and the number of values it contains returned.
+   }
+   \sstinvocation{
+      status = GWM\_GetColTable( display, win\_id, \&table, \&size);
+   }
+   \sstarguments{
+      \sstsubsection{
+         display = $*$Display (given)
+      }{
+         Display id
+      }
+      \sstsubsection{
+         win\_id = Window (given)
+      }{
+         Window id
+      }
+      \sstsubsection{
+         table = $*$unsigned long (returned)
+      }{
+         Pointer to Colour table
+      }
+      \sstsubsection{
+         size = unsigned long (returned)
+      }{
+         Number of colour table entries
+      }
+   }
+}
+\sstroutine{
+   GWM\_GetFgCol
+}{
+   Get foreground colour
+}{
+   \sstdescription{
+      The value of the GWM\_foreground property is fetched from the window.
+   }
+   \sstinvocation{
+      status = GWM\_GetFgCol(display, win\_id, \&fg);
+   }
+   \sstarguments{
+      \sstsubsection{
+         display = $*$Display (given)
+      }{
+         Display id
+      }
+      \sstsubsection{
+         win\_id = Window (given)
+      }{
+         Window id
+      }
+      \sstsubsection{
+         fg = char$*$ (returned)
+      }{
+         Pointer to foreground colour specification
+      }
+   }
+}
+\sstroutine{
+   GWM\_GetOvMask
+}{
+   Get overlay mask
+}{
+   \sstdescription{
+      The GMW\_ov\_mask property is fetched from the window.
+   }
+   \sstinvocation{
+      status = GWM\_GetOvMask( display, win\_id, \&mask);
+   }
+   \sstarguments{
+      \sstsubsection{
+         display = $*$Display (given)
+      }{
+         Display id
+      }
+      \sstsubsection{
+         win\_id = Window (given)
+      }{
+         Window id
+      }
+      \sstsubsection{
+         mask = unsigned long
+      }{
+         Overlay plane mask
+      }
+   }
+}
+\sstroutine{
+   GWM\_GetOvScroll
+}{
+   Get overlay scroll offset
+}{
+   \sstdescription{
+      The values of the GWM\_x\_ov\_offset and GWM\_y\_ov\_offset properties
+      are fetched from the window.
+   }
+   \sstinvocation{
+      status = GWM\_GetOvScroll( display, win\_id, \&xoffset, \&yoffset);
+   }
+   \sstarguments{
+      \sstsubsection{
+         display = $*$Display (given)
+      }{
+         Display id
+      }
+      \sstsubsection{
+         win\_id = Window (given)
+      }{
+         Window id
+      }
+      \sstsubsection{
+         xoffset = int (returned)
+      }{
+         Overlay scroll offset in x
+      }
+      \sstsubsection{
+         yoffset = int (returned)
+      }{
+         Overlay scroll offset in y
+      }
+   }
+}
+\sstroutine{
+   GWM\_GetPixmap
+}{
+   Get pixmap id
+}{
+   \sstdescription{
+      The value of the GWM\_pixmap property is fetched from the window.
+   }
+   \sstinvocation{
+      status = GWM\_GetPixmap( display, win\_id, \&pix\_id);
+   }
+   \sstarguments{
+      \sstsubsection{
+         display = $*$Display (given)
+      }{
+         Display id
+      }
+      \sstsubsection{
+         win\_di = Window (given)
+      }{
+         Window id
+      }
+      \sstsubsection{
+         pix\_id = Pixmap (returned)
+      }{
+         Pixmap id
+      }
+   }
+}
+\sstroutine{
+   GWM\_GetScroll
+}{
+   Get scroll offset
+}{
+   \sstdescription{
+      The values of the GWM\_x\_offset and GWM\_y\_offset properties are
+      fetched from the window.
+   }
+   \sstinvocation{
+      status = GWM\_GetScroll(display, win\_id, \&xoffset, \&yoffset);
+   }
+   \sstarguments{
+      \sstsubsection{
+         display = $*$Display (given)
+      }{
+         Display id
+      }
+      \sstsubsection{
+         win\_id = Window (given)
+      }{
+         Window id
+      }
+      \sstsubsection{
+         xoffset = int (returned)
+      }{
+         Scroll offset in x
+      }
+      \sstsubsection{
+         yoffset = int (returned)
+      }{
+         Scroll offset in y
+      }
+   }
+}
+\sstroutine{
+   GWM\_SetBgCol
+}{
+   Set background colour property
+}{
+   \sstdescription{
+      The value of the GWM\_background property is set on the window.
+   }
+   \sstinvocation{
+      status = GWM\_SetBgCol(display, win\_id, bg);
+   }
+   \sstarguments{
+      \sstsubsection{
+         display = $*$Display (given)
+      }{
+         Display id
+      }
+      \sstsubsection{
+         win\_id = Window (given)
+      }{
+         Window id
+      }
+      \sstsubsection{
+         bg = char (given)
+      }{
+         Background colour specification
+      }
+   }
+}
+\sstroutine{
+   GWM\_SetColTable
+}{
+   Set colour table
+}{
+   \sstdescription{
+      The GWM\_colour\_table window property is replaced with the new
+      array of values.
+   }
+   \sstinvocation{
+      status = GWM\_SetColTable( display, win\_id, table, size);
+   }
+   \sstarguments{
+      \sstsubsection{
+         display = $*$Display (given)
+      }{
+         Display id
+      }
+      \sstsubsection{
+         win\_id = Window (given)
+      }{
+         Window id
+      }
+      \sstsubsection{
+         table = $*$unsigned int (given)
+      }{
+         Pointer to new colour table array
+      }
+      \sstsubsection{
+         size = unsigned long (given)
+      }{
+         Number of entries in colour table
+      }
+   }
+}
+\sstroutine{
+   GWM\_SetFgCol
+}{
+   Set foreground colour property
+}{
+   \sstdescription{
+      The value of the GWM\_foreground property is set on the window.
+   }
+   \sstinvocation{
+      status = GWM\_SetFgCol(display, win\_id, fg);
+   }
+   \sstarguments{
+      \sstsubsection{
+         display = $*$Display (given)
+      }{
+         Display id
+      }
+      \sstsubsection{
+         win\_id = Window (given)
+      }{
+         Window id
+      }
+      \sstsubsection{
+         fg = char (given)
+      }{
+         Foreground colour specification
+      }
+   }
+}
+\sstroutine{
+   GWM\_SetOvScroll
+}{
+   Set overlay scroll offset
+}{
+   \sstdescription{
+      The values of the GWM\_x\_ov\_offset and GWM\_y\_ov\_offset window
+      properties are replaced by the new values.
+   }
+   \sstinvocation{
+      status = GWM\_SetOvScroll( display, win\_id, xoffset, yoffset);
+   }
+   \sstarguments{
+      \sstsubsection{
+         display = $*$Display (given)
+      }{
+         Display id
+      }
+      \sstsubsection{
+         win\_id = Window (given)
+      }{
+         Window id
+      }
+      \sstsubsection{
+         xoffset = int (given)
+      }{
+         New overlay offset value in x
+      }
+      \sstsubsection{
+         yoffset = int (given)
+      }{
+         New overlay offset value in y
+      }
+   }
+}
+\sstroutine{
+   GWM\_SetPixmap
+}{
+   Set pixmap id
+}{
+   \sstdescription{
+      The value of the GWM\_pixmap window property is replaced with the
+      new value.
+   }
+   \sstinvocation{
+      status = GWM\_SetPixmap( display, win\_id, pix\_id);
+   }
+   \sstarguments{
+      \sstsubsection{
+         display = $*$Display (given)
+      }{
+         Display id
+      }
+      \sstsubsection{
+         win\_id = Window (given)
+      }{
+         Window id
+      }
+      \sstsubsection{
+         pix\_id = Pixmap (given)
+      }{
+         New pixmap id
+      }
+   }
+}
+\sstroutine{
+   GWM\_SetScroll
+}{
+   Set offset offset
+}{
+   \sstdescription{
+      The GWM\_x\_offset and GWM\_y\_offset window properties
+      are replaced by the new values.
+   }
+   \sstinvocation{
+      status = GWM\_SetScroll( display, win\_id, xoffset, yoffset);
+   }
+   \sstarguments{
+      \sstsubsection{
+         display = $*$Display (given)
+      }{
+         Display id
+      }
+      \sstsubsection{
+         win\_id = Window (given)
+      }{
+         Window id
+      }
+      \sstsubsection{
+         xoffset = int (given)
+      }{
+         New window scroll offset in x
+      }
+      \sstsubsection{
+         yoffset = int (given)
+      }{
+         New window scroll offset in y
+      }
+   }
+}
+\end{small}
+\end{document}

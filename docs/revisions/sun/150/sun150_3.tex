@@ -1,0 +1,3327 @@
+\documentstyle[11pt]{article} 
+\pagestyle{headings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {150.3}
+\newcommand{\stardocauthors}   {D.S. Berry}
+\newcommand{\stardocdate}      {9th March 1994}
+\newcommand{\stardoctitle}     {GRP \\ [1ex]
+                                Routines for Managing Groups of\\
+                                Objects}
+\newcommand{\stardocversion}   {Version 2.0}
+\newcommand{\stardocmanual}    {Programmer's Manual}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\renewcommand{\_}{{\tt\char'137}}
+\renewcommand{\thepage}{\roman{page}}
+
+\begin{document}
+
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Huge\bf  \stardoctitle \\ [2.5ex]}
+{\LARGE\bf \stardocversion \\ [4ex]}
+{\Huge\bf  \stardocmanual}
+\end{center}
+\vspace{15mm}
+
+%------------------------------------------------------------------------------
+%  Package Description
+\begin{center}
+{\Large\bf Description}
+\end{center}
+
+GRP provides facilities for handling groups of objects which can be described by
+character strings (e.g. file names, astronomical objects, numerical values,
+etc). Facilities are provided for storing and retrieving such character strings
+within groups, and for passing groups of character strings between applications
+by means of a text file. It also allows the creation of groups in which each
+element is a modified version of an element in another group. 
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+\newpage
+\markright{\stardocname}
+\null\vspace {5mm}
+\begin {center}
+\rule{80mm}{0.5mm} \\ [1ex]
+{\Large\bf \stardoctitle \\ [2.5ex]
+           \stardocversion} \\ [2ex]
+\rule{80mm}{0.5mm}
+\end{center}
+
+\setlength{\parskip}{0mm}
+\tableofcontents
+\setlength{\parskip}{\medskipamount}
+
+%------------------------------------------------------------------------------
+%  Introduction page
+\newpage
+\markright{\stardocname}
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
+
+\null\vspace {5mm}
+\begin {center}
+\rule{80mm}{0.5mm} \\ [1ex]
+{\Large\bf \stardoctitle \\ [2.5ex]
+           \stardocversion} \\ [2ex]
+\rule{80mm}{0.5mm}
+\end{center}
+\vspace{30mm}
+
+
+\section {Introduction}
+
+Applications often have to manage groups of strings in which each string 
+represents some object. Typical examples of the contents of such groups may be:
+
+\begin{itemize}
+\item Names of astronomical objects.
+\item File names.
+\item Lists of wavelengths of spectral lines.
+\end{itemize}
+
+The GRP package provides facilities for managing the storage and retrieval of
+strings within such groups. Applications may explicitly specify strings to be
+stored within a group, or instead may specify the name of a text file from which
+to read such strings. The contents of a group may be written out to a text file,
+providing an easy means of passing groups of objects between applications.
+
+\subsection{Facilities Provided by GRP}
+\label{SEC:FAC}
+The concept of a group within GRP may be compared with an ``array'' structure
+within a high level programming language such as Fortran. Arrays are used for
+storing many values in a single object, with each value associated with an
+integer ``index''. A value can be stored in, or retrieved from, a particular
+element of an array by specifying the index for that element. The facilities
+provided by the GRP package are similar. GRP allows character strings to be
+stored in, or retrieved from, one of several ``groups'' (in this sense, a
+``group'' is the GRP equivalent of a character array). Each element within the
+group has an associated index, and different groups are distinguished by
+different ``identifiers'' (similar to the way that different arrays are
+distinguished by having different names). 
+
+GRP also provides the following features not available through the use of
+Fortran arrays: 
+
+\begin{enumerate}
+
+\item In order to store values in a normal character array, you must assign an
+explicit character string to each element of the array. The GRP package provides
+similar facilities for storing explicit strings, but also provides facilities
+for reading the values to be stored from a text file. This is known as {\em
+indirection}; instead of providing a set of strings to be stored, you provide
+the name of a file which contains the strings to to be stored. For instance, if
+you were prompted for a list of data files to be processed, you could then
+respond either with the explicit name of each data file, or with the name of a
+text file containing a list of the names of the data files. 
+
+\item \label{ITEM:MOD} An alternative method for specifying values to be stored
+in a group is by modification of the values already stored in {\em another}
+group. For instance, if values are to be assigned to elements 1 to 3, the actual
+strings stored would be obtained by taking the values stored in elements 1 to 3
+of another group and applying some editing to them. The same editing is used for
+each element; it can include the addition of a suffix and/or a prefix, and the
+substitution of one sub-string with another. A typical use of this facility
+could be to specify a set of output files by describing the editing and the names
+of the corresponding input files. Thus, if a group describing the input files
+contained the three strings:
+
+\small
+\begin{verbatim}
+      OBJ1.DAT
+      OBJ2.DAT   
+      OBJ3.DAT
+\end{verbatim}
+\normalsize
+
+you might specify the output files using a string such as:
+
+\small
+\begin{verbatim}
+      A_*|DAT|TXT|
+\end{verbatim}
+\normalsize
+
+This would cause the addition of the
+prefix ``{\bf A\_}'' and substitution of ``{\bf TXT}'' for ``{\bf DAT}'',
+resulting in the output file names:
+
+\small
+\begin{verbatim}
+      A_OBJ1.TXT
+      A_OBJ2.TXT
+      A_OBJ3.TXT
+\end{verbatim}
+\normalsize
+
+\item In the above example, a group of values was obtained by copying them from
+another group, and then applying some specified editing. This technique of
+editing values can be combined with other ways of specifying the original
+values. For instance, to apply the same editing as above to each of the values
+stored in the text file {\tt OBJECTS.LIS} the following response could be given:
+
+\small
+\begin{verbatim}
+      A_{^OBJECTS.LIS}|DAT|TXT|
+\end{verbatim}
+\normalsize
+
+\newpage
+
+If the same editing is to be applied to a list of literal values typed in 
+directly at the keyboard, then a response such as the following could be given:
+
+\small
+\begin{verbatim}
+      A_{OBJ1.DAT,OBJ2.DAT,OBJ3.DAT}|DAT|TXT|
+\end{verbatim}
+\normalsize
+
+\item Groups have dynamic size (i.e. they expand in size as required to make
+room for new values), which is often more convenient than the fixed size of an
+array specified in its declaration. Thus if an application wants to process
+many data files, and chooses to store the file names in a GRP group, then no
+limit is imposed on the number of files which the user may specify. 
+
+\item The contents of a group may be written out to a text file using a single
+subroutine call. This, together with the ability to read a group's contents
+from a text file, provides a convenient means of passing groups of objects
+between applications. For instance, an application may produce a text file
+holding the names of all the output data files it has created. A later
+application can then read this text file to obtain the names of the data files
+which it is to process. 
+
+\item Elements within a group can be copied in a single call to another group.
+Duplicate names may also be purged from a group in a single call. 
+
+\item GRP stores information about how each value within a group group was
+obtained (i.e. whether it was given explicitly, or by indirection, or by
+modification). The names of indirection files are stored, as are the identifiers
+for groups used as the basis for ``modified'' elements, and all this information
+is available to the calling application. 
+
+\end{enumerate}
+
+GRP is a general purpose library which makes no attempt to 
+attach any particular meaning or properties to the strings stored in a group.
+It is expected that other, more specialized libraries will be written 
+which use GRP to handle specific types of strings (eg coordinate values, names
+of data files, etc). Such packages will provide additional features to handle 
+the objects stored by GRP (eg the creation, opening and closing of data files).
+
+\subsection{An Example of a Simple GRP Application}
+\label{SEC:EXAMC}
+The facilities of GRP are particularly useful for processing lists of text
+strings provided in response to a prompt. The user of an application can specify
+the strings literally, or can specify the name of a text file containing the
+strings, or can specify the editing to be used to derive them by modification of
+the strings stored somewhere else.
+
+\subsubsection{Example Code}
+Here is a simple example of the use of GRP which illustrates the ideas of
+indirection and modification. In this example, each stored string corresponds to
+the name of a file but obviously an application could apply other
+interpretations. The user is prompted for a set of input file names and then
+prompted again for a set of output file names. Each input file is processed in
+some way (by routine PROC) to produce the corresponding output file. The source
+code that follows is not intended to provide all the information necessary to
+write GRP applications, but simply to give a feeling for the way GRP works: 
+\small
+\begin{quote}
+\begin{tabbing} % Not clear why this is needed, but leading spaces get
+                % lost otherwise.
+\verb#      SUBROUTINE GRP_TEST( STATUS )                           # \fbox{1}\\
+\verb#      IMPLICIT NONE                                           #\\
+\verb#                                                              #\\
+\verb#*  Include definitions of global constants.                   #\\
+\verb#      INCLUDE 'SAE_PAR'                                       # \fbox{2}\\
+\verb#      INCLUDE 'GRP_PAR'                                       # \fbox{3}\\
+\verb#                                                              #\\
+\verb#*  Declare local variables.                                   #\\
+\verb#      INTEGER STATUS, IGRP1, IGRP2, SIZE1, SIZE2, ADDED, I    #\\
+\verb#      CHARACTER*(GRP__SZNAM) INFIL, OUTFIL                    #\\
+\verb#      LOGICAL FLAG                                            #\\
+\verb#                                                              #\\
+\verb#*  Check inherited global status.                             #\\
+\verb#      IF ( STATUS .NE. SAI__OK ) RETURN                       # \fbox{4}\\
+\verb#                                                              #\\
+\verb#*  Create a new (empty) group to contain the names of the     #\\
+\verb#*  input files.                                               #\\
+\verb#      CALL GRP_NEW( 'Input files', IGRP1, STATUS )            # \fbox{5}\\
+\verb#                                                              #\\
+\verb#*  Prompt the user for a group of input file names and place  #\\
+\verb#*  them in the group just created.                            #\\
+\verb#      CALL GRP_GROUP( 'IN_FILES', GRP__NOID, IGRP1, SIZE1,    # \fbox{6}\\
+\verb#     :                ADDED, FLAG, STATUS )                   #\\
+\verb#                                                              #\\
+\verb#*  Create a second group to hold output file names.           #\\
+\verb#      CALL GRP_NEW( 'Output files', IGRP2, STATUS )           # \fbox{7}\\
+\verb#                                                              #\\
+\verb#*  Prompt the user for a group of output file names, giving   #\\
+\verb#*  the chance to specify them by modification of the input    #\\
+\verb#*  file names. Place the output file names in the new group   #\\
+\verb#*  just created.                                              #\\
+\verb#      CALL GRP_GROUP( 'OUT_FILES', IGRP1, IGRP2, SIZE2,       # \fbox{8}\\
+\verb#     :                ADDED, FLAG, STATUS )                   #\\
+\verb#                                                              #\\
+\verb#*  Report an error and abort if the number of output files    #\\
+\verb#*  does not equal the number of input files.                  #\\
+\verb#      IF( SIZE2 .NE. SIZE1 .AND. STATUS .EQ. SAI__OK ) THEN   # \fbox{9}\\
+\verb#         STATUS = SAI__ERROR                                  #\\
+\verb#         CALL ERR_REP( 'GRP_TEST_ERR1',                       #\\
+\verb#     :           'Incorrect number of output files specified',#\\
+\verb#     :           STATUS )                                     #\\
+\verb#         GO TO 999                                            #\\
+\verb#      END IF                                                  #\\
+\verb#                                                              #\\
+\verb#*  Loop round each input file.                                #\\
+\verb#      DO I = 1, SIZE1                                         # \fbox{10}\\
+\verb#                                                              #\\
+\verb#*  Retrieve the input file name with index given by I.        #\\
+\verb#         CALL GRP_GET( IGRP1, I, 1, INFIL, STATUS )           # \fbox{11}\\
+\verb#                                                              #\\
+\verb#*  Retrieve the output file name with index given by I.       #\\
+\verb#         CALL GRP_GET( IGRP2, I, 1, OUTFIL, STATUS )          #\\
+\verb#                                                              #\\
+\verb#*  Process the data.                                          #\\
+\verb#         CALL PROC( INFIL, OUTFIL, STATUS )                   # \fbox{12}\\
+\verb#                                                              #\\
+\verb#*  Do the next input file.                                    #\\
+\verb#      END DO                                                  #\\
+\verb#                                                              #\\
+\verb#*  Delete the groups created by this application.             #\\
+\verb# 999  CONTINUE                                                #\\
+\verb#      CALL GRP_DELET( IGRP1, STATUS )                         # \fbox{13}\\
+\verb#      CALL GRP_DELET( IGRP2, STATUS )                         #\\
+\verb#                                                              #\\
+\verb#      END                                                     #\\
+\end{tabbing}
+\end{quote}
+\normalsize
+
+{\bf Programming notes:}
+
+\begin{enumerate}
+
+\item The example is actually an ADAM A-task, and so consists of a subroutine with
+a single argument giving the inherited status value. See SUN/101 for further
+details about writing ADAM A-tasks. A ``stand-alone'' version of the GRP package
+is available which can be used with non-ADAM applications. 
+
+\item The first INCLUDE statement is used to define standard ``symbolic
+constants'', such as the values SAI\_\_OK and SAI\_\_ERROR which are used in
+this routine. Starlink software makes widespread use of such constants, which should always
+be defined in this way rather than by using actual numerical values. The file
+SAE\_PAR is almost always needed, and should be included as standard in every
+application. 
+
+\item The second INCLUDE statement performs a similar function to the first, but
+defines symbolic constants which are specific to the GRP package. Such constants
+are recognizable by the fact that they start with the five characters
+``GRP\_\_'' (such as GRP\_\_NOID and GRP\_\_SZNAM used in the above example).
+Note the double underscore ``\_\_'' which distinguishes them from subroutine
+names. 
+
+\item The value of the STATUS argument is checked. This is because the
+application uses the Starlink error handling strategy (see SUN/104), which
+requires that a subroutine should do nothing unless its STATUS argument is set
+to the value SAI\_\_OK on entry. Here, we simply return without action if STATUS
+has the wrong value. 
+
+\item An identifier for a new group is now obtained. The variable IGRP1 is
+returned holding an integer value which the GRP package uses to recognise the
+group just created. Initially, there are no names stored in the group. A string
+is stored which should be used to give a description of the type of objects
+stored within the group (in this case the string {\em ``Input files''} is
+used). 
+
+\item The user is now prompted for a value for the parameter IN\_FILES, and
+replies with a string, which GRP splits up into separate elements, each element
+being either a literal file name or the name of a text file containing other
+file names. As there are no other groups defined at this point, it is not
+possible to specify the files names using ``modification'' (as described in item
+\ref{ITEM:MOD} in section \ref{SEC:FAC}). For this reason, the second argument
+(which would normally specify the group to use as the basis for modification) is
+given the value GRP\_\_NOID. This is a special identifier value used to indicate
+a ``null'' group. The names supplied by the user are stored in the group created
+by the previous call to GRP\_NEW, and the number of names is returned in
+argument SIZE1. \footnotemark 
+\footnotetext{ Note, no permanent association exists between the {\em group}
+identified by IGRP1 and the {\em parameter} IN\_FILES (which is one reason why
+GRP\_GROUP is not called GRP\_ASSOC). The parameter value may be cancelled (for
+instance using PAR\_CANCL) without effecting the contents of the group.} 
+
+\item A second group is now created to hold the output file names. The two 
+groups are distinguished by the fact that they have different identifiers 
+(stored in IGRP1 and IGRP2).
+
+\item \label {ITEM:OUT} The user is prompted again, this time for a value for
+the parameter OUT\_FILES and the names obtained are stored in the second group
+just created. Again the user can give literal files names and/or the names of
+text files holding other file names. Now that there are two groups, it is
+possible to use modification to specify the output files. The identifier for the
+group containing the input files names is given as the second argument of
+GRP\_GROUP, telling the GRP system that {\em if} the user specifies output file
+names using modification (which may not be the case of course), then the output
+file names are to be derived by modifying the input file names stored in the
+first group. 
+
+\item \label {ITEM:CHK} In this particular application it is deemed necessary to
+have equal numbers of input and output files, but GRP imposes no restrictions on the
+number of strings which can be supplied when responding to a prompt from
+GRP\_GROUP. It is therefore necessary to check the that the two groups contain
+the same number of elements. A more sophisticated application might seek user
+intervention to determine how to proceed at this point (either by requesting
+extra output file names or by ignoring some). Note, if some other error has already been detected (as shown by 
+STATUS having a value other than SAI\_\_OK), then the check on the number of 
+input and output files is irrelevant. 
+
+\item Having stored the input file names in one group and the output file names
+in another, the application now loops through each pair of input and output file
+names in turn. An ``index'' I is used to distinguish between different
+elements within a group. The input file name with index I is retrieved from the
+first group and the output file name with the same index is retrieved from the
+second group. 
+
+\item Note, there is a limit to the size of the character string which can be
+stored in a GRP group. This size is given by the symbolic constant GRP\_\_SZNAM.
+
+\item A routine is now called which uses the two file names; a typical routine
+may take data out of the input file, process it and store the results in the
+output file. The file handling itself would be done within the routine PROC.
+This example actually makes no assumptions about what the strings stored in the
+two groups represent (the descriptive strings stored when the two groups were
+created are of no significance in this application). Although, for clarity, it
+has been assumed that the strings correspond to file names, they could just as
+easily have been wavelengths, the names of astronomical objects, calender dates,
+or just about anything else. 
+
+\item Finally, the groups created by this application are deleted. This is
+particularly important in applications which run as subroutines within a wider
+context (such as ADAM applications). There is a limited number of groups
+available, and if applications forget to delete the groups they have created,
+then the possibility of exceeding the limit then exists. Note, the groups should
+be deleted even if the application aborts because of an error, so the statement
+labelled 999 (to which a jump is made if an error is detected) comes {\em
+before} the calls to GRP\_DELET. 
+
+\end{enumerate}
+
+\subsubsection{Examples of Possible User Responses}
+If the example above was run, the user could respond in several ways to the
+prompts for parameters IN\_FILES and OUT\_FILES. The following paragraphs
+illustrate the use of indirection and modification in this context. 
+
+\paragraph {Indirection.}
+When prompted for IN\_FILES the user could reply with the following text:
+
+\small
+\begin{verbatim}
+      IC_1575_RAW, IC_4320_RAW, ^NGC_OBJECTS.LIS
+\end{verbatim}
+\normalsize
+
+This would cause the GRP package to place the two strings {\tt IC\_1575\_RAW}
+and {\tt IC\_4320\-\_RAW} in two elements of the first group and then search
+for a file called {\tt NGC\_OBJECTS.LIS}. If this file contains the following
+two lines of text: 
+
+\small
+\begin{verbatim}
+      NGC_5128_RAW, NGC_2534_RAW
+      ^OTHERS.LIS
+\end{verbatim}
+\normalsize
+
+then the strings {\tt NGC\_5128\_RAW} and {\tt NGC\_2534\_RAW} would be added
+to the same group, and a search made for the file {\tt OTHERS.LIS}. If this
+file, in turn, contained the two lines:
+
+\small
+\begin{verbatim}
+      NGC_1947_FLAT
+      NGC_3302_FLAT
+\end{verbatim}
+\normalsize
+
+then the final group would consist of the six strings:
+
+\small
+\begin{verbatim}
+      IC_1575_RAW
+      IC_4320_RAW
+      NGC_5128_RAW
+      NGC_2534_RAW   
+      NGC_1947_FLAT
+      NGC_3302_FLAT
+\end{verbatim}
+\normalsize
+
+This illustrates the use of indirection as a means of specifying the strings to
+be stored in a group, and shows it being combined with the specification of
+literal strings, and indirections being nested. 
+
+Strings stored in a text file can be edited ``on the fly'' before being stored
+in a group. For instance, the user could give the following response to a prompt
+for IN\_FILES:
+
+\small
+\begin{verbatim}
+        ^NGC_OBJECTS.LIS|_RAW|_CAL|
+\end{verbatim}
+\normalsize
+
+This would cause the GRP package to read the values stored in text file {\tt
+NGC\_OBJECTS.LIS}, replacing all occurrences of the string ``\_RAW'' with the
+string ``\_CAL''. If the file {\tt NGC\_OBJECTS.LIS} contained the same values
+as before, then the editing would also be applied to the values stored in the
+file {\tt OTHERS.LIS}.
+
+\paragraph {Modification.}
+As an example of the use of ``modification'', let's suppose that the user
+responds to the prompt for OUT\_FILES with the string: 
+
+\small
+\begin{verbatim}
+      A_*2|RAW|FLAT|
+\end{verbatim}
+\normalsize
+
+This would cause the application to generate six strings, based on the
+six strings held in the first group (see programming note \ref{ITEM:OUT}).
+The names are generated as follows
+\begin{enumerate}
+\item First, a copy of the six names in the first group is made and stored in 
+the second group.
+\item Next, any occurrence of the string ``RAW'' within any of these
+names is replaced with the string ``FLAT''. This 
+leaves the second group holding the names:
+
+\small
+\begin{verbatim}
+      IC_1575_FLAT
+      IC_4320_FLAT
+      NGC_5128_FLAT
+      NGC_2534_FLAT
+      NGC_1947_FLAT
+      NGC_3302_FLAT
+\end{verbatim}
+\normalsize
+
+\item Next, each name is substituted in turn for the ``$*$'' character in the 
+string to the left of the first ``$\mid$'' character. Thus each name is prefixed by
+``A\_'' and suffixed by ``2''. The second group finally holds the names:
+
+\small
+\begin{verbatim}
+      A_IC_1575_FLAT2
+      A_IC_4320_FLAT2
+      A_NGC_5128_FLAT2 
+      A_NGC_2534_FLAT2
+      A_NGC_1947_FLAT2
+      A_NGC_3302_FLAT2
+\end{verbatim}
+\normalsize
+
+\end{enumerate}
+
+Modification can be combined with indirection and/or the specification of 
+literal strings. For instance, the user could have replied to the prompt for 
+OUT\_FILES with the string:
+
+\small
+\begin{verbatim}
+      NEW_FILE,A_*2|RAW|FLAT|,^LIST.DAT
+\end{verbatim}
+\normalsize
+
+This would have caused the second group to contain not only the six names
+described above, but also the additional names {\bf NEW\_FILE} and any names
+read from the text file LIST.DAT. In this case, the number of output files would
+have exceeded the number of input files and the check described in programming
+note \ref{ITEM:CHK} would fail. 
+
+\section{Names}
+
+Each string stored within a group is referred to in the rest of this document as
+a {\em name}. The term is used purely for convenience and is not meant to imply
+anything about what the strings actually represent. In some cases the strings
+may easily be thought of as {\em names} (for instance, in the example
+in the previous section the strings were the {\em names} of
+files), but this may not always be so. 
+
+The maximum length of a name is given by the symbolic constant GRP\_\_SZNAM
+(which is currently 255). Leading spaces, and spaces within names are
+significant, but trailing spaces are ignored. Completely blank names are
+allowed, and null names (i.e. names of zero length) are treated as blank names.
+
+\subsection{Case Sensitivity}
+\label{SEC:CASE}
+Names are always {\em stored} in the form in which they are supplied. However,
+when names are {\em retrieved} from a group they will be converted to upper case
+if the group has been designated as a case insensitive group. When groups are
+first created they are considered to be case sensitive (i.e. names are retrieved
+from the group in the same form in which they were stored). They can be made
+case {\em in}-sensitive by calling routine GRP\_SETCS. Any comparisons involving
+names held in case insensitive groups are performed without reference to case. 
+
+\section{Groups and Group Identifiers}
+
+Applications can maintain information about many independent groups
+simultaneously. The maximum number of simultaneously active groups is currently
+set to 100 and is given by the symbolic constant GRP\_\_MAXG. There is no
+limit on the number of names that a single group can contain (other than those
+imposed by system quotas).
+
+The GRP system distinguishes between different groups by use of an {identifier}
+system. When a new group is created, it is assigned a ``GRP identifier'' or
+``group identifier''. This value is used to specify which group is to be acted
+upon by subsequent GRP calls. The symbolic constant GRP\_\_NOID can be given in
+certain places where a GRP identifier would normally be given, in order to
+specify a ``null'' group. Note, identifiers in the GRP package cannot be
+``cloned'' to produce alternative, independent channels for accessing the same
+group. If two integer variables contain identifiers for a single group, then
+the integer values stored in the two variables will always be equal. 
+
+\section {Group Expressions}
+\label{SEC:GREXP}
+
+One of the most useful routines within GRP is GRP\_GROUP. This routine appends
+names to the end of a previously created group using a ``group expression''
+obtained from the environment via a named parameter which can be of any type. The
+routine GRP\_GRPEX also performs this function, except that the group expression
+is provided by the calling application, rather than being obtained through the
+parameter system. 
+
+This section describes the syntax of group expressions.
+
+\subsection{Elements and Delimiters}
+Group expressions may contain several ``delimiter'' characters (usually a comma
+although this can be changed, see section \ref{SEC:CC}) and the substrings
+delimited by these characters are referred to as ``elements''. If there are no
+delimiters in a group expression, then the group expression consists of a single
+element. For instance, the group expression: 
+
+\small
+\begin{verbatim}
+      NEW_FILE,A_*2|RAW|FLAT|,^LIST.DAT
+\end{verbatim}
+\normalsize
+
+consists of the three elements {\bf NEW\_FILE}, 
+{\bf A\_$*$2$\mid$RAW$\mid$FLAT$\mid$} and {\bf
+\verb+^+LIST.DAT}. Note, delimiter characters are ignored if they occur within
+matching ``nesting characters'' (see section \ref{SEC:NEST}). For instance, 
+nesting prevents the group expression:
+
+\small
+\begin{verbatim}
+      FLATFIELD(100:200,20:220),OBJECT
+\end{verbatim}
+\normalsize
+
+being split into three elements instead of two (i.e. the first comma does not
+act as a delimiter because it occurs within a nest formed by matching parentheses). 
+
+Each element of a group expression may be a literal name (eg {\bf NEW\_FILE} in
+the previous example), or an ``indirection element'' or a ``modification
+element''. An indirection element specifies a text file from which further names
+are to be read (eg {\bf \verb+^+LIST.DAT} in the previous example). A
+modification element specifies an existing group of names which are to be used
+as the basis for the new names (eg {\bf A\_$*$2$\mid$RAW$\mid$FLAT$\mid$} in the
+previous example). These are described in more detail below. 
+
+\subsection{Editing of Names}
+Each element in a group expression will give rise to one or more names 
+(depending on whether the element consists of a literal name, an indirection 
+element or a modification element). These names may be edited before being 
+stored in a group by including certain ``editing strings'' within the text of 
+the element. The general format of an element with editing strings included is:
+
+\small
+\begin{verbatim}
+      prefix{kernel}suffix|old|new|
+\end{verbatim}
+\normalsize
+
+The {\em kernel} string can be a single element, or can be a full group
+expression. Processing of the element proceeds as follows:
+
+\begin{enumerate}
+
+\item The kernel is first expanded to give a list of literal names. This may
+involve reading names from files, copying names from another group, etc,
+depending on the exact nature of the kernel. The characters which mark the start
+and end of the kernel are known as the opening and closing kernel delimiters.
+They are usually set to be ``\{'' and ``\}'', but can be changed if needed. 
+
+\item Each name is checked to see if it contains the {\em old} string. If it
+does, all occurrences of the {\em old} string are replaced by the {\em new}
+string. The character which delimits the {\em old} and {\em new} strings is
+known as the ``separator'' character and is usually a ``$\mid$'' character, 
+but can be
+changed if needed. This substitution will be case sensitive if the group to
+which the names are to be added has been designated as case sensitive (see
+section \ref{SEC:CASE}). If no substitutions are to be performed then the old
+and new strings, together with the three separator characters, should be
+omitted. 
+
+\item The {\em prefix} string is added to the start of each name, and the {\em 
+suffix} string is appended to the end of each name. Either or both of these 
+strings may be null (i.e. of zero length).
+
+\end{enumerate}
+
+The names which result from this processing are then added to a group. If there
+is no ambiguity about where the kernel starts and finishes (for instance if the
+prefix and suffix are both omitted, and the kernel consists of a single element)
+then the kernel does not need to be enclosed within kernel delimiters. The
+contents of the kernel can be any group expression. In particular, the kernel
+can contain other nested kernels with their own associated editing strings. 
+
+Let's look at some examples:
+
+\small
+\begin{verbatim}
+      A_{TOM,DICK,HARRY}_B
+\end{verbatim}
+\normalsize
+
+This will give rise to the three names {\bf A\_TOM\_B}, {\bf A\_DICK\_B} and 
+{\bf A\_HARRY\_B}.
+
+\small
+\begin{verbatim}
+      ^FILE.LIS|_OLD|_NEW|
+\end{verbatim}
+\normalsize
+
+This will read names from the text file {\tt FILE.LIS} (see the description of 
+indirection elements below), and replace all occurrences of the string ``{\bf 
+\_OLD}'' within the names with the string ``{\bf \_NEW}''.
+
+\small
+\begin{verbatim}
+      WW,{A,B_{ONE,TWO,THREE}|T|Z|,C}KK|_Z|_Y|
+\end{verbatim}
+\normalsize
+
+This is a complex example and needs looking at carefully. Looking at it at the 
+highest level, it can be thought of as:
+
+\small
+\begin{verbatim}
+      WW,{kernel}KK|_Z|_Y|
+\end{verbatim}
+\normalsize
+
+where {\tt kernel} is the group expression:
+
+\small
+\begin{verbatim}
+      A,B_{ONE,TWO,THREE}|T|Z|,C
+\end{verbatim}
+\normalsize
+
+The first and third elements in this inner group expression are simple literal names
+and give rise to the two names {\bf A} and {\bf C}. The second element specifies
+that the three names {\bf ONE}, {\bf TWO} and {\bf THREE} are to be edited by
+replacement of the letter T by the letter Z, and the addition of the prefix {\bf
+B\_}. After editing, these three names become {\bf B\_ONE}, {\bf B\_ZWO} and
+{\bf B\_ZHREE}. So the total group specified by this inner kernel is: 
+
+\small
+\begin{verbatim}
+      A
+      B_ONE
+      B_ZWO
+      B_ZHREE
+      C
+\end{verbatim}
+\normalsize
+
+We can now go back and look at the full group expression in the form:
+
+\small
+\begin{verbatim}
+      WW,{kernel}KK|_Z|_Y|
+\end{verbatim}
+\normalsize
+
+The first element specifies the single name {\bf WW}. The second element 
+specifies that each of the names arising from the expansion of the inner kernel 
+(i.e. the names listed above) should be edited by replacing {\bf \_Z} with {\bf 
+\_Y}, and then appending the suffix {\bf KK}. Thus the final group contains:
+
+\small
+\begin{verbatim}
+      WW
+      AKK
+      B_ONEKK
+      B_YWOKK
+      B_YHREEKK
+      CKK
+\end{verbatim}
+\normalsize
+
+\subsection{Indirection Elements}
+An indirection element consists of an ``indirection character'' (usually
+``\verb+^+'' (up arrow) although this can be changed, see section \ref{SEC:CC})
+followed by the name of a text file. On VMS machines, the file type defaults to
+``.DAT'' if no file type is included. For instance, the group expression:
+
+\small
+\begin{verbatim}
+      ^RAW_DATA
+\end{verbatim}
+\normalsize
+
+would cause GRP to search for a file called RAW\_DATA.DAT (on a VMS machine).
+
+The specified file is read to obtain further names to be added to the group.
+Each line in the file is processed as if it were a separate group expression,
+and so may contain any combination of literal names, modification elements or
+further indirection elements. It is thus possible to get several levels of
+indirection, in which a literal name is specified within a text file, which is
+itself specified within an indirection element contained within another text
+file, etc. GRP imposes a limit of 7 levels of indirection, primarily to
+safe-guard against ``run-away'' indirection which happens (for instance) when a
+file specifies {\em itself} within an indirection element. 
+
+Indirection elements are always considered to be case sensitive, even if the
+group has been designated case insensitive. This is because file names on
+certain operating systems (eg UNIX) are always considered case sensitive, and so
+problems would arise while accessing indirection files if GRP was to consider
+them case {\em in}sensitive. 
+  
+\subsection{Modification Elements}
+\label{SEC:MOD}
+A modification element causes GRP to generate a set of names by copying the
+names from another group. These new names can then be modified using the
+facilities for editing names described above. The application specifies which
+group is to be used as the basis for the new names. A special character (usually
+a ``$*$'' character, but this can be changed if required) is used as a token to 
+represent all the names in the basis group. Thus:
+
+\small
+\begin{verbatim}
+      *|_DS|_BK|
+\end{verbatim}
+\normalsize
+
+would cause all the names in the basis group to be modified by replacing the 
+string {\bf \_DS} with the string {\bf \_BK}. The basis names can also be 
+modified by the addition of a prefix and suffix. Following the description of 
+name editing given above, you may expect the format to be (for instance):
+
+\small
+\begin{verbatim}
+      Hello_{*}_Goodbye
+\end{verbatim}
+\normalsize
+
+in which the token character takes on the role of the kernel. This does in fact
+work, but in this case the opening and closing kernel delimiters (``\{'' and
+``\}'') can be omitted because there is no ambiguity about where the kernel
+starts and finishes. Thus a simpler form would be:
+
+\small
+\begin{verbatim}
+      Hello_*_Goodbye
+\end{verbatim}
+\normalsize
+
+The addition of a prefix and suffix can be combined with substitution as 
+usual. For instance, the element:
+
+\small
+\begin{verbatim}
+      A*B|C|D|
+\end{verbatim}
+\normalsize
+
+would cause all occurrences of the letter C within the names of the basis group 
+to be replaced with D, followed by the addition of the prefix A and the suffix 
+B.
+
+If a ``null'' group is specified as the basis group (i.e. the group identifier 
+is given as GRP\_\_NOID), then there are no
+names on which to base the new names and the token character is treated as a 
+literal name. That is, if the user gave the group expression
+
+\small
+\begin{verbatim}
+      A_*2|RAW|FLAT|
+\end{verbatim}
+\normalsize
+
+and the application had specified a null group as the basis for modification
+elements, the the specified editing would be applied to the {\em literal name} 
+``$*$'', resulting in the single literal name ``{\bf A\_$*$2}'' being added to the 
+group.
+
+\subsection{Nesting Within Group Expressions}
+\label{SEC:NEST}
+There is sometimes a clash of interests to be resolved when deciding on the best
+choice for the character which delimits elements within a group expression. The 
+default delimiter character is the comma, but this character can sometimes be
+useful {\em within} an element, for instance when specifying a set of indices.
+For instance, if the user gave the group expression:
+
+\small
+\begin{verbatim}
+      A(1,2),B(3,10)
+\end{verbatim}
+\normalsize
+
+in which each element is a literal name corresponding to an array element, it
+would be wrong to split this up using the commas as delimiters into the four
+strings ``{\bf A(1}'', ``{\bf 2)}'', ``{\bf B(3}'' and ``{\bf 10)}''. 
+
+To get round this particular problem, GRP ignores delimiters which occur within
+matching ``nesting characters''. There are two nesting characters, the ``open
+nest'' character (usually set to ``('') and the ``close nest'' character
+(usually set to ``)''). Thus in the above example, the commas occurring within
+the parentheses would not be treated as delimiters, resulting in the group
+expression being split into the two elements {\bf A(1,2)} and {\bf B(3,10)}. The
+characters to use as the opening and closing nest characters may be set by the
+calling application (see section \ref{SEC:CC}). 
+
+\subsection{Flagging a Group Expression}
+\label{SEC:FLAG}
+GRP allows a group expression to be flagged by terminating it with a ``flag''
+character (usually a minus sign although this can be changed, see section
+\ref{SEC:CC}). If the last character in the group expression is a flag
+character, then the FLAG argument of routine GRP\_GROUP is returned true. The
+flag character is stripped off the group expression before it is split up into
+elements, so the flag character itself does not get included in any of the names
+stored in the group. 
+
+A typical use of this facility might be to allow the user to request a further
+prompt for more names. For instance, in the example of section \ref{SEC:EXAMC},
+the user may wish to specify more input file names than will fit on a single
+line. To allow this, the call to GRP\_GROUP would be replaced with the
+following: 
+\small
+\begin{quote}
+\begin{tabbing} % Not clear why this is needed, but leading spaces get
+                % lost otherwise.
+\verb#*  Loop round, prompting the user for group expressions       #\\
+\verb#*  until one is found without a minus sign at the end, or an  #\\
+\verb#*  error occurs.                                              #\\
+\verb#      FLAG = .TRUE.                                           #\\
+\verb#      DO WHILE( FLAG .AND. STATUS .EQ. SAI__OK )              #\\
+\verb#         CALL GRP_GROUP( 'IN_FILES', GRP__NOID, IGRP1, SIZE1, #\\
+\verb#     :                   ADDED, FLAG, STATUS )                #\\
+\verb#                                                              #\\
+\verb#*  Cancel the parameter association to get a new group        #\\
+\verb#*  expression on the next call to GRP_GROUP.                  #\\
+\verb#         CALL PAR_CANCL( 'IN_FILES', STATUS )                 #\\
+\verb#                                                              #\\
+\verb#      END DO                                                  #\\
+\end{tabbing}
+\end{quote}
+\normalsize
+
+The user could then request a further prompt by appending a minus sign to the
+end of the group expression, as follows: 
+
+\small
+\begin{verbatim}
+      NEW_FILE,A_*2|RAW|FLAT|,^LIST.DAT-
+\end{verbatim}
+\normalsize
+
+The names obtained at each prompt are appended to the end of the group, which
+expands as necessary. 
+
+Note, if the final element in a group expression is an indirection element, the
+flag character may be placed at the end of the last record in the indicated text
+file. For instance, instead of giving: 
+
+\small
+\begin{verbatim}
+      ^LIST.DAT-
+\end{verbatim}
+\normalsize
+
+where the file LIST.DAT contains the single record
+
+\small
+\begin{verbatim}
+      RED,GREEN,BLUE
+\end{verbatim}
+\normalsize
+
+a user could ``hard-wire'' a flag character on to the end of LIST.DAT so that
+it contains:
+
+\small
+\begin{verbatim}
+      RED,GREEN,BLUE-
+\end{verbatim}
+\normalsize
+
+\subsection{Comments Within Group Expressions}
+It is often useful to mix comments with names, particularly within a text file.
+All group expressions (whether obtained from the environment or from a text
+file or as an argument) are truncated if a ``comment'' character is found (usually `\#'' but this
+can be changed, see section \ref{SEC:CC}). Anything occurring after such a
+character is ignored. In a text file, the comment is assumed to extend from the
+comment character to the end of the line, so a new group expression may be
+given on the next line. Note, blank lines are {\em not} ignored. Each blank line
+within a text file will result in a blank name being added to the group. 
+
+\subsection{The Order of Names Within a Group}
+Names are stored within a group in the order in which they are specified in the 
+group expression. For instance, if the file F1.DAT contained the following two
+records:
+
+\small
+\begin{verbatim}
+      A,^F2
+      B,C
+\end{verbatim}
+\normalsize
+
+and the file F2.DAT contained the following three records:
+
+\small
+\begin{verbatim}
+      D
+      E
+      F
+\end{verbatim}
+\normalsize
+
+then the group expression:
+
+\small
+\begin{verbatim}
+      X,^F1.DAT,Y
+\end{verbatim}
+\normalsize
+
+would result in the names being added to the group in the following order
+
+\small
+\begin{verbatim}
+      X
+      A
+      D
+      E
+      F
+      B
+      C
+      Y
+\end{verbatim}
+\normalsize
+
+The contents of the two indirection files have been inserted at the position at
+which the corresponding indirection element occurred. Names resulting from the
+expansion of modification elements are similarly inserted into the list at the
+position at which the modification element occurred. The modified names are
+stored in the same order as the names within the group upon which the
+modification was based. For example, if the above group is used as the basis for
+modification, then the group expression: 
+
+\small
+\begin{verbatim}
+      U,*_2,V
+\end{verbatim}
+\normalsize
+
+would give rise to the group:
+
+\small
+\begin{verbatim}
+      U
+      X_2
+      A_2
+      D_2
+      E_2
+      F_2
+      B_2
+      C_2
+      Y_2
+      V
+\end{verbatim}
+\normalsize
+
+
+\section{Using GRP Routines}
+
+Many of the points described below are illustrated by the example application in
+section \ref{SEC:EXAMC}. Further details can be found in the subroutine
+specifications in appendix \ref{APP:SPEC}. 
+
+\subsection{Symbolic Constants and Status Values}
+The GRP package has associated with it various symbolic constants defining such 
+things as the required length of various character variables, an invalid GRP 
+identifier value, etc. These values consist of a name of up to 5 characters 
+prefixed by ``GRP\_\_''  (note the {\em double} underscore), and can be made 
+available to an application by including the line:
+
+\small
+\begin{verbatim}
+      INCLUDE 'GRP_PAR'
+\end{verbatim}
+\normalsize
+
+on VMS systems and:
+
+\small
+\begin{verbatim}
+      INCLUDE '/star/include/grp_par'
+\end{verbatim}
+\normalsize
+
+on UNIX systems. Another set of symbolic constants is made available by the
+statement:
+
+\small
+\begin{verbatim}
+      INCLUDE 'GRP_ERR'
+\end{verbatim}
+\normalsize
+
+on VMS systems, and the statement:
+
+\small
+\begin{verbatim}
+      INCLUDE '/star/include/grp_err'
+\end{verbatim}
+\normalsize
+
+on UNIX systems.
+
+These values have the same format of those contained in GRP\_PAR, but define
+error conditions which can be generated within the GRP package. Applications can
+compare the $STATUS$ argument with these values to check for specific error
+conditions. These values are described in appendix \ref {APP:ERRORS}. 
+
+\subsection{Creating and Deleting Groups}
+New groups can be created by calling GRP\_NEW which returns an identifier for
+the new group. The group is initially empty but names can be added immediately
+using any of the methods described in section \ref{SEC:ADDN}. The calling
+application must provide a ``type'' for the group when calling GRP\_NEW. This
+type is not used directly by the GRP system, but is provided as a means for
+applications to differentiate between different {\em types} of groups (for
+instance, groups holding file names and groups holding names of astronomical
+objects). No restrictions are placed on the strings which can be used for
+group types. The type of a group can be recalled at any time using routine
+GRP\_GTYPE, and a group can be given a new type by calling GRP\_PTYPE. 
+
+New groups are also created by the routines GRP\_COPY, GRP\_REMOV and
+GRP\_PURGE, but they differ from GRP\_NEW in that the created group is based on
+a previously existing group. GRP\_COPY creates a new group containing a copy of
+a subsection of an old group, GRP\_REMOV creates a new group containing a copy
+of the whole of an old group, but excluding all occurrences of a given name, and
+GRP\_PURGE creates a new group containing a purged copy of the whole of an old
+group (i.e. there are no duplicate entries in the new group). The new groups
+inherit the type string, control characters and case sensitivity of the old
+groups, but do not inherit any other attributes (such as owner/slave
+relationships - see section \ref {SEC:OWN}). 
+
+The routine GRP\_DELET deletes a group, thus freeing the GRP identifier and the
+internal resources used by the group. As well as deleting the group identified
+by the specified GRP identifier, it also deletes any groups {\em associated}
+with the specified group (by means of an owner-slave relationship as described
+in section \ref{SEC:OWN}). 
+
+To avoid running out of group identifiers, applications should always delete all
+groups which they have created (using GRP\_DELET) before terminating, even if an
+error status exists. 
+
+\subsection{Storing Names in a Group}
+\label{SEC:ADDN}
+There are several routines which can be used to store names in a group. 
+
+The routine GRP\_PUT stores a set of names starting at a given index within a
+group. Any previous names with the same indices are over-written, and the group
+is extended as necessary. Note, an application must supply the {\em literal}
+names to be stored, as modification and indirection elements cannot be used with
+GRP\_PUT. For instance, if the string ``\verb+^+LIST.DAT'' was stored in a group
+using GRP\_PUT, the \verb+^+ character would {\em not} cause names to be read
+from the file LIST.DAT. Instead the string would be stored in the group exactly
+as supplied. 
+
+The routine GRP\_GROUP obtains a group expression from the environment using a
+specified parameter and expands it into a list of literal names. These names are
+appended to the end of a group, which must previously have been created. An
+existing group may be specified as the basis group for any modification elements
+included in the group expression. If such a group is not supplied, all elements
+are stored literally as names. GRP\_GROUP returns the total number of names in
+the group, together with the number of names which it has added. It also returns
+a logical argument indicating if the group expression was ``flagged'' (see
+section \ref{SEC:FLAG}). 
+
+The routine GRP\_GRPEX performs the same function as GRP\_GROUP except 
+that the group expression is supplied as an argument instead of being
+obtained through the parameter system. This routine can thus be used in 
+stand-alone applications.
+
+The following code fragment shows an example of the use of GRP\_GRPEX and
+GRP\_PUT. It is assumed that the text file FRIENDS.LIS exists and contains the
+single record ``FRED,BERT''.
+
+\small
+\begin{verbatim}
+      INTEGER IGRP, STATUS, SIZE, ADDED
+      LOGICAL FLAG
+      CHARACTER * ( GRP__SZNAM ) NAMES( 3 )
+
+      ...
+
+      CALL GRP_NEW( 'A test group', IGRP, STATUS )
+
+      CALL GRP_GRPEX( '^FRIENDS.LIS', GRP__NOID, IGRP, SIZE, ADDED, FLAG, 
+     :                STATUS )      
+
+      CALL GRP_GRPEX( 'HAROLD', GRP__NOID, IGRP, SIZE, ADDED, FLAG, 
+     :                STATUS )      
+      ...
+
+      NAMES( 1 ) = 'TOM'
+      NAMES( 2 ) = 'DICK'
+      NAMES( 3 ) = 'HARRY'
+
+      ...
+
+      CALL GRP_PUT( IGRP, 3, NAMES, 2, STATUS )
+\end{verbatim}
+\normalsize
+
+The call to GRP\_NEW creates a new, empty group. The first call to GRP\_GRPEX
+read the two names from the file FRIENDS.LIS and stores them with the following 
+indices:
+
+\small
+\begin{verbatim}
+      1 - FRED
+      2 - BERT
+\end{verbatim}
+\normalsize
+
+Both SIZE and ADDED are returned equal to two. The second call to GRP\_GRPEX
+appends the name {\bf HAROLD} to the group, so that the group becomes:
+
+\small
+\begin{verbatim}
+      1 - FRED
+      2 - BERT
+      3 - HAROLD
+\end{verbatim}
+\normalsize
+
+SIZE is returned equal to 3 and ADDED equal to 1. The call to GRP\_PUT
+then stores the name {\bf TOM} at index 2 (over-writing {\bf BERT}), and {\bf
+DICK} at index 3 (over-writing {\bf HAROLD}). The group is then extended and
+{\bf HARRY} is stored at index 4 so that the group becomes:
+
+\small
+\begin{verbatim}
+      1 - FRED
+      2 - TOM
+      3 - DICK
+      4 - HARRY
+\end{verbatim}
+\normalsize
+
+\subsection{Retreiving Names from a Group}
+GRP\_GET will retrieve a set of names from a group starting at a given index. An
+error is reported if a range of indices extending beyond the current size of
+the group is specified. If a character variable which receives a name  has a
+declared length shorter than the stored name, then the name is truncated to the
+length of the character variable, but no error is reported. 
+
+A group can be searched for a specified name by calling GRP\_INDEX, which 
+returns the index of the name within the specified group. If the name does 
+not exist within the group, the returned index is set to zero but no error is 
+reported. 
+
+The routines GRP\_LIST and GRP\_LISTF each create a text file containing a
+subset of the names stored in a specified group. The names are written one per
+record, and a comment is stored as the first record. The difference between
+GRP\_LIST and GRP\_LISTF is that the former obtains the name of the text file to
+be created through the parameter system, whereas the latter requires the calling
+application to provide it. These routines are useful for passing groups of names
+between successive applications. For instance, the first application may create
+a text file holding a group of names using GRP\_LIST, and the second application
+may then call GRP\_GROUP, allowing the file created by the previous application
+to be specified within an indirection element. 
+
+A single name can also be retrieved from a group using routine GRP\_INFOC, 
+giving the value ``NAME'' for the argument ITEM (see below).
+
+\subsection{Retrieving Attributes of Names}
+Each name has associated with it various attributes, which can be retrieved
+using GRP\_INFOC (for attributes which take character values) and GRP\_INFOI 
+(for attributes which take integer values). In both cases, the particular 
+attribute required is specified by the argument ITEM. Attributes of a name
+are carried round with the name if it is copied using GRP\_COPY, GRP\_REMOV or
+GRP\_PURGE. The following attributes are currently used:
+
+\begin{description}
+\item [MODGRP] - An integer which has the value GRP\_\_NOID unless the name was
+specified using a modification element. Otherwise, it is the identifier for the
+group which was used as the basis for the modification element (see section
+\ref{SEC:MOD}). 
+
+\item [MODIND] - An integer value which is zero unless the name was specified 
+using a modification element. Otherwise, it is the index of the name within 
+the basis group (i.e. the group identified by the MODGRP attribute) which was 
+modified in order to generate the specified name. 
+
+\item [DEPTH] - An integer value which is zero unless the name was specified 
+using an indirection element. Otherwise, it is the number of levels of 
+indirection at which the literal name was specified. For instance, consider the 
+case where a prompt 
+issued by GRP\_GROUP is responded to with the group expression
+
+\small
+\begin{verbatim}
+      ^FILE1.DAT
+\end{verbatim}
+\normalsize
+
+and the file FILE1.DAT contains the single record ``NAME1,\verb+^+FILE2.DAT'',
+and the file FILE2.DAT contained the single record ``NAME2''. The DEPTH
+attribute would have a value of 1 for name {\bf NAME1} indicating that the name
+was given within a file specified directly within the group expression, and a
+value of 2 for name {\bf NAME2} indicating that the name was given within a file
+which was itself given within another file. 
+
+\item [FILE] - A character value which is returned blank unless the name was
+specified using an indirection element. Otherwise, it is the name of the file in
+which the name was literally stored. Thus, in the above example it would be
+FILE1.DAT for name {\bf NAME1} and FILE2.DAT for {\bf NAME2}.
+
+\item [NAME] - A character value equal to the name itself.
+
+\end{description}
+
+\subsection{Deleting Names}
+Names can be deleted from a group using GRP\_REMOV, which deletes all
+occurrences of a specified name within a group, creating a new group to hold the
+results (the input group is left unchanged).
+
+Names with a specified range of indices can be deleted from a group using 
+GRP\_COPY, as in the following example:
+
+\small
+\begin{verbatim}
+      CALL GRP_COPY( IGRP, 3, 5, .TRUE., ITEMP, STATUS )
+      CALL GRP_DELET( IGRP, STATUS )
+      IGRP = ITEMP
+\end{verbatim}
+\normalsize
+
+The call to GRP\_COPY creates a copy of the group identified by IGRP, 
+excluding the names with indices between 3 and 5. The copy is stored in a new 
+group, the identifier for which is returned in ITEMP. The names which used to 
+have indices greater than 5 are shuffled down to fill up the gap (name 6 in
+the old group becomes name 3 in the new group, etc). The above example then 
+deletes the original group, and copies the new group identifier into the 
+variable previously used to store the identifier to the old group.
+
+Names can also be deleted using GRP\_SETSZ which reduces the size of a group.
+Thus, if a group with size of 6 is reduced to a size of 4, then the names with 
+indices 5 and 6 are deleted.
+
+Routine GRP\_PURGE deletes duplicate names within a group, creating a new group 
+to hold the results.
+
+\subsection{Changing the Characters Used to Control the Syntax of Group 
+Expressions}
+\label{SEC:CC}
+A set of eleven ``control characters'' are used to indicate various items of 
+syntax within
+a group expression. Each group is created with a set of default control
+characters, but these can be changed by subsequent calls to GRP\_SETCC. Each
+group has its own set of control characters which can be different to those of
+other groups, and they can be inspected using routine GRP\_GETCC. When calling
+these routines, specific control characters are represented by the following
+names: 
+
+\begin{description}
+\item [INDIRECTION] - The character used to indicate that the string which 
+follows is not a literal name but is the name of a text file from which further 
+names are to be read. The INDIRECTION control character defaults to 
+``\verb+^+''.
+
+\item [COMMENT] - The character used to indicate that the remainder of the group 
+expression (or record within a text file) is a comment and is to be ignored.
+The COMMENT control character defaults to ``\#''.
+
+\item [DELIMITER] - The character used to delimit elements within a group
+expression. The DELIMITER control character defaults to ``,''. 
+
+\item [NAME\_TOKEN] - The character used within a modification element as a
+token for each name in the basis group. The NAME\_TOKEN character defaults to
+``$*$''. 
+
+\item [SEPARATOR] - The character used to separate old and new substitution
+strings when editing a group of names. The SEPARATOR character defaults to
+``$\mid$''. 
+
+\item [OPEN\_NEST] - The character used to open a nest within a group
+expression, within which any DELIMITER characters are ignored. The OPEN\_NEST
+character defaults to ``(''. 
+
+\item [CLOSE\_NEST] - The character used to close a nest within a group
+expression, within which any DELIMITER characters are ignored. The CLOSE\_NEST
+character defaults to ``)''. 
+
+\item [FLAG] - The character which can be used to flag selected group
+expressions by appending it to the end of the group expression. The presence of
+the flag is communicated to the calling application by means of the FLAG
+argument of routines GRP\_GROUP and GRP\_GRPEX. The FLAG character defaults
+to ``-''. 
+
+\item [OPEN\_KERNEL] - The character used to open a kernel within an element.
+The OPEN\_KERNEL character defaults to ``\{''. 
+
+\item [CLOSE\_KERNEL] - The character used to close a kernel within an element.
+The CLOSE\_KERNEL character defaults to ``\}''. 
+
+\item [NULL] - This is a character which can be assigned to any other control 
+character to suppress use of that control character (see below). The NULL 
+character defaults to ``\%''.
+
+\end{description}
+
+\subsubsection {Suppressing the Use of Selected Control Characters}
+Applications may sometimes want to suppress the use of certain control
+characters. For instance, an application which stores lines of text within a
+group may want to suppress the division of each group expression into separate
+elements, so that the whole group expression is stored as a single name within
+the group. One way to do this would be to set the DELIMITER control character to
+a character which is guaranteed not to occur within the supplied text. However,
+such a character may not exist. A more flexible approach is to assign the value
+of the NULL control character to the DELIMITER control character. For instance,
+if the NULL and DELIMITER characters are both set to ``\%'', then the group
+expression is not split up into elements delimited by ``\%'' signs. Note, any
+``\%'' signs in the group expression will be included in the name stored in the
+group without any change. The NULL character can be assigned to any of the other
+control characters to suppress the use of those control character. The only
+restriction is that if one of the two control characters OPEN\_NEST and
+CLOSE\_NEST is assigned the NULL value, then the other one must also be assigned
+the NULL value. The same restriction applies to the OPEN\_KERNEL and
+CLOSE\_KERNEL control characters. 
+
+\subsection{Creating Associations Between Groups}
+\label{SEC:OWN}
+Each group may be ``owned'' by another group. This idea of ownership may be 
+used to
+establish associations between groups. Many groups may be associated together
+into a sort of ``super-group'', or group of groups, by making one group the
+owner of another, which in turn is the owner of another, and so on. These
+associations are provided for the benefit of the calling application, which can
+impose any meaning it likes on the associations. The only significance of these
+associations within the GRP package is that when a group is deleted (using
+GRP\_DELET), all other groups in the same ``super-group'' (i.e. all groups which
+have an association, either directly, or indirectly, with the specified group)
+are also deleted. 
+
+An example of the use of these associations is to provide a means of attaching
+supplemental information to a group describing the global properties of the
+group. For instance, consider an application which uses groups to store
+information about spiral galaxies. Group A may contain the names {\bf 1232},
+{\bf 628}, {\bf 5364}, and group B may contain {\bf 81}, {\bf 31}. It may be
+necessary to store supplemental information describing each of these groups, for
+instance the catalogue to which the numbers in groups A and B refer, the
+morphological type, and so. A new group C could be created holding the names
+{\bf NGC} and {\bf ScI}, giving the catalogue and type of the galaxies in group
+A. This group could then be associated with group A. Similarly a group D could
+be created holding the names {\bf Messier} and {\bf Sb}, and associated with
+group B. 
+
+Three routines are included in the GRP package for handling these associations;
+GRP\_SOWN establishes one group as owner of another, GRP\_OWN returns the
+identifier of the group which owns a specified group, and GRP\_HEAD returns the
+group at the head of an owner-slave chain. Groups are ``free'' (i.e. are not
+owned by any other group) when they are created. A group which has had an owner
+established for it can be made free again by calling GRP\_SOWN giving a null
+group (GRP\_\_NOID) as the ``owner''. A group may not be owned by more than one
+group, and may itself own a maximum of one group. It is thus possible to
+establish ``chains'' of owner-slave associations (but not ``tree structures'').
+All the groups in such a chain form a ``super-group'' of inter-dependant groups.
+When an attempt is made to delete any group within such a super-group, all the
+other groups in the same super-group are also deleted whether higher or lower in
+the chain. 
+
+The owner-slave relationship is strictly one way; a group cannot own its own
+owner, or equivalently be a slave of its own slave. If an attempt is
+made to set up such an association using GRP\_SOWN, then an error is reported,
+and STATUS is returned set to GRP\_\_SLAVE. Thus if group A is owned by group B,
+and group B is owned by group C, group C may not be owned by either group A or
+group B. 
+
+\section{Compiling and Linking}
+
+\subsection{VMS}
+ADAM users need take no special steps in order to access routines from
+the GRP\_ library. The normal ADAM startup commands:
+
+\begin{small}
+\begin{verbatim}
+      $ ADAMSTART
+      $ ADAMDEV
+\end{verbatim}
+\end{small}
+
+will ensure that all necessary definitions are made, and the standard
+ADAM link commands will automatically access the appropriate version of
+the GRP\_ library. Thus, for instance, an ADAM A-task which calls GRP\_
+routines might be linked simply as follows:
+
+\begin{small}
+\begin{verbatim}
+      $ FORTRAN ADAMPROG
+      $ ALINK ADAMPROG
+\end{verbatim}
+\end{small}
+
+For non-ADAM users, the initialisation command:
+
+\small
+\begin{verbatim}
+      $ GRP_DEV
+\end{verbatim}
+\normalsize
+
+must first be executed before compiling or linking an application which
+calls GRP\_ routines. This will define all the logical names required
+for accessing include files and linker options files.
+
+The preferred method of linking ``stand-alone'' ({\em i.e.}\ non-ADAM)
+applications which use the GRP\_ library is via the standard STAR\_LINK
+options file. Thus, to compile and link a stand-alone application, the
+following might be used:
+
+\small
+\begin{verbatim}
+      $ FORTRAN PROG
+      $ LINK PROG,STAR_LINK/OPT
+\end{verbatim}
+\normalsize
+
+If, for any reason, you wish to link explicitly with the GRP\_ library,
+rather than via the STAR\_LINK library, then the options file GRP\_LINK
+may be used instead, thus:
+
+\small
+\begin{verbatim}
+      $ LINK PROG,GRP_LINK/OPT
+\end{verbatim}
+\normalsize
+
+The ADAM and stand-alone versions of the GRP\_ system differ, in that those
+routines which use ADAM facilities ({\em i.e.}\ those listed in
+\ref{SEC:ADAM}) are not available in the stand-alone version. 
+
+\subsection{UNIX}
+To compile and link a UNIX ADAM application with the GRP package, the following
+commands should be used (see SUN/144): 
+
+\small
+\verb#      % alink adamprog.f# `\verb#grp_link_adam#`
+\normalsize
+
+Note the use of {\em opening} apostrophes (`) rather than the more common
+closing apostrophe ('). To compile and link a stand-alone UNIX application with
+the GRP package, the following commands should be used: 
+
+\small
+\verb#      % f77 prog.f -o prog# `\verb#grp_link#`
+\normalsize
+
+This produces an executable image called {\bf prog}.
+
+\appendix
+\section{Alphabetical List of Routines}
+
+Note that the argument lists of all the following routines, together with
+on-line help information, are available within the Starlink language sensitive
+editor STARLSE (SUN/105).
+
+% Command for displaying routines in routine lists:
+% =================================================
+
+\newcommand{\noteroutine}[2]{{\small \bf #1} \nopagebreak \\
+                             \hspace*{3em} {\em #2} \\[1.5ex]}
+
+
+% List of routines:
+% =================
+
+\noteroutine{GRP\_DELET( IGRP, STATUS )}
+            {Delete a group}
+\noteroutine{GRP\_COPY( IGRP1, INDXLO, INDXHI, REJECT, IGRP2, STATUS )}
+            {Create a new group containing a copy of a section of an old group}
+\noteroutine{GRP\_GET( IGRP, INDEX, SIZE, NAMES, STATUS )}
+            {Retrieve names from a group}
+\noteroutine{GRP\_GETCC( IGRP, CCLIST, CC, STATUS )}
+            {Return control characters for a given group}
+\noteroutine{GRP\_GETCS( IGRP, SENSIT, STATUS )}
+            {Determine if a group is case sensitive or not}
+\noteroutine{GRP\_GROUP( PARAM, IGRP1, IGRP2, SIZE, ADDED, FLAG, STATUS )}
+            {Add names obtained from the environment into a group}
+\noteroutine{GRP\_GRPEX( GRPEXP, IGRP1, IGRP2, SIZE, ADDED, FLAG, STATUS )}
+            {Add names specified by a given group expression into a group}
+\noteroutine{GRP\_GRPSZ( IGRP, SIZE, STATUS )}
+            {Return the current size of a group}
+\noteroutine{GRP\_GTYPE( IGRP, TYPE, STATUS )}
+            {Return the type string stored with a group}
+\noteroutine{GRP\_HEAD( IGRP1, IGRP2, STATUS )}
+            {Find the group at the head of an owner-slave chain}
+\noteroutine{GRP\_INDEX( NAME, IGRP, START, INDEX, STATUS )}
+            {Find the index of a given name within a group}
+\noteroutine{GRP\_INFOC( IGRP, INDEX, ITEM, VALUE, STATUS )}
+            {Return an item of character information relating to a specific name}
+\noteroutine{GRP\_INFOI( IGRP, INDEX, ITEM, VALUE, STATUS )}
+            {Return an item of integer information relating to a specific name}
+\noteroutine{GRP\_LIST( PARAM, INDXLO, INDXHI, COMNT, IGRP, STATUS )}
+            {Write all the names in a group out to a text file specified by the 
+environment}
+\noteroutine{GRP\_LISTF( FILENM, INDXLO, INDXHI, COMNT, IGRP, STATUS )}
+            {Write all the names in a group out to a text file specified by the 
+calling application}
+\noteroutine{GRP\_NEW( TYPE, IGRP, STATUS )}
+            {Create a new, empty group}
+\noteroutine{GRP\_OWN( IGRP1, IGRP2, STATUS )}
+            {Return the identifier of the group which ``owns'' a specified 
+group}
+\noteroutine{GRP\_PTYPE( IGRP, TYPE, STATUS )}
+            {Store a new type string with a group}
+\noteroutine{GRP\_PURGE( IGRP1, IGRP2, STATUS )}
+            {Remove duplicate entries from a group, putting the results in a new 
+group}
+\noteroutine{GRP\_PUT( IGRP, SIZE, NAMES, INDEX, STATUS )}
+            {Store a list of explicit names in a group}
+\noteroutine{GRP\_REMOV( IGRP1, NAME, IGRP2, STATUS )}
+            {Remove all occurrences of a given name from a group, putting the results in a new group}
+\noteroutine{GRP\_SETCC( IGRP, CCLIST, CC, STATUS )}
+            {Set up new control characters for a group}
+\noteroutine{GRP\_SETCS( IGRP, SENSIT, STATUS )}
+            {Establish a group as case sensitive or case insensitive}
+\noteroutine{GRP\_SETSZ( IGRP, SIZE, STATUS )}
+            {Reduce the size of a group}
+\noteroutine{GRP\_SOWN( IGRP1, IGRP2, STATUS )}
+            {Establish one group as ``owner'' of another group}
+\noteroutine{GRP\_VALID( IGRP, VALID, STATUS )}
+            {Check if a group identifier is valid}
+
+\section{Classified List of Routines}
+
+\subsection{Creating and Deleting Groups}
+
+\noteroutine{GRP\_DELET( IGRP, STATUS )}
+            {Delete a group}
+\noteroutine{GRP\_COPY( IGRP1, INDXLO, INDXHI, REJECT, IGRP2, STATUS )}
+            {Create a new group containing a copy of a section of an old group}
+\noteroutine{GRP\_NEW( TYPE, IGRP, STATUS )}
+            {Create a new, empty group}
+\noteroutine{GRP\_PURGE( IGRP1, IGRP2, STATUS )}
+            {Remove duplicate entries from a group, putting the results in a new 
+group}
+\noteroutine{GRP\_REMOV( IGRP1, NAME, IGRP2, STATUS )}
+            {Remove all occurrences of a given name from a group, putting the results in a new group}
+
+\subsection{Enquiring Group Attributes}
+
+\noteroutine{GRP\_GETCC( IGRP, CCLIST, CC, STATUS )}
+            {Return control characters for a given group}
+\noteroutine{GRP\_GETCS( IGRP, SENSIT, STATUS )}
+            {Determine if a group is case sensitive or not}
+\noteroutine{GRP\_GRPSZ( IGRP, SIZE, STATUS )}
+            {Return the current size of a group}
+\noteroutine{GRP\_GTYPE( IGRP, TYPE, STATUS )}
+            {Return the type string stored with a group}
+\noteroutine{GRP\_HEAD( IGRP1, IGRP2, STATUS )}
+            {Find the group at the head of an owner-slave chain}
+\noteroutine{GRP\_OWN( IGRP1, IGRP2, STATUS )}
+            {Return the identifier of the group which ``owns'' a specified 
+group}
+\noteroutine{GRP\_VALID( IGRP, VALID, STATUS )}
+            {Check if a group identifier is valid}
+
+
+\subsection{Setting Group Attributes}
+
+\noteroutine{GRP\_DELET( IGRP, STATUS )}
+            {Delete a group}
+\noteroutine{GRP\_PTYPE( IGRP, TYPE, STATUS )}
+            {Store a new type string with a group}
+\noteroutine{GRP\_SETCC( IGRP, CCLIST, CC, STATUS )}
+            {Set up new control characters for a group}
+\noteroutine{GRP\_SETCS( IGRP, SENSIT, STATUS )}
+            {Establish a group as case sensitive or case insensitive}
+\noteroutine{GRP\_SETSZ( IGRP, SIZE, STATUS )}
+            {Reduce the size of a group}
+\noteroutine{GRP\_SOWN( IGRP1, IGRP2, STATUS )}
+            {Establish one group as ``owner'' of another group}
+
+
+\subsection{Enquiring Name Attributes}
+
+\noteroutine{GRP\_INDEX( NAME, IGRP, START, INDEX, STATUS )}
+            {Find the index of a given name within a group}
+\noteroutine{GRP\_INFOC( IGRP, INDEX, ITEM, VALUE, STATUS )}
+            {Return an item of character information relating to a specific name}
+\noteroutine{GRP\_INFOI( IGRP, INDEX, ITEM, VALUE, STATUS )}
+            {Return an item of integer information relating to a specific name}
+
+
+\subsection{Retreiving Names}
+
+\noteroutine{GRP\_GET( IGRP, INDEX, SIZE, NAMES, STATUS )}
+            {Retrieve names from a group}
+\noteroutine{GRP\_INFOC( IGRP, INDEX, ITEM, VALUE, STATUS )}
+            {Return an item of character information relating to a specific name}
+\noteroutine{GRP\_LIST( PARAM, INDXLO, INDXHI, COMNT, IGRP, STATUS )}
+            {Write all the names in a group out to a text file specified by the 
+environment}
+\noteroutine{GRP\_LISTF( FILENM, INDXLO, INDXHI, COMNT, IGRP, STATUS )}
+            {Write all the names in a group out to a text file specified by the 
+calling application}
+
+
+\subsection{Storing Names}
+
+\noteroutine{GRP\_COPY( IGRP1, INDXLO, INDXHI, REJECT, IGRP2, STATUS )}
+            {Create a new group containing a copy of a section of an old group}
+\noteroutine{GRP\_GROUP( PARAM, IGRP1, IGRP2, SIZE, ADDED, FLAG, STATUS )}
+            {Add names obtained from the environment into a group}
+\noteroutine{GRP\_GRPEX( GRPEXP, IGRP1, IGRP2, SIZE, ADDED, FLAG, STATUS )}
+            {Add names specified by a given group expression into a group}
+\noteroutine{GRP\_PUT( IGRP, SIZE, NAMES, INDEX, STATUS )}
+            {Store a list of explicit names in a group}
+
+
+
+\subsection{Deleting Names}
+
+\noteroutine{GRP\_COPY( IGRP1, INDXLO, INDXHI, REJECT, IGRP2, STATUS )}
+            {Create a new group containing a copy of a section of an old group}
+\noteroutine{GRP\_PURGE( IGRP1, IGRP2, STATUS )}
+            {Remove duplicate entries from a group, putting the results in a new 
+group}
+\noteroutine{GRP\_REMOV( IGRP1, NAME, IGRP2, STATUS )}
+            {Remove all occurrences of a given name from a group, putting the results in a new group}
+\noteroutine{GRP\_SETSZ( IGRP, SIZE, STATUS )}
+            {Reduce the size of a group}
+
+
+\subsection{Creation and Control of Identifiers}
+
+\noteroutine{GRP\_DELET( IGRP, STATUS )}
+            {Delete a group}
+\noteroutine{GRP\_COPY( IGRP1, INDXLO, INDXHI, REJECT, IGRP2, STATUS )}
+            {Create a new group containing a copy of a section of an old group}
+\noteroutine{GRP\_NEW( TYPE, IGRP, STATUS )}
+            {Create a new, empty group}
+\noteroutine{GRP\_PURGE( IGRP1, IGRP2, STATUS )}
+            {Remove duplicate entries from a group, putting the results in a new 
+group}
+\noteroutine{GRP\_REMOV( IGRP1, NAME, IGRP2, STATUS )}
+            {Remove all occurrences of a given name from a group, putting the results in a new group}
+\noteroutine{GRP\_VALID( IGRP, VALID, STATUS )}
+            {Check if a group identifier is valid}
+
+\subsection{ADAM Parameter System Routines}
+\label{SEC:ADAM}
+
+\noteroutine{GRP\_GROUP( PARAM, IGRP1, IGRP2, SIZE, ADDED, FLAG, STATUS )}
+            {Add names obtained from the environment into a group}
+\noteroutine{GRP\_LIST( PARAM, INDXLO, INDXHI, COMNT, IGRP, STATUS )}
+            {Write all the names in a group out to a text file specified by the 
+environment}
+
+
+\newpage
+\section{Routine Descriptions}
+\label{APP:SPEC}
+
+%+
+%  Name:
+%     LAYOUT.TEX
+
+%  Purpose:
+%     Define Latex commands for laying out documentation produced by PROLAT.
+
+%  Language:
+%     Latex
+
+%  Type of Module:
+%     Data file for use by the PROLAT application.
+
+%  Description:
+%     This file defines Latex commands which allow routine documentation
+%     produced by the SST application PROLAT to be processed by Latex. The
+%     contents of this file should be included in the source presented to
+%     Latex in front of any output from PROLAT. By default, this is done
+%     automatically by PROLAT.
+
+%  Notes:
+%     The definitions in this file should be included explicitly in any file
+%     which requires them. The \include directive should not be used, as it
+%     may not then be possible to process the resulting document with Latex
+%     at a later date if changes to this definitions file become necessary.
+
+%  Authors:
+%     RFWS: R.F. Warren-Smith (STARLINK)
+
+%  History:
+%     10-SEP-1990 (RFWS):
+%        Original version.
+%     10-SEP-1990 (RFWS):
+%        Added the implementation status section.
+%     12-SEP-1990 (RFWS):
+%        Added support for the usage section and adjusted various spacings.
+%     {enter_further_changes_here}
+
+%  Bugs:
+%     {note_any_bugs_here}
+
+%-
+
+%  Define length variables.
+\newlength{\sstbannerlength}
+\newlength{\sstcaptionlength}
+
+%  Define a \tt font of the required size.
+\font\ssttt=cmtt10 scaled 1095
+
+%  Define a command to produce a routine header, including its name,
+%  a purpose description and the rest of the routine's documentation.
+\newcommand{\sstroutine}[3]{
+   \goodbreak
+   \rule{\textwidth}{0.5mm}
+   \vspace{-7ex}
+   \newline
+   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
+   \setlength{\sstcaptionlength}{\textwidth}
+   \addtolength{\sstbannerlength}{0.5em}
+   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
+   \addtolength{\sstcaptionlength}{-4.45pt}
+   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
+   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
+   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
+   \begin{description}
+      #3
+   \end{description}
+}
+
+%  Format the description section.
+\newcommand{\sstdescription}[1]{\item[Description:] #1}
+
+%  Format the usage section.
+\newcommand{\sstusage}[1]{\item[Usage:] \mbox{} \\[1.3ex] {\ssttt #1}}
+
+%  Format the invocation section.
+\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
+
+%  Format the arguments section.
+\newcommand{\sstarguments}[1]{
+   \item[Arguments:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the returned value section (for a function).
+\newcommand{\sstreturnedvalue}[1]{
+   \item[Returned Value:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the parameters section (for an application).
+\newcommand{\sstparameters}[1]{
+   \item[Parameters:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the examples section.
+\newcommand{\sstexamples}[1]{
+   \item[Examples:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Define the format of a subsection in a normal section.
+\newcommand{\sstsubsection}[1]{\item[{#1}] \mbox{} \\}
+
+%  Define the format of a subsection in the examples section.
+\newcommand{\sstexamplesubsection}[1]{\item[{\ssttt #1}] \mbox{} \\}
+
+%  Format the notes section.
+\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
+
+%  Provide a general-purpose format for additional (DIY) sections.
+\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}] \mbox{} \\[1.3ex] #2}
+
+%  Format the implementation status section.
+\newcommand{\sstimplementationstatus}[1]{
+   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
+
+%  Format the bugs section.
+\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
+
+%  Format a list of items while in paragraph mode.
+\newcommand{\sstitemlist}[1]{
+  \mbox{} \\
+  \vspace{-3.5ex}
+  \begin{itemize}
+     #1
+  \end{itemize}
+}
+
+%  Define the format of an item.
+\newcommand{\sstitem}{\item}
+
+%  End of LAYOUT.TEX layout definitions.
+%.
+
+% Routine descriptions:
+% =====================
+\small
+
+\sstroutine{
+   GRP\_COPY
+}{
+   Copy a section of an existing group to a new group
+}{
+   \sstdescription{
+      A new group is created by copying a section of an existing group
+      specified by the range of indices supplied in INDXLO and INDXHI.
+      The whole group is used if INDXLO and INDXHI are both zero.
+      The output group can be formed in one of two ways:
+
+      1) All names from the input group are copied to the output group
+      except for those with indices in the given range.
+
+      2) Only those names from the input group which have indices within
+      the given range are copied to the output group.
+
+      The method used is determined by the argument REJECT. Note, a
+      name with a given index in the input group will have a different
+      index in the output group if INDXLO is not 1 (or zero). The new
+      group inherits the type, control characters and case sensitivity
+      flag of the old group, but does not inherit any owner/slave
+      relationships (see routine GRP\_SOWN). If the input group is no
+      longer required, it should be deleted using GRP\_DELET.
+   }
+   \sstinvocation{
+      CALL GRP\_COPY( IGRP, INDXLO, INDXHI, REJECT, IGRP2, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IGRP1 = INTEGER (Given)
+      }{
+         A GRP identifier for the input group.
+      }
+      \sstsubsection{
+         INDXLO = INTEGER (Given)
+      }{
+         The lowest index to reject or to copy.
+      }
+      \sstsubsection{
+         INDXHI = INTEGER (Given)
+      }{
+         The highest index to reject or to copy.
+      }
+      \sstsubsection{
+         REJECT = LOGICAL ( Given)
+      }{
+         If reject is .TRUE., then names in the given range are
+         rejected.  Otherwise, names in the given range are copied.
+      }
+      \sstsubsection{
+         IGRP2 = INTEGER (Returned)
+      }{
+         A GRP identifier for the created group. Returned equal to
+         GRP\_\_NOID if an error occurs.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   GRP\_DELET
+}{
+   Delete a group from the GRP system
+}{
+   \sstdescription{
+      This routine releases the identifier and internal resources used
+      by the specified group so that they can be used for another
+      group.  There is a limited number of groups available for use
+      within an application, so each group should be deleted when it is
+      no longer needed to avoid the possibility of reaching the limit.
+
+      Note, any parameter association used to establish the group is NOT
+      cancelled.
+
+      This routine also deletes any groups which are related to the
+      supplied group by means of {\tt "}owner-slave{\tt "} relationships
+      established by calls to GRP\_SOWN. All groups in the same
+      {\tt "}owner-slave{\tt "} chain are deleted whether higher up or lower down
+      than the supplied group.
+
+      This routine attempts to execute even if STATUS is bad on entry,
+      although no further error report will be made if it subsequently
+      fails under these circumstances.
+   }
+   \sstinvocation{
+      CALL GRP\_DELET( IGRP, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IGRP = INTEGER (Given and Returned)
+      }{
+         A GRP identifier for the group. Returned equal to GRP\_\_NOID.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   GRP\_GET
+}{
+   Returns a set of names contained in a group
+}{
+   \sstdescription{
+      The names with indices between INDEX and INDEX$+$SIZE-1 (inclusive)
+      contained in the given group are returned. An error is reported if
+      the bounds of the group are exceeded, and STATUS is returned
+      equal to GRP\_\_OUTBN. If the group is case insensitive (as
+      established by a call to GRP\_SETCS) then the names are converted
+      to upper case before being returned.
+   }
+   \sstinvocation{
+      CALL GRP\_GET( IGRP, INDEX, SIZE, NAMES, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IGRP = INTEGER (Given)
+      }{
+         A GRP identifier for the group.
+      }
+      \sstsubsection{
+         INDEX = INTEGER (Given)
+      }{
+         The lowest index for which the corresponding name is required.
+      }
+      \sstsubsection{
+         SIZE = INTEGER (Given)
+      }{
+         The number of names required.
+      }
+      \sstsubsection{
+         NAMES( SIZE ) = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         The names held at the given positions in the group. The
+         corresponding character variables should have declared length
+         specified by the symbolic constant GRP\_\_SZNAM. If the declared
+         length is shorter than this, the returned names may be
+         truncated, but no error is reported.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   GRP\_GETCC
+}{
+   Returns requested control characters for the specified group
+}{
+   \sstdescription{
+      Each group has associated with it several {\tt "}control characters{\tt "}
+      which are the characters used to indicate various items of syntax
+      within a group expression. These control characters can be
+      changed at any time by calling GRP\_SETCC. This routine returns
+      the current values of a list of these control character.  The
+      individual characters are described in GRP\_\_SETCC.
+   }
+   \sstinvocation{
+      CALL GRP\_GETCC( IGRP, CCLIST, CC, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IGRP = INTEGER (Given)
+      }{
+         A GRP identifier for the group for which the control characters
+         are required.
+      }
+      \sstsubsection{
+         CCLIST = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         A comma separated list of control character names to be
+         returned. See routine GRP\_SETCC for a description of these
+         names.
+      }
+      \sstsubsection{
+         CC = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         A character variable to receive the requested list of control
+         characters. The control characters are stored at adjacent
+         indices within this character variable, starting at index 1.
+         The characters are stored in the same order that they are
+         specified in CCLIST. An error is reported if the character
+         variable is not long enough to receive all the requested
+         control characters.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   GRP\_GETCS
+}{
+   Determine the case sensitivity of a group
+}{
+   \sstdescription{
+      Checks whether a group is currently case sensitive, or case
+      insensitive (see routine GRP\_SETCS).
+   }
+   \sstinvocation{
+      CALL GRP\_GETCS( IGRP, SENSIT, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IGRP = INTEGER (Given)
+      }{
+         A GRP identifier for the group.
+      }
+      \sstsubsection{
+         SENSIT = LOGICAL (Returned)
+      }{
+         Returned .TRUE. if the group is case sensitive and .FALSE.
+         otherwise.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   GRP\_GROUP
+}{
+   Append a list of names obtained from the environment
+   to a previously created group
+}{
+   \sstdescription{
+      A group expression is obtained from the environment
+      using the supplied parameter name. The expression is parsed to
+      produce a list of names which are appended to the end of the
+      group identified by IGRP2. Note, no permanent association between
+      the parameter and the group exists. The parameter value can be
+      cancelled without effecting the contents of the group. If an error
+      occurs while parsing the group expression, the user is re-prompted
+      for a new group expression.
+
+      If the group expression contains any modification elements, then
+      the list of names added to the output group is based on the group
+      identified by IGRP1. If IGRP1 is invalid (equal to the symbolic
+      constant GRP\_\_NOID for instance), then any elements with the
+      syntax of a modification element are stored in the output group
+      as a single literal name.
+
+      If the last character read from the group expression (or from a
+      text file if the last element of the group expression is an
+      indirection element) is equal to the current {\tt "}flag{\tt "} character for
+      the group IGRP2 (see routine GRP\_SETCC), then argument FLAG is
+      returned set to .TRUE. Otherwise, it is returned set to .FALSE.
+      The calling application can use this flag for any purpose (eg it
+      may use it to indicate that the user wants to give more names).
+      Note, the flag character itself is not included in the returned
+      group.
+   }
+   \sstinvocation{
+      CALL GRP\_GROUP( PARAM, IGRP1, IGRP2, SIZE, ADDED, FLAG, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The ADAM parameter with which to associate the group
+         expression. This may be of any type.
+      }
+      \sstsubsection{
+         IGRP1 = INTEGER (Given)
+      }{
+         A GRP identifier for the group to be used as the basis for any
+         modification elements which may be contained within the group
+         expression obtained from the environment. This can be set to
+         the symbolic constant GRP\_\_NOID if modification elements are
+         to be treated as literal names.
+      }
+      \sstsubsection{
+         IGRP2 = INTEGER (Given)
+      }{
+         A GRP identifier for the group to which the new names are to
+         be appended.
+      }
+      \sstsubsection{
+         SIZE = INTEGER (Returned)
+      }{
+         The number of names in the returned group. It is returned equal
+         to 1 if an error status exists on entry. If an error occurs
+         during execution of this routine, then SIZE is returned equal
+         to the size of the group on entry (unless the group has zero
+         size on entry, in which case it is returned equal to 1).
+      }
+      \sstsubsection{
+         ADDED = INTEGER (Returned)
+      }{
+         The number of names added to the group as a result of the
+         current call to this routine.
+      }
+      \sstsubsection{
+         FLAG = LOGICAL (Returned)
+      }{
+         .TRUE. if the last character in the group expression is equal
+         to the current flag character for group IGRP2. Note, if this
+         is the case, then the flag character itself is not included
+         in the returned group. FLAG is returned .FALSE. if the last
+         character is not a flag character. Returned .FALSE. if an
+         error occurs.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         A null value (!) can be given for the parameter to indicate
+         that no more names are to be specified. The corresponding error
+         is annulled before returning unless no names have been added to
+         the group.
+      }
+   }
+}
+\sstroutine{
+   GRP\_GRPEX
+}{
+   Append a list of names contained within a supplied group
+   expression to a previously created group
+}{
+   \sstdescription{
+      The supplied group expression is expanded to produce a list of
+      names which are appended to the end of the group identified by
+      IGRP2.
+
+      If the group expression contains any modification elements, then
+      the list of names added to the output group is based on the group
+      identified by IGRP1. If IGRP1 is invalid (equal to the symbolic
+      constant GRP\_\_NOID for instance), then any elements with the
+      syntax of a modification element are stored in the output group
+      as a single literal name.
+
+      If the last character read from the group expression (or from a
+      text file if the last element of the group expression is an
+      indirection element) is equal to the current {\tt "}flag{\tt "} character for
+      the group IGRP2 (see routine GRP\_SETCC), then argument FLAG is
+      returned set to true. Otherwise, it is returned set to false. The
+      calling application can use this flag for any purpose (eg it may
+      use it to indicate that the user wants to give more names). Note,
+      the flag character itself is not included in the returned group.
+   }
+   \sstinvocation{
+      CALL GRP\_GRPEX( GRPEXP, IGRP1, IGRP2, SIZE, ADDED, FLAG, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         GRPEXP = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         A group expression. This should not be longer than GRP\_\_SZGEX.
+         If it is, the surplus characters will be ignored.
+      }
+      \sstsubsection{
+         IGRP1 = INTEGER (Given)
+      }{
+         A GRP identifier for the group to be used as the basis for
+         any modification elements which may be contained within the
+         supplied group expression. This can be set to the symbolic
+         constant GRP\_\_NOID if modification elements are to be treated
+         as literal names.
+      }
+      \sstsubsection{
+         IGRP2 = INTEGER (Given)
+      }{
+         A GRP identifier for the group to which the new names are to
+         be appended.
+      }
+      \sstsubsection{
+         SIZE = INTEGER (Returned)
+      }{
+         The number of names in the returned group. It is returned equal
+         to 1 if an error status exists on entry. If an error occurs
+         during execution of this routine, then SIZE is returned equal
+         to the size of the group on entry (unless the group has zero
+         size on entry, in which case it is returned equal to 1).
+      }
+      \sstsubsection{
+         ADDED = INTEGER (Returned)
+      }{
+         The number of names added to the group by this routine.
+      }
+      \sstsubsection{
+         FLAG = LOGICAL (Returned)
+      }{
+         .TRUE. if the last character in the group expression is equal
+         to the current flag character for group IGRP2. Note, if this
+         is the case, then the flag character itself is not included
+         in the returned group. FLAG is returned .FALSE. if the last
+         character is not a flag character. Returned .FALSE. if an
+         error occurs.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   GRP\_GRPSZ
+}{
+   Returns the number of names in a group
+}{
+   \sstdescription{
+      This routine returns the number of names in a group.
+   }
+   \sstinvocation{
+      CALL GRP\_GRPSZ( IGRP, SIZE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IGRP = INTEGER (Given)
+      }{
+         A GRP identifier for the group.
+      }
+      \sstsubsection{
+         SIZE = INTEGER (Returned)
+      }{
+         The number of names in the group. Returned equal to one if an
+         error occurs.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   GRP\_GTYPE
+}{
+   Retrieve the type string stored with a group
+}{
+   \sstdescription{
+      The type string specified when the group was created is retrieved.
+   }
+   \sstinvocation{
+      CALL GRP\_GTYPE( IGRP, TYPE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IGRP = INTEGER (Given)
+      }{
+         A GRP group identifier.
+      }
+      \sstsubsection{
+         TYPE = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         The group type. The maximum allowable type length is given by
+         the symbolic constant GRP\_\_SZTYP. If the supplied variable is
+         too short, the type is truncated but no error is reported. If
+         an error occurs, the string is returned blank.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   GRP\_HEAD
+}{
+   Finds the group which is at the head of an owner-slave chain
+}{
+   \sstdescription{
+      This routine climbs the chain of owners starting at the group
+      identified by IGRP1, until a group is found which has no owner.
+      The identifier issued for this group is returned in IGRP2. If
+      the group identified by IGRP1 has no owner, then IGRP2 is returned
+      equal to IGRP1.
+   }
+   \sstinvocation{
+      CALL GRP\_HEAD( IGRP1, IGRP2, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IGRP1 = INTEGER (Given)
+      }{
+         A group identifier.
+      }
+      \sstsubsection{
+         IGRP2 = INTEGER (Given)
+      }{
+         The identifier for the group which is at the head of the
+         owner-slave chain. Returned equal to GRP\_\_NOID if an error
+         occurs.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   GRP\_INDEX
+}{
+   Searches for a given name and if found, returns its index
+}{
+   \sstdescription{
+      The group is searched for the given name, starting at the name
+      with index given by START, and continuing to the end of the
+      group.  If it is found then the corresponding index within the
+      group is returned. If it is not found, the index is set to zero,
+      but no error status is generated. The search is case sensitive
+      unless GRP\_SETCS has been called to indicate that the group is
+      case insensitive.  If the section of the group searched contains
+      the name more than once then the lowest index is returned.
+   }
+   \sstinvocation{
+      CALL GRP\_INDEX( NAME, IGRP, START, INDEX, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NAME = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The name to be searched for.
+      }
+      \sstsubsection{
+         IGRP = INTEGER (Given)
+      }{
+         A GRP identifier for the group to be searched.
+      }
+      \sstsubsection{
+         START = INTEGER (Given)
+      }{
+         The lowest index to be checked.
+      }
+      \sstsubsection{
+         INDEX = INTEGER (Returned)
+      }{
+         The index of the name within the group. This number is greater
+         than or equal to START if the name is found, and zero if it is
+         not found.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   GRP\_INFOC
+}{
+   Retrieve an item of character information about a name
+}{
+   \sstdescription{
+      This routine returns an item of character information about a
+      single name from a group. The item can be any one of those
+      described under argument ITEM.
+   }
+   \sstinvocation{
+      CALL GRP\_INFOC( IGRP, INDEX, ITEM, VALUE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IGRP = INTEGER (Given)
+      }{
+         A GRP group identifier.
+      }
+      \sstsubsection{
+         INDEX = INTEGER (Given)
+      }{
+         An index within the group specified by IGRP.  If the supplied
+         value is outside the bounds of the group, then a blank value
+         is returned for VALUE, and an error is reported.
+      }
+      \sstsubsection{
+         ITEM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The name of an item of information. This can be any of the
+         following (abbreviations are not allowed):
+
+         NAME  -  The name itself. If the group is case insensitive
+         (as established by a call to routine GRP\_SETCS) then the name
+         is returned in upper case.
+
+         FILE  -  The text file within which the name was explicitly
+         given. If the name was not specified within a file then FILE
+         is returned blank.
+      }
+      \sstsubsection{
+         VALUE = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         The requested item of information. If the supplied character
+         variable is too short, the string is truncated. If an error
+         occurs a blank value is returned.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   GRP\_INFOI
+}{
+   Retrieve an item of integer information about a name
+}{
+   \sstdescription{
+      This routine returns an item of integer information about a
+      single name from a group. The item can be any one of those
+      described under argument ITEM.
+   }
+   \sstinvocation{
+      CALL GRP\_INFOI( IGRP, INDEX, ITEM, VALUE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IGRP = INTEGER (Given)
+      }{
+         A GRP group identifier.
+      }
+      \sstsubsection{
+         INDEX = INTEGER (Given)
+      }{
+         An index within the group specified by IGRP.  If the supplied
+         value is outside the bounds of the group, then a {\tt "}null{\tt "} value
+         is returned for VALUE as described below, and an error is
+         reported.
+      }
+      \sstsubsection{
+         ITEM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The name of an item of information. This can be any of the
+         following (abbreviations are not allowed):
+
+         MODGRP  -  If the name was specified by means of a
+         modification element, then the the GRP identifier of the group
+         used as a basis for the modification element is returned in
+         VALUE. If the name was not specified by a modification
+         element, then GRP\_\_NOID is returned.  If INDEX is outside the
+         bounds of the group, then a value of GRP\_\_NOID is returned.
+
+         MODIND  -  If the name was specified by means of a
+         modification element, then the index of the original name
+         (upon which the returned name was based) is returned in VALUE.
+         This is an index into the group identified by MODGRP. If
+         MODGRP is returned equal to GRP\_\_NOID, then MODIND will be
+         zero.
+
+         DEPTH  -  The number of levels of indirection at which the
+         name was specified is returned in VALUE. Names given
+         explicitly within a group expression have a DEPTH value of
+         zero. Names given explicitly within a DEPTH zero indirection
+         element have DEPTH 1. Names given explicitly within a DEPTH 1
+         indirection element, have DEPTH 2, etc. If INDEX is out of
+         bounds, then zero is returned.
+      }
+      \sstsubsection{
+         VALUE = INTEGER (Returned)
+      }{
+         The requested item of information.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   GRP\_LIST
+}{
+   Write names to a text file specified by the environment
+}{
+   \sstdescription{
+      A text file is created with a name obtained from the environment
+      using the supplied parameter. The supplied comment is written to
+      the file as the first record (so long as it is not blank), using
+      the groups current comment character (see routine GRP\_SETCC) .
+      All the names stored within the specified group section are then
+      written to the file, one name per record. If the group is case
+      insensitive (as set up by a call to routine GRP\_SETCS) then the
+      names are written out in upper case, otherwise they are written
+      out as supplied.
+   }
+   \sstinvocation{
+      CALL GRP\_LIST( PARAM, INDXLO, INDXHI, COMNT, IGRP, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The parameter to be used to get the name of the text file to
+         be created.
+      }
+      \sstsubsection{
+         INDXLO = INTEGER (Given)
+      }{
+         The low index limit of the group section. If both INDXLO and
+         INDXHI are zero, then the entire group is used.
+      }
+      \sstsubsection{
+         INDXHI = INTEGER (Given)
+      }{
+         The high index limit of the group section.
+      }
+      \sstsubsection{
+         COMNT = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         A comment line to form the first record in the file. The text
+         is prefixed with the group{\tt '}s current comment character before
+         being written to the file.
+      }
+      \sstsubsection{
+         IGRP = INTEGER (Given)
+      }{
+         The GRP identifier for the group to be listed.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   GRP\_LISTF
+}{
+   Write names to a specified text file
+}{
+   \sstdescription{
+      A text file is created with the specified name.  The supplied
+      comment is written to the file as the first record (so long as it
+      is not blank), using the groups current comment character (see
+      routine GRP\_SETCC). All the names stored within the specified
+      group section are then written to the file, one name per record.
+      If the group is case insensitive (as set up by a call to routine
+      GRP\_SETCS) then the names are written out in upper case,
+      otherwise they are written out as supplied.
+
+      The routine GRP\_LIST can be used if the file name is to be
+      obtained through the parameter system.
+   }
+   \sstinvocation{
+      CALL GRP\_LISTF( FILENM, INDXLO, INDXHI, COMNT, IGRP, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         FILENM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The name of the text file to be created.
+      }
+      \sstsubsection{
+         INDXLO = INTEGER (Given)
+      }{
+         The low index limit of the group section. If both INDXLO and
+         INDXHI are zero, then the entire group is used.
+      }
+      \sstsubsection{
+         INDXHI = INTEGER (Given)
+      }{
+         The high index limit of the group section.
+      }
+      \sstsubsection{
+         COMNT = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         A comment line to form the first record in the file. The text
+         is prefixed with a the groups current comment character before
+         being written to the file.
+      }
+      \sstsubsection{
+         IGRP = INTEGER (Given)
+      }{
+         The GRP identifier for the group to be listed.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   GRP\_NEW
+}{
+   Create a new empty group
+}{
+   \sstdescription{
+      A new empty group is created and an identifier to it is returned
+      in IGRP. The string supplied in TYPE is stored with the group,
+      and should be used to store a description of the contents of the
+      group (see also routines GRP\_GTYPE and GRP\_PTYPE).
+
+      The created group has the default control characters described in
+      routine GRP\_SETCC, and has no {\tt "}owner{\tt "} group (see GRP\_OWN).
+   }
+   \sstinvocation{
+      CALL GRP\_NEW( TYPE, IGRP, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         TYPE = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         A descriptive string to be associated with the group. The
+         maximum length for a TYPE string is given by GRP\_\_SZTYP.
+         Supplied characters beyond this length are ignored.
+      }
+      \sstsubsection{
+         IGRP = INTEGER (Returned)
+      }{
+         An identifier for the created group. GRP\_\_NOID is returned if
+         an error occurs.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   GRP\_OWN
+}{
+   Returns the identifier of the group which owns the specified
+   group
+}{
+   \sstdescription{
+      If the group identified by IGRP1 has had an {\tt "}owner{\tt "} group
+      established for it by a call to GRP\_SOWN, then the identifier of
+      the owner group is returned in IGRP2. Otherwise, the value
+      GRP\_\_NOID is returned (but no error is reported).
+   }
+   \sstinvocation{
+      CALL GRP\_OWN( IGRP1, IGRP2, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IGRP1 = INTEGER (Given)
+      }{
+         An identifier for the slave group whose owner is to be
+         returned.
+      }
+      \sstsubsection{
+         IGRP2 = INTEGER (Given)
+      }{
+         An identifier for the group which owns the group identified by
+         IGRP1. Returned equal to GRP\_\_NOID if an error occurs.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   GRP\_PTYPE
+}{
+   Associate a new type string with a group
+}{
+   \sstdescription{
+      The given type string is stored with the group, replacing the
+      previous value.  The maximum length of the type string is given
+      by symbolic constant GRP\_\_SZTYP. If the supplied type string is
+      longer than this, the title is truncated.
+   }
+   \sstinvocation{
+      CALL GRP\_PTYPE( IGRP, TYPE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IGRP = INTEGER (Given)
+      }{
+         A GRP identifier for the group.
+      }
+      \sstsubsection{
+         TYPE = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The group type.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   GRP\_PURGE
+}{
+   Purge duplicate entries from a group
+}{
+   \sstdescription{
+      This routine creates a new group based on a given existing group.
+      The contents of the existing group are copied to the new group,
+      but any duplicated names are only included once. The check for
+      duplication is case sensitive unless the group has been declared
+      case insensitive by a call to GRP\_SETCS. The new group inherits
+      the type, control characters case sensitivity flag of the old
+      group, but does not inherit any owner/slave relationships (see
+      routine GRP\_SOWN).
+
+      Note, indices determined from the old group will in general not
+      point to the same name in the new group. The old group should be
+      deleted using GRP\_DELET if it is no longer required.
+   }
+   \sstinvocation{
+      CALL GRP\_PURGE( IGRP1, IGRP2, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IGRP1 = INTEGER (Given)
+      }{
+         The GRP identifier for an existing group.
+      }
+      \sstsubsection{
+         IGRP2 = INTEGER (Returned)
+      }{
+         A GRP identifier for the created group. This group is a purged
+         form of the group identified by IGRP1. A value of GRP\_\_NOID is
+         returned if an error occurs.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   GRP\_PUT
+}{
+   Put a given set of literal names into a group
+}{
+   \sstdescription{
+      The given names are stored in the group in the form in which they
+      are supplied (including any control characters). They overwrite
+      any previous names stored at the specified indices. The group is
+      extended if the range of indices extends beyond the current size
+      of the group. The names can be appended to the end of the group
+      by giving INDEX a value of zero or one greater than the current
+      size of the group. An error is reported if the names are added
+      beyond the end of the group (i.e.  if adding the names would
+      result in a gap within the group for which no names would be
+      defined).
+   }
+   \sstinvocation{
+      CALL GRP\_PUT( IGRP, SIZE, NAMES, INDEX, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IGRP = INTEGER (Given)
+      }{
+         A GRP identifier for the group.
+      }
+      \sstsubsection{
+         SIZE = INTEGER (Given)
+      }{
+         The size of the NAMES array.
+      }
+      \sstsubsection{
+         NAMES( SIZE ) = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The names to be stored in the group. The first name is stored
+         at the index given by INDEX, the last is stored at index
+         INDEX$+$SIZE-1.
+      }
+      \sstsubsection{
+         INDEX = INTEGER (Given)
+      }{
+         The index at which to store the first name. A value of zero
+         causes the names to be appended to the end of the group.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   GRP\_REMOV
+}{
+   Remove all occurrences of a given name from a group
+}{
+   \sstdescription{
+      A new group is created by copying the contents of an existing
+      group, excluding any occurrences of a specified name. Note, a name
+      with a given index in the input group will in general have a
+      different index in the output group. The new group inherits the
+      type, control characters and case sensitivity flag of the old
+      group, but does not inherit any owner/slave relationships (see
+      routine GRP\_SOWN). If the input group is no longer required, it
+      should be deleted using GRP\_DELET.
+   }
+   \sstinvocation{
+      CALL GRP\_REMOV( IGRP1, NAME, IGRP2, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IGRP1 = INTEGER (Given)
+      }{
+         A GRP identifier for the input group.
+      }
+      \sstsubsection{
+         NAME = CHARACTER $*$ ( $*$ )(Given)
+      }{
+         The name to be removed. Leading blanks are significant, and
+         case is also significant unless the group has been marked as
+         case insensitive by calling GRP\_SETCS.
+      }
+      \sstsubsection{
+         IGRP2 = INTEGER (Returned)
+      }{
+         A GRP identifier for the created group. Returned equal to
+         GRP\_\_NOID if an error occurs.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   GRP\_SETCC
+}{
+   Sets requested control characters for the specified group
+}{
+   \sstdescription{
+      Each group has associated with it several {\tt "}control characters{\tt "}
+      which are the characters used to indicate various items of syntax
+      within a group expression. These characters are listed and
+      described in the {\tt "}Notes{\tt "} section below. The control characters are
+      given default values when the group is created, but can be changed
+      at any time by calling this routine.
+
+      Checks for particular control characters may be suppressed by
+      assigning the NULL character to them. The NULL character is
+      itself a control character which may be assigned a value using
+      this routine. Some control characters form pairs, and an error is
+      reported if only one member of a pair is assigned the NULL value.
+      These pairs are OPEN\_NEST and CLOSE\_NEST, and OPEN\_KERNEL and
+      CLOSE\_KERNEL.
+
+      If a blank value for argument CCLIST is supplied, then the default
+      control characters described in the {\tt "}Notes{\tt "} section are
+      re-established.
+
+      An error is reported if any two control characters are the same.
+      The exception to this is that any number of control characters
+      may have the same value as the NULL control character. If any
+      error occurs, the control characters are left unaltered.
+   }
+   \sstinvocation{
+      CALL GRP\_SETCC( IGRP, CCLIST, CC, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IGRP = INTEGER (Given)
+      }{
+         A GRP identifier for the group to which the control characters
+         refer.
+      }
+      \sstsubsection{
+         CCLIST = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         A comma separated list of names specifying which control
+         character are to be altered. Unambiguous abbreviations may be
+         used. A blank value causes all control characters to be reset
+         to the default values.
+      }
+      \sstsubsection{
+         CC = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         A list of the new control characters, in the same order as the
+         corresponding names in CCLIST. Note, if CCLIST contains N
+         names, then the first N characters are used out of the string
+         specified by CC. If the total length (including any trailing
+         blanks) of CC is less than N, then an error is reported.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      The following names are used to refer to the individual control
+      characters:
+      \sstitemlist{
+
+         \sstitem
+         INDIRECTION: (Default {\tt "}$\wedge${\tt "}) The name given to the character used
+         to indicate that an element of a group expression is the name of a
+         text file from which further elements should be read.
+
+         \sstitem
+         COMMENT: (Default {\tt "}\#{\tt "}) The name given to the character used to
+         introduce comments in group expressions.
+
+         \sstitem
+         DELIMITER: (Default {\tt "},{\tt "}) The name given to the character used
+         to delimit elements within group expressions. Note, delimiters
+         within group expressions are ignored if they occur within matched
+         nesting characters (see OPEN\_NEST and CLOSE\_NEST below).
+
+         \sstitem
+         NAME\_TOKEN: (Default {\tt "}$*${\tt "}) The name given to the character used
+         as a token for input names in a modification element.
+
+         \sstitem
+         SEPARATOR: (Default {\tt "}$|${\tt "}) The name given to the character used
+         to separate the substitution strings within a modification
+         element.
+
+         \sstitem
+         OPEN\_NEST: (Default {\tt "}({\tt "}) The name given to the character used
+         to open a {\tt "}nest{\tt "} within a group expression. Any delimiter
+         characters occurring within matched nesting characters are ignored.
+
+         \sstitem
+         CLOSE\_NEST: (Default {\tt "}){\tt "}) The name given to the character used
+         to close a {\tt "}nest{\tt "} within a group expression.
+
+         \sstitem
+         FLAG: (Default {\tt "}-{\tt "}) The name given to a character which can
+         be appended to the end of a group expression in order to
+         {\tt "}flag{\tt "} that expression. The interpretation of this flag is left
+         up to the application.
+
+         \sstitem
+         OPEN\_KERNEL: (Default {\tt "}\{{\tt "}) The name given to the character used
+         to open a {\tt "}kernel{\tt "} within a group expression.
+
+         \sstitem
+         CLOSE\_KERNEL: (Default {\tt "}\}{\tt "}) The name given to the character used
+         to close a {\tt "}kernel{\tt "} within a group expression.
+
+         \sstitem
+         NULL: (Default {\tt "}\%{\tt "}) The name given to the character which can
+         be assigned to other control characters to suppress checks for
+         those control characters.
+      }
+   }
+}
+\sstroutine{
+   GRP\_SETCS
+}{
+   Establish the case sensitivity of a group
+}{
+   \sstdescription{
+      When a group is created using GRP\_NEW, it is initially case
+      sensitive. This routine can be called to make it case
+      insensitive, or to make it case sensitive again.
+
+      All names stored within a case sensitive group are used in the
+      same form as they were supplied by the environment or
+      application. If the group is case insensitive the upper case
+      equivalent is used when any reference is made to a name stored
+      within the group, and all comparisons between strings (such as
+      performed within routines GRP\_INDEX and GRP\_PURGE for instance)
+      related to that group are performed without reference to case.
+
+      Note, names are always stored in the form they are given.  Any
+      case conversion takes place when the names are read out of the
+      group, not when they are put into the group. This means that
+      groups can be changed at any time from being case insensitive to
+      being case sensitive (or vice-versa).
+   }
+   \sstinvocation{
+      CALL GRP\_SETCS( IGRP, SENSIT, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IGRP = INTEGER (Given)
+      }{
+         A GRP identifier for the group.
+      }
+      \sstsubsection{
+         SENSIT = LOGICAL (Given)
+      }{
+         If .TRUE. then the group is made case sensitive. If .FALSE.,
+         then the group is made case insensitive.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   GRP\_SETSZ
+}{
+   Reduce the size of a group
+}{
+   \sstdescription{
+      This routine sets the size of the given group to the specified
+      value. The new size must be less than or equal to the old size.
+      The names with indices greater than the new size are lost. Other
+      names remain unaltered.
+   }
+   \sstinvocation{
+      CALL GRP\_SETSZ( IGRP, SIZE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IGRP = INTEGER (Given)
+      }{
+         A GRP identifier for the group.
+      }
+      \sstsubsection{
+         SIZE = INTEGER (Given)
+      }{
+         The new group size. If a negative value is given, then zero
+         is used.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   GRP\_SOWN
+}{
+   Establish one group as the owner of another group
+}{
+   \sstdescription{
+      This routine establishes one specified group as {\tt "}owner{\tt "} of
+      another specified group. An error is reported if the group is
+      already owned by another group. An error is also reported if the
+      {\tt "}owner{\tt "} group already owns a slave.
+
+      This routine may also be used to cancel an {\tt "}owner-slave{\tt "}
+      relationship, by specifying IGRP2 as GRP\_\_NOID. The group
+      identified by IGRP1 then becomes a {\tt "}free{\tt "} group (i.e. has no
+      owner). An error is reported if IGRP1 identifies a group which is
+      already free.
+   }
+   \sstinvocation{
+      CALL GRP\_SOWN( IGRP1, IGRP2, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IGRP1 = INTEGER (Given)
+      }{
+         The identifier of the {\tt "}slave{\tt "} group which is to have an owner
+         established for it. An error is reported if an invalid
+         identifier is given.
+      }
+      \sstsubsection{
+         IGRP2 = INTEGER (Given)
+      }{
+         The identifier of the group which is to be established as
+         the owner of the group identified by IGRP1.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a restriction on the use of owner-slave
+         relationships, namely that a slave cannot own its own owner,
+         either directly or indirectly. That is, if group A is owned by
+         group B, and group B is owned by group C, then group C cannot be
+         owned by either group B, or group A. An error is reported, if an
+         attempt is made to set up such a relationship.
+
+         \sstitem
+         When a group is deleted using GRP\_DELET, all other groups in
+         the same owner/slave chain, whether higher up or lower down, are
+         also deleted. If a group is to be deleted without deleting all
+         other related groups, then the group must be established as a
+         {\tt "}free{\tt "} group (i.e. no owner) by calling this routine with IGRP2
+         set to GRP\_\_NOID, before calling GRP\_DELET.
+      }
+   }
+}
+\sstroutine{
+   GRP\_VALID
+}{
+   Determine if a group identifier is valid
+}{
+   \sstdescription{
+      Argument VALID is returned .TRUE. if the group identified by IGRP
+      is valid, and is returned .FALSE. otherwise.
+   }
+   \sstinvocation{
+      CALL GRP\_VALID( IGRP, VALID, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IGRP = INTEGER (Given)
+      }{
+         A GRP identifier.
+      }
+      \sstsubsection{
+         VALID = LOGICAL (Returned)
+      }{
+         The status of the group.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+
+\normalsize
+
+
+\section{GRP Error Status Values}
+
+\label{APP:ERRORS}
+This appendix lists the STATUS values generated within the GRP package. Note, 
+STATUS values generated by the packages listed in appendix \ref{APP:PACK} may 
+also be returned.
+
+\begin{description}
+\item [GRP\_\_BADCC] - An ambiguous or un-recognised control character name has 
+been supplied.
+\item [GRP\_\_BADIT] - An un-recognised item of information has been requested.
+\item [GRP\_\_BADME] - A modification element has been given which has an 
+illegal format.
+\item [GRP\_\_DEEP] - The maximum depth of indirection has been exceeded.
+\item [GRP\_\_EMPTY] - The specified group is empty.
+\item [GRP\_\_FIOER] - A Fortran I/O error has occurred.
+\item [GRP\_\_FREE] - The group to be made free is already free.
+\item [GRP\_\_INTER] - An internal GRP error has occurred.
+\item [GRP\_\_INVID] - An invalid group identifier was given.
+\item [GRP\_\_NOLUN] - No free logical unit numbers available.
+\item [GRP\_\_NOMOR] - No more groups can be created.
+\item [GRP\_\_NULNM] - A zero length name was given.
+\item [GRP\_\_OUTBN] - A group has been indexed outside its bounds.
+\item [GRP\_\_OWNED] - The group to be enslaved is already owned.
+\item [GRP\_\_OWNER] - An attempt has been made to enslave a group to a group 
+which already owns another group.
+\item [GRP\_\_SHORT] - A character variable supplied as an argument was too 
+short.
+\item [GRP\_\_SLAVE] - An attempt has been made to make a group a slave of its 
+own slave.
+\item [GRP\_\_SZINC] - An attempt has been made to increase the size of a 
+group using GRP\_SETSZ.
+\end{description}
+
+\section{Packages Called From Within GRP}
+
+\label{APP:PACK}
+The GRP package makes use of subroutines from the PSX
+library (see SUN/121), the CHR library (see SUN/40) and the ERR library (see
+SUN/104).
+
+\section{Acknowledgements}
+
+Peter Draper is thanked for his work on porting the original IRH\_ package to
+UNIX, and Rodney Warren-Smith is thanked for his extensive suggestions for
+improvements to the GRP\_ package. 
+
+\section{Changes and New Features in V1.1}
+The following changes have occurred in the GRP\_ system since version 1.0:
+\begin{enumerate}
+\item A new routine GRP\_HEAD has been introduced to simplify the task of 
+finding the head of an owner-slave chain.
+\item Routines GRP\_GROUP and GRP\_GRPEX
+\begin{itemize}
+\item Argument FLAG is now returned false if an error occurs.
+\item If an error occurs, then argument SIZE is returned equal to the supplied
+size of the group identified by argument IGRP2. If the group has zero size on 
+entry then argument SIZE is returned equal to one.
+\end{itemize}
+\end{enumerate}
+
+\section{Changes and New Features in V2.0}
+The following changes have occurred in the GRP\_ system since version 1.1:
+\begin{enumerate}
+\item The facility for editing names which was previously restricted to use 
+within modification elements, has been made available for use with any form
+of element. See section \ref{SEC:GREXP}.
+\item Null names (i.e. names with zero length) are now accepted and treated as 
+blank names. 
+\end{enumerate}
+
+\end{document}

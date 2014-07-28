@@ -1,0 +1,3821 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {104.5}
+\newcommand{\stardocauthors}   {P C T Rees}
+\newcommand{\stardocdate}      {3 February 1993}
+\newcommand{\stardoctitle}     {MSG and ERR \\ [1ex]
+                                Message and Error Reporting Systems}
+\newcommand{\stardocversion}   {Version 1.2-3}
+\newcommand{\stardocmanual}    {Programmer's Manual}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+\renewcommand{\thepage}{\roman{page}}
+
+%+
+%  Name:
+%     LAYOUT.TEX
+
+%  Purpose:
+%     Define Latex commands for laying out documentation produced by PROLAT.
+
+%  Language:
+%     Latex
+
+%  Type of Module:
+%     Data file for use by the PROLAT application.
+
+%  Description:
+%     This file defines Latex commands which allow routine documentation
+%     produced by the SST application PROLAT to be processed by Latex. The
+%     contents of this file should be included in the source presented to
+%     Latex in front of any output from PROLAT. By default, this is done
+%     automatically by PROLAT.
+
+%  Notes:
+%     The definitions in this file should be included explicitly in any file
+%     which requires them. The \include directive should not be used, as it
+%     may not then be possible to process the resulting document with Latex
+%     at a later date if changes to this definitions file become necessary.
+
+%  Authors:
+%     RFWS: R.F. Warren-Smith (STARLINK)
+
+%  History:
+%     10-SEP-1990 (RFWS):
+%        Original version.
+%     10-SEP-1990 (RFWS):
+%        Added the implementation status section.
+%     12-SEP-1990 (RFWS):
+%        Added support for the usage section and adjusted various spacings.
+%     {enter_further_changes_here}
+
+%  Bugs:
+%     {note_any_bugs_here}
+
+%-
+
+%  Define length variables.
+\newlength{\sstbannerlength}
+\newlength{\sstcaptionlength}
+
+%  Define a \tt font of the required size.
+\font\ssttt=cmtt10 scaled 1095
+
+%  Define a command to produce a routine header, including its name,
+%  a purpose description and the rest of the routine's documentation.
+\newcommand{\sstroutine}[3]{
+   \goodbreak
+   \rule{\textwidth}{0.5mm}
+   \vspace{-7ex}
+   \newline
+   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
+   \setlength{\sstcaptionlength}{\textwidth}
+   \addtolength{\sstbannerlength}{0.5em}
+   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
+   \addtolength{\sstcaptionlength}{-4.45pt}
+   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
+   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
+   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
+   \begin{description}
+      #3
+   \end{description}
+}
+
+%  Format the description section.
+\newcommand{\sstdescription}[1]{\item[Description:] #1}
+
+%  Format the usage section.
+\newcommand{\sstusage}[1]{\item[Usage:] \mbox{} \\[1.3ex] {\ssttt #1}}
+
+%  Format the invocation section.
+\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
+
+%  Format the arguments section.
+\newcommand{\sstarguments}[1]{
+   \item[Arguments:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the returned value section (for a function).
+\newcommand{\sstreturnedvalue}[1]{
+   \item[Returned Value:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the parameters section (for an application).
+\newcommand{\sstparameters}[1]{
+   \item[Parameters:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the examples section.
+\newcommand{\sstexamples}[1]{
+   \item[Examples:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Define the format of a subsection in a normal section.
+\newcommand{\sstsubsection}[1]{\item[{#1}] \mbox{} \\}
+
+%  Define the format of a subsection in the examples section.
+\newcommand{\sstexamplesubsection}[1]{\item[{\ssttt #1}] \mbox{} \\}
+
+%  Format the notes section.
+\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
+
+%  Provide a general-purpose format for additional (DIY) sections.
+\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}] \mbox{} \\[1.3ex] #2}
+
+%  Format the implementation status section.
+\newcommand{\sstimplementationstatus}[1]{
+   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
+
+%  Format the bugs section.
+\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
+
+%  Format a list of items while in paragraph mode.
+\newcommand{\sstitemlist}[1]{
+  \mbox{} \\
+  \vspace{-3.5ex}
+  \begin{itemize}
+     #1
+  \end{itemize}
+}
+
+%  Define the format of an item.
+\newcommand{\sstitem}{\item}
+
+%  End of LAYOUT.TEX layout definitions.
+%.
+
+%------------------------------------------------------------------------------
+
+\begin{document}
+
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Huge\bf  \stardoctitle \\ [2.5ex]}
+{\LARGE\bf \stardocversion \\ [4ex]}
+{\Huge\bf  \stardocmanual}
+\end{center}
+\vspace{20mm}
+
+%------------------------------------------------------------------------------
+%  Package Description
+\begin{center}
+{\Large\bf Description}
+\end{center}
+
+This document describes two subroutine libraries which can be used to provide
+informational text to the user from any application program: MSG and ERR.
+The Message Reporting System, MSG, is used for reporting non-error information
+and the Error Reporting System, ERR, is used specifically for reporting error
+messages.
+The conventions for reporting errors from Starlink software are also
+discussed in detail.
+
+This document is recommended reading for anyone writing applications
+software for use on Starlink.
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+\newpage
+\markright{\stardocname}
+\null\vspace {5mm}
+\begin {center}
+\rule{80mm}{0.5mm} \\ [1ex]
+{\Large\bf \stardoctitle \\ [2.5ex]
+           \stardocversion} \\ [2ex]
+\rule{80mm}{0.5mm}
+\end{center}
+\vspace{30mm}
+
+\setlength{\parskip}{0mm}
+\tableofcontents
+\setlength{\parskip}{\medskipamount}
+
+%------------------------------------------------------------------------------
+%  Introduction page
+\newpage
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
+
+\null\vspace {5mm}
+\begin {center}
+\rule{80mm}{0.5mm} \\ [1ex]
+{\Large\bf \stardoctitle \\ [2.5ex]
+           \stardocversion} \\ [2ex]
+\rule{80mm}{0.5mm}
+\end{center}
+\vspace{30mm}
+
+\section {Introduction}
+
+There is a general need for application programs on Starlink to provide the
+user with informative textual messages about:
+
+\begin {itemize}
+\item What they do --- for example, during long operations it is helpful if the
+user is kept informed of what a program is doing.
+
+\item What results have been obtained --- for example, the notification of  the
+final results from a procedure, or of some intermediate results that would help
+the user respond to further prompts. 
+
+\item What errors have occurred --- for example, errors which lead to the user
+being prompted to provide more sensible input to a program, or fatal
+errors which cause an application to stop.
+\end {itemize}
+
+This document describes two subroutine libraries which can be used to provide
+informational text to the user from an application program.
+The two packages are:
+
+\begin {quote}
+\begin {itemize}
+\item [MSG] --- Message Reporting System, used for reporting non-error
+information. 
+
+\item [ERR] --- Error Reporting System, used specifically for reporting error
+messages.
+\end {itemize}
+\end {quote}
+
+This document is aimed at all programmers who are writing applications software
+on Starlink, either for use within the ADAM environment or stand-alone.
+The major part of this document concerns the use of the stand-alone version of
+the Message and Error Reporting System subroutines.
+The additional features of the ADAM version of these subroutines and their use
+are described in Appendix \ref{adam_sect}.
+
+\section {MSG --- Message Reporting System}
+
+\subsection {Overview}
+
+The most obvious way of producing informational messages from within 
+Fortran application programs is through formatted WRITE and PRINT 
+statements.
+It is possible to construct the text of a message from various components, 
+including numbers, formatted in a CHARACTER variable using the internal WRITE
+statement. 
+The resulting informational message may then be output to the user.
+However, it is sometimes difficult to format numerical output in its most
+concise form within textual messages.
+To do this in-line each time a message is sent to the user would be very
+inconvenient and justifies the provision of a dedicated set of subroutines. 
+ 
+These considerations have led to the design and implementation of a set of
+subroutines which form the Message Reporting System.
+The Message System subroutines have names of the form
+
+\begin {quote}
+\begin {small}
+\begin{verbatim}
+MSG_name
+\end{verbatim}
+\end {small}
+\end {quote}
+
+where {\tt name} indicates what the subroutine does.
+
+
+\subsection {Reporting messages}
+
+The primary message reporting subroutine is MSG\_OUT. 
+It has a calling sequence of the form 
+
+\begin {small}
+\begin{verbatim}
+      CALL MSG_OUT( PARAM, TEXT, STATUS )
+\end{verbatim}
+\end {small}
+
+where the argument PARAM is a character string giving the name of the message,
+TEXT is a character string giving the message text, and STATUS is the
+integer subroutine status value. 
+The subroutine MSG\_OUT uses the Starlink convention of inherited
+status. 
+This means that calls to MSG\_OUT will do nothing unless the given value of
+STATUS is equal to SAI\_\_OK.
+If an error is encountered within the subroutine, then STATUS is returned
+set to an error value. 
+(The global constant SAI\_\_OK is defined in the include file SAE\_PAR. 
+The use of this global constant and of inherited status are discussed in detail
+in \S\ref{inherit_sect}.) 
+
+MSG\_OUT sends the message string, TEXT, to the standard output stream. 
+This will normally be the user's terminal, but will correspond to the log file
+in the case of a batch job.
+The maximum length of an output message is 200 characters.
+If the output message exceeds this length, then the message is truncated with
+an ellipsis, {\em i.e.} ``\ldots'', but no error will result.
+
+Within the application the message name, PARAM, should be a unique identifier 
+for the message string, TEXT. 
+The message name serves no purpose within a working stand-alone application
+except to uniquely identify the message text to the programmer.
+In ADAM subroutine packages and applications, however, the message name has
+a specific purpose which is discussed in detail in Appendix \ref{adam_msg}.
+
+Here is an example of using MSG\_OUT:
+
+\begin {small}
+\begin{verbatim}
+      CALL MSG_OUT( 'EXAMPLE_MSGOUT', 'An example of MSG_OUT.', STATUS )
+\end{verbatim}
+\end {small}
+
+It is sometimes useful to intersperse blank lines amongst lines of textual
+output for clarity.
+This could be done using calls to MSG\_OUT, {\em e.g.}
+
+\begin {small}
+\begin{verbatim}
+      CALL MSG_OUT( ' ', ' ', STATUS )
+\end{verbatim}
+\end {small}
+
+For convenience, the subroutine MSG\_BLANK has been provided for this 
+purpose, {\em e.g.}
+
+\begin {small}
+\begin{verbatim}
+      CALL MSG_BLANK( STATUS )
+\end{verbatim}
+\end {small}
+
+The status argument in MSG\_BLANK behaves in the same way as the status 
+argument in MSG\_OUT.
+
+
+\subsection {Conditional message reporting}
+
+It is sometimes useful to have varying levels of message output which 
+may be controlled by the user of an application.
+Instances where this facility might be of use are
+
+\begin {itemize}
+\item the ability to switch on novice informational messages for an 
+application which can later be switched off as the user becomes familiar with 
+the application;
+\item the ability to switch off unnecessary informational messages when
+an application is run in batch mode, or within a command procedure;
+\item the ability to output detailed information from an application on 
+request, say from within an iterative procedure.
+\end {itemize}
+
+\begin {sloppypar}
+Conditional message output is provided in the Message Reporting System
+using the subroutines MSG\_IFSET, MSG\_IFLEV and MSG\_OUTIF.
+Here, MSG\_IFSET is used to set the conditional message output filtering level,
+MSG\_IFLEV is used to inquire the conditional message output filtering
+level and MSG\_OUTIF is used to conditionally output a message.
+There are three filtering levels for conditional message output which are 
+represented by symbolic constants available in the include file MSG\_PAR:
+\end {sloppypar}
+
+\begin {quote}
+\begin {description}
+\item [MSG\_\_QUIET] -- quiet mode;
+\item [MSG\_\_NORM] -- normal node (default);
+\item [MSG\_\_VERB] -- verbose mode.
+\end {description}
+\end {quote}
+
+By default, the Message Reporting System is set to the normal conditional 
+output filter.
+It may be modified using the subroutine MSG\_IFSET, {\em e.g.}
+
+\begin {small}
+\begin{verbatim}
+      CALL MSG_IFSET( MSG__QUIET, STATUS )
+\end{verbatim}
+\end {small}
+
+Note that if MSG\_IFSET is called with an invalid conditional filtering level
+an error will be reported and the status argument will be returned set
+to MSG\_\_INVIF.
+
+Conditional message output is achieved explicitly using the subroutine
+MSG\_OUTIF, {\em e.g.}
+
+\begin {small}
+\begin{verbatim}
+      CALL MSG_OUTIF( MSG__NORM, ' ', 'A conditional message', STATUS )
+\end{verbatim}
+\end {small}
+
+Here, the first argument is the ``priority'' associated with the message and 
+can be any one of the three filter levels given previously.
+The action of MSG\_OUTIF resulting from each of the defined priority values is 
+as follows:
+
+\begin {quote}
+\begin {description}
+\item [MSG\_\_QUIET] -- always output given the message, regardless of output
+filter setting;
+\item [MSG\_\_NORM] -- output the given message if the current output filter is
+set to either MSG\_\_NORM or MSG\_\_VERB;
+\item [MSG\_\_VERB] -- output the given message only if the current output
+filter is set to MSG\_\_VERB.
+\end {description}
+\end {quote}
+
+In this scheme, messages given the priority MSG\_\_QUIET could never be 
+turned off and would therefore be the most most important messages being
+output by an application.
+
+Here is an example of how conditional message output might be used 
+in an application using interactive graphics with differing levels of 
+informational messages to match how familiar the user is with the application:
+
+\begin {small}
+\begin{verbatim}
+*  Use the cursor to enter the approximate positions of stars on the 
+*  displayed image to be fitted.
+      CALL MSG_OUT( ' ', 'Use the cursor to enter star positions', 
+     :             STATUS )
+
+*  Explain the positioning of the cursor.
+      CALL MSG_OUTIF( MSG__NORM, ' ', 
+     :               'The graphics cursor should be positioned ' //
+     :               'close to the centre of each star image', STATUS )
+
+*  Explain the cursor keys to new user.
+      CALL MSG_OUTIF( MSG__VERB, ' ', 'Cursor keys: 1 add entry', STATUS )
+      CALL MSG_OUTIF( MSG__VERB, ' ', '             2 reject last entry', 
+     :               STATUS )
+      CALL MSG_OUTIF( MSG__VERB, ' ', '             3 entry complete', 
+     :               STATUS )
+\end{verbatim}
+\end {small}
+
+
+\subsection {Conditional Message Reporting and MSG\_OUT}
+
+Although conditional message reporting may be handled explicitly by using calls
+to MSG\_OUTIF, calls to MSG\_OUT and MSG\_BLANK also have conditional message
+reporting built in.
+The implicit behaviour of MSG\_OUT is equivalent to a call to MSG\_OUTIF with 
+the output priority set to MSG\_\_NORM, {\em i.e.}
+
+\begin{verbatim}
+      CALL MSG_OUTIF( MSG__NORM, PARAM, TEXT, STATUS )
+\end{verbatim}
+
+Similiarly, the implicit behaviour of MSG\_BLANK is equivalent to a call to
+MSG\_OUTIF with the output priority set to MSG\_\_NORM, {\em i.e.}
+
+\begin{verbatim}
+      CALL MSG_OUTIF( MSG__NORM, ' ', ' ', STATUS )
+\end{verbatim}
+
+This means that messages reported using MSG\_OUT will only be output when the
+conditional output filter is set to MSG\_\_NORM (the default) or MSG\_\_VERB.
+
+In the previous examples of MSG\_OUT and MSG\_OUTIF, the message text is 
+``constant'' in the sense that it does not refer to any variable items, 
+{\em e.g.} file names or numeric values. 
+However, variables of most standard Fortran types can be embedded in the
+message text using message tokens.
+
+
+\subsection {Message tokens}
+
+Very often, applications need to include the values of Fortran variables 
+within output messages. 
+This is done in the Message System using tokens embedded within the message
+text.
+For example, a program which measures the intensity of an emission line in
+a spectrum can output its result by
+
+\begin {small}
+\begin{verbatim}
+      CALL MSG_SETR( 'FLUX', FLUX )
+      CALL MSG_OUT( 'EXAMPLE_RESULT', 
+     :             'Emission flux is ^FLUX (erg/cm2/A/s).',
+     :             STATUS )
+\end{verbatim}
+\end {small}
+
+Here, the subroutine MSG\_SETR is called to assign the program result, stored
+in the REAL variable FLUX, to the message token named ``FLUX''. 
+The token string is then included in the message text by prefixing it with the
+up-arrow, ``$^\wedge$'', escape character. 
+
+If the variable FLUX in this example has the value 2.4, then
+the message output to the terminal would be
+
+\begin {quote}
+\begin {small}
+\begin{verbatim}
+Emission flux is 2.4 (erg/cm2/A/s).
+\end{verbatim}
+\end {small}
+\end {quote}
+
+There is a set of MSG\_SETx subroutines, one subroutine for each of five
+standard Fortran 77 data types (the Fortran type COMPLEX has not been provided
+for).
+Here, {\em x} corresponds to the Fortran data type of the value to be assigned
+to the named message token:
+
+\begin {center}
+\begin {tabular}{||c|c||}
+\hline
+{\em x} & {\em Fortran Type}\\
+\hline
+D & DOUBLE PRECISION\\
+R & REAL\\
+I & INTEGER\\
+L & LOGICAL\\
+C & CHARACTER\\
+\hline
+\end {tabular}
+\end {center}
+
+In each case, the calling sequence is of the form
+
+\begin {small}
+\begin{verbatim}
+      CALL MSG_SETx( TOKEN, VALUE )
+\end{verbatim}
+\end {small}
+
+The numeric subroutines, MSG\_SETD, MSG\_SETR and MSG\_SETI, adopt the most
+concise format that will represent the value by removing trailing zeros,
+leading and trailing blanks, and by avoiding the use of exponential notation
+unless it is necessary. 
+MSG\_SETL uses {\tt TRUE} or {\tt FALSE} according to the value it is given. 
+MSG\_SETC removes trailing blanks from the character string. 
+
+An additional feature of the MSG\_SETx routines is that calls to these routines
+using an existing token name will result in the value being appended to any
+previously assigned token string.
+Here is the previous example written to exploit this feature of the MSG\_SETx
+routines:
+
+\begin {small}
+\begin{verbatim}
+*  Local Constants:
+      CHARACTER FUNITS * 12
+      PARAMETER( FUNITS = ' erg/cm2/A/s' )
+
+      ...
+
+      CALL MSG_SETR( 'FLUX', FLUX )
+      CALL MSG_SETC( 'FLUX', FUNITS )
+      CALL MSG_OUT( 'EXAMPLE_RESULT', 
+     :             'Emission flux is ^FLUX.', STATUS )
+\end{verbatim}
+\end {small}
+
+where the CHARACTER variable FUNITS has been assigned the value of an 
+appropriate unit of flux ({\em e.g.} erg/cm2/A/s) earlier in the program.
+Note that repeated calls to the MSG\_SETx routines will append values to the 
+token string with no separator, hence a leading space in the FUNITS string 
+is needed to separate the flux value and its units in the expanded message.
+
+The text string associated with a message token ({\em i.e.} the token value)
+may be up to 200 characters long.
+Token names may be up to 15 characters long and should be valid names:
+{\em i.e.} they should begin with an alphabetic character and continue with
+alphanumeric or underscore characters.
+A maximum of 64 uniquely named message tokens may be included in any output
+message. 
+Initially, no message tokens are defined: {\em i.e.} named.
+After each call to MSG\_OUT, MSG\_OUTIF or MSG\_LOAD (or a corresponding ERR
+routine see \S\ref{etok_sect}), all existing tokens are left undefined. 
+
+
+\subsection {Formatted tokens}
+
+The MSG\_SETx subroutines encode numeric values in the most concise format
+that will describe the supplied value. 
+This is normally what is wanted for a simple message. 
+Sometimes, however, a specific format is required; for example, the message
+may form part of a table. 
+More precise numeric formats could be achieved using the Fortran WRITE
+statement with the Message System, {\em e.g.}
+
+\begin {small}
+\begin{verbatim}
+*  Local Constants:
+      CHARACTER * 12 FUNITS
+      PARAMETER( FUNITS = ' erg/cm2/A/s' )
+
+*  Local Variables:
+      CHARACTER * 12 VALUE
+
+      ...
+
+*  Output the flux value.
+      WRITE( VALUE, '( 1E12.5 )' ) FLUX
+      CALL MSG_SETC( 'FLUX', VALUE )
+      CALL MSG_SETC( 'FLUX', FUNITS )
+      CALL MSG_OUT( 'EXAMPLE_RESULT', 
+     :             'Emission flux is ^FLUX.', STATUS )
+\end{verbatim}
+\end {small}
+
+which would produce the message
+
+\begin {quote}
+\begin {small}
+\begin{verbatim}
+Emission flux is  2.40000E+00 (erg/cm2/A/s).
+\end{verbatim}
+\end {small}
+\end {quote}
+
+In this case, the first call to MSG\_SETC assigns the supplied character 
+string VALUE to the named token ``FLUX''.
+
+Since this sequence of a formatted internal WRITE followed by a call to
+MSG\_SETC is of general use, it is provided in a set of subroutines of the form
+
+\begin {small}
+\begin{verbatim}
+      CALL MSG_FMTx( TOKEN, FORMAT, VALUE )
+\end{verbatim}
+\end {small}
+
+where FORMAT is a valid Fortran 77 format string which can be used to
+encode the supplied value, VALUE.
+As for MSG\_SETx, {\em x} corresponds to each of the five standard Fortran 77 
+data types -- {\em D}, {\em R}, {\em I}, {\em L} and {\em C}.
+
+Using MSG\_FMTx, the example given above can be performed by
+
+\begin {small}
+\begin{verbatim}
+*  Output the flux value.
+      CALL MSG_FMTR( 'FLUX', '1E12.5', FLUX )
+      CALL MSG_SETC( 'FLUX', FUNITS )
+      CALL MSG_OUT( 'EXAMPLE_RESULT', 
+     :             'Emission flux is ^FLUX.', STATUS )
+\end{verbatim}
+\end {small}
+
+The use of the MSG\_FMTx routines along with their ability to append values
+of any type to existing tokens is a very powerful tool for constructing 
+tabular output from applications software.
+
+
+\subsection {Renewing annulled message tokens}
+
+Each call to MSG\_OUT or MSG\_OUTIF will annul any defined message tokens
+regardless of the success of the call.
+This feature of the Message Reporting System ensures that message token names
+can be re-used with safety in a series of calls to, say, MSG\_OUT ({\em e.g.}
+in order to output a table of values line by line).
+However, under certain circumstances it is useful to be able to restore, or 
+renew, the values of any message tokens set prior to the call to MSG\_OUT.
+This can be done using the subroutine MSG\_RENEW.
+In order to be effective, MSG\_RENEW must be called immediately after the call
+which annulled the required message tokens and prior to any further message
+token  definitions ({\em e.g.} using the MSG\_SETx and MSG\_FMTx routines).
+If MSG\_RENEW is called with existing message tokens defined, no action is
+taken.
+
+Here is an example of the use of MSG\_RENEW where a table of values is being
+output to the user and to a log file
+
+\begin {small}
+\begin{verbatim}
+*  Loop to output the table.
+      DO 10 I = 1, NROWS
+
+*     Set a token for each column.
+         CALL MSG_FMTI( 'COL1', '1X, I10', I )
+         CALL MSG_FMTI( 'COL2', 'I7', HDNUMB( I ) )
+         CALL MSG_FMTR( 'COL3', 'F10.5', X( I ) )
+         CALL MSG_FMTR( 'COL4', 'F10.5', Y( I ) )
+         CALL MSG_FMTR( 'COL5', 'F10.5', Z( I ) )
+
+*     Output a row of the table to the user.
+         CALL MSG_OUT( ' ', '^COL1 ^COL2 ^COL3 ^COL4 ^COL5', STATUS )
+
+*     Renew the token values.
+         CALL MSG_RENEW
+
+*     Build a string with the row of data.
+         CALL MSG_LOAD( ' ', '^COL1 ^COL2 ^COL3 ^COL4 ^COL5', OPSTR,
+     :                 OPLEN, STATUS )
+
+*     Write the string to a file.
+         WRITE( OPFILE, '( 1X, A )', IOSTAT = IOSTAT ) OPSTR( 1 : OPLEN )
+ 10   CONTINUE
+\end{verbatim}
+\end {small}
+
+The use of the subroutine MSG\_LOAD is discussed in detail in
+\S\ref{inter_sect}.
+
+
+\subsection {Including escape characters in messages}
+
+Sometimes it is necessary to include the message token escape character,
+``$^\wedge$'', literally in a message. 
+When the character is not the last in a message string, then it can be included
+literally by duplicating it.
+So, for example
+
+\begin {small}
+\begin{verbatim}
+      CALL MSG_SETC( 'TOKEN', 'message token' )
+      CALL MSG_OUT( 'EXAM_UPARROW', 
+     :             'Up-arrow, ^^, is the ^TOKEN escape character.', 
+     :             STATUS )
+\end{verbatim}
+\end {small}
+
+would produce the message
+
+\begin {quote}
+\begin {small}
+\begin{verbatim}
+Up-arrow, ^, is the message token escape character.
+\end{verbatim}
+\end {small}
+\end {quote}
+
+When the message token escape character is immediately followed by a blank
+space, or is at the end of the MSG\_OUT text, it is included literally. 
+Escape characters and token names will also be output literally if they 
+appear within the value assigned to a message token; {\em i.e.} message token 
+substitution is not recursive.
+This means that if the message system is to be used to output the value of a 
+character variable, the contents of which are unknown and may therefore 
+include escape characters, the value should first be assigned to a message 
+token.
+Thus,
+
+\begin {small}
+\begin {verbatim}
+      CALL MSG_SETC( 'TEXT', VALUE )
+      CALL MSG_OUT( 'EXAMPLE_OK', '^TEXT', STATUS )
+\end{verbatim}
+\end {small}
+
+will output the contents of VALUE literally, whereas
+
+\begin {small}
+\begin{verbatim}
+      CALL MSG_OUT( 'EXAMPLE_BAD', VALUE, STATUS )
+\end{verbatim}
+\end {small}
+
+might not produce the desired result.
+This consideration is particularly important when outputting text values 
+such as file names within the ADAM environment, where a number of additional 
+escape characters are defined (see Appendix \ref{adam_msg}).
+
+
+\subsection {Intercepting messages} \label{inter_sect}
+
+It may sometimes be convenient within an application to write the text of a 
+message, complete with decoded message tokens, to a character variable 
+instead of the standard output stream.
+The Message System provides a subroutine to do this: MSG\_LOAD.
+MSG\_LOAD has the calling sequence
+
+\begin {small}
+\begin{verbatim}
+      CALL MSG_LOAD( PARAM, TEXT, OPSTR, OPLEN, STATUS )
+\end{verbatim}
+\end {small}
+
+Here, the arguments PARAM, TEXT and STATUS are identical to those for MSG\_OUT.
+The behaviour of MSG\_LOAD is also the same as MSG\_OUT except that, instead of
+sending the message text to the standard output stream, if the conditional 
+message output filter is set appropriately, the message text is {\em always}
+returned in the character variable OPSTR.
+OPLEN returns the length of the message in OPSTR.
+If the message text is longer than the declared length of OPSTR, then the
+message is truncated with an ellipsis, {\em i.e.} ``\ldots'', but no error 
+results.
+
+The symbolic constant MSG\_\_SZMSG is provided for defining the length of 
+character variables which are to hold such messages.
+This constant is defined in the include file MSG\_PAR (see Appendix
+\ref{incl_sect}).
+
+
+\subsection {Resilience}
+
+Other than MSG\_OUT, MSG\_BLANK and MSG\_LOAD, the Message System subroutines do
+not use a status argument. 
+This is because they are intended to be very robust.
+In order to construct a message for output to the user, they will attempt to 
+recover from any internal failure. 
+The STATUS argument in MSG\_OUT, MSG\_BLANK and MSG\_LOAD conforms to the
+Starlink convention for inherited status.
+This means that an application can contain sequences of MSG\_SETx, MSG\_FMTx
+and MSG\_OUT calls, and only needs to check the status at the end.
+
+There are two kinds of ``failure'' that can occur within the Message
+System:
+
+\begin {itemize}
+\item Message Construction --- Any tokens which cannot be evaluated while
+constructing the output message are indicated in the message text by using a
+special syntax. 
+This syntax is illustrated for the text resulting from the call
+
+\begin {small}
+\begin{verbatim}
+      CALL MSG_OUT( 'EXAMPLE_FLUX', 
+     :             'Emission flux is ^FLUX (erg/cm2/s).', STATUS )
+\end{verbatim}
+\end {small}
+
+If the token ``FLUX'' is not defined, then this call will produce the text 
+
+\begin {quote}
+\begin {small}
+\begin{verbatim}
+Emission flux is ^<FLUX> (erg/cm2/s).
+\end{verbatim}
+\end {small}
+\end {quote}
+
+There are several reasons why a token may be undefined:
+
+\begin {itemize}
+\item It has not been defined since the last call to MSG\_OUT, MSG\_OUTIF 
+or MSG\_LOAD (or a corresponding ERR routine).
+
+\item An attempt has been made to define more than 64 message tokens.
+
+\item An error has been made in a call to one of the MSG\_FMTx subroutines. 
+This error could be either a syntax error in the FORMAT argument, or the
+result of specifying a field width which is too small (referred to 
+as an ``output conversion error'' in Fortran). 
+\end {itemize}
+
+Errors in message construction which result from undefined tokens are {\em not}
+considered fatal and STATUS is not set as a result.
+
+\item Message Output --- If it is not possible to output the message using
+MSG\_OUT, MSG\_OUTIF or MSG\_BLANK, then the STATUS argument will be set to an
+error value and an  error message will be reported (see \S\ref{report_sect}).
+Errors writing the message text to the standard output stream may occur for a
+number of reasons, {\em e.g.} if disk quota is exceeded during a batch job.
+The seriousness of such an error is dependent upon where the message was
+intended to go:
+
+\begin {itemize}
+\item Command terminal or batch log file --- 
+In this case the likelihood of being able to inform the user about the error
+is small.
+Generally, the application has little chance of continuing successfully under
+these circumstances.
+
+\item Output file --- 
+The message output may have been re-directed to an output file for the
+duration of a particular application. 
+Under these circumstances, the user can probably be informed about the error
+and the application may be able to continue.
+\end {itemize}
+\end {itemize}
+
+
+\section {ERR --- Error Reporting System}
+
+\subsection {Overview}
+
+Although the Message Reporting System could be used for reporting errors, there
+are a number of considerations which demand that separate facilities are
+available for this:
+
+\begin {itemize}
+\item The inherited status scheme is used by the Message System, and so the 
+subroutines MSG\_OUT, MSG\_OUTIF and MSG\_LOAD will not execute if STATUS is
+set to an error value. 
+Consequently, the Message System cannot be used to report information about
+an earlier error which has resulted in STATUS being set. 
+
+\item In a program or package consisting of many levels of subroutines, each
+routine which has something informative to say about the error should be
+able to contribute to the information that the user receives.
+This includes:
+
+\begin {itemize}
+\item The subroutine which first detects the error, as this will probably
+have access to specific information which is hidden from higher level
+routines. 
+
+\item The chain of subroutines between the main program and the routine in
+which the error originated.
+Some of these will usually be able to report on the context in which the error
+occurred, and so add relevant information which is not available to routines 
+at lower levels. 
+\end {itemize}
+
+This can lead to several error reports arising from a single failure. 
+
+\item It is not always necessary for an error report to reach the user. 
+For example, a high-level subroutine or the main program, may decide that it
+can handle an error detected at a lower level safely without informing the
+user. 
+In this case, it is necessary for error reports associated with that
+error to be discarded, and this can only happen if the output of error
+messages to the user is deferred. 
+
+\end {itemize}
+
+These considerations have led to the design and implementation of a set of
+subroutines which form the Error Reporting System.
+The subroutines have names of the form
+
+\begin {quote}
+\begin {small}
+\begin{verbatim}
+ERR_name
+\end{verbatim}
+\end {small}
+\end {quote}
+
+where {\tt name} indicates what the subroutine does.
+These subroutines work in conjunction with the Message System and allow error
+messages to incorporate message tokens. 
+
+
+\subsection {Inherited status checking} \label{inherit_sect}
+
+The recommended method of indicating when errors have occurred within
+Starlink software is to use an integer status value in each subroutine
+argument list. 
+This inherited status argument, say STATUS, should always be the last
+argument and every subroutine should check its value on entry. 
+The principle is as follows:
+
+\begin {itemize}
+\item The subroutine returns without action if STATUS is input with a value
+other than SAI\_\_OK. 
+
+\item The subroutine leaves STATUS unchanged if it completes successfully.
+
+\item The subroutine sets STATUS to an appropriate error value and reports an
+error message if it fails to complete successfully. 
+\end {itemize}
+
+Here is an example of the use of inherited status within a simple subroutine:
+
+\begin {small}
+\begin{verbatim}
+      SUBROUTINE ROUTN( VALUE, STATUS )
+      
+*  Define the SAI__OK global constant.
+      INCLUDE 'SAE_PAR'
+      INTEGER STATUS
+
+      ...
+
+*  Check the inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+      <application code>
+
+      END
+\end{verbatim}
+\end {small}
+
+If an error occurs within the ``application code'' of such a subroutine, then
+STATUS is set to a value which is not SAI\_\_OK, an error is reported (see
+below) and the subroutine aborts. 
+
+Note that it is often useful to use a status argument and inherited status
+checking in subroutines which ``cannot fail''. 
+This prevents them executing, possibly producing a run-time error, if
+their arguments contain rubbish after a previous error.
+Every piece of software that calls such a routine is then saved from making
+an extra status check. 
+Furthermore, if the routine is later upgraded it may acquire the potential
+to fail, and so a status argument will subsequently be required.
+If a status argument is included initially, existing code which calls 
+the routine will not need to be changed (see \S\ref{convert_sect} for a 
+further discussion of this).
+
+
+\subsection {Reporting errors} \label{report_sect}
+
+The subroutine used to report errors is ERR\_REP. 
+It has a calling sequence of the form
+
+\begin {small}
+\begin{verbatim}
+      CALL ERR_REP( PARAM, TEXT, STATUS )
+\end{verbatim}
+\end {small}
+
+Here, the argument PARAM is the error message name, TEXT is the error message
+text and STATUS is the inherited status.
+These arguments are broadly similar to those used in the Message System
+subroutine MSG\_OUT. 
+
+The error message name PARAM should be a globally unique identifier for the
+error report.
+It is recommended that it has the form:
+
+\begin {quote}
+\begin {small}
+\begin{verbatim}
+routn_message
+\end{verbatim}
+\end {small}
+\end {quote}
+
+in the general case of subroutines within an application, or
+
+\begin {quote}
+\begin {small}
+\begin{verbatim}
+fac_routn_message
+\end{verbatim}
+\end {small}
+\end {quote}
+
+in the case of routines within a subroutine library.
+In the former case, {\tt routn} is the name of the application routine from
+which ERR\_REP is being called and {\tt message} is a sequence of characters
+uniquely identifying the error report within that subroutine. 
+In the latter case, {\tt fac\_routn} is the full name of the subroutine from
+which ERR\_REP is being called (see the Starlink Application Programming
+Standard, SGP/16, for a discussion of the recommended subroutine naming
+convention), and {\tt message} is a sequence of characters unique within 
+that subroutine.
+These naming conventions are designed to ensure that each individual error
+report made within a complete software system has a unique error name
+associated with it. 
+
+Here is a simple example of error reporting where part of the application
+code of the previous example detects an invalid value of some kind, sets
+STATUS, reports the error and then aborts: 
+
+\begin {small}
+\begin{verbatim}
+      IF ( <value invalid> ) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'ROUTN_BADV', 'Value is invalid.', STATUS )
+         GO TO 999
+      END IF
+
+      ...
+
+ 999  CONTINUE
+      END
+\end{verbatim}
+\end {small}
+
+This sequence of three operations:
+
+\begin {quote}
+\begin {enumerate}
+\item Set STATUS to an error value.
+\item Report an error.
+\item Abort.
+\end {enumerate}
+\end {quote}
+
+is the standard response to an error condition and should be adopted by all
+software which uses the Error System. 
+
+Note that the behaviour of the STATUS argument in ERR\_REP differs somewhat 
+from that in MSG\_OUT in that ERR\_REP will execute regardless of the input 
+value of STATUS.
+Although the Starlink convention is for subroutines not to execute if their
+status argument indicates a previous error, the Error System subroutines
+obviously cannot behave in this way if their purpose is to report these 
+errors.
+
+On exit from ERR\_REP the value of STATUS remains unchanged, with three
+exceptions:
+
+\begin{itemize}
+\item if ERR\_REP is called with STATUS set to SAI\_\_OK;
+\item if ERR\_REP is unable to output the error message;
+\item if an internal EMS fault occurs (see \S\ref{errdef_sect}).
+\end{itemize}
+
+If ERR\_REP is called with STATUS set to SAI\_\_OK, then STATUS is returned set
+to ERR\_\_BADOK and an additional error message to this effect is stacked for
+output to the user.
+If ERR\_REP is unable to output an error message, then STATUS is returned set to
+ERR\_\_OPTER (see Appendix \ref{incl_sect}).
+
+
+\subsection {Message tokens in error messages} \label{etok_sect}
+
+Message tokens can be used in the error text presented to ERR\_REP
+in the same manner as their use in calls to MSG\_OUT, MSG\_OUTIF and 
+MSG\_LOAD.
+Here is an example where two values, LOWER and UPPER, are in conflict: 
+
+\begin {small}
+\begin{verbatim}
+*  Check if LOWER and UPPER are in conflict.
+      IF ( LOWER .GT. UPPER ) THEN
+
+*     Construct and report the error message.
+         STATUS = SAI__ERROR
+         CALL MSG_SETI( 'LO', LOWER )
+         CALL MSG_SETI( 'UP', UPPER )
+         CALL ERR_REP( 'BOUND_ERR', 
+     :                'LOWER(^LO) is greater than UPPER(^UP).', STATUS )
+         GO TO 999
+      END IF
+\end{verbatim}
+\end {small}
+
+If the value of LOWER is 50 and the value of UPPER is 10, then the user
+might receive a message like
+
+\begin {quote}
+\begin {small}
+\begin{verbatim}
+!! LOWER(50) is greater than UPPER(10).
+\end{verbatim}
+\end {small}
+\end {quote}
+
+After a call to ERR\_REP, all message tokens are left undefined.
+
+
+\subsection {When to report an error} \label{when_sect}
+
+In the following example, part of an application makes a series of subroutine
+calls:
+
+\begin {small}
+\begin{verbatim}
+      CALL ROUTN1( A, B, STATUS )
+      CALL ROUTN2( C, STATUS )
+      CALL ROUTN3( T, Z, STATUS )
+
+*  Check the global status.
+      IF ( STATUS .NE. SAI__OK ) GO TO 999
+
+      ...
+
+999   CONTINUE
+      END
+\end{verbatim}
+\end {small}
+
+Each of these subroutines uses the inherited status strategy and makes 
+error reports by calling ERR\_REP.
+If an error occurs within any of the subroutines, STATUS will be set 
+to an error value by that routine and inherited status checking by all
+subsequent routines will cause them not to execute. 
+Thus, it becomes unnecessary to check for an error after each subroutine
+call, and a single check at the end of a sequence of calls is all that is
+required to correctly handle any error condition that may arise. 
+Because an error report will already have been made by the subroutine that
+failed, it is usually sufficient simply to abort if an error arises in a
+sequence of subroutine calls.
+
+It is important to distinguish the case where a called subroutine sets STATUS 
+and makes its own error report, as above, from the case where STATUS is set 
+explicitly as a result of a directly detected error, as in the previous
+example.
+If the error reporting strategy is to function correctly, then responsibility 
+for reporting the error must lie with the routine which modifies the status 
+argument.
+The golden rule is therefore:
+
+\begin {quote}
+{\em If STATUS is explicitly set to an error value, then an accompanying
+call to ERR\_REP {\bf must} be made.} 
+\end {quote}
+
+Unless there are good documented reasons why this cannot be done,
+subroutines which return a status value and do not make an accompanying
+error report should be regarded as containing a bug.
+\footnote{For historical reasons there are still many routines in ADAM which
+set a status value without making an accompanying error report -- these are
+gradually being corrected. 
+If such a routine is used before it has been corrected, then the strategy 
+outlined here is recommended.
+It is advisable not to complicate new code by attempting to make an error
+report on behalf of the faulty subroutine.
+If it is appropriate, please ensure that the relevant support person is made
+aware of the problem.} 
+
+
+\subsection {Setting and defining status values}
+
+The use of the global constants SAI\_\_OK and SAI\_\_ERROR for setting
+status values is recommended in general applications. 
+These global constants may be defined in each subroutine by including the
+file SAE\_PAR at the beginning of the subroutine, prior to the declaration
+of any subroutine arguments or local variables. 
+When writing subroutine libraries, however, it is useful to have a larger 
+number of error codes available and to define these in a separate include 
+file.
+The naming convention 
+
+\begin {quote}
+\begin {small}
+\begin{verbatim}
+fac__ecode
+\end{verbatim}
+\end {small}
+\end {quote}
+
+should be used for the names of error codes defined in this way; where {\tt
+fac} is the three-character facility prefix and {\tt ecode} is up to five
+alphanumeric characters of error code name. 
+{\em Note the double underscore used in this naming convention.}
+The include file should be referred to by the name fac\_ERR, {\em e.g.}
+
+\begin {small}
+\begin{verbatim}
+      INCLUDE 'SGS_ERR'
+\end{verbatim}
+\end {small}
+
+where the facility name is {\tt SGS}, the Starlink Simple Graphics System,
+in this case. 
+These symbolic constants should be defined at the beginning of every
+subroutine which requires them, prior to the declaration of any subroutine
+arguments or local variables. 
+
+The purpose of error codes is to enable the status argument to indicate that an 
+error has occurred by having a value which is not equal to SAI\_\_OK.
+By using a set of predefined error codes the calling module is 
+able to test the returned status to distinguish between error conditions 
+which may require different action.
+It is not generally necessary to define a very large number of error codes
+which would allow a unique value to be used every time an error report is
+made. 
+It is sufficient to be able to distinguish the important classes of error which
+may occur. 
+Examples of existing software can be consulted as a guide in this matter.
+
+Software from outside a package which defines a set of error codes may
+use that package's codes to test for specific error conditions arising within
+that package.
+However, with the exception of the SAI\_\_ codes, it should {\em not} assign
+these values to the status argument.
+To do so could cause confusion about which package detected the error. 
+
+
+\subsection {The content of error messages}
+
+The purpose of an error message is to be informative and it should
+therefore provide as much relevant information about the context of the
+error as possible.
+It must also avoid the danger of being misleading, or of containing
+too much irrelevant information which might be confusing to a user. 
+Particular care is necessary when reporting errors from within subroutines
+which might be called by a wide variety of software.
+Such reports must not make unjustified assumptions about what sort of 
+application might be calling them.
+For example, in a routine that adds two arrays, the report
+
+\begin {quote}
+\begin {small}
+\begin{verbatim}
+!! Error adding two arrays.
+\end{verbatim}
+\end {small}
+\end {quote}
+
+would be preferable to
+
+\begin {quote}
+\begin {small}
+\begin{verbatim}
+!! Error adding two images.
+\end{verbatim}
+\end {small}
+\end {quote}
+
+if the same routine could be called to add two spectra!
+
+The name of the routine which called ERR\_REP to make an error report can
+often be a vital piece of information when trying to understand what went
+wrong. 
+However, the error report is intended for the user, not the programmer, and so
+the name of an obscure internal routine is more likely to confuse than to
+clarify the nature of the error.
+A good rule of thumb is to include the names of routines in error reports
+only if those names also appear in documentation -- so that the function
+they perform can be discovered without delving into the code.
+An example of this appears in the next section.
+
+
+\subsection {Adding contextual information}
+
+Instead of simply aborting when a status value is set by a called
+subroutine, it is also possible for an application to add further information
+about the circumstances surrounding the error. 
+In the following example, an application makes several calls to a subroutine
+which might return an error status value. 
+In each case, it reports a further error message so that it is clear which 
+operation was being performed when the lower-level error occurred:
+
+\begin {small}
+\begin{verbatim}
+*  Smooth the sky values.
+      CALL SMOOTH( NX, NY, SKY, STATUS )
+      IF ( STATUS .NE. SAI__OK ) THEN
+         CALL ERR_REP( 'SKYOFF_SKY',
+     :                'SKYOFF: Failed to smooth sky values.', STATUS )
+         GO TO 999
+      END IF
+
+*  Smooth the object values.
+      CALL SMOOTH( NX, NY, OBJECT, STATUS )
+      IF ( STATUS .NE. SAI__OK ) THEN
+         CALL ERR_REP( 'SKYOFF_OBJ',
+     :                'SKYOFF: Failed to smooth object values.', 
+     :                STATUS )
+         GO TO 999
+      END IF
+
+      ...
+
+999   CONTINUE
+      END
+\end{verbatim}
+\end {small}
+
+Notice how an additional error report is made in each case, but because
+the original status value contains information about the precise nature of 
+the error which occurred within the subroutine SMOOTH, it is left unchanged. 
+
+If the first call to subroutine SMOOTH were to fail, say because it could not 
+find any valid pixels in the image it was smoothing, then the error message 
+the user would receive might be 
+
+\begin {quote}
+\begin {small}
+\begin{verbatim}
+!! Image contains no valid pixels to smooth.
+!  SKYOFF: Error smoothing sky image.
+\end{verbatim}
+\end {small}
+\end {quote}
+
+The first part of this message originates from within the subroutine SMOOTH, 
+while the second part qualifies the earlier report, making it clear how the 
+error has arisen.
+Since SKYOFF is the name of an application known to the user, it has been 
+included in the contextual error message.
+
+This technique can often be very useful in simplifying error diagnosis, but
+it should not be overdone; the practice of reporting errors at {\em every}
+level in a program hierarchy tends to produce a flood of redundant messages.
+As an example of good practice for a subroutine library, an error report made 
+when an error is first detected, followed by a further contextual error report 
+from the ``top-level'' routine which the user actually called, normally
+suffices to produce very helpful error messages. 
+
+
+\subsection {Deferred error reporting} \label{errdef_sect}
+
+Although the action of the subroutine ERR\_REP is to report an error to the 
+Error System, the Error System has the capacity to defer the output of
+that message to the user.
+This allows the final delivery of error messages to be controlled within
+applications software, and this control is achieved using the subroutines
+ERR\_MARK, ERR\_RLSE, ERR\_FLUSH and ERR\_ANNUL. 
+This section describes the function of these subroutines and how they are
+used.
+
+The purpose of deferred error reporting can be illustrated by the following
+example.
+Consider a subroutine, say HELPER, which detects an error during execution. 
+The subroutine HELPER reports the error that has occurred, giving as much
+contextual information about the error as it can.
+It also returns an error status value, enabling the software that called it
+to react to the failure appropriately. 
+However, what may be considered an ``error'' at the level of subroutine
+HELPER, {\em e.g.} an ``end of file'' condition, may be considered by the
+calling module to be a case which can be handled without informing the user,
+{\em e.g.} by simply terminating its input sequence. 
+Thus, although the subroutine HELPER will always report the error condition,
+it is not always necessary for the associated error message to reach the
+user. 
+The deferral of error reporting enables application programs to handle such 
+error conditions internally.
+
+Here is a schematic example of what subroutine HELPER might look like:
+
+\begin {small}
+\begin{verbatim}
+      SUBROUTINE HELPER( LINE, STATUS )
+
+      ...
+
+*  Check if a Fortran I/O error has occurred.
+      IF ( IOSTAT .NE. 0 ) THEN
+
+*     Set STATUS and report the error.
+         IF ( IOSTAT .LT. 0 ) THEN
+
+*        Report an end-of-file error.
+            STATUS = <end-of-file error code>
+            CALL ERR_REP( 'HELPER_FIOER', 
+     :         'Fortran I/O error: end of input file reached', STATUS )
+         ELSE
+
+*        Report a Fortran I/O error.
+            STATUS = SAI__ERROR
+            CALL ERR_REP( 'HELPER_FIOER', 
+     :         'Fortran I/O error encountered during data input',
+     :         STATUS )
+         END IF
+
+*     Abort.
+         GO TO 999
+      END IF
+
+      ...
+
+ 999  CONTINUE
+      END
+\end{verbatim}
+\end {small}
+
+Suppose HELPER is called and reports an error, returning with STATUS set.
+At this point, the error message may, or may not, have been received by the
+user -- this will depend on the environment in which the routine is running,
+and on whether the software which called HELPER took any action to defer the
+error report. 
+HELPER itself does not need to take action (indeed it should {\em not} take 
+action) to ensure delivery of the message to the user; its responsibility 
+ends when it aborts, and responsibility for handling the error condition then
+passes to the software which called it. 
+
+Now suppose that the subroutine HELPED calls HELPER and wishes to defer any
+messages from HELPER so that it can decide how to handle error conditions
+itself, rather than troubling the user with spurious messages. 
+It can do this by calling the routine ERR\_MARK before it calls HELPER.
+This has the effect of ensuring that all subsequent error messages are
+deferred by the Error System and stored in an ``error table''.
+ERR\_MARK also starts a new ``error context'' which is independent of any 
+previous error messages or message tokens.
+A return to the previous context can later be made by calling ERR\_RLSE, 
+whereupon any messages in the new error context are transferred to the 
+previous context.
+In this way, no existing error messages can be lost through the deferral 
+mechanism.
+Calls to ERR\_MARK and ERR\_RLSE should always occur in matching pairs and can
+be nested if required.
+
+The operation of error message deferral can be illustrated by a simple
+example:
+
+\begin {small}
+\begin{verbatim}
+      SUBROUTINE HELPED( STATUS )
+
+      ...
+
+*  Create a new error context.
+      CALL ERR_MARK
+
+      <any error messages from HELPER are now deferred>
+
+      CALL HELPER( LINE, STATUS )
+
+*  Release the current error context.
+      CALL ERR_RLSE
+
+      ...
+\end{verbatim}
+\end {small}
+
+By calling ERR\_MARK before calling HELPER, subroutine HELPED ensures that any
+error  messages reported by HELPER are deferred, {\em i.e.} held in the error table.
+HELPED can then handle the error condition itself in one of two ways:
+
+\begin {itemize}
+\item By calling ERR\_ANNUL( STATUS ), which ``annuls'' the error, deleting 
+any deferred error messages in the current context and resetting STATUS to 
+SAI\_\_OK.
+This effectively causes the error condition to be ignored.
+For instance, it might be used if an ``end of file'' condition was expected, 
+but was to be ignored and some appropriate action taken instead.
+(A call to ERR\_REP could also be used after ERR\_ANNUL to replace the 
+initial error condition with another more appropriate one, although this is
+not often done.) 
+
+\item By calling ERR\_FLUSH( STATUS ), which ``flushes out'' the error, 
+sending any deferred error messages in the current context to the user and
+resetting STATUS to SAI\_\_OK. 
+This notifies the user that a problem has occurred, but allows the 
+application to continue anyway.
+For instance, it might be used if a series of files were being read: if one
+of these files could not be accessed, then the user could be informed of
+this by calling ERR\_FLUSH before going on to process the next file. 
+\end{itemize}
+
+When ERR\_RLSE is called, the new error context created by ERR\_MARK ceases
+to exist and any error messages still remaining in it are transferred to the
+previous context. 
+At this point they might be delivered to the user, or they may continue
+to be deferred according to any action taken at a yet higher level ({\em e.g.}
+to  defer error messages from HELPED itself).
+
+When an application finally ends, the value of the status argument will
+reflect whether or not it finished with an error condition. 
+At this point, any remaining error messages will be delivered automatically
+to the user by the Error System. 
+
+Here is the previous example, elaborated to demonstrate the use of ERR\_ANNUL.
+It shows how an ``end of file'' condition from HELPER might be detected, 
+annulled, and stored by HELPED in a logical variable EOF for later use:
+
+\begin {small}
+\begin{verbatim}
+*  Initialise end-of-file flag, EOF.
+      EOF = .FALSE.
+
+*  Create a new error context.
+      CALL ERR_MARK
+
+*  Read line of data.
+      CALL HELPER( LINE, STATUS )
+
+*  Trap end-of-file error status and annul any reported error messages
+*  for the current error context.
+      IF ( STATUS .EQ. <end-of-file error status> ) THEN
+         CALL ERR_ANNUL( STATUS )
+         EOF = .TRUE.
+      END IF
+
+*  Release the current error context.
+      CALL ERR_RLSE
+
+*  Abort application on error.
+      IF ( STATUS .NE. SAI__OK ) GO TO 999
+
+      ...
+
+999   CONTINUE
+      END
+\end{verbatim}
+\end {small}
+
+Note that the routine chooses only to handle ``end of file'' error
+conditions; any other error condition will not be annulled and will
+subsequently cause an abort when STATUS is checked after the call to
+ERR\_RLSE. 
+
+Here is an example of the use of ERR\_FLUSH. 
+It shows how both ERR\_FLUSH and ERR\_ANNUL are used during the process of
+acquiring a value from the user via a call to the subroutine RDPAR: 
+
+\begin {small}
+\begin{verbatim}
+*  Create a new error context.
+      CALL ERR_MARK
+
+*  Loop to get DSCALE parameter value.
+      DO WHILE ( .TRUE. )
+         CALL RDPAR( 'DSCALE', DSCALE, STATUS )
+
+*     Check the returned global status.
+         IF ( STATUS .EQ. SAI__OK ) THEN
+
+*        Success, so continue with the application.
+            GO TO 10
+         ELSE IF ( STATUS .EQ. <abort status> ) THEN
+
+*        User wanted to abort, so abort the application.
+            CALL ERR_RLSE
+            GO TO 999
+         ELSE IF ( STATUS .EQ. <null status> ) THEN
+
+*        User entered "null", so annul the error and supply a default.
+            CALL ERR_ANNUL( STATUS )
+            DSCALE = 1.0
+            GO TO 10
+         ELSE
+
+*        An error has occurred, so ensure the user knows about it before
+*        trying again.
+            CALL ERR_FLUSH( STATUS )
+            CALL CNPAR( 'DSCALE', STATUS )
+         END IF
+      END DO
+
+ 10   CONTINUE
+
+*  Release the current error context.
+      CALL ERR_RLSE
+
+      ...
+
+ 999  CONTINUE
+      END
+\end{verbatim}
+\end {small}
+
+Note how ERR\_FLUSH is used to ensure that any error messages are output to
+the user before trying again to get a new value. 
+In effect, it passes responsibility for the error condition to the user.
+This interactive situation is typical of how ERR\_FLUSH should 
+be used; it is not needed very often during normal error reporting, and it 
+is certainly {\em not} required as a regular means of ensuring the delivery
+of error messages following calls to ERR\_REP.
+This should be left to the Error System itself as described in
+\S\ref{report_sect}. 
+
+Note that if ERR\_FLUSH cannot output the error message to the user, then it
+will return the error status ERR\_\_OPTER (see Appendix \ref{incl_sect}).
+This allows critical applications to attempt to recover in the event of the
+failure of the Error System.
+
+The error table can contain up to 32 error messages, normally reported at
+different levels within the hierarchy of a structured program. 
+If an attempt is made to defer the reporting of more than 32 error messages, 
+then the last reported error message will be replaced by the message:
+
+\begin{quote}
+\begin {small}
+\begin{verbatim}
+!! Error message stack overflow (EMS fault).
+\end{verbatim}
+\end {small}
+\end{quote}
+
+There are up to 256 context levels available in the Error System, the 
+initial error context level being 1.
+The current error context level may be inquired using a call to ERR\_LEVEL.
+If an attempt is made to mark a context level beyond 256, the error message
+
+\begin{quote}
+\begin {small}
+\begin{verbatim}
+!! Error context stack overflow (EMS fault).
+\end{verbatim}
+\end {small}
+\end{quote}
+
+is placed on the error stack at context level 256 and any subsequent error
+reports will be placed at context level 256.
+A bug report should be made if either of the ``EMS fault'' error messages are
+reported from software.
+
+Finally, as a safety feature, if ERR\_FLUSH is called when no errors have
+been reported, it outputs the message 
+
+\begin {quote}
+\begin {small}
+\begin{verbatim}
+!! No error to report (improper use of EMS).
+\end{verbatim}
+\end {small}
+\end {quote}
+
+This is to highlight problems where the inherited status has been set by 
+some item of software, but no accompanying error message has been reported. 
+
+
+\subsection {Routines which perform ``cleaning-up'' operations}
+
+If a subroutine performs ``cleaning-up'' operations which must execute even
+if the inherited status has been set, then a different sequence of status 
+checking must usually be performed.
+The deferral of error messages may also be involved.
+
+Normally, the effect required is that a cleaning-up routine called with 
+its status argument set to SAI\_\_OK will behave like any other routine, 
+setting the status value and reporting an error if it fails.
+However, if the value of status has been set to an error condition because of 
+a previous error, it must still attempt to execute, even if there is a
+good chance that it will not succeed.
+In this latter case, an error report is not normally required from the
+cleaning-up routine. 
+
+The following is a typical example:
+
+\begin {small}
+\begin{verbatim}
+      CALL ALLOC( NBYTES, PNTR, STATUS )
+
+      <application code>
+
+      CALL DEALL( NBYTES, PNTR, STATUS )
+\end{verbatim}
+\end {small}
+
+Here, ALLOC allocates some memory for use by the ``application code'' and 
+DEALL de-allocates it at the end.
+The following error conditions may arise:
+
+\begin{itemize}
+\item DEALL fails -- In this case we want to receive an error message from
+DEALL saying why this happened. 
+
+\item The application code fails - In this case STATUS will be set to an
+error value, but DEALL must still execute in order to recover the allocated
+memory. 
+
+\item ALLOC fails -- In this case STATUS will be set to an error value, and
+DEALL will attempt to execute, but will also fail because there is no memory
+to deallocate. 
+In this case, we normally only want to receive an error message from ALLOC.
+\end {itemize}
+
+The solution is to write DEALL so that it saves the value of STATUS on entry
+and restores it again on exit. 
+To preserve the associated error messages, calls to ERR\_MARK and ERR\_RLSE
+are also required. 
+For example:
+
+
+\begin {small}
+\begin{verbatim}
+      SUBROUTINE DEALL( NBYTES, PNTR, STATUS )
+
+      ...
+
+*  Save the initial status value and set a new value for this routine.
+      ISTAT = STATUS
+      STATUS = SAI__OK
+
+*  Create a new error context.
+      CALL ERR_MARK
+
+      <clean-up code>
+
+*  If the initial status was bad, then ignore all internal errors.
+      IF ( ISTAT .NE. SAI__OK ) THEN
+         CALL ERR_ANNUL( STATUS )
+         STATUS = ISTAT
+      END IF
+
+*  Release the current error context.
+      CALL ERR_RLSE
+
+      END
+\end{verbatim}
+\end {small}
+
+Note how a new error context is used to constrain ERR\_ANNUL to annulling
+only errors arising from the ``clean-up code'', and not the pre-existing
+error condition which is to be preserved. 
+
+Two routines are provided to ``wrap up'' these clean-up calls: ERR\_BEGIN and
+ERR\_END, which begin and end what is effectively a new error reporting
+environment.
+A call to ERR\_BEGIN will begin a new error context and return the 
+status value set to SAI\_\_OK. 
+A call to ERR\_END will annul the current error context if the previous
+context contains undelivered error messages.
+It will then release the current error context.
+ERR\_END returns the status of the last reported error message pending
+delivery to the user after the current error context has been released.
+If there are no error messages pending output, then the status is
+returned set to SAI\_\_OK.
+This behaviour is exactly that represented by the code in the previous example.
+Here is the previous example re-written using calls to ERR\_BEGIN and
+ERR\_END:
+
+\begin {small}
+\begin{verbatim}
+      SUBROUTINE DEALL( NBYTES, PNTR, STATUS )
+
+      ...
+
+*  Begin a new error reporting environment.
+      CALL ERR_BEGIN( STATUS )
+
+      <clean-up code>
+
+*  End the current error reporting environment.
+      CALL ERR_END( STATUS )
+
+      END
+\end{verbatim}
+\end {small}
+
+Like ERR\_MARK and ERR\_RLSE, ERR\_BEGIN and ERR\_END should always occur in
+pairs and can be nested if required.
+If ERR\_BEGIN is called with STATUS set to an error value, then a check is 
+made to determine if there are any error messages pending output at the 
+current error context; if there are not then the status has been set without 
+making an error report.
+In these cases ERR\_BEGIN will make the error report
+
+\begin {quote}
+\begin {small}
+\begin{verbatim}
+!! Status set with no error report (improper use of EMS).
+\end{verbatim}
+\end {small}
+\end{quote}
+
+using the given status value before marking a new error context.
+
+Any code which attempts to execute when the inherited status is set to an error
+value should be regarded as ``cleaning-up''.
+This has implications for the values of message tokens used in reporting either
+messages or errors because message tokens are annulled when calls are made to
+MSG\_OUT, MSG\_OUTIF, MSG\_LOAD or ERR\_REP.
+As a general rule, message tokens should be assigned, using calls to the
+MSG\_SETx and MSG\_FMTx routines, immediately prior to the call 
+in which they are to be used.
+However, this is not always convenient; {\em e.g.} within an iteration 
+or a block IF statement where the same tokens may be used in one of several
+potential message reports.
+Under these circumstances, it is important to protect the values of assigned
+message tokens when subroutines which may fail are called -- when a subroutine
+fails it must be assumed that it will make an accompanying error report
+using ERR\_REP within the existing error reporting context, thereby annulling
+any currently defined message tokens.
+The only sure way of protecting against such behaviour is to bracket the 
+subroutine call which may fail with calls to ERR\_MARK and ERR\_RLSE.
+It is not good practice to assign message tokens which are to be used in
+another subroutine.
+
+Here is an example of assigning message tokens outside a block IF statement
+to be used by ERR\_REP and MSG\_OUT calls within the IF block. 
+The code is a fragment of a routine for rescaling a single array to a mean 
+of unity.
+If the call to the subroutine MEAN fails, any assigned message tokens in the 
+current error reporting context may be annulled; hence the need to bracket this
+call by calls to ERR\_MARK and ERR\_RLSE.
+
+\begin{verbatim}
+*  Get the data arrays.
+      CALL GETDAT( X, Y, QUAL, NDATA, STATUS )
+
+*  Check the returned status.
+      IF ( STATUS .EQ. SAI__OK ) THEN
+
+*     The data have been obtained successfully, assign the token value 
+*     and inform the user of the number of data obtained.
+         CALL MSG_SETI( 'NDATA', NDATA )
+
+         IF ( NDATA .LE. 0 ) THEN
+
+*        No data exist, report an error message and abort.
+            STATUS = SAI__ERROR
+            CALL ERR_REP( 'NDATA_INVAL', 
+     :                    'Cannot use this number of data (^NDATA).',
+     :                    STATUS )
+         ELSE
+
+*        Get the mean of the data.
+            CALL ERR_MARK
+            CALL MEAN( NDATA, Y, QUAL, MEAN, STATUS )
+            CALL ERR_RLSE
+
+*        Check the returned status.
+            IF ( STATUS .EQ. SAI__OK ) THEN
+
+*           Deliver the number of data and their mean to the user.
+               CALL MSG_SETR( 'MEAN', MEAN )
+
+               IF ( NDATA .EQ. 1 ) THEN
+                  CALL MSG_OUT( ' ', 
+     :               '^NDATA data value (^MEAN) will be used.', 
+     :               STATUS )
+               ELSE
+                  CALL MSG_OUT( ' ', 
+     :               '^NDATA data values with a mean of ^MEAN' //
+     :               ' will be used.', STATUS )
+               END IF
+            ELSE
+
+*           Failed to calculate a mean value for the data (the quality
+*           flags were probably all bad). Report an error and abort.
+               IF ( NDATA .EQ. 1 ) THEN
+                  CALL MSG_SETC( 'VALUE', 'value' )
+               ELSE
+                  CALL MSG_SETC( 'VALUE', 'values' )
+               END IF
+
+               CALL ERR_REP( 'BAD_DATA', 
+     :            'No mean available for ^NDATA ^VALUE,', //
+     :            ' cannot rescale the data.', STATUS )
+            END IF
+         END IF
+      END IF
+\end{verbatim}
+
+\subsection {Intercepting error messages}
+
+It may sometimes be convenient within an application to obtain access to any 
+error messages within the current context via a character variable,
+instead of the error output stream.
+The Error System provides a subroutine to do this: ERR\_LOAD, which has the
+calling sequence
+
+\begin {small}
+\begin{verbatim}
+      CALL ERR_LOAD( PARSTR, PARLEN, OPSTR, OPLEN, STATUS )
+\end{verbatim}
+\end {small}
+
+The behaviour of ERR\_LOAD is the same as ERR\_FLUSH except that, instead of
+delivering deferred error messages from the current error context to the
+user, the error messages are returned, one by one, in a series of calls to
+ERR\_LOAD through a character variable.
+Here, the variables PARSTR and PARLEN return the error message name and its 
+length, as given in the call to ERR\_REP, and the variables OPSTR and OPLEN 
+return the error message and its length.
+ERR\_LOAD also returns the status value associated with the {\em next} error 
+message stacked for output, and returns SAI\_\_OK when the last message has
+been returned.
+If the message text is longer than the declared length of OPSTR, then the
+message is truncated with an ellipsis, {\em i.e.} ``\ldots'', but no error 
+results.
+
+The symbolic constants ERR\_\_SZPAR, ERR\_\_SZMSG are provided for declaring 
+the lengths of character variables which are to receive message names and
+error messages in this way (see Appendix \ref{incl_sect}).
+These constants are defined in the include file ERR\_PAR.
+
+
+\subsection {Reporting Fortran I/O and operating system errors}
+\label{fio_sect}
+
+Some items of software may need to perform Fortran I/O operations or calls
+to operating system routines, both of which may fail but will not be able to
+make error reports through ERR\_REP. 
+This must therefore be done explicitly following the detection of such an error.
+Two subroutines exist to enable a message token to be built from
+the error flag value returned under these circumstances. 
+These subroutines are
+
+\begin {quote}
+\begin {small}
+\begin{verbatim}
+ERR_FIOER( TOKEN, IOSTAT )
+\end{verbatim}
+\end {small}
+\end {quote}
+
+and
+
+\begin {quote}
+\begin {small}
+\begin{verbatim}
+ERR_SYSER( TOKEN, SYSTAT )
+\end{verbatim}
+\end {small}
+\end {quote}
+
+ERR\_FIOER will assign a message derived from
+the Fortran I/O status code IOSTAT to the named message token. 
+For example, here is a section of code that writes a character variable to a
+formatted sequential file, given the Fortran logical unit of the file: 
+
+\begin {small}
+\begin{verbatim}
+*  Write the character variable STR.
+      WRITE( UNIT, '(A)', IOSTAT = IOSTAT ) STR
+
+*  Check the Fortran I/O status.
+      IF ( IOSTAT .NE. 0 ) THEN
+
+*     Fortran write error, so set STATUS.
+         STATUS = SAI__ERROR
+
+*     Define the I/O status and logical unit message tokens and attempt 
+*     to obtain the file name.
+         CALL ERR_FIOER( 'MESSAGE', IOSTAT )
+         CALL MSG_SETI( 'UNIT', UNIT )
+         INQUIRE( UNIT, NAME = FNAME, IOSTAT = IOS )
+
+*     Check the returned I/O status from the INQUIRE statement and act.
+         IF ( IOS .EQ. 0 ) THEN
+
+*        Define the file name message token.
+            CALL MSG_SETC( 'FNAME', FNAME )
+
+*        Report the error.
+            CALL ERR_REP( 'PUTSTR_WRERR',
+     :                'Error writing to file ^FNAME on ' //
+     :                'unit ^UNIT: ^MESSAGE', STATUS )
+         ELSE
+
+*        No file name has been found so just report the error.
+            CALL ERR_REP( 'PUTSTR_WRERR',
+     :                'Error writing to unit ^UNIT: ^MESSAGE', STATUS )
+         END IF
+
+         GO TO 999
+      END IF
+
+      ...
+
+ 999  CONTINUE
+      END
+\end{verbatim}
+\end {small}
+
+Here, the name of the file being read is also obtained in order to construct 
+a comprehensive error message, which might be something like:
+
+\begin {quote}
+\begin {small}
+\begin{verbatim}
+!! Error writing to file BLOGGS.DAT on unit 17: Disk quota exceeded.
+\end{verbatim}
+\end {small}
+\end {quote}
+
+Note that the I/O status values used in Fortran do not have universally
+defined meanings except for zero (meaning no error), but by using
+ERR\_FIOER it is still possible to make high quality error reports about
+Fortran I/O errors in a portable manner. 
+
+In a similar way, the subroutine ERR\_SYSER may be used to assign an 
+operating system message associated with the 
+system status flag SYSTAT to the named message token.
+Of course, software that calls operating system routines directly cannot be
+portable, but ERR\_SYSER provides a convenient interface for reporting 
+errors that occur in such routines in a form that can be easily changed if 
+necessary.
+For example:
+
+\begin {small}
+\begin{verbatim}
+      IF ( <system error condition> ) THEN
+
+*     Operating system error, so set STATUS.
+         STATUS = SAI__ERROR
+
+*     Report the error and abort.
+         CALL ERR_SYSER( 'ERRMSG', SYSTAT )
+         CALL ERR_REP( 'ROUTN_SYSER', 'System error: ^ERRMSG', STATUS )
+         GO TO 999
+      END IF
+
+      ...
+
+ 999  CONTINUE
+      END
+\end{verbatim}
+\end {small}
+
+On completion, each of these subroutines returns its second argument
+unchanged. 
+
+Fortran I/O and operating system error messages, obtained through calls to 
+ERR\_FIOER and ERR\_SYSER respectively, will differ depending upon which 
+operating system an application is run on ({\em e.g.} UNIX or VAX/VMS).
+Furthermore, these error messages will probably differ between the different 
+implementations of UNIX.
+
+Because of the necessary generality of these messages, many will appear rather
+vague and unhelpful without additional contextual information.
+This is particularly true of UNIX implementations.
+It is very important to provide additional contextual information when using
+these routines in order to avoid obfuscating rather than clarifying the nature 
+of an error.
+This can be done either as part of the error message which includes the message
+token set by ERR\_FIOER or ERR\_SYSER, or by making a further error report.
+The examples in this section provide a good illustration of how this can 
+be done.
+
+
+\subsection {Incorporating foreign routines} \label{foreign_sect}
+
+Sometimes ``foreign'' subroutines must be called which do not use the
+Starlink error status conventions ({\em e.g.} because they must adhere to some
+standard interface definition like GKS).
+Unless they are unusually robust, such routines must normally be prevented
+from executing under error conditions, either by performing a status check
+immediately beforehand, or by enclosing them within an appropriate IF...END 
+IF block.
+Depending on the form of error indication that such foreign routines use, it 
+may also be necessary to check afterwards whether they have succeeded or 
+not.
+If such a routine fails, then for compatibility with other Starlink
+software a status value should be set and an error report made on its
+behalf. 
+
+For example, the following code makes a GKS inquiry and checks the 
+success of that inquiry:
+
+\begin {small}
+\begin{verbatim}
+      IF ( STATUS .EQ. SAI__OK ) THEN
+
+*     Inquire the GKS workstation colour facilities available.
+         CALL GQCF( WTYPE, ERRIND, NCOLI, COLA, NPCI )
+
+*     Check if a GKS error has occurred.
+         IF ( ERRIND .NE. GKS__OK ) THEN
+
+*        An error has occurred, so report it and abort.
+            STATUS = SAI__ERROR
+            CALL MSG_SETI( 'ERRIND', ERRIND )
+            CALL ERR_REP( 'ROUTN_GQCFERR', 
+     :              'Error no. ^ERRIND occurred in GKS routine GQCF ' //
+                    '(enquire workstation colour facilities).',
+     :              STATUS )
+            GO TO 999
+         END IF
+      END IF
+
+      ...
+
+ 999  CONTINUE
+      END
+\end{verbatim}
+\end {small}
+
+In some cases, it may be possible to obtain a textual error message from the
+error flag, by means of a suitable inquiry routine, which could be used as
+the basis of the error report. 
+
+It will be obvious from this example how convenient the inherited error
+status strategy is, and how much extra work is involved in obtaining the
+same degree of robustness and quality of error reporting from routines
+which do not use it. 
+It is worth bearing this in mind if you are involved in importing foreign
+subroutine libraries for use with Starlink software: the provision of a few
+simple routines for automating error reporting, or an extra layer of
+subroutine calls where inherited status checking and error reporting can be
+performed, can make the final product vastly easier to use. 
+Starlink staff will be pleased to offer advice on this matter if consulted.
+
+
+\subsection {Converting existing subroutine libraries} \label{convert_sect}
+
+When converting existing subroutine
+libraries to use the inherited status conventions and the Error System,
+it is conceivable that an existing subroutine which does not have a
+status argument will acquire the potential to fail and report an error, either 
+from within itself or from packages layered beneath it.
+Ideally, the argument list of the subroutine should be changed to include a
+status argument.
+However, 
+it may be inconvenient to modify the argument list of a commonly used
+subroutine ({\em i.e.} because of the amount of existing code which would have
+to be changed), and so an alternative method is needed to determine if status
+has  been set during the
+call so that the appropriate action can be taken by the caller.
+The subroutine ERR\_STAT is provided for recovering the last reported status
+value under these conditions.
+Here is an example of the use of ERR\_STAT, called from a subroutine which
+follows the error reporting conventions:
+
+\begin {small}
+\begin{verbatim}
+*  Call subroutine NOSTAT.
+      CALL NOSTAT( GIVARG, RETARG )
+      CALL ERR_STAT( STATUS )
+\end{verbatim}
+\end {small}
+
+Here, the calls to NOSTAT and ERR\_STAT are equivalent to one subroutine call 
+with a status argument.
+The use of ERR\_STAT to return the current error status relies upon the use of
+ERR\_REP to report errors by the conventions described in this document.
+In particular, foreign packages {\em must} be incorporated in the way described
+in \S\ref{foreign_sect} for ERR\_STAT to be reliable.
+
+Finally, it is emphasised that ERR\_STAT is {\em only} for use where there is
+no other choice than to use this mechanism to determine the last reported error
+status.
+
+
+\section {Compiling and Linking with the Message and Error Systems}
+\label{comp_sect}
+
+\subsection {Use with the VAX/VMS operating system}
+
+Five include files are available for use with the Message and Error Reporting 
+Systems.
+These files have the logical names SAE\_PAR, MSG\_PAR, MSG\_ERR, ERR\_PAR and 
+ERR\_ERR.
+Here, SAE\_PAR is included to define the global constants SAI\_\_OK and
+SAI\_\_ERROR, MSG\_PAR and ERR\_PAR are included to define parameters (such 
+as  character string lengths) associated with the MSG and ERR routines,
+and MSG\_ERR and ERR\_ERR are included to define the Message and Error System
+error values.
+Further details of the contents of these include files can be found in Appendix
+\ref {incl_sect}.
+
+The stand-alone, {\em i.e.} non-ADAM, Message and Error System libraries are
+available in the directory EMS\_DIR.
+The logical names  required for the use of the stand-alone ERR and MSG
+libraries are  defined by executing the procedure EMS\_DEV
+before compiling any applications, {\em i.e.}
+
+\begin {quote}
+\begin {small}
+\begin{verbatim}
+$ EMS_DEV
+\end{verbatim}
+\end {small}
+\end {quote}
+
+To link these libraries with stand-alone applications, the linker input 
+specifier
+
+\begin {quote}
+\begin {small}
+\begin{verbatim}
+EMS_LINK/OPT
+\end{verbatim}
+\end {small}
+\end {quote}
+
+is used. 
+For example, a typical link operation would be
+
+\begin {quote}
+\begin {small}
+\begin{verbatim}
+$ LINK PROGRAM, EMS_LINK/OPT
+\end{verbatim}
+\end {small}
+\end {quote}
+
+Compiling and linking ADAM applications is discussed in Appendix
+\ref{adam_link}.
+
+
+\subsection {Use with the UNIX operating system}
+
+The five include files available for use with the Message and Error Reporting
+Systems are named {\bf sae\_par}, {\bf msg\_par}, {\bf msg\_err}, 
+{\bf err\_par} and {\bf err\_err} on UNIX machines, and reside in the 
+directory {\bf /star/include}.
+UNIX does not have an equivalent to VAX/VMS logical name and its nearest
+analogue, the soft link, is not used in the include file conventions.
+When including these files within Fortran code, the full path name is required,
+{\em e.g.}
+
+\begin {small}
+\begin{verbatim}
+*  Global Constants:
+      INCLUDE '/star/include/sae_par'
+\end{verbatim}
+\end {small}
+
+\begin {sloppypar}
+Assuming all Starlink directories have been added to the environment variables
+{\bf PATH} and {\bf LD\_LIBRARY\_PATH} (see SUN/118), then to link a program
+with the non-ADAM Message and Error Reporting Systems the command line would be
+\end {sloppypar}
+
+\begin {quote}
+\begin {small}
+\begin{verbatim}
+% f77 program.o `err_link` -o program.out
+\end{verbatim}
+\end {small}
+\end {quote}
+
+Compiling and linking ADAM applications is discussed in Appendix
+\ref{adam_link}.
+
+
+\section {References}
+
+\begin {trivlist} \item[]
+\begin {tabular}{lll}
+Lawden, M.D. & 1989. & SG/4 --- ADAM -- The Starlink Software Environment.\\
+Rees, P.C.T. & 1989. & SSN/4 --- EMS -- Error Message Service.\\
+\end {tabular}
+\end {trivlist}
+
+\newpage\appendix
+\section {Include Files} \label{incl_sect}
+
+There are several include files used by the Message and Error Systems to define
+global constants during compilation.
+These files have the following logical names: SAE\_PAR, MSG\_PAR, MSG\_ERR, 
+ERR\_PAR and ERR\_ERR.
+The contents of each of these include files are given below.
+
+\begin {description}
+\item [SAE\_PAR] Defines the global constants SAI\_\_OK and SAI\_\_ERROR.
+\subitem {\bf SAI\_\_ERROR} -- Error encountered.
+\subitem {\bf SAI\_\_OK} -- No error.
+\subitem {\bf SAI\_\_WARN} -- Warning.
+\indexspace
+\item [MSG\_PAR] Defines the public Message System constants.
+\subitem {\bf MSG\_\_NORM} -- Normal conditional message output level.
+\subitem {\bf MSG\_\_QUIET} -- Quiet (few messages) conditional message output 
+level.
+\subitem {\bf MSG\_\_SZMSG} -- Maximum length of message text.
+\subitem {\bf MSG\_\_VERB} -- Verbose (abundant messages) conditional message
+output level.
+\indexspace
+\item [MSG\_ERR] Defines the Message Reporting System errors.
+\subitem {\bf MSG\_\_INVIF} -- Invalid conditional message filter value.
+\subitem {\bf MSG\_\_OPTER} -- Error encountered during message output.
+\subitem {\bf MSG\_\_SYNER} -- Error encountered during message
+synchronisation.
+\indexspace
+\item [ERR\_PAR] Defines the public Error System constants.
+\subitem {\bf ERR\_\_SZMSG} -- Maximum length of error message text.
+\subitem {\bf ERR\_\_SZPAR} -- Maximum length of error message name.
+\indexspace
+\item [ERR\_ERR] Defines the Error Reporting System errors.
+\subitem {\bf ERR\_\_BADOK} -- Status set to SAI\_\_OK in call to ERR\_REP
+(improper use of ERR\_REP).
+\subitem {\bf ERR\_\_OPTER} -- Error encountered on message output. 
+\subitem {\bf ERR\_\_UNSET} -- Status not set in call to ERR\_REP (improper
+use of ERR\_REP). 
+\end {description}
+
+
+\newpage
+\section {Subroutine List}
+
+\subsection {Message System subroutines}
+
+\begin {description} 
+\item [MSG\_BLANK] ( STATUS ) 
+\subitem Output a blank line.
+\indexspace 
+\item [MSG\_FMTx] ( TOKEN, FORMAT, VALUE ) 
+\subitem Assign a value to a message token (formatted).
+\indexspace 
+\item [MSG\_IFLEV] ( FILTER ) 
+\subitem Return the current filter level for conditional message output.
+\indexspace 
+\item [MSG\_IFSET] ( FILTER, STATUS ) 
+\subitem Set the filter level for conditional message output.
+\indexspace 
+\item [MSG\_LOAD] ( PARAM, TEXT, OPSTR, OPLEN, STATUS ) 
+\subitem Expand and return a message. 
+\indexspace 
+\item [MSG\_OUT] ( PARAM, TEXT, STATUS ) 
+\subitem Output a message. 
+\indexspace 
+\item [MSG\_OUTIF] ( FILTER, PARAM, TEXT, STATUS ) 
+\subitem Conditionally deliver the text of a message to the user.
+\indexspace 
+\item [MSG\_RENEW] \hfill
+\subitem Renew any annulled message tokens in the current context.
+\indexspace 
+\item [MSG\_SETx] ( TOKEN, VALUE ) 
+\subitem Assign a value to a message token (concise).
+\end {description}
+
+
+\subsection {Error System subroutines}
+
+\begin {description}
+\item [ERR\_ANNUL] ( STATUS ) 
+\subitem Annul the contents of the current error context.
+\indexspace
+\item [ERR\_BEGIN] ( STATUS )
+\subitem Begin a new error reporting environment.
+\indexspace
+\item [ERR\_END] ( STATUS )
+\subitem End the current error reporting environment.
+\indexspace
+\item [ERR\_FIOER] ( TOKEN, IOSTAT ) 
+\subitem Assign a Fortran I/O error message to a token.
+\indexspace
+\item [ERR\_FLUSH] ( STATUS ) 
+\subitem Flush the current error context.
+\indexspace
+\item [ERR\_LEVEL] ( LEVEL )
+\subitem Inquire the current error context level.
+\indexspace
+\item [ERR\_LOAD] ( PARSTR, PARLEN, OPSTR, OPLEN, STATUS ) 
+\subitem Return error messages from the current error context.
+\indexspace
+\item [ERR\_MARK] \hfill
+\subitem Mark (start) a new error context.
+\indexspace
+\item [ERR\_REP] ( PARAM, TEXT, STATUS ) 
+\subitem Report an error message.
+\indexspace
+\item [ERR\_RLSE] \hfill
+\subitem Release (end) the current error context.
+\indexspace
+\item [ERR\_STAT] ( STATUS )
+\subitem Inquire the last reported error status.
+\indexspace
+\item [ERR\_SYSER] ( TOKEN, SYSTAT ) 
+\subitem Assign an operating system error message to a token.
+\end {description}
+
+\newpage
+\section {Subroutine Specifications}
+
+\subsection {Message System subroutines}
+
+\begin {small}
+\sstroutine{
+   MSG\_BLANK
+}{
+   Output a blank line
+}{
+   \sstdescription{
+      A blank line is output to the user. If the status argument is not set
+      to SAI\_\_OK on entry, no action is taken. If an output error occurs,
+      an error report is made and the status argument returned set to 
+      MSG\_\_OPTER.
+   }
+   \sstinvocation{
+      CALL MSG\_BLANK( STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   MSG\_FMTx
+}{
+   Assign a value to a message token (formatted)
+}{
+   \sstdescription{
+      A given value is encoded using the supplied Fortran
+      77 format field and the result assigned to the named message token.
+      If the token is already defined, the result is appended to the
+      existing token value. The given value may be one of the following 
+      Fortran 77 data types and there is one routine provided for each data 
+      type:
+
+      \begin {center}
+      \begin {tabular}{||l|c||}
+      \hline
+      {\em Subroutine} & {\em Fortran 77 Type}\\
+      \hline
+      MSG\_SETD & DOUBLE PRECISION\\
+      MSG\_SETR & REAL\\
+      MSG\_SETI & INTEGER\\
+      MSG\_SETL & LOGICAL\\
+      MSG\_SETC & CHARACTER\\
+      \hline
+      \end {tabular}
+      \end {center}
+
+      If these subroutines fail, the token remains unmodified - this will
+      be apparent in any messages which refer to this token.
+   }
+   \sstinvocation{
+      CALL MSG\_FMTx( TOKEN, FORMAT, VALUE )
+   }
+   \sstarguments{
+      \sstsubsection{
+         TOKEN = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The message token name.
+      }
+      \sstsubsection{
+         FORMAT = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The Fortran 77 FORMAT field used to encode the supplied value.
+      }
+      \sstsubsection{
+         VALUE = Fortran 77 type (Given)
+      }{
+         The value to be assigned to the message token.
+      }
+   }
+}
+\sstroutine{
+   MSG\_IFLEV
+}{
+   Return the current filter level for conditional message output
+}{
+   \sstdescription{
+      The value of the current filtering level set for conditional
+      message output is returned.
+   }
+   \sstinvocation{
+      CALL MSG\_IFLEV( FILTER )
+   }
+   \sstarguments{
+      \sstsubsection{
+         FILTER = INTEGER (Returned)
+      }{
+         The current message filtering level.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   MSG\_IFSET
+}{
+   Set the filter level for conditional message output
+}{
+   \sstdescription{
+      The value of the message filtering level is set using the given
+      filtering value. If no such level exists, then an error is 
+      reported and the status returned set to MSG\_\_IFINV: the current 
+      filtering level remains unchanged.
+   }
+   \sstinvocation{
+      CALL MSG\_IFSET( FILTER, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         FILTER = INTEGER (Given)
+      }{
+         The filtering level. This may be one of three levels:
+
+         \sstitemlist{
+
+            \sstitem
+               MSG\_\_QUIET = quiet mode;
+
+            \sstitem
+               MSG\_\_NORM = normal mode;
+
+            \sstitem
+               MSG\_\_VERB = verbose mode.
+         }
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   MSG\_LOAD
+}{
+   Expand and return a message
+}{
+   \sstdescription{
+      Any tokens in the supplied message are expanded and the result is
+      returned in the character variable supplied. If the status
+      argument is not set to SAI\_\_OK on entry, no action is taken
+      except that the values of any existing message tokens are always
+      left undefined after a call to MSG\_LOAD. If the expanded message 
+      is longer than the length of the supplied character variable, 
+      the message is terminated with an ellipsis.
+   }
+   \sstinvocation{
+      CALL MSG\_LOAD( PARAM, TEXT, OPSTR, OPLEN, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The message name.
+      }
+      \sstsubsection{
+         TEXT = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The raw message text.
+      }
+      \sstsubsection{
+         OPSTR = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         The expanded message text.
+      }
+      \sstsubsection{
+         OPLEN = INTEGER (Returned)
+      }{
+         The length of the expanded message.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   MSG\_OUT
+}{
+   Output a message
+}{
+   \sstdescription{
+      Any tokens in supplied message are expanded and the result is output
+      to the user. If the status argument is not set to SAI\_\_OK on entry,
+      no action is taken except that the values of any existing message 
+      tokens are always left undefined after a call to MSG\_OUT. If an output 
+      error occurs, an error is reported and the status argument is returned 
+      set to MSG\_\_OPTER.
+
+      A call to MSG\_OUT is equivalent to a call to MSG\_OUTIF with the 
+      message output priority set to MSG\_\_NORM. 
+   }
+   \sstinvocation{
+      CALL MSG\_OUT( PARAM, TEXT, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The message name.
+      }
+      \sstsubsection{
+         TEXT = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The message text.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   MSG\_OUTIF
+}{
+   Conditionally deliver the text of a message to the user
+}{
+   \sstdescription{
+      Depending upon the given value of the given message priority and 
+      the message filtering level set using MSG\_IFSET, the message
+      text is either expanded and output to the user or discarded.
+      The values of any existing message tokens are always annulled by 
+      a call to MSG\_OUTIF. If an output error occurs, an error is 
+      reported and the status argument returned set to MSG\_\_OPTER.
+   }
+   \sstinvocation{
+      CALL MSG\_OUTIF( PRIOR, PARAM, TEXT, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PRIOR = INTEGER (Given)
+      }{
+         \begin {sloppypar}
+         Message output priority. This may be one of three values:
+
+         \sstitemlist{
+
+            \sstitem
+               MSG\_\_QUIET = always output the message, regardless of the
+               output filter setting;
+
+            \sstitem
+               MSG\_\_NORM = output the message if the current output
+               filter is set to either MSG\_\_NORM or MSG\_\_VERB;
+
+            \sstitem
+               MSG\_\_VERB = output the message only if the current
+               output filter is set to MSG\_\_VERB.
+
+         } 
+         Here, the collating sequence:
+
+            MSG\_\_QUIET $<$ MSG\_\_NORM $<$ MSG\_\_VERB
+
+         may be assumed. Any other value will result in an error report
+         and the status being returned set to MSG\_\_INVIF: no further 
+         action will be taken. \end {sloppypar}
+      }
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The message name.
+      }
+      \sstsubsection{
+         TEXT = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The message text.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   MSG\_RENEW
+}{
+   Renew any annulled message tokens in the current context
+}{
+   \sstdescription{
+      Any message tokens which have been annulled by a call to MSG\_OUT,
+      MSG\_OUTIF, MSG\_LOAD, ERR\_REP, ERR\_ANNUL or ERR\_LOAD are renewed.
+      If any new token value has been defined (using the MSG\_SETx and 
+      MSG\_FMTx routines) since the previous tokens were annulled, no 
+      action is taken. The intended use of MSG\_RENEW is to renew all message
+      tokens immediately after a call MSG\_OUT, MSG\_OUTIF, MSG\_LOAD,
+      ERR\_REP, ERR\_ANNUL or ERR\_LOAD for re-use in a subsequent message.
+   }
+   \sstinvocation{
+      CALL MSG\_RENEW
+   }
+}
+\sstroutine{
+   MSG\_SETx
+}{
+   Assign a value to a message token (concise)
+}{
+   \sstdescription{
+      A given value is encoded using a concise format and the
+      result assigned to the named message token. If the token is
+      already defined, the result is appended to the existing token value.
+      The given value may be one of the following Fortran 77 data types
+      and there is one routine provided for each data type:
+
+      \begin {center}
+      \begin {tabular}{||l|c||}
+      \hline
+      {\em Subroutine} & {\em Fortran 77 Type}\\
+      \hline
+      MSG\_SETD & DOUBLE PRECISION\\
+      MSG\_SETR & REAL\\
+      MSG\_SETI & INTEGER\\
+      MSG\_SETL & LOGICAL\\
+      MSG\_SETC & CHARACTER\\
+      \hline
+      \end {tabular}
+      \end {center}
+
+      If these subroutines fail, the token remains unmodified - this will
+      be apparent in any messages which refer to this token.
+   }
+   \sstinvocation{
+      CALL MSG\_SETx( TOKEN, CVALUE )
+   }
+   \sstarguments{
+      \sstsubsection{
+         TOKEN = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The message token name.
+      }
+      \sstsubsection{
+         VALUE = Fortran 77 type (Given)
+      }{
+         The value to be assigned to the message token.
+      }
+   }
+}
+\end {small}
+
+\newpage
+\subsection {Error System subroutines}
+
+\begin {small}
+\sstroutine{
+   ERR\_ANNUL
+}{
+   Annul the contents of the current error context
+}{
+   \sstdescription{
+      Any error messages pending output in the current error context are
+      annulled, i.e. deleted. The values of any existing message tokens
+      become undefined and the value of the status argument is reset to
+      SAI\_\_OK.
+   }
+   \sstinvocation{
+      CALL ERR\_ANNUL( STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STATUS = INTEGER (Returned)
+      }{
+         The global status: it is set to SAI\_\_OK on return.
+      }
+   }
+}
+\sstroutine{
+   ERR\_BEGIN
+}{
+   Create a new error reporting environment
+}{
+   \sstdescription{
+      Begin a new error reporting environment by marking a new error
+      reporting context and then resetting the status argument to SAI\_\_OK.
+      If ERR\_BEGIN is called with the status argument set to an error
+      value, a check is made to determine if there are any messages
+      pending output in the current context: if there are none, an
+      error report to this effect is made on behalf of the calling
+      application.
+   }
+   \sstinvocation{
+      CALL ERR\_BEGIN( STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   ERR\_END
+}{
+   End the current error reporting environment
+}{
+   \sstdescription{
+      Check if any error messages are pending output in the previous
+      error reporting context. If there are, the current context is
+      annulled and then released; if not, the current context is just
+      released. The last reported status value is returned on exit.
+   }
+   \sstinvocation{
+      CALL ERR\_END( STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STATUS = INTEGER (Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   ERR\_FIOER
+}{
+   Assign a Fortran I/O error message to a token
+}{
+   \sstdescription{
+      The text of the error message associated with the Fortran I/O status
+      value, IOSTAT, is assigned to the  named message token. This token
+      may then be included in an error message.
+   }
+   \sstinvocation{
+      CALL ERR\_FIOER( TOKEN, IOSTAT )
+   }
+   \sstarguments{
+      \sstsubsection{
+         TOKEN = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The message token name.
+      }
+      \sstsubsection{
+         IOSTAT = INTEGER (Given)
+      }{
+         The Fortran I/O status value.
+      }
+   }
+   \sstdiytopic{
+      System-specific
+   }{
+      The messages generated using this facility will depend on the 
+      computer system upon which the library is implemented.
+   }
+}
+\sstroutine{
+   ERR\_FLUSH
+}{
+   Flush the current error context
+}{
+   \sstdescription{
+      Ensure that all pending error messages in the current error
+      context have been output to the user. On successful completion, the
+      error context is annulled and the status argument reset to SAI\_\_OK;
+      if an error occurs during output of the error messages, the
+      error context is not annulled and the status argument is returned
+      set to ERR\_\_OPTER.
+   }
+   \sstinvocation{
+      CALL ERR\_FLUSH( STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STATUS = INTEGER (Returned)
+      }{
+         The global status: it is set to SAI\_\_OK on return if the
+         error message output is successful; if not, it is set to 
+         ERR\_\_OPTER.
+      }
+   }
+}
+\sstroutine{
+   ERR\_LEVEL
+}{
+   Inquire the current error context level
+}{
+   \sstdescription{
+      Return the number of context markers set in the error message table.
+   }
+   \sstinvocation{
+      CALL ERR\_LEVEL( LEVEL )
+   }
+   \sstarguments{
+      \sstsubsection{
+         LEVEL = INTEGER (Returned)
+      }{
+         The error context level: all values greater than one indicate 
+         the deferral of reported error messages.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   ERR\_LOAD
+}{
+   Return error messages from the current error context
+}{
+   \sstdescription{
+      Each message name and error message pending output in the current
+      error context are copied into character variables from the error
+      table. The subroutine is invoked repeatedly, returning the status
+      value associated with the {\em following} error message, until all
+      error messages in the current context have been copied, indicated
+      by the status argument being returned set to SAI\_\_OK. At this point
+      the current error context is annulled.
+   }
+   \sstinvocation{
+      ERR\_LOAD( PARAM, PARLEN, OPSTR, OPLEN, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         The error message name.
+      }
+      \sstsubsection{
+         PARLEN = INTEGER (Returned)
+      }{
+         The length of the error message name.
+      }
+      \sstsubsection{
+         OPSTR = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         The error message.
+      }
+      \sstsubsection{
+         OPLEN = INTEGER (Returned)
+      }{
+         The length of the error message.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status associated with the {\em next} error message: 
+         it is set to SAI\_\_OK when the load is complete.
+      }
+   }
+}
+\sstroutine{
+   ERR\_MARK
+}{
+   Mark (start) a new error context
+}{
+   \sstdescription{
+      Begin a new error reporting context so that delivery of subsequently
+      reported error messages is deferred and the messages held in the
+      error table. Calls to ERR\_ANNUL, ERR\_FLUSH and ERR\_LOAD will only
+      flush or annul the contents of the error table within this new
+      context.
+   }
+   \sstinvocation{
+      CALL ERR\_MARK
+   }
+}
+\sstroutine{
+   ERR\_REP
+}{
+   Report an error message
+}{
+   \sstdescription{
+      Report an error message. According to the error context, the 
+      error message is either sent to the user or retained in the 
+      error table. The latter case allows the application to take
+      further action before deciding if the user should receive the 
+      message. On exit the values associated with any existing message 
+      tokens are left undefined. On successful completion, the global 
+      status is returned unchanged; if the status argument is set to 
+      SAI\_\_OK on entry, an error report to this effect is made on behalf 
+      of the application and the status argument is returned set to 
+      ERR\_\_BADOK; if an output error occurs, the status argument is
+      returned set to EMS\_\_OPTER. The status argument may also be returned
+      set to an EMS fault error value, indicating an error occurring 
+      within the error reporting software.
+   }
+   \sstinvocation{
+      CALL ERR\_REP( PARAM, TEXT, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The error message name.
+      }
+      \sstsubsection{
+         TEXT = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The error message text.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given)
+      }{
+         The global status: it is left unchanged on successful completion,
+         or is set an appropriate error value if an internal error has 
+         occurred.
+      }
+   }
+}
+\sstroutine{
+   ERR\_RLSE
+}{
+   Release (end) the current error context
+}{
+   \sstdescription{
+      Release a {\tt "}mark{\tt "} in the error message table, returning the Error
+      Reporting System to the previous error context. Any error messages
+      pending output will be passed to this previous context, {\em not}
+      annulled.
+   }
+   \sstinvocation{
+      CALL ERR\_RLSE
+   }
+}
+\sstroutine{
+   ERR\_STAT
+}{
+   Inquire the last reported error status
+}{
+   \sstdescription{
+      The current error context is checked for any error messages pending
+      output. If none exist, the status argument is returned set to
+      SAI\_\_OK. If any messages have been reported, the status argument is
+      returned set to the last reported value.
+   }
+   \sstinvocation{
+      CALL ERR\_STAT( STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STATUS = INTEGER (Returned)
+      }{
+         The global status: it returned set to the last reported
+         error status within the current error context; if none exist,
+         it is returned set to SAI\_\_OK.
+      }
+   }
+}
+\sstroutine{
+   ERR\_SYSER
+}{
+   Assign an operating system error message to a token
+}{
+   \sstdescription{
+      The text of the error message associated with the operating system
+      status value, SYSTAT, is assigned to the named message token. This
+      token may then be included in an error message.
+   }
+   \sstinvocation{
+      CALL ERR\_SYSER( TOKEN, SYSTAT )
+   }
+   \sstarguments{
+      \sstsubsection{
+         TOKEN = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The message token name.
+      }
+      \sstsubsection{
+         SYSTAT = INTEGER (Given)
+      }{
+         The operating system status value.
+      }
+   }
+   \sstdiytopic{
+      System-specific
+   }{
+      The messages generated using this facility will depend on the 
+      computer system upon which the library is implemented.
+   }
+}
+\end {small}
+\newpage
+
+\section {Using MSG and ERR within ADAM} \label{adam_sect}
+
+\subsection {Overview}
+
+If the procedures recommended in this document have been adhered to, 
+stand-alone applications which use the Message and Error Reporting Systems can
+be converted to run within the ADAM environment without change to the message
+and error reporting code.
+However, the use of the Message and Error Systems within ADAM applications
+provides access to facilities which cannot exist in the stand-alone version.
+This section describes these facilities and how they can be used.
+In what follows, a prior knowledge of ADAM applications programming to the
+level of the SG/4 (ADAM -- The Starlink Software Environment) is assumed.
+
+
+\subsection {Using MSG within ADAM applications} \label{adam_msg}
+
+\subsubsection {Message parameters}
+
+In calls to the subroutines MSG\_OUT and MSG\_LOAD in ADAM applications, the
+message name is the name of a message parameter which is associated with the
+message text.
+The message parameter name should be no more than 15 characters in length and 
+may be associated with the text of a message in the ADAM interface file, as 
+well as in the argument list of either MSG\_OUT or MSG\_LOAD.
+This allows the ADAM user interface to have an alternative version of the
+message text. 
+When the message parameter is specified in the interface file, 
+this text is used in preference to that given in the argument list.
+
+Here is an example of using MSG\_OUT within an ADAM application:
+
+\begin {small}
+\begin{verbatim}
+      CALL MSG_OUT( 'RD_TAPE', 'Reading tape.', STATUS )
+\end{verbatim}
+\end {small}
+
+This statement will result in the message 
+
+\begin {quote}
+\begin {small}
+\begin{verbatim}
+Reading tape.
+\end{verbatim}
+\end {small}
+\end {quote}
+
+If the message parameter, `RD\_TAPE', is associated with a  different text
+string in the interface module, {\em e.g.}
+
+\begin {small}
+\begin{verbatim}
+message RD_TAPE
+   text 'The program is currently reading the tape, please wait.'
+endmessage
+\end{verbatim}
+\end {small}
+
+then the output message would be the one defined in the interface file:
+
+\begin {quote}
+\begin {small}
+\begin{verbatim}
+The program is currently reading the tape, please wait.
+\end{verbatim}
+\end {small}
+\end {quote}
+
+This facility enables ADAM applications to conveniently support foreign
+languages. 
+However, it is recommended that message parameters used in applications
+software are not normally defined in the interface file.
+If message parameters are defined in the interface file of an application,
+then it is clearly necessary to ensure that the text associated with each
+message parameter imparts essentially the same information as the text used
+within the program code, even if they are in different languages. 
+
+
+\subsubsection {Parameter references}
+
+It is often necessary to refer to an ADAM program parameter in a message. 
+There are two kinds of reference required: 
+
+\begin {itemize}
+\item The keyword associated with a parameter. 
+The keyword is the name for a parameter that the user sees in the 
+documentation of an application. 
+The keyword-parameter association is held in the interface file and is
+not directly available to the application. 
+
+\item The name of an object, device or file associated with a parameter. 
+This will usually only be relevant for non-primitive parameters ({\em e.g.} file 
+names), although primitive parameters ({\em i.e.} any numerical, CHARACTER or LOGICAL 
+data type) may have an associated object -- often their parameter file
+entry.
+\end {itemize}
+
+Parameter references can be included in the text of a message by prefixing 
+their names with the appropriate escape character. 
+To include the keyword associated with a parameter, its name is prefixed with
+the percent escape character, ``\%'', {\em e.g.} 
+
+\begin {small}
+\begin{verbatim}
+      CALL MSG_OUT( 'ET_RANGE', '%ET parameter is ignored.', STATUS )
+\end{verbatim}
+\end {small}
+
+\begin {sloppypar}
+Here, the parameter `ET' might be associated in the interface file 
+with the keyword ``EXPOSURE\_TIME'', {\em e.g.}
+\end {sloppypar}
+
+\begin {quote}
+\begin {small}
+\begin{verbatim}
+parameter ET
+   type '_INTEGER'
+   keyword 'EXPOSURE_TIME'
+   prompt 'Exposure time required'
+endparameter
+\end{verbatim}
+\end {small}
+\end {quote}
+
+In this case, the resultant output would be
+
+\begin {quote}
+\begin {small}
+\begin{verbatim}
+EXPOSURE_TIME parameter is ignored.
+\end{verbatim}
+\end {small}
+\end {quote}
+
+To include the name of an object, device or file associated with a parameter, 
+the parameter name is prefixed with the dollar escape character, ``\$'', {\em e.g.}
+
+\begin {small}
+\begin{verbatim}
+      CALL MSG_OUT( 'DS_CREATE', 'Creating $DATASET.', STATUS )
+\end{verbatim}
+\end {small}
+
+If the parameter `DATASET' is associated with the object called ``SWP1234'' 
+then this would produce the output
+
+\begin {quote}
+\begin {small}
+\begin{verbatim}
+Creating SWP1234.
+\end{verbatim}
+\end {small}
+\end {quote}
+
+
+\subsubsection {Using program parameters as tokens}
+
+It is sometimes necessary to refer to a program parameter in a message, where
+its name is contained in a variable. 
+In order to incorporate its reference into a message, a message token can be
+associated with its name. 
+Here is an example of how this would be coded:
+
+\begin {small}
+\begin{verbatim}
+      CALL MSG_SETC( 'PAR', PNAME )
+      CALL MSG_OUT( 'PAR_UNEXP', '%^PAR=0.0 unexpected', STATUS )
+\end{verbatim}
+\end {small}
+
+In this example, the escape sequence ``$^\wedge$'' prefixes the token name,
+'PAR'. 
+The sequence '$^\wedge$PAR' gets replaced by the contents of the character
+string contained in the variable PNAME; this, being prefixed by ``\%'', then
+gets replaced in the final message by the keyword associated with the
+parameter. 
+
+
+\subsubsection {Reserved tokens}
+
+The token name ``STATUS'' is reserved for use by the Error System and should
+not be used in Message System calls.
+If the token name ``STATUS'' is used, then it will always be associated with
+the message 
+
+\begin {quote}
+\begin {small}
+\begin{verbatim}
+NONAME-W-NOMSG, Message number 00000000
+\end{verbatim}
+\end {small}
+\end {quote}
+
+or else no message is output.
+
+
+\subsubsection {Getting the conditional output level}
+
+In addition to the subroutine for setting the filter level for conditional
+message output, {\em i.e.} MSG\_IFSET, the ADAM version of MSG also provides 
+a subroutine to get a character string from the parameter system and use
+this to set the filter level: MSG\_IFGET.
+The subroutine has the calling sequence
+
+\begin {small}
+\begin{verbatim}
+      CALL MSG_IFGET( PNAME, STATUS )
+\end{verbatim}
+\end {small}
+
+where PNAME is the parameter name.
+It is recommended that one parameter name is used universally for this purpose,
+namely MSG\_FILTER, in order to clarify the interface file entries.
+The three acceptable strings for MSG\_FILTER are
+
+\begin {quote}
+\begin {description}
+\item [QUIET] -- representing MSG\_\_QUIET;
+\item [NORMAL] -- representing MSG\_\_NORM;
+\item [VERBOSE] -- representing MSG\_\_VERB.
+\end {description}
+\end {quote}
+
+Any other value will result in an error report and the status value being
+returned set to MSG\_\_INVIF.
+
+
+\subsubsection {Synchronising message output}
+
+Graphical and textual output from an ADAM application can have problems with
+synchronisation.
+This is because the message output arrives at the terminal via the command
+process and is buffered, whereas the graphical output is sent directly to the
+terminal.
+The effect of this is that graphical output to the terminal can get corrupted by
+message output.
+This problem can be avoided by using the subroutine MSG\_SYNC, which flushes
+the textual output buffer of the command process:
+
+\begin {small}
+\begin{verbatim}
+      CALL MSG_SYNC( STATUS )
+\end{verbatim}
+\end {small}
+
+MSG\_SYNC should be called immediately before any graphical output to avoid any
+corruption. 
+
+
+\subsection {Using ERR within ADAM applications} \label{adam_err}
+
+\subsubsection {Error message parameters}
+
+In calls to the subroutine ERR\_REP in ADAM applications, the error name is the
+name of a message parameter which is associated with the error message text.
+Like the message parameters used in the subroutines MSG\_OUT and MSG\_LOAD,
+message parameters used in the subroutine ERR\_REP may be associated with the
+text of an error message in the ADAM interface file as well as in the argument
+list.
+This allows the ADAM user interface to contain alternative versions of the
+error message text.
+When the error message parameter is specified in the interface file, this text
+is used in preference to that given in the argument list.
+
+
+\subsubsection {Initial error context level}
+
+In the non-ADAM, stand-alone, version of the Error System the initial error
+context level is set to one.
+Thus calls to ERR\_LEVEL will return a value of unity before any call to
+ERR\_MARK.
+This allows any error reports made at this level to be delivered immediately to
+the user.
+However, the ADAM version of the Error System defers error reporting before
+the ADAM application is called.
+Thus calls to ERR\_LEVEL will return a value of two from the application,
+before any call to ERR\_MARK.
+Any remaining error reports are delivered to the user after execution of
+the application.
+
+
+\subsubsection {Status messages}
+
+The status values returned from each ADAM package should be globally unique in
+order to associate each status value with a specific error condition, message
+and package.
+Considerable use in ADAM has been made of the VAX/VMS MESSAGE utility, both to
+generate globally unique error codes and to associate each error code with the
+text of an error message.
+The VAX/VMS MESSAGE utility is used by the VMS operating system for reporting 
+its own messages, both informational and error messages.
+The use of the MESSAGE utility in ADAM software has resulted in the use of
+a reserved message token, STATUS. 
+Every call to ERR\_REP results in the status value given being converted into
+its associated VAX/VMS message, and then this message is associated with the 
+token STATUS.
+Hence the global status may be used to construct an error message as follows:
+
+\begin {small}
+\begin{verbatim}
+      CALL ERR_REP( 'DSCALE_BAD', '%DSCALE: ^STATUS', STATUS )
+\end{verbatim}
+\end {small}
+
+This method of constructing error messages makes the assumption that {\em all}
+status values have been defined using the MESSAGE utility and is therefore
+not portable to other computer systems.
+Subroutines following the error reporting strategy outlined in
+\S\ref{when_sect} will always make an accompanying error report when the
+returned status is set with an error value.
+As a result, error reports based upon the reserved token STATUS are not
+necessary and limit the portability of ADAM software.
+
+If it is certain that a status value has resulted directly from the operating
+system, then the subroutine ERR\_SYSER may be used to associate the operating 
+system error message with a token, {\em e.g.}
+
+\begin {small}
+\begin{verbatim}
+      STATUS = <error code>
+      CALL ERR_SYSER( 'ERRMSG', SYSTAT )
+      CALL ERR_REP( 'DSCALE_BAD', '%DSCALE: ^ERRMSG', STATUS )
+\end{verbatim}
+\end {small}
+
+where SYSTAT is the operating system status value.
+This method of constructing operating system error messages is recommended in
+preference to the use of the reserved token STATUS. 
+It should {\em never} be assumed that the status values returned by Starlink
+routines are operating system status values which can be translated in this
+manner, unless this fact is documented. 
+
+The method for uniquely identifying each subroutine library used by the ADAM
+system is to assign each package a unique facility number. 
+Each error condition may then be assigned a unique message number within that
+package.
+An algorithm exists (see Appendix \ref{stat_sect}) for combining the facility
+and message numbers into a globally unique integer status value for each error 
+condition required by the subroutine library.
+This algorithm is based upon that used by the VAX/VMS MESSAGE utility to create
+error status codes. 
+Because of this, its use ensures that the error codes currently in use within
+ADAM will remain globally unique without limiting the portability of ADAM
+software.
+
+
+\subsubsection {Returning the status to the environment}
+
+ADAM applications are Fortran subroutines which are called by the software
+environment. 
+An ADAM application has the schematic form 
+
+\begin {small}
+\begin{verbatim}
+      SUBROUTINE APPLIC( STATUS )
+
+      ...
+
+      <application code>
+
+      ...
+
+      END
+\end{verbatim}
+\end {small}
+
+where the argument STATUS is given as SAI\_\_OK. 
+When the application ends and returns control to the environment, the final
+value of STATUS will reflect whether or not the application finished on an
+error condition.
+This provides the environment with a status to be associated with the
+application as a whole. 
+The exit status of the application can be used by the environment to decide
+what to do next. 
+If a status value other than SAI\_\_OK is returned to the environment,
+then any pending error messages are output. 
+Applications which fail should therefore return an error status.
+This recommendation does not, in fact, differ from that for stand-alone 
+applications (see \S\ref{errdef_sect}).
+
+
+\subsection {Compiling and linking ADAM applications} \label{adam_link}
+
+\subsubsection {Use with the VAX/VMS operating system}
+
+When developing ADAM applications, all logical names required for include
+files used during compilation are defined by executing the procedures
+
+\begin {quote}
+\begin {small}
+\begin{verbatim}
+$ ADAMSTART
+$ ADAMDEV
+\end{verbatim}
+\end {small}
+\end {quote}
+
+The application may then be compiled using the FORTRAN command and linked using
+the ALINK or MLINK procedures. 
+
+If it is necessary to link a subroutine library with the Message and Error
+Reporting Systems, {\em e.g.} when building a shareable image, then the
+ADAM shareable image library ADAMSHRLIB may be used:
+
+\begin {quote}
+\begin {small}
+\begin{verbatim}
+$ LINK /MAP /SHAREABLE=PACKAGE_IMAGE_ADAM.EXE PACKAGE_IMAGE_ADAM.OBJ, -
+     SYS$INPUT /OPTIONS
+     PACKAGE /LIBRARY
+     ADAMSHRLIB /LIBRARY
+$
+\end{verbatim}
+\end {small}
+\end {quote}
+
+
+\subsubsection {Use with the UNIX operating system}
+
+For ADAM, the five include files available for use with the Message and Error
+Reporting Systems on UNIX machines, {\em i.e.} {\bf sae\_par}, {\bf msg\_par},
+{\bf msg\_err},  {\bf err\_par} and {\bf err\_err}, are the same as those 
+used for non-ADAM applications and reside in the  directory
+{\bf /star/include} (see \S\ref{comp_sect}).
+
+If it is necessary to link an ADAM application explicitly with the Message and
+Error Reporting Systems, the command line would be similar to
+
+\begin {quote}
+\begin {small}
+\begin{verbatim}
+% f77 adam_application.o `err_link_adam` -o adam_application.out
+\end{verbatim}
+\end {small}
+\end {quote}
+
+\begin {sloppypar}
+As for the non-ADAM version, this assumes all Starlink directories have been
+added to the environment variables {\bf PATH} and {\bf LD\_LIBRARY\_PATH} (see
+SUN/118).
+\end {sloppypar}
+
+
+\subsection {Using the Error Message Service for ADAM system programming}
+
+The Message and Error Systems are intended for use when writing stand-alone and
+ADAM applications. 
+However, there are certain areas of the ADAM system which require that no 
+assumptions be made about the working order of either the ADAM parameter 
+or data systems.
+For reporting errors from this lower level of ADAM another subroutine library
+is available: the Error Message Service, EMS. 
+The subroutine calling sequences for this library are very similar to those of
+the Message and Error Systems and are described in SSN/4.
+The Error Message Service library is intended specifically for ADAM system 
+development and should not be used in applications software.
+
+\subsection {Subroutine specifications}
+
+\small
+\sstroutine{
+   MSG\_IFGET
+}{
+   Get the filter level for conditional message output from the ADAM
+   parameter system
+}{
+   \sstdescription{
+      Translate the given parameter name into a value for the filter
+      level for conditional message output. This value is then used to
+      set the informational filtering level. It is recommended that one
+      parameter name is used universally for this purpose,
+      namely MSG\_FILTER, in order to clarify the interface file entries.
+      The three acceptable strings for MSG\_FILTER are
+
+      \sstitemlist{
+
+         \sstitem
+            QUIET -- representing MSG\_\_QUIET;
+
+         \sstitem
+            NORMAL -- representing MSG\_\_NORM;
+
+         \sstitem
+            VERBOSE -- representing MSG\_\_VERB.
+
+      }
+      MSG\_IFGET accepts abbreviations of these strings; any other value 
+      will result in an error report and the status value being returned 
+      set to MSG\_\_INVIF. If an error occurs getting the parameter value,
+      the status value is returned and an additional error report is made.
+   }
+   \sstinvocation{
+      CALL MSG\_IFGET( PNAME, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PNAME = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The filtering level parameter name.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+
+
+\newpage
+\sstroutine{
+   MSG\_SYNC
+}{
+   Synchronise message output via the user interface
+}{
+   \sstdescription{
+      This performs a synchronisation handshake with the user interface.
+      This is required if the current task has been outputting messages
+      via the user interface and now wants to use a graphics cursor on the
+      command device. If a synchronisation error occurs, then an error
+      report is made and the status value is returned set to MSG\_\_SYNER.
+   }
+   \sstinvocation{
+      CALL MSG\_SYNC( STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status: it is returned set to MSG\_\_SYNER on error.
+      }
+   }
+}
+
+\rule{\textwidth}{0.5mm}
+\normalsize
+
+\section {Calculating Globally Unique Error Codes} \label{stat_sect}
+
+This section presents a method for calculating globally unique error status
+codes for ADAM subroutine libraries.
+In order to be used effectively, it requires a Fortran compiler capable of four
+byte integer representation.
+If this is not the case, then the status values generated will {\em not} be
+globally unique.
+
+The error codes are calculated using the equation
+
+\begin {equation}
+CODE \,= \, 134250498 \,\, + \,\, 65536\times <fac> \,\, + \,\,  8\times <mes> 
+\end {equation}
+
+Here, $<mes>$ is the message number (in the range 1 to 4095) assigned to the
+error condition by the author of the subroutine library, and $<fac>$ is the
+facility number (in the range 1 to 2047) allocated to this subroutine library
+by the ADAM Support Group.
+Developers wishing to have facility numbers allocated to subroutine libraries 
+should contact the ADAM Support Group or the Starlink Software Librarian
+({\em i.e.} RLVAD::STAR).
+
+\section {Portability}
+
+\subsection {Overview}
+
+This section discusses the portability of MSG and ERR, including the coding 
+standard adopted for MSG and ERR and a list of those Starlink packages which 
+need to be ported to the target machine before a port of MSG or ERR can proceed.
+
+
+\subsection {Coding and porting prerequisites}
+
+The standard of Fortran used for the coding of MSG and ERR is fundamentally
+Fortran 77, using the Starlink Fortran coding conventions described in SGP/16.
+Several common extensions to the Fortran 77 standard are used in source 
+code for MSG and ERR, they are as follows:
+
+\begin {itemize}
+\item end-of-line comments using the ``!'' symbol;
+\item symbolic subprogram names may be longer than six characters (but are 
+always shorter than ten characters);
+\item symbolic subprogram names include the ``\_'' symbol;
+\item symbolic constant names may be longer than six characters (but are always
+shorter than eleven characters);
+\item symbolic constant names may include the ``\_'' symbol;
+\item the the full ASCII character set is assumed in character constants.
+\end {itemize}
+
+To use MSG and ERR on any computer system the Starlink Error Message Service
+(EMS, SSN/4) and Character Handling Routines (CHR, SUN/40) must be available.
+
+
+\subsection {Operating system specific routines}
+
+Several ERR subroutines make use of operating system calls specific to the 
+machine upon which they are implemented.
+The names of these routines and their purpose are as follows:
+
+\begin {quote}
+\begin {description}
+\item [ERR\_FIOER] ( TOKEN, IOSTAT ) 
+\subitem Assign a Fortran I/O error message to a token.
+\indexspace
+\item [ERR\_SYSER] ( TOKEN, SYSTAT ) 
+\subitem Assign an operating system error message to a token.
+\end {description}
+\end {quote}
+
+These subroutines call their EMS counterparts which will have to be rewritten
+specifically for each new target machine and operating system.
+
+
+\section {Changes and New Features in Version 1.2}
+
+\subsection {Changes in behaviour of existing routines}
+
+\begin {description}
+\item [MSG\_LOAD] previously only annulled any existing message tokens if the
+given status value was SAI\_\_OK. It has been changed to {\em always} annul 
+any existing message tokens regardless of the given status value.
+\item [MSG\_OUT] previously only annulled any existing message tokens if the
+given status value was SAI\_\_OK. It has been changed to {\em always} annul 
+any existing message tokens regardless of the given status value.
+\item [ERR\_BEGIN] previously reported an error message if it was called
+with a set status value and without an error report having been 
+made within the current context. 
+This message was associated  with the status value ERR\_\_NOREP, which was
+subsequently  returned by ERR\_END. 
+It now associates the given status value  with this error message.
+\item [ERR\_END] previously returned the last reported status value in the
+error reporting context valid on exit.
+It now returns the status value given in the nested call to ERR\_BEGIN, even
+if this status value is not associated with the last reported error
+message in the initial context.
+If nested calls to ERR\_BEGIN and ERR\_END get out of sequence, the status
+value EMS\_\_NSTER will be returned from ERR\_END.
+\end {description}
+
+
+\subsection {New routines}
+
+\begin {description}
+\item [MSG\_IFGET] -- Get the filter level for conditional message output from
+the ADAM parameter system. {\em Available in the ADAM version of MSG only.}
+\item [MSG\_IFLEV] -- Return the current filter level for conditional
+message output.
+\item [MSG\_IFSET] -- Set the filter level for conditional message output.
+\item [MSG\_OUTIF] -- Conditionally deliver the text of a message to the user.
+\item [MSG\_RENEW] -- Renew any annulled message tokens in the current
+context.
+\end {description}
+
+
+\subsection {Other changes}
+
+\begin {description}
+\item [EMS\_DIR:LOGICAL.COM] -- This file has been renamed 
+EMS\_DIR:EMS\_DEV.COM.
+\item [EMS\_DIR:EMSLINK.COM] -- This file has been deleted.
+\item [EMS\_DIR:EMSLINK.OPT] -- This file has been renamed 
+EMS\_DIR:EMS\_LINK.OPT.
+\item [Output format] -- The output format of error messages has changed:
+the first error message in a flush of the error table begins with the character
+sequence ``!!~'', {\em e.g.}
+\begin {small}
+\begin{verbatim}
+!! The first error message.
+\end{verbatim}
+\end {small}
+
+Subsequent contextual error messages in a flush of the error table begin with
+the character sequence ``!~~'', {\em e.g.}
+\begin {small}
+\begin{verbatim}
+!  A contextual error message.
+\end{verbatim}
+\end {small}
+
+Continuation lines of a reported error message begin with the character
+sequence ``!~~~~~'', {\em e.g.}
+\begin {small}
+\begin{verbatim}
+!! The first line of an error message ...
+!     and its continuation onto another line.
+!  A second contextual error message.
+\end{verbatim}
+\end {small}
+
+\item [ERR error messages] -- The text for several ERR error messages has been
+changed to be more informative.
+\end {description}
+
+\end {document}

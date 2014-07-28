@@ -1,0 +1,2715 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {143.2}
+\newcommand{\stardocauthors}   {P M Allan \\ A J Chipperfield}
+\newcommand{\stardocdate}      {9 March 1994}
+\newcommand{\stardoctitle}     {FIO/RIO \\ [1ex]
+                                FORTRAN file I/O routines} 
+\newcommand{\stardocversion}   {Version 1.4}
+\newcommand{\stardocmanual}    {Programmer's Manual}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\renewcommand{\thepage}{\roman{page}}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here.
+
+%+
+%  Name:
+%     LAYOUT.TEX
+
+%  Purpose:
+%     Define Latex commands for laying out documentation produced by PROLAT.
+
+%  Language:
+%     Latex
+
+%  Type of Module:
+%     Data file for use by the PROLAT application.
+
+%  Description:
+%     This file defines Latex commands which allow routine documentation
+%     produced by the SST application PROLAT to be processed by Latex. The
+%     contents of this file should be included in the source presented to
+%     Latex in front of any output from PROLAT. By default, this is done
+%     automatically by PROLAT.
+
+%  Notes:
+%     The definitions in this file should be included explicitly in any file
+%     which requires them. The \include directive should not be used, as it
+%     may not then be possible to process the resulting document with Latex
+%     at a later date if changes to this definitions file become necessary.
+
+%  Authors:
+%     RFWS: R.F. Warren-Smith (STARLINK)
+
+%  History:
+%     10-SEP-1990 (RFWS):
+%        Original version.
+%     10-SEP-1990 (RFWS):
+%        Added the implementation status section.
+%     12-SEP-1990 (RFWS):
+%        Added support for the usage section and adjusted various spacings.
+%     10-DEC-1991 (RFWS):
+%        Refer to font files in lower case for UNIX compatibility.
+%     {enter_further_changes_here}
+
+%  Bugs:
+%     {note_any_bugs_here}
+
+%-
+
+%  Define length variables.
+\newlength{\sstbannerlength}
+\newlength{\sstcaptionlength}
+
+%  Define a \tt font of the required size.
+\font\ssttt=cmtt10 scaled 1095
+
+%  Define a command to produce a routine header, including its name,
+%  a purpose description and the rest of the routine's documentation.
+\newcommand{\sstroutine}[3]{
+   \goodbreak
+   \rule{\textwidth}{0.5mm}
+   \vspace{-7ex}
+   \newline
+   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
+   \setlength{\sstcaptionlength}{\textwidth}
+   \addtolength{\sstbannerlength}{0.5em}
+   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
+   \addtolength{\sstcaptionlength}{-4.45pt}
+   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
+   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
+   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
+   \begin{description}
+      #3
+   \end{description}
+}
+
+%  Format the description section.
+\newcommand{\sstdescription}[1]{\item[Description:] #1}
+
+%  Format the usage section.
+\newcommand{\sstusage}[1]{\item[Usage:] \mbox{} \\[1.3ex] {\ssttt #1}}
+
+%  Format the invocation section.
+\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
+
+%  Format the arguments section.
+\newcommand{\sstarguments}[1]{
+   \item[Arguments:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the returned value section (for a function).
+\newcommand{\sstreturnedvalue}[1]{
+   \item[Returned Value:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the parameters section (for an application).
+\newcommand{\sstparameters}[1]{
+   \item[Parameters:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the examples section.
+\newcommand{\sstexamples}[1]{
+   \item[Examples:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Define the format of a subsection in a normal section.
+\newcommand{\sstsubsection}[1]{\item[{#1}] \mbox{} \\}
+
+%  Define the format of a subsection in the examples section.
+\newcommand{\sstexamplesubsection}[1]{\item[{\ssttt #1}] \mbox{} \\}
+
+%  Format the notes section.
+\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
+
+%  Provide a general-purpose format for additional (DIY) sections.
+\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}] \mbox{} \\[1.3ex] #2}
+
+%  Format the implementation status section.
+\newcommand{\sstimplementationstatus}[1]{
+   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
+
+%  Format the bugs section.
+\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
+
+%  Format a list of items while in paragraph mode.
+\newcommand{\sstitemlist}[1]{
+  \mbox{} \\
+  \vspace{-3.5ex}
+  \begin{itemize}
+     #1
+  \end{itemize}
+}
+
+%  Define the format of an item.
+\newcommand{\sstitem}{\item}
+
+%  End of LAYOUT.TEX layout definitions.
+%.
+
+%+
+% Extra sst definitions written by PMA.
+%-
+
+% Define layout of brief listing sections - Pinched from SUN/33
+
+\newcommand{\noteroutine}[2]{{\small \bf #1} \nopagebreak \\
+                             \hspace*{3em} {\em #2} \\[1.5ex]}
+
+%  End of extra sst definitions.
+%.
+
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Huge\bf  \stardoctitle \\ [2.5ex]}
+{\LARGE\bf \stardocversion \\ [4ex]}
+{\Huge\bf  \stardocmanual}
+\end{center}
+\vspace{20mm}
+
+%------------------------------------------------------------------------------
+%  Package Description
+\begin{center}
+{\Large\bf Description}
+\end{center}
+
+FIO/RIO is a subroutine package that allows a FORTRAN programmer to access
+sequential and direct access data files in a machine independent manner. The
+package consists of stand alone FIO and RIO routines, which can be used
+independently of the ADAM environment, plus routines to interface to the ADAM
+parameter system.
+
+The library is currently available on VAX/VMS systems, Sun Sparcstations
+running SunOS or Solaris, DECstations running Ultrix and DEC Alphas running
+OSF/1.
+
+\markright{\stardocname}
+\newpage
+\markright{\stardocname}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+\null\vspace {5mm}
+\begin {center}
+\rule{80mm}{0.5mm} \\ [1ex]
+{\Large\bf \stardoctitle \\ [2.5ex]
+           \stardocversion} \\ [2ex]
+\rule{80mm}{0.5mm}
+\end{center}
+\vspace{30mm}
+
+\setlength{\parskip}{0mm}
+\tableofcontents
+\setlength{\parskip}{\medskipamount}
+\markright{\stardocname}
+\newpage
+%------------------------------------------------------------------------------
+% Section 1 begins ...
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
+
+\null\vspace {5mm}
+\begin {center}
+\rule{80mm}{0.5mm} \\ [1ex]
+{\Large\bf \stardoctitle \\ [2.5ex]
+           \stardocversion} \\ [2ex]
+\rule{80mm}{0.5mm}
+\end{center}
+\vspace{30mm}
+
+
+\section{Introduction}
+
+The FIO/RIO package is intended for handling record oriented files (e.g.\
+simple text files) in both ADAM tasks and stand-alone FORTRAN programs.
+Although most bulk data will be stored in HDS files, there are occasions when
+the use of HDS is not appropriate. Writing formatted sequential files that are
+intended for printing as reports is one obvious example. When it is necessary
+to read and write record oriented files, then the use of FIO can ease the
+writing of such programs and will assist in the production of portable
+software.
+
+The essential difference between the FIO and RIO routines is that FIO handles
+sequential files and RIO handles direct access files (also known as random
+access files, hence the R in RIO). The FIO routines are primarily intended for
+handling formatted, sequential files, but some can also process unformatted,
+sequential files. Formatted, sequential access files may have the first
+character of each record interpreted as a carriage control character when the
+file is printed. Whether or not a formatted file contains carriage control
+characters can be specified when the file is created. RIO routines are
+primarily used to handle unformatted, direct access files, although some can
+handle formatted, direct access files as well.
+
+FIO and RIO use a common table of file descriptors so that file descriptors
+created by RIO routines may be used with appropriate FIO routines: e.g.\
+FIO\_FNAME returns the filename associated with a file descriptor obtained via
+either FIO or RIO.
+
+The normal Starlink `inherited status' error handling strategy is employed
+throughout. Any FIO/RIO routine that fails will report an error and set the
+STATUS argument to an appropriate value. Symbolic constants for these STATUS
+values are given in appendix \ref{status-values}.
+
+\section{FIO/RIO descriptors}
+
+FIO/RIO uses internal file descriptors to maintain information about the files
+that it processes. The descriptors contain the FORTRAN unit number of the file,
+the name of the file, the access mode and the record size. Knowledge of the
+access mode allows FIO/RIO to check for invalid operations, such as writing to
+a read-only file. Checking for invalid I/O operations before they are actually
+performed makes programs more robust, since the corresponding I/O error is
+never generated.
+
+The FIO/RIO file descriptors do not contain any more information about a file
+than could be obtained by using the FORTRAN INQUIRE statement, but they store
+the information in such a way that it is more efficient to use descriptors than
+the INQUIRE statement.
+
+\section{Using FIO/RIO}
+
+FIO/RIO can be used in three main ways; you can use it in a minimalist way to
+ease the writing of normal FORTRAN programs, you can use the extra
+functionality provided by FIO file descriptors in stand alone FORTRAN programs,
+or you can use the ADAM parameter system interface in ADAM programs.
+
+\subsection{Routines to enhance simple FORTRAN I/O}
+
+Some of the FIO/RIO routines do not use FIO file descriptors and are provided
+to simplify common I/O operations. For example, FIO\_GUNIT will get an unused
+FORTRAN unit number. Using this routine is better than `hard wiring' unit
+numbers into code as you may not know what unit numbers other subroutines are
+using. The routines that do not use the FIO file descriptors are:
+
+\begin{description}
+\item[FIO\_ERASE] Erase a file
+\item[FIO\_GUNIT] Get a FORTRAN I/O unit number
+\item[FIO\_PUNIT] Return an FORTRAN I/O unit number
+\item[FIO\_REP]  Report an I/O error
+\item[FIO\_SERR]  Report an I/O error
+\item[FIO\_TEST]  Test if a status value belongs to a certain class of errors
+\item[RIO\_ERASE] Erase a file
+\end{description}
+
+Here is an example of the use of some of these routines.
+
+\begin{verbatim}
+      ...
+*  Get a unit number.
+      CALL FIO_GUNIT( UNIT, STATUS )
+*  Open a file.
+      OPEN( UNIT=UNIT, FILE=FILNAM, STATUS='NEW', IOSTAT=ISTAT )
+      IF ( IOSTAT .EQ. 0 ) THEN
+*  Save the data.
+         WRITE( UNIT, '(5F10.2)' ) ( X( I ), I = 1, 5 )
+         CLOSE( UNIT )
+      ELSE
+*  Report an error
+         CALL FIO_REP( UNIT, FILNAM, ISTAT, ' ', STATUS )
+      END IF
+*  Return the unit number.
+      CALL FIO_PUNIT( UNIT, STATUS )
+      ...
+\end{verbatim}
+
+Consistent use of the FIO\_GUNIT and FIO\_PUNIT routines has reduced the
+likelihood of a clash of unit number between this part of the program and some
+other part, and the use of FIO\_REP allows machine independent reporting of
+any errors.
+
+\subsection{The stand-alone subroutines}
+
+In addition to the routines in the previous section, FIO provides a set of
+routines to do some simple I/O on files. FIO maintains a set of file
+descriptors for active files which are used by these routines. These
+descriptors contain such things as the access mode of a file (read only,
+update, etc.), which allow FIO to trap some errors rather than permitting a run
+time error to occur. For example, if an attempt is made to write to a file that
+has been opened with `read only' access, FIO will report the error, but the
+program will not crash, allowing the user to take corrective action. Use of
+these routines also makes user written code more portable. Issues such as
+requiring CARRIAGECONTROL='LIST' in DEC FORTRAN OPEN statements are handled
+internally. The routines that handle FIO file descriptors are:
+
+\begin{description}
+\item[FIO\_CLOSE] Close a file.
+\item[FIO\_FNAME] Get the name of a file.
+\item[FIO\_OPEN] Open a file.
+\item[FIO\_READ]  Read a file.
+\item[FIO\_READF] Read a file (faster than FIO\_READ).
+\item[FIO\_RWIND] Rewind a file.
+\item[FIO\_UNIT] Get the unit number of a file.
+\item[FIO\_WRITE] Write a file.
+\item[RIO\_CLOSE] Close a file.
+\item[RIO\_OPEN] Open a file.
+\item[RIO\_READ]  Read a file.
+\item[RIO\_WRITE] Write a file.
+\end{description}
+
+Note that the same file descriptors are used by the FIO and RIO routines, so
+these can be freely mixed, where appropriate.
+
+Here is an example of the use of some of these routines.
+
+\begin{verbatim}
+      ...
+*  Open a file.
+      CALL FIO_OPEN( FILNAM, 'WRITE', 'LIST', 0, FD, STATUS )
+*  Write the data.
+         DO I = 1, N
+            CALL FIO_WRITE( FD, BUF( I ), STATUS )
+         END DO
+*  Close the file.
+      CALL FIO_CLOSE( FD, STATUS )
+      ...
+\end{verbatim}
+
+Note that there is no testing for errors in this piece of code since the FIO
+routines follow the normal Starlink convention for error handling and will not
+execute if STATUS is bad. However, if the loop is to be executed many times, it
+would be worth testing that the call to FIO\_OPEN was successful, otherwise you
+could end up executing the loop many times to no effect.
+
+\subsection{The environment level routines}
+
+The last way of using FIO/RIO is in its fully integrated ADAM form. The
+following routines provide an interface to the ADAM parameter system:
+
+\begin{description}
+\item[FIO\_ANNUL] Annul a file descriptor and close the file.
+\item[FIO\_ASSOC] Open a file associated with an ADAM parameter.
+\item[FIO\_CANCL] Close a file and cancel the parameter.
+\item[RIO\_ANNUL] Annul a file descriptor and close the file.
+\item[RIO\_ASSOC] Open a file associated with an ADAM parameter.
+\item[RIO\_CANCL] Close a file and cancel the parameter.
+\end{description}
+
+These routines are typically used to get the name of a file through the ADAM
+parameter system. For instance, the previous example could be re-written as:
+
+\begin{verbatim}
+      ...
+*  Open a file.
+      CALL FIO_ASSOC( PNAME, 'WRITE', 'LIST', 0, FD, STATUS )
+*  Write the data.
+         DO I = 1, N
+            CALL FIO_WRITE( FD, BUF( I ), STATUS )
+         END DO
+*  Close the file.
+      CALL FIO_CANCL( PNAME, STATUS )
+      ...
+\end{verbatim}
+
+When the call to FIO\_ASSOC is executed, the name of the file will be obtained
+via the parameter system. This may involve prompting the user, but the file
+name could equally well be defaulted from the interface file. The interface
+file might contain something like this:
+
+\begin{verbatim}
+      PARAMETER  FILE
+        TYPE     'FILENAME'
+        VPATH    'PROMPT'
+        PROMPT   'Name of file to be created'
+        PPATH    'CURRENT,DEFAULT'
+        DEFAULT  newfile.dat
+      END PARAMETER
+\end{verbatim}
+
+{\bf N.B.} At present, if you specify a file name that contains a directory
+name in an interface file, then you must use a VMS or Unix specific syntax for
+the file name.
+In the future, FIO may be enhanced to handle logical names and environment
+variable as part of the file specification.
+
+\section{Access Mode, Format and Record Size of Files}
+
+When a file is opened by one of FIO\_OPEN, FIO\_ASSOC, RIO\_OPEN or
+RIO\_ASSOC, then various attributes of the file need to be specified. These are
+the access mode, the format and the record size.
+
+The access mode can be one of 'READ', 'WRITE', 'UPDATE' or 'APPEND'. 'READ'
+specifies that the file is to be opened for reading only. This is required if
+the protection of the file forbids writing to it, but it is good practice to
+always use this option for files that will only ever be read. 'WRITE' specifies
+that a new file is created and the file is opened for writing to. This also
+allows the file to be read, as once a record has been written, it can then be
+read. 'UPDATE' access opens an existing file for read and write access.
+'APPEND' opens an existing file for read and write access. Any records written
+to the file will be added to the end of the file current file. If the file does
+not exist, it will be created.
+
+The format specifies the type of the file. It can be one of 'LIST', 'FORTRAN'
+or 'NONE' (for FIO\_OPEN and FIO\_ASSOC), 'FORMATTED' (for RIO\_OPEN and
+RIO\_ASSOC), or 'UNFORMATTED'. 'LIST' specifies that the first character in a
+record should not be interpreted as a carriage control character, and is
+usually what is needed to produce simple text files. 'FORTRAN' specifies that
+the first character in a record will be interpreted as a carriage control
+character. This may be useful when producing reports that are to be printed on
+a line printer. The FORTRAN~77 standard says that output record that are to be
+printed will have their first characters interpreted as carriage control
+characters, and implies, but does not state explicitly, that output records that
+are not be be printed will not have their first characters interpreted as
+carriage control characters. Unfortunately, it is rather vague as to what the
+term {\em printing\/} actually means. An additional source of confusion is that
+a standard FORTRAN OPEN statement will create files that do cause the first
+character of each record to be interpreted as a carriage control character on
+VMS, but not on Unix. In fact, Unix has no concept of the type of a file, so
+files that have carriage control characters in them need to be passed through a
+filter (often called fpr) for the carriage control characters to have their
+desired effect.
+
+A format of 'NONE' specifies that there is no carriage control character. This
+differs from a format of 'LIST' on VMS or Ultrix as the file will print on a
+single line when listed on a terminal or printed on a printer. On SunOS, a
+format of 'NONE' has the same effect as 'LIST'. It is best to avoid this option
+whenever possible. In fact, for formatted, sequential access files (i.e.\
+simple text files), it is best to use a format of 'LIST' whenever possible.
+
+A format of 'FORMATTED' will produce a formatted direct access file with
+RIO\_OPEN or RIO\_ASSOC and a format of 'UNFORMATTED' will always produce an
+unformatted file.
+
+The record size is generally only needed for direct access files created by
+RIO\_OPEN and RIO\_ASSOC. In other cases it should be specified as zero, which
+causes FIO to use the default size of a record. In fact it is a violation of
+the FORTRAN~77 standard to give a record length when opening a sequential file.
+However, VMS requires the record length to be given when creating records that
+are longer than the default of 133 bytes. If a record length is given to an FIO
+routine on Unix, it will ignore it.
+
+
+\section{INCLUDE files}
+\label{include-files}
+
+The include file {\tt FIO\_PAR} defines symbolic names for various constants
+which  may be required by tasks. The most useful constants are FIO\_\_SZMOD,
+which is used to specify the length of the access mode string in calls to
+FIO\_OPEN and RIO\_OPEN, and FIO\_\_SZFNM, which is the maximum allowed length
+of a filename in FIO/RIO.
+
+If you need to test for explicit status values returned from FIO/RIO
+subroutines, include the statement:
+
+\begin{quote}{\tt
+      INCLUDE 'FIO\_ERR'
+}
+\end{quote}
+
+in the program. The return status can then be tested. For example:
+
+\begin{verbatim}
+      IF( STATUS .EQ. FIO__ERROR ) ...
+\end{verbatim}
+
+However, there are problems to do with portability when testing return status
+values. These are dealt with in the next section.
+
+\section{Reporting and handling errors}
+\label{errors}
+
+FIO/RIO routines all report errors if they return bad status values, so
+programs that do all I/O through calls to FIO/RIO do not have to worry about
+this. However, some programs use direct FORTRAN statements to perform I/O and
+may still need to report errors. Two routines are provided to assist with this;
+FIO\_SERR and FIO\_REP. FIO\_SERR is the simpler of the two. It takes an IOSTAT
+value as its first argument, returns a corresponding FIO error value in its
+status argument and reports an error. The error report is of the form:
+
+\begin{quote}{\tt
+FIO\_SERR: IOSTAT error $=$ Unit not connected
+}
+\end{quote}
+
+This is fine if all you want to do is translate the IOSTAT value, but the error
+report does not contain any contextual information such as the unit that was
+not connected nor the file that it should have been connected to. For a fuller
+report, the routine FIO\_REP is provided. This takes as input arguments the
+unit number, the file name, the IOSTAT value and a message to be printed.
+FIO\_REP sets three message tokens, FNAME, UNIT and IOSTAT and then reports the
+message that it was given. This message can contain references to the message
+tokens to provide a more meaningful error message. For example:
+
+\begin{verbatim}
+      OPEN( UNIT=UNUM, FILE=FILNAM, STATUS='OLD', IOSTAT=ISTAT )
+      CALL FIO_REP( UNUM, FILNAM, ISTAT,
+     :  'Error opening file ^FNAME. Status = ^IOSTAT', STATUS )
+\end{verbatim}
+
+In this case, the error report contains the fact that this error has been
+generated when trying to open a file. To save having to generate an error
+message for every call to FIO\_REP, it is possible to give a blank message,
+which is equivalent to
+
+\begin{verbatim}
+      'Error with file ^FNAME on unit number ^UNIT; IOSTAT = ^IOSTAT'
+\end{verbatim} % verbatim is necessary to get the ^ to come out right.
+
+For a given value of IOSTAT, the value of status that is returned by FIO\_REP
+is the same as that returned by FIO\_SERR.
+
+\subsection{Handling errors}
+
+Sometimes it is desired to take corrective action if a routine returns a
+particular bad status value, and section \ref{include-files} contains an
+example of how you might do this. Unfortunately there is a problem with testing
+FIO/RIO status values that does not occur with most other packages.
+
+FIO/RIO can generate two sorts of error codes. Firstly there are internal
+FIO/RIO codes. There is no problem testing for these. Secondly there are codes
+that are a translation of a FORTRAN IOSTAT value. It is these status codes that
+gives rise to the problem as such values are inherently machine specific, thus
+making it very difficult to write portable applications that test for bad
+status values. It might be thought that the things that could go wrong with
+FORTRAN I/O were sufficiently similar from one machine to another, that a
+common set of error codes could be devised, but surprisingly this is not the
+case in practice. The list of error codes that can be returned as IOSTAT values
+are very different from one machine to another. Even when it looks like two
+errors on different machines will be equivalent in practice, this does not
+always turn out to be the case.
+
+On account of these difficulties, FIO/RIO adopts the following strategy:
+
+\begin{quote}{\it
+If the text of an error message in the computer manufacturer's documentation is
+the same for two different machines, then FIO/RIO will return the same status
+value on those two machines. Otherwise different status values are returned on
+the different machines.
+}
+\end{quote}
+
+This strategy is applied quite rigorously, even when, at first sight, it looks
+like two error messages might be equivalent. The only exception at present is
+that `Cannot stat file' (on Ultrix) and `can't stat file' (on SunOS) return the
+same error code. Not to do so smacks of pedantry of the highest order! This
+strategy has been chosen as a balance between returning unique error codes on
+all machines (which is barely any better than using the raw IOSTAT value) and
+trying to guess which error codes are equivalent to each other (with the
+likelihood of getting it wrong). Presumably if the text of two error messages
+are identical, then they are intended to apply to the same situation. Even this
+cannot be guaranteed, but it is the best one can do.
+
+Occasionally, the Fortran run time system will return an IOSTAT value that
+corresponds to a operating system error rather than a Fortran error. In such a
+case, an error message describing the error will be generated and the status
+will be set to the value of the symbolic constant FIO\_\_OSERR.
+
+The strategy of only returning the same error number when the text of the
+message is the same definitely errs on the side of caution. It means that
+programs that are intended to be run on several different machines must often
+test for different error codes, one for each machine type. For example, it is
+quite common to test for {\tt FIO\_\_FILNF} (file not found) on VAX/VMS.
+Unfortunately, there is no error that corresponds sufficiently closely to this
+on SunOS. As well as being very tedious, it means that tests for bad status
+values in application programs probably need to be modified to run on a new
+computer. To minimize this problem, FIO/RIO provides the ability to test status
+values for classes of errors. This is best described by an example. Suppose
+that you have prompted a user for the name of an input file and you then try to
+open a file using the returned string. If the program fails to open the file,
+this might be for one of several reasons. It may be that the string typed in is
+not a valid file name (e.g.\ {\tt [PMA\}TEST.DAT} on VMS), or that the file
+does not exist, or that the file exists, but you do not have the right to
+access the file. In all of these situations, you can rely on the error
+reporting to tell the user what has gone wrong, but all the program cares about
+is that it has failed to open the file and that it should re-prompt the user. A
+program can test for a general class of errors by using the logical function
+FIO\_TEST. This takes a character argument and a status value and returns TRUE
+if the value of STATUS is in the class of errors described by the character
+argument.
+Here is an example:
+
+\begin{verbatim}
+      IF( FIO_TEST( 'OPEN error', STATUS ) ) THEN
+         ...
+      ENDIF
+\end{verbatim}
+
+Note that FIO\_TEST is not sensitive to the case of the character string
+given as its first argument. An example of attempting to open a file using
+FORTRAN I/O and then testing to see if this was successful is:
+
+\begin{verbatim}
+      CALL ERR_MARK
+      OPEN( UNIT=UNUM, FILE=FILNAM, STATUS='OLD', IOSTAT=ISTAT )
+      CALL FIO_REP( UNUM, FILNAM, ISTAT, ' ', STATUS )
+*  Test for `could not open file'.
+      IF( FIO_TEST( 'OPEN error', STATUS ) ) THEN
+*  Handle the error if we can.
+         ...
+         CALL ERR_ANNUL( STATUS )
+      END IF
+      CALL ERR_RLSE
+\end{verbatim}
+
+This example has used a FORTRAN OPEN statement in the application code. It is
+generally better to let FIO handle all file access as this makes for more
+portable code. (It is also less typing.) In this case, the above example would
+be written as:
+
+\begin{verbatim}
+      CALL ERR_MARK
+      CALL FIO_OPEN( FILNAM, 'UPDATE', 'LIST', 0, FD, STATUS )
+      IF( FIO_TEST( 'OPEN error', STATUS ) ) THEN
+*  Handle the error if we can.
+         ...
+         CALL ERR_ANNUL( STATUS )
+      END IF
+      CALL ERR_RLSE
+\end{verbatim}
+
+A list of all the classes of errors that can be handled in this manner is given
+in appendix~\ref{status-values}. At present, the list of error classes is
+fixed, but it is intended that users will be able to define their own error
+classes in a future release of FIO/RIO.
+
+\subsection{Note to software developers}
+\begin{quote}
+{\it 
+The routines that provide the interface to the ADAM parameter system report
+errors by calling the ERR library. All other routines report errors by calling
+the EMS library.}
+\end{quote}
+
+\section{Compiling and Linking}
+
+\subsection{VMS}
+
+The current version of FIO/RIO is distributed as a shareable image. Before
+compiling a program that uses any of the FIO include files, or linking any
+program that uses FIO, type 
+
+\begin{quote}{\tt
+\$ FIO\_DEV
+}
+\end{quote}
+
+The FIO shareable image is included in the STAR\_LINK shareable image library,
+so the preferred method of linking basic FORTRAN programs is:
+
+\begin{quote}{\tt
+\$ LINK progname,STAR\_LINK/OPT
+}
+\end{quote}
+
+To link an ADAM program with FIO, type:
+
+\begin{quote}{\tt
+\$ ALINK progname
+}
+\end{quote}
+
+The shareable libraries and object libraries are stored in FIO\_DIR, so if you
+need to link explicitly with the shareable library, type:
+
+\begin{quote}{\tt
+\$ LINK progname,FIO\_LINK/OPT
+}
+\end{quote}
+
+or to link with the object library, type:
+
+\begin{quote}{\tt
+\$ LINK progname,FIO\_DIR:FIO/LIB
+}
+\end{quote}
+
+Linking with the object library is not recommended as it makes the size of
+executable files larger than using shareable libraries and it will require
+relinking programs to take advantage of bug fixes or updates.
+
+\subsection{Unix}
+
+On a Unix system, the FORTRAN compiler will only look for include files in the
+directory that contains the source code of the program being compiled unless
+the include file is given as an explicit path name. Consequently, the best way
+of naming include files on a Unix system is to use soft links. For example, the
+program contains lines such as:
+
+\begin{quote}{\tt
+      INCLUDE 'SAE\_PAR'
+}
+\end{quote}
+
+and you create a soft link in your directory with the command:
+
+\begin{quote}{\tt
+\% ln -s /star/include/sae\_par SAE\_PAR
+}
+\end{quote}
+
+A shell script called {\tt fio\_dev} is provided to create the appropriate soft
+links for the FIO library.
+
+To compile and link a program that uses FIO, type:
+
+\begin{quote}{\tt
+\% f77 prog.f -L/star/lib `fio\_link`
+}
+\end{quote}
+
+To compile and link an ADAM program that uses FIO, type:
+
+\begin{quote}{\tt
+\% alink prog.f -L/star/lib `fio\_link\_adam`
+}
+\end{quote}
+
+\appendix
+
+\newpage
+\section{Alphabetical List of Routines}
+
+\noteroutine{
+   FIO\_ACTIV
+}{
+   Initialise FIO library for ADAM application
+}
+\noteroutine{
+   FIO\_ANNUL
+}{
+   Annul a file descriptor and close the file
+}
+\noteroutine{
+   FIO\_ASSOC
+}{
+   Create/open a sequential file associated with a parameter
+}
+\noteroutine{
+   FIO\_CANCL
+}{
+   Close a file and cancel the parameter
+}
+\noteroutine{
+   FIO\_CLOSE
+}{
+   Close a sequential file
+}
+\noteroutine{
+   FIO\_DEACT
+}{
+   Deactivate FIO
+}
+\noteroutine{
+   FIO\_ERASE
+}{
+   Delete a file
+}
+\noteroutine{
+   FIO\_FNAME
+}{
+   Get the full file name of a file
+}
+\noteroutine{
+   FIO\_GUNIT
+}{
+   Get a unit number
+}
+\noteroutine{
+   FIO\_OPEN
+}{
+   Create/open a sequential file
+}
+\noteroutine{
+   FIO\_PUNIT
+}{
+   Release a unit number
+}
+\noteroutine{
+   FIO\_READ
+}{
+   Read sequential record
+}
+\noteroutine{
+   FIO\_READF
+}{
+   Fast read sequential record
+}
+\noteroutine{
+   FIO\_REP
+}{
+   Report error from FORTRAN I/O statements
+}
+\noteroutine{
+   FIO\_RWIND
+}{
+   Rewind a sequential file
+}
+\noteroutine{
+   FIO\_SERR
+}{
+   Set error status
+}
+\noteroutine{
+   FIO\_START
+}{
+   Set up units numbers and open standard I/O streams
+}
+\noteroutine{
+   FIO\_STOP
+}{
+   Close down FIO
+}
+\noteroutine{
+   FIO\_TEST
+}{
+   Test if an FIO status value belongs to a certain class of errors
+}
+\noteroutine{
+   FIO\_UNIT
+}{
+   Get a unit number given a file descriptor
+}
+\noteroutine{
+   FIO\_WRITE
+}{
+   Write a sequential record
+}
+\noteroutine{
+   RIO\_ANNUL
+}{
+   Annul a file descriptor and close the file
+}
+\noteroutine{
+   RIO\_ASSOC
+}{
+   Create/open a direct access file associated with a parameter
+}
+\noteroutine{
+   RIO\_CANCL
+}{
+   Close a file and cancel the parameter
+}
+\noteroutine{
+   RIO\_CLOSE
+}{
+   Close a direct access file
+}
+\noteroutine{
+   RIO\_ERASE
+}{
+   Delete a file
+}
+\noteroutine{
+   RIO\_OPEN
+}{
+   Open a direct access file
+}
+\noteroutine{
+   RIO\_READ
+}{
+   Read record from direct access file
+}
+\noteroutine{
+   RIO\_WRITE
+}{
+   Write a record to a direct access file
+}
+
+
+\newpage
+\section{Classified List of Routines}
+
+\subsection{Simple I/O routines}
+
+\noteroutine{
+   FIO\_ERASE
+}{
+   Delete a file
+}
+\noteroutine{
+   FIO\_GUNIT
+}{
+   Get a unit number
+}
+\noteroutine{
+   FIO\_PUNIT
+}{
+   Release a unit number
+}
+\noteroutine{
+   FIO\_REP
+}{
+   Report error from FORTRAN I/O statements
+}
+\noteroutine{
+   FIO\_SERR
+}{
+   Set error status
+}
+\noteroutine{
+   FIO\_TEST
+}{
+   Test if an FIO status value belongs to a certain class of errors
+}
+\noteroutine{
+   RIO\_ERASE
+}{
+   Delete a file
+}
+
+\subsection{Stand alone routines}
+
+\noteroutine{
+   FIO\_CLOSE
+}{
+   Close a sequential file
+}
+\noteroutine{
+   FIO\_FNAME
+}{
+   Get the full file name of a file
+}
+\noteroutine{
+   FIO\_OPEN
+}{
+   Create/open a sequential file
+}
+\noteroutine{
+   FIO\_READ
+}{
+   Read sequential record
+}
+\noteroutine{
+   FIO\_READF
+}{
+   Fast read sequential record
+}
+\noteroutine{
+   FIO\_RWIND
+}{
+   Rewind a sequential file
+}
+\noteroutine{
+   FIO\_UNIT
+}{
+   Get a unit number given a file descriptor
+}
+\noteroutine{
+   FIO\_WRITE
+}{
+   Write a sequential record
+}
+\noteroutine{
+   RIO\_CLOSE
+}{
+   Close a direct access file
+}
+\noteroutine{
+   RIO\_OPEN
+}{
+   Open a direct access file
+}
+\noteroutine{
+   RIO\_READ
+}{
+   Read record from direct access file
+}
+\noteroutine{
+   RIO\_WRITE
+}{
+   Write a record to a direct access file
+}
+
+\subsection{ADAM parameter system routines}
+
+\noteroutine{
+   FIO\_ANNUL
+}{
+   Annul a file descriptor and close the file
+}
+\noteroutine{
+   FIO\_ASSOC
+}{
+   Create/open a sequential file associated with a parameter
+}
+\noteroutine{
+   FIO\_CANCL
+}{
+   Close a file and cancel the parameter
+}
+\noteroutine{
+   RIO\_ANNUL
+}{
+   Annul a file descriptor and close the file
+}
+\noteroutine{
+   RIO\_ASSOC
+}{
+   Create/open a direct access file associated with a parameter
+}
+\noteroutine{
+   RIO\_CANCL
+}{
+   Close a file and cancel the parameter
+}
+
+\subsection{Miscellaneous routines}
+
+\noteroutine{
+   FIO\_ACTIV
+}{
+   Initialise FIO library for ADAM application
+}
+\noteroutine{
+   FIO\_DEACT
+}{
+   Deactivate FIO
+}
+\noteroutine{
+   FIO\_START
+}{
+   Set up units numbers and open standard I/O streams
+}
+\noteroutine{
+   FIO\_STOP
+}{
+   Close down FIO
+}
+
+
+\newpage
+\section{Routine Descriptions}
+
+\begin{small}
+\sstroutine{
+   FIO\_ANNUL
+}{
+   Annul a file descriptor and close the file
+}{
+   \sstdescription{
+      This routine closes the file associated with the file descriptor
+      FD, resets the file descriptor and removes the association with
+      the ADAM parameter. It does not cancel the ADAM parameter though.
+      This allows the value of the ADAM parameter to be reused.
+   }
+   \sstinvocation{
+      CALL FIO\_ANNUL( FD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         FD = INTEGER (Given)
+      }{
+         The file descriptor
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If STATUS is not SAI\_\_OK on input, then the routine
+            will still attempt to execute, but will return with STATUS set
+            to the import value.
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1993 Science \& Engineering Research Council
+   }
+}
+\sstroutine{
+   FIO\_ASSOC
+}{
+   Create/open a sequential file associated with a parameter
+}{
+   \sstdescription{
+      Open the sequential file specified by parameter PNAME and return
+      a file descriptor for it.
+   }
+   \sstinvocation{
+      CALL FIO\_ASSOC( PNAME, ACMODE, FORM, RECSZ, FD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PNAME = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Expression giving the name of a file parameter.
+      }
+      \sstsubsection{
+         ACMODE = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Expression giving the required access mode.
+         Valid modes are:\\
+         {\tt '}READ{\tt '} - Open the file READONLY. The file must exist.\\
+         {\tt '}WRITE{\tt '} - Create a new file and open it to write.\\
+         {\tt '}UPDATE{\tt '} - Open a file to write. The file must exist.\\
+         {\tt '}APPEND{\tt '} - Open a file to append. The file need not exist.
+      }
+      \sstsubsection{
+         FORM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Expression giving the required formatting of the file.
+         Valid formats are:\\
+         {\tt '}FORTRAN{\tt '} - Formatted file, normal Fortran interpretation
+                     of the first character of each record.\\
+         {\tt '}LIST{\tt '} - Formatted file, single spacing between records.\\
+         {\tt '}NONE{\tt '} - Formatted file, no implied carriage control.\\
+         {\tt '}UNFORMATTED{\tt '} - Unformatted, no implied carriage control.
+      }
+      \sstsubsection{
+         RECSZ = INTEGER (Given)
+      }{
+         Expression giving the maximum record size in bytes.
+         Set it to zero if the Fortran default is required.
+      }
+      \sstsubsection{
+         FD = INTEGER (Returned)
+      }{
+         Variable to contain the file descriptor.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstdiytopic{
+      External Routines Used
+   }{
+      CHR:
+         CHR\_SIMLR
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1992 Science \& Engineering Research Council
+   }
+}
+\sstroutine{
+   FIO\_CANCL
+}{
+   Close a file and cancel the parameter
+}{
+   \sstdescription{
+      Close any open file that is associated with the parameter and
+      cancel the parameter.
+   }
+   \sstinvocation{
+      CALL FIO\_CANCL( PNAME, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PNAME = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Expression giving the name of a file parameter which has
+         previously been associated with a file using FIO\_ASSOC.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If STATUS is not SAI\_\_OK on input, then the routine
+            will still attempt to execute, but will return with STATUS set
+            to the import value.
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1992 Science \& Engineering Research Council
+   }
+}
+\sstroutine{
+   FIO\_CLOSE
+}{
+   Close a sequential file
+}{
+   \sstdescription{
+      Close the file with the specified file descriptor.
+   }
+   \sstinvocation{
+      CALL FIO\_CLOSE( FD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         FD = INTEGER (Given)
+      }{
+         The file descriptor.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If the STATUS variable is not SAI\_\_OK on input, then the
+            routine will still attempt to execute, but will return with
+            STATUS set to the import value.
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1992 Science \& Engineering Research Council
+   }
+}
+\sstroutine{
+   FIO\_ERASE
+}{
+   Delete a file
+}{
+   \sstdescription{
+      Delete the named file.
+   }
+   \sstinvocation{
+      CALL FIO\_ERASE( FILE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         FILE = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Expression giving the name of the file to be deleted.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1991 Science \& Engineering Research Council
+   }
+}
+\sstroutine{
+   FIO\_FNAME
+}{
+   Get the full file name of a file
+}{
+   \sstdescription{
+      Get the full name of the file with the specified file
+      descriptor.
+   }
+   \sstinvocation{
+      CALL FIO\_FNAME( FD, FNAME, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         FD = INTEGER (Given)
+      }{
+         The file descriptor.
+      }
+      \sstsubsection{
+         FNAME = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         Variable to contain the full file name of the file.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1992 Science \& Engineering Research Council
+   }
+}
+\sstroutine{
+   FIO\_GUNIT
+}{
+   Get a unit number
+}{
+   \sstdescription{
+      Get an unused Fortran unit number.
+   }
+   \sstinvocation{
+      CALL FIO\_GUNIT( UNIT, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         UNIT = INTEGER (Given)
+      }{
+         A variable to contain the unit number.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1991 Science \& Engineering Research Council
+   }
+}
+\sstroutine{
+   FIO\_OPEN
+}{
+   Create/open a sequential file
+}{
+   \sstdescription{
+      Open a sequential file with the specified access mode.
+      When the file is created, the specified carriage control mode and
+      maximum record size will be used.
+      Return a file descriptor which can be used to access the file.
+   }
+   \sstinvocation{
+      CALL FIO\_OPEN( FILE, ACMODE, FORM, RECSZ, FD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         FILE = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Expression giving the name of the file to be opened.
+      }
+      \sstsubsection{
+         ACMODE = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Expression giving the required access mode.
+         Valid modes are:\\
+         {\tt '}READ{\tt '} - Open the file READONLY. The file must exist.\\
+         {\tt '}WRITE{\tt '} - Create a new file and open it to write.\\
+         {\tt '}UPDATE{\tt '} - Open a file to write. The file must exist.\\
+         {\tt '}APPEND{\tt '} - Open a file to append. The file need not exist.
+      }
+      \sstsubsection{
+         FORM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Expression giving the required formatting of the file.
+         Valid formats are:\\
+         {\tt '}FORTRAN{\tt '} - Formatted file, normal Fortran interpretation
+                     of the first character of each record.\\
+         {\tt '}LIST{\tt '} - Formatted file, single spacing between records.\\
+         {\tt '}NONE{\tt '} - Formatted file, no implied carriage control.\\
+         {\tt '}UNFORMATTED{\tt '} - Unformatted, no implied carriage control.
+      }
+      \sstsubsection{
+         RECSZ = INTEGER (Given)
+      }{
+         Expression giving the maximum record size in bytes.
+         Set it to zero if the Fortran default is required.
+      }
+      \sstsubsection{
+         FD = INTEGER (Returned)
+      }{
+         Variable to contain the file descriptor.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1991 Science \& Engineering Research Council
+   }
+}
+\sstroutine{
+   FIO\_PUNIT
+}{
+   Release a unit number
+}{
+   \sstdescription{
+      Give back a Fortran unit number to FIO.
+   }
+   \sstinvocation{
+      CALL FIO\_PUNIT( UNIT, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         UNIT = INTEGER (Given)
+      }{
+         Variable containing the unit number.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      If STATUS is not set to SAI\_\_OK on input, then the routine will
+      still attempt to execute, but will return with STATUS set to the
+      import value.
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1991 Science \& Engineering Research Council
+   }
+}
+\sstroutine{
+   FIO\_READ
+}{
+   Read sequential record
+}{
+   \sstdescription{
+      Read a record from the file with the specified file descriptor
+      and return the `used length{\tt '} of the buffer.
+   }
+   \sstinvocation{
+      CALL FIO\_READ( FD, BUF, NCHAR, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         FD = INTEGER (Given)
+      }{
+         The file descriptor.
+      }
+      \sstsubsection{
+         BUF = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         Variable to receive the record.
+      }
+      \sstsubsection{
+         NCHAR = INTEGER (Returned)
+      }{
+         Variable to receive the number of characters read, ignoring
+         trailing spaces.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstdiytopic{
+      External Routines Used
+   }{
+      CHR:
+         CHR\_LEN
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1991 Science \& Engineering Research Council
+   }
+}
+\sstroutine{
+   FIO\_READF
+}{
+   Fast read sequential record
+}{
+   \sstdescription{
+      Read a record from the file with the specified file descriptor.
+      Unlike FIO\_READ, this routine does not return the `used length{\tt '}
+      of the buffer and is therefore faster.
+   }
+   \sstinvocation{
+      CALL FIO\_READF( FD, BUF, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         FD = INTEGER (Given)
+      }{
+         The file descriptor.
+      }
+      \sstsubsection{
+         BUF = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         Variable to receive the record.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1991 Science \& Engineering Research Council
+   }
+}
+\sstroutine{
+   FIO\_REP
+}{
+   Report error from FORTRAN I/O statements
+}{
+   \sstdescription{
+      Translate the value of IOSTAT to an FIO error code and report the
+      corresponding error message.
+   }
+   \sstinvocation{
+      CALL FIO\_REP( UNIT, FNAME, IOSTAT, MESS, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         UNIT = INTEGER (Given)
+      }{
+         The Fortran I/O unit number.
+      }
+      \sstsubsection{
+         FNAME = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The name of the data file.
+      }
+      \sstsubsection{
+         IOSTAT = INTEGER (Given)
+      }{
+         The value of IOSTAT from a Fortran I/O statement.
+      }
+      \sstsubsection{
+         MESS = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         An error message to be output.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         CALL FIO\_REP( UNIT, {\tt '} {\tt '}, IOSTAT, {\tt '} {\tt '}, STATUS )
+      }{
+         This will inquire the name of the file that is connected to
+         UNIT and report an error message containing the unit number
+         file name and which error occurred.
+      }
+      \sstexamplesubsection{
+         CALL FIO\_REP( UNIT, {\tt '} {\tt '}, IOSTAT, {\tt '}Failed to open $\wedge$FNAME{\tt '}, STATUS )
+      }{
+         This example provides an explicit error message containing the
+         token FNAME.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         This routine sets the message tokens UNIT, FNAME and IOSTAT.
+            They can be given in the text of the error message.
+
+         \sstitem
+         FNAME can be a general character string, a hyphen or blank.
+            If FNAME is a general character string, it is used as the name
+            of the file when reporting the error message.
+            If FNAME is blank, then this routine uses INQUIRE to find the
+            name of the file.
+            If FNAME is a hyphen, then this routine does not set the token
+            FNAME. It should be set before calling this routine if a
+            sensible error message is to be produced.
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1992 Science \& Engineering Research Council
+   }
+}
+\sstroutine{
+   FIO\_RWIND
+}{
+   Rewind a sequential file
+}{
+   \sstdescription{
+      Rewind a sequential access file.
+   }
+   \sstinvocation{
+      CALL FIO\_RWIND( FD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         FD = INTEGER (Given)
+      }{
+         The file descriptor.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         This routine must ONLY be used on sequential access files.
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1992 Science \& Engineering Research Council
+   }
+   \sstbugs{
+      None known.
+   }
+}
+\sstroutine{
+   FIO\_SERR
+}{
+   Set error status
+}{
+   \sstdescription{
+      Convert a Fortran IOSTAT error value into an FIO status value and
+      report the error.
+   }
+   \sstinvocation{
+      CALL FIO\_SERR( IOSTAT, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IOSTAT = INTEGER (Given)
+      }{
+         Variable containing the Fortran error value.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+         Set to contain the FIO status.
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1992 Science \& Engineering Research Council
+   }
+}
+\sstroutine{
+   FIO\_TEST
+}{
+   Test if an FIO status value belongs to a certain class of errors
+}{
+   \sstdescription{
+      See if the value of STATUS corresponds one of the FIO error codes
+      that correspond to the error class given as the first argument.
+   }
+   \sstinvocation{
+      RESULT = FIO\_TEST( ERRCLS, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         ERRCLS = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The name of the error class
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         FIO\_TEST = LOGICAL
+      }{
+         Whether STATUS is in the named class of errors.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         IF( FIO\_TEST( {\tt '}OPEN ERROR{\tt '}, STATUS ) ) THEN ...
+      }{
+         See if the value of STATUS is one of the values associated
+         with the error class {\tt '}OPEN ERROR{\tt '}.
+      }
+   }
+   \sstdiytopic{
+      External Routines Used
+   }{
+      CHR:
+         CHR\_SIMLR
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1992 Science \& Engineering Research Council
+   }
+}
+\sstroutine{
+   FIO\_UNIT
+}{
+   Get a unit number given a file descriptor
+}{
+   \sstdescription{
+      The Fortran unit number associated with the given file descriptor
+      is returned.
+   }
+   \sstinvocation{
+      CALL FIO\_UNIT( FD, UNIT, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         FD = INTEGER (Given)
+      }{
+         The file descriptor.
+      }
+      \sstsubsection{
+         UNIT = INTEGER (Returned)
+      }{
+         Variable to receive the unit number.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1991 Science \& Engineering Research Council
+   }
+}
+\sstroutine{
+   FIO\_WRITE
+}{
+   Write a sequential record
+}{
+   \sstdescription{
+      Write a buffer to the file with the specified file descriptor.
+   }
+   \sstinvocation{
+      CALL FIO\_WRITE( FD, BUF, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         FD = INTEGER (Given)
+      }{
+         The file descriptor.
+      }
+      \sstsubsection{
+         BUF = CHARACTER ( $*$ ) (Given)
+      }{
+         Expression containing the data to be written.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1991 Science \& Engineering Research Council
+   }
+}
+\sstroutine{
+   RIO\_ANNUL
+}{
+   Annul a file descriptor and close the file
+}{
+   \sstdescription{
+      This routine closes the file associated with the file descriptor
+      FD, resets the file descriptor and removes the association with
+      the ADAM parameter. It does not cancel the ADAM parameter though.
+      This allows the value of the ADAM parameter to be reused.
+   }
+   \sstinvocation{
+      CALL RIO\_ANNUL( FD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         FD = INTEGER (Given)
+      }{
+         The file descriptor
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If STATUS is not SAI\_\_OK on input, then the routine
+            will still attempt to execute, but will return with STATUS set
+            to the import value.
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1993 Science \& Engineering Research Council
+   }
+}
+\sstroutine{
+   RIO\_ASSOC
+}{
+   Create/open a direct access file associated with a parameter
+}{
+   \sstdescription{
+      Open the direct access file specified by parameter PNAME and
+      return a file descriptor for it.
+   }
+   \sstinvocation{
+      CALL RIO\_ASSOC( PNAME, ACMODE, FORM, RECSZ, FD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PNAME = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Expression giving the name of a file parameter.
+      }
+      \sstsubsection{
+         ACMODE = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Expression giving the required access mode.
+         Valid modes are:\\
+         {\tt '}READ{\tt '} - Open the file READONLY. The file must exist.\\
+         {\tt '}WRITE{\tt '} - Create a new file and open it to write/read.\\
+         {\tt '}UPDATE{\tt '} - Open a file to read/write. The file must exist.\\
+         {\tt '}APPEND{\tt '} - Open a file to write/read.
+                    If the file does not already exist, create it.
+                    (APPEND has no other effect for direct access)
+      }
+      \sstsubsection{
+         FORM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Expression giving the required record formatting.
+         Valid options are {\tt '}FORMATTED{\tt '} or {\tt '}UNFORMATTED{\tt '}
+      }
+      \sstsubsection{
+         RECSZ = INTEGER (Returned)
+      }{
+         Expression giving the record size in bytes.
+         RECSZ is only used if ACMODE is {\tt '}WRITE{\tt '} or {\tt '}APPEND{\tt '}.
+         If ACMODE is {\tt '}APPEND{\tt '} and the file already exists, RECSZ
+         must agree with the existing record size.
+      }
+      \sstsubsection{
+         FD = INTEGER (Returned)
+      }{
+         Variable to contain the file descriptor.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and returned)
+      }{
+         Global status
+      }
+   }
+   \sstdiytopic{
+      External Routines Used
+   }{
+      CHR:
+         CHR\_SIMLR
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1992 Science \& Engineering Research Council
+   }
+}
+\sstroutine{
+   RIO\_CANCL
+}{
+   Close a file and cancel the parameter
+}{
+   \sstdescription{
+      Close any open file that is associated with the parameter and
+      cancel the parameter.
+   }
+   \sstinvocation{
+      CALL RIO\_CANCL( PNAME, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PNAME = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Expression giving the name of a file parameter which has
+         previously been associated with a file using RIO\_ASSOC.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If STATUS is not SAI\_\_OK on input, then the routine
+            will still attempt to execute, but will return with STATUS set
+            to the import value.
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1992 Science \& Engineering Research Council
+   }
+}
+\sstroutine{
+   RIO\_CLOSE
+}{
+   Close a direct access file
+}{
+   \sstdescription{
+      Close the file with the specified file descriptor.
+   }
+   \sstinvocation{
+      CALL RIO\_CLOSE( FD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         FD = INTEGER (Given)
+      }{
+         A variable containing the file descriptor.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      If the STATUS variable is not SAI\_\_OK on input, then the routine
+      will still attempt to execute, but will return with STATUS set to
+      the import value.
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1992 Science \& Engineering Research Council
+   }
+}
+\sstroutine{
+   RIO\_ERASE
+}{
+   Delete a file
+}{
+   \sstdescription{
+      Delete the named file.
+   }
+   \sstinvocation{
+      CALL RIO\_ERASE( FILE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         FILE = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Expression giving the name of the file to be deleted.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1991 Science \& Engineering Research Council
+   }
+}
+\sstroutine{
+   RIO\_OPEN
+}{
+   Open a direct access file
+}{
+   \sstdescription{
+      Open a direct access file with the specified access mode and
+      record size.
+      Return a file descriptor which can be used to access the file.
+   }
+   \sstinvocation{
+      CALL RIO\_OPEN( FILE, ACMODE, FORM, RECSZ, FD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         FILE = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Expression giving the name of the file to be opened.
+      }
+      \sstsubsection{
+         ACMODE = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Expression giving the required access mode.
+         Valid modes are:\\
+         {\tt '}READ{\tt '} - Open the file READONLY. The file must exist.\\
+         {\tt '}WRITE{\tt '} - Create a new file and open it to write/read.\\
+         {\tt '}UPDATE{\tt '} - Open a file to read/write. The file must exist.\\
+         {\tt '}APPEND{\tt '} - Open a file to write/read.
+                    If the file does not already exist, create it.
+                    (APPEND has no other effect for direct access)
+      }
+      \sstsubsection{
+         FORM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Expression giving the required record formatting.
+         {\tt '}FORMATTED{\tt '} or  {\tt '}UNFORMATTED{\tt '}
+      }
+      \sstsubsection{
+         RECSZ = INTEGER (Given)
+      }{
+         Expression giving the record size in bytes.
+         RECSZ is only used if ACMODE is {\tt '}WRITE{\tt '} or {\tt '}APPEND{\tt '}.
+         If ACMODE is {\tt '}APPEND{\tt '} and the file already exists, RECSZ
+         must agree with the existing record size.
+      }
+      \sstsubsection{
+         FD = INTEGER (Returned)
+      }{
+         Variable to contain the file descriptor.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1992 Science \& Engineering Research Council
+   }
+}
+\sstroutine{
+   RIO\_READ
+}{
+   Read record from direct access file
+}{
+   \sstdescription{
+      Read the specified unformatted record from the file with the
+      given file descriptor.
+   }
+   \sstinvocation{
+      CALL RIO\_READ( FD, RECNO, NCHAR, BUF, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         FD = INTEGER (Given)
+      }{
+         The file descriptor.
+      }
+      \sstsubsection{
+         RECNO = INTEGER (Given)
+      }{
+         Expression giving the number of the record to be read.
+      }
+      \sstsubsection{
+         NCHAR = INTEGER (Given)
+      }{
+         Expression giving the buffer size
+      }
+      \sstsubsection{
+         BUF = BYTE( NCHAR ) (Returned)
+      }{
+         A byte array to receive the record.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1992 Science \& Engineering Research Council
+   }
+}
+\sstroutine{
+   RIO\_WRITE
+}{
+   Write a record to a direct access file
+}{
+   \sstdescription{
+      Write the specified record number, unformatted, to the file with
+      the specified file descriptor.
+   }
+   \sstinvocation{
+      CALL RIO\_WRITE( FD, RECNO, NCHAR, BUF, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         FD = INTEGER (Given)
+      }{
+         The file descriptor.
+      }
+      \sstsubsection{
+         RECNO = INTEGER (Given)
+      }{
+         Expression giving the number of the record to be written.
+      }
+      \sstsubsection{
+         NCHAR = INTEGER (Given)
+      }{
+         Expression giving the buffer size.
+      }
+      \sstsubsection{
+         BUF = BYTE( NCHAR ) (given)
+      }{
+         A byte array containing the data to be written.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1992 Science \& Engineering Research Council
+   }
+}
+
+\newpage
+\section{Description of Miscellaneous Routines}
+
+These routines are never needed in standard programs. However, they are
+documented here for completeness as they have existed for several years and
+there may be a case for calling them in certain time-critical applications.
+Calling them will not speed up a program, but can move a small amount of
+execution time from the body of a program to its initialization phase.
+
+\sstroutine{
+   FIO\_ACTIV
+}{
+   Initialise FIO library for ADAM application
+}{
+   \sstdescription{
+      The FIO package and parameter system is initialised for the start
+      of an executable image.
+   }
+   \sstinvocation{
+      CALL FIO\_ACTIV( STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         This routine is not normally needed in a simple program
+            as FIO activates itself when necessary.
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1992 Science \& Engineering Research Council
+   }
+}
+\sstroutine{
+   FIO\_DEACT
+}{
+   Deactivate FIO
+}{
+   \sstdescription{
+      The FIO stand-alone and environment levels are de-activated for
+      the end of an executable image.
+   }
+   \sstinvocation{
+      CALL FIO\_DEACT( STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If STATUS is not SAI\_\_OK on input, then the routine will still
+            attempt to execute, but will return with STATUS set to the
+            import value.
+
+         \sstitem
+         This routine is not normally needed as FIO is closed down by
+            normal program termination.
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1992 Science \& Engineering Research Council
+   }
+}
+\sstroutine{
+   FIO\_START
+}{
+   Set up units numbers and open standard I/O streams
+}{
+   \sstdescription{
+      Allocate unit numbers for use by FIO and mark them as available.
+      Open standard input, output and error files.
+   }
+   \sstinvocation{
+      CALL FIO\_START( STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         This routine is not normally needed in a simple program as FIO
+            starts itself when necessary.
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1991 Science \& Engineering Research Council
+   }
+}
+\sstroutine{
+   FIO\_STOP
+}{
+   Close down FIO
+}{
+   \sstdescription{
+      Close the FIO file descriptor system and all associated files.
+   }
+   \sstinvocation{
+      CALL FIO\_STOP( STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         If STATUS is not SAI\_\_OK on input, then the routine will
+            still attempt to execute, but will return with STATUS set to
+            the import value.
+
+         \sstitem
+         This routine is not normally needed in a simple program as FIO
+            is closed down by normal program termination.
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1991 Science \& Engineering Research Council
+   }
+}
+
+\end{small}
+\newpage
+\section{FIO status values and error classes}
+\label{status-values}
+
+This appendix lists all of the error codes and classes.
+
+As described in section \ref{errors}, FIO/RIO can return both machine
+independent and machine specific error codes in the STATUS argument. Portable
+programs should only test for the machine independent codes or test for error
+classes using FIO\_TEST.
+
+Note that, historically, the codes FIO\_\_ILLAC and FIO\_\_IVUNT have been used
+both as machine independent internal FIO error codes and as VMS specific error
+codes. This usage is retained for compatibility. It is unlikely to cause any
+problems, but the user should be aware of this, particular if mixing direct
+FORTRAN I/O operations with FIO calls that perform actual I/O.
+
+Internal (machine independent) FIO status values:
+
+\begin{tabbing}
+XXXXXXXXXXXXXXX \= \kill
+FIO\_\_EOF   \> End of file \\
+FIO\_\_ERROR \> Error \\
+FIO\_\_FDNFP \> File descriptor does not have an associated file parameter
+descriptor \\
+FIO\_\_ILLAC \footnotemark[1] \> Illegal access mode \\
+FIO\_\_ILLFD \> Illegal file descriptor \\
+FIO\_\_INVRL \> Invalid record length \\
+FIO\_\_IVUNT \footnotemark[1] \> Invalid unit number \\
+FIO\_\_ISACT \> File parameter is active \\
+FIO\_\_IVACM \> Invalid access mode \\
+FIO\_\_IVFMT \> Invalid format \\
+FIO\_\_NOUNT \> No more unit numbers available \\
+FIO\_\_NTOPN \> File not open \\
+FIO\_\_OSERR \> General operating system error code \\
+FIO\_\_TOOFD \> No more available file descriptors \\
+FIO\_\_TOOFP \> Too many file parameters \\
+FIO\_\_UNKPA \> Parameter is not a file parameter \\
+
+\end{tabbing}
+
+\footnotetext[1]{See note about multiple use of this error code}
+
+Error classes:
+
+\begin{tabbing}
+XXXXXXXXXXXXXXX \= \kill
+\underline{Class name} \> \underline{STATUS values that match the class} \\
+OPEN error \> FIO\_\_FILNF, FIO\_\_CFOLF, FIO\_\_COEXI, FIO\_\_NFEXI, \\
+           \> FIO\_\_NAMER, FIO\_\_NODEV, FIO\_\_OPNER, FIO\_\_PTAFD, \\
+           \> FIO\_\_PERMD, FIO\_\_ILLOP, FIO\_\_ALOPN, FIO\_\_TOOMF \\
+CLOSE error \> FIO\_\_CLSER, FIO\_\_ILLCL, FIO\_\_INCOC \\
+READ error  \> FIO\_\_RDER, FIO\_\_INPCN, FIO\_\_INREQ, FIO\_\_SYNAM, \\
+            \> FIO\_\_TOOMV, FIO\_\_RUNCH, FIO\_\_BLINP, FIO\_\_ILSTI, \\
+            \> FIO\_\_IINAM \\
+WRITE error \> FIO\_\_WRT, FIO\_\_REWRT, FIO\_\_OUTCN, FIO\_\_OUTOV \\
+REWIND error \> FIO\_\_REWER \\
+BACKSPACE error \> FIO\_\_BACER, FIO\_\_CNTBF \\
+\end{tabbing}
+
+Note that references to error classes in programs are case insensitive.
+
+\newpage
+DEC FORTRAN (VMS, Ultrix and OSF/1) specific FIO status values:
+\footnotetext[1]{See note about multiple use of this error code}
+
+\begin{tabbing}
+XXXXXXXXXXXXXXX \= \kill
+FIO\_\_ALOPN \> File already open \\
+FIO\_\_BACER \> BACKSPACE error \\
+FIO\_\_CLSER \> File close error \\
+FIO\_\_CNTSF \> Cannot stat file (Ultrix only) \\
+FIO\_\_COEXI \> Cannot overwrite existing file (Ultrix only) \\
+FIO\_\_DLTER \> File delete error \\
+FIO\_\_DUPFL \> Duplicate file \\
+FIO\_\_ENDFL \> ENDFILE error \\
+FIO\_\_FILNF \> File not found \\
+FIO\_\_FINER \> FIND error \\
+FIO\_\_FORVR \> Format/variable-type mismatch \\
+FIO\_\_ILLAC \footnotemark[1] \> Illegal access mode \\
+FIO\_\_INCKC \> Inconsistent key change or duplicate key \\
+FIO\_\_INCOC \> Inconsistent OPEN/CLOSE parameters \\
+FIO\_\_INCRC \> Inconsistent record length \\
+FIO\_\_INCRG \> Inconsistent file organization \\
+FIO\_\_INCRT \> Inconsistent record type \\
+FIO\_\_INFOR \> Infinite format loop \\
+FIO\_\_INPCN \> Input conversion error \\
+FIO\_\_INREQ \> Input statement requires too much data \\
+FIO\_\_INSVR \> Insufficient virtual memory \\
+FIO\_\_INVMK \> Invalid key match specifier for key direction \\
+FIO\_\_INVKY \> Invalid key specification \\
+FIO\_\_INVRG \> Invalid argument to FORTRAN Run-Time Library \\
+FIO\_\_INVRV \> Invalid reference to variable \\
+FIO\_\_IVUNT \footnotemark[1] \> Invalid unit number \\
+FIO\_\_KEYVL \> Keyword value error in OPEN statement \\
+FIO\_\_LISYN \> List-directed I/O syntax error \\
+FIO\_\_MIXFL \> Mixed file access modes \\
+FIO\_\_NAMER \> File name error \\
+FIO\_\_NOCRC \> No current record \\
+FIO\_\_NODEV \> No such device \\
+FIO\_\_OPNER \> File open error \\
+FIO\_\_OPREQ \> OPEN or DEFINE FILE required \\
+FIO\_\_OUTCN \> Output conversion error \\
+FIO\_\_OUTFL \> Outside file \\
+FIO\_\_OUTOV \> Output statement overflows record \\
+FIO\_\_PTAFD \> Permission to access file denied (Ultrix only) \\
+FIO\_\_RDER  \> File read error \\
+FIO\_\_RECIO \> Recursive I/O operation \\
+FIO\_\_RECTL \> Record too long \\
+FIO\_\_REQSA \> Requires seek ability (Ultrix only) \\
+FIO\_\_REWER \> REWIND error \\
+FIO\_\_REWRT \> REWRITE error \\
+FIO\_\_SEGRC \> Segmented record format error \\
+FIO\_\_SPLOC \> Specified record locked \\
+FIO\_\_SYNAM \> Syntax error in NAMELIST input \\
+FIO\_\_SYNER \> Syntax error in format \\
+FIO\_\_TOOMV \> Too many values for NAMELIST variable \\
+FIO\_\_TOORC \> Too many records in I/O statement \\
+FIO\_\_UNLER \> UNLOCK error \\
+FIO\_\_UNTNC \> Unit not connected (Ultrix only) \\
+FIO\_\_VFVAL \> Variable format expression value error \\
+FIO\_\_WRTER \> File write error \\
+\end{tabbing}
+
+Sun FORTRAN specific FIO status values:
+
+\begin{tabbing}
+XXXXXXXXXXXXXXX \= \kill
+FIO\_\_BLINP \> Blank logical input field (Sun Fortran 1.x only) \\
+FIO\_\_CFOLF \> Cannot find `OLD' file \\
+FIO\_\_CNTBF \> Cannot backspace file \\
+FIO\_\_CNTSF \> Can't stat file \\
+FIO\_\_DIONA \> Direct I/O not allowed \\
+FIO\_\_ERFMT \> Error in format \\
+FIO\_\_FILEO \> Error in FILEOPT parameter \\
+FIO\_\_FIONA \> Formatted I/O not allowed \\
+FIO\_\_IINAM \> Illegal input for namelist \\
+FIO\_\_ILARG \> Illegal argument \\
+FIO\_\_ILINP \> Illegal logical input field (Sun Fortran 2.x only) \\
+FIO\_\_ILLUN \> Illegal unit number \\
+FIO\_\_ILOPU \> Illegal operation for unit \\
+FIO\_\_ILSTI \> Incomprehensible list input \\
+FIO\_\_INSPE \> Incompatible specifiers in open (Sun Fortran 2.x only) \\
+FIO\_\_NAARC \> No $*$ after repeat count \\
+FIO\_\_NEGRC \> Negative repeat count \\
+FIO\_\_NFEXI \> `NEW' file exists \\
+FIO\_\_OFBOR \> Off beginning of record \\
+FIO\_\_OFEOR \> Off end of record \\
+FIO\_\_OOFSP \> Out of free space \\
+FIO\_\_REQSA \> Requires seek ability \\
+FIO\_\_RUNCH \> Read unexpected character \\
+FIO\_\_SIONA \> Sequential I/O not allowed \\
+FIO\_\_TOOMF \> Too many file opens -- no free descriptors (Sun Fortran 1.x
+only) \\
+FIO\_\_TRUNF \> Truncation failed (Sun Fortran 1.x only) \\
+FIO\_\_UIONA \> Unformatted I/O not allowed \\
+FIO\_\_UNKNO \> Unknown system error \\
+FIO\_\_UNTNC \> Unit not connected \\
+FIO\_\_UNTNO \> Attempted operation on unit that is not open (Sun Fortran 1.x
+only) \\
+\end{tabbing}
+
+The following FIO error status codes may be returned on machines running SunOS
+or Solaris. They correspond to operating system error rather than Fortran
+errors. This is not an exhaustive list of all possible errors. Rather they are
+those errors that it seemed to the author of the package to be worth detecting.
+
+\begin{tabbing}
+XXXXXXXXXXXXXXX \= \kill
+FIO\_\_PERMD \> Permission denied \\
+FIO\_\_FTOOL \> File to large \\
+FIO\_\_NSLOD \> No space left of device \\
+FIO\_\_FNTL  \> File name too long \\
+FIO\_\_DQEXC \> Disk quota exceeded \\
+\end{tabbing}
+
+Redundant FIO status values:
+
+These status values are no longer used by FIO. The symbolic constants are
+retained so that old code that may refer to them will still compile. However,
+any code that tests for them as a returned status value will never find these
+values.
+
+\begin{tabbing}
+XXXXXXXXXXXXXXX \= \kill
+FIO\_\_CRTER \> File create error \\
+FIO\_\_EREXH \> Error establishing exit handler \\
+FIO\_\_ILLCL \> Illegal close request \\
+FIO\_\_ILLOP \> Illegal open request \\
+FIO\_\_NOTFD \> File not found (superseded by FIO\_\_FILNF) \\
+FIO\_\_NTSUP \> Option not supported yet \\
+FIO\_\_OLORG \> Illegal origin \\
+FIO\_\_REDON \> File is readonly \\
+FIO\_\_TOMNY \> Too many open files \\
+\end{tabbing}
+
+\section{Implementation details}
+
+The implementation uses FORTRAN I/O and FORTRAN 77 standards are used with 
+the following exceptions:
+
+\subsection{VMS}
+
+\begin{itemize}
+\item The READONLY keyword is used when opening files for reading only.
+This is required under VMS to allow a user to open a file for which
+only read access is permitted.
+\item The CARRIAGECONTROL keyword is used.
+\item The ACCESS $=$ APPEND keyword is available to permit the useful but
+non-standard facility of appending to files.
+\item The RECL option on the OPEN statement is allowed with sequential files.
+\item Keywords BLOCKSIZE ($=$ 11*512) and ORGANIZATION (= 'RELATIVE') are used 
+when creating direct access files.
+\item A byte array is used as the buffer for direct access I/O.
+\end{itemize}
+
+\subsection{DECstation}
+
+\begin{itemize}
+\item The READONLY keyword is used when opening files for reading only.
+This is required under VMS to allow a user to open a file for which
+only read access is permitted.
+\item The CARRIAGECONTROL keyword is used.
+\item The ACCESS $=$ APPEND keyword is available to permit the useful but
+non-standard facility of appending to files.
+\item The RECL option on the OPEN statement is allowed with sequential files.
+\item The keyword ORGANIZATION (= 'RELATIVE') is used when creating direct
+access files.
+\item A byte array is used as the buffer for direct access I/O.
+\end{itemize}
+
+\subsection{SunOS}
+
+\begin{itemize}
+\item The ACCESS $=$ APPEND keyword is available to permit the useful but
+non-standard facility of appending to files.
+\end{itemize}
+
+\section{Changes and new features}
+
+\subsection{in version 1.1}
+
+Earlier versions of the FIO/RIO system did not include any of the
+environment level routines.
+
+This release has rationalized the stand-alone subroutine interface so that 
+there is only one routine to open sequential files and one to open direct 
+access files.
+The following subroutines have been withdrawn:
+
+\begin{itemize}
+\item FIO\_CROP
+\item FIO\_NEW
+\item FIO\_CREATE
+\item RIO\_NEW
+\end{itemize}
+
+The specifications (including the argument lists) of FIO\_OPEN and RIO\_OPEN 
+have been changed so that the functionality of these routines may be provided 
+in a much clearer and efficient fashion as follows:
+
+\begin{tabular}{llcc}
+
+Old Routine &   New Routine   &  \multicolumn{2}{c}{Arguments} \\
+ & & ACMODE &  FORM \\
+\hline \\
+FIO\_OPEN   &    FIO\_OPEN  &      *     &    'LIST' \\
+FIO\_CROP   &    FIO\_OPEN  &      *     &   'FORTRAN' \\
+FIO\_NEW    &    FIO\_OPEN  &   'WRITE'  &    'LIST' \\
+           &    FIO\_CLOSE & & \\
+FIO\_CREATE &    FIO\_OPEN  &   'WRITE'  &   'FORTRAN' \\
+           &    FIO\_CLOSE & & \\
+RIO\_NEW    &    RIO\_OPEN  &   'WRITE'  &  'UNFORMATTED' \\
+           &    RIO\_CLOSE & & \\
+RIO\_OPEN   &    RIO\_OPEN  &      *     &  'UNFORMATTED'
+
+\end{tabular}
+
+(* indicates the value used formerly):
+
+In addition, the following routines have been withdrawn as they did nothing.
+
+\begin{itemize}
+\item FIO\_FLUSH   
+\item RIO\_FLUSH
+\end{itemize}
+
+\subsection{in version 1.2}
+
+This version is the first release of FIO/RIO on the Sun and DECstation. It is
+functionally the same as version 1.1, but the code was changed so that it would
+run on Suns and DECstations, as well as VAX/VMS machines.
+
+\subsection{in version 1.3}
+
+This version has added error reporting via EMS. Previously, FIO/RIO set bad
+status values without reporting errors, except in FIO\_ASSOC and RIO\_ASSOC.
+
+FIO\_ASSOC and RIO\_ASSOC have been modified so that if an invalid file name is
+given as the value of the ADAM parameter, the user is prompted for a new name.
+
+New routines, FIO\_REP and FIO\_TEST have been added.
+
+This release has VMS shareable libraries as well as the object library. There
+are four versions: stand alone; ADAM; stand alone with error reports annulled;
+and ADAM with error reports annulled. Future releases of FIO/RIO will not
+contain the shareable libraries with error reports annulled.
+
+The option of having all error reports annulled has been provided as a
+temporary measure for the situation where the new version of FIO/RIO causes a
+lot of spurious error reports to be output to the screen due to an application
+not handling them correctly. The error reports from the FIO/RIO routines are
+annulled by calling EMS\_MARK (or ERR\_MARK) before each FIO/RIO routine and
+calling EMS\_ANNUL and EMS\_RLSE (or ERR\_ANNUL and ERR\_RLSE) after each
+FIO/RIO routine. This has the effect of returning the correct status code, but
+annulling all error messages. It will also slow down the execution of the
+program by a small amount. Any error messages generated by routines that are
+called by FIO/RIO will also be annulled, so this facility must be used with
+caution. If you do want to use this facility, you must define the following
+logical names:
+
+\begin{quote}{\tt
+\$ DEFINE/JOB FIO\_IMAGE FIO\_DIR:FIO\_IMAGE\_QUIET \\
+\$ DEFINE/JOB FIO\_IMAGE\_ADAM FIO\_DIR:FIO\_IMAGE\_ADAM\_QUIET
+}
+\end{quote}
+
+The facility for annulling error reports is only present in the VMS version of
+the software. It is not available on Unix.
+
+\subsection{in version 1.4}
+
+This version of FIO has added two new routines, FIO\_ANNUL and RIO\_ANNUL.
+These routines provide similar functions to ANNUL routines in other subroutine
+packages.
+
+There are several new error status codes: FIO\_\-\_\-FDNFP, FIO\_\-\_\-INVRL,
+FIO\_\-\_\-OSERR, FIO\_\-\_\-ILINP, FIO\_\-\_\-INSPE.
+
+This version adds machine specific routines (not visible to the normal user of
+the library) for supporting Solaris. The difference from the SunOS routines is
+that the IOSTAT values corresponding to Fortran errors on Solaris lie in the
+range 1000 to 1027 whereas they lie in the range 100 to 127 on SunOS.
+
+A set of machine dependent routines have been added to the library for an
+`unknown' system. The purpose of these routines is to enable the library to be
+built on any platform, and to provide a starting point for writing machine
+dependent routines for a new system. The routines are FIO1\_\-OPEN,
+FIO1\_\-SERR and RIO1\_\-OPEN.
+
+\end{document}

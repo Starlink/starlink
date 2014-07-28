@@ -1,0 +1,2055 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {145.4}
+\newcommand{\stardocauthors}   {M D Lawden, G R Mellor}
+\newcommand{\stardocdate}      {23 July 1993}
+\newcommand{\stardoctitle}     {UNIX --- An introduction}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+\setlength{\parskip}{0mm}
+\tableofcontents
+\setlength{\parskip}{\medskipamount}
+\markright{\stardocname}
+
+\newpage
+
+\section{Introduction}
+
+This note is meant to get you started on a Starlink Unix computer.
+
+It is not comprehensive.
+It tries to be simple.
+It is Starlink-specific.
+It is a survival kit to help you through the initial learning phase, during
+which you are suffering from information overload.
+To ease this overload we omit lots of options and alternatives.
+There is infinitely more to Unix than described here, but you don't need to
+know it in order to do useful work.
+
+In this introduction, we assume that the command language you are using is the
+'C shell' or 'T-C shell'.
+This is the most common one on Starlink Unix systems at present, although
+eventually `Solaris' will be the Starlink standard.
+The transition to Solaris is described in the article {\em The end of SunOS?}\,
+in {\em Starlink Bulletin 11}.
+
+In addition to reading this guide, have a chat with your Site Manager about
+running Unix at your Site; he or she will know the local setup and will show
+you things.
+Find a colleague who already knows Unix and give him\footnote{From now on,
+`him' stands for `him or her.'} the pleasure of showing off his knowledge by
+asking some callow questions about it.
+Get hold of a book on Unix; there are lots of good ones around and
+they take time to explain things that are skimped or omitted here.
+(One that has been bought for all Starlink sites is {\em Unix for VMS Users}\,
+by Philip Bourne.)
+Finally, if you come from a VMS stable, check Appendix~\ref{crosref} which
+tells you which Unix command corresponds to which VMS command.
+
+\section{Background}
+
+In the old days of Starlink you used a VAX under VMS and that was that.
+This has all changed.
+Now, the hardware you are likely to use is a Sun Sparcstation or a DECstation,
+but in future it may be an Alpha-based machine.
+The version of Unix is most likely SunOS on a Sun, or Ultrix on a DECstation,
+but these are changing to Solaris and OSF/1.
+There are various command languages (`Shells' in Unix-speak) as well.
+The most popular is the `C shell', but you may also encounter the T-C shell,
+Korn shell, or Bourne shell.
+Finally, you may be working from a simple VDU connected to a terminal server,
+an X-terminal, or a powerful workstation.
+
+All this variety makes life difficult for writers of introductory guides.
+Fortunately, most of the variation affects only system managers.
+Users are not so affected---most commands work on Unix systems of
+all flavours.
+
+Starlink's Unix computers run the `Unix Starlink Software Collection' (USSC),
+which is distributed by Starlink to all its sites.
+Part of this Collection is a `Standard Setup' or `Base Set', which tries to
+ensure that users who visit several Starlink sites encounter a familiar Unix
+environment---the same editors, mailers, compilers, shells, utilities and so on.
+These are mentioned below.
+
+\section{Getting started}
+
+This section introduces you to the basic skills you need in order to do anything
+at all with a Unix computer.
+Try the examples yourself.
+It mentions things that are covered more systematically, or in greater depth,
+later on.
+
+The first thing you need is an account on a Unix machine---see your Site
+Manager.
+Then, you need to know how to login to it from your keyboard.
+Having logged in, you can try out some commands to see what files you've got
+and what's inside them, see who else is logged in, and try out the help system.
+You can also check to see that you are set up to run Starlink software.
+This section guides you through all this.
+
+\subsection{Logging in}
+
+Your Site Manager should show you how to login to a Unix machine.
+You've just got to know the local details (like computer names, available
+equipment and networks), which we can't go into here.
+Some background information is given in Appendix~\ref{login}.
+
+You login by entering your username and password {\it in lowercase letters}\,
+(Unix is case sensitive).
+Having logged in, you will probably see a prompt `{\tt \%}' generated by the
+C shell.
+You can now enter commands which will be interpreted by this shell.
+
+\subsection{Changing your password}
+
+The first thing you should do is change your password.
+The standard command to do this is {\tt passwd}.
+However, in general you must use {\tt yppasswd} as this updates your password
+on every machine in a cluster, whereas {\tt passwd} only updates it on one of
+them.
+This is what happens:
+\begin{verbatim}
+    % yppasswd
+    Changing NIS password for <user> on <machine>.
+    Old password:
+    New password:
+    Retype new password:
+    NIS entry changed on <machine>
+\end{verbatim}
+Passwords are not echoed to the screen when you type them.
+They should be six letters or more long and can include upper or lowercase
+letters, numbers, and punctuation.
+
+\subsection{Logging out}
+
+To logout, type:
+\begin{verbatim}
+    % logout
+\end{verbatim}
+If the system responds with ``{\tt there  are stopped jobs}'', then type it
+again---those stopped jobs will be abandoned.
+
+\subsection{Controlling your terminal}
+
+Here are some keys to control your input, output and programs:
+\begin{description}
+\begin{description}
+\item [DEL] --- Rubout the last character typed.
+\item [ctrl/S] --- Stop output appearing on your screen (you won't lose
+  anything).
+\item [ctrl/Q] --- Start output appearing on your screen again (use after
+  ctrl/S).
+\item [ctrl/U] --- Cancel and clear the command line.
+\item [ctrl/C] --- Interrupt the running command (it cannot be restarted).
+  You can then type in another command.
+\item [ctrl/D] --- `End of File'. Used to terminate data or text input from
+  the keyboard.  {\em If you use it when being prompted for a command, it will
+  log you out!}
+\end{description}
+\end{description}
+There are plenty of other control keys, but the ones above enable you to deal
+with emergencies.
+
+\subsection{Looking around}
+
+If you logged out, log back in again.
+Now use some commands to look around.
+The usual form of a Unix command is:
+\begin{verbatim}
+    command [-options] [arguments]
+\end{verbatim}
+The brackets `{\tt [ ]}' indicate that a field is optional.
+For example, if you want to know what the date and time are, enter the command:
+\begin{verbatim}
+    % date
+\end{verbatim}
+This command has been entered (in response to the prompt `{\tt \%}') with no
+options or arguments.
+Other commands that don't need options or arguments include:
+\begin{verbatim}
+    % who
+\end{verbatim}
+which lists the usernames of the people who are logged into the machine you are
+using (a similar command is {\tt finger}, which is nicer because it tells you
+their names), and
+\begin{verbatim}
+    % pwd
+\end{verbatim}
+which tells you the name of your current working directory.
+If you have just logged in, this will be your `home' directory.
+Command:
+\begin{verbatim}
+    %  ls
+\end{verbatim}
+lists the names of the files in your current directory in a compact form.
+This command is often used with options, for example:
+\begin{verbatim}
+    %  ls -la
+\end{verbatim}
+The options are introduced by the `{\tt -}' character.
+Each character that follows specifies a command option.
+In this case `{\tt l}' specifies a more detailed type of listing, and `{\tt a}'
+specifies that a type of file that is normally hidden should be listed.
+
+The {\tt ls} command is also often used with arguments, for example:
+\begin{verbatim}
+    %  ls /star
+\end{verbatim}
+lists the names of the files in directory {\tt /star} in compact form.
+The shell knows that {\tt star} is an argument and not an option because it
+doesn't have that `{\tt -}' sign in front of it.
+Finally, you can combine options and arguments, as in:
+\begin{verbatim}
+    % ls -l /star/
+\end{verbatim}
+which lists full details of the files stored in directory {\tt /star}.
+The `{\tt /}' on the end of the above command is not a misprint.
+If you leave it out, you may only get details of the directory file
+itself.
+The command behaves differently on different systems.
+
+When you typed `{\tt ls -l /star/}' you probably found that the first part of
+the listing shot off the top of the screen.
+The best way to control this is to add `{\tt | more}' onto the end of the
+command, thus:
+\begin{verbatim}
+    %  ls -l /star/ | more
+\end{verbatim}
+What this does is route the output of the {\tt ls -l /star/} command directly
+into the input of the {\tt more} command.
+The {\tt more} command displays its input one screenful at a time.
+To get the next screen, press the {\tt <space>} key ({\em not}\, the
+{\tt <return>} key).
+To quit the listing, type `{\tt q}'.
+
+The `{\tt |}' character is called a `Pipe' and is one of the most powerful
+features of Unix.
+It routes the output of a command into the input of the next command and lets
+you string commands together.
+For example:
+\begin{verbatim}
+    % ls -s /bin | sort -nr | head
+\end{verbatim}
+will list the ten largest files in directory {\tt /bin}.
+The {\tt ls -s /bin} command generates a list of the names and sizes of the
+files in directory {\tt /bin}.
+The {\tt sort -nr} command sorts this list into numerical order, based on
+the size field.
+Finally, the {\tt head} command displays the first ten lines of output of
+the {\tt sort} command.
+
+\subsection{Setting up your environment}
+\label{suye}
+
+When you login, the system reads commands from two files (called {\em startup
+scripts}) in order to set up an appropriate environment.
+This is analogous to the use of the {\tt LOGIN.COM} file in VMS.
+The files are called {\tt .login} and {\tt .cshrc} and should be stored in your
+home directory (the directory you start in).
+Initial versions will probably have been set up by your Site Manager.
+However, you should make sure they contain the commands which let you use
+Starlink software.
+These are:
+\begin{verbatim}
+    source /star/etc/login
+\end{verbatim}
+in your {\tt .login} file and
+\begin{verbatim}
+    source /star/etc/cshrc
+\end{verbatim}
+in your {\tt .cshrc} file.
+You can see what these commands are by:
+\begin{verbatim}
+    % cat /star/etc/login /star/etc/cshrc | more
+\end{verbatim}
+The {\tt cat} command lists the contents of a one or more files.
+More information about startup scripts is given in sections~\ref{ss1} and
+\ref{ss2}.
+
+\subsection{Getting help}
+
+Unix has a `Manual' stored on-line which includes command descriptions.
+You can look at these with the {\tt man} command.
+For example, to find out about the {\tt ls} command, type:
+\begin{verbatim}
+    % man ls
+\end{verbatim}
+Instead of a command name, you can specify a keyword.
+For example, to find commands which might have something to do with printing,
+type:
+\begin{verbatim}
+    % man -k print
+\end{verbatim}
+On some machines (not Ultrix machines) you can get a one-line description of
+all available commands by typing:
+\begin{verbatim}
+    % man list
+\end{verbatim}
+(This is a long list; use {\tt q} to get the prompt back.)
+If you want to know what a command does, type:
+\begin{verbatim}
+    % whatis cat
+\end{verbatim}
+for example.
+This will tell you what {\tt cat} does.
+(Ignore any error messages about missing files and directories.)
+
+\subsection{Review}
+
+Here is a list of the commands used so far:
+
+\begin{quote}
+\begin{tabular}{lp{5.2in}}
+
+{\tt\bf yppasswd}  & changes your password on all the machines in your cluster. \\
+
+{\tt\bf logout}  & logs you out. \\
+
+{\tt\bf date} & reports the system time and date. \\
+
+{\tt\bf who}  & reports who is currently logged into the system (terse). \\
+
+{\tt\bf finger}  & reports who is currently logged into the system (gives names).
+ \\
+
+{\tt\bf pwd}  & gives the name of your current directory. \\
+
+{\tt\bf ls}   & lists the contents of a directory.  \\
+
+{\tt\bf cat}  & displays the contents of one or more files. \\
+
+{\tt\bf more} &  displays input to the screen, one page at a time. \\
+
+{\tt\bf man}  & gives details of a command. \\
+
+{\tt\bf whatis}  & gives a one-line description of a command.
+\end{tabular}
+\end{quote}
+
+\section{Files and directories}
+
+Now you have looked around and convinced yourself that Unix works, we will
+describe it more systematically.
+This means some duplication, I'm afraid.
+
+Computers process information by running programs.
+Programs and information are stored in files.
+Related files are stored in separate directories.
+The Unix directory structure is tree-like, beginning at a top level
+root directory called {\tt /}, and branching into multiple levels of
+subdirectories.
+Unlike VMS, there are no disk names---extra disks get mounted as subdirectories.
+You just see one directory structure for the whole system.
+A typical example of a Unix directory structure is shown below (each box is a
+directory):
+
+\begin{center}
+\begin{picture}(140,80)
+
+\setlength{\unitlength}{0.6mm}
+
+\put(72.5,95){\framebox(35,10){\tt /}}
+\put(90,90){\line(0,1){5}}
+\put(12.5,90){\line(1,0){155}}
+\put(12.5,85){\line(0,1){5}}
+\put(0,75){\framebox(25,10){\tt etc}}
+\put(42.5,85){\line(0,1){5}}
+\put(30,75){\framebox(25,10){\tt dev}}
+\put(72.5,85){\line(0,1){5}}
+\put(60,75){\framebox(25,10){\tt usr}}
+\put(72.5,65){\line(0,1){10}}
+%
+% second level down from usr
+%
+\put(12.5,70){\line(1,0){90}}
+\put(12.5,65){\line(0,1){5}}
+\put(0,55){\framebox(25,10){\tt bin}}
+\put(42.5,65){\line(0,1){5}}
+\put(30,55){\framebox(25,10){\tt ucb}}
+\put(72.5,65){\line(0,1){5}}
+\put(60,55){\framebox(25,10){\tt lib}}
+\put(102.5,65){\line(0,1){5}}
+\put(90,55){\framebox(25,10){\tt man}}
+%
+% home dir structure
+%
+\put(167.5,85){\line(0,1){5}}
+\put(155,75){\framebox(25,10){\tt home}}
+\put(167.5,50){\line(0,1){25}}
+%
+% 1st level
+%
+\put(70,50){\line(1,0){120}}
+\put(70,45){\line(0,1){5}}
+\put(57.5,35){\framebox(25,10){\tt grm}}
+\put(100,45){\line(0,1){5}}
+\put(87.5,35){\framebox(25,10){\tt rds}}
+\put(130,45){\line(0,1){5}}
+\put(117.5,35){\framebox(25,10){\tt md}}
+\put(160,45){\line(0,1){5}}
+\put(147.5,35){\framebox(25,10){\tt cgp}}
+\put(190,45){\line(0,1){5}}
+\put(177.5,35){\framebox(25,10){\tt pn}}
+%
+% 2nd level
+%
+\put(190,30){\line(0,1){5}}
+\put(112.5,30){\line(1,0){97.5}}
+\put(112.5,25){\line(0,1){5}}
+\put(100,15){\framebox(25,10){\tt proj}}
+\put(112.5,10){\line(0,1){5}}
+\put(102.5,-10){\framebox(20,20){\tt code}}
+\put(147.5,25){\line(0,1){5}}
+\put(135,15){\framebox(25,10){\tt band}}
+\put(180,25){\line(0,1){5}}
+\put(170,5){\framebox(20,20){\tt data}}
+\put(210,25){\line(0,1){5}}
+\put(200,5){\framebox(20,20){\tt test}}
+
+\end{picture}
+\end{center}
+
+\vspace*{15mm}
+The {\tt home} directory has subdirectories which are the `home' directories
+of individual users.
+Thus, directory {\tt /home/pn} is the `home' directory of the user with
+username {\tt pn}.
+Its subdirectories hold all the files for that user.
+The other directory trees are used by the Unix system.
+
+Some sites implement a disk quota system on Unix machines, others do not.
+
+\subsection{Naming things}
+
+Files and directories are located by specifying a `pathname'---the name
+describes the path through the directory structure which ends up at the
+place you want.
+Pathnames can be `absolute' or `relative'.
+A relative pathname is relative to your current directory, while an absolute
+pathname is the path from the root directory {\tt /}---absolute pathnames
+begin with {\tt /}.
+As an example, in the directory structure above there is a directory called
+{\tt cgp}.
+Its full pathname is {\tt /home/cgp}.
+However, if your current directory is {\tt /home}, its relative pathname is
+{\tt cgp}.
+
+Three useful shorthand names are:
+\begin{description}
+\begin{description}
+\item [.] --- current directory (the directory you are in at the moment).
+\item [..] --- parent directory (the directory which contains your current
+ directory).
+\item [$\sim$] --- `home' directory (the directory you are in immediately
+ after login).
+\end{description}
+\end{description}
+
+\subsection{Moving around}
+
+The following command lets you move around the directory structure:
+
+\begin{quote}
+\begin{tabular}{lp{5.2in}}
+
+{\tt\bf cd}  & change directory.
+
+\end{tabular}
+\end{quote}
+
+{\em Examples:}
+
+\begin{quote}
+\begin{tabular}{lp{4.5in}}
+
+{\tt cd test}          & move down one level to subdirectory {\tt test}
+                         (relative pathname).\\
+
+{\tt cd test/lower}    & move down two levels to subdirectory {\tt test/lower}
+                         (relative pathname).\\
+
+{\tt cd /home/grm}     & move to this directory (absolute pathname).\\
+
+{\tt cd}               & move back to your home directory.\\
+
+{\tt cd $\sim$user}    & move to the home directory of `user'.\\
+
+{\tt cd ..}            & move up one directory level.
+
+\end{tabular}
+\end{quote}
+
+\subsection{Looking after directories}
+
+The following commands enable you to look after your directories:
+
+\begin{quote}
+\begin{tabular}{lp{5.2in}}
+
+{\tt\bf ls}  & list the names of the files in a directory. \\
+
+{\tt\bf mkdir}  & create a new directory. \\
+
+{\tt\bf rmdir }  & delete a directory.
+
+\end{tabular}
+\end{quote}
+{\em Examples:}
+
+\begin{quote}
+\begin{tabular}{lp{4.5in}}
+
+{\tt ls -a} &  list the names of all files in a directory (including
+               hidden `.' files).\\
+
+{\tt ls -F} &  list file names with a character appended to each name
+               indicating the file type: \\
+
+               &  {\bf  /}  indicates a directory.\\
+
+               &  {\bf *} indicates an executable file.\\
+
+               &  {\bf @} indicates a soft link (points to another file).\\
+ 
+{\tt ls -R} & list subdirectories recursively.\\
+
+{\tt ls -l} & give full details of files.\\
+
+{\tt ls -dl} & give details of the directory file only, rather than its
+                 contents.
+
+\end{tabular}
+\end{quote}
+
+\vspace*{-8mm}
+
+\begin{quote}
+\begin{tabular}{lp{3.9in}}
+
+{\tt mkdir mydir}     & create a directory called {\tt mydir} below the current
+                           location. \\
+
+{\tt mkdir /home/grm/mydir} & create a directory called {\tt mydir} in the
+                                 specified place. \\
+\\
+{\tt rmdir mydir} & delete directory {\tt mydir}. Directories
+                       will only be deleted if they are empty.  If you cannot
+                       delete a directory that appears empty, look
+                       for hidden files with {\tt ls -a}.
+
+\end{tabular}
+\end{quote}
+
+\subsection{Looking after files}
+
+The following commands enable you to look after your files:
+
+\begin{quote}
+\begin{tabular}{lp{5.2in}}
+
+{\tt\bf cp}  & copy files. \\
+
+{\tt\bf mv}  & move ({\em i.e.}\, rename) files. \\
+
+{\tt\bf rm}  & delete files.
+
+\end{tabular}
+\end{quote}
+
+{\em Examples:}
+
+\begin{quote}
+\begin{tabular}{lp{3.5in}}
+
+{\tt cp geoff.1 geoff.2} & copy file {\tt geoff.1} to file {\tt geoff.2}
+             in the same directory, creating {\tt geoff.2} if necessary. \\
+
+{\tt cp geoff.1 /home/md} & copy file {\tt geoff.1} to directory
+            {\tt /home/md}, giving it the same name as before. \\
+
+{\tt cp geoff.1 /home/md/geoff.2} & copy file {\tt geoff.1} to directory
+            {\tt /home/md}, giving it the name {\tt geoff.2}. \\
+
+{\tt cp f* /home/grm} & copy all files beginning with the letter `f'.\\
+
+{\tt cp -i geoff.1 /home/grm} & {\tt cp} usually overwrites existing files.
+              The {\tt -i} option will prompt for confirmation if the copy 
+              would overwrite an existing file and will proceed only if a
+              {\tt y} is given. \\
+
+{\tt cp -r /home/grm /home/md} & copy recursively a directory
+                             and its contents to the specified location. \\
+\\
+{\tt mv geoff.1 geoff.2} & rename file {\tt geoff.1}, {\tt geoff.2}.\\
+
+{\tt mv geoff.1 /home/md} & move file to a different directory. If a
+                     new filename is specified, the file name will change. \\
+
+{\tt mv -i f* /home/grm} & prompt for confirmation if a move would overwrite
+                  an existing file. \\
+\\
+{\tt rm geoff.1} &  delete file {\tt geoff.1}.  \\
+
+{\tt rm *} &  delete all files in the current directory ({\it without 
+                 prompting!}) \\
+
+{\tt rm -i *} & prompt first before deleting the files.\\
+
+{\tt rm -r /home/grm} & delete everything (directories included) below
+                      the specified directory. \\
+
+{\tt rm -ir} & the recursive option is probably safer when used with the
+               interactive option.
+
+\end{tabular}
+\end{quote}
+
+\subsection{Looking at files}
+
+The following commands show what is in a file:
+
+\begin{quote}
+\begin{tabular}{lp{5.2in}}
+
+{\tt\bf cat }  & show the contents of one or more files. \\
+
+{\tt\bf more } & show the contents of a file, one screen at a time. \\
+
+{\tt\bf head} & show the top ten lines of a file. \\
+
+{\tt\bf tail} & show the bottom ten lines of a file.
+
+\end{tabular}
+\end{quote}
+\goodbreak
+
+{\em Examples:}
+
+\begin{quote}
+\begin{tabular}{lp{3.5in}}
+{\tt cat note1} & show the contents of file {\tt note1}. \\
+{\tt cat dic1 dic2} & concatenate the contents of {\tt dic1} and {\tt dic2} and
+   show the result.\\
+\\
+{\tt more /star/docs/sun.tex} & show the contents of {\tt sun.tex}, one screen
+   at a time.\\
+\\
+{\tt head /star/docs/sun.tex} & show the first 10 lines of {\tt sun.tex}.\\
+\\
+{\tt tail /star/docs/sun.tex} & show the last 10 lines of {\tt sun.tex}.
+\end{tabular}
+\end{quote}
+
+\subsection{Finding out about files}
+
+The following commands give information about files:
+
+\begin{quote}
+\begin{tabular}{lp{5.2in}}
+
+{\tt\bf du }  & show file size.\\
+{\tt\bf file} & show file type.\\
+{\tt\bf wc} & show line, word and character counts.\\
+
+\end{tabular}
+\end{quote}
+
+File size is shown in Kbyte on a DECstation or Alpha, but in units of 512 bytes
+on a Sun.
+
+{\em Examples:}
+
+\begin{quote}
+\begin{tabular}{lp{3.5in}}
+{\tt du -s * | sort -nr | head} & show the sizes of the top ten largest files
+   in your current directory.\\
+\\
+{\tt file /star/docs/*} & show the type of each file in {\tt /star/docs}.\\
+\\
+{\tt wc /star/docs/sun1.tex} & show the number of lines/words/characters in
+    {\tt sun1.tex}.
+\end{tabular}
+\end{quote}
+
+\subsection{Finding things in files}
+
+The following commands find things in files:
+
+\begin{quote}
+\begin{tabular}{lp{5.2in}}
+
+{\tt\bf grep}  & find a string in a file.\\
+{\tt\bf awk}   & find a string in a file and perform an action.
+
+\end{tabular}
+\end{quote}
+These are both powerful and complex commands, and we can't describe them fully
+here.
+The examples below illustrate the sort of things they can do, but you should
+look them up in a Unix book if you want to understand and use them properly.
+The precise syntax varies on different machines.
+
+\goodbreak
+
+{\em Examples:}
+
+\begin{quote}
+\begin{tabular}{lp{2.8in}}
+{\tt grep Lawden /star/admin/whoswho} & search {\tt whoswho} for information on
+`Lawden'.\\
+{\tt grep -l IUE /star/docs/* | more } & find which Starlink documents mention
+IUE.\\
+\\
+{\tt who | awk '{print \$1}' | sort | uniq -c} & show in alphabetical order who
+    is logged in, and how many sessions they've got.\\
+{\tt ls -l | awk '\$4 > 10000 \{print\}'} & show which files in your current
+    directory are bigger than 10000 bytes.  If you are using Solaris, the size
+    appears in the 5th field, so you must replace {\tt \$4} by {\tt \$5}.
+\end{tabular}
+\end{quote}
+
+\subsection{Controlling access to files}
+
+File protection is implemented by {\em file ownership}\, and {\em permissions}.
+The creator of a file is the owner, and the file is created with default
+permissions.
+The owner can then alter these permissions to allow the required degree of
+access to the files.
+
+Permissions are split into three categories: {\tt user} (the file
+owner), {\tt group} (members of the user's group) and {\tt others}
+(everyone else).
+
+There are three types of permission, but their effect varies slightly between
+directories and files:
+\begin{quote}
+\begin{tabular}{lp{4.5in}}
+ {\em Normal files:} &\\
+&\\
+ READ (r) &  can look at the contents. \\
+
+ WRITE (w)& can modify the contents or delete.\\
+
+ EXECUTE (x) & can execute.\\
+&\\
+
+ {\em Directories:} &\\
+&\\
+
+ READ (r) & can list contents.\\
+
+ WRITE (w) & can modify contents.\\ 
+
+ EXECUTE (x) & can move through (use in a pathname).
+
+\end{tabular}
+\end{quote}
+
+File permissions can be seen by typing an {\tt ls -l} command.
+This displays information similar to that shown below:
+\begin{quote}
+{\tt
+\begin{tabular}{l l l r l r l l}
+drwxr-xr-x &2& grm& 512& Nov& 18& 04:10& mydir \\
+-rwxr-xr-x &1 &grm &1640 &Nov &21 &18:15 &workfile 
+\end{tabular}
+}
+\end{quote}
+
+The first field is the permission field.
+Its first character shows the file type: the most common are normal files
+({\tt -}) and directory files ({\tt d}).
+The next three characters describe the `user' permissions, followed by three
+for `group' and three for `others' permissions, making a ten-character field in
+all.
+The permissions can be described in octal format instead of by letters.
+Those for each category are totalled, giving three digits to describe the file.
+For example:
+\begin{quote}
+{\tt -rw-r--r--} is equivalent to {\tt 644}.
+
+{\tt -rwxr-xr-x} is equivalent to {\tt 755}.
+\end{quote}
+The owner can change the permissions of a file with the {\tt chmod} command.
+Either octal or character notation can be used:
+\begin{quote}
+\begin{tabular}{lp{4.0in}}
+
+{\tt chmod 700 geoff.1} & set full access to user, none to group or others.\\
+
+{\tt  chmod 740 g*}     & set full access to user, read access to group,
+                        none to others, for all files beginning with g.\\
+
+{\tt  chmod og=rw g*}   & set others and group to read and write access.\\
+
+{\tt  chmod og+w g*}    & add write access to others and group.\\
+
+{\tt  chmod og-w g*}    & remove write access from others and group.\\
+
+{\tt  chmod a=rw g*}    & set all ({\em i.e.}\, user, group and others) to
+                          read and write access.\\
+
+{\tt  chmod -R 755 mydir} & recursively set access to files below {\tt mydir}
+                           directory. \\
+
+{\tt  chmod 755 script}  & a script (a file of shell commands) must have execute
+                          permission to run; you set it like this.
+
+\end{tabular}
+\end{quote}
+
+\subsection{Accessing files on a VAX}
+
+If your site still has a VAX and you want to access files on it, you may find
+that VAX directories have been incorporated into your Unix file system.
+If so, files in these directories can be accessed like any other Unix file: just
+specify the path.
+Ask your Site Manager what names to use on your system to access VAX disks.
+
+If your VAX files are not part of the Unix file system, you must copy
+them over a network; see Section~\ref{Mail}.
+
+\subsection{Backing up files}
+
+You can backup your files to a tape or disk file with the {\tt tar} command.
+The resulting file is called a tarfile.
+The basic syntax is:
+\begin{verbatim}
+    % tar cvf <destination> <source>
+\end{verbatim}
+(The omission of the {\tt -} character before the options {\tt cvf} is
+deliberate; for some commands it is not required.)
+This recursively backs up all the files in the {\tt <source>} directory
+structure into a {\tt <destination>} tarfile or tape drive.
+The {\tt c} option specifies that a new tarfile is to be created;
+the {\tt v} option specifies verbose mode (each file's name is logged to your
+terminal);
+the {\tt f} option indicates that the next field ({\em i.e.}\,
+{\tt <destination>}) specifies the name of the tarfile.
+
+A tarfile can be {\em relative}\, or {\em absolute}, depending on how the
+source file name is specified.
+This example produces an absolute tarfile:
+\begin{verbatim}
+    % tar cvf /dev/rst0 /home/grm
+\end{verbatim}
+because {\tt /home/grm} is an absolute file name.
+The destination {\tt /dev/rst0} specifies that the tarfile will be written to
+tape drive {\tt st0}.
+When this absolute tarfile is unpacked, the files are restored to directory
+{\tt /home/grm}, regardless of the current working directory.
+
+This example produces a relative tarfile:
+\begin{verbatim}
+    % tar cvf /home/grm/tarfile.tar .
+\end{verbatim}
+because the {\tt <source>} (the current directory) is specified as a
+relative file name.
+It is conventional to use the extension {\tt .tar} in a tarfile name.
+When a relative tarfile is unpacked, it will recreate the stored file
+structure under the current directory.
+
+To {\em list}\, the contents of a tarfile, use the {\tt t} option:
+\begin{verbatim}
+    % tar tvf /home/grm/tarfile.tar
+\end{verbatim}
+To {\em restore}\, the contents of a tarfile, use the {\tt x} option:
+\begin{verbatim}
+    % tar xvf /home/grm/tarfile.tar
+\end{verbatim}
+Many other options are available; see the {\tt man} pages for details.
+
+You may have old backup files written on a VAX.
+Program VMSBACKUP enables tapes written in VMS BACKUP format to be read on
+Unix machines; see SUN/151.
+
+\section{Shells---The command languages}
+
+`Shell' is the Unix term for `command language interpreter'.
+Several different shells are available:
+\begin{itemize}
+\item C shell (csh).
+\item T-C shell (tcsh).
+\item Bourne shell (sh).
+\item Korn shell (ksh).
+\end{itemize}
+Starlink's Unix software can be run from the C shell or T-C shell, but
+not from the Bourne or Korn shells.
+We recommend the T-C shell; it is a variant of the C shell with file name
+completion and command line editing.
+The C shell is also a good choice since it has more features for interactive
+users than the Bourne shell.
+Starlink doesn't support the Korn shell yet.
+
+The following sections describe features of the C shell.
+
+\subsection{Standard files}
+
+A program works with three special `files' which are normally connected to your
+terminal's screen and keyboard.
+Normally, it receives input from {\tt stdin} (the keyboard), sends output to
+{\tt stdout} (the screen), and error messages to {\tt stderr} (also the screen).
+However, this can be redirected by special operators:
+\begin{quote}
+\begin{tabular}{lp{5.4in}}
+
+{\tt $>$} & directs {\tt stdout} to a file.
+           {\em e.g.}\, {\tt date > date.file} writes the date/time to file
+            {\tt date.file}.\\
+
+{\tt  $>>$} & appends {\tt stdout} to an existing file.\\
+
+{\tt  $<$} & directs {\tt stdin} to read from a file.
+            {\em e.g.}\, {\tt cat > newfile < date.file} writes the contents of
+             {\tt date.file} to {\tt newfile}.
+
+\end{tabular}
+\end{quote}
+
+\subsection{Pipes}
+
+A Pipe is an important and useful feature of Unix:
+\begin{quote}
+\begin{tabular}{lp{5.4in}}
+
+{\tt  $\mid$} & directs the {\tt stdout} of one command into
+  the {\tt stdin} of another without creating a temporary intermediate file.
+  {\em e.g.}\, {\tt ls -l | more} shows a directory listing, page by page.
+
+\end{tabular}
+\end{quote}
+
+\subsection{Filename expansion}
+
+You can specify multiple file names in a single expression by including
+certain characters in the name you type:
+
+\begin{quote}
+\begin{tabular}{lp{5in}}
+
+{\tt  *}  & represents one or more characters.
+  {\em e.g.}\, {\tt A*} represents any name beginning with {\tt A}.\\
+
+{\tt  ?}  & represents a single character.
+  {\em e.g.}\, {\tt CA?} represents any three character name beginning
+  with {\tt CA}; thus {\tt CAD} and {\tt CAT} would be recognised.\\
+
+{\tt  [a-z]}   & a string of characters enclosed in brackets is known as a
+  `character class'.
+  It means {\em match any single character which appears within the brackets.}
+  You can specify individual characters like {\tt [aft]}, or sequences of
+  characters like {\tt [a-c]}.
+  {\em e.g.}\, {\tt CA[DT]} represents the two names {\tt CAD} and {\tt CAT}. \\
+
+{\bf $\sim$}   & represents a user's home directory.
+  {\em e.g.}\, {\tt cd {\bf $\sim$}/subdir} will change directory to
+  {\tt subdir} below your home directory.
+
+\end{tabular}
+\end{quote}
+
+
+\subsection{History file}
+
+The history file allows commands entered earlier in your session to be recalled
+for reuse or modification.
+It is not as convenient as the VMS command line recall system; however, if you
+are using the T-C shell, you can recall the last command by pressing the
+up-arrow key.
+
+To activate the history mechanism, type:
+\begin{verbatim}
+    % set history = <n>
+\end{verbatim}
+where {\tt <n>} is the number of previous commands to store (23 is a good
+number to choose, giving one screenful of the most recent commands entered).
+This command is best included in your {\tt .cshrc} file as this will cause
+the history mechanism to be activated automatically for every shell you start.
+Once activated, commands like the following can be used:
+\begin{quote}
+\begin{tabular}{lp{4.5in}}
+
+{\tt history} & displays a list of previously entered commands.\\
+
+{\tt  !39}    & execute command 39 again.\\
+ 
+{\tt !p}      & working back from the most recent command in the list, execute
+   the last command beginning with {\tt p}.\\
+
+{\tt \verb+^t^d+} & replace {\tt t} by {\tt d} in the last command and
+   re-execute.
+   {\tt t} and {\tt d} can be character strings of any length.\\
+
+{\tt !39:p}   & recall command 39 but do not execute.
+   This allows a command entered earlier to made the most recent one.
+   It can then be edited using the `\verb+^+' operator.\\
+
+{\tt du !\$}  & {\tt !\$} represents the last field in the previous command.\\
+
+{\tt !? memo} & scan the history list for the last command that contained the
+               string {\tt memo}, then execute it.\\
+
+{\tt !!}      & re-execute the last command.\\
+
+{\tt !!letters}  & re-execute the last command, after having appended the text
+    following {\tt !!} to it.\\
+
+{\tt !103:s/te/et} & recall command 103 and replace the first occurrence of
+                     {\tt te} by {\tt et} before executing it.\\
+
+{\tt !103:gs/te/et} & recall command 103 and replace {\it all}\, occurrences
+              of {\tt te} by {\tt et} before executing it.
+
+\end{tabular}
+\end{quote}
+
+\subsection{Variables}
+
+Two types of variable are used by the C shell:
+\begin{itemize}
+\item Shell variables
+\item Environment variables
+\end{itemize}
+Their main features are shown below:
+\begin{center}
+\begin{tabular}{|l|l|l|}
+\hline
+ & {\bf Shell variables} & {\bf Environment variables} \\ \hline \hline
+{\em Scope} & Current shell & Global \\ \hline
+{\em Naming convention} & lower case & upper case \\ \hline
+{\em Type} & strings, numbers,  arrays & strings (only) \\ \hline
+{\em Reference} & {\tt \$var} & {\tt \$VAR} \\ \hline
+{\em Set value} & {\tt set var = value} & {\tt setenv VAR value} \\ \hline
+{\em Show value} & {\tt echo \$var} & {\tt echo \$VAR} \\ \hline
+{\em Show all values} & {\tt set} & {\tt printenv} \\ \hline
+\end{tabular}
+\end{center}
+Scope is a little more complicated than described above\footnote{To be precise,
+the scope ({\em i.e.}\, where it is valid) of an environment variable is the
+shell in which it is defined and any sub-shells created under that shell, but
+not any parent shells of that shell.}.
+
+Variables control the way the shell operates and certain ones are set by
+default.
+Here is a list of shell variables that are frequently defined:
+\begin{quote}
+\begin{tabular}{lp{4.5in}}
+{\tt argv() } & passes command line arguments.              \\
+{\tt  cwd   } & your current working directory. \\   
+{\tt  home  } & your home directory. \\
+{\tt  path  } & list of directories searched for a command.           \\
+{\tt  prompt} & the shell prompt.                                     \\
+{\tt  shell } & the default shell. \\
+{\tt  status} & reports whether a command succeeded.                  \\
+{\tt  term  } & terminal type.                                        \\
+{\tt  user  } & username used to login.
+\end{tabular}
+\end{quote}
+Many other shell variables can be used; the manual page for {\tt csh}
+describes them.
+Some don't need values but can be toggled on or off by {\tt set} or {\tt unset}.
+Here are a few examples:
+\begin{quote}
+\begin{tabular}{lp{4.4in}}
+
+{\tt  set filec} & enables filename completion.
+   Type in an unambiguous part of a file specification, press {\tt <Escape>},
+   and the shell will complete the filename.                     \\
+
+{\tt  set noclobber} & restricts output redirection so that existing
+                 files are not destroyed by accident.               \\
+
+                  & {\tt $>$} redirections can only be made to new files.\\
+
+                  & {\tt  $>>$} redirections can only be made to existing
+                    files.\\
+
+{\tt  unset noclobber} & removes the definition of the {\tt noclobber} variable
+                   and cancels its effect.
+
+\end{tabular}
+\end{quote}
+Here is an example of a shell variable being defined and then used:
+\begin{verbatim}
+    % set mydocs = ~/docs
+    % cd $mydocs
+\end{verbatim}
+This is how you define and use arrays:
+\begin{verbatim}
+    % set localmail = (ptw mdl cac dlt)
+    % mail $localmail[2]
+\end{verbatim}
+This would send mail to {\tt mdl}.
+
+Some variable names, such as {\tt path} and {\tt term}, are unusual in that
+they refer to both shell and environment variables which are identical.
+Thus, you can add more directories to the {\tt path} by treating it as a shell
+variable:
+\begin{verbatim}
+    % set path=($path /usr/local/cad)
+\end{verbatim}
+or as an environment variable:
+\begin{verbatim}
+    % setenv PATH $PATH:/usr/local/cad
+\end{verbatim}
+One difference is that when {\tt path} is used as a shell variable, its value is
+an array whose components are separated by blank characters, but when it is
+used as an environment variable, the components are separated by {\tt :}
+characters.
+You can see this by trying {\tt echo \$path}, followed by {\tt echo \$PATH}.
+
+Remember, shell variables are only valid in the shell in which they are set.
+They are not passed down to any subsequent shells that are started.
+However, you can make them available automatically by putting their definitions
+in your {\tt .cshrc} file (see section~\ref{ss1}).
+
+\subsection{Aliases}
+
+The {\tt alias} command saves you time by giving shorthand names to long command
+strings that you use frequently.
+Here are some examples:
+\begin{quote}
+\begin{tabular}{lp{4.0in}}
+
+{\tt alias h history} & shortens the command {\tt history} to the single letter
+  {\tt h}.\\
+
+{\tt  alias dir ls} & allows your favourite VMS command {\tt dir} to work the
+   same way in Unix (perhaps not a good idea in the long run).\\
+
+{\tt  alias ll 'pwd;ls -l'} & allows a sequence of commands to be executed as a
+   single command.\\
+
+{\tt  alias } & on its own, shows all the aliases currently defined within the
+                shell.\\
+
+{\tt  unalias ll} & removes the alias {\tt ll}.
+
+\end{tabular}
+\end{quote}
+
+\subsection{Startup scripts}
+\label{ss1}
+
+As already mentioned (section~\ref{suye}), two files containing commands are
+executed automatically when you login:
+\begin{itemize}
+\item {\tt .cshrc}
+\item {\tt .login}
+\end{itemize}
+They must reside in your home directory.
+The difference between them is that {\tt .cshrc} is executed whenever a C shell
+(or T-C shell) is started, but {\tt .login} is only executed at login time.
+Thus, {\tt .login} is used to set up a global environment which affects your
+entire terminal session.
+For example, it can define environment variables such as {\tt TERM} and
+{\tt PATH}, set up terminal characteristics using {\tt stty}, and start up
+X-windows.
+On the other hand, {\tt .cshrc} is used to define shell variables and aliases
+(which are defined only for a specific shell).
+
+Special definitions are required in order to run Starlink software successfully.
+These are stored in {\tt /star/etc/login} and {\tt /star/etc/cshrc}.
+These contain definitions that should be added to those in {\tt .login} and
+{\tt .cshrc}.
+This is done by reading these extra files from within the original files; the
+Unix term for this process is `sourced'.
+Thus, your {\tt .login} file should contain the command:
+\begin{verbatim}
+    source /star/etc/login
+\end{verbatim}
+and your {\tt .cshrc} file should contain the command:
+\begin{verbatim}
+    source /star/etc/cshrc
+\end{verbatim}
+These commands should appear at the end of the files, so that anything else
+you do in them does not override Starlink definitions.
+
+\subsection{Shell scripts}
+\label{ss2}
+
+A text file that is interpreted as a set of commands by a shell is called a
+{\em shell script}.
+If you type a command that is the name of a text file, the shell assumes this
+file contains a shell script and creates a new process running a new shell.
+This new shell reads the standard startup file for that shell ({\tt .cshrc}
+for the C shell) and executes the commands in your text file.
+
+The shell that executes a shell script might not be the same type as the one
+into which you are typing commands.
+The exact rules for which shell is used are rather complex, but briefly, if the
+first line of a shell script is:
+\begin{itemize}
+\item a normal command, the Bourne shell is used.
+\item a comment, the C shell is used, except that:
+\item if the comment is {\tt \#!/bin/sh}, the Bourne shell is used.
+\item if the comment is {\tt \#!/bin/csh}, the C shell is used.
+(This mechanism can be generalised for other shells.)
+\end{itemize}
+A common problem for users of the C shell or T-C shell is to write a quick
+shell script and wonder why it fails completely.
+Often, this is because there are no comments at the top of the script (yes,
+we all do it), so the script is run by the Bourne shell.
+Many Bourne shell commands are different from the corresponding C shell
+commands.
+
+\subsection{What happens when you type a command}
+
+I know we promised not to have any unnecessary detail in this document, but
+sometimes it is useful to know just what happens when you type a command in
+Unix, particularly as this differs from VMS.
+If you don't want to know this yet, skip the rest of this section.
+
+When you enter a command, the shell you are talking to examines what you have
+typed and works out what to do.
+The first thing it does is see if the command (the first word you typed)
+matches an alias.
+If it does, the shell replaces the command with its alias.
+There are now two possibilities.
+If the command is a shell command (one that it understands such as
+{\tt setenv}), the shell processes the command itself.
+Otherwise, it takes the command to be the name of a program to run.
+It must now find the program.
+It does this by examining the environment variable PATH.
+It looks in turn in each of the directories specified in PATH for a file that
+matches the name of the command.
+Once found, there are again two possibilities.
+If the file is executable ({\em e.g.}\, the result of compiling and linking a Fortran
+program), the shell creates a new process that is an almost identical copy
+of the current one (this is known as forking a process) and executes the
+program in that new process.
+If the file contains ASCII text (known as a shell script), the shell again
+forks a new process, but this time the program that is run is a shell.
+If it is a C shell, it will read the {\tt .cshrc} file in your home directory.
+The new shell then reads the contents of the text file and executes each
+command, using the above rules.
+
+The difference from VMS is that each executable command is run in a new
+process.
+This means that programs cannot affect each other.
+In particular, program A cannot set an environment variable to be used
+subsequently by program B.
+
+\section{Controlling processes}
+
+In Unix, you can have several things going on at once.
+You may be compiling a large package, editing a couple of documents, monitoring
+your mail messages, keeping your eye on the clock and watching the load on
+your computer.
+You keep switching your attention between these various tasks.
+In computing terms, this means that there are several processes competing
+for system resources.
+
+Normally, when you enter a command, you have to wait until the job or process
+that carries out this command has finished before you can enter another
+command.
+In this case, the job runs in the `foreground'.
+However, if you end the command with an `{\tt \&}', the job runs in the
+`background'; which means that you can type another command while the previous
+one is being processed.
+(A background process is like the SPAWN command in VMS.)
+You can also stop a job from running.
+This can be a temporary suspension ({\em i.e.}\, you can start the job again),
+or you can `kill' the job so that it ceases to exist and cannot be restarted.
+The diagram below illustrates these various states, and the transitions between
+them.
+
+\begin{picture}(160,70)
+\setlength{\unitlength}{1mm}
+%
+% Draw boxes
+%
+\put(40,55){\framebox(40,10){\bf suspended}}
+\put(5,30){\framebox(40,10){\bf foreground}}
+\put(75,30){\framebox(40,10){\bf background}}
+%
+% Draw arrows
+%
+\put(10,10){\vector(0,1){20}}
+\put(10,40){\line(0,1){20}}
+\put(10,60){\vector(1,0){30}}
+\put(110,10){\vector(0,1){20}}
+\put(110,40){\line(0,1){20}}
+\put(110,60){\vector(-1,0){30}}
+\put(40,55){\vector(0,-1){15}}
+\put(40,30){\vector(0,-1){20}}
+\put(80,55){\vector(0,-1){15}}
+\put(80,30){\vector(0,-1){20}}
+\put(75,35){\vector(-1,0){30}}
+%
+% Draw text
+%
+\put(12,45){\tt ctrl/Z}
+\put(42,45){\tt fg}
+\put(73,45){\tt bg}
+\put(100,45){\tt stop}
+\put(58,37){\tt fg}
+\put(42,18){\tt ctrl/C}
+\put(70,18){\tt kill}
+\put(2,3){\tt command}
+\put(102,3){\tt command \&}
+\put(140,58){\em Suspended}
+\put(140,52){\em (Stopped)}
+\put(140,33){\em Running}
+\put(140,10){\em Terminated}
+\end{picture}
+
+\vspace*{5mm}
+
+Processes are identified in three ways:
+\begin{description}
+\begin{description}
+\item [PID] --- Process identifier.
+\item [\%N] --- Job number N.
+\item [\%] --- Current job.
+\end{description}
+\end{description}
+Thus, if you want to terminate a background job, you can do it with any of
+the commands:
+\begin{verbatim}
+    % kill PID
+    % kill %N
+    % kill %
+\end{verbatim}
+You can find out the process identifiers of your existing processes with the
+{\tt ps} command.
+The output format on SunOS and Solaris is slightly different, on SunOS it is:
+\begin{verbatim}
+    % ps
+      PID TT STAT  TIME COMMMAND
+     8585 p0 S     0:01 -tcsh (tcsh)
+     8612 p0 R     0:00 ps
+\end{verbatim}
+The example shows a situation in which two processes exist.
+The first (PID=8585) is running {\tt tcsh} and is suspended.
+The second (PID=8612) is running the {\tt ps} command and is in the foreground.
+
+You can find out your current job numbers with the {\tt jobs} command:
+\begin{verbatim}
+    % jobs
+    [1] + Running    du >storage &
+    [2] - Running    cc -o foo foo.c >&errs &
+    [3] - Stopped    find / -size 0 -print
+\end{verbatim}
+The job numbers are enclosed in brackets.
+The `+' indicates which job is the `current job'.
+
+A background job will halt when it needs input from your terminal.
+To proceed, bring it to the foreground with the {\tt fg} command and type some
+input.
+
+If you wish to execute a job at a later time (rather than immediately by using
+an {\tt \&}), you can use the {\tt at} commmand.
+For example:
+\begin{verbatim}
+    % at 23:00 Jul 07 < spectrum
+\end{verbatim}
+will run the commands in file {\tt spectrum} at 23:00 on 7th July.
+\begin{verbatim}
+    % at -l
+\end{verbatim}
+will list all your scheduled jobs.
+
+You can control the priority at which commands execute with the {\tt nice}
+command; look this up in the {\tt man} pages.
+
+\section{Editing text}
+
+Editors are personal things, so it is impossible to make a recommendation
+that will satisfy everyone.
+If you are used to EDT or EVE, we recommend {\tt nu/TPU} because it simulates
+them very well.
+A document describing {\tt nu/TPU} has been distributed to every site---see
+your Site Manager.
+To use it, just type the command {\tt tpu}, followed by the name of the file
+you want to edit (on DECstations and Alphas, this command will start DEC's own
+{\tt tpu} editor).
+
+Alternatives include {\tt jed} (SUN/168), and {\tt emacs} (SUN/34, MUD/102).
+These can emulate EVE and have some VAX features.
+
+The standard Unix screen editor is {\tt vi}.
+This will seem strange to EDT/EVE users, but it is very fast and at non-Starlink
+sites it may be the only editor available, so you may need to know how to use
+it.
+It is documented in MUD/122 and MUD/123.
+
+Further information on editors is given in SUN/170.
+They can have a big impact on your work, so we strongly recommend that you
+read this carefully and think about the issues.
+
+\section{Producing documents and graphs}
+
+\subsection{Documents}
+
+We recommend you use \LaTeX\ to produce documents; see SUN/9.
+We also recommend that you base your documents on standard Starlink styles,
+such as {\tt /star/docs/sun.tex}; see SGP/28.
+
+To run \TeX\ and \LaTeX, type:
+\begin{verbatim}
+    % tex filename
+\end{verbatim}
+or
+\begin{verbatim}
+    % latex filename
+\end{verbatim}
+to process file {\tt filename}.
+You need not give the {\tt .tex} file extension, but it won't matter if you
+do. 
+
+To view or print the resulting {\tt filename.dvi} file there are several
+options. 
+To view your document in an X-window, use the {\tt xdvi} utility; see SUN/9:
+\begin{verbatim}
+    % xdvi filename
+\end{verbatim}
+(If you get the error message `{\tt Error: Can't open display:}', type
+{\tt xdisplay} and try again.
+This isn't the place to discuss X-windows, but you can look at the description
+of {\tt xdisplay} in SUN/129 for enlightenment.)
+
+To make printable versions, use the {\tt dvips} translator:
+\begin{verbatim}
+    % dvips filename
+\end{verbatim}
+Then print the resulting PostScript file by a command like:
+\begin{verbatim}
+    % lpr -P1 filename.dvi-ps
+\end{verbatim}
+The appropriate option is locally dependent---see your Site Manager.
+Other options enable you to print ordinary text files rather than PostScript
+files.
+
+\subsection{Graphs}
+
+All Starlink's graphics software works on Unix the same as it does on VMS.
+If you are using X to run programs on a remote workstation, use command
+{\tt xdisplay} to set up the connection between the workstation and your X
+device before running any graphics program (or any other X application).
+Reply {\tt xwindows} if prompted for a graphics device name.
+
+\section{Mailing and Networking}
+\label{Mail}
+
+\subsection{Pine}
+
+The default {\tt mail} utility is adequate but unfriendly.
+We recommend {\tt pine}.
+It is designed to be easy for a novice to use.
+For example, it tolerates mistakes, and its command menus are always present.
+It can be learned by exploration rather than by reading manuals, although the
+nervous can read SUN/169.
+To start it, just type {\tt pine}.
+
+More information on mail can be found in SUN/36.
+
+\subsection{Mail addresses}
+
+Starlink does not run a DECnet service on its Unix machines, so you can't send
+mail to addresses like RLVAD::MDL.
+Instead, you use a modified form of JANET address.
+You may already be using JANET addresses, like:
+\begin{verbatim}
+    cbs%uk.ac.rl.star::cac
+\end{verbatim}
+on your VAXes.
+Here, the {\tt cbs\%} indicates that mail is being sent to a Coloured Book or
+JANET site, the JANET address is {\tt uk.ac.rl.star}, and the username is
+{\tt cac}.
+Notice that the JANET address precedes the username.
+
+On Unix you send mail to addresses like:
+\begin{verbatim}
+    cac@star.rl.ac.uk.
+\end{verbatim}
+Here the username precedes the modified JANET address, and they are separated
+by an `@'.
+The JANET address is modified by having its elements appear in reverse order.
+This form of address is known as the `Internet' or `IP' form, and this
+should be used on Starlink's Unix machines. 
+(It is only a convention that the IP address is the same as the reversed JANET
+address.  At some sites this isn't true.)
+
+The network addresses of Starlink sites can be found in
+{\tt /star/admin/whoswho}.
+
+To aid migration to Unix, Starlink has a DECnet/IP gateway installed at RAL.
+This allows Unix machines to access DECnet sites not on JANET, and vice versa,
+as shown in the following list:
+\begin{description}
+\begin{description}
+\item [IP to DECnet] ---
+Send to: $<user>$\%$<node>$.dnet@star-gw.rl.ac.uk.
+
+\item [DECnet to IP] ---
+Send to: RLSGW::"$<user>$@$<host>$".
+
+Because mail to and from the gateway is sent via the RAL mail relay, you can
+also use the gateway to route mail between DECnet and JANET (Coloured books)
+sites. 
+
+\item [JANET to DECnet] ---
+Send to: $<user>$@$<node>$.dnet@uk.ac.rl.star-gw.
+
+\item [DECnet to JANET] ---
+Send to: RLSGW::"$<user>$@$<site>$"
+
+The site name must be given in full and in the `Internet' order, for example
+star.rl.ac.uk, not uk.ac.rl.star or star.rl.
+\end{description}
+\end{description}
+The items enclosed in angle brackets should be replaced as follows:
+\begin{quote}
+\begin{tabbing}
+XXXXXXXXXX\=\kill
+$<user>$ \> A username ({\em e.g.}\, {\tt DLT})\\
+$<node>$ \> A DECnet node name ({\em e.g.}\, {\tt RLVAD})\\
+$<host>$ \> An IP host name ({\em e.g.}\, {\tt star.rl.ac.uk})
+\end{tabbing}
+\end{quote}
+
+There's no easy way to copy your old VAX mail files into a Unix system.
+
+\subsection{Copying files across networks}
+
+There are several ways to copy files from one machine to another.
+The best method may depend on how your local system is set up.
+Nevertheless, there are several standard methods that normally work:
+
+\begin{description}
+\begin{description}
+
+\item [Local machines ({\tt cp})] \hspace*{\fill}
+
+All the disks on your local group of machines will probably appear as part of
+your file system.
+If so, just use the {\tt cp} command in the normal way:
+\begin{verbatim}
+    % cp <source-pathname> <destination-pathname>
+\end{verbatim}
+
+\item [Other machines ({\tt ftp})] \hspace*{\fill}
+
+You need a username on the remote machine.
+Type:
+\begin{verbatim}
+    % ftp remote_host
+\end{verbatim}
+where {\tt remote\_host} is either the name of a host (like
+{\tt ftp.ncsa.uiuc.edu}), or its `dotted quad' network number (like
+{\tt 128.40.4.169}).
+You will be prompted for your remote username and password, and will be
+logged in for file transfer work only.
+You can use directory changing and listing commands such as {\tt cd} and
+{\tt ls} to locate the files you want.
+To copy a file from a remote machine to your local one, type:
+\begin{verbatim}
+    ftp> get remote_filename local_filename
+\end{verbatim}
+To copy a file from your local machine to a remote one, type:
+\begin{verbatim}
+    ftp> put local_filename remote_filename
+\end{verbatim}
+You can {\tt get} files from any remote host on which you have a username,
+and you can {\tt put} files to any remote host on the same basis.
+
+By default, {\tt ftp} will transfer data in ASCII mode---which is correct for
+text files.
+To transfer binary files (executables, tar files, NDF container files
+{\em etc.}), set {\tt ftp} into {\tt binary} mode.
+Otherwise, although the transfers will probably happen, the destination file
+will probably be useless. 
+To get {\tt ftp} into binary mode, type:
+\begin{verbatim}
+    ftp> binary
+\end{verbatim}
+To get help in an {\tt ftp} session, type:
+\begin{verbatim}
+    ftp> help
+\end{verbatim}
+To disconnect from an {\tt ftp} session, type:
+\begin{verbatim}
+    ftp> quit
+\end{verbatim}
+\end{description}
+\end{description}
+Some hosts have a special facility called `anonymous ftp.'
+This has some disk space for a `public' area, and is commonly used to
+allow distribution to remote users of common software utilities, pictures
+{\em etc.}
+To use it, start a normal {\tt ftp} session to the host, but instead of using
+your username, login as {\tt anonymous}.
+You will be prompted for your local username and node name in lieu of a
+password. 
+Specify your full network address (for example \verb+mdl@star.rl.ac.uk+) as the
+password so that the owners of the system can find out who is accessing it.
+You will gain access to a limited set of files, provided for the anonymous ftp
+facility, which you can copy to your local machine as described above. 
+
+\subsection{Logging into another machine}
+
+To login to another machine {\em from your current session}\, use {\tt telnet}.
+The command is:
+\begin{verbatim}
+    % telnet remote_host
+\end{verbatim}
+You will be prompted for a username and password, depending on what the
+{\tt remote\_host} requires for user identification.
+The form of the name you give as a {\tt remote\_host}
+will depend upon how your Site Manager has set up your systems.
+In some cases you will be able to type just the machine name.
+For more remote machines, {\em i.e.}\, those in different network domains, you
+may have to give the full network address.
+For example, to connect to the Starlink anonymous ftp machine, users of RAL
+machines need only type:
+\begin{verbatim}
+    % telnet starlink-ftp
+\end{verbatim}
+whereas users of machines outside RAL would probably need to type:
+\begin{verbatim}
+    % telnet starlink-ftp.rl.ac.uk
+\end{verbatim}
+You can also use the `dotted quad' network number of the machine:
+\begin{verbatim}
+    % telnet 130.246.32.53
+\end{verbatim}
+
+\section{Using Starlink software}
+\label{USSC}
+
+The Starlink software on Unix is called the `Unix Starlink Software Collection'
+(USSC).
+Its content, organisation and use are described in SUN/118, and an up-to-date
+specification is stored in {\tt /star/admin/ssi}.
+The executable programs are stored in {\tt /star/bin} and the documents
+are stored in {\tt /star/docs}.
+
+The USSC is based on the original VAX version of the Starlink software.
+However, it has some specifically Unix additions called the `Base Set' which
+comprises a number of utilities to make all Starlink sites look similar to the
+wandering astronomer.
+These are:
+\begin{description}
+\begin{description}
+\item [Editors]  \hspace*{\fill}
+\begin{description}
+\item [jed] --- a public-domain editor which emulates EDT.
+\item [tpu] --- proprietary editors which emulate EDT and EVE (nu/TPU on Suns
+ and DEC TPU on DECstations).
+\item [emacs] --- a sophisticated editor.
+\end{description}
+\item [Document processors]  \hspace*{\fill}
+\begin{description}
+\item [TeX] --- a type setting program which includes \LaTeX. It is the
+ standard tool used to produce Starlink documents.
+\end{description}
+\item [Mailers] \hspace*{\fill}
+\begin{description}
+\item [pine] --- mail utility.
+\end{description}
+\item [Shells] \hspace*{\fill}
+\begin{description}
+\item [tcsh] --- an improved C shell.
+\end{description}
+\item [Compilers] \hspace*{\fill}
+\begin{description}
+\item [gcc] --- a C compiler called Gnu C. Only available on Suns---DEC machines
+ come with a bundled Ansi C compiler.
+\end{description}
+\item [Windows] \hspace*{\fill}
+\begin{description}
+\item [X11RS] --- X windows interface.
+\item [Motif] --- a graphical user interface.
+\end{description}
+\item [Template files] \hspace*{\fill}
+\begin{description}
+\item [.login] --- login script.
+\item [.cshrc] --- login script.
+\item [.xinitrc] --- X window initialisation.
+\item [.Xdefaults] --- X window defaults.
+\end{description}
+\end{description}
+\end{description}
+
+\section{Programming}
+
+On Suns, three compilers should be available: Fortran, C and GNU C.
+They are invoked by commands {\tt f77}, {\tt cc} and {\tt gcc} respectively.
+They produce an object file (extension {\tt .o}).
+The object code, and any other objects specified, are passed to the loader
+which produces an executable image.
+All this is done by one command.
+
+To compile and link a Fortran program stored in file {\tt prog1.f}, type:
+\begin{verbatim}
+    % f77 prog1.f
+\end{verbatim}
+This will produce an executable file called {\tt a.out}.
+If you would rather name the executable file {\tt prog1}, use the {\tt -o}
+option:
+\begin{verbatim}
+    % f77 -o prog1 prog1.f
+\end{verbatim}
+If you only want to compile the program without linking, use the {\tt -c}
+option:
+\begin{verbatim}
+    % f77 -c prog1.f
+\end{verbatim}
+This will create an object file called {\tt prog1.o}.
+
+You can compile a program that is stored in several files with a single command:
+\begin{verbatim}
+    % f77 -o progall prog1.f sub1.f sub2.f
+\end{verbatim}
+or in stages:
+\begin{verbatim}
+    % f77 -c prog1.f
+    % f77 -c sub1.f
+    % f77 -c sub2.f
+    % f77 -o progall prog1.o sub1.o sub2.o
+\end{verbatim}
+or with a mixture of the two, such as:
+\begin{verbatim}
+    % f77 -c sub1.f
+    % f77 -c sub2.f
+    % f77 -o progall prog1.f sub1.o sub2.o
+\end{verbatim}
+If you wish to link your program with a subroutine library, use the {\tt -L}
+option to specify the name of the directory containing the library, and use the
+{\tt -l} option to specify the name of the library itself.
+In general, to link with library {\tt libxxx.a}, specify {\tt -lxxx} in the
+compilation command.
+Thus, to link with library {\tt libnag}, specify {\tt -lnag}:
+\begin{verbatim}
+    % f77 -o prog2 prog2.f -L/star/lib -lnag
+\end{verbatim}
+To compile C programs, follow the above instructions, replacing the {\tt f77}
+command by the command that invokes the C compiler on your computer ({\tt cc},
+{\tt c89} or {\tt gcc}).
+
+If you want to link with Starlink subroutine libraries, there are linking
+scripts provided to make the job easier (see SUN/118 for information about
+specific Starlink libraries).
+For example, to link a program that calls the AGI subroutine library, type:
+\begin{verbatim}
+    % f77 -o agitest agiprog1.f `agi_link`
+\end{verbatim}
+If you are using Starlink subroutine libraries in your Fortran programs, you
+may need to have INCLUDE statements in your code.
+Use the file name given in the documentation, {\em e.g.}
+\begin{verbatim}
+    INCLUDE 'SAE_PAR'
+\end{verbatim}
+In order for the compiler to find this file, the name {\tt SAE\_PAR}
+must appear in the current directory.
+To make this happen, type the command:
+\begin{verbatim}
+    % star_dev
+\end{verbatim}
+before running the compiler.
+You only need do this once per directory.
+This sets up a link from the current directory to the real file.
+Each subroutine library has its own {\em package}\_{\tt dev} command file:
+{\tt ems\_dev}, {\tt fio\_dev}, {\em etc.}
+
+In C programs, extra source files may be included with statements like:
+\begin{verbatim}
+    #include "psx_err.h"
+\end{verbatim}
+You must tell the C compiler where to find these files, using the {\tt -I}
+option:
+\begin{verbatim}
+    % cc -I/star/include cprog1.c
+\end{verbatim}
+Note that the way you tell the compiler where to look for `include' files is
+different in Fortran and C.
+Unfortunately, the Fortran compiler has no equivalent of the C compiler's
+{\tt -I} option.
+
+To build your own subroutine libraries and link to them, divide up your
+Fortran source code so that there is one subroutine or function in each file
+(use {\tt fsplit}), and then compile each routine and insert it into a library
+(called `archives' on Unix) as follows:
+\begin{verbatim}
+    % f77 -c mysub.f
+    % ar r libmine.a mysub.o
+\end{verbatim}
+When all the modules have been inserted, update the archive index (except on
+Solaris) with:
+\begin{verbatim}
+    % ranlib libmine.a
+\end{verbatim}
+To link with the new library, use the {\tt -L} option to specify the directories
+containing the archives, and the {\tt -l} option to specify the name of the
+archive.
+For example:
+\begin{verbatim}
+    % f77 myprog.f -L. -lmine
+\end{verbatim}
+will cause the linker to look in the current directory for an archive called
+{\tt libmine.a}.
+
+A program often requires many files to be compiled and linked to produce an
+executable file; there may be source files, header files, and so on.
+The sequence of commands needed to control this process may be complex.
+Fortunately, in Unix there is a {\tt make} facility which allows programmers to
+create a file, known as a {\tt makefile}, which defines dependency
+relationships between files and specifies the command sequences required to
+create a program.
+This facility is not described here, but if you are going to do serious
+programming you should find out about it.
+Starlink's Unix software uses {\tt make} files extensively in its software
+distribution and management.
+
+\section{Going further}
+
+This document is only an introduction.
+For more information, refer to the system documentation and the online {\tt man}
+pages.
+Other recommended reading is as follows:
+
+\begin{description}
+\begin{description}
+\item [MUD/102]: emacs --- Unix editor.
+\item [MUD/121]: Unix for beginners.
+\item [MUD/122]: An introduction to display editing with vi.
+\item [MUD/123]: vi --- Quick reference card.
+\item [MUD/124]: An introduction to running Fortran programs on Unix
+\item [SGP/7]: Unix and Starlink.
+\item [SGP/28]: Starlink documentation production.
+\item [SSN/66]: Starlink software organisation on Unix.
+\item [SUN/9]: LATEX --- Document preparation system.
+\item [SUN/36]: Starlink networking.
+\item [SUN/118]: Starlink Software on Unix.
+\item [SUN/129]: TPAU --- The Peter Allan Utilities.
+\item [SUN/144]: ADAM --- Unix version.
+\item [SUN/151]: VMSBACKUP --- VMS backup reader for Unix.
+\item [SUN/168]: JED --- Text Editor.
+\item [SUN/169]: PINE --- Electronic mail interface.
+\item [SUN/170]: Editors and Mail on Unix.
+\item [Starlink Bulletin 11]: The end of SunOS?
+\item [Unix for VMS Users] P Bourne, Digital Press.
+\end{description}
+\end{description}
+
+\section{Acknowledgements}
+
+Thanks to Peter Allan, Martin Bly, Chris Clayton, Patrick Wallace and Dave
+Terrett for providing material on specific topics for this note.
+Another invaluable source of information was the course notes provided
+by Michael Auerbach for his course {\em Introduction to Unix/SunOS}\, attended
+by Mike Lawden at RAL in October 1992.
+
+\newpage
+
+\appendix
+
+\section{Logging into a Unix machine}
+\label{login}
+
+There are three basic situations:
+\begin{description}
+\begin{description}
+
+\item [X-terminal or Workstation] ---
+
+This should start by displaying a `login box' into which you type your username
+and password; if the login prompt is not visible, press {\tt <RETURN>} to get
+one.
+What happens next depends on whether you're using a workstation or an
+X-terminal, what sort it is, how it has been set up and what operating system
+is in use.
+A window may start up automatically through which you can login, or there may
+be an obvious pull-down menu to try.
+If not, you'll just have to ask your Site Manager or another user.
+
+You can accept the way your terminal is set up and start exploring Unix.
+However, some people like to fiddle with their window before they feel
+comfortable.
+
+What do you do if you don't like the colours, or the shape of the cursor, or
+the fonts, or the way you select which window is active and how much of it
+you can see?
+
+All these things are controlled by files in your login directory.
+These are `hidden files' (their names begin with a period, and you have to
+type {\tt ls -a} to see them).
+Most X-terminals and workstations provide fancy applications which let you
+change colours through sliders {\em etc.}, and which update the appropriate
+files for you.
+Alternatively, you can customize the files directly using a text editor.
+The names of these files vary at different sites so you will have to ask
+your Site Manager about them.
+At RAL, for example, three files in particular are worth looking at:
+{\tt .Xdefaults} and {\tt .xsession}, which relate to the X windows system,
+and {\tt .mwmrc}, which relates to the Motif window manager.
+Talk to your Site Manager before tinkering.
+
+\item [Terminal server] ---
+
+Terminal servers connect terminals to computers.
+They communicate with the computers in various languages called protocols.
+Two of the most common of these are TCP/IP and LAT; ask your Site Manager what
+protocols your terminal server supports.
+If your terminal server is TCP/IP compatible you can connect to a computer by:
+\begin{verbatim}
+    telnet <cpu>
+\end{verbatim}
+where {\tt <cpu>} is the network name of the computer you are trying to use.
+If your terminal server is LAT compatible, you can connect to a DECstation that
+has LAT installed by:
+\begin{verbatim}
+    Connect <cpu>
+\end{verbatim}
+
+
+\item [VAX session] ---
+
+If you are already using a VAX, you can login to another machine from your
+current session by:
+\begin{verbatim}
+    Telnet <cpu>
+\end{verbatim}
+command.
+
+\end{description}
+\end{description}
+
+If you are sitting at the console rather than logging in remotely, logging into
+a Sun usually just gets you a `glass teletype' from where you can start
+X windows, whereas on a DECstation you go straight into X windows.
+To start up X windows on a Sun, type {\tt startx}.
+
+\newpage
+
+\section{VAX/Unix command cross-reference}
+\label{crosref}
+
+This is a concise dictionary of VMS to UNIX commands from the book `{\em UNIX
+for VMS users}'.
+
+\begin{quote}
+\begin{tabbing}
+VMS commandXXXXXX\=\kill
+{\bf VMS command} \>{\bf Unix equivalent}\\
+\\
+:=		\>alias / set\\
+:==		\>setenv\\
+@		\>source\\
+append          \>cat file1 file2 $>$ file3\\
+assign		\>ln\\
+backup		\>tar\\
+backup/list 	\>tar -t\\
+backup/log 	\>tar -v\\
+cc		\>cc\\
+copy		\>cp\\
+create		\>cat $>$\\
+create/dir	\>mkdir\\
+debug		\>dbx\\
+delete		\>rm\\
+delete/conf 	\>rm -i\\
+delete/entry	\>lprm / kill\\
+delete/queue	\>lprm -Pqueue\\
+difference	\>diff\\
+directory	\>ls\\
+dir/size/date	\>ls -laF\\
+dir/since	\>ls -lat\\
+dir/tot		\>du\\
+dir [...]	\>find ~ -name "fred*" -print\\
+dump		\>od\\
+edit		\>vi\\
+exchange	\>dd\\
+exit		\>exit\\
+fortran		\>f77\\
+help		\>man\\
+library		\>ar\\
+library/create 	\>ar -cr\\
+library/insert 	\>ar -q\\
+library/list 	\>ar -t\\
+library/replace	\>ar -r\\
+link		\>(see fort)\\
+logout		\>logout\\
+mail		\>mail\\
+mail$>$ dir     \>h\\
+mail$>$ delete	\>d\\
+mail$>$ exit	\>q\\
+mail$>$ extract	\>s file\\
+mail$>$ help	\>?\\
+mail$>$ send 	\>m\\
+mail$>$ reply	\>r\\
+on control\_y	\>onintr\\
+phone		\>talk [ttyname]\\
+print		\>lpr\\
+recall/all	\>history\\
+rename		\>mv\\
+runoff		\>nroff / troff\\
+search		\>grep -i\\
+set broadcast	\>mesg y\\
+set broa=nomail \>biff n\\
+set default	\>cd\\
+set file/own	\>chgrp\\
+set host	\>rlogin / telnet\\
+set password	\>passwd\\
+set proc/prior	\>nice / renice / limit\\
+set protection	\>chmod\\
+set terminal	\>tset / stty\\
+set verify	\>csh -x\\
+show default	\>pwd\\
+show device/all	\>tty\\
+show device/ful \>df\\
+show logical	\>printenv / echo\\
+show memory	\>vmstat\\
+show network	\>netstat / ruptime\\
+show process    \>whoami / ps / limit\\
+show queue	\>lpq / jobs\\
+show status	\>time\\
+show system	\>ps -aux\\
+show time	\>date\\
+show uic	\>groups\\
+show user	\>w\\
+sort		\>sort\\
+stop/id		\>kill -number\\
+submit		\>at / bg\\
+type		\>cat\\
+type/page	\>more / head / tail\\
+write		\>echo
+\end{tabbing}
+\end{quote}
+
+\end{document}

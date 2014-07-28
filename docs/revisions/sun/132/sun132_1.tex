@@ -1,0 +1,718 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {132.1}
+\newcommand{\stardocauthors}   {J.\ F.\ Lightfoot \& P.\ A.\ Harrison}
+\newcommand{\stardocdate}      {13 October 1992}
+\newcommand{\stardoctitle}     {JCMTDR --- Figaro Applications for Reducing
+JCMT Data \\[2ex] Version 1.0}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+\setlength{\parskip}{0mm}
+\tableofcontents
+\setlength{\parskip}{\medskipamount}
+\markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\newpage
+
+\section{Introduction}
+
+JCMTDR is a package of Figaro applications that is intended to replace
+NOD2 for the reduction of continuum mapping data obtained with UKT14
+on the James Clerk Maxwell Telescope.
+
+Two versions have been released; one that runs in DCL, the other an
+ADAM monolith. The DCL commands are made available by typing:
+
+\begin{verbatim}
+      $ JCMTDR
+\end{verbatim}
+
+The monolith is loaded by typing:
+
+\begin{verbatim}
+      $ ADAMSTART
+      $ ICL
+      ICL> JCMTDR
+\end{verbatim}
+
+Help information for both versions can be obtained by typing HELP
+JCMTDR.
+
+\section {The Applications}
+
+\subsection{AE2RD1}
+
+This application will transform JCMT map data into a tangent  plane
+image centred on a specified RA, Dec. The rebinning is performed by
+convolving the input data with a truncated Bessel function. It is
+similar but not identical to the NOD2 CONVERT function. 
+
+The width of the Bessel function used is such that it would just be
+fully  sampled by data points at the spacing of the pixels of the
+output  map. The pixel spacing of the output map is set to be the
+minimum  of the nominal pixel spacings of the input maps. To minimise
+edge  effects the Bessel function is truncated at a radius of 7 pixels 
+from its centre, and apodised over its outer third by a cosine 
+function.
+
+In Fourier terms the method approximates to Fourier transforming the
+input dataset(s), multiplying the transform by a cylindrical top hat
+(the F.T. of the Bessel function), then transforming back into image
+space. 
+
+The application can read in up to 10 separate input datasets. The
+output map will be large enough to cover all the input data  points
+and the map centre can be specified by the user (the  default is the
+map centre of the first input dataset). Each input  dataset can be
+assigned a weight relative to that of the first.  Output pixels
+further than one pixel spacing from any input data  point will be
+flagged as a bad value. Input pixels flagged as bad will be ignored.
+Input error arrays are not propagated.
+
+The convolution assumes that all pixels outside the measured  area are
+zero. This will lower the brightness of objects that are  less than
+the radius of the convolution function (7 output pixels)  from the map
+edge, though the effect is only a few percent unless  the object is
+very close (2 or 3 pixels) to the edge. 
+
+\newpage    % ***** PAGE BREAK *****
+
+The parameters used are:
+
+\begin{small}
+\begin{verbatim}
+         PARAMETER  INFILE
+            TYPE    CHAR
+            NAME    IN(file)
+            PROMPT  "(INfile) The name of a file containing JCMT map data"
+            TEXT   ---------------------------------------------------
+                   The name of a file containing the map data. Giving
+                   END as the name of the file will finish the input 
+                   sequence.
+                   ---------------------------------------------------
+
+         PARAMETER  OUTPUT
+            TYPE    FILE
+            NAME    OUT(PUT)
+            OPTIONS OUTPUT
+            PROMPT  "(OUTput) The name of the file to contain the output map"
+
+         PARAMETER B1950 
+            TYPE    KEY 
+            NAME    B1(950) 
+            PROMPT "(B1950) make output coordinates B1950 equinox"
+            TEXT   ---------------------------------------------------
+                   By default the application will transform the data 
+                   into a map whose centre and tangent plane offsets
+                   are in the FK5 system with Julian 2000 equinox.
+                   Setting B1950 to YES will give results in the FK4
+                   system with Besselian 1950 equinox.
+                   ---------------------------------------------------
+
+         PARAMETER WEIGHT
+            TYPE   FLOAT
+            PROMPT "(WEIGHT) weight of this dataset relative to the first"
+            TEXT   ---------------------------------------------------
+                   The first dataset will be coadded into the output
+                   data array with unit weight. Subsequent datasets
+                   can be coadded in with specified weights relative
+                   to the first.
+                   ---------------------------------------------------
+
+         PARAMETER RA_CENTRE
+            TYPE   CHAR
+            PROMPT "(RA_centre) The RA of the centre of the output map"
+            TEXT   ---------------------------------------------------
+                   The positions of the output map pixels will be 
+                   given in terms of a tangent plane offset in arcsec 
+                   from a map centre specified by the user. This parameter
+                   specifies the RA of the centre, it must be input in 
+                   hh mm ss.s format.
+                   ---------------------------------------------------
+
+         PARAMETER DEC_CENTRE
+            TYPE   CHAR
+            PROMPT "(DEC_centre) The Dec. of the centre of the output map"
+            TEXT   ---------------------------------------------------
+                   The positions of the output map pixels will be 
+                   given in terms of a tangent plane offset in arcsec 
+                   from a map centre specified by the user. This parameter
+                   specifies the declination of the centre, it must be 
+                   input in (sign)dd mm ss.s format.
+                   ---------------------------------------------------
+\end{verbatim}
+\end{small}
+
+There is a problem with this method if the mapped area, or part of it,
+was not sampled closely enough to fully sample the telescope beam.
+Users should treat the resampled output for those  areas with
+suspicion. In such cases it would be better to use AE2RD2, which uses
+a NAG interpolation routine to perform the rebinning.
+
+
+\subsubsection {Pointing Corrections}
+
+If required, AE2RD1 will correct the nominal offsets of the  input map
+pixels for pointing errors. To make this happen you should use the LET
+command to specify the pointing correction in the .PCORR structure in
+each input map file (note that using LET to create an array requires
+the last element of the array to be created first). AE2RD1 will look
+for a structure of the following form:
+
+\begin{small}
+\begin{verbatim}
+      .PCORR
+         .LST   (ncorr) lst1, lst2, .... lstn
+         .D_RA  (ncorr) d_ra1, d_ra2, .... d_ran
+         .D_DEC (ncorr) d_dec1, d_dec2, .... d_decn
+\end{verbatim}
+\end{small}
+
+where \verb+ncorr+ is the number of points at which the correction has
+been specified. The three arrays specify the magnitude of the
+correction in RA and Dec as a function of LST. The LST must be
+specified in radians, the pointing corrections in arcsec. The
+correction for each map point is calculated by linear interpolation
+between the LSTs that bracket the LST of the measurement. If the
+measurement lies outside the described  range, the correction will be
+that with the nearest LST. The corrections are {\em added} to the RA
+and Dec of the pixels.
+
+\subsection{AE2RD2}
+
+This application performs the same function as AE2RD1 but rebins each
+input dataset individually using NAG interpolation routines (E01SAF
+and E01SBF) before coadding them into the result. Errors associated
+with the input datasets are not propagated.
+
+\subsection{JCMTEXTC}
+
+This application corrects JCMT data for the effect of  atmospheric
+extinction. The airmass at which each map pixel was  observed is
+calculated, and multiplied by the estimated zenith  atmospheric
+extinction at the time of observation to give the  extinction optical
+depth along the line of sight. Multiplying the data point by the
+exponential of the optical depth gives  the value that would have been
+measured above the atmosphere. 
+
+The zenith optical depth is assumed to vary linearly with  time
+between the values given by the parameters TAU and ENDTAU.
+
+The parameters used are:
+
+\begin{small}
+\begin{verbatim}
+         PARAMETER  INPUT
+            TYPE    FILE
+            NAME    IN(PUT)
+            OPTIONS INPUT
+            PROMPT  "(INput) file containing map data to be corrected"
+
+         PARAMETER  OUTPUT
+            TYPE    FILE
+            NAME    OUT(PUT)
+            OPTIONS OUTPUT
+            PROMPT  "(OUTput) file to contain the corrected data"
+
+         PARAMETER  TAU
+            TYPE    FLOAT
+            NAME    TAU
+            OPTIONS REQUIRED
+            PROMPT  "(TAU) initial value of the atmospheric extinction"
+            TEXT    --------------------------------------------------
+                    The value of the zenith atmospheric extinction at
+                    the start of the map observation.
+                    --------------------------------------------------
+
+         PARAMETER  ENDTAU
+            TYPE    FLOAT
+            NAME    ENDTAU
+            OPTIONS REQUIRED
+            PROMPT  "(ENDTAU) final value of the atmospheric extinction"
+            TEXT    --------------------------------------------------
+                    The value of the zenith atmospheric extinction at
+                    the end of the map observation. The zenith extinction
+                    for each pixel will be calculated assuming a linear 
+                    gradient with time between the start and end values.
+                    --------------------------------------------------
+\end{verbatim}
+\end{small}
+
+\subsection{MAKEMAP}
+
+This takes a JCMT data file in GSD format and converts it to a Figaro
+file. It is recommended that the JOB logical name FIGARO\_FORMATS be
+set  to `NDF' before running the application so that the output file
+will be a Starlink NDF, readable by both KAPPA and Figaro. The command
+has the following parameters:
+
+\begin{small}
+\begin{verbatim}
+         PARAMETER  GSDFILE
+            TYPE    CHAR
+            NAME    GSD(FILE)
+            PROMPT  "(GSDfile) GSD file containing JCMT data"
+            TEXT    --------------------------------------------------
+                    This file has the default extension .DAT which
+                    should not be specified in the command line
+                    --------------------------------------------------
+
+         PARAMETER  OUTPUT
+            TYPE    FILE
+            NAME    OUT(PUT)
+            OPTIONS OUTPUT
+            PROMPT  "(OUTput) name of resulting Figaro data file"
+            TEXT    --------------------------------------------------
+                    This file will have the extension .DST unless the
+                    logical name FIGARO_FORMATS is set to NDF, in which
+                    case it will be a Starlink NDF with file extension
+                    .SDF.
+                    --------------------------------------------------
+
+         PARAMETER  CHANNEL
+            TYPE    INT
+            NAME    CHAN(NEL)
+            OPTIONS NOPROMPT
+            PROMPT  "(CHANnel) backend channel to be used"
+            TEXT    --------------------------------------------------
+                    In a multi backend channel system the channel
+                    number that should be used to make the map has to
+                    be specified. The default is channel 1.
+                    --------------------------------------------------
+
+         PARAMETER  TEL_BEAM
+            TYPE    CHAR
+            NAME    TEL(_BEAM)
+            PROMPT  "(TEL_beam) beam that telescope was in during map"
+            TEXT    --------------------------------------------------
+                    The beam towards which the telescope was pointing
+                    while the map was made. The choice is L, M or R.
+                    The majority of maps are made with the telescope
+                    in the middle (M) beam, in fact this version of the
+                    JCMTDR package won't work unless this is the case.
+                    --------------------------------------------------
+
+         PARAMETER  POS_BEAM
+            TYPE    CHAR
+            NAME    POS(_BEAM)
+            PROMPT  "(POS_beam) positive beam of chopper"
+            TEXT    --------------------------------------------------
+                    The positive beam of the secondary chopper while
+                    the map was made. This should be L or R.
+                    --------------------------------------------------
+\end{verbatim}
+\end{small}
+
+The output from MAKEMAP is a Figaro file whose main data array is a
+2-d map made up of from the measured data arranged according to its
+cell offset from the observation map centre. The x and y axes of the
+data are the pixel offsets along the cell axes from the map centre. If
+the data were obtained pixel by pixel rather than by scanning then it
+is possible that not all the pixels in the mesh were observed. Such
+pixels will be set to a `bad' value.
+
+The application creates a JCMT-specific section in the file in which
+are stored parameters relating to the telescope, the environment and
+the way in which the map was made. 
+
+If MAKEMAP fails to find important items in the GSD file, they will be 
+prompted for. If all else fails you can create, delete, rename or set
+individual items in the datafile using the Figaro CROBJ, DELOBJ, 
+RENOBJ or LET commands (see section~\ref{sec-data} for a description
+of the data structures used).
+
+\subsection {MAP2MEM}
+
+This application takes a JCMT map file and converts the data into a
+format suitable for further processing (deconvolution and resampling)
+by the  DBMEM package written by J.S.Richer. The parameters required
+are:
+
+\begin{small}
+\begin{verbatim}
+         PARAMETER  INPUT
+            TYPE    FILE
+            NAME    IN(PUT)
+            OPTIONS INPUT
+            PROMPT  "(INput) The name of the file containing JCMT map data"
+
+         PARAMETER  OUTPUT
+            TYPE    CHAR
+            NAME    OUT(PUT)
+            PROMPT  "(OUTput) The rootname of the DBMEM file to contain the map"
+            TEXT   ---------------------------------------------------
+                   The map will be output to 2 files; the header file
+                   <rootname>.DBH, and the data file which will
+                   either be <rootname>.MEM or .BIN depending on the
+                   value of parameter BINARY.
+                   ---------------------------------------------------
+
+         PARAMETER B1950 
+            TYPE    KEY 
+            NAME    B1(950) 
+            PROMPT "(B1950) make output coordinates B1950 equinox"
+            TEXT   ---------------------------------------------------
+                   By default the application will transform the data 
+                   into a map whose centre and tangent plane offsets
+                   are in the FK5 system with Julian 2000 equinox.
+                   Setting B1950 to YES will give results in the FK4
+                   system with Besselian 1950 equinox.
+                   ---------------------------------------------------
+
+         PARAMETER BINARY
+            TYPE   KEY
+            NAME   BINARY
+            PROMPT "(BINARY) output data to unformatted file"
+            TEXT   ---------------------------------------------------
+                   YES will result in the output data being written to
+                   file <rootname>.BIN, NO will give ASCII numbers in 
+                   <rootname>.MEM.
+                   ---------------------------------------------------
+
+         PARAMETER RA_CENTRE
+            TYPE   CHAR
+            PROMPT "(RA_centre) The RA of the centre of the output map"
+            TEXT   ---------------------------------------------------
+                   The positions of the output map pixels will be 
+                   given in terms of a tangent plane offset in arcsec 
+                   from a map centre specified by the user. This parameter
+                   specifies the RA of the centre, it must be input in 
+                   hh mm ss.s format.
+                   ---------------------------------------------------
+
+         PARAMETER DEC_CENTRE
+            TYPE   CHAR
+            PROMPT "(DEC_centre) The Dec. of the centre of the output map"
+            TEXT   ---------------------------------------------------
+                   The positions of the output map pixels will be 
+                   given in terms of a tangent plane offset in arcsec 
+                   from a map centre specified by the user. This parameter
+                   specifies the declination of the centre, it must be 
+                   input in (sign)dd mm ss.s format.
+                   ---------------------------------------------------
+
+         PARAMETER NOISE
+            TYPE   FLOAT
+            PROMPT "(NOISE) Estimate of noise on each map point"
+            TEXT   ---------------------------------------------------
+                   An estimate of the noise on each measured data point.
+                   If the input data already has an associated error
+                   array then those numbers will be used.
+                   ---------------------------------------------------
+\end{verbatim}
+\end{small}
+
+\subsection{MAP2TS}
+
+This application converts an image into a `time spectrum' with the map
+pixels sorted in order of increasing LST of observation. The LST is
+stored as  the X axis. It is useful to have the data in this form if
+you want to spot and correct variations in the data that are functions
+of time. The data will have to be transformed back into map format
+using TS2MAP before being input to other JCMTDR applications.
+
+The application has the following parameters:
+
+\begin{small}
+\begin{verbatim}
+         PARAMETER  INPUT
+            TYPE    FILE
+            NAME    IN(PUT)
+            OPTIONS INPUT
+            PROMPT  "(INput) file containing map data"
+
+         PARAMETER  OUTPUT
+            TYPE    FILE
+            NAME    OUT(PUT)
+            OPTIONS OUTPUT
+            PROMPT  "(OUTput) "file to contain time-sorted data"
+\end{verbatim}
+\end{small}
+
+\subsection{RESTORE}
+
+This application deconvolves the chopped-beam from a JCMT dual  beam
+map of a source in a manner similar to that described by  Emerson,
+Klein \& Haslam (Astron.Astrophys., 76, 92). The algorithm  is exactly
+the same as that used in NOD2; first the spatial  frequencies to which
+the chop is insensitive are set to zero,  then the chop is
+deconvolved. The map is deconvolved scan by scan.
+
+The source will come out negative if the positive beam of the chopper
+was specified wrongly in MAKEMAP. This can be fixed by using LET to
+set {\em file}.MORE.JCMT.MAP.POS\_BEAM to the correct value and
+re-running RESTORE. Similarly, the chop throw  is read from {\em
+file}.MORE.\-JCMT.\-MAP.CHOP\_THRW and can be changed if you  believe that
+the nominal value was inaccurate.
+
+If there are any bad pixels in the input data they will be ignored,
+effectively treated as zero in the restoration process. If the pixel
+is in the source then this is {\em not what you want to happen}. The
+pixel should be set to something nearer to its real value by using one
+of the Figaro data editing applications. Similarly  the process
+carries the implicit assumption that all data points outside the raw
+map would have been zero had they been measured. Bad results will be
+obtained if the raw map does not extend right off the source in the
+scan direction. Lastly, the zero level in the raw map must be set to 0
+before RESTORE is run, often the raw data has a DC offset.
+
+The parameters used are:
+
+\begin{small}
+\begin{verbatim}
+         PARAMETER  INPUT
+            TYPE    FILE
+            NAME    IN(PUT)
+            OPTIONS INPUT
+            PROMPT  "(INput) file containing map data"
+
+         PARAMETER  OUTPUT
+            TYPE    FILE
+            NAME    OUT(PUT)
+            OPTIONS OUTPUT
+            PROMPT  "(OUTput) file to contain restored map"
+
+         PARAMETER  UNBAL
+            TYPE    FLOAT
+            NAME    UNBAL
+            OPTIONS NOPROMPT
+            PROMPT  "(UNBAL) amplitude (L beam) / amplitude (R beam)"
+            TEXT    ------------------------------------------------------
+                    The ratio of the amplitude of the left hand chop beam
+                    and that of the right hand chop beam. For the JCMT this
+                    will normally be 1.
+                    ------------------------------------------------------
+\end{verbatim}
+\end{small}
+
+\newpage    % ***** PAGE BREAK *****
+
+\subsection{TS2MAP}
+
+Performs the inverse operation of MAP2TS. The parameters required are:
+
+\begin{small}
+\begin{verbatim}
+         PARAMETER  INPUT
+            TYPE    FILE
+            NAME    IN(PUT)
+            OPTIONS INPUT
+            PROMPT  "(INput) Name of file containing time-sorted data"
+
+         PARAMETER  OUTPUT
+            TYPE    FILE
+            NAME    OUT(PUT)
+            OPTIONS OUTPUT
+            PROMPT  "(OUTput) Name of file to contain map data"
+\end{verbatim}
+\end{small}
+
+\section{GSD Utilities}
+
+Two utilities are provided to allow examination and  modification of
+the raw GSD data files. They are available as DCL symbols and should
+be prefaced by a \$ when run from ICL.
+
+\subsection{GSD\_PRINT}
+
+This reads the contents of a GSD file and writes them to an ASCII file
+suitable for printing or examining with an editor.
+
+\subsection{GSD\_FORMAT}
+
+This is used to display individual, named items in the GSD file and
+can modify their values. The program operates in a loop which can be
+exited by responding to a prompt with CTRL-C.
+
+\section{Datafile Formats}
+\label{sec-data}
+
+The applications can access data files either in `old Figaro' or
+Starlink  NDF formats. It is recommended that the NDF format be used
+as this will allow most other Starlink packages ({\em e.g.} KAPPA and
+PHOTOM) to access the data as well. The IRCAM data reduction package
+should also be able to access the main data arrays, though other parts
+of the data structure will be inaccessible.
+
+To make these applications (and the rest of Figaro) access Starlink
+NDF files the user should define the logical name FIGARO\_FORMATS to
+be {\tt  "NDF"}. If the applications are being run as an ADAM monolith from
+ICL then the logical name should be defined /JOB. NDF files have the
+extension {\tt .SDF} while `old Figaro' files have the extension {\tt
+.DST}.
+
+A list of all the structures that might be found in a JCMT datafile
+before the rebinning stage follows (the example is in Starlink NDF
+format).  The actual items and  structures present in a given file and
+the order in which they appear will depend on the stage that has been
+reached in the reduction process. The temporary structures used by the
+MAP2TS and TS2MAP applications  have been left out.
+
+\newpage    % ***** PAGE BREAK *****
+
+JCMT Datafile structure before rebinning.
+
+\begin{small}
+\begin{verbatim}
+! the name of the file.
+OBS_IFD_0207
+! `bad' pixels may be present.
+  .BAD_PIXEL     Logical 1
+! the main data array holding the data values.
+  .DATA_ARRAY[77,33]  Float 4.99 5.002 5.01 4.998 4.973 4.952 4.969
+                                         .... 5.013 5.016 5.016 5.023
+! the x-axis structure. Before it has been re-binned to an RA, dec grid
+! the x-axis values will be offsets along the x cell axis. After
+! rebinning the offsets will be true RA offsets from the map centre.
+  .AXIS[1]       Axis
+    .DATA_ARRAY[77]  Float -190 -185 -180 -175 -170 -165 -160 -155 -150
+                                     .... 160 165 170 175 180 185 190
+    .UNITS[32]   Char    ARCSEC
+    .LABEL[32]   Char    X offset
+! the y-axis structure.
+  .AXIS[2]       Axis
+    .DATA_ARRAY[33]  Float -80 -75 -70 -65 -60 -55 -50 -45 -40 -35 -30
+                                      .... 40 45 50 55 60 65 70 75 80
+    .UNITS[32]   Char    ARCSEC
+    .LABEL[32]   Char    Y offset
+  .MORE          Ext
+! the extension structure that will hold the JCMT-specific information
+! used by the JCMTDR package.
+    .JCMT        Ext_jcmt
+! the array holding the local sidereal time at which each raw map measurement
+! was made (radians).
+      .LST       Ndf
+        .DATA_ARRAY[77,33]  Double 1.429 1.429 1.429 1.429 1.429 1.429
+                                             .... 1.64 1.64 1.64 1.64
+      .OBS       Struc
+        .OBJECT[64]  Char OMC1             ! object name
+        .OBS_1[32]  Char GS_RMP            ! observer's name(s)
+        .OBS_2[32]  Char KKP               !      "        "
+        .PROJECT[32]  Char mu35            ! PATT number
+        .NOBS    Int     207               ! observation number
+      .TEL       Struc
+        .NAME[32]  Char  JCMT              ! telescope name
+        .FRONTEND[32]  Char UKT14          ! front-end receiver
+        .BACKEND[32]  Char IFD             ! back-end
+        .LONG    Double  3.57              ! telescope longitude (radians)
+        .LAT     Double  0.346             ! latitude (radians)
+        .HEIGHT   Double 4092.1            ! height above sea-level (metres)
+      .MAP       Struc
+        .CENTRE_CRD[32]  Char RB           ! coordinate system of map centre
+        .EPOCH   Double  1950              ! epoch of coords
+        .RACEN   Double  1.452             ! RA (radians)
+        .DECCEN   Double -0.09437          ! Dec (radians)
+        .LOCAL_CRD[32]  Char AZ            ! coordinate system for local offsets
+        .V2Y     Float   0                 ! local vertical to cell y axis
+                                           !    (anticlockwise, radians)
+        .X2Y     Float   1.571             ! cell x to cell y (anticlockwise,
+                                           !    radians)
+        .CELL_X   Float  5                 ! size of x cell
+        .CELL_X_UNIT[10]  Char ARCSEC
+        .CELL_Y   Float  5                 ! size of y cell
+        .CELL_Y_UNIT[10]  Char ARCSEC
+        .ON_FLY   Int    255               ! flag T if data taken on-the-fly
+        .INT_TIME   Float 1                ! integration time per point
+        .SCAN_DIR[16]  Char HORIZONTAL     ! direction of scans in data array
+        .MJD_START   Double 48571.5        ! modified Julian day of observation
+        .CHOP_THRW    Float   50           ! chop-throw (arcsec)
+        .CHOP_PA    Float   1.571          ! chopper position angle (radians)
+        .CHOP_CRD[32]    Char LO           ! chopper coordinate system
+        .TEL_BEAM    Char M                ! beam at which telescope was 
+                                           !    pointing during map
+        .POS_BEAM    Char R                ! +ve beam of chopper
+        .FREQ    Float   273               ! chop-frequency (Hz)
+      .ENVRNMNT   Struc
+        .AMB_TEMP   Float 276.5            ! environment stuff
+        .PRESSURE   Float 625.0
+        .REL_HUMID   Float 0.1802
+      .PCORR     Struc
+        .LST
+        .D_RA
+        .D_DEC
+! the structure generated by the JCMTEXTC application to store the airmass
+! at which each pixel was measured.
+      .AIRMASS   Struc
+        .DATA_ARRAY[77,33]  Float 1.106 1.106 1.106 1.106 1.106 1.106
+                                               .... 1.124 1.124 1.124
+! the structure generated by the JCMTEXTC application to store the zenith
+! opacity used to extinction correct each pixel.
+      .TAU       Struc
+        .DATA_ARRAY[77,33]  Float 0.254 0.254 0.254 0.254 0.254 0.254
+                                               .... 0.258 0.258 0.258
+  .TITLE[32]     Char    OMC1
+\end{verbatim}
+\end{small}
+
+\newpage    % ***** PAGE BREAK *****
+
+A fully reduced and rebinned data file should look something like the
+following:
+
+\begin{small}
+\begin{verbatim}
+TEST
+  .BAD_PIXEL     Logical 1
+  .DATA_ARRAY[90,57]  Float -1.701E+38 -1.701E+38 -1.701E+38 -1.701E+38
+                                .... -1.701E+38 -1.701E+38 -1.701E+38
+  .AXIS[1]       Axis
+    .DATA_ARRAY[90]  Float 225 220 215 210 205 200 195 190 185 180 175
+                                        .... -200 -205 -210 -215 -220
+    .UNITS[32]   Char    ARCSEC
+    .LABEL[32]   Char    RA
+  .AXIS[2]       Axis
+    .DATA_ARRAY[57]  Float -110 -105 -100 -95 -90 -85 -80 -75 -70 -65
+                                     .... 140 145 150 155 160 165 170
+    .UNITS[32]   Char    ARCSEC
+    .LABEL[32]   Char    DEC
+  .TITLE[32]     Char    OMC1
+! the more structure now contains an array of FITS items that hold the names
+! and weights of the files input to the rebinning application, and the method
+! of rebinning used.
+  .MORE          Ext
+    .FITS[80,9]  Char    FILE_1  = 'OBS_IFD_0207'       / Name of input
+\end{verbatim}
+\end{small}
+
+\end{document}

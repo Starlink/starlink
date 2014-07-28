@@ -1,0 +1,470 @@
+\documentstyle{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink General Paper}
+\newcommand{\stardocinitials}  {SGP}
+\newcommand{\stardocnumber}    {28.4}
+\newcommand{\stardocauthors}   {M D Lawden}
+\newcommand{\stardocdate}      {20 January 1989}
+\newcommand{\stardoctitle}     {Starlink Document Production}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+\section{Introduction}
+
+This note gives advice on how to prepare documents that are meant to be
+distributed through Starlink.
+The emphasis is on documents that are meant to read in printed form; on-line
+documentation is a specialised art and is not dealt with here.
+
+Starlink documents fall into two broad categories:
+\begin{itemize}
+\item Unclassified.
+\item Classified.
+\end{itemize}
+The format of the former is left almost entirely to the discretion of the
+author, with the exception of a few general points outlined in the next section.
+The format of the latter is more tightly controlled as they are intended to form
+a uniform set of documents issued by the Project.
+The Starlink Documentation Librarian (currently Mike Lawden) has editorial
+powers to make format changes and obvious corrections to submitted classified
+documents in order to preserve a uniform `Starlink style'; the information
+content will not be affected.
+
+\section{Unclassified documents}
+
+When unclassified documents are available as computer files, they will be
+stored in association with the software they describe, and will be a primary
+source of information for people using this software and for programmers
+maintaining it.
+If appropriate, they will be indexed in DOCSDIR:MUD.LIS as Miscellaneous
+User Documents.
+If they are an important source of information for a user, they should be
+referred to within a note in the Starlink SUN series.
+
+The layout is left to the discretion and good taste of the author, but the
+following specific points should be born in mind:
+\begin{itemize}
+\item If the text is meant to be readable on a VDU screen, lines must not
+exceed 79 characters (80 character lines can cause double spacing on some
+terminals, indeed some terminals can't handle more than 74), and underlining
+(if essential) must be done in such a way that the text does not get destroyed
+by the underlines.
+\item If the document is meant for a Printronix or Sanders printer, it should
+be possible to print it without spurious blank or overflow pages coming out.
+It should also be possible to photocopy the printed document onto A4 paper with
+adequate margins.
+This implies lines of no more than 70 characters and a maximum of 57 lines per
+page.
+\end{itemize}
+
+If the software has an on-line help system, remember that users often wish to
+have hardcopies of this information, so bear this in mind when planning its
+layout, and indicate in the manual how such copies can be made.
+
+\section{Classified documents}
+
+Classified Starlink documents which are project-wide are stored in DOCSDIR and
+are indexed in the Starlink documentation index DOCSDIR:DOCS.LIS.
+Each site may also have local documents stored in LDOCSDIR and indexed in
+LDOCSDIR:DOCS.LIS.
+These documents are the basic source material for Starlink users.
+If they are of high quality, standard and uniformity, they make the Project
+look professional and well managed.
+Alternatively, documents which contain trivial errors and are presented in a
+variety of styles and formats make the project look amateurish and poorly
+managed.
+Part of the Starlink Documentation Librarian's job is to achieve the former
+state, rather than the latter.
+
+There are five classes of document:
+\begin{description}
+\begin{description}
+\item [SUG] --- Starlink User Guide
+
+This is a general introduction to Starlink for new users.
+
+\item [SG] --- Starlink Guides
+
+These are guides to the effective use of specific Starlink software items.
+
+\item [SUN] --- Starlink User Notes
+
+These describe how to use Starlink software.
+
+\item [SSN] --- Starlink System Notes
+
+These give implementation and installation information on Starlink software.
+
+\item [SGP] --- Starlink General Papers
+
+These cover a wide range of topics such as project management, programming
+standards, and proposals for future developments.
+\end{description}
+\end{description}
+
+\subsection{Content}
+
+A SUN may fully document a software item, or may just be an introduction
+which references more complete documentation stored elsewhere.
+In either case, remember that the reader may know nothing of either the specific
+software item, or any other Starlink software; your note may be the first that a
+new user reads!
+It is reasonable to assume that the reader is an astronomer with some
+familiarity with computers in general and the VAX in particular, and has read
+(and understood!) the VAX/VMS Introduction (even though this may well not be
+the case).
+
+Do not assume that the user is reading the note just to find out how to use the
+software (although of course he may be).
+Notes are often read by people who wish to know what the software does, what it
+is for, or (most difficult of all) if it will solve a particular problem.
+To satisfy all three types of reader, a User Note will typically contain the
+following sections, probably in the order given.
+\begin{itemize}
+\item An introduction outlining the intended use of the software or the
+problem it addresses.
+\item A general description of the methods used.
+\item A tutorial style introduction to using it.
+\item A detailed description of commands, subroutine interfaces or whatever is
+appropriate.
+\item A detailed description of the algorithms used.
+\end{itemize}
+Each section can be anything from a short paragraph followed by references to
+other documents, to a complete description many pages long.
+The first two sections should aim to be relatively complete, while the remainder
+may in some cases be little more than a list of references.
+Other sections may be required in many cases.
+
+\subsection{Title}
+
+A user looking for information usually selects a note on the basis of its title
+(as listed in the documentation index) and it should therefore be as informative
+and concise as possible about the content of the note.
+It should contain the acronym generally used to refer to the software and
+indicate its function.
+Remember, the note may have a long life, so phrases such as ``A New\ldots" which
+will quickly become either obsolete or positively misleading should be avoided.
+An example title is:
+
+\begin{center}
+{\bf ASPIC --- A set of image processing programs}
+\end{center}
+
+\subsection{Document identification}
+
+Each document has an identifier and a date of issue.
+Identifiers have the format `class/nn.v' where `class' is the class,
+`nn' is the number within that class, and `v' is the version number starting
+at 1 (e.g.\ the identifier of this document is SGP/28.4).
+Identifiers are allocated by the Documentation Librarian
+(MDL@UK.AC.RL.STAR on JANET, or RLVAD::MDL on DECNET), who can also be
+consulted on any other aspect of document production.
+If you like, you can specify your document number as `nn' and leave the
+Librarian to alter this to the required number.
+When a note is revised, its version number should be incremented and the issue
+date revised.
+
+\subsection{Header layout}
+
+You must conform to the standard style and layout for the header to a Starlink
+document.
+Use the \LaTeX\ template files SUN.TEX, etc., or the RUNOFF template files
+SUN.RNO, etc., which are stored in DOCSDIR.
+
+\subsection{File names}
+
+Files which store Starlink documents should have a name of the form SUNn, etc.,
+where `n' is the number of the document.
+For example, this note is in a file called SGP28.
+The file name extension should be `.TEX' for a \LaTeX\ version, `.RNO' for a
+RUNOFF version, and `.LIS' for a readable version (only relevant for RUNOFF).
+Manuals and guides may use other conventions, but if so these should be
+clearly described in the accompanying Starlink Note.
+Files containing classified documents are stored in DOCSDIR.
+
+\section{Text processors}
+
+For all but the simplest of notes you will probably wish to use a text
+processing program.
+Starlink recommends that you use {\LaTeX}, although RUNOFF is an acceptable
+alternative (but note that such documents may be converted to \LaTeX\ by
+Starlink staff).
+Don't use GEROFF as it is no longer supported by Starlink and may stop
+working.
+Don't use \TeX\ unless you enjoy making life unnecessarily difficult for
+yourself and others; \LaTeX\ is much easier.
+In my experience the output from \TeX\ source (assuming you have access to all
+the private macros the author thought everyone had) always turns out to be
+inferior to that of standard Starlink documents and invariably has idiosyncratic
+style and format.
+
+Various aspects of \LaTeX\ are documented in SUN/9, 12, 34, and 77; there is
+also an excellent book on the subject by Leslie Lamport.
+\TeX\ is documented in SUN/93 and in the book by Donald Knuth.
+
+\section{Starting or revising a document}
+
+When starting a new document, copy the appropriate template file from DOCSDIR
+into your own directory and change the variable information; then add your
+own text.
+Produce your original file in the form of a .TEX or .RNO file ready for
+processing by the text processor.
+Try to avoid making your document dependent on other files; it should be
+self-sufficient.
+If you must have things like `include' files, make sure you submit them at
+the same time as your main file.
+
+When updating a document, copy the existing file from DOCSDIR and edit
+that; do {\em not} start from a private copy as your submitted file may have
+been edited by the Documentation Librarian before final issue, and the changes
+(such as spelling corrections) will be lost and have to be done again.
+
+\section{Submitting a note for distribution}
+
+When you have finished your document, tell the Documentation Librarian the
+whereabouts of the file you have produced.
+If necessary, send paper copies of any additional material required, such as
+diagrams, which will not appear in the hardcopy derived from your file.
+The Librarian may edit your file to make it conform to Starlink standards and
+will then produce a paper master and make copies.
+He will also distribute the file in a software release and send several paper
+copies to every Starlink Site Manager for his users.
+
+\section{Recommended techniques}
+
+SUN/12 contains many examples of how to use \LaTeX\ and shows the style
+preferred by Starlink.
+An earlier version of this paper (SGP/28.3) contained recommended techniques
+for using RUNOFF.
+
+\section{Style}
+
+Starlink is trying to achieve a common style in all its documents, particularly
+in their format.
+A number of stylistic recommendations are listed below, and the next section
+warns you about various `Documentation diseases' that are rampant.
+
+\begin{itemize}
+
+\item Organise your paper into sections using sectioning commands (see SUN/12,
+chapter 2).
+
+\item Use the {\em list}\/ facilities to highlight options or features
+(see SUN/12 chapter 4).
+
+\item Indent example commands and show them as they appear to the user,
+including any prompt symbol.
+Leave a space between the prompt symbol and the command --- `what you read is
+what you see'.
+Thus:
+\begin{verbatim}
+    $ CAR_HELP SEARCH
+\end{verbatim}
+is clearer than
+\begin{verbatim}
+$CAR_HELP SEARCH
+\end{verbatim}
+
+\item Try to keep your formatting techniques as simple and obvious as possible.
+I find the basic techniques shown in SUN/12 to be adequate for all normal
+purposes.
+
+\item Documentation is often revised, merged or restructured many times and
+you should make it as easy as possible for this to be done on a computer.
+For \LaTeX\ source, etc, you are recommended to start each sentence on a new
+line; this makes insertions and movement of chunks of text very easy.
+
+\end{itemize}
+
+\section{Documentation diseases}
+
+There are a number of faults in documents produced by non-specialist authors
+which can be recognised and classified fairly easily.
+I call them {\em documentation diseases}.
+Some affect the content and organisation of a document.
+Others are trivial typing faults.
+The following are diseases of content.
+
+\begin{description}
+
+\item [Verbosity] :
+
+This is a common fault in documentation submitted to Starlink.
+It is an insidious disease which afflicts us all, but its symptoms can be
+controlled if you check your own text for them.
+There is far too much to read without having to wade through redundant waffle.
+Good documents should be as {\em short}\/ and {\em concise}\/ as possible.
+A reader does not want to waste his time ploughing through:
+\begin{quote}
+The purpose of this document is to introduce the reader to the CHART software
+system which has been developed in the Fortran language on the RGO Starlink
+computer (funded by the SERC) to assist the user in the production of finding
+charts which, hopefully, will be of some assistance to the user's astronomical
+investigations.
+\end{quote}
+when he would be quite satisfied with:
+\begin{quote}
+The CHART program produces star finding charts.
+\end{quote}
+
+\item [Members only] :
+
+Authors sometimes get so wrapped up in their work that they cannot conceive
+of anyone not being {\em au fait}\/ with what they are writing about.
+I once attended an introductory lecture on Cybernetics at which the lecturer
+handed out a sheet containing a very complex diagram of his model of human
+visual perception.
+The class was then asked to suggest improvements.
+It was our first exposure to a subject he had been researching for years.
+This kind of pedagogical incompetance is sometimes evident, in milder form, in
+submitted Starlink User Notes.
+Don't just write for members of your clique, but give faint hearts and
+browsers some background and context to your work.
+Also,a brief introduction is very useful for me when I am adding notes on new
+software to SUN/1.
+
+\item [Where's the ON switch?] :
+
+Believe it or not, people sometimes omit to describe how to start up their
+software, or they may bury this information in the middle of a big paragraph.
+Make this information very clear and put it in front of information on how
+to use your software; e.g.:
+\begin{quote}
+To start the program, type the command:
+\begin{verbatim}
+    $ CHART
+\end{verbatim}
+You can then get an introductory summary of the principal commands by typing:
+\begin{verbatim}
+    $ PROMPT
+\end{verbatim}
+\end{quote}
+Clear, isn't it?
+
+\end{description}
+
+These days, most documentation is produced by the author typing his text into
+a computer and producing hardcopy through a text processor.
+This means that various filters that cleaned the raw text in the past (like
+fussy typists and obsessive editors) have been eliminated.
+The result has been an epidemic of trivial documentation diseases which
+disfigure some of the text submitted to Starlink for release.
+Some of these seem to be caused by the author's desire to save as much
+of his own time as possible.
+However, one assumes a document worth publishing will have more readers
+than authors, so it is worth while for the author to spend a little extra
+time to save his readers time and effort.
+Here are some of these diseases I come across frequently:
+
+\begin{description}
+
+\item [Smothered punctuation marks] :
+
+Most people accept the convention of leaving a space between individual words
+as they recognise that it aids comprehension.
+However, the old convention of leaving a space between sentences and after
+punctuation marks is under attack.
+One frequently sees text written like this:
+\begin{quote}
+I can save my precious time,and energy,by missing out unnecessary
+spaces;anyway,I'm impatient.I don't care if this makes my text
+irritating to read,and infuriating to edit,as my time is more important than
+other peoples,and this extra speed gives me a competitive edge.Why do people
+bother about such trivial things?Don't be so fussy!
+\end{quote}
+This style of punctuation might be tolerable in a Fortran FORMAT statement
+(where, perhaps, it originated), but it is barbaric and illiterate in text
+meant for the human eye.
+It makes the reader angry with you.
+Is that what you want?
+
+\item [Lonely parentheses] :
+
+This is the inverse of the {\em Smothered punctuation marks} disease\/ ---
+too much space rather than too little.
+It has the following symptom:
+\begin{quote}
+Some authors ( not many ) do this.
+\end{quote}
+No doubt, such authors think this is clearer than:
+\begin{quote}
+Most (thank goodness) do this.
+\end{quote}
+The problem with this disease is that it makes the syntactic structure of a
+sentence less obvious --- you are writing for the human eye, not a parser.
+
+\item [Tabs] :
+
+The trouble with tabs is that they may not be interpreted as you expect, since
+this depends on the device or software your reader is using.
+What you see on your terminal may not be what he sees on his.
+The safest thing is not to use them.
+
+\item [Missing files]:
+
+A very common disease of \TeX\ virtuosi and RUNOFF aficionados is to submit
+document files which refer to other files which only exist in their author's
+local environment.
+Make sure you submit all the files required to produce hardcopy outside
+your personal software environment.
+
+\item [Clever dates]:
+
+Many text processors have a facility which enables you to generate automatically
+today's date when preparing hardcopy.
+This can be very convenient in things like letter headings which are used
+to produce a single document at a specific moment, but it is a source of
+danger when used in long-life documents that can be generated several
+times.
+A date should identify such a document uniquely and should not be vulnerable to
+arbitrary change.
+The use of clever dates can cause a number of versions of a document to go
+into circulation which are identical, apart from the date in the heading.
+This can cause great confusion.
+
+\end{description}
+
+\section{References}
+
+\begin{enumerate}
+\item SUN/9, `\LaTeX\ --- A document preparation system'.
+\item SUN/12, `\LaTeX\ Cook-book'.
+\item SUN/34, `\TeX\ DVI file translators'.
+\item SUN/77, `DVIDIS --- DVI file previwer'.
+\item SUN/93, `\TeX\ --- A superior document preparation system'.
+\item Leslie Lamport, `A Document Preparation System. \LaTeX\ User's Guide \&
+ Reference Manual', Addison-Wesley, 1986.
+\item Donald E Knuth, `The \TeX book', Addison-Wesley, 1986.
+\end{enumerate}
+
+\end{document}

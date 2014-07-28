@@ -1,0 +1,87 @@
+\documentstyle {article} 
+\markright{SSN/29.3}
+\setlength{\textwidth}{153mm}
+\setlength{\textheight}{220mm}
+\setlength{\oddsidemargin}{3mm}
+\setlength{\evensidemargin}{3mm}
+\pagestyle{myheadings}
+
+\begin{document}
+\thispagestyle{plain}
+\noindent
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill SSN/29.3\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf Starlink System Note 29.3}
+\begin{flushright}
+M D Lawden\\
+3 June 1987
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{10mm}
+\begin{center}
+{\Large\bf SSL --- Startup, Shutdown, Login files}
+\end{center}
+\vspace{10mm}
+\section {INTRODUCTION}
+This note introduces the Startup, Shutdown and Login files used at Starlink
+sites specifically to tailor the VMS system for the execution of Starlink
+software.
+\section {STARTUP FILES}
+When a VAX/VMS system is booted, a sequence of command procedure files are
+executed which prepare the software environment for users.
+The full sequence is complicated and site-dependant, but as far as the Starlink
+Software Collection is concerned the following components are the most
+significant:
+\setlength{\unitlength}{1mm}
+\begin{center}
+\begin{picture}(60,25)
+\thicklines
+\put (0,20){\framebox(60,5){SYS\$MANAGER:SYSTARTUP.COM}}
+\put (0,10){\framebox(60,5){SSC:STARTUP.COM}}
+\put (0,0){\framebox(60,5){LSSC:STARTUP.COM}}
+\put (30,20){\vector(0,-1){5}}
+\put (30,10){\vector(0,-1){5}}
+\end{picture}
+\end{center}
+File SSC:STARTUP.COM defines some system logical names and installs Starlink
+programs which require privilege.
+This file is distributed with the Starlink Software Collection and should be
+executed at every Starlink site.
+Each site should also have a local startup command procedure in file
+LSSC:STARTUP.COM which defines further system logical names required locally.
+Each definition is identified with a particular software item name.
+These files are subject to continual change so if you want to refer to the
+latest version of them, print them out.
+\section {SHUTDOWN FILE}
+The command procedure in file SSC:SHUTDOWN.COM is executed when the system is
+shut down.
+At present, it does not do anything significant.
+\section {LOGIN FILES}
+When a user logs in to a Starlink VAX computer, the system attempts to execute a
+command procedure specified in the user's authorization file.
+This would normally be file LOGIN.COM in the users default directory.
+If you wish to use Starlink software, include the following command in your
+LOGIN.COM file:
+\begin{verbatim}
+         $ @SSC:LOGIN
+\end{verbatim}
+This command procedure defines some symbols required by users of the Starlink
+Software Collection.
+It also calls a local command procedure called LSSC:LOGIN.COM.
+Thus, the call tree is:
+\begin{center}
+\begin{picture}(60,25)
+\thicklines
+\put (0,20){\framebox(60,5){[user default]LOGIN.COM}}
+\put (0,10){\framebox(60,5){SSC:LOGIN.COM}}
+\put (0,0){\framebox(60,5){LSSC:LOGIN.COM}}
+\put (30,20){\vector(0,-1){5}}
+\put (30,10){\vector(0,-1){5}}
+\end{picture}
+\end{center}
+These command procedures are subject to continual change.
+Their current contents can be examined at any time.
+Each definition is identified with a particular software item name.
+\end{document}

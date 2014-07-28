@@ -1,0 +1,278 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {17.5}
+\newcommand{\stardocauthors}   {J F Lightfoot \& R M Prestage}
+\newcommand{\stardocdate}      {22 September 1992}
+\newcommand{\stardoctitle}     {SPECX --- A Millimetre Wave Spectral Reduction 
+				Package \\[2ex] 
+				-- Version 6.2 --}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+%  \setlength{\parskip}{0mm}
+%  \tableofcontents
+%  \setlength{\parskip}{\medskipamount}
+%  \markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\section {Introduction}
+
+SPECX is a general mm and sub-mm wavelength data reduction system
+written by Rachael Padman at MRAO. Although it may be used to
+process spectra obtained from many different instruments,
+Starlink users will find it particularly useful for the reduction
+of data obtained with the James Clerk Maxwell Telescope. 
+SPECX has it's own command line interpreter, and manipulates 
+spectra on a pop-down stack. The package is designed to work on
+a graphics terminal with dual-screen facility and VT emulation 
+({\em e.g.} a Pericom MG100), but can be usefully run
+on other graphics terminals. Hardcopy may be output on any printer
+for which a GKS driver is provided by Starlink.
+
+Some of the major features of SPECX are:
+\begin{itemize}
+\item
+The ability to process up to eight spectra (quadrants) simultaneously:
+these may have the same or different centre frequencies, resolutions, 
+etc. This allows users to operate on different filter-banks, or
+dual polarization data for example, in parallel. 
+\item
+The ability to automatically save the current status of the system 
+after each command is executed. This means that if SPECX is
+stopped (unintentionally or otherwise), when restarted it will
+`remember' the previous state of the program.
+\item
+Commands for the listing and display of spectra on a graphics
+terminal, with hardcopy on a variety of printers.
+\item
+Single and multiple scan arithmetic, scan averaging, {\em etc.}
+\item
+Commands to store and retrieve intermediate spectra in storage registers.
+\item
+Commands to perform the fitting and removal of polynomial, 
+harmonic and gaussian baselines.
+\item
+Commands for filtering and editing spectra.
+\item
+Commands to determine important line parameters (peak intensity, width, 
+etc).
+\item
+The ability to perform Fourier transform and power spectrum calculations.
+\item
+Procedures for the calibration of data.
+\item
+The ability to assemble a number of reduced individual spectra into a 
+map file, and contour or greyscale any plane or planes of the resulting cube.
+\item
+The ability to write indirect command files.
+\end{itemize}
+
+A thorough description of the package is given in the ``SPECX Users' Manual''
+which has been distributed as a Starlink Miscellaneous User Document (MUD).
+
+SPECX is intended primarily for the analysis of JCMT data and can read
+such data directly from the GSD files produced at the
+telescope. However, there are now facilities for reading data from a
+range of other important mm-wave telescopes, {\em e.g.} Onsala,
+FCRAO, UMASS CO survey, IRAM-FITS, JCMT RxG, NRAO 8-beam (see 
+the SPECX user manual for details). 
+Spectra and maps can be output as FITS files, Starlink NDFs or ASCII files
+for reading into other packages.
+
+
+\section {Changes from Version 6.1}
+
+The most important change is that the package now uses PGPLOT for its
+plotting rather than Mongo. This means that cube planes can now be displayed
+as false colour images as well as contour plots. In addition, the user now 
+has control of the plotted line thickness so that better quality graphics
+can be produced for publication.
+
+\section {Getting Started}
+
+SPECX is made available by typing:
+\begin{verbatim}
+      $ specxstart
+\end{verbatim}
+and started by typing:
+\begin{verbatim}
+      $ specx 
+\end{verbatim}
+The program will display the current version number and
+a brief informational message, then the SPECX prompt ({\tt>>}) will appear.
+
+\begin{verbatim}
+
+                   -------------------------------------------
+                           SPECX V6.2    7th-June-1992
+                             Copyright (C) R.Padman
+                   -------------------------------------------
+
+        .
+        .
+
+      >> 
+\end{verbatim}
+
+Commands may then be entered to read and process data.
+SPECX commands consist of one or more keywords, separated
+by hyphens. Minimum matching is applied to each keyword
+individually. A full list of all valid SPECX commands
+may be found by entering `SHOW-COMMANDS', with a carriage return
+in response to the resulting prompt. On-line help is available
+using the command `HELP'.
+
+A DCL command may be executed by proceeding it with a {\tt \$}, {\em e.g.}
+
+\begin{verbatim}
+      >> $dir
+\end{verbatim}
+
+The tab and blank characters, `,', `\verb+\+' and `;' are SPECX delimiters;
+to pass these to DCL the entire string must be enclosed in single 
+inverted commas, {\em e.g.}
+
+\begin{verbatim}
+      >> '$dir/size scan*.dat'
+\end{verbatim}
+
+Control-C may be 
+used to interrupt commands in progress.
+Control-C typed at the command level (when the
+{\tt>>} prompt is displayed) will exit the program.
+
+The EXIT command is the normal method of returning to DCL.
+
+\section {SPECX files and directories}
+
+SPECX uses and produces a variety of files. For graphics, 
+intermediate plot files (called PLOT.nnn) are produced in the directory 
+with logical name SPECXDIR. The SPECXSTART command assigns 
+SPECXDIR to SYS\$LOGIN so that, 
+by default, the PLOT.nnn files will appear in 
+your login directory. This may be over-ridden if you define 
+SPECXDIR as a process logical name. For example, typing
+
+\begin{verbatim}
+      $ define SPECXDIR disk$scratch:[user.data]
+\end{verbatim}
+
+after the SPECXSTART will cause plot files to appear in the named directory.
+
+SPECX uses Starlink PGPLOT for graphics  and thus will produce data  files for
+plots sent to some graphics devices ({\em e.g.} CANON.DAT for the Canon laser
+printer, GKS\_72.PS for a Postscript printer). These are created in the current
+default  directory, and are automatically deleted when the plot finishes.
+
+There is an option (defaulted true) in SPECX which  allows dumping of the
+current status of the program after each  command is executed. This is saved in
+the file SPECX.DMP in the  current default directory. If this file does not
+exist when SPECX  is started for the first time, it will be created. If it is 
+subsequently deleted (or SPECX is started from a different  directory), the
+package will restart with default initialisation; otherwise SPECX will be
+re-started will all flags as previously  set, data files opened, and so on. 
+
+
+\section {Examples}
+New users should read the introductory chapters of the SPECX manual,
+which give explanations and examples of basic techniques. Some sample
+data and a demonstration command file are also available in the
+[.EXAMPLE] sub-directory of SYS\_SPECX. These can be copied to the user's own
+file space and tried out. The demonstration file is DEMO.SPX,
+which the user should print out and work through by typing the commands
+in from the terminal. It demonstrates the reading of JCMT data,
+the fitting of baselines and gaussians to spectra, and shows how to make
+and display a datacube. The file can also be run as an indirect command
+file by an experienced user to check that the package is working correctly.
+
+\section{Linking User-supplied Subroutines}
+User-defined commands can be added to SPECX by making use of the
+subroutines EXTRNL1 to EXTRNL10. For the Starlink version of SPECX 
+the steps required are:
+
+\begin{itemize}
+\item
+Compile your routine:
+\begin{small}
+\begin{verbatim}
+$ specxstart
+$ @sys_specx:specxdev ! to set up logical names for include files such as SPECX
+$                     ! common blocks. These common blocks should always be
+$                     ! the official ones referred to by the logical names, and
+$                     ! not private copies.
+$ fortran extrnl1
+
+\end{verbatim}
+\end{small}
+\item
+Set up the logical names required to link with the NDF library.
+\begin{verbatim}
+$ ndf_dev
+\end{verbatim}
+
+\item
+Copy the file LINKPG\_NDF.COM from SYS\_SPECX. 
+and edit it to link
+in your own version of the appropriate routine. For example, the
+line:
+\begin{verbatim}
+$ link /exe=specx_v6-2 -
+\end{verbatim}
+might be replaced by:
+\begin{verbatim}
+$ link /exe=specx_v6-2 extrnl1, -
+\end{verbatim}
+\item
+Copy the CLD file SYS\_SPECX:SPECX62.CLD, and 
+edit it to run your own version of SPECX\_V6-2.EXE. 
+Redefine the SPECX command by typing:
+\begin{verbatim}
+$ set command specx62.cld
+\end{verbatim}
+\end{itemize}
+
+\section{Acknowledgements}
+STARLINK would like to acknowledge Rachael Padman for making
+the SPECX package available for use, assisting in its installation,
+and providing the example data.
+
+\end{document}

@@ -1,0 +1,3913 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink Guide}
+\newcommand{\stardocinitials}  {SG}
+\newcommand{\stardocnumber}    {3.2}
+\newcommand{\stardocauthors}   {Paul Rees, Jack Giddings \& Dave Mills}
+\newcommand{\stardocdate}      {6 October 1993}
+\newcommand{\stardoctitle}     {IUEDR --- Reference Manual}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+\tableofcontents
+\markright{\stardocname}
+
+\begin{center}
+\vspace {10mm}
+{\bf NOTE}
+\end {center}
+
+This document replaces the IUEDR global parameter manual,  {\tt
+IUEDR\_DOC:GLOBAL}, and the IUEDR command manual information provided
+in the directory {\tt IUEDR\_MAN}.
+
+\newpage
+\section {Introduction}
+
+This Manual describes the commands and parameters used by IUEDR.  It
+is intended as a reference aid for people using IUEDR. If you are new
+to IUE data reduction, you should read the IUEDR User Guide (SUN/37)
+before proceeding any further. 
+
+IUEDR functions fall into a number of specific categories:
+
+\begin {itemize}
+\item IUE tape inspection and file reading
+\item Data display and manipulation
+\item Spectrum extraction and calibration
+\item Extraction product inspection and manipulation
+\item Extraction product output
+\end {itemize}
+
+These functions are controlled by over fifty commands, with  nearly
+one hundred global parameters within IUEDR.  Sensible defaults for the
+most important parameters are set at the beginning of each IUEDR
+session by a startup comand file. The default parameters are given in
+the Appendix. There follows a summary of the commands in each of the
+categories described above. 
+
+\subsection {IUE tape inspection and file reading}
+
+\begin {description}
+\item [KILL IUEDR] Exit IUEDR and return to ICL. (type EXIT in the non-ICL 
+UNIX version).
+\item [LISTIUE] Analyse the contents of one or more IUE tape files.
+\item [MTMOVE] Move to the start of a tape file.
+\item [MTREW] Rewind to the start of the tape.
+\item [MTSHOW] Show the current tape position.
+\item [MTSKIPEOV] Skip over the end-of-volume mark.
+\item [MTSKIPF] Skip over NSKIP tape marks.
+\item [READIUE] Read a RAW, GPHOT or PHOT IUE image from the tape/file.
+\item [READSIPS] Read the MELO or MEHI IUESIPS product from the tape/file.
+\item [SAVE] Write new versions for any files that have had their contents 
+updated during the current IUEDR session.
+\end {description}
+
+\subsubsection{VMS version}
+
+An ICL abort (Control-C or Control-Y) may have the effect of losing
+data not saved during the IUEDR session.
+
+\subsubsection{UNIX version}
+
+Interrupting the UNIX IUEDR (pre-ICL) will put it into the
+`background'. The task may be reattatched by typing `{\tt fg}'.
+
+A log of all commands typed during an IUEDR session and the response
+printed at the terminal can be found in {\tt SESSION.LIS}.  This is
+particularly useful when investigating the contents of IUE tapes. 
+
+\subsection {Data display and manipulation}
+
+\begin {description}
+
+\item [CULIMITS] Delineate the graphical display limits using the
+graphics cursor. 
+
+\item [CURSOR] Determine dipslay coordinates using the graphics cursor
+and print them at the terminal. 
+
+\item [DRIMAGE] Display an IUE image on a suitable graphics
+workstation.
+
+\item [EDIMAGE] Edit the image data quality using the graphics cursor.
+
+\item [MODIMAGE] Modify image pixel intensities interactively.
+
+\item [SHOW] Print information relating to the current dataset at the
+terminal.
+
+\item [ERASE] Erase the display screen of the current graphics
+workstation.
+
+\end {description}
+
+Image displays are colour coded to provide data quality information.
+The  colour codes used by IUEDR are as follows:
+
+\begin {quote}
+\begin {description}
+\item GREEN -- pixels affected by reseau marks
+\item RED -- pixels which are saturated (DN=255)
+\item ORANGE -- pixels affected by ITF truncation
+\item YELLOW -- pixels marked bad by the user
+\end {description}
+\end {quote}
+
+When using a mouse or tracker-ball with the graphics cursor, the
+cursor ``hit'' buttons are normally numbered in increasing order from
+left to right. 
+
+\subsection {Spectrum extraction and calibration}
+
+\begin {description}
+
+\item [BARKER] Correct the extracted data for echelle ripple using a 
+method based upon that of Barker (1984).
+
+\item [CGSHIFT] Determine the spectrum template shift using the cursor
+on  a SCAN plot.
+
+\item [LBLS] Extract a line-by-line-spectrum array from the image.
+
+\item [NEWABS] Associate a new absolute flux calibration with the
+current  dataset.
+
+\item [NEWCUT] Associate new echelle order wavelength limits with the
+current  dataset.
+
+\item [NEWDISP] Associate new spectrograph dispersion data with the
+current  dataset.
+
+\item [NEWFID] Associate new fiducial positions with the current
+dataset.
+
+\item [NEWRIP] Associate new ripple calibration data with the current 
+dataset.
+
+\item [NEWTEM] Associate new spectrum centroid template data with the 
+current dataset.
+
+\item [SCAN] Perform a scan of the image data perpendicular to the 
+spectrograph dispersion.
+
+\item [SETA] Set dataset parameters which are aperture specific.
+
+\item [SETD] Set dataset parameters which are independent of order and 
+aperture.
+
+\item [SETM] Set dataset parameters which are order specific.
+
+\item [TRAK] Extract a spectrum from the image.
+
+\end {description}
+
+\subsection {Extraction product inspection and manipulation}
+
+\begin {description}
+
+\item [EDMEAN] Edit the mean extracted spectrum using the graphics
+cursor.
+
+\item [EDSPEC] Edit the net extracted spectrum using the graphics
+cursor.
+
+\item [MAP] Map and merge extracted spectrum components to produce a
+mean  spectrum.
+
+\item [PLCEN] Plot the smoothed spectrum centroid shifts.
+
+\item [PLFLUX] Plot the calibrated flux spectrum.
+
+\item [PLGRS] Plot the pseudo-gross and background resulting from the 
+spectrum extraction.
+
+\item [PLMEAN] Plot the mean spectrum.
+
+\item [PLNET] Plot the uncalibrated net spectrum.
+
+\item [PLSCAN] Plot the image scan perpendicular to the dispersion.
+
+\item [SGS] Print the names of the available SGS graphics devices at
+the  terminal.
+
+\end {description}
+
+Plots of extracted IUE spectra and image scans include data quality
+information for bad data. The data quality codes used by IUEDR are as 
+follows:
+
+\begin {quote}
+\begin {description}
+\item 1 -- affected by extrapolated ITF
+\item 2 -- affected by microphonics
+\item 3 -- affected by noise spike
+\item 4 -- affected by bright point (or user)
+\item 5 -- affected by reseau mark
+\item 6 -- affected by ITF truncation
+\item 7 -- affected by saturation
+\item U -- affected by user edit
+\end {description}
+\end {quote}
+
+\subsection {Extraction product output}
+
+\begin {description}
+
+\item [OUTEM] Output the current spectrum template data to a formatted
+data  file.
+
+\item [OUTLBLS] Output the current LBLS array to a binary data file.
+
+\item [OUTMEAN] Output the current mean spectrum to a DIPSO ``SP''
+format  data file.\footnote{The DIPSO SP0 format has been changed from
+unformatted into a NDF format which allows inter-machine operation.}
+
+\item [OUTNET] Output the current net spectrum to a DIPSO ``SP''
+format data file. 
+
+\item [OUTRAK] Output the current uncalibrated spectrum to a ``TRAK'' 
+formatted data file. 
+
+\item [OUTSCAN] Output the current scan data to a DIPSO ``SP'' format
+data  file. 
+
+\item [OUTSPEC] Output the current aperture (LORES) or order (HIRES)
+spectrum to a DIPSO ``SP'' format data file.  
+
+\item [PRGRS] Print the current extracted aperture or order spectrum
+in tabular form.  
+
+\item [PRLBLS] Print the current LBLS array in tabular form. 
+
+\item [PRMEAN] Print the current mean spectrum in tabular form. 
+
+\item [PRSCAN] Print the intensities of the current image scan in
+tabular  form. 
+
+\item [PRSPEC] Print the current aperture or order spectrum in tabular 
+form. 
+
+\end {description} 
+
+\newpage
+
+\section {User Interface}
+
+\subsection {IUEDR Prompts}
+
+The IUEDR user interface has been replaced by the ICL user interface.
+This provides more functionality and on-line help to the user.
+
+Type HELP at the ICL prompt for details (See also SG/4).
+
+The UNIX version of ICL is not yet available. Therefore, the UNIX
+IUEDR user interface consists of a dedicated command line (prompt
+\verb+iuedr>+) which accepts only IUEDR commands (and optional
+parameter specifications).
+
+\subsection {Response to Command Prompts}
+
+Instructions to IUEDR are given as  command lines.
+
+Command lines begin with a command and an optional list of parameter
+assignments.
+
+Command lines and parameter lists can be continued onto a subsequent
+line by finishing the line with a tilde: \(\tilde{ }\). This indicates
+to IUEDR that further parameters are to be specified, {\em e.g.}
+
+\begin{verbatim}
+      ICL> READIUE ~
+      ICL>  DRIVE=TAPE FILE=1
+\end{verbatim}
+
+Usually IUEDR will only prompt for parameters required by commands if
+they have no currently defined value. However, some parameters are
+either cancelled during the execution of a command or are set so that
+the user is always prompted for a value. A command can be forced to
+prompt for all required parameter values thus:
+
+\begin{verbatim}
+      ICL> READIUE PROMPT
+\end{verbatim}
+
+To force a command to prompt for parameter values and give additional
+HELP information, you can reply `{\'tt ?}' in response to a parameter
+prompt:
+
+\begin{verbatim}
+      ICL> READIUE PROMPT
+      DRIVE [MUA0]: ?
+\end{verbatim}
+
+To route command output normally printed at the terminal to a log
+file, the syntax:
+
+\begin{verbatim}
+      ICL> REPORT OUTPUT.DAT
+\end{verbatim}
+
+is used. This will log all output generated by the IUEDR commands to
+the  file {\tt OUTPUT.DAT}. 
+
+Such logfiles can be examined using the REPFILE command.
+
+\subsection {Response to Parameter prompts} 
+
+Help about a parameter can
+be obtained by responding to the parameter prompt with a question
+mark, {\em e.g.}
+
+\begin{verbatim}
+      DATASET(SWP19986) ?
+\end{verbatim}
+
+Help information will then be printed at the terminal and the prompt
+repeated.
+
+Sometimes an undefined parameter value is interpreted by a command in
+a specific way ({\em e.g.} autoscaling within plotting commands).  A
+parameter can be set undefined by responding to the prompt with an
+exclaimation mark, {\em e.g.}
+
+\begin{verbatim}
+      XL(1150,1950) !
+\end{verbatim}
+
+A command may be aborted by responding to a parameter prompt with a 
+double exclaimation mark, {\em e.g.}
+
+\begin{verbatim}
+      XL(1150,1950) !!
+\end{verbatim}
+
+\subsection {Getting HELP}
+
+\subsubsection{VMS version}
+
+Type HELP IUEDR at the ICL command line prompt. You may optionally
+append a detailed description of the topic on which help is required.
+
+\subsubsection{UNIX version}
+
+Type HELP at the IUEDR command line prompt. You may optionally append
+a detailed description of the topic on which help is required.
+
+
+\subsection {VMS version - Access to DCL}
+
+Access to DCL commands from within an ICL session is accomplished  by
+pre-pending the command with a dollar sign, {\em e.g.}
+
+\begin{verbatim}
+      ICL> $ some-DCL-command
+\end{verbatim}
+
+Executing DCL commands in this way will end by returning to the ICL
+command prompt once the DCL command has finished execution.
+
+If you want an extended DCL session then you may type SPAWN at the ICL
+prompt. The DCL command LOGOUT is used to return to ICL from DCL, {\em
+e.g.}
+
+\begin{verbatim}
+      $ LOGOUT
+\end{verbatim}
+
+\subsection {IUEDR in Script and Batch Modes}
+
+NOTE: The previous Script and Batch facilities have been superseded by
+those provided within ICL. 
+
+It is possible to run IUEDR in ``script'' mode, where command and
+parameter input originates from a file instead of the terminal.  The
+file name from which the command input is to be taken is pre-pended
+with a LOAD command, {\tt e.g.}
+
+\begin{verbatim}
+ICL> LOAD SCRIPT
+\end{verbatim}
+
+This will result in the command input being taken from the file
+SCRIPT.ICL and the text output being written to the screen and default
+logfile.
+
+When ICL starts up it look for a login script in LOGIN.ICL thus to 
+run a BATCH job you need to place your commands in this file and then 
+submit a command file consisting of the following:
+
+\begin{verbatim}
+      $ ADAMSTART
+      $ SET DEFAULT somedisk:[some-dir]
+      $ ICL
+      $ EXIT
+\end{verbatim}
+
+NOTE: remember to include EXIT as the last ICL command in your login
+script.
+
+In addition to IUEDR commands, the script may contain any valid ICL
+command and also commands for any other loaded package.
+
+\subsection{UNIX version}
+
+ICL is not yet available on all UNIX platforms. If you are running the
+non-ICL IUEDR monolith then you can create a batch job by creating an 
+ascii file containing your commands and their associated parameters.
+You can then run this in the background by typing
+
+\begin{verbatim}
+      ascii-file-name &
+\end{verbatim}
+
+If you want the output to go to a logfile rather than the screen you
+can type: 
+
+\begin{verbatim}
+      ascii-file-name > log-file-name &
+\end{verbatim}
+
+This strategy runs each IUEDR command as a seperate program and is
+thus  rather inefficient as is will need to keep re-reading the data
+files for each command.
+
+\subsection {IUEDR Data Files}
+
+NOTE: The IUEDR data files have changed format in order to allow 
+inter-machine operation. However, IUEDR will still READ the OLD format
+files IF they are present (this is only useful on the VAX as all OLD
+format files will have been created on VAXen). If you have old format
+files then you should use IUEDR to convert them to the new format by
+doing the following, 
+
+\begin{verbatim}
+      ICL> TRAK DATASET=cam12345
+      ICL> $ RENAME cam12345.UE* cam12345\_old.UE*
+      ICL> $ SAVE
+\end{verbatim}
+
+During the reduction of an IUE dataset IUEDR will create a number of
+binary data files. Their filenames are as follows:
+
+\begin {description}
+\item \verb+<dataset>.UEC+ --- calibration file
+\item \verb+<dataset>_UED.SDF+ --- image data and quality file
+\item \verb+<dataset>_UES.SDF+ --- uncalibrated spectrum file
+\item \verb+<dataset>_UEM.SDF+ --- calibrated mean spectrum file
+\end {description}
+
+where \verb+<dataset>+ refers to the IUEDR DATASET parameter.
+
+The {\tt .SDF} files are STARLINK NDF format files and can be read and
+processed by any of the standard  packages ({\em e.g.}, KAPPA,FIGARO).
+These files are in a machine indepedent format and can be freely
+copied between any of the platforms which STARLINK supports. They may
+be quickly examined using the ICL TRACE and NDFTRACE commands.
+
+These files are in addition to the IUEDR log file and files generated
+by the  IUEDR output commands. They should only be deleted once the
+data reduction is complete and output  spectra obtained.
+
+\newpage
+
+\section{Changes to latest version}
+
+This section describes the main changes that have been made to IUEDR
+during its conversion to an ADAM based application which runs on both
+VAX and UNIX based systems.
+
+If you are a seasoned IUEDR user then you should study this section
+especially carefully.
+
+The most significant change from the scientific point of view is that 
+the precision of all floating point calculations has been upgraded to
+DOUBLE PRECISION. This was done after it was noticed that for high
+resolution extraction the output spectra were subject to rounding
+noise at the 1\% level.
+
+The format of the calibration file ({\tt .UEC}) created by IUEDR has
+been  changed to make it more readable. Old format files can still be 
+read, the format being automatically determined by the program.
+
+The functionality of the package has been enhanced to allow image data
+to be read directly from disk, and command procedures are provided to 
+automatically retreive images from the IUE archives.
+
+The general operation of IUEDR, and all the command and parameter
+names, are identical to those used in previous versions.
+
+\subsection{UNIX version}
+
+This release of IUEDR is written to run from the ICL command language.
+However, this is not yet available on all UNIX platforms. In these
+cases IUEDR runs as a single task which prompts the user for IUEDR
+specific commands.
+
+To start the IUEDR monolith task type 
+
+\begin{verbatim}
+      % iuedr3
+\end{verbatim}
+
+at the system prompt. The monolith then prompts repeatedly for IUEDR
+commands until exit. To exit from this task, type 
+
+\begin{verbatim}
+      iuedr> exit
+\end{verbatim}
+
+To access the on-line help, type:
+
+\begin{verbatim}
+      iuedr> help
+\end{verbatim}
+
+To abort a task type:
+
+\begin{verbatim}
+      iuedr> ctrl-c
+\end{verbatim}
+
+In addition to running as a monolithic task each IUEDR command is also
+available from the UNIX command line. Thus you can type:
+
+\begin{verbatim}
+      % trak
+\end{verbatim}
+
+at the system prompt and the IUEDR TRAK command will be invoked.
+
+{\em However, it is important to remember that in this case the
+program is re-started for each individual command and any previous
+context is lost leading to the inefficient re-reading of files.}
+
+\subsection{Log files}
+
+The creation of log files recording the output of IUEDR is different 
+depending upon whether you are running under ICL or not (not available
+for all UNIX platforms at the time of writing).
+
+\subsubsection{From ICL}
+
+ICL has its own message logging and reporting functions and
+information on these can be found using the HELP command.
+ 
+For convenience IUEDR defines the alias HISTORY as a shorthand command
+to provide a replay of the session log. By default this log is stored
+in {\tt SESSION.DAT} and may be examined using the ICL REPFILE
+command.
+
+To direct the logging to a different file the ICL command: 
+ 
+\begin{verbatim}
+      iuedr> report filename
+\end{verbatim}
+
+may be used.
+
+\subsubsection{From UNIX}
+
+Until ICL arrives on your UNIX platform the easiest way to create a
+log of a sequence of IUEDR commands is to place the commands in an
+ascii file (using an editor of your choice) and then type:
+
+\begin{verbatim}
+      % filename > log-filename
+\end{verbatim}
+
+at the system prompt.
+
+If you only need to log the output of a single command then you can
+simply type:
+
+\begin{verbatim}
+      iuedr-command > log-filename
+\end{verbatim}
+
+\subsection{IUEDR command files}
+
+The .CMD style of IUEDR command files is not directly supported by
+ICL, and neither is the associated input/output redirection using
+\(<\) and \(>\).
+
+ICL command procedures provide this functionality in the version 3.
+
+It is very easy to convert a {\tt .CMD} file into an ICL command procedure.
+{\em e.g.} a {\tt DEMO.CMD} procedure:
+
+\begin{verbatim}
+      DATASET=SWP03196
+      SHOW
+      TRAK APERTURE=LAP
+      SHOW V=S
+\end{verbatim}
+
+would become ICL procedure DEMO.ICL, thus:
+
+\begin{verbatim}
+      SHOW DATASET=SWP03196
+      TRAK APERTURE=LAP
+      SHOW V=S
+\end{verbatim}
+
+The only changes which need be made are to move any parameter
+specifications (eg DATASET=) onto the same line as they  command they
+apply to.
+
+ICL command procedures are run by typing:
+
+\begin{verbatim}
+      ICL> LOAD procedure-name
+\end{verbatim}
+
+ICL procedures may contain any valid ICL commands as well as the IUEDR
+provided command set. In addition you may  include commands provided
+by other monoliths ({\em e.g.} KAPPA,PONGO) to access functions not
+integrated into IUEDR.
+
+{\em If ICL is not yet available on your machine then you may simply 
+type the name of your command file at the system prompt and the
+IUEDR commands will be executed by the system shell.}
+
+\subsection{Interaction with DIPSO}
+
+This release of IUEDR is accompanied with a UNIX release of DIPSO. The
+format of the default DIPSO spectrum format SP0 files has been 
+changed to use the STARLINK NDF data format. This means that these
+files can be read by any standard STARLINK package.
+
+The IUEDR/DIPSO user should notice no difference, as both IUEDR and
+DIPSO understand the new format. However, if you have old VMS based
+{\tt .UES}/{\tt .UEM} files generated by previous versions of IUEDR,
+it is possible to read them into the new version of DIPSO (on VMS
+ONLY) by using the OSP0RD command instead of SP0RD.
+
+\subsection{DRIVE parameter options}
+
+The use of the DRIVE parameter has been enhanced to allow
+specification of disk files containing IUE datasets. This is intended
+for use with  files obtained from online archives (RAL and NASA).
+
+The sytax is to provide the full filename and extension in response to 
+the DRIVE prompt:
+
+\begin{verbatim}
+      DRIVE> SWP12345.RAW
+\end{verbatim}
+
+Two command procedures are provided to help automate the retreival of
+datasets from the archives: NDADSA\_FETCH and RLVAD\_FETCH retreive
+datasets from their respective archive sites. To use the procedures
+type:
+
+\begin{verbatim}
+      NDADSA_FETCH parmameter-1 [parameter-2]
+\end{verbatim}
+
+The first parameter may be either a dataset  identifier ({\em e.g.}
+SWP12345) or the name of a file containing a list of dataset
+identifiers (one per line).
+
+The second parameter is optional and specifies the type of dataset
+required. The default value is RAW, meaning raw data image. The set of
+available types is:
+
+\begin{itemize}
+\item RAW --- raw data image
+\item MELO --- extracted lo-res spectrum
+\item ELBL --- extracted line-by-line hi-res spectra
+\end{itemize}
+
+For example:
+
+\begin{verbatim}
+      NDADSA_FETCH images.lis ELBL
+\end{verbatim}
+
+would attempt to retreive a set of ELBL files whose identifiers are
+listed on the file `images.lis'
+
+The process can take some time depending upon the network load and the
+number of datasets requested. It may be convenient to let the job run
+in the background by typing:
+
+\begin{verbatim}
+      SPAWN/NOWAIT @IUEDR_DIR:NDADSA_FETCH images.lis ELBL
+\end{verbatim}
+
+{\em Automated retreival is not yet available from UNIX machines.}
+
+\subsection{VAX-UNIX IUEDR image file exchange}
+
+An IUEDR image file is one of RAW,PHOT, or GPHOT type and consist of
+768 by 768 pixels each stored in a 1 or 2-byte integer.
+
+The transfer of files between VAX and UNIX systems is complicated by
+the sophistication of the VAX file system. Under VMS the system
+records a complex description of the precise format of all the  files
+(and stores it in  the directory entry). Under UNIX this information
+has to be provided by the user of the file when it is  opened. Because
+of this difference it is sometimes necessary to use the following
+format conversion utilities.
+
+\subsubsection{VAX to UNIX}
+
+If you wish to transfer IUE image data from a VAX onto a UNIX machine
+in order to use the UNIX IUEDR then the transfer should be done using
+FTP (in BINARY mode).
+
+If you intend to copy the file using some other method (eg via NFS)
+then you should first use the command:
+
+\begin{verbatim}
+      UNIX_FORMAT image-name
+\end{verbatim}
+
+to ensure the file is properly transferred.
+
+Note that this also applies if you wish to just {\em access} the file
+via NFS without explicitly transferring it.
+
+\subsubsection{UNIX to VAX}
+
+If you wish to transfer IUE image data from a UNIX machine onto a VAX
+in order to use the VAX IUEDR then the transfer should be done using
+FTP (in BINARY mode) and the command:
+
+\begin{verbatim}
+      VAX_FORMAT  image-name
+\end{verbatim}
+
+should then be used to ensure the file has the correct format.
+
+If you use some other method of transferring the file (eg NFS) then 
+the above command is {\em still} required.
+
+\subsubsection{What will work?}
+
+In general the following two commands will allow you to use any disk
+based IUE image with any machine running IUEDR:
+
+\begin{itemize}
+\item {\tt VAX\_FORMAT} sets the file format as required by VAX IUEDR
+\item {\tt UNIX\_FORMAT} sets the file format as required by UNIX IUEDR
+\end{itemize}
+
+Both commands operate only on the VAX.
+
+The following illustrate some of the situations in which the format
+conversions are used. A YES indicates that the strategy will work as
+is, and  a NO that it will not, unless the remedial action described
+in the bracketed text, is applied.
+
+\begin{itemize}
+\item
+Copy file from archive onto VAX
+\begin{itemize}
+\item{YES using VAX IUEDR}
+\item{NO using UNIX IUEDR and accessing file via NFS (use UNIX\_FORMAT filename).}
+\end{itemize}
+
+\item
+FTP file from VAX to a UNIX system using BINARY transfer
+\begin{itemize}
+\item{YES using UNIX IUEDR}
+\item{UNKNOWN using VAX IUEDR and accessing file via NFS)}
+\end{itemize}
+
+\item
+FTP file from UNIX to a VAX system using BINARY transfer
+\begin{itemize}
+\item{NO using VAX IUEDR (use VAX\_FORMAT filename command).}
+\item{YES using UNIX IUEDR and accessing file via NFS)}
+\end{itemize}
+
+\item
+NFS copy file from VAX to a UNIX system after using UNIX\_FORMAT filename
+\begin{itemize}
+\item{YES using UNIX IUEDR}
+\item{UNKNOWN using VAX IUEDR and accessing file via NFS)}
+\end{itemize}
+
+\end{itemize}
+
+\subsection{Accessing data via NFS}
+
+UNIX machines commonly provide disk sharing amongst remote machines
+using the NFS protocol. 
+
+For example your data frame may reside on a DECstation local  disk
+called `iuedata' in the Rutherford cluster on machine `adam4'. In
+order to get IUEDR to read it directly you could enter the following
+in response to the DRIVE prompt:
+
+\begin{verbatim}
+      DRIVE> /adam4/iuedata/swp12345.raw
+\end{verbatim}
+
+To see which disks you have NFS access to you should use the {\tt
+\%~df } command. In general any disks whose entry does not start with
+a `/dev' are being served by a remote machine.
+
+
+{\em IMPORTANT NOTE}
+
+IUEDR allows you to use this method of data access with the following
+proviso.
+
+If the data resides on a VAX served disk then you must first  convert
+its directory entry using the following command:
+
+\begin{verbatim}
+      UNIX_FORMAT  image-name
+\end{verbatim}
+
+This command does not change the data in any way. It merely alters the
+description of the file format as stored in the VAX directory.
+
+If at some later stage you wish to use the VAX version of IUEDR on the
+same data file it first be necessary to use the command:
+
+\begin{verbatim}
+      VAX_FORMAT  image-name
+\end{verbatim}
+
+to convert back.
+	
+\subsection{Using on-line HELP}
+
+IUEDR now has a selection of methods for obtaining on-line help.
+
+\begin{itemize}
+\item
+From the VAX command line you may type:
+
+\begin{verbatim}
+      $ HELP IUEDR
+\end{verbatim}
+\item
+From the ICL command line you may type:
+
+\begin{verbatim}
+      ICL> HELP IUEDR
+\end{verbatim}
+
+\item
+From the IUEDR prompt on a UNIX machine you may type:
+
+\begin{verbatim}
+      iuedr> help
+\end{verbatim}
+
+\item
+From any IUEDR parameter prompt on any machine you may type:
+
+\begin{verbatim}
+      ?            for help on that parameter
+      ??           for help and to browse the help library
+\end{verbatim}
+
+\end{itemize}
+
+\subsection{Specifying vector parameters}
+
+Some IUEDR parameters (eg. XP, YP) require the specification of a pair
+of numbers defining the limits of a range of values (eg pixels).
+
+The method of setting such values has changed to the ADAM style:
+
+\begin{verbatim}
+	XP=[100,300]
+\end{verbatim}
+
+Note that the square brackets are only necessary when vector
+parameters are specified on the command line. They are not required
+when IUEDR prompts the user for a vector parameter.
+
+\newpage
+
+\section {Commands}
+
+This section contains a detailed description of each of the commands
+used by IUEDR.
+ 
+\begin {description}
+
+\item [BARKER] The spectrum data in DATASET are corrected for echelle 
+ripple in the range ORDERS using a the method based upon that of
+Barker (1984).
+
+\begin {description}
+\item Parameters:
+
+\begin {description}
+\item DATASET -- Dataset name.
+\item ORDERS -- This delineates a range of echelle orders.
+\end {description}
+
+\item Description:
+
+The spectrum data in DATASET are corrected for residual echelle ripple
+using  the method described by Barker (1984. Astronomical Journal,
+{\underline 89},  899). Orders in the range ORDERS are used in the
+ripple correction optimisation.  Note that this optimisation method is
+only applicable for SWP spectra. \end {description}
+
+\item [CGSHIFT] Determine spectrum template shift using the cursor on
+a  scan plot.
+
+\begin {description}
+\item Parameters:
+
+\begin {description}
+\item DATASET -- Dataset name.
+\item APERTURE -- Aperture name (SAP or LAP).
+\item ORDERS -- This delineates a range of echelle orders.
+\item DEVICE -- GKS/SGS graphics device name.
+\end {description}
+
+\item Description:
+
+This command allows the graphics cursor to be used to provide
+information about spectrum template registration shifts.
+
+A plot of the current spectrum scan must be available. A cycle
+consisting of hitting either the ``1'' or ``2'' cursor keys is used to
+mark the position of the spectrum. Each hit is used to calculate a
+linear geometric shift of the spectrum template relative to the image.
+The cycle is terminated by hitting any other key.
+
+For LORES, when the cycle is complete the last geometric shift
+determined is adopted and the scan is revoked.
+
+For HIRES, each cursor hit is automatically associated with an echelle
+order in the range defined by the ORDERS parameter. The last shift is
+again adopted, but the scan is available for further display or
+measurement. 
+
+\end {description}
+
+\item [CULIMITS] This command allows the display limits to be
+delineated  by the cursor and the appropriate parameters set
+accordingly.
+
+\begin {description}
+\item Parameters:
+
+\begin {description}
+\item DEVICE -- GKS/SGS graphics device name.
+\item XL -- $x$-axis plotting limits, [0,0] means auto-scale.
+\item YL -- $y$-axis plotting limits, [0,0] means auto-scale.
+\item XP -- $x$-axis pixel limits, undefined means full extent.
+\item YP -- $y$-axis pixel limits, undefined means full extent.
+\end {description}
+
+\item Description:
+
+This command uses the cursor to delineate part of a current display,
+graph or image, to be displayed in some subsequent command ({\em e.g.}
+PLFLUX,  DRIMAGE, ...). 
+
+The two cursor positions should be at the corners of the required
+rectangular subset. The relation between cursor position sequences and
+axis reversals for graphs is:
+
+\begin {quote}
+\begin {tabbing}
+Positionx1xxxx\=Positionx2xxxx\=$x$-reversedxxx\=$y$-reversed\=\kill
+\\
+{\bf Position 1}\>{\bf Position 2}\>{\bf $x$-reversed}\>{\bf 
+$y$-reversed}\\
+\\
+bottom/left\>top/right\>NO\>NO\\
+bottom/right\>top/left\>YES\>NO\\
+top/left\>bottom/right\>NO\>YES\\
+top/right\>bottom/left\>YES\>YES\\
+\end {tabbing}
+\end {quote}
+
+The XL and YL values are changed accordingly.
+
+In the case of an image display, the XP and YP parameter values
+are changed. The image will ALWAYS be drawn without axis reversals.
+\end {description}
+
+\item [CURSOR]
+Find display coordinates using the cursor and print them at the 
+terminal.
+                                                                
+\begin {description}
+\item Parameters:
+
+\begin {description}
+\item None.
+\end {description}
+
+\item Description:
+
+This command uses the graphics cursor to find coordinates on a
+displayed graph or image. 
+
+Either of the cursor hit keys ``1'' and ``2'' can be used repeatedly, with
+any other key being used to terminate.
+The coordinates for each cursor hit are printed on the terminal and 
+correspond to scale of the axes on the current diagram (e.g.
+(wavelength, flux) ).
+If meaningful, additional coordinate information is also printed.
+\end {description}
+
+\item [DRIMAGE]
+Display an IUE image on an suitable graphics workstation.
+
+\begin {description}
+\item Parameters:
+
+\begin {description}
+\item DATASET -- Dataset name.
+\item DEVICE -- GKS/SGS graphics device name.
+\item XP -- $x$-axis pixel limits, undefined means full extent.
+\item YP -- $y$-axis pixel limits, undefined means full extent.
+\item ZL -- Data limits for image display, undefined means full range.
+\item FLAG -- Whether data quality for faulty pixels are displayed.
+\end {description}
+
+\item Description:
+
+This command displays the image specified by the DATASET
+parameter on the device specified by the DEVICE parameter.
+
+The part of the image displayed is specified by the XP and YP
+parameter values.
+If unspecified, XP and YP default to the entire image extent, i.e.
+
+\begin {quote}
+      XP = (1,768), YP = (1,768).
+\end {quote}
+
+If the values of XP or YP are specified in decreasing order, the
+image will NOT be reversed along the appropriate axis.
+
+The range of data values displayed as a grey scale is limited
+by the two values of the ZL parameter.
+Data values at or below ZL(1) will appear BLACK, those at ZL(2) will
+appear WHITE and those above ZL(2) will appear blue.
+If the ZL values are given in decreasing order, then high data
+values will be represented by low (dark) display intensities,
+and vice-versa.
+If the values are undefined, then the full intensity range of the
+image will be used.
+The full intensity range of the image can be found using the command
+
+\begin {quote}
+\begin{verbatim}
+> SHOW V=I
+\end{verbatim}
+\end {quote}
+
+If a pixel is affected by more than one of the above faults, then
+the first in the list is adopted for display.
+
+\begin {description}
+\item GREEN -- pixels affected by reseau marks
+\item RED -- pixels which are saturated (DN=255)
+\item ORANGE -- pixels affected by ITF truncation
+\item YELLOW -- pixels marked bad by the user
+\end {description}
+
+If a pixel is affected by more than one of the above faults, then
+the first in the list is adopted for display.
+\end {description}
+
+\item [EDIMAGE]
+Edit the image data quality using the graphics cursor.
+
+\begin {description}
+\item Parameters:
+
+\begin {description}
+\item DATASET -- Dataset name.
+\item DEVICE -- GKS/SGS graphics device name.
+\end {description}
+
+\item Description:
+
+This command uses the image display cursor to mark pixels and
+regions of the current image that are ``bad'' or ``good''.
+The image should have previously been displayed using the
+DRIMAGE command.
+So that faulty pixels can be seen, the FLAG=TRUE option in DRIMAGE should be
+used.
+
+The image display is specified by the DEVICE parameter and the associated
+dataset by the DATASET parameter.
+
+The following cursor hit sequences can be used in a cycle:
+
+\begin {description}
+\item 1 then 1 -- marks all pixels in the rectangle GOOD
+\item 2 then 2 -- marks all points in the rectangle BAD
+\item 1 -- marks the nearest pixel GOOD
+\item 2 -- marks the nearest pixel BAD
+\item 3 -- causes the cursor cycle to terminate
+\end {description}
+
+The pixels or ranges changed are printed on the terminal.
+The term ``rectangle'' is used above to indicate a rectangular
+set of pixels delineated by the two cursor positions.
+Thus, for the first hit, the cursor can be positioned at the
+bottom left corner, and for the second at the top right corner.
+
+Only the user-defined data quality bit can be changed by this
+command.
+Initially, all faulty pixels have this bit set BAD, so that
+spectrum extraction (say) can ignore these where appropriate.
+However, the user-defined data quality can also be set GOOD.
+
+See the IUEDR User Guide for further information on data quality.
+\end {description}
+
+\item [EDMEAN]
+Edit the mean extracted spectrum using the graphics cursor.
+
+\begin {description}
+\item Parameters:
+
+\begin {description}
+\item DATASET -- Dataset name.
+\item DEVICE -- GKS/SGS graphics device name.
+\end {description}
+
+\item Description:
+
+This command uses the graphics cursor to mark points and
+regions of the mean spectrum that are ``bad'' or ``good''.
+
+The following cursor hit sequences can be used in a cycle:
+
+\begin {description}
+\item 1 then 1 -- marks all points in the $x$-range GOOD
+\item 2 then 2 -- marks all points in the $x$-range BAD
+\item 1 -- marks the nearest point in $x$-direction GOOD
+\item 2 -- marks the nearest point in $x$-direction BAD
+\item 3 -- causes the cursor cycle to terminate
+\end {description}
+
+The points or ranges changed are printed on the terminal.
+
+See the IUEDR User Guide for further information on data quality.
+\end {description}
+
+\item [EDSPEC]
+Edit the net extracted spectrum using the graphics cursor.
+
+\begin {description}
+\item Parameters:
+
+\begin {description}
+\item DATASET -- Dataset name.
+\item ORDER -- Echelle order number.
+\item APERTURE -- Aperture name (SAP or LAP).
+\item DEVICE -- GKS/SGS graphics device name.
+\end {description}
+
+\item Description:
+
+This command uses the graphics cursor to mark points and
+regions of the current net spectrum that are ``bad'' or ``good''.
+A plot of the APERTURE or ORDER spectrum is required before this
+command can be used.
+
+The following cursor hit sequences can be used in a cycle:
+
+\begin {description}
+\item 1 then 1 -- marks all points in the $x$-range GOOD
+\item 2 then 2 -- marks all points in the $x$-range BAD
+\item 1 -- marks the nearest point in $x$-direction GOOD
+\item 2 -- marks the nearest point in $x$-direction BAD
+\item 3 -- causes the cursor cycle to terminate
+\end {description}
+
+The points or ranges changed are printed on the terminal.
+
+Only the user-defined data quality bit can be changed by this
+command.
+Initially, all faulty points have this bit set BAD (e.g. by TRAK).
+However, whether they are considered bad (e.g. when plotting
+or creating output files) is determined by the user-defined
+bit, which can be changed at will.
+
+See the IUEDR User Guide for further information on data quality.
+\end {description}
+
+\item [ERASE]
+Erase the display screen of the graphics device.
+
+\begin {description}
+\item Parameters:
+
+\begin {description}
+\item DEVICE -- GKS/SGS graphics device name.
+\end {description}
+
+\item Description:
+
+The display screen of the specified graphics device is erased.
+\end {description}
+
+\item [EXIT]
+Quit IUEDR and return to DCL.
+
+\begin {description}
+\item Parameters:
+
+\begin {description}
+\item None.
+\end {description}
+
+\item Description:
+
+This command quits IUEDR and returns to DCL.
+Any files that require new versions will be written by this
+command.
+This command is a synonym for the QUIT command.
+\end {description}
+
+\item [LBLS]
+Extracts a line-by-line-spectrum (LBLS) array from the 
+image.
+
+\begin {description}
+\item Parameters:
+
+\begin {description}
+\item DATASET -- Dataset name.
+\item ORDER -- Echelle order number.
+\item APERTURE -- Aperture name (SAP or LAP).
+\item GSAMP -- Spectrum grid sampling rate (geometric pixels).
+\item CUTWV -- Whether wavelength cutoff data used for extraction grid.
+\item CENTM -- Whether pre-existing centroid template is used.
+\item RL -- Limits across spectrum for LBLS array (pixels).
+\item RSAMP -- Radial coordinate sampling rate for LBLS grid (pixels).
+\end {description}
+
+\item Description:
+
+This command creates a line-by-line-spectrum (LBLS) array from the
+image defined by DATASET.
+The array consists of intensities F(IR,IW) for a grid of wavelengths,
+W(IW), and radial coordinates, R(IR).
+The wavelength grid, W, is determined in a similar way to the TRAK command,
+using the CUTWV (HIRES) and GSAMP (HIRES/LORES) parameters.
+
+The radial coordinates are distances from the centre of the spectrum,
+derived from the template data,
+along a line perpendicular to the dispersion direction and
+measured in geometric pixels.
+The radial grid, R, is determined by the RL and RSAMP parameters.
+
+The value of each pixel in the array corresponds to the surface
+over the image of a rectangle centred on its (R,W) coordinates,
+and extents
+
+\begin {quote}
+(R(IR)-DR/2, R(IR)+DR/2)
+\end {quote}
+and
+
+\begin {quote}
+(W(IW)-DW/2, W(IW)+DW/2).
+\end {quote}
+DR is the distance between R values, and DW is the wavelength step
+between W values.
+
+This surface integral is scaled along the W direction to
+correspond to an interval of 1.414 geometric pixels.
+The reason for this is to make LBLS intensities consistent with 
+those produced by the TRAK command.
+For a particular wavelength, W(IW), the sum of LBLS intensities
+after removal of background should correspond to the net
+flux as measured by TRAK.
+\end {description}
+
+\item [LISTIUE]
+Analyse the contents of one or more IUE tape files.
+
+\begin {description}
+\item Parameters:
+
+\begin {description}
+\item DRIVE -- Tape drive logical name/file.
+\item FILE -- Tape file number.
+\item NFILE -- Number of tape files to be processed.
+\item NLINE -- Number of IUE header lines printed.
+\item SKIPNEXT -- Whether skip to next file.
+\end {description}
+
+\item Description:
+
+This performs an analysis of NFILE IUE tape files, starting at
+the file specified by the FILE parameter.
+NFILE=-1 means list all files until the end of the tape.
+NLINE=-1 means print all lines in file header.
+\end {description}
+
+\item [MAP]
+Map and merge the extracted spectrum components to produce a mean spectrum.
+
+\begin {description}
+\item Parameters:
+
+\begin {description}
+\item DATASET -- Dataset name.
+\item ORDERS -- This delineates a range of echelle orders.
+\item RM -- Whether mean spectrum is reset before averaging.
+\item ML -- Wavelength grid limits for mean spectrum.
+\item MSAMP -- Wavelength sampling rate for mean spectrum grid.
+\item FILLGAP -- Whether gaps can be filled within order.
+\item COVERGAP -- Whether gaps can be filled by covering orders.
+\end {description}
+
+\item Description:
+
+This command can be used to produce a mean spectrum with contributions
+from several echelle orders (HIRES), or from several apertures (LORES).
+
+If RM=TRUE, or if there is no existing mean spectrum, then an
+evenly spaced wavelength grid is constructed between the
+limits specified by the ML parameter using the sampling rate
+specified by the MSAMP parameter.
+
+If RM=FALSE and there IS an existing mean spectrum, then the wavelength
+grid AND CONTENTS are retained.
+New components will be averaged with what is already there.
+
+In the case of HIRES, the ORDERS parameter is used to delimit the range
+of echelle orders that are allowed to contribute to the mean.
+
+In the case of LORES, only a single aperture specified by the 
+APERTURE parameter is mapped at a given time.
+\end {description}
+
+\item [MODIMAGE]
+Modifies image pixel intensities interactively.
+
+\begin {description}
+\item Parameters:
+
+\begin {description}
+\item DATASET -- Dataset name.
+\item DEVICE -- GKS/SGS graphics device name.
+\item FN -- Replacement Flux Number for pixel.
+\end {description}
+
+\item Description:
+
+This command uses the image display cursor to modify image data.
+The image should already have been displayed using the DRIMAGE command.
+
+The following cursor sequences are adopted:
+
+\begin {description}
+\item 1 then 2 -- copy intensity of first picked pixel to the second
+\item 2 -- prompt for replacement pixel intensity
+\item 3 -- finish
+\end {description}
+
+If the data or data qualities change after a session, then the file is
+saved on disk.
+
+The assumption is made that the current image displayed corresponds
+to the current dataset!
+\end {description}
+
+\item [MTMOVE]
+Move to the start of a tape file.
+
+\begin {description}
+\item Parameters:
+
+\begin {description}
+\item DRIVE -- Tape drive logical name.
+\item FILE -- Tape file number.
+\end {description}
+
+\item Description:
+
+Move to the start of the file specified by the FILE parameter on the 
+tape specified by the DRIVE parameter.
+\end {description}
+
+\item [MTREW]
+Rewind to the start of the tape.
+
+\begin {description}
+\item Parameters:
+
+\begin {description}
+\item DRIVE -- Tape drive logical name.
+\end {description}
+
+\item Description:
+
+This command rewinds the tape specified by the DRIVE parameter.
+The FILE parameter is also set to 1 by this command.
+\end {description}
+
+\item [MTSHOW]
+Show the current tape position.
+
+\begin {description}
+\item Parameters:
+
+\begin {description}
+\item DRIVE -- Tape drive logical name.
+\end {description}
+
+\item Description:
+
+This command displays the current tape position.
+This includes the file number and the block position relative to either 
+the start or the end of the file.
+
+Note that the actual file position may differ from the
+value of the FILE parameter.
+\end {description}
+
+\item [MTSKIPEOV]
+Skip over end-of-volume (EOV) mark.
+
+\begin {description}
+\item Parameters:
+
+\begin {description}
+\item DRIVE -- Tape drive logical name.
+\end {description}
+
+\item Description:
+
+This command skips over an end-of-volume (EOV) mark on the tape specified 
+by the DRIVE parameter.
+An EOV condition is where there are two consecutive tape marks.
+When attempting to skip across an EOV, an error will be reported
+and the tape left positioned between the two marks.
+Subsequent attempts to skip forward will fail and
+only this command can be used to move forward beyond the
+second tape mark.
+\end {description}
+
+\item [MTSKIPF]
+Skip over NSKIP tape marks.
+
+\begin {description}
+\item Parameters:
+
+\begin {description}
+\item DRIVE -- Tape drive logical name.
+\item NSKIP -- Number of tape marks to be skipped over.
+\end {description}
+
+\item Description:
+
+This command skips over NSKIP tape marks on the tape specified
+by the DRIVE parameter.
+If NSKIP is negative this means that tape marks are skipped in the
+reverse direction, i.e. towards the start of the tape.
+\end {description}
+
+\item [NEWABS]
+Associate a new absolute flux calibration with the current dataset.
+
+\begin {description}
+\item Parameters:
+
+\begin {description}
+\item DATASET -- Dataset name.
+\item ABSFILE -- Name of file containing absolute flux calibration.
+\footnote{If you are on a UNIX machine then you should ensure that the
+correct case if used (upper/lower) or the file will not be found.}
+\end {description}
+
+\item Description:
+
+This command reads the absolute flux calibration from a text file
+specified by the ABSFILE parameter and stores it in the dataset
+specified by DATASET.
+
+The file type is assumed to be ``.ABS'' and should not be
+specified as part of the ABSFILE parameter.
+
+The calibration of any current spectrum is automatically updated.
+\end {description}
+
+\item [NEWCUT]
+Associate new echelle order wavelength limits with the current
+dataset.
+
+\begin {description}
+\item Parameters:
+
+\begin {description}
+\item DATASET -- Dataset name.
+\item CUTFILE -- Name of file containing echelle order wavelength limits.
+\end {description}
+
+\item Description:
+
+This command reads the echelle order wavelength limits from a text file
+specified by the CUTFILE parameter and stores them in the dataset
+specified by DATASET.
+
+The file type is assumed to be ``.CUT'' and should not be
+specified as part of the CUTFILE parameter.
+
+The calibration of any current spectrum is automatically updated.
+\end {description}
+
+\item [NEWDISP]
+Associate new spectrograph dispersion data with the current dataset.
+
+\begin {description}
+\item Parameters:
+
+\begin {description}
+\item DATASET -- Dataset name.
+\item DISPFILE -- Name of file containing dispersion data.
+\end {description}
+
+\item Description:
+
+This command reads spectrograph dispersion data from a text file
+specified by the DISPFILE parameter and stores them in the dataset
+specified by DATASET.
+
+The file type is assumed to be ``.DSP'' and should not be specified
+as part of the DISPFILE parameter.
+\end {description}
+
+\item [NEWFID]
+Read IUE fiducial positions into DATASET from text file with
+name specified by FIDFILE.
+
+\begin {description}
+\item Parameters:
+
+\begin {description}
+\item DATASET -- Dataset name.
+\item FIDFILE -- Name of file containing fiducial positions.
+\item NGEOM -- Number of Chebyshev terms used to represent geometry.
+\end {description}
+
+\item Description:
+
+This command reads IUE fiducial positions from a text file
+specified by the FIDFILE parameter and stores them in the dataset
+specified by DATASET.
+
+The file type is assumed to be ``.FID'' and should not be specified
+as part of the FIDFILE parameter.
+
+The image data quality and geometry representation are updated to
+account for any changes that these fidicual positions imply.
+In the case of datasets containing image distortion, the NGEOM
+parameter is used to specify the number of terms used for the Chebyshev 
+representation along each axis.
+\end {description}
+
+\item [NEWRIP]
+Read echelle ripple calibration into DATASET from text file 
+with name specified by RIPFILE.
+
+\begin {description}
+\item Parameters:
+
+\begin {description}
+\item DATASET -- Dataset name.
+\item RIPFILE -- Name of file containing echelle ripple calibration.
+\end {description}
+
+\item Description:
+
+This command reads an echelle ripple calibration from a text file
+specified by the RIPFILE parameter and stores it in the dataset
+specified by DATASET.
+
+The file type is assumed to be ``.RIP'' and should not be specified 
+as part of the RIPFILE parameter.
+
+The calibration of any current spectrum is automatically updated.
+\end {description}
+
+\item [NEWTEM]
+Read spectrum centroid template data into DATASET from text 
+file with name specified by TEMFILE.
+
+\begin {description}
+\item Parameters:
+
+\begin {description}
+\item DATASET -- Dataset name.
+\item TEMFILE -- Name of file containing spectrum template data.
+\end {description}
+
+\item Description:
+
+This command reads the spectrum centroid template data into DATASET from 
+a text file with name specified by TEMFILE.
+
+The file type is assumed to be ``.TEM'' and should not be specified
+as part of the TEMFILE.
+\end {description}
+
+\item [OUTEM]
+Output the current spectrum template data to a formatted data file.
+
+\begin {description}
+\item Parameters:
+
+\begin {description}
+\item DATASET -- Dataset name.
+\item TEMFILE -- Name of file containing spectrum template data.
+\end {description}
+
+\item Description:
+
+This command outputs the templates stored with the current
+dataset to a separate text file. 
+If not specified, the file name is constructed as:
+
+\begin {quote}
+$<$CAMERA$>$HI$<$APERTURE$>$.TEM
+\end {quote}
+or
+
+\begin {quote}
+$<$CAMERA$>$LO.TEM
+\end {quote}
+
+for the HIRES and LORES cases respectively.
+\end {description}
+
+\item [OUTLBLS]
+Output the current LBLS array to a binary data file.
+
+\begin {description}
+\item Parameters:
+
+\begin {description}
+\item DATASET -- Dataset name.
+\item OUTFILE -- Name of output file.
+\end {description}
+
+\item Description:
+
+This command outputs the current LBLS array 
+to a file.
+If not specified by the OUTFILE parameter, the file name is constructed as:
+
+\begin {quote}
+$<$CAMERA$><$IMAGE$>$R.DAT
+\end {quote}
+The format of this file is described by the Fortran 77 routine, RDLBLS, which
+can be found in the file:
+
+\begin {quote}
+IUEDR\_USER:RDLBLS.FOR
+\end {quote}
+The directory IUEDR\_USER: also contains a test
+program for using RDLBLS and other helpful items.
+\end {description}
+
+\item [OUTMEAN]
+Output current mean spectrum to a DIPSO ``SP'' format data file.
+
+\begin {description}
+\item Parameters:
+
+\begin {description}
+\item DATASET -- Dataset name.
+\item OUTFILE -- Name of output file.
+\item SPECTYPE -- DIPSO ``SP'' file type (0, 1 or 2).
+\end {description}
+
+\item Description:
+
+This command outputs the mean spectrum associated with 
+DATASET to a file that can be read into DIPSO (i.e. SUN/50).
+
+This file is created with type specified
+by the SPECTYPE parameter (see SUN/50 for ``SP'' options). 
+If not specified, the file name is constructed as:
+
+\begin {quote}
+$<$CAMERA$><$IMAGE$>$M.DAT
+\end {quote}
+In DIPSO ``SP'' format, bad points are indicated by having zero intensities.
+In determining which points in the output file are to be marked
+``bad'', the user-defined data quality bit is used.
+Since this bit can be arbitrarily edited,
+faulty data values can be written to the output file 
+without subsequent information being retained.
+\end {description}
+
+\item [OUTNET]
+Output the current net spectrum to a DIPSO  ``SP'' format data file.
+
+\begin {description}
+\item Parameters:
+
+\begin {description}
+\item DATASET -- Dataset name.
+\item APERTURE -- Aperture name (SAP or LAP).
+\item ORDER -- Echelle order number.
+\item OUTFILE -- Name of output file.
+\item SPECTYPE -- DIPSO ``SP'' file type (0, 1 or 2).
+\end {description}
+
+\item Description:
+
+This command outputs the net spectrum associated with ORDER or APERTURE
+and DATASET to a file that can be read into DIPSO (i.e. SUN/50).
+
+The file is created with type specified
+by the SPECTYPE parameter (see SUN/50 for ``SP'' options).
+If not specified, the file name is constructed as:
+
+\begin {quote}
+$<$CAMERA$><$IMAGE$>.<$APERTURE$>$
+\end {quote}
+in the case of LORES and
+
+\begin {quote}
+$<$CAMERA$><$IMAGE$>.<$ORDER$>$
+\end {quote}
+in the case of HIRES.
+Here, $<$APERTURE$>$ is the aperture name (SAP or LAP), or index, and
+$<$ORDER$>$ is the echelle order number.
+
+In DIPSO ``SP'' format, bad points are indicated by having zero intensities.
+In determining which points in the output file are to be marked
+``bad'', the user-defined data quality bit is used.
+Since this bit can be arbitrarily edited,
+faulty data values can be written to the output file 
+without subsequent information being retained.
+\end {description}
+
+\item [OUTRAK]
+Output the current uncalibrated spectrum to a ``TRAK'' formatted data file.
+
+\begin {description}
+\item Parameter:
+
+\begin {description}
+\item DATASET -- Dataset name.
+\item OUTFILE -- Name of output file.
+\end {description}
+
+\item Description:
+
+This command outputs the uncalibrated spectrum associated with
+DATASET to a formatted file that is compatible with output
+from the old ``TRAK'' program.
+The default file name is of the form:
+
+\begin {quote}
+$<$CAMERA$><$IMAGE$>$.TRK
+\end {quote}
+The main difference from an actual ``TRAK'' file is that the background
+level is uniformly zero, so that GROSS=NET.
+\end {description}
+
+\item [OUTSCAN]
+Output the current scan data to a DIPSO  ``SP'' format data file.
+
+\begin {description}
+\item Parameter:
+
+\begin {description}
+\item DATASET -- Dataset name.
+\item OUTFILE -- Name of output file.
+\item SPECTYPE -- DIPSO ``SP'' file type (0, 1 or 2).
+\end {description}
+
+\item Description:
+
+This command outputs the current scan associated with 
+DATASET to a file which can be read into DIPSO (i.e. SUN/50).
+
+The file is created with type specified
+by the SPECTYPE parameter (see SUN/50 for ``SP'' options).
+If not specified, the file name is constructed as:
+
+\begin {quote}
+$<$CAMERA$><$IMAGE$>$S.DAT
+\end {quote}
+In DIPSO ``SP'' format, bad points are indicated by having zero intensities.
+In determining which points in the output file are to be marked
+``bad'', the user-defined data quality bit is used.
+Since this bit can be arbitrarily edited,
+faulty data values can be written to the output file 
+without subsequent information being retained.
+\end {description}
+
+\item [OUTSPEC]
+Output the current aperture (LORES) or order (HIRES) spectrum 
+to a DIPSO ``SP'' format data file.
+
+\begin {description}
+\item Parameters:
+
+\begin {description}
+\item DATASET -- Dataset name.
+\item APERTURE -- Aperture name (SAP or LAP).
+\item ORDER -- Echelle order number.
+\item OUTFILE -- Name of output file.
+\item SPECTYPE -- DIPSO ``SP'' file type (0, 1 or 2).
+\end {description}
+
+\item Description:
+
+This command outputs the spectrum associated with ORDER or APERTURE
+and DATASET to a file which can be read into DIPSO (i.e. SUN/50).
+
+The file is created with type specified
+by the SPECTYPE parameter (see SUN/50 for ``SP'' options)
+If not specified, the file name is constructed as:
+
+\begin {quote}
+$<$CAMERA$><$IMAGE$>.<$APERTURE$>$
+\end {quote}
+in the case of LORES and
+
+\begin {quote}
+$<$CAMERA$><$IMAGE$>.<$ORDER$>$
+\end {quote}
+in the case of HIRES.
+Here, $<$APERTURE$>$ is the aperture name (SAP or LAP), or index, and
+$<$ORDER$>$ is the echelle order number.
+
+In DIPSO ``SP'' format, bad points are indicated by having zero intensities.
+In determining which points in the output file are to be marked
+``bad'', the user-defined data quality bit is used.
+Since this bit can be arbitrarily edited,
+faulty data values can be written to the output file
+without subsequent information being retained.
+\end {description}
+
+\item [PLCEN]
+Plot smoothed centroid shifts.
+
+\begin {description}
+\item Parameters:
+
+\begin {description}
+\item DATASET -- Dataset name.
+\item ORDER -- Echelle order number.
+\item APERTURE -- Aperture name (SAP or LAP).
+\item RS -- Whether display is reset before plotting.
+\item DEVICE -- GKS/SGS graphics device name.
+\item ZONE -- Zone to be used for plotting.
+\item LINE -- Plotting line style (SOLID, DASH, DOTDASH, DOT).
+\item LINEROT -- Whether line style is changed after next plot.
+\item COL -- Plotting line colour (1, 2, 3, ..., 10).
+\item COLROT -- Whether line colour is changed after next plot.
+\item XL -- $x$-axis plotting limits, [0,0] means auto-scale.
+\item YL -- $y$-axis plotting limits, [0,0] means auto-scale.
+\end {description}
+
+\item Description:
+
+This command plots the smoothed centroid shifts produced during
+the most recent spectrum extraction from DATASET
+on the graphics device and zone specified by the DEVICE and
+ZONE parameters respectively.
+
+In the case of a LORES spectrum, if there is more than a single
+aperture available, then the APERTURE parameter needs to be specified.
+
+In the case of a HIRES spectrum, if there is more than a single
+echelle order, then the ORDER parameter needs to be specified.
+
+The RS parameter specifies whether a new plot is started, or whether
+the data can be plotted over an existing plot.
+
+The LINE and LINEROT parameters determine the line style which will be
+used for plotting.
+
+The COL and COLROT parameters determine the line colour which will be used
+for plotting if the DEVICE supports colour graphics.
+
+The diagram limits are specified by the XL and YL parameter values.
+If XL and YL have values
+
+\begin {quote}
+XL=[0,0], YL=[0,0],
+\end {quote}
+then the plot limits along each axis are determined so that the whole
+spectrum is visible.
+If the values of XL or YL are specified in decreasing order, then
+the coordinates will be reversed along the appropriate axis.
+\end {description}
+
+\item [PLFLUX]
+Plot calibrated flux spectrum.
+
+\begin {description}
+\item Parameters:
+
+\begin {description}
+\item DATASET -- Dataset name.
+\item ORDER -- Echelle order number.
+\item APERTURE -- Aperture name (SAP or LAP).
+\item RS -- Whether display is reset before plotting.
+\item DEVICE -- GKS/SGS graphics device name.
+\item ZONE -- Zone to be used for plotting.
+\item LINE -- Plotting line style (SOLID, DASH, DOTDASH, DOT).
+\item LINEROT -- Whether line style is changed after next plot.
+\item COL -- Plotting line colour (1, 2, 3, ..., 10).
+\item COLROT -- Whether line colour is changed after next plot.
+\item HIST -- Whether lines are drawn as histograms.
+\item QUAL -- Whether data quality information is plotted.
+\item XL -- $x$-axis plotting limits, [0,0] means auto-scale.
+\item YL -- $y$-axis plotting limits, [0,0] means auto-scale.
+\end {description}
+
+\item Description:
+
+This command plots the calibrated flux spectrum from DATASET
+on the graphics device and zone specified by the DEVICE and 
+ZONE parameters respectively.
+
+In the case of a LORES spectrum, if there is more than a single
+aperture available, then the APERTURE parameter needs to be specified.
+
+In the case of a HIRES spectrum, if there is more than a single
+echelle order, then the ORDER parameter needs to be specified.
+
+The RS parameter specifies whether a new plot is started, or whether
+the data can be plotted over an existing plot.
+
+The HIST parameter determines whether the line is drawn as a histogram
+rather than a continuous polyline.
+
+The LINE and LINEROT parameters determine the line style which will be
+used for plotting.
+
+The COL and COLROT parameters determine the line colour which will be used
+for plotting if the DEVICE supports colour graphics.
+
+The diagram limits are specified by the XL and YL parameter values.
+If XL and YL have values
+
+\begin {quote}
+XL=[0,0], YL=[0,0],
+\end {quote}
+then the plot limits along each axis are determined so that the whole
+spectrum is visible.
+If the values of XL or YL are specified in decreasing order, then
+the coordinates will be reversed along the appropriate axis.
+
+The QUAL parameter indicates whether faulty points are flagged with
+their data quality codes (see Section 1).
+
+If a point is affected by more than one of the above faults, then
+the highest code is plotted.
+Points marked bad by user edits are only indicated if they are otherwise
+fault-free.
+\end {description}
+
+\item [PLGRS]
+Plot pseudo-gross and background from spectrum extraction.
+
+\begin {description}
+\item Parameters:
+
+\begin {description}
+\item DATASET -- Dataset name.
+\item ORDER -- Echelle order number.
+\item APERTURE -- Aperture name (SAP or LAP).
+\item RS -- Whether display is reset before plotting.
+\item DEVICE -- GKS/SGS graphics device name.
+\item ZONE -- Zone to be used for plotting.
+\item LINE -- Plotting line style (SOLID, DASH, DOTDASH, DOT).
+\item LINEROT -- Whether line style is changed after next plot
+\item COL -- Plotting line colour (1, 2, 3, ..., 10).
+\item COLROT -- Whether line colour is changed after next plot.
+\item HIST -- Whether lines are drawn as histograms.
+\item QUAL -- Whether data quality information is plotted.
+\item XL -- $x$-axis plotting limits, [0,0] means auto-scale.
+\item YL -- $y$-axis plotting limits, [0,0] means auto-scale.
+\end {description}
+
+\item Description:
+
+This command plots the pseudo-gross and smooth background produced during
+the most recent spectrum extraction from DATASET
+on the graphics device and zone specified by the DEVICE and
+ZONE parameters respectively.
+
+The pseudo-gross is constructed by taking the net spectrum and adding
+the smooth background multiplied by the width of the object channel.
+The smooth background plotted is also for the object channel width.
+
+In the case of a LORES spectrum, if there is more than a single
+aperture available, then the APERTURE parameter needs to be specified.
+
+In the case of a HIRES spectrum, if there is more than a single
+echelle order, then the ORDER parameter needs to be specified.
+
+The RS parameter specifies whether a new plot is started, or whether
+the data can be plotted over an existing plot.
+
+The HIST parameter determines whether the line is drawn as a histogram
+rather than a continuous polyline.
+
+The LINE and LINEROT parameters determine the line style which will be
+used for plotting.
+
+The COL and COLROT parameters determine the line colour which will be used
+for plotting if the DEVICE supports colour graphics.
+
+The diagram limits are specified by the XL and YL parameter values.
+If XL and YL have values
+
+\begin {quote}
+XL=[0,0], YL=[0,0],
+\end {quote}
+then the plot limits along each axis are determined so that the whole
+spectrum is visible.
+If the values of XL or YL are specified in decreasing order, then
+the coordinates will be reversed along the appropriate axis.
+
+The QUAL parameter indicates whether faulty points are flagged with
+their data quality codes (see Section 1).
+
+If a point is affected by more than one of the above faults, then
+the highest code is plotted.
+Points marked bad by user edits are only indicated if they are otherwise
+fault-free.
+\end {description}
+
+\item [PLMEAN]
+Plot mean spectrum.
+
+\begin {description}
+\item Parameters:
+
+\begin {description}
+\item DATASET -- Dataset name.
+\item RS -- Whether display is reset before plotting.
+\item DEVICE -- GKS/SGS graphics device name.
+\item ZONE -- Zone to be used for plotting.
+\item LINE -- Plotting line style (SOLID, DASH, DOTDASH, DOT).
+\item LINEROT -- Whether line style is changed after next plot
+\item COL -- Plotting line colour (1, 2, 3, ..., 10).
+\item COLROT -- Whether line colour is changed after next plot.
+\item HIST -- Whether lines are drawn as histograms.
+\item QUAL -- Whether data quality information is plotted.
+\item XL -- $x$-axis plotting limits, [0,0] means auto-scale.
+\item YL -- $y$-axis plotting limits, [0,0] means auto-scale.
+\end {description}
+
+\item Description:
+
+This command plots the mean spectrum associated with DATASET on the
+graphics device and zone specified by the DEVICE and ZONE parameters 
+respectively.
+
+The RS parameter specifies whether a new plot is started, or whether
+the data can be plotted over an existing plot.
+
+The HIST parameter determines whether the line is drawn as a histogram
+rather than a continuous polyline.
+
+The LINE and LINEROT parameters determine the line style which will be
+used for plotting.
+
+The COL and COLROT parameters determine the line colour which will be used
+for plotting if the DEVICE supports colour graphics.
+
+The diagram limits are specified by the XL and YL parameter values.
+If XL and YL have values
+
+\begin {quote}
+XL=[0,0], YL=[0,0],
+\end {quote}
+then the plot limits along each axis are determined so that the whole
+spectrum is visible.
+If the values of XL or YL are specified in decreasing order, then
+the coordinates will be reversed along the appropriate axis.
+
+The QUAL parameter indicates whether faulty points are flagged with
+their data quality codes (see Section 1).
+
+If a point is affected by more than one of the above faults, then
+the highest code is plotted.
+Points marked bad by user edits are only indicated if they are otherwise
+fault-free.
+\end {description}
+
+\item [PLNET]
+Plot uncalibrated net spectrum.
+
+\begin {description}
+\item Parameters:
+
+\begin {description}
+\item DATASET -- Dataset name.
+\item ORDER -- Echelle order number.
+\item APERTURE -- Aperture name (SAP or LAP).
+\item RS -- Whether display is reset before plotting.
+\item DEVICE -- GKS/SGS graphics device name.
+\item ZONE -- Zone to be used for plotting.
+\item LINE -- Plotting line style (SOLID, DASH, DOTDASH, DOT).
+\item LINEROT -- Whether line style is changed after next plot
+\item COL -- Plotting line colour (1, 2, 3, ..., 10).
+\item COLROT -- Whether line colour is changed after next plot.
+\item HIST -- Whether lines are drawn as histograms.
+\item QUAL -- Whether data quality information is plotted.
+\item XL -- $x$-axis plotting limits, [0,0] means auto-scale.
+\item YL -- $y$-axis plotting limits, [0,0] means auto-scale.
+\end {description}
+
+\item Description:
+
+This command plots the uncalibrated net spectrum specified by the DATASET
+parameter on the graphics device and zone specified by the DEVICE and 
+ZONE parameters respectively.
+
+In the case of a LORES spectrum, if there is more than a single
+aperture available, then the APERTURE parameter needs to be specified.
+
+In the case of a HIRES spectrum, if there is more than a single
+echelle order, then the ORDER parameter needs to be specified.
+
+The RS parameter specifies whether a new plot is started, or whether
+the data can be plotted over an existing plot.
+
+The HIST parameter determines whether the line is drawn as a histogram
+rather than a continuous polyline.
+
+The LINE and LINEROT parameters determine the line style which will be
+used for plotting.
+
+The COL and COLROT parameters determine the line colour which will be used
+for plotting if the DEVICE supports colour graphics.
+
+The diagram limits are specified by the XL and YL parameter values.
+If XL and YL have values
+
+\begin {quote}
+XL=[0,0], YL=[0,0],
+\end {quote}
+then the plot limits along each axis are determined so that the whole
+spectrum is visible.
+If the values of XL or YL are specified in decreasing order, then
+the coordinates will be reversed along the appropriate axis.
+
+The QUAL parameter indicates whether faulty points are flagged with
+their data quality codes (see Section 1).
+
+If a point is affected by more than one of the above faults, then
+the highest code is plotted.
+Points marked bad by user edits are only indicated if they are otherwise
+fault-free.
+\end {description}
+
+\item [PLSCAN]
+Plot scan perpendicular to dispersion.
+
+\begin {description}
+\item Parameters:
+
+\begin {description}
+\item DATASET -- Dataset name.
+\item RS -- Whether display is reset before plotting.
+\item DEVICE -- GKS/SGS graphics device name.
+\item ZONE -- Zone to be used for plotting.
+\item LINE -- Plotting line style (SOLID, DASH, DOTDASH, DOT).
+\item LINEROT -- Whether line style is changed after next plot.
+\item COL -- Plotting line colour (1, 2, 3, ..., 10).
+\item COLROT -- Whether line colour is changed after next plot.
+\item QUAL -- Whether data quality information is plotted.
+\item XL -- $x$-axis plotting limits, [0,0] means auto-scale.
+\item YL -- $y$-axis plotting limits, [0,0] means auto-scale.
+\end {description}
+
+\item Description:
+
+This command plots the most recent scan perpendicular to dispersion 
+associated with DATASET on the graphics device and zone specified by
+the DEVICE and ZONE parameters respectively.
+
+The RS parameter specifies whether a new plot is started, or whether
+the data can be plotted over an existing plot.
+
+The LINE and LINEROT parameters determine the line style which will be
+used for plotting.
+
+The COL and COLROT parameters determine the line colour which will be used
+for plotting if the DEVICE supports colour graphics.
+
+The diagram limits are specified by the XL and YL parameter values.
+If XL and YL have values
+
+\begin {quote}
+XL=[0,0], YL=[0,0],
+\end {quote}
+then the plot limits along each axis are determined so that the whole
+spectrum is visible.
+If the values of XL or YL are specified in decreasing order, then
+the coordinates will be reversed along the appropriate axis.
+
+The QUAL parameter indicates whether faulty points are flagged with
+their data quality codes (see Section 1).
+
+If a point is affected by more than one of the above faults, then
+the highest code is plotted.
+Points marked bad by user edits are only indicated if they are otherwise
+fault-free.
+\end {description}
+
+\item [PRGRS]
+Print the current extracted aperture or order spectrum in tabular 
+form.
+
+\begin {description}
+\item Parameters:
+
+\begin {description}
+\item DATASET -- Dataset name.
+\item APERTURE -- Aperture name (SAP or LAP).
+\end {description}
+
+\item Description:
+
+This command prints the recently extracted spectrum associated
+with ORDER or APERTURE
+and DATASET in tabular form.
+The table consists of wavelengths, ``gross'', smooth background, net
+and calibrated fluxes, along
+with any data quality information.
+The ``gross'' and smooth background correspond to an image sample
+with width specified by the adopted extraction slit.
+
+The output from this command should be diverted to a file, since
+it is likely to be too voluminous to read at the terminal.
+\end {description}
+
+\item [PRLBLS]
+Print the current LBLS array in tabular form.
+
+\begin {description}
+\item Parameters:
+
+\begin {description}
+\item DATASET -- Dataset name.
+\end {description}
+
+\item Description:
+
+This command prints the current LBLS array in tabular form.
+
+Each line of the main table consists of a wavelength and a set of
+mapped image intensities (FN), corresponding to cells at distances, R (pixels),
+from spectrum centre.
+
+Any array cells which are affected by ``bad'' image pixels (e.g. reseaux,
+saturation, etc.) have data quality values printed below them, the
+meaning of which is given at the start of the output.
+
+The output from this command should be diverted to a file, since
+it is likely to be too voluminous to read at the terminal.
+\end {description}
+
+\item [PRMEAN]
+Print the current mean spectrum in tabular form.
+
+\begin {description}
+\item Parameters:
+
+\begin {description}
+\item DATASET -- Dataset name.
+\end {description}
+
+\item Description:
+
+This command prints the mean spectrum associated with DATASET in tabular form.
+
+The table consists of wavelengths and calibrated fluxes, along
+with any data quality information.
+
+The output from this command should be diverted to a file, since
+it is likely to be too voluminous to read at the terminal.
+\end {description}
+
+\item [PRSCAN]
+Print the intensities of the current image scan in tabular form.
+
+\begin {description}
+\item Parameters:
+
+\begin {description}
+\item DATASET -- Dataset name.
+\end {description}
+
+\item Description:
+
+This command prints the scan associated with DATASET in tabular form.
+The table consists of wavelengths and net fluxes, along
+with any data quality information.
+
+The output from this command should be diverted to a file, since
+it is likely to be too voluminous to read at the terminal.
+\end {description}
+
+\item [PRSPEC]
+Print the current aperture or order spectrum in tabular form.
+
+\begin {description}
+\item Parameters:
+
+\begin {description}
+\item DATASET -- Dataset name.
+\item APERTURE -- Aperture name (SAP or LAP).
+\item ORDER -- Echelle order number.
+\end {description}
+
+\item Description:
+
+This command prints the spectrum associated with ORDER or APERTURE
+and DATASET in tabular form.
+
+The table consists of wavelengths, net and calibrated fluxes, along
+with any data quality information.
+
+The output from this command should be diverted to a file, since
+it is likely to be too voluminous to read at the terminal.
+\end {description}
+
+\item [QUIT]
+Quit IUEDR and return to DCL.
+
+\begin {description}
+\item Parameters:
+
+\begin {description}
+\item None.
+\end {description}
+
+\item Description:
+
+This command quits IUEDR and returns to DCL.
+Any files that require new versions will be written by this
+command.
+This command is a synonym for the EXIT command.
+\end {description}
+
+\item [READIUE]
+Read a RAW, GPHOT or PHOT IUE image from tape.
+
+\begin {description}
+\item Parameters:
+
+\begin {description}
+\item DRIVE -- Tape drive logical name/file name.
+\item FILE -- Tape file number.
+\item NLINE -- Number of IUE header lines printed.
+\item DATASET -- Dataset name.
+\item TYPE -- Dataset type (RAW, PHOT, GPHOT).
+\item OBJECT -- Object identification text.
+\item CAMERA -- Camera name (LWP, LWR, SWP).
+\item IMAGE -- Image number.
+\item APERTURES -- Aperture name.
+\item RESOLUTION -- Spectrograph resolution mode (LORES or HIRES).
+\item EXPOSURES -- Spectrum exposure time(s) (seconds).
+\item THDA -- IUE camera temperature (C).
+\item ITFMAX -- Pixel value on tape for ITF saturation.
+\item BADITF -- Whether bad LORES SWP ITF requires correction.
+\item YEAR -- Year number (A.D.).
+\item MONTH -- Month number (1-12).
+\item DAY -- Day number in Month.
+\item NGEOM -- Number of Chebyshev terms used to represent geometry.
+\item ITF -- This is the ITF generation used in the image calibration.
+\end {description}
+
+\item Description:
+
+This command reads an IUE dataset (RAW, GPHOT or PHOT) from tape.
+The DATASET parameter determines the names of VMS files that
+will contain the various data components (e.g. Calibration, Image,
+Image Quality).
+
+The ITFMAX and NGEOM parameters are only prompted for if the image
+data are geometrically and photometrically calibrated.
+\end {description}
+
+\item [READSIPS]
+Reads MELO/MEHI from IUESIPS\#1 or IUESIPS\#2 tape/file name.
+
+\begin {description}
+\item Parameters:
+
+\begin {description}
+\item DRIVE -- Tape drive logical name.
+\item FILE -- Tape file number.
+\item NLINE -- Number of IUE header lines printed.
+\item DATASET -- Dataset name.
+\item OBJECT -- Object identification text.
+\item CAMERA -- Camera name (LWP, LWR, SWP).
+\item IMAGE -- Image number.
+\item APERTURES -- Aperture name.
+\item EXPOSURES -- Spectrum exposure time(s) (seconds).
+\item THDA -- IUE camera temperature (C).
+\item YEAR -- Year number (A.D.).
+\item MONTH -- Month number (1-12).
+\item DAY -- Day number in Month.
+\end {description}
+
+\item Description:
+
+This command reads the MELO/MEHI product from IUESIPS\#1 or IUESIPS\#2
+tape. Operation is much like READIUE, except that some parameters and
+associated information are not needed. Only calibration ({\tt .UEC})
+and spectrum ({\tt \_UES.SDF}) files are created. The values for
+certain parameters may be obtained from the tape, in which case you
+will not be prompted for them. 
+
+\end {description}
+
+\item [SAVE]
+Write new versions for any files that have had their contents
+changed during the current session.
+
+\begin {description}
+\item Parameters:
+
+\begin {description}
+\item None.
+\end {description}
+
+\item Description:
+
+This command forces new versions to be written for dataset files
+that have had their contents changed during the current session.
+If there are no outstanding files then this command does nothing.
+\end {description}
+
+\item [SCAN]
+This command performs a scan perpendicular to spectrograph 
+dispersion.
+
+\begin {description}
+\item Parameters:
+
+\begin {description}
+\item DATASET -- Dataset name.
+\item ORDERS -- This delineates a range of echelle orders.
+\item SCANDIST -- Distance of HIRES scan from faceplate centre (geometric 
+pixels).
+\item SCANAV -- Averaging filter FWHM for image scan (geometric pixels).
+\item SCANWV -- Central wavelength for LORES image scan (\AA).
+\end {description}
+
+\item Description:
+
+This command performs a scan perpendicular to spectrograph dispersion.
+The scan is performed by folding pixels with a triangle function
+with FWHM of SCANAV geometric pixels along the dispersion direction.
+
+In the case of HIRES, the SCANDIST parameter determines the distance
+of the scan from the faceplate centre.
+
+In the case of LORES, the SCANWV parameter determines the central wavelength
+of the scan in Angstroms.
+
+The algorithm used to produce scan intensities is not very good
+and so quantitative results should not be sought from this command.
+Its sole intention lies in providing data for aligning the spectrum.
+\end {description}
+
+\item [SETA]
+Set dataset parameters that are APERTURE specific.
+
+\begin {description}
+\item Parameters:
+
+\begin {description}
+\item DATASET -- Dataset name.
+\item APERTURE -- Aperture name (SAP or LAP).
+\item EXPOSURE -- Spectrum exposure time (seconds).
+\item FSCALE -- Flux scale factor.
+\item WSHIFT -- Constant wavelength shift (\AA).
+\item VSHIFT -- Velocity shift of detector relative to Sun (km/s).
+\item ESHIFT -- Global echelle wavelength shift.
+\item GSHIFT -- Global shift of spectrum on image (geometric pixels).
+\end {description}
+
+\item Description:
+
+This command allows changes to be made to dataset values which are
+specific to the specified APERTURE.
+Items for which parameters are not specified retain their current
+values.
+\end {description}
+
+\item [SETD]
+Set dataset parameters which are independent of ORDER/APERTURE.
+
+\begin {description}
+\item Parameters:
+
+\begin {description}
+\item DATASET -- Dataset name.
+\item OBJECT -- Object identification text.
+\item THDA -- IUE camera temperature (C).
+\item FIDSIZE -- Half width of fiducials (pixels).
+\item BADITF -- Whether bad LORES ITF requires correction.
+\item NGEOM -- Number of Chebyshev terms used to represent geometry.
+\item RIPK -- Echelle ripple constant (\AA).
+\item RIPA -- Ripple function scale factor.
+\item XCUT -- Global echelle wavelength clipping.
+\item HALTYPE -- The type of halation (order-overlap) correction used.
+\item HALC -- Halation correction constant (fraction of continuum).
+\item HALWC -- Wavelength for which the halation correction HALC is defined 
+(\AA).
+\item HALW0 -- Wavelength at which halation correction is zero (\AA).
+\item HALAV -- Averaging FWHM for halation correction (gometric pixels).
+\end {description}
+
+\item Description:
+
+This command allows changes to be made to dataset values which are
+independent of any specific APERTURE/ORDER.
+Items for which parameters are not specified retain their current
+values.
+\end {description}
+
+\item [SETM]
+Set dataset parameters that are ORDER specific.
+
+\begin {description}
+\item Parameters:
+
+\begin {description}
+\item DATASET -- Dataset name.
+\item ORDER -- Echelle order number.
+\item RIPK -- Echelle ripple constant (\AA).
+\item RIPA -- Ripple function scale factor.
+\item RIPC -- Ripple function correction polynomial.
+\item WCUT -- Wavelength limits for echelle order (\AA).
+\end {description}
+
+\item Description:
+
+This command allows changes to be made to dataset values which are
+specific to the specified ORDER.
+Items for which parameters are not specified retain their current
+values.
+\end {description}
+
+\item [SGS]
+Write names of available SGS devices at the terminal.
+
+\begin {description}
+\item Parameters:
+
+\begin {description}
+\item None.
+\end {description}
+
+\item Description:
+
+This commands writes a list of availavle SGS device names at the terminal. See
+SUN/85 for details of the SGS graphics system.
+\end {description}
+
+\item [SHOW]
+Print dataset values.
+
+\begin {description}
+\item Parameters:
+
+\begin {description}
+\item DATASET -- Dataset name.
+\item V -- List of items to be printed.
+\end {description}
+
+\item Description:
+
+This command shows the values of parameters in the dataset specified
+by the DATA\-SET parameter. The items to be printed are specified by the
+V parameter, which is a string containing any of the following
+characters:
+
+\begin {description}
+\item H -- Header and file information
+\item I -- Image details
+\item F -- Fiducials
+\item G -- Geometry
+\item D -- Dispersion
+\item C -- Centroid templates
+\item R -- Echelle Ripple and halation
+\item A -- Absolute calibration
+\item S -- Raw Spectrum
+\item M -- Mean spectrum
+\item * -- All of the above
+\item Q -- Image data Quality summary
+\end {description}
+
+The ``*'' character needs to be placed within inverted commas. 
+
+The V parameter is cancelled afterwards.
+\end {description}
+
+\item [TRAK]
+Extract spectrum from image.
+
+\begin {description}
+\item Parameters:
+
+\begin {description}
+\item DATASET -- Dataset name.
+\item ORDER -- Echelle order number.
+\item APERTURE -- Aperture name (SAP or LAP).
+\item NORDER -- Number of echelle orders to be processed.
+\item AUTOSLIT -- Whether GSLIT, BDIST and BSLIT are determined automatically.
+\item GSLIT -- Object channel limits (geometric pixels).
+\item BSLIT -- Background channel half widths (geometric pixels).
+\item BDIST -- Distances of background channels from centre (geometric pixels).
+\item GSAMP -- Spectrum grid sampling rate (geometric pixels).
+\item CUTWV -- Whether wavelength cutoff data used for extraction grid.
+\item BKGIT -- Number of background smoothing iterations.
+\item BKGAV -- Background averaging filter FWHM (geometric pixels).
+\item BKGSD -- Discrimination level for background pixels (s.d.).
+\item CENTM -- Whether pre-existing centroid template is used.
+\item CENSH -- Whether the spectrum template is just shifted linearly.
+\item CENSV -- Whether the spectrum template is saved in the dataset.
+\item CENIT -- Number of centroid tracking iterations.
+\item CENAV -- Centroid averaging filter FWHM (geometric pixels).
+\item CENSD -- Significance level for signal to be used for centroids
+(s.d.).
+\item EXTENDED -- Whether the object is not a point source.
+\item CONTINUUM -- Whether the object spectrum is expected to have a 
+``continuum''.
+\end {description}
+
+\item Description:
+
+This command extracts a spectrum from an image.
+It does this by defining an evenly spaced wavelength grid along the
+spectrum, and mapping pixel intensities onto this grid in object
+and background channels.
+The background pixels are used to form a smooth background spectrum.
+The object pixels (less smooth background) are used to form the
+integrated net signal for the object.
+
+In the LORES case, the spectrum specified by the APERTURE parameter
+is extracted.
+
+In the HIRES case, the first echelle order to be extracted is
+specified by the ORDER.
+Up to NORDER orders are extracted, with ORDER being
+decremented each time.
+
+The wavelength grid is defined by the region of the dispersion line
+contained in the image subset (faceplate).
+The grid spacing is set by the GSAMP parameter value which is
+the sample step in geometric pixels.
+The wavelength limits can optionally be constrained within the
+echelle cutoff values by specifying CUTWV=TRUE.
+
+The object and background channel widths and positions are determined
+automatically if AUTOSLIT=TRUE.
+Otherwise, the object channel is specified by the values of the
+GSLIT parameter, whilst the background channel positions and
+widths are determined by the BDIST and BSLIT parameter values
+respectively.
+
+The EXTENDED and CONTINUUM parameters allow more precise control
+over slit determinations (see the IUEDR User Guide for details).
+
+The background spectrum is smoothed with a triangle function with a 
+FWHM given in geometric pixels by the BKGAV parameter.
+Once the background channel spectra have been obtained, they are
+extracted a further BKGIT times.
+Prior to each additional background extraction pixels which are
+outside BKGSD local standard deviations are rejected.
+
+The object spectrum is obtained by integrating pixel intensities
+(less smooth background) within the object channel.
+Once the object spectrum has been obtained it is extracted an
+additional CENIT times, the centroid positions
+from the previous extraction being used to ``follow'' the
+spectrum each time.
+The centroid spectrum (template) is smoothed by folding with a
+triangle function, FWHM given in geometric
+pixels by the CENAV parameter.
+Wavelengths with flux levels below CENSD standard deviations
+above background are not used in determining the centroid spectrum.
+
+By default, the initial spectrum template is given by the dispersion
+relations and the geometric shifts determined using the CGSHIFT.
+However, if CENTM=TRUE, then a pre-defined template associated with
+the dataset may be used as a start guess.
+If CENSH=TRUE, then this template can be shifted linearly to match the
+image (i.e. without changing its shape).
+If CENSV=TRUE, then the final centroid spectrum is used to update the
+spectrum template in the dataset.
+
+The net flux associated with a wavelength point in the final extracted
+spectrum is defined as the integral of pixel intensities over a rectangle
+with dimensions given by the object channel width and the wavelength
+interval.
+These fluxes are scaled so that they correspond to an interval
+along the wavelength direction of 1.414 geometric pixels.
+This is so that the standard IUESIPS calibrations can be applied
+regardless of what actual sample rate has been employed.
+The integral is performed by using linear interpolation of pixel intensities.
+
+For the extraction of large amounts of data, e.g. whole HIRES spectra,
+it is advisable to run IUEDR in batch mode. Typically, the extraction
+of a complete HIRES spectrum will take 23 minutes on a VAX 11/780 (approx
+1 minute CPU on a DECstation 5000/125).
+\end {description}
+\end {description}
+\newpage
+%------------------------------------------------------------------------------
+
+\section {Parameters}
+
+There follows a detailed description for each of the parameters used by
+IUEDR commands. 
+The description for a particular parameter applies in any
+command which uses it. 
+Some parameters have default values which at initialised on invoking
+IUEDR.
+These default parameters are indicated in this section and their
+default values are given in the Appendix. 
+
+This release of IUEDR uses the ADAM parameter system. In this system
+all the parameters and their usage is described in an interface file 
+(See SG/4 for more detail). It is possible to override the default
+interface file with your own local version. This permits you to tailor
+the precise behavior of each parameter according to requirements.
+
+
+\begin {description}
+
+\item [ABSFILE=string]
+This is the name of a VMS file containing an absolute flux calibration.
+A file type of ``.ABS'' is assumed and should not be specified
+explicitly.
+If the file name contains a directory specification, then it should be
+enclosed in quotes.
+\footnote{If you are on a UNIX machine then you should ensure that the
+correct case if used (upper/lower) or the file will not be found.}
+
+\item [APERTURE=name]
+This is the name of an individual aperture.
+The following names have defined meanings:
+
+\begin {quote}
+\begin {description}
+\item SAP -- IUE small aperture
+\item LAP -- IUE large aperture
+\end {description}
+\end {quote}
+
+Other apertures may also be defined.
+
+\item [APERTURES=name]
+This specifies an aperture or group of apertures.
+The following names have defined meanings:
+
+\begin {quote}
+\begin {description}
+\item SAP -- IUE small aperture
+\item LAP -- IUE large aperture
+\item BAP -- IUE both apertures (i.e. SAP and LAP together)
+\end {description}
+\end {quote}
+
+\item [AUTOSLIT=boolean]
+This determines whether the extraction slit is determined automatically
+by the command.
+When AUTOSLIT=TRUE the GSLIT, BDIST and BSLIT parameter values are
+determined automatically, based on the IUE camera, resolution, aperture,
+and on the values of the EXTENDED and CONTINUUM parameters.
+This mode of operation is probably the best for point source objects.
+
+This parameter has a default value of ``TRUE''.
+
+\item [BADITF=boolean]
+This parameter determines whether a correction is made to the pixel
+intensities to account for errors during Ground Station ITF
+calibration.
+(Note that the best scientific results would be obtained 
+from reprocessed data which can be obtained on request.)
+The following case is handled:
+
+\begin {quote}
+\begin {description}
+\item SWP,LORES -- correction of 2nd (faulty) ITF
+\end {description}
+\end {quote}
+
+\item [BDIST=(number\{,number\})]
+This is a pair of numbers delineating the background spectrum channel
+positions during spectrum extraction.
+The distances are measured in geometric pixels from the spectrum centre.
+
+Negative distances mean ``to the left of centre'', and positive distances
+mean ``to the right of centre''.
+
+If only one value is defined, then this is taken as meaning
+that the channels are positioned symmetrically
+about centre.
+
+The spectrum ``centre'' is determined by the dispersion relations, and
+modified by any prevailing centroid shifts.
+
+\item [BKGAV=number]
+This is the FWHM of a triangle function filter used in folding the
+pixel intensities to form the smooth background spectrum.
+It is measured in geometric pixels.
+
+This parameter has a default value of ``30.0''.
+
+\item [BKGIT=number]
+This is the number of background smoothing iterations performed during
+spectrum extraction.
+
+\begin {description}
+\item BKGIT=0 means that the background is taken as the result of the
+first pass of a triangle function filter with a FWHM defined by
+the BKGAV parameter.
+
+\item BKGIT=1 means that, after producing the initial estimate for the
+smooth background, pixels discrepant by more that BKGSD standard
+deviations are marked as ``spikes''.
+The smooth background is then re-evaluated, missing out these marked
+pixels.
+\end {description}
+
+Higher values of BKGIT are possible, but seldom necessary.
+
+This parameter has a default value of ``1''.
+
+\item [BKGSD=number]
+This is the discrimination level, measured in standard deviations,
+beyond which background pixels are marked as ``spikes''.
+It is not used for BKGIT=0.
+
+This parameter has a default value of ``2.0''.
+
+\item [BLOCK=number] This is the tape block number. The first block in
+a file is BLOCK=1.
+
+This parameter has a default value of ``1''.
+
+\item [BSLIT=(number\{,number\})]
+This defines the half width of each background channel, measured
+in geometric pixels.
+A single value means that both channels have the same width.
+
+\item [CAMERA=name]
+This is the camera name.
+The following are defined:
+
+\begin {quote}
+\begin {description}
+\item LWP -- IUE long wavelength prime
+\item LWR -- IUE long wavelength redundant
+\item SWP -- IUE short wavelength prime
+\end {description}
+\end {quote}
+
+\item [CENAV=number]
+This is the FWHM of a triangle function filter used in folding the
+pixel intensities to form the smooth spectrum centroid positions.
+It is measured in geometric pixels.
+
+This parameter has a default value of ``30.0''.
+
+\item [CENIT=number]
+This is the number of spectrum centroid tracking iterations performed during
+spectrum extraction.
+
+\begin {description}
+\item CENIT=0 means that the spectrum position is taken directly from the
+dispersion relations.
+
+\item CENIT=1 means that the spectrum position is first taken from the
+dispersion relations, but is modified to force it to
+follow the spectrum centroid.
+\end {description}
+
+Higher values of CENIT are possible, but seldom necessary:  it either
+works or fails.
+
+This parameter has a default value of ``1''.
+
+\item [CENSD=number]
+This is the discrimination level, measured in standard deviations,
+below which object signal is not considered significant enough
+to be used to determine the centroid position.
+It is not used for CENIT=0.
+
+This parameter has a default value of ``4.0''.
+
+\item [CENSH=boolean]
+This indicates whether the spectrum signal produces a single linear
+shift to the initial template.
+
+This can be used in cases where the object signal is too weak
+to provide a detailed centroid determination by moving a pre-existing
+template shape into the right position.
+
+This parameter has a default value of ``FALSE''.
+
+\item [CENSV=boolean]
+This indicates whether the spectrum template, as refined by the
+object centroid during spectrum extraction, is saved in the calibration
+dataset.
+
+The primary use of this facility is in determining templates from,
+say, the whole spectrum using TRAK, and subsequently using these
+with LBLS, or another spectrum.
+
+This parameter has a default value of ``FALSE''.
+
+\item [CENTM=boolean]
+This indicates whether a centroid template from the calibration dataset
+is used as a start in defining the precise position of the spectrum
+signal on the image.
+
+This parameter has a default value of ``FALSE''.
+
+\item [COL=number]
+This specifies the line colour to be used for the next curve to be
+plotted.
+It can be an integer in the range 1 to 10, and the corresponding
+colours are as follows:
+
+\begin {quote}
+\begin {description}
+\item 1 -- Yellow
+\item 2 -- Green
+\item 3 -- Red
+\item 4 -- Blue
+\item 5 -- Pink
+\item 6 -- Violet
+\item 7 -- Turquoise
+\item 8 -- Orange
+\item 9 -- Light green
+\item 10 -- Olive
+\end {description}
+\end {quote}
+
+Lines will only appear with different colours it the device supports colour 
+graphics, on other devices COL is ignored.
+
+\item [COLROT=boolean]
+This indicates whether the line colour is to be changed after the
+next plot.
+The initial line has colour index 1 (YELLOW), unless specified explicitly
+using the COL parameter.
+The sequence of colour indices goes (1, 2, 3, ..., 10, 1, 2, ...).
+
+In commands where more than one line is plotted, COLROT determines
+whether these lines have different colours.
+
+Lines will only appear with different colours if the device supports
+colour graphics; on other devices COLROT is harmless.
+
+This parameter has a default value of ``TRUE''.
+
+\item [CONTINUUM=boolean]
+This indicates whether the object spectrum is expected to contain a
+significant continuum.
+It is used in conjunction with the EXTENDED parameter in determining
+the positions and widths of object and background channels for
+spectrum extraction from HIRES datasets.
+
+This parameter has a default value of ``TRUE''.
+
+\item [COVERGAP=boolean]
+If after mapping an order/aperture, a grid point is marked as unusable,
+then this parameter determines whether other orders/apertures
+can be allowed to contribute to this grid point.
+
+This parameter has a default value of ``FALSE''.
+
+\item [CUTFILE=string]
+This is the name of a file containing an echelle order
+wavelength limits.
+A file type of ``.CUT'' is assumed and should not be specified
+explicitly.
+If the file name contains a directory specification, then it should be
+enclosed in quotes.
+\footnote{If you are on a UNIX machine then you should ensure that the
+correct case if used (upper/lower) or the file will not be found.}
+
+\item [CUTWV=boolean]
+This indicates whether any available echelle order wavelength cutoff
+limits are to be used for the spectrum extraction wavelength grid
+limits.
+Highly recommended, provided that you are happy with these wavelength limits.
+
+This parameter has a default value of ``TRUE''.
+
+\item [DATASET=filename]
+This is the root name of the files containing the dataset.
+The file type (e.g. ``.SDF'') should not be given in the DATASET
+name.
+If the file name contains a directory specification, then it
+should be enclosed in quotes.
+\footnote{If you are on a UNIX machine then you should ensure that the
+correct case if used (upper/lower) or the file will not be found.}
+
+Note that the actual filename have an additional 4 characters appended
+to the name to define their contents (eg, LWP12345\_UES - spectrum).
+
+\item [DAY=number]
+This is the day number, measured from the start of the month, used
+for constructing dates. 
+The DAY, MONTH and YEAR parameters refer to the date the IUE
+observations were made and are important to the calibration of the
+data.
+
+\item [DEVICE=name]
+This is the GKS/SGS graphics device.
+A list of possible GKS workstations may be found in SUN/83.
+A list of SGS workstation names available at your 
+site may be obtained either by a null response to the DEVICE parameter 
+prompt, i.e. ``!'', or by using the IUEDR Command SGS.
+
+\item [DISPFILE=string]
+This is the name of a file containing dispersion data.
+A file type of ``.DSP'' is assumed and should not be specified
+explicitly.
+If the file name contains a directory specification, then it should be
+enclosed in quotes.
+\footnote{If you are on a UNIX machine then you should ensure that the
+correct case if used (upper/lower) or the file will not be found.}
+
+\item [DRIVE=name] This is the name of the tape drive. Feasible values
+are `TAPE', `MUx0',`MSx0' and `MTx1'. Where `x' is A,B,C,D
+etc.
+
+On VMS these will be logical names pointing to the actual device.
+
+On UNIX they will be environment variables which translate to the
+name of the appropriate device driver in the /dev directory.
+
+This parameter has a default value of ``TAPE''.
+
+This version of IUEDR additionally supports the direct reading of 
+IUEDR data from disk files which have the same format as those on
+GO format tapes. 
+
+In order to read from directly from such a file (probably grabbed from
+an on-line archive such as NDADSA), you specify its name directly in
+response to the DRIVE parameter prompt.
+
+If the file is not in the current directory then you must provide 
+the full pathname (remember UNIX systems are CaSe-sensitive).
+Access to files on NFS (Network Filing System) drives is also
+supported (See Using NFS).
+
+\item [ESHIFT=number]
+This is a global wavelength shift applied to the wavelengths in
+echelle spectral orders.
+It is measured in Angstroms, and affects the spectrum wavelengths as follows:
+
+\begin {equation}
+\lambda _{new} = \lambda _{old} + \frac{ESHIFT}{ORDER}
+\end {equation}
+
+This is designed to account for wavelength errors that result
+from a global linear shift of the spectrum format on the
+image.
+
+\item [EXPOSURE=number]
+This is the exposure time associated with the spectrum, measured in seconds.
+If there is more than one aperture, then this time applies
+to that specified by the APERTURE parameter.
+
+\item [EXPOSURES=(number\{,number\})]
+This is one or more exposure times associated with the 
+spectrum, measured in seconds.
+There is an exposure time for each aperture defined.
+
+\item [EXTENDED=boolean]
+This indicates whether the object spectrum is expected to be extended,
+rather than a point source.
+It is used in conjunction with the CONTINUUM parameter in determining
+the positions and widths of the object and background channels used
+for spectrum extraction from HIRES datasets.
+
+This parameter has a default value of ``FALSE''.
+
+\item [FIDFILE=string]
+This is the name of a file containing fiducial positions.
+A file type of ``.FID'' is assumed and should not be specified
+explicitly.
+If the file name contains a directory specification, then it should be
+enclosed in quotes.
+
+\item [FIDSIZE=number]
+This is the half width of a fiducial measured in pixel units. The fiducials 
+are considered to be square.
+
+\item [FILE=number]
+This is the tape file number.
+The first file on a tape would be FILE=1.
+One case which may present some problems is
+that of a tape with a an end-of-volume (EOV) mark in the middle
+and with valuable data beyond.
+An EOV is two consecutive tape marks (sometimes called ``file marks'').
+A file is defined here as the information between two tape marks.
+So if the number for a real file before EOV is FILEN, then
+the number of the next real file following the EOV is (FILEN+2).
+
+\item [FILLGAP=boolean]
+If a grid point in the mean spectrum would have had a contribution
+from a bad data point, this parameter determines whether that
+grid point is marked as unusable within the context
+of the order or aperture being mapped.
+If the grid point is marked as unusable in this way then other
+good points cannot contribute to it.
+
+This parameter has a default value of ``FALSE''.
+
+\item [FLAG=boolean]
+This specifies whether the data quality information is displayed
+along with the image.
+If so, then faulty pixels will be marked with a colour according to
+the following scheme:
+
+\begin {quote}
+\begin {description}
+\item GREEN -- pixels affected by reseau marks
+\item RED -- pixels which are saturated (DN=255)
+\item ORANGE -- pixels affacted by ITF truncation
+\item YELLOW -- pixels marked bad by the user
+\end {description}
+\end {quote}
+
+If a pixel is affected by more than one of the above faults, then
+the first in the list is adopted for display.
+Hence, user edits are only shown where no other fault is present.
+
+This option would normally only be used when assessing the quality
+of faulty pixels, possibly with a view to using them, i.e. marking them
+``good'' with a cursor editor.
+
+This parameter has a default value of ``TRUE''.
+
+\item [FN=number]
+This parameter is the replacement Flux Number for a pixel changed
+explicitly by the user.
+
+\item [FSCALE=number]
+This is an arbitrary scale factor applied to spectrum fluxes.
+It affects fluxes as follows:
+
+\begin {equation}
+{\cal F}_{new} = {\cal F}_{new} \times FSCALE
+\end {equation}
+
+It finds application in accounting for grey attentuation, or obscuration
+of object signal through a narrow aperture.
+
+\item [GSAMP=number]
+This is the sampling rate used for spectrum extraction.
+It is measured in geometric pixels.
+GSAMP=1.414 corresponds to the original IUESIPS (\#1) sampling
+rate, while GSAMP=0.707 corresponds to the new IUESIPS (\#2) sampling
+rate.
+Other values can be chosen.
+
+This parameter has a default value of ``1.414''.
+
+\item [GSHIFT=(number,number)]
+This is a global constant shift of the spectrum format on the image, 
+$(dx,dx)$, where the geometric coordinates, $(x,y)$ of a spectrum position
+are
+
+\begin {equation}
+x_{new} = x_{old} + dx
+\end {equation}
+
+and
+
+\begin {equation}
+y_{new} = y_{old} + dy
+\end {equation}
+
+\item [GSLIT=(number\{,number\})]
+This is a pair of numbers delineating the object spectrum channel
+during spectrum extraction.
+The distances are measured in geometric pixels.
+
+Negative distances mean ``to the left of centre'', and positive distances
+mean ``to the right of centre''.
+
+Object channels that do not cover the actual object signal on the
+image will not be meaningful when centroid tracking is employed.
+
+If only one value is defined, then this is taken as representing
+a channel that is symmetrical about the spectrum centre.
+
+The spectrum ``centre'' is determined by the dispersion relations 
+modified by any prevailing centroid shifts.
+
+\item [HALAV=number]
+This is the FWHM of a triangle function used for smoothing the
+net spectrum for the HALTYPE=POWER halation correction technique.
+
+\item [HALC=number]
+This is the Halation correction constant used for HALTYPE=POWER
+cases, and defined at wavelength HALWC.
+The value of the correction constant
+corresponds roughly to the measured depression of a broad
+zero intensity absorption below ``zero'', in units
+of the continuum in adjacent orders.
+The ``constant'', $C$, varies with wavelength as follows:
+
+\begin {equation}
+C_\lambda = \frac {HALC \times (\lambda - HALW0)}{(HALWC - HALW0)}
+\end {equation}
+
+See the HALTYPE, HALWC, HALW0, HALAV parameters.
+
+\item [HALTYPE=name]
+This is the type of Halation or order-overlap correction applied to the
+flux spectrum.
+It can take the value
+
+\begin {quote}
+\begin {description}
+\item POWER -- correction based on power-law PSF decay
+\end {description}
+\end {quote}
+
+\item [HALW0=number]
+This is the wavelength, measured in Angstroms, at which the
+halation correction is zero.
+
+See the HALTYPE, HALC and HALWC parameters.
+
+\item [HALWC=number]
+This is the wavelength, measured in Angstroms, at which the
+halation correction is HALC.
+
+See the HALTYPE, HALC and HALW0 parameters.
+
+\item [HIST=boolean]
+This determines whether lines are plotted as histograms rather than
+continuous lines (polylines).
+
+This parameter has a default value of ``TRUE''.
+
+\item [IMAGE=number]
+This is the Image Sequence Number.
+
+\item [ITF=number]
+This is the ITF generation used in the photometric calibration of the 
+image. This information is needed for the correct absolute flux calibration 
+of the resulting spectra. Possible values for each camera are as follows:
+
+\begin {quote}
+\begin {description}
+\item SWP -- 2
+\item LWR -- 1 and 2
+\item LWP -- 1 and 2
+\end {description}
+\end {quote}
+
+The appropriate value can be determined from inspection of the
+IUE header text for the GPHOT/PHOT file using the table
+of numbers following the line beginning ``PCF C/**''.
+Here are the ITF values associated with various forms of this
+table:
+
+\begin {quote}
+\begin {tabbing}
+xx\=1800xx\=3700xx\=5600xx\=...xx\=30000xxx\=
+(Corrected, 3rd SWP ITF)xx\=ITFxx\kill
+\>\>{\bf TABLE}\>\>\>\>{\bf IDENTIFICATION}\>{\bf ITF}\\
+\\
+0\>1800\>3700\>5600\>...\>30000\>Preliminary LWR ITF\>ITF0\\
+0\>2303\>4069\>8008\>...\>42032\>2nd LWR ITF\>ITF1\\
+0\>2300\>3969\>6062\>...\>32973\>1st LWP ITF\>ITF1\\
+0\>2723\>5429\>8145\>...\>38389\>2nd LWP ITF\>ITF2\\
+0\>1800\>3600\>5500\>...\>\>Preliminary SWP ITF\>ITF0\\
+0\>1753\>3461\>6936\>...\>28674\>Faulty, 2nd SWP ITF\>ITF1\\
+0\>1684\>3374\>6873\>...\>28500\>Corrected, 3rd SWP ITF\>ITF2\\
+\end {tabbing}
+\end {quote}
+
+If the ITF table used has no corresponding absolute flux calibration within
+IUEDR, e.g. LWR ITF0 or SWP ITF0, you are advised to contact the IUE Project.
+Although the BADITF parameter is available for data calibrated using SWP ITF1, 
+it is advisable to have these data reprocessed by the IUE Project. 
+
+\item [ITFMAX=number]
+This is the pixel value on tape corresponding to ITF saturation.
+Its value is fixed for a given ITF table.
+The value of ITFMAX is only needed for IUE images of type ``GPHOT''.
+The appropriate value can be determined from inspection of the
+IUE header text for the GPHOT file using the table
+of numbers following the line beginning ``PCF C/**''.
+
+\begin {quote}
+\begin {tabbing}
+ITFMAXxxx\=0xx\=1800xx\=3700xx\=5600xx\=...xx\=30000xxx\=
+(Corrected, 3rd SWP ITF)\kill
+{\bf ITFMAX}\>\>\>{\bf TABLE}\>\>\>\>{\bf IDENTIFICATION}\\
+\\
+20000\>0\>1800\>3700\>5600\>...\>30000\>Preliminary LWR ITF\\
+27220\>0\>2303\>4069\>8008\>...\>42032\>2nd LWR ITF\\
+19983\>0\>1800\>3600\>5500\>...\>\>Preliminary SWP ITF\\
+19740\>0\>1753\>3461\>6936\>...\>28674\>Faulty, 2nd SWP ITF\\
+19632\>0\>1684\>3374\>6873\>...\>28500\>Corrected, 3rd SWP ITF\\
+\end {tabbing}
+\end {quote}
+
+\item [LINE=name]
+This specifies the line style to be used for the next curve to be
+plotted.
+It can be one of the following:
+
+\begin {quote}
+\begin {description}
+\item SOLID -- solid (continuous) line
+\item DASH -- dashed line
+\item DOTDASH -- dot-dash line
+\item DOT -- dotted line
+\end {description}
+\end {quote}
+
+The order of these is that invoked when automatic line style rotation
+is in effect (see the LINEROT parameter).
+
+\item [LINEROT=boolean]
+This indicates whether the line style is to be changed after the
+next plot.
+The initial line style is SOLID, unless specified explicitly
+using the LINE parameter.
+The sequence of line styles goes (SOLID, DASH, DOTDASH, DOT, SOLID,
+DASH, ...).
+
+In commands where more than one line is plotted, LINEROT determines
+whether these lines have different styles.
+
+This parameter has a default value of ``FALSE''.
+
+\item [ML=(number,number)]
+This is a pair of wavelength values defining the start and end of
+the mean spectrum grid.
+The grid will consist of evenly spaced vacuum wavelengths between these
+values.
+
+\item [MONTH=number]
+This is the month number, measured from the start of the Year,
+used in constructing dates.
+
+\item [MSAMP=number]
+This is the vacuum wavelength sampling rate for the mean spectrum
+grid.
+If it does not fit an integral number of times into the grid limits,
+then the latter are adjusted to fit.
+
+\item [NFILE=number]
+This is the number of tape files to be processed.
+A value of ``-1'' means all files until the end.
+
+This parameter has a default value of ``1''.
+
+\item [NGEOM=number]
+This is the number of Chebyshev terms used to represent the
+geometrical distortion.
+The same value is used for each axis direction.
+
+\item [NLINE=number]
+This is the number of IUE header lines printed.
+A value of ``-1'' means the entire header is printed.
+
+This parameter has a default value of ``10''.
+
+\item [NORDER=number]
+This is the number of echelle orders to be processed by a command.
+
+This parameter has a default value of ``0''.
+
+\item [NSKIP=number]
+This is the number of tape marks to be skipped.
+
+This parameter has a default value of ``1''.
+
+\item [OBJECT=string]
+This is a string containing text to identify the ``object'' of the
+observation.
+It can also contain information about the observation
+(e.g. camera, image, ...) if required.
+The maximum allowed length of the string is 40 characters.
+
+\item [ORDER=number]
+This is the echelle order number.
+
+\item [ORDERS=(number\{,number\})]
+This is a pair of echelle order numbers delineating a range.
+If only a single value is specified, then the range consists of that
+order only.
+The sequence of the two numbers is not significant.
+The useful maximum range for each camera is as follows:
+
+\begin {quote}
+\begin {description}
+\item SWP -- orders 66 to 125
+\item LWR -- orders 72 to 125
+\item LWP -- orders 72 to 125
+\end {description}
+\end {quote}
+
+\item [OUTFILE=string]
+This is the name of a file to receive the output spectrum.
+\footnote{If you are on a UNIX machine then you should ensure that the
+correct case if used (upper/lower) or the file will not be found.}
+This release of IUEDR uses the STARLINK NDF format for all output
+spectra. This means that all standard STARLINK packages can be used
+to plot/display/analyse the spectra, in particular some of the
+facilites of KAPPA and FIGARO may prove useful to the general user.
+
+\item [PRINT=number]
+This is determines how much printable information is produced.
+Higher values of PRINT produce more printout.
+
+\item [QUAL=boolean]
+This specifies whether the data quality information is plotted
+along with the data.
+If so, then faulty points will be marked with their data quality
+severity code, which is one from:
+
+\begin {quote}
+\begin {description}
+\item 1 -- affected by extrapolated ITF
+\item 2 -- affected by microphonics
+\item 3 -- affected by spike
+\item 4 -- affected by bright point (or user)
+\item 5 -- affected by reseau mark
+\item 6 -- affected by ITF truncation
+\item 7 -- affected by saturation
+\item U -- affected by user edit
+\end {description}
+\end {quote}
+
+User edits are only shown where no other fault is present.
+
+This option would normally only be used when assessing the quality
+of faulty points, possibly with a view to using them, i.e. marking them
+``good'' with a cursor editor.
+
+This parameter has a default value of ``TRUE''.
+
+\item [RESOLUTION=name]
+This is the spectrograph resolution mode.
+The following modes are defined:
+
+\begin {quote}
+\begin {description}
+\item LORES -- IUE Low Resolution
+\item HIRES -- IUE High Resolution (echelle mode)
+\end {description}
+\end {quote}
+
+\item [RIPA=number]
+This is an empirical scale factor that can be used to modify the
+echelle ripple function.
+The normal value is ``1''.
+The primary component of the ripple function is
+
+\begin {equation}
+SCALE = (\frac{\sin x}{x})^2
+\end {equation}
+
+where
+
+\begin {equation}
+x = \frac {\pi \times RIPA \times (\lambda - \lambda_c) \times ORDER}
+{\lambda_c}
+\end {equation}
+
+and
+
+\begin {equation}
+\lambda_c = \frac {RIPK}{ORDER}
+\end {equation}
+
+The net spectrum is divided by SCALE above.
+Empirical values of RIPA can be used to optimise the ripple correction.
+
+See the RIPK and RIPC parameter description.
+
+\item [RIPC=(number\{,number\})]
+This is a polyomial in ``$x$'' used to modify the standard echelle
+ripple calibration function.
+The calibration is given by
+
+\begin {equation}
+SCALE = (\frac {\sin x}{x})^2 \times (RIPC(1) + RIPC(2) \times x 
++ RIPC(3) \times x^2 ...)
+\end {equation}
+
+where
+
+\begin {equation}
+x = \frac {\pi \times RIPA \times (\lambda - \lambda_c) \times ORDER}
+{\lambda_c}
+\end {equation}
+
+and
+
+\begin {equation}
+\lambda_c = \frac {RIPK}{ORDER}
+\end {equation}
+
+The net spectrum is divided by SCALE above.
+
+See the RIPK and RIPA parameter descriptions.
+
+\item [RIPFILE=string]
+This is the name of a file containing an echelle ripple calibration.
+A file type of ``.RIP'' is assumed and should not be specified
+explicitly.
+If the file name contains a directory specification, then it should be
+enclosed in quotes.
+\footnote{If you are on a UNIX machine then you should ensure that the
+correct case if used (upper/lower) or the file will not be found.}
+
+\item [RIPK=(number\{,number\})]
+This is the echelle ripple constant measured in Angstroms.
+It corresponds to the central wavelength of echelle order number 1.
+The central wavelength of an arbitrary ORDER is
+
+\begin {equation}
+\lambda_c = \frac {RIPK}{ORDER}
+\end {equation}
+
+Where this parameter is used for an entire HIRES dataset, the
+parameter can have more than one value, and represent a polynomial
+in ORDER
+
+\begin {equation}
+\lambda_c 
+= \frac {(RIPK(1) + RIPK(2) \times ORDER + RIPK(3) \times ORDER^2 + ...)}
+{ORDER}
+\end {equation}
+
+\item [RL=(number,number)]
+This is a pair of radial coordinate values defining the start and end of
+the radial grid in an LBLS array.
+These radial coordinates are measured in geometric pixels, and run
+perpendicular to the dispersion direction.
+A coordinate value of ``0.0'' corresponds to the centre of the spectrum.
+
+Values (0.0,0.0) indicate that internal defaults are to be adopted.
+A single value is reflected symmetrically about 0.0.
+
+\item [RM=boolean]
+This determines whether the mean spectrum is reset before a mapping
+takes place.
+If the spectrum is not reset, then the spectra being mapped will be
+averaged with the existing mean spectrum.
+
+This parameter has a default value of ``TRUE''.
+
+\item [RS=boolean]
+This determines whether the display screen is reset before plotting.
+
+This parameter has a default value of ``TRUE''.
+
+\item [RSAMP=number]
+This is the sample spacing used for the radial grid in the LBLS array.
+If it does not fit an integral number of times into the grid limits, RL,
+then the latter are adjusted to fit.
+
+Suggested values range from 0.707 to 1.414 pixels, the latter
+corresponding to the IUESIPS LBLS grid.
+
+This parameter has a default value of ``1.414''.
+
+\item [SCANAV=number]
+This is the FWHM of a triangle function with which pixels are folded
+during the generation of a scan across the image perpendicular to
+spectrograph dispersion.
+It is measured in geometric pixels.
+
+This parameter has a default value of ``5''.
+
+\item [SCANDIST=number]
+This is the distance of a scan across a HIRES image from the faceplate
+centre.
+It is measured in geometric pixels.
+
+\item [SCANWV=number]
+This is the central wavelength for a scan of a LORES image
+perpendicular to spectrograph dispersion.
+It is measured in Angstroms in vacuo.
+
+\item [SKIPNEXT=boolean]
+This determines whether the tape is positioned at the start of the
+next file after processing.
+If only the start of a file is being processed, then by setting
+SKIPNEXT=FALSE time can be saved.
+
+This parameter has a default value of ``FALSE''.
+
+\item [SPECTYPE=number]
+This is the type of file, in the DIPSO ``SP'' format terminology, to be
+created. The following values are allowed: 
+
+\begin {quote}
+\begin {description}
+\item 0 -- unformatted (binary) file
+\item 1 -- fixed format file
+\item 2 -- free format file
+\end {description}
+\end {quote}
+
+It is recommended that datasets with many points be written with
+SPECTYPE=0, which is more efficient in disk space and time spent
+reading and writing.
+A description of the format of each of these file types can be found
+in the documentation for the DIPSO package, SUN/50.
+
+This parameter has a default value of ``0''.
+
+\item [TEMFILE=string]
+This is the name of a file containing the standard spectrum template
+data.
+A  file type of ``.TEM'' is assumed and should not be specified
+explicitly.
+If the file name contains a directory specification, then it should be
+enclosed in quotes.
+\footnote{If you are on a UNIX machine then you should ensure that the
+correct case if used (upper/lower) or the file will not be found.}
+
+\item [THDA=number]
+This is the IUE camera temperature, measured in degrees Centigrade.
+It is used for such things as adjustments to fiducial positions
+and spectrograph dispersion relations.
+A value of 0.0 implies that no THDA value is available, the program
+will then  use a suitable mean THDA for the camera being used.
+Values for the THDA can be found in the IUE header text of the final
+spectrum file on the Guest Observer tape for IUESIPS\#2 ---
+THDA values derived from spectrum motion are best.
+
+\item [TYPE=name]
+This is the type of dataset.
+Defined values are as follows:
+
+\begin {quote}
+\begin {description}
+\item RAW -- IUE raw image
+\item GPHOT -- IUE GPHOT image (geometric and photometric)
+\item PHOT -- IUE PHOT image (photometric only)
+\end {description}
+\end {quote}
+
+Types PHOT and GPHOT are not automatically distinguishable from IUE
+Guest Observer tape contents.
+
+\item [V=string]
+This is a string defining a list of items and includes
+any of the following characters:
+
+\begin {quote}
+\begin {description}
+\item H -- header and file information
+\item I -- image details
+\item F -- fiducials
+\item G -- geometry
+\item D -- dispersion
+\item C -- centroid templates
+\item R -- echelle ripple and halation
+\item A -- absolute calibration
+\item S -- raw spectrum
+\item M -- mean spectrum
+\item * -- all of the above
+\item Q -- image data quality summary
+\end {description}
+\end {quote}
+
+\item [VSHIFT=number]
+This is the radial velocity of the detector relative to the Sun.
+It is measured in km/s and affects the calibrated wavelength
+scale as follows:
+
+\begin {equation}
+\lambda_{true} = \frac {\lambda_{obs}}{(1 + \frac {VSHIFT}{c})}
+\end {equation}
+
+where $c$ is the velocity of light in km/s.
+
+\item [WCUT=(number,number)]
+This is one of the mechanisms that can be used to delimit the
+parts of echelle orders that are calibrated for ripple response.
+The two values of this parameter are the start and end wavelengths
+for a specific ORDER.
+
+Apart from poor ripple calibration, the order ends can also be affected
+by the parts of the camera faceplate that are retained in the image.
+
+\item [WSHIFT=number]
+This is a constant wavelength shift applied to spectrum wavelengths.
+It is measured in Angstroms and affects the spectrum wavelengths as follows:
+
+\begin {equation}
+\lambda_{new} = \lambda_{old} + WSHIFT
+\end {equation}
+
+This is only used for LORES spectra.
+
+\item [XCUT=(number,number)]
+This is one of the mechanisms that can be used to delimit the
+ends of echelle orders that are calibrated for ripple response.
+The two values of this parameter are the start and end ``$x$'' coordinates
+of the order, where
+
+\begin {equation}
+x = \frac {\pi \times RIPA \times (\lambda - \lambda_c) \times ORDER}
+{\lambda_c}
+\end {equation}
+
+and
+
+\begin {equation}
+\lambda_c = \frac {RIPK}{ORDER}
+\end {equation}
+
+The nature of the standard ripple function is that $x$ is only
+formally meaningful in the range ($-\pi$,$+\pi$).
+
+See the RIPK, RIPC and RIPA parameter descriptions.
+
+\item [XL=(number,number)]
+This specifies the data limits used for plotting in the $x$-direction.
+This parameter is only read if the display has been reset, and
+the axes are being redrawn.
+If both values are the same (e.g. [0,0]),
+then the data limits in the $x$-direction will be determined from the
+data being plotted.
+
+\item [XP=(number,number)]
+This specifies the pixel limits along the $x$-direction used for
+image display.
+Values in decreasing order will cause the image to be inverted
+along the $x$-direction.
+If the values are undefined, the pixel limits will default to include
+the whole extent of the image along the $x$-direction.
+
+\item [YEAR=number]
+This is the year (A.D.) used in constructing dates.
+
+\item [YL=(number,number)]
+This specifies the data limits used for plotting in the $y$-direction.
+This parameter is only read if the display has been reset, and
+the axes are being redrawn.
+If both values are the same (e.g. [0,0]),
+then the data limits in the $y$-direction will be determined from the
+data being plotted.
+
+\item [YP=(number,number)]
+This specifies the pixel limits along the $y$-direction used for
+image display.
+Values in decreasing order will cause the image to be inverted
+along the $y$-direction.
+If the values are undefined, the pixel limits will default to include
+the whole extent of the image along the $y$-direction. 
+
+\item [ZL=(number,number)]
+This specifies the data limits used for display of images.
+If the values are given in decreasing order, then high data
+values will be represented by low (dark) display intensities,
+and vice-versa.
+If the values are undefined, then the full intensity range of the
+image will be used.
+
+Data values which fall at or below the lowest display intensity are drawn
+BLACK, those which are at the highest display intensity are drawn
+WHITE and those which are above the highest display intensity are
+drawn BLUE.
+
+\item [ZONE=number]
+This specifies the zone to be used for plotting.
+The zone numbers range
+from 0 to 8 and correspond to those defined by the TZONE command in 
+DIPSO (i.e. SUN/50), e.g.
+
+\begin {quote}
+\begin {description}
+\item 0 -- entire display surface
+\item 1 -- top left quarter
+\item 2 -- top right quarter
+\item 3 -- bottom left quarter
+\item 4 -- bottom right quarter
+\item 5 -- top half
+\item 6 -- bottom half
+\item 7 -- left half
+\item 8 -- right half
+\end {description}
+\end {quote}
+
+This parameter has a default value of ``0''.
+
+\end {description}
+\newpage
+%------------------------------------------------------------------------------
+
+\appendix
+\section {Parameter Defaults}
+
+The following parameters have default values:
+
+\begin {description}
+\item [AUTOSLIT=TRUE] Whether GSLIT, BDIST and BSLIT are determined 
+automatically.
+\item [BKGAV=30.0] Background averaging filter FWHM (geometric pixels).
+\item [BKGIT=1] Number of background smoothing iterations.
+\item [BKGSD=2.0] Discrimination level for background pixels (standard 
+deviations).
+\item [BLOCK=1] Tape block number.
+\item [CENAV=30.0] Centroid averaging filter FWHM (geometric pixels).
+\item [CENIT=1] Number of centroid tracking iterations.
+\item [CENSD=4.0] Discrimination level for signal to be used for centroids 
+(standard deviations).
+\item [CENSH=FALSE] Whether the spectrum template is just shifted linearly.
+\item [CENSV=FALSE] Whether the spectrum template is saved in the dataset.
+\item [CENTM=FALSE] Whether an existing centroid template is used.
+\item [COLROT=TRUE] Whether the line colour is changed after the next plot.
+\item [CONTINUUM=TRUE] Whether the object spectrum is expected to have a 
+``continuum''.
+\item [COVERGAP=FALSE] Whether gaps can be filled by covering orders.
+\item [CUTWV=TRUE] Whether wavelength cutoff data is to be used for the 
+extraction grid.
+\item [DRIVE=TAPE] Tape drive logical name.
+\item [EXTENDED=FALSE] Whether the object spectrum is expected to be 
+extended.
+\item [FILLGAP=FALSE] Whether gaps can be filled within an order.
+\item [FLAG=TRUE] Whether data quality for faulty pixels is displayed.
+\item [GSAMP=1.414] Spectrum grid sampling rate (geometric pixels).
+\item [HIST=TRUE] Whether lines are to be drawn as histograms during 
+plotting.
+\item [LINEROT=FALSE] Whether line style is to be changed after the next 
+plot.
+\item [NFILE=1] Number of tape files to be processed.
+\item [NLINE=10] Number of IUE header lines to be printed.
+\item [NORDER=0] Number of echelle orders to be processed.
+\item [NSKIP=1] Number of tape marks to be skipped over.
+\item [QUAL=TRUE] Whether data quality information is plotted.
+\item [RM=TRUE] Whether the mean spectrum is reset before averaging.
+\item [RS=TRUE] Whether the display is reset before plotting.
+\item [RSAMP=1.414] Radial coordinate sampling rate for LBLS grid (pixels).
+\item [SCANAV=5] Averaging filter FWHM for image scan (goemetric pixels).
+\item [SKIPNEXT=FALSE] Whether skip to next tape file.
+\item [SPECTYPE=0] DIPSO ``SP'' format file type (0, 1 or 2).
+\item [ZONE=0] Graphics zone to be used for plotting.
+\end {description}
+\end {document}
+

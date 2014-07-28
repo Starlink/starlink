@@ -1,0 +1,1161 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {58.6}
+\newcommand{\stardocauthors}   {C Lloyd}
+\newcommand{\stardocdate}      {2 December 1992}
+\newcommand{\stardoctitle}     {IUEDEARCH --- Access to the IUE data archive}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+\setlength{\parskip}{0mm}
+\tableofcontents
+\setlength{\parskip}{\medskipamount}
+\markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\section {Introduction}
+
+The IUE data archive is supported and maintained by members of the UK IUE 
+Project in the Space Science Department at RAL. 
+The archive comprises some 1400 tapes, containing about 80000 images,
+and a catalogue which gives details of the exposures. New images are continually
+added to the archive and the catalogue is updated every month.
+All IUE data are formally 
+available to the astronomical community about six months after
+the observations are made and appear in the catalogue shortly
+before release.
+The aim is to provide UK astronomers with quick and painless 
+access to IUE data.
+This document describes how to interrogate the catalogue and extract data from
+the archive. There are also two other documents relating to IUE data. SUN/37:
+IUEDR---IUE data reduction package,
+describes how to extract spectra from IUE data files and SUN/20:
+ULDA/USSP---Accessing the IUE ULDA,
+describes a subsidiary archive of extracted low-resolution spectra.
+
+\subsection {IUE data}
+
+IUE spectra cover two wavelength ranges; 1100 -- 2000\AA, (the short wavelength,
+SW)
+and 1900 -- 3300\AA, (the long wavelength, LW).
+Both spectrographs have a prime (P) and redundant (R) camera. The SWP camera
+has been used throughout the mission while the LWR was used until 1984 and
+the LWP since then.
+The spectrographs may be used in two resolution modes.
+In low resolution (LORES) $\Delta\lambda\sim6\AA$ and high resolution (HIRES)
+$\Delta\lambda\sim0.1\AA$.
+The spectrographs have two apertures. The 
+large aperture (LAP) is 10$\times$20 arcsec and may be used for single,
+multiple, trailed or extended images. The small aperture (SAP) is 2 arcsec
+in diameter and vignettes the beam.
+
+IUE images are held as a number of files which contain the raw image, some
+intermediate partly processed images and the final extracted 1-d spectrum. The
+high resolution spectra usually have three files---the RAW, the G/PHOT and the
+EXTRACTED. 
+The G/PHOT is the geometrically and/or photometrically corrected image, and
+which of these is held depends on when the image was last processed. The 
+timing of the change over from GPHOT to PHOT is given in Section \ref{change}.
+Low resolution spectra 
+usually have in addition an (extended) line-by-line file ((E)LBL) 
+which is a 2-d image for spectroscopy of extended sources. Early LORES images
+also have a rectified image segment file.
+LORES images may contain spectra taken through both apertures and a very small
+number of images contain spectra taken at both resolutions.
+Over the lifetime of the satellite the standard image processing (IUESIPS)
+has evolved and although the extracted spectra are calibrated they are not
+uniformly processed. Some early images have been reprocessed.
+
+In the UK it is common practice to extract the spectra from the G/PHOT
+image using the IUEDR package (SUN/37)
+which offers significant advantages over IUESIPS,
+particularly for the older HIRES spectra and poorly exposed LORES spectra.
+For some work the Uniform Low Dispersion Archive (SUN/20) may be appropriate.
+The ULDA is an on-line archive of LORES extracted spectra which have had the 
+details
+of the targets and exposures verified. However it should be remembered that 
+these spectra are {\it not} uniformly processed, and are identical to the 
+extracted spectra in the tape archive.
+
+\subsection {Overview of the dearchiving process}
+
+Access to the IUE archive is through three interrelated components.
+The captive IUE account on STADAT at RAL, the IBM at RAL and
+a small number of global commands which are issued from your own username.
+The captive account
+is used to interrogate the IUE catalogue and identify the images
+of the targets you are interested in, 
+and to allocate yourself an output tape to hold your data.
+The IUE archive tapes and blank output tapes are held in the IBM tape library.
+The global command IUEDEARCH is used to submit the
+dearchiving program which runs on the IBM
+and copies the required files from archive tapes to an output tape.
+A log file, which gives a list of the files copied and other information,
+is automatically copied to your account.
+You ask for the output tape to be sent to you with the global command
+IUEDESPATCH.
+
+\subsection {Network access}
+
+Before using the package ensure that @NET\$DIR:NETSYMB is included in your 
+LOGIN.COM file.
+To run IUEDEARCH you must have access to CBS mail and the JTMP
+file-transfer protocol. This usually requires that you are
+connected to the boot node of your cluster.
+Your site must also be correctly registered to use JTMP in the NRS tables.
+
+\section {The IUE captive account}
+
+The IUE captive account is a username on the database machine at RAL 
+(STADAT::IUE) which is only accessible from a STARLINK machine.
+To use the captive account, login to your own username on a STARLINK node
+and then:
+
+\begin{quote}
+{\tt \$ SET HOST STADAT}
+\end{quote}
+
+and login to username IUE (no password is required).
+You are asked for a name, which is used for a subdirectory to contain your 
+files, and then the system displays a list of options. These give access to the 
+catalogue and other 
+facilities, and enable a few DCL commands to be issued.
+These options are:
+
+\begin{description}
+\begin{description}
+\item [HELP] - An online help facility which gives brief descriptions of how
+to use the various options in IUE.
+
+\item [MAIL] - Gives access to the VMS mail facility.
+
+\item [IUELOG] - Searches the IUE catalogue.
+
+\item [CLASSKEY] - Displays a list of the various classification codes used in the
+IUE catalogue.
+
+\item [TYPE] - Same as the DCL command 'TYPE'.
+It can be used to view any of the files in the IUE directory. 
+Wild card characters can not be used in the TYPE command.
+
+\item [DIR] - Displays the contents of the IUE directory.
+It may be used with the same options as the DCL equivalent.
+
+\item [TRANS] - Files which have been created in the IUE directory can be
+transferred to one of your own directories with this option.
+You will be prompted for the filename, your NRS node name, your username, 
+password and the directory
+you wish the files to be transferred to.
+Wild card characters may be used in the filename to allow several versions of
+a file to be transferred at once. MAIL may be used as an alternative.
+
+\item [BETA] - Calculates beta and other angles for targets observed with IUE.
+
+\item [LOG] - End the session and log-out.
+
+\end{description}
+\end{description}
+
+Any files you create in the IUE directory will be deleted automatically after
+two weeks.
+If you wish to keep a files for longer than this they must be transferred to 
+one of your own directories using TRANS or MAIL.
+
+\subsection {Consulting the catalogue}
+
+At present consulting the catalogue is possible only through the IUE 
+captive account. Select the IUELOG option. 
+There is usually a page of information about the latest log update and then
+you are prompted for a {\it label} for your files.
+The IUELOG user interface has been completely rewritten to enable multiple 
+search criteria and bears no relation to the old system.
+You should only need to search the MAIN catalogue (the default).
+You will be asked:
+
+\begin{quote}
+{\tt Enter search key}
+\end{quote}
+
+which may be any of the following:
+
+\begin{itemize}
+
+\item {\tt HIRES} selects high resolution images.
+
+\item {\tt LORES} selects low resolution images, these two are mutually
+exclusive.
+If you do not select either then by default both resolutions are selected.
+
+\item {\tt LWP n, m}
+
+\item {\tt LWR n, m}
+
+\item {\tt SWP n, m}
+
+\item {\tt SWR n, m} where both n and m are optional image numbers specifying a range
+of required images. If no range is given then all images are selected.
+Only one camera may be specifically selected at a time but by default all 
+cameras are selected. 
+
+\item {\tt OC n, m} where n and m (optional) specify a range of object classes
+otherwise 
+all object classes are selected. A single object class may be specified.
+
+\item {\tt RA hh mm ss.s, hh mm ss.s} where the ra's specify the limits of a range in
+right ascension.
+The ra's may be truncated to any level. Single digit hours, minutes or seconds
+may be given as a single digit or with a preceding zero. Hours, minutes and
+seconds {\it must} be separated by spaces and the two limits {\it must} be
+separated by a comma. The limits are in the sense, from and increasing to, 
+and it is possible to search across the boundary from 24 to 0 hours, although
+a warning will be issued.
+A single ra may be given which defines the centre of
+a search area the size of which is determined by the BOX keyword (see below).
+
+\item {\tt DEC $\pm$dd mm ss, $\pm$dd mm ss} where the dec's specify the limits of 
+a range in
+declination. The general comments for RA also apply. Positive dec's do not
+require a sign.
+The RA and DEC keywords may be used completely independently.
+
+\item {\tt BOX n} where n 
+specifies the size of the search box in arc minutes around a central
+ra and dec. If ra and dec {\it limits} are given then the value of BOX is
+irrelevant. There is no dec dependence of the dimension of the box in ra.
+The default value of n is 30.
+
+\item {\tt NAME string} where string specifies a target name. The string may include
+spaces and wildcard (*) characters. The time taken for a name search, including
+wildcards, may be up to 90 seconds.
+
+\item {\tt PROG string} where string specifies a programme identification code.
+The string may include wildcard (*) characters.
+
+\item {\tt DATE year day, year day} where the dates define the limits of the search.
+The year may be given with or without the preceding 19.
+The year and day are separated by spaces and the two limits by a comma.
+The year only may be given and a single year may also be selected. 
+
+\item {\tt CLEAR} clears all the search criteria to their default values.
+
+\item {\tt Q} quits the search program.
+
+\item {\tt ?} brief outline of the keywords.
+
+\end{itemize}
+
+The search keys are entered one per line in response to the prompt.
+Any combination, order and number of search keys may be used. 
+If an error is made simply re-enter the search key at any time.
+To initiate the search hit carriage return at the prompt.
+
+The results of the search are stored in a workfile which is named as
+appropriate.
+The workfiles may be searched (using the old system) but with multiple search
+keys this should not be necessary and the new system alone should provide the 
+list you want. 
+Any of the workfiles may be kept with the KEEP option
+and will be saved as {\it label}.IUE.
+Initially the workfiles are
+in RA order but it is possible to sort them using the ORDER option 
+by either date or camera and image number. Enter DATE or CIM as appropriate, or
+a null carriage return to exit the order option.
+All the KEEPed and ORDERed files are saved as different
+generations of [IUE]{\it label}.IUE. 
+Note that the label and not the workfile name is used.
+The {\it label}.IUE files may be transferred or MAILed to your own account.
+
+\subsection {Allocating an output tape}
+\label{allocate}
+Before dearchiving IUE images it is necessary to allocate yourself an
+output data tape.
+At present allocating a tape is possible only from the IUE captive account.
+Login and select the ALLOCATE option. In response to the prompts 
+give your name and address. 
+The name of the tape will be selected automatically and is of the form
+WDC{\it nnn}.
+The tapes are all 6250 bpi NL (no label).
+
+\section {Global commands}
+\label{global}
+
+The main dearchiving commands may be issued globally from your own username on 
+your local STARLINK node, without the need to login to the captive account.
+To set up the appropriate symbols include:
+
+\begin{quote}
+{\tt \$ @STADAT::DISK\$STARDATA:[IUES.CAPACCNT]REMOTESTART}
+\end{quote}
+
+in your LOGIN.COM. The commands currently available are:
+
+\begin{itemize}
+
+\item {\tt \$ IUEHELP} - brief outline of the remote commands
+
+\item {\tt \$ IUENEWS} - any news of log updates, revisions etc
+
+\item {\tt \$ IUECOPYSUN} - copies the current version of the SUN58 LaTeX file
+to your current directory
+
+\end{itemize}
+
+and
+
+\begin{itemize}
+
+\item {\tt \$ IUEDEARCH}
+
+\item {\tt \$ IUERESUBMIT}
+
+\item {\tt \$ IUEDESPATCH}
+
+\end{itemize}
+
+which are described in detail in the appropriate sections below.
+
+\section {Dearchiving images}
+
+\subsection {Preparing and submitting the job}
+
+First allocate yourself an output tape (see Section \ref{allocate}).
+IUEDEARCH can only be run from a machine that has both a link to JANET and a
+DECnet connection to Starlink. You must also be on the machine that has 
+access to CBS mail and JTMP,
+which is usually the boot node
+of your cluster. Some nodes are set up differently.
+Dearchiving jobs are submitted from your own username using the 
+global command:
+
+\begin{quote}
+{\tt \$ IUEDEARCH}
+\end{quote}
+
+If IUEDEARCH is not recognised check that you have the remotestart procedure 
+set up correctly (see Section \ref{global}) or if it continues to fail
+contact RLVAD::IUES.
+IUEDEARCH gives a page or so of information about bug fixes or updates and
+then you will be prompted for the following:
+
+\begin{quote}
+{\tt Please give your name: }surname first, then your initials.
+
+{\tt and your establishment: } one line
+
+{\tt Please give the output tape name: } WDC{\it nnn}
+
+{\tt Please give combination of codes for type of files required }
+\newline
+{\tt ? gives the list of codes: }
+\end{quote}
+
+Any combination of files may be requested
+(eg. GPHOT image or/and EXTRACTED etc).
+If you do not know the codes, type `?' for a list (see also Section \ref{codes}).
+Some information relating to
+the image is available in a more understandable form in the header of the 
+EXTRACTED spectrum, so for HIRES it is usual to dearchive the G/PHOT and the
+EXTRACTED files. On tapes received from NASA since May 1992 the order of the
+files has been different to before, and inconsistent. To circumvent this problem
+all the files on the relevant tapes will be copied, irrespective of the codes
+given.
+
+\begin{quote}
+{\tt Please give the number of the first file on the output tape: }
+\end{quote}
+
+Initially this will be 1 but if 
+you have copied 10 files to this tape previously, you would type 11.
+If you give a number other than 1 you will be asked to give the
+amount of tape already used
+which is given in the WDC{\it nnn}.REQ of the previous job; see below.
+The program keeps track of the amount of output tape used, so the tape is used
+efficiently and the IBM job should not crash when the tape is full.
+
+\begin{quote}
+{\tt Type image number, or LIST for input file or}
+\newline
+{\tt END to finish}
+
+{\tt Type camera and image number: }
+\end{quote}
+
+The camera name and image number 
+may be entered with or without a space and in upper or lower case,
+eg. SWP1234, SWP 1234,
+swp1234 or swp 1234 will all work. For details of list directed input see
+Section \ref{list}.
+
+Check that the object identification is correct; the default is YES so you may 
+simply hit carriage return. If there are an unusual number of files for an
+image you will be asked if you want each file individually. 
+
+Repeat for all the required images and enter END to finish.
+Alternatively, the program will stop when it estimates that the output tape will
+be filled by the data.
+IUEDEARCH checks the release date of all images requested so you may not be
+allowed access to some images.
+
+\begin{quote}
+{\tt Enter the NRS code for your machine. (? for list)}
+\end{quote}
+
+A list is available form the program if you type `?',
+and also in SUN/36 and on the back of the STARLINK bulletin.
+
+Finally you will be asked:
+
+\begin{quote}
+{\tt Do you want to submit this job? ([Y]/N)} the default is YES.
+\end{quote}
+
+If for any reason you do not want to submit the job, you can stop the job from 
+being
+submitted by replying `N' to the prompt at this stage.
+If the job fails or you do not submit the job, the relevant files remain in your
+directory and may be submitted later using IUERESUBMIT. 
+
+On submitting the job you will receive the following messages:
+
+\begin{quote}
+\tt
+File DISK\$USER1:[IUES]WDC001.JOB;1 Copied
+\newline
+Task 69856 has been queued
+\newline
+...submitting WDC001
+\newline
+Mail request 69857 has been queued
+\newline
+Mail request 69858 has been queued
+\end{quote}
+
+\rm
+If you receive the message:
+
+\begin{quote}
+{\tt /TRANSFER/ unrecognized command}
+\end{quote}
+
+it probably means you do not 
+have @NET\$DIR:NETSYMB in your LOGIN.COM file.
+
+If you receive:
+
+\begin{quote}
+\begin{verbatim}
+%DCL-W-IVVERB, unrecognized command verb - check validity and spelling
+ \SEND\
+\end{verbatim}
+\end{quote}
+
+you do not have access to JTMP which probably means that you are not connected 
+to the appropriate machine on your cluster. It is usually accompanied by:
+
+\small
+\begin{quote}
+{\tt \%MAIL-E-ERRACTRNS, error activating transport CBS
+\newline
+\%LIB-E-ACTIMAGE, error activating image \$1\$DUA1:[STARSEC.NOCBS]NOCBS\_MAILSHR.EXE;
+\newline
+-RMS-E-FNF, file not found}
+\end{quote}
+\normalsize
+
+or something like:
+
+\begin{quote}
+{\tt \%MAIL-E-NOSUCH\_PROTOCOL, To use CBS mail on this machine, send mail to
+\newline
+ARMV1::CBS\%<NRS node name>::<username>}
+\end{quote}
+
+IUEDEARCH creates several files in your current directory;
+WDC{\it nnn}.JOB, WDC{\it nnn}.JIN, WDC{\it nnn}.REQ and some temporary files.
+The .JOB file is the batch job which is submitted to the IBM at your request.
+The .JIN file is used by JTMP to submit the .JOB file and the .REQ file contains
+a list of the requested images (the old REQU.FIL).
+A copy of .REQ is sent to the IUE data archive for dearchiving 
+statistics, and so you may be notified
+when any bad tapes you required are replaced.
+The order of the files on the output tape will almost certainly
+be different from the order in which you
+entered them.
+
+When the job has been accepted an initial mail message is sent by the 
+FTP\_manager.
+When the dearchiving job has completed on the IBM four more mail messages
+are issued and examples of these and a variety of error messages 
+are described in Section \ref{jtmp}.
+
+\subsection {List directed input}
+\label{list}
+
+Instead of giving the image numbers individually it is now possible to give
+the filename of a list containing the required image numbers. When asked
+for the camera and image number, reply:
+
+\begin{quote}
+{\tt LIST}
+\end{quote}
+
+and then give the filename of the list at the prompt.
+The list may be in either of two formats. The program will extract the camera 
+and image numbers from an IUELOG
+listing complete with all the header information, or as an alternative 
+a simple typed list may be used, as in the example below, which
+follows the rules for entering the image numbers individually. No {\tt END}
+is required to terminate the list.
+
+\begin{quote}
+\begin{verbatim}
+LWR1234
+swp6789
+swp12345
+lwp 23456
+lwp 3456
+\end{verbatim}
+\end{quote}
+
+When running
+in list directed mode the program issues no information about the images and
+assumes that the target identifications are correct. All the information that
+you would normally see goes instead to the .REQ file.
+If there is any ambiguity
+the program will copy a file rather than not.
+
+\subsection {Waiting for the job to run}
+
+If you have access to CMS at RAL, you can check the progress of your job by
+logging in and typing BATCH Q AMGHK{\it nnn} 
+where WDC{\it nnn} is your output tape.
+Do not submit a new job using the same output tape until you are sure the
+previous job has finished.
+
+\subsection {Output from IUEDEARCH}
+
+The output of the IBM job should appear in your default directory as 
+a file called WDC{\it nnn}.OUT.
+It contains several pages of the IBM log file and then for each file that has
+been copied five lines from the image header for identification. 
+You should examine the .OUT file for errors and to identify these you should
+see Section \ref{out} {\it The .OUT file and IBM errors},
+and if necessary report
+any problems with a copy of the file to RLVAD::IUES.
+Output from different jobs using the same tape appear in your default directory
+as different generations of WDC{\it nnn}.OUT.
+The turn-around time for a dearchiving job may be as little as 5 minutes or
+several hours depending on the size of the job and the work load of the machine.
+If this file appears almost immediately then the job has most probably
+failed for some reason.
+If your output does not appear within a day or so you should also report it.
+Your output tape is retained at RAL until you request it 
+so you may append data from further
+dearchiving jobs. 
+
+\subsection {When things go wrong}
+
+If most of the file copying is successful but
+for various reasons some files are not copied correctly then do not resubmit the
+whole job again but re-dearchive the missing images. This is a simple matter
+if the image numbers are held in a file. If some images still refuse
+to be copied then again mail the .OUT file to RLVAD::IUES.
+If the bulk of the job failed or it is not clear what happened then mail the
+.OUT file to RLVAD::IUES.
+
+\subsection {Submitting another job}
+
+Now that you have checked the job has run and inspected the output in your
+files, you may if you wish run another job to copy a further set of files to
+the same output tape. You will need to know the number of files on the tape
+and an estimate of the amount of tape used, from the previous WDC{\it nnn}.REQ.
+Obviously the amount given in the .REQ
+file assumes that all the files were copied successfully and so represents an
+upper limit.
+Do not submit another job using the same output tape until you have checked 
+that the previous one has finished. 
+
+\subsection {Resubmitting a job}
+\label{resubmit}
+
+If the file transfer to the IBM is not successful
+JTMP re-queues the job and tries a limited number of
+times automatically before giving up.
+If you do not receive mail from the JTMP\_manager confirming that the job
+has been sent you may examine the FTP queue with the command:
+
+\begin{quote}
+{\tt \$ LIST}
+\end{quote}
+
+If necessary you can resubmit the job later, without
+going through IUEDEARCH again. There may be other circumstances when the job as
+submitted is correct but it has failed.
+To resubmit a job use the global command:
+
+\begin{quote}
+{\tt \$ IUERESUBMIT}
+\end{quote}
+
+By default IUERESUBMIT will
+pick up the last .JOB file you created in the current directory
+but this may be changed at the prompt:
+
+\begin{quote}
+{\tt Which job do you want to resubmit [WDC001]?:}
+\end{quote}
+
+If you are unsure of the file
+names you may type `?' and the procedure will list the .JOB files in the 
+current directory. There is no default.
+On submitting the job the procedure issues the message:
+
+\begin{quote}
+{\tt...submitting WDC001}
+\end{quote}
+
+and the JTMP messages should be received as above.
+
+\subsection {Requesting the output tape}
+When you have all the required data on tape you may request the tape to be
+despatched to you by using the global command:
+
+\begin{quote}
+{\tt \$ IUEDESPATCH tapename}
+\end{quote}
+
+which sends a standard message to RLVAD::IUES and the IBM tape library.
+If the tapename is omitted it is prompted for.
+Your tape will then be despatched to you by post and
+you will receive an acknowledgement that it has been sent.
+
+\subsection {Error messages}
+
+IUEDEARCH is intended to be robust and the messages it issues are self 
+explanatory. If it can be made to fail under normal circumstances or its
+behaviour is unclear then
+please report the problem to RLVAD::IUES.
+
+\section {The .OUT file and IBM errors}
+\label{out}
+
+The handling of archive tapes on the IBM is relatively complex. Many of the 
+archive tapes are old and unreliable, so to preserve the data and also for
+operational reasons the open reel tapes are being copied as they are
+used on to 3480 cartridges. Most of the cartridges are now held almost 
+`on-line' in a StorageTek device but the open tapes are held in one of the
+tape libraries. Most of the problems that occur with the tapes stems from a
+tape being in the wrong place.
+
+The .OUT file divides into two main sections. The first part contains largely
+unintelligible tape setup and mounting, and tape to cartridge copying 
+information. The second part also contains extracts of the system log but it
+is mostly IUE archive tape copying information.
+
+If an archive tape is not available in the local library it will be 
+{\it rejected} by the system and problems may occur in copying files from other
+tapes. Search the .OUT file for `REJECTED' and report to RLVAD::IUES.
+The relevant section of log file looks like:
+
+\begin{quote}
+{\small
+\tt
+**SETMNT** SETUP TAPE 184 NAS100 REAL NOMOUNT
+\newline
+** VOLSER NAS100 REJECTED BY TMS
+\newline
+*** COPY FAILED FROM NAS100 TO 8N0100
+\newline
+File not open
+\newline
+DMSTPJ113S TAP4(184) not attached
+}
+\end{quote}
+
+\rm
+The {\tt COPY FAILED} line may also occur on other occasions and may be ignored.
+
+The start of the program output should look like:
+
+\begin{quote}
+{\small
+\tt
+  IUE DEARCHIVING PROGRAM VERSION 2.1 FOR SLAC BATCH
+\newline
+  ==================================================
+\newline
+INITIALIZING OUTPUT TAPE
+\newline
+ Dumping ...
+\newline
+ PROFILE  EXEC     B1
+\newline
+ ***  OPENED WDC002 DENSITY       6250
+}
+\end{quote}
+
+\rm
+or if files have been appended to the output tape:
+
+\begin{quote}
+{\small
+\tt
+  IUE DEARCHIVING PROGRAM VERSION 2.1 FOR SLAC BATCH
+\newline
+  ==================================================
+\newline
+SKIPPING FORWARD         54  FILES
+\newline
+***  OPENED WDC343 AT 6250
+}
+\end{quote}
+
+\rm
+Each file which has been correctly copied will have 5 lines listed from the 
+header and a message saying which file on the output tape it has been copied
+to:
+
+\begin{quote}
+{\small
+\begin{verbatim}
+HEADER FOR LWR 3122
+===================
+
+                         0001000107681536   1 2 0221 3122            1  C
+       *    *        *   *   *     9*      *   *  * * * * * *     *  2  C
+                                                                     3  C
+                                                                     4  C
+        NO LAMP-EXP TIME=9 SECS                                      5  C
+**********************************************
+*** LWR 3122 HAS BEEN COPIED TO FILENO 25
+**********************************************
+\end{verbatim}
+}
+\end{quote}
+
+If the file does not correspond to the one expected, the erroneous header
+is listed and an error message given.
+
+\begin{quote}
+{\small
+\begin{verbatim}
+HEADER FOR LWP13155
+===================
+
+                         0001000101662048   1 2 022014124            1  C
+     99*   4*8SEP-1  *   *   *    20*      *   *  * * * * * *     *  2  C
+ HD31295,LWR14124,LORES,SLAP,0M10S,16:52:25,0M10S,16:55:17           3  C
+ 020908,SPREP,MAXG,LOREAD,EA115,WEHRSE-HECK                          4  C
+ 36,330,FU,13.5,4 MIN-HTR                                            5  C
+**********************************************
+*** TAPE FILE WAS      LWR 14124
+*** SHOULD HAVE BEEN   LWP 13155
+*** PLEASE MAIL THIS FILE TO RLVAD::IUES,
+*** SPECIFYING SUBJECT -INDEX ERROR-
+**********************************************
+***  ERROR ON TAPE OPERATION
+***  IRC =        0 INFO =        1
+***     -----------------------------
+*** *** THIS FILE HAS NOT BEEN COPIED ***
+***     -----------------------------
+***  WILL PROCEED TO NEXT FILE
+**********************************************
+\end{verbatim}
+}
+\end{quote}
+
+Sometimes there are tape errors when reading the header or the data part of
+the file. 
+
+\begin{quote}
+{\small
+\begin{verbatim}
+HEADER FOR SWP 3552
+===================
+
+**********************************************
+***   ERROR READING LABEL WIL015 FILE 119
+***   SWP 3552 AT LINE    1
+***   MAIL THIS OUTPUT TO RLVAD::IUES
+**********************************************
+***   ERROR ON TAPE OPERATION
+***   IRC =   -10000 INFO =        3
+***     -----------------------------
+*** *** THIS FILE HAS NOT BEEN COPIED ***
+***     -----------------------------
+***   WILL PROCEED TO NEXT FILE
+**********************************************
+
+
+HEADER FOR LWR 3122
+===================
+
+                         0001000107680768   1 2 0221 3122            1  C
+       *    *        *   *   *     9*      *   *  * * * * * *     *  2  C
+                                                                     3  C
+                                                                     4  C
+        NO LAMP-EXP TIME=9 SECS                                      5  C
+**********************************************
+***   ERROR READING WIL015 FILE 131
+***   LWR 3122 AT LINE       32
+**********************************************
+***   ERROR ON TAPE OPERATION
+***   IRC =   -10000 INFO =        3
+***     -----------------------------
+*** *** THIS FILE HAS NOT BEEN COPIED ***
+***     -----------------------------
+***   WILL PROCEED TO NEXT FILE
+**********************************************
+\end{verbatim}
+}
+\end{quote}
+
+...and sometimes the file cannot be opened:
+
+\begin{quote}
+{\small
+\begin{verbatim}
+**********************************************
+***   ERROR OPENING NAS069 FILE 281 LWR 3462
+***   IRC =    -1001  INFO =        3
+***   INPUT NAME = CAR2NL
+*********THIS FILE WILL NOT BE COPIED*********
+\end{verbatim}
+}
+\end{quote}
+
+If in any doubt mail the .OUT file to RLVAD::IUES.
+
+\section {JTMP mail messages}
+\label{jtmp}
+
+On submitting the job, there is an initial message from JTMP:
+
+\begin{quote}
+{\small
+\tt
+From:	JTMP\_Manager  4-OCT-1991 10:26:28.91
+\newline
+To:	IUES        
+\newline
+CC:	
+\newline
+Subj:	JTMP Report for Task : 0000055166
+
+Task reference: 0000055166
+\newline
+Report from UK.AC.RUTHERFORD.IBM-B
+\newline
+Parent Task type : EXECUTION
+\newline
+Task has been accepted.
+}
+\end{quote}
+
+\rm
+When the job is {\it completed}, these 4 messages are issued:
+
+1. The job file was copied successfully to the IBM:
+
+\begin{quote}
+{\small
+\tt
+From:	JTMP\_Manager  4-OCT-1991 12:22:13.63
+\newline
+To:	IUES        
+\newline
+CC:	
+\newline
+Subj:	JTMP Report for Task : 0000055166
+
+Task reference: 0000055166
+\newline
+Report from UK.AC.RUTHERFORD.IBM-B
+\newline
+Task type : DOCUMENT DISPOSITION
+\newline
+Task successfully created.
+\newline
+Target site : UK.AC.RUTHERFORD.STARLINK
+}
+\end{quote}
+
+\rm
+2. It understands the job and accepts it:
+
+\begin{quote}
+{\small
+\tt
+From:	JTMP\_Manager  4-OCT-1991 12:22:29.88
+\newline
+To:	IUES        
+\newline
+CC:	
+\newline
+Subj:	JTMP Report for Task : 0000055166
+
+Task reference: 0000055166
+\newline
+Report from local host
+\newline
+Arrival report message: 
+\newline ~JTMP task analysed and accepted
+}
+\end{quote}
+
+\rm
+3. Dearchiving program has finished and created one (log) file:
+
+\begin{quote}
+{\small
+\tt
+From:	JTMP\_Manager  4-OCT-1991 12:22:38.10
+\newline
+To:	IUES        
+\newline
+CC:	
+\newline
+Subj:	JTMP Report for Task : 0000055166
+
+Task reference: 0000055166
+\newline
+Report from UK.AC.RUTHERFORD.IBM-B
+\newline
+Parent Task type : EXECUTION
+\newline
+Task terminated normally.
+\newline
+Number of descriptors spawned : 1
+}
+\end{quote}
+
+\rm
+4. WDC{\it nnn}.OUT file successfully transferred:
+
+\begin{quote}
+{\small
+\tt
+From:	JTMP\_Manager  4-OCT-1991 12:22:41.68                                   
+\newline
+To:	IUES        
+\newline
+CC:	
+\newline
+Subj:	JTMP Report for Task : 0000055166
+
+Task reference: 0000055166
+\newline
+Report from UK.AC.RUTHERFORD.IBM-B
+\newline
+Task type : DOCUMENT DISPOSITION
+\newline
+Task transferred successfully.
+\newline
+Receiving site : UK.AC.RUTHERFORD.STARLINK
+}
+\end{quote}
+
+\rm
+\subsection {JTMP errors}
+In the following case the .OUT was not copied, probably because there was not 
+enough file space:
+
+\begin{quote}
+{\small
+\tt
+From:	JTMP\_Manager  2-JAN-1992 17:46:10.96
+\newline
+To:	IUES        
+\newline
+CC:	
+\newline
+Subj:	JTMP Report for Task : 0000057094
+
+Task reference: 0000057094
+\newline
+Report from UK.AC.RUTHERFORD.IBM-B
+\newline
+Task type : DOCUMENT DISPOSITION
+\newline
+Task has terminated abnormally.
+\newline
+Number of descriptors spawned : 0
+\newline
+Report message : 
+\newline
+Transfer terminated by UK.AC.RUTHERFORD.STARLINK. JTMP file delivery failure 
+\newline
+- reason:  \%RMS-E-CRE, ACP file create failed.
+}
+\end{quote}
+
+\rm
+No explanation for this one yet, but it seems like a transmission error:
+
+\begin{quote}
+{\small
+\tt
+From:	JTMP\_Manager 20-FEB-1992 11:15:30.38
+\newline
+To:	IUES        
+\newline
+CC:	
+\newline
+Subj:	JTMP Report for Task : 0000060839
+
+Task reference: 0000060839
+\newline
+Report from UK.AC.RUTHERFORD.IBM-B
+\newline
+Task type : DOCUMENT DISPOSITION
+\newline
+Task has terminated abnormally.
+\newline
+Number of descriptors spawned : 0
+\newline
+Report message : 
+\newline
+Transfer rejected by UK.AC.RUTHERFORD.STARLINK. Unacceptable attribute on SFT. 
+\newline
+Invalid value in command:  "initial\_restart\_mark" value 0 offered, but mark 
+\newline
+acknowledgement not agreed. Binary\_word\_size ignored. VAX/VMS FTP (80) Version 
+}
+\end{quote}
+
+\rm
+The following
+facility not found error probably indicates that your site is not correctly
+listed in the national NRS tables as a JTMP user:
+
+\begin{quote}
+{\small
+\tt
+From:	JTMP\_Manager  4-MAR-1992 15:16:51.37
+\newline
+To:	ANON
+\newline
+CC:	
+\newline
+Subj:	Task failure
+
+Task reference: 23260
+\newline
+Report from local host
+
+Your task for UK.AC.RUTHERFORD.IBM-B has failed
+\newline
+Further information :
+\newline
+Facility not found
+}
+\end{quote}
+
+\rm
+The following 
+and variants of the invalid command received seem to indicate a random
+transmission problem which is overcome by simply resubmitting the job. It also
+can occur if there is an error in the node name. If this problem persists delete
+the WDC{\it nnn}.JIN;* files and run IUERESUBMIT giving your node name at the prompt.
+See Section \ref{resubmit}.
+
+\begin{quote}
+{\small
+\tt
+From:	JTMP\_Manager 14-MAY-1992 14:51:55.25
+\newline
+To:	ANON
+\newline
+CC:	
+\newline
+Subj:	Task failure
+
+Task reference: 3562
+\newline
+Report from local host
+
+Your task for UK.AC.RUTHERFORD.IBM-B has failed
+\newline
+Further information :
+\newline
+invalid command received!/- !AC
+\newline
+Invalid value in command:  Value "0822" returned for attribute 
+\newline
+"delimiter\_preservation" outside offered range.
+}
+\end{quote}
+
+\rm
+\section {Change over from GPHOT to PHOT}
+\label{change}
+
+The timing of the change over from GPHOT to PHOT images was different for
+the two ground stations and different dispersions and is given in the table.
+It should also be remembered that some early images may have been reprocessed
+at a later date and have a different set of output files.
+
+\begin{center}
+\begin{tabular}{rcc} 
+	& Goddard & Vilspa \\
+LORES	& ~3 Nov 1980 & 10 Mar 1981 \\
+HIRES	& 10 Nov 1981 & 11 Mar 1981 \\
+
+\end{tabular}
+\end{center}
+
+\section{File Codes}
+\label{codes}
+
+\begin{center}
+\begin{tabular}{ll} 
+R & Raw image file\\
+G & GPHOT or PHOT image file\\
+E & Extracted spectrum file\\
+L & (Extended) line-by-line file\\
+S & Image segment file\\
+A & All files \\
+
+\end{tabular}
+\end{center}
+
+\end{document}

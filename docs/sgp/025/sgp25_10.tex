@@ -1,0 +1,1403 @@
+\documentstyle{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink General Paper}
+\newcommand{\stardocinitials}  {SGP}
+\newcommand{\stardocnumber}    {25.10}
+\newcommand{\stardocauthors}   {J C Sherman, A V Roberts, C A Clayton, M D Lawden}
+\newcommand{\stardocdate}      {19 September 1991}
+\newcommand{\stardoctitle}     {Starlink Site Manager's Guide --- Major Nodes}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+\large
+
+\setlength{\parskip}{0mm}
+\tableofcontents
+\setlength{\parskip}{\medskipamount}
+\markright{\stardocname}
+
+\newpage
+
+\section {Introduction}
+
+This paper is intended primarily for the managers of Starlink's Major Nodes,
+all but 2 of which (RAL and ROE) are supported by Starlink via Site Contracts or
+(Cambridge) via a contract which is similar to a Site Contract.
+Managers should make themselves familiar with the terms of the corresponding
+contract --- copies are available from the University or from Starlink.
+
+A companion paper (SGP/37) is available for managers of Minor Nodes.
+You should already know which category your node falls in but, if not, refer to
+ADMINDIR:WHOSWHO.
+
+This paper will help you understand the Starlink Project and your role in it.
+It assumes you are aware of the documentation vendors provide for managers
+and operators of their computers, so it contains only the extra information
+you need for Starlink purposes.
+It contains many references to other Starlink documents; you need to become
+familiar with these to carry out your job properly.
+Also, you should visit the Project Starlink site at RAL to see how that site is
+run and to get to know the Project staff.
+You can propose such a visit at any time --- don't wait to be asked.
+
+There are a number of people you can turn to for help.
+These include the other site managers and Project staff with particular areas
+of expertise.
+Their names, addresses (network and postal) and functions are specified in
+ADMINDIR:WHOSWHO.LIS.
+In general, use the VMS MAIL utility (SUN/36) to communicate with people as
+your message can then be dealt with at a convenient time and you have a printed
+record.
+
+\section {Site Manager's Responsibilities}
+
+A site manager's responsibilities are many and varied.
+The following list includes those duties which are common to all Major Nodes;
+individual site managers may be asked to perform additional duties from time to
+time.
+\begin{itemize}
+\item Implement Starlink policy.
+This means both project-wide policy which is relevant to your site, and local
+policy recommended by your Area Management Committee (AMC).
+\item Liaise with Starlink central management, especially with regard to
+hardware and software changes.
+\item Liaise with field service organisations, such as DEC and other
+maintainers of equipment and software, and deal with equipment faults.
+\item Operate the computer and associated equipment to provide a satisfactory
+day-to-day service to users, both on and off site.
+This includes providing advice and assistance to users of Starlink application
+packages, and answering questions on operating systems and layered products.
+You should be the first person users turn to when they have problems, although
+you may need assistance to answer some questions.
+\item Install licensed software releases and the Starlink Software Collection.
+The Starlink Software Changes for VMS (SSCs) and Unix Starlink Software Changes
+(USSCs) issued by RAL should be implemented as soon as possible.
+\item Encourage users who are developing software to do so according to Starlink
+programming standards (SGP/16) and within the ADAM environment (SG/4, SUN/101).
+\item Control the use of the node and ensure, via the VMS security system and
+AUDITOR on VAXs, that only accredited users use the system.
+Register new users.
+\item Maintain usage and configuration records and up-to-date inventory lists.
+\item Maintain on-line equipment inventories locally.
+\item Check maintenance schedules maintained on-line at RLVAD.
+\item Act as secretary to the Area Management Committee.
+\item Keep the managers of any Minor Nodes in your Area informed of any
+decisions made or news obtained at Site Manager's Meetings which may be
+relevant to them.
+\item Keep up-to-date with relevant conferences.
+\item Help manage the finances of the node.
+\item Maintain the on-line information summaries requested by the Starlink
+Documentation Librarian.
+\item Distribute documentation to users, and maintain a filing cabinet
+containing copies of Starlink papers for users.
+Distribute the Starlink Bulletin.
+\item Keep appropriate non-users at your site informed about Starlink.
+Give them things like the Starlink Bulletin and the Starlink User Guide.
+\end{itemize}
+In carrying out these duties you will sometimes need advice or information
+from Project staff at RAL.
+Concerning the allowed use of the node and registration of users, consult
+Gordon Bromage.
+For maintenance, inventories or the progress of orders for new hardware or
+software, consult Andrea Roberts.
+For site contract renewals, contract policy or hardware plans, contact John
+Sherman.
+For documentation, contact Mike Lawden.
+For the Starlink Software Collection, contact Martin Bly.
+For applications software development, consult Rodney Warren-Smith.
+For graphics and networking, consult David Terrett.
+For the ADAM software environment, consult Peter Allan.
+
+\section {Administration}
+
+The hardware configuration of your node should not be altered in any significant
+way, even temporarily, without the approval of the Network Manager.
+Furthermore, additions to your node which are proposed by users and which are
+not funded by Starlink (e.g.\ those funded by SERC block grant or by ad hoc SERC
+or UGC grants) must be discussed with yourself and with the Starlink Project
+well before the proposal is finalised.
+The advantages of early discussion with the Project are noted in SGP/39.
+In brief they are:
+\begin{itemize}
+\item The feasibility of the proposal and its relation to Starlink's plans can
+be reviewed.
+\item Short-term and long-term maintenance can be discussed.
+\item In the case of SERC grants, subsequent review by the Starlink User
+Committee and/or Theory and Computation Panel will be simplified.
+\end{itemize}
+You must provide Starlink management with the following information in August
+of each year:
+\begin{enumerate}
+\item An Annual Report, prepared in collaboration with your AMC.
+This should contain contributions from any Minor Nodes in your Catchment Area.
+\item Hardware Configuration Diagrams of your computer installation, including
+Ethernet configuration, and a note of the proprietary software licensed for
+each machine.
+\item A Hardware Inventory of the equipment installed at your site in the
+approved format.
+(The inventory list must conform to the approved format since it will become
+part of your site contract.)
+\end{enumerate}
+Examples of the sort of material required can be obtained from David Rawlinson.
+Items 2 and 3 should also be sent once a month, even if there have been no
+changes --- in this case only the revision dates on the documents you send need
+be modified.
+It is important that RAL has accurate and up-to-date records of the equipment
+at your node or your node may be neglected when hardware upgrades are planned.
+
+All site managers are entitled to reimbursement of their expenses when they
+travel on Starlink business (e.g.\ to attend Site Managers meetings, Special
+Interest Group meetings, or ad hoc meetings called by the Project Management).
+The RGO, ROE and RAL managers should all claim through their local
+establishment.
+The managers of the University sites should submit a claim to the University,
+consistent with the University's normal regulations.
+Subsequently, the University can claim reimbursement from Starlink by including
+the expenses on one of the quarterly site contract invoices.
+These arrangements are noted in the site contract document, which also notes
+that prior approval must have been obtained from Starlink before any claim
+can be paid.
+Prior approval has been given for all travel and subsistence expenses in
+connection with several ``standard" purposes, this approval being in the
+form of a letter from John Sherman dated 28 July 1989.
+If the letter, with its list of ``standard" purposes, has been mislaid, please
+ask for another copy.
+Prior approval must still be obtained, case by case, for any travel and
+subsistence expenses in connection with visits which are not in the ``standard"
+list, or where there is some doubt.
+
+Members of Starlink Remote User Groups are entitled to reimbursement of travel
+expenses when they visit their nearest Major Node to use Starlink facilities.
+They should complete RAL claim form N3(V) which you must check and initial
+before forwarding it to Andrea Roberts.
+RAL imposes strict rules about who can be paid travelling expenses, so it is
+worth contacting the Project beforehand in dubious or unusually expensive cases
+(e.g.\ where overnight accommodation will be required or where several trips
+per day are claimed).
+
+\section {Meetings}
+
+There are four series of meetings which you must attend:
+\begin{description}
+\begin{description}
+\item [SMM --- Site Managers' Meeting:]
+This enables Major Node site managers and relevant Project staff to discuss
+problems, report developments, and agree on common standards and procedures.
+Meetings are held twice a year, once at RAL and once at one of the other
+Starlink sites.
+\item [AGM --- Annual General Meeting:]
+This meeting is held once a year at RAL (Cosener's House).
+It is similar to an SMM, but also includes contract Application Programmers and
+all managers of Minor Nodes.
+It is therefore considerably larger and lasts longer than SMMs.
+\item [AMC --- Area Management Committee:]
+Most Major Nodes are the centre of an AMC which must meet at least twice a year.
+It advises the site manager on resource allocation, and informs him of long term
+user needs.
+Its membership includes the site manager (who should be secretary) and the most
+active users.
+One or more representatives of Starlink central management must attend each
+meeting; meetings without representatives of Starlink central management can
+be held, of course, but these are not formal AMC meetings.
+AMCs are explained in more detail in SGP/8.  
+\item [SLUG --- Starlink Local User Group:]
+AMC meetings are preceded by SLUG meetings which are open to all users.
+Minutes of both AMC and SLUG meetings should be taken and sent to the Project
+Management at RAL.
+\end{description}
+\end{description}
+The dates of all Starlink meetings are usually known well in advance so clashes
+with other commitments can be avoided.
+ 
+There are three other series of meetings which you need to know about:
+\begin{description}
+\begin{description}
+\item [SUC --- Starlink Users' Committee:]
+This is the SERC committee which oversees the Starlink Project.
+It reports directly to the APS board and meets 3 times a year, usually in
+London.
+Its membership is listed in ADMINDIR:WHOSWHO.
+The Project Management always attends.
+\item [SIG --- Special Interest Groups:]
+These are user groups which consider software development in specific
+application areas.
+The meetings tend to be held where most of the SIG's work is being done.
+You may be asked to be a member of a SIG if you have special expertise,
+or volunteer if you believe you can contribute.
+The membership of current SIGs is listed in ADMINDIR:SIG.LIS; see also SGP/14.
+When a SIG meeting is held at your site, attend as an observer even if you are
+not a member.
+\item [HAG --- Hardware Advisory Group:]
+This group advises the Project on future hardware purchases.
+Its membership is listed in ADMINDIR:HAG.LIS.
+\end{description}
+\end{description}
+
+\section {Operating Standards}
+
+There are a number of practical aspects to consider when setting up and
+operating a Starlink computer, some of which are described below.
+The initial setting up will be done by an experienced manager, so this
+section does not describe the set up procedure in detail.
+Make the most of Site Managers' Meetings to find out what ingenious but
+doubtless undocumented procedures are used at other sites.
+
+Advice on setting up a Starlink SUN-based System running Unix can be found in
+SSN/7.
+Some notes for VAX-based systems are included below.
+
+\subsection {Disk assignments}
+
+Select one of your disk drives to be the System disk.
+Put your users on one or more User disks with labels USER1, USER2, etc.
+User disks should be under quota control, but the System disk normally should
+not.
+If quotas have to be used on the System disk, it is essential that the [SYSTEM]
+account has ample space.
+Usually, quotas on the System disk can be avoided by making the User disks and
+the System disk different devices.
+ 
+Disk space is always at a premium, so start your users off with a small quota
+(say 2000 blocks, equivalent to 1 Mbyte) and give more only to those who really
+need it.
+If users request more space temporarily, remember to reclaim it at the
+earliest opportunity.
+Encourage users to minimise their usage of disk space and make sure they
+understand the use of PURGE, BACKUP and SET FILE/TRUNCATE.
+De-fragment your disk space on a regular basis using the RABBIT7 software
+supplied for this purpose.
+
+Most sites have one or more SCRATCH disks which are always mounted, the
+algorithm used to delete old files from these disks varying from site to site.
+Alan Lotts, the manager at Durham, can supply examples of the algorithms in use.
+
+Starlink software and data can be distributed over many disks and these can be
+chosen as you wish, with the restriction that directories [STARLOCAL] and
+[STARLHOLD] must be stored on the same disk.
+The structure of Starlink software is described in section 8.
+The disk storing the core directory [STARLINK] is referred to
+by the logical name STARDISK, and the disk storing the local software
+(directories [STARLOCAL] and [STARLHOLD]) is referred to by the logical name
+LSTARDISK.
+These two logical names should be assigned to disks of your choice,
+or sometimes to the same disk, in SYS\$MANAGER:SYSTARTUP.COM.
+Other software and data can be stored on any disk or disks.
+As explained in section 8, there is no need to store optional software items
+that are not used at your site.
+You can copy missing items over the network from RAL when required.
+ 
+Logical names for standard software are defined in [STARLINK]STARTUP.COM, while
+logical names for local and optional software and data should be defined by
+you in [STARLOCAL]STARTUP.COM.
+
+\subsection {Disk backup}
+
+The following recommendations for disk backup are based on the responses to a
+questionnaire which was sent to all site managers, most of whom have many years
+experience of backup procedures.
+The responses demonstrated good agreement among most site managers.
+The recommendations should not be treated as rigid rules to be applied at every
+site --- there is room for some local variation.
+Nevertheless, any site which deviates substantially from them should consider
+why everyone else is doing something different.
+ 
+The purpose of backup is to protect your computer against accidental file
+deletion, the most common causes of accidental deletion being user error and
+disk failure, in that order.
+Since the whole purpose of backup is to provide security, the approach adopted
+by experienced managers, and in the following recommendations, is to avoid
+unnecessary risk.
+ 
+\begin{itemize}
+\item Full backups should be run every 4 to 6 weeks.
+\item Normal use of the system should be prohibited during full backups
+and the /VERIFY switch should be used.
+\item Where possible, full backups should be made out of prime time, for
+example early morning, evening or weekend.
+\item Incremental backups should be run on user disks at least once a week
+(most sites run incrementals once a day).
+The frequency of incrementals depends on local factors such as the number and
+type of tape drives available.
+Incremental backups of the system disk need not be done as frequently as for
+user disks.
+\item High capacity cartridge drives, e.g.\ Exabyte or TK70, should be used to
+enable backups to be run overnight where possible, and thus avoid using the
+system in prime time.
+\item Normal use of the system should be allowed during incremental runs
+which should not use the /VERIFY switch.
+\item Don't eliminate too much from the backup.
+The wrong choice here will not save much time, but will cause a large amount of
+extra work during any restore.
+Files which could be excluded are catalogues which are available on the
+Database machine at RAL (but do you really need them locally in the first
+place?).
+\item Consider storing your backup media away from the machine room to reduce
+the possibility of both the online data and the backups being destroyed by the
+same disaster.
+\item Be very careful when you brief a stand-in to act as manager in your
+absence.
+Stand-ins are a major cause of damage to system files.
+Please ask the stand-in to call RAL or another site manager if he or she gets
+stuck.
+A stand-in who presses on with his or her fingers crossed when things don't
+go quite as the manager had led him or her to expect can do a surprising
+amount of damage, especially when the stand-in is armed with numerous
+privileges.
+\item If you have not yet retrieved files from full or incremental backups,
+use a scratch disk to make an end-to-end test of your procedures.
+\end{itemize}
+Command procedures for backup are available from Peter Allan, RAL, or from
+Alan Lotts, Durham.
+
+\subsection {Special usernames}
+
+A number of special usernames, such as FIELD and NETUSR, will be created during
+the initial setting up of a Starlink site.
+In this section we mention those that are of particular relevance to Starlink.
+
+OPER is used when acting as site manager; ask your users to send any operational
+MAIL, e.g.\ requests to mount a disk, to OPER.
+All Starlink Software Changes (SSCs) are sent to OPER from RAL.
+You can contact other site managers by sending MAIL messages to OPER at their
+nodes and they will address MAIL for you to OPER.
+OPER is the primary way of communicating between sites and should be monitored
+regularly; a deputy must be instructed to do this if you are away, even for
+a day.
+
+STAR is used for maintaining Starlink software.
+Give it the same privileges as OPER and UIC=\-[STARLINK,\-STAR].
+Set its default protection to (RE,RWED,RE,RE) and its default directory to
+[STAR].
+Create directory [STAR.TEMP] for receiving and implementing SSCs.
+
+SYSTEM is used for VMS work.
+
+You will probably also have a personal username.
+Try to use either OPER or your personal username when sending MAIL messages
+since the use of other usernames can cause confusion over which reply address
+to use.
+ 
+Every manager of a Major Node is permitted a username on the Project node at
+RAL.
+The username should be the initials of the manager and should be changed when
+a new person takes over.
+The password should never be divulged to users.
+Managers also have usernames on the database machine, STADAT; for more detail,
+see SUN/30.
+
+\subsection {Use of other nodes}
+
+Users are not normally expected to have usernames at more than one node.
+DECnet allows access to files on other nodes, the NETSHOW command gives
+information about other nodes, and TALK can be used to another node (SUN/36).
+Together with MAIL, these facilities allow most legitimate use of another node
+without the need for a username there.
+ 
+You should install a captive account with the username STARLINK to provide
+access to the network for visiting users from other nodes.
+For more details, see Appendix A.
+
+\subsection {User authorisation file}
+
+Each accredited Starlink application form will lead to the generation of a new
+username which implies a new entry in the UAF.
+The following standards should be applied to UAF fields.
+\begin{description}
+\begin{description}
+\item [USERNAME:] The initials of the user (e.g.\ MDL).
+\item [OWNER:] The name of the user (e.g.\ MIKE LAWDEN).
+\item [ACCOUNT:] Assign the 8 characters of this field as follows:
+\begin{itemize}
+\item 1-3 defines the user's home location.
+Use the 3-letter codes given in Appendix B if the user is based at a Starlink
+site, or invent your own codes for users based elsewhere.
+\item 4 defines your site; use the 1-letter codes given in Appendix B.
+\item 5-8 defines the sequence number of the application form.
+\item An example account number is:
+\begin{quote}
+CARR0020
+\end{quote}
+which is interpreted as:
+\begin{description}
+\begin{description}
+\item [CAR:] Cardiff (home base)
+\item [R:] RAL (Starlink site)
+\item [0020:] 20th application form for RAL
+\end{description}
+\end{description}
+\end{itemize}
+\end{description}
+\end{description}
+
+\subsection {Passwords}
+
+To protect a site from hackers, all passwords should be difficult to guess
+(passwords found in a dictionary should not be used since they can ``guessed''
+by hacking software) and should be changed periodically.
+The defaults provided by VMS should be used: 6 characters changed at
+6 month intervals for non-privileged users, and 8 characters changed at 1 month
+intervals for privileged users (like OPER).
+
+\subsection {Process names}
+
+Process names can be set by the command:
+\begin{quote}
+{\tt \$ SET PROCESS/NAME="xxx"}
+\end{quote}
+If none is set, VMS uses the username.
+Encourage your users to set their process name to their personal name in their
+LOGIN.COM file since this enables the owner of a particular process to be
+identified.
+Process names which are offensive or silly are not allowed; stop such processes
+on sight.
+
+\subsection {Magnetic tapes}
+
+Starlink recommends the following standard for labelling magnetic tapes.
+The label should be of the form:
+\begin{quote}
+SSSnnn
+\end{quote}
+where: `SSS' is the 3-letter site code (see Appendix B) and
+`nnn' is a sequence number (000\ldots999).
+
+\subsection {Games}
+
+Computer games are not allowed.
+Any node where games are played will be regarded by the Project Management as
+undermining the Project's efforts to obtain and retain funding for Starlink and
+the blatant waste of resources will be taken into account when considering
+upgrades!
+
+\subsection {Maintenance schedules}
+
+It is the responsibility of site managers to make sure that their Starlink
+maintained equipment is on an appropriate maintenance contract.
+
+The maintenance schedules that are administered through RAL are stored 
+online at RLVAD, and are available to all managers.
+The files are kept in LSTARDISK:\-[STARLOCAL.\-ADMIN.\-MAINTENANCE.\-decnetname]
+for each site, and have obvious names, such as DEC\_HW.LIS for DEC hardware.
+These files should be checked on a regular basis, especially if any schedule
+amendments have been requested for your site. 
+
+The schedule lists stored online are exact copies of the details that each 
+maintenance company has for each site.
+{\em If it is not online, we do not have any record of it for maintenance
+purposes.}
+For amendments, additions or deletions required by your site, please send full
+details of the changes to Andrea Roberts on RLVAD::AVR, stating schedule numbers
+where known.
+A quick way to find your schedule numbers is to look in 
+LSTARDISK:[STARLOCAL.ADMIN.MAINTENANCE.SCHEDULES] where you will find 
+listings for all sites.
+The amendments will not be put online until confirmation of change has been
+received from the maintenance company, but there is a directory called
+AMENDMENTS.DIR in LSTARDISK:[STARLOCAL.ADMIN.MAINTENANCE] that will hold the
+latest amendment requests.
+
+It is vital that these maintenance schedules are kept up to date.
+Failure to do so will cause substantial delays (months, not weeks) in repairing
+faults.
+
+\section {VAX Notes}
+
+All site managers are required to read and contribute to the following 
+VAXnotes conferences (SUN/44, SSN/51) on a regular basis:
+\begin{description}
+\begin{description}
+
+\item [RLVAD::SYSTEMS\_MANAGEMENT] ---
+This is {\bf the} most important conference for site managers.
+It contains invaluable advice and instructions from other managers and Project
+staff which is not documented anywhere else (e.g.\ the availability of new
+versions of system software).
+All managers should read this conference at least once a week, preferably daily.
+
+\item [RLVAD::NEWS] ---
+Managers should post to this conference any NEWS items they wish to broadcast
+via the Starlink-wide NEWS system (SUN/51).
+Similarly, managers should review this conference daily, taking any notes
+posted by other managers and inserting them in their local NEWS system.
+
+\item [CAVAD::FAULTS] ---
+{\bf All} hardware faults (however small or uninteresting) should be logged in
+this conference in order to help identify systematic problems and design faults.
+
+\item [RLVAD::NETWORKS] ---
+New Starlink DECnet addresses and general network information are posted here.
+When new DECnet nodes are added at a site, the network manager for the relevant 
+DECnet area (normally the manager of the nearest Major Node) should post a new
+list of DECnet addresses for that area in this conferences.
+Other managers should then use that announcement to update their own DECnet
+databases.
+See the NETWORKS conference itself for more information.
+ 
+\item [RLVAD::SSC\_RELEASE] ---
+SSC release announcements are posted here.
+See Appendix C for details of how to implement software changes.
+
+\item [RLVAD::USSC\_RELEASE] ---
+USSC release announcements are posted here.
+
+\item [RLVAD::BUG\_REPORTS] ---
+All bug reports on Starlink software are posted here.
+
+\item [RLVAD::CONFERENCES] ---
+This should be consulted regularly to alert managers to any new conferences
+in which they should participate.
+Other conferences that may be of interest to managers include VAXSTATIONS,
+DECSTATIONS, HARDWARE and UNIX\_MANAGEMENT.
+See the CONFERENCES conference for more details.
+
+\end{description}
+\end{description}
+
+Some sites set up local conferences of a more general and chatty nature, e.g.\
+a GOSSIP conference.
+These are OK provided they do not get out of hand.
+Here are some guidelines for conference management:
+\begin{itemize}
+\item There is a recognised set of strictly Starlink-related and Starlink-wide
+conferences which Starlink organises and is responsible for.
+They include the ones listed above.
+\item When the user community at a site or in an area wishes to set up a
+conference devoted to another topic, Starlink will have no objections {\em as
+long as the AMC agrees to accept responsibility for the conference.}
+AMCs may wish to restrict a given conference to local users, or some other
+subset, but are at liberty to create conferences accessible to the whole of
+Starlink if they believe this is appropriate.
+\item Each conference will be operated by a single named individual who will
+be a moderator of the conference, but who may wish to delegate some of the
+work to one or more other moderators.
+\item It is recommended that moderators apply commonsense restrictions on
+style and content, such as discouraging discussion of religion, politics or sex.
+They should take into account both the resources used (such as disk space and
+network traffic) and the impression of the node concerned and of Starlink in
+general that might be given to outsiders.
+Serious topics of no direct relevance to Starlink activities are probably an
+unwise use of the VAX Notes facility, whatever the level of resources.
+Light-hearted contributions are not discouraged, but should avoid excessive
+length.
+\item Starlink will apply its own guidelines to the `official' conferences,
+and also will recommend the AMCs to apply them to their conferences, but
+without insisting they do so.
+\end{itemize}
+
+\section {User Registration}
+
+Anyone who wants to use Starlink facilities must complete the form `APPLICATION
+FOR USE OF STARLINK' (obtainable from the Starlink Documentation Librarian) and
+return it to the manager of the appropriate site.
+Each form should cover one person and one username only.
+Shared usernames should be avoided unless absolutely essential as they are a
+security risk.
+If you have them, make sure that their use is properly controlled.
+ 
+In deciding on appropriate usage of your node, be guided by the following
+priorities (highest at the top):
+\begin{enumerate}
+\item Astronomical data reduction that can only be done interactively.
+\item Other astronomical data reduction.
+\item Other astronomical research work that can only be done interactively.
+\item Other astronomical research work.
+\item Other APSB research work.
+\end{enumerate}
+If there is any doubt whether or not work falls within Starlink's terms of
+reference, consult the Project Scientist, Gordon Bromage.
+A difficult question is where to draw the dividing line between, for example,
+routine telemetry processing associated with the operation of a particular
+satellite or instrument, which is clearly not Starlink work, and analysis of
+calibrated scientific data, which clearly is.
+
+Site managers can provisionally accredit new users themselves, provided they 
+are reasonably sure the work to be done is high on the preceding priority list.
+Dubious cases should be referred at once to the Project Scientist who reviews
+all applications in due course.
+The Project Scientist may not allow an application if the work does not meet
+Starlink criteria and has asked for usernames to be withdrawn when they have
+been granted incorrectly.
+Copies of all completed application forms should be sent to the Documentation
+Librarian at RAL.
+
+As a user's work evolves, his or her reason for using Starlink, which was
+legitimate initially, may become less legitimate.
+If the work has changed substantially, ask the user to fill in a new
+Application Form and forward a copy to RAL.
+If it is not clear that the new work is suitable for Starlink, refer the case
+to the Project Scientist.
+ 
+New users of your site who are also new to Starlink should be given a `New User
+Documentation Pack'.
+(If they have previously used other sites, just give them any local
+documentation you think appropriate.)
+Its contents are at your discretion, but should include the Starlink User Guide
+(SUG), enclosed in the specially made loose leaf binder, and the DEC
+manual `Introduction to VAX/VMS'.
+Supplies can be obtained from the Documentation Librarian, who can also supply
+an example of the `New User Documentation Pack' provided at RAL.
+
+In the rare cases where it is essential (see section 5.4), a user may have a
+username on more than one node.
+Such a user should specify a `Primary Node', responsible for supplying him
+or her with Starlink documentation.
+His or her other nodes are termed `Secondary Nodes'.
+The distinction between Primary and Secondary nodes helps to avoid double
+counting of users.
+
+Every six months, Starlink issues a newsletter called the Starlink Bulletin.
+Copies are sent to every site and you must distribute a copy to all
+your primary users, and to any non-users who you think may be interested.
+(Your secondary users will receive a copy via their primary node.)
+The Bulletin is the primary mechanism by which Starlink informs its users of
+Project status, policies and plans and it costs a lot of money, so please
+distribute it promptly.
+
+Apart from the New User Documentation Pack and the Starlink Bulletin, document
+distribution to users is at your discretion.
+RAL sends every Starlink site a small number of paper copies of every
+project-wide document.
+You should maintain a central filing cabinet of these documents containing
+copies available for users to take away.
+This is particularly important for documents containing diagrams and for the
+many documents prepared using \LaTeX.
+The latter are awkward to read from normal terminals, and expensive to reproduce
+from the \LaTeX\ source.
+ 
+When a user leaves permanently (say for more than 3 months), remove his or her
+username and files from the system and delete references to him or her in the
+on-line information summaries.
+This should be done within one month of departure.
+
+\section {Starlink Software}
+
+Many different aspects of the Starlink software are described in the Starlink
+documentation.
+The following documents provide general background to Starlink software
+development:
+\begin{description}
+\begin{description}
+\item [SGP/4:] Starlink C programming standards
+\item [SGP/13:] Starlink applications software development
+\item [SGP/16:] Starlink applications programming standards
+\item [SGP/21:] Starlink software distribution policy
+\item [SUN/1:] The Starlink software collection
+\end{description}
+\end{description}
+The following documents deal with specific details of the management of the
+Starlink Software Collection:
+\begin{description}
+\begin{description}
+\item [SGP/19:] Starlink software submission
+\item [SGP/20:] Starlink software management
+\item [SSN/15:] Starlink software installation
+\item [SSN/41:] Starlink software changes
+\end{description}
+\end{description}
+You should read all these papers to gain a proper appreciation of Starlink
+software and how it is managed.
+Some of the most crucial concepts and facts are summarised in section 7 of the
+Starlink User Guide.
+ 
+The top level structure of Starlink software is:
+\begin{description}
+\begin{description}
+\item [Standard set:] comprises [STARLINK], ADAM, FIGARO, and KAPPA, and must
+be installed at every Starlink site.
+\item [Secure set:] comprises [STARSEC].
+This holds software that could represent a security risk and which should not
+be given away with the Standard set.
+The items in the set are optional.
+Secure items are identified by the key `*S*' in the Starlink Software Index.
+\item [Option set:] comprises optional items installed outside the [STARLINK]
+directory.
+If you have difficulty storing all the Starlink software at your site, you may
+delete (or decide not to install) optional items which are not needed by your
+users, e.g.\ ASTERIX.
+If you get a request for an optional item which you have not installed at your
+site, you can copy the latest version from RAL by logging in to RLVAD, making a
+save set of the appropriate directories, and copying this over the network.
+You will also need to puzzle out which symbols and logical names need to be
+defined before the software will run.
+Optional items are identified by the key `*O*' in the Starlink Software Index.
+\item [Restricted set:] comprises items which are only installed on STADAT
+(Starlink's central data and software facility at RAL).
+Restricted items are identified by the key `*R*' in the Starlink Software Index.
+\item [Local set:] comprises [STARLOCAL] and [STARLHOLD].
+Their contents are site dependent.
+\item [Data:] comprises such things as star catalogues.
+\end{description}
+\end{description}
+Proprietary (licensed) software can be found in the Option set, and the
+Restricted set.
+Clearly, such software must NOT be given away.
+SGP/21 contains a complete list of proprietary software; an online list is in
+ADMINDIR:SSI.LIS.
+
+A Starlink objective is that every Starlink site should have an
+up-to-date copy of the required parts of the Starlink Software Collection
+installed on its system.
+SSN/15 tells you how to install the Collection from scratch.
+Once this has been done, you will get a series of Starlink Software Change
+(SSC) notices which tell you how to update your copy of the Collection (SGP/20,
+SSN/41).
+These are sent to an appropriate username at your site (usually OPER).
+Print them out, then file and implement them as quickly as possible in order to
+keep your site in step with the other Starlink sites. 
+The technique for implementing them is described in Appendix C.
+You should copy the updates within a month of release since they are only kept
+on-line for that length of time.
+We do archive the SSC save sets for sending to overseas sites (AAO etc).
+In dire emergencies SSC save sets may be recovered for you to copy, but there
+may well be a long delay before this is done.
+
+A complete set of SSCs is stored in ADMINDIR:SSCLIS.TLB and SSCCOM.TLB.
+Each release document is stored as a separate module in these libraries, with
+names like SSCnnn where `nnn' is the number of the release.
+This is a useful source of information about specific software items.
+The Starlink Software Index (ADMINDIR:SSI.LIS) identifies all the SSCs which
+have affected each item, so if you are having trouble with an item, look
+through its associated SSCs and you may find the answer to your problem.
+
+You must not distribute any part of the Collection to anyone else without
+permission from Starlink management (SGP/21).
+Contact the Software Librarian, Martin Bly, in the first instance.
+In particular, proprietary software such as the NAG libraries must not be
+distributed.
+If you do receive permission to distribute Starlink software to another site,
+give the Librarian the following details about the site:
+\begin{itemize}
+\item The full postal address, network address, telephone and telex number.
+\item What you sent, when you sent it, tape type (and, if half-inch, the
+density used).
+\item The name of a contact at the site.
+\item What support you intend to give. (Will you answer queries from users?
+Will you supply updates?)
+\end{itemize}
+GKS may be distributed to non-profit-making astronomical research centres
+for use in connection with other Starlink software.
+This involves a registration procedure and must be done by the Project.
+ 
+If you, or a user, have trouble with a software item, send details to the
+Software Librarian (RLVAD::STAR).
+Do not just make a local fix and forget about it; inform the Librarian and
+get the correction properly distributed through the official release mechanism.
+When reporting bugs, please include sufficient detail to make the bug
+repeatable --- a bug which cannot be repeated cannot, in general, be fixed.
+Details of reported bugs can be found in the conference RLVAD::BUG\_REPORTS.
+
+Don't let your version of Starlink software become chronically different from
+RAL's.
+This has caused major problems in the past.
+Software developed on another node has been submitted for release and did not
+work at RAL because it relied on some local modification.
+Also, software which was released by RAL sometimes didn't work at another
+site because of local peculiarities.
+Be warned: if you allow your site to get into this kind of mess you may
+find that new or improved software doesn't run at your site.
+
+\section {On-line Information Summaries}
+
+The Starlink User Guide explains how information is organised in Starlink and
+how it may be accessed.
+This section describes your role in providing the part of this information
+called `On-line Information Summaries'.
+It does not consider those summaries distributed with the Starlink Software
+Collection as these are maintained by RAL.
+
+Starlink never has as many resources as it would like, so it is important that
+the resources it does have are managed efficiently.
+This can only be done if up-to-date, accurate and consistent information is
+kept on users, documentation, software and Project management.
+Such information changes quite rapidly.
+Furthermore, it is often the most recent changes that are of most interest.
+One way to provide this information is to maintain a set of on-line text
+files containing information summaries.
+Information in these files should never be allowed to get more than a day or
+two out of date.
+They are referred to many times in Starlink documentation, particularly the
+Starlink User Guide, so users will expect them to be up-to-date.
+If a person discovers that information in one of these files is wrong or
+missing, he will rapidly lose faith in the file and will not use it.
+Conversely, if he finds it is up-to-date, accurate and consistent, he will
+regard it as a valuable reference.
+Thus, the effort required to set up and maintain these files is only
+worthwhile if the job is done properly.
+
+RAL maintains a large number of these information summaries; they are listed in
+RLVAD::\-LDOCS\-DIR:\-ONLINE.\-LIS.
+Every one of them has arisen in response to a specific need.
+They incorporate many years of practical experience during which the following
+principles have been found to be useful:
+\begin{itemize}
+\item The information density should be as {\em high} as possible and
+(provided the
+requirements of the file are met) the amount of information stored should as
+{\em low} as possible.
+This reduces bulk and speeds searching.
+\item The format should be consistent --- similar types of information should be
+stored in the same format.
+\item Each file should have a standard heading format which should include the
+current date on the left and the file name on the right.
+The current date should be the date it was last edited, not the date you printed
+it out.
+\item They should be easy to display and print.
+The maximum line length should be 80 characters.
+This just fills the screen on most terminals and a printed listing can be
+trimmed to A4 size.
+\item They should be simple, quick and easy to change.
+This means using text files produced by a text editor.
+Do not use text processors such as Runoff or \LaTeX.
+Do not use the underscore character or tabs.
+\item Anticipate your reader's needs and do as much work for him as possible
+(don't set exercises) --- e.g.\ put names in alphabetical order, align phone
+numbers in columns, count the number of things in different categories, etc.
+\item Similar files at different sites should have the same format and type of
+content.
+This helps people find information at other sites because they are familiar with
+how it is stored.
+\end{itemize}
+Some of these principles are conflicting, but the Project believes the formats
+and contents recommended below are a good practical compromise.
+The formats are not always specified in detail below, so we suggest you model
+your own files on the equivalent RAL files.
+The major effort needed is in the initial setting up.
+Once this has been done, maintenance should take only a few percent of your
+time.
+
+On-line information on people is subject in the UK to the Data Protection Act.
+This demands that such information be registered and places restrictions on its
+use.
+Starlink's files are believed to be covered {\em at SERC sites only}\, by the
+general SERC registration, and we have given full details of the relevant files
+(see RLVAD::LADMINDIR:DPA.LIS) to the appropriate SERC contact.
+However, this does not cover Universities.
+The manager of every Starlink site at a University should, therefore, inform
+the Data Protection officer at that site of the existence and contents of any
+files held on his Starlink computer(s) which contain information about specific
+people.
+Your DP officer will probably have a form for you to fill in.
+File RLVAD::LADMINDIR:DPA.LIS contains the details that I submitted to our DP
+officer at RAL with respect to our Starlink computers.
+This may help you prepare your own submission.
+You may also have local files that you should add to the list.
+Users of Starlink facilities are also responsible for registering their
+own files containing information on other people with their DP registrar.
+However, I do not believe this involves the Site Manager.
+Any queries to do with the Data Protection Act should be sent to Mike Lawden.
+
+\subsection {Mandatory files}
+
+The following files are {\em mandatory} at your site:
+\begin{description}
+\begin{description}
+\item [LADMINDIR:] \hfill
+\begin{description}
+\item [USERNAMES.LIS] \hfill
+\item [USERS.LIS] \hfill
+\item [AMC.LIS] \hfill
+\item [INVENTORY.LIS] \hfill
+\end{description}
+\end{description}
+\end{description}
+{\em The} {\bf USERNAMES} {\em file is the most important single information
+file that you maintain.}
+It is used every month by RAL to compile a list of all current Starlink users
+which is released to all sites as ADMINDIR:USERNAMES.\-LIS.
+It makes your users `visible' to the rest of the Starlink community, and enables
+RAL to keep accurate records of the Starlink user population.
+It is the primary source of information for people who wish to know usernames
+for the purpose of sending mail messages.
+The format of your file must be identical to the RAL file and you must not use
+tabs.
+The format required is as follows:
+\begin{itemize}
+\item Column 1: User code:
+\begin{description}
+\begin{description}
+\item [r] --- UK-resident research astronomer actively processing data
+ (includes post-graduate students).
+\item [t] --- UK-resident scientific and technical staff supporting research
+ astronomy (includes site managers!).
+\item [o] --- Other UK-resident users (e.g.\ secretaries and e-mail-only users).
+\item [f] --- Non-resident users (abroad for at least half the current academic
+ year).
+\end{description}
+\end{description}
+You should only specify a code for your primary users.
+\item Column 2: Type an `*' if the user is a secondary user.
+Thus, if column 1 contains a code, column 2 should be blank, and if column 2
+contains an `*', column 1 should be blank.
+\item Columns 3-26: Username(s).
+If a user uses more than one username, put the principal one first (this will
+most likely be used for e-mail) and separate the usernames with a `/' character.
+For example: UNAME1/UNAME2/UNAME3.
+\item Columns 27-49: Surname.
+\item Columns 50-80: First name or familiar name.
+\end{itemize}
+Your users are not properly registered until their names appear in this file.
+It is most important that you give high priority to keeping this file accurate
+and up-to-date.
+When a user leaves, be sure to remove his or her name from this file.
+Every month, Mike Lawden merges all the local USERNAMES files to produce a
+new version of ADMINDIR:\-USERNAMES.\-LIS.
+This usually throws up a few inconsistencies between different site's files.
+A `Username queries' message is sent to the sites involved to try to resolve
+differences.
+Please read and act on the instructions or requests in this message promptly.
+
+The {\bf USERS} file records information about the registered users who
+currently have access to your computer.
+The information required is:
+\begin{description}
+\begin{description}
+\item [Form number:] Use the serial number of the application form.
+\item [Account:] see section 5.5.
+\item [Username]
+\item [Name:] This should include the name by which he or she is familiarly
+known, and the title (Prof, Dr, Ms, Rev, Lord, \ldots).
+\item [Work Address:] this should be as concise as possible, e.g.\ `RAL',
+`MSSL', `Oxford U - Th Phys'.
+\item [Work phone number:] including extension.
+\item [Usage:] This should say, very briefly, what a user is doing on the
+computer.
+`IUE data analysis' is about the level required.
+\item [Registration date:] this is the date when the user was first registered
+for this username.
+Use the code `xy' where `x' is the year 198x or 199x and `y' is the month number
+expressed as a hexadecimal digit; thus `01' represents January 1990 and `5C'
+represents December 1985 or December 1995.
+The serial number should resolve any ambiguity between the 80s and 90s.
+\item [Revision date:] this is the date when the information on this user was
+last amended.
+If the information has not been revised, leave blank.
+\item [Termination date:] This is the date on which a user is expected to stop
+using the computer.
+Most users won't know this, in which case specify `Indef'.
+\end{description}
+\end{description}
+The RAL approach is to divide the file into the following sections:
+\begin{enumerate}
+\item Registered users: Summary
+\item Registered users: Detailed information
+\item Off site users.
+\end{enumerate}
+The `Summary' section serves as an index to the `Detailed information' section
+and may be all that is required for many purposes.
+Each entry in the `Detailed information' section should be checked at least once
+a year by contacting the person directly.
+This should be done a year after the `Revision date', unless the `Termination
+date' comes first in which case the check should be done then.
+This way, the monitoring process is spread over the year and does not become an
+intolerable burden; you just check a few users every month.
+
+The {\bf AMC} file lists the current members of your Area Management Committee.
+
+The {\bf INVENTORY} file specifies the hardware components that exist at your
+site.
+It must be in a format which will allow it to become part of your site contract.
+
+\subsection {Recommended files}
+
+The following files are {\em recommended} at your site:
+\begin{description}
+\begin{description}
+\item [LADMINDIR:] \hfill
+\begin{description}
+\item [PEOPLE.ADR] \hfill
+\item [SSI.LIS] \hfill
+\item [SURGERY.LIS] \hfill
+\item [CHARTS.DIR] \hfill
+\item [NUDP.LIS] \hfill
+\item [DPA.LIS] \hfill
+\end{description}
+\item [LDOCSDIR:] \hfill
+\begin{description}
+\item [DOCS.LIS] \hfill
+\item [BUGS.LIS] \hfill
+\end{description}
+\end{description}
+\end{description}
+The {\bf PEOPLE} file stores the postal addresses of people you may wish to contact.
+You may use this for any purpose you wish, but the following groups of people
+should be on the list:
+\begin{itemize}
+\item Active registered users of your site.
+\item Non-users to whom you wish to send information about Starlink.
+\end{itemize}
+Do not use more than 40 characters per line, then the address can be printed
+on a sticky label.
+Program COMSAL can be used to prepare a compressed listing of this file (LSN/31
+PRO).
+Program DISLIS can be used to print names on selected address lists (LSN/12
+PRO).
+Program STICKY can be used to print addresses on sticky labels for selected
+address lists (LSN/28 PRO).
+These local programs can be adapted to your requirements.
+
+The {\bf SSI} file specifies details of local software that you think should be
+generally known at your site.
+The format should be modelled on ADMINDIR:SSI.LIS, leaving out those parts
+dealing with software releases.
+
+The {\bf SURGERY} file records any modifications you have made at your node to
+the standard Starlink Software Collection.
+For instance, you may decide to save space by deleting some source code or some
+items.
+
+The {\bf CHARTS} directory contains summaries of usage of the machine.
+The recommended procedure for maintaining these files is documented in LSN/29
+(PRO).
+They are a vast improvement on the indigestible accounts listing.
+
+The {\bf NUDP} file specifies the documentation that should be given to a new
+user on initial registration.
+
+The {\bf DPA} file specifies the names and contents of the files that contain
+personal information and are therefore governed by the Data Protection Act (UK).
+
+The {\bf DOCS} file lists every current local Starlink document which has been
+released and is still valid at your site, in order of type and serial number.
+
+The {\bf BUGS} file documents known bugs in local software.
+
+\section {References}
+
+\begin{description}
+\begin{description}
+\item [LSN/12 (PRO)]: DISLIS --- Produce distribution lists from an address list
+\item [LSN/28 (PRO)]: STICKY --- Produce address labels from an address list
+\item [LSN/29 (PRO)]: ACCOUNTS --- A machine accounting system
+\item [LSN/31 (PRO)]: COMSAL --- Compress an address list
+\item [SG/4]: ADAM ---- The Starlink software environment
+\item [SGP/4]: Starlink C programming standard
+\item [SGP/8]: Starlink local management
+\item [SGP/13]: Starlink applications software development
+\item [SGP/14]: Starlink special interest groups
+\item [SGP/16]: Starlink applications programming standards
+\item [SGP/19]: Starlink software submission
+\item [SGP/20]: Starlink software management
+\item [SGP/21]: Starlink software distribution policy
+\item [SGP/37]: Starlink site manager's guide --- minor nodes
+\item [SGP/39]: Upgrades to Starlink hardware and software
+\item [SSN/7]:  Administering Starlink Sun systems
+\item [SSN/15]: Starlink software installation
+\item [SSN/41]: Starlink software changes
+\item [SSN/51]: VAXnotes
+\item [SUG]: Starlink User Guide
+\item [SUN/1]: Starlink software --- An introduction
+\item [SUN/30]: Using the Starlink database MicroVAX
+\item [SUN/36]: Starlink networking
+\item [SUN/44]: VAXnotes --- An introduction
+\item [SUN/51]: Submission of NEWS items
+\item [SUN/101]: Introduction to ADAM programming
+\item [DEC]: Introduction to VMS
+\end{description}
+\end{description}
+
+\appendix
+
+\section {Captive Account For Network Access}
+
+\subsection {Introduction}
+
+Astronomers travel around a great deal but like to keep in touch with their home
+institutions.
+Often this means that they want to be able to login to a Starlink VAX where they
+happen to be visiting and use a network connection (either DECnet or JANET) to
+access their `home' machine to read MAIL, contact their colleagues, etc.
+Most users do not have accounts on more than one Starlink machine and hence find
+that they cannot login when they happen to be at a remote site.
+In the past they would ask the site manager to allow them use of a `visitor'
+account, but this is often not possible at odd hours of the day or weekends.
+In addition, the use of such accounts needs careful management if it is not to
+become a security risk.
+This appendix (based on LSN/2 (UCL) by R N Hook) describes a simple solution
+to this problem involving the use of a captive account.
+It should be installed at all Starlink sites.
+
+\subsection {Setting up the captive account}
+
+The aim is to set up an identical secure account at each node which will allow
+access to other machines only, i.e.\ deny access to DCL locally.
+Making an account `captive' is a convenient way of limiting what a user can do
+in this manner.
+Details of the procedure for setting up such a secure account are given in the
+`Guide to VAX/VMS System Security' Section 5.8.1.
+The main thing to be avoided is the possibility of the user breaking out of the
+captive procedure and returning to DCL.
+The following listing of the UAF entry for the STARLINK username at UCL shows
+one way such an account can be configured:
+
+\normalsize
+
+\begin{verbatim}
+Username: STARLINK                         Owner:  NETWORK ACCESS ACCOUNT
+Account:  UCLLNET                          UIC:    [355,1] ([STARLINK])
+CLI:      DCL                              Tables: 
+Default:  SYS$SYSDEVICE:[NETWORK]
+LGICMD:   SYS$MANAGER:STAR_LOGIN.COM
+Login Flags:  Disctly Lockpwd Captive Diswelcome Disnewmail Dismail Disreport
+Primary days:   Mon Tue Wed Thu Fri Sat Sun
+Secondary days:                            
+Primary   000000000011111111112222  Secondary 000000000011111111112222
+Day Hours 012345678901234567890123  Day Hours 012345678901234567890123
+Network:  -----  No access  ------            -----  No access  ------
+Batch:    -----  No access  ------            -----  No access  ------
+Local:    ##### Full access ######            ##### Full access ######
+Dialup:   -----  No access  ------            -----  No access  ------
+Remote:   -----  No access  ------            -----  No access  ------
+Expiration:            (none)    Pwdminimum:  6   Login Fails:     0
+Pwdlifetime:        300 00:00    Pwdchange:             (none) 
+Last Login: 15-SEP-1986 15:31 (interactive), 17-JUN-1986 15:45 (non-interactive)
+Maxjobs:         0  Fillm:        30  Bytlm:         8192
+Maxacctjobs:     0  Shrfillm:      0  Pbytlm:           0
+Maxdetach:       0  BIOlm:        18  JTquota:       1024
+Prclm:           0  DIOlm:        18  WSdef:          250
+Prio:            4  ASTlm:        15  WSquo:          400
+Queprio:         0  TQElm:        10  WSextent:      4096
+CPU:        (none)  Enqlm:        30  Pgflquo:      20480
+Authorized Privileges: 
+  TMPMBX NETMBX
+Default Privileges: 
+  TMPMBX NETMBX
+\end{verbatim}
+
+\large
+
+Note the use of all the FLAGS and the non-standard login file.
+The username STARLINK for the account was agreed by the site managers and
+should be used.
+It is important to allow only LOCAL access to prevent people using these
+accounts to hop around the country from machine to machine.
+The password can be null if desired.
+
+\subsection {The login command procedure}
+
+The login procedure for this account must allow the user to access a selection
+of sites around the network if it is to be useful.
+The DCL command SET HOST is used with the optional qualifier /X29 to allow
+access to all sites on DECnet and JANET.
+It was also felt that some form of HELP facility would be of value to
+inexperienced users of this username.
+The procedure used at UCL is reproduced below but could doubtless be tailored
+and improved for other sites:
+
+\normalsize
+
+\begin{quote}
+\begin{verbatim}
+$ ! Login procedure for NETWORK access captive account
+$ !
+$ ! Richard Hook, UCL, September 1986
+$ ! 
+$ ! Make this as secure as possible
+$ !
+$ set on
+$ set nocontrol_y
+$ on error then logout/brief
+$ !
+$ ! Welcome user and explain how this works
+$ !
+$ write sys$output " "
+$ write sys$output "Welcome to NETWORK access account"
+$ write sys$output "(Type HELP for some explanation.)"
+$ write sys$output " "
+$ !
+$ ! Prompt the user
+$ !
+$ Prompt:
+$ read/prompt="Node? "  sys$command nodename
+$ !
+$ ! Check for HELP request
+$ !
+$ if (f$locate(nodename,"HELP") .nes. 0) .and. -
+     (f$locate(nodename,"help") .nes. 0) then goto SetHost
+$    type sys$input
+
+
+      This NETWORK facility allows a visitor to call another machine using
+      the SET HOST command but prevents him from using DCL commands.
+
+      In reply to the prompt Node? reply either with the name of the DECnet
+      (Starlink) node name (e.g. RLVAD,REVAD etc) or with <number>/X where
+      <number> is the DTE address of the Janet machine you wish to call.
+
+$    goto Prompt
+$ !
+$ ! Use SET HOST to get network connection
+$ !
+$ SetHost:
+$ !
+$ !  filter out any attempt to set host to the starlink database system
+$ !  (STADAT 19.7 = 19463)
+$ !
+$ nodename = f$edit(nodename,"COLLAPSE,UPCASE,UNCOMMENT")
+$ nodename = f$extract(0,f$locate(":",nodename),nodename)
+$1$:
+$ if f$extract(0,1,nodename).nes."_" then goto 2$
+$     nodename = f$extract(1,9999,nodename)
+$     goto 1$
+$2$:
+$ if nodename.eqs."STADAT" .or. nodename.eq.19463 then goto no_access
+$!
+$ deassign sys$input
+$ assign sys$command sys$input
+$ set host 'nodename'
+$ !
+$ ! Throw the user out
+$ !
+$ logout/brief
+$no_access:
+$ write sys$output "Access to STADAT is not allowed"
+$ logout/brief
+\end{verbatim}
+\end{quote}
+
+\large
+
+\subsection {Using the account for JANET access}
+
+One problem with such an approach is that the normal mnemonics for the JANET
+sites are unavailable because the CBS is not being used.
+The PSI provides a facility to use logical names in a similar way to mnemonics,
+rather than having to find out and remember the long DTE numbers.
+Such logical names must be entered into the PSI\$DTE\_TABLE system logical name
+table.
+It is not sensible or syntactically possible to transfer all the NRS mnemonics
+to this table, but it is desirable that all the commonly needed sites are
+entered.
+For example, a privileged user may enter the London PSS gateway address as
+follows:
+\begin{quote}
+{\tt \$ ASSIGN/TABLE=PSI\$DTE\_TABLE 40000040 PSS}
+\end{quote}
+It is desirable that a standard minimum set of such mnemonics be common to all
+Starlink sites.
+Ask Alan Lotts for details.
+
+\newpage
+
+\section {Short Codes For Starlink Sites}
+
+The 1-letter and 3-letter short codes for Starlink sites are:
+\begin{tabbing}
+XXXXX\=1-letterXX\=3-letterXX\=\kill
+\>1-letter\>3-letter\>Site\\
+\\  
+\>A\>ARM\>Armagh\\
+\>Q\>BEL\>Belfast\\
+\>B\>BIR\>Birmingham\\
+\>C\>CAM\>Cambridge: IOA/RGO\\
+\>F\>CAR\>Cardiff\\
+\>D\>DUR\>Durham\\
+\>V\>HAT\>Hatfield\\
+\>W\>IMP\>Imperial College of Science, Technology \& Medicine\\
+\>J\>JOD\>Jodrell Bank\\
+\>K\>KEE\>Keele\\
+\>N\>KEN\>Kent\\
+\>I\>LEI\>Leicester\\
+\>M\>MAN\>Manchester\\
+\>O\>OXF\>Oxford\\
+\>P\>PRE\>Preston\\
+\>U\>QMW\>Queen Mary \& Westfield College\\
+\>H\>RAL\>RAL (Astrophysics cluster)\\
+\>R\>PRO\>RAL (Project cluster)\\
+\>Z\>CEN\>RAL (STADAT)\\
+\>E\>ROE\>Royal Observatory Edinburgh\\
+\>S\>SOU\>Southampton\\
+\>T\>STA\>St Andrews\\
+\>X\>SUS\>Sussex\\
+\>L\>UCL\>University College London\\
+\end{tabbing}
+
+\newpage
+
+\section{Installing Starlink Software Changes}
+
+The directory containing the files for release SSCn is stored at RAL as a
+compressed save set in DISK\$SOFTDEV:\-[STAR.\-TEMP]\-SSCn.\-BCK.
+Copy this to your local site and install the release.
+There may be an optional save set called SSCnX.BCK in the same directory.
+This need not be copied if you do not want to install an optional item.
+However, you should {\em always} copy SSCn.BCK and run the command procedure
+SSCn.COM that it contains.
+Also, you should install updates in their numerical order since information
+files are updated in every release.
+
+\begin{description}
+
+\item [COPY]: Copy SSCn.BCK and any optional save sets from RAL.
+If on DECnet, store the command:
+\begin{verbatim}
+    $ COPY RLVAD::DISK$SOFTDEV:[STAR.TEMP]SSCn.BCK disk:[STAR.TEMP]*.*
+\end{verbatim}
+in file CPYSSC.COM, then submit it to a batch queue:
+\begin{verbatim}
+    $ SUBMIT CPYSSC
+\end{verbatim}
+If not on DECnet, use the TRANSFER command:
+\begin{verbatim}
+    $ TRANSFER/CODE=FAST/USERNAME=NETUSR,NETUSR -
+         UK.AC.RL.STAR::DISK$SOFTDEV:[STAR.TEMP]SSCn.BCK -
+         disk:[STAR.TEMP]SSCn.BCK
+\end{verbatim}
+
+\item [RECREATE]: Recreate the [STAR.TEMP.SSCn] directory:
+\begin{verbatim}
+    $ SET DEF [STAR.TEMP]
+    $ LZDCM  SSCn.BCK SSCn.BCK
+    $ PURGE
+    $ BACKUP SSCn.BCK/SAVE [*...]
+\end{verbatim}
+Notice that you must de-compress the copied version of the save-set using
+LZDCM before using BACKUP to recreate the directory.
+People of a nervous disposition may use the qualifiers /LOG and /VERIFY in the
+BACKUP command if this makes them feel happier.
+
+\item [IMPLEMENT]: Follow the implementation instructions in SSCn.LIS (which you
+should already have available) to install the release.
+
+\item [CLEAN-UP]: Carry out any actions of the CLEAN-UP phase (SSN/41) that you
+consider necessary.
+\end{description}
+
+\rule{\textwidth}{0.3mm}
+\begin{quote}
+N.B.\ YOU MUST COPY THE SSCn.BCK FILE FROM RAL WITHIN A MONTH OF NOTIFICATION
+OF A RELEASE AS THE FILE WILL DISAPPEAR WITHOUT NOTICE AFTER THIS TIME.
+\end{quote}
+\rule{\textwidth}{0.3mm}
+
+\end{document}

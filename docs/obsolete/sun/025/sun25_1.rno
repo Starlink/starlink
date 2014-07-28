@@ -1,0 +1,58 @@
+.title SUN/25.1
+.set date 22,06,1987
+.autoparagraph
+.set paragraph 0,1,2
+.layout 3,2
+.page size 57,70
+.flags substitute
+.nofill
+.keep
+.justify
+SCIENCE#AND#ENGINEERING#RESEARCH#COUNCIL SUN/25.1
+RUTHERFORD#APPLETON#LABORATORY
+SPACE#_&#ASTROPHYSICS#DIVISION
+
+Starlink#Project Issued#by
+Starlink#User#Note#25.1
+
+.right;S E Black
+.right;$$date
+
+.fill
+.repeat 70,"-"
+.blank
+.centre;LZCMP - File compression
+.centre;------------------------
+.blank 2
+LZCMP implements the Lempel-Ziv file compression algorithm. 
+Files compressed by LZCMP are decompressed using LZDCMP.
+The source files contain documentation commented out at the  
+beginning of the code for those curious about the programs' 
+operation.
+
+To use LZCMP and LZDCM, define them as DCL foreign
+symbols. At RAL they are defined as:
+.lt
+
+	 $ LZCMP:== $ UTILITYDIR:LZCMP
+
+	 $ LZDCM:== $ UTILITYDIR:LZDCM
+
+.el
+To compress a file use the command:
+.lt
+
+	 $ LZCMP -v inputfile.typ compressedfile.typ
+
+.el
+or to decompress use the command:
+.lt
+
+	 $ LZDCM compressedfile.typ decompressedfile.typ
+
+.el
+
+The -v switch for LZCMP is the "verbose" switch so that when LZCMP
+is completed it will report what it did. The default operation on
+VMS preserves file attributes in the compressed file. 
+

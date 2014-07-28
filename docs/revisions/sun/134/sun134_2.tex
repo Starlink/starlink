@@ -1,0 +1,1792 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {134.2}
+\newcommand{\stardocauthors}   {B D Kelly\footnote{Royal Observatory
+Edinburgh}\\A J Chipperfield}
+\newcommand{\stardocdate}      {30 March 1992}
+\newcommand{\stardoctitle}     {ADAM -- Guide to Writing Instrumentation Tasks}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Huge\bf \stardoctitle}
+\end{center}
+\vspace{20mm}
+
+%------------------------------------------------------------------------------
+%  Package Description
+\begin{center}
+{\Large\bf Description}
+\end{center}
+
+
+This guide shows you how to write programs for use as part of
+instrumentation systems under ADAM Version 2. If you are a programmer
+experienced with ADAM Version 1, then refer to Appendix C which
+summarises some of the differences between the new ADAM tasking model
+and the old one. 
+
+
+\markright{\stardocname}
+\newpage
+\markright{\stardocname}
+
+
+
+%------------------------------------------------------------------------------
+\small
+%  Add this part if you want a table of contents
+  \setlength{\parskip}{0mm}
+  \tableofcontents
+  \setlength{\parskip}{\medskipamount}
+  \markright{\stardocname}
+\normalsize
+%------------------------------------------------------------------------------
+
+\section{INTRODUCTION}
+
+An ADAM instrumentation system typically consists of a number of 
+separate programs which are loaded into various computers and which 
+carry out their functions in response to receiving commands. A large part 
+of their functionality involves either sending commands to some 
+instrument and receiving data back from it, or sending commands to other 
+ADAM tasks. It follows that communication is a key feature of an ADAM 
+task, and one can expect that a task spends most of its time waiting for 
+a communication of one sort or another. Experience indicates that it is 
+very inconvenient if a task is only sensitive to the communication it is 
+expecting - for example, it becomes very difficult for the user to
+intervene because there has been a change of plan. An ADAM task written
+as part of an instrumentation system should, therefore, be organised
+such that if it is waiting for something it can also receive a command.
+This document describes the ADAM facilities provided to enable you to
+write tasks which match this idea. 
+
+
+\section{A SIMPLE PICTURE OF A TASK}
+
+A task is implemented by the application code plus an interface file. 
+The interface file is a text file containing declarations of the 
+parameters and actions ({\em i.e.} commands) which the task can carry out. The 
+source code looks like this
+\small \begin{quote} \begin{verbatim}
+      SUBROUTINE MYTASK ( STATUS )
+      INCLUDE 'SAE_PAR'
+      INTEGER STATUS
+
+      IF ( STATUS .NE. SAI__OK ) RETURN
+        do things
+      END
+\end{verbatim} \end{quote} \normalsize
+
+That is, it appears as a subroutine which is linked into some ADAM code 
+called the task {\em fixed-part}.
+It is conventional to test STATUS on entry and to exit without action if it
+is not equal to SAI\_\_OK. The value SAI\_\_OK is defined in the include file
+SAE\_PAR.
+When the task does things, it might have to wait for some other task or 
+system to reply.
+
+The things a task might be waiting for include
+\begin{itemize}
+\item receipt of a command
+\item completion of a timed interval
+\item completion of data input
+\item receipt of messages from one or more other tasks
+\end{itemize}
+An ADAM instrumentation application works by telling the ADAM system
+what kind of thing it is expecting to happen by giving it a REQUEST
+through calling TASK\_PUT\_REQUEST.
+
+\small \begin{quote} \begin{verbatim}
+CALL TASK_PUT_REQUEST(REQUEST,STATUS)
+\end{verbatim} \end{quote} \normalsize
+
+and then returning to the code which called it (the task's fixed-part).
+See Appendix E for possible values of REQUEST. 
+
+The fixed-part waits for messages to arrive. If one arrives which your 
+application has warned it about, then it will call your application 
+after storing information about the message where you can collect it.
+
+The following sections describe how to wait for the various 
+possibilities.
+
+
+\section{WAITING FOR A COMMAND}
+
+When you first load your task, the only thing it is waiting for is a 
+command. It can receive commands from other ADAM tasks telling it to SET 
+or GET the value of one of its program parameters. The fixed-part 
+handles this without your code being aware of it. It can also receive a 
+command telling it to CANCEL an earlier command, but as there hasn't yet 
+been a command, the fixed-part will return an error to the other task.
+
+If the fixed-part receives an OBEY $<action\_name>$ command, it checks 
+whether the given action\_name has been declared in the interface file. 
+If it has, then your code is called. You can find out why your code has 
+been called by using the TASK library, for example, 
+\small \begin{quote} \begin{verbatim}
+CALL TASK_GET_NAME(NAME,STATUS)
+\end{verbatim} \end{quote} \normalsize
+returns the name of the action.
+
+\section{CARRYING OUT A SIMPLE COMMAND}
+
+Suppose your application is very simple, for example, SUMS.IFL contains 
+
+\small \begin{quote} \begin{verbatim}
+interface SUMS
+   parameter VALUE
+      type '_REAL'
+   endparameter
+   action SQUARE
+      obey
+      endobey
+   endaction
+endinterface
+\end{verbatim} \end{quote} \normalsize
+
+and SUMS.FOR contains
+
+\small \begin{quote} \begin{verbatim}
+      SUBROUTINE SUMS ( STATUS )
+      IMPLICIT NONE
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'ACT_ERR'
+      INTEGER STATUS
+      REAL VALUE
+
+      IF ( STATUS .NE. SAI__OK ) RETURN
+      CALL PAR_GET0R ( 'VALUE', VALUE, STATUS )
+      CALL MSG_SETR ( 'ANS', VALUE**2 )
+      CALL MSG_OUT ( ' ', 'answer is = ^ANS', STATUS )
+      END
+\end{verbatim} \end{quote} \normalsize
+
+This can be built as a task called SUMS and loaded using ICL. When it is 
+loaded, the fixed-part reads the interface file and discovers that the 
+task has just one action, called SQUARE, and one parameter called VALUE. 
+If you send a command to it of the form
+
+\small \begin{quote} \begin{verbatim}
+ICL> send sums obey square
+\end{verbatim} \end{quote} \normalsize
+
+then the task will prompt you for VALUE. It will attempt to square your 
+reply and then return to the fixed-part. If you send the command again,
+you will not be prompted for VALUE. The task will remember the value of
+VALUE unless your application calls PAR\_CANCL, or you KILL the task
+from ICL. 
+
+
+\section{A TASK WITH TWO ACTIONS}
+
+Let us make the task SUMS able to accept two different commands.
+SUMS.IFL contains 
+
+\small \begin{quote} \begin{verbatim}
+interface SUMS
+   parameter VALUE
+      type '_REAL'
+   endparameter
+   action SQUARE
+      obey needs VALUE
+      endobey
+   endaction
+   action ADD
+      obey needs VALUE
+      endobey
+   endaction
+endinterface
+\end{verbatim} \end{quote} \normalsize
+
+and SUMS.FOR contains
+
+\small \begin{quote} \begin{verbatim}
+      SUBROUTINE SUMS ( STATUS )
+      IMPLICIT NONE
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'ACT_ERR'
+      INTEGER STATUS
+      REAL VALUE
+      CHARACTER*(PAR__SZNAM) NAME
+
+      IF ( STATUS .NE. SAI__OK ) RETURN
+      CALL TASK_GET_NAME ( NAME, STATUS )
+      IF ( NAME .EQ. 'SQUARE' ) THEN
+         CALL PAR_GET0R ( 'VALUE', VALUE, STATUS )
+         CALL MSG_SETR ( 'ANS', VALUE**2 )
+         CALL MSG_OUT ( ' ', 'answer is = ^ANS', STATUS )
+      ELSE IF ( NAME .EQ. 'ADD' ) THEN
+         CALL PAR_GET0R ( 'VALUE', VALUE, STATUS )
+         CALL MSG_SETR ( 'ANS', VALUE+VALUE )
+         CALL MSG_OUT ( ' ', 'answer is = ^ANS', STATUS )
+      ENDIF
+      END
+\end{verbatim} \end{quote} \normalsize
+
+As above, you can issue the ICL command
+
+\small \begin{quote} \begin{verbatim}
+ICL> send sums obey square
+\end{verbatim} \end{quote} \normalsize
+
+and you will be prompted for VALUE. Thereafter, that same value of VALUE 
+will be used, even if you
+
+\small \begin{quote} \begin{verbatim}
+ICL> send sums obey add
+\end{verbatim} \end{quote} \normalsize
+
+However, notice that the interface file has now been changed to specify that 
+VALUE is NEEDed by the actions. This means that you can
+
+\small \begin{quote} \begin{verbatim}
+ICL> send sums obey add 42
+\end{verbatim} \end{quote} \normalsize
+
+and the value 42 is put into the parameter by the fixed-part before your 
+application is called.
+
+
+\section{COMPLETION OF A TIMED INTERVAL}
+
+Having received a command, the application might not wish to complete
+immediately, but may want to wait for something to happen. The simplest
+thing to wait for is the passing of a timed interval. This is set up by
+using TASK\_PUT\_REQUEST(ACT\_\_WAIT,STATUS) to tell the fixed-part a
+timer is required and using TASK\_PUT\_DELAY to tell the system how long
+a time is required. Note that your code has to find out whether it is
+being called for the first time or not by inquiring the sequence number
+SEQ. 
+
+\small \begin{quote} \begin{verbatim}
+interface timer
+   action WAIT
+      obey
+      endobey
+   endaction
+endinterface
+
+      SUBROUTINE TIMER ( STATUS )
+      IMPLICIT NONE
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'ACT_ERR'
+      INTEGER STATUS
+      INTEGER SEQ
+
+      IF ( STATUS .NE. SAI__OK ) RETURN
+      CALL TASK_GET_SEQ ( SEQ, STATUS )
+      IF ( SEQ .EQ. 0 ) THEN
+*      first-time, request 100 millisecond wait
+         CALL TASK_PUT_DELAY ( 100, STATUS )
+         CALL TASK_PUT_REQUEST ( ACT__WAIT, STATUS )
+      ELSE
+*      next time in, finished
+         CALL MSG_OUT ( ' ', 'finished', STATUS )
+      ENDIF
+      END
+\end{verbatim} \end{quote} \normalsize
+
+The time delay can also be used as a timeout facility in conjunction
+with waiting for input or message receipt. 
+
+It is possible to have several actions active at once, each waiting to 
+be called by the fixed-part. Here is a simple example of two actions, 
+each doing a timed reschedule.
+
+\small \begin{quote} \begin{verbatim}
+      SUBROUTINE TIMER ( STATUS )
+      IMPLICIT NONE
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'ACT_ERR'
+      INTEGER STATUS
+      INTEGER SEQ
+      CHARACTER*(PAR__SZNAM) NAME
+
+      IF ( STATUS .NE. SAI__OK ) RETURN
+      CALL TASK_GET_SEQ ( SEQ, STATUS )
+      CALL TASK_GET_NAME ( NAME, STATUS )
+      IF ( SEQ .EQ. 0 ) THEN
+         IF ( NAME .EQ. 'WAIT' ) THEN
+            CALL TASK_PUT_DELAY ( 5000, STATUS )
+            CALL TASK_PUT_REQUEST ( ACT__WAIT, STATUS )
+         ELSE IF ( NAME .EQ. 'WAIT1' ) THEN
+            CALL TASK_PUT_DELAY ( 1000, STATUS )
+            CALL TASK_PUT_REQUEST ( ACT__WAIT, STATUS )
+         ENDIF
+      ELSE
+         IF ( NAME .EQ. 'WAIT' ) THEN
+            CALL MSG_OUT ( ' ', 'WAIT has rescheduled', STATUS )
+            CALL TASK_PUT_DELAY ( 5000, STATUS )
+            CALL TASK_PUT_REQUEST ( ACT__WAIT, STATUS )
+         ELSE IF ( NAME .EQ. 'WAIT1' ) THEN
+            CALL MSG_OUT ( ' ', 'WAIT1 has rescheduled', STATUS )
+            CALL TASK_PUT_DELAY ( 1000, STATUS )
+            CALL TASK_PUT_REQUEST ( ACT__WAIT, STATUS )
+         ENDIF
+      ENDIF
+      END
+\end{verbatim} \end{quote} \normalsize
+
+Obviously, this application never terminates, but will put out the WAIT 
+message every 5 seconds and the WAIT1 message every 1 second.
+
+
+\section{COMPLETION OF DATA INPUT}
+
+Suppose that your task has to input data from some hardware connected to 
+an RS232 line. You can use the VAX/VMS SYS\$QIO system service with your 
+own AST handler to start the input operation, optionally call 
+TASK\_PUT\_DELAY to set a timeout on the operation, and return 
+to the task fixed-part after having put a request ACT\_\_ASTINT. 
+
+When the input completes, VMS hands control to your AST handler which
+can carry out whatever actions are necessary and then use 
+TASK\_ASTMSG(NAME,LENGTH,VALUE,STATUS) to tell the fixed part to call the 
+application again. In this call:
+\begin{description}
+\item[NAME] is the name of the relevant task
+action
+\item[VALUE] is a character string containing any information you want 
+passed
+\item[LENGTH] is the number of significant bytes in VALUE
+\end{description}
+
+Provided NAME coincides with one of your actions which has requested to be 
+called again, any associated timer is cancelled and your application is called.
+
+TASK\_GET\_REASON(REASON,STATUS) returns, in REASON, value
+MESSYS\_\_ASTINT if the message was received from the AST handler,
+or MESSYS\_\-\_\-RESCHED if the timer completed.
+In the former case, you could use 
+TASK\_GET\_VALUE(VALUE,STATUS) to get the information passed from the AST 
+handler.
+
+Let us consider an example task called DO\_IO with an action called READ.
+
+
+\small \begin{quote} \begin{verbatim}
+      SUBROUTINE DO_IO ( STATUS )
+      IMPLICIT NONE
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'ACT_ERR'
+      INCLUDE 'MESSYS_ERR'
+      INCLUDE 'DDMSG'
+      INCLUDE '$IODEF'
+      INTEGER ASTPARM
+      CHARACTER*(MSG_VAL_LEN) VALUE
+      INTEGER CHAN
+      CHARACTER*80 INSTRING
+      INTEGER REASON
+      INTEGER STATUS
+      INTEGER SEQ
+      EXTERNAL READAST
+
+      IF ( STATUS .NE. SAI__OK ) RETURN
+      CALL TASK_GET_SEQ( SEQ, STATUS )
+      IF ( SEQ .EQ. 0 ) THEN
+         CALL SYS$ASSIGN ( 'TTA5:', CHAN, ,)
+         CALL SYS$QIO ( , %VAL(CHAN), IO$_READ,, READAST, ASTPARM, 
+     :     %REF(INSTRING), %VAL(80),,,,)
+         CALL TASK_PUT_DELAY ( 5000, STATUS )
+         CALL TASK_PUT_REQUEST ( ACT__ASTINT, STATUS )
+      ELSE
+         CALL TASK_GET_REASON ( REASON, STATUS )
+         IF ( REASON .EQ. MESSYS__ASTINT ) THEN
+            CALL TASK_GET_VALUE ( VALUE, STATUS )
+            CALL MSG_OUT ( ' ', VALUE, STATUS )
+         ELSE IF ( REASON .EQ. MESSYS__RESCHED ) THEN
+            CALL MSG_OUT ( ' ', 'timed-out', STATUS )
+         ENDIF
+         CALL SYS$DASSGN ( %VAL(CHAN) )
+      ENDIF
+      END
+
+      SUBROUTINE READAST ( ASTPARM )
+      IMPLICIT NONE
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DDMSG'
+      INTEGER ASTPARM
+      CHARACTER*(MSG_VAL_LEN) VALUE
+      CHARACTER*(PAR__SZNAM) NAME
+      INTEGER LENGTH
+      INTEGER STATUS
+
+      STATUS = SAI__OK
+      NAME = 'READ'
+      VALUE = 'input finished'
+      LENGTH = 14
+      CALL TASK_ASTMSG ( NAME, LENGTH, VALUE, STATUS )
+      END
+\end{verbatim} \end{quote} \normalsize
+
+
+
+\section{KICKING ONE ACTION FROM ANOTHER}
+
+In some complex instrumentation systems you may wish to have an action in a
+task which wakes other waiting actions within the same task.
+TASK\_KICK(NAME,LENGTH,VALUE,STATUS) may be called to do this.
+
+\small \begin{quote} \begin{verbatim}
+      SUBROUTINE KICKER ( STATUS )
+      IMPLICIT NONE
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'ACT_ERR'
+      INCLUDE 'MESSYS_ERR'
+      INTEGER STATUS
+      INTEGER SEQ
+      INTEGER REASON
+      CHARACTER*(PAR__SZNAM) NAME
+      CHARACTER*(MSG_VAL_LEN) VALUE
+      INTEGER LENGTH
+
+      IF ( STATUS .NE. SAI__OK ) RETURN
+      CALL TASK_GET_NAME ( NAME, STATUS )
+      IF ( NAME .EQ. 'WAIT' ) THEN
+         CALL TASK_GET_SEQ ( SEQ, STATUS )
+         IF ( SEQ .EQ. 0 ) THEN
+            CALL TASK_PUT_DELAY ( 10000, STATUS )
+            CALL TASK_PUT_REQUEST ( ACT__WAIT, STATUS )
+         ELSE
+            CALL TASK_GET_REASON ( REASON, STATUS )
+            IF ( REASON .EQ. MESSYS__KICK ) THEN
+               CALL TASK_GET_VALUE ( VALUE, STATUS )
+               CALL MSG_OUT ( ' ', VALUE, STATUS )
+            ELSE IF ( REASON .EQ. MESSYS__RESCHED ) THEN
+               CALL MSG_OUT ( ' ', waked by timer', STATUS )
+            ENDIF
+         ENDIF
+      ELSE IF ( NAME .EQ. 'KICK' ) THEN
+         VALUE = 'waked by kick'
+         LENGTH = 13
+         CALL TASK_KICK ( 'WAIT', LENGTH, VALUE, STATUS )
+      ENDIF
+      END
+\end{verbatim} \end{quote} \normalsize
+
+
+
+\section{RECEIPT OF MESSAGES FROM OTHER TASKS}
+
+Suppose that your task is controlling other tasks. Say it sends an OBEY
+message to some other task. The other task will carry out its
+operations, maybe generating output intended for the user to see, and
+send your task a final message when it has completed the obey. You can
+use: 
+\small \begin{quote} \begin{verbatim}
+TASK_ADD_MESSINFO(PATH,MESSID,STATUS)
+\end{verbatim} \end{quote} \normalsize
+to tell the fixed-part you are 
+expecting messages on this PATH,MESSID combination, then return to the 
+fixed-part having set a request ACT\_\_MESSAGE. You could also have set a 
+timeout as above. You can use multiple calls to TASK\_ADD\_MESSINFO if you 
+are controlling more than one operation in other tasks.
+
+When the fixed-part calls your application again, you can use:
+\small \begin{quote} \begin{verbatim}
+TASK_GET_MESSINFO(PATH,CONTEXT,NAME,VALUE,MESSID,EVENT,STATUS) 
+\end{verbatim} \end{quote} \normalsize
+to obtain the information carried in the message. 
+
+Note that any output generated by the other task ({\em e.g.} using MSG\_OUT) 
+will have been handled automatically by the fixed-part of your task and will 
+not cause your application subroutine to be called.
+Messages from subsidiary tasks which do cause your subroutine to be called 
+will generally be completion messages, however, a special `TRIGGER' message is
+also available.
+
+To send a TRIGGER message the subsidiary task can use:
+\small \begin{quote} \begin{verbatim}
+TASK_TRIGGER(ACTNAME,VALUE,STATUS)
+\end{verbatim} \end{quote} \normalsize
+The message will be sent and the task can continue working.
+
+When your controlling task calls TASK\_GET\_MESSINFO, MESSYS\_\_TRIGGER will
+be returned in EVENT.
+
+Obviously, the example for all this is rather complex, involving three 
+separate tasks and multiple actions. The example, written by William 
+Lupton, involves a pair of tasks for making tea and coffee respectively 
+and a third task controlling them, and is relegated to Appendix A.
+
+
+\section{CANCELLING ACTIONS}
+
+It is possible to cancel an action which is in a wait state. Here is a 
+simple example.
+
+\small \begin{quote} \begin{verbatim}
+interface timer
+   action WAIT
+      obey
+      endobey
+      cancel
+      endcancel
+   endaction
+endinterface
+
+      SUBROUTINE TIMER ( STATUS )
+      IMPLICIT NONE
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'ACT_ERR'
+      INCLUDE 'ADAMDEFNS'
+      INTEGER STATUS
+      INTEGER SEQ
+      INTEGER CONTEXT
+
+      IF ( STATUS .NE. SAI__OK ) RETURN
+      CALL TASK_GET_CONTEXT ( CONTEXT, STATUS )
+      IF ( CONTEXT .EQ. OBEY ) THEN
+         CALL TASK_GET_SEQ ( SEQ, STATUS )
+         IF ( SEQ .EQ. 0 ) THEN
+            CALL TASK_PUT_DELAY ( 10000, STATUS )
+            CALL TASK_PUT_REQUEST ( ACT__WAIT, STATUS )
+         ELSE
+            CALL MSG_OUT ( ' ', 'finished', STATUS )
+         ENDIF
+      ELSE IF ( CONTEXT .EQ. CANCEL ) THEN
+         CALL MSG_OUT ( ' ', 'I was cancelled', STATUS )
+         CALL TASK_PUT_REQUEST ( ACT__CANCEL, STATUS )
+      ENDIF
+      END
+\end{verbatim} \end{quote} \normalsize
+
+Note the CANCEL declaration in the interface file. This example is exercised by
+
+\small \begin{quote} \begin{verbatim}
+ICL> send timer obey wait
+ICL> send timer cancel wait
+\end{verbatim} \end{quote} \normalsize
+
+It is possible to write the application such that CANCEL modifies the 
+behaviour of the rescheduling action rather than terminating it.
+
+\small \begin{quote} \begin{verbatim}
+interface timer
+   parameter CANTIME
+      type '_INTEGER'
+   endparameter
+   action WAIT
+      obey
+      endobey
+      cancel needs CANTIME
+      endcancel
+   endaction
+endinterface
+
+      SUBROUTINE TIMER ( STATUS )
+      IMPLICIT NONE
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'ACT_ERR'
+      INCLUDE 'ADAMDEFNS'
+      INTEGER STATUS
+      INTEGER SEQ
+      INTEGER CONTEXT
+      INTEGER STATE
+      SAVE STATE, TIME
+
+      IF ( STATUS .NE. SAI__OK ) RETURN
+      CALL TASK_GET_CONTEXT ( CONTEXT, STATUS )
+      IF ( CONTEXT .EQ. OBEY ) THEN
+         CALL TASK_GET_SEQ ( SEQ, STATUS )
+         IF ( SEQ .EQ. 0 ) THEN
+            STATE = 0
+            CALL TASK_PUT_DELAY ( 500, STATUS )
+            CALL TASK_PUT_REQUEST ( ACT__WAIT, STATUS )
+         ELSE
+            IF ( STATE .EQ. 0 ) THEN
+*            Normal reschedule
+               CALL TASK_PUT_DELAY ( 500, STATUS )
+               CALL MSG_OUT ( ' ', 'default timer', STATUS )
+               CALL TASK_PUT_REQUEST ( ACT__WAIT, STATUS )
+            ELSE
+*            Rescheduling after CANCEL
+               CALL TASK_PUT_DELAY ( TIME, STATUS )
+               CALL MSG_OUT ( ' ', 'altered timer', STATUS )
+               CALL TASK_PUT_REQUEST ( ACT__WAIT, STATUS )
+            ENDIF
+         ENDIF
+      ELSE IF ( CONTEXT .EQ. CANCEL ) THEN
+         STATE = 1
+         CALL PAR_GET0I ( 'CANTIME', TIME, STATUS )
+         CALL TASK_PUT_DELAY ( TIME, STATUS )
+         CALL MSG_OUT ( ' ', 'timer changed', STATUS )
+         CALL TASK_PUT_REQUEST ( ACT__WAIT, STATUS )
+      ENDIF
+      END
+\end{verbatim} \end{quote} \normalsize
+
+Then:
+\small \begin{quote} \begin{verbatim}
+ICL> send timer obey wait
+ICL> send timer cancel wait 10000
+\end{verbatim} \end{quote} \normalsize
+
+will cause the task to start rescheduling at 0.5sec intervals, but then 
+switch to rescheduling at 10sec intervals. In this particular example 
+the action never terminates.
+
+An example of sending a CANCEL to a task which is controlling a 
+subsidiary task is given in Appendix B.
+
+\section{BEHAVIOUR OF THE PARAMETER SYSTEM}
+
+As far as the ADAM parameter system is concerned, there are two aspects 
+of instrumentation tasks which cause them to behave differently from 
+standard data analysis tasks (A-tasks). The first is the way they are 
+linked. The second is the form of the interface file declarations.
+
+Whenever an A-task executes, the parameter system is started-up, the 
+application is called, then the parameter system is closed-down. For an 
+instrumentation task this continuous opening-closing of the parameter 
+system does not happen. There are two obvious consequences of this. 
+Firstly, parameters remain ACTIVE once they have been given a value. 
+Secondly, global associations for WRITE never happen.
+
+All the parameters of an instrumentation task are available to all the 
+actions. In addition, a specific OBEY or CANCEL can specify that values 
+of named parameters can be passed on the command line.
+
+\small \begin{quote} \begin{verbatim}
+   action TRYIT
+      obey needs TIME
+           needs MYVAL
+      endobey
+   endaction
+   action OTHER
+      obey needs MYVAL
+           needs TIME
+      endobey
+   endaction
+\end{verbatim} \end{quote} \normalsize
+
+The order in which NEEDS declarations occur specifies the order in 
+which the values are expected on the command-line.
+
+An item of special interest to programmers of instrumentation systems is 
+the value-search-path (VPATH) declaration INTERNAL. An INTERNAL 
+parameter has the following properties which distinguish it from 
+ordinary parameters.
+
+If it is a scalar, it is stored as a variable inside the parameter 
+system. All other parameter values are stored in HDS. This means that 
+access to INTERNAL scalar parameters is much faster than access to 
+ordinary parameters. This property may be of interest to instrumentation 
+applications which make heavy use of the parameter system.
+
+An INTERNAL parameter is not prompted for. All other parameters have an 
+implicit PROMPT at the end of their VPATH declarations unless it is 
+explicitly overridden by NOPROMPT.
+
+The behaviour of PAR\_PUTxx is different for an INTERNAL parameter. 
+Putting an INTERNAL parameter simply puts the given value into the 
+parameter. For an ordinary parameter, the parameter system expects to be 
+told an existing HDS component into which the value should be put.
+
+\section{COMPILING AND LINKING}
+Assuming that \verb%$ ADAMSTART% has been obeyed to start ADAM, type:
+\small \begin{quote} \begin{verbatim}
+$ ADAM_DEV
+\end{verbatim} \end{quote} \normalsize
+This will define logical names for include files such as SAE\_PAR and ACT\_ERR
+and display the message
+``\verb%+ logged in for ADAM program development%''.
+User-code for tasks may now be compiled.
+
+To link instrumentation tasks, type:
+\small \begin{quote} \begin{verbatim}
+$ ILINK task [qual] [*]
+\end{verbatim} \end{quote} \normalsize
+\begin{description}
+\item[task] (mandatory) is the list of user routines, libraries {\em etc.}
+required for input to the linker. Note that the ADAM libraries will be
+included automatically. The executable image produced will take its name from
+the first item specified.
+\item[qual] (optional) is any qualifiers required for the linker ({\em e.g.}
+/DEBUG).
+\item[*] (optional) specify \verb%*% if it is required to link with ADAM object
+libraries rather than the shareable images. Note that the full ADAM release
+must be installed and \verb%$ @ADAM_SYS:SYSDEV% obeyed for this option to
+work. If \verb%*% is specified, \verb%qual% must also be specified (use
+/NODEBUG if nothing else is required).
+\end{description}
+
+\section{FURTHER READING}
+More detailed descriptions of the subjects introduced in this document
+can be found in the following documents.
+\begin{itemize}
+\item SG/4 --- ADAM -- The Starlink Software Environment
+\item SG/5 --- ICL -- The Interactive Command Language for ADAM - Users Guide
+\item SUN/115 --- ADAM --  Interface Module Reference Manual
+\item SUN/104 --- MSG and ERR -- Message and Error Reporting System
+\item AED/15 --- Using the ADAM Parameter System
+\item SUN/114 --- PAR -- ADAM Parameter Routines - Programmer's Guide
+(in preparation)
+\end{itemize}
+
+\appendix
+\newpage
+\section{MAKING TEA AND COFFEE}
+
+\subsection{Making Tea}
+\small \begin{quote} \begin{verbatim}
+interface test_tea
+#  Test tea task
+    parameter param
+        type '_integer'
+        range 1,10
+        vpath 'internal'
+        default 2
+    endparameter
+    action lapsang1
+        obey
+        endobey
+    endaction
+    action lapsang2
+        obey
+        endobey
+    endaction
+    action lapsang3
+        obey
+        endobey
+    endaction
+    action lapsang4
+        obey
+        endobey
+    endaction
+    action lapsang5
+        obey
+        endobey
+    endaction
+endinterface
+
+      SUBROUTINE TEST_TEA (STATUS)
+
+*     Test D-task that is run from a rescheduling control task
+
+      IMPLICIT NONE
+      INTEGER   STATUS          ! Modified STATUS
+ 
+      INCLUDE   'SAE_PAR'
+      INCLUDE   'ADAMDEFNS'
+      INCLUDE   'ACT_ERR'
+ 
+      INTEGER   SEQ             ! Action sequence number
+      INTEGER   CONTEXT         ! Context (OBEY or CANCEL)
+      INTEGER   PARAM           ! Arbitrary integer parameter
+      INTEGER   DELAY           ! Delay between initial and final entries
+      CHARACTER NAME*24         ! Action name
+      CHARACTER VALUE*80        ! Value string
+ 
+      SAVE PARAM                ! Value must be saved
+
+      IF (STATUS .NE. SAI__OK) RETURN
+
+*  Pick up required "ACT parameters"
+
+      CALL TASK_GET_NAME (NAME,STATUS)
+      CALL TASK_GET_CONTEXT (CONTEXT,STATUS)
+      CALL TASK_GET_SEQ (SEQ,STATUS)
+
+*  Loop through possible OBEYs
+ 
+      IF (NAME(1:7) .EQ. 'LAPSANG') THEN
+         IF (SEQ .EQ. 0) THEN
+*         Produce error - undefined parameter on LAPSANG2
+            IF (NAME(8:8) .EQ. '2') THEN
+               CALL PAR_GET0I ('X',PARAM,STATUS)
+               IF (STATUS .NE. SAI__OK) THEN
+                  CALL ERR_REP (' ',
+     :            'TEA: LAPSANG1 Deliberate error - '//
+     :            'No parameter X: ^STATUS', STATUS)
+*               Flush the error messages and allow task to continue
+                  CALL ERR_FLUSH ( STATUS )
+               ENDIF
+
+*         Get parameter value on LAPSANG3
+*         to be used as a count of TRIGGERS
+            ELSE IF (NAME(8:8) .EQ. '3') THEN
+               CALL PAR_GET0I ('PARAM',PARAM,STATUS)
+               IF (STATUS .NE. SAI__OK) THEN
+                  CALL ERR_REP (' ',
+     :            'TEA: LAPSANG3 Failed to get PARAM: ^STATUS',
+     :             STATUS)
+*              Set harmless value for PARAM
+                  PARAM = -1
+                  RETURN
+               ENDIF
+            ENDIF
+            CALL MSG_SETC ('NAME',NAME)
+            CALL MSG_OUT (' ','TEA: Starting ^NAME action',STATUS)
+            DELAY = 1000 * (ICHAR(NAME(8:8)) - ICHAR('0'))
+            CALL TASK_PUT_DELAY (DELAY,STATUS)
+            CALL TASK_PUT_REQUEST ( ACT__WAIT, STATUS )
+         ELSE IF (NAME(8:8) .EQ. '4' .AND. SEQ .LE. PARAM) THEN
+            VALUE = NAME(1:8)//' is paging you ...'
+            CALL TASK_TRIGGER (NAME,VALUE,STATUS)
+            IF (STATUS .NE. SAI__OK) THEN
+               CALL ERR_REP (' ',
+     :         'TEA: LAPSANG4 Failed to trigger control task: ^STATUS',
+     :          STATUS)
+            ENDIF
+            CALL TASK_PUT_DELAY (2000,STATUS)
+            CALL TASK_PUT_REQUEST ( ACT__WAIT, STATUS )
+         ELSE
+            CALL MSG_SETC ('NAME',NAME)
+            CALL MSG_OUT (' ','TEA: Finishing ^NAME action',STATUS)
+            CALL TASK_PUT_VALUE ('Lapsang''s ready!',STATUS)
+         ENDIF
+
+      ENDIF
+      END
+
+
+\end{verbatim} \end{quote} \normalsize
+
+\subsection{Making Coffee}
+\small \begin{quote} \begin{verbatim}
+interface test_coffee
+#  Test coffee task
+    action mocha1
+        obey
+        endobey
+    endaction
+    action mocha2
+        obey
+        endobey
+    endaction
+    action mocha3
+        obey
+        endobey
+    endaction
+    action mocha4
+        obey
+        endobey
+    endaction
+    action mocha5
+        obey
+        endobey
+    endaction
+endinterface
+
+      SUBROUTINE TEST_COFFEE (STATUS)
+
+*     Test D-task that is run from a rescheduling control task
+
+      IMPLICIT NONE
+      INTEGER   STATUS          ! Modified STATUS
+ 
+      INCLUDE   'SAE_PAR'
+      INCLUDE   'ACT_ERR'
+ 
+      INTEGER   SEQ             ! Action sequence number
+      INTEGER   DELAY           ! Delay between initial and final entries
+      CHARACTER NAME*24         ! Action name
+ 
+      IF (STATUS .NE. SAI__OK) RETURN
+
+*  Pick up required "ACT parameters"
+
+      CALL TASK_GET_NAME (NAME,STATUS)
+      CALL TASK_GET_SEQ (SEQ,STATUS)
+
+*  Loop through possible OBEYs
+ 
+      IF (NAME(1:5) .EQ. 'MOCHA') THEN
+         IF (SEQ .EQ. 0) THEN
+            CALL MSG_SETC ('NAME',NAME)
+            CALL MSG_OUT (' ','COFFEE: Starting ^NAME action',STATUS)
+            DELAY = 1000 * (ICHAR(NAME(6:6)) - ICHAR('0'))
+            CALL TASK_PUT_DELAY (DELAY,STATUS)
+            CALL TASK_PUT_REQUEST ( ACT__WAIT, STATUS )
+         ELSE
+            CALL MSG_SETC ('NAME',NAME)
+            CALL MSG_OUT (' ','COFFEE: Finishing ^NAME action',STATUS)
+            CALL TASK_PUT_VALUE ('Mocha''s ready!',STATUS)
+         ENDIF
+      ENDIF
+      END
+
+\end{verbatim} \end{quote} \normalsize
+
+\subsection{Controlling Tea and Coffee Making}
+\small \begin{quote} \begin{verbatim}
+interface test_control
+#  Test control task
+    parameter max
+        type '_integer'
+        range 1,10
+        prompt 'Number of actions'
+        vpath 'prompt'
+        default 1
+    endparameter
+    parameter time
+        type '_integer'
+        range -1,3600
+        prompt 'Timeout in seconds'
+        vpath 'prompt'
+        default 10
+    endparameter
+    action brew
+        obey
+            needs max
+            needs time
+        endobey
+    endaction
+endinterface
+
+      SUBROUTINE TEST_CONTROL (STATUS)
+
+*     Test control task that controls and reschedules multiple actions
+*     in multiple subsidiary tasks
+
+      IMPLICIT NONE
+      INTEGER   STATUS          ! Modified STATUS
+ 
+      INCLUDE   'ADAMDEFNS'
+      INCLUDE   'SAE_PAR'
+      INCLUDE   'MESSYS_ERR'
+      INCLUDE   'ACT_ERR'
+      INCLUDE   'DTASK_ERR'
+ 
+      INTEGER   I               ! Counter
+      INTEGER   MAX             ! Number of TEA/COFFEE actions to start
+      INTEGER   TIME            ! Timeout in seconds
+      INTEGER   SEQ             ! Action sequence number
+      INTEGER   PATH            ! Path to task in which OBEY completed
+      INTEGER   MESSID          ! Message id of OBEY that completed
+      INTEGER   TEA_PATH        ! Path to TEA task
+      INTEGER   TEA_MESSID      ! Message ID of TEA's LAPSANG action
+      INTEGER   TEA_ACTIVE      ! Number of active LAPSANG actions
+      INTEGER   COFFEE_PATH     ! Path to COFFEE task
+      INTEGER   COFFEE_MESSID   ! Message ID of COFFEE's MOCHA action
+      INTEGER   COFFEE_ACTIVE   ! Number of active MOCHA actions
+      INTEGER   CONTEXT         ! Context (OBEY or CANCEL)
+      CHARACTER NAME*24         ! Action name
+      CHARACTER VALUE*200       ! Action returned value
+      CHARACTER INVAL*1         ! Action input value (unused)
+      CHARACTER OUTVAL*1        ! Action output value (unused)
+      INTEGER EVENT             ! Event which caused reschedule
+
+      SAVE TEA_ACTIVE,COFFEE_ACTIVE,TIME ! Retain these values
+ 
+      IF (STATUS .NE. SAI__OK) RETURN
+
+*  Pick up required "ACT parameters"
+
+      CALL TASK_GET_NAME (NAME,STATUS)
+      CALL TASK_GET_SEQ (SEQ,STATUS)
+
+*  Loop through possible OBEYs
+ 
+      IF (NAME .EQ. 'BREW') THEN
+ 
+*  First time through, initiate the actions ...
+ 
+         IF (SEQ .EQ. 0) THEN
+
+*  ... actions LAPSANG1 .. LAPSANG'MAX etc are initiated with a timeout
+*  of TIME seconds ...
+
+            CALL PAR_GET0I ('MAX',MAX,STATUS)
+            CALL PAR_GET0I ('TIME',TIME,STATUS)
+
+*  ... in the tea-maker ...
+
+            TEA_ACTIVE = 0
+            DO I = 1,MAX
+               NAME = 'LAPSANG'//CHAR(48+I)
+               INVAL = ' '
+               CALL TASK_OBEY ('TEST_TEA',NAME,INVAL,
+     :           OUTVAL,TEA_PATH,TEA_MESSID,STATUS)
+               IF (STATUS .EQ. DTASK__ACTSTART) THEN
+                  STATUS = SAI__OK
+                  CALL TASK_ADD_MESSINFO (TEA_PATH,TEA_MESSID,
+     :              STATUS)
+                  TEA_ACTIVE = TEA_ACTIVE + 1
+               ELSE
+                  CALL MSG_SETC ('NAME',NAME)
+                  CALL ERR_REP (' ',
+     :              'CONTROL: Failed to start ^NAME: '//
+     :              '^STATUS',STATUS)
+*              Output reports associated with this failed OBEY
+*              and try next
+                  CALL ERR_FLUSH ( STATUS )
+               ENDIF
+            ENDDO
+
+*  ... and in the coffee-maker ...
+
+            COFFEE_ACTIVE = 0
+            DO I = 1,MAX
+               NAME = 'MOCHA'//CHAR(48+I)
+               INVAL = ' '
+               CALL TASK_OBEY ('TEST_COFFEE',NAME,INVAL,
+     :           OUTVAL,COFFEE_PATH,COFFEE_MESSID,STATUS)
+               IF (STATUS .EQ. DTASK__ACTSTART) THEN
+                  STATUS = SAI__OK
+                  CALL TASK_ADD_MESSINFO (COFFEE_PATH,COFFEE_MESSID,
+     :              STATUS)
+                  COFFEE_ACTIVE = COFFEE_ACTIVE + 1
+               ELSE
+                  CALL MSG_SETC ('NAME',NAME)
+                  CALL ERR_REP (' ',
+     :              'CONTROL: Failed to start ^NAME: '//
+     :              '^STATUS',STATUS)
+*              Output reports associated with this failed OBEY
+*              and try next
+                  CALL ERR_FLUSH ( STATUS )
+               ENDIF
+            ENDDO
+ 
+*  ... and, if OK, set time-out period and set ACT__MESSAGE request.
+ 
+            IF (TEA_ACTIVE .GT. 0 .OR. COFFEE_ACTIVE .GT. 0) THEN
+               IF (TIME .NE. -1) THEN
+                  CALL TASK_PUT_DELAY ( 1000*TIME, STATUS )
+               ENDIF
+               CALL TASK_PUT_REQUEST ( ACT__MESSAGE, STATUS )
+            ENDIF
+ 
+*  On subsequent entries, get the details of the message that has
+*  caused this entry (it should either correspond to a subsidiary
+*  action completion, TRIGGER or a timeout).
+ 
+         ELSE
+            CALL TASK_GET_MESSINFO (PATH,CONTEXT,NAME,VALUE,MESSID,
+     :        EVENT,STATUS)
+
+*  First check for timeout in which case abort the action ...
+
+            IF (EVENT .EQ. MESSYS__RESCHED) THEN
+               CALL MSG_SETI ('TIME',TIME)
+               CALL ERR_REP (' ',
+     :           'CONTROL: Timeout occurred after ^TIME '//
+     :           'seconds',EVENT)
+
+*  ... or check whether this is a triggering message, in which case
+*  simply report and set ACT__MESSAGE request
+
+            ELSE IF (EVENT .EQ. MESSYS__TRIGGER) THEN
+               CALL MSG_SETC ('NAME',NAME)
+               CALL MSG_SETC ('VALUE',VALUE)
+               CALL MSG_OUT (' ',
+     :           'CONTROL: Triggered by ^NAME: ^VALUE',
+     :           STATUS)
+               IF (TIME .NE. -1) THEN
+                 CALL TASK_PUT_DELAY ( 1000*TIME, STATUS )
+               ENDIF
+               CALL TASK_PUT_REQUEST ( ACT__MESSAGE, STATUS )
+
+*  ... or determine which action has completed. Set ACT__MESSAGE request
+*  if more remain. Otherwise the BREW action is complete.
+ 
+            ELSE
+               IF (NAME(1:7) .EQ. 'LAPSANG') THEN
+                  TEA_ACTIVE = TEA_ACTIVE - 1
+               ELSE IF (NAME(1:5) .EQ. 'MOCHA') THEN
+                  COFFEE_ACTIVE = COFFEE_ACTIVE - 1
+               ENDIF
+
+*  Report normal subsidiary action completion ...
+               CALL MSG_SETC ('NAME',NAME)
+               IF (EVENT .EQ. DTASK__ACTCOMPLETE) THEN
+                  CALL MSG_OUT (' ',
+     :            'CONTROL: Action ^NAME completed normally',STATUS)
+*  including VALUE returned.
+                  IF ( VALUE .NE. ' ' ) THEN
+                     CALL MSG_SETC( 'VALUE', VALUE )
+                     CALL MSG_OUT (' ',
+     :               'CONTROL: Value string: ^VALUE', STATUS)
+                  ENDIF                  
+*  or failure ...
+               ELSE
+                  CALL ERR_REP (' ',
+     :            'CONTROL: Action ^NAME completed: ^STATUS',EVENT)
+*  including VALUE returned.
+                  IF ( VALUE .NE. ' ' ) THEN
+                     CALL MSG_SETC( 'VALUE', VALUE )
+                     CALL ERR_REP (' ',
+     :               'CONTROL: Value string: ^VALUE', EVENT)
+                  ENDIF                  
+*  Flush 
+                  CALL ERR_FLUSH ( EVENT )
+               ENDIF
+               IF (TEA_ACTIVE .GT. 0 .OR. COFFEE_ACTIVE .GT. 0) THEN
+                  IF (TIME .NE. -1) THEN
+                     CALL TASK_PUT_DELAY ( 1000*TIME, STATUS )
+                  ENDIF
+                  CALL TASK_PUT_REQUEST ( ACT__MESSAGE, STATUS )
+               ENDIF
+            ENDIF
+         ENDIF
+      ENDIF
+      END
+
+\end{verbatim} \end{quote} \normalsize
+
+\newpage
+\section{CANCELLING IN MULTI-TASK SUBSYSTEMS}
+\label{cmotask}
+This example was provided by Ian Smith (ROE). When the controlling task 
+receives a CANCEL, it sends a CANCEL to the subsidiary task. The 
+controlling task then requests ACT\_\_MESSAGE to wait for the 
+final acknowledgement from the OBEY in the subsidiary task. The final 
+completion status from the subsidiary task is obtained by the 
+controlling task by the call to TASK\_GET\_REASON, irrespective of 
+whether the final completion was due to a CANCEL.
+
+\subsection{Controlling Task}
+\small \begin{quote} \begin{verbatim}
+interface cmotask
+#  Motor task controller
+   parameter motor
+      type '_char'
+      in 'FILTER_WHEEL', 'FOCUS_WHEEL'
+      prompt 'which wheel - FILTER_WHEEL or FOCUS_WHEEL?'
+   endparameter
+   action motor_control
+      obey
+         needs motor
+      endobey
+      cancel
+         needs motor
+      endcancel
+   endaction
+endinterface
+
+      SUBROUTINE CMOTASK( STATUS )
+
+*     Control the task Motask which moves 2 imaginary motors
+
+      IMPLICIT NONE              ! No implicit typing
+
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'ADAMDEFNS'
+      INCLUDE 'MESSYS_ERR'
+      INCLUDE 'ACT_ERR'  
+      INCLUDE 'DTASK_ERR'
+
+      INTEGER STATUS             ! modified status
+      INTEGER CONTEXT            ! context OBEY or CANCEL
+      INTEGER SEQ                ! action sequence number
+      INTEGER GOOD_STATUS        ! local status
+      INTEGER MOTASK_PATH        ! path to subsidiary task
+      INTEGER MOTASK_MESSID      ! message id
+      CHARACTER*80 MOTOR         ! name of motor to be moved
+      CHARACTER*80 INVAL         ! parameter string sent
+      CHARACTER*80 OUTVAL        ! parameter string returned
+      INTEGER REASON             ! subsidiary completion status
+
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+      GOOD_STATUS = SAI__OK
+      CALL TASK_GET_CONTEXT ( CONTEXT, STATUS )
+      IF ( CONTEXT .EQ. OBEY ) THEN
+         CALL TASK_GET_SEQ ( SEQ, STATUS )
+         IF ( SEQ .EQ. 0 ) THEN
+            CALL PAR_GET0C ( 'MOTOR', MOTOR, STATUS )
+            INVAL = ' '
+            CALL TASK_OBEY ( 'MOTASK', MOTOR, INVAL, OUTVAL,
+     :        MOTASK_PATH, MOTASK_MESSID, STATUS )
+            IF ( STATUS .EQ. DTASK__ACTSTART ) THEN
+               STATUS = SAI__OK
+               CALL TASK_ADD_MESSINFO ( MOTASK_PATH, MOTASK_MESSID, 
+     :           STATUS )          
+               CALL TASK_PUT_REQUEST ( ACT__MESSAGE, STATUS )
+            ELSE
+               CALL MSG_SETC ( 'MOTOR', MOTOR )
+               CALL ERR_REP ( ' ', '^MOTOR FAILED', STATUS )
+            END IF
+         ELSE 
+            CALL TASK_GET_REASON ( REASON, STATUS )
+            IF ( REASON .EQ. DTASK__ACTCANCEL ) THEN
+               CALL MSG_OUT ( ' ',
+     :           'CMOTASK: subsidiary task has been cancelled',
+     :           STATUS )
+            ELSE IF ( REASON .NE. DTASK__ACTCOMPLETE ) THEN
+               STATUS = REASON
+               CALL ERR_REP ( ' ',
+     :           'CMOTASK: subsidiary task has returned bad status',
+     :           STATUS )
+            END IF
+         END IF
+      ELSE IF ( CONTEXT .EQ. CANCEL ) THEN
+         CALL TASK_CANCEL ( 'MOTASK', MOTOR, INVAL, OUTVAL, STATUS )
+         IF ( STATUS .EQ. DTASK__ACTCANCEL ) THEN
+            STATUS = SAI__OK
+            CALL TASK_PUT_REQUEST ( ACT__MESSAGE, STATUS )
+         ELSE
+            CALL ERR_REP ( ' ', 'CMOTASK: failure cancelling MOTASK', 
+     :        STATUS )
+         ENDIF
+      END IF
+
+      CALL PAR_CANCL ( 'MOTOR', GOOD_STATUS )
+
+      END
+
+\end{verbatim} \end{quote} \normalsize
+
+\subsection{Controlled Task}
+\small \begin{quote} \begin{verbatim}
+interface motask
+   parameter filter
+      type '_integer'
+      range 1,100
+   endparameter
+   parameter focus
+      type '_integer'
+      range 1,100
+   endparameter
+   action filter_wheel
+      obey
+         needs filter
+      endobey
+      cancel
+      endcancel
+   endaction
+   action focus_wheel
+      obey
+         needs focus
+      endobey
+      cancel
+      endcancel
+   endaction
+endinterface
+
+      SUBROUTINE MOTASK( STATUS )
+
+*     Task to drive 2 dummy motors. One called FILTER_WHEEL
+*     and the other FOCUS. Each invocation requires 1 parameter
+*     relating to requested position but will be used in the call to the
+*     delay routine for a delay of n seconds
+
+      IMPLICIT NONE              ! No implicit typing
+
+      INCLUDE 'SAE_PAR'  
+      INCLUDE 'ACT_ERR'  
+      INCLUDE 'ADAMDEFNS'
+
+      INTEGER STATUS
+      INTEGER CONTEXT
+      INTEGER SEQ
+      INTEGER FILTER
+      INTEGER FOCUS
+      INTEGER PERIOD
+      CHARACTER*(PAR__SZNAM) NAME
+
+      SAVE FILTER
+      SAVE FOCUS
+
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+      CALL TASK_GET_NAME ( NAME, STATUS )
+
+      IF ( NAME .EQ. 'FILTER_WHEEL' ) THEN
+         CALL TASK_GET_CONTEXT ( CONTEXT, STATUS )
+         IF ( CONTEXT .EQ. OBEY ) THEN
+            CALL TASK_GET_SEQ ( SEQ, STATUS )
+            IF ( SEQ .EQ. 0 ) THEN
+               CALL PAR_GET0I ( 'FILTER', FILTER, STATUS )
+               PERIOD = FILTER * 1000
+               CALL MSG_SETI ( 'FILTER', FILTER )
+               CALL MSG_OUT ( ' ', 'moving to filter ^FILTER...', 
+     :           STATUS )
+               CALL TASK_PUT_DELAY ( PERIOD, STATUS )
+               CALL PAR_CANCL ( 'FILTER', STATUS )
+               CALL TASK_PUT_REQUEST ( ACT__WAIT, STATUS )
+            ELSE
+               CALL MSG_SETI ( 'FILTER', FILTER )
+               CALL MSG_OUT( ' ', 'filter position ^FILTER reached',
+     :           STATUS )
+            END IF
+         ELSE IF ( CONTEXT .EQ. CANCEL ) THEN
+            CALL TASK_PUT_REQUEST ( ACT__CANCEL, STATUS )
+         END IF
+      ELSE IF ( NAME .EQ. 'FOCUS_WHEEL' ) THEN
+         CALL TASK_GET_CONTEXT ( CONTEXT, STATUS )
+         IF ( CONTEXT .EQ. OBEY ) THEN
+            CALL TASK_GET_SEQ ( SEQ, STATUS )
+            IF ( SEQ .EQ. 0 ) THEN
+               CALL PAR_GET0I ( 'FOCUS', FOCUS, STATUS )
+               PERIOD = FOCUS * 1000
+               CALL MSG_SETI ( 'FOCUS', FOCUS )
+               CALL MSG_OUT ( ' ', 'moving to focus ^FOCUS...', STATUS )
+               CALL TASK_PUT_DELAY ( PERIOD, STATUS )
+               CALL PAR_CANCL ( 'FOCUS', STATUS )
+               CALL TASK_PUT_REQUEST ( ACT__WAIT, STATUS )
+            ELSE
+               CALL MSG_SETI ( 'FOCUS', FOCUS )
+               CALL MSG_OUT ( ' ', 'focus position ^FOCUS reached',
+     :           STATUS)
+            END IF
+         ELSE IF ( CONTEXT .EQ. CANCEL ) THEN
+            CALL TASK_PUT_REQUEST ( ACT__CANCEL, STATUS )
+         END IF
+      END IF
+      END
+\end{verbatim} \end{quote} \normalsize
+
+\newpage
+\section{FOR ``OLD'' PROGRAMMERS}
+\label{old}
+\subsection{Introduction to the Changes}
+C-tasks, CD-tasks and D-tasks are now ``unfashionable'', but are supported
+for the time being. That is, all existing ADAM tasks should continue to 
+behave as they did under ADAM V1, except for the following two features. 
+
+Firstly, an OBEY to a task will no longer be rejected on the grounds 
+that its NEEDS list is not satisfied. See section \ref{needs} for more details.
+
+Secondly, the VALUE string is only guaranteed to contain the parameter 
+string for the OBEY on first entry to ACT. If the action is 
+rescheduling, the VALUE string will not have retained the parameter 
+string for subsequent entries.
+
+Note that D-tasks are now free to use ERR and MSG and to send messages
+to other tasks whenever they feel like it (except inside AST routines!).
+
+The characteristics of the new-style ``instrumentation" tasks are as 
+follows:
+\begin{itemize}
+\item The arguments previously passed in the call to CD-tasks and D-tasks, 
+{\em ie.} CONTEXT, NAME, SEQ, VALUE and RETVAL are now accessed by calls to the
+TASK routines. 
+\item The DTASK library is being phased-out as far as applications are 
+concerned. The DTASK\_ calls are replaced by TASK\_ calls.
+\item The syntax of the interface file remains unchanged.
+\end{itemize}
+The following sections list all the changes.
+
+\subsection{Linking Old-style Tasks}
+Old-style D-tasks and CD-tasks may still be linked using DLINK and CDLINK.
+After re-linking they will use the new fixed-part and exhibit the new
+behaviour, particularly the improved error reporting. Furthermore, future 
+changes to the fixed-part will be incorporated automatically via a shareable 
+image.
+
+DLINK and CDLINK have the same parameters as ILINK. Procedures DNOSHR and
+CDNOSHR are withdrawn.
+
+\subsection{NEEDS List Checking}
+\label{needs}
+The fixed-part will no longer reject an OBEY or CANCEL on the grounds 
+that the parameters specified on the NEEDS list do not have suitable 
+values.
+The only significance of NEEDS lists in ADAM V2 is to specify the order of any
+command-line parameters -- NEEDS constraints no longer have any effect.
+
+\subsection{DTASK\_RPON and DTASK\_RPOFF}
+These no longer do anything. The fixed-part automatically enables 
+reporting back to whatever process issued the GET/SET/OBEY/CANCEL 
+currently under way.
+
+\subsection{DTASK\_ASTSIGNAL and DTASK\_TSTINTFLG}
+These routines are being phased-out. TASK\_ASTSIGNAL 
+and TASK\_TSTINTFLG, which have the same arguments and functionality, should
+be used instead.
+The DTASK\_ calls will continue to work for the time being.
+
+\subsection{TASK\_ASTMSG ( NAME, LENGTH, VALUE, STATUS )}
+This is a new routine, similar in function to TASK\_ASTSIGNAL, but 
+allowing a message of length LENGTH to be passed in the character string 
+VALUE. When the main-line code is rescheduled it can extract the message 
+from VALUE.
+
+\subsection{Multiple Calls to TASK\_ASTSIGNAL, TASK\_ASTMSG}
+It is now possible for an AST handler to make 
+multiple calls to TASK\_ASTSIGNAL and TASK\_ASTMSG during a single execution.
+The information carried in the call is now sent as a message (rather than 
+entered in a COMMON block) and so the last call does not overwrite the earlier
+ones.
+
+\subsection{AST Enabling and Disabling}
+The DTASK fixed-part no longer re-enables ASTs, and the various AST 
+events (timed reschedules and AST reschedules) no longer disable ASTs. 
+This means that execution of outstanding AST handlers is no longer 
+delayed while the main-line code tidies-up from earlier events.
+
+\subsection{Message Reschedules}
+The TASK library makes it possible for a task to send an OBEY to 
+another task, and then request the fixed-part to reschedule this action 
+on receipt of the final acknowledgement from the other task. The 
+fixed-part automatically handles message forwarding from the other task.
+
+\subsection{Timeout on AST and Message Reschedules}
+If the application sets RETVAL and then returns with STATUS requesting 
+an AST or message reschedule, the fixed-part will also set a timed 
+reschedule for the time indicated in RETVAL. If the AST or message event 
+happens first, the timer is cancelled. Implications of this are that if 
+the application has been ``accidentally" setting RETVAL in the past, it 
+will now set up a timer, and alternatively, if a single action has been
+managing to set up multiple timers for itself, it will now only be able
+to have one outstanding at any one time. 
+
+\subsection{Closing Down the Parameter System -- Global Associations}
+The parameter system does not close-down when an instrumentation task
+action completes. This means that parameters retain their values and
+remain ``active", rather than being returned to the ``ground" state.
+{\em It also means that instrumentation tasks never write global
+associations.}
+This behaviour is similar to the behaviour for D-tasks, but unlike the 
+behaviour for CD-tasks.
+
+\newpage
+\section{List of TASK Routines}
+The ``action keyword'' is the name by which a task's action is known in 
+the world outside that task. The ``action name'' is the name by which the 
+action is known to the application code inside that task. These names 
+are defined in the interface file. The action keyword defaults to the 
+action name if it is not otherwise specified.
+
+There is a similar distinction between parameter keywords and parameter
+names.
+\small
+\begin{center}
+\begin{tabular}{ll}
+ACTKEY=CHARACTER*(PAR\_\_SZNAM)   &  action keyword \\
+ACTNAME=CHARACTER*(PAR\_\_SZNAM)  &  action name \\
+CONTEXT=INTEGER                  &  symbol for GET, SET, OBEY \\
+                                 &  or CANCEL \\
+CONTEXTNAME=CHARACTER*(*)        &  string for 'GET', 'SET' etc. \\
+DELAY=INTEGER                    &  requested delay time in millisecond \\
+EVENT=INTEGER                    &  received message status \\
+INVAL=CHARACTER*(MSG\_VAL\_LEN)  &  a received value string \\
+LENGTH=INTEGER                   &  number of bytes in VALUE \\
+MAXVALS=INTEGER                  &  maximum number of values \\
+MESSID=INTEGER                   &  transaction number \\
+NAMECODE=INTEGER                 &  parameter system code-number for the \\
+                                 &  action \\
+NVALS=INTEGER                    &  actual number of values \\
+OUTVAL=CHARACTER*(MSG\_VAL\_LEN) &  a sent value string \\
+PARKEY=CHARACTER*(PAR\_\_SZNAM)   &  parameter keyword \\
+PATH=INTEGER                     &  path identifier to another task \\
+REASON=INTEGER                   &  symbol giving reason for reschedule \\
+REQUEST=INTEGER                  &  symbol requesting reschedules \\
+RESULT=LOGICAL                   &  .TRUE. implies an AST has occurred \\
+SEQ=INTEGER                      &  sequence number \\
+STATUS=INTEGER                   &  status \\
+STRINGS(*)=CHARACTER*(*)         &  array of character strings \\
+TASK\_NAME=CHARACTER*(PAR\_\_SZNAM) & name of another task \\
+TIMEOUT=INTEGER                  &  timeout in milliseconds, -1 = infinite \\
+VALUE=CHARACTER*(MSG\_VAL\_LEN)  &  value string \\
+\end{tabular}
+\end{center}
+\normalsize
+
+\begin{verbatim}
+*  Add to the list of active subsidiary actions for an action
+CALL TASK_ADD_MESSINFO ( PATH, MESSID, STATUS )
+Given : PATH, MESSID
+Given and returned : STATUS
+
+*  Used in application AST routine to signal to main-line code
+CALL TASK_ASTMSG ( ACTNAME, LENGTH, VALUE, STATUS )
+Given : ACTNAME, LENGTH, VALUE
+Given and returned : STATUS
+
+*  Used in application AST routine to signal to main-line code
+CALL TASK_ASTSIGNAL ( ACTNAME, STATUS )
+Given : ACTNAME
+Given and returned : STATUS
+\end{verbatim}
+\newpage
+\begin{verbatim}
+*  Request a task to cancel an action
+CALL TASK_CANCEL ( TASK_NAME, ACTKEY, INVAL, OUTVAL, STATUS )
+Given : TASK_NAME, ACTKEY, INVAL
+Given and returned : STATUS
+Returned : OUTVAL
+
+*  Concatenate an array of strings into an argument list
+CALL TASK_CNCAT ( NVALS, STRINGS, VALUE, STATUS )
+Given : NVALS, STRINGS
+Given and returned : STATUS
+Returned : VALUE
+
+*  Wait for final acknowledgement from task
+CALL TASK_DONE ( TIMEOUT, PATH, MESSID, OUTVAL, STATUS )
+Given : TIMEOUT, PATH, MESSID
+Given and returned : STATUS (Returns the status associated with the final
+                     acknowledgement message from the task.)
+Returned : OUTVAL
+
+*  Get a parameter value from a task
+CALL TASK_GET ( TASK_NAME, PARKEY, OUTVAL, STATUS )
+Given : TASK_NAME, PARKEY
+Given and returned : STATUS
+Returned : OUTVAL
+
+*  Get current action context
+CALL TASK_GET_CONTEXT ( CONTEXT, STATUS)
+Given and returned : STATUS
+Returned : CONTEXT
+
+*  Get current action context name
+CALL TASK_GET_CONTEXTNAME ( CONTEXTNAME, STATUS)
+Given and returned : STATUS
+Returned : CONTEXTNAME
+
+*  Get details of message which forced reschedule
+CALL TASK_GET_MESSINFO ( PATH, CONTEXT, ACTKEY, VALUE, MESSID, EVENT, STATUS)
+Given and returned STATUS
+Returned : PATH, CONTEXT, ACTKEY, VALUE, MESSID, EVENT
+
+*  Get current action name
+CALL TASK_GET_NAME ( ACTNAME, STATUS)
+Given and returned : STATUS
+Returned : ACTNAME
+\end{verbatim}
+\newpage
+\begin{verbatim}
+*  Get parameter system code for current action name
+CALL TASK_GET_NAMECODE ( NAMECODE, STATUS)
+Given and returned : STATUS
+Returned : NAMECODE
+
+*  Get reason for current reschedule
+CALL TASK_GET_REASON ( REASON, STATUS )
+Given and returned : STATUS
+Returned : REASON
+
+*  Get current action sequence number
+CALL TASK_GET_SEQ ( SEQ, STATUS)
+Given and returned : STATUS
+Returned : SEQ
+
+*  Get value string for current action
+CALL TASK_GET_VALUE ( VALUE, STATUS )
+Given and returned : STATUS
+Returned : VALUE
+
+*  Signal another action to reschedule
+CALL TASK_KICK ( ACTNAME, LENGTH, VALUE, STATUS )
+Given : ACTNAME, LENGTH, VALUE
+Given and returned : STATUS
+
+*  Send an OBEY to a task
+CALL TASK_OBEY ( TASK_NAME, ACTKEY, INVAL, OUTVAL, PATH, MESSID, STATUS )
+Given : TASK_NAME, ACTKEY, INVAL
+Given and returned : STATUS (Returns the status associated with the initial
+                     acknowledgement message from the task.)
+Returned : OUTVAL, PATH, MESSID
+
+*  Set delay before next entry for current action
+CALL TASK_PUT_DELAY ( DELAY, STATUS )
+Given : DELAY
+Given and returned : STATUS
+
+*  Request the action to be rescheduled on certain events
+CALL TASK_PUT_REQUEST ( REQUEST, STATUS )
+Given : REQUEST
+Given and returned : STATUS
+
+*  Set current action sequence number
+CALL TASK_PUT_SEQ ( SEQ, STATUS )
+Given : SEQ
+Given and returned : STATUS
+\end{verbatim}
+\newpage
+\begin{verbatim}
+*  Set value string for current action
+CALL TASK_PUT_VALUE ( VALUE, STATUS )
+Given : VALUE
+Given and returned : STATUS
+
+*  Set a parameter value in a task
+CALL TASK_SET (TASK_NAME, PARKEY, INVAL, STATUS )
+Given : TASK_NAME, PARKEY, INVAL
+Given and returned : STATUS
+
+*  Split an argument list into an array of strings
+CALL TASK_SPLIT ( VALUE, MAXVALS, NVALS, STRINGS, STATUS )
+Given : VALUE, MAXVALS
+Given and returned : STATUS
+Returned : NVALS, STRINGS
+
+*  Return a triggering message to the controlling task
+CALL TASK_TRIGGER ( ACTNAME, VALUE, STATUS )
+Given : ACTNAME, VALUE
+Given and returned : STATUS
+
+*  Test interrupt flag
+CALL TASK_TSTINTFLG ( RESULT, STATUS )
+Given and returned : STATUS
+Returned : RESULT
+\end{verbatim}
+
+The following generic string-handling routines are provided to help in 
+building or interpreting VALUE strings. Each TASK\_xxx$<$T$>$ routine 
+represents the set of calls TASK\_xxxC, TASK\_xxxD, TASK\_xxxI, TASK\_xxxL, 
+and TASK\_xxxR.
+
+\small
+\begin{center}
+\begin{tabular}{ll}
+NDIMS=INTEGER            &    number of dimensions \\
+DIMS(*)=INTEGER          &    sizes of dimensions \\
+NMAXDIMS=INTEGER         &    maximum number of dimensions \\
+MAXDIMS(*)=INTEGER       &    maximum sizes of dimensions \\
+STRING=CHARACTER*(*)     &    string being built or interpreted \\
+$<$T$>$VAL=$<$TYPE$>$    &    value being converted \\
+$<$T$>$VALS()=$<$TYPE$>$ &    array being converted \\
+STATUS=INTEGER           &    status \\
+\end{tabular}
+\end{center}
+\normalsize
+
+\begin{verbatim}
+*  Decode a character string as a value
+CALL TASK_DEC0<T> ( STRING, <T>VAL, STATUS )
+Given : STRING
+Given and returned : STATUS
+Returned : <T>VAL
+\end{verbatim}
+\newpage
+\begin{verbatim}
+*  Decode a character string as a vector
+CALL TASK_DEC1<T> ( STRING, MAXVALS, NVALS, <T>VALS, STATUS )
+Given : STRING, MAXVALS
+Given and returned : STATUS
+Returned : NVALS, <T>VALS
+
+*  Decode a character string as an array
+CALL TASK_DECN<T> ( STRING, NMAXDIMS, MAXDIMS, NDIMS, DIMS, <T>VALS, STATUS )
+Given : STRING, NMAXDIMS, MAXDIMS
+Given and returned : STATUS
+Returned : NDIMS, DIMS, <T>VALS
+
+*  Encode a value as a character string
+CALL TASK_ENC0<T> ( <T>VAL, STRING, STATUS )
+Given : <T>VAL
+Given and returned : STATUS
+Returned : STRING
+
+*  Encode a vector as a character string
+CALL TASK_ENC1<T> ( NVALS, <T>VALS, STRING, STATUS )
+Given : NVALS, <T>VALS
+Given and returned : STATUS
+Returned : STRING
+
+*  Encode an array as a character string
+CALL TASK_ENCN<T> ( NDIMS, DIMS, <T>VALS, STRING, STATUS )
+Given : NDIMS, DIMS, <T>VALS
+Given and returned : STATUS
+Returned : STRING
+\end{verbatim}
+
+The following three generic routines are provided for compatibility with 
+earlier ADAM releases. New applications should use the TASK\_ENC calls 
+instead.
+
+\begin{verbatim}
+CALL TASK_VAL0<T> ( <T>VAL, STRING, STATUS )
+CALL TASK_VAL1<T> ( NVALS, <T>VALS, STRING, STATUS )
+CALL TASK_VALN<T> ( NDIMS, DIMS, <T>VALS, STRING, STATUS )
+\end{verbatim}
+
+\newpage
+\section{REQUEST constants}
+
+The values your application can set using TASK\_PUT\_REQUEST to instruct
+the fixed-part are 
+
+\begin{center}
+\begin{tabular}{ll}
+ACT\_\_ASTINT   &   requests reschedule on AST receipt, with optional timer \\
+ACT\_\_CANCEL   &   signifies the action has completed due to a CANCEL \\
+ACT\_\_MESSAGE  &   requests reschedule on message receipt, optional timer \\
+ACT\_\_STAGE    &   requests an immediate (10msec) timed reschedule \\
+ACT\_\_WAIT     &   requests a timed reschedule \\
+\end{tabular}
+\end{center}
+
+The following ACT\_\_ constants also exist for upwards compatibility 
+with ADAM Version 1.
+\begin{center}
+\begin{tabular}{ll}
+ACT\_\_END      &   signifies the action has completed successfully \\
+ACT\_\_EXIT     &   *** for U-task writers ONLY *** \\
+ACT\_\_INFORM   &   signifies the action has completed with an error \\
+ACT\_\_UNIMP    &   the requested action is not implemented \\
+\end{tabular}
+\end{center}
+
+The fixed-part only acts on the REQUEST if your task returns a status of 
+SAI\_\_OK. Any other status returned, for example an error status of
+some sort, causes the action to be closed down. The error status is
+returned to the task which issued the original OBEY. Note that
+SS\$\_NORMAL is not recognised as an OK status, and will be reported as 
+an error.
+
+\section{Important STATUS Values}
+
+The inquiry routines
+TASK\_GET\_REASON and TASK\_GET\_MESSINFO return a value in one of two groups. 
+The first group concerns reschedules caused by events in this task.
+
+\begin{center}
+\begin{tabular}{ll}
+MESSYS\_\_RESCHED  & a timer has expired \\
+MESSYS\_\_ASTINT   & an AST routine has been obeyed \\
+MESSYS\_\_KICK     & the action has been `kicked' \\
+\end{tabular}
+\end{center}
+
+The second group concerns messages received from a subsidiary task.
+
+\begin{center}
+\begin{tabular}{ll}
+MESSYS\_\_TRIGGER    &  a trigger message has arrived, the subsidiary action \\
+                     &  continues \\
+DTASK\_\_ACTCOMPLETE &  the subsidiary action completed successfully \\
+DTASK\_\_ACTINFORM   &  the subsidiary action completed with an error \\
+DTASK\_\_ACTCANCEL   &  the subsidiary action was cancelled \\
+DTASK\_\_IVACTSTAT   &  the subsidiary action completed with an illegal 
+REQUEST \\
+\end{tabular}
+\end{center}
+
+In addition, the value can be any error status returned by the action 
+in the subsidiary task.
+
+\section{Document Changes}
+There is a correction to the example CMOTASK in Appendix \ref{cmotask} and some
+re-wording of Appendix \ref{old}.
+
+\end{document}

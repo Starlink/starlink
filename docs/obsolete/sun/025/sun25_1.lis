@@ -1,0 +1,57 @@
+
+
+
+SCIENCE AND ENGINEERING RESEARCH COUNCIL                      SUN/25.1
+RUTHERFORD APPLETON LABORATORY
+SPACE & ASTROPHYSICS DIVISION
+
+Starlink Project                                             Issued by
+Starlink User Note 25.1
+
+                                                             S E Black
+                                                          22 June 1987
+
+----------------------------------------------------------------------
+
+                       LZCMP - File compression
+                       ------------------------
+
+
+LZCMP implements the Lempel-Ziv  file  compression  algorithm.   Files
+compressed  by  LZCMP are decompressed using LZDCMP.  The source files
+contain documentation commented out at the beginning of the  code  for
+those curious about the programs' operation.
+
+To use LZCMP and LZDCM, define them as DCL foreign  symbols.   At  RAL
+they are defined as:
+
+         $ LZCMP:== $ UTILITYDIR:LZCMP
+
+         $ LZDCM:== $ UTILITYDIR:LZDCM
+
+To compress a file use the command:
+
+         $ LZCMP -v inputfile.typ compressedfile.typ
+
+or to decompress use the command:
+
+         $ LZDCM compressedfile.typ decompressedfile.typ
+
+
+The -v switch for LZCMP is the "verbose" switch so that when LZCMP  is
+completed  it  will  report what it did.  The default operation on VMS
+preserves file attributes in the compressed file.
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 1 -

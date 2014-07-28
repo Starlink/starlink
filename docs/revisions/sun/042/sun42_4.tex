@@ -1,0 +1,255 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {42.4}
+\newcommand{\stardocauthors}   {Nicholas Eaton}
+\newcommand{\stardocdate}      {21 January 1992}
+\newcommand{\stardoctitle}     {DAOPHOT --- Stellar Photometry Package}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+%  \setlength{\parskip}{0mm}
+%  \tableofcontents
+%  \setlength{\parskip}{\medskipamount}
+%  \markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\section{Introduction}
+
+DAOPHOT is a stellar photometry package designed to deal with crowded fields.
+and written by Peter Stetson at DAO,
+The package performs various tasks including finding objects, aperture
+photometry, obtaining the point-spread function, and profile-fitting photometry.
+Profile fitting in crowded regions is performed iteratively which improves the
+accuracy of the photometry.
+
+This document is an introduction to DAOPHOT II: The Next Generation. It
+replaces the previous version which is known as DAOPHOT Classic. The main
+changes concern the choice of the point-spread fitting function and the
+handling of undersampled data. This version uses image data written in the
+Starlink N-Dimensional Data Format (NDF).
+
+Reference [1] gives the background to the algorithms used by DAOPHOT. A user
+guide is also available through Starlink.
+
+DAOPHOT does not directly use an image display, which is one of the
+reasons why the package has been successfully ported round the world.
+Three additional routines have therefore been supplied which allow results
+obtained with DAOPHOT to be displayed on an image device.
+
+The routine DAOGREY will display a grey scale image of the data on a suitable
+device. DAOPLOT will indicate the positions of objects found with DAOPHOT on
+top of the grey image. DAOCURS will put up a cursor on the display to allow
+positions to be measured from the screen. Although KAPPA routines could be used
+for the image display and cursor interaction, DAOPHOT does not comply with the
+Starlink coordinate system convention (SSN/22) and thus any coordinates would
+be half a pixel out.
+
+DAOPHOT is copyright of Peter Stetson at the Dominion Astrophysical Observatory.
+The algorithms should not be changed without permission.
+
+\section{Running DAOPHOT}
+
+DAOPHOT is invoked by the simple command
+\begin{verbatim}
+        $ DAOPHOT
+\end{verbatim}
+DAOPHOT is a single executable image, and so once invoked the user remains
+within DAOPHOT until the command
+\begin{verbatim}
+        Command: EXIT
+\end{verbatim}
+is given. Control will then return to the environment. The data to be analysed
+is made known to DAOPHOT using the command
+\begin{verbatim}
+        Command: ATTACH <filename>
+\end{verbatim}
+The file has to be in the NDF format of the Starlink Standard Data Structures,
+reference [2]. The default file extension is .SDF.
+
+At present DAOPHOT can only handle NDF files that have the DATA\_ARRAY
+structure at the top level. If the program fails to find the data structure in
+the container file, then the message
+\begin{verbatim}
+        Failed to attach <filename>
+\end{verbatim}
+will be displayed. If you do not expect this message, then this is the moment
+to seek help. If you do not get this message, then you can carry on with
+DAOPHOT.
+
+The complete set of DAOPHOT commands can be found in the user manual.
+
+There are three options files which are used by DAOPHOT at various stages of
+the reduction. There are examples of these in the DAO2\_DIR directory. The file
+DAOPHOT.OPT is used when the program starts up. Parameter definitions can be
+added or removed from the options file as required. An option is specified
+using a two letter mnemonic followed by its value. If a copy of this file is
+not present in the default directory, or the parameters have invalid values,
+then the program will prompt for those parameters that it cannot continue
+without, namely the  read-out noise and the gain. This is signified by the
+message
+\begin{verbatim}
+        Value unacceptable --- please re-enter
+\end{verbatim}
+followed by the parameter prompt. The user has to give values for the read-out
+noise and gain before the program will continue. Both parameters are used at
+various stages of processing and the user guide keeps stressing that it is
+highly advisable to have the most accurate values as possible for these
+parameters. Although the program will execute with guesstimates for these, the
+results should be treated with caution. The sections on the {\bf PEAK} and {\bf
+NSTAR} commands in the user guide suggest a method of checking the validity of
+the values given.
+
+The file PHOTO.OPT contains the list of aperture radii used by DAOPHOT when
+performing aperture photometry.
+
+An alternative to the iterative profile fitting routine NSTAR in DAOPHOT has
+been written by Peter Stetson and is called ALLSTAR. It is described in the
+user manual and can be executed by typing
+\begin{verbatim}
+        $ ALLSTAR
+\end{verbatim}
+The file ALLSTAR.OPT contains parameters for this program.
+\section{DAOGREY}
+
+DAOPHOT does not directly use an image display, instead it produces image files
+of intermediate results which can be displayed on any available display system.
+It is often desirable to indicate the positions of stars on top of the displayed
+image. To achieve this some special routines have been created.
+
+DAOGREY is the first of these routines and this will display the image data on
+a suitable device.
+DAOGREY, DAOPLOT and DAOCURS use the ADAM parameter system and therefore the
+command
+\begin{verbatim}
+        $ ADAMSTART
+\end{verbatim}
+has to be given first.
+DAOGREY is executed by typing
+\begin{verbatim}
+        $ DAOGREY
+\end{verbatim}
+The following parameters are requested:
+\begin{description}
+\begin{description}
+\item[IMAGE] :
+The name of the file containing the image data.
+\item[XSTART, XEND, YSTART, YEND] :
+These specify the limits in pixel coordinates of the area of the data array to
+be plotted.
+The choice of values allows subsections of the data to be viewed.
+\item[LOW, HIGH] :
+These specify the data values corresponding to black and white on the display.
+The grey levels in between are set automatically.
+\item[DEVICE] :
+The name of the display device to be used.
+The image is plotted in the centre of the display, best filling the display
+area.
+\end{description}
+\end{description}
+
+\section{DAOPLOT}
+
+DAOPLOT will take a file produced by DAOPHOT and overlay the positions
+of objects in the file on top of the grey image produced by DAOGREY.
+The positions are indicated by a green cross.
+The file can be any of the types .COO, .AP, .GRP or .NST produced by
+DAOPHOT.
+If the file is not suitable then error messages will be given and the routine
+will end.
+If the filename was entered wrongly, then just run the task again.
+
+To run DAOPLOT type
+\begin{verbatim}
+        $ DAOPLOT
+\end{verbatim}
+The following parameter is requested:
+\begin{description}
+\begin{description}
+\item[PFILE] :
+The name of the file containing the positions of the objects to be indicated.
+The filename and extension should be given.
+\end{description}
+\end{description}
+
+\section{DAOCURS}
+
+DAOCURS will display a cursor over the grey image produced by DAOGREY so that
+positions can be read off the screen.
+The cursor is positioned with the mouse and the position recorded
+by pressing any of the keys, except the break key on the mouse.
+The break key ends the cursor session.
+Positions are written to the terminal as well as a file.
+
+To run DAOCURS type
+\begin{verbatim}
+        $ DAOCURS
+\end{verbatim}
+The following parameter is requested:
+\begin{description}
+\begin{description}
+\item[RFILE] :
+The name of the file to receive the positions selected by the cursor operation.
+\end{description}
+\end{description}
+
+\section{Database}
+
+DAOGREY, DAOPLOT and DAOCURS have been specially tailored round each other.
+DAOPLOT and DAOCURS will not at present work on an image displayed with any
+other routine than DAOGREY\. DAOGREY uses the AGI database system to record the
+position of the image on the screen. DAOPLOT and DAOCURS use the database file
+to set up the screen coordinates. When an entire session has been completed the
+database file can be deleted.
+
+\section{References}
+
+1 --- Stetson, P.B., 1987, DAOPHOT: A computer program for crowded-field
+stellar photometry, \\
+\hspace*{2.0em} Publ.astr.Soc.Pacific, {\bf 99}, 191-222.
+
+2 --- SUN/33: NDF - A Subroutine Library for Accessing NDF Data Structures.
+
+3 --- SUN/48: AGI - Applications Graphics Interface Programmers Guide.
+
+4 --- SSN/22: Coordinate Systems for Pixel Arrays.
+
+\end{document}

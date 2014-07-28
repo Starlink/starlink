@@ -1,0 +1,209 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {170.1}
+\newcommand{\stardocauthors}   {C A Clayton}
+\newcommand{\stardocdate}      {1 June 1993}
+\newcommand{\stardoctitle}     {Editors and Mail on Unix}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+\section{Introduction}
+
+The purpose of this document is to give new Unix users some advice on how
+to choose which editor and which mail utility to use on Unix machines.
+Under VMS the choice is simple; virtually everyone uses TPU or EDT as
+his or her editor and there is only one MAIL utility. Under Unix the default
+editor and mail utilities are considered to be unfriendly and many users prefer
+to use other more sophisticated alternatives. However, many such alternatives
+exist; there is not one single editor or mail utility that everyone 
+uses and hence each user must decide for himself or herself which to adopt. 
+
+
+\section{Editors}
+
+In this section I point out some pros and cons of each editor to help you
+choose for yourself which you should adopt. When Starlink started the move to
+Unix, we recommended that users use either \verb|vi| or \verb|emacs|, mainly
+since these editors are very widely available (SGP/7).
+We considered \verb|vi| adequate
+for the average user with \verb|emacs| as an option for those who needed 
+something friendlier and could cope with the greater
+sophistication. However, this advice was not popular with all users. Some felt
+that \verb|vi| was just too unfriendly 
+and \verb|emacs| too complex. Our original recommendation still
+stands, but I am also including here information on other editor options.
+
+\subsection{vi}
+
+\subsubsection*{Pros}
+
+\begin{itemize}
+\item used by lots of people
+\item will be available on every Unix machine you encounter, anywhere
+\item works with any keyboard since it only uses standard {\tt qwerty} keys
+and not the keypad
+\item no cost (in terms of software support and installation)
+\item fast
+\end{itemize}
+
+\subsubsection*{Cons}
+
+\begin{itemize}
+\item unfriendly
+\item not as powerful as some of the other editors
+\end{itemize}
+
+
+\subsection{emacs}
+
+\subsubsection*{Pros}
+
+\begin{itemize}
+\item very powerful editor
+\item available for most Unix platforms but sites must build and 
+install it themselves
+\item free and readily available
+\item works with any keyboard since it only uses standard {\tt qwerty} keys
+and not the keypad (unless you choose to configure it to do so)
+\item available on non--Unix platforms (e.g. VMS and MS--DOS)
+\end{itemize}
+
+\subsubsection*{Cons}
+\begin{itemize}
+\item not necessarily available on every Unix machine you will meet
+\item too complex for some users
+\end{itemize}
+
+\subsection{TPU (EDT) emulators}
+
+\subsubsection*{Pros}
+
+\begin{itemize}
+\item easiest transition from VMS to Unix
+\end{itemize}
+
+\subsubsection*{Cons}
+
+\begin{itemize}
+\item costs money
+\item emulation problems on some keyboards
+\item you are {\bf very} unlikely to find a TPU emulator on non-Starlink machines
+\item you {\bf cannot} take a copy of a TPU emulator with you to non-Starlink sites
+\end{itemize}
+
+\subsection{jed (see SUN/168) (and other public domain editors)}
+
+\subsubsection*{Pros}
+
+\begin{itemize}
+\item can emulate EDT incompletely but quite usably
+\item is free
+\item you {\bf can} take a copy of \verb|jed| with you when you leave Starlink
+\item available on non-Unix platforms (e.g. VMS and MS--DOS)
+\end{itemize}
+
+\subsubsection*{Cons}
+\begin{itemize}
+\item is less ubiquitous than \verb|vi| or \verb|emacs|
+\item EDT emulation is not perfect (e.g. no highlight on cut/paste)
+\end{itemize}
+
+
+\subsection{X--windows based editors}
+
+\subsubsection*{Pros}
+
+\begin{itemize}
+\item some users find this type of editor easy to use
+\end{itemize}
+
+\subsubsection*{Cons}
+\begin{itemize}
+\item use limited to an X--display
+\item X--based editors are not part of Unix and thus can vary
+enormously between different machine types. Hence you will probably 
+have to learn several different X--editors if you wish to use all 
+types of Starlink Unix machine.
+\end{itemize}
+
+
+
+
+\section{Mail utility}
+
+The default mail utility in Unix is adequate but unfriendly. Hence, many users
+prefer to use one of many freely available public-domain alternatives. As
+with editors, different users prefer different mailers and there is no outright
+leader in the field. After consultation with users and site managers, we have
+decided to recommend a public-domain mailer called \verb|pine|.
+This decision is not the result of a detailed evaluation of many different
+mailers; whichever mailer we select for whatever reasons, it will be considered
+the wrong choice by some people. We are picking \verb|pine|  partly because
+users seem to like it and it is easy to use, but mostly because we  must
+standardize on a single mailer to help new users.
+
+\verb|pine| is a mailer designed specifically for ease-of-use with
+the Unix novice in mind. For example, it has a high-tolerance of user mistakes
+and always-present command menus. It is considered that \verb|pine| can be
+learned by exploration rather than reading manuals, although \verb|pine| is in
+fact fully documented (SUN/169).
+
+Attractive features include:
+
+\begin{itemize}
+
+\item mail index showing a message summary which includes the status, sender,
+size, date and subjects of messages
+
+\item address book for saving long, complex addresses and personal 
+distribution lists under a nickname
+
+\item multiple folders and folder management screen for filing messages
+
+\item message composer with easy-to-use editor and spelling checker
+
+\item on--line help specific to each screen and context
+
+\end{itemize}
+
+\verb|pine| should be available on all Starlink Unix machines. If it is not, see your
+Site Manager. 
+
+\end{document}

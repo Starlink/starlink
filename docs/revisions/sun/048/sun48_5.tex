@@ -1,0 +1,3863 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {48.5}
+\newcommand{\stardocauthors}   {Nicholas Eaton}
+\newcommand{\stardocdate}      {25 September 1992}
+\newcommand{\stardoctitle}     {AGI --- Applications Graphics Interface\\[2.5ex]
+                                A Subroutine Library for Accessing the\\
+                                Graphics Database}
+\newcommand{\stardocversion}   {Version 1.4}
+\newcommand{\stardocmanual}    {Programmer's Manual}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\LARGE\bf \stardoctitle\\[2.5ex]}
+{\Large\bf \stardocversion\\[4.0ex]}
+{\LARGE\bf \stardocmanual}
+\end{center}
+\vspace{10mm}
+
+\input{sun48a}
+
+\newpage
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+\setlength{\parskip}{0mm}
+\tableofcontents
+\setlength{\parskip}{\medskipamount}
+\markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\newpage
+
+\section {Introduction}
+
+AGI is a graphics database system. It can be used to store information
+about the size and position of a plot on a graphics device. This can be
+used by subsequent applications to find out where the plot has been drawn
+and how the coordinate system maps onto the plotting area.
+
+One obvious use of the database is to allow an application to overlay
+its output on top of that produced by a different application, for instance
+plotting radio contours onto an optical image. The first application draws
+its image and informs AGI the size and position of the plot. The second
+application uses AGI to set up its graphics coordinate system to match
+that of the first application so that the contour map appears in the
+correct position on the screen.
+
+Another common use is to allow an application to put up an interactive
+cursor to read off positions from a previously drawn image.
+
+Although designed for use within ADAM, AGI can also be used in non-ADAM
+applications.
+
+\section {Brief Description}
+
+The AGI database system is implemented as a subroutine library.
+The routines are split into two functional types. One set of
+routines deals with the manipulation of, and navigation around, the
+database; these routines are prefixed with {\bf AGI\_}. The other set of
+routines provides an interface between the database and the graphics
+package used by the application. These routines are prefixed {\bf AGS\_}
+if the graphics package is SGS, {\bf AGP\_} if the package is PGPLOT and
+{\bf AGD\_} if the package is IDI.
+
+The basic structure of the database is an object called a picture. This
+represents a rectangular area on the display surface and contains
+information about the coordinate system in use when the picture was
+created. Pictures are usually created in the database by one of the
+interface routines specific to a particular graphics package. For
+instance the routine {\bf AGS\_SZONE} will save the extent and coordinate
+system of the current SGS zone as a picture in the database. However
+pictures in the database are independent of the graphics package that
+created them. This means that, for example, a picture created by one
+application using SGS graphics can be used by another application
+employing PGPLOT. It is even possible, with care, to use two graphics
+packages, such as SGS and IDI, in one application by using AGI to
+mediate between them.
+
+Although pictures are independent of a graphics package they are not
+independent of the graphics device to which they refer. When a picture
+is created it contains an implicit reference to the current device,
+even if nothing has been plotted on the screen or even if a graphics
+package has not been activated on the device.
+The pictures in the database are grouped into a larger unit, here called
+a workstation structure, that contains all the pictures on a given device,
+stored in the order they were created.
+
+Pictures are given a name which gives an indication of what the plotting
+space contains. For effective communication between applications it is
+important that the picture names are standardised. It is customary for
+a picture containing other pictures to be referred to as a `FRAME' picture,
+and a picture containing a plot to be referred to as a `DATA' picture.
+A `BASE' picture refers to the whole plotting space and this name should
+not be used for other purposes.
+
+As well as a name a picture structure contains a one line comment field
+which can be used to further identify a picture in the database. The name,
+comment and coordinate system are mandatory components of a picture in
+the database, but there are some other components which are optional.
+The first is a reference to the data associated with a picture. This
+is a complete description of where the data is located, containing both
+the file name and the location within the file. This can be used by a
+later application to access the same data set without having to prompt
+the user again.
+
+The second optional component is a transformation structure.
+The default coordinate system of a picture stored in the database is a
+simple orthogonal linear set that increases left to right and bottom to top.
+If the coordinate system of a plot on the screen does not conform to this
+rule then a transformation which defines the relationship can
+be saved in the database.
+For example, an application may have displayed an image and saved a
+transformation from pixel coordinates to right ascension and declination
+in the database. A later cursor application can then use the transformation
+to report its results in these non-linear coordinates.
+
+The last optional component of a picture is a label. This is basically a
+short character string which can be used by an application to uniquely
+identify a picture. Unlike the other components of a picture the label
+contents can be changed at any time, the only restriction being that
+the label is unique on a given device.
+
+If it is necessary to store additional information in a picture
+structure, that cannot be accommodated by any of the defined components,
+then a MORE component is available for this purpose. It is important to
+remember, however, that the structure and contents of the MORE component
+can only be interpreted by applications that know how to use it, and
+a general purpose application will ignore the MORE structure.
+
+\vspace*{4ex} %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Fix a nasty page break
+
+\section {Summary of AGI Calls}
+
+\begin{tabbing}
+xxxxxxxxxxxxxx \= \kill
+\underline{Interface to IDI}\\ \\
+{\bf AGD\_ACTIV} \> ( status )\\
+                 \> Initialise IDI\\[1ex]
+{\bf AGD\_ASSOC} \> ( param, acmode, pname, memid, picid, dispid,\\
+                 \> ~~xsize, ysize, xoff, yoff, status )\\
+                 \> Associate a device with AGI and IDI through ADAM\\[1ex]
+{\bf AGD\_DEACT} \> ( status )\\
+                 \> Close down IDI\\[1ex]
+{\bf AGD\_DEASS} \> ( param, parcan, status )\\
+                 \> Deassociate a device from AGI and IDI\\[1ex]
+{\bf AGD\_NWIND} \> ( memid, dispid, xsize, ysize, xoff, yoff, status )\\
+                 \> Define an IDI window from the current picture\\[1ex]
+{\bf AGD\_SWIND} \> ( dispid, memid, xsize, ysize, xoff, yoff,\\
+                 \> ~~pname, coment, wx1, wx2, wy1, wy2, picid, status )\\
+                 \> Save an IDI window in the database\\[2ex]
+
+\underline{Interface to PGPLOT}\\ \\
+{\bf AGP\_ACTIV} \> ( status )\\
+                 \> Initialise PGPLOT\\[1ex]
+{\bf AGP\_ASSOC} \> ( param, acmode, pname, border, picid, status )\\
+                 \> Associate a device with AGI and PGPLOT through ADAM\\[1ex]
+{\bf AGP\_DEACT} \> ( status )\\
+                 \> Close down PGPLOT\\[1ex]
+{\bf AGP\_DEASS} \> ( param, parcan, status )\\
+                 \> Deassociate a device from AGI and PGPLOT\\[1ex]
+{\bf AGP\_NVIEW} \> ( border, status )\\
+                 \> Create a new PGPLOT viewport from the current picture\\[1ex]
+{\bf AGP\_SVIEW} \> ( pname, coment, picid, status )\\
+                 \> Save the current PGPLOT viewport in the database\\[2ex]
+
+\underline{Interface to SGS}\\ \\
+{\bf AGS\_ACTIV} \> ( status )\\
+                 \> Initialise SGS\\[1ex]
+{\bf AGS\_ASSOC} \> ( param, acmode, pname, picid, newzon, status )\\
+                 \> Associate a device with AGI and SGS through ADAM\\[1ex]
+{\bf AGS\_DEACT} \> ( status )\\
+                 \> Close down SGS\\[1ex]
+{\bf AGS\_DEASS} \> ( param, parcan, status )\\
+                 \> Deassociate a device from AGI and SGS\\[1ex]
+{\bf AGS\_NZONE} \> ( newzon, status )\\
+                 \> Create a new SGS zone from the current picture\\[1ex]
+{\bf AGS\_SZONE} \> ( pname, coment, picid, status )\\
+                 \> Save the current SGS zone in the database\\[2ex]
+
+\underline{Control}\\ \\
+{\bf AGI\_ANNUL} \> ( picid, status )\\
+                 \> Annul a picture identifier\\[1ex]
+{\bf AGI\_ASSOC} \> ( param, acmode, picid, status )\\
+                 \> Associate an AGI device with an ADAM parameter\\[1ex]
+{\bf AGI\_BEGIN} \> Mark the beginning of a new AGI scope\\[1ex]
+{\bf AGI\_CANCL} \> ( param, status )\\
+                 \> Cancel the ADAM device parameter\\[1ex]
+{\bf AGI\_CLOSE} \> ( status )\\
+                 \> Close AGI in non-ADAM environments\\[1ex]
+{\bf AGI\_END}   \> ( picid, status )\\
+                 \> Mark the end of an AGI scope\\[1ex]
+{\bf AGI\_NUPIC} \> ( wx1, wx2, wy1, wy2, pname, coment,\\
+                 \> ~~newx1, newx2, newy1, newy2, picid, status )\\
+                 \> Create a new picture in the database\\[1ex]
+{\bf AGI\_OPEN}  \> ( wkname, acmode, picid, status )\\
+                 \> Open an AGI device in a non-ADAM environment\\[1ex]
+{\bf AGI\_PDEL}  \> ( status )\\
+                 \> Delete all the pictures on the current device\\[1ex]
+{\bf AGI\_SELP}  \> ( picid, status )\\
+                 \> Select the given picture as the current one\\[1ex]
+{\bf AGI\_SROOT} \> ( status )\\
+                 \> Select the root picture for searching\\[2ex]
+
+\underline{Recall}\\ \\
+{\bf AGI\_RCF}   \> ( pname, picid, status )\\
+                 \> Recall first picture of specified name\\[1ex]
+{\bf AGI\_RCFP}  \> ( pname, x, y, picid, status )\\
+                 \> Recall first picture embracing a position\\[1ex]
+{\bf AGI\_RCL}   \> ( pname, picid, status )\\
+                 \> Recall last picture of specified name\\[1ex]
+{\bf AGI\_RCLP}  \> ( pname, x, y, picid, status )\\
+                 \> Recall last picture embracing a position\\[1ex]
+{\bf AGI\_RCP}   \> ( pname, pstart, picid, status )\\
+                 \> Recall preceding picture of specified name\\[1ex]
+{\bf AGI\_RCPP}  \> ( pname, pstart, x, y, picid, status )\\
+                 \> Recall preceding picture embracing a position\\[1ex]
+{\bf AGI\_RCS}   \> ( pname, pstart, picid, status )\\
+                 \> Recall succeeding picture of specified name\\[1ex]
+{\bf AGI\_RCSP}  \> ( pname, pstart, x, y, picid, status )\\
+                 \> Recall succeeding picture embracing a position\\[2ex]
+
+\underline{Labels}\\ \\
+{\bf AGI\_ILAB}  \> ( picid, label, status )\\
+                 \> Inquire label of a picture\\[1ex]
+{\bf AGI\_SLAB}  \> ( picid, label, status )\\
+                 \> Store label in picture\\[2ex]
+
+\underline{Reference}\\ \\
+{\bf AGI\_GTREF} \> ( picid, mode, datref, status )\\
+                 \> Get a reference object from a picture\\[1ex]
+{\bf AGI\_PTREF} \> ( datref, picid, status )\\
+                 \> Store a reference object in a picture\\[2ex]
+
+\underline{Transformations}\\ \\
+{\bf AGI\_TCOPY} \> ( trnloc, picid, status )\\
+                 \> Copy a transformation structure to the database\\[1ex]
+{\bf AGI\_TDDTW} \> ( picid, nxy, dx, dy, wx, wy, status )\\
+                 \> Transform double precision data to world coordinates\\[1ex]
+{\bf AGI\_TDTOW} \> ( picid, nxy, dx, dy, wx, wy, status )\\
+                 \> Transform data to world coordinates\\[1ex]
+{\bf AGI\_TNEW}  \> ( ncd, ncw, dtow, wtod, picid, status )\\
+                 \> Store a transformation in the database\\[1ex]
+{\bf AGI\_TWTDD} \> ( picid, nxy, wx, wy, dx, dy, status )\\
+                 \> Transform double precision world to data coordinates\\[1ex]
+{\bf AGI\_TWTOD} \> ( picid, nxy, wx, wy, dx, dy, status )\\
+                 \> Transform world to data coordinates\\[2ex]
+
+\underline{Inquiries}\\ \\
+{\bf AGI\_IBASE} \> ( picid, status )\\
+                 \> Inquire base picture for current device\\[1ex]
+{\bf AGI\_ICOM}  \> ( coment, status )\\
+                 \> Inquire comment for the current picture\\[1ex]
+{\bf AGI\_ICURP} \> ( picid, status )\\
+                 \> Inquire the current picture\\[1ex]
+{\bf AGI\_INAME} \> ( pname, status )\\
+                 \> Inquire name of the current picture\\[1ex]
+{\bf AGI\_IPOBS} \> ( picid, lobs, status )\\
+                 \> Is current picture obscured by another?\\[1ex]
+{\bf AGI\_ISAMD} \> ( picid, lsame, status )\\
+                 \> Inquire if pictures are on same device\\[1ex]
+{\bf AGI\_ISAMP} \> ( picid, lsame, status )\\
+                 \> Inquire if two pictures are the same\\[1ex]
+{\bf AGI\_ITOBS} \> ( nxy, x, y, ltobs, status )\\
+                 \> Inquire if test points are obscured\\[1ex]
+{\bf AGI\_IWOCO} \> ( wx1, wx2, wy1, wy2, status )\\
+                 \> Inquire world coordinates of current picture\\[2ex]
+
+\underline{More}\\ \\
+{\bf AGI\_IMORE} \> ( picid, lmore, status )\\
+                 \> Inquire if a MORE structure exists\\[1ex]
+{\bf AGI\_MORE}  \> ( picid, acmode, morloc, status )\\
+                 \> Return an HDS locator to a MORE structure\\[2ex]
+\end{tabbing}
+
+\subsection{Example skeleton applications}\label{exam}
+
+The lengthy subroutine list suggests that any application utilising
+AGI could end up looking complicated, but this need not be the case.
+By using the wrap-up routines simple applications need only call two or
+three routines from the list. As an example consider first an application
+that plots something on the screen and makes an entry in the database. A
+second application then uses a cursor to read a position from the graph.
+The second application is quite general and will work with any application
+that creates a DATA picture in the database, such as KAPPA:DISPLAY.
+\begin{verbatim}
+      SUBROUTINE PPLOT( STATUS )
+      INCLUDE 'SAE_PAR'
+      INTEGER I, ID1, ID2, N, STATUS
+      PARAMETER ( N = 100 )
+      REAL XP( N ), YP( N )
+
+*   Check inherited global status
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
+
+*   Define the function to plot
+      DO I = 1, N
+         XP( I ) = REAL( I )
+         YP( I ) = REAL( I )
+      ENDDO
+
+*   Open AGI and PGPLOT through the ADAM interface
+      CALL AGP_ASSOC( 'DEVICE', 'WRITE', ' ', .TRUE., ID1, STATUS )     ...1
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
+
+*   Define the world coordinates of the viewport to match the data
+      CALL PGWINDOW( 0.0, 100.0, 0.0, 100.0 )
+
+*   Create a box and plot the data
+      CALL PGBOX( 'BCNST', 0.0, 0, 'BCNST', 0.0, 0 )
+      CALL PGLINE( N, XP, YP )
+
+*   Save the PGPLOT viewport as a picture in the database
+      CALL AGP_SVIEW( 'DATA', 'PGLINE output', ID2, STATUS )            ...2
+
+*   Close down AGI and PGPLOT cancelling the parameter
+      CALL AGP_DEASS( 'DEVICE', .TRUE., STATUS )                        ...3
+
+  99  CONTINUE
+      END
+\end{verbatim}
+The program requires an interface file to define the DEVICE parameter.
+The following example will do the job:-
+\newpage %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Fix a nasty page break
+\begin{verbatim}
+interface PPLOT
+   parameter DEVICE
+      access 'READ'
+      vpath 'PROMPT'
+      prompt 'Display device '
+   endparameter
+endinterface
+\end{verbatim}
+
+{\bf Program notes:}
+\begin{enumerate}
+\item[1.] The routine {\bf AGP\_ASSOC} is used to access the database and
+open PGPLOT. It is a wrap-up routine for a number of commonly called AGI
+functions. The mode is set to 'WRITE' so that the plotting area is cleared
+and the border argument is set true to allow room for annotation of the
+axes. Passing an empty string in the name argument results in the current
+database picture being used to define the PGPLOT viewport.
+\item[2.] The current PGPLOT viewport is saved as an AGI picture in the
+database.
+\item[3.] The database and PGPLOT are closed using another of the wrap-up
+routines. This also tidies up any picture identifiers returned from AGI
+routines, and in this example cancels the parameter association.
+\end{enumerate}
+
+\begin{verbatim}
+      SUBROUTINE PCURS( STATUS )
+      INCLUDE 'SAE_PAR'
+      INTEGER ID, STATUS
+      CHARACTER CH, TEXT*64
+      REAL XC, YC
+
+*   Check inherited global status
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
+
+*   Open AGI and PGPLOT through the ADAM interface
+      CALL AGP_ASSOC( 'DEVICE', 'READ', 'DATA', .FALSE., ID, STATUS )   ...4
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
+
+*   Request a PGPLOT cursor
+      CALL PGCURSE( XC, YC, CH )
+
+*   Report the result
+      WRITE( TEXT, '( ''Cursor position ='', 2F6.1 )' ) XC, YC
+      CALL MSG_OUT( 'PCURS', TEXT, STATUS )
+
+*   Close down AGI and PGPLOT cancelling the parameter
+      CALL AGP_DEASS( 'DEVICE', .TRUE., STATUS )                        ...5
+
+  99  CONTINUE
+      END
+\end{verbatim}
+
+\newpage %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Fix a nasty page break
+{\bf Program notes:}
+\begin{enumerate}
+\item[4.] The mode argument in {\bf AGP\_ASSOC} is set to 'READ' to ensure
+that the plot is not cleared. The name argument specifies that the last
+picture of type DATA should be recalled.
+The border argument is set false to ensure that the PGPLOT viewport is
+created to exactly match the DATA picture.
+\item[5.] The call to {\bf AGI\_END} within {\bf AGP\_DEASS} resets the
+current picture to be the one current when the application began.
+\end{enumerate}
+
+\section {Control}
+
+\subsection{Opening the Database}
+
+AGI can be used independently of a graphics system. When AGI is opened,
+no specific graphics system is associated with the database.
+When it is required to display something on a device, a graphics package
+is selected and the plotting done. The opening and closing of the package
+is performed separately from the opening and closing of the database
+\footnote{There are routines, such as {\bf AGP\_ASSOC} and {\bf AGP\_DEASS},
+which package both operations in one unit.}.
+The following simplified block diagram illustrates this operation.
+\begin{verbatim}
+          OPEN AGI ( e.g. AGI_ASSOC )
+
+             OPEN the graphics package ( e.g. AGP_ACTIV )
+             OPEN the graphics device ( e.g. AGP_NVIEW )
+             plot with the graphics package
+             CLOSE the graphics package ( e.g. AGP_DEACT )
+
+          CLOSE AGI ( e.g. AGI_CANCL )
+\end{verbatim}
+
+The first step of opening the database is done by calling either
+{\bf AGI\_ASSOC} or {\bf AGI\_OPEN}. {\bf AGI\_ASSOC} is used in ADAM
+tasks and obtains the name of the device through the ADAM parameter
+system.
+\begin{verbatim}
+          CALL AGI_ASSOC( PARAM, ACMODE, PICID, STATUS )
+\end{verbatim}
+PARAM is the name of the parameter in the ADAM interface file through
+which the device name is to be obtained. It should be stressed that
+{\bf AGI\_ASSOC} does not open the specified device for plotting, it 
+opens the database entry for that device. The opening of the device for
+plotting is handled by the routines specific to a particular graphics
+package, for instance the {\bf AGS\_} routines.
+ACMODE is an access mode which has a particular meaning for AGI. It does
+not refer to the access mode of the database, i.e. whether an application
+can update the database or not, but instead it refers to the access mode
+of the graphics device. It is used to control whether the device should
+be cleared when it is opened by a graphics package. The possible modes
+are `READ', `UPDATE', and `WRITE'. The modes `READ' and `UPDATE' leave
+the display as it is; the `WRITE' mode clears the area of the display
+specified by the current picture returned in PICID. PICID returns an
+identifier to the current picture in the database; on opening the
+database this will be the picture that was current when the database was
+last accessed. If there is no previous entry in the database for this
+device then a `BASE' picture will be created.
+This `BASE' picture will fill the display area and will be created with a
+default world coordinate system, in the same way as the SGS base zone.
+
+{\bf AGI\_OPEN} is used in non-ADAM tasks.
+\begin{verbatim}
+          CALL AGI_OPEN( WKNAME, ACMODE, PICID, STATUS )
+\end{verbatim}
+WKNAME is the device name. The other arguments are the same as those in
+{\bf AGI\_ASSOC}.
+
+The given device name, whether passed through the parameter system or the
+argument list, should obey the syntax of GNS device names (SUN/57).
+AGI converts the given device name into an internal name that locates
+the workstation structure in the database. For devices that have more than
+one plotting plane, e.g.\ the Ikon,
+it is desirable that AGI treat pictures plotted on the different planes as
+being on the same device, so that plots on the overlay plane can be lined up
+with plots below them.
+Database entries for pictures on these different planes, which are different
+devices in GKS and SGS, will therefore appear in the same AGI workstation
+structure.
+
+Devices with windowing capabilities allow the user to change the size of the
+display window between applications. This has a detrimental affect on AGI
+because the size of the base picture, and the relationship between pictures
+changes. Rather than considering this an error status, which could terminate
+an application, AGI deletes all the pictures on this device, creates a
+new base picture and sends the following message to the user.
+\begin{verbatim}
+Display has changed size.
+Deleting previous database entries.
+\end{verbatim}
+This allows any application that can continue from such a situation to do so.
+For instance it is sensible to allow a display application that uses the
+current picture for output to continue in this situation. In this case, after
+the existing database entries have been deleted, the current picture will be
+the base picture.
+
+\subsection{Picture identifiers}
+
+Pictures are flagged by means of an integer identifier (the picture
+identifier) which combines knowledge of a device name and a picture
+number in the same way that an SGS zone number does. Both {\bf AGI\_ASSOC}
+and {\bf AGI\_OPEN} return a picture identifier to the current picture on
+the given device. Pictures in the database can only be referenced by means
+of these identifiers which are returned to the application from the
+appropriate AGI routines. These identifiers should only be passed on to
+other AGI routines and should not be altered in any way by an application.
+
+Once a picture is no longer required it is good practice to release it using
+{\bf AGI\_ANNUL} which liberates internal workspace. Picture identifiers
+can be automatically released by using a begin-end block (see section
+\ref{bend}).
+
+\subsection{Closing the Database}
+
+It may seem a bit premature to close the database having only just
+described how to open it, but some things are best explained at this stage.
+In an ADAM environment the routine {\bf AGI\_CANCL} cancels the
+association of the specified parameter and performs specific tidying
+up operations concerning that parameter. If the parameter association
+has to be retained outside the program then {\bf AGI\_CANCL} should not
+be called.
+
+If the workstation structure is opened by {\bf AGI\_OPEN}, a call to
+{\bf AGI\_CLOSE} should be used to close it.
+
+General tidying up operations (e.g. closing the database) are performed
+when the last active identifier has been annulled, either with
+{\bf AGI\_ANNUL} or {\bf AGI\_END}. It is important that tasks clean
+up all their identifiers otherwise unusual side effects may occur if
+the executable image is permanently resident in memory (such as an
+ADAM task).
+
+\subsection{Begin-End blocks}\label{bend}
+As the database is not closed until all identifiers have been annulled
+it is important that each task keeps its allocation of identifiers
+under control. For a complicated application annulling individual
+identifiers may be tiresome and so a general tidying up scheme is
+available using a begin-end block. The routines {\bf AGI\_BEGIN} and
+{\bf AGI\_END} are used to bracket a block of code and all the
+identifiers allocated within the block are automatically annulled
+by {\bf AGI\_END}. These routines may be nested, (up to a depth of eight)
+but each {\bf AGI\_BEGIN} must have its corresponding {\bf AGI\_END}.
+
+As well as annulling identifiers the routine {\bf AGI\_END} performs another
+important function. The routine takes a picture identifier as its input
+and this picture is made current. If the identifier is valid then this is
+no different to calling {\bf AGI\_SELP}, but if the argument passed to
+{\bf AGI\_END} is a negative number then the picture that was current when
+the corresponding {\bf AGI\_BEGIN} was called is made current again. This
+is useful for applications that need to restore the current picture to
+that which was current when the application began.
+
+The following two examples show different uses of a begin-end block.
+In the first example the call to {\bf AGI\_END} annuls all the
+identifiers, which results in the database being closed, since there
+are no more active identifiers. As there was no current picture when
+the corresponding {\bf AGI\_BEGIN} was called (since the database had
+not been opened) the negative argument in {\bf AGI\_END} has no effect
+in this case, and the picture that was current just before the call to
+{\bf AGI\_END} remains current.
+\begin{verbatim}
+    *   Begin an AGI scope
+          CALL AGI_BEGIN
+
+    *   Open AGI on a device obtained from the parameter system
+          CALL AGI_ASSOC( 'DEVICE', 'WRITE', ID, STATUS )
+
+    *   Main body of program
+          <main body of program>
+
+    *   Annul identifiers and close the database
+          CALL AGI_END( -1, STATUS )
+\end{verbatim}
+In the second example {\bf AGI\_BEGIN} is put after {\bf AGI\_ASSOC}.
+When {\bf AGI\_END} is called the identifier returned from {\bf AGI\_ASSOC}
+is not annulled, since it is outside the scope of the begin-end block.
+The negative argument in {\bf AGI\_END} makes the picture that was current
+when the corresponding {\bf AGI\_BEGIN} was called current again (in this
+example the picture that was current when the application began).
+\begin{verbatim}
+    *   Open AGI on a device obtained from the parameter system
+          CALL AGI_ASSOC( 'DEVICE', 'WRITE', ID, STATUS )
+
+    *   Begin an AGI scope
+          CALL AGI_BEGIN
+
+    *   Main body of program
+          <main body of program>
+
+    *   Annul identifiers from the main body of the program
+    *   and reinstate the current picture
+          CALL AGI_END( -1, STATUS )
+
+    *   Annul the initial identifier and close the database
+          CALL AGI_ANNUL( ID, STATUS )
+\end{verbatim}
+
+\subsection{The Database file}
+
+The database is stored in an HDS container file named AGI\_$<$node$>$.SDF
+in the directory defined by the logical name AGI\_USER
+(HDS is the Hierarchical Data System described in SUN/92). The name of the
+node is included in the file name to prevent two or more devices which
+have the same name but are on different nodes causing a conflict.
+On VMS systems the default is for the logical name AGI\_USER to point to
+the logical name ADAM\_USER; which provides each ADAM user with a private
+database in their own directory structure.
+Non-ADAM users will need to define AGI\_USER appropriately for themselves.
+On UNIX systems the default is for the environment variable AGI\_USER to
+point to the HOME directory unless otherwise defined by the user.
+The contents of the file can be examined using the ADAM application TRACE.
+In certain circumstances the database file may become corrupted. If this
+is suspected it is best to delete the appropriate file and start again.
+
+The name of the container file can be optionally changed by defining the
+logical name AGI\_NODE to be equivalent to some user defined string.
+If such a logical name exists then the container file is constructed
+by replacing the default node with the new string. Thus if the logical
+name AGI\_NODE is defined to be NONODE then the container file will
+have the name AGI\_NONODE.SDF in the directory AGI\_USER. This mechanism
+can be used to pick up a database created on a different node by
+defining the logical name to be equivalent to the required node name.
+
+\section {Components}
+
+\subsection{Pictures}
+
+Pictures represent rectangular areas on a display.
+The pictures have default coordinate systems that are linear and increase
+left to right and bottom to top, corresponding to GKS rules.
+Each picture can optionally have an associated transformation to allow for
+other coordinate systems.
+Pictures are stored in the database in the order they were created, so when
+recalling the last picture of a given name, for example, the most recently
+created picture of that name will be recovered.
+
+The AGI interface to each graphics package will interpret the meaning of a
+picture to suit the design of that particular package.
+When used in conjunction with SGS a picture is made equivalent to an SGS zone.
+For example to save an SGS zone as a picture use
+\begin{verbatim}
+          CALL AGS_SZONE( PNAME, COMENT, PICID, STATUS )
+\end{verbatim}
+PNAME and COMENT are used to identify the picture in the database as described
+in the sections below.
+PICID returns the identifier for the new picture in the database.
+
+There is one routine, {\bf AGI\_NUPIC}, that allows new pictures to be created
+in the database without necessarily opening a graphics package first.
+\begin{verbatim}
+          CALL AGI_NUPIC( WX1, WX2, WY1, WY2, PNAME, COMENT,
+         :                NEWX1, NEWX2, NEWY1, NEWY2, PICID, STATUS )
+\end{verbatim}
+WX1, WX2, WY1, WY2 define the rectangular extent of the new picture in terms of
+the world coordinates of the current picture.
+PNAME and COMENT describe the picture as discussed in the following
+sections.
+NEWX1, NEWX2, NEWY1, NEWY2 specify the world coordinate system of the new
+picture.
+PICID returns the identifier for the new picture in the database.
+
+AGI works with a current picture in an analogous manner to SGS and its
+current zone.
+A new picture has to be created within the bounds of the current one, and this
+then becomes the current picture.
+Pictures are recalled from the database only if they lie within the physical
+bounds of the current one; the recalled picture then becomes the current one.
+A picture can be made current by calling the routine {\bf AGI\_SELP}.
+
+The picture recall routines, {\bf AGI\_RC*}, provide the means of traversing
+the database.
+The key to the search is the picture name, and the search ends when a picture
+of the given name is found that lies within completely the bounds of the
+current picture. This picture then becomes the current picture.
+If no suitable picture is found then an error status is returned.
+The search can be made more general by giving an empty name string. This
+results in the first picture on the search path, that lies within the current
+one, being recalled.
+{\bf AGI\_RCL} searches backwards from the last (most recent) picture in the
+database.
+{\bf AGI\_RCF} searches forwards from the first (most ancient) picture in the
+database.
+{\bf AGI\_RCP} searches backwards starting at the picture given by the PSTART
+identifier, and {\bf AGI\_RCS} does the same searching forwards.
+
+A further restriction on the search can be introduced by using the
+{\bf AGI\_RC*P} routines.
+With these, a picture is only recalled if it corresponds to the given name,
+lies within the bounds of the current picture, {\em and} encompasses a given
+point in the world coordinate space of the current picture.
+This type of recall is useful when a cursor has been put up on the display,
+and the user asked to select a picture with the cursor.
+
+A potential problem arises when searching backwards through the database.
+The hierarchy of pictures in the database implies that previous pictures
+will usually be larger than the current one, but the search strategy
+requires the current picture to be larger than the picture being sought.
+This problem can be overcome by selecting a picture known to be larger
+than any picture being sought as the current one. The base picture is
+the most convenient as this is larger than any picture in the database.
+The following example shows how to search backwards through the database
+for a picture with a particular label (labels are discussed in section
+\ref{lab}).
+\begin{verbatim}
+    *   Get an identifier for the base picture and select it as current.
+          CALL AGI_IBASE( BASEID, STATUS )
+          CALL AGI_SELP( BASEID, STATUS )
+
+    *   Recall the last picture in the database of any name and get its label.
+          CALL AGI_RCL( ' ', PICID, STATUS )
+          CALL AGI_ILAB( PICID, PLABEL, STATUS )
+
+    *   Loop through the database until the a match with LABEL is found.
+          DO WHILE ( ( PLABEL .NE. LABEL ) .AND. ( STATUS .EQ. SAI__OK ) )
+
+    *   Reselect the base picture as the current one.
+    *   This ensures the search does not fail because a picture is not
+    *   within the current one.
+             CALL AGI_SELP( BASEID, STATUS )
+
+    *   Search backwards starting at the previously recalled picture
+             PICIDS = PICID
+             CALL AGI_RCP( ' ', PICIDS, PICID, STATUS )
+
+    *   Inquire the label of this picture
+             CALL AGI_ILAB( PICID, PLABEL, STATUS )
+          ENDDO
+\end{verbatim}
+
+\subsection{The root picture}
+For devices that allow the memories to be scrolled independently there is
+a potential conflict when searching for a picture. This occurs because
+under normal conditions a picture can only be recalled from the database
+if it lies within the current picture. If the pictures are located on
+different memory planes then this can be negated by scrolling one of the
+memories. To overcome this a more general search is allowed by selecting
+the root picture which contains all other pictures (including the base
+picture). A call to the routine {\bf AGI\_SROOT} selects the root
+picture. A subsequent call to any of the recall routines {\bf AGI\_RC*}
+will obtain the relevant picture without it having to lie within the
+current picture. The root picture is deselected in the recall routine, and
+so {\bf AGI\_SROOT} has to be called on every occasion that an unlimited
+search is to be made. Recall is the only operation allowed with the root
+picture. Any other operation called while the root picture is selected
+will result in the previously current picture being used.
+
+\subsection{World coordinates}
+When AGI needs to access information in the database by position it uses the
+world coordinate system of the current picture.
+World coordinates are those set up by the user to represent a useful linear
+range of coordinates which fill the picture space.
+These world coordinates must be linear and increase from left to right
+and from bottom to top. If the required coordinate system does not correspond
+to these rules then the user should choose a basic world coordinate system
+that does obey them, and then define a transformation to go to and from
+the basic system and the required one (see the section on transformations
+\ref{tran}).
+
+When a picture is created with one of the package interface routines the
+current world coordinates of the graphics zone are stored in the database.
+If the user subsequently changes the world coordinate system of the graphics
+space on the physical device, errors may result if information is requested
+from the database by position.
+The routine {\bf AGI\_IWOCO} can be used to inquire the world coordinates
+of the current picture.
+
+\subsection{Name}
+The name is a character string indicating the type of picture created.
+It should reflect the general intention of the plotting space, and not
+describe specifically what the picture contains.
+For example, the name `FRAME' is used to indicate that the space will be used
+to group together a collection of other plots.
+The name `DATA' is used to indicate that the space will contain some sort of
+representation of data in graphical form, e.g.\ a grey-scale image, or a
+scatter plot.
+The name `BASE' is used by AGI to signify the base picture, and this name
+should not be used for other purposes.
+The length of the name string is limited to the number of characters defined
+by the AGI\_\_SZNAM constant from the AGI\_PAR FORTRAN include file
+(currently 15 characters).
+When stored in the database the character string will have leading blanks
+removed and converted into upper case.
+
+There are at present no compulsory names, but clearly consistent usage is
+necessary if packages written by different programmers are to integrate
+successfully.
+
+\subsection{Comment}
+The comment is a character string containing a description of the
+picture. The application can use this component to store any text that
+will help identify the picture in the database.
+It is restricted to one line of text at present, with a maximum length
+given by the parameter AGI\_\_CMAX defined in the AGI\_PAR include file.
+The comment string is stored with the picture at the time of picture creation.
+
+\subsection{Labels}\label{lab}
+There is another character identifier that can be stored in the database
+and used to distinguish a picture more precisely. This is the label which
+is an optional component of a picture.
+It differs from other structures in AGI in that its contents can be
+changed at any time (by overwriting the existing contents), whereas
+other picture elements can only be defined when they are first created.
+Because the label contents can be changed at any time the responsibility
+for guarding against misuse is left up to the application/user.
+
+The labels differ in another way from the name component in that each
+label within a workstation structure must be unique. If a new label clashes
+with an exiting one within a workstation structure then the existing label
+will be deleted and replaced by a blank string. Although the labels are
+stored with mixed case the comparison is done with leading blanks removed
+and in uppercase only.
+
+The routine {\bf AGI\_SLAB} will associate a label with an existing picture,
+indicated by the picture identifier. If the picture identifier is negative
+then the current picture is used to store the label. If a label already
+exists for a picture then the old one will be overwritten.
+The routine {\bf AGI\_ILAB} will return the label of the requested picture.
+If the picture identifier is negative then the current picture is searched.
+If no label is associated with this picture then a blank string is returned.
+
+The length of the label string is limited to the number of characters defined
+by the AGI\_\_SZLAB constant from the AGI\_PAR include file
+(currently 15 characters).
+
+\subsection{Reference to data}
+It may often be desirable to access the data used by one application
+in a second one. To store the actual data in the database would be wasteful
+of disk space since this data would be replicated in the original data file
+and in the database. Even more space would be wasted if the same data
+was associated with more than one picture in the database. Instead of
+saving the data in the database AGI stores a reference to it (a string
+describing it's location) that enables other applications to recover the
+data.
+
+A reference to a data object is not a compulsory component of a database
+picture, and as such will not be created when a new picture is inserted
+in the database.
+An explicit call to one of the appropriate routines is used
+to create or access a reference object in the database.
+The subroutine argument that defines the reference object can be either
+an HDS locator or any character string reference. If the string is a
+valid HDS locator then a reference is constructed to point to the
+relevant object, otherwise the string is assumed to be a reference
+itself and is stored as supplied. This dual definition of what defines
+a reference is intended to smooth the transition from applications
+using raw HDS calls to using NDF routines to access the data. When the
+NDF reference mechanism is well established the HDS interface will be
+removed.
+
+A reference is saved in the database by calling the routine
+{\bf AGI\_PTREF}. The reference
+structure is stored within the picture indicated by the picture
+identifier. If the picture identifier is negative then the current
+picture is used to store the reference. If a reference already exists
+in the picture then an error status will be returned.
+
+A reference is obtained from the database by calling the routine
+{\bf AGI\_GTREF}. The reference is obtained from the picture indicated
+by the picture identifier. If the picture identifier is negative then
+the current picture is used to obtain the reference.
+If the reference was created from an HDS locator then an HDS locator
+is returned and this should be annulled in the application using
+{\bf REF\_ANNUL} rather than {\bf DAT\_ANNUL}. This will ensure that
+the file containing the reference is properly shut down.
+
+One important point to note is that AGI does not check if the data being
+referenced is valid or not.
+
+\subsection{Coordinate transformations}\label{tran}
+The default coordinate system used by AGI is an orthogonal linear
+system of world coordinates that increase from left to right and
+bottom to top. If the data coordinate system used by an application
+complies with these rules then a basic picture saving operation
+will store sufficient information to recreate these coordinates at a
+later stage.
+
+If the transformation between data coordinates and the world coordinates
+of a rectangular piece of the display screen is more complicated than
+this simple system then a separate transformation has to be stored in
+the database to define the relationships.
+AGI uses the TRANSFORM facility described in SUN/61 to define the
+transformations. AGI does not offer the full flexibility of the TRANSFORM
+package as it is only interested in the limited case of transforming
+from the data coordinates into the flat, world coordinates of the display
+device.
+
+There are two types of transformation to be defined, the first is the
+transformation from data to world coordinates, and the second is the
+transformation from world to data coordinates. Usually both will be
+defined, although this is not a necessity.
+The present implementation only allows for 2-dimensional data
+coordinates, and an error will be returned if the number of data
+variables differs from this.
+
+The transformations are defined as character strings which describe the
+mathematical formulas as if they appeared in a piece of FORTRAN code.
+Therefore the description of the formulas should follow all the FORTRAN
+rules for operators and functions. As an example the case of data
+coordinates in polar coordinates will be used. The transformation
+from polar coordinates $(r,\theta)$ to Cartesian world coordinates $(x,y)$
+is defined by the equations
+$x = r \cos( \theta )$ and $y = r \sin( \theta )$.
+The inverse transformation is defined by the equations
+$r = \sqrt{x^2+y^2}$ and $\theta = \tan^{-1}(y/x)$.
+These are formulated in a program in the following way.
+\begin{verbatim}
+    *   Define the number of input ( data ) and output ( world ) variables
+    *   Note: This should be 2 for each transformation.
+          INTEGER NCD, NCW
+          PARAMETER ( NCD = 2, NCW = 2 )
+
+    *   Declare arrays for the two sets of transformations
+          CHARACTER * 32 DTOW( NCW ), WTOD( NCD )
+
+    *   Assign the data to world transformation functions
+          DTOW( 1 ) = 'X = R * COS( THETA )'
+          DTOW( 2 ) = 'Y = R * SIN( THETA )'
+
+    *   Assign the world to data transformation functions
+          WTOD( 1 ) = 'R = SQRT( X * X + Y * Y )'
+          WTOD( 2 ) = 'THETA = ATAN2( Y, X )'
+\end{verbatim}
+
+The transformation is then stored in the database using the routine
+{\bf AGI\_TNEW}.
+
+If a transformation already exists in an HDS structure which converts
+the data coordinates into the two dimensional world coordinates of the
+display screen then the transformation can be copied into the database
+using the routine {\bf AGI\_TCOPY}.
+
+The AGI interface has four routines which will perform transformations
+that have been stored in the database. The routine {\bf AGI\_TDTOW}
+will transform data coordinates into world coordinates, and the routine
+{\bf AGI\_TWTOD} will perform the inverse.
+The argument list for these routines includes a picture identifier which
+indicates the picture containing the transformation. If the identifier is
+negative then the current picture is searched.
+The routines take two arrays containing the $x$ and $y$ coordinates of the
+points to be transformed and returns two arrays containing the new
+$x$ and $y$ coordinates. In this context $x$ and $y$ need not mean a
+Cartesian system when used for the data coordinates, they are simply
+names for the first and second coordinate of the data system. In the above
+example $r$ and $\theta$ correspond to the $x$ and $y$ coordinates of the
+data. If no transformation is found in the indicated picture then the
+identity transformation (output = input) is used. The transformations
+can be executed with double precision by calling the equivalent routines
+{\bf AGI\_TDDTW} and {\bf AGI\_TWTDD}.
+
+\subsection{Inquiries}
+There are a number of inquiry routines available to investigate the properties
+of the current picture.
+{\bf AGI\_INAME} and {\bf AGI\_ICOM} inquire the name and description of the
+current picture.
+{\bf AGI\_ISAMD} inquires if the given picture is on the same physical device
+as the current picture.
+{\bf AGI\_ISAMP} inquires if the given picture identifier points to the
+same picture in the database as the current picture identifier.
+{\bf AGI\_IPOBS} tests if the current picture is obscured either partially or
+totally by a specified picture in the database.
+Obscuration means here that the given picture intersects the current picture
+and that it overlays the current picture (was created more recently).
+The obscuration of the current picture can be tested against all subsequent
+pictures in the database by specifying a negative number in place of the
+picture identifier in the argument list.
+{\bf AGI\_ITOBS} tests the obscuration of a number of test points.
+The test points are specified in the coordinate system of the current picture,
+and each point is tested in turn for obscuration by any picture overlying the
+current one.
+
+\subsection{More}
+It may be desirable for an application to store information in the database
+that is outside the scope of the routines provided. For this reason an
+application can access a MORE structure using the routine {\bf AGI\_MORE}
+and save arbitrary HDS objects within it. A MORE structure can be created
+for each of the pictures in the database. It must be stressed that if an
+application uses this facility then it is responsible for the contents
+and whatever any subsequent application may make of them. Also an
+application may need to cope with the situation of a corrupted structure.
+
+The MORE structure is accessed for reading and writing using the routine
+{\bf AGI\_MORE}
+\begin{verbatim}
+          CALL AGI_MORE( PICID, ACMODE, MORLOC, STATUS )
+\end{verbatim}
+The access mode (ACMODE) controls the action of this routine. If the mode
+is 'WRITE' then an HDS locator to an empty MORE structure is returned. If
+there was no previous MORE structure then one is created, and if there was
+a structure present then the previous contents are erased. At present
+there is no lock to prevent one application erasing a MORE structure being
+accessed by another. If the access mode is 'READ' or 'UPDATE' then the
+routine returns a locator to the top of the MORE structure, unless there
+was no structure present in which case an error is returned. The HDS
+locator returned by this routine has to be annulled by the calling
+application.
+
+The presence of a MORE structure can be tested using the routine
+{\bf AGI\_IMORE}. The return argument is true if a MORE structure exists
+for the given picture, otherwise the argument is false.
+
+%\newpage
+
+\section {Interface to Graphics Systems}
+
+The AGI database is useful in two basic contexts. The first is to pass
+information between separate applications that may or may not be plotting
+on the device with the same graphics package; an example of this type of
+use has been given earlier \ref{exam}. The second is to allow
+different graphics packages to interact within a single application, for
+example by using SGS to draw on top of an image displayed with IDI. These
+two packages have completely different models of the display device and
+AGI is used to mediate between them. The major restriction with this second
+mode of use is that the two graphics packages cannot both be open at the
+same time. There will be other restrictions depending on how the physical
+device characteristics are utilized by each graphics package; for example
+the size of the display area may be different in the different packages and
+this will cause problems if a picture defined by one package is beyond the
+limits of another.
+
+The following simplified block diagram illustrates the recommended operation
+of AGI and two graphics packages within one application.
+\begin{verbatim}
+          OPEN AGI ( e.g. AGI_ASSOC )
+
+             OPEN the first graphics package ( e.g. AGD_ACTIV )
+             OPEN the device ( e.g. AGD_NWIND )
+             plot with the first graphics package
+             CLOSE the first graphics package ( e.g. AGD_DEACT )
+
+             OPEN the second graphics package ( e.g. AGS_ACTIV )
+             OPEN the device ( e.g. AGS_NZONE )
+             plot with the second graphics package
+             CLOSE the second graphics package ( e.g. AGS_DEACT )
+
+          CLOSE AGI ( e.g. AGI_CANCL )
+\end{verbatim}
+
+\subsection{Interface to SGS}
+
+A set of routines are supplied to interface the database to the SGS graphics
+package, these are prefixed by AGS\_ instead of AGI\_.
+A picture in the database is equated with an SGS zone.
+SGS is activated with a call to {\bf AGS\_ACTIV}.
+This does not open a device for plotting.
+A device is opened when the first call to {\bf AGS\_NZONE} is made.
+The actual device that is opened will be the one associated with the
+current picture in the database.
+This means that AGI has to be open before {\bf AGS\_NZONE} can be called.
+{\bf AGS\_NZONE} creates an SGS zone from the current AGI picture, and returns
+the zone identifier.
+An SGS zone is saved as a picture in the database using a call to
+{\bf AGS\_SZONE}. The size of the new picture must be less than or equal
+to the size of the current picture in the database otherwise and error
+status is returned.
+SGS is shut down using {\bf AGS\_DEACT}.
+
+The job of opening and closing the device is handled by the AGS\_ routines
+and therefore the routines {\bf SGS\_ASSOC} and {\bf SGS\_CANCL} or
+{\bf SGS\_OPEN} and {\bf SGS\_CLOSE} should not be called when using the
+AGS\_ routines.
+
+The first example shows how an application might save an SGS zone in the
+database.
+\begin{verbatim}
+    *   Obtain the device name from the ADAM parameter system
+          CALL AGI_ASSOC( 'DEVICE', 'WRITE', ID1, STATUS )
+          CALL AGI_BEGIN
+
+    *   Open the given device for plotting
+          CALL AGS_ACTIV( STATUS )
+          CALL AGS_NZONE( IZONE, STATUS )
+
+    *   Plot the data in an SGS zone
+          <plot the data with SGS>
+
+    *   Save the current zone as a picture in the database
+          CALL AGS_SZONE( 'DATA', 'Description', ID2, STATUS )
+
+    *   Close down
+          CALL AGS_DEACT( STATUS )
+          CALL AGI_END( -1, STATUS )
+          CALL AGI_CANCL( 'DEVICE', STATUS )
+\end{verbatim}
+
+The second example shows how another application could recreate a zone,
+perhaps to overlay one plot with another, or to obtain coordinates with
+a cursor. It assumes that the current picture in the database is the one
+that is wanted. If this is not the case the recall routines can be used
+to search the database for the correct picture.
+\begin{verbatim}
+    *   Obtain the device name from the ADAM parameter system
+    *   Use update mode to ensure the original plot is not cleared
+          CALL AGI_ASSOC( 'DEVICE', 'UPDATE', ID1, STATUS )
+          CALL AGI_BEGIN
+
+    *   Open the given device for plotting recreating the current
+    *   picture as an SGS zone
+          CALL AGS_ACTIV( STATUS )
+          CALL AGS_NZONE( IZONE, STATUS )
+
+    *   Plot with SGS
+          <plot with SGS>
+
+    *   Close down
+          CALL AGS_DEACT( STATUS )
+          CALL AGI_END( -1, STATUS )
+          CALL AGI_CANCL( 'DEVICE', STATUS )
+\end{verbatim}
+
+These examples show that the AGI operations of accessing the database and
+opening the graphics package are common to both applications. These
+common opening and closing operations have been packaged up into single
+routines. Thus the sequence of calls {\bf AGI\_ASSOC}, {\bf AGI\_BEGIN},
+{\bf AGS\_ACTIV}, {\bf AGS\_NZONE} can be replaced by a single call to
+{\bf AGS\_ASSOC}, and the sequence of calls {\bf AGS\_DEACT},
+{\bf AGI\_END}, {\bf AGI\_CANCL} can be replaced by a single call to
+{\bf AGS\_DEASS}. Note that these wrap-up routines only exist for the
+ADAM interface. If the application is using the non-ADAM routines
+{\bf AGI\_OPEN} and {\bf AGI\_CLOSE} then the sequence of calls has to
+be made explicitly. Using these wrap-up routines then second application
+above would become
+\begin{verbatim}
+    *   Obtain the device name from the ADAM parameter system and open
+    *   SGS on the given device
+          CALL AGS_ASSOC( 'DEVICE', 'UPDATE', ' ', ID1, IZONE, STATUS )
+
+    *   Plot with SGS
+          <plot with SGS>
+
+    *   Close down
+          CALL AGS_DEASS( 'DEVICE', .TRUE., STATUS )
+\end{verbatim}
+The third (picture name) argument in {\bf AGS\_ASSOC} can optionally be
+used to recall the last picture of the given name using {\bf AGI\_RCL}.
+If the name string is blank (as in the example above) then this recall
+routine is not called and the current database picture is returned.
+If the second argument in {\bf AGS\_DEASS} is false then the ADAM parameter
+is not cancelled and instead the picture identifier returned from
+{\bf AGS\_ASSOC} is annulled.
+
+If GKS calls are mixed in with the SGS calls to produce the plot
+then some GKS operations may result in the plot being cleared when the
+device is shut down. This can happen if the device is opened with 'WRITE'
+mode, which results in the zone being initially cleared, and then some
+aspect of the device, such as a pen colour, is changed using GKS calls.
+GKS believes that the original plot is now wrong because the colours are
+wrong and requests that the plot be redrawn in the new colours.
+By default this request does not happen immediately but is deferred until
+closedown. An application can force the update to happen immediately by
+setting the deferral mode:
+\begin{verbatim}
+    *   Set the GKS deferral mode to 'ASAP'
+          CALL SGS_ICURW( IWKID )
+          CALL GSDS( IWKID, 0, 1 )
+
+\end{verbatim}
+
+\subsection{Interface to PGPLOT}
+
+A set of routines are supplied to interface the database to the PGPLOT
+graphics package, these are prefixed by AGP\_ instead of AGI\_.
+A picture in the database is equated with a PGPLOT viewport.
+Unlike SGS and GKS PGPLOT only allows one device to be open at one
+time. The PGPLOT interface to AGI signifies this by returning an error
+status if another device is requested while a current PGPLOT device is
+open.
+
+PGPLOT is activated with a call to {\bf AGP\_ACTIV}, but it does not
+actually open a device for plotting.
+A device is opened when the first call to {\bf AGP\_NVIEW} is made.
+The actual device that is opened will be the one associated with the
+current picture in the database.
+{\bf AGP\_NVIEW} creates a new PGPLOT viewport from the current AGI
+picture.
+If the border argument in {\bf AGP\_NVIEW} is false then the
+new viewport fills the area specified by the picture and the world
+coordinate system of the database picture is recreated in the viewport.
+If however the border argument in {\bf AGP\_NVIEW} is true then
+the viewport is created smaller than the area defined by the picture so
+that a standard width border surrounds the viewport. The world coordinates
+of this viewport are given the default values of 0 to 1 in each axis.
+
+The current viewport can be saved as a picture in the database using a
+call to {\bf AGP\_SVIEW}. The size of the new picture must be less than
+or equal to the size of the current picture in the database, otherwise
+an error status is returned.
+Although PGPLOT uses the concept of a border around a plot in which to
+put annotations, it does not let an application inquire the size of this
+border and so it is not possible to save the border area as a 'FRAME'
+picture in the database from within the associated viewport. If such a
+'FRAME' picture is required in the database then it must be saved before
+the viewport is created, or must be recreated from an existing picture.
+
+PGPLOT is shut down using {\bf AGP\_DEACT}.
+
+The following code segment gives an example of an application that
+creates a viewport that matches the size of the current picture if the
+overlay flag is true, or creates a viewport with a border for annotation
+if the overlay flag is false.
+\begin{verbatim}
+    *   Open AGI on a device obtained from the parameter system.
+    *   Do not clear the viewport if overlay mode is requested.
+          IF ( OVER ) THEN
+             CALL AGI_ASSOC( 'DEVICE', 'UPDATE', ID1, STATUS )
+          ELSE
+             CALL AGI_ASSOC( 'DEVICE', 'WRITE', ID1, STATUS )
+          ENDIF
+
+    *   Activate the PGPLOT interface to AGI
+          CALL AGP_ACTIV( STATUS )
+
+    *   If plotting over previous plot find the last data picture and
+    *   match the PGPLOT viewport to it
+          IF ( OVER ) THEN
+
+    *   Use the current picture if it is a data picture otherwise 
+    *   find the last data picture that fits within the current one
+             CALL AGI_INAME( CNAME, STATUS )
+             IF ( CNAME .NE. 'DATA' ) THEN
+                CALL AGI_RCL( 'DATA', ID2, STATUS )
+             ENDIF
+
+    *   If a suitable data picture was not found then abort
+             IF ( STATUS .NE. SAI__OK ) <goto closedown>
+
+    *   Create the viewport to match the data picture
+             CALL AGP_NVIEW( .FALSE., STATUS )
+
+    *   If not using an overlay then create a viewport with a border
+          ELSE
+             CALL AGP_NVIEW( .TRUE., STATUS )
+          ENDIF
+\end{verbatim}
+
+The next piece of code shows how the viewport and frame from the previous
+example can be stored in the database as pictures. If the overlay mode has
+been used then the viewport and associated frame will be the same size.
+\begin{verbatim}
+    *   Select the picture within which the viewport was created
+    *   and inquire its world coordinates
+          CALL AGI_SELP( ID1, STATUS )
+          CALL AGI_IWOCO( WX1, WX2, WY1, WY2, STATUS )
+
+    *   Save this in the database as the frame picture using the
+    *   full extent of the picture.
+    *   Define a default world coordinate system for the new picture.
+          CALL AGI_NUPIC( WX1, WX2, WY1, WY2, 'FRAME', 'Frame picture',
+         :                0.0, 1.0, 0.0, 1.0, FID, STATUS )
+
+    *   Save the current viewport as the data picture
+          CALL AGP_SVIEW( 'DATA', 'Data picture', VID, STATUS )
+\end{verbatim}
+
+There are wrap-up routines to open and close AGI and PGPLOT within the
+ADAM environment using single calls. The sequence of calls {\bf AGI\_ASSOC},
+{\bf AGI\_BEGIN},  {\bf AGP\_ACTIV}, {\bf AGP\_NVIEW} can be replaced by a
+single call to {\bf AGP\_ASSOC}. As with {\bf AGS\_ASSOC} an optional call
+to {\bf AGI\_RCL} can be made by passing a non-blank name argument.
+The sequence of calls {\bf AGP\_DEACT}, {\bf AGI\_END}, {\bf AGI\_CANCL}
+or {\bf AGI\_ANNUL} can be replaced by a single call to {\bf AGP\_DEASS}.
+
+PGPLOT can be used as a stand-alone package, or it can be started from
+within an SGS zone. In the latter case PGPLOT
+is initialised while SGS is still open. This is the only situation where
+AGI allows more than one graphics package to be open at one time.
+The following simplified program section illustrates the opening of
+PGPLOT from within an SGS zone.
+\begin{verbatim}
+    *   Open AGI and SGS on a device obtained from the parameter system
+          CALL AGS_ASSOC( 'DEVICE', 'WRITE', ID, IZONE, STATUS )
+
+    *   Create a new SGS zone of the required size and shape
+          <Create a new zone with SGS calls>
+
+    *   Open up PGPLOT and create a new viewport matching the current zone
+          CALL AGP_ACTIV( STATUS )
+          CALL AGP_NVIEW( .FALSE., STATUS )
+
+    *   Create a new PGPLOT environment and draw the picture
+          <Use PGPLOT to draw the picture>
+
+    *   Close down PGPLOT, SGS and AGI
+          CALL AGP_DEACT( STATUS )
+          CALL AGS_DEASS( 'DEVICE', .TRUE., STATUS )
+\end{verbatim}
+
+Note that when using the AGP routines to open PGPLOT in the current SGS
+zone it is essential that SGS has been opened using the AGS routines.
+Normally {\bf AGP\_NVIEW} creates a viewport that matches the size of
+the current picture in the database, but in this instance the size of
+the viewport matches the current SGS zone.
+The new viewport inherits the world coordinate system of the current picture
+in the usual way.
+
+The job of opening and closing the device is handled by the AGP\_ routines
+and therefore PGBEGIN and PGEND should not be called in an application
+using AGI. Similarly the routines PGENV, PGPAPER and PGVSTAND should not be
+called as these subvert the underlying coordinate system.
+
+\subsection{Interface to IDI}
+
+A set of routines are supplied to interface the database to the IDI graphics
+package, these are prefixed by AGD\_ instead of AGI\_. IDI is a low-level
+graphics package that does not have the kind of abstraction that packages
+like SGS and PGPLOT have. The coordinate system is not device independent
+and there is no natural structure in the specification that corresponds to
+a picture in the way that an SGS zone does. The AGI interface to IDI is
+therefore more contrived than for the other packages.
+
+IDI instructions are directed to a specific device by means of a display
+identifier that has to be supplied as an argument to the IDI subroutines.
+The routine {\bf AGD\_NWIND} returns a display identifier that corresponds
+to the device associated with the current picture. This identifier can
+then be used as input to the IDI routines. If the device is not already
+open then {\bf AGD\_NWIND} will open the relevant device. Subsequent calls
+to {\bf AGD\_NWIND} will return the same identifier if the current picture
+is associated with the same device.
+
+The routines {\bf AGD\_ACTIV} and {\bf AGD\_DEACT} should be called before
+and after any other AGD\_ routines.
+
+IDI has no structure that matches the concept of a picture in the database,
+and so an abstract space has been defined, here called simply a window, which
+represents a rectangular space in the memory of the device. The definition
+of such a window is similar to a the definition of a transfer window in IDI,
+which is used to load images into the display memory.
+IDI works in pixel coordinates and a window is defined by its size in
+pixels along each axis (XSIZE and YSIZE), and by an offset, in pixels,
+of its bottom left hand corner from the memory origin (XOFF and YOFF).
+The routine {\bf AGD\_SWIND} will save such a window as a picture in the
+database. The following code segment shows how a transfer window which has
+been set up to load an image into a memory can be saved as a picture in the
+database.
+\begin{verbatim}
+    *   Set up the transfer window defined by XSIZE, YSIZE, XOFF, YOFF
+    *   to match the size of the image NX * NY
+          XSIZE = NX
+          YSIZE = NY
+          CALL IIMSTW( DISPID, MEMID, 0, XSIZE, YSIZE, 8, XOFF, YOFF, STATUS )
+
+    *   Load the image held in the array ADATA
+          NPIX = NX * NY
+          CALL IIMWMY( DISPID, MEMID, ADATA, NPIX, 8, 1, 0, 0, STATUS )
+
+    *   Store the transfer window as a picture in the database
+          CALL AGD_SWIND( DISPID, MEMID, XSIZE, YSIZE, XOFF, YOFF,
+         :                'DATA', 'IDI transfer window', 0.0, REAL( NX ),
+         :                 0.0, REAL( NY ), ID, STATUS )
+\end{verbatim}
+As usual when creating a picture in the database if this new picture lies
+outside the current picture an error status is returned.
+
+The routine {\bf AGD\_NWIND} will return the size and offsets of a window that
+matches the current picture in the database. The returned arguments should
+not be used to define a transfer window directly unless it is known that
+the picture exactly matches the size and shape of the image to be loaded
+into the transfer window. This is because IDI uses the transfer window to
+define where the end of one row occurs in the input stream of pixel values.
+If the transfer window is the wrong shape for the image then the line
+breaks will not occur in the correct place and the image will appear
+garbled. When using {\bf AGD\_NWIND} to set up a transfer window it is best
+to compare the returned arguments to the size of the image and set up the
+transfer window accordingly. The following code segment shows how a
+transfer window is set up so that the image loads from the bottom left of
+the picture. The transfer window is set up so that the bottom left corner
+of the image is aligned with the bottom left corner of the picture, but the
+size of the transfer window is defined by the size of the image and not the
+size of the picture.
+\begin{verbatim}
+    *   Get the size of the current picture from the database
+          CALL AGD_NWIND( DISPID, MEMID, XSIZE, YSIZE, XOFF, YOFF, STATUS )
+
+    *   Check that the image does not overflow the picture
+          IF ( ( NX .LE. XSIZE ) .AND. ( NY .LE. YSIZE ) ) THEN
+
+    *   Set up the transfer window to match the size of the image NX * NY
+    *   and to begin at the bottom left of the picture
+             CALL IIMSTW( DISPID, MEMID, 0, NX, NY, 8, XOFF, YOFF, STATUS )
+
+    *   Load the image held in the array ADATA
+             NPIX = NX * NY
+             CALL IIMWMY( DISPID, MEMID, ADATA, NPIX, 8, 1, 0, 0, STATUS )
+          ENDIF
+\end{verbatim}
+There is a slight difference between the definition of an IDI window and
+a picture in the database due to the former being stored as integers and
+the latter being stored as floating point numbers. This does not matter
+when saving a window in the database because the integer coordinates are
+simply expressed as reals in the database, but a picture already defined in
+the database may have limits that correspond to partial pixels on the screen.
+In the latter case the pixel coordinates returned by the routine
+{\bf AGD\_NWIND} are rounded up from the picture coordinates so that the
+window contains the whole picture. This means that the resulting window
+may be slightly larger (by fractions of a pixel) than the original picture.
+
+There are wrap-up routines to open and close AGI and IDI within the
+ADAM environment using single calls. The sequence of calls {\bf AGI\_ASSOC},
+{\bf AGI\_BEGIN},  {\bf AGD\_ACTIV}, {\bf AGD\_NWIND} can be replaced by a
+single call to {\bf AGD\_ASSOC}. As with {\bf AGS\_ASSOC} an optional call
+to {\bf AGI\_RCL} can be made by passing a non-blank name argument.
+The sequence of calls {\bf AGD\_DEACT}, {\bf AGI\_END}, {\bf AGI\_CANCL}
+or {\bf AGI\_ANNUL} can be replaced by a single call to {\bf AGD\_DEASS}.
+
+The job of opening and closing the device is handled by the AGD\_ routines
+and therefore the routines {\bf IDI\_ASSOC} and {\bf IDI\_CANCL} or
+{\bf IIDOPN} and {\bf IIDCLO} should not be called when using the
+AGD\_ routines.
+
+%\newpage
+
+\section {Linking}
+
+\subsection{VAX/VMS Systems}
+
+Before compiling and linking a program containing AGI calls some
+initialisations may have to be performed. These are achieved by issuing
+the command
+\begin{verbatim}
+          $ AGI_DEV
+\end{verbatim}
+
+For programs in the ADAM environment the AGI library is automatically
+accessed using the ADAM link command
+\begin{verbatim}
+          $ ALINK <task>
+\end{verbatim}
+
+For standalone programs the usual linking method is to use the STAR\_LINK
+options file
+\begin{verbatim}
+          $ LINK <program>,STAR_LINK/OPT
+\end{verbatim}
+Alternatively a program can be linked using AGI\_LINK/OPTIONS.
+
+When running a standalone program the user will have to assign the logical
+name AGI\_USER to point to a directory to contain the database file.
+
+\subsection{UNIX Systems}
+
+Any programs requiring the AGI include files have to specify the path
+explicitly. The name should also be given in lower case. For example
+\begin{verbatim}
+          INCLUDE '/star/include/agi_par'
+\end{verbatim}
+
+For programs in the ADAM environment the substitute command `agi\_link\_adam`
+should be used. For example to compile and link an ADAM task called `task.f'
+the following is used
+\begin{verbatim}
+          % alink task.f `agi_link_adam`
+\end{verbatim}
+(note the use of the backward quotes).
+
+A standalone program is linked by specifying `agi\_link` on the compiler
+command line. Thus to compile and link a standalone application called
+`prog.f' the following is used
+\begin{verbatim}
+          % f77 prog.f -o prog `agi_link`
+\end{verbatim}
+
+\section {References}
+
+1 --- SUN/92: HDS - Hierarchical Data System Programmer's Guide.
+
+2 --- SUN/57: GNS - Graphics Workstation Name Service.
+
+3 --- SUN/31: REF - Handling References to HDS Objects.
+
+4 --- SUN/61: The TRANSFORM Coordinate Transformation Facility.
+
+5 --- SUN/85: SGS - Simple Graphics System.
+
+6 --- SUN/15: PGPLOT - Graphics Subroutine Library.
+
+7 --- SUN/65: IDI - Image Display Interface.
+
+\newpage
+
+\section {Routine Specifications}
+
+%+
+%  Name:
+%     LAYOUT.TEX
+
+%  Purpose:
+%     Define Latex commands for laying out documentation produced by PROLAT.
+
+%  Language:
+%     Latex
+
+%  Type of Module:
+%     Data file for use by the PROLAT application.
+
+%  Description:
+%     This file defines Latex commands which allow routine documentation
+%     produced by the SST application PROLAT to be processed by Latex. The
+%     contents of this file should be included in the source presented to
+%     Latex in front of any output from PROLAT. By default, this is done
+%     automatically by PROLAT.
+
+%  Notes:
+%     The definitions in this file should be included explicitly in any file
+%     which requires them. The \include directive should not be used, as it
+%     may not then be possible to process the resulting document with Latex
+%     at a later date if changes to this definitions file become necessary.
+
+%  Authors:
+%     RFWS: R.F. Warren-Smith (STARLINK)
+
+%  History:
+%     10-SEP-1990 (RFWS):
+%        Original version.
+%     10-SEP-1990 (RFWS):
+%        Added the implementation status section.
+%     12-SEP-1990 (RFWS):
+%        Added support for the usage section and adjusted various spacings.
+%     10-DEC-1991 (RFWS):
+%        Refer to font files in lower case for UNIX compatibility.
+%     {enter_further_changes_here}
+
+%  Bugs:
+%     {note_any_bugs_here}
+
+%-
+
+%  Define length variables.
+\newlength{\sstbannerlength}
+\newlength{\sstcaptionlength}
+
+%  Define a \tt font of the required size.
+\font\ssttt=cmtt10 scaled 1095
+
+%  Define a command to produce a routine header, including its name,
+%  a purpose description and the rest of the routine's documentation.
+\newcommand{\sstroutine}[3]{
+   \goodbreak
+   \rule{\textwidth}{0.5mm}
+   \vspace{-7ex}
+   \newline
+   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
+   \setlength{\sstcaptionlength}{\textwidth}
+   \addtolength{\sstbannerlength}{0.5em}
+   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
+   \addtolength{\sstcaptionlength}{-4.45pt}
+   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
+   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
+   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
+   \begin{description}
+      #3
+   \end{description}
+}
+
+%  Format the description section.
+\newcommand{\sstdescription}[1]{\item[Description:] #1}
+
+%  Format the usage section.
+\newcommand{\sstusage}[1]{\item[Usage:] \mbox{} \\[1.3ex] {\ssttt #1}}
+
+%  Format the invocation section.
+\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
+
+%  Format the arguments section.
+\newcommand{\sstarguments}[1]{
+   \item[Arguments:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the returned value section (for a function).
+\newcommand{\sstreturnedvalue}[1]{
+   \item[Returned Value:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the parameters section (for an application).
+\newcommand{\sstparameters}[1]{
+   \item[Parameters:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the examples section.
+\newcommand{\sstexamples}[1]{
+   \item[Examples:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Define the format of a subsection in a normal section.
+\newcommand{\sstsubsection}[1]{\item[{#1}] \mbox{} \\}
+
+%  Define the format of a subsection in the examples section.
+\newcommand{\sstexamplesubsection}[1]{\item[{\ssttt #1}] \mbox{} \\}
+
+%  Format the notes section.
+\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
+
+%  Provide a general-purpose format for additional (DIY) sections.
+\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}] \mbox{} \\[1.3ex] #2}
+
+%  Format the implementation status section.
+\newcommand{\sstimplementationstatus}[1]{
+   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
+
+%  Format the bugs section.
+\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
+
+%  Format a list of items while in paragraph mode.
+\newcommand{\sstitemlist}[1]{
+  \mbox{} \\
+  \vspace{-3.5ex}
+  \begin{itemize}
+     #1
+  \end{itemize}
+}
+
+%  Define the format of an item.
+\newcommand{\sstitem}{\item}
+
+%  End of LAYOUT.TEX layout definitions.
+%.
+\begin{small}
+\sstroutine{
+   AGD\_ACTIV
+}{
+   Initialise IDI
+}{
+   \sstdescription{
+      Initialise IDI. This has to be called before any other AGD or
+      IDI routines. An error is returned if this or any other graphics
+      interface is already active.
+   }
+   \sstinvocation{
+      CALL AGD\_ACTIV( STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status
+      }
+   }
+}
+\sstroutine{
+   AGD\_ASSOC
+}{
+   Associate a device with AGI and IDI
+}{
+   \sstdescription{
+      This is a wrap-up routine to associate a device with the AGI
+      database via the ADAM parameter system and open IDI on it.
+      The size and position of an IDI window corresponding to the
+      current picture in the database is returned. This routine calls
+      AGI\_ASSOC, AGI\_BEGIN, AGD\_ACTIV and AGD\_NWIND. Also if the name
+      string is not blank then AGI\_RCL is called to recall the last
+      picture of that name. This routine should be matched by a closing
+      call to AGD\_DEASS.
+   }
+   \sstinvocation{
+       \parbox[t]{135mm}{CALL AGD\_ASSOC ( PARAM, ACMODE, PNAME, MEMID, PICID, 
+                      DISPID, \\ XSIZE, YSIZE, XOFF, YOFF, STATUS )}
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER$*$($*$) (Given)
+      }{
+         The name of the ADAM parameter for accessing device names
+      }
+      \sstsubsection{
+         ACMODE = CHARACTER$*$($*$) (Given)
+      }{
+         Access mode for pictures. {\tt '}READ{\tt '}, {\tt '}WRITE{\tt '} or {\tt '}UPDATE{\tt '}.
+      }
+      \sstsubsection{
+         PNAME = CHARACTER$*$($*$) (Given)
+      }{
+         Recall last picture of this name if not blank.
+      }
+      \sstsubsection{
+         MEMID = INTEGER (Given)
+      }{
+         IDI Memory identifier.
+      }
+      \sstsubsection{
+         PICID = INTEGER (Returned)
+      }{
+         Picture identifier for current picture on given device.
+      }
+      \sstsubsection{
+         DISPID = INTEGER (Returned)
+      }{
+         IDI Display identifier.
+      }
+      \sstsubsection{
+         XSIZE = INTEGER (Returned)
+      }{
+         X size of window
+      }
+      \sstsubsection{
+         YSIZE = INTEGER (Returned)
+      }{
+         Y size of window
+      }
+      \sstsubsection{
+         XOFF = INTEGER (Returned)
+      }{
+         X offset of window from memory origin
+      }
+      \sstsubsection{
+         YOFF = INTEGER (Returned)
+      }{
+         Y offset of window from memory origin
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   AGD\_DEACT
+}{
+   Close down IDI
+}{
+   \sstdescription{
+      Close down IDI whatever the value of status. This should be called
+      after all AGD and IDI routines.
+   }
+   \sstinvocation{
+      CALL AGD\_DEACT( STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status
+      }
+   }
+}
+\sstroutine{
+   AGD\_DEASS
+}{
+   Deassociate a device from AGI and IDI
+}{
+   \sstdescription{
+      This is a wrap-up routine to deassociate a device from the AGI
+      database and to close down IDI. The picture current when
+      AGD\_ASSOC was called is reinstated. This routine calls AGD\_DEACT,
+      AGI\_END and either AGI\_CANCL or AGI\_ANNUL. This routine is
+      executed regardless of the given value of status.
+   }
+   \sstinvocation{
+      CALL AGD\_DEASS( PARAM, PARCAN, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER$*$($*$) (Given)
+      }{
+         The name of the ADAM parameter associated with the device.
+      }
+      \sstsubsection{
+         PARCAN = LOGICAL (Given)
+      }{
+         If true the parameter given by PARAM is cancelled, otherwise
+         it is annulled.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   AGD\_NWIND
+}{
+   Define an IDI window from the current picture
+}{
+   \sstdescription{
+      Define an IDI window in the given memory from the current picture.
+      The window coordinates define the size of the rectangular area in
+      pixels and the offset of its bottom left corner from the memory
+      origin. The window is defined as the smallest possible area, made
+      up of whole pixels, that completely contains the picture. If the
+      device associated with the current picture is not already open
+      then this routine will open the device and return the display
+      identifier. Furthermore if the device was opened with {\tt '}WRITE{\tt '}
+      access (in AGI\_ASSOC or AGI\_OPEN) then the window will be cleared.
+      If the device is already open then the display identifier will be
+      the same as previously and the device will not be cleared.
+   }
+   \sstinvocation{
+      CALL AGD\_NWIND( MEMID, DISPID, XSIZE, YSIZE, XOFF, YOFF, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         MEMID = INTEGER (Given)
+      }{
+         Memory identifier
+      }
+      \sstsubsection{
+         DISPID = INTEGER (Returned)
+      }{
+         Display identifier
+      }
+      \sstsubsection{
+         XSIZE = INTEGER (Returned)
+      }{
+         X size of window
+      }
+      \sstsubsection{
+         YSIZE = INTEGER (Returned)
+      }{
+         Y size of window
+      }
+      \sstsubsection{
+         XOFF = INTEGER (Returned)
+      }{
+         X offset of window from origin
+      }
+      \sstsubsection{
+         YOFF = INTEGER (Returned)
+      }{
+         Y offset of window from origin
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status
+      }
+   }
+}
+\sstroutine{
+   AGD\_SWIND
+}{
+   Save an IDI window in the database
+}{
+   \sstdescription{
+      Save an IDI window as a picture in the database. The new picture
+      must be equal in size or smaller than the current picture in the
+      database. The window coordinates define the size of the
+      rectangular area in pixels and the offset of its bottom left
+      corner from the memory origin. The name of the picture and a
+      comment are used to identify the picture in the database. The name
+      string has leading blanks removed and is converted to upper case.
+      The world coordinates define the user coordinate system and are
+      saved in the database as given. They should be linear and increasing
+      left to right and bottom to top. If the picture was successfully
+      created then a valid picture identifier is returned and the new
+      picture becomes the current picture.
+   }
+   \sstinvocation{
+       \parbox[t]{135mm}{CALL AGD\_SWIND( DISPID, MEMID, XSIZE, YSIZE, XOFF, YOFF,
+                      PNAME, COMENT, \\  WX1, WX2, WY1, WY2, PICID, STATUS )}
+   }
+   \sstarguments{
+      \sstsubsection{
+         DISPID = INTEGER (Given)
+      }{
+         Display identifier
+      }
+      \sstsubsection{
+         MEMID = INTEGER (Given)
+      }{
+         Memory identifier
+      }
+      \sstsubsection{
+         XSIZE = INTEGER (Given)
+      }{
+         X size of window (pixels)
+      }
+      \sstsubsection{
+         YSIZE = INTEGER (Given)
+      }{
+         Y size of window (pixels)
+      }
+      \sstsubsection{
+         XOFF = INTEGER (Given)
+      }{
+         X offset of window from origin (pixels)
+      }
+      \sstsubsection{
+         YOFF = INTEGER (Given)
+      }{
+         Y offset of window from origin (pixels)
+      }
+      \sstsubsection{
+         PNAME = CHARACTER$*$($*$) (Given)
+      }{
+         Name of picture
+      }
+      \sstsubsection{
+         COMENT = CHARACTER$*$($*$) (Given)
+      }{
+         Description of picture
+      }
+      \sstsubsection{
+         WX1 = REAL (Given)
+      }{
+         World coordinate of left edge of new picture
+      }
+      \sstsubsection{
+         WX2 = REAL (Given)
+      }{
+         World coordinate of right edge of new picture
+      }
+      \sstsubsection{
+         WY1 = REAL (Given)
+      }{
+         World coordinate of bottom edge of new picture
+      }
+      \sstsubsection{
+         WY2 = REAL (Given)
+      }{
+         World coordinate of top edge of new picture
+      }
+      \sstsubsection{
+         PICID = INTEGER (Returned)
+      }{
+         Picture identifier
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status
+      }
+   }
+}
+\sstroutine{
+   AGI\_ANNUL
+}{
+   Annul a picture identifier
+}{
+   \sstdescription{
+      Annul the picture identifier. If this is the last active
+      identifier then the database is closed. This routine is
+      executed regardless of the given value of status.
+   }
+   \sstinvocation{
+      CALL AGI\_ANNUL( PICID, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PICID = INTEGER (Given)
+      }{
+         Picture identifier
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status
+      }
+   }
+}
+\sstroutine{
+   AGI\_ASSOC
+}{
+   Associate an AGI device with an ADAM parameter
+}{
+   \sstdescription{
+      Associate an AGI device with a parameter in the ADAM environment
+      and return an identifier to the current picture. If there are no
+      pictures on the device then a base picture is created and made
+      current. If the size of the display window has changed since a
+      previous database operation the database is cleared and a message
+      sent to the user. The access mode does not affect the database
+      operation, but it is used by the graphics system to determine if
+      the display should be cleared the first time the device is opened;
+      {\tt '}READ{\tt '} and {\tt '}UPDATE{\tt '} access do not clear the display, but {\tt '}WRITE{\tt '}
+      access does.
+   }
+   \sstinvocation{
+      CALL AGI\_ASSOC( PARAM, ACMODE, PICID, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER$*$($*$) (Given)
+      }{
+         Name of the parameter used for accessing the device
+      }
+      \sstsubsection{
+         ACMODE = CHARACTER$*$($*$) (Given)
+      }{
+         Access mode: {\tt '}READ{\tt '}, {\tt '}WRITE{\tt '} or {\tt '}UPDATE{\tt '}
+      }
+      \sstsubsection{
+         PICID = INTEGER (Returned)
+      }{
+         Identifier for current picture on the given device
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status
+      }
+   }
+}
+\sstroutine{
+   AGI\_BEGIN
+}{
+   Mark the beginning of a new AGI scope
+}{
+   \sstdescription{
+      Mark the beginning of a new AGI scope. This should be matched with
+      a call to AGI\_END. Up to eight levels of nested begin-end blocks
+      are allowed.
+   }
+   \sstinvocation{
+      CALL AGI\_BEGIN
+   }
+}
+\sstroutine{
+   AGI\_CANCL
+}{
+   Cancel the ADAM device parameter
+}{
+   \sstdescription{
+      Cancel the association of the ADAM device parameter with AGI. Any
+      picture identifiers associated with this parameter are annulled.
+      This routine is executed regardless of the given value of status.
+   }
+   \sstinvocation{
+      CALL AGI\_CANCL( PARAM, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER$*$($*$) (Given)
+      }{
+         Name of the parameter used for accessing the device
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status
+      }
+   }
+}
+\sstroutine{
+   AGI\_CLOSE
+}{
+   Close AGI in non-ADAM environments
+}{
+   \sstdescription{
+      Close AGI in non-ADAM environments. The database file is closed.
+   }
+   \sstinvocation{
+      CALL AGI\_CLOSE( STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status
+      }
+   }
+}
+\sstroutine{
+   AGI\_END
+}{
+   Mark the end of an AGI scope
+}{
+   \sstdescription{
+      Mark the end of an AGI scope. The given picture is made the
+      current one. If the argument is a negative number then the picture
+      current when the matching AGI\_BEGIN was called is made current.
+      All identifiers allocated within this begin-end block are annulled.
+      If the last active identifier is annulled the database is closed.
+   }
+   \sstinvocation{
+      CALL AGI\_END( PICID, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PICID = INTEGER (Given)
+      }{
+         Picture identifier
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status
+      }
+   }
+}
+\sstroutine{
+   AGI\_GTREF
+}{
+   Get a reference object from a picture
+}{
+   \sstdescription{
+      This returns a reference to a data object which has been stored
+      in the database. The picture identifier signifies which picture
+      to obtain the reference from. If this identifier is negative then
+      the current picture is used. If no reference object is found for
+      the given picture an error is returned. If the reference was
+      created from an HDS locator then an HDS locator is returned, and
+      this should be annulled in the application using REF\_ANNUL to
+      ensure the file is properly closed.
+   }
+   \sstinvocation{
+      CALL AGI\_GTREF ( PICID, MODE, DATREF, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PICID = INTEGER (Given)
+      }{
+         Picture identifier
+      }
+      \sstsubsection{
+         MODE = CHARACTER$*$($*$) (Given)
+      }{
+         Access mode for object, {\tt '}READ{\tt '}, {\tt '}WRITE{\tt '}, or {\tt '}UPDATE{\tt '}
+      }
+      \sstsubsection{
+         DATREF = CHARACTER$*$($*$) (Returned)
+      }{
+         String containing reference object
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status
+      }
+   }
+}
+\sstroutine{
+   AGI\_IBASE
+}{
+   Inquire base picture for current device
+}{
+   \sstdescription{
+      A picture identifier for the base picture on the current device
+      is returned. The picture is not selected as the current picture.
+   }
+   \sstinvocation{
+      CALL AGI\_IBASE( PICID, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PICID = INTEGER (Returned)
+      }{
+         Identifier for base picture
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status
+      }
+   }
+}
+\sstroutine{
+   AGI\_ICOM
+}{
+   Inquire comment for the current picture
+}{
+   \sstdescription{
+      The comment string for the current picture is returned.
+   }
+   \sstinvocation{
+      CALL AGI\_ICOM( COMENT, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         COMENT = CHARACTER$*$($*$) (Returned)
+      }{
+         Comment for current picture
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status
+      }
+   }
+}
+\sstroutine{
+   AGI\_ICURP
+}{
+   Inquire the current picture
+}{
+   \sstdescription{
+      The picture identifier of the current picture is returned.
+   }
+   \sstinvocation{
+      CALL AGI\_ICURP( PICID, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PICID = INTEGER (Returned)
+      }{
+         Picture identifier
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status
+      }
+   }
+}
+\sstroutine{
+   AGI\_ILAB
+}{
+   Inquire label of a picture
+}{
+   \sstdescription{
+      Inquire the label of a picture referenced by the identifier. If
+      the picture identifier is negative then the current picture is
+      searched. If no label is associated with this picture then a
+      blank string is returned.
+   }
+   \sstinvocation{
+      CALL AGI\_ILAB ( PICID, LABEL, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PICID = INTEGER (Given)
+      }{
+         Picture identifier
+      }
+      \sstsubsection{
+         LABEL = CHARACTER$*$(AGI\_\_SZLAB) (Returned)
+      }{
+         Label string
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status
+      }
+   }
+}
+\sstroutine{
+   AGI\_IMORE
+}{
+   Inquire if a MORE structure exists
+}{
+   \sstdescription{
+      Inquire if a MORE structure exists for the given picture. If the
+      given value for PICID is negative then the current picture is used.
+      The return argument is true if a MORE structure exists for the
+      picture otherwise it is false.
+   }
+   \sstinvocation{
+      CALL AGI\_IMORE( PICID, LMORE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PICID = INTEGER (Given)
+      }{
+         Picture identifier
+      }
+      \sstsubsection{
+         LMORE = LOGICAL (Returned)
+      }{
+         Locator to the transformation structure
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status
+      }
+   }
+}
+\sstroutine{
+   AGI\_INAME
+}{
+   Inquire name of the current picture
+}{
+   \sstdescription{
+      The name of the current picture is returned.
+   }
+   \sstinvocation{
+      CALL AGI\_INAME ( PNAME, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PNAME = CHARACTER$*$($*$) (Returned)
+      }{
+         Name of current picture
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status
+      }
+   }
+}
+\sstroutine{
+   AGI\_IPOBS
+}{
+   Is current picture obscured by another?
+}{
+   \sstdescription{
+      Inquire if the current picture is obscured, either totally or
+      partially by another picture. Obscured means that a picture
+      intersects the current picture and was created more recently.
+      If the input value for the picture identifier is negative the
+      current picture is tested against all other overlying pictures;
+      i.e. those created more recently than the current picture. If the
+      picture identifier corresponds to a valid picture then the current
+      one is only tested against the given one.
+   }
+   \sstinvocation{
+      CALL AGI\_IPOBS( PICID, LOBS, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PICID = INTEGER (Given)
+      }{
+         Picture identifier.
+      }
+      \sstsubsection{
+         LOBS = LOGICAL (Returned)
+      }{
+         True if picture is obscured, otherwise false.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status
+      }
+   }
+}
+\sstroutine{
+   AGI\_ISAMD
+}{
+   Inquire if pictures are on same device
+}{
+   \sstdescription{
+      Inquire if the given picture is on the same device as the current
+      picture.
+   }
+   \sstinvocation{
+      CALL AGI\_ISAMD( PICID, LSAME, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PICID = INTEGER (Given)
+      }{
+         Picture identifier
+      }
+      \sstsubsection{
+         LSAME = LOGICAL (Returned)
+      }{
+         True if pictures on same device, otherwise false.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status
+      }
+   }
+}
+\sstroutine{
+   AGI\_ISAMP
+}{
+   Inquire if two pictures are the same
+}{
+   \sstdescription{
+      Inquire if a picture identifier references the same picture as
+      the current picture. The picture referenced by the given picture
+      identifier is compared with the current picture to see if they
+      point to the same picture in the database.
+   }
+   \sstinvocation{
+      CALL AGI\_ISAMP( PICID, LSAME, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PICID = INTEGER (Given)
+      }{
+         Picture identifier.
+      }
+      \sstsubsection{
+         LSAME = LOGICAL (Returned)
+      }{
+         True if the pictures are the same, otherwise false.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   AGI\_ITOBS
+}{
+   Inquire if test points are obscured
+}{
+   \sstdescription{
+      Inquire if the members of the array of test points are obscured
+      by any picture overlying (create more recently than) the current
+      picture. The points are defined in the world coordinate system of
+      the current picture. An array of logical values is returned
+      containing true if the corresponding point is obscured, otherwise
+      false.
+   }
+   \sstinvocation{
+      CALL AGI\_ITOBS( NXY, X, Y, LTOBS, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NXY = INTEGER (Given)
+      }{
+         Number of test points
+      }
+      \sstsubsection{
+         X = REAL(NXY) (Given)
+      }{
+         Array of x coordinates of test points
+      }
+      \sstsubsection{
+         Y = REAL(NXY) (Given)
+      }{
+         Array of y coordinates of test points
+      }
+      \sstsubsection{
+         LTOBS = LOGICAL(NXY) (Returned)
+      }{
+         Array of results. True if point is obscured, otherwise false.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status
+      }
+   }
+}
+\sstroutine{
+   AGI\_IWOCO
+}{
+   Inquire world coordinates of current picture
+}{
+   \sstdescription{
+      Return the world coordinate limits of the current picture.
+   }
+   \sstinvocation{
+      CALL AGI\_IWOCO( WX1, WX2, WY1, WY2, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         WX1 = REAL (Returned)
+      }{
+         World coordinate of left edge of picture
+      }
+      \sstsubsection{
+         WX2 = REAL (Returned)
+      }{
+         World coordinate of right edge of picture
+      }
+      \sstsubsection{
+         WY1 = REAL (Returned)
+      }{
+         World coordinate of bottom edge of picture
+      }
+      \sstsubsection{
+         WY2 = REAL (Returned)
+      }{
+         World coordinate of top edge of picture
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status
+      }
+   }
+}
+\sstroutine{
+   AGI\_MORE
+}{
+   Return an HDS locator to a MORE structure
+}{
+   \sstdescription{
+      An HDS locator that points to a MORE structure in the database
+      is returned. A MORE structure can be associated with any picture
+      and it can be used to store any application specific information.
+      If the given value for PICID is negative then the current picture
+      is used. If the access mode is {\tt '}WRITE{\tt '} then an empty MORE structure
+      is created if none existed. If there is an existing structure then
+      {\tt '}WRITE{\tt '} mode will erase the existing contents and return a locator
+      to an empty structure. If the access mode is {\tt '}READ{\tt '} or {\tt '}UPDATE{\tt '} then
+      a locator to an existing structure is returned. In this case an
+      error is returned if there is not a MORE structure for the given
+      picture. The database is not responsible for what goes in the MORE
+      structure or how the information is used. The application is also
+      responsible for annulling the returned locator.
+   }
+   \sstinvocation{
+      CALL AGI\_MORE( PICID, ACMODE, MORLOC, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PICID = INTEGER (Given)
+      }{
+         Picture identifier
+      }
+      \sstsubsection{
+         ACMODE = CHARACTER$*$($*$) (Given)
+      }{
+         Access mode for MORE structure. {\tt '}READ{\tt '}, {\tt '}WRITE{\tt '} or {\tt '}UPDATE{\tt '}.
+      }
+      \sstsubsection{
+         MORLOC = CHARACTER$*$(DAT\_\_SZLOC) (Returned)
+      }{
+         Locator to the transformation structure
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status
+      }
+   }
+}
+\sstroutine{
+   AGI\_NUPIC
+}{
+   Create a new picture in the database
+}{
+   \sstdescription{
+      Create a new picture in the database. The extent of the new
+      picture is defined in the world coordinate system of the current
+      picture. The world coordinates of this new picture are set to the
+      values passed. The name string has leading blanks removed and is
+      converted to upper case. The new picture is selected as the
+      current one and a picture identifier returned.
+   }
+   \sstinvocation{
+       \parbox[t]{135mm}{CALL AGI\_NUPIC( WX1, WX2, WY1, WY2, PNAME, COMENT, \\
+                      NEWX1, NEWX2, NEWY1, NEWY2, PICID, STATUS )}
+   }
+   \sstarguments{
+      \sstsubsection{
+         WX1 = REAL (Given)
+      }{
+         Current world coordinate of left edge of picture
+      }
+      \sstsubsection{
+         WX2 = REAL (Given)
+      }{
+         Current world coordinate of right edge of picture
+      }
+      \sstsubsection{
+         WY1 = REAL (Given)
+      }{
+         Current world coordinate of bottom edge of picture
+      }
+      \sstsubsection{
+         WY2 = REAL (Given)
+      }{
+         Current world coordinate of top edge of picture
+      }
+      \sstsubsection{
+         PNAME = CHARACTER$*$($*$) (Given)
+      }{
+         Name of new picture
+      }
+      \sstsubsection{
+         COMENT = CHARACTER$*$($*$) (Given)
+      }{
+         Comment for new picture
+      }
+      \sstsubsection{
+         NEWX1 = REAL (Given)
+      }{
+         World coordinate of left edge of new picture
+      }
+      \sstsubsection{
+         NEWX2 = REAL (Given)
+      }{
+         World coordinate of right edge of new picture
+      }
+      \sstsubsection{
+         NEWY1 = REAL (Given)
+      }{
+         World coordinate of bottom edge of new picture
+      }
+      \sstsubsection{
+         NEWY2 = REAL (Given)
+      }{
+         World coordinate of top edge of new picture
+      }
+      \sstsubsection{
+         PICID = INTEGER (Returned)
+      }{
+         Picture identifier
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status
+      }
+   }
+}
+\sstroutine{
+   AGI\_OPEN
+}{
+   Open an AGI device in a non-ADAM environment
+}{
+   \sstdescription{
+      Open an AGI device and return an identifier to the current picture.
+      If there are no pictures on the device then a base picture is
+      created and made current. If the size of the display window has
+      changed since a previous database operation the database is cleared
+      and a message sent to the user. The access mode does not affect the
+      database operation, but it is used by the graphics system to
+      determine if the display should be cleared the first time a zone is
+      created; {\tt '}READ{\tt '} and {\tt '}UPDATE{\tt '} access do not clear the display, but
+      {\tt '}WRITE{\tt '} access does.
+   }
+   \sstinvocation{
+      CALL AGI\_OPEN( WKNAME, ACMODE, PICID, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         WKNAME = CHARACTER$*$($*$) (Given)
+      }{
+         Name of the device to open
+      }
+      \sstsubsection{
+         ACMODE = CHARACTER$*$($*$) (Given)
+      }{
+         Access mode: {\tt '}READ{\tt '}, {\tt '}WRITE{\tt '} or {\tt '}UPDATE{\tt '}
+      }
+      \sstsubsection{
+         PICID = INTEGER (Returned)
+      }{
+         Identifier for current picture on the given device
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status
+      }
+   }
+}
+\sstroutine{
+   AGI\_PDEL
+}{
+   Delete all the pictures on the current device
+}{
+   \sstdescription{
+      Delete all the pictures (except the base picture) on the current
+      device. This routine will only execute if the current picture is
+      the base picture, otherwise no action is taken. All picture
+      identifiers associated with this device are released except for
+      the current one.
+   }
+   \sstinvocation{
+      CALL AGI\_PDEL( STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STATUS = INTEGER (Given and returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   AGI\_PTREF
+}{
+   Store a reference object in a picture
+}{
+   \sstdescription{
+      This creates a reference to a data object in the database. The
+      argument can be either an HDS locator or any character string
+      reference. If the string is a valid HDS locator then a reference
+      is constructed to point to the relevant object, otherwise the
+      string is assumed to be a reference itself and is stored as
+      supplied. The picture identifier signifies which picture to put
+      the reference into. If this identifier is negative then the
+      current picture is used. If a reference already exists for the
+      given picture then an error is returned.
+   }
+   \sstinvocation{
+      CALL AGI\_PTREF( DATREF, PICID, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         DATREF = CHARACTER$*$($*$) (Given)
+      }{
+         String containing reference object
+      }
+      \sstsubsection{
+         PICID = INTEGER (Given)
+      }{
+         Picture identifier
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status
+      }
+   }
+}
+\sstroutine{
+   AGI\_RCF
+}{
+   Recall first picture of specified name
+}{
+   \sstdescription{
+      Recall the first picture on the current device that has the
+      specified name and lies within the bounds of the current picture.
+      The name string has leading blanks removed and is converted to
+      upper case before being compared. An empty name string (just
+      spaces) results in a search for a picture of any name. This
+      picture becomes the current picture. If no picture fulfills the
+      conditions an error is returned.
+   }
+   \sstinvocation{
+      CALL AGI\_RCF( PNAME, PICID, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PNAME = CHARACTER$*$($*$) (Given)
+      }{
+         Name of picture
+      }
+      \sstsubsection{
+         PICID = INTEGER (Returned)
+      }{
+         Picture identifier
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status
+      }
+   }
+}
+\sstroutine{
+   AGI\_RCFP
+}{
+   Recall first picture embracing a position
+}{
+   \sstdescription{
+      Recall the first picture on the current device that has the
+      specified name, embraces the given position and lies within the
+      bounds of the current picture. The name string has leading blanks
+      removed and is converted to upper case before being compared.
+      An empty name string (just spaces) results in a search for a
+      picture of any name. The position has to be given in the world
+      coordinates of the current picture. This picture becomes the
+      current picture. If no picture fulfills the conditions an error is
+      returned.
+   }
+   \sstinvocation{
+      CALL AGI\_RCFP( PNAME, X, Y, PICID, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PNAME = CHARACTER$*$($*$) (Given)
+      }{
+         Name of picture
+      }
+      \sstsubsection{
+         X = REAL (Given)
+      }{
+         X position of test point
+      }
+      \sstsubsection{
+         Y = REAL (Given)
+      }{
+         Y position of test point
+      }
+      \sstsubsection{
+         PICID = INTEGER (Returned)
+      }{
+         Picture identifier
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status
+      }
+   }
+}
+\sstroutine{
+   AGI\_RCL
+}{
+   Recall last picture of specified name
+}{
+   \sstdescription{
+      Recall the last picture on the current device that has the
+      specified name and lies within the bounds of the current picture.
+      The name string has leading blanks removed and is converted to
+      upper case before being compared. An empty name string (just
+      spaces) results in a search for a picture of any name. This
+      picture becomes the current picture. If no picture fulfills the
+      conditions an error is returned.
+   }
+   \sstinvocation{
+      CALL AGI\_RCL( PNAME, PICID, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PNAME = CHARACTER$*$($*$) (Given)
+      }{
+         Name of picture
+      }
+      \sstsubsection{
+         PICID = INTEGER (Returned)
+      }{
+         Picture identifier
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status
+      }
+   }
+}
+\sstroutine{
+   AGI\_RCLP
+}{
+   Recall last picture embracing a position
+}{
+   \sstdescription{
+      Recall the last picture on the current device that has the
+      specified name, embraces the given position and lies within the
+      bounds of the current picture. The name string has leading blanks
+      removed and is converted to upper case before being compared.
+      An empty name string (just spaces) results in a search for a
+      picture of any name. The position has to be given in the world
+      coordinates of the current picture. This picture becomes the
+      current picture. If no picture fulfills the conditions an error is
+      returned.
+   }
+   \sstinvocation{
+      CALL AGI\_RCLP( PNAME, X, Y, PICID, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PNAME = CHARACTER$*$($*$) (Given)
+      }{
+         Name of picture
+      }
+      \sstsubsection{
+         X = REAL (Given)
+      }{
+         X position of test point
+      }
+      \sstsubsection{
+         Y = REAL (Given)
+      }{
+         Y position of test point
+      }
+      \sstsubsection{
+         PICID = INTEGER (Returned)
+      }{
+         Picture identifier
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status
+      }
+   }
+}
+\sstroutine{
+   AGI\_RCP
+}{
+   Recall preceding picture of specified name
+}{
+   \sstdescription{
+      Recall the picture preceding the given one on the current device
+      that has the specified name and lies within the bounds of the
+      current picture. The search is started at the picture identified
+      by the PSTART argument. The name string has leading blanks removed
+      and is converted to upper case before being compared. An empty
+      name string (just spaces) results in a search for a picture of any
+      name. This picture becomes the current picture. If no picture
+      fulfills the conditions an error is returned.
+   }
+   \sstinvocation{
+      CALL AGI\_RCP( PNAME, PSTART, PICID, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PNAME = CHARACTER$*$($*$) (Given)
+      }{
+         Name of picture
+      }
+      \sstsubsection{
+         PSTART = INTEGER (Given)
+      }{
+         Identifier of picture starting the search
+      }
+      \sstsubsection{
+         PICID = INTEGER (Returned)
+      }{
+         Picture identifier
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status
+      }
+   }
+}
+\sstroutine{
+   AGI\_RCPP
+}{
+   Recall preceding picture embracing a position
+}{
+   \sstdescription{
+      Recall the picture preceding the given one on the current device
+      that has the specified name, embraces the given position and lies
+      within the bounds of the current picture. The search is started at
+      the picture identified by the PSTART argument. The name string has
+      leading blanks removed and is converted to upper case before being
+      compared. An empty name string (just spaces) results in a search
+      for a picture of any name. This picture becomes the current
+      picture. If no picture in the workstation structure fulfills the
+      conditions an error is returned.
+   }
+   \sstinvocation{
+      CALL AGI\_RCPP( PNAME, PSTART, X, Y, PICID, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PNAME = CHARACTER$*$($*$) (Given)
+      }{
+         Name of picture
+      }
+      \sstsubsection{
+         PSTART = INTEGER (Given)
+      }{
+         Identifier of picture starting the search
+      }
+      \sstsubsection{
+         X = REAL (Given)
+      }{
+         X position of test point
+      }
+      \sstsubsection{
+         Y = REAL (Given)
+      }{
+         Y position of test point
+      }
+      \sstsubsection{
+         PICID = INTEGER (Returned)
+      }{
+         Picture identifier
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status
+      }
+   }
+}
+\sstroutine{
+   AGI\_RCS
+}{
+   Recall succeeding picture of specified name
+}{
+   \sstdescription{
+      Recall the picture succeeding the given one on the current device
+      that has the specified name and lies within the bounds of the
+      current picture. The search is started at the picture identified
+      by the PSTART argument. The name string has leading blanks removed
+      and is converted to upper case before being compared. An empty
+      name string (just spaces) results in a search for a picture of any
+      name. This picture becomes the current picture. If no picture
+      fulfills the conditions an error is returned.
+   }
+   \sstinvocation{
+      CALL AGI\_RCS( PNAME, PSTART, PICID, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PNAME = CHARACTER$*$($*$) (Given)
+      }{
+         Name of picture
+      }
+      \sstsubsection{
+         PSTART = INTEGER (Given)
+      }{
+         Identifier of picture starting the search
+      }
+      \sstsubsection{
+         PICID = INTEGER (Returned)
+      }{
+         Picture identifier
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status
+      }
+   }
+}
+\sstroutine{
+   AGI\_RCSP
+}{
+   Recall succeeding picture embracing a position
+}{
+   \sstdescription{
+      Recall the picture succeeding the given one on the current device
+      that has the specified name, embraces the given position and lies
+      within the bounds of the current picture. The search is started at
+      the picture identified by the PSTART argument. The name string has
+      leading blanks removed and is converted to upper case before being
+      compared. An empty name string (just spaces) results in a search
+      for a picture of any name. This picture becomes the current
+      picture. If no picture in the workstation structure fulfills the
+      conditions an error is returned.
+   }
+   \sstinvocation{
+      CALL AGI\_RCSP( PNAME, PSTART, X, Y, PICID, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PNAME = CHARACTER$*$($*$) (Given)
+      }{
+         Name of picture
+      }
+      \sstsubsection{
+         PSTART = INTEGER (Given)
+      }{
+         Identifier of picture starting the search
+      }
+      \sstsubsection{
+         X = REAL (Given)
+      }{
+         X position of test point
+      }
+      \sstsubsection{
+         Y = REAL (Given)
+      }{
+         Y position of test point
+      }
+      \sstsubsection{
+         PICID = INTEGER (Returned)
+      }{
+         Picture identifier
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status
+      }
+   }
+}
+\sstroutine{
+   AGI\_SELP
+}{
+   Select the given picture as the current one
+}{
+   \sstdescription{
+      Select the given picture as the current one.
+   }
+   \sstinvocation{
+      CALL AGI\_SELP( PICID, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PICID = INTEGER (Given)
+      }{
+         Picture identifier
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status
+      }
+   }
+}
+\sstroutine{
+   AGI\_SLAB
+}{
+   Store label in picture
+}{
+   \sstdescription{
+      Store a label in the picture referenced by the identifier. If the
+      picture identifier is negative then the current picture is used
+      to store the label. If a label already exists for the picture
+      then the old one is overwritten. If this label clashes with
+      another on the same device then the existing label will be
+      replaced with a blank string. For comparison purposes the label
+      string has leading blanks removed and is converted to upper case
+      before being processed, although it is stored as supplied. An
+      empty label string will delete any label stored for that picture.
+   }
+   \sstinvocation{
+      CALL AGI\_SLAB ( PICID, LABEL, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PICID = INTEGER (Given)
+      }{
+         Picture identifier
+      }
+      \sstsubsection{
+         LABEL = CHARACTER$*$(AGI\_\_SZLAB) (Given)
+      }{
+         Label string
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status
+      }
+   }
+}
+\sstroutine{
+   AGI\_SROOT
+}{
+   Select the root picture for searching
+}{
+   \sstdescription{
+      The root picture is selected for searching operations. The root
+      picture contains all other pictures (including the base picture)
+      and can be used to recall any picture whether it lies within the
+      current picture or not. This is used to override the usual
+      restriction that a recalled picture must lie within the bounds of
+      the current picture. The root picture is automatically deselected
+      after a call to any of the recall routines AGI\_RC$*$. Recall is the
+      only operation allowed with the root picture, any other operation
+      called while the root picture is selected will use the current
+      picture.
+   }
+   \sstinvocation{
+      CALL AGI\_SROOT( STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status
+      }
+   }
+}
+\sstroutine{
+   AGI\_TCOPY
+}{
+   Copy a transformation structure to the database
+}{
+   \sstdescription{
+      The transformation pointed to by the HDS locator is stored in
+      the database. The picture identifier signifies which picture is
+      to receive the transformation structure. If this identifier is
+      negative then the current picture will be used. If a transformation
+      already exists for this picture then an error will be returned.
+      The supplied transformation should convert data coordinates into
+      the world coordinates of the database picture, as if it had been
+      created with a call to AGI\_TNEW.
+   }
+   \sstinvocation{
+      CALL AGI\_TCOPY( TRNLOC, PICID, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         TRNLOC = CHARACTER$*$(DAT\_\_SZLOC) (Given)
+      }{
+         Locator to the transformation structure
+      }
+      \sstsubsection{
+         PICID = INTEGER (Given)
+      }{
+         Picture identifier
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status
+      }
+   }
+}
+\sstroutine{
+   AGI\_TDDTW
+}{
+   Transform double precision data to world coordinates
+}{
+   \sstdescription{
+      Transform a set of double precision data coordinates into world
+      coordinates using a transformation stored in the database. The
+      picture identifier signifies which picture contains the required
+      transformation structure. If this identifier is negative then
+      the current picture is used. If no transformation structure
+      is found then the identity transformation is used, i.e. the
+      world coordinates equal the data coordinates.
+   }
+   \sstinvocation{
+      CALL AGI\_TDDTW( PICID, NXY, DX, DY, WX, WY, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PICID = INTEGER (Given)
+      }{
+         Picture identifier
+      }
+      \sstsubsection{
+         NXY = INTEGER (Given)
+      }{
+         Number of data points to transform
+      }
+      \sstsubsection{
+         DX = DBLE(NXY) (Given)
+      }{
+         Array of x data coordinates
+      }
+      \sstsubsection{
+         DY = DBLE(NXY) (Given)
+      }{
+         Array of y data coordinates
+      }
+      \sstsubsection{
+         WX = DBLE(NXY) (Returned)
+      }{
+         Array of x world coordinates
+      }
+      \sstsubsection{
+         WY = DBLE(NXY) (Returned)
+      }{
+         Array of y world coordinates
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status
+      }
+   }
+}
+\sstroutine{
+   AGI\_TDTOW
+}{
+   Transform data to world coordinates
+}{
+   \sstdescription{
+      Transform a set of data coordinates into world coordinates
+      using a transformation stored in the database. The picture
+      identifier signifies which picture contains the required
+      transformation structure. If this identifier is negative then
+      the current picture is used. If no transformation structure
+      is found then the identity transformation is used, i.e. the
+      world coordinates equal the data coordinates.
+   }
+   \sstinvocation{
+      CALL AGI\_TDTOW( PICID, NXY, DX, DY, WX, WY, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PICID = INTEGER (Given)
+      }{
+         Picture identifier
+      }
+      \sstsubsection{
+         NXY = INTEGER (Given)
+      }{
+         Number of data points to transform
+      }
+      \sstsubsection{
+         DX = REAL(NXY) (Given)
+      }{
+         Array of x data coordinates
+      }
+      \sstsubsection{
+         DY = REAL(NXY) (Given)
+      }{
+         Array of y data coordinates
+      }
+      \sstsubsection{
+         WX = REAL(NXY) (Returned)
+      }{
+         Array of x world coordinates
+      }
+      \sstsubsection{
+         WY = REAL(NXY) (Returned)
+      }{
+         Array of y world coordinates
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status
+      }
+   }
+}
+\sstroutine{
+   AGI\_TNEW
+}{
+   Store a transformation in the database
+}{
+   \sstdescription{
+      The transformation defined by the pseudo-code FORTRAN statements
+      DTOW and WTOD is stored in the database. The picture identifier
+      signifies which picture is to receive the transformation
+      structure. If this identifier is negative then the current picture
+      will be used. If a transformation already exists for this picture
+      then an error will be returned. The number of world variables NCW
+      has to be equal to 2 otherwise an error will be returned. The
+      number of data variables NCD also has to equal 2 in the present
+      implementation.
+   }
+   \sstinvocation{
+      CALL AGI\_TNEW ( NCD, NCW, DTOW, WTOD, PICID, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NCD = INTEGER (Given)
+      }{
+         Number of data variables
+      }
+      \sstsubsection{
+         NCW = INTEGER (Given)
+      }{
+         Number of world variables
+      }
+      \sstsubsection{
+         DTOW = CHARACTER$*$($*$)(NCW) (Given)
+      }{
+         Array of forward transformation functions
+      }
+      \sstsubsection{
+         WTOD = CHARACTER$*$($*$)(NCD) (Given)
+      }{
+         Array of inverse transformation functions
+      }
+      \sstsubsection{
+         PICID = INTEGER (Given)
+      }{
+         Picture identifier
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status
+      }
+   }
+}
+\sstroutine{
+   AGI\_TWTDD
+}{
+   Transform double precision world to data coordinates
+}{
+   \sstdescription{
+      Transform a set of double precision world coordinates into data
+      coordinates using a transformation stored in the database. The
+      picture identifier signifies which picture contains the required
+      transformation structure. If this identifier is negative then
+      the current picture is used. If no transformation structure
+      is found then the identity transformation is used, i.e. the
+      data coordinates equal the world coordinates.
+   }
+   \sstinvocation{
+      CALL AGI\_TWTDD( PICID, NXY, WX, WY, DX, DY, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PICID = INTEGER (Given)
+      }{
+         Picture identifier
+      }
+      \sstsubsection{
+         NXY = INTEGER (Given)
+      }{
+         Number of data points to transform
+      }
+      \sstsubsection{
+         WX = DBLE(NXY) (Given)
+      }{
+         Array of x world coordinates
+      }
+      \sstsubsection{
+         WY = DBLE(NXY) (Given)
+      }{
+         Array of y world coordinates
+      }
+      \sstsubsection{
+         DX = DBLE(NXY) (Returned)
+      }{
+         Array of x data coordinates
+      }
+      \sstsubsection{
+         DY = DBLE(NXY) (Returned)
+      }{
+         Array of y data coordinates
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status
+      }
+   }
+}
+\sstroutine{
+   AGI\_TWTOD
+}{
+   Transform world to data coordinates
+}{
+   \sstdescription{
+      Transform a set of world coordinates into data coordinates
+      using a transformation stored in the database. The picture
+      identifier signifies which picture contains the required
+      transformation structure. If this identifier is negative then
+      the current picture is used. If no transformation structure
+      is found then the identity transformation is used, i.e. the
+      data coordinates equal the world coordinates.
+   }
+   \sstinvocation{
+      CALL AGI\_TWTOD( PICID, NXY, WX, WY, DX, DY, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PICID = INTEGER (Given)
+      }{
+         Picture identifier
+      }
+      \sstsubsection{
+         NXY = INTEGER (Given)
+      }{
+         Number of data points to transform
+      }
+      \sstsubsection{
+         WX = REAL(NXY) (Given)
+      }{
+         Array of x world coordinates
+      }
+      \sstsubsection{
+         WY = REAL(NXY) (Given)
+      }{
+         Array of y world coordinates
+      }
+      \sstsubsection{
+         DX = REAL(NXY) (Returned)
+      }{
+         Array of x data coordinates
+      }
+      \sstsubsection{
+         DY = REAL(NXY) (Returned)
+      }{
+         Array of y data coordinates
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status
+      }
+   }
+}
+\sstroutine{
+   AGP\_ACTIV
+}{
+   Initialise PGPLOT
+}{
+   \sstdescription{
+      Initialise PGPLOT. This has to be called before any other AGP or
+      PGPLOT routines. An error is returned if this or any other
+      graphics interface, other than AGS\_, is active.
+   }
+   \sstinvocation{
+      CALL AGP\_ACTIV( STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status
+      }
+   }
+}
+\sstroutine{
+   AGP\_ASSOC
+}{
+   Associate a device with AGI and PGPLOT
+}{
+   \sstdescription{
+      This is a wrap-up routine to associate a device with the AGI
+      database via the ADAM parameter system and open PGPLOT on it.
+      A PGPLOT viewport corresponding to the current picture in the
+      database is created. This routine calls AGI\_ASSOC, AGI\_BEGIN
+      AGP\_ACTIV and AGP\_NVIEW. Also if the name string is not blank
+      then AGI\_RCL is called to recall the last picture of that name.
+      This routine should be matched by a closing call to AGP\_DEASS.
+   }
+   \sstinvocation{
+      CALL AGP\_ASSOC( PARAM, ACMODE, PNAME, BORDER, PICID, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER$*$($*$) (Given)
+      }{
+         The name of the ADAM parameter for accessing device names
+      }
+      \sstsubsection{
+         ACMODE = CHARACTER$*$($*$) (Given)
+      }{
+         Access mode for pictures. {\tt '}READ{\tt '}, {\tt '}WRITE{\tt '} or {\tt '}UPDATE{\tt '}.
+      }
+      \sstsubsection{
+         PNAME = CHARACTER$*$($*$) (Given)
+      }{
+         Recall last picture of this name if not blank.
+      }
+      \sstsubsection{
+         BORDER = LOGICAL (Given)
+      }{
+         Flag to indicate if a border is to be left around the viewport.
+      }
+      \sstsubsection{
+         PICID = INTEGER (Returned)
+      }{
+         Picture identifier for current picture on given device.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   AGP\_DEACT
+}{
+   Close down PGPLOT
+}{
+   \sstdescription{
+      Close down PGPLOT whatever the value of status. This should be
+      called after all AGP and PGPLOT routines.
+   }
+   \sstinvocation{
+      CALL AGP\_DEACT( STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status
+      }
+   }
+}
+\sstroutine{
+   AGP\_DEASS
+}{
+   Deassociate a device from AGI and PGPLOT
+}{
+   \sstdescription{
+      This is a wrap-up routine to deassociate a device from the AGI
+      database and to close down PGPLOT. The picture current when
+      AGP\_ASSOC was called is reinstated. This routine calls AGP\_DEACT,
+      AGI\_END and either AGI\_CANCL or AGI\_ANNUL. This routine is
+      executed regardless of the given value of status.
+   }
+   \sstinvocation{
+      CALL AGP\_DEASS( PARAM, PARCAN, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER$*$($*$) (Given)
+      }{
+         The name of the ADAM parameter associated with the device.
+      }
+      \sstsubsection{
+         PARCAN = LOGICAL (Given)
+      }{
+         If true the parameter given by PARAM is cancelled, otherwise
+         it is annulled.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   AGP\_NVIEW
+}{
+   Create a new PGPLOT viewport from the current picture
+}{
+   \sstdescription{
+      Create a new PGPLOT viewport from the current picture. The
+      viewport will be created with the coordinate system of the
+      current picture. The border flag allocates space around the plot
+      for annotation if required. If true the viewport is made
+      approximately 10\% smaller than the picture to allow space for
+      annotation. If false the viewport matches the picture exactly.
+      If the device associated with the current picture is not open then
+      this routine will open it, and additionally the viewport will be
+      cleared if the access mode is {\tt '}WRITE{\tt '} (in AGI\_ASSOC or AGI\_OPEN).
+      If the SGS interface is already active then the first call to
+      this routine will open PGPLOT in the current SGS zone. In this
+      case the viewport normalised device coordinates will not match the
+      coordinate system of the current picture, but will have the
+      default range of 0 to 1.
+   }
+   \sstinvocation{
+      CALL AGP\_NVIEW ( STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         BORDER = LOGICAL (Given)
+      }{
+         Flag to indicate if a border is to be left around the viewport
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status
+      }
+   }
+}
+\sstroutine{
+   AGP\_SVIEW
+}{
+   Save the current PGPLOT viewport in the database
+}{
+   \sstdescription{
+      Save the current PGPLOT viewport as a picture in the database.
+      The new picture must be equal in size or smaller than the current
+      picture in the database. The name of the picture and a comment are
+      used to identify the picture in the database. The name string has
+      leading blanks removed and is converted to upper case. If the
+      picture was successfully created then a valid picture identifier
+      is returned and the new picture becomes the current picture.
+   }
+   \sstinvocation{
+      CALL AGP\_SVIEW( PICNAM, COMENT, PICID, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PICNAM = CHARACTER$*$($*$) (Given)
+      }{
+         Name of picture
+      }
+      \sstsubsection{
+         COMENT = CHARACTER$*$($*$) (Given)
+      }{
+         Description of picture
+      }
+      \sstsubsection{
+         PICID = INTEGER (Returned)
+      }{
+         Picture identifier
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status
+      }
+   }
+}
+\sstroutine{
+   AGS\_ACTIV
+}{
+   Initialise SGS
+}{
+   \sstdescription{
+      Initialise SGS. This has to be called before any other AGS or
+      SGS routines. An error is returned if this or any other graphics
+      interface is already active.
+   }
+   \sstinvocation{
+      CALL AGS\_ACTIV( STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status
+      }
+   }
+}
+\sstroutine{
+   AGS\_ASSOC
+}{
+   Associate a device with AGI and SGS
+}{
+   \sstdescription{
+      This is a wrap-up routine to associate a device with the AGI
+      database via the ADAM parameter system and open SGS on it. An
+      SGS zone corresponding to the current picture in the database
+      is created. This routine calls AGI\_ASSOC, AGI\_BEGIN, AGS\_ACTIV
+      and AGS\_NZONE. Also if the name string is not blank then AGI\_RCL
+      is called to recall the last picture of that name. This routine
+      should be matched by a closing call to AGS\_DEASS.
+   }
+   \sstinvocation{
+      CALL AGS\_ASSOC( PARAM, ACMODE, PNAME, PICID, NEWZON, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER$*$($*$) (Given)
+      }{
+         The name of the ADAM parameter for accessing device names
+      }
+      \sstsubsection{
+         ACMODE = CHARACTER$*$($*$) (Given)
+      }{
+         Access mode for pictures. {\tt '}READ{\tt '}, {\tt '}WRITE{\tt '} or {\tt '}UPDATE{\tt '}.
+      }
+      \sstsubsection{
+         PNAME = CHARACTER$*$($*$) (Given)
+      }{
+         Recall last picture of this name if not blank.
+      }
+      \sstsubsection{
+         PICID = INTEGER (Returned)
+      }{
+         Picture identifier for current picture on given device.
+      }
+      \sstsubsection{
+         NEWZON = INTEGER (Returned)
+      }{
+         The new SGS zone that matches the current picture.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   AGS\_DEACT
+}{
+   Close down SGS
+}{
+   \sstdescription{
+      Close down SGS whatever the value of status. This should be
+      called after all AGS and SGS routines.
+   }
+   \sstinvocation{
+      CALL AGS\_DEACT( STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status
+      }
+   }
+}
+\sstroutine{
+   AGS\_DEASS
+}{
+   Deassociate a device from AGI and SGS
+}{
+   \sstdescription{
+      This is a wrap-up routine to deassociate a device from the AGI
+      database and to close down SGS. The picture current when AGS\_ASSOC
+      was called is reinstated. This routine call AGS\_DEACT, AGI\_END and
+      either AGI\_CANCL or AGI\_ANNUL. This routine is executed regardless
+      of the given value of status.
+   }
+   \sstinvocation{
+      CALL AGS\_DEASS( PARAM, PARCAN, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER$*$($*$) (Given)
+      }{
+         The name of the ADAM parameter associated with the device.
+      }
+      \sstsubsection{
+         PARCAN = LOGICAL (Given)
+      }{
+         If true the parameter given by PARAM is cancelled, otherwise
+         it is annulled.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   AGS\_NZONE
+}{
+   Create a new SGS zone from the current picture
+}{
+   \sstdescription{
+      Create a new SGS zone from the current picture. The zone will be
+      created with the coordinate system of the current picture.
+      If the device associated with the current picture is not already
+      open then this routine will open it, and additionally the zone
+      will be cleared if the access mode is {\tt '}WRITE{\tt '} (in AGI\_ASSOC or
+      AGI\_OPEN).
+   }
+   \sstinvocation{
+      CALL AGS\_NZONE ( NEWZON, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         NEWZON = INTEGER (Returned)
+      }{
+         SGS zone identifier of new zone
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status
+      }
+   }
+}
+\sstroutine{
+   AGS\_SZONE
+}{
+   Save the current SGS zone in the database
+}{
+   \sstdescription{
+      Save the current SGS zone as a picture in the database. The new
+      picture must be equal in size or smaller than the current picture
+      in the database. The name of the picture and a comment are used to
+      identify the picture in the database. The name string has leading
+      blanks removed and is converted to upper case. If the picture was
+      successfully created then a valid picture identifier is returned
+      and the new picture becomes the current picture.
+   }
+   \sstinvocation{
+      CALL AGS\_SZONE( PNAME, COMENT, PICID, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PNAME = CHARACTER$*$($*$) (Given)
+      }{
+         Name of picture
+      }
+      \sstsubsection{
+         COMENT = CHARACTER$*$($*$) (Given)
+      }{
+         Description of picture
+      }
+      \sstsubsection{
+         PICID = INTEGER (Returned)
+      }{
+         Picture identifier
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status
+      }
+   }
+}
+\end{small}
+\end{document}
+

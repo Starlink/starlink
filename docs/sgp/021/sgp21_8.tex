@@ -1,0 +1,645 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink General Paper}
+\newcommand{\stardocinitials}  {SGP}
+\newcommand{\stardocnumber}    {21.8}
+\newcommand{\stardocauthors}   {M D Lawden, M J Bly, J C Sherman}
+\newcommand{\stardocdate}      {24 November 1992}
+\newcommand{\stardoctitle}     {Starlink Software Distribution Policy}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\LARGE \bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%-------------------------------------------------------------------------------
+\setlength{\parskip}{0mm}
+\tableofcontents
+\setlength{\parskip}{\medskipamount}
+\markright{\stardocname}
+%-------------------------------------------------------------------------------
+
+\newpage
+
+\section {Introduction}
+\label{se:intro}
+
+This paper specifies Starlink's policy for distributing its software both
+within Starlink, and to non-Starlink sites. It applies to anyone (Site Manager
+or user) who is considering installing Starlink software at a Starlink site, or
+sending it to a non-Starlink site. It also provides information about how to
+obtain commercial software used by Starlink. The policy outlined herein applies 
+to the VAX/VMS and Unix implementations of Starlink software, and any other
+implementations on other systems. 
+
+\begin{itemize}
+\item SGP/20 defines the meaning of the term `Starlink Software'.
+\item SSN/15 specifies the procedure for physically distributing and installing
+Starlink software.
+\item SSN/41 specifies the procedure for updating Starlink software.
+\end{itemize}
+
+This paper distinguishes between {\em Non-commercial Software,} usually written
+by an astronomer or Starlink programmer, and {\em Commercial Software,} which
+has been obtained from a supplier such as NAG on payment of a license or
+purchase fee.
+
+{\em Non-commercial Software} can be supplied to bona-fide astronomers at
+non-Starlink sites from any Starlink site with the consent of the Site Manager,
+provided the restrictions described in Appendix \ref{se:cons} are adhered to,
+and that full information about the recipient and the software items supplied
+are sent to the Starlink Software Librarian (currently Martin Bly) at RAL.
+
+{\em Commercial Software} {\bf cannot} be supplied to non-Starlink sites,
+except under the specific circumstances described in Section \ref{se:comm}.
+
+The currently available Starlink software is specified in file  {\tt
+ADMINDIR:SSI.LIS} (VAX/VMS systems) which should be consulted for the latest
+situation.
+
+The normal point of distribution for the Starlink Software Collection is the
+Starlink Software Librarian at RAL, who may be contacted at the following
+address:\label{pa:add} 
+
+\begin{verse}
+Starlink Software Librarian,\\
+Rutherford Appleton Laboratory \\
+Room 1-28, R68 \\
+Chilton, \\
+DIDCOT, \\
+Oxfordshire \\
+OX11 0QX \\
+UNITED KINGDOM.
+
+
+Tel: 0235 445363 (UK) \quad (+44 235 445363 overseas) \\
+Fax: 0235 445848 (UK) \quad (+44 235 445848 overseas) \\
+email: RLVAD::STAR \quad (DECnet/SPAN) \\
+email: STAR@UK.AC.RL.STAR \quad (JANET) \\
+email: star@star.rl.ac.uk \quad (Internet)
+\end{verse}
+
+\newpage
+
+\section {Non-commercial Software}
+\label{se:nonc}
+
+Appendix \ref{se:lsco} contains a letter from SERC Central Office concerning 
+the exchange of Starlink software.
+The conditions under which non-commercial Starlink software may be distributed
+to non-Starlink sites is set out in Appendix \ref{se:cons}.
+They have been influenced by the document reproduced in Appendix
+\ref{se:lsco}.
+
+Appendix \ref{se:gdf} contains a form devised by the licenser of GKS 7.2 and
+7.4 (NRDC) which states the conditions under which this software can be
+distributed by Starlink.
+
+Any Starlink software distributed to a non-Starlink site should be accompanied
+by a copy of SUG, SUN/1, SGP/25, SGP/31, SSN/15 and the policy statement shown
+in Appendix \ref{se:cons}. The Starlink Software Librarian must agree to the
+distribution before it is made. Details of known software distributions to
+non-Starlink sites are stored in file {\tt RLVAD::LADMINDIR:EXTERNAL.LIS}.
+
+\section {Commercial Software}
+\label{se:comm}
+
+There are two items of commercial software\footnote{Another item (NCAR) may
+change its status at some time in the future to become licensed software; if
+this happens, it will affect distribution to new sites but will not affect
+existing use.} which can be distributed to non-Starlink sites under special
+conditions.
+
+These are:
+\begin{tabbing}
+XXXX\=XXXXX\=\kill
+\>{\bf GKS}:\>Graphical Kernel System (version 7.2 on VMS or 7.4 on Unix).\\
+\>{\bf NAG}:\>Mathematical subroutine library.
+\end{tabbing}
+
+The status of currently used commercial software is shown in Table
+\ref{tab:comm}.
+
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{||l|l|l|l||} \hline
+{\em Item} & {\em Proprietor} & {\em Installed} & {\em Support} \\ \hline \hline
+GENSTAT   & NAG      & All sites & Software Librarian\\
+GKS       & NRDC     & All sites & David Terrett \\
+MEMSYS    & MEDC Ltd & All sites & David Berry \\
+NAG       & NAG Ltd  & All sites & Software Librarian \\
+TOOLPACK  & NAG Ltd  & All sites & Software Librarian \\ \hline
+CLUSTAN   & Clustan Ltd & BIR CAM DUR & Malcolm Currie \\
+          &             & LEI MAN PRE & \\
+          &             & QMW SOU RAL ROE & \\
+IDL       & Research Systems Inc & ARM BEL BIR & Jeff Payne \\
+          &             & CAM RAL OXF QMW & \\ \hline
+FORCHECK  & Polyhedron Software & STADAT & Software Librarian \\
+MAPLE     & Waterloo Maple Software & STADAT & Software Librarian\\
+SPAG      & Polyhedron Software & STADAT & Paul Rees \\ \hline
+\end{tabular}
+\caption{Commercial software in the Starlink Software Collection.}
+\label{tab:comm}
+\end{center}
+\end{table}
+
+The licensing details for each commercial software item in the Starlink
+Software Collection is described in more detail below.
+
+\subsection {CLUSTAN}
+
+{\em VMS only}
+
+This software must only be installed at Starlink sites as specified in Table 
+\ref{tab:comm}.
+It must not be installed at other Starlink sites, or be distributed to
+non-Starlink sites.
+Purchase enquiries should be directed to:
+
+\begin{verse}
+CLUSTAN Ltd,\\
+16 Kingsburgh Road,\\
+EDINBURGH,\\
+EH12 6DZ\\
+UNITED KINGDOM.
+
+Tel: 031-337-1448; \hspace{10mm} Tx: 72165 (TELEXG)
+\end{verse}
+
+\subsection {FORCHECK}
+
+{\em VMS only}
+
+This software must only be installed on the STADAT Starlink node.
+It must not be installed on other Starlink nodes, or be distributed to
+non-Starlink sites.
+Purchase enquiries should be directed to:
+
+\begin{verse}
+Polyhedron Software Ltd,\\
+Linden House,\\
+93 High Street,\\
+Standlake,\\
+WITNEY,\\
+OX8 7RH\\
+UNITED KINGDOM
+
+Tel: 0865-300-579;  \hspace{10mm} Fax: 0865-300-232
+\end{verse}
+
+\subsection {GENSTAT}
+
+{\em VMS only}
+
+This software is licensed under the same terms as NAG. It must not be
+distributed to non-Starlink sites but can be provided to new Starlink sites.
+Starlink may have up to 5 installations of GENSTAT, one each on any of the 
+Starlink VAX Clusters.
+
+See under NAG for further details.
+
+\subsection {GKS}
+
+GKS can be distributed to a new Starlink site without charge or notice.
+It can be distributed to non-Starlink sites only under special conditions.
+For these cases, send the following letter together with the GKS Declaration
+Form shown in Appendix \ref{se:gdf} to the site requesting the software:
+
+\begin{quotation}
+`The Starlink project has adopted version 7.2 of the GKS graphics software as
+part of the Starlink Software Collection. Many items in this Collection depend
+on GKS 7.2 so you may well need to install it. If you wish to receive it, you
+must complete the enclosed form and return it to me. If you wish to distribute
+it to any other sites, each such site must complete a copy of this form and
+return it to me. Licensing agreements with the owners of the software do not
+permit me to supply it unless this procedure is followed.'
+\end{quotation}
+
+The Declaration Form specifies the conditions under which the software must be
+used. The Declaration Form should be completed and returned to the Starlink
+Software Librarian at RAL, who will file it. GKS may then be sent to the person
+who requested it.
+
+GKS is also obtainable from:
+
+\begin{verse}
+The Secretary (Ref: KWC/123855),\\
+National Research Development Corporation,\\
+101 Newington Causeway,\\
+LONDON\\
+SE1 6BU
+\end{verse}
+
+It is possible to use Starlink software in conjunction with other GKS
+implementations. Starlink actually uses GKS 7.4 in the Unix Software
+Collection. However, there are likely to be slight differences in behaviour
+which will require adaptation of applications code and may prevent some
+applications from running satisfactorily.
+
+\subsection {IDL}
+
+This software must only be installed at Starlink sites as specified in Table 1.
+It must not be installed at other Starlink sites, or be distributed to
+non-Starlink sites.
+Purchase enquiries should be directed to:
+
+\begin{verse}
+Research Systems Inc,\\
+777 29th Street, Suite 302,\\
+Boulder,\\
+CO 80303\\
+USA
+
+Tel: 010-1-303-786-9900; \hspace{10mm} Fax: 010-1-303-786-9909
+\end{verse}
+
+\subsection {MAPLE}
+
+{\em VMS only}
+
+This software must only be installed on the STADAT Starlink node.
+It must not be installed on other Starlink nodes, or be distributed to
+non-Starlink sites.
+Purchase enquiries should be directed to:
+\begin{verse}
+Waterloo Maple Software,\\
+160 Columbia Street West,\\
+Waterloo,\\
+Ontario,\\
+N2L 3L3,\\
+CANADA
+
+Tel: 010-1-519-747-2373;  \hspace{10mm} Fax: 010-1-519-747-5284
+\end{verse}
+
+\subsection {MEMSYS}
+
+{\em VMS only}
+
+This software must only be installed at Starlink sites.
+It must not be distributed to non-Starlink sites.
+In addition, any person who wishes to use this software must complete a copy of
+the {\em `Memsys Starlink Academic User's Licence Agreement'}\/ and return it 
+to the Starlink Software Librarian at RAL.
+Access to MEMSYS is controlled by Access Control Lists (ACLs).
+
+Purchase enquiries should be directed to:
+\begin{verse}
+Maximum Entropy Data Consultants Ltd,\\
+20 Cockcroft Place,\\
+CAMBRIDGE\\
+CB3 0HF\\
+UNITED KINGDOM
+
+Tel: 0223-312562;  \hspace{10mm} Fax: 0223-354599
+\end{verse}
+
+\subsection {NAG}
+
+The SERC and NAG have negotiated a deal for the period 1st April 1991 to 31st
+March 1996, which allows many implementations of the NAG Fortran and Graphics 
+Libraries to be run on any SERC owned CPU. This includes Starlink CPUs, and
+Starlink contributes towards the cost of the deal. 
+
+The software currently available and applicable to Starlink is shown in 
+Table~\ref{tab:nag}.
+
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{|l|l|c|c|c|} \hline
+{\em Product}  & {\em Version} & {\em VAX/VMS} & {\em SPARCstation} & 
+{\em DECstation} \\ \hline \hline
+Fortran & Double   &    X    &     X        &    X       \\
+        & Single   &    X    &     X        &    -       \\
+        & G\_Float &    X    &     -        &    -       \\ \hline
+Graphics & Double  &    X    &     X        &    X       \\
+        & Single   &    X    &     -        &    -       \\ \hline
+Online Info & ~~~- &    X    &     X        &    X       \\ \hline
+\end{tabular}
+\caption{NAG Fortran and Graphics Implementations available to Starlink.}
+\label{tab:nag}
+\end{center}
+\end{table}
+
+Purchase enquiries should be directed to:
+
+\begin{verse}
+NAG Ltd\\
+Wilkinson House\\
+Jordan Hill Road\\
+OXFORD, OX2 8DR\\
+UNITED KINGDOM
+
+Tel: 0865-511245;\hspace{10mm}Tx: 83354 NAG UK G;\hspace{10mm}Fax:
+0865-310139\\
+\end{verse}
+
+When a new version of the NAG library is released, RAL receives tapes
+containing the new versions together with updates for the NAG Fortran Library
+Manual and a new Introductory Guide. RAL then distributes the object libraries
+to the other Starlink sites as part of a Starlink Software Change (SSC or
+USSC). The other Starlink sites do not automatically receive any documentation
+updates so it is necessary to buy them from NAG. Please contact the Starlink
+Documentation Librarian regarding documentation purchase.
+
+Some Starlink software contains NAG routines which have been incorporated into
+executable modules during the linking process.
+The specific modules involved are unknown, but we have obtained an informal
+agreement with NAG to distribute such Starlink software under the following
+conditions:
+\begin{enumerate}
+\item Sites which are sent this software must satisfy the general conditions
+laid out in Appendix~\ref{se:cons}.
+\item Distribution must be only occasional.
+\item A disclaimer (see Appendix~\ref{se:cons}) must be sent with the software.
+\end{enumerate}
+NAG have asked that the following paragraph be included in the documentation
+with the software and/or in a covering letter:
+
+\begin{quote} 
+`Fortran subroutines are included in this program by kind permission of the
+Numerical Algorithms Group Ltd (NAG), Jordan Hill Road, Oxford, OX2 8DR who
+retain all intellectual property rights to the routines. They are not to be
+used separately from this program or any charge to be made for this program
+without the express written permission of NAG.' 
+\end{quote}
+
+\subsection {NCAR}
+
+The NCAR graphics library was originally distributed as public domain software.
+This appears to have changed.
+A release was received at RAL in August 1986 accompanied by a letter (dated
+July 25th 1986) containing the following paragraph:
+
+\begin{quote}
+`Under new guidelines from the NSF, this NCAR software package is not in the
+public domain. Distribution by NCAR does not include the right of the recipient
+or the user to distribute or use this software for commercial purposes.
+Commercial distribution is permitted only under agreement with NCAR.'
+\end{quote}
+
+Starlink's current view is that its software distribution is not `commercial
+distribution' and so we can still distribute NCAR along with the rest of the
+Starlink software. However, this position is under consideration and may
+change.
+
+The original source of NCAR is:
+\begin{verse}
+National Center for Atmospheric Research,\\
+Scientific Computing Division\\
+P O Box 3000,\\
+Boulder,\\
+Co 80307,\\
+USA
+
+Tel: 010-1-303-497-1000
+\end{verse}
+
+\subsection {SPAG}
+
+{\em VMS only}
+
+This software must only be installed on the STADAT Starlink node.
+It must not be installed on other Starlink nodes, or be distributed to
+non-Starlink sites.
+
+SPAG is part of the PlusFORT suite from Polyhedron Software. For details see
+FORCHECK.
+
+\subsection {TOOLPACK}
+
+{\em VMS only}
+
+This software may be installed and used at any Starlink site but must not
+be distributed to non-Starlink sites.
+It may be purchased from NAG.
+
+\subsection {Other licensed software}
+
+Other licensed software used at Starlink sites (VMS, Fortran, PSI, DECnet,
+Coloured Book, JTMP, Rabbit-7, Auditor, etc) is not part of the Starlink
+Software Collection and distribution of such software to non-Starlink sites is
+{\em not allowed}.
+Please refer any questions regarding this software to the Starlink Network
+Manager (John Sherman).
+
+\section {References}
+
+\begin{description}
+\begin{description}
+\item [SGP/20]: Starlink Software Management
+\item [SGP/25]: Starlink Site Manager's Guide --- Major Nodes
+\item [SGP/37]: Starlink Site Manager's Guide --- Minor Nodes
+\item [SSN/15]: Starlink Software Installation
+\item [SSN/41]: Starlink Software Changes
+\item [SUG]: Starlink User Guide
+\end{description}
+\end{description}
+
+\newpage
+
+\appendix
+
+\section {Letter from SERC Central Office}
+\label{se:lsco}
+
+This letter from SERC Central Office regarding Software Distribution was sent by
+Peter Davies (SERC AII Secretary) to Keith Tritton (then Starlink Project
+Scientist) on 12th May 1982:
+
+\vspace{25mm}
+
+\begin{quote}
+\begin{center}
+EXCHANGE OF STARLINK SOFTWARE
+\end{center}
+
+You will recall that I have been seeking the `official line' on how we should
+tackle exchange and distribution of Starlink software.
+SSAG took a very sensible line on this about 18 months ago but it was not
+apparently cleared then with Finance Division here.
+The step is required because public resources have been invested in the
+software and the question of exploitation must be considered.
+
+Happily the outcome recognises that scientific collaboration in modern astronomy
+implies exchange of software.
+Thus provided that the distribution of our software is done as part of a
+scientific exchange whereby we also expect to benefit in the long term, it can
+go ahead within the following guidelines:
+\begin{itemize}
+\item Licensed software is not distributed.
+\item The recipients have a bona-fide astronomical interest and will not
+ undertake any commercial exploitation of the software, and therefore will
+ retain it for their own use and not themselves distribute it without the
+ approval of Starlink management
+\item Individual Starlink users seek the approval of Starlink management
+ before distributing software developed at SERC's expense (i.e.\ to ensure that
+ the two points above can be safeguarded).
+\end{itemize}
+If there is to be a formal agreement with any organisation then Finance Division
+will need to be consulted and they will keep the interests of British Technology
+Group\footnote{Now NRDC.} in mind.
+This should be done through ASR Division, either by contacting me or Vince
+Foley.
+\end{quote}
+
+\newpage
+
+\section{Starlink Software --- Conditions of Supply}
+\label{se:cons}
+
+The {\em General Starlink Software Distribution Policy} is as follows:
+
+\begin{quote}
+Starlink is prepared to distribute Starlink software to anyone with a bona-fide
+astronomical interest, within the following guidelines:
+
+\begin{enumerate}
+
+\item Only non-licensed software can be distributed, unless special permission
+has been obtained to do so from the licensee.
+
+\item The recipients must not undertake any commercial exploitation of the
+software, and must not themselves distribute it without the agreement of
+Starlink management.
+
+\item Starlink does not undertake to support or maintain distributed software.
+(There are exceptions to this for particular sites which are closely associated
+with Starlink; namely the AAO, SAAO and some UK universities running Starlink
+software on their own VAXs.)
+
+\item Recipients of Starlink software must give the following details of their
+site: full postal and computer network addresses, telephone, fax and/or telex
+number, name of a personal contact, tape type and density preferred.
+
+\item Anyone intending to distribute Starlink software must first obtain the
+permission of the Starlink Software Librarian (Martin Bly), or the Site
+Manager, and provide him  with details of the software and site involved.
+
+\item Starlink software is supplied on an `as is' basis and is not guaranteed
+for any particular purpose. The Starlink project does not offer any warranties
+or representations, nor does it accept any liabilities with respect to the
+supplied software.
+
+\item Any site requesting the GKS software must complete and return to the
+Starlink Software Librarian the GKS form shown in Appendix \ref{se:gdf}. 
+
+\end{enumerate}
+
+\end{quote}
+
+Some Starlink software makes use of routines which have been linked with the
+NAG libraries.
+NAG have asked for the following paragraph to apply to such software:
+
+\begin{quote}
+`Fortran subroutines are included in this program by kind permission of the
+Numerical Algorithms Group Ltd (NAG), Jordan Hill Road, Oxford, OX2 8DR who
+retain all intellectual property rights to the routines. They are not to be
+used separately from this program or any charge to be made for this program
+without the express written permission of NAG.'
+\end{quote}
+
+\newpage
+
+\section{GKS Declaration Form} 
+\label{se:gdf} 
+To be returned to the Starlink Software Librarian, at the address on 
+page~\pageref{pa:add}.
+
+\begin{footnotesize}
+\begin{center}
+{\bf The University or Institution receiving the software:}
+\end{center}
+\begin{verbatim}
+      FROM: ..................................................................
+
+            ..................................................................
+
+            ..................................................................
+
+      To: The Secretary (Ref: KWC/123855)       Copy to: Dr C D Osland
+          National Research Development Corp.            Rutherford Appleton Lab
+          101 Newington Causeway                         Chilton, DIDCOT, Oxon
+          LONDON, SE1 6BU                                OX11 0QX
+\end{verbatim}
+
+Dear Sirs,
+\begin{center}
+COMPUTER SOFTWARE IN WHICH NRDC HAS EXPLOITATION INTERESTS
+\end{center}
+My Institution is interested in obtaining from the Rutherford Appleton
+Laboratory (RAL) a copy of the computer software known as RAL-GKS which is
+more particularly described below.
+
+I understand that the software has been developed with financial support from
+the Science and Engineering Research Council and that, consequently, the
+National Research Development Corporation (NRDC) has an interest in its
+commercial exploitation. In recognition of this, I agree that the programs and
+other information (as described below) when received by my Institution will be
+kept confidential and will be used by my Institution for research development
+and educational purposes only and not for commercial purposes with or without
+any alterations. The originals and any further copies made by me will be
+returned on request. I also agree not to provide copies for use outside my
+Institution and not to publish details of the programs without the consent of
+NRDC. If any modifications are made to this software by anyone in this
+Institution, the modified software including any new workstation handler or
+device driver code will become part of the original software covered by this
+undertaking and a free copy supplied as soon as possible to the Rutherford
+Appleton Laboratory. I will advise any enquirers of this software to contact
+NRDC quoting the above reference.
+
+Yours faithfully
+\begin{verbatim}
+      Research Investigator ................................................... (signature)
+
+      ............. (Date) ........................................ (Name - block capitals)
+
+      University Secretary or Nominee ......................................... (signature)
+
+      ............. (Date) ........................................ (Name - block capitals)
+
+      for and on behalf of .................................................. (Institution)
+\end{verbatim}
+\begin{center}
+DESCRIPTION OF PROGRAMS AND OTHER INFORMATION
+\end{center}
+
+The RAL-GKS software package is the software developed at the Rutherford
+Appleton Laboratory by a team which has been supported jointly by the Science
+and Engineering Research Council and International Computers Limited, as
+described in the RAL-GKS User Guide dated May 1985. The software to be supplied
+will consist of the object code prepared for a given machine range but will not
+include the PERQ system interface nor the PERQ screen device handler modules.
+Source code for workstation interface modules, and source code for an example
+of a workstation handler may also be included.
+
+\end{footnotesize}
+\end{document}
