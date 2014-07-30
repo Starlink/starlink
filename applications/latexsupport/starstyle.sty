@@ -9,7 +9,7 @@
 % % Command for text that should be pushed to the right of the line (eg
 % % following an hfill, on a single line of text
 
-\newcommand{\scpushright}[1]{\hfill #1}
+\newcommand*{\scpushright}[1]{\hfill #1}
 
 
 \DeclareGraphicsExtensions{.pdf,.png,.jpg,.jpeg}
@@ -17,11 +17,11 @@
 
 
 % %...reference and link commands
-\newcommand{\cref}[3]{#1~\ref{#2}}
-\newcommand{\xlabel}[1]{\label{\protect{xref_#1}}}
-\newcommand{\latexhtml}[3]{#1}
-\renewcommand{\htmladdnormallink}[2]{\href{#2}{#1}\footnote{\url{#2}}}
-\renewcommand{\html}[1]{}
+\newcommand*{\cref}[3]{#1~\ref{#2}}
+\newcommand*{\xlabel}[1]{\label{\protect{xref_#1}}}
+\newcommand*{\latexhtml}[3]{#1}
+\renewcommand*{\htmladdnormallink}[2]{\href{#2}{#1}\footnote{\url{#2}}}
+%\renewcommand*{\html}[1]{}
 
 
 
@@ -35,8 +35,10 @@
 \clearpage
 \begingroup \catcode`\_=12 \tableofcontents \endgroup
 \clearpage
+\ifwithlof
+\typeout{Testing lof!}
 \begingroup \catcode`\_=12 \listoffigures \endgroup
-
+\fi
 \clearpage
 \renewcommand{\thepage}{\arabic{page}}
 \setcounter{page}{1}

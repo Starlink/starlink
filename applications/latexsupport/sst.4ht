@@ -11,8 +11,7 @@
  class="sstsectitle">}}{\HCode{</h3>}}
 
 \ConfigureToc{sstrefsection}{}{}{}{}
-
-
+%\renewcommand{\sstrefsection}[1]{\subsection*{#1}}
 
 %%% sstsectitle[2]: Formatting of the title: Name of command and short
 %%% description.
@@ -25,14 +24,17 @@
 
 %% sstattribute[3]
 \renewcommand{\sstattribute}[3]{%
-  \HCode{hr}
-\subsection*{#1 -- #2}
+\HCode{<div class="sstattribute">}
+\HCode{<h4 class="sstattributehead">}
+#1---#2
+\HCode{</h4>}
+%\subsubsection*{#1---#2}
 \addcontentsline{toc}{subsubsection}{\protect\numberline{}#1---#2}
 \label{\RemoveSpaces{#1}}
 #3
-\HCode{hr}
+\HCode{</div>}
 }
-
+\Css{div.sstattribute:before{content:"";display:block;border-bottom:solid 1px grey;padding-top:1em}}
 %%% sstroutine[3]
 
 \renewcommand{\sstroutine}[3]{%
@@ -59,6 +61,7 @@
 \Css{.toccom{font-size:80\%;whitespace:nowrap}}
 
 \renewcommand{\ssttitle}[2]{
+%  \subsection*{\centering #1}}
         \sstrefsection{#1}
         \sstsubtitle{#2}}
 

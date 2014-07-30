@@ -24,15 +24,16 @@ while ($line=<DOCFILE>)
 	$line = "$1documentclass$2\{starlink\}$3\n";
       }
     # Change star doc commands to new version.
-    if ($line=~/(.*?)newcommand\{\\stardoc(.*?)\}(.*)\{(.*?)\}/)
-      {
-	$line = "$1\stardoc$2$3\{$4\}\n";
-      }
+    #if ($line=~/(.*?)newcommand\{\\stardoc(.*?)\}(.*)\{(.*?)\}/)
+    #  {
+#	$line = "$1\stardoc$2$3\{$4\}\n";
+#      }
 
     if ($line=~/(.*?)\\begin{document}(.*?)/ )
       {
 	$line = "$1\\begin{document}\n\\scfrontmatter\n$2";
       }
+
 
     print OUTPUTFILE "$line";
   }
@@ -43,10 +44,16 @@ close OUTPUTFILE;
 
 #write out file
 my $text = read_file("$outname");
+$text =~s/\\newcommand{\\stardoc(.*?)}(.*?){(.*?)}/\\stardoc$1 $2 {$3}/g;
 
+$text =~s/\\newcommand{\\stardocabstract}/\\stardocabstract/g;
+$text =~s/\\newcommand{\\stardoccopyright}/\\stardoccopyright/g;
 # Replace \small\verbatim with terminalv
 $text =~s/\\latex{\\small}\n\\begin{verbatim}/\\begin{terminalv}/g;
 $text =~s/\\end{verbatim}\n\\latex{\\normalsize}/\\end{terminalv}/g;
+# Replace \myquote\verbatim with terminalv
+$text =~s/\\begin{myquote}\n\\begin{verbatim}/\\begin{terminalv}/g;
+$text =~s/\\end{verbatim}\n\\end{myquote}/\\end{terminalv}/g;
 
 # Replace verbatim with terminalv enivornment
 $text =~s/\\begin{verbatim}/\\begin{terminalv}/g;
@@ -71,6 +78,11 @@ $text =~s/\\latexonlytoc//g;
 
 # Remove setcounter
 $text =~ s/\\setcounter{(.*)}{(.*)}//g;
+
+
+# Remove table of contents
+$text =~ s/\\tableofcontents//g;
+
 
 
 $text =~ s/\\newlength{\\menuwidth}\n(.*)\n(.*)\n(.*)\n(.*)\n(.*)\n(.*)\n(.*)\n(.*)\n(.*)\n(.*)\n(.*)\\renewcommand{\\baselinestretch}(.*)}\n//g;
@@ -179,7 +191,7 @@ open (OUTPUTFILE, ">$outname.temp");
 my $echo = 1;
 while($line=<INFILE>)
   {
-    if ($line=~/\% SST definitions(.*?)/)
+    if ($line=~/\%(\s*)SST.TEX(.*?)/)
       {
 	print "Removing the following SST definitions:\n";
 	$echo = 0;
@@ -192,7 +204,7 @@ while($line=<INFILE>)
       {
 	print color("red"),"$line",color("reset");
       }
-    if ($line=~/\% End of SST definitions(.*?)/ )
+    if ($line=~/\%(\s*)End of "sst.tex/ )
       {
 	print "Turning echo back on \n\n";
 	$echo = 1;
@@ -294,3 +306,9 @@ copy ("$outname.temp", "$outname") or die "Copy failed: $!";
 # move abstract into \stardocabstract.
 # being/end description around menuitems.
 # create section Release notes and move everything else down one level (replace section{ with subsection{ for rest of document
+
+
+# Changes for sun258:
+# remove space in abstract
+# description around menuitem
+# comment out/remove stuff at top

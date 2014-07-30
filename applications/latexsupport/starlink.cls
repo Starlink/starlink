@@ -2,14 +2,19 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{starlink}
 
+% Declare options 
 \newif\ifwithchapters
 \withchaptersfalse
 
 \newif\iftwoside
 \twosidefalse
 
+\newif\ifwithlof
+\withloftrue
+
 \DeclareOption{chapters}{\withchapterstrue}
 \DeclareOption{twoside}{\twosidetrue}
+\DeclareOption{nolof}{\withloffalse}
 
 \ProcessOptions\relax
 
@@ -30,7 +35,8 @@
 % microtype For improved pdf typography (must come after loading class)
 \RequirePackage{microtype}
 
-
+%maths
+\RequirePackage{amsmath}
 
 \RequirePackage{mathpazo}
 
@@ -235,7 +241,9 @@
 
 \setlist[sldes,1]{%
   style=nextline,leftmargin=0.15\textwidth%
-}
+  }
+
+\newlist{sldes2}{description}{2}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%% Starlink xref command
 
@@ -255,7 +263,7 @@
 
 %%%% Command that doesn't do anything in latex
 
-\newcommand{\html}{}
+\newcommand{\html}[1]{}
 
 
 %.. The remaining starlink specific definitions.

@@ -1,6 +1,4 @@
 
-    \usepackage{microtype}
-    \DisableLigatures{encoding = *, family = * }
 
 %This needs to occur before the TocAt commands?
 \ConfigureToc{sstrefsection}{}{}{}{}
@@ -17,7 +15,8 @@
    \TocAt{section,subsection,sstrefsection}
 \fi
    \CutAt{appendix,appendix}
-   \CutAt{sstrefsection,section}
+   \CutAt{sstrefsection,sstrefsection}
+   %\CutAt{+sstrefsection,section}
 %% Sort out the front matter for the main thing.
 
 \renewcommand{\scfrontmatter}{%
@@ -163,15 +162,15 @@
    {\egroup\EndP\HCode{</dt><dd\Hnewline >}}
 
 
-\ConfigureList{description}%
-   {\EndP\HCode{<dl \a:LRdir class="description">}%
-      \PushMacro\end:itm
-\global\let\end:itm=\empty}
-   {\PopMacro\end:itm \global\let\end:itm \end:itm
-\EndP\HCode{</dd></dl>}\ShowPar}
-   {\end:itm \global\def\end:itm{\EndP\Tg</dd>}\HCode{<dt
-        class="description">}\bgroup \bf}
-   {\egroup\EndP\HCode{</dt><dd\Hnewline class="description">}}
+%\ConfigureList{description}%
+%   {\EndP\HCode{<dl \a:LRdir class="description">}%
+%      \PushMacro\end:itm
+%\global\let\end:itm=\empty}
+%   {\PopMacro\end:itm \global\let\end:itm \end:itm
+%\EndP\HCode{</dd></dl>}\ShowPar}
+%   {\end:itm \global\def\end:itm{\EndP\Tg</dd>}\HCode{<dt
+%        class="description">}\bgroup \bf}
+%   {\egroup\EndP\HCode{</dt><dd\Hnewline class="description">}}
 
 
 %\renewenvironment{longtable}[1]{%
@@ -220,8 +219,11 @@
 
 
 
+%\renewcommand{\item}[1][]{\item #1}
+%\newenvironment{sldes2}{\begin{tabular}{c l}\mycommand}{\end{tabular}}
 
-\renewenvironment{sldes}{\begin{description}}{\end{description}}
+
+%\renewenvironment{sldes2}{\begin{description}}{\end{description}}
 
 \ConfigureList{sldes}{\EndP\HCode{<dl \a:LRdir class="sldes">}%
  \PushMacro\end:itm
@@ -233,8 +235,15 @@
 
 
 
-
-
+\ConfigureList{sldes2}{\EndP\HCode{<table \a:LRdir class="sldes2">}%
+ \PushMacro\end:itm
+\global\let\end:itm=\empty}
+   {\PopMacro\end:itm \global\let\end:itm \end:itm
+\EndP\HCode{</dd></table>}\ShowPar}
+   {\end:itm \global\def\end:itm{\EndP\Tg</td>\Tg</tr>}\HCode{<tr><td>}\bgroup \bf}
+   {\egroup\EndP\HCode{</td><td\Hnewline >}}
+\Css{table.sldes2 td{vertical-align:top; padding: 0px 5px 0px 5px;}}
+\Css{table.sldes2{margin-left:10\%;margin-right:10\%;}}
 
 
 
@@ -263,3 +272,7 @@
 
 
 
+
+
+%#don't include -cunithtf as commandline option -- it will enable
+%ligatures as htmlcharacters. Breaks cut and paste etc.
