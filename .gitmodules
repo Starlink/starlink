@@ -160,3 +160,6 @@
 [submodule "thirdparty/fsf/autotools/m4/m4"]
 	path = thirdparty/fsf/autotools/m4/m4
 	url = ../m4.git
+[submodule "thirdparty/erfa/erfa"]
+	path = thirdparty/erfa/erfa
+	url = git://github.com/liberfa/erfa.git

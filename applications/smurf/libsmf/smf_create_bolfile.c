@@ -74,12 +74,16 @@
 *     2011-05-16 (TIMJ):
 *        Allow variance to be disabled as well as quality. Use a single
 *        flags argument instead of hasqual.
+*     2014-07-30 (TIMJ):
+*        Extract BOLO frame from the suppled reference time-series WCS
+*        rather than recalculating everything.
 
 *  Notes:
 *     - Does not propogate provenance or history from refdata.
 
 *  Copyright:
 *     Copyright (C) 2009-2011 Science and Technology Facilities Council.
+*     Copyright (C) 2014 Cornell University.
 *     All Rights Reserved.
 
 *  Licence:
@@ -111,6 +115,7 @@
 #include "ndf.h"
 #include "star/kaplibs.h"
 #include "star/thr.h"
+#include "star/atl.h"
 #include "ast.h"
 #include "star/one.h"
 
@@ -187,14 +192,17 @@ void smf_create_bolfile( ThrWorkForce *wf, const Grp * bgrp, size_t index,
       one_strlcat( buffer, datalabel, sizeof(buffer), status );
     }
 
-    /* Create output WCS. Should really extract it from the
-       refdata WCS rather than attempting to reconstruct. */
-    sc2ast_createwcs( subnum, NULL, NULL, NULL, NO_FTS, &wcs, status );
+    /* Create output WCS by selecting the FPLANE domain from the
+       time-series WCS. If there is no FPLANE we do not write a WCS */
+    if (refdata->hdr->tswcs) {
+      wcs = atlFrameSetSplit( refdata->hdr->tswcs, "FPLANE", status );
 
-    /* and switch to BOLO frame which is best for bolometer analysis */
-    kpg1Asffr( wcs, "BOLO", &frnum, status );
-    if (frnum != AST__NOFRAME) astSetI( wcs, "CURRENT", frnum );
-
+      /* and switch to BOLO frame which is best for bolometer analysis */
+      if (wcs) {
+        kpg1Asffr( wcs, "BOLO", &frnum, status );
+        if (frnum != AST__NOFRAME) astSetI( wcs, "CURRENT", frnum );
+      }
+    }
     (*bolmap)->hdr = smf_construct_smfHead( NULL, refdata->hdr->instrument,
                                             wcs, NULL,
                                             astCopy( refdata->hdr->fitshdr ),
@@ -214,7 +222,7 @@ void smf_create_bolfile( ThrWorkForce *wf, const Grp * bgrp, size_t index,
     /* write WCS and FITS information to file and sync other information */
     if (bgrp) {
       kpgPtfts( (*bolmap)->file->ndfid, refdata->hdr->fitshdr, status );
-      ndfPtwcs( wcs, (*bolmap)->file->ndfid, status );
+      if (wcs) ndfPtwcs( wcs, (*bolmap)->file->ndfid, status );
       smf_write_clabels( *bolmap, status );
     }
   }
