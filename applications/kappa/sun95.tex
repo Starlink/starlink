@@ -148,10 +148,10 @@ and alphabetical summaries.}
 % this was fixed by say having extra braces, the \sstattribute
 % then used roman fount for its headings.  The current lash up
 % appears to work, but needs further investigation or a TeX wizard.
-\providecommand{\att}[1]{\sf #1}
+\providecommand{\att}[1]{\textsf{#1}}
 
 
-\providecommand{\htmlattref}[2]{\htmlref{\att{#1}}{#2}\rm}
+\providecommand{\htmlattref}[2]{\htmlref{\att{#1}}{#2}}
 
 % Shorthands for hypertext links.
 % -------------------------------
@@ -1975,14 +1975,15 @@ the file \verb+style.dat+ contained the following two lines:
    colour(border)=red,^labels.dat
 \end{terminalv}
 
-then the strings \verb+grid=1+, \verb+colour(grid)=red+, \verb+border=1+
-and \verb+colour(border)=red+ would be returned to the application, and
-in addition the file \verb+labels.dat+ would be searched for further
-strings.  This nesting of text files can go down to seven levels.  Text
-files may also contain comments.  Anything occurring after a {\tt{"}}\verb+#+{\tt{"}}
-character is ignored.  To ignore an entire line the \verb+#+ character
-must be in column 1 (any blanks in front of the \verb+#+ character are
-considered to be significant).
+then the strings \verb+grid=1+, \verb+colour(grid)=red+,
+\verb+border=1+ and \verb+colour(border)=red+ would be returned to the
+application, and in addition the file \verb+labels.dat+ would be
+searched for further strings.  This nesting of text files can go down
+to seven levels.  Text files may also contain comments.  Anything
+occurring after a {\tt{"}}\verb+#+{\tt{"}} character is ignored.  To
+ignore an entire line the \verb+#+ character must be in column 1 (any
+blanks in front of the \verb+#+ character are considered to be
+significant).
 
 \subsubsection{\label{SEC:GRPEDIT}Editing}
 
@@ -2332,11 +2333,11 @@ You can obtain vector values too.
 
 This displays the image otherndf surrounded by axes, but the plot's
 axis labels originate from another dataset called myndf
-\footnote{ The {\att style} parameter specifies the appearance of the annotated axes,
+\footnote{ The \att{style} parameter specifies the appearance of the annotated axes,
 and is given as a comma-separated group of \emph{attribute settings}, each
 of which is a {\tt name=value} string specifying the attribute name and
-value.  In this case, we assign values to the two attributes {\att label(1)}
-and {\att label(2)}.  The whole group must be enclosed in single quotes to
+value.  In this case, we assign values to the two attributes \att{label(1)}
+and \att{label(2)}.  The whole group must be enclosed in single quotes to
 prevent the parameter system splitting the string at the commas.  The
 string must then also be enclosed in double quotes to prevent the UNIX shell
 from interpreting the parantheses and equals signs.  A simpler way of
@@ -2608,44 +2609,46 @@ called attribute setting strings.  For instance:
 \end{terminalv}
 
 are two attribute setting strings.  The first assigns the value {\tt 1} to
-the attribute called {\att Border}, and the second assigns the string
-{\tt "This is my plot title"} to the attribute with name {\att Title}
+the attribute called \att{Border}, and the second assigns the string
+{\tt "This is my plot title"} to the attribute with name \att{Title}
 (attribute names are case insensitive but cannot be abbreviated).
 
-Here is a list of the available attributes, with a brief description of
-each.  Full descriptions are included \slhyperref{later}{in Section~}{}{se:plotting_attr}.
+Here is a list of the available attributes, with a brief description
+of each.  Full descriptions are included \slhyperref{later}{in
+  Section~}{}{se:plotting_attr}.
 
-\begin{verse}
-{\att Border}: Draw a border around valid regions of a plot?\\
-{\att Colour(element)}: Colour for a plot element\\
-{\att DrawAxes}: Draw axes?\\
-{\att DrawDSB}: Annotate both sidebands in a dual sideband spectrum?\\
-{\att DrawTitle}: Draw a title?\\
-{\att Edge(axis)}: Which edges to label\\
-{\att FileInTitle}: Include the NDF name as a second line in the title?\\
-{\att Font(element)}: Character fount for a plot element\\
-{\att Gap(axis)}: Interval between major axis values\\
-{\att Grid}: Draw grid lines?\\
-{\att LabelAt(axis)}: Where to place numerical labels\\
-{\att LabelUnits(axis)}: Include unit descriptions in axis labels?\\
-{\att LabelUp(axis)}: Draw numerical axis labels upright?\\
-{\att Labelling}: Label and tick placement option\\
-{\att MajTickLen}: Length of major tick marks \\
-{\att MinTickLen}: Length of minor tick marks \\
-{\att MinTick(axis)}: Density of minor tick marks\\
-{\att NumLab(axis)}: Draw numerical axis labels?\\
-{\att NumLabGap(axis)}: Spacing of numerical axis labels\\
-{\att Size(element)}: Character size for a plot element\\
-{\att Style(element)}: Line style for a plot element\\
-{\att TextBackColour}: Background colour to use when drawing text\\
-{\att TextLab(axis)}: Draw descriptive axis labels?\\
-{\att TextLabGap(axis)}: Spacing of descriptive axis labels\\
-{\att TextMargin}: Width of margin to clear when drawing text\\
-{\att TickAll}: Draw tick marks on all edges?\\
-{\att TitleGap}: Vertical spacing for the title\\
-{\att Tol}: Plotting tolerance\\
-{\att Width(element)}: Line width for a plot element
-\end{verse}
+
+\begin{sldes2}
+\item[\att{Border}] Draw a border around valid regions of a plot?
+\item[\att{Colour(element)}] Colour for a plot element
+\item[\att{DrawAxes}] Draw axes?
+\item[\att{DrawDSB}] Annotate both sidebands in a dual sideband spectrum?
+\item[\att{DrawTitle}] Draw a title?
+\item[\att{Edge(axis)}] Which edges to label
+\item[\att{FileInTitle}] Include the NDF name as a second line in the title?
+\item[\att{Font(element)}] Character fount for a plot element
+\item[\att{Gap(axis)}] Interval between major axis values
+\item[\att{Grid}] Draw grid lines?
+\item[\att{LabelAt(axis)}] Where to place numerical labels
+\item[\att{LabelUnits(axis)}] Include unit descriptions in axis labels?
+\item[\att{LabelUp(axis)}] Draw numerical axis labels upright?
+\item[\att{Labelling}] Label and tick placement option
+\item[\att{MajTickLen}] Length of major tick marks 
+\item[\att{MinTickLen}] Length of minor tick marks 
+\item[\att{MinTick(axis)}] Density of minor tick marks
+\item[\att{NumLab(axis)}] Draw numerical axis labels?
+\item[\att{NumLabGap(axis)}] Spacing of numerical axis labels
+\item[\att{Size(element)}] Character size for a plot element
+\item[\att{Style(element)}] Line style for a plot element
+\item[\att{TextBackColour}] Background colour to use when drawing text
+\item[\att{TextLab(axis)}] Draw descriptive axis labels?
+\item[\att{TextLabGap(axis)}] Spacing of descriptive axis labels
+\item[\att{TextMargin}] Width of margin to clear when drawing text
+\item[\att{TickAll}] Draw tick marks on all edges?
+\item[\att{TitleGap}] Vertical spacing for the title
+\item[\att{Tol}] Plotting tolerance
+\item[\att{Width(element)}] Line width for a plot element
+\end{sldes2}
 
 Some attribute names can be qualified so that they refer to a particular
 component of the plot.  This is done by putting the qualifier in
@@ -2656,8 +2659,8 @@ parentheses after the attribute name.  For instance:
    Edge(2)=left
 \end{terminalv}
 
-assigns the value {\tt 2} to the {\att Colour} attribute for the plot border,
-and assigns the value {\tt left} to the {\att Edge} attribute for the second
+assigns the value {\tt 2} to the \att{Colour} attribute for the plot border,
+and assigns the value {\tt left} to the \att{Edge} attribute for the second
 axis.  The full description of each attribute describes what happens if
 you omit the qualifier.  Attribute names that end in {\tt "(axis)"} in
 the above list can be qualified by an integer axis index to refer to a
@@ -2666,65 +2669,93 @@ the above list can be qualified by any of the following strings to refer to
 a particular component of the plot (the qualifiers are case-insensitive and
 unambiguous abbreviations may be used):
 
-\begin{verse}
-{\att Axes}: Axis lines drawn through tick marks within the plotting area,
-drawn if attribute {\att DrawAxes} is given a
-non-zero value.  Values set using {\att Axes} are
-only only used if axis-specific values have not been set using {\att Axis1}
-or {\att Axis2}.  Thus, {\att Axes} provides default values for {\att Axis1} and
-{\att Axis2}. \\
-{\att Axis1}: An axis line drawn through tick marks on Axis~1 within the
-plotting area, drawn if attribute {\att DrawAxes} is given a
-non-zero value.  Values specified using {\att Axis1} override any supplied
-using {\att Axes}. \\
-{\att Axis2}: An axis line drawn through tick marks on Axis~2 within the
-plotting area, drawn if attribute {\att DrawAxes} is given a
-non-zero value.  Values specified using {\att Axis2} override any supplied
-using {\att Axes}. \\
-{\att Border}: The plot border, drawn if attribute {\att Border} is given a non-zero value.\\
-{\att Curves}: Curves drawn over the top of a plot (\emph{e.g.} contours, data curves).\\
-{\att Grid}: The grid lines, drawn if attribute {\att Grid} is given a non-zero value.
-Values set using {\att Grid} are only only used if axis-specific values have not been
-set using {\att Grid1} or {\att Grid2}.  Thus, {\att Grid} provides default values
-for {\att Grid1} and {\att Grid2}. \\
-{\att Grid1}: Grid lines that cross Axis~1, drawn if attribute {\att Grid}
-is given a non-zero value.  Values specified using {\att Grid1} override any
-supplied using {\att Grid}. \\
-{\att Grid2}: Grid lines that cross Axis~2, drawn if attribute {\att Grid}
-is given a non-zero value.  Values specified using {\att Grid2} override any
-supplied using {\att Grid}. \\
-{\att Markers}: Graphical markers (symbols) drawn over a plot.\\
-{\att NumLab}: Numerical axis labels drawn around annotated axes.
-Values set using {\att NumLab} are
-only only used if axis-specific values have not been set using {\att NumLab1}
-or {\att NumLab2}.  Thus, {\att NumLab} provides default values for {\att NumLab1}
-and {\att NumLab2}. \\
-{\att NumLab1}: Numerical labels drawn along Axis~1.  Values specified using
-{\att NumLab1} override any supplied using {\att NumLab}. \\
-{\att NumLab2}: Numerical labels drawn along Axis~2.  Values specified using
-{\att NumLab2} override any supplied using {\att NumLab}. \\
-{\att Strings}: Text strings drawn over a plot (except for axis labels and plot title).\\
-{\att TextLab}: Descriptive axis labels drawn around annotated axes.
-Values set using {\att TextLab} are
-only only used if axis-specific values have not been set using {\att TextLab1}
-or {\att TextLab2}.  Thus, {\att TextLab} provides default values
-for {\att TextLab1} and {\att TextLab2}. \\
-{\att TextLab1}: Descriptive label for Axis~1.  Values specified using
-{\att TextLab1} override any supplied using {\att TextLab}. \\
-{\att TextLab2}: Descriptive label for Axis~2.  Values specified using
-{\att TextLab2} override any supplied using {\att TextLab}. \\
-{\att Ticks}: Tick marks (both major and minor) drawn along annotated axes.
-Values set using {\att Ticks} are
-only only used if axis-specific values have not been set using {\att Ticks1}
-or {\att Ticks2}.  Thus, {\att Ticks} provides default values for
-{\att Ticks1}  and {\att Ticks2}. \\
-{\att Ticks1}: Tick marks (both major and minor) drawn along Axis~1.
-Values specified using {\att Ticks1} override any supplied using {\att Ticks}. \\
-{\att Ticks2}: Tick marks (both major and minor) drawn along Axis~2.
-Values specified using {\att Ticks2} override any supplied using {\att Ticks}. \\
+\begin{sldes2}
+\item[\att{Axes}] Axis lines drawn through tick marks within the
+  plotting area, drawn if attribute \att{DrawAxes} is given a
+  non-zero value.  Values set using \att{Axes} are only only used if
+  axis-specific values have not been set using \att{Axis1} or {\att
+    Axis2}.  Thus, \att{Axes} provides default values for {\att
+    Axis1} and \att{Axis2}.
+
+\item[\att{Axis1}] An axis line drawn through tick marks on Axis~1
+  within the plotting area, drawn if attribute \att{DrawAxes} is
+  given a non-zero value.  Values specified using \att{Axis1}
+  override any supplied
+  using \att{Axes}.
+\item[\att{Axis2}] An axis line drawn through tick marks on Axis~2
+  within the plotting area, drawn if attribute \att{DrawAxes} is
+  given a non-zero value.  Values specified using \att{Axis2}
+  override any supplied using \att{Axes}.
+
+\item[\att{Border}] The plot border, drawn if attribute {\att
+    Border} is given a non-zero value.
+
+\item[\att{Curves}] Curves drawn over the top of a plot (\emph{e.g.}
+  contours, data curves).
+
+\item[\att{Grid}] The grid lines, drawn if attribute \att{Grid} is
+  given a non-zero value.  Values set using \att{Grid} are only only
+  used if axis-specific values have not been set using \att{Grid1} or
+  \att{Grid2}.  Thus, \att{Grid} provides default values
+  for \att{Grid1} and \att{Grid2}.
+
+\item[\att{Grid1}] Grid lines that cross Axis~1, drawn if attribute
+  \att{Grid} is given a non-zero value.  Values specified using {\att
+    Grid1} override any supplied using \att{Grid}.
+
+\item[\att{Grid2}] Grid lines that cross Axis~2, drawn if attribute
+  \att{Grid} is given a non-zero value.  Values specified using {\att
+    Grid2} override any supplied using \att{Grid}.
+
+\item[\att{Markers}] Graphical markers (symbols) drawn over a plot.
+\item[\att{NumLab}] Numerical axis labels drawn around annotated
+  axes.  Values set using \att{NumLab} are only only used if
+  axis-specific values have not been set using \att{NumLab1} or {\att
+    NumLab2}.  Thus, \att{NumLab} provides default values for {\att
+    NumLab1} and \att{NumLab2}.
+
+\item[\att{NumLab1}] Numerical labels drawn along Axis~1.  Values
+  specified using \att{NumLab1} override any supplied using {\att
+    NumLab}.
+
+\item[\att{NumLab2}] Numerical labels drawn along Axis~2.  Values
+  specified using\att{NumLab2} override any supplied using {\att
+    NumLab}.
+
+\item[\att{Strings}] Text strings drawn over a plot (except for axis
+  labels and plot title).
+
+\item[\att{TextLab}] Descriptive axis labels drawn around annotated
+  axes.  Values set using \att{TextLab} are only only used if
+  axis-specific values have not been set using \att{TextLab1} or
+  \att{TextLab2}.  Thus, \att{TextLab} provides default values for
+  \att{TextLab1} and \att{TextLab2}.
+
+\item[\att{TextLab1}] Descriptive label for Axis~1.  Values
+  specified using \att{TextLab1} override any supplied using {\att
+    TextLab}.
+
+\item[\att{TextLab2}] Descriptive label for Axis~2.  Values
+  specified using \att{TextLab2} override any supplied using {\att
+    TextLab}.
+
+\item[\att{Ticks}] Tick marks (both major and minor) drawn along
+  annotated axes.  Values set using \att{Ticks} are only only used if
+  axis-specific values have not been set using \att{Ticks1} or {\att
+    Ticks2}.  Thus, \att{Ticks} provides default values for {\att
+    Ticks1} and \att{Ticks2}.
+
+\item[\att{Ticks1}] Tick marks (both major and minor) drawn along
+  Axis~1.  Values specified using \att{Ticks1} override any supplied
+  using \att{Ticks}.
+
+\item[\att{Ticks2}] Tick marks (both major and minor) drawn along
+  Axis~2.  Values specified using \att{Ticks2} override any supplied
+  using \att{Ticks}.
+
 \label{plotel:Title}
-{\att Title}: The title drawn at the top of a plot.
-\end{verse}
+\item[\att{Title}] The title drawn at the top of a plot.
+\end{sldes2}
 
 A collection of attribute settings is called a \emph{plotting style}.
 Attributes that are not specified in a plotting style take on default
@@ -2910,12 +2941,12 @@ purpose of the attribute within the context of a particular application.
 These synonyms are listed in the description of the STYLE parameter for
 the particular applications concerned.  For instance, the
 \htmlref{CONTOUR}{CONTOUR} applications draws contours as `curves',
-that is, it uses the attributes {\att Colour(Curves)}, {\att Width(Curves)}
-and {\att Style(Curves)} to determine the appearance of the contours.
-However, the synonym {\att Contours} (minimum abbreviation {\att Cont}) may be
-used in place of {\att Curves}, so the appearance of the contours can also
-be specified using the `pseudo-' attributes {\att Colour(Cont)}, {\att
-Width(Cont)} and {\att Style(Cont)}.
+that is, it uses the attributes \att{Colour(Curves)}, \att{Width(Curves)}
+and \att{Style(Curves)} to determine the appearance of the contours.
+However, the synonym \att{Contours} (minimum abbreviation \att{Cont}) may be
+used in place of \att{Curves}, so the appearance of the contours can also
+be specified using the `pseudo-' attributes \att{Colour(Cont)}, {\att
+Width(Cont)} and \att{Style(Cont)}.
 
 You should remember that a synonym is simply an alternative way of
 specifying a particular attribute.  So if you are running CONTOUR and you
@@ -2930,7 +2961,7 @@ the contours will appear blue, not red, because the second attribute
 setting overrides the first one.
 
 Any particular synonym will only be recognised by certain applications.
-Thus, {\att Contours} is only recognised as a synonym for {\att Curves} when
+Thus, \att{Contours} is only recognised as a synonym for \att{Curves} when
 running CONTOUR.  Applications ignore attributes (or synonyms) that they
 do not recognise without reporting an error.  Thus if the file containing
 your default plotting style (used by all applications---see later)
@@ -2956,7 +2987,7 @@ supplied, ending up with blue contours.
 
 \subsubsection{\xlabel{se_colour_attributes}Colour Attributes\label{se:colattr}}
 
-The {\att Colour} attribute can be used to specify the colours of various
+The \att{Colour} attribute can be used to specify the colours of various
 components of a plot.  The value assigned to the attribute can be one
 of the following options.
 \begin{itemize}
@@ -3115,34 +3146,34 @@ digits):
            so that a value of {\tt "100"} corresponds to the height of
            `normal' text.
 
-\item \verb=%s...+= :   Change the {\att Size} attribute for subsequent characters.  The
+\item \verb=%s...+= :   Change the \att{Size} attribute for subsequent characters.  The
            digits {\tt "..."} give the new Size as a fraction of the `normal'
            Size, scaled so that a value of {\tt "100"} corresponds
            to 1.0;
 
-\item \verb=%s+= :   Reset the {\att Size} attribute to its `normal' value.
+\item \verb=%s+= :   Reset the \att{Size} attribute to its `normal' value.
 
-\item \verb=%w...+= :   Change the {\att Width} attribute for subsequent characters.  The
+\item \verb=%w...+= :   Change the \att{Width} attribute for subsequent characters.  The
            digits {\tt "..."} give the new width as a fraction of the
            `normal' Width, scaled so that a value of {\tt "100"} corresponds
            to 1.0;
 
-\item \verb=%w+= :      Reset the {\att Width} attribute to its `normal' value.
+\item \verb=%w+= :      Reset the \att{Width} attribute to its `normal' value.
 
-\item \verb=%f...+= :   Change the {\att Font} attribute for subsequent characters.  The
+\item \verb=%f...+= :   Change the \att{Font} attribute for subsequent characters.  The
            digits {\tt "..."} give the new Font value.
 
-\item \verb=%f+= :  Reset the {\att Font} attribute to its `normal' value.
+\item \verb=%f+= :  Reset the \att{Font} attribute to its `normal' value.
 
-\item \verb=%c...+= :   Change the {\att Colour} attribute for subsequent characters.  The
+\item \verb=%c...+= :   Change the \att{Colour} attribute for subsequent characters.  The
            digits {\tt "..."} give the new Colour value.
 
-\item \verb=%c+= :   Reset the {\att Colour} attribute to its `normal' value.
+\item \verb=%c+= :   Reset the \att{Colour} attribute to its `normal' value.
 
-\item \verb=%t...+= :   Change the {\att Style} attribute for subsequent characters.  The
+\item \verb=%t...+= :   Change the \att{Style} attribute for subsequent characters.  The
            digits {\tt "..."} give the new Style value.
 
-\item \verb=%t+= :   Reset the {\att Style} attribute to its `normal' value.
+\item \verb=%t+= :   Reset the \att{Style} attribute to its `normal' value.
 
 \item \verb=%-= :   Push the current graphics attribute values on to the top of
            the stack (see \verb=%+=).
@@ -3181,13 +3212,13 @@ It is often useful to specify values for some of the attributes of the current
       whether a border is drawn around regions corresponding to the
       valid co-ordinates.
 
-      If the {\att Border} value of a plot is non-zero, then this border will
+      If the \att{Border} value of a plot is non-zero, then this border will
       be drawn as part of the axes.  Otherwise, the border is not drawn
       (although axis labels and tick marks will still appear, unless
       other relevant attributes indicate that they should
       not).  The default behaviour is to draw the border if tick marks
       and numerical labels will be drawn around the edges of the
-      plotting area (see the \htmlref{{\att Labelling}}{Labelling}~ attribute),
+      plotting area (see the \htmlref{\att{Labelling}}{Labelling}~ attribute),
       but to omit it otherwise.
    }
    \sstattributetype{
@@ -3226,8 +3257,8 @@ It is often useful to specify values for some of the attributes of the current
 
          \sstitem
 
-         If no graphical element is specified, (\emph{e.g.} {\att Colour} instead
-         of {\att Colour(title)}), then all graphical elements are affected.
+         If no graphical element is specified, (\emph{e.g.} \att{Colour} instead
+         of \att{Colour(title)}), then all graphical elements are affected.
 
       }
    }
@@ -3248,7 +3279,7 @@ It is often useful to specify values for some of the attributes of the current
       axis lines) is determined by the
       \htmlattref{LabelAt(axis)}{LabelAt(axis)}~ attribute.
 
-      If the {\att DrawAxes} value is non-zero (the default), then
+      If the \att{DrawAxes} value is non-zero (the default), then
       axis lines will be drawn, otherwise they will be omitted.
    }
    \sstattributetype{
@@ -3259,14 +3290,14 @@ It is often useful to specify values for some of the attributes of the current
 
          \sstitem
          Axis lines are drawn independently of any co-ordinate grid
-         lines (see the \htmlref{{\att Grid}}{Grid}~ attribute) so grid lines may be used to
+         lines (see the \htmlref{\att{Grid}}{Grid}~ attribute) so grid lines may be used to
          substitute for axis lines if required.
 
          \sstitem
          In some circumstances, numerical labels and tick marks are
          drawn around the edges of the plotting area (see the
          \htmlattref{Labelling}{Labelling}~ attribute).  In this case,
-         the value of the {\att DrawAxes} attribute is ignored.
+         the value of the \att{DrawAxes} attribute is ignored.
       }
    }
 }
@@ -3280,7 +3311,7 @@ It is often useful to specify values for some of the attributes of the current
       This attribute controls the appearance of annotated axes by
       determining what to draw for a spectral axis representing a dual
       sideband spectrum. The sideband selected using the
-      \xref{\att SideBand}{sun210}{SideBand} attribute will always be
+      \xref{\att{SideBand}}{sun210}{SideBand} attribute will always be
       annotated on the edge of the Plot selected using the
       \htmlattref{Edge(axis)}{Edge(axis)} attribute. In addition, if the
       DrawDSB attribute is non-zero (the default) the other sideband will
@@ -3300,7 +3331,7 @@ It is often useful to specify values for some of the attributes of the current
       This attribute controls the appearance of annotated axes by determining
       whether a title is drawn.
 
-      If the {\att DrawTitle}~ value is non-zero (the default), then
+      If the \att{DrawTitle}~ value is non-zero (the default), then
       the title will be drawn, otherwise it will be omitted.
    }
    \sstattributetype{
@@ -3337,7 +3368,7 @@ It is often useful to specify values for some of the attributes of the current
       usually {\tt bottom} for the first axis and {\tt left} for the second
       axis.  However, if exterior labelling was requested (see the
       \htmlattref{Labelling}{Labelling}~ attribute) but cannot be produced
-      using these default {\att Edge} values, then the default
+      using these default \att{Edge} values, then the default
       values will be swapped if this enables exterior labelling to be produced.
    }
    \sstattributetype{
@@ -3350,7 +3381,7 @@ It is often useful to specify values for some of the attributes of the current
          In some circumstances, numerical labels will be drawn along
          internal grid lines instead of at the edges of the plotting
          area (see the \htmlattref{Labelling}{Labelling}~ attribute).
-         In this case, the {\att Edge} attribute only affects the
+         In this case, the \att{Edge} attribute only affects the
          placement of the descriptive labels (these are drawn at the
          edges of the plotting area, rather than along the axis lines).
       }
@@ -3407,8 +3438,8 @@ It is often useful to specify values for some of the attributes of the current
          \slhyperref{here}{Section~}{}{se:styles}.
 
          \sstitem
-         If no graphical element is specified, (\emph{e.g.} {\att Font} instead
-         of {\att Font(title)}), then all graphical elements are affected.
+         If no graphical element is specified, (\emph{e.g.} \att{Font} instead
+         of \att{Font(title)}), then all graphical elements are affected.
       }
    }
 }
@@ -3425,13 +3456,13 @@ It is often useful to specify values for some of the attributes of the current
       Gap(2)=3.0}~ specifies the interval between major values along the
       second axis.
 
-      The {\att Gap} value supplied will usually be rounded to the nearest
+      The \att{Gap} value supplied will usually be rounded to the nearest
       `nice' value, suitable (\emph{e.g.}) for generating axis labels, before
       use.  To avoid this `nicing' you should set an explicit format for
       the axis using the \htmlattref{Format(axis)}{Format(axis)}~ or
       \htmlattref{Digits/Digits(axis)}{Digits/Digits(axis)}~
       attribute.  The default behaviour is for the
-      application to generate its own {\att Gap} value when required, based on
+      application to generate its own \att{Gap} value when required, based on
       the range of axis values to be represented.
    }
    \sstattributetype{
@@ -3441,13 +3472,13 @@ It is often useful to specify values for some of the attributes of the current
       \sstitemlist{
 
          \sstitem
-         The {\att Gap} value should use the same units as are used internally
+         The \att{Gap} value should use the same units as are used internally
          for storing co-ordinate values on the corresponding axis.  For
-         example, with a celestial co-ordinate system, the {\att Gap} value
+         example, with a celestial co-ordinate system, the \att{Gap} value
          should be in radians, not hours or degrees.
 
          \sstitem
-         If no axis is specified, (\emph{e.g.} {\att Gap} instead of {\att Gap(2)}),
+         If no axis is specified, (\emph{e.g.} \att{Gap} instead of \att{Gap(2)}),
          then both axes are affected.
       }
    }
@@ -3462,7 +3493,7 @@ It is often useful to specify values for some of the attributes of the current
       determining whether grid lines (a grid of curves marking the
       `major' values on each axis) are drawn across the plotting area.
 
-      If the {\att Grid} attribute is non-zero, then grid lines will be
+      If the \att{Grid} attribute is non-zero, then grid lines will be
       drawn.  Otherwise, short tick marks on the axes are used to mark
       the major axis values.  The default behaviour is to use tick
       marks if the entire plotting area is filled by valid
@@ -3494,12 +3525,12 @@ It is often useful to specify values for some of the attributes of the current
       specifies where the numerical labels and tick marks for the
       second axis should be drawn.
 
-      For each axis, the {\att LabelAt} value gives the value on the other
+      For each axis, the \att{LabelAt} value gives the value on the other
       axis at which numerical labels and tick marks should be placed.
       For example, in a celestial (right ascension, declination) co-ordinate
-      system, {\att LabelAt(1)} gives a declination value that defines a line (of
+      system, \att{LabelAt(1)} gives a declination value that defines a line (of
       constant declination) along which the numerical right-ascension labels and their
-      associated tick marks will be drawn.  Similarly, {\att LabelAt(2)} gives
+      associated tick marks will be drawn.  Similarly, \att{LabelAt(2)} gives
       the right-ascension value at which the declination labels and ticks will be drawn.
 
       The default bahaviour is for the application to generate its own
@@ -3512,13 +3543,13 @@ It is often useful to specify values for some of the attributes of the current
       \sstitemlist{
 
          \sstitem
-         The {\att LabelAt} value should use the same units as are used
+         The \att{LabelAt} value should use the same units as are used
          internally for storing co-ordinate values on the appropriate
          axis.  For example, with a celestial co-ordinate system, the
-         {\att LabelAt} value should be in radians, not hours or degrees.
+         \att{LabelAt} value should be in radians, not hours or degrees.
 
          \sstitem
-         Normally, the {\att LabelAt} value also determines where the lines
+         Normally, the \att{LabelAt} value also determines where the lines
          representing co-ordinate axes will be drawn, so that the tick
          marks will lie on these lines (but also see the
          \htmlattref{DrawAxes}{DrawAxes}~ attribute).
@@ -3527,7 +3558,7 @@ It is often useful to specify values for some of the attributes of the current
          In some circumstances, numerical labels and tick marks are
          drawn around the edges of the plotting area (see the
          \htmlattref{Labelling}{Labelling}~ attribute).  In this case,
-         the value of the {\att LabelAt} attribute is ignored.
+         the value of the \att{LabelAt} attribute is ignored.
       }
    }
 }
@@ -3545,7 +3576,7 @@ It is often useful to specify values for some of the attributes of the current
       specifies that a unit description should be included in the
       label for the second axis.
 
-      If the {\att LabelUnits} value axis is non-zero, a unit
+      If the \att{LabelUnits} value axis is non-zero, a unit
       description will be included in the descriptive label for that
       axis, otherwise it will be omitted.  The default behaviour is to
       include a unit description unless the
@@ -3564,8 +3595,8 @@ It is often useful to specify values for some of the attributes of the current
          \htmlattref{Unit(axis)}{Unit(axis)}~ attribute.
 
          \sstitem
-         If no axis is specified, (\emph{e.g.} {\att LabelUnits} instead of
-         {\att LabelUnits(2)}), then both axes are affected.
+         If no axis is specified, (\emph{e.g.} \att{LabelUnits} instead of
+         \att{LabelUnits(2)}), then both axes are affected.
       }
    }
 }
@@ -3582,7 +3613,7 @@ It is often useful to specify values for some of the attributes of the current
       {\tt "LabelUp(2)=1"}~ specifies that numerical labels for the second
       axis should be drawn upright.
 
-      If the {\att LabelUp} value axis is non-zero, it causes
+      If the \att{LabelUp} value axis is non-zero, it causes
       numerical labels for that axis to be plotted upright (\emph{i.e.} as
       normal, horizontal text), otherwise (the default) these labels
       rotate to follow the axis to which they apply.
@@ -3597,11 +3628,11 @@ It is often useful to specify values for some of the attributes of the current
          In some circumstances, numerical labels and tick marks are
          drawn around the edges of the plotting area (see the
          \htmlattref{Labelling}{Labelling}~ attribute).  In this case,
-         the value of the {\att LabelUp} attribute is ignored.
+         the value of the \att{LabelUp} attribute is ignored.
 
          \sstitem
-         If no axis is specified, (\emph{e.g.} {\att LabelUp} instead of
-         {\att LabelUp(2)}), then both axes are affected.
+         If no axis is specified, (\emph{e.g.} \att{LabelUp} instead of
+         \att{LabelUp(2)}), then both axes are affected.
       }
    }
 }
@@ -3614,10 +3645,10 @@ It is often useful to specify values for some of the attributes of the current
       This attribute controls the appearance of annotated axes by determining
       the strategy for placing numerical labels and tick marks.
 
-      If the {\att Labelling} value is {\tt "exterior"}~ (the default), then
+      If the \att{Labelling} value is {\tt "exterior"}~ (the default), then
       numerical labels and their associated tick marks are placed
       around the edges of the plotting area, if possible.  If this is
-      not possible, or if the {\att Labelling}~ value is {\tt "interior"}, then they
+      not possible, or if the \att{Labelling}~ value is {\tt "interior"}, then they
       are placed along grid lines inside the plotting area.
    }
    \sstattributetype{
@@ -3627,7 +3658,7 @@ It is often useful to specify values for some of the attributes of the current
       \sstitemlist{
 
          \sstitem
-         The {\att LabelAt(axis)} attribute may be used to determine the exact
+         The \att{LabelAt(axis)} attribute may be used to determine the exact
          placement of labels and tick marks that are drawn inside the
          plotting area.
       }
@@ -3642,7 +3673,7 @@ It is often useful to specify values for some of the attributes of the current
       This attribute controls the appearance of annotated axes by determining
       the length of the major tick marks drawn on the axes.
 
-      The {\att MajTickLen}~ value should be given as a fraction of the
+      The \att{MajTickLen}~ value should be given as a fraction of the
       minimum dimension of the plotting area.  Negative values cause
       major tick marks to be placed on the outside of the
       corresponding grid line or axis (but subject to any clipping
@@ -3651,7 +3682,7 @@ It is often useful to specify values for some of the attributes of the current
 
       The default behaviour depends on whether a co-ordinate grid is
       drawn inside the plotting area (see the \htmlattref{Grid}{Grid}~
-      attribute).  If so, the default {\att MajTickLen} value is zero (so that
+      attribute).  If so, the default \att{MajTickLen} value is zero (so that
       major ticks are not drawn), otherwise the default is $+0.015$.
    }
    \sstattributetype{
@@ -3684,8 +3715,8 @@ It is often useful to specify values for some of the attributes of the current
       \sstitemlist{
 
          \sstitem
-         If no axis is specified, (\emph{e.g.} {\att MinTick} instead of
-         {\att MinTick(2)}), then both axes are affected.
+         If no axis is specified, (\emph{e.g.} \att{MinTick} instead of
+         \att{MinTick(2)}), then both axes are affected.
       }
    }
 }
@@ -3698,7 +3729,7 @@ It is often useful to specify values for some of the attributes of the current
       This attribute controls the appearance of annotated axes by determining
       the length of the minor tick marks drawn on the axes.
 
-      The {\att MinTickLen}~ value should be given as a fraction of the
+      The \att{MinTickLen}~ value should be given as a fraction of the
       minimum dimension of the plotting area.  Negative values cause
       minor tick marks to be placed on the outside of the
       corresponding grid line or axis (but subject to any clipping
@@ -3715,7 +3746,7 @@ It is often useful to specify values for some of the attributes of the current
 
          \sstitem
          The number of minor tick marks drawn is determined by the
-         {\att MinTick(axis)} attribute.
+         \att{MinTick(axis)} attribute.
       }
    }
 }
@@ -3732,7 +3763,7 @@ It is often useful to specify values for some of the attributes of the current
       "NumLab(2)=1"}~ specifies that numerical labels should be drawn for
       the second axis.
 
-      If the {\att NumLab} value for an axis is non-zero (the default),
+      If the \att{NumLab} value for an axis is non-zero (the default),
       then numerical labels will be drawn for that axis, otherwise
       they will be omitted.
    }
@@ -3748,8 +3779,8 @@ It is often useful to specify values for some of the attributes of the current
          controlled by the \htmlattref{TextLab(axis)}{TextLab(axis)}~ attribute.
 
          \sstitem
-         If no axis is specified, (\emph{e.g.} {\att NumLab} instead of
-         {\att NumLab(2)}), then both axes are affected.
+         If no axis is specified, (\emph{e.g.} \att{NumLab} instead of
+         \att{NumLab(2)}), then both axes are affected.
       }
    }
 }
@@ -3766,14 +3797,14 @@ It is often useful to specify values for some of the attributes of the current
       specifies where the numerical label for the second axis should
       be drawn.
 
-      For each axis, the {\att NumLabGap} value gives the spacing between the
+      For each axis, the \att{NumLabGap} value gives the spacing between the
       axis line (or edge of the plotting area, if appropriate) and the
       nearest edge of the corresponding numerical axis
       labels.  Positive values cause the descriptive label to be placed
       on the opposite side of the line to the default tick marks,
       while negative values cause it to be placed on the same side.
 
-      The {\att NumLabGap} value should be given as a fraction of the minimum
+      The \att{NumLabGap} value should be given as a fraction of the minimum
       dimension of the plotting area, the default value being $+0.01$.
    }
    \sstattributetype{
@@ -3783,8 +3814,8 @@ It is often useful to specify values for some of the attributes of the current
       \sstitemlist{
 
          \sstitem
-         If no axis is specified, (\emph{e.g.} {\att NumLabGap} instead of
-         {\att NumLabGap(2)}), then both axes are affected.
+         If no axis is specified, (\emph{e.g.} \att{NumLabGap} instead of
+         \att{NumLabGap(2)}), then both axes are affected.
       }
    }
 }
@@ -3811,8 +3842,8 @@ It is often useful to specify values for some of the attributes of the current
          \slhyperref{here}{Section~}{}{se:styles}.
 
          \sstitem
-         If no graphical element is specified, (\emph{e.g.} {\att Size} instead
-         of {\att Size(title)}), then all graphical elements are affected.
+         If no graphical element is specified, (\emph{e.g.} \att{Size} instead
+         of \att{Size(title)}), then all graphical elements are affected.
       }
    }
 }
@@ -3852,8 +3883,8 @@ It is often useful to specify values for some of the attributes of the current
          \slhyperref{here}{Section~}{}{se:styles}.
 
          \sstitem
-         If no graphical element is specified, (\emph{e.g.} {\att Style} instead
-         of {\att Style(border)}), then all graphical elements are affected.
+         If no graphical element is specified, (\emph{e.g.} \att{Style} instead
+         of \att{Style(border)}), then all graphical elements are affected.
       }
    }
 }
@@ -3889,7 +3920,7 @@ It is often useful to specify values for some of the attributes of the current
       the setting {\tt "TextLab(2)=1"}~ specifies that descriptive labels
       should be drawn for the second axis.
 
-      If the {\att TextLab} value of an axis is non-zero, then
+      If the \att{TextLab} value of an axis is non-zero, then
       descriptive labels will be drawn for that axis, otherwise they
       will be omitted.  The default behaviour is to draw descriptive
       labels if tick marks and numerical labels are being drawn around
@@ -3914,8 +3945,8 @@ It is often useful to specify values for some of the attributes of the current
          axis) is controlled by the \htmlattref{NumLab(axis)}{NumLab(axis)}~ attribute.
 
          \sstitem
-         If no axis is specified, (\emph{e.g.} {\att TextLab} instead of
-         {\att TextLab(2)}), then both axes are affected.
+         If no axis is specified, (\emph{e.g.} \att{TextLab} instead of
+         \att{TextLab(2)}), then both axes are affected.
       }
    }
 }
@@ -3932,7 +3963,7 @@ It is often useful to specify values for some of the attributes of the current
       specifies where the descriptive label for the second axis should
       be drawn.
 
-      For each axis, the {\att TextLabGap} value
+      For each axis, the \att{TextLabGap} value
       gives the spacing between the descriptive label and the edge of
       a box enclosing all other parts of the annotated grid (excluding
       other descriptive labels).  The gap is measured to the nearest
@@ -3941,7 +3972,7 @@ It is often useful to specify values for some of the attributes of the current
       bounding box, while negative values cause it to be placed
       inside.
 
-      The {\att TextLabGap} value should be given as a fraction of the minimum
+      The \att{TextLabGap} value should be given as a fraction of the minimum
       dimension of the plotting area, the default value being $+0.01$.
    }
    \sstattributetype{
@@ -3957,8 +3988,8 @@ It is often useful to specify values for some of the attributes of the current
          plotting area (see the \htmlattref{Labelling}{Labelling}~ attribute).
 
          \sstitem
-         If no axis is specified, (\emph{e.g.} {\att TextLabGap} instead of
-         {\att TextLabGap(2)}), then both axes are affected.
+         If no axis is specified, (\emph{e.g.} \att{TextLabGap} instead of
+         \att{TextLabGap(2)}), then both axes are affected.
       }
    }
 }
@@ -3986,7 +4017,7 @@ It is often useful to specify values for some of the attributes of the current
       This attribute controls the appearance of annotated axes by determining
       whether tick marks should be drawn on all edges of the plot.
 
-      If the {\att TickAll}~ value is non-zero (the default), then
+      If the \att{TickAll}~ value is non-zero (the default), then
       tick marks will be drawn on all edges of the plot.  Otherwise,
       they will be drawn only on those edges where the numerical and
       descriptive axis labels are drawn (see the
@@ -4002,7 +4033,7 @@ It is often useful to specify values for some of the attributes of the current
          In some circumstances, numerical labels and tick marks are
          drawn along grid lines inside the plotting area, rather than
          around its edges (see the \htmlattref{Labelling}{Labelling}~ attribute).
-         In this case, the value of the {\att TickAll} attribute is ignored.
+         In this case, the value of the \att{TickAll} attribute is ignored.
       }
    }
 }
@@ -4021,7 +4052,7 @@ It is often useful to specify values for some of the attributes of the current
       drawn outside the box, while negative values cause it to be drawn
       inside.
 
-      The {\att TitleGap} value should be given as a fraction of the minimum
+      The \att{TitleGap} value should be given as a fraction of the minimum
       dimension of the plotting area, the default value being $+0.05$.
    }
    \sstattributetype{
@@ -4083,8 +4114,8 @@ It is often useful to specify values for some of the attributes of the current
          \slhyperref{here}{Section~}{}{se:styles}.
 
          \sstitem
-         If no graphical element is specified, (\emph{e.g.} {\att Width} instead
-         of {\att Width(title)}), then all graphical elements are affected.
+         If no graphical element is specified, (\emph{e.g.} \att{Width} instead
+         of \att{Width(title)}), then all graphical elements are affected.
 
       }
    }
@@ -6298,26 +6329,26 @@ axis labels, axis units, a Frame title, \emph{etc.} These are called the
 briefly below (full descriptions of these attributes are included
 \slhyperref{later}{in Section~}{}{se:frmatt}.
 
-\begin{verse}
-{\att Digits}: Number of digits of precision\\
-{\att Domain}: Physical domain described by the co-ordinate system\\
-{\att Epoch}: A date \& time that defines the co-ordinate system\\
-{\att Format(axis)}: Format specification for axis values\\
-{\att Label(axis)}: Axis label\\
-{\att Naxes}: Number of Frame axes\\
-{\att Symbol(axis)}: Axis symbol\\
-{\att System}: Specific co-ordinate system used to describe the domain\\
-{\att Title}: Frame title\\
-{\att Unit(axis)}: Axis physical units
-\end{verse}
+\begin{sldes2}
+\item[\att{Digits}]: Number of digits of precision
+\item[\att{Domain}]: Physical domain described by the co-ordinate system
+\item[\att{Epoch}]: A date \& time that defines the co-ordinate system
+\item[\att{Format(axis)}]: Format specification for axis values
+\item[\att{Label(axis)}]: Axis label
+\item[\att{Naxes}]: Number of Frame axes
+\item[\att{Symbol(axis)}]: Axis symbol
+\item[\att{System}]: Specific co-ordinate system used to describe the domain
+\item[\att{Title}]: Frame title
+\item[\att{Unit(axis)}]: Axis physical units
+\end{sldes2}
 
 The single most important attribute is the
-\xref{Frame}{sun210}{Frame}~ {\att Domain}, which is an uppercase
+\xref{Frame}{sun210}{Frame}~ \att{Domain}, which is an uppercase
 character string indicating the physical domain in which the
-co-ordinate system is defined.  Frames with the same {\att Domain} can,
+co-ordinate system is defined.  Frames with the same \att{Domain} can,
 in general, be aligned with each other.
 
-Frames with the following {\att Domain} values are defined within every
+Frames with the following \att{Domain} values are defined within every
 NDF, no matter how the NDF is created.
 
 \begin{description}
@@ -6867,9 +6898,9 @@ RA and Dec.  In this case, the current co-ordinate Frame will actually be
 a `compound' Frame containing two `component' Frames; a one-dimensional
 spectral Frame and a two-dimensional sky Frame.  If we consider an attribute
 such as {\tt System} (which all classes of Frame have), we now seem to have
-three different Systems to consider; the {\att System} value for the component
-spectral Frame, the {\att System} value for the component sky Frame and the
-{\att System} value for the compound Frame as a whole.  So if we want to set the
+three different Systems to consider; the \att{System} value for the component
+spectral Frame, the \att{System} value for the component sky Frame and the
+\att{System} value for the compound Frame as a whole.  So if we want to set the
 spectral system to {\tt "optical velocity"}, and celestial system to
 {\tt "Galactic"} what do we do?  The answer is to include the index of an axis
 within the attribute name.  If WCS axis 1 is the spectral axis, 2 is the
@@ -6883,7 +6914,7 @@ RA axis and 3 is the Dec. axis, then we would do the following:
 
 In fact, we could have used {\tt "System(3)"} in place of {\tt "System(2)"} since
 axes 2 and 3 are both contained within the same sky Frame and so setting
-the {\att System} attribute for either one will have the same effect.  We could
+the \att{System} attribute for either one will have the same effect.  We could
 now examine the attributes as follows:
 
 \begin{terminalv}
@@ -6898,7 +6929,7 @@ the following command:
     % wcsattrib fred get "System"
 \end{terminalv}
 
-will display {\tt Compound} since it is displaying the {\att System} value of the
+will display {\tt Compound} since it is displaying the \att{System} value of the
 compound Frame \emph{as a whole} (because no axis index was included).
 
 To continue this example, the \xref{SpecFrame}{sun210}{SpecFrame}~
@@ -6912,7 +6943,7 @@ of Frames.  If we do:
 \end{terminalv}
 
 we will get an error saying the attribute name is unknown.  This is because
-compound Frames do not have a {\att StdOfRest} attribute.  If we want to set the
+compound Frames do not have a \att{StdOfRest} attribute.  If we want to set the
 standard of rest, we must indicate the index of the spectral axis as follows:
 
 \begin{terminalv}
@@ -6968,12 +6999,12 @@ attribute of the sky Frame, we could say:
          the current Frame of the NDF {\tt m51}.  This results in axis
          values being formatted with four digits of precision when they are
          displayed by any application, so long as no value has been set
-         for the {\att Format} attribute.
+         for the \att{Format} attribute.
       }
       \sstexamplesubsection{
          wcsattrib m51 set digits(1) 4
       }{
-         This is like the previous example, except that the {\att Digits} value
+         This is like the previous example, except that the \att{Digits} value
          is only set for the first axis in the current Frame of the NDF.
       }
    }
@@ -6989,15 +7020,15 @@ attribute of the sky Frame, we could say:
       domain of the co-ordinate system that a
       \xref{Frame}{sun210}{Frame}~ describes.
 
-      The {\att Domain} attribute also controls how Frames align with each other.
-      If the {\att Domain} value in a Frame is set, then only Frames with the
-      same {\att Domain} value can be aligned with it.
+      The \att{Domain} attribute also controls how Frames align with each other.
+      If the \att{Domain} value in a Frame is set, then only Frames with the
+      same \att{Domain} value can be aligned with it.
 
-      Some Frames are given standard {\att Domain} values when they are created
+      Some Frames are given standard \att{Domain} values when they are created
       (\emph{e.g.} GRID, FRACTION, PIXEL, AXIS, SKY, SPECTRUM, CURPIC, NDC,
       BASEPIC, GRAPHICS).
       Frames created by the user (for instance, using \htmlref{WCSADD}{WCSADD})
-      can have any {\att Domain} value, but the standard {\att Domain} names should be
+      can have any \att{Domain} value, but the standard \att{Domain} names should be
       avoided unless the standard meanings are appropriate for the Frame
       being created.
 
@@ -7022,7 +7053,7 @@ attribute of the sky Frame, we could say:
       \sstitemlist{
 
          \sstitem
-         All {\att Domain} values are converted to uppercase and white space
+         All \att{Domain} values are converted to uppercase and white space
          is removed before use.
       }
    }
@@ -7088,7 +7119,7 @@ attribute of the sky Frame, we could say:
       co-ordinates are known
       to be correct.  Often, this will be the date of observation.
 
-      The {\att Epoch} value is important in cases where the co-ordinate
+      The \att{Epoch} value is important in cases where the co-ordinate
       system changes with time.  For instance, when considering celestial
       co-ordinate systems, possible reasons for change include:
       (i) changing aberration of light caused by the observer's
@@ -7102,7 +7133,7 @@ attribute of the sky Frame, we could say:
       individual sources rather than the co-ordinate system as a
       whole).
 
-      The {\att Epoch} attribute is stored as a Modified Julian Date, and is not
+      The \att{Epoch} attribute is stored as a Modified Julian Date, and is not
       usually changed.
    }
    \sstattributetype{
@@ -7130,7 +7161,7 @@ attribute of the sky Frame, we could say:
    \sstdiytopic{
       Input Formats
    }{
-      The formats accepted when setting an {\att Epoch}~ value are listed
+      The formats accepted when setting an \att{Epoch}~ value are listed
       below.  They are all case-insensitive and are generally tolerant
       of extra white space and alternative field delimiters.
 
@@ -7174,7 +7205,7 @@ attribute of the sky Frame, we could say:
       Output Format
    }{
 
-      When enquiring {\att Epoch} values, the format used is the
+      When enquiring \att{Epoch} values, the format used is the
       ``Year'' format described under \htmlref{``Input
       Formats''}{epoch:input}.  This is a value in decimal years, which
       will be a Besselian epoch if less than 1984.0, and a Julian epoch
@@ -7209,9 +7240,9 @@ attribute of the sky Frame, we could say:
       qualified by a moment in time (the `epoch of the mean equinox'
       or `equinox' for short) which allows the position of the model
       co-ordinate system on the sky to be determined.  This is the r\^{o}le
-      of the {\att Equinox} attribute.
+      of the \att{Equinox} attribute.
 
-      The {\att Equinox} attribute is stored as a Modified Julian Date, but
+      The \att{Equinox} attribute is stored as a Modified Julian Date, but
       when setting or getting its value you may use the same formats
       as for the \htmlattref{Epoch}{Epoch}~ attribute (q.v.).
 
@@ -7223,10 +7254,10 @@ attribute of the sky Frame, we could say:
       \sstitemlist{
 
          \sstitem
-         Care must be taken to distinguish the {\att Equinox} value, which
+         Care must be taken to distinguish the \att{Equinox} value, which
          relates to the definition of a time-dependent co-ordinate system
          (based on solar-system reference planes which are in motion),
-         from the superficially similar {\att Epoch} value.
+         from the superficially similar \att{Epoch} value.
          The latter is used to qualify co-ordinate systems where the
          positions of sources change with time (or appear to do so)
          for a variety of other reasons, such as aberration of light
@@ -7251,10 +7282,10 @@ attribute of the sky Frame, we could say:
       \xref{Frame}{sun210}{Frame}~ axis
       (\emph{i.e.} to convert values from binary to character form).
 
-      If no {\att Format} value is set for a Frame axis, a default value is
+      If no \att{Format} value is set for a Frame axis, a default value is
       supplied instead.  This is based on the value of the
       \htmlattref{Digits}{Digits/Digits(axis)}, or
-      {\att Digits(axis)} attribute and is chosen so that it displays the
+      \att{Digits(axis)} attribute and is chosen so that it displays the
       requested number of digits of precision.
 
       The interpretation of this string depends on whether or not the
@@ -7264,7 +7295,7 @@ attribute of the sky Frame, we could say:
       "\%1.7G"}) in order to format a single co-ordinate value
       (supplied as a double-precision number).
 
-      For SkyFrames, the syntax and default value of the {\att Format} string is
+      For SkyFrames, the syntax and default value of the \att{Format} string is
       re-defined to allow the formatting of sexagesimal values as appropriate
       for the particular celestial co-ordinate system being represented.  The
       syntax of SkyFrame Format strings is described (below) in the
@@ -7356,7 +7387,7 @@ attribute of the sky Frame, we could say:
       \sstexamplesubsection{
          wcsattrib my\_data set format(1) \%10.5G
       }{
-         This sets the {\att Format} attribute for Axis 1 in the current
+         This sets the \att{Format} attribute for Axis 1 in the current
          co-ordinate Frame in the NDF called {\tt my\_data}, so that axis values
          are formatted as floating-point values using a minimum field
          width of ten characters, and displaying five significant figures.  An
@@ -7365,7 +7396,7 @@ attribute of the sky Frame, we could say:
       \sstexamplesubsection{
          wcsattrib ngc5128 set format(2) bdms.2
       }{
-         This sets the {\att Format} attribute for Axis 2 in the current
+         This sets the \att{Format} attribute for Axis 2 in the current
          co-ordinate Frame in the NDF called {\tt ngc5128}, so that axis
          values are formatted as separate degrees, minutes and seconds field,
          separated by blanks.  The seconds field has two decimal places.
@@ -7456,7 +7487,7 @@ attribute of the sky Frame, we could say:
       This attribute specifies a label to be attached to each axis of
       a Frame when it is represented (\emph{e.g.}) in graphical output.
 
-      If a {\att Label} value has not been set for a Frame axis, then a
+      If a \att{Label} value has not been set for a Frame axis, then a
       suitable default is supplied, depending on whether or not the
       Frame is a \xref{SkyFrame}{sun210}{SkyFrame}.
 
@@ -7478,7 +7509,7 @@ attribute of the sky Frame, we could say:
       \sstexamplesubsection{
          wcsattrib my\_data set label(2) "IRAS data (marked in white)"
       }{
-         This sets the {\att Label} for Axis 2 in the current Frame in the NDF
+         This sets the \att{Label} for Axis 2 in the current Frame in the NDF
          called {\tt my\_data}, to the string {\tt "IRAS data (marked in white)"}.
       }
    }
@@ -7538,6 +7569,7 @@ attribute of the sky Frame, we could say:
    }
 }
 
+\clearpage
 \sstattribute{
    ObsLat
 }{
@@ -7558,27 +7590,29 @@ attribute of the sky Frame, we could say:
       The value is stored internally in radians, but is converted to
       and from a degrees string for access.  Some example input
       formats are: {\tt "22:19:23.2"}, {\tt "22 19 23.2"}, {\tt
-      "22:19.387"}, {\tt "22.32311"}, {\tt "N22.32311"}, {\tt"-45.6"},
-      {\tt"S45.6"}.  As indicated, the sign of the latitude can
-      optionally be indicated using characters {\tt "N"} and {\tt "S"}
-      in place of the usual {\tt "$+$"} and {\tt "-"}.
+        "22:19.387"}, {\tt "22.32311"}, {\tt "N22.32311"},
+      {\tt"-45.6"}, {\tt"S45.6"}.  As indicated, the sign of the
+      latitude can optionally be indicated using characters {\tt "N"}
+      and {\tt "S"} in place of the usual {\tt "$+$"} and {\tt "-"}.
       When converting the stored value to a string, the format
-      {\tt{"}}[s]dd:mm:ss.s{\tt{"}} is used, when {\tt "[s]"} is {\tt "N"}
-      or {\tt "S"}.
+      {\tt{"}}[s]dd:mm:ss.s{\tt{"}} is used, when {\tt "[s]"} is {\tt
+        "N"} or {\tt "S"}.
    }
    \sstattributetype{
       String.
    }
 }
+
 \sstattribute{
    ObsLon
 }{
-   The geodetic longitude of the observer (\xref{SpecFrames}{sun210}{SpecFrame}~ only)
+   The geodetic longitude of the observer (\xref{SpecFrames}{sun210}{SpecFrame} only) 
 }{
    \sstdescription{
-      This attribute specifies the geodetic (or equivalently, geocentric)
-      longitude of the observer, in degrees, measured positive eastwards.
-      See also attribute \htmlattref{ObsLat}{ObsLat}.  The default value is zero.
+      This attribute specifies the geodetic (or equivalently,
+      geocentric) longitude of the observer, in degrees, measured
+      positive eastwards.  See also attribute
+      \htmlattref{ObsLat}{ObsLat}.  The default value is zero.
 
       The value is stored internally in radians, but is converted to
       and from a degrees string for access.  Some example input
@@ -7600,7 +7634,7 @@ attribute of the sky Frame, we could say:
 \sstattribute{
    RefDec
 }{
-   The declination of the reference point (\htmlref{SpecFrames}{system:SpecFrame}~ only)
+    The declination of the reference point (\htmlref{SpecFrames}{system:SpecFrame}~ only)
 }{
    \sstdescription{
       This attribute specifies the FK5 J2000.0 declination of a reference
@@ -7612,6 +7646,8 @@ attribute of the sky Frame, we could say:
       String.
    }
 }
+
+
 \sstattribute{
    RefRA
 }{
@@ -7626,12 +7662,12 @@ attribute of the sky Frame, we could say:
       correction for Doppler shift to be applied when converting between
       different standards of rest.
 
-      The {\att RefRA} and {\att RefDec} attributes are stored internally in radians,
+      The \att{RefRA} and \att{RefDec} attributes are stored internally in radians,
       but are converted to and from a string for access.  The format
-      {\tt{"}}hh:mm:ss.ss{\tt{"}} is used for {\att RefRA}, and
-      {\tt{"}}dd:mm:ss.s{\tt{"}} is used for {\att RefDec}.
+      {\tt{"}}hh:mm:ss.ss{\tt{"}} is used for \att{RefRA}, and
+      {\tt{"}}dd:mm:ss.s{\tt{"}} is used for \att{RefDec}.
 
-      {\att RefRA} has a default value of zero.
+      \att{RefRA} has a default value of zero.
    }
    \sstattributetype{
       String.
@@ -7643,27 +7679,30 @@ attribute of the sky Frame, we could say:
    The rest frequency (\htmlref{SpecFrames}{system:SpecFrame}~ only)
 }{
    \sstdescription{
-      This attribute specifies the frequency corresponding to zero
-      velocity.  It is used when converting between between velocity-based
-      spectral co-ordinate systems and and other co-ordinate systems (such as
-      frequency, wavelength, energy, \emph{etc.}).  The default value is 1.0E5 GHz.
+     This attribute specifies the frequency corresponding to zero
+     velocity.  It is used when converting between between
+     velocity-based spectral co-ordinate systems and and other
+     co-ordinate systems (such as frequency, wavelength, energy,
+     \emph{etc.}).  The default value is 1.0E5 GHz.
 
-      When setting a new value for this attribute, the new value can be
-      supplied either directly as a frequency, or indirectly as a wavelength
-      or energy, in which case the supplied value is converted to a frequency
-      before being stored.  The nature of the supplied value is indicated by
-      appending text to the end of the numerical value indicating the units in
-      which the value is supplied.  If the units are not specified, then the
-      supplied value is assumed to be a frequency in units of GHz.  If the
-      supplied unit is a unit of frequency, the supplied value is assumed to
-      be a frequency in the given units.  If the supplied unit is a unit of
-      length, the supplied value is assumed to be a (vacuum) wavelength.  If
-      the supplied unit is a unit of energy, the supplied value is assumed to
-      be an energy.  For instance, the following strings all result in
-      a rest frequency of around 1.4E14 Hz being used: {\tt "1.4E5"},
-      {\tt "1.4E14 Hz"}, {\tt "1.4E14 s$*$$*$-1"}, {\tt "1.4E5 GHz"},
-      {\tt "2.14E-6 m"}, {\tt "21400 Angstrom"}, {\tt "9.28E-20 J"},
-      {\tt "9.28E-13 erg"}, {\tt "0.58 eV"}, etc.
+     When setting a new value for this attribute, the new value can be
+     supplied either directly as a frequency, or indirectly as a
+     wavelength or energy, in which case the supplied value is
+     converted to a frequency before being stored.  The nature of the
+     supplied value is indicated by appending text to the end of the
+     numerical value indicating the units in which the value is
+     supplied.  If the units are not specified, then the supplied
+     value is assumed to be a frequency in units of GHz.  If the
+     supplied unit is a unit of frequency, the supplied value is
+     assumed to be a frequency in the given units.  If the supplied
+     unit is a unit of length, the supplied value is assumed to be a
+     (vacuum) wavelength.  If the supplied unit is a unit of energy,
+     the supplied value is assumed to be an energy.  For instance, the
+     following strings all result in a rest frequency of around 1.4E14
+     Hz being used: {\tt "1.4E5"}, {\tt "1.4E14 Hz"}, {\tt "1.4E14
+       s$*$$*$-1"}, {\tt "1.4E5 GHz"}, {\tt "2.14E-6 m"}, {\tt "21400
+       Angstrom"}, {\tt "9.28E-20 J"}, {\tt "9.28E-13 erg"}, {\tt
+       "0.58 eV"}, etc.
 
       When getting the value of this attribute, the returned value is
       always a frequency in units of GHz.
@@ -7710,13 +7749,13 @@ attribute of the sky Frame, we could say:
       \htmlattref{RefRA}{RefRA}, and \htmlattref{RefDec}{RefDec})
       defines the `Source' standard of rest (see attribute
       \htmlattref{StdOfRest}{StdOfRest}).  This is a rest frame that
-      is moving towards the position given by {\att RefRA} and {\att
+      is moving towards the position given by \att{RefRA} and {\att
       RefDec} at a velocity given by SourceVel (in km/s).  When
       setting a value for \htmlattref{SourceVel}{SourceVel}~ using
       \htmlref{WCSATTRIB}{WCSATTRIB}, the velocity should be supplied
-      in the rest frame specified by the {\att SourceVRF} attribute.
-      Likewise, when getting the value of {\att SourceVel}, it will be
-      returned in the rest frame specified by the {\att SourceVRF}
+      in the rest frame specified by the \att{SourceVRF} attribute.
+      Likewise, when getting the value of \att{SourceVel}, it will be
+      returned in the rest frame specified by the \att{SourceVRF}
       attribute.
 
       The default value is zero.
@@ -7739,11 +7778,11 @@ attribute of the sky Frame, we could say:
       \htmlattref{SourceVel}{SourceVel}).  When setting a new value for the
       SourceVel attribute, the source velocity should be supplied in the
       rest frame indicated by this attribute.  Likewise, when getting the
-      value of the {\att SourceVel} attribute, the velocity will be returned in
+      value of the \att{SourceVel} attribute, the velocity will be returned in
       this rest frame.
 
-      If the value of {\att SourceVRF} is changed, the value stored for
-      {\att SourceVel} will be converted from the old to the new rest frame.
+      If the value of \att{SourceVRF} is changed, the value stored for
+      \att{SourceVel} will be converted from the old to the new rest frame.
 
       The values that can be supplied are the same as for the
       \htmlattref{StdOfRest}{StdOfRest}~ attribute (except that {\att
@@ -7765,7 +7804,7 @@ attribute of the sky Frame, we could say:
       axis values of a \htmlref{SpecFrame}{system:SpecFrame}~ refer, and may take any of the values
       listed in the \htmlref{``Standards of Rest''}{stdofrest:StdOfRest}~ section (below).
 
-      The default {\att StdOfRest} value is {\tt "Helio"}.
+      The default \att{StdOfRest} value is {\tt "Helio"}.
    }
    \sstattributetype{
       String.
@@ -7775,7 +7814,7 @@ attribute of the sky Frame, we could say:
       Standards of Rest
    }{
       The \xref{SpecFrame}{sun210}{SpecFrame}~ class supports the following
-      {\att StdOfRest} values (all are case-insensitive).
+      \att{StdOfRest} values (all are case-insensitive).
 
       \sstitemlist{
 
@@ -7793,7 +7832,7 @@ attribute of the sky Frame, we could say:
          Spectra recorded in this standard of rest suffer a Doppler shift which
          varies over the course of a year because of the rotation of the earth
          around the Sun.  This standard of rest must be qualified using the
-         {\att Epoch}, {\att RefRA}, and {\att RefDec} attributes.
+         \att{Epoch}, \att{RefRA}, and \att{RefDec} attributes.
 
          \sstitem
          {\tt "Barycentric"}, {\tt "Barycent"} or {\tt "Bary"}: The rest-frame of the solar-system
@@ -7801,44 +7840,44 @@ attribute of the sky Frame, we could say:
          shift which depends both on the velocity of the Sun through the Local
          Standard of Rest, and on the movement of the planets through the solar
          system.  This standard of rest must be qualified using the
-         {\att Epoch}, {\att RefRA}, and {\att RefDec} attributes.
+         \att{Epoch}, \att{RefRA}, and \att{RefDec} attributes.
 
          \sstitem
          {\tt "Heliocentric"}, {\tt "Heliocen"} or {\tt "Helio"}: The rest-frame of the Sun.
          Spectra recorded in this standard of rest suffer a Doppler shift which
          depends on the velocity of the Sun through the Local Standard of Rest.
-         This standard of rest must be qualified using the {\att RefRA} and
-         {\att RefDec} attributes.
+         This standard of rest must be qualified using the \att{RefRA} and
+         \att{RefDec} attributes.
 
          \sstitem
          {\tt "LSR"}, {\tt "LSRK"}: The rest-frame of the kinematical Local Standard of
          Rest.  Spectra recorded in this standard of rest suffer a Doppler shift
          which depends on the velocity of the kinematical Local Standard of Rest
          through the galaxy.  This standard of rest must be qualified using the
-         {\att RefRA} and {\att RefDec} attributes.
+         \att{RefRA} and \att{RefDec} attributes.
 
          \sstitem
          {\tt "LSRD"}: The rest-frame of the dynamical Local Standard of Rest.  Spectra
          recorded in this standard of rest suffer a Doppler shift which depends
          on the velocity of the dynamical Local Standard of Rest through the
          galaxy.   This standard of rest must be qualified using the
-         {\att RefRA} and {\att RefDec} attributes.
+         \att{RefRA} and \att{RefDec} attributes.
 
          \sstitem
          {\tt "Galactic"}, {\tt "Galactoc"} or {\tt "Gal"}: The rest-frame of the galactic centre.
          Spectra recorded in this standard of rest suffer a Doppler shift which
          depends on the velocity of the galactic centre through the local group.
-         This standard of rest must be qualified using the {\att RefRA} and
-         {\att RefDec} attributes.
+         This standard of rest must be qualified using the \att{RefRA} and
+         \att{RefDec} attributes.
 
          \sstitem
          {\tt "Local\_group"}, {\tt "Localgrp"} or {\tt "LG"}: The rest-frame of the local group.
-         This standard of rest must be qualified using the {\att RefRA} and
-         {\att RefDec} attributes.
+         This standard of rest must be qualified using the \att{RefRA} and
+         \att{RefDec} attributes.
 
          \sstitem
          {\tt "Source"}, or {\tt "src"}: The rest-frame of the source.  This standard of
-         rest must be qualified using the {\att RefRA}, {\att RefDec}, and
+         rest must be qualified using the \att{RefRA}, \att{RefDec}, and
          \htmlattref{SourceVel}{SourceVel}~ attributes.
 
       }
@@ -7859,21 +7898,21 @@ attribute of the sky Frame, we could say:
       a full description of the axis would be inappropriate.  Examples
       include {\tt "RA"} and {\tt "Dec"} (for right ascension and declination).
 
-      If a {\att Symbol} value has not been set for a Frame axis, then a
+      If a \att{Symbol} value has not been set for a Frame axis, then a
       suitable default is supplied.
 
-      The default {\att Symbol} value supplied for simple Frames is the
+      The default \att{Symbol} value supplied for simple Frames is the
       string ``$<${\tt Domain}$>$$<${\tt{n}}$>$'', where
       $<${\tt{n}}$>$ is {\tt 1}, {\tt 2}, \emph{etc.} for successive
       axes, and $<$Domain$>$ is the value of the Frame's \htmlattref{Domain}{Domain}~
       attribute (truncated if necessary so that the final string
-      does not exceed 15 characters).  If no {\att Domain} value has been
+      does not exceed 15 characters).  If no \att{Domain} value has been
       set, {\tt "x"} is used as the $<$Domain$>$ value in constructing
       this default string.
 
       Specialised Frames (\xref{SkyFrame}{sun210}{SkyFrame},
       \xref{SpecFrame}{sun210}{SpecFrame},\emph{etc.}) re-define the
-      default {\att Symbol} value to be appropriate for
+      default \att{Symbol} value to be appropriate for
       the particular co-ordinate system being represented.
 
    }
@@ -7884,7 +7923,7 @@ attribute of the sky Frame, we could say:
       \sstexamplesubsection{
          wcsattrib my\_data set symbol(2)  AR
       }{
-         This sets the {\att Symbol} for Axis 2 in the current Frame in the NDF
+         This sets the \att{Symbol} for Axis 2 in the current Frame in the NDF
          called {\tt my\_data}, to the string {\tt "AR"}.
       }
    }
@@ -7911,11 +7950,11 @@ attribute of the sky Frame, we could say:
       positions on the sky.  As another example, the
       \xref{SpecFrame}{sun210}{SpecFrame}~ class can use frequency, wavelength,
       velocity \emph{etc.} to describe a position within an electromagnetic
-      spectrum.  The {\att System} attribute identifies the particular co-ordinate
+      spectrum.  The \att{System} attribute identifies the particular co-ordinate
       system represented by a \xref{Frame}{sun210}{Frame}.  Each class of Frame
       defines a set of acceptable values for this attribute, as listed
       below (all are case insensitive).  Where more than one alternative
-      {\att System}~ value is shown, the first of will be returned when an
+      \att{System}~ value is shown, the first of will be returned when an
       enquiry is made.
    }
    \sstattributetype{
@@ -7925,7 +7964,7 @@ attribute of the sky Frame, we could say:
       \sstsubsection{
          Frame
       }{
-         The {\att System} attribute for a basic Frame always equals {\tt"Cartesian"},
+         The \att{System} attribute for a basic Frame always equals {\tt"Cartesian"},
          and may not be altered.
       }
       \label{system:SkyFrame}
@@ -7933,7 +7972,7 @@ attribute of the sky Frame, we could say:
          SkyFrame
       }{
          The \xref{SkyFrame class}{sun210}{SkyFrame}~ supports the following
-         {\att System} values and associated celestial co-ordinate systems.
+         \att{System} values and associated celestial co-ordinate systems.
 
          \ssthitemlist{
 
@@ -7949,7 +7988,7 @@ attribute of the sky Frame, we could say:
             {\tt "FK4-NO-E"} or {\tt "FK4\_NO\_E"}: The old FK4 (barycentric) equatorial
             system but without the \emph{E-terms of aberration} (\emph{e.g.} some radio
             catalogues).  This co-ordinate system should also be qualified by
-            both an {\att Equinox} and an {\att Epoch} value.
+            both an \att{Equinox} and an \att{Epoch} value.
 
             \sstitem
             {\tt "FK5"} or {\tt "EQUATORIAL"}: The modern FK5 (barycentric) equatorial
@@ -7961,7 +8000,7 @@ attribute of the sky Frame, we could say:
             equatorial co-ordinate system, which gives the apparent positions
             of sources relative to the true plane of the Earth's equator and
             the equinox (the co-ordinate origin) at a time specified by the
-            qualifying {\att Epoch} value.  (Note that no {\att Equinox} is needed to
+            qualifying \att{Epoch} value.  (Note that no \att{Equinox} is needed to
             qualify this co-ordinate system because no model `mean equinox'
             is involved.)  These co-ordinates give the apparent right
             ascension and declination of a source for a specified date of
@@ -7980,7 +8019,7 @@ attribute of the sky Frame, we could say:
 
             \sstitem
             {\tt "ECLIPTIC"}: Ecliptic co-ordinates (IAU 1980), referred to the
-            ecliptic and mean equinox specified by the qualifying {\att Equinox}
+            ecliptic and mean equinox specified by the qualifying \att{Equinox}
             value.
 
             \sstitem
@@ -8002,7 +8041,7 @@ attribute of the sky Frame, we could say:
          SpecFrame
       }{
          The \xref{SpecFrame}{sun210}{SpecFrame}~ \xref{DSBSpecFrame}{sun210}{DSBSpecFrame}~
-         classes supports the following {\att System} values and associated spectral co-ordinate
+         classes supports the following \att{System} values and associated spectral co-ordinate
          systems (the default is {\tt "WAVE"} --- wavelength):
 
          \ssthitemlist{
@@ -8269,7 +8308,7 @@ attribute of the sky Frame, we could say:
       Frame represents.  Examples might be {\tt "Detector Co-ordinates"} or
       {\tt "Galactic Co-ordinates"}.
 
-      If a {\att Title} value has not been set for a Frame, then a suitable
+      If a \att{Title} value has not been set for a Frame, then a suitable
       default is supplied.
 
       The default supplied by the Frame class is {\tt "<n>-d co-ordinate
@@ -8288,7 +8327,7 @@ attribute of the sky Frame, we could say:
       \sstexamplesubsection{
          wcsattrib my\_data set Title "My own data"
       }{
-         This sets the {\att Title} for the current Frame in the NDF
+         This sets the \att{Title} for the current Frame in the NDF
          called {\tt my\_data}, to the string {\tt "My own data"}.
       }
    }
@@ -8296,7 +8335,7 @@ attribute of the sky Frame, we could say:
       \sstitemlist{
 
          \sstitem
-         A Frame's {\att Title} is intended purely for interpretation by human
+         A Frame's \att{Title} is intended purely for interpretation by human
          readers and not by software.
       }
    }
@@ -8314,20 +8353,20 @@ attribute of the sky Frame, we could say:
 
       Specialised Frames (\xref{SkyFrame}{sun210}{SkyFrame},
       \xref{SpecFrame}{sun210}{SpecFrame}, \emph{etc.}) re-define the
-      default {\att Unit} values to be appropriate to the particular co-ordinate
+      default \att{Unit} values to be appropriate to the particular co-ordinate
       system being represented.
 
-      For most classes, the {\att Unit} attribute is a purely descriptive
+      For most classes, the \att{Unit} attribute is a purely descriptive
       comment intended for human readers and makes no difference to
       the operation of the software.  However, there are some classes
-      that have \emph{active} {\att Unit} attributes.  Changing the {\att Unit}
+      that have \emph{active} \att{Unit} attributes.  Changing the \att{Unit}
       attribute for such classes will result in the
       \xref{Mappings}{sun210}{Mapping}~ within the WCS
       \xref{FrameSet}{sun210}{FrameSet}~ being modified in order
       to reflect the change in units.
-      By default, only SpecFrames have an active {\att Unit} attribute.
+      By default, only SpecFrames have an active \att{Unit} attribute.
 
-      In general, the syntax of the {\att Unit} attribute should follow the
+      In general, the syntax of the \att{Unit} attribute should follow the
       recommendations made in the FITS standard (see the paper
       ``Representation of world coordinates in FITS'' by Greisen \&
       Calabretta (available at
@@ -16915,7 +16954,7 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
          The appearance of the data values is controlled by the attributes
          \htmlattref{Colour(Curves)}{Colour(element)},
          \htmlattref{Width(Curves)}{Width(element)}, \emph{etc.} (the synonym
-         {\att Lines} may be used in place of {\att Curves}).
+         \att{Lines} may be used in place of \att{Curves}).
          {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
@@ -18735,16 +18774,15 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
       key may be controlled using Parameters KEYSTYLE and KEYPOS.
    }
    \sstusage{
-      contour ndf [comp] mode ncont [key] [device]
-        \newline\hspace*{1.5em}
-        $\left\{ {\begin{tabular}{l}
-                  low=? high=? \\
-                  percentiles=? \\
-                  sigmas=?
-                  \end{tabular} }
-        \right.$
-        \newline\hspace*{1.9em}
-        \makebox[0mm][c]{\small mode}
+     \begin{tabular}{c l}
+      contour ndf [comp] mode ncont [key] [device] &
+      {  $\begin{cases}
+          \mathtt{\tt low=?\ high=?} \\
+          \mathtt{percentiles=?} \\
+          \mathtt{sigmas=?}
+        \end{cases} $}\\
+      & mode\\
+    \end{tabular}
    }
    \sstparameters{
       \sstsubsection{
@@ -18894,18 +18932,18 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
          appearance of the contour indices is controlled by attributes
          \htmlattref{Colour(TextLab)}{Colour(element)},
          \htmlattref{Font(TextLab)}{Font(element)}, \emph{etc.} (the
-         synonym {\att Index} can be used in place of
+         synonym \att{Index} can be used in place of
          \htmlattref{TextLab}{TextLab(axis)}). The appearance of the
          contour values is controlled by attributes {\att
-         Colour(NumLab)}, {\att Font(NumLab)}, \emph{etc.} (the
-         synonym {\att Value} can be used in place of
+         Colour(NumLab)}, \att{Font(NumLab)}, \emph{etc.} (the
+         synonym \att{Value} can be used in place of
          \htmlattref{NumLab}{NumLab(axis)}).
          Contour indices are formatted using attributes
          \htmlattref{Format(1)}{Format(axis)},
          \htmlattref{Digits(1)}{Digits/Digits(axis)}, \emph{etc.} (the
-         synonym {\att Index} can be used in place of value 1).
+         synonym \att{Index} can be used in place of value 1).
          Contour values are formatted using attributes {\att
-         Format(2)}, \emph{etc.} (the synonym {\att Value} can be used
+         Format(2)}, \emph{etc.} (the synonym \att{Value} can be used
          in place of the value 2).  {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
@@ -19087,7 +19125,7 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
          The appearance of the contours is controlled by the attributes
          \htmlattref{Colour(Curves)}{Colour(element)},
          \htmlattref{Width(Curves)}{Width(element)}, \emph{etc.} (the synonym
-         {\att Contours} may be used in place of {\att Curves}).  The contour
+         \att{Contours} may be used in place of \att{Curves}).  The contour
          appearance established in  this way may be modified using Parameters
          PENS, PENROT and DASHED.  {\tt [}current value{\tt{]}}
       }
@@ -21488,10 +21526,10 @@ KAPPA: \htmlref{ADD}{ADD},
          The appearance of the arrows is controlled by the attributes
          \htmlattref{Colour(Axes)}{Colour(element)},
          \htmlattref{Width(Axes)}{Width(element)}, \emph{etc.} (the synonym
-         {\att Arrows} may be used in place of {\att Axes}).
+         \att{Arrows} may be used in place of \att{Axes}).
 
          The text of the label to draw against each arrow is specified by
-         the {\att Symbol(1)} and {\att Symbol(2)} attributes.  These default to the
+         the \att{Symbol(1)} and \att{Symbol(2)} attributes.  These default to the
          corresponding attributes of the underlying picture.  The
          appearance of these labels can be controlled using the attributes
          \htmlattref{Font(TextLab)}{Font(element)},
@@ -21709,10 +21747,10 @@ KAPPA: \htmlref{ADD}{ADD},
 
          The attributes \htmlattref{Colour(Curves)}{Colour(element)},
          \htmlattref{Width(Curves)}{Width(element)}, \emph{etc.}, can be used
-         to specify the style for the lines ({\att Lines} is recognised as a
-         synonym for {\att Curves}).  These values apply to all
+         to specify the style for the lines (\att{Lines} is recognised as a
+         synonym for \att{Curves}).  These values apply to all
          lines unless subsequent attributes override them.  Attributes for
-         individual clipping levels can be given by replacing {\att Curves} above
+         individual clipping levels can be given by replacing \att{Curves} above
          by a string of the form {\tt "Nsig$<$i$>$"} where {\tt "$<$i$>$"} is an integer
          index into the list of clipping levels supplied for Parameter
          NSIGMA.  Thus, {\tt "Colour(Nsig1)"} will set the colour for the lines
@@ -26540,13 +26578,13 @@ KAPPA: \htmlref{GDSET}{GDSET},
          The appearance of the outline is controlled by the attributes
          \htmlattref{Colour(Border)}{Colour(element)}, \latex{\goodbreak}
          \htmlattref{Width(Border)}{Width(element)}, \emph{etc.} (the synonym
-         {\att Outline} may be used in place of {\att Border}).  In addition,
+         \att{Outline} may be used in place of \att{Border}).  In addition,
          the following attributes
          may be set in order to control the appearance of the formatted axis
          values reported on the screen: \htmlattref{Format}{Format(axis)},
          \htmlattref{Digits}{Digits/Digits(axis)},
          \htmlattref{Symbol}{Symbol(axis)}, \htmlattref{Unit}{Unit(axis)}.  These
-         may be suffixed with an axis number (\emph{e.g.} {\att Digits(2)}) to refer to
+         may be suffixed with an axis number (\emph{e.g.} \att{Digits(2)}) to refer to
          the values displayed for a specific axis.  {\tt [}current value{\tt{]}}
       }
    }
@@ -27828,7 +27866,7 @@ KAPPA: \htmlref{LAPLACE}{LAPLACE},
          The appearance of the histogram curve is controlled by the
          attributes \htmlattref{Colour(Curves)}{Colour(element)},
          \htmlattref{Width(Curves)}{Width(element)}, {\em{etc}}.  (The
-         synonym {\att Line} may be used in place of {\att Curves}.)
+         synonym \att{Line} may be used in place of \att{Curves}.)
          {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
@@ -28815,18 +28853,18 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
          limits (see Parameter ALIGN).  Thus you can generate a composite
          plot within a single set of axes, say using different colours or
          modes to distinguish data from different datasets.  Note,
-         alignment between the two plots is controlled by the {\att AlignSystem}
+         alignment between the two plots is controlled by the \att{AlignSystem}
          attribute of the data being displayed.  For instance, if you have
          an existing plot showing a spectrum plotted against radio
          velocity and you overlay another spectrum, also in radio velocity
          but with a different rest frequency, the appearance of the final
-         plot will depend on the value of the {\att AlignSystem} attribute of the
-         second spectrum.  If {\att AlignSystem} is {\tt "Wavelen"} (this is the default)
+         plot will depend on the value of the \att{AlignSystem} attribute of the
+         second spectrum.  If \att{AlignSystem} is {\tt "Wavelen"} (this is the default)
          then the two spectra will be aligned in wavelength, but if
-         {\att AlignSystem} is {\tt "vrad"} they will be aligned in radio velocity.
+         \att{AlignSystem} is {\tt "vrad"} they will be aligned in radio velocity.
          There will be no difference in effect between these two forms of
          alignment unless the rest frequency is different in the two
-         spectra.  Likewise, the {\att AlignStdOfRest} attribute of the second
+         spectra.  Likewise, the \att{AlignStdOfRest} attribute of the second
          spectrum controls the standard of rest in which alignment occurs.
          These attributes (like all other attributes) may be examined and
          modified using \htmlref{WCSATTRIB}{WCSATTRIB}.
@@ -29071,7 +29109,7 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
          The length of the error bars can be controlled using Parameters
          XSIGMA and YSIGMA.  The colour, line width and line style used to
          draw them can be controlled using the plotting attributes
-         {\att Colour(ErrBars)}, {\att Width(ErrBars)} and
+         \att{Colour(ErrBars)}, \att{Width(ErrBars)} and
          \htmlattref{Style(ErrBars)}{Style(element)}~
          (see Parameter STYLE).  SHAPE is only accessed when Parameter ERRBAR
          is {\tt TRUE}.    {\tt [}current value{\tt{]}}
@@ -29112,13 +29150,13 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
          The appearance of the data values is controlled by the attributes
          \htmlattref{Colour(Curves)}{Colour(element)},
          \htmlattref{Width(Curves)}{Width(element)}, \emph{etc.} (the synonym
-         {\att Lines} may be used in place of {\att Curves}).  The appearance
+         \att{Lines} may be used in place of \att{Curves}).  The appearance
          of markers used if Parameter MODE is set to {\tt "Point"},
          {\tt "Mark"} or {\tt "Chain"} is controlled by
-         {\att Colour(Markers)}, {\att Width(Markers)}, \emph{etc.} (the
-         synonym {\att Symbols} may be used in place of {\att Markers}).  The
+         \att{Colour(Markers)}, \att{Width(Markers)}, \emph{etc.} (the
+         synonym \att{Symbols} may be used in place of \att{Markers}).  The
          appearance of the error symbols is
-         controlled using {\att Colour(ErrBars)}, {\att Width(ErrBars)}, \emph{etc}, (see
+         controlled using \att{Colour(ErrBars)}, \att{Width(ErrBars)}, \emph{etc}, (see
          Parameter SHAPE).   {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
@@ -29956,7 +29994,7 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
          If {\tt TRUE} the positions are labelled on the graphics device
          specified by Parameter DEVICE.  The offset of the centre of each
          label from the corresponding position is controlled using the
-         \htmlattref{NumLabGap(1)}{NumLabGap(axis)}~ and {\att NumLabGap(2)}
+         \htmlattref{NumLabGap(1)}{NumLabGap(axis)}~ and \att{NumLabGap(2)}
          plotting attributes, and the appearance of the labels is controlled
          using attributes \htmlattref{Colour(NumLab)}{Colour(element)},
          \htmlattref{Size(NumLab)}{Size(element)}, \emph{etc}.  These
@@ -30199,7 +30237,7 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
          be set in order to control the appearance of the formatted axis
          values reported on the screen: \htmlattref{Format}{Format(axis)}, \htmlattref{Digits}{Digits/Digits(axis)},
          \htmlattref{Symbol}{Symbol(axis)}, \htmlattref{Unit}{Unit(axis)}.  These
-         may be suffixed with an axis number (\emph{e.g.} {\att Digits(2)}) to refer to
+         may be suffixed with an axis number (\emph{e.g.} \att{Digits(2)}) to refer to
          the values displayed for a specific axis.  {\tt [}current value{\tt{]}}
       }
    }
@@ -30246,7 +30284,7 @@ KAPPA: \htmlref{CURSOR}{CURSOR},
          in text file {\tt stars\_2.txt} in their original co-ordinate Frame.  By
          default, five digits are used to format Axis-1 values, and seven to format
          Axis-2 values.  These defaults are overridden if the attributes
-         \htmlattref{Format(1)}{Format(axis)}~ and/or {\att Format(2)} are assigned
+         \htmlattref{Format(1)}{Format(axis)}~ and/or \att{Format(2)} are assigned
          values in the description of the current Frame stored in the positions list.
       }
       \sstexamplesubsection{
@@ -32191,7 +32229,7 @@ KAPPA: \htmlref{LUTEDIT}{LUTEDIT},
 
          Axis 1 is always the \emph{data value} axis, whether it is displayed
          horizontally or vertically.  So for instance, to set the label
-         for the data value axis, assign a value to {\att Label(1)} in the
+         for the data value axis, assign a value to \att{Label(1)} in the
          supplied style.
 
          To get a ramp key (the default), specify {\tt "form=ramp"}.  To
@@ -34584,14 +34622,14 @@ KAPPA: \htmlref{SETBAD}{SETBAD}.
          by attributes \htmlattref{Colour(Title)}{Colour(element)},
          \htmlattref{Font(Title)}{Font(element)}, \emph{etc}.  The appearance of
          the curve labels is controlled by attributes
-         {\att Colour(TextLab)}, {Font(TextLab)}, \emph{etc.} (the synonym
-         {\att Labels} can be used in place of \htmlattref{TextLab}{TextLab(axis)}).  The
+         \att{Colour(TextLab)}, {Font(TextLab)}, \emph{etc.} (the synonym
+         \att{Labels} can be used in place of \htmlattref{TextLab}{TextLab(axis)}).  The
          appearance of the offset values is controlled by attributes
-         {\att Colour(NumLab)}, {\att Font(NumLab)}, \emph{etc.} (the
-         synonym {\att Offset} can be used in place of
+         \att{Colour(NumLab)}, \att{Font(NumLab)}, \emph{etc.} (the
+         synonym \att{Offset} can be used in place of
          \htmlattref{NumLab}{NumLab(axis)}).  Offset values
-         are formatted using attributes {\att Format(2)}, \emph{etc.} (the
-         synonym {\att Offset} can be used in place of the value 2).
+         are formatted using attributes \att{Format(2)}, \emph{etc.} (the
+         synonym \att{Offset} can be used in place of the value 2).
          {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
@@ -34805,22 +34843,22 @@ KAPPA: \htmlref{SETBAD}{SETBAD}.
          The appearance of the data curves is controlled by the attributes
          \htmlattref{Colour(Curves)}{Colour(element)},
          \htmlattref{Width(Curves)}{Width(element)}, \emph{etc.} (the synonym
-         {\att Lines} may be used in place of {\att Curves}).  The appearance
+         \att{Lines} may be used in place of \att{Curves}).  The appearance
          of markers used if Parameter MODE is set to {\tt "Point"}, {\tt "Mark"}
-         or {\tt "Chain"} is controlled by {\att Colour(Markers)},
-         {\att Width(Markers)}, \emph{etc.} (the synonym {\att Symbols} may
-         be used in place of {\att Markers}).  The appearance of the
-         error bars is  controlled using {\att Colour(ErrBars)},
-         {\att Width(ErrBars)}, \emph{etc.} (see Parameter ERRBAR).  The appearance of
-         the zero-point markers is controlled using {\att Colour(ZeroMark)},
-         {\att Size(ZeroMark}),  \emph{etc}.  The appearance of the curve labels is
-         controlled using {\att Colour(Labels)}, {\att Size(Labels)}, \emph{etc}.
-         {\att LabPos(Left)} controls the horizontal position
+         or {\tt "Chain"} is controlled by \att{Colour(Markers)},
+         \att{Width(Markers)}, \emph{etc.} (the synonym \att{Symbols} may
+         be used in place of \att{Markers}).  The appearance of the
+         error bars is  controlled using \att{Colour(ErrBars)},
+         \att{Width(ErrBars)}, \emph{etc.} (see Parameter ERRBAR).  The appearance of
+         the zero-point markers is controlled using \att{Colour(ZeroMark)},
+         \att{Size(ZeroMark}),  \emph{etc}.  The appearance of the curve labels is
+         controlled using \att{Colour(Labels)}, \att{Size(Labels)}, \emph{etc}.
+         \att{LabPos(Left)} controls the horizontal position
          of the in-line curve label (see Parameter LINLAB), and
-         {\att LabPos(Right)} controls the horizontal position of the curve
+         \att{LabPos(Right)} controls the horizontal position of the curve
          label associated with the right-hand zero-point marker (see
-         Parameter ZMARK).  {\att LabPos} without any qualifier is equivalent to
-         {\att LabPos(Left)}.  {\att LabPos} values are floating point, with
+         Parameter ZMARK).  \att{LabPos} without any qualifier is equivalent to
+         \att{LabPos(Left)}.  \att{LabPos} values are floating point, with
          {\tt 0.0} meaning
          the left edge of the plotting area, and {\tt 1.0} the right edge. Values
          outside the range 0 to 1 may be used.  {\tt [}current value{\tt{]}}
@@ -36302,37 +36340,37 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND};
          {\tt "$\backslash$S"} --- Matches anything but white space.
          }
       }
-      \html{
-        \sstitemlist{
+      % \html{
+      %   \sstitemlist{
 
-         \sstitem
-         {\tt "[chars]"} --- Matches any of the characters within the brackets.
+      %    \sstitem
+      %    {\tt "[chars]"} --- Matches any of the characters within the brackets.
 
-         \sstitem
-         {\tt "[$\wedge$chars]"} --- Matches any character that is not within the
-                       brackets (ignoring the initial {\tt "$\wedge$"} character).
-         \sstitem
-         {\tt "."} --- Matches any single character.
+      %    \sstitem
+      %    {\tt "[$\wedge$chars]"} --- Matches any character that is not within the
+      %                  brackets (ignoring the initial {\tt "$\wedge$"} character).
+      %    \sstitem
+      %    {\tt "."} --- Matches any single character.
 
-         \sstitem
-         \verb+"\d"+ --- Matches a single digit.
+      %    \sstitem
+      %    \verb+"\d"+ --- Matches a single digit.
 
-         \sstitem
-         \verb+"\D"+ --- Matches anything but a single digit.
+      %    \sstitem
+      %    \verb+"\D"+ --- Matches anything but a single digit.
 
-         \sstitem
-         \verb+"\w"+ --- Matches any alphanumeric character, and {\tt "\_"}.
+      %    \sstitem
+      %    \verb+"\w"+ --- Matches any alphanumeric character, and {\tt "\_"}.
 
-         \sstitem
-         \verb+"\W"+ --- Matches anything but alphanumeric characters, and {\tt "\_"}.
+      %    \sstitem
+      %    \verb+"\W"+ --- Matches anything but alphanumeric characters, and {\tt "\_"}.
 
-         \sstitem
-         \verb+"\s"+ --- Matches white space.
+      %    \sstitem
+      %    \verb+"\s"+ --- Matches white space.
 
-         \sstitem
-         \verb+"\S"+ --- Matches anything but white space.
-        }
-      }
+      %    \sstitem
+      %    \verb+"\S"+ --- Matches anything but white space.
+      %   }
+      % }
 
       Any other character that has no special significance within a
       regular expression matches itself.  Characters that have special
@@ -37159,12 +37197,12 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
 
          The appearance of the best-fitting straight line is controlled by
          the attributes \latex{\goodbreak} \htmlattref{Colour(Curves)}{Colour(element)},
-         \htmlattref{Width(Curves)}{Width(element)}, \emph{etc.} (the synonym {\att Line}
-         may be used in place of {\att Curves}).  The appearance of markers is
-         controlled by {\att Colour(Markers)}, {\att Width(Markers)},
-         \emph{etc.} (the synonym {\att Symbols} may be used in place of
-         {\att Markers}).  The appearance of the error bars is controlled
-         using {\att Colour(ErrBars)}, {\att Width(ErrBars)},
+         \htmlattref{Width(Curves)}{Width(element)}, \emph{etc.} (the synonym \att{Line}
+         may be used in place of \att{Curves}).  The appearance of markers is
+         controlled by \att{Colour(Markers)}, \att{Width(Markers)},
+         \emph{etc.} (the synonym \att{Symbols} may be used in place of
+         \att{Markers}).  The appearance of the error bars is controlled
+         using \att{Colour(ErrBars)}, \att{Width(ErrBars)},
          \emph{etc}.  Note, \htmlattref{Size(ErrBars)}{Size(element)}~ controls
          the length of the serifs (\emph{i.e.} the cross pieces at each end of the
          error bar), and defaults to 1.0.  {\tt [}current value{\tt{]}}
@@ -41512,37 +41550,37 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
          {\tt "$\backslash$S"} --- Matches anything but white space.
          }
       }
-      \html{
-        \sstitemlist{
+      % \html{
+      %   \sstitemlist{
 
-         \sstitem
-         {\tt "[chars]"} --- Matches any of the characters within the brackets.
+      %    \sstitem
+      %    {\tt "[chars]"} --- Matches any of the characters within the brackets.
 
-         \sstitem
-         {\tt "[$\wedge$chars]"} --- Matches any character that is not within the
-                       brackets (ignoring the initial {\tt "$\wedge$"} character).
-         \sstitem
-         {\tt "."} --- Matches any single character.
+      %    \sstitem
+      %    {\tt "[$\wedge$chars]"} --- Matches any character that is not within the
+      %                  brackets (ignoring the initial {\tt "$\wedge$"} character).
+      %    \sstitem
+      %    {\tt "."} --- Matches any single character.
 
-         \sstitem
-         \verb+"\d"+ --- Matches a single digit.
+      %    \sstitem
+      %    \verb+"\d"+ --- Matches a single digit.
 
-         \sstitem
-         \verb+"\D"+ --- Matches anything but a single digit.
+      %    \sstitem
+      %    \verb+"\D"+ --- Matches anything but a single digit.
 
-         \sstitem
-         \verb+"\w"+ --- Matches any alphanumeric character, and {\tt "\_"}.
+      %    \sstitem
+      %    \verb+"\w"+ --- Matches any alphanumeric character, and {\tt "\_"}.
 
-         \sstitem
-         \verb+"\W"+ --- Matches anything but alphanumeric characters, and {\tt "\_"}.
+      %    \sstitem
+      %    \verb+"\W"+ --- Matches anything but alphanumeric characters, and {\tt "\_"}.
 
-         \sstitem
-         \verb+"\s"+ --- Matches white space.
+      %    \sstitem
+      %    \verb+"\s"+ --- Matches white space.
 
-         \sstitem
-         \verb+"\S"+ --- Matches anything but white space.
-         }
-      }
+      %    \sstitem
+      %    \verb+"\S"+ --- Matches anything but white space.
+      %    }
+      % }
 
       Any other character that has no special significance within a
       regular expression matches itself.  Characters that have special
@@ -42040,10 +42078,10 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
          The appearance of the model curve is controlled by the attributes
          \htmlattref{Colour(Curves)}{Colour(element)},
          \htmlattref{Width(Curves)}{Width(element)}, \emph{etc.} (the synonym
-         {\att Line} may be used in place of {\att Curves}).  The appearance of the
-         markers representing the real data is controlled by {\att Colour(Markers)},
-         {\att Width(Markers)},
-         \emph{etc.} (the synonym {\att Symbols} may be used in place of {\att Markers}).
+         \att{Line} may be used in place of \att{Curves}).  The appearance of the
+         markers representing the real data is controlled by \att{Colour(Markers)},
+         \att{Width(Markers)},
+         \emph{etc.} (the synonym \att{Symbols} may be used in place of \att{Markers}).
          {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
@@ -43666,8 +43704,8 @@ KAPPA: \htmlref{FLIP}{FLIP},
          The appearance of markers is controlled by
          \htmlattref{Colour(Markers)}{Colour(element)},
          \htmlattref{Width(Markers)}{Width(element)}, \emph{etc.} (the synonym
-         {\att Symbols} may be used in place
-         of {\att Markers}).  {\tt [}current value{\tt{]}}
+         \att{Symbols} may be used in place
+         of \att{Markers}).  {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
          XLEFT = \_DOUBLE (Read)
@@ -44060,11 +44098,11 @@ KAPPA: \htmlref{NORMALIZE}{NORMALIZE}.
          The appearance of the lines forming the edges of each polygon is
          controlled by the attributes \htmlattref{Colour(Curves)}{Colour(element)},
          \htmlattref{Width(Curves)}{Width(element)}, \emph{etc.}
-         (either of the synonyms {\att Lines} and {\att Edges} may be used in place of
-         {\att Curves}).  The appearance of the vertex markers is controlled by the
-         attributes {\att Colour(Markers)},
+         (either of the synonyms \att{Lines} and \att{Edges} may be used in place of
+         \att{Curves}).  The appearance of the vertex markers is controlled by the
+         attributes \att{Colour(Markers)},
          \htmlattref{Size(Markers)}{Size(element)}, \emph{etc.} (the synonyms
-         {\att Vertices} may be used in place of {\att Markers}).  {\tt [}current value{\tt{]}}
+         \att{Vertices} may be used in place of \att{Markers}).  {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
          USEAXIS = \htmlref{GROUP}{se:groups} (Read)
@@ -48656,22 +48694,22 @@ KAPPA: \htmlref{ADD}{ADD},
          for a description of the available attributes.  Any unrecognised
          attributes are ignored (no error is reported).
 
-         The appearance of the text in the key is controlled using {\att String}
-         attributes (\emph{e.g.} {\att Colour(Strings)},
+         The appearance of the text in the key is controlled using \att{String}
+         attributes (\emph{e.g.} \att{Colour(Strings)},
          \htmlattref{Font(Strings)}{Font(element)}; the
-         synonym {\att Text} can be used in place of {\att Strings}).  Note, the
+         synonym \att{Text} can be used in place of \att{Strings}).  Note, the
          \htmlattref{Size}{Size(element)}~ attribute specifies the size of key
          text relative to the size of the numerical labels on the vector-map
-         axes.  Thus a value of {\tt 2.0} for {\att Size} will result in text which is
+         axes.  Thus a value of {\tt 2.0} for \att{Size} will result in text which is
          twice the size of the numerical axis labels. The appearance of the
-         example vector is controlled using {\att Curve} attributes
-         (\emph{e.g.} \htmlattref{Colour(Curves)}{Colour(element)}; the synonym {\att Vector} can be
-         used in place of {\att Curves}).  The numerical scale value is
+         example vector is controlled using \att{Curve} attributes
+         (\emph{e.g.} \htmlattref{Colour(Curves)}{Colour(element)}; the synonym \att{Vector} can be
+         used in place of \att{Curves}).  The numerical scale value is
          formatted as an axis-1 value (using attributes \htmlattref{Format(1)}{Format(axis)},
-          \htmlattref{Digits(1)}{Digits/Digits(axis)}, \emph{etc}; the synonym {\att Scale} can be used in
+          \htmlattref{Digits(1)}{Digits/Digits(axis)}, \emph{etc}; the synonym \att{Scale} can be used in
          place of the value 1).  The length of the example vector is formatted
-         as an axis-2 value (using attribute {\att Format(2)}, \emph{etc}; the
-         synonym {\att Vector} can be used in place of the value 2).  The
+         as an axis-2 value (using attribute \att{Format(2)}, \emph{etc}; the
+         synonym \att{Vector} can be used in place of the value 2).  The
          vertical space between lines in the key can be controlled using
          attribute \htmlattref{TextLabGap}{TextLabGap(axis)}.  A value of {\tt 1.0} is used if no
          value is set for this attribute, and produces default vertical
@@ -48760,8 +48798,8 @@ KAPPA: \htmlref{ADD}{ADD},
          The appearance of the vectors is controlled by the attributes
          \htmlattref{Colour(Curves)}{Colour(element)},
          \htmlattref{Width(Curves)}{Width(element)}, \emph{etc.} (the
-         synonym {\att Vectors} may be
-         used in place of {\att Curves}).  {\tt [}current value{\tt{]}}
+         synonym \att{Vectors} may be
+         used in place of \att{Curves}).  {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
          VSCALE = \_REAL (Read)
@@ -48979,7 +49017,7 @@ KAPPA: \htmlref{CALPOL}{CALPOL}.
       \sstsubsection{
          DOMAIN = LITERAL (Read)
       }{
-         The value for the {\att Domain} attribute for the new Frame.  Care should be
+         The value for the \att{Domain} attribute for the new Frame.  Care should be
          taken to ensure that domain names are used consistently.  This
          will usually mean avoiding any domain names that are already in
          use within the WCS component, particularly the
@@ -49154,7 +49192,7 @@ KAPPA: \htmlref{CALPOL}{CALPOL}.
       \sstsubsection{
          SIMPFI = \_LOGICAL (Read)
       }{
-         The value of the Mapping's {\att SimpFI} attribute (whether it is
+         The value of the Mapping's \att{SimpFI} attribute (whether it is
          legitimate to simplify the forward followed by the inverse
          transformation to a unit transformation).  This parameter is
          only used when MAPTYPE={\tt "MATH"}.  {\tt [TRUE]}
@@ -49162,7 +49200,7 @@ KAPPA: \htmlref{CALPOL}{CALPOL}.
       \sstsubsection{
          SIMPIF = \_LOGICAL (Read)
       }{
-         The value of the Mapping's {\att SimpIF} attribute (whether it is
+         The value of the Mapping's \att{SimpIF} attribute (whether it is
          legitimate to simplify the inverse followed by the forward
          transformation to a unit transformation).  This parameter is
          only used when MAPTYPE={\tt "MATH"}.  {\tt [TRUE]}
@@ -49209,7 +49247,7 @@ KAPPA: \htmlref{CALPOL}{CALPOL}.
          Frame (Specified by Parameter FRMTYPE), if they are applicable
          to the new Frame. If {\tt FALSE}, no attribute values are transferred.
          The dynamic default is {\tt TRUE} if and only if the two Frames are
-         of the same class and have the same value for their {\att Domain}
+         of the same class and have the same value for their \att{Domain}
          attributes.  {\tt []}
       }
       \sstsubsection{
@@ -49986,7 +50024,7 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
       \sstexamplesubsection{
          wcsattrib my\_data set domain saved\_pixel
       }{
-         This sets the {\att Domain} attribute of the current co-ordinate Frame in
+         This sets the \att{Domain} attribute of the current co-ordinate Frame in
          the NDF called my\_data to the string SAVED\_PIXEL.
       }
       \sstexamplesubsection{
@@ -50026,7 +50064,7 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
       \sstexamplesubsection{
          wcsattrib my\_data clear label(1)
       }{
-         This clears the {\att Label} attribute for the first axis of the current
+         This clears the \att{Label} attribute for the first axis of the current
          co-ordinate Frame in the NDF called my\_data.  It reverts to its
          default value.
       }
@@ -50330,7 +50368,7 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          Frame in the NDF m51 (if available).  The specific spectral
          co-ordinate system (wavelength, frequency, \emph{etc.}) will depend on the
          contents of the WCS component of the NDF, but may be changed by
-         setting a new value for the {\att System} attribute using the WCSATTRIB
+         setting a new value for the \att{System} attribute using the WCSATTRIB
          command.
       }
       \sstexamplesubsection{
@@ -51821,13 +51859,13 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
          The appearance of vertical and horizontal lines is controlled by
          the attributes \latex{\goodbreak} \htmlattref{Colour(Curves)}{Colour(element)},
          \htmlattref{Width(Curves)}{Width(element)},
-         \emph{etc.} (the synonym {\att Lines} may be used in place of
-         {\att Curves}).  The appearance of boxes is controlled by the
-         attributes {\att Colour(Border)},
+         \emph{etc.} (the synonym \att{Lines} may be used in place of
+         \att{Curves}).  The appearance of boxes is controlled by the
+         attributes \att{Colour(Border)},
          \htmlattref{Size(Border)}{Size(element)}, \emph{etc.}
-         (the synonym {\att Box} may be used in place of Border).  The appearance
-         of markers is controlled by attributes {\att Colour(Markers)},
-         {\att Size(Markers)}, \emph{etc}.  {\tt [}current value{\tt{]}}
+         (the synonym \att{Box} may be used in place of Border).  The appearance
+         of markers is controlled by attributes \att{Colour(Markers)},
+         \att{Size(Markers)}, \emph{etc}.  {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
          TITLE = LITERAL (Read)
@@ -52367,7 +52405,7 @@ by applications such as \htmlref{REGRID}{REGRID} which require a mapping.
       Here, we first calculate three intermediate results ($R$, $ROUT$
       and $THETA$) and then use these to calculate the final results ($XOUT$
       and $YOUT$).  The MathMap knows that only the final two results
-      constitute values for the output variables because its {\att Nout} attribute
+      constitute values for the output variables because its \att{Nout} attribute
       is set to 2.  You may define as many intermediate variables in this
       way as you choose.  Having defined a variable, you may then refer to it
       on the right of any subsequent expressions.
@@ -53223,6 +53261,575 @@ and HDS data types is as follows:
 \subsection{Modified Commands}
 The following applications have been modified:
 
+      \item [\htmlref{CENTROID}{CENTROID}] \mbox{}
+         \begin{itemize}
+
+            \item Positions can now be read from and written to position
+            list catalogues such as created by CURSOR and LISTMAKE.
+
+            \item All positions, both given by the user and returned by
+            the program, now refer to the Current Frame of the NDF.
+
+            \item Either the initial or final positions may now be marked
+            on the screen (see Parameter MARK).
+
+            \item There is now much greater control over the appearance
+            of any annotation draw over the screen.  This is provided
+            through the PLOTSTYLE parameter which allow plotting
+            attributes to be set.
+
+            \item The error on the final position is now returned in
+            Parameters XERR and YERR.
+
+            \item The following parameters have been removed
+            (alternatives to using these old parameters are indicated):
+
+               \begin{description}
+                  \item[COSYS] --- Use application WCSFRAME to set the required
+                                  \htmlref{co-ordinate Frame}{se:domains}~  first.
+               \end{description}
+
+            \item The following new parameters have been added: DESCRIBE,
+            ERROR, GUESS, INCAT, MARKER, OUTCAT, PLOTSTYLE, QUIET, \htmlref{TITLE}{apndf:title},
+            XERR, YERR.
+
+            \item The following parameters have been modified:
+               \begin{description}
+
+                  \item[CENTRE] --- This is now a string parameter in
+                  which is returned the formatted co-ordinates of the
+                  last centroid position, in the current Frame of the
+                  NDF.
+
+                  \item[INIT] --- This is now a string parameter which
+                  should be given the co-ordinates of the initial guess
+                  in the Current Frame of the NDF.
+
+                  \item[MARK] --- Now indicates whether the initial or
+                  final positions should be marked on the screen.
+
+                  \item[MODE] --- Now accepts the extra value "Catalogue".
+
+                  \item[XCEN,YCEN] --- These are now string parameters
+                  which return the formatted \textit{x} and \textit{y} co-ordinates of the
+                  last centroid position, in the current Frame of the
+                  NDF.
+
+               \end{description}
+         \end{itemize}
+
+      \item [\htmlref{COMPADD}{COMPADD}] \mbox{}
+         A bug has been fixed which could produce incorrect WCS
+         co-ordinates in the output NDF if the lower bounds of the input
+         NDF were not (1,~1).
+
+      \item [\htmlref{COMPAVE}{COMPAVE}] \mbox{}
+         A bug has been fixed which could produce incorrect WCS
+         co-ordinates in the output NDF if the lower bounds of the input
+         NDF were not (1,~1).
+
+      \item [\xref{CONTOVER}{sun239}{CONTOVER}] \mbox{}
+         CONTOVER has been scheduled for withdrawl at the next release of
+         \KAPPA, and a warning message is now displayed every time
+         CONTOVER is run.  Use {\tt "contour clear=no"} instead to draw a contour
+         map over an existing data picture.
+
+      \item [\htmlref{CURSOR}{CURSOR}] \mbox{}
+         A bug has been fixed which resulted in CURSOR running out of
+         picture identifiers (and consequently aborting) if more than
+         40 positions were given.
+
+      \item [\htmlref{DISPLAY}{DISPLAY}] \mbox{}
+         New Parameters KEY, KEYPOS and KEYSTYLE have been added, allowing
+         DISPLAY to create a key containing a colour ramp in the same style
+         as LUTVIEW.
+
+      \item [\htmlref{DRAWSIG}{DRAWSIG}] \mbox{}
+         \begin{itemize}
+            \item There is now much greater control over the appearance
+                  of the lines drawn.  Each line may be drawn with a
+                  different appearance.  This is provided through the
+                  STYLE parameter which allow plotting attributes to
+                  be set for each line drawn.
+
+            \item The following parameters have been removed (alternatives to
+                  using these old parameters are indicated):
+
+               \begin{description}
+                  \item[LINESTYLE] --- Use the STYLE parameter to specify a
+                                   value for the plotting attribute
+                                   \htmlattref{Style(Lines)}{Style(element)}.
+                  \item[SIGCOL] --- Use the \htmlattref{Colour(Lines)}{Colour(element)}~
+                                   plotting attributes.
+                  \item[THICK]  --- Use the \htmlattref{Width(Lines)}{Width(element)}~
+                                   plotting attributes.
+               \end{description}
+
+            \item The following new parameters have been added: STYLE.
+
+         \end{itemize}
+
+      \item [\htmlref{EXP10}{EXP10}] \mbox{}
+         This command is now a synonym for {\tt expon base=10D0}.
+
+      \item [\htmlref{EXPE}{EXPE}] \mbox{}
+         This command is now a synonym for {\tt expon base=natural}.
+
+      \item [\htmlref{EXPON}{EXPON}] \mbox{}
+         Re-written to use NDF data structures.
+
+      \item [\htmlref{FITSMOD}{FITSMOD}] \mbox{}
+         A new output Parameter EXISTS has been added to store the result
+         of the final "Exist" operation.
+
+      \item [\xref{GREYPLOT}{sun239}{GREYPLOT}] \mbox{}
+         GREYPLOT has been scheduled for withdrawl at the next release of
+         \KAPPA, and a warning message is now displayed every time
+         GREYPLOT is run.  DISPLAY can now produce a key to the colour
+         table using the new KEY parameter, so there is no longer any
+         real need for GREYPLOT.
+
+      \item [\htmlref{HISTOGRAM}{HISTOGRAM}] \mbox{}
+         \begin{itemize}
+            \item There is now much greater control over the appearance
+                  of the plot.  This is provided through the STYLE parameter
+                  which allow plotting attributes to be set.
+
+            \item The following parameters have been removed (alternatives to
+                  using these old parameters are indicated):
+
+               \begin{description}
+                  \item[ABSLAB] --- Use the STYLE parameter to specify a
+                                   value for the plotting attribute \htmlattref{Label(1)}{Label(axis)}.
+                  \item[FONT]   --- Use the \htmlattref{Font}{Font(element)}~ plotting attributes.
+                  \item[MAJTIC] --- Use the \htmlattref{Gap}{Gap(axis)}~ plotting attributes.
+                  \item[MINTIC] --- Use the \att{MinTick} plotting attribute.
+                  \item[ORDLAB] --- Use \att{Label(2)} plotting attribute.
+                  \item[OUTTIC] --- Use \htmlattref{MajTickLen}{MajTickLen}~ and \htmlattref{MinTickLen}{MinTickLen}~
+                                   plotting attributes.
+                  \item[PLTITL] --- Use the \htmlattref{Title}{plotel:Title}~ plotting attribute.
+                  \item[PXSIZE] --- Create the picture first with the
+                                   required picture size using PICDEF.
+                  \item[PYSIZE] --- See PXSIZE.
+                  \item[THICK]  --- Use the \htmlattref{Width}{Width(element)}~ plotting attributes.
+               \end{description}
+
+            \item The following new parameters have been added: AXES, MARGIN,
+                  MARKER, STYLE, XLEFT, XRIGHT, YBOT, YTOP.
+
+            \item The following parameters have been modified:
+               \begin{description}
+
+                  \item[XLOG] --- If a logarithmic horizontal axis is
+                  requested, the axis is now annotated with equally spaced
+                  values of the logarithm (base 10) of the data value.
+
+                  \item[YLOG] --- If a logarithmic vertical axis is requested,
+                  the vertical axis is now annotated with equally spaced
+                  values of the logarithm (base 10) of the pixel count.
+
+               \end{description}
+
+         \end{itemize}
+
+      \item [\htmlref{LINPLOT}{LINPLOT}] \mbox{}
+         A new Parameter LMODE has been added to allow the default limits
+         for the vertical axis to be chosen in various ways (for instance
+         using percentiles, multiples of the standard deviation, \emph{etc.}).
+
+      \item [\htmlref{LOG10}{LOG10}] \mbox{}
+         This command is now a synonym for {\tt logar base=10D0}.
+
+      \item [\htmlref{LOGAR}{LOGAR}] \mbox{}
+         Re-written to use NDF data structures.
+
+      \item [\htmlref{LOGE}{LOGE}] \mbox{}
+         This command is now a synonym for {\tt logar base=natural}.
+
+      \item [\htmlref{LUTVIEW}{LUTVIEW}] \mbox{}
+         \begin{itemize}
+
+            \item The annotation placed around the colour ramp can now be
+            controlled in much greater detail using the new STYLE
+            parameter.
+
+            \item If MODE={\tt "XY"}, the bounds of the area occupied by the colour
+            ramp and annotation can be specified in a variety of co-ordinate
+            systems (specified by the new Parameter FRAME).
+
+            \item The following parameters have been removed
+            (alternatives to using these old parameters are indicated):
+
+               \begin{description}
+
+                  \item[ANNOTA] --- Use the STYLE parameter to specify
+                  which elements of the annotation (if any) are required.
+                  For instance, set {\tt "NumLab(1)=0"} to suppress the
+                  numerical data values.
+
+                  \item[OUTLINE] --- Use the STYLE parameter to specify
+                  which elements of the annotation (if any) are required.
+                  For instance, set {\tt "BORDER=0"} to suppress the box drawn
+                  around the colour ramp.
+
+               \end{description}
+
+            \item The following new parameters have been added: FRAME,
+            STYLE.
+
+            \item The following parameters have been modified:
+               \begin{description}
+
+                  \item[LBOUND] --- Now gives the lower bounds in the
+                  co-ordinate Frame specified by Parameter FRAME.  The
+                  parameter type is now LITERAL rather than \_REAL.
+
+                  \item[UBOUND] --- Now gives the upper bounds in the
+                  co-ordinate Frame specified by Parameter FRAME.  The
+                  parameter type is now LITERAL rather than \_REAL.
+
+               \end{description}
+         \end{itemize}
+
+      \item [\htmlref{MLINPLOT}{MLINPLOT}] \mbox{}
+         \begin{itemize}
+
+            \item The appearance of the annotated axes can now be
+            controlled in much greater detail using the new STYLE
+            parameter.
+
+            \item The horizontal axis may now be annotated with values
+            from one of the axes in the Current co-ordinate Frame of the
+            NDF (see new Parameter USEAXIS).
+
+            \item The appearance of the data curves (colour, line style,
+            line width, \emph{etc.}) can now be specified individually using the
+            new PENS and MODE parameters.
+
+            \item Vertical error bars can now be displayed if the
+            supplied NDF has a VARIANCE component (see new Parameter
+            ERRBAR).
+
+            \item If the display is not cleared (using Parameter CLEAR),
+            then an attempt is made to align the new plot with any
+            existing plot.
+
+            \item The vertical and horizontal position of the key can now
+            be controlled using new Parameter KEYPOS, and its appearance
+            can be controlled using new Parameter KEYSTYLE.
+
+            \item The strings which which to label the data curves can
+            now be given explicitly using new Parameter LABELS.
+
+            \item Whether or not vertical offset markers are drawn for
+            each curve is now controlled by the new Parameter ZMARK.
+
+            \item The following parameters have been removed
+            (alternatives to using these old parameters are indicated):
+
+               \begin{description}
+
+                  \item[ABSLAB] --- Use the STYLE parameter to specify a
+                  value for the plotting attribute \htmlattref{Label(1)}{Label(axis)}.
+
+                  \item[FONT] --- Use the \htmlattref{Font}{Font(element)}~ plotting attributes.
+
+                  \item[LBSIZE] --- Use the \htmlattref{Size(Labels)}{Size(element)}~
+                                   plotting attribute.
+
+                  \item[MAJTIC] --- Use the \htmlattref{Gap}{Gap(axis)}~ plotting attributes.
+
+                  \item[MINTIC] --- Use the \att{MinTick} plotting attribute.
+
+                  \item[ORDLAB] --- Use \att{Label(2)} plotting attribute.
+
+                  \item[OUTTIC] --- Use \htmlattref{MajTickLen}{MajTickLen}~ and
+                                   \htmlattref{MinTickLen}{MinTickLen}~ plotting attributes.
+
+                  \item[PLTITL] --- Use the \htmlattref{Title}{plotel:Title}~ plotting attribute.
+
+                  \item[PXSIZE] --- Create the picture first using PICDEF,
+                  the required picture size using the SIZE.
+
+                  \item[PYSIZE] --- See PXSIZE.
+
+                  \item[TICLN] --- Use the \htmlattref{MajTickLen}{MajTickLen}~ and
+                                  \htmlattref{MinTickLen}{MinTickLen}~ plotting attributes.
+
+                  \item[XLOG] --- Logarithmic \textit{x} axes are not currently
+                  supported.
+
+                  \item[YLIMIT] --- Use new Parameters YBOT and YTOP.
+
+               \end{description}
+
+            \item The following new parameters have been added: AXES,
+            ERRBAR, FREQ, KEYPOS, KEYSTYLE, LABELS, MARGIN, MARKER, MODE,
+            PENS, SIGMA, STYLE, USEAXIS, XLEFT, XRIGHT, YBOT, YTOP, ZMARK.
+
+            \item The following parameters have been modified:
+               \begin{description}
+
+                  \item[LNINDX] --- Ranges of pixel indices are now
+                  specified using a colon ({\tt ":"}) instead of a hyphen
+                  ({\tt "-"}).  So for instance, pixel rows 5 to 10 would now
+                  be given as {\tt "5:10"} and not {\tt "5-10"}.
+
+                  \item[OFFSET] --- Now double precision.
+
+                  \item[SPACE] --- Now accepts the additional value {\tt "None"}
+                  which specifies that all curves should be drawn with
+                  the same vertical zero point.
+
+                  \item[YLOG] --- If a logarithmic vertical axis is requested,
+                  the vertical axis is now annotated with equally spaced
+                  values of the logarithm (base 10) of the supplied data.
+                  Also, the curves are drawn with the vertical offsets
+                  specified by Parameter SPACE, and the appearance
+                  specified by Parameters PENS and STYLE.
+
+               \end{description}
+         \end{itemize}
+
+      \item [\htmlref{NORMALIZE}{NORMALIZE}] \mbox{}
+         \begin{itemize}
+            \item There is now much greater control over the appearance
+                  of the normalization plot.  This is provided through the
+                  STYLE parameter which allow plotting attributes to
+                  be set.
+
+            \item The following parameters have been removed (alternatives to
+                  using these old parameters are indicated):
+
+               \begin{description}
+                  \item[ABSLAB] --- Use the STYLE parameter to specify a
+                                   value for the plotting attribute \htmlattref{Label(1)}{Label(axis)}.
+                  \item[FONT] --- Use the \htmlattref{Font}{Font(element)}~ plotting attributes.
+                  \item[MAJTIC] --- Use the \htmlattref{Gap}{Gap(axis)}~ plotting attributes.
+                  \item[MINTIC] --- Use the \att{MinTick} plotting attribute.
+                  \item[ORDLAB] --- Use \att{Label(2)} plotting attribute.
+                  \item[OUTTIC] --- Use \htmlattref{MajTickLen}{MajTickLen}~ and
+                                   \htmlattref{MinTickLen}{MinTickLen}~
+                                   plotting attributes.
+                  \item[PTITLE] --- Use the \htmlattref{Title}{plotel:Title}~ plotting attribute.
+               \end{description}
+
+            \item The following new parameters have been added: AXES, MARGIN,
+                  MARKER, STYLE, XLEFT, XRIGHT, YBOT, YTOP.
+
+         \end{itemize}
+
+      \item [\htmlref{PIXDUPE}{PIXDUPE}] \mbox{}
+         \begin{itemize}
+            \item Modified so that pixel origin information is not lost.
+            For instance, if you expand two aligned images by the same
+            factor, they will still be aligned after the expansion.
+         \end{itemize}
+
+      \item [\htmlref{PSF}{PSF}] \mbox{}
+         \begin{itemize}
+
+            \item Positions can now be read from position list catalogues
+            such as created by CURSOR and LISTMAKE.
+
+            \item All positions and distances, both given by the user and
+            returned by program, now refer to the Current Frame of the NDF.
+            For instance, this means that if the Current Frame of the NDF
+            is a SKY Frame, then:
+
+               \begin{itemize}
+               \item celestial co-ordinates must be provided for the star
+               positions.
+               \item the FWHM will be displayed in arcseconds.
+               \item the radial distance in the plot will be displayed in
+               arcseconds.
+               \item the orientation of the major axis will be given as a
+               position angle (from north through east).
+               \end{itemize}
+
+            Note, it is assumed that the image scale does not vary
+            significantly across the image, so you should be cautious
+            about using PSF with very large images.
+
+            If, instead, the Current Frame of the NDF is the PIXEL Frame,
+            then:
+
+               \begin{itemize}
+               \item pixel co-ordinates must be provided for the star
+               positions.
+               \item the FWHM will be displayed in pixels.
+               \item the plot will be annotated in pixels.
+               \item the orientation of the major axis will be given as the
+               angle from the first (X) axis through the second (Y) axis.
+               \end{itemize}
+
+            \item The appearance of the annotated axes can now be
+            controlled in much greater detail using the new STYLE
+            parameter.
+
+            \item If the display is not cleared (using Parameter CLEAR),
+            then an attempt is made to align the new plot with any
+            existing plot.
+
+            \item The following parameters have been removed
+            (alternatives to using these old parameters are indicated):
+
+               \begin{description}
+
+                  \item[ABSLAB] --- Use the STYLE parameter to specify a
+                  value for the plotting attribute \htmlattref{Label(1)}{Label(axis)}.
+
+                  \item[COSYS] --- Use application WCSFRAME to set the required
+                                  co-ordinate Frame first.
+                  \item[FONT] --- Use the \htmlattref{Font}{Font(element)}~ plotting attributes.
+
+                  \item[MAJTIC] --- Use the \htmlattref{Gap}{Gap(axis)}~ plotting attributes.
+
+                  \item[MINTIC] --- Use the \att{MinTick} plotting attribute.
+
+                  \item[ORDLAB] --- Use \att{Label(2)} plotting attribute.
+
+                  \item[OUTTIC] --- Use \htmlattref{MajTickLen}{MajTickLen}~ and \htmlattref{MinTickLen}{MinTickLen}~ plotting attributes.
+
+                  \item[PLTITL] --- Use the \htmlattref{Title}{plotel:Title}~ plotting attribute.
+
+                  \item[PXSIZE] --- Create the picture first using PICDEF,
+                  the required picture size using the SIZE.
+
+                  \item[PYSIZE] --- See PXSIZE.
+
+                  \item[RADUNITS] --- Use application WCSFRAME to set the required
+                                  co-ordinate Frame first, or set the Unit
+                                  attribute for Axis 1 of the input NDF
+                                  using application \htmlref{WCSATTRIB}{WCSATTRIB}.
+
+                  \item[SCALE] --- Use application WCSFRAME to set the required
+                                  co-ordinate Frame first.  Create a new
+                                  Frame if necessary using application \htmlref{WCSADD}{WCSADD}.
+
+               \end{description}
+
+            \item The following new parameters have been added: AXES,
+            INCAT, MARGIN, MARKER, STYLE, USEAXIS, XLEFT, XRIGHT, YBOT, YTOP.
+
+            \item The following parameters have been modified:
+               \begin{description}
+
+                  \item[OUT] --- The pixel origin is no longer [1,1].
+                  Instead, the pixel bounds are chosen to align the model
+                  PSF with the first fitted star in pixel co-ordinates.
+                  As a consequence, the PSF centre may not be exactly at
+                  the centre of the output image (it will, however, still
+                  be within one pixel of the centre).  A WCS component is
+                  stored in the output NDF holding a copy of the input
+                  WCS component.  An additional Frame with Domain name
+                  OFFSET is added, and is made the current Frame.  This
+                  Frame measures the distance from the PSF centre in the
+                  units in which the FWHM is reported.  These changes
+                  allows the model PSF to be aligned with the input NDF
+                  for comparison purposes, using WCSALIGN, CONTOUR,
+                     \emph{etc}.  Also, the output NDF is now created with
+                  the same type as the input NDF.
+
+               \end{description}
+
+         \end{itemize}
+
+      \item [\htmlref{ROTATE}{ROTATE}] \mbox{}
+         \begin{itemize}
+            \item Modified so that rotation occurs around the origin of
+            pixel co-ordinates.  This means that origin information is not
+            lost.  For instance, if you rotate two aligned images by the
+            same angle, they will still be aligned after the rotation.
+            Negative rotation angles are now accepted.
+         \end{itemize}
+
+      \item [\xref{TURBOCONT}{sun239}{TURBOCONT}] \mbox{}
+         TURBOCONT has been scheduled for withdrawl at the next release of
+         \KAPPA, and a warning message is now displayed every time
+         TURBOCONT is run.  To retain TURBOCONT would require it to be
+         converted to use \PGPLOT\ /AST.  This would slow it down so that it
+         would offer little speed benefit over CONTOUR.  In these days of
+         higher powered workstatations the small difference in speed would
+         not justify having two essentially identical applications.
+
+      \item [\htmlref{VECPLOT}{VECPLOT}] \mbox{}
+         \begin{itemize}
+            \item Axes are now annotated with values in the current co-ordinate
+                  Frame of the supplied NDF.
+            \item Information describing the co-ordinate Frames available
+                  in the supplied NDF is stored with the DATA picture in
+                  the AGI graphics database.
+            \item If the screen is not cleared before plotting a vector
+                  map (\emph{i.e.} if the Parameter CLEAR is set to {\tt FALSE}), then
+                  an attempt will be made to align the new contour map
+                  spatially with any existing DATA picture.  This alignment
+                  occurs by preference in the current co-ordinate Frame
+                  of the supplied vector magnitude NDF, but may occur in
+                  another Frame if the existing DATA picture does not have
+                  suitable WCS information stored with it.
+            \item There is now much greater control over the appearance
+                  of the map.  This is provided through the STYLE and
+                  KEYSTYLE parameters which allow plotting attributes to
+                  be set.
+            \item The position of the key can now be controlled both
+                  vertically and horizontally.
+            \item The following parameters have been removed (alternatives to
+                  using these old parameters are indicated):
+
+               \begin{description}
+                  \item[ABSLAB] --- Use the STYLE parameter to specify a
+                                   value for the plotting attribute \htmlattref{Label(1)}{Label(axis)}.
+                  \item[BORDER] --- Set AXES={\tt TRUE}, and suppress everything
+                                   but the border by setting suitable plotting
+                                   attributes (\emph{e.g.} {\tt MajTickLen=0,
+                                   MinTickLen=0, TextLab=0} \emph{etc.}).
+                  \item[COSYS] --- Use application WCSFRAME to set the required
+                                   co-ordinate Frame first.
+                  \item[FONT] --- Use the \htmlattref{Font}{Font(element)}~ plotting attributes.
+                  \item[MAJTIC] --- Use the \htmlattref{Gap}{Gap(axis)}~ plotting attributes.
+                  \item[MINTIC] --- Use the \att{MinTick} plotting attribute.
+                  \item[ORDLAB] --- Use \att{Label(2)} plotting attribute.
+                  \item[OUTTIC] --- Use \htmlattref{MajTickLen}{MajTickLen}~ and
+                                   \htmlattref{MinTickLen}{MinTickLen}~
+                                   plotting attributes.
+                  \item[PLTITL] --- Use the \htmlattref{Title}{plotel:Title}~ plotting attribute.
+                  \item[PXSIZE] --- Create the picture first using PICDEF,
+                                   specifying the required picture size using
+                                   the new Parameter SIZE.
+                  \item[PYSIZE] --- See PXSIZE.
+                  \item[THICK] --- Use the \htmlattref{Width}{Width(element)}~ plotting attributes.
+                  \item[VECCOL] --- Use the \htmlattref{Colour(vectors)}{Colour(element)}~
+                                   plotting attributes.
+                  \item[VTYPE] --- Use the new Parameter ARROW.
+               \end{description}
+
+            \item The following new parameters have been added: ARROW,
+                  FILL, KEYPOS, KEYSTYLE, MARGIN, STYLE, USEAXIS.
+
+            \item The following parameters have been modified:
+               \begin{description}
+                  \item [AXES] --- Axes are now annotated with the current
+                                  co-ordinate Frame of the NDF.
+                  \item [CLEAR] --- Setting CLEAR={\tt FALSE} cause the new contour map
+                               to be aligned spatially with any existing DATA
+                               picture (if possible).
+                  \item [KEY] --- The appearance of the key can now be controlled
+                              using Parameter KEYSTYLE, and the position of the
+                              key can be controlled using Parameter KEYPOS.
+               \end{description}
+         \end{itemize}
+
+      \item [\htmlref{WCSALIGN}{WCSALIGN}] \mbox{}
+         \begin{itemize}
+            \item Several new interpolation methods have been added, and an
+            improved algorithm is now used which should be more efficient in
+            some cases.
+         \end{itemize}
+
+   \end{description}
+
+\subsubsection{New applications}
 \begin{description}
    \item [\htmlref{CONFIGECHO}{CONFIGECHO}]\mbox{}
       \begin{itemize}
@@ -53487,7 +54094,7 @@ The following applications have been modified:
         to new Frame can now be controlled using a new boolean parameter
         called TRANSFER (previously, set attributes were always transferred). The
         new default is to transfer attributes only if the two Frames have
-        the same class and {\att Domain}.
+        the same class and \att{Domain}.
       \end{itemize}
    \item [\htmlref{WCSREMOVE}{WCSREMOVE}] \mbox{}
       \begin{itemize}
