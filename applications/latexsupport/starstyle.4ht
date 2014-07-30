@@ -162,15 +162,23 @@
    {\egroup\EndP\HCode{</dt><dd\Hnewline >}}
 
 
-%\ConfigureList{description}%
-%   {\EndP\HCode{<dl \a:LRdir class="description">}%
-%      \PushMacro\end:itm
-%\global\let\end:itm=\empty}
-%   {\PopMacro\end:itm \global\let\end:itm \end:itm
-%\EndP\HCode{</dd></dl>}\ShowPar}
-%   {\end:itm \global\def\end:itm{\EndP\Tg</dd>}\HCode{<dt
-%        class="description">}\bgroup \bf}
-%   {\egroup\EndP\HCode{</dt><dd\Hnewline class="description">}}
+
+%\renewenvironment{description}[1][]{\begin{description}}{\end{description}}
+
+\let\description@orig=\description
+\def\description{\@ifnextchar[% ]
+{\description@ht}{\description@orig}}
+\def\description@ht[#1]{\description@orig}
+
+\ConfigureList{description}%
+   {\EndP\HCode{<dl \a:LRdir class="description">}%
+      \PushMacro\end:itm
+\global\let\end:itm=\empty}
+   {\PopMacro\end:itm \global\let\end:itm \end:itm
+\EndP\HCode{</dd></dl>}\ShowPar}
+   {\end:itm \global\def\end:itm{\EndP\Tg</dd>}\HCode{<dt
+        class="description">}\bgroup \bf}
+   {\egroup\EndP\HCode{</dt><dd\Hnewline class="description">}}
 
 
 %\renewenvironment{longtable}[1]{%
