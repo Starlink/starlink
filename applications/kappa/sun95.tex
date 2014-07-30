@@ -1206,15 +1206,15 @@ application.
 For your convenience, here is a summary of how to use parameters.
 If you want more information, go to the appropriate section.
 
-\begin{description}
+\begin{description}[style=nextline]
 
-\item Command-line values \newline
+\item[Command-line values]% \newline
  On the command line you can supply values by keyword or by position.
  See \latexhtml{Section~\ref{se:cmdlindef}}{\htmlref{Specifying Parameter
  Values on Command Lines}{se:cmdlindef}} for more details including abbreviated
  keywords.
 
-\item {\tt ACCEPT, PROMPT, RESET} command-line special keywords \newline
+\item [{\tt ACCEPT, PROMPT, RESET} command-line special keywords] %\newline
  {\tt ACCEPT} accepts all the suggested defaults that would otherwise
  be prompted.  {\tt PROMPT} prompts for all the parameters not given on
  the command line, and {\tt RESET} resets all the suggested defaults to
@@ -1222,7 +1222,7 @@ If you want more information, go to the appropriate section.
  \latexhtml{Section~\ref{se:parspeckey}.}{\htmlref{Special Keywords: ACCEPT,
  PROMPT, RESET}{se:parspeckey}.}
 
-\item {\tt NAME - Prompt string /Suggested default/ $>$} \newline
+\item [{\tt NAME - Prompt string /Suggested default/ $>$} ]%\newline
  This is a schematic of a prompt.  NAME is the parameter's name.
  You normally respond with the value for the parameter, but there are
  special responses available (see below).
@@ -1239,22 +1239,22 @@ differences, they are noted.
 
 \begin{description}
 
-\item {\tt 5409.12} \newline
+\item[{\tt 5409.12}]% \newline
  This is a scalar.  Numerical values can be integer, real, or double precision.
 
-\item {\tt 12,34,56,78} \newline
+\item[{\tt 12,34,56,78}]% \newline
  This is a vector.  They must be enclosed in {\tt [~]} if the array
  is supplied on the command line, or for character arrays.
 
-\item {\tt [[11,21,31],[12,22,32]]} \newline
+\item [{\tt [[11,21,31],[12,22,32]]}]% \newline
  This is a 3$\times$2 array.  Arrays of dimension $>$ 2 should
  appear in nested brackets.  See
  \latexhtml{Section~\ref{se:pararrays}}{\htmlref{Arrays}{se:pararrays}}
  for more about array values.
 
-\item {\tt T} \newline
-\vspace{-5ex}
-\item {\tt no} \newline
+\item [{\tt T}]% \newline
+%\vspace{-5ex}
+\item [{\tt no}]% \newline
  This is a {\tt TRUE} value followed by a {\tt FALSE} values for
  logical parameters.  Acceptable values are {\tt TRUE}, {\tt FALSE},
  {\tt YES}, {\tt NO}, {\tt T}, {\tt F},  {\tt Y}, {\tt N} and their
@@ -1262,9 +1262,9 @@ differences, they are noted.
  the parameter name as a keyword means {\tt TRUE}.  If the name is
  prefixed with {\tt NO}, the value is set to {\tt FALSE}.
 
-\item {\tt a string} \newline
-\vspace{-5ex}
-\item {\tt "a string"} \newline
+\item [{\tt a string}]% \newline
+%\vspace{-5ex}
+\item [{\tt "a string"}]% \newline
  This is a string.  Strings need not be quoted at prompts.  Quotes are
  required on the command line if the string includes spaces or
  wildcards, or is a comma-separated array of strings.  There is more in
@@ -1275,9 +1275,9 @@ differences, they are noted.
  \latexhtml{Section~\ref{se:parmenu}}{\htmlref{Menus}{se:parmenu}}
  for more information.)
 
-\item {\tt filename} \newline
-\vspace{-5ex}
-\item {\tt @123} \newline
+\item [{\tt filename}]% \newline
+%\vspace{-5ex}
+\item [{\tt @123}]% \newline
  This enters a filename (or tape drive).  You give a text filename
  verbatim, and \xref{NDFs}{sun33}{overview_of_an_ndf} without the file
  extension.  Foreign formats will
@@ -1285,15 +1285,15 @@ differences, they are noted.
  value, it must be preceded by an {\tt @}.  There is more in
  \latexhtml{Section~\ref{se:parstrings}.}{\htmlref{Strings}{se:parstrings}.}
 
-\item {\tt min} \newline
-\vspace{-5ex}
-\item {\tt max} \newline
+\item [{\tt min}]% \newline
+%\vspace{-5ex}
+\item [{\tt max}]% \newline
  This selects the minimum- or maximum-allowed value, but not all
  parameters have a defined range of permitted values.  See
  \latexhtml{Section~\ref{se:parminmax}.}{\htmlref{MIN and MAX
  parameter values}{se:parminmax}.}
 
-\item {\tt{!}} \newline
+\item [{\tt{!}}]% \newline
  Enters the null value.  This has a variety of special meanings; which
  one will depend on the particular parameter.  For example, null might
  indicate that an output file is not to be created, or a loop is to be
@@ -1301,12 +1301,12 @@ differences, they are noted.
  \latexhtml{Section~\ref{se:abortnull}.}{\htmlref{Abort and
  Null}{se:abortnull}.}
 
-\item {\tt !!} \newline
+\item [{\tt !!}]% \newline
  This aborts the application cleanly.
 
-\item {\tt ?} \newline
-\vspace{-5ex}
-\item {\tt ??} \newline
+\item [{\tt ?}]% \newline
+%\vspace{-5ex}
+\item [{\tt ??}]% \newline
  A single question mark presents the online help for the parameter,
  and then reprompts.  A double question mark leaves you in the help
  system to explore other help information.  See
@@ -1314,7 +1314,7 @@ differences, they are noted.
  for examples.  These special values are not supported from the
  command line.
 
-\item \verb+\+ \newline
+\item [\texttt{\textbackslash} ]%\newline
  This accepts the suggested default for the prompted parameter and the
  respective suggested defaults for all subsequent parameters for which
  prompting would otherwise occur.  On the command line \verb+\+
@@ -45060,19 +45060,19 @@ KAPPA: \htmlref{NDFCOPY}{NDFCOPY},
       }{
          The operation to perform on the extension or a component
          therein.  The recognised options are listed below.
-         \begin{description}
-         \item {\tt "Delete"} --- Delete an existing NDF extension.
-         \item {\tt "Erase"}  --- Erase a component within an NDF extension
-         \item {\tt "Exit"}   --- Exit from the task (when LOOP={\tt TRUE})
-         \item {\tt "Get"}    --- Display the value of a component within an NDF
+         \begin{sldes2}
+         \item [{\tt "Delete"}] --- Delete an existing NDF extension.
+         \item [{\tt "Erase"}]  --- Erase a component within an NDF extension
+         \item [{\tt "Exit"}]   --- Exit from the task (when LOOP={\tt TRUE})
+         \item [{\tt "Get"}]    --- Display the value of a component within an NDF
                                   extension.  The component must exist.
-         \item {\tt "Put"}    --- Change the value of a component within an NDF
+         \item [{\tt "Put"}]    --- Change the value of a component within an NDF
                          extension or create a new component.
-         \item {\tt "Rename"} --- Renames a component.  The component must exist.
-         \item {\tt "Select"} --- Selects another extension.  If the extension
+         \item [{\tt "Rename"}] --- Renames a component.  The component must exist.
+         \item {\tt "Select"}] --- Selects another extension.  If the extension
                          does not exist a new one is created.  This
                          option is not allowed when LOOP={\tt FALSE}.
-         \end{description}
+         \end{sldes2}
 
          The suggested default is the current value, except for the
          first option where there is no default.
@@ -53260,6 +53260,7 @@ and HDS data types is as follows:
 
 \subsection{Modified Commands}
 The following applications have been modified:
+   \begin{description}[style=nextline]
 
       \item [\htmlref{CENTROID}{CENTROID}] \mbox{}
          \begin{itemize}
