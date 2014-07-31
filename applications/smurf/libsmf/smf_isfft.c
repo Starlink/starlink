@@ -60,6 +60,7 @@
 
 *  Authors:
 *     Ed Chapin (UBC)
+*     AGM: Gaelen Marsden (UBC)
 *     {enter_new_authors_here}
 
 *  Notes:
@@ -76,10 +77,14 @@
 *        support FFTs of 2D maps, and return real and fourier-space dimensions
 *     2011-10-03 (EC):
 *        Add df.
+*     2014-07-31 (AGM):
+*        more reliable test for real-space map or time-stream (old one failed
+*           for ntslice*ndet*1 time-stream data sets)
+*     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
-*     Copyright (C) 2008,2010-2011 University of British Columbia.
+*     Copyright (C) 2008,2010-2011,2014 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -223,8 +228,7 @@ int smf_isfft( const smfData *indata, dim_t rdims[2], dim_t *nbolo,
       return retval;
     }
 
-    if( (indata->ndims == 2) ||
-        ((indata->ndims == 3) && (indata->dims[2] == 1) && (indata->dims[1] > 1)) ) {
+    if( !indata->hdr || !indata->hdr->nframes || indata->hdr->nframes <= 1 ) {
       /* A 2D map. Note that maps produced by SMURF have a 3rd
        frequency axis of length 1 */
       ndims0 = 2;
