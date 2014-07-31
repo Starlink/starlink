@@ -82,22 +82,22 @@ and alphabetical summaries.}
 
 
 % hours symbol
-\providecommand{\hr}{\hbox{$^{\rm h}$}}
+\providecommand{\hr}{\hbox{$^{\textrm{h}}$}}
 %
 
 
 % minutes symbol
-\providecommand{\mn}{\hbox{$^{\rm m}$}}
+\providecommand{\mn}{\hbox{$^{\textrm{m}}$}}
 %
 
 
 % seconds symbol
-\providecommand{\scn}{\hbox{$^{\rm s}$}}
+\providecommand{\scn}{\hbox{$^{\textrm{s}}$}}
 %
 
 
 % decimal-minutes symbol
-\providecommand{\um}{\hskip-0.3em\hbox{$^{\rm m}$}\hskip-0.08em}
+\providecommand{\um}{\hskip-0.3em\hbox{$^{\textrm{m}}$}\hskip-0.08em}
 
 
 
@@ -107,7 +107,7 @@ and alphabetical summaries.}
 
 
 % decimal-second symbol
-\providecommand{\us}{\hskip-0.27em\hbox{$^{\rm s}$}\hskip-0.06em}
+\providecommand{\us}{\hskip-0.27em\hbox{$^{\text{s}}$}\hskip-0.06em}
 %
 
 
@@ -122,7 +122,7 @@ and alphabetical summaries.}
 
 
 % centre an asterisk
-\providecommand{\lsk}{\raisebox{-0.4ex}{\rm *}}
+\providecommand{\lsk}{\raisebox{-0.4ex}{\textrm{*}}}
 
 \hyphenation{which-ever}
 
@@ -140,14 +140,9 @@ and alphabetical summaries.}
 % Lines for breaking up Appendices A and B.
 \providecommand{\jrule}{\noindent\rule{\textwidth}{0.45mm}}
 \providecommand{\krule}{\vspace*{-1.5ex}
-                    \item [\rm \rule{\textwidth}{0.15mm}]}
+                    \item [\textrm{ \rule{\textwidth}{0.15mm}}]}
 
-% Frame attributes fount.  Need to find a way for these to stand out.
-% San serif doesn't work by default.  Also without the \rm the
-% san serif continues after \att hyperlinks.  Not sure why.  Why
-% this was fixed by say having extra braces, the \sstattribute
-% then used roman fount for its headings.  The current lash up
-% appears to work, but needs further investigation or a TeX wizard.
+% Frame attributes fount.
 \providecommand{\att}[1]{\textsf{#1}}
 
 
@@ -3110,7 +3105,7 @@ the characters forming an escape sequence are stripped out of the string
 before the string is displayed.} Escape sequences are introduced using a
 percent character.  For instance, if the string \verb="10%^50+%^s50+Z"=
 was used as an axis label in a plot, it would produce a string similar to
-{\tt "$10^{\rm Z}$"}---that is, the character {\tt "Z"} would be displayed as a small
+{\tt "$10^{\textrm{Z}}$"}---that is, the character {\tt "Z"} would be displayed as a small
 superscript character.  Any unrecognised, illegal or incomplete escape
 sequences are printed literally.  The following escape sequences are
 currently recognised ({\tt "..."} represents a string of one or more decimal
@@ -5204,7 +5199,7 @@ first one (SHOWPIXEL) causes the pixel co-ordinates at each selected
 position to be displayed, in addition to the co-ordinates selected using
 Parameter FRAME (which defaults in this case to RA/DEC since FRAME was
 not specified).  For instance, the first position is at a right
-ascension of $0^{\rm h} 41^{\rm m} 33.5^{\rm s}$ and a declination of
+ascension of $0^{\textrm{h}} 41^{\textrm{m}} 33.5^{\textrm{s}}$ and a declination of
 $40$\dgs $33$\arcm $01$\arcsec, and has pixel
 co-ordinates $(172.4,78.2)$.\footnote{Pixel \emph{co-ordinates} are
 fractional, where-as pixel \emph{indices} are integer.  The pixel with
@@ -12527,7 +12522,7 @@ by the application, and may depend on the values of other parameters.
 Therefore, the default cannot be given explicitly.
 \item[{\tt [,]}]
 As above, but there are two default values that are created dynamically.
-\item[{\tt [}{\rm default}{\tt{]}}]
+\item[{\tt [}{\textrm{default}}{\tt{]}}]
 Occasionally, a description of the default is given in normal type,
 {\it{e.g.}}\ the size of the plotting region in a graphics application,
 where the exact default values depend on the device chosen.
@@ -14614,7 +14609,7 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
       \sstexamplesubsection{
          block ccdin(123,) ccdcol [1,9]
       }{
-         Smooths the 123$^{\rm rd}$ column in the two-dimensional NDF called ccdin
+         Smooths the 123$^{\textrm{rd}}$ column in the two-dimensional NDF called ccdin
          using a box size of 9 pixels, and stores the result in the NDF
          structure ccdcol.  The first value of the smoothing box is
          ignored as the first dimension has only one element.  Each
@@ -14880,7 +14875,7 @@ KAPPA: \htmlref{ADD}{ADD},
    }
    \sstexamples{
       \sstexamplesubsection{
-      {\rm Shell usage:}
+      {\textrm{Shell usage:}}
       }{
       The syntax in the following examples apply to the shell.
       }
@@ -14916,7 +14911,7 @@ KAPPA: \htmlref{ADD}{ADD},
          {\tt \$x} is the value of the shell variable x.
       }
       \sstexamplesubsection{
-      {\rm \ICL\ usage:}
+      {\textrm{\ICL\ usage:}}
       }{
       For \ICL\ usage only those expressions containing
       parentheses need to be in quotes, though \ICL
@@ -23988,14 +23983,14 @@ KAPPA: \htmlref{FITSHEAD}{FITSHEAD},
          For simple or group format FITS objects in automatic mode the
          application generates a filename beginning with a defined
          prefix followed by the number of the file on tape.  For
-         example, if the prefix was {\tt "XRAY"} and the 25$^{\rm th}$ file of the
+         example, if the prefix was {\tt "XRAY"} and the 25$^{\textrm{th}}$ file of the
          tape was being processed, the filename of the NDF would be
          XRAY25.
 
          For table-format FITS objects in the automatic mode the
          application generates a filename beginning with a defined
          prefix followed by the number of the file on tape.  For
-         example, if the prefix was {\tt "cat"} and the 9$^{\rm th}$ file of the tape
+         example, if the prefix was {\tt "cat"} and the 9$^{\textrm{th}}$ file of the tape
          was being processed, the filename of the table and its
          associated FACTS description file would be {\tt cat9.dat} and
          {\tt dscfcat9.dat} respectively.
@@ -40405,35 +40400,35 @@ KAPPA: \htmlref{COMPADD}{COMPADD},
             nearest-neighbour scheme, but is marginally slower.
 
             \sstitem
-            {\tt "Sinc"} --- Uses the ${\rm sinc}({\pi}x)$ kernel, where
+            {\tt "Sinc"} --- Uses the ${\textrm{sinc}}({\pi}x)$ kernel, where
             $x$ is the pixel offset from the interpolation point and
-            ${\rm sinc}(z)=\sin(z)/z$.  Use of this scheme is not recommended.
+            ${\textrm{sinc}}(z)=\sin(z)/z$.  Use of this scheme is not recommended.
 
             \sstitem
-            {\tt "SincSinc"} --- Uses the ${\rm sinc}({\pi}x){\rm sinc}(k{\pi}x)$
+            {\tt "SincSinc"} --- Uses the ${\textrm{sinc}}({\pi}x){\textrm{sinc}}(k{\pi}x)$
             kernel.  A valuable general-purpose scheme, intermediate in its visual
             effect on NDFs between the linear option and using the
             nearest neighbour.
 
             \sstitem
-            {\tt "SincCos"} --- Uses the  ${\rm sinc}({\pi}x)\cos(k{\pi}x)$
+            {\tt "SincCos"} --- Uses the  ${\textrm{sinc}}({\pi}x)\cos(k{\pi}x)$
             kernel.  Gives similar results to the {\tt "SincSinc"} scheme.
 
             \sstitem
-            {\tt "SincGauss"} --- Uses the ${\rm sinc}({\pi}x)e^{-kx^2}$
+            {\tt "SincGauss"} --- Uses the ${\textrm{sinc}}({\pi}x)e^{-kx^2}$
             kernel.  Good results can be obtained by matching the FWHM of the
             envelope function to the point-spread function of the
             input data (see Parameter PARAMS).
 
             \sstitem
-            {\tt "Somb"} --- Uses the  ${\rm somb}({\pi}x)$ kernel, where
+            {\tt "Somb"} --- Uses the  ${\textrm{somb}}({\pi}x)$ kernel, where
             $x$ is the pixel offset from the interpolation point, and
-            ${\rm somb}(z)=2*J_{1}(z)/z$ ($J_1$ is the first-order Bessel
+            ${\textrm{somb}}(z)=2*J_{1}(z)/z$ ($J_1$ is the first-order Bessel
             function of the first kind.  This scheme is similar to the
             {\tt "Sinc"} scheme.
 
             \sstitem
-            {\tt "SombCos"} --- Uses the ${\rm somb}({\pi}x)\cos(k{\pi}x)$
+            {\tt "SombCos"} --- Uses the ${\textrm{somb}}({\pi}x)\cos(k{\pi}x)$
             kernel.  This scheme is similar to the {\tt "SincCos"} scheme.
 
             \sstitem
@@ -42659,36 +42654,36 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
             nearest output pixel.
 
             \sstitem
-            {\tt "Sinc"} --- Uses the ${\rm sinc}({\pi}x)$ kernel, where $x$ is the pixel
+            {\tt "Sinc"} --- Uses the ${\textrm{sinc}}({\pi}x)$ kernel, where $x$ is the pixel
             offset from the interpolation point (resampling) or transformed
-            input pixel centre (rebinning), and ${\rm sinc}(z)=\sin(z)/z$.  Use of this
+            input pixel centre (rebinning), and ${\textrm{sinc}}(z)=\sin(z)/z$.  Use of this
             scheme is not recommended.
 
             \sstitem
-            {\tt "SincSinc"} --- Uses the ${\rm sinc}({\pi}x){\rm sinc}(k{\pi}x)$ kernel.  A
+            {\tt "SincSinc"} --- Uses the ${\textrm{sinc}}({\pi}x){\textrm{sinc}}(k{\pi}x)$ kernel.  A
             valuable general-purpose scheme, intermediate in its visual effect
             on NDFs between the bi-linear and nearest-neighbour schemes.
 
             \sstitem
-            {\tt "SincCos"} --- Uses the ${\rm sinc}({\pi}x)\cos(k{\pi}x)$ kernel.  Gives
+            {\tt "SincCos"} --- Uses the ${\textrm{sinc}}({\pi}x)\cos(k{\pi}x)$ kernel.  Gives
             similar results to the {\tt "Sincsinc"} scheme.
 
             \sstitem
-            {\tt "SincGauss"} --- Uses the ${\rm sinc}({\pi}x)e^{-kx^2}$ kernel.  Good
+            {\tt "SincGauss"} --- Uses the ${\textrm{sinc}}({\pi}x)e^{-kx^2}$ kernel.  Good
             results can be obtained by matching the FWHM of the
             envelope function to the point-spread function of the
             input data (see Parameter PARAMS).
 
             \sstitem
-            {\tt "Somb"} --- Uses the ${\rm somb}({\pi}x)$ kernel, where $x$ is the pixel
+            {\tt "Somb"} --- Uses the ${\textrm{somb}}({\pi}x)$ kernel, where $x$ is the pixel
             offset from the interpolation point (resampling) or transformed
             input pixel centre (rebinning), and
-            ${\rm somb}(z)=2*J_{1}(z)/z$ ($J_1$ is the
+            ${\textrm{somb}}(z)=2*J_{1}(z)/z$ ($J_1$ is the
             first-order Bessel function of the first kind.  This scheme is
             similar to the {\tt "Sinc"} scheme.
 
             \sstitem
-            {\tt "SombCos"} --- Uses the ${\rm somb}({\pi}x)\cos(k{\pi}x)$ kernel.  This
+            {\tt "SombCos"} --- Uses the ${\textrm{somb}}({\pi}x)\cos(k{\pi}x)$ kernel.  This
             scheme is similar to the {\tt "SincCos"} scheme.
 
             \sstitem
@@ -46658,29 +46653,29 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
 
             \sstitem
             {\tt "Sinc"}      --- Sum of surrounding pixels weighted using
-                              a one-dimensional ${\rm sinc}({\pi}x)$ kernel.
+                              a one-dimensional ${\textrm{sinc}}({\pi}x)$ kernel.
 
             \sstitem
             {\tt "SincSinc"}  --- Sum of surrounding pixels weighted using
                               a one-dimensional
-                              ${\rm sinc}({\pi}x){\rm sinc}(k{\pi}x)$ kernel.
+                              ${\textrm{sinc}}({\pi}x){\textrm{sinc}}(k{\pi}x)$ kernel.
 
             \sstitem
             {\tt "SincCos"}   --- Sum of surrounding pixels weighted using
                               a one-dimensional \linebreak
-                              ${\rm sinc}({\pi}x)\cos(k{\pi}x)$ kernel.
+                              ${\textrm{sinc}}({\pi}x)\cos(k{\pi}x)$ kernel.
 
             \sstitem
             {\tt "SincGauss"} --- Sum of surrounding pixels weighted using
                               a one-dimensional
-                              ${\rm sinc}({\pi}x)e^{-kx^2}$ kernel.
+                              ${\textrm{sinc}}({\pi}x)e^{-kx^2}$ kernel.
 
             \sstitem
             {\tt "BlockAve"}  --- Block averaging over all pixels in the
                               surrounding \textit{n}-dimensional cube.
 
          }
-         In the above, ${\rm sinc}(z)=\sin(z)/z$.  Some of these schemes will
+         In the above, ${\textrm{sinc}}(z)=\sin(z)/z$.  Some of these schemes will
          require additional parameters to be supplied via the PARAMS
          parameter.  A more-detailed discussion of these schemes is
          given in the \htmlref{``Sub-pixel Interpolation Schemes''}{subpixel:sqorst}
@@ -46912,28 +46907,28 @@ KAPPA: \htmlref{REGRID}{REGRID},
 
             \sstitem
             {\tt "Sinc"}      --- Sum of surrounding pixels weighted using
-                              a one-dimensional ${\rm sinc}({\pi}x)$ kernel.
+                              a one-dimensional ${\textrm{sinc}}({\pi}x)$ kernel.
 
             \sstitem
             {\tt "SincSinc"}  --- Sum of surrounding pixels weighted using
                               a one-dimensional
-                              ${\rm sinc}({\pi}x){\rm sinc}(k{\pi}x)$ kernel.
+                              ${\textrm{sinc}}({\pi}x){\textrm{sinc}}(k{\pi}x)$ kernel.
 
             \sstitem
             {\tt "SincCos"}   --- Sum of surrounding pixels weighted using
                               a one-dimensional \linebreak
-                              ${\rm sinc}({\pi}x)\cos(k{\pi}x)$ kernel.
+                              ${\textrm{sinc}}({\pi}x)\cos(k{\pi}x)$ kernel.
 
             \sstitem
             {\tt "SincGauss"} --- Sum of surrounding pixels weighted using
                               a one-dimensional
-                              ${\rm sinc}({\pi}x)e^{-kx^2}$ kernel.
+                              ${\textrm{sinc}}({\pi}x)e^{-kx^2}$ kernel.
 
             \sstitem
             {\tt "BlockAve"}  --- Block averaging over surrounding pixels.
 
          }
-         In the above, ${\rm sinc}(z)=\sin(z)/z$.  Some of these schemes will
+         In the above, ${\textrm{sinc}}(z)=\sin(z)/z$.  Some of these schemes will
          require additional parameters to be supplied via the PARAMS
          parameter.  A more-detailed discussion of these schemes is
          given in the {\tt "Sub-Pixel Interpolation Schemes"} section below.
@@ -48144,7 +48139,7 @@ KAPPA: \htmlref{HISTEQ}{HISTEQ},
       co-ordinates.  The pixel index of a data value is calculated
       using the expression
 
-      \[   {\rm index} = {\rm FLOOR}( ( x - xoff ) / {\rm scale} ) + 1 \]
+      \[   {\textrm{index}} = {\textrm{FLOOR}}( ( x - xoff ) / {\textrm{scale}} ) + 1 \]
 
       where \textit{x} is the supplied co-ordinate and $xoff$ is the value
       of the POFFSET parameter (which defaults to the minimum supplied
@@ -49555,36 +49550,36 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
             nearest output pixel.
 
             \sstitem
-            {\tt "Sinc"} --- Uses the ${\rm sinc}({\pi}x)$ kernel, where $x$ is the pixel
+            {\tt "Sinc"} --- Uses the ${\textrm{sinc}}({\pi}x)$ kernel, where $x$ is the pixel
             offset from the interpolation point (resampling) or transformed
-            input pixel centre (rebinning), and ${\rm sinc}(z)=\sin(z)/z$.  Use of this
+            input pixel centre (rebinning), and ${\textrm{sinc}}(z)=\sin(z)/z$.  Use of this
             scheme is not recommended.
 
             \sstitem
-            {\tt "SincSinc"} --- Uses the ${\rm sinc}({\pi}x){\rm sinc}(k{\pi}x)$ kernel.  A
+            {\tt "SincSinc"} --- Uses the ${\textrm{sinc}}({\pi}x){\textrm{sinc}}(k{\pi}x)$ kernel.  A
             valuable general-purpose scheme, intermediate in its visual effect
             on NDFs between the bi-linear and nearest-neighbour schemes.
 
             \sstitem
-            {\tt "SincCos"} --- Uses the ${\rm sinc}({\pi}x)\cos(k{\pi}x)$ kernel.  Gives
+            {\tt "SincCos"} --- Uses the ${\textrm{sinc}}({\pi}x)\cos(k{\pi}x)$ kernel.  Gives
             similar results to the {\tt "Sincsinc"} scheme.
 
             \sstitem
-            {\tt "SincGauss"} --- Uses the ${\rm sinc}({\pi}x)e^{-kx^2}$ kernel.  Good
+            {\tt "SincGauss"} --- Uses the ${\textrm{sinc}}({\pi}x)e^{-kx^2}$ kernel.  Good
             results can be obtained by matching the FWHM of the
             envelope function to the point-spread function of the
             input data (see Parameter PARAMS).
 
             \sstitem
-            {\tt "Somb"} --- Uses the ${\rm somb}({\pi}x)$ kernel, where $x$ is the pixel
+            {\tt "Somb"} --- Uses the ${\textrm{somb}}({\pi}x)$ kernel, where $x$ is the pixel
             offset from the interpolation point (resampling) or transformed
             input pixel centre (rebinning), and
-            ${\rm somb}(z)=2*J_{1}(z)/z$ ($J_1$ is the
+            ${\textrm{somb}}(z)=2*J_{1}(z)/z$ ($J_1$ is the
             first-order Bessel function of the first kind.  This scheme is
             similar to the {\tt "Sinc"} scheme.
 
             \sstitem
-            {\tt "SombCos"} --- Uses the ${\rm somb}({\pi}x)\cos(k{\pi}x)$ kernel.  This
+            {\tt "SombCos"} --- Uses the ${\textrm{somb}}({\pi}x)\cos(k{\pi}x)$ kernel.  This
             scheme is similar to the {\tt "SincCos"} scheme.
 
             \sstitem
@@ -50618,33 +50613,33 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
             the single nearest output pixel.
 
             \sstitem
-            {\tt "Sinc"} --- Uses the ${\rm sinc}({\pi}x)$ kernel, where $x$ is
+            {\tt "Sinc"} --- Uses the ${\textrm{sinc}}({\pi}x)$ kernel, where $x$ is
             the pixel offset from the transformed input pixel centre, and
-            ${\rm sinc}(z)=\sin(z)/z$.  Use of this scheme is not recommended.
+            ${\textrm{sinc}}(z)=\sin(z)/z$.  Use of this scheme is not recommended.
 
             \sstitem
-            {\tt "SincSinc"} --- Uses the ${\rm sinc}({\pi}x){\rm sinc}(k{\pi}x)$
+            {\tt "SincSinc"} --- Uses the ${\textrm{sinc}}({\pi}x){\textrm{sinc}}(k{\pi}x)$
             kernel.  This is a valuable general-purpose scheme, intermediate in
             its visual effect on NDFs between the bilinear and nearest-neighbour
             schemes.
 
             \sstitem
-            {\tt "SincCos"} --- Uses the ${\rm sinc}({\pi}x)\cos(k{\pi}x)$ kernel.
+            {\tt "SincCos"} --- Uses the ${\textrm{sinc}}({\pi}x)\cos(k{\pi}x)$ kernel.
             It gives similar results to the {\tt "Sincsinc"} scheme.
 
             \sstitem
-            {\tt "SincGauss"} --- Uses the ${\rm sinc}({\pi}x)e^{-kx^2}$ kernel.
+            {\tt "SincGauss"} --- Uses the ${\textrm{sinc}}({\pi}x)e^{-kx^2}$ kernel.
             Good results can be obtained by matching the FWHM of the
             envelope function to the point-spread function of the
             input data (see Parameter PARAMS).
 
             \sstitem
-            {\tt "Somb"} --- Uses the  ${\rm somb}({\pi}x)$ kernel, where
-            ${\rm somb}(z)=2*J_{1}(z)/z$ ($J_1$ is the first-order Bessel function
+            {\tt "Somb"} --- Uses the  ${\textrm{somb}}({\pi}x)$ kernel, where
+            ${\textrm{somb}}(z)=2*J_{1}(z)/z$ ($J_1$ is the first-order Bessel function
             of the first kind).  This scheme is similar to the {\tt "Sinc"} scheme.
 
             \sstitem
-            {\tt "SombCos"} --- Uses the ${\rm somb}({\pi}x)\cos(k{\pi}x)$ kernel.
+            {\tt "SombCos"} --- Uses the ${\textrm{somb}}({\pi}x)\cos(k{\pi}x)$ kernel.
             This scheme is similar to the {\tt "SincCos"} scheme.
 
             \sstitem
