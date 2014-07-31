@@ -11,30 +11,25 @@
  class="sstsectitle">}}{\HCode{</h3>}}
 
 \ConfigureToc{sstrefsection}{}{}{}{}
-%\renewcommand{\sstrefsection}[1]{\subsection*{#1}}
 
-%%% sstsectitle[2]: Formatting of the title: Name of command and short
-%%% description.
+%% sst attribute sections
+\newcounter{attributesec}
+\NewSection\attributesec{\theattributesec}
+ \Configure{attributesec}
+    {\HCode{<div class="attributesec">}}
+    {\HCode{</div>}}
+    {\HCode{<h4 class="sstattributeHead">}}
+    {\HCode{</h4>}}
 
-%\NewConfigure{sstsectitle}{4}
-%\renewcommand{\sstsectitle}[2]{\a:sstsectitle #1 \b:sstsectitle \c:sstsectitle #2 \d:sstsectitle}
-%\Configure{sstsectitle}{\ifvmode \ShowPar\fi \HCode{<h3
-%class="sstsectitle">}}{\Tg</h3>}{\Tg<p class="subtitle">}{\Tg</p>}
+\ConfigureToc{attributesec}{}{}{}{}
 
-
-%% sstattribute[3]
-\renewcommand{\sstattribute}[3]{%
-\HCode{<div class="sstattribute">}
-\HCode{<h4 class="sstattributehead">}
-#1---#2
-\HCode{</h4>}
-%\subsubsection*{#1---#2}
-\addcontentsline{toc}{subsubsection}{\protect\numberline{}#1---#2}
-\label{\RemoveSpaces{#1}}
-#3
-\HCode{</div>}
+\renewcommand{\sstattribute}[3]{
+    \attributesec{#1 --- #2}%
+    \addcontentsline{toc}{subsubsection}{\protect\numberline{}#1---#2}
+    \label{\RemoveSpaces{#1}}
+    #3
 }
-\Css{div.sstattribute:before{content:"";display:block;border-bottom:solid 1px grey;padding-top:1em}}
+\Css{div.attributesec:before{content:"";display:block;border-bottom:solid 1px grey;padding-top:1em}}
 %%% sstroutine[3]
 
 \renewcommand{\sstroutine}[3]{%
