@@ -173,7 +173,7 @@
   </xs:complexType>
   
 <!-- INFO is defined in Version 1.2 as a PARAM of String type 
-<xs:complexType name="Info">
+<xs:complexType name="INFO">
   <xs:complexContent>
     <xs:restriction base="Param">
       <xs:attribute name="unit" fixed=""/>
@@ -183,7 +183,7 @@
   </xs:complexContent>
 </xs:complexType>
  -or- as a full definition:
-<xs:complexType name="Info">
+<xs:complexType name="INFO">
   <xs:sequence> 
   <xs:element name="DESCRIPTION" type="anyTEXT" minOccurs="0"/>
     <xs:element name="VALUES" type="VALUES" minOccurs="0"/>
@@ -200,7 +200,7 @@
 </xs:complexType>
 -->
 <!-- No sub-element is accepted in INFO for backward compatibility -->
-<xs:complexType name="iNFO">
+<xs:complexType name="INFO">
   <xs:simpleContent>
     <xs:extension base="xs:string">
       <xs:attribute name="ID" type="xs:ID"/>
@@ -462,9 +462,9 @@
     <xs:element name="DESCRIPTION" type="anyTEXT" minOccurs="0"/>
 <!-- GL: why a choice iso for example -->
 <!-- 
-      <xs:element name="PARAM" type="Param" minOccurs="0" maxOccurs="unbounded"/>
-      <xs:element name="FIELD" type="Field" minOccurs="0" maxOccurs="unbounded"/>
-      <xs:element name="GROUP" type="Group" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="PARAM" type="pARAM" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="FIELD" type="fIELD" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="GROUP" type="gROUP" minOccurs="0" maxOccurs="unbounded"/>
 -->
 <!-- 
   This could also enforce groups to be defined after the fields and params 
@@ -474,9 +474,9 @@
     <xs:element name="INFO" type="INFO" minOccurs="0" maxOccurs="unbounded"/> 
     <!-- An empty table without any FIELD/PARAM should not be acceptable -->
     <xs:choice minOccurs="1" maxOccurs="unbounded"> 
-      <xs:element name="FIELD" type="Field"/>
-      <xs:element name="PARAM" type="Param"/>
-      <xs:element name="GROUP" type="Group"/>
+      <xs:element name="FIELD" type="FIELD"/>
+      <xs:element name="PARAM" type="PARAM"/>
+      <xs:element name="GROUP" type="GROUP"/>
     </xs:choice>
     <xs:element name="LINK" type="LINK" minOccurs="0" maxOccurs="unbounded"/>
     <!-- This would allow several DATA parts in a table (future extension?)
@@ -486,7 +486,7 @@
     </xs:sequence>
     -->
     <xs:element name="DATA" type="DATA" minOccurs="0"/>
-    <xs:element name="INFO" type="Info" minOccurs="0" maxOccurs="unbounded"/>
+    <xs:element name="INFO" type="INFO" minOccurs="0" maxOccurs="unbounded"/>
   </xs:sequence>
   <xs:attribute name="ID"   type="xs:ID"/>
   <xs:attribute name="name" type="xs:token"/>
