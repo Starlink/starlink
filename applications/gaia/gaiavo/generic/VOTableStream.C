@@ -49,6 +49,7 @@
 #include <bitset>
 #include <cmath>
 #include <cstdio>
+#include <cstdlib>
 
 /*  Local includes. */
 #include "VOTableStream.h"
@@ -183,7 +184,17 @@ namespace gaia {
 
         //  If runlength encoded, first four bytes are the quantity.
         if ( quantity == 0 ) {
-            readValue( quantity );
+            if ( readValue( quantity ) ) {
+                if ( quantity == 0 ) {
+                    //  No value.
+                    *out << " ";
+                }
+            }
+            else {
+                /*  End of stream. */
+                result = false;
+                quantity = 0;
+            }
         }
 
         for ( int i = 0; i < quantity; i++ ) {
@@ -237,7 +248,17 @@ namespace gaia {
 
         //  If runlength encoded, first four bytes are the quantity.
         if ( quantity == 0 ) {
-            readValue( quantity );
+            if ( readValue( quantity ) ) {
+                if ( quantity == 0 ) {
+                    //  No value.
+                    *out << " ";
+                }
+            }
+            else {
+                /*  End of stream. */
+                result = false;
+                quantity = 0;
+            }
         }
 
         for ( int i = 0; i < quantity; i++ ) {
@@ -284,7 +305,17 @@ namespace gaia {
 
         //  If runlength encoded, first four bytes are the quantity.
         if ( quantity == 0 ) {
-            readValue( quantity );
+            if ( readValue( quantity ) ) {
+                if ( quantity == 0 ) {
+                    //  No value.
+                    *out << " ";
+                }
+            }
+            else {
+                /*  End of stream. */
+                result = false;
+                quantity = 0;
+            }
         }
 
         //  Extract the null value.
@@ -347,7 +378,17 @@ namespace gaia {
 
         //  If runlength encoded, first four bytes are the quantity.
         if ( quantity == 0 ) {
-            readValue( quantity );
+            if ( readValue( quantity ) ) {
+                if ( quantity == 0 ) {
+                    //  No value.
+                    *out << " ";
+                }
+            }
+            else {
+                /*  End of stream. */
+                result = false;
+                quantity = 0;
+            }
         }
 
         for ( int i = 0; i < quantity; i++ ) {
@@ -385,17 +426,28 @@ namespace gaia {
     /**
      *  Read a VOTable unicode string from the stream and write the decoded
      *  value to the output stream. Usually a string, which can be terminated
-     *  by a '\0'. If this is required then the quantity may be specified as
-     *  0. Returns false if the read fails.
+     *  by a ='\0'. If this is required then the quantity may be specified as
+     *  0. Returns false if the read fails. Note the output stream does not
+     *  support unicode, so we convert to ASCII and hope for the best.
      */
     bool VOTableStream::readUniChars( int quantity, ostream *out )
     {
         bool result = true;
-        wchar_t value;
+        char value;
 
         //  If runlength encoded, first four bytes are the quantity.
         if ( quantity == 0 ) {
-            readValue( quantity );
+            if ( readValue( quantity ) ) {
+                if ( quantity == 0 ) {
+                    //  No value.
+                    *out << " ";
+                }
+            }
+            else {
+                /*  End of stream. */
+                result = false;
+                quantity = 0;
+            }
         }
 
         for ( int i = 0; i < quantity; i++ ) {
@@ -404,7 +456,13 @@ namespace gaia {
                     break;
                 }
                 else {
-                    *out << value;
+                    //  Avoid newlines, tabs etc. These will break the format.
+                    if ( iscntrl( value ) ) {
+                        *out << " ";
+                    }
+                    else {
+                        *out << value;
+                    }
                 }
             }
             else {
@@ -416,30 +474,25 @@ namespace gaia {
     }
 
     /**
-     *  Read a VOTable unicode character from the stream and return the result.
-     *  Returns false if the read fails.
+     *  Read a VOTable unicode character from the stream and return the result
+     *  as an ASCII char.  Returns false if the read fails. Note no bigendian
+     *  checks as that is assumed by the encoding (UCS-2), so we just return
+     *  byte 2 as the ASCII.
      */
-    bool VOTableStream::readUniChar( wchar_t &value )
+    bool VOTableStream::readUniChar( char &value )
     {
         bool result = true;
-        union {
-            char b[2];
-            wchar_t w;
-        } u;
+        char b[2];
 
-        if ( bigendian_ ) {
-            u.b[0] = in_->sbumpc();
-            u.b[1] = in_->sbumpc();
-        }
-        else {
-            u.b[1] = in_->sbumpc();
-            u.b[0] = in_->sbumpc();
-        }
-        if ( ( u.b[1] == EOF || u.b[0] == EOF ) ) {
+        b[0] = in_->sbumpc();
+        b[1] = in_->sbumpc();
+
+        if ( ( b[1] == EOF || b[0] == EOF ) ) {
+            value = '\0';
             result = false;
         }
         else {
-            value = u.w;
+            value = b[1];
         }
         return result;
     }
@@ -461,7 +514,17 @@ namespace gaia {
 
         //  If runlength encoded, first four bytes are the quantity.
         if ( quantity == 0 ) {
-            readValue( quantity );
+            if ( readValue( quantity ) ) {
+                if ( quantity == 0 ) {
+                    //  No value.
+                    *out << " ";
+                }
+            }
+            else {
+                /*  End of stream. */
+                result = false;
+                quantity = 0;
+            }
         }
 
         T nullvalue;
@@ -516,7 +579,17 @@ namespace gaia {
 
         //  If runlength encoded, first four bytes are the quantity.
         if ( quantity == 0 ) {
-            readValue( quantity );
+            if ( readValue( quantity ) ) {
+                if ( quantity == 0 ) {
+                    //  No value.
+                    *out << " ";
+                }
+            }
+            else {
+                /*  End of stream. */
+                result = false;
+                quantity = 0;
+            }
         }
 
         T nullvalue;

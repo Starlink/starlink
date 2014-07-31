@@ -75,7 +75,7 @@ namespace gaia {
         int readBoolean( bool &value );
         bool readByte( unsigned char &value );
         bool readChar( char &value );
-        bool readUniChar( wchar_t &value );
+        bool readUniChar( char &value );
 
         template <typename T> bool readValue( T &value );
 

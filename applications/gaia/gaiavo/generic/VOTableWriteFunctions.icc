@@ -834,7 +834,7 @@ int VOTable::data_tabledata( const NS::TABLE& table, const NS::TABLEDATA& tdata,
     //  TABLEDATA consists of rows of <TR> with each cell as a <TD> element.
     TABLEDATA::TR_const_iterator triter( tdata.TR().begin() );
     TABLEDATA::TR_const_iterator trend( tdata.TR().end() );
-    int nrow = 0;
+    int nrow = 1;
     string cell;
     for ( ; triter != trend; ++triter ) {
         TR::TD_const_iterator tditer( triter->TD().begin() );
@@ -1051,7 +1051,7 @@ int VOTable::data_binarydata( const NS::TABLE& table, const NS::BINARY& bdata,
     /*  Now write the rows. */
     VOTableStream os( inbuf );
     bool ok = true;
-    int row = 0;
+    int nrow = 1;
     while ( ok ) {
         for ( int i = 0; i < (int) field_types.size(); i++ ) {
             ok = os.readPrint( field_types[i], arraysizes[i], havenull[i],
@@ -1064,8 +1064,8 @@ int VOTable::data_binarydata( const NS::TABLE& table, const NS::BINARY& bdata,
             }
         }
         if ( id_index == -1 && ok ) {
-            out << '\t' << row;
-            row++;
+            out << nrow << '\t';
+            nrow++;
         }
         if ( ok ) out << '\n';
     }
@@ -1200,16 +1200,16 @@ int VOTable::data_fitsdata( const NS::FITS& fdata, ofstream& out, int& id_index,
     }
 
     char *s;
-    for ( long row = 1; row <= nrows; row++ ) {
+    for ( long nrow = 1; nrow <= nrows; nrow++ ) {
         for ( long col = 1; col <= ncols; col++ ) {
             if ( col == ( ra_index + 1 ) ) {
-                s = fits->getTableValue( row, col, rascale );
+                s = fits->getTableValue( nrow, col, rascale );
             }
             else if ( col == ( dec_index + 1 ) ) {
-                s = fits->getTableValue( row, col, decscale );
+                s = fits->getTableValue( nrow, col, decscale );
             }
             else {
-                s = fits->getTableValue( row, col, 1.0 );
+                s = fits->getTableValue( nrow, col, 1.0 );
             }
             if ( ! s ) {
                 return 0;
@@ -1221,7 +1221,7 @@ int VOTable::data_fitsdata( const NS::FITS& fdata, ofstream& out, int& id_index,
             }
         }
         if ( id_index == -1 ) {
-            out << '\t' << row;
+            out << '\t' << nrow;
         }
         out << '\n';
     }
