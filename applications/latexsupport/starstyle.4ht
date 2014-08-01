@@ -6,17 +6,36 @@
 % Configure toc.
 \ifwithchapters
    \typeout{...WithChapters starlinkxhtml.cfg...}
-   \CutAt{chapter,chapter}
+   \CutAt{chapter}
 
    \TocAt{chapter,section,subsection,sstrefsection}
 \else
    \typeout{...WithoutChapters stalrinkxhtml.cfg...}
-   \CutAt{section,chapter}
+   \CutAt{section}
    \TocAt{section,subsection,sstrefsection}
 \fi
-   \CutAt{appendix,appendix}
-   \CutAt{sstrefsection,sstrefsection}
-   %\CutAt{+sstrefsection,section}
+\CutAt{appendix}
+\Configure{+CutAt}{appendix}{[}{]}
+\TocAt{appendix, section, subsection, sstrefsection}
+\CutAt{sstrefsection,sstrefsection}
+\Configure{+CutAt}{sstrefsection}{[}{]}
+
+% \CutAt{+sstrefsection,section}
+
+\def\my:nextlink{%
+\ifx\nextCut\empty\relax\else[\Link[\nextCut]{}{}next\EndLink]\fi
+}
+\def\my:prevlink{%
+\ifx\prevCut\empty\relax\else[\Link[\prevCut]{}{}prev\EndLink]\fi
+}
+
+%\Configure{section}{\empty}{\empty}{\HCode{<h3>}\my:prevlink}{\my:nextlink\HCode{</h3>}}
+\Configure{crosslinks}{[}{]}{}{}{tail-prev}{head}{tail}{}
+\Configure{crosslinks+}{[\hyperlink{toc}{toc}]\my:prevlink\my:nextlink}{}{[\hyperlink{toc}{toc}]\my:prevlink\my:nextlink}{}
+\empty
+
+% add a label to table of contens
+%\Configure{tableofcontents} {\hypertarget{toc}{}} {} {} {} {}
 %% Sort out the front matter for the main thing.
 
 \renewcommand{\scfrontmatter}{%
@@ -27,10 +46,11 @@
 \end{titlepage}
 
 \Abstract{}
+\hypertarget{toc}{}
 \ifwithchapters
-\tableofcontents[chapter,section,subsection,subsubsection,appendix]
+\tableofcontents[chapter,section,subsection,subsubsection,appendix]%\label{toc}
 \else
-\tableofcontents[section,subsection,subsubsection,appendix]
+\tableofcontents[section,subsection,subsubsection,appendix]%\label{toc}
 \fi
 }
 
@@ -230,8 +250,8 @@
 %\renewcommand{\item}[1][]{\item #1}
 %\newenvironment{sldes2}{\begin{tabular}{c l}\mycommand}{\end{tabular}}
 
-
-%\renewenvironment{sldes2}{\begin{description}}{\end{description}}
+% SLDES
+\renewenvironment{sldes}{\begin{description}}{\end{description}}
 
 \ConfigureList{sldes}{\EndP\HCode{<dl \a:LRdir class="sldes">}%
  \PushMacro\end:itm
