@@ -67,17 +67,21 @@ and alphabetical summaries.}
 % Also define the html equivalents.
 
 % degrees symbol
-\providecommand{\dgs}{\hbox{$^\circ$}}
+%\usepackage{siunitx}
+\ifpdf
+\newcommand{\dgs}{\si{\degree}}%$^{\circ}$}
+\else
+\newcommand{\dgs}{\HCode{&deg}}
+\fi
 %
 
-
 % arcminute symbol
-\providecommand{\arcm}{\hbox{$^\prime$}}
+\providecommand{\arcm}{\si{\arcminute}}%\hbox{$^{\prime$}}}
 %
 
 
 % arcsec symbol
-\providecommand{\arcsec}{\arcm\hskip -0.1em\arcm}
+\providecommand{\arcsec}{\si{\arcsecond}}%\arcm\hskip -0.1em\arcm}
 %
 
 
@@ -5185,12 +5189,12 @@ screen or paper has a length of 1.0 (the scales on both axes are equal).
 
 \item [NDC] -- similar to BASEPIC but specifies positions in a
 normalised co-ordinate system in which the bottom-left corner has
-co-ordinates (0,~0) and the top-right corner has co-ordinates (1,~1).
+co-ordinates $(0,0)$ and the top-right corner has co-ordinates (1,1).
 Thus, for a non-square device the scales on the two axes will be different.
 
 \item [CURPIC] -- similar to BASEPIC except that it covers only the
 specified picture.  Thus, the bottom-left corner of each picture is
-at $(0,~0)$ and the shorter dimension of each picture has length 1.0.
+at $(0,0)$ and the shorter dimension of each picture has length 1.0.
 
 \end{description}
 
@@ -5199,7 +5203,8 @@ first one (SHOWPIXEL) causes the pixel co-ordinates at each selected
 position to be displayed, in addition to the co-ordinates selected using
 Parameter FRAME (which defaults in this case to RA/DEC since FRAME was
 not specified).  For instance, the first position is at a right
-ascension of $0^{\textrm{h}} 41^{\textrm{m}} 33.5^{\textrm{s}}$ and a declination of
+ascension of $0^{\textrm{h}} 41^{\textrm{m}} 33.5^{\textrm{s}}$
+and a declination of
 $40$\dgs $33$\arcm $01$\arcsec, and has pixel
 co-ordinates $(172.4,78.2)$.\footnote{Pixel \emph{co-ordinates} are
 fractional, where-as pixel \emph{indices} are integer.  The pixel with
