@@ -89,7 +89,7 @@
 \RequirePackage{tocloft}
 \fi
 %.. hyperref
-\RequirePackage[backref,breaklinks=True,pdfdisplaydoctitle=true]{hyperref}
+\RequirePackage[pdfusetitle=true,backref,breaklinks=True,pdfdisplaydoctitle=true]{hyperref}
 
 \setlength{\parindent}{0mm}
 
@@ -108,8 +108,8 @@
 \newcommand{\stardocversion}[1]{\def \@stardocversion{#1}}
 \newcommand{\stardocmanual}[1]{\def \@stardocmanual{#1}}
 \newcommand{\stardocabstract}[1]{\def \@stardocabstract{#1}}
-\newcommand{\stardocauthors}[1]{\def\@author{#1}}
-\newcommand{\stardocdate}[1]{\def\@date{#1}}
+\newcommand{\stardocauthors}[1]{\def\@stardocauthors{#1}}
+\newcommand{\stardocdate}[1]{\def\@stardocdate{#1}}
 \newcommand{\startitlepic}[1]{\def\@startitlepic{#1}}
 
 \newcommand{\starinstitute}[1]{\def\@starinstitute{#1}}
@@ -136,6 +136,8 @@
 \stardocauthors{}
 \startitlepic{}
 \stardocname{}
+\stardocauthors{}
+\stardocdate{}
 
 
 % provide the... versions of these commands so you don't need to use @
@@ -149,7 +151,7 @@
 \newcommand{\thestardocversion}{\@stardocversion}
 \newcommand{\thestardocmanual}{\@stardocmanual}
 \newcommand{\thestardocabstract}{\@stardocabstract}
-\newcommand{\thestardocauthors}{\@author}
+\newcommand{\thestardocauthors}{\@stardocauthors}
 \newcommand{\thestarinstitute}{\@starinstitute}
 \newcommand{\thestarfunders}{\@starfunders}
 \newcommand{\thestarproject}{\@starproject}
@@ -157,11 +159,16 @@
 \newcommand{\thestardocsource}{\@stardocsource}
 
 
-
-%  Ensure the title is available at a command\thetitle
+%  Ensure the title etc is available.
 \newcommand{\thetitle}{\@stardoctitle}
 \title{\@stardoctitle}
 \newcommand{\thedate}{\@date}
+% Uncommeting the following line causes the \scfrontmatter command for
+% pdf to break with a 'no line to end here fault...'
+%\date{\@stardocdate}
+\newcommand{\theauthor}{\@stardocauthors}
+\author{\@stardocauthors}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
