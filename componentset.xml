@@ -138,7 +138,7 @@ system are supported.
 </component>
 
 <component id="convert" support="S">
-  <version>1.7-1</version>
+  <version>1.8</version>
   <path>applications/convert</path>
   <description>CONVERT -- format-conversion package</description>
   <abstract><p>
@@ -4841,13 +4841,12 @@ to handle data from a variety of different instruments.
 </component>
 
 <component id="pal" support="S">
-  <version>0.3.1</version>
+  <version>0.4.0</version>
   <path>libext/pal</path>
-  <description>Position Astronomy Library</description>
+  <description>Positional Astronomy Library</description>
   <abstract><p>
     This library is a collection of code designed to aid in
-    replacing the SLA library with code from NOVAS and
-    SOFA.
+    replacing the SLA library with code from SOFA.
 
     Where possible the API is similar to the C SLA API
     except for the use of a "pal" prefix.
@@ -6856,7 +6855,7 @@ documents to hypertext.
 </component>
 
 <component id="fftw" support="U">
-  <version>3.3.3</version>
+  <version>3.3.4</version>
   <path>thirdparty/mit/fftw</path>
   <description>Fastest Fourier Transform in the West</description>
   <dependencies >
