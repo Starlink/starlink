@@ -4841,7 +4841,7 @@ to handle data from a variety of different instruments.
 </component>
 
 <component id="pal" support="S">
-  <version>0.4.0</version>
+  <version>0.5.0</version>
   <path>libext/pal</path>
   <description>Positional Astronomy Library</description>
   <abstract><p>
@@ -4852,7 +4852,7 @@ to handle data from a variety of different instruments.
     except for the use of a "pal" prefix.
     </p></abstract>
   <dependencies >
-    <build>sofa</build><build>starutil</build><link>sofa</link><link>starutil</link><sourceset>star2html</sourceset>
+    <build>erfa</build><build>starutil</build><link>erfa</link><link>starutil</link><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>

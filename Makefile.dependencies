@@ -1851,7 +1851,7 @@ $(MANIFESTS)/one: \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/pal: \
-		$(MANIFESTS)/sofa \
+		$(MANIFESTS)/erfa \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starutil
 	cd libext/pal \
@@ -2495,6 +2495,7 @@ $(MANIFESTS)/smurf: \
 		$(MANIFESTS)/chr \
 		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/ems \
+		$(MANIFESTS)/erfa \
 		$(MANIFESTS)/fftw \
 		$(MANIFESTS)/fio \
 		$(MANIFESTS)/generic \
