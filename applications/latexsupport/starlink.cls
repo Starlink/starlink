@@ -40,6 +40,9 @@
 
 \RequirePackage{mathpazo}
 
+% units
+\RequirePackage{siunitx}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Packages required for all reports
