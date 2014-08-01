@@ -793,6 +793,10 @@ $(MANIFESTS)/ems: \
 	cd libraries/ems \
 	  && $(MAKE_CPT)
 
+$(MANIFESTS)/erfa:
+	cd thirdparty/erfa \
+	  && $(MAKE_CPT)
+
 $(MANIFESTS)/esp: \
 		$(MANIFESTS)/agi \
 		$(MANIFESTS)/ard \

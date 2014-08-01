@@ -39,6 +39,7 @@ ALL_TARGETS = \
 	$(MANIFESTS)/echomop \
 	$(MANIFESTS)/echwind \
 	$(MANIFESTS)/ems \
+	$(MANIFESTS)/erfa \
 	$(MANIFESTS)/esp \
 	$(MANIFESTS)/extractor \
 	$(MANIFESTS)/extreme \

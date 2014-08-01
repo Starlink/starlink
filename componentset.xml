@@ -6554,6 +6554,24 @@ Ultrix and for SunOS and may still work for them.
   <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
+<component id="erfa" support="U">
+  <version>1.1</version>
+  <path>thirdparty/erfa</path>
+  <description>Essential Routines for Fundamental Astronomy</description>
+  <dependencies >
+    
+  </dependencies>
+  <developers>
+    <person>
+      <name>Tim Jenness</name>
+      <uname>timj</uname>
+      <email>t.jenness@jach.hawaii.edu</email>
+      <role>owner</role>
+    </person>
+  </developers>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
+</component>
+
 <component id="skycat" support="U">
   <version>3.1.2</version>
   <path>thirdparty/eso/skycat</path>

@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="erfa" support="U">
+  <version>1.1</version>
+  <path>thirdparty/erfa</path>
+  <description>Essential Routines for Fundamental Astronomy</description>
+  <!-- <abstract><p></p></abstract> -->
+  <dependencies >
+    
+  </dependencies>
+  <developers>
+    <!-- ERFA is maintained on Github at https://github.com/liberfa/erfa -->
+    <!-- and issues should be filed there if they are not due to the -->
+    <!-- Starlink build system. -->
+    <person>
+      <name>Tim Jenness</name>
+      <uname>timj</uname>
+      <email>t.jenness@jach.hawaii.edu</email>
+      <role>owner</role>
+    </person>
+  </developers>
+  <!-- <documentation></documentation> -->
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
