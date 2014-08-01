@@ -141,7 +141,7 @@
 %\renewcommand{\titlespacing}[4]{}
 
 % Fix some weirdness in symbols
-%\renewcommand{\^}{\HCode{^}}
+\renewcommand{\^}{\HCode{^}}
 \renewcommand\${\HCode{$}}%$ %$ is to fix syntax highlighting.
 %xs\renewcommand{\_}{\texttt{\_}}
 

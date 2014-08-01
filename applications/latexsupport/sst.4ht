@@ -1,94 +1,91 @@
 
-
 %%% sstrefsection New section command for sst routines
 
-%\renewcounter{sstrefsection}
+% Define section
 \NewSection\sstrefsection {\thesstrefsection}
+
+% Configure section
  \Configure{sstrefsection}
     {\HCode{<div class="sstrefsection">}}
     {\HCode{</div>}}
     {\HCode{<header class="sstreftitle">}\HCode{<h3
  class="sstsectitle">}}{\HCode{</h3>}}
 
+% Hide from toc
 \ConfigureToc{sstrefsection}{}{}{}{}
 
-%% sst attribute sections
-\newcounter{attributesec}
-\NewSection\attributesec{\theattributesec}
- \Configure{attributesec}
-    {\HCode{<div class="attributesec">}}
-    {\HCode{</div>}}
-    {\HCode{<h4 class="sstattributeHead">}}
-    {\HCode{</h4>}}
-
-\ConfigureToc{attributesec}{}{}{}{}
-
-\renewcommand{\sstattribute}[3]{
-    \attributesec{#1 --- #2}%
-    \addcontentsline{toc}{subsubsection}{\protect\numberline{}#1---#2}
-    \label{\RemoveSpaces{#1}}
-    #3
-}
-\Css{div.attributesec:before{content:"";display:block;border-bottom:solid 1px grey;padding-top:1em}}
-%%% sstroutine[3]
+% Replace the \sstroutine with tex4ht appropriate command:
 
 \renewcommand{\sstroutine}[3]{%
-\ssttitle{#1}{#2}%
-%\addcontentsline{toc}{subsection}{\protect\numberline{}\HCode{<span
-%class="toccom">}#1:\HCode{</span><span
-%class="tocdes">}#2\HCode{</span>}}%
-\addcontentsline{toc}{subsection}{\protect\numberline{}\HCode{<span class="toccom">}#1---#2\HCode{</span>}}
-\label{\RemoveSpaces{#1}}#3}
-
-%\Css{.toccom{vertical-align:top;
-%        width:10em;
-%        text-align:right;
-%        float:left;
-%        display:inline-block;
-%        padding-right:1em;
-%        %padding-left:10\%;
-%        }}
-\Css{.tocdes{display:inline-block;width:25em;text-align:left;float:right}}
-%\Css{div.tocline, div.toccomand, div.tocdescrip{height:0em; font-size:80\%}}
-%\Css{div.toccommand{float:left;box-sizing: border-box; -moz-box-sizing:
-%border-box; text-align: right; padding-right:1em;width:25\%}}
-%\Css{div.tocdescrip{width:70\%;display:inline-block;}}
-\Css{.toccom{font-size:80\%;whitespace:nowrap}}
-
+        \ssttitle{#1}{#2}%
+        \addcontentsline{toc}{subsection}{\protect\numberline{}\HCode{<span class="toccom">}#1---#2\HCode{</span>}}
+        \label{\RemoveSpaces{#1}}
+        #3
+        }
+% Command to set the title of the sstrefsection
 \renewcommand{\ssttitle}[2]{
 %  \subsection*{\centering #1}}
         \sstrefsection{#1}
         \sstsubtitle{#2}}
-
-
 
 \NewConfigure{sstsubtitle}{2}
 \newcommand{\sstsubtitle}[1]{
         \a:sstsubtitle #1 \b:sstsubtitle}
 \Configure{sstsubtitle}{\Tg<p class="subtitle">}{\Tg</p> \Tg</h3> \Tg</header>}
 
+%% sst attribute sections
+
+% Define section (and counter)
+\newcounter{attributesec}
+\NewSection\attributesec{\theattributesec}
+
+% Configure attribute section
+\Configure{attributesec}
+    {\HCode{<div class="attributesec">}}
+    {\HCode{</div>}}
+    {\HCode{<h4 class="sstattributeHead">}}
+    {\HCode{</h4>}}
+% Hide from toc.
+\ConfigureToc{attributesec}{}{}{}{}
+
+% Replace \sstattribute with tex4ht version:
+\renewcommand{\sstattribute}[3]{
+    \attributesec{#1 --- #2}%
+    \addcontentsline{toc}{subsubsection}{\protect\numberline{}#1---#2}
+    \label{\RemoveSpaces{#1}}
+    #3
+}
+
+% Styling for attributesection
+\Css{div.attributesec:before{content:"";display:block;border-bottom:solid 1px grey;padding-top:1em}}
+
+
+% Styling for table of contents options
+\Css{.tocdes{display:inline-block;width:25em;text-align:left;float:right}}
+\Css{.toccom{font-size:80\%;whitespace:nowrap}}
+
+
 %% Basic SST topic.
 
 \NewConfigure{basictopic}{4}
-\newcommand{\basictopic}[2]{\a:basictopic #1 \b:basictopic
-  \c:basictopic #2 \d:basictopic}
+\newcommand{\basictopic}[2]{%
+        \a:basictopic #1 \b:basictopic \c:basictopic #2 \d:basictopic}
 \Configure{basictopic}{\EndP\HCode{<h4
     class="ssth4">}}{\Tg</h4>}{\Tg<div
   class="sstvalues">}{\Tg</div>}
 
+% Css styling for basic SST sections and their headings :
 \Css{div.sstvalues{padding-left:5\%}}
 
-%%% 
-
+% Derived commands
 \renewcommand{\sstdescription}[1]{\basictopic{Description:}{#1}}
-%\renewcommand{\sstusage}[1]{\basictopic{Usage:}{#1}}
 \renewcommand{\sstparameters}[1]{\basictopic{Parameters:}{#1}}
 \renewcommand{\sstnotes}[1]{\basictopic{Notes:}{#1}}
 \renewcommand{\sstbugs}[1]{\basictopic{Bugs:}{#1}}
 \renewcommand{\sstdiytopic}[2]{\basictopic{#1}{#2}}
-\renewcommand{\sstimplementationstatus}[1]{\basictopic{Implementation
-    Status:}{#1}}
+\renewcommand{\sstimplementationstatus}[1]{\basictopic{Implementation Status:}{#1}}
 \renewcommand{\sstexamples}[1]{\basictopic{Examples:}{#1}}
+
 
 %%% sstsubsection [2]
 \NewConfigure{sstsubsection}{4}
@@ -97,6 +94,8 @@
   class="sstsub">}{\Tg</div>}
 \Css{div.sstsub{padding-left:5\%}}
 
+%% SST usage has separate command instead of being derived from
+%% basictopic so that the content can be set in texttt
 \NewConfigure{sstusage}{4}
 \renewcommand{\sstusage}[1]{\a:sstusage Usage: \b:sstusage
   \c:sstusage #1 \d:sstusage}
@@ -108,10 +107,6 @@
 \NewConfigure{sstdiylist}{4}
 \renewcommand\sstdiylist[2]{\a:sstdiylist #1: \b:sstdiylist \c:sstdiylist #2 \d:sstdiylist}
 \Configure{sstdiylist}{\Tg<h4 class="ssth4">}{\Tg</h4>}{\Tg<div class="sstvalues">}{\Tg</div>}
-
-
-%%% sstimplementationstatus[1]
-
 
 %%% sstitemlist [1]
 \NewConfigure{sstitemlist}{2}
@@ -129,15 +124,10 @@
 \Configure{sstexamplesubsection}{\EndP\HCode{<dl class="sstexamplesubsection">}}{\Tg</dl>}{\Tg<dd class="sst">}{\Tg</dd>}
 
 
-
-
-
 %%% sstitem
 \NewConfigure{sstitem}{1}
 \renewcommand{\sstitem}{\a:sstitem}
 \Configure{sstitem}{\Tg<li >}
-
-
 
 %%% sstattributetype [1]
 \NewConfigure{sstattributetype}{4}
@@ -148,6 +138,8 @@
 
 
 %% CSS
+
+
 \Css{header{font-size:1.5em;border-bottom: 5px solid \#aaa;}}
 \Css{h3.sstsectitle{text-align:center;}}
 \Css{p.subtitle{text-align:center}}
@@ -158,7 +150,7 @@
 \Css{dl.sstsub{font-weight:bold;}}
 
 
-
-\renewcommand{\wedge}{\texttt{\^{}}}
+% Fix a command used in some sst options?
+\renewcommand{\wedge}{\texttt{\HCode{^}}}
 %\renewcommand{\wedge}{\HCode{&\#8248}}
 
