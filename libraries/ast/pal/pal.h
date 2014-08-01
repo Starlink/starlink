@@ -42,12 +42,12 @@
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -94,7 +94,7 @@ void palAoppa ( double date, double dut, double elongm, double phim,
 
 void palAoppat ( double date, double aoprms[14] );
 
-void palAopqk ( double rap, double dap, double aoprms[14],
+void palAopqk ( double rap, double dap, const double aoprms[14],
                 double *aob, double *zob, double *hob,
                 double *dob, double *rob );
 
@@ -372,7 +372,7 @@ void palOap ( const char *type, double ob1, double ob2, double date,
               double rh, double wl, double tlr,
               double *rap, double *dap );
 
-void palOapqk ( const char *type, double ob1, double ob2, double aoprms[14],
+void palOapqk ( const char *type, double ob1, double ob2, const double aoprms[14],
                 double *rap, double *dap );
 
 int palObs( size_t n, const char * c,

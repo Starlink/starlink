@@ -44,6 +44,7 @@
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 1995 Rutherford Appleton Laboratory
 *     Copyright (C) 2012 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
@@ -53,12 +54,12 @@
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -71,7 +72,7 @@
 #include "pal.h"
 #include "palmac.h"
 #include "palmac.h"
-#include "erfam.h"
+#include "pal1sofa.h"
 
 void palPvobs( double p, double h, double stl, double pv[6] ){
 
@@ -79,7 +80,7 @@ void palPvobs( double p, double h, double stl, double pv[6] ){
    double xyz[3], z, r, s, c, v;
 
 /* Geodetic to geocentric conversion (WGS84 reference ellipsoid). */
-   eraGd2gc( 1, 0.0, p, h, xyz );
+   eraGd2gc( ERFA_WGS84, 0.0, p, h, xyz );
 
 /* Convert from metres to AU */
    r = xyz[ 0 ]/ERFA_DAU;

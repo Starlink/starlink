@@ -4,7 +4,7 @@
 *     palOne2One
 
 *  Purpose:
-*     File containing simple PAL wrappers for SLA routines that are identical in ERFA
+*     File containing simple PAL wrappers for SLA routines that are identical in SOFA
 
 *  Invocation:
 *     Matches SLA API
@@ -16,11 +16,11 @@
 *     Library routine
 
 *  Description:
-*     Some ERFA routines are identical to their SLA counterparts. PAL provides
+*     Some SOFA/ERFA routines are identical to their SLA counterparts. PAL provides
 *     direct counterparts to these although it is generally a better idea to
-*     use the ERFA routine directly in new code.
+*     use the SOFA/ERFA routine directly in new code.
 *
-*     The PAL routines with direct equivalents in ERFA are:
+*     The PAL routines with direct equivalents in SOFA/ERFA are:
 *     - palCldj
 *     - palDbear
 *     - palDaf2r
@@ -53,6 +53,7 @@
 *     - palGmst
 *     - palGmsta
 *     - palHfk5z
+*     - palRefcoq
 
 *  Authors:
 *     TIMJ: Tim Jenness (JAC, Hawaii)
@@ -61,11 +62,11 @@
 
 *  Notes:
 *     - Do not call these functions from other PAL functions. Always use
-*       the ERFA routines directly in new code.
+*       the SOFA/ERFA routines directly in new code.
 *     - These are implemented as real functions rather than C preprocessor
 *       macros so there may be a performance penalty in using the PAL
-*       version instead of the ERFA version.
-*     - Routines that take MJDs have ERFA equivalents that have an explicit
+*       version instead of the SOFA/ERFA version.
+*     - Routines that take MJDs have SOFA/ERFA equivalents that have an explicit
 *       MJD offset included.
 *     - palEqeqx, palGmst and palGmsta use the IAU 2006 precession model.
 
@@ -77,9 +78,12 @@
 *        Update prologue.
 *     2012-05-09 (DSBJ):
 *        Move palDrange into a separate file.
+*     2014-07-15 (TIMJ):
+*        SOFA now has palRefcoq equivalent.
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyeight (C) 2014 Tim Jenness
 *     Copyright (C) 2012 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
@@ -89,12 +93,12 @@
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -106,7 +110,7 @@
 
 #include "pal.h"
 #include "palmac.h"
-#include "erfa.h"
+#include "pal1sofa.h"
 
 void palCldj ( int iy, int im, int id, double *djm, int *j ) {
   double djm0;
@@ -244,12 +248,13 @@ void palFk5hz ( double r5, double d5, double epoch,
   eraFk5hz( r5, d5, date1, date2, rh, dh );
 }
 
-/* Note that ERFA has more accurate time arguments and we use the 2006 precession model */
+/* Note that SOFA/ERFA has more accurate time arguments
+   and we use the 2006 precession model */
 double palGmst ( double ut1 ) {
   return eraGmst06( PAL__MJD0, ut1, PAL__MJD0, ut1 );
 }
 
-/* Slightly better but still not as accurate as ERFA */
+/* Slightly better but still not as accurate as SOFA/ERFA */
 
 double palGmsta( double date, double ut ) {
   date += PAL__MJD0;
@@ -264,3 +269,9 @@ void palHfk5z ( double rh, double dh, double epoch,
   eraHfk5z( rh, dh, date1, date2, r5, d5, dr5, dd5 );
 }
 
+void palRefcoq ( double tdk, double pmb, double rh, double wl,
+                 double *refa, double *refb ) {
+  /* Note that SLA (and therefore PAL) uses units of kelvin
+     but SOFA/ERFA uses deg C */
+  eraRefco( pmb, tdk - 273.15, rh, wl, refa, refb );
+}

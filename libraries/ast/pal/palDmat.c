@@ -24,7 +24,7 @@
 *        of memory). After calling this routine "a" contains the
 *        inverse of the matrix.
 *     y = double[] (Given & Returned)
-*        The vector of N unknowns. On exit this vector contains the
+*        On input the vector of N knowns. On exit this vector contains the
 *        N solutions.
 *     d = double * (Returned)
 *        The determinant.
@@ -33,6 +33,8 @@
 *        is returned.  If the matrix is singular, jf=-1 & d=0.0 are
 *        returned.  In the latter case, the contents of array "a" on
 *        return are undefined.
+*     iw = int[] (Given)
+*        Integer workspace of size N.
 
 *  Description:
 *     Matrix inversion & solution of simultaneous equations

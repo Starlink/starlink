@@ -29,11 +29,12 @@
 
 *  Authors:
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     PTW: Patrick T. Wallace
 *     {enter_new_authors_here}
 
 *  Notes:
-*     - Consider a comprehensive upgrade to use the time transformations in ERFA's time
-*       cookbook:  http://www.eraerfa.org/erfa_ts_c.pdf.
+*     - Consider a comprehensive upgrade to use the time transformations in SOFA's time
+*       cookbook:  http://www.iausofa.org/sofa_ts_c.pdf.
 *     - See eraDat for a description of error conditions when calling this function
 *       with a time outside of the UTC range. This behaviour differs from slaDtt.
 
@@ -44,6 +45,7 @@
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 1995 Rutherford Appleton Laboratory
 *     Copyright (C) 2012 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
@@ -53,12 +55,12 @@
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.

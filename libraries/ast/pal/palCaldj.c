@@ -47,7 +47,7 @@
 *     - Unlike eraCal2jd this routine treats the years 0-100 as
 *       referring to the end of the 20th Century and beginning of
 *       the 21st Century. If this behaviour is not acceptable
-*       use the ERFA routine directly or palCldj.
+*       use the SOFA/ERFA routine directly or palCldj.
 *       Acceptable years are 00-49, interpreted as 2000-2049,
 *                            50-99,     "       "  1950-1999,
 *                            all others, interpreted literally.
@@ -55,6 +55,7 @@
 
 
 *  Copyright:
+*     Copyright (C) 1995 Rutherford Appleton Laboratory
 *     Copyright (C) 2012 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
@@ -64,12 +65,12 @@
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -81,7 +82,7 @@
 
 #include "pal.h"
 #include "palmac.h"
-#include "erfa.h"
+#include "pal1sofa.h"
 
 void palCaldj ( int iy, int im, int id, double *djm, int *j ) {
   int adj = 0;   /* Year adjustment */

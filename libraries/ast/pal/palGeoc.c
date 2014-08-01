@@ -29,6 +29,7 @@
 *     Convert geodetic position to geocentric.
 
 *  Authors:
+*     PTW: Patrick T. Wallace
 *     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
@@ -43,6 +44,7 @@
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2004 Patrick T. Wallace
 *     Copyright (C) 2012 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
@@ -52,12 +54,12 @@
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -68,14 +70,14 @@
 */
 
 #include "pal.h"
-#include "erfa.h"
+#include "pal1sofa.h"
 
 void palGeoc ( double p, double h, double *r, double *z ) {
   double xyz[3];
   const double elong = 0.0;   /* Use zero longitude */
   const double AU = 1.49597870E11;
   /* WGS84 looks to be the closest match */
-  eraGd2gc( 1, elong, p, h, xyz );
+  eraGd2gc( ERFA_WGS84, elong, p, h, xyz );
   *r = xyz[0] / (AU * cos(elong) );
   *z = xyz[2] / AU;
 }
