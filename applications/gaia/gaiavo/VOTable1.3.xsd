@@ -365,6 +365,7 @@
     <xs:choice>
       <xs:element name="TABLEDATA" type="TABLEDATA"/>
       <xs:element name="BINARY" type="BINARY"/>
+      <xs:element name="BINARY2" type="BINARY2"/>
       <xs:element name="FITS" type="FITS"/>
     </xs:choice>
     <xs:element name="INFO" type="INFO" minOccurs="0" maxOccurs="unbounded"/>
@@ -416,6 +417,13 @@
 
 <!-- BINARY data format -->
 <xs:complexType name="BINARY">
+  <xs:sequence>
+    <xs:element name="STREAM" type="STREAM"/>
+ </xs:sequence>
+</xs:complexType>
+
+<!-- BINARY2 data format -->
+<xs:complexType name="BINARY2">
   <xs:sequence>
     <xs:element name="STREAM" type="STREAM"/>
   </xs:sequence>

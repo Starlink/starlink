@@ -70,12 +70,20 @@ namespace gaia {
         bool readPrint( datatype type, int quantity, bool havenull,
                         string &nullstring, ostream *out );
 
+        /*  Read vector of given types from the stream and discard.
+         *  Need to do this when the values are known to be null as
+         *  the BINARY2 bitmask is set. */
+        bool readSkip( datatype type, int quantity );
+
         /*  Native type access to the values in the stream. */
         bool readBitArray( string &value );
         int readBoolean( bool &value );
         bool readByte( unsigned char &value );
         bool readChar( char &value );
         bool readUniChar( char &value );
+
+        /*  BINARY2 null support. */
+        bool readBitMask( int n, bool bitmask[] );
 
         template <typename T> bool readValue( T &value );
 
@@ -101,5 +109,13 @@ namespace gaia {
                                                     string &nullvalue, ostream *out );
         template <typename T> bool readValues( int quantity, bool havenull,
                                                string &nullvalue, ostream *out );
+
+        /*  Discard values that are known to be null (BINARY2). */
+        bool skipBitArrays( int quantity );
+        bool skipBooleans( int quantity );
+        bool skipBytes( int quantity );
+        bool skipChars( int quantity );
+        bool skipUniChars( int quantity );
+        template <typename T> bool skipValues( int quantity );
     };
 }

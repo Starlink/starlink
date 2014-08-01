@@ -276,6 +276,7 @@ namespace votable_13
   class TR;
   class FITS;
   class BINARY;
+  class BINARY2;
   class STREAM;
   class TABLE;
   class RESOURCE;
@@ -2605,6 +2606,27 @@ namespace votable_13
     void
     BINARY (::std::auto_ptr< BINARY_type > p);
 
+    // BINARY2
+    // 
+    typedef ::votable_13::BINARY2 BINARY2_type;
+    typedef ::xsd::cxx::tree::optional< BINARY2_type > BINARY2_optional;
+    typedef ::xsd::cxx::tree::traits< BINARY2_type, char > BINARY2_traits;
+
+    const BINARY2_optional&
+    BINARY2 () const;
+
+    BINARY2_optional&
+    BINARY2 ();
+
+    void
+    BINARY2 (const BINARY2_type& x);
+
+    void
+    BINARY2 (const BINARY2_optional& x);
+
+    void
+    BINARY2 (::std::auto_ptr< BINARY2_type > p);
+
     // FITS
     // 
     typedef ::votable_13::FITS FITS_type;
@@ -2672,6 +2694,7 @@ namespace votable_13
     protected:
     TABLEDATA_optional TABLEDATA_;
     BINARY_optional BINARY_;
+    BINARY2_optional BINARY2_;
     FITS_optional FITS_;
     INFO_sequence INFO_;
   };
@@ -2969,6 +2992,58 @@ namespace votable_13
 
     virtual 
     ~BINARY ();
+
+    // Implementation.
+    //
+    protected:
+    void
+    parse (::xsd::cxx::xml::dom::parser< char >&,
+           ::xml_schema::flags);
+
+    protected:
+    ::xsd::cxx::tree::one< STREAM_type > STREAM_;
+  };
+
+  class BINARY2: public ::xml_schema::type
+  {
+    public:
+    // STREAM
+    // 
+    typedef ::votable_13::STREAM STREAM_type;
+    typedef ::xsd::cxx::tree::traits< STREAM_type, char > STREAM_traits;
+
+    const STREAM_type&
+    STREAM () const;
+
+    STREAM_type&
+    STREAM ();
+
+    void
+    STREAM (const STREAM_type& x);
+
+    void
+    STREAM (::std::auto_ptr< STREAM_type > p);
+
+    // Constructors.
+    //
+    BINARY2 (const STREAM_type&);
+
+    BINARY2 (::std::auto_ptr< STREAM_type >&);
+
+    BINARY2 (const ::xercesc::DOMElement& e,
+             ::xml_schema::flags f = 0,
+             ::xml_schema::container* c = 0);
+
+    BINARY2 (const BINARY2& x,
+             ::xml_schema::flags f = 0,
+             ::xml_schema::container* c = 0);
+
+    virtual BINARY2*
+    _clone (::xml_schema::flags f = 0,
+            ::xml_schema::container* c = 0) const;
+
+    virtual 
+    ~BINARY2 ();
 
     // Implementation.
     //
@@ -4611,6 +4686,9 @@ namespace votable_13
 
   void
   operator<< (::xercesc::DOMElement&, const BINARY&);
+
+  void
+  operator<< (::xercesc::DOMElement&, const BINARY2&);
 
   void
   operator<< (::xercesc::DOMElement&, const STREAM&);

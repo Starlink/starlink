@@ -87,6 +87,7 @@ namespace gaia {
      */
     const char *VOTABLE_NS11 ="http://www.ivoa.net/xml/VOTable/v1.1";
     const char *VOTABLE_NS12 ="http://www.ivoa.net/xml/VOTable/v1.2";
+    const char *VOTABLE_NS13 ="http://www.ivoa.net/xml/VOTable/v1.3";
 
     /**  Static member initializations. */
     bool VOTable::initialized = false;
@@ -99,7 +100,8 @@ namespace gaia {
     VOTable::VOTable() :
         votable1_(NULL),
         votable2_(NULL),
-        votable3_(NULL)
+        votable3_(NULL),
+        votable4_(NULL)
     {
         // Initialise Xerces runtime
         if ( !VOTable::initialized ) {
@@ -179,6 +181,10 @@ namespace gaia {
             delete votable3_;
             votable3_ = NULL;
         }
+        if ( votable4_ ) {
+            delete votable4_;
+            votable4_ = NULL;
+        }
 
         //  Open the VOTable using the correct parsing classes. Currently this
         //  just scans for the namespace qualifying string in the first 2048
@@ -191,7 +197,8 @@ namespace gaia {
 
         //   Now look for namespace signifier.
         if ( strstr( line, VOTABLE_NS11 ) == NULL &&
-             strstr( line, VOTABLE_NS12 ) == NULL ) {
+             strstr( line, VOTABLE_NS12 ) == NULL &&
+             strstr( line, VOTABLE_NS13 ) == NULL ) {
 
             //  No namespace.
             votable1_ = openVOTable1( in );
@@ -199,15 +206,24 @@ namespace gaia {
         else {
             //  Namespace.
             if ( strstr( line, VOTABLE_NS11 ) == NULL ) {
-                votable3_ = openVOTable3( in );
+                // Not 1.1
+                if ( strstr( line, VOTABLE_NS12 ) == NULL ) {
+                    //  1.3
+                    votable4_ = openVOTable4( in );
+                }
+                else {
+                    // 1.2
+                    votable3_ = openVOTable3( in );
+                }
             }
             else {
+                // 1.1
                 votable2_ = openVOTable2( in );
             }
         }
 
         //  If we have a table, that's OK.
-        if ( votable1_ || votable2_ || votable3_ ) {
+        if ( votable1_ || votable2_ || votable3_ || votable4_ ) {
             return 1;
         }
         return 0;
@@ -233,6 +249,10 @@ namespace gaia {
         if ( votable3_ ) {
             delete votable3_;
             votable3_ = NULL;
+        }
+        if ( votable4_ ) {
+            delete votable4_;
+            votable4_ = NULL;
         }
 
         //  Create new instance.
@@ -263,6 +283,16 @@ namespace gaia {
             votable3_->version( "1.2" );
             VOTABLE_write( out, *votable3_, map );
         }
+
+        using namespace votable_13;
+        if ( votable4_ != NULL ) {
+            ofstream out( file, ios::out );
+            xml_schema::namespace_infomap map;
+            map[""].name = "http://www.ivoa.net/xml/VOTable/v1.3";
+            map[""].schema = "VOTable1.3.xsd";
+            votable4_->version( "1.3" );
+            VOTABLE_write( out, *votable4_, map );
+        }
     }
 
     /**
@@ -278,6 +308,9 @@ namespace gaia {
         }
         if ( votable3_ ) {
             delete votable3_;
+        }
+        if ( votable4_ ) {
+            delete votable4_;
         }
     }
 
@@ -418,6 +451,31 @@ namespace gaia {
     }
 
     /**
+     *  Read stream for a VOTable version 1.3 using fully qualified
+     *  namespace.
+     */
+    votable_13::VOTABLE *VOTable::openVOTable4( istream *in )
+    {
+        using namespace votable_13;
+        try {
+            auto_ptr<VOTABLE> table =
+                VOTABLE_read( *in,
+                              xml_schema::flags::dont_validate |
+                              xml_schema::flags::dont_initialize |
+                              xml_schema::flags::keep_dom );
+            return table.release();
+        }
+        catch ( const xml_schema::exception &e ) {
+            //  Basic report to terminal.
+            cerr << "open_votable: ";
+            cerr << e << endl;
+        }
+
+        //  Open failed.
+        return NULL;
+    }
+
+    /**
      *  Simple listing of VOTable contents.
      */
     void VOTable::list( ostream& str )
@@ -430,6 +488,9 @@ namespace gaia {
         }
         else if ( votable3_ ) {
             votable_enum( *votable3_, str );
+        }
+        else if ( votable4_ ) {
+            votable_enum( *votable4_, str );
         }
     }
 
@@ -446,6 +507,9 @@ namespace gaia {
         }
         else if ( votable3_ ) {
             return votable_count( *votable3_ );
+        }
+        else if ( votable4_ ) {
+            return votable_count( *votable4_ );
         }
         return 0;
     }
@@ -471,6 +535,9 @@ namespace gaia {
         }
         else if ( votable3_ ) {
             result = votable_write( *votable3_, index, out );
+        }
+        else if ( votable4_ ) {
+            result = votable_write( *votable4_, index, out );
         }
         out.close();
 
@@ -506,6 +573,9 @@ namespace gaia {
         }
         else if ( votable3_ ) {
             return votable_info_value( *votable3_, name, value, content );
+        }
+        else if ( votable4_ ) {
+            return votable_info_value( *votable4_, name, value, content );
         }
         return 0;
     }

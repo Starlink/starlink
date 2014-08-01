@@ -757,8 +757,9 @@ void VOTable::table_coosys( const NS::COOSYS& coosys, ofstream& out )
  *  are converted from radians to degrees if needed.
  */
 int VOTable::table_columns( const NS::TABLE& table, ofstream& out,
-                   int& id_index, int& ra_index, bool& ra_radians, string& ra_unit,
-                   int& dec_index, bool& dec_radians, string& dec_unit )
+                            int& id_index, int& ra_index, bool& ra_radians,
+                            string& ra_unit, int& dec_index, bool& dec_radians,
+                            string& dec_unit )
 {
     using namespace NS;
 
@@ -768,7 +769,7 @@ int VOTable::table_columns( const NS::TABLE& table, ofstream& out,
     //  Empty tables are OK.
     if ( odata ) {
 
-        //  Three variants, TABLEDATA, BINARY and FITS.
+        //  Four variants, TABLEDATA, BINARY, BINARY2 and FITS.
         const DATA::TABLEDATA_optional tdata( odata.get().TABLEDATA() );
         if ( tdata ) {
             return data_tabledata( table, tdata.get(), out, id_index,
@@ -778,10 +779,21 @@ int VOTable::table_columns( const NS::TABLE& table, ofstream& out,
 
         const DATA::BINARY_optional bdata( odata.get().BINARY() );
         if ( bdata ) {
-            return data_binarydata( table, bdata.get(), out, id_index,
+            return data_binarydata( false, table, bdata.get(), out, id_index,
                                     ra_index, ra_radians, dec_index,
                                     dec_radians );
         }
+
+        /*  Only in 1.3 and later */
+#if NSVERS == 13
+
+        const DATA::BINARY2_optional bdata2( odata.get().BINARY2() );
+        if ( bdata2 ) {
+            return data_binarydata2( true, table, bdata2.get(), out, id_index,
+                                     ra_index, ra_radians, dec_index,
+                                     dec_radians );
+        }
+#endif
 
         const DATA::FITS_optional fdata( odata.get().FITS() );
         if ( fdata ) {
@@ -910,10 +922,33 @@ int VOTable::data_tabledata( const NS::TABLE& table, const NS::TABLEDATA& tdata,
 }
 
 /**
- *  Write a BINARY element of a table to Skycat format. RA and Dec columns
- *  are converted from radians to degrees if needed.
+ *  Write a BINARY2 element of a table to Skycat format. RA and Dec
+ *  columns are converted from radians to degrees if needed.
  */
-int VOTable::data_binarydata( const NS::TABLE& table, const NS::BINARY& bdata,
+#if NSVERS == 13
+int VOTable::data_binarydata2( bool binary2, const NS::TABLE& table, const NS::BINARY2& bdata,
+                               ofstream& out, int& id_index, int& ra_index,
+                               bool& ra_radians, int& dec_index, bool& dec_radians )
+{
+    using namespace NS;
+
+    //  See if we need to decode the data. Support base64 and gzip and
+    //  native. See if this is needed by checking the encodingType.
+    BINARY2::STREAM_type stream( bdata.STREAM() );
+    string encoding( stream.encoding() );
+    STREAM::href_optional href( stream.href() );
+
+    return data_binarystream( binary2, table, stream, encoding, href,
+                              out, id_index, ra_index,
+                              ra_radians, dec_index, dec_radians );
+}
+#endif
+
+/**
+ *  Write a BINARY element of a table to Skycat format. RA and Dec
+ *  columns are converted from radians to degrees if needed.
+ */
+int VOTable::data_binarydata( bool binary2, const NS::TABLE& table, const NS::BINARY& bdata,
                               ofstream& out, int& id_index, int& ra_index,
                               bool& ra_radians, int& dec_index, bool& dec_radians )
 {
@@ -924,6 +959,24 @@ int VOTable::data_binarydata( const NS::TABLE& table, const NS::BINARY& bdata,
     BINARY::STREAM_type stream( bdata.STREAM() );
     string encoding( stream.encoding() );
     STREAM::href_optional href( stream.href() );
+
+    return data_binarystream( binary2, table, stream, encoding, href,
+                              out, id_index, ra_index,
+                              ra_radians, dec_index, dec_radians );
+}
+
+/**
+ *  Read a stringstream wrapping a BINARY or BINARY2 element of a table to
+ *  Skycat format. RA and Dec columns are converted from radians to degrees if
+ *  needed.
+ */
+int VOTable::data_binarystream( bool binary2, const NS::TABLE& table,
+                                const string& stream, const string& encoding,
+                                NS::STREAM::href_optional& href,
+                                ofstream& out, int& id_index, int& ra_index,
+                                bool& ra_radians, int& dec_index, bool& dec_radians )
+{
+    using namespace NS;
 
     streambuf *inbuf;
     stringstream *istr;
@@ -1024,7 +1077,9 @@ int VOTable::data_binarydata( const NS::TABLE& table, const NS::BINARY& bdata,
         arraysizes.push_back( field_arraysize( *fiter ) );
 
         //  Check for a null attribute in the optional VALUES element.
+        //  Not used in BINARY2, null bits are encoded for each row.
         FIELD::VALUES_optional values( fiter->VALUES() );
+
         if ( values ) {
             VALUES::null_optional nullv( values.get().null() );
             if ( &nullv.get() != 0 ) {
@@ -1052,10 +1107,34 @@ int VOTable::data_binarydata( const NS::TABLE& table, const NS::BINARY& bdata,
     VOTableStream os( inbuf );
     bool ok = true;
     int nrow = 1;
+
+    //  Number of bytes used for nulls in BINARY2 format.
+    int b2bytes = (int) (field_types.size() + 7 ) / 8;
+    bool *b2mask = new bool[b2bytes * 8];
+
     while ( ok ) {
+        if ( binary2 ) {
+            // First field is null bit array.
+            ok = os.readBitMask( b2bytes, b2mask );
+            if ( ! ok ) {
+                break;
+            }
+        }
         for ( int i = 0; i < (int) field_types.size(); i++ ) {
-            ok = os.readPrint( field_types[i], arraysizes[i], havenull[i],
-                               nullvalues[i], &out );
+            if ( binary2 ) {
+                if ( b2mask[i] ) {
+                    ok = os.readSkip( field_types[i], arraysizes[i] );
+                    out << " ";
+                }
+                else {
+                    ok = os.readPrint( field_types[i], arraysizes[i],
+                                       havenull[i], nullvalues[i], &out );
+                }
+            }
+            else {
+                ok = os.readPrint( field_types[i], arraysizes[i], havenull[i],
+                                   nullvalues[i], &out );
+            }
             if ( ok ) {
                 out << '\t';
             }
@@ -1071,6 +1150,7 @@ int VOTable::data_binarydata( const NS::TABLE& table, const NS::BINARY& bdata,
     }
 
     delete istr;
+    delete[] b2mask;
 
     return 1;
 }

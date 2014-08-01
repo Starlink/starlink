@@ -51,6 +51,7 @@
 #include "VOTable1.1.hxx"
 #include "VOTable1.1_dns.hxx"
 #include "VOTable1.2.hxx"
+#include "VOTable1.3.hxx"
 
 using namespace std;
 
@@ -73,6 +74,10 @@ namespace gaia
         //  Open a VOTable 1.2.
         votable_12::VOTABLE *votable3_;
         votable_12::VOTABLE *openVOTable3( istream *in );
+
+        //  Open a VOTable 1.3.
+        votable_13::VOTABLE *votable4_;
+        votable_13::VOTABLE *openVOTable4( istream *in );
 
         //  Note for above. VOTABLE classes are not derived, so cannot
         //  simply use an array.
@@ -124,16 +129,28 @@ namespace gaia
         //  default namespace). These read a VOTable and write a tab
         //  table. Defined in VOTableWriteFunctions.C.
 #define NS ::votable_11_dns
+#define NSVERS 11
 #include "VOTableWriteFunctions.h"
 #undef NS
+#undef NSVERS
 
 #define NS ::votable_11
+#define NSVERS 11
 #include "VOTableWriteFunctions.h"
 #undef NS
+#undef NSVERS
 
 #define NS ::votable_12
+#define NSVERS 12
 #include "VOTableWriteFunctions.h"
 #undef NS
+#undef NSVERS
+
+#define NS ::votable_13
+#define NSVERS 13
+#include "VOTableWriteFunctions.h"
+#undef NS
+#undef NSVERS
 
         //  Similar functions for reading a tab table and writing a VOTable.
         //  Only support writing in the VOTable 1.1 namespace so no need for

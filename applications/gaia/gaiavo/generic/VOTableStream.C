@@ -3,13 +3,13 @@
  *     gaia::VOTableStream
 
  *  Purpose:
- *     Class for handling a VOTable BINARY stream.
+ *     Class for handling VOTable BINARY and BINARY2 streams.
 
  *  Language:
  *     C++
 
  *  Copyright:
- *     Copyright (C) 2008 Science and Technology Facilities Council.
+ *     Copyright (C) 2008-2014 Science and Technology Facilities Council.
  *     All Rights Reserved.
 
  *  Licence:
@@ -127,7 +127,8 @@ namespace gaia {
             }
             break;
             case SHORT: {
-                return readValues<short>( quantity, havenull, nullstring, out );
+                return readValues<short>( quantity, havenull, nullstring,
+                                          out );
             }
             break;
             case INT: {
@@ -151,18 +152,18 @@ namespace gaia {
             }
             break;
             case DOUBLE: {
-                return readValues<double>( quantity, havenull,
-                                           nullstring, out );
+                return readFloatValues<double>( quantity, havenull,
+                                                nullstring, out );
             }
             break;
             case FLOATCOMPLEX: {
-                return readValues<float>( quantity * 2, havenull,
-                                          nullstring, out );
+                return readFloatValues<float>( quantity * 2, havenull,
+                                               nullstring, out );
             }
             break;
             case DOUBLECOMPLEX: {
-                return readValues<double>( quantity * 2, havenull,
-                                           nullstring, out );
+                return readFloatValues<double>( quantity * 2, havenull,
+                                                nullstring, out );
             }
             break;
         }
@@ -394,8 +395,9 @@ namespace gaia {
         for ( int i = 0; i < quantity; i++ ) {
             if ( readChar( value ) ) {
                 if ( value == '\0' ) {
-                    //  End of string.
-                    break;
+                    //  End of string, so don't print more, but we 
+                    //  need to read stream for required quantity.
+                    continue;
                 }
                 else {
                     *out << value;
@@ -453,7 +455,9 @@ namespace gaia {
         for ( int i = 0; i < quantity; i++ ) {
             if ( readUniChar( value ) ) {
                 if ( value == '\0' ) {
-                    break;
+                    //  End of string, so don't print more, but we 
+                    //  need to read stream for required quantity.
+                    continue;
                 }
                 else {
                     //  Avoid newlines, tabs etc. These will break the format.
@@ -657,5 +661,273 @@ namespace gaia {
             return true;
         }
         return false;
+    }
+
+
+    //  BINARY2 specific support.
+
+    /**
+     *  Read n bytes from the stream and interpret as a BINARY2 null bit mask.
+     *  Returning the 0/1 bit values as false/true in the bitmask array.
+     *  The bitmask array should be of size n*8.
+     */
+    bool VOTableStream::readBitMask( int n, bool bitmask[] )
+    {
+        bool result = true;
+        char b;
+        int k = 0;
+
+        for ( int i = 0; i < n; i++ ) {
+            char b = in_->sbumpc();
+            if ( b != EOF ) {
+                bitset<8> bs( b );
+                for ( int j = 7; j >= 0; j-- ) {
+                    bitmask[k] = bs.test( j );
+                    k++;
+                }
+            }
+            else {
+                result = false;
+                break;
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     *  Read a supported vector of data objects from the input stream and
+     *  discard their content. Returns false if the read fails. Use to skip
+     *  over null elements in a BINARY2 stream.
+     */
+    bool VOTableStream::readSkip( datatype type, int quantity )
+    {
+        switch ( type ) {
+            case BOOLEAN: {
+                return skipBooleans( quantity );
+            }
+            break;
+            case BITARRAY: {
+                return skipBitArrays( quantity );
+            }
+            break;
+            case BYTE: {
+                return skipBytes( quantity );
+            }
+            break;
+            case CHAR: {
+                return skipChars( quantity );
+            }
+            break;
+            case UNICODE: {
+                return skipUniChars( quantity );
+            }
+            break;
+            case SHORT: {
+                return skipValues<short>( quantity );
+            }
+            break;
+            case INT: {
+                return skipValues<int>( quantity );
+            }
+            break;
+            case LONG: {
+                if ( uselonglong_ ) {
+                    return skipValues<long long>( quantity );
+                }
+                else {
+                    return skipValues<long>( quantity );
+                }
+            }
+            break;
+            case FLOAT: {
+                return skipValues<float>( quantity );
+            }
+            break;
+            case DOUBLE: {
+                return skipValues<double>( quantity );
+            }
+            break;
+            case FLOATCOMPLEX: {
+                return skipValues<float>( quantity * 2 );
+            }
+            break;
+            case DOUBLECOMPLEX: {
+                return skipValues<double>( quantity * 2 );
+            }
+            break;
+        }
+
+        //  Cannot happen (unless a datatype is missed).
+        return false;
+    }
+
+    /**
+     *  Read a vector of VOTable booleans from the stream and discard
+     *  them. Result is false if the read fails.
+     */
+    bool VOTableStream::skipBooleans( int quantity )
+    {
+        bool result = true;
+        bool value;
+        int status;
+
+        //  If runlength encoded, first four bytes are the quantity.
+        if ( quantity == 0 ) {
+            if ( ! readValue( quantity ) ) {
+                /*  End of stream. */
+                result = false;
+                quantity = 0;
+            }
+        }
+
+        for ( int i = 0; i < quantity; i++ ) {
+            if ( ! readBoolean( value ) ) {
+                result = false;
+                break;
+            }
+        }
+        return result;
+    }
+
+    /**
+     *  Read a VOTable bit array vector from the stream and discard.
+     *  The result is false if the read fails.
+     */
+    bool VOTableStream::skipBitArrays( int quantity )
+    {
+        bool result = true;
+        string value;
+
+        //  If runlength encoded, first four bytes are the quantity.
+        if ( quantity == 0 ) {
+            if ( ! readValue( quantity ) ) {
+                /*  End of stream. */
+                result = false;
+                quantity = 0;
+            }
+        }
+
+        for ( int i = 0; i < quantity; i++ ) {
+            if ( ! readBitArray( value ) ) {
+                result = false;
+                break;
+            }
+        }
+        return result;
+    }
+
+    /**
+     *  Read a VOTable byte vector from the stream and discard.
+     *  Returns false if the read fails.
+     */
+    bool VOTableStream::skipBytes( int quantity )
+    {
+        bool result = true;
+        unsigned char value;
+
+        //  If runlength encoded, first four bytes are the quantity.
+        if ( quantity == 0 ) {
+            if ( ! readValue( quantity ) ) {
+                /*  End of stream. */
+                result = false;
+                quantity = 0;
+            }
+        }
+
+        for ( int i = 0; i < quantity; i++ ) {
+            if ( ! readByte( value ) ) {
+                result = false;
+                break;
+            }
+        }
+        return result;
+    }
+
+    /**
+     *  Read a VOTable string from the stream and discard. 
+     */
+    bool VOTableStream::skipChars( int quantity )
+    {
+        bool result = true;
+        char value;
+
+        //  If runlength encoded, first four bytes are the quantity.
+        if ( quantity == 0 ) {
+            if ( ! readValue( quantity ) ) {
+                /*  End of stream. */
+                result = false;
+                quantity = 0;
+            }
+        }
+
+        for ( int i = 0; i < quantity; i++ ) {
+            if ( readChar( value ) ) {
+                if ( value == '\0' ) {
+                    //  End of string, so don't print more, but we 
+                    //  need to read stream for required quantity.
+                    continue;
+                }
+            }
+            else {
+                result = false;
+                break;
+            }
+        }
+        return result;
+    }
+
+    /**
+     *  Read a VOTable unicode string from the stream and discard.
+     */
+    bool VOTableStream::skipUniChars( int quantity )
+    {
+        bool result = true;
+        char value;
+
+        //  If runlength encoded, first four bytes are the quantity.
+        if ( quantity == 0 ) {
+            if ( ! readValue( quantity ) ) {
+                /*  End of stream. */
+                result = false;
+                quantity = 0;
+            }
+        }
+
+        for ( int i = 0; i < quantity; i++ ) {
+            if ( ! readUniChar( value ) ) {
+                result = false;
+                break;
+            }
+        }
+        return result;
+    }
+
+    /**
+     *  Read a vector of values from the input stream and discard.
+     *  If the read fails then false is returned.
+     */
+    template <typename T>
+        bool VOTableStream::skipValues( int quantity )
+    {
+        bool result = true;
+        T value;
+
+        //  If runlength encoded, first four bytes are the quantity.
+        if ( quantity == 0 ) {
+            if ( ! readValue( quantity ) ) {
+                /*  End of stream. */
+                result = false;
+                quantity = 0;
+            }
+        }
+
+        for ( int i = 0; i < quantity; i++ ) {
+            if ( ! readValue( value ) ) {
+                result = false;
+                break;
+            }
+        }
+        return result;
     }
 }

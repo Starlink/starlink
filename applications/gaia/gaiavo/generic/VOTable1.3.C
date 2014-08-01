@@ -2220,6 +2220,36 @@ namespace votable_13
     this->BINARY_.set (x);
   }
 
+  const DATA::BINARY2_optional& DATA::
+  BINARY2 () const
+  {
+    return this->BINARY2_;
+  }
+
+  DATA::BINARY2_optional& DATA::
+  BINARY2 ()
+  {
+    return this->BINARY2_;
+  }
+
+  void DATA::
+  BINARY2 (const BINARY2_type& x)
+  {
+    this->BINARY2_.set (x);
+  }
+
+  void DATA::
+  BINARY2 (const BINARY2_optional& x)
+  {
+    this->BINARY2_ = x;
+  }
+
+  void DATA::
+  BINARY2 (::std::auto_ptr< BINARY2_type > x)
+  {
+    this->BINARY2_.set (x);
+  }
+
   const DATA::FITS_optional& DATA::
   FITS () const
   {
@@ -2451,6 +2481,34 @@ namespace votable_13
   }
 
   void BINARY::
+  STREAM (::std::auto_ptr< STREAM_type > x)
+  {
+    this->STREAM_.set (x);
+  }
+
+
+  // BINARY2
+  // 
+
+  const BINARY2::STREAM_type& BINARY2::
+  STREAM () const
+  {
+    return this->STREAM_.get ();
+  }
+
+  BINARY2::STREAM_type& BINARY2::
+  STREAM ()
+  {
+    return this->STREAM_.get ();
+  }
+
+  void BINARY2::
+  STREAM (const STREAM_type& x)
+  {
+    this->STREAM_.set (x);
+  }
+
+  void BINARY2::
   STREAM (::std::auto_ptr< STREAM_type > x)
   {
     this->STREAM_.set (x);
@@ -6206,6 +6264,7 @@ namespace votable_13
   : ::xml_schema::type (),
     TABLEDATA_ (::xml_schema::flags (), this),
     BINARY_ (::xml_schema::flags (), this),
+    BINARY2_ (::xml_schema::flags (), this),
     FITS_ (::xml_schema::flags (), this),
     INFO_ (::xml_schema::flags (), this)
   {
@@ -6218,6 +6277,7 @@ namespace votable_13
   : ::xml_schema::type (x, f, c),
     TABLEDATA_ (x.TABLEDATA_, f, this),
     BINARY_ (x.BINARY_, f, this),
+    BINARY2_ (x.BINARY2_, f, this),
     FITS_ (x.FITS_, f, this),
     INFO_ (x.INFO_, f, this)
   {
@@ -6230,6 +6290,7 @@ namespace votable_13
   : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
     TABLEDATA_ (f, this),
     BINARY_ (f, this),
+    BINARY2_ (f, this),
     FITS_ (f, this),
     INFO_ (f, this)
   {
@@ -6274,6 +6335,20 @@ namespace votable_13
         if (!this->BINARY_)
         {
           this->BINARY_.set (r);
+          continue;
+        }
+      }
+
+      // BINARY2
+      //
+      if (n.name () == "BINARY2" && n.namespace_ () == "http://www.ivoa.net/xml/VOTable/v1.3")
+      {
+        ::std::auto_ptr< BINARY2_type > r (
+          BINARY2_traits::create (i, f, this));
+
+        if (!this->BINARY2_)
+        {
+          this->BINARY2_.set (r);
           continue;
         }
       }
@@ -6753,6 +6828,93 @@ namespace votable_13
 
   BINARY::
   ~BINARY ()
+  {
+  }
+
+  // BINARY2
+  //
+
+  BINARY2::
+  BINARY2 (const STREAM_type& STREAM)
+  : ::xml_schema::type (),
+    STREAM_ (STREAM, ::xml_schema::flags (), this)
+  {
+  }
+
+  BINARY2::
+  BINARY2 (::std::auto_ptr< STREAM_type >& STREAM)
+  : ::xml_schema::type (),
+    STREAM_ (STREAM, ::xml_schema::flags (), this)
+  {
+  }
+
+  BINARY2::
+  BINARY2 (const BINARY2& x,
+           ::xml_schema::flags f,
+           ::xml_schema::container* c)
+  : ::xml_schema::type (x, f, c),
+    STREAM_ (x.STREAM_, f, this)
+  {
+  }
+
+  BINARY2::
+  BINARY2 (const ::xercesc::DOMElement& e,
+           ::xml_schema::flags f,
+           ::xml_schema::container* c)
+  : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+    STREAM_ (f, this)
+  {
+    if ((f & ::xml_schema::flags::base) == 0)
+    {
+      ::xsd::cxx::xml::dom::parser< char > p (e, true, false);
+      this->parse (p, f);
+    }
+  }
+
+  void BINARY2::
+  parse (::xsd::cxx::xml::dom::parser< char >& p,
+         ::xml_schema::flags f)
+  {
+    for (; p.more_elements (); p.next_element ())
+    {
+      const ::xercesc::DOMElement& i (p.cur_element ());
+      const ::xsd::cxx::xml::qualified_name< char > n (
+        ::xsd::cxx::xml::dom::name< char > (i));
+
+      // STREAM
+      //
+      if (n.name () == "STREAM" && n.namespace_ () == "http://www.ivoa.net/xml/VOTable/v1.3")
+      {
+        ::std::auto_ptr< STREAM_type > r (
+          STREAM_traits::create (i, f, this));
+
+        if (!STREAM_.present ())
+        {
+          this->STREAM_.set (r);
+          continue;
+        }
+      }
+
+      break;
+    }
+
+    if (!STREAM_.present ())
+    {
+      throw ::xsd::cxx::tree::expected_element< char > (
+        "STREAM",
+        "http://www.ivoa.net/xml/VOTable/v1.3");
+    }
+  }
+
+  BINARY2* BINARY2::
+  _clone (::xml_schema::flags f,
+          ::xml_schema::container* c) const
+  {
+    return new class BINARY2 (*this, f, c);
+  }
+
+  BINARY2::
+  ~BINARY2 ()
   {
   }
 
@@ -9540,6 +9702,19 @@ namespace votable_13
       s << *i.BINARY ();
     }
 
+    // BINARY2
+    //
+    if (i.BINARY2 ())
+    {
+      ::xercesc::DOMElement& s (
+        ::xsd::cxx::xml::dom::create_element (
+          "BINARY2",
+          "http://www.ivoa.net/xml/VOTable/v1.3",
+          e));
+
+      s << *i.BINARY2 ();
+    }
+
     // FITS
     //
     if (i.FITS ())
@@ -9673,6 +9848,24 @@ namespace votable_13
 
   void
   operator<< (::xercesc::DOMElement& e, const BINARY& i)
+  {
+    e << static_cast< const ::xml_schema::type& > (i);
+
+    // STREAM
+    //
+    {
+      ::xercesc::DOMElement& s (
+        ::xsd::cxx::xml::dom::create_element (
+          "STREAM",
+          "http://www.ivoa.net/xml/VOTable/v1.3",
+          e));
+
+      s << i.STREAM ();
+    }
+  }
+
+  void
+  operator<< (::xercesc::DOMElement& e, const BINARY2& i)
   {
     e << static_cast< const ::xml_schema::type& > (i);
 

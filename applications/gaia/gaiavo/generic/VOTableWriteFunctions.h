@@ -73,9 +73,20 @@ int data_tabledata( const NS::TABLE& table, const NS::TABLEDATA& tdata,
                     int& ra_index, bool& ra_radians, string& ra_unit,
                     int& dec_index, bool& dec_radians, string& dec_unit );
 
-int data_binarydata( const NS::TABLE& table, const NS::BINARY& bdata,
+#if NSVERS == 13
+int data_binarydata2( bool binary2, const NS::TABLE& table, const NS::BINARY2& bdata,
+                      ofstream& out, int& id_index, int& ra_index,
+                      bool& ra_radians, int& dec_index, bool& dec_radians );
+#endif
+int data_binarydata( bool binary2, const NS::TABLE& table, const NS::BINARY& bdata,
                      ofstream& out, int& id_index, int& ra_index,
                      bool& ra_radians, int& dec_index, bool& dec_radians );
+
+int data_binarystream( bool binary2, const NS::TABLE& table, 
+                       const string& stream, const string& encoding,
+                       NS::STREAM::href_optional& href,
+                       ofstream& out, int& id_index, int& ra_index,
+                       bool& ra_radians, int& dec_index, bool& dec_radians );
 
 int data_fitsdata( const NS::FITS& fdata, ofstream& out, int& id_index,
                    int& ra_index, bool& ra_radians, int& dec_index,

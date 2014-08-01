@@ -490,7 +490,7 @@ distdir:
 #============================================================================
 
 VOTable1.1.C: VOTable1.1.xsd
-	xsd cxx-tree --root-element VOTABLE \
+	xsdcxx cxx-tree --root-element VOTABLE \
 	    --generate-serialization \
 	    --namespace-map http://www.ivoa.net/xml/VOTable/v1.1=votable_11 \
 	    --parser-regex '/VOTABLE/VOTABLE_read/' \
@@ -504,7 +504,7 @@ VOTable1.1.C: VOTable1.1.xsd
 
 #  Note no serialization support for this. Do not want to write these.
 VOTable1.1_dns.C: VOTable1.1_dns.xsd
-	xsd cxx-tree --root-element VOTABLE \
+	xsdcxx cxx-tree --root-element VOTABLE \
 	    --namespace-map '=votable_11_dns' \
 	    --parser-regex '/VOTABLE/VOTABLE_read/' \
 	    --generate-wildcard \
@@ -515,7 +515,7 @@ VOTable1.1_dns.C: VOTable1.1_dns.xsd
 	mv VOTable1.1_dns.hxx generic/VOTable1.1_dns.hxx
 
 VOTable1.2.C: VOTable1.2.xsd
-	xsd cxx-tree --root-element VOTABLE \
+	xsdcxx cxx-tree --root-element VOTABLE \
 	    --generate-serialization \
 	    --namespace-map http://www.ivoa.net/xml/VOTable/v1.2=votable_12 \
 	    --parser-regex '/VOTABLE/VOTABLE_read/' \
@@ -526,6 +526,19 @@ VOTable1.2.C: VOTable1.2.xsd
 	mv VOTable1.2.cxx generic/VOTable1.2.C
 	rm -f generic/VOTable1.2.hxx
 	mv VOTable1.2.hxx generic/VOTable1.2.hxx
+
+VOTable1.3.C: VOTable1.3.xsd
+	xsdcxx cxx-tree --root-element VOTABLE \
+	    --generate-serialization \
+	    --namespace-map http://www.ivoa.net/xml/VOTable/v1.3=votable_13 \
+	    --parser-regex '/VOTABLE/VOTABLE_read/' \
+	    --serializer-regex '/VOTABLE/VOTABLE_write/' \
+	    --generate-wildcard \
+	    VOTable1.3.xsd
+	rm -f generic/VOTable1.3.C
+	mv VOTable1.3.cxx generic/VOTable1.3.C
+	rm -f generic/VOTable1.3.hxx
+	mv VOTable1.3.hxx generic/VOTable1.3.hxx
 
 #  Local dependencies.
 VOTableWriteFunctions.o: ./generic/VOTableWriteFunctions.icc
