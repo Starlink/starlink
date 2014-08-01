@@ -3,7 +3,7 @@
 
 % ------------------------------------------------------------------------
 % starlink set up
-\title{SUN/258}
+%\title{SUN/258}
 \stardoccategory  {Starlink User Note}
 \stardocinitials  {SUN}
 \stardoccopyright{Copyright \copyright\ 2012 University of British Columbia \& the Science \& Technology Facilities Council}
@@ -258,10 +258,9 @@ The main (top-level) components are:
 \item Raw data units (K for ACSIS, adu (possibly as compressed integers) for raw SCUBA-2 data,
   pW for flatfielded SCUBA-2 data).
 \end{itemize}
-For ACSIS, the raw data are stored as $N_{\rm chan} \times N_{\rm
-  receptors} \times N_{\rm samp}$, while SCUBA-2 data are stored as
-$N_{\rm columns} \times N_{\rm rows} \times N_{\rm samp}$, where
-$N_{\rm samp}$ is the number of time samples in a file.
+For ACSIS, the raw data are stored as $N_{\textrm{chan}} \times N_{\textrm{receptors}} \times N_{\textrm{samp}}$, while SCUBA-2 data are stored as
+$N_{\textrm{columns}} \times N_{\textrm{rows}} \times N_{\textrm{samp}}$, where
+$N_{\textrm{samp}}$ is the number of time samples in a file.
 
 The files also contain additional NDF components common to both
 instruments:
@@ -370,9 +369,8 @@ more fully in the \htmladdnormallink{\em ACSIS Data Reduction
 \subsection{The makecube command}
 
 The central step in the reduction of ACSIS data is the conversion of one
-or more time-series cubes with {\tt [spectral channel number, receptor
-index, time-slice index]} axes, into a spatial cube with {\tt
-[RA, Dec, spectral channel number]} axes\footnote{The RA and Dec axes may
+or more time-series cubes with \texttt{[spectral channel number, receptor
+index, time-slice index]} axes, into a spatial cube with \texttt{[RA, Dec, spectral channel number]} axes\footnote{The RA and Dec axes may
 be replaced by axes appropriate for other celestial co-ordinate
 systems.}. This step is accomplished using the \makecube\ command.
 
@@ -606,7 +604,7 @@ To emphasize a number of issues:
 \item {\em ONLY for Gaussians} do the fitted parameters correspond
   {\em exactly} to amplitude, centre, and FWHM! For the other functions
   such correspondence does not exist: while they are related, the
-  numerical values are not exact. Users are {\bf strongly cautioned} to
+  numerical values are not exact. Users are \textbf{strongly cautioned} to
   keep this in mind. The above-mentioned help for ``fitting\_functions''
   outlines the exact relations.
 \item The fitted ``gauss*'' functions can in principle be mixed along a
@@ -682,9 +680,9 @@ fitted, with each representing a fitted parameter:
          2 = fit error: (see help fit1d)
 \end{terminalv}
 
-Thus, for Gaussian fits \ndfcomp{OUTFILE.MORE.SMURF\_FIT1D.COMP\_1(,,1)} is
+Thus, for Gaussian fits \ndfcomp{OUTFILE.MORE.SMURF\_FIT1D.COMP\_1(,\phantom{},1)} is
 an image of the fitted amplitudes of Component 1 of each profile,
-while \ndfcomp{OUTFILE.MORE.SMURF\_FIT1D.COMP\_1(,,3)} shows the fitted FWHMs
+while \ndfcomp{OUTFILE.MORE.SMURF\_FIT1D.COMP\_1(,\phantom{},3)} shows the fitted FWHMs
 across the field-of-view.
 
 Much of the (anticipated) use of \fitdd\ derives from the fact that
@@ -850,8 +848,7 @@ The output from processing a FLATFIELD observation is a data file
 solution in the NDF extension \texttt{.MORE.SCUBA2.FLATCAL}, the same
 location as for the raw data. The main data array for this output file
 is a three-dimensional array containing the reference-subtracted
-measurements for each heater setting ($N_{\rm row}\times N_{\rm
-  column} \times N_{\rm heat}$).
+measurements for each heater setting ($N_{\textrm{row}}\times N_{\textrm{column}} \times N_{\textrm{heat}}$).
 
 In addition to generating the flatfield solution, \calcflat\ can also
 create a responsivity image for the current subarray. The
@@ -951,7 +948,7 @@ and its offset from a one-to-one relationship with the input
 radiation. Thus the output power from bolometer $i$ is related to the
 input (optical) power by:
 \begin{equation}
-P_{{\rm out},i} = G_i P_{{\rm in},i} + O_i.
+P_{{\textrm{out}},i} = G_i P_{{\textrm{in}},i} + O_i.
 \end{equation}
 where $G$ is the gain and $O$ is the offset.
 
@@ -1038,42 +1035,40 @@ there is more atmosphere along the line of sight between the source
 and the telescope.
 
 The radiation received by SCUBA-2 is the sum of the radiation from the
-astronomical source (represented by $I_{\rm src}$ in Equation
-\ref{eq:iobs} below) and the radiation from the atmosphere ($I_{\rm
-  atm}$). However, $I_{\rm src}$ is diminished by the optical depth
+astronomical source (represented by $I_{\textrm{src}}$ in Equation
+\ref{eq:iobs} below) and the radiation from the atmosphere ($I_{\textrm{atm}}$). However, $I_{\textrm{src}}$ is diminished by the optical depth
 of the atmosphere ($\tau$) as follows:
 \begin{equation}
-I_{\rm obs} = I_{\rm atm} + I_{\rm src} \exp(-\tau).
+I_{\textrm{obs}} = I_{\textrm{atm}} + I_{\textrm{src}} \exp(-\tau).
 \label{eq:iobs}
 \end{equation}
 The optical depth is usually quoted as the value at the zenith
-($\tau_{\rm zenith}$), but you need the value of tau at the same
-elevation as your observations ($\tau_{\rm obs}$). For a
-plane-parallel atmosphere, $\tau_{\rm obs} = A \times \tau_{\rm
-  zenith}$, where airmass ($A$) is a measure of the total atmosphere
+($\tau_{\textrm{zenith}}$), but you need the value of tau at the same
+elevation as your observations ($\tau_{\textrm{obs}}$). For a
+plane-parallel atmosphere, $\tau_{\textrm{obs}} = A \times \tau_{\textrm{zenith}}$, where airmass ($A$) is a measure of the total atmosphere
 along the line of sight.
 
 Airmass is defined as $1 / \cos \theta$, where $\theta$ is the zenith
 angle. The zenith angle is the vertical angle measured from the zenith
 ($\theta = 0^\circ$) towards the horizon ($\theta = 90^\circ$) and is
 thus equal to $90-\phi$, where $\phi$ is the elevation. You can now
-calculate $\tau_{\rm obs}$ from $\tau_{\rm zenith}$ and $\phi$ as
+calculate $\tau_{\textrm{obs}}$ from $\tau_{\textrm{zenith}}$ and $\phi$ as
 follows:
 \begin{equation}
-\tau_{\rm obs} = \tau_{\rm zenith} / \cos(90^\circ - \phi ).
+\tau_{\textrm{obs}} = \tau_{\textrm{zenith}} / \cos(90^\circ - \phi ).
 \label{eq:tau}
 \end{equation}
 
 Using Equation \ref{eq:tau}, rewrite Equation \ref{eq:iobs} as:
 \begin{equation}
-I_{\rm obs} = I_{\rm atm} + I_{\rm src} \exp \left(
-\frac{-\tau_{\rm zenith}}{\cos(90^\circ-\phi)}\right).
+I_{\textrm{obs}} = I_{\textrm{atm}} + I_{\textrm{src}} \exp \left(
+\frac{-\tau_{\textrm{zenith}}}{\cos(90^\circ-\phi)}\right).
 \end{equation}
 %The top graph in Figure ??? shows how the observed signal varies with elevation
 %and airmass.
 
 The elevation angle of each bolometer can be calculated, and given
-$\tau_{\rm zenith}$ \remsky\ calculates the $\tau_{\rm obs}$ at the
+$\tau_{\textrm{zenith}}$ \remsky\ calculates the $\tau_{\textrm{obs}}$ at the
 elevation angle of each bolometer.
 
 The zenith optical depth can be obtained via three methods:
@@ -1084,20 +1079,18 @@ The zenith optical depth can be obtained via three methods:
   process SCUBA-2 skydips.
 
 \item CSO tipping radiometer: The Caltech Submillimeter Observatory
-  (CSO) radiometer measures $\tau_{\rm zenith}$ from skydip
-  observations at 225 GHz. The CSO radiometer records a new $\tau_{\rm
-    zenith}$ every 10 minutes and values are stored in the FITS
+  (CSO) radiometer measures $\tau_{\textrm{zenith}}$ from skydip
+  observations at 225 GHz. The CSO radiometer records a new $\tau_{\textrm{zenith}}$ every 10 minutes and values are stored in the FITS
   headers corresponding to the start and end timestamps of the file
   (\texttt{TAU225ST} and \texttt{TAU225EN}). \SMURF\ converts CSO
-  $\tau_{\rm zenith}$ to $\tau_{\rm zenith}$ at 450 or 850 $\mu$m,
-  relying on an empirical relationship between $\tau_{\rm zenith}$ at
-  225 GHz and $\tau_{\rm zenith}$ at 450 or 850 $\mu$m.
+  $\tau_{\textrm{zenith}}$ to $\tau_{\textrm{zenith}}$ at 450 or 850 $\mu$m,
+  relying on an empirical relationship between $\tau_{\textrm{zenith}}$ at
+  225 GHz and $\tau_{\textrm{zenith}}$ at 450 or 850 $\mu$m.
 
 \item JCMT Water Vapour Monitor: The JCMT Water Vapour Monitor (WVM)
   provides opacity estimates every 1.2 seconds by measuring the
   spectral shape of the 183 GHz water line along the telescope
-  line-of-sight, and then converting this to an effective $\tau_{\rm
-    zenith}$ at 225 GHz. Since the measurement is aligned with the
+  line-of-sight, and then converting this to an effective $\tau_{\textrm{zenith}}$ at 225 GHz. Since the measurement is aligned with the
   submillimetre beam this method circumvents the need to apply the
   plane parallel approximation (which breaks down at the horizon). The
   raw WVM data are stored in the JCMT state structure, though the
@@ -1110,7 +1103,7 @@ variable atmospheric conditions where the CSO radiometer may not be
 giving sufficiently-frequent readings.
 
 The \SMURF\ routine that corrects for atmospheric extinction is called
-\extinction. The \extinction\ routine can use $\tau_{\rm zenith}$
+\extinction. The \extinction\ routine can use $\tau_{\textrm{zenith}}$
 determined by all of the above methods, and obtains values
 automatically from the FITS headers for the WVM and CSO cases or uses
 the raw WVM data if desired.
@@ -1386,21 +1379,20 @@ and $DKS$ signals described above. Therefore we express the residual
 noise as
 %
 \begin{equation}
-N^i(t) = N^i_{\rm w}(t) + N^i_{\rm lf}(t),
+N^{i}(t) = N^i_{\textrm{w}}(t) + N^i_{\textrm{lf}}(t),
 \label{eq:dimm_noise}
 \end{equation}
 %
-where $N^i_{\rm w}(t)$ and $N^i_{\rm lf}(t)$ are the white and
+where $N^{i}_{\textrm{w}}(t)$ and $N^{i}_{\textrm{lf}}(t)$ are the white and
 independent low-frequency noise components, respectively. The DIMM can
-attempt to fit $N^i_{\rm lf}(t)$ using the $FLT$ model component such
-that the residual signal is given only by $N^i_{\rm w}(t)$.
+attempt to fit $N^{i}_{\textrm{lf}}(t)$ using the $FLT$ model component such
+that the residual signal is given only by $N^{i}_{\textrm{w}}(t)$.
 
 The strategy used by the DIMM is to estimate each of the signal
 components sequentially, roughly in order of decreasing amplitude. At
 the end of this procedure a numerical value proportional to $\chi^2$
 (quantifying the mismatch between the model and the data) is
-calculated from the r.m.s. in the residual noise $N^i_{\rm
-  w}(t)$. Provided that the model components are in some sense
+calculated from the r.m.s. in the residual noise $N^{i}_{\textrm{w}}(t)$. Provided that the model components are in some sense
 `orthogonal', multiple iterations of this procedure produces improved
 estimates of each component with stable convergence properties. This
 can be checked by monitoring the value of $\chi^2$: if the change
@@ -1489,7 +1481,7 @@ below:
 \item[5. Fit post-map estimate models:] Once the map has been
   estimated and the astronomical signal removed from the data, the
   residual should contain only noise. However, this signal often
-  contains a weak drift ($N_{\rm lf}$ in Eq.~\ref{eq:dimm_noise}) that
+  contains a weak drift ($N_{\textrm{lf}}$ in Eq.~\ref{eq:dimm_noise}) that
   is independent from one detector to the next. By specifying the
   $FLT$ model component after $AST$, it is possible to remove this
   component using, for example, a low-pass filter. It is advisable to
@@ -1511,7 +1503,7 @@ below:
   the CHITOL value specified in the configuration file. In the latter
   case, $\chi^2$ is calculated in the following way. In the first
   iteration, $NOI$ estimates the white-noise contribution to the
-  r.m.s., $\sigma_{\rm w}$, in each detector directly from the flat
+  r.m.s., $\sigma_{\textrm{w}}$, in each detector directly from the flat
   part of their power spectra (presently defined over the frequency
   range 2 to 10 Hz). If any astronomical signal, or low-frequency
   signal components are present in the data, the r.m.s.\ of the data
@@ -1519,12 +1511,12 @@ below:
   power spectrum). However, as the solution converges, the residual
   signal should slowly approach a white noise distribution, once the
   other signal components are estimated and removed. $\chi^2$ is
-  therefore calculated as $(1/N) \sum_i[ r_i^2/\sigma^2_{\rm w}]$,
+  therefore calculated as $(1/N) \sum_i[ r_i^2/\sigma^2_{\textrm{w}}]$,
   where $r_i$ is the $i$th residual sample for a given detector, and
   $N$ is the total number of samples for that detector. This number,
   averaged over all samples and detectors, should tend to 1 as the
   solution converges, although in practice it will be off by some
-  factor related to the bandwidth used to calculate $\sigma_{\rm w}$.
+  factor related to the bandwidth used to calculate $\sigma_{\textrm{w}}$.
 
   The final map estimate, the model signal components, and the
   residual signal may then all be exported to files for examination
@@ -2188,7 +2180,7 @@ functions as follows.
 
 {\large
 \begin{center}
-{\bf General Purpose}
+\textbf{General Purpose}
 \end{center}
 }
 
@@ -2207,7 +2199,7 @@ Stack multiple 2-d images into a 3d cube, optionally sorted by time.
 
 {\large
 \begin{center}
-{\bf SCUBA-2 Data Processing}
+\textbf{SCUBA-2 Data Processing}
 \end{center}
 }
 
@@ -2280,7 +2272,7 @@ Copy a 2d image out of a time series file.
 
 {\large
 \begin{center}
-{\bf ACSIS Data Processing}
+\textbf{ACSIS Data Processing}
 \end{center}
 }
 
@@ -2301,7 +2293,7 @@ Retrieve TSYS (or TRX) from ACSIS data files.
 
 {\large
 \begin{center}
-{\bf Data Import}
+\textbf{Data Import}
 \end{center}
 }
 
@@ -2316,7 +2308,7 @@ Retrieve TSYS (or TRX) from ACSIS data files.
 
 {\large
 \begin{center}
-{\bf SCUBA-2 Simulations}
+\textbf{SCUBA-2 Simulations}
 \end{center}
 }
 
@@ -2568,7 +2560,7 @@ as additional lines of median, mean and standard deviation.
       the state information to standard out. The output file is in TST
       format and can be read into the TOPCAT application (but may
       require that TOPCAT is told explicitly that the catalogue is in
-      TST format, e.g. with the {\tt "}-f tst{\tt "} command line option).
+      TST format, e.g. with the \texttt{"}-f tst\texttt{"} command line option).
 
       This information includes the telescope pointing position (Actual,
       Demand and Base) in both the tracking system and AZEL coordinate
