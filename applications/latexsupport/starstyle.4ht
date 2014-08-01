@@ -31,8 +31,26 @@
 
 %\Configure{section}{\empty}{\empty}{\HCode{<h3>}\my:prevlink}{\my:nextlink\HCode{</h3>}}
 \Configure{crosslinks}{[}{]}{}{}{tail-prev}{head}{tail}{}
-\Configure{crosslinks+}{[\hyperlink{toc}{toc}]\my:prevlink\my:nextlink}{}{[\hyperlink{toc}{toc}]\my:prevlink\my:nextlink}{}
-\empty
+
+% Following code slightly altered from html4.4ht:
+\Configure{crosslinks+}
+   {\IgnorePar\EndP\HCode{<!--l. \the\inputlineno-->%
+%
+                          <div class="crosslinks"><p class="noindent">}[\hyperlink{toc}{toc}]\my:prevlink\my:nextlink}
+   {\HCode{</p></div>}\par\ShowPar}
+   {\ifvmode \IgnorePar\fi\EndP
+\ifvoid \fn:box\else
+   \HCode{<div class="footnotes">}\box\fn:box\HCode{</div>}
+   \IgnorePar\EndP
+\fi
+%
+    \ifvmode \IgnorePar\fi \EndP
+    \HCode{<!--l. \the\inputlineno-->%
+%
+            <div class="crosslinks"><p class="noindent">}[\hyperlink{toc}{toc}]\my:prevlink\my:nextlink}
+   {\HCode{</p></div>}\par\ShowPar}
+%\Configure{crosslinks+}{[\hyperlink{toc}{toc}]\my:prevlink\my:nextlink}{}{[\hyperlink{toc}{toc}]\my:prevlink\my:nextlink}{}
+%\empty
 
 % add a label to table of contens
 %\Configure{tableofcontents} {\hypertarget{toc}{}} {} {} {} {}
