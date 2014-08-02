@@ -319,6 +319,7 @@ STAR_PAL_FILES = \
     pal/palRvlsrk.c \
     pal/palSubet.c \
     pal/palSupgal.c \
+    pal/pal1sofa.h \
     pal/palmac.h
 
 ERFA_FILES = \
@@ -459,6 +460,7 @@ ERFA_FILES = \
     erfa/pvup.c \
     erfa/pvxpv.c \
     erfa/pxp.c \
+    erfa/refco.c \
     erfa/rm2v.c \
     erfa/rv2m.c \
     erfa/rx.c \
