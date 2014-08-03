@@ -242,6 +242,7 @@
 #include "erfa/pvup.c"
 #include "erfa/pvxpv.c"
 #include "erfa/pxp.c"
+#include "erfa/refco.c"
 #include "erfa/rm2v.c"
 #include "erfa/rv2m.c"
 #include "erfa/rx.c"

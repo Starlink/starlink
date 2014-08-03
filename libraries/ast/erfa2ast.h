@@ -206,6 +206,7 @@
 #define eraPvu	   astEraPvu
 #define eraPvup	   astEraPvup
 #define eraPvxpv   astEraPvxpv
+#define eraRefco   astEraRefco
 #define eraS00	   astEraS00
 #define eraS00a	   astEraS00a
 #define eraS00b	   astEraS00b
