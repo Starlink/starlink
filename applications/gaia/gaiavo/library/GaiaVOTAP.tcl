@@ -145,7 +145,7 @@ itcl::class gaiavo::GaiaVOTAP {
             -command [code $this query_done] \
             -gaiactrl [$itk_option(-gaia) get_image]
       }
-      pack $itk_component(tap) -side top -fill x
+      pack $itk_component(tap) -side top -fill x -expand 1
       add_short_help $itk_component(tap) \
          {Controls for querying the TAP service}
 
@@ -162,31 +162,6 @@ itcl::class gaiavo::GaiaVOTAP {
    #  table.
    protected method open_service_ {args} {
       #  Do nothing.
-   }
-
-   #  Extract the accessURL for the TAP service from a list of headers and the
-   #  associated data row. 
-   public proc getAccessURL {headers row} {
-      puts "headers = $headers"
-      puts "$row"
-      eval lassign "$row" $headers
-      if { [info exists accessURL] } {
-         return $accessURL
-      }
-      return {}
-   }
-
-   #  Extract a name for TAP service from a list of headers and the associated
-   #  data row. 
-   public proc getName {headers row} {
-      eval lassign "$row" $headers
-      if { [info exists shortName] && $shortName != {} } {
-         return $shortName
-      }
-      if { [info exists title] } {
-         return $title
-      }
-      return {}
    }
 
    #  Plot the RA and Dec positions on the image using the defined symbols.
@@ -402,12 +377,6 @@ itcl::class gaiavo::GaiaVOTAP {
 
    #  Configuration options: (public variables)
    #  ----------------------
-
-   #  The shortname of the service.
-   itk_option define -shortname shortname ShortName {}
-
-   #  The URL for the TAP service.
-   itk_option define -accessURL accessURL AccessURL {}
 
    #  Instance of GAIA to display the catalogue.
    itk_option define -gaia gaia Gaia {} {

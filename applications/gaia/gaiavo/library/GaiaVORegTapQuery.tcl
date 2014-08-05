@@ -66,6 +66,15 @@
 
 itcl::class gaiavo::GaiaVORegTapQuery {
 
+   #  Singleton entry point:
+   #  ----------------------
+   proc instance {} {
+      if { $instance_ == {} } {
+         set instance_ [GaiaVORegTapQuery ::\#auto]
+      }
+      return $instance_
+   }
+
    #  Inheritances:
    #  -------------
 
@@ -85,24 +94,29 @@ itcl::class gaiavo::GaiaVORegTapQuery {
    #  Methods:
    #  --------
 
+   #  Return the service type.
+   public method get_type {} {
+      return "RegTAP"
+   }
+
    #  Get ADQL for list of TAP servers.
-   public proc get_taps {{substring {}}} {
+   public method get_taps_query {{substring {}}} {
       return [get_servers ivo://ivoa.net/std/tap $substring]
    }
 
    #  Get ADQL for list of conesearch servers.
-   public proc get_taps {{substring {}}} {
+   public method get_cones_query {{substring {}}} {
       return [get_servers ivo://ivoa.net/std/ConeSearch $substring]
    }
 
    #  Get ADQL to get list of SIA servers, qualified by some optional string
    #  that should be in a descriptive content element. 
-   public proc get_sias {{substring {}}} {
+   public method get_sias_query {{substring {}}} {
       return [get_servers ivo://ivoa.net/std/sia $substring]
    }
 
    #  Get ADQL to get list of registries.
-   public proc get_registries {} {
+   public method get_registries_query {} {
       set query {}
       append query "SELECT access_url "
       append query "FROM rr.interface "
@@ -119,7 +133,7 @@ itcl::class gaiavo::GaiaVORegTapQuery {
    #  Get ADQL to get list of servers with the given standard_id, qualified by
    #  some optional string that should be in a descriptive content element. 
    #  XXX only apply subtring to some elements.
-   public proc get_servers {standard_id {substring {}}} {
+   public method get_servers_query {standard_id {substring {}}} {
       set query {}
       append query "SELECT ivoid, short_name, res_title, reference_url, base_role, role_name, "
       append query    "email, intf_index, access_url, standard_id, cap_type, cap_description, "
@@ -148,22 +162,99 @@ itcl::class gaiavo::GaiaVORegTapQuery {
       return $query
    }
    
+   #  Get the default registry endpoints. Returns a list of pairs of values,
+   #  a symbolic name followed by the endpoint.
+   public method get_registries {} {
+      return [::array get registries_]
+   }
+
+   #  Add a new registry to the default list. Not peristent.
+   public method add_registry {shortname url} {
+      set registries_($shortname) $url
+   }
+
+   #  Get the "default" registry.
+   public method default_registry {} {
+      return [list GAVO_AIP $registries_(GAVO_AIP)]
+   }
+
+   #  Get the standard id for a service type shortname.
+   public method get_standard_id {name} {
+      return $standardIDs_($name)
+   }
+
+   #  Get the default columns to show.
+   public method default_columns {} {
+      return "$default_columns_"
+   }
+
+   #  Extract the access url from a row of values. The headers are the 
+   #  names of the associated columns.
+   public method get_access_url {headers row} {
+      eval lassign "$row" $headers
+      if { [info exists access_url] } {
+         return $access_url
+      }
+      return {}
+   }
+
+   #  Extract a name for a service from a row of values. The headers are the
+   #  names of the associated columns.
+   public method get_name {headers row} {
+      eval lassign "$row" $headers
+      if { [info exists short_name] && $short_name != {} } {
+         return $short_name
+      }
+      if { [info exists res_title] } {
+         return $res_title
+      }
+      return {}
+   }
+
+   #  Extract the IVOA identifier for the service from a list of headers
+   #  and the associated data row.
+   public method get_identifier {headers row} {
+      eval lassign "$row" $headers
+      if { [info exists ivoid] } {
+         return $ivoid
+      }
+      return {}
+   }
+
    #  Configuration options: (public variables)
    #  ----------------------
-
 
    #  Common variables: (shared by all instances)
    #  -----------------
 
-   #  Known RegTAP servers. Needed to boot this process.
-   public common registries
+   #  The instance of this class.
+   protected common instance_ {}
 
-   #  TAP endpoint for GAVO registry currently hosted at ARI Heidelberg
-   set registries(ARI) "http://dc.g-vo.org/tap"
+   #  Known RegTAP servers. Needed to boot this process.
+   protected common registries_
 
    #  TAP endpoint for GAVO registry hosted at AIP.
-   set registries(AIP) "http://gavo.aip.de/tap"
+   set registries_(GAVO_AIP) "http://gavo.aip.de/__system__/tap/run/tap"
 
+   #  TAP endpoint for GAVO registry currently hosted at ARI Heidelberg
+   set registries_(GAVO_ARI) "http://dc.zah.uni-heidelberg.de/__system__/tap/run/tap"
+
+   #  Mapping of short service names to their standard ids. Yes these differ
+   #  in case from RI1.0...
+   protected common standardIDs_
+   set standardIDs_(SIAP) "ivo://ivoa.net/std/sia"
+   set standardIDs_(SSAP) "ivo://ivoa.net/std/ssa"
+   set standardIDs_(CONE) "ivo://ivoa.net/std/conesearch"
+   set standardIDs_(TAP)  "ivo://ivoa.net/std/tap"
+
+   #  Default columns to show in table views.
+   protected common default_columns_ "short_name res_title"
+
+   #  Useful columns.
+   protected common columns_  \
+      "ivoid short_name res_title reference_url base_role role_name email \
+   intf_index access_url standard_id cap_type cap_description std_version \
+   res_subjects"
 
 #  End of class definition.
 }

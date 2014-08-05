@@ -99,17 +99,17 @@ itcl::class gaiavo::GaiaVOTAPQuery {
       pack $itk_component(service) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(service) "The TAP service"
 
-      #  Get the ADQL text.
-      itk_component add adql {
-         LabelEntry $w_.adql \
-            -text "Query:" \
-            -labelwidth $lwidth \
-            -valuewidth $vwidth \
-            -command [code $this adql_query_]
+      #  Get the ADQL query.
+      itk_component add adqlframe {
+         iwidgets::scrolledtext $w_.adql \
+            -labeltext "ADQL Query" \
+            -wrap none \
+            -vscrollmode static \
+            -hscrollmode dynamic
       }
-      pack $itk_component(adql) -side top -fill x -ipadx 1m -ipady 1m
-      add_short_help $itk_component(adql) \
-         {ADQL query, press <Return> to activate}
+
+      pack $itk_component(adqlframe) -side top -fill x -ipadx 1m -ipady 1m
+      add_short_help $itk_component(adqlframe) {ADQL query, press Query button to activate}
    }
 
    #  Destructor:
@@ -142,7 +142,7 @@ itcl::class gaiavo::GaiaVOTAPQuery {
       }
       set votable_ [$tempcats_ get_typed_name ".vot"]
       set interrupted_ 0
-      set query [$itk_component(adql) get]
+      set query [$itk_component(adqlframe) get 1.0 end]
       $querytask_ runwith $itk_option(-accessURL) $query $votable_
    }
 

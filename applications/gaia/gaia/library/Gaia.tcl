@@ -2167,7 +2167,6 @@ itcl::class gaia::Gaia {
             file copy -force $config_file ${backupname}
          }
          file copy -force $gaia_library/skycat2.0.cfg $config_file
-         puts "file copy -force $gaia_library/skycat2.0.cfg $config_file"
 
          #  Make a directory entry that accesses the old configs.
          if { $backupname != "" } {
@@ -2599,10 +2598,10 @@ window gives you access to this."
 
          #  See if the given headers and row data specify a SIAP server.
          #  Need a accessURL field for that.
-         set accessURL [gaiavo::GaiaVOCatSIAP::getAccessURL $headers $row]
+         set accessURL [gaiavo::GaiaVOCat::getAccessURL $headers $row]
          if { $accessURL != {} } {
-            set name [gaiavo::GaiaVOCatSIAP::getName $headers $row]
-            set id [gaiavo::GaiaVOCatSIAP::getIdentifier $headers $row]
+            set name [gaiavo::GaiaVOCat::getName $headers $row]
+            set id [gaiavo::GaiaVOCat::getIdentifier $headers $row]
             gaiavo::GaiaVOCatSIAP $w_.siapquery\#auto \
                -accessURL $accessURL \
                -identifier $id \
@@ -2645,9 +2644,9 @@ window gives you access to this."
 
          #  See if the given headers and row data specify a Cone
          #  server. Need a accessURL field for that.
-         set accessURL [gaiavo::GaiaVOCatCone::getAccessURL $headers $row]
+         set accessURL [gaiavo::GaiaVOCat::getAccessURL $headers $row]
          if { $accessURL != {} } {
-            set name [gaiavo::GaiaVOCatCone::getName $headers $row]
+            set name [gaiavo::GaiaVOCat::getName $headers $row]
             gaiavo::GaiaVOCatCone $w_.conequery\#auto \
                -accessURL $accessURL \
                -shortname $name \
@@ -2671,7 +2670,6 @@ window gives you access to this."
             -catalog $tap_file \
             -service TAP \
             -title "TAP server queries" \
-            -show_cols {shortName title} \
             -activate_cmd [code $this vo_query_tap_] \
             -whole_operation 0 \
             -help_file tap
@@ -2686,9 +2684,9 @@ window gives you access to this."
 
          #  See if the given headers and row data specify a TAP
          #  service. Need a URL resource for that.
-         set accessURL [gaiavo::GaiaVOTAP::getAccessURL $headers $row]
+         set accessURL [gaiavo::GaiaVOCat::getAccessURL $headers $row]
          if { $accessURL != {} } {
-            set name [gaiavo::GaiaVOTAP::getName $headers $row]
+            set name [gaiavo::GaiaVOCat::getName $headers $row]
             gaiavo::GaiaVOTAP $w_.tap\#auto \
                -accessURL $accessURL \
                -shortname $name \

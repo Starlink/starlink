@@ -170,6 +170,7 @@ itcl::class gaiavo::GaiaVOCatRegistry {
             -feedbackcommand  [code $this set_feedback] \
             -command [code $this query_done] \
             -query_cmd [code $this query] \
+            -show_cols_cmd [code $this set_show_cols] \
             -service $itk_option(-service)
       }
       pack $itk_component(registry) -side top -fill x
@@ -231,7 +232,7 @@ itcl::class gaiavo::GaiaVOCatRegistry {
    #  The type of operation, whole or row.
    itk_option define -whole_operation whole_operation Whole_Operation 1
 
-   #  The type of services to query for - SSAP, SIAP, ConeSearch.
+   #  The type of services to query for - SSAP, SIAP, ConeSearch, TAP.
    itk_option define -service service Service SIAP
 
    #  GaiaVOBlacklist instance that manages the blacklist for the services.

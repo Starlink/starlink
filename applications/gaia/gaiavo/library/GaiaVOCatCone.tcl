@@ -201,29 +201,6 @@ itcl::class gaiavo::GaiaVOCatCone {
       #  Do nothing.
    }
 
-   #  Extract the accessURL for the Cone Search service from a list of headers
-   #  and the associated data row.
-   public proc getAccessURL {headers row} {
-      eval lassign "$row" $headers
-      if { [info exists accessURL] } {
-         return $accessURL
-      }
-      return {}
-   }
-
-   #  Extract a name for Cone Search service from a list of headers
-   #  and the associated data row.
-   public proc getName {headers row} {
-      eval lassign "$row" $headers
-      if { [info exists shortName] && $shortName != {} } {
-         return $shortName
-      }
-      if { [info exists title] } {
-         return $title
-      }
-      return {}
-   }
-
    #  Plot the RA and Dec positions on the image using the defined symbols.
    public method plot {} {
 
@@ -437,12 +414,6 @@ itcl::class gaiavo::GaiaVOCatCone {
 
    #  Configuration options: (public variables)
    #  ----------------------
-
-   #  The shortname of the service.
-   itk_option define -shortname shortname ShortName {}
-
-   #  The accessURL for the Cone Search server.
-   itk_option define -accessURL accessURL AccessURL {}
 
    #  Instance of GAIA to display the catalogue.
    itk_option define -gaia gaia Gaia {} {
