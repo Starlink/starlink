@@ -78,7 +78,7 @@ if { [info exists ::env(http_proxy)] } {
 proc get {query} {
 
    #  Download the response.
-   if { [catch {set response [::http::geturl $query] } msg] } {
+   if { [catch {set response [::http::geturl $query -strict 0] } msg] } {
 
       #  Failed.
       puts stderr "$msg"

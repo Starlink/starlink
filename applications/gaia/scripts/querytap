@@ -83,7 +83,7 @@ proc get {endpoint query outfile} {
    set fid [::open $outfile w]
 
    #  Download the response.
-   if { [catch {set response [::http::geturl $endpoint -query $query] } msg] } {
+   if { [catch {set response [::http::geturl $endpoint -query $query -strict 0] } msg] } {
 
       #  Failed, so delete file and exit with an error.
       catch {

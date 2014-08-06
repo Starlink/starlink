@@ -91,7 +91,7 @@ proc get {query outfile} {
    set fid [::open $outfile w]
 
    #  Download the response.
-   if { [catch {set response [::http::geturl $query] } msg] } {
+   if { [catch {set response [::http::geturl $query -strict 0] } msg] } {
 
       #  Failed, so delete file and exit with an error.
       catch {
