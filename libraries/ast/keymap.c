@@ -6707,8 +6707,8 @@ static int MapDefined( AstKeyMap *this, const char *skey, int *status ) {
 /*
 *++
 *  Name:
-c     astMapDefined<X>
-f     AST_MAPDEFINED<X>
+c     astMapDefined
+f     AST_MAPDEFINED
 
 *  Purpose:
 *     Check if a KeyMap contains a defined value for a key.
