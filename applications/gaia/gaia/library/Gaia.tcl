@@ -27,7 +27,7 @@
 #  Copyright:
 #     Copyright (C) 1998-2001 Central Laboratory of the Research Councils
 #     Copyright (C) 2006-2007 Particle Physics & Astronomy Research Council.
-#     Copyright (C) 2007-2009 Science and Technology Facilities Council.
+#     Copyright (C) 2007-2014 Science and Technology Facilities Council.
 #     All Rights Reserved.
 
 #  Licence:

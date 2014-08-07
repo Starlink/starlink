@@ -125,7 +125,7 @@ itcl::class gaiavo::GaiaVORegV1Query {
    #  Extract the access url from a row of values. The headers are the 
    #  names of the associated columns.
    public method get_access_url {headers row} {
-      eval lassign "$row" $headers
+      eval lassign \$row $headers
       if { [info exists accessURL] } {
          return $accessURL
       }
@@ -135,7 +135,7 @@ itcl::class gaiavo::GaiaVORegV1Query {
    #  Extract a name for a service from a row of values. The headers are the
    #  names of the associated columns.
    public method get_name {headers row} {
-      eval lassign "$row" $headers
+      eval lassign \$row $headers
       if { [info exists shortName] && $shortName != {} } {
          return $shortName
       }
@@ -148,7 +148,7 @@ itcl::class gaiavo::GaiaVORegV1Query {
    #  Extract the IVOA identifier for the service from a list of headers
    #  and the associated data row.
    public method get_identifier {headers row} {
-      eval lassign "$row" $headers
+      eval lassign \$row $headers
       if { [info exists identifier] } {
          return $identifier
       }

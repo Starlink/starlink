@@ -426,15 +426,39 @@ itcl::class gaiavo::GaiaVOSIAPSearchs {
       return [list $ra $dec $radius]
    }
 
+   #  Realise the registry dialog, we need this for service functions as well
+   #  as when we want to change the list of SIAP servers, so use local method
+   #  rather than utils. XXX clearly this should all be refactored so thst
+   #  registry is a model and we just have various views.
+   protected method create_registry_ { withdraw } {
+      if { [winfo exists $w_.voregistry] } {
+         $w_.voregistry config \
+            -catalog [$itk_option(-astrocat) longname] \
+            -service SIAP \
+            -activate_cmd [code $this changed_registry_] \
+            -blacklist $itk_option(-blacklist)
+      } else {
+         GaiaVOCatRegistry $w_.voregistry \
+            -catalog [$itk_option(-astrocat) longname] \
+            -service SIAP \
+            -activate_cmd [code $this changed_registry_] \
+            -blacklist $itk_option(-blacklist)
+         #  Wait for realisation to complete...
+         tkwait visibility $w_.voregistry
+      }
+
+      if { ! $withdraw } {
+         utilRaiseWindow $w_.voregistry
+      } else {
+         wm withdraw $w_.voregistry
+      }
+   }
+
+
    #  Activate the registry dialog.
    protected method registry_query_ {} {
       blt::busy hold [winfo toplevel $w_]
-      utilReUseWidget GaiaVOCatRegistry $w_.voregistry \
-         -catalog [$itk_option(-astrocat) longname] \
-         -service SIAP \
-         -show_cols {shortName title} \
-         -activate_cmd [code $this changed_registry_] \
-         -blacklist $itk_option(-blacklist)
+      create_registry_ 0
    }
 
    #  Registry has been changed and maybe accepted.
@@ -442,6 +466,22 @@ itcl::class gaiavo::GaiaVOSIAPSearchs {
       blt::busy release [winfo toplevel $w_]
       $itk_option(-astrocat) open [$w_.voregistry cget -catalog]
    }
+
+   #  Provide access to GaiaVOCatRegistry specialisations for different
+   #  registry types.
+   public method get_identifier {headings row} {
+      create_registry_ 1
+      return [$w_.voregistry get_identifier "$headings" "$row"]
+   }
+   public method get_access_url {headings row} {
+      create_registry_ 1
+      return [$w_.voregistry get_access_url "$headings" "$row"]
+   }
+   public method get_name {headings row} {
+      create_registry_ 1
+      return [$w_.voregistry get_name "$headings" "$row"]
+   }
+
 
    #  Configuration options: (public variables)
    #  ----------------------

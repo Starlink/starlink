@@ -135,17 +135,15 @@ itcl::class gaiavo::GaiaVORegTapQuery {
    #  XXX only apply subtring to some elements.
    public method get_servers_query {standard_id {substring {}}} {
       set query {}
-      append query "SELECT ivoid, short_name, res_title, reference_url, base_role, role_name, "
-      append query    "email, intf_index, access_url, standard_id, cap_type, cap_description, "
+      append query "SELECT ivoid, short_name, res_title, reference_url, "
+      append query    "intf_index, access_url, standard_id, cap_type, cap_description, "
       append query    "std_version, res_subjects "
       append query "FROM rr.resource AS res "
       append query "NATURAL JOIN rr.interface "
       append query "NATURAL JOIN rr.capability "
-      append query "NATURAL LEFT OUTER JOIN rr.res_role "
       append query "NATURAL LEFT OUTER JOIN "
       append query "(SELECT ivoid, ivo_string_agg(res_subject, ', ') AS res_subjects FROM rr.res_subject GROUP BY ivoid) AS sbj "
       append query "WHERE "
-      append query   "(base_role='contact' OR base_role='publisher' OR  base_role IS NULL ) AND "
       append query   "standard_id='${standard_id}' AND "
       append query   "intf_type='vs:paramhttp'"
       if { $substring != {} } {
@@ -155,7 +153,6 @@ itcl::class gaiavo::GaiaVORegTapQuery {
          append query    "1=ivo_hasword(res_title, '${substring}') OR "
          append query    "1=ivo_hasword(res_subjects, '${substring}') OR "
          append query    "1=ivo_nocasematch(ivoid, '%${substring}%') OR "
-         append query    "(base_role='publisher' AND 1=ivo_nocasematch(role_name,'%${substring}%')) OR "
          append query    "1=ivo_hasword(res_description, '${substring}') "
          append query "))"
       }
@@ -191,7 +188,7 @@ itcl::class gaiavo::GaiaVORegTapQuery {
    #  Extract the access url from a row of values. The headers are the 
    #  names of the associated columns.
    public method get_access_url {headers row} {
-      eval lassign "$row" $headers
+      eval lassign \$row $headers
       if { [info exists access_url] } {
          return $access_url
       }
@@ -201,7 +198,7 @@ itcl::class gaiavo::GaiaVORegTapQuery {
    #  Extract a name for a service from a row of values. The headers are the
    #  names of the associated columns.
    public method get_name {headers row} {
-      eval lassign "$row" $headers
+      eval lassign \$row $headers
       if { [info exists short_name] && $short_name != {} } {
          return $short_name
       }
@@ -214,7 +211,7 @@ itcl::class gaiavo::GaiaVORegTapQuery {
    #  Extract the IVOA identifier for the service from a list of headers
    #  and the associated data row.
    public method get_identifier {headers row} {
-      eval lassign "$row" $headers
+      eval lassign \$row $headers
       if { [info exists ivoid] } {
          return $ivoid
       }
@@ -252,9 +249,8 @@ itcl::class gaiavo::GaiaVORegTapQuery {
 
    #  Useful columns.
    protected common columns_  \
-      "ivoid short_name res_title reference_url base_role role_name email \
-   intf_index access_url standard_id cap_type cap_description std_version \
-   res_subjects"
+      "ivoid short_name res_title reference_url intf_index access_url standard_id \
+cap_type cap_description std_version res_subjects"
 
 #  End of class definition.
 }

@@ -375,6 +375,24 @@ itcl::class gaiavo::GaiaVORegistrySearch {
       }
    }
 
+   #  Get the identifier from a catalogue row with the associated headings.
+   #  Uses the current registry type to locate the column name.
+   public method get_identifier {headings row} {
+      return [$reghandler_ get_identifier "$headings" "$row"]
+   }
+
+   #  Get the access URL from a catalogue row with the associated headings.
+   #  Uses the current registry type to locate the column name.
+   public method get_access_url {headings row} {
+      return [$reghandler_ get_access_url "$headings" "$row"]
+   }
+
+   #  Get the name/title from a catalogue row with the associated headings.
+   #  Uses the current registry type to locate the column name.
+   public method get_name {headings row} {
+      return [$reghandler_ get_name "$headings" "$row"]
+   }
+
    #  Configuration options: (public variables)
    #  ----------------------
    
