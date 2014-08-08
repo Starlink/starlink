@@ -1,0 +1,137 @@
+#!/bin/sh
+# The next line is executed by /bin/sh, but not Tcl \
+exec $GAIA_DIR/gaiavo_tcl $0 ${1+"$@"}
+#+
+#   Name:
+#      querytapthings
+
+#   Purpose:
+#      Query a TAP service about some capability of the end point
+
+#   Usage:
+#      querytapthings endpoint thing [outfile]
+
+#   Description:
+#      Queries a TAP service using given thing as a qualifier for the
+#      given endpoint. The result is usually some VOResource that
+#      describes the thing, that a list of tables or capabilities.
+#      If no output file is given the result is sent to standard output.
+
+#   Authors:
+#      Peter W. Draper (PWD):
+
+#  Copyright:
+#     Copyright (C) 2014 Science and Technology Facilties Council.
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of the
+#     License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+#     of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA
+#     02110-1301, USA
+
+#   History:
+#      07-AUG-2014 (PWD):
+#         Original version.
+#-
+#.
+
+package require uri
+
+#  Check the command-line arguments.
+set outfile {}
+if { $argc >= 2  } {
+   set endpoint [lindex $argv 0]
+   set thing [lindex $argv 1]
+   if { $argc == 3 } {
+      set outfile [lindex $argv 2]
+   }
+} else {
+   puts stderr {Usage: querytapthing endpoint thing [outfile]}
+   exit 1
+}
+
+#  Open the output file, just a test.
+if { $outfile != {} } {
+   if { [catch "::open $outfile w" fid] } {
+      puts stderr "Failed to open output file: $outfile"
+      exit 1
+   }
+   ::close $fid
+}
+
+#  Establish the standard proxy define using http_proxy.
+#cat::ProxyDialog::check_proxies $::env(HOME)/.skycat/proxies
+set proxy {}
+set port {}
+if { [info exists ::env(http_proxy)] } {
+   if { [scan $::env(http_proxy) {http://%[^:/]:%d} proxy port] != 2 } {
+      scan $::env(http_proxy) {http://%[^:/]} proxy
+   }
+}
+::http::config -proxyhost $proxy
+::http::config -proxyport $port
+
+#  Proc to do the query. Needed as can be recursive if redirected.
+proc get {query outfile} {
+
+   #  Open the result file, if given.
+   if { $outfile != {} } {
+      set fid [::open $outfile w]
+   } else {
+      set fid stdout
+   }
+
+   #  Download the response.
+   if { [catch {set response [::http::geturl $query -strict 0] } msg] } {
+
+      #  Failed, so delete file and exit with an error.
+      if { $outfile != {} } {
+         catch {
+            ::close $fid
+            ::file delete $outfile
+         }
+      }
+      puts stderr "$msg"
+      return 1
+   }
+
+   #  Check for a moved response and handle the re-direct.
+   if { [::http::ncode $response] == 302 || [::http::ncode $response] == 303 } {
+      array set meta [eval set $response\(meta\)]
+      set location $meta(Location)
+      puts "Redirected to: $newquery"
+      if { $outfile != {} } {
+         catch {::close $fid}
+      }
+      get $location $query $outfile
+      return
+   }
+
+   #  Get content and copy to the output stream.
+   puts $fid [::http::data $response]
+
+   if { $outfile != {} } {
+      catch {::close $fid}
+   }
+   return 0
+}
+
+#  Construct URL suitable for a GET from the service.
+set url "${endpoint}/${thing}"
+
+#  Do it.
+if { [get "${url}" $outfile] == 1 } {
+   exit 1
+}
+exit
