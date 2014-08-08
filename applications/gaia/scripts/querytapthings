@@ -3,29 +3,25 @@
 exec $GAIA_DIR/gaiavo_tcl $0 ${1+"$@"}
 #+
 #   Name:
-#      querycone
+#      querytapthings
 
 #   Purpose:
-#      Query a Cone Search server for a catalogue.
+#      Query a TAP service about some capability of the end point
 
 #   Usage:
-#      querycone endpoint ra dec size verbosity outfile
+#      querytapthings endpoint thing [outfile]
 
 #   Description:
-#      Queries a VO Cone Search server for all all known objects in a given
-#      area of the sky. The result is a VOTable catalogue containing all
-#      the sources in the portion of sky in the cone.
-#
-#      The RA and Dec values are in FK5/J2000 and must be in decimal
-#      degrees. The size should also be degrees and may be a comma
-#      delimetered list, width and height. Verbosity should be an integer
-#      from the list 1, 2, 3 or the empty string.
+#      Queries a TAP service using given thing as a qualifier for the
+#      given endpoint. The result is usually some VOResource that
+#      describes the thing, that a list of tables or capabilities.
+#      If no output file is given the result is sent to standard output.
 
 #   Authors:
 #      Peter W. Draper (PWD):
 
 #  Copyright:
-#     Copyright (C) 2009 Science and Technology Facilties Council.
+#     Copyright (C) 2014 Science and Technology Facilties Council.
 #     All Rights Reserved.
 
 #  Licence:
@@ -45,7 +41,7 @@ exec $GAIA_DIR/gaiavo_tcl $0 ${1+"$@"}
 #     02110-1301, USA
 
 #   History:
-#      12-JAN-2009 (PWD):
+#      07-AUG-2014 (PWD):
 #         Original version.
 #-
 #.
@@ -53,24 +49,26 @@ exec $GAIA_DIR/gaiavo_tcl $0 ${1+"$@"}
 package require uri
 
 #  Check the command-line arguments.
-if { $argc == 6 } {
+set outfile {}
+if { $argc >= 2  } {
    set endpoint [lindex $argv 0]
-   set ra [lindex $argv 1]
-   set dec [lindex $argv 2]
-   set size [lindex $argv 3]
-   set verb [lindex $argv 4]
-   set outfile [lindex $argv 5]
+   set thing [lindex $argv 1]
+   if { $argc == 3 } {
+      set outfile [lindex $argv 2]
+   }
 } else {
-   puts stderr {Usage: querycone endpoint ra dec size verb outfile}
+   puts stderr {Usage: querytapthing endpoint thing [outfile]}
    exit 1
 }
 
 #  Open the output file, just a test.
-if { [catch "::open $outfile w" fid] } {
-   puts stderr "Failed to open output file: $outfile"
-   exit 1
+if { $outfile != {} } {
+   if { [catch "::open $outfile w" fid] } {
+      puts stderr "Failed to open output file: $outfile"
+      exit 1
+   }
+   ::close $fid
 }
-::close $fid
 
 #  Establish the standard proxy define using http_proxy.
 #cat::ProxyDialog::check_proxies $::env(HOME)/.skycat/proxies
@@ -87,16 +85,22 @@ if { [info exists ::env(http_proxy)] } {
 #  Proc to do the query. Needed as can be recursive if redirected.
 proc get {query outfile} {
 
-   #  Open the result file.
-   set fid [::open $outfile w]
+   #  Open the result file, if given.
+   if { $outfile != {} } {
+      set fid [::open $outfile w]
+   } else {
+      set fid stdout
+   }
 
    #  Download the response.
    if { [catch {set response [::http::geturl $query -strict 0] } msg] } {
 
       #  Failed, so delete file and exit with an error.
-      catch {
-         ::close $fid
-         ::file delete $outfile
+      if { $outfile != {} } {
+         catch {
+            ::close $fid
+            ::file delete $outfile
+         }
       }
       puts stderr "$msg"
       return 1
@@ -106,54 +110,28 @@ proc get {query outfile} {
    if { [::http::ncode $response] == 302 || [::http::ncode $response] == 303 } {
       array set meta [eval set $response\(meta\)]
       set location $meta(Location)
-
-      if { [string first "http://" $location] == -1 } {
-
-         #  Need to rebuild the query (usual case).
-         array set parts [::uri::split $query]
-         if { $parts(port) != {} } {
-            set newquery "$parts(scheme)://$parts(host):$parts(port)${location}"
-         } else {
-            set newquery "$parts(scheme)://$parts(host)${location}"
-         }
-      } else {
-
-         #  Funny location is already a URL, probably broken, but try it
-         #  anyway.
-         set newquery $location
-      }
-
       puts "Redirected to: $newquery"
-      catch {::close $fid}
-      get $newquery $outfile
+      if { $outfile != {} } {
+         catch {::close $fid}
+      }
+      get $location $query $outfile
       return
    }
 
-   #  Get content and copy to the file.
+   #  Get content and copy to the output stream.
    puts $fid [::http::data $response]
 
-   catch {::close $fid}
+   if { $outfile != {} } {
+      catch {::close $fid}
+   }
    return 0
 }
 
-#  Construct the initial query from the endpoint and parameters.
-#  Endpoint can terminate in & or ?
-switch -glob $endpoint {
-   *& {
-      set query ${endpoint}RA=${ra}&DEC=${dec}&SR=${size}
-   }
-   default {
-      set query ${endpoint}&RA=${ra}&DEC=${dec}&SR=${size}
-   }
-}
-
-#  Only add verb when set, some services (NED) do not like it.
-if { $verb != {} } {
-   set query ${query}&VERB=${verb}
-}
+#  Construct URL suitable for a GET from the service.
+set url "${endpoint}/${thing}"
 
 #  Do it.
-if { [get $query $outfile] == 1 } {
+if { [get "${url}" $outfile] == 1 } {
    exit 1
 }
 exit

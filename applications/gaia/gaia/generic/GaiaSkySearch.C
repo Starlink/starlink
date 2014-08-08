@@ -119,7 +119,7 @@ public:
     {"imgplot",    &GaiaSkySearch::imgplotCmd,      1,  4},
     {"info",       &GaiaSkySearch::infoCmd,         1,  2},
     {"namesvr",    &GaiaSkySearch::namesvrCmd,      2,  2},
-    {"open",       &GaiaSkySearch::openCmd,         1,  2},
+    {"open",       &GaiaSkySearch::openCmd,         0,  2},
     {"origin",     &GaiaSkySearch::originCmd,       0,  2},
     {"save",       &GaiaSkySearch::saveCmd,         1,  5},
     {"setequinox", &GaiaSkySearch::setequinoxCmd,   1,  1}
@@ -225,6 +225,18 @@ GaiaSkySearch::~GaiaSkySearch()
  */
 int GaiaSkySearch::openCmd(int argc, char* argv[])
 {
+    //  Return if a catalogue is open if no args are given.
+    if ( argc == 0 ) {
+        if ( cat_ ) {
+            set_result( "1" );
+        }
+        else {
+            set_result( "0" );
+        }
+        return TCL_OK;
+    }
+
+
     if ( cat_ ) {
         delete cat_;
         cat_ = NULL;

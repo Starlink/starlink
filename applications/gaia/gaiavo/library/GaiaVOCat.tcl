@@ -310,14 +310,17 @@ itcl::class gaiavo::GaiaVOCat {
 
    #  Called when the user has selected columns to show.
    public method set_show_cols {cols} {
-      set show [$w_.cat showcols]
-      if { "$show" == {} } {
-         set show [$itk_component(results) get_headings]
+      if { [$w_.cat open] } {
+         set show [$w_.cat showcols]
+         if { "$show" == {} } {
+            set show [$itk_component(results) get_headings]
+         }
+         if { "$show" != "$cols" } {
+            $w_.cat showcols $cols
+            cat::CatalogInfo::save {} $w_ 0
+         }
       }
-      if { "$show" != "$cols" } {
-         $w_.cat showcols $cols
-         cat::CatalogInfo::save {} $w_ 0
-      }
+      configure -show_cols $cols
    }
 
    #  Clear the table listing.
@@ -523,6 +526,52 @@ itcl::class gaiavo::GaiaVOCat {
       add_help_button vo "About VO services..." {Help on VO in GAIA}
    }
 
+   #  Extract an access URL from the given row, given the names of the values
+   #  in headers. Tricky as we have two possible names access_url and
+   #  accessURL from the two registry types.
+   public proc getAccessURL {headers row} {
+
+      #  Nasty external knowledge required as to what kind of registry the row
+      #  came from, so try all known handlers.
+      foreach handler $reghandlers_ {
+         set accessurl [$handler get_access_url $headers $row]
+         if { $accessurl != {} } {
+            return $accessurl
+         }
+      }
+      return {}
+   }
+
+   #  Extract a name for TAP service from a list of headers and the associated
+   #  data row.
+   public proc getName {headers row} {
+
+      #  Nasty external knowledge required as to what kind of registry the row
+      #  came from, so try all known handlers.
+      foreach handler $reghandlers_ {
+         set name [$handler get_name $headers $row]
+         if { $name != {} } {
+            return $name
+         }
+      }
+      return {}
+   }
+
+   #  Extract the IVOA identifier for the service from a list of headers
+   #  and the associated data row.
+   public proc getIdentifier {headers row} {
+
+      #  Nasty external knowledge required as to what kind of registry the row
+      #  came from, so try all known handlers.
+      foreach handler $reghandlers_ {
+         set id [$handler get_identifier $headers $row]
+         if { $id != {} } {
+            return $id
+         }
+      }
+      return {}
+   }
+
    #  Check for a file ~/.skycat/proxies, once each session, and use it to
    #  initialize environment variables for a proxy server.
    public proc check_proxies {} {
@@ -561,6 +610,12 @@ itcl::class gaiavo::GaiaVOCat {
    itk_option define -help_file help_file Help_File {}
    itk_option define -help_label help_label Help_Label "On Window..."
 
+   #  The shortname of the service.
+   itk_option define -shortname shortname ShortName {}
+
+   #  The URL for the service.
+   itk_option define -accessURL accessURL AccessURL {}
+
    #  Protected variables: (available to instance)
    #  --------------------
 
@@ -584,4 +639,9 @@ itcl::class gaiavo::GaiaVOCat {
 
    #  Flag: set to 1 after we checked for a proxy server.
    protected common checked_proxies_ 0
+
+   #  Handlers for different registry types.
+   protected common regtap_ [::gaiavo::GaiaVORegTapQuery::instance]
+   protected common regv1_ [::gaiavo::GaiaVORegV1Query::instance]
+   protected common reghandlers_ "$regtap_ $regv1_"
 }

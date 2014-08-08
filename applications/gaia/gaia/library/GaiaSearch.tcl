@@ -873,10 +873,15 @@ itcl::class gaia::GaiaSearch {
          set state disabled
       }
 
-      #  Cone Search.
+      #  Cone search.
       $w add_menuitem $m command "Query a VO catalog server..." \
          {Find VO cone search servers and query for catalogs} \
          -command [code $w vo_find_cone] -state $state
+
+      #  TAP query.
+      $w add_menuitem $m command "Query a TAP service..." \
+         {Find TAP services and query} \
+         -command [code $w vo_find_tap] -state $state
 
       #  Add SIAP query dialogs
       $w add_menuitem $m command "Query a VO image server..." \

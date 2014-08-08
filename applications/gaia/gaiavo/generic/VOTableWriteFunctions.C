@@ -87,6 +87,7 @@
 #include "VOTable1.1_dns.hxx"
 #include "VOTable1.1.hxx"
 #include "VOTable1.2.hxx"
+#include "VOTable1.3.hxx"
 #include "VOTable.h"
 #include "VOTableStream.h"
 #include "GaiaUtils.h"
@@ -102,15 +103,27 @@ namespace gaia {
 
     // Actual members are defined elsewhere.
 #define NS votable_11_dns
+#define NSVERS 11
 #include "VOTableWriteFunctions.icc"
 #undef NS
+#undef NSVERS
 
 #define NS votable_11
+#define NSVERS 11
 #include "VOTableWriteFunctions.icc"
 #undef NS
+#undef NSVERS
 
 #define NS votable_12
+#define NSVERS 12
 #include "VOTableWriteFunctions.icc"
 #undef NS
+#undef NSVERS
+
+#define NS votable_13
+#define NSVERS 13
+#include "VOTableWriteFunctions.icc"
+#undef NS
+#undef NSVERS
 
 }

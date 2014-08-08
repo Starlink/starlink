@@ -3,29 +3,24 @@
 exec $GAIA_DIR/gaiavo_tcl $0 ${1+"$@"}
 #+
 #   Name:
-#      querycone
+#      querytap
 
 #   Purpose:
-#      Query a Cone Search server for a catalogue.
+#      Query a TAP service synchronously.
 
 #   Usage:
-#      querycone endpoint ra dec size verbosity outfile
+#      querytap endpoint "adql-query" outfile
 
 #   Description:
-#      Queries a VO Cone Search server for all all known objects in a given
-#      area of the sky. The result is a VOTable catalogue containing all
-#      the sources in the portion of sky in the cone.
-#
-#      The RA and Dec values are in FK5/J2000 and must be in decimal
-#      degrees. The size should also be degrees and may be a comma
-#      delimetered list, width and height. Verbosity should be an integer
-#      from the list 1, 2, 3 or the empty string.
+#      Queries a TAP service using the given ADQL expression. Currently
+#      we do this synchronously so the result is a VOTable catalogue
+#      containing the result.
 
 #   Authors:
 #      Peter W. Draper (PWD):
 
 #  Copyright:
-#     Copyright (C) 2009 Science and Technology Facilties Council.
+#     Copyright (C) 2014 Science and Technology Facilties Council.
 #     All Rights Reserved.
 
 #  Licence:
@@ -45,7 +40,7 @@ exec $GAIA_DIR/gaiavo_tcl $0 ${1+"$@"}
 #     02110-1301, USA
 
 #   History:
-#      12-JAN-2009 (PWD):
+#      28-MAR-2014 (PWD):
 #         Original version.
 #-
 #.
@@ -53,15 +48,12 @@ exec $GAIA_DIR/gaiavo_tcl $0 ${1+"$@"}
 package require uri
 
 #  Check the command-line arguments.
-if { $argc == 6 } {
+if { $argc == 3 } {
    set endpoint [lindex $argv 0]
-   set ra [lindex $argv 1]
-   set dec [lindex $argv 2]
-   set size [lindex $argv 3]
-   set verb [lindex $argv 4]
-   set outfile [lindex $argv 5]
+   set adql [lindex $argv 1]
+   set outfile [lindex $argv 2]
 } else {
-   puts stderr {Usage: querycone endpoint ra dec size verb outfile}
+   puts stderr {Usage: querytap endpoint adql outfile}
    exit 1
 }
 
@@ -85,13 +77,13 @@ if { [info exists ::env(http_proxy)] } {
 ::http::config -proxyport $port
 
 #  Proc to do the query. Needed as can be recursive if redirected.
-proc get {query outfile} {
+proc get {endpoint query outfile} {
 
    #  Open the result file.
    set fid [::open $outfile w]
 
    #  Download the response.
-   if { [catch {set response [::http::geturl $query -strict 0] } msg] } {
+   if { [catch {set response [::http::geturl $endpoint -query $query -strict 0] } msg] } {
 
       #  Failed, so delete file and exit with an error.
       catch {
@@ -106,26 +98,9 @@ proc get {query outfile} {
    if { [::http::ncode $response] == 302 || [::http::ncode $response] == 303 } {
       array set meta [eval set $response\(meta\)]
       set location $meta(Location)
-
-      if { [string first "http://" $location] == -1 } {
-
-         #  Need to rebuild the query (usual case).
-         array set parts [::uri::split $query]
-         if { $parts(port) != {} } {
-            set newquery "$parts(scheme)://$parts(host):$parts(port)${location}"
-         } else {
-            set newquery "$parts(scheme)://$parts(host)${location}"
-         }
-      } else {
-
-         #  Funny location is already a URL, probably broken, but try it
-         #  anyway.
-         set newquery $location
-      }
-
       puts "Redirected to: $newquery"
       catch {::close $fid}
-      get $newquery $outfile
+      get $location $query $outfile
       return
    }
 
@@ -136,24 +111,11 @@ proc get {query outfile} {
    return 0
 }
 
-#  Construct the initial query from the endpoint and parameters.
-#  Endpoint can terminate in & or ?
-switch -glob $endpoint {
-   *& {
-      set query ${endpoint}RA=${ra}&DEC=${dec}&SR=${size}
-   }
-   default {
-      set query ${endpoint}&RA=${ra}&DEC=${dec}&SR=${size}
-   }
-}
-
-#  Only add verb when set, some services (NED) do not like it.
-if { $verb != {} } {
-   set query ${query}&VERB=${verb}
-}
+#  Construct a query suitable for POSTing to the service.
+set query [::http::formatQuery REQUEST doQuery LANG ADQL QUERY "$adql"]
 
 #  Do it.
-if { [get $query $outfile] == 1 } {
+if { [get "${endpoint}/sync" "$query" $outfile] == 1 } {
    exit 1
 }
 exit

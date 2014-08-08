@@ -9,13 +9,19 @@
 #     Class for querying a VO registry.
 
 #  Description:
-#     This class defines the access methods for querying the NVO
-#     registry and astrogrid registries.
+#     This class defines the access methods for querying VO registries.
 #
-#     The basic query to a service type (like sia:SimpleImageAccess) can be
-#     refined by adding a ADQL where clause that looks for a specified
+#     There are two types of registry, the old V1.0 type, that use a SOAP
+#     query interface and the newer RegTAP, that use TAP (ADQL) queries.
+#     RegTAP is expected to supercede V1.0.
+#
+#     The basic query to a 1.0 service type (like sia:SimpleImageAccess) can
+#     be refined by adding a ADQL where clause that looks for a specified
 #     substring in one of the known columns (these must match the meta-data
 #     definitions for a VOResource).
+#
+#     In TAP there is a similar mechanism, that gives greater freedom to
+#     control the query. That isn't necessarily exposed (yet).
 
 #  Invocations:
 #
@@ -34,7 +40,7 @@
 #     Performs the given method on this object.
 
 #  Copyright:
-#     Copyright (C) 2008-2009 Science and Technology Facilities Council
+#     Copyright (C) 2008-2014 Science and Technology Facilities Council
 #     All Rights Reserved.
 
 #  Licence:
@@ -85,25 +91,39 @@ itcl::class gaiavo::GaiaVORegistrySearch {
       set tempcats_ [gaia::GaiaTempName \#auto -prefix GaiaTempReg \
                         -exists 0 -type ".TAB"]
 
-      #  Display the registry. Offer two symbolic types. NVO and AstroGrid.
+      #  User selects the registry type and registry.
+      itk_component add regframe {
+         ::frame $w_.regframe
+      }
       set lwidth 10
       set vwidth 50
       itk_component add registry {
-         LabelMenu $w_.registry \
+         LabelMenu $itk_component(regframe).registry \
             -text "Registry:" \
             -labelwidth $lwidth \
             -valuewidth $vwidth
       }
-      pack $itk_component(registry) -side top -fill x -ipadx 1m -ipady 1m
-      add_short_help $itk_component(registry) {VO Registry}
+      pack $itk_component(registry) -side left -fill x -ipadx 1m -ipady 1m
+      add_short_help $itk_component(registry) {VO registry}
 
-      foreach {name value} [array get registries_] {
-         $itk_component(registry) add \
-            -command [code $this set_registry_ $name] \
-            -label $name \
-            -value $name
+      itk_component add regtype {
+         LabelMenu $itk_component(regframe).regtype \
+            -labelwidth 0 \
+            -valuewidth 6
       }
-      $itk_component(registry) configure -value $itk_option(-registry)
+      pack $itk_component(regtype) -side left -fill x -ipadx 1m -ipady 1m
+      add_short_help $itk_component(regtype) {VO registry type}
+
+      pack $itk_component(regframe) -side top -fill x -ipadx 1m -ipady 1m
+
+      foreach type "RI1.0 RegTAP" {
+         $itk_component(regtype) add \
+            -command [code $this set_registry_type_ $type] \
+            -label $type \
+            -value $type
+      }
+      $itk_component(regtype) configure -value "RegTAP"
+      set_registry_type_ "RegTAP"
 
       #  Display the type of service. This is fixed.
       itk_component add service {
@@ -169,10 +189,15 @@ itcl::class gaiavo::GaiaVORegistrySearch {
          eval $itk_option(-feedbackcommand) on
       }
 
-      #  Establish object to run the query scripts.
-      if { $querytask_ == {} } {
-         set querytask_ [gaia::GaiaForeignExec \#auto \
+      #  Establish objects to run the query scripts.
+      if { $queryregtask_ == {} } {
+         set queryregtask_ [gaia::GaiaForeignExec \#auto \
                                -application $::gaia_dir/queryreg \
+                               -notify [code $this query_done_]]
+      }
+      if { $querytaptask_ == {} } {
+         set querytaptask_ [gaia::GaiaForeignExec \#auto \
+                               -application $::gaia_dir/querytap \
                                -notify [code $this query_done_]]
       }
 
@@ -180,11 +205,21 @@ itcl::class gaiavo::GaiaVORegistrySearch {
       set interrupted_ 0
 
       if { $itk_option(-column) != {} && $itk_option(-substring) != {} } {
-         $querytask_ runwith [get_registry_] [get_service_] \
-            "$itk_option(-column)" "$itk_option(-substring)" "$votable_"
+         if { $itk_option(-registry_type) == "RI1.0" } {
+            $queryregtask_ runwith [get_registry_] [get_service_] \
+               "$itk_option(-column)" "$itk_option(-substring)" "$votable_"
+         } else {
+            set query [$regtap_ get_servers_query [get_service_] "$itk_option(-substring)"]
+            $querytaptask_ runwith [get_registry_] "$query" "$votable_"
+         }
+
       } else {
-         $querytask_ runwith [get_registry_] [get_service_] \
-            "" "" "$votable_"
+         if { $itk_option(-registry_type) == "RI1.0" } {
+            $queryregtask_ runwith [get_registry_] [get_service_]  "" "" "$votable_"
+         } else {
+            set query [$regtap_ get_servers_query [get_service_] {}]
+            $querytaptask_ runwith [get_registry_] "$query" "$votable_"
+         }
       }
    }
 
@@ -224,13 +259,13 @@ itcl::class gaiavo::GaiaVORegistrySearch {
    }
 
    #  Set the registry.
-   protected method set_registry_ {registry} {
-      configure -registry $registry
+   protected method set_registry_ {name url} {
+      configure -registry [list $name $url]
    }
 
    #  Get the registry endpoint.
    protected method get_registry_ {} {
-      return $registries_($itk_option(-registry))
+      return [lindex $itk_option(-registry) 1]
    }
 
    #  Set the service.
@@ -240,7 +275,7 @@ itcl::class gaiavo::GaiaVORegistrySearch {
 
    #  Translate a service type to its full description or standard ID.
    protected method get_service_ {} {
-      return $standardIDs_($itk_option(-service))
+      return [$reghandler_ get_standard_id $itk_option(-service)]
    }
 
    #  Save the result of a query to an external VOTable.
@@ -253,7 +288,7 @@ itcl::class gaiavo::GaiaVORegistrySearch {
    #  Read the query directly from an existing file.
    public method read_query {filename} {
 
-      #  Convert to a TST file so we can open it up as usual.
+      #  Convert to a TST file so we can open it up as usual. 
       set vot [gaiavotable::open $filename]
 
       #  Check the STATUS return.
@@ -266,6 +301,32 @@ itcl::class gaiavo::GaiaVORegistrySearch {
 
          #  This is the current VOTable now.
          set votable_ $filename
+
+         #  Wart: seems that registries do not only return resources with the
+         #  expected capability class, so apply a retrospective filter. Esp.
+         #  bad for TAP services. Shouldn't be a large response so just eat the
+         #  file process into the same name.
+         set fp [::open $tempname]
+         set data [::read $fp]
+         ::close $fp
+         set fp [::open $tempname "w"]
+         set pattern [get_service_]
+         set ok 1
+         foreach line [split $data "\n"] {
+            if { $ok } {
+               #  Just passthrough header section.
+               if { [string first "--" $line] == 0 } {
+                  set ok 0
+               }
+               puts $fp $line
+            } else {
+               if { [string first $pattern $line] != -1 } {
+                  puts $fp $line
+               }
+            }
+         }
+         ::close $fp
+
       } else {
          set status 0
          set tempname \
@@ -278,13 +339,68 @@ itcl::class gaiavo::GaiaVORegistrySearch {
       }
    }
 
+   #  Change the registry type.
+   protected method set_registry_type_ {type} {
+
+      # If changed we want to change the columns.
+      set change_cols 0
+      if { $type != $itk_option(-registry_type) } {
+         set change_cols 1
+      }
+      configure -registry_type $type
+
+      #  Set the handler.
+      if { $type == "RI1.0" } {
+         set reghandler_ $regv1_
+      } else {
+         set reghandler_ $regtap_
+      }
+
+      #  Clear any existing registries.
+      $itk_component(registry) clear
+
+      foreach {name value} [$reghandler_ get_registries] {
+         $itk_component(registry) add \
+            -command [code $this set_registry_ $name $value] \
+            -label $name \
+            -value $value
+      }
+      $itk_component(registry) configure \
+         -value [lindex [$reghandler_ default_registry] 1]
+      eval set_registry_ [$reghandler_ default_registry]
+
+      #  Change default columns.
+      if { $itk_option(-show_cols_cmd) != {} } {
+         eval $itk_option(-show_cols_cmd) {[$reghandler_ default_columns]}
+      }
+   }
+
+   #  Get the identifier from a catalogue row with the associated headings.
+   #  Uses the current registry type to locate the column name.
+   public method get_identifier {headings row} {
+      return [$reghandler_ get_identifier "$headings" "$row"]
+   }
+
+   #  Get the access URL from a catalogue row with the associated headings.
+   #  Uses the current registry type to locate the column name.
+   public method get_access_url {headings row} {
+      return [$reghandler_ get_access_url "$headings" "$row"]
+   }
+
+   #  Get the name/title from a catalogue row with the associated headings.
+   #  Uses the current registry type to locate the column name.
+   public method get_name {headings row} {
+      return [$reghandler_ get_name "$headings" "$row"]
+   }
+
    #  Configuration options: (public variables)
    #  ----------------------
+   
+   #  Current registry and type.
+   itk_option define -registry registry Registry {}
+   itk_option define -registry_type registry_type Registry_Type {}
 
-   #  The type of VO registry to query, NVO or AstroGrid.
-   itk_option define -registry registry Registry "NVO"
-
-   #  The type of query, SIAP, SSAP or CONE.
+   #  The type of query, SIAP, SSAP, CONE or TAP.
    itk_option define -service service Service "SIAP"
 
    #  Command to execute when a list of servers is accepted.
@@ -297,6 +413,10 @@ itcl::class gaiavo::GaiaVORegistrySearch {
    #  do the same job as the "Query" button). Issued when return is pressed in
    #  the substring entry.
    itk_option define -query_cmd query_cmd Query_Cmd {}
+
+   #  Command to execute when the default columns to show in the results
+   #  should change. This is necessary when switching between the two types.
+   itk_option define -show_cols_cmd show_cols_cmd Show_Cols_Cmd {}
 
    #  Name of a column to qualify query.
    itk_option define -column column Column {title}
@@ -314,35 +434,28 @@ itcl::class gaiavo::GaiaVORegistrySearch {
    protected variable votable_ {}
 
    #  Task controlling queries.
-   protected variable querytask_ {}
+   protected variable queryregtask_ {}
+   protected variable querytaptask_ {}
 
    #  Set true when a query is being interrupted.
    protected variable interrupted_ 0
 
+   #  Current handler for different registry types.
+   protected variable reghandler_ [::gaiavo::GaiaVORegTapQuery::instance]
+
    #  Common variables: (shared by all instances)
    #  -----------------
-
-   #  The known registries.
-   protected common registries_
-   set registries_(NVO) "http://nvo.stsci.edu/vor10/ristandardservice.asmx"
-   set registries_(AstroGrid) \
-      "http://registry.astrogrid.org/astrogrid-registry/services/RegistryQueryv1_0"
 
    #  Mapping for short to full names of services.
    protected common services_
    set services_(SIAP) "SimpleImageAccess"
    set services_(SSAP) "SimpleSpectralAccess"
    set services_(CONE) "ConeSearch"
+   set services_(TAP)  "TableAccess"
 
-   #  Mapping of short service names to their standard ids.
-   protected common standardIDs_
-   set standardIDs_(SIAP) "ivo://ivoa.net/std/SIA"
-   set standardIDs_(SSAP) "ivo://ivoa.net/std/SSA"
-   set standardIDs_(CONE) "ivo://ivoa.net/std/ConeSearch"
-
-   #  Possible columns for adding a predicate.
-   protected common columns_ "title shortName"
-
+   #  Handlers for different registry types.
+   protected common regtap_ [::gaiavo::GaiaVORegTapQuery::instance]
+   protected common regv1_ [::gaiavo::GaiaVORegV1Query::instance]
 
 #  End of class definition.
 }

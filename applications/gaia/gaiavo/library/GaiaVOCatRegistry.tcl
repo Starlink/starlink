@@ -170,6 +170,7 @@ itcl::class gaiavo::GaiaVOCatRegistry {
             -feedbackcommand  [code $this set_feedback] \
             -command [code $this query_done] \
             -query_cmd [code $this query] \
+            -show_cols_cmd [code $this set_show_cols] \
             -service $itk_option(-service)
       }
       pack $itk_component(registry) -side top -fill x
@@ -190,7 +191,7 @@ itcl::class gaiavo::GaiaVOCatRegistry {
          } else {
             #  Need headers and selected row.
             set headings [$itk_component(results) get_headings]
-            eval $itk_option(-activate_cmd) "\$headings" "\$args"
+            eval $itk_option(-activate_cmd) \$headings "$args"
          }
       }
    }
@@ -207,7 +208,7 @@ itcl::class gaiavo::GaiaVOCatRegistry {
          set headings [$w_.cat headings]
          set result {}
          foreach row [$w_.cat content] {
-            eval lassign \$row $headings
+            set identifier [$query_component_ get_identifier "$headings" "$row"]
             if { ! [$itk_option(-blacklist) blacklisted $identifier] } {
                lappend result $row
             }
@@ -215,6 +216,18 @@ itcl::class gaiavo::GaiaVOCatRegistry {
          set info_ $result
       }
       $itk_component(results) config -info $info_
+   }
+
+   #  Provide access to query_component_ specialisations for different
+   #  registry types.
+   public method get_identifier {headings row} {
+      return [$query_component_ get_identifier "$headings" "$row"]
+   }
+   public method get_access_url {headings row} {
+      return [$query_component_ get_access_url "$headings" "$row"]
+   }
+   public method get_name {headings row} {
+      return [$query_component_ get_name "$headings" "$row"]
    }
 
    #  Add more help if this is just a simple registry query.
@@ -231,7 +244,7 @@ itcl::class gaiavo::GaiaVOCatRegistry {
    #  The type of operation, whole or row.
    itk_option define -whole_operation whole_operation Whole_Operation 1
 
-   #  The type of services to query for - SSAP, SIAP, ConeSearch.
+   #  The type of services to query for - SSAP, SIAP, ConeSearch, TAP.
    itk_option define -service service Service SIAP
 
    #  GaiaVOBlacklist instance that manages the blacklist for the services.

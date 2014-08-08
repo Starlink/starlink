@@ -27,7 +27,7 @@
 #  Copyright:
 #     Copyright (C) 1998-2001 Central Laboratory of the Research Councils
 #     Copyright (C) 2006-2007 Particle Physics & Astronomy Research Council.
-#     Copyright (C) 2007-2009 Science and Technology Facilities Council.
+#     Copyright (C) 2007-2014 Science and Technology Facilities Council.
 #     All Rights Reserved.
 
 #  Licence:
@@ -2167,7 +2167,6 @@ itcl::class gaia::Gaia {
             file copy -force $config_file ${backupname}
          }
          file copy -force $gaia_library/skycat2.0.cfg $config_file
-         puts "file copy -force $gaia_library/skycat2.0.cfg $config_file"
 
          #  Make a directory entry that accesses the old configs.
          if { $backupname != "" } {
@@ -2599,10 +2598,10 @@ window gives you access to this."
 
          #  See if the given headers and row data specify a SIAP server.
          #  Need a accessURL field for that.
-         set accessURL [gaiavo::GaiaVOCatSIAP::getAccessURL $headers $row]
+         set accessURL [gaiavo::GaiaVOCat::getAccessURL $headers $row]
          if { $accessURL != {} } {
-            set name [gaiavo::GaiaVOCatSIAP::getName $headers $row]
-            set id [gaiavo::GaiaVOCatSIAP::getIdentifier $headers $row]
+            set name [gaiavo::GaiaVOCat::getName $headers $row]
+            set id [gaiavo::GaiaVOCat::getIdentifier $headers $row]
             gaiavo::GaiaVOCatSIAP $w_.siapquery\#auto \
                -accessURL $accessURL \
                -identifier $id \
@@ -2625,7 +2624,7 @@ window gives you access to this."
          #  Find and open the current list of servers.
          set cone_file [vo_config_file_ GaiaConeServers.vot]
 
-         utilReUseWidget gaiavo::GaiaVOCatRegistry $w_.voregistry \
+         utilReUseWidget gaiavo::GaiaVOCatRegistry $w_.voregistrycone \
             -catalog $cone_file \
             -service CONE \
             -title "Catalogue Cone search" \
@@ -2645,9 +2644,9 @@ window gives you access to this."
 
          #  See if the given headers and row data specify a Cone
          #  server. Need a accessURL field for that.
-         set accessURL [gaiavo::GaiaVOCatCone::getAccessURL $headers $row]
+         set accessURL [gaiavo::GaiaVOCat::getAccessURL $headers $row]
          if { $accessURL != {} } {
-            set name [gaiavo::GaiaVOCatCone::getName $headers $row]
+            set name [gaiavo::GaiaVOCat::getName $headers $row]
             gaiavo::GaiaVOCatCone $w_.conequery\#auto \
                -accessURL $accessURL \
                -shortname $name \
@@ -2660,12 +2659,56 @@ window gives you access to this."
       }
    }
 
+   #  Open a dialog for querying TAP services.
+   public method vo_find_tap {} {
+      if { [gaia::GaiaVOTableAccess::check_for_gaiavo] } {
+
+         #  Find and open the current list of servers.
+         set tap_file [vo_config_file_ GaiaTAPServers.vot]
+
+         utilReUseWidget gaiavo::GaiaVOCatRegistry $w_.voregistrytap \
+            -catalog $tap_file \
+            -service TAP \
+            -title "TAP server queries" \
+            -activate_cmd [code $this vo_query_tap_] \
+            -whole_operation 0 \
+            -help_file tap
+      } else {
+         error_dialog "No GAIA-VO extension is available" $w_
+      }
+   }
+
+   #  Open a dialog for querying a TAP server.
+   protected method vo_query_tap_ {headers row} {
+      if { [gaia::GaiaVOTableAccess::check_for_gaiavo] } {
+
+         #  See if the given headers and row data specify a TAP
+         #  service. Need a URL resource for that.
+         set accessURL [gaiavo::GaiaVOCat::getAccessURL $headers $row]
+         if { $accessURL != {} } {
+            set name [gaiavo::GaiaVOCat::getName $headers $row]
+            gaiavo::GaiaVOTAP $w_.tap\#auto \
+               -accessURL $accessURL \
+               -shortname $name \
+               -gaia $this \
+               -title "$name TAP service" \
+               -help_file tapquery
+         } else {
+            warning_dialog "TAP service does not specify a resource URL" $w_
+         }
+      }
+   }
+
    #  Get a cached configuration file. If not present use builtin list.
    protected method vo_config_file_ {name} {
       set config_file [utilGetConfigFilename .skycat $name]
       if { ! [::file exists $config_file] } {
-         #  Use builtin defaults.
-         ::file copy -force $::gaiavo_library/$name $config_file
+         #  Use builtin defaults. If any.
+         if { [::file exists $::gaiavo_library/$name ] } {
+            ::file copy -force $::gaiavo_library/$name $config_file
+         } else {
+            puts stderr "Warning: no $name configuation file located"
+         }
       }
       return $config_file
    }

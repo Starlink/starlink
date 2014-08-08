@@ -239,47 +239,8 @@ itcl::class gaiavo::GaiaVOCatSIAP {
       }
    }
 
-   #  Extract the accessURL for the SIAP service from a list of headers
-   #  and the associated data row.
-   public proc getAccessURL {headers row} {
-      eval lassign "$row" $headers
-      if { [info exists accessURL] } {
-         return $accessURL
-      }
-      return {}
-   }
-
-   #  Extract the IVOA identifier for the SIAP service from a list of headers
-   #  and the associated data row.
-   public proc getIdentifier {headers row} {
-      eval lassign "$row" $headers
-      if { [info exists identifier] } {
-         return $identifier
-      }
-      return {}
-   }
-
-   #  Extract a name for SIAP service from a list of headers
-   #  and the associated data row.
-   public proc getName {headers row} {
-      eval lassign "$row" $headers
-      if { [info exists shortName] && $shortName != {} } {
-         return $shortName
-      }
-      if { [info exists title] } {
-         return $title
-      }
-      return {}
-   }
-
    #  Configuration options: (public variables)
    #  ----------------------
-
-   #  The shortname of the service.
-   itk_option define -shortname shortname ShortName {}
-
-   #  The accessURL for the SIAP server.
-   itk_option define -accessURL accessURL AccessURL {}
 
    #  The identifier for the SIAP server.
    itk_option define -identifier identifier Identifier {}

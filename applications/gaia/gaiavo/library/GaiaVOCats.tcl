@@ -31,7 +31,7 @@
 #     Performs the given method on this object.
 
 #  Copyright:
-#     Copyright (C) 2008-2009 Science and Technology Facilities Council
+#     Copyright (C) 2008-2014 Science and Technology Facilities Council
 #     All Rights Reserved.
 
 #  Licence:
@@ -384,12 +384,16 @@ itcl::class gaiavo::GaiaVOCats {
    #  removal).
    protected method remove_current_ {text} {
       after 0 [list $itk_component(progressbar) config -text $text]
-      $itk_component(notebook) delete $current_
-      $itk_component(bookmenu) delete $current_
-      $itk_component(bookmenu) update_menubutton
-      incr current_ -1
-      incr npages_ -1
-      incr ncolumn_ -1
+
+      #  Seems to fail with some visibility timer, so handle that ungracefully.
+      catch {
+         $itk_component(notebook) delete $current_
+         $itk_component(bookmenu) delete $current_
+         $itk_component(bookmenu) update_menubutton
+         incr current_ -1
+         incr npages_ -1
+         incr ncolumn_ -1
+      }
    }
 
    #  Start the queries.

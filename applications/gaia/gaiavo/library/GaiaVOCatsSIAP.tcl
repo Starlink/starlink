@@ -242,6 +242,10 @@ itcl::class gaiavo::GaiaVOCatsSIAP {
    #  Use specialised warning dialog that offers to blacklist the current
    #  server.
    protected method warning_dialog_ {message} {
+
+      #  Truncate message, these can be very long.
+      set message [string range $message 0 200]
+
       set choice [choice_dialog "$message" "OK Blacklist" "OK" $w_]
       if { $choice != "OK" } {
          $itk_option(-blacklist) blacklist $ids_($current_)
@@ -251,6 +255,9 @@ itcl::class gaiavo::GaiaVOCatsSIAP {
    #  Use specialised error dialog that offers to blacklist the current
    #  server.
    protected method error_dialog_ {message} {
+      #  Truncate message, these can be very long.
+      set message [string range $message 0 200]
+
       set choice [choice_dialog "$message" "OK Blacklist" "OK" $w_]
       if { $choice != "OK" } {
          $itk_option(-blacklist) blacklist $ids_($current_)
@@ -264,7 +271,9 @@ itcl::class gaiavo::GaiaVOCatsSIAP {
       set headings [$w_.cat headings]
       set result {}
       foreach row [$w_.cat content] {
-         eval lassign \$row $headings
+         set identifier [$query_component_ get_identifier "$headings" "$row"]
+         set accessURL [$query_component_ get_access_url "$headings" "$row"]
+         set title [$query_component_ get_name "$headings" "$row"]
          if { ! [$itk_option(-blacklist) blacklisted $identifier] && $accessURL != {} } {
             lappend result $accessURL $title $identifier
          }

@@ -1,23 +1,23 @@
 #+
 #  Name:
-#     GaiaVOCatCone
+#     GaiaVOTAP
 
 #  Type of Module:
 #     [incr Tcl] class
 
 #  Purpose:
-#     Query a Cone Search server for a catalogue.
+#     Query a TAP service.
 
 #  Description:
-#     Extends the GaiaVOCat class to query a given Cone Search server for
-#     any objects it contains in a given region of sky. The objects are
-#     described as a row in a catalogue.
+#     Extends the GaiaVOCat class to query a given TAP service.
+#     XXX what kind of results are we expecting, simple catalogue?
+#     Links to images/cubes etc?
 
 #  Invocations:
 #
-#        GaiaVOCatCone object_name [configuration options]
+#        GaiaVOTAP object_name [configuration options]
 #
-#     This creates an instance of a GaiaVOCatCone object. The return is
+#     This creates an instance of a GaiaVOTAP object. The return is
 #     the name of the object.
 #
 #        object_name configure -configuration_options value
@@ -30,7 +30,7 @@
 #     Performs the given method on this object.
 
 #  Copyright:
-#     Copyright (C) 2009 Science and Technology Facilities Council
+#     Copyright (C) 2014 Science and Technology Facilities Council
 #     All Rights Reserved.
 
 #  Licence:
@@ -54,7 +54,7 @@
 #     {enter_new_authors_here}
 
 #  History:
-#     13-JAN-2009 (PWD):
+#     28-MAR-2014 (PWD):
 #        Original version.
 #     {enter_further_changes_here}
 
@@ -62,9 +62,9 @@
 
 #.
 
-itk::usual GaiaVOCatCone {}
+itk::usual GaiaVOTAP {}
 
-itcl::class gaiavo::GaiaVOCatCone {
+itcl::class gaiavo::GaiaVOTAP {
 
    #  Inheritances:
    #  -------------
@@ -84,12 +84,12 @@ itcl::class gaiavo::GaiaVOCatCone {
    #  Methods:
    #  --------
 
-   #  Add additional menu items. Nameserver.
+   #  Add additional menu items.
    public method init {} {
       GaiaVOCat::init
 
       #  Override title.
-      wm title $w_ "Query VO Cone Search server"
+      wm title $w_ "Query TAP service"
 
       set m [add_menubutton Options "Options menu"]
 
@@ -100,32 +100,6 @@ itcl::class gaiavo::GaiaVOCatCone {
 
       #  Add menus for selecting simple plot symbols.
       add_plot_menus_
-
-      #  Add the standard name servers.
-      set ns_menu [menu $m.ns]
-      add_menuitem $m cascade "Set Name Server" \
-         {Select the name server used to resolve astronomical object names} \
-         -menu $ns_menu
-
-      if { [catch {set list [$w_.cat info namesvr]} msg] } {
-         error_dialog $msg $w_
-         return
-      }
-
-      foreach namesvr $list {
-         $ns_menu add radiobutton \
-            -label $namesvr \
-            -command [code $this set_namesvr $namesvr] \
-            -variable [scope itk_option(-namesvr)]
-      }
-
-      if { ![info exists namesvr] } {
-         error_dialog "No default name server found for astronomical objects"
-         return
-      }
-
-      #  And set the default name server.
-      set_namesvr $namesvr
 
       #  Plot symbols button.
       itk_component add plot {
@@ -159,34 +133,23 @@ itcl::class gaiavo::GaiaVOCatCone {
          [code $this select_result_row]
    }
 
-   #  Set the name server used, pass to other components.
-   public method set_namesvr {name} {
-      configure -namesvr $name
-      if { [info exists itk_component(cone)] } {
-         $itk_component(cone) configure -namesvr $name
-      } else {
-         puts "skipped component(cone)"
-      }
-   }
-
    #  Add the component that will control the query.
    protected method add_query_component_ {} {
 
-      itk_component add cone {
-         gaiavo::GaiaVOConeSearch $w_.cone \
+      itk_component add tap {
+         gaiavo::GaiaVOTAPQuery $w_.tap \
             -accessURL $itk_option(-accessURL) \
             -shortname $itk_option(-shortname) \
             -feedbackcommand  [code $this set_feedback] \
             -astrocat [code $w_.cat] \
             -command [code $this query_done] \
-            -namesvr $itk_option(-namesvr) \
             -gaiactrl [$itk_option(-gaia) get_image]
       }
-      pack $itk_component(cone) -side top -fill x
-      add_short_help $itk_component(cone) \
-         {Controls for querying Cone Search server}
+      pack $itk_component(tap) -side top -fill x -expand 1
+      add_short_help $itk_component(tap) \
+         {Controls for querying the TAP service}
 
-      set query_component_ $itk_component(cone)
+      set query_component_ $itk_component(tap)
    }
 
    #  New catalogue, set default plot symbol.
@@ -422,9 +385,6 @@ itcl::class gaiavo::GaiaVOCatCone {
       set canvas_ [$rtdctrl_ get_canvas]
       set draw_ [$rtdctrl_ component draw]
    }
-
-   #  The name server.
-   itk_option define -namesvr namesvr NameSvr {}
 
    #  Protected variables: (available to instance)
    #  --------------------
