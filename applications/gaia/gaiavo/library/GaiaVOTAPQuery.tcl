@@ -89,15 +89,42 @@ itcl::class gaiavo::GaiaVOTAPQuery {
       } else {
          set name $itk_option(-accessURL)
       }
-      itk_component add service {
-         LabelValue $w_.service \
+
+      itk_component add actionframe {
+         frame $w_.actionframe
+      }
+      pack $itk_component(actionframe) -side top -fill x -ipadx 1m -ipady 1m
+
+      itk_component add servicename {
+         LabelValue $itk_component(actionframe).servicename \
             -text "Service:" \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
-            -value $name
+            -value $itk_option(-shortname)
       }
-      pack $itk_component(service) -side top -fill x -ipadx 1m -ipady 1m
-      add_short_help $itk_component(service) "The TAP service"
+      pack $itk_component(servicename) -side top -fill x -expand 1
+      add_short_help $itk_component(servicename) "The TAP service name"
+
+      itk_component add serviceurl {
+         LabelValue $itk_component(actionframe).serviceurl \
+            -text "        " \
+            -labelwidth $lwidth \
+            -valuewidth $vwidth \
+            -value $itk_option(-accessURL)
+      }
+      pack $itk_component(serviceurl) -side top -fill x -expand 1
+      add_short_help $itk_component(serviceurl) "The TAP service endpoint"
+
+      #  Additional query for discovering information about the tables
+      #  on offer.
+      itk_component add queryservice {
+         button $itk_component(actionframe).queryservice \
+            -text "Tables..." \
+            -command [code $this query_tables_]
+      }
+      pack $itk_component(queryservice) -side right -fill none -expand 0 -ipadx 1m
+      add_short_help $itk_component(queryservice) \
+         {Query the service for information about the tables available}
 
       #  Get the ADQL query.
       itk_component add adqlframe {
@@ -221,6 +248,42 @@ itcl::class gaiavo::GaiaVOTAPQuery {
       }
    }
 
+   #  Query the TAP service about the tables that it provides and display some
+   #  of the metadata. Only done once, as should be fixed for an accessURL.
+   protected method query_tables_ {} {
+      if { $tables_doc_ == {} } {
+         set query "$itk_option(-accessURL)/tables"
+         if { $querytaptask_ == {} } {
+            set querytaptask_ [gaia::GaiaForeignExec \#auto \
+                                  -application $::gaia_dir/querytapthings \
+                                  -preprocess [code $this query_tables_output_] \
+                                  -notify [code $this query_tables_done_]]
+         }
+
+         blt::busy hold $w_
+         set tables_doc_ {}
+         $querytaptask_ runwith $itk_option(-accessURL) "tables"
+      } else {
+         #  Just make sure the results window can be viewed.
+         utilRaiseWindow $w_.tableset
+      }
+   }
+
+   #  Handle output from query_tables task.
+   protected method query_tables_output_ {msg} {
+      append tables_doc_ $msg
+   }
+   
+   #  Query table completed, so pass on result to viewer.
+   protected method query_tables_done_ {} {
+      blt::busy release $w_
+      if { $tables_doc_ != {} } {
+         utilReUseWidget gaiavo::GaiaVOTableSet $w_.tableset -xml $tables_doc_
+         ::update idletasks
+         $w_.tableset update
+      }
+   }
+
    #  Configuration options: (public variables)
    #  ----------------------
 
@@ -258,6 +321,12 @@ itcl::class gaiavo::GaiaVOTAPQuery {
 
    #  Set true when a query is being interrupted.
    protected variable interrupted_ 0
+
+   #  Task to query the TAP service about it's tables.
+   protected variable querytaptask_ {}
+
+   #  Output from querytaptask_, an XML document.
+   protected variable tables_doc_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------

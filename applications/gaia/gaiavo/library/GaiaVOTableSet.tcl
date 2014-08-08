@@ -126,9 +126,15 @@ itcl::class gaiavo::GaiaVOTableSet {
             -selectmode $selectmode_ \
             -exportselection $exportselection_ \
             -headings {name description} \
-            -height 5
+            -height 5 \
+            -width 80
       }
       add_short_help $itk_component(tables) {Tables available}
+
+      #  Set table binding edit the entries.
+      bind $itk_component(tables).listbox <1> [code $this view_selected_]
+      bind $itk_component(tables).listbox <<ListboxSelect>> \
+         [code $this view_selected_]
 
       #  Add the table for displaying the current table.
       itk_component add table {
@@ -137,8 +143,9 @@ itcl::class gaiavo::GaiaVOTableSet {
             -hscroll 1 \
             -selectmode $selectmode_ \
             -exportselection $exportselection_ \
-            -headings {column description datatype} \
-            -height 15
+            -headings {column description datatype units ucd utype} \
+            -height 15 \
+            -width 80
       }
       add_short_help $itk_component(table) \
          {Columns and descriptions in the current table}
@@ -156,9 +163,6 @@ itcl::class gaiavo::GaiaVOTableSet {
       }
       pack $itk_component(close) -side left -expand 1 -pady 2m
       add_short_help $itk_component(close) {Close window}
-
-      #  Set table binding edit the entries.
-      bind $itk_component(tables).listbox <1> [code $this view_selected_]
 
       #  Pack all widgets into place.
       pack $itk_component(tables) -side top -fill both -expand 1
@@ -303,38 +307,39 @@ itcl::class gaiavo::GaiaVOTableSet {
 
       #  Now find all the <table>s.
       set root [$doc documentElement]
-      if { ! [string equal -nocase "tableset" [$root nodeName]] } {
-         error_dialog "root of document not a tableset: [$root nodeName]"
-         return
-      }
+
+      #  Don't do this, some responses are not correct, but still usable.
+      #if { ! [string match -nocase "*tableset" [$root nodeName]] } {
+      #   error_dialog "root of document not a tableset: [$root nodeName]"
+      #   return
+      #}
       set tables [$root selectNodes "//table"]
 
       #  Gather names and descriptions.
       set info {}
       array unset tablelist_
       foreach table $tables {
-         set nameNode [$table selectNode "name"]
-         if { $nameNode != {} } {
-            set name [$nameNode text]
+         set name [get_node_text_ $table "name"]
 
-            #  We require a name.
-            if { $name != {} } {
-               set descNode [$table selectNode "description"]
-               set desc "None provided"
-               if { $descNode != {} } {
-                  set desc [$descNode text]
-               }
-               lappend info [list $name $desc]
+         #  We require a name.
+         if { $name != {} } {
+            set desc [get_node_text_ $table "description"]
+            set desc [clean_ $desc]
+            lappend info [list $name $desc]
 
-               #  Keep indexed list of table nodes so we can pick out content as
-               #  needed.
-               set tablelist_($name) $table
-            }
+            #  Keep indexed list of table nodes so we can pick out content as
+            #  needed.
+            set tablelist_($name) $table
          }
       }
 
       set_contents 1 $info
       new_info 1
+
+      #  Select first row.
+      $itk_component(tables) select_row 1
+      ::update idletasks
+      view_selected_
    }
 
    #  View the properties of the selected table.
@@ -356,20 +361,38 @@ itcl::class gaiavo::GaiaVOTableSet {
       set info {}
       set columns [$table selectNode "column"]
       foreach column $columns {
-         set nameNode [$column selectNode "name"]
-         set name [$nameNode text]
+         catch {
+            set name [get_node_text_ $column "name"]
+            set desc [get_node_text_ $column "description"]
+            set desc [clean_ $desc]
+            set datatype [get_node_text_ $column "dataType"]
+            set units [get_node_text_ $column "unit"]
+            set ucd [get_node_text_ $column "ucd"]
+            set utype [get_node_text_ $column "utype"]
 
-         set descNode [$column selectNode "description"]
-         set desc [$descNode text]
-
-         set dataNode [$column selectNode "dataType"]
-         set datatype [$dataNode text]
-
-         lappend info [list $name $desc $datatype]
+            lappend info [list $name $desc $datatype $units $ucd $utype]
+         }
       }
       set_contents 0 $info
       new_info 0
    }
+
+   #  Get all text from a named child.
+   protected method get_node_text_ {parent name} {
+      set node [$parent selectNode $name]
+      if { $node != {} } {
+         return [$node text]
+      }
+      return {}
+   }
+
+
+   #  Clean a string, removing funny characters and trimming.
+   protected method clean_ {str} {
+      regsub -all {[^\w\d\s\.]} $str {} str
+      return [string trim $str]
+   }
+
 
    #  Configuration options
    #  =====================
@@ -388,7 +411,7 @@ itcl::class gaiavo::GaiaVOTableSet {
    protected variable tablelist_
 
    #  Table configuration.
-   protected variable selectmode_ single
+   protected variable selectmode_ browse
    protected variable exportselection_ 0
 
    #  Common variables: (shared by all instances)

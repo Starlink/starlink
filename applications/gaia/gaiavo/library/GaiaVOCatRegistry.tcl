@@ -191,7 +191,6 @@ itcl::class gaiavo::GaiaVOCatRegistry {
          } else {
             #  Need headers and selected row.
             set headings [$itk_component(results) get_headings]
-            puts "$itk_option(-activate_cmd) \$headings \$args"
             eval $itk_option(-activate_cmd) \$headings "$args"
          }
       }
