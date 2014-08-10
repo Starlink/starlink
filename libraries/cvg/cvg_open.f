@@ -4,7 +4,7 @@
 *     CVG_OPEN
 
 *  Purpose:
-*     Open an existing FITS file for read or update access.
+*     Opens an existing FITS file for read or update access.
 
 *  Language:
 *     Starlink Fortran 77
@@ -54,7 +54,7 @@
 
 *  Authors:
 *     DSB: David S. Berry (JAC, Hawaii)
-*     {enter_OPEN_authors_here}
+*     {enter_newauthors_here}
 
 *  History:
 *     14-NOV-2013 (DSB):

@@ -4,7 +4,7 @@
 *     CVG_CLOSE
 
 *  Purpose:
-*     Close a FITS file.
+*     Closes a FITS file.
 
 *  Language:
 *     Starlink Fortran 77
@@ -50,14 +50,14 @@
 
 *  Authors:
 *     DSB: David S. Berry (JAC, Hawaii)
-*     {enter_CLOSE_authors_here}
+*     {enter_new_authors_here}
 
 *  History:
 *     14-NOV-2013 (DSB):
 *        Original version, based on code from COF_NDF2F.
 *     18-NOV-2013 (DSB):
-*        DO not use Fotran INQUIRE statement to get information about the
-*        supplied unit number. Use FITSIO routines instead.
+*        Do not use Fortran INQUIRE statement to get information about
+*        the supplied unit number. Use FITSIO routines instead.
 *     {enter_further_changes_here}
 
 *-

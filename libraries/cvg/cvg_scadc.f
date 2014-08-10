@@ -145,7 +145,7 @@
 
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.
-      IF( FSTAT .GT. CVG__FITSOK ) THEN
+      IF ( FSTAT .GT. CVG__FITSOK ) THEN
          FTSUB = 'FTOPEN'
          EBUFF = 'Error opening input FITS file '//FILNAM( :FLEN )//'.'
 
@@ -172,4 +172,3 @@
       END IF
 
       END
-

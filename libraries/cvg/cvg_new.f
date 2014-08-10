@@ -4,7 +4,7 @@
 *     CVG_NEW
 
 *  Purpose:
-*     Create a new FITS file and return a unit number for it.
+*     Creates a new FITS file and return a unit number for it.
 
 *  Language:
 *     Starlink Fortran 77

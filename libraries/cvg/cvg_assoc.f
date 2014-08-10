@@ -4,7 +4,7 @@
 *     CVG_ASSOC
 
 *  Purpose:
-*     Open an existing FITS file specified by an environment parameter.
+*     Opens an existing FITS file specified by an environment parameter.
 
 *  Language:
 *     Starlink Fortran 77
@@ -53,7 +53,7 @@
 
 *  Authors:
 *     DSB: David S. Berry (JAC, Hawaii)
-*     {enter_ASSOC_authors_here}
+*     {enter_new_authors_here}
 
 *  History:
 *     20-NOV-2013 (DSB):

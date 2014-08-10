@@ -519,7 +519,7 @@ been moved into a separate library.
 \sstroutine{
    CVG\_ASSOC
 }{
-   Open an existing FITS file specified by an environment parameter
+   Opens an existing FITS file specified by an environment parameter
 }{
    \sstdescription{
       This function opens an existing FITS file with a path obtained from
@@ -611,9 +611,35 @@ been moved into a separate library.
    }
 }
 \sstroutine{
+   CVG\_CLEAN
+}{
+   Removes standard header cards from a FitsCHan
+}{
+   \sstdescription{
+      This removes the following cards, if present, from the supplied
+      FitsChan: SIMPLE, BITPIX, EXTEND, NAXIS, NAXISj, all WCS related
+      cards.
+   }
+   \sstinvocation{
+      CALL CVG\_CLEAN( IPROV, FC, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         FC = INTEGER (Given)
+      }{
+         The FitsChan to clean.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
    CVG\_CLOSE
 }{
-   Close a FITS file
+   Closes a FITS file
 }{
    \sstdescription{
       This function closes the FITS files specified by the supplied
@@ -713,7 +739,7 @@ been moved into a separate library.
          CLEAR = LOGICAL (Given)
       }{
          Should he header be cleared before copying in the new cards?
-         Otherwise, the new cards are appended to the end of teh HDU.
+         Otherwise, the new cards are appended to the end of the HDU.
       }
       \sstsubsection{
          FUNIT = INTEGER (Given)
@@ -806,8 +832,10 @@ been moved into a separate library.
 }{
    \sstdescription{
       This function creates a new FITS binary table holding data copied
-      from an AST FitsTable. The current HDU on exit can be indicated
-      using MKCHDU.
+      from an AST FitsTable. If a binary table extension with the given
+      extension name already exists in the FITS file, it is replaced by
+      the new one. Otherwise, the table is written into the current HDU.
+      The current HDU on exit can be selected using MKCHDU.
    }
    \sstinvocation{
       CALL CVG\_FT2BT( TABLE, FUNIT, EXTNAM, ASTVER, MKCHDU, STATUS )
@@ -971,7 +999,7 @@ been moved into a separate library.
 \sstroutine{
    CVG\_NEW
 }{
-   Create a new FITS file and return a unit number for it
+   Creates a new FITS file and return a unit number for it
 }{
    \sstdescription{
       This function creates a new FITS file with a given path, and
@@ -1017,7 +1045,7 @@ been moved into a separate library.
 \sstroutine{
    CVG\_OPEN
 }{
-   Open an existing FITS file for read or update access
+   Opens an existing FITS file for read or update access
 }{
    \sstdescription{
       This function opens an existing FITS file with a given path,

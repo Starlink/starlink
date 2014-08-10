@@ -208,7 +208,7 @@
       FSTAT = CVG__FITSOK
 
 * Check a Provenance structure was supplied.
-      IF( IPROV .NE. NDG__NULL ) THEN
+      IF ( IPROV .NE. NDG__NULL ) THEN
 
 *  Get a copy of the provenance info excluding hidden ancestors.
          CALL NDG_COPYPROV( IPROV, .TRUE., IPROV2, STATUS )
@@ -256,7 +256,7 @@
                CALL NDG_GETPROV( IPROV2, IDP, ANCKM, STATUS )
                IF ( .NOT. AST_MAPGET0C( ANCKM, 'PATH', PATH, L,
      :                                  STATUS ) ) THEN
-                  IF( STATUS .EQ. SAI__OK ) THEN
+                  IF ( STATUS .EQ. SAI__OK ) THEN
                      STATUS = SAI__ERROR
                      CALL MSG_SETI( 'I', IDP )
                      CALL ERR_REP( ' ', 'No path found for ancestor '//
@@ -427,7 +427,7 @@
       IF ( NHDU .EQ. 1 ) THEN
          CALL FTGKYS( FUNIT, 'PRODUCT', PRODUC, COMENT, FSTAT )
 
-         IF( FSTAT .EQ. 202 .AND. STATUS .EQ. SAI__OK ) THEN
+         IF ( FSTAT .EQ. 202 .AND. STATUS .EQ. SAI__OK ) THEN
             FSTAT = CVG__FITSOK
             CALL FTCMSG
             STATUS = SAI__ERROR
@@ -463,7 +463,7 @@
      :                   'Error writing CADC provenance header cards.',
      :                   STATUS )
 
-      ELSE IF( STATUS .NE. SAI__OK ) THEN
+      ELSE IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( ' ', 'Error writing CADC provenance header '//
      :                 'cards.', STATUS )
       END IF
