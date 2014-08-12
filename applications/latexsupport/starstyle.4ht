@@ -301,15 +301,15 @@
 
 % Css for toc
 \Css{.sectionToc{}}
-\Css{.subsectionToc{padding-left:1em;display:inline-block;}}
-\Css{.subsubsectionToc{padding-left:4em;font-size:80\%}}
+\Css{.subsectionToc{padding-left:1em;}}
+\Css{.subsubsectionToc{padding-left:3em;font-size:100\%}}
 \Css{.chapterHead,.appendixHead{line-height:150\%}}
 
 \ifwithchapters
 \Css{.chapterToc{}}
 \Css{.sectionToc{padding-left:1em}}
-\Css{.subsectionToc{padding-left:2em;display:inline-block;}}
-\Css{.subsubsectionToc{}}
+\Css{.subsectionToc{padding-left:4em;}}
+\Css{.subsubsectionToc{padding-left:7em}}
 \fi
 
 
