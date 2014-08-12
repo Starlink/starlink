@@ -61,8 +61,8 @@
 
 
 % Styling for table of contents options
-\Css{.tocdes{display:inline-block;width:25em;text-align:left;float:right}}
-\Css{.toccom{font-size:80\%;whitespace:nowrap}}
+\Css{.tocdes{width:25em;text-align:left;float:right}}
+\Css{.toccom{margin-left:3emfont-size:100\%}}
 
 
 %% Basic SST topic.
