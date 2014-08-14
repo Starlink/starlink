@@ -338,7 +338,9 @@
 *     2014 August 13 (MJC):
 *        Call KPS1_MSAGx separately for Data and Variance as this
 *        routine only processes one array component at a time.
-*        This preserves the pointer to the variance array.
+*        This preserves the pointer to the variance array.  Check for
+*        bad status after obtaining parameters to ensure the parameter
+*        values are defined before attempting to use them.
 *     {enter_further_changes_here}
 
 *-
@@ -462,6 +464,7 @@
 *  Get the component we require.
       CALL PAR_CHOIC( 'COMP', 'DATA', 'DATA,VARIANCE,QUALITY,ERROR',
      :                .FALSE., COMP, STATUS )
+      IF ( STATUS .NE. SAI__OK ) GOTO 999
 
 *  Single pixel mode.
 *  ==================
