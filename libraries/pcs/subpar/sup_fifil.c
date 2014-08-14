@@ -85,6 +85,8 @@
 *     13-FEB-2006 (TIMJ):
 *        Use cnfFree again since this is easier to control when changing
 *        malloc library.
+*     2014-08-14 (TIMJ):
+*        Use emsRepf rather than emsSetnc
 *     {enter_changes_here}
 
 *  Bugs:
@@ -303,17 +305,15 @@ struct stat statb;
 /* Failed to malloc for path
 */
             *status = SUBPAR__IFNF;
-            emsSetnc( "PATH", path_c, EMS__SZTOK);
-            emsRep("SUP_FIFIL3",
-            "malloc failed for ^PATH translation", status );
+            emsRepf("SUP_FIFIL3",
+                    "malloc failed for %s translation", status, path_c );
             }
          }
       else
          {
          *status = SUBPAR__IFNF;
-         emsSetnc( "PATH", path_c, EMS__SZTOK);
-         emsRep("SUP_FIFIL4",
-         "Environment variable ^PATH not defined", status );
+         emsRepf("SUP_FIFIL4",
+                 "Environment variable %s not defined", status, path_c );
          }
       }
    else
@@ -326,11 +326,9 @@ struct stat statb;
    if ( notfound )
       {
       *status = SUBPAR__IFNF;
-      emsSetnc( "NAME", name_c, EMS__SZTOK);
-      emsSetnc( "EXT", ext_c, EMS__SZTOK);
-      emsSetnc( "PATH", path_c, EMS__SZTOK);
-      emsRep("SUP_FIFIL6",
-      " SUBPAR: Failed to find file ^NAME^EXT on path ^PATH", status );
+      emsRepf("SUP_FIFIL6",
+              " SUBPAR: Failed to find file '%s%s' on path %s", status,
+              name_c, ext_c, path_c);
       }
 
 /* Free the imported C strings etc. - works OK even if they weren't allocated
