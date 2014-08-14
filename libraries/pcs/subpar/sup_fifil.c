@@ -231,15 +231,15 @@ struct stat statb;
 */
                if ( *dir == '~' )
                   {
-                  if ( tmpdir = malloc( strlen( tmphome = getenv("HOME") )
-                           + strlen(dir) + 1 ) )
+                  if ( ( tmpdir = malloc( strlen( tmphome = getenv("HOME") )
+                           + strlen(dir) + 1 ) ) )
                      {
                      strcpy( tmpdir, tmphome );
                      strcat( tmpdir, dir+1 );
                       }
                   }
                else
-                  if ( tmpdir = malloc( strlen( dir ) + 1 ) )
+                  if ( ( tmpdir = malloc( strlen( dir ) + 1 ) ) )
                      strcpy( tmpdir, dir );
 
 
@@ -255,10 +255,10 @@ struct stat statb;
                           ( !ind || (*ind<nexts) );
                         (*ind)++ )
                      {
-                     if ( tmpname=malloc
+                     if ( ( tmpname=malloc
                         ( strlen(tmpdir) + namlen
                           + ( ( exts[*ind] != NULL ) ? strlen(exts[*ind]) : 0 )
-                          + 2 ) )
+                          + 2 ) ) )
                         {
                         strcpy( tmpname, tmpdir );
                         strcat( tmpname,"/");
