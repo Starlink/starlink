@@ -267,6 +267,7 @@ SUN                            STARLINK USER NOTES                           SUN
 266.01  2011-09-14 DSB   ??   THR - A Thread Management Library
 267.01  2012-03-23 TJ    ??   PAL - Positional Astronomy Library
 268.01  2013-11-14 DSB   ??   CVG - A Library of Format Conversion Utility Routines
+269.01  2014-08-14 TL    ??   ORAC-DR - Las Cumbres Observatory recipes
 
 AUTHORS                          AUTHORS                                AUTHORS
                                      (Site code)
@@ -408,6 +409,7 @@ AUTHORS                          AUTHORS                                AUTHORS
        TJ    Tim Jenness             (JACH)
        TJH   Tim Harries             (STA)
        TJP   Tim Pearson             (Caltech)
+       TL    Tim Lister              (LCOGT)
        TMG   Tim Gledhill            (HAT)
        TNW   Tim Wilkins             (DUR - left)
        TW    Thomas Walker           (Hawaii)
