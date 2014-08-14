@@ -281,8 +281,8 @@
 *     Councils.
 *     Copyright (C) 2006 Particle Physics & Astronomy Research
 *     Council.
-*     Copyright (C) 2008, 2009, 2012 Science & Technology Facilities
-*     Council.
+*     Copyright (C) 2008, 2009, 2012, 2014, Science & Technology
+*     Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -335,6 +335,10 @@
 *        instead (set by the global MSG_FILTER environment variable).
 *     2012 August 3 (MJC):
 *        Added "NGood", "NBad", "FGood", and "FBad" estimators.
+*     2014 August 13 (MJC):
+*        Call KPS1_MSAGx separately for Data and Variance as this
+*        routine only processes one array component at a time.
+*        This preserves the pointer to the variance array.
 *     {enter_further_changes_here}
 
 *-
@@ -699,11 +703,23 @@
 *  make an array one dimension larger, which is then collapsed.
 *  The routine returns the pointer to the mapped component.
             IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-               CALL KPS1_MSAGD( NNDF, %VAL( CNF_PVAL( IPNDF ) ), COMP,
-     :                          NDIM, IBLSIZ, IBLOCK, IPIN, STATUS )
+               CALL KPS1_MSAGD( NNDF, %VAL( CNF_PVAL( IPNDF ) ), 'Data',
+     :                          NDIM, IBLSIZ, IBLOCK, IPIN( 1 ),
+     :                          STATUS )
+               IF ( PVAR ) THEN
+                  CALL KPS1_MSAGD( NNDF, %VAL( CNF_PVAL( IPNDF ) ),
+     :                             'Variance', NDIM, IBLSIZ, IBLOCK,
+     :                             IPIN( 2 ), STATUS )
+               END IF
             ELSE
-               CALL KPS1_MSAGR( NNDF, %VAL( CNF_PVAL( IPNDF ) ), COMP,
-     :                          NDIM, IBLSIZ, IBLOCK, IPIN, STATUS )
+               CALL KPS1_MSAGR( NNDF, %VAL( CNF_PVAL( IPNDF ) ), 'Data',
+     :                          NDIM, IBLSIZ, IBLOCK, IPIN(  1 ),
+     :                          STATUS )
+               IF ( PVAR ) THEN
+                  CALL KPS1_MSAGR( NNDF, %VAL( CNF_PVAL( IPNDF ) ),
+     :                             'Variance', NDIM, IBLSIZ, IBLOCK,
+     :                             IPIN( 2 ), STATUS )
+               END IF
             END IF
             CALL NDF_BLOCK( ONDF, NDIM, OBLSIZ, IBLOCK, OBL, STATUS )
 
