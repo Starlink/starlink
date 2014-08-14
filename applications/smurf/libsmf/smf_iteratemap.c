@@ -2292,10 +2292,10 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
           /* See if the map variances calculated on the previous iteration
              should be retained. This is the case if we are doing the
-             last iteration and a different FLT filter has been used for this
-             iteration. */
+             last iteration, the FLT model is being used and a different
+             FLT filter has been used for this iteration. */
           reuse_var = 0;
-          if( quit == 0 && astMapGet0A( keymap, "FLT", &kmap ) ) {
+          if( quit == 0 && haveflt && astMapGet0A( keymap, "FLT", &kmap ) ) {
              double val, lastval;
              astMapGet0D( kmap, "FILT_EDGE_LARGESCALE", &val );
              lastval = val;
