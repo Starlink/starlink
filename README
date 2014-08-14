@@ -458,3 +458,12 @@ Arch Linux:
    netpbm
    tcsh
    texlive-most
+
+CentOS 7:
+   libXext-devel
+   libXau-devel
+   libX11-devel
+   libXt-devel
+   libxml2-devel
+   ncurses-devel
+   texlive-multirow
