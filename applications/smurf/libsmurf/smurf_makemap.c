@@ -746,7 +746,10 @@
 *        accessed (unless JSA tiles are being created).
 *     2014-03-31 (DSB):
 *        smf_mapbounds fast mode has been fixed so that it now works for
-#        the JSA all-sky pixel grid.
+*        the JSA all-sky pixel grid.
+*     2014-08-14 (DSB):
+*        Add NCHUNK item to the SMURF extension of the output map,
+*        holding the number of chunks used.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -1823,6 +1826,10 @@ void smurf_makemap( int *status ) {
     if( iters != -1 && ncontchunks == 1 ) {
        ndfXpt0i( iters, ondf, SMURF__EXTNAME, "NUMITER", status );
     }
+
+    /* Store the number of chunks used in the smurf extension of the
+       output map. */
+    ndfXpt0i( (int) ncontchunks, ondf, SMURF__EXTNAME, "NCHUNK", status );
 
     /* Set bad bits mask to enable QUALITY. We can have quality bits set
        indicating where a boundary condition to zero the map has been used.
