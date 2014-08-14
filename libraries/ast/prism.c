@@ -48,12 +48,12 @@ f     The Prism class does not define any new routines beyond those
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -78,6 +78,8 @@ f     The Prism class does not define any new routines beyond those
 *        - Over-ride the astMapList method.
 *     19-MAR-2009 (DSB):
 *        Over-ride the astDecompose method.
+*     14-AUG-2014 (DSB):
+*        Over-ride the astGetRegionBounds method.
 *class--
 */
 
@@ -138,21 +140,22 @@ f     The Prism class does not define any new routines beyond those
 static int class_check;
 
 /* Pointers to parent class methods which are extended by this class. */
-static int (* parent_maplist)( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
-static int (* parent_getobjsize)( AstObject *, int * );
+static AstMapping *(* parent_simplify)( AstMapping *, int * );
 static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet *, int * );
 static AstRegion *(* parent_getdefunc)( AstRegion *, int * );
-static void (* parent_setregfs)( AstRegion *, AstFrame *, int * );
-static AstMapping *(* parent_simplify)( AstMapping *, int * );
+static double (*parent_getfillfactor)( AstRegion *, int * );
 static int (* parent_equal)( AstObject *, AstObject *, int * );
-static void (* parent_setclosed)( AstRegion *, int, int * );
-static void (* parent_setmeshsize)( AstRegion *, int, int * );
+static int (* parent_getobjsize)( AstObject *, int * );
+static int (* parent_maplist)( AstMapping *, int, int, int *, AstMapping ***, int **, int * );
+static int (* parent_overlapx)( AstRegion *, AstRegion *, int * );
 static void (* parent_clearclosed)( AstRegion *, int * );
 static void (* parent_clearmeshsize)( AstRegion *, int * );
-static double (*parent_getfillfactor)( AstRegion *, int * );
-static int (* parent_overlapx)( AstRegion *, AstRegion *, int * );
-static void (*parent_regsetattrib)( AstRegion *, const char *, char **, int * );
+static void (* parent_setclosed)( AstRegion *, int, int * );
+static void (* parent_setmeshsize)( AstRegion *, int, int * );
+static void (* parent_setregfs)( AstRegion *, AstFrame *, int * );
+static void (*parent_getregionbounds)( AstRegion *, double *, double *, int * );
 static void (*parent_regclearattrib)( AstRegion *, const char *, char **, int * );
+static void (*parent_regsetattrib)( AstRegion *, const char *, char **, int * );
 
 #if defined(THREAD_SAFE)
 static int (* parent_managelock)( AstObject *, int, int, AstObject **, int * );
@@ -215,6 +218,7 @@ static void Decompose( AstMapping *, AstMapping **, AstMapping **, int *, int *,
 static void Delete( AstObject *, int * );
 static void Dump( AstObject *, AstChannel *, int * );
 static void GetRegions( AstPrism *, AstRegion **, AstRegion **, int *, int * );
+static void GetRegionBounds( AstRegion *, double *, double *, int * );
 static void RegBaseBox( AstRegion *, double *, double *, int * );
 static void RegClearAttrib( AstRegion *, const char *, char **, int * );
 static void RegSetAttrib( AstRegion *, const char *, char **, int * );
@@ -940,6 +944,181 @@ static double GetFillFactor( AstRegion *this_region, int *status ) {
    return result;
 }
 
+static void GetRegionBounds( AstRegion *this_region, double *lbnd,
+                             double *ubnd, int *status ){
+/*
+*
+*  Name:
+*     GetRegionBounds
+
+*  Purpose:
+*     Returns the bounding box of Prism.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpregion.h"
+*     void GetRegionBounds( AstRegion *this_region, double *lbnd,
+*                           double *ubnd, int *status )
+
+*  Class Membership:
+*     Prism member function (over-rides the protected astGetRegionBounds
+*     method inherited from the Region class).
+
+*  Description:
+*     This function returns the upper and lower limits of a box which just
+*     encompasses the supplied Prism. The limits are returned as axis
+*     values within the Frame represented by the Prism. The value of the
+*     Negated attribute is ignored (i.e. it is assumed that the Prism has
+*     not been negated).
+
+*  Parameters:
+*     this
+*        Pointer to the Prism.
+*     lbnd
+*        Pointer to an array in which to return the lower axis bounds
+*        covered by the Prism. It should have at least as many elements as
+*        there are axes in the Prism. If an axis has no lower limit, the
+*        returned value will be the largest possible negative value.
+*     ubnd
+*        Pointer to an array in which to return the upper axis bounds
+*        covered by the Prism. It should have at least as many elements as
+*        there are axes in the Prism. If an axis has no upper limit, the
+*        returned value will be the largest possible positive value.
+
+*  Notes:
+*    - The value of the Negated attribute is ignored (i.e. it is assumed that
+*    the Prism has not been negated).
+*    - If an axis has no extent on an axis then the lower limit will be
+*    returned larger than the upper limit. Note, this is different to an
+*    axis which has a constant value (in which case both lower and upper
+*    limit will be returned set to the constant value).
+*    - If the bounds on an axis cannot be determined, AST__BAD is returned for
+*    both upper and lower bounds
+*    - The implementation of this method for Prisms attempts to split the Prism 
+*    into two separate Regions spanning indepenent sets of axes, and then uses 
+*    the astGetRegionBouinds method to get the bounds on these two Regions. Care 
+*    has to be taken because the Prism may have been remapped into a different 
+*    Frame since it was created.
+
+*-
+*/
+
+/* Local Variables: */
+   AstFrame *cfrm1;             /* Frame spanning current axes for 1st component Region */
+   AstFrame *cfrm2;             /* Frame spanning current axes for 2nd component Region */
+   AstFrame *cfrm;              /* Current Frame for total Prism */
+   AstMapping *fsmap;           /* Base->Current Mapping */
+   AstMapping *map1;            /* Base->Current Mapping for axes of 1st component Region */
+   AstMapping *map2;            /* Base->Current Mapping for axes of 2nd component Region */
+   AstMapping *map;             /* Case->Current mapping for total Prism */
+   AstPrism *this;              /* Pointer to Prism structure */
+   AstRegion *reg1;             /* 1st component Region Mapping into Prism's Frame */
+   AstRegion *reg2;             /* 2nd component Region Mapping into Prism's Frame */
+   int *baxes;                  /* Indicies of Base Frame axes to be picked */
+   int *caxes;                  /* Indicies of Current Frame axes to be picked */
+   int iax;                     /* Axis index */
+   int nax1;                    /* Number of axes in first component Region */
+   int nax1_out;                /* Number of current Frame axes in first component Region */
+   int nax2;                    /* Number of axes in second component Region */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the Prism structure. */
+   this = (AstPrism *) this_region;
+
+/* Initialise */
+   cfrm1 = NULL;
+   cfrm2 = NULL;
+   map1 = NULL;
+   map2 = NULL;
+   nax1_out = 0;
+
+/* The number of base-frame axes spanned by the two component Regions. */
+   nax1 = astGetNaxes( this->region1 );
+   nax2 = astGetNaxes( this->region2 );
+
+/* Work space to hold the base frame indices for a single component
+   FrameSet. */
+   baxes = astMalloc( ( nax1 + nax2 )*sizeof( int ) );
+   if( astOK ) {
+
+/* Get the Mapping from Base to Current Frame from the Prism's FrameSet,
+   and get a pointer to the current Frame. */
+      map = astGetMapping( this_region->frameset, AST__BASE, AST__CURRENT );
+      cfrm = astGetFrame( this_region->frameset, AST__CURRENT );
+
+/* Attempt to split the FrameSet encapsulated within the Prism into two -
+   one containing the axes spanned by the first component Region and
+   another containing the axes spanned by the second component Region.
+   First store the zero-based indices of the base Frame axes
+   corresponding to the first component Region. */
+      for( iax = 0; iax < nax1; iax++ ) baxes[ iax ] = iax;
+
+/* Attempt to split these inputs from the total Mapping, thus creating a
+   Mapping that converts just the axes spanned by the first component
+   Region. */
+      caxes = astMapSplit( map, nax1, baxes, &map1 );
+
+/* If the Mapping could be split, get a Frame spanning the current Frame
+   axes corresponding to the first component Region. */
+      if( caxes ) {
+         nax1_out = astGetNout( map1 );
+         cfrm1 = astPickAxes( cfrm, nax1_out, caxes, NULL );
+         caxes = astFree( caxes );
+      }
+
+/* Do the same thing for the second component Region. */
+      for( iax = 0; iax < nax2; iax++ ) baxes[ iax ] = iax + nax1;
+      caxes = astMapSplit( map, nax2, baxes, &map2 );
+      if( caxes ) {
+         cfrm2 = astPickAxes( cfrm, astGetNout( map2 ), caxes, NULL );
+         caxes = astFree( caxes );
+      }
+
+/* Free resources. */
+      cfrm = astAnnul( cfrm );
+      map = astAnnul( map );
+   }
+   baxes = astFree( baxes );
+
+/* If the Prism mapping could not be split, use the parent GetRegionBounds
+   method. */
+   if( !map1 || !map2 ) {
+      (*parent_getregionbounds)( this_region, lbnd, ubnd, status );
+
+/* Otherwise, we get the bounds of the two component Regions separately. */
+   } else {
+
+/* Remap the first component Region using the FrameSet created above. */
+      reg1 = astMapRegion( this->region1, map1, cfrm1 );
+
+/* Get the bounds of this Region, storing the results at the start of the
+   returned lbnd/ubnd arrays. */
+      astGetRegionBounds( reg1, lbnd, ubnd );
+      reg1 = astAnnul( reg1 );
+
+/* Do the same thing for the second component Region, storing the results
+   at the end of the returned lbnd/ubnd arrays. */
+      reg2 = astMapRegion( this->region2, map2, cfrm2 );
+      astGetRegionBounds( reg2, lbnd + nax1_out, ubnd + nax1_out );
+      reg2 = astAnnul( reg2 );
+
+/* What about the possibility that the axes of the Prism have been
+   permuted? */
+
+   }
+
+/* Free resources. */
+   if( map1 ) map1 = astAnnul( map1 );
+   if( map2 ) map2 = astAnnul( map2 );
+   if( cfrm1 ) cfrm1 = astAnnul( cfrm1 );
+   if( cfrm2 ) cfrm2 = astAnnul( cfrm2 );
+
+}
+
 static void GetRegions( AstPrism *this, AstRegion **reg1, AstRegion **reg2,
                         int *neg, int *status ) {
 /*
@@ -1209,11 +1388,13 @@ void astInitPrismVtab_(  AstPrismVtab *vtab, const char *name, int *status ) {
    parent_regclearattrib = region->RegClearAttrib;
    region->RegClearAttrib = RegClearAttrib;
 
+   parent_getregionbounds = region->GetRegionBounds;
+   region->GetRegionBounds = GetRegionBounds;
+
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
    mapping->Decompose = Decompose;
    region->RegBaseBox = RegBaseBox;
-   region->RegBaseMesh = RegBaseMesh;
    region->RegPins = RegPins;
    region->GetBounded = GetBounded;
    region->RegCentre = RegCentre;
