@@ -71,7 +71,7 @@
       PARAMETER ( SST__BKSLH = '\\' )
 
 *  Characters that can represent a comment in SST prologues
-      CHARACTER * (3) SST__COMCHARS
+      CHARACTER * (4) SST__COMCHARS
       PARAMETER ( SST__COMCHARS = '*Cc#' )
 
 *.
