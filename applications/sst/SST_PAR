@@ -29,6 +29,7 @@
 *        Add parameterization of printable backslash.
 *     14-AUG-2014 (TIMJ):
 *        Define comment characters in one location
+*        Add "#" as comment character.
 *     {enter_changes_here}
 
 *  Copyright:
@@ -71,7 +72,7 @@
 
 *  Characters that can represent a comment in SST prologues
       CHARACTER * (3) SST__COMCHARS
-      PARAMETER ( SST__COMCHARS = '*Cc' )
+      PARAMETER ( SST__COMCHARS = '*Cc#' )
 
 *.
 * @(#)sst_par   1.1   94/12/05 11:38:25   96/07/05 10:28:45
