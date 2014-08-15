@@ -86,6 +86,7 @@
 *  Copyright:
 *     Copyright (C) 1990 Science & Engineering Research Council.
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2014 Tim Jenness
 *     All Rights Reserved.
 
 *  Licence:
@@ -126,6 +127,8 @@
 *        Added calls to ERR_MARK and ERR_RLSE.
 *     13-APR-2006 (TIMJ):
 *        Check for ENDFL as well as EOF
+*     14-AUG-2014 (TIMJ):
+*        Use comment character constant from SST_PAR
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -247,7 +250,7 @@
             CALL CHR_CLEAN( LINE ( : NC ) )
 
 *  Note if it is a comment line.
-            COMENT = INDEX( '*Cc', LINE( 1 : 1 ) ) .NE. 0
+            COMENT = INDEX( SST__COMCHARS, LINE( 1 : 1 ) ) .NE. 0
 
 *  Note if it is blank (whether a comment or not).
             BLANK = LINE( 2 : NC ) .EQ. ' '

@@ -31,6 +31,7 @@
 *  Copyright:
 *     Copyright (C) 1990, 1994 Science & Engineering Research Council.
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2014 Tim Jenness
 *     All Rights Reserved.
 
 *  Licence:
@@ -65,6 +66,8 @@
 *        Added calls to ERR_MARK and ERR_RLSE.
 *     13-APR-2006 (TIMJ):
 *        Check for ENDFL as well as EOF
+*     14-AUG-2014 (TIMJ):
+*        Use comment character constant from SST_PAR
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -124,7 +127,7 @@
 *  of prologue" character sequence. If so, then back space the input
 *  file and terminate the input loop.
       IF ( .NOT. PROLOG ) THEN
-         IF ( ( INDEX( '*Cc', LINE( 1 : 1 ) ) .NE. 0 ) .AND.
+         IF ( ( INDEX( SST__COMCHARS, LINE( 1 : 1 ) ) .NE. 0 ) .AND.
      :        ( LINE( 2 : 2 ) .EQ. '+' ) ) THEN
             BACKSPACE( SCB_IN )
             GO TO 99
@@ -156,7 +159,7 @@
 *  See if the input line contains an "end of prologue" character
 *  sequence.  If so, then write the equivalent output sequence and turn
 *  the prologue flag off.
-         ELSE IF ( ( INDEX( '*Cc', LINE( 1 : 1 ) ) .NE. 0 ) .AND.
+         ELSE IF ( ( INDEX( SST__COMCHARS, LINE( 1 : 1 ) ) .NE. 0) .AND.
      :             ( LINE( 2 : 2 ) .EQ. '-' ) ) THEN
             IF ( .NOT. PREVBL ) CALL SST_PUT( 0, ' ', STATUS )
             CALL SST_FOR( 1, '.', STATUS )
@@ -167,7 +170,7 @@
 
 *  Any non-comment lines are sent straight to the output file. However,
 *  blank lines are only used if the previous line was not blank.
-         ELSE IF ( INDEX( '*Cc', LINE( 1 : 1 ) ) .EQ. 0 ) THEN
+         ELSE IF ( INDEX( SST__COMCHARS, LINE( 1 : 1 ) ) .EQ. 0 ) THEN
             RECOG = .FALSE.
             IF ( NC .EQ. 0 ) THEN
                IF ( .NOT. PREVBL ) CALL SST_PUT( 0, ' ', STATUS )

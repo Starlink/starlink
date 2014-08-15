@@ -35,6 +35,7 @@
 *  Copyright:
 *     Copyright (C) 1989, 1990 Science & Engineering Research Council.
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2014 Tim Jenness
 *     All Rights Reserved.
 
 *  Licence:
@@ -74,6 +75,8 @@
 *        Added calls to ERR_MARK and ERR_RLSE.
 *     13-APR-2006 (TIMJ):
 *        Check for ENDFL as well as EOF
+*     14-AUG-2014 (TIMJ):
+*        Use comment character constant from SST_PAR
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -123,7 +126,7 @@
 *  column. This line is not wanted, but marks the start of the
 *  prologue.
       IF ( ( TEST( 2 : 2 ) .NE. '+' ) .OR.
-     :     ( INDEX( '*Cc', TEST( 1 : 1 ) ) .EQ. 0 ) ) GO TO 1
+     :     ( INDEX( SST__COMCHARS, TEST( 1 : 1 ) ) .EQ. 0 ) ) GO TO 1
 
 *  Loop to read the prologue lines, checking for errors.
 2     CONTINUE
@@ -135,7 +138,7 @@
 *  if they do not actually have a comment character).
       NC = CHR_LEN( LINE )
       IF ( ( NC .EQ. 0 ) .OR.
-     :     ( INDEX( '*Cc', LINE( 1 : 1 ) ) .NE. 0 ) ) THEN
+     :     ( INDEX( SST__COMCHARS, LINE( 1 : 1 ) ) .NE. 0 ) ) THEN
 
 *  If there is a '-' in the second column, then it marks the end of the
 *  prologue. Disregard this line and exit from the reading loop.

@@ -19,6 +19,7 @@
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
 *     PWD: Peter W. Draper (STARLINK, Durham University)
+*     TIMJ: Tim Jenness
 *     {enter_new_authors_here}
 
 *  History:
@@ -26,9 +27,12 @@
 *        Original version.
 *     14-APR-2005 (PWD):
 *        Add parameterization of printable backslash.
+*     14-AUG-2014 (TIMJ):
+*        Define comment characters in one location
 *     {enter_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2014 Tim Jenness
 *     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 1990 Science and Engineering Research Council.
 *     All Rights Reserved.
@@ -64,5 +68,10 @@
 *  on the occasions when that isn't needed.
       CHARACTER * ( 1 ) SST__BKSLH
       PARAMETER ( SST__BKSLH = '\\' )
+
+*  Characters that can represent a comment in SST prologues
+      CHARACTER * (3) SST__COMCHARS
+      PARAMETER ( SST__COMCHARS = '*Cc' )
+
 *.
 * @(#)sst_par   1.1   94/12/05 11:38:25   96/07/05 10:28:45

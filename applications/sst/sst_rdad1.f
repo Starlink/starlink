@@ -55,6 +55,7 @@
 *  Copyright:
 *     Copyright (C) 1990 Science & Engineering Research Council.
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2014 Tim Jenness
 *     All Rights Reserved.
 
 *  Licence:
@@ -92,6 +93,8 @@
 *        Added calls to ERR_MARK and ERR_RLSE.
 *     13-APR-2006 (TIMJ):
 *        Seems that FIO__ENDFL is also a valid "end of file" status.
+*     14-AUG-2014 (TIMJ):
+*        Use comment character constant from SST_PAR
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -163,7 +166,7 @@
 *  Find the significant length of the line read and determine if it is
 *  a comment line.
       NC = CHR_LEN( LINE )
-      COMENT = INDEX( '*Cc', LINE( 1 : 1 ) ) .NE. 0
+      COMENT = INDEX( SST__COMCHARS, LINE( 1 : 1 ) ) .NE. 0
 
 *  If the program unit type is not yet known and this line is not a
 *  comment and is sufficiently long, then check to see if it is a
