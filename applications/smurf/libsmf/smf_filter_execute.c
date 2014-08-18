@@ -101,9 +101,11 @@
 *     2013-12-02 (DSB):
 *        Changed so that it can be used on a smfData with no quality (e.g. the
 *        COM model).
+*     2014-8-18 (DSB):
+*        Ensure any BADDA samples have a bad data value on exit.
 
 *  Copyright:
-*     Copyright (C) 2011 Science & Technology Facilities Council.
+*     Copyright (C) 2011-2014 Science & Technology Facilities Council.
 *     Copyright (C) 2007-2009 University of British Columbia.
 *     All Rights Reserved.
 
@@ -481,6 +483,16 @@ void smfFilterExecuteParallel( void *job_data_ptr, int *status ) {
             }
           }
 
+        }
+      }
+
+      /* If a quality array is present ensure any BADDA samples have a
+         bad data value on exit. */
+      if( qbase ) {
+        base = data->pntr[0];
+        base += i*bstride;
+        for( j = 0; j < ntslice; j++ ){
+          if( qbase[ j ] & SMF__Q_BADDA ) base[ j ] = VAL__BADD;
         }
       }
     }
