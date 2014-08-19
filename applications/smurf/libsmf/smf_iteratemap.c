@@ -23,8 +23,9 @@
 *                    double *map, int *hitsmap, double *exp_time,
 *                    double *mapvar, smf_qual_t *mapqual, double *weights,
 *                    char data_units[], double *nboloeff,
-*                    size_t *numcontchunks, size_t *numinsmp, size_t *numcnvg,
-*                    int *iters, int *masked, int *status );
+*                    size_t *numcontchunks, size_t *ncontig, int *memlow,
+*                    size_t *numinsmp, size_t *numcnvg, int *iters,
+*                    int *masked, int *status );
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -94,6 +95,12 @@
 *     numcontchunks = size_t *(Returned)
 *        If non-NULL, will contain the number of continuous data chunks that
 *        were processed.
+*     ncontig = size_t * (Returned)
+*        If non-NULL, will contain the number of continuous chunks within
+*        the supplied data.
+*     memlow = int * (Returned)
+*        If non-NULL, will be non-zerp if the data was chunked due to
+*        insufficient memory.
 *     numinsmp = size_t *(Returned)
 *        If non-NULL, will contain the number of continuous data chunks that
 *        did not go into the map due to insufficient samples.
@@ -474,6 +481,8 @@
 *        reduce the max chunk size so that all chunks have more equal sizes.
 *     2014-7-18 (DSB):
 *        Added config parameter memcheck.
+*     2014-8-19 (DSB):
+*        Added arguments ncontig and memlow.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -587,8 +596,9 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                      double *map, int *hitsmap, double * exp_time,
                      double *mapvar, smf_qual_t *mapqual, double *weights,
                      char data_units[], double * nboloeff,
-                     size_t *numcontchunks, size_t *numinsmp,
-                     size_t *numcnvg, int *iters, int *status ) {
+                     size_t *numcontchunks,  size_t *ncontig, int *memlow,
+                     size_t *numinsmp, size_t *numcnvg, int *iters,
+                     int *status ) {
 
   /* Local Variables */
   int ast_skip;                 /* Number of iterations with no AST model */
@@ -752,6 +762,8 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
   /* initalise */
   *iters = -1;
+  if( memlow ) *memlow = 0;
+  if( ncontig ) *ncontig = 0;
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -1264,10 +1276,11 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   }
 
   if (igroup) {
+    if( ncontig ) *ncontig = igroup->chunk[igroup->ngroups-1]+1;
     msgOutf( " ", FUNC_NAME ": provided data are in %" DIM_T_FMT
              " continuous chunks, the largest of which has %zu samples "
-             "(%lg s)", status, igroup->chunk[igroup->ngroups-1]+1, maxconcat,
-             maxconcat/srate_maxlen );
+             "(%lg s)", status, igroup->chunk[igroup->ngroups-1]+1,
+             maxconcat, maxconcat/srate_maxlen );
   }
 
   /* Once we've run smf_grp_related we know how many subarrays there
@@ -1295,6 +1308,9 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
     smf_checkmem_dimm( maxconcat, INST__SCUBA2, igroup->nrelated, modeltyps,
                        nmodels, msize, keymap, maxdimm, maxfile,
                        &memneeded, status );
+
+    /* Note if there was insufficient memory to avoid chunking. */
+    if( memlow ) *memlow = ( *status == SMF__NOMEM );
 
       /* If we need too much memory, generate a warning message and then try
          to re-group the files using smaller contchunks. */

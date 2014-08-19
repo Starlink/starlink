@@ -1589,6 +1589,8 @@ void smurf_makemap( int *status ) {
     size_t ncontchunks=0;
     size_t ninsmp=0;
     size_t ncnvg=0;
+    size_t ncontig=0;
+    int memlow=0;
     NdgProvenance * oprov = NULL;
 
     /************************* I T E R A T E *************************************/
@@ -1721,7 +1723,8 @@ void smurf_makemap( int *status ) {
                       heateffmap, outfset, moving, lbnd_out, ubnd_out,
                       fts_port, maxmem-mapmem,
                       map, hitsmap, exp_time, variance, mapqual, weights, data_units,
-                      &nboloeff, &ncontchunks, &ninsmp, &ncnvg, &iters, status );
+                      &nboloeff, &ncontchunks, &ncontig, &memlow, &ninsmp,
+                      &ncnvg, &iters, status );
 
       /* If we have just run smf_iteratemap for the second time, free the
          snr mask allocated after the first run. */
@@ -1878,6 +1881,16 @@ void smurf_makemap( int *status ) {
        atlPtfti( fchan, "TILENUM", 1,
                  "Index of this tile (1->NUMTILES)", status );
     }
+
+    /* Store the number of contiguous chunks of time-series data
+       supplied. */
+    atlPtfti( fchan, "NCONTIG", (int) ncontig, "No. of contig. chunks "
+              "within supplied data ", status );
+
+    /* Store a flag indicating if the data was chunked due to lack of
+       memory. */
+    atlPtftl( fchan, "MEMLOW", memlow, "Was data chunked due to insufficient "
+              "memory?", status );
 
     /* Store the effective bolometer count */
     atlPtftd( fchan, "NBOLOEFF", nboloeff,
