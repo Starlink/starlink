@@ -189,7 +189,8 @@ def msg_out(text,level=PROGRESS):
    global ilevel
    global glevel
    global __logfd
-
+   if isinstance( text, bytes ):
+      text = text.decode("utf-8")
    if level == DEBUG:
       text = "debug> {0}".format(text)
 
@@ -352,6 +353,8 @@ def invoke(command,aslist=False,buffer=None,annul=False):
 
          line = proc.stdout.readline()
          while line != None and len(line) > 0:
+            if isinstance( line, bytes ):
+               line = line.decode("utf-8")
             line = line.rstrip()
             msg_out( line, ATASK )
             if aslist:
