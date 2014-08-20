@@ -601,6 +601,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                      int *status ) {
 
   /* Local Variables */
+  float ast_filt_diff;          /* Size of map-change filter */
   int ast_skip;                 /* Number of iterations with no AST model */
   int bolomap=0;                /* If set, produce single bolo maps */
   size_t bstride;               /* Bolometer stride */
@@ -703,7 +704,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   char name[GRP__SZNAM+1];      /* Buffer for storing exported model names */
   dim_t nbolo;                  /* Number of bolometers */
   size_t ncontchunks=0;         /* Number continuous chunks outside iter loop*/
-  int nhitslim;                 /* Min number of hits allowed in a map pixel */
+  int nhitslim=0;               /* Min number of hits allowed in a map pixel */
   int nm=0;                     /* Signed int version of nmodels */
   dim_t nmodels=0;              /* Number of model components / iteration */
   int noidone;                  /* Has the NOI model been calculated yet? */
@@ -722,7 +723,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   smf_qual_t *qua_data=NULL;    /* Pointer to DATA component of qua */
   smfGroup *quagroup=NULL;      /* smfGroup of quality model files */
   int quit=0;                   /* flag indicates when to quit */
-  int rate_limited;             /* Was the MAPTOL_RATE limit hit? */
+  int rate_limited=0;           /* Was the MAPTOL_RATE limit hit? */
   int rebinflags;               /* Flags to control rebinning */
   smfArray **res=NULL;          /* Residual signal */
   double *res_data=NULL;        /* Pointer to DATA component of res */
@@ -883,8 +884,13 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
       /* A negative AST.SKIP value over-rides NUMITER. */
       ast_skip = 0;
+      ast_filt_diff = 0.0;
       if( astMapGet0A( keymap, "AST", &kmap ) ) {
          astMapGet0I( kmap, "SKIP", &ast_skip );
+
+         /* Remove low spatial frequencies in map-change? If non-zero,
+            ast.filt_diff gives the filter size, in arc-secs. */
+         astMapGet0F( kmap, "FILT_DIFF", &ast_filt_diff );
          kmap = astAnnul( kmap );
       }
 
@@ -2366,6 +2372,25 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
           msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
                      ": ** %f s rebinning map",
                      status, smf_timerupdate(&tv1,&tv2,status) );
+
+          /* If required, modify the map to remove low frequencies changes
+             between the new map and the old map. */
+          if( ast_filt_diff > 0.0 ) {
+
+             /* Can only do this if we have a map from the previous
+                iteration (i.e. this is not the ifrst iter). */
+             if( importsky || iter > 1 ) {
+
+                /* Do not do it on the final iteration since we want the
+                   final map to contain all the residual flux. But when
+                   run from skyloop (as indicated by numiter being 1),
+                   we always run it (skyloop will clear ast.filt_diff on
+                   the last iteration). */
+                if( quit == -1 || numiter == 1 ) {
+                   smf_filter_mapchange( wf, &dat, ast_filt_diff, status );
+                }
+             }
+          }
 
           /* If required, subtract an external error map from the map
              created above. */

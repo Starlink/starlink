@@ -166,6 +166,7 @@ smf_filter_execute.c \
 smf_filter_fromkeymap.c \
 smf_filter_getlowf.c \
 smf_filter_ident.c \
+smf_filter_mapchange.c \
 smf_filter_mce.c \
 smf_filter_notch.c \
 smf_filter_r2c.c \

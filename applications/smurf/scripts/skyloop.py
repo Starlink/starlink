@@ -502,6 +502,13 @@ try:
       cleanup()
       sys.exit()
 
+#  See if low frequency changes are to be removed from the map on each
+#  iteration.
+   ast_filt_diff = float( invoke( "$KAPPA_DIR/configecho "
+                               "name=ast.filt_diff config={0} "
+                               "defaults=$SMURF_DIR/smurf_makemap.def "
+                               "select=\"\'450=0,850=1\'\" defval=0.0".format(config)))
+
 #  The first invocation of makemap will create NDFs holding cleaned
 #  time-series data, EXT, LUT and NOI model values. The NDFs are created
 #  with hard-wired names and put in the current working directory. For
@@ -766,11 +773,17 @@ try:
 
 #  Also, if this is the last iteration, create a modified configuration file
 #  that supresses masking (unless the xxx.zero_notlast value in the
-#  supplied config indicates otjerwise).
+#  supplied config indicates otherwise).
             for model in ["ast", "com", "flt"]:
                if zero_notlast[model] != 0:
                   add["ast.zero_notlast"] = 1
                   newcon = 1
+
+#  Also, if this is the last iteration, do not remove low frequency
+#  changes from the map.
+            if ast_filt_diff != 0.0:
+               add["ast.filt_diff"] = 0.0
+               newcon = 1
 
 #  Also override the normal values for parameters that have a
 #  corresponding "_last" value.
