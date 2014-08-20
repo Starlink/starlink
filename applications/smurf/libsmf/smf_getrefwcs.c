@@ -85,6 +85,9 @@
 *        parameter.
 *     25-NOV-2013 (DSB):
 *        Added argument "isjsa".
+*     20-AUG-2014 (DSB):
+*        Convert mapregion circle to ICRS before checking to see if it 
+*        crosses any of the JSA ICRS discontinuities.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -243,6 +246,9 @@ void smf_getrefwcs( const char *param, Grp *igrp, AstFrameSet **specwcs,
    describing the approximate area of the observation within the tracking
    system. */
                   circle = smf_mapregion_approx( igrp, 1, status );
+
+/* Convert the circle to ICRS (as used by the JSA all-sky grid). */
+                  astSetC( circle, "System", "ICRS" );
 
 /* Get the centre and radius of this circle. */
                   astCirclePars( circle, centre, &radius, NULL );
