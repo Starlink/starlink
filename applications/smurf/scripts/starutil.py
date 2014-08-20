@@ -1,4 +1,5 @@
 import os
+import stat
 import sys
 import re
 import abc
@@ -1845,6 +1846,11 @@ class NDG(object):
          NDG.tempdir = tempfile.mkdtemp( prefix='NDG_', dir=dir )
       elif not os.path.isdir(NDG.tempdir):
          os.mkdir( NDG.tempdir )
+
+   # For convenience of allowing others to see the files, make them world-readable.
+      st = os.stat( NDG.tempdir )
+      os.chmod( NDG.tempdir, st.st_mode | stat.S_IRGRP | stat.S_IROTH )
+
       return NDG.tempdir
 
    # Return the path to the temporary list file to use for a group. It is
