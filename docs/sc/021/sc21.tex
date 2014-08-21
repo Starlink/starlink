@@ -1,7 +1,7 @@
 \documentclass[11pt,oneside,chapters]{starlink}
 
-
-\title{SC/21}
+\usepackage{amsfonts}
+%\title{SC/21}
 \stardoccategory {Starlink Cookbook}
 \stardocinitials {SC}
 \stardoccopyright{Copyright \copyright\ 2014 Science and Technology Facilities Council}
@@ -114,7 +114,13 @@ We recommend the following:
 \subsubsection*{Why these recommendations?}
 
 For large-area maps it is important to process a full observation in a
-single chunk. See the text box on \latexhtml{Page~\pageref{box:chunk}}{\htmlref{Chunking}{box:chunk}}\ for an explanation of chunking. For large maps, using normal map-maker parameters a machine having 96\,GB is acceptable. It is important that the memory is as fast as can be afforded, as RAM speed has a direct linear effect on processing time given that the time-series data are continually being funnelled through the CPU.
+single chunk. See the text box on
+\latexhtml{Page~\pageref{box:chunk}}{\htmlref{Chunking}{box:chunk}}\
+for an explanation of chunking. For large maps, using normal map-maker
+parameters a machine having 96\,GB is acceptable. It is important that
+the memory is as fast as can be afforded, as RAM speed has a direct
+linear effect on processing time given that the time-series data are
+continually being funnelled through the CPU.
 
 For blank-field surveys, data that only use 850\,$\mu$m, or smaller
 regions of the sky you can usefully run the map-maker with less memory
@@ -1211,6 +1217,7 @@ configuration file}).
   \includegraphics[width=\linewidth]{sc21_ast} \\
   \includegraphics[width=\linewidth]{sc21_res} \\
 \end{latexonly}
+\end{center}
 %\begin{htmlonly}
 %  \includegraphics[width=136mm]{sc21_com} \\
 %  \includegraphics[width=136mm]{sc21_flt} \\
@@ -1227,7 +1234,6 @@ showing as a positive spike when this bolometer passes over the
 source, and the \model{RES} model looking (as expected) like white
 noise.}
 \label{fig:itercomp}
-\end{center}
 \end{figure}
 
 
@@ -1573,12 +1579,16 @@ emission in your map.
 By default these recipes do not point to any existing configuration file. To use
 these recipes in addition to  \file{dimmconfig\_bright\_extended.lis} you should
 create a parameter file containing the following lines.
-\begin{quote}
+
 \begin{verbatim}
 ^/star/share/smurf/dimmconfig_bright_extended.lis
 ^/star/share/smurf/dimmconfig_fix_blobs.lis
 \end{verbatim}
-\end{quote}
+
+\begin{terminalv}
+^/star/share/smurf/dimmconfig_bright_extended.lis
+^/star/share/smurf/dimmconfig_fix_blobs.lis
+\end{terminalv}
 This reads a complete set of configuration parameter from the
 \file{dimmconfig\_bright\_extended.lis} file, and then assigns new values for just
 those parameters defined in \file{dimmconfig\_fix\_blobs.lis}. These values override
@@ -2683,11 +2693,11 @@ in the \gaiathing{Display image sections} window and click
 
 \begin{minipage}[c]{0.65\linewidth}
 \centering
-\hspace{0.5mm}
-\includegraphics[width=3cm, height=3cm]{sc21_iter1}
-\includegraphics[width=3cm, height=3cm]{sc21_iter2}
-\includegraphics[width=3cm, height=3cm]{sc21_iter31}
-\vspace{0.2cm}
+%\hspace{0.5mm}
+\includegraphics[width=3cm, ]{sc21_iter1}
+\includegraphics[width=3cm, ]{sc21_iter2}
+\includegraphics[width=3cm, ]{sc21_iter31}
+%\vspace{0.2cm}
 \end{minipage}
 \hspace{0.3cm}
 \begin{minipage}[c]{0.29\linewidth}
