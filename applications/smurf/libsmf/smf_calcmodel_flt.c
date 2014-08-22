@@ -90,6 +90,8 @@
 *     2013-10-21 (DSB):
 *        - Provide an option to flag samples that appear to suffer from
 *        ringing  after the FLT model has been removed.
+*     2013-08-22 (DSB):
+*        Include extra checks for bad values stored for BADDA samples.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -495,7 +497,7 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
 
           /* If required, locate and flag any residuals that seem to suffer
              from ringing now that the low frequency FLT model has been
-             removed. DO not apply a ringing filter unless an AST model 
+             removed. DO not apply a ringing filter unless an AST model
              was used on the previous iteration. */
           if( ring_box1 > 0.0 && !dat->ast_skipped &&
               ( ring_freeze <= 0 || dat->iter <= ring_freeze ) ){
@@ -596,8 +598,9 @@ static void smf1_calcmodel_flt( void *job_data_ptr, int *status ) {
             pm = pdata->model_data + ibase;
             for( itime = 0; itime < pdata->ntslice; itime++ ) {
 
-/*  Add the model value on to the residual. */
-               *pr += *pm;
+/*  Add the model value on to the residual. BADDA samples will have bad 
+    values so check for them. */
+               if( *pr != VAL__BADD ) *pr += *pm;
 
 /* Clear any SMF__Q_RING flags. */
                if( pdata->clear_ring) *pq &= ~SMF__Q_RING;
@@ -649,13 +652,14 @@ static void smf1_calcmodel_flt( void *job_data_ptr, int *status ) {
             pn = pdata->noi_data + ibolo*pdata->noibstride;
 
             for( itime = 0; itime < pdata->ntslice; itime++ ) {
-               *pr -= *pm;
-
-               if( pdata->noi_data && !( *pq & SMF__Q_GOOD ) ) {
-                  double change = *pm - *pmc;
-                  pdata->dchisq += change*change /
-                                   pn[ (itime % pdata->nointslice)*pdata->noitstride ];
-                  pdata->ndchisq++;
+               if( *pr != VAL__BADD ) {
+                  *pr -= *pm;
+                  if( pdata->noi_data && !( *pq & SMF__Q_GOOD ) ) {
+                     double change = *pm - *pmc;
+                     pdata->dchisq += change*change /
+                                      pn[ (itime % pdata->nointslice)*pdata->noitstride ];
+                     pdata->ndchisq++;
+                  }
                }
 
                pr += pdata->tstride;

@@ -24,7 +24,7 @@
 *        Pointer to smfData that will contain the updated QUALITY array
 *     syncbad = int (Given)
 *        If set ensure that every bad pixel (VAL__BADx) in the data array
-*        has a corresponding quality of SMF__Q_BADDA.
+*        has a corresponding quality of SMF__Q_BADDA, and vice-versa.
 *     badmask = const int* (Given)
 *        Integer array with same dimensions as bolometers.
 *        Each position that is bad will set SMF__Q_BADB for all data
@@ -77,7 +77,7 @@
 *     2008-12-03 (TIMJ):
 *        Use modified smf_get_dims
 *     2008-12-12 (TIMJ):
-*        Check data array when badfrac is true buy syncbad is false.
+*        Check data array when badfrac is true but syncbad is false.
 *     2010-03-19 (EC):
 *        Rename SMF__Q_BADS to SMF__Q_BADDA
 *     2010-07-06 (TIMJ):
@@ -87,6 +87,8 @@
 *        New quality sidecar scheme
 *     2014-01-14 (DSB):
 *        Multi-thread.
+*     2014-08-21 (DSB):
+*        If syncbad is non-zero, assign bad data values to all BADDA samples.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -355,15 +357,23 @@ static void smf1_update_quality( void *job_data_ptr, int *status ) {
    if( pdata->operation == 1 ){
       p1 = pdata->ddata + i1;
       p2 = pdata->qual + i1;
-      for( i = i1; i <= i2; i++,p2++) {
-         if( *(p1++) == VAL__BADD ) *p2 |= SMF__Q_BADDA;
+      for( i = i1; i <= i2; i++,p1++,p2++) {
+         if( *p1 == VAL__BADD ) {
+            *p2 |= SMF__Q_BADDA;
+         } else if( *p2 & SMF__Q_BADDA ) {
+            *p1 = VAL__BADD;
+         }
       }
 
    } else if( pdata->operation == 2 ){
       p3 = pdata->idata + i1;
       p2 = pdata->qual + i1;
-      for( i = i1; i <= i2; i++,p2++) {
-         if( *(p3++) == VAL__BADI ) *p2 |= SMF__Q_BADDA;
+      for( i = i1; i <= i2; i++,p3++,p2++) {
+         if( *p3 == VAL__BADI ) {
+            *p2 |= SMF__Q_BADDA;
+         } else if( *p2 & SMF__Q_BADDA ) {
+            *p3 = VAL__BADI;
+         }
       }
 
    } else if( pdata->operation == 3 ){
