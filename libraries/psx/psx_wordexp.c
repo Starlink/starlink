@@ -171,6 +171,9 @@ F77_SUBROUTINE(psx_wordexp)( CHARACTER(WORDS), INTEGER(CONTEXT),
                         "Unrecognized error from wordexp", STATUS );
           }
 
+          psx1_rep_c( "PSX_WORDEXP_ERR3", "Error expanding words within "
+                      "string '%s'", STATUS, words );
+
         }
       }
     }
