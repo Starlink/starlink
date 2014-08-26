@@ -86,8 +86,11 @@
 *     25-NOV-2013 (DSB):
 *        Added argument "isjsa".
 *     20-AUG-2014 (DSB):
-*        Convert mapregion circle to ICRS before checking to see if it 
+*        Convert mapregion circle to ICRS before checking to see if it
 *        crosses any of the JSA ICRS discontinuities.
+*     26-AUG-2014 (DSB):
+*        Allow some tolerance for rounding errors when checking whether the
+*        observation instersects an HPX discontinuity.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -278,8 +281,10 @@ void smf_getrefwcs( const char *param, Grp *igrp, AstFrameSet **specwcs,
                      p0[ 1 ] = centre[ 1 ];
 
 /* If the arc-distance between this point and the circle centre is less
-   than the radius, the circle intersects the meridian. */
-                     if( fabs( astDistance( circle, centre, p0 ) <= radius ) ) {
+   than the radius, the circle intersects the meridian. Use twice the
+   radius to allow some tolerance (there's no real harm in using XPH
+   rather than HPX in the polar regions so it's better to be safe). */
+                     if( fabs( astDistance( circle, centre, p0 ) <= 2*radius ) ) {
 
 /* If the circle centre is above the northern transitional latitude, we
    need to use the XPH projection centred on the north pole. */
