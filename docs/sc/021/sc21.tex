@@ -235,12 +235,12 @@ To execute the \task{cat} command you must enclose it in back quotes. You must
 also include the \file{.sdf} extension on any files passed to \picard.
 
 \begin{tip}
-TIP: The .sdf extension on filenames is required by \textsc{Picard}.
+The .sdf extension on filenames is required by \textsc{Picard}.
 \end{tip}
 
 
 \begin{tip}
-TIP: If the environment variable \envvar{ORAC\_DATA\_OUT} is defined, any files
+If the environment variable \envvar{ORAC\_DATA\_OUT} is defined, any files
 created by \textsc{Picard} will be written in that location. Check there if new
 files are expected but do not appear in your working directory.
 \end{tip}
@@ -583,12 +583,12 @@ before examining it.
 
 
 \begin{tip}
-TIP: You do not need to apply the flat-field prior to reducing your
+You do not need to apply the flat-field prior to reducing your
 data with the map-maker.
 \end{tip}
 
 %\begin{htmlonly}
-%\textbf{TIP: You do not need to apply the flat-field
+%\textbf{You do not need to apply the flat-field
 %prior to reducing your data with the map-maker.\\*\\*}
 %\end{htmlonly}
 
@@ -711,11 +711,11 @@ the pattern completed successfully.
 
 
 \begin{tip}
-TIP: Follow the \task{jcmtstate} command with \texttt{-h} to find out more information.
+Follow the \task{jcmtstate} command with \texttt{-h} to find out more information.
 \end{tip}
 
 %\begin{htmlonly}
-%  \textbf{TIP: Follow the \task{jcmtstate} command with \texttt{-h} to find% out more information.\\\\}
+%  \textbf{Follow the \task{jcmtstate} command with \texttt{-h} to find% out more information.\\\\}
 %\end{htmlonly}
 
 This catalogue can be loaded into \topcat\ for plotting, making sure
@@ -838,12 +838,12 @@ arcsec).
 }
 
 \begin{tip}
-TIP: If you do not include \param{method=rebin}, the map-maker will will
+If you do not include \param{method=rebin}, the map-maker will will
 default to \param{method=iterate}.
 \end{tip}
 
 %\begin{htmlonly}
-%\textbf{TIP: If you do not include method=rebin, the map-maker will
+%\textbf{If you do not include method=rebin, the map-maker will
 %default to method=iterate.\\*\\*}
 %\end{htmlonly}
 
@@ -1278,11 +1278,11 @@ SCUBA-2 Data}).~} The variance and quality for the data are stored as
 the VARIANCE and QUALITY components within the residual file NDF.
 
 \begin{tip}
-TIP: You can examine any of these model components as you would the final map.
+You can examine any of these model components as you would the final map.
 \end{tip}
 
 %\begin{htmlonly}
-%\textbf{TIP: You can examine any of these model components as you would the final map.\\*\\*}
+%\textbf{You can examine any of these model components as you would the final map.\\*\\*}
 %\end{htmlonly}
 
 Examples of the time traces for a single bolometer from these output
@@ -1580,15 +1580,11 @@ By default these recipes do not point to any existing configuration file. To use
 these recipes in addition to  \file{dimmconfig\_bright\_extended.lis} you should
 create a parameter file containing the following lines.
 
-\begin{verbatim}
-^/star/share/smurf/dimmconfig_bright_extended.lis
-^/star/share/smurf/dimmconfig_fix_blobs.lis
-\end{verbatim}
-
 \begin{terminalv}
 ^/star/share/smurf/dimmconfig_bright_extended.lis
 ^/star/share/smurf/dimmconfig_fix_blobs.lis
 \end{terminalv}
+
 This reads a complete set of configuration parameter from the
 \file{dimmconfig\_bright\_extended.lis} file, and then assigns new values for just
 those parameters defined in \file{dimmconfig\_fix\_blobs.lis}. These values override
@@ -1625,7 +1621,7 @@ edit can be found in \cref{Section}{sec:tweak}{Tweaking the
 configuration file}.
 
 \begin{tip}
-TIP: An up-caret (\,\texttt{\^}\,) is required any time you are reading in
+An up-caret (\,\texttt{\^}\,) is required any time you are reading in
 a  group text file in \starlink. For the map-maker this includes the
 configuration file (a group of parameters) and a list of your input files
 (e.g. \texttt{in=\^\,myrawfiles.txt}).
@@ -1651,7 +1647,7 @@ fitting---instead regrid your map as a post-processing step.
 %complete list of all ADAM parameters can be found in \smurfsun.
 
 \begin{tip}
-TIP: Map-maker not finding your raw files from a path? Check you have
+Map-maker not finding your raw files from a path? Check you have
 double quotes around your `in' option and are not using \texttt{*sdf}---use
 either \texttt{*.sdf} or just \texttt{*}.
 \end{tip}
@@ -1759,8 +1755,8 @@ smf_iteratemap: ****** Completed in 5 iterations
 smf_iteratemap: ****** Solution CONVERGED
 Total samples available from all chunks: 18273302 (3067.53 bolos)
 %%%%\end{}
-
 \end{terminalv}
+
 
 
 \section{\xlabel{look_for}What to look out for}
@@ -2101,7 +2097,7 @@ output from \drrecipe{CROP\_SCUBA2\_IMAGES} is a file with the suffix
 \htmladdnormallink{\textsc{Picard} website}{http://www.oracdr.org/oracdr/PICARD}\latex{\footnote{\url{http://www.oracdr.org/oracdr/PICARD}}}.
 
 \begin{tip}
-TIP: The default crop shape will be a square. Avoid losing good data
+The default crop shape will be a square. Avoid losing good data
 by specifying a circle using the parameter file.
 \end{tip}
 
@@ -2142,7 +2138,7 @@ all observations simultaneously or separately. However, the latter
 does allow the option of assessing the individual maps before co-adding.
 
 \begin{tip}
-  TIP: The list of files can be the output from \texttt{cat}. Remember
+  The list of files can be the output from \texttt{cat}. Remember
   to include the back quotes.  For example, \texttt{\% picard
     MOSAIC\_JCMT\_IMAGES \`{}cat myfiles.txt\`{}}.
 \end{tip}
@@ -2204,11 +2200,11 @@ After applying any necessary FCF, \drrecipe{SCUBA2\_CHECK\_RMS} simply
 executes the following steps to get the map noise.
 
 \begin{enumerate}
-\item (1) Crops the map to remove the noisy edges.
+\item Crops the map to remove the noisy edges.
 \begin{terminalv}
 % picard CROP_JCMT_IMAGES map_cal.sdf
 \end{terminalv}
-\item (2) Runs the \Kappa\ command \stats\ to extract the median value from
+\item Runs the \Kappa\ command \stats\ to extract the median value from
 the error array.
 \begin{terminalv}
 % stats map_cal_crop comp=err order
@@ -2216,14 +2212,14 @@ the error array.
 \end{enumerate}
 
 \begin{tip}
-TIP: Use the error array to avoid contamination of the noise
+Use the error array to avoid contamination of the noise
 distribution from bright sources.
 
 \vspace{0.1cm}
 \end{tip}
 
 \begin{htmlonly}
-\textbf{TIP: Use the error array to avoid contamination of the noise
+\textbf{Use the error array to avoid contamination of the noise
 distribution from bright sources.}
 \end{htmlonly}
 
@@ -2247,12 +2243,7 @@ the median is also shown.
 similar result to the mean/median of the error array except with
 additional contamination from sources.
 
-\begin{latexonly}
-\myfig{sc21_noihist}{[b!]}{height=7.5cm}{fig:noihisto}{
-  The error array viewed with \textsc{Kappa} command \task{histogram}.}{
-  The error array viewed with \textsc{Kappa} command \task{histogram}.
-}
-\end{latexonly}
+
 
 \subsection{Viewing the noise histogram}
 
@@ -2267,12 +2258,10 @@ The output is shown in the \cref{Figure}{fig:noihisto}{the plot below}.
 For more information on the options for \histogram\ see
 \kappasun.
 
-\begin{htmlonly}
-\myfig{sc21_noihist}{[b!]}{height=10cm}{fig:noihisto}{
+\myfig{sc21_noihist}{}{width=0.7\linewidth}{fig:noihisto}{
   The error array viewed with \textsc{Kappa} command \task{histogram}.}{
   The error array viewed with \textsc{Kappa} command \task{histogram}.
 }
-\end{htmlonly}
 
 \subsection{Examining the error map with GAIA}
 
@@ -2290,18 +2279,18 @@ window to get a report of the statistics in the selected region.
 
 \begin{tip}
 
-TIP: You can write out the error array of your map into a new NDF
+You can write out the error array of your map into a new NDF
 using the \textsc{Kappa} command \ndfcopy. For example, \texttt{\% ndfcopy map comp=err map\_err}
 \end{tip}
 
 
-\begin{latexonly}
+
 \myfig{sc21_noigaia6}{[h!]}{width=\linewidth}{fig:noigaia}{
   The error map viewed with \gaia}{
   The error array displayed with \gaia. After clicking the
   \gaiathing{Error} button (circled in red) you will have to rescale your map.
 }
-\end{latexonly}
+
 
 \section{\xlabel{regridding}Regridding your data}
 \label{sec:regriddata}
@@ -2315,7 +2304,7 @@ compression factor of 2.
 \end{terminalv}
 
 \begin{tip}
-TIP: Remember you can use \ndftrace\ if you are unsure of the pixel size.
+Remember you can use \ndftrace\ if you are unsure of the pixel size.
 \end{tip}
 
 
@@ -2422,12 +2411,14 @@ nearby sources, each ends up contributing flux to both peaks.
 As in the example parameter file below we have requested the
 background should be estimated by first smoothing the map and PSF with
 a 15-arcsec Gaussian.
-\begin{quote}
-\begin{verbatim}
+
+\begin{terminalv}
+
 [SCUBA2_MATCHED_FILTER]
 SMOOTH_FWHM = 15
-\end{verbatim}
-\end{quote}
+
+\end{terminalv}
+
 \latex{\vspace{4mm}}
 
 This is a fairly common technique used throughout the extra-galactic
@@ -2488,7 +2479,7 @@ same sizes at the four position angles is then found and used as the
 clump shape.
 \end{minipage}
 
-\myfig{sc21_plotstcshapes}{[ht!]}{width=0.99\linewidth}{fig:stcshapes}{
+\myfig{sc21_plotstcshapes}{[ht!]}{width=1.0\linewidth}{fig:stcshapes}{
   Overlaying a clump catalogue in \gaia.}{
   STC shapes displayed over the input map with \gaia. To overlay your clumps
   in this way display your map with \textsc{Gaia}. Under the \gaiathing{Image-Analysis}
@@ -2610,12 +2601,12 @@ repository}{https://github.com/Starlink/starlink/blob/master/applications/smurf/
  However, we do not advise users to alter any of these default parameters.
 
 \begin{tip}
-TIP: If you wish to disable an active parameter in the default file,
+If you wish to disable an active parameter in the default file,
 set it as \param{<undef>} in your personalised file.
 \end{tip}
 
 \begin{htmlonly}
-\textbf{TIP: If you wish to disable an active parameter in the default
+\textbf{If you wish to disable an active parameter in the default
 file, set it as \param{<undef>} in your personalised file.}
 \end{htmlonly}
 
@@ -3262,12 +3253,11 @@ In order to optimally find sources that are the size of the telescope
 beam, we apply the matched filter recipe, namely
 \xref{\drrecipe{SCUBA2\_MATCHED\_FILTER}}{sun265}{SCUBA2_MATCHED_FILTER}.
 We create a simple parameter file called \file{smooth.ini}:
-\begin{quote}
-\begin{verbatim}
+
+\begin{terminalv}
 [SCUBA2_MATCHED_FILTER]
 SMOOTH_FWHM = 15
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 where \param{SMOOTH\_FWHM~=~15} indicates that the background should be
 estimated by first smoothing the map and PSF with a 15-arcsec FWHM
 Gaussian. Next, the recipe is executed as follows:
@@ -3389,12 +3379,12 @@ series. This produces a co-added signal map (\file{\_wmos}) and a
 coadded PSF map (\file{\_mappsf}).
 
 \begin{tip}
-TIP: The recipe name \drrecipe{FAINT\_POINT\_SOURCES\_JACKKNIFE} can be used
+The recipe name \drrecipe{FAINT\_POINT\_SOURCES\_JACKKNIFE} can be used
 interchangably with  \drrecipe{REDUCE\_SCAN\_FAINT\_POINT\_SOURCES\_JACKKNIFE}.
 \end{tip}x
 
 \begin{htmlonly}
-\textbf{TIP: The recipe names \drrecipe{FAINT\_POINT\_SOURCES\_JACKKNIFE} can be
+\textbf{The recipe names \drrecipe{FAINT\_POINT\_SOURCES\_JACKKNIFE} can be
 used interchangably with  \drrecipe{REDUCE\_SCAN\_FAINT\_POINT\_SOURCES\_JACKKNIFE}.}
 \end{htmlonly}
 
@@ -3432,12 +3422,10 @@ If you decide to re-run this step you first co-add all the
 \end{terminalv}
 Next create a parameter file (\file{recpars.lis}) for the jack-knife
 recipe (\drrecipe{SCUBA2\_JACKKNIFE}) containing the following lines.
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 [SCUBA2_JACKKNIFE]
 PSF_MATCHFILTER = <name_of_above_coadded_PSF>.sdf
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 Another option for this parameter file is \param{WHITEN\_BOX} to set the
 size of the region used to calculate the angular power spectrum.
 Finally run \drrecipe{SCUBA2\_JACKKNIFE}.
@@ -3541,16 +3529,14 @@ format---note how it is based on
 \file{dimmconfig\_bright\_extended.lis}. It has decreased the
 convergence parameter to \param{MAPTOL}=0.03 but increased the number
 of iterations to compensate as 40 is unlikely to be sufficient.
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 ^$STARLINK_DIR/share/smurf/dimmconfig_bright_extended.lis
 numiter = -100
 noisecliphigh = 10.0
 maptol = 0.03
 ast.zero_mask=1
 ast.zero_snr = 0
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 
 \textbf{Step 4: Cropping the map}
 \vspace{0.2cm}\\
@@ -3571,12 +3557,10 @@ at the exposure-time image with \gaia.  See
 The exposure-time map shows a sharp drop off at a radius of 30\,arcmin.
 We can thus specify a parameter file like below.
 \begin{center}
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 [CROP_JCMT_IMAGES]
 MAP_RADIUS = 1800
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 \end{center}
 
 \begin{terminalv}
@@ -3772,12 +3756,10 @@ For example, to run the pipeline with \drrecipe{REDUCE\_SCAN\_CHECKRMS} with a
 configuration file called \file{myconfig.lis}, the recipe parameter file
 (\file{mypars.ini}) will look like this.
 \vspace{0.2cm}
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 [REDUCE_SCAN_CHECKRMS]
 MAKEMAP_CONFIG = myconfig.lis
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 
 Then run the pipeline calling the parameter file via the
 \texttt{-recpars} option.
@@ -3830,14 +3812,12 @@ want to supply a new configuration file and a different set of
 clump-finding parameters. To do so we create a parameter file called
 \file{mypars.ini} which contains the following text.
 
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 [REDUCE_SCAN]
 MAKEMAP_CONFIG = mynewconfig.lis
 FINDCLUMPS_CFG = myfellwalkerparams.lis
 
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 
 \end{minipage}
 
@@ -4278,12 +4258,10 @@ effective shape of a point-source in this background-subtracted map.
 
 Before running \textsc{Picard}, a simple parameters file called \file{smooth.ini}
 may be created.
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 [SCUBA2_MATCHED_FILTER]
 SMOOTH_FWHM = 15
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 %
 where \param{SMOOTH\_FWHM~=~15} indicates that the background should
 be estimated by first smoothing the map and PSF with a 15~arcsec FWHM
@@ -4358,12 +4336,10 @@ relation was applied by using the \Kappa\ command \hislist.
 %  hislist file | grep EXT.TAURELATION
 \end{terminalv}
 This will return something like the following,
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
       EXT.TAURELATION.450=(26.0,-0.012),
       EXT.TAURELATION.850=(4.6,-0.0043), EXT.TAUSRC=auto, FAKESCALE=1,
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 
 \newpage
 \chapter{\xlabel{cog}Aperture-photometry curve of growth}
@@ -4683,8 +4659,7 @@ Parameter & Value & Description \\
 \label{app:special}
 
 \section{\file{dimmconfig\_bright\_extended.lis}}
-\begin{quote}
-\begin{verbatim}
+\begin{terminalv}
 ^$STARLINK_DIR/share/smurf/dimmconfig.lis
    numiter=-40
    flt.filt_edge_largescale=480
@@ -4695,8 +4670,7 @@ Parameter & Value & Description \\
    flt.zero_snr=5
    flt.zero_snrlo=3
 
-\end{verbatim}
-\end{quote}
+\end{terminalv}
 
 \section{\file{dimmconfig\_bright\_compact.lis}}
 \begin{terminalv}
