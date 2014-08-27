@@ -1847,10 +1847,10 @@ class NDG(object):
       elif not os.path.isdir(NDG.tempdir):
          os.mkdir( NDG.tempdir )
 
-   # For convenience of allowing others to see the files, make them world-readable.
+   # For convenience of allowing others to see the files, make them
+   # world-readable. Also make the directory world-executable.
       st = os.stat( NDG.tempdir )
-      os.chmod( NDG.tempdir, st.st_mode | stat.S_IRGRP | stat.S_IROTH )
-
+      os.chmod( NDG.tempdir, st.st_mode | stat.S_IRGRP | stat.S_IROTH | stat.S_IXGRP | stat.S_IXOTH )
       return NDG.tempdir
 
    # Return the path to the temporary list file to use for a group. It is
