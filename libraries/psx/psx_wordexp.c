@@ -141,6 +141,7 @@ F77_SUBROUTINE(psx_wordexp)( CHARACTER(WORDS), INTEGER(CONTEXT),
           *STATUS = PSX__BDWXP;
           switch(retval) {
           case WRDE_BADCHAR:
+            *STATUS = PSX__BDCHR;
             psx1_rep_c( "PSX_WORDEXP_ERR3",
                         "The WORDS argument contains illegal unquoted characters",
                         STATUS );

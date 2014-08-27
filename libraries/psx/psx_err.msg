@@ -13,4 +13,5 @@ ERRNO   <System error during POSIX call>
 TRUNC   <Truncated string>
 BADIT	<Unknown item of file information requested>
 BDWXP   <Error from word expansion>
+BDCHR   <Illegal characters encountered by word expansion>
 .END
