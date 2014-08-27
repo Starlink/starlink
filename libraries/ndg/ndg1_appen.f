@@ -72,6 +72,10 @@
 *     2011-03-07 (TIMJ):
 *        Use the new ONE_WORDEXP_FILE so that we only get matches
 *        to files that exist.
+*     27-AUG-2014 (DSB):
+*        If the template contains characters that are illegal within 
+*        a file name (as defined by thw wordexp function), then annul 
+*        the error and treat it like a simple case of "no matching NDFs".
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -85,6 +89,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'GRP_PAR'          ! GRP constants.
+      INCLUDE 'PSX_ERR'          ! PSX error constants.
 
 *  Arguments Given:
       INTEGER IGRP1
@@ -130,6 +135,12 @@
 *  Append a copy of REST to the second group.
                CALL GRP_PUT( IGRP2, 1, REST, 0, STATUS )
 
+*  If the error status indicates that the name contained some illegal
+*  characters, we probably have an HDS cell index. So annul the error and
+*  treat it like a simple case of "no matching NDFs".
+            ELSE IF( STATUS .EQ. PSX__BDCHR ) THEN
+               CALL ERR_ANNUL( STATUS )
+               ICONTX = 0
             END IF
 
          END DO
