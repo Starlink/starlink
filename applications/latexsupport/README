@@ -1,6 +1,6 @@
 htlatex has a lot of options. Current command line example is:
 
-htlatex sc21.tex "starlinkxhtml.cfg,xhtml,mathml,charset=utf-8,fn-in" '  -cvalidate -cunihtf'
+htlatex sc21.tex "starlinkxhtml.cfg,xhtml,mathml,charset=utf-8,fn-in" '  -cvalidate '
 
 Where starlinkxhtml.cfg loads the correct configuration file,
 
@@ -8,8 +8,26 @@ xhtml and mathml define the output.
 
 charset=utf-8 gives you unicode characters.
 
-fn-in gives footnotes at the bottom of page (although note if you redefine the lower crosslinks you can accidentally hide this)
+fn-in gives footnotes at the bottom of page (although note if you
+redefine the lower crosslinks you can accidentally hide this)
 
- -cunihtf has been added back in in order to allow \mathcal and \mathfrak to work correctly. IT MAY BREAK OTHER THINGS! check if there is weirdness 
 
 
+Using -cunihtf will be default use unicode ligature characters. These
+prevent browsers from correctly searching etc, so don't turn it on.
+If its needed, then you can use the hacked unicode.4hf file in this
+directory, which turns off the ligatures at issue. This will need to
+be copied into the: 
+
+TEXLIVE/2013/texmf-dist/tex4ht/ht-fonts/unicode/charset/ directory.
+
+(It will overwrite a file of the same name already there).
+
+It should be possible to tell tex4ht to look at a different location
+for the file, but I'm not sure how to do it.
+
+
+Tex4ht.env configuration:
+
+To use the local env file here, please set the environmental variable
+TEX4HTENV to the full path of this file.
