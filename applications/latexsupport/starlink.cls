@@ -3,12 +3,16 @@
 \ProvidesClass{starlink}
 
 % Declare options 
+
+% With chapters...
 \newif\ifwithchapters
 \withchaptersfalse
 
+% If twoside...
 \newif\iftwoside
 \twosidefalse
 
+% If list of figures (lof)
 \newif\ifwithlof
 \withloftrue
 
@@ -37,7 +41,6 @@
 
 %maths
 \RequirePackage{amsmath}
-
 \RequirePackage{mathpazo}
 
 % units
@@ -50,12 +53,10 @@
 \RequirePackage{ifpdf}
 
 
-% Load titlesec for the pdf files, but don't load it for tex4ht
-%\ifpdf
+% Titlesec.
 \RequirePackage{titlesec}
-%\RequirePackage{titletoc}
-%\fi
 
+% Abstract?
 \RequirePackage{abstract}
 
 % Package to allow graphics to be loaded (\includegraphics)
@@ -72,6 +73,7 @@
 
 %.. Allow boxes with frames and backgrounds, over multiple pages
 \RequirePackage[framemethod=TikZ]{mdframed}
+
 %.. Allow tables on multiple pages
 \RequirePackage{longtable}
 
@@ -89,7 +91,8 @@
 \RequirePackage{tocloft}
 \fi
 %.. hyperref
-\RequirePackage[pdfusetitle=true,backref,breaklinks=True,pdfdisplaydoctitle=true]{hyperref}
+\RequirePackage[pdfusetitle=true,backref,
+                breaklinks=True,pdfdisplaydoctitle=true]{hyperref}
 
 \setlength{\parindent}{0mm}
 
@@ -120,8 +123,8 @@
 \newcommand{\stardocname}[1]{\def\@stardocname{#1}}
 
 % Defaults for current data?
-\starinstitute{}%Joint Astronomy Centre}
-\starfunders{}%Science \& Technology Facilities Council}
+\starinstitute{}
+\starfunders{}
 \starproject{Starlink Project}
 
 % initalise to nothing
@@ -140,9 +143,8 @@
 \stardocdate{}
 
 
-% provide the... versions of these commands so you don't need to use @
+% Provide the... versions of these commands so you don't need to use @
 % in latex.
-
 \newcommand{\thestardoccategory}{\@stardoccategory}
 \newcommand{\thestardocinitials}{\@stardocinitials}
 \newcommand{\thestardoccopyright}{\@stardoccopyright}
@@ -248,21 +250,20 @@
 %% (e.g. for descriptions where the label has a pretty short section
 %% of the space.
 \newlist{sldes}{description}{2}
-
 \setlist[sldes,1]{%
   style=nextline,leftmargin=0.15\textwidth%
   }
 
 \newlist{sldes2}{description}{2}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%% Starlink xref command
 
-%\newcommand{\xref}[3]{#1}
 \newcommand{\xref}[3]{\href{http://starlink.jach.hawaii.edu/cgi-bin/htxserver/#2.htx/#2.html?xref_#3}{#1}}
 
 
 
-%----------------------------------------------------------------------------
+%------------------------------------------------------------------------
 %..  Define additional colours.
 \definecolor{mygray}{gray}{0.7}
 \definecolor{MidnightBlue}{RGB}{25, 25, 112}
@@ -272,14 +273,12 @@
 \def\RemoveSpaces#1{\zap@space#1 \@empty}
 
 %%%% Command that doesn't do anything in latex
-
 \newcommand{\html}[1]{}
 
 
 %.. The remaining starlink specific definitions.
 \RequirePackage{starabbrev}
 \RequirePackage{starstyle}
-
 \RequirePackage{sst}
 
 
@@ -289,6 +288,7 @@
   \else%
     ... command '#1' does not exist ...%
   \fi%
-  }
+}
 
-  \newcommand{\slhyperref}[4]{#2\ref{#4}#3}
+% A starlink Hyperref.
+\newcommand{\slhyperref}[4]{#2\ref{#4}#3}

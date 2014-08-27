@@ -1,0 +1,53 @@
+/*sst title*/
+h3.sstsectitle{text-align:center;}
+p.subtitle{text-align:center}
+
+/*sst section styling*/
+header.sstreftitle{
+    font-size:1.5em;
+    border-bottom: 5px solid #aaa;
+}
+
+/*Styling for attributesection*/
+div.attributesec:before{
+    content:"";
+    display:block;
+    border-bottom:solid 1px grey;
+    padding-top:1em;
+}
+
+
+/*Styling for table of contents options*/
+.tocdes{
+    width:25em;
+    text-align:left;
+    float:right
+}
+.toccom{
+    margin-left:3em;
+    font-size:100%
+}
+
+
+/*Css styling for basic SST sections and their headings*/
+div.sstvalues{padding-left:5%}
+
+
+/*the sst subsection*/
+div.sstsub{padding-left:5%}
+
+
+
+
+
+/* sst description list*/
+dl.sst{
+    font-weight:bold
+      }
+div.sstusage,dl.sstexamplesubsection{
+    font-family: "Droid Sans Mono",monospace;
+    white-space: nowrap;
+    font-size: 8%;
+    line-space:85%
+}
+dl.sstsub{font-weight:bold;}
