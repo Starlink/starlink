@@ -189,7 +189,7 @@
 
 
 % Fix some weirdness in symbols
-\renewcommand{\^}{\HCode{^}}
+%\renewcommand{\^}{\HCode{^}}
 \renewcommand\${\HCode{$}}%$ %$ is to fix syntax highlighting.
 
 
@@ -329,7 +329,7 @@
 }
 
 \renewcommand{\myfigduo}[8]{
-  \begin{figure}#3
+  \begin{figure}[#3]
     \begin{center}
     \includegraphics[#4]{#1}
     \typeout{#1 inserted on page \arabic{page}}
