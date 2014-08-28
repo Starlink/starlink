@@ -39,6 +39,10 @@ p.indent{ text-indent: 0em }
 /*Fonts for section headings.*/
 .sectionHead, .likesectionHead, .subsectionHead,.likesubsectionHead, .sstattributeHead {font-family:"Georgia", serif; font-weight:bold; font-size:110%;}
 
+.sectionHead, .likesectionHead{
+    padding:5px;
+}
+
 /*Fonts for some headings and table fo contents entries.*/
 strong, b, .partToc a, .partToc, .likepartToc a, .likepartToc,
 .chapterToc a, .chapterToc, .likechapterToc a, .likechapterToc,
