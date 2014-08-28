@@ -1,19 +1,18 @@
 htlatex has a lot of options. Current command line example is:
 
-htlatex sc21.tex "starlinkxhtml.cfg,xhtml,mathml,charset=utf-8,fn-in" '  -cvalidate '
+
+htlatex sc21.tex "starlinkxhtml.cfg,charset="utf-8",fn-in" '  -cvalidate '
 
 Where starlinkxhtml.cfg loads the correct configuration file,
 
-xhtml and mathml define the output.
-
-charset=utf-8 gives you unicode characters.
+charset=utf-8 gives you unicode characters (otherwise accents are broken)
 
 fn-in gives footnotes at the bottom of page (although note if you
 redefine the lower crosslinks you can accidentally hide this)
 
 
 
-Using -cunihtf will be default use unicode ligature characters. These
+Using the flag -cunihtf will be default use unicode ligature characters. These
 prevent browsers from correctly searching etc, so don't turn it on.
 If its needed, then you can use the hacked unicode.4hf file in this
 directory, which turns off the ligatures at issue. This will need to
