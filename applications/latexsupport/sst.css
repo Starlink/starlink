@@ -47,7 +47,7 @@ dl.sst{
 div.sstusage,dl.sstexamplesubsection{
     font-family: "Droid Sans Mono",monospace;
     white-space: nowrap;
-    font-size: 8%;
+    font-size: 80%;
     line-space:85%
 }
 dl.sstsub{font-weight:bold;}
