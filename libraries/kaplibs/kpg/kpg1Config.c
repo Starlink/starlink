@@ -93,7 +93,7 @@ AstKeyMap *kpg1Config( const char *param, const char *def,
 *     config parameter is used.
 
 *  Arguments:
-*     paramc = const char * (Given)
+*     param = const char * (Given)
 *        The name of the environment parameter to use.
 *     def = const char * (Given)
 *        The path to a file containing the default value for every allowed config
