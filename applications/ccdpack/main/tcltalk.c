@@ -81,7 +81,8 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <signal.h>
-#include <errno.h>
+#include <stddef.h>
+
 #include "tcl.h"
 #include "sae_par.h"
 #include "tcltalk.h"
@@ -369,7 +370,8 @@
          c = retbuf - 1;
          *retbuf = '\0';
          do {
-            if ( ++c >= retbuf + BUFLENG ) {
+            c++;
+            if ( (ptrdiff_t)(c - retbuf) >= BUFLENG ) {
                *status = SAI__ERROR;
                errRep( "CCD_TCL_BUF", "Buffer overflow", status );
                return NULL;

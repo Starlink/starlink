@@ -91,6 +91,8 @@
 #include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <stddef.h>
+
 #include "tcl.h"
 #include "tk.h"
 #include "mers.h"
@@ -422,7 +424,8 @@ extern F77_SUBROUTINE(ccd1_linflt)();
          c = buffer - 1;
          do {
             int bytes;
-            if ( ++c >= buffer + BUFLENG ) {
+            c++;
+            if (  (ptrdiff_t)(c - buffer) >= BUFLENG ) {
                strcpy( buffer, "Buffer overflow in Tcl process\n" );
                write( ofd, buffer, strlen( buffer ) );
                exit( 1 );
