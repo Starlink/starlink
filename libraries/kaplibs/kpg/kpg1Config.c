@@ -71,7 +71,7 @@ AstKeyMap *kpg1Config( const char *param, const char *def,
 *     an associated value of 1) has the name of the alternative removed
 *     (but only if no value has been supplied for the parameter without
 *     an alternative prefix - thus "filt=10" takes priority of "450.filt=20").
-*     Any parameter that start with the name of any of the other
+*     Any parameter that starts with the name of any of the other
 *     alternatives is simply removed from the configuration. Thus, using
 *     the above example, if "nested" contains two entries - one with key
 *     "850" and value "1", and the other with key "450" and value "0" -
@@ -86,7 +86,7 @@ AstKeyMap *kpg1Config( const char *param, const char *def,
 *     Finally, the values in the user-supplied configuration are used to
 *     replace those in the defaults file.
 *
-*     The beneifts of using this function are that 1) the user gets to
+*     The benefits of using this function are that 1) the user gets to
 *     know if they mis-spell a config parameter name, and 2) the default
 *     parameter values can be defined in a single place, rather than
 *     hard-wiring them into application code at each place where the
