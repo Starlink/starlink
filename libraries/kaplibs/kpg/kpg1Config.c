@@ -11,7 +11,8 @@
 static AstKeyMap *kpg1Config_ProcessNesting( AstKeyMap *keymap, AstKeyMap *nested,
                                              int *status );
 static void kpg1Config_CheckNames( AstKeyMap *map1, AstKeyMap *map2, Grp *grp,
-                                   const char *param, int *status );
+                                   const char *param, const char *prefix,
+                                   int *status );
 
 
 
@@ -171,6 +172,9 @@ AstKeyMap *kpg1Config( const char *param, const char *def,
 *        the parameter.
 *     19-FEB-2013 (DSB):
 *        Added argument "null".
+*     1-SEP-2014 (DSB):
+*        Correct the error message issued when the user config contains a 
+*        parameter that is not in the defaults config.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -243,7 +247,7 @@ AstKeyMap *kpg1Config( const char *param, const char *def,
    this (called below) but the wording of the error message created by
    astMapCopy is a bit too generalised to be useful. */
          if( result ) {
-            kpg1Config_CheckNames( result, external, grp, param, status );
+            kpg1Config_CheckNames( result, external, grp, param, NULL, status );
 
 /* Copy the overrides into the default. */
             astMapCopy( result, external );
@@ -371,7 +375,8 @@ static AstKeyMap *kpg1Config_ProcessNesting( AstKeyMap * keymap, AstKeyMap * nes
 }
 
 static void kpg1Config_CheckNames( AstKeyMap *map1, AstKeyMap *map2, Grp *grp,
-                                   const char *param, int *status ){
+                                   const char *param, const char *prefix,
+                                   int *status ){
 /*
 *  Name:
 *     kpg1Config_CheckNames
@@ -381,7 +386,8 @@ static void kpg1Config_CheckNames( AstKeyMap *map1, AstKeyMap *map2, Grp *grp,
 
 *  Invocation:
 *     void kpg1Config_CheckNames( AstKeyMap *map1, AstKeyMap *map2, Grp *grp,
-*                                 const char *param, int *status )
+*                                 const char *param, const char *prefix,
+*                                 int *status )
 
 *  Description:
 *     This function is a private helper function for kpg1Config. It
@@ -400,6 +406,9 @@ static void kpg1Config_CheckNames( AstKeyMap *map1, AstKeyMap *map2, Grp *grp,
 *        Pointer to the GRP group obtained from the user.
 *     param = const char * (Given)
 *        The ADAM parameter used to obtain the group.
+*     prefix = const char * (Given)
+*        The prefix used within "grp" for the entries in "map2"
+*        (e.g."450.flt."etc ). NULL if no prefix was used.
 *     status = int * (Given & Returned)
 *        The inherited status.
 
@@ -415,16 +424,17 @@ static void kpg1Config_CheckNames( AstKeyMap *map1, AstKeyMap *map2, Grp *grp,
    AstObject *obj1;          /* Object pointer obtained from map1 */
    AstObject *obj2;          /* Object pointer obtained from map2 */
    char *match;              /* Pointer to matching string */
-   char *up_badname;         /* Upper-case version of badname */
    char *up_elem = NULL;     /* Upper case version of "elem" */
+   char *fullname;           /* Fully qualified version of badname */
+   char *newprefix;          /* Prefix for use in nested call */
    char elem[ GRP__SZNAM ];  /* Value of element in "grp" */
    char file[ GRP__SZFNM ];  /* File name from which element was read */
    char re[ 100 ];           /* Regular expression matching an assigment */
    const char *badname;      /* String holding unknwon parameter name */
    const char *key;          /* Key for entry being checked */
-   int file_len;             /* Length of file name */
    int ielem;                /* Index of element in "grp" */
    int ikey;                 /* Index of of entry in map2 */
+   int nc;                   /* No. of characters in buffer */
    int nelem;                /* Number of elements in "grp" */
    int nkey;                 /* Number of entries in map2 */
 
@@ -447,15 +457,29 @@ static void kpg1Config_CheckNames( AstKeyMap *map1, AstKeyMap *map2, Grp *grp,
          if( astMapType( map1, key ) == AST__OBJECTTYPE ) {
 
 /* ... and the corresponding "map2" entry is a KeyMap, call this function
-   recursively to check the contents of the two KeyMaps. */
+   recursively to check the contents of the two KeyMaps. Modify the
+   supplied prefix to include the key for the current entry, followed by
+   a dot. */
             if( astMapType( map2, key ) == AST__OBJECTTYPE ) {
 
                (void) astMapGet0A( map1, key, &obj1 );
                (void) astMapGet0A( map2, key, &obj2 );
 
+               if( prefix ) {
+                  nc = strlen( prefix );
+                  newprefix = astStore( NULL, prefix, nc + 1 );
+               } else {
+                  nc = 0;
+                  newprefix = NULL;
+               }
+               newprefix = astAppendString( newprefix, &nc, key );
+               newprefix = astAppendString( newprefix, &nc, "." );
+
                kpg1Config_CheckNames( (AstKeyMap *) obj1,
                                       (AstKeyMap *) obj2,
-                                      grp, param, status );
+                                      grp, param, newprefix, status );
+
+               newprefix = astFree( newprefix );
 
 /* Indicate we have found a bad name if the corresponding "map2" entry is not
    a KeyMap. */
@@ -479,20 +503,29 @@ static void kpg1Config_CheckNames( AstKeyMap *map1, AstKeyMap *map2, Grp *grp,
    name. */
    if( badname && *status == SAI__OK ) {
 
-/* Create an upper-case copy of the bad name. */
-      up_badname = astStringCase( badname, 1 );
+/* Form the full name, including the supplied prefix, and convert to
+   upper case. */
+      if( prefix ) {
+         nc = strlen( prefix );
+         fullname = astStore( NULL, prefix, nc + 1 );
+      } else {
+         nc = 0;
+         fullname = NULL;
+      }
+      fullname = astAppendString( fullname, &nc, badname );
+      astChrCase( NULL, fullname, 1, 0 );
 
 /* Create a regular expression that matches a string that assigns a value
-   to the upper case bad name (with or without preceededing parent key
-   names). */
-      sprintf( re, "\\.%s *\\=|^%s *\\=", up_badname, up_badname );
+   to the upper case bad name. */
+      sprintf( re, "^%s *\\=", fullname );
 
 /* Loop round all elements in the group. */
       nelem =  grpGrpsz( grp, status );
       for( ielem = 1; ielem <= nelem; ielem++ ) {
 
-/* Get the text of the element. */
+/* Get the text of the element, and remove leading spaces. */
          grpInfoc( grp, ielem, "Name", elem, GRP__SZNAM, status );
+         astRemoveLeadingBlanks( elem );
 
 /* Create an upper-case copy of the element. */
          up_elem = astStringCase( elem, 1 );
@@ -508,7 +541,6 @@ static void kpg1Config_CheckNames( AstKeyMap *map1, AstKeyMap *map2, Grp *grp,
 /* Free resources. */
          up_elem = astFree( up_elem );
       }
-      up_badname = astFree( up_badname );
 
 /* If we found a grp element that assigns a value to the bad name, get the
    name of the file from which the element was read. */
@@ -516,12 +548,11 @@ static void kpg1Config_CheckNames( AstKeyMap *map1, AstKeyMap *map2, Grp *grp,
          grpInfoc( grp, ielem, "File", file, GRP__SZFNM, status );
       } else {
          file[ 0 ] = 0;
-         file_len = 0;
       }
 
 /* Create an error report, including the group element and the name of the file
    from which the element was read, if possible. */
-      msgSetc( "M", badname );
+      msgSetc( "M", fullname );
       msgSetc( "P", param );
 
       *status = SAI__ERROR;
@@ -542,6 +573,8 @@ static void kpg1Config_CheckNames( AstKeyMap *map1, AstKeyMap *map2, Grp *grp,
          errRep( " ", "^M", status );
       }
 
+/* Free resources. */
+      fullname = astFree( fullname );
       up_elem = astFree( up_elem );
    }
 }
