@@ -463,6 +463,11 @@ try:
                                        "defaults=$SMURF_DIR/smurf_makemap.def "
                                        "select=\"\'450=0,850=1\'\"".format(model,config)))
 
+#  Similarly, we need to record com.freeze_flags.
+   com_freeze_flags = int( invoke( "$KAPPA_DIR/configecho name=com.freeze_flags config={0} "
+                                   "defaults=$SMURF_DIR/smurf_makemap.def "
+                                   "select=\"\'450=0,850=1\'\"".format(config)))
+
 #  Save parameter values to be used on the last iteration (-1.0 if unset)
    filt_edge_largescale_last = float( invoke( "$KAPPA_DIR/configecho "
                                       "name=flt.filt_edge_largescale_last config={0} "
@@ -765,6 +770,13 @@ try:
                zero_freeze[model] = 0
                add[ model+".zero_freeze" ] = -1
                newcon = 1
+
+#  When "com_freeze_flags" invocations have been performed, freeze the
+#  COM flags (so long as com_freeze_flags > 0).  Do this for AST, COM and FLT models.
+         if com_freeze_flags > 0 and iter > com_freeze_flags + 1:
+            com_freeze_flags = 0
+            add[ "com.freeze_flags" ] = -1
+            newcon = 1
 
 #  If this is the last iteration, put the output map in the NDF specified
 #  by the script's "OUT" parameter.

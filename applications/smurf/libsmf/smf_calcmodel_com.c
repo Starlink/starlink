@@ -314,8 +314,10 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
       kamap = astAnnul( kamap );
 
 /* Convert "freeze_flags" from an iteration count into a boolean flag
-   indicating if the COM flags are now frozen. */
-      if( dat->iter == freeze_flags + skip ) {
+   indicating if the COM flags are now frozen. We always switch freezing
+   on if freeze_flags is less than zero, saince this i show skylopp 
+   indicates that freezing is required. */
+      if( dat->iter == freeze_flags + skip || freeze_flags < 0 ) {
          msgOutif( MSG__VERB, "", "  COM flagging is now frozen due to "
                    "COM.FREEZE_FLAGS setting.", status );
          freeze_flags = 1;
@@ -681,7 +683,7 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    The correlation coefficient for such blocks is set to VAL__BADD. */
       for( icom = 0; icom < ncom && *status == SAI__OK; icom++ ) {
          if( gai ) {
-            int gai_flags = pdata->freeze_flags ? 7 : 6;
+            int gai_flags = freeze_flags ? 7 : 6;
 
             if( perarray ) {
                smf_find_gains( wf, gai_flags, res->sdata[ icom ], mask,
