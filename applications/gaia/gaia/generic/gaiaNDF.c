@@ -19,6 +19,7 @@
  *     Copyright (C) 1995-2005 Central Laboratory of the Research Councils
  *     Copyright (C) 2006 Particle Physics & Astronomy Research Council
  *     Copyright (C) 2008 Science and Technology Facilities Council
+ *     Copyright (C) 2014 Cornell University.
  *     All Rights Reserved.
 
  *  Licence:
@@ -39,6 +40,7 @@
 
  *   Authors:
  *      PWD: Peter W. Draper, Starlink - University of Durham
+ *      TIMJ: Tim Jenness - Cornell University
 
  *   History:
  *      18-JAN-1995 (PWD):
@@ -59,6 +61,8 @@
  *         (>MAXNDFNAME).
  *      21-NOV-2005 (PWD):
  *         Changed to use public HDS C interface.
+ *      02-SEP-2014 (TIMJ):
+ *         Use DAT__FLEXT rather than explicit ".sdf"
  *      {enter_changes_here}
  *-
  */
@@ -81,6 +85,7 @@
 #include "ems.h"
 #include "merswrap.h"
 #include "star/hds.h"
+#include "dat_par.h"
 #include "dat_err.h"
 #include "ndf.h"
 #include "gaiaNDF.h"
@@ -838,12 +843,12 @@ int gaiaInitMNDF( const char *name, int deepsearch, void **handle,
         /*  Not an NDF. May just be a HDS container name with NDFs at this
             level. Need to parse down to a filename and an HDS path. */
         filename = strdup( name );
-        path = strstr( filename, ".sdf" );
+        path = strstr( filename, DAT__FLEXT );
         if ( path ) {
-            *path++ = ' '; /* Have ".sdf" in name, cut it out. */
-            *path++ = ' ';
-            *path++ = ' ';
-            *path++ = ' ';
+            int i;
+            for ( i = 0; i < DAT__SZFLX; i++ ) {
+                *path++ = ' '; /* Have ".sdf" in name, cut it out. */
+            }
         }
         path = strrchr( filename, '/' );  /* Last / in name */
         if ( ! path ) {
@@ -1029,7 +1034,7 @@ NDFinfo *traceMNDFs( NDFinfo **headptr, HDSLoc *baseloc, int baseid,
         hdsTrace( newloc, &level, ndfpath, ndffile, &status,
                   MAXNDFNAME, MAXNDFNAME );
 
-        ftype = strstr( ndffile, ".sdf" ); /* Strip .sdf from filename */
+        ftype = strstr( ndffile, DAT__FLEXT ); /* Strip .sdf from filename */
         if ( ftype ) *ftype = '\0';
 
         path = strstr( ndfpath, "." );   /* Now find first component */
@@ -2089,12 +2094,11 @@ int gaiaNDFFindChild( const char *name, int *ndfid, char **error_mess )
 
     /*  Need to parse down to a filename and an HDS path. */
     filename = strdup( name );
-    path = strstr( filename, ".sdf" );
+    path = strstr( filename, DAT__FLEXT );
     if ( path ) {
-        *path++ = ' '; /* Have ".sdf" in name, cut it out. */
-        *path++ = ' ';
-        *path++ = ' ';
-        *path++ = ' ';
+      for ( i = 0; i < DAT__SZFLX; i++ ) {
+            *path++ = ' '; /* Have ".sdf" in name, cut it out. */
+        }
     }
     path = strrchr( filename, '/' );  /* Last / in name */
     if ( ! path ) {
@@ -2130,7 +2134,7 @@ int gaiaNDFFindChild( const char *name, int *ndfid, char **error_mess )
             hdsTrace( newloc, &level, ndfpath, ndffile, &status,
                       MAXNDFNAME, MAXNDFNAME );
 
-            ftype = strstr( ndffile, ".sdf" ); /* Strip .sdf from filename */
+            ftype = strstr( ndffile, DAT__FLEXT ); /* Strip .sdf from filename */
             if ( ftype ) *ftype = '\0';
 
             path = strstr( ndfpath, "." );  /* Now find first component */

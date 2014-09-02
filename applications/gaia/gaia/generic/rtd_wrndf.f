@@ -54,11 +54,13 @@
 
 *  Authors:
 *     PWD: Peter Draper (STARLINK - Durham University)
+*     TIMJ: Tim Jenness (Cornell University)
 *     {enter_new_authors_here}
 
 *  Copyright:
 *     Copyright (C) 1997 Central Laboratory of the Research Councils
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2014 Cornell University
 *     All Rights Reserved.
 
 *  Licence:
@@ -97,6 +99,8 @@
 *        Now supports _DOUBLE data directly rather than presuming _REAL.
 *     02-SEP-2004 (PWD):
 *        Converted to use CNF_PVAL for pointers.
+*     02-SEP-2014 (TIMJ):
+*        Use DAT__FLEXT rather than explicit .sdf
 *     {enter_changes_here}
 
 *  Bugs:
@@ -138,7 +142,7 @@
       CHARACTER * ( NDF__SZTYP ) DTYPE ! Type of NDF data array
       INTEGER DIM( 1 )          ! Dimension of FITS extension
       INTEGER EL                ! Number of pixels in NDF
-      INTEGER IAT               ! Position of .sdf in name
+      INTEGER IAT               ! Position of file extension in name
       INTEGER IDNEW             ! Identifier of new NDF
       INTEGER IERR              ! Not used
       INTEGER IPDAT             ! Pointer to NDF data array
@@ -163,7 +167,7 @@
       CALL NDF_BEGIN
 
 *  Remove the .sdf part of the name (it if exists).
-      IAT = INDEX( NAME, '.sdf' )
+      IAT = INDEX( NAME, DAT__FLEXT )
       IF ( IAT .EQ. 0 ) THEN
          IAT = CHR_LEN( NAME )
       ELSE
