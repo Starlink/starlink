@@ -71,6 +71,8 @@
 *        Rewrite in C.
 *     28-DEC-2005 (TIMJ):
 *        Use DAT__FLEXT instead of hard-coded ".sdf"
+*     03-SEP-2014 (TIMJ):
+*        Fix some issues with DAT__SZFLX not being used everywhere
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -130,7 +132,7 @@ int datRef( const HDSLoc * locator, char * ref, size_t reflen, int * status ) {
   /*  Obtain the data object path and container file name. */
   /*  Lie about the size of the supplied buffer to account for quotes
       and dots that may be added */
-  hdsTrace( locator, &nlev, path, file, status, MAX_PATH_LEN-3, MAX_PATH_LEN-1 );
+  hdsTrace( locator, &nlev, path, file, status, MAX_PATH_LEN-DAT__SZFLX, MAX_PATH_LEN-1 );
 
   if ( *status == DAT__OK ) {
 
@@ -156,7 +158,7 @@ int datRef( const HDSLoc * locator, char * ref, size_t reflen, int * status ) {
      *  extension of '.SDF' with at least one character preceding it. */
 
     odd = 1;
-    if ( ncf >= 5 ) {
+    if ( ncf >= (DAT__SZFLX+1) ) {
       if ( strcmp( &file[ncf-DAT__SZFLX], DAT__FLEXT) == 0) {
 	odd = 0;
       } else {
@@ -212,7 +214,7 @@ int datRef( const HDSLoc * locator, char * ref, size_t reflen, int * status ) {
     }
 
     /*  If the file name is not odd, then omit the file extension. */
-    if (!odd) file[ncf-4] = '\0';
+    if (!odd) file[ncf-DAT__SZFLX] = '\0';
 
     /*  Enter the file name into the buffer, surrounding it in quotes if it
      *  is odd. */
