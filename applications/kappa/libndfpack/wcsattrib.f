@@ -92,8 +92,8 @@
 *        The new value to assign to the attribute.  It is only used if
 *        MODE is "Set".
 *     REMAP = _LOGICAL (Read)
-*        Only accessed if MODE is "Set". If REMAP is TRUE, then the
-*        Mappings which connect the current Frame to the other Frames
+*        Only accessed if MODE is "Set" or "clear". If REMAP is TRUE, then
+*        the Mappings which connect the current Frame to the other Frames
 *        within the WCS FrameSet will be modified (if necessary) to
 *        maintain the FrameSet integrity. For instance, if the current
 *        Frame of the NDF represents FK5 RA and DEC, and you change
@@ -229,6 +229,8 @@
 *        Give only read access to the NDF when the MODE=Test.
 *     4-AUG-2009 (DSB):
 *        Add FRACTION frame.
+*     4-SEP-2014 (DSB):
+*        REMAP should be used when clearing as well as when setting.
 *     {enter_further_changes_here}
 
 *-
@@ -443,7 +445,24 @@
 
 *  Clear the attribute.
          ELSE
-            CALL AST_CLEAR( IWCS, NAME, STATUS )
+
+*  See if the attribute should be cleared using the FrameSet method
+*  (which may cause inter-Frame Mappings to change in order to maintain
+*  FrameSet integrity), or the Frame method (which will leave the
+*  Mappings unchanged).
+            CALL PAR_GET0L( 'REMAP', REMAP, STATUS )
+
+*  If the Frame is to be remapped, use the FrameSet method.
+            IF( REMAP ) THEN
+               CALL AST_CLEAR( IWCS, NAME, STATUS )
+
+*  Otherwise, extract the Frame and use the Frame method.
+            ELSE
+               FRM = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
+               CALL AST_CLEAR( FRM, NAME, STATUS )
+               CALL AST_ANNUL( FRM, STATUS )
+            END IF
+
          END IF
 
       END IF
