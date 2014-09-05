@@ -208,7 +208,7 @@
 
       ELSE IF( TYPE(:5) .EQ. '_CHAR' ) THEN
          CALL DAT_CLEN( LOC1, CLEN, STATUS )
-         CALL KPG1_CPNDD( NDIM, LBNDI, UBNDI, %VAL( CNF_PVAL( IPIN ) ),
+         CALL KPG1_CPNDC( NDIM, LBNDI, UBNDI, %VAL( CNF_PVAL( IPIN ) ),
      :                    LBND, UBND, %VAL( CNF_PVAL( IPOUT ) ), EL,
      :                    STATUS, %VAL( CNF_CVAL( CLEN ) ),
      :                    %VAL( CNF_CVAL( CLEN ) ) )
