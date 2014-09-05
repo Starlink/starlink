@@ -51193,19 +51193,19 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
       \sstsubsection{
          REMAP = \_LOGICAL (Read)
       }{
-         Only accessed if MODE is {\tt "Set"}.  If REMAP is {\tt TRUE}, then
-         the \htmlref{Mappings}{se:curframe}~ which connect the current Frame
-         to the other Frames within the \htmlref{WCS FrameSet}{se:curframe}~
-         will be modified (if necessary) to maintain the FrameSet integrity.
-         For instance, if the current Frame of the NDF represents FK5 RA and
-         DEC, and you change {\att System} from {\tt "FK5"} to {\tt
-         "Galactic"}, then the Mappings which connect the SKY Frame to the
-         other Frames (\emph{e.g.} PIXEL, AXIS) will be modified so that each
-         pixel corresponds to the correct Galactic co-ordinates.  If REMAP is
-         {\tt FALSE}, then the Mappings will not be changed.  This can be
-         useful if the FrameSet has incorrect attribute values for some
-         reason, which need to be corrected without altering the Mappings to
-         take account of the change.  {\tt [TRUE]}
+         Only accessed if MODE is {\tt "Set"} or {\tt "Clear"}.  If REMAP is
+         {\tt TRUE}, then the \htmlref{Mappings}{se:curframe}~ which connect
+         the current Frame to the other Frames within the
+         \htmlref{WCS FrameSet}{se:curframe}~ will be modified (if necessary)
+         to maintain the FrameSet integrity.  For instance, if the current
+         Frame of the NDF represents FK5 RA and DEC, and you change {\att System}
+         from {\tt "FK5"} to {\tt "Galactic"}, then the Mappings which connect
+         the SKY Frame to the other Frames (\emph{e.g.} PIXEL, AXIS) will be
+         modified so that each pixel corresponds to the correct Galactic
+         co-ordinates.  If REMAP is {\tt FALSE}, then the Mappings will not be
+         changed.  This can be useful if the FrameSet has incorrect attribute
+         values for some reason, which need to be corrected without altering
+         the Mappings to take account of the change.  {\tt [TRUE]}
       }
       \sstsubsection{
          SETTING = LITERAL (Read)

@@ -63,6 +63,7 @@
 *     Copyright (C) 1998-2001 Central Laboratory of the Research Councils
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
 *     Copyright (C) 2012 Science and Technology Facilities Council.
+*     Copyright (C) 2014 Cornell University
 *     All Rights Reserved.
 
 *  Licence:
@@ -84,6 +85,7 @@
 
 *  Authors:
 *     PWD: Peter Draper (STARLINK - Durham University)
+*     TIMJ: Tim Jenness (Cornell University)
 *     {enter_new_authors_here}
 
 *  History:
@@ -113,6 +115,8 @@
 *        Now supports _DOUBLE directly.
 *     17-MAY-2012 (PWD):
 *        Add long integer (_INT64) support.
+*     02-SEP-2014 (TIMJ):
+*        Use DAT__FLEXT rather than explicit .sdf
 *     {enter_changes_here}
 
 *  Bugs:
@@ -152,7 +156,7 @@
       INTEGER AVAIL             ! Number of cards available in header
       INTEGER DIM( NDF__MXDIM ) ! NDF dimensions
       INTEGER I                 ! Loop variable
-      INTEGER IAT               ! Position of .sdf in name
+      INTEGER IAT               ! Position of file extension in name
       INTEGER NAMLEN            ! Length of name string
       INTEGER NDIM              ! Number of NDF dimensions
       INTEGER PLACE             ! NDF placeholder (not used)
@@ -166,14 +170,14 @@
 *  Remove the .sdf part of the name (if it exists), being careful to
 *  retain the slice information.
       NAMLEN = CHR_LEN( NAME )
-      IAT = INDEX( NAME, '.sdf' )
+      IAT = INDEX( NAME, DAT__FLEXT )
       IF ( IAT .NE. 0 ) THEN
 
 *  Special case is .sdf.something (like a compressed foreign
 *  datatype). Need to preserve the whole name in this case.
-         IF ( INDEX( NAME, '.sdf.' ) .EQ. 0 ) THEN
-            DO 1 I = IAT, MAX( IAT + 4, NAMLEN - 4 )
-               NAME( I : I ) = NAME( I + 4  : I + 4 )
+         IF ( INDEX( NAME, DAT__FLEXT ) .EQ. 0 ) THEN
+            DO 1 I = IAT, MAX( IAT + DAT__SZFLX, NAMLEN - DAT__SZFLX )
+               NAME( I : I ) = NAME( I + DAT__SZFLX  : I + DAT__SZFLX )
  1          CONTINUE
             NAME( I : ) = ' '
             IAT = I

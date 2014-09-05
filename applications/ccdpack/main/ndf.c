@@ -495,9 +495,9 @@
             for ( j = 0; j < ndf1->fits.ncard; j++ ) {
                card = ndf1->fits.data + j * 80;
                pc = card + 79;
-               while ( *pc == ' ' && pc >= card ) pc--;
-               while ( *pc == '/' && pc >= card ) pc--;
-               while ( *pc == ' ' && pc >= card ) pc--;
+               while ( *pc == ' ' && pc > card ) pc--;
+               while ( *pc == '/' && pc > card ) pc--;
+               while ( *pc == ' ' && pc > card ) pc--;
                cardobj = Tcl_NewStringObj( card, ( pc - card + 1 ) );
                Tcl_ListObjAppendElement( interp, result, cardobj );
             }
@@ -536,7 +536,7 @@
                                         TRAIL_ARG(fkey) TRAIL_ARG(fvalue) );
                   if ( *status == SAI__OK ) {
                      pc = fvalue + fvalue_length - 1;
-                     while ( *pc == ' ' && pc >= fvalue ) pc--;
+                     while ( *pc == ' ' && pc > fvalue ) pc--;
                      valobj = Tcl_NewStringObj( fvalue, ( pc - fvalue + 1 ) );
                   }
                   else {

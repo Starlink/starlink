@@ -361,6 +361,10 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *     18-JUL-2013 (DSB):
 *        Correct logic for determining whether to divide or not in
 *        RebinAdaptively. The old logic could lead to infinite recursion.
+*     1-SEP-2014 (DSB):
+*        Modify astLinearAPprox to avoid using regularly placed
+*        test points, as such regular placement may result in
+*        non-representative behaviour.
 *class--
 */
 
@@ -6688,26 +6692,28 @@ f     - A value of .FALSE.
                                          frac * ubnd[ 0 ];
             }
 
-/* Otherwise, generate one point at the grid centre. */
+/* Otherwise, generate one point at the grid centre (offset slightly
+   since the exact centre may not be very representative). */
          } else {
             point = 0;
             for ( coord_in = 0; coord_in < ndim_in; coord_in++ ) {
                ptr_in_t[ coord_in ][ point ] =
-                  0.5 * ( lbnd[ coord_in ] + ubnd[ coord_in ] );
+                  0.49 * lbnd[ coord_in ] + 0.51 * ubnd[ coord_in ];
             }
             point++;
 
 /* Similarly generate a point half way between the grid centre and the
-   centre of each face. */
+   centre of each face. Again introduce some small random offsets to break
+   any regularity in the grid. */
             for ( face = 0; face < ( 2 * ndim_in ); face++ ) {
                for ( coord_in = 0; coord_in < ndim_in; coord_in++ ) {
                   ptr_in_t[ coord_in ][ point ] =
-                     0.5 * ( lbnd[ coord_in ] + ubnd[ coord_in ] );
+                     0.48 * lbnd[ coord_in ] + 0.52 * ubnd[ coord_in ];
                }
                ptr_in_t[ face / 2 ][ point ] =
-                  0.5 * ( ( ( ( face % 2 ) ? ubnd[ face / 2 ] :
+                        ( 0.51 * ( ( ( face % 2 ) ? ubnd[ face / 2 ] :
                                              lbnd[ face / 2 ] ) ) +
-                          ptr_in_t[ face / 2 ][ 0 ] );
+                          0.49 * ptr_in_t[ face / 2 ][ 0 ] );
                point++;
             }
 
@@ -6731,8 +6737,8 @@ f     - A value of .FALSE.
 
 /* Also place one half way between the grid centre and each vertex. */
                      ptr_in_t[ coord_in ][ point + 1 ] =
-                        0.5 * ( ptr_in_t[ coord_in ][ point ] +
-                                ptr_in_t[ coord_in ][ 0 ] );
+                             ( 0.52 * ptr_in_t[ coord_in ][ point ] +
+                               0.48 * ptr_in_t[ coord_in ][ 0 ] );
                   }
                   point += 2;
 

@@ -11,11 +11,13 @@
  *  Authors:
  *     P.W. Draper (PWD)
  *     Allan Brighton, ESO (ALLAN)
+ *     Tim Jenness, Cornell University (TIMJ)
 
  *  Copyright:
  *     Copyright (C) 1997-2005 Central Laboratory of the Research Councils.
  *     Copyright (C) 2006-2007 Particle Physics & Astronomy Research Council.
  *     Copyright (C) 2008-2009 Science and Technology Facilities Council.
+ *     Copyright (C) 2014 Cornell University.
  *     All Rights Reserved.
 
  *  Licence:
@@ -209,6 +211,8 @@
  *     10-FEB-2010 (PWD):
  *        Added forcedegrees command. Sets whether to display decimal
  *        degrees for all celestial coordinate systems.
+ *     02-SEP-2014 (TIMJ):
+ *        Use DAT__FLEXT rather than explicit ".sdf"
  *-
  */
 #if HAVE_CONFIG_H
@@ -256,6 +260,7 @@
 #include "tcl_err.h"
 extern "C" {
 #include "ast_tclerr.h"
+#include "dat_par.h"
 }
 #include "rtdDtrn.h"
 #include "GaiaRtdRemote.h"
@@ -6203,9 +6208,9 @@ int StarRtdImage::parseName( const char *imagename, char **fullname,
     //  for a component name which should be after the ".sdf" string,
     //  but before the slice.
     int found = 0;
-    char *sdf = strstr( *fullname, ".sdf" );
+    char *sdf = strstr( *fullname, DAT__FLEXT );
     if ( sdf ) {
-        sdf += 4;
+        sdf += DAT__SZFLX;
         if ( *sdf == '.' ) {
             strcpy( *path, sdf );
             *sdf = '\0';

@@ -124,7 +124,7 @@
 *        Allow masks to be created using an algorithm like the
 *        kappa:ffclean command.
 *     2-APR-2014 (DSB):
-*        Changed so that the SNR map, rather than the data value map, is 
+*        Changed so that the SNR map, rather than the data value map, is
 *        filtered using ZERO_SNR_LOPASS and ZERO_SNR_HIPASS.
 *     {enter_further_changes_here}
 
@@ -408,6 +408,8 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
 /* If the mask is now frozen, we just return the existing mask. So leave the
    loop. */
                if( zero_freeze != 0 && dat->iter > zero_freeze + skip ) {
+                  msgOutiff( MSG__DEBUG, " ", "smf_get_mask: The %s mask "
+                             "is now frozen.", status, modname );
                   break;
 
 /* Low hits masking... */
