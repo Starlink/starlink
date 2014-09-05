@@ -119,6 +119,7 @@ smf_is_wvm_usable( const smfHead * hdr, int *status ) {
     20140128,
     20140827,
     20140829,
+    20140830,
     0    /* Sentinenl */
   };
 
