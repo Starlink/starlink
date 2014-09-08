@@ -772,7 +772,7 @@ try:
                newcon = 1
 
 #  When "com_freeze_flags" invocations have been performed, freeze the
-#  COM flags (so long as com_freeze_flags > 0).  Do this for AST, COM and FLT models.
+#  COM flags (so long as com_freeze_flags > 0).
          if com_freeze_flags > 0 and iter > com_freeze_flags + 1:
             com_freeze_flags = 0
             add[ "com.freeze_flags" ] = -1
@@ -867,11 +867,26 @@ try:
                cmd += " "+extra
             invoke(cmd)
 
+#  The quality array in the new map will not be of much use since it will
+#  have been created on the basis of maps made from individual chunks, rather
+#  than the total coadded map. This will causes the following estimation
+#  of the normalised change to be wrong. So we copy the quality mask from
+#  the previous map to the new map, and use that instead (this mask was
+#  created when the previous map was read into makemap). This also helps
+#  if the mask is frozen by one of the xxx.zero_freeze config parameters.
+            if prevmap != None:
+               try:
+                  invoke("$KAPPA_DIR/setqual ndf={0} like={1}".format(newmap,prevmap) )
+               except starutil.StarUtilError as err:
+                  pass
+
 #  If required, get the mean normalised map change, and see if it has
 #  dropped below maptol. If so, we must do one further iteration to
 #  ensure that the masking is not visible in the final map.
+         invoke("$KAPPA_DIR/setbb ndf={0} bb=1".format(newmap) )
          invoke("$KAPPA_DIR/maths exp=\"'abs(ia-ib)/sqrt(va)'\" ia={0} "
                 "ib={1} out={2}".format(newmap,prevmap,mapchange))
+         invoke("$KAPPA_DIR/setbb ndf={0} bb=0".format(newmap) )
          invoke("$KAPPA_DIR/stats ndf={0} clip=\\[3,3,3\\] quiet".format(mapchange))
          meanchange = starutil.get_task_par( "mean", "stats" )
          if maptol > 0.0 and converged == False:
@@ -902,17 +917,6 @@ try:
       msg_out( "Creating output itermap cube {0}...".format(itermap) )
       inputs = NDG( maps )
       invoke("$KAPPA_DIR/paste in={0} out={1} shift=\[0,0,1\]".format(inputs,itermap) )
-
-#  Since no masking is done on the final iteration, the output map will
-#  not currently contain a quality array. If the previous iteration has a
-#  quality component copy it to the last iteration, and set bad bits to
-#  zero. This is to provide a record of the final used mask.
-   if prevmap != None:
-      try:
-         invoke("$KAPPA_DIR/setqual ndf={0} like={1}".format(newmap,prevmap) )
-      except starutil.StarUtilError as err:
-         pass
-   if niter > 1 : invoke("$KAPPA_DIR/setbb ndf={0} bb=0".format(newmap) )
 
 #  Remove temporary files.
    cleanup()

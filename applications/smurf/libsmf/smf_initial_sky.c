@@ -71,6 +71,11 @@
 *     10-MAR-2014 (DSB):
 *        Update the Quality component of the supplied NDF to match the
 *        mask created by smf_calcmodel_ast.
+*     8-SEP-2014 (DSB):
+*        Changed to support freezing of masks within SKYLOOP. Initial
+*        masks are now made from the Quality array in the supplied NDF.
+*        These will be immediately over-written (within smf_calcmodel_ast)
+*        with new masks unless the mask is frozen.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -122,6 +127,8 @@ int smf_initial_sky( ThrWorkForce *wf, AstKeyMap *keymap, smfDIMMData *dat,
    int result;                /* Returned flag */
    int there;                 /* Is there a smurf extension in the NDF? */
    int update;                /* Was NDF opened for UPDATE access? */
+   size_t i;                  /* Loop count */
+   size_t junk;               /* Unused value */
 
 /* Initialise the returned value to indicate no sky has been subtractred. */
    result = 0;
@@ -204,6 +211,37 @@ int smf_initial_sky( ThrWorkForce *wf, AstKeyMap *keymap, smfDIMMData *dat,
       ndfXstat( indf1, SMURF__EXTNAME, &there, status );
       if( there ) ndfXgt0i( indf1, SMURF__EXTNAME, "NUMITER", iters,
                             status );
+
+/* If the NDF has a Quality component, import it and create initial AST,
+   FLT and COM masks from it. These will often be over-ridden by new masks
+   calculated with smf_calcmodel_ast below, but will not be over-written
+   if the masks have been frozen by xxx.zero_freeze. */
+      ndfState( indf2, "Quality", &there, status );
+      if( there && dat->mapqual ) {
+         smf_qual_t *qarray = smf_qual_map( wf, indf2, "Read", NULL, &junk,
+                                            status );
+         if( *status == SAI__OK ) {
+            smf_qual_t *pq = qarray;
+            for( i = 0; i < dat->msize; i++,pq++ ) {
+               if( *pq & SMF__MAPQ_AST ) {
+                  if( !dat->ast_mask ) dat->ast_mask = astCalloc( dat->msize,
+                                                  sizeof( *(dat->ast_mask) ) );
+                  (dat->ast_mask)[ i ] = 1;
+               }
+               if( *pq & SMF__MAPQ_FLT ) {
+                  if( !dat->flt_mask ) dat->flt_mask = astCalloc( dat->msize,
+                                                  sizeof( *(dat->flt_mask) ) );
+                  (dat->flt_mask)[ i ] = 1;
+               }
+               if( *pq & SMF__MAPQ_COM ) {
+                  if( !dat->com_mask ) dat->com_mask = astCalloc( dat->msize,
+                                                  sizeof( *(dat->com_mask) ) );
+                  (dat->com_mask)[ i ] = 1;
+               }
+            }
+         }
+         qarray = astFree( qarray );
+      }
 
 /* Indicate the map arrays within the supplied smfDIMMData structure now
    contain usable values. We need to do this before calling
