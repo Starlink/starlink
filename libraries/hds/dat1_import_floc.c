@@ -31,15 +31,15 @@
  *     for internal usage by HDS only. The public version is datImportFloc.
 
  *  Arguments
- *    char flocator[DAT__SZLOC] = Given
+ *    flocator = const char * (Given)
  *       Fortran character string buffer. Should be at least DAT__SZLOC
  *       characters long.
- *    int len = Given
+ *    len = int (Given)
  *       Size of Fortran character buffer. Sanity check.
- *    HDSLoc ** clocator = Returned
- *       Fills the HDSLoc struct with the contents of the fortran buffer.
+ *    clocator = HDSLoc * (Returned)
+ *       Fills the supplied HDSLoc struct with the contents of the fortran buffer.
  *       The C struct will not be malloced by this routine.
- *    int *status = Given and Returned
+ *    status = int * (Given and Returned)
  *       Inherited status. Attempts to execute even if status is not DAT__OK
  *       on entry.
 
