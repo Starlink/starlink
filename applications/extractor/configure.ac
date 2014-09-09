@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT([extractor],[2.5-1],[starlink@jiscmail.ac.uk])
+AC_INIT([extractor],[2.19-5],[starlink@jiscmail.ac.uk])
 AC_CONFIG_AUX_DIR([build-aux])
 
 dnl    Require autoconf-2.50 at least
@@ -26,12 +26,15 @@ dnl    To configure the two components we just run ./configure in the
 dnl    extract and sextractor directories. Do not invoke AC_CONFIG_SUBDIRS,
 dnl    since that prompts autoreconf to try to reconfigure that directory, and
 dnl    automake to assume it's allowed to play there, too.
+dnl
+dnl    Added -disable-model-fitting so that we can build the basic
+dnl    SExtractor without requiring an ATLAS library.
 (
     cd extract
-    ./configure --prefix=$prefix --cache-file=config.cache STARLINK=$STARLINK
+    ./configure --prefix=$prefix --cache-file=config.cache -disable-model-fitting STARLINK=$STARLINK
     cd ..
     cd sextractor
-    ./configure --prefix=$prefix --cache-file=config.cache
+    ./configure --prefix=$prefix --cache-file=config.cache -disable-model-fitting
 )
 
 dnl    Find required versions of the programs we need for configuration

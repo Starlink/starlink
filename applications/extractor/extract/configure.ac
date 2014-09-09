@@ -111,6 +111,38 @@ AC_FUNC_FSEEKO
 #AC_DEFINE(USE_THREADS, 1, [Triggers multhreading])
 AC_DEFINE_UNQUOTED(THREADS_NMAX, 1,[Maximum number of POSIX threads])
 
+############# Actions to complete if model-fitting is activated ##############
+if test x$enable_model_fitting != xno; then
+  AC_DEFINE(USE_MODEL, 1, [Triggers model-fitting])
+dnl ############ handle the INTEL MKL library (FFTW + LAPACK) ###########
+dnl   if test x$enable_mkl = xyes; then
+dnl     convlibs="${srcdir}/wcs/libwcs_c.a,${srcdir}/levmar/liblevmar.a"
+dnl     ACX_MKL($with_mkl_dir,,$enable_best_link,$convlibs)
+dnl     if test x$MKL_WARN != x; then
+dnl       AC_MSG_WARN([$MKL_WARN])
+dnl     fi
+dnl     AM_CFLAGS="$AM_CFLAGS $MKL_CFLAGS "
+dnl     AM_LDFLAGS="$AM_LDFLAGS $MKL_LDFLAGS"
+dnl     LIBS="$LIBS $MKL_LIBS"
+dnl   else
+dnl ################ handle the FFTW library (Fourier transforms) ################
+dnl     ACX_FFTW($with_fftw_libdir,$with_fftw_incdir,$use_pthreads,yes,
+dnl 	LIBS="$FFTW_LIBS $LIBS"
+dnl 	if test x$FFTW_WARN != x; then
+dnl 	  AC_MSG_WARN([$FFTW_WARN])
+dnl 	fi,
+dnl 	AC_MSG_ERROR([$FFTW_ERROR Exiting.]))
+dnl ################## handle the ATLAS library(linear algebra) ##################
+dnl     ACX_ATLAS($with_atlas_libdir,$with_atlas_incdir,$use_pthreads,
+dnl 	LIBS="$ATLAS_LIBS $LIBS"
+dnl 	if test x$ATLAS_WARN != x; then
+dnl 	  AC_MSG_WARN([$ATLAS_WARN])
+dnl 	fi,
+dnl 	AC_MSG_ERROR([$ATLAS_ERROR Exiting.]))
+dnl   fi
+fi
+AM_CONDITIONAL(USE_MODEL, [test x$enable_model_fitting != xno])
+
 # href to the XSL style-sheet in preflist.h
 CFLAGS="$CFLAGS -DXSL_URL=\\\"file://$datarootdir/${PACKAGE_NAME}/${PACKAGE_NAME}.xsl\\\""
 

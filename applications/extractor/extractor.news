@@ -1,5 +1,15 @@
 1 Update to EXTRACTOR
 
+ Changes in release 2.19.5
+
+    EXTRACTOR and SExtractor have been updated to version 2.19.5.
+    This is a limited update as not all features are available,
+    in particular the galaxy model fitting features have not
+    been enabled. This is mainly to reduce the external dependencies
+    required to build EXTRACTOR/SExtractor, also it isn't clear how useful
+    these abilities would be without also creating an NDF version
+    of PSFEx.
+
  Changes in release 2.5.1
 
     When using weight images in EXTRACTOR a bug in handle bad pixels
