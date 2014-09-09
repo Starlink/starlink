@@ -1109,6 +1109,9 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 *     9-JUL-2014 (DSB):
 *        Added attribute FitsAxisOrder, which allows an order to be
 *        specified for WCS axis within FITS headers generated using astWrite.
+*     9-SEP-2014 (DSB):
+*        Modify Split so that any non-printing characters such as
+*        newlines at the end of the string are ignored.
 *class--
 */
 
@@ -29924,9 +29927,9 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
 /* Return. */
    return ret;
 }
+
 int Split( const char *card, char **name, char **value,
            char **comment, const char *method, const char *class, int *status ){
-
 /*
 *  Name:
 *     Split
@@ -30021,11 +30024,13 @@ int Split( const char *card, char **name, char **value,
    if( !astOK ) return type;
 
 /* Store the number of characters to be read from the supplied card. This
-   is not allowed to be more than the length of a FITS header card.
-   Trailing white space and non-printing characters such as new-line are
-   ignored. */
+   is not allowed to be more than the length of a FITS header card. */
    nc = 0;
    while( nc < AST__FITSCHAN_FITSCARDLEN && card[ nc ] ) nc++;
+
+/* Reduce the number of characters to read so that any non-printing
+   characters such as new-lines at the end of the string are ignored. */
+   while( nc > 0 && !isprint( card[ nc - 1 ] ) ) nc--;
 
 /* Allocate memory for a copy of the keyword name plus a terminating
    null character. */
