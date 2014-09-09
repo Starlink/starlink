@@ -269,7 +269,7 @@ int datRef( const HDSLoc * locator, char * ref, size_t reflen, int * status ) {
     if ( strlen(buff) > reflen -1 ) {
       strncpy( ref, buff, reflen - 4 );
       ref[reflen-4] = '\0';
-      strcat(ref, "xyz");
+      strcat(ref, "...");
 
       /* Report an error showing the truncated character string */
       *status = DAT__TRUNC;
