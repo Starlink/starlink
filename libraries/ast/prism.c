@@ -80,6 +80,9 @@ f     The Prism class does not define any new routines beyond those
 *        Over-ride the astDecompose method.
 *     14-AUG-2014 (DSB):
 *        Over-ride the astGetRegionBounds method.
+*     9-SEP-2014 (DSB):
+*        Record the pointer to the Prism implementation of RegBaseMesh 
+*        within the class virtual function table.
 *class--
 */
 
@@ -996,10 +999,10 @@ static void GetRegionBounds( AstRegion *this_region, double *lbnd,
 *    limit will be returned set to the constant value).
 *    - If the bounds on an axis cannot be determined, AST__BAD is returned for
 *    both upper and lower bounds
-*    - The implementation of this method for Prisms attempts to split the Prism 
-*    into two separate Regions spanning indepenent sets of axes, and then uses 
-*    the astGetRegionBouinds method to get the bounds on these two Regions. Care 
-*    has to be taken because the Prism may have been remapped into a different 
+*    - The implementation of this method for Prisms attempts to split the Prism
+*    into two separate Regions spanning indepenent sets of axes, and then uses
+*    the astGetRegionBouinds method to get the bounds on these two Regions. Care
+*    has to be taken because the Prism may have been remapped into a different
 *    Frame since it was created.
 
 *-
@@ -1395,6 +1398,7 @@ void astInitPrismVtab_(  AstPrismVtab *vtab, const char *name, int *status ) {
    new member functions implemented here. */
    mapping->Decompose = Decompose;
    region->RegBaseBox = RegBaseBox;
+   region->RegBaseMesh = RegBaseMesh;
    region->RegPins = RegPins;
    region->GetBounded = GetBounded;
    region->RegCentre = RegCentre;
