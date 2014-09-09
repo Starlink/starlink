@@ -2332,8 +2332,10 @@ itcl::class gaia::GaiaSextractor {
 
                   #  Generate file names, include MEF extension so that only
                   #  this extension is processed. Otherwise all image
-                  #  extensions would be done.
+                  #  extensions would be done. -1 as SExtractor changed
+                  #  the indexing from the initial Starlink version.
                   set hdunum [$itk_option(-rtdimage) hdu]
+                  incr hdunum -1
                   set fitsname "$diskimage\[$hdunum\]"
 
                   #  Run program, monitoring output...
