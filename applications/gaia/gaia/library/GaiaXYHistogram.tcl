@@ -299,7 +299,7 @@ itcl::class gaia::GaiaXYHistogram {
    protected method make_graph_ {} {
 
       set lwidth 14
-      set vwidth 8
+      set vwidth 14
 
       #  Create the X graph and add it to the upper pane.
       itk_component add xgraph {
@@ -342,7 +342,11 @@ itcl::class gaia::GaiaXYHistogram {
          frame $w_.tableframe \
             -relief flat -borderwidth 1
       }
-      pack $itk_component(tableframe) -fill none -expand 0
+      pack $itk_component(tableframe) -fill x -expand 1
+
+      #  Smaller labels in main area.
+      set lwidth 9
+      set vwidth 16
 
       #  Readout coordinate.
       itk_component add uppercoord {
