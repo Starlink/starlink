@@ -14,16 +14,14 @@
 *  Description:
 *     Creates a FITS file for each chunk of time-series data specifed by
 *     "IN". Each FITS file is in the form expected by the Unimap map-maker
-*     (see http://w3.uniroma1.it/unimap/). The name of each FITS file
-*     starts with the base name used by smurf:makemap for exported
-*     time-series data, but ends with "_unimap.fit". For instance, if the
-*     input file is s4a20091214_00015_0002.sdf, the output will be left in
-*     s4a20091214_00015_0002_unimap.fit.
+*     (see http://w3.uniroma1.it/unimap/).
 
 *  Usage:
-*     unimap in out [retain] [msg_filter] [ilevel] [glevel] [logfile]
+*     unimap in out [fakemap] [retain] [msg_filter] [ilevel] [glevel] [logfile]
 
 *  Parameters:
+*     FAKEMAP = NDF (Read)
+*        An image to use as a fakemap. [!]
 *     GLEVEL = LITERAL (Read)
 *        Controls the level of information to write to a text log file.
 *        Allowed values are as for "ILEVEL". The log file to create is
@@ -101,6 +99,8 @@
 *  History:
 *     6-FEB-2014 (DSB):
 *        Original version
+*     10-SEP-2014 (DSB):
+*        Added parameter FAKEMAP.
 *-
 '''
 
@@ -161,6 +161,9 @@ try:
 
    params.append(starutil.Par0S("OUT", "The base name for the output FITS files"))
 
+   params.append(starutil.ParNDG("FAKEMAP", "A fake map to add into the data",
+                 default=None, noprompt=True, maxsize=1))
+
    params.append(starutil.Par0L("RETAIN", "Retain temporary files?", False,
                                  noprompt=True))
 
@@ -175,6 +178,7 @@ try:
    indata = parsys["IN"].value
    retain = parsys["RETAIN"].value
    outbase = parsys["OUT"].value
+   fakemap = parsys["FAKEMAP"].value
 
 #  Erase any NDFs holding cleaned data, exteinction or pointing data from
 #  previous runs.
@@ -203,6 +207,8 @@ try:
    fd.write("noisecliphigh=0\n")
    fd.write("order=0\n")
    fd.write("downsampscale=0\n")
+   if fakemap != None:
+      fd.write("fakemap={0}\n".format(fakemap) )
    fd.close()
 
    map = NDG(1)
