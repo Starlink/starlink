@@ -208,6 +208,7 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
    const char *cval;
    const char *modname;
    const char *out;
+   const char *table = NULL;
    double mingood;
    int addqual;
    int append;
@@ -233,6 +234,7 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
    int time;
    smfArray *res;
    smf_modeltype model;
+   static smfSampleTable *tabdata = NULL;
 
 /* Check inherited status. */
    if( *status != SAI__OK ) return;
@@ -246,14 +248,14 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
    astMapGet0A( keymap, "DIAG", &obj );
    kmap = (AstKeyMap *) obj;
 
+/* Get pointer to the smfArray containing the current residuals, and the
+   number of available subarrays. */
+   res = dat->res[0];
+   nsub = res->ndat;
+
 /* Get the name of the HDS container file in which to store the
    diagnostics info. Skip to the end if none is specified. */
    if( astMapGet0C( kmap, "OUT", &out ) ) {
-
-/* Get pointer to the smfArray containing the current residuals, and the
-   number of available subarrays. */
-      res = dat->res[0];
-      nsub = res->ndat;
 
 /* See if we should append data for the current run of makemap to NDFs
    created by a previous run (e.g. when running the skyloop script). */
@@ -268,6 +270,19 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
 
 /* See if NDFs are to include Quality arrays. */
       astMapGet0I( kmap, "QUAL", &addqual );
+
+/* See if an ascii table of values falling in a specified map pixel is
+   to be produced. If so, create a structure to hold information about
+   the table. */
+      if( ! tabdata && dat->lut ) {
+         astMapGet0C( kmap, "TABLE", &table );
+         if( table ) {
+            tabdata = astCalloc( 1, sizeof( *tabdata ) );
+            tabdata->table = astStore( NULL, table, strlen( table ) + 1 );
+            astMapGet0I( kmap, "XPIX", &(tabdata->xpix) );
+            astMapGet0I( kmap, "YPIX", &(tabdata->ypix) );
+         }
+      }
 
 /* If we are appending to previously created NDFs, attempt to open the
    pre-existing container file. */
@@ -437,7 +452,7 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
                   sprintf( root, "bef_%d", chunk );
                   smf_diag( wf, mloc, &ibolo, irow, power, time, isub,
                             dat, type, NULL, 1, root, 0, mingood, cube,
-                            map, addqual, status );
+                            map, addqual, tabdata, status );
                }
 
 /* If this function has been called immediately after estimating the new
@@ -447,14 +462,15 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
                sprintf( root, "mod_%d", chunk );
                smf_diag( wf, mloc, &ibolo, irow, power, time, isub,
                          dat, type, allmodel ? allmodel[ 0 ] : NULL,
-                         0, root, mask, mingood, cube, map, addqual, status );
+                         0, root, mask, mingood, cube, map, addqual,
+                         tabdata, status );
                if( res_after && type != SMF__RES ) {
                   msgOutf( "", "Diagnostics: Dumping residuals after subtraction of %s",
                            status, modname );
                   sprintf( root, "aft_%d", chunk );
                   smf_diag( wf, mloc, &ibolo, irow, power, time, isub,
                             dat, type, NULL, 1, root, 0, mingood, cube,
-                            map, addqual, status );
+                            map, addqual, tabdata, status );
                }
 
 /* Any other "where" value is currently an error. */

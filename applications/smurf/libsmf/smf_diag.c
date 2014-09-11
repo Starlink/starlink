@@ -17,7 +17,7 @@
 *               int power, int time, int isub, smfDIMMData *dat,
 *               smf_modeltype type, smfArray *model, int res,
 *               const char *root, int mask, double mingood, int cube,
-*               int map, int addqual, int *status )
+*               int map, int addqual, smfSampleTable *table, int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -75,6 +75,9 @@
 *        negative, the map will contain data for all available subarrays.
 *     addqual = int (Given)
 *        If non-zero, the output NDFs will include a quality array.
+*     table = smfSampleTable * (Given)
+*        Pointer to a structure to be updated with information about
+*        values falling in a specified map pixel, or NULL.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -158,7 +161,7 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
                int power, int time, int isub, smfDIMMData *dat,
                smf_modeltype type, smfArray *model, int res,
                const char *root, int mask, double mingood, int cube,
-               int map, int addqual, int *status ){
+               int map, int addqual, smfSampleTable *table, int *status ){
 
 /* Local Variables: */
    AstCmpFrame *totfrm;
@@ -836,6 +839,129 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
 
 /* Annul the NDF identifier. */
       ndfAnnul( &indf, status );
+   }
+
+/* If required, add new columns to the table holding information about
+   each sample that falls in a given map pixel. */
+   if( table ) {
+      int *pi0, *pi, jj, nc;
+      dim_t jcol, jrow;
+      dim_t ibol, ipix, itime;
+      char hdsname[ DAT__SZNAM + 1 ];
+      char colname[ 128 ];
+      size_t iel;
+      double *pvals = NULL;
+      double *qvals = NULL;
+
+/* If not akready done, identify the samples that fall in the specified
+   pixel, and store columns holding the corresponding time slice and
+   bolometer indices. */
+      if( !table->nrow ) {
+         ipix = ( table->xpix - dat->lbnd_out[ 0 ] ) +
+                dat->mdims[ 0 ]*( table->ypix - dat->lbnd_out[ 1 ] );
+
+         pi0 = dat->lut[0]->sdata[isub]->pntr[0];
+         for( itime = 0; itime < ntslice; itime++ ) {
+            pi = pi0;
+            for( ibol = 0; ibol < nbolo; ibol++ ) {
+               if( *pi == (int) ipix ) {
+                  jj = (table->nrow)++;
+                  table->times = astGrow( table->times, table->nrow,
+                                          sizeof( *(table->times) ) );
+                  table->bolos = astGrow( table->bolos, table->nrow,
+                                          sizeof( *(table->bolos) ) );
+                  if( *status == SAI__OK ) {
+                     (table->times)[ jj ] = itime;
+                     (table->bolos)[ jj ] = ibol;
+                  }
+               }
+               pi += bstride;
+            }
+            pi0 += tstride;
+         }
+      }
+
+/* Create the name of the new column, and append to the end of the list
+   of column names. Also create an array to hold column values and append
+   to the end of the list. Then do the same for quality values. */
+      datName( loc, hdsname, status );
+      nc = sprintf( colname, "%s_%s_iter%d", hdsname, root, dat->iter );
+      jj = (table->ncol)++;
+      table->colnames = astGrow( table->colnames, table->ncol,
+                                 sizeof( *(table->colnames) ) );
+      table->colvals = astGrow( table->colvals, table->ncol,
+                                 sizeof( *(table->colvals) ) );
+      pvals = astMalloc( table->nrow*sizeof( *pvals ) );
+
+      if( *status == SAI__OK ) {
+         (table->colnames)[ jj ] = astStore( NULL, colname, nc + 1 );
+         (table->colvals)[ jj ] = pvals;
+      }
+
+      if( qual ) {
+         nc = sprintf( colname, "%s_%s_iter%d_qual", hdsname, root, dat->iter );
+         jj = (table->ncol)++;
+         table->colnames = astGrow( table->colnames, table->ncol,
+                                    sizeof( *(table->colnames) ) );
+         table->colvals = astGrow( table->colvals, table->ncol,
+                                    sizeof( *(table->colvals) ) );
+         qvals = astMalloc( table->nrow*sizeof( *qvals ) );
+
+         if( *status == SAI__OK ) {
+            (table->colnames)[ jj ] = astStore( NULL, colname, nc + 1 );
+            (table->colvals)[ jj ] = qvals;
+         }
+      }
+
+/* Store column values. */
+      if( *status == SAI__OK ) {
+         double *pd = (data->pntr)[0];
+         size_t *pt = table->times;
+         size_t *pb = table->bolos;
+         if( nbolo > 1 ) {
+            for( jrow = 0; jrow < table->nrow; jrow++ ) {
+               iel = (*(pb++))*bstride + (*(pt++))*tstride;
+               *(pvals++) = pd[ iel ];
+               if( qual ) *(qvals++) = qual[ iel ];
+            }
+         } else {
+            for( jrow = 0; jrow < table->nrow; jrow++ ) {
+               iel = *(pt++);
+               *(pvals++) = pd[ iel ];
+               if( qual ) *(qvals++) = qual[ iel ];
+            }
+         }
+
+/* Now write out the whole table, over-writing any previous table. */
+         FILE *fd = fopen( table->table, "w" );
+         if( fd ) {
+            fprintf( fd, "# xpix=%d ypix=%d\n", table->xpix, table->ypix );
+            fprintf( fd, "# ibolo itime " );
+            for( jcol = 0; jcol < table->ncol; jcol++ ) {
+               fprintf( fd, "%s ", table->colnames[ jcol ] );
+            }
+            fprintf( fd, "\n" );
+
+            pt = table->times;
+            pb = table->bolos;
+            for( jrow = 0; jrow < table->nrow; jrow++ ) {
+               fprintf( fd, "%zu %zu ", *(pb++), *(pt++) );
+               for( jcol = 0; jcol < table->ncol; jcol++ ) {
+                  if( table->colvals[ jcol ][jrow] != VAL__BADD ) {
+                     fprintf( fd, "%g ", table->colvals[ jcol ][jrow] );
+                  } else {
+                     fprintf( fd, "null " );
+                  }
+               }
+               fprintf( fd, "\n" );
+            }
+            fclose( fd );
+
+         } else {
+            errRepf( "", "smf_diag: Failed to open table file '%s'.",
+                    status, table->table );
+         }
+      }
    }
 
 /* Free the array holding the AST model and re-instate the original RES

@@ -816,6 +816,20 @@ diag.res_after = 0
 diag.res_before = 0
 
 #-----------------------------------------------------------------
+#  Name: 	diag.table
+#  Type: 	string
+#  Default: 	<undef>
+#  Purpose: 	Qualifies the required dignostic information.
+#  Description: If supplied, a text file is created with the given name
+#               containing a table with columns that hold the
+#               bolometer and time slice index (zero-based) of each sample
+#               that falls within the map pixel given by parameter
+#               "diag.xpix" and parameter "diag.ypix". The table also
+#               holds columns for the other quantities requested by the
+#               other "diag..." parameters.
+diag.table = <undef>
+
+#-----------------------------------------------------------------
 #  Name: 	diag.time
 #  Type: 	real
 #  Default: 	1
@@ -824,6 +838,24 @@ diag.res_before = 0
 # 		selected model. Only used if a value is supplied for
 #		parameter "diag.out".
 diag.time = 1
+
+#-----------------------------------------------------------------
+#  Name: 	diag.xpix
+#  Type: 	integer
+#  Default: 	0
+#  Purpose: 	Qualifies the required dignostic information.
+#  Description: The X pixel index of the map pixel that is to be recorded
+#               in the table specified by parameter "diag.table".
+diag.xpix = 0
+
+#-----------------------------------------------------------------
+#  Name: 	diag.ypix
+#  Type: 	integer
+#  Default: 	0
+#  Purpose: 	Qualifies the required dignostic information.
+#  Description: The Y pixel index of the map pixel that is to be recorded
+#               in the table specified by parameter "diag.table".
+diag.ypix = 0
 
 #-----------------------------------------------------------------
 #  Name: 	dks.boxcar

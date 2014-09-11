@@ -954,6 +954,20 @@ typedef struct smfFITSMaths {
   AstMathMap *map;/* The MathMap that defines the expression. */
 } smfFITSMaths;
 
+/* Struct to store a table of values falling in a specified map pixel (see smf_diag.c). */
+
+typedef struct smfSampleTable {
+  char *table;    /* The name of the ascii file to receive the table */
+  int xpix;       /* X pixel index of the map pixel */
+  int ypix;       /* X pixel index of the map pixel */
+  size_t nrow;    /* Number of rows in the table */
+  size_t *times;  /* A column of time slices indicies */
+  size_t *bolos;  /* A column of bolometer indicies */
+  dim_t ncol;     /* Number of other columns */
+  double **colvals;/* Columns of values */
+  char **colnames; /* The name for each column */
+} smfSampleTable;
+
 
 /* These are the bits defined in the DA for use in the SCUBA-2 DRCONTROL
    structure to indicate whether we are missing information from a particular
