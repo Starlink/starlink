@@ -138,7 +138,7 @@ itcl::class gaia::GaiaXYHistogram {
          {Change histogram during rectangle motion}
 
       #  Add toggle for using data limits of main image.
-      $Options add checkbutton -label {Use data limits} \
+      $Options add checkbutton -label {Use full data limits} \
          -variable [scope itk_option(-use_data_limits)] \
          -onvalue 1 \
          -offvalue 0 \
