@@ -37,17 +37,17 @@
  *    This function should be used to convert a an array of dimensions
  *    of type hdsdim to an array of dimensions suitable for Fortran
  *    usage. Returns a pointer to an array of F77_INTEGER_TYPE suitable
- *    for the Fortran routine
+ *    for the Fortran routine and always fills the Fortran array.
 
  *  Arguments
  *    ndim = int (Given)
  *       Number of relevant dimensions. Should not exceed DAT__MXDIM.
  *    dims[] = const hdsdim (Given)
  *       Input dimensions to copy, of size ndim.
- *    fdims[DAT__MXDIM] = F77_INTEGER_TYPE (Given)
+ *    fdims[DAT__MXDIM] = F77_INTEGER_TYPE (Given & Returned)
  *       Buffer space that can be used to store the copied dimensions.
- *       Note that there is no guarantee that at exit this array will
- *       have been used.
+ *       Will contain the dimensions even if the types for dims and
+ *       fdims match.
  *    int *status = Given and Returned
  *       Inherited status. If set, this routine will return NULL.
 
@@ -57,21 +57,30 @@
 
  *  Authors:
  *    Tim Jenness (JAC, Hawaii)
+ *    Tim Jenness (Cornell University)
 
  *  History:
  *    11-JUL-2005 (TIMJ):
  *      Initial version
+ *    2014-09-15 (TIMJ):
+ *      To ensure that this routine can be used in the fortran
+ *      interface we now always guarantee to fill fdims. This is a change of
+ *      behavior but allows HDSDIM2INT to be removed from interfaces.
 
  *  Notes:
- *    - Only use the pointer returned by this routine. Do not
- *      assume that fdims[] will be filled since it may not be
- *      used if the type of hdsdim is the same as a F77_INTEGER_TYPE.
+ *    - This routine is commonly used to copy the output of a C routine
+ *      to a pre-existing Fortran buffer. This requires that fdims[] is
+ *      filled regardless of type matching. If the types match then a
+ *      fast memmove will be used to do the filling rather than a for loop.
  *    - Status will be set to bad if the C dimension can not fit into
  *      the corresponding Fortran integer.
  *    - The expectation is that this routine is used solely for C
  *      interfaces to Fortran library routines.
+ *    - fdims is always filled, so the return value is now always fdims.
+ *      It is retained for API compatibility.
 
  *  Copyright:
+ *    Copyright (C) 2014 Cornell University.
  *    Copyright (C) 2006 Particle Physics and Astronomy Research Council.
  *    All Rights Reserved.
 
@@ -125,8 +134,10 @@ hdsDimC2F( int ndim, const hdsdim dims[],
   if (*status == DAT__OK) retval = fdims;
 
 #else
-  /* hdsdim is the same size and sign so no copy required */
-  retval = (F77_INTEGER_TYPE*)dims;
+  /* hdsdim is the same size and sign so fast copy can
+     be used. */
+  memmove( fdims, dims, ndim*sizeof(*fdims) );
+  retval = fdims;
 #endif
 
   return retval;

@@ -1356,10 +1356,7 @@ F77_SUBROUTINE(dat_mapn)( CHARACTER(locator),
    char type_c[DAT__SZTYP+1];
    char mode_c[DAT__SZMOD+1];
    void *cpntr = NULL; /* initialise in case of bad return status */
-#if HDS_COPY_FORTRAN_DIMS
-   hdsdim dims64[DAT__MXDIM];
-   int i;
-#endif
+   hdsdim cdims[DAT__MXDIM];
 
 /* Enter routine.	*/
 
@@ -1370,17 +1367,11 @@ F77_SUBROUTINE(dat_mapn)( CHARACTER(locator),
    cnfImpn( type, type_length, DAT__SZTYP,  type_c);
    cnfImpn( mode, mode_length, DAT__SZMOD,  mode_c);
 
-#if HDS_COPY_FORTRAN_DIMS
 /* Call pure C routine                                       */
-   datMapN( locator_c, type_c, mode_c, *ndim, &cpntr, dims64, status);
+   datMapN( locator_c, type_c, mode_c, *ndim, &cpntr, cdims, status);
 
-   /* Copy the array back to fortran from hdsdim */
-   for( i = 0; i<*ndim; i++) {
-     HDSDIM2INT( "DAT_MAPN", dims64[i], dims[i], status );
-   }
-#else
-   datMapN( locator_c, type_c, mode_c, *ndim, &cpntr, dims, status);
-#endif
+/* Handle copying to Fortran dims */
+   (void)hdsDimC2F( *ndim, cdims, dims, status );
 
 /* Export the C pointer as a FORTRAN POINTER */
    *pntr = cnfFptr( cpntr );
@@ -2742,28 +2733,19 @@ F77_SUBROUTINE(dat_shape)( CHARACTER(locator),
 
 /* Local variables.     */
    HDSLoc * locator_c = NULL;
-#if HDS_COPY_FORTRAN_DIMS
-   hdsdim dims64[DAT__MXDIM];
-   int i;
-#endif
+   hdsdim cdims[DAT__MXDIM];
 
 /* Enter routine.	*/
 
 /* Import the input locator string                  */
    datImportFloc( locator, locator_length, &locator_c, status );
 
-#if HDS_COPY_FORTRAN_DIMS
 /* Call pure C routine                                       */
-   datShape( locator_c, *ndimx, dims64, ndim, status );
+   datShape( locator_c, *ndimx, cdims, ndim, status );
 
-   /* Copy the array back to fortran from hdsdim */
-   for( i = 0; i<_min(*ndimx,*ndim); i++) {
-     HDSDIM2INT( "DAT_MAPN", dims64[i], dims[i], status );
-   }
+/* Handle copying to Fortran dims */
+   (void)hdsDimC2F( *ndim, cdims, dims, status );
 
-#else
-   datShape( locator_c, *ndimx, dims, ndim, status );
-#endif
 }
 
 F77_SUBROUTINE(dat_size)( CHARACTER(locator),
