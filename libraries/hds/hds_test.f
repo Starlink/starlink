@@ -96,6 +96,7 @@
       INTEGER I, ITEMP
       CHARACTER * (10) CHARARR(2), RETCHARARR(2)
       DOUBLE PRECISION DTEMP
+      CHARACTER * (DAT__SZFLX) UPEXTENSION
 
 *  Local Data:
       DATA DIM / 10, 20 /
@@ -420,11 +421,12 @@
       CALL HDS_OPEN( PATHX, 'UPDATE', LOC1, STATUS )
       CALL HDS_ERASE( LOC1, STATUS )
 
-*  Now try to con HDS_FIND with a component that actually does include .SDF
+*  Now try to con HDS_FIND with a component that actually does include the
+*  file extension.
       CALL HDS_NEW( PATH, 'HDS_TEST', 'NDF', 0, DIM, LOC1,
      :              STATUS )
-      CALL DAT_NEW0I( LOC1, 'SDF', STATUS )
-      CALL DAT_FIND( LOC1, 'SDF', LOC2, STATUS )
+      CALL DAT_NEW0I( LOC1, DAT__FLEXT(2:DAT__SZFLX), STATUS )
+      CALL DAT_FIND( LOC1, DAT__FLEXT(2:DAT__SZFLX), LOC2, STATUS )
       CALL DAT_PUT0I( LOC2, 22, STATUS )
       CALL DAT_ANNUL( LOC2, STATUS)
       CALL HDS_CLOSE( LOC1, STATUS )
@@ -432,11 +434,14 @@
       CALL HDS_FIND( DAT__ROOT, PATH, 'READ', LOC1, STATUS )
       CALL DAT_NAME( LOC1, REF, STATUS )
       IF (STATUS .EQ. SAI__OK) THEN
-         IF ( REF .NE. 'SDF' ) THEN
+         UPEXTENSION = DAT__FLEXT(2:DAT__SZFLX)
+         CALL CHR_UCASE( UPEXTENSION )
+         IF ( REF .NE. UPEXTENSION ) THEN
             STATUS = SAI__ERROR
             CALL EMS_SETC( 'NM', REF )
+            CALL EMS_SETC( 'EXP', UPEXTENSION )
             CALL EMS_REP('DAT_NAME_ERR',
-     :           'Name was ^NM rather than "SDF"', STATUS )
+     :           'Name was ^NM rather than "^EXP"', STATUS )
          END IF
       END IF
       CALL DAT_GET0I( LOC1, ITEMP, STATUS )
