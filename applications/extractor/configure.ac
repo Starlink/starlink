@@ -19,6 +19,11 @@ dnl    Option `per-package-dirs' means that executables and help files
 dnl    are installed in package-specific directories.
 STAR_DEFAULTS(per-package-dirs)
 
+dnl    Find required versions of the programs we need for configuration
+AC_PROG_CC
+AC_PROG_FC
+LT_INIT
+
 dnl    Need to build an atask, depends on much the same as a full monolith.
 STAR_MONOLITHS
 
@@ -36,11 +41,6 @@ dnl    SExtractor without requiring an ATLAS library.
     cd sextractor
     ./configure --prefix=$prefix --cache-file=config.cache -disable-model-fitting
 )
-
-dnl    Find required versions of the programs we need for configuration
-AC_PROG_CC
-AC_PROG_FC
-LT_INIT
 
 dnl    Declare the build and use dependencies for this package
 STAR_DECLARE_DEPENDENCIES(build, [ast ndg sae], [link])
