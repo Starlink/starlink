@@ -2,7 +2,7 @@
 *+
 *{a_task_prologue}
 *-
-      
+
 *  Type definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -84,9 +84,9 @@
 *.
 
       CALL TST_INIT
-      
+
       STATUS = SAI__OK
-      
+
       II = 0
       NI = 0
 1     CONTINUE                   ! Start of 'DO WHILE' loop
@@ -218,7 +218,7 @@
             IF ( STATUS .NE. SAI__OK ) GO TO 66
             NI = NI + 1
             II = NI
-            
+
 *  Obtain data representation.
          ELSE IF ( CHR_SIMLR( CMD, 'DREP' ) ) THEN
             CALL TST_OUT( ' ', 'Obtain data representation...',
@@ -394,13 +394,13 @@
             CALL DAT_MAPC( LOC( II ), MODE, MNDIM( II ),
      :                       MDIM( 1, II ), PNTR( II ), STATUS )
             IF ( STATUS .NE. SAI__OK ) GO TO 66
- 
+
             CALL MSG_SETI( 'EL', EL( II ) )
             CALL TST_OUT( ' ', '^EL elements mapped', STATUS )
             IF ( MNDIM( II ) .EQ. 0 ) MDIM( 1, II ) = 1
             MAP( II ) = .TRUE.
             MTYPE( II ) = '_CHAR'
- 
+
 *  Map primitive as DOUBLE PRECISION.
          ELSE IF ( CHR_SIMLR( CMD, 'MAPD' ) ) THEN
             CALL TST_OUT( ' ', 'Map primitive as DOUBLE PRECISION...',
@@ -412,13 +412,13 @@
             CALL DAT_MAPD( LOC( II ), MODE, MNDIM( II ),
      :                       MDIM( 1, II ), PNTR( II ), STATUS )
             IF ( STATUS .NE. SAI__OK ) GO TO 66
- 
+
             CALL MSG_SETI( 'EL', EL( II ) )
             CALL TST_OUT( ' ', '^EL elements mapped', STATUS )
             IF ( MNDIM( II ) .EQ. 0 ) MDIM( 1, II ) = 1
             MAP( II ) = .TRUE.
             MTYPE( II ) = '_DOUBLE'
- 
+
 *  Map primitive as INTEGER.
          ELSE IF ( CHR_SIMLR( CMD, 'MAPI' ) ) THEN
             CALL TST_OUT( ' ', 'Map primitive as INTEGER...',
@@ -430,13 +430,13 @@
             CALL DAT_MAPI( LOC( II ), MODE, MNDIM( II ),
      :                       MDIM( 1, II ), PNTR( II ), STATUS )
             IF ( STATUS .NE. SAI__OK ) GO TO 66
- 
+
             CALL MSG_SETI( 'EL', EL( II ) )
             CALL TST_OUT( ' ', '^EL elements mapped', STATUS )
             IF ( MNDIM( II ) .EQ. 0 ) MDIM( 1, II ) = 1
             MAP( II ) = .TRUE.
             MTYPE( II ) = '_INTEGER'
- 
+
 *  Map primitive as LOGICAL.
          ELSE IF ( CHR_SIMLR( CMD, 'MAPL' ) ) THEN
             CALL TST_OUT( ' ', 'Map primitive as LOGICAL...',
@@ -448,13 +448,13 @@
             CALL DAT_MAPL( LOC( II ), MODE, MNDIM( II ),
      :                       MDIM( 1, II ), PNTR( II ), STATUS )
             IF ( STATUS .NE. SAI__OK ) GO TO 66
- 
+
             CALL MSG_SETI( 'EL', EL( II ) )
             CALL TST_OUT( ' ', '^EL elements mapped', STATUS )
             IF ( MNDIM( II ) .EQ. 0 ) MDIM( 1, II ) = 1
             MAP( II ) = .TRUE.
             MTYPE( II ) = '_LOGICAL'
- 
+
 *  Map primitive as REAL.
          ELSE IF ( CHR_SIMLR( CMD, 'MAPR' ) ) THEN
             CALL TST_OUT( ' ', 'Map primitive as REAL...',
@@ -466,13 +466,13 @@
             CALL DAT_MAPR( LOC( II ), MODE, MNDIM( II ),
      :                       MDIM( 1, II ), PNTR( II ), STATUS )
             IF ( STATUS .NE. SAI__OK ) GO TO 66
- 
+
             CALL MSG_SETI( 'EL', EL( II ) )
             CALL TST_OUT( ' ', '^EL elements mapped', STATUS )
             IF ( MNDIM( II ) .EQ. 0 ) MDIM( 1, II ) = 1
             MAP( II ) = .TRUE.
             MTYPE( II ) = '_REAL'
- 
+
 *  Alter object shape.
          ELSE IF ( CHR_SIMLR( CMD, 'MOULD' ) ) THEN
             CALL TST_OUT( ' ', 'Alter object shape...',
@@ -1189,7 +1189,7 @@ c      call lib$show_timer
      :                         STATUS )
             CALL TST_FLUSH( STATUS )
          END IF
-      
+
          GO TO 1
       END IF
 
@@ -1207,7 +1207,7 @@ c      call lib$show_timer
       INCLUDE 'SAE_PAR'
       INTEGER STATUS
       LOGICAL STATE
-      
+
       IF ( STATUS .NE. SAI__OK ) RETURN
 
       CALL HDS_STATE( STATE, STATUS )
@@ -1215,7 +1215,7 @@ c      call lib$show_timer
       CALL TST_OUT( ' ', 'HDS state in application = ^STATE', STATUS )
 
       END
-      
+
       SUBROUTINE TST_GETC( PROMPT, CVALUE, STATUS )
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
@@ -1307,7 +1307,7 @@ c      call lib$show_timer
       CHARACTER * ( MSG__SZMSG ) MSG
       INTEGER NC
       INTEGER I1, I2
-      
+
       CALL MSG_LOAD( PARAM, TEXT, MSG, NC, STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
          IF ( NC .EQ. 0 ) THEN
@@ -1318,14 +1318,14 @@ c            DO 1 I1 = 1, NC, 80
 c               I2 = MIN( I1 + 79, NC )
 c               WRITE( *, '( 1X, A )' ) MSG( I1 : I2 )
 c               WRITE( 13, '( A )' ) MSG( I1 : I2 )
-c 1          CONTINUE           
+c 1          CONTINUE
             WRITE( *, '( A )' ) MSG( : NC )
             WRITE( 13, '( A )' ) MSG( : NC )
          END IF
       END IF
 
       END
-      
+
       SUBROUTINE TST_BLANK( STATUS )
       IMPLICIT NONE
       INCLUDE 'SAE_PAR'
@@ -1335,7 +1335,7 @@ c 1          CONTINUE
          WRITE( 13, * )
       END IF
       END
-      
+
       SUBROUTINE TST_INIT
       IMPLICIT NONE
       OPEN( UNIT = 12, FILE = 'exercise.input', STATUS = 'UNKNOWN',
@@ -1364,7 +1364,7 @@ C  NB Workaround for EMS bug.
       INTEGER LNAM
       CHARACTER * ( ERR__SZMSG ) MSG
       INTEGER NC, I1, I2
-      
+
  1    CONTINUE                   ! Start of 'DO WHILE' loop
       CALL ERR_LOAD( MSGNAM, LNAM, MSG, NC, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
@@ -1376,12 +1376,12 @@ C            DO 2 I1 = 1, NC, 80
 C               I2 = MIN( I1 + 79, NC )
 C               WRITE( *, '( 1X, A )' ) MSG( I1 : I2 )
 C               WRITE( 13, '( A )' ) MSG( I1 : I2 )
-C 2          CONTINUE           
+C 2          CONTINUE
             WRITE( *, '( A )' ) MSG( : NC )
             WRITE( 13, '( A )' ) MSG( : NC )
          END IF
          GO TO 1
-      END IF     
+      END IF
       END
 
       SUBROUTINE WRN( TYPE, NDIM, DIM, PNTR, STATUS, LENPTR )
@@ -1402,19 +1402,19 @@ C 2          CONTINUE
 
       IF ( UTYPE .EQ. '_BYTE' ) THEN
          CALL WRNB( NDIM, DIM, %VAL( CNF_PVAL( PNTR ) ), STATUS )
- 
+
       ELSE IF ( UTYPE .EQ. '_UBYTE' ) THEN
          CALL WRNUB( NDIM, DIM, %VAL( CNF_PVAL( PNTR ) ), STATUS )
- 
+
       ELSE IF ( UTYPE .EQ. '_DOUBLE' ) THEN
          CALL WRND( NDIM, DIM, %VAL( CNF_PVAL( PNTR ) ), STATUS )
- 
+
       ELSE IF ( UTYPE .EQ. '_INTEGER' ) THEN
          CALL WRNI( NDIM, DIM, %VAL( CNF_PVAL( PNTR ) ), STATUS )
- 
+
       ELSE IF ( UTYPE .EQ. '_REAL' ) THEN
          CALL WRNR( NDIM, DIM, %VAL( CNF_PVAL( PNTR ) ), STATUS )
- 
+
       ELSE IF ( UTYPE .EQ. '_WORD' ) THEN
          CALL WRNW( NDIM, DIM, %VAL( CNF_PVAL( PNTR ) ), STATUS )
 
@@ -1433,435 +1433,435 @@ C 2          CONTINUE
 
       SUBROUTINE WRNB( NDIM, DIM, ARRAY, STATUS )
       INCLUDE 'SAE_PAR'
- 
+
       INTEGER NDIM
       INTEGER DIM( NDIM )
       BYTE ARRAY( * )
       INTEGER STATUS
       INTEGER N
       INTEGER I
- 
+
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
       N = 1
       DO 1 I = 2, NDIM
          N = N * DIM ( I )
 1     CONTINUE
- 
+
       DO 2 I = 1, N
          CALL WRB( DIM( 1 ), ARRAY( ( I - 1 ) * DIM( 1 ) + 1 ), STATUS )
          CALL TST_BLANK( STATUS )
 2     CONTINUE
- 
+
       END
- 
+
       SUBROUTINE WRNUB( NDIM, DIM, ARRAY, STATUS )
       INCLUDE 'SAE_PAR'
- 
+
       INTEGER NDIM
       INTEGER DIM( NDIM )
       BYTE ARRAY( * )
       INTEGER STATUS
       INTEGER N
       INTEGER I
- 
+
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
       N = 1
       DO 1 I = 2, NDIM
          N = N * DIM ( I )
 1     CONTINUE
- 
+
       DO 2 I = 1, N
          CALL WRUB( DIM( 1 ), ARRAY( ( I - 1 ) * DIM( 1 ) + 1 ),
      :   STATUS )
          CALL TST_BLANK( STATUS )
 2     CONTINUE
- 
+
       END
- 
+
       SUBROUTINE WRND( NDIM, DIM, ARRAY, STATUS )
       INCLUDE 'SAE_PAR'
- 
+
       INTEGER NDIM
       INTEGER DIM( NDIM )
       DOUBLE PRECISION ARRAY( * )
       INTEGER STATUS
       INTEGER N
       INTEGER I
- 
+
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
       N = 1
       DO 1 I = 2, NDIM
          N = N * DIM ( I )
 1     CONTINUE
- 
+
       DO 2 I = 1, N
          CALL WRD( DIM( 1 ), ARRAY( ( I - 1 ) * DIM( 1 ) + 1 ), STATUS )
          CALL TST_BLANK( STATUS )
 2     CONTINUE
- 
+
       END
- 
+
       SUBROUTINE WRNI( NDIM, DIM, ARRAY, STATUS )
       INCLUDE 'SAE_PAR'
- 
+
       INTEGER NDIM
       INTEGER DIM( NDIM )
       INTEGER ARRAY( * )
       INTEGER STATUS
       INTEGER N
       INTEGER I
- 
+
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
       N = 1
       DO 1 I = 2, NDIM
          N = N * DIM ( I )
 1     CONTINUE
- 
+
       DO 2 I = 1, N
          CALL WRI( DIM( 1 ), ARRAY( ( I - 1 ) * DIM( 1 ) + 1 ), STATUS )
          CALL TST_BLANK( STATUS )
 2     CONTINUE
- 
+
       END
- 
+
       SUBROUTINE WRNR( NDIM, DIM, ARRAY, STATUS )
       INCLUDE 'SAE_PAR'
- 
+
       INTEGER NDIM
       INTEGER DIM( NDIM )
       REAL ARRAY( * )
       INTEGER STATUS
       INTEGER N
       INTEGER I
- 
+
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
       N = 1
       DO 1 I = 2, NDIM
          N = N * DIM ( I )
 1     CONTINUE
- 
+
       DO 2 I = 1, N
          CALL WRR( DIM( 1 ), ARRAY( ( I - 1 ) * DIM( 1 ) + 1 ), STATUS )
          CALL TST_BLANK( STATUS )
 2     CONTINUE
- 
+
       END
- 
+
       SUBROUTINE WRNW( NDIM, DIM, ARRAY, STATUS )
       INCLUDE 'SAE_PAR'
- 
+
       INTEGER NDIM
       INTEGER DIM( NDIM )
       INTEGER*2 ARRAY( * )
       INTEGER STATUS
       INTEGER N
       INTEGER I
- 
+
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
       N = 1
       DO 1 I = 2, NDIM
          N = N * DIM ( I )
 1     CONTINUE
- 
+
       DO 2 I = 1, N
          CALL WRW( DIM( 1 ), ARRAY( ( I - 1 ) * DIM( 1 ) + 1 ), STATUS )
          CALL TST_BLANK( STATUS )
 2     CONTINUE
- 
+
       END
- 
+
       SUBROUTINE WRNUW( NDIM, DIM, ARRAY, STATUS )
       INCLUDE 'SAE_PAR'
- 
+
       INTEGER NDIM
       INTEGER DIM( NDIM )
       INTEGER*2 ARRAY( * )
       INTEGER STATUS
       INTEGER N
       INTEGER I
- 
+
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
       N = 1
       DO 1 I = 2, NDIM
          N = N * DIM ( I )
 1     CONTINUE
- 
+
       DO 2 I = 1, N
          CALL WRUW( DIM( 1 ), ARRAY( ( I - 1 ) * DIM( 1 ) + 1 ),
      :   STATUS )
          CALL TST_BLANK( STATUS )
 2     CONTINUE
- 
+
       END
 
       SUBROUTINE WRNL( NDIM, DIM, ARRAY, STATUS )
       INCLUDE 'SAE_PAR'
- 
+
       INTEGER NDIM
       INTEGER DIM( NDIM )
       LOGICAL ARRAY( * )
       INTEGER STATUS
       INTEGER N
       INTEGER I
- 
+
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
       N = 1
       DO 1 I = 2, NDIM
          N = N * DIM ( I )
 1     CONTINUE
- 
+
       DO 2 I = 1, N
          CALL WRL( DIM( 1 ), ARRAY( ( I - 1 ) * DIM( 1 ) + 1 ),
      :   STATUS )
          CALL TST_BLANK( STATUS )
 2     CONTINUE
- 
+
       END
 
       SUBROUTINE WRNC( NDIM, DIM, ARRAY, STATUS )
       INCLUDE 'SAE_PAR'
- 
+
       INTEGER NDIM
       INTEGER DIM( NDIM )
       CHARACTER * ( * ) ARRAY( * )
       INTEGER STATUS
       INTEGER N
       INTEGER I
- 
+
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
       N = 1
       DO 1 I = 2, NDIM
          N = N * DIM ( I )
 1     CONTINUE
- 
+
       DO 2 I = 1, N
          CALL WRC( DIM( 1 ), ARRAY( ( I - 1 ) * DIM( 1 ) + 1 ),
      :   STATUS )
          CALL TST_BLANK( STATUS )
 2     CONTINUE
- 
+
       END
 
       SUBROUTINE WRB( N, ARRAY, STATUS )
 *+
 *{subroutine_prologue}
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
       INCLUDE 'SAE_PAR'
       INCLUDE 'MSG_PAR'
 
 *  Arguments Given:
       INTEGER N
       BYTE ARRAY( * )
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  Local Variables:
       INTEGER I                  ! Loop counter
- 
+
       INCLUDE 'NUM_DEC_CVT'
       INCLUDE 'NUM_DEF_CVT'
 *.
- 
+
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
       IF(N.GT.0)THEN
          DO 1 I = 1, MIN( N, MSG__SZMSG )
             IF ( I .GT. 1 ) CALL MSG_SETC( 'MSG', ' ' )
             CALL MSG_SETI( 'MSG', NUM_BTOI( ARRAY( I ) ) )
- 1       CONTINUE        
+ 1       CONTINUE
          CALL TST_OUT( ' ', '^MSG', STATUS )
       ENDIF
- 
+
       END
       SUBROUTINE WRUB( N, ARRAY, STATUS )
 *+
 *{subroutine_prologue}
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
       INCLUDE 'SAE_PAR'
       INCLUDE 'MSG_PAR'
 
 *  Arguments Given:
       INTEGER N
       BYTE ARRAY( * )
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  Local Variables:
       INTEGER I                  ! Loop counter
- 
+
       INCLUDE 'NUM_DEC_CVT'
       INCLUDE 'NUM_DEF_CVT'
 *.
- 
+
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
       IF(N.GT.0)THEN
          DO 1 I = 1, MIN( N, MSG__SZMSG )
             IF ( I .GT. 1 ) CALL MSG_SETC( 'MSG', ' ' )
             CALL MSG_SETI( 'MSG', NUM_UBTOI( ARRAY( I ) ) )
- 1       CONTINUE        
+ 1       CONTINUE
          CALL TST_OUT( ' ', '^MSG', STATUS )
       ENDIF
- 
+
       END
       SUBROUTINE WRI( N, ARRAY, STATUS )
 *+
 *{subroutine_prologue}
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
       INCLUDE 'SAE_PAR'
       INCLUDE 'MSG_PAR'
 
 *  Arguments Given:
       INTEGER N
       INTEGER ARRAY( * )
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  Local Variables:
       INTEGER I                  ! Loop counter
- 
+
       INCLUDE 'NUM_DEC_CVT'
       INCLUDE 'NUM_DEF_CVT'
 *.
- 
+
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
       IF(N.GT.0)THEN
          DO 1 I = 1, MIN( N, MSG__SZMSG )
             IF ( I .GT. 1 ) CALL MSG_SETC( 'MSG', ' ' )
             CALL MSG_SETI( 'MSG', ARRAY( I ) )
- 1       CONTINUE        
+ 1       CONTINUE
          CALL TST_OUT( ' ', '^MSG', STATUS )
       ENDIF
- 
+
       END
       SUBROUTINE WRW( N, ARRAY, STATUS )
 *+
 *{subroutine_prologue}
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
       INCLUDE 'SAE_PAR'
       INCLUDE 'MSG_PAR'
 
 *  Arguments Given:
       INTEGER N
       INTEGER*2 ARRAY( * )
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  Local Variables:
       INTEGER I                  ! Loop counter
- 
+
       INCLUDE 'NUM_DEC_CVT'
       INCLUDE 'NUM_DEF_CVT'
 *.
- 
+
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
       IF(N.GT.0)THEN
          DO 1 I = 1, MIN( N, MSG__SZMSG )
             IF ( I .GT. 1 ) CALL MSG_SETC( 'MSG', ' ' )
             CALL MSG_SETI( 'MSG', NUM_WTOI( ARRAY( I ) ) )
- 1       CONTINUE        
+ 1       CONTINUE
          CALL TST_OUT( ' ', '^MSG', STATUS )
       ENDIF
- 
+
       END
       SUBROUTINE WRUW( N, ARRAY, STATUS )
 *+
 *{subroutine_prologue}
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
       INCLUDE 'SAE_PAR'
       INCLUDE 'MSG_PAR'
 
 *  Arguments Given:
       INTEGER N
       INTEGER*2 ARRAY( * )
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  Local Variables:
       INTEGER I                  ! Loop counter
- 
+
       INCLUDE 'NUM_DEC_CVT'
       INCLUDE 'NUM_DEF_CVT'
 *.
- 
+
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
       IF(N.GT.0)THEN
          DO 1 I = 1, MIN( N, MSG__SZMSG )
             IF ( I .GT. 1 ) CALL MSG_SETC( 'MSG', ' ' )
             CALL MSG_SETI( 'MSG', NUM_UWTOI( ARRAY( I ) ) )
- 1       CONTINUE        
+ 1       CONTINUE
          CALL TST_OUT( ' ', '^MSG', STATUS )
       ENDIF
- 
+
       END
       SUBROUTINE WRR( N, ARRAY, STATUS )
 *+
 *{subroutine_prologue}
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
       INCLUDE 'SAE_PAR'
       INCLUDE 'MSG_PAR'
 
 *  Arguments Given:
       INTEGER N
       REAL ARRAY( * )
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  Local Variables:
       INTEGER I                  ! Loop counter
- 
+
 *.
- 
+
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
       IF(N.GT.0)THEN
          DO 1 I = 1, MIN( N, MSG__SZMSG )
             IF ( I .GT. 1 ) CALL MSG_SETC( 'MSG', ' ' )
@@ -1870,37 +1870,37 @@ C 2          CONTINUE
             ELSE
                CALL MSG_SETR( 'MSG', ARRAY( I ) )
             END IF
- 1       CONTINUE        
+ 1       CONTINUE
          CALL TST_OUT( ' ', '^MSG', STATUS )
       ENDIF
- 
+
       END
       SUBROUTINE WRD( N, ARRAY, STATUS )
 *+
 *{subroutine_prologue}
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
       INCLUDE 'SAE_PAR'
       INCLUDE 'MSG_PAR'
 
 *  Arguments Given:
       INTEGER N
       DOUBLE PRECISION ARRAY( * )
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  Local Variables:
       INTEGER I                  ! Loop counter
- 
+
 *.
- 
+
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
       IF(N.GT.0)THEN
          DO 1 I = 1, MIN( N, MSG__SZMSG )
             IF ( I .GT. 1 ) CALL MSG_SETC( 'MSG', ' ' )
@@ -1909,83 +1909,83 @@ C 2          CONTINUE
             ELSE
                CALL MSG_SETD( 'MSG', ARRAY( I ) )
             END IF
- 1       CONTINUE        
+ 1       CONTINUE
          CALL TST_OUT( ' ', '^MSG', STATUS )
       ENDIF
- 
+
       END
       SUBROUTINE WRL( N, ARRAY, STATUS )
 *+
 *{subroutine_prologue}
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
       INCLUDE 'SAE_PAR'
       INCLUDE 'MSG_PAR'
 
 *  Arguments Given:
       INTEGER N
       LOGICAL ARRAY( * )
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  Local Variables:
       INTEGER I                  ! Loop counter
- 
+
 *.
- 
+
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
       IF(N.GT.0)THEN
          DO 1 I = 1, MIN( N, MSG__SZMSG )
             IF ( I .GT. 1 ) CALL MSG_SETC( 'MSG', ' ' )
             CALL MSG_SETL( 'MSG', ARRAY( I ) )
- 1       CONTINUE        
+ 1       CONTINUE
          CALL TST_OUT( ' ', '^MSG', STATUS )
       ENDIF
- 
+
       END
 
       SUBROUTINE WRC( N, ARRAY, STATUS )
 *+
 *{subroutine_prologue}
 *-
- 
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
- 
+
       INCLUDE 'SAE_PAR'
       INCLUDE 'MSG_PAR'
 
 *  Arguments Given:
       INTEGER N
       CHARACTER * ( * ) ARRAY( * )
- 
+
 *  Status:
       INTEGER STATUS             ! Global status
- 
+
 *  Local Variables:
       INTEGER I                  ! Loop counter
- 
+
 *.
- 
+
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
       IF(N.GT.0)THEN
          DO 1 I = 1, MIN( N, MSG__SZMSG )
             IF ( I .GT. 1 ) CALL MSG_SETC( 'MSG', ' ' )
             CALL MSG_SETC( 'MSG', '''' )
             CALL MSG_SETC( 'MSG', ARRAY( I ) )
             CALL MSG_SETC( 'MSG', '''' )
- 1       CONTINUE        
+ 1       CONTINUE
          CALL TST_OUT( ' ', '^MSG', STATUS )
       ENDIF
- 
+
       END
 
       SUBROUTINE SET( TYPE, START, INC, EL, PNTR, STATUS )
@@ -1997,28 +1997,28 @@ C 2          CONTINUE
       LOGICAL CHR_SIMLR
 
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
+
       IF ( CHR_SIMLR( TYPE, '_BYTE' ) ) THEN
          CALL SETB( START, INC, EL, %VAL( CNF_PVAL( PNTR ) ), STATUS )
- 
+
       ELSE IF ( CHR_SIMLR( TYPE, '_UBYTE' ) ) THEN
          CALL SETUB( START, INC, EL, %VAL( CNF_PVAL( PNTR ) ), STATUS )
- 
+
       ELSE IF ( CHR_SIMLR( TYPE, '_DOUBLE' ) ) THEN
          CALL SETD( START, INC, EL, %VAL( CNF_PVAL( PNTR ) ), STATUS )
- 
+
       ELSE IF ( CHR_SIMLR( TYPE, '_INTEGER' ) ) THEN
          CALL SETI( START, INC, EL, %VAL( CNF_PVAL( PNTR ) ), STATUS )
- 
+
       ELSE IF ( CHR_SIMLR( TYPE, '_REAL' ) ) THEN
          CALL SETR( START, INC, EL, %VAL( CNF_PVAL( PNTR ) ), STATUS )
- 
+
       ELSE IF ( CHR_SIMLR( TYPE, '_WORD' ) ) THEN
          CALL SETW( START, INC, EL, %VAL( CNF_PVAL( PNTR ) ), STATUS )
- 
+
       ELSE IF ( CHR_SIMLR( TYPE, '_UWORD' ) ) THEN
          CALL SETUW( START, INC, EL, %VAL( CNF_PVAL( PNTR ) ), STATUS )
- 
+
       ENDIF
 
       END
@@ -2034,15 +2034,15 @@ C 2          CONTINUE
 
       INCLUDE 'NUM_DEC_CVT'
       INCLUDE 'NUM_DEF_CVT'
- 
+
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
       DO 1 I = 1, EL
          ARRAY( I ) = NUM_RTOB( START + INC * REAL( I -1 ) )
 1     CONTINUE
- 
+
       END
- 
+
       SUBROUTINE SETUB( START, INC, EL, ARRAY, STATUS )
       INCLUDE 'SAE_PAR'
       REAL START
@@ -2054,15 +2054,15 @@ C 2          CONTINUE
 
       INCLUDE 'NUM_DEC_CVT'
       INCLUDE 'NUM_DEF_CVT'
- 
+
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
       DO 1 I = 1, EL
          ARRAY( I ) = NUM_RTOUB( START + INC * REAL( I -1 ) )
 1     CONTINUE
- 
+
       END
- 
+
       SUBROUTINE SETD( START, INC, EL, ARRAY, STATUS )
       INCLUDE 'SAE_PAR'
       REAL START
@@ -2074,15 +2074,15 @@ C 2          CONTINUE
 
       INCLUDE 'NUM_DEC_CVT'
       INCLUDE 'NUM_DEF_CVT'
- 
+
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
       DO 1 I = 1, EL
          ARRAY( I ) = NUM_RTOD( START + INC * REAL( I -1 ) )
 1     CONTINUE
- 
+
       END
- 
+
       SUBROUTINE SETI( START, INC, EL, ARRAY, STATUS )
       INCLUDE 'SAE_PAR'
       REAL START
@@ -2094,15 +2094,15 @@ C 2          CONTINUE
 
       INCLUDE 'NUM_DEC_CVT'
       INCLUDE 'NUM_DEF_CVT'
- 
+
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
       DO 1 I = 1, EL
          ARRAY( I ) = NUM_RTOI( START + INC * REAL( I -1 ) )
 1     CONTINUE
- 
+
       END
- 
+
       SUBROUTINE SETR( START, INC, EL, ARRAY, STATUS )
       INCLUDE 'SAE_PAR'
       REAL START
@@ -2114,15 +2114,15 @@ C 2          CONTINUE
 
       INCLUDE 'NUM_DEC_CVT'
       INCLUDE 'NUM_DEF_CVT'
- 
+
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
       DO 1 I = 1, EL
          ARRAY( I ) = NUM_RTOR( START + INC * REAL( I -1 ) )
 1     CONTINUE
- 
+
       END
- 
+
       SUBROUTINE SETW( START, INC, EL, ARRAY, STATUS )
       INCLUDE 'SAE_PAR'
       REAL START
@@ -2134,15 +2134,15 @@ C 2          CONTINUE
 
       INCLUDE 'NUM_DEC_CVT'
       INCLUDE 'NUM_DEF_CVT'
- 
+
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
       DO 1 I = 1, EL
          ARRAY( I ) = NUM_RTOW( START + INC * REAL( I -1 ) )
 1     CONTINUE
- 
+
       END
- 
+
       SUBROUTINE SETUW( START, INC, EL, ARRAY, STATUS )
       INCLUDE 'SAE_PAR'
       REAL START
@@ -2154,12 +2154,12 @@ C 2          CONTINUE
 
       INCLUDE 'NUM_DEC_CVT'
       INCLUDE 'NUM_DEF_CVT'
- 
+
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
       DO 1 I = 1, EL
          ARRAY( I ) = NUM_RTOUW( START + INC * REAL( I -1 ) )
          STATUS = SAI__OK
 1     CONTINUE
- 
+
       END
