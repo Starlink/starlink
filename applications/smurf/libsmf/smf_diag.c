@@ -885,82 +885,84 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
 /* Create the name of the new column, and append to the end of the list
    of column names. Also create an array to hold column values and append
    to the end of the list. Then do the same for quality values. */
-      datName( loc, hdsname, status );
-      nc = sprintf( colname, "%s_%s_iter%d", hdsname, root, dat->iter );
-      jj = (table->ncol)++;
-      table->colnames = astGrow( table->colnames, table->ncol,
-                                 sizeof( *(table->colnames) ) );
-      table->colvals = astGrow( table->colvals, table->ncol,
-                                 sizeof( *(table->colvals) ) );
-      pvals = astMalloc( table->nrow*sizeof( *pvals ) );
-
-      if( *status == SAI__OK ) {
-         (table->colnames)[ jj ] = astStore( NULL, colname, nc + 1 );
-         (table->colvals)[ jj ] = pvals;
-      }
-
-      if( qual ) {
-         nc = sprintf( colname, "%s_%s_iter%d_qual", hdsname, root, dat->iter );
+      if( table->nrow > 0 ) {
+         datName( loc, hdsname, status );
+         nc = sprintf( colname, "%s_%s_iter%d", hdsname, root, dat->iter );
          jj = (table->ncol)++;
          table->colnames = astGrow( table->colnames, table->ncol,
                                     sizeof( *(table->colnames) ) );
          table->colvals = astGrow( table->colvals, table->ncol,
                                     sizeof( *(table->colvals) ) );
-         qvals = astMalloc( table->nrow*sizeof( *qvals ) );
+         pvals = astMalloc( table->nrow*sizeof( *pvals ) );
 
          if( *status == SAI__OK ) {
             (table->colnames)[ jj ] = astStore( NULL, colname, nc + 1 );
-            (table->colvals)[ jj ] = qvals;
+            (table->colvals)[ jj ] = pvals;
          }
-      }
+
+         if( qual ) {
+            nc = sprintf( colname, "%s_%s_iter%d_qual", hdsname, root, dat->iter );
+            jj = (table->ncol)++;
+            table->colnames = astGrow( table->colnames, table->ncol,
+                                       sizeof( *(table->colnames) ) );
+            table->colvals = astGrow( table->colvals, table->ncol,
+                                       sizeof( *(table->colvals) ) );
+            qvals = astMalloc( table->nrow*sizeof( *qvals ) );
+
+            if( *status == SAI__OK ) {
+               (table->colnames)[ jj ] = astStore( NULL, colname, nc + 1 );
+               (table->colvals)[ jj ] = qvals;
+            }
+         }
 
 /* Store column values. */
-      if( *status == SAI__OK ) {
-         double *pd = (data->pntr)[0];
-         size_t *pt = table->times;
-         size_t *pb = table->bolos;
-         if( nbolo > 1 ) {
-            for( jrow = 0; jrow < table->nrow; jrow++ ) {
-               iel = (*(pb++))*bstride + (*(pt++))*tstride;
-               *(pvals++) = pd[ iel ];
-               if( qual ) *(qvals++) = qual[ iel ];
+         if( *status == SAI__OK ) {
+            double *pd = (data->pntr)[0];
+            size_t *pt = table->times;
+            size_t *pb = table->bolos;
+            if( nbolo > 1 ) {
+               for( jrow = 0; jrow < table->nrow; jrow++ ) {
+                  iel = (*(pb++))*bstride + (*(pt++))*tstride;
+                  *(pvals++) = pd[ iel ];
+                  if( qual ) *(qvals++) = qual[ iel ];
+               }
+            } else {
+               for( jrow = 0; jrow < table->nrow; jrow++ ) {
+                  iel = *(pt++);
+                  *(pvals++) = pd[ iel ];
+                  if( qual ) *(qvals++) = qual[ iel ];
+               }
             }
-         } else {
-            for( jrow = 0; jrow < table->nrow; jrow++ ) {
-               iel = *(pt++);
-               *(pvals++) = pd[ iel ];
-               if( qual ) *(qvals++) = qual[ iel ];
-            }
-         }
 
 /* Now write out the whole table, over-writing any previous table. */
-         FILE *fd = fopen( table->table, "w" );
-         if( fd ) {
-            fprintf( fd, "# xpix=%d ypix=%d\n", table->xpix, table->ypix );
-            fprintf( fd, "# ibolo itime " );
-            for( jcol = 0; jcol < table->ncol; jcol++ ) {
-               fprintf( fd, "%s ", table->colnames[ jcol ] );
-            }
-            fprintf( fd, "\n" );
-
-            pt = table->times;
-            pb = table->bolos;
-            for( jrow = 0; jrow < table->nrow; jrow++ ) {
-               fprintf( fd, "%zu %zu ", *(pb++), *(pt++) );
+            FILE *fd = fopen( table->table, "w" );
+            if( fd ) {
+               fprintf( fd, "# xpix=%d ypix=%d\n", table->xpix, table->ypix );
+               fprintf( fd, "# ibolo itime " );
                for( jcol = 0; jcol < table->ncol; jcol++ ) {
-                  if( table->colvals[ jcol ][jrow] != VAL__BADD ) {
-                     fprintf( fd, "%g ", table->colvals[ jcol ][jrow] );
-                  } else {
-                     fprintf( fd, "null " );
-                  }
+                  fprintf( fd, "%s ", table->colnames[ jcol ] );
                }
                fprintf( fd, "\n" );
-            }
-            fclose( fd );
 
-         } else {
-            errRepf( "", "smf_diag: Failed to open table file '%s'.",
-                    status, table->table );
+               pt = table->times;
+               pb = table->bolos;
+               for( jrow = 0; jrow < table->nrow; jrow++ ) {
+                  fprintf( fd, "%zu %zu ", *(pb++), *(pt++) );
+                  for( jcol = 0; jcol < table->ncol; jcol++ ) {
+                     if( table->colvals[ jcol ][jrow] != VAL__BADD ) {
+                        fprintf( fd, "%g ", table->colvals[ jcol ][jrow] );
+                     } else {
+                        fprintf( fd, "null " );
+                     }
+                  }
+                  fprintf( fd, "\n" );
+               }
+               fclose( fd );
+
+            } else {
+               errRepf( "", "smf_diag: Failed to open table file '%s'.",
+                       status, table->table );
+            }
          }
       }
    }
