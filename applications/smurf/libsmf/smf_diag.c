@@ -855,8 +855,9 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
 
 /* If not akready done, identify the samples that fall in the specified
    pixel, and store columns holding the corresponding time slice and
-   bolometer indices. */
-      if( !table->nrow ) {
+   bolometer indices. Ignore models such as COM that only have 1
+   time-series. */
+      if( !table->nrow && nbolo > 1 ) {
          ipix = ( table->xpix - dat->lbnd_out[ 0 ] ) +
                 dat->mdims[ 0 ]*( table->ypix - dat->lbnd_out[ 1 ] );
 
