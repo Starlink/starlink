@@ -46,6 +46,11 @@
 *        Original version.
 *     7-NOV-2013 (DSB):
 *        Changed old "instrument" parameter to "skytiling".
+*     18-SEP-2014 (DSB):
+*        The mapping from sky to tile (x,y) offsets is very non-linear
+*        for regions that straddle the RA=12h meridian. So ensure that
+*        this is taken into account when simplifying the Region if it is
+*        a Polygon.
 
 *  Copyright:
 *     Copyright (C) 2013 Science and Technology Facilities Council.
@@ -111,6 +116,7 @@ int *smf_jsatiles_region( AstRegion *region, smfJSATiling *skytiling,
    int lbnd[ 2 ];
    int mapsize;
    int npoint;
+   int old_sv;
    int overlap;
    int ubnd[ 2 ];
    int value;
@@ -165,7 +171,10 @@ int *smf_jsatiles_region( AstRegion *region, smfJSATiling *skytiling,
    smf_jsatile( -1, skytiling, 0, 0, NULL, &fs, NULL, lbnd, ubnd, status );
 
 /* Map the Region using the FrameSet obtained above so that the new Region
-   describes offsets in tiles from the lower left tile. */
+   describes offsets in tiles from the lower left tile. If "space_region"
+   is a Polygon, ensure that the SImpVertices attribute is set so that the
+   simplify method will take non-linearities into account (such as the
+   region being split by the RA=12h meridian). */
    astInvert( fs );
    fs = astConvert( space_region, fs, "SKY" );
    if( !fs && *status == SAI__OK ) {
@@ -173,7 +182,22 @@ int *smf_jsatiles_region( AstRegion *region, smfJSATiling *skytiling,
       errRep( "", "Cannot convert the supplied Region to ICRS.", status );
       goto L999;
    }
+
+   old_sv = -999;
+   if( astIsAPolygon( space_region ) ){
+      if( astTest( space_region, "SimpVertices" ) ) {
+         old_sv = astGetI( space_region, "SimpVertices" );
+      }
+      astSetI( space_region, "SimpVertices", 0 );
+   }
+
    region2 = astMapRegion( space_region, fs, fs );
+
+   if( old_sv == -999 ) {
+      astClear( space_region, "SimpVertices" );
+   } else {
+      astSetI( space_region, "SimpVertices", old_sv );
+   }
 
 /* Get a mesh of all-sky "grid" positions (actually tile X and Y indices)
    covering the region. Since the mesh positions are limited in number
