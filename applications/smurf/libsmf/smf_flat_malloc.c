@@ -36,8 +36,9 @@
 *     data and the flatfield power data.
 
 *  Authors:
-*     Tim Jenness (JAC, Hawaii)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     COBA: Coskun Oba (UoL)
+*     DSB: David Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  Notes:
@@ -53,9 +54,11 @@
 *        Handle time ordering properly.
 *     2011-04-26 (TIMJ):
 *        Fix assignment of rows and colums to bolval
+*     2014-09-19 (DSB):
+*        Ensure *bolvald is returned with a (3-D) WCS FrameSet.
 
 *  Copyright:
-*     Copyright (C) 2010-2011 Science and Technology Facilities Council.
+*     Copyright (C) 2010-2014 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -92,6 +95,8 @@
 #include "sae_par.h"
 #include "mers.h"
 #include "msg_par.h"
+#include "ast.h"
+#include "star/atl.h"
 
 /* SMURF routines */
 #include "smf.h"
@@ -111,6 +116,11 @@ void smf_flat_malloc( size_t nheat, const smfData * refdata,
   smfHead * oldhdr = NULL;   /* header from refdata */
   void *pntr[] = { NULL, NULL };          /* pointers for smfData */
   double * powval = NULL; /* Data array inside powrefd */
+  const char *dom;        /* Domain of axis 1 */
+  AstFrameSet *new_fs;    /* New FrameSet for returned *bolvald */
+  AstMapping *map;        /* Mapping from pixel index 3 to heater index */
+  AstFrame *frm;          /* Frame describing heater index */
+  int ubnd[ 1 ];          /* Upper bound on heater index */
 
   if (bolvald) *bolvald = NULL;
   if (powvald) *powvald = NULL;
@@ -181,6 +191,32 @@ void smf_flat_malloc( size_t nheat, const smfData * refdata,
     *bolvald = smf_construct_smfData( NULL, NULL, hdr, NULL, NULL, SMF__DOUBLE,
                                       pntr, NULL, SMF__QFAM_TSERIES, NULL, 0, 1,
                                       dims, lbnd, 3, 0, 0, NULL, NULL, status );
+
+    /* Assign a 3D WCS FRameSet in which the third axis represents heater
+       value index (note, not actual heater value, since we do not yet
+       know what the heater values are). First split the supplied time-series
+       WCS FrameSet to extract a FrameSet in which the current Frame
+       contains only the axes within the ame Domain as the first axis 
+       (this is safe because the first axis is always a spatial axis). */
+    if( oldhdr->tswcs ) {
+      dom = astGetC( oldhdr->tswcs, "Domain(1)" );
+      new_fs = atlFrameSetSplit( oldhdr->tswcs, dom, status );
+
+      /* Check this FrameSet is 2D, and if so, add in a third axis describing
+         heater value index. */
+      if( new_fs && astGetI( new_fs, "Naxes" ) == 2 ) {
+         map = (AstMapping *) astUnitMap( 1, " " );
+         frm = astFrame( 1, "Domain=HEATER_INDEX" );
+         ubnd[ 0 ] = nheat;
+         atlAddWcsAxis(  new_fs, map, frm, NULL, ubnd, status );
+         map = astAnnul( map );
+         frm = astAnnul( frm );
+
+         /* Hand over the FrameSet pointer to the returned smfData. */
+         (*bolvald)->hdr->tswcs = new_fs;
+
+      }
+    }
   }
 
   return;
