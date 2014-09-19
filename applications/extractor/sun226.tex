@@ -15,10 +15,10 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {226.12}
+\newcommand{\stardocnumber}    {226.13}
 \newcommand{\stardocauthors}   {A.J. Chipperfield\\
                                 P.W. Draper}
-\newcommand{\stardocdate}      {23rd February 2009}
+\newcommand{\stardocdate}      {19th September 2014}
 \newcommand{\stardoctitle}     {EXTRACTOR\\
                                 An Astronomical Source Detection Program}
 \newcommand{\stardocmanual}    {User Manual}
@@ -28,7 +28,7 @@ popular \SExtractor\ program, has very flexible configuration
 facilities and can handle images and catalogues in a variety of formats.}
 % ? End of document identification
 
-\newcommand{\sexversion}{2.5.0}
+\newcommand{\sexversion}{2.19.5}
 
 % -----------------------------------------------------------------------------
 
@@ -554,22 +554,13 @@ astronomical image and building a catalogue of their properties. It is
 particularly suited for the reduction of large scale galaxy-survey
 data, but also performs well on other astronomical images.
 
-\EXTRACTOR\ is basically Emmanuel Bertin's \SExtractor\
+\EXTRACTOR\ is Emmanuel Bertin's \SExtractor\
 (Source-Extractor) program\footnote{BERTIN E. and ARNOUTS S., 1996,
 A\&AS 117,393} re-packaged for use in the
 \xref{Starlink Software Environment}{sg4}{} \latex{(see SG/4)}.
 This means that it uses the Starlink parameter system, accepts images in
 \xref{NDF}{sun33}{abstract} format \latex{(see SUN/33)} and uses the
 \xref{AST}{sun210}{} library \latex{(SUN/210)} for astrometry.
-
-Extending the program to use NDFs allows it to read and write other
-image formats using the NDF library \xref{`on-the-fly' conversion
-facility}{ssn20}{abstract} \latex{(see SSN/20)}.  Conversion to and
-from many ``standard'' astronomical
-\xref{formats}{sun55}{the_default_conversion_commands} are available
-by using the \xref{\CONVERT}{sun55}{abstract} package \latex{(see
-SUN/55)} -- these include \htmladdnormallink{FITS}{\FITSURL} and
-\htmladdnormallink{IRAF}{\IRAFURL} OIF.
 
 A slightly modified version of \SExtractor\ \sexversion\ is also
 included in the distribution of \EXTRACTOR.
@@ -586,6 +577,12 @@ in much the same way, although with
 -- \htmladdnormallink{\texttt{\SExtractorURL}}{\SExtractorURL} --
 offers more information, such as a link to the
 \htmladdnormallink{\textit{SExtractor for Dummies}}{\DUMMIESURL}.
+
+In the Starlink release both \EXTRACTOR\ and \SExtractor\ do not offer the
+galaxy model fitting features that the full \SExtractor\ builds do. This has
+been done to reduce the external package dependencies required, also it isn't
+clear how useful these abilities would be without also creating an NDF version
+of PSFEx.
 
 This document describes how to run \EXTRACTOR, and includes
 \htmlref{instructions for running \SExtractor}{running_sextractor}
@@ -629,8 +626,7 @@ specified in the preferences file).
 
 CONFIG has a `default' value of
 \texttt{\$EXTRACTOR\_DIR/config/default.sex}.  This file has some
-\htmlref{sensible defaults}{defaults} \latex{(described in
-Section~\ref{defaults})} but you will probably want to copy it to your
+sensible defaults but you will probably want to copy it to your
 own directories and modify it to your taste (as you would for the
 native \SExtractor\ program).  Similarly with the other configuration
 files.  The environment variable \texttt{EXTRACTOR\_DIR} is defined to
@@ -707,44 +703,6 @@ EOF
 Using the C-shell \verb+<<EOF+ mechanism allows you to send
 information to the program as if you're typing it in.
 
-
-\section{\xlabel{the_default_configuration}\label{defaults}\xlabel{defaults}The default configuration}
-
-The directory \texttt{\$EXTRACTOR\_DIR/config} contains the default
-configuration files.
-
-The main `preferences' file, \texttt{default.sex} is listed in
-Appendix~\ref{default_sex}.
-You will see that it uses the default convolution mask and `Neural Network
-Weights' file, and specifies that an ASCII\_HEAD-type catalogue named
-\texttt{test.cat} is to be produced.
-
-File \texttt{default.param} specifies which measurements are to be
-made of the objects (these are all written to the output
-catalogue). The defaults are:
-\begin{quote}\begin{verbatim}
-NUMBER
-X_IMAGE
-Y_IMAGE
-FLUX_ISO
-FLUXERR_ISO
-FLUX_AUTO
-FLUXERR_AUTO
-FLUX_MAX
-ISOAREA_IMAGE
-CXX_IMAGE
-CYY_IMAGE
-CXY_IMAGE
-THETA_IMAGE
-ELLIPTICITY
-FLAGS
-\end{verbatim}\end{quote}
-
-For a full description of the meaning of the configuration parameters, see
-the
-\htmladdnormallink{\SExtractor\ User's Guide}{\MUD} \latex{(MUD/165)}
-and \htmladdnormallink{related documents}{sex1_doc.ps}.
-
 \section{\xlabel{using_images_in_nonndf_formats}Using images in non-NDF formats}
 If you want to read an image in one of the
 \xref{formats handled by the
@@ -770,13 +728,14 @@ will use the FITS file \texttt{image.fit}, automatically converting it to a
 temporary NDF file and then reading the temporary file.
 
 \section{\xlabel{running_sextractor}Running \SExtractor \label{running_sextractor}}
-The native version of \SExtractor\ is also distributed with \EXTRACTOR.
-This works exclusively with FITS files but will provide the full range of
-facilities. The executable image will be installed in \texttt{\$EXTRACTOR\_DIR}
-and it is run as described in the
-\htmladdnormallink{\SExtractor\ User's Guide}{\MUD}\latex{ (MUD/165)}.
+A native, FITS-only, version of \SExtractor\ is also distributed with the
+\EXTRACTOR\ package for convenience and use in the object detection toolbox in
+the \xref{GAIA}{sun214}{} application. The executable image is installed in
+\texttt{\$EXTRACTOR\_DIR} and is ran as described in the
+\htmladdnormallink{\SExtractor\ User's Guide}{\MUD}\latex{(MUD/165)}.
 
-Either put \texttt{\$EXTRACTOR\_DIR} on your \texttt{PATH} or define an alias:
+To use this version either put \texttt{\$EXTRACTOR\_DIR} on your \texttt{PATH}
+or define an alias: 
 \begin{quote} \begin{verbatim}
 % alias sex $EXTRACTOR_DIR/sex
 \end{verbatim}\end{quote}
@@ -790,17 +749,6 @@ Note that if the \texttt{-c} option is omitted, file
 \texttt{default.sex} in the current working directory will be used
 \dash\ if you want to use the installed default file, you will need to
 specify it explicitly.
-
-A patch has been applied to \SExtractor\ that allows you to read a specific
-extension of an MEF file (normally you process all the extensions).
-To process an image stored in the first extension you should use the format:
-\begin{quote}
-\texttt{\% sex \textit{image'[1]'} [-c \textit{configuration-file}]}
-\texttt{[-\textit{Parameter1 Value1}] [-\textit{Parameter2 Value2}] ...}
-\end{quote}
-the second extension is indicated by \texttt{\textit{image'[2]'}} and
-so on (note that the single quotes are only needed to protect the square
-brackets from the C-shell).
 
 \section{\xlabel{using_gaia_and_extractor}Using GAIA and \EXTRACTOR}
 The Graphical Astronomy and Image Analysis Tool (GAIA -
@@ -820,9 +768,7 @@ objects on the basis of their measurements.
 
 \section{\label{implementation_notes}\xlabel{implementation_notes}Implementation notes}
 
-\EXTRACTOR, unlike the PISA (\xref{SUN/109}{sun109}{}) package that it
-will eventually replace, will read data in floating point format
-(\textit{c.f.} the PISA restriction of data in the range 0-32000).  It will
+\EXTRACTOR, will read data in floating point format.  It will
 also read NDFs that contain BAD pixels. These will appear as
 ``missing'' regions, so any objects that are intersected will be split
 into parts.
@@ -852,6 +798,8 @@ arise, when using non-default configurations.
 A \SExtractor\ facility that has not been implemented is the piping of
 catalogues to standard output.  The use of weight and flag images are
 not supported.
+
+Finally as noted earlier the galaxy fitting parameters are not available.
 
 If you come across any problems with \EXTRACTOR\ please notify
 Starlink Software Support
@@ -927,7 +875,7 @@ APM/PISA (see \xref{SUN/109}{sun109}{}) analysis thresholds are used:
 This gives approx $0.75$ magnitude steps ($2.5*log(2)$). The first
 threshold is set to the analysis threshold.
 
-\paragraph{Notes:} before any measurements will be made at least one
+\textbf{Notes:} before any measurements will be made at least one
 of the catalogue parameters \texttt{RAD0} through \texttt{RAD15} must
 be present in the \texttt{default.param} file. The minimum starting
 threshold that can be used is the analysis one ---  no information about
@@ -942,185 +890,6 @@ profile. Under this scheme each threshold is:
 where $I_{p}$ = peak intensity.  So you get a range of levels for each
 object spanning the range from its analysis threshold to just below
 the peak intensity.
-
-\section{Changes}
-\subsection{Version 1.2-0}
-
- This is a minor update to the \EXTRACTOR\ package with several
- significant changes:
- \begin{itemize}
-   \item \SExtractor\ has been updated to version 2.2.1.
-
-   \item New parameters to control the measurement of \texttt{mean}
-         object radii at configurable intensity levels have been
-         added to the Starlink version of \EXTRACTOR\ and \SExtractor.
- \end{itemize}
- The update to \SExtractor\ 2.2.1 introduces the following changes (from
- the \SExtractor\ change log).
- \begin{itemize}
-   \item Version 2.2.1
-      \begin{itemize}
-         \item  Memory allocation bug for large images on Alphas while
-                preparing the background-map fixed.
-         \item CLEANing bug with hollow objects on weighted images fixed.
-      \end{itemize}
-   \item Version 2.2.0
-      \begin{itemize}
-        \item \texttt{MAP\_RMS} weight-map bug fixed.
-        \item Huge \texttt{MAP\_WEIGHT} calibration bugs fixed.
-      \end{itemize}
-   \item Version 2.1.6
-     \begin{itemize}
-        \item Crowding-flag bug introduced in V2.1.5 fixed.
-     \end{itemize}
-   \item Version 2.1.5
-      \begin{itemize}
-        \item Small inaccuracy in crowding-flag positioning fixed.
-        \item Fixed division by zero in local background in
-              \texttt{MASK\_TYPE} \texttt{CORRECT} mode.
-        \item Risk of segmentation fault with huge weight maps fixed.
-      \end{itemize}
-   \item Version 2.1.4
-      \begin{itemize}
-        \item Quote (') symbol now properly handled in FITS headers.
-        \item Removed display of debug information inadvertently left
-              in the previous release.
-      \end{itemize}
-   \item Version V2.1.3
-      \begin{itemize}
-        \item Bug in \texttt{ASSOC} on Linux systems fixed.
-        \item Background bug in \texttt{WEIGHT\_TYPE} \texttt{NONE},
-              \texttt{MAP\_WEIGHT} mode fixed.
-        \item \texttt{THRESH\_TYPE} \texttt{ABSOLUTE} now works on
-              weighted images.
-      \end{itemize}
-   \item Version V2.1.0
-      \begin{itemize}
-        \item Better formatting of output flags.
-        \item  New display.
-        \item Total robust handling of weight-maps during background-
-              determination.
-        \item (tiny) differences between single and double-image results
-              suppressed.
-        \item New (experimental) \texttt{\_PROFILE} photometric parameters.
-        \item New \texttt{WEIGHT\_GAIN} parameter.
-      \end{itemize}
-   \item Version V2.0.22
-      \begin{itemize}
-        \item Many memory leaks fixed.
-        \item \texttt{CLEAN}ing bug with very faint sources fixed.
-        \item \texttt{BACKGROUND\_RMS} check-images are now operational in
-              single-image mode.
-        \item Documentation improved.
-      \end{itemize}
-   \item Version V2.0.21
-      \begin{itemize}
-        \item \texttt{BACK\_VALUE} bug fixed.
-        \item \texttt{XPEAK} and \texttt{YPEAK} offset bugs fixed.
-      \end{itemize}
-   \item Version V2.0.20
-      \begin{itemize}
-        \item \texttt{ASSOC} bug in 2 \texttt{ASSOC\_PARAMS} mode fixed.
-        \item Variable thresholding is now taken into account when
-              computing \texttt{FWHM} and \texttt{CLASS\_STAR}
-              if \texttt{WEIGHT\_TYPE} != \texttt{NONE}
-      \end{itemize}
- \end{itemize}
-
-\subsection{Version 1.3-0}
-A minor update to \EXTRACTOR\ with the following changes:
-\begin{itemize}
-   \item a bug in \EXTRACTOR\ that could cause a crash on Tru64 UNIX if
-       the measurement image contained BAD values that the detection
-       image did not, has been fixed.
-
-    \item The output format for the \texttt{X\_WORLD} and
-          \texttt{Y\_WORLD} fields has been changed to always give at
-           least $0.01$ arcsecond accuracy.
-
-    \item \EXTRACTOR\ and \SExtractor\ have modified to offer the
-       \texttt{BKGSIG} parameter (local background sigma) option used
-       by \texttt{GIM2D} .
-
-     \item A bug causing the output from \EXTRACTOR\ to be occasionally
-       garbled has been fixed.
-\end{itemize}
-
-\subsection{Version 1.4-0}
- This is a minor release of \EXTRACTOR, just adding two new parameters:
- \texttt{X\_PIXEL} and \texttt{Y\_PIXEL}. These output NDF pixel coordinates.
-
- A patch to enable the native version to read MEF files has been
- incorporated. The extension is identified using a number in square
- brackets (0 is the primary extension), for instance:
- \begin{quote}
- \begin{verbatim}
-     % $EXTRACTOR_DIR/sex mef_file.fits'[1]'
- \end{verbatim}
- \end{quote}
- would process the first extension. MEF files input to
- \SExtractor\ should contain a primary image.
-
-\subsection{Version 1.4-2}
-
- This is a minor release of \EXTRACTOR. The most significant change
- is an update to SExtractor version 2.2.2.
-
-\subsection{Version 1.4-3}
-
- This is a minor release of \EXTRACTOR\ to fix a problem writing out
- RA and Dec values (this effected \EXTRACTOR\ only, not \SExtractor).
-
- \EXTRACTOR\ is now released under the GNU General Public License.
-
-\subsection{Version 2.3}
-
- \EXTRACTOR\ has been updated to work with \SExtractor\ 2.3.2.
- This updates the native \SExtractor\ command to include Large File Support
- and full support for MEFs. The native MEF support differs to that previously
- available in that it scans a complete MEF file in a single pass, so this
- behaviour has been changed so that a extension may be specified.
-
- An error previously limited \EXTRACTOR\ input file names to 20 characters,
- this has now been corrected.
-
- The \EXTRACTOR\ major version number has been changed to reflect that of the
- version of \SExtractor\ that it is based on.
-
-\subsection{Version 2.3.1}
-
- \EXTRACTOR\ will now work with images that have Dec,RA coordinate systems
- (previously it would only work with RA,Dec systems, but these could have
- any orientation and could therefore appear as Dec,RA).
-
-\subsection{Version 2.4.4}
-
- \EXTRACTOR\ has been updated to use \SExtractor\ version 2.4.4. The main
- changes are the introduction of Petrosian magnitudes and windowed
- measurements.
-
-\subsection{Version 2.4.5}
-
- \EXTRACTOR\ has been changed so that it now works on NDFs with higher
- number of dimensions, provided that only two dimensions are significant.
- This means it's now possible to run \EXTRACTOR\ on a plane of a cube:
- \begin{quote}
- \begin{verbatim}
-       extractor cube'(,,1)'
- \end{verbatim}
- \end{quote}
-
- \EXTRACTOR\ has also been changed to avoid converting all data to single
- precision reals before they are processed. This makes it much more efficient
- when accessing integer and double precision data.
-
-\subsection{Version 2.5.0}
-
-  \EXTRACTOR\ has been updated to use \SExtractor\ version 2.5.0. The
-  main change is the introduction of a VOTable output catalogue
-  format.
-
-
 
 \section{\xlabel{references}References}
 Bailey, J.A. : \xref{SG/5}{sg5}{} : ICL \dash\ The Interactive Command Language for ADAM.\\
@@ -1239,95 +1008,5 @@ Warren-Smith, R.F. : \xref{SUN/33}{sun33}{} : NDF \dash\ Routines for Accessing 
    }
 }
 \normalsize
-\newpage
-\section{\xlabel{labeldefault_sex}\label{default_sex}
-         \xlabel{default_sex}
-         The default preferences}
 
-This is a listing of \texttt{\$EXTRACTOR\_DIR/config/default.sex}, the
-installed default preferences file.
-\small
-\begin{quote} \begin{verbatim}
-# Default configuration file for SExtractor 2.5.0
-# EB 2006-07-14
-
-#-------------------------------- Catalog ------------------------------------
-
-CATALOG_NAME    test.cat        # name of the output catalog
-CATALOG_TYPE     ASCII_HEAD     # NONE,ASCII,ASCII_HEAD, ASCII_SKYCAT,
-                                # ASCII_VOTABLE, FITS_1.0 or FITS_LDAC
-PARAMETERS_NAME  $EXTRACTOR_DIR/config/default.param
-                                # name of the file containing catalog contents
-
-#------------------------------- Extraction ----------------------------------
-
-DETECT_TYPE      CCD            # CCD (linear) or PHOTO (with gamma correction)
-DETECT_MINAREA  5               # minimum number of pixels above threshold
-DETECT_THRESH   1.5             # <sigmas> or <threshold>,<ZP> in mag.arcsec-2
-ANALYSIS_THRESH 1.5             # <sigmas> or <threshold>,<ZP> in mag.arcsec-2
-
-FILTER           Y              # apply filter for detection (Y or N)?
-FILTER_NAME      $EXTRACTOR_DIR/config/default.conv
-                                # name of the file containing the filter
-
-DEBLEND_NTHRESH 32              # Number of deblending sub-thresholds
-DEBLEND_MINCONT 0.005           # Minimum contrast parameter for deblending
-
-CLEAN           Y               # Clean spurious detections? (Y or N)?
-CLEAN_PARAM     1.0             # Cleaning efficiency
-
-MASK_TYPE       CORRECT         # type of detection MASKing: can be one of
-                                # NONE, BLANK or CORRECT
-
-#------------------------------ Photometry -----------------------------------
-
-PHOT_APERTURES  5               # MAG_APER aperture diameter(s) in pixels
-PHOT_AUTOPARAMS 2.5, 3.5        # MAG_AUTO parameters: <Kron_fact>,<min_radius>
-PHOT_PETROPARAMS 2.0, 3.5       # MAG_PETRO parameters: <Petrosian_fact>,
-                                # <min_radius>
-
-SATUR_LEVEL     50000.0         # level (in ADUs) at which arises saturation
-
-MAG_ZEROPOINT   0.0             # magnitude zero-point
-MAG_GAMMA       4.0             # gamma of emulsion (for photographic scans)
-GAIN             1.0            # detector gain in e-/ADU
-PIXEL_SCALE      1.0            # size of pixel in arcsec (0=use FITS WCS info)
-
-#------------------------- Star/Galaxy Separation ----------------------------
-
-SEEING_FWHM     1.2             # stellar FWHM in arcsec
-STARNNW_NAME     $EXTRACTOR_DIR/config/default.nnw
-                                # Neural-Network_Weight table filename
-
-#------------------------------ Background -----------------------------------
-
-BACK_SIZE       64              # Background mesh: <size> or <width>,<height>
-BACK_FILTERSIZE 3               # Background filter: <size> or <width>,<height>
-
-BACKPHOTO_TYPE   GLOBAL         # can be GLOBAL or LOCAL
-
-#------------------------------ Check Image ----------------------------------
-
-CHECKIMAGE_TYPE  NONE           # can be NONE, BACKGROUND, BACKGROUND_RMS,
-                                # MINIBACKGROUND, MINIBACK_RMS, -BACKGROUND,
-                                # FILTERED, OBJECTS, -OBJECTS, SEGMENTATION,
-                                # or APERTURES
-CHECKIMAGE_NAME  check          # Filename for the check-image
-
-#--------------------- Memory (change with caution!) -------------------------
-
-MEMORY_OBJSTACK  3000           # number of objects in stack
-MEMORY_PIXSTACK  300000         # number of pixels in stack
-MEMORY_BUFSIZE  1024            # number of lines in buffer
-
-#----------------------------- Miscellaneous ---------------------------------
-
-VERBOSE_TYPE     NORMAL         # can be QUIET, NORMAL or FULL
-WRITE_XML        N              # Write XML file (Y/N)?
-XML_NAME         sex.xml        # Filename for XML output
-
-\end{verbatim}\end{quote}
-\normalsize
-
-% ? End of main text
 \end{document}
