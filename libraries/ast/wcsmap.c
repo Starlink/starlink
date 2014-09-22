@@ -217,6 +217,17 @@ f     The WcsMap class does not define any new routines beyond those
 *        no less useful (and no more useful) than a fixed value of zero.
 *     12-JUN-2014 (DSB):
 *        Added XPH projection.
+*     22-SEP-2014 (DSB):
+*        Provide a class variable ("WcsWrap") that allow the wrapping of
+*        lon/lat into their normal ranges to be disabled prior to
+*        transforming them into (x,y) values. The flag can be set and got
+*        using the class (i.e. non-virtual) functions astGetWcsWrap and
+*        astSetWcsWrap. The default is to do wrapping. It may be
+*        necessary to disable wrapping for projections that have complex
+*        definition of the "normal" range of longitude. For instance, the
+*        normal range of longitude for an all-sky HPX projection depends
+*        on the latitude so that wrap-around happens on a zig-zag line
+*        rather than a simple meridian (e.g. RA = 12h).
 *class--
 */
 
@@ -2169,6 +2180,57 @@ static int GetPVMax( AstWcsMap *this, int i, int *status ) {
    return mxpar - 1;
 }
 
+int astGetWcsWrap_( int *status ) {
+/*
+*+
+*  Name:
+*     astGetWcsWrap
+
+*  Purpose:
+*     Get the value of the class flag  "WcsWrap".
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "wcsmap.h"
+*     int astGetWcsWrap
+
+*  Class Membership:
+*     WcsMap static class function
+
+*  Description:
+*     This function returns the value of the "wcsWrap" flag associated
+*     with the WcsMap class. Note, this is a class flag, so all instances
+*     of the WcsMap class use the same value, set by this function.
+*
+*     The WcsWrap flag indicates if supplied (longitude,latitude) should
+*     be wrapped into the ranges expected by WCSLIB before being
+*     transformed into Cartesian (x,y) values. The default value is 1
+*     (i.e. wrapping occurs by default).
+
+*-
+*/
+
+/* Local Variables: */
+   astDECLARE_GLOBALS           /* Pointer to thread-specific global data */
+
+/* Check inherited status. */
+   if( !astOK ) return 1;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS( NULL );
+
+/* If required, initialise the virtual function table for this class. */
+   if ( !class_init ) {
+      astInitWcsMapVtab( &class_vtab, "WcsMap" );
+      class_init = 1;
+   }
+
+/* Return the wrap value. */
+   return class_vtab.wrap;
+}
+
 static void InitPrjPrm( AstWcsMap *this, int *status ) {
 /*
 *  Name:
@@ -2386,6 +2448,10 @@ void astInitWcsMapVtab_(  AstWcsMapVtab *vtab, const char *name, int *status ) {
    class_check variable to generate this unique value. */
    vtab->id.check = &class_check;
    vtab->id.parent = &(((AstMappingVtab *) vtab)->id);
+
+/*  Initialise class variables. */
+/*  --------------------------- */
+   vtab->wrap = 1;
 
 /* Initialise member function pointers. */
 /* ------------------------------------ */
@@ -2712,6 +2778,7 @@ static int Map( AstWcsMap *this, int forward, int npoint, double *in0,
    int point;                    /* Loop counter for points */
    int type;                     /* Projection type */
    int wcs_status;               /* Status from WCSLIB functions */
+   int wrap;                     /* Wrap lon/lat values? */
    struct AstPrjPrm *params;     /* Pointer to structure holding WCSLIB info */
 
 /* Check the global error status. */
@@ -2751,6 +2818,9 @@ static int Map( AstWcsMap *this, int forward, int npoint, double *in0,
    the factor that scales the WcsMap input into radians. */
    factor = astGetTPNTan( this ) ? 1.0 : AST__DD2R;
 
+/* Should lon/lat values be wrapped into the ranges expected by wcslib? */
+   wrap = forward ? astGetWcsWrap : 0;
+
 /* Loop to apply the projection to each point in turn, checking for
    (and propagating) bad values in the process. */
    for ( point = 0; point < npoint; point++ ) {
@@ -2765,21 +2835,27 @@ static int Map( AstWcsMap *this, int forward, int npoint, double *in0,
 
 /* The input coordinates are assumed to be longitude and latitude, in
    radians or degrees (as specified by the TPNTan attribute). Convert them
-   to degrees ensuring that the longitude value is in the range [-180,180]
-   and the latitude is in the range [-90,90] (as required by the WCSLIB
-   library). Any point with a latitude outside the range [-90,90] is
-   converted to the equivalent point on the complementary meridian. */
-            latitude = AST__DR2D*palDrange(  factor*in1[ point ] );
-            if ( latitude > 90.0 ){
-               latitude = 180.0 - latitude;
-               longitude = AST__DR2D*palDrange( AST__DPI + factor*in0[ point ] );
+   to degrees. If required, ensure that the longitude value is in the
+   range [-180,180] and the latitude is in the range [-90,90] (as usually
+   required by the WCSLIB library). Any point with a latitude outside the
+   range [-90,90] is converted to the equivalent point on the complementary
+   meridian. */
+            if( wrap ) {
+               latitude = AST__DR2D*palDrange(  factor*in1[ point ] );
+               if ( latitude > 90.0 ){
+                  latitude = 180.0 - latitude;
+                  longitude = AST__DR2D*palDrange( AST__DPI + factor*in0[ point ] );
 
-            } else if ( latitude < -90.0 ){
-               latitude = -180.0 - latitude;
-               longitude = AST__DR2D*palDrange( AST__DPI + factor*in0[ point ] );
+               } else if ( latitude < -90.0 ){
+                  latitude = -180.0 - latitude;
+                  longitude = AST__DR2D*palDrange( AST__DPI + factor*in0[ point ] );
 
+               } else {
+                  longitude = AST__DR2D*palDrange( factor*in0[ point ] );
+               }
             } else {
-               longitude = AST__DR2D*palDrange( factor*in0[ point ] );
+               latitude = AST__DR2D*factor*in1[ point ];
+               longitude = AST__DR2D*factor*in0[ point ];
             }
 
 /* Call the relevant WCSLIB forward projection function. */
@@ -3911,6 +3987,61 @@ static void SetTPNTan( AstWcsMap *this, int val, int *status ) {
 
 /* Re-initialize the values stored in the "AstPrjPrm" structure. */
    InitPrjPrm( this, status );
+}
+
+void astSetWcsWrap_( int wrap, int *status ) {
+/*
+*+
+*  Name:
+*     astSetWcsWrap
+
+*  Purpose:
+*     Set a value for the class flag  "WcsWrap".
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "wcsmap.h"
+*     void astSetWcsWrap( int wrap )
+
+*  Class Membership:
+*     WcsMap static class function
+
+*  Description:
+*     This function sets a new value for the "wcsWrap" flag associated
+*     with the WcsMap class. Note, this is a class flag, so all instances
+*     of the WcsMap class use the same value, set by this function.
+*
+*     The WcsWrap flag indicates if supplied (longitude,latitude) should
+*     be wrapped into the ranges expected by WCSLIB before being
+*     transformed into Cartesian (x,y) values. The default value is 1
+*     (i.e. wrapping occurs by default).
+
+*  Parameters:
+*     wrap
+*        The new flag value.The projection type.
+
+*-
+*/
+
+/* Local Variables: */
+   astDECLARE_GLOBALS           /* Pointer to thread-specific global data */
+
+/* Check inherited status. */
+   if( !astOK ) return;
+
+/* Get a pointer to the thread specific global data structure. */
+   astGET_GLOBALS( NULL );
+
+/* If required, initialise the virtual function table for this class. */
+   if ( !class_init ) {
+      astInitWcsMapVtab( &class_vtab, "WcsMap" );
+      class_init = 1;
+   }
+
+/* Store the new wrap value. */
+   class_vtab.wrap = wrap;
 }
 
 static int TestAttrib( AstObject *this_object, const char *attrib, int *status ) {
@@ -6023,6 +6154,7 @@ int astGetPVMax_( AstWcsMap *this, int i, int *status ) {
    if ( !astOK ) return -1;
    return (**astMEMBER(this,WcsMap,GetPVMax))( this, i, status );
 }
+
 
 
 

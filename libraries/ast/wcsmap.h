@@ -385,6 +385,10 @@ typedef struct AstWcsMapVtab {
 /* A Unique identifier to determine class membership. */
    AstClassIdentifier id;
 
+/* Should the WcsMap class wrap supplied lon.Lat values into the ranges
+   expected by WcsLib? */
+   int wrap;
+
 /* Properties (e.g. methods) specific to this class. */
    double (* GetNatLat)( AstWcsMap *, int * );
    double (* GetNatLon)( AstWcsMap *, int * );
@@ -485,6 +489,10 @@ void astInitWcsMapGlobals_( AstWcsMapGlobals * );
 
 #endif
 
+void astSetWcsWrap_( int wrap, int *status );
+int astGetWcsWrap_( int *status );
+
+
 /* Function interfaces. */
 /* ==================== */
 /* These macros are wrap-ups for the functions defined by this class
@@ -583,6 +591,10 @@ astINVOKE(V,astGetWcsAxis_(astCheckWcsMap(this),index,STATUS_PTR))
 astINVOKE(V,astIsZenithal_(astCheckWcsMap(this),STATUS_PTR))
 
 #endif
+
+#define astGetWcsWrap astGetWcsWrap_(STATUS_PTR)
+#define astSetWcsWrap(wrap) astSetWcsWrap_(wrap,STATUS_PTR)
+
 #endif
 
 
