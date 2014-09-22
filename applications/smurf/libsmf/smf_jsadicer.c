@@ -96,6 +96,11 @@
 *     24-JUL-2014 (DSB):
 *        DSBSPECTRUM spectral axes are now handled, in addition to
 *        SPECTRUM axes.
+*     22-SEP-2014 (DSB):
+*        Disable lon/lat wrap-around in the WcsMap class before finding
+*        the bounding box of each tile in the output NDF. This is to
+*        avoid tailes that span RA=12h being wrapped round to the far
+*        side of the projection, thus producing a huge box.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -212,6 +217,7 @@ void smf_jsadicer( int indf, const char *base, int trim, smf_inst_t instrument,
    int nsig;
    int ntiles;
    int olbnd[ 3 ];
+   int old_wrap;
    int oubnd[ 3 ];
    int outperm[ 3 ];
    int place;
@@ -474,14 +480,17 @@ void smf_jsadicer( int indf, const char *base, int trim, smf_inst_t instrument,
 
 /* Next job is to find the pixel bounds of the output NDF to create
    which will hold data for the current tile. First map the pixel bounds
-   of the whole tile from output to input. */
+   of the whole tile from output to input. Because of the jagged
+   discontinuity at RA=12 h in the HPX all-sky projection, we need to
+   disable wrapping of WCS values qwithint he WcsMap class temporarily. */
       lbnd_in[ 0 ] = tile_lbnd[ 0 ] - 0.5;
       lbnd_in[ 1 ] = tile_lbnd[ 1 ] - 0.5;
       lbnd_in[ 2 ] = lbnd[ 2 ] - 0.5;
       ubnd_in[ 0 ] = tile_ubnd[ 0 ] - 0.5;
       ubnd_in[ 1 ] = tile_ubnd[ 1 ] - 0.5;
       ubnd_in[ 2 ] = ubnd[ 2 ] - 0.5;
-
+      old_wrap = astGetWcsWrap;
+      astSetWcsWrap( 0 );
       astMapBox( p2pmap, lbnd_in, ubnd_in, 0, 1, lbnd_out + 0,
                  ubnd_out + 0, NULL, NULL );
       astMapBox( p2pmap, lbnd_in, ubnd_in, 0, 2, lbnd_out + 1,
@@ -489,6 +498,7 @@ void smf_jsadicer( int indf, const char *base, int trim, smf_inst_t instrument,
       if( ndim == 3 ) astMapBox( p2pmap, lbnd_in, ubnd_in, 0, 3,
                                  lbnd_out + 2, ubnd_out + 2, NULL,
                                  NULL );
+      astSetWcsWrap( old_wrap );
 
       lbnd_tile[ 0 ] = floor( lbnd_out[ 0 ] ) + 1;
       lbnd_tile[ 1 ] = floor( lbnd_out[ 1 ] ) + 1;
