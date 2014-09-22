@@ -483,6 +483,10 @@
 *        Added config parameter memcheck.
 *     2014-8-19 (DSB):
 *        Added arguments ncontig and memlow.
+*     2014-09-22 (DSB):
+*        When running from SKYLOOP, and if ast.filt_diff is set, filter the 
+*        map change after all chunks have been combined, rather than after 
+*        each individual chunk.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -654,7 +658,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 /*  size_t i;                     */ /* Loop counter */
   size_t idat;                  /* smfData counter */
   size_t imodel;                /* Model counter */
-  size_t importsky;             /* Subtract a supplied initial sky map? */
+  size_t importsky = 0;         /* Subtract a supplied initial sky map? */
   int intopt;                   /* Interupt option */
   size_t ipix;                  /* Pixel counter */
   int ii;                       /* Loop counter */
@@ -2374,19 +2378,20 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                      status, smf_timerupdate(&tv1,&tv2,status) );
 
           /* If required, modify the map to remove low frequencies changes
-             between the new map and the old map. */
-          if( ast_filt_diff > 0.0 ) {
+             between the new map and the old map. We do not do this if
+             the AST model was skipped on the previous iteration. */
+          if( ast_filt_diff > 0.0 && !dat.ast_skipped ) {
 
              /* Can only do this if we have a map from the previous
                 iteration (i.e. this is not the ifrst iter). */
              if( importsky || iter > 1 ) {
 
                 /* Do not do it on the final iteration since we want the
-                   final map to contain all the residual flux. But when
-                   run from skyloop (as indicated by numiter being 1),
-                   we always run it (skyloop will clear ast.filt_diff on
-                   the last iteration). */
-                if( quit == -1 || numiter == 1 ) {
+                   final map to contain all the residual flux. If run
+                   from skyloop (as indicated by numiter being 1), we
+                   always defer this until after the full map has been
+                   made from all chunks.  */
+                if( quit == -1 && numiter > 1 ) {
                    smf_filter_mapchange( wf, &dat, ast_filt_diff, status );
                 }
              }
@@ -2707,8 +2712,6 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
           }
 
-          memcpy( lastmap, thismap, msize*sizeof(*lastmap) );
-
           msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
                      ": ** %f s calculating change in the map",
                      status, smf_timerupdate(&tv1,&tv2,status) );
@@ -2813,6 +2816,11 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
         } else {
           quit = 1;
         }
+
+/* If another iteration is to be done, copy the map created by this
+   iteration into the "lastmap" array. Otherwise, leave "lastmap" unchanged
+   so that it is available later on, if needed. */
+        if( quit < 1 ) memcpy( lastmap, thismap, msize*sizeof(*lastmap) );
       }
 
       /* If we are dumping the final error map, check we have done at
@@ -3479,6 +3487,14 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
     }
   }
 
+  /* If we are running frmo skyloop (as indicated by the fact that we are
+     doing only one iteration), then we now consider whether or not to
+     filter the differences between the new map and the old map in order to
+     suppress the growth of smooth large scale structures. */
+  if( ast_filt_diff > 0.0 && numiter == 1 && importsky ) {
+    dat.map = map;
+    smf_filter_mapchange( wf, &dat, ast_filt_diff, status );
+  }
 
   /* Store a flag indicating if the MAPTOL_RATE limit was hit. */
   parPut0l( "RATE_LIMITED", rate_limited, status );
