@@ -172,7 +172,7 @@ int *smf_jsatiles_region( AstRegion *region, smfJSATiling *skytiling,
 
 /* Map the Region using the FrameSet obtained above so that the new Region
    describes offsets in tiles from the lower left tile. If "space_region"
-   is a Polygon, ensure that the SImpVertices attribute is set so that the
+   is a Polygon, ensure that the SimpVertices attribute is set so that the
    simplify method will take non-linearities into account (such as the
    region being split by the RA=12h meridian). */
    astInvert( fs );
@@ -193,10 +193,12 @@ int *smf_jsatiles_region( AstRegion *region, smfJSATiling *skytiling,
 
    region2 = astMapRegion( space_region, fs, fs );
 
-   if( old_sv == -999 ) {
-      astClear( space_region, "SimpVertices" );
-   } else {
-      astSetI( space_region, "SimpVertices", old_sv );
+   if( astIsAPolygon( space_region ) ){
+      if( old_sv == -999 ) {
+         astClear( space_region, "SimpVertices" );
+      } else {
+         astSetI( space_region, "SimpVertices", old_sv );
+      }
    }
 
 /* Get a mesh of all-sky "grid" positions (actually tile X and Y indices)
