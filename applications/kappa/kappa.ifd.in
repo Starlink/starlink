@@ -9936,6 +9936,16 @@ package kappa {
             default "<***>"
          }
 
+         parameter logfile {
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Filename to store config parameters}
+            default !
+            helpkey *
+         }
+
          parameter name {
             position 1
             type LITERAL

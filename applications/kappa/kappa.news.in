@@ -50,6 +50,12 @@ The following new applications have been added:
       -  No longer sets the BAD_PIXEL flag for the DATA and VARIANCE
       components.
 
+   o  CONFIGECHO
+
+      -  A new parameter called LOGFILE has been added that allows the
+      list of displayed configuration parameters to be written to a
+      text file.
+
    o  DISPLAY
 
       -  The MODE parameter can now be set to "Current" to force the

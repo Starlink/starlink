@@ -19868,6 +19868,12 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
          parameter, or if the value is {\tt "$<$undef$>$"}.  {\tt [<***>]}
       }
       \sstsubsection{
+         LOGFILE = LITERAL (Read)
+      }{
+         The name of a text file in which to store the displayed
+         configuration parameters. {\tt [!]}
+      }
+      \sstsubsection{
          NAME = LITERAL (Read)
       }{
          The name of the configuration parameter to display. If it is
@@ -59247,6 +59253,12 @@ The following applications have been modified:
         ascension and declination, are now normalised into the usual
         ranges.  This aplies both to the reported positions and the
         output parameters.
+      \end{itemize}
+   \item [\htmlref{CONFIGECHO}{CONFIGECHO}]\mbox{}
+      \begin{itemize}
+        \item A new parameter called LOGFILE has been added that allows
+        the list of displayed configuration parameters to be written to a
+        text file.
       \end{itemize}
    \item [\htmlref{COPYBAD}{COPYBAD}]\mbox{}
       \begin{itemize}

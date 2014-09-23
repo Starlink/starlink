@@ -10,9 +10,10 @@
 #include <math.h>
 #include <string.h>
 #include <stdio.h>
+#include <errno.h>
 
 static void DisplayKeyMap( AstKeyMap *km, int sort, const char *prefix,
-                           AstKeyMap *refkm, int *status );
+                           AstKeyMap *refkm, FILE *fd, int *status );
 void HistoryKeyMap(int i, char* const text[], int* status);
 AstKeyMap* historyConfig = NULL;
 
@@ -97,6 +98,9 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
 *     DEFVAL = LITERAL (Read)
 *        The value to return if no value can be obtained for the named
 *        parameter, or if the value is "<undef>".  [<***>]
+*     LOGFILE = LITERAL (Read)
+*        The name of a text file in which to store the displayed
+*        configuration parameters. [!]
 *     NAME = LITERAL (Read)
 *        The name of the configuration parameter to display.  If set to
 *        null (!), then all parameters defined in the configuration are
@@ -210,9 +214,11 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
 *     15-FEB-2013 (DSB):
 *        Expand the prologue docs, and use NULL in place of zero for pointers.
 *     22-FEB-2013 (DSB):
-*        Guard against seg fault in HistoryKeymap when the NDF does 
-*        not contain the required CONFIG entry in the History 
+*        Guard against seg fault in HistoryKeymap when the NDF does
+*        not contain the required CONFIG entry in the History
 *        component.
+*     23-SEP-2014 (DSB):
+*        Added parameter LOGFILE.
 *     {enter_further_changes_here}
 
 *-
@@ -223,22 +229,24 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
 /* Local Variables: */
    AstKeyMap *keymap2;
    AstKeyMap *keymap;
+   FILE *fd = NULL;
    Grp *grp = NULL;
    char *dot;
    char *pname;
+   char application[NDF__SZAPP];
+   char applicationi[NDF__SZAPP];
    char defs[250];
    char defval[250];
+   char logfile[250];
    char name[250];
-   const char *value;
    const char *historyValue = NULL;
+   const char *value;
+   int i;
+   int indf = 0;
+   int nrec;
    int showall;
    int sort;
    size_t size;
-   int indf = 0;
-   int nrec;
-   int i;
-   char application[NDF__SZAPP];
-   char applicationi[NDF__SZAPP];
 
 /* Abort if an error has already occurred. */
    if( *STATUS != SAI__OK ) return;
@@ -338,6 +346,23 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
       }
    }
 
+
+/* Open a log file if required. */
+   if( *STATUS == SAI__OK ) {
+      parGet0c( "LOGFILE", logfile, sizeof(logfile), STATUS );
+      if( *STATUS == PAR__NULL ) {
+         errAnnul( STATUS );
+      } else if( *STATUS == SAI__OK ) {
+         fd = fopen( logfile, "w" );
+         if( !fd ) {
+            *STATUS == SAI__ERROR;
+            errRepf( "", "Failed to create log file (%s): %s.", STATUS,
+                     logfile, strerror(errno) );
+         }
+      }
+   }
+
+/* Check it is safe to proceed. */
    if( *STATUS == SAI__OK ) {
 
 /* First deal with cases where we are displaying a single parameter
@@ -420,16 +445,19 @@ F77_SUBROUTINE(configecho)( INTEGER(STATUS) ){
 
 /* Display them. */
          if (historyConfig) {
-            DisplayKeyMap( historyConfig , sort, "", keymap, STATUS );
+            DisplayKeyMap( historyConfig , sort, "", keymap, fd, STATUS );
          }
          else {
-            DisplayKeyMap( keymap, sort, "", NULL, STATUS );
+            DisplayKeyMap( keymap, sort, "", NULL, fd, STATUS );
          }
       }
    }
 
 /* Tidy up. */
 L999:;
+
+/* Close the log file. */
+   if( fd ) fclose( fd );
 
 /* End the AST context */
    astEnd;
@@ -451,7 +479,7 @@ L999:;
 
 
 static void DisplayKeyMap( AstKeyMap *km, int sort, const char *prefix,
-                           AstKeyMap *refkm, int *status ){
+                           AstKeyMap *refkm, FILE *fd, int *status ){
 /*
 *  Name:
 *     DisplayKeyMap
@@ -461,7 +489,7 @@ static void DisplayKeyMap( AstKeyMap *km, int sort, const char *prefix,
 
 *  Synopsis:
 *     void DisplayKeyMap( AstKeyMap *km, int sort, const char *prefix,
-*                         int *status )
+*                         FILE *fd, int *status )
 
 *  Arguments:
 *     km
@@ -473,6 +501,9 @@ static void DisplayKeyMap( AstKeyMap *km, int sort, const char *prefix,
 *     refkm
 *        Reference key map (e.g. values from the supplied configuration
 *        rather than the NDF history), or null if not required.
+*     fd
+*        Pointer to stdio descriptor for log file, or NULL. If supplied,
+*        a copy of the displayed text is appended to the log file.
 *     status
 *        Inherited status pointer.
 
@@ -487,11 +518,12 @@ static void DisplayKeyMap( AstKeyMap *km, int sort, const char *prefix,
 /* Local Variables: */
    AstObject *avalue;
    AstObject *refavalue;
+   char *text;
    char cbuffer[ 255 ];
    char newpref[ 255 ];
    const char *cvalue;
-   const char *refcvalue;
    const char *key;
+   const char *refcvalue;
    int ikey;
    int ival;
    int nc;
@@ -511,7 +543,7 @@ static void DisplayKeyMap( AstKeyMap *km, int sort, const char *prefix,
       key = astMapKey( km, ikey );
 
 /* If the current entry is a nest KeyMap, get a pointer to it and call
-   this function recurisvely to display it, modifying the prefix to add
+   this function recursively to display it, modifying the prefix to add
    to each key so that it includes the key associated with the nest keymap. */
       if( astMapType( km, key ) == AST__OBJECTTYPE ) {
          astMapGet0A( km, key, &avalue );
@@ -525,7 +557,7 @@ static void DisplayKeyMap( AstKeyMap *km, int sort, const char *prefix,
          }
          sprintf( newpref, "%s%s.", prefix, key );
          DisplayKeyMap( (AstKeyMap *) avalue, sort, newpref,
-                        (AstKeyMap *) refavalue, status );
+                        (AstKeyMap *) refavalue, fd, status );
          avalue = astAnnul( avalue );
          if (refavalue) refavalue = astAnnul(refavalue);
 
@@ -537,23 +569,22 @@ static void DisplayKeyMap( AstKeyMap *km, int sort, const char *prefix,
 
 /* If it is a scalar, just get its value as a character string using
    the automatic type conversion provided by the KeyMap class, and
-   display it, putting the supplied prefix at the start of the key. */
+   format it, putting the supplied prefix at the start of the key. */
          if( nval <= 1 ) {
+            text = NULL;
+            nc = 0;
             cvalue = "<undef>";
             astMapGet0C( km, key, &cvalue );
-            if (refkm) {
+            if( refkm ) {
                refcvalue = "<undef>";
-               if (astMapGet0C(refkm, key, &refcvalue)
-                     && ! strcmp(cvalue, refcvalue)) {
-                  msgOutf("", "- %s%s = %s", status, prefix, key, cvalue);
-               }
-               else {
-                  msgOutf("", "+ %s%s = %s", status, prefix, key, cvalue);
+               if( astMapGet0C( refkm, key, &refcvalue ) &&
+                   !strcmp( cvalue, refcvalue ) ) {
+                  text = astAppendString( text, &nc, "- " );
+               } else {
+                  text = astAppendString( text, &nc, "+ " );
                }
             }
-            else {
-               msgOutf( "", "%s%s = %s", status, prefix, key, cvalue );
-            }
+            text = astAppendString( text, &nc, "%s%s = %s", prefix, key, cvalue );
 
 /* If it is a vector, we construct a string containing a comma-separated
    list of elements, enclosed in parentheses. */
@@ -586,27 +617,31 @@ static void DisplayKeyMap( AstKeyMap *km, int sort, const char *prefix,
                   }
                }
                refcvalue = astAppendString((char*) refcvalue, &nc, ")");
-            }
-            else {
+            } else {
                refcvalue = NULL;
             }
 
-/* Display the total string, with the current key prefix, and free the memory
+/* Format the total string, with the current key prefix, and free the memory
    used to store it. */
+            text = NULL;
+            nc = 0;
             if (refkm) {
                if (refcvalue && ! strcmp(cvalue, refcvalue)) {
-                  msgOutf("", "- %s%s = %s", status, prefix, key, cvalue);
-               }
-               else {
-                  msgOutf("", "+ %s%s = %s", status, prefix, key, cvalue);
+                  text = astAppendString( text, &nc, "- " );
+               } else {
+                  text = astAppendString( text, &nc, "+ " );
                }
             }
-            else {
-               msgOutf( "", "%s%s = %s", status, prefix, key, cvalue );
-            }
+            text = astAppendString( text, &nc, "%s%s = %s", prefix, key, cvalue );
             cvalue = astFree( (void *) cvalue );
             if (refcvalue) refcvalue = astFree((void*) refcvalue);
          }
+
+/* Display the total text on standard output. */
+         msgOut( "", text, status );
+
+/* If required, write the total text to the log file. */
+         if( fd ) fprintf( fd, "%s\n", text );
       }
    }
 }
