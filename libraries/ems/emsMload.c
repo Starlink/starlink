@@ -107,7 +107,7 @@ void emsMload( const char *msg __attribute__((unused)), const char *text, char *
     DEBUG( "emsMload", "msglev = %d", msgtab->msglev );
 
     /*  Check the inherited global status. */
-    if ( *status |= SAI__OK ) {
+    if ( *status != SAI__OK ) {
 
         /*  Status is not SAI__OK, so just annul the token table. */
         ems1Ktok();

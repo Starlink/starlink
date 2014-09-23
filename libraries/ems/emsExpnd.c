@@ -112,7 +112,7 @@ void emsExpnd( const char *text, char *opstr, const int maxlen,
     opstr[0] = '\0';
 
     /*  Check the inherited global status. */
-    if ( *status |= SAI__OK ) {
+    if ( *status != SAI__OK ) {
 
         /*  Status is not SAI__OK, so just annul the token table. */
         ems1Ktok();
