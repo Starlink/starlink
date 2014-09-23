@@ -66,12 +66,12 @@
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -223,7 +223,7 @@ void *astStore_( void *, const void *, size_t, int * );
 size_t astChrLen_( const char *, int * );
 double astChr2Double_( const char *, int * );
 void astRemoveLeadingBlanks_( char *, int * );
-char *astAppendString_( char *, int *, const char *, int * );
+char *astAppendString_( char *, int *, const char *, ... )__attribute__((format(printf,3,4)));
 char *astChrSub_( const char *, const char *, const char *[], int, int * );
 
 #ifdef MEM_PROFILE
@@ -268,7 +268,7 @@ void astEndPM_( int * );
 #define astIsDynamic(ptr) astERROR_INVOKE(astIsDynamic_(ptr,STATUS_PTR))
 #define astTSizeOf(ptr) astERROR_INVOKE(astTSizeOf_(ptr,STATUS_PTR))
 #define astStore(ptr,data,size) astERROR_INVOKE(astStore_(ptr,data,size,STATUS_PTR))
-#define astAppendString(ptr,len,text) astERROR_INVOKE(astAppendString_(ptr,len,text,STATUS_PTR))
+#define astAppendString astAppendString_
 #define astString(chars,nchars) astERROR_INVOKE(astString_(chars,nchars,STATUS_PTR))
 #define astStringArray(chars,nel,len) astERROR_INVOKE(astStringArray_(chars,nel,len,STATUS_PTR))
 #define astStringCase(string,toupper) astERROR_INVOKE(astStringCase_(string,toupper,STATUS_PTR))

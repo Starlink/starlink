@@ -15,7 +15,9 @@ environment-independent.
 
 Main Changes in this Version
 ----------------------------
-
+- The macro used to invoke the astAppendString utility function has
+  changed to allow printf-style converstions to be included in the
+  supplied text. Any code that uses this macro must be re-compiled.
 - The FITS XPH projection is now supported.
 - The order of WCS axes within new FITS-WCS headers created by astWrite
   can now be controlled using a new attribute called FitsAxisOrder.

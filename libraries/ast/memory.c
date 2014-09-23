@@ -25,12 +25,12 @@
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -152,6 +152,9 @@
 *     16-JAN-2014 (DSB):
 *        Dump details of all active memory blocks if the total memory allocation
 *        specified by astMemoryWarning is exceeded.
+*     23-SEP-2014 (DSB):
+*        Modify astAppendString to allow printf conversion specifications to
+*        be included in the appended string.
 */
 
 /* Configuration results. */
@@ -532,7 +535,7 @@ static int CompareTimers2( const void *, const void * );
 
 /* Function implementations. */
 /* ========================= */
-char *astAppendString_( char *str1, int *nc, const char *str2, int *status ) {
+char *astAppendString_( char *str1, int *nc, const char *str2, ... ) {
 /*
 *++
 *  Name:
@@ -546,7 +549,7 @@ char *astAppendString_( char *str1, int *nc, const char *str2, int *status ) {
 
 *  Synopsis:
 *     #include "memory.h"
-*     char *astAppendString( char *str1, int *nc, const char *str2 )
+*     char *astAppendString( char *str1, int *nc, const char *str2, ... )
 
 *  Description:
 *     This function appends one string to another dynamically
@@ -572,7 +575,13 @@ char *astAppendString_( char *str1, int *nc, const char *str2, int *status ) {
 *        be ignored and zero will be used.
 *     str2
 *        Pointer to a constant null-terminated string, a copy of which
-*        is to be appended to "str1".
+*        is to be appended to "str1". It may contain conversion
+*        specifications such as used with the C "printf" family of
+*        functions.
+*     ...
+*        Additional optional arguments (as used by e.g. "printf")
+*        which specify values which are to be substituted into the "str2"
+*        string in place of any conversion specifications.
 
 *  Returned Value:
 *     astAppendString()
@@ -591,22 +600,62 @@ char *astAppendString_( char *str1, int *nc, const char *str2, int *status ) {
 */
 
 /* Local Variables: */
+   char *pbuf;                   /* Pointer to buffer for expanded "str2" */
    char *result;                 /* Pointer value to return */
+   char buf[1000];               /* A large buffer for the expanded "str2" */
+   int *status;                  /* Pointer to inherited status variable */
+   int buf_size;                 /* Size of buffer for expanded "str2" */
    int len;                      /* Length of new string */
+   int nexp;                     /* Number of characters written to "pbuf". */
+   va_list args;                 /* Variable argument list pointer */
 
 /* Initialise. */
    result = str1;
 
 /* If the first string pointer is NULL, also initialise the character
    count to zero. */
-   if ( !str1 ) *nc = 0;
+   if( !str1 ) *nc = 0;
+
+/* Get a pointer to the integer holding the inherited status value. This
+   function cannot have a "status" argument like most other functions
+   because of the variable argument list. */
+   status = astGetStatusPtr;
 
 /* Check the global error status. */
    if ( !astOK || !str2 ) return result;
 
+/* If available use vsnprintf to determine the amount of memory needed to
+   hold the expanded version of "str2". Then allocate the required memory. */
+#if HAVE_VSNPRINTF
+   va_start( args, str2 );
+   buf_size = vsnprintf( buf, sizeof( buf ), str2, args ) + 1;
+   va_end( args );
+   pbuf = astMalloc( buf_size );
+
+/* Otherwise, all we can do is use a big buffer and hope for the best. */
+#else
+   buf_size = sizeof( buf );
+   pbuf = buf;
+#endif
+
+/* Expand any conversion specifications in "str2". */
+   va_start( args, str2 );
+   nexp = vsprintf( pbuf, str2, args );
+   va_end( args );
+
+/* Check that the result buffer did not overflow (should only be
+   possible if vsnprintf is not available). If it did, memory may
+   have been corrupted. Report the error and abort. */
+   if( nexp >= buf_size ) {
+      if( astOK ) astError( AST__ATSER, "astAppendString: Internal buffer "
+                            "overflow while appending a string - the "
+                            "result exceeds %d characters.", status,
+                            buf_size - 1 );
+   }
+
 /* Calculate the total string length once the two strings have been
    concatenated. */
-   len = *nc + (int) strlen( str2 );
+   len = *nc + nexp;
 
 /* Extend the first (dynamic) string to the required length, including
    a final null. Save the resulting pointer, which will be
@@ -616,9 +665,14 @@ char *astAppendString_( char *str1, int *nc, const char *str2, int *status ) {
 /* If OK, append the second string and update the total character
    count. */
    if ( astOK ) {
-      (void) strcpy( result + *nc, str2 );
+      (void) strcpy( result + *nc, pbuf );
       *nc = len;
    }
+
+/* If required, free the buffer holding the expanded version of "str2". */
+#if HAVE_VSNPRINTF
+   pbuf = astFree( pbuf );
+#endif
 
 /* Return the result pointer. */
    return result;

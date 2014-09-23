@@ -94,6 +94,9 @@ AC_CHECK_FUNCS([backtrace])
 # Do we have reentrant strerror and strtok?
 AC_CHECK_FUNCS([strerror_r strtok_r])
 
+# Do we have vsnprintf?
+AC_CHECK_FUNCS([vsnprintf])
+
 #  See if we have long doubles (used by the Mapping and Region classes)
 AC_CHECK_TYPES([long double])
 
