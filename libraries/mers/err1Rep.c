@@ -65,6 +65,7 @@
 *     Copyright (C) 1983, 1989-1991, 1994 Science & Engineering
 *     Research Council.
 *     Copyright (C) 1999, 2001 Central Laboratory of the Research Councils.
+*     Copyright (C) 2014 Cornell University.
 *     All Rights Reserved.
 
 *  Licence:
@@ -90,6 +91,7 @@
 *     PCTR: P.C.T. Rees (STARLINK)
 *     AJC: A.J. Chipperfield (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     TIMJ: Tim Jenness (Cornell)
 *     {enter_new_authors_here}
 
 *  History:
@@ -124,6 +126,8 @@
 *        Copy from errRep to allow printf formatting to be enabled/disabled.
 *     12-JAN-2009 (TIMJ):
 *        Fix err1Gtstm logic for msg1Form (was inverted)
+*     2014-09-24 (TIMJ):
+*        Initialise tokpos to the correct starting position.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -156,7 +160,7 @@ void err1Rep( const char * param, const char * text, int useformat,
   int istat = SAI__OK;      /* Internal status */
   int mlen = 0;             /* Length of final error message text */
   size_t lpos = 0;             /* string position pointer */
-  int tokpos = 0;           /* Position of ^ in string */
+  int tokpos = -1;          /* Position of ^ in string */
 
   /* Terminate strings */
   pstr[0] = '\0';
