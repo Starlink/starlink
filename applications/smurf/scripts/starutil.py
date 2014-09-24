@@ -388,15 +388,22 @@ def invoke(command,aslist=False,buffer=None,annul=False):
 
 
 def get_fits_header( ndf, keyword, report=False ):
-   there = invoke("$KAPPA_DIR/fitsmod {0} edit=exist keyword={1}".format( ndf, keyword ), False )
-   if there == "TRUE":
-      value = invoke("$KAPPA_DIR/fitsmod {0} edit=print keyword={1}".format( ndf, keyword ), False )
-      if value == "" and report:
-         raise NoValueError("{0} contains a null value for FITS header'{1}'.".format(ndf,keyword))
-   else:
+   try:
+      there = invoke("$KAPPA_DIR/fitsmod {0} edit=exist keyword={1}".format( ndf, keyword ), False )
+      if there == "TRUE":
+         value = invoke("$KAPPA_DIR/fitsmod {0} edit=print keyword={1}".format( ndf, keyword ), False )
+      else:
+         value = None
+
+   except AtaskError:
       value = None
-      if report:
+
+   if report:
+      if value == "":
+         raise NoValueError("{0} contains a null value for FITS header'{1}'.".format(ndf,keyword))
+      elif value == None:
          raise NoValueError("{0} contains no value for FITS header'{1}'.".format(ndf,keyword))
+
    return value
 
 
