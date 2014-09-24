@@ -389,6 +389,10 @@
 *     1-APR-2011 (DSB):
 *        Use KPG_GDFND in place of KPG1_AGFND in case the most recent
 *        data picture had no WCS.
+*     24-SEP-2014 (DSB):
+*        Ensure the CVERT and PVERT arrays have room for the maximum
+*        possible number of axes. Previously, seg-faults could occur if
+*        the 2D NDF has any extra degenerate pixel or WCS axes.
 *     {enter_further_changes_here}
 
 *-
@@ -427,9 +431,9 @@
       CHARACTER TITLE*1          ! Catalogue title (unused)
       DOUBLE PRECISION BC( 2 )   ! Dummy argument
       DOUBLE PRECISION CC( 2 )   ! User supplied position
-      DOUBLE PRECISION CVERT( MXVERT, 2 )! Current Frame vertex positions
+      DOUBLE PRECISION CVERT( MXVERT, NDF__MXDIM )! Current Frame vertex positions
       DOUBLE PRECISION GVERT( MXVERT, 2 )! GRAPHICS Frame vertex positions
-      DOUBLE PRECISION PVERT( MXVERT, 2 )! PIXEL Frame vertex positions
+      DOUBLE PRECISION PVERT( MXVERT, NDF__MXDIM )! PIXEL Frame vertex positions
       INTEGER ACT( MXVERT )      ! Action associated with each vertex
       INTEGER AXES( 2 )          ! Indices of Current Frame axes being supplied
       INTEGER CATNAX             ! No. of axes in IWCSC Base Frame
