@@ -4,7 +4,7 @@
 #include "sae_par.h"
 
 AstFrameSet *atlFrameSetSplit( AstFrameSet *fset, const char *domain_list,
-                               int *status ){
+                               int **bax, int **cax, int *status ){
 /*
 *+
 *  Name:
@@ -15,7 +15,7 @@ AstFrameSet *atlFrameSetSplit( AstFrameSet *fset, const char *domain_list,
 
 *  Invocation:
 *     AstFrameSet *atlFrameSetSplit( AstFrameSet *fset, const char *domain,
-*                                    int *status )
+*                                    int **bax, int **cax, int *status )
 
 *  Description:
 *     This function searches the current Frame of the supplied FrameSet
@@ -41,6 +41,20 @@ AstFrameSet *atlFrameSetSplit( AstFrameSet *fset, const char *domain_list,
 *        will be used in turn until one is found which allows the
 *        supplied FrameSet to be split succesfully (any remaining Domain
 *        values will be ignored).
+*     bax
+*        If not NULL, this should be the address of a pointer in which to
+*        return a pointer to an array holding the one-based indices of
+*        the base frame axes that were included in the returned FrameSet.
+*        The array should be freed using astFree when no longer needed.
+*        The length of the array will equal the number of base Frame axes
+*        in the returned FrameSet.
+*     cax
+*        If not NULL, this should be the address of a pointer in which to
+*        return a pointer to an array holding the one-based indices of
+*        the current frame axes that were included in the returned FrameSet.
+*        The array should be freed using astFree when no longer needed.
+*        The length of the array will equal the number of current Frame axes
+*        in the returned FrameSet.
 *     status
 *        The global status.
 
@@ -234,7 +248,19 @@ AstFrameSet *atlFrameSetSplit( AstFrameSet *fset, const char *domain_list,
       }
    }
 
-/* Free resources. */
+/* If required, return pointers to the used base and current Frame axes. */
+   if( *status == SAI__OK ) {
+      if( bax ) {
+         *bax = baxes;
+         baxes = NULL;
+      }
+      if( cax ) {
+         *cax = caxes;
+         caxes = NULL;
+      }
+   }
+
+/* Free remaining resources. */
    caxes = astFree( caxes );
    baxes = astFree( baxes );
    if( domains ) {

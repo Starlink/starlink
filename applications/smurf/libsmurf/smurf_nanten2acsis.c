@@ -380,7 +380,7 @@ void smurf_nanten2acsis( int *status ) {
         }
 
         /* Get the SKY part of the FrameSet */
-        wcsframe = atlFrameSetSplit( tmpwcs, "SKY", status );
+        wcsframe = atlFrameSetSplit( tmpwcs, "SKY", NULL, NULL, status );
 
         astAnnul(tmpfs);
         astAnnul(tmpwcs);

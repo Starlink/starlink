@@ -195,7 +195,7 @@ void smf_create_bolfile( ThrWorkForce *wf, const Grp * bgrp, size_t index,
     /* Create output WCS by selecting the FPLANE domain from the
        time-series WCS. If there is no FPLANE we do not write a WCS */
     if (refdata->hdr->tswcs) {
-      wcs = atlFrameSetSplit( refdata->hdr->tswcs, "FPLANE", status );
+      wcs = atlFrameSetSplit( refdata->hdr->tswcs, "FPLANE", NULL, NULL, status );
 
       /* and switch to BOLO frame which is best for bolometer analysis */
       if (wcs) {

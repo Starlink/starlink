@@ -196,11 +196,11 @@ void smf_flat_malloc( size_t nheat, const smfData * refdata,
        value index (note, not actual heater value, since we do not yet
        know what the heater values are). First split the supplied time-series
        WCS FrameSet to extract a FrameSet in which the current Frame
-       contains only the axes within the ame Domain as the first axis 
+       contains only the axes within the ame Domain as the first axis
        (this is safe because the first axis is always a spatial axis). */
     if( oldhdr->tswcs ) {
       dom = astGetC( oldhdr->tswcs, "Domain(1)" );
-      new_fs = atlFrameSetSplit( oldhdr->tswcs, dom, status );
+      new_fs = atlFrameSetSplit( oldhdr->tswcs, dom, NULL, NULL, status );
 
       /* Check this FrameSet is 2D, and if so, add in a third axis describing
          heater value index. */

@@ -139,7 +139,7 @@ int main( void ){
    fs = astRead( fc );
 
 /* Split this FrameSet to extract the sky axes. */
-   fs2 = atlFrameSetSplit( fs, "SKY", &status );
+   fs2 = atlFrameSetSplit( fs, "SKY", NULL, NULL, &status );
    if( astOK && !fs2 ) {
       status = SAI__ERROR;
       errRep( "", "Error 2; atlFrameSetSplit failed.", &status );
@@ -154,7 +154,7 @@ int main( void ){
    }
 
 /* Split this FrameSet to extract the spectral axes. */
-   fs2 = atlFrameSetSplit( fs, "SPECTRUM", &status );
+   fs2 = atlFrameSetSplit( fs, "SPECTRUM", NULL, NULL, &status );
    if( astOK && !fs2 ) {
       status = SAI__ERROR;
       errRep( "", "Error 5; atlFrameSetSplit failed.", &status );
