@@ -25,12 +25,13 @@
 *     string = char* (Given)
 *        The string to be searched.
 *     iposn = int* (Given and Returned)
-*        Given as the pointer to the previous escape char, returned
-*        as the pointer to the next escape char. IPOSN is given as
-*        0 to indicate the start of the search and is returned set to
+*        Given as the pointer to the position of the previous escape char,
+*        returned as the pointer to the next escape char. IPOSN is given as
+*        -1 to indicate the start of the search (i.e. the search should
+*        begin at position 0 "the next char") and is returned set to
 *        the index of the next escape char: when no more escape
 *        chars can be found in the given string, IPOSN is returned
-*        as 0.
+*        as -1.
 
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council.
