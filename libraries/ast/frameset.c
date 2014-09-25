@@ -112,12 +112,12 @@ f     - AST_REMOVEFRAME: Remove a Frame from a FrameSet
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -254,6 +254,9 @@ f     - AST_REMOVEFRAME: Remove a Frame from a FrameSet
 *     29-APR-2013 (DSB):
 *        Added attributes AllVariants and Variant. Also added methods
 *        astAddVariant and astMirrorVariants.
+*     25-SEP-2014 (DSB):
+*        Allow Base and Current attributes to be specified by giving a
+*        Domain name.
 *class--
 */
 
@@ -8915,9 +8918,10 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
 */
 
 /* Local Variables: */
-   astDECLARE_GLOBALS            /* Declare the thread specific global data */
-   AstFrame *fr;                 /* Pointer to current Frame */
+   AstFrame *fr;                 /* Pointer to a Frame within the FrameSet */
    AstFrameSet *this;            /* Pointer to the FrameSet structure */
+   astDECLARE_GLOBALS            /* Declare the thread specific global data */
+   const char *dom;              /* Pointer to Domain string */
    int base;                     /* Base attribute value */
    int base_off;                 /* Offset of Base value string */
    int current;                  /* Current attribute value */
@@ -8926,6 +8930,7 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
    int invert;                   /* Invert attribute value */
    int len;                      /* Length of setting string */
    int nc;                       /* Number of characters read by astSscanf */
+   int nfrm;                     /* Number of Frames in FrameSet */
    int report;                   /* Report attribute value */
    int variant;                  /* Offset of Variant string */
 
@@ -8973,11 +8978,26 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
       } else if ( astChrMatch( "AST__BASE", setting + base_off ) ||
                   astChrMatch( "Base", setting + base_off ) ) {
 
-/* Report an error if the value wasn't recognised. */
+/* If the FrameSet contains a Frame with the given Domain name, make it
+   the base Frame. */
       } else {
-         astError( AST__ATTIN, "astSetAttrib(%s): Invalid index value for "
-                   "Base Frame \"%s\".", status,
-                   astGetClass( this ),  setting + base_off );
+         nfrm = astGetNframe( this );
+         for( base = 1; base <= nfrm; base++ ) {
+            fr = astGetFrame( this, base );
+            dom = astGetDomain( fr );
+            fr = astAnnul( fr );
+            if( astChrMatch( dom, setting + base_off ) ) break;
+         }
+
+         if( base <= nfrm ) {
+            astSetBase( this, base );
+
+/* Report an error if the value wasn't recognised. */
+         } else {
+            astError( AST__ATTIN, "astSetAttrib(%s): Invalid index value for "
+                      "Base Frame \"%s\".", status,
+                      astGetClass( this ),  setting + base_off );
+         }
       }
 
 /* Current. */
@@ -9012,11 +9032,28 @@ static void SetAttrib( AstObject *this_object, const char *setting, int *status 
       } else if ( astChrMatch( "AST__CURRENT", setting + current_off ) ||
                   astChrMatch( "Current", setting + current_off ) ) {
 
-/* Report an error if the value wasn't recognised. */
+/* If the FrameSet contains a Frame with the given Domain name, make it
+   the current Frame. */
       } else {
-         astError( AST__ATTIN, "astSetAttrib(%s): Invalid index value for "
-                   "Current Frame \"%s\".", status,
-                   astGetClass( this ),  setting + current_off );
+         nfrm = astGetNframe( this );
+         for( current = 1; current <= nfrm; current++ ) {
+            fr = astGetFrame( this, current );
+            dom = astGetDomain( fr );
+            fr = astAnnul( fr );
+            if( astChrMatch( dom, setting + current_off ) ) break;
+         }
+
+         if( current <= nfrm ) {
+            RestoreIntegrity( this, status );
+            astSetCurrent( this, current );
+            RecordIntegrity( this, status );
+
+/* Report an error if the value wasn't recognised. */
+         } else {
+            astError( AST__ATTIN, "astSetAttrib(%s): Invalid index value for "
+                      "Current Frame \"%s\".", status,
+                      astGetClass( this ),  setting + current_off );
+         }
       }
 
 /* ID. */
@@ -11349,6 +11386,13 @@ static void VSet( AstObject *this_object, const char *settings,
 *     regarded as the "base" Frame within a FrameSet. The default is
 *     the first Frame added to the FrameSet when it is created (this
 *     Frame always has an index of 1).
+*
+*     When setting a new value for this attribute, a string may be
+*     supplied instead of an integer index. In this case a search
+*     is made within the FrameSet for a Frame that has its Domain
+*     attribute value equal to the supplied string (the comparison is
+*     case-insensitive). If found, the Frame is made the base Frame.
+*     Otherwise an error is reported.
 
 *  Applicability:
 *     FrameSet
@@ -11381,6 +11425,13 @@ f     Invert attribute, with the AST_INVERT routine for example) will
 *     regarded as the "current" Frame within a FrameSet. The default
 *     is the most recent Frame added to the FrameSet (this Frame
 *     always has an index equal to the FrameSet's Nframe attribute).
+*
+*     When setting a new value for this attribute, a string may be
+*     supplied instead of an integer index. In this case a search
+*     is made within the FrameSet for a Frame that has its Domain
+*     attribute value equal to the supplied string (the comparison is
+*     case-insensitive). If found, the Frame is made the current Frame.
+*     Otherwise an error is reported.
 
 *  Applicability:
 *     FrameSet

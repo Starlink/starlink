@@ -34,6 +34,21 @@ c      call ast_watchmemory(100)
       fs = ast_frameset( pfrm, ' ', status )
       call ast_addframe( fs, AST__CURRENT, p2fmap, ffrm, status )
 
+      call ast_setc( fs, 'Base', 'Fplane', status )
+      if( ast_geti( fs, 'Base', status ) .ne. 2 )
+     :    call stopit( status, 'Error -3' )
+
+      call ast_setc( fs, 'Base', 'pixel', status )
+      if( ast_geti( fs, 'Base', status ) .ne. 1 )
+     :    call stopit( status, 'Error -2' )
+
+      call ast_setc( fs, 'Current', 'PIXEL', status )
+      if( ast_geti( fs, 'Current', status ) .ne. 1 )
+     :    call stopit( status, 'Error -1' )
+
+      call ast_setc( fs, 'Current', 'fplane', status )
+      if( ast_geti( fs, 'Current', status ) .ne. 2 )
+     :    call stopit( status, 'Error 0' )
 
       text = ast_getc( fs, 'AllVariants', status )
       if( text .ne. 'FPLANE' ) call stopit( status, 'Error 1' )

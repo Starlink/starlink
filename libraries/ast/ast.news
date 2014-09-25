@@ -20,6 +20,8 @@ Main Changes in this Version
   supplied text. Any code that uses this macro must be re-compiled.
 - The astRebin and astRebinSeq family of functions now include support
   for arrays with char (byte) and unsigned char (unsigned byte) data types.
+- The Base and Current attributes of a FrameSet may now be set using the
+  Domain name or the index of the required Frame.
 - The FITS XPH projection is now supported.
 - The order of WCS axes within new FITS-WCS headers created by astWrite
   can now be controlled using a new attribute called FitsAxisOrder.
