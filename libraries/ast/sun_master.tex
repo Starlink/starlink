@@ -22970,6 +22970,17 @@ current version):
 \item The order of WCS axes within new FITS-WCS headers created by astWrite
   can now be controlled using a new attribute called FitsAxisOrder.
 \item Supported added for FITS XPH (polar HEALPIX) projection.
+c+
+\item The macro used to invoke the astAppendString utility function has
+  changed to allow printf-style converstions to be included in the
+  supplied text. Any code that uses this macro must be re-compiled.
+\item The astRebin and astRebinSeq family of functions now include support
+  for arrays with char (byte) and unsigned char (unsigned byte) data types.
+c-
+f+
+\item The AST\_REBIN and AST\_REBINSEQ family of functions now include support
+  for arrays with byte and unsigned byte data types.
+f-
 
 \end{enumerate}
 

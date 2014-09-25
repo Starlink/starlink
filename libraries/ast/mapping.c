@@ -365,6 +365,8 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *        Modify astLinearAPprox to avoid using regularly placed
 *        test points, as such regular placement may result in
 *        non-representative behaviour.
+*     25-SEP-2014 (DSB):
+*        Add support for B and UB data types to astRebin and astRebinSeq.
 *class--
 */
 
@@ -623,6 +625,8 @@ static void SpreadNearest##X( int, const int *, const int *, const Xtype *, \
 DECLARE_GENERIC(D,double)
 DECLARE_GENERIC(F,float)
 DECLARE_GENERIC(I,int)
+DECLARE_GENERIC(UB,unsigned char)
+DECLARE_GENERIC(B,char)
 
 #if HAVE_LONG_DOUBLE     /* Not normally implemented */
 DECLARE_GENERIC(LD,long double)
@@ -2483,6 +2487,8 @@ VTAB_GENERIC(LD)
 VTAB_GENERIC(D)
 VTAB_GENERIC(F)
 VTAB_GENERIC(I)
+VTAB_GENERIC(B)
+VTAB_GENERIC(UB)
 
 #if HAVE_LONG_DOUBLE     /* Not normally implemented */
 VTAB_GENERIC(LD)
@@ -9580,9 +9586,13 @@ f     replace <X> in the generic function name AST_REBIN<X> with a
 c     - D: double
 c     - F: float
 c     - I: int
+c     - B: byte (signed char)
+c     - UB: unsigned byte (unsigned char)
 f     - D: DOUBLE PRECISION
 f     - R: REAL
 f     - I: INTEGER
+f     - B: BYTE (treated as signed)
+f     - UB: BYTE (treated as unsigned)
 *
 c     For example, astRebinD would be used to process "double"
 c     data, while astRebinI would be used to process "int"
@@ -10002,6 +10012,8 @@ MAKE_REBIN(LD,long double,0)
 MAKE_REBIN(D,double,0)
 MAKE_REBIN(F,float,0)
 MAKE_REBIN(I,int,1)
+MAKE_REBIN(B,char,1)
+MAKE_REBIN(UB,unsigned char,1)
 
 /* Undefine the macro. */
 #undef MAKE_REBIN
@@ -11788,9 +11800,13 @@ f     replace <X> in the generic function name AST_REBINSEQ<X> with a
 c     - D: double
 c     - F: float
 c     - I: int
+c     - B: byte (signed char)
+c     - UB: unsigned byte (unsigned char)
 f     - D: DOUBLE PRECISION
 f     - R: REAL
 f     - I: INTEGER
+f     - B: BYTE (treated as signed)
+f     - UB: BYTE (treated as unsigned)
 *
 c     For example, astRebinSeqD would be used to process "double"
 c     data, while astRebinSeqI would be used to process "int"
@@ -12361,6 +12377,8 @@ MAKE_REBINSEQ(LD,long double,0)
 MAKE_REBINSEQ(D,double,0)
 MAKE_REBINSEQ(F,float,0)
 MAKE_REBINSEQ(I,int,1)
+MAKE_REBINSEQ(B,char,1)
+MAKE_REBINSEQ(UB,unsigned char,1)
 
 /* Undefine the macro. */
 #undef MAKE_REBINSEQ
@@ -18171,6 +18189,8 @@ MAKE_SPREAD_KERNEL1(LD,long double,0)
 MAKE_SPREAD_KERNEL1(D,double,0)
 MAKE_SPREAD_KERNEL1(F,float,0)
 MAKE_SPREAD_KERNEL1(I,int,1)
+MAKE_SPREAD_KERNEL1(B,char,1)
+MAKE_SPREAD_KERNEL1(UB,unsigned char,1)
 
 /* Undefine the macros used above. */
 #undef KERNEL_ND
@@ -19008,6 +19028,8 @@ MAKE_SPREAD_LINEAR(LD,long double,0)
 MAKE_SPREAD_LINEAR(D,double,0)
 MAKE_SPREAD_LINEAR(F,float,0)
 MAKE_SPREAD_LINEAR(I,int,1)
+MAKE_SPREAD_LINEAR(B,char,1)
+MAKE_SPREAD_LINEAR(UB,unsigned char,1)
 
 /* Undefine the macros used above. */
 #undef LINEAR_1D
@@ -19690,6 +19712,8 @@ MAKE_SPREAD_NEAREST(LD,long double,0)
 MAKE_SPREAD_NEAREST(D,double,0)
 MAKE_SPREAD_NEAREST(F,float,0)
 MAKE_SPREAD_NEAREST(I,int,1)
+MAKE_SPREAD_NEAREST(B,char,1)
+MAKE_SPREAD_NEAREST(UB,unsigned char,1)
 
 /* Undefine the macros used above. */
 #undef NEAR_ND
@@ -23715,6 +23739,8 @@ MAKE_REBIN_(LD,long double)
 MAKE_REBIN_(D,double)
 MAKE_REBIN_(F,float)
 MAKE_REBIN_(I,int)
+MAKE_REBIN_(B,char)
+MAKE_REBIN_(UB,unsigned char)
 #undef MAKE_REBIN_
 
 
@@ -23746,6 +23772,8 @@ MAKE_REBINSEQ_(LD,long double)
 MAKE_REBINSEQ_(D,double)
 MAKE_REBINSEQ_(F,float)
 MAKE_REBINSEQ_(I,int)
+MAKE_REBINSEQ_(B,char)
+MAKE_REBINSEQ_(UB,unsigned char)
 
 #undef MAKE_REBINSEQ_
 

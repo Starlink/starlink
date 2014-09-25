@@ -253,12 +253,12 @@
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -514,6 +514,8 @@ DECLARE_GENERIC_ALL(LD,long double)
 DECLARE_GENERIC_DFI(D,double)
 DECLARE_GENERIC_DFI(F,float)
 DECLARE_GENERIC_DFI(I,int)
+DECLARE_GENERIC_DFI(B,char)
+DECLARE_GENERIC_DFI(UB,unsigned char)
 
 #if HAVE_LONG_DOUBLE     /* Not normally implemented */
 DECLARE_GENERIC_DFI(LD,long double)
@@ -613,6 +615,8 @@ PROTO_GENERIC_ALL(LD,long double)
 PROTO_GENERIC_DFI(D,double)
 PROTO_GENERIC_DFI(F,float)
 PROTO_GENERIC_DFI(I,int)
+PROTO_GENERIC_DFI(B,char)
+PROTO_GENERIC_DFI(UB,unsigned char)
 
 #if HAVE_LONG_DOUBLE     /* Not normally implemented */
 PROTO_GENERIC_DFI(LD,long double)
@@ -722,12 +726,20 @@ astINVOKE(V,astRebinD_(astCheckMapping(this),wlim,ndim_in,lbnd_in,ubnd_in,in,in_
 astINVOKE(V,astRebinF_(astCheckMapping(this),wlim,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var,STATUS_PTR))
 #define astRebinI(this,wlim,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var) \
 astINVOKE(V,astRebinI_(astCheckMapping(this),wlim,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var,STATUS_PTR))
+#define astRebinB(this,wlim,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var) \
+astINVOKE(V,astRebinB_(astCheckMapping(this),wlim,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var,STATUS_PTR))
+#define astRebinUB(this,wlim,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var) \
+astINVOKE(V,astRebinUB_(astCheckMapping(this),wlim,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var,STATUS_PTR))
 #define astRebinSeqD(this,wlim,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var,weights,nused) \
 astINVOKE(V,astRebinSeqD_(astCheckMapping(this),wlim,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var,weights,nused,STATUS_PTR))
 #define astRebinSeqF(this,wlim,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var,weights,nused) \
 astINVOKE(V,astRebinSeqF_(astCheckMapping(this),wlim,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var,weights,nused,STATUS_PTR))
 #define astRebinSeqI(this,wlim,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var,weights,nused) \
 astINVOKE(V,astRebinSeqI_(astCheckMapping(this),wlim,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var,weights,nused,STATUS_PTR))
+#define astRebinSeqB(this,wlim,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var,weights,nused) \
+astINVOKE(V,astRebinSeqB_(astCheckMapping(this),wlim,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var,weights,nused,STATUS_PTR))
+#define astRebinSeqUB(this,wlim,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var,weights,nused) \
+astINVOKE(V,astRebinSeqUB_(astCheckMapping(this),wlim,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var,weights,nused,STATUS_PTR))
 #define astResampleD(this,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,finterp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var) \
 astINVOKE(V,astResampleD_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,in_var,interp,finterp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var,STATUS_PTR))
 #define astResampleF(this,ndim_in,lbnd_in,ubnd_in,in,in_var,interp,finterp,params,flags,tol,maxpix,badval,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out,out_var) \

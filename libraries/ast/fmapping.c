@@ -42,12 +42,12 @@
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*     
+*
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -510,6 +510,8 @@ F77_SUBROUTINE(ast_rebin##f)( INTEGER(THIS), \
 MAKE_AST_REBIN(d,D,DOUBLE,D,double)
 MAKE_AST_REBIN(r,R,REAL,F,float)
 MAKE_AST_REBIN(i,I,INTEGER,I,int)
+MAKE_AST_REBIN(b,B,BYTE,B,signed char)
+MAKE_AST_REBIN(ub,UB,UBYTE,UB,unsigned char)
 #undef MAKE_AST_REBIN
 
 /* AST_REBINSEQ<X> requires a function for each possible data type, so
@@ -602,6 +604,8 @@ F77_SUBROUTINE(ast_rebinseq##f)( INTEGER(THIS), \
 MAKE_AST_REBINSEQ(d,D,DOUBLE,D,double)
 MAKE_AST_REBINSEQ(r,R,REAL,F,float)
 MAKE_AST_REBINSEQ(i,I,INTEGER,I,int)
+MAKE_AST_REBINSEQ(b,B,BYTE,B,signed char)
+MAKE_AST_REBINSEQ(ub,UB,UBYTE,UB,unsigned char)
 #undef MAKE_AST_REBINSEQ
 
 F77_INTEGER_FUNCTION(ast_removeregions)( INTEGER(THIS),
