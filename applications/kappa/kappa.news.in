@@ -1,6 +1,20 @@
-1 KAPPA_Version_2.1
+1 KAPPA_Version_2.2
 
    A new release of KAPPA (@PACKAGE_VERSION@) is under development.  The main
+   changes are listed below.  For complete details of all
+   changes, see the "Release Notes" appendix in SUN/95.
+
+2 Modified_applications
+
+   o  CONFIGECHO
+
+      -  A new parameter called LOGFILE has been added that allows the
+      list of displayed configuration parameters to be written to a
+      text file.
+
+1 KAPPA_Version_2.1
+
+   A new release of KAPPA (2.1) is available.  The main
    changes are listed below.  For complete details of all
    changes, see the "Release Notes" appendix in SUN/95.
 
