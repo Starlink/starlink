@@ -11070,16 +11070,16 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
                CASE_NEAREST(D,double)
                CASE_NEAREST(F,float)
                CASE_NEAREST(I,int)
+               CASE_NEAREST(B,char)
+               CASE_NEAREST(UB,unsigned char)
 
                case ( TYPE_L ): break;
                case ( TYPE_K ): break;
-               case ( TYPE_B ): break;
                case ( TYPE_S ): break;
                case ( TYPE_UL ): break;
                case ( TYPE_UI ): break;
                case ( TYPE_UK ): break;
                case ( TYPE_US ): break;
-               case ( TYPE_UB ): break;
             }
             break;
 
@@ -11113,16 +11113,16 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
                CASE_LINEAR(D,double)
                CASE_LINEAR(F,float)
                CASE_LINEAR(I,int)
+               CASE_LINEAR(B,char)
+               CASE_LINEAR(UB,unsigned char)
 
                case ( TYPE_L ): break;
                case ( TYPE_K ): break;
-               case ( TYPE_B ): break;
                case ( TYPE_S ): break;
                case ( TYPE_UL ): break;
                case ( TYPE_UI ): break;
                case ( TYPE_UK ): break;
                case ( TYPE_US ): break;
-               case ( TYPE_UB ): break;
             }
             break;
 
@@ -11312,16 +11312,16 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
                CASE_KERNEL1(D,double)
                CASE_KERNEL1(F,float)
                CASE_KERNEL1(I,int)
+               CASE_KERNEL1(B,char)
+               CASE_KERNEL1(UB,unsigned char)
 
                case ( TYPE_L ): break;
                case ( TYPE_K ): break;
-               case ( TYPE_B ): break;
                case ( TYPE_S ): break;
                case ( TYPE_UL ): break;
                case ( TYPE_UI ): break;
                case ( TYPE_UK ): break;
                case ( TYPE_US ): break;
-               case ( TYPE_UB ): break;
             }
             break;
 
@@ -11349,16 +11349,16 @@ static void RebinSection( AstMapping *this, const double *linear_fit,
                CASE_ERROR(D)
                CASE_ERROR(F)
                CASE_ERROR(I)
+               CASE_ERROR(B)
+               CASE_ERROR(UB)
 
                case ( TYPE_L ): break;
                case ( TYPE_K ): break;
-               case ( TYPE_B ): break;
                case ( TYPE_S ): break;
                case ( TYPE_UL ): break;
                case ( TYPE_UI ): break;
                case ( TYPE_UK ): break;
                case ( TYPE_US ): break;
-               case ( TYPE_UB ): break;
             }
             break;
 
