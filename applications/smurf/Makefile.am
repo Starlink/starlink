@@ -61,6 +61,7 @@ impaztec \
 jsatileinfo \
 jsatilelist \
 jsadicer \
+jsapaster \
 makecube \
 makemap \
 nanten2acsis \

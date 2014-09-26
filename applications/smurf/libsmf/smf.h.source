@@ -1657,6 +1657,10 @@ void smf_polext( int ondf, int store_angle, double angle, const char *domain, in
 
 void smf_pread( Grp *igrp, const char *param, int *status );
 
+void smf_projbox( Grp *igrp, AstFrameSet *refwcs,
+                  int lbnd[ NDF__MXDIM ], int ubnd[ NDF__MXDIM ],
+                  int dims[ NDF__MXDIM ], int *status );
+
 void smf_puthistory( smfData *data, const char *appn, int *status );
 
 size_t smf_qfamily_count( smf_qfam_t qfamily, int * status );

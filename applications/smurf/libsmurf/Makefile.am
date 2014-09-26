@@ -39,6 +39,7 @@ smurf_gsd2acsis.c \
 smurf_gsdshow.c \
 smurf_impaztec.c \
 smurf_jsadicer.c \
+smurf_jsapaster.c \
 smurf_jsatileinfo.c \
 smurf_jsatilelist.c \
 smurf_makecube.c \

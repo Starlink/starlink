@@ -365,6 +365,8 @@ void smurf_mon( int * status ) {
     smurf_impaztec( status );
   } else if (strcmp( taskname, "JSADICER" ) == 0 ) {
     smurf_jsadicer( status );
+  } else if (strcmp( taskname, "JSAPASTER" ) == 0 ) {
+    smurf_jsapaster( status );
   } else if (strcmp( taskname, "JSATILEINFO" ) == 0 ) {
     smurf_jsatileinfo( status );
   } else if (strcmp( taskname, "JSATILELIST" ) == 0 ) {

@@ -21,8 +21,9 @@
 
 *  Description:
 *     This routine creates multiple output NDFs by dicing a supplied
-*     2D- or 3D- NDF up into JSA tiles. The spatial WCS of the input NDF
-*     must matches the JSA all-sky grid.
+*     2D- or 3D- NDF up into JSA tiles (i.e. it is the inverse of
+*     JSAPASTER). The spatial WCS of the input NDF must matches the
+*     JSA all-sky grid.
 
 *  ADAM Parameters:
 *     IN = NDF (Read)

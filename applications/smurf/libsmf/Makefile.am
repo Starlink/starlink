@@ -345,6 +345,7 @@ smf_pattern_extract.c \
 smf_pcorr.c \
 smf_polext.c \
 smf_pread.c \
+smf_projbox.c \
 smf_puthistory.c \
 smf_qfamily_count.c \
 smf_qfamily_str.c \
