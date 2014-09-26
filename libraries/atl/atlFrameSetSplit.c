@@ -47,14 +47,16 @@ AstFrameSet *atlFrameSetSplit( AstFrameSet *fset, const char *domain_list,
 *        the base frame axes that were included in the returned FrameSet.
 *        The array should be freed using astFree when no longer needed.
 *        The length of the array will equal the number of base Frame axes
-*        in the returned FrameSet.
+*        in the returned FrameSet. A NULL pointer will be returned if the
+*        FrameSet could not be split.
 *     cax
 *        If not NULL, this should be the address of a pointer in which to
 *        return a pointer to an array holding the one-based indices of
 *        the current frame axes that were included in the returned FrameSet.
 *        The array should be freed using astFree when no longer needed.
 *        The length of the array will equal the number of current Frame axes
-*        in the returned FrameSet.
+*        in the returned FrameSet. A NULL pointer will be returned if the
+*        FrameSet could not be split.
 *     status
 *        The global status.
 
@@ -249,7 +251,7 @@ AstFrameSet *atlFrameSetSplit( AstFrameSet *fset, const char *domain_list,
    }
 
 /* If required, return pointers to the used base and current Frame axes. */
-   if( *status == SAI__OK ) {
+   if( result && *status == SAI__OK ) {
       if( bax ) {
          *bax = baxes;
          baxes = NULL;
