@@ -123,6 +123,9 @@
 *        - Fix problem invoking kappa:paste if only one tile has been
 *        supplied.
 *        - Change sincsinc kernel width from 2 to 3.
+*     26-SEP-2014 (DSB):
+*        Use smurf:jsapaster instead of kappa:paste to stick the tiles
+*        together.
 *-
 '''
 
@@ -351,106 +354,18 @@ try:
       jsatile = int( len(tiles)/2 )
       jsatile = starutil.get_fits_header( tiles[ jsatile ], "TILENUM" )
 
-#  Paste these tile NDFs into a single image by abutting them in pixel
-#  space. This image still uses the JSA all-sky pixel grid. If we have
-#  only a single tile, then just use it as it is.
+#  Paste these tile NDFs into a single image. This image still uses the
+#  JSA all-sky pixel grid. If we have only a single tile, then just use
+#  it as it is.
    if len(used_tiles) > 1:
-
-#  It is possible that the user may have mistakenly supplied a collection of
-#  tiles that are far away from each other on the sky, so before forming
-#  the mosaic, find the total pixel bounds it would have and check they
-#  are not silly large.
-      lx = 1E10
-      ly = 1E10
-      ux = -1E10
-      uy = -1E10
-      for used_tile in used_tiles:
-         invoke( "$KAPPA_DIR/ndftrace {0} quiet".format(used_tile) )
-         lx = min( lx, int( starutil.get_task_par( "LBOUND(1)", "ndftrace" )))
-         ly = min( ly, int( starutil.get_task_par( "LBOUND(2)", "ndftrace" )))
-         ux = max( ux, int( starutil.get_task_par( "UBOUND(1)", "ndftrace" )))
-         uy = max( uy, int( starutil.get_task_par( "UBOUND(2)", "ndftrace" )))
-
-#  If the mosaic will be silly large, it may just be because the tiles
-#  straddle a discontinutity in the normal HPX projection - they may be
-#  close together on the sky. To check for this we reproject each tile
-#  into a north XPH (polar HEALPix) projection, and see if the resulting
-#  mosaic would be a reasonable size.
-      xph_tiles = None
-      if ux - lx + 1 > 10000 or uy - ly + 1 > 10000:
-         msg_out( "HPX mosaic of all tiles it too large ({0}x{1}) - "
-                  "trying northern XPH mosaic".format(ux - lx + 1,uy - ly + 1 ))
-         lx = 1E10
-         ly = 1E10
-         ux = -1E10
-         uy = -1E10
-         xph_tile_list = []
-         for used_tile in used_tiles:
-            invoke( "$SMURF_DIR/jsadicer in={0} instrument={1} "
-                    "out={2}/dice usexph=north".
-                    format(used_tile,instrument,NDG.tempdir) )
-            tilenum = starutil.get_fits_header( used_tile, "TILENUM", True )
-            tt = "{0}/dice_{1}".format(NDG.tempdir,tilenum )
-            xph_tile_list.append( tt )
-
-            invoke( "$KAPPA_DIR/ndftrace {0} quiet".format(tt) )
-            lx = min( lx, int( starutil.get_task_par( "LBOUND(1)", "ndftrace" )))
-            ly = min( ly, int( starutil.get_task_par( "LBOUND(2)", "ndftrace" )))
-            ux = max( ux, int( starutil.get_task_par( "UBOUND(1)", "ndftrace" )))
-            uy = max( uy, int( starutil.get_task_par( "UBOUND(2)", "ndftrace" )))
-
-         xph_tiles = NDG( xph_tile_list )
-
-#  If the mosaic of northern XPH tiles is still too big, try converting
-#  the tiles to southern XPH projection.
-         if ux - lx + 1 > 10000 or uy - ly + 1 > 10000:
-            msg_out( "Northern XPH mosaic of all tiles it too large ({0}x{1}) - "
-                     "trying southern XPH mosaic".format(ux - lx + 1,uy - ly + 1 ))
-            xph_tiles.empty()
-
-            lx = 1E10
-            ly = 1E10
-            ux = -1E10
-            uy = -1E10
-            xph_tile_list = []
-            for used_tile in used_tiles:
-               invoke( "$SMURF_DIR/jsadicer in={0} instrument={1} "
-                       "out={2}/dice usexph=south".
-                       format(used_tile,instrument,NDG.tempdir) )
-               tilenum = starutil.get_fits_header( used_tile, "TILENUM", True )
-               tt = "{0}/dice_{1}".format(NDG.tempdir,tilenum )
-               xph_tile_list.append( tt )
-
-               invoke( "$KAPPA_DIR/ndftrace {0} quiet".format(tt) )
-               lx = min( lx, int( starutil.get_task_par( "LBOUND(1)", "ndftrace" )))
-               ly = min( ly, int( starutil.get_task_par( "LBOUND(2)", "ndftrace" )))
-               ux = max( ux, int( starutil.get_task_par( "UBOUND(1)", "ndftrace" )))
-               uy = max( uy, int( starutil.get_task_par( "UBOUND(2)", "ndftrace" )))
-
-            xph_tiles = NDG( xph_tile_list )
-
-#  If the mosaic of southern XPH tiles is still too big, raise an exception.
-            if ux - lx + 1 > 10000 or uy - ly + 1 > 10000:
-               xph_tiles.empty()
-               raise starutil.InvalidParameterError( "The resulting mosaic "
-                     "would be too big ({0}x{1})".format(ux - lx + 1,uy - ly + 1 ))
-
-#  Now mosaic them.
       temp = NDG(1)
-      if xph_tiles != None:
-         invoke( "$KAPPA_DIR/paste in={0} out={1}".format(xph_tiles,temp) )
-      else:
-         invoke( "$KAPPA_DIR/paste in={0} out={1}".format(used_tiles,temp) )
-
+      invoke( "$SMURF_DIR/jsapaster in={0} out={1}".format(used_tiles,temp) )
    else:
       temp = used_tiles
 
 #  Strip any bad border from the montage.
    jsa_montage = NDG(1)
    invoke( "$KAPPA_DIR/ndfcopy in={0} out={1} trimbad".format(temp,jsa_montage) )
-
-#  Erase any outline polygon from the montage since it will be incorrect.
-   invoke( "$KAPPA_DIR/erase {0}.more.outline ok".format(jsa_montage) )
 
 #  Get the nominal pixel size of the montage.
    invoke( "$KAPPA_DIR/ndftrace {0} quiet".format(jsa_montage) )
