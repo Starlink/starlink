@@ -20833,6 +20833,9 @@ KAPPA: \htmlref{SUBSTITUTE}{SUBSTITUTE},
          structure and propagates all \htmlref{extensions}{apndf:extensions}.
 
          \sstitem
+         The \htmlref{BAD\_PIXEL flag}{apndf:bpflag} is set appropriately.
+
+         \sstitem
          All \htmlref{non-complex numeric data types}{ap:HDStypes} can be handled.
       }
    }
@@ -54567,8 +54570,14 @@ The following applications have been modified:
         the list of displayed configuration parameters to be written to a
         text file.
       \end{itemize}
-\end{description}
 
+   \item [\htmlref{COPYBAD}{COPYBAD}]\mbox{}
+      \begin{itemize}
+        \item Restore setting the BAD\_PIXEL flag for the DATA and VARIANCE
+        components, only setting it false if no bad pixels were copied
+        and none existed in the input NDF.
+      \end{itemize}
+\end{description}
 
 
 \section{Notes from Previous Few Releases}

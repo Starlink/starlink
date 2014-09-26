@@ -12,6 +12,12 @@
       list of displayed configuration parameters to be written to a
       text file.
 
+   o  COPYBAD
+
+      -  Restore setting the BAD_PIXEL flag for the DATA and VARIANCE
+      components, only setting it false if no bad pixels were copied
+      and none existed in the input NDF.
+
 1 KAPPA_Version_2.1
 
    A new release of KAPPA (2.1) is available.  The main

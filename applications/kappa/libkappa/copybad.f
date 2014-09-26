@@ -73,6 +73,7 @@
 *     -  This routine correctly processes the WCS, AXIS, DATA, QUALITY,
 *     LABEL, TITLE, UNITS, HISTORY, and VARIANCE components of an NDF
 *     data structure and propagates all extensions.
+*     -  The BAD_PIXEL flag is set appropriately.
 *     -  All non-complex numeric data types can be handled.
 
 *  Copyright:
@@ -156,6 +157,12 @@
 *        values copied.  Remove NDF_SBAD call which could disable
 *        the BAD_PIXEL flag even though bad values were present in
 *        either data or variance arrays.
+*     2014 September 25 (MJC):
+*        The previous change went too far.  The output NDF bad-pixel
+*        flag should be a combination (OR) of whether or not any bad
+*        values were copied from the reference NDF, and any were
+*        present in the  input NDF.  As coded it was possible to inherit
+*        a false bad-pixel flag even if bad values had been introduced.
 *     {enter_further_changes_here}
 
 *-
@@ -172,17 +179,19 @@
       INTEGER STATUS                    ! Global status
 
 *  Local Variables:
-      CHARACTER * ( NDF__SZTYP ) TY_IN  ! Data type for processing
-      INTEGER NEL                       ! Number of mapped elements
+      LOGICAL BADIN                     ! Bad pixels in the input NDF?
+      LOGICAL BADOUT                    ! Bad pixels in the output NDF?
       INTEGER IN                        ! Identifier for IN (input)
+      LOGICAL INVERT                    ! Invert the good/bad status?
       INTEGER NBAD                      ! Number of bad pixels in output
+      INTEGER NEL                       ! Number of mapped elements
       INTEGER OUT                       ! Identifier for OUT (output)
       INTEGER P_OUT                     ! Pointer to OUT's data array
       INTEGER P_OUTV                    ! Pointer to OUT's variance array
       INTEGER P_REF                     ! Pointer to REF's data array
       INTEGER REF                       ! Identifier for REF (input)
+      CHARACTER * ( NDF__SZTYP ) TY_IN  ! Data type for processing
       LOGICAL VAR                       ! Varience array present in IN ?
-      LOGICAL INVERT                    ! Invert the good/bad status?
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
@@ -210,8 +219,8 @@
 
 *  If required, map the VARIANCE array.
       CALL NDF_STATE( IN, 'Variance', VAR, STATUS )
-      IF( VAR ) CALL NDF_MAP( OUT, 'Variance', TY_IN, 'UPDATE', P_OUTV,
-     :                        NEL, STATUS )
+      IF ( VAR ) CALL NDF_MAP( OUT, 'Variance', TY_IN, 'UPDATE', P_OUTV,
+     :                         NEL, STATUS )
 
 *  See if the operation is to be inverted.
       CALL PAR_GET0L( 'INVERT', INVERT, STATUS )
@@ -293,6 +302,15 @@
 
 *  Obtain the output title and insert it into the output NDF.
       CALL NDF_CINP( 'TITLE', OUT, 'Title', STATUS )
+
+*  See if there are any bad pixels present in the output NDF.
+*  To be set false there must be none in the input NDF and none
+*  were copied.
+      CALL NDF_BAD( IN, 'Data,Variance', .TRUE., BADIN, STATUS )
+      BADOUT = BADIN .OR. NBAD .GT. 0
+
+*  Set the bad-pixel flag in the output NDF.
+      CALL NDF_SBAD( BADOUT, OUT, 'Data,Variance', STATUS )
 
 *  End the NDF context.
       CALL NDF_END( STATUS )
