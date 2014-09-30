@@ -106,6 +106,9 @@
 *        - Added argument "move".
 *     12-JUN-2014 (DSB):
 *        Added argument "usexph".
+*     30-SEP-2014 (DSB):
+*        Include a Frame representing JSA all-sky HPX pixel coordinates
+*        within the all-sky WCS.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -198,6 +201,23 @@ AstFitsChan *smf_jsatileheader( int itile, smfJSATiling *skytiling,
       ra_ref = 0.0;
       fc = smfMakeFC( ng, ng, skytiling->ntpf, 1, gx_ref, gy_ref, ra_ref,
                       dec_ref, usexph, status );
+
+/* For HPX, add in an alternate axis descriptions describing the JSA pixel (x,y)
+   coordinate grid. */
+      if( ! usexph ) {
+         astPutFits( fc, "CTYPE1A = 'XJSA'", 1 );
+         astPutFits( fc, "CTYPE2A = 'YJSA'", 1 );
+         astPutFits( fc, "CRVAL1A = -1.0", 1 );
+         astPutFits( fc, "CRVAL2A = -1.0", 1 );
+         sprintf( card, "CRPIX1A = %.15g", gx_ref );
+         astPutFits( fc, card, 1 );
+         sprintf( card, "CRPIX2A = %.15g", gy_ref );
+         astPutFits( fc, card, 1 );
+         sprintf( card, "CDELT1A = %d",skytiling->ppt );
+         astPutFits( fc, card, 1 );
+         sprintf( card, "CDELT2A = %d",skytiling->ppt );
+         astPutFits( fc, card, 1 );
+      }
 
 /* Otherwise, get the number of pixels along one edge of a facet. */
    } else {

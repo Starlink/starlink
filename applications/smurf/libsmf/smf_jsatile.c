@@ -89,6 +89,9 @@
 *        right of the all sky pixel grid.
 *     12-JUN-2014 (DSB):
 *        Added argument "usexph".
+*     30-SEP-2014 (DSB):
+*        Set up correct properties for the JSA_PIXEL Frame, returned within 
+*        the all-sky WCS.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -146,6 +149,7 @@ void smf_jsatile( int itile, smfJSATiling *skytiling, int local_origin, int usex
    int icrpix1;
    int icrpix2;
    int icur;
+   int isky;
    int move;
    int offset;
 
@@ -210,6 +214,21 @@ void smf_jsatile( int itile, smfJSATiling *skytiling, int local_origin, int usex
       astTran2( lfs, 1, point1, point1 + 1, 1, point2, point2 + 1 );
       astSetD( lfs, "SkyRef(1)", point2[ 0 ] );
       astSetD( lfs, "SkyRef(2)", point2[ 1 ] );
+
+/* If an allsky grid was created above, it may contain a Frame
+   representing the all-sky JSA HPX pixel grid. This Frame will have
+   Domain "XJSA-YJSA". Change its Frame attributes to more useful values. */
+      if( itile == -1 && !usexph ) {
+         isky = astGetI( lfs, "Current" );
+         astSetC( lfs, "Current", "XJSA-YJSA" );
+         astSetC( lfs, "Domain", "JSA_PIXEL" );
+         astSetC( lfs, "Label(1)", "JSA pixel coordinate 1" );
+         astSetC( lfs, "Label(2)", "JSA pixel coordinate 2" );
+         astSetC( lfs, "Unit(1)", "pixel" );
+         astSetC( lfs, "Unit(2)", "pixel" );
+         astSetC( lfs, "Title", "JSA all-sky pixel coordinates" );
+         astSetI( lfs, "Current", isky );
+      }
 
 /* If required, create a Region (a Box) describing the tile in GRID coords.
    GRID coords are described by the base Frame in the FrameSet. Reduce the
