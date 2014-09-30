@@ -1112,6 +1112,11 @@ f     - AST_WRITEFITS: Write all cards out to the sink function
 *     9-SEP-2014 (DSB):
 *        Modify Split so that any non-printing characters such as
 *        newlines at the end of the string are ignored.
+*     30-SEP-2014 (DSB):
+*        Modify CnvType to indicate that comment cards cannot be
+*        converted to any other data type. For instance, this causes
+*        a warning to be issued if an equals sign is misplaced in a
+*        WCS-related card (causing it to be treated as a comment card).
 *class--
 */
 
@@ -6748,11 +6753,14 @@ static int CnvType( int otype, void *odata, size_t osize, int type, int undef,
               ( !odata && otype != AST__COMMENT ) ) {
       ret = 0;
 
-/* If there is no data (and therefore this is a comment card), leave the
-   supplied buffers unchanged. */
-   } else if( odata ) {
+/* If there is no data value (and therefore this is a comment card),
+   conversion is only possible if the output type is also a comment. */
+   } else if( !odata ) {
+      if( type != AST__COMMENT ) ret = 0;
 
-/* Do each possible combination of supplied and stored data types... */
+/* Otherwise we have a data value, so do each possible combination of
+   supplied and stored data types... */
+   } else {
 
 /* Convert a AST__FLOAT data value to ... */
       if( otype == AST__FLOAT ){
