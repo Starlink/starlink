@@ -324,7 +324,7 @@ void smurf_jsatileinfo( int *status ) {
               status );
 
 /* Create all-sky map using XPH projection. */
-      if( usexph ) {
+      if( usexph && *status == SAI__OK ) {
 
 /* Loop round every tile index. */
          for( jtile = 0; jtile < skytiling.ntiles; jtile++ ) {
@@ -352,7 +352,7 @@ void smurf_jsatileinfo( int *status ) {
          }
 
 /* Create all-sky map using HPX projection. */
-      } else {
+      } else if( *status == SAI__OK ){
 
 /* Loop round every row and column */
          for( j = 0; j < ubnd[ 1 ] - lbnd[ 1 ] + 1; j++ ) {
