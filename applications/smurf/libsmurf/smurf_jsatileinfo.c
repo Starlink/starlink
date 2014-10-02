@@ -88,6 +88,12 @@
 *     MAXTILE = _INTEGER (Write)
 *        An output parameter to which is written the largest tile index
 *        associated with the instrument specified by parameter INSTRUMENT.
+*     PROJ = LITERAL (Read)
+*        Determines the JSA projection to use. The allowed values are
+*        "HPX" (HPX projection centred on RA=0h), "HPX12" (HPX projection
+*        centred on RA=12h), "XPHN" (XPH projection centred on the north
+*        pole) and "XPHS" (XPH projection centred on the south pole). A
+*        null (!) value causes "HPX" to be used. ["HPX"]
 *     RACEN = LITERAL (Write)
 *        An output parameter to which is written the ICRS Right Ascension
 *        of the tile centre, in radians.
@@ -123,13 +129,6 @@
 *     UBND( 2 ) = _INTEGER (Write)
 *        An output parameter to which are written the upper pixel bounds
 *        of the NDF containing the co-added data for the tile.
-*     USEXPH = LITERAL (Read)
-*        Determines the projection used by the output NDFs. The allowed
-*        values are "North", "South" or "None". A value of "None" causes
-*        the standard JSA equatorial HPX projection to be used. The other
-*        two values cause an XPH (polar HEALPix) projection centred on
-*        the north or south pole to be used. A null (!) value causes "NONE"
-*        to be used. ["None"]
 
 *  Related Applications:
 *     SMURF: MAKECUBE, MAKEMAP, TILELIST.
@@ -160,6 +159,8 @@
 *     8-JUL-2014 (DSB):
 *        Change USEXPH to accept "North", "South" or "None" instead of 1,
 *        -1 and 0.
+*     1-OCT-2014 (DSB):
+*        Change USEXPH to PROJ.
 
 *  Copyright:
 *     Copyright (C) 2011-2014 Science and Technology Facilities Council.
@@ -254,7 +255,6 @@ void smurf_jsatileinfo( int *status ) {
    int indf3;
    int itile;
    int iv;
-   int j;
    int jtile;
    int lbnd[ 2 ];
    int local_origin;
@@ -263,7 +263,7 @@ void smurf_jsatileinfo( int *status ) {
    int tlbnd[ 2 ];
    int tubnd[ 2 ];
    int ubnd[ 2 ];
-   int usexph;
+   smf_jsaproj_t proj;
    int xt;
    int yt;
    smfJSATiling skytiling;
@@ -286,15 +286,10 @@ void smurf_jsatileinfo( int *status ) {
 /* Abort if an error has occurred. */
    if( *status != SAI__OK ) goto L999;
 
-/* Decide what sort of projection (HPX or XPH) to use. */
-   parChoic( "USEXPH", "NONE", "NONE,NORTH,SOUTH", 1, text, sizeof(text), status );
-   if( !strcmp( text, "NORTH" ) ) {
-      usexph = 1;
-   } else if( !strcmp( text, "SOUTH" ) ) {
-      usexph = -1;
-   } else {
-      usexph = 0;
-   }
+/* Decide what sort of projection to use. */
+   parChoic( "PROJ", "HPX", "HPX,HPX12,XPHN,XPHS", 1, text, sizeof(text),
+             status );
+   proj = smf_jsaproj_fromstr( text, 1, status );
 
 /* If required, create an all-sky NDF in which each pixel covers the area
    of a single tile, and holds the integer tile index. The NDF has an
@@ -310,7 +305,7 @@ void smurf_jsatileinfo( int *status ) {
 /* Otherwise, create a FrameSet describing the whole sky in which each
    pixel corresponds to a single tile. */
    } else {
-      smf_jsatile( -1, &skytiling, 0, usexph, NULL, &fs, NULL, lbnd, ubnd,
+      smf_jsatile( -1, &skytiling, 0, proj, NULL, &fs, NULL, lbnd, ubnd,
                    status );
 
 /* Change the bounds of the output NDF. */
@@ -324,20 +319,27 @@ void smurf_jsatileinfo( int *status ) {
               status );
 
 /* Create all-sky map using XPH projection. */
-      if( usexph && *status == SAI__OK ) {
+      if( *status == SAI__OK ) {
 
 /* Loop round every tile index. */
          for( jtile = 0; jtile < skytiling.ntiles; jtile++ ) {
 
-/* Get the zero-based (x,y) indices of the tile within an HPX projection. */
+/* Get the zero-based (x,y) indices of the tile within an HPX projection.
+   This flips the bottom left half-facet up to the top right. */
             smf_jsatilei2xy( jtile, &skytiling, &xt, &yt, NULL, status );
 
 /* Convert these HPX indices to the corresponding indices within the
-   required XPH projection. */
-            smf_jsatilexyconv( &skytiling, usexph, xt, yt, &xt, &yt, status );
+   required projection. Note, the lower left facet is split by the above
+   call to smf_jsatilei2xy tile (i.e. (xt,yt) indices are *not* in the
+   "raw" mode). For instance, (0,0) is not a valid tile. */
+            smf_jsatilexyconv( &skytiling, proj, xt, yt, 0, &xt, &yt, status );
 
-/* Get the vector index of the correspsonding element of the all-sky NDF. */
-            iv = xt + 4*skytiling.ntpf*yt;
+/* Get the vector index of the corresponding element of the all-sky NDF. */
+            if( proj == SMF__JSA_HPX || proj == SMF__JSA_HPX12 ) {
+               iv = xt + 5*skytiling.ntpf*yt;
+            } else {
+               iv = xt + 4*skytiling.ntpf*yt;
+            }
 
 /* Report an error if this element has already been assigned a tile
    index. Otherwise, store the tile index. */
@@ -345,21 +347,9 @@ void smurf_jsatileinfo( int *status ) {
                ipntr[ iv ] = jtile;
             } else if( *status == SAI__OK ) {
                *status = SAI__ERROR;
-               errRepf( "", "All-sky XPH projection assigns multiple "
-                        "tiles to pixel (%d,%d).", status, xt, yt );
+               errRepf( "", "%s projection assigns multiple tiles to "
+                        "pixel (%d,%d).", status, text, xt, yt );
                break;
-            }
-         }
-
-/* Create all-sky map using HPX projection. */
-      } else if( *status == SAI__OK ){
-
-/* Loop round every row and column */
-         for( j = 0; j < ubnd[ 1 ] - lbnd[ 1 ] + 1; j++ ) {
-            for( i = 0; i < ubnd[ 0 ] - lbnd[ 0 ] + 1; i++ ) {
-
-/* Store the tile index at this pixel. */
-               *(ipntr++) = smf_jsatilexy2i( i, j, &skytiling, status );
             }
          }
       }
@@ -399,7 +389,7 @@ void smurf_jsatileinfo( int *status ) {
 
 /* Get the FITS header, FrameSet and Region defining the tile, and the tile
    bounds in pixel indices. */
-   smf_jsatile( itile, &skytiling, local_origin, usexph, &fc, &fs, &region,
+   smf_jsatile( itile, &skytiling, local_origin,  proj, &fc, &fs, &region,
                 lbnd, ubnd, status );
 
 /* Write the FITS headers out to a file, annulling the error if the

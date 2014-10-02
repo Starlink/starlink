@@ -15,6 +15,19 @@ typedef enum {
 } smf_inst_t;
 
 
+/* The four HPX-related projections available for mosaics of JSA
+   tiles. The projection for a mosaic is chosen in order to avoid any
+   discontinuities being present within the mosaic. Individual JSA tiles
+   always use SMF__JSA_HPX. */
+typedef enum {
+  SMF__JSA_NULL,          /* Not an JSA projection */
+  SMF__JSA_HPX,           /* HPX projection centred on RA=0, Dec=0 */
+  SMF__JSA_HPX12,         /* HPX projection centred on RA=12h, Dec=0 */
+  SMF__JSA_XPHN,          /* XPH projection centred on RA=0, Dec=90 */
+  SMF__JSA_XPHS           /* XPH projection centred on RA=0, Dec=-90 */
+} smf_jsaproj_t;
+
+
 /* Struct to store information about the JSA tiling scheme for a given
    JCMT instrument. */
 
@@ -37,14 +50,15 @@ void         smf_jsainstrument( const char *param, AstFitsChan *fc,
                                 smf_inst_t def, smfJSATiling *tiling,
                                 int *status );
 void         smf_jsadicer( int indf, const char *base, int trim,
-                           smf_inst_t instrument, int usexph, size_t *ntile,
-                           Grp *grp, int *status );
-void         smf_jsatile( int itile, smfJSATiling *jsatiling,
-                          int local_origin, int usexph, AstFitsChan **fc,
+                           smf_inst_t instrument, smf_jsaproj_t proj,
+                           size_t *ntile, Grp *grp, int *status );
+void         smf_jsatile( int itile, smfJSATiling *jsatiling, int local_origin,
+                          smf_jsaproj_t proj, AstFitsChan **fc,
                           AstFrameSet **fs, AstRegion **region, int lbnd[2],
                           int ubnd[2], int *status );
-AstFitsChan *smf_jsatileheader( int itile, smfJSATiling *jsatiling,
-                                int local_origin, int usexph, int *move, int *status );
+AstFitsChan *smf_jsatileheader( int itile, smfJSATiling *skytiling,
+                                int local_origin, smf_jsaproj_t proj,
+                                int *move, int *status );
 void         smf_jsatilei2xy( int itile, smfJSATiling *jsatiling, int *xt,
                               int *yt, int *fi, int *status );
 int *        smf_jsatiles_region( AstRegion *region, smfJSATiling *tiling,
@@ -53,9 +67,12 @@ int *        smf_jsatiles_data( ThrWorkForce *wf, Grp *igrp, size_t size,
                                 smfJSATiling *tiling, int *ntile, int *status );
 int          smf_jsatilexy2i( int xt, int yt, smfJSATiling *jsatiling,
                               int *status );
-void         smf_jsatilexyconv( smfJSATiling *skytiling, int usexph, int xt_hpx,
-                                int yt_hpx, int *xt_out, int *yt_out, int *status );
+void         smf_jsatilexyconv( smfJSATiling *skytiling, smf_jsaproj_t proj,
+                                int xt_hpx, int yt_hpx, int raw, int *xt_out,
+                                int *yt_out, int *status );
 void         smf_jsatiling( smf_inst_t instrument, smfJSATiling *jsatiling,
                             int *status );
-
-
+smf_jsaproj_t smf_jsaproj( int ntile, const int *tiles,
+                           smfJSATiling *skytiling, int *status );
+smf_jsaproj_t smf_jsaproj_fromstr( const char *str, int rep, int *status );
+const char * smf_jsaproj_tostr( smf_jsaproj_t proj, int *status );

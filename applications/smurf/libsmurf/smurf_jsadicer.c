@@ -56,19 +56,18 @@
 *        all the output NDFs created by this application via parameter
 *        OUT (one per line). If a null (!) value is supplied no file is
 *        created. [!]
+*     PROJ = LITERAL (Read)
+*        Determines the projection used by the output NDFs. The allowed
+*        values are "HPX" (HPX projection centred on RA=0h), "HPX12" (HPX
+*        projection centred on RA=12h), "XPHN" (XPH projection centred on
+*        the north pole) and "XPHS" (XPH projection centred on the south
+*        pole). A null (!) value causes "HPX" to be used. ["HPX"]
 *     TRIM = _INTEGER (Read)
 *        A zero or negative value results in each output NDF covering the
 *        full area of the corresponding JSAtile. A value of one results in
 *        each output NDF being cropped to the bounds of the supplied NDF. A
 *        value of two or more results in each output NDF being cropped to
 *        remove any blank borders. [2]
-*     USEXPH = LITERAL (Read)
-*        Determines the projection used by the output NDFs. The allowed
-*        values are "North", "South" or "None". A value of "None" causes
-*        the standard JSA equatorial HPX projection to be used. The other
-*        two values cause an XPH (polar HEALPix) projection centred on
-*        the north or south pole to be used. A null (!) value causes "NONE"
-*        to be used. ["None"]
 
 *  Authors:
 *     DSB: David Berry (JAC, Hawaii)
@@ -85,6 +84,8 @@
 *     8-JUL-2014 (DSB):
 *        Change USEXPH to accept "North", "South" or "None" instead of 1,
 *        -1 and 0.
+*     1-OCT-2014 (DSB):
+*        Change USEXPH to PROJ.
 
 *  Copyright:
 *     Copyright (C) 2013-2014 Science and Technology Facilities Council.
@@ -152,10 +153,10 @@ void smurf_jsadicer( int *status ) {
    char text[ 255 ];
    int indf;
    int trim;
-   int usexph;
    size_t ntile;
    size_t size;
    smfJSATiling tiling;
+   smf_jsaproj_t proj;
 
 /* Check inherited status */
    if (*status != SAI__OK) return;
@@ -181,15 +182,10 @@ void smurf_jsadicer( int *status ) {
 /* See how the output NDFs are to be trimmed. */
    parGet0i( "TRIM", &trim, status );
 
-/* Decide what sort of projection (HPX or XPH) to use. */
-   parChoic( "USEXPH", "NONE", "NONE,NORTH,SOUTH", 1, text, sizeof(text), status );
-   if( !strcmp( text, "NORTH" ) ) {
-      usexph = 1;
-   } else if( !strcmp( text, "SOUTH" ) ) {
-      usexph = -1;
-   } else {
-      usexph = 0;
-   }
+/* Decide what sort of projection to use. */
+   parChoic( "PROJ", "HPX", "HPX,HPX12,XPHN,XPHS", 1, text, sizeof(text),
+             status );
+   proj = smf_jsaproj_fromstr( text, 1, status );
 
 /* Get a FitsChan holding the contents of the FITS extension from the
    input NDF. Annul the error if the NDF has no FITS extension. */
@@ -212,7 +208,7 @@ void smurf_jsadicer( int *status ) {
    ogrp = grpNew( "", status );
 
 /* Dice the map into output NDFs. */
-   smf_jsadicer( indf, basename, trim, tiling.instrument, usexph, &ntile,
+   smf_jsadicer( indf, basename, trim, tiling.instrument, proj, &ntile,
                  ogrp, status );
 
 /* Write out the list of output NDF names, annulling the error if a null

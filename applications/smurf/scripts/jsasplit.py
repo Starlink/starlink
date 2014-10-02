@@ -122,6 +122,10 @@
 *     26-JUN-2014 (DSB):
 *        Support input NDFs that straddle a discontinuity in the HPX
 *        projection.
+*     2-OCT-2014 (DSB):
+*        - Let jsatilelist determine the best projection to use for the JSA
+*        grid (HPX, HPX12, XPHN or XPHS).
+*        - Resample the SMURF extension NDFs in the same way as the main NDF.
 *-
 '''
 
@@ -245,59 +249,17 @@ try:
 #  JSADICER requires the input array to be gridded on the JSA all-sky
 #  pixel grid. This is normally an HPX projection, but if the supplied
 #  NDF straddles a discontinuity in the HPX projection then we need to
-#  use an XPH (polar HEALPix) projection instead. So now we see if this
-#  is the case. Initially, assume that we can use a normal HPX projection.
-   usexph = "None"
-
-#  Now loop round all the tiles touched by the supplied NDF.
-   igore_first = -1
-   for tile in tiles:
-
-#  Get the RA and Dec at the centre of the tile, and convert to degrees.
-      invoke( "$SMURF_DIR/jsatileinfo itile={0} instrument={1} quiet".format(tile,instrument) )
-      racen = math.degrees(float(starutil.get_task_par( "RACEN", "jsatileinfo" )))
-      deccen = math.degrees(float(starutil.get_task_par( "DECCEN", "jsatileinfo" )))
-
-#  Ensure the RA is in the range 0 - 360.
-      if racen < 0.0:
-         racen += 360.0
-
-#  The HPX projection is made up of four "gores", each of which spans
-#  90 degrees in RA. Find the zero-based integer index of the gore
-#  containing the current tile.
-      igore = int( racen / 90.0 )
-
-#  Discontinuities only affect tiles in the polar regions of the HPX
-#  projection, so pass on if the Dec is below the value defining the
-#  boundary between polar and equatorial regions. First deal with
-#  northern polar tiles.
-      if deccen > HPX_TRANS:
-
-#  If this is the first polar tile, just record its gore index.
-         if igore_first == -1:
-            igore_first = igore
-
-#  Otherwise, if the current polar tile is in a different gore to the first
-#  polar tile, the NDF straddles a northern HPX discontinuity, so use an
-#  XPH projection centred on the north pole.
-         elif igore != igore_first:
-            usexph = "North"
-            break
-
-#  Now do the same for southern polar tiles. Set usexph to indicate
-#  a southern XPH projection should be used.
-      elif deccen < -HPX_TRANS:
-         if igore_first == -1:
-            igore_first = igore
-         elif igore != igore_first:
-            usexph = "South"
-            break;
+#  use a different flavour of HPX (either an HPX projection centred on
+#  RA=12h or am XPH (polar HEALPix) projection centred on the north or
+#  south pole). The above call to jsatileinfo will have determined the
+#  appropriate projection to use, so get it.
+   proj = starutil.get_task_par( "PROJ", "jsatilelist" )
 
 #  Create a file holding the FITS-WCS header for the first tile, using
-#  an HPX or XPH projection as determined above.
+#  the type of projection determined above.
    head = "{0}/header".format(NDG.tempdir)
    invoke( "$SMURF_DIR/jsatileinfo itile={0} instrument={1} header={2} "
-           "usexph={3} quiet".format(tiles[0],instrument,head,usexph) )
+           "proj={3} quiet".format(tiles[0],instrument,head,proj) )
 
 #  Get the lower pixel index bounds of the first tile.
    lx = int( starutil.get_task_par( "LBND(1)", "jsatileinfo" ) )
@@ -336,11 +298,22 @@ try:
       method = "gauss"
       width = 0.8*pixsize_tile/pixsize_in
 
+#  Create a group of NDFs that need to be split. This is the main
+#  supplied NDF, plus any NDFs in the SMURF extension of the main NDF.
+   subndfs = NDG( "{0}.more.smurf".format(starutil.shell_quote(inndf[0],True)) )
+   ndfstosplit = NDG( [inndf, subndfs ] )
+
+#  Get a corresponding group of intermediate NDFs.
+   jsa_montage = NDG( 1 )
+   ndf_list = []
+   for ndf in ndfstosplit:
+      ndf_list.append( ndf.replace( inndf[0], jsa_montage[0] ) )
+   splitndfs = NDG( ndf_list )
+
 #  Create an intermediate NDF by resampling the supplied NDF onto the pixel
-#  grid of the first tile. Do 2D and 3D separately.
-   jsa_montage = NDG(1)
+#  grid of the first tile. Also resample any sub-NDFs.
    invoke( "$KAPPA_DIR/wcsalign in={0} out={1} ref={2} lbnd=! method={3} "
-           "params=\[0,{4}\]".format(inndf,jsa_montage,ref,method,width) )
+           "params=\[0,{4}\]".format(ndfstosplit,splitndfs,ref,method,width) )
 
 #  Dice this resampled image up into parts corresponding to JSA tiles.
    print( invoke( "$SMURF_DIR/jsadicer in={0} out={1} instrument={2} trim={3}".

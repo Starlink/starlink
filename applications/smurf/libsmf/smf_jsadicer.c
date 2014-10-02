@@ -15,15 +15,16 @@
 
 *  Invocation:
 *     void smf_jsadicer( int indf, const char *base, int trim,
-*                        smf_inst_t instrument, int usexph, size_t *ntile,
-*                        Grp *grp, int *status )
+*                        smf_inst_t instrument, smf_jsaproj_t proj,
+*                        size_t *ntile, Grp *grp, int *status )
 
 *  Arguments:
 *     indf = int (Given)
 *        An identifier for the NDF to be diced. This may be 2D or 3D. The
-*        NDF is assumed to be gridded on the JSA all-sky pixel grid (either
-*        HPX or XPH), and the current Frame of the NDF's WCS FrameSet must
-*        contain an ICRS SkyFrame (but they need not be axes 1 and 2).
+*        NDF is assumed to be gridded on one of the supported JSA all-sky
+*        pixel grids (some flavour of HPX or XPH projection), and the
+*        current Frame of the NDF's WCS FrameSet must contain an ICRS
+*        SkyFrame (but they need not be axes 1 and 2).
 *     base = const char * (Given)
 *        The base path for the output NDFs. Each tile index, preceeded by
 *        and underscore, will be appended to this base name to create the
@@ -36,11 +37,9 @@
 *        remove any blank borders.
 *     instrument = smf_inst_t (Given)
 *        The instrument that created the supplied NDF.
-*     usexph = int (Given)
-*        Specified the projection to use for the created tiles. A value
-*        of zero means use the normal equatorial HPX projection. If greater
-*        than zero, a north polar HEALPix (XPH) projection is used. If
-*        less than zero, a south polar HEALPix (XPH) projection is used.
+*     proj = smf_jsaproj_t (Given)
+*        Specified the projection to use for the created tiles. Should
+*        always be SMF__JSA_HPX, except for debugging or experiments.
 *     ntile = * size_t (Returned)
 *        The number of tiles created.
 *     grp = * Grp (Returned)
@@ -56,9 +55,9 @@
 *     the JSA all-sky pixel grids (either HPX or XPH).
 *
 *     A new output NDF is generated for each tile touched by the supplied
-*     NDF. Each output NDF uses the JSA standard HPX pixel grid. An STC-S
-*     polygon is created describing the spatial outline of the good data
-*     values in the NDF, and stored in NDF extension OUTLINE.
+*     NDF. Each output NDF uses the projection requested by "proj". An
+*     STC-S polygon is created describing the spatial outline of the good
+*     data values in the NDF, and stored in NDF extension OUTLINE.
 *
 *     The zero-based indicies of the created tiles are written to an output
 *     paramater called "JSATILELIST".
@@ -89,7 +88,7 @@
 *     19-JUN-2014 (DSB):
 *        Major changes to allow the input NDF to be in XPH projection.
 *     25-JUN-2014 (DSB):
-*        Added argument "usexph"m to allow the output projection to be
+*        Added argument "usexph" to allow the output projection to be
 *        chosen.
 *     7-JUL-2014 (DSB):
 *        Ensure the output NDFs inherited the Epoch value of the input NDF.
@@ -102,9 +101,11 @@
 *        avoid tailes that span RA=12h being wrapped round to the far
 *        side of the projection, thus producing a huge box.
 *     30-SEP-2014 (DSB):
-*        Only disable lon/lat wrapping for tiles that span RA=12h. The 
-*        other tiles in the split HPX facet require lon/lat wrapping to 
+*        Only disable lon/lat wrapping for tiles that span RA=12h. The
+*        other tiles in the split HPX facet require lon/lat wrapping to
 *        be on, in order to work properly.
+*     1-OCT-2014 (DSB):
+*        Add support for HPX projections centred on RA=12h.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -155,7 +156,7 @@ static void smf1_jsadicer( int indfo, int *olbnd, int *oubnd,
 
 /* Main entry */
 void smf_jsadicer( int indf, const char *base, int trim, smf_inst_t instrument,
-                   int usexph, size_t *ntile, Grp *grp, int *status ){
+                   smf_jsaproj_t proj, size_t *ntile, Grp *grp, int *status ){
 
 /* Local Variables: */
    AstBox *box;
@@ -276,9 +277,9 @@ void smf_jsadicer( int indf, const char *base, int trim, smf_inst_t instrument,
    }
 
 /* Get the bounds of the NDF in pixel indices and the the corresponding
-   double precision GRID bounds (reduce the size of the grid by a amslla
-   mount to avoid problems with tiles that are on the edge of the valid sky
-   regions - astMapRegion can report na error for such tiles). Also store
+   double precision GRID bounds (reduce the size of the grid by a small
+   amount to avoid problems with tiles that are on the edge of the valid sky
+   regions - astMapRegion can report an error for such tiles). Also store
    the GRID coords of the centre. Also count the number of significant
    pixel axes. */
    ndfBound( indf, 3, lbnd, ubnd, &ndim, status );
@@ -388,14 +389,14 @@ void smf_jsadicer( int indf, const char *base, int trim, smf_inst_t instrument,
    for( itile = 0; itile < ntiles && *status == SAI__OK; itile++ ) {
       tile_index = tiles[ itile ];
 
-/* Get the spatial pixel bounds of the current tile within the JSA all-sky
-   pixel grid. Also get the (2D) WCS FrameSet for the tile. */
-      smf_jsatile( tile_index, &tiling, 0, usexph, NULL, &tile_wcs, NULL,
+/* Get the spatial pixel bounds of the current tile within the requested
+   JSA all-sky projection. Also get the (2D) WCS FrameSet for the tile. */
+      smf_jsatile( tile_index, &tiling, 0, proj, NULL, &tile_wcs, NULL,
                    tile_lbnd, tile_ubnd, status );
 
 /* We need the mapping from the N-dimensional input NDF pixel coord. system
    to the  N-dimensional output NDF pixel coord. system. This will be the
-   same for all tiles, so only do it once. */
+   same for all tiles within the requested projection, so only do it once. */
       if( !p2pmap ){
 
 /* Extract the tile pixel->WCS mapping and WCS Frame. We know the indices
@@ -501,10 +502,14 @@ void smf_jsadicer( int indf, const char *base, int trim, smf_inst_t instrument,
                                  lbnd_out + 2, ubnd_out + 2, NULL,
                                  NULL );
 
-/* Tiles that straddle RA=12h will produce very big bounding boxes
-   because half of the tile will be wrapped round to the other side of the
-   all-sky grid. Test for this, and if found, re-calculate the bounding
-   boxes without wrapping WCS values within the WcsMap class. */
+/* Tiles that straddle RA=12h (for SMF__JSA_HPX) or RA=0h (for
+   SMF__JSA_HPX12) will produce very big bounding boxes because half
+   of the tile will be wrapped round to the other side of the all-sky grid.
+   Test for this, and if found, re-calculate the bounding boxes without
+   wrapping WCS values within the WcsMap class. NOTE - we should never
+   find any such tiles because the projection for the input NDF should
+   have been chosen to put the valid data well away from the above RA
+   values). */
       if( ubnd_out[0] - lbnd_out[0] > 10000 ||
           ubnd_out[1] - lbnd_out[1] > 10000 ) {
          old_wrap = astGetWcsWrap;
@@ -794,17 +799,14 @@ static void smf1_jsadicer( int indfo, int *olbnd, int *oubnd,
 *        The mapping from pixel coords in the input NDF to pixel coords in
 *        the output NDF.
 *     ipd = void * (Given)
-*        Pointer to the start of the input data array. It should have
-*        bounds given by "lbnd_tile" and "ubnd_tile". If this is NULL,
+*        Pointer to the start of the input data array. If this is NULL,
 *        the existing contents of the NDF are used as input.
 *     ipv = void * (Given)
-*        Pointer to the start of the input variance array. It should have
-*        bounds given by "lbnd_tile" and "ubnd_tile". Should be NULL if
-*        no variances are available.
+*        Pointer to the start of the input variance array. Should be NULL
+*        if no variances are available.
 *     ipq = unsigned char * (Given)
-*        Pointer to the start of the input quality array. It should have
-*        bounds given by "lbnd_tile" and "ubnd_tile". Should be NULL if
-*        no quality is available.
+*        Pointer to the start of the input quality array. Should be NULL
+*        if no quality is available.
 *     status = int * (Given)
 *        Pointer to the inherited status variable.
 */

@@ -52,6 +52,12 @@
 *        done, or if a Region is supplied for parameter IN, then no dynamic
 *        default is provided, and the user is prompted for a value if none
 *        was supplied on the command line. []
+*     PROJ = LITERAL (Write)
+*        The type of JSA projection that should be used to describe the
+*        area of sky covered by the returned lost of tiles. Will be one of
+*        "HPX", "HPX12", "XPHN" or "XPHS". The choice is made to minimise
+*        the possibility of a projection discontinuity falling within the
+*        sky area covered by the tiles.
 *     TILES(*) = _INTEGER (Write)
 *        An output parameter to which is written the list of integer tile
 *        indices.
@@ -113,6 +119,8 @@
 *     9-MAY-2014 (DSB):
 *        No need to check for science files before calling
 *        smf_jsatiles_data. This speeds things up a lot.
+*     2-OCT-2014 (DSB):
+*        Added PROJ parameter.
 
 *  Copyright:
 *     Copyright (C) 2011,2013,2014 Science and Technology Facilities Council.
@@ -174,6 +182,7 @@ void smurf_jsatilelist( int *status ) {
    AstObject *obj;
    AstRegion *region;
    Grp *igrp = NULL;
+   ThrWorkForce *wf = NULL;
    double vertex_data[ 2*MAXVERT ];
    int *tiles = NULL;
    int i;
@@ -185,7 +194,7 @@ void smurf_jsatilelist( int *status ) {
    int ubnd[2];
    size_t size;
    smfJSATiling tiling;
-   ThrWorkForce *wf = NULL;
+   smf_jsaproj_t proj;
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -285,8 +294,13 @@ void smurf_jsatilelist( int *status ) {
       if( igrp ) grpDelet( &igrp, status);
    }
 
-/* Sort the list of overlapping tiles into ascending order. */
+/* If we got a list of tiles, see what JSA projection should be used to
+   describe the mosaic so that any discontinuities are avoided. */
    if( tiles && *status == SAI__OK ) {
+      proj = smf_jsaproj( ntile, tiles, &tiling, status );
+      parPut0c( "PROJ", smf_jsaproj_tostr( proj, status ), status );
+
+/* Sort the list of overlapping tiles into ascending order. */
       qsort( tiles, ntile, sizeof( *tiles ), jsatilelist_icomp );
 
 /* Display the list of overlapping tiles. */

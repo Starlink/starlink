@@ -126,6 +126,8 @@
 *     26-SEP-2014 (DSB):
 *        Use smurf:jsapaster instead of kappa:paste to stick the tiles
 *        together.
+*     2-OCT-2014 (DSB):
+*        Resample the SMURF extension NDFs in the same way as the main NDF.
 *-
 '''
 
@@ -521,25 +523,37 @@ try:
       method = "gauss"
       width = 0.8*pixsize_ref/pixsize_jsa
 
-#  Create the output NDF by resampling the combined NDF holding all
-#  tiles. Do 2D and 3D separately.
+#  Create a group of NDFs that need to be resampled. This is the
+#  combined NDF holding all tiles, plus any NDFs in its SMURF
+#  extension.
+   subndfs = NDG( "{0}.more.smurf".format(starutil.shell_quote(jsa_montage[0],True)) )
+   ndfstoresample = NDG( [jsa_montage, subndfs ] )
+
+#  Get a corresponding group of output NDFs.
    if region:
       out = outdata
    else:
       out = NDG(1)
 
+   ndf_list = []
+   for ndf in ndfstoresample:
+      ndf_list.append( ndf.replace( jsa_montage[0], out[0] ) )
+   resampledndfs = NDG( ndf_list )
+
+#  Create the output NDF by resampling the combined NDF holding all
+#  tiles. Do 2D and 3D separately.
    if lz == None:
       invoke( "$KAPPA_DIR/wcsalign in={0} out={1} ref={2} lbnd=\[{3},{4}\] "
               "ubnd=\[{5},{6}\] method={7} params=\[0,{8}\]".
-              format(jsa_montage,out,ref,lx,ly,ux,uy,method,width) )
+              format(ndfstoresample,resampledndfs,ref,lx,ly,ux,uy,method,width) )
    else:
       invoke( "$KAPPA_DIR/wcsalign in={0} out={1} ref={2} lbnd=\[{3},{4},{5}\] "
               "ubnd=\[{6},{7},{8}\] method={9} params=\[0,{10}\]".
-              format(jsa_montage,out,ref,lx,ly,lz,ux,uy,uz,method,width) )
+              format(ndfstoresample,resampledndfs,ref,lx,ly,lz,ux,uy,uz,method,width) )
 
 #  If using all input tiles, strip any bad border from the output.
    if region == None:
-      invoke( "$KAPPA_DIR/ndfcopy in={0} out={1} trimbad".format(out,outdata) )
+      invoke( "$KAPPA_DIR/ndfcopy in={0} out={1} trimbad exten=yes".format(out,outdata) )
 
 #  Remove temporary files.
    cleanup()

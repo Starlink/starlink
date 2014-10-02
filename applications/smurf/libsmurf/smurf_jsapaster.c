@@ -122,6 +122,7 @@ void smurf_jsapaster( int *status ) {
    AstFrameSet *iwcs;
    AstFrameSet *refwcs;
    AstFrameSet *refwcs_hpx;
+   AstFrameSet *refwcs_hpx12;
    AstFrameSet *refwcs_xphs;
    AstFrameSet *refwcs_xphn;
    AstKeyMap *km;
@@ -147,6 +148,7 @@ void smurf_jsapaster( int *status ) {
    int indf;
    int isky;
    int lbnd_hpx[ NDF__MXDIM ];
+   int lbnd_hpx12[ NDF__MXDIM ];
    int lbnd_ref[ 2 ];
    int lbnd_xphn[ NDF__MXDIM ];
    int lbnd_xphs[ NDF__MXDIM ];
@@ -156,14 +158,16 @@ void smurf_jsapaster( int *status ) {
    int place;
    int ref_tile;
    int there;
+   int ubnd_hpx12[ NDF__MXDIM ];
    int ubnd_hpx[ NDF__MXDIM ];
    int ubnd_ref[ 2 ];
    int ubnd_xphn[ NDF__MXDIM ];
    int ubnd_xphs[ NDF__MXDIM ];
-   int use_xph;
+   smf_jsaproj_t proj;
    size_t index;
    size_t npix;
    size_t npix_hpx;
+   size_t npix_hpx12;
    size_t npix_xphn;
    size_t npix_xphs;
    size_t size;
@@ -228,8 +232,8 @@ void smurf_jsapaster( int *status ) {
                       status );
 
 /* Get the spatial WCS for the reference tile in HPX projection. */
-   smf_jsatile( ref_tile, &tiling, 0, 0, NULL, &refwcs_hpx, NULL, lbnd_ref,
-                ubnd_ref, status );
+   smf_jsatile( ref_tile, &tiling, 0, SMF__JSA_HPX, NULL, &refwcs_hpx,
+                NULL, lbnd_ref, ubnd_ref, status );
 
 /* Make the PIXEL Frame the base Frame. */
    astSetC( refwcs_hpx, "Base", "PIXEL" );
@@ -242,31 +246,47 @@ void smurf_jsapaster( int *status ) {
    npix_hpx = 1;
    for( idim = 0; idim < ndim; idim++ ) npix_hpx *= dims[ idim ];
 
+/* Now do the same for HPX12 projection (like HPX but centred on RA=12h). */
+   smf_jsatile( ref_tile, &tiling, 0, SMF__JSA_HPX12, NULL, &refwcs_hpx12,
+                NULL, lbnd_ref, ubnd_ref, status );
+   astSetC( refwcs_hpx12, "Base", "PIXEL" );
+   smf_projbox( igrp, refwcs_hpx12, lbnd_hpx12, ubnd_hpx12, dims, status );
+   npix_hpx12 = 1;
+   for( idim = 0; idim < ndim; idim++ ) npix_hpx12 *= dims[ idim ];
+
 /* Now do the same for XPH (north) projection. */
-   smf_jsatile( ref_tile, &tiling, 0, 1, NULL, &refwcs_xphn, NULL, lbnd_ref,
-                ubnd_ref, status );
+   smf_jsatile( ref_tile, &tiling, 0, SMF__JSA_XPHN, NULL, &refwcs_xphn,
+                NULL, lbnd_ref, ubnd_ref, status );
    astSetC( refwcs_xphn, "Base", "PIXEL" );
    smf_projbox( igrp, refwcs_xphn, lbnd_xphn, ubnd_xphn, dims, status );
    npix_xphn = 1;
    for( idim = 0; idim < ndim; idim++ ) npix_xphn *= dims[ idim ];
 
 /* Now do the same for XPH (south) projection. */
-   smf_jsatile( ref_tile, &tiling, 0, -1, NULL, &refwcs_xphs, NULL, lbnd_ref,
-                ubnd_ref, status );
+   smf_jsatile( ref_tile, &tiling, 0, SMF__JSA_XPHS, NULL, &refwcs_xphs,
+                NULL, lbnd_ref, ubnd_ref, status );
    astSetC( refwcs_xphs, "Base", "PIXEL" );
    smf_projbox( igrp, refwcs_xphs, lbnd_xphs, ubnd_xphs, dims, status );
    npix_xphs = 1;
    for( idim = 0; idim < ndim; idim++ ) npix_xphs *= dims[ idim ];
 
 /* Now find the projection which gives the smallest mosaic. */
-   use_xph = 0;
+   proj = SMF__JSA_HPX;
    npix = npix_hpx;
    lbnd = lbnd_hpx;
    ubnd = ubnd_hpx;
    refwcs = refwcs_hpx;
 
+   if( npix_hpx12 < npix ) {
+      proj = SMF__JSA_HPX12;
+      npix = npix_hpx12;
+      lbnd = lbnd_hpx12;
+      ubnd = ubnd_hpx12;
+      refwcs = refwcs_hpx12;
+   }
+
    if( npix_xphn < npix ) {
-      use_xph = 1;
+      proj = SMF__JSA_XPHN;
       npix = npix_xphn;
       lbnd = lbnd_xphn;
       ubnd = ubnd_xphn;
@@ -274,7 +294,7 @@ void smurf_jsapaster( int *status ) {
    }
 
    if( npix_xphs < npix ) {
-      use_xph = -1;
+      proj = SMF__JSA_XPHS;
       npix = npix_xphs;
       lbnd = lbnd_xphs;
       ubnd = ubnd_xphs;
@@ -282,10 +302,15 @@ void smurf_jsapaster( int *status ) {
    }
 
 /* Warn the user if the output will use an XPH projection. */
-   if( use_xph ) {
-      msgOutf( "", "   The output mosaic will use an XPH projection "
-               "centred on the %s pole.", status,
-               ( use_xph > 0 ) ? "north" : "south" );
+   if( proj != SMF__JSA_HPX ) {
+      if( proj != SMF__JSA_HPX12 ) {
+         msgOutf( "", "   The output mosaic will use an HPX projection "
+                  "centred on RA = 12h.", status );
+      } else {
+         msgOutf( "", "   The output mosaic will use an XPH projection "
+                  "centred on the %s pole..", status,
+                  ( proj == SMF__JSA_XPHN ) ? "north" : "south" );
+      }
    }
 
 /* Make GRID coords the base Frame in the reference WCS. */

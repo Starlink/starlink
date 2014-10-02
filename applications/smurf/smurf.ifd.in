@@ -2783,13 +2783,13 @@ package @PACKAGE@ {
                 helpkey *
             }
 
-            parameter usexph {
+            parameter proj {
                 type LITERAL
                 access READ
                 vpath DEFAULT
                 ppath CURRENT DEFAULT
-                prompt {XPH projection pole - north or south}
-                default "None"
+                prompt {JSA projection}
+                default "HPX"
                 helpkey *
             }
         }
@@ -2996,13 +2996,13 @@ package @PACKAGE@ {
                 helpkey *
             }
 
-            parameter usexph {
+            parameter proj {
                 type LITERAL
                 access READ
                 vpath DEFAULT
                 ppath CURRENT DEFAULT
-                prompt {XPH projection pole - north or south}
-                default "None"
+                prompt {JSA projection}
+                default "HPX"
                 helpkey *
             }
 
@@ -3030,6 +3030,14 @@ package @PACKAGE@ {
                 vpath DYNAMIC PROMPT
                 prompt {JCMT instrument}
                 default {SCUBA-2(850)}
+                helpkey *
+            }
+
+            parameter proj {
+                type _CHAR
+                access WRITE
+                vpath DEFAULT
+                default UNKNOWN
                 helpkey *
             }
 

@@ -14,8 +14,8 @@
 
 *  Invocation:
 *     AstFitsChan *smf_jsatileheader( int itile, smfJSATiling *skytiling,
-*                                     int local_origin, int usexph, int *move,
-*                                     int *status )
+*                                     int local_origin, smf_jsaproj_t proj,
+*                                     int *move, int *status )
 
 *  Arguments:
 *     itile = int (Given)
@@ -29,17 +29,20 @@
 *        projection parameters PVi_1 and PVi_2 that causes the origin of
 *        grid coordinates to be moved to the centre of the tile. If zero,
 *        the origin of pixel coordinates will be at RA=0, Dec=0.
-*     usexph = int (Given)
-*        If zero, the tile is projected into pixel space using the standard
-*        HPX projection. If greater than zero, it is projected using an
-*        XPH projection centred on the north pole. If less than zero, it is
-*        projected using an XPH projection centred on the south pole.
+*     proj = smf_jsaproj_t (Given)
+*        The projection to use. This can be an HPX projection centred
+*        either on RA=0 or RA=12h, or an XPH projection centred either
+*        on the north pole or the south pole. When creating an individual
+*        JSA tile, SMF__JSA_HPX (HPX centred on RA=0) should always be
+*        used. When creating a mosaic of JSA tiles, the projection should
+*        be chosen so that no discontinuities cross the mosaic.
 *     move = int * (Returned)
 *        Pointer to an int which is returned non-zero if the tile is in
-*        the bottom left part of the bottom left HPX tile (the one that
-*        is truncated by RA=12 hours). Such tiles should be moved up to
-*        the top right corner of the all-sky grid in pixel coords. May
-*        be NULL. Returned equal to zero if "usexph" is non-zero.
+*        the bottom left part of the bottom left tile of an HPX projection
+*        (truncated by RA=12 hours (SMF__JSA_HPX) or RA=0 hours
+*        (SMF__JSA_HPX12) ). Such tiles should be moved up to the top right
+*        corner of the all-sky grid in pixel coords. May be NULL. Returned
+*        equal to zero if "proj" is SMF__JSA_XPHN or SMF__XHPS
 *     status = int * (Given)
 *        Pointer to the inherited status variable.
 
@@ -48,16 +51,66 @@
 *     holding data from a specified JCMT instrument (or, if "itile" is
 *     -1, a FITS header describing the whole collection of tiles).
 *
-*     The whole sky is covered by an HPX (HEALPix) projection containing
-*     12 basic facets,the reference point (native lon.=0, native lat.=0)
-*     of the projection is put at (RA,Dec)=(0,0) [except for facet six
-*     which has a reference point of (12h,0)], so that native coords
-*     are equivalent to celestial coords. The projection plane is rotated
-*     by 45 degrees so that the edges of each facet are parallel to X and
-*     Y (as in Fig.3 of the A&A paper "Mapping on the HEALPix grid" by
-*     Calabretta and Roukema). Each facet is then divided up into NxN
-*     tiles, where N is given by "skytiling->ntpf". Each tile is then
-*     divided into PxP pixels, where P is given by "skytiling->ppt".
+*     The whole sky is divided into 12 basic HEALPix facets. Each
+*     facet is then divided up into NxN tiles, where N is given by
+*     "skytiling->ntpf". Each tile is then divided into PxP pixels,
+*     where P is given by "skytiling->ppt".
+*
+*     HEALPix facets are numbered from 0 to 11 as defined in the HEALPix
+*     paper (Gorsky et. al. 2005 ApJ 622, 759). Facet zero contains tiles
+*     zero to N*N-1, facet one contains tiles N*N to 2*N*N-1, etc. Within
+*     a facet tiles are indexed using the "nested" scheme described in
+*     the HEALPix paper. This starts with the lowest tile number in the
+*     southern corner of the facet.  The even bits number the position in
+*     the north-east direction and the odd bits number the position in
+*     the north-west direction.
+*
+*     Four flavours of HEALPix projection can be used to map these tiles
+*     onto a pixel grid. Two are based on the HPX projection (see the A&A
+*     paper "Mapping on the HEALPix grid" by Calabretta and Roukema), and
+*     two on the XPH projection ( see the PASA paper "Representing the
+*     ‘Butterfly’ Projection in FITS—Projection Co" by Calabretta
+*     and Lowe). Transforming a tile between any pair of these four
+*     projections just involves a shift and a rotation within pixel
+*     coordinates. The rotation is always a multiple of 90 degrees, and
+*     so the transformation can be performed without degradation using
+*     nearest neighbour resampling or rebinning.
+*
+*     The SMF__JSA_HPX projection is an HPX projection in which the
+*     reference point is at RA=0 Dec=0. The SMF__JSA_HPX12 projection is
+*     an HPX projection in which the reference point is at RA=12h Dec=0.
+*     The SMF__JSA_XPHN projection is an XPH projection in which the
+*     reference point is at the north pole. The SMF__JSA_XPHS projection
+*     is an XPH projection in which the reference point is at the south
+*     pole.
+*
+*     Each of these projections include discontinuities, but these
+*     discontinuities will be at different places on the sky for each
+*     one. When creating a header to describe a large area of the sky
+*     (i.e. larger than one tile), the projection should be chosen to
+*     ensure that the mapped area does not include any discontinuities.
+*     For instance, areas close to the north pole should use SMF__JSA_XPHN,
+*     areas close to the south pole should use SMF__JSA_XPHS, areas close
+*     to RA=0 should use SMF__JSA_HPX, areas close to RA=12h should use
+*     SMF__JSA_HPX12, etc.
+*
+*     Note, in all four projections, the discontinuities run between
+*     tiles, never across tiles. When creating a header for a single
+*     tile, the SMF__JSA_HPX projection should always be used.
+*
+*     The reference point (native lon.=0, native lat.=0) of the
+*     SMF__JSA_HPX projection is put at (RA,Dec)=(0,0) [except for facet
+*     six which has a reference point of (12h,0)], so that native coords
+*     are equivalent to celestial coords. Note, facet six occupies the
+*     bottom left corner of the SMF__JSA_HPX projection plane and covers
+*     an RA range of 9h to 15h - the top right corner of the projection
+*     covers the same area on the sky but has no corresponding tile.
+*     The projection plane is rotated by 45 degrees so that the edges
+*     of each facet are parallel to X and Y (as in Fig.3 of the
+*     Calabretta and Roukema paper).
+*
+*     The bottom left facet of the SMF__JSA_HPX12 projection is split by
+*     the RA=0h line in a similar way.
 *
 *     The projection reference point is at the origin of native longitude
 *     and latitude, which corresponds to the origin of (RA,Dec). However,
@@ -71,18 +124,6 @@
 *     the celestial and pixel coords of an arbitrary point (specified by
 *     projection parameters PVi_1 and PVi_2 for longitude axis "i"). The
 *     point actually used is the centre centre of the requested tile.
-*
-*     HEALPix facets are numbered from 0 to 11 as defined in the HEALPix
-*     paper (Gorsky et. al. 2005 ApJ 622, 759) (note, facet six
-*     occupies the bottom left corner of the projection plane and covers
-*     an RA range of 9h to 15h - the top right corner of the projection
-*     covers the same area on the sky but has no corresponding tile). Facet
-*     zero contains tiles zero to N*N-1, facet one contains tiles N*N to
-*     2*N*N-1, etc. Within a facet tiles are indexed using the "nested"
-*     scheme described in the HEALPix paper. This starts with pixel
-*     zero in the southern corner of the facet.  The even bits number
-*     the position in the north-east direction and the odd bits number
-*     the position in the north-west direction.
 
 *  Authors:
 *     DSB: David S Berry (JAC, UCLan)
@@ -109,6 +150,8 @@
 *     30-SEP-2014 (DSB):
 *        Include a Frame representing JSA all-sky HPX pixel coordinates
 *        within the all-sky WCS.
+*     1-OCT-2014 (DSB):
+*        Allow an HPX projection centred on RA=12 to be used.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -147,7 +190,7 @@
 #include "libsmf/smf.h"
 
 
-#include "libsmf/jsatiles.h"   /* Move this to smf_typ.h and smf.h when done */
+#include "libsmf/jsatiles.h"
 
 /* Prototypes for private functions. */
 static AstFitsChan *smfMakeFC( int nx, int ny, int n, int p, double crpix1,
@@ -155,8 +198,8 @@ static AstFitsChan *smfMakeFC( int nx, int ny, int n, int p, double crpix1,
                                int usexph, int *status );
 
 AstFitsChan *smf_jsatileheader( int itile, smfJSATiling *skytiling,
-                                int local_origin, int usexph, int *move,
-                                int *status ){
+                                int local_origin, smf_jsaproj_t proj,
+                                int *move, int *status ){
 
 /* Local Variables: */
    AstFitsChan *fc = NULL;
@@ -173,6 +216,7 @@ AstFitsChan *smf_jsatileheader( int itile, smfJSATiling *skytiling,
    int fi;            /* Zero-based facet index in range [0,11] */
    int m;             /* The number of pixels along one edge of a facet */
    int ng;            /* The number of tile along one edge of the FITS grid */
+   int usexph;        /* Use an XPH projection? */
    int xt;            /* X offset to the requested tile */
    int yt;            /* Y offset to the requested tile */
 
@@ -182,29 +226,48 @@ AstFitsChan *smf_jsatileheader( int itile, smfJSATiling *skytiling,
 /* Check inherited status */
    if( *status != SAI__OK ) return fc;
 
+/* Initialise things for a SMF__JSA_HPX projection. */
+   usexph = 0;
+   ra_ref = 0.0;
+   dec_ref = 0.0;
+   gx_ref = 0.0;
+   gy_ref = 0.0;
+
 /* If the tile index is -1, produce a header for the whole sky (one
    pixel per tile). */
    if( itile == -1 ) {
 
-      if( usexph > 0 ) {
+      if( proj == SMF__JSA_HPX ) {
+         ng = 5*skytiling->ntpf;
+
+      } else if( proj == SMF__JSA_HPX12 ) {
+         ng = 5*skytiling->ntpf;
+         ra_ref = AST__DPI;
+
+      } else if( proj == SMF__JSA_XPHN ) {
          ng = 4*skytiling->ntpf;
          dec_ref = AST__DPIBY2;
-      } else if( usexph < 0 ) {
+         usexph = 1;
+
+      } else if( proj == SMF__JSA_XPHS ) {
          ng = 4*skytiling->ntpf;
          dec_ref = -AST__DPIBY2;
-      } else {
-         ng = 5*skytiling->ntpf;
-         dec_ref = 0.0;
+         usexph = 1;
+
+      } else if( *status == SAI__OK ){
+         ng = 0;
+         *status = SAI__ERROR;
+         errRepf( "", "smf_jsatileheader: Unsupported projection '%d' "
+                  "requested.", status, proj );
       }
 
-      gx_ref = gy_ref = 0.5*( ng + 1);
-      ra_ref = 0.0;
+      gx_ref = gy_ref = 0.5*( ng + 1 );
       fc = smfMakeFC( ng, ng, skytiling->ntpf, 1, gx_ref, gy_ref, ra_ref,
                       dec_ref, usexph, status );
 
-/* For HPX, add in an alternate axis descriptions describing the JSA pixel (x,y)
-   coordinate grid. */
-      if( ! usexph ) {
+/* For SMF__JSA_HPX, add in an alternate axis descriptions describing the
+   JSA pixel (x,y) coordinate grid. */
+      if(  proj == SMF__JSA_HPX ) {
          astPutFits( fc, "CTYPE1A = 'XJSA'", 1 );
          astPutFits( fc, "CTYPE2A = 'YJSA'", 1 );
          astPutFits( fc, "CRVAL1A = -1.0", 1 );
@@ -225,37 +288,45 @@ AstFitsChan *smf_jsatileheader( int itile, smfJSATiling *skytiling,
 
 /* Convert the supplied tile index into a pair of X and Y offsets that
    give the gaps along the X and Y axes, in tiles, between the bottom left
-   tile in the HPX projection plane and the required tile. This function
-   includes a check that the tile number is valid. */
+   tile in the SMF__JSA_HPX projection plane and the required tile. This
+   function includes a check that the tile number is valid. It also
+   returns the index of the HEALPix facet containing the tile. It does
+   *not* flip the bottom left half-facet up to the top right. */
       smf_jsatilei2xy( itile, skytiling, &xt, &yt, &fi, status );
       if( *status != SAI__OK ) return fc;
 
+/* Convert the (x,y) offsets of the tile within the SMF__JSA_HPX grid to
+   the corresponding offsets in the requested projection. Note, tile
+   (x,y) indices are currently in the "raw" mode, in which the lower left
+   facet is *not* split (i.e. (0,0) is a valid tile). */
+      smf_jsatilexyconv( skytiling, proj, xt, yt, 1, &xt, &yt, status );
+      if( ( xt == VAL__BADI || yt == VAL__BADI ) && *status == SAI__OK ) {
+         *status = SAI__ERROR;
+         errRep( " ", "smf_jsatileheader: converted tile index is bad "
+                "(programming error).", status );
+         return fc;
+      }
+
 /* Choose the sky and pixel coords at the reference point. First deal with
-   XPH projections. The entire XPH projection plane is spanned by four
-   facets along each edge.*/
-      if( usexph ) {
+   XPH projections. */
+      if( proj == SMF__JSA_XPHN || proj == SMF__JSA_XPHS ) {
+         usexph = 1;
 
 /* The reference point is the north or south pole. */
-         ra_ref = 0.0;
-         dec_ref = ( usexph > 0 ) ? AST__DPIBY2 : -AST__DPIBY2;
+         dec_ref = ( proj == SMF__JSA_XPHN ) ? AST__DPIBY2 : -AST__DPIBY2;
 
-/* Convert the (x,y) offsets of the tile within the HPX all-sky grid to
-   the corresponding offsets in the XPH all-sky grid. */
-         smf_jsatilexyconv( skytiling, usexph, xt, yt, &xt, &yt, status );
-
-/* Get the grid coordinates (within the grid frame of the current tile),
+/* Get the grid coordinates (within the grid frame of the requested tile),
    of the projection reference point. The entire XPH projection plane is
    spanned by four facets along each edge. */
          gx_ref = 0.5*( 4.0*m + 1.0 ) - xt*skytiling->ppt;
          gy_ref = 0.5*( 4.0*m + 1.0 ) - yt*skytiling->ppt;
 
-/* Now deal with HPX projections. */
-      } else {
+/* Now deal with SMF_JSA_HPX projections. */
+      } else if( proj == SMF__JSA_HPX ) {
 
-/* Note the RA at the reference point. This is 0 hours except for tiles
-   within facet six. */
+/* Note the RA at the reference point. For SMF__JSA_HPX projections, this
+   is 0 hours except for tiles within facet six. */
          if( fi != 6 ) {
-            ra_ref = 0.0;
 
 /* Get the grid coordinates (within the grid frame of the current tile),
    of the projection reference point. The entire HPX projection plane is
@@ -263,12 +334,12 @@ AstFitsChan *smf_jsatileheader( int itile, smfJSATiling *skytiling,
             gx_ref = 0.5*( 5.0*m + 1.0) - xt*skytiling->ppt;
             gy_ref = 0.5*( 5.0*m + 1.0) - yt*skytiling->ppt;
 
-/* The seventh facet (i.e bottom right, fi==6) in the projection plane is a
-   problem because it is split by the ra = 12hours line into two halfs.
-   When a WcsMap is used transform (x,y) points in the lower left half of
-   this facet, the resulting RA an Dec values will be AST__BAD. To avoid
-   this, we use (ra,dec)=(12h,0) as the reference point for the seventh
-   facet. Note the RA at the reference point. */
+/* The seventh facet (i.e bottom right, fi==6) in the SMF__JSA_HPX
+   projection plane is a problem because it is split by the ra = 12 hours
+   line into two halfs. When a WcsMap is used transform (x,y) points in
+   the lower left half of this facet, the resulting RA an Dec values will
+   be AST__BAD. To avoid this, we use (ra,dec)=(12h,0) as the reference
+   point for the seventh facet. Note the RA at the reference point. */
          } else {
             ra_ref = AST__DPI;
 
@@ -283,8 +354,44 @@ AstFitsChan *smf_jsatileheader( int itile, smfJSATiling *skytiling,
             if( move )  *move = yt < skytiling->ntpf - 1 && xt < skytiling->ntpf - 1 - yt;
          }
 
-/* The Declination at the reference point is zero for all tiles. */
-         dec_ref = 0.0;
+/* Now deal with SMF_JSA_HPX12 projections. */
+      } else if( proj == SMF__JSA_HPX12 ) {
+
+/* Note the RA at the reference point. For SMF__JSA_HPX12 projections, this
+   is 12 hours except for tiles within facet six. */
+         if( fi != 6 ) {
+            ra_ref = AST__DPI;
+
+/* Get the grid coordinates (within the grid frame of the current tile),
+   of the projection reference point. The entire HPX projection plane is
+   spanned by five facets along each edge. */
+            gx_ref = 0.5*( 5.0*m + 1.0) - xt*skytiling->ppt;
+            gy_ref = 0.5*( 5.0*m + 1.0) - yt*skytiling->ppt;
+
+/* The seventh facet (i.e bottom right, fi==6) in the SMF__JSA_HPX12
+   projection plane is a problem because it is split by the ra = 0 hours
+   line into two halfs. When a WcsMap is used transform (x,y) points in
+   the lower left half of this facet, the resulting RA an Dec values will
+   be AST__BAD. To avoid this, we use (ra,dec)=(0h,0) as the reference
+   point for the seventh facet. Note the RA at the reference point. */
+         } else {
+
+/* Get the grid coordinates (within the grid frame of the current tile),
+   of the projection reference point (which is at the centre of the first
+   facet in this case). */
+            gx_ref = 0.5*( m + 1.0) - xt*skytiling->ppt;
+            gy_ref = 0.5*( m + 1.0) - yt*skytiling->ppt;
+
+/* Indicate if the tile is in the lower left section (the section that
+   needs to be moved up to the top right in pixel coords). */
+            if( move )  *move = yt < skytiling->ntpf - 1 && xt < skytiling->ntpf - 1 - yt;
+         }
+
+/* Report an error for an unknown projection. */
+      } else if( *status == SAI__OK ){
+         *status = SAI__ERROR;
+         errRepf( "", "smf_jsatileheader: Unsupported projection '%d' "
+                  "requested.", status, proj );
       }
 
 /* Put the basic header into a FitsChan. */

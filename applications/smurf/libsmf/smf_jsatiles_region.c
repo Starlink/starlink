@@ -165,10 +165,11 @@ int *smf_jsatiles_region( AstRegion *region, smfJSATiling *skytiling,
    }
 
 /* Create a FrameSet describing the whole sky in which each pixel
-   corresponds to a single tile. The current Frame is ICRS (RA,Dec) and
-   the base Frame is grid coords in which each grid pixel corresponds to
-   a single tile. */
-   smf_jsatile( -1, skytiling, 0, 0, NULL, &fs, NULL, lbnd, ubnd, status );
+   corresponds to a single tile in SMF__JSA_HPX projection. The current
+   Frame is ICRS (RA,Dec) and the base Frame is grid coords in which each
+   grid pixel corresponds to a single tile. */
+   smf_jsatile( -1, skytiling, 0, SMF__JSA_HPX, NULL, &fs, NULL, lbnd, ubnd,
+                status );
 
 /* Map the Region using the FrameSet obtained above so that the new Region
    describes offsets in tiles from the lower left tile. If "space_region"
@@ -252,8 +253,8 @@ int *smf_jsatiles_region( AstRegion *region, smfJSATiling *skytiling,
       if( value == -1 ) {
 
 /* Get a Region covering the tile. */
-         smf_jsatile( itile, skytiling, 0, 0, NULL, NULL, &tregion, lbnd, ubnd,
-                      status );
+         smf_jsatile( itile, skytiling, 0, SMF__JSA_HPX, NULL, NULL, &tregion,
+                      lbnd, ubnd, status );
 
 /* See if this Region overlaps the user supplied region. Set the value of
    the KeyMap entry to +1 or 0 accordingly. */

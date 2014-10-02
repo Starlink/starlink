@@ -166,10 +166,12 @@ int *smf_jsatiles_data( ThrWorkForce *wf, Grp *igrp, size_t size,
                             tiling, status );
 
 /* Create a FrameSet describing the whole sky in which each pixel
-   corresponds to a single tile. The current Frame is ICRS (RA,Dec) and
-   the base Frame is grid coords in which each grid pixel corresponds to
-   a single tile. Then invert it so that the current Frame is GRID. */
-         smf_jsatile( -1, tiling, 0, 0, NULL, &fs, NULL, lbnd, ubnd, status );
+   corresponds to a single tile IN smf__jsa_hpx PROJECTION. The current
+   Frame is ICRS (RA,Dec) and the base Frame is grid coords in which each
+   grid pixel corresponds to a single tile. Then invert it so that the
+   current Frame is GRID. */
+         smf_jsatile( -1, tiling, 0, SMF__JSA_HPX, NULL, &fs, NULL, lbnd,
+                      ubnd, status );
          astInvert( fs );
 
 /* Unlock the FrameSet pointer so that it can be locked by the worker

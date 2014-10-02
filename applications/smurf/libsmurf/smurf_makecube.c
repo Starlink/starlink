@@ -2126,8 +2126,8 @@ void smurf_makecube( int *status ) {
          if( jsatiles ) {
             parGet0l( "TRIMTILES", &trimtiles, status );
             grpSetsz( igrp4, 0, status );
-            smf_jsadicer( tndf, oname, trimtiles, SMF__INST_NONE, 0, &njsatile,
-                          igrp4, status );
+            smf_jsadicer( tndf, oname, trimtiles, SMF__INST_NONE,
+                          SMF__JSA_HPX, &njsatile, igrp4, status );
             delete = -1;
          }
 

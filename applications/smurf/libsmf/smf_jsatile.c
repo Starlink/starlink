@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     void smf_jsatile( int itile, smfJSATiling *skytiling, int local_origin,
-*                       int usexph, AstFitsChan **fc, AstFrameSet **fs,
+*                       smf_jsaproj_t proj, AstFitsChan **fc, AstFrameSet **fs,
 *                       AstRegion **region, int lbnd[2], int ubnd[2], int *status )
 
 *  Arguments:
@@ -31,13 +31,13 @@
 *        projection parameters PVi_1 and PVi_2 that causes the origin of
 *        grid coordinates to be moved to the centre of the tile. If zero,
 *        the origin of pixel coordinates will be at RA=0, Dec=0.
-*     usexph = int (Given)
-*        If zero, the tile is projected into pixel space using the standard
-*        HPX projection. If greater than zero, it is projected using an
-*        XPH projection centred on the north pole. If less than zero, it is
-*        projected using an XPH projection centred on the south pole. The
-*        choice of projection changes all the returned values, except for
-*        "region".
+*     proj = smf_jsaproj_t (Given)
+*        The projection to use. This can be an HPX projection centred
+*        either on RA=0 or RA=12h, or an XPH projection centred either
+*        on the north pole or the south pole. When creating an individual
+*        JSA tile, SMF__JSA_HPX (HPX centred on RA=0) should always be
+*        used. When creating a mosaic of JSA tiles, the projection should
+*        be chosen so that no discontinuities cross the mosaic.
 *     fc = AstFitsChan ** (Returned)
 *        Address at which to return a pointer to a FitsChan containing
 *        the FITS headers for the tile. May be NULL.
@@ -90,8 +90,10 @@
 *     12-JUN-2014 (DSB):
 *        Added argument "usexph".
 *     30-SEP-2014 (DSB):
-*        Set up correct properties for the JSA_PIXEL Frame, returned within 
+*        Set up correct properties for the JSA_PIXEL Frame, returned within
 *        the all-sky WCS.
+*     1-OCT-2014 (DSB):
+*        Allow an HPX projection centred on RA=12 to be used.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -131,9 +133,9 @@
 /* Local constants */
 #define DELTA 0.05          /* Pixel offset to avoid edges */
 
-void smf_jsatile( int itile, smfJSATiling *skytiling, int local_origin, int usexph,
-                  AstFitsChan **fc, AstFrameSet **fs, AstRegion **region,
-                  int lbnd[2], int ubnd[2], int *status ) {
+void smf_jsatile( int itile, smfJSATiling *skytiling, int local_origin,
+                  smf_jsaproj_t proj, AstFitsChan **fc, AstFrameSet **fs,
+                  AstRegion **region, int lbnd[2], int ubnd[2], int *status ) {
 
 /* Local Variables: */
    AstFitsChan *lfc = NULL;
@@ -166,7 +168,8 @@ void smf_jsatile( int itile, smfJSATiling *skytiling, int local_origin, int usex
 
 /* Get a FitsChan holding the FITS headers defining the tile WCS and
    extent. */
-   lfc = smf_jsatileheader( itile, skytiling, local_origin, usexph, &move, status );
+   lfc = smf_jsatileheader( itile, skytiling, local_origin, proj, &move,
+                            status );
 
 /* Store the upper bounds of the tile in GRID coords (later changed to
    PIXEL coords). */
@@ -216,9 +219,10 @@ void smf_jsatile( int itile, smfJSATiling *skytiling, int local_origin, int usex
       astSetD( lfs, "SkyRef(2)", point2[ 1 ] );
 
 /* If an allsky grid was created above, it may contain a Frame
-   representing the all-sky JSA HPX pixel grid. This Frame will have
-   Domain "XJSA-YJSA". Change its Frame attributes to more useful values. */
-      if( itile == -1 && !usexph ) {
+   representing the all-sky JSA HPX (SMF__JSA_HPX) pixel grid. This Frame
+   will have Domain "XJSA-YJSA". Change its Frame attributes to more useful
+   values. */
+      if( itile == -1 && proj == SMF__JSA_HPX ) {
          isky = astGetI( lfs, "Current" );
          astSetC( lfs, "Current", "XJSA-YJSA" );
          astSetC( lfs, "Domain", "JSA_PIXEL" );
@@ -250,7 +254,7 @@ void smf_jsatile( int itile, smfJSATiling *skytiling, int local_origin, int usex
 /* Get the integer GRID index that contains the FITS reference point.
    This is basically just the nearest integer to CRPIX, except that
    midway values (i.e. xxx.5) are always rounded in the positive
-   direction, reradgless of whether CRPIX is positive or negative. */
+   direction, regardless of whether CRPIX is positive or negative. */
    if( crpix1 >= 0.0 ) {
       icrpix1 = (int)( crpix1 + 0.5 );
    } else {
@@ -274,19 +278,19 @@ void smf_jsatile( int itile, smfJSATiling *skytiling, int local_origin, int usex
    lbnd[ 0 ] = 1 - icrpix1;
    lbnd[ 1 ] = 1 - icrpix2;
 
-/* Now correct the above bounds if the tile is in a facet that uses RA=12H
-   as the reference (there is only one such facet - the first facet,
-   which is split bottm left and top right of the all-sky map). */
-   if( fabs( crval1 ) > 0.1 ) {
+/* Now correct the above bounds if the tile is in the lower left facet of
+   an HPX projection, which uses a different reference point on the sky. */
+   if( ( proj == SMF__JSA_HPX && fabs( crval1 ) > 0.1 ) ||
+       ( proj == SMF__JSA_HPX12 && fabs( crval1 ) < 0.1 ) ) {
 
 /* The required shift is the same on both pixel axes, and is the number
    of pixels across two facets. */
       offset = 2*skytiling->ntpf*skytiling->ppt;
 
-/* For tiles in the top right half-facet of the all sky map, the current
-   lbnd values are with repect to a pixel origin at the middle of the top
-   right diagonal edge of the all-sky map. Shift them to refer to the
-   centre of the all sky map. */
+/* For tiles that should be in the top right half-facet of the all sky map,
+   the current lbnd values are with repect to a pixel origin at the middle
+   of the top right diagonal edge of the all-sky map. Shift them to refer to
+   the centre of the all sky map. */
       if( move ) {
          lbnd[ 0 ] += offset;
          lbnd[ 1 ] += offset;

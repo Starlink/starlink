@@ -456,7 +456,7 @@ def get_task_par( parname, taskname, **kwargs ):
    return result
 
 
-def shell_quote(text):
+def shell_quote(text,remove=False):
    """
 
    Put single quotes around a string (and escape any embedded single
@@ -470,6 +470,9 @@ def shell_quote(text):
    Arguments:
       command = string
          The full command including directory and arguments. The
+      remove = boolean
+         If True, remove any existing shell quotes rather than
+         adding them.
 
    Returned Value:
       The quoted string.
@@ -477,10 +480,19 @@ def shell_quote(text):
    """
 
    if text != None:
-      if not re.search( "^\s*\'(.*)\'\s*$",text):
-         return "'" + text.replace("'", "'\\''") + "'"
+
+      if remove:
+         match = re.search( "^\s*\'(.*)\'\s*$",text)
+         if match:
+            return match.group(1)
+         else:
+            return text
+
       else:
-         return text
+         if not re.search( "^\s*\'(.*)\'\s*$",text):
+            return "'" + text.replace("'", "'\\''") + "'"
+         else:
+            return text
    else:
       return None
 

@@ -281,6 +281,9 @@ smf_isfft.c \
 smf_iteratemap.c \
 smf_jsainstrument.c \
 smf_jsadicer.c \
+smf_jsaproj.c \
+smf_jsaproj_fromstr.c \
+smf_jsaproj_tostr.c \
 smf_jsatileheader.c \
 smf_jsatile.c \
 smf_jsatiling.c \
