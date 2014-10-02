@@ -1338,10 +1338,8 @@ c 1          CONTINUE
 
       SUBROUTINE TST_INIT
       IMPLICIT NONE
-      OPEN( UNIT = 12, FILE = 'exercise.input', STATUS = 'UNKNOWN',
-     : CARRIAGECONTROL ='LIST' )
-      OPEN( UNIT = 13, FILE = 'exercise.result', STATUS = 'UNKNOWN',
-     : CARRIAGECONTROL ='LIST' )
+      OPEN( UNIT = 12, FILE = 'exercise.input', STATUS = 'UNKNOWN')
+      OPEN( UNIT = 13, FILE = 'exercise.result', STATUS = 'UNKNOWN')
 C  NB Workaround for EMS bug.
       CALL ERR_MARK
       CALL ERR_MARK
