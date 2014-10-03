@@ -1,52 +1,76 @@
-*+ CMP_MODC - Create new string object, or alter existing one
       subroutine cmp_modc(struct, comp, len, ndim, dims, status)
-*    Description :
+*+
+*  Name:
+*     CMP_MODC
+
+*  Purpose:
+*     Create new string object, or alter existing one.
+
+*  Language:
+*     VAX Fortran
+
+*  Invocation:
+*     CALL CMP_MODC(LOC, NAME, LEN, NDIM, DIMS, STATUS)
+
+*  Description:
 *     A structure component of specified string precision and dimensions
 *     is procured.   If no such component exists, then one is created.
 *     If an unsuitable object exists, it is altered or replaced.
-*    Invocation :
-*     CALL CMP_MODC(LOC, NAME, LEN, NDIM, DIMS; STATUS)
-*    Parameters :
+
+*  Arguments:
 *     LOC=CHARACTER*(DAT__SZLOC)
-*           Variable containing a locator associated with a structured
-*           data object.
+*        Variable containing a locator associated with a structured
+*        data object.
 *     NAME=CHARACTER*(*)
-*           Expression specifying the name of the component to be
-*           created in the structure.
+*        Expression specifying the name of the component to be
+*        created in the structure.
 *     LEN=INTEGER
-*           Expression specifying the number of characters per value.
+*        Expression specifying the number of characters per value.
 *     NDIM=INTEGER
-*           Expression specifying the number of object dimensions.
+*        Expression specifying the number of object dimensions.
 *     DIMS(NDIM)=INTEGER
-*           Array containing the object dimensions.
+*        Array containing the object dimensions.
 *     STATUS=INTEGER
-*           Variable holding the status value. If this variable is not
-*           SAI__OK on input, the routine will return without action.
-*           If the routine fails to complete, this variable will be
-*           set to an appropriate error number.
-*    Method :
+*        Variable holding the status value. If this variable is not
+*        SAI__OK on input, the routine will return without action.
+*        If the routine fails to complete, this variable will be
+*        set to an appropriate error number.
+
+*  Algorithm:
 *     See if it exists.   If it does not exist, create it.
 *     If it does exist, see that it matches the required
 *     type and dimensions.
 *     If it exists, but does not match, delete it and create
 *     a new component.
-*    Authors :
-*     Jack Giddings (UCL::JRG)
-*    History :
-*     3-JAN-1983:  Original.  (UCL::JRG)
-*     11-MAR-1987: Remove calls to ERR_ANNUL
-*                  correct call dat_erase   (RAL::AJC)
-*     15-APR-1987:  Improved prologue layout (RAL::AJC)
-*    Deficiencies :
+
+*  Implementation Deficiencies:
 *     It does not attempt to use DAT_ALTER if the mis-match is only
 *     in the dimensions, rather than the dimensionality or type.
-*    Global constants :
+
+*  Authors:
+*     Jack Giddings (UCL::JRG)
+*     {enter_new_authors_here}
+
+*  History:
+*     3-JAN-1983:  Original.  (UCL::JRG)
+*     11-MAR-1987: Remove calls to ERR_ANNUL
+*        correct call dat_erase   (RAL::AJC)
+*     15-APR-1987:  Improved prologue layout (RAL::AJC)
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'CMP_CONST'
       INCLUDE 'CMP_ERR'
       INCLUDE 'DAT_ERR'
-*    Import :
+
+*  Arguments Given:
       character*(*) struct		! Structure Locator
       character*(*) comp		! Component Name
       integer len			! String precision
@@ -54,9 +78,11 @@
       integer dims(*)			! Object dimensions
 *    Status return :
       integer status			! Status Return
-*    External references :
+
+*  External References:
       logical chr_simlr			! Caseless string equality
-*    Local variables :
+
+*  Local Variables:
       character*(DAT__SZLOC) loc	! Component locator
       character*(DAT__SZTYP) atype	! Actual type
       integer alen			! Actual string precision
@@ -64,7 +90,9 @@
       integer adims(DAT__MXDIM)		! Actual dimensions
       integer i				! Loop index
       logical there                     ! If component there
-*-
+
+*.
+
 
       if (status .ne. SAI__OK) return
 

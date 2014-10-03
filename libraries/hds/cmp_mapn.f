@@ -1,74 +1,103 @@
-*+ CMP_MAPN - Map component as n-dimensional array
       subroutine cmp_mapn(struct, comp, type, mode, ndim, ptr,
      :  dims, status)
-*    Description :
+*+
+*  Name:
+*     CMP_MAPN
+
+*  Purpose:
+*     Map component as n-dimensional array.
+
+*  Language:
+*     VAX Fortran
+
+*  Invocation:
+*     CALL CMP_MAPN(LOC, NAME, TYPE, MODE, NDIM, PNTR, DIMS, STATUS)
+
+*  Description:
 *     This routine maps a primitive component of a structure for
 *     reading, writing or updating.   The caller is expected to know
 *     the number of object dimensions, NDIM.   The object dimensions
 *     are returned in the array, DIMS(NDIM).
-*    Invocation :
-*     CALL CMP_MAPN(LOC, NAME, TYPE, MODE, NDIM; PNTR, DIMS, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     LOC=CHARACTER*(DAT__SZLOC)
-*           Variable containing a locator associated with a structured
-*           data object.
+*        Variable containing a locator associated with a structured
+*        data object.
 *     NAME=CHARACTER*(*)
-*           Expression specifying the component name of a primitive
-*           object contained in the structure.
+*        Expression specifying the component name of a primitive
+*        object contained in the structure.
 *     TYPE=CHARACTER*(*)
-*           Expression specifying the data type of the mapped values.
-*           If the actual type of the data object differs from this,
-*           then conversion will be performed in 'READ' and 'UPDATE'
-*           modes.
+*        Expression specifying the data type of the mapped values.
+*        If the actual type of the data object differs from this,
+*        then conversion will be performed in 'READ' and 'UPDATE'
+*        modes.
 *     MODE=CHARACTER*(*)
-*           Expression specifying the mode in which the data are to be
-*           mapped.  (Either 'READ', 'WRITE' or 'UPDATE'.)
+*        Expression specifying the mode in which the data are to be
+*        mapped.  (Either 'READ', 'WRITE' or 'UPDATE'.)
 *     NDIM=INTEGER
-*           Expression specifying the number of array dimensions.
-*           This must match the actual number of object dimensions.
+*        Expression specifying the number of array dimensions.
+*        This must match the actual number of object dimensions.
 *     PNTR=INTEGER
-*           Variable to receive the virtual memory pointer for the
-*           mapped values.   This can be used in conjunction with the
-*           VAX Fortran "%VAL" construct.
+*        Variable to receive the virtual memory pointer for the
+*        mapped values.   This can be used in conjunction with the
+*        VAX Fortran "%VAL" construct.
 *     DIMS(NDIM)=INTEGER
-*           Array to receive the dimensions of the object mapped.
+*        Array to receive the dimensions of the object mapped.
 *     STATUS=INTEGER
-*           Variable holding the status value. If this variable is not
-*           SAI__OK on input, the routine will return without action.
-*           If the routine fails to complete, this variable will be
-*           set to an appropriate error number.
-*    Method :
+*        Variable holding the status value. If this variable is not
+*        SAI__OK on input, the routine will return without action.
+*        If the routine fails to complete, this variable will be
+*        set to an appropriate error number.
+
+*  Algorithm:
 *     Check that the component is not already mapped.   Find
 *     a slot in the Component Table.  Map in data values.
 *     Update Component Table based on outcome.
-*    Authors :
+
+*  Authors:
 *     Jack Giddings (UCL::JRG)
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     3-JAN-1982:  Original.  (UCL::JRG)
 *     15-APR-1987:  Improved prologue layout (RAL::AJC)
-*    Global constants :
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'CMP_CONST'
       INCLUDE 'CMP_ERR'
-*    Import :
+
+*  Arguments Given:
       character*(*) struct		! Structure Locator
       character*(*) comp		! Component Name
       character*(*) type		! Access type
       character*(*) mode		! Access mode
       integer ndim			! Number of dimensions required
-*    Export :
+
+*  Arguments Returned:
       integer ptr			! Address pointer
       integer dims(*)			! Actual object dimensions
 *    Status return :
       integer status			! Status Return
-*    External references :
+
+*  External References:
       logical chr_simlr			! Caseless string equality
-*    Global variables :
+
+*  Global Variables:
       INCLUDE 'CMP_CCT'
-*    Local variables :
+
+*  Local Variables:
       integer index			! Table index
-*-
+
+*.
+
 
 *    Allowed to execute ?
       if (status .ne. SAI__OK) then

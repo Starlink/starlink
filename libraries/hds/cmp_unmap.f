@@ -1,54 +1,82 @@
-*+ CMP_UNMAP - Unmap structure component
       subroutine cmp_unmap(struct, comp, status)
-*    Description :
+*+
+*  Name:
+*     CMP_UNMAP
+
+*  Purpose:
+*     Unmap structure component.
+
+*  Language:
+*     VAX Fortran
+
+*  Invocation:
+*     CALL CMP_UNMAP(LOC, NAME, STATUS)
+
+*  Description:
 *     Unmap a structure component, previously mapped with CMP_MAPV
 *     or CMP_MAPN.
-*    Invocation :
-*     CALL CMP_UNMAP(LOC, NAME; STATUS)
-*    Parameters :
+
+*  Arguments:
 *     LOC=CHARACTER*(DAT__SZLOC)
-*           Variable containing a locator associated with a structured
-*           data object.
+*        Variable containing a locator associated with a structured
+*        data object.
 *     NAME=CHARACTER*(*)
-*           Expression specifying the component name of a primitive
-*           object contained in the structure.
+*        Expression specifying the component name of a primitive
+*        object contained in the structure.
 *     STATUS=INTEGER
-*           Variable holding the status value.
-*           The routine will attempt to execute regardless of the input
-*           value of this variable.
-*           If its input value is not SAI__OK then it is left unchanged
-*           by this routine, even if it fails to complete.
-*           If its input value is SAI__OK and this routine fails, then
-*           the value is changed to an appropriate error number.
-*    Method :
+*        Variable holding the status value.
+*        The routine will attempt to execute regardless of the input
+*        value of this variable.
+*        If its input value is not SAI__OK then it is left unchanged
+*        by this routine, even if it fails to complete.
+*        If its input value is SAI__OK and this routine fails, then
+*        the value is changed to an appropriate error number.
+
+*  Algorithm:
 *     Find index in Component Table.   Unmap the object.
 *     Annul its Locator and table entry.
-*    Authors :
+
+*  Authors:
 *     Jack Giddings (UCL::JRG)
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     3-JAN-1983:  Original.  (UCL::JRG)
 *     15-APR-1987:  Improved prologue layout (RAL::AJC)
 *     5-JUN-1991 (RFWS):
 *        Fixed bug causing OK status to be returned if status was bad
 *        on entry and the specified component was not mapped.
-*    Global constants :
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'CMP_CONST'
       INCLUDE 'CMP_ERR'
-*    Import :
+
+*  Arguments Given:
       character*(*) struct		! Structure Locator
       character*(*) comp		! Component Name
 *    Status return :
       integer status			! Status Return
-*    External references :
+
+*  External References:
       logical chr_simlr			! Caseless string equality
-*    Global variables :
+
+*  Global Variables:
       INCLUDE 'CMP_CCT'
-*    Local variables :
+
+*  Local Variables:
       integer index			! Table index
       integer istat			! Local status
-*-
+
+*.
+
 
       istat = status
       status = SAI__OK

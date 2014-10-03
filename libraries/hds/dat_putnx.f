@@ -1,71 +1,96 @@
-*+ DAT_PUTNC - Write object values as an n-dimensional array
       subroutine dat_putnC(loc, ndim, maxd, values, actd, status)
-*    Description :
+*+
+*  Name:
+*     DAT_PUTNC
+
+*  Purpose:
+*     Write object values as an n-dimensional array.
+
+*  Language:
+*     VAX Fortran
+
+*  Invocation:
+*     CALL DAT_PUTNC(LOC, NDIM, MAXDIM, VALUES, ACTDIM, STATUS)
+
+*  Description:
 *     Write the values into an n-dimensional primitive object.
 *     The supplied number of dimensions, NDIM, is expected to match the
 *     actual number of object dimensions.   The dimensions, MAXDIM, of
 *     the program array must be of sufficient size (along each axis)
 *     to contain the object array.
 *     There is a routine for each access type,
-*
+
 *        DAT_PUTND    DOUBLE PRECISION
 *        DAT_PUTNR    REAL
 *        DAT_PUTNI    INTEGER
 *        DAT_PUTNL    LOGICAL
 *        DAT_PUTNC    CHARACTER[*n]
-*
+
 *     If the object data type differs from the access type, then
 *     conversion is performed.
-*    Invocation :
-*     CALL DAT_PUTNC(LOC, NDIM, MAXDIM, VALUES, ACTDIM; STATUS)
-*    Parameters :
+
+*  Arguments:
 *     LOC=CHARACTER*(DAT__SZLOC)
-*           Variable containing a locator associated with a primitive
-*           data object.
+*        Variable containing a locator associated with a primitive
+*        data object.
 *     NDIM=INTEGER
-*           Expression specifying the number of dimensions of the
-*           program array, VALUES.   This must match the actual number
-*           of object dimensions.
+*        Expression specifying the number of dimensions of the
+*        program array, VALUES.   This must match the actual number
+*        of object dimensions.
 *     MAXDIM(NDIM)=INTEGER
-*           Array specifying the dimensions of the program array
-*           containing the data values.
+*        Array specifying the dimensions of the program array
+*        containing the data values.
 *     VALUES(*)=CHARACTER*(*)
-*           Array containing the values to be written into the object.
+*        Array containing the values to be written into the object.
 *     ACTDIM(NDIM)=INTEGER
-*           Array containing the actual object dimensions.  These must
-*           match the actual object dimensions.
+*        Array containing the actual object dimensions.  These must
+*        match the actual object dimensions.
 *     STATUS=INTEGER
-*           Variable holding the status value. If this variable is not
-*           SAI__OK on input, the routine will return without action.
-*           If the routine fails to complete, this variable will be
-*           set to an appropriate error number.
-*    Method :
+*        Variable holding the status value. If this variable is not
+*        SAI__OK on input, the routine will return without action.
+*        If the routine fails to complete, this variable will be
+*        set to an appropriate error number.
+
+*  Algorithm:
 *     Use DAT_SHAPE to get the object dimensions, and check that
 *     it is contained in the supplied array.
 *     Treate the 0-D and 1-D cases directly using the
 *     DAT_PUTC routine;  treate the n-D case by a series of calls
 *     to DAT_VEC and DAT_PUTC, copying blocks where the program
 *     and array dimensions concur.
-*    Authors :
+
+*  Authors:
 *     Jack Giddings (UCL::JRG)
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     3-JAN-1983:  Original.  (UCL::JRG)
 *     05.11.1984:   Remove calls to error system (REVAD::BDK)
 *     15-APR-1987:  Improved prologue layout (RAL::AJC)
-*    Global constants :
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'DAT_ERR'
-*    Import :
+
+*  Arguments Given:
       character*(*) loc			! Object Locator
       integer ndim			! Number of dimensions
       integer maxd(*)			! Program array dimensions
       CHARACTER*(*) values(*)			! Array to receive values
       integer actd(*)			! Object dimensions
-*    Export :
+
+*  Arguments Returned:
 *    Status return :
       integer status			! Status Return
-*    Local variables :
+
+*  Local Variables:
       character*(DAT__SZLOC) whole	! Whole object as vector
       character*(DAT__SZLOC) vec	! Locator for Vector Slice
       integer size			! object size
@@ -79,7 +104,9 @@
       integer nblock			! number of transfer blocks
       integer i				! loop index
       integer dims(1)
-*-
+
+*.
+
 
       if (status .eq. SAI__OK) then
 *       Enquire object size and shape
@@ -154,74 +181,99 @@
       endif
 
       end
-*+ DAT_PUTND - Write object values as an n-dimensional array
       subroutine dat_putnD(loc, ndim, maxd, values, actd, status)
-*    Description :
+*+
+*  Name:
+*     DAT_PUTND
+
+*  Purpose:
+*     Write object values as an n-dimensional array.
+
+*  Language:
+*     VAX Fortran
+
+*  Invocation:
+*     CALL DAT_PUTND(LOC, NDIM, MAXDIM, VALUES, ACTDIM, STATUS)
+
+*  Description:
 *     Write the values into an n-dimensional primitive object.
 *     The supplied number of dimensions, NDIM, is expected to match the
 *     actual number of object dimensions.   The dimensions, MAXDIM, of
 *     the program array must be of sufficient size (along each axis)
 *     to contain the object array.
 *     There is a routine for each access type,
-*
+
 *        DAT_PUTND    DOUBLE PRECISION
 *        DAT_PUTNR    REAL
 *        DAT_PUTNI    INTEGER
 *        DAT_PUTNL    LOGICAL
 *        DAT_PUTNC    CHARACTER[*n]
-*
+
 *     If the object data type differs from the access type, then
 *     conversion is performed.
-*    Invocation :
-*     CALL DAT_PUTND(LOC, NDIM, MAXDIM, VALUES, ACTDIM; STATUS)
-*    Parameters :
+
+*  Arguments:
 *     LOC=CHARACTER*(DAT__SZLOC)
-*           Variable containing a locator associated with a primitive
-*           data object.
+*        Variable containing a locator associated with a primitive
+*        data object.
 *     NDIM=INTEGER
-*           Expression specifying the number of dimensions of the
-*           program array, VALUES.   This must match the actual number
-*           of object dimensions.
+*        Expression specifying the number of dimensions of the
+*        program array, VALUES.   This must match the actual number
+*        of object dimensions.
 *     MAXDIM(NDIM)=INTEGER
-*           Array specifying the dimensions of the program array
-*           containing the data values.
+*        Array specifying the dimensions of the program array
+*        containing the data values.
 *     VALUES(*)=DOUBLE PRECISION
-*           Array containing the values to be written into the object.
+*        Array containing the values to be written into the object.
 *     ACTDIM(NDIM)=INTEGER
-*           Array containing the actual object dimensions.  These must
-*           match the actual object dimensions.
+*        Array containing the actual object dimensions.  These must
+*        match the actual object dimensions.
 *     STATUS=INTEGER
-*           Variable holding the status value. If this variable is not
-*           SAI__OK on input, the routine will return without action.
-*           If the routine fails to complete, this variable will be
-*           set to an appropriate error number.
-*    Method :
+*        Variable holding the status value. If this variable is not
+*        SAI__OK on input, the routine will return without action.
+*        If the routine fails to complete, this variable will be
+*        set to an appropriate error number.
+
+*  Algorithm:
 *     Use DAT_SHAPE to get the object dimensions, and check that
 *     it is contained in the supplied array.
 *     Treate the 0-D and 1-D cases directly using the
 *     DAT_PUTD routine;  treate the n-D case by a series of calls
 *     to DAT_VEC and DAT_PUTD, copying blocks where the program
 *     and array dimensions concur.
-*    Authors :
+
+*  Authors:
 *     Jack Giddings (UCL::JRG)
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     3-JAN-1983:  Original.  (UCL::JRG)
 *     05.11.1984:   Remove calls to error system (REVAD::BDK)
 *     15-APR-1987:  Improved prologue layout (RAL::AJC)
-*    Global constants :
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'DAT_ERR'
-*    Import :
+
+*  Arguments Given:
       character*(*) loc			! Object Locator
       integer ndim			! Number of dimensions
       integer maxd(*)			! Program array dimensions
       DOUBLE PRECISION values(*)			! Array to receive values
       integer actd(*)			! Object dimensions
-*    Export :
+
+*  Arguments Returned:
 *    Status return :
       integer status			! Status Return
-*    Local variables :
+
+*  Local Variables:
       character*(DAT__SZLOC) whole	! Whole object as vector
       character*(DAT__SZLOC) vec	! Locator for Vector Slice
       integer size			! object size
@@ -235,7 +287,9 @@
       integer nblock			! number of transfer blocks
       integer i				! loop index
       integer dims(1)
-*-
+
+*.
+
 
       if (status .eq. SAI__OK) then
 *       Enquire object size and shape
@@ -310,74 +364,99 @@
       endif
 
       end
-*+ DAT_PUTNI - Write object values as an n-dimensional array
       subroutine dat_putnI(loc, ndim, maxd, values, actd, status)
-*    Description :
+*+
+*  Name:
+*     DAT_PUTNI
+
+*  Purpose:
+*     Write object values as an n-dimensional array.
+
+*  Language:
+*     VAX Fortran
+
+*  Invocation:
+*     CALL DAT_PUTNI(LOC, NDIM, MAXDIM, VALUES, ACTDIM, STATUS)
+
+*  Description:
 *     Write the values into an n-dimensional primitive object.
 *     The supplied number of dimensions, NDIM, is expected to match the
 *     actual number of object dimensions.   The dimensions, MAXDIM, of
 *     the program array must be of sufficient size (along each axis)
 *     to contain the object array.
 *     There is a routine for each access type,
-*
+
 *        DAT_PUTND    DOUBLE PRECISION
 *        DAT_PUTNR    REAL
 *        DAT_PUTNI    INTEGER
 *        DAT_PUTNL    LOGICAL
 *        DAT_PUTNC    CHARACTER[*n]
-*
+
 *     If the object data type differs from the access type, then
 *     conversion is performed.
-*    Invocation :
-*     CALL DAT_PUTNI(LOC, NDIM, MAXDIM, VALUES, ACTDIM; STATUS)
-*    Parameters :
+
+*  Arguments:
 *     LOC=CHARACTER*(DAT__SZLOC)
-*           Variable containing a locator associated with a primitive
-*           data object.
+*        Variable containing a locator associated with a primitive
+*        data object.
 *     NDIM=INTEGER
-*           Expression specifying the number of dimensions of the
-*           program array, VALUES.   This must match the actual number
-*           of object dimensions.
+*        Expression specifying the number of dimensions of the
+*        program array, VALUES.   This must match the actual number
+*        of object dimensions.
 *     MAXDIM(NDIM)=INTEGER
-*           Array specifying the dimensions of the program array
-*           containing the data values.
+*        Array specifying the dimensions of the program array
+*        containing the data values.
 *     VALUES(*)=INTEGER
-*           Array containing the values to be written into the object.
+*        Array containing the values to be written into the object.
 *     ACTDIM(NDIM)=INTEGER
-*           Array containing the actual object dimensions.  These must
-*           match the actual object dimensions.
+*        Array containing the actual object dimensions.  These must
+*        match the actual object dimensions.
 *     STATUS=INTEGER
-*           Variable holding the status value. If this variable is not
-*           SAI__OK on input, the routine will return without action.
-*           If the routine fails to complete, this variable will be
-*           set to an appropriate error number.
-*    Method :
+*        Variable holding the status value. If this variable is not
+*        SAI__OK on input, the routine will return without action.
+*        If the routine fails to complete, this variable will be
+*        set to an appropriate error number.
+
+*  Algorithm:
 *     Use DAT_SHAPE to get the object dimensions, and check that
 *     it is contained in the supplied array.
 *     Treate the 0-D and 1-D cases directly using the
 *     DAT_PUTI routine;  treate the n-D case by a series of calls
 *     to DAT_VEC and DAT_PUTI, copying blocks where the program
 *     and array dimensions concur.
-*    Authors :
+
+*  Authors:
 *     Jack Giddings (UCL::JRG)
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     3-JAN-1983:  Original.  (UCL::JRG)
 *     05.11.1984:   Remove calls to error system (REVAD::BDK)
 *     15-APR-1987:  Improved prologue layout (RAL::AJC)
-*    Global constants :
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'DAT_ERR'
-*    Import :
+
+*  Arguments Given:
       character*(*) loc			! Object Locator
       integer ndim			! Number of dimensions
       integer maxd(*)			! Program array dimensions
       INTEGER values(*)			! Array to receive values
       integer actd(*)			! Object dimensions
-*    Export :
+
+*  Arguments Returned:
 *    Status return :
       integer status			! Status Return
-*    Local variables :
+
+*  Local Variables:
       character*(DAT__SZLOC) whole	! Whole object as vector
       character*(DAT__SZLOC) vec	! Locator for Vector Slice
       integer size			! object size
@@ -391,7 +470,9 @@
       integer nblock			! number of transfer blocks
       integer i				! loop index
       integer dims(1)
-*-
+
+*.
+
 
       if (status .eq. SAI__OK) then
 *       Enquire object size and shape
@@ -466,74 +547,99 @@
       endif
 
       end
-*+ DAT_PUTNL - Write object values as an n-dimensional array
       subroutine dat_putnL(loc, ndim, maxd, values, actd, status)
-*    Description :
+*+
+*  Name:
+*     DAT_PUTNL
+
+*  Purpose:
+*     Write object values as an n-dimensional array.
+
+*  Language:
+*     VAX Fortran
+
+*  Invocation:
+*     CALL DAT_PUTNL(LOC, NDIM, MAXDIM, VALUES, ACTDIM, STATUS)
+
+*  Description:
 *     Write the values into an n-dimensional primitive object.
 *     The supplied number of dimensions, NDIM, is expected to match the
 *     actual number of object dimensions.   The dimensions, MAXDIM, of
 *     the program array must be of sufficient size (along each axis)
 *     to contain the object array.
 *     There is a routine for each access type,
-*
+
 *        DAT_PUTND    DOUBLE PRECISION
 *        DAT_PUTNR    REAL
 *        DAT_PUTNI    INTEGER
 *        DAT_PUTNL    LOGICAL
 *        DAT_PUTNC    CHARACTER[*n]
-*
+
 *     If the object data type differs from the access type, then
 *     conversion is performed.
-*    Invocation :
-*     CALL DAT_PUTNL(LOC, NDIM, MAXDIM, VALUES, ACTDIM; STATUS)
-*    Parameters :
+
+*  Arguments:
 *     LOC=CHARACTER*(DAT__SZLOC)
-*           Variable containing a locator associated with a primitive
-*           data object.
+*        Variable containing a locator associated with a primitive
+*        data object.
 *     NDIM=INTEGER
-*           Expression specifying the number of dimensions of the
-*           program array, VALUES.   This must match the actual number
-*           of object dimensions.
+*        Expression specifying the number of dimensions of the
+*        program array, VALUES.   This must match the actual number
+*        of object dimensions.
 *     MAXDIM(NDIM)=INTEGER
-*           Array specifying the dimensions of the program array
-*           containing the data values.
+*        Array specifying the dimensions of the program array
+*        containing the data values.
 *     VALUES(*)=LOGICAL
-*           Array containing the values to be written into the object.
+*        Array containing the values to be written into the object.
 *     ACTDIM(NDIM)=INTEGER
-*           Array containing the actual object dimensions.  These must
-*           match the actual object dimensions.
+*        Array containing the actual object dimensions.  These must
+*        match the actual object dimensions.
 *     STATUS=INTEGER
-*           Variable holding the status value. If this variable is not
-*           SAI__OK on input, the routine will return without action.
-*           If the routine fails to complete, this variable will be
-*           set to an appropriate error number.
-*    Method :
+*        Variable holding the status value. If this variable is not
+*        SAI__OK on input, the routine will return without action.
+*        If the routine fails to complete, this variable will be
+*        set to an appropriate error number.
+
+*  Algorithm:
 *     Use DAT_SHAPE to get the object dimensions, and check that
 *     it is contained in the supplied array.
 *     Treate the 0-D and 1-D cases directly using the
 *     DAT_PUTL routine;  treate the n-D case by a series of calls
 *     to DAT_VEC and DAT_PUTL, copying blocks where the program
 *     and array dimensions concur.
-*    Authors :
+
+*  Authors:
 *     Jack Giddings (UCL::JRG)
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     3-JAN-1983:  Original.  (UCL::JRG)
 *     05.11.1984:   Remove calls to error system (REVAD::BDK)
 *     15-APR-1987:  Improved prologue layout (RAL::AJC)
-*    Global constants :
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'DAT_ERR'
-*    Import :
+
+*  Arguments Given:
       character*(*) loc			! Object Locator
       integer ndim			! Number of dimensions
       integer maxd(*)			! Program array dimensions
       LOGICAL values(*)			! Array to receive values
       integer actd(*)			! Object dimensions
-*    Export :
+
+*  Arguments Returned:
 *    Status return :
       integer status			! Status Return
-*    Local variables :
+
+*  Local Variables:
       character*(DAT__SZLOC) whole	! Whole object as vector
       character*(DAT__SZLOC) vec	! Locator for Vector Slice
       integer size			! object size
@@ -547,7 +653,9 @@
       integer nblock			! number of transfer blocks
       integer i				! loop index
       integer dims(1)
-*-
+
+*.
+
 
       if (status .eq. SAI__OK) then
 *       Enquire object size and shape
@@ -622,74 +730,99 @@
       endif
 
       end
-*+ DAT_PUTNR - Write object values as an n-dimensional array
       subroutine dat_putnR(loc, ndim, maxd, values, actd, status)
-*    Description :
+*+
+*  Name:
+*     DAT_PUTNR
+
+*  Purpose:
+*     Write object values as an n-dimensional array.
+
+*  Language:
+*     VAX Fortran
+
+*  Invocation:
+*     CALL DAT_PUTNR(LOC, NDIM, MAXDIM, VALUES, ACTDIM, STATUS)
+
+*  Description:
 *     Write the values into an n-dimensional primitive object.
 *     The supplied number of dimensions, NDIM, is expected to match the
 *     actual number of object dimensions.   The dimensions, MAXDIM, of
 *     the program array must be of sufficient size (along each axis)
 *     to contain the object array.
 *     There is a routine for each access type,
-*
+
 *        DAT_PUTND    DOUBLE PRECISION
 *        DAT_PUTNR    REAL
 *        DAT_PUTNI    INTEGER
 *        DAT_PUTNL    LOGICAL
 *        DAT_PUTNC    CHARACTER[*n]
-*
+
 *     If the object data type differs from the access type, then
 *     conversion is performed.
-*    Invocation :
-*     CALL DAT_PUTNR(LOC, NDIM, MAXDIM, VALUES, ACTDIM; STATUS)
-*    Parameters :
+
+*  Arguments:
 *     LOC=CHARACTER*(DAT__SZLOC)
-*           Variable containing a locator associated with a primitive
-*           data object.
+*        Variable containing a locator associated with a primitive
+*        data object.
 *     NDIM=INTEGER
-*           Expression specifying the number of dimensions of the
-*           program array, VALUES.   This must match the actual number
-*           of object dimensions.
+*        Expression specifying the number of dimensions of the
+*        program array, VALUES.   This must match the actual number
+*        of object dimensions.
 *     MAXDIM(NDIM)=INTEGER
-*           Array specifying the dimensions of the program array
-*           containing the data values.
+*        Array specifying the dimensions of the program array
+*        containing the data values.
 *     VALUES(*)=REAL
-*           Array containing the values to be written into the object.
+*        Array containing the values to be written into the object.
 *     ACTDIM(NDIM)=INTEGER
-*           Array containing the actual object dimensions.  These must
-*           match the actual object dimensions.
+*        Array containing the actual object dimensions.  These must
+*        match the actual object dimensions.
 *     STATUS=INTEGER
-*           Variable holding the status value. If this variable is not
-*           SAI__OK on input, the routine will return without action.
-*           If the routine fails to complete, this variable will be
-*           set to an appropriate error number.
-*    Method :
+*        Variable holding the status value. If this variable is not
+*        SAI__OK on input, the routine will return without action.
+*        If the routine fails to complete, this variable will be
+*        set to an appropriate error number.
+
+*  Algorithm:
 *     Use DAT_SHAPE to get the object dimensions, and check that
 *     it is contained in the supplied array.
 *     Treate the 0-D and 1-D cases directly using the
 *     DAT_PUTR routine;  treate the n-D case by a series of calls
 *     to DAT_VEC and DAT_PUTR, copying blocks where the program
 *     and array dimensions concur.
-*    Authors :
+
+*  Authors:
 *     Jack Giddings (UCL::JRG)
-*    History :
+*     {enter_new_authors_here}
+
+*  History:
 *     3-JAN-1983:  Original.  (UCL::JRG)
 *     05.11.1984:   Remove calls to error system (REVAD::BDK)
 *     15-APR-1987:  Improved prologue layout (RAL::AJC)
-*    Global constants :
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Global Constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'DAT_ERR'
-*    Import :
+
+*  Arguments Given:
       character*(*) loc			! Object Locator
       integer ndim			! Number of dimensions
       integer maxd(*)			! Program array dimensions
       REAL values(*)			! Array to receive values
       integer actd(*)			! Object dimensions
-*    Export :
+
+*  Arguments Returned:
 *    Status return :
       integer status			! Status Return
-*    Local variables :
+
+*  Local Variables:
       character*(DAT__SZLOC) whole	! Whole object as vector
       character*(DAT__SZLOC) vec	! Locator for Vector Slice
       integer size			! object size
@@ -703,7 +836,9 @@
       integer nblock			! number of transfer blocks
       integer i				! loop index
       integer dims(1)
-*-
+
+*.
+
 
       if (status .eq. SAI__OK) then
 *       Enquire object size and shape
