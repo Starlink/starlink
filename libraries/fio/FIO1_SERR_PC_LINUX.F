@@ -15,6 +15,7 @@
 
 *  Copyright:
 *     Copyright (C) 2005-2007 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2014 Science and Technology Research Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -39,6 +40,9 @@
 *  History:
 *    2005-SEP-12 (PWD):
 *       First version.
+*    2014-OCT-03 (PWD):
+*       Add fix for gfortran which sends 5001, LIBERROR_OPTION_CONFLICT
+*       when reading after a file is already positioned at the end of file.
 
 *-
 
@@ -110,7 +114,7 @@
 
 #elif defined(__GNUC__) && __GNUC__ >= 4
 
-      DATA FIOERN/ FIO__INVRG, FIO__INVRG, FIO__INVKY, FIO__ALOPN,
+      DATA FIOERN/ FIO__ENDFL, FIO__INVRG, FIO__INVKY, FIO__ALOPN,
      :             FIO__UNTNO, FIO__ERFMT, FIO__IVACM, FIO__ENDFL,
      :             FIO__RDER,  FIO__RDER,  FIO__RDER,  FIO__INVRG,
      :             FIO__ILOPU, FIO__INSVR, FIO__OUTOV, FIO__OFEOR,
@@ -118,6 +122,8 @@
 
 * Gfortran errors:
 * ERROR_OPTION_CONFLICT 5001  "Conflicting statement options"
+*                              also read past end of file of end of file
+*                              use this section option
 * ERROR_BAD_OPTION      5002  "Bad statement option"
 * ERROR_MISSING_OPTION  5003  "Missing statement option"
 * ERROR_ALREADY_OPEN    5004  "File already opened in another unit"
