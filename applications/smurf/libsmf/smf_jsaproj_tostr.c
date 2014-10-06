@@ -13,13 +13,11 @@
 *     C function
 
 *  Invocation:
-*     const char *smf_jsaproj_tostr( smf_jsaproj_t proj, int *status )
+*     const char *smf_jsaproj_tostr( smf_jsaproj_t proj )
 
 *  Arguments:
 *     proj = smf_jsaproj_t (Given)
 *        The JSA projection identifier.
-*     status = int * (Given)
-*        Pointer to the inherited status variable.
 
 *  Returned Value:
 *     The corresponding string - one of "HPX", "HPX12", "XPHN" or "XPHS".
@@ -71,16 +69,10 @@
 #include "libsmf/smf.h"
 #include "libsmf/jsatiles.h"
 
-const char *smf_jsaproj_tostr( smf_jsaproj_t proj, int *status ){
+const char *smf_jsaproj_tostr( smf_jsaproj_t proj ){
 
 /* Local Variables: */
    const char *result;
-
-/* Initialise the returned value. */
-   result = "HPX";
-
-/* Check inherited status */
-   if( *status != SAI__OK ) return result;
 
 /* Do it. */
    if( proj == SMF__JSA_HPX ) {
@@ -96,9 +88,7 @@ const char *smf_jsaproj_tostr( smf_jsaproj_t proj, int *status ){
       result = "XPHS";
 
    } else {
-      *status = SAI__ERROR;
-      errRepf( " ", "smf_jsaproj_tostr: Unsupported JSA projection type "
-               "(%d) supplied.", status, proj );
+      result = "Unknown JSA projection";
    }
 
    return result;

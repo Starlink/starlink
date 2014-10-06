@@ -275,7 +275,7 @@ void smf_getrefwcs( const char *param, Grp *igrp, AstFrameSet **specwcs,
                msgOutf( " ", "The %s will be created on the JSA %s "
                         "pixel grid.", status,
                         (data->hdr->instrument==INST__ACSIS)?"cube":"map",
-                        smf_jsaproj_tostr( proj, status ) );
+                        smf_jsaproj_tostr( proj ) );
 
 /* All tiles within the same JSA projection use the same WCS, so we get
    the WCS FrameSet for an arbitrary central tile, and use it for the

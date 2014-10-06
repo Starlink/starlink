@@ -298,7 +298,7 @@ void smurf_jsatilelist( int *status ) {
    describe the mosaic so that any discontinuities are avoided. */
    if( tiles && *status == SAI__OK ) {
       proj = smf_jsaproj( ntile, tiles, &tiling, status );
-      parPut0c( "PROJ", smf_jsaproj_tostr( proj, status ), status );
+      parPut0c( "PROJ", smf_jsaproj_tostr( proj ), status );
 
 /* Sort the list of overlapping tiles into ascending order. */
       qsort( tiles, ntile, sizeof( *tiles ), jsatilelist_icomp );

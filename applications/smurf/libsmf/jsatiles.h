@@ -75,4 +75,4 @@ void         smf_jsatiling( smf_inst_t instrument, smfJSATiling *jsatiling,
 smf_jsaproj_t smf_jsaproj( int ntile, const int *tiles,
                            smfJSATiling *skytiling, int *status );
 smf_jsaproj_t smf_jsaproj_fromstr( const char *str, int rep, int *status );
-const char * smf_jsaproj_tostr( smf_jsaproj_t proj, int *status );
+const char * smf_jsaproj_tostr( smf_jsaproj_t proj );
