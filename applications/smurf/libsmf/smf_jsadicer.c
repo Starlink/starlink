@@ -483,6 +483,12 @@ void smf_jsadicer( int indf, const char *base, int trim, smf_inst_t instrument,
       p2pmap = astSimplify( p2pmap );
       astInvert( tile_map );
 
+/* Show the bounds of the tile within the input NDF. */
+      msgOutiff( MSG__DEBUG, "", "   tile %d has bounds (%d:%d,%d:%d) "
+                 "within the output NDF.", status, tile_index,
+                 tile_lbnd[ 0 ], tile_ubnd[ 0 ], tile_lbnd[ 1 ],
+                 tile_ubnd[ 1 ] );
+
 /* Next job is to find the pixel bounds of the output NDF to create
    which will hold data for the current tile. First map the pixel bounds
    of the whole tile from output to input. */
@@ -529,6 +535,12 @@ void smf_jsadicer( int indf, const char *base, int trim, smf_inst_t instrument,
       ubnd_tile[ 0 ] = floor( ubnd_out[ 0 ] ) + 1;
       ubnd_tile[ 1 ] = floor( ubnd_out[ 1 ] ) + 1;
       ubnd_tile[ 2 ] = floor( ubnd_out[ 2 ] ) + 1;
+
+/* Show the bounds of the tile within the input NDF. */
+      msgOutiff( MSG__DEBUG, "", "   tile %d has bounds (%d:%d,%d:%d) "
+                 "within the input NDF.", status, tile_index,
+                 lbnd_tile[ 0 ], ubnd_tile[ 0 ], lbnd_tile[ 1 ],
+                 ubnd_tile[ 1 ] );
 
 /* If required, trim the bounds to the extent of the input NDF. */
       if( trim ) {
@@ -734,6 +746,10 @@ void smf_jsadicer( int indf, const char *base, int trim, smf_inst_t instrument,
          created_tiles = astGrow( created_tiles, ++(*ntile),
                                   sizeof( *created_tiles ) );
          if( *status == SAI__OK ) created_tiles[ *ntile - 1 ] = tile_index;
+
+      } else {
+         msgOutiff( MSG__DEBUG, "", "   Tile %d does not overlap the input "
+                    "NDF after trimming.", status, tile_index );
       }
    }
    msgBlank( status );
