@@ -389,7 +389,7 @@ def invoke(command,aslist=False,buffer=None,annul=False):
 
 def get_fits_header( ndf, keyword, report=False ):
    try:
-      there = invoke("$KAPPA_DIR/fitsmod {0} edit=exist keyword={1}".format( ndf, keyword ), False )
+      there = invoke("$KAPPA_DIR/fitsmod {0} edit=exist keyword={1}".format( ndf, keyword ), False ).strip()
       if there == "TRUE":
          value = invoke("$KAPPA_DIR/fitsmod {0} edit=print keyword={1}".format( ndf, keyword ), False )
       else:
