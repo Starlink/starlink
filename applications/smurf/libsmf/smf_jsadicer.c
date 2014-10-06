@@ -106,6 +106,11 @@
 *        be on, in order to work properly.
 *     1-OCT-2014 (DSB):
 *        Add support for HPX projections centred on RA=12h.
+*     6-OCT-2014 (DSB):
+*        The split tile (bottom-left/top-right) will have a different WCS
+*        to the other since it uses a different reference point. So we need
+*        to get"p2pmap" separately for every tile, rather than just re-using 
+*        the p2pmap from the first tile.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -394,95 +399,89 @@ void smf_jsadicer( int indf, const char *base, int trim, smf_inst_t instrument,
       smf_jsatile( tile_index, &tiling, 0, proj, NULL, &tile_wcs, NULL,
                    tile_lbnd, tile_ubnd, status );
 
-/* We need the mapping from the N-dimensional input NDF pixel coord. system
-   to the  N-dimensional output NDF pixel coord. system. This will be the
-   same for all tiles within the requested projection, so only do it once. */
-      if( !p2pmap ){
-
 /* Extract the tile pixel->WCS mapping and WCS Frame. We know the indices
    of the required Frames because they are hard-wired in smf_jsatile. */
-         tile_map = astGetMapping( tile_wcs, 3, 2 );
-         tile_frm = astGetFrame( tile_wcs, 2 );
+      tile_map = astGetMapping( tile_wcs, 3, 2 );
+      tile_frm = astGetFrame( tile_wcs, 2 );
 
 /* Find the indices of the grid and pixel frames in the input NDF. */
-         ipixel = -1;
-         igrid = astGetI( iwcs, "Base" );
-         nfrm = astGetI( iwcs, "NFrame" );
-         for( ifrm = 0; ifrm < nfrm; ifrm++ ) {
-            dom = astGetC( astGetFrame( iwcs, ifrm + 1 ), "Domain" );
-            if( astChrMatch( dom, "PIXEL" ) ) ipixel = ifrm + 1;
-         }
+      ipixel = -1;
+      igrid = astGetI( iwcs, "Base" );
+      nfrm = astGetI( iwcs, "NFrame" );
+      for( ifrm = 0; ifrm < nfrm; ifrm++ ) {
+         dom = astGetC( astGetFrame( iwcs, ifrm + 1 ), "Domain" );
+         if( astChrMatch( dom, "PIXEL" ) ) ipixel = ifrm + 1;
+      }
 
 /* If required, extract the pixel->spectral mapping and spectral frame in
    the input NDF, and add it in parallel with the above tile mapping. */
-         if( ndim == 3 ) {
-            astSetI( iwcs, "Base", ipixel );
-            tfs = atlFrameSetSplit( iwcs, "DSBSPECTRUM SPECTRUM", NULL,
-                                    NULL, status );
-            astSetI( iwcs, "Base", igrid );
-            if( tfs ) {
-               specmap = astGetMapping( tfs, AST__BASE, AST__CURRENT );
-               specfrm = astGetFrame( tfs, AST__CURRENT );
-            } else if( *status == SAI__OK ) {
-               *status = SAI__ERROR;
-               ndfMsg( "N", indf );
-               errRep( "", "smf_jsadicer: Cannot find the spectral axis "
-                       "in '^N'.", status );
-            }
-
-            tile_map = (AstMapping *) astCmpMap( tile_map, specmap, 0, " " );
-            tile_frm = (AstFrame *) astCmpFrame( tile_frm, specfrm, " " );
+      if( ndim == 3 ) {
+         astSetI( iwcs, "Base", ipixel );
+         tfs = atlFrameSetSplit( iwcs, "DSBSPECTRUM SPECTRUM", NULL,
+                                 NULL, status );
+         astSetI( iwcs, "Base", igrid );
+         if( tfs ) {
+            specmap = astGetMapping( tfs, AST__BASE, AST__CURRENT );
+            specfrm = astGetFrame( tfs, AST__CURRENT );
+         } else if( *status == SAI__OK ) {
+            *status = SAI__ERROR;
+            ndfMsg( "N", indf );
+            errRep( "", "smf_jsadicer: Cannot find the spectral axis "
+                    "in '^N'.", status );
          }
 
+         tile_map = (AstMapping *) astCmpMap( tile_map, specmap, 0, " " );
+         tile_frm = (AstFrame *) astCmpFrame( tile_frm, specfrm, " " );
+      }
+
 /* Ensure the Epoch is inherited form the input NDF. */
-         astSetD( tile_frm, "Epoch", astGetD( iwcs, "Epoch" ) );
+      astSetD( tile_frm, "Epoch", astGetD( iwcs, "Epoch" ) );
 
 /* Currently tile axis 1 is RA, axis 2 is Dec and axis 3 (if present) is
    spectral. Append a PermMap that re-orders these tile WCS axes to match
    those of the NDF. */
-         outperm[ axlon - 1 ] = 1;
-         outperm[ axlat - 1 ] = 2;
-         outperm[ axspec - 1 ] = 3;
-         inperm[ 0 ] = axlon;
-         inperm[ 1 ] = axlat;
-         inperm[ 2 ] = axspec;
-         tile_map = (AstMapping *) astCmpMap( tile_map, astPermMap( ndim, inperm,
-                                                                    ndim, outperm,
-                                                                    NULL, " " ),
-                                              1, " " );
-         tile_map = astSimplify( tile_map );
+      outperm[ axlon - 1 ] = 1;
+      outperm[ axlat - 1 ] = 2;
+      outperm[ axspec - 1 ] = 3;
+      inperm[ 0 ] = axlon;
+      inperm[ 1 ] = axlat;
+      inperm[ 2 ] = axspec;
+      tile_map = (AstMapping *) astCmpMap( tile_map, astPermMap( ndim, inperm,
+                                                                 ndim, outperm,
+                                                                 NULL, " " ),
+                                           1, " " );
+      tile_map = astSimplify( tile_map );
 
 /* Also re-order the WCS axes in the tile frame. */
-         astPermAxes( tile_frm, outperm );
+      astPermAxes( tile_frm, outperm );
 
 /* We want the zero-based indicies of the input pixel axes corresponding
    to ra, dec and spectral. So find the indicies of the pixel axes in the
    supplied NDF that are most closely aligned with each WCS axis. */
-         atlPairAxes( iwcs, NULL, gcen, NULL, inperm, status );
-         if( inperm[ 0 ] == axlon ) {
-            lonax = 0;
-         } else if( inperm[ 1 ] == axlon ) {
-            lonax = 1;
-         } else {
-            lonax = 2;
-         }
-         if( inperm[ 0 ] == axlat ) {
-            latax = 0;
-         } else if( inperm[ 1 ] == axlat ) {
-            latax = 1;
-         } else {
-            latax = 2;
-         }
+      atlPairAxes( iwcs, NULL, gcen, NULL, inperm, status );
+      if( inperm[ 0 ] == axlon ) {
+         lonax = 0;
+      } else if( inperm[ 1 ] == axlon ) {
+         lonax = 1;
+      } else {
+         lonax = 2;
+      }
+      if( inperm[ 0 ] == axlat ) {
+         latax = 0;
+      } else if( inperm[ 1 ] == axlat ) {
+         latax = 1;
+      } else {
+         latax = 2;
+      }
 
 /* To get the mapping from pixel coords in the input NDF to pixel coords
    in the output NDF, we invert the above mapping so that it goes from WCS
    to pixel, and append it to the end of the NDF pixel->WCS mapping. */
-         ndf_map = astGetMapping( iwcs, ipixel, AST__CURRENT );
-         astInvert( tile_map );
-         p2pmap = (AstMapping *) astCmpMap( ndf_map, tile_map, 1, " " );
-         p2pmap = astSimplify( p2pmap );
-         astInvert( tile_map );
-      }
+      ndf_map = astGetMapping( iwcs, ipixel, AST__CURRENT );
+      astInvert( tile_map );
+      p2pmap = (AstMapping *) astCmpMap( ndf_map, tile_map, 1, " " );
+      p2pmap = astSimplify( p2pmap );
+      astInvert( tile_map );
 
 /* Next job is to find the pixel bounds of the output NDF to create
    which will hold data for the current tile. First map the pixel bounds
