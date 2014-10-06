@@ -357,9 +357,10 @@ AstFitsChan *smf_jsatileheader( int itile, smfJSATiling *skytiling,
 /* Now deal with SMF_JSA_HPX12 projections. */
       } else if( proj == SMF__JSA_HPX12 ) {
 
-/* Note the RA at the reference point. For SMF__JSA_HPX12 projections, this
-   is 12 hours except for tiles within facet six. */
-         if( fi != 6 ) {
+/* Note the RA at the reference point. For SMF__JSA_HPX12 projections,
+   this is 12 hours except for tiles within facet four (the equivalent of
+   facet 6 in HPX). */
+         if( fi != 4 ) {
             ra_ref = AST__DPI;
 
 /* Get the grid coordinates (within the grid frame of the current tile),
@@ -368,12 +369,12 @@ AstFitsChan *smf_jsatileheader( int itile, smfJSATiling *skytiling,
             gx_ref = 0.5*( 5.0*m + 1.0) - xt*skytiling->ppt;
             gy_ref = 0.5*( 5.0*m + 1.0) - yt*skytiling->ppt;
 
-/* The seventh facet (i.e bottom right, fi==6) in the SMF__JSA_HPX12
+/* The fifth facet (i.e bottom right, fi==4) in the SMF__JSA_HPX12
    projection plane is a problem because it is split by the ra = 0 hours
    line into two halfs. When a WcsMap is used transform (x,y) points in
    the lower left half of this facet, the resulting RA an Dec values will
    be AST__BAD. To avoid this, we use (ra,dec)=(0h,0) as the reference
-   point for the seventh facet. Note the RA at the reference point. */
+   point for the fifth facet. Note the RA at the reference point. */
          } else {
 
 /* Get the grid coordinates (within the grid frame of the current tile),
@@ -440,7 +441,11 @@ AstFitsChan *smf_jsatileheader( int itile, smfJSATiling *skytiling,
       }
 
 /* Add the zero based tile index into the header. */
-      sprintf( card, "JCMTTILE= %d", itile );
+      sprintf( card, "JSATILE = %d", itile );
+      astPutFits( fc, card, 1 );
+
+/* Add the JSA projection type into the header. */
+      sprintf( card, "JSAPROJ = '%s'", smf_jsaproj_tostr( proj ) );
       astPutFits( fc, card, 1 );
    }
 

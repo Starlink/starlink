@@ -94,6 +94,12 @@
 *        the all-sky WCS.
 *     1-OCT-2014 (DSB):
 *        Allow an HPX projection centred on RA=12 to be used.
+*     3-OCT-2014 (DSB):
+*        Most edge tiles are bisected by a discontinuity, which can
+*        prevent the tile centre and region being determined. If this
+*        occurs, try to determine the centre and region for the requested
+*        tile using a different JSA projection (which will have different
+*        discontinuities).
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -131,7 +137,7 @@
 #include "libsmf/jsatiles.h"
 
 /* Local constants */
-#define DELTA 0.05          /* Pixel offset to avoid edges */
+#define DELTA 0.05 /* Pixel offset to avoid edges */
 
 void smf_jsatile( int itile, smfJSATiling *skytiling, int local_origin,
                   smf_jsaproj_t proj, AstFitsChan **fc, AstFrameSet **fs,
@@ -139,7 +145,9 @@ void smf_jsatile( int itile, smfJSATiling *skytiling, int local_origin,
 
 /* Local Variables: */
    AstFitsChan *lfc = NULL;
+   AstFitsChan *tfc = NULL;
    AstFrameSet *lfs = NULL;
+   AstFrameSet *tfs = NULL;
    AstRegion *lregion = NULL;
    double crpix1;
    double crpix2;
@@ -148,12 +156,15 @@ void smf_jsatile( int itile, smfJSATiling *skytiling, int local_origin,
    double point2[ 2 ];
    double shift[ 2 ];
    double tmp;
+   int edge_tile;
    int icrpix1;
    int icrpix2;
    int icur;
    int isky;
    int move;
    int offset;
+   int tubnd[ 2];
+   smf_jsaproj_t tproj;
 
 /* Initialise the returned pointers. */
    if( fc ) *fc = NULL;
@@ -210,14 +221,6 @@ void smf_jsatile( int itile, smfJSATiling *skytiling, int local_origin,
       astSetI( lfs, "Digits(1)", 8 );
       astSetI( lfs, "Digits(2)", 8 );
 
-/* Find the sky coords at the centre of the tile and use as the sky
-   reference position. */
-      point1[ 0 ] = ( ubnd[ 0 ] + 1.0 )/2.0;
-      point1[ 1 ] = ( ubnd[ 1 ] + 1.0 )/2.0;
-      astTran2( lfs, 1, point1, point1 + 1, 1, point2, point2 + 1 );
-      astSetD( lfs, "SkyRef(1)", point2[ 0 ] );
-      astSetD( lfs, "SkyRef(2)", point2[ 1 ] );
-
 /* If an allsky grid was created above, it may contain a Frame
    representing the all-sky JSA HPX (SMF__JSA_HPX) pixel grid. This Frame
    will have Domain "XJSA-YJSA". Change its Frame attributes to more useful
@@ -234,20 +237,110 @@ void smf_jsatile( int itile, smfJSATiling *skytiling, int local_origin,
          astSetI( lfs, "Current", isky );
       }
 
+/* Loop until we have found a projection in which the tile centre and
+   region can be determined (i.e. a projection in which the tile is not an
+   edge tile). */
+      tfs = astClone( lfs );
+      tubnd[ 0 ] = ubnd[ 0 ];
+      tubnd[ 1 ] = ubnd[ 1 ];
+      tproj = SMF__JSA_NULL;
+      edge_tile = 1;
+      while( edge_tile && *status == SAI__OK ){
+
+/* Find the sky coords at the centre of the tile and use as the sky
+   reference position. If a projection discontinuity passes through the
+   tile (i.e. edge tiles) it may not be possible to determine the centre
+   coords. Set a flag to indicate this. */
+         point1[ 0 ] = ( tubnd[ 0 ] + 1.0 )/2.0;
+         point1[ 1 ] = ( tubnd[ 1 ] + 1.0 )/2.0;
+
+         astTran2( tfs, 1, point1, point1 + 1, 1, point2, point2 + 1 );
+
+         if( point2[ 0 ] != AST__BAD && point2[ 1 ] != AST__BAD ) {
+            astSetD( lfs, "SkyRef(1)", point2[ 0 ] );
+            astSetD( lfs, "SkyRef(2)", point2[ 1 ] );
+            edge_tile = 0;
+         } else {
+            astClear( lfs, "SkyRef" );
+            edge_tile = 1;
+         }
+
 /* If required, create a Region (a Box) describing the tile in GRID coords.
    GRID coords are described by the base Frame in the FrameSet. Reduce the
    size of the box slightly to avoid bad sky values at the edges of
    extreme tiles. */
-      if( region ) {
-         point1[ 0 ] = 0.5 + DELTA;
-         point1[ 1 ] = 0.5 + DELTA;
-         point2[ 0 ] = ubnd[ 0 ] + 0.5 - DELTA;
-         point2[ 1 ] = ubnd[ 1 ] + 0.5 - DELTA;
-         lregion = (AstRegion *) astBox(  astGetFrame( lfs, AST__BASE ), 1,
-                                          point1, point2, NULL, " " );
+         if( region && !edge_tile ) {
+            point1[ 0 ] = 0.5 + DELTA;
+            point1[ 1 ] = 0.5 + DELTA;
+            point2[ 0 ] = tubnd[ 0 ] + 0.5 - DELTA;
+            point2[ 1 ] = tubnd[ 1 ] + 0.5 - DELTA;
+            lregion = (AstRegion *) astBox(  astGetFrame( tfs, AST__BASE ), 1,
+                                             point1, point2, NULL, " " );
 
-/* Map this Box into (RA,Dec) (the current Frame in the FrameSet). */
-         lregion = astMapRegion( lregion, lfs, lfs );
+/* Map this Box into (RA,Dec) (the current Frame in the FrameSet). If a
+   projection discontinuity passes through the tile (i.e. edge tiles) it
+   may not be possible to do this mapping. Annul athe error if this
+   occrs.*/
+            if( *status == SAI__OK ) {
+               lregion = astMapRegion( lregion, tfs, tfs );
+               if( *status == AST__NODEF ) {
+                  errAnnul( status );
+                  edge_tile = 1;
+               }
+            }
+         }
+
+/* If this is an edge tile in the current JSA projection, we may not have
+   been able to determine the tile centre or sky region. So we now attempt
+   to determine them using one of the other JSA projections (the sky Region
+   and centre should be the same no matter what projection is used). */
+         if( edge_tile ) {
+
+/* Find the next JSA projection to try, Report an error if we have tried
+   them all without success. Skip over the supplied projection since we
+   have already done it. */
+            while( *status == SAI__OK ){
+               if( tproj == SMF__JSA_NULL ){
+                  tproj = SMF__JSA_HPX;
+               } else if( tproj == SMF__JSA_HPX ){
+                  tproj = SMF__JSA_HPX12;
+               } else if( tproj == SMF__JSA_HPX12 ){
+                  tproj = SMF__JSA_XPHN;
+               } else if( tproj == SMF__JSA_XPHN ){
+                  tproj = SMF__JSA_XPHS;
+               } else if( *status == SAI__OK ) {
+                  *status = SAI__ERROR;
+                  errRepf( "", "Cannot determine the sky region for JSA tile "
+                           "%d", status, itile );
+               }
+               if( tproj != proj ) break;
+            }
+
+/* Get a FitsChan holding the FITS headers defining the tile WCS and
+   extent in the new projection. */
+            tfc = smf_jsatileheader( itile, skytiling, local_origin, tproj,
+                                     NULL, status );
+
+/* Store the upper bounds of the tile in new GRID coords. */
+            if( ( !astGetFitsI( tfc, "NAXIS1", tubnd )  ||
+                  !astGetFitsI( tfc, "NAXIS2", tubnd + 1 ) ) &&
+                  *status == SAI__OK ) {
+               *status = SAI__ERROR;
+               errRep( " ", "Failed to get a tile dimensions (programming error).",
+                          status );
+            }
+
+/* Read a FrameSet from the FITS headers. */
+            astClear( tfc, "Card" );
+            tfs = astRead( tfc );
+            if( !tfs ) {
+               if( *status == SAI__OK ) {
+                  *status = SAI__ERROR;
+                  errRep( " ", "Failed to get a FrameSet for the tile "
+                          "(programming error).", status );
+               }
+            }
+         }
       }
    }
 

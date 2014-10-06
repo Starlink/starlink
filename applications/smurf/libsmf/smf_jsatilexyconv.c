@@ -215,7 +215,7 @@ void smf_jsatilexyconv( smfJSATiling *skytiling, smf_jsaproj_t proj,
 
 /* Moving from SMF__JSA_HPX to SMF__JSA_HPX12 involves moving each facet
    by two facets to the upper right, so that facet 6 moves to the
-   position of facet 1, facet 9 moves to the position of facet 11, etc. */
+   position of facet 4, etc. */
             *xt_out = xt_hpx + 2*skytiling->ntpf;
             *yt_out = yt_hpx + 2*skytiling->ntpf;
 

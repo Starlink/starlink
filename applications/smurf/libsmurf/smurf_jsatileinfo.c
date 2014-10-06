@@ -231,17 +231,19 @@ void smurf_jsatileinfo( int *status ) {
    char *jcmt_tiles;
    char *tilendf = NULL;
    char text[ 200 ];
-   double dec[ 9 ];
+   double dec[ 8 ];
    double dist;
    double dlbnd[ 2 ];
    double dubnd[ 2 ];
-   double gx[ 9 ];
-   double gy[ 9 ];
+   double gx[ 8 ];
+   double gy[ 8 ];
    double maxdist;
    double norm_radec[2];
    double point1[ 2 ];
    double point2[ 2 ];
-   double ra[ 9 ];
+   double ra[ 8 ];
+   double ra0;
+   double dec0;
    int *ipntr;
    int axes[ 2 ];
    int create;
@@ -416,75 +418,94 @@ void smurf_jsatileinfo( int *status ) {
    msgSeti( "YU", ubnd[ 1 ] );
    msgOut( " ", "      Pixel bounds: (^XL:^XU,^YL:^YU)", status );
 
-/* Transform the region centre and a collection of points on the edge
-   of the region (corners and side mid-points) from GRID coords to RA,Dec. */
-   point1[ 0 ] = 0.5;
-   point1[ 1 ] = 0.5;
-   point2[ 0 ] = ubnd[ 0 ] - lbnd[ 0 ] + 1;
-   point2[ 1 ] = ubnd[ 1 ] - lbnd[ 1 ] + 1;
+/* Get the RA,Dec at the tile centre. */
+   if( astTest( fs, "SkyRef" ) ) {
+      ra0 = astGetD( fs, "SkyRef(1)" );
+      dec0 = astGetD( fs, "SkyRef(2)" );
 
-   gx[ 0 ] = 0.5*( point1[ 0 ] + point2[ 0 ] );   /* Centre */
-   gy[ 0 ] = 0.5*( point1[ 1 ] + point2[ 1 ] );
+/* Format the central RA and Dec. and display. Call astNorm on the
+   coordinates provided that the frame set has the correct number of
+   axes (which it should as it comes from smf_jsatile). */
+      norm_radec[0] = ra0;
+      norm_radec[1] = dec0;
+      if (astGetI(fs, "Naxes") == 2) astNorm(fs, norm_radec);
+      msgSetc( "RACEN",  astFormat( fs, 1, norm_radec[ 0 ] ));
+      msgSetc( "DECCEN",  astFormat( fs, 2, norm_radec[ 1 ] ));
+      msgOut( " ", "      Centre (ICRS): RA=^RACEN DEC=^DECCEN", status );
 
-   gx[ 1 ] = point1[ 0 ];      /* Bottom left */
-   gy[ 1 ] = point1[ 1 ];
+/* Transform a collection of points on the edge of the region (corners and
+   side mid-points) from GRID coords to RA,Dec. */
+      point1[ 0 ] = 0.5;
+      point1[ 1 ] = 0.5;
+      point2[ 0 ] = ubnd[ 0 ] - lbnd[ 0 ] + 1;
+      point2[ 1 ] = ubnd[ 1 ] - lbnd[ 1 ] + 1;
 
-   gx[ 2 ] = point1[ 0 ];      /* Centre left */
-   gy[ 2 ] = gy[ 0 ];
+      gx[ 0 ] = point1[ 0 ];         /* Bottom left */
+      gy[ 0 ] = point1[ 1 ];
 
-   gx[ 3 ] = point1[ 0 ];      /* Top left */
-   gy[ 3 ] = point2[ 1 ];
+      gx[ 1 ] = point1[ 0 ];         /* Centre left */
+      gy[ 1 ] = gy[ 0 ];
 
-   gx[ 4 ] = gx[ 0 ];          /* Top centre */
-   gy[ 4 ] = point2[ 1 ];
+      gx[ 2 ] = point1[ 0 ];         /* Top left */
+      gy[ 2 ] = point2[ 1 ];
 
-   gx[ 5 ] = point2[ 0 ];      /* Top right */
-   gy[ 5 ] = point2[ 1 ];
+      gx[ 3 ] = gx[ 0 ];             /* Top centre */
+      gy[ 3 ] = point2[ 1 ];
 
-   gx[ 6 ] = point2[ 0 ];      /* Centre right */
-   gy[ 6 ] = gy[ 0 ];
+      gx[ 4 ] = point2[ 0 ];         /* Top right */
+      gy[ 4 ] = point2[ 1 ];
 
-   gx[ 7 ] = point2[ 0 ];      /* Bottom right */
-   gy[ 7 ] = point1[ 1 ];
+      gx[ 5 ] = point2[ 0 ];         /* Centre right */
+      gy[ 5 ] = gy[ 0 ];
 
-   gx[ 8 ] = gx[ 0 ];          /* Bottom centre */
-   gy[ 8 ] = point1[ 1 ];
+      gx[ 6 ] = point2[ 0 ];         /* Bottom right */
+      gy[ 6 ] = point1[ 1 ];
 
-   astTran2( fs, 9, gx, gy, 1, ra, dec );
+      gx[ 7 ] = gx[ 0 ];             /* Bottom centre */
+      gy[ 7 ] = point1[ 1 ];
 
-/* Format the central RA and Dec. and display.
-   Call astNorm on the coordinates provided that the frame set has the
-   correct number of axes.  (Which it should as it comes from
-   smf_jsatile.) */
-   norm_radec[0] = ra[0];
-   norm_radec[1] = dec[0];
-   if (astGetI(fs, "Naxes") == 2) {
-      astNorm(fs, norm_radec);
-   }
-   msgSetc( "RACEN",  astFormat( fs, 1, norm_radec[ 0 ] ));
-   msgSetc( "DECCEN",  astFormat( fs, 2, norm_radec[ 1 ] ));
-   msgOut( " ", "      Centre (ICRS): RA=^RACEN DEC=^DECCEN", status );
-
-/* Write the tile centre ra and dec in radians to the output parameters. */
-   parPut0d( "RACEN", ra[ 0 ], status );
-   parPut0d( "DECCEN", dec[ 0 ], status );
+      astTran2( fs, 8, gx, gy, 1, ra, dec );
 
 /* Find the arc-distance from the centre to the furthest point from the
    centre. */
-   point1[ 0 ] = ra[ 0 ];
-   point1[ 1 ] = dec[ 0 ];
-   maxdist = -1.0;
+      point1[ 0 ] = ra0;
+      point1[ 1 ] = dec0;
+      maxdist = -1.0;
 
-   for( i = 1; i < 9; i++ ) {
-      point2[ 0 ] = ra[ i ];
-      point2[ 1 ] = dec[ i ];
-      dist = astDistance( fs, point1, point2 );
-      if( dist > maxdist ) maxdist = dist;
-   }
+      for( i = 1; i < 8; i++ ) {
+         if( ra[ i ] != AST__BAD && dec[ i ] != AST__BAD ) {
+            point2[ 0 ] = ra[ i ];
+            point2[ 1 ] = dec[ i ];
+            dist = astDistance( fs, point1, point2 );
+            if( dist > maxdist ) maxdist = dist;
+         }
+      }
+
+/* Convert from radius to diameter. */
+      maxdist *= 2.0;
 
 /* Format this size as a dec value (i.e. arc-distance) and display it. */
-   msgSetc( "SIZE",  astFormat( fs, 2, maxdist ) );
-   msgOut( " ", "      Size: ^SIZE", status );
+      if( maxdist > 0.0 ) {
+         msgSetc( "SIZE",  astFormat( fs, 2, maxdist ) );
+         msgOut( " ", "      Size: ^SIZE", status );
+      } else {
+         maxdist = AST__BAD;
+         msgOut( " ", "      Size: <unknown>", status );
+      }
+
+/* If a discontinuity passes through the tile, the centre and size may be
+   unknown. */
+   } else {
+      ra0 = AST__BAD;
+      dec0 = AST__BAD;
+      maxdist = AST__BAD;
+      msgOut( " ", "      Centre (ICRS): RA=<unknown> DEC=<unknown>", status );
+      msgOut( " ", "      Size: <unknown>", status );
+   }
+
+/* Write the tile centre ra and dec in radians to the output parameters. */
+   parPut0d( "RACEN", norm_radec[ 0 ], status );
+   parPut0d( "DECCEN", norm_radec[ 1 ], status );
 
 /* Write the size to the output parameter as radians. */
    parPut0d( "SIZE", maxdist, status );

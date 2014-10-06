@@ -33,8 +33,7 @@
 
 *  Description:
 *     This function determines the type of JSA projection to use for a
-*     map that coveres a given set of tiles. The projection that produces
-*     the smallest map is chosenb.
+*     map that coveres a given set of tiles.
 
 *  Authors:
 *     DSB: David S Berry (JAC, UCLan)
@@ -83,17 +82,20 @@ smf_jsaproj_t smf_jsaproj( int ntile, const int *tiles,
                            smfJSATiling *skytiling, int *status ){
 
 /* Local Variables: */
-   smf_jsaproj_t result;
-   smf_jsaproj_t proj[ 4 ] = { SMF__JSA_HPX, SMF__JSA_HPX12,
-                               SMF__JSA_XPHN, SMF__JSA_XPHS };
+   AstFrameSet *fs;
+   double rd0[ 2];
+   double xy0[ 2];
+   int box_lbnd[2];
+   int box_ubnd[2];
    int iproj;
    int itile;
    int lbnd[2];
    int ubnd[2];
-   int box_lbnd[2];
-   int box_ubnd[2];
    size_t box_nel;
    size_t minnel = 0;
+   smf_jsaproj_t result;
+   smf_jsaproj_t proj[ 4 ] = { SMF__JSA_HPX, SMF__JSA_HPX12,
+                               SMF__JSA_XPHN, SMF__JSA_XPHS };
 
 /* Initialise the returned value. */
    result = SMF__JSA_HPX;
@@ -113,9 +115,10 @@ smf_jsaproj_t smf_jsaproj( int ntile, const int *tiles,
 /* Loop over all the supplied tiles. */
       for( itile = 0; itile < ntile; itile++ ) {
 
-/* Get the bounds of the current tile using the current projection. */
+/* Get the bounds of the current tile using the current projection. Also,
+   for the first tile only, get the WCS FrameSet. */
          smf_jsatile( tiles[ itile ], skytiling, 0, proj[ iproj ],
-                      NULL, NULL, NULL, lbnd, ubnd, status );
+                      NULL, itile?NULL:&fs, NULL, lbnd, ubnd, status );
 
 /* Extend the bounding box to include the current tile. */
          if( lbnd[ 0 ] < box_lbnd[ 0 ] ) box_lbnd[ 0 ] = lbnd[ 0 ];
@@ -132,7 +135,45 @@ smf_jsaproj_t smf_jsaproj( int ntile, const int *tiles,
       if( iproj == 0 || box_nel < minnel ) {
          minnel = box_nel;
          result = proj[ iproj ];
+
+/* If this is the same as the previous smallest box, we select the
+   projection which puts the centre of the bounding box further away from
+   the edges of the projection. Note, if only a single tile is supplied
+   then all projections will produce equal sized bounding boxes. */
+      } else if( box_nel == minnel ) {
+
+/* Get the (RA,Dec) at the centre of the bounding box. */
+         astSetC( fs, "Base", "PIXEL" );
+         xy0[0] = 0.5*( box_ubnd[ 0 ] + box_lbnd[ 0 ] - 1 );
+         xy0[1] = 0.5*( box_ubnd[ 1 ] + box_lbnd[ 1 ] - 1 );
+         astTran2( fs, 1, xy0, xy0+1, 1, rd0, rd0 + 1 );
+         if( rd0[ 0 ] != AST__BAD && rd0[ 1 ] != AST__BAD ) {
+
+/* Ensure the RA value is in the range 0 to 2*PI. */
+            astNorm( fs, rd0 );
+
+/* If the centre is in the northern polar region, use XPHN. */
+            if( rd0[ 1 ]*AST__DR2D > SMF__HPX_TRANS ) {
+               result = SMF__JSA_XPHN;
+
+/* If the centre is in the southern polar region, use XPHS. */
+            } else if( rd0[ 1 ]*AST__DR2D > SMF__HPX_TRANS ) {
+               result = SMF__JSA_XPHS;
+
+/* If the centre is in the RA range [6h->18h] use HPX12. */
+            } else if( rd0[ 0 ] > AST__DPIBY2 &&
+                       rd0[ 0 ] < 3*AST__DPIBY2 ) {
+               result = SMF__JSA_HPX12;
+
+/* Otherwise, use HPX. */
+            } else {
+               result = SMF__JSA_HPX;
+            }
+         }
       }
+
+/* Free the WCS FrameSet read from the first tile. */
+      fs = astAnnul( fs );
    }
 
    return result;
