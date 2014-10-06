@@ -63,6 +63,9 @@
 *        Added argument ISTART.
 *     19-APR-2006 (DSB):
 *        Allow bad values to be read.
+*     6-OCT-2014 (DSB):
+*        More careful handling of status given CHR functions set status 
+*        but do not report an error.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -114,12 +117,9 @@
 
 *  Otherwise, attempt to convert it to a double.
             ELSE
+               CALL GRP_INFOC( IGRP, I, 'NAME', FILE, STATUS )
                CALL CHR_CTOD( TEXT, DATA( I + ISTART - 1 ), STATUS )
                IF( STATUS .NE. SAI__OK ) THEN
-
-                  CALL ERR_BEGIN( STATUS )
-                  CALL GRP_INFOC( IGRP, I, 'NAME', FILE, STATUS )
-                  CALL ERR_END( STATUS )
 
                   CALL MSG_SETC( 'C', TEXT )
                   IF( FILE .EQ. ' ' ) THEN
