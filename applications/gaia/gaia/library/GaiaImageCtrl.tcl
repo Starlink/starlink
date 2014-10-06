@@ -578,7 +578,8 @@ itcl::class gaia::GaiaImageCtrl {
          while {$grabbed_x < $x2} {
             $canvas_ configure -scrollregion [list $grabbed_x $grabbed_y \
                                                 [expr {$grabbed_x + $view_width}] [expr {$grabbed_y + $view_height}]]
-            ::update
+            ::update idletasks
+            ::after 250
 
             # Take a screenshot of the visible canvas part...
             set tmpimg [image create photo -format window -data $canvas_]

@@ -487,6 +487,8 @@ itcl::class gaia::GaiaCubeAnimation {
    protected method capture_ {} {
 
       #  Do snapshot.
+      ::update idletasks
+      ::after $itk_option(-delay)
       set canvas [$itk_option(-gaiacube) cget -canvas]
       set image [::image create photo -format window -data $canvas]
       incr capcount_
