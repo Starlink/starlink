@@ -2137,6 +2137,51 @@ itcl::class gaia::GaiaSextractor {
       set to_(write_xml) WRITE_XML
       set from_(XML_NAME) xml_name
       set to_(xml_name) XML_NAME
+
+      #  Weighting. Not used.
+      set from_(WEIGHT_IMAGE) weight_image
+      set to_(weight_image) WEIGHT_IMAGE
+      set from_(WEIGHT_TYPE) weight_type
+      set to_(weight_type) WEIGHT_TYPE
+
+      #  Flagging. Not used.
+      set from_(FLAG_TYPE) flag_type
+      set to_(flag_type) FLAG_TYPE
+      
+      #  Automatic apertures? Not used.
+      set from_(PHOT_AUTOAPERS) phot_autoapers
+      set to_(phot_autoapers) PHOT_AUTOAPERS
+
+      #  Saturation value keyword. Not used.
+      set from_(SATUR_KEY) satur_key
+      set to_(satur_key) SATUR_KEY
+
+      #  Gain keyword. Not used.
+      set from_(GAIN_KEY) gain_key
+      set to_(gain_key) GAIN_KEY
+
+      #  ASCII file to associate. Not used.
+      set from_(ASSOC_NAME) assoc_name
+      set to_(assoc_name) ASSOC_NAME
+      set from_(ASSOC_DATA) assoc_data
+      set to_(assoc_data) ASSOC_DATA
+      set from_(ASSOC_PARAMS) assoc_params
+      set to_(assoc_params) ASSOC_PARAMS
+      set from_(ASSOC_RADIUS) assoc_radius
+      set to_(assoc_radius) ASSOC_RADIUS
+      set from_(ASSOC_TYPE) assoc_type
+      set to_(assoc_type) ASSOC_TYPE
+      set from_(ASSOCSELEC_TYPE) assocselec_type
+      set to_(assocselec_type) ASSOCSELEC_TYPE
+
+      #  Extension for headers. Not used.
+      set from_(HEADER_SUFFIX) header_suffix
+      set to_(header_suffix) HEADER_SUFFIX
+
+      #  Style sheet for VOTables. Not used.
+      set from_(XSL_URL) xsl_url
+      set to_(xsl_url) XSL_URL
+      
    }
 
    #  Set the initial defaults for the values_ array. These are
