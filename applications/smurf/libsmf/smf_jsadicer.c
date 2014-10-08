@@ -109,8 +109,12 @@
 *     6-OCT-2014 (DSB):
 *        The split tile (bottom-left/top-right) will have a different WCS
 *        to the other since it uses a different reference point. So we need
-*        to get"p2pmap" separately for every tile, rather than just re-using 
+*        to get"p2pmap" separately for every tile, rather than just re-using
 *        the p2pmap from the first tile.
+*     8-OCT-2014 (DSB):
+*        Remove lon/lat wrapping as a means of handling tiles that stradle
+*        RA=12h. It is no longer needed since the introduction of the HPX12
+*        projection.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -227,7 +231,6 @@ void smf_jsadicer( int indf, const char *base, int trim, smf_inst_t instrument,
    int nsig;
    int ntiles;
    int olbnd[ 3 ];
-   int old_wrap;
    int oubnd[ 3 ];
    int outperm[ 3 ];
    int place;
@@ -507,27 +510,6 @@ void smf_jsadicer( int indf, const char *base, int trim, smf_inst_t instrument,
                                  lbnd_out + 2, ubnd_out + 2, NULL,
                                  NULL );
 
-/* Tiles that straddle RA=12h (for SMF__JSA_HPX) or RA=0h (for
-   SMF__JSA_HPX12) will produce very big bounding boxes because half
-   of the tile will be wrapped round to the other side of the all-sky grid.
-   Test for this, and if found, re-calculate the bounding boxes without
-   wrapping WCS values within the WcsMap class. NOTE - we should never
-   find any such tiles because the projection for the input NDF should
-   have been chosen to put the valid data well away from the above RA
-   values). */
-      if( ubnd_out[0] - lbnd_out[0] > 10000 ||
-          ubnd_out[1] - lbnd_out[1] > 10000 ) {
-         old_wrap = astGetWcsWrap;
-         astSetWcsWrap( 0 );
-         astMapBox( p2pmap, lbnd_in, ubnd_in, 0, 1, lbnd_out + 0,
-                    ubnd_out + 0, NULL, NULL );
-         astMapBox( p2pmap, lbnd_in, ubnd_in, 0, 2, lbnd_out + 1,
-                    ubnd_out + 1, NULL, NULL );
-         if( ndim == 3 ) astMapBox( p2pmap, lbnd_in, ubnd_in, 0, 3,
-                                    lbnd_out + 2, ubnd_out + 2, NULL,
-                                    NULL );
-         astSetWcsWrap( old_wrap );
-      }
 
       lbnd_tile[ 0 ] = floor( lbnd_out[ 0 ] ) + 1;
       lbnd_tile[ 1 ] = floor( lbnd_out[ 1 ] ) + 1;
