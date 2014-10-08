@@ -221,6 +221,9 @@
 *        Remove argument noi_boxsize.
 *     2014-05-15 (DSB):
 *        Add argument "qua".
+*     2014-10-08 (DSB):
+*        Only use multiple NOI values per bolometer if the time stream
+*        is long enough to create at least two NOI values.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -634,7 +637,9 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
 
             /* Get the number of variance values per bolometer. This is
                one, unless NOI.BOX_SIZE is set non-zero in which case it
-               is "ntslice". */
+               is "ntslice". But if the time stream contains insufficient
+               time slices to create two boxes, then we use a single
+               variance per bolometer. */
             astMapGet0A( keymap, "NOI", &kmap );
             smf_get_nsamp( kmap, "BOX_SIZE", idata, &noi_boxsize, status );
             astMapGet0I( kmap, "CALCFIRST", &calcfirst );
@@ -647,7 +652,11 @@ void smf_model_create( ThrWorkForce *wf, const smfGroup *igroup,
                           "non-zero - this is not allowed.", status );
                }
             }
-            dim_t nointslice = noi_boxsize ? idata->dims[isTordered?2:0] : 1;
+
+            dim_t nointslice = idata->dims[isTordered?2:0];
+            if( noi_boxsize == 0 || nointslice < 2*noi_boxsize ) {
+               nointslice = 1;
+            }
 
             head.data.dtype = SMF__DOUBLE;
             head.data.ndims = 3;

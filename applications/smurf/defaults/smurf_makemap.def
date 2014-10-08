@@ -1972,7 +1972,10 @@ noexportsetbad = 0
 #		of seconds, and positive values as a number of down-sampled
 #		time slices. Note, very small box sizes may produce
 #		unrepresentative noise levels, and there is a hard minimum
-#		of 101 on the number of downsampled time slices in a noise box.
+#		of 101 on the number of downsampled time slices in a noise
+#       box. Also, if the number of time slices in the data is smaller
+#       than two times the requested box size, then a single noise 
+#       value is used for each bolometer.
 noi.box_size = 0
 
 #-----------------------------------------------------------------
