@@ -763,3 +763,48 @@ int gaiaUtilsCreateArdMask( char *desc, int maskPtr[], int dims[], int lbnd[],
     emsRlse();
     return 1;
 }
+
+/*
+ *  Return a NaN for use with float arrays.
+ */
+float gaiaFitsNaNF()
+{
+    static int initialized;
+    static float value = 0.0f;
+
+    if ( !initialized ) {
+        /*  Set all bits in the value  (same technique as cfitsio) */
+        union {
+            long buff;
+            float f;
+        } nanun;
+
+        nanun.buff = -1;
+        value = nanun.f;
+        initialized = 1;
+    }
+    return value;
+}
+
+/*
+ *  Return a NaN for use with double arrays.
+ */
+double gaiaFitsNaND()
+{
+    static int initialized;
+    static double value = 0.0;
+
+    if ( !initialized ) {
+        /*  Set all bits in the value  (same technique as cfitsio) */
+        union {
+            long buff[2];
+            double d;
+        } nanun;
+
+        nanun.buff[0] = -1;
+        nanun.buff[1] = -1;
+        value = nanun.d;
+        initialized = 1;
+    }
+    return value;
+}

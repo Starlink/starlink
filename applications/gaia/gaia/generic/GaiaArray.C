@@ -84,7 +84,7 @@
 
 /* Local types as HDS type strings, static for simple export */
 static const char *hdstypes[] = {
-    "_UBYTE", "_BYTE", "_UWORD", "_WORD", "_INTEGER", "_INT64", 
+    "_UBYTE", "_BYTE", "_UWORD", "_WORD", "_INTEGER", "_INT64",
     "_REAL", "_DOUBLE"
 };
 
@@ -2909,41 +2909,48 @@ void gaiaArrayMaskData( ARRAYinfo *dataInfo, ARRAYinfo *maskInfo,
             }                                                           \
         }
 
-        /*  FITS mask, may need to handle swapping. */
+        /*  FITS mask, may need to handle swapping. Note BAD value is
+         *  for image, so may not need swapping. */
         switch ( dataInfo->type )
         {
             case HDS_DOUBLE: {
-                double badValue = SWAP_DOUBLE_( VAL__BADD );
+                double badValue =
+                    (dataInfo->isfits ? gaiaFitsNaND() : VAL__BADD );
                 SWAP_MASK_AND_COPY(double,badValue)
             }
             break;
 
             case HDS_REAL: {
-                float badValue = SWAP_FLOAT_( VAL__BADR );
+                float badValue =
+                    (dataInfo->isfits ? gaiaFitsNaNF() : VAL__BADR );
                 SWAP_MASK_AND_COPY(float,badValue)
             }
             break;
 
             case HDS_INT64: {
-                INT64 badValue = SWAP_INT64_( VAL__BADK );
+                INT64 badValue =
+                    (dataInfo->isfits ? SWAP_INT64_(VAL__BADK) : VAL__BADK );
                 SWAP_MASK_AND_COPY(INT64,badValue)
             }
             break;
 
             case HDS_INTEGER: {
-                int badValue = SWAP_INT_( VAL__BADI );
+                int badValue =
+                    (dataInfo->isfits ? SWAP_INT_(VAL__BADI) : VAL__BADI );
                 SWAP_MASK_AND_COPY(int,badValue)
             }
             break;
 
             case HDS_WORD: {
-                short badValue = SWAP_SHORT_( VAL__BADW );
+                short badValue =
+                    (dataInfo->isfits ? SWAP_SHORT_(VAL__BADW) : VAL__BADW );
                 SWAP_MASK_AND_COPY(short,badValue)
             }
             break;
 
             case HDS_UWORD: {
-                unsigned short badValue = SWAP_USHORT_( VAL__BADUW );
+                unsigned short badValue =
+                    (dataInfo->isfits ? SWAP_USHORT_(VAL__BADUW) : VAL__BADUW );
                 SWAP_MASK_AND_COPY(unsigned short,badValue)
             }
             break;

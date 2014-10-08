@@ -540,6 +540,7 @@ static int gaiaArrayCreate( ClientData clientData, Tcl_Interp *interp,
  *   the address of the memory to wrap
  *   data type as a FITS bitpix
  *   the number of elements in the array.
+ *   whether the data is a mapped FITS array (could be byte swapped)
  *
  * The result is an ARRAYinfo struct. Note that the memory will never be
  * freed, the caller must arrange that.
@@ -550,13 +551,14 @@ static int gaiaArrayWrap( ClientData clientData, Tcl_Interp *interp,
     ARRAYinfo *arrayInfo;
     int bitpix;
     int type;
+    int isfits;
     long adr;
     long el;
     void *ptr;
 
     /* Check arguments */
-    if ( objc != 4 ) {
-        Tcl_WrongNumArgs( interp, 1, objv, "address data_type nel" );
+    if ( objc != 5 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "address data_type nel isfits" );
         return TCL_ERROR;
     }
 
@@ -587,8 +589,15 @@ static int gaiaArrayWrap( ClientData clientData, Tcl_Interp *interp,
         return TCL_ERROR;
     }
 
+    /* Whether data is from FITS. */
+    if ( Tcl_GetIntFromObj( interp, objv[4], &isfits ) != TCL_OK ) {
+        Tcl_AppendResult( interp, ": failed to isfits",
+                          (char *) NULL );
+        return TCL_ERROR;
+    }
+
     /* Create the info struct. */
-    arrayInfo = gaiaArrayCreateInfo( ptr, type, el, 1, 0, 0, 1.0, 0.0,
+    arrayInfo = gaiaArrayCreateInfo( ptr, type, el, isfits, 0, 0, 1.0, 0.0,
                                      GAIA_ARRAY_NONE );
 
     /* Export */

@@ -53,6 +53,11 @@ extern "C" {
     int gaiaUtilsCreateArdMask( char *desc, int maskPtr[], int dims[],
                                 int lbnd[], int ubnd[], char **error_mess );
 
+
+    /* Get a NaN value foe setting floating point values bad */
+    float gaiaFitsNaNF();
+    double gaiaFitsNaND();
+
 #ifdef __cplusplus
 }
 #endif
