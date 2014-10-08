@@ -360,9 +360,10 @@ itcl::class gaia::GaiaMask {
          set bitpix [$itk_option(-rtdimage) bitpix]
          set el [expr [$itk_option(-rtdimage) width] * \
                       [$itk_option(-rtdimage) height]]
+         set isfits [$itk_option(-rtdimage) isfits]
 
          #  And wrap as an array structure.
-         set image_adr_ [array::wrap $adr $bitpix $el]
+         set image_adr_ [array::wrap $adr $bitpix $el $isfits]
       }
 
       #  Apply the mask to to the image and display, returns the masked
@@ -370,7 +371,7 @@ itcl::class gaia::GaiaMask {
       set range [get_values_]
       if { [catch {set adr [array::maskdata $image_adr_ $mask_adr_ $range]} msg] } {
          $history_ clear_last
-         error_dialog "Failed to mask data: $msg"
+         error "Failed to mask data: $msg"
          return
       }
 
@@ -496,7 +497,7 @@ itcl::class gaia::GaiaMask {
    protected variable mask_namer_ {}
 
    #  Mask values to display.
-   protected variable values_ {}
+   protected variable values_ 0
 
    #  The GaiaHistory instance used for "Go" menu.
    protected variable history_ {}

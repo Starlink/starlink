@@ -2881,6 +2881,9 @@ void gaiaArrayMaskData( ARRAYinfo *dataInfo, ARRAYinfo *maskInfo,
                             destptr[i] = badValue;                      \
                         }                                               \
                     }                                                   \
+                    else if ( maskValue == 0 && ! seebad ) {            \
+                        destptr[i] = badValue;                          \
+                    }                                                   \
                     else {                                              \
                         if ( seebad ) {                                 \
                             destptr[i] = badValue;                      \
@@ -2985,6 +2988,9 @@ void gaiaArrayMaskData( ARRAYinfo *dataInfo, ARRAYinfo *maskInfo,
                         else {                                          \
                             destptr[i] = badValue;                      \
                         }                                               \
+                    }                                                   \
+                    else if ( maskValue == 0 && ! seebad ) {            \
+                        destptr[i] = badValue;                          \
                     }                                                   \
                     else {                                              \
                         if ( seebad ) {                                 \
