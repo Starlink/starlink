@@ -25,6 +25,8 @@ libgwm_la_SOURCES = \
 	$(C_ROUTINES) \
 	$(PRIVATE_INCLUDES)
 
+libgwm_la_LIBADD =  $(X_LIBS) $(X_PRE_LIBS) -lX11 -lXt `ems_link` `cnf_link`
+
 include_MESSAGES = gwm_err.h GWM_ERR
 include_HEADERS = $(PUBLIC_INCLUDES)
 
