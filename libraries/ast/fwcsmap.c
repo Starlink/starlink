@@ -27,12 +27,12 @@
 *     License as published by the Free Software Foundation, either
 *     version 3 of the License, or (at your option) any later
 *     version.
-*
+*     
 *     This program is distributed in the hope that it will be useful,
 *     but WITHOUT ANY WARRANTY; without even the implied warranty of
 *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *     GNU Lesser General Public License for more details.
-*
+*     
 *     You should have received a copy of the GNU Lesser General
 *     License along with this program.  If not, see
 *     <http://www.gnu.org/licenses/>.
@@ -103,24 +103,3 @@ F77_INTEGER_FUNCTION(ast_wcsmap)( INTEGER(NAXES),
    )
    return RESULT;
 }
-
-F77_LOGICAL_FUNCTION(ast_getwcswrap)( INTEGER(STATUS) ) {
-   F77_LOGICAL_TYPE(RESULT);
-
-   astAt( "AST_GETWCSWRAP", NULL, 0 );
-   astWatchSTATUS(
-      RESULT = astGetWcsWrap ? F77_TRUE : F77_FALSE;
-   )
-   return RESULT;
-}
-
-F77_SUBROUTINE(ast_setwcswrap)( LOGICAL(VALUE),
-                                INTEGER(STATUS) ) {
-   GENPTR_LOGICAL(VALUE)
-
-   astAt( "AST_SETWCSWRAP", NULL, 0 );
-   astWatchSTATUS(
-      astSetWcsWrap( F77_ISTRUE( *VALUE ) ? 1 : 0 );
-   )
-}
-
