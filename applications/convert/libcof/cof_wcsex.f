@@ -136,6 +136,12 @@
 *        of all WCS headers.
 *        - If the NDF has no WCS component, ensure any WCS Frames in the
 *        FITS extension are included in the returned header.
+*     8-OCT-2014 (DSB):
+*        - The 15/11/13 change had a bug that FITS extension WCS was copied
+*        into the NDF if the NDF *did* have a WCS component, rather than
+*        *did not* have a WCS component.
+*        - Check that the WCS in the FITS extension describes the same
+*        number of pixel axes as the NDF before adding it to the NDFs WCS.
 *     {enter_further_changes_here}
 
 *-
@@ -513,63 +519,68 @@
 *  If the WCS component of the NDF is in an undefined state, we attempt
 *  to extend the FrameSet obtained above (which will contain only
 *  standard NDF Frames) by including any Frames that were read from
-*  any WCS keywords in the NDF extension.
+*  any WCS keywords in the FITS extension.
       CALL NDF_STATE( INDF, 'WCS', THERE, STATUS )
-      IF( THERE .AND. XWCS .NE. AST__NULL ) THEN
+      IF( .NOT. THERE .AND. XWCS .NE. AST__NULL ) THEN
+
+*  We can only use WCS from the FITS extension if it refers to the same
+*  number of pixel axes as the NDF contains.
+         IF( AST_GETI( XWCS, 'Nin', STATUS ) .EQ. NDIM ) THEN
 
 *  Note the indicies of the base (i.e. GRID) and current Frames in the
 *  FrameSet read from the NDF FITS extension.
-         IGRID = AST_GETI( XWCS, 'BASE', STATUS )
-         ICURR0 = AST_GETI( XWCS, 'CURRENT', STATUS )
+            IGRID = AST_GETI( XWCS, 'BASE', STATUS )
+            ICURR0 = AST_GETI( XWCS, 'CURRENT', STATUS )
 
 *  Note the original current Frame in the main FrameSet since it will be
 *  changed each time a new Frame is added by AST_ADDFRAME.
-         ICURR = AST_GETI( IWCS, 'CURRENT', STATUS )
+            ICURR = AST_GETI( IWCS, 'CURRENT', STATUS )
 
 *  Loop round all Frames int eh FrameSet read from the NDF FITS extension.
-         NFRAME = AST_GETI( XWCS, 'NFRAME', STATUS )
-         DO IFRAME = 1, NFRAME
+            NFRAME = AST_GETI( XWCS, 'NFRAME', STATUS )
+            DO IFRAME = 1, NFRAME
 
 *  We already have a GRID Frame in the main FrameSet so skip the GRID Frame.
-            IF( IFRAME .NE. IGRID ) THEN
+               IF( IFRAME .NE. IGRID ) THEN
 
 *  Get the IFRAME'th Frame from the FITS extension FrameSet, and get its
 *  Domain value.
-               FRM = AST_GETFRAME( XWCS, IFRAME, STATUS )
-               EXCNAM = AST_GETC( FRM, 'DOMAIN', STATUS )
+                  FRM = AST_GETFRAME( XWCS, IFRAME, STATUS )
+                  EXCNAM = AST_GETC( FRM, 'DOMAIN', STATUS )
 
 *  We do not add any standard NDF Frames since these have already been
 *  dealt with.
-               IF( EXCNAM .NE. 'PIXEL' .AND.
-     :             EXCNAM .NE. 'AXIS' .AND.
-     :             EXCNAM .NE. 'FRACTION' ) THEN
+                  IF( EXCNAM .NE. 'PIXEL' .AND.
+     :                EXCNAM .NE. 'AXIS' .AND.
+     :                EXCNAM .NE. 'FRACTION' ) THEN
 
 *  Get the Mapping from the GRID Frame to the IFRAME'th Frame, and add
 *  the Frame into the main FrameSet. Then Annull the Mapping pointer.
-                  MAP = AST_GETMAPPING( XWCS, IGRID, IFRAME, STATUS )
-                  CALL AST_ADDFRAME( IWCS, AST__BASE, MAP, FRM, STATUS )
-                  CALL AST_ANNUL( MAP, STATUS )
+                     MAP = AST_GETMAPPING( XWCS, IGRID, IFRAME, STATUS )
+                     CALL AST_ADDFRAME( IWCS, AST__BASE, MAP, FRM,
+     :                                  STATUS )
+                     CALL AST_ANNUL( MAP, STATUS )
 
 *  If the Frame we have just added was the current Frame in the FITS
 *  extension FrameSet, record it's index so that we can make it the
 *  current Frame in the main FrameSet once we have finished.
-                  IF( IFRAME .EQ. ICURR0 ) ICURR = AST_GETI( IWCS,
+                     IF( IFRAME .EQ. ICURR0 ) ICURR = AST_GETI( IWCS,
      :                                               'CURRENT', STATUS )
-               END IF
+                  END IF
 
 *  Annul the FITS extension Frame pointer.
-               CALL AST_ANNUL( FRM, STATUS )
-            END IF
-         END DO
+                  CALL AST_ANNUL( FRM, STATUS )
+               END IF
+            END DO
 
 *  Reset the current Frame index in the main FrameSet back to the correct
 *  value. This will be the current Frame from the FITS extension FrameSet
 *  so long as that Frame is not an NDF standard Frame. If it was, then
 *  the original current Frame will be re-instated.
-         CALL AST_SETI( IWCS, 'CURRENT', ICURR, STATUS )
+            CALL AST_SETI( IWCS, 'CURRENT', ICURR, STATUS )
 
+         END IF
       END IF
-
 
 *  Exclude requested Frames.
 *  =========================
