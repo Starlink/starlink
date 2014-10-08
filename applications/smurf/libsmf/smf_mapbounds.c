@@ -175,6 +175,8 @@
 *     2014-07-7 (DSB):
 *        Ensure Epoch in returned SKyFrame is set from the data rather
 *        than any supplied spatial reference FrameSet.
+*     2014-10-08 (DSB):
+*        Report an error if either axis of the map spans more than 20000 pixels.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -224,7 +226,7 @@
 #include "sc2da/sc2ast.h"
 
 #define FUNC_NAME "smf_mapbounds"
-#define MAX_PIXELS (20000*20000)
+#define MAX_DIM 20000
 
 void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
                     AstFrameSet *spacerefwcs, int alignsys, int *lbnd_out,
@@ -840,8 +842,8 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
     msgOutif( MSG__NORM, " ", "   Output map pixel bounds: ( ^XL:^XU, ^YL:^YU )",
               status );
 
-    if( ( ubnd_out[ 0 ] - lbnd_out[ 0 ] + 1 )*
-        ( ubnd_out[ 1 ] - lbnd_out[ 1 ] + 1 ) > MAX_PIXELS ) {
+    if( ( ubnd_out[ 0 ] - lbnd_out[ 0 ] + 1 ) > MAX_DIM ||
+        ( ubnd_out[ 1 ] - lbnd_out[ 1 ] + 1 ) > MAX_DIM ) {
       *status = SAI__ERROR;
       errRep( "", FUNC_NAME ": The map is too big. Check your list of input "
               "data files does not include widely separated observations.",
