@@ -95,6 +95,9 @@
 *     2014-05-02 (MS)
 *        Fixed memory leak with fftw plan
 *        - Moved fftw plan destructor inside the loop in which it was created.
+*     2014-06-06 (MS)
+*        Add optional SFP WN range overrides
+*        - This includes both 850 and 450 band spectral filter profile wave number ranges
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -183,11 +186,19 @@ void smurf_fts2_spectrum(int* status)
     double* SFP               = NULL;           /* Spectral Filter Profile for all pixels */
     double* SFPij             = NULL;           /* Spectral Filter Profile for a single pixel */
     double wavelen            = 0.0;            /* The central wave length of the subarray filter (m) */
-    double wnSfp850First      = 11.220;         /* Starting 850 band SFP wave number */
-    double wnSfp850Last       = 12.395;         /* Ending 850 band SFP wave number */
+    /*double wnSfp850First      = 11.220; */    /* Starting 850 band SFP wave number */
+    /*double wnSfp850Last       = 12.395; */    /* Ending 850 band SFP wave number */
+    double wnSfpFirst         = 10.600;         /* Starting 850 band SFP wave number */
+    double wnSfpLast          = 12.800;         /* Ending 850 band SFP wave number */
+    double wnSfp850First      = 10.600;         /* Starting 850 band SFP wave number */
+    double wnSfp850Last       = 12.800;         /* Ending 850 band SFP wave number */
     double wnSfp450First      = 21.630;         /* Starting 450 band SFP wave number */
     double wnSfp450Last       = 23.105;         /* Ending 450 band SFP wave number */
+    double wnSfpFirst_override= 0.0;            /* Starting SFP wave number override */
+    double wnSfpLast_override = 0.0;            /* Ending SFP wave number override */
     double wnSfpResolution    = 0.025;          /* The resolution of the SFP wave numbers (1/cm) */
+    double wnSfpF             = 0.0;            /* Starting SFP wave number */
+    double wnSfpL             = 0.0;            /* Ending SFP wave number */
     double* WN                = NULL;           /* Wave Numbers from SFP */
     double* DS                = NULL;           /* Double Sided Interferogram */
     fftw_complex* DSIN        = NULL;           /* Double-Sided interferogram, FFT input */
@@ -252,9 +263,11 @@ void smurf_fts2_spectrum(int* status)
 
     /* Resolution */
     parGet0d("RESOLUTION", &resolution_override, status);
-    if (*status != SAI__OK) {
-        errRep(FUNC_NAME, "Could not read resolution_override parameter", status);
-        goto CLEANUP;
+
+    if(doSFP) {
+        /* SFP WN Range overrides */
+        parGet0d("WNSFPFIRST", &wnSfpFirst_override, status);
+        parGet0d("WNSFPLAST", &wnSfpLast_override, status);
     }
 
     /* BEGIN NDF */
@@ -301,6 +314,29 @@ void smurf_fts2_spectrum(int* status)
             errRep(FUNC_NAME, "Unable to find the wavelen in the FITS header!", status);
             goto CLEANUP;
         }
+
+        /* Set WN SFP range according to band */
+        if(wavelen == 0.00085) {
+            wnSfpFirst = wnSfp850First;
+            wnSfpLast = wnSfp850Last;
+        } else if(wavelen == 0.00045) {
+            wnSfpFirst = wnSfp450First;
+            wnSfpLast = wnSfp450Last;
+        }
+
+        printf("%s: wnSfpFirst_override=%f, wnSfpLast_override=%f\n", TASK_NAME, wnSfpFirst_override, wnSfpLast_override);
+        printf("%s: wnSfpFirst=%f, wnSfpLast=%f\n", TASK_NAME, wnSfpFirst, wnSfpLast);
+        if(wnSfpFirst_override) {
+            wnSfpF = wnSfpFirst_override;
+        } else {
+            wnSfpF = wnSfpFirst;
+        }
+        if(wnSfpLast_override) {
+            wnSfpL = wnSfpLast_override;
+        } else {
+            wnSfpL = wnSfpLast;
+        }
+        printf("%s: wnSfpF=%f, wnSfpL=%f\n", TASK_NAME, wnSfpF, wnSfpL);
 
         fNyquistin = fNyquistzp = 0.0;
         dx = dxin = dxzp = 0.0;
@@ -438,32 +474,30 @@ void smurf_fts2_spectrum(int* status)
             WN  = astCalloc(nSfp, sizeof(*WN));
 
             /* DEBUG: Dispay SFP data */
-            // printf("smurf_fts2_spectrum ([%d,%d,%d] elements): WN, SFP\n", (int)sfpData->dims[0],(int)sfpData->dims[1],(int)sfpData->dims[2]);
+            /* printf("smurf_fts2_spectrum ([%d,%d,%d] elements): WN, SFP\n", (int)sfpData->dims[0],(int)sfpData->dims[1],(int)sfpData->dims[2]); */
             for(k=0;k<((int)nSfp);k++){
-                //  printf("WN:%.3f,SFP:%.10f\n", *((double*) (sfpData->pntr[0]) + i), *((double*) (sfpData->pntr[0]) + i+1));
+                /* printf("WN:%.3f,SFP:%.10f\n", *((double*) (sfpData->pntr[0]) + i), *((double*) (sfpData->pntr[0]) + i+1)); */
                 /* Adjust starting and ending wave number ranges for 450 or 850 bands */
-                if(wavelen == 0.00085) {
-                    WN[k] = wnSfp850First + k * wnSfpResolution;
-                } else if(wavelen == 0.00045) {
-                    WN[k] = wnSfp450First + k * wnSfpResolution;
+                if(wavelen == 0.00085 || wavelen == 0.00045) {
+                    WN[k] = wnSfpFirst + k * wnSfpResolution;
                 } else {
                     *status = SAI__ERROR;
                     errRep(FUNC_NAME, "Unexpected WAVELEN value found in the FITS header!", status);
                     goto CLEANUP;
                 }
-                // printf("SFP WN[%d]=%f\n",k,WN[k]);
+                /* printf("SFP WN[%d]=%f\n",k,WN[k]); */
                 for(j=0;j<nHeight;j++) {
                     for(i=0;i<nWidth;i++) {
                         bolIndex = i + j * nWidth;
                         cubeIndex = bolIndex + k * nPixels;
                         SFP[cubeIndex] = *((double*) (sfpData->pntr[0]) + cubeIndex);
-                        //  if(i==10 && j==20) printf("SFP i:%d,j:%d,k:%d,bolIndex:%d,cubeIndex:%d=%f\n",i,j,k,bolIndex,cubeIndex,SFP[cubeIndex]);
+                        /* if(i==10 && j==20) printf("SFP i:%d,j:%d,k:%d,bolIndex:%d,cubeIndex:%d=%f\n",i,j,k,bolIndex,cubeIndex,SFP[cubeIndex]); */
                     }
                 }
             }
 
-            //printf("smurf_fts2_spectrum DEBUG: early exiting!\n");
-            //exit(0);
+            /*printf("smurf_fts2_spectrum DEBUG: early exiting!\n");
+              exit(0); */
 
             /* Create a 2D SFP index array and store it in the file, if given
             sfp = smf_create_smfData(SMF__NOCREATE_DA | SMF__NOCREATE_FTS, status);
@@ -589,12 +623,13 @@ void smurf_fts2_spectrum(int* status)
 
                     /* Divide the spectrum in the band pass region by the interpolated SFP value at each position */
                     for(k = 0; k < N; k++) {
-                        if(k*dSigma >= WN[0] && k*dSigma <= WN[nSfp-1]) {
+                      /*if(k*dSigma >= WN[0] && k*dSigma <= WN[nSfp-1]) {*/
+                        if(k*dSigma >= wnSfpF && k*dSigma <= wnSfpL) {
                             f = gsl_spline_eval(SPLINE, k*dSigma, ACC);
-                            //index = bolIndex + nPixels * k;
+                            /*index = bolIndex + nPixels * k;*/
                             s = SPEC[k][0];
                             SPEC[k][0] = s / f;
-                         // if(i==10 && j==20) { printf("SFP i=%d, j=%d, k=%d, dSigma=%f, k*dSigma=%f, s=%f, f=%f, s/f=%f, \n", i, j, k, dSigma, k*dSigma, s, f, s/f); }
+                         /* if(i==10 && j==20) { printf("SFP i=%d, j=%d, k=%d, dSigma=%f, k*dSigma=%f, s=%f, f=%f, s/f=%f, \n", i, j, k, dSigma, k*dSigma, s, f, s/f); } */
                         }
                     }
                 }

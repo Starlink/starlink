@@ -282,6 +282,9 @@
 #     2014-04-17 (MS):
 #        Revise fts2spectrum resolution parameter to directly enter the desired spectral resolution value
 #        The default resolution is 0.005, but one could enter any sensible alternative as an override
+#     2014-06-06 (MS):
+#        Add optional fts2spectrum SFP WN range overrides
+#        - This applies to either the 850 or 450 band spectral filter profile wave number ranges, whichever is current
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -2551,6 +2554,28 @@ package @PACKAGE@ {
                 ppath GLOBAL CURRENT
                 prompt {SFP calibration file}
                 default !
+                helpkey *
+            }
+
+            parameter wnSfpFirst {
+                type _DOUBLE
+
+                access READ
+                vpath {PROMPT}
+                ppath CURRENT DEFAULT
+                prompt {Spectral Filter Profile Wave Number range starting from}
+                default 0.0
+                helpkey *
+            }
+
+            parameter wnSfpLast {
+                type _DOUBLE
+
+                access READ
+                vpath {PROMPT}
+                ppath CURRENT DEFAULT
+                prompt {Spectral Filter Profile Wave Number range ending with}
+                default 0.0
                 helpkey *
             }
 
