@@ -98,6 +98,8 @@
 *     2014-06-06 (MS)
 *        Add optional SFP WN range overrides
 *        - This includes both 850 and 450 band spectral filter profile wave number ranges
+*     2014-10-09 (MS)
+*        Comment out debug printf's
 
 *  Copyright:
 *     Copyright (C) 2010 Science and Technology Facilities Council.
@@ -324,8 +326,8 @@ void smurf_fts2_spectrum(int* status)
             wnSfpLast = wnSfp450Last;
         }
 
-        printf("%s: wnSfpFirst_override=%f, wnSfpLast_override=%f\n", TASK_NAME, wnSfpFirst_override, wnSfpLast_override);
-        printf("%s: wnSfpFirst=%f, wnSfpLast=%f\n", TASK_NAME, wnSfpFirst, wnSfpLast);
+        /*printf("%s: wnSfpFirst_override=%f, wnSfpLast_override=%f\n", TASK_NAME, wnSfpFirst_override, wnSfpLast_override);*/
+        /*printf("%s: wnSfpFirst=%f, wnSfpLast=%f\n", TASK_NAME, wnSfpFirst, wnSfpLast);*/
         if(wnSfpFirst_override) {
             wnSfpF = wnSfpFirst_override;
         } else {
@@ -336,7 +338,7 @@ void smurf_fts2_spectrum(int* status)
         } else {
             wnSfpL = wnSfpLast;
         }
-        printf("%s: wnSfpF=%f, wnSfpL=%f\n", TASK_NAME, wnSfpF, wnSfpL);
+        /*printf("%s: wnSfpF=%f, wnSfpL=%f\n", TASK_NAME, wnSfpF, wnSfpL);*/
 
         fNyquistin = fNyquistzp = 0.0;
         dx = dxin = dxzp = 0.0;
