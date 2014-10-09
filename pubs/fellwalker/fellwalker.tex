@@ -127,19 +127,20 @@
 
 \begin{abstract}
 %% Text of abstract
-This paper describes the FellWalker algorithm, which segments a 1-, 2- or
-3-dimensional array of data values into a set of disjoint clumps of
-emission, each containing a single significant peak. Pixels below a
-nominated constant data level are assumed to be background pixels and are
-not assigned to any clump. FellWalker is thus equivalent in purpose to
-the CLUMPFIND algorithm. However, unlike CLUMPFIND, which segments the
-array on the basis of a set of evenly-spaced contours and thus uses only
-a small fraction of the available data  values, the FellWalker algorithm
-is based on a gradient-tracing scheme which uses all available data values.
-Comparisons of CLUMPFIND and FellWalker using a crowded field of
-artificial Gaussian clumps, all of equal peak value and width, suggest
-that the results produced by FellWalker are less dependent on specific
-parameter settings than are those of CLUMPFIND.
+This paper describes the FellWalker algorithm, a \emph{watershed}
+algorithm that segments a 1-, 2- or 3-dimensional array of data values
+into a set of disjoint clumps of emission, each containing a single
+significant peak. Pixels below a nominated constant data level are
+assumed to be background pixels and are not assigned to any clump.
+FellWalker is thus equivalent in purpose to the CLUMPFIND algorithm.
+However, unlike CLUMPFIND, which segments the array on the basis of a set
+of evenly-spaced contours and thus uses only a small fraction of the
+available data values, the FellWalker algorithm is based on a
+gradient-tracing scheme which uses all available data values. Comparisons
+of CLUMPFIND and FellWalker using a crowded field of artificial Gaussian
+clumps, all of equal peak value and width, suggest that the results
+produced by FellWalker are less dependent on specific parameter settings
+than are those of CLUMPFIND.
 \end{abstract}
 
 \begin{keyword}
@@ -216,6 +217,16 @@ at 978 metres above sea level, just visible under cloud. Copyright: Nick
 Thorne, \url{http://www.lakedistrict.gov.uk/learning/freephotos\#} }
 \label{fig:wasdale}
 \end{figure}
+
+FellWalker is a form of \emph{watershed} algorithm \citep{2001Roerdink} -
+a class of algorithms that segment images by identifying the
+``watershed'' lines that separate low lying areas (``catchment basins'').
+FellWalker inverts this idea so that each identified segment of the array
+is associated with a peak (a local maximum), rather than a basin (a local
+minimum). It shares much in common with the HOP algorithm
+\citep{1998Eisenstein} - another gradient-tracing watershed algorithm, but is
+designed for use with gridded observational data rather than particles in
+an N-body simulation.
 
 An implementation of the FellWalker algorithm is included in the Starlink
 \htmladdnormallinkfoot{CUPID}{http://starlink.jach.hawaii.edu/starlink/CUPID}
