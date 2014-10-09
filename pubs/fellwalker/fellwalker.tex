@@ -226,7 +226,10 @@ is associated with a peak (a local maximum), rather than a basin (a local
 minimum). It shares much in common with the HOP algorithm
 \citep{1998Eisenstein} - another gradient-tracing watershed algorithm, but is
 designed for use with gridded observational data rather than particles in
-an N-body simulation.
+an N-body simulation. HOP is known to be relatively insensitive to the
+values supplied for its parameters (except the lower threshold),
+reflecting a similar feature found for FellWalker (see
+section~\ref{sec:compare}).
 
 An implementation of the FellWalker algorithm is included in the Starlink
 \htmladdnormallinkfoot{CUPID}{http://starlink.jach.hawaii.edu/starlink/CUPID}
