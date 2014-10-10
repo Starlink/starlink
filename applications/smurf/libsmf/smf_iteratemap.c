@@ -484,9 +484,13 @@
 *     2014-8-19 (DSB):
 *        Added arguments ncontig and memlow.
 *     2014-09-22 (DSB):
-*        When running from SKYLOOP, and if ast.filt_diff is set, filter the 
-*        map change after all chunks have been combined, rather than after 
+*        When running from SKYLOOP, and if ast.filt_diff is set, filter the
+*        map change after all chunks have been combined, rather than after
 *        each individual chunk.
+*     2014-10-10 (DSB):
+*        If there is insufficient memory to avoid chunking, try the
+*        calculation again but without the extra work-space needed to
+*        support multi-threading in smf_rebinmap1.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -611,6 +615,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   size_t bstride;               /* Bolometer stride */
   double *chisquared=NULL;      /* chisquared for each chunk each iter */
   double chitol=VAL__BADD;      /* chisquared change tolerance for stopping */
+  int chunking;                 /* Will we be chunking due to low memory? */
   double chunkweight;           /* The relative weight to give to the
                                    current chunk when adding into the running
                                    sum map. */
@@ -705,6 +710,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
   smf_calcmodelptr modelptr=NULL; /* Pointer to current model calc function */
   dim_t mdims[2];               /* Dimensions of map */
   dim_t msize;                  /* Number of elements in map */
+  int mw;                       /* No. of threads to use when rebinning data into a map */
   char name[GRP__SZNAM+1];      /* Buffer for storing exported model names */
   dim_t nbolo;                  /* Number of bolometers */
   size_t ncontchunks=0;         /* Number continuous chunks outside iter loop*/
@@ -1319,17 +1325,58 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
                        nmodels, msize, keymap, maxdimm, maxfile,
                        &memneeded, status );
 
-    /* Note if there was insufficient memory to avoid chunking. */
-    if( memlow ) *memlow = ( *status == SMF__NOMEM );
-
-      /* If we need too much memory, generate a warning message and then try
-         to re-group the files using smaller contchunks. */
-    if( *status == SMF__NOMEM && memcheck == 0 ) {
+    /* If we need too much memory, generate a warning message and then
+       see if we would have enough memory if we were to not use
+       multi-threading in the function that rebins time-series data into
+       a map. */
+    if( *status == SMF__NOMEM ) {
       errAnnul( status );
       msgOutf( " ", FUNC_NAME ": *** WARNING ***\n  %zu continuous samples "
                "(%lg s, including padding) require %zu MiB > %zu MiB",
                status, maxconcat, maxconcat/srate_maxlen,
                memneeded/SMF__MIB, maxdimm/SMF__MIB);
+
+      msgOut( "", "  Will try again without multi-threaded rebinning...",
+              status );
+
+    /* Check memory for the map again, this time without multi-threading
+       in smf_rebinmap1. */
+      smf_checkmem_map( lbnd_out, ubnd_out, 0, 1, maxmem, epsout, &mapmem,
+                        status );
+      maxdimm = maxmem-mapmem;
+
+    /* Then the iterative components that are proportional to time */
+      smf_checkmem_dimm( maxconcat, INST__SCUBA2, igroup->nrelated, modeltyps,
+                         nmodels, msize, keymap, maxdimm, maxfile,
+                         &memneeded, status );
+
+    /* Annul the error and use a better message if there was still
+       insufficient memory to avoid chunking. In this case we revert to
+       using multi-threading in smf_rebinmap1. */
+      if( *status == SMF__NOMEM ){
+         chunking = 1;
+         mw = nw;
+         errAnnul( status );
+         msgOutf( " ", FUNC_NAME ": %zu MiB available with less multi-threading "
+                  "- still too low.", status, maxdimm/SMF__MIB );
+      } else {
+         chunking = 0;
+         mw = 1;
+         msgOutf( " ", FUNC_NAME ": %zu MiB available with less multi-threading "
+                  "- so we can avoid chunking at the expense of slower "
+                  "map-making.", status, maxdimm/SMF__MIB );
+      }
+    } else {
+      chunking = 0;
+      mw = nw;
+    }
+
+    /* Note if there was insufficient memory to avoid chunking. */
+    if( memlow ) *memlow = chunking;
+
+    /* If we need too much memory, generate a warning message and then try
+       to re-group the files using smaller contchunks. */
+    if( chunking && memcheck == 0 ) {
 
       /* Try is meant to be the largest contchunk of ~equal length
          that fits in memory. The first step uses the ratio of
@@ -1535,12 +1582,12 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
 
         /* submaps for multithread rebinning -- each thread needs its own map.
            Requires copying onto input maps on first contchunk */
-        thismap = astCalloc( nw*msize, sizeof(*thismap) );
-        thisweight = astCalloc( nw*msize, sizeof(*thisweight) );
-        thisweightsq = astCalloc( nw*msize, sizeof(*thisweightsq) );
-        thisvar = astCalloc( nw*msize, sizeof(*thisvar) );
-        thishits = astCalloc( nw*msize, sizeof(*thishits) );
-        thisqual = astCalloc( nw*msize, sizeof(*thisqual) );
+        thismap = astCalloc( mw*msize, sizeof(*thismap) );
+        thisweight = astCalloc( mw*msize, sizeof(*thisweight) );
+        thisweightsq = astCalloc( mw*msize, sizeof(*thisweightsq) );
+        thisvar = astCalloc( mw*msize, sizeof(*thisvar) );
+        thishits = astCalloc( mw*msize, sizeof(*thishits) );
+        thisqual = astCalloc( mw*msize, sizeof(*thisqual) );
       }
 
       /* Concat everything in this contchunk into a single smfArray. Note
@@ -2360,7 +2407,7 @@ void smf_iteratemap( ThrWorkForce *wf, const Grp *igrp, const Grp *iterrootgrp,
             }
 
             /* Rebin the residual + astronomical signal into a map */
-            smf_rebinmap1( wf, res[0]->sdata[idx],
+            smf_rebinmap1( ( mw > 1 ) ? wf : NULL, res[0]->sdata[idx],
                            dat.noi ? dat.noi[0]->sdata[idx] : NULL,
                            lut_data, 0, 0, 0, NULL, 0, SMF__Q_GOOD,
                            varmapmethod, rebinflags, thismap, thisweight,
