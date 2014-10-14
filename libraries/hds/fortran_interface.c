@@ -92,7 +92,7 @@ F77_SUBROUTINE(dat_basic)( CHARACTER(locator),
 
 /* Local variables.     */
    char mode_c[DAT__SZMOD+1];
-   void *cpntr = NULL; /* initialise in case of bad return status */
+   unsigned char *cpntr = NULL; /* initialise in case of bad return status */
    HDSLoc * locator_c = NULL;
    size_t len_c = 0;
 

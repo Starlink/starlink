@@ -37,7 +37,7 @@ datAnnul(HDSLoc    **locator,
 int
 datBasic(const HDSLoc    *locator,
          const char      *mode_c,
-         void **pntr,
+         unsigned char **pntr,
          size_t    *len,
          int       *status);
 
