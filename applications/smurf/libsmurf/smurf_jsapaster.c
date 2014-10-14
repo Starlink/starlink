@@ -217,7 +217,7 @@ void smurf_jsapaster( int *status ) {
 
 /* Get the JSA tile number from the FITS extension. */
    if( !astGetFitsI( fc, "TILENUM", &ref_tile ) && *status == SAI__OK ){
-      *status = SAI__OK;
+      *status = SAI__ERROR;
       ndfMsg( "N", indf );
       errRep( "", "No JSA tile number found in the FITS extension of NDF "
               "'^N'.", status );
