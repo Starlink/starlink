@@ -92,8 +92,9 @@ F77_SUBROUTINE(dat_basic)( CHARACTER(locator),
 
 /* Local variables.     */
    char mode_c[DAT__SZMOD+1];
-   unsigned char *cpntr = NULL; /* initialise in case of bad return status */
+   void *cpntr = NULL; /* initialise in case of bad return status */
    HDSLoc * locator_c = NULL;
+   size_t len_c = 0;
 
 /* Enter routine.	*/
 
@@ -103,7 +104,8 @@ F77_SUBROUTINE(dat_basic)( CHARACTER(locator),
    cnfImpn( mode, mode_length, DAT__SZMOD, mode_c);
 
 /* Call pure C routine                                       */
-   datBasic( locator_c, mode_c, &cpntr, len, status);
+   datBasic( locator_c, mode_c, &cpntr, &len_c, status);
+   *len = (F77_INTEGER_TYPE) len_c; /* ignore truncation */
 
 /* Export the C pointer as a FORTRAN pointer */
    *pntr = cnfFptr( cpntr );

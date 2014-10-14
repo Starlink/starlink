@@ -418,8 +418,8 @@ datMapV(const HDSLoc *locator,
 int
 datBasic(const HDSLoc *locator,
          const char *mode_c,
-         unsigned char **pntr,
-         int *len,
+         void **pntr,
+         size_t *len,
          int *status)
 {
 #undef context_name
