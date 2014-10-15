@@ -64,6 +64,10 @@
 #include <stdio.h>
 #include <inttypes.h>
 
+static void traceme (const HDSLoc * loc, int *status);
+static void cmpprec ( const HDSLoc * loc1, const char * name, int * status );
+
+
 int main (void) {
 
   /*  Local Variables: */
@@ -105,12 +109,91 @@ int main (void) {
   /* Create a new container file */
   hdsNew( path, "HDS_TEST", "NDF", 0, dim, &loc1, &status );
 
+  {
+    int gndim;
+    int i;
+    hdsdim celldims[] = {1};
+    hdsdim gdims[DAT__MXDIM];
+    datShape(loc1, DAT__MXDIM, gdims, &gndim, &status);
+    printf("GROUP NDIMS: %d\n", gndim);
+    for (i=0; i<gndim; i++) {
+      printf(" Dim[%d] = %zu\n", i, (size_t)gdims[i]);
+    }
+    datVec( loc1, &loc2, &status);
+    datShape(loc2, DAT__MXDIM, gdims, &gndim, &status);
+    printf("GROUP NDIMS: %d\n", gndim);
+    for (i=0; i<gndim; i++) {
+      printf(" Dim[%d] = %zu\n", i, (size_t)gdims[i]);
+    }
+    datCell( loc2, 1, celldims, &loc3, &status );
+    datAnnul( &loc3, &status );
+    datAnnul( &loc2, &status );
+  }
+
   /* Some components */
   datNew( loc1, "DATA_ARRAY", "_INTEGER", 2, dim, &status );
   datNew1C( loc1, "ONEDCHAR", 14, 3, &status );
   datNew1D( loc1, "ONEDD", 2, &status );
   datNew0K( loc1, "TESTI64", &status );
   datNew0K( loc1, "TESTBADI64", &status );
+  datNew1L( loc1, "BOOLEAN", 3, &status );
+
+  /* Create structure array */
+  {
+    hdsdim histdim[] = { 5, 2 };
+    hdsdim subs[] = { 3, 2 };
+    char namestr[DAT__SZNAM+1];
+    char opstr[2048];
+    HDSLoc * loc4 = NULL;
+    datNew( loc1, "RECORDS", "HIST_REC", 2, histdim, &status );
+    datFind( loc1, "RECORDS", &loc2, &status );
+    datCell( loc2, 2, subs, &loc3, &status );
+    datNew0I( loc3, "INTINCELL", &status );
+    datFind( loc3, "INTINCELL", &loc4, &status );
+    datName( loc2, namestr, &status );
+    printf("Parent name '%s'\n", namestr );
+    datName( loc3, namestr, &status );
+    printf("Cell name '%s'\n", namestr );
+    /* Now for datRef */
+    datRef( loc2, opstr, sizeof(opstr), &status);
+    printf("datRef structure array: %s\n", opstr);
+    datRef( loc3, opstr, sizeof(opstr), &status);
+    printf("datRef cell: %s\n", opstr);
+    traceme(loc3, &status);
+    traceme(loc4, &status);
+    datAnnul( &loc4, &status );
+    datAnnul( &loc3, &status );
+    datAnnul( &loc2, &status );
+  }
+
+  { /* Create structure and then put a
+       component of each type in it */
+
+//    datNew0B( loc1, "BYTE", &status);
+//    datNew0UB( loc1, "UBYTE", &status);
+    datNew0W( loc1, "WORD", &status);
+    datNew0UW( loc1, "UWORD", &status);
+    datNew0I( loc1, "INTEGER", &status);
+    datNew0K( loc1, "INT64", &status);
+    datNew0L( loc1, "LOGICAL", &status);
+    datNew0R( loc1, "REAL", &status);
+    datNew0D( loc1, "DOUBLE", &status);
+    datNew0C( loc1, "CHAR", 12, &status );
+
+//    cmpprec( loc1, "BYTE", &status );
+//    cmpprec( loc1, "UBYTE", &status );
+    cmpprec( loc1, "WORD", &status );
+    cmpprec( loc1, "UWORD", &status );
+    cmpprec( loc1, "INTEGER", &status );
+    cmpprec( loc1, "INT64", &status );
+    cmpprec( loc1, "LOGICAL", &status );
+    cmpprec( loc1, "REAL", &status );
+    cmpprec( loc1, "DOUBLE", &status );
+    cmpprec( loc1, "CHAR", &status );
+
+  }
+
+
 
   /* Populate */
   testin64 = 9223372036854775800;
@@ -141,6 +224,30 @@ int main (void) {
   datFind( loc1, "ONEDCHAR", &loc2, &status );
   datPutVC( loc2, 3, chararr, &status );
 
+  traceme(loc2, &status);
+
+ if (status == DAT__OK) {
+    /* Do not use MERS in test. We create an error message
+       with EMS and then extract it as text */
+    int lstat = DAT__FATAL;
+    char param[10];
+    char opstr[2048];
+    int oplen;
+    int parlen;
+    emsMark();
+    datMsg("OBJ", loc2 );
+    emsRep("", "^OBJ", &lstat);
+    emsEload( param, &parlen, opstr, &oplen, &lstat);
+    printf("datMsg: %s\n", opstr);
+    emsAnnul(&lstat);
+    emsRlse();
+
+    /* Now for datRef */
+    datRef( loc2, opstr, sizeof(opstr), &status);
+    printf("datRef: %s\n", opstr);
+  }
+
+
   /* Check contents */
   datGetVC(loc2, 3, 1024, buffer, retchararr, &actval, &status);
   if (status == DAT__OK) {
@@ -160,6 +267,13 @@ int main (void) {
     }
   }
 
+  datAnnul( &loc2, &status );
+
+  datFind( loc1, "BOOLEAN", &loc2, &status );
+  {
+    int boolarr[] = { 1, 0, 1};
+    datPutVL( loc2, 3, boolarr, &status );
+  }
   datAnnul( &loc2, &status );
 
   datFind( loc1, "ONEDD", &loc2, &status );
@@ -259,6 +373,14 @@ int main (void) {
       emsRep( "PREC","Precision for _REAL not 4 bytes but ^NB", &status);
     }
   }
+  datLen( loc3, &nbytes, &status );
+  if (status == DAT__OK) {
+    if ( nbytes != 4) {
+      status = DAT__FATAL;
+      emsSeti( "NB", nbytes );
+      emsRep( "PREC","Precision for _REAL not 4 bytes but ^NB", &status);
+    }
+  }
 
   /* Try hdsShow */
   hdsShow("LOCATORS", &status);
@@ -323,7 +445,7 @@ int main (void) {
 
 
   /* Tidy up and close */
-  hdsErase( &loc1, &status );
+  //hdsErase( &loc1, &status );
 
   if (status == DAT__OK) {
     printf("HDS C installation test succeeded\n");
@@ -337,3 +459,28 @@ int main (void) {
 
 
 }
+
+
+static void cmpprec ( const HDSLoc * loc1, const char * name, int * status ) {
+    HDSLoc * locator = NULL;
+    size_t complen = 0;
+    size_t compprec = 0;
+
+    datFind( loc1, name, &locator, status);
+    datPrec( locator, &compprec, status);
+    datLen( locator, &complen, status);
+    printf("%s precision: %zu length: %zu\n", name, compprec, complen);
+    datAnnul(&locator, status );
+}
+
+static void traceme (const HDSLoc * loc, int *status) {
+    char path_str[1024];
+    char file_str[2048];
+    int nlev;
+    hdsTrace( loc, &nlev, path_str, file_str,
+              status, sizeof(path_str),
+              sizeof(file_str));
+    printf("File: '%s' Path: '%s' Level = %d\n", file_str,
+           path_str, nlev);
+  }
+
