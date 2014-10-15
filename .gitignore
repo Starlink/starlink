@@ -84,6 +84,7 @@ stamp-h2
 test-driver
 ylwrap
 *-stamp
+*.trs
 
 # Perl
 
