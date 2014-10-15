@@ -5973,6 +5973,10 @@ package @PACKAGE@ {
         obey {python $SMURF_DIR/jsasplit.py}
     }
 
+    command jsatilemoc {
+        obey {python $SMURF_DIR/jsatilemoc.py}
+    }
+
     command rawregion {
         obey {python $SMURF_DIR/rawregion.py}
     }

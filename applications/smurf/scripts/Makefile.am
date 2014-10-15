@@ -7,6 +7,7 @@ configmeld.py \
 fts2gaia.py \
 jsajoin.py \
 jsasplit.py \
+jsatilemoc.py \
 skyloop.py
 
 # Help file
