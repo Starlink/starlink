@@ -915,7 +915,8 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
                      AstFrameSet *specrefwcs, double par[ 7 ],
                      Grp *detgrp, int moving, int specunion, int lbnd[ 3 ],
                      int ubnd[ 3 ], AstFrameSet **wcsout, int *npos,
-                     int *hasoffexp, smfBox **boxes, int *polobs, int *status );
+                     int *hasoffexp, smfBox **boxes, int *polobs,
+                     double *aref, double *bref, int *status );
 
 void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
                    int autogrid, int alignsys, Grp *detgrp, double par[ 7 ],

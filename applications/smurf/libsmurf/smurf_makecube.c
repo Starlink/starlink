@@ -891,9 +891,12 @@
 *        - Ensure the NTILE parameter is written before the OUT parameter is
 *        accessed (unless JSA tiles are being created).
 *        - Added parameter POSERRFATAL.
+*     14-OCT-2014 (DSB):
+*        Handle cases where the target is moving but the output cube has
+*        absolute sky coords (e.g. when creating JSA tiles for moving targets).
 
 *  Copyright:
-*     Copyright (C) 2007-2013 Science and Technology Facilities Council.
+*     Copyright (C) 2007-2014 Science and Technology Facilities Council.
 *     Copyright (C) 2006-2007 Particle Physics and Astronomy Research
 *     Council. Copyright (C) 2006-2008,2013 University of British Columbia.
 *     All Rights Reserved.
@@ -985,6 +988,8 @@ void smurf_makecube( int *status ) {
    char pabuf[ 10 ];          /* Text buffer for parameter value */
    char system[ 10 ];         /* Celestial coord system for output cube */
    double *pangle;            /* Ptr to array holding angle for each pol bin */
+   double aref = AST__BAD;    /* Absolute sky longitude of target */
+   double bref = AST__BAD;    /* Absolute sky latitude of target */
    double fcon;               /* Tsys factor for file */
    double par[ 7 ];           /* Projection parameter */
    double params[ 4 ];        /* astRebinSeq parameters */
@@ -1256,7 +1261,7 @@ void smurf_makecube( int *status ) {
                       spacerefwcs, specrefwcs, par,
                       ( trim ? detgrp : NULL ), moving, specunion, lbnd_out,
                       ubnd_out, &wcsout, &npos, &hasoffexp, &boxes,
-                      &polobs, status );
+                      &polobs, &aref, &bref, status );
 
 /* See if the input data should be weighted according to the reciprocal
    of the input variances. This required ACS_OFFEXPOSURE values in the
@@ -1540,8 +1545,32 @@ void smurf_makecube( int *status ) {
       if( tile->map2d ) astRemapFrame( wcstile2d, AST__BASE, tile->map2d );
 
 /* Get the Mapping from 2D GRID to SKY coords (the tiles equivalent of
-   "oskymap"). */
-      tskymap = astGetMapping( wcstile2d, AST__BASE, AST__CURRENT );
+   "oskymap"). If the target is moving, but an absolute skyframe is used
+   by the output, then we need to change the skyframe to use offsets
+   before getting the mapping (as required by smf_rebin_totmap). We set
+   the correct target position first. */
+      if( moving && astChrMatch( astGetC( wcstile2d, "SkyRefIs" ),
+                                 "Ignored" ) ){
+         AstFrameSet *temp = astCopy( wcstile2d );
+         astSetD( temp, "SkyRef(1)", aref );
+         astSetD( temp, "SkyRef(2)", bref );
+         astSetC( temp, "SkyRefIs", "Origin" );
+         tskymap = astGetMapping( temp, AST__BASE, AST__CURRENT );
+         temp = astAnnul( temp );
+
+/* If the target is not moving, but an offset skyframe is used by the
+   output, then we need to change the skyframe to use absolute coords
+   before getting the mapping (as required by smf_rebin_totmap). */
+      } else if( !moving && astChrMatch( astGetC( wcstile2d, "SkyRefIs" ),
+                                         "Origin" ) ){
+         astClear( wcstile2d, "SkyRefIs" );
+         tskymap = astGetMapping( wcstile2d, AST__BASE, AST__CURRENT );
+         astSetC( wcstile2d, "SkyRefIs", "Origin" );
+
+/* Otherwise just use the mapping as it is. */
+      } else {
+         tskymap = astGetMapping( wcstile2d, AST__BASE, AST__CURRENT );
+      }
 
 /* Invert the output sky mapping so that it goes from sky to pixel
    coords. */
