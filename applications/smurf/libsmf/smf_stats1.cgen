@@ -72,8 +72,9 @@
 *     Technometrics 4(3):419-420.
 
 *  Authors:
-*     Edward Chapin (UBC)
+*     EC: Edward Chapin (UBC)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     DSB: David Berry (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -94,6 +95,8 @@
 *        Add median
 *     2011-10-18 (EC):
 *        Update to use the "on-line" algorithm to improve numerical stability
+*     2014-10-15 (DSB):
+*        Prevent divide by zero if count == 1.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -344,14 +347,13 @@ void CGEN_FUNCTION(smf_stats1)( const CGEN_TYPE *data, size_t stride,
             status );
   }
 
-  /* Calculate numbers as long as count > 0 */
-  if( count > 0 ) {
-    if( mean ) *mean = mu;
-    if( sigma ) {
-      double variance = m2 / ((double) count - 1);
-      *sigma = sqrt( variance );
-    }
+  /* Calculate numbers if possible */
+  if( mean && count > 0 ) *mean = mu;
+  if( sigma && count > 1 ) {
+    double variance = m2 / ((double) count - 1);
+    *sigma = sqrt( variance );
   }
+
   if( ngood ) *ngood = count;
 
   /* Enough samples? */
