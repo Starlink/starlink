@@ -163,7 +163,7 @@ void err1Rep( const char * param, const char * text, int useformat,
   int tokpos = -1;          /* Position of ^ in string */
 
   /* Terminate strings */
-  tstr[0] = '\0';
+  memset( tstr, '\0', sizeof(tstr) );
   mstr[0] = '\0';
   pstr[0] = '\0';
 
