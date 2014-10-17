@@ -1653,7 +1653,6 @@ void findclumps( int *status ) {
 
 /* Delete the GRP group. */
       grpDelet( &confgrp, status );
-
    }
 
 /* End the error context. */
@@ -1663,7 +1662,7 @@ void findclumps( int *status ) {
    until now to be sure the main output NDF is complete. We copy the
    HISTORY information from the main output NDF to the output JSA
    catalogue. */
-   if( jsacat ) {
+   if( jsacat && nclumps ) {
 
 /* Ensure default history has been written to the main output NDF. */
       ndfHdef( indf2, " ", status );
