@@ -31,6 +31,10 @@ all:
 	        -D TK_INCLUDE_PATH:PATH=$(prefix)/include \
 	        -D TK_LIBRARY:FILEPATH=$(prefix)/lib/libtk8.5$(SHLIB_EXT) \
 	        -D VTK_OPENGL_HAS_OSMESA:BOOL=OFF \
+                -D CMAKE_FIND_FRAMEWORK=NEVER \
+                -D OPENGL_INCLUDE_DIR:PATH=$(X11_INCLUDES) \
+                -D OPENGL_gl_LIBRARY:FILEPATH=$(X11_LIBS)/libGL$(SHLIB_EXT) \
+                -D OPENGL_glu_LIBRARY:FILEPATH=$(X11_LIBS)/libGLU$(SHLIB_EXT) \
 	        -D VTK_USE_CARBON:BOOL=OFF \
 	        -D VTK_USE_COCOA:BOOL=OFF  \
 	        -D VTK_USE_GEOVIS:BOOL=OFF \

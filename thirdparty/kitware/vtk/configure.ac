@@ -9,6 +9,15 @@ AC_PREREQ(2.50)
 dnl    Require Starlink automake
 AM_INIT_AUTOMAKE(1.8.2-starlink)
 
+dnl  Need to work out where the X11 libraries are. On a Mac
+dnl  VTK always looks for the OpenGL framework even if building
+dnl  against X11.
+AC_PATH_XTRA
+X11_INCLUDES=$x_includes
+X11_LIBS=$x_libraries
+AC_SUBST(X11_INCLUDES)
+AC_SUBST(X11_LIBS)
+
 dnl    Get extension for shared libraries.
 dnl    Need to determine the suffix for shareable libraries, as used by
 dnl    Tcl, so we can link against the GAIA dynamic library.
