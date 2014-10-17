@@ -6229,6 +6229,7 @@ ac_x_header_dirs='
 /usr/X11R5/include
 /usr/X11R4/include
 
+/opt/X11/include
 /usr/include/X11
 /usr/include/X11R7
 /usr/include/X11R6
