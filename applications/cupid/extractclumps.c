@@ -2,6 +2,7 @@
 #include "mers.h"
 #include "ndf.h"
 #include "star/ndg.h"
+#include "star/cvg.h"
 #include "ast.h"
 #include "star/kaplibs.h"
 #include "star/irq.h"
@@ -107,6 +108,45 @@ void extractclumps( int *status ) {
 *        parameters (for JSA-style catalogues see parameter "JSACAT"). See the
 *        description of the OUTCAT parameter for the FINDCLUMPS command for
 *        further information.
+*     SHAPE = LITERAL (Read)
+*        Specifies the shape that should be used to describe the spatial
+*        coverage of each clump in the output catalogue. It can be set to
+*        "None", "Polygon" or "Ellipse". If it is set to "None", the
+*        spatial shape of each clump is not recorded in the output
+*        catalogue. Otherwise, the catalogue will have an extra column
+*        named "Shape" holding an STC-S description of the spatial coverage
+*        of each clump. "STC-S" is a textual format developed by the IVOA
+*        for describing regions within a WCS - see
+*        http://www.ivoa.net/Documents/latest/STC-S.html for details.
+*        These STC-S desriptions can be displayed by the KAPPA:LISTSHOW
+*        command, or using GAIA. Since STC-S cannot describe regions within
+*        a pixel array, it is necessary to set parameter WCSPAR to TRUE if
+*        using this option. An error will be reported if WCSPAR is FALSE. An
+*        error will also be reported if the WCS in the input data does not
+*        contain a pair of scelestial sky axes.
+*
+*        - Polygon: Each polygon will have, at most, 15 vertices. If the data
+*        is 2-dimensional, the polygon is a fit to the clump's outer boundary
+*        (the region containing all godo data values). If the data is
+*        3-dimensional, the spatial footprint of each clump is determined
+*        by rejecting the least significant 10% of spatial pixels, where
+*        "significance" is measured by the number of spectral channels that
+*        contribute to the spatial pixel. The polygon is then a fit to
+*        the outer boundary of the remaining spatial pixels.
+*
+*        - Ellipse: All data values in the clump are projected onto the
+*        spatial plane and "size" of the collapsed clump at four different
+*        position angles - all separated by 45 degrees - is found (see the
+*        OUTCAT parameter for a description of clump "size"). The ellipse
+*        that generates the same sizes at the four position angles is then
+*        found and used as the clump shape.
+*
+*        In general, "Ellipse" will outline the brighter, inner regions
+*        of each clump, and "Polygon" will include the fainter outer
+*        regions. The dynamic default is "Polygon" if a JSA-style
+*        catalogue (see parameters JSACAT) is being created, and "None"
+*        otherwise. Note, if a JSA-style catalogue is neing created an
+*        error will be reported if "Ellipse" or "None" is selected. []
 *     VELORES = _REAL (Read)
 *        The velocity resolution of the instrument, in channels. If DECONV is
 *        TRUE, the velocity width of each clump written to the output
@@ -179,6 +219,8 @@ void extractclumps( int *status ) {
 *        Add star/irq.h include as it is no longer in star/kaplibs.h.
 *     19-NOV-2013 (DSB):
 *        Add parameter JSACAT.
+*     15-OCT-2014 (SFG):
+*        Add paramter SHAPE.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -199,15 +241,18 @@ void extractclumps( int *status ) {
    HDSLoc *xloc;                /* HDS locator for CUPID extension */
    IRQLocs *qlocs;              /* HDS locators for quality name information */
    char attr[ 30 ];             /* AST attribute name */
+   char buffer[ GRP__SZNAM ];    /* Buffer for GRP element */
    char dataunits[ 21 ];        /* NDF data units */
    char dtype[ 20 ];            /* NDF data type */
    char itype[ 20 ];            /* NDF data type */
    char logfilename[ GRP__SZNAM + 1 ]; /* Log file name */
+   char shape[ 10 ];            /* Shape for spatial STC-S regions */
    const char *dom;             /* Axis domain */
    const char *method;          /* Algorithm string supplied by user */
    double beamcorr[ 3 ];        /* Beam width corrections */
    double fb;                   /* FWHMBEAM value */
    double vr;                   /* VELORES value */
+   fitsfile *fptr;              /* Pointer to FITS file structure */
    float *rmask;                /* Pointer to cump mask array */
    int *clbnd;                  /* Lower GRID bounds of each clump */
    int *cubnd;                  /* Upper GRID bounds of each clump */
@@ -215,6 +260,7 @@ void extractclumps( int *status ) {
    int *pa;                     /* Pointer to next pixel assignment value */
    int *pid;                    /* Pointer to next clump ID */
    int backoff;                 /* Remove background when finding clump sizes? */
+   int blockf;                  /* FITS file blocking factor */
    int deconv;                  /* Should clump parameters be deconvolved? */
    int dim[ NDF__MXDIM ];       /* Pixel axis dimensions */
    int dims[ 3 ];               /* Significant pixel axis dimensions */
@@ -227,6 +273,8 @@ void extractclumps( int *status ) {
    int indf1;                   /* Identifier for input data NDF */
    int indf2;                   /* Identifier for input mask NDF */
    int indf3;                   /* Identifier for output mask NDF */
+   int ishape;                  /* STC-S shape for spatial coverage */
+   int jsacat;                  /* Is a JSA-style catalogue being created? */
    int ix;                      /* GRID value on 1st axis */
    int iy;                      /* GRID value on 2nd axis */
    int iz;                      /* GRID value on 3rd axis */
@@ -359,6 +407,25 @@ void extractclumps( int *status ) {
       }
    }
 
+/* See if a JSA-style output catalogue is being created. */
+   jsacat = 0;
+   if( *status == SAI__OK ) {
+      parGet0c( "JSACAT", buffer, sizeof( buffer ), status );
+      if( *status == SAI__OK ) {
+         jsacat = 1;
+      } else if( *status == PAR__NULL ) {
+         errAnnul( status );
+      }
+   }
+/* If so, report an error unless the WCS of the input NDF contains a pair
+   of sky axes. */
+   if( jsacat && nskyax != 2 && *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRepf( " ", "Cannot create a JSA-style output catalogue since "
+               "the input NDF does not have any WCS sky axes.", status );
+   }
+
+
 /* See if the clump parameters are to be described using WCS values or
    pixel values. The default is yes if the current WCS Frame consists
    entirely of sky and spectral axes, and does not contain more than 1
@@ -368,6 +435,46 @@ void extractclumps( int *status ) {
                        ( nsig == 3 && nspecax == 1 && nskyax == 2 ),
              status );
    parGet0l( "WCSPAR", &usewcs, status );
+
+/* See what STC-S shape should be used to describe each spatial clump. */
+   ishape = 0;
+   parChoic( "SHAPE", jsacat ? "Polygon" : "None", "Ellipse,Polygon,None", 1,
+             shape, 10, status );
+   if( *status == SAI__OK ) {
+      if( !strcmp( shape, "POLYGON" ) ) {
+         ishape = 2;
+      } else if( !strcmp( shape, "ELLIPSE" ) ) {
+         ishape = 1;
+      }
+   }
+
+/* Report an error if we are creating a JSA-style catalogue and the user
+   has selected not to use polygon shapes. */
+   if( jsacat && ishape != 2 && *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRepf( " ", "Cannot create a JSA-style output catalogue since "
+               "the SHAPE parameter is not set to 'Polygon'.", status );
+   }
+
+/* Report an error if an attempt is made to produce STC-S descriptions of
+   the spatial coverage of each clump using pixel coords. */
+   if( ishape && *status == SAI__OK ) {
+      if( nskyax < 2 ) {
+         msgSetc( "S", shape );
+         msgSetc( "S", "s" );
+         *status = SAI__ERROR;
+         errRep( " ", "Cannot produce STC-S ^S: the current WCS frame in "
+                 "the input does not contain a pair of celestial sky axes.",
+                 status );
+
+      } else if( !usewcs ) {
+         msgSetc( "S", shape );
+         msgSetc( "S", "s" );
+         *status = SAI__ERROR;
+         errRep( " ", "Cannot produce STC-S ^S: the WCSPAR parameter "
+                 "must be set TRUE to produce spatial regions.", status );
+      }
+   }
 
 /* Choose the data type to use when mapping the DATA Data array. */
    ndfMtype( "_REAL,_DOUBLE", indf1, indf1, "DATA", itype, 20, dtype, 20,
@@ -549,7 +656,7 @@ void extractclumps( int *status ) {
       ndfState( indf1, "WCS", &gotwcs, status );
       msgBlank( status );
       cupidStoreClumps( "OUTCAT", "JSACAT", indf1, xloc, ndfs, nsig, deconv,
-                        backoff, 1, velax, beamcorr, "Output from CUPID:EXTRACTCLUMPS",
+                        backoff, ishape, velax, beamcorr, "Output from CUPID:EXTRACTCLUMPS",
                         usewcs, gotwcs ? iwcs : NULL, dataunits, NULL, logfile,
                         &nclumps, status );
 
@@ -571,15 +678,22 @@ void extractclumps( int *status ) {
       irqDelet( indf3, status );
       irqNew( indf3, "CUPID", &qlocs, status );
 
-/* Add in two quality names; "CLUMP"and "BACKGROUND". */
+/* Add in three quality names; "CLUMP", "BACKGROUND" and "EDGE". */
       irqAddqn( qlocs, "CLUMP", 0, "set iff a pixel is within a clump",
                 status );
       irqAddqn( qlocs, "BACKGROUND", 0, "set iff a pixel is not within a clump",
+                status );
+      irqAddqn( qlocs, "EDGE", 0, "set iff a pixel is on the edge of a clump",
                 status );
 
 /* Transfer the pixel mask to the NDF quality array. */
       irqSetqm( qlocs, 1, "BACKGROUND", el, rmask, &n, status );
       irqSetqm( qlocs, 0, "CLUMP", el, rmask, &n, status );
+
+/* Find the edges of the clumps (all other pixels will be set to
+   VAL__BADR in "rmask"), and then set the "EDGE" Quality flag. */
+      cupidEdges( rmask, el, dims, skip, 1.0, VAL__BADR, status );
+      irqSetqm( qlocs, 0, "EDGE", el, rmask, &n, status );
 
 /* Release the quality name information. */
       rmask = astFree( rmask );
@@ -588,6 +702,35 @@ void extractclumps( int *status ) {
 /* Relase the extension locator.*/
       datAnnul( &xloc, status );
    }
+
+
+/* Now we add history to any output JSA-style catalogue. We leave it
+   until now to be sure the main output NDF is complete. We copy the
+   HISTORY information from the main output NDF to the output JSA
+   catalogue. */
+   if( jsacat && nclumps ) {
+
+/* Ensure default history has been written to the main output NDF. */
+      ndfHdef( indf3, " ", status );
+
+/* Re-open the output JSA catalogue. */
+      cvgAssoc( "JSACAT", "Update", &fptr, &blockf, status );
+
+/* Copy History from the main output NDF to the output catalogue. */
+      cvgWhisr( indf3, fptr, status );
+
+/* Add CHECKSUM and DATASUM headers. */
+      if( *status == SAI__OK ) {
+         int fstat = 0;
+         ffpcks( fptr, &fstat );
+      }
+
+/* Close the FITS file. */
+      cvgClose( &fptr, status );
+   }
+
+/* Tidy up */
+L999:
 
 /* Release the HDS object containing the list of NDFs describing the clumps. */
    if( ndfs ) datAnnul( &ndfs, status );
