@@ -584,7 +584,7 @@ static void DisplayKeyMap( AstKeyMap *km, int sort, const char *prefix,
                   text = astAppendString( text, &nc, "+ " );
                }
             }
-            text = astAppendString( text, &nc, "%s%s = %s", prefix, key, cvalue );
+            text = astAppendStringf( text, &nc, "%s%s = %s", prefix, key, cvalue );
 
 /* If it is a vector, we construct a string containing a comma-separated
    list of elements, enclosed in parentheses. */
@@ -632,7 +632,7 @@ static void DisplayKeyMap( AstKeyMap *km, int sort, const char *prefix,
                   text = astAppendString( text, &nc, "+ " );
                }
             }
-            text = astAppendString( text, &nc, "%s%s = %s", prefix, key, cvalue );
+            text = astAppendStringf( text, &nc, "%s%s = %s", prefix, key, cvalue );
             cvalue = astFree( (void *) cvalue );
             if (refcvalue) refcvalue = astFree((void*) refcvalue);
          }
