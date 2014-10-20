@@ -22958,12 +22958,10 @@ copy of ERFA is included within AST.
 
 \end{enumerate}
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V8.0.1}
+\subsection{Changes Introduced in V8.0.1}
 
-The following describes the most significant changes which have
-occurred in the AST library between versions V8.0.0 and V8.0.1 (the
-current version):
+The following describes the most significant changes which
+occurred in the AST library between versions V8.0.0 and V8.0.1:
 
 \begin{enumerate}
 
@@ -22981,12 +22979,34 @@ c+
 c-
 f+
 \item The AST\_REBIN and AST\_REBINSEQ family of functions now include support
-  for arrays with byte and unsigned byte data types.
+  for arrays with \_BYTE (byte) and and \_UBYTE (unsigned byte) data types.
 f-
 
 \end{enumerate}
 
-Programs which are statically linked will need to be re-linked in
-order to take advantage of these new facilities.
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V8.0.2}
+c+
+The following describes the most significant changes which have
+occurred in the AST library between versions V8.0.1 and V8.0.2 (the
+current version):
+
+\begin{enumerate}
+\item For security reasons, the change introduced to astAppendString in
+  V8.0.1 has been moved to a new function called astAppendStringf, and
+  astAppendString itself has been reverted to its V8.0.0 version.
+  Any software that has been built against V8.0.1 will need to be
+  re-compiled and re-linked against V8.0.2.
+\end{enumerate}
+
+c-
+f+
+The changes that occurred in the AST library between versions V8.0.1 and
+V8.0.2 only affect the C interface. The Fortran interface remains the
+same as V8.0.1.
+f-
+
+% Programs which are statically linked will need to be re-linked in
+% order to take advantage of these new facilities.
 
 \end{document}

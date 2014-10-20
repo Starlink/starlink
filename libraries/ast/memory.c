@@ -155,6 +155,9 @@
 *     23-SEP-2014 (DSB):
 *        Modify astAppendString to allow printf conversion specifications to
 *        be included in the appended string.
+*     20-OCT-2014 (DSB):
+*        Revert the change to astAppendString made on 23-SEP-2014 as it is
+*        insecure. Instead add new function astAppendStringf.
 */
 
 /* Configuration results. */
@@ -535,7 +538,7 @@ static int CompareTimers2( const void *, const void * );
 
 /* Function implementations. */
 /* ========================= */
-char *astAppendString_( char *str1, int *nc, const char *str2, ... ) {
+char *astAppendString_( char *str1, int *nc, const char *str2, int *status ) {
 /*
 *++
 *  Name:
@@ -549,7 +552,7 @@ char *astAppendString_( char *str1, int *nc, const char *str2, ... ) {
 
 *  Synopsis:
 *     #include "memory.h"
-*     char *astAppendString( char *str1, int *nc, const char *str2, ... )
+*     char *astAppendString( char *str1, int *nc, const char *str2 )
 
 *  Description:
 *     This function appends one string to another dynamically
@@ -575,13 +578,108 @@ char *astAppendString_( char *str1, int *nc, const char *str2, ... ) {
 *        be ignored and zero will be used.
 *     str2
 *        Pointer to a constant null-terminated string, a copy of which
-*        is to be appended to "str1". It may contain conversion
+*        is to be appended to "str1".
+
+*  Returned Value:
+*     astAppendString()
+*        A possibly new pointer to the dynamic string with the new string
+*        appended (its location in memory may have to change if it has to
+*        be extended, in which case the original memory is automatically
+*        freed by this function). When the string is no longer required,
+*        its memory should be freed using astFree.
+
+*  Notes:
+*     - If this function is invoked with the global error status set
+*     or if it should fail for any reason, then the returned pointer
+*     will be equal to "str1" and the dynamic string contents will be
+*     unchanged.
+*--
+*/
+
+
+/* Local Variables: */
+   char *result;                 /* Pointer value to return */
+   int len;                      /* Length of new string */
+
+/* Initialise. */
+   result = str1;
+
+/* If the first string pointer is NULL, also initialise the character
+   count to zero. */
+   if ( !str1 ) *nc = 0;
+
+/* Check the global error status. */
+   if ( !astOK || !str2 ) return result;
+
+/* Calculate the total string length once the two strings have been
+   concatenated. */
+   len = *nc + (int) strlen( str2 );
+
+/* Extend the first (dynamic) string to the required length, including
+   a final null. Save the resulting pointer, which will be
+   returned. */
+   result = astGrow( str1, len + 1, sizeof( char ) );
+
+/* If OK, append the second string and update the total character
+   count. */
+   if ( astOK ) {
+      (void) strcpy( result + *nc, str2 );
+      *nc = len;
+   }
+
+/* Return the result pointer. */
+   return result;
+}
+
+char *astAppendStringf_( char *str1, int *nc, const char *str2, ... ) {
+/*
+*++
+*  Name:
+*     astAppendStringf
+
+*  Purpose:
+*     Append a string to another string, allowing printf format specifiers.
+
+*  Type:
+*     Public function.
+
+*  Synopsis:
+*     #include "memory.h"
+*     char *astAppendStringf( char *str1, int *nc, const char *str2, ... )
+
+*  Description:
+*     This function appends one string to another dynamically
+*     allocated string, extending the dynamic string as necessary to
+*     accommodate the new characters (plus the final null). It is the
+*     same as astAppendString, except that the "str2" string ay include
+*     printf format specifiers.
+
+*  Parameters:
+*     str1
+*        Pointer to the null-terminated dynamic string, whose memory
+*        has been allocated using an AST memory allocation function.
+*        If no space has yet been allocated for this string, a NULL
+*        pointer may be given and fresh space will be allocated by this
+*        function.
+*     nc
+*        Pointer to an integer containing the number of characters in
+*        the dynamic string (excluding the final null). This is used
+*        to save repeated searching of this string to determine its
+*        length and it defines the point where the new string will be
+*        appended. Its value is updated by this function to include
+*        the extra characters appended.
+*
+*        If "str1" is NULL, the initial value supplied for "*nc" will
+*        be ignored and zero will be used.
+*     str2
+*        Pointer to a constant null-terminated string, a copy of which
+*        is to be appended to "str1". It may contain format
 *        specifications such as used with the C "printf" family of
 *        functions.
 *     ...
 *        Additional optional arguments (as used by e.g. "printf")
 *        which specify values which are to be substituted into the "str2"
-*        string in place of any conversion specifications.
+*        string in place of any format specifications.
 
 *  Returned Value:
 *     astAppendString()

@@ -16,7 +16,9 @@ environment-independent.
 Main Changes in this Version
 ----------------------------
 
-
+- For security reasons, the change introduced to astAppendString in
+  V8.0.1 has been moved to a new function called astAppendStringf, and
+  astAppendString itself has been reverted to its V8.0.0 version.
 
 Main Changes in V8.0.1
 ----------------------
