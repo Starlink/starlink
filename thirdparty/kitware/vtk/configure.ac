@@ -11,12 +11,13 @@ AM_INIT_AUTOMAKE(1.8.2-starlink)
 
 dnl  Need to work out where the X11 libraries are. On a Mac
 dnl  VTK always looks for the OpenGL framework even if building
-dnl  against X11.
+dnl  against X11. Trap case where no special X11 location is needed.
 AC_PATH_XTRA
 X11_INCLUDES=$x_includes
 X11_LIBS=$x_libraries
 AC_SUBST(X11_INCLUDES)
 AC_SUBST(X11_LIBS)
+AM_CONDITIONAL( NEED_GLPATH, [test "x$x_includes" != "x"])
 
 dnl    Get extension for shared libraries.
 dnl    Need to determine the suffix for shareable libraries, as used by

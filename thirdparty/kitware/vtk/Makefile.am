@@ -5,6 +5,18 @@
 ##  Extension for shared libraries.
 SHLIB_EXT = @TCL_SHLIB_EXT@
 
+if NEED_GLPATH
+
+  GLPATH_INFO = -D OPENGL_INCLUDE_DIR:PATH=$(X11_INCLUDES) \
+                -D OPENGL_gl_LIBRARY:FILEPATH=$(X11_LIBS)/libGL$(SHLIB_EXT) \
+                -D OPENGL_glu_LIBRARY:FILEPATH=$(X11_LIBS)/libGLU$(SHLIB_EXT)
+
+else
+
+  GLPATH_INFO =
+
+endif
+
 ##  First build CMake, then use that to configure VTK and finall build it.
 ##  Note need a softlink so that include files are located using <vtk/>
 ##  (this will need updating for new major versions of VTK).
@@ -32,10 +44,7 @@ all:
                 -D TK_XLIB_PATH:PATH=$(X11_INCLUDES) \
 	        -D TK_LIBRARY:FILEPATH=$(prefix)/lib/libtk8.5$(SHLIB_EXT) \
 	        -D VTK_OPENGL_HAS_OSMESA:BOOL=OFF \
-                -D CMAKE_FIND_FRAMEWORK=NEVER \
-                -D OPENGL_INCLUDE_DIR:PATH=$(X11_INCLUDES) \
-                -D OPENGL_gl_LIBRARY:FILEPATH=$(X11_LIBS)/libGL$(SHLIB_EXT) \
-                -D OPENGL_glu_LIBRARY:FILEPATH=$(X11_LIBS)/libGLU$(SHLIB_EXT) \
+                -D CMAKE_FIND_FRAMEWORK=NEVER $(GLPATH_INFO) \
 	        -D VTK_USE_CARBON:BOOL=OFF \
 	        -D VTK_USE_COCOA:BOOL=OFF  \
 	        -D VTK_USE_GEOVIS:BOOL=OFF \
