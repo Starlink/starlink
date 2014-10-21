@@ -264,10 +264,10 @@ peak. Whilst this approach has been used widely, there are several
 alternative approaches to the problem of identifying clumps of emission
 which can be more appropriate, depending on the particular science being
 performed. For instance, it may be beneficial to allow clumps of emission
-to overlap (\emph{e.g.} GaussClumps \cite[][\ascl{1406.018}]{1990ApJ...356..513S} 
-and GetSources \cite{GetSources}), or to take account of the hierarchical 
-structure within clouds (\emph{e.g.} deprograms \cite{2008Rosolowsky}). However, 
-such issues are outside the remit of the FellWalker algorithm, and consequently 
+to overlap (\emph{e.g.} GaussClumps \cite[][\ascl{1406.018}]{1990ApJ...356..513S}
+and GetSources \cite{GetSources}), or to take account of the hierarchical
+structure within clouds (\emph{e.g.} deprograms \cite{2008Rosolowsky}). However,
+such issues are outside the remit of the FellWalker algorithm, and consequently
 this paper provides only a comparison of FellWalker with CLUMPFIND.
 
 \section{The FellWalker Algorithm}
@@ -464,12 +464,18 @@ clump index within a box of width 3 pixels centred on the corresponding
 pixel within the old CAA. The output CAA from one step becomes the input
 CAA to the next step. By default, only one step is performed.
 Fig.~\ref{fig:cleanedmask} shows the effects of applying a single step to
-the CAA shown in Fig.~\ref{fig:rawmask}.
+the CAA shown in Fig.~\ref{fig:rawmask}. Note, this cleaning process
+produces only minimal changes in the smooth artificial data used in these
+figures. The effect of the cleaning process can be much more pronounced
+in real data.
 
 \begin{figure}
 \includegraphics[width=\columnwidth]{cleaned}
 \caption{The smoothing effect of a single step of the cellular automaton
-on the clump outlines shown in Fig.~\ref{fig:rawmask}.}
+on the clump outlines shown in Fig.~\ref{fig:rawmask}. The outer
+boundaries of the two clumps are noticably smoother, although in this
+particular case the boundary \emph{between} the two clumps has not
+changed much, since it is already very smooth.}
 \label{fig:cleanedmask}
 \end{figure}
 
