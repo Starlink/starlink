@@ -184,9 +184,9 @@ clumps of emission, each associated with a single significant peak. It is
 based upon an analysis of a set of evenly spaced contours derived from
 the data array and has two main parameters - the lowest contour level,
 below which data is ignored, and the interval between contours. However
-it has often been noted (\emph{e.g.} \cite{2014Christie},
-\cite{2009Kainulainen}, \cite{2009Pineda}, \cite{2008Smith}, \cite{2007Elia},
-\cite{2003Brunt}) that the decomposition produced by CLUMPFIND can be very
+it has often been noted (\emph{e.g.} \citet{2014Christie},
+\citet{2009Kainulainen}, \citet{2009Pineda}, \citet{2008Smith}, \citet{2007Elia},
+\citet{2003Brunt}) that the decomposition produced by CLUMPFIND can be very
 sensitive to the specific value used for the contour interval, particularly
 for 3-dimensional data and crowded fields. The choice of an optimal contour
 interval is a compromise - real peaks may be missed if the interval is too
@@ -264,9 +264,9 @@ peak. Whilst this approach has been used widely, there are several
 alternative approaches to the problem of identifying clumps of emission
 which can be more appropriate, depending on the particular science being
 performed. For instance, it may be beneficial to allow clumps of emission
-to overlap (\emph{e.g.} GaussClumps \cite[][\ascl{1406.018}]{1990ApJ...356..513S}
-and GetSources \cite{GetSources}), or to take account of the hierarchical
-structure within clouds (\emph{e.g.} deprograms \cite{2008Rosolowsky}). However,
+to overlap (\emph{e.g.} GaussClumps \citep[][\ascl{1406.018}]{1990ApJ...356..513S}
+and GetSources \citep{GetSources}), or to take account of the hierarchical
+structure within clouds (\emph{e.g.} dendrograms \citep{2008Rosolowsky}). However,
 such issues are outside the remit of the FellWalker algorithm, and consequently
 this paper provides only a comparison of FellWalker with CLUMPFIND.
 
@@ -572,13 +572,13 @@ clump volume should be unchanged by the instrumental blurring:
 
 \section{Comparing FellWalker and CLUMPFIND}
 \label{sec:compare}
-\cite{2010Watson} made a detailed comparison of the performance of several
+\citet{2010Watson} made a detailed comparison of the performance of several
 different 2-dimensional clump finding algorithms, including FellWalker and CLUMPFIND.
 This concluded that, under the conditions used in the study, FellWalker
 is less likely than CLUMPFIND to split up large clumps, and is less
 likely to create false clump detections. A similar conclusion was reached
-by \cite{2014Christie} for 3-dimensional data. The tendency for CLUMPFIND
-to split sources has also been noted by \cite{2006Enoch}.
+by \citet{2014Christie} for 3-dimensional data. The tendency for CLUMPFIND
+to split sources has also been noted by \citet{2006Enoch}.
 
 An independent illustration of this for 2-dimensional data is presented in
 Fig.~\ref{fig:comp1}, which shows a field of artificial Gaussian clumps,
@@ -676,7 +676,7 @@ two times the noise level for all tests of both algorithms.
 
 The default implementation of CLUMPFIND provided by the Starlink CUPID
 package follows the description of the algorithm contained in
-\cite{1994Williams}. The IDL version of CLUMPFIND distributed by Williams
+\citet{1994Williams}. The IDL version of CLUMPFIND distributed by Williams
 includes some enhancements to the published algorithm. These are also
 available in the CUPID version, but are disabled by default. They were,
 however, enabled for the purposes of the current comparison.
@@ -756,12 +756,12 @@ hope for a gain of unity (\emph{i.e.} the median measured clump data sum
 equalling the expected clump data sum). It can be seen that such a
 condition is typically achieved at a DeltaT value around 10 times the
 noise level, but that the relationship between DeltaT, Gain and RMS is
-quite unpredictable. This supports the findings of \cite{2009Pineda},
+quite unpredictable. This supports the findings of \citet{2009Pineda},
 who found that CLUMPFIND results were very sensitive to the value of DeltaT.
 
-At the DeltaT value of 2.0 recommended by \cite{1994Williams}, all noise
+At the DeltaT value of 2.0 recommended by \citet{1994Williams}, all noise
 levels produce clumps which are well under the expected total data sum,
-supporting the finding of \cite{2010Watson} that CLUMPFIND tends to
+supporting the finding of \citet{2010Watson} that CLUMPFIND tends to
 fragment clumps.
 
 \begin{figure}
