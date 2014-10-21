@@ -523,7 +523,8 @@ outside the clump set to a special ``blank'' value.
 \item[Size1] The size of the clump along pixel axis 1.
 \item[Size2] The size of the clump along pixel axis 2.
 \item[Size3] The size of the clump along pixel axis 3.
-\item[Sum] The total data sum in the clump.
+\item[Sum] The total data sum in the clump (\emph{i.e.} the sum of the
+pixel values within the clump).
 \item[Peak] The peak value in the clump.
 \item[Volume] The total number of pixels falling within the clump.
 \item[Shape] An optional column containing an STC-S description
@@ -617,7 +618,8 @@ by a factor of 5.}
 \end{figure}
 
 If either algorithm splits clumps into several parts, not only will it
-produce too many clumps, but the total data sum in each clump will on
+produce too many clumps, but the total data sum in each clump (\emph{i.e.}
+the sum of the pixel values within the clump) will on
 average be too low. A useful tool for measuring the performance of these
 algorithms is therefore the distribution of the measured total data sum
 in each clump compared to the expected distribution, based on knowledge
