@@ -46,14 +46,18 @@ if( ! $?AST ) then
    setenv AST $STARLINK
 endif
 
+if( ! $?LDFLAGS ) then
+   setenv LDFLAGS ""
+endif
+
 setenv PATH $AST/bin\:$STARLINK/bin\:$PATH
 
 
 # Build the progs
-#gfortran -fno-second-underscore -o regression regression.f -fno-range-check -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -ems` `chr_link`
-gfortran -fno-second-underscore -o plotter plotter.f -fno-range-check -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -pgp -ems` `pgplot_link`
-gfortran -fno-second-underscore -o wcsconverter wcsconverter.f -fno-range-check -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -ems` `chr_link` `err_link`
-gfortran -fno-second-underscore -o simplify simplify.f -fno-range-check -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -ems` `chr_link` `err_link`
+#gfortran -fno-second-underscore -o regression regression.f -fno-range-check $LDFLAGS -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -ems` `chr_link`
+gfortran -fno-second-underscore -o plotter plotter.f -fno-range-check $LDFLAGS -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -pgp -ems` `pgplot_link`
+gfortran -fno-second-underscore -o wcsconverter wcsconverter.f -fno-range-check $LDFLAGS -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -ems` `chr_link` `err_link`
+gfortran -fno-second-underscore -o simplify simplify.f -fno-range-check $LDFLAGS -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -ems` `chr_link` `err_link`
 
 # Run the other test progs
 echo ""
@@ -61,7 +65,7 @@ echo ""
 
 foreach prog (testframeset testchannel testpolymap testcmpmap testlutmap testfitstable testtable teststcschan teststc testspecframe testfitschan testswitchmap testrebin testrebinseq testtrangrid testnormmap testtime testrate testflux testratemap testspecflux testxmlchan testregions testkeymap )
 
-gfortran -fno-second-underscore -w -g -o $prog -g $prog.f -fno-range-check -I$AST/include \
+gfortran -fno-second-underscore -w -g -o $prog -g $prog.f -fno-range-check $LDFLAGS -I$AST/include \
      -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -ems` \
      `psx_link` `prm_link` `chr_link` `err_link`
 
@@ -74,7 +78,7 @@ end
 
 foreach prog (testobject testconvert)
 
-gcc -o $prog $prog.c -I.. -DHAVE_CONFIG_H -L/star/lib `ast_link`
+gcc -o $prog $prog.c -I.. -DHAVE_CONFIG_H $LDFLAGS -L/star/lib `ast_link`
 
 $prog
 rm $prog
