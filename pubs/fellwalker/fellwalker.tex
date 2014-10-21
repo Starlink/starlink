@@ -583,11 +583,18 @@ to split sources has also been noted by \cite{2006Enoch}.
 An independent illustration of this for 2-dimensional data is presented in
 Fig.~\ref{fig:comp1}, which shows a field of artificial Gaussian clumps,
 with the resulting clump assignment arrays produced by FellWalker and
-CLUMPFIND. The input data image is an array of $500\times500$ pixels
-containing 200 circular clumps distributed randomly across the
-image\footnote{Except none are allowed to touch an edge of the image}.
-Each clump has a Gaussian profile with a Full Width at Half Maximum of 15
-pixels. The clump peak values are distributed uniformly between 30 and
+CLUMPFIND\footnote{In cases such as this, where the clumps are known \emph{a
+priori} to be Gaussian in shape, algorithms that assume a Gaussian model
+for each clump - such as the GaussClumps algorithm - will provide a better
+decomposition of merged sources than either FellWalker or CLUMPFIND. However,
+in general the intrinsic shape of each source within a real data array is
+unknown. In such cases, assuming a Gaussian shape is likely to require each
+source to be split into many overlapping Gaussians in order to match a
+real non-Gaussian total source profile.}. The input data image is an array
+of $500\times500$ pixels containing 200 circular clumps distributed randomly
+across the image\footnote{Except none are allowed to touch an edge of the
+image}. Each clump has a Gaussian profile with a Full Width at Half Maximum
+of 15 pixels. The clump peak values are distributed uniformly between 30 and
 100, and Gaussian noise of standard deviation 15 is added to the image.
 Both FellWalker and CLUMPFIND are run with the default parameter values
 supplied by CUPID (\emph{FellWalker.MinDip}=3.RMS,
