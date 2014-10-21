@@ -515,7 +515,7 @@ ERFA_FILES = \
     erfa/zr.c
 
 PAL_FILES = \
-    pal.c \
+    palwrap.c \
     pal.h \
     erfa.h \
     erfam.h
