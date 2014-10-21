@@ -687,10 +687,18 @@ appendix~\ref{app:configs}.
 \subsection{Measuring Performance}
 In each test, the artificial data consists of a collection of identical
 clumps. So the initial expectation is that a reliable clump-finding
-algorithm should produce a set of measured clumps that all have the same
-total data sum, and that this total data sum should be the same as that
-of the artificial clumps. However, this will not be the case in practice
-for two different reasons:
+algorithm should produce a set of measured clumps each of which has the
+same total data sum, and that the total data sum of each measured clump
+should be the same as that of an artificial clump. We refer to the ratio
+of the measured total data sum to the expected total data sum for a
+single clump as the ``gain'' (\emph{i.e.} a measured clump with a gain
+greater than unity has a measured total data sum in excess of the expected
+total data sum). So for an ideal clump-finder we would expect all gains values
+to be unity.
+
+However, this will not be the case in practice for two different reasons
+(excluding the random variations caused by the addition of noise to the
+data):
 
 \begin{enumerate}
 
@@ -707,24 +715,38 @@ tail.
 \item Each algorithm ignores pixel values below a threshold of two times the
 noise level. This means that tests performed at higher noise levels will
 set the threshold higher and so will detect clumps with smaller total
-data sums.
+data sums. See Fig.~\ref{fig:comp5}.
+
+\begin{figure}
+\includegraphics[width=\columnwidth]{comp5}
+\caption{Each panel shows the same noise-free Gaussian curve in green.
+The black curves are created by adding noise to the Gaussian - 0.02 in
+the left panel and 0.1 in the right panel. The red line indicates the two
+sigma threshold below which both FellWalker and CLUMPFIND ignore pixels -
+0.04 on the left and 0.2 on the right. So the total data sum measured by
+both algorithms is the sum of the values above the red line. So it is
+expected that they will measure a lower total data sum in the right hand
+panel because fewer pixels fall above the red line.
+}
+\label{fig:comp5}
+\end{figure}
 
 \end{enumerate}
 
 Whilst it is difficult to quantify the effects of the first of these two
-issues, its impact can be reduced by comparing the expected clump data
-sum with the median of the measured clump data sums rather than the mean.
-This will reduce the influence of the tail of high-valued clump data sums.
+issues, its impact can be reduced by using the median of the individual
+gain values, rather than the mean, as our measure of the performance of each
+algorithm. This will reduce the influence of the tail of high-valued clump
+data sums.
 
-The second issue can be taken into account by thresholding a single artificial
-clump at the two sigma threshold before finding its data sum. So at each
-noise level the sum of the data values in an artificial clump is found,
-excluding pixel below the two sigma threshold. This value is then used as
-the expected value for the total data sum in the clumps measured at the
-same noise level. To simplify this comparison, the ratio of the median of
-the measured clump data sums to the expected clump data sum is used below
-as a measure of the performance of each algorithm. This is referred to as
-the ``gain'' in the following figures.
+The second issue can be taken into account by a small re-definition of
+the gain value. Instead of defining the gain for a clump as the ratio of
+the total data sum measured by FellWalker or CLUMPFIND, to the total data
+sum in an artificial Gaussian source, we define it as the ratio of
+the measured total data sum, to the total data sum \emph{that falls above the
+two sigma threshold} in an artificial Gaussian source. With reference to
+Fig.~\ref{fig:comp5}, we are comparing the measured total data sums to
+the sum of the green values that fall above the red line.
 
 \subsection{CLUMPFIND Results}
 Fig.~\ref{fig:cf_results} shows the ratio of median clump data sum, as

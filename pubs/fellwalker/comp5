@@ -1,0 +1,40 @@
+#!/bin/tcsh
+
+source $KAPPA_DIR/kappa.csh > /dev/null
+
+echo "drawtitle=0" > sty
+echo "colour(textlab)=black" >> sty
+echo "colour(border)=black" >> sty
+echo "colour(ticks)=black" >> sty
+echo "colour(numlab)=black" >> sty
+echo "numlab(1)=0" >> sty
+echo "textlab(1)=0" >> sty
+
+gdset /acps
+gdclear
+picdef mode=a xpic=2 ypic=1 prefix=a nooutline
+
+set nlist = ( 0.01, 0.1 )
+set i = 0
+while( $i < $#nlist )
+   @ i = $i + 1
+   set n = $nlist[$i]
+
+   maths exp="'exp(-(xa/pa)**2)'" type=_REAL lbound=-100 ubound=100 out=g1 pa=30
+   wcsframe g1 pixel
+   creframe lbound=\[-100,1\] ubound=\[100,1\] mode=gn mean=0 sigma=$n out=noise
+   add g1 noise ng1
+   set n2 = `calc "'pa*2'" pa=$n`
+   creframe lbound=\[-100,1\] ubound=\[100,1\] mode=fl mean=$n2 out=flat
+
+   picsel a$i
+   linplot ng1 axes ytop = 1.4 ybot=-0.4 style=^sty
+   linplot noclear tempstyle=\'width=1,colour=green\' g1
+   linplot noclear tempstyle=\'width=2,colour=red\' flat
+
+end
+
+ps2pdf pgplot.ps
+pdfcrop pgplot.pdf comp5.pdf
+
+

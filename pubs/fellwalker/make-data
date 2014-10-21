@@ -112,3 +112,4 @@ rm aa spikes.sdf sp15.sdf sp25.sdf noise.sdf tot.sdf mask.sdf peak2.sdf \
 ./comp4
 ./comp4-3d #  <-- takes a LONG time to run (12 hours?) and generates lots of
            # disk files (47 GB)
+./comp5
