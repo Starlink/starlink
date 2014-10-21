@@ -1,0 +1,127 @@
+1) "As appears to be unknown to the author, the essentials of the FellWalker
+algorithm are identical to those of the watershed transform,
+http://en.wikipedia.org/wiki/Watershed_(image_processing), which is used
+in various fields. In astronomy, it has been used in large-scale
+structure quite widely, both on regular and irregular meshes, for example
+in void (http://adsabs.harvard.edu/abs/2007MNRAS.380..551P ;
+http://adsabs.harvard.edu/abs/2008MNRAS.386.2101N) and dark-matter-halo
+(http://adsabs.harvard.edu/abs/1998ApJ...498..137E;
+http://adsabs.harvard.edu/abs/2005MNRAS.356.1222N) identification. For a
+similar algorithm based on "persistence" and Morse theory, which has
+connections to the watershed transform, see
+http://adsabs.harvard.edu/abs/2011MNRAS.414..350S. A review-like
+discussion can be found in
+http://adsabs.harvard.edu/abs/2014arXiv1406.6111W.
+
+Some discussion of this context should be included, and it should be
+noted if there are any important differences between FellWalker and a
+watershed algorithm that I have missed. It should be noted in the
+abstract that FellWalker is essentially a watershed algorithm, if only
+for it to reach a wider audience of those interested in watershed
+methods."
+
+- Thanks for pointing this out. I have labelled FellWalker as a watershed
+algorithm in the abstract and have added a paragraph to the introduction
+expanding upon this.
+
+
+
+2) "While it is fairly clear that FellWalker represents an improvement over
+CLUMPFIND in several ways, it is not entirely clear from the discussion
+whether or not there are other algorithms used in clump finding that also
+give improvements. Some discussion of other clump finders should be
+given."
+
+- I have included a paragraph in the introduction that mentions some
+other popular approaches to clump-finding, but since the purpose of the
+paper is to document the FellWalker algorithm and to compare it with
+Clumpfind I have not expanded too much on this. Other methods such as
+GaussClumps, dendrograms, getsources, etc, all take very different
+approaches to FellWalker/CLUMPFIND. They are probably to be preferred in
+some cases, but that depends on the science being done. My paper focuses
+on cases where simple image segmentation is what is required.
+
+
+
+
+3) "Sec. 2.2: One method that watershed implementations use to prune
+noise is to use a _ratio_ between a peak and a saddle, e.g. in
+http://adsabs.harvard.edu/abs/2005MNRAS.356.1222N. Does the author
+suspect that that (or a difference, etc. in pixel values) would work as
+well as the "MinDip" criterion, or is MinDip especially suited to the
+type of data being analyzed?"
+
+- The MinDip criterion does in fact do this. It merges clumps if the
+difference between the peak and the neighbouring saddle is below the
+supplied MinDip value.
+
+
+
+
+4) "Figs. 5 and 6 seem to differ by only a couple of pixels, to me. It
+would make sense to somehow indicate any pixels that have changed. Also,
+since the change is so subtle, why not eliminate the "cellular automaton"
+step, for simplicity? Perhaps there are more pathological cases than that
+shown in Fig. 5 that it improves?
+
+- Yes that is the case. The artificial data I use is very smooth and so
+does not benefit much from cleaning, compared to real data. The join
+between the two clumps is largely unaffected by the cleaning, but the
+outer boundaries of the two clumps show the effects more clearly. I've
+changed the wording of the captions to point this out.
+
+
+
+5) "Please define "total data sum." This is simply the sum of the pixel
+values within the structure, correct?
+
+- That's right. I've added words to make this clearer.
+
+
+6) "In Sect. 2.5, a sentence or two describing the STC-S shape parameter
+(and an expansion of the initialism) should be present.
+
+- I've added a brief description of STC-S.
+
+
+
+7) "In the test case of Gaussian mixtures (Figs. 7, 8), the obvious
+method to compare FellWalker to is a Gaussian mixture model. I am not
+asking for this to be implemented and tested, but I suggest the author
+speculate on the advantages and disadvantages of FellWalker compared to
+that. One obvious benefit of FellWalker is that it assumes no fixed
+shape, although a particular algorithm may perform better for Gaussian
+mixtures."
+
+- I have added a footnote to this effect.
+
+
+
+8) "Although in Sect. 3.1, the text says that all the Gaussian sources
+have equal amplitude, that does not appear to be so, by eye. Is that
+because of an improbable number of overlaps, does my eye deceive me, or
+is the text wrong? Fig. 11, on the other hand, does seem to have a set of
+equal, superimposed Gaussians."
+
+- Yes, the clumps shown in Figs 7 and 8 do not all have the same peak
+value, but this is not the data that is used for the later tests. It is
+simply intended as a visual illustration of how clumpfind fragments
+clumps. The data used for the later tests is described in section 3.1,
+but is not shown visually in any of the figures. I've added a footnote to
+emphasis this.
+
+
+
+9) "I find the "gain" quantity, the thing used for quantitative
+comparison in Figs. 9, 10, to be a bit confusing, and should be explained
+further. Why is it called "gain"? This is the total "data sum" in all
+clumps? It may be more useful to look at the "data sum" spectrum, i.e.
+the PDF of "data sum" over clumps, but that would be more difficult to
+view as a function of MaxJump."
+
+- Part of the reason for choosing the "gain" as a measure of performance was
+that it is easily visualised. I have re-worded section 3.3 in order,
+hopefully, to make its meaning clearer.
+
+
+
