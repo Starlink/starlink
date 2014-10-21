@@ -258,6 +258,18 @@ above figure.}
 \label{fig:fellwalking}
 \end{figure}
 
+FellWalker, like CLUMPFIND, segments the supplied data array into a
+number of disjoint regions, each associated with a single significant
+peak. Whilst this approach has been used widely, there are several
+alternative approaches to the problem of identifying clumps of emission
+which can be more appropriate, depending on the particular science being
+performed. For instance, it may be beneficial to allow clumps of emission
+to overlap (\emph{e.g.} GaussClumps \cite[][\ascl{1406.018}]{1990ApJ...356..513S} 
+and GetSources \cite{GetSources}), or to take account of the hierarchical 
+structure within clouds (\emph{e.g.} deprograms \cite{2008Rosolowsky}). However, 
+such issues are outside the remit of the FellWalker algorithm, and consequently 
+this paper provides only a comparison of FellWalker with CLUMPFIND.
+
 \section{The FellWalker Algorithm}
 
 The core of the FellWalker algorithm consists of following many different
