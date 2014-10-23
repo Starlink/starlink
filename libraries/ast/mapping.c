@@ -367,6 +367,9 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *        non-representative behaviour.
 *     25-SEP-2014 (DSB):
 *        Add support for B and UB data types to astRebin and astRebinSeq.
+*     23-OCT-2014 (DSB):
+*        Report an error if arrays have too many pixels to count in a 32
+*        bit int (astTranGrid, astResample, astRebin and astRebinSeq).
 *class--
 */
 
@@ -9748,6 +9751,7 @@ static void Rebin##X( AstMapping *this, double wlim, int ndim_in, \
    int nout;                     /* Number of Mapping output coordinates */ \
    int npix;                     /* Number of pixels in input region */ \
    int npix_out;                 /* Number of pixels in output array */ \
+   int64_t mpix;                 /* Number of pixels for testing */ \
 \
 /* Check the global error status. */ \
    if ( !astOK ) return; \
@@ -9788,6 +9792,7 @@ static void Rebin##X( AstMapping *this, double wlim, int ndim_in, \
 \
 /* Check that the lower and upper bounds of the input grid are \
    consistent. Report an error if any pair is not. */ \
+   mpix = 1; \
    if ( astOK ) { \
       for ( idim = 0; idim < ndim_in; idim++ ) { \
          if ( lbnd_in[ idim ] > ubnd_in[ idim ] ) { \
@@ -9798,8 +9803,17 @@ static void Rebin##X( AstMapping *this, double wlim, int ndim_in, \
             astError( AST__GBDIN, "Error in input dimension %d.", status, \
                       idim + 1 ); \
             break; \
+         } else { \
+            mpix *= ubnd_in[ idim ] - lbnd_in[ idim ] + 1; \
          } \
       } \
+   } \
+\
+/* Report an error if there are too many pixels in the input. */ \
+   if ( astOK && (int) mpix != mpix ) { \
+      astError( AST__EXSPIX, "astRebin"#X"(%s): Supplied input array " \
+                "contains too many pixels (%zu): must be fewer than %d.", \
+                status, astGetClass( this ), mpix, INT_MAX ); \
    } \
 \
 /* Check that the positional accuracy tolerance supplied is valid and \
@@ -9821,6 +9835,7 @@ static void Rebin##X( AstMapping *this, double wlim, int ndim_in, \
 \
 /* Check that the lower and upper bounds of the output grid are \
    consistent. Report an error if any pair is not. */ \
+   mpix = 1; \
    if ( astOK ) { \
       for ( idim = 0; idim < ndim_out; idim++ ) { \
          if ( lbnd_out[ idim ] > ubnd_out[ idim ] ) { \
@@ -9831,11 +9846,21 @@ static void Rebin##X( AstMapping *this, double wlim, int ndim_in, \
             astError( AST__GBDIN, "Error in output dimension %d.", status, \
                       idim + 1 ); \
             break; \
+         } else { \
+            mpix *= ubnd_out[ idim ] - lbnd_out[ idim ] + 1; \
          } \
       } \
    } \
 \
+/* Report an error if there are too many pixels in the output. */ \
+   if ( astOK && (int) mpix != mpix ) { \
+      astError( AST__EXSPIX, "astRebin"#X"(%s): Supplied output array " \
+                "contains too many pixels (%zu): must be fewer than %d.", \
+                status, astGetClass( this ), mpix, INT_MAX ); \
+   } \
+\
 /* Similarly check the bounds of the input region. */ \
+   mpix = 1; \
    if ( astOK ) { \
       for ( idim = 0; idim < ndim_out; idim++ ) { \
          if ( lbnd[ idim ] > ubnd[ idim ] ) { \
@@ -9856,6 +9881,8 @@ static void Rebin##X( AstMapping *this, double wlim, int ndim_in, \
                       "input region (%d) exceeds corresponding " \
                       "bound of input grid (%d).", status, astGetClass( this ), \
                       ubnd[ idim ], ubnd_in[ idim ] ); \
+         } else { \
+            mpix *= ubnd[ idim ] - lbnd[ idim ] + 1; \
          } \
 \
 /* Say which dimension produced the error. */ \
@@ -9865,6 +9892,13 @@ static void Rebin##X( AstMapping *this, double wlim, int ndim_in, \
             break; \
          } \
       } \
+   } \
+\
+/* Report an error if there are too many pixels in the input region. */ \
+   if ( astOK && (int) mpix != mpix ) { \
+      astError( AST__EXSPIX, "astRebin"#X"(%s): Supplied input region " \
+                "contains too many pixels (%zu): must be fewer than %d.", \
+                status, astGetClass( this ), mpix, INT_MAX ); \
    } \
 \
 /* If OK, loop to determine how many input pixels are to be binned. */ \
@@ -11999,6 +12033,7 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
    int nout;                     /* Number of Mapping output coordinates */ \
    int npix;                     /* Number of pixels in input region */ \
    int npix_out;                 /* Number of pixels in output array */ \
+   int64_t mpix;                 /* Number of pixels for testing */ \
 \
 /* Check the global error status. */ \
    if ( !astOK ) return; \
@@ -12049,6 +12084,7 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
 \
 /* Check that the lower and upper bounds of the input grid are \
    consistent. Report an error if any pair is not. */ \
+      mpix = 1; \
       if ( astOK ) { \
          for ( idim = 0; idim < ndim_in; idim++ ) { \
             if ( lbnd_in[ idim ] > ubnd_in[ idim ] ) { \
@@ -12059,8 +12095,17 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
               astError( AST__GBDIN, "Error in input dimension %d.", status, \
                         idim + 1 ); \
               break; \
+            } else { \
+               mpix *= ubnd_in[ idim ] - lbnd_in[ idim ] + 1; \
             } \
          } \
+      } \
+\
+/* Report an error if there are too many pixels in the input. */ \
+      if ( astOK && (int) mpix != mpix ) { \
+         astError( AST__EXSPIX, "astRebinSeq"#X"(%s): Supplied input array " \
+                   "contains too many pixels (%zu): must be fewer than %d.", \
+                   status, astGetClass( this ), mpix, INT_MAX ); \
       } \
 \
 /* Ensure any supplied "in_var" pointer is ignored if no input variances are \
@@ -12094,6 +12139,7 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
 \
 /* Check that the lower and upper bounds of the output grid are \
    consistent. Report an error if any pair is not. */ \
+      mpix = 1; \
       if ( astOK ) { \
          for ( idim = 0; idim < ndim_out; idim++ ) { \
             if ( lbnd_out[ idim ] > ubnd_out[ idim ] ) { \
@@ -12104,11 +12150,21 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
                astError( AST__GBDIN, "Error in output dimension %d.", status, \
                          idim + 1 ); \
                break; \
+            } else { \
+               mpix *= ubnd_out[ idim ] - lbnd_out[ idim ] + 1; \
             } \
          } \
       } \
 \
+/* Report an error if there are too many pixels in the output. */ \
+   if ( astOK && (int) mpix != mpix ) { \
+      astError( AST__EXSPIX, "astRebinSeq"#X"(%s): Supplied output array " \
+                "contains too many pixels (%zu): must be fewer than %d.", \
+                status, astGetClass( this ), mpix, INT_MAX ); \
+   } \
+\
 /* Similarly check the bounds of the input region. */ \
+      mpix = 1; \
       if ( astOK ) { \
          for ( idim = 0; idim < ndim_in; idim++ ) { \
             if ( lbnd[ idim ] > ubnd[ idim ] ) { \
@@ -12129,6 +12185,8 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
                          "input region (%d) exceeds corresponding " \
                          "bound of input grid (%d).", status, astGetClass( this ), \
                          ubnd[ idim ], ubnd_in[ idim ] ); \
+            } else { \
+               mpix *= ubnd[ idim ] - lbnd[ idim ] + 1; \
             } \
 \
 /* Say which dimension produced the error. */ \
@@ -12138,6 +12196,13 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
                break; \
             } \
          } \
+      } \
+\
+/* Report an error if there are too many pixels in the input region. */ \
+      if ( astOK && (int) mpix != mpix ) { \
+         astError( AST__EXSPIX, "astRebinSeq"#X"(%s): Supplied input region " \
+                   "contains too many pixels (%zu): must be fewer than %d.", \
+                   status, astGetClass( this ), mpix, INT_MAX ); \
       } \
 \
 /* Check that only one of AST__USEVAR and ASR__GENVAR has been supplied. */ \
@@ -13841,6 +13906,7 @@ static int Resample##X( AstMapping *this, int ndim_in, \
    int nout;                     /* Number of Mapping output coordinates */ \
    int npix;                     /* Number of pixels in output region */ \
    int result;                   /* Result value to return */ \
+   int64_t mpix;                 /* Number of pixels for testing */ \
 \
 /* Initialise. */ \
    result = 0; \
@@ -13883,7 +13949,9 @@ static int Resample##X( AstMapping *this, int ndim_in, \
    } \
 \
 /* Check that the lower and upper bounds of the input grid are \
-   consistent. Report an error if any pair is not. */ \
+   consistent. Report an error if any pair is not. Also get the number \
+   of pixels in the input grid. */ \
+   mpix = 1; \
    if ( astOK ) { \
       for ( idim = 0; idim < ndim_in; idim++ ) { \
          if ( lbnd_in[ idim ] > ubnd_in[ idim ] ) { \
@@ -13894,8 +13962,17 @@ static int Resample##X( AstMapping *this, int ndim_in, \
             astError( AST__GBDIN, "Error in input dimension %d.", status, \
                       idim + 1 ); \
             break; \
+         } else { \
+            mpix *= ubnd_in[ idim ] - lbnd_in[ idim ] + 1; \
          } \
       } \
+   } \
+\
+/* Report an error if there are too many pixels in the input. */ \
+   if ( astOK && (int) mpix != mpix ) { \
+      astError( AST__EXSPIX, "astResample"#X"(%s): Supplied input array " \
+                "contains too many pixels (%zu): must be fewer than %d.", \
+                status, astGetClass( this ), mpix, INT_MAX ); \
    } \
 \
 /* Check that the positional accuracy tolerance supplied is valid and \
@@ -13916,7 +13993,9 @@ static int Resample##X( AstMapping *this, int ndim_in, \
    } \
 \
 /* Check that the lower and upper bounds of the output grid are \
-   consistent. Report an error if any pair is not. */ \
+   consistent. Report an error if any pair is not. Also get the \
+   number of pixels in the output array. */ \
+   mpix = 1; \
    if ( astOK ) { \
       for ( idim = 0; idim < ndim_out; idim++ ) { \
          if ( lbnd_out[ idim ] > ubnd_out[ idim ] ) { \
@@ -13927,11 +14006,21 @@ static int Resample##X( AstMapping *this, int ndim_in, \
             astError( AST__GBDIN, "Error in output dimension %d.", status, \
                       idim + 1 ); \
             break; \
+         } else { \
+            mpix *= ubnd_out[ idim ] - lbnd_out[ idim ] + 1; \
          } \
       } \
    } \
 \
+/* Report an error if there are too many pixels in the output. */ \
+   if ( astOK && (int) mpix != mpix ) { \
+      astError( AST__EXSPIX, "astResample"#X"(%s): Supplied output array " \
+                "contains too many pixels (%zu): must be fewer than %d.", \
+                status, astGetClass( this ), mpix, INT_MAX ); \
+   } \
+\
 /* Similarly check the bounds of the output region. */ \
+   mpix = 1; \
    if ( astOK ) { \
       for ( idim = 0; idim < ndim_out; idim++ ) { \
          if ( lbnd[ idim ] > ubnd[ idim ] ) { \
@@ -13952,6 +14041,8 @@ static int Resample##X( AstMapping *this, int ndim_in, \
                       "output region (%d) exceeds corresponding " \
                       "bound of output grid (%d).", status, astGetClass( this ), \
                       ubnd[ idim ], ubnd_out[ idim ] ); \
+         } else { \
+            mpix *= ubnd[ idim ] - lbnd[ idim ] + 1; \
          } \
 \
 /* Say which dimension produced the error. */ \
@@ -13961,6 +14052,13 @@ static int Resample##X( AstMapping *this, int ndim_in, \
             break; \
          } \
       } \
+   } \
+\
+/* Report an error if there are too many pixels in the output region. */ \
+   if ( astOK && (int) mpix != mpix ) { \
+      astError( AST__EXSPIX, "astResample"#X"(%s): Supplied output region " \
+                "contains too many pixels (%zu): must be fewer than %d.", \
+                status, astGetClass( this ), mpix, INT_MAX ); \
    } \
 \
 /* If we are conserving flux, check "tol" is not zero. */ \
@@ -20216,6 +20314,7 @@ f     be reversed.
    int coord;                    /* Loop counter for coordinates */
    int idim;                     /* Loop counter for coordinate dimensions */
    int npoint;                   /* Number of points in the grid */
+   int64_t mpix;                 /* Number of points for testing */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -20226,7 +20325,7 @@ f     be reversed.
 /* Calculate the number of points in the grid, and check that the lower and
    upper bounds of the input grid are consistent. Report an error if any
    pair is not. */
-   npoint = 1;
+   mpix = 1;
    for ( idim = 0; idim < ncoord_in; idim++ ) {
       if ( lbnd[ idim ] > ubnd[ idim ] ) {
          astError( AST__GBDIN, "astTranGrid(%s): Lower bound of "
@@ -20237,9 +20336,25 @@ f     be reversed.
                    idim + 1 );
          break;
       } else {
-         npoint *= ubnd[ idim ] - lbnd[ idim ] + 1;
+         mpix *= ubnd[ idim ] - lbnd[ idim ] + 1;
       }
    }
+
+/* Report an error if there are too many pixels in the input. */
+   npoint = mpix;
+   if ( astOK && npoint != mpix ) {
+      astError( AST__EXSPIX, "astTranGrid(%s): Supplied grid "
+                "contains too many points (%zu): must be fewer than %d.",
+                status, astGetClass( this ), mpix, INT_MAX/ncoord_out );
+   }
+
+   mpix = outdim*ncoord_out;
+   if ( astOK && (int) mpix != mpix ) {
+      astError( AST__EXSPIX, "astTranGrid(%s): Supplied output array "
+                "contains too many pixels (%zu): must be fewer than %d.",
+                status, astGetClass( this ), mpix, INT_MAX );
+   }
+
 
 /* Validate the mapping and numbers of points/coordinates. */
    ValidateMapping( this, forward, npoint, ncoord_in, ncoord_out,

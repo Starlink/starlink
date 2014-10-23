@@ -199,4 +199,7 @@ MIRRO           <Attempt to add a variant Mapping to a mirror Frame>
 ! New codes introduced for V8.0
 MNPCK           <Error in cminpack Levenberg-Marquardt code>
 
+! New codes introduced for V8.0.3
+EXSPIX          <Supplied array has too many pixels>
+
 .END
