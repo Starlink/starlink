@@ -5042,6 +5042,24 @@ Ultrix and for SunOS and may still work for them.
   <bugreports>starlink@jiscmail.ac.uk</bugreports>
 </component>
 
+<component id="hdf5" support="U">
+  <version>1.8.13</version>
+  <path>thirdparty/hdfgroup/hdf5</path>
+  <description>Hierarchical Data Format version 5</description>
+  <dependencies >
+    
+  </dependencies>
+  <developers>
+    <person>
+      <name>Tim Jenness</name>
+      <uname>timj</uname>
+      <email>stardev@jiscmail.ac.uk</email>
+      <role>owner</role>
+    </person>
+  </developers>
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
+</component>
+
 <component id="cfitsio" support="U">
   <version>3.39</version>
   <path>thirdparty/heasarc/cfitsio</path>

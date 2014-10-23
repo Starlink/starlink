@@ -163,3 +163,6 @@
 [submodule "libext/ast"]
 	path = libext/ast
 	url = ../ast.git
+[submodule "thirdparty/hdfgroup/hdf5/hdf5"]
+	path = thirdparty/hdfgroup/hdf5/hdf5
+	url = https://github.com/Starlink/hdf5.git

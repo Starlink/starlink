@@ -1198,6 +1198,10 @@ $(MANIFESTS)/gwm: \
 	cd libraries/gwm \
 	  && $(MAKE_CPT)
 
+$(MANIFESTS)/hdf5:
+	cd thirdparty/hdfgroup/hdf5 \
+	  && $(MAKE_CPT)
+
 $(MANIFESTS)/hds: \
 		$(MANIFESTS)/chr \
 		$(MANIFESTS)/cnf \

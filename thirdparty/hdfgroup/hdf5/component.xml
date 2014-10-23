@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="hdf5" support="U">
+  <version>1.8.13</version>
+  <path>thirdparty/hdfgroup/hdf5</path>
+  <description>Hierarchical Data Format version 5</description>
+  <!-- <abstract><p></p></abstract> -->
+  <dependencies >
+    
+  </dependencies>
+  <developers>
+    <!-- FFTW is maintained by hdfgroup.org, but we take the call first-->
+    <person>
+      <name>Tim Jenness</name>
+      <uname>timj</uname>
+      <email>stardev@jiscmail.ac.uk</email>
+      <role>owner</role>
+    </person>
+  </developers>
+  <!-- <documentation></documentation> -->
+  <bugreports>starlink@jiscmail.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
