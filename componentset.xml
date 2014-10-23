@@ -465,7 +465,7 @@ proposal, or before or during an observing run.
 </component>
 
 <component id="extractor" support="S">
-  <version>2.5-1</version>
+  <version>2.19-5</version>
   <path>applications/extractor</path>
   <description>EXTRACTOR - An Astronomical Source Detection Program</description>
   <abstract><p>
@@ -867,7 +867,7 @@ Traces an HDS file
 </component>
 
 <component id="kappa" support="S">
-  <version>2.1-12</version>
+  <version>2.2</version>
   <path>applications/kappa</path>
   <description>KAPPA - Kernel Application Package</description>
   <abstract><p>
@@ -4841,7 +4841,7 @@ to handle data from a variety of different instruments.
 </component>
 
 <component id="pal" support="S">
-  <version>0.5.0</version>
+  <version>0.7.0</version>
   <path>libext/pal</path>
   <description>Positional Astronomy Library</description>
   <abstract><p>
@@ -4960,7 +4960,7 @@ to handle data from a variety of different instruments.
 </component>
 
 <component id="ast" support="S">
-  <version>8.0.0</version>
+  <version>8.0.3</version>
   <path>libraries/ast</path>
   <description>WCS library</description>
   <abstract>
@@ -6521,7 +6521,7 @@ Ultrix and for SunOS and may still work for them.
 </component>
 
 <component id="xerces-c" support="U">
-  <version>3.0.1</version>
+  <version>3.1.1</version>
   <path>thirdparty/apache/xerces-c</path>
   <description>Apache Xerces-c library for parsing XML</description>
   <dependencies >
@@ -6733,7 +6733,7 @@ Ultrix and for SunOS and may still work for them.
 </component>
 
 <component id="cfitsio" support="U">
-  <version>3.36</version>
+  <version>3.37</version>
   <path>thirdparty/heasarc/cfitsio</path>
   <description>CFITSIO -- C and Fortran libraries for access to FITS files
         </description>
@@ -6916,7 +6916,7 @@ documents to hypertext.
 </component>
 
 <component id="match" support="U">
-  <version>0.10-0</version>
+  <version>0.16-0</version>
   <path>thirdparty/rit/match</path>
   <description>MATCH</description>
   <abstract><p>
@@ -6999,7 +6999,7 @@ and some distortion.
 </component>
 
 <component id="tcl" support="U">
-  <version>8.5.15</version>
+  <version>8.5.16</version>
   <path>thirdparty/tclsys/tcl</path>
   <description>The Tcl system</description>
   <dependencies >
@@ -7073,7 +7073,7 @@ and some distortion.
 </component>
 
 <component id="tk" support="U">
-  <version>8.5.15</version>
+  <version>8.5.16</version>
   <path>thirdparty/tclsys/tk</path>
   <description>The Tk system</description>
   <dependencies >
