@@ -1271,7 +1271,7 @@ static vtkFollower *CreateVectorText( const char *text, float ref[3],
 
     /*  Set mapper and add text to it. */
     prop->SetMapper( mapper );
-    mapper->SetInputData( vtext->GetOutput() );
+    mapper->SetInputConnection( vtext->GetOutputPort() );
 
     /* Set the text properties. */
     vtkProperty *property = vtkProperty::New();
@@ -1284,6 +1284,7 @@ static vtkFollower *CreateVectorText( const char *text, float ref[3],
     property->SetAmbient( 10.0 );
 
     /* Do the positioning... */
+    mapper->Update();
 
     /* Calculate the rotation of text plane. */
     double orient[3];
