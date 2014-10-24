@@ -407,8 +407,6 @@ if (!_ok(*status))\
       int hds1_get_subs( int ndim, HDS_PTYPE *dims, INT_BIG offset,
                          HDS_PTYPE  *subs );
 
-      int dat1_import_floc ( const char flocator[DAT__SZLOC],
-			      int loc_length, HDSLoc *clocator,
-			      int * status);
+      HDSLoc * dat1_import_floc ( const char flocator[DAT__SZLOC], int loc_length, int * status);
 
 #endif

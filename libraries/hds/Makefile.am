@@ -25,7 +25,7 @@ libhdsf_la_SOURCES = \
 	$(F_C_ROUTINES) \
 	$(BLOCK_DATA_FILES)
 
-libhdsf_la_LIBADD = `ems_link`
+libhdsf_la_LIBADD = `ems_link` `one_link`
 
 # Make all library code position independent. This is handy for creating
 # shareable libraries from the static ones (Java JNI libraries).

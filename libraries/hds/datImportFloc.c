@@ -7,7 +7,6 @@
 #include <string.h>
 
 #include "ems.h"
-#include "star/mem.h"
 
 #include "hds1.h"
 #include "rec.h"
@@ -23,37 +22,37 @@
  *    datImportFloc
 
  *  Purpose:
- *    Import a Fortran HDS locator buffer into C with malloc
+ *    Import a Fortran HDS locator buffer into C
 
  *  Invocation:
  *    datImportFloc( const char flocator[DAT__SZLOC], int loc_length, HDSLoc **clocator, int * status);
 
  *  Description:
  *    This function should be used to convert a Fortran HDS locator
- *    (implemented as a string buffer) to a C locator struct. The C locator
- *    is malloced by this routine. The memory will be freed when datAnnul
- *    is called. This function is also available via the
+ *    (implemented as a string buffer) to a C locator struct.
+ *    This function is also available via the
  *    HDS_IMPORT_FLOCATOR macro defined in hds_fortran.h.
 
  *  Arguments
- *    const char flocator[DAT__SZLOC] = Given
+ *    flocator = const char [DAT__SZLOC] (Given)
  *       Fortran character string buffer. Should be at least DAT__SZLOC
  *       characters long.
- *    int loc_length = Given
+ *    loc_length = int (Given)
  *       Size of Fortran character buffer. Sanity check.
- *    HDSLoc ** clocator = Returned
- *       Fills the HDSLoc struct with the contents of the fortran buffer.
- *       Locator struct is malloced by this routine and should be freed
- *       either with dat1_free_hdsloc or dat1_export_loc. *clocator must
- *       be NULL on entry. If status is set by this routine, the struct
- *       will not be malloced on return.
- *    int *status = Given and Returned
+ *       Should be DAT__SZLOC.
+ *    clocator = HDSLoc ** (Returned)
+ *       Assigned to the C version of the Fortran locator.
+ *       Must be NULL on entry. Memory is not allocated by this routine
+ *       and the locator must not be annulled whilst the Fortran
+ *       locator is still being used.
+ *    status = int * (Given and Returned)
  *       Inherited status. Attempts to excecute even if status is not SAI__OK
  *       on entry.
 
  *  Authors:
  *    Tim Jenness (JAC, Hawaii)
  *    David Berry (JAC, Preston)
+ *    Tim Jenness (Cornell)
 
  *  History:
  *    16-NOV-2005 (TIMJ):
@@ -73,19 +72,27 @@
  *    22-OCT-2010 (DSB):
  *      Return a NULL pointer without error if the supplied pointer is
  *      DAT__NOLOC.
+ *    2014-09-07 (TIMJ):
+ *      Complete rewrite. No long allocate and memcpy, just extract the
+ *      pointer directly from the buffer.
 
  *  Notes:
- *    - A NULL pointer is returne dif the supplied locator is DAT__NOLOC.
- *    - Does not check the contents of the locator for validity.
+ *    - A NULL pointer is returned if the supplied locator is DAT__NOLOC.
+ *    - Does check the contents of the locator for validity to avoid
+ *      uncertainty when receiving uninitialized memory.
  *    - The expectation is that this routine is used solely for C
  *      interfaces to Fortran library routines.
+ *    - The locator returned by this routine has not been allocated
+ *      independently. It is the same locator tracked by the Fortran
+ *      layer. Do not annul this locator if the Fortran layer is still
+ *      tracking it.
 
  *  See Also:
  *    - datExportFloc
 
  *  Copyright:
-*     Copyright (C) 2010 Science & Technology Facilities Council.
-*     All Rights Reserved.
+ *    Copyright (C) 2014 Cornell University.
+ *    Copyright (C) 2010 Science & Technology Facilities Council.
  *    Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
  *    All Rights Reserved.
 
@@ -124,22 +131,22 @@ void datImportFloc ( const char flocator[DAT__SZLOC], int loc_length, HDSLoc ** 
     return;
   }
 
-/* Return the NULL pointer unchanged if the supplied locator is DAT__NOLOC. */
+  /* For these HDS/HDF5 locators that are either hex pointers or "<xxx_xxx>" strings
+     we can validate them immediately */
+  if (flocator[0] != '0' && flocator[0] != '<') {
+    if (*status == DAT__OK) {
+      char flocstr[DAT__SZLOC+1];
+      *status = DAT__WEIRD;
+      memmove( flocstr, flocator, DAT__SZLOC);
+      emsRepf( "datImportFloc_2",
+               "datImportFloc: Supplied Fortran locator looks to be corrupt: '%s'",
+               status, flocstr );
+    }
+    return;
+  }
+
+  /* Return the NULL pointer unchanged if the supplied locator is DAT__NOLOC. */
   if( strncmp( DAT__NOLOC, flocator, loc_length ) ) {
-
-  /* See if we need to allocate memory for the locator struct */
-  /* Allocate some memory to hold the C structure */
-
-     *clocator = MEM_MALLOC( sizeof( struct LOC ) );
-
-     if (*clocator == NULL ) {
-       if( *status == DAT__OK ) {
-          *status = DAT__NOMEM;
-          emsRep( "datImportFloc", "datImportFloc: No memory for C locator struct",
-                  status);
-       }
-       return;
-     }
 
      /* Now import the Fortran locator - this will work even if status
         is bad on entry but it is possible for this routine to set status
@@ -148,10 +155,8 @@ void datImportFloc ( const char flocator[DAT__SZLOC], int loc_length, HDSLoc ** 
         HDS locator. */
      emsMark();
      lstat = DAT__OK;
-     dat1_import_floc( flocator, loc_length, *clocator, &lstat);
+     *clocator = dat1_import_floc( flocator, loc_length, &lstat);
      if (lstat != DAT__OK) {
-       /* free the memory and trigger a NULL pointer */
-       dat1_free_hdsloc( clocator );
 
        /* Annul all this if status was already bad, since we do not
           want the extra meaningless messages on the stack. If status
