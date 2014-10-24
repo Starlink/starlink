@@ -231,9 +231,6 @@ itcl::class ::gaia3d::Gaia3dVtkSegmenter {
    #  and scalar ranges.
    protected method get_dataminmax_ {} {
       if { ! $read_imagedata_ } {
-         #  Make sure imagedata is available.
-         $imagedata Update
-         lassign [$imagedata GetScalarRange] smin smax
 
          #  Lower value is usually BAD, so assume 0, or need to visit the raw cube.
          set dmin_ 0

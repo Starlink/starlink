@@ -217,13 +217,8 @@ itcl::class ::gaia3d::Gaia3dVtkPrism {
    #  The render window (a Gaia3dVtkWindow instance).
    public variable renwindow {}
 
-   #  The current vtkImageData instance. Make sure extent information is
-   #  available.
-   public variable dataset {} {
-      if { $dataset != {} } {
-         $dataset Update
-      }
-   }
+   #  The current vtkImageData instance.
+   public variable dataset {}
 
    #  The extrusion axis.
    public variable axis 3 {}

@@ -274,13 +274,8 @@ itcl::class ::gaia3d::Gaia3dVtkLine {
    #  The render window (a Gaia3dVtkWindow instance).
    public variable renwindow {}
 
-   #  The current vtkImageData instance. Make sure extent information is
-   #  available.
-   public variable dataset {} {
-      if { $dataset != {} } {
-         #$dataset Update
-      }
-   }
+   #  The current vtkImageData instance.
+   public variable dataset {}
 
    #  Whether to keep line within dataset bounds.
    public variable clip_to_bounds 1
