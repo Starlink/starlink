@@ -1014,7 +1014,7 @@ static int vtkG3DTxExt( const char *text, float ref[3], const char *just,
     vtkPolyDataMapper *mapper = vtkPolyDataMapper::New();
     vtkFollower *prop = vtkFollower::New();
     prop->SetMapper( mapper );
-    mapper->SetInput( vtext->GetOutput() );
+    mapper->SetInputData( vtext->GetOutput() );
 
     double *bbox = prop->GetBounds();
     vtext->Delete();
@@ -1195,7 +1195,7 @@ static void CreatePolyObjects( void )
 
     /*  Set mapper and add polyData to it. */
     prop->SetMapper( mapper );
-    mapper->SetInput( currentGC->polyData );
+    mapper->SetInputData( currentGC->polyData );
 
     /*  Record in assembly for tidying up later. */
     currentGC->assembly->AddPart( prop );
@@ -1271,7 +1271,7 @@ static vtkFollower *CreateVectorText( const char *text, float ref[3],
 
     /*  Set mapper and add text to it. */
     prop->SetMapper( mapper );
-    mapper->SetInput( vtext->GetOutput() );
+    mapper->SetInputData( vtext->GetOutput() );
 
     /* Set the text properties. */
     vtkProperty *property = vtkProperty::New();
@@ -1536,11 +1536,11 @@ static void CreateMarkerObjects( void )
     currentGC->markerGlyph = vtkProgrammableGlyphFilter::New();
 
     /*  Colour markers with markersInfo (see above). */
-    currentGC->markerGlyph->SetInput( markerPolyData );
+    currentGC->markerGlyph->SetInputData( markerPolyData );
 
     /*  Define the marker source and the function used to generate the various
      *  sources (polydata). */
-    currentGC->markerGlyph->SetSource( currentGC->markerSquad->GetOutput() );
+    currentGC->markerGlyph->SetSourceData( currentGC->markerSquad->GetOutput() );
     currentGC->markerGlyph->SetGlyphMethod( Grf3dMarkerGlyphFactory, NULL );
 
     /*  Map the glyphs. */

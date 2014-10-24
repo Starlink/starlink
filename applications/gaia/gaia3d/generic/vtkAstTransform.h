@@ -46,7 +46,7 @@ extern "C" {
 #include <ast.h>
 }
 
-class VTK_COMMON_EXPORT vtkAstTransform : public vtkWarpTransform
+class VTKCOMMONTRANSFORMS_EXPORT vtkAstTransform : public vtkWarpTransform
 {
  public:
     static vtkAstTransform *New();
